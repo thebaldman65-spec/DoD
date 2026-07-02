@@ -81,11 +81,11 @@ func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
 
 func _build_bars() -> void:
 	var bar_y := 62.0
-	add_child(_make_bar_bg(Vector2(-31, bar_y), Vector2(62, 7)))
-	_hp_fill = _make_fill(Vector2(-30, bar_y + 1), Vector2(60, 5), Color(0.30, 0.78, 0.32))
+	add_child(_make_bar_bg(Vector2(-42, bar_y), Vector2(84, 11)))
+	_hp_fill = _make_fill(Vector2(-41, bar_y + 1), Vector2(82, 9), Color(0.30, 0.78, 0.32))
 	add_child(_hp_fill)
-	add_child(_make_bar_bg(Vector2(-31, bar_y + 9), Vector2(62, 5)))
-	_pressure_fill = _make_fill(Vector2(-30, bar_y + 10), Vector2(60, 3), Color(0.75, 0.35, 0.95))
+	add_child(_make_bar_bg(Vector2(-42, bar_y + 13), Vector2(84, 10)))
+	_pressure_fill = _make_fill(Vector2(-41, bar_y + 14), Vector2(82, 8), Color(0.80, 0.35, 1.0))
 	add_child(_pressure_fill)
 
 	var name_label := Label.new()
@@ -100,7 +100,7 @@ func _build_bars() -> void:
 	_status_label = Label.new()
 	_status_label.add_theme_font_size_override("font_size", 12)
 	_status_label.add_theme_color_override("font_color", Color(0.85, 0.4, 1.0))
-	_status_label.position = Vector2(-40, 78)
+	_status_label.position = Vector2(-40, 88)
 	_status_label.size = Vector2(80, 14)
 	_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(_status_label)
@@ -123,8 +123,11 @@ func _make_fill(pos: Vector2, bar_size: Vector2, color: Color) -> ColorRect:
 
 
 func refresh_bars() -> void:
-	_hp_fill.size.x = 60.0 * clampf(hp / float(max_hp), 0.0, 1.0)
-	_pressure_fill.size.x = 60.0 * clampf(pressure / float(stability), 0.0, 1.0)
+	_hp_fill.size.x = 82.0 * clampf(hp / float(max_hp), 0.0, 1.0)
+	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
+	_pressure_fill.size.x = 82.0 * pressure_ratio
+	# Shifts toward hot pink as the unit gets close to Breaking.
+	_pressure_fill.color = Color(0.80, 0.35, 1.0).lerp(Color(1.0, 0.25, 0.55), pressure_ratio)
 	_status_label.text = "BROKEN" if broken else ""
 
 

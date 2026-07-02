@@ -455,7 +455,7 @@ func _run_skill_check() -> String:
 
 func _process(delta: float) -> void:
 	if sc_active:
-		sc_pos += sc_dir * delta / 0.9
+		sc_pos += sc_dir * delta / 0.72
 		if sc_pos >= 1.0:
 			sc_pos = 1.0
 			sc_dir = -1.0
