@@ -16,9 +16,13 @@ const GOOD_HALF := 0.16
 const STATUS_INFO := {
 	"slow": ["Slow", "S", Color(0.5, 0.75, 1.0), "-25% speed; turns arrive later."],
 	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Takes 6 damage at the start of each turn."],
+	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Takes 5 damage at the start of each turn."],
 	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-30% armor."],
 	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4), "Takes 50% less Pressure."],
 }
+
+# Damage-over-time statuses ticked at the start of the afflicted unit's turn.
+const DOT_STATUSES := {"burn": 6, "bleed": 5}
 
 var heroes: Array = []
 var enemies: Array = []
@@ -30,6 +34,8 @@ var message_label: Label
 var action_panel: PanelContainer
 var action_box: HBoxContainer
 var active_marker: Label
+
+var history: RichTextLabel
 
 var sc_root: Control
 var sc_cursor: ColorRect
@@ -50,14 +56,22 @@ func _ready() -> void:
 
 func _build_arena() -> void:
 	var bg := ColorRect.new()
-	bg.size = Vector2(1280, 720)
+	bg.position = Vector2(-200, -100)
+	bg.size = Vector2(1680, 920)
 	bg.color = Color(0.09, 0.07, 0.11)
 	add_child(bg)
 	var floor_rect := ColorRect.new()
-	floor_rect.position = Vector2(0, 340)
-	floor_rect.size = Vector2(1280, 380)
+	floor_rect.position = Vector2(-200, 340)
+	floor_rect.size = Vector2(1680, 560)
 	floor_rect.color = Color(0.13, 0.10, 0.14)
 	add_child(floor_rect)
+	# Zoomed camera so the combatants fill more of the screen (UI is on a
+	# CanvasLayer and unaffected).
+	var cam := Camera2D.new()
+	cam.position = Vector2(615, 450)
+	cam.zoom = Vector2(1.2, 1.2)
+	add_child(cam)
+	cam.make_current()
 
 
 func _spawn_units() -> void:
@@ -86,17 +100,18 @@ func _spawn_units() -> void:
 	enemies.append(_make_unit({
 		"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
 		"max_hp": 110, "armor": 0.15, "speed": 90.0, "stability": 50,
-		"abilities": _orc_kit(17, 26),
+		"abilities": _orc_raider_kit(),
 	}, Vector2(900, 400), Color.WHITE))
 	enemies.append(_make_unit({
 		"unit_name": "Orc Chief", "is_hero": false, "sheet_dir": orc,
 		"max_hp": 190, "armor": 0.20, "speed": 80.0, "stability": 70,
-		"abilities": _orc_kit(24, 34), "sprite_scale": 2.8,
+		"resource_name": "Rage", "resource": 0, "max_resource": 100,
+		"abilities": _orc_chief_kit(), "sprite_scale": 2.8,
 	}, Vector2(1050, 510), Color(1.0, 0.75, 0.7)))
 	enemies.append(_make_unit({
 		"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
 		"max_hp": 110, "armor": 0.15, "speed": 90.0, "stability": 50,
-		"abilities": _orc_kit(17, 26),
+		"abilities": _orc_raider_kit(),
 	}, Vector2(940, 630), Color.WHITE))
 
 	for u in heroes + enemies:
@@ -166,12 +181,25 @@ func _cleric_kit() -> Array:
 	]
 
 
-func _orc_kit(light_dmg: int, heavy_dmg: int) -> Array:
+func _orc_raider_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Slash", "damage": light_dmg, "pressure": 10,
+		Ability.make({"display_name": "Slash", "damage": 17, "pressure": 10,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Smash", "damage": heavy_dmg, "pressure": 16,
-			"delay": 4.0, "anim": "attack02"}),
+		Ability.make({"display_name": "Jagged Cut", "damage": 12, "pressure": 8,
+			"delay": 2.5, "anim": "attack02",
+			"applies_status": {"id": "bleed", "turns": 3}, "status_chance": 0.6}),
+	]
+
+
+# The Chief fights like a weaker Warrior: builds Rage, spends it on heavy hits.
+func _orc_chief_kit() -> Array:
+	return [
+		Ability.make({"display_name": "Strike", "damage": 14, "pressure": 10,
+			"resource_gain": 15, "delay": 2.0, "anim": "attack01"}),
+		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 28,
+			"pressure": 16, "delay": 4.0, "anim": "attack02"}),
+		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 17,
+			"pressure": 24, "delay": 4.0, "anim": "attack02"}),
 	]
 
 
@@ -202,6 +230,17 @@ func _build_ui() -> void:
 	action_box.add_theme_constant_override("separation", 10)
 	action_panel.add_child(action_box)
 	action_panel.visible = false
+
+	var history_panel := PanelContainer.new()
+	history_panel.position = Vector2(968, 8)
+	history_panel.self_modulate = Color(1, 1, 1, 0.85)
+	ui.add_child(history_panel)
+	history = RichTextLabel.new()
+	history.bbcode_enabled = true
+	history.scroll_following = true
+	history.custom_minimum_size = Vector2(300, 190)
+	history.add_theme_font_size_override("normal_font_size", 12)
+	history_panel.add_child(history)
 
 	active_marker = Label.new()
 	active_marker.text = "▼"
@@ -267,6 +306,11 @@ func _message(text: String) -> void:
 	message_label.text = text
 
 
+# Appends one line to the battle history panel.
+func _log(text: String, color := "#d8d2c4") -> void:
+	history.append_text("[color=%s]%s[/color]\n" % [color, text])
+
+
 func _rebuild_turn_bar() -> void:
 	for child in turn_bar.get_children():
 		child.queue_free()
@@ -283,13 +327,13 @@ func _rebuild_turn_bar() -> void:
 		var slot := VBoxContainer.new()
 		var portrait := TextureRect.new()
 		portrait.texture = u.portrait()
-		portrait.custom_minimum_size = Vector2(42, 42)
+		portrait.custom_minimum_size = Vector2(48, 64)
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		portrait.flip_h = not u.is_hero
 		slot.add_child(portrait)
 		var stripe := ColorRect.new()
-		stripe.custom_minimum_size = Vector2(42, 4)
+		stripe.custom_minimum_size = Vector2(48, 4)
 		stripe.color = Color(0.35, 0.8, 0.4) if u.is_hero else Color(0.85, 0.3, 0.3)
 		slot.add_child(stripe)
 		turn_bar.add_child(slot)
@@ -309,17 +353,24 @@ func _run_battle() -> void:
 			break
 		active_marker.visible = true
 		active_marker.position = u.position + Vector2(-11, -130)
-		if u.has_status("burn"):
-			var burned_out: bool = u.take_tick_damage(6, "-6 Burn", STATUS_INFO["burn"][2])
-			await _wait(0.5)
-			if burned_out:
-				_message("%s burns away!" % u.unit_name)
-				_check_end()
-				continue
+		for dot_id in DOT_STATUSES:
+			if u.has_status(dot_id) and not u.dead:
+				var dot_dmg: int = DOT_STATUSES[dot_id]
+				var info: Array = STATUS_INFO[dot_id]
+				var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
+				_log("%s takes %d %s damage" % [u.unit_name, dot_dmg, info[0]], "#e08850")
+				await _wait(0.5)
+				if dot_died:
+					_message("%s succumbs to %s!" % [u.unit_name, info[0]])
+					_log("† %s dies" % u.unit_name, "#e05050")
+		if u.dead:
+			_check_end()
+			continue
 		u.tick_statuses()
 		if u.broken_pending:
 			u.broken_pending = false
 			_message("%s is Broken and loses their turn!" % u.unit_name)
+			_log("%s loses their turn (Broken)" % u.unit_name, "#c070e0")
 			await _wait(1.0)
 			u.recover_from_break()
 			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
@@ -403,17 +454,21 @@ func _enemy_turn(u: BattleUnit) -> void:
 		return
 	var target: BattleUnit
 	var ab: Ability
+	var affordable: Array = u.abilities.filter(func(a): return a.cost <= u.resource)
 	var broken_heroes := living.filter(func(h): return h.broken)
 	if not broken_heroes.is_empty():
-		# Exploit a Broken hero with the heaviest attack available.
+		# Exploit a Broken hero with the hardest-hitting attack they can afford.
 		target = _lowest_hp(broken_heroes)
-		ab = u.abilities[1]
+		ab = affordable[0]
+		for a in affordable:
+			if a.damage > ab.damage:
+				ab = a
 		_message("%s exploits the Break!" % u.unit_name)
 		await _wait(0.4)
 	else:
 		# Prefer finishing off wounded heroes; sometimes spread damage.
 		target = _lowest_hp(living) if randf() < 0.65 else living.pick_random()
-		ab = u.abilities[1] if randf() < 0.35 else u.abilities[0]
+		ab = affordable.pick_random()
 	await _resolve(u, ab, target, "good")
 
 
@@ -434,11 +489,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	attacker.play_anim(ab.anim)
 	await _wait(0.3)
 
+	var grade_tag := {"perfect": " [PERFECT]", "good": "", "fail": " [Miss]"}[grade] as String
 	if ab.heal > 0:
 		var amount := int(ab.heal * dmg_mult)
 		target.heal_amount(amount)
 		target.float_text("+%d" % amount, Color(0.4, 0.9, 0.45))
 		_message("%s heals %s for %d" % [attacker.unit_name, target.unit_name, amount])
+		_log("%s: %s on %s heals %d%s" % [attacker.unit_name, ab.display_name,
+			target.unit_name, amount, grade_tag], "#70d878")
 		if is_perfect and ab.perfect_id == "ward":
 			_apply_status(target, "ward", 2)
 	else:
@@ -454,9 +512,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		var result: Dictionary = target.take_hit(final, pr)
 		target.float_text("%d%s" % [final, "!" if is_crit else ""],
 			Color(1.0, 0.5, 0.2) if is_crit else Color(0.95, 0.85, 0.75))
+		_log("%s: %s on %s — %d dmg%s, +%d Pressure%s" % [attacker.unit_name,
+			ab.display_name, target.unit_name, final, " CRIT" if is_crit else "",
+			pr, grade_tag], "#d8d2c4" if attacker.is_hero else "#e0a0a0")
 		if ab.delay_push > 0.0:
 			target.next_time += ab.delay_push * 100.0 / target.effective_speed()
-		if not result.died and not ab.applies_status.is_empty():
+		if not result.died and not ab.applies_status.is_empty() and randf() <= ab.status_chance:
 			var turns: int = ab.applies_status["turns"]
 			if is_perfect and ab.perfect_id == "slow_plus":
 				turns = 4
@@ -465,10 +526,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_apply_perfect_bonus(attacker, target, ab, result.died)
 		if result.broke:
 			_message("%s BREAKS!" % target.unit_name)
+			_log("!! %s BREAKS" % target.unit_name, "#c070e0")
 			_shake()
 			await _wait(0.5)
 		if result.died:
 			_message("%s falls!" % target.unit_name)
+			_log("† %s dies" % target.unit_name, "#e05050")
 			await _wait(0.5)
 
 	await _wait(0.45)
@@ -479,6 +542,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 func _apply_status(target: BattleUnit, id: String, turns: int) -> void:
 	var info: Array = STATUS_INFO[id]
 	target.add_status(id, info[0], info[1], info[2], turns, info[3])
+	_log("   → %s on %s (%d turns)" % [info[0], target.unit_name, turns], "#b0a8e0")
 
 
 # Unique bonus effects for Perfect skill checks (per ability).
@@ -487,12 +551,15 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 		"rage":
 			attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
 			attacker.float_text("+10 Rage", Color(1.0, 0.5, 0.4))
+			_log("   → %s gains +10 Rage" % attacker.unit_name, "#b0a8e0")
 		"mana":
 			attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
 			attacker.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
+			_log("   → %s restores 10 Mana" % attacker.unit_name, "#b0a8e0")
 		"self_heal":
 			attacker.heal_amount(8)
 			attacker.float_text("+8", Color(0.4, 0.9, 0.45))
+			_log("   → %s recovers 8 HP" % attacker.unit_name, "#b0a8e0")
 		"sunder":
 			if not target_died:
 				_apply_status(target, "sunder", 2)

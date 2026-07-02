@@ -282,8 +282,16 @@ func hide_info() -> void:
 	_info_label.text = ""
 
 
+# Cropped close-up of the character for the initiative bar (the raw frame
+# is mostly empty space around a small figure).
 func portrait() -> Texture2D:
-	return _idle_texture
+	var src := _idle_texture as AtlasTexture
+	if src == null:
+		return _idle_texture
+	var crop := AtlasTexture.new()
+	crop.atlas = src.atlas
+	crop.region = Rect2(src.region.position + Vector2(28, 18), Vector2(44, 60))
+	return crop
 
 
 func play_anim(anim_name: String) -> void:
