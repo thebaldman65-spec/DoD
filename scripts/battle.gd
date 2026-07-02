@@ -8,6 +8,18 @@ signal _skill_done(grade)
 
 const BASIC_DELAY := 2.0
 
+# Skill check zones (half-widths around the bar's center, 0..1 scale).
+const PERFECT_HALF := 0.045
+const GOOD_HALF := 0.16
+
+# Visual identity of each status effect: [label, chip tag, color]
+const STATUS_INFO := {
+	"slow": ["Slow", "S", Color(0.5, 0.75, 1.0)],
+	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2)],
+	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7)],
+	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4)],
+}
+
 var heroes: Array = []
 var enemies: Array = []
 var battle_over := false
@@ -106,12 +118,15 @@ func _warrior_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Strike", "cost": 0, "damage": 16, "pressure": 10,
 			"resource_gain": 15, "delay": 2.0, "anim": "attack01",
+			"perfect_id": "rage", "perfect_text": "+10 bonus Rage",
 			"description": "Basic attack. Builds 15 Rage."}),
 		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 34, "pressure": 18,
 			"delay": 4.0, "anim": "attack02",
+			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
 			"description": "Big single-target damage."}),
 		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 20, "pressure": 28,
 			"delay": 4.0, "anim": "attack03",
+			"perfect_id": "sunder", "perfect_text": "Sunders armor (-30%) for 2 turns",
 			"description": "Moderate damage, huge Pressure."}),
 	]
 
@@ -120,13 +135,17 @@ func _mage_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Magic Bolt", "cost": 0, "damage": 14, "pressure": 8,
 			"delay": 2.0, "anim": "attack01",
+			"perfect_id": "mana", "perfect_text": "Restores 10 Mana",
 			"description": "Basic arcane projectile."}),
 		Ability.make({"display_name": "Fireball", "cost": 25, "damage": 32, "pressure": 12,
 			"delay": 4.0, "anim": "attack02",
+			"perfect_id": "burn", "perfect_text": "Sets the target ablaze (6 dmg/turn, 2 turns)",
 			"description": "Heavy fire damage."}),
 		Ability.make({"display_name": "Frost Spike", "cost": 20, "damage": 18, "pressure": 10,
-			"delay": 3.0, "delay_push": 2.0, "anim": "attack03",
-			"description": "Damages and pushes the target's next turn back."}),
+			"delay": 3.0, "anim": "attack03",
+			"applies_status": {"id": "slow", "turns": 2},
+			"perfect_id": "slow_plus", "perfect_text": "Slow lasts 4 turns instead of 2",
+			"description": "Damages and Slows the target (-25% speed)."}),
 	]
 
 
@@ -134,12 +153,15 @@ func _cleric_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Smite", "cost": 0, "damage": 12, "pressure": 10,
 			"delay": 2.0, "anim": "attack01",
+			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 8 HP",
 			"description": "Basic radiant strike."}),
 		Ability.make({"display_name": "Mend Wounds", "cost": 25, "heal": 38,
 			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
+			"perfect_id": "ward", "perfect_text": "Grants Ward (-50% Pressure taken, 2 turns)",
 			"description": "Restore HP to one ally."}),
 		Ability.make({"display_name": "Radiant Burst", "cost": 20, "damage": 18, "pressure": 14,
 			"delay": 3.0, "anim": "attack03",
+			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
 			"description": "Holy damage with solid Pressure."}),
 	]
 
@@ -216,14 +238,14 @@ func _build_skill_check_ui() -> void:
 	sc_root.add_child(track)
 
 	var good_zone := ColorRect.new()
-	good_zone.position = Vector2(10 + 0.30 * 420, 34)
-	good_zone.size = Vector2(0.40 * 420, 20)
+	good_zone.position = Vector2(10 + (0.5 - GOOD_HALF) * 420, 34)
+	good_zone.size = Vector2(GOOD_HALF * 2 * 420, 20)
 	good_zone.color = Color(0.35, 0.5, 0.3)
 	sc_root.add_child(good_zone)
 
 	var perfect_zone := ColorRect.new()
-	perfect_zone.position = Vector2(10 + 0.44 * 420, 34)
-	perfect_zone.size = Vector2(0.12 * 420, 20)
+	perfect_zone.position = Vector2(10 + (0.5 - PERFECT_HALF) * 420, 34)
+	perfect_zone.size = Vector2(PERFECT_HALF * 2 * 420, 20)
 	perfect_zone.color = Color(0.9, 0.8, 0.3)
 	sc_root.add_child(perfect_zone)
 
@@ -271,7 +293,7 @@ func _rebuild_turn_bar() -> void:
 		stripe.color = Color(0.35, 0.8, 0.4) if u.is_hero else Color(0.85, 0.3, 0.3)
 		slot.add_child(stripe)
 		turn_bar.add_child(slot)
-		best.t += BASIC_DELAY * 100.0 / u.speed
+		best.t += BASIC_DELAY * 100.0 / u.effective_speed()
 
 
 # ---------- battle loop ----------
@@ -287,13 +309,20 @@ func _run_battle() -> void:
 			break
 		active_marker.visible = true
 		active_marker.position = u.position + Vector2(-11, -130)
+		if u.has_status("burn"):
+			var burned_out: bool = u.take_tick_damage(6, "-6 Burn", STATUS_INFO["burn"][2])
+			await _wait(0.5)
+			if burned_out:
+				_message("%s burns away!" % u.unit_name)
+				_check_end()
+				continue
+		u.tick_statuses()
 		if u.broken_pending:
 			u.broken_pending = false
 			_message("%s is Broken and loses their turn!" % u.unit_name)
-			u.float_text("BROKEN", Color(0.8, 0.4, 1.0))
 			await _wait(1.0)
 			u.recover_from_break()
-			u.next_time += BASIC_DELAY * 100.0 / u.speed
+			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
 			continue
 		if u.is_hero:
 			await _player_turn(u)
@@ -349,6 +378,8 @@ func _show_actions(u: BattleUnit) -> void:
 		btn.text = "%s\n(%s)" % [ab.display_name, cost_text]
 		btn.custom_minimum_size = Vector2(150, 58)
 		btn.tooltip_text = ab.description
+		if ab.perfect_text != "":
+			btn.tooltip_text += "\nPerfect: %s" % ab.perfect_text
 		btn.disabled = ab.cost > u.resource
 		btn.pressed.connect(func(): _ability_picked.emit(ab))
 		action_box.add_child(btn)
@@ -377,15 +408,35 @@ func _enemy_turn(u: BattleUnit) -> void:
 	var living := heroes.filter(func(h): return not h.dead)
 	if living.is_empty():
 		return
-	var target: BattleUnit = living.pick_random()
-	var ab = u.abilities[0] if randf() < 0.7 else u.abilities[1]
+	var target: BattleUnit
+	var ab: Ability
+	var broken_heroes := living.filter(func(h): return h.broken)
+	if not broken_heroes.is_empty():
+		# Exploit a Broken hero with the heaviest attack available.
+		target = _lowest_hp(broken_heroes)
+		ab = u.abilities[1]
+		_message("%s exploits the Break!" % u.unit_name)
+		await _wait(0.4)
+	else:
+		# Prefer finishing off wounded heroes; sometimes spread damage.
+		target = _lowest_hp(living) if randf() < 0.65 else living.pick_random()
+		ab = u.abilities[1] if randf() < 0.35 else u.abilities[0]
 	await _resolve(u, ab, target, "good")
+
+
+func _lowest_hp(pool: Array) -> BattleUnit:
+	var best: BattleUnit = pool[0]
+	for h in pool:
+		if h.hp / float(h.max_hp) < best.hp / float(best.max_hp):
+			best = h
+	return best
 
 
 func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: String) -> void:
 	attacker.resource = clampi(attacker.resource - ab.cost + ab.resource_gain, 0, attacker.max_resource)
-	var dmg_mult := {"perfect": 1.35, "good": 1.0, "fail": 0.6}[grade] as float
-	var pr_mult := {"perfect": 1.5, "good": 1.0, "fail": 0.5}[grade] as float
+	var dmg_mult := {"perfect": 1.15, "good": 1.0, "fail": 0.6}[grade] as float
+	var pr_mult := {"perfect": 1.25, "good": 1.0, "fail": 0.5}[grade] as float
+	var is_perfect := grade == "perfect"
 
 	attacker.play_anim(ab.anim)
 	await _wait(0.3)
@@ -395,20 +446,30 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		target.heal_amount(amount)
 		target.float_text("+%d" % amount, Color(0.4, 0.9, 0.45))
 		_message("%s heals %s for %d" % [attacker.unit_name, target.unit_name, amount])
+		if is_perfect and ab.perfect_id == "ward":
+			_apply_status(target, "ward", 2)
 	else:
 		var crit_chance := 0.10 + (0.25 if target.broken else 0.0)
 		var is_crit := randf() < crit_chance
 		var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
 		if is_crit:
 			raw *= 1.5
-		var effective_armor: float = target.armor * (0.7 if target.broken else 1.0)
-		var final := maxi(int(round(raw * (1.0 - effective_armor))), 1)
+		var final := maxi(int(round(raw * (1.0 - target.effective_armor()))), 1)
 		var pr := int(round(ab.pressure * pr_mult * (1.5 if is_crit else 1.0)))
+		if is_perfect and ab.perfect_id == "pressure":
+			pr = int(pr * 1.6)
 		var result: Dictionary = target.take_hit(final, pr)
 		target.float_text("%d%s" % [final, "!" if is_crit else ""],
 			Color(1.0, 0.5, 0.2) if is_crit else Color(0.95, 0.85, 0.75))
 		if ab.delay_push > 0.0:
-			target.next_time += ab.delay_push * 100.0 / target.speed
+			target.next_time += ab.delay_push * 100.0 / target.effective_speed()
+		if not result.died and not ab.applies_status.is_empty():
+			var turns: int = ab.applies_status["turns"]
+			if is_perfect and ab.perfect_id == "slow_plus":
+				turns = 4
+			_apply_status(target, ab.applies_status["id"], turns)
+		if is_perfect:
+			_apply_perfect_bonus(attacker, target, ab, result.died)
 		if result.broke:
 			_message("%s BREAKS!" % target.unit_name)
 			_shake()
@@ -419,7 +480,32 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 
 	await _wait(0.45)
 	attacker.return_to_idle()
-	attacker.next_time += ab.delay * 100.0 / attacker.speed
+	attacker.next_time += ab.delay * 100.0 / attacker.effective_speed()
+
+
+func _apply_status(target: BattleUnit, id: String, turns: int) -> void:
+	var info: Array = STATUS_INFO[id]
+	target.add_status(id, info[0], info[1], info[2], turns)
+
+
+# Unique bonus effects for Perfect skill checks (per ability).
+func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability, target_died: bool) -> void:
+	match ab.perfect_id:
+		"rage":
+			attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
+			attacker.float_text("+10 Rage", Color(1.0, 0.5, 0.4))
+		"mana":
+			attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
+			attacker.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
+		"self_heal":
+			attacker.heal_amount(8)
+			attacker.float_text("+8", Color(0.4, 0.9, 0.45))
+		"sunder":
+			if not target_died:
+				_apply_status(target, "sunder", 2)
+		"burn":
+			if not target_died:
+				_apply_status(target, "burn", 2)
 
 
 # ---------- skill check ----------
@@ -463,9 +549,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		sc_active = false
 		var dist: float = absf(sc_pos - 0.5)
 		var grade := "fail"
-		if dist <= 0.06:
+		if dist <= PERFECT_HALF:
 			grade = "perfect"
-		elif dist <= 0.20:
+		elif dist <= GOOD_HALF:
 			grade = "good"
 		_skill_done.emit(grade)
 

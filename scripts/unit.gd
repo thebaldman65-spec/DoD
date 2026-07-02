@@ -1,5 +1,5 @@
-# One combatant on the battlefield: sprite, animations, stats, HP/Pressure bars.
-# Built entirely in code from the 100x100 sprite sheets.
+# One combatant on the battlefield: sprite, animations, stats, HP/Pressure bars,
+# and status effects (buffs/debuffs). Built in code from the 100x100 sprite sheets.
 class_name BattleUnit
 extends Node2D
 
@@ -23,10 +23,13 @@ var broken_pending := false # will lose its next turn
 var dead := false
 var next_time := 0.0        # position on the initiative timeline
 
+# Active statuses: {id, label, short, color, turns}
+var statuses: Array = []
+
 var sprite: AnimatedSprite2D
 var _hp_fill: ColorRect
 var _pressure_fill: ColorRect
-var _status_label: Label
+var _chips_root: Node2D
 var _info_label: Label
 var _idle_texture: Texture2D
 
@@ -98,20 +101,16 @@ func _build_bars() -> void:
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(name_label)
 
-	_status_label = Label.new()
-	_status_label.add_theme_font_size_override("font_size", 12)
-	_status_label.add_theme_color_override("font_color", Color(0.85, 0.4, 1.0))
-	_status_label.position = Vector2(-40, 82)
-	_status_label.size = Vector2(80, 14)
-	_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(_status_label)
+	_chips_root = Node2D.new()
+	_chips_root.position = Vector2(0, 84)
+	add_child(_chips_root)
 
 	_info_label = Label.new()
 	_info_label.add_theme_font_size_override("font_size", 12)
 	_info_label.add_theme_color_override("font_color", Color(0.95, 0.92, 0.8))
 	_info_label.add_theme_constant_override("outline_size", 3)
 	_info_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
-	_info_label.position = Vector2(-60, 82)
+	_info_label.position = Vector2(-60, 104)
 	_info_label.size = Vector2(120, 32)
 	_info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(_info_label)
@@ -139,10 +138,84 @@ func refresh_bars() -> void:
 	_pressure_fill.size.x = 70.0 * pressure_ratio
 	# Shifts toward hot pink as the unit gets close to Breaking.
 	_pressure_fill.color = Color(0.80, 0.35, 1.0).lerp(Color(1.0, 0.25, 0.55), pressure_ratio)
-	_status_label.text = "BROKEN" if broken else ""
 	if _info_label.text != "":
 		show_info()
 
+
+# ---------- status effects ----------
+
+# Adds (or refreshes) a status. `short` is the 1-2 char tag shown on the chip.
+func add_status(id: String, label: String, short: String, color: Color, turns: int) -> void:
+	for s in statuses:
+		if s.id == id:
+			s.turns = maxi(s.turns, turns)
+			_refresh_chips()
+			return
+	statuses.append({"id": id, "label": label, "short": short, "color": color, "turns": turns})
+	float_text(label, color)
+	_refresh_chips()
+
+
+func remove_status(id: String) -> void:
+	statuses = statuses.filter(func(s): return s.id != id)
+	_refresh_chips()
+
+
+func has_status(id: String) -> bool:
+	for s in statuses:
+		if s.id == id:
+			return true
+	return false
+
+
+# Called at the start of this unit's turn. Broken is managed separately.
+func tick_statuses() -> void:
+	for s in statuses:
+		if s.id != "broken":
+			s.turns -= 1
+	statuses = statuses.filter(func(s): return s.id == "broken" or s.turns > 0)
+	_refresh_chips()
+
+
+func effective_speed() -> float:
+	return speed * (0.75 if has_status("slow") else 1.0)
+
+
+func effective_armor() -> float:
+	var a := armor
+	if broken:
+		a *= 0.7
+	if has_status("sunder"):
+		a *= 0.7
+	return a
+
+
+func _refresh_chips() -> void:
+	for child in _chips_root.get_children():
+		child.queue_free()
+	var count := statuses.size()
+	if count == 0:
+		return
+	var start_x := -(count * 18.0 - 2.0) / 2.0
+	for i in count:
+		var s: Dictionary = statuses[i]
+		var chip := ColorRect.new()
+		chip.position = Vector2(start_x + i * 18.0, 0)
+		chip.size = Vector2(16, 16)
+		chip.color = s.color
+		_chips_root.add_child(chip)
+		var tag := Label.new()
+		tag.text = s.short
+		tag.add_theme_font_size_override("font_size", 10)
+		tag.add_theme_color_override("font_color", Color(0.05, 0.05, 0.08))
+		tag.position = chip.position
+		tag.size = Vector2(16, 16)
+		tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		_chips_root.add_child(tag)
+
+
+# ---------- info readout ----------
 
 # Shows HP + class resource under the sprite while this unit is acting.
 func show_info() -> void:
@@ -167,11 +240,15 @@ func return_to_idle() -> void:
 		sprite.play("idle")
 
 
+# ---------- damage / healing ----------
+
 # Applies damage + Pressure. Returns what happened so battle.gd can react.
 func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	hp = maxi(hp - amount, 0)
 	if resource_name == "Rage":
 		resource = mini(resource + 10, max_resource)
+	if has_status("ward"):
+		pressure_add = int(pressure_add * 0.5)
 	var just_broke := false
 	if not broken:
 		pressure += pressure_add
@@ -181,21 +258,39 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			pressure = stability
 			just_broke = true
 			modulate = Color(0.85, 0.6, 1.0)
+			add_status("broken", "BROKEN", "B", Color(0.8, 0.4, 1.0), 1)
 	if hp <= 0:
-		dead = true
-		broken = false
-		broken_pending = false
-		play_anim("death")
+		_die()
 	elif not just_broke:
 		play_anim("hurt")
 	refresh_bars()
 	return {"died": dead, "broke": just_broke}
 
 
+# Damage from DoT effects (Burn). No Pressure, no hurt animation. Returns true on death.
+func take_tick_damage(amount: int, label: String, color: Color) -> bool:
+	hp = maxi(hp - amount, 0)
+	float_text(label, color)
+	if hp <= 0:
+		_die()
+	refresh_bars()
+	return dead
+
+
+func _die() -> void:
+	dead = true
+	broken = false
+	broken_pending = false
+	statuses.clear()
+	_refresh_chips()
+	play_anim("death")
+
+
 func recover_from_break() -> void:
 	broken = false
 	pressure = 0
 	modulate = Color.WHITE
+	remove_status("broken")
 	refresh_bars()
 
 
