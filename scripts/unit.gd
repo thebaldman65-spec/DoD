@@ -27,6 +27,7 @@ var sprite: AnimatedSprite2D
 var _hp_fill: ColorRect
 var _pressure_fill: ColorRect
 var _status_label: Label
+var _info_label: Label
 var _idle_texture: Texture2D
 
 
@@ -81,11 +82,11 @@ func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
 
 func _build_bars() -> void:
 	var bar_y := 62.0
-	add_child(_make_bar_bg(Vector2(-42, bar_y), Vector2(84, 11)))
-	_hp_fill = _make_fill(Vector2(-41, bar_y + 1), Vector2(82, 9), Color(0.30, 0.78, 0.32))
+	add_child(_make_bar_bg(Vector2(-36, bar_y), Vector2(72, 8)))
+	_hp_fill = _make_fill(Vector2(-35, bar_y + 1), Vector2(70, 6), Color(0.30, 0.78, 0.32))
 	add_child(_hp_fill)
-	add_child(_make_bar_bg(Vector2(-42, bar_y + 13), Vector2(84, 10)))
-	_pressure_fill = _make_fill(Vector2(-41, bar_y + 14), Vector2(82, 8), Color(0.80, 0.35, 1.0))
+	add_child(_make_bar_bg(Vector2(-36, bar_y + 10), Vector2(72, 7)))
+	_pressure_fill = _make_fill(Vector2(-35, bar_y + 11), Vector2(70, 5), Color(0.80, 0.35, 1.0))
 	add_child(_pressure_fill)
 
 	var name_label := Label.new()
@@ -100,10 +101,20 @@ func _build_bars() -> void:
 	_status_label = Label.new()
 	_status_label.add_theme_font_size_override("font_size", 12)
 	_status_label.add_theme_color_override("font_color", Color(0.85, 0.4, 1.0))
-	_status_label.position = Vector2(-40, 88)
+	_status_label.position = Vector2(-40, 82)
 	_status_label.size = Vector2(80, 14)
 	_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(_status_label)
+
+	_info_label = Label.new()
+	_info_label.add_theme_font_size_override("font_size", 12)
+	_info_label.add_theme_color_override("font_color", Color(0.95, 0.92, 0.8))
+	_info_label.add_theme_constant_override("outline_size", 3)
+	_info_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+	_info_label.position = Vector2(-60, 82)
+	_info_label.size = Vector2(120, 32)
+	_info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	add_child(_info_label)
 
 
 func _make_bar_bg(pos: Vector2, bar_size: Vector2) -> ColorRect:
@@ -123,12 +134,23 @@ func _make_fill(pos: Vector2, bar_size: Vector2, color: Color) -> ColorRect:
 
 
 func refresh_bars() -> void:
-	_hp_fill.size.x = 82.0 * clampf(hp / float(max_hp), 0.0, 1.0)
+	_hp_fill.size.x = 70.0 * clampf(hp / float(max_hp), 0.0, 1.0)
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
-	_pressure_fill.size.x = 82.0 * pressure_ratio
+	_pressure_fill.size.x = 70.0 * pressure_ratio
 	# Shifts toward hot pink as the unit gets close to Breaking.
 	_pressure_fill.color = Color(0.80, 0.35, 1.0).lerp(Color(1.0, 0.25, 0.55), pressure_ratio)
 	_status_label.text = "BROKEN" if broken else ""
+	if _info_label.text != "":
+		show_info()
+
+
+# Shows HP + class resource under the sprite while this unit is acting.
+func show_info() -> void:
+	_info_label.text = "HP %d/%d\n%s %d/%d" % [hp, max_hp, resource_name, resource, max_resource]
+
+
+func hide_info() -> void:
+	_info_label.text = ""
 
 
 func portrait() -> Texture2D:

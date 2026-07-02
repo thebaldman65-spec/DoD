@@ -17,7 +17,6 @@ var turn_bar: HBoxContainer
 var message_label: Label
 var action_panel: PanelContainer
 var action_box: HBoxContainer
-var resource_label: Label
 var active_marker: Label
 var target_buttons: Array = []
 
@@ -177,15 +176,9 @@ func _build_ui() -> void:
 	action_panel = PanelContainer.new()
 	action_panel.position = Vector2(400, 630)
 	ui.add_child(action_panel)
-	var vbox := VBoxContainer.new()
-	action_panel.add_child(vbox)
-	resource_label = Label.new()
-	resource_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	resource_label.add_theme_font_size_override("font_size", 14)
-	vbox.add_child(resource_label)
 	action_box = HBoxContainer.new()
 	action_box.add_theme_constant_override("separation", 10)
-	vbox.add_child(action_box)
+	action_panel.add_child(action_box)
 	action_panel.visible = false
 
 	active_marker = Label.new()
@@ -325,6 +318,7 @@ func _player_turn(u: BattleUnit) -> void:
 	if u.resource_name == "Mana":
 		u.resource = mini(u.resource + 12, u.max_resource)
 	_message("%s's turn — choose an ability" % u.unit_name)
+	u.show_info()
 	_show_actions(u)
 	var ab = await _ability_picked
 	action_panel.visible = false
@@ -343,13 +337,12 @@ func _player_turn(u: BattleUnit) -> void:
 
 	var grade: String = await _run_skill_check()
 	await _resolve(u, ab, target, grade)
+	u.hide_info()
 
 
 func _show_actions(u: BattleUnit) -> void:
 	for child in action_box.get_children():
 		child.queue_free()
-	resource_label.text = "%s  —  HP %d/%d    %s %d/%d" % [
-		u.unit_name, u.hp, u.max_hp, u.resource_name, u.resource, u.max_resource]
 	for ab in u.abilities:
 		var btn := Button.new()
 		var cost_text: String = "Free" if ab.cost == 0 else "%d %s" % [ab.cost, u.resource_name]
@@ -521,8 +514,11 @@ func _show_end(title: String, subtitle: String) -> void:
 
 # ---------- helpers ----------
 
+const PACE := 0.85  # global combat pacing multiplier (lower = faster fights)
+
+
 func _wait(seconds: float) -> void:
-	await get_tree().create_timer(seconds).timeout
+	await get_tree().create_timer(seconds * PACE).timeout
 
 
 func _shake() -> void:
