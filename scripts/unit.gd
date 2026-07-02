@@ -3,7 +3,10 @@
 class_name BattleUnit
 extends Node2D
 
+signal clicked
+
 const FRAME_SIZE := 100
+const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
 var unit_name := ""
 var is_hero := true
@@ -32,6 +35,9 @@ var _pressure_fill: ColorRect
 var _chips_root: Node2D
 var _info_label: Label
 var _idle_texture: Texture2D
+var _target_btn: Button
+var _target_marker: Label
+var _base_tint := Color.WHITE
 
 
 func setup(config: Dictionary) -> void:
@@ -84,7 +90,7 @@ func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
 
 
 func _build_bars() -> void:
-	var bar_y := 62.0
+	var bar_y := 48.0
 	add_child(_make_bar_bg(Vector2(-36, bar_y), Vector2(72, 8)))
 	_hp_fill = _make_fill(Vector2(-35, bar_y + 1), Vector2(70, 6), Color(0.30, 0.78, 0.32))
 	add_child(_hp_fill)
@@ -94,15 +100,18 @@ func _build_bars() -> void:
 
 	var name_label := Label.new()
 	name_label.text = unit_name
-	name_label.add_theme_font_size_override("font_size", 13)
-	name_label.add_theme_color_override("font_color", Color(0.9, 0.88, 0.8))
-	name_label.position = Vector2(-40, -92)
-	name_label.size = Vector2(80, 16)
+	name_label.add_theme_font_override("font", NAME_FONT)
+	name_label.add_theme_font_size_override("font_size", 17)
+	name_label.add_theme_color_override("font_color", Color(0.92, 0.88, 0.78))
+	name_label.add_theme_constant_override("outline_size", 4)
+	name_label.add_theme_color_override("font_outline_color", Color(0.05, 0.03, 0.08, 0.9))
+	name_label.position = Vector2(-50, -62)
+	name_label.size = Vector2(100, 18)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(name_label)
 
 	_chips_root = Node2D.new()
-	_chips_root.position = Vector2(0, 84)
+	_chips_root.position = Vector2(0, 70)
 	add_child(_chips_root)
 
 	_info_label = Label.new()
@@ -110,10 +119,50 @@ func _build_bars() -> void:
 	_info_label.add_theme_color_override("font_color", Color(0.95, 0.92, 0.8))
 	_info_label.add_theme_constant_override("outline_size", 3)
 	_info_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
-	_info_label.position = Vector2(-60, 104)
+	_info_label.position = Vector2(-60, 90)
 	_info_label.size = Vector2(120, 32)
 	_info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(_info_label)
+
+	_build_target_zone()
+
+
+# Invisible click zone over the sprite, shown only while picking a target.
+func _build_target_zone() -> void:
+	_target_btn = Button.new()
+	_target_btn.position = Vector2(-60, -95)
+	_target_btn.size = Vector2(120, 190)
+	_target_btn.focus_mode = Control.FOCUS_NONE
+	var empty := StyleBoxEmpty.new()
+	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
+		_target_btn.add_theme_stylebox_override(state, empty)
+	_target_btn.pressed.connect(func(): clicked.emit())
+	_target_btn.mouse_entered.connect(func(): sprite.self_modulate = _base_tint.lightened(0.45))
+	_target_btn.mouse_exited.connect(func(): sprite.self_modulate = _base_tint)
+	_target_btn.visible = false
+	add_child(_target_btn)
+
+	_target_marker = Label.new()
+	_target_marker.text = "▼"
+	_target_marker.add_theme_font_size_override("font_size", 22)
+	_target_marker.add_theme_color_override("font_color", Color(1.0, 0.75, 0.25))
+	_target_marker.add_theme_constant_override("outline_size", 4)
+	_target_marker.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+	_target_marker.position = Vector2(-10, -90)
+	_target_marker.visible = false
+	add_child(_target_marker)
+
+
+func set_tint(tint: Color) -> void:
+	_base_tint = tint
+	sprite.self_modulate = tint
+
+
+func set_targetable(on: bool) -> void:
+	_target_btn.visible = on
+	_target_marker.visible = on
+	if not on:
+		sprite.self_modulate = _base_tint
 
 
 func _make_bar_bg(pos: Vector2, bar_size: Vector2) -> ColorRect:
@@ -145,13 +194,14 @@ func refresh_bars() -> void:
 # ---------- status effects ----------
 
 # Adds (or refreshes) a status. `short` is the 1-2 char tag shown on the chip.
-func add_status(id: String, label: String, short: String, color: Color, turns: int) -> void:
+func add_status(id: String, label: String, short: String, color: Color, turns: int, desc := "") -> void:
 	for s in statuses:
 		if s.id == id:
 			s.turns = maxi(s.turns, turns)
 			_refresh_chips()
 			return
-	statuses.append({"id": id, "label": label, "short": short, "color": color, "turns": turns})
+	statuses.append({"id": id, "label": label, "short": short, "color": color,
+		"turns": turns, "desc": desc})
 	float_text(label, color)
 	_refresh_chips()
 
@@ -203,11 +253,17 @@ func _refresh_chips() -> void:
 		chip.position = Vector2(start_x + i * 18.0, 0)
 		chip.size = Vector2(16, 16)
 		chip.color = s.color
+		chip.mouse_filter = Control.MOUSE_FILTER_STOP
+		chip.tooltip_text = "%s (%s turn%s left)\n%s" % [
+			s.label, s.turns, "" if s.turns == 1 else "s", s.desc]
+		if s.id == "broken":
+			chip.tooltip_text = "%s\n%s" % [s.label, s.desc]
 		_chips_root.add_child(chip)
 		var tag := Label.new()
 		tag.text = s.short
 		tag.add_theme_font_size_override("font_size", 10)
 		tag.add_theme_color_override("font_color", Color(0.05, 0.05, 0.08))
+		tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tag.position = chip.position
 		tag.size = Vector2(16, 16)
 		tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -258,7 +314,8 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			pressure = stability
 			just_broke = true
 			modulate = Color(0.85, 0.6, 1.0)
-			add_status("broken", "BROKEN", "B", Color(0.8, 0.4, 1.0), 1)
+			add_status("broken", "BROKEN", "B", Color(0.8, 0.4, 1.0), 1,
+				"Loses next turn. -30% armor, +25% crit chance against this unit.")
 	if hp <= 0:
 		_die()
 	elif not just_broke:

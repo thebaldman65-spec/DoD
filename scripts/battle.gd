@@ -12,12 +12,12 @@ const BASIC_DELAY := 2.0
 const PERFECT_HALF := 0.045
 const GOOD_HALF := 0.16
 
-# Visual identity of each status effect: [label, chip tag, color]
+# Visual identity of each status effect: [label, chip tag, color, tooltip]
 const STATUS_INFO := {
-	"slow": ["Slow", "S", Color(0.5, 0.75, 1.0)],
-	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2)],
-	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7)],
-	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4)],
+	"slow": ["Slow", "S", Color(0.5, 0.75, 1.0), "-25% speed; turns arrive later."],
+	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Takes 6 damage at the start of each turn."],
+	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-30% armor."],
+	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4), "Takes 50% less Pressure."],
 }
 
 var heroes: Array = []
@@ -30,7 +30,6 @@ var message_label: Label
 var action_panel: PanelContainer
 var action_box: HBoxContainer
 var active_marker: Label
-var target_buttons: Array = []
 
 var sc_root: Control
 var sc_cursor: ColorRect
@@ -109,7 +108,8 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color) -> BattleUnit:
 	u.position = pos
 	add_child(u)
 	u.setup(config)
-	u.sprite.self_modulate = tint
+	u.set_tint(tint)
+	u.clicked.connect(func(): _target_picked.emit(u))
 	u.refresh_bars()
 	return u
 
@@ -388,17 +388,10 @@ func _show_actions(u: BattleUnit) -> void:
 
 func _pick_target(pool: Array) -> BattleUnit:
 	for t in pool:
-		var btn := Button.new()
-		btn.text = "▶ %s" % t.unit_name
-		btn.position = t.position + Vector2(-55, -160)
-		btn.size = Vector2(110, 30)
-		btn.pressed.connect(func(): _target_picked.emit(t))
-		ui.add_child(btn)
-		target_buttons.append(btn)
-	var chosen = await _target_picked
-	for btn in target_buttons:
-		btn.queue_free()
-	target_buttons.clear()
+		t.set_targetable(true)
+	var chosen: BattleUnit = await _target_picked
+	for t in pool:
+		t.set_targetable(false)
 	return chosen
 
 
@@ -485,7 +478,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 
 func _apply_status(target: BattleUnit, id: String, turns: int) -> void:
 	var info: Array = STATUS_INFO[id]
-	target.add_status(id, info[0], info[1], info[2], turns)
+	target.add_status(id, info[0], info[1], info[2], turns, info[3])
 
 
 # Unique bonus effects for Perfect skill checks (per ability).
