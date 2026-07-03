@@ -168,18 +168,18 @@ func _spawn_units() -> void:
 
 	enemies.append(_make_unit({
 		"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
-		"max_hp": 140, "armor": 0.15, "speed": 90.0, "stability": 50,
+		"max_hp": 115, "armor": 0.15, "speed": 90.0, "stability": 50,
 		"abilities": _orc_raider_kit(),
 	}, Vector2(900, 400), Color.WHITE))
 	enemies.append(_make_unit({
 		"unit_name": "Orc Chief", "is_hero": false, "sheet_dir": orc,
-		"max_hp": 250, "armor": 0.20, "speed": 80.0, "stability": 70,
+		"max_hp": 210, "armor": 0.20, "speed": 80.0, "stability": 70,
 		"resource_name": "Rage", "resource": 0, "max_resource": 100,
 		"abilities": _orc_chief_kit(), "sprite_scale": 3.2,
 	}, Vector2(1050, 510), Color(1.0, 0.75, 0.7)))
 	enemies.append(_make_unit({
 		"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
-		"max_hp": 140, "armor": 0.15, "speed": 90.0, "stability": 50,
+		"max_hp": 115, "armor": 0.15, "speed": 90.0, "stability": 50,
 		"abilities": _orc_raider_kit(),
 	}, Vector2(940, 630), Color.WHITE))
 
@@ -202,11 +202,11 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color) -> BattleUnit:
 
 func _warrior_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Strike", "cost": 0, "damage": 22, "pressure": 10,
+		Ability.make({"display_name": "Strike", "cost": 0, "damage": 23, "pressure": 10,
 			"resource_gain": 15, "delay": 2.0, "anim": "attack01",
 			"perfect_id": "rage", "perfect_text": "+10 bonus Rage",
 			"description": "Basic attack. Builds 15 Rage."}),
-		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 48, "pressure": 18,
+		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 50, "pressure": 18,
 			"delay": 4.0, "anim": "attack02",
 			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
 			"description": "Big single-target damage."}),
@@ -214,7 +214,7 @@ func _warrior_kit() -> Array:
 			"resource_gain": 15, "delay": 3.0, "anim": "attack01",
 			"perfect_id": "", "perfect_text": "Stronger rally (-25 Pressure, +30% resource)",
 			"description": "Party-wide: allies shed 15 Pressure and\nregain 20% of their resource.\nGrants the Warrior 15 Rage."}),
-		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 28, "pressure": 20,
+		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 32, "pressure": 20,
 			"delay": 4.0, "anim": "attack03",
 			"applies_status": {"id": "sunder", "turns": 3},
 			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
@@ -245,7 +245,7 @@ func _mage_kit() -> Array:
 
 func _cleric_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Smite", "cost": 0, "damage": 18, "pressure": 10,
+		Ability.make({"display_name": "Smite", "cost": 0, "damage": 22, "pressure": 10,
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 8 HP",
 			"description": "Basic radiant strike. Builds Faith."}),
@@ -266,9 +266,9 @@ func _cleric_kit() -> Array:
 
 func _orc_raider_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Slash", "damage": 17, "pressure": 10,
+		Ability.make({"display_name": "Slash", "damage": 25, "pressure": 13,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Jagged Cut", "damage": 12, "pressure": 8,
+		Ability.make({"display_name": "Jagged Cut", "damage": 18, "pressure": 11,
 			"delay": 2.5, "anim": "attack02",
 			"applies_status": {"id": "bleed", "turns": 3}, "status_chance": 0.6}),
 	]
@@ -277,12 +277,12 @@ func _orc_raider_kit() -> Array:
 # The Chief fights like a weaker Warrior: builds Rage, spends it on heavy hits.
 func _orc_chief_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Strike", "damage": 14, "pressure": 10,
+		Ability.make({"display_name": "Strike", "damage": 21, "pressure": 13,
 			"resource_gain": 15, "delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 28,
-			"pressure": 16, "delay": 4.0, "anim": "attack02"}),
-		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 17,
-			"pressure": 24, "delay": 4.0, "anim": "attack02"}),
+		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 40,
+			"pressure": 20, "delay": 4.0, "anim": "attack02"}),
+		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 25,
+			"pressure": 28, "delay": 4.0, "anim": "attack02"}),
 	]
 
 
