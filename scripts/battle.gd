@@ -23,7 +23,7 @@ const STATUS_INFO := {
 	"barrier": ["Barrier", "Ba", Color(0.40, 0.85, 0.95), "Absorbs incoming damage."],
 	"focus": ["Focus", "Fo", Color(0.35, 0.60, 1.0), "Restores 10 Mana each turn."],
 	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores 8 HP each turn."],
-	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% damage."],
+	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% attack."],
 }
 
 # Ordered item ids for the dropdown menu.
@@ -192,7 +192,7 @@ func _mage_kit() -> Array:
 		Ability.make({"display_name": "Arcane Surge", "cost": 15, "special": "surge",
 			"delay": 3.0, "anim": "attack03",
 			"perfect_id": "", "perfect_text": "+2 Resonance instead of +1",
-			"description": "+20% damage for 1 turn.\nGuarantees +1 Resonance."}),
+			"description": "+20% attack on your next turn.\nGuarantees +1 Resonance."}),
 	]
 
 
@@ -672,16 +672,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		await _resolve(target, target.abilities[0], attacker, "good", true)
 	else:
 		var crit_chance := CRIT_CHANCE + (0.25 if target.broken else 0.0)
-		# Resonant Mind: +2% crit per Resonance stack.
+		# Resonant Mind: +3% crit per Resonance stack.
 		if attacker.second_resource_name == "Resonance":
-			crit_chance += 0.02 * attacker.second_resource
+			crit_chance += 0.03 * attacker.second_resource
 		var is_crit := randf() < crit_chance
 		var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
 		if is_crit:
 			raw *= 1.5
-		# Resonance: +5% damage per stack; targets with stacks take +5% per stack.
+		# Resonance: +15% damage per stack; targets with stacks take +5% per stack.
 		if attacker.second_resource_name == "Resonance":
-			raw *= 1.0 + 0.05 * attacker.second_resource
+			raw *= 1.0 + 0.15 * attacker.second_resource
 		if attacker.has_status("surge"):
 			raw *= 1.2
 		if target.second_resource_name == "Resonance":
@@ -742,7 +742,8 @@ func _gain_resonance(caster: BattleUnit, stacks: int) -> void:
 	caster.second_resource = mini(caster.second_resource + stacks, caster.second_max)
 	if caster.second_resource != before:
 		caster.float_text("+%d Resonance" % (caster.second_resource - before), Color(0.8, 0.5, 1.0))
-	if caster.second_resource == caster.second_max and before < caster.second_max:
+	# Backlash Ward: any cast while at max stacks restores Mana.
+	if caster.second_resource == caster.second_max:
 		caster.resource = mini(caster.resource + 15, caster.max_resource)
 		caster.float_text("Backlash Ward +15 Mana", Color(0.5, 0.7, 1.0))
 		_log("   → Backlash Ward: %s restores 15 Mana" % caster.unit_name, "#b0a8e0")
@@ -783,10 +784,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s focuses..." % attacker.unit_name)
 			_log("%s: Focus — regenerating Mana" % attacker.unit_name, "#70d878")
 		"surge":
-			_apply_status(attacker, "surge", 1)
+			# Lasts through one status tick so it covers exactly the next turn's attack.
+			_apply_status(attacker, "surge", 2)
 			_gain_resonance(attacker, 2 if is_perfect else 1)
 			_message("%s surges with power!" % attacker.unit_name)
-			_log("%s: Arcane Surge — +20%% damage" % attacker.unit_name, "#70d878")
+			_log("%s: Arcane Surge — +20%% attack next turn" % attacker.unit_name, "#70d878")
 		"purge":
 			var amount := int((35 if is_perfect else 25) * mult)
 			target.heal_amount(amount)
