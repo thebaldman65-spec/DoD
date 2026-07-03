@@ -23,7 +23,7 @@ const STATUS_INFO := {
 	"barrier": ["Barrier", "Ba", Color(0.40, 0.85, 0.95), "Absorbs incoming damage."],
 	"focus": ["Focus", "Fo", Color(0.35, 0.60, 1.0), "Restores 10 Mana each turn."],
 	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores 8 HP each turn."],
-	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% spell damage."],
+	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% damage."],
 }
 
 # Ordered item ids for the dropdown menu.
@@ -121,18 +121,18 @@ func _spawn_units() -> void:
 
 	enemies.append(_make_unit({
 		"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
-		"max_hp": 110, "armor": 0.15, "speed": 90.0, "stability": 50,
+		"max_hp": 140, "armor": 0.15, "speed": 90.0, "stability": 50,
 		"abilities": _orc_raider_kit(),
 	}, Vector2(900, 400), Color.WHITE))
 	enemies.append(_make_unit({
 		"unit_name": "Orc Chief", "is_hero": false, "sheet_dir": orc,
-		"max_hp": 190, "armor": 0.20, "speed": 80.0, "stability": 70,
+		"max_hp": 250, "armor": 0.20, "speed": 80.0, "stability": 70,
 		"resource_name": "Rage", "resource": 0, "max_resource": 100,
 		"abilities": _orc_chief_kit(), "sprite_scale": 3.2,
 	}, Vector2(1050, 510), Color(1.0, 0.75, 0.7)))
 	enemies.append(_make_unit({
 		"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
-		"max_hp": 110, "armor": 0.15, "speed": 90.0, "stability": 50,
+		"max_hp": 140, "armor": 0.15, "speed": 90.0, "stability": 50,
 		"abilities": _orc_raider_kit(),
 	}, Vector2(940, 630), Color.WHITE))
 
@@ -155,19 +155,19 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color) -> BattleUnit:
 
 func _warrior_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Strike", "cost": 0, "damage": 16, "pressure": 10,
+		Ability.make({"display_name": "Strike", "cost": 0, "damage": 22, "pressure": 10,
 			"resource_gain": 15, "delay": 2.0, "anim": "attack01",
 			"perfect_id": "rage", "perfect_text": "+10 bonus Rage",
 			"description": "Basic attack. Builds 15 Rage."}),
-		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 34, "pressure": 18,
+		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 48, "pressure": 18,
 			"delay": 4.0, "anim": "attack02",
 			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
 			"description": "Big single-target damage."}),
 		Ability.make({"display_name": "Rallying Shout", "cost": 15, "special": "rally",
-			"delay": 3.0, "anim": "attack01",
+			"resource_gain": 15, "delay": 3.0, "anim": "attack01",
 			"perfect_id": "", "perfect_text": "Stronger rally (-25 Pressure, +8 resource)",
-			"description": "Party-wide: allies shed 15 Pressure and\ngain a little of their resource."}),
-		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 20, "pressure": 20,
+			"description": "Party-wide: allies shed 15 Pressure and\ngain a little of their resource.\nGrants the Warrior 15 Rage."}),
+		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 28, "pressure": 20,
 			"delay": 4.0, "anim": "attack03",
 			"applies_status": {"id": "sunder", "turns": 3},
 			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
@@ -177,7 +177,7 @@ func _warrior_kit() -> Array:
 
 func _mage_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Magic Bolt", "cost": 0, "damage": 14, "pressure": 8,
+		Ability.make({"display_name": "Magic Bolt", "cost": 0, "damage": 20, "pressure": 8,
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "mana", "perfect_text": "Restores 10 Mana",
 			"description": "Basic arcane projectile. Builds Resonance."}),
@@ -192,17 +192,17 @@ func _mage_kit() -> Array:
 		Ability.make({"display_name": "Arcane Surge", "cost": 15, "special": "surge",
 			"delay": 3.0, "anim": "attack03",
 			"perfect_id": "", "perfect_text": "+2 Resonance instead of +1",
-			"description": "+20% spell damage for 1 turn.\nGuarantees +1 Resonance."}),
+			"description": "+20% damage for 1 turn.\nGuarantees +1 Resonance."}),
 	]
 
 
 func _cleric_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Smite", "cost": 0, "damage": 12, "pressure": 10,
+		Ability.make({"display_name": "Smite", "cost": 0, "damage": 18, "pressure": 10,
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 8 HP",
 			"description": "Basic radiant strike. Builds Faith."}),
-		Ability.make({"display_name": "Mend Wounds", "cost": 25, "heal": 38,
+		Ability.make({"display_name": "Mend Wounds", "cost": 25, "heal": 45,
 			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 			"perfect_id": "ward", "perfect_text": "Grants Ward (-50% Pressure taken, 2 turns)",
 			"description": "Restore HP to one ally. Builds Faith."}),
@@ -260,7 +260,7 @@ func _build_ui() -> void:
 	ui.add_child(message_label)
 
 	action_panel = PanelContainer.new()
-	action_panel.position = Vector2(370, 628)
+	action_panel.position = Vector2(180, 630)
 	ui.add_child(action_panel)
 	action_box = HBoxContainer.new()
 	action_box.add_theme_constant_override("separation", 10)
@@ -537,8 +537,13 @@ func _show_actions(u: BattleUnit) -> void:
 		var btn := Button.new()
 		var cost_text: String = "Free" if ab.cost == 0 else "%d %s" % [ab.cost, u.resource_name]
 		btn.text = "%s\n(%s)" % [ab.display_name, cost_text]
-		btn.custom_minimum_size = Vector2(150, 58)
+		btn.custom_minimum_size = Vector2(130, 58)
 		btn.tooltip_text = ab.description
+		if ab.damage > 0:
+			btn.tooltip_text += "\nDamage: %d–%d    Pressure: %d" % [
+				int(ab.damage * 0.9), int(round(ab.damage * 1.1)), ab.pressure]
+		if ab.heal > 0:
+			btn.tooltip_text += "\nHeals: %d" % ab.heal
 		if ab.perfect_text != "":
 			btn.tooltip_text += "\nPerfect: %s" % ab.perfect_text
 		btn.disabled = ab.cost > u.resource
@@ -674,7 +679,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
 		if is_crit:
 			raw *= 1.5
-		# Resonance: +5% spell damage per stack; targets with stacks take +5% per stack.
+		# Resonance: +5% damage per stack; targets with stacks take +5% per stack.
 		if attacker.second_resource_name == "Resonance":
 			raw *= 1.0 + 0.05 * attacker.second_resource
 		if attacker.has_status("surge"):
@@ -781,7 +786,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_apply_status(attacker, "surge", 1)
 			_gain_resonance(attacker, 2 if is_perfect else 1)
 			_message("%s surges with power!" % attacker.unit_name)
-			_log("%s: Arcane Surge — +20%% spell damage" % attacker.unit_name, "#70d878")
+			_log("%s: Arcane Surge — +20%% damage" % attacker.unit_name, "#70d878")
 		"purge":
 			var amount := int((35 if is_perfect else 25) * mult)
 			target.heal_amount(amount)

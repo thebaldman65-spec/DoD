@@ -104,7 +104,7 @@ func _build_bars() -> void:
 	add_child(_make_bar_bg(Vector2(-46, bar_y), Vector2(92, 14)))
 	_hp_fill = _make_fill(Vector2(-45, bar_y + 1), Vector2(90, 12), Color(0.30, 0.78, 0.32))
 	add_child(_hp_fill)
-	_hp_text = _make_bar_text(Vector2(-45, bar_y), 10)
+	_hp_text = _make_bar_text(Vector2(-46, bar_y), Vector2(92, 14), 10)
 	add_child(_hp_text)
 	var next_y := bar_y + 16.0
 	# Class resource bar (Rage/Mana) with numeric readout, if the unit has one.
@@ -113,7 +113,7 @@ func _build_bars() -> void:
 		var res_color := Color(0.85, 0.30, 0.25) if resource_name == "Rage" else Color(0.30, 0.50, 0.90)
 		_res_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 11), res_color)
 		add_child(_res_fill)
-		_res_text = _make_bar_text(Vector2(-45, next_y), 9)
+		_res_text = _make_bar_text(Vector2(-46, next_y), Vector2(92, 13), 9)
 		add_child(_res_text)
 		next_y += 15.0
 	# Secondary resource bar (Faith / Arcane Resonance).
@@ -123,7 +123,7 @@ func _build_bars() -> void:
 			else Color(0.75, 0.40, 0.95)
 		_res2_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 10), res2_color)
 		add_child(_res2_fill)
-		_res2_text = _make_bar_text(Vector2(-45, next_y - 1), 9)
+		_res2_text = _make_bar_text(Vector2(-46, next_y), Vector2(92, 12), 9)
 		add_child(_res2_text)
 		next_y += 14.0
 	# Pressure bar.
@@ -150,10 +150,11 @@ func _build_bars() -> void:
 	_build_target_zone()
 
 
-func _make_bar_text(pos: Vector2, font_size: int) -> Label:
+# Text label sized exactly to its bar so centering is pixel-true.
+func _make_bar_text(pos: Vector2, bar_size: Vector2, font_size: int) -> Label:
 	var label := Label.new()
-	label.position = pos + Vector2(0, -2)
-	label.size = Vector2(90, 14)
+	label.position = pos
+	label.size = bar_size
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", Color(1, 1, 1))
 	label.add_theme_constant_override("outline_size", 3)
