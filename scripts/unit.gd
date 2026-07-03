@@ -135,7 +135,7 @@ func _build_bars() -> void:
 
 func _make_bar_text(pos: Vector2, font_size: int) -> Label:
 	var label := Label.new()
-	label.position = pos
+	label.position = pos + Vector2(0, -2)
 	label.size = Vector2(90, 14)
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", Color(1, 1, 1))

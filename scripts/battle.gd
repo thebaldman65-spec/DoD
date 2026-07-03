@@ -343,13 +343,13 @@ func _rebuild_turn_bar() -> void:
 		var slot := VBoxContainer.new()
 		var portrait := TextureRect.new()
 		portrait.texture = u.portrait()
-		portrait.custom_minimum_size = Vector2(48, 64)
+		portrait.custom_minimum_size = Vector2(66, 90)
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		portrait.flip_h = not u.is_hero
 		slot.add_child(portrait)
 		var stripe := ColorRect.new()
-		stripe.custom_minimum_size = Vector2(48, 4)
+		stripe.custom_minimum_size = Vector2(66, 4)
 		stripe.color = Color(0.35, 0.8, 0.4) if u.is_hero else Color(0.85, 0.3, 0.3)
 		slot.add_child(stripe)
 		turn_bar.add_child(slot)
@@ -574,7 +574,14 @@ func _lowest_hp(pool: Array) -> BattleUnit:
 	return best
 
 
-func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: String) -> void:
+# Base chances for the attack rolls. Many things will modify these later.
+const MISS_CHANCE := 0.10
+const PARRY_CHANCE := 0.10
+const CRIT_CHANCE := 0.10
+
+
+func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: String,
+		is_counter := false) -> void:
 	attacker.resource = clampi(attacker.resource - ab.cost + ab.resource_gain, 0, attacker.max_resource)
 	attacker.refresh_bars()
 	var dmg_mult := {"perfect": 1.15, "good": 1.0, "fail": 0.6}[grade] as float
@@ -584,7 +591,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	attacker.play_anim(ab.anim)
 	await _wait(0.3)
 
-	var grade_tag := {"perfect": " [PERFECT]", "good": "", "fail": " [Miss]"}[grade] as String
+	var grade_tag := {"perfect": " [PERFECT]", "good": "", "fail": " [Sloppy]"}[grade] as String
 	if ab.heal > 0:
 		var amount := int(ab.heal * dmg_mult)
 		target.heal_amount(amount)
@@ -594,8 +601,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			target.unit_name, amount, grade_tag], "#70d878")
 		if is_perfect and ab.perfect_id == "ward":
 			_apply_status(target, "ward", 2)
+	elif not is_counter and randf() < MISS_CHANCE:
+		target.float_text("MISS", Color(0.75, 0.75, 0.75))
+		_message("%s misses!" % attacker.unit_name)
+		_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
+			target.unit_name], "#909090")
+		await _wait(0.35)
+	elif not is_counter and not target.broken and not target.dead and randf() < PARRY_CHANCE:
+		# Parry negates the hit; the defender immediately counters with
+		# their basic attack (a free action — no rolls, no initiative cost).
+		target.float_text("PARRY", Color(0.4, 0.9, 1.0))
+		_message("%s parries and counters!" % target.unit_name)
+		_log("%s parries %s — counter attack!" % [target.unit_name,
+			attacker.unit_name], "#50c8e0")
+		await _wait(0.5)
+		attacker.return_to_idle()
+		await _resolve(target, target.abilities[0], attacker, "good", true)
 	else:
-		var crit_chance := 0.10 + (0.25 if target.broken else 0.0)
+		var crit_chance := CRIT_CHANCE + (0.25 if target.broken else 0.0)
 		var is_crit := randf() < crit_chance
 		var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
 		if is_crit:
@@ -631,7 +654,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 
 	await _wait(0.45)
 	attacker.return_to_idle()
-	attacker.next_time += ab.delay * 100.0 / attacker.effective_speed()
+	if not is_counter:
+		attacker.next_time += ab.delay * 100.0 / attacker.effective_speed()
 
 
 func _apply_status(target: BattleUnit, id: String, turns: int) -> void:
@@ -683,7 +707,7 @@ func _run_skill_check() -> String:
 			sc_result.text = "Good"
 			sc_result.add_theme_color_override("font_color", Color(0.6, 0.85, 0.6))
 		"fail":
-			sc_result.text = "Miss..."
+			sc_result.text = "Sloppy..."
 			sc_result.add_theme_color_override("font_color", Color(0.8, 0.4, 0.4))
 	await _wait(0.45)
 	sc_root.visible = false
