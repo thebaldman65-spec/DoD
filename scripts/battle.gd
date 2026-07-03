@@ -109,6 +109,9 @@ func _ready() -> void:
 		Engine.max_fps = 0
 		if sim_started_ms == 0:
 			sim_started_ms = Time.get_ticks_msec()
+	if Run.active:
+		for id in items:
+			items[id][1] = Run.items.get(id, items[id][1])
 	_build_arena()
 	_build_ui()
 	_build_sfx_pool()
@@ -141,47 +144,77 @@ func _build_arena() -> void:
 	cam.make_current()
 
 
-func _spawn_units() -> void:
+const HERO_SLOTS := [Vector2(340, 400), Vector2(230, 520), Vector2(150, 630)]
+const HERO_TINTS := [Color.WHITE, Color(0.65, 0.75, 1.0), Color(1.0, 0.9, 0.6)]
+const ENEMY_LAYOUTS := {
+	1: [Vector2(1000, 500)],
+	2: [Vector2(920, 420), Vector2(1000, 600)],
+	3: [Vector2(900, 400), Vector2(1050, 510), Vector2(940, 630)],
+}
+
+
+func _hero_config(key: String) -> Dictionary:
 	var soldier := "res://assets/sprites/soldier"
+	match key:
+		"warrior":
+			return {"unit_name": "Warrior", "is_hero": true, "sheet_dir": soldier,
+				"max_hp": 140, "armor": 0.25, "speed": 95.0, "stability": 60,
+				"resource_name": "Rage", "resource": 0, "max_resource": 100,
+				"abilities": _warrior_kit()}
+		"mage":
+			return {"unit_name": "Mage", "is_hero": true, "sheet_dir": soldier,
+				"max_hp": 90, "armor": 0.10, "speed": 110.0, "stability": 40,
+				"resource_name": "Mana", "resource": 100, "max_resource": 100,
+				"second_resource_name": "Resonance", "second_resource": 0, "second_max": 5,
+				"abilities": _mage_kit()}
+		_:
+			return {"unit_name": "Cleric", "is_hero": true, "sheet_dir": soldier,
+				"max_hp": 110, "armor": 0.15, "speed": 100.0, "stability": 50,
+				"resource_name": "Mana", "resource": 100, "max_resource": 100,
+				"second_resource_name": "Faith", "second_resource": 0, "second_max": 100,
+				"abilities": _cleric_kit()}
+
+
+func _enemy_config(kind: String) -> Dictionary:
 	var orc := "res://assets/sprites/orc"
+	match kind:
+		"chief":
+			return {"unit_name": "Orc Chief", "is_hero": false, "sheet_dir": orc,
+				"max_hp": 210, "armor": 0.20, "speed": 80.0, "stability": 70,
+				"resource_name": "Rage", "resource": 0, "max_resource": 100,
+				"abilities": _orc_chief_kit(), "sprite_scale": 3.2,
+				"tint": Color(1.0, 0.75, 0.7)}
+		"boss":
+			# Forest boss stand-in until we have real boss art and a unique kit.
+			return {"unit_name": "Withered Warden", "is_hero": false, "sheet_dir": orc,
+				"max_hp": 320, "armor": 0.22, "speed": 85.0, "stability": 90,
+				"resource_name": "Rage", "resource": 20, "max_resource": 100,
+				"abilities": _orc_chief_kit(), "sprite_scale": 3.6,
+				"tint": Color(0.7, 1.0, 0.7)}
+		_:
+			return {"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
+				"max_hp": 115, "armor": 0.15, "speed": 90.0, "stability": 50,
+				"abilities": _orc_raider_kit(), "tint": Color.WHITE}
 
-	heroes.append(_make_unit({
-		"unit_name": "Warrior", "is_hero": true, "sheet_dir": soldier,
-		"max_hp": 140, "armor": 0.25, "speed": 95.0, "stability": 60,
-		"resource_name": "Rage", "resource": 0, "max_resource": 100,
-		"abilities": _warrior_kit(),
-	}, Vector2(340, 400), Color.WHITE))
-	heroes.append(_make_unit({
-		"unit_name": "Mage", "is_hero": true, "sheet_dir": soldier,
-		"max_hp": 90, "armor": 0.10, "speed": 110.0, "stability": 40,
-		"resource_name": "Mana", "resource": 100, "max_resource": 100,
-		"second_resource_name": "Resonance", "second_resource": 0, "second_max": 5,
-		"abilities": _mage_kit(),
-	}, Vector2(230, 520), Color(0.65, 0.75, 1.0)))
-	heroes.append(_make_unit({
-		"unit_name": "Cleric", "is_hero": true, "sheet_dir": soldier,
-		"max_hp": 110, "armor": 0.15, "speed": 100.0, "stability": 50,
-		"resource_name": "Mana", "resource": 100, "max_resource": 100,
-		"second_resource_name": "Faith", "second_resource": 0, "second_max": 100,
-		"abilities": _cleric_kit(),
-	}, Vector2(150, 630), Color(1.0, 0.9, 0.6)))
 
-	enemies.append(_make_unit({
-		"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
-		"max_hp": 115, "armor": 0.15, "speed": 90.0, "stability": 50,
-		"abilities": _orc_raider_kit(),
-	}, Vector2(900, 400), Color.WHITE))
-	enemies.append(_make_unit({
-		"unit_name": "Orc Chief", "is_hero": false, "sheet_dir": orc,
-		"max_hp": 210, "armor": 0.20, "speed": 80.0, "stability": 70,
-		"resource_name": "Rage", "resource": 0, "max_resource": 100,
-		"abilities": _orc_chief_kit(), "sprite_scale": 3.2,
-	}, Vector2(1050, 510), Color(1.0, 0.75, 0.7)))
-	enemies.append(_make_unit({
-		"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
-		"max_hp": 115, "armor": 0.15, "speed": 90.0, "stability": 50,
-		"abilities": _orc_raider_kit(),
-	}, Vector2(940, 630), Color.WHITE))
+func _spawn_units() -> void:
+	var hero_keys := ["warrior", "mage", "cleric"]
+	for i in hero_keys.size():
+		var u := _make_unit(_hero_config(hero_keys[i]), HERO_SLOTS[i], HERO_TINTS[i])
+		if Run.active and i < Run.party.size():
+			u.hp = clampi(Run.party[i]["hp"], 1, u.max_hp)
+			u.refresh_bars()
+		heroes.append(u)
+
+	var composition: Array = ["raider", "chief", "raider"]
+	if Run.active and Run.encounter.has("enemies"):
+		composition = Run.encounter["enemies"]
+	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 3)]
+	for i in composition.size():
+		var cfg := _enemy_config(composition[i])
+		var tint: Color = cfg["tint"]
+		cfg.erase("tint")
+		enemies.append(_make_unit(cfg, layout[i], tint))
 
 	for u in heroes + enemies:
 		u.next_time = (100.0 / u.speed) * randf_range(0.0, 1.0)
@@ -1110,12 +1143,60 @@ func _check_end() -> void:
 			_print_sim_report()
 			get_tree().quit()
 		return
+	if not Run.active:
+		# Standalone battle scene (testing): simple restart loop.
+		if victory:
+			_sfx("victory", -4.0)
+			_show_end("VICTORY", "The Decay recedes... for now.",
+				[["Fight Again", func(): get_tree().reload_current_scene()]])
+		else:
+			_sfx("defeat", -4.0)
+			_show_end("THE PARTY HAS FALLEN", "The cycle begins anew.",
+				[["Fight Again", func(): get_tree().reload_current_scene()]])
+		return
+
+	# Run mode: sync state back and route through the map.
+	for id in items:
+		Run.items[id] = items[id][1]
 	if victory:
+		for i in heroes.size():
+			# The Untouched refuse to stay down: the fallen return at 20% HP.
+			Run.party[i]["hp"] = maxi(heroes[i].hp, int(heroes[i].max_hp * 0.2))
 		_sfx("victory", -4.0)
-		_show_end("VICTORY", "The Decay recedes... for now.")
+		if Run.encounter.get("type", "") == "boss":
+			Run.active = false
+			_show_end("THE WARDEN FALLS", "The forest breathes again. Run complete!",
+				[["New Run", _start_new_run]])
+		else:
+			_show_end("VICTORY", "Choose your spoils:", [
+				["Rest (party heals 25%)", _reward_rest],
+				["Scavenge (+1 random item)", _reward_loot],
+			])
 	else:
+		Run.active = false
 		_sfx("defeat", -4.0)
-		_show_end("THE PARTY HAS FALLEN", "The cycle begins anew.")
+		_show_end("THE PARTY HAS FALLEN", "The Decay claims this cycle.",
+			[["New Run", _start_new_run]])
+
+
+func _reward_rest() -> void:
+	Run.heal_party(0.25)
+	_to_map()
+
+
+func _reward_loot() -> void:
+	var id: String = ["bomb", "revive", "defense"].pick_random()
+	Run.items[id] = Run.items.get(id, 0) + 1
+	_to_map()
+
+
+func _to_map() -> void:
+	get_tree().change_scene_to_file("res://scenes/map.tscn")
+
+
+func _start_new_run() -> void:
+	Run.new_run()
+	_to_map()
 
 
 func _print_sim_report() -> void:
@@ -1159,7 +1240,7 @@ func _print_sim_report() -> void:
 	print("=============================================\n")
 
 
-func _show_end(title: String, subtitle: String) -> void:
+func _show_end(title: String, subtitle: String, buttons: Array) -> void:
 	var dim := ColorRect.new()
 	dim.size = Vector2(1280, 720)
 	dim.color = Color(0, 0, 0, 0.55)
@@ -1181,11 +1262,12 @@ func _show_end(title: String, subtitle: String) -> void:
 	sub_label.text = subtitle
 	sub_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(sub_label)
-	var btn := Button.new()
-	btn.text = "Fight Again"
-	btn.custom_minimum_size = Vector2(180, 44)
-	btn.pressed.connect(func(): get_tree().reload_current_scene())
-	vbox.add_child(btn)
+	for entry in buttons:
+		var btn := Button.new()
+		btn.text = entry[0]
+		btn.custom_minimum_size = Vector2(240, 44)
+		btn.pressed.connect(entry[1])
+		vbox.add_child(btn)
 
 
 # ---------- helpers ----------
