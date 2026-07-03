@@ -18,6 +18,12 @@ Turn-based, party-based roguelike RPG. Phase 1: combat prototype.
 - Timing-bar skill checks on every ability (Perfect / Good / Miss)
 - Crits, armor, floating damage numbers, victory/defeat + restart
 
+## Automated testing
+
+- `DOD_AUTOPLAY=1 <godot> --headless --path .` — one auto-played battle with debug prints
+- `DOD_SIM=200 <godot> --headless --path .` — 200 max-speed battles, prints a
+  balance report (win rate, rounds, damage share, breaks, roll rates, ability usage)
+
 ## Project layout
 
 - `scenes/battle.tscn` — entry scene (everything is built in code)

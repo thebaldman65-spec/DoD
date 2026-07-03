@@ -52,9 +52,18 @@ var action_panel: PanelContainer
 var action_box: HBoxContainer
 var active_marker: Label
 
-# Autoplay: heroes act automatically (first ability, first target, no skill
-# check). Lets battles run headless for testing: DOD_AUTOPLAY=1 godot --headless
-var autoplay := OS.get_environment("DOD_AUTOPLAY") == "1"
+# Autoplay: heroes act automatically with a simple policy (no skill check UI).
+#   DOD_AUTOPLAY=1 godot --headless          -> one battle with debug prints
+#   DOD_SIM=200  godot --headless            -> 200 max-speed battles + stats report
+var autoplay := false
+var sim := false
+var sim_target := 0
+var debug_prints := false
+
+# Accumulated across scene reloads within one simulation run.
+static var sim_stats := {}
+static var sim_done := 0
+static var sim_started_ms := 0
 
 var history: RichTextLabel
 
@@ -67,6 +76,14 @@ var sc_dir := 1.0
 
 
 func _ready() -> void:
+	sim_target = int(OS.get_environment("DOD_SIM"))
+	sim = sim_target > 0
+	autoplay = sim or OS.get_environment("DOD_AUTOPLAY") == "1"
+	debug_prints = autoplay and not sim
+	if sim:
+		Engine.max_fps = 0
+		if sim_started_ms == 0:
+			sim_started_ms = Time.get_ticks_msec()
 	_build_arena()
 	_build_ui()
 	_spawn_units()
@@ -462,8 +479,11 @@ func _player_turn(u: BattleUnit) -> void:
 	_message("%s's turn — choose an ability" % u.unit_name)
 	_show_actions(u)
 	var ab: Ability
+	var auto_target: BattleUnit = null
 	if autoplay:
-		ab = u.abilities[0]
+		var pick := _autoplay_pick(u)
+		ab = pick[0]
+		auto_target = pick[1]
 	else:
 		ab = await _ability_picked
 	action_panel.visible = false
@@ -471,23 +491,59 @@ func _player_turn(u: BattleUnit) -> void:
 	var target: BattleUnit
 	if ab.special in ["rally", "focus", "surge"]:
 		target = u  # self/party effects need no target choice
+	elif autoplay:
+		target = auto_target
 	else:
 		var pool: Array
 		if ab.target == Ability.Target.ALLY:
 			pool = heroes.filter(func(h): return not h.dead)
 		else:
 			pool = enemies.filter(func(e): return not e.dead)
-		if pool.size() == 1 or autoplay:
+		if pool.size() == 1:
 			target = pool[0]
 		else:
 			_message("Choose a target")
 			target = await _pick_target(pool)
 
 	var grade := "good"
-	if not autoplay:
+	if autoplay:
+		# Approximate a human player's skill check outcomes.
+		var roll := randf()
+		grade = "perfect" if roll < 0.20 else ("fail" if roll > 0.85 else "good")
+	else:
 		grade = await _run_skill_check()
 	await _resolve(u, ab, target, grade)
 	current_hero = null
+
+
+# Simple hero policy for automated battles: heal when hurt, spend when able,
+# focus the weakest (preferring Broken) enemy.
+func _autoplay_pick(u: BattleUnit) -> Array:
+	var foes := enemies.filter(func(e): return not e.dead)
+	var allies := heroes.filter(func(h): return not h.dead)
+	var broken_foes := foes.filter(func(e): return e.broken)
+	var target_foe: BattleUnit = _lowest_hp(broken_foes) if not broken_foes.is_empty() \
+		else _lowest_hp(foes)
+	var weakest_ally := _lowest_hp(allies)
+	match u.unit_name:
+		"Warrior":
+			if u.resource >= 30:
+				return [u.abilities[1], target_foe]      # Heavy Strike
+			if u.resource >= 20 and not target_foe.has_status("sunder"):
+				return [u.abilities[3], target_foe]      # Crushing Blow
+			return [u.abilities[0], target_foe]          # Strike
+		"Mage":
+			if weakest_ally.hp < weakest_ally.max_hp * 0.35 and u.resource >= 20 \
+					and not weakest_ally.has_status("barrier"):
+				return [u.abilities[1], weakest_ally]    # Arcane Barrier
+			if u.resource < 15 and not u.has_status("focus"):
+				return [u.abilities[2], u]               # Focus
+			return [u.abilities[0], target_foe]          # Magic Bolt
+		"Cleric":
+			if weakest_ally.hp < weakest_ally.max_hp * 0.5 and u.resource >= 25:
+				return [u.abilities[1], weakest_ally]    # Mend Wounds
+			return [u.abilities[0], target_foe]          # Smite
+	return [u.abilities[0], target_foe]
 
 
 # Items are shared by the party and never consume the turn: the action
@@ -562,7 +618,7 @@ func _show_actions(u: BattleUnit) -> void:
 			btn.tooltip_text += "\nDamage: %d–%d    Pressure: %d" % [
 				int(ab.damage * 0.9 * buff_mult), int(round(ab.damage * 1.1 * buff_mult)),
 				ab.pressure]
-			if autoplay and u.second_resource_name == "Resonance":
+			if debug_prints and u.second_resource_name == "Resonance":
 				print("[DBG] %s tooltip @%d stacks: %s" % [ab.display_name,
 					u.second_resource, btn.tooltip_text.replace("\n", " | ")])
 		if ab.heal > 0:
@@ -657,6 +713,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 
 	attacker.play_anim(ab.anim)
 	await _wait(0.3)
+	if attacker.is_hero:
+		_stat("hero_actions")
+		_stat("use_" + ab.display_name)
 
 	# Faith builds from every Cleric action; any Mage cast counts for Resonance decay.
 	if attacker.second_resource_name == "Faith":
@@ -670,6 +729,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		await _resolve_special(attacker, ab, target, grade, dmg_mult)
 	elif ab.heal > 0:
 		var amount := int(ab.heal * dmg_mult)
+		_stat("healing", amount)
 		target.heal_amount(amount)
 		target.float_text("+%d" % amount, Color(0.4, 0.9, 0.45))
 		_message("%s heals %s for %d" % [attacker.unit_name, target.unit_name, amount])
@@ -678,6 +738,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if is_perfect and ab.perfect_id == "ward":
 			_apply_status(target, "ward", 2)
 	elif not is_counter and randf() < MISS_CHANCE:
+		_stat("attacks")
+		_stat("attack_miss")
 		target.float_text("MISS", Color(0.75, 0.75, 0.75))
 		_message("%s misses!" % attacker.unit_name)
 		_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
@@ -686,6 +748,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	elif not is_counter and not target.broken and not target.dead and randf() < PARRY_CHANCE:
 		# Parry negates the hit; the defender immediately counters with
 		# their basic attack (a free action — no rolls, no initiative cost).
+		_stat("attacks")
+		_stat("attack_parry")
 		target.float_text("PARRY", Color(0.4, 0.9, 1.0))
 		_message("%s parries and counters!" % target.unit_name)
 		_log("%s parries %s — counter attack!" % [target.unit_name,
@@ -712,7 +776,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# A damage spell cast at max Resonance releases all stacks after it lands.
 		var releasing: bool = attacker.second_resource_name == "Resonance" \
 			and attacker.second_resource >= attacker.second_max
-		if autoplay and attacker.second_resource_name == "Resonance":
+		if debug_prints and attacker.second_resource_name == "Resonance":
 			print("[DBG] %s attacks @%d stacks: base %d -> raw %.1f" % [
 				attacker.unit_name, attacker.second_resource, ab.damage, raw])
 		var final := maxi(int(round(raw * (1.0 - target.effective_armor()))), 1)
@@ -722,6 +786,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		var pr := int(round(ab.pressure * pr_mult * (1.5 if is_crit else 1.0)))
 		if is_perfect and ab.perfect_id == "pressure":
 			pr = int(pr * 1.6)
+		_stat("attacks")
+		_stat("attack_landed")
+		if is_crit:
+			_stat("attack_crit")
+		if attacker.is_hero:
+			_stat("dmg_hero_" + attacker.unit_name, final)
+		else:
+			_stat("dmg_enemy", final)
 		var result: Dictionary = target.take_hit(final, pr)
 		if is_crit:
 			target.float_text("%d!" % final, Color(1.0, 0.45, 0.15), true)
@@ -750,11 +822,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if is_perfect:
 			_apply_perfect_bonus(attacker, target, ab, result.died)
 		if result.broke:
+			_stat("breaks_on_heroes" if target.is_hero else "breaks_on_enemies")
 			_message("%s BREAKS!" % target.unit_name)
 			_log("!! %s BREAKS" % target.unit_name, "#c070e0")
 			_shake()
 			await _wait(0.5)
 		if result.died:
+			_stat("hero_deaths" if target.is_hero else "enemy_deaths")
 			_message("%s falls!" % target.unit_name)
 			_log("† %s dies" % target.unit_name, "#e05050")
 			await _wait(0.5)
@@ -934,12 +1008,71 @@ func _unhandled_input(event: InputEvent) -> void:
 func _check_end() -> void:
 	if battle_over:
 		return
-	if enemies.all(func(e): return e.dead):
-		battle_over = true
+	var victory := enemies.all(func(e): return e.dead)
+	var defeat := heroes.all(func(h): return h.dead)
+	if not victory and not defeat:
+		return
+	battle_over = true
+	if sim:
+		sim_done += 1
+		_stat("battles")
+		if victory:
+			_stat("wins")
+		for h in heroes:
+			if not h.dead:
+				_stat("surviving_hero_hp_pct", h.hp / float(h.max_hp))
+				_stat("surviving_heroes")
+		if sim_done < sim_target:
+			get_tree().reload_current_scene()
+		else:
+			_print_sim_report()
+			get_tree().quit()
+		return
+	if victory:
 		_show_end("VICTORY", "The Decay recedes... for now.")
-	elif heroes.all(func(h): return h.dead):
-		battle_over = true
+	else:
 		_show_end("THE PARTY HAS FALLEN", "The cycle begins anew.")
+
+
+func _print_sim_report() -> void:
+	var battles := maxf(sim_stats.get("battles", 0.0), 1.0)
+	var attacks := maxf(sim_stats.get("attacks", 0.0), 1.0)
+	var landed := maxf(sim_stats.get("attack_landed", 0.0), 1.0)
+	var elapsed := (Time.get_ticks_msec() - sim_started_ms) / 1000.0
+	print("\n===== DAWN OF DECAY — SIMULATION REPORT =====")
+	print("Battles: %d   Wins: %d (%.0f%%)   Sim time: %.1fs" % [int(battles),
+		int(sim_stats.get("wins", 0.0)), 100.0 * sim_stats.get("wins", 0.0) / battles, elapsed])
+	print("Avg rounds/battle (hero turns / 3): %.1f" % [
+		sim_stats.get("hero_actions", 0.0) / battles / 3.0])
+	print("Hero deaths/battle: %.2f   Survivors' avg HP: %.0f%%" % [
+		sim_stats.get("hero_deaths", 0.0) / battles,
+		100.0 * sim_stats.get("surviving_hero_hp_pct", 0.0) / maxf(sim_stats.get("surviving_heroes", 0.0), 1.0)])
+	var hero_dmg := {}
+	var hero_total := 0.0
+	for key in sim_stats:
+		if key.begins_with("dmg_hero_"):
+			hero_dmg[key.trim_prefix("dmg_hero_")] = sim_stats[key]
+			hero_total += sim_stats[key]
+	var share_parts := PackedStringArray()
+	for hero_name in hero_dmg:
+		share_parts.append("%s %.0f%% (%.0f/battle)" % [hero_name,
+			100.0 * hero_dmg[hero_name] / maxf(hero_total, 1.0), hero_dmg[hero_name] / battles])
+	print("Hero damage share: %s" % " | ".join(share_parts))
+	print("Enemy damage dealt/battle: %.0f   Healing/battle: %.0f" % [
+		sim_stats.get("dmg_enemy", 0.0) / battles, sim_stats.get("healing", 0.0) / battles])
+	print("Breaks/battle: on enemies %.2f, on heroes %.2f" % [
+		sim_stats.get("breaks_on_enemies", 0.0) / battles,
+		sim_stats.get("breaks_on_heroes", 0.0) / battles])
+	print("Rolls: miss %.1f%%, parry %.1f%%, crit %.1f%% of landed" % [
+		100.0 * sim_stats.get("attack_miss", 0.0) / attacks,
+		100.0 * sim_stats.get("attack_parry", 0.0) / attacks,
+		100.0 * sim_stats.get("attack_crit", 0.0) / landed])
+	var usage_parts := PackedStringArray()
+	for key in sim_stats:
+		if key.begins_with("use_"):
+			usage_parts.append("%s %.1f" % [key.trim_prefix("use_"), sim_stats[key] / battles])
+	print("Hero ability uses/battle: %s" % " | ".join(usage_parts))
+	print("=============================================\n")
 
 
 func _show_end(title: String, subtitle: String) -> void:
@@ -977,7 +1110,16 @@ const PACE := 0.85  # global combat pacing multiplier (lower = faster fights)
 
 
 func _wait(seconds: float) -> void:
-	await get_tree().create_timer(seconds * PACE).timeout
+	if sim:
+		await get_tree().process_frame
+	else:
+		await get_tree().create_timer(seconds * PACE).timeout
+
+
+# One stat counter, accumulated across all simulated battles.
+func _stat(key: String, amount := 1.0) -> void:
+	if sim:
+		sim_stats[key] = sim_stats.get(key, 0.0) + amount
 
 
 func _shake() -> void:
