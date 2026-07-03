@@ -63,6 +63,7 @@ var items := {
 var item_used := false  # one item per character per turn
 
 var ui: CanvasLayer
+var cam: Camera2D
 var turn_bar: HBoxContainer
 var message_label: Label
 var action_panel: PanelContainer
@@ -126,7 +127,7 @@ func _build_arena() -> void:
 	add_child(art)
 	# Zoomed camera so the combatants fill more of the screen (UI is on a
 	# CanvasLayer and unaffected).
-	var cam := Camera2D.new()
+	cam = Camera2D.new()
 	cam.position = Vector2(615, 450)
 	cam.zoom = Vector2(1.2, 1.2)
 	add_child(cam)
@@ -734,6 +735,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	var pr_mult := {"perfect": 1.25, "good": 1.0, "fail": 0.5}[grade] as float
 	var is_perfect := grade == "perfect"
 
+	# Lunge toward the target so attacks visibly connect (specials stay put).
+	var lunge_origin := attacker.position
+	if not sim and ab.special == "" and target != attacker:
+		var toward := (target.position - attacker.position).normalized()
+		var lunge_dist := 90.0 if ab.heal == 0 else 40.0
+		var lunge := create_tween()
+		lunge.tween_property(attacker, "position", lunge_origin + toward * lunge_dist, 0.14) \
+			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
 	attacker.play_anim(ab.anim)
 	await _wait(0.3)
 	if attacker.is_hero:
@@ -821,6 +831,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		else:
 			_stat("dmg_enemy", final)
 		var result: Dictionary = target.take_hit(final, pr)
+		if not sim and not result.died:
+			target.hit_react((target.position - attacker.position).normalized())
 		if is_crit:
 			_sfx("crit", -3.0)
 			target.float_text("%d!" % final, Color(1.0, 0.45, 0.15), true)
@@ -855,6 +867,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_sfx("break", -3.0)
 			_message("%s BREAKS!" % target.unit_name)
 			_log("!! %s BREAKS" % target.unit_name, "#c070e0")
+			await _break_impact()
 			_shake()
 			await _wait(0.5)
 		if result.died:
@@ -864,6 +877,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_log("† %s dies" % target.unit_name, "#e05050")
 			await _wait(0.5)
 
+	if not sim and attacker.position != lunge_origin:
+		var back := create_tween()
+		back.tween_property(attacker, "position", lunge_origin, 0.18) \
+			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	await _wait(0.45)
 	attacker.return_to_idle()
 	if not is_counter:
@@ -1190,3 +1207,29 @@ func _shake() -> void:
 	for i in 4:
 		tween.tween_property(self, "position", Vector2(randf_range(-8, 8), randf_range(-6, 6)), 0.05)
 	tween.tween_property(self, "position", Vector2.ZERO, 0.05)
+
+
+# The Break payoff moment: brief hitstop freeze, purple fracture flash,
+# and a camera zoom punch (per the UI design doc).
+func _break_impact() -> void:
+	if sim:
+		return
+	# Hitstop: freeze the world for ~90ms of real time.
+	Engine.time_scale = 0.05
+	await get_tree().create_timer(0.09, true, false, true).timeout
+	Engine.time_scale = 1.0
+	# Purple fracture flash over the whole screen.
+	var overlay := ColorRect.new()
+	overlay.size = Vector2(1280, 720)
+	overlay.color = Color(0.60, 0.20, 0.90, 0.0)
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ui.add_child(overlay)
+	var flash := create_tween()
+	flash.tween_property(overlay, "color:a", 0.28, 0.05)
+	flash.tween_property(overlay, "color:a", 0.0, 0.35)
+	flash.tween_callback(overlay.queue_free)
+	# Camera zoom punch.
+	var punch := create_tween()
+	punch.tween_property(cam, "zoom", Vector2(1.27, 1.27), 0.08) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	punch.tween_property(cam, "zoom", Vector2(1.2, 1.2), 0.25)

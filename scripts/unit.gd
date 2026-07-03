@@ -403,6 +403,17 @@ func _die() -> void:
 	play_anim("death")
 
 
+# White flash + knockback nudge when struck. `dir` points away from the attacker.
+func hit_react(dir: Vector2) -> void:
+	sprite.self_modulate = Color(2.5, 2.5, 2.5)
+	var flash := create_tween()
+	flash.tween_property(sprite, "self_modulate", _base_tint, 0.25)
+	var origin := position
+	var nudge := create_tween()
+	nudge.tween_property(self, "position", origin + dir * 10.0, 0.06)
+	nudge.tween_property(self, "position", origin, 0.12)
+
+
 # Brings a KO'd unit back at a fraction of max HP.
 func revive(pct: float) -> void:
 	dead = false
