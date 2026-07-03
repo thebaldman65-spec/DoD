@@ -19,6 +19,7 @@ const STATUS_INFO := {
 	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Takes 5 damage at the start of each turn."],
 	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-30% armor."],
 	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4), "Takes 50% less Pressure."],
+	"fortify": ["Fortify", "+D", Color(0.55, 0.8, 0.9), "+10% armor for the rest of the battle."],
 }
 
 # Damage-over-time statuses ticked at the start of the afflicted unit's turn.
@@ -27,12 +28,21 @@ const DOT_STATUSES := {"burn": 6, "bleed": 5}
 var heroes: Array = []
 var enemies: Array = []
 var battle_over := false
+var current_hero: BattleUnit
+
+# Shared party inventory: item id -> [label, count, tooltip]
+var items := {
+	"bomb": ["Bomb", 2, "Deals 15 damage to all enemies."],
+	"revive": ["Revive Potion", 1, "Revives a fallen ally at 50% HP."],
+	"defense": ["Defense Potion", 1, "+10% armor to all living party members\nfor the rest of the battle."],
+}
 
 var ui: CanvasLayer
 var turn_bar: HBoxContainer
 var message_label: Label
 var action_panel: PanelContainer
 var action_box: HBoxContainer
+var item_box: HBoxContainer
 var active_marker: Label
 
 var history: RichTextLabel
@@ -60,11 +70,14 @@ func _build_arena() -> void:
 	bg.size = Vector2(1680, 920)
 	bg.color = Color(0.09, 0.07, 0.11)
 	add_child(bg)
-	var floor_rect := ColorRect.new()
-	floor_rect.position = Vector2(-200, 340)
-	floor_rect.size = Vector2(1680, 560)
-	floor_rect.color = Color(0.13, 0.10, 0.14)
-	add_child(floor_rect)
+	# Battle background art, scaled uniformly to cover the camera's view.
+	var tex: Texture2D = load("res://assets/backgrounds/battle_background_1.png")
+	var art := Sprite2D.new()
+	art.texture = tex
+	var cover := maxf(1680.0 / tex.get_width(), 920.0 / tex.get_height())
+	art.scale = Vector2(cover, cover)
+	art.position = Vector2(640, 360)
+	add_child(art)
 	# Zoomed camera so the combatants fill more of the screen (UI is on a
 	# CanvasLayer and unaffected).
 	var cam := Camera2D.new()
@@ -224,11 +237,17 @@ func _build_ui() -> void:
 	ui.add_child(message_label)
 
 	action_panel = PanelContainer.new()
-	action_panel.position = Vector2(400, 630)
+	action_panel.position = Vector2(400, 596)
 	ui.add_child(action_panel)
+	var panel_vbox := VBoxContainer.new()
+	panel_vbox.add_theme_constant_override("separation", 6)
+	action_panel.add_child(panel_vbox)
+	item_box = HBoxContainer.new()
+	item_box.add_theme_constant_override("separation", 8)
+	panel_vbox.add_child(item_box)
 	action_box = HBoxContainer.new()
 	action_box.add_theme_constant_override("separation", 10)
-	action_panel.add_child(action_box)
+	panel_vbox.add_child(action_box)
 	action_panel.visible = false
 
 	var history_panel := PanelContainer.new()
@@ -395,6 +414,7 @@ func _next_unit() -> BattleUnit:
 
 
 func _player_turn(u: BattleUnit) -> void:
+	current_hero = u
 	if u.resource_name == "Mana":
 		u.resource = mini(u.resource + 12, u.max_resource)
 	_message("%s's turn — choose an ability" % u.unit_name)
@@ -418,11 +438,77 @@ func _player_turn(u: BattleUnit) -> void:
 	var grade: String = await _run_skill_check()
 	await _resolve(u, ab, target, grade)
 	u.hide_info()
+	current_hero = null
+
+
+# Items are shared by the party and never consume the turn: the action
+# panel comes right back after the effect resolves.
+func _use_item(item_id: String) -> void:
+	if items[item_id][1] <= 0:
+		return
+	action_panel.visible = false
+	items[item_id][1] -= 1
+	match item_id:
+		"bomb":
+			_message("Bomb thrown!")
+			_log("Item: Bomb — 15 dmg to all enemies", "#e0c060")
+			_shake()
+			for e in enemies.filter(func(en): return not en.dead):
+				var result: Dictionary = e.take_hit(15, 0)
+				e.float_text("15", Color(1.0, 0.8, 0.4))
+				if result.died:
+					_message("%s falls!" % e.unit_name)
+					_log("† %s dies" % e.unit_name, "#e05050")
+			await _wait(0.8)
+			_rebuild_turn_bar()
+			_check_end()
+		"revive":
+			var fallen := heroes.filter(func(h): return h.dead)
+			if fallen.is_empty():
+				items[item_id][1] += 1
+				return
+			var target: BattleUnit
+			if fallen.size() == 1:
+				target = fallen[0]
+			else:
+				_message("Choose an ally to revive")
+				target = await _pick_target(fallen)
+			target.revive(0.5)
+			target.float_text("REVIVED", Color(0.5, 1.0, 0.6))
+			if current_hero != null:
+				target.next_time = current_hero.next_time + BASIC_DELAY * 100.0 / target.effective_speed()
+			_message("%s returns to the fight!" % target.unit_name)
+			_log("Item: Revive Potion — %s revived at 50%% HP" % target.unit_name, "#e0c060")
+			_rebuild_turn_bar()
+			await _wait(0.6)
+		"defense":
+			_message("The party braces!")
+			_log("Item: Defense Potion — party gains Fortify", "#e0c060")
+			for h in heroes.filter(func(he): return not he.dead):
+				_apply_status(h, "fortify", -1)
+			await _wait(0.6)
+	if not battle_over and current_hero != null and not current_hero.dead:
+		_show_actions(current_hero)
 
 
 func _show_actions(u: BattleUnit) -> void:
 	for child in action_box.get_children():
 		child.queue_free()
+	for child in item_box.get_children():
+		child.queue_free()
+	for item_id in items:
+		var entry: Array = items[item_id]
+		var item_btn := Button.new()
+		item_btn.text = "%s x%d" % [entry[0], entry[1]]
+		item_btn.custom_minimum_size = Vector2(150, 26)
+		item_btn.add_theme_font_size_override("font_size", 12)
+		item_btn.tooltip_text = "%s\nDoes not consume the turn." % entry[2]
+		var usable: bool = entry[1] > 0
+		if item_id == "revive":
+			usable = usable and heroes.any(func(h): return h.dead)
+		item_btn.disabled = not usable
+		item_btn.pressed.connect(_use_item.bind(item_id))
+		item_box.add_child(item_btn)
 	for ab in u.abilities:
 		var btn := Button.new()
 		var cost_text: String = "Free" if ab.cost == 0 else "%d %s" % [ab.cost, u.resource_name]
@@ -542,7 +628,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 func _apply_status(target: BattleUnit, id: String, turns: int) -> void:
 	var info: Array = STATUS_INFO[id]
 	target.add_status(id, info[0], info[1], info[2], turns, info[3])
-	_log("   → %s on %s (%d turns)" % [info[0], target.unit_name, turns], "#b0a8e0")
+	var span := "battle" if turns < 0 else "%d turns" % turns
+	_log("   → %s on %s (%s)" % [info[0], target.unit_name, span], "#b0a8e0")
 
 
 # Unique bonus effects for Perfect skill checks (per ability).

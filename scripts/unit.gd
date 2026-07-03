@@ -90,7 +90,7 @@ func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
 
 
 func _build_bars() -> void:
-	var bar_y := 48.0
+	var bar_y := 42.0
 	add_child(_make_bar_bg(Vector2(-36, bar_y), Vector2(72, 8)))
 	_hp_fill = _make_fill(Vector2(-35, bar_y + 1), Vector2(70, 6), Color(0.30, 0.78, 0.32))
 	add_child(_hp_fill)
@@ -105,13 +105,13 @@ func _build_bars() -> void:
 	name_label.add_theme_color_override("font_color", Color(0.92, 0.88, 0.78))
 	name_label.add_theme_constant_override("outline_size", 4)
 	name_label.add_theme_color_override("font_outline_color", Color(0.05, 0.03, 0.08, 0.9))
-	name_label.position = Vector2(-50, -62)
+	name_label.position = Vector2(-50, -52)
 	name_label.size = Vector2(100, 18)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(name_label)
 
 	_chips_root = Node2D.new()
-	_chips_root.position = Vector2(0, 70)
+	_chips_root.position = Vector2(0, 62)
 	add_child(_chips_root)
 
 	_info_label = Label.new()
@@ -119,7 +119,7 @@ func _build_bars() -> void:
 	_info_label.add_theme_color_override("font_color", Color(0.95, 0.92, 0.8))
 	_info_label.add_theme_constant_override("outline_size", 3)
 	_info_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
-	_info_label.position = Vector2(-60, 90)
+	_info_label.position = Vector2(-60, 80)
 	_info_label.size = Vector2(120, 32)
 	_info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(_info_label)
@@ -218,12 +218,13 @@ func has_status(id: String) -> bool:
 	return false
 
 
-# Called at the start of this unit's turn. Broken is managed separately.
+# Called at the start of this unit's turn. Broken is managed separately;
+# negative turn counts mean "lasts the whole battle".
 func tick_statuses() -> void:
 	for s in statuses:
-		if s.id != "broken":
+		if s.id != "broken" and s.turns > 0:
 			s.turns -= 1
-	statuses = statuses.filter(func(s): return s.id == "broken" or s.turns > 0)
+	statuses = statuses.filter(func(s): return s.id == "broken" or s.turns != 0)
 	_refresh_chips()
 
 
@@ -233,6 +234,8 @@ func effective_speed() -> float:
 
 func effective_armor() -> float:
 	var a := armor
+	if has_status("fortify"):
+		a += 0.10
 	if broken:
 		a *= 0.7
 	if has_status("sunder"):
@@ -256,7 +259,7 @@ func _refresh_chips() -> void:
 		chip.mouse_filter = Control.MOUSE_FILTER_STOP
 		chip.tooltip_text = "%s (%s turn%s left)\n%s" % [
 			s.label, s.turns, "" if s.turns == 1 else "s", s.desc]
-		if s.id == "broken":
+		if s.id == "broken" or s.turns < 0:
 			chip.tooltip_text = "%s\n%s" % [s.label, s.desc]
 		_chips_root.add_child(chip)
 		var tag := Label.new()
@@ -349,6 +352,17 @@ func _die() -> void:
 	statuses.clear()
 	_refresh_chips()
 	play_anim("death")
+
+
+# Brings a KO'd unit back at a fraction of max HP.
+func revive(pct: float) -> void:
+	dead = false
+	hp = maxi(int(max_hp * pct), 1)
+	pressure = 0
+	modulate = Color.WHITE
+	sprite.self_modulate = _base_tint
+	sprite.play("idle")
+	refresh_bars()
 
 
 func recover_from_break() -> void:
