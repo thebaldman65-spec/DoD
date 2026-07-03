@@ -52,6 +52,10 @@ var action_panel: PanelContainer
 var action_box: HBoxContainer
 var active_marker: Label
 
+# Autoplay: heroes act automatically (first ability, first target, no skill
+# check). Lets battles run headless for testing: DOD_AUTOPLAY=1 godot --headless
+var autoplay := OS.get_environment("DOD_AUTOPLAY") == "1"
+
 var history: RichTextLabel
 
 var sc_root: Control
@@ -460,7 +464,11 @@ func _player_turn(u: BattleUnit) -> void:
 		u.refresh_bars()
 	_message("%s's turn — choose an ability" % u.unit_name)
 	_show_actions(u)
-	var ab = await _ability_picked
+	var ab: Ability
+	if autoplay:
+		ab = u.abilities[0]
+	else:
+		ab = await _ability_picked
 	action_panel.visible = false
 
 	var target: BattleUnit
@@ -472,13 +480,15 @@ func _player_turn(u: BattleUnit) -> void:
 			pool = heroes.filter(func(h): return not h.dead)
 		else:
 			pool = enemies.filter(func(e): return not e.dead)
-		if pool.size() == 1:
+		if pool.size() == 1 or autoplay:
 			target = pool[0]
 		else:
 			_message("Choose a target")
 			target = await _pick_target(pool)
 
-	var grade: String = await _run_skill_check()
+	var grade := "good"
+	if not autoplay:
+		grade = await _run_skill_check()
 	await _resolve(u, ab, target, grade)
 	current_hero = null
 
@@ -552,9 +562,12 @@ func _show_actions(u: BattleUnit) -> void:
 				buff_mult *= 1.0 + 0.15 * u.second_resource
 			if u.has_status("surge"):
 				buff_mult *= 1.2
-			btn.tooltip_text += "\nDamage: %d–%d%s    Pressure: %d" % [
+			btn.tooltip_text += "\nDamage: %d–%d    Pressure: %d" % [
 				int(ab.damage * 0.9 * buff_mult), int(round(ab.damage * 1.1 * buff_mult)),
-				" (buffed)" if buff_mult > 1.0 else "", ab.pressure]
+				ab.pressure]
+			if autoplay and u.second_resource_name == "Resonance":
+				print("[DBG] %s tooltip @%d stacks: %s" % [ab.display_name,
+					u.second_resource, btn.tooltip_text.replace("\n", " | ")])
 		if ab.heal > 0:
 			btn.tooltip_text += "\nHeals: %d" % ab.heal
 		if ab.perfect_text != "":
@@ -699,7 +712,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			raw *= 1.2
 		if target.second_resource_name == "Resonance":
 			raw *= 1.0 + 0.05 * target.second_resource
+		if autoplay and attacker.second_resource_name == "Resonance":
+			print("[DBG] %s attacks @%d stacks: base %d -> raw %.1f" % [
+				attacker.unit_name, attacker.second_resource, ab.damage, raw])
 		var final := maxi(int(round(raw * (1.0 - target.effective_armor()))), 1)
+		# Make Resonance-boosted hits legible: tint the number purple.
+		var resonance_boosted: bool = attacker.second_resource_name == "Resonance" \
+			and attacker.second_resource > 0
 		var pr := int(round(ab.pressure * pr_mult * (1.5 if is_crit else 1.0)))
 		if is_perfect and ab.perfect_id == "pressure":
 			pr = int(pr * 1.6)
@@ -707,6 +726,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if is_crit:
 			target.float_text("%d!" % final, Color(1.0, 0.45, 0.15), true)
 			_shake()
+		elif resonance_boosted:
+			target.float_text("%d" % final, Color(0.85, 0.55, 1.0))
 		else:
 			target.float_text("%d" % final, Color(0.95, 0.85, 0.75))
 		_gain_resonance(attacker, 2 if is_crit else 1)

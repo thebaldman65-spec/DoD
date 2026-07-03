@@ -228,7 +228,11 @@ func refresh_bars() -> void:
 		_res_text.text = "%d/%d" % [resource, max_resource]
 	if _res2_fill != null:
 		_res2_fill.size.x = 90.0 * clampf(second_resource / float(second_max), 0.0, 1.0)
-		_res2_text.text = "%s %d/%d" % [second_resource_name, second_resource, second_max]
+		if second_resource_name == "Resonance":
+			_res2_text.text = "%d/%d (+%d%% dmg)" % [second_resource, second_max,
+				second_resource * 15]
+		else:
+			_res2_text.text = "%s %d/%d" % [second_resource_name, second_resource, second_max]
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
 	_pressure_fill.size.x = 90.0 * pressure_ratio
 	# Shifts toward hot pink as the unit gets close to Breaking.
