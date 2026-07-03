@@ -17,9 +17,13 @@ const STATUS_INFO := {
 	"slow": ["Slow", "S", Color(0.5, 0.75, 1.0), "-25% speed; turns arrive later."],
 	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Takes 6 damage at the start of each turn."],
 	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Takes 5 damage at the start of each turn."],
-	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-30% armor."],
+	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-35% armor."],
 	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4), "Takes 50% less Pressure."],
 	"fortify": ["Fortify", "+D", Color(0.55, 0.8, 0.9), "+10% armor."],
+	"barrier": ["Barrier", "Ba", Color(0.40, 0.85, 0.95), "Absorbs incoming damage."],
+	"focus": ["Focus", "Fo", Color(0.35, 0.60, 1.0), "Restores 10 Mana each turn."],
+	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores 8 HP each turn."],
+	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% spell damage."],
 }
 
 # Ordered item ids for the dropdown menu.
@@ -104,12 +108,14 @@ func _spawn_units() -> void:
 		"unit_name": "Mage", "is_hero": true, "sheet_dir": soldier,
 		"max_hp": 90, "armor": 0.10, "speed": 110.0, "stability": 40,
 		"resource_name": "Mana", "resource": 100, "max_resource": 100,
+		"second_resource_name": "Resonance", "second_resource": 0, "second_max": 5,
 		"abilities": _mage_kit(),
 	}, Vector2(230, 520), Color(0.65, 0.75, 1.0)))
 	heroes.append(_make_unit({
 		"unit_name": "Cleric", "is_hero": true, "sheet_dir": soldier,
 		"max_hp": 110, "armor": 0.15, "speed": 100.0, "stability": 50,
 		"resource_name": "Mana", "resource": 100, "max_resource": 100,
+		"second_resource_name": "Faith", "second_resource": 0, "second_max": 100,
 		"abilities": _cleric_kit(),
 	}, Vector2(150, 630), Color(1.0, 0.9, 0.6)))
 
@@ -145,6 +151,8 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color) -> BattleUnit:
 	return u
 
 
+# Core ability sets from the Classes design doc (specialization kits come later).
+
 func _warrior_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Strike", "cost": 0, "damage": 16, "pressure": 10,
@@ -155,10 +163,15 @@ func _warrior_kit() -> Array:
 			"delay": 4.0, "anim": "attack02",
 			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
 			"description": "Big single-target damage."}),
-		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 20, "pressure": 28,
+		Ability.make({"display_name": "Rallying Shout", "cost": 15, "special": "rally",
+			"delay": 3.0, "anim": "attack01",
+			"perfect_id": "", "perfect_text": "Stronger rally (-25 Pressure, +8 resource)",
+			"description": "Party-wide: allies shed 15 Pressure and\ngain a little of their resource."}),
+		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 20, "pressure": 20,
 			"delay": 4.0, "anim": "attack03",
-			"perfect_id": "sunder", "perfect_text": "Sunders armor (-30%) for 2 turns",
-			"description": "Moderate damage, huge Pressure."}),
+			"applies_status": {"id": "sunder", "turns": 3},
+			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
+			"description": "Moderate damage. Sunders armor (-35%) for 3 turns."}),
 	]
 
 
@@ -167,16 +180,19 @@ func _mage_kit() -> Array:
 		Ability.make({"display_name": "Magic Bolt", "cost": 0, "damage": 14, "pressure": 8,
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "mana", "perfect_text": "Restores 10 Mana",
-			"description": "Basic arcane projectile."}),
-		Ability.make({"display_name": "Fireball", "cost": 25, "damage": 32, "pressure": 12,
-			"delay": 4.0, "anim": "attack02",
-			"perfect_id": "burn", "perfect_text": "Sets the target ablaze (6 dmg/turn, 2 turns)",
-			"description": "Heavy fire damage."}),
-		Ability.make({"display_name": "Frost Spike", "cost": 20, "damage": 18, "pressure": 10,
+			"description": "Basic arcane projectile. Builds Resonance."}),
+		Ability.make({"display_name": "Arcane Barrier", "cost": 20, "special": "barrier",
+			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
+			"perfect_id": "", "perfect_text": "Stronger barrier (absorbs 50)",
+			"description": "Shield an ally: absorbs 35 damage (3 turns)."}),
+		Ability.make({"display_name": "Focus", "cost": 0, "special": "focus",
+			"delay": 3.0, "anim": "attack02",
+			"perfect_id": "", "perfect_text": "Also restores 10 Mana instantly",
+			"description": "Regenerate 10 Mana per turn for 2 turns."}),
+		Ability.make({"display_name": "Arcane Surge", "cost": 15, "special": "surge",
 			"delay": 3.0, "anim": "attack03",
-			"applies_status": {"id": "slow", "turns": 2},
-			"perfect_id": "slow_plus", "perfect_text": "Slow lasts 4 turns instead of 2",
-			"description": "Damages and Slows the target (-25% speed)."}),
+			"perfect_id": "", "perfect_text": "+2 Resonance instead of +1",
+			"description": "+20% spell damage for 1 turn.\nGuarantees +1 Resonance."}),
 	]
 
 
@@ -185,15 +201,19 @@ func _cleric_kit() -> Array:
 		Ability.make({"display_name": "Smite", "cost": 0, "damage": 12, "pressure": 10,
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 8 HP",
-			"description": "Basic radiant strike."}),
+			"description": "Basic radiant strike. Builds Faith."}),
 		Ability.make({"display_name": "Mend Wounds", "cost": 25, "heal": 38,
 			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 			"perfect_id": "ward", "perfect_text": "Grants Ward (-50% Pressure taken, 2 turns)",
-			"description": "Restore HP to one ally."}),
-		Ability.make({"display_name": "Radiant Burst", "cost": 20, "damage": 18, "pressure": 14,
-			"delay": 3.0, "anim": "attack03",
-			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
-			"description": "Holy damage with solid Pressure."}),
+			"description": "Restore HP to one ally. Builds Faith."}),
+		Ability.make({"display_name": "Blessed Purge", "cost": 30, "special": "purge",
+			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack03",
+			"perfect_id": "", "perfect_text": "Bigger heal",
+			"description": "Heal an ally, remove 1 debuff,\nand grant +10% armor for 2 turns."}),
+		Ability.make({"display_name": "Renewal", "cost": 20, "special": "renewal",
+			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
+			"perfect_id": "", "perfect_text": "Also heals 8 HP instantly",
+			"description": "Ally heals 8 HP at the start of each\nof their turns, for 5 turns."}),
 	]
 
 
@@ -382,6 +402,22 @@ func _run_battle() -> void:
 		if u.dead:
 			_check_end()
 			continue
+		# Turn-start regeneration effects.
+		if u.has_status("renewal"):
+			u.heal_amount(8)
+			u.float_text("+8", Color(0.45, 0.9, 0.5))
+			_log("%s regenerates 8 HP (Renewal)" % u.unit_name, "#70d878")
+		if u.has_status("focus") and u.resource_name == "Mana":
+			u.resource = mini(u.resource + 10, u.max_resource)
+			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
+			u.refresh_bars()
+		# Resonance decays if the Mage went a turn without casting a spell.
+		if u.second_resource_name == "Resonance":
+			if not u.cast_recently and u.second_resource > 0:
+				u.second_resource -= 1
+				u.float_text("Resonance fades", Color(0.6, 0.45, 0.75))
+				u.refresh_bars()
+			u.cast_recently = false
 		u.tick_statuses()
 		if u.broken_pending:
 			u.broken_pending = false
@@ -421,17 +457,20 @@ func _player_turn(u: BattleUnit) -> void:
 	var ab = await _ability_picked
 	action_panel.visible = false
 
-	var pool: Array
-	if ab.target == Ability.Target.ALLY:
-		pool = heroes.filter(func(h): return not h.dead)
-	else:
-		pool = enemies.filter(func(e): return not e.dead)
 	var target: BattleUnit
-	if pool.size() == 1:
-		target = pool[0]
+	if ab.special in ["rally", "focus", "surge"]:
+		target = u  # self/party effects need no target choice
 	else:
-		_message("Choose a target")
-		target = await _pick_target(pool)
+		var pool: Array
+		if ab.target == Ability.Target.ALLY:
+			pool = heroes.filter(func(h): return not h.dead)
+		else:
+			pool = enemies.filter(func(e): return not e.dead)
+		if pool.size() == 1:
+			target = pool[0]
+		else:
+			_message("Choose a target")
+			target = await _pick_target(pool)
 
 	var grade: String = await _run_skill_check()
 	await _resolve(u, ab, target, grade)
@@ -575,8 +614,8 @@ func _lowest_hp(pool: Array) -> BattleUnit:
 
 
 # Base chances for the attack rolls. Many things will modify these later.
-const MISS_CHANCE := 0.10
-const PARRY_CHANCE := 0.10
+const MISS_CHANCE := 0.05
+const PARRY_CHANCE := 0.05
 const CRIT_CHANCE := 0.10
 
 
@@ -591,8 +630,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	attacker.play_anim(ab.anim)
 	await _wait(0.3)
 
+	# Faith builds from every Cleric action; any Mage cast counts for Resonance decay.
+	if attacker.second_resource_name == "Faith":
+		attacker.second_resource = mini(attacker.second_resource + 10, attacker.second_max)
+		attacker.refresh_bars()
+	elif attacker.second_resource_name == "Resonance":
+		attacker.cast_recently = true
+
 	var grade_tag := {"perfect": " [PERFECT]", "good": "", "fail": " [Sloppy]"}[grade] as String
-	if ab.heal > 0:
+	if ab.special != "":
+		await _resolve_special(attacker, ab, target, grade, dmg_mult)
+	elif ab.heal > 0:
 		var amount := int(ab.heal * dmg_mult)
 		target.heal_amount(amount)
 		target.float_text("+%d" % amount, Color(0.4, 0.9, 0.45))
@@ -619,17 +667,31 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		await _resolve(target, target.abilities[0], attacker, "good", true)
 	else:
 		var crit_chance := CRIT_CHANCE + (0.25 if target.broken else 0.0)
+		# Resonant Mind: +2% crit per Resonance stack.
+		if attacker.second_resource_name == "Resonance":
+			crit_chance += 0.02 * attacker.second_resource
 		var is_crit := randf() < crit_chance
 		var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
 		if is_crit:
 			raw *= 1.5
+		# Resonance: +5% spell damage per stack; targets with stacks take +5% per stack.
+		if attacker.second_resource_name == "Resonance":
+			raw *= 1.0 + 0.05 * attacker.second_resource
+		if attacker.has_status("surge"):
+			raw *= 1.2
+		if target.second_resource_name == "Resonance":
+			raw *= 1.0 + 0.05 * target.second_resource
 		var final := maxi(int(round(raw * (1.0 - target.effective_armor()))), 1)
 		var pr := int(round(ab.pressure * pr_mult * (1.5 if is_crit else 1.0)))
 		if is_perfect and ab.perfect_id == "pressure":
 			pr = int(pr * 1.6)
 		var result: Dictionary = target.take_hit(final, pr)
-		target.float_text("%d%s" % [final, "!" if is_crit else ""],
-			Color(1.0, 0.5, 0.2) if is_crit else Color(0.95, 0.85, 0.75))
+		if is_crit:
+			target.float_text("%d!" % final, Color(1.0, 0.45, 0.15), true)
+			_shake()
+		else:
+			target.float_text("%d" % final, Color(0.95, 0.85, 0.75))
+		_gain_resonance(attacker, 2 if is_crit else 1)
 		_log("%s: %s on %s — %d dmg%s, +%d Pressure%s" % [attacker.unit_name,
 			ab.display_name, target.unit_name, final, " CRIT" if is_crit else "",
 			pr, grade_tag], "#d8d2c4" if attacker.is_hero else "#e0a0a0")
@@ -658,11 +720,90 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		attacker.next_time += ab.delay * 100.0 / attacker.effective_speed()
 
 
-func _apply_status(target: BattleUnit, id: String, turns: int) -> void:
+func _apply_status(target: BattleUnit, id: String, turns: int, power := 0) -> void:
 	var info: Array = STATUS_INFO[id]
-	target.add_status(id, info[0], info[1], info[2], turns, info[3])
+	target.add_status(id, info[0], info[1], info[2], turns, info[3], power)
 	var span := "battle" if turns < 0 else "%d turns" % turns
 	_log("   → %s on %s (%s)" % [info[0], target.unit_name, span], "#b0a8e0")
+
+
+# Arcane Resonance: builds on damaging casts (2 on crit via Arcane Instability);
+# hitting max stacks triggers Backlash Ward (+15 Mana).
+func _gain_resonance(caster: BattleUnit, stacks: int) -> void:
+	if caster.second_resource_name != "Resonance":
+		return
+	caster.cast_recently = true
+	var before := caster.second_resource
+	caster.second_resource = mini(caster.second_resource + stacks, caster.second_max)
+	if caster.second_resource != before:
+		caster.float_text("+%d Resonance" % (caster.second_resource - before), Color(0.8, 0.5, 1.0))
+	if caster.second_resource == caster.second_max and before < caster.second_max:
+		caster.resource = mini(caster.resource + 15, caster.max_resource)
+		caster.float_text("Backlash Ward +15 Mana", Color(0.5, 0.7, 1.0))
+		_log("   → Backlash Ward: %s restores 15 Mana" % caster.unit_name, "#b0a8e0")
+	caster.refresh_bars()
+
+
+# Non-attack abilities (buffs, shields, party effects). Effect strength scales
+# with the skill check via `mult`.
+func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
+		grade: String, mult: float) -> void:
+	var is_perfect := grade == "perfect"
+	match ab.special:
+		"rally":
+			var pressure_cut := 25 if is_perfect else int(15 * mult)
+			var res_gain := 8 if is_perfect else 5
+			_message("%s rallies the party!" % attacker.unit_name)
+			for h in heroes.filter(func(he): return not he.dead):
+				h.pressure = maxi(h.pressure - pressure_cut, 0)
+				if h != attacker:
+					h.resource = mini(h.resource + res_gain, h.max_resource)
+				h.refresh_bars()
+				h.float_text("-%d Pressure" % pressure_cut, Color(0.8, 0.5, 1.0))
+			_log("%s: Rallying Shout — party -%d Pressure, +%d resource%s" % [
+				attacker.unit_name, pressure_cut, res_gain,
+				" [PERFECT]" if is_perfect else ""], "#70d878")
+		"barrier":
+			var power := 50 if is_perfect else int(35 * mult)
+			_apply_status(target, "barrier", 3, power)
+			_message("%s shields %s (%d)" % [attacker.unit_name, target.unit_name, power])
+			_log("%s: Arcane Barrier on %s — absorbs %d" % [attacker.unit_name,
+				target.unit_name, power], "#70d878")
+		"focus":
+			_apply_status(attacker, "focus", 2)
+			if is_perfect:
+				attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
+				attacker.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
+			attacker.refresh_bars()
+			_message("%s focuses..." % attacker.unit_name)
+			_log("%s: Focus — regenerating Mana" % attacker.unit_name, "#70d878")
+		"surge":
+			_apply_status(attacker, "surge", 1)
+			_gain_resonance(attacker, 2 if is_perfect else 1)
+			_message("%s surges with power!" % attacker.unit_name)
+			_log("%s: Arcane Surge — +20%% spell damage" % attacker.unit_name, "#70d878")
+		"purge":
+			var amount := int((35 if is_perfect else 25) * mult)
+			target.heal_amount(amount)
+			target.float_text("+%d" % amount, Color(0.4, 0.9, 0.45))
+			for debuff_id in ["slow", "burn", "bleed", "sunder"]:
+				if target.has_status(debuff_id):
+					target.remove_status(debuff_id)
+					target.float_text("Cleansed", Color(1.0, 0.95, 0.7))
+					_log("   → %s cleansed of %s" % [target.unit_name, debuff_id], "#b0a8e0")
+					break
+			_apply_status(target, "fortify", 2)
+			_message("%s purges %s" % [attacker.unit_name, target.unit_name])
+			_log("%s: Blessed Purge on %s — heals %d" % [attacker.unit_name,
+				target.unit_name, amount], "#70d878")
+		"renewal":
+			_apply_status(target, "renewal", 5)
+			if is_perfect:
+				target.heal_amount(8)
+				target.float_text("+8", Color(0.4, 0.9, 0.45))
+			_message("%s blesses %s with Renewal" % [attacker.unit_name, target.unit_name])
+			_log("%s: Renewal on %s — 8 HP/turn for 5 turns" % [attacker.unit_name,
+				target.unit_name], "#70d878")
 
 
 # Unique bonus effects for Perfect skill checks (per ability).

@@ -19,6 +19,7 @@ var applies_status := {} # status applied on hit, e.g. {"id": "slow", "turns": 2
 var status_chance := 1.0 # probability the status lands (1.0 = always)
 var perfect_id := ""     # unique bonus effect on a Perfect skill check
 var perfect_text := ""   # tooltip text for the perfect bonus
+var special := ""        # non-attack effect: rally, barrier, focus, surge, purge, renewal
 var description := ""
 
 

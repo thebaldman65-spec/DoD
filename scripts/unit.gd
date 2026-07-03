@@ -19,6 +19,11 @@ var pressure := 0
 var resource_name := ""    # "Rage" or "Mana" (heroes only)
 var resource := 0
 var max_resource := 100
+# Secondary class resource: Cleric Faith (0-100), Mage Arcane Resonance (0-5).
+var second_resource_name := ""
+var second_resource := 0
+var second_max := 100
+var cast_recently := true  # Resonance decays if the Mage skips a turn of casting
 var abilities: Array = []
 
 var broken := false         # Broken: defenses down, crit vulnerable
@@ -34,6 +39,8 @@ var _hp_fill: ColorRect
 var _hp_text: Label
 var _res_fill: ColorRect
 var _res_text: Label
+var _res2_fill: ColorRect
+var _res2_text: Label
 var _pressure_fill: ColorRect
 var _chips_root: Node2D
 var _idle_texture: Texture2D
@@ -109,6 +116,16 @@ func _build_bars() -> void:
 		_res_text = _make_bar_text(Vector2(-45, next_y), 9)
 		add_child(_res_text)
 		next_y += 15.0
+	# Secondary resource bar (Faith / Arcane Resonance).
+	if second_resource_name != "":
+		add_child(_make_bar_bg(Vector2(-46, next_y), Vector2(92, 12)))
+		var res2_color := Color(0.95, 0.80, 0.30) if second_resource_name == "Faith" \
+			else Color(0.75, 0.40, 0.95)
+		_res2_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 10), res2_color)
+		add_child(_res2_fill)
+		_res2_text = _make_bar_text(Vector2(-45, next_y - 1), 9)
+		add_child(_res2_text)
+		next_y += 14.0
 	# Pressure bar.
 	add_child(_make_bar_bg(Vector2(-46, next_y), Vector2(92, 8)))
 	_pressure_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 6), Color(0.80, 0.35, 1.0))
@@ -207,6 +224,9 @@ func refresh_bars() -> void:
 	if _res_fill != null:
 		_res_fill.size.x = 90.0 * clampf(resource / float(max_resource), 0.0, 1.0)
 		_res_text.text = "%d/%d" % [resource, max_resource]
+	if _res2_fill != null:
+		_res2_fill.size.x = 90.0 * clampf(second_resource / float(second_max), 0.0, 1.0)
+		_res2_text.text = "%s %d/%d" % [second_resource_name, second_resource, second_max]
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
 	_pressure_fill.size.x = 90.0 * pressure_ratio
 	# Shifts toward hot pink as the unit gets close to Breaking.
@@ -216,14 +236,16 @@ func refresh_bars() -> void:
 # ---------- status effects ----------
 
 # Adds (or refreshes) a status. `short` is the 1-2 char tag shown on the chip.
-func add_status(id: String, label: String, short: String, color: Color, turns: int, desc := "") -> void:
+func add_status(id: String, label: String, short: String, color: Color, turns: int,
+		desc := "", power := 0) -> void:
 	for s in statuses:
 		if s.id == id:
 			s.turns = maxi(s.turns, turns)
+			s.power = maxi(s.power, power)
 			_refresh_chips()
 			return
 	statuses.append({"id": id, "label": label, "short": short, "color": color,
-		"turns": turns, "desc": desc})
+		"turns": turns, "desc": desc, "power": power})
 	float_text(label, color)
 	_refresh_chips()
 
@@ -261,7 +283,7 @@ func effective_armor() -> float:
 	if broken:
 		a *= 0.7
 	if has_status("sunder"):
-		a *= 0.7
+		a *= 0.65
 	return a
 
 
@@ -322,6 +344,16 @@ func return_to_idle() -> void:
 
 # Applies damage + Pressure. Returns what happened so battle.gd can react.
 func take_hit(amount: int, pressure_add: int) -> Dictionary:
+	# Barrier absorbs damage (not Pressure) before HP is touched.
+	for s in statuses:
+		if s.id == "barrier" and s.power > 0:
+			var absorbed: int = mini(s.power, amount)
+			amount -= absorbed
+			s.power -= absorbed
+			float_text("Absorbed %d" % absorbed, Color(0.4, 0.85, 0.95))
+			if s.power <= 0:
+				remove_status("barrier")
+			break
 	hp = maxi(hp - amount, 0)
 	if resource_name == "Rage":
 		resource = mini(resource + 10, max_resource)
@@ -389,21 +421,34 @@ func heal_amount(amount: int) -> void:
 	refresh_bars()
 
 
-func float_text(text: String, color: Color) -> void:
+func float_text(text: String, color: Color, big := false) -> void:
 	var label := Label.new()
 	label.text = text
-	label.add_theme_font_size_override("font_size", 22)
+	label.add_theme_font_size_override("font_size", 46 if big else 22)
 	label.add_theme_color_override("font_color", color)
-	label.add_theme_constant_override("outline_size", 4)
-	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
-	label.position = Vector2(randf_range(-30, 10), -80)
+	label.add_theme_constant_override("outline_size", 8 if big else 4)
+	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+	label.position = Vector2(randf_range(-34, -6), -96 if big else -80)
 	label.z_index = 10
 	add_child(label)
 	var tween := create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(label, "position:y", label.position.y - 45, 0.9)
-	tween.tween_property(label, "modulate:a", 0.0, 0.9).set_delay(0.3)
-	tween.chain().tween_callback(label.queue_free)
+	if big:
+		# Crit pop: number explodes onto the screen, hangs, then fades.
+		label.pivot_offset = Vector2(30, 25)
+		label.scale = Vector2(0.2, 0.2)
+		tween.tween_property(label, "scale", Vector2(1.35, 1.35), 0.18) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.12)
+		tween.tween_interval(0.35)
+		tween.set_parallel(true)
+		tween.tween_property(label, "position:y", label.position.y - 55, 0.6)
+		tween.tween_property(label, "modulate:a", 0.0, 0.6)
+		tween.chain().tween_callback(label.queue_free)
+	else:
+		tween.set_parallel(true)
+		tween.tween_property(label, "position:y", label.position.y - 45, 0.9)
+		tween.tween_property(label, "modulate:a", 0.0, 0.9).set_delay(0.3)
+		tween.chain().tween_callback(label.queue_free)
 
 
 func _on_anim_finished() -> void:
