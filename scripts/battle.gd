@@ -411,9 +411,15 @@ func _run_battle() -> void:
 			u.resource = mini(u.resource + 10, u.max_resource)
 			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
 			u.refresh_bars()
-		# Resonance decays if the Mage went a turn without casting a spell.
+		# Resonance resets after peaking at max; otherwise it decays if the
+		# Mage went a turn without casting.
 		if u.second_resource_name == "Resonance":
-			if not u.cast_recently and u.second_resource > 0:
+			if u.second_resource >= u.second_max:
+				u.second_resource = 0
+				u.float_text("Resonance dissipates", Color(0.6, 0.45, 0.75))
+				u.refresh_bars()
+				_log("%s's Resonance resets to 0" % u.unit_name, "#b0a8e0")
+			elif not u.cast_recently and u.second_resource > 0:
 				u.second_resource -= 1
 				u.float_text("Resonance fades", Color(0.6, 0.45, 0.75))
 				u.refresh_bars()
@@ -540,8 +546,15 @@ func _show_actions(u: BattleUnit) -> void:
 		btn.custom_minimum_size = Vector2(130, 58)
 		btn.tooltip_text = ab.description
 		if ab.damage > 0:
-			btn.tooltip_text += "\nDamage: %d–%d    Pressure: %d" % [
-				int(ab.damage * 0.9), int(round(ab.damage * 1.1)), ab.pressure]
+			# Live damage range: includes any buffs currently boosting this unit.
+			var buff_mult := 1.0
+			if u.second_resource_name == "Resonance":
+				buff_mult *= 1.0 + 0.15 * u.second_resource
+			if u.has_status("surge"):
+				buff_mult *= 1.2
+			btn.tooltip_text += "\nDamage: %d–%d%s    Pressure: %d" % [
+				int(ab.damage * 0.9 * buff_mult), int(round(ab.damage * 1.1 * buff_mult)),
+				" (buffed)" if buff_mult > 1.0 else "", ab.pressure]
 		if ab.heal > 0:
 			btn.tooltip_text += "\nHeals: %d" % ab.heal
 		if ab.perfect_text != "":
@@ -742,8 +755,9 @@ func _gain_resonance(caster: BattleUnit, stacks: int) -> void:
 	caster.second_resource = mini(caster.second_resource + stacks, caster.second_max)
 	if caster.second_resource != before:
 		caster.float_text("+%d Resonance" % (caster.second_resource - before), Color(0.8, 0.5, 1.0))
-	# Backlash Ward: any cast while at max stacks restores Mana.
-	if caster.second_resource == caster.second_max:
+	# Backlash Ward: hitting max stacks restores Mana. The stacks then reset
+	# to 0 at the start of the Mage's next turn, restarting the cycle.
+	if caster.second_resource == caster.second_max and before < caster.second_max:
 		caster.resource = mini(caster.resource + 15, caster.max_resource)
 		caster.float_text("Backlash Ward +15 Mana", Color(0.5, 0.7, 1.0))
 		_log("   → Backlash Ward: %s restores 15 Mana" % caster.unit_name, "#b0a8e0")

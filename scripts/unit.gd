@@ -100,32 +100,33 @@ func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
 
 func _build_bars() -> void:
 	var bar_y := 50.0
-	# HP bar with numeric readout.
-	add_child(_make_bar_bg(Vector2(-46, bar_y), Vector2(92, 14)))
-	_hp_fill = _make_fill(Vector2(-45, bar_y + 1), Vector2(90, 12), Color(0.30, 0.78, 0.32))
+	# HP bar with numeric readout. Bars are tall enough that the text
+	# (including its outline) fits fully inside.
+	add_child(_make_bar_bg(Vector2(-46, bar_y), Vector2(92, 17)))
+	_hp_fill = _make_fill(Vector2(-45, bar_y + 1), Vector2(90, 15), Color(0.30, 0.78, 0.32))
 	add_child(_hp_fill)
-	_hp_text = _make_bar_text(Vector2(-46, bar_y), Vector2(92, 14), 10)
+	_hp_text = _make_bar_text(Vector2(-46, bar_y), Vector2(92, 17), 10)
 	add_child(_hp_text)
-	var next_y := bar_y + 16.0
+	var next_y := bar_y + 19.0
 	# Class resource bar (Rage/Mana) with numeric readout, if the unit has one.
 	if resource_name != "":
-		add_child(_make_bar_bg(Vector2(-46, next_y), Vector2(92, 13)))
+		add_child(_make_bar_bg(Vector2(-46, next_y), Vector2(92, 15)))
 		var res_color := Color(0.85, 0.30, 0.25) if resource_name == "Rage" else Color(0.30, 0.50, 0.90)
-		_res_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 11), res_color)
+		_res_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 13), res_color)
 		add_child(_res_fill)
-		_res_text = _make_bar_text(Vector2(-46, next_y), Vector2(92, 13), 9)
+		_res_text = _make_bar_text(Vector2(-46, next_y), Vector2(92, 15), 9)
 		add_child(_res_text)
-		next_y += 15.0
+		next_y += 17.0
 	# Secondary resource bar (Faith / Arcane Resonance).
 	if second_resource_name != "":
-		add_child(_make_bar_bg(Vector2(-46, next_y), Vector2(92, 12)))
+		add_child(_make_bar_bg(Vector2(-46, next_y), Vector2(92, 14)))
 		var res2_color := Color(0.95, 0.80, 0.30) if second_resource_name == "Faith" \
 			else Color(0.75, 0.40, 0.95)
-		_res2_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 10), res2_color)
+		_res2_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 12), res2_color)
 		add_child(_res2_fill)
-		_res2_text = _make_bar_text(Vector2(-46, next_y), Vector2(92, 12), 9)
+		_res2_text = _make_bar_text(Vector2(-46, next_y), Vector2(92, 14), 9)
 		add_child(_res2_text)
-		next_y += 14.0
+		next_y += 16.0
 	# Pressure bar.
 	add_child(_make_bar_bg(Vector2(-46, next_y), Vector2(92, 8)))
 	_pressure_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 6), Color(0.80, 0.35, 1.0))
@@ -157,7 +158,7 @@ func _make_bar_text(pos: Vector2, bar_size: Vector2, font_size: int) -> Label:
 	label.size = bar_size
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", Color(1, 1, 1))
-	label.add_theme_constant_override("outline_size", 3)
+	label.add_theme_constant_override("outline_size", 2)
 	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
