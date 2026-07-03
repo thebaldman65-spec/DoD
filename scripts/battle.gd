@@ -24,6 +24,7 @@ const STATUS_INFO := {
 	"focus": ["Focus", "Fo", Color(0.35, 0.60, 1.0), "Restores 10 Mana each turn."],
 	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores 8 HP each turn."],
 	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% attack."],
+	"guard": ["Guard", "G", Color(0.55, 0.65, 0.85), "-40% damage and -50% Pressure taken\nuntil this unit's next turn."],
 }
 
 # Ordered item ids for the dropdown menu.
@@ -61,6 +62,12 @@ var items := {
 	"defense": ["Defense Potion", 1, "+10% armor to all living party members for 5 turns."],
 }
 var item_used := false  # one item per character per turn
+
+# Guard: universal defensive action available to every hero.
+var guard_ability: Ability = Ability.make({"display_name": "Guard", "cost": 0,
+	"special": "guard", "delay": 1.5, "anim": "idle",
+	"perfect_id": "", "perfect_text": "Also sheds 10 Pressure immediately",
+	"description": "Brace: take 40% less damage and 50% less\nPressure until your next turn. Quick action."})
 
 var ui: CanvasLayer
 var cam: Camera2D
@@ -509,7 +516,7 @@ func _player_turn(u: BattleUnit) -> void:
 	action_panel.visible = false
 
 	var target: BattleUnit
-	if ab.special in ["rally", "focus", "surge"]:
+	if ab.special in ["rally", "focus", "surge", "guard"]:
 		target = u  # self/party effects need no target choice
 	elif autoplay:
 		target = auto_target
@@ -652,6 +659,15 @@ func _show_actions(u: BattleUnit) -> void:
 			_sfx("click", -12.0)
 			_ability_picked.emit(ab))
 		action_box.add_child(btn)
+	var guard_btn := Button.new()
+	guard_btn.text = "Guard\n(Free)"
+	guard_btn.custom_minimum_size = Vector2(100, 58)
+	guard_btn.tooltip_text = guard_ability.description
+	guard_btn.tooltip_text += "\nPerfect: %s" % guard_ability.perfect_text
+	guard_btn.pressed.connect(func():
+		_sfx("click", -12.0)
+		_ability_picked.emit(guard_ability))
+	action_box.add_child(guard_btn)
 	action_box.add_child(_build_items_menu())
 	action_panel.visible = true
 
@@ -809,6 +825,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			raw *= 1.2
 		if target.second_resource_name == "Resonance":
 			raw *= 1.0 + 0.05 * target.second_resource
+		if target.has_status("guard"):
+			raw *= 0.6
 		# A damage spell cast at max Resonance releases all stacks after it lands.
 		var releasing: bool = attacker.second_resource_name == "Resonance" \
 			and attacker.second_resource >= attacker.second_max
@@ -971,6 +989,15 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s purges %s" % [attacker.unit_name, target.unit_name])
 			_log("%s: Blessed Purge on %s — heals %d" % [attacker.unit_name,
 				target.unit_name, amount], "#70d878")
+		"guard":
+			_sfx("parry", -9.0, 0.6)
+			_apply_status(attacker, "guard", 1)
+			if is_perfect:
+				attacker.pressure = maxi(attacker.pressure - 10, 0)
+				attacker.float_text("-10 Pressure", Color(0.8, 0.5, 1.0))
+				attacker.refresh_bars()
+			_message("%s braces for impact" % attacker.unit_name)
+			_log("%s guards" % attacker.unit_name, "#70d878")
 		"renewal":
 			_sfx("heal", -9.0, 1.1)
 			_apply_status(target, "renewal", 5)

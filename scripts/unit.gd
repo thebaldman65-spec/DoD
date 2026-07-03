@@ -365,6 +365,8 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		resource = mini(resource + 10, max_resource)
 	if has_status("ward"):
 		pressure_add = int(pressure_add * 0.5)
+	if has_status("guard"):
+		pressure_add = int(pressure_add * 0.5)
 	var just_broke := false
 	if not broken:
 		pressure += pressure_add
