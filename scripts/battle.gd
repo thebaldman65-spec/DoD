@@ -29,6 +29,23 @@ const STATUS_INFO := {
 # Ordered item ids for the dropdown menu.
 const ITEM_IDS := ["bomb", "revive", "defense"]
 
+# Placeholder SFX (procedurally generated, see repo history; replace with
+# licensed audio later).
+const SFX := {
+	"hit": preload("res://assets/sfx/hit.wav"),
+	"crit": preload("res://assets/sfx/crit.wav"),
+	"break": preload("res://assets/sfx/break.wav"),
+	"heal": preload("res://assets/sfx/heal.wav"),
+	"miss": preload("res://assets/sfx/miss.wav"),
+	"parry": preload("res://assets/sfx/parry.wav"),
+	"click": preload("res://assets/sfx/click.wav"),
+	"perfect": preload("res://assets/sfx/perfect.wav"),
+	"death": preload("res://assets/sfx/death.wav"),
+	"bomb": preload("res://assets/sfx/bomb.wav"),
+	"victory": preload("res://assets/sfx/victory.wav"),
+	"defeat": preload("res://assets/sfx/defeat.wav"),
+}
+
 # Damage-over-time statuses ticked at the start of the afflicted unit's turn.
 const DOT_STATUSES := {"burn": 6, "bleed": 5}
 
@@ -86,6 +103,7 @@ func _ready() -> void:
 			sim_started_ms = Time.get_ticks_msec()
 	_build_arena()
 	_build_ui()
+	_build_sfx_pool()
 	_spawn_units()
 	_run_battle()
 
@@ -414,6 +432,7 @@ func _run_battle() -> void:
 			if u.has_status(dot_id) and not u.dead:
 				var dot_dmg: int = DOT_STATUSES[dot_id]
 				var info: Array = STATUS_INFO[dot_id]
+				_sfx("hit", -14.0, 0.8)
 				var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
 				_log("%s takes %d %s damage" % [u.unit_name, dot_dmg, info[0]], "#e08850")
 				await _wait(0.5)
@@ -559,6 +578,7 @@ func _use_item(item_id: String) -> void:
 		"bomb":
 			_message("Bomb thrown!")
 			_log("Item: Bomb — 50 dmg to all enemies", "#e0c060")
+			_sfx("bomb", -2.0)
 			_shake()
 			for e in enemies.filter(func(en): return not en.dead):
 				var result: Dictionary = e.take_hit(50, 0)
@@ -582,6 +602,7 @@ func _use_item(item_id: String) -> void:
 				_message("Choose an ally to revive")
 				target = await _pick_target(fallen)
 			target.revive(0.5)
+			_sfx("heal", -5.0, 0.8)
 			target.float_text("REVIVED", Color(0.5, 1.0, 0.6))
 			if current_hero != null:
 				target.next_time = current_hero.next_time + BASIC_DELAY * 100.0 / target.effective_speed()
@@ -626,7 +647,9 @@ func _show_actions(u: BattleUnit) -> void:
 		if ab.perfect_text != "":
 			btn.tooltip_text += "\nPerfect: %s" % ab.perfect_text
 		btn.disabled = ab.cost > u.resource
-		btn.pressed.connect(func(): _ability_picked.emit(ab))
+		btn.pressed.connect(func():
+			_sfx("click", -12.0)
+			_ability_picked.emit(ab))
 		action_box.add_child(btn)
 	action_box.add_child(_build_items_menu())
 	action_panel.visible = true
@@ -730,6 +753,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	elif ab.heal > 0:
 		var amount := int(ab.heal * dmg_mult)
 		_stat("healing", amount)
+		_sfx("heal", -8.0)
 		target.heal_amount(amount)
 		target.float_text("+%d" % amount, Color(0.4, 0.9, 0.45))
 		_message("%s heals %s for %d" % [attacker.unit_name, target.unit_name, amount])
@@ -740,6 +764,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	elif not is_counter and randf() < MISS_CHANCE:
 		_stat("attacks")
 		_stat("attack_miss")
+		_sfx("miss")
 		target.float_text("MISS", Color(0.75, 0.75, 0.75))
 		_message("%s misses!" % attacker.unit_name)
 		_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
@@ -750,6 +775,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# their basic attack (a free action — no rolls, no initiative cost).
 		_stat("attacks")
 		_stat("attack_parry")
+		_sfx("parry", -4.0)
 		target.float_text("PARRY", Color(0.4, 0.9, 1.0))
 		_message("%s parries and counters!" % target.unit_name)
 		_log("%s parries %s — counter attack!" % [target.unit_name,
@@ -796,11 +822,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_stat("dmg_enemy", final)
 		var result: Dictionary = target.take_hit(final, pr)
 		if is_crit:
+			_sfx("crit", -3.0)
 			target.float_text("%d!" % final, Color(1.0, 0.45, 0.15), true)
 			_shake()
 		elif resonance_boosted:
+			_sfx("hit", -5.0, 1.15)
 			target.float_text("%d" % final, Color(0.85, 0.55, 1.0))
 		else:
+			_sfx("hit")
 			target.float_text("%d" % final, Color(0.95, 0.85, 0.75))
 		if releasing:
 			attacker.second_resource = 0
@@ -823,12 +852,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_apply_perfect_bonus(attacker, target, ab, result.died)
 		if result.broke:
 			_stat("breaks_on_heroes" if target.is_hero else "breaks_on_enemies")
+			_sfx("break", -3.0)
 			_message("%s BREAKS!" % target.unit_name)
 			_log("!! %s BREAKS" % target.unit_name, "#c070e0")
 			_shake()
 			await _wait(0.5)
 		if result.died:
 			_stat("hero_deaths" if target.is_hero else "enemy_deaths")
+			_sfx("death", -4.0)
 			_message("%s falls!" % target.unit_name)
 			_log("† %s dies" % target.unit_name, "#e05050")
 			await _wait(0.5)
@@ -874,6 +905,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"rally":
 			var pressure_cut := 25 if is_perfect else int(15 * mult)
 			var res_pct := 0.30 if is_perfect else 0.20
+			_sfx("heal", -9.0, 0.7)
 			_message("%s rallies the party!" % attacker.unit_name)
 			for h in heroes.filter(func(he): return not he.dead):
 				h.pressure = maxi(h.pressure - pressure_cut, 0)
@@ -888,6 +920,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				" [PERFECT]" if is_perfect else ""], "#70d878")
 		"barrier":
 			var power := 50 if is_perfect else int(35 * mult)
+			_sfx("parry", -8.0, 0.7)
 			_apply_status(target, "barrier", 3, power)
 			_message("%s shields %s (%d)" % [attacker.unit_name, target.unit_name, power])
 			_log("%s: Arcane Barrier on %s — absorbs %d" % [attacker.unit_name,
@@ -908,6 +941,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Arcane Surge — +20%% attack next turn" % attacker.unit_name, "#70d878")
 		"purge":
 			var amount := int((35 if is_perfect else 25) * mult)
+			_sfx("heal", -8.0)
 			target.heal_amount(amount)
 			target.float_text("+%d" % amount, Color(0.4, 0.9, 0.45))
 			for debuff_id in ["slow", "burn", "bleed", "sunder"]:
@@ -921,6 +955,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Blessed Purge on %s — heals %d" % [attacker.unit_name,
 				target.unit_name, amount], "#70d878")
 		"renewal":
+			_sfx("heal", -9.0, 1.1)
 			_apply_status(target, "renewal", 5)
 			if is_perfect:
 				target.heal_amount(8)
@@ -966,12 +1001,15 @@ func _run_skill_check() -> String:
 	var grade: String = await _skill_done
 	match grade:
 		"perfect":
+			_sfx("perfect", -6.0)
 			sc_result.text = "PERFECT!"
 			sc_result.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3))
 		"good":
+			_sfx("click", -8.0)
 			sc_result.text = "Good"
 			sc_result.add_theme_color_override("font_color", Color(0.6, 0.85, 0.6))
 		"fail":
+			_sfx("click", -10.0, 0.6)
 			sc_result.text = "Sloppy..."
 			sc_result.add_theme_color_override("font_color", Color(0.8, 0.4, 0.4))
 	await _wait(0.45)
@@ -1029,8 +1067,10 @@ func _check_end() -> void:
 			get_tree().quit()
 		return
 	if victory:
+		_sfx("victory", -4.0)
 		_show_end("VICTORY", "The Decay recedes... for now.")
 	else:
+		_sfx("defeat", -4.0)
 		_show_end("THE PARTY HAS FALLEN", "The cycle begins anew.")
 
 
@@ -1120,6 +1160,29 @@ func _wait(seconds: float) -> void:
 func _stat(key: String, amount := 1.0) -> void:
 	if sim:
 		sim_stats[key] = sim_stats.get(key, 0.0) + amount
+
+
+var _sfx_players: Array = []
+var _sfx_idx := 0
+
+
+func _build_sfx_pool() -> void:
+	for i in 8:
+		var player := AudioStreamPlayer.new()
+		add_child(player)
+		_sfx_players.append(player)
+
+
+# Slight random pitch variance keeps repeated sounds from feeling robotic.
+func _sfx(sound: String, volume_db := -6.0, pitch := 1.0) -> void:
+	if sim:
+		return
+	var player: AudioStreamPlayer = _sfx_players[_sfx_idx]
+	_sfx_idx = (_sfx_idx + 1) % _sfx_players.size()
+	player.stream = SFX[sound]
+	player.volume_db = volume_db
+	player.pitch_scale = clampf(pitch + randf_range(-0.05, 0.05), 0.1, 3.0)
+	player.play()
 
 
 func _shake() -> void:
