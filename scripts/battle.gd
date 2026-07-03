@@ -19,8 +19,11 @@ const STATUS_INFO := {
 	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Takes 5 damage at the start of each turn."],
 	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-30% armor."],
 	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4), "Takes 50% less Pressure."],
-	"fortify": ["Fortify", "+D", Color(0.55, 0.8, 0.9), "+10% armor for the rest of the battle."],
+	"fortify": ["Fortify", "+D", Color(0.55, 0.8, 0.9), "+10% armor."],
 }
+
+# Ordered item ids for the dropdown menu.
+const ITEM_IDS := ["bomb", "revive", "defense"]
 
 # Damage-over-time statuses ticked at the start of the afflicted unit's turn.
 const DOT_STATUSES := {"burn": 6, "bleed": 5}
@@ -32,17 +35,17 @@ var current_hero: BattleUnit
 
 # Shared party inventory: item id -> [label, count, tooltip]
 var items := {
-	"bomb": ["Bomb", 2, "Deals 15 damage to all enemies."],
+	"bomb": ["Bomb", 2, "Deals 50 damage to all enemies."],
 	"revive": ["Revive Potion", 1, "Revives a fallen ally at 50% HP."],
-	"defense": ["Defense Potion", 1, "+10% armor to all living party members\nfor the rest of the battle."],
+	"defense": ["Defense Potion", 1, "+10% armor to all living party members for 5 turns."],
 }
+var item_used := false  # one item per character per turn
 
 var ui: CanvasLayer
 var turn_bar: HBoxContainer
 var message_label: Label
 var action_panel: PanelContainer
 var action_box: HBoxContainer
-var item_box: HBoxContainer
 var active_marker: Label
 
 var history: RichTextLabel
@@ -119,7 +122,7 @@ func _spawn_units() -> void:
 		"unit_name": "Orc Chief", "is_hero": false, "sheet_dir": orc,
 		"max_hp": 190, "armor": 0.20, "speed": 80.0, "stability": 70,
 		"resource_name": "Rage", "resource": 0, "max_resource": 100,
-		"abilities": _orc_chief_kit(), "sprite_scale": 2.8,
+		"abilities": _orc_chief_kit(), "sprite_scale": 3.2,
 	}, Vector2(1050, 510), Color(1.0, 0.75, 0.7)))
 	enemies.append(_make_unit({
 		"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
@@ -237,17 +240,11 @@ func _build_ui() -> void:
 	ui.add_child(message_label)
 
 	action_panel = PanelContainer.new()
-	action_panel.position = Vector2(400, 596)
+	action_panel.position = Vector2(370, 628)
 	ui.add_child(action_panel)
-	var panel_vbox := VBoxContainer.new()
-	panel_vbox.add_theme_constant_override("separation", 6)
-	action_panel.add_child(panel_vbox)
-	item_box = HBoxContainer.new()
-	item_box.add_theme_constant_override("separation", 8)
-	panel_vbox.add_child(item_box)
 	action_box = HBoxContainer.new()
 	action_box.add_theme_constant_override("separation", 10)
-	panel_vbox.add_child(action_box)
+	action_panel.add_child(action_box)
 	action_panel.visible = false
 
 	var history_panel := PanelContainer.new()
@@ -415,10 +412,11 @@ func _next_unit() -> BattleUnit:
 
 func _player_turn(u: BattleUnit) -> void:
 	current_hero = u
+	item_used = false
 	if u.resource_name == "Mana":
 		u.resource = mini(u.resource + 12, u.max_resource)
+		u.refresh_bars()
 	_message("%s's turn — choose an ability" % u.unit_name)
-	u.show_info()
 	_show_actions(u)
 	var ab = await _ability_picked
 	action_panel.visible = false
@@ -437,25 +435,26 @@ func _player_turn(u: BattleUnit) -> void:
 
 	var grade: String = await _run_skill_check()
 	await _resolve(u, ab, target, grade)
-	u.hide_info()
 	current_hero = null
 
 
 # Items are shared by the party and never consume the turn: the action
-# panel comes right back after the effect resolves.
+# panel comes right back after the effect resolves. Limit: one item per
+# character per turn.
 func _use_item(item_id: String) -> void:
-	if items[item_id][1] <= 0:
+	if items[item_id][1] <= 0 or item_used:
 		return
+	item_used = true
 	action_panel.visible = false
 	items[item_id][1] -= 1
 	match item_id:
 		"bomb":
 			_message("Bomb thrown!")
-			_log("Item: Bomb — 15 dmg to all enemies", "#e0c060")
+			_log("Item: Bomb — 50 dmg to all enemies", "#e0c060")
 			_shake()
 			for e in enemies.filter(func(en): return not en.dead):
-				var result: Dictionary = e.take_hit(15, 0)
-				e.float_text("15", Color(1.0, 0.8, 0.4))
+				var result: Dictionary = e.take_hit(50, 0)
+				e.float_text("50", Color(1.0, 0.8, 0.4))
 				if result.died:
 					_message("%s falls!" % e.unit_name)
 					_log("† %s dies" % e.unit_name, "#e05050")
@@ -466,6 +465,7 @@ func _use_item(item_id: String) -> void:
 			var fallen := heroes.filter(func(h): return h.dead)
 			if fallen.is_empty():
 				items[item_id][1] += 1
+				item_used = false
 				return
 			var target: BattleUnit
 			if fallen.size() == 1:
@@ -485,7 +485,7 @@ func _use_item(item_id: String) -> void:
 			_message("The party braces!")
 			_log("Item: Defense Potion — party gains Fortify", "#e0c060")
 			for h in heroes.filter(func(he): return not he.dead):
-				_apply_status(h, "fortify", -1)
+				_apply_status(h, "fortify", 5)
 			await _wait(0.6)
 	if not battle_over and current_hero != null and not current_hero.dead:
 		_show_actions(current_hero)
@@ -494,21 +494,6 @@ func _use_item(item_id: String) -> void:
 func _show_actions(u: BattleUnit) -> void:
 	for child in action_box.get_children():
 		child.queue_free()
-	for child in item_box.get_children():
-		child.queue_free()
-	for item_id in items:
-		var entry: Array = items[item_id]
-		var item_btn := Button.new()
-		item_btn.text = "%s x%d" % [entry[0], entry[1]]
-		item_btn.custom_minimum_size = Vector2(150, 26)
-		item_btn.add_theme_font_size_override("font_size", 12)
-		item_btn.tooltip_text = "%s\nDoes not consume the turn." % entry[2]
-		var usable: bool = entry[1] > 0
-		if item_id == "revive":
-			usable = usable and heroes.any(func(h): return h.dead)
-		item_btn.disabled = not usable
-		item_btn.pressed.connect(_use_item.bind(item_id))
-		item_box.add_child(item_btn)
 	for ab in u.abilities:
 		var btn := Button.new()
 		var cost_text: String = "Free" if ab.cost == 0 else "%d %s" % [ab.cost, u.resource_name]
@@ -520,7 +505,30 @@ func _show_actions(u: BattleUnit) -> void:
 		btn.disabled = ab.cost > u.resource
 		btn.pressed.connect(func(): _ability_picked.emit(ab))
 		action_box.add_child(btn)
+	action_box.add_child(_build_items_menu())
 	action_panel.visible = true
+
+
+# Dropdown menu for the shared party inventory (one item per character per turn).
+func _build_items_menu() -> MenuButton:
+	var menu := MenuButton.new()
+	menu.text = "Items ▾"
+	menu.custom_minimum_size = Vector2(110, 58)
+	menu.flat = false
+	menu.disabled = item_used
+	if item_used:
+		menu.tooltip_text = "Already used an item this turn."
+	var popup := menu.get_popup()
+	for i in ITEM_IDS.size():
+		var entry: Array = items[ITEM_IDS[i]]
+		popup.add_item("%s  x%d" % [entry[0], entry[1]], i)
+		popup.set_item_tooltip(i, "%s\nDoes not consume the turn." % entry[2])
+		var usable: bool = entry[1] > 0
+		if ITEM_IDS[i] == "revive":
+			usable = usable and heroes.any(func(h): return h.dead)
+		popup.set_item_disabled(i, not usable)
+	popup.id_pressed.connect(func(id: int): _use_item(ITEM_IDS[id]))
+	return menu
 
 
 func _pick_target(pool: Array) -> BattleUnit:
@@ -568,6 +576,7 @@ func _lowest_hp(pool: Array) -> BattleUnit:
 
 func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: String) -> void:
 	attacker.resource = clampi(attacker.resource - ab.cost + ab.resource_gain, 0, attacker.max_resource)
+	attacker.refresh_bars()
 	var dmg_mult := {"perfect": 1.15, "good": 1.0, "fail": 0.6}[grade] as float
 	var pr_mult := {"perfect": 1.25, "good": 1.0, "fail": 0.5}[grade] as float
 	var is_perfect := grade == "perfect"
@@ -637,10 +646,12 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 	match ab.perfect_id:
 		"rage":
 			attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
+			attacker.refresh_bars()
 			attacker.float_text("+10 Rage", Color(1.0, 0.5, 0.4))
 			_log("   → %s gains +10 Rage" % attacker.unit_name, "#b0a8e0")
 		"mana":
 			attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
+			attacker.refresh_bars()
 			attacker.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
 			_log("   → %s restores 10 Mana" % attacker.unit_name, "#b0a8e0")
 		"self_heal":

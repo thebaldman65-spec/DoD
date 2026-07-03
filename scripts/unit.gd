@@ -31,9 +31,11 @@ var statuses: Array = []
 
 var sprite: AnimatedSprite2D
 var _hp_fill: ColorRect
+var _hp_text: Label
+var _res_fill: ColorRect
+var _res_text: Label
 var _pressure_fill: ColorRect
 var _chips_root: Node2D
-var _info_label: Label
 var _idle_texture: Texture2D
 var _target_btn: Button
 var _target_marker: Label
@@ -45,7 +47,7 @@ func setup(config: Dictionary) -> void:
 		if key != "sheet_dir" and key != "sprite_scale":
 			set(key, config[key])
 	hp = max_hp
-	_build_sprite(config["sheet_dir"], config.get("sprite_scale", 2.2))
+	_build_sprite(config["sheet_dir"], config.get("sprite_scale", 2.6))
 	_build_bars()
 
 
@@ -90,12 +92,26 @@ func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
 
 
 func _build_bars() -> void:
-	var bar_y := 42.0
-	add_child(_make_bar_bg(Vector2(-36, bar_y), Vector2(72, 8)))
-	_hp_fill = _make_fill(Vector2(-35, bar_y + 1), Vector2(70, 6), Color(0.30, 0.78, 0.32))
+	var bar_y := 50.0
+	# HP bar with numeric readout.
+	add_child(_make_bar_bg(Vector2(-46, bar_y), Vector2(92, 14)))
+	_hp_fill = _make_fill(Vector2(-45, bar_y + 1), Vector2(90, 12), Color(0.30, 0.78, 0.32))
 	add_child(_hp_fill)
-	add_child(_make_bar_bg(Vector2(-36, bar_y + 10), Vector2(72, 7)))
-	_pressure_fill = _make_fill(Vector2(-35, bar_y + 11), Vector2(70, 5), Color(0.80, 0.35, 1.0))
+	_hp_text = _make_bar_text(Vector2(-45, bar_y), 10)
+	add_child(_hp_text)
+	var next_y := bar_y + 16.0
+	# Class resource bar (Rage/Mana) with numeric readout, if the unit has one.
+	if resource_name != "":
+		add_child(_make_bar_bg(Vector2(-46, next_y), Vector2(92, 13)))
+		var res_color := Color(0.85, 0.30, 0.25) if resource_name == "Rage" else Color(0.30, 0.50, 0.90)
+		_res_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 11), res_color)
+		add_child(_res_fill)
+		_res_text = _make_bar_text(Vector2(-45, next_y), 9)
+		add_child(_res_text)
+		next_y += 15.0
+	# Pressure bar.
+	add_child(_make_bar_bg(Vector2(-46, next_y), Vector2(92, 8)))
+	_pressure_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 6), Color(0.80, 0.35, 1.0))
 	add_child(_pressure_fill)
 
 	var name_label := Label.new()
@@ -105,33 +121,37 @@ func _build_bars() -> void:
 	name_label.add_theme_color_override("font_color", Color(0.92, 0.88, 0.78))
 	name_label.add_theme_constant_override("outline_size", 4)
 	name_label.add_theme_color_override("font_outline_color", Color(0.05, 0.03, 0.08, 0.9))
-	name_label.position = Vector2(-50, -52)
+	name_label.position = Vector2(-50, -62)
 	name_label.size = Vector2(100, 18)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(name_label)
 
 	_chips_root = Node2D.new()
-	_chips_root.position = Vector2(0, 62)
+	_chips_root.position = Vector2(0, next_y + 12.0)
 	add_child(_chips_root)
 
-	_info_label = Label.new()
-	_info_label.add_theme_font_size_override("font_size", 12)
-	_info_label.add_theme_color_override("font_color", Color(0.95, 0.92, 0.8))
-	_info_label.add_theme_constant_override("outline_size", 3)
-	_info_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
-	_info_label.position = Vector2(-60, 80)
-	_info_label.size = Vector2(120, 32)
-	_info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(_info_label)
-
 	_build_target_zone()
+
+
+func _make_bar_text(pos: Vector2, font_size: int) -> Label:
+	var label := Label.new()
+	label.position = pos
+	label.size = Vector2(90, 14)
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", Color(1, 1, 1))
+	label.add_theme_constant_override("outline_size", 3)
+	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return label
 
 
 # Invisible click zone over the sprite, shown only while picking a target.
 func _build_target_zone() -> void:
 	_target_btn = Button.new()
-	_target_btn.position = Vector2(-60, -95)
-	_target_btn.size = Vector2(120, 190)
+	_target_btn.position = Vector2(-70, -110)
+	_target_btn.size = Vector2(140, 220)
 	_target_btn.focus_mode = Control.FOCUS_NONE
 	var empty := StyleBoxEmpty.new()
 	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
@@ -182,13 +202,15 @@ func _make_fill(pos: Vector2, bar_size: Vector2, color: Color) -> ColorRect:
 
 
 func refresh_bars() -> void:
-	_hp_fill.size.x = 70.0 * clampf(hp / float(max_hp), 0.0, 1.0)
+	_hp_fill.size.x = 90.0 * clampf(hp / float(max_hp), 0.0, 1.0)
+	_hp_text.text = "%d/%d" % [hp, max_hp]
+	if _res_fill != null:
+		_res_fill.size.x = 90.0 * clampf(resource / float(max_resource), 0.0, 1.0)
+		_res_text.text = "%d/%d" % [resource, max_resource]
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
-	_pressure_fill.size.x = 70.0 * pressure_ratio
+	_pressure_fill.size.x = 90.0 * pressure_ratio
 	# Shifts toward hot pink as the unit gets close to Breaking.
 	_pressure_fill.color = Color(0.80, 0.35, 1.0).lerp(Color(1.0, 0.25, 0.55), pressure_ratio)
-	if _info_label.text != "":
-		show_info()
 
 
 # ---------- status effects ----------
@@ -272,17 +294,6 @@ func _refresh_chips() -> void:
 		tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		_chips_root.add_child(tag)
-
-
-# ---------- info readout ----------
-
-# Shows HP + class resource under the sprite while this unit is acting.
-func show_info() -> void:
-	_info_label.text = "HP %d/%d\n%s %d/%d" % [hp, max_hp, resource_name, resource, max_resource]
-
-
-func hide_info() -> void:
-	_info_label.text = ""
 
 
 # Cropped close-up of the character for the initiative bar (the raw frame
