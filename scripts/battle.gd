@@ -167,10 +167,10 @@ func _warrior_kit() -> Array:
 			"delay": 4.0, "anim": "attack02",
 			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
 			"description": "Big single-target damage."}),
-		Ability.make({"display_name": "Rallying Shout", "cost": 15, "special": "rally",
+		Ability.make({"display_name": "Rallying Shout", "cost": 0, "special": "rally",
 			"resource_gain": 15, "delay": 3.0, "anim": "attack01",
-			"perfect_id": "", "perfect_text": "Stronger rally (-25 Pressure, +8 resource)",
-			"description": "Party-wide: allies shed 15 Pressure and\ngain a little of their resource.\nGrants the Warrior 15 Rage."}),
+			"perfect_id": "", "perfect_text": "Stronger rally (-25 Pressure, +30% resource)",
+			"description": "Party-wide: allies shed 15 Pressure and\nregain 20% of their resource.\nGrants the Warrior 15 Rage."}),
 		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 28, "pressure": 20,
 			"delay": 4.0, "anim": "attack03",
 			"applies_status": {"id": "sunder", "turns": 3},
@@ -415,15 +415,12 @@ func _run_battle() -> void:
 			u.resource = mini(u.resource + 10, u.max_resource)
 			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
 			u.refresh_bars()
-		# Resonance resets after peaking at max; otherwise it decays if the
-		# Mage went a turn without casting.
+		# Resonance holds at max until a damage spell is cast at 5 stacks
+		# (release handled in _resolve); below max it decays if the Mage
+		# went a turn without casting.
 		if u.second_resource_name == "Resonance":
-			if u.second_resource >= u.second_max:
-				u.second_resource = 0
-				u.float_text("Resonance dissipates", Color(0.6, 0.45, 0.75))
-				u.refresh_bars()
-				_log("%s's Resonance resets to 0" % u.unit_name, "#b0a8e0")
-			elif not u.cast_recently and u.second_resource > 0:
+			if not u.cast_recently and u.second_resource > 0 \
+					and u.second_resource < u.second_max:
 				u.second_resource -= 1
 				u.float_text("Resonance fades", Color(0.6, 0.45, 0.75))
 				u.refresh_bars()
@@ -712,6 +709,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			raw *= 1.2
 		if target.second_resource_name == "Resonance":
 			raw *= 1.0 + 0.05 * target.second_resource
+		# A damage spell cast at max Resonance releases all stacks after it lands.
+		var releasing: bool = attacker.second_resource_name == "Resonance" \
+			and attacker.second_resource >= attacker.second_max
 		if autoplay and attacker.second_resource_name == "Resonance":
 			print("[DBG] %s attacks @%d stacks: base %d -> raw %.1f" % [
 				attacker.unit_name, attacker.second_resource, ab.damage, raw])
@@ -730,7 +730,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			target.float_text("%d" % final, Color(0.85, 0.55, 1.0))
 		else:
 			target.float_text("%d" % final, Color(0.95, 0.85, 0.75))
-		_gain_resonance(attacker, 2 if is_crit else 1)
+		if releasing:
+			attacker.second_resource = 0
+			attacker.float_text("Resonance released!", Color(0.85, 0.55, 1.0))
+			_log("   → %s releases all Resonance" % attacker.unit_name, "#b0a8e0")
+			attacker.refresh_bars()
+		else:
+			_gain_resonance(attacker, 2 if is_crit else 1)
 		_log("%s: %s on %s — %d dmg%s, +%d Pressure%s" % [attacker.unit_name,
 			ab.display_name, target.unit_name, final, " CRIT" if is_crit else "",
 			pr, grade_tag], "#d8d2c4" if attacker.is_hero else "#e0a0a0")
@@ -793,16 +799,18 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 	match ab.special:
 		"rally":
 			var pressure_cut := 25 if is_perfect else int(15 * mult)
-			var res_gain := 8 if is_perfect else 5
+			var res_pct := 0.30 if is_perfect else 0.20
 			_message("%s rallies the party!" % attacker.unit_name)
 			for h in heroes.filter(func(he): return not he.dead):
 				h.pressure = maxi(h.pressure - pressure_cut, 0)
-				if h != attacker:
-					h.resource = mini(h.resource + res_gain, h.max_resource)
-				h.refresh_bars()
 				h.float_text("-%d Pressure" % pressure_cut, Color(0.8, 0.5, 1.0))
-			_log("%s: Rallying Shout — party -%d Pressure, +%d resource%s" % [
-				attacker.unit_name, pressure_cut, res_gain,
+				if h != attacker:
+					var gain := int(h.max_resource * res_pct)
+					h.resource = mini(h.resource + gain, h.max_resource)
+					h.float_text("+%d %s" % [gain, h.resource_name], Color(0.5, 0.8, 1.0))
+				h.refresh_bars()
+			_log("%s: Rallying Shout — party -%d Pressure, allies +%d%% resource%s" % [
+				attacker.unit_name, pressure_cut, int(res_pct * 100),
 				" [PERFECT]" if is_perfect else ""], "#70d878")
 		"barrier":
 			var power := 50 if is_perfect else int(35 * mult)
