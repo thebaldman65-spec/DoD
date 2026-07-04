@@ -16,6 +16,10 @@ var anim := "attack01"
 var resource_gain := 0   # resource generated on use (e.g. basic attacks build Rage)
 var delay_push := 0.0    # pushes the target's next turn back
 var recoil_base := 0.0   # self-damage: this fraction of damage dealt per (1 + Resonance stacks)
+var aoe := false         # hits every living enemy (no miss/parry rolls)
+var faith_cost := 0      # secondary-resource cost (Cleric Miracles)
+var heal_missing := 0.0  # attacker self-heals this fraction of their missing HP on hit
+var armor_pierce := 0.0  # ignores this fraction of the target's armor
 var applies_status := {} # status applied on hit, e.g. {"id": "slow", "turns": 2}
 var status_chance := 1.0 # probability the status lands (1.0 = always)
 var perfect_id := ""     # unique bonus effect on a Perfect skill check

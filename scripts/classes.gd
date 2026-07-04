@@ -99,24 +99,154 @@ static func cleric_kit() -> Array:
 	]
 
 
-# Specialization flavor for the party screen (mechanics arrive in a later phase).
-const SPECS := {
-	"warrior": [
-		["Berserker", "Reckless savagery — grows stronger as their blood spills."],
-		["Warden", "Protector of the weak — shields allies with their own body."],
-		["Swordmaster", "Precision and technique — critical hits chain into flurries."],
-	],
-	"mage": [
-		["Pyromancer", "Aggressive flame — burns that spread and stack."],
-		["Cryomancer", "Battlefield control — slow, freeze, then shatter."],
-		["Arcanist", "Unstable raw magic — bends the rules of turn and time."],
-	],
-	"cleric": [
-		["Holy", "Pure vessel of light — mass healing and shields of faith."],
-		["Inquisitor", "Zealous judge — exposes and executes the corrupted."],
-		["Occultist", "Forbidden rites — leech life and trade blood for power."],
-	],
+# Specializations: ordered ids per class, plus display/passive data.
+# Each spec = 1 passive (implemented via passive_id hooks in battle.gd)
+# + 2 abilities appended to the core kit.
+const SPEC_IDS := {
+	"warrior": ["berserker", "warden", "swordmaster"],
+	"mage": ["pyromancer", "cryomancer", "arcanist"],
+	"cleric": ["holy", "inquisitor", "occultist"],
 }
+
+const SPEC_INFO := {
+	"berserker": {"name": "Berserker", "passive": "bloodrage",
+		"passive_desc": "Blood Frenzy: up to +40% damage as HP falls.",
+		"blurb": "Reckless savagery — grows stronger as their blood spills."},
+	"warden": {"name": "Warden", "passive": "bulwark",
+		"passive_desc": "Bulwark: +10% armor, +15 Stability.",
+		"blurb": "Protector of the weak — shields allies with their own body."},
+	"swordmaster": {"name": "Swordmaster", "passive": "duelist",
+		"passive_desc": "Duelist: +10% crit chance; crits refund 10 Rage.",
+		"blurb": "Precision and technique — critical hits fuel the flurry."},
+	"pyromancer": {"name": "Pyromancer", "passive": "ignite",
+		"passive_desc": "Ignite: damaging spells have 50% chance to Burn (2 turns).",
+		"blurb": "Aggressive flame — burns that spread and stack."},
+	"cryomancer": {"name": "Cryomancer", "passive": "chill",
+		"passive_desc": "Chill: damaging spells have 50% chance to Slow (2 turns).",
+		"blurb": "Battlefield control — slow, freeze, then shatter."},
+	"arcanist": {"name": "Arcanist", "passive": "echo",
+		"passive_desc": "Echo: 15% chance spells strike again at 50% power.",
+		"blurb": "Unstable raw magic — bends the rules of turn and time."},
+	"holy": {"name": "Holy", "passive": "grace",
+		"passive_desc": "Grace: all healing +25%.",
+		"blurb": "Pure vessel of light — mass healing and shields of faith."},
+	"inquisitor": {"name": "Inquisitor", "passive": "zeal",
+		"passive_desc": "Zeal: +15% damage; Faith builds 13 per action.",
+		"blurb": "Zealous judge — exposes and executes the corrupted."},
+	"occultist": {"name": "Occultist", "passive": "corrupt",
+		"passive_desc": "Corrupted Channeling: hits have 25% chance to Cripple (2 turns).",
+		"blurb": "Forbidden rites — leech life and trade blood for power."},
+}
+
+
+static func spec_abilities(spec: String) -> Array:
+	match spec:
+		"berserker":
+			return [
+				Ability.make({"display_name": "Bloodlust", "cost": 25, "damage": 26,
+					"pressure": 12, "delay": 3.0, "anim": "attack02", "heal_missing": 0.3,
+					"perfect_id": "", "perfect_text": "Heals 45% of missing HP instead",
+					"description": "Strike and drink deep: heals the Warrior\nfor 30% of their missing HP."}),
+				Ability.make({"display_name": "Wildstrikes", "cost": 35, "damage": 16,
+					"pressure": 10, "delay": 4.5, "anim": "attack03", "aoe": true,
+					"applies_status": {"id": "bleed", "turns": 3},
+					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
+					"description": "Savage sweep: hits ALL enemies and\nleaves them Bleeding (3 turns)."}),
+			]
+		"warden":
+			return [
+				Ability.make({"display_name": "Shieldwall", "cost": 25, "special": "shieldwall",
+					"delay": 3.5, "anim": "attack01",
+					"perfect_id": "", "perfect_text": "Also sheds 10 Pressure from each ally",
+					"description": "The party takes 50% less damage\nuntil their next turns."}),
+				Ability.make({"display_name": "Taunt", "cost": 10, "special": "taunt",
+					"delay": 2.0, "anim": "attack01",
+					"perfect_id": "", "perfect_text": "Taunt lasts 3 turns instead of 2",
+					"description": "Force all enemies to attack the\nWarrior for 2 turns."}),
+			]
+		"swordmaster":
+			return [
+				Ability.make({"display_name": "Overpower", "cost": 20, "damage": 30,
+					"pressure": 14, "delay": 3.0, "anim": "attack02",
+					"perfect_id": "", "perfect_text": "+15% crit chance on this strike",
+					"description": "Precise heavy cut. Critical hits\nrefund 20 Rage."}),
+				Ability.make({"display_name": "Momentum", "cost": 25, "damage": 20,
+					"pressure": 30, "delay": 3.5, "anim": "attack03",
+					"perfect_id": "pressure", "perfect_text": "+60% Pressure",
+					"description": "Building strike focused entirely\non Pressure."}),
+			]
+		"pyromancer":
+			return [
+				Ability.make({"display_name": "Flame Surge", "cost": 20, "damage": 16,
+					"pressure": 8, "delay": 3.5, "anim": "attack02", "aoe": true,
+					"applies_status": {"id": "burn", "turns": 2},
+					"perfect_id": "", "perfect_text": "Burn lasts 3 turns",
+					"description": "Cone of fire: hits ALL enemies\nand sets them Burning."}),
+				Ability.make({"display_name": "Phoenix Rebirth", "cost": 0, "special": "phoenix",
+					"delay": 3.0, "anim": "attack03",
+					"perfect_id": "", "perfect_text": "Only sacrifices 15% HP",
+					"description": "Sacrifice 25% of current HP: fully\nrestore Mana and gain Empower (3 turns)."}),
+			]
+		"cryomancer":
+			return [
+				Ability.make({"display_name": "Frost Spike", "cost": 20, "damage": 22,
+					"pressure": 10, "delay": 3.0, "anim": "attack02", "delay_push": 1.5,
+					"applies_status": {"id": "slow", "turns": 2},
+					"perfect_id": "slow_plus", "perfect_text": "Slow lasts 4 turns",
+					"description": "Icy lance: Slows the target and\npushes their next turn back."}),
+				Ability.make({"display_name": "Blizzard", "cost": 30, "damage": 15,
+					"pressure": 8, "delay": 4.0, "anim": "attack03", "aoe": true,
+					"applies_status": {"id": "slow", "turns": 2},
+					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
+					"description": "Storm of ice: hits ALL enemies\nand Slows them."}),
+			]
+		"arcanist":
+			return [
+				Ability.make({"display_name": "Arcane Rift", "cost": 25, "damage": 38,
+					"pressure": 12, "delay": 4.0, "anim": "attack02", "armor_pierce": 0.5,
+					"perfect_id": "", "perfect_text": "Ignores ALL armor",
+					"description": "Tear reality: heavy damage that\nignores half the target's armor."}),
+				Ability.make({"display_name": "Reality Fracture", "cost": 20, "damage": 15,
+					"pressure": 10, "delay": 3.0, "anim": "attack03", "delay_push": 4.0,
+					"perfect_id": "", "perfect_text": "Also +1 Resonance",
+					"description": "Shove the target far down the\ninitiative order."}),
+			]
+		"holy":
+			return [
+				Ability.make({"display_name": "Dawnbreak", "cost": 20, "special": "dawnbreak",
+					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
+					"perfect_id": "", "perfect_text": "+15 bonus healing",
+					"description": "Heal an ally for 40. Overhealing\nflows back to the Cleric."}),
+				Ability.make({"display_name": "Hymn of Hope", "cost": 0, "faith_cost": 60,
+					"special": "hymn", "delay": 4.0, "anim": "attack03",
+					"perfect_id": "", "perfect_text": "Heals 25% instead",
+					"description": "MIRACLE: heal ALL allies for 20%\nof their max HP."}),
+			]
+		"inquisitor":
+			return [
+				Ability.make({"display_name": "Burning Verdict", "cost": 0, "faith_cost": 40,
+					"damage": 40, "pressure": 14, "delay": 3.5, "anim": "attack02",
+					"applies_status": {"id": "exposed", "turns": 3},
+					"perfect_id": "", "perfect_text": "+50% Pressure",
+					"description": "MIRACLE: radiant execution that\nleaves the target Exposed (3 turns)."}),
+				Ability.make({"display_name": "Condemn", "cost": 15, "damage": 12,
+					"pressure": 12, "delay": 3.5, "anim": "attack03", "aoe": true,
+					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
+					"description": "Holy censure strikes ALL enemies."}),
+			]
+		"occultist":
+			return [
+				Ability.make({"display_name": "Hex of Ruin", "cost": 20, "damage": 14,
+					"pressure": 10, "delay": 3.0, "anim": "attack02",
+					"applies_status": {"id": "sunder", "turns": 3},
+					"perfect_id": "", "perfect_text": "Also Crippled (2 turns)",
+					"description": "Curse the target: Sunders armor\n(-35%) for 3 turns."}),
+				Ability.make({"display_name": "Dark Benediction", "cost": 0, "faith_cost": 40,
+					"special": "benediction", "delay": 3.5, "anim": "attack03",
+					"perfect_id": "", "perfect_text": "No HP sacrifice",
+					"description": "MIRACLE: sacrifice 10% max HP to heal\nall allies 15% and Empower them (2 turns)."}),
+			]
+	return []
 
 const CLASS_BLURBS := {
 	"warrior": "Flexible frontliner. Rage builds through attack and pain.",

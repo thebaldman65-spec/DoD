@@ -147,21 +147,44 @@ func _draw_detail() -> void:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		panel.add_child(label)
 
-	# Specializations column (right) — flavor until the talent phase.
+	# Specializations column (right): pick one, switch freely between fights.
 	var spec_header := Label.new()
-	spec_header.text = "SPECIALIZATIONS"
+	spec_header.text = "SPECIALIZATIONS  (switch any time outside battle)"
 	spec_header.add_theme_font_size_override("font_size", 17)
 	spec_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
-	spec_header.position = Vector2(890, 150)
+	spec_header.position = Vector2(860, 150)
 	add_child(spec_header)
-	var specs: Array = Classes.SPECS[selected]
-	for i in specs.size():
+	var current_spec: String = member.get("spec", "")
+	var spec_ids: Array = Classes.SPEC_IDS[selected]
+	for i in spec_ids.size():
+		var spec_id: String = spec_ids[i]
+		var info: Dictionary = Classes.SPEC_INFO[spec_id]
 		var panel := PanelContainer.new()
-		panel.position = Vector2(890, 185 + i * 118)
-		panel.custom_minimum_size = Vector2(330, 106)
+		panel.position = Vector2(860, 185 + i * 160)
+		panel.custom_minimum_size = Vector2(390, 148)
 		add_child(panel)
+		var vbox := VBoxContainer.new()
+		panel.add_child(vbox)
 		var label := Label.new()
-		label.text = "%s\n%s\n(locked — coming soon)" % [specs[i][0], specs[i][1]]
-		label.add_theme_font_size_override("font_size", 13)
+		var spec_ability_names := PackedStringArray()
+		for ab in Classes.spec_abilities(spec_id):
+			spec_ability_names.append(ab.display_name)
+		label.text = "%s — %s\n%s\nGrants: %s" % [info["name"], info["blurb"],
+			info["passive_desc"], ", ".join(spec_ability_names)]
+		label.add_theme_font_size_override("font_size", 12)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		panel.add_child(label)
+		label.custom_minimum_size = Vector2(370, 0)
+		vbox.add_child(label)
+		var pick := Button.new()
+		pick.text = "ACTIVE" if current_spec == spec_id else "Choose"
+		pick.disabled = current_spec == spec_id
+		pick.custom_minimum_size = Vector2(120, 30)
+		pick.pressed.connect(_pick_spec.bind(spec_id))
+		vbox.add_child(pick)
+
+
+func _pick_spec(spec_id: String) -> void:
+	for m in Run.party:
+		if m["key"] == selected:
+			m["spec"] = spec_id
+	_draw_screen()

@@ -23,6 +23,7 @@ var max_resource := 100
 var second_resource_name := ""
 var second_resource := 0
 var second_max := 100
+var passive_id := ""       # specialization passive hook (see battle.gd)
 var abilities: Array = []
 
 var broken := false         # Broken: defenses down, crit vulnerable

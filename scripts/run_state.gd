@@ -29,9 +29,9 @@ var encounter := {}        # {"type": ..., "enemies": ["raider", ...]} for the n
 func new_run() -> void:
 	active = true
 	party = [
-		{"key": "warrior", "hp": 140, "max_hp": 140, "mana": 0, "max_mana": 100},
-		{"key": "mage", "hp": 90, "max_hp": 90, "mana": 100, "max_mana": 100},
-		{"key": "cleric", "hp": 110, "max_hp": 110, "mana": 100, "max_mana": 100},
+		{"key": "warrior", "hp": 140, "max_hp": 140, "mana": 0, "max_mana": 100, "spec": ""},
+		{"key": "mage", "hp": 90, "max_hp": 90, "mana": 100, "max_mana": 100, "spec": ""},
+		{"key": "cleric", "hp": 110, "max_hp": 110, "mana": 100, "max_mana": 100, "spec": ""},
 	]
 	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
 	floor_idx = -1

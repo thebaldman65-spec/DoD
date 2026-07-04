@@ -25,6 +25,11 @@ const STATUS_INFO := {
 	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores 8 HP each turn."],
 	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% attack."],
 	"guard": ["Guard", "G", Color(0.55, 0.65, 0.85), "-40% damage and -50% Pressure taken\nuntil this unit's next turn."],
+	"taunt": ["Taunt", "T", Color(0.95, 0.5, 0.3), "Enemies must attack this unit."],
+	"shieldwall": ["Shieldwall", "SW", Color(0.6, 0.7, 0.9), "Takes 50% less damage."],
+	"empower": ["Empower", "+A", Color(0.95, 0.45, 0.35), "+25% damage dealt."],
+	"exposed": ["Exposed", "E", Color(0.95, 0.9, 0.4), "Takes 15% more damage."],
+	"cripple": ["Cripple", "C", Color(0.5, 0.4, 0.55), "-15% damage dealt."],
 }
 
 # Placeholder SFX (procedurally generated, see repo history; replace with
@@ -176,7 +181,17 @@ func _enemy_config(kind: String) -> Dictionary:
 func _spawn_units() -> void:
 	var hero_keys := ["warrior", "mage", "cleric"]
 	for i in hero_keys.size():
-		var u := _make_unit(Classes.hero_config(hero_keys[i]), HERO_SLOTS[i], HERO_TINTS[i])
+		var cfg := Classes.hero_config(hero_keys[i])
+		var spec := ""
+		if Run.active and i < Run.party.size():
+			spec = Run.party[i].get("spec", "")
+		if spec != "":
+			cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
+			cfg["passive_id"] = Classes.SPEC_INFO[spec]["passive"]
+			if cfg["passive_id"] == "bulwark":
+				cfg["armor"] += 0.10
+				cfg["stability"] += 15
+		var u := _make_unit(cfg, HERO_SLOTS[i], HERO_TINTS[i])
 		if Run.active and i < Run.party.size():
 			u.hp = clampi(Run.party[i]["hp"], 1, u.max_hp)
 			if u.resource_name == "Mana":
@@ -252,7 +267,7 @@ func _build_ui() -> void:
 	ui.add_child(message_label)
 
 	action_panel = PanelContainer.new()
-	action_panel.position = Vector2(180, 630)
+	action_panel.position = Vector2(140, 630)
 	ui.add_child(action_panel)
 	action_box = HBoxContainer.new()
 	action_box.add_theme_constant_override("separation", 10)
@@ -451,8 +466,12 @@ func _player_turn(u: BattleUnit) -> void:
 	action_panel.visible = false
 
 	var target: BattleUnit
-	if ab.special in ["rally", "focus", "surge", "guard"]:
+	if ab.special in ["rally", "focus", "surge", "guard", "shieldwall", "taunt",
+			"phoenix", "hymn", "benediction"]:
 		target = u  # self/party effects need no target choice
+	elif ab.aoe:
+		var foes := enemies.filter(func(e): return not e.dead)
+		target = foes[0]  # resolve loops over all living enemies
 	elif autoplay:
 		target = auto_target
 	else:
@@ -594,8 +613,11 @@ func _show_actions(u: BattleUnit) -> void:
 	for ab in u.abilities:
 		var btn := Button.new()
 		var cost_text: String = "Free" if ab.cost == 0 else "%d %s" % [ab.cost, u.resource_name]
+		if ab.faith_cost > 0:
+			cost_text = "%d %s" % [ab.faith_cost, u.second_resource_name]
 		btn.text = "%s\n(%s)" % [ab.display_name, cost_text]
-		btn.custom_minimum_size = Vector2(130, 58)
+		btn.custom_minimum_size = Vector2(112, 58)
+		btn.add_theme_font_size_override("font_size", 13)
 		btn.tooltip_text = ab.description
 		if ab.damage > 0:
 			# Live damage range: includes any buffs currently boosting this unit.
@@ -614,14 +636,14 @@ func _show_actions(u: BattleUnit) -> void:
 			btn.tooltip_text += "\nHeals: %d" % ab.heal
 		if ab.perfect_text != "":
 			btn.tooltip_text += "\nPerfect: %s" % ab.perfect_text
-		btn.disabled = ab.cost > u.resource
+		btn.disabled = ab.cost > u.resource or ab.faith_cost > u.second_resource
 		btn.pressed.connect(func():
 			_sfx("click", -12.0)
 			_ability_picked.emit(ab))
 		action_box.add_child(btn)
 	var guard_btn := Button.new()
 	guard_btn.text = "Guard\n(Free)"
-	guard_btn.custom_minimum_size = Vector2(100, 58)
+	guard_btn.custom_minimum_size = Vector2(90, 58)
 	guard_btn.tooltip_text = guard_ability.description
 	guard_btn.tooltip_text += "\nPerfect: %s" % guard_ability.perfect_text
 	guard_btn.pressed.connect(func():
@@ -636,7 +658,7 @@ func _show_actions(u: BattleUnit) -> void:
 func _build_items_menu() -> MenuButton:
 	var menu := MenuButton.new()
 	menu.text = "Items ▾"
-	menu.custom_minimum_size = Vector2(110, 58)
+	menu.custom_minimum_size = Vector2(96, 58)
 	menu.flat = false
 	menu.disabled = item_used
 	if item_used:
@@ -669,6 +691,9 @@ func _enemy_turn(u: BattleUnit) -> void:
 	var living := heroes.filter(func(h): return not h.dead)
 	if living.is_empty():
 		return
+	var taunters := living.filter(func(h): return h.has_status("taunt"))
+	if not taunters.is_empty():
+		living = taunters
 	var target: BattleUnit
 	var ab: Ability
 	var affordable: Array = u.abilities.filter(func(a): return a.cost <= u.resource)
@@ -726,9 +751,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_stat("hero_actions")
 		_stat("use_" + ab.display_name)
 
-	# Faith builds from every Cleric action.
+	if ab.faith_cost > 0:
+		attacker.second_resource = maxi(attacker.second_resource - ab.faith_cost, 0)
+	# Faith builds from every Cleric action (Zeal: 13).
 	if attacker.second_resource_name == "Faith":
-		attacker.second_resource = mini(attacker.second_resource + 10, attacker.second_max)
+		var faith_gain := 13 if attacker.passive_id == "zeal" else 10
+		attacker.second_resource = mini(attacker.second_resource + faith_gain, attacker.second_max)
 		attacker.refresh_bars()
 
 	var grade_tag := {"perfect": " [PERFECT]", "good": "", "fail": " [Sloppy]"}[grade] as String
@@ -745,7 +773,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			target.unit_name, amount, grade_tag], "#70d878")
 		if is_perfect and ab.perfect_id == "ward":
 			_apply_status(target, "ward", 2)
-	elif not is_counter and randf() < MISS_CHANCE:
+	elif not is_counter and not ab.aoe and randf() < MISS_CHANCE:
 		_stat("attacks")
 		_stat("attack_miss")
 		_sfx("miss")
@@ -754,7 +782,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
 			target.unit_name], "#909090")
 		await _wait(0.35)
-	elif not is_counter and not target.broken and not target.dead and randf() < PARRY_CHANCE:
+	elif not is_counter and not ab.aoe and not target.broken and not target.dead and randf() < PARRY_CHANCE:
 		# Parry negates the hit; the defender immediately counters with
 		# their basic attack (a free action — no rolls, no initiative cost).
 		_stat("attacks")
@@ -768,62 +796,130 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		attacker.return_to_idle()
 		await _resolve(target, target.abilities[0], attacker, "good", true)
 	else:
-		var crit_chance := CRIT_CHANCE + (0.25 if target.broken else 0.0)
-		# Resonant Mind: +3% crit per Resonance stack.
-		if attacker.second_resource_name == "Resonance":
-			crit_chance += 0.03 * attacker.second_resource
-		var is_crit := randf() < crit_chance
-		var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
-		if is_crit:
-			raw *= 1.5
-		# Resonance: +15% damage per stack; targets with stacks take +5% per stack.
-		if attacker.second_resource_name == "Resonance":
-			raw *= 1.0 + 0.15 * attacker.second_resource
-		if attacker.has_status("surge"):
-			raw *= 1.2
-		# Resonance is a lightning rod: +10% damage taken per stack.
-		if target.second_resource_name == "Resonance":
-			raw *= 1.0 + 0.10 * target.second_resource
-		if target.has_status("guard"):
-			raw *= 0.6
-		if debug_prints and attacker.second_resource_name == "Resonance":
-			print("[DBG] %s attacks @%d stacks: base %d -> raw %.1f" % [
-				attacker.unit_name, attacker.second_resource, ab.damage, raw])
-		var final := maxi(int(round(raw * (1.0 - target.effective_armor()))), 1)
-		# Make Resonance-boosted hits legible: tint the number purple.
-		var resonance_boosted: bool = attacker.second_resource_name == "Resonance" \
-			and attacker.second_resource > 0
-		var pr := int(round(ab.pressure * pr_mult * (1.5 if is_crit else 1.0)))
-		if is_perfect and ab.perfect_id == "pressure":
-			pr = int(pr * 1.6)
-		_stat("attacks")
-		_stat("attack_landed")
-		if is_crit:
-			_stat("attack_crit")
-		if attacker.is_hero:
-			_stat("dmg_hero_" + attacker.unit_name, final)
-		else:
-			_stat("dmg_enemy", final)
-		var result: Dictionary = target.take_hit(final, pr)
-		if not sim and not result.died:
-			target.hit_react((target.position - attacker.position).normalized())
-		if is_crit:
-			_sfx("crit", -3.0)
-			target.float_text("%d!" % final, Color(1.0, 0.45, 0.15), true)
-			_shake()
-		elif resonance_boosted:
-			_sfx("hit", -5.0, 1.15)
-			target.float_text("%d" % final, Color(0.85, 0.55, 1.0))
-		else:
-			_sfx("hit")
-			target.float_text("%d" % final, Color(0.95, 0.85, 0.75))
-		_gain_resonance(attacker, 2 if is_crit else 1)
-		_log("%s: %s on %s — %d dmg%s, +%d Pressure%s" % [attacker.unit_name,
-			ab.display_name, target.unit_name, final, " CRIT" if is_crit else "",
-			pr, grade_tag], "#d8d2c4" if attacker.is_hero else "#e0a0a0")
+		var strike_targets: Array = [target]
+		if ab.aoe:
+			strike_targets = (enemies if attacker.is_hero else heroes).filter(
+				func(t): return not t.dead)
+		var total_dealt := 0
+		var any_crit := false
+		for strike_target: BattleUnit in strike_targets:
+			var crit_chance := CRIT_CHANCE + (0.25 if strike_target.broken else 0.0)
+			# Resonant Mind: +3% crit per Resonance stack.
+			if attacker.second_resource_name == "Resonance":
+				crit_chance += 0.03 * attacker.second_resource
+			if attacker.passive_id == "duelist":
+				crit_chance += 0.10
+			if is_perfect and ab.display_name == "Overpower":
+				crit_chance += 0.15
+			var is_crit := randf() < crit_chance
+			any_crit = any_crit or is_crit
+			var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
+			if is_crit:
+				raw *= 1.5
+			# Attacker-side modifiers.
+			if attacker.second_resource_name == "Resonance":
+				raw *= 1.0 + 0.15 * attacker.second_resource
+			if attacker.has_status("surge"):
+				raw *= 1.2
+			if attacker.has_status("empower"):
+				raw *= 1.25
+			if attacker.has_status("cripple"):
+				raw *= 0.85
+			if attacker.passive_id == "bloodrage":
+				raw *= 1.0 + 0.4 * (1.0 - attacker.hp / float(attacker.max_hp))
+			if attacker.passive_id == "zeal":
+				raw *= 1.15
+			# Target-side modifiers.
+			if strike_target.second_resource_name == "Resonance":
+				raw *= 1.0 + 0.10 * strike_target.second_resource
+			if strike_target.has_status("guard"):
+				raw *= 0.6
+			if strike_target.has_status("shieldwall"):
+				raw *= 0.5
+			if strike_target.has_status("exposed"):
+				raw *= 1.15
+			if debug_prints and attacker.second_resource_name == "Resonance":
+				print("[DBG] %s attacks @%d stacks: base %d -> raw %.1f" % [
+					attacker.unit_name, attacker.second_resource, ab.damage, raw])
+			var effective_armor := strike_target.effective_armor() * (1.0 - ab.armor_pierce)
+			if is_perfect and ab.display_name == "Arcane Rift":
+				effective_armor = 0.0
+			var final := maxi(int(round(raw * (1.0 - effective_armor))), 1)
+			var resonance_boosted: bool = attacker.second_resource_name == "Resonance" \
+				and attacker.second_resource > 0
+			var pr := int(round(ab.pressure * pr_mult * (1.5 if is_crit else 1.0)))
+			if is_perfect and (ab.perfect_id == "pressure" or ab.aoe):
+				pr = int(pr * 1.5)
+			_stat("attacks")
+			_stat("attack_landed")
+			if is_crit:
+				_stat("attack_crit")
+			if attacker.is_hero:
+				_stat("dmg_hero_" + attacker.unit_name, final)
+			else:
+				_stat("dmg_enemy", final)
+			total_dealt += final
+			var result: Dictionary = strike_target.take_hit(final, pr)
+			if not sim and not result.died:
+				strike_target.hit_react((strike_target.position - attacker.position).normalized())
+			if is_crit:
+				_sfx("crit", -3.0)
+				strike_target.float_text("%d!" % final, Color(1.0, 0.45, 0.15), true)
+				_shake()
+			elif resonance_boosted:
+				_sfx("hit", -5.0, 1.15)
+				strike_target.float_text("%d" % final, Color(0.85, 0.55, 1.0))
+			else:
+				_sfx("hit")
+				strike_target.float_text("%d" % final, Color(0.95, 0.85, 0.75))
+			_log("%s: %s on %s — %d dmg%s, +%d Pressure%s" % [attacker.unit_name,
+				ab.display_name, strike_target.unit_name, final, " CRIT" if is_crit else "",
+				pr, grade_tag], "#d8d2c4" if attacker.is_hero else "#e0a0a0")
+			# Arcanist Echo: the spell strikes again at half power.
+			if attacker.passive_id == "echo" and not result.died and randf() < 0.15:
+				var echo_dmg := maxi(int(final * 0.5), 1)
+				strike_target.take_hit(echo_dmg, 0)
+				strike_target.float_text("%d Echo" % echo_dmg, Color(0.8, 0.6, 1.0))
+				_log("   → Echo strikes %s for %d" % [strike_target.unit_name, echo_dmg], "#b0a8e0")
+			if ab.delay_push > 0.0:
+				strike_target.next_time += ab.delay_push * 100.0 / strike_target.effective_speed()
+			if not result.died and not ab.applies_status.is_empty() and randf() <= ab.status_chance:
+				var turns: int = ab.applies_status["turns"]
+				if is_perfect and ab.perfect_id == "slow_plus":
+					turns = 4
+				if is_perfect and ab.display_name == "Flame Surge":
+					turns += 1
+				_apply_status(strike_target, ab.applies_status["id"], turns)
+			# Specialization on-hit passives.
+			if not strike_target.dead:
+				if attacker.passive_id == "ignite" and randf() < 0.5:
+					_apply_status(strike_target, "burn", 2)
+				elif attacker.passive_id == "chill" and randf() < 0.5:
+					_apply_status(strike_target, "slow", 2)
+				elif attacker.passive_id == "corrupt" and randf() < 0.25:
+					_apply_status(strike_target, "cripple", 2)
+				if is_perfect and ab.display_name == "Hex of Ruin":
+					_apply_status(strike_target, "cripple", 2)
+			if is_perfect:
+				_apply_perfect_bonus(attacker, strike_target, ab, result.died)
+			if result.broke:
+				_stat("breaks_on_heroes" if strike_target.is_hero else "breaks_on_enemies")
+				_sfx("break", -3.0)
+				_message("%s BREAKS!" % strike_target.unit_name)
+				_log("!! %s BREAKS" % strike_target.unit_name, "#c070e0")
+				await _break_impact()
+				_shake()
+				await _wait(0.5)
+			if result.died:
+				_stat("hero_deaths" if strike_target.is_hero else "enemy_deaths")
+				_sfx("death", -4.0)
+				_message("%s falls!" % strike_target.unit_name)
+				_log("† %s dies" % strike_target.unit_name, "#e05050")
+				await _wait(0.5)
+		# Post-strike attacker effects.
 		if ab.recoil_base > 0.0 and not is_perfect:
 			var recoil_pct := ab.recoil_base * (1.0 + attacker.second_resource)
-			var recoil := maxi(int(round(final * recoil_pct)), 1)
+			var recoil := maxi(int(round(total_dealt * recoil_pct)), 1)
 			var recoil_died := attacker.take_tick_damage(recoil, "-%d Recoil" % recoil,
 				Color(1.0, 0.4, 0.5))
 			_log("   → %s recoils for %d" % [attacker.unit_name, recoil], "#e08850")
@@ -832,30 +928,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_sfx("death", -4.0)
 				_message("%s is consumed by their own power!" % attacker.unit_name)
 				_log("† %s dies" % attacker.unit_name, "#e05050")
-		if ab.delay_push > 0.0:
-			target.next_time += ab.delay_push * 100.0 / target.effective_speed()
-		if not result.died and not ab.applies_status.is_empty() and randf() <= ab.status_chance:
-			var turns: int = ab.applies_status["turns"]
-			if is_perfect and ab.perfect_id == "slow_plus":
-				turns = 4
-			_apply_status(target, ab.applies_status["id"], turns)
-		if is_perfect:
-			_apply_perfect_bonus(attacker, target, ab, result.died)
-		if result.broke:
-			_stat("breaks_on_heroes" if target.is_hero else "breaks_on_enemies")
-			_sfx("break", -3.0)
-			_message("%s BREAKS!" % target.unit_name)
-			_log("!! %s BREAKS" % target.unit_name, "#c070e0")
-			await _break_impact()
-			_shake()
-			await _wait(0.5)
-		if result.died:
-			_stat("hero_deaths" if target.is_hero else "enemy_deaths")
-			_sfx("death", -4.0)
-			_message("%s falls!" % target.unit_name)
-			_log("† %s dies" % target.unit_name, "#e05050")
-			await _wait(0.5)
-
+		if ab.heal_missing > 0.0 and not attacker.dead:
+			var drain_frac := 0.45 if is_perfect else ab.heal_missing
+			var missing_hp := attacker.max_hp - attacker.hp
+			if missing_hp > 0:
+				var drained := maxi(int(missing_hp * drain_frac), 1)
+				attacker.heal_amount(drained)
+				attacker.float_text("+%d" % drained, Color(0.4, 0.9, 0.45))
+				_log("   → %s drains %d HP" % [attacker.unit_name, drained], "#70d878")
+		if attacker.passive_id == "duelist" and any_crit and attacker.resource_name == "Rage":
+			var refund := 20 if ab.display_name == "Overpower" else 10
+			attacker.resource = mini(attacker.resource + refund, attacker.max_resource)
+			attacker.refresh_bars()
+			attacker.float_text("+%d Rage" % refund, Color(1.0, 0.5, 0.4))
+		_gain_resonance(attacker, 2 if any_crit else 1)
 	if not sim and attacker.position != lunge_origin:
 		var back := create_tween()
 		back.tween_property(attacker, "position", lunge_origin, 0.18) \
@@ -963,6 +1049,77 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.refresh_bars()
 			_message("%s braces for impact" % attacker.unit_name)
 			_log("%s guards" % attacker.unit_name, "#70d878")
+		"shieldwall":
+			_sfx("parry", -7.0, 0.5)
+			for h in heroes.filter(func(he): return not he.dead):
+				_apply_status(h, "shieldwall", 1)
+				if is_perfect:
+					h.pressure = maxi(h.pressure - 10, 0)
+					h.refresh_bars()
+			_message("%s raises the shieldwall!" % attacker.unit_name)
+			_log("%s: Shieldwall — party takes half damage" % attacker.unit_name, "#70d878")
+		"taunt":
+			_sfx("click", -6.0, 0.7)
+			_apply_status(attacker, "taunt", 3 if is_perfect else 2)
+			_message("%s roars a challenge!" % attacker.unit_name)
+			_log("%s taunts the enemy" % attacker.unit_name, "#70d878")
+		"phoenix":
+			var sacrifice := int(attacker.hp * (0.15 if is_perfect else 0.25))
+			attacker.hp = maxi(attacker.hp - sacrifice, 1)
+			attacker.resource = attacker.max_resource
+			attacker.refresh_bars()
+			attacker.float_text("-%d" % sacrifice, Color(1.0, 0.4, 0.5))
+			attacker.float_text("Mana restored!", Color(0.5, 0.7, 1.0))
+			_apply_status(attacker, "empower", 3)
+			_sfx("heal", -6.0, 0.6)
+			_message("%s burns with rebirth!" % attacker.unit_name)
+			_log("%s: Phoenix Rebirth — sacrificed %d HP for full Mana" % [
+				attacker.unit_name, sacrifice], "#70d878")
+		"dawnbreak":
+			var base := int((55 if is_perfect else 40) * mult)
+			if attacker.passive_id == "grace":
+				base = int(base * 1.25)
+			var missing_hp := target.max_hp - target.hp
+			var applied := mini(base, missing_hp)
+			target.heal_amount(applied)
+			target.float_text("+%d" % applied, Color(0.4, 0.9, 0.45))
+			var overflow := base - applied
+			if overflow > 0 and target != attacker:
+				attacker.heal_amount(overflow)
+				attacker.float_text("+%d" % overflow, Color(0.4, 0.9, 0.45))
+			_sfx("heal", -6.0)
+			_stat("healing", base)
+			_message("%s calls the dawn" % attacker.unit_name)
+			_log("%s: Dawnbreak heals %s for %d (overflow %d to self)" % [
+				attacker.unit_name, target.unit_name, applied, overflow], "#70d878")
+		"hymn":
+			var pct := 0.25 if is_perfect else 0.20
+			if attacker.passive_id == "grace":
+				pct *= 1.25
+			_sfx("heal", -4.0, 0.9)
+			for h in heroes.filter(func(he): return not he.dead):
+				var amt := int(h.max_hp * pct)
+				h.heal_amount(amt)
+				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
+				_stat("healing", amt)
+			_message("MIRACLE — Hymn of Hope!")
+			_log("%s: Hymn of Hope — party heals %d%%" % [attacker.unit_name,
+				int(pct * 100)], "#70d878")
+		"benediction":
+			if not is_perfect:
+				var blood_cost := int(attacker.max_hp * 0.10)
+				attacker.hp = maxi(attacker.hp - blood_cost, 1)
+				attacker.float_text("-%d" % blood_cost, Color(1.0, 0.4, 0.5))
+			_sfx("heal", -5.0, 0.7)
+			for h in heroes.filter(func(he): return not he.dead):
+				var amt := int(h.max_hp * 0.15 * (1.25 if attacker.passive_id == "grace" else 1.0))
+				h.heal_amount(amt)
+				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
+				_apply_status(h, "empower", 2)
+				_stat("healing", amt)
+			attacker.refresh_bars()
+			_message("MIRACLE — Dark Benediction!")
+			_log("%s: Dark Benediction — blood for power" % attacker.unit_name, "#70d878")
 		"renewal":
 			_sfx("heal", -9.0, 1.1)
 			_apply_status(target, "renewal", 5)
