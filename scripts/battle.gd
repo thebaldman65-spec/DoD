@@ -195,7 +195,13 @@ func _spawn_units() -> void:
 			if cfg["passive_id"] == "bulwark":
 				cfg["armor"] += 0.10
 				cfg["stability"] += 15
+			if Run.active and i < Run.party.size():
+				Talents.apply(cfg, spec, Run.party[i].get("talents", []))
 		var u := _make_unit(cfg, HERO_SLOTS[i], HERO_TINTS[i])
+		u.crit_bonus = cfg.get("crit_bonus", 0.0)
+		if spec != "":
+			u.add_status("spec_passive", Classes.SPEC_INFO[spec]["name"], "★",
+				Color(0.9, 0.78, 0.4), -1, Classes.SPEC_INFO[spec]["passive_desc"])
 		if Run.active and i < Run.party.size():
 			u.hp = clampi(Run.party[i]["hp"], 1, u.max_hp)
 			if u.resource_name == "Mana":
@@ -892,6 +898,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				crit_chance += 0.03 * attacker.second_resource
 			if attacker.passive_id == "duelist":
 				crit_chance += 0.10
+			crit_chance += attacker.crit_bonus
 			if is_perfect and ab.display_name == "Overpower":
 				crit_chance += 0.15
 			var is_crit := randf() < crit_chance
@@ -1009,8 +1016,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_message("%s falls!" % strike_target.unit_name)
 				_log("† %s dies" % strike_target.unit_name, "#e05050")
 				await _wait(0.5)
-			if strike_targets.size() > 1:
-				await _wait(0.45)  # let each hit land distinctly
+			if ab.random_hits > 0 and strike_targets.size() > 1:
+				await _wait(0.45)  # sequential shards land distinctly
 		# Post-strike attacker effects.
 		if ab.recoil_base > 0.0 and not is_perfect:
 			var recoil_pct := ab.recoil_base * (1.0 + attacker.second_resource)
@@ -1023,6 +1030,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_sfx("death", -4.0)
 				_message("%s is consumed by their own power!" % attacker.unit_name)
 				_log("† %s dies" % attacker.unit_name, "#e05050")
+		if ab.lifesteal > 0.0 and total_dealt > 0 and not attacker.dead:
+			var leech := int(total_dealt * ab.lifesteal * (1.5 if is_perfect else 1.0))
+			attacker.heal_amount(leech)
+			attacker.float_text("+%d" % leech, Color(0.4, 0.9, 0.45))
+			_log("   → %s leeches %d HP" % [attacker.unit_name, leech], "#70d878")
 		if ab.heal_missing > 0.0 and not attacker.dead:
 			var drain_frac := 0.45 if is_perfect else ab.heal_missing
 			var missing_hp := attacker.max_hp - attacker.hp
@@ -1200,6 +1212,19 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("MIRACLE — Hymn of Hope!")
 			_log("%s: Hymn of Hope — party heals %d%%" % [attacker.unit_name,
 				int(pct * 100)], "#70d878")
+		"sanctuary":
+			var sanct_pct := 0.18 if is_perfect else 0.12
+			if attacker.passive_id == "grace":
+				sanct_pct *= 1.25
+			_sfx("heal", -4.0, 0.8)
+			for h in heroes.filter(func(he): return not he.dead):
+				var amt := int(h.max_hp * sanct_pct)
+				h.heal_amount(amt)
+				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
+				_apply_status(h, "shieldwall", 1)
+				_stat("healing", amt)
+			_message("MIRACLE — Sanctuary!")
+			_log("%s: Sanctuary — party healed and walled" % attacker.unit_name, "#70d878")
 		"benediction":
 			if not is_perfect:
 				var blood_cost := int(attacker.max_hp * 0.10)
@@ -1367,13 +1392,15 @@ func _check_end() -> void:
 			Run.party[i]["hp"] = maxi(heroes[i].hp, int(heroes[i].max_hp * 0.2))
 			if heroes[i].resource_name == "Mana":
 				Run.party[i]["mana"] = heroes[i].resource
+		var pts := Run.award_talent_points(Run.encounter.get("type", "fight"))
 		_sfx("victory", -4.0)
 		if Run.encounter.get("type", "") == "boss":
 			Run.active = false
-			_show_end("THE WARDEN FALLS", "The forest breathes again. Run complete!",
+			_show_end("THE WARDEN FALLS", "The forest breathes again. Run complete!\n(Each hero gained %d talent points.)" % pts,
 				[["New Run", _start_new_run]])
 		else:
-			_show_end("VICTORY", "Choose your spoils:", [
+			_show_end("VICTORY", "Each hero gains %d talent point%s. Choose your spoils:" % [
+				pts, "" if pts == 1 else "s"], [
 				["Rest (party heals 25%)", _reward_rest],
 				["Scavenge (+1 random item)", _reward_loot],
 			])

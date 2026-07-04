@@ -29,9 +29,9 @@ var encounter := {}        # {"type": ..., "enemies": ["raider", ...]} for the n
 func new_run() -> void:
 	active = true
 	party = [
-		{"key": "warrior", "hp": 140, "max_hp": 140, "mana": 0, "max_mana": 100, "spec": ""},
-		{"key": "mage", "hp": 90, "max_hp": 90, "mana": 100, "max_mana": 100, "spec": ""},
-		{"key": "cleric", "hp": 110, "max_hp": 110, "mana": 100, "max_mana": 100, "spec": ""},
+		{"key": "warrior", "hp": 140, "max_hp": 140, "mana": 0, "max_mana": 100, "spec": "", "talent_points": 0, "talents": []},
+		{"key": "mage", "hp": 90, "max_hp": 90, "mana": 100, "max_mana": 100, "spec": "", "talent_points": 0, "talents": []},
+		{"key": "cleric", "hp": 110, "max_hp": 110, "mana": 100, "max_mana": 100, "spec": "", "talent_points": 0, "talents": []},
 	]
 	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
 	floor_idx = -1
@@ -132,3 +132,16 @@ func restore_mana(pct: float) -> void:
 
 func random_loot() -> String:
 	return LOOT_POOL.pick_random()
+
+
+# Combat rewards: every hero gains talent points (fight 1, elite 2, boss 3).
+func award_talent_points(node_type: String) -> int:
+	var pts := 1
+	match node_type:
+		"elite":
+			pts = 2
+		"boss":
+			pts = 3
+	for member in party:
+		member["talent_points"] = member.get("talent_points", 0) + pts
+	return pts
