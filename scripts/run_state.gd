@@ -11,7 +11,7 @@ const ITEM_INFO := {
 	"mana": ["Mana Potion", "Restores 40 Mana (or Rage) to one ally."],
 	"bomb": ["Bomb", "Deals 50 damage to all enemies."],
 	"revive": ["Revive Potion", "Revives a fallen ally at 50% HP."],
-	"defense": ["Defense Potion", "+10% armor to all living party members for 5 turns."],
+	"defense": ["Defense Potion", "+10% armor to all living party members for 3 turns."],
 }
 # Potions drop more often than the heavy items.
 const LOOT_POOL := ["health", "health", "mana", "mana", "bomb", "revive", "defense"]

@@ -5,6 +5,7 @@ extends Node2D
 signal _ability_picked(ability)
 signal _target_picked(unit)
 signal _skill_done(grade)
+signal _confirmed(ok)
 
 const BASIC_DELAY := 2.0
 
@@ -268,7 +269,7 @@ func _build_ui() -> void:
 	ui.add_child(message_label)
 
 	action_panel = PanelContainer.new()
-	action_panel.position = Vector2(140, 630)
+	action_panel.position = Vector2(380, 644)
 	ui.add_child(action_panel)
 	action_box = HBoxContainer.new()
 	action_box.add_theme_constant_override("separation", 10)
@@ -375,6 +376,10 @@ func _rebuild_turn_bar() -> void:
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		portrait.flip_h = not u.is_hero
+		portrait.mouse_filter = Control.MOUSE_FILTER_STOP
+		portrait.tooltip_text = u.unit_name
+		portrait.mouse_entered.connect(u.set_highlight.bind(true))
+		portrait.mouse_exited.connect(u.set_highlight.bind(false))
 		slot.add_child(portrait)
 		var stripe := ColorRect.new()
 		stripe.custom_minimum_size = Vector2(66, 4)
@@ -471,9 +476,17 @@ func _player_turn(u: BattleUnit) -> void:
 		if ab.special in ["rally", "focus", "surge", "guard", "shieldwall", "taunt",
 				"phoenix", "hymn", "benediction", "retaliate"]:
 			target = u  # self/party effects need no target choice
+			if not autoplay:
+				var ok: bool = await _confirm_cast(ab)
+				if not ok:
+					target = null
 		elif ab.aoe or ab.random_hits > 0:
 			var foes := enemies.filter(func(e): return not e.dead)
 			target = foes[0]  # resolve picks the real targets
+			if not autoplay:
+				var ok_aoe: bool = await _confirm_cast(ab)
+				if not ok_aoe:
+					target = null
 		elif autoplay:
 			target = auto_target
 		else:
@@ -484,6 +497,9 @@ func _player_turn(u: BattleUnit) -> void:
 				pool = enemies.filter(func(e): return not e.dead)
 			if pool.size() == 1:
 				target = pool[0]
+				var ok_single: bool = await _confirm_cast(ab)
+				if not ok_single:
+					target = null
 			else:
 				_message("Choose a target")
 				target = await _pick_target(pool)
@@ -520,7 +536,7 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if u.resource >= 30:
 				return [u.abilities[1], target_foe]      # Heavy Strike
 			if u.resource >= 20 and not target_foe.has_status("sunder"):
-				return [u.abilities[3], target_foe]      # Crushing Blow
+				return [u.abilities[2], target_foe]      # Crushing Blow
 			return [u.abilities[0], target_foe]          # Strike
 		"Mage":
 			if u.resource >= 15 and u.second_resource < u.second_max and randf() < 0.3:
@@ -608,7 +624,7 @@ func _use_item(item_id: String) -> void:
 			_message("The party braces!")
 			_log("Item: Defense Potion — party gains Fortify", "#e0c060")
 			for h in heroes.filter(func(he): return not he.dead):
-				_apply_status(h, "fortify", 5)
+				_apply_status(h, "fortify", 3)
 			await _wait(0.6)
 	if not battle_over and current_hero != null and not current_hero.dead:
 		_show_actions(current_hero)
@@ -654,6 +670,11 @@ func _show_actions(u: BattleUnit) -> void:
 	action_box.add_child(guard_btn)
 	action_box.add_child(_build_items_menu())
 	action_panel.visible = true
+	call_deferred("_center_action_panel")
+
+
+func _center_action_panel() -> void:
+	action_panel.position = Vector2(640.0 - action_panel.size.x / 2.0, 644.0)
 
 
 func _on_ability_button(ab: Ability) -> void:
@@ -707,6 +728,28 @@ func _build_items_menu() -> MenuButton:
 		popup.set_item_disabled(i, not usable)
 	popup.id_pressed.connect(func(id: int): _use_item(Run.ITEM_IDS[id]))
 	return menu
+
+
+# Confirm-or-cancel step for abilities that need no target click (self, AoE,
+# or only one possible target) so every cast can be backed out of.
+func _confirm_cast(ab: Ability) -> bool:
+	var bar := HBoxContainer.new()
+	bar.position = Vector2(490, 560)
+	bar.add_theme_constant_override("separation", 12)
+	ui.add_child(bar)
+	var cast := Button.new()
+	cast.text = "Cast %s" % ab.display_name
+	cast.custom_minimum_size = Vector2(180, 40)
+	cast.pressed.connect(func(): _confirmed.emit(true))
+	bar.add_child(cast)
+	var cancel := Button.new()
+	cancel.text = "✕ Cancel"
+	cancel.custom_minimum_size = Vector2(110, 40)
+	cancel.pressed.connect(func(): _confirmed.emit(false))
+	bar.add_child(cancel)
+	var ok: bool = await _confirmed
+	bar.queue_free()
+	return ok
 
 
 func _pick_target(pool: Array) -> BattleUnit:
@@ -812,7 +855,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_log("%s: %s on %s heals %d%s" % [attacker.unit_name, ab.display_name,
 			target.unit_name, amount, grade_tag], "#70d878")
 		if is_perfect and ab.perfect_id == "ward":
-			_apply_status(target, "ward", 2)
+			_apply_status(target, "ward", 3)
 	elif not is_counter and not ab.aoe and randf() < MISS_CHANCE:
 		_stat("attacks")
 		_stat("attack_miss")
@@ -947,13 +990,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Specialization on-hit passives.
 			if not strike_target.dead:
 				if attacker.passive_id == "ignite" and randf() < 0.5:
-					_apply_status(strike_target, "burn", 2)
+					_apply_status(strike_target, "burn", 3)
 				elif attacker.passive_id == "chill" and randf() < 0.5:
-					_apply_status(strike_target, "slow", 2)
+					_apply_status(strike_target, "slow", 3)
 				elif attacker.passive_id == "corrupt" and randf() < 0.25:
-					_apply_status(strike_target, "cripple", 2)
+					_apply_status(strike_target, "cripple", 3)
 				if is_perfect and ab.display_name == "Hex of Ruin":
-					_apply_status(strike_target, "cripple", 2)
+					_apply_status(strike_target, "cripple", 3)
 			if is_perfect:
 				_apply_perfect_bonus(attacker, strike_target, ab, result.died)
 			# Retaliation stance: the victim counters with their basic attack.
@@ -1081,21 +1124,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_gain_resonance(attacker, 2 if is_perfect else 1)
 			_message("%s surges with power!" % attacker.unit_name)
 			_log("%s: Arcane Surge — +20%% attack next turn" % attacker.unit_name, "#70d878")
-		"purge":
-			var amount := int((35 if is_perfect else 25) * mult)
-			_sfx("heal", -8.0)
-			target.heal_amount(amount)
-			target.float_text("+%d" % amount, Color(0.4, 0.9, 0.45))
-			for debuff_id in ["slow", "burn", "bleed", "sunder"]:
-				if target.has_status(debuff_id):
-					target.remove_status(debuff_id)
-					target.float_text("Cleansed", Color(1.0, 0.95, 0.7))
-					_log("   → %s cleansed of %s" % [target.unit_name, debuff_id], "#b0a8e0")
-					break
-			_apply_status(target, "fortify", 2)
-			_message("%s purges %s" % [attacker.unit_name, target.unit_name])
-			_log("%s: Blessed Purge on %s — heals %d" % [attacker.unit_name,
-				target.unit_name, amount], "#70d878")
+		"divine_shield":
+			var shield := 130 if is_perfect else 100
+			_sfx("parry", -6.0, 0.6)
+			_apply_status(target, "barrier", -1, shield)
+			_message("%s shields %s (%d)" % [attacker.unit_name, target.unit_name, shield])
+			_log("%s: Divine Shield on %s — absorbs %d" % [attacker.unit_name,
+				target.unit_name, shield], "#70d878")
 		"guard":
 			_sfx("parry", -9.0, 0.6)
 			_apply_status(attacker, "guard", 1)
@@ -1184,7 +1219,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var amt := int(h.max_hp * 0.15 * (1.25 if attacker.passive_id == "grace" else 1.0))
 				h.heal_amount(amt)
 				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
-				_apply_status(h, "empower", 2)
+				_apply_status(h, "empower", 3)
 				_stat("healing", amt)
 			attacker.refresh_bars()
 			_message("MIRACLE — Dark Benediction!")

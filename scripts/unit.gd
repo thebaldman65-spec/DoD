@@ -197,6 +197,11 @@ func set_tint(tint: Color) -> void:
 	sprite.self_modulate = tint
 
 
+# Battlefield highlight driven by hovering the initiative bar.
+func set_highlight(on: bool) -> void:
+	sprite.self_modulate = _base_tint.lightened(0.6) if on else _base_tint
+
+
 func set_targetable(on: bool) -> void:
 	_target_btn.visible = on
 	_target_marker.visible = on
