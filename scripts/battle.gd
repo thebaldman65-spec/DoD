@@ -16,7 +16,7 @@ const GOOD_HALF := 0.16
 const STATUS_INFO := {
 	"slow": ["Slow", "S", Color(0.5, 0.75, 1.0), "-25% speed; turns arrive later."],
 	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Takes 6 damage at the start of each turn."],
-	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Takes 5 damage at the start of each turn."],
+	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Bleed builds with wounding attacks;\nat 100 the target bleeds out for 20% max HP."],
 	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-35% armor."],
 	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4), "Takes 50% less Pressure."],
 	"fortify": ["Fortify", "+D", Color(0.55, 0.8, 0.9), "+10% armor."],
@@ -51,7 +51,7 @@ const SFX := {
 }
 
 # Damage-over-time statuses ticked at the start of the afflicted unit's turn.
-const DOT_STATUSES := {"burn": 6, "bleed": 5}
+const DOT_STATUSES := {"burn": 6}
 
 var heroes: Array = []
 var enemies: Array = []
@@ -204,10 +204,22 @@ func _spawn_units() -> void:
 				cfg["armor"] += 0.10
 				cfg["stability"] += 15
 			if Run.active and i < Run.party.size():
-				Talents.apply(cfg, spec, Run.party[i].get("talents", []))
+				Talents.apply(cfg, spec, Run.party[i].get("talents", {}))
 		name_counts[cfg["unit_name"]] = name_counts.get(cfg["unit_name"], 0) + 1
 		if hero_keys.count(hero_keys[i]) > 1:
 			cfg["unit_name"] = "%s %d" % [cfg["unit_name"], name_counts[cfg["unit_name"]]]
+		if Run.active and i < Run.party.size():
+			for rune in Run.party[i].get("runes", []):
+				Talents.apply_payload(cfg, rune["payload"], 1)
+			if Relics.has("dragonbone"):
+				cfg["dmg_bonus"] = cfg.get("dmg_bonus", 0.0) + 0.10
+			if Relics.has("emberheart"):
+				var bonuses: Dictionary = cfg.get("type_dmg_bonus", {})
+				bonuses["fire"] = bonuses.get("fire", 0.0) + 0.20
+				bonuses["holy"] = bonuses.get("holy", 0.0) + 0.20
+				cfg["type_dmg_bonus"] = bonuses
+			if Relics.has("eidolon") and cfg["resource_name"] == "Rage":
+				cfg["resource"] = 25
 		var u := _make_unit(cfg, HERO_SLOTS[i], HERO_TINTS[i])
 		u.crit_bonus = cfg.get("crit_bonus", 0.0)
 		u.parry_bonus = cfg.get("parry_bonus", 0.0)
@@ -250,9 +262,9 @@ func _orc_raider_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Slash", "damage": 30, "pressure": 13,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Jagged Cut", "damage": 22, "pressure": 11,
+		Ability.make({"display_name": "Sundering Strike", "damage": 20, "pressure": 11,
 			"delay": 2.5, "anim": "attack02",
-			"applies_status": {"id": "bleed", "turns": 3}, "status_chance": 0.6}),
+			"applies_status": {"id": "sunder", "turns": 2}, "status_chance": 0.6}),
 	]
 
 
@@ -428,7 +440,7 @@ func _run_battle() -> void:
 		active_marker.position = u.position + Vector2(-11, -130)
 		for dot_id in DOT_STATUSES:
 			if u.has_status(dot_id) and not u.dead:
-				var dot_dmg: int = DOT_STATUSES[dot_id] * maxi(u.status_stacks(dot_id), 1)
+				var dot_dmg: int = DOT_STATUSES[dot_id]
 				var info: Array = STATUS_INFO[dot_id]
 				_sfx("hit", -14.0, 0.8)
 				var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
@@ -938,6 +950,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 + 0.4 * (1.0 - attacker.hp / float(attacker.max_hp))
 			if attacker.passive_id == "zeal":
 				raw *= 1.15
+			raw *= 1.0 + attacker.dmg_bonus + float(attacker.type_dmg_bonus.get(ab.dmg_type, 0.0))
 			# Target-side modifiers.
 			if strike_target.second_resource_name == "Resonance":
 				raw *= 1.0 + 0.10 * strike_target.second_resource
@@ -1008,6 +1021,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if is_perfect and ab.display_name == "Flame Surge":
 					turns += 1
 				_apply_status(strike_target, ab.applies_status["id"], turns)
+			if ab.bleed_build > 0 and not strike_target.dead:
+				if strike_target.add_bleed(ab.bleed_build):
+					var bleed_dmg := maxi(int(strike_target.max_hp * 0.20), 1)
+					var bleed_result: Dictionary = strike_target.take_hit(bleed_dmg, 0)
+					strike_target.float_text("BLEEDOUT %d" % bleed_dmg, Color(0.9, 0.15, 0.2), true)
+					_sfx("crit", -5.0, 0.8)
+					_log("   → %s BLEEDS OUT for %d" % [strike_target.unit_name, bleed_dmg], "#e05050")
+					if bleed_result.died:
+						_stat("hero_deaths" if strike_target.is_hero else "enemy_deaths")
+						_sfx("death", -4.0)
+						_message("%s falls!" % strike_target.unit_name)
+						_log("† %s dies" % strike_target.unit_name, "#e05050")
+						await _wait(0.5)
 			# Specialization on-hit passives.
 			if not strike_target.dead:
 				if attacker.passive_id == "ignite" and randf() < 0.5:
@@ -1418,14 +1444,22 @@ func _check_end() -> void:
 			if heroes[i].resource_name == "Mana":
 				Run.party[i]["mana"] = heroes[i].resource
 		var pts := Run.award_talent_points(Run.encounter.get("type", "fight"))
+		var gold_gain := Run.award_gold(Run.encounter.get("type", "fight"))
+		if Relics.has("chalice"):
+			Run.heal_party(0.10)
 		_sfx("victory", -4.0)
 		if Run.encounter.get("type", "") == "boss":
 			Run.active = false
-			_show_end("THE WARDEN FALLS", "The forest breathes again. Run complete!\n(Each hero gained %d talent points.)" % pts,
-				[["New Run", _start_new_run]])
+			var relic := Relics.unlock_random()
+			var boss_text := "The forest breathes again. Run complete!\n+%d gold, %d talent points each." % [gold_gain, pts]
+			if not relic.is_empty():
+				boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
+			else:
+				boss_text += "\nEvery relic has already been claimed."
+			_show_end("THE WARDEN FALLS", boss_text, [["New Run", _start_new_run]])
 		else:
-			_show_end("VICTORY", "Each hero gains %d talent point%s. Choose your spoils:" % [
-				pts, "" if pts == 1 else "s"], [
+			_show_end("VICTORY", "+%d gold. Each hero gains %d talent point%s. Choose your spoils:" % [
+				gold_gain, pts, "" if pts == 1 else "s"], [
 				["Rest (party heals 25%)", _reward_rest],
 				["Scavenge (+1 random item)", _reward_loot],
 			])

@@ -17,7 +17,8 @@ const ITEM_INFO := {
 const LOOT_POOL := ["health", "health", "mana", "mana", "bomb", "revive", "defense"]
 
 var active := false
-var specs_chosen := false  # locked in after the first combat victory
+var specs_chosen := false
+var gold := 0  # locked in after the first combat victory
 var zone_name := "Forest of Old"
 var party: Array = []      # [{key, hp, max_hp}] snapshots between battles
 var items := {}            # item id -> count (shared inventory)
@@ -42,8 +43,10 @@ func new_run(keys := ["warrior", "mage", "cleric"]) -> void:
 		var base: Dictionary = HERO_BASE[key]
 		party.append({"key": key, "hp": base["hp"], "max_hp": base["hp"],
 			"mana": base["mana"], "max_mana": 100, "spec": "",
-			"talent_points": 0, "talents": {}})
+			"talent_points": 1 if Relics.has("waystone") else 0,
+			"talents": {}, "runes": []})
 	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
+	gold = 60 + (80 if Relics.has("coin") else 0)
 	floor_idx = -1
 	node_idx = -1
 	encounter = {}
@@ -80,6 +83,16 @@ func _generate_map() -> void:
 			if not has_inbound:
 				var nearest := 0 if b == 1 else int(round(j * float(a - 1) / float(maxi(b - 1, 1))))
 				map[f][nearest]["links"].append(j)
+	# Guarantee at least one shop per run.
+	var has_shop := false
+	for floor_row in map:
+		for map_node in floor_row:
+			if map_node["type"] == "shop":
+				has_shop = true
+	if not has_shop:
+		var shop_floor := randi_range(2, 5)
+		var row: Array = map[shop_floor]
+		row[randi_range(0, row.size() - 1)]["type"] = "shop"
 
 
 func _roll_node_type(f: int) -> String:
@@ -88,11 +101,13 @@ func _roll_node_type(f: int) -> String:
 	if f == 0:
 		return "fight"
 	var roll := randf()
-	if roll < 0.55:
+	if roll < 0.50:
 		return "fight"
-	elif roll < 0.72 and f >= 2:
+	elif roll < 0.67 and f >= 2:
 		return "elite"
-	elif roll < 0.88:
+	elif roll < 0.77 and f >= 1:
+		return "shop"
+	elif roll < 0.90:
 		return "rest"
 	else:
 		return "treasure"
@@ -142,6 +157,17 @@ func restore_mana(pct: float) -> void:
 
 func random_loot() -> String:
 	return LOOT_POOL.pick_random()
+
+
+func award_gold(node_type: String) -> int:
+	var amount := randi_range(25, 35)
+	match node_type:
+		"elite":
+			amount = randi_range(55, 70)
+		"boss":
+			amount = randi_range(110, 130)
+	gold += amount
+	return amount
 
 
 # Combat rewards: every hero gains talent points (fight 1, elite 2, boss 3).

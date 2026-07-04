@@ -110,6 +110,14 @@
 <li>Node map shows the Forest zone art (from the new "imported files" workflow) behind a readability dim.</li>
 <li>Distinct hero models require new sprite sheets — currently only Soldier and Orc exist. Drop new sheets in "imported files" using the Soldier format (100x100 frame rows: Name_Idle/Walk/Attack01-03/Hurt/Death PNGs).</li>
 </ul>
+<h3>2026-07-04 (seventh pass) — Bleed buildup, gold economy, shops, RELICS</h3>
+<ul>
+<li><b>Bleed reworked as a buildup meter:</b> wounding attacks add Bleed (chip shows Bl35, Bl70...); at 100 the target BLEEDS OUT for 20% of max HP (true damage) and the meter resets. No more per-turn bleed ticks. Wildstrikes builds 35 per target; Berserker's Deep Wounds talent adds +10 per rank.</li>
+<li><b>Orc raiders lose Jagged Cut (bleed)</b> and gain Sundering Strike (60% chance to Sunder armor, 2 turns).</li>
+<li><b>Gold:</b> victories pay 25-35 (fight), 55-70 (elite), 110-130 (boss); runs start with 60. Shown on the map readout and victory panel.</li>
+<li><b>Shop nodes ("The Wandering Peddler")</b> appear on the map (~10% of nodes, at least one guaranteed per run). Sells consumables (potions 30g, bombs 45g, revives 80g) and <b>runes</b> — run-long class modifiers offered per party member (e.g. Rune of Fury: Strike +5 dmg; Rune of Deep Wells: +20 max Mana), one copy each.</li>
+<li><b>RELICS — first meta-progression layer.</b> Killing the zone boss unlocks one random relic, permanent across runs (saved to disk). Pool of six: Waystone Shard (+1 starting talent point per hero), Dragonbone Idol (+10% all damage), Chalice of Dawn (party heals 10% after victories), Gravewrought Coin (+80 starting gold), Eidolon Mirror (Warriors start battles with 25 Rage), Emberheart (fire/holy +20%). All unlocked relics are always active; per-character relic slots from the design doc come later.</li>
+</ul>
 <h2>Progress Snapshot</h2>
 <p>Phase 1 (combat core) complete and simulator-tuned. Phase 2 (run structure) playable: map, battles, rewards, carryover, party/inventory screens. Next: class specializations, then drafting, talents, and zone variety. Automated testing: DOD_AUTOPLAY (single bot battle) and DOD_SIM=N (batch balance reports).</p>
 </body></html>

@@ -132,9 +132,9 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Strike and drink deep: heals the Warrior\nfor 30% of their missing HP."}),
 				Ability.make({"display_name": "Wildstrikes", "cost": 35, "damage": 16,
 					"pressure": 7, "delay": 4.5, "anim": "attack03", "aoe": true,
-					"applies_status": {"id": "bleed", "turns": 3},
+					"bleed_build": 35,
 					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
-					"description": "Savage sweep: hits ALL enemies and\nleaves them Bleeding (3 turns)."}),
+					"description": "Savage sweep: hits ALL enemies and\nbuilds 35 Bleed on each."}),
 			]
 		"warden":
 			return [

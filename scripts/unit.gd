@@ -26,6 +26,9 @@ var second_max := 100
 var passive_id := ""       # specialization passive hook (see battle.gd)
 var crit_bonus := 0.0      # from talents
 var parry_bonus := 0.0     # from talents
+var dmg_bonus := 0.0       # global damage multiplier bonus (relics)
+var type_dmg_bonus := {}   # dmg_type -> bonus fraction (relics)
+var bleed_buildup := 0     # bleeds out at 100
 var resists := {}          # dmg_type -> fraction reduced (negative = vulnerable)
 var abilities: Array = []
 
@@ -262,14 +265,8 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 		desc := "", power := 0) -> void:
 	for s in statuses:
 		if s.id == id:
-			if id == "bleed":
-				# Bleeds stack additively: each application is another wound.
-				s.stacks = s.get("stacks", 1) + 1
-				s.short = "Bl%d" % s.stacks
-				s.turns = maxi(s.turns, turns)
-			else:
-				s.turns = maxi(s.turns, turns)
-				s.power = maxi(s.power, power)
+			s.turns = maxi(s.turns, turns)
+			s.power = maxi(s.power, power)
 			_refresh_chips()
 			return
 	statuses.append({"id": id, "label": label, "short": short, "color": color,
@@ -288,6 +285,32 @@ func has_status(id: String) -> bool:
 		if s.id == id:
 			return true
 	return false
+
+
+# Bleed is a buildup: wounding attacks add to it; at 100 the target bleeds
+# out (caller applies the damage) and the meter resets. Returns true on
+# bleedout.
+func add_bleed(amount: int) -> bool:
+	bleed_buildup = mini(bleed_buildup + amount, 100)
+	var bled := bleed_buildup >= 100
+	if bled:
+		bleed_buildup = 0
+		remove_status("bleed")
+	else:
+		var found := false
+		for s in statuses:
+			if s.id == "bleed":
+				s.short = "Bl%d" % bleed_buildup
+				s.desc = "Bleed buildup: %d/100.\nAt 100 the target bleeds out\nfor 20%% of max HP." % bleed_buildup
+				found = true
+		if not found:
+			statuses.append({"id": "bleed", "label": "Bleed", "short": "Bl%d" % bleed_buildup,
+				"color": Color(0.85, 0.25, 0.25), "turns": -1,
+				"desc": "Bleed buildup: %d/100.\nAt 100 the target bleeds out\nfor 20%% of max HP." % bleed_buildup,
+				"power": 0, "stacks": 1})
+		float_text("Bleed %d" % bleed_buildup, Color(0.85, 0.3, 0.3))
+	_refresh_chips()
+	return bled
 
 
 func status_stacks(id: String) -> int:

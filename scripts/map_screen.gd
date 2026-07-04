@@ -6,12 +6,12 @@ const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
 const NODE_LABELS := {
 	"fight": "Fight", "elite": "ELITE", "rest": "Rest",
-	"treasure": "Loot", "boss": "BOSS",
+	"treasure": "Loot", "boss": "BOSS", "shop": "Shop",
 }
 const NODE_COLORS := {
 	"fight": Color(0.75, 0.72, 0.65), "elite": Color(0.95, 0.55, 0.3),
 	"rest": Color(0.5, 0.85, 0.55), "treasure": Color(0.95, 0.85, 0.4),
-	"boss": Color(0.9, 0.3, 0.35),
+	"boss": Color(0.9, 0.3, 0.35), "shop": Color(0.5, 0.8, 0.95),
 }
 
 
@@ -78,7 +78,7 @@ func _draw_screen() -> void:
 			part += " (%d MP)" % member["mana"]
 		party_parts.append(part)
 	var status := Label.new()
-	status.text = "   ".join(party_parts)
+	status.text = "Gold: %d      %s" % [Run.gold, "   ".join(party_parts)]
 	status.add_theme_font_size_override("font_size", 14)
 	status.add_theme_color_override("font_color", Color(0.75, 0.72, 0.65))
 	status.position = Vector2(0, 690)
@@ -159,6 +159,8 @@ func _on_node_pressed(f: int, i: int) -> void:
 			Run.items[id] = Run.items.get(id, 0) + 1
 			_draw_screen()
 			_toast("Scavenged a %s!" % Run.ITEM_INFO[id][0])
+		"shop":
+			get_tree().change_scene_to_file("res://scenes/shop.tscn")
 		_:
 			Run.encounter = {"type": node["type"], "enemies": Run.compose(node["type"])}
 			get_tree().change_scene_to_file("res://scenes/battle.tscn")

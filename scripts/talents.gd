@@ -18,9 +18,9 @@ const TREES := {
 			"desc": "+8 Stability per rank.", "payload": {"stat": {"stability": 8}}},
 		{"id": "b4", "tier": 2, "ranks": 2, "requires": "", "name": "Frenzied Pace",
 			"desc": "+5 Speed per rank.", "payload": {"stat": {"speed": 5}}},
-		{"id": "b5", "tier": 2, "ranks": 1, "requires": "b2", "name": "Deep Wounds",
-			"desc": "Wildstrikes' Bleed lasts 5 turns.",
-			"payload": {"ability": "Wildstrikes", "status_turns": 5}},
+		{"id": "b5", "tier": 2, "ranks": 2, "requires": "b2", "name": "Deep Wounds",
+			"desc": "Wildstrikes builds +10 more Bleed per rank.",
+			"payload": {"ability": "Wildstrikes", "add": {"bleed_build": 10}}},
 		{"id": "b6", "tier": 3, "ranks": 1, "requires": "b5", "name": "Rampage",
 			"desc": "New ability: brutal 40-damage strike (30 Rage).",
 			"payload": {"new_ability": {"display_name": "Rampage", "cost": 30, "damage": 40,
@@ -290,21 +290,25 @@ static func apply(cfg: Dictionary, spec: String, learned: Dictionary) -> void:
 		var ranks := int(learned.get(t["id"], 0))
 		if ranks < 1:
 			continue
-		var payload: Dictionary = t["payload"]
-		if payload.has("stat"):
-			for field in payload["stat"]:
-				if field == "crit_bonus" or field == "parry_bonus":
-					cfg[field] = cfg.get(field, 0.0) + payload["stat"][field] * ranks
-				else:
-					cfg[field] = cfg[field] + payload["stat"][field] * ranks
-		elif payload.has("new_ability"):
-			cfg["abilities"] = cfg["abilities"] + [Ability.make(payload["new_ability"])]
-		elif payload.has("ability"):
-			for ab in cfg["abilities"]:
-				if ab.display_name == payload["ability"]:
-					for field in payload.get("add", {}):
-						ab.set(field, ab.get(field) + payload["add"][field] * ranks)
-					for field in payload.get("set", {}):
-						ab.set(field, payload["set"][field])
-					if payload.has("status_turns") and not ab.applies_status.is_empty():
-						ab.applies_status["turns"] = payload["status_turns"]
+		apply_payload(cfg, t["payload"], ranks)
+
+
+# Shared payload applicator (talents and shop runes).
+static func apply_payload(cfg: Dictionary, payload: Dictionary, ranks: int) -> void:
+	if payload.has("stat"):
+		for field in payload["stat"]:
+			if field == "crit_bonus" or field == "parry_bonus":
+				cfg[field] = cfg.get(field, 0.0) + payload["stat"][field] * ranks
+			else:
+				cfg[field] = cfg[field] + payload["stat"][field] * ranks
+	elif payload.has("new_ability"):
+		cfg["abilities"] = cfg["abilities"] + [Ability.make(payload["new_ability"])]
+	elif payload.has("ability"):
+		for ab in cfg["abilities"]:
+			if ab.display_name == payload["ability"]:
+				for field in payload.get("add", {}):
+					ab.set(field, ab.get(field) + payload["add"][field] * ranks)
+				for field in payload.get("set", {}):
+					ab.set(field, payload["set"][field])
+				if payload.has("status_turns") and not ab.applies_status.is_empty():
+					ab.applies_status["turns"] = payload["status_turns"]
