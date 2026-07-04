@@ -76,4 +76,4 @@ func _pick(slot: int, key: String) -> void:
 
 func _start_run() -> void:
 	Run.new_run(picks.duplicate())
-	get_tree().change_scene_to_file("res://scenes/map.tscn")
+	get_tree().change_scene_to_file("res://scenes/spec_choice.tscn")

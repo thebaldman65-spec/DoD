@@ -42,7 +42,7 @@ func new_run(keys := ["warrior", "mage", "cleric"]) -> void:
 		var base: Dictionary = HERO_BASE[key]
 		party.append({"key": key, "hp": base["hp"], "max_hp": base["hp"],
 			"mana": base["mana"], "max_mana": 100, "spec": "",
-			"talent_points": 0, "talents": []})
+			"talent_points": 0, "talents": {}})
 	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
 	floor_idx = -1
 	node_idx = -1

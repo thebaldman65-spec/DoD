@@ -69,7 +69,10 @@ func _draw_list() -> void:
 			member["hp"], member["max_hp"]]
 		if key != "warrior":
 			line += "    Mana %d/%d" % [member["mana"], member["max_mana"]]
-		line += "    Points: %d" % member.get("talent_points", 0)
+		var pts: int = member.get("talent_points", 0)
+		if pts > 0:
+			line += "    ● %d POINTS TO SPEND" % pts
+			btn.modulate = Color(1.0, 0.92, 0.55)
 		btn.text = line
 		btn.custom_minimum_size = Vector2(460, 96)
 		btn.position = Vector2(410, 140 + i * 130)
@@ -176,51 +179,61 @@ func _draw_detail() -> void:
 	tree_header.text = "TALENTS — %s tree    (Points: %d)" % [
 		Classes.SPEC_INFO[spec]["name"], member.get("talent_points", 0)]
 
-	var learned: Array = member.get("talents", [])
+	var learned: Dictionary = member.get("talents", {})
 	var points: int = member.get("talent_points", 0)
 	var tree: Array = Talents.tree(spec)
-	for i in tree.size():
-		var talent: Dictionary = tree[i]
-		var col := i % 2
-		var row := i / 2
+	var tier_counts := {}
+	for talent in tree:
+		var tier: int = talent["tier"]
+		var idx_in_tier: int = tier_counts.get(tier, 0)
+		tier_counts[tier] = idx_in_tier + 1
 		var panel := PanelContainer.new()
-		panel.position = Vector2(520 + col * 372, 110 + row * 148)
-		panel.custom_minimum_size = Vector2(360, 136)
+		panel.position = Vector2(505 + idx_in_tier * 252, 110 + (tier - 1) * 196)
+		panel.custom_minimum_size = Vector2(244, 184)
 		add_child(panel)
 		var vbox := VBoxContainer.new()
 		vbox.add_theme_constant_override("separation", 4)
 		panel.add_child(vbox)
+		var ranks_have := int(learned.get(talent["id"], 0))
 		var label := Label.new()
-		label.text = "T%d — %s\n%s" % [talent["tier"], talent["name"], talent["desc"]]
-		label.add_theme_font_size_override("font_size", 12)
+		var req_line := ""
+		if talent["requires"] != "":
+			req_line = "\nRequires: %s" % Talents.node(spec, talent["requires"])["name"]
+		label.text = "T%d  %s   [%d/%d]\n%s%s" % [talent["tier"], talent["name"],
+			ranks_have, talent["ranks"], talent["desc"], req_line]
+		label.add_theme_font_size_override("font_size", 11)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.custom_minimum_size = Vector2(340, 0)
+		label.custom_minimum_size = Vector2(228, 0)
 		vbox.add_child(label)
 		var learn := Button.new()
-		learn.custom_minimum_size = Vector2(140, 28)
+		learn.custom_minimum_size = Vector2(130, 28)
 		learn.add_theme_font_size_override("font_size", 12)
-		var is_learned: bool = learned.has(talent["id"])
-		var unlocked: bool = Talents.tier_unlocked(spec, talent["tier"], learned)
-		if is_learned:
-			learn.text = "LEARNED"
+		var check: Dictionary = Talents.can_learn(spec, talent["id"], learned)
+		if ranks_have >= int(talent["ranks"]):
+			learn.text = "MAXED"
 			learn.disabled = true
 			panel.modulate = Color(0.75, 0.95, 0.75)
-		elif not unlocked:
-			learn.text = "Locked (%d in tree)" % ((talent["tier"] - 1) * 2)
+		elif not check["ok"]:
+			learn.text = check["why"]
 			learn.disabled = true
 		elif points < 1:
 			learn.text = "No points"
 			learn.disabled = true
 		else:
-			learn.text = "Learn (1 pt)"
+			learn.text = "Learn (1 pt)" if ranks_have == 0 else "Rank up (1 pt)"
 			learn.pressed.connect(_learn_talent.bind(talent["id"]))
+			if ranks_have > 0:
+				panel.modulate = Color(0.85, 0.95, 0.8)
 		vbox.add_child(learn)
 
 
 func _learn_talent(talent_id: String) -> void:
 	var member: Dictionary = Run.party[selected]
-	if member.get("talent_points", 0) < 1 or member.get("talents", []).has(talent_id):
+	var spec: String = member.get("spec", "")
+	var learned: Dictionary = member.get("talents", {})
+	if member.get("talent_points", 0) < 1 or not Talents.can_learn(spec, talent_id, learned)["ok"]:
 		return
-	member["talents"].append(talent_id)
+	learned[talent_id] = int(learned.get(talent_id, 0)) + 1
+	member["talents"] = learned
 	member["talent_points"] -= 1
 	_draw_screen()

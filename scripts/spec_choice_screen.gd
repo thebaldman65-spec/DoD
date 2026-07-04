@@ -43,7 +43,7 @@ func _draw_screen() -> void:
 	add_child(title)
 
 	var subtitle := Label.new()
-	subtitle.text = "Choose a specialization — this choice is permanent for the run (hero %d of %d)" % [
+	subtitle.text = "Choose their path — this choice is permanent for the run (hero %d of %d)" % [
 		idx + 1, Run.party.size()]
 	subtitle.add_theme_font_size_override("font_size", 15)
 	subtitle.add_theme_color_override("font_color", Color(0.6, 0.55, 0.5))

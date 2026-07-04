@@ -428,7 +428,7 @@ func _run_battle() -> void:
 		active_marker.position = u.position + Vector2(-11, -130)
 		for dot_id in DOT_STATUSES:
 			if u.has_status(dot_id) and not u.dead:
-				var dot_dmg: int = DOT_STATUSES[dot_id]
+				var dot_dmg: int = DOT_STATUSES[dot_id] * maxi(u.status_stacks(dot_id), 1)
 				var info: Array = STATUS_INFO[dot_id]
 				_sfx("hit", -14.0, 0.8)
 				var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
@@ -890,20 +890,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if ab.aoe:
 			strike_targets = (enemies if attacker.is_hero else heroes).filter(
 				func(t): return not t.dead)
-		elif ab.random_hits > 0:
-			strike_targets = []
-			var hits := ab.random_hits + (1 if is_perfect else 0)
-			for k in hits:
-				var pool: Array = (enemies if attacker.is_hero else heroes).filter(
-					func(t): return not t.dead)
-				if pool.is_empty():
-					break
-				strike_targets.append(pool.pick_random())
+		var total_hits := strike_targets.size()
+		if ab.random_hits > 0:
+			total_hits = ab.random_hits + (1 if is_perfect else 0)
 		var total_dealt := 0
 		var any_crit := false
-		for strike_target: BattleUnit in strike_targets:
-			if strike_target.dead:
-				continue
+		for hit_i in total_hits:
+			var strike_target: BattleUnit
+			if ab.random_hits > 0:
+				# Each shard picks a fresh living target at launch time.
+				var live_pool: Array = (enemies if attacker.is_hero else heroes).filter(
+					func(t): return not t.dead)
+				if live_pool.is_empty():
+					break
+				strike_target = live_pool.pick_random()
+			else:
+				strike_target = strike_targets[hit_i]
+				if strike_target.dead:
+					continue
 			var crit_chance := CRIT_CHANCE + (0.25 if strike_target.broken else 0.0)
 			# Resonant Mind: +3% crit per Resonance stack.
 			if attacker.second_resource_name == "Resonance":
@@ -1037,7 +1041,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_message("%s falls!" % strike_target.unit_name)
 				_log("† %s dies" % strike_target.unit_name, "#e05050")
 				await _wait(0.5)
-			if ab.random_hits > 0 and strike_targets.size() > 1:
+			if ab.random_hits > 0 and total_hits > 1:
 				await _wait(0.45)  # sequential shards land distinctly
 		# Post-strike attacker effects.
 		if ab.recoil_base > 0.0 and not is_perfect:
@@ -1445,10 +1449,9 @@ func _reward_loot() -> void:
 
 
 func _to_map() -> void:
-	if Run.active and not Run.specs_chosen:
-		get_tree().change_scene_to_file("res://scenes/spec_choice.tscn")
-	else:
-		get_tree().change_scene_to_file("res://scenes/map.tscn")
+	# Route through the party screen so talent points get spent before
+	# picking the next node.
+	get_tree().change_scene_to_file("res://scenes/party.tscn")
 
 
 func _start_new_run() -> void:

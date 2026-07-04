@@ -241,6 +241,14 @@ func refresh_bars() -> void:
 				second_resource * 15]
 		else:
 			_res2_text.text = "%s %d/%d" % [second_resource_name, second_resource, second_max]
+	if passive_id == "bloodrage":
+		for s in statuses:
+			if s.id == "spec_passive":
+				var bonus := int(round(40.0 * (1.0 - hp / float(max_hp))))
+				s.short = "+%d%%" % bonus
+				s.desc = "Blood Frenzy: currently +%d%% damage\n(scales up to +40%% as HP falls)." % bonus
+				_refresh_chips()
+				break
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
 	_pressure_fill.size.x = 90.0 * pressure_ratio
 	# Shifts toward hot pink as the unit gets close to Breaking.
@@ -254,12 +262,18 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 		desc := "", power := 0) -> void:
 	for s in statuses:
 		if s.id == id:
-			s.turns = maxi(s.turns, turns)
-			s.power = maxi(s.power, power)
+			if id == "bleed":
+				# Bleeds stack additively: each application is another wound.
+				s.stacks = s.get("stacks", 1) + 1
+				s.short = "Bl%d" % s.stacks
+				s.turns = maxi(s.turns, turns)
+			else:
+				s.turns = maxi(s.turns, turns)
+				s.power = maxi(s.power, power)
 			_refresh_chips()
 			return
 	statuses.append({"id": id, "label": label, "short": short, "color": color,
-		"turns": turns, "desc": desc, "power": power})
+		"turns": turns, "desc": desc, "power": power, "stacks": 1})
 	float_text(label, color)
 	_refresh_chips()
 
@@ -274,6 +288,13 @@ func has_status(id: String) -> bool:
 		if s.id == id:
 			return true
 	return false
+
+
+func status_stacks(id: String) -> int:
+	for s in statuses:
+		if s.id == id:
+			return int(s.get("stacks", 1))
+	return 0
 
 
 # Called at the start of this unit's turn. Broken is managed separately;
@@ -307,12 +328,17 @@ func _refresh_chips() -> void:
 	var count := statuses.size()
 	if count == 0:
 		return
-	var start_x := -(count * 18.0 - 2.0) / 2.0
+	var total_w := 0.0
+	for s in statuses:
+		total_w += (16.0 if String(s.short).length() <= 2 else 34.0) + 2.0
+	var start_x := -(total_w - 2.0) / 2.0
+	var x := start_x
 	for i in count:
 		var s: Dictionary = statuses[i]
+		var chip_w := 16.0 if String(s.short).length() <= 2 else 34.0
 		var chip := ColorRect.new()
-		chip.position = Vector2(start_x + i * 18.0, 0)
-		chip.size = Vector2(16, 16)
+		chip.position = Vector2(x, 0)
+		chip.size = Vector2(chip_w, 16)
 		chip.color = s.color
 		chip.mouse_filter = Control.MOUSE_FILTER_STOP
 		chip.tooltip_text = "%s (%s turn%s left)\n%s" % [
@@ -322,14 +348,15 @@ func _refresh_chips() -> void:
 		_chips_root.add_child(chip)
 		var tag := Label.new()
 		tag.text = s.short
-		tag.add_theme_font_size_override("font_size", 10)
+		tag.add_theme_font_size_override("font_size", 9 if chip_w > 16.0 else 10)
 		tag.add_theme_color_override("font_color", Color(0.05, 0.05, 0.08))
 		tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tag.position = chip.position
-		tag.size = Vector2(16, 16)
+		tag.size = Vector2(chip_w, 16)
 		tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		_chips_root.add_child(tag)
+		x += chip_w + 2.0
 
 
 # Cropped close-up of the character for the initiative bar (the raw frame

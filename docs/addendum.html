@@ -100,6 +100,16 @@
 <li><b>Enemy damage +20%</b> across all orc kits. Post-change baseline: 85% wins, ~0.9 hero deaths per battle.</li>
 <li>Arcane Rift removed (Arcanist: Cannon, Reality Fracture, + Singularity talent).</li>
 </ul>
+<h3>2026-07-04 (sixth pass) — WoW-style talents, flow polish, stacking bleeds</h3>
+<ul>
+<li><b>Talent trees rebuilt WoW-style:</b> nodes have ranks (multi-point stat/numeric talents, e.g. Thick Blood 3 ranks of +10 HP) and branching prerequisites ("Requires: Deep Wounds"); ability-granting talents stay single-rank. Tier N unlocks at (N-1)*3 points spent in the tree.</li>
+<li><b>Flow:</b> spec selection now happens immediately after the hero draft (before the map); after every battle victory the game routes through the Party screen before the node map; unspent talent points glow gold on the map's Party tab, the party list, and hero rows.</li>
+<li><b>Bleed stacks additively</b> — each application adds another 5-damage wound (chip shows Bl2, Bl3...). Applies to enemies and heroes alike; sim win rate dropped from 85% to ~70% as a result (enemy Jagged Cuts stack now).</li>
+<li>Berserker's Blood Frenzy chip live-updates with the current bonus (e.g. "+24%").</li>
+<li>Razor Ice re-targets each shard at launch — no more strikes on corpses or stalled sequences.</li>
+<li>Node map shows the Forest zone art (from the new "imported files" workflow) behind a readability dim.</li>
+<li>Distinct hero models require new sprite sheets — currently only Soldier and Orc exist. Drop new sheets in "imported files" using the Soldier format (100x100 frame rows: Name_Idle/Walk/Attack01-03/Hurt/Death PNGs).</li>
+</ul>
 <h2>Progress Snapshot</h2>
 <p>Phase 1 (combat core) complete and simulator-tuned. Phase 2 (run structure) playable: map, battles, rewards, carryover, party/inventory screens. Next: class specializations, then drafting, talents, and zone variety. Automated testing: DOD_AUTOPLAY (single bot battle) and DOD_SIM=N (batch balance reports).</p>
 </body></html>

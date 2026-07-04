@@ -37,6 +37,20 @@ func _draw_screen() -> void:
 	bg.size = Vector2(1280, 720)
 	bg.color = Color(0.08, 0.06, 0.10)
 	add_child(bg)
+	# Zone art behind the map, dimmed so nodes stay readable.
+	var art_tex: Texture2D = load("res://assets/backgrounds/node_background_forest.png")
+	var art := TextureRect.new()
+	art.texture = art_tex
+	art.size = Vector2(1280, 720)
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(art)
+	var dim := ColorRect.new()
+	dim.size = Vector2(1280, 720)
+	dim.color = Color(0.05, 0.04, 0.08, 0.55)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(dim)
 
 	var title := Label.new()
 	title.text = Run.zone_name
@@ -74,8 +88,13 @@ func _draw_screen() -> void:
 
 	# Top tabs: Party (own screen) and Inventory (dropdown).
 	var party_btn := Button.new()
-	party_btn.text = "Party"
-	party_btn.custom_minimum_size = Vector2(120, 42)
+	var unspent := 0
+	for member in Run.party:
+		unspent += member.get("talent_points", 0)
+	party_btn.text = "Party" if unspent == 0 else "Party  (%d pts!)" % unspent
+	if unspent > 0:
+		party_btn.modulate = Color(1.0, 0.9, 0.45)
+	party_btn.custom_minimum_size = Vector2(150, 42)
 	party_btn.position = Vector2(20, 16)
 	party_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/party.tscn"))
 	add_child(party_btn)
