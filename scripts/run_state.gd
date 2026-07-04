@@ -17,8 +17,11 @@ const ITEM_INFO := {
 const LOOT_POOL := ["health", "health", "mana", "mana", "bomb", "revive", "defense"]
 
 var active := false
-var specs_chosen := false
-var gold := 0  # locked in after the first combat victory
+var specs_chosen := false  # locked in during the pre-run awakening
+var gold := 0
+
+const ZONES := ["Forest of Old", "The Scarlands"]
+var zone_idx := 0
 var zone_name := "Forest of Old"
 var party: Array = []      # [{key, hp, max_hp}] snapshots between battles
 var items := {}            # item id -> count (shared inventory)
@@ -47,6 +50,10 @@ func new_run(keys := ["warrior", "mage", "cleric"]) -> void:
 			"talents": {}, "runes": []})
 	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
 	gold = 60 + (80 if Relics.has("coin") else 0)
+	zone_idx = 0
+	zone_name = ZONES[0]
+	zone_idx = 0
+	zone_name = ZONES[0]
 	floor_idx = -1
 	node_idx = -1
 	encounter = {}
@@ -157,6 +164,20 @@ func restore_mana(pct: float) -> void:
 
 func random_loot() -> String:
 	return LOOT_POOL.pick_random()
+
+
+func has_next_zone() -> bool:
+	return zone_idx < ZONES.size() - 1
+
+
+# Move to the next zone: fresh map, path reset, same party/items/gold.
+func advance_zone() -> void:
+	zone_idx += 1
+	zone_name = ZONES[zone_idx]
+	floor_idx = -1
+	node_idx = -1
+	encounter = {}
+	_generate_map()
 
 
 func award_gold(node_type: String) -> int:

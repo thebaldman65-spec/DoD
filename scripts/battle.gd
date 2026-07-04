@@ -148,7 +148,7 @@ func _build_arena() -> void:
 	cam.make_current()
 
 
-const HERO_SLOTS := [Vector2(340, 400), Vector2(230, 520), Vector2(150, 630)]
+const HERO_SLOTS := [Vector2(380, 400), Vector2(230, 510), Vector2(340, 630)]
 const HERO_TINTS := [Color.WHITE, Color(0.65, 0.75, 1.0), Color(1.0, 0.9, 0.6)]
 const ENEMY_LAYOUTS := {
 	1: [Vector2(1000, 500)],
@@ -168,13 +168,19 @@ func _enemy_config(kind: String) -> Dictionary:
 				"tint": Color(1.0, 0.75, 0.7),
 				"resists": {"physical": 0.15}}
 		"boss":
-			# Forest boss stand-in until we have real boss art and a unique kit.
-			return {"unit_name": "Withered Warden", "is_hero": false, "sheet_dir": orc,
+			# Zone boss stand-ins until real boss art and unique kits exist.
+			var boss_defs := [
+				{"unit_name": "Withered Warden", "tint": Color(0.7, 1.0, 0.7),
+					"resists": {"nature": 0.50, "physical": 0.10, "fire": -0.25}},
+				{"unit_name": "Ash-Wrought Tyrant", "tint": Color(1.0, 0.55, 0.35),
+					"resists": {"fire": 0.50, "physical": 0.10, "frost": -0.25}},
+			]
+			var bd: Dictionary = boss_defs[clampi(Run.zone_idx if Run.active else 0, 0, boss_defs.size() - 1)]
+			return {"unit_name": bd["unit_name"], "is_hero": false, "sheet_dir": orc,
 				"max_hp": 320, "armor": 0.22, "speed": 85.0, "stability": 90,
 				"resource_name": "Rage", "resource": 20, "max_resource": 100,
 				"abilities": _orc_chief_kit(), "sprite_scale": 3.6,
-				"tint": Color(0.7, 1.0, 0.7),
-				"resists": {"nature": 0.50, "physical": 0.10, "fire": -0.25}}
+				"tint": bd["tint"], "resists": bd["resists"]}
 		_:
 			return {"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
 				"max_hp": 115, "armor": 0.15, "speed": 90.0, "stability": 50,
@@ -210,7 +216,8 @@ func _spawn_units() -> void:
 			cfg["unit_name"] = "%s %d" % [cfg["unit_name"], name_counts[cfg["unit_name"]]]
 		if Run.active and i < Run.party.size():
 			for rune in Run.party[i].get("runes", []):
-				Talents.apply_payload(cfg, rune["payload"], 1)
+				if rune.get("equipped", false):
+					Talents.apply_payload(cfg, rune["payload"], 1)
 			if Relics.has("dragonbone"):
 				cfg["dmg_bonus"] = cfg.get("dmg_bonus", 0.0) + 0.10
 			if Relics.has("emberheart"):
@@ -237,10 +244,17 @@ func _spawn_units() -> void:
 	if Run.active and Run.encounter.has("enemies"):
 		composition = Run.encounter["enemies"]
 	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 3)]
+	# Later zones field tougher versions of the same foes.
+	var zone_mult := (1.0 + 0.35 * Run.zone_idx) if Run.active else 1.0
 	for i in composition.size():
 		var cfg := _enemy_config(composition[i])
 		var tint: Color = cfg["tint"]
 		cfg.erase("tint")
+		if zone_mult > 1.0:
+			cfg["max_hp"] = int(cfg["max_hp"] * zone_mult)
+			for ab in cfg["abilities"]:
+				ab.damage = int(ab.damage * zone_mult)
+			tint = tint.lerp(Color(1.0, 0.6, 0.45), 0.35)
 		enemies.append(_make_unit(cfg, layout[i], tint))
 
 	for u in heroes + enemies:
@@ -942,6 +956,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 + 0.15 * attacker.second_resource
 			if attacker.has_status("surge"):
 				raw *= 1.2
+			if is_perfect and ab.display_name == "Arcane Cannon":
+				raw *= 1.0 + 0.075 * attacker.second_resource
 			if attacker.has_status("empower"):
 				raw *= 1.25
 			if attacker.has_status("cripple"):
@@ -1070,7 +1086,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.random_hits > 0 and total_hits > 1:
 				await _wait(0.45)  # sequential shards land distinctly
 		# Post-strike attacker effects.
-		if ab.recoil_base > 0.0 and not is_perfect:
+		if ab.recoil_base > 0.0:
 			var recoil_pct := ab.recoil_base * (1.0 + attacker.second_resource)
 			var recoil := maxi(int(round(total_dealt * recoil_pct)), 1)
 			var recoil_died := attacker.take_tick_damage(recoil, "-%d Recoil" % recoil,
@@ -1449,20 +1465,21 @@ func _check_end() -> void:
 			Run.heal_party(0.10)
 		_sfx("victory", -4.0)
 		if Run.encounter.get("type", "") == "boss":
-			Run.active = false
 			var relic := Relics.unlock_random()
-			var boss_text := "The forest breathes again. Run complete!\n+%d gold, %d talent points each." % [gold_gain, pts]
+			var boss_text := "+%d gold, %d talent points each." % [gold_gain, pts]
 			if not relic.is_empty():
 				boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
+			if Run.has_next_zone():
+				_show_end("THE ZONE IS CLEANSED", boss_text,
+					[["Descend into %s" % Run.ZONES[Run.zone_idx + 1], _next_zone]])
 			else:
-				boss_text += "\nEvery relic has already been claimed."
-			_show_end("THE WARDEN FALLS", boss_text, [["New Run", _start_new_run]])
+				Run.active = false
+				_show_end("THE DECAY RECEDES", boss_text + "\nRun complete!",
+					[["New Run", _start_new_run]])
 		else:
-			_show_end("VICTORY", "+%d gold. Each hero gains %d talent point%s. Choose your spoils:" % [
-				gold_gain, pts, "" if pts == 1 else "s"], [
-				["Rest (party heals 25%)", _reward_rest],
-				["Scavenge (+1 random item)", _reward_loot],
-			])
+			_show_end("VICTORY", "+%d gold. Each hero gains %d talent point%s." % [
+				gold_gain, pts, "" if pts == 1 else "s"],
+				[["Continue", _to_map]])
 	else:
 		Run.active = false
 		_sfx("defeat", -4.0)
@@ -1470,15 +1487,8 @@ func _check_end() -> void:
 			[["New Run", _start_new_run]])
 
 
-func _reward_rest() -> void:
-	Run.heal_party(0.25)
-	Run.restore_mana(0.25)
-	_to_map()
-
-
-func _reward_loot() -> void:
-	var id := Run.random_loot()
-	Run.items[id] = Run.items.get(id, 0) + 1
+func _next_zone() -> void:
+	Run.advance_zone()
 	_to_map()
 
 

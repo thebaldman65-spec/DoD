@@ -165,6 +165,45 @@ func _draw_detail() -> void:
 		chip.tooltip_text = tip
 		add_child(chip)
 
+	# Runes: equip up to 2 (run-scoped, bought at shops).
+	var runes: Array = member.get("runes", [])
+	var rune_header := Label.new()
+	var equipped_count := 0
+	for rune in runes:
+		if rune.get("equipped", false):
+			equipped_count += 1
+	rune_header.text = "RUNES  (%d/2 equipped)" % equipped_count
+	rune_header.add_theme_font_size_override("font_size", 15)
+	rune_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
+	rune_header.position = Vector2(60, 520)
+	add_child(rune_header)
+	if runes.is_empty():
+		var none := Label.new()
+		none.text = "None yet — the Peddler sells them."
+		none.add_theme_font_size_override("font_size", 12)
+		none.add_theme_color_override("font_color", Color(0.55, 0.52, 0.5))
+		none.position = Vector2(60, 548)
+		add_child(none)
+	for i in mini(runes.size(), 4):
+		var rune: Dictionary = runes[i]
+		var toggle := Button.new()
+		var is_on: bool = rune.get("equipped", false)
+		toggle.text = "Unequip" if is_on else "Equip"
+		toggle.custom_minimum_size = Vector2(80, 26)
+		toggle.position = Vector2(60, 546 + i * 34)
+		toggle.add_theme_font_size_override("font_size", 11)
+		toggle.disabled = not is_on and equipped_count >= 2
+		toggle.pressed.connect(_toggle_rune.bind(i))
+		add_child(toggle)
+		var rune_label := Label.new()
+		rune_label.text = "%s — %s" % [rune["name"], rune["desc"]]
+		rune_label.add_theme_font_size_override("font_size", 12)
+		rune_label.add_theme_color_override("font_color",
+			rune.get("rarity_color", Color(0.8, 0.8, 0.8)))
+		rune_label.position = Vector2(150, 550 + i * 34)
+		rune_label.size = Vector2(330, 20)
+		add_child(rune_label)
+
 	# Right side: the chosen spec's talent tree lives on this same page.
 	var tree_header := Label.new()
 	tree_header.add_theme_font_size_override("font_size", 15)
@@ -225,6 +264,23 @@ func _draw_detail() -> void:
 			if ranks_have > 0:
 				panel.modulate = Color(0.85, 0.95, 0.8)
 		vbox.add_child(learn)
+
+
+func _toggle_rune(rune_idx: int) -> void:
+	var member: Dictionary = Run.party[selected]
+	var runes: Array = member.get("runes", [])
+	var rune: Dictionary = runes[rune_idx]
+	if rune.get("equipped", false):
+		rune["equipped"] = false
+	else:
+		var equipped_count := 0
+		for r in runes:
+			if r.get("equipped", false):
+				equipped_count += 1
+		if equipped_count >= 2:
+			return
+		rune["equipped"] = true
+	_draw_screen()
 
 
 func _learn_talent(talent_id: String) -> void:

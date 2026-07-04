@@ -38,7 +38,12 @@ func _draw_screen() -> void:
 	bg.color = Color(0.08, 0.06, 0.10)
 	add_child(bg)
 	# Zone art behind the map, dimmed so nodes stay readable.
-	var art_tex: Texture2D = load("res://assets/backgrounds/node_background_forest.png")
+	var zone_backgrounds := {
+		"Forest of Old": "res://assets/backgrounds/node_background_forest.png",
+		"The Scarlands": "res://assets/backgrounds/node_background_scarlands.png",
+	}
+	var art_tex: Texture2D = load(zone_backgrounds.get(Run.zone_name,
+		"res://assets/backgrounds/node_background_forest.png"))
 	var art := TextureRect.new()
 	art.texture = art_tex
 	art.size = Vector2(1280, 720)

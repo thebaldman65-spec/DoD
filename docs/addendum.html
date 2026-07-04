@@ -118,6 +118,15 @@
 <li><b>Shop nodes ("The Wandering Peddler")</b> appear on the map (~10% of nodes, at least one guaranteed per run). Sells consumables (potions 30g, bombs 45g, revives 80g) and <b>runes</b> — run-long class modifiers offered per party member (e.g. Rune of Fury: Strike +5 dmg; Rune of Deep Wells: +20 max Mana), one copy each.</li>
 <li><b>RELICS — first meta-progression layer.</b> Killing the zone boss unlocks one random relic, permanent across runs (saved to disk). Pool of six: Waystone Shard (+1 starting talent point per hero), Dragonbone Idol (+10% all damage), Chalice of Dawn (party heals 10% after victories), Gravewrought Coin (+80 starting gold), Eidolon Mirror (Warriors start battles with 25 Rage), Emberheart (fire/holy +20%). All unlocked relics are always active; per-character relic slots from the design doc come later.</li>
 </ul>
+<h3>2026-07-04 (eighth pass) — The Scarlands, rune economy, tuning</h3>
+<ul>
+<li><b>Second zone: The Scarlands.</b> Clearing the Forest boss now continues the run into a fresh Scarlands map (own node background) instead of ending it. Enemies are reused orcs scaled +35% HP/damage with an ash-red tint; the zone boss is the Ash-Wrought Tyrant (resists fire 50%, vulnerable to frost). Every zone boss still unlocks a relic; the run ends after the final zone.</li>
+<li><b>Runes reworked as generated loot:</b> generic stat runes rolled per shop visit with rarity (Cracked/Polished/Radiant at 60/30/10%, power x1/x2/x3, priced 50/100/160g), offered only for classes in the current party. Bought runes go to the hero's rune pouch and are <b>equipped on the Party tab (2 slots per hero)</b>; they are lost when the run ends. Full loot table to come.</li>
+<li>Rest-or-Scavenge choice removed after battles — victories pay gold/points and continue; healing lives in Rest nodes, potions, and the Cleric.</li>
+<li>Heroes now stand in the same staggered triangle as enemies (position still cosmetic).</li>
+<li>Arcane Cannon Perfect reworked: recoil always applies; Perfect instead grants +7.5% damage per Resonance stack on that blast.</li>
+<li>Cleric speed reduced 15% (100 to 85).</li>
+</ul>
 <h2>Progress Snapshot</h2>
 <p>Phase 1 (combat core) complete and simulator-tuned. Phase 2 (run structure) playable: map, battles, rewards, carryover, party/inventory screens. Next: class specializations, then drafting, talents, and zone variety. Automated testing: DOD_AUTOPLAY (single bot battle) and DOD_SIM=N (batch balance reports).</p>
 </body></html>

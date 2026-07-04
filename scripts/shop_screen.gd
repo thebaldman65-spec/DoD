@@ -6,32 +6,25 @@ const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
 const ITEM_PRICES := {"health": 30, "mana": 30, "bomb": 45, "revive": 80, "defense": 40}
 
-const RUNES := {
-	"warrior": [
-		{"name": "Rune of Fury", "price": 70, "desc": "Strike deals +5 damage.",
-			"payload": {"ability": "Strike", "add": {"damage": 5}}},
-		{"name": "Rune of Bulwark", "price": 75, "desc": "+5% armor.",
-			"payload": {"stat": {"armor": 0.05}}},
-		{"name": "Rune of Warpath", "price": 65, "desc": "+8 Speed.",
-			"payload": {"stat": {"speed": 8}}},
-	],
-	"mage": [
-		{"name": "Rune of Torrents", "price": 70, "desc": "Magic Bolt deals +6 damage.",
-			"payload": {"ability": "Magic Bolt", "add": {"damage": 6}}},
-		{"name": "Rune of Deep Wells", "price": 60, "desc": "+20 max Mana.",
-			"payload": {"stat": {"max_resource": 20}}},
-		{"name": "Rune of Haste", "price": 65, "desc": "+8 Speed.",
-			"payload": {"stat": {"speed": 8}}},
-	],
-	"cleric": [
-		{"name": "Rune of Grace", "price": 70, "desc": "Mend Wounds heals +10.",
-			"payload": {"ability": "Mend Wounds", "add": {"heal": 10}}},
-		{"name": "Rune of Vigor", "price": 60, "desc": "+20 max HP.",
-			"payload": {"stat": {"max_hp": 20}}},
-		{"name": "Rune of Light", "price": 65, "desc": "Smite deals +6 damage.",
-			"payload": {"ability": "Smite", "add": {"damage": 6}}},
-	],
-}
+# Generic rune generation until the full loot table exists. Rarity scales
+# both power and price. Runes are run-scoped (lost on run end) and only
+# offered for classes present in the current party.
+const RARITIES := [
+	{"key": "common", "label": "Common", "mult": 1, "price": 50, "prefix": "Cracked",
+		"color": Color(0.8, 0.8, 0.8)},
+	{"key": "rare", "label": "Rare", "mult": 2, "price": 100, "prefix": "Polished",
+		"color": Color(0.45, 0.65, 1.0)},
+	{"key": "epic", "label": "Epic", "mult": 3, "price": 160, "prefix": "Radiant",
+		"color": Color(0.75, 0.45, 1.0)},
+]
+const TEMPLATES := [
+	{"noun": "Vitality", "stat": "max_hp", "base": 10, "fmt": "+%d max HP"},
+	{"noun": "Warding", "stat": "armor", "base": 0.02, "fmt": "+%d%% armor"},
+	{"noun": "Swiftness", "stat": "speed", "base": 4, "fmt": "+%d Speed"},
+	{"noun": "Poise", "stat": "stability", "base": 6, "fmt": "+%d Stability"},
+	{"noun": "Precision", "stat": "crit_bonus", "base": 0.02, "fmt": "+%d%% crit chance"},
+	{"noun": "Springs", "stat": "max_resource", "base": 8, "fmt": "+%d max Mana"},
+]
 
 var offers: Array = []  # [{member_idx, rune}]
 
@@ -48,13 +41,35 @@ func _roll_offers() -> void:
 	offers = []
 	for i in Run.party.size():
 		var member: Dictionary = Run.party[i]
+		var rune := _generate_rune(member["key"])
 		var owned_names: Array = []
-		for rune in member.get("runes", []):
-			owned_names.append(rune["name"])
-		var pool: Array = RUNES[member["key"]].filter(
-			func(r): return not owned_names.has(r["name"]))
-		if not pool.is_empty():
-			offers.append({"member_idx": i, "rune": pool.pick_random()})
+		for owned in member.get("runes", []):
+			owned_names.append(owned["name"])
+		for attempt in 4:
+			if not owned_names.has(rune["name"]):
+				break
+			rune = _generate_rune(member["key"])
+		if not owned_names.has(rune["name"]):
+			offers.append({"member_idx": i, "rune": rune})
+
+
+func _generate_rune(class_key: String) -> Dictionary:
+	var pool := TEMPLATES.filter(
+		func(t): return not (t["stat"] == "max_resource" and class_key == "warrior"))
+	var template: Dictionary = pool.pick_random()
+	var roll := randf()
+	var rarity: Dictionary = RARITIES[0] if roll < 0.6 else (RARITIES[1] if roll < 0.9 else RARITIES[2])
+	var value = template["base"] * rarity["mult"]
+	var shown: int = int(value * 100) if template["base"] is float else int(value)
+	return {
+		"name": "%s Rune of %s" % [rarity["prefix"], template["noun"]],
+		"rarity": rarity["label"],
+		"rarity_color": rarity["color"],
+		"price": rarity["price"],
+		"desc": template["fmt"] % shown,
+		"payload": {"stat": {template["stat"]: value}},
+		"equipped": false,
+	}
 
 
 func _draw_screen() -> void:
@@ -124,9 +139,10 @@ func _draw_screen() -> void:
 		vbox.add_theme_constant_override("separation", 6)
 		panel.add_child(vbox)
 		var label := Label.new()
-		label.text = "%s  (for %s %d)\n%s" % [rune["name"],
-			member["key"].capitalize(), offer["member_idx"] + 1, rune["desc"]]
+		label.text = "%s  [%s]  (for %s %d)\n%s — equip it from the Party tab" % [rune["name"],
+			rune["rarity"], member["key"].capitalize(), offer["member_idx"] + 1, rune["desc"]]
 		label.add_theme_font_size_override("font_size", 14)
+		label.add_theme_color_override("font_color", rune["rarity_color"])
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		vbox.add_child(label)
 		var buy := Button.new()

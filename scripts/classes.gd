@@ -19,7 +19,7 @@ static func hero_config(key: String) -> Dictionary:
 				"abilities": kit(key)}
 		_:
 			return {"unit_name": "Cleric", "is_hero": true, "sheet_dir": soldier,
-				"max_hp": 110, "armor": 0.15, "speed": 100.0, "stability": 50,
+				"max_hp": 110, "armor": 0.15, "speed": 85.0, "stability": 50,
 				"resource_name": "Mana", "resource": 100, "max_resource": 100,
 				"second_resource_name": "Faith", "second_resource": 0, "second_max": 100,
 				"abilities": kit(key)}
