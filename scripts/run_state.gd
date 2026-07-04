@@ -4,6 +4,18 @@ extends Node
 
 const FLOORS := 8
 
+# All item metadata lives here; battle and map both read it.
+const ITEM_IDS := ["health", "mana", "bomb", "revive", "defense"]
+const ITEM_INFO := {
+	"health": ["Health Potion", "Restores 40 HP to one ally."],
+	"mana": ["Mana Potion", "Restores 40 Mana (or Rage) to one ally."],
+	"bomb": ["Bomb", "Deals 50 damage to all enemies."],
+	"revive": ["Revive Potion", "Revives a fallen ally at 50% HP."],
+	"defense": ["Defense Potion", "+10% armor to all living party members for 5 turns."],
+}
+# Potions drop more often than the heavy items.
+const LOOT_POOL := ["health", "health", "mana", "mana", "bomb", "revive", "defense"]
+
 var active := false
 var zone_name := "Forest of Old"
 var party: Array = []      # [{key, hp, max_hp}] snapshots between battles
@@ -17,11 +29,11 @@ var encounter := {}        # {"type": ..., "enemies": ["raider", ...]} for the n
 func new_run() -> void:
 	active = true
 	party = [
-		{"key": "warrior", "hp": 140, "max_hp": 140},
-		{"key": "mage", "hp": 90, "max_hp": 90},
-		{"key": "cleric", "hp": 110, "max_hp": 110},
+		{"key": "warrior", "hp": 140, "max_hp": 140, "mana": 0, "max_mana": 100},
+		{"key": "mage", "hp": 90, "max_hp": 90, "mana": 100, "max_mana": 100},
+		{"key": "cleric", "hp": 110, "max_hp": 110, "mana": 100, "max_mana": 100},
 	]
-	items = {"bomb": 1, "revive": 1, "defense": 1}
+	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
 	floor_idx = -1
 	node_idx = -1
 	encounter = {}
@@ -109,3 +121,14 @@ func heal_party(pct: float) -> void:
 	for member in party:
 		if member["hp"] > 0:
 			member["hp"] = mini(member["hp"] + int(member["max_hp"] * pct), member["max_hp"])
+
+
+# Resting restores spirit as well as flesh (Mage/Cleric mana pools).
+func restore_mana(pct: float) -> void:
+	for member in party:
+		if member["key"] != "warrior":
+			member["mana"] = mini(member["mana"] + int(member["max_mana"] * pct), member["max_mana"])
+
+
+func random_loot() -> String:
+	return LOOT_POOL.pick_random()

@@ -27,9 +27,6 @@ const STATUS_INFO := {
 	"guard": ["Guard", "G", Color(0.55, 0.65, 0.85), "-40% damage and -50% Pressure taken\nuntil this unit's next turn."],
 }
 
-# Ordered item ids for the dropdown menu.
-const ITEM_IDS := ["bomb", "revive", "defense"]
-
 # Placeholder SFX (procedurally generated, see repo history; replace with
 # licensed audio later).
 const SFX := {
@@ -55,19 +52,15 @@ var enemies: Array = []
 var battle_over := false
 var current_hero: BattleUnit
 
-# Shared party inventory: item id -> [label, count, tooltip]
-var items := {
-	"bomb": ["Bomb", 2, "Deals 50 damage to all enemies."],
-	"revive": ["Revive Potion", 1, "Revives a fallen ally at 50% HP."],
-	"defense": ["Defense Potion", 1, "+10% armor to all living party members for 5 turns."],
-}
+# Shared party inventory built from Run.ITEM_INFO: id -> [label, count, tooltip]
+var items := {}
 var item_used := false  # one item per character per turn
 
 # Guard: universal defensive action available to every hero.
 var guard_ability: Ability = Ability.make({"display_name": "Guard", "cost": 0,
 	"special": "guard", "delay": 1.5, "anim": "idle",
 	"perfect_id": "", "perfect_text": "Also sheds 10 Pressure immediately",
-	"description": "Brace: take 40% less damage and 50% less\nPressure until your next turn. Quick action."})
+	"description": "Brace: take 40% less damage and 50% less\nPressure until your next turn. Quick action.\nMage: venting releases all Resonance."})
 
 var ui: CanvasLayer
 var cam: Camera2D
@@ -109,9 +102,7 @@ func _ready() -> void:
 		Engine.max_fps = 0
 		if sim_started_ms == 0:
 			sim_started_ms = Time.get_ticks_msec()
-	if Run.active:
-		for id in items:
-			items[id][1] = Run.items.get(id, items[id][1])
+	_init_items()
 	_build_arena()
 	_build_ui()
 	_build_sfx_pool()
@@ -120,6 +111,13 @@ func _ready() -> void:
 
 
 # ---------- setup ----------
+
+func _init_items() -> void:
+	var defaults := {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
+	for id in Run.ITEM_IDS:
+		var count: int = Run.items.get(id, 0) if Run.active else defaults[id]
+		items[id] = [Run.ITEM_INFO[id][0], count, Run.ITEM_INFO[id][1]]
+
 
 func _build_arena() -> void:
 	var bg := ColorRect.new()
@@ -153,28 +151,6 @@ const ENEMY_LAYOUTS := {
 }
 
 
-func _hero_config(key: String) -> Dictionary:
-	var soldier := "res://assets/sprites/soldier"
-	match key:
-		"warrior":
-			return {"unit_name": "Warrior", "is_hero": true, "sheet_dir": soldier,
-				"max_hp": 140, "armor": 0.25, "speed": 95.0, "stability": 60,
-				"resource_name": "Rage", "resource": 0, "max_resource": 100,
-				"abilities": _warrior_kit()}
-		"mage":
-			return {"unit_name": "Mage", "is_hero": true, "sheet_dir": soldier,
-				"max_hp": 90, "armor": 0.10, "speed": 110.0, "stability": 40,
-				"resource_name": "Mana", "resource": 100, "max_resource": 100,
-				"second_resource_name": "Resonance", "second_resource": 0, "second_max": 5,
-				"abilities": _mage_kit()}
-		_:
-			return {"unit_name": "Cleric", "is_hero": true, "sheet_dir": soldier,
-				"max_hp": 110, "armor": 0.15, "speed": 100.0, "stability": 50,
-				"resource_name": "Mana", "resource": 100, "max_resource": 100,
-				"second_resource_name": "Faith", "second_resource": 0, "second_max": 100,
-				"abilities": _cleric_kit()}
-
-
 func _enemy_config(kind: String) -> Dictionary:
 	var orc := "res://assets/sprites/orc"
 	match kind:
@@ -200,9 +176,11 @@ func _enemy_config(kind: String) -> Dictionary:
 func _spawn_units() -> void:
 	var hero_keys := ["warrior", "mage", "cleric"]
 	for i in hero_keys.size():
-		var u := _make_unit(_hero_config(hero_keys[i]), HERO_SLOTS[i], HERO_TINTS[i])
+		var u := _make_unit(Classes.hero_config(hero_keys[i]), HERO_SLOTS[i], HERO_TINTS[i])
 		if Run.active and i < Run.party.size():
 			u.hp = clampi(Run.party[i]["hp"], 1, u.max_hp)
+			if u.resource_name == "Mana":
+				u.resource = clampi(Run.party[i].get("mana", u.resource), 0, u.max_resource)
 			u.refresh_bars()
 		heroes.append(u)
 
@@ -229,72 +207,6 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color) -> BattleUnit:
 	u.clicked.connect(func(): _target_picked.emit(u))
 	u.refresh_bars()
 	return u
-
-
-# Core ability sets from the Classes design doc (specialization kits come later).
-
-func _warrior_kit() -> Array:
-	return [
-		Ability.make({"display_name": "Strike", "cost": 0, "damage": 23, "pressure": 10,
-			"resource_gain": 15, "delay": 2.0, "anim": "attack01",
-			"perfect_id": "rage", "perfect_text": "+10 bonus Rage",
-			"description": "Basic attack. Builds 15 Rage."}),
-		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 50, "pressure": 18,
-			"delay": 4.0, "anim": "attack02",
-			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
-			"description": "Big single-target damage."}),
-		Ability.make({"display_name": "Rallying Shout", "cost": 0, "special": "rally",
-			"resource_gain": 15, "delay": 3.0, "anim": "attack01",
-			"perfect_id": "", "perfect_text": "Stronger rally (-25 Pressure, +30% resource)",
-			"description": "Party-wide: allies shed 15 Pressure and\nregain 20% of their resource.\nGrants the Warrior 15 Rage."}),
-		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 32, "pressure": 20,
-			"delay": 4.0, "anim": "attack03",
-			"applies_status": {"id": "sunder", "turns": 3},
-			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
-			"description": "Moderate damage. Sunders armor (-35%) for 3 turns."}),
-	]
-
-
-func _mage_kit() -> Array:
-	return [
-		Ability.make({"display_name": "Magic Bolt", "cost": 0, "damage": 20, "pressure": 8,
-			"delay": 2.0, "anim": "attack01",
-			"perfect_id": "mana", "perfect_text": "Restores 10 Mana",
-			"description": "Basic arcane projectile. Builds Resonance."}),
-		Ability.make({"display_name": "Arcane Barrier", "cost": 20, "special": "barrier",
-			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
-			"perfect_id": "", "perfect_text": "Stronger barrier (absorbs 50)",
-			"description": "Shield an ally: absorbs 35 damage (3 turns)."}),
-		Ability.make({"display_name": "Focus", "cost": 0, "special": "focus",
-			"delay": 3.0, "anim": "attack02",
-			"perfect_id": "", "perfect_text": "Also restores 10 Mana instantly",
-			"description": "Regenerate 10 Mana per turn for 2 turns."}),
-		Ability.make({"display_name": "Arcane Surge", "cost": 15, "special": "surge",
-			"delay": 3.0, "anim": "attack03",
-			"perfect_id": "", "perfect_text": "+2 Resonance instead of +1",
-			"description": "+20% attack on your next turn.\nGuarantees +1 Resonance."}),
-	]
-
-
-func _cleric_kit() -> Array:
-	return [
-		Ability.make({"display_name": "Smite", "cost": 0, "damage": 22, "pressure": 10,
-			"delay": 2.0, "anim": "attack01",
-			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 8 HP",
-			"description": "Basic radiant strike. Builds Faith."}),
-		Ability.make({"display_name": "Mend Wounds", "cost": 25, "heal": 45,
-			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
-			"perfect_id": "ward", "perfect_text": "Grants Ward (-50% Pressure taken, 2 turns)",
-			"description": "Restore HP to one ally. Builds Faith."}),
-		Ability.make({"display_name": "Blessed Purge", "cost": 30, "special": "purge",
-			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack03",
-			"perfect_id": "", "perfect_text": "Bigger heal",
-			"description": "Heal an ally, remove 1 debuff,\nand grant +10% armor for 2 turns."}),
-		Ability.make({"display_name": "Renewal", "cost": 20, "special": "renewal",
-			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
-			"perfect_id": "", "perfect_text": "Also heals 8 HP instantly",
-			"description": "Ally heals 8 HP at the start of each\nof their turns, for 5 turns."}),
-	]
 
 
 func _orc_raider_kit() -> Array:
@@ -492,16 +404,6 @@ func _run_battle() -> void:
 			u.resource = mini(u.resource + 10, u.max_resource)
 			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
 			u.refresh_bars()
-		# Resonance holds at max until a damage spell is cast at 5 stacks
-		# (release handled in _resolve); below max it decays if the Mage
-		# went a turn without casting.
-		if u.second_resource_name == "Resonance":
-			if not u.cast_recently and u.second_resource > 0 \
-					and u.second_resource < u.second_max:
-				u.second_resource -= 1
-				u.float_text("Resonance fades", Color(0.6, 0.45, 0.75))
-				u.refresh_bars()
-			u.cast_recently = false
 		u.tick_statuses()
 		if u.broken_pending:
 			u.broken_pending = false
@@ -593,11 +495,10 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				return [u.abilities[3], target_foe]      # Crushing Blow
 			return [u.abilities[0], target_foe]          # Strike
 		"Mage":
-			if weakest_ally.hp < weakest_ally.max_hp * 0.35 and u.resource >= 20 \
-					and not weakest_ally.has_status("barrier"):
-				return [u.abilities[1], weakest_ally]    # Arcane Barrier
 			if u.resource < 15 and not u.has_status("focus"):
 				return [u.abilities[2], u]               # Focus
+			if u.resource >= 20 and u.second_resource >= 2 and u.hp > u.max_hp * 0.35:
+				return [u.abilities[1], target_foe]      # Arcane Cannon
 			return [u.abilities[0], target_foe]          # Magic Bolt
 		"Cleric":
 			if weakest_ally.hp < weakest_ally.max_hp * 0.5 and u.resource >= 25:
@@ -630,6 +531,32 @@ func _use_item(item_id: String) -> void:
 			await _wait(0.8)
 			_rebuild_turn_bar()
 			_check_end()
+		"health":
+			var living := heroes.filter(func(h): return not h.dead)
+			var heal_target: BattleUnit = living[0]
+			if living.size() > 1:
+				_message("Choose an ally to heal")
+				heal_target = await _pick_target(living)
+			heal_target.heal_amount(40)
+			_sfx("heal", -6.0)
+			heal_target.float_text("+40", Color(0.4, 0.9, 0.45))
+			_message("%s drinks a Health Potion" % heal_target.unit_name)
+			_log("Item: Health Potion — %s +40 HP" % heal_target.unit_name, "#e0c060")
+			await _wait(0.5)
+		"mana":
+			var drinkers := heroes.filter(func(h): return not h.dead)
+			var mana_target: BattleUnit = drinkers[0]
+			if drinkers.size() > 1:
+				_message("Choose an ally")
+				mana_target = await _pick_target(drinkers)
+			mana_target.resource = mini(mana_target.resource + 40, mana_target.max_resource)
+			mana_target.refresh_bars()
+			_sfx("heal", -8.0, 1.2)
+			mana_target.float_text("+40 %s" % mana_target.resource_name, Color(0.5, 0.7, 1.0))
+			_message("%s drinks a Mana Potion" % mana_target.unit_name)
+			_log("Item: Mana Potion — %s +40 %s" % [mana_target.unit_name,
+				mana_target.resource_name], "#e0c060")
+			await _wait(0.5)
 		"revive":
 			var fallen := heroes.filter(func(h): return h.dead)
 			if fallen.is_empty():
@@ -715,15 +642,15 @@ func _build_items_menu() -> MenuButton:
 	if item_used:
 		menu.tooltip_text = "Already used an item this turn."
 	var popup := menu.get_popup()
-	for i in ITEM_IDS.size():
-		var entry: Array = items[ITEM_IDS[i]]
+	for i in Run.ITEM_IDS.size():
+		var entry: Array = items[Run.ITEM_IDS[i]]
 		popup.add_item("%s  x%d" % [entry[0], entry[1]], i)
 		popup.set_item_tooltip(i, "%s\nDoes not consume the turn." % entry[2])
 		var usable: bool = entry[1] > 0
-		if ITEM_IDS[i] == "revive":
+		if Run.ITEM_IDS[i] == "revive":
 			usable = usable and heroes.any(func(h): return h.dead)
 		popup.set_item_disabled(i, not usable)
-	popup.id_pressed.connect(func(id: int): _use_item(ITEM_IDS[id]))
+	popup.id_pressed.connect(func(id: int): _use_item(Run.ITEM_IDS[id]))
 	return menu
 
 
@@ -799,12 +726,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_stat("hero_actions")
 		_stat("use_" + ab.display_name)
 
-	# Faith builds from every Cleric action; any Mage cast counts for Resonance decay.
+	# Faith builds from every Cleric action.
 	if attacker.second_resource_name == "Faith":
 		attacker.second_resource = mini(attacker.second_resource + 10, attacker.second_max)
 		attacker.refresh_bars()
-	elif attacker.second_resource_name == "Resonance":
-		attacker.cast_recently = true
 
 	var grade_tag := {"perfect": " [PERFECT]", "good": "", "fail": " [Sloppy]"}[grade] as String
 	if ab.special != "":
@@ -856,13 +781,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			raw *= 1.0 + 0.15 * attacker.second_resource
 		if attacker.has_status("surge"):
 			raw *= 1.2
+		# Resonance is a lightning rod: +10% damage taken per stack.
 		if target.second_resource_name == "Resonance":
-			raw *= 1.0 + 0.05 * target.second_resource
+			raw *= 1.0 + 0.10 * target.second_resource
 		if target.has_status("guard"):
 			raw *= 0.6
-		# A damage spell cast at max Resonance releases all stacks after it lands.
-		var releasing: bool = attacker.second_resource_name == "Resonance" \
-			and attacker.second_resource >= attacker.second_max
 		if debug_prints and attacker.second_resource_name == "Resonance":
 			print("[DBG] %s attacks @%d stacks: base %d -> raw %.1f" % [
 				attacker.unit_name, attacker.second_resource, ab.damage, raw])
@@ -894,16 +817,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		else:
 			_sfx("hit")
 			target.float_text("%d" % final, Color(0.95, 0.85, 0.75))
-		if releasing:
-			attacker.second_resource = 0
-			attacker.float_text("Resonance released!", Color(0.85, 0.55, 1.0))
-			_log("   → %s releases all Resonance" % attacker.unit_name, "#b0a8e0")
-			attacker.refresh_bars()
-		else:
-			_gain_resonance(attacker, 2 if is_crit else 1)
+		_gain_resonance(attacker, 2 if is_crit else 1)
 		_log("%s: %s on %s — %d dmg%s, +%d Pressure%s" % [attacker.unit_name,
 			ab.display_name, target.unit_name, final, " CRIT" if is_crit else "",
 			pr, grade_tag], "#d8d2c4" if attacker.is_hero else "#e0a0a0")
+		if ab.recoil_base > 0.0 and not is_perfect:
+			var recoil_pct := ab.recoil_base * (1.0 + attacker.second_resource)
+			var recoil := maxi(int(round(final * recoil_pct)), 1)
+			var recoil_died := attacker.take_tick_damage(recoil, "-%d Recoil" % recoil,
+				Color(1.0, 0.4, 0.5))
+			_log("   → %s recoils for %d" % [attacker.unit_name, recoil], "#e08850")
+			if recoil_died:
+				_stat("hero_deaths")
+				_sfx("death", -4.0)
+				_message("%s is consumed by their own power!" % attacker.unit_name)
+				_log("† %s dies" % attacker.unit_name, "#e05050")
 		if ab.delay_push > 0.0:
 			target.next_time += ab.delay_push * 100.0 / target.effective_speed()
 		if not result.died and not ab.applies_status.is_empty() and randf() <= ab.status_chance:
@@ -946,17 +874,16 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0) -> vo
 
 
 # Arcane Resonance: builds on damaging casts (2 on crit via Arcane Instability);
-# hitting max stacks triggers Backlash Ward (+15 Mana).
+# hitting max stacks triggers Backlash Ward (+15 Mana). Stacks persist until
+# the Mage uses Guard, which vents them all.
 func _gain_resonance(caster: BattleUnit, stacks: int) -> void:
 	if caster.second_resource_name != "Resonance":
 		return
-	caster.cast_recently = true
 	var before := caster.second_resource
 	caster.second_resource = mini(caster.second_resource + stacks, caster.second_max)
 	if caster.second_resource != before:
 		caster.float_text("+%d Resonance" % (caster.second_resource - before), Color(0.8, 0.5, 1.0))
-	# Backlash Ward: hitting max stacks restores Mana. The stacks then reset
-	# to 0 at the start of the Mage's next turn, restarting the cycle.
+	# Backlash Ward: hitting max stacks restores Mana.
 	if caster.second_resource == caster.second_max and before < caster.second_max:
 		caster.resource = mini(caster.resource + 15, caster.max_resource)
 		caster.float_text("Backlash Ward +15 Mana", Color(0.5, 0.7, 1.0))
@@ -1025,6 +952,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"guard":
 			_sfx("parry", -9.0, 0.6)
 			_apply_status(attacker, "guard", 1)
+			if attacker.second_resource_name == "Resonance" and attacker.second_resource > 0:
+				attacker.second_resource = 0
+				attacker.float_text("Resonance vented", Color(0.6, 0.45, 0.75))
+				attacker.refresh_bars()
+				_log("   → %s vents all Resonance" % attacker.unit_name, "#b0a8e0")
 			if is_perfect:
 				attacker.pressure = maxi(attacker.pressure - 10, 0)
 				attacker.float_text("-10 Pressure", Color(0.8, 0.5, 1.0))
@@ -1162,6 +1094,8 @@ func _check_end() -> void:
 		for i in heroes.size():
 			# The Untouched refuse to stay down: the fallen return at 20% HP.
 			Run.party[i]["hp"] = maxi(heroes[i].hp, int(heroes[i].max_hp * 0.2))
+			if heroes[i].resource_name == "Mana":
+				Run.party[i]["mana"] = heroes[i].resource
 		_sfx("victory", -4.0)
 		if Run.encounter.get("type", "") == "boss":
 			Run.active = false
@@ -1181,11 +1115,12 @@ func _check_end() -> void:
 
 func _reward_rest() -> void:
 	Run.heal_party(0.25)
+	Run.restore_mana(0.25)
 	_to_map()
 
 
 func _reward_loot() -> void:
-	var id: String = ["bomb", "revive", "defense"].pick_random()
+	var id := Run.random_loot()
 	Run.items[id] = Run.items.get(id, 0) + 1
 	_to_map()
 

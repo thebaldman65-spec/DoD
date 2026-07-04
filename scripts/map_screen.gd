@@ -58,20 +58,39 @@ func _draw_screen() -> void:
 
 	var party_parts := PackedStringArray()
 	for member in Run.party:
-		party_parts.append("%s %d/%d" % [member["key"].capitalize(), member["hp"], member["max_hp"]])
-	var item_parts := PackedStringArray()
-	for id in Run.items:
-		if Run.items[id] > 0:
-			item_parts.append("%s x%d" % [id.capitalize(), Run.items[id]])
+		var part := "%s %d/%d" % [member["key"].capitalize(), member["hp"], member["max_hp"]]
+		if member["key"] != "warrior":
+			part += " (%d MP)" % member["mana"]
+		party_parts.append(part)
 	var status := Label.new()
-	status.text = "%s      Items: %s" % ["   ".join(party_parts),
-		", ".join(item_parts) if item_parts.size() > 0 else "none"]
+	status.text = "   ".join(party_parts)
 	status.add_theme_font_size_override("font_size", 14)
 	status.add_theme_color_override("font_color", Color(0.75, 0.72, 0.65))
 	status.position = Vector2(0, 690)
 	status.size = Vector2(1280, 20)
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(status)
+
+	# Top tabs: Party (own screen) and Inventory (dropdown).
+	var party_btn := Button.new()
+	party_btn.text = "Party"
+	party_btn.custom_minimum_size = Vector2(120, 42)
+	party_btn.position = Vector2(20, 16)
+	party_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/party.tscn"))
+	add_child(party_btn)
+
+	var inv := MenuButton.new()
+	inv.text = "Inventory ▾"
+	inv.custom_minimum_size = Vector2(140, 42)
+	inv.position = Vector2(1120, 16)
+	inv.flat = false
+	var popup := inv.get_popup()
+	for i in Run.ITEM_IDS.size():
+		var id: String = Run.ITEM_IDS[i]
+		popup.add_item("%s  x%d" % [Run.ITEM_INFO[id][0], Run.items.get(id, 0)], i)
+		popup.set_item_tooltip(i, Run.ITEM_INFO[id][1])
+		popup.set_item_disabled(i, true)  # display only; items are used in battle
+	add_child(inv)
 
 	# Path lines first so nodes draw over them.
 	for f in Run.FLOORS - 1:
@@ -112,13 +131,14 @@ func _on_node_pressed(f: int, i: int) -> void:
 	match node["type"]:
 		"rest":
 			Run.heal_party(0.3)
+			Run.restore_mana(0.3)
 			_draw_screen()
-			_toast("The party rests by the waystone (+30% HP)")
+			_toast("The party rests by the waystone (+30% HP & Mana)")
 		"treasure":
-			var id: String = ["bomb", "revive", "defense"].pick_random()
+			var id := Run.random_loot()
 			Run.items[id] = Run.items.get(id, 0) + 1
 			_draw_screen()
-			_toast("Scavenged a %s!" % id.capitalize())
+			_toast("Scavenged a %s!" % Run.ITEM_INFO[id][0])
 		_:
 			Run.encounter = {"type": node["type"], "enemies": Run.compose(node["type"])}
 			get_tree().change_scene_to_file("res://scenes/battle.tscn")
