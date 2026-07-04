@@ -30,6 +30,7 @@ const STATUS_INFO := {
 	"empower": ["Empower", "+A", Color(0.95, 0.45, 0.35), "+25% damage dealt."],
 	"exposed": ["Exposed", "E", Color(0.95, 0.9, 0.4), "Takes 15% more damage."],
 	"cripple": ["Cripple", "C", Color(0.5, 0.4, 0.55), "-15% damage dealt."],
+	"retaliate": ["Retaliation", "R!", Color(0.95, 0.6, 0.25), "Counters attackers with a basic strike."],
 }
 
 # Placeholder SFX (procedurally generated, see repo history; replace with
@@ -465,26 +466,34 @@ func _player_turn(u: BattleUnit) -> void:
 		ab = await _ability_picked
 	action_panel.visible = false
 
-	var target: BattleUnit
-	if ab.special in ["rally", "focus", "surge", "guard", "shieldwall", "taunt",
-			"phoenix", "hymn", "benediction"]:
-		target = u  # self/party effects need no target choice
-	elif ab.aoe:
-		var foes := enemies.filter(func(e): return not e.dead)
-		target = foes[0]  # resolve loops over all living enemies
-	elif autoplay:
-		target = auto_target
-	else:
-		var pool: Array
-		if ab.target == Ability.Target.ALLY:
-			pool = heroes.filter(func(h): return not h.dead)
+	var target: BattleUnit = null
+	while true:
+		if ab.special in ["rally", "focus", "surge", "guard", "shieldwall", "taunt",
+				"phoenix", "hymn", "benediction", "retaliate"]:
+			target = u  # self/party effects need no target choice
+		elif ab.aoe or ab.random_hits > 0:
+			var foes := enemies.filter(func(e): return not e.dead)
+			target = foes[0]  # resolve picks the real targets
+		elif autoplay:
+			target = auto_target
 		else:
-			pool = enemies.filter(func(e): return not e.dead)
-		if pool.size() == 1:
-			target = pool[0]
-		else:
-			_message("Choose a target")
-			target = await _pick_target(pool)
+			var pool: Array
+			if ab.target == Ability.Target.ALLY:
+				pool = heroes.filter(func(h): return not h.dead)
+			else:
+				pool = enemies.filter(func(e): return not e.dead)
+			if pool.size() == 1:
+				target = pool[0]
+			else:
+				_message("Choose a target")
+				target = await _pick_target(pool)
+		if target != null:
+			break
+		# Cancelled: back to the action bar to pick something else.
+		_message("%s's turn — choose an ability" % u.unit_name)
+		_show_actions(u)
+		ab = await _ability_picked
+		action_panel.visible = false
 
 	var grade := "good"
 	if autoplay:
@@ -514,10 +523,8 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				return [u.abilities[3], target_foe]      # Crushing Blow
 			return [u.abilities[0], target_foe]          # Strike
 		"Mage":
-			if u.resource < 15 and not u.has_status("focus"):
-				return [u.abilities[2], u]               # Focus
-			if u.resource >= 20 and u.second_resource >= 2 and u.hp > u.max_hp * 0.35:
-				return [u.abilities[1], target_foe]      # Arcane Cannon
+			if u.resource >= 15 and u.second_resource < u.second_max and randf() < 0.3:
+				return [u.abilities[1], u]               # Arcane Surge
 			return [u.abilities[0], target_foe]          # Magic Bolt
 		"Cleric":
 			if weakest_ally.hp < weakest_ally.max_hp * 0.5 and u.resource >= 25:
@@ -610,48 +617,74 @@ func _use_item(item_id: String) -> void:
 func _show_actions(u: BattleUnit) -> void:
 	for child in action_box.get_children():
 		child.queue_free()
-	for ab in u.abilities:
-		var btn := Button.new()
-		var cost_text: String = "Free" if ab.cost == 0 else "%d %s" % [ab.cost, u.resource_name]
-		if ab.faith_cost > 0:
-			cost_text = "%d %s" % [ab.faith_cost, u.second_resource_name]
-		btn.text = "%s\n(%s)" % [ab.display_name, cost_text]
-		btn.custom_minimum_size = Vector2(112, 58)
-		btn.add_theme_font_size_override("font_size", 13)
-		btn.tooltip_text = ab.description
-		if ab.damage > 0:
-			# Live damage range: includes any buffs currently boosting this unit.
-			var buff_mult := 1.0
-			if u.second_resource_name == "Resonance":
-				buff_mult *= 1.0 + 0.15 * u.second_resource
-			if u.has_status("surge"):
-				buff_mult *= 1.2
-			btn.tooltip_text += "\nDamage: %d–%d    Pressure: %d" % [
-				int(ab.damage * 0.9 * buff_mult), int(round(ab.damage * 1.1 * buff_mult)),
-				ab.pressure]
-			if debug_prints and u.second_resource_name == "Resonance":
-				print("[DBG] %s tooltip @%d stacks: %s" % [ab.display_name,
-					u.second_resource, btn.tooltip_text.replace("\n", " | ")])
-		if ab.heal > 0:
-			btn.tooltip_text += "\nHeals: %d" % ab.heal
-		if ab.perfect_text != "":
-			btn.tooltip_text += "\nPerfect: %s" % ab.perfect_text
-		btn.disabled = ab.cost > u.resource or ab.faith_cost > u.second_resource
-		btn.pressed.connect(func():
-			_sfx("click", -12.0)
-			_ability_picked.emit(ab))
-		action_box.add_child(btn)
+	# Basic attack: always its own button.
+	var basic: Ability = u.abilities[0]
+	var basic_btn := Button.new()
+	basic_btn.text = basic.display_name
+	basic_btn.custom_minimum_size = Vector2(130, 58)
+	basic_btn.tooltip_text = _ability_tooltip(u, basic)
+	basic_btn.pressed.connect(_on_ability_button.bind(basic))
+	action_box.add_child(basic_btn)
+	# Everything else lives in the Abilities dropdown.
+	var menu := MenuButton.new()
+	menu.text = "Abilities ▾"
+	menu.custom_minimum_size = Vector2(140, 58)
+	menu.flat = false
+	var popup := menu.get_popup()
+	for i in range(1, u.abilities.size()):
+		var ab: Ability = u.abilities[i]
+		var label: String = ab.display_name
+		if ab.cost > 0:
+			label += "   %d %s" % [ab.cost, u.resource_name]
+		elif ab.faith_cost > 0:
+			label += "   %d %s" % [ab.faith_cost, u.second_resource_name]
+		popup.add_item(label, i)
+		popup.set_item_tooltip(popup.item_count - 1, _ability_tooltip(u, ab))
+		popup.set_item_disabled(popup.item_count - 1,
+			ab.cost > u.resource or ab.faith_cost > u.second_resource)
+	popup.id_pressed.connect(_on_ability_menu.bind(u))
+	action_box.add_child(menu)
+	# Guard and Items keep their own buttons.
 	var guard_btn := Button.new()
-	guard_btn.text = "Guard\n(Free)"
-	guard_btn.custom_minimum_size = Vector2(90, 58)
+	guard_btn.text = "Guard"
+	guard_btn.custom_minimum_size = Vector2(110, 58)
 	guard_btn.tooltip_text = guard_ability.description
 	guard_btn.tooltip_text += "\nPerfect: %s" % guard_ability.perfect_text
-	guard_btn.pressed.connect(func():
-		_sfx("click", -12.0)
-		_ability_picked.emit(guard_ability))
+	guard_btn.pressed.connect(_on_ability_button.bind(guard_ability))
 	action_box.add_child(guard_btn)
 	action_box.add_child(_build_items_menu())
 	action_panel.visible = true
+
+
+func _on_ability_button(ab: Ability) -> void:
+	_sfx("click", -12.0)
+	_ability_picked.emit(ab)
+
+
+func _on_ability_menu(id: int, u: BattleUnit) -> void:
+	_sfx("click", -12.0)
+	_ability_picked.emit(u.abilities[id])
+
+
+# Tooltip with live damage ranges (includes the unit's current buffs).
+func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
+	var tip := ab.description
+	if ab.damage > 0:
+		var buff_mult := 1.0
+		if u.second_resource_name == "Resonance":
+			buff_mult *= 1.0 + 0.15 * u.second_resource
+		if u.has_status("surge"):
+			buff_mult *= 1.2
+		if u.has_status("empower"):
+			buff_mult *= 1.25
+		tip += "\nDamage: %d–%d    Pressure: %d" % [
+			int(ab.damage * 0.9 * buff_mult), int(round(ab.damage * 1.1 * buff_mult)),
+			ab.pressure]
+	if ab.heal > 0:
+		tip += "\nHeals: %d" % ab.heal
+	if ab.perfect_text != "":
+		tip += "\nPerfect: %s" % ab.perfect_text
+	return tip
 
 
 # Dropdown menu for the shared party inventory (one item per character per turn).
@@ -679,9 +712,16 @@ func _build_items_menu() -> MenuButton:
 func _pick_target(pool: Array) -> BattleUnit:
 	for t in pool:
 		t.set_targetable(true)
+	var cancel := Button.new()
+	cancel.text = "✕ Cancel"
+	cancel.custom_minimum_size = Vector2(120, 40)
+	cancel.position = Vector2(580, 560)
+	cancel.pressed.connect(func(): _target_picked.emit(null))
+	ui.add_child(cancel)
 	var chosen: BattleUnit = await _target_picked
 	for t in pool:
 		t.set_targetable(false)
+	cancel.queue_free()
 	return chosen
 
 
@@ -800,9 +840,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if ab.aoe:
 			strike_targets = (enemies if attacker.is_hero else heroes).filter(
 				func(t): return not t.dead)
+		elif ab.random_hits > 0:
+			strike_targets = []
+			var hits := ab.random_hits + (1 if is_perfect else 0)
+			for k in hits:
+				var pool: Array = (enemies if attacker.is_hero else heroes).filter(
+					func(t): return not t.dead)
+				if pool.is_empty():
+					break
+				strike_targets.append(pool.pick_random())
 		var total_dealt := 0
 		var any_crit := false
 		for strike_target: BattleUnit in strike_targets:
+			if strike_target.dead:
+				continue
 			var crit_chance := CRIT_CHANCE + (0.25 if strike_target.broken else 0.0)
 			# Resonant Mind: +3% crit per Resonance stack.
 			if attacker.second_resource_name == "Resonance":
@@ -812,6 +863,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if is_perfect and ab.display_name == "Overpower":
 				crit_chance += 0.15
 			var is_crit := randf() < crit_chance
+			# Razor Ice always crits against Slowed (chilled) targets.
+			if ab.display_name == "Razor Ice" and strike_target.has_status("slow"):
+				is_crit = true
 			any_crit = any_crit or is_crit
 			var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
 			if is_crit:
@@ -902,6 +956,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_apply_status(strike_target, "cripple", 2)
 			if is_perfect:
 				_apply_perfect_bonus(attacker, strike_target, ab, result.died)
+			# Retaliation stance: the victim counters with their basic attack.
+			if strike_target.has_status("retaliate") and not is_counter \
+					and not strike_target.dead and not attacker.dead and ab.damage > 0:
+				strike_target.float_text("RETALIATE", Color(0.95, 0.6, 0.25))
+				_log("%s retaliates!" % strike_target.unit_name, "#50c8e0")
+				await _wait(0.4)
+				await _resolve(strike_target, strike_target.abilities[0], attacker, "good", true)
 			if result.broke:
 				_stat("breaks_on_heroes" if strike_target.is_hero else "breaks_on_enemies")
 				_sfx("break", -3.0)
@@ -1060,9 +1121,17 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Shieldwall — party takes half damage" % attacker.unit_name, "#70d878")
 		"taunt":
 			_sfx("click", -6.0, 0.7)
-			_apply_status(attacker, "taunt", 3 if is_perfect else 2)
+			_apply_status(attacker, "taunt", 5)
+			if is_perfect:
+				attacker.pressure = maxi(attacker.pressure - 10, 0)
+				attacker.refresh_bars()
 			_message("%s roars a challenge!" % attacker.unit_name)
 			_log("%s taunts the enemy" % attacker.unit_name, "#70d878")
+		"retaliate":
+			_sfx("parry", -7.0, 0.8)
+			_apply_status(attacker, "retaliate", 4 if is_perfect else 3)
+			_message("%s enters a retaliatory stance" % attacker.unit_name)
+			_log("%s: Retaliation stance" % attacker.unit_name, "#70d878")
 		"phoenix":
 			var sacrifice := int(attacker.hp * (0.15 if is_perfect else 0.25))
 			attacker.hp = maxi(attacker.hp - sacrifice, 1)

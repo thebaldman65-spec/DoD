@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>DoD Implementation Addendum</title></head>
+<body>
+<h1>Dawn of Decay — Implementation Addendum</h1>
+<p><i>Records every design change made during prototyping (July 2026). Where this document conflicts with the original design docs, this document wins. Organized by the source document each change updates.</i></p>
+
+<h2>Updates to "Dawn of Decay.docx" &amp; "DoD Narrative_Zones.docx" (Structure)</h2>
+<ul>
+<li><b>DESIGN PIVOT — no explorable overworld.</b> Runs now use a Slay-the-Spire-style node map: the player picks a reachable node on a branching 8-floor path and combat begins immediately. Node types: Fight, Elite, Rest (+30% HP &amp; Mana), Loot (+1 item), Boss (top of map).</li>
+<li>Zones survive as <b>flavor layers</b>: each map region carries a zone's enemy roster, battle background, and (future) environmental modifiers. Forest of Old is the first zone; its boss slot is currently a stand-in "Withered Warden".</li>
+<li>Roguelike layer lives <b>between fights</b>: rewards after victory (Rest +25% HP/Mana or Scavenge +1 item), talents/specs are changed from the map's Party screen.</li>
+</ul>
+
+<h2>Updates to "DoD Run.docx" (Run Flow)</h2>
+<ul>
+<li><b>HP and Mana carry over between battles.</b> No automatic refill. Rage still starts at 0 each battle. Faith and Arcane Resonance are battle-scoped.</li>
+<li>Fallen heroes return at 20% HP after a <i>won</i> battle. Full party wipe ends the run.</li>
+<li>Shared run inventory: Health Potion (40 HP, targeted), Mana Potion (40 Mana/Rage, targeted), Bomb (50 true damage to all enemies), Revive Potion (fallen ally at 50%), Defense Potion (party +10% armor, 5 turns). Starting stock: 2/1/1/1/1. Loot drops favor potions.</li>
+</ul>
+
+<h2>Updates to "DoD Combat.docx" (Combat System)</h2>
+<ul>
+<li><b>Attack rolls:</b> 5% miss (no effect), 5% parry (defender negates and counters with a free basic attack; Broken units cannot parry; heals cannot miss/be parried), 10% crit (1.5x damage, +25% chance vs Broken). Base rates; stats/talents will modify.</li>
+<li><b>Guard action</b> (free, every hero): -40% damage and -50% Pressure taken until the unit's next turn; 1.5 initiative delay; Perfect check sheds 10 Pressure. For the Mage, Guard also vents all Resonance.</li>
+<li><b>Items in combat:</b> one item per character per turn, does not consume the turn (dropdown menu next to abilities).</li>
+<li><b>Skill checks:</b> timing bar with Perfect / Good / Sloppy zones; every ability carries a unique Perfect bonus. Perfect grants +15% effect and the bonus property.</li>
+<li><b>Statuses implemented:</b> Broken, Slow (-25% speed), Burn (6/turn), Bleed (5/turn), Sunder (-35% armor), Ward (-50% Pressure taken), Fortify (+10% armor), Barrier (damage absorb), Focus (+10 Mana/turn), Renewal (+8 HP/turn), Surge (+20% attack), Guard. Status chips show under units with tooltips.</li>
+<li><b>Tuned baseline</b> (200-battle simulations): ~85% win rate, 7-9 rounds per fight, damage share Warrior ~42% / Mage ~40% / Cleric ~19%, ~2.5 Breaks per side per fight.</li>
+</ul>
+
+<h2>Updates to "DoD Classes.docx" (Classes)</h2>
+<h3>Warrior</h3>
+<ul>
+<li>Rallying Shout (core): free, grants the Warrior 15 Rage, party sheds 15 Pressure, <b>allies regain 20% of their max resource</b> (25 Pressure / 30% on Perfect).</li>
+<li>Crushing Blow applies Sunder (-35% armor, 3 turns) baseline.</li>
+</ul>
+<h3>Mage — reworked</h3>
+<ul>
+<li><b>Arcane Resonance:</b> +15% damage dealt and +3% crit per stack, but <b>+10% damage taken per stack</b>. Stacks build on damaging casts (2 on spell crit), <b>never decay, and are only removed by Guard (vents all stacks)</b>. Backlash Ward: +15 Mana on reaching max stacks.</li>
+<li>Magic Bolt: 25 damage.</li>
+<li><b>Arcane Barrier removed</b> from the core kit. Replaced by <b>Arcane Cannon</b>: 30 base damage; recoils on the Mage for 5% of damage dealt +5% per Resonance stack; Perfect skill check = no recoil.</li>
+</ul>
+<h3>Cleric</h3>
+<ul>
+<li>Core kit per doc: Smite, Mend Wounds, Blessed Purge, Renewal. Faith builds +10 per action; Miracles (Faith spenders) arrive with specializations.</li>
+</ul>
+
+<h2>Updates to "DoD UI.docx" (Interface)</h2>
+<ul>
+<li>Map screen: gothic zone title, branching node buttons, party HP/MP readout, <b>Party tab</b> (full party screen: per-hero stats, abilities, specializations, back navigation) and <b>Inventory dropdown</b>.</li>
+<li>Combat UI: initiative bar with cropped portraits (next 10 turns), Pressure bar shifts purple to pink near Break, numeric HP/resource bars, scrolling battle history log (all actions, damage, statuses, Breaks, deaths), item dropdown, Guard button.</li>
+<li>Feel: attack lunges, hit flash + knockback, crit numbers explode on screen with shake, Break = hitstop + purple fracture flash + camera punch (per UI doc), 12 placeholder retro SFX.</li>
+</ul>
+
+
+<h2>Change Log</h2>
+<h3>2026-07-04 — Specializations v1 and combat revisions</h3>
+<ul>
+<li><b>Specializations implemented</b> (selectable and switchable on the Party screen between fights). Each grants a passive plus abilities: Warrior — Berserker (Blood Frenzy; Bloodlust, Wildstrikes), Warden (Bulwark; Shieldwall, Retaliation), Swordmaster (Duelist; Overpower, Momentum). Mage — Pyromancer (Ignite; Flame Surge, Phoenix Rebirth), Cryomancer (Chill; Razor Ice, Blizzard), Arcanist (Echo; Arcane Cannon, Arcane Rift, Reality Fracture). Cleric — Holy (Grace; Dawnbreak, Hymn of Hope), Inquisitor (Zeal; Burning Verdict, Condemn), Occultist (Corrupted Channeling; Hex of Ruin, Dark Benediction). Cleric Miracles are the first Faith spenders (40-60 Faith).</li>
+<li><b>Taunt is Warrior core</b> (all specs): free, forces all enemies to attack the Warrior for 5 turns. Warden's second ability is now Retaliation (counter stance, 3 turns).</li>
+<li><b>Arcane Cannon is Arcanist-exclusive</b>; removed from the Mage core kit. <b>Focus removed</b> entirely. Mage core = Magic Bolt + Arcane Surge.</li>
+<li><b>Razor Ice</b> (Cryomancer) replaces Frost Spike: 15 damage to 2 random enemies; always crits against Slowed targets.</li>
+<li><b>Hero Pressure generation reduced ~20-30%</b> across all kits; enemy Breaks now ~1.5 per battle (were ~2.5) so Breaking feels earned.</li>
+<li><b>Combat UI:</b> action bar is now Basic Attack | Abilities dropdown | Guard | Items dropdown; free abilities no longer labeled "(Free)"; target selection has a Cancel button to re-pick the ability before casting.</li>
+<li>New systems supporting specs: AoE attacks, random-multi-hit attacks, Faith costs, armor pierce, missing-HP drain, Taunt targeting, Echo procs, statuses Shieldwall / Empower / Exposed / Cripple / Retaliation.</li>
+</ul>
+<h2>Progress Snapshot</h2>
+<p>Phase 1 (combat core) complete and simulator-tuned. Phase 2 (run structure) playable: map, battles, rewards, carryover, party/inventory screens. Next: class specializations, then drafting, talents, and zone variety. Automated testing: DOD_AUTOPLAY (single bot battle) and DOD_SIM=N (batch balance reports).</p>
+</body></html>

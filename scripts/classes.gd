@@ -37,11 +37,11 @@ static func kit(key: String) -> Array:
 
 static func warrior_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Strike", "cost": 0, "damage": 23, "pressure": 10,
+		Ability.make({"display_name": "Strike", "cost": 0, "damage": 23, "pressure": 9,
 			"resource_gain": 15, "delay": 2.0, "anim": "attack01",
 			"perfect_id": "rage", "perfect_text": "+10 bonus Rage",
 			"description": "Basic attack. Builds 15 Rage."}),
-		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 50, "pressure": 18,
+		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 50, "pressure": 15,
 			"delay": 4.0, "anim": "attack02",
 			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
 			"description": "Big single-target damage."}),
@@ -49,28 +49,24 @@ static func warrior_kit() -> Array:
 			"resource_gain": 15, "delay": 3.0, "anim": "attack01",
 			"perfect_id": "", "perfect_text": "Stronger rally (-25 Pressure, +30% resource)",
 			"description": "Party-wide: allies shed 15 Pressure and\nregain 20% of their resource.\nGrants the Warrior 15 Rage."}),
-		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 32, "pressure": 20,
+		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 32, "pressure": 17,
 			"delay": 4.0, "anim": "attack03",
 			"applies_status": {"id": "sunder", "turns": 3},
 			"perfect_id": "pressure", "perfect_text": "+60% Pressure",
 			"description": "Moderate damage. Sunders armor (-35%) for 3 turns."}),
+		Ability.make({"display_name": "Taunt", "cost": 0, "special": "taunt",
+			"delay": 2.0, "anim": "attack01",
+			"perfect_id": "", "perfect_text": "Also sheds 10 of the Warrior's Pressure",
+			"description": "Force all enemies to attack the\nWarrior for 5 turns."}),
 	]
 
 
 static func mage_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Magic Bolt", "cost": 0, "damage": 25, "pressure": 8,
+		Ability.make({"display_name": "Magic Bolt", "cost": 0, "damage": 25, "pressure": 7,
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "mana", "perfect_text": "Restores 10 Mana",
 			"description": "Basic arcane projectile. Builds Resonance."}),
-		Ability.make({"display_name": "Arcane Cannon", "cost": 20, "damage": 30, "pressure": 12,
-			"delay": 3.5, "anim": "attack02", "recoil_base": 0.05,
-			"perfect_id": "", "perfect_text": "No recoil",
-			"description": "Channel raw Resonance into a blast.\nRecoils on the Mage for 5% of damage\ndealt, +5% per Resonance stack."}),
-		Ability.make({"display_name": "Focus", "cost": 0, "special": "focus",
-			"delay": 3.0, "anim": "attack02",
-			"perfect_id": "", "perfect_text": "Also restores 10 Mana instantly",
-			"description": "Regenerate 10 Mana per turn for 2 turns."}),
 		Ability.make({"display_name": "Arcane Surge", "cost": 15, "special": "surge",
 			"delay": 3.0, "anim": "attack03",
 			"perfect_id": "", "perfect_text": "+2 Resonance instead of +1",
@@ -80,7 +76,7 @@ static func mage_kit() -> Array:
 
 static func cleric_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Smite", "cost": 0, "damage": 22, "pressure": 10,
+		Ability.make({"display_name": "Smite", "cost": 0, "damage": 22, "pressure": 8,
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 8 HP",
 			"description": "Basic radiant strike. Builds Faith."}),
@@ -144,11 +140,11 @@ static func spec_abilities(spec: String) -> Array:
 		"berserker":
 			return [
 				Ability.make({"display_name": "Bloodlust", "cost": 25, "damage": 26,
-					"pressure": 12, "delay": 3.0, "anim": "attack02", "heal_missing": 0.3,
+					"pressure": 9, "delay": 3.0, "anim": "attack02", "heal_missing": 0.3,
 					"perfect_id": "", "perfect_text": "Heals 45% of missing HP instead",
 					"description": "Strike and drink deep: heals the Warrior\nfor 30% of their missing HP."}),
 				Ability.make({"display_name": "Wildstrikes", "cost": 35, "damage": 16,
-					"pressure": 10, "delay": 4.5, "anim": "attack03", "aoe": true,
+					"pressure": 7, "delay": 4.5, "anim": "attack03", "aoe": true,
 					"applies_status": {"id": "bleed", "turns": 3},
 					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
 					"description": "Savage sweep: hits ALL enemies and\nleaves them Bleeding (3 turns)."}),
@@ -159,26 +155,26 @@ static func spec_abilities(spec: String) -> Array:
 					"delay": 3.5, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "Also sheds 10 Pressure from each ally",
 					"description": "The party takes 50% less damage\nuntil their next turns."}),
-				Ability.make({"display_name": "Taunt", "cost": 10, "special": "taunt",
-					"delay": 2.0, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "Taunt lasts 3 turns instead of 2",
-					"description": "Force all enemies to attack the\nWarrior for 2 turns."}),
+				Ability.make({"display_name": "Retaliation", "cost": 20, "special": "retaliate",
+					"delay": 3.0, "anim": "attack01",
+					"perfect_id": "", "perfect_text": "Stance lasts 4 turns",
+					"description": "For 3 turns, counter every attack\nthat strikes the Warrior."}),
 			]
 		"swordmaster":
 			return [
 				Ability.make({"display_name": "Overpower", "cost": 20, "damage": 30,
-					"pressure": 14, "delay": 3.0, "anim": "attack02",
+					"pressure": 10, "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "+15% crit chance on this strike",
 					"description": "Precise heavy cut. Critical hits\nrefund 20 Rage."}),
 				Ability.make({"display_name": "Momentum", "cost": 25, "damage": 20,
-					"pressure": 30, "delay": 3.5, "anim": "attack03",
+					"pressure": 24, "delay": 3.5, "anim": "attack03",
 					"perfect_id": "pressure", "perfect_text": "+60% Pressure",
 					"description": "Building strike focused entirely\non Pressure."}),
 			]
 		"pyromancer":
 			return [
 				Ability.make({"display_name": "Flame Surge", "cost": 20, "damage": 16,
-					"pressure": 8, "delay": 3.5, "anim": "attack02", "aoe": true,
+					"pressure": 6, "delay": 3.5, "anim": "attack02", "aoe": true,
 					"applies_status": {"id": "burn", "turns": 2},
 					"perfect_id": "", "perfect_text": "Burn lasts 3 turns",
 					"description": "Cone of fire: hits ALL enemies\nand sets them Burning."}),
@@ -189,25 +185,28 @@ static func spec_abilities(spec: String) -> Array:
 			]
 		"cryomancer":
 			return [
-				Ability.make({"display_name": "Frost Spike", "cost": 20, "damage": 22,
-					"pressure": 10, "delay": 3.0, "anim": "attack02", "delay_push": 1.5,
-					"applies_status": {"id": "slow", "turns": 2},
-					"perfect_id": "slow_plus", "perfect_text": "Slow lasts 4 turns",
-					"description": "Icy lance: Slows the target and\npushes their next turn back."}),
+				Ability.make({"display_name": "Razor Ice", "cost": 20, "damage": 15,
+					"pressure": 7, "delay": 3.0, "anim": "attack02", "random_hits": 2,
+					"perfect_id": "", "perfect_text": "3 shards instead of 2",
+					"description": "Hurl razor shards at 2 random enemies.\nAlways crits against Slowed targets."}),
 				Ability.make({"display_name": "Blizzard", "cost": 30, "damage": 15,
-					"pressure": 8, "delay": 4.0, "anim": "attack03", "aoe": true,
+					"pressure": 6, "delay": 4.0, "anim": "attack03", "aoe": true,
 					"applies_status": {"id": "slow", "turns": 2},
 					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
 					"description": "Storm of ice: hits ALL enemies\nand Slows them."}),
 			]
 		"arcanist":
 			return [
+				Ability.make({"display_name": "Arcane Cannon", "cost": 20, "damage": 30,
+					"pressure": 9, "delay": 3.5, "anim": "attack02", "recoil_base": 0.05,
+					"perfect_id": "", "perfect_text": "No recoil",
+					"description": "Channel raw Resonance into a blast.\nRecoils on the Mage for 5% of damage\ndealt, +5% per Resonance stack."}),
 				Ability.make({"display_name": "Arcane Rift", "cost": 25, "damage": 38,
-					"pressure": 12, "delay": 4.0, "anim": "attack02", "armor_pierce": 0.5,
+					"pressure": 9, "delay": 4.0, "anim": "attack02", "armor_pierce": 0.5,
 					"perfect_id": "", "perfect_text": "Ignores ALL armor",
 					"description": "Tear reality: heavy damage that\nignores half the target's armor."}),
 				Ability.make({"display_name": "Reality Fracture", "cost": 20, "damage": 15,
-					"pressure": 10, "delay": 3.0, "anim": "attack03", "delay_push": 4.0,
+					"pressure": 7, "delay": 3.0, "anim": "attack03", "delay_push": 4.0,
 					"perfect_id": "", "perfect_text": "Also +1 Resonance",
 					"description": "Shove the target far down the\ninitiative order."}),
 			]
@@ -225,19 +224,19 @@ static func spec_abilities(spec: String) -> Array:
 		"inquisitor":
 			return [
 				Ability.make({"display_name": "Burning Verdict", "cost": 0, "faith_cost": 40,
-					"damage": 40, "pressure": 14, "delay": 3.5, "anim": "attack02",
+					"damage": 40, "pressure": 10, "delay": 3.5, "anim": "attack02",
 					"applies_status": {"id": "exposed", "turns": 3},
 					"perfect_id": "", "perfect_text": "+50% Pressure",
 					"description": "MIRACLE: radiant execution that\nleaves the target Exposed (3 turns)."}),
 				Ability.make({"display_name": "Condemn", "cost": 15, "damage": 12,
-					"pressure": 12, "delay": 3.5, "anim": "attack03", "aoe": true,
+					"pressure": 9, "delay": 3.5, "anim": "attack03", "aoe": true,
 					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
 					"description": "Holy censure strikes ALL enemies."}),
 			]
 		"occultist":
 			return [
 				Ability.make({"display_name": "Hex of Ruin", "cost": 20, "damage": 14,
-					"pressure": 10, "delay": 3.0, "anim": "attack02",
+					"pressure": 7, "delay": 3.0, "anim": "attack02",
 					"applies_status": {"id": "sunder", "turns": 3},
 					"perfect_id": "", "perfect_text": "Also Crippled (2 turns)",
 					"description": "Curse the target: Sunders armor\n(-35%) for 3 turns."}),
