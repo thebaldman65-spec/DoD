@@ -5,7 +5,6 @@ extends Node2D
 signal _ability_picked(ability)
 signal _target_picked(unit)
 signal _skill_done(grade)
-signal _confirmed(ok)
 
 const BASIC_DELAY := 2.0
 
@@ -182,11 +181,14 @@ func _enemy_config(kind: String) -> Dictionary:
 
 func _spawn_units() -> void:
 	var hero_keys := ["warrior", "mage", "cleric"]
+	var sim_specs := ["swordmaster", "pyromancer", "holy"]
 	for i in hero_keys.size():
 		var cfg := Classes.hero_config(hero_keys[i])
 		var spec := ""
 		if Run.active and i < Run.party.size():
 			spec = Run.party[i].get("spec", "")
+		elif autoplay:
+			spec = sim_specs[i]
 		if spec != "":
 			cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
 			cfg["passive_id"] = Classes.SPEC_INFO[spec]["passive"]
@@ -268,9 +270,13 @@ func _build_ui() -> void:
 	message_label.add_theme_font_size_override("font_size", 20)
 	ui.add_child(message_label)
 
+	var bottom_center := CenterContainer.new()
+	bottom_center.position = Vector2(0, 640)
+	bottom_center.size = Vector2(1280, 76)
+	bottom_center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ui.add_child(bottom_center)
 	action_panel = PanelContainer.new()
-	action_panel.position = Vector2(380, 644)
-	ui.add_child(action_panel)
+	bottom_center.add_child(action_panel)
 	action_box = HBoxContainer.new()
 	action_box.add_theme_constant_override("separation", 10)
 	action_panel.add_child(action_box)
@@ -472,21 +478,15 @@ func _player_turn(u: BattleUnit) -> void:
 	action_panel.visible = false
 
 	var target: BattleUnit = null
+	var grade := "good"
 	while true:
+		var used_targeting := false
 		if ab.special in ["rally", "focus", "surge", "guard", "shieldwall", "taunt",
 				"phoenix", "hymn", "benediction", "retaliate"]:
 			target = u  # self/party effects need no target choice
-			if not autoplay:
-				var ok: bool = await _confirm_cast(ab)
-				if not ok:
-					target = null
 		elif ab.aoe or ab.random_hits > 0:
 			var foes := enemies.filter(func(e): return not e.dead)
 			target = foes[0]  # resolve picks the real targets
-			if not autoplay:
-				var ok_aoe: bool = await _confirm_cast(ab)
-				if not ok_aoe:
-					target = null
 		elif autoplay:
 			target = auto_target
 		else:
@@ -497,27 +497,24 @@ func _player_turn(u: BattleUnit) -> void:
 				pool = enemies.filter(func(e): return not e.dead)
 			if pool.size() == 1:
 				target = pool[0]
-				var ok_single: bool = await _confirm_cast(ab)
-				if not ok_single:
-					target = null
 			else:
+				used_targeting = true
 				_message("Choose a target")
 				target = await _pick_target(pool)
 		if target != null:
-			break
+			if autoplay:
+				var roll := randf()
+				grade = "perfect" if roll < 0.20 else ("fail" if roll > 0.85 else "good")
+				break
+			# Auto-cast abilities (no target click) can cancel during the skill check.
+			grade = await _run_skill_check(not used_targeting)
+			if grade != "cancel":
+				break
 		# Cancelled: back to the action bar to pick something else.
 		_message("%s's turn — choose an ability" % u.unit_name)
 		_show_actions(u)
 		ab = await _ability_picked
 		action_panel.visible = false
-
-	var grade := "good"
-	if autoplay:
-		# Approximate a human player's skill check outcomes.
-		var roll := randf()
-		grade = "perfect" if roll < 0.20 else ("fail" if roll > 0.85 else "good")
-	else:
-		grade = await _run_skill_check()
 	await _resolve(u, ab, target, grade)
 	current_hero = null
 
@@ -533,20 +530,39 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 	var weakest_ally := _lowest_hp(allies)
 	match u.unit_name:
 		"Warrior":
-			if u.resource >= 30:
-				return [u.abilities[1], target_foe]      # Heavy Strike
-			if u.resource >= 20 and not target_foe.has_status("sunder"):
-				return [u.abilities[2], target_foe]      # Crushing Blow
+			var crushing := _find_ability(u, "Crushing Blow")
+			if crushing != null and u.resource >= crushing.cost \
+					and not target_foe.has_status("sunder"):
+				return [crushing, target_foe]
+			var overpower := _find_ability(u, "Overpower")
+			if overpower != null and u.resource >= overpower.cost:
+				return [overpower, target_foe]
 			return [u.abilities[0], target_foe]          # Strike
 		"Mage":
-			if u.resource >= 15 and u.second_resource < u.second_max and randf() < 0.3:
-				return [u.abilities[1], u]               # Arcane Surge
+			var surge_ab := _find_ability(u, "Arcane Surge")
+			if surge_ab != null and u.resource >= surge_ab.cost \
+					and u.second_resource < u.second_max and randf() < 0.25:
+				return [surge_ab, u]
+			var flame := _find_ability(u, "Flame Surge")
+			if flame != null and u.resource >= flame.cost and foes.size() >= 2:
+				return [flame, target_foe]
 			return [u.abilities[0], target_foe]          # Magic Bolt
 		"Cleric":
+			var hymn := _find_ability(u, "Hymn of Hope")
+			if hymn != null and u.second_resource >= hymn.faith_cost \
+					and weakest_ally.hp < weakest_ally.max_hp * 0.6:
+				return [hymn, u]
 			if weakest_ally.hp < weakest_ally.max_hp * 0.5 and u.resource >= 25:
 				return [u.abilities[1], weakest_ally]    # Mend Wounds
 			return [u.abilities[0], target_foe]          # Smite
 	return [u.abilities[0], target_foe]
+
+
+func _find_ability(u: BattleUnit, ability_name: String) -> Ability:
+	for ab in u.abilities:
+		if ab.display_name == ability_name:
+			return ab
+	return null
 
 
 # Items are shared by the party and never consume the turn: the action
@@ -670,11 +686,6 @@ func _show_actions(u: BattleUnit) -> void:
 	action_box.add_child(guard_btn)
 	action_box.add_child(_build_items_menu())
 	action_panel.visible = true
-	call_deferred("_center_action_panel")
-
-
-func _center_action_panel() -> void:
-	action_panel.position = Vector2(640.0 - action_panel.size.x / 2.0, 644.0)
 
 
 func _on_ability_button(ab: Ability) -> void:
@@ -728,28 +739,6 @@ func _build_items_menu() -> MenuButton:
 		popup.set_item_disabled(i, not usable)
 	popup.id_pressed.connect(func(id: int): _use_item(Run.ITEM_IDS[id]))
 	return menu
-
-
-# Confirm-or-cancel step for abilities that need no target click (self, AoE,
-# or only one possible target) so every cast can be backed out of.
-func _confirm_cast(ab: Ability) -> bool:
-	var bar := HBoxContainer.new()
-	bar.position = Vector2(490, 560)
-	bar.add_theme_constant_override("separation", 12)
-	ui.add_child(bar)
-	var cast := Button.new()
-	cast.text = "Cast %s" % ab.display_name
-	cast.custom_minimum_size = Vector2(180, 40)
-	cast.pressed.connect(func(): _confirmed.emit(true))
-	bar.add_child(cast)
-	var cancel := Button.new()
-	cancel.text = "✕ Cancel"
-	cancel.custom_minimum_size = Vector2(110, 40)
-	cancel.pressed.connect(func(): _confirmed.emit(false))
-	bar.add_child(cancel)
-	var ok: bool = await _confirmed
-	bar.queue_free()
-	return ok
 
 
 func _pick_target(pool: Array) -> BattleUnit:
@@ -1020,6 +1009,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_message("%s falls!" % strike_target.unit_name)
 				_log("† %s dies" % strike_target.unit_name, "#e05050")
 				await _wait(0.5)
+			if strike_targets.size() > 1:
+				await _wait(0.45)  # let each hit land distinctly
 		# Post-strike attacker effects.
 		if ab.recoil_base > 0.0 and not is_perfect:
 			var recoil_pct := ab.recoil_base * (1.0 + attacker.second_resource)
@@ -1262,13 +1253,26 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 
 # ---------- skill check ----------
 
-func _run_skill_check() -> String:
+func _run_skill_check(cancellable := false) -> String:
 	sc_pos = 0.0
 	sc_dir = 1.0
 	sc_result.text = ""
 	sc_root.visible = true
 	sc_active = true
+	var cancel_btn: Button = null
+	if cancellable:
+		cancel_btn = Button.new()
+		cancel_btn.text = "✕ Cancel"
+		cancel_btn.custom_minimum_size = Vector2(104, 34)
+		cancel_btn.position = Vector2(448, 20)
+		cancel_btn.pressed.connect(_cancel_skill_check)
+		sc_root.add_child(cancel_btn)
 	var grade: String = await _skill_done
+	if cancel_btn != null:
+		cancel_btn.queue_free()
+	if grade == "cancel":
+		sc_root.visible = false
+		return grade
 	match grade:
 		"perfect":
 			_sfx("perfect", -6.0)
@@ -1285,6 +1289,12 @@ func _run_skill_check() -> String:
 	await _wait(0.45)
 	sc_root.visible = false
 	return grade
+
+
+func _cancel_skill_check() -> void:
+	if sc_active:
+		sc_active = false
+		_skill_done.emit("cancel")
 
 
 func _process(delta: float) -> void:

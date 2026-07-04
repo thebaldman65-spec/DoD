@@ -73,6 +73,15 @@
 <li>Cleric: Blessed Purge replaced by <b>Divine Shield</b> — grants an ally a shield absorbing 100 damage (130 on Perfect) that persists until it breaks.</li>
 <li>Rallying Shout removed from the Warrior kit for now.</li>
 </ul>
+<h3>2026-07-04 (third pass) — Cast flow and kit trims</h3>
+<ul>
+<li>Confirm prompt removed. Targeted abilities cancel during target selection; auto-cast abilities (self/AoE/random) cancel via a button next to the skill check bar. Cancelling refunds nothing because nothing was spent yet.</li>
+<li>Action bar now lives in a self-centering container at the bottom center (fixed the drift-to-left bug).</li>
+<li>Razor Ice shards land 0.45s apart so each hit reads distinctly (applies to all multi-hit attacks).</li>
+<li>Heavy Strike removed for now. Crushing Blow moved to Swordmaster, replacing Momentum. Warrior core kit: Strike + Taunt.</li>
+<li>Party screen: hover tooltips on stats (definitions of Armor/Speed/Stability/resources), each ability card, spec cards (passive + granted ability details), and hero list entries.</li>
+<li>Simulator bot now runs default specializations (Swordmaster/Pyromancer/Holy); baseline 92% wins, 6.4 rounds, 1.7 enemy Breaks per battle.</li>
+</ul>
 <h2>Progress Snapshot</h2>
 <p>Phase 1 (combat core) complete and simulator-tuned. Phase 2 (run structure) playable: map, battles, rewards, carryover, party/inventory screens. Next: class specializations, then drafting, talents, and zone variety. Automated testing: DOD_AUTOPLAY (single bot battle) and DOD_SIM=N (batch balance reports).</p>
 </body></html>

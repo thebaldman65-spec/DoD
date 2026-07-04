@@ -69,6 +69,7 @@ func _draw_list() -> void:
 		btn.custom_minimum_size = Vector2(420, 96)
 		btn.position = Vector2(430, 140 + i * 130)
 		btn.add_theme_font_size_override("font_size", 20)
+		btn.tooltip_text = Classes.CLASS_BLURBS[key]
 		btn.pressed.connect(_select_hero.bind(key))
 		add_child(btn)
 
@@ -115,6 +116,16 @@ func _draw_detail() -> void:
 	stats.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
 	stats.position = Vector2(80, 150)
 	stats.size = Vector2(260, 400)
+	stats.mouse_filter = Control.MOUSE_FILTER_STOP
+	stats.tooltip_text = "HP — hit points; at 0 the hero falls (revivable).\n" \
+		+ "%s — spent on abilities%s\n" % [cfg["resource_name"],
+			"; carries over between battles." if cfg["resource_name"] == "Mana"
+			else "; builds from attacking and taking hits."] \
+		+ "Armor — %% of incoming damage blocked.\n" \
+		+ "Speed — how quickly turns arrive (100 = average).\n" \
+		+ "Stability — Pressure needed to Break this hero.\n" \
+		+ ("Resonance — +15%% dmg/+3%% crit per stack, +10%% dmg taken;\nvented by Guard." if cfg.get("second_resource_name", "") == "Resonance"
+			else ("Faith — builds with every action; spent on Miracles." if cfg.get("second_resource_name", "") == "Faith" else ""))
 	add_child(stats)
 
 	# Abilities column (center).
@@ -145,6 +156,9 @@ func _draw_detail() -> void:
 		label.text = text
 		label.add_theme_font_size_override("font_size", 13)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		panel.tooltip_text = text
+		if ab.special != "":
+			panel.tooltip_text += "\n(Utility — no direct damage)"
 		panel.add_child(label)
 
 	# Specializations column (right): pick one, switch freely between fights.
@@ -174,6 +188,17 @@ func _draw_detail() -> void:
 		label.add_theme_font_size_override("font_size", 12)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.custom_minimum_size = Vector2(370, 0)
+		var tip := "Passive: %s" % info["passive_desc"]
+		for ab in Classes.spec_abilities(spec_id):
+			tip += "\n\n%s" % ab.display_name
+			if ab.cost > 0:
+				tip += " (%d)" % ab.cost
+			elif ab.faith_cost > 0:
+				tip += " (%d Faith)" % ab.faith_cost
+			if ab.damage > 0:
+				tip += " — %d–%d dmg" % [int(ab.damage * 0.9), int(round(ab.damage * 1.1))]
+			tip += "\n%s" % ab.description.replace("\n", " ")
+		panel.tooltip_text = tip
 		vbox.add_child(label)
 		var pick := Button.new()
 		pick.text = "ACTIVE" if current_spec == spec_id else "Choose"
