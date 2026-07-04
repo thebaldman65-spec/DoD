@@ -17,6 +17,7 @@ const ITEM_INFO := {
 const LOOT_POOL := ["health", "health", "mana", "mana", "bomb", "revive", "defense"]
 
 var active := false
+var specs_chosen := false  # locked in after the first combat victory
 var zone_name := "Forest of Old"
 var party: Array = []      # [{key, hp, max_hp}] snapshots between battles
 var items := {}            # item id -> count (shared inventory)
@@ -26,13 +27,22 @@ var node_idx := -1
 var encounter := {}        # {"type": ..., "enemies": ["raider", ...]} for the next battle
 
 
-func new_run() -> void:
+const HERO_BASE := {
+	"warrior": {"hp": 140, "mana": 0},
+	"mage": {"hp": 90, "mana": 100},
+	"cleric": {"hp": 110, "mana": 100},
+}
+
+
+func new_run(keys := ["warrior", "mage", "cleric"]) -> void:
 	active = true
-	party = [
-		{"key": "warrior", "hp": 140, "max_hp": 140, "mana": 0, "max_mana": 100, "spec": "", "talent_points": 0, "talents": []},
-		{"key": "mage", "hp": 90, "max_hp": 90, "mana": 100, "max_mana": 100, "spec": "", "talent_points": 0, "talents": []},
-		{"key": "cleric", "hp": 110, "max_hp": 110, "mana": 100, "max_mana": 100, "spec": "", "talent_points": 0, "talents": []},
-	]
+	specs_chosen = false
+	party = []
+	for key in keys:
+		var base: Dictionary = HERO_BASE[key]
+		party.append({"key": key, "hp": base["hp"], "max_hp": base["hp"],
+			"mana": base["mana"], "max_mana": 100, "spec": "",
+			"talent_points": 0, "talents": []})
 	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
 	floor_idx = -1
 	node_idx = -1

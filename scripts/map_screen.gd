@@ -17,7 +17,8 @@ const NODE_COLORS := {
 
 func _ready() -> void:
 	if not Run.active:
-		Run.new_run()
+		get_tree().change_scene_to_file.call_deferred("res://scenes/draft.tscn")
+		return
 	_draw_screen()
 
 

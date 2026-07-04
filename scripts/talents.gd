@@ -24,6 +24,10 @@ const TREES := {
 				"description": "A reckless, devastating blow."}}},
 		{"id": "b6", "tier": 3, "name": "Deeper Thirst", "desc": "Bloodlust heals 45% of missing HP.",
 			"payload": {"ability": "Bloodlust", "set": {"heal_missing": 0.45}}},
+{"id": "b7", "tier": 2, "name": "Frenzied Pace", "desc": "+10 Speed.",
+			"payload": {"stat": {"speed": 10}}},
+		{"id": "b8", "tier": 3, "name": "Bloodbath", "desc": "Wildstrikes deals +6 damage.",
+			"payload": {"ability": "Wildstrikes", "add": {"damage": 6}}},
 	],
 	"warden": [
 		{"id": "w1", "tier": 1, "name": "Iron Skin", "desc": "+5% armor.",
@@ -41,6 +45,10 @@ const TREES := {
 				"description": "Slam with the shield's full weight."}}},
 		{"id": "w6", "tier": 3, "name": "Thick Hide", "desc": "+25 max HP.",
 			"payload": {"stat": {"max_hp": 25}}},
+{"id": "w7", "tier": 2, "name": "Guardian's Vigor", "desc": "+15 max HP.",
+			"payload": {"stat": {"max_hp": 15}}},
+		{"id": "w8", "tier": 3, "name": "Unbreakable", "desc": "+5% armor.",
+			"payload": {"stat": {"armor": 0.05}}},
 	],
 	"swordmaster": [
 		{"id": "s1", "tier": 1, "name": "Keen Edge", "desc": "+5% crit chance.",
@@ -58,6 +66,10 @@ const TREES := {
 				"description": "A blinding sequence of cuts."}}},
 		{"id": "s6", "tier": 3, "name": "Honed Basics", "desc": "Strike deals +6 damage.",
 			"payload": {"ability": "Strike", "add": {"damage": 6}}},
+{"id": "s7", "tier": 2, "name": "Riposte Training", "desc": "+5% parry chance.",
+			"payload": {"stat": {"parry_bonus": 0.05}}},
+		{"id": "s8", "tier": 3, "name": "Deathblow", "desc": "Overpower deals +8 damage.",
+			"payload": {"ability": "Overpower", "add": {"damage": 8}}},
 	],
 	"pyromancer": [
 		{"id": "p1", "tier": 1, "name": "Ember Mind", "desc": "+20 max Mana.",
@@ -69,13 +81,17 @@ const TREES := {
 		{"id": "p4", "tier": 2, "name": "Ashen Guard", "desc": "+15 max HP.",
 			"payload": {"stat": {"max_hp": 15}}},
 		{"id": "p5", "tier": 3, "name": "Inferno", "desc": "New ability: engulf ALL enemies for 24 damage + Burn (35 Mana).",
-			"payload": {"new_ability": {"display_name": "Inferno", "cost": 35, "damage": 24,
+			"payload": {"new_ability": {"display_name": "Inferno", "dmg_type": "fire", "cost": 35, "damage": 24,
 				"pressure": 6, "delay": 4.5, "anim": "attack03", "aoe": true,
 				"applies_status": {"id": "burn", "turns": 3},
 				"perfect_id": "", "perfect_text": "+50% Pressure on every target",
 				"description": "The battlefield becomes a furnace."}}},
 		{"id": "p6", "tier": 3, "name": "Swift Rebirth", "desc": "Phoenix Rebirth costs less initiative.",
 			"payload": {"ability": "Phoenix Rebirth", "add": {"delay": -1.0}}},
+{"id": "p7", "tier": 2, "name": "Cinder Skin", "desc": "+5% armor.",
+			"payload": {"stat": {"armor": 0.05}}},
+		{"id": "p8", "tier": 3, "name": "Fire Feeds Fire", "desc": "Inferno costs 10 less Mana.",
+			"payload": {"ability": "Inferno", "add": {"cost": -10}}},
 	],
 	"cryomancer": [
 		{"id": "c1", "tier": 1, "name": "Shard Storm", "desc": "Razor Ice throws an extra shard.",
@@ -87,30 +103,38 @@ const TREES := {
 		{"id": "c4", "tier": 2, "name": "Sharper Ice", "desc": "Razor Ice deals +5 damage per shard.",
 			"payload": {"ability": "Razor Ice", "add": {"damage": 5}}},
 		{"id": "c5", "tier": 3, "name": "Absolute Zero", "desc": "New ability: 20 damage and shoves the target far down the initiative order (30 Mana).",
-			"payload": {"new_ability": {"display_name": "Absolute Zero", "cost": 30, "damage": 20,
+			"payload": {"new_ability": {"display_name": "Absolute Zero", "dmg_type": "frost", "cost": 30, "damage": 20,
 				"pressure": 8, "delay": 3.5, "anim": "attack02", "delay_push": 6.0,
 				"applies_status": {"id": "slow", "turns": 3},
 				"perfect_id": "", "perfect_text": "Also +50% Pressure",
 				"description": "Entomb them in ice and time."}}},
 		{"id": "c6", "tier": 3, "name": "Glacier Mind", "desc": "+20 max Mana.",
 			"payload": {"stat": {"max_resource": 20}}},
+{"id": "c7", "tier": 2, "name": "Numbing Cold", "desc": "+15 Stability.",
+			"payload": {"stat": {"stability": 15}}},
+		{"id": "c8", "tier": 3, "name": "Winter's Pace", "desc": "+10 Speed.",
+			"payload": {"stat": {"speed": 10}}},
 	],
 	"arcanist": [
 		{"id": "a1", "tier": 1, "name": "Stable Cannon", "desc": "Arcane Cannon recoil reduced to 3% per stack step.",
 			"payload": {"ability": "Arcane Cannon", "set": {"recoil_base": 0.03}}},
-		{"id": "a2", "tier": 1, "name": "Wider Rift", "desc": "Arcane Rift deals +8 damage.",
-			"payload": {"ability": "Arcane Rift", "add": {"damage": 8}}},
+		{"id": "a2", "tier": 1, "name": "Focused Blast", "desc": "Arcane Cannon deals +8 damage.",
+			"payload": {"ability": "Arcane Cannon", "add": {"damage": 8}}},
 		{"id": "a3", "tier": 2, "name": "Deep Reserves", "desc": "+20 max Mana.",
 			"payload": {"stat": {"max_resource": 20}}},
 		{"id": "a4", "tier": 2, "name": "Cheap Fracture", "desc": "Reality Fracture costs 5 less Mana.",
 			"payload": {"ability": "Reality Fracture", "add": {"cost": -5}}},
 		{"id": "a5", "tier": 3, "name": "Singularity", "desc": "New ability: 55-damage collapse that ignores 30% armor (40 Mana).",
-			"payload": {"new_ability": {"display_name": "Singularity", "cost": 40, "damage": 55,
+			"payload": {"new_ability": {"display_name": "Singularity", "dmg_type": "arcane", "cost": 40, "damage": 55,
 				"pressure": 10, "delay": 5.0, "anim": "attack03", "armor_pierce": 0.3,
 				"perfect_id": "", "perfect_text": "Ignores ALL armor",
 				"description": "Fold space onto a single point."}}},
 		{"id": "a6", "tier": 3, "name": "Warded Flesh", "desc": "+15 max HP.",
 			"payload": {"stat": {"max_hp": 15}}},
+{"id": "a7", "tier": 2, "name": "Riftwalker", "desc": "+10 Speed.",
+			"payload": {"stat": {"speed": 10}}},
+		{"id": "a8", "tier": 3, "name": "Overcharge", "desc": "Singularity deals +10 damage.",
+			"payload": {"ability": "Singularity", "add": {"damage": 10}}},
 	],
 	"holy": [
 		{"id": "h1", "tier": 1, "name": "Clarity", "desc": "Mend Wounds costs 5 less Mana.",
@@ -128,6 +152,10 @@ const TREES := {
 				"description": "Hallowed ground: heal the party 12%\nand halve incoming damage."}}},
 		{"id": "h6", "tier": 3, "name": "Light Feet", "desc": "+10 Speed.",
 			"payload": {"stat": {"speed": 10}}},
+{"id": "h7", "tier": 2, "name": "Serenity", "desc": "+20 max Mana.",
+			"payload": {"stat": {"max_resource": 20}}},
+		{"id": "h8", "tier": 3, "name": "Radiance", "desc": "Smite deals +6 damage.",
+			"payload": {"ability": "Smite", "add": {"damage": 6}}},
 	],
 	"inquisitor": [
 		{"id": "i1", "tier": 1, "name": "Righteous Fury", "desc": "Smite deals +6 damage.",
@@ -139,12 +167,16 @@ const TREES := {
 		{"id": "i4", "tier": 2, "name": "Hardened Faith", "desc": "+15 max HP.",
 			"payload": {"stat": {"max_hp": 15}}},
 		{"id": "i5", "tier": 3, "name": "Excommunicate", "desc": "New MIRACLE: 55-damage execution (50 Faith).",
-			"payload": {"new_ability": {"display_name": "Excommunicate", "cost": 0, "faith_cost": 50,
+			"payload": {"new_ability": {"display_name": "Excommunicate", "dmg_type": "holy", "cost": 0, "faith_cost": 50,
 				"damage": 55, "pressure": 12, "delay": 4.0, "anim": "attack02",
 				"perfect_id": "pressure", "perfect_text": "+60% Pressure",
 				"description": "Cast them out of the light entirely."}}},
 		{"id": "i6", "tier": 3, "name": "Executioner's Eye", "desc": "+5% crit chance.",
 			"payload": {"stat": {"crit_bonus": 0.05}}},
+{"id": "i7", "tier": 2, "name": "Unbending", "desc": "+10 Stability.",
+			"payload": {"stat": {"stability": 10}}},
+		{"id": "i8", "tier": 3, "name": "Fanaticism", "desc": "Excommunicate costs 40 Faith.",
+			"payload": {"ability": "Excommunicate", "set": {"faith_cost": 40}}},
 	],
 	"occultist": [
 		{"id": "o1", "tier": 1, "name": "Dark Vigor", "desc": "+15 max HP.",
@@ -156,18 +188,24 @@ const TREES := {
 		{"id": "o4", "tier": 2, "name": "Occult Reserves", "desc": "+20 max Mana.",
 			"payload": {"stat": {"max_resource": 20}}},
 		{"id": "o5", "tier": 3, "name": "Soul Leech", "desc": "New ability: 24 damage, heals the Cleric for all damage dealt (30 Mana).",
-			"payload": {"new_ability": {"display_name": "Soul Leech", "cost": 30, "damage": 24,
+			"payload": {"new_ability": {"display_name": "Soul Leech", "dmg_type": "shadow", "cost": 30, "damage": 24,
 				"pressure": 7, "delay": 3.0, "anim": "attack02", "lifesteal": 1.0,
 				"perfect_id": "", "perfect_text": "+50% healing from the drain",
 				"description": "Drink their essence."}}},
 		{"id": "o6", "tier": 3, "name": "Bone Ward", "desc": "+10 Stability.",
 			"payload": {"stat": {"stability": 10}}},
+{"id": "o7", "tier": 2, "name": "Shadowmeld", "desc": "+10 Speed.",
+			"payload": {"stat": {"speed": 10}}},
+		{"id": "o8", "tier": 3, "name": "Gluttony", "desc": "Soul Leech deals +6 damage.",
+			"payload": {"ability": "Soul Leech", "add": {"damage": 6}}},
 	],
 }
 
 
 static func tree(spec: String) -> Array:
-	return TREES.get(spec, [])
+	var talents: Array = TREES.get(spec, []).duplicate()
+	talents.sort_custom(func(a, b): return a["tier"] < b["tier"])
+	return talents
 
 
 static func picks_in_tree(spec: String, learned: Array) -> int:
@@ -192,8 +230,8 @@ static func apply(cfg: Dictionary, spec: String, learned: Array) -> void:
 		var payload: Dictionary = t["payload"]
 		if payload.has("stat"):
 			for field in payload["stat"]:
-				if field == "crit_bonus":
-					cfg["crit_bonus"] = cfg.get("crit_bonus", 0.0) + payload["stat"][field]
+				if field == "crit_bonus" or field == "parry_bonus":
+					cfg[field] = cfg.get(field, 0.0) + payload["stat"][field]
 				else:
 					cfg[field] = cfg[field] + payload["stat"][field]
 		elif payload.has("new_ability"):

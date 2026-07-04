@@ -165,23 +165,31 @@ func _enemy_config(kind: String) -> Dictionary:
 				"max_hp": 210, "armor": 0.20, "speed": 80.0, "stability": 70,
 				"resource_name": "Rage", "resource": 0, "max_resource": 100,
 				"abilities": _orc_chief_kit(), "sprite_scale": 3.2,
-				"tint": Color(1.0, 0.75, 0.7)}
+				"tint": Color(1.0, 0.75, 0.7),
+				"resists": {"physical": 0.15}}
 		"boss":
 			# Forest boss stand-in until we have real boss art and a unique kit.
 			return {"unit_name": "Withered Warden", "is_hero": false, "sheet_dir": orc,
 				"max_hp": 320, "armor": 0.22, "speed": 85.0, "stability": 90,
 				"resource_name": "Rage", "resource": 20, "max_resource": 100,
 				"abilities": _orc_chief_kit(), "sprite_scale": 3.6,
-				"tint": Color(0.7, 1.0, 0.7)}
+				"tint": Color(0.7, 1.0, 0.7),
+				"resists": {"nature": 0.50, "physical": 0.10, "fire": -0.25}}
 		_:
 			return {"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
 				"max_hp": 115, "armor": 0.15, "speed": 90.0, "stability": 50,
-				"abilities": _orc_raider_kit(), "tint": Color.WHITE}
+				"abilities": _orc_raider_kit(), "tint": Color.WHITE,
+				"resists": {"physical": 0.10}}
 
 
 func _spawn_units() -> void:
 	var hero_keys := ["warrior", "mage", "cleric"]
+	if Run.active:
+		hero_keys = []
+		for member in Run.party:
+			hero_keys.append(member["key"])
 	var sim_specs := ["swordmaster", "pyromancer", "holy"]
+	var name_counts := {}
 	for i in hero_keys.size():
 		var cfg := Classes.hero_config(hero_keys[i])
 		var spec := ""
@@ -197,8 +205,12 @@ func _spawn_units() -> void:
 				cfg["stability"] += 15
 			if Run.active and i < Run.party.size():
 				Talents.apply(cfg, spec, Run.party[i].get("talents", []))
+		name_counts[cfg["unit_name"]] = name_counts.get(cfg["unit_name"], 0) + 1
+		if hero_keys.count(hero_keys[i]) > 1:
+			cfg["unit_name"] = "%s %d" % [cfg["unit_name"], name_counts[cfg["unit_name"]]]
 		var u := _make_unit(cfg, HERO_SLOTS[i], HERO_TINTS[i])
 		u.crit_bonus = cfg.get("crit_bonus", 0.0)
+		u.parry_bonus = cfg.get("parry_bonus", 0.0)
 		if spec != "":
 			u.add_status("spec_passive", Classes.SPEC_INFO[spec]["name"], "★",
 				Color(0.9, 0.78, 0.4), -1, Classes.SPEC_INFO[spec]["passive_desc"])
@@ -236,9 +248,9 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color) -> BattleUnit:
 
 func _orc_raider_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Slash", "damage": 25, "pressure": 13,
+		Ability.make({"display_name": "Slash", "damage": 30, "pressure": 13,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Jagged Cut", "damage": 18, "pressure": 11,
+		Ability.make({"display_name": "Jagged Cut", "damage": 22, "pressure": 11,
 			"delay": 2.5, "anim": "attack02",
 			"applies_status": {"id": "bleed", "turns": 3}, "status_chance": 0.6}),
 	]
@@ -247,11 +259,11 @@ func _orc_raider_kit() -> Array:
 # The Chief fights like a weaker Warrior: builds Rage, spends it on heavy hits.
 func _orc_chief_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Strike", "damage": 21, "pressure": 13,
+		Ability.make({"display_name": "Strike", "damage": 25, "pressure": 13,
 			"resource_gain": 15, "delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 40,
+		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 48,
 			"pressure": 20, "delay": 4.0, "anim": "attack02"}),
-		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 25,
+		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 30,
 			"pressure": 28, "delay": 4.0, "anim": "attack02"}),
 	]
 
@@ -715,9 +727,9 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 			buff_mult *= 1.2
 		if u.has_status("empower"):
 			buff_mult *= 1.25
-		tip += "\nDamage: %d–%d    Pressure: %d" % [
+		tip += "\nDamage: %d–%d (%s)    Pressure: %d" % [
 			int(ab.damage * 0.9 * buff_mult), int(round(ab.damage * 1.1 * buff_mult)),
-			ab.pressure]
+			ab.dmg_type.capitalize(), ab.pressure]
 	if ab.heal > 0:
 		tip += "\nHeals: %d" % ab.heal
 	if ab.perfect_text != "":
@@ -860,7 +872,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
 			target.unit_name], "#909090")
 		await _wait(0.35)
-	elif not is_counter and not ab.aoe and not target.broken and not target.dead and randf() < PARRY_CHANCE:
+	elif not is_counter and not ab.aoe and not target.broken and not target.dead and randf() < PARRY_CHANCE + target.parry_bonus:
 		# Parry negates the hit; the defender immediately counters with
 		# their basic attack (a free action — no rolls, no initiative cost).
 		_stat("attacks")
@@ -934,6 +946,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if debug_prints and attacker.second_resource_name == "Resonance":
 				print("[DBG] %s attacks @%d stacks: base %d -> raw %.1f" % [
 					attacker.unit_name, attacker.second_resource, ab.damage, raw])
+			var resist := float(strike_target.resists.get(ab.dmg_type, 0.0))
+			if resist != 0.0:
+				raw *= 1.0 - resist
 			var effective_armor := strike_target.effective_armor() * (1.0 - ab.armor_pierce)
 			if is_perfect and ab.display_name == "Arcane Rift":
 				effective_armor = 0.0
@@ -965,9 +980,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			else:
 				_sfx("hit")
 				strike_target.float_text("%d" % final, Color(0.95, 0.85, 0.75))
-			_log("%s: %s on %s — %d dmg%s, +%d Pressure%s" % [attacker.unit_name,
-				ab.display_name, strike_target.unit_name, final, " CRIT" if is_crit else "",
-				pr, grade_tag], "#d8d2c4" if attacker.is_hero else "#e0a0a0")
+			var resist_tag := ""
+			if resist > 0.0:
+				resist_tag = " (resisted)"
+			elif resist < 0.0:
+				resist_tag = " (vulnerable!)"
+			_log("%s: %s on %s — %d %s dmg%s%s, +%d Pressure%s" % [attacker.unit_name,
+				ab.display_name, strike_target.unit_name, final, ab.dmg_type,
+				" CRIT" if is_crit else "", resist_tag, pr, grade_tag],
+				"#d8d2c4" if attacker.is_hero else "#e0a0a0")
 			# Arcanist Echo: the spell strikes again at half power.
 			if attacker.passive_id == "echo" and not result.died and randf() < 0.15:
 				var echo_dmg := maxi(int(final * 0.5), 1)
@@ -1424,12 +1445,15 @@ func _reward_loot() -> void:
 
 
 func _to_map() -> void:
-	get_tree().change_scene_to_file("res://scenes/map.tscn")
+	if Run.active and not Run.specs_chosen:
+		get_tree().change_scene_to_file("res://scenes/spec_choice.tscn")
+	else:
+		get_tree().change_scene_to_file("res://scenes/map.tscn")
 
 
 func _start_new_run() -> void:
-	Run.new_run()
-	_to_map()
+	Run.active = false
+	get_tree().change_scene_to_file("res://scenes/draft.tscn")
 
 
 func _print_sim_report() -> void:

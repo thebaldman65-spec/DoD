@@ -25,6 +25,8 @@ var second_resource := 0
 var second_max := 100
 var passive_id := ""       # specialization passive hook (see battle.gd)
 var crit_bonus := 0.0      # from talents
+var parry_bonus := 0.0     # from talents
+var resists := {}          # dmg_type -> fraction reduced (negative = vulnerable)
 var abilities: Array = []
 
 var broken := false         # Broken: defenses down, crit vulnerable

@@ -22,6 +22,7 @@ var faith_cost := 0      # secondary-resource cost (Cleric Miracles)
 var heal_missing := 0.0  # attacker self-heals this fraction of their missing HP on hit
 var armor_pierce := 0.0  # ignores this fraction of the target's armor
 var lifesteal := 0.0     # attacker heals this fraction of damage dealt
+var dmg_type := "physical"  # arcane/nature/shadow/holy/physical/fire/frost
 var applies_status := {} # status applied on hit, e.g. {"id": "slow", "turns": 2}
 var status_chance := 1.0 # probability the status lands (1.0 = always)
 var perfect_id := ""     # unique bonus effect on a Perfect skill check
