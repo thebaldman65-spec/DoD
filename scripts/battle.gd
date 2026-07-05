@@ -26,6 +26,9 @@ const STATUS_INFO := {
 	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% attack."],
 	"guard": ["Guard", "G", Color(0.55, 0.65, 0.85), "-40% damage and -50% Pressure taken\nuntil this unit's next turn."],
 	"mocked": ["Mocked", "M!", Color(0.95, 0.5, 0.3), "Must attack the Warrior who mocked them."],
+	"poison": ["Poison", "P", Color(0.45, 0.8, 0.3), "Takes 6 damage at the start of each turn."],
+	"marked": ["Marked", "Mk", Color(0.95, 0.8, 0.35), "+15% crit chance against this unit."],
+	"camo": ["Camouflage", "Cm", Color(0.55, 0.7, 0.55), "Harder to hit; their next attack\ndeals +20% damage."],
 	"shieldwall": ["Shieldwall", "SW", Color(0.6, 0.7, 0.9), "Takes 50% less damage."],
 	"empower": ["Empower", "+A", Color(0.95, 0.45, 0.35), "+25% damage dealt."],
 	"exposed": ["Exposed", "E", Color(0.95, 0.9, 0.4), "Takes 15% more damage."],
@@ -51,7 +54,7 @@ const SFX := {
 }
 
 # Damage-over-time statuses ticked at the start of the afflicted unit's turn.
-const DOT_STATUSES := {"burn": 6}
+const DOT_STATUSES := {"burn": 6, "poison": 6}
 
 var heroes: Array = []
 var enemies: Array = []
@@ -148,12 +151,13 @@ func _build_arena() -> void:
 	cam.make_current()
 
 
-const HERO_SLOTS := [Vector2(380, 400), Vector2(230, 510), Vector2(340, 630)]
-const HERO_TINTS := [Color.WHITE, Color(0.65, 0.75, 1.0), Color(1.0, 0.9, 0.6)]
+const HERO_SLOTS := [Vector2(430, 380), Vector2(240, 470), Vector2(430, 560), Vector2(240, 650)]
+const HERO_TINTS := [Color.WHITE, Color(0.65, 0.75, 1.0), Color(1.0, 0.9, 0.6), Color(0.7, 1.0, 0.75)]
 const ENEMY_LAYOUTS := {
 	1: [Vector2(1000, 500)],
 	2: [Vector2(920, 420), Vector2(1000, 600)],
 	3: [Vector2(900, 400), Vector2(1050, 510), Vector2(940, 630)],
+	4: [Vector2(880, 380), Vector2(1060, 470), Vector2(880, 560), Vector2(1060, 650)],
 }
 
 
@@ -181,6 +185,11 @@ func _enemy_config(kind: String) -> Dictionary:
 				"resource_name": "Rage", "resource": 20, "max_resource": 100,
 				"abilities": _orc_chief_kit(), "sprite_scale": 3.6,
 				"tint": bd["tint"], "resists": bd["resists"]}
+		"archer":
+			return {"unit_name": "Orc Archer", "is_hero": false, "sheet_dir": orc,
+				"max_hp": 90, "armor": 0.10, "speed": 100.0, "stability": 42,
+				"abilities": _orc_archer_kit(), "tint": Color(1.0, 0.35, 0.35),
+				"resists": {"physical": 0.05}}
 		_:
 			return {"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
 				"max_hp": 115, "armor": 0.15, "speed": 90.0, "stability": 50,
@@ -189,12 +198,12 @@ func _enemy_config(kind: String) -> Dictionary:
 
 
 func _spawn_units() -> void:
-	var hero_keys := ["warrior", "mage", "cleric"]
+	var hero_keys := ["warrior", "mage", "cleric", "hunter"]
 	if Run.active:
 		hero_keys = []
 		for member in Run.party:
 			hero_keys.append(member["key"])
-	var sim_specs := ["swordmaster", "pyromancer", "holy"]
+	var sim_specs := ["swordmaster", "pyromancer", "holy", "sharpshooter"]
 	var name_counts := {}
 	for i in hero_keys.size():
 		var cfg := Classes.hero_config(hero_keys[i])
@@ -206,9 +215,7 @@ func _spawn_units() -> void:
 		if spec != "":
 			cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
 			cfg["passive_id"] = Classes.SPEC_INFO[spec]["passive"]
-			if cfg["passive_id"] == "bulwark":
-				cfg["armor"] += 0.10
-				cfg["stability"] += 15
+			Classes.apply_passive(cfg, spec)
 			if Run.active and i < Run.party.size():
 				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
 					Run.party[i].get("talents", {}))
@@ -241,7 +248,7 @@ func _spawn_units() -> void:
 			u.refresh_bars()
 		heroes.append(u)
 
-	var composition: Array = ["raider", "chief", "raider"]
+	var composition: Array = ["raider", "chief", "archer", "archer"]
 	if Run.active and Run.encounter.has("enemies"):
 		composition = Run.encounter["enemies"]
 	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 3)]
@@ -275,22 +282,32 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color) -> BattleUnit:
 
 func _orc_raider_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Slash", "damage": 30, "pressure": 13,
+		Ability.make({"display_name": "Slash", "damage": 34, "pressure": 13,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Sundering Strike", "damage": 20, "pressure": 11,
+		Ability.make({"display_name": "Sundering Strike", "damage": 23, "pressure": 11,
 			"delay": 2.5, "anim": "attack02",
 			"applies_status": {"id": "sunder", "turns": 2}, "status_chance": 0.6}),
+	]
+
+
+func _orc_archer_kit() -> Array:
+	return [
+		Ability.make({"display_name": "Arrow Shot", "damage": 21, "pressure": 8,
+			"delay": 2.0, "anim": "attack01"}),
+		Ability.make({"display_name": "Poison Arrow", "damage": 16, "pressure": 7,
+			"delay": 2.5, "anim": "attack02",
+			"applies_status": {"id": "poison", "turns": 3}, "status_chance": 0.7}),
 	]
 
 
 # The Chief fights like a weaker Warrior: builds Rage, spends it on heavy hits.
 func _orc_chief_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Strike", "damage": 25, "pressure": 13,
+		Ability.make({"display_name": "Strike", "damage": 28, "pressure": 13,
 			"resource_gain": 15, "delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 48,
+		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 54,
 			"pressure": 20, "delay": 4.0, "anim": "attack02"}),
-		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 30,
+		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 34,
 			"pressure": 28, "delay": 4.0, "anim": "attack02"}),
 	]
 
@@ -526,7 +543,7 @@ func _player_turn(u: BattleUnit) -> void:
 	var grade := "good"
 	while true:
 		var used_targeting := false
-		if ab.special in ["rally", "focus", "surge", "guard", "shieldwall",
+		if ab.special in ["rally", "focus", "surge", "guard", "shieldwall", "camo",
 				"phoenix", "hymn", "benediction", "retaliate"]:
 			target = u  # self/party effects need no target choice
 		elif ab.aoe or ab.random_hits > 0:
@@ -592,6 +609,11 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if flame != null and u.resource >= flame.cost and foes.size() >= 2:
 				return [flame, target_foe]
 			return [u.abilities[0], target_foe]          # Magic Bolt
+		"Hunter":
+			var aimed := _find_ability(u, "Aimed Shot")
+			if aimed != null and u.resource >= aimed.cost:
+				return [aimed, target_foe]
+			return [u.abilities[0], target_foe]          # Quick Shot
 		"Cleric":
 			var hymn := _find_ability(u, "Hymn of Hope")
 			if hymn != null and u.second_resource >= hymn.faith_cost \
@@ -891,7 +913,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			target.unit_name, amount, grade_tag], "#70d878")
 		if is_perfect and ab.perfect_id == "ward":
 			_apply_status(target, "ward", 3)
-	elif not is_counter and not ab.aoe and randf() < MISS_CHANCE:
+	elif not is_counter and not ab.aoe and randf() < MISS_CHANCE + (0.15 if target.has_status("camo") else 0.0):
 		_stat("attacks")
 		_stat("attack_miss")
 		_sfx("miss")
@@ -940,19 +962,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Resonant Mind: +3% crit per Resonance stack.
 			if attacker.second_resource_name == "Resonance":
 				crit_chance += 0.03 * attacker.second_resource
-			if attacker.passive_id == "duelist":
-				crit_chance += 0.10
 			crit_chance += attacker.crit_bonus
+			if strike_target.has_status("marked"):
+				crit_chance += 0.15
 			if is_perfect and ab.display_name == "Overpower":
 				crit_chance += 0.15
 			var is_crit := randf() < crit_chance
 			# Razor Ice always crits against Slowed (chilled) targets.
 			if ab.display_name == "Razor Ice" and strike_target.has_status("slow"):
 				is_crit = true
+			if ab.display_name == "Aimed Shot" and strike_target.has_status("marked"):
+				is_crit = true
 			any_crit = any_crit or is_crit
 			var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
 			if is_crit:
-				raw *= 1.5
+				raw *= 1.75 if attacker.passive_id == "lethal_aim" else 1.5
+			if attacker.has_status("camo"):
+				raw *= 1.2
+				attacker.remove_status("camo")
 			# Attacker-side modifiers.
 			if attacker.second_resource_name == "Resonance":
 				raw *= 1.0 + 0.15 * attacker.second_resource
@@ -1024,6 +1051,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				ab.display_name, strike_target.unit_name, final, ab.dmg_type,
 				" CRIT" if is_crit else "", resist_tag, pr, grade_tag],
 				"#d8d2c4" if attacker.is_hero else "#e0a0a0")
+			if attacker.passive_id == "pack" and is_crit and not strike_target.dead:
+				var pack_dmg := maxi(int(final * 0.3), 1)
+				strike_target.take_hit(pack_dmg, 0)
+				strike_target.float_text("%d Pack" % pack_dmg, Color(0.8, 0.6, 0.3))
+				_log("   → the pack strikes for %d" % pack_dmg, "#b0a8e0")
 			# Arcanist Echo: the spell strikes again at half power.
 			if attacker.passive_id == "echo" and not result.died and randf() < 0.15:
 				var echo_dmg := maxi(int(final * 0.5), 1)
@@ -1230,6 +1262,19 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					h.refresh_bars()
 			_message("%s raises the shieldwall!" % attacker.unit_name)
 			_log("%s: Shieldwall — party takes half damage" % attacker.unit_name, "#70d878")
+		"mark":
+			_sfx("click", -6.0, 1.2)
+			_apply_status(target, "marked", 5 if is_perfect else 3)
+			_message("%s marks %s!" % [attacker.unit_name, target.unit_name])
+			_log("%s: Hunter's Mark on %s" % [attacker.unit_name, target.unit_name], "#70d878")
+		"camo":
+			_sfx("miss", -8.0)
+			_apply_status(attacker, "camo", 2)
+			if is_perfect:
+				attacker.pressure = maxi(attacker.pressure - 10, 0)
+				attacker.refresh_bars()
+			_message("%s melts into cover" % attacker.unit_name)
+			_log("%s: Camouflage" % attacker.unit_name, "#70d878")
 		"retaliate":
 			_sfx("parry", -7.0, 0.8)
 			_apply_status(attacker, "retaliate", 4 if is_perfect else 3)
@@ -1324,6 +1369,11 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 			attacker.refresh_bars()
 			attacker.float_text("+10 Rage", Color(1.0, 0.5, 0.4))
 			_log("   → %s gains +10 Rage" % attacker.unit_name, "#b0a8e0")
+		"focus":
+			attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
+			attacker.refresh_bars()
+			attacker.float_text("+10 Focus", Color(0.6, 0.9, 0.5))
+			_log("   → %s gains +10 Focus" % attacker.unit_name, "#b0a8e0")
 		"mana":
 			attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
 			attacker.refresh_bars()

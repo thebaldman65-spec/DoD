@@ -35,6 +35,7 @@ const HERO_BASE := {
 	"warrior": {"hp": 140, "mana": 0},
 	"mage": {"hp": 90, "mana": 100},
 	"cleric": {"hp": 110, "mana": 100},
+	"hunter": {"hp": 100, "mana": 0},
 }
 
 
@@ -142,11 +143,18 @@ func advance(f: int, i: int) -> void:
 func compose(node_type: String) -> Array:
 	match node_type:
 		"elite":
-			return ["chief", "raider"]
+			return ["chief", "archer", "raider"] if zone_idx == 0 \
+				else ["chief", "raider", "archer", "archer"]
 		"boss":
-			return ["boss", "raider", "raider"]
+			return ["boss", "raider", "archer"] if zone_idx == 0 \
+				else ["boss", "raider", "archer", "archer"]
 		_:
-			return ["raider", "raider"] if randf() < 0.5 else ["raider", "raider", "raider"]
+			var pools := [["raider", "raider", "archer"], ["raider", "archer", "archer"],
+				["raider", "raider", "raider"], ["archer", "archer", "raider"]]
+			if zone_idx >= 1:
+				pools.append(["raider", "raider", "archer", "archer"])
+				pools.append(["raider", "raider", "raider", "archer"])
+			return pools.pick_random()
 
 
 func heal_party(pct: float) -> void:
@@ -158,7 +166,7 @@ func heal_party(pct: float) -> void:
 # Resting restores spirit as well as flesh (Mage/Cleric mana pools).
 func restore_mana(pct: float) -> void:
 	for member in party:
-		if member["key"] != "warrior":
+		if member["key"] == "mage" or member["key"] == "cleric":
 			member["mana"] = mini(member["mana"] + int(member["max_mana"] * pct), member["max_mana"])
 
 

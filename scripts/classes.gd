@@ -6,6 +6,11 @@ class_name Classes
 static func hero_config(key: String) -> Dictionary:
 	var soldier := "res://assets/sprites/soldier"
 	match key:
+		"hunter":
+			return {"unit_name": "Hunter", "is_hero": true, "sheet_dir": soldier,
+				"max_hp": 100, "armor": 0.12, "speed": 105.0, "stability": 45,
+				"resource_name": "Focus", "resource": 0, "max_resource": 100,
+				"abilities": kit(key)}
 		"warrior":
 			return {"unit_name": "Warrior", "is_hero": true, "sheet_dir": soldier,
 				"max_hp": 140, "armor": 0.25, "speed": 95.0, "stability": 60,
@@ -31,8 +36,32 @@ static func kit(key: String) -> Array:
 			return warrior_kit()
 		"mage":
 			return mage_kit()
+		"hunter":
+			return hunter_kit()
 		_:
 			return cleric_kit()
+
+
+static func hunter_kit() -> Array:
+	return [
+		Ability.make({"display_name": "Quick Shot", "cost": 0, "damage": 20, "pressure": 7,
+			"resource_gain": 15, "delay": 2.0, "anim": "attack01",
+			"perfect_id": "focus", "perfect_text": "+10 bonus Focus",
+			"description": "Basic ranged shot. Builds 15 Focus."}),
+		Ability.make({"display_name": "Pinning Arrow", "cost": 20, "damage": 22, "pressure": 8,
+			"delay": 3.0, "anim": "attack02",
+			"applies_status": {"id": "slow", "turns": 2},
+			"perfect_id": "slow_plus", "perfect_text": "Slow lasts 4 turns",
+			"description": "Pin the target: damage and Slow (2 turns)."}),
+		Ability.make({"display_name": "Hunter's Mark", "cost": 15, "special": "mark",
+			"delay": 2.0, "anim": "attack01",
+			"perfect_id": "", "perfect_text": "Mark lasts 5 turns",
+			"description": "Mark a target: everyone gains +15% crit\nchance against it for 3 turns."}),
+		Ability.make({"display_name": "Camouflage", "cost": 10, "special": "camo",
+			"delay": 2.0, "anim": "attack01",
+			"perfect_id": "", "perfect_text": "Also sheds 10 Pressure",
+			"description": "Fade into cover: harder to hit and your\nnext attack deals +20% damage."}),
+	]
 
 
 static func warrior_kit() -> Array:
@@ -89,7 +118,19 @@ const SPEC_IDS := {
 	"warrior": ["berserker", "warden", "swordmaster"],
 	"mage": ["pyromancer", "cryomancer", "arcanist"],
 	"cleric": ["holy", "inquisitor", "occultist"],
+	"hunter": ["beastmaster", "sharpshooter", "mystic"],
 }
+
+
+# Spec passives that are plain stat changes live here so both the battle
+# spawner and the character sheet apply them identically.
+static func apply_passive(cfg: Dictionary, spec: String) -> void:
+	match SPEC_INFO[spec]["passive"]:
+		"bulwark":
+			cfg["armor"] += 0.10
+			cfg["stability"] += 15
+		"duelist":
+			cfg["crit_bonus"] = cfg.get("crit_bonus", 0.0) + 0.10
 
 const SPEC_INFO := {
 	"berserker": {"name": "Berserker", "passive": "bloodrage",
@@ -119,6 +160,15 @@ const SPEC_INFO := {
 	"occultist": {"name": "Occultist", "passive": "corrupt",
 		"passive_desc": "Corrupted Channeling: hits have 25% chance to Cripple (2 turns).",
 		"blurb": "Forbidden rites — leech life and trade blood for power."},
+	"beastmaster": {"name": "Beastmaster", "passive": "pack",
+		"passive_desc": "Pack Bond: your crits trigger a bonus strike for 30% damage.",
+		"blurb": "The wilds hunt beside them — every kill is shared."},
+	"sharpshooter": {"name": "Sharpshooter", "passive": "lethal_aim",
+		"passive_desc": "Lethal Aim: critical hits deal x1.75 damage instead of x1.5.",
+		"blurb": "Every arrow an execution — patient, precise, final."},
+	"mystic": {"name": "Mystic Ranger", "passive": "wild",
+		"passive_desc": "Wrath of the Wild: hits have 30% chance to Slow (2 turns).",
+		"blurb": "Nature's fury strung on a bow — thorns, roots, and spirits."},
 }
 
 
@@ -229,9 +279,46 @@ static func spec_abilities(spec: String) -> Array:
 					"perfect_id": "", "perfect_text": "No HP sacrifice",
 					"description": "MIRACLE: sacrifice 10% max HP to heal\nall allies 15% and Empower them (2 turns)."}),
 			]
+		"beastmaster":
+			return [
+				Ability.make({"display_name": "Twin Fang", "cost": 25, "damage": 14,
+					"pressure": 6, "delay": 3.0, "anim": "attack02", "random_hits": 2,
+					"perfect_id": "", "perfect_text": "3 strikes instead of 2",
+					"description": "The pack strikes twice at random foes."}),
+				Ability.make({"display_name": "Bear Maul", "cost": 30, "damage": 28,
+					"pressure": 14, "delay": 3.5, "anim": "attack03", "delay_push": 2.0,
+					"perfect_id": "pressure", "perfect_text": "+60% Pressure",
+					"description": "A crushing maul that staggers the\ntarget's next turn."}),
+			]
+		"sharpshooter":
+			return [
+				Ability.make({"display_name": "Aimed Shot", "cost": 25, "damage": 34,
+					"pressure": 8, "delay": 3.5, "anim": "attack02",
+					"perfect_id": "", "perfect_text": "+15% crit on this shot",
+					"description": "A perfect line. Always crits against\nMarked targets."}),
+				Ability.make({"display_name": "Piercing Arrow", "cost": 20, "damage": 24,
+					"pressure": 8, "delay": 3.0, "anim": "attack03", "armor_pierce": 0.5,
+					"applies_status": {"id": "cripple", "turns": 2},
+					"perfect_id": "", "perfect_text": "Ignores ALL armor",
+					"description": "Punches through plate and Cripples\nthe target."}),
+			]
+		"mystic":
+			return [
+				Ability.make({"display_name": "Thorn Volley", "cost": 20, "damage": 14,
+					"pressure": 6, "delay": 3.5, "anim": "attack02", "aoe": true,
+					"dmg_type": "nature",
+					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
+					"description": "Thorns rain on ALL enemies (nature)."}),
+				Ability.make({"display_name": "Sylvan Binding", "cost": 25, "damage": 16,
+					"pressure": 8, "delay": 3.0, "anim": "attack03", "dmg_type": "nature",
+					"delay_push": 4.0, "applies_status": {"id": "slow", "turns": 3},
+					"perfect_id": "", "perfect_text": "Also +50% Pressure",
+					"description": "Roots drag the target down the\ninitiative order (nature)."}),
+			]
 	return []
 
 const CLASS_BLURBS := {
+	"hunter": "Ranged damage. Focus builds with every shot, spent on\nprecision payoffs and primal magic.",
 	"warrior": "Flexible frontliner. Rage builds through attack and pain.",
 	"mage": "Glass cannon. Resonance stacks power at the cost of safety —\nonly Guard releases them.",
 	"cleric": "Divine vessel. Faith builds with every act, awaiting Miracles.",

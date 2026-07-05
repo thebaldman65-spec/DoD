@@ -74,8 +74,8 @@ func _draw_list() -> void:
 			line += "    ● %d POINTS TO SPEND" % pts
 			btn.modulate = Color(1.0, 0.92, 0.55)
 		btn.text = line
-		btn.custom_minimum_size = Vector2(460, 96)
-		btn.position = Vector2(410, 140 + i * 130)
+		btn.custom_minimum_size = Vector2(460, 88)
+		btn.position = Vector2(410, 120 + i * 112)
 		btn.add_theme_font_size_override("font_size", 18)
 		btn.tooltip_text = Classes.CLASS_BLURBS[key]
 		btn.pressed.connect(_select_hero.bind(i))
@@ -94,6 +94,7 @@ func _draw_detail() -> void:
 	var spec: String = member.get("spec", "")
 	if spec != "":
 		cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
+		Classes.apply_passive(cfg, spec)
 		Talents.apply_from_tree(cfg, member.get("tree", []), member.get("talents", {}))
 	for rune in member.get("runes", []):
 		if rune.get("equipped", false):

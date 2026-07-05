@@ -2,9 +2,9 @@
 extends Node2D
 
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
-const ROSTER := ["warrior", "mage", "cleric"]
+const ROSTER := ["warrior", "mage", "cleric", "hunter"]
 
-var picks: Array = ["", "", ""]
+var picks: Array = ["", "", "", ""]
 
 
 func _ready() -> void:
@@ -31,7 +31,7 @@ func _draw_screen() -> void:
 	add_child(title)
 
 	var subtitle := Label.new()
-	subtitle.text = "Choose three heroes for this cycle (duplicates allowed)"
+	subtitle.text = "Choose four heroes for this cycle (duplicates allowed)"
 	subtitle.add_theme_font_size_override("font_size", 15)
 	subtitle.add_theme_color_override("font_color", Color(0.6, 0.55, 0.5))
 	subtitle.position = Vector2(0, 80)
@@ -39,20 +39,20 @@ func _draw_screen() -> void:
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(subtitle)
 
-	for slot in 3:
+	for slot in 4:
 		var slot_label := Label.new()
 		slot_label.text = "Slot %d" % (slot + 1)
 		slot_label.add_theme_font_size_override("font_size", 18)
 		slot_label.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
-		slot_label.position = Vector2(180, 150 + slot * 150)
+		slot_label.position = Vector2(130, 148 + slot * 120)
 		add_child(slot_label)
 		for c in ROSTER.size():
 			var key: String = ROSTER[c]
 			var btn := Button.new()
 			btn.text = key.capitalize()
-			btn.custom_minimum_size = Vector2(220, 90)
-			btn.position = Vector2(300 + c * 250, 130 + slot * 150)
-			btn.add_theme_font_size_override("font_size", 20)
+			btn.custom_minimum_size = Vector2(190, 78)
+			btn.position = Vector2(250 + c * 210, 122 + slot * 120)
+			btn.add_theme_font_size_override("font_size", 18)
 			btn.tooltip_text = Classes.CLASS_BLURBS[key]
 			if picks[slot] == key:
 				btn.modulate = Color(0.6, 1.0, 0.65)

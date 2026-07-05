@@ -53,6 +53,7 @@ var _idle_texture: Texture2D
 var _target_btn: Button
 var _target_marker: Label
 var _base_tint := Color.WHITE
+var _base_scale := 2.6
 
 
 func setup(config: Dictionary) -> void:
@@ -97,6 +98,7 @@ func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
 	frames.remove_animation("default")
 	sprite = AnimatedSprite2D.new()
 	sprite.sprite_frames = frames
+	_base_scale = sprite_scale
 	sprite.scale = Vector2(sprite_scale, sprite_scale)
 	sprite.flip_h = not is_hero
 	add_child(sprite)
@@ -203,9 +205,12 @@ func set_tint(tint: Color) -> void:
 	sprite.self_modulate = tint
 
 
-# Battlefield highlight driven by hovering the initiative bar.
+# Battlefield highlight driven by hovering the initiative bar. A tint
+# change is invisible on white units, so pop the scale and show the marker.
 func set_highlight(on: bool) -> void:
-	sprite.self_modulate = _base_tint.lightened(0.6) if on else _base_tint
+	var factor := 1.18 if on else 1.0
+	sprite.scale = Vector2(_base_scale * factor, _base_scale * factor)
+	_target_marker.visible = on or _target_btn.visible
 
 
 func set_targetable(on: bool) -> void:
