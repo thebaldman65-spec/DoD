@@ -635,6 +635,15 @@ func _find_ability(u: BattleUnit, ability_name: String) -> Ability:
 # Items are shared by the party and never consume the turn: the action
 # panel comes right back after the effect resolves. Limit: one item per
 # character per turn.
+# Cancelled a targeted item: give it back and reopen the action bar.
+func _refund_item(item_id: String) -> void:
+	items[item_id][1] += 1
+	item_used = false
+	if current_hero != null and not current_hero.dead:
+		_message("%s's turn — choose an ability" % current_hero.unit_name)
+		_show_actions(current_hero)
+
+
 func _use_item(item_id: String) -> void:
 	if items[item_id][1] <= 0 or item_used:
 		return
@@ -662,6 +671,9 @@ func _use_item(item_id: String) -> void:
 			if living.size() > 1:
 				_message("Choose an ally to heal")
 				heal_target = await _pick_target(living)
+			if heal_target == null:
+				_refund_item(item_id)
+				return
 			heal_target.heal_amount(40)
 			_sfx("heal", -6.0)
 			heal_target.float_text("+40", Color(0.4, 0.9, 0.45))
@@ -674,6 +686,9 @@ func _use_item(item_id: String) -> void:
 			if drinkers.size() > 1:
 				_message("Choose an ally")
 				mana_target = await _pick_target(drinkers)
+			if mana_target == null:
+				_refund_item(item_id)
+				return
 			mana_target.resource = mini(mana_target.resource + 40, mana_target.max_resource)
 			mana_target.refresh_bars()
 			_sfx("heal", -8.0, 1.2)
@@ -694,6 +709,9 @@ func _use_item(item_id: String) -> void:
 			else:
 				_message("Choose an ally to revive")
 				target = await _pick_target(fallen)
+			if target == null:
+				_refund_item(item_id)
+				return
 			target.revive(0.5)
 			_sfx("heal", -5.0, 0.8)
 			target.float_text("REVIVED", Color(0.5, 1.0, 0.6))
