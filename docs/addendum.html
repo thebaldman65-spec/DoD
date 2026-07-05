@@ -142,6 +142,17 @@
 <li><b>Burn ticks can now crit</b> (10% chance, x1.5, shown with an !).</li>
 <li><b>Fixes:</b> spec passive stat bonuses (Bulwark, Duelist) now show on the character sheet via a shared passive applicator; initiative-bar hover highlight was invisible on white-tinted units — now a scale pop + gold marker over the hovered unit.</li>
 </ul>
+<h3>2026-07-05 (third pass) — Focus economy, bigger fights, UI declutter</h3>
+<ul>
+<li><b>Focus reworked:</b> Hunters start every battle at 100 Focus; abilities spend it and +20 returns at the start of each of their turns. Focus classes come online immediately but have a fixed ceiling — distinct from Rage (build by fighting), Mana (carried pool), Faith (build by acting), Resonance (stacking risk). Quick Shot no longer generates Focus.</li>
+<li><b>Enemy packs up to 5</b> (new battle layout): standard fights 3-4 enemies, Scarlands fights up to 5; elites/bosses field 5 in zone 2.</li>
+<li>Pinning Arrow removed (Hunter core: Quick Shot, Hunter's Mark, Camouflage). Piercing Arrow deals +50% damage to Broken enemies.</li>
+<li>Divine Shield moved from the Cleric core to the Inquisitor spec (core: Smite, Mend Wounds, Renewal). Hymn of Hope costs 40 Faith (Resonant Hymn talent lowers it to 30).</li>
+<li>Initiative-bar hover now grows the unit 30% and draws a white shader outline.</li>
+<li>HP/resource bars shrunk (72px wide, tighter stack) and pulled closer to the sprite — the bottom hero's info no longer clips off-screen.</li>
+<li>Removed turn/targeting announcer text ("X's turn", "Choose a target"); the message bar now only speaks for events (Breaks, deaths, miracles).</li>
+<li>Sim baseline: 90% wins, 1.3 hero deaths/battle vs the new 4-enemy default.</li>
+</ul>
 <h2>Progress Snapshot</h2>
 <p>Phase 1 (combat core) complete and simulator-tuned. Phase 2 (run structure) playable: map, battles, rewards, carryover, party/inventory screens. Next: class specializations, then drafting, talents, and zone variety. Automated testing: DOD_AUTOPLAY (single bot battle) and DOD_SIM=N (batch balance reports).</p>
 </body></html>

@@ -9,7 +9,7 @@ static func hero_config(key: String) -> Dictionary:
 		"hunter":
 			return {"unit_name": "Hunter", "is_hero": true, "sheet_dir": soldier,
 				"max_hp": 100, "armor": 0.12, "speed": 105.0, "stability": 45,
-				"resource_name": "Focus", "resource": 0, "max_resource": 100,
+				"resource_name": "Focus", "resource": 100, "max_resource": 100,
 				"abilities": kit(key)}
 		"warrior":
 			return {"unit_name": "Warrior", "is_hero": true, "sheet_dir": soldier,
@@ -45,14 +45,9 @@ static func kit(key: String) -> Array:
 static func hunter_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Quick Shot", "cost": 0, "damage": 20, "pressure": 7,
-			"resource_gain": 15, "delay": 2.0, "anim": "attack01",
+			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "focus", "perfect_text": "+10 bonus Focus",
-			"description": "Basic ranged shot. Builds 15 Focus."}),
-		Ability.make({"display_name": "Pinning Arrow", "cost": 20, "damage": 22, "pressure": 8,
-			"delay": 3.0, "anim": "attack02",
-			"applies_status": {"id": "slow", "turns": 2},
-			"perfect_id": "slow_plus", "perfect_text": "Slow lasts 4 turns",
-			"description": "Pin the target: damage and Slow (2 turns)."}),
+			"description": "Basic ranged shot."}),
 		Ability.make({"display_name": "Hunter's Mark", "cost": 15, "special": "mark",
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "", "perfect_text": "Mark lasts 5 turns",
@@ -100,10 +95,6 @@ static func cleric_kit() -> Array:
 			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 			"perfect_id": "ward", "perfect_text": "Grants Ward (-50% Pressure taken, 2 turns)",
 			"description": "Restore HP to one ally. Builds Faith."}),
-		Ability.make({"display_name": "Divine Shield", "cost": 30, "special": "divine_shield",
-			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack03",
-			"perfect_id": "", "perfect_text": "Shield absorbs 130 instead",
-			"description": "Grant an ally a holy shield that\nabsorbs 100 damage, then breaks."}),
 		Ability.make({"display_name": "Renewal", "cost": 20, "special": "renewal",
 			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 			"perfect_id": "", "perfect_text": "Also heals 8 HP instantly",
@@ -250,13 +241,17 @@ static func spec_abilities(spec: String) -> Array:
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "+15 bonus healing",
 					"description": "Heal an ally for 40. Overhealing\nflows back to the Cleric."}),
-				Ability.make({"display_name": "Hymn of Hope", "cost": 0, "faith_cost": 60,
+				Ability.make({"display_name": "Hymn of Hope", "cost": 0, "faith_cost": 40,
 					"special": "hymn", "delay": 4.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Heals 25% instead",
 					"description": "MIRACLE: heal ALL allies for 20%\nof their max HP."}),
 			]
 		"inquisitor":
 			return [
+				Ability.make({"display_name": "Divine Shield", "cost": 30, "special": "divine_shield",
+					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack03",
+					"perfect_id": "", "perfect_text": "Shield absorbs 130 instead",
+					"description": "Grant an ally a holy shield that\nabsorbs 100 damage, then breaks."}),
 				Ability.make({"display_name": "Burning Verdict", "dmg_type": "holy", "cost": 0, "faith_cost": 40,
 					"damage": 40, "pressure": 10, "delay": 3.5, "anim": "attack02",
 					"applies_status": {"id": "exposed", "turns": 3},
@@ -300,7 +295,7 @@ static func spec_abilities(spec: String) -> Array:
 					"pressure": 8, "delay": 3.0, "anim": "attack03", "armor_pierce": 0.5,
 					"applies_status": {"id": "cripple", "turns": 2},
 					"perfect_id": "", "perfect_text": "Ignores ALL armor",
-					"description": "Punches through plate and Cripples\nthe target."}),
+					"description": "Punches through plate and Cripples the\ntarget. +50% damage vs Broken enemies."}),
 			]
 		"mystic":
 			return [

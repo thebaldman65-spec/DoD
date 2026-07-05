@@ -144,16 +144,16 @@ func compose(node_type: String) -> Array:
 	match node_type:
 		"elite":
 			return ["chief", "archer", "raider"] if zone_idx == 0 \
-				else ["chief", "raider", "archer", "archer"]
+				else ["chief", "raider", "raider", "archer", "archer"]
 		"boss":
 			return ["boss", "raider", "archer"] if zone_idx == 0 \
-				else ["boss", "raider", "archer", "archer"]
+				else ["boss", "raider", "raider", "archer", "archer"]
 		_:
 			var pools := [["raider", "raider", "archer"], ["raider", "archer", "archer"],
-				["raider", "raider", "raider"], ["archer", "archer", "raider"]]
+				["raider", "raider", "archer", "archer"], ["raider", "raider", "raider", "archer"]]
 			if zone_idx >= 1:
-				pools.append(["raider", "raider", "archer", "archer"])
-				pools.append(["raider", "raider", "raider", "archer"])
+				pools.append(["raider", "raider", "raider", "archer", "archer"])
+				pools.append(["raider", "raider", "archer", "archer", "archer"])
 			return pools.pick_random()
 
 

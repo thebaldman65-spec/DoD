@@ -7,6 +7,7 @@ signal clicked
 
 const FRAME_SIZE := 100
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
+const OUTLINE_SHADER := preload("res://shaders/outline.gdshader")
 
 var unit_name := ""
 var is_hero := true
@@ -98,6 +99,9 @@ func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
 	frames.remove_animation("default")
 	sprite = AnimatedSprite2D.new()
 	sprite.sprite_frames = frames
+	var outline_mat := ShaderMaterial.new()
+	outline_mat.shader = OUTLINE_SHADER
+	sprite.material = outline_mat
 	_base_scale = sprite_scale
 	sprite.scale = Vector2(sprite_scale, sprite_scale)
 	sprite.flip_h = not is_hero
@@ -107,37 +111,34 @@ func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
 
 
 func _build_bars() -> void:
-	var bar_y := 50.0
-	# HP bar with numeric readout. Bars are tall enough that the text
-	# (including its outline) fits fully inside.
-	add_child(_make_bar_bg(Vector2(-46, bar_y), Vector2(92, 17)))
-	_hp_fill = _make_fill(Vector2(-45, bar_y + 1), Vector2(90, 15), Color(0.30, 0.78, 0.32))
+	var bar_y := 40.0
+	# Compact bars hugging the sprite so tall parties fit on screen.
+	add_child(_make_bar_bg(Vector2(-36, bar_y), Vector2(72, 13)))
+	_hp_fill = _make_fill(Vector2(-35, bar_y + 1), Vector2(70, 11), Color(0.30, 0.78, 0.32))
 	add_child(_hp_fill)
-	_hp_text = _make_bar_text(Vector2(-46, bar_y), Vector2(92, 17), 10)
+	_hp_text = _make_bar_text(Vector2(-36, bar_y), Vector2(72, 13), 9)
 	add_child(_hp_text)
-	var next_y := bar_y + 19.0
-	# Class resource bar (Rage/Mana) with numeric readout, if the unit has one.
+	var next_y := bar_y + 15.0
 	if resource_name != "":
-		add_child(_make_bar_bg(Vector2(-46, next_y), Vector2(92, 15)))
-		var res_color := Color(0.85, 0.30, 0.25) if resource_name == "Rage" else Color(0.30, 0.50, 0.90)
-		_res_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 13), res_color)
+		add_child(_make_bar_bg(Vector2(-36, next_y), Vector2(72, 12)))
+		var res_color := Color(0.85, 0.30, 0.25) if resource_name == "Rage" else \
+			(Color(0.55, 0.85, 0.40) if resource_name == "Focus" else Color(0.30, 0.50, 0.90))
+		_res_fill = _make_fill(Vector2(-35, next_y + 1), Vector2(70, 10), res_color)
 		add_child(_res_fill)
-		_res_text = _make_bar_text(Vector2(-46, next_y), Vector2(92, 15), 9)
+		_res_text = _make_bar_text(Vector2(-36, next_y), Vector2(72, 12), 8)
 		add_child(_res_text)
-		next_y += 17.0
-	# Secondary resource bar (Faith / Arcane Resonance).
+		next_y += 14.0
 	if second_resource_name != "":
-		add_child(_make_bar_bg(Vector2(-46, next_y), Vector2(92, 14)))
+		add_child(_make_bar_bg(Vector2(-36, next_y), Vector2(72, 11)))
 		var res2_color := Color(0.95, 0.80, 0.30) if second_resource_name == "Faith" \
 			else Color(0.75, 0.40, 0.95)
-		_res2_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 12), res2_color)
+		_res2_fill = _make_fill(Vector2(-35, next_y + 1), Vector2(70, 9), res2_color)
 		add_child(_res2_fill)
-		_res2_text = _make_bar_text(Vector2(-46, next_y), Vector2(92, 14), 9)
+		_res2_text = _make_bar_text(Vector2(-36, next_y), Vector2(72, 11), 8)
 		add_child(_res2_text)
-		next_y += 16.0
-	# Pressure bar.
-	add_child(_make_bar_bg(Vector2(-46, next_y), Vector2(92, 8)))
-	_pressure_fill = _make_fill(Vector2(-45, next_y + 1), Vector2(90, 6), Color(0.80, 0.35, 1.0))
+		next_y += 13.0
+	add_child(_make_bar_bg(Vector2(-36, next_y), Vector2(72, 6)))
+	_pressure_fill = _make_fill(Vector2(-35, next_y + 1), Vector2(70, 4), Color(0.80, 0.35, 1.0))
 	add_child(_pressure_fill)
 
 	var name_label := Label.new()
@@ -147,13 +148,13 @@ func _build_bars() -> void:
 	name_label.add_theme_color_override("font_color", Color(0.92, 0.88, 0.78))
 	name_label.add_theme_constant_override("outline_size", 4)
 	name_label.add_theme_color_override("font_outline_color", Color(0.05, 0.03, 0.08, 0.9))
-	name_label.position = Vector2(-50, -62)
+	name_label.position = Vector2(-50, -54)
 	name_label.size = Vector2(100, 18)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(name_label)
 
 	_chips_root = Node2D.new()
-	_chips_root.position = Vector2(0, next_y + 12.0)
+	_chips_root.position = Vector2(0, next_y + 9.0)
 	add_child(_chips_root)
 
 	_build_target_zone()
@@ -205,11 +206,12 @@ func set_tint(tint: Color) -> void:
 	sprite.self_modulate = tint
 
 
-# Battlefield highlight driven by hovering the initiative bar. A tint
-# change is invisible on white units, so pop the scale and show the marker.
+# Battlefield highlight driven by hovering the initiative bar: grow the
+# sprite and draw a white outline around it.
 func set_highlight(on: bool) -> void:
-	var factor := 1.18 if on else 1.0
+	var factor := 1.3 if on else 1.0
 	sprite.scale = Vector2(_base_scale * factor, _base_scale * factor)
+	sprite.material.set_shader_parameter("outline_on", on)
 	_target_marker.visible = on or _target_btn.visible
 
 
@@ -237,13 +239,13 @@ func _make_fill(pos: Vector2, bar_size: Vector2, color: Color) -> ColorRect:
 
 
 func refresh_bars() -> void:
-	_hp_fill.size.x = 90.0 * clampf(hp / float(max_hp), 0.0, 1.0)
+	_hp_fill.size.x = 70.0 * clampf(hp / float(max_hp), 0.0, 1.0)
 	_hp_text.text = "%d/%d" % [hp, max_hp]
 	if _res_fill != null:
-		_res_fill.size.x = 90.0 * clampf(resource / float(max_resource), 0.0, 1.0)
+		_res_fill.size.x = 70.0 * clampf(resource / float(max_resource), 0.0, 1.0)
 		_res_text.text = "%d/%d" % [resource, max_resource]
 	if _res2_fill != null:
-		_res2_fill.size.x = 90.0 * clampf(second_resource / float(second_max), 0.0, 1.0)
+		_res2_fill.size.x = 70.0 * clampf(second_resource / float(second_max), 0.0, 1.0)
 		if second_resource_name == "Resonance":
 			_res2_text.text = "%d/%d (+%d%% dmg)" % [second_resource, second_max,
 				second_resource * 15]
@@ -258,7 +260,7 @@ func refresh_bars() -> void:
 				_refresh_chips()
 				break
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
-	_pressure_fill.size.x = 90.0 * pressure_ratio
+	_pressure_fill.size.x = 70.0 * pressure_ratio
 	# Shifts toward hot pink as the unit gets close to Breaking.
 	_pressure_fill.color = Color(0.80, 0.35, 1.0).lerp(Color(1.0, 0.25, 0.55), pressure_ratio)
 

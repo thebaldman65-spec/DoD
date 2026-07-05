@@ -158,6 +158,8 @@ const ENEMY_LAYOUTS := {
 	2: [Vector2(920, 420), Vector2(1000, 600)],
 	3: [Vector2(900, 400), Vector2(1050, 510), Vector2(940, 630)],
 	4: [Vector2(880, 380), Vector2(1060, 470), Vector2(880, 560), Vector2(1060, 650)],
+	5: [Vector2(880, 370), Vector2(1060, 440), Vector2(880, 510), Vector2(1060, 580),
+		Vector2(950, 650)],
 }
 
 
@@ -251,7 +253,7 @@ func _spawn_units() -> void:
 	var composition: Array = ["raider", "chief", "archer", "archer"]
 	if Run.active and Run.encounter.has("enemies"):
 		composition = Run.encounter["enemies"]
-	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 4)]
+	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 5)]
 	# Later zones field tougher versions of the same foes.
 	var zone_mult := (1.0 + 0.35 * Run.zone_idx) if Run.active else 1.0
 	for i in composition.size():
@@ -527,7 +529,9 @@ func _player_turn(u: BattleUnit) -> void:
 	if u.resource_name == "Mana":
 		u.resource = mini(u.resource + 12, u.max_resource)
 		u.refresh_bars()
-	_message("%s's turn — choose an ability" % u.unit_name)
+	elif u.resource_name == "Focus":
+		u.resource = mini(u.resource + 20, u.max_resource)
+		u.refresh_bars()
 	_show_actions(u)
 	var ab: Ability
 	var auto_target: BattleUnit = null
@@ -561,7 +565,6 @@ func _player_turn(u: BattleUnit) -> void:
 				target = pool[0]
 			else:
 				used_targeting = true
-				_message("Choose a target")
 				target = await _pick_target(pool)
 		if target != null:
 			if autoplay:
@@ -573,7 +576,6 @@ func _player_turn(u: BattleUnit) -> void:
 			if grade != "cancel":
 				break
 		# Cancelled: back to the action bar to pick something else.
-		_message("%s's turn — choose an ability" % u.unit_name)
 		_show_actions(u)
 		ab = await _ability_picked
 		action_panel.visible = false
@@ -640,7 +642,6 @@ func _refund_item(item_id: String) -> void:
 	items[item_id][1] += 1
 	item_used = false
 	if current_hero != null and not current_hero.dead:
-		_message("%s's turn — choose an ability" % current_hero.unit_name)
 		_show_actions(current_hero)
 
 
@@ -669,7 +670,6 @@ func _use_item(item_id: String) -> void:
 			var living := heroes.filter(func(h): return not h.dead)
 			var heal_target: BattleUnit = living[0]
 			if living.size() > 1:
-				_message("Choose an ally to heal")
 				heal_target = await _pick_target(living)
 			if heal_target == null:
 				_refund_item(item_id)
@@ -684,7 +684,6 @@ func _use_item(item_id: String) -> void:
 			var drinkers := heroes.filter(func(h): return not h.dead)
 			var mana_target: BattleUnit = drinkers[0]
 			if drinkers.size() > 1:
-				_message("Choose an ally")
 				mana_target = await _pick_target(drinkers)
 			if mana_target == null:
 				_refund_item(item_id)
@@ -707,7 +706,6 @@ func _use_item(item_id: String) -> void:
 			if fallen.size() == 1:
 				target = fallen[0]
 			else:
-				_message("Choose an ally to revive")
 				target = await _pick_target(fallen)
 			if target == null:
 				_refund_item(item_id)
@@ -843,7 +841,6 @@ func _pick_target(pool: Array) -> BattleUnit:
 
 
 func _enemy_turn(u: BattleUnit) -> void:
-	_message("%s attacks!" % u.unit_name)
 	await _wait(0.7)
 	var living := heroes.filter(func(h): return not h.dead)
 	if living.is_empty():
@@ -1005,6 +1002,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.2
 			if is_perfect and ab.display_name == "Arcane Cannon":
 				raw *= 1.0 + 0.075 * attacker.second_resource
+			if ab.display_name == "Piercing Arrow" and strike_target.broken:
+				raw *= 1.5
 			if attacker.has_status("empower"):
 				raw *= 1.25
 			if attacker.has_status("cripple"):
