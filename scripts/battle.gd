@@ -251,7 +251,7 @@ func _spawn_units() -> void:
 	var composition: Array = ["raider", "chief", "archer", "archer"]
 	if Run.active and Run.encounter.has("enemies"):
 		composition = Run.encounter["enemies"]
-	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 3)]
+	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 4)]
 	# Later zones field tougher versions of the same foes.
 	var zone_mult := (1.0 + 0.35 * Run.zone_idx) if Run.active else 1.0
 	for i in composition.size():
