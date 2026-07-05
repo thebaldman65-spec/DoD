@@ -94,4 +94,5 @@ func _draw_screen() -> void:
 
 func _choose(idx: int, spec_id: String) -> void:
 	Run.party[idx]["spec"] = spec_id
+	Run.party[idx]["tree"] = Talents.generate_tree(spec_id, Run.party[idx]["key"])
 	_draw_screen()

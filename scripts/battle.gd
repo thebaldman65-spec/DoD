@@ -25,7 +25,7 @@ const STATUS_INFO := {
 	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores 8 HP each turn."],
 	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% attack."],
 	"guard": ["Guard", "G", Color(0.55, 0.65, 0.85), "-40% damage and -50% Pressure taken\nuntil this unit's next turn."],
-	"taunt": ["Taunt", "T", Color(0.95, 0.5, 0.3), "Enemies must attack this unit."],
+	"mocked": ["Mocked", "M!", Color(0.95, 0.5, 0.3), "Must attack the Warrior who mocked them."],
 	"shieldwall": ["Shieldwall", "SW", Color(0.6, 0.7, 0.9), "Takes 50% less damage."],
 	"empower": ["Empower", "+A", Color(0.95, 0.45, 0.35), "+25% damage dealt."],
 	"exposed": ["Exposed", "E", Color(0.95, 0.9, 0.4), "Takes 15% more damage."],
@@ -210,7 +210,8 @@ func _spawn_units() -> void:
 				cfg["armor"] += 0.10
 				cfg["stability"] += 15
 			if Run.active and i < Run.party.size():
-				Talents.apply(cfg, spec, Run.party[i].get("talents", {}))
+				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
+					Run.party[i].get("talents", {}))
 		name_counts[cfg["unit_name"]] = name_counts.get(cfg["unit_name"], 0) + 1
 		if hero_keys.count(hero_keys[i]) > 1:
 			cfg["unit_name"] = "%s %d" % [cfg["unit_name"], name_counts[cfg["unit_name"]]]
@@ -525,7 +526,7 @@ func _player_turn(u: BattleUnit) -> void:
 	var grade := "good"
 	while true:
 		var used_targeting := false
-		if ab.special in ["rally", "focus", "surge", "guard", "shieldwall", "taunt",
+		if ab.special in ["rally", "focus", "surge", "guard", "shieldwall",
 				"phoenix", "hymn", "benediction", "retaliate"]:
 			target = u  # self/party effects need no target choice
 		elif ab.aoe or ab.random_hits > 0:
@@ -807,9 +808,10 @@ func _enemy_turn(u: BattleUnit) -> void:
 	var living := heroes.filter(func(h): return not h.dead)
 	if living.is_empty():
 		return
-	var taunters := living.filter(func(h): return h.has_status("taunt"))
-	if not taunters.is_empty():
-		living = taunters
+	if u.has_status("mocked"):
+		var mocker_idx := u.status_power("mocked")
+		if mocker_idx >= 0 and mocker_idx < heroes.size() and not heroes[mocker_idx].dead:
+			living = [heroes[mocker_idx]]
 	var target: BattleUnit
 	var ab: Ability
 	var affordable: Array = u.abilities.filter(func(a): return a.cost <= u.resource)
@@ -1050,6 +1052,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_message("%s falls!" % strike_target.unit_name)
 						_log("† %s dies" % strike_target.unit_name, "#e05050")
 						await _wait(0.5)
+			if ab.display_name == "Mocking Blow" and not strike_target.dead:
+				var mocker_idx := heroes.find(attacker)
+				if mocker_idx >= 0:
+					_apply_status(strike_target, "mocked", 4 if is_perfect else 3, mocker_idx)
 			# Specialization on-hit passives.
 			if not strike_target.dead:
 				if attacker.passive_id == "ignite" and randf() < 0.5:
@@ -1224,14 +1230,6 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					h.refresh_bars()
 			_message("%s raises the shieldwall!" % attacker.unit_name)
 			_log("%s: Shieldwall — party takes half damage" % attacker.unit_name, "#70d878")
-		"taunt":
-			_sfx("click", -6.0, 0.7)
-			_apply_status(attacker, "taunt", 5)
-			if is_perfect:
-				attacker.pressure = maxi(attacker.pressure - 10, 0)
-				attacker.refresh_bars()
-			_message("%s roars a challenge!" % attacker.unit_name)
-			_log("%s taunts the enemy" % attacker.unit_name, "#70d878")
 		"retaliate":
 			_sfx("parry", -7.0, 0.8)
 			_apply_status(attacker, "retaliate", 4 if is_perfect else 3)

@@ -313,6 +313,13 @@ func add_bleed(amount: int) -> bool:
 	return bled
 
 
+func status_power(id: String) -> int:
+	for s in statuses:
+		if s.id == id:
+			return int(s.get("power", 0))
+	return -1
+
+
 func status_stacks(id: String) -> int:
 	for s in statuses:
 		if s.id == id:

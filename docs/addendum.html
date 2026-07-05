@@ -127,6 +127,13 @@
 <li>Arcane Cannon Perfect reworked: recoil always applies; Perfect instead grants +7.5% damage per Resonance stack on that blast.</li>
 <li>Cleric speed reduced 15% (100 to 85).</li>
 </ul>
+<h3>2026-07-05 — Shuffled talent trees, honest character sheet, Mocking Blow</h3>
+<ul>
+<li><b>Talent trees now shuffle every run.</b> Talents are classified tier 1-6 by depth (deeper = stronger; capstone abilities sit at tier 5). Each spec has a tiered pool; when a spec is chosen at run start, that hero's tree is generated — 2 slots per tier drawn from the pool, padded with tier-scaled generic Training talents until more signature talents are authored. Tier N unlocks at (N-1)*2 points spent. Branch prerequisites were dropped (they fight the shuffle); pool sizes and slot counts are placeholders pending the final tree size.</li>
+<li><b>Character screen now tells the truth:</b> stats, ability chips, and tooltips are computed from the hero's effective build (talents + equipped runes applied), not base class values. Crit Chance (base 10%) and Parry (base 5%) lines added.</li>
+<li><b>Taunt removed; Mocking Blow added</b> (Warrior core): an attack (15 physical, 8 Pressure) that taunts only its victim for 3 turns (4 on Perfect) — the mocked enemy must attack the Warrior. Party-wide 5-turn taunt is gone; tank-and-heal no longer trivializes fights.</li>
+<li>Sim baseline after changes: 77% wins over 60 battles.</li>
+</ul>
 <h2>Progress Snapshot</h2>
 <p>Phase 1 (combat core) complete and simulator-tuned. Phase 2 (run structure) playable: map, battles, rewards, carryover, party/inventory screens. Next: class specializations, then drafting, talents, and zone variety. Automated testing: DOD_AUTOPLAY (single bot battle) and DOD_SIM=N (batch balance reports).</p>
 </body></html>

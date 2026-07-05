@@ -92,6 +92,12 @@ func _draw_detail() -> void:
 	var key: String = member["key"]
 	var cfg := Classes.hero_config(key)
 	var spec: String = member.get("spec", "")
+	if spec != "":
+		cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
+		Talents.apply_from_tree(cfg, member.get("tree", []), member.get("talents", {}))
+	for rune in member.get("runes", []):
+		if rune.get("equipped", false):
+			Talents.apply_payload(cfg, rune["payload"], 1)
 	var spec_label: String = Classes.SPEC_INFO[spec]["name"] if spec != "" else "Unawakened"
 	_title("%s — %s" % [cfg["unit_name"], spec_label], 20, 34)
 
@@ -106,13 +112,16 @@ func _draw_detail() -> void:
 	add_child(blurb)
 
 	var stats := Label.new()
+	var crit_pct := int(round((0.10 + cfg.get("crit_bonus", 0.0)) * 100))
 	var lines := PackedStringArray([
-		"HP: %d / %d" % [member["hp"], member["max_hp"]],
+		"HP: %d / %d" % [member["hp"], cfg["max_hp"]],
 		"%s: %s" % [cfg["resource_name"],
-			("%d / %d" % [member["mana"], member["max_mana"]]) if cfg["resource_name"] == "Mana"
+			("%d / %d" % [member["mana"], cfg["max_resource"]]) if cfg["resource_name"] == "Mana"
 			else "builds in combat"],
-		"Armor: %d%%    Speed: %d    Stability: %d" % [int(cfg["armor"] * 100),
+		"Armor: %d%%    Speed: %d    Stability: %d" % [int(round(cfg["armor"] * 100)),
 			int(cfg["speed"]), cfg["stability"]],
+		"Crit Chance: %d%%    Parry: %d%%" % [crit_pct,
+			int(round((0.05 + cfg.get("parry_bonus", 0.0)) * 100))],
 		"Talent Points: %d" % member.get("talent_points", 0),
 	])
 	if spec != "":
@@ -123,9 +132,11 @@ func _draw_detail() -> void:
 	stats.position = Vector2(60, 132)
 	stats.size = Vector2(400, 140)
 	stats.mouse_filter = Control.MOUSE_FILTER_STOP
-	stats.tooltip_text = "Armor — % of incoming damage blocked.\n" \
+	stats.tooltip_text = "Values include talents and equipped runes.\n" \
+		+ "Armor — % of incoming damage blocked.\n" \
 		+ "Speed — how quickly turns arrive (100 = average).\n" \
 		+ "Stability — Pressure needed to Break this hero.\n" \
+		+ "Crit — base 10% plus bonuses. Parry — base 5% plus bonuses.\n" \
 		+ "Talent points come from victories (1 fight / 2 elite / 3 boss)."
 	add_child(stats)
 
@@ -137,8 +148,6 @@ func _draw_detail() -> void:
 	add_child(ability_header)
 
 	var abilities: Array = cfg["abilities"]
-	if spec != "":
-		abilities = abilities + Classes.spec_abilities(spec)
 	for i in abilities.size():
 		var ab: Ability = abilities[i]
 		var chip := PanelContainer.new()
@@ -220,34 +229,31 @@ func _draw_detail() -> void:
 
 	var learned: Dictionary = member.get("talents", {})
 	var points: int = member.get("talent_points", 0)
-	var tree: Array = Talents.tree(spec)
+	var tree: Array = member.get("tree", [])
 	var tier_counts := {}
 	for talent in tree:
 		var tier: int = talent["tier"]
 		var idx_in_tier: int = tier_counts.get(tier, 0)
 		tier_counts[tier] = idx_in_tier + 1
 		var panel := PanelContainer.new()
-		panel.position = Vector2(505 + idx_in_tier * 252, 110 + (tier - 1) * 196)
-		panel.custom_minimum_size = Vector2(244, 184)
+		panel.position = Vector2(505 + idx_in_tier * 380, 106 + (tier - 1) * 96)
+		panel.custom_minimum_size = Vector2(372, 88)
 		add_child(panel)
 		var vbox := VBoxContainer.new()
-		vbox.add_theme_constant_override("separation", 4)
+		vbox.add_theme_constant_override("separation", 2)
 		panel.add_child(vbox)
 		var ranks_have := int(learned.get(talent["id"], 0))
 		var label := Label.new()
-		var req_line := ""
-		if talent["requires"] != "":
-			req_line = "\nRequires: %s" % Talents.node(spec, talent["requires"])["name"]
-		label.text = "T%d  %s   [%d/%d]\n%s%s" % [talent["tier"], talent["name"],
-			ranks_have, talent["ranks"], talent["desc"], req_line]
-		label.add_theme_font_size_override("font_size", 11)
+		label.text = "T%d  %s  [%d/%d] — %s" % [talent["tier"], talent["name"],
+			ranks_have, talent["ranks"], talent["desc"]]
+		label.add_theme_font_size_override("font_size", 10)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.custom_minimum_size = Vector2(228, 0)
+		label.custom_minimum_size = Vector2(356, 0)
 		vbox.add_child(label)
 		var learn := Button.new()
-		learn.custom_minimum_size = Vector2(130, 28)
-		learn.add_theme_font_size_override("font_size", 12)
-		var check: Dictionary = Talents.can_learn(spec, talent["id"], learned)
+		learn.custom_minimum_size = Vector2(120, 22)
+		learn.add_theme_font_size_override("font_size", 10)
+		var check: Dictionary = Talents.can_learn(tree, talent["id"], learned)
 		if ranks_have >= int(talent["ranks"]):
 			learn.text = "MAXED"
 			learn.disabled = true
@@ -285,9 +291,9 @@ func _toggle_rune(rune_idx: int) -> void:
 
 func _learn_talent(talent_id: String) -> void:
 	var member: Dictionary = Run.party[selected]
-	var spec: String = member.get("spec", "")
 	var learned: Dictionary = member.get("talents", {})
-	if member.get("talent_points", 0) < 1 or not Talents.can_learn(spec, talent_id, learned)["ok"]:
+	if member.get("talent_points", 0) < 1 \
+			or not Talents.can_learn(member.get("tree", []), talent_id, learned)["ok"]:
 		return
 	learned[talent_id] = int(learned.get(talent_id, 0)) + 1
 	member["talents"] = learned

@@ -41,10 +41,10 @@ static func warrior_kit() -> Array:
 			"resource_gain": 15, "delay": 2.0, "anim": "attack01",
 			"perfect_id": "rage", "perfect_text": "+10 bonus Rage",
 			"description": "Basic attack. Builds 15 Rage."}),
-		Ability.make({"display_name": "Taunt", "cost": 0, "special": "taunt",
-			"delay": 2.0, "anim": "attack01",
-			"perfect_id": "", "perfect_text": "Also sheds 10 of the Warrior's Pressure",
-			"description": "Force all enemies to attack the\nWarrior for 5 turns."}),
+		Ability.make({"display_name": "Mocking Blow", "cost": 0, "damage": 15, "pressure": 8,
+			"delay": 2.5, "anim": "attack01",
+			"perfect_id": "", "perfect_text": "Taunt lasts 4 turns",
+			"description": "Strike and humiliate: the target must\nattack the Warrior for 3 turns."}),
 	]
 
 
