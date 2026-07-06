@@ -31,7 +31,7 @@ func _draw_screen() -> void:
 	add_child(title)
 
 	var subtitle := Label.new()
-	subtitle.text = "Choose four heroes for this cycle (duplicates allowed)"
+	subtitle.text = "Choose your four heroes - one of each"
 	subtitle.add_theme_font_size_override("font_size", 15)
 	subtitle.add_theme_color_override("font_color", Color(0.6, 0.55, 0.5))
 	subtitle.position = Vector2(0, 80)
@@ -56,6 +56,8 @@ func _draw_screen() -> void:
 			btn.tooltip_text = Classes.CLASS_BLURBS[key]
 			if picks[slot] == key:
 				btn.modulate = Color(0.6, 1.0, 0.65)
+			elif picks.has(key):
+				btn.disabled = true  # no repeats: one of each hero
 			btn.pressed.connect(_pick.bind(slot, key))
 			add_child(btn)
 
@@ -70,6 +72,10 @@ func _draw_screen() -> void:
 
 
 func _pick(slot: int, key: String) -> void:
+	# Claiming a class held by another slot frees that slot.
+	for i in picks.size():
+		if picks[i] == key:
+			picks[i] = ""
 	picks[slot] = key
 	_draw_screen()
 

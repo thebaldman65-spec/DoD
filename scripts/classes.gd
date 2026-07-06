@@ -48,11 +48,11 @@ static func hunter_kit() -> Array:
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "focus", "perfect_text": "+10 bonus Focus",
 			"description": "Basic ranged shot."}),
-		Ability.make({"display_name": "Hunter's Mark", "cost": 15, "special": "mark",
+		Ability.make({"display_name": "Hunter's Mark", "cost": 20, "special": "mark",
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "", "perfect_text": "Mark lasts 5 turns",
 			"description": "Mark a target: everyone gains +15% crit\nchance against it for 3 turns."}),
-		Ability.make({"display_name": "Camouflage", "cost": 10, "special": "camo",
+		Ability.make({"display_name": "Camouflage", "cost": 15, "special": "camo",
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "", "perfect_text": "Also sheds 10 Pressure",
 			"description": "Fade into cover: harder to hit and your\nnext attack deals +20% damage."}),
@@ -202,6 +202,10 @@ static func spec_abilities(spec: String) -> Array:
 			]
 		"pyromancer":
 			return [
+				Ability.make({"display_name": "Pyroblast", "dmg_type": "fire", "cost": 45,
+					"damage": 55, "pressure": 10, "delay": 6.0, "anim": "attack03",
+					"perfect_id": "", "perfect_text": "Also sets the target Burning (3 turns)",
+					"description": "A slow, devastating comet of flame.\n+50% damage against Burning targets."}),
 				Ability.make({"display_name": "Flame Surge", "dmg_type": "fire", "cost": 20, "damage": 16,
 					"pressure": 6, "delay": 3.5, "anim": "attack02", "aoe": true,
 					"applies_status": {"id": "burn", "turns": 2},
@@ -276,22 +280,22 @@ static func spec_abilities(spec: String) -> Array:
 			]
 		"beastmaster":
 			return [
-				Ability.make({"display_name": "Twin Fang", "cost": 25, "damage": 14,
+				Ability.make({"display_name": "Twin Fang", "cost": 30, "damage": 14,
 					"pressure": 6, "delay": 3.0, "anim": "attack02", "random_hits": 2,
 					"perfect_id": "", "perfect_text": "3 strikes instead of 2",
 					"description": "The pack strikes twice at random foes."}),
-				Ability.make({"display_name": "Bear Maul", "cost": 30, "damage": 28,
+				Ability.make({"display_name": "Bear Maul", "cost": 35, "damage": 28,
 					"pressure": 14, "delay": 3.5, "anim": "attack03", "delay_push": 2.0,
 					"perfect_id": "pressure", "perfect_text": "+60% Pressure",
 					"description": "A crushing maul that staggers the\ntarget's next turn."}),
 			]
 		"sharpshooter":
 			return [
-				Ability.make({"display_name": "Aimed Shot", "cost": 25, "damage": 34,
+				Ability.make({"display_name": "Aimed Shot", "cost": 30, "damage": 34,
 					"pressure": 8, "delay": 3.5, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "+15% crit on this shot",
 					"description": "A perfect line. Always crits against\nMarked targets."}),
-				Ability.make({"display_name": "Piercing Arrow", "cost": 20, "damage": 24,
+				Ability.make({"display_name": "Piercing Arrow", "cost": 25, "damage": 24,
 					"pressure": 8, "delay": 3.0, "anim": "attack03", "armor_pierce": 0.5,
 					"applies_status": {"id": "cripple", "turns": 2},
 					"perfect_id": "", "perfect_text": "Ignores ALL armor",
@@ -299,12 +303,12 @@ static func spec_abilities(spec: String) -> Array:
 			]
 		"mystic":
 			return [
-				Ability.make({"display_name": "Thorn Volley", "cost": 20, "damage": 14,
+				Ability.make({"display_name": "Thorn Volley", "cost": 25, "damage": 14,
 					"pressure": 6, "delay": 3.5, "anim": "attack02", "aoe": true,
 					"dmg_type": "nature",
 					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
 					"description": "Thorns rain on ALL enemies (nature)."}),
-				Ability.make({"display_name": "Sylvan Binding", "cost": 25, "damage": 16,
+				Ability.make({"display_name": "Sylvan Binding", "cost": 30, "damage": 16,
 					"pressure": 8, "delay": 3.0, "anim": "attack03", "dmg_type": "nature",
 					"delay_push": 4.0, "applies_status": {"id": "slow", "turns": 3},
 					"perfect_id": "", "perfect_text": "Also +50% Pressure",

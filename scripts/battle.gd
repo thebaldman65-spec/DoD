@@ -426,19 +426,27 @@ func _log(text: String, color := "#d8d2c4") -> void:
 	history.append_text("[color=%s]%s[/color]\n" % [color, text])
 
 
-func _rebuild_turn_bar() -> void:
+func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability = null) -> void:
 	for child in turn_bar.get_children():
 		child.queue_free()
 	var alive := (heroes + enemies).filter(func(u): return not u.dead)
 	if alive.is_empty():
 		return
 	var sim: Array = alive.map(func(u): return {"unit": u, "t": u.next_time})
+	if preview_unit != null and preview_ability != null:
+		for entry in sim:
+			if entry.unit == preview_unit:
+				entry.t += preview_ability.delay * 100.0 / preview_unit.effective_speed()
 	for i in 10:
 		var best: Dictionary = sim[0]
 		for entry in sim:
 			if entry.t < best.t:
 				best = entry
 		var u: BattleUnit = best.unit
+		var is_ghost: bool = preview_unit != null and u == preview_unit \
+			and not best.get("ghost_shown", false)
+		if is_ghost:
+			best["ghost_shown"] = true
 		var slot := VBoxContainer.new()
 		var portrait := TextureRect.new()
 		portrait.texture = u.portrait()
@@ -450,10 +458,15 @@ func _rebuild_turn_bar() -> void:
 		portrait.tooltip_text = u.unit_name
 		portrait.mouse_entered.connect(u.set_highlight.bind(true))
 		portrait.mouse_exited.connect(u.set_highlight.bind(false))
+		if is_ghost:
+			portrait.modulate = Color(1.0, 0.9, 0.45, 0.7)
+			portrait.tooltip_text += " (your next turn if you cast this)"
 		slot.add_child(portrait)
 		var stripe := ColorRect.new()
 		stripe.custom_minimum_size = Vector2(66, 4)
 		stripe.color = Color(0.35, 0.8, 0.4) if u.is_hero else Color(0.85, 0.3, 0.3)
+		if is_ghost:
+			stripe.color = Color(1.0, 0.85, 0.3)
 		slot.add_child(stripe)
 		turn_bar.add_child(slot)
 		best.t += BASIC_DELAY * 100.0 / u.effective_speed()
@@ -530,7 +543,7 @@ func _player_turn(u: BattleUnit) -> void:
 		u.resource = mini(u.resource + 12, u.max_resource)
 		u.refresh_bars()
 	elif u.resource_name == "Focus":
-		u.resource = mini(u.resource + 20, u.max_resource)
+		u.resource = mini(u.resource + 15, u.max_resource)
 		u.refresh_bars()
 	_show_actions(u)
 	var ab: Ability
@@ -541,6 +554,7 @@ func _player_turn(u: BattleUnit) -> void:
 		auto_target = pick[1]
 	else:
 		ab = await _ability_picked
+		_rebuild_turn_bar(u, ab)
 	action_panel.visible = false
 
 	var target: BattleUnit = null
@@ -576,8 +590,10 @@ func _player_turn(u: BattleUnit) -> void:
 			if grade != "cancel":
 				break
 		# Cancelled: back to the action bar to pick something else.
+		_rebuild_turn_bar()
 		_show_actions(u)
 		ab = await _ability_picked
+		_rebuild_turn_bar(u, ab)
 		action_panel.visible = false
 	await _resolve(u, ab, target, grade)
 	current_hero = null
@@ -797,6 +813,7 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 			ab.dmg_type.capitalize(), ab.pressure]
 	if ab.heal > 0:
 		tip += "\nHeals: %d" % ab.heal
+	tip += "\nInitiative cost: %.1f" % ab.delay
 	if ab.perfect_text != "":
 		tip += "\nPerfect: %s" % ab.perfect_text
 	return tip
@@ -1004,6 +1021,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 + 0.075 * attacker.second_resource
 			if ab.display_name == "Piercing Arrow" and strike_target.broken:
 				raw *= 1.5
+			if ab.display_name == "Pyroblast" and strike_target.has_status("burn"):
+				raw *= 1.5
 			if attacker.has_status("empower"):
 				raw *= 1.25
 			if attacker.has_status("cripple"):
@@ -1087,7 +1106,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					turns = 4
 				if is_perfect and ab.display_name == "Flame Surge":
 					turns += 1
-				_apply_status(strike_target, ab.applies_status["id"], turns)
+				var status_meta := 0
+				if ab.applies_status["id"] == "burn":
+					status_meta = int(round((CRIT_CHANCE + attacker.crit_bonus) * 100))
+				_apply_status(strike_target, ab.applies_status["id"], turns, status_meta)
 			if ab.bleed_build > 0 and not strike_target.dead:
 				if strike_target.add_bleed(ab.bleed_build):
 					var bleed_dmg := maxi(int(strike_target.max_hp * 0.20), 1)
@@ -1108,13 +1130,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Specialization on-hit passives.
 			if not strike_target.dead:
 				if attacker.passive_id == "ignite" and randf() < 0.5:
-					_apply_status(strike_target, "burn", 3)
+					_apply_status(strike_target, "burn", 3,
+						int(round((CRIT_CHANCE + attacker.crit_bonus) * 100)))
 				elif attacker.passive_id == "chill" and randf() < 0.5:
 					_apply_status(strike_target, "slow", 3)
 				elif attacker.passive_id == "corrupt" and randf() < 0.25:
 					_apply_status(strike_target, "cripple", 3)
 				if is_perfect and ab.display_name == "Hex of Ruin":
 					_apply_status(strike_target, "cripple", 3)
+			if is_perfect and ab.display_name == "Pyroblast" and not strike_target.dead:
+				_apply_status(strike_target, "burn", 3,
+					int(round((CRIT_CHANCE + attacker.crit_bonus) * 100)))
 			if is_perfect:
 				_apply_perfect_bonus(attacker, strike_target, ab, result.died)
 			# Retaliation stance: the victim counters with their basic attack.
