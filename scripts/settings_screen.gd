@@ -32,10 +32,7 @@ func _ready() -> void:
 	vol.value = Settings.volume
 	vol.custom_minimum_size = Vector2(400, 30)
 	vol.position = Vector2(440, 254)
-	vol.value_changed.connect(func(v: float):
-		Settings.volume = v
-		Settings.apply()
-		Settings.save())
+	vol.value_changed.connect(_on_volume)
 	add_child(vol)
 
 	var fs := CheckBox.new()
@@ -43,10 +40,7 @@ func _ready() -> void:
 	fs.button_pressed = Settings.fullscreen
 	fs.add_theme_font_size_override("font_size", 18)
 	fs.position = Vector2(440, 320)
-	fs.toggled.connect(func(on: bool):
-		Settings.fullscreen = on
-		Settings.apply()
-		Settings.save())
+	fs.toggled.connect(_on_fullscreen)
 	add_child(fs)
 
 	var back := Button.new()
@@ -55,3 +49,15 @@ func _ready() -> void:
 	back.position = Vector2(560, 600)
 	back.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/main_menu.tscn"))
 	add_child(back)
+
+
+func _on_volume(v: float) -> void:
+	Settings.volume = v
+	Settings.apply()
+	Settings.save()
+
+
+func _on_fullscreen(on: bool) -> void:
+	Settings.fullscreen = on
+	Settings.apply()
+	Settings.save()

@@ -52,6 +52,15 @@ func _draw_screen() -> void:
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(subtitle)
 
+	var back := Button.new()
+	back.text = "< Back to Draft"
+	back.custom_minimum_size = Vector2(150, 42)
+	back.position = Vector2(20, 16)
+	back.pressed.connect(func():
+		Run.active = false
+		get_tree().change_scene_to_file("res://scenes/draft.tscn"))
+	add_child(back)
+
 	var spec_ids: Array = Classes.SPEC_IDS[member["key"]]
 	for i in spec_ids.size():
 		var spec_id: String = spec_ids[i]
