@@ -24,11 +24,9 @@ const STATUS_INFO := {
 	"focus": ["Focus", "Fo", Color(0.35, 0.60, 1.0), "Restores 10 Mana each turn."],
 	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores 8 HP each turn."],
 	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% attack."],
-	"guard": ["Guard", "G", Color(0.55, 0.65, 0.85), "-40% damage and -50% Pressure taken\nuntil this unit's next turn."],
 	"mocked": ["Mocked", "M!", Color(0.95, 0.5, 0.3), "Must attack the Warrior who mocked them."],
 	"poison": ["Poison", "P", Color(0.45, 0.8, 0.3), "Takes 6 damage at the start of each turn."],
-	"marked": ["Marked", "Mk", Color(0.95, 0.8, 0.35), "+15% crit chance against this unit."],
-	"camo": ["Camouflage", "Cm", Color(0.55, 0.7, 0.55), "Harder to hit; their next attack\ndeals +20% damage."],
+	"quickdraw": ["Quick Draw", "QD", Color(0.55, 0.85, 0.40), "All abilities act 50% faster;\nturns arrive sooner."],
 	"stunned": ["Stunned", "St", Color(0.95, 0.9, 0.4), "Loses their next turn."],
 	"shieldwall": ["Shieldwall", "SW", Color(0.6, 0.7, 0.9), "Takes 50% less damage."],
 	"empower": ["Empower", "+A", Color(0.95, 0.45, 0.35), "+25% damage dealt."],
@@ -66,16 +64,9 @@ var current_hero: BattleUnit
 var items := {}
 var item_used := false  # one item per character per turn
 
-# Guard: universal defensive action available to every hero.
-var guard_ability: Ability = Ability.make({"display_name": "Guard", "cost": 0,
-	"special": "guard", "delay": 1.5, "anim": "idle",
-	"perfect_id": "", "perfect_text": "Also sheds 10 Pressure immediately",
-	"description": "Brace: take 40% less damage and 50% less\nPressure until your next turn. Quick action.\nMage: venting releases all Resonance."})
-
 var ui: CanvasLayer
 var cam: Camera2D
 var turn_bar: HBoxContainer
-var message_label: Label
 var action_panel: PanelContainer
 var action_box: HBoxContainer
 var active_marker: Label
@@ -321,19 +312,25 @@ func _build_ui() -> void:
 	ui = CanvasLayer.new()
 	add_child(ui)
 
+	# Burger menu: run controls without leaving the battle scene.
+	var burger := MenuButton.new()
+	burger.text = "☰"
+	burger.custom_minimum_size = Vector2(46, 42)
+	burger.position = Vector2(16, 12)
+	burger.flat = false
+	var bpop := burger.get_popup()
+	bpop.add_item("Restart Run", 0)
+	bpop.add_item("Settings", 1)
+	bpop.add_item("Exit to Main Menu", 2)
+	bpop.id_pressed.connect(_on_burger)
+	ui.add_child(burger)
+
 	var bar_panel := PanelContainer.new()
-	bar_panel.position = Vector2(16, 12)
+	bar_panel.position = Vector2(70, 12)
 	ui.add_child(bar_panel)
 	turn_bar = HBoxContainer.new()
-	turn_bar.add_theme_constant_override("separation", 6)
+	turn_bar.add_theme_constant_override("separation", 4)
 	bar_panel.add_child(turn_bar)
-
-	message_label = Label.new()
-	message_label.position = Vector2(340, 70)
-	message_label.size = Vector2(600, 30)
-	message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	message_label.add_theme_font_size_override("font_size", 20)
-	ui.add_child(message_label)
 
 	var bottom_center := CenterContainer.new()
 	bottom_center.position = Vector2(0, 640)
@@ -379,7 +376,7 @@ func _build_skill_check_ui() -> void:
 	sc_root.add_child(bg)
 
 	var hint := Label.new()
-	hint.text = "Press SPACE!"
+	hint.text = "SPACE or CLICK!"
 	hint.position = Vector2(0, 4)
 	hint.size = Vector2(440, 18)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -418,8 +415,80 @@ func _build_skill_check_ui() -> void:
 	sc_root.add_child(sc_result)
 
 
-func _message(text: String) -> void:
-	message_label.text = text
+func _on_burger(id: int) -> void:
+	match id:
+		0:  # Restart Run: abandon this run and head back to the draft.
+			Run.clear_save()
+			Run.active = false
+			get_tree().change_scene_to_file("res://scenes/draft.tscn")
+		1:
+			_open_settings_overlay()
+		2:  # The run resumes from the last saved map node.
+			get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+
+
+# In-battle settings: a small overlay so the fight isn't lost to a scene change.
+func _open_settings_overlay() -> void:
+	var dim := ColorRect.new()
+	dim.size = Vector2(1280, 720)
+	dim.color = Color(0, 0, 0, 0.55)
+	ui.add_child(dim)
+	var panel := PanelContainer.new()
+	panel.position = Vector2(440, 220)
+	panel.custom_minimum_size = Vector2(400, 240)
+	ui.add_child(panel)
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 14)
+	panel.add_child(vbox)
+	var title := Label.new()
+	title.text = "Settings"
+	title.add_theme_font_size_override("font_size", 24)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title)
+	var vol_label := Label.new()
+	vol_label.text = "Master Volume"
+	vbox.add_child(vol_label)
+	var vol := HSlider.new()
+	vol.min_value = 0.0
+	vol.max_value = 1.0
+	vol.step = 0.05
+	vol.value = Settings.volume
+	vol.custom_minimum_size = Vector2(360, 30)
+	vol.value_changed.connect(_on_overlay_volume)
+	vbox.add_child(vol)
+	var fs := CheckBox.new()
+	fs.text = "Fullscreen"
+	fs.button_pressed = Settings.fullscreen
+	fs.toggled.connect(_on_overlay_fullscreen)
+	vbox.add_child(fs)
+	var close := Button.new()
+	close.text = "Close"
+	close.custom_minimum_size = Vector2(160, 40)
+	close.pressed.connect(_close_settings_overlay.bind(dim, panel))
+	vbox.add_child(close)
+
+
+func _on_overlay_volume(v: float) -> void:
+	Settings.volume = v
+	Settings.apply()
+	Settings.save()
+
+
+func _on_overlay_fullscreen(on: bool) -> void:
+	Settings.fullscreen = on
+	Settings.apply()
+	Settings.save()
+
+
+func _close_settings_overlay(dim: ColorRect, panel: PanelContainer) -> void:
+	dim.queue_free()
+	panel.queue_free()
+
+
+# Announcer banner removed by design: battle info lives in the combat log
+# and floating text. Kept as a stub so resolve code stays readable.
+func _message(_text: String) -> void:
+	pass
 
 
 # Appends one line to the battle history panel.
@@ -451,7 +520,7 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 		var slot := VBoxContainer.new()
 		var portrait := TextureRect.new()
 		portrait.texture = u.portrait()
-		portrait.custom_minimum_size = Vector2(66, 90)
+		portrait.custom_minimum_size = Vector2(48, 66)
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		portrait.flip_h = not u.is_hero
@@ -464,7 +533,7 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 			portrait.tooltip_text += " (your next turn if you cast this)"
 		slot.add_child(portrait)
 		var stripe := ColorRect.new()
-		stripe.custom_minimum_size = Vector2(66, 4)
+		stripe.custom_minimum_size = Vector2(48, 4)
 		stripe.color = Color(0.35, 0.8, 0.4) if u.is_hero else Color(0.85, 0.3, 0.3)
 		if is_ghost:
 			stripe.color = Color(1.0, 0.85, 0.3)
@@ -553,6 +622,9 @@ func _player_turn(u: BattleUnit) -> void:
 	elif u.resource_name == "Focus":
 		u.resource = mini(u.resource + 15, u.max_resource)
 		u.refresh_bars()
+	elif u.resource_name == "Rage":
+		u.resource = mini(u.resource + 5, u.max_resource)
+		u.refresh_bars()
 	_show_actions(u)
 	var ab: Ability
 	var auto_target: BattleUnit = null
@@ -570,7 +642,7 @@ func _player_turn(u: BattleUnit) -> void:
 	var grade := "good"
 	while true:
 		var used_targeting := false
-		if ab.special in ["rally", "focus", "surge", "guard", "shieldwall", "camo",
+		if ab.special in ["rally", "focus", "surge", "shieldwall", "quickdraw",
 				"phoenix", "hymn", "benediction", "retaliate"]:
 			target = u  # self/party effects need no target choice
 		elif ab.aoe or ab.random_hits > 0:
@@ -770,12 +842,16 @@ func _show_actions(u: BattleUnit) -> void:
 	basic_btn.mouse_entered.connect(_preview_delay.bind(u, basic))
 	basic_btn.mouse_exited.connect(_clear_delay_preview)
 	action_box.add_child(basic_btn)
-	# Everything else lives in the Abilities dropdown.
-	var menu := MenuButton.new()
-	menu.text = "Abilities ▾"
-	menu.custom_minimum_size = Vector2(140, 58)
-	menu.flat = false
-	var popup := menu.get_popup()
+	# Everything else lives in the Abilities dropdown. Built from real Buttons
+	# (not a PopupMenu) so hovering each entry previews its initiative cost —
+	# PopupMenu only reports focus from keyboard navigation, not the mouse.
+	var menu_btn := Button.new()
+	menu_btn.text = "Abilities ▾"
+	menu_btn.custom_minimum_size = Vector2(140, 58)
+	var popup := PopupPanel.new()
+	var list := VBoxContainer.new()
+	list.add_theme_constant_override("separation", 4)
+	popup.add_child(list)
 	for i in range(1, u.abilities.size()):
 		var ab: Ability = u.abilities[i]
 		var label: String = ab.display_name
@@ -783,26 +859,29 @@ func _show_actions(u: BattleUnit) -> void:
 			label += "   %d %s" % [ab.cost, u.resource_name]
 		elif ab.faith_cost > 0:
 			label += "   %d %s" % [ab.faith_cost, u.second_resource_name]
-		popup.add_item(label, i)
-		popup.set_item_tooltip(popup.item_count - 1, _ability_tooltip(u, ab))
-		popup.set_item_disabled(popup.item_count - 1,
-			ab.cost > u.resource or ab.faith_cost > u.second_resource)
-	popup.id_pressed.connect(_on_ability_menu.bind(u))
-	popup.id_focused.connect(_on_menu_hover.bind(u))
+		var ab_btn := Button.new()
+		ab_btn.text = label
+		ab_btn.custom_minimum_size = Vector2(230, 38)
+		ab_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		ab_btn.tooltip_text = _ability_tooltip(u, ab)
+		ab_btn.disabled = ab.cost > u.resource or ab.faith_cost > u.second_resource
+		ab_btn.pressed.connect(_on_popup_ability.bind(popup, ab))
+		ab_btn.mouse_entered.connect(_preview_delay.bind(u, ab))
+		ab_btn.mouse_exited.connect(_clear_delay_preview)
+		list.add_child(ab_btn)
 	popup.popup_hide.connect(_clear_delay_preview)
-	action_box.add_child(menu)
-	# Guard and Items keep their own buttons.
-	var guard_btn := Button.new()
-	guard_btn.text = "Guard"
-	guard_btn.custom_minimum_size = Vector2(110, 58)
-	guard_btn.tooltip_text = guard_ability.description
-	guard_btn.tooltip_text += "\nPerfect: %s" % guard_ability.perfect_text
-	guard_btn.pressed.connect(_on_ability_button.bind(guard_ability))
-	guard_btn.mouse_entered.connect(_preview_delay.bind(u, guard_ability))
-	guard_btn.mouse_exited.connect(_clear_delay_preview)
-	action_box.add_child(guard_btn)
+	menu_btn.add_child(popup)
+	menu_btn.pressed.connect(_open_ability_popup.bind(popup, menu_btn))
+	action_box.add_child(menu_btn)
 	action_box.add_child(_build_items_menu())
 	action_panel.visible = true
+
+
+# Opens the ability list just above its anchor button.
+func _open_ability_popup(popup: PopupPanel, anchor: Button) -> void:
+	popup.popup()
+	popup.position = Vector2i(int(anchor.global_position.x),
+		int(anchor.global_position.y) - popup.size.y - 6)
 
 
 var _preview_locked := false
@@ -811,11 +890,6 @@ var _preview_locked := false
 func _preview_delay(u: BattleUnit, ab: Ability) -> void:
 	if not _preview_locked:
 		_rebuild_turn_bar(u, ab)
-
-
-func _on_menu_hover(id: int, u: BattleUnit) -> void:
-	if not _preview_locked and id >= 0 and id < u.abilities.size():
-		_rebuild_turn_bar(u, u.abilities[id])
 
 
 func _clear_delay_preview() -> void:
@@ -828,9 +902,9 @@ func _on_ability_button(ab: Ability) -> void:
 	_ability_picked.emit(ab)
 
 
-func _on_ability_menu(id: int, u: BattleUnit) -> void:
-	_sfx("click", -12.0)
-	_ability_picked.emit(u.abilities[id])
+func _on_popup_ability(popup: PopupPanel, ab: Ability) -> void:
+	popup.hide()
+	_on_ability_button(ab)
 
 
 # Tooltip with live damage ranges (includes the unit's current buffs).
@@ -981,7 +1055,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			target.unit_name, amount, grade_tag], "#70d878")
 		if is_perfect and ab.perfect_id == "ward":
 			_apply_status(target, "ward", 3)
-	elif not is_counter and not ab.aoe and randf() < MISS_CHANCE + (0.15 if target.has_status("camo") else 0.0):
+	elif not is_counter and not ab.aoe and randf() < MISS_CHANCE:
 		_stat("attacks")
 		_stat("attack_miss")
 		_sfx("miss")
@@ -1031,23 +1105,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if attacker.second_resource_name == "Resonance":
 				crit_chance += 0.03 * attacker.second_resource
 			crit_chance += attacker.crit_bonus
-			if strike_target.has_status("marked"):
-				crit_chance += 0.15
 			if is_perfect and ab.display_name == "Overpower":
 				crit_chance += 0.15
 			var is_crit := randf() < crit_chance
 			# Razor Ice always crits against Slowed (chilled) targets.
 			if ab.display_name == "Razor Ice" and strike_target.has_status("slow"):
 				is_crit = true
-			if ab.display_name == "Aimed Shot" and strike_target.has_status("marked"):
-				is_crit = true
 			any_crit = any_crit or is_crit
 			var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
 			if is_crit:
 				raw *= 1.75 if attacker.passive_id == "lethal_aim" else 1.5
-			if attacker.has_status("camo"):
-				raw *= 1.2
-				attacker.remove_status("camo")
 			# Attacker-side modifiers.
 			if attacker.second_resource_name == "Resonance":
 				raw *= 1.0 + 0.15 * attacker.second_resource
@@ -1057,6 +1124,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 + 0.075 * attacker.second_resource
 			if ab.display_name == "Piercing Arrow" and strike_target.broken:
 				raw *= 1.5
+			# Powershot: +2% damage per 1% of the target's Break (Pressure) bar.
+			if ab.display_name == "Powershot":
+				raw *= 1.0 + 2.0 * clampf(
+					strike_target.pressure / float(strike_target.stability), 0.0, 1.0)
 			if ab.display_name == "Pyroblast" and strike_target.has_status("burn"):
 				raw *= 1.25
 			if attacker.has_status("empower"):
@@ -1071,8 +1142,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Target-side modifiers.
 			if strike_target.second_resource_name == "Resonance":
 				raw *= 1.0 + 0.10 * strike_target.second_resource
-			if strike_target.has_status("guard"):
-				raw *= 0.6
 			if strike_target.has_status("shieldwall"):
 				raw *= 0.5
 			if strike_target.has_status("exposed"):
@@ -1253,8 +1322,8 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0) -> vo
 
 
 # Arcane Resonance: builds on damaging casts (2 on crit via Arcane Instability);
-# hitting max stacks triggers Backlash Ward (+15 Mana). Stacks persist until
-# the Mage uses Guard, which vents them all.
+# hitting max stacks triggers Backlash Ward (+15 Mana). Stacks persist for the
+# whole battle.
 func _gain_resonance(caster: BattleUnit, stacks: int) -> void:
 	if caster.second_resource_name != "Resonance":
 		return
@@ -1320,20 +1389,6 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s shields %s (%d)" % [attacker.unit_name, target.unit_name, shield])
 			_log("%s: Divine Shield on %s — absorbs %d" % [attacker.unit_name,
 				target.unit_name, shield], "#70d878")
-		"guard":
-			_sfx("parry", -9.0, 0.6)
-			_apply_status(attacker, "guard", 1)
-			if attacker.second_resource_name == "Resonance" and attacker.second_resource > 0:
-				attacker.second_resource = 0
-				attacker.float_text("Resonance vented", Color(0.6, 0.45, 0.75))
-				attacker.refresh_bars()
-				_log("   → %s vents all Resonance" % attacker.unit_name, "#b0a8e0")
-			if is_perfect:
-				attacker.pressure = maxi(attacker.pressure - 10, 0)
-				attacker.float_text("-10 Pressure", Color(0.8, 0.5, 1.0))
-				attacker.refresh_bars()
-			_message("%s braces for impact" % attacker.unit_name)
-			_log("%s guards" % attacker.unit_name, "#70d878")
 		"shieldwall":
 			_sfx("parry", -7.0, 0.5)
 			for h in heroes.filter(func(he): return not he.dead):
@@ -1343,19 +1398,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					h.refresh_bars()
 			_message("%s raises the shieldwall!" % attacker.unit_name)
 			_log("%s: Shieldwall — party takes half damage" % attacker.unit_name, "#70d878")
-		"mark":
-			_sfx("click", -6.0, 1.2)
-			_apply_status(target, "marked", 5 if is_perfect else 3)
-			_message("%s marks %s!" % [attacker.unit_name, target.unit_name])
-			_log("%s: Hunter's Mark on %s" % [attacker.unit_name, target.unit_name], "#70d878")
-		"camo":
-			_sfx("miss", -8.0)
-			_apply_status(attacker, "camo", 2)
-			if is_perfect:
-				attacker.pressure = maxi(attacker.pressure - 10, 0)
-				attacker.refresh_bars()
-			_message("%s melts into cover" % attacker.unit_name)
-			_log("%s: Camouflage" % attacker.unit_name, "#70d878")
+		"quickdraw":
+			_sfx("click", -6.0, 1.3)
+			_apply_status(attacker, "quickdraw", 6 if is_perfect else 5)
+			_message("%s's hands blur!" % attacker.unit_name)
+			_log("%s: Quick Draw — +50%% ability speed" % attacker.unit_name, "#70d878")
 		"retaliate":
 			_sfx("parry", -7.0, 0.8)
 			_apply_status(attacker, "retaliate", 4 if is_perfect else 3)
@@ -1531,7 +1578,11 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if sc_active and event.is_action_pressed("ui_accept"):
+	if not sc_active:
+		return
+	var clicked_check: bool = event is InputEventMouseButton \
+		and event.button_index == MOUSE_BUTTON_LEFT and event.pressed
+	if event.is_action_pressed("ui_accept") or clicked_check:
 		sc_active = false
 		var dist: float = absf(sc_pos - 0.5)
 		var grade := "fail"

@@ -88,7 +88,9 @@ func _draw_screen() -> void:
 					int(round(ab.damage * 1.1)), ab.dmg_type.capitalize()]
 			ability_lines.append(line)
 			ability_lines.append("   %s" % ab.description.replace("\n", " "))
-		body.text = "%s\n\nPassive: %s\n\n%s" % [info["blurb"], info["passive_desc"],
+		var arch: String = info.get("archetype", "")
+		body.text = "%s\n\nArchetype: %s — %s\n\nPassive: %s\n\n%s" % [info["blurb"],
+			arch, Classes.ARCHETYPE_DESC.get(arch, ""), info["passive_desc"],
 			"\n".join(ability_lines)]
 		body.add_theme_font_size_override("font_size", 13)
 		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

@@ -48,23 +48,15 @@ static func hunter_kit() -> Array:
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "focus", "perfect_text": "+10 bonus Focus",
 			"description": "Basic ranged shot."}),
-		Ability.make({"display_name": "Hunter's Mark", "cost": 20, "special": "mark",
-			"delay": 2.0, "anim": "attack01",
-			"perfect_id": "", "perfect_text": "Mark lasts 5 turns",
-			"description": "Mark a target: everyone gains +15% crit\nchance against it for 3 turns."}),
-		Ability.make({"display_name": "Camouflage", "cost": 15, "special": "camo",
-			"delay": 2.0, "anim": "attack01",
-			"perfect_id": "", "perfect_text": "Also sheds 10 Pressure",
-			"description": "Fade into cover: harder to hit and your\nnext attack deals +20% damage."}),
 	]
 
 
 static func warrior_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Strike", "cost": 0, "damage": 23, "pressure": 9,
-			"resource_gain": 15, "delay": 2.0, "anim": "attack01",
+			"resource_gain": 20, "delay": 2.0, "anim": "attack01",
 			"perfect_id": "rage", "perfect_text": "+10 bonus Rage",
-			"description": "Basic attack. Builds 15 Rage."}),
+			"description": "Basic attack. Builds 20 Rage."}),
 		Ability.make({"display_name": "Mocking Blow", "cost": 0, "damage": 15, "pressure": 8,
 			"delay": 2.5, "anim": "attack01",
 			"perfect_id": "", "perfect_text": "Taunt lasts 4 turns",
@@ -102,7 +94,28 @@ static func cleric_kit() -> Array:
 	]
 
 
-# Specializations: ordered ids per class, plus display/passive data.
+# Archetype outline (design north star for every spec's kit):
+#   Damage — Ramp: starts weak, snowballs as the battle progresses.
+#            Rush: starts strong, resources dwindle as it progresses.
+#            Nuker: banks resources for one devastating turn; exploits weakened foes.
+#            Pressure: steady damage, debuffs/DoTs, Break pressure.
+#   Support — Healer: restores HP/mana, can revive.
+#             Warder: damage mitigation and buffs.
+#   Tank — Tank: absorbs and redirects damage, buffs.
+#          Bruiser: damage/tank hybrid, weakens enemies, moderate damage, debuffs.
+const ARCHETYPE_DESC := {
+	"Ramp": "Starts weak, snowballs as the battle progresses.",
+	"Rush": "Starts strong; resources dwindle as the fight drags on.",
+	"Nuker": "Banks resources to unleash a single devastating turn.",
+	"Pressure": "Steady damage, debuffs and DoTs, Break pressure.",
+	"Healer": "Restores lost HP and mana; can revive.",
+	"Warder": "Damage mitigation and protective buffs.",
+	"Tank": "Absorbs and redirects damage; buffs the line.",
+	"Bruiser": "Damage/tank hybrid — weakens foes with moderate damage and debuffs.",
+}
+
+
+# Specializations: ordered ids per class, plus display/passive/archetype data.
 # Each spec = 1 passive (implemented via passive_id hooks in battle.gd)
 # + 2 abilities appended to the core kit.
 const SPEC_IDS := {
@@ -124,42 +137,42 @@ static func apply_passive(cfg: Dictionary, spec: String) -> void:
 			cfg["crit_bonus"] = cfg.get("crit_bonus", 0.0) + 0.10
 
 const SPEC_INFO := {
-	"berserker": {"name": "Berserker", "passive": "bloodrage",
+	"berserker": {"name": "Berserker", "archetype": "Ramp", "passive": "bloodrage",
 		"passive_desc": "Blood Frenzy: up to +40% damage as HP falls.",
 		"blurb": "Reckless savagery — grows stronger as their blood spills."},
-	"warden": {"name": "Warden", "passive": "bulwark",
+	"warden": {"name": "Warden", "archetype": "Tank", "passive": "bulwark",
 		"passive_desc": "Bulwark: +10% armor, +15 Stability.",
 		"blurb": "Protector of the weak — shields allies with their own body."},
-	"swordmaster": {"name": "Swordmaster", "passive": "duelist",
+	"swordmaster": {"name": "Swordmaster", "archetype": "Bruiser", "passive": "duelist",
 		"passive_desc": "Duelist: +10% crit chance; crits refund 10 Rage.",
 		"blurb": "Precision and technique — critical hits fuel the flurry."},
-	"pyromancer": {"name": "Pyromancer", "passive": "ignite",
+	"pyromancer": {"name": "Pyromancer", "archetype": "Nuker", "passive": "ignite",
 		"passive_desc": "Ignite: damaging spells have 50% chance to Burn (2 turns).",
 		"blurb": "Aggressive flame — burns that spread and stack."},
-	"cryomancer": {"name": "Cryomancer", "passive": "chill",
+	"cryomancer": {"name": "Cryomancer", "archetype": "Nuker", "passive": "chill",
 		"passive_desc": "Chill: damaging spells have 50% chance to Slow (2 turns).",
 		"blurb": "Battlefield control — slow, freeze, then shatter."},
-	"arcanist": {"name": "Arcanist", "passive": "echo",
+	"arcanist": {"name": "Arcanist", "archetype": "Ramp", "passive": "echo",
 		"passive_desc": "Echo: 15% chance spells strike again at 50% power.",
 		"blurb": "Unstable raw magic — bends the rules of turn and time."},
-	"holy": {"name": "Holy", "passive": "grace",
+	"holy": {"name": "Holy", "archetype": "Healer", "passive": "grace",
 		"passive_desc": "Grace: all healing +25%.",
 		"blurb": "Pure vessel of light — mass healing and shields of faith."},
-	"inquisitor": {"name": "Inquisitor", "passive": "zeal",
+	"inquisitor": {"name": "Inquisitor", "archetype": "Warder", "passive": "zeal",
 		"passive_desc": "Zeal: +15% damage; Faith builds 13 per action.",
 		"blurb": "Zealous judge — exposes and executes the corrupted."},
-	"occultist": {"name": "Occultist", "passive": "corrupt",
+	"occultist": {"name": "Occultist", "archetype": "Pressure", "passive": "corrupt",
 		"passive_desc": "Corrupted Channeling: hits have 25% chance to Cripple (2 turns).",
 		"blurb": "Forbidden rites — leech life and trade blood for power."},
-	"beastmaster": {"name": "Beastmaster", "passive": "pack",
+	"beastmaster": {"name": "Beastmaster", "archetype": "Rush", "passive": "pack",
 		"passive_desc": "Pack Bond: your crits trigger a bonus strike for 30% damage.",
 		"blurb": "The wilds hunt beside them — every kill is shared."},
-	"sharpshooter": {"name": "Sharpshooter", "passive": "lethal_aim",
+	"sharpshooter": {"name": "Sharpshooter", "archetype": "Rush", "passive": "lethal_aim",
 		"passive_desc": "Lethal Aim: critical hits deal x1.75 damage instead of x1.5.",
 		"blurb": "Every arrow an execution — patient, precise, final."},
-	"mystic": {"name": "Mystic Ranger", "passive": "wild",
+	"mystic": {"name": "Survivalist", "archetype": "Pressure", "passive": "wild",
 		"passive_desc": "Wrath of the Wild: hits have 30% chance to Slow (2 turns).",
-		"blurb": "Nature's fury strung on a bow — thorns, roots, and spirits."},
+		"blurb": "Endures the wilds and bleeds them dry — thorns, roots, and snares."},
 }
 
 
@@ -294,12 +307,20 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Aimed Shot", "cost": 30, "damage": 34,
 					"pressure": 8, "delay": 3.5, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "+15% crit on this shot",
-					"description": "A perfect line. Always crits against\nMarked targets."}),
+					"description": "A perfect line. Patient, precise, final."}),
 				Ability.make({"display_name": "Piercing Arrow", "cost": 25, "damage": 24,
 					"pressure": 8, "delay": 3.0, "anim": "attack03", "armor_pierce": 0.5,
 					"applies_status": {"id": "cripple", "turns": 2},
 					"perfect_id": "", "perfect_text": "Ignores ALL armor",
 					"description": "Punches through plate and Cripples the\ntarget. +50% damage vs Broken enemies."}),
+				Ability.make({"display_name": "Powershot", "cost": 25, "damage": 20,
+					"pressure": 10, "delay": 3.5, "anim": "attack03",
+					"perfect_id": "focus", "perfect_text": "+10 bonus Focus",
+					"description": "Exploits the crack in their guard: +2%\ndamage per 1% of the target's Break bar\n(up to triple damage at full Pressure)."}),
+				Ability.make({"display_name": "Quick Draw", "cost": 15, "special": "quickdraw",
+					"delay": 2.0, "anim": "attack01",
+					"perfect_id": "", "perfect_text": "Lasts 6 turns",
+					"description": "Adrenaline takes over: all your abilities\nact 50% faster for 5 turns."}),
 			]
 		"mystic":
 			return [
@@ -319,6 +340,6 @@ static func spec_abilities(spec: String) -> Array:
 const CLASS_BLURBS := {
 	"hunter": "Ranged damage. Focus builds with every shot, spent on\nprecision payoffs and primal magic.",
 	"warrior": "Flexible frontliner. Rage builds through attack and pain.",
-	"mage": "Glass cannon. Resonance stacks power at the cost of safety —\nonly Guard releases them.",
+	"mage": "Glass cannon. Resonance stacks power at the cost of safety —\nstacks last the whole battle.",
 	"cleric": "Divine vessel. Faith builds with every act, awaiting Miracles.",
 }

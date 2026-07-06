@@ -345,7 +345,10 @@ func tick_statuses() -> void:
 
 
 func effective_speed() -> float:
-	return speed * (0.75 if has_status("slow") else 1.0)
+	var s := speed * (0.75 if has_status("slow") else 1.0)
+	if has_status("quickdraw"):
+		s *= 1.5
+	return s
 
 
 func effective_armor() -> float:
@@ -436,8 +439,6 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	if resource_name == "Rage":
 		resource = mini(resource + 10, max_resource)
 	if has_status("ward"):
-		pressure_add = int(pressure_add * 0.5)
-	if has_status("guard"):
 		pressure_add = int(pressure_add * 0.5)
 	var just_broke := false
 	if not broken:

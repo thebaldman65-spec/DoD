@@ -45,8 +45,11 @@ SUPERSEDED where they conflict with `docs/addendum.html` (the living changelog).
 shuffled talent trees, damage types (7) with resists, bleed buildup (100 =
 20% max HP bleedout), gold + shop runes (rarity-generated, 2 equip slots),
 2 zones (Forest → Scarlands, orc enemies incl. red Archer w/ poison), relics
-meta layer. Combat: crit 10%/miss 5%/parry 5%, Guard, Mocking Blow taunt,
-initiative ghost preview on ability hover.
+meta layer. Combat: crit 10%/miss 5%/parry 5%, Mocking Blow taunt, per-ability
+initiative ghost preview (no Guard — removed by design). Specs carry archetype
+tags (Ramp/Rush/Nuker/Pressure/Healer/Warder/Tank/Bruiser) in SPEC_INFO.
+Battle has burger menu (restart/settings overlay/exit); skill checks accept
+Space or left click; no announcer text (combat log only).
 
 ## Known open threads
 - Menu background image not yet in imported files (fallback: forest art).

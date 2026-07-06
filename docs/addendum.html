@@ -171,6 +171,20 @@
 <li><b>Combat tuning:</b> Overpower crits also Stun the target (new status: loses next turn) alongside the 20 Rage refund; Crushing Blow Pressure 17 to 11; Pyroblast's bonus vs Burning 50% to 25%.</li>
 <li><b>Zone completion fully restores the party</b> (HP and Mana) before the next zone.</li>
 </ul>
+<h3>2026-07-06 (third pass) — Archetype outline, Guard removed, Sharpshooter rework, battle QoL</h3>
+<ul>
+<li><b>Class archetype outline</b> (design north star; shown on the spec choice screen). Damage: <i>Ramp</i> (start weak, snowball), <i>Rush</i> (start strong, resources dwindle), <i>Nuker</i> (bank resources for one devastating turn, exploit weakened foes), <i>Pressure</i> (steady damage, debuffs/DoTs, Break pressure). Support: <i>Healer</i> (restore HP/mana, revive), <i>Warder</i> (mitigation, buffs). Tank: <i>Tank</i> (absorb/redirect, buffs), <i>Bruiser</i> (damage/tank hybrid, debuffs). Assignments — Mage: Pyromancer/Cryomancer Nuker, Arcanist Ramp. Cleric: Holy Healer, Inquisitor Warder, Occultist Pressure. Warrior: Berserker Ramp, Warden Tank, Swordmaster Bruiser. Hunter: Beastmaster/Sharpshooter Rush, Survivalist Pressure (renamed from Mystic Ranger).</li>
+<li><b>Guard removed entirely</b> — no universal defend action, no Guard status. Consequence: the Mage no longer has a Resonance vent; stacks now persist all battle.</li>
+<li><b>Hunter's Mark and Camouflage removed</b> (with the Marked/Camouflage statuses and their crit/miss hooks). Aimed Shot no longer auto-crits Marked targets.</li>
+<li><b>Powershot (new, Sharpshooter):</b> 25 Focus, initiative 3.5, base 20 damage +2% per 1% of the target's Break (Pressure) bar — up to triple damage at the Break threshold. Perfect: +10 Focus.</li>
+<li><b>Quick Draw (new, Sharpshooter):</b> 15 Focus, initiative 2.0 — all the Hunter's abilities act 50% faster (initiative delays shrink) for 5 turns; Perfect: 6 turns.</li>
+<li><b>Warrior Rage economy buffed:</b> +5 Rage at the start of each of his turns, and Strike now builds 20 Rage (was 15). Unchanged: +10 when hit, Perfect Strike +10.</li>
+<li><b>Per-ability initiative preview:</b> the Abilities dropdown is now a real button list — hovering each individual ability re-sorts the initiative bar with the gold ghost (the old menu only previewed from keyboard focus).</li>
+<li><b>Announcer text removed:</b> no more banner messages at the top of the battle; the combat log and floating numbers carry the information.</li>
+<li><b>Initiative bar shrunk</b> (portraits 66x90 to 48x66) so it no longer runs under the combat log.</li>
+<li><b>Battle burger menu (☰):</b> Restart Run, Settings (in-battle overlay — volume/fullscreen without losing the fight), Exit to Main Menu (run resumes from the last saved node).</li>
+<li><b>Skill checks accept left click</b> as well as Spacebar.</li>
+</ul>
 <h2>Progress Snapshot</h2>
 <p>Phase 1 (combat core) complete and simulator-tuned. Phase 2 (run structure) playable: map, battles, rewards, carryover, party/inventory screens. Next: class specializations, then drafting, talents, and zone variety. Automated testing: DOD_AUTOPLAY (single bot battle) and DOD_SIM=N (batch balance reports).</p>
 </body></html>
