@@ -161,6 +161,16 @@
 <li><b>Pyroblast (Pyromancer):</b> 45 Mana, initiative cost 6.0, 55 fire damage, +50% against Burning targets; Perfect also applies Burn. The Flame Surge > Pyroblast combo is the spec's payoff line.</li>
 <li><b>Burn crits now use the caster's crit chance</b> (snapshotted onto the status when applied) instead of a flat 10%.</li>
 </ul>
+<h3>2026-07-06 (second pass) — Main menu, saves, relic slots, combat polish</h3>
+<ul>
+<li><b>Main menu</b> (new entry scene): New Game, Continue (enabled when a save exists), Relics collection viewer, Settings (master volume + fullscreen, persisted), Exit. Menu background pending — using zone art until the image lands in imported files.</li>
+<li><b>Saving:</b> the run auto-saves after every completed node (battle victory, rest, loot, shop, zone transition) to user://run_save.bin. Run end (victory or wipe) clears the save. Continue resumes at the map.</li>
+<li><b>Node map burger menu (☰):</b> Restart Run, Quit to Main Menu, Quit to Desktop (the quits save first).</li>
+<li><b>Draft redesigned:</b> heroes shown as sprite cards — click to select (selection order = battle position), selected cards grey out, one of each. <b>Relic assignment moved here: up to 3 earned relics may be equipped per run</b> (relics are no longer all-active).</li>
+<li><b>Initiative:</b> bar extended 10 to 14 slots (Pyroblast's 6.0 delay now stays visible); the gold ghost preview now appears on HOVER over any action (buttons and the Abilities dropdown items), locking in once the ability is chosen.</li>
+<li><b>Combat tuning:</b> Overpower crits also Stun the target (new status: loses next turn) alongside the 20 Rage refund; Crushing Blow Pressure 17 to 11; Pyroblast's bonus vs Burning 50% to 25%.</li>
+<li><b>Zone completion fully restores the party</b> (HP and Mana) before the next zone.</li>
+</ul>
 <h2>Progress Snapshot</h2>
 <p>Phase 1 (combat core) complete and simulator-tuned. Phase 2 (run structure) playable: map, battles, rewards, carryover, party/inventory screens. Next: class specializations, then drafting, talents, and zone variety. Automated testing: DOD_AUTOPLAY (single bot battle) and DOD_SIM=N (batch balance reports).</p>
 </body></html>

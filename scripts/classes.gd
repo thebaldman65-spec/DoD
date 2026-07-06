@@ -195,7 +195,7 @@ static func spec_abilities(spec: String) -> Array:
 					"perfect_id": "", "perfect_text": "+15% crit chance on this strike",
 					"description": "Precise heavy cut. Critical hits\nrefund 20 Rage."}),
 				Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 32,
-					"pressure": 17, "delay": 4.0, "anim": "attack03",
+					"pressure": 11, "delay": 4.0, "anim": "attack03",
 					"applies_status": {"id": "sunder", "turns": 3},
 					"perfect_id": "pressure", "perfect_text": "+60% Pressure",
 					"description": "Moderate damage. Sunders armor\n(-35%) for 3 turns."}),

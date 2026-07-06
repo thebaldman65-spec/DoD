@@ -31,7 +31,7 @@ var offers: Array = []  # [{member_idx, rune}]
 
 func _ready() -> void:
 	if not Run.active:
-		get_tree().change_scene_to_file.call_deferred("res://scenes/draft.tscn")
+		get_tree().change_scene_to_file.call_deferred("res://scenes/main_menu.tscn")
 		return
 	_roll_offers()
 	_draw_screen()
@@ -156,7 +156,9 @@ func _draw_screen() -> void:
 	leave.text = "Leave the Shop"
 	leave.custom_minimum_size = Vector2(220, 48)
 	leave.position = Vector2(530, 640)
-	leave.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/map.tscn"))
+	leave.pressed.connect(func():
+		Run.save_run()
+		get_tree().change_scene_to_file("res://scenes/map.tscn"))
 	add_child(leave)
 
 

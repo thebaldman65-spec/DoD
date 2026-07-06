@@ -29,6 +29,7 @@ const STATUS_INFO := {
 	"poison": ["Poison", "P", Color(0.45, 0.8, 0.3), "Takes 6 damage at the start of each turn."],
 	"marked": ["Marked", "Mk", Color(0.95, 0.8, 0.35), "+15% crit chance against this unit."],
 	"camo": ["Camouflage", "Cm", Color(0.55, 0.7, 0.55), "Harder to hit; their next attack\ndeals +20% damage."],
+	"stunned": ["Stunned", "St", Color(0.95, 0.9, 0.4), "Loses their next turn."],
 	"shieldwall": ["Shieldwall", "SW", Color(0.6, 0.7, 0.9), "Takes 50% less damage."],
 	"empower": ["Empower", "+A", Color(0.95, 0.45, 0.35), "+25% damage dealt."],
 	"exposed": ["Exposed", "E", Color(0.95, 0.9, 0.4), "Takes 15% more damage."],
@@ -228,14 +229,14 @@ func _spawn_units() -> void:
 			for rune in Run.party[i].get("runes", []):
 				if rune.get("equipped", false):
 					Talents.apply_payload(cfg, rune["payload"], 1)
-			if Relics.has("dragonbone"):
+			if Run.relic_active("dragonbone"):
 				cfg["dmg_bonus"] = cfg.get("dmg_bonus", 0.0) + 0.10
-			if Relics.has("emberheart"):
+			if Run.relic_active("emberheart"):
 				var bonuses: Dictionary = cfg.get("type_dmg_bonus", {})
 				bonuses["fire"] = bonuses.get("fire", 0.0) + 0.20
 				bonuses["holy"] = bonuses.get("holy", 0.0) + 0.20
 				cfg["type_dmg_bonus"] = bonuses
-			if Relics.has("eidolon") and cfg["resource_name"] == "Rage":
+			if Run.relic_active("eidolon") and cfg["resource_name"] == "Rage":
 				cfg["resource"] = 25
 		var u := _make_unit(cfg, HERO_SLOTS[i], HERO_TINTS[i])
 		u.crit_bonus = cfg.get("crit_bonus", 0.0)
@@ -437,7 +438,7 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 		for entry in sim:
 			if entry.unit == preview_unit:
 				entry.t += preview_ability.delay * 100.0 / preview_unit.effective_speed()
-	for i in 10:
+	for i in 14:
 		var best: Dictionary = sim[0]
 		for entry in sim:
 			if entry.t < best.t:
@@ -508,6 +509,13 @@ func _run_battle() -> void:
 			u.resource = mini(u.resource + 10, u.max_resource)
 			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
 			u.refresh_bars()
+		if u.has_status("stunned"):
+			u.remove_status("stunned")
+			u.float_text("STUNNED", Color(0.95, 0.9, 0.4))
+			_log("%s is stunned and loses their turn" % u.unit_name, "#e0d060")
+			await _wait(0.8)
+			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
+			continue
 		u.tick_statuses()
 		if u.broken_pending:
 			u.broken_pending = false
@@ -554,6 +562,7 @@ func _player_turn(u: BattleUnit) -> void:
 		auto_target = pick[1]
 	else:
 		ab = await _ability_picked
+		_preview_locked = true
 		_rebuild_turn_bar(u, ab)
 	action_panel.visible = false
 
@@ -590,12 +599,15 @@ func _player_turn(u: BattleUnit) -> void:
 			if grade != "cancel":
 				break
 		# Cancelled: back to the action bar to pick something else.
+		_preview_locked = false
 		_rebuild_turn_bar()
 		_show_actions(u)
 		ab = await _ability_picked
+		_preview_locked = true
 		_rebuild_turn_bar(u, ab)
 		action_panel.visible = false
 	await _resolve(u, ab, target, grade)
+	_preview_locked = false
 	current_hero = null
 
 
@@ -755,6 +767,8 @@ func _show_actions(u: BattleUnit) -> void:
 	basic_btn.custom_minimum_size = Vector2(130, 58)
 	basic_btn.tooltip_text = _ability_tooltip(u, basic)
 	basic_btn.pressed.connect(_on_ability_button.bind(basic))
+	basic_btn.mouse_entered.connect(_preview_delay.bind(u, basic))
+	basic_btn.mouse_exited.connect(_clear_delay_preview)
 	action_box.add_child(basic_btn)
 	# Everything else lives in the Abilities dropdown.
 	var menu := MenuButton.new()
@@ -774,6 +788,8 @@ func _show_actions(u: BattleUnit) -> void:
 		popup.set_item_disabled(popup.item_count - 1,
 			ab.cost > u.resource or ab.faith_cost > u.second_resource)
 	popup.id_pressed.connect(_on_ability_menu.bind(u))
+	popup.id_focused.connect(_on_menu_hover.bind(u))
+	popup.popup_hide.connect(_clear_delay_preview)
 	action_box.add_child(menu)
 	# Guard and Items keep their own buttons.
 	var guard_btn := Button.new()
@@ -782,9 +798,29 @@ func _show_actions(u: BattleUnit) -> void:
 	guard_btn.tooltip_text = guard_ability.description
 	guard_btn.tooltip_text += "\nPerfect: %s" % guard_ability.perfect_text
 	guard_btn.pressed.connect(_on_ability_button.bind(guard_ability))
+	guard_btn.mouse_entered.connect(_preview_delay.bind(u, guard_ability))
+	guard_btn.mouse_exited.connect(_clear_delay_preview)
 	action_box.add_child(guard_btn)
 	action_box.add_child(_build_items_menu())
 	action_panel.visible = true
+
+
+var _preview_locked := false
+
+
+func _preview_delay(u: BattleUnit, ab: Ability) -> void:
+	if not _preview_locked:
+		_rebuild_turn_bar(u, ab)
+
+
+func _on_menu_hover(id: int, u: BattleUnit) -> void:
+	if not _preview_locked and id >= 0 and id < u.abilities.size():
+		_rebuild_turn_bar(u, u.abilities[id])
+
+
+func _clear_delay_preview() -> void:
+	if not _preview_locked:
+		_rebuild_turn_bar()
 
 
 func _on_ability_button(ab: Ability) -> void:
@@ -1022,7 +1058,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Piercing Arrow" and strike_target.broken:
 				raw *= 1.5
 			if ab.display_name == "Pyroblast" and strike_target.has_status("burn"):
-				raw *= 1.5
+				raw *= 1.25
 			if attacker.has_status("empower"):
 				raw *= 1.25
 			if attacker.has_status("cripple"):
@@ -1138,6 +1174,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_apply_status(strike_target, "cripple", 3)
 				if is_perfect and ab.display_name == "Hex of Ruin":
 					_apply_status(strike_target, "cripple", 3)
+			if ab.display_name == "Overpower" and is_crit and not strike_target.dead:
+				_apply_status(strike_target, "stunned", 1)
 			if is_perfect and ab.display_name == "Pyroblast" and not strike_target.dead:
 				_apply_status(strike_target, "burn", 3,
 					int(round((CRIT_CHANCE + attacker.crit_bonus) * 100)))
@@ -1552,8 +1590,9 @@ func _check_end() -> void:
 				Run.party[i]["mana"] = heroes[i].resource
 		var pts := Run.award_talent_points(Run.encounter.get("type", "fight"))
 		var gold_gain := Run.award_gold(Run.encounter.get("type", "fight"))
-		if Relics.has("chalice"):
+		if Run.relic_active("chalice"):
 			Run.heal_party(0.10)
+		Run.save_run()
 		_sfx("victory", -4.0)
 		if Run.encounter.get("type", "") == "boss":
 			var relic := Relics.unlock_random()
@@ -1565,6 +1604,7 @@ func _check_end() -> void:
 					[["Descend into %s" % Run.ZONES[Run.zone_idx + 1], _next_zone]])
 			else:
 				Run.active = false
+				Run.clear_save()
 				_show_end("THE DECAY RECEDES", boss_text + "\nRun complete!",
 					[["New Run", _start_new_run]])
 		else:
@@ -1573,6 +1613,7 @@ func _check_end() -> void:
 				[["Continue", _to_map]])
 	else:
 		Run.active = false
+		Run.clear_save()
 		_sfx("defeat", -4.0)
 		_show_end("THE PARTY HAS FALLEN", "The Decay claims this cycle.",
 			[["New Run", _start_new_run]])
@@ -1580,6 +1621,7 @@ func _check_end() -> void:
 
 func _next_zone() -> void:
 	Run.advance_zone()
+	Run.save_run()
 	_to_map()
 
 

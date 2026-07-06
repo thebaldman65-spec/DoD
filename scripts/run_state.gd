@@ -20,7 +20,10 @@ var active := false
 var specs_chosen := false  # locked in during the pre-run awakening
 var gold := 0
 
+const SAVE_PATH := "user://run_save.bin"
+
 const ZONES := ["Forest of Old", "The Scarlands"]
+var active_relics: Array = []  # up to 3 relic ids chosen at the draft
 var zone_idx := 0
 var zone_name := "Forest of Old"
 var party: Array = []      # [{key, hp, max_hp}] snapshots between battles
@@ -39,18 +42,24 @@ const HERO_BASE := {
 }
 
 
-func new_run(keys := ["warrior", "mage", "cleric"]) -> void:
+func relic_active(id: String) -> bool:
+	return active_relics.has(id)
+
+
+func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []) -> void:
 	active = true
 	specs_chosen = false
+	active_relics = relics.slice(0, 3)
+	clear_save()
 	party = []
 	for key in keys:
 		var base: Dictionary = HERO_BASE[key]
 		party.append({"key": key, "hp": base["hp"], "max_hp": base["hp"],
 			"mana": base["mana"], "max_mana": 100, "spec": "",
-			"talent_points": 1 if Relics.has("waystone") else 0,
+			"talent_points": 1 if relic_active("waystone") else 0,
 			"talents": {}, "runes": []})
 	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
-	gold = 60 + (80 if Relics.has("coin") else 0)
+	gold = 60 + (80 if relic_active("coin") else 0)
 	zone_idx = 0
 	zone_name = ZONES[0]
 	zone_idx = 0
@@ -178,14 +187,63 @@ func has_next_zone() -> bool:
 	return zone_idx < ZONES.size() - 1
 
 
-# Move to the next zone: fresh map, path reset, same party/items/gold.
+# Move to the next zone: fresh map, path reset; the party is fully
+# restored as a reward for cleansing the zone.
 func advance_zone() -> void:
 	zone_idx += 1
 	zone_name = ZONES[zone_idx]
 	floor_idx = -1
 	node_idx = -1
 	encounter = {}
+	for member in party:
+		member["hp"] = member["max_hp"]
+		member["mana"] = member["max_mana"]
 	_generate_map()
+
+
+# ---------- persistence (saved after every completed node) ----------
+
+func save_run() -> void:
+	if not active:
+		return
+	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	file.store_var({
+		"version": 1, "party": party, "items": items, "gold": gold,
+		"zone_idx": zone_idx, "zone_name": zone_name, "floor_idx": floor_idx,
+		"node_idx": node_idx, "specs_chosen": specs_chosen,
+		"active_relics": active_relics, "map": map,
+	}, true)
+
+
+func has_save() -> bool:
+	return FileAccess.file_exists(SAVE_PATH)
+
+
+func load_run() -> bool:
+	if not has_save():
+		return false
+	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var data: Variant = file.get_var(true)
+	if not (data is Dictionary):
+		return false
+	party = data["party"]
+	items = data["items"]
+	gold = data["gold"]
+	zone_idx = data["zone_idx"]
+	zone_name = data["zone_name"]
+	floor_idx = data["floor_idx"]
+	node_idx = data["node_idx"]
+	specs_chosen = data["specs_chosen"]
+	active_relics = data["active_relics"]
+	map = data["map"]
+	encounter = {}
+	active = true
+	return true
+
+
+func clear_save() -> void:
+	if has_save():
+		DirAccess.remove_absolute(SAVE_PATH)
 
 
 func award_gold(node_type: String) -> int:

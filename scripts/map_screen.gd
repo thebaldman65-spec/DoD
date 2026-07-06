@@ -17,7 +17,7 @@ const NODE_COLORS := {
 
 func _ready() -> void:
 	if not Run.active:
-		get_tree().change_scene_to_file.call_deferred("res://scenes/draft.tscn")
+		get_tree().change_scene_to_file.call_deferred("res://scenes/main_menu.tscn")
 		return
 	_draw_screen()
 
@@ -104,6 +104,18 @@ func _draw_screen() -> void:
 	party_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/party.tscn"))
 	add_child(party_btn)
 
+	var burger := MenuButton.new()
+	burger.text = "☰"
+	burger.custom_minimum_size = Vector2(52, 42)
+	burger.position = Vector2(180, 16)
+	burger.flat = false
+	var bpop := burger.get_popup()
+	bpop.add_item("Restart Run", 0)
+	bpop.add_item("Quit to Main Menu", 1)
+	bpop.add_item("Quit to Desktop", 2)
+	bpop.id_pressed.connect(_on_burger)
+	add_child(burger)
+
 	var inv := MenuButton.new()
 	inv.text = "Inventory ▾"
 	inv.custom_minimum_size = Vector2(140, 42)
@@ -157,18 +169,35 @@ func _on_node_pressed(f: int, i: int) -> void:
 		"rest":
 			Run.heal_party(0.3)
 			Run.restore_mana(0.3)
+			Run.save_run()
 			_draw_screen()
 			_toast("The party rests by the waystone (+30% HP & Mana)")
 		"treasure":
 			var id := Run.random_loot()
 			Run.items[id] = Run.items.get(id, 0) + 1
+			Run.save_run()
 			_draw_screen()
 			_toast("Scavenged a %s!" % Run.ITEM_INFO[id][0])
 		"shop":
+			Run.save_run()
 			get_tree().change_scene_to_file("res://scenes/shop.tscn")
 		_:
 			Run.encounter = {"type": node["type"], "enemies": Run.compose(node["type"])}
 			get_tree().change_scene_to_file("res://scenes/battle.tscn")
+
+
+func _on_burger(id: int) -> void:
+	match id:
+		0:
+			Run.clear_save()
+			Run.active = false
+			get_tree().change_scene_to_file("res://scenes/draft.tscn")
+		1:
+			Run.save_run()
+			get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+		2:
+			Run.save_run()
+			get_tree().quit()
 
 
 func _toast(text: String) -> void:

@@ -10,7 +10,7 @@ var selected := -1  # party index; -1 = list view
 
 func _ready() -> void:
 	if not Run.active:
-		get_tree().change_scene_to_file.call_deferred("res://scenes/draft.tscn")
+		get_tree().change_scene_to_file.call_deferred("res://scenes/main_menu.tscn")
 		return
 	_draw_screen()
 
