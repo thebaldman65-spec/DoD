@@ -78,6 +78,12 @@ func _draw_list() -> void:
 		btn.position = Vector2(410, 120 + i * 112)
 		btn.add_theme_font_size_override("font_size", 18)
 		btn.tooltip_text = Classes.CLASS_BLURBS[key]
+		# Class icon beside the name, tinted to match the hero in battle.
+		btn.icon = Classes.class_icon(key)
+		var tint: Color = Classes.HERO_TINTS[i % Classes.HERO_TINTS.size()]
+		for state in ["icon_normal_color", "icon_hover_color", "icon_pressed_color",
+				"icon_focus_color"]:
+			btn.add_theme_color_override(state, tint)
 		btn.pressed.connect(_select_hero.bind(i))
 		add_child(btn)
 

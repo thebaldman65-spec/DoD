@@ -2,7 +2,14 @@
 # Spire-style node map. Persists across scene switches within one run.
 extends Node
 
-const FLOORS := 8
+# Zone structure rules: the player interacts with 10 nodes before the boss.
+# 10 tiers × 3 nodes = 30 interconnected nodes, plus the boss tier on top.
+const FLOORS := 11  # 10 pickable tiers + the boss tier
+const NODES_PER_TIER := 3
+# Fixed node composition per zone: 60% fights, 20% rest, 20% loot.
+const FIGHT_NODES := 18
+const REST_NODES := 6
+const LOOT_NODES := 6
 
 # All item metadata lives here; battle and map both read it.
 const ITEM_IDS := ["health", "mana", "bomb", "revive", "defense"]
@@ -71,13 +78,34 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 
 
 func _generate_map() -> void:
+	# Shuffle a fixed deck of 30 node types, deal 3 per tier, boss on top.
+	var deck: Array = []
+	for i in FIGHT_NODES:
+		deck.append("fight")
+	for i in REST_NODES:
+		deck.append("rest")
+	for i in LOOT_NODES:
+		deck.append("treasure")
+	deck.shuffle()
+	# The run should open with combat: tier 1 holds at least one fight.
+	if not deck.slice(0, NODES_PER_TIER).has("fight"):
+		for j in range(NODES_PER_TIER, deck.size()):
+			if deck[j] == "fight":
+				var tmp: String = deck[0]
+				deck[0] = deck[j]
+				deck[j] = tmp
+				break
 	map = []
-	for f in FLOORS:
+	for f in FLOORS - 1:
 		var row: Array = []
-		var count := 1 if f == FLOORS - 1 else randi_range(2, 3)
-		for i in count:
-			row.append({"type": _roll_node_type(f), "links": [], "visited": false})
+		for i in NODES_PER_TIER:
+			var kind: String = deck[f * NODES_PER_TIER + i]
+			# Deeper fights can spawn as elites (still fights, tougher + richer).
+			if kind == "fight" and f >= 5 and randf() < 0.25:
+				kind = "elite"
+			row.append({"type": kind, "links": [], "visited": false})
 		map.append(row)
+	map.append([{"type": "boss", "links": [], "visited": false}])
 	# Link each node to 1-2 nodes on the next floor, keeping paths connected.
 	for f in FLOORS - 1:
 		var a: int = map[f].size()
@@ -100,34 +128,6 @@ func _generate_map() -> void:
 			if not has_inbound:
 				var nearest := 0 if b == 1 else int(round(j * float(a - 1) / float(maxi(b - 1, 1))))
 				map[f][nearest]["links"].append(j)
-	# Guarantee at least one shop per run.
-	var has_shop := false
-	for floor_row in map:
-		for map_node in floor_row:
-			if map_node["type"] == "shop":
-				has_shop = true
-	if not has_shop:
-		var shop_floor := randi_range(2, 5)
-		var row: Array = map[shop_floor]
-		row[randi_range(0, row.size() - 1)]["type"] = "shop"
-
-
-func _roll_node_type(f: int) -> String:
-	if f == FLOORS - 1:
-		return "boss"
-	if f == 0:
-		return "fight"
-	var roll := randf()
-	if roll < 0.50:
-		return "fight"
-	elif roll < 0.67 and f >= 2:
-		return "elite"
-	elif roll < 0.77 and f >= 1:
-		return "shop"
-	elif roll < 0.90:
-		return "rest"
-	else:
-		return "treasure"
 
 
 # Node indices on the next floor the player may move to.

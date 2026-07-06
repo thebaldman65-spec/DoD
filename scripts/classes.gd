@@ -2,6 +2,23 @@
 # Used by both the battle scene and the party screen.
 class_name Classes
 
+# Per-slot tints distinguish heroes until distinct class sprites arrive.
+const HERO_TINTS := [Color.WHITE, Color(0.65, 0.75, 1.0), Color(1.0, 0.9, 0.6),
+	Color(0.7, 1.0, 0.75)]
+
+
+# Cropped close-up of the class's idle sprite, used as a list icon.
+static func class_icon(key: String) -> Texture2D:
+	var sheet_dir: String = hero_config(key)["sheet_dir"]
+	var prefix: String = sheet_dir.get_file().capitalize()
+	var tex: Texture2D = load("%s/%s_Idle.png" % [sheet_dir, prefix])
+	if tex == null:
+		return null
+	var crop := AtlasTexture.new()
+	crop.atlas = tex
+	crop.region = Rect2(28, 18, 44, 60)
+	return crop
+
 
 static func hero_config(key: String) -> Dictionary:
 	var soldier := "res://assets/sprites/soldier"
@@ -57,10 +74,6 @@ static func warrior_kit() -> Array:
 			"resource_gain": 20, "delay": 2.0, "anim": "attack01",
 			"perfect_id": "rage", "perfect_text": "+10 bonus Rage",
 			"description": "Basic attack. Builds 20 Rage."}),
-		Ability.make({"display_name": "Mocking Blow", "cost": 0, "damage": 15, "pressure": 8,
-			"delay": 2.5, "anim": "attack01",
-			"perfect_id": "", "perfect_text": "Taunt lasts 4 turns",
-			"description": "Strike and humiliate: the target must\nattack the Warrior for 3 turns."}),
 	]
 
 
@@ -182,16 +195,26 @@ static func spec_abilities(spec: String) -> Array:
 			return [
 				Ability.make({"display_name": "Bloodlust", "cost": 25, "damage": 26,
 					"pressure": 9, "delay": 3.0, "anim": "attack02", "heal_missing": 0.3,
+					"resource_gain": 10,
 					"perfect_id": "", "perfect_text": "Heals 45% of missing HP instead",
-					"description": "Strike and drink deep: heals the Warrior\nfor 30% of their missing HP."}),
+					"description": "Strike and drink deep: heals the Warrior\nfor 30% of their missing HP. Builds 10 Rage."}),
 				Ability.make({"display_name": "Wildstrikes", "cost": 35, "damage": 16,
 					"pressure": 7, "delay": 4.5, "anim": "attack03", "aoe": true,
-					"bleed_build": 35,
+					"bleed_build": 35, "resource_gain": 10,
 					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
-					"description": "Savage sweep: hits ALL enemies and\nbuilds 35 Bleed on each."}),
+					"description": "Savage sweep: hits ALL enemies and\nbuilds 35 Bleed on each. Builds 10 Rage."}),
+				Ability.make({"display_name": "Hack and Slash", "cost": 20, "damage": 10,
+					"pressure": 5, "delay": 3.0, "anim": "attack01", "multi_hits": 3,
+					"bleed_build": 20, "bleed_chance": 0.4, "resource_gain": 10,
+					"perfect_id": "", "perfect_text": "4 strikes instead of 3",
+					"description": "Three savage cuts at one target; each\nhit has a 40% chance to build 20 Bleed.\nBuilds 10 Rage."}),
 			]
 		"warden":
 			return [
+				Ability.make({"display_name": "Mocking Blow", "cost": 0, "damage": 15, "pressure": 8,
+					"resource_gain": 10, "delay": 2.5, "anim": "attack01",
+					"perfect_id": "", "perfect_text": "Taunt lasts 4 turns",
+					"description": "Strike and humiliate: the target must\nattack the Warrior for 3 turns.\nBuilds 10 Rage."}),
 				Ability.make({"display_name": "Shieldwall", "cost": 25, "special": "shieldwall",
 					"delay": 3.5, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "Also sheds 10 Pressure from each ally",
@@ -204,14 +227,14 @@ static func spec_abilities(spec: String) -> Array:
 		"swordmaster":
 			return [
 				Ability.make({"display_name": "Overpower", "cost": 20, "damage": 30,
-					"pressure": 10, "delay": 3.0, "anim": "attack02",
+					"pressure": 10, "delay": 3.0, "anim": "attack02", "resource_gain": 10,
 					"perfect_id": "", "perfect_text": "+15% crit chance on this strike",
-					"description": "Precise heavy cut. Critical hits\nrefund 20 Rage."}),
+					"description": "Precise heavy cut. Critical hits\nrefund 20 Rage. Builds 10 Rage."}),
 				Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 32,
-					"pressure": 11, "delay": 4.0, "anim": "attack03",
+					"pressure": 11, "delay": 4.0, "anim": "attack03", "resource_gain": 10,
 					"applies_status": {"id": "sunder", "turns": 3},
 					"perfect_id": "pressure", "perfect_text": "+60% Pressure",
-					"description": "Moderate damage. Sunders armor\n(-35%) for 3 turns."}),
+					"description": "Moderate damage. Sunders armor\n(-35%) for 3 turns. Builds 10 Rage."}),
 			]
 		"pyromancer":
 			return [
@@ -304,7 +327,7 @@ static func spec_abilities(spec: String) -> Array:
 			]
 		"sharpshooter":
 			return [
-				Ability.make({"display_name": "Aimed Shot", "cost": 30, "damage": 34,
+				Ability.make({"display_name": "Aimed Shot", "cost": 20, "damage": 34,
 					"pressure": 8, "delay": 3.5, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "+15% crit on this shot",
 					"description": "A perfect line. Patient, precise, final."}),

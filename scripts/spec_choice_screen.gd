@@ -79,6 +79,20 @@ func _draw_screen() -> void:
 		name_label.add_theme_color_override("font_color", Color(0.9, 0.82, 0.6))
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		vbox.add_child(name_label)
+		# Archetype: bold name only; the explanation lives in the tooltip.
+		var arch: String = info.get("archetype", "")
+		var arch_label := Label.new()
+		arch_label.text = arch
+		var bold := FontVariation.new()
+		bold.base_font = ThemeDB.fallback_font
+		bold.variation_embolden = 0.9
+		arch_label.add_theme_font_override("font", bold)
+		arch_label.add_theme_font_size_override("font_size", 16)
+		arch_label.add_theme_color_override("font_color", Color(0.82, 0.75, 0.6))
+		arch_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		arch_label.mouse_filter = Control.MOUSE_FILTER_STOP
+		arch_label.tooltip_text = Classes.ARCHETYPE_DESC.get(arch, "")
+		vbox.add_child(arch_label)
 		var body := Label.new()
 		var ability_lines := PackedStringArray()
 		for ab in Classes.spec_abilities(spec_id):
@@ -88,9 +102,7 @@ func _draw_screen() -> void:
 					int(round(ab.damage * 1.1)), ab.dmg_type.capitalize()]
 			ability_lines.append(line)
 			ability_lines.append("   %s" % ab.description.replace("\n", " "))
-		var arch: String = info.get("archetype", "")
-		body.text = "%s\n\nArchetype: %s — %s\n\nPassive: %s\n\n%s" % [info["blurb"],
-			arch, Classes.ARCHETYPE_DESC.get(arch, ""), info["passive_desc"],
+		body.text = "%s\n\nPassive: %s\n\n%s" % [info["blurb"], info["passive_desc"],
 			"\n".join(ability_lines)]
 		body.add_theme_font_size_override("font_size", 13)
 		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

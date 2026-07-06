@@ -89,6 +89,7 @@ var history: RichTextLabel
 var sc_root: Control
 var sc_cursor: ColorRect
 var sc_result: Label
+var sc_cancel: Button
 var sc_active := false
 var sc_pos := 0.0
 var sc_dir := 1.0
@@ -144,7 +145,6 @@ func _build_arena() -> void:
 
 
 const HERO_SLOTS := [Vector2(430, 380), Vector2(240, 470), Vector2(430, 560), Vector2(240, 650)]
-const HERO_TINTS := [Color.WHITE, Color(0.65, 0.75, 1.0), Color(1.0, 0.9, 0.6), Color(0.7, 1.0, 0.75)]
 const ENEMY_LAYOUTS := {
 	1: [Vector2(1000, 500)],
 	2: [Vector2(920, 420), Vector2(1000, 600)],
@@ -229,7 +229,7 @@ func _spawn_units() -> void:
 				cfg["type_dmg_bonus"] = bonuses
 			if Run.relic_active("eidolon") and cfg["resource_name"] == "Rage":
 				cfg["resource"] = 25
-		var u := _make_unit(cfg, HERO_SLOTS[i], HERO_TINTS[i])
+		var u := _make_unit(cfg, HERO_SLOTS[i], Classes.HERO_TINTS[i])
 		u.crit_bonus = cfg.get("crit_bonus", 0.0)
 		u.parry_bonus = cfg.get("parry_bonus", 0.0)
 		if spec != "":
@@ -921,6 +921,8 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 		tip += "\nDamage: %d–%d (%s)    Pressure: %d" % [
 			int(ab.damage * 0.9 * buff_mult), int(round(ab.damage * 1.1 * buff_mult)),
 			ab.dmg_type.capitalize(), ab.pressure]
+		if ab.random_hits > 0 or ab.multi_hits > 0:
+			tip += "   × %d hits" % maxi(ab.random_hits, ab.multi_hits)
 	if ab.heal > 0:
 		tip += "\nHeals: %d" % ab.heal
 	tip += "\nInitiative cost: %.1f" % ab.delay
@@ -1085,6 +1087,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		var total_hits := strike_targets.size()
 		if ab.random_hits > 0:
 			total_hits = ab.random_hits + (1 if is_perfect else 0)
+		elif ab.multi_hits > 0:
+			total_hits = ab.multi_hits + (1 if is_perfect else 0)
 		var total_dealt := 0
 		var any_crit := false
 		for hit_i in total_hits:
@@ -1096,6 +1100,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if live_pool.is_empty():
 					break
 				strike_target = live_pool.pick_random()
+			elif ab.multi_hits > 0:
+				# Repeated strikes on the chosen target; stop if it falls.
+				strike_target = target
+				if strike_target.dead:
+					break
 			else:
 				strike_target = strike_targets[hit_i]
 				if strike_target.dead:
@@ -1215,7 +1224,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if ab.applies_status["id"] == "burn":
 					status_meta = int(round((CRIT_CHANCE + attacker.crit_bonus) * 100))
 				_apply_status(strike_target, ab.applies_status["id"], turns, status_meta)
-			if ab.bleed_build > 0 and not strike_target.dead:
+			if ab.bleed_build > 0 and not strike_target.dead and randf() <= ab.bleed_chance:
 				if strike_target.add_bleed(ab.bleed_build):
 					var bleed_dmg := maxi(int(strike_target.max_hp * 0.20), 1)
 					var bleed_result: Dictionary = strike_target.take_hit(bleed_dmg, 0)
@@ -1271,8 +1280,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_message("%s falls!" % strike_target.unit_name)
 				_log("† %s dies" % strike_target.unit_name, "#e05050")
 				await _wait(0.5)
-			if ab.random_hits > 0 and total_hits > 1:
-				await _wait(0.45)  # sequential shards land distinctly
+			if (ab.random_hits > 0 or ab.multi_hits > 0) and total_hits > 1:
+				await _wait(0.45)  # sequential strikes land distinctly
 		# Post-strike attacker effects.
 		if ab.recoil_base > 0.0:
 			var recoil_pct := ab.recoil_base * (1.0 + attacker.second_resource)
@@ -1527,17 +1536,18 @@ func _run_skill_check(cancellable := false) -> String:
 	sc_result.text = ""
 	sc_root.visible = true
 	sc_active = true
-	var cancel_btn: Button = null
+	sc_cancel = null
 	if cancellable:
-		cancel_btn = Button.new()
-		cancel_btn.text = "✕ Cancel"
-		cancel_btn.custom_minimum_size = Vector2(104, 34)
-		cancel_btn.position = Vector2(448, 20)
-		cancel_btn.pressed.connect(_cancel_skill_check)
-		sc_root.add_child(cancel_btn)
+		sc_cancel = Button.new()
+		sc_cancel.text = "✕ Cancel"
+		sc_cancel.custom_minimum_size = Vector2(104, 34)
+		sc_cancel.position = Vector2(448, 20)
+		sc_cancel.pressed.connect(_cancel_skill_check)
+		sc_root.add_child(sc_cancel)
 	var grade: String = await _skill_done
-	if cancel_btn != null:
-		cancel_btn.queue_free()
+	if sc_cancel != null:
+		sc_cancel.queue_free()
+		sc_cancel = null
 	if grade == "cancel":
 		sc_root.visible = false
 		return grade
@@ -1577,20 +1587,33 @@ func _process(delta: float) -> void:
 		sc_cursor.position.x = 10.0 + sc_pos * 420.0 - 2.0
 
 
-func _unhandled_input(event: InputEvent) -> void:
+# Left clicks are handled in _input because UI panels (the check bar itself,
+# the log, portraits) would otherwise swallow them before _unhandled_input.
+func _input(event: InputEvent) -> void:
 	if not sc_active:
 		return
-	var clicked_check: bool = event is InputEventMouseButton \
-		and event.button_index == MOUSE_BUTTON_LEFT and event.pressed
-	if event.is_action_pressed("ui_accept") or clicked_check:
-		sc_active = false
-		var dist: float = absf(sc_pos - 0.5)
-		var grade := "fail"
-		if dist <= PERFECT_HALF:
-			grade = "perfect"
-		elif dist <= GOOD_HALF:
-			grade = "good"
-		_skill_done.emit(grade)
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT \
+			and event.pressed:
+		# Clicking the Cancel button must cancel, not grade the check.
+		if sc_cancel != null and sc_cancel.get_global_rect().has_point(event.position):
+			return
+		_grade_skill_check()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if sc_active and event.is_action_pressed("ui_accept"):
+		_grade_skill_check()
+
+
+func _grade_skill_check() -> void:
+	sc_active = false
+	var dist: float = absf(sc_pos - 0.5)
+	var grade := "fail"
+	if dist <= PERFECT_HALF:
+		grade = "perfect"
+	elif dist <= GOOD_HALF:
+		grade = "good"
+	_skill_done.emit(grade)
 
 
 # ---------- end of battle ----------
@@ -1637,6 +1660,9 @@ func _check_end() -> void:
 		for i in heroes.size():
 			# The Untouched refuse to stay down: the fallen return at 20% HP.
 			Run.party[i]["hp"] = maxi(heroes[i].hp, int(heroes[i].max_hp * 0.2))
+			# Keep the saved max in sync with talents/runes so full heals
+			# (rest, zone transitions) reach the hero's true maximum.
+			Run.party[i]["max_hp"] = heroes[i].max_hp
 			if heroes[i].resource_name == "Mana":
 				Run.party[i]["mana"] = heroes[i].resource
 		var pts := Run.award_talent_points(Run.encounter.get("type", "fight"))

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
+<body>
+<h1>DAWN OF DECAY — Master Design Document</h1>
+<p><i>Authoritative reference as of 2026-07-06. This document supersedes the original concept
+docs ("Dawn of Decay.docx", "DoD Combat.docx", "DoD Classes.docx", "DoD Run.docx",
+"DoD UI.docx", "DoD Narrative_Zones.docx"). Day-to-day changes continue to be logged in the
+Implementation Addendum; this master is the full picture. Engine: Godot 4.7, all UI built in
+code.</i></p>
+
+<h2>1. Concept</h2>
+<p>A turn-based party roguelike. The world is being consumed by <b>the Decay</b>; the player
+commands <b>the Untouched</b> — four heroes immune to it — through zone after zone of corrupted
+enemies. Runs are short, buildcrafted, and repeatable: draft a party, awaken permanent
+specializations, climb a node map, defeat the zone boss, descend deeper. Death ends the run but
+feeds a permanent relic collection (meta-progression). Combat is timeline-initiative with a
+timing skill check on every action — the player's execution matters as much as their build.</p>
+
+<h2>2. Run Flow</h2>
+<p><b>Main Menu</b> → <b>Draft</b> (pick 4 heroes + equip up to 3 relics) →
+<b>Map</b> (node climbing) → <b>Battles / Rest / Loot</b> → after the first victory,
+<b>Spec Choice</b> (permanent) → <b>Party screen</b> (talents, runes) → … → <b>Zone Boss</b> →
+next zone (party fully restored) → final boss → run complete.</p>
+<ul>
+<li><b>Main menu:</b> New Game, Continue (enabled when a save exists), Relics (collection
+viewer), Settings (master volume, fullscreen — persisted to user://settings.cfg), Exit.</li>
+<li><b>Draft:</b> heroes shown as sprite cards; click to select. Selection order = battle
+position (slot order also sets each hero's tint). One of each class — picking a duplicate moves
+it. Up to 3 unlocked relics may be equipped for the run.</li>
+<li><b>Spec choice:</b> offered per hero after the first victory. Three cards per class, each
+showing the spec name, its <b>archetype</b> in bold (mouseover for the archetype explanation),
+blurb, passive, and full ability details. The choice is permanent for the run.</li>
+<li><b>Victory rewards:</b> gold + talent points for every hero. Fallen heroes return after a
+won battle at 20% max HP ("the Untouched refuse to stay down").</li>
+<li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft.</li>
+<li><b>Saving:</b> auto-save to user://run_save.bin after every completed node; Continue
+resumes at the map. Run end (win or wipe) clears the save.</li>
+</ul>
+
+<h2>3. Zones &amp; the Node Map</h2>
+<p><b>Structure rules:</b> every zone is a ladder of <b>10 tiers plus the boss tier</b>. Each
+tier holds <b>3 nodes</b> — 30 interconnected nodes total — and the player picks exactly one
+node per tier, so <b>10 nodes are interacted with before the boss</b>. Node composition is a
+fixed deck per zone:</p>
+<table border="1" cellpadding="4">
+<tr><th>Type</th><th>Count</th><th>Share</th><th>Effect</th></tr>
+<tr><td>Fight</td><td>18</td><td>60%</td><td>Battle vs. a zone encounter. Fights on tiers 6+
+have a 25% chance to spawn as an ELITE (tougher composition, double talent points, more
+gold).</td></tr>
+<tr><td>Rest</td><td>6</td><td>20%</td><td>Party heals 30% max HP and Mage/Cleric recover 30%
+Mana at the waystone.</td></tr>
+<tr><td>Loot</td><td>6</td><td>20%</td><td>Scavenge one random consumable (weighted pool: 2×
+Health, 2× Mana, 1× each Bomb / Revive / Defense).</td></tr>
+</table>
+<p>The deck is shuffled and dealt 3 per tier (tier 1 is guaranteed at least one fight so runs
+open with combat). Every node links to 1–2 nodes on the next tier and every node has at least
+one inbound path, so all paths stay connected. The boss tier is a single node.
+<b>Note:</b> under these quotas, shop nodes no longer spawn — see §10 (open question).</p>
+<ul>
+<li><b>Zones:</b> 1. Forest of Old → 2. The Scarlands. Later zones multiply enemy HP and
+damage by (1 + 0.35 × zone index) and tint enemies redder.</li>
+<li><b>Zone completion:</b> killing the boss awards a relic unlock, big gold, 3 talent points,
+and fully restores the party (HP and Mana) before the descent.</li>
+<li><b>Map screen:</b> zone art background, node ladder, Party button (shows unspent talent
+points), read-only Inventory dropdown, burger menu (Restart Run / Quit to Main Menu / Quit to
+Desktop), gold + party HP readout.</li>
+</ul>
+
+<h2>4. Combat System</h2>
+<h3>4.1 Initiative timeline</h3>
+<p>Every unit sits on a shared timeline. After acting, a unit's next turn arrives after
+<b>delay × 100 / speed</b> time units (delay is the ability's initiative cost, listed in every
+tooltip; basic actions are 2.0, heavy abilities up to 6.0). Speed 100 is average. Slow status
+reduces effective speed to 75%; Quick Draw raises it by 50%. Some abilities shove the
+<i>target</i> down the timeline (delay_push). The initiative bar (top of screen, 14 slots,
+48×66 portraits) always shows the coming order; <b>hovering any individual ability re-sorts
+the bar with a gold "ghost" portrait</b> showing where that cast would land your next turn.
+The ghost locks in when the ability is chosen and persists through targeting and the skill
+check.</p>
+<h3>4.2 Skill checks</h3>
+<p>Every hero action runs a timing bar: a cursor sweeps 0→1→0 (0.72s per sweep); stop it with
+<b>Spacebar or Left Click</b>.</p>
+<table border="1" cellpadding="4">
+<tr><th>Grade</th><th>Zone (half-width around center)</th><th>Damage</th><th>Pressure</th><th>Extra</th></tr>
+<tr><td>PERFECT</td><td>±0.045</td><td>×1.15</td><td>×1.25</td><td>Unique per-ability bonus
+(listed in every tooltip); AoE perfects get ×1.5 Pressure</td></tr>
+<tr><td>Good</td><td>±0.16</td><td>×1.0</td><td>×1.0</td><td>—</td></tr>
+<tr><td>Sloppy (miss the zones)</td><td>—</td><td>×0.6</td><td>×0.5</td><td>—</td></tr>
+</table>
+<p>Auto-cast abilities (no target click) show a Cancel button during the check; cancelling
+returns to the action bar. Enemies and the sim bot always act at "Good" (bot: 20% perfect,
+15% sloppy).</p>
+<h3>4.3 Attack resolution pipeline</h3>
+<p>Per strike, in order: base damage × random variance (0.9–1.1) × grade multiplier × crit
+(×1.5; Sharpshooter passive ×1.75) × attacker modifiers × target modifiers × (1 − resist) ×
+(1 − effective armor), minimum 1.</p>
+<ul>
+<li><b>Miss:</b> 5% base chance (single-target, non-counter only). AoE never misses/parries.</li>
+<li><b>Parry:</b> 5% base + parry bonuses; negated hit and the defender counters with their
+basic attack as a free action (no initiative cost, cannot chain). Broken units cannot parry.</li>
+<li><b>Crit:</b> 10% base + 25% vs Broken targets + 3% per Mage Resonance stack + talent/spec
+bonuses. Guaranteed: Razor Ice vs Slowed.</li>
+<li><b>Attacker modifiers:</b> Resonance +15%/stack; Surge +20%; Empower +25%; Cripple −15%;
+Blood Frenzy up to +40% as HP falls; Zeal +15%; relic bonuses (global +10% dragonbone; fire/holy
++20% emberheart); Piercing Arrow +50% vs Broken; Powershot +2% per 1% target Break bar;
+Pyroblast +25% vs Burning.</li>
+<li><b>Target modifiers:</b> Shieldwall −50%; Exposed +15%; Mage Resonance +10% damage
+<i>taken</i> per stack (the glass-cannon risk).</li>
+<li><b>Armor:</b> flat % damage reduction. Fortify +10%; Broken ×0.7; Sunder ×0.65; armor_pierce
+ignores a fraction (Piercing Arrow 50%, Singularity 30%).</li>
+<li><b>Damage types (7):</b> physical, fire, frost, arcane, nature, shadow, holy. Enemies carry
+resist fractions (negative = vulnerable, e.g. the Withered Warden takes +25% fire).</li>
+<li><b>Barrier</b> absorbs damage (not Pressure) before HP.</li>
+</ul>
+<h3>4.4 Pressure &amp; Break</h3>
+<p>Attacks add Pressure equal to the ability's Pressure value × grade multiplier (×1.5 on
+crits). When Pressure reaches the unit's <b>Stability</b>, it <b>BREAKS</b>: it loses its next
+turn, armor ×0.7, +25% crit chance against it, and enemies actively exploit Broken heroes with
+their hardest affordable attack. Breaking triggers hitstop, a purple fracture flash, and a
+camera punch. After the lost turn, Pressure resets to 0. Ward and (removed) mitigation statuses
+halve incoming Pressure.</p>
+<h3>4.5 Bleed &amp; damage over time</h3>
+<ul>
+<li><b>Bleed</b> is a 0–100 buildup meter (chip shows Bl##). Wounding attacks add buildup
+(Wildstrikes 35 always; Hack and Slash 20 at 40% per hit). At 100 the target <b>bleeds out for
+20% max HP</b> and the meter resets.</li>
+<li><b>Burn / Poison:</b> 6 damage at the start of the afflicted unit's turn. Burn ticks can
+crit using the caster's snapshotted crit chance.</li>
+<li><b>Renewal</b> +8 HP and <b>Focus (status)</b> +10 Mana at turn start.</li>
+</ul>
+<h3>4.6 Status effects (current roster)</h3>
+<table border="1" cellpadding="4">
+<tr><th>Status</th><th>Effect</th></tr>
+<tr><td>Slow</td><td>−25% speed; turns arrive later.</td></tr>
+<tr><td>Burn / Poison</td><td>6 damage at the start of each turn.</td></tr>
+<tr><td>Bleed</td><td>Buildup meter; bleeds out for 20% max HP at 100.</td></tr>
+<tr><td>Sunder</td><td>−35% armor.</td></tr>
+<tr><td>Ward</td><td>Takes 50% less Pressure.</td></tr>
+<tr><td>Fortify</td><td>+10% armor (Defense Potion).</td></tr>
+<tr><td>Barrier</td><td>Absorbs N incoming damage, then breaks.</td></tr>
+<tr><td>Focus</td><td>+10 Mana each turn.</td></tr>
+<tr><td>Renewal</td><td>+8 HP each turn.</td></tr>
+<tr><td>Surge</td><td>+20% attack.</td></tr>
+<tr><td>Mocked</td><td>Must attack the Warrior who mocked them.</td></tr>
+<tr><td>Quick Draw</td><td>All abilities act 50% faster.</td></tr>
+<tr><td>Stunned</td><td>Loses their next turn.</td></tr>
+<tr><td>Shieldwall</td><td>Takes 50% less damage.</td></tr>
+<tr><td>Empower</td><td>+25% damage dealt.</td></tr>
+<tr><td>Exposed</td><td>Takes 15% more damage.</td></tr>
+<tr><td>Cripple</td><td>−15% damage dealt.</td></tr>
+<tr><td>Retaliation</td><td>Counters attackers with a basic strike.</td></tr>
+<tr><td>Broken</td><td>Loses next turn; −30% armor; +25% crit taken.</td></tr>
+</table>
+<p>Statuses tick down at the start of the affected unit's turn; negative durations last the
+whole battle. Removed by design: Guard, Marked, Camouflage.</p>
+<h3>4.7 Items in battle</h3>
+<p>The party inventory is shared. Using an item does <b>not</b> consume the turn, but each hero
+may use only one item per turn. Bomb: 50 damage to all enemies. Health Potion: +40 HP.
+Mana Potion: +40 Mana/Rage. Revive Potion: fallen ally returns at 50% HP. Defense Potion:
+party gains Fortify (3 turns).</p>
+<h3>4.8 Enemy AI</h3>
+<p>Enemies prefer finishing wounded heroes (65%) or spread damage randomly; if any hero is
+Broken they exploit it with their hardest affordable hit. Mocked enemies must attack the
+taunting Warrior. The Chief/Bosses build and spend Rage like a Warrior.</p>
+<h3>4.9 There is no announcer</h3>
+<p>All battle information lives in the scrolling combat log (top right) and floating combat
+text. No banner text appears at the top of the battle.</p>
+
+<h2>5. Heroes</h2>
+<p>All four classes are drafted every run (one of each). Sprites currently share the Soldier
+sheet, distinguished by slot tints (white / blue / gold / green); distinct art is pending.</p>
+<table border="1" cellpadding="4">
+<tr><th>Class</th><th>HP</th><th>Armor</th><th>Speed</th><th>Stability</th><th>Resource(s)</th></tr>
+<tr><td>Warrior</td><td>140</td><td>25%</td><td>95</td><td>60</td><td>Rage 0–100</td></tr>
+<tr><td>Mage</td><td>90</td><td>10%</td><td>110</td><td>40</td><td>Mana 100 + Resonance 0–5</td></tr>
+<tr><td>Cleric</td><td>110</td><td>15%</td><td>85</td><td>50</td><td>Mana 100 + Faith 0–100</td></tr>
+<tr><td>Hunter</td><td>100</td><td>12%</td><td>105</td><td>45</td><td>Focus 100</td></tr>
+</table>
+<h3>5.1 Resource mechanics</h3>
+<ul>
+<li><b>Rage (Warrior):</b> starts at 0. +5 at the start of each of his turns; +10 whenever he
+is hit; every attack builds Rage (Strike 20, all spec/talent attacks 10); Perfect Strike +10.
+Eidolon Mirror relic: start battles at 25.</li>
+<li><b>Mana (Mage/Cleric):</b> +12 at the start of their turns; potions/Rally restore more.
+Mage Phoenix Rebirth trades HP for a full refill.</li>
+<li><b>Focus (Hunter):</b> +15 at the start of their turns; Perfect basic +10.</li>
+<li><b>Faith (Cleric secondary):</b> +10 per action taken (13 with Zeal); spent on MIRACLE
+abilities (no Mana cost).</li>
+<li><b>Arcane Resonance (Mage secondary, 0–5):</b> +1 per damaging resolve (+2 if it crit).
+Each stack: +15% damage dealt, +3% crit, but +10% damage <i>taken</i>. Hitting max triggers
+Backlash Ward (+15 Mana). Stacks persist the whole battle (the old Guard vent is gone).</li>
+</ul>
+<h3>5.2 Core kits (before specialization)</h3>
+<ul>
+<li><b>Warrior:</b> Strike — 23 dmg / 9 Pressure / delay 2.0, builds 20 Rage
+(Perfect: +10 Rage).</li>
+<li><b>Mage:</b> Magic Bolt — 25 arcane / 7 Pr / 2.0 (Perfect: +10 Mana); Arcane Surge —
+15 Mana, 3.0, +20% attack next turn, +1 Resonance guaranteed (Perfect: +2).</li>
+<li><b>Cleric:</b> Smite — 22 holy / 8 Pr / 2.0 (Perfect: self-heal 8); Mend Wounds — 25 Mana,
+heal 45, 3.0 (Perfect: Ward 2 turns); Renewal — 20 Mana, ally +8 HP/turn for 5 turns, 3.0
+(Perfect: +8 instant).</li>
+<li><b>Hunter:</b> Quick Shot — 20 dmg / 7 Pr / 2.0 (Perfect: +10 Focus).</li>
+</ul>
+
+<h2>6. Archetypes &amp; Specializations</h2>
+<p>Archetypes are the design north star for every spec's kit. They appear in bold on the spec
+choice screen with a mouseover explanation.</p>
+<table border="1" cellpadding="4">
+<tr><th>Role</th><th>Archetype</th><th>Definition</th></tr>
+<tr><td rowspan="4">Damage</td><td>Ramp</td><td>Starts weak, snowballs as the battle progresses.</td></tr>
+<tr><td>Rush</td><td>Starts strong; resources dwindle as the fight drags on.</td></tr>
+<tr><td>Nuker</td><td>Banks resources to unleash a single devastating turn; exploits weakened foes.</td></tr>
+<tr><td>Pressure</td><td>Steady damage, debuffs and DoTs, Break pressure.</td></tr>
+<tr><td rowspan="2">Support</td><td>Healer</td><td>Restores lost HP and mana; can revive.</td></tr>
+<tr><td>Warder</td><td>Damage mitigation and protective buffs.</td></tr>
+<tr><td rowspan="2">Tank</td><td>Tank</td><td>Absorbs and redirects damage; buffs the line.</td></tr>
+<tr><td>Bruiser</td><td>Damage/tank hybrid — weakens foes, moderate damage, debuffs.</td></tr>
+</table>
+<p>Every spec grants one passive plus abilities appended to the core kit. Specs are chosen once
+per run and are permanent.</p>
+
+<h3>6.1 Warrior</h3>
+<ul>
+<li><b>Berserker (Ramp)</b> — Passive <i>Blood Frenzy</i>: up to +40% damage as HP falls.<br>
+Bloodlust — 25 Rage, 26 dmg / 9 Pr / 3.0, heals 30% of missing HP, builds 10 Rage
+(Perfect: 45% missing HP).<br>
+Wildstrikes — 35 Rage, 16 dmg to ALL / 7 Pr / 4.5, +35 Bleed each, builds 10 Rage
+(Perfect: +50% Pressure).<br>
+Hack and Slash — 20 Rage, 3 strikes × 10 dmg / 5 Pr / 3.0 at one target, each hit 40% chance
+to build 20 Bleed, builds 10 Rage (Perfect: 4 strikes).</li>
+<li><b>Warden (Tank)</b> — Passive <i>Bulwark</i>: +10% armor, +15 Stability.<br>
+Mocking Blow — free, 15 dmg / 8 Pr / 2.5, taunts the target for 3 turns, builds 10 Rage
+(Perfect: 4 turns).<br>
+Shieldwall — 25 Rage, 3.5, party takes 50% less damage until their next turns
+(Perfect: each ally also −10 Pressure).<br>
+Retaliation — 20 Rage, 3.0, counter every attack on the Warrior for 3 turns
+(Perfect: 4 turns).</li>
+<li><b>Swordmaster (Bruiser)</b> — Passive <i>Duelist</i>: +10% crit; crits refund 10 Rage.<br>
+Overpower — 20 Rage, 30 dmg / 10 Pr / 3.0, crits refund 20 Rage and Stun, builds 10 Rage
+(Perfect: +15% crit).<br>
+Crushing Blow — 20 Rage, 32 dmg / 11 Pr / 4.0, Sunders (−35% armor, 3 turns), builds 10 Rage
+(Perfect: +60% Pressure).</li>
+</ul>
+<h3>6.2 Mage</h3>
+<ul>
+<li><b>Pyromancer (Nuker)</b> — Passive <i>Ignite</i>: damaging spells 50% chance to Burn
+(2 turns).<br>
+Pyroblast — 45 Mana, 55 fire / 10 Pr / 6.0, +25% vs Burning (Perfect: also Burns 3 turns).<br>
+Flame Surge — 20 Mana, 16 fire to ALL / 6 Pr / 3.5 + Burn 2 turns (Perfect: 3 turns).<br>
+Phoenix Rebirth — free, 3.0, sacrifice 25% current HP for full Mana + Empower 3 turns
+(Perfect: only 15% HP).</li>
+<li><b>Cryomancer (Nuker)</b> — Passive <i>Chill</i>: damaging spells 50% chance to Slow
+(2 turns).<br>
+Razor Ice — 20 Mana, 15 frost / 7 Pr / 3.0 × 2 random targets, always crits vs Slowed
+(Perfect: 3 shards).<br>
+Blizzard — 30 Mana, 15 frost to ALL / 6 Pr / 4.0 + Slow 2 turns (Perfect: +50% Pressure).</li>
+<li><b>Arcanist (Ramp)</b> — Passive <i>Echo</i>: 15% chance spells strike again at 50%
+power.<br>
+Arcane Cannon — 20 Mana, 30 arcane / 9 Pr / 3.5, recoils 5% of damage dealt +5% per Resonance
+stack (Perfect: no recoil).<br>
+Reality Fracture — 20 Mana, 15 arcane / 7 Pr / 3.0, shoves the target 4.0 down the initiative
+order (Perfect: +1 Resonance).</li>
+</ul>
+<h3>6.3 Cleric</h3>
+<ul>
+<li><b>Holy (Healer)</b> — Passive <i>Grace</i>: all healing +25%.<br>
+Dawnbreak — 20 Mana, 3.0, heal an ally 40; overheal flows back to the Cleric
+(Perfect: +15 healing).<br>
+Hymn of Hope — MIRACLE, 40 Faith, 4.0, heal ALL allies 20% max HP (Perfect: 25%).</li>
+<li><b>Inquisitor (Warder)</b> — Passive <i>Zeal</i>: +15% damage; Faith builds 13/action.<br>
+Divine Shield — 30 Mana, 3.0, ally shield absorbing 100 (Perfect: 130).<br>
+Burning Verdict — MIRACLE, 40 Faith, 40 holy / 10 Pr / 3.5 + Exposed 3 turns
+(Perfect: +50% Pressure).<br>
+Condemn — 15 Mana, 12 holy to ALL / 9 Pr / 3.5 (Perfect: +50% Pressure).</li>
+<li><b>Occultist (Pressure)</b> — Passive <i>Corrupted Channeling</i>: hits 25% chance to
+Cripple (2 turns).<br>
+Hex of Ruin — 20 Mana, 14 shadow / 7 Pr / 3.0 + Sunder 3 turns (Perfect: also Cripple).<br>
+Dark Benediction — MIRACLE, 40 Faith, 3.5, sacrifice 10% max HP: heal all allies 15% + Empower
+(Perfect: no sacrifice).</li>
+</ul>
+<h3>6.4 Hunter</h3>
+<ul>
+<li><b>Beastmaster (Rush)</b> — Passive <i>Pack Bond</i>: crits trigger a bonus strike for 30%
+damage.<br>
+Twin Fang — 30 Focus, 14 dmg / 6 Pr / 3.0 × 2 random targets (Perfect: 3 strikes).<br>
+Bear Maul — 35 Focus, 28 dmg / 14 Pr / 3.5, staggers the target 2.0 down the order
+(Perfect: +60% Pressure).</li>
+<li><b>Sharpshooter (Rush)</b> — Passive <i>Lethal Aim</i>: crits deal ×1.75.<br>
+Aimed Shot — 20 Focus, 34 dmg / 8 Pr / 3.5 (Perfect: +15% crit).<br>
+Piercing Arrow — 25 Focus, 24 dmg / 8 Pr / 3.0, ignores 50% armor, Cripples, +50% vs Broken
+(Perfect: ignores ALL armor).<br>
+Powershot — 25 Focus, 20 dmg / 10 Pr / 3.5, +2% damage per 1% of the target's Break bar (up
+to triple damage at full Pressure) (Perfect: +10 Focus).<br>
+Quick Draw — 15 Focus, 2.0, all abilities act 50% faster for 5 turns (Perfect: 6 turns).</li>
+<li><b>Survivalist (Pressure)</b> — Passive <i>Wrath of the Wild</i>: hits 30% chance to Slow
+(2 turns).<br>
+Thorn Volley — 25 Focus, 14 nature to ALL / 6 Pr / 3.5 (Perfect: +50% Pressure).<br>
+Sylvan Binding — 30 Focus, 16 nature / 8 Pr / 3.0, Slow 3 turns + shove 4.0 down the order
+(Perfect: also +50% Pressure).</li>
+</ul>
+
+<h2>7. Talents</h2>
+<p>Each spec has a signature talent <b>pool</b>, tiered 1–6. Every run generates a fresh tree:
+2 slots per tier, drawn from the pool and padded with generic Training talents (Vitality
++HP / Swiftness +Speed / Poise +Stability / Warding +armor / Precision +crit / Reserves +Mana,
+values scale with tier). Tier N unlocks after (N−1)×2 points are spent in the tree. Points come
+from victories: fight 1, elite 2, boss 3 (Waystone relic: +1 at run start). Some talents have
+prerequisites and multiple ranks; tier-5 talents typically grant a whole new ability
+(Rampage, Bulwark Slam, Flurry, Inferno, Absolute Zero, Singularity, Sanctuary, Excommunicate,
+Soul Leech — all warrior talent attacks also build 10 Rage). Beastmaster, Sharpshooter and
+Survivalist pools are still thin (2 signatures each) and lean on Training fillers — growth
+planned.</p>
+
+<h2>8. Economy</h2>
+<ul>
+<li><b>Gold:</b> start 60 (+80 with Gravewrought Coin). Fight 25–35, elite 55–70, boss
+110–130.</li>
+<li><b>Consumable prices:</b> Health 30, Mana 30, Bomb 45, Revive 80, Defense 40. Starting
+inventory: 2 Health, 1 Mana, 1 Bomb, 1 Revive, 1 Defense.</li>
+<li><b>Runes</b> (run-scoped gear, bought at the Peddler): generated per party member —
+rarity roll 60% Common (×1, 50g, "Cracked"), 30% Rare (×2, 100g, "Polished"), 10% Epic (×3,
+160g, "Radiant") over templates: +10 max HP / +2% armor / +4 Speed / +6 Stability / +2% crit /
++8 max Mana (per rarity multiplier). Each hero can <b>equip 2</b> (toggled on the party
+screen); one copy of each rune name per hero.</li>
+<li><b>Relics</b> (permanent meta): one random unlock per boss kill, stored in
+user://relics.json; up to 3 equipped per run at the draft. Pool (6): Waystone Shard (+1 talent
+point at run start), Dragonbone Idol (+10% damage), Chalice of Dawn (party heals 10% after
+victories), Gravewrought Coin (+80 starting gold), Eidolon Mirror (Warriors start battles with
+25 Rage), Emberheart (fire &amp; holy +20%).</li>
+</ul>
+
+<h2>9. Enemies</h2>
+<table border="1" cellpadding="4">
+<tr><th>Enemy</th><th>HP</th><th>Armor</th><th>Speed</th><th>Stability</th><th>Kit</th></tr>
+<tr><td>Orc Raider</td><td>115</td><td>15%</td><td>90</td><td>50</td><td>Slash 34/13Pr;
+Sundering Strike 23/11Pr, 60% Sunder 2t. Resists: physical 10%.</td></tr>
+<tr><td>Orc Archer (red)</td><td>90</td><td>10%</td><td>100</td><td>42</td><td>Arrow Shot
+21/8Pr; Poison Arrow 16/7Pr, 70% Poison 3t. Resists: physical 5%.</td></tr>
+<tr><td>Orc Chief (elite)</td><td>210</td><td>20%</td><td>80</td><td>70</td><td>Rage user:
+Strike 28/13Pr +15 Rage; Heavy Strike 30R 54/20Pr; Crushing Blow 20R 34/28Pr. Resists:
+physical 15%.</td></tr>
+<tr><td>Zone bosses (stand-ins)</td><td>320</td><td>22%</td><td>85</td><td>90</td><td>Chief
+kit, bigger sprite, 20 starting Rage. Zone 1: Withered Warden (nature 50%, physical 10%,
+fire −25%). Zone 2: Ash-Wrought Tyrant (fire 50%, physical 10%, frost −25%).</td></tr>
+</table>
+<p><b>Compositions:</b> regular fights draw from pools of 3–4 enemies (raiders + archers; zone
+2 adds 5-enemy pools). Elite: Chief + escorts (zone 2: Chief + 4). Boss: boss + escorts.
+Zone scaling multiplies HP and ability damage ×(1 + 0.35 × zone index).</p>
+
+<h2>10. Battle Screen &amp; Controls</h2>
+<ul>
+<li><b>Layout:</b> burger menu (☰) top-left; initiative bar beside it; combat log top-right
+(scrolling, color-coded); heroes left, enemies right on the zone battlefield; action bar
+bottom-center on the acting hero's turn; per-unit HP / resource / Pressure bars, status chips
+(hover for tooltips), and a bleed meter under each combatant.</li>
+<li><b>Action bar:</b> Basic attack button; <b>Abilities ▾</b> — a button list where hovering
+each entry live-previews its initiative cost on the bar (costs shown, unaffordable entries
+greyed); <b>Items ▾</b>. Guard no longer exists.</li>
+<li><b>Burger menu:</b> Restart Run (abandons to a fresh draft), Settings (overlay with volume
++ fullscreen — the battle isn't lost), Exit to Main Menu (run resumes from the last saved
+node).</li>
+<li><b>Targeting:</b> click a highlighted unit (cancel button available); single-target
+abilities auto-target when only one candidate lives.</li>
+<li><b>Skill check controls: Spacebar or Left Click.</b></li>
+<li><b>Feedback:</b> floating damage text (crit pop-ups), hit flash + knockback, screen shake,
+lunge animations, Break hitstop + fracture flash + camera punch, per-event SFX (placeholder
+procedural audio), tinted portraits + hover highlight (outline shader) linking the initiative
+bar to the field.</li>
+</ul>
+<p><b>Open question:</b> the node quotas in §3 leave no shop nodes, so the Peddler (runes +
+supplies) is currently unreachable during a run. Needs a design decision — e.g. fold the shop
+into rest sites, make it a fixed mid-zone visit, or add it to the quota.</p>
+
+<h2>11. Other Screens</h2>
+<ul>
+<li><b>Party screen:</b> hero list with tinted class icons beside each name, HP/Mana readouts
+and unspent-point highlights; detail page per hero: stats (with tooltip explaining derived
+values), ability chips (hover for numbers), rune equip toggles (2 max), and the run's generated
+talent tree with learn/rank-up buttons.</li>
+<li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per party member.
+(Currently unreachable — see §10.)</li>
+<li><b>Relics screen:</b> collection viewer from the main menu.</li>
+<li><b>Settings:</b> master volume slider, fullscreen toggle; persisted; also available
+mid-battle via the burger.</li>
+</ul>
+
+<h2>12. Technical Reference</h2>
+<ul>
+<li><b>Scenes:</b> main_menu, draft, spec_choice, map, battle, party, shop, settings, relics.
+All UI is built in code (no editor scenes).</li>
+<li><b>Autoloads:</b> Run (run state + saves), Settings. Static data: Classes, Talents,
+Relics, Ability.</li>
+<li><b>Saves:</b> user://run_save.bin (auto after every node; versioned dictionary),
+user://relics.json, user://settings.cfg.</li>
+<li><b>Balance tooling:</b> DOD_AUTOPLAY=1 (one bot battle with debug prints), DOD_SIM=N
+(N max-speed battles + a stats report: win rate, damage shares, ability usage, roll rates).
+Target ≈85% bot win rate.</li>
+<li><b>Sprites:</b> 100×100 frame strips named Name_Idle/Walk/Attack01–03/Hurt/Death.png;
+new character art must follow this format. New assets arrive in "imported files/".</li>
+<li><b>Combat pacing:</b> global PACE multiplier 0.85 on battle waits.</li>
+</ul>
+
+<h2>13. Known Gaps / Next Steps</h2>
+<ul>
+<li>Shop unreachable under the new node quotas (decision needed, §10).</li>
+<li>Distinct Mage/Cleric/Hunter sprites and a menu background awaited in imported files.</li>
+<li>Boss kits are Chief stand-ins; unique boss mechanics + art planned.</li>
+<li>Hunter spec talent pools need signatures; full rune loot table pending; relic pool (6)
+needs growth.</li>
+<li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>
+<li>Difficulty leans easy for practiced players (sim ~85%); real tuning via playtests.</li>
+</ul>
+</body></html>

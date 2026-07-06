@@ -23,9 +23,10 @@ func _ready() -> void:
 
 
 func _node_pos(f: int, i: int) -> Vector2:
+	# 11 rows (10 tiers + boss) stacked from y=620 up to y=100.
 	var row_size: int = Run.map[f].size()
 	var x := 640.0 + (i - (row_size - 1) / 2.0) * 220.0
-	var y := 620.0 - f * 72.0
+	var y := 620.0 - f * 52.0
 	return Vector2(x, y)
 
 
@@ -147,8 +148,8 @@ func _draw_screen() -> void:
 			var node: Dictionary = Run.map[f][i]
 			var btn := Button.new()
 			btn.text = NODE_LABELS[node["type"]]
-			btn.custom_minimum_size = Vector2(96, 40)
-			btn.position = _node_pos(f, i) - Vector2(48, 20)
+			btn.custom_minimum_size = Vector2(92, 36)
+			btn.position = _node_pos(f, i) - Vector2(46, 18)
 			var is_reachable: bool = f == next_floor and reachable.has(i)
 			btn.disabled = not is_reachable
 			if node["visited"]:

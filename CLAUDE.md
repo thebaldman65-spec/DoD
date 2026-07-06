@@ -1,13 +1,17 @@
 # Dawn of Decay — project guide for Claude
 
-Turn-based party roguelike (Godot 4.7, GDScript). Design docs: `../` (*.docx) —
-SUPERSEDED where they conflict with `docs/addendum.html` (the living changelog).
+Turn-based party roguelike (Godot 4.7, GDScript). **`docs/master.html`
+("DoD Master Document.docx") is the authoritative design reference** — keep it
+updated alongside `docs/addendum.html` (the living changelog). The original
+`../*.docx` concept docs are superseded by both.
 
 ## Working agreement (user's standing rules)
 - User is a beginner coder: explain plainly; Claude writes all code; user is
   the designer + playtester. Iterate on their feedback each session.
 - EVERY design change: append to Change Log in `docs/addendum.html`, then
   `textutil -convert docx -output "/Users/zipples/Documents/DoD/DoD Implementation Addendum.docx" docs/addendum.html`
+- Keep `docs/master.html` current for anything it covers, then
+  `textutil -convert docx -output "/Users/zipples/Documents/DoD/DoD Master Document.docx" docs/master.html`
 - User drops new assets in `../imported files/` — always check there.
   New character sprites need the Soldier format: 100x100 frame strips named
   `Name_Idle/Walk/Attack01-03/Hurt/Death.png`.
@@ -45,7 +49,9 @@ SUPERSEDED where they conflict with `docs/addendum.html` (the living changelog).
 shuffled talent trees, damage types (7) with resists, bleed buildup (100 =
 20% max HP bleedout), gold + shop runes (rarity-generated, 2 equip slots),
 2 zones (Forest → Scarlands, orc enemies incl. red Archer w/ poison), relics
-meta layer. Combat: crit 10%/miss 5%/parry 5%, Mocking Blow taunt, per-ability
+meta layer. Map: 10 tiers × 3 nodes + boss; fixed 18 fight / 6 rest / 6 loot
+(NOTE: no shop nodes spawn under these quotas — Peddler unreachable, design
+decision pending). Combat: crit 10%/miss 5%/parry 5%, Mocking Blow taunt, per-ability
 initiative ghost preview (no Guard — removed by design). Specs carry archetype
 tags (Ramp/Rush/Nuker/Pressure/Healer/Warder/Tank/Bruiser) in SPEC_INFO.
 Battle has burger menu (restart/settings overlay/exit); skill checks accept

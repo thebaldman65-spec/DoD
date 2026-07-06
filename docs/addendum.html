@@ -185,6 +185,36 @@
 <li><b>Battle burger menu (☰):</b> Restart Run, Settings (in-battle overlay — volume/fullscreen without losing the fight), Exit to Main Menu (run resumes from the last saved node).</li>
 <li><b>Skill checks accept left click</b> as well as Spacebar.</li>
 </ul>
+<h3>2026-07-06 (fourth pass) — Master document, node rules, warrior/hunter kits, fixes</h3>
+<ul>
+<li><b>Master Design Document created</b> (docs/master.html → "DoD Master Document.docx"): the
+full authoritative reference — concept, run flow, node rules, complete combat math, every class
+/ spec / ability / talent / relic / rune / enemy with numbers, UI and controls, saves and
+tooling. It supersedes the original concept docs; the addendum remains the changelog.</li>
+<li><b>Node map rules formalized:</b> every zone = 10 tiers × 3 nodes (30 interconnected nodes;
+the player interacts with exactly 10 before the boss) + a boss tier. Fixed composition per
+zone: 18 fights (60%), 6 rest (20%), 6 loot (20%); fights on tiers 6+ have a 25% chance to be
+elite; tier 1 always contains a fight. <b>Consequence: shop nodes no longer spawn</b> — the
+Peddler is unreachable until a design decision (flagged in master doc §10).</li>
+<li><b>Spec choice screen:</b> archetype now shows as just its name in bold under the spec
+title; the explanation moved to a mouseover tooltip.</li>
+<li><b>Skill check left-click fixed:</b> clicks were being swallowed by UI panels (including
+the check bar itself) before reaching the input handler; clicks are now captured ahead of the
+GUI (the Cancel button still cancels).</li>
+<li><b>Boss heal fix:</b> heroes' saved max HP now syncs with talent/rune bonuses after every
+victory, so the full restore on zone completion (and rest-node healing) reaches their true
+maximum instead of the base value.</li>
+<li><b>Party screen:</b> tinted class icon next to each hero's name in the list (crop of their
+idle sprite, matching their battle tint).</li>
+<li><b>Warrior:</b> ALL attacks now build Rage — Strike 20; Mocking Blow, Bloodlust,
+Wildstrikes, Overpower, Crushing Blow, and the talent attacks (Rampage, Bulwark Slam, Flurry)
+10 each. Mocking Blow removed from Berserker and Swordmaster — it is now a Warden spec ability
+(the Warden taunt identity).</li>
+<li><b>Hack and Slash (new, Berserker):</b> 20 Rage, initiative 3.0 — three strikes of 10 at
+one target, each hit 40% chance to build 20 Bleed, builds 10 Rage. Perfect: 4 strikes. (New
+engine support: same-target multi-hits and per-hit bleed chance.)</li>
+<li><b>Aimed Shot cost 30 → 20 Focus.</b></li>
+</ul>
 <h2>Progress Snapshot</h2>
 <p>Phase 1 (combat core) complete and simulator-tuned. Phase 2 (run structure) playable: map, battles, rewards, carryover, party/inventory screens. Next: class specializations, then drafting, talents, and zone variety. Automated testing: DOD_AUTOPLAY (single bot battle) and DOD_SIM=N (batch balance reports).</p>
 </body></html>
