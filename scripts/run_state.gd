@@ -6,10 +6,10 @@ extends Node
 # 10 tiers × 3 nodes = 30 interconnected nodes, plus the boss tier on top.
 const FLOORS := 11  # 10 pickable tiers + the boss tier
 const NODES_PER_TIER := 3
-# Fixed node composition per zone: 60% fights, 20% rest, 20% loot.
+# Fixed node composition per zone: 60% fights, 20% rest, 20% shops.
 const FIGHT_NODES := 18
 const REST_NODES := 6
-const LOOT_NODES := 6
+const SHOP_NODES := 6
 
 # All item metadata lives here; battle and map both read it.
 const ITEM_IDS := ["health", "mana", "bomb", "revive", "defense"]
@@ -84,8 +84,8 @@ func _generate_map() -> void:
 		deck.append("fight")
 	for i in REST_NODES:
 		deck.append("rest")
-	for i in LOOT_NODES:
-		deck.append("treasure")
+	for i in SHOP_NODES:
+		deck.append("shop")
 	deck.shuffle()
 	# The run should open with combat: tier 1 holds at least one fight.
 	if not deck.slice(0, NODES_PER_TIER).has("fight"):
@@ -106,14 +106,17 @@ func _generate_map() -> void:
 			row.append({"type": kind, "links": [], "visited": false})
 		map.append(row)
 	map.append([{"type": "boss", "links": [], "visited": false}])
-	# Link each node to 1-2 nodes on the next floor, keeping paths connected.
+	# Link each node to 1-2 nodes on the next floor: its own column, plus a
+	# 70% chance of ONE adjacent column. Never all three — the player gets a
+	# choice most tiers but can only drift one column per step, so reaching a
+	# specific elite or shop takes route planning.
 	for f in FLOORS - 1:
 		var a: int = map[f].size()
 		var b: int = map[f + 1].size()
 		for i in a:
 			var base := 0 if a == 1 else int(round(i * float(b - 1) / float(maxi(a - 1, 1))))
 			var links: Array = [base]
-			if randf() < 0.45:
+			if randf() < 0.70:
 				var extra := base + (1 if randf() < 0.5 else -1)
 				if extra >= 0 and extra < b and not links.has(extra):
 					links.append(extra)
@@ -183,6 +186,47 @@ func random_loot() -> String:
 	return LOOT_POOL.pick_random()
 
 
+# ---------- rune generation (shared by the Peddler and elite drops) ----------
+
+# Rarity scales both power and price. Runes are run-scoped.
+const RUNE_RARITIES := [
+	{"key": "common", "label": "Common", "mult": 1, "price": 50, "prefix": "Cracked",
+		"color": Color(0.8, 0.8, 0.8)},
+	{"key": "rare", "label": "Rare", "mult": 2, "price": 100, "prefix": "Polished",
+		"color": Color(0.45, 0.65, 1.0)},
+	{"key": "epic", "label": "Epic", "mult": 3, "price": 160, "prefix": "Radiant",
+		"color": Color(0.75, 0.45, 1.0)},
+]
+const RUNE_TEMPLATES := [
+	{"noun": "Vitality", "stat": "max_hp", "base": 10, "fmt": "+%d max HP"},
+	{"noun": "Warding", "stat": "armor", "base": 0.02, "fmt": "+%d%% armor"},
+	{"noun": "Swiftness", "stat": "speed", "base": 4, "fmt": "+%d Speed"},
+	{"noun": "Poise", "stat": "stability", "base": 6, "fmt": "+%d Stability"},
+	{"noun": "Precision", "stat": "crit_bonus", "base": 0.02, "fmt": "+%d%% crit chance"},
+	{"noun": "Springs", "stat": "max_resource", "base": 8, "fmt": "+%d max Mana"},
+]
+
+
+func generate_rune(class_key: String) -> Dictionary:
+	var pool := RUNE_TEMPLATES.filter(
+		func(t): return not (t["stat"] == "max_resource" and class_key == "warrior"))
+	var template: Dictionary = pool.pick_random()
+	var roll := randf()
+	var rarity: Dictionary = RUNE_RARITIES[0] if roll < 0.6 \
+		else (RUNE_RARITIES[1] if roll < 0.9 else RUNE_RARITIES[2])
+	var value = template["base"] * rarity["mult"]
+	var shown: int = int(value * 100) if template["base"] is float else int(value)
+	return {
+		"name": "%s Rune of %s" % [rarity["prefix"], template["noun"]],
+		"rarity": rarity["label"],
+		"rarity_color": rarity["color"],
+		"price": rarity["price"],
+		"desc": template["fmt"] % shown,
+		"payload": {"stat": {template["stat"]: value}},
+		"equipped": false,
+	}
+
+
 func has_next_zone() -> bool:
 	return zone_idx < ZONES.size() - 1
 
@@ -250,7 +294,8 @@ func award_gold(node_type: String) -> int:
 	var amount := randi_range(25, 35)
 	match node_type:
 		"elite":
-			amount = randi_range(55, 70)
+			# Elites pay out hard — seeking them out is how skilled players snowball.
+			amount = randi_range(80, 100)
 		"boss":
 			amount = randi_range(110, 130)
 	gold += amount

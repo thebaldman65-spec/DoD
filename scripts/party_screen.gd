@@ -12,6 +12,7 @@ func _ready() -> void:
 	if not Run.active:
 		get_tree().change_scene_to_file.call_deferred("res://scenes/main_menu.tscn")
 		return
+	Music.play("map")
 	_draw_screen()
 
 

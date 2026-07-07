@@ -62,7 +62,8 @@ func setup(config: Dictionary) -> void:
 		if key != "sheet_dir" and key != "sprite_scale":
 			set(key, config[key])
 	hp = max_hp
-	_build_sprite(config["sheet_dir"], config.get("sprite_scale", 2.6))
+	# Default scale sized for the 1:1 full-scene camera.
+	_build_sprite(config["sheet_dir"], config.get("sprite_scale", 3.2))
 	_build_bars()
 
 
@@ -111,7 +112,7 @@ func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
 
 
 func _build_bars() -> void:
-	var bar_y := 40.0
+	var bar_y := 50.0
 	# Compact bars hugging the sprite so tall parties fit on screen.
 	add_child(_make_bar_bg(Vector2(-36, bar_y), Vector2(72, 13)))
 	_hp_fill = _make_fill(Vector2(-35, bar_y + 1), Vector2(70, 11), Color(0.30, 0.78, 0.32))
@@ -148,7 +149,7 @@ func _build_bars() -> void:
 	name_label.add_theme_color_override("font_color", Color(0.92, 0.88, 0.78))
 	name_label.add_theme_constant_override("outline_size", 4)
 	name_label.add_theme_color_override("font_outline_color", Color(0.05, 0.03, 0.08, 0.9))
-	name_label.position = Vector2(-50, -54)
+	name_label.position = Vector2(-50, -68)
 	name_label.size = Vector2(100, 18)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(name_label)
@@ -196,7 +197,7 @@ func _build_target_zone() -> void:
 	_target_marker.add_theme_color_override("font_color", Color(1.0, 0.75, 0.25))
 	_target_marker.add_theme_constant_override("outline_size", 4)
 	_target_marker.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
-	_target_marker.position = Vector2(-10, -90)
+	_target_marker.position = Vector2(-10, -102)
 	_target_marker.visible = false
 	add_child(_target_marker)
 

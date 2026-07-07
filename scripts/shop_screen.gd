@@ -6,26 +6,8 @@ const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
 const ITEM_PRICES := {"health": 30, "mana": 30, "bomb": 45, "revive": 80, "defense": 40}
 
-# Generic rune generation until the full loot table exists. Rarity scales
-# both power and price. Runes are run-scoped (lost on run end) and only
-# offered for classes present in the current party.
-const RARITIES := [
-	{"key": "common", "label": "Common", "mult": 1, "price": 50, "prefix": "Cracked",
-		"color": Color(0.8, 0.8, 0.8)},
-	{"key": "rare", "label": "Rare", "mult": 2, "price": 100, "prefix": "Polished",
-		"color": Color(0.45, 0.65, 1.0)},
-	{"key": "epic", "label": "Epic", "mult": 3, "price": 160, "prefix": "Radiant",
-		"color": Color(0.75, 0.45, 1.0)},
-]
-const TEMPLATES := [
-	{"noun": "Vitality", "stat": "max_hp", "base": 10, "fmt": "+%d max HP"},
-	{"noun": "Warding", "stat": "armor", "base": 0.02, "fmt": "+%d%% armor"},
-	{"noun": "Swiftness", "stat": "speed", "base": 4, "fmt": "+%d Speed"},
-	{"noun": "Poise", "stat": "stability", "base": 6, "fmt": "+%d Stability"},
-	{"noun": "Precision", "stat": "crit_bonus", "base": 0.02, "fmt": "+%d%% crit chance"},
-	{"noun": "Springs", "stat": "max_resource", "base": 8, "fmt": "+%d max Mana"},
-]
-
+# Rune generation lives in Run (shared with elite drops); runes are run-scoped
+# and only offered for classes present in the current party.
 var offers: Array = []  # [{member_idx, rune}]
 
 
@@ -33,6 +15,7 @@ func _ready() -> void:
 	if not Run.active:
 		get_tree().change_scene_to_file.call_deferred("res://scenes/main_menu.tscn")
 		return
+	Music.play("map")
 	_roll_offers()
 	_draw_screen()
 
@@ -41,35 +24,16 @@ func _roll_offers() -> void:
 	offers = []
 	for i in Run.party.size():
 		var member: Dictionary = Run.party[i]
-		var rune := _generate_rune(member["key"])
+		var rune: Dictionary = Run.generate_rune(member["key"])
 		var owned_names: Array = []
 		for owned in member.get("runes", []):
 			owned_names.append(owned["name"])
 		for attempt in 4:
 			if not owned_names.has(rune["name"]):
 				break
-			rune = _generate_rune(member["key"])
+			rune = Run.generate_rune(member["key"])
 		if not owned_names.has(rune["name"]):
 			offers.append({"member_idx": i, "rune": rune})
-
-
-func _generate_rune(class_key: String) -> Dictionary:
-	var pool := TEMPLATES.filter(
-		func(t): return not (t["stat"] == "max_resource" and class_key == "warrior"))
-	var template: Dictionary = pool.pick_random()
-	var roll := randf()
-	var rarity: Dictionary = RARITIES[0] if roll < 0.6 else (RARITIES[1] if roll < 0.9 else RARITIES[2])
-	var value = template["base"] * rarity["mult"]
-	var shown: int = int(value * 100) if template["base"] is float else int(value)
-	return {
-		"name": "%s Rune of %s" % [rarity["prefix"], template["noun"]],
-		"rarity": rarity["label"],
-		"rarity_color": rarity["color"],
-		"price": rarity["price"],
-		"desc": template["fmt"] % shown,
-		"payload": {"stat": {template["stat"]: value}},
-		"equipped": false,
-	}
 
 
 func _draw_screen() -> void:

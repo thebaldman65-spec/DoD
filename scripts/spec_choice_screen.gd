@@ -6,6 +6,7 @@ const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
 
 func _ready() -> void:
+	Music.play("map")
 	_draw_screen()
 
 

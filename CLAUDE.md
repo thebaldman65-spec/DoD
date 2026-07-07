@@ -49,9 +49,10 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 shuffled talent trees, damage types (7) with resists, bleed buildup (100 =
 20% max HP bleedout), gold + shop runes (rarity-generated, 2 equip slots),
 2 zones (Forest → Scarlands, orc enemies incl. red Archer w/ poison), relics
-meta layer. Map: 10 tiers × 3 nodes + boss; fixed 18 fight / 6 rest / 6 loot
-(NOTE: no shop nodes spawn under these quotas — Peddler unreachable, design
-decision pending). Combat: crit 10%/miss 5%/parry 5%, Mocking Blow taunt, per-ability
+meta layer. Map: 10 tiers × 3 nodes + boss; fixed 18 fight / 6 rest / 6 shop;
+links = own column + 70% one adjacent (never all 3). Elites drop rune + item +
+80-100 gold. Music autoload (menu/map/battle + boss intro), zone battle art,
+bow SFX, full-scene 1:1 battle camera (sprites 3.2/3.9/4.4). Combat: crit 10%/miss 5%/parry 5%, Mocking Blow taunt, per-ability
 initiative ghost preview (no Guard — removed by design). Specs carry archetype
 tags (Ramp/Rush/Nuker/Pressure/Healer/Warder/Tank/Bruiser) in SPEC_INFO.
 Battle has burger menu (restart/settings overlay/exit); skill checks accept

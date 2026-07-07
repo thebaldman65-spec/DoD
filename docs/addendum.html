@@ -215,6 +215,32 @@ one target, each hit 40% chance to build 20 Bleed, builds 10 Rage. Perfect: 4 st
 engine support: same-target multi-hits and per-hit bleed chance.)</li>
 <li><b>Aimed Shot cost 30 → 20 Focus.</b></li>
 </ul>
+<h3>2026-07-07 — Audio &amp; art drop, full-scene battles, shop nodes, elite spoils</h3>
+<ul>
+<li><b>New assets wired in:</b> main menu background image; Scarlands battle scene art (battles
+now pick their background by zone); music — menu track (menu/draft/settings/relics), node map
+track (map/party/shop/spec choice, continues seamlessly between those screens), battle track,
+and a boss-entry tune that plays once when a boss battle starts and hands off to the battle
+track; bow SFX — Hunter and Orc Archer attacks use dedicated attack/impact/blocked sounds. New
+Music autoload manages tracks across scene changes (idempotent play, volume on the master
+bus).</li>
+<li><b>Whole battle scene visible:</b> camera now 1:1 over the full 1280×720 arena (was zoomed
+to 1.2); sprites scaled up ~25% to compensate (heroes 2.6 → 3.2, Chief 3.9, bosses 4.4); name
+plates, bars, and markers repositioned for the larger sprites; Break camera punch retuned.</li>
+<li><b>Loot nodes replaced with shop nodes:</b> zone deck is now 18 fights / 6 rest / 6 shops —
+the Peddler is back on the map (resolves the fourth-pass open question). Loot chests remain
+only as elite drops.</li>
+<li><b>Path connectivity tuned:</b> every node links to its own column plus a 70% chance of ONE
+adjacent column — never all three. Choice most tiers, but only one column of drift per step, so
+reaching a specific elite or shop takes route planning.</li>
+<li><b>Elite spoils — the snowball reward:</b> elites now drop a rune for a random hero, a
+random consumable, and more gold (80–100, up from 55–70), on top of their double talent
+points. Skilled players who route toward elites out-scale the zone.</li>
+<li><b>Multi-hit attacks roll miss/parry per strike:</b> a parried or missed hit no longer
+cancels the follow-up strikes (each parried strike still triggers its counter). Applies to
+Hack and Slash, Razor Ice, Twin Fang, Flurry.</li>
+<li>Rune generation moved into the Run autoload (shared by shop offers and elite drops).</li>
+</ul>
 <h2>Progress Snapshot</h2>
 <p>Phase 1 (combat core) complete and simulator-tuned. Phase 2 (run structure) playable: map, battles, rewards, carryover, party/inventory screens. Next: class specializations, then drafting, talents, and zone variety. Automated testing: DOD_AUTOPLAY (single bot battle) and DOD_SIM=N (batch balance reports).</p>
 </body></html>

@@ -49,13 +49,18 @@ have a 25% chance to spawn as an ELITE (tougher composition, double talent point
 gold).</td></tr>
 <tr><td>Rest</td><td>6</td><td>20%</td><td>Party heals 30% max HP and Mage/Cleric recover 30%
 Mana at the waystone.</td></tr>
-<tr><td>Loot</td><td>6</td><td>20%</td><td>Scavenge one random consumable (weighted pool: 2×
-Health, 2× Mana, 1× each Bomb / Revive / Defense).</td></tr>
+<tr><td>Shop</td><td>6</td><td>20%</td><td>The Wandering Peddler: consumables + one rune offer
+per party member (see §8).</td></tr>
 </table>
 <p>The deck is shuffled and dealt 3 per tier (tier 1 is guaranteed at least one fight so runs
-open with combat). Every node links to 1–2 nodes on the next tier and every node has at least
-one inbound path, so all paths stay connected. The boss tier is a single node.
-<b>Note:</b> under these quotas, shop nodes no longer spawn — see §10 (open question).</p>
+open with combat). <b>Connectivity is deliberately limited:</b> every node links to its own
+column on the next tier, plus a 70% chance of ONE adjacent column — never all three. The player
+gets a route choice most tiers but can only drift one column per step, so reaching a specific
+elite or shop takes planning; every node keeps at least one inbound path so the map never
+strands. The boss tier is a single node.</p>
+<p><b>Elites are the snowball engine:</b> a skilled player routes toward them. On top of double
+talent points, an elite kill drops a rune for a random hero, a random consumable, and a bigger
+gold purse (80–100).</p>
 <ul>
 <li><b>Zones:</b> 1. Forest of Old → 2. The Scarlands. Later zones multiply enemy HP and
 damage by (1 + 0.35 × zone index) and tint enemies redder.</li>
@@ -95,9 +100,13 @@ returns to the action bar. Enemies and the sim bot always act at "Good" (bot: 20
 (×1.5; Sharpshooter passive ×1.75) × attacker modifiers × target modifiers × (1 − resist) ×
 (1 − effective armor), minimum 1.</p>
 <ul>
-<li><b>Miss:</b> 5% base chance (single-target, non-counter only). AoE never misses/parries.</li>
+<li><b>Miss:</b> 5% base chance (single-target, non-counter only). AoE never misses/parries.
+Multi-hit and random-hit attacks roll miss <i>per strike</i> — a missed hit never cancels the
+follow-up strikes.</li>
 <li><b>Parry:</b> 5% base + parry bonuses; negated hit and the defender counters with their
-basic attack as a free action (no initiative cost, cannot chain). Broken units cannot parry.</li>
+basic attack as a free action (no initiative cost, cannot chain). Broken units cannot parry.
+Multi-hit attacks roll parry per strike; each parried strike triggers a counter, and the
+remaining strikes still land (unless the counter kills the attacker).</li>
 <li><b>Crit:</b> 10% base + 25% vs Broken targets + 3% per Mage Resonance stack + talent/spec
 bonuses. Guaranteed: Razor Ice vs Slowed.</li>
 <li><b>Attacker modifiers:</b> Resonance +15%/stack; Surge +20%; Empower +25%; Cripple −15%;
@@ -313,15 +322,15 @@ planned.</p>
 
 <h2>8. Economy</h2>
 <ul>
-<li><b>Gold:</b> start 60 (+80 with Gravewrought Coin). Fight 25–35, elite 55–70, boss
+<li><b>Gold:</b> start 60 (+80 with Gravewrought Coin). Fight 25–35, elite 80–100, boss
 110–130.</li>
 <li><b>Consumable prices:</b> Health 30, Mana 30, Bomb 45, Revive 80, Defense 40. Starting
 inventory: 2 Health, 1 Mana, 1 Bomb, 1 Revive, 1 Defense.</li>
-<li><b>Runes</b> (run-scoped gear, bought at the Peddler): generated per party member —
-rarity roll 60% Common (×1, 50g, "Cracked"), 30% Rare (×2, 100g, "Polished"), 10% Epic (×3,
-160g, "Radiant") over templates: +10 max HP / +2% armor / +4 Speed / +6 Stability / +2% crit /
+<li><b>Runes</b> (run-scoped gear, bought at the Peddler or dropped by elites): rarity roll
+60% Common (×1, 50g, "Cracked"), 30% Rare (×2, 100g, "Polished"), 10% Epic (×3, 160g,
+"Radiant") over templates: +10 max HP / +2% armor / +4 Speed / +6 Stability / +2% crit /
 +8 max Mana (per rarity multiplier). Each hero can <b>equip 2</b> (toggled on the party
-screen); one copy of each rune name per hero.</li>
+screen); shop offers avoid duplicates per hero.</li>
 <li><b>Relics</b> (permanent meta): one random unlock per boss kill, stored in
 user://relics.json; up to 3 equipped per run at the draft. Pool (6): Waystone Shard (+1 talent
 point at run start), Dragonbone Idol (+10% damage), Chalice of Dawn (party heals 10% after
@@ -349,10 +358,12 @@ Zone scaling multiplies HP and ability damage ×(1 + 0.35 × zone index).</p>
 
 <h2>10. Battle Screen &amp; Controls</h2>
 <ul>
-<li><b>Layout:</b> burger menu (☰) top-left; initiative bar beside it; combat log top-right
-(scrolling, color-coded); heroes left, enemies right on the zone battlefield; action bar
-bottom-center on the acting hero's turn; per-unit HP / resource / Pressure bars, status chips
-(hover for tooltips), and a bleed meter under each combatant.</li>
+<li><b>Layout:</b> the camera shows the whole battle scene at 1:1 (sprites scaled up to
+compensate — heroes ×3.2, Chief ×3.9, bosses ×4.4). Burger menu (☰) top-left; initiative bar
+beside it; combat log top-right (scrolling, color-coded); heroes left, enemies right on the
+zone's own battlefield art (Forest / Scarlands); action bar bottom-center on the acting hero's
+turn; per-unit HP / resource / Pressure bars, status chips (hover for tooltips), and a bleed
+meter under each combatant.</li>
 <li><b>Action bar:</b> Basic attack button; <b>Abilities ▾</b> — a button list where hovering
 each entry live-previews its initiative cost on the bar (costs shown, unaffordable entries
 greyed); <b>Items ▾</b>. Guard no longer exists.</li>
@@ -363,13 +374,15 @@ node).</li>
 abilities auto-target when only one candidate lives.</li>
 <li><b>Skill check controls: Spacebar or Left Click.</b></li>
 <li><b>Feedback:</b> floating damage text (crit pop-ups), hit flash + knockback, screen shake,
-lunge animations, Break hitstop + fracture flash + camera punch, per-event SFX (placeholder
-procedural audio), tinted portraits + hover highlight (outline shader) linking the initiative
-bar to the field.</li>
+lunge animations, Break hitstop + fracture flash + camera punch, per-event SFX (bow users —
+the Hunter and Orc Archers — get dedicated attack / impact / blocked sounds; the rest is
+placeholder procedural audio), tinted portraits + hover highlight (outline shader) linking the
+initiative bar to the field.</li>
+<li><b>Music:</b> menu track (main menu, draft, settings, relics), map track (map, party, shop,
+spec choice — continues seamlessly between them), battle track in combat. Boss battles open
+with a dedicated entry tune that hands off to the battle track. Managed by the Music autoload;
+volume rides the master bus (Settings).</li>
 </ul>
-<p><b>Open question:</b> the node quotas in §3 leave no shop nodes, so the Peddler (runes +
-supplies) is currently unreachable during a run. Needs a design decision — e.g. fold the shop
-into rest sites, make it a fixed mid-zone visit, or add it to the quota.</p>
 
 <h2>11. Other Screens</h2>
 <ul>
@@ -377,8 +390,8 @@ into rest sites, make it a fixed mid-zone visit, or add it to the quota.</p>
 and unspent-point highlights; detail page per hero: stats (with tooltip explaining derived
 values), ability chips (hover for numbers), rune equip toggles (2 max), and the run's generated
 talent tree with learn/rank-up buttons.</li>
-<li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per party member.
-(Currently unreachable — see §10.)</li>
+<li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per party member;
+reached via the 6 shop nodes on every zone map.</li>
 <li><b>Relics screen:</b> collection viewer from the main menu.</li>
 <li><b>Settings:</b> master volume slider, fullscreen toggle; persisted; also available
 mid-battle via the burger.</li>
@@ -388,8 +401,9 @@ mid-battle via the burger.</li>
 <ul>
 <li><b>Scenes:</b> main_menu, draft, spec_choice, map, battle, party, shop, settings, relics.
 All UI is built in code (no editor scenes).</li>
-<li><b>Autoloads:</b> Run (run state + saves), Settings. Static data: Classes, Talents,
-Relics, Ability.</li>
+<li><b>Autoloads:</b> Run (run state + saves), Settings, Music (looping stream player that
+survives scene changes; idempotent play()). Static data: Classes, Talents, Relics,
+Ability.</li>
 <li><b>Saves:</b> user://run_save.bin (auto after every node; versioned dictionary),
 user://relics.json, user://settings.cfg.</li>
 <li><b>Balance tooling:</b> DOD_AUTOPLAY=1 (one bot battle with debug prints), DOD_SIM=N
@@ -402,8 +416,7 @@ new character art must follow this format. New assets arrive in "imported files/
 
 <h2>13. Known Gaps / Next Steps</h2>
 <ul>
-<li>Shop unreachable under the new node quotas (decision needed, §10).</li>
-<li>Distinct Mage/Cleric/Hunter sprites and a menu background awaited in imported files.</li>
+<li>Distinct Mage/Cleric/Hunter sprites awaited in imported files.</li>
 <li>Boss kits are Chief stand-ins; unique boss mechanics + art planned.</li>
 <li>Hunter spec talent pools need signatures; full rune loot table pending; relic pool (6)
 needs growth.</li>

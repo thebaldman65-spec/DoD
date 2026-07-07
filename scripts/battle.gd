@@ -50,6 +50,9 @@ const SFX := {
 	"bomb": preload("res://assets/sfx/bomb.wav"),
 	"victory": preload("res://assets/sfx/victory.wav"),
 	"defeat": preload("res://assets/sfx/defeat.wav"),
+	"bow_attack": preload("res://assets/sfx/bow_attack.wav"),
+	"bow_blocked": preload("res://assets/sfx/bow_blocked.wav"),
+	"bow_impact": preload("res://assets/sfx/bow_impact.wav"),
 }
 
 # Damage-over-time statuses ticked at the start of the afflicted unit's turn.
@@ -109,6 +112,12 @@ func _ready() -> void:
 	_build_ui()
 	_build_sfx_pool()
 	_spawn_units()
+	if not sim:
+		# Boss fights open with the entry tune, then the battle track loops.
+		if Run.active and Run.encounter.get("type", "") == "boss":
+			Music.play_intro_then("boss_intro", "battle")
+		else:
+			Music.play("battle")
 	_run_battle()
 
 
@@ -127,19 +136,24 @@ func _build_arena() -> void:
 	bg.size = Vector2(1680, 920)
 	bg.color = Color(0.09, 0.07, 0.11)
 	add_child(bg)
-	# Battle background art, scaled uniformly to cover the camera's view.
-	var tex: Texture2D = load("res://assets/backgrounds/battle_background_1.png")
+	# Battle background art per zone, scaled uniformly to cover the view.
+	var bg_by_zone := {
+		"Forest of Old": "res://assets/backgrounds/battle_background_1.png",
+		"The Scarlands": "res://assets/backgrounds/battle_background_scarlands.png",
+	}
+	var zone: String = Run.zone_name if Run.active else "Forest of Old"
+	var tex: Texture2D = load(bg_by_zone.get(zone, bg_by_zone["Forest of Old"]))
 	var art := Sprite2D.new()
 	art.texture = tex
 	var cover := maxf(1680.0 / tex.get_width(), 920.0 / tex.get_height())
 	art.scale = Vector2(cover, cover)
 	art.position = Vector2(640, 360)
 	add_child(art)
-	# Zoomed camera so the combatants fill more of the screen (UI is on a
-	# CanvasLayer and unaffected).
+	# Camera at 1:1 so the whole battle scene is visible (sprites are scaled
+	# up to compensate; UI is on a CanvasLayer and unaffected).
 	cam = Camera2D.new()
-	cam.position = Vector2(615, 450)
-	cam.zoom = Vector2(1.2, 1.2)
+	cam.position = Vector2(640, 360)
+	cam.zoom = Vector2(1.0, 1.0)
 	add_child(cam)
 	cam.make_current()
 
@@ -162,7 +176,7 @@ func _enemy_config(kind: String) -> Dictionary:
 			return {"unit_name": "Orc Chief", "is_hero": false, "sheet_dir": orc,
 				"max_hp": 210, "armor": 0.20, "speed": 80.0, "stability": 70,
 				"resource_name": "Rage", "resource": 0, "max_resource": 100,
-				"abilities": _orc_chief_kit(), "sprite_scale": 3.2,
+				"abilities": _orc_chief_kit(), "sprite_scale": 3.9,
 				"tint": Color(1.0, 0.75, 0.7),
 				"resists": {"physical": 0.15}}
 		"boss":
@@ -177,7 +191,7 @@ func _enemy_config(kind: String) -> Dictionary:
 			return {"unit_name": bd["unit_name"], "is_hero": false, "sheet_dir": orc,
 				"max_hp": 320, "armor": 0.22, "speed": 85.0, "stability": 90,
 				"resource_name": "Rage", "resource": 20, "max_resource": 100,
-				"abilities": _orc_chief_kit(), "sprite_scale": 3.6,
+				"abilities": _orc_chief_kit(), "sprite_scale": 4.4,
 				"tint": bd["tint"], "resists": bd["resists"]}
 		"archer":
 			return {"unit_name": "Orc Archer", "is_hero": false, "sheet_dir": orc,
@@ -554,7 +568,7 @@ func _run_battle() -> void:
 		if u == null:
 			break
 		active_marker.visible = true
-		active_marker.position = u.position + Vector2(-11, -130)
+		active_marker.position = u.position + Vector2(-11, -150)
 		for dot_id in DOT_STATUSES:
 			if u.has_status(dot_id) and not u.dead:
 				var dot_dmg: int = DOT_STATUSES[dot_id]
@@ -1012,6 +1026,11 @@ const PARRY_CHANCE := 0.05
 const CRIT_CHANCE := 0.10
 
 
+# Bow users get dedicated attack/impact/blocked sounds.
+func _uses_bow(u: BattleUnit) -> bool:
+	return u.unit_name.begins_with("Hunter") or u.unit_name.begins_with("Orc Archer")
+
+
 func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: String,
 		is_counter := false) -> void:
 	attacker.resource = clampi(attacker.resource - ab.cost + ab.resource_gain, 0, attacker.max_resource)
@@ -1030,6 +1049,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 	attacker.play_anim(ab.anim)
+	if _uses_bow(attacker) and ab.damage > 0:
+		_sfx("bow_attack", -8.0)
 	await _wait(0.3)
 	if attacker.is_hero:
 		_stat("hero_actions")
@@ -1057,7 +1078,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			target.unit_name, amount, grade_tag], "#70d878")
 		if is_perfect and ab.perfect_id == "ward":
 			_apply_status(target, "ward", 3)
-	elif not is_counter and not ab.aoe and randf() < MISS_CHANCE:
+	elif not is_counter and not ab.aoe and ab.multi_hits == 0 and ab.random_hits == 0 \
+			and randf() < MISS_CHANCE:
 		_stat("attacks")
 		_stat("attack_miss")
 		_sfx("miss")
@@ -1066,12 +1088,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
 			target.unit_name], "#909090")
 		await _wait(0.35)
-	elif not is_counter and not ab.aoe and not target.broken and not target.dead and randf() < PARRY_CHANCE + target.parry_bonus:
+	elif not is_counter and not ab.aoe and ab.multi_hits == 0 and ab.random_hits == 0 \
+			and not target.broken and not target.dead \
+			and randf() < PARRY_CHANCE + target.parry_bonus:
 		# Parry negates the hit; the defender immediately counters with
 		# their basic attack (a free action — no rolls, no initiative cost).
 		_stat("attacks")
 		_stat("attack_parry")
-		_sfx("parry", -4.0)
+		_sfx("bow_blocked" if _uses_bow(attacker) else "parry", -4.0)
 		target.float_text("PARRY", Color(0.4, 0.9, 1.0))
 		_message("%s parries and counters!" % target.unit_name)
 		_log("%s parries %s — counter attack!" % [target.unit_name,
@@ -1108,6 +1132,32 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			else:
 				strike_target = strike_targets[hit_i]
 				if strike_target.dead:
+					continue
+			# Multi-hit attacks roll miss/parry per strike: a blocked or missed
+			# hit never stops the follow-up strikes.
+			if not is_counter and (ab.multi_hits > 0 or ab.random_hits > 0):
+				if randf() < MISS_CHANCE:
+					_stat("attacks")
+					_stat("attack_miss")
+					_sfx("miss")
+					strike_target.float_text("MISS", Color(0.75, 0.75, 0.75))
+					_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
+						strike_target.unit_name], "#909090")
+					await _wait(0.45)
+					continue
+				if not strike_target.broken \
+						and randf() < PARRY_CHANCE + strike_target.parry_bonus:
+					_stat("attacks")
+					_stat("attack_parry")
+					_sfx("bow_blocked" if _uses_bow(attacker) else "parry", -4.0)
+					strike_target.float_text("PARRY", Color(0.4, 0.9, 1.0))
+					_log("%s parries %s — counter attack!" % [strike_target.unit_name,
+						attacker.unit_name], "#50c8e0")
+					await _wait(0.5)
+					await _resolve(strike_target, strike_target.abilities[0], attacker,
+						"good", true)
+					if attacker.dead:
+						break
 					continue
 			var crit_chance := CRIT_CHANCE + (0.25 if strike_target.broken else 0.0)
 			# Resonant Mind: +3% crit per Resonance stack.
@@ -1190,7 +1240,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_sfx("hit", -5.0, 1.15)
 				strike_target.float_text("%d" % final, Color(0.85, 0.55, 1.0))
 			else:
-				_sfx("hit")
+				_sfx("bow_impact" if _uses_bow(attacker) else "hit")
 				strike_target.float_text("%d" % final, Color(0.95, 0.85, 0.75))
 			var resist_tag := ""
 			if resist > 0.0:
@@ -1282,8 +1332,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				await _wait(0.5)
 			if (ab.random_hits > 0 or ab.multi_hits > 0) and total_hits > 1:
 				await _wait(0.45)  # sequential strikes land distinctly
-		# Post-strike attacker effects.
-		if ab.recoil_base > 0.0:
+		# Post-strike attacker effects (skipped if a counter felled the attacker).
+		if ab.recoil_base > 0.0 and not attacker.dead:
 			var recoil_pct := ab.recoil_base * (1.0 + attacker.second_resource)
 			var recoil := maxi(int(round(total_dealt * recoil_pct)), 1)
 			var recoil_died := attacker.take_tick_damage(recoil, "-%d Recoil" % recoil,
@@ -1667,6 +1717,18 @@ func _check_end() -> void:
 				Run.party[i]["mana"] = heroes[i].resource
 		var pts := Run.award_talent_points(Run.encounter.get("type", "fight"))
 		var gold_gain := Run.award_gold(Run.encounter.get("type", "fight"))
+		# Elite spoils: a rune for a random hero + a consumable on top of the
+		# bigger gold purse — the snowball reward for hunting elites.
+		var elite_text := ""
+		if Run.encounter.get("type", "") == "elite":
+			var looter: Dictionary = Run.party.pick_random()
+			var rune: Dictionary = Run.generate_rune(looter["key"])
+			looter["runes"] = looter.get("runes", []) + [rune]
+			var drop_id: String = Run.random_loot()
+			Run.items[drop_id] = Run.items.get(drop_id, 0) + 1
+			elite_text = "\n\nELITE SPOILS\n%s (%s) — for the %s, equip it from the Party tab\n+1 %s" % [
+				rune["name"], rune["desc"], looter["key"].capitalize(),
+				Run.ITEM_INFO[drop_id][0]]
 		if Run.relic_active("chalice"):
 			Run.heal_party(0.10)
 		Run.save_run()
@@ -1685,8 +1747,8 @@ func _check_end() -> void:
 				_show_end("THE DECAY RECEDES", boss_text + "\nRun complete!",
 					[["New Run", _start_new_run]])
 		else:
-			_show_end("VICTORY", "+%d gold. Each hero gains %d talent point%s." % [
-				gold_gain, pts, "" if pts == 1 else "s"],
+			_show_end("VICTORY", "+%d gold. Each hero gains %d talent point%s.%s" % [
+				gold_gain, pts, "" if pts == 1 else "s", elite_text],
 				[["Continue", _to_map]])
 	else:
 		Run.active = false
@@ -1853,6 +1915,6 @@ func _break_impact() -> void:
 	flash.tween_callback(overlay.queue_free)
 	# Camera zoom punch.
 	var punch := create_tween()
-	punch.tween_property(cam, "zoom", Vector2(1.27, 1.27), 0.08) \
+	punch.tween_property(cam, "zoom", Vector2(1.06, 1.06), 0.08) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	punch.tween_property(cam, "zoom", Vector2(1.2, 1.2), 0.25)
+	punch.tween_property(cam, "zoom", Vector2(1.0, 1.0), 0.25)

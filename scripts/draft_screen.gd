@@ -15,6 +15,7 @@ var relic_picks: Array = []   # up to 3 relic ids
 
 func _ready() -> void:
 	Relics.load_data()
+	Music.play("menu")
 	_draw_screen()
 
 

@@ -9,6 +9,7 @@ const BG_FALLBACK := "res://assets/backgrounds/node_background_forest.png"
 
 func _ready() -> void:
 	Settings.apply()
+	Music.play("menu")
 	_draw_screen()
 
 
