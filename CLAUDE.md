@@ -24,6 +24,9 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - New `class_name` files need `--headless --import` before they resolve.
 - Balance: `DOD_SIM=50 <godot> --headless --path . res://scenes/battle.tscn`
   prints a report (target ~85% wins). `DOD_AUTOPLAY=1` = 1 debug battle.
+  `DOD_SIM_SPECS="berserker,cryomancer,inquisitor,beastmaster"` picks the bot's
+  specs (warrior,mage,cleric,hunter order). `DOD_DEBUG=1` adds map-burger debug
+  items (gold/points/heal/jump-to-boss/next-zone) for late-game testing.
 - GDScript gotchas that bit us: multiline lambdas in call args (use named
   methods), ternaries need parens for type inference, `:=` can't infer from
   untyped funcs, edits via python heredocs (apostrophes!) — use chr(39).
@@ -51,8 +54,13 @@ shuffled talent trees, damage types (7) with resists, bleed buildup (100 =
 2 zones (Forest → Scarlands, orc enemies incl. red Archer w/ poison), relics
 meta layer. Map: 10 tiers × 3 nodes + boss; fixed 18 fight / 6 rest / 6 shop;
 links = own column + 70% one adjacent (never all 3). Elites drop rune + item +
-80-100 gold. Music autoload (menu/map/battle + boss intro), zone battle art,
-bow SFX, full-scene 1:1 battle camera (sprites 3.2/3.9/4.4). Combat: crit 10%/miss 5%/parry 5%, Mocking Blow taunt, per-ability
+80-100 gold. Music autoload (menu/map/battle + boss intro; spec choice = menu
+track, boss tune plays on spec-confirm fade to map), zone battle art, bow SFX,
+full-scene 1:1 battle camera (sprites 3.2/3.9/4.4). Specs overhauled 07-08:
+Swordmaster Seasoned Fighter + Pommel Strike, Devout (ex-Inquisitor) Unity,
+Occultist Mind Flay, Beastmaster summonable companions (sphere placeholders,
+no timeline turns), Survivalist Trapper + stacking Poison (3/turn/stack),
+Chilled = renamed Slow. See docs/master.html §6 for full kits. Combat: crit 10%/miss 5%/parry 5%, Mocking Blow taunt, per-ability
 initiative ghost preview (no Guard — removed by design). Specs carry archetype
 tags (Ramp/Rush/Nuker/Pressure/Healer/Warder/Tank/Bruiser) in SPEC_INFO.
 Battle has burger menu (restart/settings overlay/exit); skill checks accept

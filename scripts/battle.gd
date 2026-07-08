@@ -14,7 +14,7 @@ const GOOD_HALF := 0.16
 
 # Visual identity of each status effect: [label, chip tag, color, tooltip]
 const STATUS_INFO := {
-	"slow": ["Slow", "S", Color(0.5, 0.75, 1.0), "-25% speed; turns arrive later."],
+	"slow": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "-25% speed; turns arrive later."],
 	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Takes 6 damage at the start of each turn."],
 	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Bleed builds with wounding attacks;\nat 100 the target bleeds out for 20% max HP."],
 	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-35% armor."],
@@ -25,8 +25,13 @@ const STATUS_INFO := {
 	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores 8 HP each turn."],
 	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% attack."],
 	"mocked": ["Mocked", "M!", Color(0.95, 0.5, 0.3), "Must attack the Warrior who mocked them."],
-	"poison": ["Poison", "P", Color(0.45, 0.8, 0.3), "Takes 6 damage at the start of each turn."],
+	"poison": ["Poison", "P", Color(0.45, 0.8, 0.3), "Takes 3 damage per stack at the start of\neach turn; new stacks refresh the timer."],
 	"quickdraw": ["Quick Draw", "QD", Color(0.55, 0.85, 0.40), "All abilities act 50% faster;\nturns arrive sooner."],
+	"parry_up": ["Parry Up", "P+", Color(0.4, 0.9, 1.0), "+15% parry chance."],
+	"unity": ["Unity", "Un", Color(0.95, 0.85, 0.4), "Souls bound: all damage received is\nsplit evenly among the party."],
+	"mindflay": ["Mind Flay", "MF", Color(0.75, 0.35, 0.85), "Maddened: attacks its own allies\nwith bonus Break damage."],
+	"devotion": ["Devotion Aura", "DA", Color(0.95, 0.8, 0.45), "The Devout's presence: takes 15%\nless Pressure."],
+	"tripwire": ["Tripwire", "TW", Color(0.8, 0.65, 0.35), "Retaliates against every attacking\nmelee enemy for 75% of their damage."],
 	"stunned": ["Stunned", "St", Color(0.95, 0.9, 0.4), "Loses their next turn."],
 	"shieldwall": ["Shieldwall", "SW", Color(0.6, 0.7, 0.9), "Takes 50% less damage."],
 	"empower": ["Empower", "+A", Color(0.95, 0.45, 0.35), "+25% damage dealt."],
@@ -53,13 +58,17 @@ const SFX := {
 	"bow_attack": preload("res://assets/sfx/bow_attack.wav"),
 	"bow_blocked": preload("res://assets/sfx/bow_blocked.wav"),
 	"bow_impact": preload("res://assets/sfx/bow_impact.wav"),
+	"strike": preload("res://assets/sfx/strike.wav"),
+	"wildstrikes": preload("res://assets/sfx/wildstrikes.wav"),
 }
 
 # Damage-over-time statuses ticked at the start of the afflicted unit's turn.
-const DOT_STATUSES := {"burn": 6, "poison": 6}
+# Poison is per-stack (stacks handled at the tick site).
+const DOT_STATUSES := {"burn": 6, "poison": 3}
 
 var heroes: Array = []
 var enemies: Array = []
+var companions: Array = []  # Beastmaster summons: hero-side, but no turns
 var battle_over := false
 var current_hero: BattleUnit
 
@@ -196,6 +205,7 @@ func _enemy_config(kind: String) -> Dictionary:
 		"archer":
 			return {"unit_name": "Orc Archer", "is_hero": false, "sheet_dir": orc,
 				"max_hp": 90, "armor": 0.10, "speed": 100.0, "stability": 42,
+				"is_ranged": true,
 				"abilities": _orc_archer_kit(), "tint": Color(1.0, 0.35, 0.35),
 				"resists": {"physical": 0.05}}
 		_:
@@ -211,7 +221,12 @@ func _spawn_units() -> void:
 		hero_keys = []
 		for member in Run.party:
 			hero_keys.append(member["key"])
+	# DOD_SIM_SPECS="berserker,cryomancer,inquisitor,beastmaster" overrides the
+	# specs used by autoplay/sim battles (order: warrior, mage, cleric, hunter).
 	var sim_specs := ["swordmaster", "pyromancer", "holy", "sharpshooter"]
+	var env_specs := OS.get_environment("DOD_SIM_SPECS")
+	if env_specs != "":
+		sim_specs = env_specs.split(",")
 	var name_counts := {}
 	for i in hero_keys.size():
 		var cfg := Classes.hero_config(hero_keys[i])
@@ -255,6 +270,12 @@ func _spawn_units() -> void:
 				u.resource = clampi(Run.party[i].get("mana", u.resource), 0, u.max_resource)
 			u.refresh_bars()
 		heroes.append(u)
+
+	# Devotion Aura (Devout): the whole party takes less Pressure, shown as a
+	# battle-long status on everyone.
+	if heroes.any(func(h): return h.passive_id == "devotion"):
+		for h in heroes:
+			_apply_status(h, "devotion", -1)
 
 	var composition: Array = ["raider", "chief", "archer", "archer"]
 	if Run.active and Run.encounter.has("enemies"):
@@ -572,6 +593,8 @@ func _run_battle() -> void:
 		for dot_id in DOT_STATUSES:
 			if u.has_status(dot_id) and not u.dead:
 				var dot_dmg: int = DOT_STATUSES[dot_id]
+				if dot_id == "poison":
+					dot_dmg *= maxi(u.status_stacks("poison"), 1)
 				var info: Array = STATUS_INFO[dot_id]
 				_sfx("hit", -14.0, 0.8)
 				var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
@@ -627,7 +650,18 @@ func _next_unit() -> BattleUnit:
 	return best
 
 
+# Everything enemies can target / allies can help: heroes plus living companions.
+func _hero_side() -> Array:
+	var side: Array = heroes.filter(func(h): return not h.dead)
+	for c in companions:
+		if not c.dead:
+			side.append(c)
+	return side
+
+
 func _player_turn(u: BattleUnit) -> void:
+	if enemies.all(func(e): return e.dead):
+		return  # a companion or DoT already ended it; the loop will notice
 	current_hero = u
 	item_used = false
 	if u.resource_name == "Mana":
@@ -639,6 +673,13 @@ func _player_turn(u: BattleUnit) -> void:
 	elif u.resource_name == "Rage":
 		u.resource = mini(u.resource + 5, u.max_resource)
 		u.refresh_bars()
+	# Companions have no turns of their own: their statuses tick (and Breaks
+	# recover) with their master.
+	if u.companion != null and not u.companion.dead:
+		u.companion.tick_statuses()
+		if u.companion.broken:
+			u.companion.broken_pending = false
+			u.companion.recover_from_break()
 	_show_actions(u)
 	var ab: Ability
 	var auto_target: BattleUnit = null
@@ -657,7 +698,7 @@ func _player_turn(u: BattleUnit) -> void:
 	while true:
 		var used_targeting := false
 		if ab.special in ["rally", "focus", "surge", "shieldwall", "quickdraw",
-				"phoenix", "hymn", "benediction", "retaliate"]:
+				"phoenix", "hymn", "retaliate", "unity", "tripwire", "summon"]:
 			target = u  # self/party effects need no target choice
 		elif ab.aoe or ab.random_hits > 0:
 			var foes := enemies.filter(func(e): return not e.dead)
@@ -667,7 +708,7 @@ func _player_turn(u: BattleUnit) -> void:
 		else:
 			var pool: Array
 			if ab.target == Ability.Target.ALLY:
-				pool = heroes.filter(func(h): return not h.dead)
+				pool = _hero_side()
 			else:
 				pool = enemies.filter(func(e): return not e.dead)
 			if pool.size() == 1:
@@ -679,6 +720,9 @@ func _player_turn(u: BattleUnit) -> void:
 			if autoplay:
 				var roll := randf()
 				grade = "perfect" if roll < 0.20 else ("fail" if roll > 0.85 else "good")
+				break
+			if ab.no_skill_check:
+				grade = "good"
 				break
 			# Auto-cast abilities (no target click) can cancel during the skill check.
 			grade = await _run_skill_check(not used_targeting)
@@ -701,6 +745,8 @@ func _player_turn(u: BattleUnit) -> void:
 # focus the weakest (preferring Broken) enemy.
 func _autoplay_pick(u: BattleUnit) -> Array:
 	var foes := enemies.filter(func(e): return not e.dead)
+	if foes.is_empty():
+		return [u.abilities[0], u]  # battle is over; the loop ends it
 	var allies := heroes.filter(func(h): return not h.dead)
 	var broken_foes := foes.filter(func(e): return e.broken)
 	var target_foe: BattleUnit = _lowest_hp(broken_foes) if not broken_foes.is_empty() \
@@ -708,6 +754,12 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 	var weakest_ally := _lowest_hp(allies)
 	match u.unit_name:
 		"Warrior":
+			var pommel := _find_ability(u, "Pommel Strike")
+			if pommel != null and u.pommel_ready and u.resource >= pommel.cost:
+				return [pommel, target_foe]
+			var hack := _find_ability(u, "Hack and Slash")
+			if hack != null and u.resource >= hack.cost and randf() < 0.4:
+				return [hack, target_foe]
 			var crushing := _find_ability(u, "Crushing Blow")
 			if crushing != null and u.resource >= crushing.cost \
 					and not target_foe.has_status("sunder"):
@@ -724,8 +776,25 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			var flame := _find_ability(u, "Flame Surge")
 			if flame != null and u.resource >= flame.cost and foes.size() >= 2:
 				return [flame, target_foe]
+			var barrage := _find_ability(u, "Arcane Barrage")
+			if barrage != null and u.resource >= barrage.cost and foes.size() >= 2:
+				return [barrage, target_foe]
+			var fbolt := _find_ability(u, "Frost Bolt")
+			if fbolt != null and u.resource >= fbolt.cost:
+				return [fbolt, target_foe]
 			return [u.abilities[0], target_foe]          # Magic Bolt
 		"Hunter":
+			var summon := _find_ability(u, "Summon Canis")
+			if summon != null and u.resource >= summon.cost \
+					and (u.companion == null or u.companion.dead):
+				return [summon, u]
+			var kill_cmd := _find_ability(u, "Kill Command")
+			if kill_cmd != null and u.resource >= kill_cmd.cost \
+					and u.companion != null and not u.companion.dead:
+				return [kill_cmd, target_foe]
+			var gut := _find_ability(u, "Gut")
+			if gut != null and u.resource >= gut.cost:
+				return [gut, target_foe]
 			var aimed := _find_ability(u, "Aimed Shot")
 			if aimed != null and u.resource >= aimed.cost:
 				return [aimed, target_foe]
@@ -735,6 +804,13 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if hymn != null and u.second_resource >= hymn.faith_cost \
 					and weakest_ally.hp < weakest_ally.max_hp * 0.6:
 				return [hymn, u]
+			var unity_ab := _find_ability(u, "Unity")
+			if unity_ab != null and u.second_resource >= unity_ab.faith_cost \
+					and weakest_ally.hp < weakest_ally.max_hp * 0.7:
+				return [unity_ab, u]
+			var flay := _find_ability(u, "Mind Flay")
+			if flay != null and u.second_resource >= flay.faith_cost and foes.size() >= 2:
+				return [flay, target_foe]
 			if weakest_ally.hp < weakest_ally.max_hp * 0.5 and u.resource >= 25:
 				return [u.abilities[1], weakest_ally]    # Mend Wounds
 			return [u.abilities[0], target_foe]          # Smite
@@ -878,7 +954,15 @@ func _show_actions(u: BattleUnit) -> void:
 		ab_btn.custom_minimum_size = Vector2(230, 38)
 		ab_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		ab_btn.tooltip_text = _ability_tooltip(u, ab)
-		ab_btn.disabled = ab.cost > u.resource or ab.faith_cost > u.second_resource
+		var unusable: bool = ab.cost > u.resource or ab.faith_cost > u.second_resource
+		# Conditional abilities.
+		if ab.display_name == "Pommel Strike" and not u.pommel_ready:
+			unusable = true
+			ab_btn.tooltip_text += "\n(Not ready: needs a parry, a crit, or an\nenemy attack missing the Warrior)"
+		if ab.special == "kill_command" and (u.companion == null or u.companion.dead):
+			unusable = true
+			ab_btn.tooltip_text += "\n(No living companion)"
+		ab_btn.disabled = unusable
 		ab_btn.pressed.connect(_on_popup_ability.bind(popup, ab))
 		ab_btn.mouse_entered.connect(_preview_delay.bind(u, ab))
 		ab_btn.mouse_exited.connect(_clear_delay_preview)
@@ -985,7 +1069,19 @@ func _pick_target(pool: Array) -> BattleUnit:
 
 func _enemy_turn(u: BattleUnit) -> void:
 	await _wait(0.7)
-	var living := heroes.filter(func(h): return not h.dead)
+	# Mind Flay: the maddened enemy turns on its own allies with bonus Break
+	# damage (falls through to normal behavior if it stands alone).
+	if u.has_status("mindflay"):
+		var fellows := enemies.filter(func(e): return not e.dead and e != u)
+		if not fellows.is_empty():
+			var mf_target: BattleUnit = fellows.pick_random()
+			var mf_options: Array = u.abilities.filter(func(a): return a.cost <= u.resource)
+			_message("%s turns on its allies!" % u.unit_name)
+			_log("%s is maddened — attacks %s!" % [u.unit_name, mf_target.unit_name], "#c070e0")
+			await _wait(0.4)
+			await _resolve(u, mf_options.pick_random(), mf_target, "good")
+			return
+	var living := _hero_side()
 	if living.is_empty():
 		return
 	if u.has_status("mocked"):
@@ -1031,10 +1127,23 @@ func _uses_bow(u: BattleUnit) -> bool:
 	return u.unit_name.begins_with("Hunter") or u.unit_name.begins_with("Orc Archer")
 
 
+# Per-ability impact sounds; falls back to bow/generic hits.
+func _impact_sfx(attacker: BattleUnit, ab: Ability) -> String:
+	if ab.display_name == "Hack and Slash" or ab.display_name == "Wildstrikes":
+		return "wildstrikes"
+	if ab.display_name == "Strike" and attacker.is_hero:
+		return "strike"
+	if _uses_bow(attacker) and ab.display_name != "Gut":
+		return "bow_impact"
+	return "hit"
+
+
 func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: String,
 		is_counter := false) -> void:
 	attacker.resource = clampi(attacker.resource - ab.cost + ab.resource_gain, 0, attacker.max_resource)
 	attacker.refresh_bars()
+	if ab.display_name == "Pommel Strike":
+		attacker.pommel_ready = false  # the opening is spent
 	var dmg_mult := {"perfect": 1.15, "good": 1.0, "fail": 0.6}[grade] as float
 	var pr_mult := {"perfect": 1.25, "good": 1.0, "fail": 0.5}[grade] as float
 	var is_perfect := grade == "perfect"
@@ -1049,7 +1158,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 	attacker.play_anim(ab.anim)
-	if _uses_bow(attacker) and ab.damage > 0:
+	if _uses_bow(attacker) and ab.damage > 0 and ab.display_name != "Gut":
 		_sfx("bow_attack", -8.0)
 	await _wait(0.3)
 	if attacker.is_hero:
@@ -1058,10 +1167,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 
 	if ab.faith_cost > 0:
 		attacker.second_resource = maxi(attacker.second_resource - ab.faith_cost, 0)
-	# Faith builds from every Cleric action (Zeal: 13).
+	# Faith builds from every Cleric action.
 	if attacker.second_resource_name == "Faith":
-		var faith_gain := 13 if attacker.passive_id == "zeal" else 10
-		attacker.second_resource = mini(attacker.second_resource + faith_gain, attacker.second_max)
+		attacker.second_resource = mini(attacker.second_resource + 10, attacker.second_max)
 		attacker.refresh_bars()
 
 	var grade_tag := {"perfect": " [PERFECT]", "good": "", "fail": " [Sloppy]"}[grade] as String
@@ -1084,19 +1192,22 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_stat("attack_miss")
 		_sfx("miss")
 		target.float_text("MISS", Color(0.75, 0.75, 0.75))
+		target.pommel_ready = true  # a whiffed attack is an opening
 		_message("%s misses!" % attacker.unit_name)
 		_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
 			target.unit_name], "#909090")
 		await _wait(0.35)
 	elif not is_counter and not ab.aoe and ab.multi_hits == 0 and ab.random_hits == 0 \
-			and not target.broken and not target.dead \
-			and randf() < PARRY_CHANCE + target.parry_bonus:
+			and not target.broken and not target.dead and not target.is_companion \
+			and randf() < PARRY_CHANCE + target.parry_bonus \
+			+ (0.15 if target.has_status("parry_up") else 0.0):
 		# Parry negates the hit; the defender immediately counters with
 		# their basic attack (a free action — no rolls, no initiative cost).
 		_stat("attacks")
 		_stat("attack_parry")
 		_sfx("bow_blocked" if _uses_bow(attacker) else "parry", -4.0)
 		target.float_text("PARRY", Color(0.4, 0.9, 1.0))
+		target.pommel_ready = true
 		_message("%s parries and counters!" % target.unit_name)
 		_log("%s parries %s — counter attack!" % [target.unit_name,
 			attacker.unit_name], "#50c8e0")
@@ -1106,21 +1217,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	else:
 		var strike_targets: Array = [target]
 		if ab.aoe:
-			strike_targets = (enemies if attacker.is_hero else heroes).filter(
-				func(t): return not t.dead)
+			strike_targets = enemies.filter(func(t): return not t.dead) \
+				if attacker.is_hero else _hero_side()
 		var total_hits := strike_targets.size()
 		if ab.random_hits > 0:
-			total_hits = ab.random_hits + (1 if is_perfect else 0)
+			total_hits = ab.random_hits + (1 if is_perfect and ab.perfect_extra_hit else 0)
 		elif ab.multi_hits > 0:
-			total_hits = ab.multi_hits + (1 if is_perfect else 0)
+			total_hits = ab.multi_hits + (1 if is_perfect and ab.perfect_extra_hit else 0)
 		var total_dealt := 0
 		var any_crit := false
 		for hit_i in total_hits:
 			var strike_target: BattleUnit
 			if ab.random_hits > 0:
 				# Each shard picks a fresh living target at launch time.
-				var live_pool: Array = (enemies if attacker.is_hero else heroes).filter(
-					func(t): return not t.dead)
+				var live_pool: Array = enemies.filter(func(t): return not t.dead) \
+					if attacker.is_hero else _hero_side()
 				if live_pool.is_empty():
 					break
 				strike_target = live_pool.pick_random()
@@ -1141,16 +1252,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_stat("attack_miss")
 					_sfx("miss")
 					strike_target.float_text("MISS", Color(0.75, 0.75, 0.75))
+					strike_target.pommel_ready = true
 					_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
 						strike_target.unit_name], "#909090")
 					await _wait(0.45)
 					continue
-				if not strike_target.broken \
-						and randf() < PARRY_CHANCE + strike_target.parry_bonus:
+				if not strike_target.broken and not strike_target.is_companion \
+						and randf() < PARRY_CHANCE + strike_target.parry_bonus \
+						+ (0.15 if strike_target.has_status("parry_up") else 0.0):
 					_stat("attacks")
 					_stat("attack_parry")
 					_sfx("bow_blocked" if _uses_bow(attacker) else "parry", -4.0)
 					strike_target.float_text("PARRY", Color(0.4, 0.9, 1.0))
+					strike_target.pommel_ready = true
 					_log("%s parries %s — counter attack!" % [strike_target.unit_name,
 						attacker.unit_name], "#50c8e0")
 					await _wait(0.5)
@@ -1164,8 +1278,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if attacker.second_resource_name == "Resonance":
 				crit_chance += 0.03 * attacker.second_resource
 			crit_chance += attacker.crit_bonus
-			if is_perfect and ab.display_name == "Overpower":
+			# Pack Bond (Aguila): the eagle sharpens the hunter's eye.
+			if attacker.passive_id == "pack" and attacker.companion != null \
+					and not attacker.companion.dead \
+					and attacker.companion.companion_kind == "aguila":
 				crit_chance += 0.15
+			if is_perfect and ab.display_name == "Frost Bolt":
+				crit_chance += 0.05
 			var is_crit := randf() < crit_chance
 			# Razor Ice always crits against Slowed (chilled) targets.
 			if ab.display_name == "Razor Ice" and strike_target.has_status("slow"):
@@ -1173,16 +1292,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			any_crit = any_crit or is_crit
 			var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
 			if is_crit:
-				raw *= 1.75 if attacker.passive_id == "lethal_aim" else 1.5
+				raw *= 2.0 if attacker.passive_id == "lethal_aim" else 1.5
 			# Attacker-side modifiers.
 			if attacker.second_resource_name == "Resonance":
 				raw *= 1.0 + 0.15 * attacker.second_resource
 			if attacker.has_status("surge"):
 				raw *= 1.2
-			if is_perfect and ab.display_name == "Arcane Cannon":
+			# Arcane Cannon: the damage (not the recoil) grows with Resonance.
+			if ab.display_name == "Arcane Cannon":
 				raw *= 1.0 + 0.075 * attacker.second_resource
-			if ab.display_name == "Piercing Arrow" and strike_target.broken:
-				raw *= 1.5
+				if is_perfect:
+					raw += 5.0
+			# Frost Bolt: 50% chance to deal DOUBLE damage to unchilled targets.
+			if ab.display_name == "Frost Bolt" and not strike_target.has_status("slow") \
+					and randf() < 0.5:
+				raw *= 2.0
+				strike_target.float_text("SHATTER x2", Color(0.5, 0.85, 1.0))
+			if is_perfect and ab.display_name == "Explosive Shot":
+				raw = 12.0 * randf_range(0.9, 1.1)
 			# Powershot: +2% damage per 1% of the target's Break (Pressure) bar.
 			if ab.display_name == "Powershot":
 				raw *= 1.0 + 2.0 * clampf(
@@ -1195,8 +1322,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 0.85
 			if attacker.passive_id == "bloodrage":
 				raw *= 1.0 + 0.4 * (1.0 - attacker.hp / float(attacker.max_hp))
-			if attacker.passive_id == "zeal":
-				raw *= 1.15
+			# Seasoned Fighter: the offensive stance above half HP.
+			if attacker.passive_id == "seasoned" and attacker.hp > attacker.max_hp * 0.5:
+				raw *= 1.25
 			raw *= 1.0 + attacker.dmg_bonus + float(attacker.type_dmg_bonus.get(ab.dmg_type, 0.0))
 			# Target-side modifiers.
 			if strike_target.second_resource_name == "Resonance":
@@ -1220,6 +1348,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			var pr := int(round(ab.pressure * pr_mult * (1.5 if is_crit else 1.0)))
 			if is_perfect and (ab.perfect_id == "pressure" or ab.aoe):
 				pr = int(pr * 1.5)
+			if is_perfect and ab.display_name == "Crushing Blow":
+				pr = 15
+			# Pack Bond (Ursus): the bear's weight behind every hit.
+			if attacker.passive_id == "pack" and attacker.companion != null \
+					and not attacker.companion.dead \
+					and attacker.companion.companion_kind == "ursus":
+				pr = int(pr * 1.25)
+			# Mind Flay: maddened attacks batter their own allies' stability.
+			if attacker.has_status("mindflay"):
+				pr = int(pr * (1.0 + attacker.status_power("mindflay") / 100.0))
 			_stat("attacks")
 			_stat("attack_landed")
 			if is_crit:
@@ -1229,6 +1367,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			else:
 				_stat("dmg_enemy", final)
 			total_dealt += final
+			# Unity: the bound party splits incoming damage evenly (Pressure
+			# still lands on the struck hero alone).
+			if strike_target.is_hero and not strike_target.is_companion \
+					and strike_target.has_status("unity"):
+				var bound := heroes.filter(func(h): return not h.dead)
+				if bound.size() > 1:
+					var share := maxi(int(round(final / float(bound.size()))), 1)
+					for h in bound:
+						if h == strike_target:
+							continue
+						var shared: Dictionary = h.take_hit(share, 0)
+						h.float_text("-%d Unity" % share, Color(0.95, 0.85, 0.4))
+						if shared.died:
+							_stat("hero_deaths")
+							_sfx("death", -4.0)
+							_message("%s falls!" % h.unit_name)
+							_log("† %s dies" % h.unit_name, "#e05050")
+					final = share
 			var result: Dictionary = strike_target.take_hit(final, pr)
 			if not sim and not result.died:
 				strike_target.hit_react((strike_target.position - attacker.position).normalized())
@@ -1240,7 +1396,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_sfx("hit", -5.0, 1.15)
 				strike_target.float_text("%d" % final, Color(0.85, 0.55, 1.0))
 			else:
-				_sfx("bow_impact" if _uses_bow(attacker) else "hit")
+				_sfx(_impact_sfx(attacker, ab))
 				strike_target.float_text("%d" % final, Color(0.95, 0.85, 0.75))
 			var resist_tag := ""
 			if resist > 0.0:
@@ -1251,22 +1407,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				ab.display_name, strike_target.unit_name, final, ab.dmg_type,
 				" CRIT" if is_crit else "", resist_tag, pr, grade_tag],
 				"#d8d2c4" if attacker.is_hero else "#e0a0a0")
-			if attacker.passive_id == "pack" and is_crit and not strike_target.dead:
-				var pack_dmg := maxi(int(final * 0.3), 1)
-				strike_target.take_hit(pack_dmg, 0)
-				strike_target.float_text("%d Pack" % pack_dmg, Color(0.8, 0.6, 0.3))
-				_log("   → the pack strikes for %d" % pack_dmg, "#b0a8e0")
-			# Arcanist Echo: the spell strikes again at half power.
-			if attacker.passive_id == "echo" and not result.died and randf() < 0.15:
+			# Arcanist Echo: the spell strikes again at half power (announced
+			# loudly so the proc reads clearly).
+			if attacker.passive_id == "echo" and not result.died and randf() < 0.20:
 				var echo_dmg := maxi(int(final * 0.5), 1)
 				strike_target.take_hit(echo_dmg, 0)
+				attacker.float_text("ECHO!", Color(0.85, 0.55, 1.0), true)
 				strike_target.float_text("%d Echo" % echo_dmg, Color(0.8, 0.6, 1.0))
-				_log("   → Echo strikes %s for %d" % [strike_target.unit_name, echo_dmg], "#b0a8e0")
+				_sfx("hit", -6.0, 1.3)
+				_log("   → ECHO! The spell strikes %s again for %d" % [
+					strike_target.unit_name, echo_dmg], "#b0a8e0")
 			if ab.delay_push > 0.0:
 				strike_target.next_time += ab.delay_push * 100.0 / strike_target.effective_speed()
-			if not result.died and not ab.applies_status.is_empty() and randf() <= ab.status_chance:
+			var status_chance := ab.status_chance
+			if is_perfect and ab.display_name == "Overpower":
+				status_chance = 0.75
+			if not result.died and not ab.applies_status.is_empty() and randf() <= status_chance:
 				var turns: int = ab.applies_status["turns"]
-				if is_perfect and ab.perfect_id == "slow_plus":
+				if is_perfect and ab.perfect_id == "status_plus":
 					turns = 4
 				if is_perfect and ab.display_name == "Flame Surge":
 					turns += 1
@@ -1275,18 +1433,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					status_meta = int(round((CRIT_CHANCE + attacker.crit_bonus) * 100))
 				_apply_status(strike_target, ab.applies_status["id"], turns, status_meta)
 			if ab.bleed_build > 0 and not strike_target.dead and randf() <= ab.bleed_chance:
-				if strike_target.add_bleed(ab.bleed_build):
-					var bleed_dmg := maxi(int(strike_target.max_hp * 0.20), 1)
-					var bleed_result: Dictionary = strike_target.take_hit(bleed_dmg, 0)
-					strike_target.float_text("BLEEDOUT %d" % bleed_dmg, Color(0.9, 0.15, 0.2), true)
-					_sfx("crit", -5.0, 0.8)
-					_log("   → %s BLEEDS OUT for %d" % [strike_target.unit_name, bleed_dmg], "#e05050")
-					if bleed_result.died:
-						_stat("hero_deaths" if strike_target.is_hero else "enemy_deaths")
-						_sfx("death", -4.0)
-						_message("%s falls!" % strike_target.unit_name)
-						_log("† %s dies" % strike_target.unit_name, "#e05050")
-						await _wait(0.5)
+				var build := ab.bleed_build
+				if is_perfect and ab.display_name == "Gut":
+					build = 25
+				_add_bleed_with_burst(strike_target, build)
 			if ab.display_name == "Mocking Blow" and not strike_target.dead:
 				var mocker_idx := heroes.find(attacker)
 				if mocker_idx >= 0:
@@ -1298,12 +1448,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						int(round((CRIT_CHANCE + attacker.crit_bonus) * 100)))
 				elif attacker.passive_id == "chill" and randf() < 0.5:
 					_apply_status(strike_target, "slow", 3)
-				elif attacker.passive_id == "corrupt" and randf() < 0.25:
-					_apply_status(strike_target, "cripple", 3)
-				if is_perfect and ab.display_name == "Hex of Ruin":
-					_apply_status(strike_target, "cripple", 3)
-			if ab.display_name == "Overpower" and is_crit and not strike_target.dead:
-				_apply_status(strike_target, "stunned", 1)
+				# Pack Bond (Canis): the wolf worries every wound open.
+				if attacker.passive_id == "pack" and attacker.companion != null \
+						and not attacker.companion.dead \
+						and attacker.companion.companion_kind == "canis":
+					_add_bleed_with_burst(strike_target, 15)
+			# Trapper: striking the Survivalist risks a poisoned barb.
+			if strike_target.passive_id == "trapper" and not attacker.is_hero \
+					and not attacker.dead and randf() < 0.25:
+				_apply_status(attacker, "poison", 5)
 			if is_perfect and ab.display_name == "Pyroblast" and not strike_target.dead:
 				_apply_status(strike_target, "burn", 3,
 					int(round((CRIT_CHANCE + attacker.crit_bonus) * 100)))
@@ -1357,11 +1510,44 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				attacker.heal_amount(drained)
 				attacker.float_text("+%d" % drained, Color(0.4, 0.9, 0.45))
 				_log("   → %s drains %d HP" % [attacker.unit_name, drained], "#70d878")
-		if attacker.passive_id == "duelist" and any_crit and attacker.resource_name == "Rage":
-			var refund := 20 if ab.display_name == "Overpower" else 10
-			attacker.resource = mini(attacker.resource + refund, attacker.max_resource)
-			attacker.refresh_bars()
-			attacker.float_text("+%d Rage" % refund, Color(1.0, 0.5, 0.4))
+		# A crit is an opening: readies the Swordmaster's Pommel Strike.
+		if any_crit:
+			attacker.pommel_ready = true
+		# The Beastmaster's companion strikes alongside the hunter.
+		if attacker.is_hero and attacker.passive_id == "pack" and ab.damage > 0 \
+				and not is_counter and attacker.companion != null \
+				and not attacker.companion.dead:
+			var comp_target: BattleUnit = target
+			if comp_target == null or comp_target.is_hero or comp_target.dead:
+				var foes := enemies.filter(func(e): return not e.dead)
+				comp_target = null if foes.is_empty() else _lowest_hp(foes)
+			if comp_target != null:
+				await _companion_strike(attacker.companion, comp_target, 1.0, false)
+		# Tripwire: rigged ground bites every attacking melee enemy.
+		if not attacker.is_hero and not attacker.is_ranged and not is_counter \
+				and total_dealt > 0:
+			for trapper in heroes:
+				if trapper.dead or not trapper.has_status("tripwire") or attacker.dead:
+					continue
+				var ret := maxi(int(total_dealt * 0.75), 1)
+				var ret_result: Dictionary = attacker.take_hit(ret, 0)
+				attacker.float_text("%d Tripwire" % ret, Color(0.8, 0.65, 0.35))
+				_log("   → %s's tripwire rips %s for %d" % [trapper.unit_name,
+					attacker.unit_name, ret], "#50c8e0")
+				if ret_result.died:
+					_stat("enemy_deaths")
+					_sfx("death", -4.0)
+					_message("%s falls!" % attacker.unit_name)
+					_log("† %s dies" % attacker.unit_name, "#e05050")
+		# Corrupted Channeling: a Crippled enemy's violence feeds the party.
+		if not attacker.is_hero and attacker.has_status("cripple") and total_dealt > 0 \
+				and heroes.any(func(h): return not h.dead and h.passive_id == "corrupt"):
+			var blessed: BattleUnit = heroes.filter(func(h): return not h.dead).pick_random()
+			var leech_heal := maxi(int(total_dealt / 2.0), 1)
+			blessed.heal_amount(leech_heal)
+			blessed.float_text("+%d" % leech_heal, Color(0.7, 0.4, 0.9))
+			_log("   → Corrupted Channeling: %s heals %d" % [blessed.unit_name,
+				leech_heal], "#b0a8e0")
 		_gain_resonance(attacker, 2 if any_crit else 1)
 	if not sim and attacker.position != lunge_origin:
 		var back := create_tween()
@@ -1522,21 +1708,32 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_stat("healing", amt)
 			_message("MIRACLE — Sanctuary!")
 			_log("%s: Sanctuary — party healed and walled" % attacker.unit_name, "#70d878")
-		"benediction":
-			if not is_perfect:
-				var blood_cost := int(attacker.max_hp * 0.10)
-				attacker.hp = maxi(attacker.hp - blood_cost, 1)
-				attacker.float_text("-%d" % blood_cost, Color(1.0, 0.4, 0.5))
+		"unity":
 			_sfx("heal", -5.0, 0.7)
 			for h in heroes.filter(func(he): return not he.dead):
-				var amt := int(h.max_hp * 0.15 * (1.25 if attacker.passive_id == "grace" else 1.0))
-				h.heal_amount(amt)
-				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
-				_apply_status(h, "empower", 3)
-				_stat("healing", amt)
-			attacker.refresh_bars()
-			_message("MIRACLE — Dark Benediction!")
-			_log("%s: Dark Benediction — blood for power" % attacker.unit_name, "#70d878")
+				_apply_status(h, "unity", 4 if is_perfect else 3)
+			_message("MIRACLE — Unity!")
+			_log("%s: Unity — the party's souls are bound" % attacker.unit_name, "#70d878")
+		"mindflay":
+			_sfx("break", -8.0, 1.4)
+			_apply_status(target, "mindflay", 3, 115 if is_perfect else 100)
+			_message("%s shatters %s's mind!" % [attacker.unit_name, target.unit_name])
+			_log("%s: Mind Flay — %s turns on its allies" % [attacker.unit_name,
+				target.unit_name], "#c070e0")
+		"tripwire":
+			_sfx("click", -8.0, 0.8)
+			_apply_status(attacker, "tripwire", 6 if is_perfect else 5)
+			_message("%s rigs the ground" % attacker.unit_name)
+			_log("%s: Tripwire set" % attacker.unit_name, "#70d878")
+		"summon":
+			await _do_summon(attacker, ab.display_name.get_slice(" ", 1).to_lower())
+		"kill_command":
+			var comp: BattleUnit = attacker.companion
+			if comp != null and not comp.dead and target != null and not target.dead:
+				_message("%s: KILL COMMAND!" % attacker.unit_name)
+				_log("%s orders %s to savage %s!" % [attacker.unit_name,
+					comp.unit_name, target.unit_name], "#e0a050")
+				await _companion_strike(comp, target, 3.0 if is_perfect else 2.0, true)
 		"renewal":
 			_sfx("heal", -9.0, 1.1)
 			_apply_status(target, "renewal", 5)
@@ -1546,6 +1743,116 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s blesses %s with Renewal" % [attacker.unit_name, target.unit_name])
 			_log("%s: Renewal on %s — 8 HP/turn for 5 turns" % [attacker.unit_name,
 				target.unit_name], "#70d878")
+
+
+# ---------- Beastmaster companions ----------
+
+# kind -> [max HP, sphere tint] (placeholder spheres until beast art exists).
+const COMPANION_STATS := {
+	"ursus": [80, Color(0.9, 0.3, 0.25)],
+	"canis": [60, Color(0.35, 0.55, 0.95)],
+	"aguila": [60, Color(0.35, 0.85, 0.4)],
+}
+
+
+# Summons (or replaces) the hunter's companion. It inherits the hunter's
+# armor, stability, and crit chance; it has no resource and takes no turns.
+func _do_summon(hunter: BattleUnit, kind: String) -> void:
+	if hunter.companion != null and is_instance_valid(hunter.companion):
+		companions.erase(hunter.companion)
+		hunter.companion.queue_free()
+		hunter.companion = null
+	var stats: Array = COMPANION_STATS[kind]
+	var cfg := {"unit_name": kind.capitalize(), "is_hero": true, "sheet_dir": "sphere",
+		"sprite_scale": 1.4, "max_hp": stats[0], "armor": hunter.armor,
+		"speed": hunter.speed, "stability": hunter.stability, "abilities": []}
+	var comp := _make_unit(cfg, hunter.position + Vector2(110, -16), stats[1])
+	comp.is_companion = true
+	comp.companion_kind = kind
+	comp.crit_bonus = hunter.crit_bonus
+	comp.next_time = INF  # never drawn a turn from the timeline
+	companions.append(comp)
+	hunter.companion = comp
+	_sfx("heal", -7.0, 0.6)
+	_message("%s answers the call!" % comp.unit_name)
+	_log("%s summons %s" % [hunter.unit_name, comp.unit_name], "#70d878")
+	await _wait(0.5)
+
+
+# One companion attack. `mult` scales damage (Kill Command: x2, x3 on Perfect);
+# `boosted` doubles the special effect (guaranteed procs, doubled Bleed).
+func _companion_strike(comp: BattleUnit, victim: BattleUnit, mult: float,
+		boosted: bool) -> void:
+	if comp == null or comp.dead or victim == null or victim.dead:
+		return
+	var proc_chance := 1.0 if boosted else 0.5
+	match comp.companion_kind:
+		"ursus":
+			await _companion_hit(comp, victim, 10.0 * mult, int(10 * mult))
+			# The bear's sweep also mauls the enemy beside the target.
+			var others := enemies.filter(func(e): return not e.dead and e != victim)
+			if not others.is_empty():
+				await _companion_hit(comp, others.pick_random(), 10.0 * mult, int(10 * mult))
+		"canis":
+			await _companion_hit(comp, victim, 15.0 * mult, 0)
+			if not victim.dead and randf() < proc_chance:
+				_add_bleed_with_burst(victim, 30 if boosted else 15)
+		"aguila":
+			await _companion_hit(comp, victim, 15.0 * mult, 0)
+			if not victim.dead and randf() < proc_chance:
+				_apply_status(victim, "sunder", 4 if boosted else 2)
+
+
+# All beasts deal physical damage using the hunter's inherited crit chance.
+func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int) -> void:
+	if victim == null or victim.dead:
+		return
+	var raw := dmg * randf_range(0.9, 1.1)
+	var is_crit := randf() < CRIT_CHANCE + comp.crit_bonus + (0.25 if victim.broken else 0.0)
+	if is_crit:
+		raw *= 1.5
+	raw *= 1.0 - float(victim.resists.get("physical", 0.0))
+	var final := maxi(int(round(raw * (1.0 - victim.effective_armor()))), 1)
+	var result: Dictionary = victim.take_hit(final, pr)
+	_sfx("crit" if is_crit else "hit", -4.0 if is_crit else -7.0, 1.1)
+	victim.float_text("%d%s" % [final, "!" if is_crit else ""],
+		Color(1.0, 0.45, 0.15) if is_crit else Color(0.9, 0.75, 0.55), is_crit)
+	if not sim and not result.died:
+		victim.hit_react((victim.position - comp.position).normalized())
+	_log("%s: strikes %s for %d%s" % [comp.unit_name, victim.unit_name, final,
+		" CRIT" if is_crit else ""], "#d8b880")
+	if result.broke:
+		_stat("breaks_on_enemies" if not victim.is_hero else "breaks_on_heroes")
+		_sfx("break", -3.0)
+		_message("%s BREAKS!" % victim.unit_name)
+		_log("!! %s BREAKS" % victim.unit_name, "#c070e0")
+		await _break_impact()
+		_shake()
+	if result.died:
+		_stat("hero_deaths" if victim.is_hero else "enemy_deaths")
+		_sfx("death", -4.0)
+		_message("%s falls!" % victim.unit_name)
+		_log("† %s dies" % victim.unit_name, "#e05050")
+	await _wait(0.35)
+	# No _check_end here: the battle loop checks after the turn fully resolves
+	# (ending mid-resolve reloads the scene under running code in sim mode).
+
+
+# Adds bleed buildup and detonates the bleedout when the meter fills.
+func _add_bleed_with_burst(victim: BattleUnit, amount: int) -> void:
+	if victim.dead:
+		return
+	if victim.add_bleed(amount):
+		var bleed_dmg := maxi(int(victim.max_hp * 0.20), 1)
+		var bleed_result: Dictionary = victim.take_hit(bleed_dmg, 0)
+		victim.float_text("BLEEDOUT %d" % bleed_dmg, Color(0.9, 0.15, 0.2), true)
+		_sfx("crit", -5.0, 0.8)
+		_log("   → %s BLEEDS OUT for %d" % [victim.unit_name, bleed_dmg], "#e05050")
+		if bleed_result.died:
+			_stat("hero_deaths" if victim.is_hero else "enemy_deaths")
+			_sfx("death", -4.0)
+			_message("%s falls!" % victim.unit_name)
+			_log("† %s dies" % victim.unit_name, "#e05050")
 
 
 # Unique bonus effects for Perfect skill checks (per ability).
@@ -1576,6 +1883,8 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 		"burn":
 			if not target_died:
 				_apply_status(target, "burn", 2)
+		"parry_up":
+			_apply_status(attacker, "parry_up", 3)
 
 
 # ---------- skill check ----------

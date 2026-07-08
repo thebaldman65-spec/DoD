@@ -241,6 +241,61 @@ cancels the follow-up strikes (each parried strike still triggers its counter). 
 Hack and Slash, Razor Ice, Twin Fang, Flurry.</li>
 <li>Rune generation moved into the Run autoload (shared by shop offers and elite drops).</li>
 </ul>
+<h3>2026-07-08 — The great spec overhaul, companions, audio polish, debug tools</h3>
+<ul>
+<li><b>Audio:</b> spec choice now keeps the MENU track (party setup theme); confirming the
+last spec plays the boss-entry tune over a fade to black into the node map (map music waits
+for the tune to end); node map track volume +100% (+6 dB); menu buttons play the new click
+clip; Strike has its own impact clip; Hack and Slash (and Wildstrikes) play the new clip per
+hit. NOTE: no "use potion" clip landed in imported files — potions still use the heal
+sound.</li>
+<li><b>Debug tools:</b> DOD_DEBUG=1 adds a DEBUG section to the map burger (+200 gold, +3
+talent points, full heal, jump to boss tier, advance zone). New DOD_SIM_SPECS env var makes
+the autoplay/sim bot play any spec loadout. Bot policies extended to use the new kits.</li>
+<li><b>Swordmaster:</b> passive is now <i>Seasoned Fighter</i> — +25% damage above half HP,
++25% armor at/below half (chip shows the live stance); replaces Duelist. Overpower: 35 dmg,
+2.5 init, 50% Stun (75% on Perfect). Crushing Blow: 3.0 init; Perfect deals flat 15 Pressure.
+New <i>Pommel Strike</i>: 15 Rage, 25 dmg / 15 Pr / 2.0, guaranteed Stun, only usable after a
+parry, a crit, or an enemy attack missing the Warrior; Perfect grants +15% parry (3
+turns).</li>
+<li><b>Cryomancer:</b> the Slow status is now called <i>Chilled</i> everywhere (same effect).
+New <i>Frost Bolt</i>: 25 Mana, 25 frost / 10 Pr / 3.0, 50% chance for DOUBLE damage vs
+unchilled targets; Perfect +5% crit.</li>
+<li><b>Arcanist:</b> Echo 15% → 20% and procs announce with a big "ECHO!". Arcane Cannon:
+30 Mana, +7.5% damage per Resonance stack (description now separates the damage bonus from
+the recoil), Perfect +5 base damage. Reality Fracture: 2.0 init, push 6.0. New <i>Arcane
+Barrage</i>: 25 Mana, 6 bolts × 5 dmg at random enemies, each bolt can Echo; Perfect adds a
+7th.</li>
+<li><b>Holy:</b> Hymn of Hope 40 → 30 Faith (Resonant Hymn talent now sets 25).</li>
+<li><b>Inquisitor is now the DEVOUT:</b> passive <i>Devotion Aura</i> — the whole party takes
+15% less Pressure (battle-long status). Burning Verdict and Condemn removed. New <i>Unity</i>
+MIRACLE: 25 Faith, damage received is split evenly among living heroes for 3 turns (Perfect
+4).</li>
+<li><b>Occultist:</b> Corrupted Channeling reworked — when a Crippled enemy attacks, a random
+hero heals for half its damage. Hex of Ruin: 2 random enemies, 15 shadow / 12 Pr each,
+Cripple 3 turns (Perfect 4). Dark Benediction replaced by <i>Mind Flay</i>: 25 Faith, the
+target attacks its own allies for 3 turns at +100% Break damage (Perfect +115%).</li>
+<li><b>Beastmaster rebuilt around companions:</b> Twin Fang and Bear Maul removed. Summon
+Ursus/Canis/Aguila (30 Focus, no skill check, one at a time, red/blue/green placeholder
+spheres): companions have HP (80/60/60), inherit the hunter's armor/Stability/crit, can be
+targeted and healed, take no turns, and auto-attack whenever the hunter attacks (Ursus: 10
+dmg + 10 Pr to the target AND another enemy; Canis: 15 dmg, 50% for 15 Bleed; Aguila: 15 dmg,
+50% Sunder). Pack Bond now depends on the beast (Ursus +25% Break dmg, Canis +15 Bleed on
+hunter attacks, Aguila +15% crit). New <i>Barbed Arrow</i> (20 Focus, 20 dmg, Cripple 3t) and
+<i>Kill Command</i> (30 Focus: companion strikes for double damage + doubled effect; Perfect
+triple).</li>
+<li><b>Sharpshooter:</b> Lethal Aim ×1.75 → ×2. Piercing Arrow removed.</li>
+<li><b>Survivalist rebuilt from scratch:</b> passive <i>Trapper</i> — enemies striking the
+Hunter have 25% chance to be Poisoned (5 turns). <b>Poison reworked globally:</b> 3
+damage/turn per stack, stacks additively, new stacks refresh the timer. New kit: <i>Tripwire</i>
+(retaliate vs every attacking melee enemy for 75% of their damage, 5 turns), <i>Explosive
+Shot</i> (35 Focus, 10 fire to ALL, 20 Pressure; Perfect 12 dmg), <i>Gut</i> (25 Focus melee
+dagger, 30 dmg, 20 Bleed; Perfect 25).</li>
+<li><b>Engine bits:</b> per-ability perfect hit-count opt-out; skill-check-free abilities;
+companion battle layer (hero-side targeting, no timeline turns, Break recovery on the
+master's turn, no parry-counters); talent pools updated for all removed/renamed
+abilities.</li>
+</ul>
 <h2>Progress Snapshot</h2>
 <p>Phase 1 (combat core) complete and simulator-tuned. Phase 2 (run structure) playable: map, battles, rewards, carryover, party/inventory screens. Next: class specializations, then drafting, talents, and zone variety. Automated testing: DOD_AUTOPLAY (single bot battle) and DOD_SIM=N (batch balance reports).</p>
 </body></html>

@@ -47,6 +47,7 @@ func _ready() -> void:
 	back.text = "< Back"
 	back.custom_minimum_size = Vector2(160, 46)
 	back.position = Vector2(560, 600)
+	back.pressed.connect(Music.click)
 	back.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/main_menu.tscn"))
 	add_child(back)
 

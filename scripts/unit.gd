@@ -37,6 +37,11 @@ var broken := false         # Broken: defenses down, crit vulnerable
 var broken_pending := false # will lose its next turn
 var dead := false
 var next_time := 0.0        # position on the initiative timeline
+var is_ranged := false      # melee/ranged split (Tripwire only punishes melee)
+var pommel_ready := false   # Swordmaster: set by parries, crits, enemy misses
+var is_companion := false   # Beastmaster summon: no turns, fights alongside
+var companion_kind := ""    # "ursus" / "canis" / "aguila"
+var companion: BattleUnit   # the Beastmaster's active summon (on the hunter)
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
@@ -68,6 +73,12 @@ func setup(config: Dictionary) -> void:
 
 
 func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
+	# Companions use a procedurally drawn sphere until real beast art exists;
+	# a single white circle frame backs every animation so the rest of the
+	# unit machinery (tint, highlight, hit flash) works unchanged.
+	if sheet_dir == "sphere":
+		_build_sphere_sprite(sprite_scale)
+		return
 	var frames := SpriteFrames.new()
 	var prefix: String = sheet_dir.get_file().capitalize()
 	# Animation name -> [file suffix, fps, loops]
@@ -106,6 +117,32 @@ func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
 	_base_scale = sprite_scale
 	sprite.scale = Vector2(sprite_scale, sprite_scale)
 	sprite.flip_h = not is_hero
+	add_child(sprite)
+	sprite.animation_finished.connect(_on_anim_finished)
+	sprite.play("idle")
+
+
+func _build_sphere_sprite(sprite_scale: float) -> void:
+	var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+	for x in 64:
+		for y in 64:
+			if (x - 32) * (x - 32) + (y - 32) * (y - 32) <= 28 * 28:
+				img.set_pixel(x, y, Color.WHITE)
+	var tex := ImageTexture.create_from_image(img)
+	var frames := SpriteFrames.new()
+	for anim_name in ["idle", "attack01", "attack02", "attack03", "hurt", "death"]:
+		frames.add_animation(anim_name)
+		frames.set_animation_loop(anim_name, anim_name == "idle")
+		frames.add_frame(anim_name, tex)
+	frames.remove_animation("default")
+	_idle_texture = tex
+	sprite = AnimatedSprite2D.new()
+	sprite.sprite_frames = frames
+	var outline_mat := ShaderMaterial.new()
+	outline_mat.shader = OUTLINE_SHADER
+	sprite.material = outline_mat
+	_base_scale = sprite_scale
+	sprite.scale = Vector2(sprite_scale, sprite_scale)
 	add_child(sprite)
 	sprite.animation_finished.connect(_on_anim_finished)
 	sprite.play("idle")
@@ -260,6 +297,17 @@ func refresh_bars() -> void:
 				s.desc = "Blood Frenzy: currently +%d%% damage\n(scales up to +40%% as HP falls)." % bonus
 				_refresh_chips()
 				break
+	# Seasoned Fighter chip shows which side of the stance switch is live.
+	if passive_id == "seasoned":
+		for s in statuses:
+			if s.id == "spec_passive":
+				var offense := hp > max_hp * 0.5
+				s.short = "+dmg" if offense else "+arm"
+				s.desc = "Seasoned Fighter: currently %s." % (
+					"+25% damage (above half HP)" if offense
+					else "+25% armor (at or below half HP)")
+				_refresh_chips()
+				break
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
 	_pressure_fill.size.x = 70.0 * pressure_ratio
 	# Shifts toward hot pink as the unit gets close to Breaking.
@@ -273,8 +321,17 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 		desc := "", power := 0) -> void:
 	for s in statuses:
 		if s.id == id:
-			s.turns = maxi(s.turns, turns)
-			s.power = maxi(s.power, power)
+			# Poison stacks additively (each stack +3 damage/turn) and every
+			# new application refreshes the timer.
+			if id == "poison":
+				s.stacks = int(s.get("stacks", 1)) + 1
+				s.turns = turns
+				s.short = "P%d" % s.stacks
+				s.desc = "Takes %d damage at the start of each turn\n(3 per stack); new stacks refresh the timer." % (3 * s.stacks)
+				float_text("%s x%d" % [label, s.stacks], color)
+			else:
+				s.turns = maxi(s.turns, turns)
+				s.power = maxi(s.power, power)
 			_refresh_chips()
 			return
 	statuses.append({"id": id, "label": label, "short": short, "color": color,
@@ -356,6 +413,9 @@ func effective_armor() -> float:
 	var a := armor
 	if has_status("fortify"):
 		a += 0.10
+	# Seasoned Fighter: the defensive half of the stance switch.
+	if passive_id == "seasoned" and hp <= max_hp * 0.5:
+		a += 0.25
 	if broken:
 		a *= 0.7
 	if has_status("sunder"):
@@ -441,6 +501,8 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		resource = mini(resource + 10, max_resource)
 	if has_status("ward"):
 		pressure_add = int(pressure_add * 0.5)
+	if has_status("devotion"):
+		pressure_add = int(pressure_add * 0.85)
 	var just_broke := false
 	if not broken:
 		pressure += pressure_add

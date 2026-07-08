@@ -6,7 +6,8 @@ const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
 
 func _ready() -> void:
-	Music.play("map")
+	# The awakening is still part of party setup — keep the menu track rolling.
+	Music.play("menu")
 	_draw_screen()
 
 
@@ -23,8 +24,7 @@ func _draw_screen() -> void:
 
 	var idx := _next_unspecced()
 	if idx == -1:
-		Run.specs_chosen = true
-		get_tree().change_scene_to_file("res://scenes/map.tscn")
+		_finish_and_fade()
 		return
 
 	var bg := ColorRect.new()
@@ -114,9 +114,26 @@ func _draw_screen() -> void:
 		choose.custom_minimum_size = Vector2(200, 44)
 		choose.pressed.connect(_choose.bind(idx, spec_id))
 		vbox.add_child(choose)
+	# (choose buttons play the click inside _choose)
 
 
 func _choose(idx: int, spec_id: String) -> void:
+	Music.click()
 	Run.party[idx]["spec"] = spec_id
 	Run.party[idx]["tree"] = Talents.generate_tree(spec_id, Run.party[idx]["key"])
 	_draw_screen()
+
+
+# All specs confirmed: the boss-entry tune plays over a fade to black, then the
+# node map appears (map music waits for the tune to finish).
+func _finish_and_fade() -> void:
+	Run.specs_chosen = true
+	Music.play_intro_then("boss_intro", "map")
+	var fade := ColorRect.new()
+	fade.size = Vector2(1280, 720)
+	fade.color = Color(0, 0, 0, 0.0)
+	add_child(fade)
+	var tween := create_tween()
+	tween.tween_property(fade, "color:a", 1.0, 1.3)
+	await tween.finished
+	get_tree().change_scene_to_file("res://scenes/map.tscn")

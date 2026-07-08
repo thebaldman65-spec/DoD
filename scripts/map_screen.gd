@@ -103,6 +103,7 @@ func _draw_screen() -> void:
 		party_btn.modulate = Color(1.0, 0.9, 0.45)
 	party_btn.custom_minimum_size = Vector2(150, 42)
 	party_btn.position = Vector2(20, 16)
+	party_btn.pressed.connect(Music.click)
 	party_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/party.tscn"))
 	add_child(party_btn)
 
@@ -115,6 +116,14 @@ func _draw_screen() -> void:
 	bpop.add_item("Restart Run", 0)
 	bpop.add_item("Quit to Main Menu", 1)
 	bpop.add_item("Quit to Desktop", 2)
+	# Testing shortcuts, only when launched with DOD_DEBUG=1.
+	if OS.get_environment("DOD_DEBUG") == "1":
+		bpop.add_separator("DEBUG")
+		bpop.add_item("+200 Gold", 10)
+		bpop.add_item("+3 Talent Points (all)", 11)
+		bpop.add_item("Full Heal Party", 12)
+		bpop.add_item("Jump to Boss Tier", 13)
+		bpop.add_item("Advance to Next Zone", 14)
 	bpop.id_pressed.connect(_on_burger)
 	add_child(burger)
 
@@ -160,6 +169,7 @@ func _draw_screen() -> void:
 				btn.add_theme_font_size_override("font_size", 17)
 			else:
 				btn.modulate = Color(0.55, 0.52, 0.6)
+			btn.pressed.connect(Music.click)
 			btn.pressed.connect(_on_node_pressed.bind(f, i))
 			add_child(btn)
 
@@ -200,6 +210,25 @@ func _on_burger(id: int) -> void:
 		2:
 			Run.save_run()
 			get_tree().quit()
+		10:  # DEBUG entries below
+			Run.gold += 200
+			_draw_screen()
+		11:
+			for member in Run.party:
+				member["talent_points"] = member.get("talent_points", 0) + 3
+			_draw_screen()
+		12:
+			Run.heal_party(1.0)
+			Run.restore_mana(1.0)
+			_draw_screen()
+		13:
+			# Land on the last pre-boss tier so the boss is the next pick.
+			Run.advance(Run.FLOORS - 2, 0)
+			_draw_screen()
+		14:
+			Run.advance_zone()
+			Run.save_run()
+			_draw_screen()
 
 
 func _toast(text: String) -> void:

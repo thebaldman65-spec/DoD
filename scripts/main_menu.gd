@@ -61,6 +61,7 @@ func _draw_screen() -> void:
 		btn.position = Vector2(490, 250 + i * 74)
 		btn.add_theme_font_size_override("font_size", 22)
 		btn.disabled = not entries[i][2]
+		btn.pressed.connect(Music.click)
 		btn.pressed.connect(entries[i][1])
 		add_child(btn)
 
