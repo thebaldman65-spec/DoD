@@ -8,10 +8,10 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 ## Working agreement (user's standing rules)
 - User is a beginner coder: explain plainly; Claude writes all code; user is
   the designer + playtester. Iterate on their feedback each session.
-- EVERY design change: append to Change Log in `docs/addendum.html`, then
-  `textutil -convert docx -output "/Users/zipples/Documents/DoD/DoD Implementation Addendum.docx" docs/addendum.html`
-- Keep `docs/master.html` current for anything it covers, then
+- EVERY design change: update `docs/master.html` — the ONLY maintained design
+  doc — and bump its "Last updated" timestamp in the top corner, then
   `textutil -convert docx -output "/Users/zipples/Documents/DoD/DoD Master Document.docx" docs/master.html`
+- `docs/addendum.html` is RETIRED (frozen history; do not update it).
 - User drops new assets in `../imported files/` — always check there.
   New character sprites need the Soldier format: 100x100 frame strips named
   `Name_Idle/Walk/Attack01-03/Hurt/Death.png`.

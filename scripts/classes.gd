@@ -25,23 +25,23 @@ static func hero_config(key: String) -> Dictionary:
 	match key:
 		"hunter":
 			return {"unit_name": "Hunter", "is_hero": true, "sheet_dir": soldier,
-				"max_hp": 100, "armor": 0.12, "speed": 105.0, "stability": 45,
+				"max_hp": 110, "armor": 0.12, "speed": 105.0, "stability": 100,
 				"resource_name": "Focus", "resource": 100, "max_resource": 100,
 				"abilities": kit(key)}
 		"warrior":
 			return {"unit_name": "Warrior", "is_hero": true, "sheet_dir": soldier,
-				"max_hp": 140, "armor": 0.25, "speed": 95.0, "stability": 60,
+				"max_hp": 154, "armor": 0.25, "speed": 95.0, "stability": 100,
 				"resource_name": "Rage", "resource": 0, "max_resource": 100,
 				"abilities": kit(key)}
 		"mage":
 			return {"unit_name": "Mage", "is_hero": true, "sheet_dir": soldier,
-				"max_hp": 90, "armor": 0.10, "speed": 110.0, "stability": 40,
+				"max_hp": 99, "armor": 0.10, "speed": 110.0, "stability": 100,
 				"resource_name": "Mana", "resource": 100, "max_resource": 100,
 				"second_resource_name": "Resonance", "second_resource": 0, "second_max": 5,
 				"abilities": kit(key)}
 		_:
 			return {"unit_name": "Cleric", "is_hero": true, "sheet_dir": soldier,
-				"max_hp": 110, "armor": 0.15, "speed": 85.0, "stability": 50,
+				"max_hp": 121, "armor": 0.15, "speed": 85.0, "stability": 100,
 				"resource_name": "Mana", "resource": 100, "max_resource": 100,
 				"second_resource_name": "Faith", "second_resource": 0, "second_max": 100,
 				"abilities": kit(key)}
@@ -61,7 +61,7 @@ static func kit(key: String) -> Array:
 
 static func hunter_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Quick Shot", "cost": 0, "damage": 20, "pressure": 7,
+		Ability.make({"display_name": "Quick Shot", "cost": 0, "damage": 20, "pressure": 14,
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "focus", "perfect_text": "+10 bonus Focus",
 			"description": "Basic ranged shot."}),
@@ -70,7 +70,7 @@ static func hunter_kit() -> Array:
 
 static func warrior_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Strike", "cost": 0, "damage": 23, "pressure": 9,
+		Ability.make({"display_name": "Strike", "cost": 0, "damage": 23, "pressure": 18,
 			"resource_gain": 20, "delay": 2.0, "anim": "attack01",
 			"perfect_id": "rage", "perfect_text": "+10 bonus Rage",
 			"description": "Basic attack. Builds 20 Rage."}),
@@ -79,7 +79,7 @@ static func warrior_kit() -> Array:
 
 static func mage_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Magic Bolt", "dmg_type": "arcane", "cost": 0, "damage": 25, "pressure": 7,
+		Ability.make({"display_name": "Magic Bolt", "dmg_type": "arcane", "cost": 0, "damage": 25, "pressure": 14,
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "mana", "perfect_text": "Restores 10 Mana",
 			"description": "Basic arcane projectile. Builds Resonance."}),
@@ -92,7 +92,7 @@ static func mage_kit() -> Array:
 
 static func cleric_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Smite", "dmg_type": "holy", "cost": 0, "damage": 22, "pressure": 8,
+		Ability.make({"display_name": "Smite", "dmg_type": "holy", "cost": 0, "damage": 22, "pressure": 16,
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 8 HP",
 			"description": "Basic radiant strike. Builds Faith."}),
@@ -145,14 +145,14 @@ static func apply_passive(cfg: Dictionary, spec: String) -> void:
 	match SPEC_INFO[spec]["passive"]:
 		"bulwark":
 			cfg["armor"] += 0.10
-			cfg["stability"] += 15
+			cfg["stability"] += 30
 
 const SPEC_INFO := {
 	"berserker": {"name": "Berserker", "archetype": "Ramp", "passive": "bloodrage",
 		"passive_desc": "Blood Frenzy: up to +40% damage as HP falls.",
 		"blurb": "Reckless savagery — grows stronger as their blood spills."},
 	"warden": {"name": "Warden", "archetype": "Tank", "passive": "bulwark",
-		"passive_desc": "Bulwark: +10% armor, +15 Stability.",
+		"passive_desc": "Bulwark: +10% armor, +30 Stability.",
 		"blurb": "Protector of the weak — shields allies with their own body."},
 	"swordmaster": {"name": "Swordmaster", "archetype": "Bruiser", "passive": "seasoned",
 		"passive_desc": "Seasoned Fighter: +25% damage above half HP;\n+25% armor at or below half HP.",
@@ -192,30 +192,30 @@ static func spec_abilities(spec: String) -> Array:
 		"berserker":
 			return [
 				Ability.make({"display_name": "Bloodlust", "cost": 25, "damage": 26,
-					"pressure": 9, "delay": 3.0, "anim": "attack02", "heal_missing": 0.3,
+					"pressure": 18, "delay": 3.0, "anim": "attack02", "heal_missing": 0.3,
 					"resource_gain": 10,
 					"perfect_id": "", "perfect_text": "Heals 45% of missing HP instead",
 					"description": "Strike and drink deep: heals the Warrior\nfor 30% of their missing HP. Builds 10 Rage."}),
 				Ability.make({"display_name": "Wildstrikes", "cost": 35, "damage": 16,
-					"pressure": 7, "delay": 4.5, "anim": "attack03", "aoe": true,
+					"pressure": 14, "delay": 4.5, "anim": "attack03", "aoe": true,
 					"bleed_build": 35, "resource_gain": 10,
 					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
 					"description": "Savage sweep: hits ALL enemies and\nbuilds 35 Bleed on each. Builds 10 Rage."}),
 				Ability.make({"display_name": "Hack and Slash", "cost": 20, "damage": 10,
-					"pressure": 5, "delay": 3.0, "anim": "attack01", "multi_hits": 3,
-					"bleed_build": 20, "bleed_chance": 0.4, "resource_gain": 10,
+					"pressure": 10, "delay": 3.0, "anim": "attack01", "multi_hits": 3,
+					"bleed_build": 25, "bleed_chance": 0.5, "resource_gain": 10,
 					"perfect_id": "", "perfect_text": "4 strikes instead of 3",
-					"description": "Three savage cuts at one target; each\nhit has a 40% chance to build 20 Bleed.\nBuilds 10 Rage."}),
+					"description": "Three savage cuts at one target; each\nhit has a 50% chance to build 25 Bleed —\na full flurry can bleed them out.\nBuilds 10 Rage."}),
 			]
 		"warden":
 			return [
-				Ability.make({"display_name": "Mocking Blow", "cost": 0, "damage": 15, "pressure": 8,
+				Ability.make({"display_name": "Mocking Blow", "cost": 0, "damage": 15, "pressure": 16,
 					"resource_gain": 10, "delay": 2.5, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "Taunt lasts 4 turns",
 					"description": "Strike and humiliate: the target must\nattack the Warrior for 3 turns.\nBuilds 10 Rage."}),
 				Ability.make({"display_name": "Shieldwall", "cost": 25, "special": "shieldwall",
 					"delay": 3.5, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "Also sheds 10 Pressure from each ally",
+					"perfect_id": "", "perfect_text": "Also sheds 20 Pressure from each ally",
 					"description": "The party takes 50% less damage\nuntil their next turns."}),
 				Ability.make({"display_name": "Retaliation", "cost": 20, "special": "retaliate",
 					"delay": 3.0, "anim": "attack01",
@@ -225,29 +225,28 @@ static func spec_abilities(spec: String) -> Array:
 		"swordmaster":
 			return [
 				Ability.make({"display_name": "Overpower", "cost": 20, "damage": 35,
-					"pressure": 10, "delay": 2.5, "anim": "attack02", "resource_gain": 10,
-					"applies_status": {"id": "stunned", "turns": 1}, "status_chance": 0.5,
-					"perfect_id": "", "perfect_text": "75% chance to Stun instead",
-					"description": "Precise heavy cut with a 50% chance\nto Stun. Builds 10 Rage."}),
+					"pressure": 20, "delay": 2.5, "anim": "attack02", "resource_gain": 10,
+					"perfect_id": "", "perfect_text": "+15% crit chance on this strike",
+					"description": "Exploits instability: +0.5 damage per\npoint of the target's Break meter.\nBuilds 10 Rage."}),
 				Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 32,
-					"pressure": 11, "delay": 3.0, "anim": "attack03", "resource_gain": 10,
+					"pressure": 22, "delay": 3.0, "anim": "attack03", "resource_gain": 10,
 					"applies_status": {"id": "sunder", "turns": 3},
-					"perfect_id": "", "perfect_text": "Deals 15 Pressure",
+					"perfect_id": "", "perfect_text": "Deals 30 Pressure",
 					"description": "Moderate damage. Sunders armor\n(-35%) for 3 turns. Builds 10 Rage."}),
 				Ability.make({"display_name": "Pommel Strike", "cost": 15, "damage": 25,
-					"pressure": 15, "delay": 2.0, "anim": "attack01", "resource_gain": 10,
+					"pressure": 30, "delay": 2.0, "anim": "attack01", "resource_gain": 10,
 					"applies_status": {"id": "stunned", "turns": 1},
 					"perfect_id": "parry_up", "perfect_text": "+15% parry chance for 3 turns",
-					"description": "Opportunist bash: guaranteed Stun.\nUsable only after a parry, a crit, or\nan enemy attack missing the Warrior."}),
+					"description": "A skull-ringing bash: guaranteed Stun.\nBuilds 10 Rage."}),
 			]
 		"pyromancer":
 			return [
 				Ability.make({"display_name": "Pyroblast", "dmg_type": "fire", "cost": 45,
-					"damage": 55, "pressure": 10, "delay": 6.0, "anim": "attack03",
+					"damage": 55, "pressure": 20, "delay": 6.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Also sets the target Burning (3 turns)",
 					"description": "A slow, devastating comet of flame.\n+50% damage against Burning targets."}),
 				Ability.make({"display_name": "Flame Surge", "dmg_type": "fire", "cost": 20, "damage": 16,
-					"pressure": 6, "delay": 3.5, "anim": "attack02", "aoe": true,
+					"pressure": 12, "delay": 3.5, "anim": "attack02", "aoe": true,
 					"applies_status": {"id": "burn", "turns": 2},
 					"perfect_id": "", "perfect_text": "Burn lasts 3 turns",
 					"description": "Cone of fire: hits ALL enemies\nand sets them Burning."}),
@@ -259,15 +258,15 @@ static func spec_abilities(spec: String) -> Array:
 		"cryomancer":
 			return [
 				Ability.make({"display_name": "Frost Bolt", "dmg_type": "frost", "cost": 25, "damage": 25,
-					"pressure": 10, "delay": 3.0, "anim": "attack01",
+					"pressure": 20, "delay": 3.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "+5% crit chance on this cast",
 					"description": "A spear of ice. 50% chance to deal\nDOUBLE damage against unchilled targets."}),
 				Ability.make({"display_name": "Razor Ice", "dmg_type": "frost", "cost": 20, "damage": 15,
-					"pressure": 7, "delay": 3.0, "anim": "attack02", "random_hits": 2,
+					"pressure": 14, "delay": 3.0, "anim": "attack02", "random_hits": 2,
 					"perfect_id": "", "perfect_text": "3 shards instead of 2",
 					"description": "Hurl razor shards at 2 random enemies.\nAlways crits against Chilled targets."}),
 				Ability.make({"display_name": "Blizzard", "dmg_type": "frost", "cost": 30, "damage": 15,
-					"pressure": 6, "delay": 4.0, "anim": "attack03", "aoe": true,
+					"pressure": 12, "delay": 4.0, "anim": "attack03", "aoe": true,
 					"applies_status": {"id": "slow", "turns": 2},
 					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
 					"description": "Storm of ice: hits ALL enemies\nand Chills them."}),
@@ -275,15 +274,15 @@ static func spec_abilities(spec: String) -> Array:
 		"arcanist":
 			return [
 				Ability.make({"display_name": "Arcane Cannon", "dmg_type": "arcane", "cost": 30, "damage": 30,
-					"pressure": 9, "delay": 3.5, "anim": "attack02", "recoil_base": 0.05,
+					"pressure": 18, "delay": 3.5, "anim": "attack02", "recoil_base": 0.025,
 					"perfect_id": "", "perfect_text": "+5 base damage",
-					"description": "Channel raw Resonance into a blast:\n+7.5% DAMAGE per Resonance stack.\nRecoil: the Mage takes 5% of the damage\ndealt (+5% more per stack)."}),
+					"description": "Channel raw Resonance into a blast:\n+7.5% DAMAGE per Resonance stack.\nRecoil: the Mage takes 2.5% of the damage\ndealt (+2.5% more per stack)."}),
 				Ability.make({"display_name": "Reality Fracture", "dmg_type": "arcane", "cost": 20, "damage": 15,
-					"pressure": 7, "delay": 2.0, "anim": "attack03", "delay_push": 6.0,
+					"pressure": 14, "delay": 2.0, "anim": "attack03", "delay_push": 6.0,
 					"perfect_id": "", "perfect_text": "Also +1 Resonance",
 					"description": "Shove the target far down the\ninitiative order."}),
 				Ability.make({"display_name": "Arcane Barrage", "dmg_type": "arcane", "cost": 25, "damage": 5,
-					"pressure": 2, "delay": 3.5, "anim": "attack03", "random_hits": 6,
+					"pressure": 4, "delay": 3.5, "anim": "attack03", "random_hits": 6,
 					"perfect_id": "", "perfect_text": "Fires a 7th bolt",
 					"description": "Six bolts rake random enemies (30 total\ndamage); every bolt can trigger Echo."}),
 			]
@@ -312,7 +311,7 @@ static func spec_abilities(spec: String) -> Array:
 		"occultist":
 			return [
 				Ability.make({"display_name": "Hex of Ruin", "dmg_type": "shadow", "cost": 20, "damage": 15,
-					"pressure": 12, "delay": 3.0, "anim": "attack02", "random_hits": 2,
+					"pressure": 24, "delay": 3.0, "anim": "attack02", "random_hits": 2,
 					"perfect_extra_hit": false,
 					"applies_status": {"id": "cripple", "turns": 3},
 					"perfect_id": "status_plus", "perfect_text": "Cripple lasts 4 turns",
@@ -327,7 +326,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Summon Ursus", "cost": 30, "special": "summon",
 					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
 					"perfect_id": "", "perfect_text": "",
-					"description": "Call the bear (80 HP): attacks with you,\nmauling your target AND a second enemy\nfor 10 damage + 10 Pressure each.\nPack Bond: your attacks deal +25%\nPressure while Ursus prowls."}),
+					"description": "Call the bear (80 HP): attacks with you,\nmauling your target AND a second enemy\nfor 10 damage + 20 Pressure each.\nPack Bond: your attacks deal +25%\nPressure while Ursus prowls."}),
 				Ability.make({"display_name": "Summon Canis", "cost": 30, "special": "summon",
 					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
 					"perfect_id": "", "perfect_text": "",
@@ -337,7 +336,7 @@ static func spec_abilities(spec: String) -> Array:
 					"perfect_id": "", "perfect_text": "",
 					"description": "Call the eagle (60 HP): attacks with you\nfor 15 damage, 50% chance to Sunder.\nPack Bond: +15% crit chance while\nAguila circles."}),
 				Ability.make({"display_name": "Barbed Arrow", "cost": 20, "damage": 20,
-					"pressure": 10, "delay": 3.0, "anim": "attack02",
+					"pressure": 20, "delay": 3.0, "anim": "attack02",
 					"applies_status": {"id": "cripple", "turns": 3},
 					"perfect_id": "status_plus", "perfect_text": "Cripple lasts 4 turns",
 					"description": "A cruel barb that Cripples the target\nfor 3 turns."}),
@@ -349,13 +348,13 @@ static func spec_abilities(spec: String) -> Array:
 		"sharpshooter":
 			return [
 				Ability.make({"display_name": "Aimed Shot", "cost": 20, "damage": 34,
-					"pressure": 8, "delay": 3.5, "anim": "attack02",
+					"pressure": 16, "delay": 3.5, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "+15% crit on this shot",
 					"description": "A perfect line. Patient, precise, final."}),
 				Ability.make({"display_name": "Powershot", "cost": 25, "damage": 20,
-					"pressure": 10, "delay": 3.5, "anim": "attack03",
+					"pressure": 20, "delay": 3.5, "anim": "attack03",
 					"perfect_id": "focus", "perfect_text": "+10 bonus Focus",
-					"description": "Exploits the crack in their guard: +2%\ndamage per 1% of the target's Break bar\n(up to triple damage at full Pressure)."}),
+					"description": "An opening haymaker: +2% damage per 1%\nof the target's Break meter still EMPTY\n(up to triple damage on untouched foes)."}),
 				Ability.make({"display_name": "Quick Draw", "cost": 15, "special": "quickdraw",
 					"delay": 2.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "Lasts 6 turns",
@@ -366,13 +365,13 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Tripwire", "cost": 20, "special": "tripwire",
 					"delay": 2.5, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "Lasts 6 turns",
-					"description": "Rig the ground: for 5 turns, retaliate\nagainst EVERY attacking melee enemy for\n75% of their attack's damage."}),
+					"description": "Rig the ground: for 5 turns, retaliate\nagainst EVERY attacking melee enemy —\neven those striking your allies — for\n75% of their attack's damage."}),
 				Ability.make({"display_name": "Explosive Shot", "dmg_type": "fire", "cost": 35,
 					"damage": 10, "pressure": 20, "delay": 3.0, "anim": "attack03", "aoe": true,
 					"perfect_id": "", "perfect_text": "Deals 12 damage",
 					"description": "A bursting charge rakes ALL enemies\nwith fire and heavy Break pressure."}),
 				Ability.make({"display_name": "Gut", "cost": 25, "damage": 30,
-					"pressure": 10, "delay": 2.0, "anim": "attack01", "bleed_build": 20,
+					"pressure": 20, "delay": 2.0, "anim": "attack01", "bleed_build": 20,
 					"perfect_id": "", "perfect_text": "Builds 25 Bleed instead",
 					"description": "A vicious dagger thrust up close:\nbuilds 20 Bleed."}),
 			]

@@ -60,6 +60,8 @@ const SFX := {
 	"bow_impact": preload("res://assets/sfx/bow_impact.wav"),
 	"strike": preload("res://assets/sfx/strike.wav"),
 	"wildstrikes": preload("res://assets/sfx/wildstrikes.wav"),
+	"hack_slash": preload("res://assets/sfx/hack_slash.wav"),
+	"potion": preload("res://assets/sfx/potion.wav"),
 }
 
 # Damage-over-time statuses ticked at the start of the afflicted unit's turn.
@@ -122,9 +124,10 @@ func _ready() -> void:
 	_build_sfx_pool()
 	_spawn_units()
 	if not sim:
-		# Boss fights open with the entry tune, then the battle track loops.
+		# Boss fights open with the entry tune, capped so the battle track
+		# doesn't keep the fight waiting.
 		if Run.active and Run.encounter.get("type", "") == "boss":
-			Music.play_intro_then("boss_intro", "battle")
+			Music.play_intro_then("boss_intro", "battle", 4.0)
 		else:
 			Music.play("battle")
 	_run_battle()
@@ -167,14 +170,15 @@ func _build_arena() -> void:
 	cam.make_current()
 
 
-const HERO_SLOTS := [Vector2(430, 380), Vector2(240, 470), Vector2(430, 560), Vector2(240, 650)]
+# Kept high enough that the bottom row's bars and status chips stay on screen.
+const HERO_SLOTS := [Vector2(430, 350), Vector2(240, 435), Vector2(430, 520), Vector2(240, 605)]
 const ENEMY_LAYOUTS := {
-	1: [Vector2(1000, 500)],
-	2: [Vector2(920, 420), Vector2(1000, 600)],
-	3: [Vector2(900, 400), Vector2(1050, 510), Vector2(940, 630)],
-	4: [Vector2(880, 380), Vector2(1060, 470), Vector2(880, 560), Vector2(1060, 650)],
-	5: [Vector2(880, 370), Vector2(1060, 440), Vector2(880, 510), Vector2(1060, 580),
-		Vector2(950, 650)],
+	1: [Vector2(1000, 470)],
+	2: [Vector2(920, 400), Vector2(1000, 560)],
+	3: [Vector2(900, 380), Vector2(1050, 480), Vector2(940, 585)],
+	4: [Vector2(880, 360), Vector2(1060, 440), Vector2(880, 520), Vector2(1060, 600)],
+	5: [Vector2(880, 350), Vector2(1060, 415), Vector2(880, 480), Vector2(1060, 545),
+		Vector2(950, 610)],
 }
 
 
@@ -183,7 +187,7 @@ func _enemy_config(kind: String) -> Dictionary:
 	match kind:
 		"chief":
 			return {"unit_name": "Orc Chief", "is_hero": false, "sheet_dir": orc,
-				"max_hp": 210, "armor": 0.20, "speed": 80.0, "stability": 70,
+				"max_hp": 210, "armor": 0.20, "speed": 80.0, "stability": 100,
 				"resource_name": "Rage", "resource": 0, "max_resource": 100,
 				"abilities": _orc_chief_kit(), "sprite_scale": 3.9,
 				"tint": Color(1.0, 0.75, 0.7),
@@ -198,19 +202,19 @@ func _enemy_config(kind: String) -> Dictionary:
 			]
 			var bd: Dictionary = boss_defs[clampi(Run.zone_idx if Run.active else 0, 0, boss_defs.size() - 1)]
 			return {"unit_name": bd["unit_name"], "is_hero": false, "sheet_dir": orc,
-				"max_hp": 320, "armor": 0.22, "speed": 85.0, "stability": 90,
+				"max_hp": 320, "armor": 0.22, "speed": 85.0, "stability": 100,
 				"resource_name": "Rage", "resource": 20, "max_resource": 100,
 				"abilities": _orc_chief_kit(), "sprite_scale": 4.4,
 				"tint": bd["tint"], "resists": bd["resists"]}
 		"archer":
 			return {"unit_name": "Orc Archer", "is_hero": false, "sheet_dir": orc,
-				"max_hp": 90, "armor": 0.10, "speed": 100.0, "stability": 42,
+				"max_hp": 90, "armor": 0.10, "speed": 100.0, "stability": 100,
 				"is_ranged": true,
 				"abilities": _orc_archer_kit(), "tint": Color(1.0, 0.35, 0.35),
 				"resists": {"physical": 0.05}}
 		_:
 			return {"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
-				"max_hp": 115, "armor": 0.15, "speed": 90.0, "stability": 50,
+				"max_hp": 115, "armor": 0.15, "speed": 90.0, "stability": 100,
 				"abilities": _orc_raider_kit(), "tint": Color.WHITE,
 				"resists": {"physical": 0.10}}
 
@@ -311,9 +315,9 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color) -> BattleUnit:
 
 func _orc_raider_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Slash", "damage": 34, "pressure": 13,
+		Ability.make({"display_name": "Slash", "damage": 34, "pressure": 26,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Sundering Strike", "damage": 23, "pressure": 11,
+		Ability.make({"display_name": "Sundering Strike", "damage": 23, "pressure": 22,
 			"delay": 2.5, "anim": "attack02",
 			"applies_status": {"id": "sunder", "turns": 2}, "status_chance": 0.6}),
 	]
@@ -321,9 +325,9 @@ func _orc_raider_kit() -> Array:
 
 func _orc_archer_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Arrow Shot", "damage": 21, "pressure": 8,
+		Ability.make({"display_name": "Arrow Shot", "damage": 21, "pressure": 16,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Poison Arrow", "damage": 16, "pressure": 7,
+		Ability.make({"display_name": "Poison Arrow", "damage": 16, "pressure": 14,
 			"delay": 2.5, "anim": "attack02",
 			"applies_status": {"id": "poison", "turns": 3}, "status_chance": 0.7}),
 	]
@@ -332,12 +336,12 @@ func _orc_archer_kit() -> Array:
 # The Chief fights like a weaker Warrior: builds Rage, spends it on heavy hits.
 func _orc_chief_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Strike", "damage": 28, "pressure": 13,
+		Ability.make({"display_name": "Strike", "damage": 28, "pressure": 26,
 			"resource_gain": 15, "delay": 2.0, "anim": "attack01"}),
 		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 54,
-			"pressure": 20, "delay": 4.0, "anim": "attack02"}),
+			"pressure": 40, "delay": 4.0, "anim": "attack02"}),
 		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 34,
-			"pressure": 28, "delay": 4.0, "anim": "attack02"}),
+			"pressure": 56, "delay": 4.0, "anim": "attack02"}),
 	]
 
 
@@ -368,8 +372,8 @@ func _build_ui() -> void:
 	bar_panel.add_child(turn_bar)
 
 	var bottom_center := CenterContainer.new()
-	bottom_center.position = Vector2(0, 640)
-	bottom_center.size = Vector2(1280, 76)
+	bottom_center.position = Vector2(0, 660)
+	bottom_center.size = Vector2(1280, 56)
 	bottom_center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui.add_child(bottom_center)
 	action_panel = PanelContainer.new()
@@ -755,7 +759,7 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 	match u.unit_name:
 		"Warrior":
 			var pommel := _find_ability(u, "Pommel Strike")
-			if pommel != null and u.pommel_ready and u.resource >= pommel.cost:
+			if pommel != null and u.resource >= pommel.cost and randf() < 0.35:
 				return [pommel, target_foe]
 			var hack := _find_ability(u, "Hack and Slash")
 			if hack != null and u.resource >= hack.cost and randf() < 0.4:
@@ -865,7 +869,7 @@ func _use_item(item_id: String) -> void:
 				_refund_item(item_id)
 				return
 			heal_target.heal_amount(40)
-			_sfx("heal", -6.0)
+			_sfx("potion", -6.0)
 			heal_target.float_text("+40", Color(0.4, 0.9, 0.45))
 			_message("%s drinks a Health Potion" % heal_target.unit_name)
 			_log("Item: Health Potion — %s +40 HP" % heal_target.unit_name, "#e0c060")
@@ -880,7 +884,7 @@ func _use_item(item_id: String) -> void:
 				return
 			mana_target.resource = mini(mana_target.resource + 40, mana_target.max_resource)
 			mana_target.refresh_bars()
-			_sfx("heal", -8.0, 1.2)
+			_sfx("potion", -8.0, 1.2)
 			mana_target.float_text("+40 %s" % mana_target.resource_name, Color(0.5, 0.7, 1.0))
 			_message("%s drinks a Mana Potion" % mana_target.unit_name)
 			_log("Item: Mana Potion — %s +40 %s" % [mana_target.unit_name,
@@ -901,7 +905,7 @@ func _use_item(item_id: String) -> void:
 				_refund_item(item_id)
 				return
 			target.revive(0.5)
-			_sfx("heal", -5.0, 0.8)
+			_sfx("potion", -5.0, 0.8)
 			target.float_text("REVIVED", Color(0.5, 1.0, 0.6))
 			if current_hero != null:
 				target.next_time = current_hero.next_time + BASIC_DELAY * 100.0 / target.effective_speed()
@@ -910,6 +914,7 @@ func _use_item(item_id: String) -> void:
 			_rebuild_turn_bar()
 			await _wait(0.6)
 		"defense":
+			_sfx("potion", -6.0, 0.9)
 			_message("The party braces!")
 			_log("Item: Defense Potion — party gains Fortify", "#e0c060")
 			for h in heroes.filter(func(he): return not he.dead):
@@ -926,7 +931,7 @@ func _show_actions(u: BattleUnit) -> void:
 	var basic: Ability = u.abilities[0]
 	var basic_btn := Button.new()
 	basic_btn.text = basic.display_name
-	basic_btn.custom_minimum_size = Vector2(130, 58)
+	basic_btn.custom_minimum_size = Vector2(105, 40)
 	basic_btn.tooltip_text = _ability_tooltip(u, basic)
 	basic_btn.pressed.connect(_on_ability_button.bind(basic))
 	basic_btn.mouse_entered.connect(_preview_delay.bind(u, basic))
@@ -937,7 +942,7 @@ func _show_actions(u: BattleUnit) -> void:
 	# PopupMenu only reports focus from keyboard navigation, not the mouse.
 	var menu_btn := Button.new()
 	menu_btn.text = "Abilities ▾"
-	menu_btn.custom_minimum_size = Vector2(140, 58)
+	menu_btn.custom_minimum_size = Vector2(112, 40)
 	var popup := PopupPanel.new()
 	var list := VBoxContainer.new()
 	list.add_theme_constant_override("separation", 4)
@@ -956,9 +961,6 @@ func _show_actions(u: BattleUnit) -> void:
 		ab_btn.tooltip_text = _ability_tooltip(u, ab)
 		var unusable: bool = ab.cost > u.resource or ab.faith_cost > u.second_resource
 		# Conditional abilities.
-		if ab.display_name == "Pommel Strike" and not u.pommel_ready:
-			unusable = true
-			ab_btn.tooltip_text += "\n(Not ready: needs a parry, a crit, or an\nenemy attack missing the Warrior)"
 		if ab.special == "kill_command" and (u.companion == null or u.companion.dead):
 			unusable = true
 			ab_btn.tooltip_text += "\n(No living companion)"
@@ -1033,7 +1035,7 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 func _build_items_menu() -> MenuButton:
 	var menu := MenuButton.new()
 	menu.text = "Items ▾"
-	menu.custom_minimum_size = Vector2(96, 58)
+	menu.custom_minimum_size = Vector2(84, 40)
 	menu.flat = false
 	menu.disabled = item_used
 	if item_used:
@@ -1129,7 +1131,9 @@ func _uses_bow(u: BattleUnit) -> bool:
 
 # Per-ability impact sounds; falls back to bow/generic hits.
 func _impact_sfx(attacker: BattleUnit, ab: Ability) -> String:
-	if ab.display_name == "Hack and Slash" or ab.display_name == "Wildstrikes":
+	if ab.display_name == "Hack and Slash":
+		return "hack_slash"
+	if ab.display_name == "Wildstrikes":
 		return "wildstrikes"
 	if ab.display_name == "Strike" and attacker.is_hero:
 		return "strike"
@@ -1142,8 +1146,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		is_counter := false) -> void:
 	attacker.resource = clampi(attacker.resource - ab.cost + ab.resource_gain, 0, attacker.max_resource)
 	attacker.refresh_bars()
-	if ab.display_name == "Pommel Strike":
-		attacker.pommel_ready = false  # the opening is spent
 	var dmg_mult := {"perfect": 1.15, "good": 1.0, "fail": 0.6}[grade] as float
 	var pr_mult := {"perfect": 1.25, "good": 1.0, "fail": 0.5}[grade] as float
 	var is_perfect := grade == "perfect"
@@ -1192,7 +1194,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_stat("attack_miss")
 		_sfx("miss")
 		target.float_text("MISS", Color(0.75, 0.75, 0.75))
-		target.pommel_ready = true  # a whiffed attack is an opening
 		_message("%s misses!" % attacker.unit_name)
 		_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
 			target.unit_name], "#909090")
@@ -1207,7 +1208,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_stat("attack_parry")
 		_sfx("bow_blocked" if _uses_bow(attacker) else "parry", -4.0)
 		target.float_text("PARRY", Color(0.4, 0.9, 1.0))
-		target.pommel_ready = true
 		_message("%s parries and counters!" % target.unit_name)
 		_log("%s parries %s — counter attack!" % [target.unit_name,
 			attacker.unit_name], "#50c8e0")
@@ -1252,7 +1252,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_stat("attack_miss")
 					_sfx("miss")
 					strike_target.float_text("MISS", Color(0.75, 0.75, 0.75))
-					strike_target.pommel_ready = true
 					_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
 						strike_target.unit_name], "#909090")
 					await _wait(0.45)
@@ -1264,7 +1263,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_stat("attack_parry")
 					_sfx("bow_blocked" if _uses_bow(attacker) else "parry", -4.0)
 					strike_target.float_text("PARRY", Color(0.4, 0.9, 1.0))
-					strike_target.pommel_ready = true
 					_log("%s parries %s — counter attack!" % [strike_target.unit_name,
 						attacker.unit_name], "#50c8e0")
 					await _wait(0.5)
@@ -1285,6 +1283,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				crit_chance += 0.15
 			if is_perfect and ab.display_name == "Frost Bolt":
 				crit_chance += 0.05
+			if is_perfect and ab.display_name == "Overpower":
+				crit_chance += 0.15
 			var is_crit := randf() < crit_chance
 			# Razor Ice always crits against Slowed (chilled) targets.
 			if ab.display_name == "Razor Ice" and strike_target.has_status("slow"):
@@ -1310,10 +1310,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				strike_target.float_text("SHATTER x2", Color(0.5, 0.85, 1.0))
 			if is_perfect and ab.display_name == "Explosive Shot":
 				raw = 12.0 * randf_range(0.9, 1.1)
-			# Powershot: +2% damage per 1% of the target's Break (Pressure) bar.
+			# Powershot: +2% damage per 1% of the target's Break bar still EMPTY —
+			# the Rush opener, strongest against untouched foes.
 			if ab.display_name == "Powershot":
-				raw *= 1.0 + 2.0 * clampf(
-					strike_target.pressure / float(strike_target.stability), 0.0, 1.0)
+				raw *= 1.0 + 2.0 * (1.0 - clampf(
+					strike_target.pressure / float(strike_target.stability), 0.0, 1.0))
+			# Overpower: exploits instability — +0.5 damage per point of Break.
+			if ab.display_name == "Overpower":
+				raw += 0.5 * strike_target.pressure
 			if ab.display_name == "Pyroblast" and strike_target.has_status("burn"):
 				raw *= 1.25
 			if attacker.has_status("empower"):
@@ -1349,7 +1353,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if is_perfect and (ab.perfect_id == "pressure" or ab.aoe):
 				pr = int(pr * 1.5)
 			if is_perfect and ab.display_name == "Crushing Blow":
-				pr = 15
+				pr = 30
 			# Pack Bond (Ursus): the bear's weight behind every hit.
 			if attacker.passive_id == "pack" and attacker.companion != null \
 					and not attacker.companion.dead \
@@ -1419,10 +1423,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					strike_target.unit_name, echo_dmg], "#b0a8e0")
 			if ab.delay_push > 0.0:
 				strike_target.next_time += ab.delay_push * 100.0 / strike_target.effective_speed()
-			var status_chance := ab.status_chance
-			if is_perfect and ab.display_name == "Overpower":
-				status_chance = 0.75
-			if not result.died and not ab.applies_status.is_empty() and randf() <= status_chance:
+			if not result.died and not ab.applies_status.is_empty() \
+					and randf() <= ab.status_chance:
 				var turns: int = ab.applies_status["turns"]
 				if is_perfect and ab.perfect_id == "status_plus":
 					turns = 4
@@ -1489,6 +1491,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if ab.recoil_base > 0.0 and not attacker.dead:
 			var recoil_pct := ab.recoil_base * (1.0 + attacker.second_resource)
 			var recoil := maxi(int(round(total_dealt * recoil_pct)), 1)
+			# Unity binds recoil too: the backlash splits across the party.
+			if attacker.has_status("unity"):
+				var bound := heroes.filter(func(h): return not h.dead)
+				if bound.size() > 1:
+					recoil = maxi(int(round(recoil / float(bound.size()))), 1)
+					for h in bound:
+						if h == attacker:
+							continue
+						if h.take_tick_damage(recoil, "-%d Unity" % recoil,
+								Color(0.95, 0.85, 0.4)):
+							_stat("hero_deaths")
+							_sfx("death", -4.0)
+							_log("† %s dies" % h.unit_name, "#e05050")
 			var recoil_died := attacker.take_tick_damage(recoil, "-%d Recoil" % recoil,
 				Color(1.0, 0.4, 0.5))
 			_log("   → %s recoils for %d" % [attacker.unit_name, recoil], "#e08850")
@@ -1510,9 +1525,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				attacker.heal_amount(drained)
 				attacker.float_text("+%d" % drained, Color(0.4, 0.9, 0.45))
 				_log("   → %s drains %d HP" % [attacker.unit_name, drained], "#70d878")
-		# A crit is an opening: readies the Swordmaster's Pommel Strike.
-		if any_crit:
-			attacker.pommel_ready = true
 		# The Beastmaster's companion strikes alongside the hunter.
 		if attacker.is_hero and attacker.passive_id == "pack" and ab.damage > 0 \
 				and not is_counter and attacker.companion != null \
@@ -1591,7 +1603,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 	var is_perfect := grade == "perfect"
 	match ab.special:
 		"rally":
-			var pressure_cut := 25 if is_perfect else int(15 * mult)
+			var pressure_cut := 50 if is_perfect else int(30 * mult)
 			var res_pct := 0.30 if is_perfect else 0.20
 			_sfx("heal", -9.0, 0.7)
 			_message("%s rallies the party!" % attacker.unit_name)
@@ -1639,7 +1651,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			for h in heroes.filter(func(he): return not he.dead):
 				_apply_status(h, "shieldwall", 1)
 				if is_perfect:
-					h.pressure = maxi(h.pressure - 10, 0)
+					h.pressure = maxi(h.pressure - 20, 0)
 					h.refresh_bars()
 			_message("%s raises the shieldwall!" % attacker.unit_name)
 			_log("%s: Shieldwall — party takes half damage" % attacker.unit_name, "#70d878")
@@ -1788,11 +1800,11 @@ func _companion_strike(comp: BattleUnit, victim: BattleUnit, mult: float,
 	var proc_chance := 1.0 if boosted else 0.5
 	match comp.companion_kind:
 		"ursus":
-			await _companion_hit(comp, victim, 10.0 * mult, int(10 * mult))
+			await _companion_hit(comp, victim, 10.0 * mult, int(20 * mult))
 			# The bear's sweep also mauls the enemy beside the target.
 			var others := enemies.filter(func(e): return not e.dead and e != victim)
 			if not others.is_empty():
-				await _companion_hit(comp, others.pick_random(), 10.0 * mult, int(10 * mult))
+				await _companion_hit(comp, others.pick_random(), 10.0 * mult, int(20 * mult))
 		"canis":
 			await _companion_hit(comp, victim, 15.0 * mult, 0)
 			if not victim.dead and randf() < proc_chance:

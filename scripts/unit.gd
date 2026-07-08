@@ -38,7 +38,6 @@ var broken_pending := false # will lose its next turn
 var dead := false
 var next_time := 0.0        # position on the initiative timeline
 var is_ranged := false      # melee/ranged split (Tripwire only punishes melee)
-var pommel_ready := false   # Swordmaster: set by parries, crits, enemy misses
 var is_companion := false   # Beastmaster summon: no turns, fights alongside
 var companion_kind := ""    # "ursus" / "canis" / "aguila"
 var companion: BattleUnit   # the Beastmaster's active summon (on the hunter)
@@ -54,6 +53,7 @@ var _res_text: Label
 var _res2_fill: ColorRect
 var _res2_text: Label
 var _pressure_fill: ColorRect
+var _pressure_text: Label
 var _chips_root: Node2D
 var _idle_texture: Texture2D
 var _target_btn: Button
@@ -175,9 +175,11 @@ func _build_bars() -> void:
 		_res2_text = _make_bar_text(Vector2(-36, next_y), Vector2(72, 11), 8)
 		add_child(_res2_text)
 		next_y += 13.0
-	add_child(_make_bar_bg(Vector2(-36, next_y), Vector2(72, 6)))
-	_pressure_fill = _make_fill(Vector2(-35, next_y + 1), Vector2(70, 4), Color(0.80, 0.35, 1.0))
+	add_child(_make_bar_bg(Vector2(-36, next_y), Vector2(72, 12)))
+	_pressure_fill = _make_fill(Vector2(-35, next_y + 1), Vector2(70, 10), Color(0.80, 0.35, 1.0))
 	add_child(_pressure_fill)
+	_pressure_text = _make_bar_text(Vector2(-36, next_y), Vector2(72, 12), 8)
+	add_child(_pressure_text)
 
 	var name_label := Label.new()
 	name_label.text = unit_name
@@ -192,7 +194,7 @@ func _build_bars() -> void:
 	add_child(name_label)
 
 	_chips_root = Node2D.new()
-	_chips_root.position = Vector2(0, next_y + 9.0)
+	_chips_root.position = Vector2(0, next_y + 15.0)
 	add_child(_chips_root)
 
 	_build_target_zone()
@@ -310,6 +312,7 @@ func refresh_bars() -> void:
 				break
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
 	_pressure_fill.size.x = 70.0 * pressure_ratio
+	_pressure_text.text = "%d/%d" % [pressure, stability]
 	# Shifts toward hot pink as the unit gets close to Breaking.
 	_pressure_fill.color = Color(0.80, 0.35, 1.0).lerp(Color(1.0, 0.25, 0.55), pressure_ratio)
 
@@ -576,6 +579,9 @@ func heal_amount(amount: int) -> void:
 	refresh_bars()
 
 
+var _float_stack := 0  # staggers rapid floating texts so they don't overlap
+
+
 func float_text(text: String, color: Color, big := false) -> void:
 	var label := Label.new()
 	label.text = text
@@ -583,9 +589,14 @@ func float_text(text: String, color: Color, big := false) -> void:
 	label.add_theme_color_override("font_color", color)
 	label.add_theme_constant_override("outline_size", 8 if big else 4)
 	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
-	label.position = Vector2(randf_range(-34, -6), -96 if big else -80)
+	label.position = Vector2(randf_range(-34, -6),
+		(-96 if big else -80) - _float_stack * 20)
 	label.z_index = 10
 	add_child(label)
+	_float_stack += 1
+	if is_inside_tree():
+		get_tree().create_timer(0.55).timeout.connect(
+			func(): _float_stack = maxi(_float_stack - 1, 0))
 	var tween := create_tween()
 	if big:
 		# Crit pop: number explodes onto the screen, hangs, then fades.

@@ -42,10 +42,10 @@ var encounter := {}        # {"type": ..., "enemies": ["raider", ...]} for the n
 
 
 const HERO_BASE := {
-	"warrior": {"hp": 140, "mana": 0},
-	"mage": {"hp": 90, "mana": 100},
-	"cleric": {"hp": 110, "mana": 100},
-	"hunter": {"hp": 100, "mana": 0},
+	"warrior": {"hp": 154, "mana": 0},
+	"mage": {"hp": 99, "mana": 100},
+	"cleric": {"hp": 121, "mana": 100},
+	"hunter": {"hp": 110, "mana": 0},
 }
 
 
@@ -201,7 +201,7 @@ const RUNE_TEMPLATES := [
 	{"noun": "Vitality", "stat": "max_hp", "base": 10, "fmt": "+%d max HP"},
 	{"noun": "Warding", "stat": "armor", "base": 0.02, "fmt": "+%d%% armor"},
 	{"noun": "Swiftness", "stat": "speed", "base": 4, "fmt": "+%d Speed"},
-	{"noun": "Poise", "stat": "stability", "base": 6, "fmt": "+%d Stability"},
+	{"noun": "Poise", "stat": "stability", "base": 12, "fmt": "+%d Stability"},
 	{"noun": "Precision", "stat": "crit_bonus", "base": 0.02, "fmt": "+%d%% crit chance"},
 	{"noun": "Springs", "stat": "max_resource", "base": 8, "fmt": "+%d max Mana"},
 ]

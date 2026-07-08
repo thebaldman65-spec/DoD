@@ -124,6 +124,7 @@ func _draw_screen() -> void:
 		bpop.add_item("Full Heal Party", 12)
 		bpop.add_item("Jump to Boss Tier", 13)
 		bpop.add_item("Advance to Next Zone", 14)
+		bpop.add_item("Reroll Specs", 15)
 	bpop.id_pressed.connect(_on_burger)
 	add_child(burger)
 
@@ -229,6 +230,19 @@ func _on_burger(id: int) -> void:
 			Run.advance_zone()
 			Run.save_run()
 			_draw_screen()
+		15:
+			# Debug spec swap: refund spent points, clear specs, re-awaken.
+			for member in Run.party:
+				var learned: Dictionary = member.get("talents", {})
+				var spent := 0
+				for talent_id in learned:
+					spent += int(learned[talent_id])
+				member["talent_points"] = member.get("talent_points", 0) + spent
+				member["spec"] = ""
+				member["talents"] = {}
+				member["tree"] = []
+			Run.specs_chosen = false
+			get_tree().change_scene_to_file("res://scenes/spec_choice.tscn")
 
 
 func _toast(text: String) -> void:

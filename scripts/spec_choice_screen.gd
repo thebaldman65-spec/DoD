@@ -94,6 +94,12 @@ func _draw_screen() -> void:
 		arch_label.mouse_filter = Control.MOUSE_FILTER_STOP
 		arch_label.tooltip_text = Classes.ARCHETYPE_DESC.get(arch, "")
 		vbox.add_child(arch_label)
+		# Long kits (Beastmaster!) scroll instead of pushing the button off
+		# screen: the text lives in a fixed-height ScrollContainer.
+		var scroll := ScrollContainer.new()
+		scroll.custom_minimum_size = Vector2(316, 320)
+		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		vbox.add_child(scroll)
 		var body := Label.new()
 		var ability_lines := PackedStringArray()
 		for ab in Classes.spec_abilities(spec_id):
@@ -105,10 +111,11 @@ func _draw_screen() -> void:
 			ability_lines.append("   %s" % ab.description.replace("\n", " "))
 		body.text = "%s\n\nPassive: %s\n\n%s" % [info["blurb"], info["passive_desc"],
 			"\n".join(ability_lines)]
-		body.add_theme_font_size_override("font_size", 13)
+		body.add_theme_font_size_override("font_size", 12)
 		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		body.custom_minimum_size = Vector2(316, 300)
-		vbox.add_child(body)
+		body.custom_minimum_size = Vector2(298, 0)
+		body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		scroll.add_child(body)
 		var choose := Button.new()
 		choose.text = "Walk this path"
 		choose.custom_minimum_size = Vector2(200, 44)

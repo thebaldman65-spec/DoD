@@ -45,10 +45,25 @@ func play(track: String, loop := true) -> void:
 
 
 # Plays `intro` once, then switches to `then` when it ends (boss battles,
-# spec-confirmation → map).
-func play_intro_then(intro: String, then: String) -> void:
+# spec-confirmation → map). `max_seconds` > 0 caps the intro: after that long
+# it fades out fast and the next track starts (boss fights shouldn't wait the
+# full tune).
+func play_intro_then(intro: String, then: String, max_seconds := 0.0) -> void:
 	play(intro, false)
 	_next = then
+	if max_seconds > 0.0:
+		_cap_intro(intro, max_seconds)
+
+
+func _cap_intro(intro: String, max_seconds: float) -> void:
+	await get_tree().create_timer(max_seconds).timeout
+	if _current != intro or _next == "" or not _player.playing:
+		return  # already ended or was replaced
+	var fade := create_tween()
+	fade.tween_property(_player, "volume_db", -40.0, 0.6)
+	await fade.finished
+	if _current == intro and _next != "":
+		_on_finished()  # switches to the queued track (play() resets volume)
 
 
 func stop() -> void:
