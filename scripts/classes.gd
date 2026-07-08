@@ -26,22 +26,26 @@ static func hero_config(key: String) -> Dictionary:
 		"hunter":
 			return {"unit_name": "Hunter", "is_hero": true, "sheet_dir": soldier,
 				"max_hp": 110, "armor": 0.12, "speed": 105.0, "stability": 100,
+				"constitution": 95,
 				"resource_name": "Focus", "resource": 100, "max_resource": 100,
 				"abilities": kit(key)}
 		"warrior":
 			return {"unit_name": "Warrior", "is_hero": true, "sheet_dir": soldier,
 				"max_hp": 154, "armor": 0.25, "speed": 95.0, "stability": 100,
+				"constitution": 110,
 				"resource_name": "Rage", "resource": 0, "max_resource": 100,
 				"abilities": kit(key)}
 		"mage":
 			return {"unit_name": "Mage", "is_hero": true, "sheet_dir": soldier,
 				"max_hp": 99, "armor": 0.10, "speed": 110.0, "stability": 100,
+				"constitution": 85,
 				"resource_name": "Mana", "resource": 100, "max_resource": 100,
 				"second_resource_name": "Resonance", "second_resource": 0, "second_max": 5,
 				"abilities": kit(key)}
 		_:
 			return {"unit_name": "Cleric", "is_hero": true, "sheet_dir": soldier,
 				"max_hp": 121, "armor": 0.15, "speed": 85.0, "stability": 100,
+				"constitution": 100,
 				"resource_name": "Mana", "resource": 100, "max_resource": 100,
 				"second_resource_name": "Faith", "second_resource": 0, "second_max": 100,
 				"abilities": kit(key)}
@@ -145,43 +149,43 @@ static func apply_passive(cfg: Dictionary, spec: String) -> void:
 	match SPEC_INFO[spec]["passive"]:
 		"bulwark":
 			cfg["armor"] += 0.10
-			cfg["stability"] += 30
+			cfg["constitution"] += 30
 
 const SPEC_INFO := {
-	"berserker": {"name": "Berserker", "archetype": "Ramp", "passive": "bloodrage",
+	"berserker": {"name": "Berserker", "constitution": 110, "archetype": "Ramp", "passive": "bloodrage",
 		"passive_desc": "Blood Frenzy: up to +40% damage as HP falls.",
 		"blurb": "Reckless savagery — grows stronger as their blood spills."},
-	"warden": {"name": "Warden", "archetype": "Tank", "passive": "bulwark",
-		"passive_desc": "Bulwark: +10% armor, +30 Stability.",
+	"warden": {"name": "Warden", "constitution": 110, "archetype": "Tank", "passive": "bulwark",
+		"passive_desc": "Bulwark: +10% armor, +30 Constitution.",
 		"blurb": "Protector of the weak — shields allies with their own body."},
-	"swordmaster": {"name": "Swordmaster", "archetype": "Bruiser", "passive": "seasoned",
-		"passive_desc": "Seasoned Fighter: +25% damage above half HP;\n+25% armor at or below half HP.",
+	"swordmaster": {"name": "Swordmaster", "constitution": 120, "archetype": "Bruiser", "passive": "seasoned",
+		"passive_desc": "Seasoned Fighter: +15% damage above half HP;\ntakes 15% less damage at or below half HP.",
 		"blurb": "Precision and technique — presses hard, then weathers the storm."},
-	"pyromancer": {"name": "Pyromancer", "archetype": "Nuker", "passive": "ignite",
+	"pyromancer": {"name": "Pyromancer", "constitution": 85, "archetype": "Nuker", "passive": "ignite",
 		"passive_desc": "Ignite: damaging spells have 50% chance to Burn (2 turns).",
 		"blurb": "Aggressive flame — burns that spread and stack."},
-	"cryomancer": {"name": "Cryomancer", "archetype": "Nuker", "passive": "chill",
+	"cryomancer": {"name": "Cryomancer", "constitution": 85, "archetype": "Nuker", "passive": "chill",
 		"passive_desc": "Chill: damaging spells have 50% chance to apply Chilled (2 turns).",
 		"blurb": "Battlefield control — chill, freeze, then shatter."},
-	"arcanist": {"name": "Arcanist", "archetype": "Ramp", "passive": "echo",
+	"arcanist": {"name": "Arcanist", "constitution": 90, "archetype": "Ramp", "passive": "echo",
 		"passive_desc": "Echo: 20% chance spells strike again at 50% power.",
 		"blurb": "Unstable raw magic — bends the rules of turn and time."},
-	"holy": {"name": "Holy", "archetype": "Healer", "passive": "grace",
+	"holy": {"name": "Holy", "constitution": 100, "archetype": "Healer", "passive": "grace",
 		"passive_desc": "Grace: all healing +25%.",
 		"blurb": "Pure vessel of light — mass healing and shields of faith."},
-	"inquisitor": {"name": "Devout", "archetype": "Warder", "passive": "devotion",
+	"inquisitor": {"name": "Devout", "constitution": 110, "archetype": "Warder", "passive": "devotion",
 		"passive_desc": "Devotion Aura: the whole party takes 15% less Pressure.",
 		"blurb": "A living shrine — faith made armor for the whole party."},
-	"occultist": {"name": "Occultist", "archetype": "Pressure", "passive": "corrupt",
+	"occultist": {"name": "Occultist", "constitution": 95, "archetype": "Pressure", "passive": "corrupt",
 		"passive_desc": "Corrupted Channeling: when a Crippled enemy attacks, a random\nhero heals for half the damage it dealt.",
 		"blurb": "Forbidden rites — leech life and trade blood for power."},
-	"beastmaster": {"name": "Beastmaster", "archetype": "Rush", "passive": "pack",
+	"beastmaster": {"name": "Beastmaster", "constitution": 100, "archetype": "Rush", "passive": "pack",
 		"passive_desc": "Pack Bond: changes with the summoned beast — Ursus: +25% Break\ndamage; Canis: attacks build 15 Bleed; Aguila: +15% crit chance.",
 		"blurb": "The wilds hunt beside them — every kill is shared."},
-	"sharpshooter": {"name": "Sharpshooter", "archetype": "Rush", "passive": "lethal_aim",
+	"sharpshooter": {"name": "Sharpshooter", "constitution": 90, "archetype": "Rush", "passive": "lethal_aim",
 		"passive_desc": "Lethal Aim: critical hits deal x2 damage instead of x1.5.",
 		"blurb": "Every arrow an execution — patient, precise, final."},
-	"mystic": {"name": "Survivalist", "archetype": "Pressure", "passive": "trapper",
+	"mystic": {"name": "Survivalist", "constitution": 100, "archetype": "Pressure", "passive": "trapper",
 		"passive_desc": "Trapper: enemies that strike the Hunter have a 25% chance\nto be Poisoned (5 turns).",
 		"blurb": "Endures the wilds and bleeds them dry — traps, powder, and steel."},
 }
@@ -235,9 +239,9 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Moderate damage. Sunders armor\n(-35%) for 3 turns. Builds 10 Rage."}),
 				Ability.make({"display_name": "Pommel Strike", "cost": 15, "damage": 25,
 					"pressure": 30, "delay": 2.0, "anim": "attack01", "resource_gain": 10,
-					"applies_status": {"id": "stunned", "turns": 1},
+					"applies_status": {"id": "stunned", "turns": 1}, "status_chance": 0.5,
 					"perfect_id": "parry_up", "perfect_text": "+15% parry chance for 3 turns",
-					"description": "A skull-ringing bash: guaranteed Stun.\nBuilds 10 Rage."}),
+					"description": "A skull-ringing bash: 50% chance to Stun\n(75% if the strike crits). Builds 10 Rage.\nBosses resist Stun until Broken."}),
 			]
 		"pyromancer":
 			return [
@@ -340,6 +344,10 @@ static func spec_abilities(spec: String) -> Array:
 					"applies_status": {"id": "cripple", "turns": 3},
 					"perfect_id": "status_plus", "perfect_text": "Cripple lasts 4 turns",
 					"description": "A cruel barb that Cripples the target\nfor 3 turns."}),
+				Ability.make({"display_name": "Poisoned Arrow", "cost": 20, "damage": 20,
+					"pressure": 20, "delay": 3.0, "anim": "attack02",
+					"perfect_id": "", "perfect_text": "Applies 4 stacks instead",
+					"description": "A venom-soaked shaft: applies 3 stacks\nof Poison (3 damage per stack per turn,\n5 turns; stacks refresh the timer)."}),
 				Ability.make({"display_name": "Kill Command", "cost": 30, "special": "kill_command",
 					"delay": 4.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "+50% to the ordered strike",
@@ -370,10 +378,11 @@ static func spec_abilities(spec: String) -> Array:
 					"damage": 10, "pressure": 20, "delay": 3.0, "anim": "attack03", "aoe": true,
 					"perfect_id": "", "perfect_text": "Deals 12 damage",
 					"description": "A bursting charge rakes ALL enemies\nwith fire and heavy Break pressure."}),
-				Ability.make({"display_name": "Gut", "cost": 25, "damage": 30,
-					"pressure": 20, "delay": 2.0, "anim": "attack01", "bleed_build": 20,
-					"perfect_id": "", "perfect_text": "Builds 25 Bleed instead",
-					"description": "A vicious dagger thrust up close:\nbuilds 20 Bleed."}),
+				Ability.make({"display_name": "Shrapnel", "cost": 25, "damage": 10,
+					"pressure": 10, "delay": 3.0, "anim": "attack03", "choose_two": true,
+					"applies_status": {"id": "cripple", "turns": 3},
+					"perfect_id": "status_plus", "perfect_text": "Cripple and Chilled last 4 turns",
+					"description": "A scattering charge rips TWO chosen\nenemies for 10 physical each, leaving\nthem Crippled and Chilled (3 turns)."}),
 			]
 	return []
 

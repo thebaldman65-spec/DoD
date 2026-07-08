@@ -15,7 +15,8 @@ var max_hp := 100
 var hp := 100
 var armor := 0.15          # fraction of damage blocked (0.25 = 25%)
 var speed := 100.0         # 100 = average; higher acts more often
-var stability := 50        # Pressure needed to Break this unit
+var stability := 100       # Break meter size (universal 0-100 scale)
+var constitution := 100    # resistance to Break: incoming Pressure × 100/constitution
 var pressure := 0
 var resource_name := ""    # "Rage" or "Mana" (heroes only)
 var resource := 0
@@ -38,9 +39,12 @@ var broken_pending := false # will lose its next turn
 var dead := false
 var next_time := 0.0        # position on the initiative timeline
 var is_ranged := false      # melee/ranged split (Tripwire only punishes melee)
+var is_boss := false        # bosses cannot be Stunned unless Broken
 var is_companion := false   # Beastmaster summon: no turns, fights alongside
 var companion_kind := ""    # "ursus" / "canis" / "aguila"
 var companion: BattleUnit   # the Beastmaster's active summon (on the hunter)
+var companion_hp_bonus := 0   # talents: extra HP for summoned companions
+var companion_power := 0      # talents: extra damage on companion attacks
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
@@ -304,10 +308,10 @@ func refresh_bars() -> void:
 		for s in statuses:
 			if s.id == "spec_passive":
 				var offense := hp > max_hp * 0.5
-				s.short = "+dmg" if offense else "+arm"
+				s.short = "+dmg" if offense else "-dmg"
 				s.desc = "Seasoned Fighter: currently %s." % (
-					"+25% damage (above half HP)" if offense
-					else "+25% armor (at or below half HP)")
+					"+15% damage dealt (above half HP)" if offense
+					else "15% less damage taken (at or below half HP)")
 				_refresh_chips()
 				break
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
@@ -416,9 +420,6 @@ func effective_armor() -> float:
 	var a := armor
 	if has_status("fortify"):
 		a += 0.10
-	# Seasoned Fighter: the defensive half of the stance switch.
-	if passive_id == "seasoned" and hp <= max_hp * 0.5:
-		a += 0.25
 	if broken:
 		a *= 0.7
 	if has_status("sunder"):
@@ -502,6 +503,8 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	hp = maxi(hp - amount, 0)
 	if resource_name == "Rage":
 		resource = mini(resource + 10, max_resource)
+	# Constitution: break resistance (100 = neutral; higher takes less Pressure).
+	pressure_add = int(round(pressure_add * 100.0 / maxf(constitution, 1.0)))
 	if has_status("ward"):
 		pressure_add = int(pressure_add * 0.5)
 	if has_status("devotion"):

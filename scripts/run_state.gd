@@ -201,7 +201,7 @@ const RUNE_TEMPLATES := [
 	{"noun": "Vitality", "stat": "max_hp", "base": 10, "fmt": "+%d max HP"},
 	{"noun": "Warding", "stat": "armor", "base": 0.02, "fmt": "+%d%% armor"},
 	{"noun": "Swiftness", "stat": "speed", "base": 4, "fmt": "+%d Speed"},
-	{"noun": "Poise", "stat": "stability", "base": 12, "fmt": "+%d Stability"},
+	{"noun": "Poise", "stat": "constitution", "base": 12, "fmt": "+%d Constitution"},
 	{"noun": "Precision", "stat": "crit_bonus", "base": 0.02, "fmt": "+%d%% crit chance"},
 	{"noun": "Springs", "stat": "max_resource", "base": 8, "fmt": "+%d max Mana"},
 ]

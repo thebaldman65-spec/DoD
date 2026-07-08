@@ -126,8 +126,8 @@ func _draw_detail() -> void:
 		"%s: %s" % [cfg["resource_name"],
 			("%d / %d" % [member["mana"], cfg["max_resource"]]) if cfg["resource_name"] == "Mana"
 			else "builds in combat"],
-		"Armor: %d%%    Speed: %d    Stability: %d" % [int(round(cfg["armor"] * 100)),
-			int(cfg["speed"]), cfg["stability"]],
+		"Armor: %d%%    Speed: %d    Constitution: %d" % [int(round(cfg["armor"] * 100)),
+			int(cfg["speed"]), cfg.get("constitution", 100)],
 		"Crit Chance: %d%%    Parry: %d%%" % [crit_pct,
 			int(round((0.05 + cfg.get("parry_bonus", 0.0)) * 100))],
 		"Talent Points: %d" % member.get("talent_points", 0),
@@ -143,7 +143,8 @@ func _draw_detail() -> void:
 	stats.tooltip_text = "Values include talents and equipped runes.\n" \
 		+ "Armor — % of incoming damage blocked.\n" \
 		+ "Speed — how quickly turns arrive (100 = average).\n" \
-		+ "Stability — Pressure needed to Break this hero.\n" \
+		+ "Constitution — Break resistance: incoming Pressure is scaled by\n" \
+		+ "  100/Constitution (100 = neutral, higher = tougher to Break).\n" \
 		+ "Crit — base 10% plus bonuses. Parry — base 5% plus bonuses.\n" \
 		+ "Talent points come from victories (1 fight / 2 elite / 3 boss)."
 	add_child(stats)

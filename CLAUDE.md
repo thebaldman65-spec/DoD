@@ -59,8 +59,11 @@ track, boss tune plays on spec-confirm fade to map), zone battle art, bow SFX,
 full-scene 1:1 battle camera (sprites 3.2/3.9/4.4). Specs overhauled 07-08:
 Swordmaster Seasoned Fighter + Pommel Strike, Devout (ex-Inquisitor) Unity,
 Occultist Mind Flay, Beastmaster summonable companions (sphere placeholders,
-no timeline turns), Survivalist Trapper + stacking Poison (3/turn/stack),
-Chilled = renamed Slow. See docs/master.html §6 for full kits. Combat: crit 10%/miss 5%/parry 5%, Mocking Blow taunt, per-ability
+no timeline turns, "Summon Companion ▸" submenu), Survivalist Trapper +
+stacking Poison (3/turn/stack), Chilled = renamed Slow. Break meter 0-100 w/
+numeric readout; CONSTITUTION = break resistance (pressure × 100/con; per-spec
+values in SPEC_INFO, bosses 160 + stun-immune unless Broken). Talent pools are
+THEMATIC per spec (8 signatures each, T5 = new ability). See master.html §6-7. Combat: crit 10%/miss 5%/parry 5%, Mocking Blow taunt, per-ability
 initiative ghost preview (no Guard — removed by design). Specs carry archetype
 tags (Ramp/Rush/Nuker/Pressure/Healer/Warder/Tank/Bruiser) in SPEC_INFO.
 Battle has burger menu (restart/settings overlay/exit); skill checks accept

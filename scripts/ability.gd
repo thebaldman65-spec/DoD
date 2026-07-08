@@ -21,6 +21,7 @@ var random_hits := 0     # strikes this many random living enemies instead
 var multi_hits := 0      # strikes the SAME target this many times
 var perfect_extra_hit := true  # multi/random-hit attacks: Perfect adds one hit
 var no_skill_check := false    # resolves without the timing bar (summons)
+var choose_two := false        # the player picks TWO enemy targets (Shrapnel)
 var faith_cost := 0      # secondary-resource cost (Cleric Miracles)
 var heal_missing := 0.0  # attacker self-heals this fraction of their missing HP on hit
 var armor_pierce := 0.0  # ignores this fraction of the target's armor
