@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-08</b></p>
+<p align="right"><b>Last updated: 2026-07-09</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative design reference (the timestamp above is bumped on every
 edit). It supersedes the original concept docs ("Dawn of Decay.docx", "DoD Combat.docx",
@@ -87,14 +87,14 @@ check.</p>
 <p>Every hero action runs a timing bar: a cursor sweeps 0→1→0 (0.72s per sweep); stop it with
 <b>Spacebar or Left Click</b>.</p>
 <table border="1" cellpadding="4">
-<tr><th>Grade</th><th>Zone (half-width around center)</th><th>Damage</th><th>Pressure</th><th>Extra</th></tr>
+<tr><th>Grade</th><th>Zone (half-width around center)</th><th>Damage</th><th>BD</th><th>Extra</th></tr>
 <tr><td>PERFECT</td><td>±0.045</td><td>×1.15</td><td>×1.25</td><td>Unique per-ability bonus
-(listed in every tooltip); AoE perfects get ×1.5 Pressure</td></tr>
+(listed in every tooltip); AoE perfects get ×1.5 BD</td></tr>
 <tr><td>Good</td><td>±0.16</td><td>×1.0</td><td>×1.0</td><td>—</td></tr>
 <tr><td>Sloppy (miss the zones)</td><td>—</td><td>×0.6</td><td>×0.5</td><td>—</td></tr>
 </table>
-<p>Auto-cast abilities (no target click) show a Cancel button during the check; cancelling
-returns to the action bar. Enemies and the sim bot always act at "Good" (bot: 20% perfect,
+<p>Every skill check shows a Cancel button — including after a target was chosen; cancelling
+returns to the action bar with nothing spent. Enemies and the sim bot always act at "Good" (bot: 20% perfect,
 15% sloppy).</p>
 <h3>4.3 Attack resolution pipeline</h3>
 <p>Per strike, in order: base damage × random variance (0.9–1.1) × grade multiplier × crit
@@ -111,7 +111,7 @@ remaining strikes still land (unless the counter kills the attacker).</li>
 <li><b>Crit:</b> 10% base + 25% vs Broken targets + 3% per Mage Resonance stack + talent/spec
 bonuses (+15% with Aguila summoned). Guaranteed: Razor Ice vs Chilled. Resonance builds
 only on the Mage's own casts — parry counters do not grant stacks.</li>
-<li><b>Attacker modifiers:</b> Resonance +15%/stack; Surge +20%; Empower +25%; Cripple −15%;
+<li><b>Attacker modifiers:</b> Resonance +15%/stack; Surge +20%; Empower +25%; Cripple −25%;
 Blood Frenzy up to +40% as HP falls; Seasoned Fighter +15% above half HP; relic bonuses
 (global +10% dragonbone; fire/holy +20% emberheart); Powershot +2% per 1% of the target's
 EMPTY Break bar; Overpower +0.5 per point of target Break; Frost Bolt 50% chance ×2 vs
@@ -123,12 +123,12 @@ below half HP; Mage Resonance +10% damage
 ignores a fraction (Piercing Arrow 50%, Singularity 30%).</li>
 <li><b>Damage types (7):</b> physical, fire, frost, arcane, nature, shadow, holy. Enemies carry
 resist fractions (negative = vulnerable, e.g. the Withered Warden takes +25% fire).</li>
-<li><b>Barrier</b> absorbs damage (not Pressure) before HP.</li>
+<li><b>Barrier</b> absorbs damage (not BD) before HP.</li>
 </ul>
-<h3>4.8 Pressure &amp; Break</h3>
-<p>Attacks add Pressure equal to the ability's Pressure value × grade multiplier (×1.5 on
+<h3>4.8 Break damage &amp; Break</h3>
+<p>Attacks deal Break damage (BD) — damage against the Break meter — equal to the ability's Break damage (BD) value × grade multiplier (×1.5 on
 crits). <b>Every unit's Break meter is a universal 0–100 scale</b> with a numeric readout on
-the bar. Resistance comes from <b>Constitution</b>: incoming Pressure is scaled by
+the bar. Resistance comes from <b>Constitution</b>: incoming BD is scaled by
 100/Constitution (100 = neutral; a 160-Constitution boss takes ~38% less Break damage; an
 85-Constitution mage takes ~18% more). Constitution is set per specialization role (see §6),
 raised by talents, the Bulwark passive, and Poise runes. When the meter fills, the unit
@@ -136,8 +136,7 @@ raised by talents, the Bulwark passive, and Poise runes. When the meter fills, t
 turn, armor ×0.7, +25% crit chance against it, and enemies actively exploit Broken heroes with
 their hardest affordable attack. <b>Bosses cannot be Stunned unless Broken</b> (stuns fizzle
 with an IMMUNE flag). Breaking triggers hitstop, a purple fracture flash, and a camera punch.
-After the lost turn, Pressure resets to 0. Ward halves incoming Pressure; Devotion Aura cuts
-it 15%.</p>
+After the lost turn, the Break meter resets to 0. Ward halves incoming BD; Devotion Aura cuts it 15%.</p>
 <h3>4.5 Bleed &amp; damage over time</h3>
 <ul>
 <li><b>Bleed</b> is a 0–100 buildup meter (chip shows Bl##). Wounding attacks add buildup
@@ -153,13 +152,14 @@ Orc Archers' Poison Arrow (3 turns) and the Survivalist's Trapper passive (5 tur
 <h3>4.6 Status effects (current roster)</h3>
 <table border="1" cellpadding="4">
 <tr><th>Status</th><th>Effect</th></tr>
-<tr><td>Chilled</td><td>−25% speed; turns arrive later. (Renamed from "Slow".)</td></tr>
+<tr><td>Chilled</td><td>−25% speed (Cryomancer-only frost).</td></tr>
+<tr><td>Slowed</td><td>−25% speed (generic; e.g. Shrapnel Charge).</td></tr>
 <tr><td>Burn</td><td>6 damage at the start of each turn.</td></tr>
 <tr><td>Poison</td><td>3 damage per stack each turn; stacks additively, new stacks refresh
-the timer.</td></tr>
+the timer. Never ticks on the turn it lands.</td></tr>
 <tr><td>Bleed</td><td>Buildup meter; bleeds out for 20% max HP at 100.</td></tr>
 <tr><td>Sunder</td><td>−35% armor.</td></tr>
-<tr><td>Ward</td><td>Takes 50% less Pressure.</td></tr>
+<tr><td>Ward</td><td>Takes 50% less BD.</td></tr>
 <tr><td>Fortify</td><td>+10% armor (Defense Potion).</td></tr>
 <tr><td>Barrier</td><td>Absorbs N incoming damage, then breaks.</td></tr>
 <tr><td>Focus</td><td>+10 Mana each turn.</td></tr>
@@ -171,13 +171,13 @@ the timer.</td></tr>
 <tr><td>Shieldwall</td><td>Takes 50% less damage.</td></tr>
 <tr><td>Empower</td><td>+25% damage dealt.</td></tr>
 <tr><td>Exposed</td><td>Takes 15% more damage.</td></tr>
-<tr><td>Cripple</td><td>−15% damage dealt.</td></tr>
+<tr><td>Cripple</td><td>−25% damage dealt.</td></tr>
 <tr><td>Retaliation</td><td>Counters attackers with a basic strike.</td></tr>
 <tr><td>Parry Up</td><td>+15% parry chance (Pommel Strike perfect).</td></tr>
-<tr><td>Unity</td><td>Damage received is split evenly among living heroes (Pressure is
+<tr><td>Unity</td><td>Damage received is split evenly among living heroes (BD is
 not).</td></tr>
 <tr><td>Mind Flay</td><td>Attacks its own allies with +100/115% Break damage.</td></tr>
-<tr><td>Devotion Aura</td><td>Takes 15% less Pressure (battle-long, from the Devout).</td></tr>
+<tr><td>Devotion Aura</td><td>Takes 15% less BD (battle-long, from the Devout).</td></tr>
 <tr><td>Tripwire</td><td>Retaliates against every attacking melee enemy for 75% of their
 attack's damage.</td></tr>
 <tr><td>Broken</td><td>Loses next turn; −30% armor; +25% crit taken.</td></tr>
@@ -190,8 +190,8 @@ may use only one item per turn. Bomb: 50 damage to all enemies. Health Potion: +
 Mana Potion: +40 Mana/Rage. Revive Potion: fallen ally returns at 50% HP. Defense Potion:
 party gains Fortify (3 turns).</p>
 <h3>4.8 Enemy AI</h3>
-<p>Enemies prefer finishing wounded heroes (65%) or spread damage randomly; if any hero is
-Broken they exploit it with their hardest affordable hit. Mocked enemies must attack the
+<p>Enemies hunt the most wounded hero 40% of the time and pick randomly otherwise (they no
+longer pile onto the squishiest target relentlessly); if any hero is Broken they exploit it with their hardest affordable hit. Mocked enemies must attack the
 taunting Warrior. The Chief/Bosses build and spend Rage like a Warrior.</p>
 <h3>4.9 There is no announcer</h3>
 <p>All battle information lives in the scrolling combat log (top right) and floating combat
@@ -223,14 +223,15 @@ Backlash Ward (+15 Mana). Stacks persist the whole battle (the old Guard vent is
 </ul>
 <h3>5.2 Core kits (before specialization)</h3>
 <ul>
-<li><b>Warrior:</b> Strike — 23 dmg / 18 Pressure / delay 2.0, builds 20 Rage
+<li><b>Warrior:</b> Strike — 23 dmg / 18 BD / delay 2.0, builds 20 Rage
 (Perfect: +10 Rage).</li>
-<li><b>Mage:</b> Magic Bolt — 25 arcane / 14 Pr / 2.0 (Perfect: +10 Mana); Arcane Surge —
-15 Mana, 3.0, +20% attack next turn, +1 Resonance guaranteed (Perfect: +2).</li>
-<li><b>Cleric:</b> Smite — 22 holy / 16 Pr / 2.0 (Perfect: self-heal 8); Mend Wounds — 25 Mana,
+<li><b>Mage:</b> Magic Bolt — 25 arcane / 14 BD / 2.0 (Perfect: +10 Mana); Mana Shield —
+15 Mana, 2.0, for 3 turns 50% of damage the Mage takes converts into Mana (Perfect: casts at
+1.5 int). (Arcane Surge and Reality Fracture are vaulted — removed but kept for later.)</li>
+<li><b>Cleric:</b> Smite — 22 holy / 16 BD / 2.0 (Perfect: self-heal 8); Mend Wounds — 25 Mana,
 heal 45, 3.0 (Perfect: Ward 2 turns); Renewal — 20 Mana, ally +8 HP/turn for 5 turns, 3.0
 (Perfect: +8 instant).</li>
-<li><b>Hunter:</b> Quick Shot — 20 dmg / 14 Pr / 2.0 (Perfect: +10 Focus).</li>
+<li><b>Hunter:</b> Quick Shot — 20 dmg / 14 BD / 2.0 (no perfect bonus).</li>
 </ul>
 
 <h2>6. Archetypes &amp; Specializations</h2>
@@ -256,54 +257,52 @@ Sharpshooter 90, Pyromancer 85, Cryomancer 85.</p>
 <h3>6.1 Warrior</h3>
 <ul>
 <li><b>Berserker (Ramp)</b> — Passive <i>Blood Frenzy</i>: up to +40% damage as HP falls.<br>
-Bloodlust — 25 Rage, 26 dmg / 18 Pr / 3.0, heals 30% of missing HP, builds 10 Rage
+Bloodlust — 25 Rage, 26 dmg / 18 BD / 3.0, heals 30% of missing HP, builds 10 Rage
 (Perfect: 45% missing HP).<br>
-Wildstrikes — 35 Rage, 16 dmg to ALL / 14 Pr / 4.5, +35 Bleed each, builds 10 Rage
-(Perfect: +50% Pressure).<br>
-Hack and Slash — 20 Rage, 3 strikes × 10 dmg / 10 Pr / 3.0 at one target, each hit 50% chance
+Wildstrikes — 35 Rage, 16 dmg to ALL / 14 BD / 4.5, +35 Bleed each, builds 10 Rage
+(Perfect: +50% BD).<br>
+Hack and Slash — 20 Rage, 3 strikes × 10 dmg / 10 BD / 3.0 at one target, each hit 50% chance
 to build 25 Bleed (a full 4-strike flurry can bleed a target out), builds 10 Rage
 (Perfect: 4 strikes).</li>
-<li><b>Warden (Tank)</b> — Passive <i>Bulwark</i>: +10% armor, +15 Stability.<br>
-Mocking Blow — free, 15 dmg / 16 Pr / 2.5, taunts the target for 3 turns, builds 10 Rage
-(Perfect: 4 turns).<br>
-Shieldwall — 25 Rage, 3.5, party takes 50% less damage until their next turns
-(Perfect: each ally also −20 Pressure).<br>
+<li><b>Warden (Tank)</b> — Passive <i>Bulwark</i>: +10% armor, +30 Constitution.<br>
+Mocking Blow — free, 20 dmg / 15 BD / 2.0, taunts the target AND one other enemy for 4 turns, builds 20 Rage
+(Perfect: 5 turns).<br>
+Shieldwall — 25 Rage, 3.0, party takes 25% less damage for 2 turns
+(Perfect: 3 turns).<br>
 Retaliation — 20 Rage, 3.0, counter every attack on the Warrior for 3 turns
 (Perfect: 4 turns).</li>
 <li><b>Swordmaster (Bruiser)</b> — Passive <i>Seasoned Fighter</i>: a stance switch — +15%
 damage dealt while above half HP; takes 15% less damage at or below half HP. The spec chip
 shows which side is live.<br>
-Overpower — 20 Rage, 35 dmg / 20 Pr / 2.5, +0.5 damage per point of the target's Break meter,
-builds 10 Rage (Perfect: +15% crit on this strike).<br>
-Crushing Blow — 20 Rage, 32 dmg / 22 Pr / 3.0, Sunders (−35% armor, 3 turns), builds 10 Rage
-(Perfect: deals a flat 30 Pressure).<br>
-Pommel Strike — 15 Rage, 25 dmg / 30 Pr / 2.0, 50% chance to Stun (75% if the strike crits),
+Overpower — 20 Rage, 15 dmg / 20 BD / 2.5, +0.5 damage per point of the target's Break meter,
+builds 10 Rage (Perfect: +5 bonus Rage).<br>
+Crushing Blow — 20 Rage, 32 dmg / 20 BD / 3.0, Sunders (−35% armor, 3 turns), builds 10 Rage
+(Perfect: +5 bonus BD).<br>
+Pommel Strike — 15 Rage, 25 dmg / 30 BD / 2.0, 50% chance to Stun (75% if the strike crits),
 builds 10 Rage (Perfect: +15% parry chance for 3 turns).</li>
 </ul>
 <h3>6.2 Mage</h3>
 <ul>
 <li><b>Pyromancer (Nuker)</b> — Passive <i>Ignite</i>: damaging spells 50% chance to Burn
 (2 turns).<br>
-Pyroblast — 45 Mana, 55 fire / 20 Pr / 6.0, +25% vs Burning (Perfect: also Burns 3 turns).<br>
-Flame Surge — 20 Mana, 16 fire to ALL / 12 Pr / 3.5 + Burn 2 turns (Perfect: 3 turns).<br>
+Pyroblast — 45 Mana, 55 fire / 20 BD / 6.0, +25% vs Burning (Perfect: also Burns 3 turns).<br>
+Flame Surge — 20 Mana, 15 fire to ALL / 10 BD / 3.0, no Burn (Perfect: +15 damage to enemies already Burning).<br>
 Phoenix Rebirth — free, 3.0, sacrifice 25% current HP for full Mana + Empower 3 turns
 (Perfect: only 15% HP).</li>
 <li><b>Cryomancer (Nuker)</b> — Passive <i>Chill</i>: damaging spells 50% chance to apply
-Chilled (2 turns; the status was renamed from "Slow" — same −25% speed effect).<br>
-Frost Bolt — 25 Mana, 25 frost / 20 Pr / 3.0, 50% chance to deal DOUBLE damage against
+Chilled (2 turns) — the Cryomancer-only frost slow; generic sources apply Slowed instead.<br>
+Frost Bolt — 25 Mana, 25 frost / 20 BD / 3.0, 50% chance to deal DOUBLE damage against
 unchilled targets (Perfect: +5% crit on the cast).<br>
-Razor Ice — 20 Mana, 15 frost / 14 Pr / 3.0 × 2 random targets, always crits vs Chilled
+Razor Ice — 20 Mana, 15 frost / 14 BD / 3.0 × 2 random targets, always crits vs Chilled
 (Perfect: 3 shards).<br>
-Blizzard — 30 Mana, 15 frost to ALL / 12 Pr / 4.0 + Chilled 2 turns (Perfect: +50%
-Pressure).</li>
-<li><b>Arcanist (Ramp)</b> — Passive <i>Echo</i>: 20% chance spells strike again at 50% power
+Blizzard — 30 Mana, 15 frost to ALL / 12 BD / 4.0 + Chilled 2 turns (Perfect: +50%
+BD).</li>
+<li><b>Arcanist (Ramp)</b> — Passive <i>Echo</i>: 20% chance spells strike again at 25% power
 (procs announce with a big "ECHO!").<br>
-Arcane Cannon — 30 Mana, 30 arcane / 18 Pr / 3.5, +7.5% DAMAGE per Resonance stack; recoil is
-2.5% of damage dealt +2.5% per stack (Perfect: +5 base damage). Unity splits the recoil across
+Arcane Cannon — 30 Mana, 30 arcane / 15 BD / 3.5, +7.5% DAMAGE per Resonance stack; recoil is
+a flat 15% of damage dealt (Perfect: +5 bonus BD). Unity splits the recoil across
 the party like any other damage.<br>
-Reality Fracture — 20 Mana, 15 arcane / 14 Pr / 2.0, shoves the target 6.0 down the initiative
-order (Perfect: +1 Resonance).<br>
-Arcane Barrage — 25 Mana, 6 bolts × 5 dmg / 4 Pr at random enemies (30 total), every bolt can
+Arcane Barrage — 25 Mana, 6 bolts × 5 dmg / 4 BD at random enemies (30 total), every bolt can
 proc Echo, 3.5 (Perfect: fires a 7th bolt).</li>
 </ul>
 <h3>6.3 Cleric</h3>
@@ -313,14 +312,14 @@ Dawnbreak — 20 Mana, 3.0, heal an ally 40; overheal flows back to the Cleric
 (Perfect: +15 healing).<br>
 Hymn of Hope — MIRACLE, 30 Faith, 4.0, heal ALL allies 20% max HP (Perfect: 25%).</li>
 <li><b>Devout (Warder)</b> — Passive <i>Devotion Aura</i>: the entire party (Cleric included)
-takes 15% less Pressure, shown as a battle-long status.<br>
+takes 15% less BD, shown as a battle-long status.<br>
 Divine Shield — 30 Mana, 3.0, ally shield absorbing 100 (Perfect: 130).<br>
 Unity — MIRACLE, 25 Faith, 3.0, binds the party's souls: all damage received is split evenly
-among living heroes for 3 turns; Pressure still lands on the struck hero (Perfect: 4
+among living heroes for 3 turns; BD still lands on the struck hero (Perfect: 4
 turns).</li>
 <li><b>Occultist (Pressure)</b> — Passive <i>Corrupted Channeling</i>: whenever a Crippled
 enemy attacks, a random living hero heals for half the damage it dealt.<br>
-Hex of Ruin — 20 Mana, 2 random enemies × 15 shadow / 24 Pr / 3.0, Cripples both for 3 turns
+Hex of Ruin — 20 Mana, 2 random enemies × 15 shadow / 24 BD / 3.0, Cripples both for 3 turns
 (Perfect: 4 turns).<br>
 Mind Flay — MIRACLE, 25 Faith, 3.5, the target attacks its OWN allies for 3 turns with +100%
 Break damage; fizzles to normal behavior if it stands alone (Perfect: +115%).</li>
@@ -338,30 +337,28 @@ and crit chance (talents can add companion HP and damage). They automatically at
 (physical) whenever the hunter attacks; they take no timeline turns (statuses tick and Breaks
 recover on the hunter's turn).<br>
 Summon Ursus — 30 Focus, 3.0. Bear, 80 HP: strikes the hunter's target AND one other enemy
-for 10 dmg + 20 Pressure each.<br>
-Summon Canis — 30 Focus, 3.0. Wolf, 60 HP: 15 dmg, 50% chance to build 15 Bleed.<br>
+for 10 dmg + 20 BD each.<br>
+Summon Canis — 30 Focus, 3.0. Wolf, 60 HP: 20 dmg, 50% chance to build 20 Bleed.<br>
 Summon Aguila — 30 Focus, 3.0. Eagle, 60 HP: 15 dmg, 50% chance to Sunder (2 turns).<br>
-Barbed Arrow — 20 Focus, 20 dmg / 20 Pr / 3.0, Cripples 3 turns (Perfect: 4 turns).<br>
-Poisoned Arrow — 20 Focus, 20 dmg / 20 Pr / 3.0, applies 3 stacks of Poison (5 turns)
+Barbed Arrow — 20 Focus, 20 dmg / 15 BD / 2.5, Cripples 3 turns (Perfect: 4 turns).<br>
+Poisoned Arrow — 20 Focus, 20 dmg / 15 BD / 2.5, applies 3 stacks of Poison (5 turns)
 (Perfect: 4 stacks).<br>
 Kill Command — 30 Focus, 4.0, the companion strikes the target for DOUBLE damage with its
 special effect doubled (guaranteed procs, doubled Bleed, Sunder 4 turns). Requires a living
 companion. (Perfect: triple damage.)</li>
 <li><b>Sharpshooter (Rush)</b> — Passive <i>Lethal Aim</i>: crits deal ×2 damage.<br>
-Aimed Shot — 20 Focus, 34 dmg / 16 Pr / 3.5 (Perfect: +15% crit).<br>
-Powershot — 25 Focus, 20 dmg / 20 Pr / 3.5, +2% damage per 1% of the target's Break bar
-still EMPTY — up to triple damage against untouched foes, the Rush opener
-(Perfect: +10 Focus).<br>
+Aimed Shot — 20 Focus, 45 dmg / 15 BD / 3.0 (Perfect: +25% crit).<br>
+Powershot — 25 Focus, 20 dmg / 20 BD / 3.0, +2% damage for every point of the
+target's Break bar still EMPTY (no perfect bonus).<br>
 Quick Draw — 15 Focus, 2.0, all abilities act 50% faster for 5 turns (Perfect: 6 turns).</li>
 <li><b>Survivalist (Pressure)</b> — Passive <i>Trapper</i>: enemies that strike the Hunter
 have a 25% chance to be Poisoned (5 turns).<br>
 Tripwire — 20 Focus, 2.5, for 5 turns the Hunter retaliates against EVERY attacking melee
-enemy — regardless of who they hit — for 75% of the damage that attack dealt
-(Perfect: 6 turns).<br>
-Explosive Shot — 35 Focus, 10 fire to ALL / 20 Pr / 3.0 (Perfect: 12 base damage).<br>
-Shrapnel — 25 Focus, 3.0, a scattering charge that rips TWO chosen enemies for 10 physical /
-10 Pr each and leaves both Crippled and Chilled for 3 turns (Perfect: 4 turns). The player
-picks both targets; each fragment rolls miss/parry separately.</li>
+enemy — regardless of who they hit (Perfect: 6 turns).<br>
+Explosive Shot — 35 Focus, 10 fire to ALL / 20 BD / 3.0 (Perfect: 12 base damage).<br>
+Shrapnel Charge — 25 Focus, 3.0, a scattering charge that rips TWO chosen enemies for 20
+physical / 25 BD each and leaves both Crippled and Slowed for 3 turns (Perfect: 4
+turns). The player picks both targets; each fragment rolls miss/parry separately.</li>
 </ul>
 
 <h2>7. Talents</h2>
@@ -372,11 +369,20 @@ tree: 2 slots per tier drawn from the pool, padded with generic Training talents
 values scale with tier). Tier N unlocks after (N−1)×2 points are spent. Points come from
 victories: fight 1, elite 2, boss 3 (Waystone relic: +1 at run start). Some talents have
 prerequisites and multiple ranks; every tier-5 talent grants a signature new ability.</p>
-<p>Pool identities — <b>Berserker:</b> HP for Blood Frenzy, Bleed amplification, Hack and
-Slash/Wildstrikes damage, Rampage. <b>Warden:</b> armor, Constitution, cheaper/faster
+<p><b>Berserker uses the first FIXED tree</b> (designed in the RPG Skill Tree Generator;
+source in data/berserker_tree.json): a 3×3 grid. Tier 1 — Savagery (+2 Bleed on
+bleed-building abilities/rank ×3), Bloodthirsty (Blood Frenzy +3%/rank ×3), Vitality (+5% max
+HP/rank ×3). Tier 2 — Crushing Force (attacks ignore 5% armor/rank ×3), Rampage (new ability:
++1% damage per 10 Bleed buildup on the enemy party for 1 turn, 20 Rage), Reckless Fury (+5%
+damage dealt AND taken/rank ×3). Tier 3 — Bloodlust (Hack and Slash strikes an extra time),
+Bloodcraze (heal 30 HP when an enemy bleeds out), Enraged (+1%/rank damage per hit taken,
+fades after 2 unhurt turns ×3). <b>Fixed-tree gating:</b> Tier 2 needs 5 points in Tier 1;
+Tier 3 needs 10 points across Tiers 1–2. Other specs still use generated pools until their
+fixed trees are designed.</p>
+<p>Generated pool identities — <b>Warden:</b> armor, Constitution, cheaper/faster
 Mocking Blow and Shieldwall, Bulwark Slam. <b>Swordmaster:</b> crit, parry, Pommel damage,
-Crushing Blow Pressure, Flurry. <b>Pyromancer:</b> Mana pool, cheaper/faster Pyroblast, Flame
-Surge damage, Inferno. <b>Cryomancer:</b> Frost Bolt and shard damage, Blizzard Pressure,
+Crushing Blow BD, Flurry. <b>Pyromancer:</b> Mana pool, cheaper/faster Pyroblast, Flame
+Surge damage, Inferno. <b>Cryomancer:</b> Frost Bolt and shard damage, Blizzard BD,
 Absolute Zero. <b>Arcanist:</b> Cannon/Barrage damage, recoil control, casting speed,
 Singularity. <b>Holy:</b> cheaper and bigger Mend Wounds, cheap Hymn, Sanctuary.
 <b>Devout:</b> cheaper/faster Divine Shield, cheap Unity, Constitution, Excommunicate.
@@ -397,23 +403,23 @@ inventory: 2 Health, 1 Mana, 1 Bomb, 1 Revive, 1 Defense.</li>
 +8 max Mana (per rarity multiplier). Each hero can <b>equip 2</b> (toggled on the party
 screen); shop offers avoid duplicates per hero.</li>
 <li><b>Relics</b> (permanent meta): one random unlock per boss kill, stored in
-user://relics.json; up to 3 equipped per run at the draft. Pool (6): Waystone Shard (+1 talent
+user://relics.json; up to 3 equipped per run at the draft. Pool (5): Waystone Shard (+1 talent
 point at run start), Dragonbone Idol (+10% damage), Chalice of Dawn (party heals 10% after
-victories), Gravewrought Coin (+80 starting gold), Eidolon Mirror (Warriors start battles with
-25 Rage), Emberheart (fire &amp; holy +20%).</li>
+victories), Gravewrought Coin (+80 starting gold), Emberheart (fire &amp; holy +20%). (Eidolon
+Mirror removed 07-09; old unlocks are dropped safely.)</li>
 </ul>
 
 <h2>9. Enemies</h2>
 <table border="1" cellpadding="4">
 <tr><th>Enemy</th><th>HP</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Kit</th></tr>
-<tr><td>Orc Raider</td><td>115</td><td>15%</td><td>90</td><td>100</td><td>Slash 34/26Pr;
-Sundering Strike 23/22Pr, 60% Sunder 2t. Resists: physical 10%.</td></tr>
-<tr><td>Orc Archer (red)</td><td>90</td><td>10%</td><td>100</td><td>85</td><td>Arrow Shot
-21/16Pr; Poison Arrow 16/14Pr, 70% Poison 3t. Resists: physical 5%.</td></tr>
-<tr><td>Orc Chief (elite)</td><td>210</td><td>20%</td><td>80</td><td>130</td><td>Rage user:
-Strike 28/26Pr +15 Rage; Heavy Strike 30R 54/40Pr; Crushing Blow 20R 34/56Pr. Resists:
+<tr><td>Orc Raider</td><td>132</td><td>15%</td><td>90</td><td>100</td><td>Slash 34/26BD;
+Sundering Strike 23/22BD, 60% Sunder 2t. Resists: physical 10%.</td></tr>
+<tr><td>Orc Archer (red)</td><td>104</td><td>10%</td><td>100</td><td>85</td><td>Arrow Shot
+21/16BD; Poison Arrow 16/14BD, 70% Poison 3t. Resists: physical 5%.</td></tr>
+<tr><td>Orc Chief (elite)</td><td>242</td><td>20%</td><td>80</td><td>130</td><td>Rage user:
+Strike 28/26BD +15 Rage; Heavy Strike 30R 54/40BD; Crushing Blow 20R 34/56BD. Resists:
 physical 15%.</td></tr>
-<tr><td>Zone bosses (stand-ins)</td><td>320</td><td>22%</td><td>85</td><td>160</td><td>Chief
+<tr><td>Zone bosses (stand-ins)</td><td>368</td><td>22%</td><td>85</td><td>160</td><td>Chief
 kit, bigger sprite, 20 starting Rage. Zone 1: Withered Warden (nature 50%, physical 10%,
 fire −25%). Zone 2: Ash-Wrought Tyrant (fire 50%, physical 10%, frost −25%).</td></tr>
 </table>

@@ -14,7 +14,8 @@ const GOOD_HALF := 0.16
 
 # Visual identity of each status effect: [label, chip tag, color, tooltip]
 const STATUS_INFO := {
-	"slow": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "-25% speed; turns arrive later."],
+	"slow": ["Slowed", "Sl", Color(0.55, 0.65, 0.9), "-25% speed; turns arrive later."],
+	"chilled": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "-25% speed; turns arrive later.\nThe Cryomancer's signature frost."],
 	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Takes 6 damage at the start of each turn."],
 	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Bleed builds with wounding attacks;\nat 100 the target bleeds out for 20% max HP."],
 	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-35% armor."],
@@ -28,15 +29,17 @@ const STATUS_INFO := {
 	"poison": ["Poison", "P", Color(0.45, 0.8, 0.3), "Takes 3 damage per stack at the start of\neach turn; new stacks refresh the timer."],
 	"quickdraw": ["Quick Draw", "QD", Color(0.55, 0.85, 0.40), "All abilities act 50% faster;\nturns arrive sooner."],
 	"parry_up": ["Parry Up", "P+", Color(0.4, 0.9, 1.0), "+15% parry chance."],
+	"mana_shield": ["Mana Shield", "MS", Color(0.35, 0.6, 1.0), "50% of damage taken converts\ninto Mana."],
+	"rampage": ["Rampage", "Rp", Color(0.9, 0.3, 0.3), "+1% damage per 10 Bleed buildup\non the enemy party (at cast time)."],
 	"unity": ["Unity", "Un", Color(0.95, 0.85, 0.4), "Souls bound: all damage received is\nsplit evenly among the party."],
 	"mindflay": ["Mind Flay", "MF", Color(0.75, 0.35, 0.85), "Maddened: attacks its own allies\nwith bonus Break damage."],
 	"devotion": ["Devotion Aura", "DA", Color(0.95, 0.8, 0.45), "The Devout's presence: takes 15%\nless Pressure."],
 	"tripwire": ["Tripwire", "TW", Color(0.8, 0.65, 0.35), "Retaliates against every attacking\nmelee enemy for 75% of their damage."],
 	"stunned": ["Stunned", "St", Color(0.95, 0.9, 0.4), "Loses their next turn."],
-	"shieldwall": ["Shieldwall", "SW", Color(0.6, 0.7, 0.9), "Takes 50% less damage."],
+	"shieldwall": ["Shieldwall", "SW", Color(0.6, 0.7, 0.9), "Takes 25% less damage."],
 	"empower": ["Empower", "+A", Color(0.95, 0.45, 0.35), "+25% damage dealt."],
 	"exposed": ["Exposed", "E", Color(0.95, 0.9, 0.4), "Takes 15% more damage."],
-	"cripple": ["Cripple", "C", Color(0.5, 0.4, 0.55), "-15% damage dealt."],
+	"cripple": ["Cripple", "C", Color(0.5, 0.4, 0.55), "-25% damage dealt."],
 	"retaliate": ["Retaliation", "R!", Color(0.95, 0.6, 0.25), "Counters attackers with a basic strike."],
 }
 
@@ -187,7 +190,7 @@ func _enemy_config(kind: String) -> Dictionary:
 	match kind:
 		"chief":
 			return {"unit_name": "Orc Chief", "is_hero": false, "sheet_dir": orc,
-				"max_hp": 210, "armor": 0.20, "speed": 80.0, "stability": 100,
+				"max_hp": 242, "armor": 0.20, "speed": 80.0, "stability": 100,
 				"constitution": 130,
 				"resource_name": "Rage", "resource": 0, "max_resource": 100,
 				"abilities": _orc_chief_kit(), "sprite_scale": 3.9,
@@ -203,21 +206,21 @@ func _enemy_config(kind: String) -> Dictionary:
 			]
 			var bd: Dictionary = boss_defs[clampi(Run.zone_idx if Run.active else 0, 0, boss_defs.size() - 1)]
 			return {"unit_name": bd["unit_name"], "is_hero": false, "sheet_dir": orc,
-				"max_hp": 320, "armor": 0.22, "speed": 85.0, "stability": 100,
+				"max_hp": 368, "armor": 0.22, "speed": 85.0, "stability": 100,
 				"constitution": 160, "is_boss": true,
 				"resource_name": "Rage", "resource": 20, "max_resource": 100,
 				"abilities": _orc_chief_kit(), "sprite_scale": 4.4,
 				"tint": bd["tint"], "resists": bd["resists"]}
 		"archer":
 			return {"unit_name": "Orc Archer", "is_hero": false, "sheet_dir": orc,
-				"max_hp": 90, "armor": 0.10, "speed": 100.0, "stability": 100,
+				"max_hp": 104, "armor": 0.10, "speed": 100.0, "stability": 100,
 				"constitution": 85,
 				"is_ranged": true,
 				"abilities": _orc_archer_kit(), "tint": Color(1.0, 0.35, 0.35),
 				"resists": {"physical": 0.05}}
 		_:
 			return {"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
-				"max_hp": 115, "armor": 0.15, "speed": 90.0, "stability": 100,
+				"max_hp": 132, "armor": 0.15, "speed": 90.0, "stability": 100,
 				"constitution": 100,
 				"abilities": _orc_raider_kit(), "tint": Color.WHITE,
 				"resists": {"physical": 0.10}}
@@ -267,8 +270,8 @@ func _spawn_units() -> void:
 				bonuses["fire"] = bonuses.get("fire", 0.0) + 0.20
 				bonuses["holy"] = bonuses.get("holy", 0.0) + 0.20
 				cfg["type_dmg_bonus"] = bonuses
-			if Run.relic_active("eidolon") and cfg["resource_name"] == "Rage":
-				cfg["resource"] = 25
+		# Percentage HP talents (Vitality) apply after every flat bonus.
+		cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
 		var u := _make_unit(cfg, HERO_SLOTS[i], Classes.HERO_TINTS[i])
 		u.crit_bonus = cfg.get("crit_bonus", 0.0)
 		u.parry_bonus = cfg.get("parry_bonus", 0.0)
@@ -638,6 +641,11 @@ func _run_battle() -> void:
 			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
 			continue
 		u.tick_statuses()
+		if u.enraged_ranks > 0:
+			u.turns_since_damaged += 1
+			if u.turns_since_damaged > 2 and u.enraged_stacks > 0:
+				u.enraged_stacks = 0
+				u.float_text("Enraged fades", Color(0.7, 0.5, 0.4))
 		if u.broken_pending:
 			u.broken_pending = false
 			_message("%s is Broken and loses their turn!" % u.unit_name)
@@ -713,7 +721,8 @@ func _player_turn(u: BattleUnit) -> void:
 	while true:
 		var used_targeting := false
 		if ab.special in ["rally", "focus", "surge", "shieldwall", "quickdraw",
-				"phoenix", "hymn", "retaliate", "unity", "tripwire", "summon"]:
+				"phoenix", "hymn", "retaliate", "unity", "tripwire", "summon",
+				"mana_shield"]:
 			target = u  # self/party effects need no target choice
 		elif ab.aoe or ab.random_hits > 0:
 			var foes := enemies.filter(func(e): return not e.dead)
@@ -752,7 +761,7 @@ func _player_turn(u: BattleUnit) -> void:
 				grade = "good"
 				break
 			# Auto-cast abilities (no target click) can cancel during the skill check.
-			grade = await _run_skill_check(not used_targeting)
+			grade = await _run_skill_check(true)
 			if grade != "cancel":
 				break
 		# Cancelled: back to the action bar to pick something else.
@@ -796,10 +805,10 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				return [overpower, target_foe]
 			return [u.abilities[0], target_foe]          # Strike
 		"Mage":
-			var surge_ab := _find_ability(u, "Arcane Surge")
-			if surge_ab != null and u.resource >= surge_ab.cost \
-					and u.second_resource < u.second_max and randf() < 0.25:
-				return [surge_ab, u]
+			var mshield := _find_ability(u, "Mana Shield")
+			if mshield != null and u.resource >= mshield.cost \
+					and not u.has_status("mana_shield") and u.resource < 40:
+				return [mshield, u]
 			var flame := _find_ability(u, "Flame Surge")
 			if flame != null and u.resource >= flame.cost and foes.size() >= 2:
 				return [flame, target_foe]
@@ -823,7 +832,7 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if parrow != null and u.resource >= parrow.cost and randf() < 0.4 \
 					and not target_foe.has_status("poison"):
 				return [parrow, target_foe]
-			var shrapnel := _find_ability(u, "Shrapnel")
+			var shrapnel := _find_ability(u, "Shrapnel Charge")
 			if shrapnel != null and u.resource >= shrapnel.cost and foes.size() >= 2:
 				return [shrapnel, target_foe]
 			var aimed := _find_ability(u, "Aimed Shot")
@@ -1079,7 +1088,7 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 			buff_mult *= 1.2
 		if u.has_status("empower"):
 			buff_mult *= 1.25
-		tip += "\nDamage: %d–%d (%s)    Pressure: %d" % [
+		tip += "\nDamage: %d–%d (%s)    BD: %d" % [
 			int(ab.damage * 0.9 * buff_mult), int(round(ab.damage * 1.1 * buff_mult)),
 			ab.dmg_type.capitalize(), ab.pressure]
 		if ab.random_hits > 0 or ab.multi_hits > 0:
@@ -1166,7 +1175,7 @@ func _enemy_turn(u: BattleUnit) -> void:
 		await _wait(0.4)
 	else:
 		# Prefer finishing off wounded heroes; sometimes spread damage.
-		target = _lowest_hp(living) if randf() < 0.65 else living.pick_random()
+		target = _lowest_hp(living) if randf() < 0.40 else living.pick_random()
 		ab = affordable.pick_random()
 	await _resolve(u, ab, target, "good")
 
@@ -1353,11 +1362,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				crit_chance += 0.15
 			if is_perfect and ab.display_name == "Frost Bolt":
 				crit_chance += 0.05
-			if is_perfect and ab.display_name == "Overpower":
-				crit_chance += 0.15
+			if is_perfect and ab.display_name == "Aimed Shot":
+				crit_chance += 0.25
 			var is_crit := randf() < crit_chance
 			# Razor Ice always crits against Slowed (chilled) targets.
-			if ab.display_name == "Razor Ice" and strike_target.has_status("slow"):
+			if ab.display_name == "Razor Ice" and strike_target.has_status("chilled"):
 				is_crit = true
 			any_crit = any_crit or is_crit
 			var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
@@ -1371,10 +1380,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Arcane Cannon: the damage (not the recoil) grows with Resonance.
 			if ab.display_name == "Arcane Cannon":
 				raw *= 1.0 + 0.075 * attacker.second_resource
-				if is_perfect:
-					raw += 5.0
+			# Flame Surge perfect: burns feed the fire.
+			if is_perfect and ab.display_name == "Flame Surge" \
+					and strike_target.has_status("burn"):
+				raw += 15.0
 			# Frost Bolt: 50% chance to deal DOUBLE damage to unchilled targets.
-			if ab.display_name == "Frost Bolt" and not strike_target.has_status("slow") \
+			if ab.display_name == "Frost Bolt" and not strike_target.has_status("chilled") \
 					and randf() < 0.5:
 				raw *= 2.0
 				strike_target.float_text("SHATTER x2", Color(0.5, 0.85, 1.0))
@@ -1393,9 +1404,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if attacker.has_status("empower"):
 				raw *= 1.25
 			if attacker.has_status("cripple"):
-				raw *= 0.85
+				raw *= 0.75
 			if attacker.passive_id == "bloodrage":
-				raw *= 1.0 + 0.4 * (1.0 - attacker.hp / float(attacker.max_hp))
+				raw *= 1.0 + (0.4 + attacker.bloodrage_bonus) \
+					* (1.0 - attacker.hp / float(attacker.max_hp))
+			if attacker.enraged_stacks > 0:
+				raw *= 1.0 + attacker.enraged_stacks / 100.0
+			# Rampage: fury drawn from every open wound on the enemy party.
+			if attacker.has_status("rampage"):
+				raw *= 1.0 + attacker.status_power("rampage") / 100.0
 			# Seasoned Fighter: the offensive stance above half HP.
 			if attacker.passive_id == "seasoned" and attacker.hp > attacker.max_hp * 0.5:
 				raw *= 1.15
@@ -1404,9 +1421,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if strike_target.second_resource_name == "Resonance":
 				raw *= 1.0 + 0.10 * strike_target.second_resource
 			if strike_target.has_status("shieldwall"):
-				raw *= 0.5
+				raw *= 0.75
 			if strike_target.has_status("exposed"):
 				raw *= 1.15
+			if strike_target.dmg_taken_bonus > 0.0:
+				raw *= 1.0 + strike_target.dmg_taken_bonus
 			# Seasoned Fighter: the defensive stance at or below half HP.
 			if strike_target.passive_id == "seasoned" \
 					and strike_target.hp <= strike_target.max_hp * 0.5:
@@ -1417,7 +1436,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			var resist := float(strike_target.resists.get(ab.dmg_type, 0.0))
 			if resist != 0.0:
 				raw *= 1.0 - resist
-			var effective_armor := strike_target.effective_armor() * (1.0 - ab.armor_pierce)
+			var effective_armor := strike_target.effective_armor() \
+				* (1.0 - clampf(ab.armor_pierce + attacker.pierce_bonus, 0.0, 1.0))
 			if is_perfect and ab.display_name == "Arcane Rift":
 				effective_armor = 0.0
 			var final := maxi(int(round(raw * (1.0 - effective_armor))), 1)
@@ -1427,7 +1447,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if is_perfect and (ab.perfect_id == "pressure" or ab.aoe):
 				pr = int(pr * 1.5)
 			if is_perfect and ab.display_name == "Crushing Blow":
-				pr = 30
+				pr += 5
+			if is_perfect and ab.display_name == "Arcane Cannon":
+				pr += 5
 			# Pack Bond (Ursus): the bear's weight behind every hit.
 			if attacker.passive_id == "pack" and attacker.companion != null \
 					and not attacker.companion.dead \
@@ -1490,7 +1512,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Arcanist Echo: the spell strikes again at half power (announced
 			# loudly so the proc reads clearly).
 			if attacker.passive_id == "echo" and not result.died and randf() < 0.20:
-				var echo_dmg := maxi(int(final * 0.5), 1)
+				var echo_dmg := maxi(int(final * 0.25), 1)
 				strike_target.take_hit(echo_dmg, 0)
 				attacker.float_text("ECHO!", Color(0.85, 0.55, 1.0), true)
 				strike_target.float_text("%d Echo" % echo_dmg, Color(0.8, 0.6, 1.0))
@@ -1508,18 +1530,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var turns: int = ab.applies_status["turns"]
 				if is_perfect and ab.perfect_id == "status_plus":
 					turns = 4
-				if is_perfect and ab.display_name == "Flame Surge":
-					turns += 1
 				var status_meta := 0
 				if ab.applies_status["id"] == "burn":
 					status_meta = int(round((CRIT_CHANCE + attacker.crit_bonus) * 100))
 				_apply_status(strike_target, ab.applies_status["id"], turns, status_meta)
 			if ab.bleed_build > 0 and not strike_target.dead and randf() <= ab.bleed_chance:
-				_add_bleed_with_burst(strike_target, ab.bleed_build)
+				_add_bleed_with_burst(strike_target, ab.bleed_build + attacker.bleed_bonus)
 			if ab.display_name == "Mocking Blow" and not strike_target.dead:
 				var mocker_idx := heroes.find(attacker)
 				if mocker_idx >= 0:
-					_apply_status(strike_target, "mocked", 4 if is_perfect else 3, mocker_idx)
+					var taunt_turns := 5 if is_perfect else 4
+					_apply_status(strike_target, "mocked", taunt_turns, mocker_idx)
+					var others := enemies.filter(
+						func(e): return not e.dead and e != strike_target)
+					if not others.is_empty():
+						_apply_status(others.pick_random(), "mocked", taunt_turns, mocker_idx)
 			# Shrapnel: the second debuff (Cripple rides applies_status above).
 			if ab.display_name == "Shrapnel" and not strike_target.dead:
 				_apply_status(strike_target, "slow", 4 if is_perfect else 3)
@@ -1533,7 +1558,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_apply_status(strike_target, "burn", 3,
 						int(round((CRIT_CHANCE + attacker.crit_bonus) * 100)))
 				elif attacker.passive_id == "chill" and randf() < 0.5:
-					_apply_status(strike_target, "slow", 3)
+					_apply_status(strike_target, "chilled", 3)
 				# Pack Bond (Canis): the wolf worries every wound open.
 				if attacker.passive_id == "pack" and attacker.companion != null \
 						and not attacker.companion.dead \
@@ -1573,7 +1598,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				await _wait(0.45)  # sequential strikes land distinctly
 		# Post-strike attacker effects (skipped if a counter felled the attacker).
 		if ab.recoil_base > 0.0 and not attacker.dead:
-			var recoil_pct := ab.recoil_base * (1.0 + attacker.second_resource)
+			var recoil_pct := ab.recoil_base
 			var recoil := maxi(int(round(total_dealt * recoil_pct)), 1)
 			# Unity binds recoil too: the backlash splits across the party.
 			if attacker.has_status("unity"):
@@ -1655,7 +1680,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	await _wait(0.45)
 	attacker.return_to_idle()
 	if not is_counter:
-		attacker.next_time += ab.delay * 100.0 / attacker.effective_speed()
+		var eff_delay := ab.delay
+		if grade == "perfect" and ab.display_name == "Mana Shield":
+			eff_delay = 1.5
+		attacker.next_time += eff_delay * 100.0 / attacker.effective_speed()
 
 
 func _apply_status(target: BattleUnit, id: String, turns: int, power := 0) -> void:
@@ -1747,10 +1775,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"shieldwall":
 			_sfx("parry", -7.0, 0.5)
 			for h in heroes.filter(func(he): return not he.dead):
-				_apply_status(h, "shieldwall", 1)
-				if is_perfect:
-					h.pressure = maxi(h.pressure - 20, 0)
-					h.refresh_bars()
+				_apply_status(h, "shieldwall", 3 if is_perfect else 2)
 			_message("%s raises the shieldwall!" % attacker.unit_name)
 			_log("%s: Shieldwall — party takes half damage" % attacker.unit_name, "#70d878")
 		"quickdraw":
@@ -1830,6 +1855,22 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s shatters %s's mind!" % [attacker.unit_name, target.unit_name])
 			_log("%s: Mind Flay — %s turns on its allies" % [attacker.unit_name,
 				target.unit_name], "#c070e0")
+		"rampage":
+			var total_bleed := 0
+			for e in enemies:
+				if not e.dead:
+					total_bleed += e.bleed_buildup
+			var pct := total_bleed / 10 + (10 if is_perfect else 0)
+			_sfx("crit", -8.0, 0.7)
+			_apply_status(attacker, "rampage", 2, pct)
+			_message("%s scents the blood!" % attacker.unit_name)
+			_log("%s: Rampage — +%d%% damage from the enemy party's wounds" % [
+				attacker.unit_name, pct], "#70d878")
+		"mana_shield":
+			_sfx("parry", -8.0, 1.2)
+			_apply_status(attacker, "mana_shield", 3)
+			_message("%s weaves a shield of mana" % attacker.unit_name)
+			_log("%s: Mana Shield — damage feeds Mana" % attacker.unit_name, "#70d878")
 		"tripwire":
 			_sfx("click", -8.0, 0.8)
 			_apply_status(attacker, "tripwire", 6 if is_perfect else 5)
@@ -1906,9 +1947,9 @@ func _companion_strike(comp: BattleUnit, victim: BattleUnit, mult: float,
 			if not others.is_empty():
 				await _companion_hit(comp, others.pick_random(), 10.0 * mult, int(20 * mult))
 		"canis":
-			await _companion_hit(comp, victim, 15.0 * mult, 0)
+			await _companion_hit(comp, victim, 20.0 * mult, 0)
 			if not victim.dead and randf() < proc_chance:
-				_add_bleed_with_burst(victim, 30 if boosted else 15)
+				_add_bleed_with_burst(victim, 40 if boosted else 20)
 		"aguila":
 			await _companion_hit(comp, victim, 15.0 * mult, 0)
 			if not victim.dead and randf() < proc_chance:
@@ -1972,6 +2013,12 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int) -> void:
 						_log("† %s dies" % h.unit_name, "#e05050")
 		var bleed_result: Dictionary = victim.take_hit(bleed_dmg, 0)
 		victim.float_text("BLEEDOUT %d" % bleed_dmg, Color(0.9, 0.15, 0.2), true)
+		if not victim.is_hero:
+			for feaster in heroes:
+				if not feaster.dead and feaster.bloodcraze > 0:
+					feaster.heal_amount(30)
+					feaster.float_text("+30 Bloodcraze", Color(0.85, 0.3, 0.3))
+					_log("   → Bloodcraze: %s feasts (+30 HP)" % feaster.unit_name, "#b0a8e0")
 		_sfx("crit", -5.0, 0.8)
 		_log("   → %s BLEEDS OUT for %d" % [victim.unit_name, bleed_dmg], "#e05050")
 		if bleed_result.died:
@@ -1992,6 +2039,11 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 			attacker.refresh_bars()
 			attacker.float_text("+10 Rage", Color(1.0, 0.5, 0.4))
 			_log("   → %s gains +10 Rage" % attacker.unit_name, "#b0a8e0")
+		"rage5":
+			attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
+			attacker.refresh_bars()
+			attacker.float_text("+5 Rage", Color(1.0, 0.5, 0.4))
+			_log("   → %s gains +5 Rage" % attacker.unit_name, "#b0a8e0")
 		"focus":
 			attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
 			attacker.refresh_bars()

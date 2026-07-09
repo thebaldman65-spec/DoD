@@ -15,8 +15,6 @@ const POOL := {
 		"desc": "The party heals 10% after every victory."},
 	"coin": {"name": "Gravewrought Coin",
 		"desc": "Begin each run with +80 gold."},
-	"eidolon": {"name": "Eidolon Mirror",
-		"desc": "Warriors enter every battle with 25 Rage already burning."},
 	"emberheart": {"name": "Emberheart",
 		"desc": "Fire and Holy damage +20%."},
 }
@@ -33,7 +31,8 @@ static func load_data() -> void:
 		var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
 		var data: Variant = JSON.parse_string(file.get_as_text())
 		if data is Array:
-			unlocked = data
+			# Drop relics that no longer exist in the pool (e.g. Eidolon Mirror).
+			unlocked = data.filter(func(id): return POOL.has(id))
 
 
 static func save_data() -> void:

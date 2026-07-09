@@ -9,37 +9,56 @@ class_name Talents
 const SLOTS_PER_TIER := 2
 const MAX_TIER := 6
 
-const POOLS := {
-	# Berserker (Ramp): bleeds, self-sustain, and sweeping damage that
-	# snowballs as the fight (and his HP) goes long.
+# FIXED trees designed in the RPG Skill Tree Generator (source JSON kept in
+# data/). Gating is cumulative: Tier 2 needs 5 points in Tier 1; Tier 3 needs
+# 10 points across Tiers 1-2. All nodes carry gate = "cumulative".
+const CUMULATIVE_REQ := {1: 0, 2: 5, 3: 10}
+
+const FIXED_TREES := {
 	"berserker": [
-		{"id": "b1", "tier": 1, "ranks": 3, "requires": "", "name": "Thick Blood",
-			"desc": "+12 max HP per rank — more room for Blood Frenzy to ramp.",
-			"payload": {"stat": {"max_hp": 12}}},
-		{"id": "b2", "tier": 2, "ranks": 2, "requires": "", "name": "Sharpened Rage",
-			"desc": "Strike deals +4 damage per rank.",
-			"payload": {"ability": "Strike", "add": {"damage": 4}}},
-		{"id": "b3", "tier": 2, "ranks": 2, "requires": "", "name": "Butcher's Rhythm",
-			"desc": "Hack and Slash deals +2 damage per hit per rank.",
-			"payload": {"ability": "Hack and Slash", "add": {"damage": 2}}},
-		{"id": "b4", "tier": 3, "ranks": 2, "requires": "b1", "name": "Iron Fury",
-			"desc": "+16 Constitution per rank.", "payload": {"stat": {"constitution": 16}}},
-		{"id": "b5", "tier": 4, "ranks": 2, "requires": "b2", "name": "Deep Wounds",
-			"desc": "Wildstrikes builds +10 more Bleed per rank.",
-			"payload": {"ability": "Wildstrikes", "add": {"bleed_build": 10}}},
-		{"id": "b6", "tier": 5, "ranks": 1, "requires": "b5", "name": "Rampage",
-			"desc": "New ability: brutal 40-damage strike (30 Rage).",
-			"payload": {"new_ability": {"display_name": "Rampage", "cost": 30, "damage": 40,
-				"pressure": 24, "delay": 4.0, "anim": "attack02", "resource_gain": 10,
-				"perfect_id": "pressure", "perfect_text": "+60% Pressure",
-				"description": "A reckless, devastating blow.\nBuilds 10 Rage."}}},
-		{"id": "b7", "tier": 4, "ranks": 2, "requires": "", "name": "Bloodbath",
-			"desc": "Wildstrikes deals +4 damage per rank.",
-			"payload": {"ability": "Wildstrikes", "add": {"damage": 4}}},
-		{"id": "b8", "tier": 6, "ranks": 1, "requires": "b3", "name": "Deeper Thirst",
-			"desc": "Bloodlust heals 45% of missing HP.",
-			"payload": {"ability": "Bloodlust", "set": {"heal_missing": 0.45}}},
+		{"id": "bz1", "tier": 1, "ranks": 3, "requires": "", "gate": "cumulative",
+			"name": "Savagery",
+			"desc": "All bleed-building Berserker abilities build +2 more Bleed per rank.",
+			"payload": {"stat": {"bleed_bonus": 2}}},
+		{"id": "bz2", "tier": 1, "ranks": 3, "requires": "", "gate": "cumulative",
+			"name": "Bloodthirsty",
+			"desc": "Blood Frenzy's damage bonus grows by +3% per rank (max 40% -> 49%).",
+			"payload": {"stat": {"bloodrage_bonus": 0.03}}},
+		{"id": "bz3", "tier": 1, "ranks": 3, "requires": "", "gate": "cumulative",
+			"name": "Vitality",
+			"desc": "+5% max HP per rank.",
+			"payload": {"stat": {"max_hp_pct": 0.05}}},
+		{"id": "bz4", "tier": 2, "ranks": 3, "requires": "", "gate": "cumulative",
+			"name": "Crushing Force",
+			"desc": "The Berserker's attacks ignore 5% of the target's armor per rank.",
+			"payload": {"stat": {"pierce_bonus": 0.05}}},
+		{"id": "bz5", "tier": 2, "ranks": 1, "requires": "", "gate": "cumulative",
+			"name": "Rampage",
+			"desc": "New ability: +1% damage per 10 Bleed buildup on the enemy party, for 1 turn (20 Rage).",
+			"payload": {"new_ability": {"display_name": "Rampage", "cost": 20,
+				"special": "rampage", "delay": 2.0, "anim": "attack03",
+				"perfect_id": "", "perfect_text": "+10% more damage",
+				"description": "Scent the blood: +1% damage per 10 Bleed\nbuildup on the enemy party. Lasts 1 turn."}}},
+		{"id": "bz6", "tier": 2, "ranks": 3, "requires": "", "gate": "cumulative",
+			"name": "Reckless Fury",
+			"desc": "+5% damage dealt AND +5% damage taken per rank.",
+			"payload": {"stat": {"dmg_bonus": 0.05, "dmg_taken_bonus": 0.05}}},
+		{"id": "bz7", "tier": 3, "ranks": 1, "requires": "", "gate": "cumulative",
+			"name": "Bloodlust",
+			"desc": "Hack and Slash strikes an extra time.",
+			"payload": {"ability": "Hack and Slash", "add": {"multi_hits": 1}}},
+		{"id": "bz8", "tier": 3, "ranks": 1, "requires": "", "gate": "cumulative",
+			"name": "Bloodcraze",
+			"desc": "When an enemy bleeds out, the Berserker heals 30 HP.",
+			"payload": {"stat": {"bloodcraze": 1}}},
+		{"id": "bz9", "tier": 3, "ranks": 3, "requires": "", "gate": "cumulative",
+			"name": "Enraged",
+			"desc": "Each hit the Berserker takes grants +1% damage per rank; fades after 2 unhurt turns.",
+			"payload": {"stat": {"enraged_ranks": 1}}},
 	],
+}
+
+const POOLS := {
 	# Warden (Tank): armor, Constitution, and a bigger taunt-and-wall toolkit.
 	"warden": [
 		{"id": "w1", "tier": 1, "ranks": 3, "requires": "", "name": "Iron Skin",
@@ -145,7 +164,7 @@ const POOLS := {
 			"desc": "New ability: 20 frost damage, shoves the target far down the initiative order (30 Mana).",
 			"payload": {"new_ability": {"display_name": "Absolute Zero", "dmg_type": "frost",
 				"cost": 30, "damage": 20, "pressure": 16, "delay": 3.5, "anim": "attack02",
-				"delay_push": 6.0, "applies_status": {"id": "slow", "turns": 3},
+				"delay_push": 6.0, "applies_status": {"id": "chilled", "turns": 3},
 				"perfect_id": "", "perfect_text": "Also +50% Pressure",
 				"description": "Entomb them in ice and time."}}},
 		{"id": "c7", "tier": 4, "ranks": 2, "requires": "c3", "name": "Glacier Mind",
@@ -372,6 +391,8 @@ const FILLER_MANA := ["max_resource", "+%d max Mana per rank", 6]
 # Builds this run's tree for a spec: per tier, shuffle the signature pool,
 # take up to SLOTS_PER_TIER, pad with generic training talents.
 static func generate_tree(spec: String, class_key: String) -> Array:
+	if FIXED_TREES.has(spec):
+		return FIXED_TREES[spec].duplicate(true)
 	var tree_nodes: Array = []
 	var pool: Array = POOLS.get(spec, [])
 	for tier in range(1, MAX_TIER + 1):
@@ -425,9 +446,25 @@ static func can_learn(tree_nodes: Array, id: String, learned: Dictionary) -> Dic
 		return {"ok": false, "why": "Unknown"}
 	if int(learned.get(id, 0)) >= int(t["ranks"]):
 		return {"ok": false, "why": "Maxed"}
+	if t.get("gate", "") == "cumulative":
+		# Fixed trees: Tier 2 needs 5 pts in Tier 1; Tier 3 needs 10 in 1-2.
+		var tier := int(t["tier"])
+		var need := int(CUMULATIVE_REQ.get(tier, 0))
+		if points_below_tier(tree_nodes, learned, tier) < need:
+			return {"ok": false, "why": "Locked: %d pts in Tiers 1-%d" % [need, tier - 1]}
+		return {"ok": true, "why": ""}
 	if not tier_unlocked(int(t["tier"]), learned):
 		return {"ok": false, "why": "Locked: %d pts spent" % [(int(t["tier"]) - 1) * 2]}
 	return {"ok": true, "why": ""}
+
+
+# Points spent in tiers strictly below `tier` (cumulative gating).
+static func points_below_tier(tree_nodes: Array, learned: Dictionary, tier: int) -> int:
+	var total := 0
+	for t in tree_nodes:
+		if int(t["tier"]) < tier:
+			total += int(learned.get(t["id"], 0))
+	return total
 
 
 # Applies a generated tree's learned talents onto a hero config.

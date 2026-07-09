@@ -45,6 +45,15 @@ var companion_kind := ""    # "ursus" / "canis" / "aguila"
 var companion: BattleUnit   # the Beastmaster's active summon (on the hunter)
 var companion_hp_bonus := 0   # talents: extra HP for summoned companions
 var companion_power := 0      # talents: extra damage on companion attacks
+# Berserker fixed-tree talent stats.
+var bleed_bonus := 0          # Savagery: extra Bleed on bleed-building abilities
+var bloodrage_bonus := 0.0    # Bloodthirsty: widens Blood Frenzy's max bonus
+var pierce_bonus := 0.0       # Crushing Force: attacks ignore extra armor
+var dmg_taken_bonus := 0.0    # Reckless Fury: takes more damage
+var enraged_ranks := 0        # Enraged: +1%/rank damage per hit taken
+var enraged_stacks := 0       # current Enraged bonus (%); resets when unhurt
+var turns_since_damaged := 0
+var bloodcraze := 0           # heals 30 when an enemy bleeds out
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
@@ -341,8 +350,11 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 				s.power = maxi(s.power, power)
 			_refresh_chips()
 			return
-	statuses.append({"id": id, "label": label, "short": short, "color": color,
-		"turns": turns, "desc": desc, "power": power, "stacks": 1})
+	var entry := {"id": id, "label": label, "short": short, "color": color,
+		"turns": turns, "desc": desc, "power": power, "stacks": 1}
+	if id == "poison":
+		entry["fresh"] = true  # no tick on the turn it lands
+	statuses.append(entry)
 	float_text(label, color)
 	_refresh_chips()
 
@@ -350,6 +362,13 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 func remove_status(id: String) -> void:
 	statuses = statuses.filter(func(s): return s.id != id)
 	_refresh_chips()
+
+
+func get_status(id: String) -> Dictionary:
+	for s in statuses:
+		if s.id == id:
+			return s
+	return {}
 
 
 func has_status(id: String) -> bool:
@@ -410,7 +429,7 @@ func tick_statuses() -> void:
 
 
 func effective_speed() -> float:
-	var s := speed * (0.75 if has_status("slow") else 1.0)
+	var s := speed * (0.75 if (has_status("slow") or has_status("chilled")) else 1.0)
 	if has_status("quickdraw"):
 		s *= 1.5
 	return s
@@ -503,6 +522,14 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	hp = maxi(hp - amount, 0)
 	if resource_name == "Rage":
 		resource = mini(resource + 10, max_resource)
+	if enraged_ranks > 0 and amount > 0:
+		enraged_stacks += enraged_ranks
+		turns_since_damaged = 0
+	# Mana Shield: half the pain flows back as Mana.
+	if has_status("mana_shield") and resource_name == "Mana" and amount > 0:
+		var converted := maxi(int(amount * 0.5), 1)
+		resource = mini(resource + converted, max_resource)
+		float_text("+%d Mana" % converted, Color(0.5, 0.7, 1.0))
 	# Constitution: break resistance (100 = neutral; higher takes less Pressure).
 	pressure_add = int(round(pressure_add * 100.0 / maxf(constitution, 1.0)))
 	if has_status("ward"):

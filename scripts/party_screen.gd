@@ -106,6 +106,7 @@ func _draw_detail() -> void:
 	for rune in member.get("runes", []):
 		if rune.get("equipped", false):
 			Talents.apply_payload(cfg, rune["payload"], 1)
+	cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
 	var spec_label: String = Classes.SPEC_INFO[spec]["name"] if spec != "" else "Unawakened"
 	_title("%s — %s" % [cfg["unit_name"], spec_label], 20, 34)
 
@@ -174,7 +175,7 @@ func _draw_detail() -> void:
 		chip.add_child(chip_label)
 		var tip := ab.description
 		if ab.damage > 0:
-			tip += "\nDamage: %d–%d (%s)   Pressure: %d" % [int(ab.damage * 0.9),
+			tip += "\nDamage: %d–%d (%s)   BD: %d" % [int(ab.damage * 0.9),
 				int(round(ab.damage * 1.1)), ab.dmg_type.capitalize(), ab.pressure]
 		if ab.heal > 0:
 			tip += "\nHeals: %d" % ab.heal
@@ -214,10 +215,12 @@ func _draw_detail() -> void:
 		toggle.pressed.connect(_toggle_rune.bind(i))
 		add_child(toggle)
 		var rune_label := Label.new()
-		rune_label.text = "%s — %s" % [rune["name"], rune["desc"]]
+		var equip_tag := "✦ " if rune.get("equipped", false) else ""
+		rune_label.text = "%s%s — %s" % [equip_tag, rune["name"], rune["desc"]]
 		rune_label.add_theme_font_size_override("font_size", 12)
 		rune_label.add_theme_color_override("font_color",
-			rune.get("rarity_color", Color(0.8, 0.8, 0.8)))
+			Color(0.45, 0.9, 0.5) if rune.get("equipped", false)
+			else rune.get("rarity_color", Color(0.8, 0.8, 0.8)))
 		rune_label.position = Vector2(150, 550 + i * 34)
 		rune_label.size = Vector2(330, 20)
 		add_child(rune_label)
@@ -239,14 +242,20 @@ func _draw_detail() -> void:
 	var learned: Dictionary = member.get("talents", {})
 	var points: int = member.get("talent_points", 0)
 	var tree: Array = member.get("tree", [])
+	# Fixed (designed) trees are three columns wide; generated trees stay two.
+	var is_fixed: bool = tree.any(func(t): return t.get("gate", "") == "cumulative")
+	var col_w := (252 if is_fixed else 380)
+	var panel_w := (244 if is_fixed else 372)
+	var row_h := (142 if is_fixed else 96)
+	var panel_h := (130 if is_fixed else 88)
 	var tier_counts := {}
 	for talent in tree:
 		var tier: int = talent["tier"]
 		var idx_in_tier: int = tier_counts.get(tier, 0)
 		tier_counts[tier] = idx_in_tier + 1
 		var panel := PanelContainer.new()
-		panel.position = Vector2(505 + idx_in_tier * 380, 106 + (tier - 1) * 96)
-		panel.custom_minimum_size = Vector2(372, 88)
+		panel.position = Vector2(505 + idx_in_tier * col_w, 106 + (tier - 1) * row_h)
+		panel.custom_minimum_size = Vector2(panel_w, panel_h)
 		add_child(panel)
 		var vbox := VBoxContainer.new()
 		vbox.add_theme_constant_override("separation", 2)
@@ -257,7 +266,7 @@ func _draw_detail() -> void:
 			ranks_have, talent["ranks"], talent["desc"]]
 		label.add_theme_font_size_override("font_size", 10)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.custom_minimum_size = Vector2(356, 0)
+		label.custom_minimum_size = Vector2(panel_w - 16, 0)
 		vbox.add_child(label)
 		var learn := Button.new()
 		learn.custom_minimum_size = Vector2(120, 22)

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Dawn of Decay — Changelog</title></head>
+<body>
+<h1>DAWN OF DECAY — Changelog</h1>
+<p><i>Newest first. The Master Document holds current truth; this records what changed and
+when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
+
+<h2>2026-07-09 — Batch 1: fixes, tuning pass, Mana Shield, Berserker tree</h2>
+<ul>
+<li><b>Fixes:</b> every skill check can now be cancelled, including after picking a target
+(the "healing wave" case); enemy targeting spreads out — 40% chance to hunt the weakest
+(was 65%), so the Mage stops eating every hit; rune equip logic was verified working across
+multiple heroes simultaneously (data + save round-trip tested) — equipped runes now show a
+green ✦ marker for clarity; Poison no longer ticks on the turn it lands; the Cryomancer's
+Chilled is now its own status separate from generic Slowed (same −25% speed); Eidolon Mirror
+removed from the relic pool (existing saves drop it safely).</li>
+<li><b>Balance:</b> all enemies +15% HP (Raider 132, Archer 104, Chief 242, bosses 368);
+Cripple now −25% damage (was −15%).</li>
+<li><b>Terminology:</b> damage against the Break meter is now <b>Break damage (BD)</b> in all
+tooltips and documentation.</li>
+<li><b>Ability tuning:</b> Overpower 15 base damage (still +0.5 per point of target Break),
+Perfect gives +5 Rage; Crushing Blow 20 BD, Perfect +5 BD; Flame Surge 15 damage / 10 BD /
+3.0 int, no longer applies Burn, Perfect +15 damage to already-Burning enemies; Echo now
+strikes at 25% power (was 50%); Arcane Cannon 15 BD, recoil is a flat 15% of damage dealt
+(no per-stack scaling), Perfect +5 BD; Quick Shot and Powershot lose their +10 Focus
+perfects; Barbed Arrow and Poisoned Arrow 15 BD / 2.5 int; Aimed Shot 45 damage / 15 BD /
+3.0 int, Perfect +25% crit; Powershot 3.0 int with plainer wording; Mocking Blow 20 damage /
+15 BD / 2.0 int, builds 20 Rage, taunts the target AND one other enemy for 4 turns (Perfect
+5); Shieldwall 3.0 int, party takes 25% less damage for 2 turns (Perfect 3); Summon Canis
+20 damage / 20 Bleed; Tripwire tooltip simplified; Shrapnel renamed <b>Shrapnel Charge</b> —
+20 damage / 25 BD, applies Slowed (not Chilled).</li>
+<li><b>New — Mana Shield</b> (Mage core, replacing Arcane Surge): 15 Mana, 2.0 int, for 3
+turns 50% of damage the Mage takes converts into Mana; Perfect casts at 1.5 int. Arcane Surge
+and Reality Fracture are vaulted (removed from kits, definitions kept for later).</li>
+<li><b>Berserker talent tree v2</b> — built from the RPG Skill Tree Generator export
+(data/berserker_tree.json): a fixed 3×3 tree. Tier 1: Savagery (+2 Bleed on bleed abilities
+/rank ×3), Bloodthirsty (Blood Frenzy +3%/rank ×3), Vitality (+5% max HP/rank ×3). Tier 2:
+Crushing Force (ignore 5% armor/rank ×3), Rampage (new ability: +1% damage per 10 Bleed
+buildup on the enemy party for 1 turn, 20 Rage), Reckless Fury (+5% damage dealt AND taken
+/rank ×3). Tier 3: Bloodlust (Hack and Slash strikes an extra time), Bloodcraze (heal 30
+when an enemy bleeds out), Enraged (+1%/rank damage per hit taken, fades after 2 unhurt
+turns ×3). <b>Gating:</b> Tier 2 unlocks at 5 points in Tier 1; Tier 3 at 10 points across
+Tiers 1–2. The party screen renders fixed trees three columns wide.</li>
+<li><b>Docs:</b> Master Document converted through a new build script that unwraps
+paragraphs (fixes the strange spacing in Word); this changelog created alongside it.</li>
+</ul>
+</body></html>

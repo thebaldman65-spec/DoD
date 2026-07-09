@@ -8,9 +8,11 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 ## Working agreement (user's standing rules)
 - User is a beginner coder: explain plainly; Claude writes all code; user is
   the designer + playtester. Iterate on their feedback each session.
-- EVERY design change: update `docs/master.html` — the ONLY maintained design
-  doc — and bump its "Last updated" timestamp in the top corner, then
-  `textutil -convert docx -output "/Users/zipples/Documents/DoD/DoD Master Document.docx" docs/master.html`
+- EVERY design change: (1) update `docs/master.html` (current truth) and bump
+  its "Last updated" timestamp; (2) add an entry to `docs/changelog.html`
+  (newest first); (3) rebuild both docx via `python3 docs/build_docs.py`
+  (unwraps paragraphs — plain textutil makes Word spacing weird).
+- Terminology: damage against the Break meter = "Break damage (BD)" everywhere.
 - `docs/addendum.html` is RETIRED (frozen history; do not update it).
 - User drops new assets in `../imported files/` — always check there.
   New character sprites need the Soldier format: 100x100 frame strips named
