@@ -135,6 +135,9 @@ func _choose(idx: int, spec_id: String) -> void:
 # node map appears (map music waits for the tune to finish).
 func _finish_and_fade() -> void:
 	Run.specs_chosen = true
+	# Persist immediately: without this, quitting before the next node made
+	# Continue resurrect the old specs and talent trees.
+	Run.save_run()
 	Music.play_intro_then("boss_intro", "map")
 	var fade := ColorRect.new()
 	fade.size = Vector2(1280, 720)

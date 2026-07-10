@@ -294,7 +294,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Death Ray", "dmg_type": "arcane", "cost": 0, "damage": 150,
 					"pressure": 100, "delay": 8.0, "anim": "attack03",
 					"perfect_id": "mana15", "perfect_text": "Restores 15 Mana",
-					"description": "Annihilation given form: benefits from\nResonance, then CONSUMES every stack."}),
+					"description": "The stored storm, released: requires\n5 Arcane Resonance and CONSUMES all of\nit. Fixed 150 damage payoff."}),
 				Ability.make({"display_name": "Arcane Barrage", "dmg_type": "arcane", "cost": 25, "damage": 5,
 					"pressure": 4, "delay": 3.5, "anim": "attack03", "random_hits": 6,
 					"perfect_id": "", "perfect_text": "Fires a 7th bolt",

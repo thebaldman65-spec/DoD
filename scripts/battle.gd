@@ -126,7 +126,7 @@ func _ready() -> void:
 	_build_ui()
 	_build_sfx_pool()
 	_spawn_units()
-	if OS.get_environment("DOD_DEBUG") == "1" and not autoplay:
+	if Run.debug_enabled() and not autoplay:
 		_build_debug_panel()
 	if not sim:
 		# Boss fights open with the entry tune, capped so the battle track
@@ -875,7 +875,7 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if flame != null and u.resource >= flame.cost and foes.size() >= 2:
 				return [flame, target_foe]
 			var dray := _find_ability(u, "Death Ray")
-			if dray != null and u.second_resource >= 4:
+			if dray != null and u.second_resource >= 5:
 				return [dray, target_foe]
 			var barrage := _find_ability(u, "Arcane Barrage")
 			if barrage != null and u.resource >= barrage.cost and foes.size() >= 2:
@@ -1097,6 +1097,9 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel) -> But
 	if ab.special == "kill_command" and (u.companion == null or u.companion.dead):
 		unusable = true
 		ab_btn.tooltip_text += "\n(No living companion)"
+	if ab.display_name == "Death Ray" and u.second_resource < 5:
+		unusable = true
+		ab_btn.tooltip_text += "\n(Requires 5 Arcane Resonance)"
 	ab_btn.disabled = unusable
 	ab_btn.pressed.connect(_on_popup_ability.bind(popup, ab))
 	ab_btn.mouse_entered.connect(_preview_delay.bind(u, ab))
@@ -1147,7 +1150,7 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 	var tip := ab.description
 	if ab.damage > 0:
 		var buff_mult := 1.0
-		if u.second_resource_name == "Resonance":
+		if u.second_resource_name == "Resonance" and ab.display_name != "Death Ray":
 			buff_mult *= 1.0 + 0.15 * u.second_resource
 		if u.has_status("surge"):
 			buff_mult *= 1.2
@@ -1438,7 +1441,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if is_crit:
 				raw *= 2.0 if attacker.passive_id == "lethal_aim" else 1.5
 			# Attacker-side modifiers.
-			if attacker.second_resource_name == "Resonance":
+			if attacker.second_resource_name == "Resonance" \
+					and ab.display_name != "Death Ray":
 				raw *= 1.0 + 0.15 * attacker.second_resource
 			if attacker.has_status("surge"):
 				raw *= 1.2

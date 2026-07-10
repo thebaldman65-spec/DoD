@@ -49,6 +49,12 @@ const HERO_BASE := {
 }
 
 
+# Debug tooling is always available in dev (unexported) builds; exported
+# builds need DOD_DEBUG=1 explicitly.
+func debug_enabled() -> bool:
+	return OS.is_debug_build() or OS.get_environment("DOD_DEBUG") == "1"
+
+
 func relic_active(id: String) -> bool:
 	return active_relics.has(id)
 
@@ -271,6 +277,21 @@ func load_run() -> bool:
 	if not (data is Dictionary):
 		return false
 	party = data["party"]
+	# Migrate members whose spec now uses a designed (fixed) tree but whose
+	# save still carries an old generated one: refund the points, swap trees.
+	for member in party:
+		var spec: String = member.get("spec", "")
+		if spec != "" and Talents.FIXED_TREES.has(spec):
+			var tree: Array = member.get("tree", [])
+			var is_fixed: bool = tree.any(func(t): return t.get("gate", "") == "cumulative")
+			if not is_fixed:
+				var learned: Dictionary = member.get("talents", {})
+				var refund := 0
+				for id in learned:
+					refund += int(learned[id])
+				member["talent_points"] = member.get("talent_points", 0) + refund
+				member["talents"] = {}
+				member["tree"] = Talents.generate_tree(spec, member["key"])
 	items = data["items"]
 	gold = data["gold"]
 	zone_idx = data["zone_idx"]

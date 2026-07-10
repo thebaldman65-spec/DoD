@@ -34,8 +34,10 @@ blurb, passive, and full ability details. The choice is permanent for the run.</
 <li><b>Victory rewards:</b> gold + talent points for every hero. Fallen heroes return after a
 won battle at 20% max HP ("the Untouched refuse to stay down").</li>
 <li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft.</li>
-<li><b>Saving:</b> auto-save to user://run_save.bin after every completed node; Continue
-resumes at the map. Run end (win or wipe) clears the save.</li>
+<li><b>Saving:</b> auto-save to user://run_save.bin after every completed node AND after
+spec confirmation (including debug rerolls); Continue resumes at the map. Loading migrates
+members to newer fixed talent trees (points refunded) when a save predates them. Run end
+(win or wipe) clears the save.</li>
 </ul>
 
 <h2>3. Zones &amp; the Node Map</h2>
@@ -302,8 +304,9 @@ Blizzard — 30 Mana, 15 frost to ALL / 12 BD / 4.0 + Chilled 2 turns (Perfect: 
 BD).</li>
 <li><b>Arcanist (Ramp)</b> — Passive <i>Arcane Resonance</i> (the stack mechanic itself; see
 §5.1). The Echo passive is vaulted for future return.<br>
-Death Ray — free, 150 arcane / 100 BD / 8.0, benefits from Resonance then CONSUMES every
-stack (Perfect: restores 15 Mana).<br>
+Death Ray — free, 8.0 int; castable ONLY at 5 Resonance stacks. A fixed 150 arcane / 100 BD
+payoff (the stacks ARE the damage — the per-stack damage bonus does not double-dip), then
+every stack is consumed (Perfect: restores 15 Mana).<br>
 Arcane Cannon — 30 Mana, 30 arcane / 15 BD / 3.5, +7.5% DAMAGE per Resonance stack; recoil is
 a flat 15% of damage dealt (Perfect: +5 bonus BD). Unity splits the recoil across
 the party like any other damage.<br>
@@ -498,8 +501,8 @@ user://relics.json, user://settings.cfg.</li>
 (N max-speed battles + a stats report: win rate, damage shares, ability usage, roll rates),
 DOD_SIM_SPECS="berserker,cryomancer,inquisitor,beastmaster" (override the specs the bot
 plays — order: warrior, mage, cleric, hunter). Target ≈85% bot win rate.</li>
-<li><b>Testing shortcuts:</b> launch with DOD_DEBUG=1 to add a DEBUG section to the map
-burger menu — +200 gold, +3 talent points for everyone, full heal, jump to the boss tier,
+<li><b>Testing shortcuts:</b> debug tools are ALWAYS available in dev (unexported) builds;
+exported builds require DOD_DEBUG=1. The map burger menu gains a DEBUG section — +200 gold, +3 talent points for everyone, full heal, jump to the boss tier,
 advance to the next zone, and <b>Reroll Specs</b> (refunds spent talent points, clears all
 specs, and reopens the awakening screen). In battle, DOD_DEBUG=1 adds a DEBUG panel (under
 the combat log): Full Restore (HP/resources/secondary for the party) and per-hero "Turn →"

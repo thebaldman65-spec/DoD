@@ -5,6 +5,19 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-09 — Batch 3: spec-save fix, always-on dev debug, Death Ray gate</h2>
+<ul>
+<li><b>Fix — reroll reverting talents:</b> the run was never saved after spec confirmation,
+so quitting before completing another node made Continue resurrect the old specs and trees
+(this is what made the Berserker tree "revert"). Specs now save immediately on confirmation
+and on debug reroll, and loading migrates old saves to current fixed trees (points
+refunded).</li>
+<li><b>Fix — missing battle debug menu:</b> debug tools were gated behind the DOD_DEBUG env
+var, which was only set when launched from the assistant. They are now always available in
+dev (unexported) builds — exported releases still hide them.</li>
+<li><b>Death Ray:</b> castable only at 5 Arcane Resonance stacks (greyed out otherwise); its
+150 damage is a fixed payoff — the per-stack damage bonus no longer double-dips on it.</li>
+</ul>
 <h2>2026-07-09 — Batch 2: talent tree styling, battle debug panel, Arcanist identity</h2>
 <ul>
 <li><b>Talent tree restyled</b> to match the "Appearance example" reference: dark backdrop

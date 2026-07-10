@@ -116,8 +116,8 @@ func _draw_screen() -> void:
 	bpop.add_item("Restart Run", 0)
 	bpop.add_item("Quit to Main Menu", 1)
 	bpop.add_item("Quit to Desktop", 2)
-	# Testing shortcuts, only when launched with DOD_DEBUG=1.
-	if OS.get_environment("DOD_DEBUG") == "1":
+	# Testing shortcuts (always on in dev builds).
+	if Run.debug_enabled():
 		bpop.add_separator("DEBUG")
 		bpop.add_item("+200 Gold", 10)
 		bpop.add_item("+3 Talent Points (all)", 11)
@@ -242,6 +242,7 @@ func _on_burger(id: int) -> void:
 				member["talents"] = {}
 				member["tree"] = []
 			Run.specs_chosen = false
+			Run.save_run()
 			get_tree().change_scene_to_file("res://scenes/spec_choice.tscn")
 
 
