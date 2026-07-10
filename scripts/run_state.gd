@@ -157,22 +157,27 @@ func advance(f: int, i: int) -> void:
 	map[f][i]["visited"] = true
 
 
-# Enemy composition per node type (kinds resolved by battle.gd).
+# Enemy composition per node type (kinds resolved by battle.gd). Every
+# encounter fields 3-5 enemies with the types rolled at random; elites (the
+# Chief) only appear on elite nodes, and bosses only on the boss node.
+const BASIC_ENEMY_KINDS := ["raider", "archer", "shieldmaster", "shaman"]
+
+
 func compose(node_type: String) -> Array:
 	match node_type:
 		"elite":
-			return ["chief", "archer", "raider"] if zone_idx == 0 \
-				else ["chief", "raider", "raider", "archer", "archer"]
+			return ["chief"] + _random_basics(randi_range(2, 4))
 		"boss":
-			return ["boss", "raider", "archer"] if zone_idx == 0 \
-				else ["boss", "raider", "raider", "archer", "archer"]
+			return ["boss"] + _random_basics(randi_range(2, 4))
 		_:
-			var pools := [["raider", "raider", "archer"], ["raider", "archer", "archer"],
-				["raider", "raider", "archer", "archer"], ["raider", "raider", "raider", "archer"]]
-			if zone_idx >= 1:
-				pools.append(["raider", "raider", "raider", "archer", "archer"])
-				pools.append(["raider", "raider", "archer", "archer", "archer"])
-			return pools.pick_random()
+			return _random_basics(randi_range(3, 5))
+
+
+func _random_basics(count: int) -> Array:
+	var kinds: Array = []
+	for i in count:
+		kinds.append(BASIC_ENEMY_KINDS.pick_random())
+	return kinds
 
 
 func heal_party(pct: float) -> void:

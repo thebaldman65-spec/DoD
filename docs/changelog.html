@@ -5,6 +5,37 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-09 — Batch 4: new orcs, Warden rework, Dazed, encounter + combat rules</h2>
+<ul>
+<li><b>New enemy — Orc Shieldmaster (orange):</b> 150 HP / 25% armor / 85 speed /
+120 Constitution. Shielding wards one ally at a time (lowest HP first, itself included) with
+25% damage reduction for 3 turns — it ALWAYS re-casts when nobody holds the ward; otherwise
+Strike (28 physical / 20 BD). New "Shielded" status chip.</li>
+<li><b>New enemy — Orc Shaman (blue):</b> 110 HP / 1% armor / 100 speed / 80 Constitution,
+ranged. Lightning Bolt (35 nature / 20 BD) or Chain Lightning (15 nature + 15 BD to the whole
+party).</li>
+<li><b>Withered Warden reworked</b> (zone 1 boss, no longer a Chief stand-in): 500 HP / 35%
+armor / 75% nature resist / 80 speed / 150 Constitution. Timber Slam (60 nature / 30 BD +
+Dazed), Roots of Wrath (25 nature / 20 BD to the whole party + Poison), Wild Growth (heals
+the most wounded of its warband for 20% max HP; 60% chance when someone is under 70%).</li>
+<li><b>New status — Dazed:</b> attacks are 20% more likely to miss, 3 turns.</li>
+<li><b>Encounters:</b> every fight now fields 3–5 enemies with types rolled at random from
+the basic pool (Raider / Archer / Shieldmaster / Shaman). Elites (Chief) appear only on elite
+nodes, bosses only on the boss node (each brings 2–4 random basics).</li>
+<li><b>Combat rules:</b> enemy parry baseline is now <b>2.5%</b> (heroes stay at 5%);
+bleedout damage explicitly ignores armor; <b>Poison now counts as nature damage</b>, so
+nature resists shrink the ticks (the Warden barely feels it).</li>
+<li><b>Hero info screen:</b> each stat now explains itself when hovered (instead of one
+tooltip dumping every stat); the talent-point line left the stats block (the count already
+sits above the talent tree); the requirements text below the talent tree is gone (lock
+reasons still show on node tooltips).</li>
+<li><b>Battle debug panel:</b> per-hero "Turn →" buttons replaced by one <b>Hero Turn Now</b>
+button (the next turn goes to a hero regardless of order) plus an <b>Enemy attacks OFF</b>
+toggle (enemies skip their turns while checked). New DOD_SIM_ENEMIES env var forces the
+enemy lineup in test battles.</li>
+<li><b>Docs:</b> the Word exports (Master Document + Changelog) now build in Arial,
+size 14.</li>
+</ul>
 <h2>2026-07-09 — Batch 3: spec-save fix, always-on dev debug, Death Ray gate</h2>
 <ul>
 <li><b>Fix — reroll reverting talents:</b> the run was never saved after spec confirmation,

@@ -47,9 +47,9 @@ node per tier, so <b>10 nodes are interacted with before the boss</b>. Node comp
 fixed deck per zone:</p>
 <table border="1" cellpadding="4">
 <tr><th>Type</th><th>Count</th><th>Share</th><th>Effect</th></tr>
-<tr><td>Fight</td><td>18</td><td>60%</td><td>Battle vs. a zone encounter. Fights on tiers 6+
-have a 25% chance to spawn as an ELITE (tougher composition, double talent points, more
-gold).</td></tr>
+<tr><td>Fight</td><td>18</td><td>60%</td><td>Battle vs. 3–5 randomly-typed foes (see §9).
+Fights on tiers 6+ have a 25% chance to spawn as an ELITE (tougher composition, double talent
+points, more gold).</td></tr>
 <tr><td>Rest</td><td>6</td><td>20%</td><td>Party heals 30% max HP and Mage/Cleric recover 30%
 Mana at the waystone.</td></tr>
 <tr><td>Shop</td><td>6</td><td>20%</td><td>The Wandering Peddler: consumables + one rune offer
@@ -103,13 +103,14 @@ returns to the action bar with nothing spent. Enemies and the sim bot always act
 (×1.5; Sharpshooter passive ×2) × attacker modifiers × target modifiers × (1 − resist) ×
 (1 − effective armor), minimum 1.</p>
 <ul>
-<li><b>Miss:</b> 5% base chance (single-target, non-counter only). AoE never misses/parries.
-Multi-hit and random-hit attacks roll miss <i>per strike</i> — a missed hit never cancels the
-follow-up strikes.</li>
-<li><b>Parry:</b> 5% base + parry bonuses; negated hit and the defender counters with their
-basic attack as a free action (no initiative cost, cannot chain). Broken units cannot parry.
-Multi-hit attacks roll parry per strike; each parried strike triggers a counter, and the
-remaining strikes still land (unless the counter kills the attacker).</li>
+<li><b>Miss:</b> 5% base chance (single-target, non-counter only); a <b>Dazed</b> attacker is
+20% more likely to miss. AoE never misses/parries. Multi-hit and random-hit attacks roll miss
+<i>per strike</i> — a missed hit never cancels the follow-up strikes.</li>
+<li><b>Parry:</b> baseline is split by side — <b>heroes parry at 5%, enemies at 2.5%</b> —
+plus parry bonuses (talents, Parry Up). A parry negates the hit and the defender counters with
+their basic attack as a free action (no initiative cost, cannot chain). Broken units cannot
+parry. Multi-hit attacks roll parry per strike; each parried strike triggers a counter, and
+the remaining strikes still land (unless the counter kills the attacker).</li>
 <li><b>Crit:</b> 10% base + 25% vs Broken targets + 3% per Mage Resonance stack + talent/spec
 bonuses (+15% with Aguila summoned). Guaranteed: Razor Ice vs Chilled. Resonance builds
 only on the Mage's own casts — parry counters do not grant stacks.</li>
@@ -145,12 +146,14 @@ After the lost turn, the Break meter resets to 0. Ward halves incoming BD; Devot
 <ul>
 <li><b>Bleed</b> is a 0–100 buildup meter (chip shows Bl##). Wounding attacks add buildup
 (Wildstrikes 35 always; Hack and Slash 20 at 40% per hit). At 100 the target <b>bleeds out for
-20% max HP</b> and the meter resets.</li>
+20% max HP</b> and the meter resets. <b>Bleedout damage ignores armor</b> entirely.</li>
 <li><b>Burn:</b> 6 damage at the start of the afflicted unit's turn; ticks can crit using the
 caster's snapshotted crit chance.</li>
-<li><b>Poison:</b> 3 damage per stack at the start of the afflicted unit's turn. Stacks
-additively with no cap; every new application adds a stack AND refreshes the timer. Applied by
-Orc Archers' Poison Arrow (3 turns) and the Survivalist's Trapper passive (5 turns).</li>
+<li><b>Poison:</b> 3 damage per stack at the start of the afflicted unit's turn.
+<b>Poison counts as nature damage</b> — nature resists reduce the tick (and nature
+vulnerability raises it). Stacks additively with no cap; every new application adds a stack
+AND refreshes the timer. Applied by Orc Archers' Poison Arrow (3 turns), the Withered Warden's
+Roots of Wrath (3 turns), and the Survivalist's Trapper passive (5 turns).</li>
 <li><b>Renewal</b> +8 HP and <b>Focus (status)</b> +10 Mana at turn start.</li>
 </ul>
 <h3>4.6 Status effects (current roster)</h3>
@@ -159,9 +162,13 @@ Orc Archers' Poison Arrow (3 turns) and the Survivalist's Trapper passive (5 tur
 <tr><td>Chilled</td><td>−25% speed (Cryomancer-only frost).</td></tr>
 <tr><td>Slowed</td><td>−25% speed (generic; e.g. Shrapnel Charge).</td></tr>
 <tr><td>Burn</td><td>6 damage at the start of each turn.</td></tr>
-<tr><td>Poison</td><td>3 damage per stack each turn; stacks additively, new stacks refresh
-the timer. Never ticks on the turn it lands.</td></tr>
-<tr><td>Bleed</td><td>Buildup meter; bleeds out for 20% max HP at 100.</td></tr>
+<tr><td>Poison</td><td>3 nature damage per stack each turn (nature resists apply); stacks
+additively, new stacks refresh the timer. Never ticks on the turn it lands.</td></tr>
+<tr><td>Bleed</td><td>Buildup meter; bleeds out for 20% max HP at 100 (ignores
+armor).</td></tr>
+<tr><td>Dazed</td><td>Attacks are 20% more likely to miss (3 turns; Timber Slam).</td></tr>
+<tr><td>Shielded</td><td>Takes 25% less damage — the Orc Shieldmaster's single-ally
+ward.</td></tr>
 <tr><td>Sunder</td><td>−35% armor.</td></tr>
 <tr><td>Ward</td><td>Takes 50% less BD.</td></tr>
 <tr><td>Fortify</td><td>+10% armor (Defense Potion).</td></tr>
@@ -195,8 +202,13 @@ Mana Potion: +40 Mana/Rage. Revive Potion: fallen ally returns at 50% HP. Defens
 party gains Fortify (3 turns).</p>
 <h3>4.8 Enemy AI</h3>
 <p>Enemies hunt the most wounded hero 40% of the time and pick randomly otherwise (they no
-longer pile onto the squishiest target relentlessly); if any hero is Broken they exploit it with their hardest affordable hit. Mocked enemies must attack the
-taunting Warrior. The Chief/Bosses build and spend Rage like a Warrior.</p>
+longer pile onto the squishiest target relentlessly); if any hero is Broken they exploit it
+with their hardest affordable hit. Mocked enemies must attack the taunting Warrior — a taunt
+also overrides support casts. <b>Support behaviors run before attacks:</b> the Orc
+Shieldmaster ALWAYS casts Shielding when no ally carries its ward (lowest-HP ally first,
+itself included); the Withered Warden has a 60% chance to cast Wild Growth on the most
+wounded of its warband (itself included) when someone is below 70% HP. The Chief and the
+Ash-Wrought Tyrant build and spend Rage like a Warrior.</p>
 <h3>4.9 There is no announcer</h3>
 <p>All battle information lives in the scrolling combat log (top right) and floating combat
 text. No banner text appears at the top of the battle.</p>
@@ -428,16 +440,29 @@ Mirror removed 07-09; old unlocks are dropped safely.)</li>
 Sundering Strike 23/22BD, 60% Sunder 2t. Resists: physical 10%.</td></tr>
 <tr><td>Orc Archer (red)</td><td>104</td><td>10%</td><td>100</td><td>85</td><td>Arrow Shot
 21/16BD; Poison Arrow 16/14BD, 70% Poison 3t. Resists: physical 5%.</td></tr>
+<tr><td>Orc Shieldmaster (orange)</td><td>150</td><td>25%</td><td>85</td><td>120</td>
+<td>Shielding — wards an ally (lowest HP first, itself included) with 25% damage reduction
+for 3 turns; only one ally holds the ward at a time, and it ALWAYS re-casts when no ally is
+shielded. Strike 28 physical/20BD.</td></tr>
+<tr><td>Orc Shaman (blue)</td><td>110</td><td>1%</td><td>100</td><td>80</td><td>Ranged
+caster. Lightning Bolt 35 nature/20BD single target; Chain Lightning 15 nature + 15BD to the
+ENTIRE hero party.</td></tr>
 <tr><td>Orc Chief (elite)</td><td>242</td><td>20%</td><td>80</td><td>130</td><td>Rage user:
 Strike 28/26BD +15 Rage; Heavy Strike 30R 54/40BD; Crushing Blow 20R 34/56BD. Resists:
 physical 15%.</td></tr>
-<tr><td>Zone bosses (stand-ins)</td><td>368</td><td>22%</td><td>85</td><td>160</td><td>Chief
-kit, bigger sprite, 20 starting Rage. Zone 1: Withered Warden (nature 50%, physical 10%,
-fire −25%). Zone 2: Ash-Wrought Tyrant (fire 50%, physical 10%, frost −25%).</td></tr>
+<tr><td>Withered Warden (zone 1 boss)</td><td>500</td><td>35%</td><td>80</td><td>150</td>
+<td>Unique kit, nature resist 75%. Timber Slam — 60 nature/30BD single target + Dazed 3t;
+Roots of Wrath — 25 nature/20BD to the whole party + Poison 3t; Wild Growth — heals an ally
+for 20% of its max HP (itself included).</td></tr>
+<tr><td>Ash-Wrought Tyrant (zone 2 boss, stand-in)</td><td>368</td><td>22%</td><td>85</td>
+<td>160</td><td>Chief kit, bigger sprite, 20 starting Rage. Resists: fire 50%, physical 10%,
+frost −25%.</td></tr>
 </table>
-<p><b>Compositions:</b> regular fights draw from pools of 3–4 enemies (raiders + archers; zone
-2 adds 5-enemy pools). Elite: Chief + escorts (zone 2: Chief + 4). Boss: boss + escorts.
-Zone scaling multiplies HP and ability damage ×(1 + 0.35 × zone index).</p>
+<p><b>Compositions:</b> every encounter fields <b>3–5 enemies with the types rolled at
+random</b> from the basic pool (Raider / Archer / Shieldmaster / Shaman). Elites only appear
+on elite nodes (the Chief + 2–4 random basics) and bosses only on the boss node (boss + 2–4
+random basics). Zone scaling multiplies HP and ability damage ×(1 + 0.35 × zone
+index).</p>
 
 <h2>10. Battle Screen &amp; Controls</h2>
 <ul>
@@ -478,9 +503,11 @@ dedicated impact clips.</li>
 <h2>11. Other Screens</h2>
 <ul>
 <li><b>Party screen:</b> hero list with tinted class icons beside each name, HP/Mana readouts
-and unspent-point highlights; detail page per hero: stats (with tooltip explaining derived
-values), ability chips (hover for numbers), rune equip toggles (2 max), and the run's generated
-talent tree with learn/rank-up buttons.</li>
+and unspent-point highlights; detail page per hero: stats — <b>each stat is its own hover
+tooltip explaining just that stat</b> (talent points are NOT listed here; the count sits above
+the talent tree) — ability chips (hover for numbers), rune equip toggles (2 max), and the
+spec's talent tree with click-to-learn nodes (no requirements text below the tree; lock
+reasons show on the node tooltips).</li>
 <li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per party member;
 reached via the 6 shop nodes on every zone map.</li>
 <li><b>Relics screen:</b> collection viewer from the main menu.</li>
@@ -500,13 +527,16 @@ user://relics.json, user://settings.cfg.</li>
 <li><b>Balance tooling:</b> DOD_AUTOPLAY=1 (one bot battle with debug prints), DOD_SIM=N
 (N max-speed battles + a stats report: win rate, damage shares, ability usage, roll rates),
 DOD_SIM_SPECS="berserker,cryomancer,inquisitor,beastmaster" (override the specs the bot
-plays — order: warrior, mage, cleric, hunter). Target ≈85% bot win rate.</li>
+plays — order: warrior, mage, cleric, hunter),
+DOD_SIM_ENEMIES="boss,shieldmaster,shaman" (force the enemy lineup in autoplay/sim/standalone
+battles). Target ≈85% bot win rate.</li>
 <li><b>Testing shortcuts:</b> debug tools are ALWAYS available in dev (unexported) builds;
 exported builds require DOD_DEBUG=1. The map burger menu gains a DEBUG section — +200 gold, +3 talent points for everyone, full heal, jump to the boss tier,
 advance to the next zone, and <b>Reroll Specs</b> (refunds spent talent points, clears all
-specs, and reopens the awakening screen). In battle, DOD_DEBUG=1 adds a DEBUG panel (under
-the combat log): Full Restore (HP/resources/secondary for the party) and per-hero "Turn →"
-buttons that make that hero act next. The battle scene also runs standalone
+specs, and reopens the awakening screen). In battle, the DEBUG panel (under the combat log)
+offers: Full Restore (HP/resources/secondary for the party), <b>Hero Turn Now</b> (the next
+turn instantly goes to a hero, whatever the timeline says), and an <b>Enemy attacks OFF</b>
+toggle (enemies skip their turns while checked). The battle scene also runs standalone
 (<code>godot res://scenes/battle.tscn</code>) with a default party and no run state.</li>
 <li><b>Sprites:</b> 100×100 frame strips named Name_Idle/Walk/Attack01–03/Hurt/Death.png;
 new character art must follow this format. New assets arrive in "imported files/".</li>
@@ -517,7 +547,8 @@ new character art must follow this format. New assets arrive in "imported files/
 <ul>
 <li>Distinct Mage/Cleric/Hunter sprites awaited in imported files; Beastmaster companions use
 placeholder colored spheres until beast art lands.</li>
-<li>Boss kits are Chief stand-ins; unique boss mechanics + art planned.</li>
+<li>The Withered Warden now has its own kit; the Ash-Wrought Tyrant is still a Chief
+stand-in — unique kit + art planned. Boss art for both pending.</li>
 <li>Hunter spec talent pools need signatures; full rune loot table pending; relic pool (6)
 needs growth.</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>

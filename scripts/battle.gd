@@ -17,7 +17,7 @@ const STATUS_INFO := {
 	"slow": ["Slowed", "Sl", Color(0.55, 0.65, 0.9), "-25% speed; turns arrive later."],
 	"chilled": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "-25% speed; turns arrive later.\nThe Cryomancer's signature frost."],
 	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Takes 6 damage at the start of each turn."],
-	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Bleed builds with wounding attacks;\nat 100 the target bleeds out for 20% max HP."],
+	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Bleed builds with wounding attacks;\nat 100 the target bleeds out for 20% max HP.\nBleed damage ignores armor."],
 	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-35% armor."],
 	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4), "Takes 50% less Pressure."],
 	"fortify": ["Fortify", "+D", Color(0.55, 0.8, 0.9), "+10% armor."],
@@ -26,7 +26,7 @@ const STATUS_INFO := {
 	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores 8 HP each turn."],
 	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% attack."],
 	"mocked": ["Mocked", "M!", Color(0.95, 0.5, 0.3), "Must attack the Warrior who mocked them."],
-	"poison": ["Poison", "P", Color(0.45, 0.8, 0.3), "Takes 3 damage per stack at the start of\neach turn; new stacks refresh the timer."],
+	"poison": ["Poison", "P", Color(0.45, 0.8, 0.3), "Takes 3 nature damage per stack at the\nstart of each turn; new stacks refresh\nthe timer."],
 	"quickdraw": ["Quick Draw", "QD", Color(0.55, 0.85, 0.40), "All abilities act 50% faster;\nturns arrive sooner."],
 	"parry_up": ["Parry Up", "P+", Color(0.4, 0.9, 1.0), "+15% parry chance."],
 	"mana_shield": ["Mana Shield", "MS", Color(0.35, 0.6, 1.0), "50% of damage taken converts\ninto Mana."],
@@ -41,6 +41,8 @@ const STATUS_INFO := {
 	"exposed": ["Exposed", "E", Color(0.95, 0.9, 0.4), "Takes 15% more damage."],
 	"cripple": ["Cripple", "C", Color(0.5, 0.4, 0.55), "-25% damage dealt."],
 	"retaliate": ["Retaliation", "R!", Color(0.95, 0.6, 0.25), "Counters attackers with a basic strike."],
+	"dazed": ["Dazed", "Dz", Color(0.95, 0.7, 0.35), "Attacks are 20% more likely to miss."],
+	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less damage\n(a Shieldmaster's ward)."],
 }
 
 # Placeholder SFX (procedurally generated, see repo history; replace with
@@ -95,6 +97,7 @@ var autoplay := false
 var sim := false
 var sim_target := 0
 var debug_prints := false
+var debug_enemies_off := false  # debug toggle: enemies skip their turns
 
 # Accumulated across scene reloads within one simulation run.
 static var sim_stats := {}
@@ -199,20 +202,34 @@ func _enemy_config(kind: String) -> Dictionary:
 				"tint": Color(1.0, 0.75, 0.7),
 				"resists": {"physical": 0.15}}
 		"boss":
-			# Zone boss stand-ins until real boss art and unique kits exist.
-			var boss_defs := [
-				{"unit_name": "Withered Warden", "tint": Color(0.7, 1.0, 0.7),
-					"resists": {"nature": 0.50, "physical": 0.10, "fire": -0.25}},
-				{"unit_name": "Ash-Wrought Tyrant", "tint": Color(1.0, 0.55, 0.35),
-					"resists": {"fire": 0.50, "physical": 0.10, "frost": -0.25}},
-			]
-			var bd: Dictionary = boss_defs[clampi(Run.zone_idx if Run.active else 0, 0, boss_defs.size() - 1)]
-			return {"unit_name": bd["unit_name"], "is_hero": false, "sheet_dir": orc,
+			# Zone 1's Withered Warden has its own kit; later bosses are still
+			# Chief stand-ins until their unique kits and art exist.
+			if (Run.zone_idx if Run.active else 0) == 0:
+				return {"unit_name": "Withered Warden", "is_hero": false,
+					"sheet_dir": orc, "max_hp": 500, "armor": 0.35, "speed": 80.0,
+					"stability": 100, "constitution": 150, "is_boss": true,
+					"abilities": _withered_warden_kit(), "sprite_scale": 4.4,
+					"tint": Color(0.7, 1.0, 0.7), "resists": {"nature": 0.75}}
+			return {"unit_name": "Ash-Wrought Tyrant", "is_hero": false, "sheet_dir": orc,
 				"max_hp": 368, "armor": 0.22, "speed": 85.0, "stability": 100,
 				"constitution": 160, "is_boss": true,
 				"resource_name": "Rage", "resource": 20, "max_resource": 100,
 				"abilities": _orc_chief_kit(), "sprite_scale": 4.4,
-				"tint": bd["tint"], "resists": bd["resists"]}
+				"tint": Color(1.0, 0.55, 0.35),
+				"resists": {"fire": 0.50, "physical": 0.10, "frost": -0.25}}
+		"shieldmaster":
+			return {"unit_name": "Orc Shieldmaster", "is_hero": false, "sheet_dir": orc,
+				"max_hp": 150, "armor": 0.25, "speed": 85.0, "stability": 100,
+				"constitution": 120,
+				"abilities": _orc_shieldmaster_kit(), "tint": Color(1.0, 0.62, 0.2),
+				"resists": {}}
+		"shaman":
+			return {"unit_name": "Orc Shaman", "is_hero": false, "sheet_dir": orc,
+				"max_hp": 110, "armor": 0.01, "speed": 100.0, "stability": 100,
+				"constitution": 80,
+				"is_ranged": true,
+				"abilities": _orc_shaman_kit(), "tint": Color(0.4, 0.55, 1.0),
+				"resists": {}}
 		"archer":
 			return {"unit_name": "Orc Archer", "is_hero": false, "sheet_dir": orc,
 				"max_hp": 104, "armor": 0.10, "speed": 100.0, "stability": 100,
@@ -299,7 +316,12 @@ func _spawn_units() -> void:
 			_apply_status(h, "devotion", -1)
 
 	var composition: Array = ["raider", "chief", "archer", "archer"]
-	if Run.active and Run.encounter.has("enemies"):
+	# DOD_SIM_ENEMIES="boss,shieldmaster,shaman" forces the enemy lineup in
+	# autoplay/sim/standalone battles (testing hook, like DOD_SIM_SPECS).
+	var env_comp := OS.get_environment("DOD_SIM_ENEMIES")
+	if env_comp != "":
+		composition = env_comp.split(",")
+	elif Run.active and Run.encounter.has("enemies"):
 		composition = Run.encounter["enemies"]
 	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 5)]
 	# Later zones field tougher versions of the same foes.
@@ -347,6 +369,41 @@ func _orc_archer_kit() -> Array:
 		Ability.make({"display_name": "Poison Arrow", "damage": 16, "pressure": 14,
 			"delay": 2.5, "anim": "attack02",
 			"applies_status": {"id": "poison", "turns": 3}, "status_chance": 0.7}),
+	]
+
+
+# The Shieldmaster guards its warband: one ally at a time carries its ward.
+func _orc_shieldmaster_kit() -> Array:
+	return [
+		Ability.make({"display_name": "Strike", "damage": 28, "pressure": 20,
+			"delay": 2.0, "anim": "attack01"}),
+		Ability.make({"display_name": "Shielding", "special": "enemy_shield",
+			"delay": 2.5, "anim": "attack02", "target": Ability.Target.ALLY,
+			"description": "Wards an ally: 25% less damage taken for 3 turns."}),
+	]
+
+
+func _orc_shaman_kit() -> Array:
+	return [
+		Ability.make({"display_name": "Lightning Bolt", "damage": 35, "pressure": 20,
+			"delay": 2.0, "anim": "attack01", "dmg_type": "nature"}),
+		Ability.make({"display_name": "Chain Lightning", "damage": 15, "pressure": 15,
+			"delay": 3.0, "anim": "attack02", "dmg_type": "nature", "aoe": true}),
+	]
+
+
+# Zone 1 boss: a nature bruiser that dazes, poisons, and tends its escorts.
+func _withered_warden_kit() -> Array:
+	return [
+		Ability.make({"display_name": "Timber Slam", "damage": 60, "pressure": 30,
+			"delay": 3.0, "anim": "attack01", "dmg_type": "nature",
+			"applies_status": {"id": "dazed", "turns": 3}}),
+		Ability.make({"display_name": "Roots of Wrath", "damage": 25, "pressure": 20,
+			"delay": 3.5, "anim": "attack02", "dmg_type": "nature", "aoe": true,
+			"applies_status": {"id": "poison", "turns": 3}}),
+		Ability.make({"display_name": "Wild Growth", "special": "wild_growth",
+			"delay": 2.5, "anim": "attack02", "target": Ability.Target.ALLY,
+			"description": "Heals an ally for 20% of their max health."}),
 	]
 
 
@@ -490,12 +547,18 @@ func _build_debug_panel() -> void:
 	restore.add_theme_font_size_override("font_size", 12)
 	restore.pressed.connect(_debug_full_restore)
 	box.add_child(restore)
-	for u in heroes:
-		var b := Button.new()
-		b.text = "Turn → %s" % u.unit_name
-		b.add_theme_font_size_override("font_size", 12)
-		b.pressed.connect(_debug_set_turn.bind(u))
-		box.add_child(b)
+	var hero_turn := Button.new()
+	hero_turn.text = "Hero Turn Now"
+	hero_turn.add_theme_font_size_override("font_size", 12)
+	hero_turn.tooltip_text = "The next turn goes to a hero,\nwhatever the timeline says."
+	hero_turn.pressed.connect(_debug_hero_turn)
+	box.add_child(hero_turn)
+	var no_enemies := CheckBox.new()
+	no_enemies.text = "Enemy attacks OFF"
+	no_enemies.add_theme_font_size_override("font_size", 12)
+	no_enemies.tooltip_text = "While checked, enemies skip their turns."
+	no_enemies.toggled.connect(_debug_toggle_enemies)
+	box.add_child(no_enemies)
 
 
 func _debug_full_restore() -> void:
@@ -510,14 +573,25 @@ func _debug_full_restore() -> void:
 	_log("DEBUG: party fully restored", "#e0a050")
 
 
-func _debug_set_turn(u: BattleUnit) -> void:
-	if u.dead:
+# Force the next turn to a hero (the one due soonest), whatever the order says.
+func _debug_hero_turn() -> void:
+	var living: Array = heroes.filter(func(h): return not h.dead)
+	if living.is_empty():
 		return
+	var soonest: BattleUnit = living[0]
+	for h in living:
+		if h.next_time < soonest.next_time:
+			soonest = h
 	var best := _next_unit()
-	if best != null:
-		u.next_time = best.next_time - 0.01
+	if best != null and not best.is_hero:
+		soonest.next_time = best.next_time - 0.01
 	_rebuild_turn_bar()
-	_log("DEBUG: %s acts next" % u.unit_name, "#e0a050")
+	_log("DEBUG: %s acts next" % soonest.unit_name, "#e0a050")
+
+
+func _debug_toggle_enemies(off: bool) -> void:
+	debug_enemies_off = off
+	_log("DEBUG: enemy attacks %s" % ("OFF" if off else "back on"), "#e0a050")
 
 
 func _on_burger(id: int) -> void:
@@ -674,6 +748,11 @@ func _run_battle() -> void:
 					var stacks := maxi(u.status_stacks("poison"), 1)
 					dot_dmg *= stacks
 					stack_tag = " (x%d stacks)" % stacks if stacks > 1 else ""
+					# Poison counts as nature damage: nature resists apply.
+					var nat_resist := float(u.resists.get("nature", 0.0))
+					if nat_resist != 0.0:
+						dot_dmg = maxi(int(round(dot_dmg * (1.0 - nat_resist))), 0)
+						stack_tag += " (resisted)" if nat_resist > 0.0 else " (vulnerable!)"
 				var info: Array = STATUS_INFO[dot_id]
 				_sfx("hit", -14.0, 0.8)
 				var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
@@ -1208,6 +1287,11 @@ func _pick_target(pool: Array) -> BattleUnit:
 
 
 func _enemy_turn(u: BattleUnit) -> void:
+	if debug_enemies_off:
+		u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
+		_log("DEBUG: %s skips its turn (enemy attacks off)" % u.unit_name, "#e0a050")
+		await _wait(0.25)
+		return
 	await _wait(0.7)
 	# Mind Flay: the maddened enemy turns on its own allies with bonus Break
 	# damage (falls through to normal behavior if it stands alone).
@@ -1215,7 +1299,9 @@ func _enemy_turn(u: BattleUnit) -> void:
 		var fellows := enemies.filter(func(e): return not e.dead and e != u)
 		if not fellows.is_empty():
 			var mf_target: BattleUnit = fellows.pick_random()
-			var mf_options: Array = u.abilities.filter(func(a): return a.cost <= u.resource)
+			# Maddened units ATTACK their allies — support abilities stay sheathed.
+			var mf_options: Array = u.abilities.filter(
+				func(a): return a.cost <= u.resource and a.damage > 0)
 			_message("%s turns on its allies!" % u.unit_name)
 			_log("%s is maddened — attacks %s!" % [u.unit_name, mf_target.unit_name], "#c070e0")
 			await _wait(0.4)
@@ -1224,13 +1310,23 @@ func _enemy_turn(u: BattleUnit) -> void:
 	var living := _hero_side()
 	if living.is_empty():
 		return
+	var is_mocked := false
 	if u.has_status("mocked"):
 		var mocker_idx := u.status_power("mocked")
 		if mocker_idx >= 0 and mocker_idx < heroes.size() and not heroes[mocker_idx].dead:
 			living = [heroes[mocker_idx]]
+			is_mocked = true
+	# Support behaviors (Shielding, Wild Growth) — a taunt forces attacking instead.
+	if not is_mocked:
+		var support := _enemy_support_action(u)
+		if not support.is_empty():
+			await _resolve(u, support[0], support[1], "good")
+			return
 	var target: BattleUnit
 	var ab: Ability
-	var affordable: Array = u.abilities.filter(func(a): return a.cost <= u.resource)
+	# Only damaging abilities count as attacks; support casts are chosen above.
+	var affordable: Array = u.abilities.filter(
+		func(a): return a.cost <= u.resource and a.damage > 0)
 	var broken_heroes := living.filter(func(h): return h.broken)
 	if not broken_heroes.is_empty():
 		# Exploit a Broken hero with the hardest-hitting attack they can afford.
@@ -1248,6 +1344,23 @@ func _enemy_turn(u: BattleUnit) -> void:
 	await _resolve(u, ab, target, "good")
 
 
+# Non-attack decisions for enemies with support abilities. Returns
+# [ability, ally_target], or [] to fall through to a normal attack.
+func _enemy_support_action(u: BattleUnit) -> Array:
+	var allies: Array = enemies.filter(func(e): return not e.dead)
+	# Shieldmaster: always keeps exactly one ally Shielded (lowest HP first).
+	var shield_ab := _find_ability(u, "Shielding")
+	if shield_ab != null and not allies.any(func(a): return a.has_status("shielded")):
+		return [shield_ab, _lowest_hp(allies)]
+	# Withered Warden: tends the most wounded of its warband (itself included).
+	var growth := _find_ability(u, "Wild Growth")
+	if growth != null:
+		var wounded: Array = allies.filter(func(a): return a.hp < a.max_hp * 0.7)
+		if not wounded.is_empty() and randf() < 0.6:
+			return [growth, _lowest_hp(wounded)]
+	return []
+
+
 func _lowest_hp(pool: Array) -> BattleUnit:
 	var best: BattleUnit = pool[0]
 	for h in pool:
@@ -1258,8 +1371,19 @@ func _lowest_hp(pool: Array) -> BattleUnit:
 
 # Base chances for the attack rolls. Many things will modify these later.
 const MISS_CHANCE := 0.05
-const PARRY_CHANCE := 0.05
+const PARRY_CHANCE := 0.05        # hero baseline
+const ENEMY_PARRY_CHANCE := 0.025 # enemy baseline (half the hero rate)
 const CRIT_CHANCE := 0.10
+
+
+func _miss_chance(attacker: BattleUnit) -> float:
+	return MISS_CHANCE + (0.20 if attacker.has_status("dazed") else 0.0)
+
+
+func _parry_chance(defender: BattleUnit) -> float:
+	var base := PARRY_CHANCE if defender.is_hero else ENEMY_PARRY_CHANCE
+	return base + defender.parry_bonus \
+		+ (0.15 if defender.has_status("parry_up") else 0.0)
 
 
 # Bow users get dedicated attack/impact/blocked sounds.
@@ -1327,7 +1451,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if is_perfect and ab.perfect_id == "ward":
 			_apply_status(target, "ward", 3)
 	elif not is_counter and not ab.aoe and ab.multi_hits == 0 and ab.random_hits == 0 \
-			and not ab.choose_two and randf() < MISS_CHANCE:
+			and not ab.choose_two and randf() < _miss_chance(attacker):
 		_stat("attacks")
 		_stat("attack_miss")
 		_sfx("miss")
@@ -1339,8 +1463,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	elif not is_counter and not ab.aoe and ab.multi_hits == 0 and ab.random_hits == 0 \
 			and not ab.choose_two \
 			and not target.broken and not target.dead and not target.is_companion \
-			and randf() < PARRY_CHANCE + target.parry_bonus \
-			+ (0.15 if target.has_status("parry_up") else 0.0):
+			and randf() < _parry_chance(target):
 		# Parry negates the hit; the defender immediately counters with
 		# their basic attack (a free action — no rolls, no initiative cost).
 		_stat("attacks")
@@ -1394,7 +1517,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Multi-hit attacks roll miss/parry per strike: a blocked or missed
 			# hit never stops the follow-up strikes.
 			if not is_counter and (ab.multi_hits > 0 or ab.random_hits > 0 or ab.choose_two):
-				if randf() < MISS_CHANCE:
+				if randf() < _miss_chance(attacker):
 					_stat("attacks")
 					_stat("attack_miss")
 					_sfx("miss")
@@ -1404,8 +1527,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					await _wait(0.45)
 					continue
 				if not strike_target.broken and not strike_target.is_companion \
-						and randf() < PARRY_CHANCE + strike_target.parry_bonus \
-						+ (0.15 if strike_target.has_status("parry_up") else 0.0):
+						and randf() < _parry_chance(strike_target):
 					_stat("attacks")
 					_stat("attack_parry")
 					_sfx("bow_blocked" if _uses_bow(attacker) else "parry", -4.0)
@@ -1490,6 +1612,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if strike_target.second_resource_name == "Resonance":
 				raw *= 1.0 + 0.10 * strike_target.second_resource
 			if strike_target.has_status("shieldwall"):
+				raw *= 0.75
+			# Shielded: the Orc Shieldmaster's single-ally ward.
+			if strike_target.has_status("shielded"):
 				raw *= 0.75
 			if strike_target.has_status("exposed"):
 				raw *= 1.15
@@ -1766,7 +1891,7 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0) -> vo
 	target.add_status(id, info[0], info[1], info[2], turns, info[3], power)
 	if id == "poison":
 		var stacks := target.status_stacks("poison")
-		_log("   → Poison on %s (x%d — %d dmg/turn, %d turns)" % [target.unit_name,
+		_log("   → Poison on %s (x%d — %d nature dmg/turn, %d turns)" % [target.unit_name,
 			stacks, 3 * stacks, turns], "#8cc843")
 		return
 	var span := "battle" if turns < 0 else "%d turns" % turns
@@ -1954,6 +2079,24 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s orders %s to savage %s!" % [attacker.unit_name,
 					comp.unit_name, target.unit_name], "#e0a050")
 				await _companion_strike(comp, target, 3.0 if is_perfect else 2.0, true)
+		"enemy_shield":
+			# The Shieldmaster's ward: one ally holds it at a time.
+			for a in (enemies if not attacker.is_hero else heroes):
+				if a != target and a.has_status("shielded"):
+					a.remove_status("shielded")
+			_sfx("parry", -7.0, 0.6)
+			_apply_status(target, "shielded", 3)
+			_message("%s shields %s!" % [attacker.unit_name, target.unit_name])
+			_log("%s: Shielding — %s takes 25%% less damage (3 turns)" % [
+				attacker.unit_name, target.unit_name], "#e0a0a0")
+		"wild_growth":
+			var growth := maxi(int(round(target.max_hp * 0.20)), 1)
+			_sfx("heal", -6.0, 0.8)
+			target.heal_amount(growth)
+			target.float_text("+%d" % growth, Color(0.4, 0.9, 0.45))
+			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
+			_log("%s: Wild Growth heals %s for %d (20%% max HP)" % [attacker.unit_name,
+				target.unit_name, growth], "#70d878")
 		"renewal":
 			_sfx("heal", -9.0, 1.1)
 			_apply_status(target, "renewal", 5)
@@ -2061,7 +2204,8 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int) -
 
 
 # Adds bleed buildup (logged) and detonates the bleedout when the meter fills.
-# Bleedout damage respects Unity's soul-binding like any other hit.
+# Bleedout damage IGNORES armor (take_hit applies none — armor only reduces
+# attack damage inside _resolve) and respects Unity's soul-binding.
 func _add_bleed_with_burst(victim: BattleUnit, amount: int) -> void:
 	if victim.dead:
 		return

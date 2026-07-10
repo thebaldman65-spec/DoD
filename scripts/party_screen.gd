@@ -120,35 +120,53 @@ func _draw_detail() -> void:
 	blurb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	add_child(blurb)
 
-	var stats := Label.new()
+	# Each stat is its own label so hovering explains just that stat.
 	var crit_pct := int(round((0.10 + cfg.get("crit_bonus", 0.0)) * 100))
-	var lines := PackedStringArray([
-		"HP: %d / %d" % [member["hp"], cfg["max_hp"]],
-		"%s: %s" % [cfg["resource_name"],
+	var resource_tips := {
+		"Mana": "Mana — spent on abilities; +12 at the start of each turn.",
+		"Rage": "Rage — spent on abilities; +5 at turn start, +10 when hit,\nand attacks build more.",
+		"Focus": "Focus — spent on abilities; +15 at the start of each turn.",
+	}
+	var stat_rows: Array = [
+		[["HP: %d / %d" % [member["hp"], cfg["max_hp"]],
+			"Health — the hero falls at 0.\nValues include talents and equipped runes."]],
+		[["%s: %s" % [cfg["resource_name"],
 			("%d / %d" % [member["mana"], cfg["max_resource"]]) if cfg["resource_name"] == "Mana"
 			else "builds in combat"],
-		"Armor: %d%%    Speed: %d    Constitution: %d" % [int(round(cfg["armor"] * 100)),
-			int(cfg["speed"]), cfg.get("constitution", 100)],
-		"Crit Chance: %d%%    Parry: %d%%" % [crit_pct,
-			int(round((0.05 + cfg.get("parry_bonus", 0.0)) * 100))],
-		"Talent Points: %d" % member.get("talent_points", 0),
-	])
+			resource_tips.get(cfg["resource_name"], "")]],
+		[["Armor: %d%%" % int(round(cfg["armor"] * 100)),
+			"Armor — % of incoming damage blocked."],
+		["Speed: %d" % int(cfg["speed"]),
+			"Speed — how quickly turns arrive (100 = average)."],
+		["Constitution: %d" % cfg.get("constitution", 100),
+			"Constitution — Break resistance: incoming Break damage is\nscaled by 100/Constitution (100 = neutral, higher = tougher\nto Break)."]],
+		[["Crit Chance: %d%%" % crit_pct,
+			"Crit Chance — chance to strike for 50% extra damage\n(base 10% plus bonuses)."],
+		["Parry: %d%%" % int(round((0.05 + cfg.get("parry_bonus", 0.0)) * 100)),
+			"Parry — chance to negate a hit and counter with the basic\nattack (base 5% plus bonuses)."]],
+	]
+	for r in stat_rows.size():
+		var row := HBoxContainer.new()
+		row.position = Vector2(60, 132 + r * 22)
+		row.add_theme_constant_override("separation", 24)
+		add_child(row)
+		for seg in stat_rows[r]:
+			var stat_label := Label.new()
+			stat_label.text = seg[0]
+			stat_label.add_theme_font_size_override("font_size", 15)
+			stat_label.add_theme_color_override("font_color", Color(0.88, 0.85, 0.78))
+			stat_label.mouse_filter = Control.MOUSE_FILTER_STOP
+			stat_label.tooltip_text = seg[1]
+			row.add_child(stat_label)
 	if spec != "":
-		lines.append("Passive: %s" % Classes.SPEC_INFO[spec]["passive_desc"])
-	stats.text = "\n".join(lines)
-	stats.add_theme_font_size_override("font_size", 15)
-	stats.add_theme_color_override("font_color", Color(0.88, 0.85, 0.78))
-	stats.position = Vector2(60, 132)
-	stats.size = Vector2(400, 140)
-	stats.mouse_filter = Control.MOUSE_FILTER_STOP
-	stats.tooltip_text = "Values include talents and equipped runes.\n" \
-		+ "Armor — % of incoming damage blocked.\n" \
-		+ "Speed — how quickly turns arrive (100 = average).\n" \
-		+ "Constitution — Break resistance: incoming Pressure is scaled by\n" \
-		+ "  100/Constitution (100 = neutral, higher = tougher to Break).\n" \
-		+ "Crit — base 10% plus bonuses. Parry — base 5% plus bonuses.\n" \
-		+ "Talent points come from victories (1 fight / 2 elite / 3 boss)."
-	add_child(stats)
+		var passive_label := Label.new()
+		passive_label.text = "Passive: %s" % Classes.SPEC_INFO[spec]["passive_desc"]
+		passive_label.add_theme_font_size_override("font_size", 15)
+		passive_label.add_theme_color_override("font_color", Color(0.88, 0.85, 0.78))
+		passive_label.position = Vector2(60, 132 + stat_rows.size() * 22)
+		passive_label.size = Vector2(400, 60)
+		passive_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		add_child(passive_label)
 
 	var ability_header := Label.new()
 	ability_header.text = "ABILITIES  (hover for details)"
@@ -325,15 +343,6 @@ func _draw_fixed_tree(tree: Array, learned: Dictionary, points: int) -> void:
 		h.size = Vector2(TREE_BACK_SIZE.x, 1)
 		h.color = Color(1, 1, 1, 0.05)
 		add_child(h)
-
-	var gate_note := Label.new()
-	gate_note.text = "Tier 2 unlocks at 5 points in Tier 1  •  Tier 3 at 10 points in Tiers 1–2"
-	gate_note.add_theme_font_size_override("font_size", 12)
-	gate_note.add_theme_color_override("font_color", Color(0.55, 0.52, 0.48))
-	gate_note.position = Vector2(TREE_BACK_POS.x, TREE_BACK_POS.y + TREE_BACK_SIZE.y + 6)
-	gate_note.size = Vector2(TREE_BACK_SIZE.x, 16)
-	gate_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(gate_note)
 
 	var tier_counts := {}
 	for talent in tree:

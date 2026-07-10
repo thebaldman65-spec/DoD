@@ -11,7 +11,8 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - EVERY design change: (1) update `docs/master.html` (current truth) and bump
   its "Last updated" timestamp; (2) add an entry to `docs/changelog.html`
   (newest first); (3) rebuild both docx via `python3 docs/build_docs.py`
-  (unwraps paragraphs — plain textutil makes Word spacing weird).
+  (unwraps paragraphs — plain textutil makes Word spacing weird; exports are
+  Arial size 14 by user preference).
 - Terminology: damage against the Break meter = "Break damage (BD)" everywhere.
 - `docs/addendum.html` is RETIRED (frozen history; do not update it).
 - User drops new assets in `../imported files/` — always check there.
@@ -27,7 +28,8 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - Balance: `DOD_SIM=50 <godot> --headless --path . res://scenes/battle.tscn`
   prints a report (target ~85% wins). `DOD_AUTOPLAY=1` = 1 debug battle.
   `DOD_SIM_SPECS="berserker,cryomancer,inquisitor,beastmaster"` picks the bot's
-  specs (warrior,mage,cleric,hunter order). `DOD_DEBUG=1` adds map-burger debug
+  specs (warrior,mage,cleric,hunter order). `DOD_SIM_ENEMIES="boss,shaman,..."`
+  forces the enemy lineup in test battles. `DOD_DEBUG=1` adds map-burger debug
   items (gold/points/heal/jump-to-boss/next-zone) for late-game testing.
 - GDScript gotchas that bit us: multiline lambdas in call args (use named
   methods), ternaries need parens for type inference, `:=` can't infer from
@@ -49,11 +51,16 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - Screens: main_menu → draft (pick 4 + relics) → spec_choice (permanent) →
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
-## Current systems snapshot (2026-07-06)
+## Current systems snapshot (2026-07-09)
 4 heroes (Warrior/Mage/Cleric/Hunter — one of each), 3 specs each, per-run
 shuffled talent trees, damage types (7) with resists, bleed buildup (100 =
-20% max HP bleedout), gold + shop runes (rarity-generated, 2 equip slots),
-2 zones (Forest → Scarlands, orc enemies incl. red Archer w/ poison), relics
+20% max HP bleedout, ignores armor; poison ticks count as nature damage),
+gold + shop runes (rarity-generated, 2 equip slots), 2 zones (Forest →
+Scarlands). Basic orcs: Raider, red Archer (poison), orange Shieldmaster
+(single-ally 25% ward), blue Shaman (nature caster, party-wide Chain
+Lightning); Chief = elite; Withered Warden has a unique boss kit (Timber Slam
++ Dazed / Roots of Wrath / Wild Growth, 75% nature resist). Every encounter =
+3-5 random-typed foes (elite/boss nodes: Chief/boss + 2-4 basics). Relics
 meta layer. Map: 10 tiers × 3 nodes + boss; fixed 18 fight / 6 rest / 6 shop;
 links = own column + 70% one adjacent (never all 3). Elites drop rune + item +
 80-100 gold. Music autoload (menu/map/battle + boss intro; spec choice = menu
@@ -65,8 +72,10 @@ no timeline turns, "Summon Companion ▸" submenu), Survivalist Trapper +
 stacking Poison (3/turn/stack), Chilled = renamed Slow. Break meter 0-100 w/
 numeric readout; CONSTITUTION = break resistance (pressure × 100/con; per-spec
 values in SPEC_INFO, bosses 160 + stun-immune unless Broken). Talent pools are
-THEMATIC per spec (8 signatures each, T5 = new ability). See master.html §6-7. Combat: crit 10%/miss 5%/parry 5%, Mocking Blow taunt, per-ability
-initiative ghost preview (no Guard — removed by design). Specs carry archetype
+THEMATIC per spec (8 signatures each, T5 = new ability). See master.html §6-7.
+Combat: crit 10%; miss 5% (Dazed +20%); parry 5% heroes / 2.5% enemies;
+Mocking Blow taunt; per-ability initiative ghost preview (no Guard — removed
+by design). Battle debug panel: Hero Turn Now + Enemy attacks OFF toggle. Specs carry archetype
 tags (Ramp/Rush/Nuker/Pressure/Healer/Warder/Tank/Bruiser) in SPEC_INFO.
 Battle has burger menu (restart/settings overlay/exit); skill checks accept
 Space or left click; no announcer text (combat log only).

@@ -343,7 +343,7 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 				s.stacks = int(s.get("stacks", 1)) + 1
 				s.turns = turns
 				s.short = "P%d" % s.stacks
-				s.desc = "Takes %d damage at the start of each turn\n(3 per stack); new stacks refresh the timer." % (3 * s.stacks)
+				s.desc = "Takes %d nature damage at the start of each\nturn (3 per stack); new stacks refresh the timer." % (3 * s.stacks)
 				float_text("%s x%d" % [label, s.stacks], color)
 			else:
 				s.turns = maxi(s.turns, turns)
@@ -392,12 +392,12 @@ func add_bleed(amount: int) -> bool:
 		for s in statuses:
 			if s.id == "bleed":
 				s.short = "Bl%d" % bleed_buildup
-				s.desc = "Bleed buildup: %d/100.\nAt 100 the target bleeds out\nfor 20%% of max HP." % bleed_buildup
+				s.desc = "Bleed buildup: %d/100.\nAt 100 the target bleeds out for\n20%% of max HP (ignores armor)." % bleed_buildup
 				found = true
 		if not found:
 			statuses.append({"id": "bleed", "label": "Bleed", "short": "Bl%d" % bleed_buildup,
 				"color": Color(0.85, 0.25, 0.25), "turns": -1,
-				"desc": "Bleed buildup: %d/100.\nAt 100 the target bleeds out\nfor 20%% of max HP." % bleed_buildup,
+				"desc": "Bleed buildup: %d/100.\nAt 100 the target bleeds out for\n20%% of max HP (ignores armor)." % bleed_buildup,
 				"power": 0, "stacks": 1})
 		float_text("Bleed %d" % bleed_buildup, Color(0.85, 0.3, 0.3))
 	_refresh_chips()
