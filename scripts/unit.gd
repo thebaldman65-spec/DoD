@@ -537,7 +537,9 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	if has_status("devotion"):
 		pressure_add = int(pressure_add * 0.85)
 	var just_broke := false
+	var applied_bd := 0
 	if not broken:
+		applied_bd = pressure_add
 		pressure += pressure_add
 		if pressure >= stability:
 			broken = true
@@ -552,7 +554,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	elif not just_broke:
 		play_anim("hurt")
 	refresh_bars()
-	return {"died": dead, "broke": just_broke}
+	return {"died": dead, "broke": just_broke, "bd": applied_bd}
 
 
 # Damage from DoT effects (Burn). No Pressure, no hurt animation. Returns true on death.

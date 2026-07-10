@@ -5,6 +5,27 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-09 — Batch 2: talent tree styling, battle debug panel, Arcanist identity</h2>
+<ul>
+<li><b>Talent tree restyled</b> to match the "Appearance example" reference: dark backdrop
+with faint grid lines, 72px square emblem nodes (gold border on hover, green when maxed),
+point counters beneath each node, black hover tooltip with white bold name + yellow
+description, click-to-learn. Backdrop and node icons are placeholders for future art.</li>
+<li><b>Battle debug panel</b> (DOD_DEBUG=1, under the combat log): Full Restore
+(HP/resources/secondaries) and per-hero "Turn →" buttons to hand any hero the next turn.</li>
+<li><b>Fix — Poison instant procs:</b> the "no tick on the turn applied" rule was never wired
+into the damage loop, so Poisoned Arrow's stacks all ticked immediately on the victim's next
+turn start. Poison now genuinely skips its first tick.</li>
+<li><b>Fix — Explosive Shot BD readout:</b> the log printed the ability's base BD while the
+meter moved by the post-Constitution amount (85-Constitution archers take ~18% more, 130+
+chiefs less — that's the per-enemy variation, by design; crits also deal ×1.5 BD). Logs now
+report the applied BD so the numbers always match the meter.</li>
+<li><b>Arcane Resonance is now the Arcanist's passive.</b> The Mage class no longer has the
+Resonance bar — only the Arcanist spec gains it (Pyromancer/Cryomancer never see it). The Echo
+passive is vaulted (removed, kept for later).</li>
+<li><b>New — Death Ray (Arcanist):</b> free cast, 150 arcane damage / 100 BD / 8.0 int;
+benefits from Resonance, then CONSUMES every stack. Perfect restores 15 Mana.</li>
+</ul>
 <h2>2026-07-09 — Batch 1: fixes, tuning pass, Mana Shield, Berserker tree</h2>
 <ul>
 <li><b>Fixes:</b> every skill check can now be cancelled, including after picking a target

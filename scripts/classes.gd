@@ -40,7 +40,6 @@ static func hero_config(key: String) -> Dictionary:
 				"max_hp": 99, "armor": 0.10, "speed": 110.0, "stability": 100,
 				"constitution": 85,
 				"resource_name": "Mana", "resource": 100, "max_resource": 100,
-				"second_resource_name": "Resonance", "second_resource": 0, "second_max": 5,
 				"abilities": kit(key)}
 		_:
 			return {"unit_name": "Cleric", "is_hero": true, "sheet_dir": soldier,
@@ -86,7 +85,7 @@ static func mage_kit() -> Array:
 		Ability.make({"display_name": "Magic Bolt", "dmg_type": "arcane", "cost": 0, "damage": 25, "pressure": 14,
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "mana", "perfect_text": "Restores 10 Mana",
-			"description": "Basic arcane projectile. Builds Resonance."}),
+			"description": "Basic arcane projectile."}),
 		Ability.make({"display_name": "Mana Shield", "cost": 15, "special": "mana_shield",
 			"delay": 2.0, "anim": "attack03",
 			"perfect_id": "", "perfect_text": "Initiative cost 1.5 instead of 2",
@@ -179,9 +178,9 @@ const SPEC_INFO := {
 	"cryomancer": {"name": "Cryomancer", "constitution": 85, "archetype": "Nuker", "passive": "chill",
 		"passive_desc": "Chill: damaging spells have 50% chance to apply Chilled (2 turns).",
 		"blurb": "Battlefield control — chill, freeze, then shatter."},
-	"arcanist": {"name": "Arcanist", "constitution": 90, "archetype": "Ramp", "passive": "echo",
-		"passive_desc": "Echo: 20% chance spells strike again at 25% power.",
-		"blurb": "Unstable raw magic — bends the rules of turn and time."},
+	"arcanist": {"name": "Arcanist", "constitution": 90, "archetype": "Ramp", "passive": "resonance",
+		"passive_desc": "Arcane Resonance: damaging casts build stacks (max 5) — each grants\n+15% damage and +3% crit but +10% damage taken. Max stacks trigger\nBacklash Ward (+15 Mana). Stacks persist until consumed.",
+		"blurb": "Unstable raw magic — stack the storm, then release it."},
 	"holy": {"name": "Holy", "constitution": 100, "archetype": "Healer", "passive": "grace",
 		"passive_desc": "Grace: all healing +25%.",
 		"blurb": "Pure vessel of light — mass healing and shields of faith."},
@@ -292,6 +291,10 @@ static func spec_abilities(spec: String) -> Array:
 					"pressure": 15, "delay": 3.5, "anim": "attack02", "recoil_base": 0.15,
 					"perfect_id": "", "perfect_text": "+5 bonus BD",
 					"description": "Channel raw Resonance into a blast:\n+7.5% DAMAGE per Resonance stack.\nRecoil: the Mage takes 15% of the\ndamage dealt."}),
+				Ability.make({"display_name": "Death Ray", "dmg_type": "arcane", "cost": 0, "damage": 150,
+					"pressure": 100, "delay": 8.0, "anim": "attack03",
+					"perfect_id": "mana15", "perfect_text": "Restores 15 Mana",
+					"description": "Annihilation given form: benefits from\nResonance, then CONSUMES every stack."}),
 				Ability.make({"display_name": "Arcane Barrage", "dmg_type": "arcane", "cost": 25, "damage": 5,
 					"pressure": 4, "delay": 3.5, "anim": "attack03", "random_hits": 6,
 					"perfect_id": "", "perfect_text": "Fires a 7th bolt",
@@ -396,6 +399,6 @@ static func spec_abilities(spec: String) -> Array:
 const CLASS_BLURBS := {
 	"hunter": "Ranged damage. Focus builds with every shot, spent on\nprecision payoffs and primal magic.",
 	"warrior": "Flexible frontliner. Rage builds through attack and pain.",
-	"mage": "Glass cannon. Resonance stacks power at the cost of safety —\nstacks last the whole battle.",
+	"mage": "Glass cannon. Mana Shield turns pain into fuel; the Arcanist\npath stacks Arcane Resonance for devastating payoffs.",
 	"cleric": "Divine vessel. Faith builds with every act, awaiting Miracles.",
 }

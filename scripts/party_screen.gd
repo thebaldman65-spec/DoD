@@ -242,20 +242,21 @@ func _draw_detail() -> void:
 	var learned: Dictionary = member.get("talents", {})
 	var points: int = member.get("talent_points", 0)
 	var tree: Array = member.get("tree", [])
-	# Fixed (designed) trees are three columns wide; generated trees stay two.
-	var is_fixed: bool = tree.any(func(t): return t.get("gate", "") == "cumulative")
-	var col_w := (252 if is_fixed else 380)
-	var panel_w := (244 if is_fixed else 372)
-	var row_h := (142 if is_fixed else 96)
-	var panel_h := (130 if is_fixed else 88)
+	# Designed (fixed) trees render as an icon grid styled after the
+	# "Appearance example" reference; generated trees keep the list panels.
+	if tree.any(func(t): return t.get("gate", "") == "cumulative"):
+		_draw_fixed_tree(tree, learned, points)
+		return
+	var col_w := 380
+	var panel_w := 372
 	var tier_counts := {}
 	for talent in tree:
 		var tier: int = talent["tier"]
 		var idx_in_tier: int = tier_counts.get(tier, 0)
 		tier_counts[tier] = idx_in_tier + 1
 		var panel := PanelContainer.new()
-		panel.position = Vector2(505 + idx_in_tier * col_w, 106 + (tier - 1) * row_h)
-		panel.custom_minimum_size = Vector2(panel_w, panel_h)
+		panel.position = Vector2(505 + idx_in_tier * col_w, 106 + (tier - 1) * 96)
+		panel.custom_minimum_size = Vector2(panel_w, 88)
 		add_child(panel)
 		var vbox := VBoxContainer.new()
 		vbox.add_theme_constant_override("separation", 2)
@@ -288,6 +289,178 @@ func _draw_detail() -> void:
 			if ranks_have > 0:
 				panel.modulate = Color(0.85, 0.95, 0.8)
 		vbox.add_child(learn)
+
+
+# ---------- fixed talent tree (styled after the "Appearance example") ----------
+
+const TREE_BACK_POS := Vector2(500, 96)
+const TREE_BACK_SIZE := Vector2(744, 566)
+const TREE_NODE_SIZE := 72.0
+const TREE_COL_X := [614.0, 806.0, 998.0]  # node centers
+const TREE_ROW_Y := [186.0, 356.0, 526.0]
+
+var _tree_tip: PanelContainer
+var _tree_tip_name: Label
+var _tree_tip_desc: Label
+var _tree_tip_state: Label
+
+
+func _draw_fixed_tree(tree: Array, learned: Dictionary, points: int) -> void:
+	# Dark backdrop (placeholder until dedicated tree art lands).
+	var back := ColorRect.new()
+	back.position = TREE_BACK_POS
+	back.size = TREE_BACK_SIZE
+	back.color = Color(0.05, 0.05, 0.06)
+	add_child(back)
+	# Faint grid lines through the node rows/columns, like the reference.
+	for cx in TREE_COL_X:
+		var v := ColorRect.new()
+		v.position = Vector2(cx, TREE_BACK_POS.y)
+		v.size = Vector2(1, TREE_BACK_SIZE.y)
+		v.color = Color(1, 1, 1, 0.05)
+		add_child(v)
+	for cy in TREE_ROW_Y:
+		var h := ColorRect.new()
+		h.position = Vector2(TREE_BACK_POS.x, cy)
+		h.size = Vector2(TREE_BACK_SIZE.x, 1)
+		h.color = Color(1, 1, 1, 0.05)
+		add_child(h)
+
+	var gate_note := Label.new()
+	gate_note.text = "Tier 2 unlocks at 5 points in Tier 1  •  Tier 3 at 10 points in Tiers 1–2"
+	gate_note.add_theme_font_size_override("font_size", 12)
+	gate_note.add_theme_color_override("font_color", Color(0.55, 0.52, 0.48))
+	gate_note.position = Vector2(TREE_BACK_POS.x, TREE_BACK_POS.y + TREE_BACK_SIZE.y + 6)
+	gate_note.size = Vector2(TREE_BACK_SIZE.x, 16)
+	gate_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	add_child(gate_note)
+
+	var tier_counts := {}
+	for talent in tree:
+		var tier: int = talent["tier"]
+		var col: int = tier_counts.get(tier, 0)
+		tier_counts[tier] = col + 1
+		var center := Vector2(TREE_COL_X[mini(col, 2)], TREE_ROW_Y[clampi(tier - 1, 0, 2)])
+		_make_tree_node(talent, learned, points, center)
+
+	# Shared hover tooltip: black panel, white bold name, yellow description.
+	_tree_tip = PanelContainer.new()
+	var tip_style := StyleBoxFlat.new()
+	tip_style.bg_color = Color(0, 0, 0, 0.94)
+	tip_style.set_corner_radius_all(4)
+	tip_style.content_margin_left = 12.0
+	tip_style.content_margin_right = 12.0
+	tip_style.content_margin_top = 8.0
+	tip_style.content_margin_bottom = 8.0
+	_tree_tip.add_theme_stylebox_override("panel", tip_style)
+	_tree_tip.visible = false
+	_tree_tip.z_index = 20
+	_tree_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var tip_box := VBoxContainer.new()
+	tip_box.add_theme_constant_override("separation", 4)
+	tip_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tree_tip.add_child(tip_box)
+	_tree_tip_name = Label.new()
+	var bold := FontVariation.new()
+	bold.base_font = ThemeDB.fallback_font
+	bold.variation_embolden = 0.9
+	_tree_tip_name.add_theme_font_override("font", bold)
+	_tree_tip_name.add_theme_font_size_override("font_size", 15)
+	_tree_tip_name.add_theme_color_override("font_color", Color.WHITE)
+	tip_box.add_child(_tree_tip_name)
+	_tree_tip_desc = Label.new()
+	_tree_tip_desc.add_theme_font_size_override("font_size", 12)
+	_tree_tip_desc.add_theme_color_override("font_color", Color(0.95, 0.82, 0.25))
+	_tree_tip_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_tree_tip_desc.custom_minimum_size = Vector2(300, 0)
+	tip_box.add_child(_tree_tip_desc)
+	_tree_tip_state = Label.new()
+	_tree_tip_state.add_theme_font_size_override("font_size", 11)
+	_tree_tip_state.add_theme_color_override("font_color", Color(0.65, 0.65, 0.65))
+	tip_box.add_child(_tree_tip_state)
+	add_child(_tree_tip)
+
+
+func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
+		center: Vector2) -> void:
+	var ranks_have := int(learned.get(talent["id"], 0))
+	var check: Dictionary = Talents.can_learn(
+		Run.party[selected].get("tree", []), talent["id"], learned)
+	var locked: bool = not check["ok"] and check["why"].begins_with("Locked")
+	var maxed: bool = ranks_have >= int(talent["ranks"])
+
+	var btn := Button.new()
+	btn.custom_minimum_size = Vector2(TREE_NODE_SIZE, TREE_NODE_SIZE)
+	btn.position = center - Vector2(TREE_NODE_SIZE / 2.0, TREE_NODE_SIZE / 2.0)
+	btn.focus_mode = Control.FOCUS_NONE
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.10, 0.10, 0.12)
+	sb.border_color = Color(0.32, 0.62, 0.34) if maxed else Color(0.24, 0.24, 0.27)
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(6)
+	var sb_hover: StyleBoxFlat = sb.duplicate()
+	sb_hover.border_color = Color(0.91, 0.78, 0.35)
+	sb_hover.set_border_width_all(3)
+	btn.add_theme_stylebox_override("normal", sb)
+	btn.add_theme_stylebox_override("hover", sb_hover)
+	btn.add_theme_stylebox_override("pressed", sb_hover)
+	# Placeholder emblem until node art lands.
+	btn.text = "⚔"
+	btn.add_theme_font_size_override("font_size", 30)
+	btn.add_theme_color_override("font_color",
+		Color(0.30, 0.30, 0.34) if locked else Color(0.58, 0.58, 0.64))
+	btn.add_theme_color_override("font_hover_color", Color(0.75, 0.75, 0.8))
+	if locked:
+		btn.modulate = Color(0.62, 0.62, 0.62)
+	btn.pressed.connect(_on_tree_node_pressed.bind(talent["id"]))
+	btn.mouse_entered.connect(_show_tree_tip.bind(talent, ranks_have, check, points, center))
+	btn.mouse_exited.connect(_hide_tree_tip)
+	add_child(btn)
+
+	var pts_label := Label.new()
+	pts_label.text = "%d/%d" % [ranks_have, int(talent["ranks"])]
+	pts_label.add_theme_font_size_override("font_size", 12)
+	var pts_color := Color(0.78, 0.75, 0.7)
+	if maxed:
+		pts_color = Color(0.5, 0.9, 0.55)
+	elif ranks_have > 0:
+		pts_color = Color(0.95, 0.85, 0.4)
+	pts_label.add_theme_color_override("font_color", pts_color)
+	pts_label.position = center + Vector2(-TREE_NODE_SIZE / 2.0, TREE_NODE_SIZE / 2.0 + 4)
+	pts_label.size = Vector2(TREE_NODE_SIZE, 14)
+	pts_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	add_child(pts_label)
+
+
+func _show_tree_tip(talent: Dictionary, ranks_have: int, check: Dictionary,
+		points: int, center: Vector2) -> void:
+	_tree_tip_name.text = talent["name"]
+	_tree_tip_desc.text = talent["desc"]
+	var state := "Rank %d/%d" % [ranks_have, int(talent["ranks"])]
+	if ranks_have >= int(talent["ranks"]):
+		state += "  —  MAXED"
+	elif not check["ok"]:
+		state += "  —  %s" % check["why"]
+	elif points < 1:
+		state += "  —  no talent points left"
+	else:
+		state += "  —  click to spend a point"
+	_tree_tip_state.text = state
+	_tree_tip.visible = true
+	# Sits to the left of the hovered node, like the reference image.
+	_tree_tip.reset_size()
+	var pos := center + Vector2(-TREE_NODE_SIZE / 2.0 - _tree_tip.size.x - 10, -24)
+	pos.x = maxf(pos.x, 12.0)
+	_tree_tip.position = pos
+
+
+func _hide_tree_tip() -> void:
+	if _tree_tip != null:
+		_tree_tip.visible = false
+
+
+func _on_tree_node_pressed(talent_id: String) -> void:
+	_learn_talent(talent_id)
 
 
 func _toggle_rune(rune_idx: int) -> void:

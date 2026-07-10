@@ -128,7 +128,9 @@ resist fractions (negative = vulnerable, e.g. the Withered Warden takes +25% fir
 <h3>4.8 Break damage &amp; Break</h3>
 <p>Attacks deal Break damage (BD) — damage against the Break meter — equal to the ability's Break damage (BD) value × grade multiplier (×1.5 on
 crits). <b>Every unit's Break meter is a universal 0–100 scale</b> with a numeric readout on
-the bar. Resistance comes from <b>Constitution</b>: incoming BD is scaled by
+the bar. Logged BD is the applied (post-Constitution) value, so the number always matches the
+meter; crits deal ×1.5 BD, which is why the same ability moves different meters by different
+amounts. Resistance comes from <b>Constitution</b>: incoming BD is scaled by
 100/Constitution (100 = neutral; a 160-Constitution boss takes ~38% less Break damage; an
 85-Constitution mage takes ~18% more). Constitution is set per specialization role (see §6),
 raised by talents, the Bulwark passive, and Poise runes. When the meter fills, the unit
@@ -203,7 +205,7 @@ sheet, distinguished by slot tints (white / blue / gold / green); distinct art i
 <table border="1" cellpadding="4">
 <tr><th>Class</th><th>HP</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Resource(s)</th></tr>
 <tr><td>Warrior</td><td>154</td><td>25%</td><td>95</td><td>110</td><td>Rage 0–100</td></tr>
-<tr><td>Mage</td><td>99</td><td>10%</td><td>110</td><td>85</td><td>Mana 100 + Resonance 0–5</td></tr>
+<tr><td>Mage</td><td>99</td><td>10%</td><td>110</td><td>85</td><td>Mana 100 (+ Resonance 0–5 as Arcanist)</td></tr>
 <tr><td>Cleric</td><td>121</td><td>15%</td><td>85</td><td>100</td><td>Mana 100 + Faith 0–100</td></tr>
 <tr><td>Hunter</td><td>110</td><td>12%</td><td>105</td><td>95</td><td>Focus 100</td></tr>
 </table>
@@ -217,9 +219,10 @@ Mage Phoenix Rebirth trades HP for a full refill.</li>
 <li><b>Focus (Hunter):</b> +15 at the start of their turns; Perfect basic +10.</li>
 <li><b>Faith (Cleric secondary):</b> +10 per action taken; spent on MIRACLE abilities (no
 Mana cost).</li>
-<li><b>Arcane Resonance (Mage secondary, 0–5):</b> +1 per damaging resolve (+2 if it crit).
-Each stack: +15% damage dealt, +3% crit, but +10% damage <i>taken</i>. Hitting max triggers
-Backlash Ward (+15 Mana). Stacks persist the whole battle (the old Guard vent is gone).</li>
+<li><b>Arcane Resonance (ARCANIST passive, 0–5):</b> only the Arcanist spec has the bar.
++1 per damaging cast (+2 on crits; parry counters grant nothing). Each stack: +15% damage
+dealt, +3% crit, but +10% damage <i>taken</i>. Hitting max triggers Backlash Ward (+15 Mana).
+Stacks persist until Death Ray consumes them.</li>
 </ul>
 <h3>5.2 Core kits (before specialization)</h3>
 <ul>
@@ -297,8 +300,10 @@ Razor Ice — 20 Mana, 15 frost / 14 BD / 3.0 × 2 random targets, always crits 
 (Perfect: 3 shards).<br>
 Blizzard — 30 Mana, 15 frost to ALL / 12 BD / 4.0 + Chilled 2 turns (Perfect: +50%
 BD).</li>
-<li><b>Arcanist (Ramp)</b> — Passive <i>Echo</i>: 20% chance spells strike again at 25% power
-(procs announce with a big "ECHO!").<br>
+<li><b>Arcanist (Ramp)</b> — Passive <i>Arcane Resonance</i> (the stack mechanic itself; see
+§5.1). The Echo passive is vaulted for future return.<br>
+Death Ray — free, 150 arcane / 100 BD / 8.0, benefits from Resonance then CONSUMES every
+stack (Perfect: restores 15 Mana).<br>
 Arcane Cannon — 30 Mana, 30 arcane / 15 BD / 3.5, +7.5% DAMAGE per Resonance stack; recoil is
 a flat 15% of damage dealt (Perfect: +5 bonus BD). Unity splits the recoil across
 the party like any other damage.<br>
@@ -377,7 +382,11 @@ HP/rank ×3). Tier 2 — Crushing Force (attacks ignore 5% armor/rank ×3), Ramp
 damage dealt AND taken/rank ×3). Tier 3 — Bloodlust (Hack and Slash strikes an extra time),
 Bloodcraze (heal 30 HP when an enemy bleeds out), Enraged (+1%/rank damage per hit taken,
 fades after 2 unhurt turns ×3). <b>Fixed-tree gating:</b> Tier 2 needs 5 points in Tier 1;
-Tier 3 needs 10 points across Tiers 1–2. Other specs still use generated pools until their
+Tier 3 needs 10 points across Tiers 1–2. Fixed trees render as an icon grid styled after the
+"Appearance example" reference: dark backdrop with faint grid lines, square emblem nodes
+(gold border on hover, green when maxed), x/y point counters beneath, black hover tooltip
+with a white bold name and yellow description, click-to-learn. Node art and the backdrop are
+placeholders awaiting final assets. Other specs still use generated pools until their
 fixed trees are designed.</p>
 <p>Generated pool identities — <b>Warden:</b> armor, Constitution, cheaper/faster
 Mocking Blow and Shieldwall, Bulwark Slam. <b>Swordmaster:</b> crit, parry, Pommel damage,
@@ -492,7 +501,9 @@ plays — order: warrior, mage, cleric, hunter). Target ≈85% bot win rate.</li
 <li><b>Testing shortcuts:</b> launch with DOD_DEBUG=1 to add a DEBUG section to the map
 burger menu — +200 gold, +3 talent points for everyone, full heal, jump to the boss tier,
 advance to the next zone, and <b>Reroll Specs</b> (refunds spent talent points, clears all
-specs, and reopens the awakening screen). The battle scene also runs standalone
+specs, and reopens the awakening screen). In battle, DOD_DEBUG=1 adds a DEBUG panel (under
+the combat log): Full Restore (HP/resources/secondary for the party) and per-hero "Turn →"
+buttons that make that hero act next. The battle scene also runs standalone
 (<code>godot res://scenes/battle.tscn</code>) with a default party and no run state.</li>
 <li><b>Sprites:</b> 100×100 frame strips named Name_Idle/Walk/Attack01–03/Hurt/Death.png;
 new character art must follow this format. New assets arrive in "imported files/".</li>

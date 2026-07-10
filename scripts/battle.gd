@@ -126,6 +126,8 @@ func _ready() -> void:
 	_build_ui()
 	_build_sfx_pool()
 	_spawn_units()
+	if OS.get_environment("DOD_DEBUG") == "1" and not autoplay:
+		_build_debug_panel()
 	if not sim:
 		# Boss fights open with the entry tune, capped so the battle track
 		# doesn't keep the fight waiting.
@@ -252,6 +254,11 @@ func _spawn_units() -> void:
 			# Role-based break resistance replaces the class base once specced.
 			cfg["constitution"] = Classes.SPEC_INFO[spec].get("constitution",
 				cfg.get("constitution", 100))
+			# Arcane Resonance is the Arcanist's passive mechanic alone.
+			if spec == "arcanist":
+				cfg["second_resource_name"] = "Resonance"
+				cfg["second_resource"] = 0
+				cfg["second_max"] = 5
 			Classes.apply_passive(cfg, spec)
 			if Run.active and i < Run.party.size():
 				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
@@ -464,6 +471,55 @@ func _build_skill_check_ui() -> void:
 	sc_root.add_child(sc_result)
 
 
+# Testing panel (DOD_DEBUG=1): jump the turn order and refill the party.
+func _build_debug_panel() -> void:
+	var panel := PanelContainer.new()
+	panel.position = Vector2(968, 206)
+	panel.self_modulate = Color(1, 1, 1, 0.85)
+	ui.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 3)
+	panel.add_child(box)
+	var title := Label.new()
+	title.text = "DEBUG"
+	title.add_theme_font_size_override("font_size", 12)
+	title.add_theme_color_override("font_color", Color(1.0, 0.6, 0.3))
+	box.add_child(title)
+	var restore := Button.new()
+	restore.text = "Full Restore"
+	restore.add_theme_font_size_override("font_size", 12)
+	restore.pressed.connect(_debug_full_restore)
+	box.add_child(restore)
+	for u in heroes:
+		var b := Button.new()
+		b.text = "Turn → %s" % u.unit_name
+		b.add_theme_font_size_override("font_size", 12)
+		b.pressed.connect(_debug_set_turn.bind(u))
+		box.add_child(b)
+
+
+func _debug_full_restore() -> void:
+	for u in heroes + companions:
+		if u.dead:
+			continue
+		u.hp = u.max_hp
+		u.resource = u.max_resource
+		if u.second_resource_name != "":
+			u.second_resource = u.second_max
+		u.refresh_bars()
+	_log("DEBUG: party fully restored", "#e0a050")
+
+
+func _debug_set_turn(u: BattleUnit) -> void:
+	if u.dead:
+		return
+	var best := _next_unit()
+	if best != null:
+		u.next_time = best.next_time - 0.01
+	_rebuild_turn_bar()
+	_log("DEBUG: %s acts next" % u.unit_name, "#e0a050")
+
+
 func _on_burger(id: int) -> void:
 	match id:
 		0:  # Restart Run: abandon this run and head back to the draft.
@@ -606,6 +662,12 @@ func _run_battle() -> void:
 		active_marker.position = u.position + Vector2(-11, -150)
 		for dot_id in DOT_STATUSES:
 			if u.has_status(dot_id) and not u.dead:
+				# Poison never ticks on the turn it was applied.
+				if dot_id == "poison":
+					var pstatus: Dictionary = u.get_status("poison")
+					if pstatus.get("fresh", false):
+						pstatus["fresh"] = false
+						continue
 				var dot_dmg: int = DOT_STATUSES[dot_id]
 				var stack_tag := ""
 				if dot_id == "poison":
@@ -812,6 +874,9 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			var flame := _find_ability(u, "Flame Surge")
 			if flame != null and u.resource >= flame.cost and foes.size() >= 2:
 				return [flame, target_foe]
+			var dray := _find_ability(u, "Death Ray")
+			if dray != null and u.second_resource >= 4:
+				return [dray, target_foe]
 			var barrage := _find_ability(u, "Arcane Barrage")
 			if barrage != null and u.resource >= barrage.cost and foes.size() >= 2:
 				return [barrage, target_foe]
@@ -1505,20 +1570,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				resist_tag = " (resisted)"
 			elif resist < 0.0:
 				resist_tag = " (vulnerable!)"
-			_log("%s: %s on %s — %d %s dmg%s%s, +%d Pressure%s" % [attacker.unit_name,
+			_log("%s: %s on %s — %d %s dmg%s%s, +%d BD%s" % [attacker.unit_name,
 				ab.display_name, strike_target.unit_name, final, ab.dmg_type,
-				" CRIT" if is_crit else "", resist_tag, pr, grade_tag],
+				" CRIT" if is_crit else "", resist_tag, result.get("bd", pr), grade_tag],
 				"#d8d2c4" if attacker.is_hero else "#e0a0a0")
-			# Arcanist Echo: the spell strikes again at half power (announced
-			# loudly so the proc reads clearly).
-			if attacker.passive_id == "echo" and not result.died and randf() < 0.20:
-				var echo_dmg := maxi(int(final * 0.25), 1)
-				strike_target.take_hit(echo_dmg, 0)
-				attacker.float_text("ECHO!", Color(0.85, 0.55, 1.0), true)
-				strike_target.float_text("%d Echo" % echo_dmg, Color(0.8, 0.6, 1.0))
-				_sfx("hit", -6.0, 1.3)
-				_log("   → ECHO! The spell strikes %s again for %d" % [
-					strike_target.unit_name, echo_dmg], "#b0a8e0")
+			# VAULTED — Echo passive (kept for future return):
+			# if attacker.passive_id == "echo" and not result.died and randf() < 0.20:
+			#     echo_dmg = max(int(final * 0.25), 1); strike again + "ECHO!" fanfare.
 			if ab.delay_push > 0.0:
 				strike_target.next_time += ab.delay_push * 100.0 / strike_target.effective_speed()
 			var status_chance := ab.status_chance
@@ -1669,6 +1727,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			blessed.float_text("+%d" % leech_heal, Color(0.7, 0.4, 0.9))
 			_log("   → Corrupted Channeling: %s heals %d" % [blessed.unit_name,
 				leech_heal], "#b0a8e0")
+		# Death Ray: the payoff — every Resonance stack is consumed.
+		if ab.display_name == "Death Ray" and attacker.second_resource_name == "Resonance" \
+				and attacker.second_resource > 0:
+			attacker.second_resource = 0
+			attacker.refresh_bars()
+			attacker.float_text("Resonance consumed", Color(0.6, 0.45, 0.75))
+			_log("   → %s consumes every Resonance stack" % attacker.unit_name, "#b0a8e0")
 		# Resonance builds only on the Mage's own casts — parry counters don't
 		# count (they made the Mage "start" battles with a stack).
 		if not is_counter:
@@ -2039,6 +2104,11 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 			attacker.refresh_bars()
 			attacker.float_text("+10 Rage", Color(1.0, 0.5, 0.4))
 			_log("   → %s gains +10 Rage" % attacker.unit_name, "#b0a8e0")
+		"mana15":
+			attacker.resource = mini(attacker.resource + 15, attacker.max_resource)
+			attacker.refresh_bars()
+			attacker.float_text("+15 Mana", Color(0.5, 0.7, 1.0))
+			_log("   → %s restores 15 Mana" % attacker.unit_name, "#b0a8e0")
 		"rage5":
 			attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
 			attacker.refresh_bars()
