@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-10</b></p>
+<p align="right"><b>Last updated: 2026-07-11</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative design reference (the timestamp above is bumped on every
 edit). It supersedes the original concept docs ("Dawn of Decay.docx", "DoD Combat.docx",
@@ -222,9 +222,9 @@ text. No banner text appears at the top of the battle.</p>
 <p>All four classes are drafted every run (one of each). Sprites currently share the Soldier
 sheet, distinguished by slot tints (white / blue / gold / green); distinct art is pending.
 <b>Test art:</b> a Warrior specced <b>Berserker</b> fights with his own sprite in battle
-(fur-cloaked axeman, native 124px frames at 1.25× battle scale; idle/walk/attack so far —
-hurt, death, and the other attack animations reuse what exists until those clips
-arrive).</p>
+(fur-cloaked axeman, native 124px frames at 1.25× battle scale, shown in its original
+colors — no slot tint; idle/walk/attack so far — hurt, death, and the other attack
+animations reuse what exists until those clips arrive).</p>
 <table border="1" cellpadding="4">
 <tr><th>Class</th><th>HP</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Resource(s)</th></tr>
 <tr><td>Warrior</td><td>154</td><td>25%</td><td>95</td><td>110</td><td>Rage 0–100</td></tr>
@@ -477,14 +477,20 @@ index).</p>
 <h2>10. Battle Screen &amp; Controls</h2>
 <ul>
 <li><b>Layout:</b> the camera shows the whole battle scene at 1:1 (sprites scaled up to
-compensate — heroes ×3.2, Chief ×3.9, bosses ×4.4). Burger menu (☰) top-left; initiative bar
-beside it; combat log top-right (scrolling, color-coded); heroes left, enemies right on the
-zone's own battlefield art (Forest / Scarlands); action bar bottom-center on the acting hero's
-turn; per-unit HP / resource bars, a Break meter with a numeric x/100 readout, status chips
-(hover for tooltips), and a bleed meter under each combatant. Rapid floating combat texts
-stagger vertically so they stay readable. The combat log details status effects: Bleed lines
-show buildup and meter value, Poison lines show stack counts and damage per turn, and DoT
-ticks report their stack multiplier.</li>
+compensate — heroes ×3.2, Chief ×3.9, bosses ×4.4; the Berserker's own art runs at ×1.25).
+The battlefield art (Forest / Scarlands) is shown at near-native pixel density — scaled to
+just cover the 1280×720 view plus a screen-shake margin, no more overscan blow-up. Burger
+menu (☰) top-left; initiative bar beside it; combat log top-right (scrolling, color-coded);
+action bar bottom-center on the acting hero's turn. <b>Each party is grouped tight</b>
+(heroes ~x350–430, enemies ~x905–990) and every unit's readouts live on a <b>nameplate</b>
+in a stack behind its party — heroes' plates along the LEFT edge, enemies' along the RIGHT.
+A plate holds the unit's name, HP bar, resource bar(s), Break meter with numeric x/100
+readout, and its status chips (hover for tooltips; Bleed buildup is a chip). Hovering a
+plate highlights its unit on the field; a dead unit's plate dims. Plate visuals are plain
+placeholders until the final UI asset set arrives. Rapid floating combat texts stagger
+vertically so they stay readable. The combat log details status effects: Bleed lines show
+buildup and meter value, Poison lines show stack counts and damage per turn, and DoT ticks
+report their stack multiplier.</li>
 <li><b>Action bar:</b> Basic attack button; <b>Abilities ▾</b> — a button list where hovering
 each entry live-previews its initiative cost on the bar (costs shown, unaffordable entries
 greyed); <b>Items ▾</b>. Guard no longer exists.</li>
@@ -493,6 +499,11 @@ order (Q is always the basic attack) — no need to open the Abilities menu. Eac
 its key, e.g. "[W] Bloodlust". A hotkey is ignored when the ability is unaffordable or gated
 (Death Ray below 5 Resonance, Kill Command without a living companion), and hotkeys only work
 while the action bar is open — never during targeting or a skill check.</li>
+<li><b>Tab:</b> while choosing an action, Tab opens/closes the <b>Abilities list</b> (browse
+with the mouse or fire a hotkey). After an ability is chosen, <b>Tab cycles through the
+available targets</b> (the highlight and ▼ marker follow) and <b>Space or Enter confirms</b>
+the highlighted one — a full keyboard turn is Q/W/E/R… → Tab → Space → Space on the skill
+check. Clicking still works everywhere.</li>
 <li><b>Burger menu:</b> Restart Run (abandons to a fresh draft), Settings (overlay with volume
 + fullscreen — the battle isn't lost), Exit to Main Menu (run resumes from the last saved
 node).</li>
@@ -548,16 +559,22 @@ battles). Target ≈85% bot win rate.</li>
 <li><b>Testing shortcuts:</b> debug tools are ALWAYS available in dev (unexported) builds;
 exported builds require DOD_DEBUG=1. The map burger menu gains a DEBUG section — +200 gold, +3 talent points for everyone, full heal, jump to the boss tier,
 advance to the next zone, and <b>Reroll Specs</b> (refunds spent talent points, clears all
-specs, and reopens the awakening screen). In battle, the DEBUG panel (under the combat log)
-offers: Full Restore (HP/resources/secondary for the party), <b>Hero Turn Now</b> (the next
-turn instantly goes to a hero, whatever the timeline says), and an <b>Enemy attacks OFF</b>
-toggle (enemies skip their turns while checked). The battle scene also runs standalone
+specs, and reopens the awakening screen). In battle, a <b>DEBUG ▾ menu</b> (bottom-right)
+offers: Full Restore (HP/resources/secondary for the party), an <b>Enemy attacks OFF</b>
+toggle (enemies skip their turns while checked), and a <b>turn lock</b> — pick a hero and
+EVERY turn is theirs until you unlock (re-select them) or lock a different hero; built for
+testing one hero's kit across many consecutive turns. The battle scene also runs standalone
 (<code>godot res://scenes/battle.tscn</code>) with a default party and no run state.</li>
 <li><b>Sprites:</b> horizontal frame strips named Name_Idle/Walk/Attack01–03/Hurt/Death.png
 (square frames; the stock sheets are 100×100, but units accept any frame size via the
 frame_size config — the Berserker test sheet is 124×124). Partial sheets are fine for
 testing: missing Attack02/03 replay Attack01, and missing Hurt/Death hold the idle frame.
 New assets arrive in "imported files/" (animated GIFs get converted to strips).</li>
+<li><b>Resolution template (the Berserker):</b> all future art should match the Berserker's
+pixel density. Characters: a standing figure ≈60–90px tall inside a ~124px frame, rendered
+around ×1.25 in battle, original colors (no slot tint on own-art heroes). Battle
+backgrounds: authored at ≈1280×720 (up to ~1670×940) and shown at/near native size — never
+blown up.</li>
 <li><b>Combat pacing:</b> global PACE multiplier 0.85 on battle waits.</li>
 </ul>
 

@@ -102,6 +102,8 @@ var sim := false
 var sim_target := 0
 var debug_prints := false
 var debug_enemies_off := false  # debug toggle: enemies skip their turns
+var debug_locked_hero: BattleUnit = null  # debug: every turn goes to this hero
+var _debug_popup: PopupMenu
 
 # Accumulated across scene reloads within one simulation run.
 static var sim_stats := {}
@@ -169,7 +171,10 @@ func _build_arena() -> void:
 	var tex: Texture2D = load(bg_by_zone.get(zone, bg_by_zone["Forest of Old"]))
 	var art := Sprite2D.new()
 	art.texture = tex
-	var cover := maxf(1680.0 / tex.get_width(), 920.0 / tex.get_height())
+	# Shown near native pixel density (the Berserker sheet is the resolution
+	# template): cover just the 1280x720 view plus a screen-shake margin,
+	# instead of the old 1680x920 overscan that blew the art up ~30%.
+	var cover := maxf(1328.0 / tex.get_width(), 768.0 / tex.get_height())
 	art.scale = Vector2(cover, cover)
 	art.position = Vector2(640, 360)
 	add_child(art)
@@ -182,16 +187,22 @@ func _build_arena() -> void:
 	cam.make_current()
 
 
-# Kept high enough that the bottom row's bars and status chips stay on screen.
-const HERO_SLOTS := [Vector2(430, 350), Vector2(240, 435), Vector2(430, 520), Vector2(240, 605)]
+# Parties are grouped tight; names/bars/chips live on nameplate stacks at the
+# screen edges (heroes left, enemies right), leaving the field to the sprites.
+const HERO_SLOTS := [Vector2(430, 380), Vector2(350, 455), Vector2(430, 530), Vector2(350, 605)]
 const ENEMY_LAYOUTS := {
-	1: [Vector2(1000, 470)],
-	2: [Vector2(920, 400), Vector2(1000, 560)],
-	3: [Vector2(900, 380), Vector2(1050, 480), Vector2(940, 585)],
-	4: [Vector2(880, 360), Vector2(1060, 440), Vector2(880, 520), Vector2(1060, 600)],
-	5: [Vector2(880, 350), Vector2(1060, 415), Vector2(880, 480), Vector2(1060, 545),
-		Vector2(950, 610)],
+	1: [Vector2(940, 470)],
+	2: [Vector2(920, 410), Vector2(980, 540)],
+	3: [Vector2(910, 390), Vector2(990, 480), Vector2(920, 575)],
+	4: [Vector2(910, 380), Vector2(990, 450), Vector2(910, 520), Vector2(990, 590)],
+	5: [Vector2(905, 370), Vector2(985, 425), Vector2(905, 480), Vector2(985, 535),
+		Vector2(945, 595)],
 }
+# Nameplate stacks: plate i belongs to party slot i (companion = 5th hero slot).
+const HERO_PLATE_X := 8.0
+const ENEMY_PLATE_X := 1048.0  # 1280 - 8 - plate width (224)
+const PLATE_TOP := 210.0
+const PLATE_STEP := 88.0
 
 
 func _enemy_config(kind: String) -> Dictionary:
@@ -306,7 +317,11 @@ func _spawn_units() -> void:
 				cfg["type_dmg_bonus"] = bonuses
 		# Percentage HP talents (Vitality) apply after every flat bonus.
 		cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
-		var u := _make_unit(cfg, HERO_SLOTS[i], Classes.HERO_TINTS[i])
+		# Heroes with their own art keep original colors — no slot tint.
+		var hero_tint: Color = Classes.HERO_TINTS[i]
+		if spec == "berserker":
+			hero_tint = Color.WHITE
+		var u := _make_unit(cfg, HERO_SLOTS[i], hero_tint, _hero_plate_pos(i))
 		u.crit_bonus = cfg.get("crit_bonus", 0.0)
 		u.parry_bonus = cfg.get("parry_bonus", 0.0)
 		if spec != "":
@@ -345,21 +360,32 @@ func _spawn_units() -> void:
 			for ab in cfg["abilities"]:
 				ab.damage = int(ab.damage * zone_mult)
 			tint = tint.lerp(Color(1.0, 0.6, 0.45), 0.35)
-		enemies.append(_make_unit(cfg, layout[i], tint))
+		enemies.append(_make_unit(cfg, layout[i], tint,
+			Vector2(ENEMY_PLATE_X, PLATE_TOP + i * PLATE_STEP)))
 
 	for u in heroes + enemies:
 		u.next_time = (100.0 / u.speed) * randf_range(0.0, 1.0)
 
 
-func _make_unit(config: Dictionary, pos: Vector2, tint: Color) -> BattleUnit:
+func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
+		plate_pos: Vector2) -> BattleUnit:
 	var u := BattleUnit.new()
 	u.position = pos
 	add_child(u)
 	u.setup(config)
+	# The nameplate is a sibling (not a child) so lunges/knockback never move it.
+	var plate := Node2D.new()
+	plate.position = plate_pos
+	add_child(plate)
+	u.build_plate(plate)
 	u.set_tint(tint)
 	u.clicked.connect(func(): _target_picked.emit(u))
 	u.refresh_bars()
 	return u
+
+
+func _hero_plate_pos(slot: int) -> Vector2:
+	return Vector2(HERO_PLATE_X, PLATE_TOP + slot * PLATE_STEP)
 
 
 func _orc_raider_kit() -> Array:
@@ -538,37 +564,46 @@ func _build_skill_check_ui() -> void:
 	sc_root.add_child(sc_result)
 
 
-# Testing panel (DOD_DEBUG=1): jump the turn order and refill the party.
+# Testing menu (dev builds): a compact DEBUG dropdown bottom-right so it
+# stays clear of the nameplate stacks. Turn lock: pick a hero and EVERY turn
+# is theirs until unlocked or another hero is picked.
 func _build_debug_panel() -> void:
-	var panel := PanelContainer.new()
-	panel.position = Vector2(968, 206)
-	panel.self_modulate = Color(1, 1, 1, 0.85)
-	ui.add_child(panel)
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 3)
-	panel.add_child(box)
-	var title := Label.new()
-	title.text = "DEBUG"
-	title.add_theme_font_size_override("font_size", 12)
-	title.add_theme_color_override("font_color", Color(1.0, 0.6, 0.3))
-	box.add_child(title)
-	var restore := Button.new()
-	restore.text = "Full Restore"
-	restore.add_theme_font_size_override("font_size", 12)
-	restore.pressed.connect(_debug_full_restore)
-	box.add_child(restore)
-	var hero_turn := Button.new()
-	hero_turn.text = "Hero Turn Now"
-	hero_turn.add_theme_font_size_override("font_size", 12)
-	hero_turn.tooltip_text = "The next turn goes to a hero,\nwhatever the timeline says."
-	hero_turn.pressed.connect(_debug_hero_turn)
-	box.add_child(hero_turn)
-	var no_enemies := CheckBox.new()
-	no_enemies.text = "Enemy attacks OFF"
-	no_enemies.add_theme_font_size_override("font_size", 12)
-	no_enemies.tooltip_text = "While checked, enemies skip their turns."
-	no_enemies.toggled.connect(_debug_toggle_enemies)
-	box.add_child(no_enemies)
+	var menu := MenuButton.new()
+	menu.text = "DEBUG ▾"
+	menu.flat = false
+	menu.custom_minimum_size = Vector2(104, 40)
+	menu.position = Vector2(1160, 668)
+	menu.self_modulate = Color(1.0, 0.85, 0.65)
+	ui.add_child(menu)
+	_debug_popup = menu.get_popup()
+	_debug_popup.add_item("Full Restore", 0)
+	_debug_popup.add_check_item("Enemy attacks OFF", 1)
+	_debug_popup.add_separator("Turn lock — stays their turn")
+	for i in heroes.size():
+		_debug_popup.add_radio_check_item("Lock → %s" % heroes[i].unit_name, 10 + i)
+	_debug_popup.id_pressed.connect(_on_debug_menu)
+
+
+func _on_debug_menu(id: int) -> void:
+	if id == 0:
+		_debug_full_restore()
+		return
+	if id == 1:
+		var check_idx := _debug_popup.get_item_index(1)
+		_debug_popup.set_item_checked(check_idx, not _debug_popup.is_item_checked(check_idx))
+		_debug_toggle_enemies(_debug_popup.is_item_checked(check_idx))
+		return
+	# Turn lock radio: clicking the active hero again unlocks.
+	var hero: BattleUnit = heroes[id - 10]
+	debug_locked_hero = null if debug_locked_hero == hero else hero
+	for i in heroes.size():
+		_debug_popup.set_item_checked(_debug_popup.get_item_index(10 + i),
+			heroes[i] == debug_locked_hero)
+	if debug_locked_hero != null:
+		_log("DEBUG: every turn goes to %s (re-select to unlock)" % hero.unit_name,
+			"#e0a050")
+	else:
+		_log("DEBUG: turn lock released", "#e0a050")
 
 
 func _debug_full_restore() -> void:
@@ -581,22 +616,6 @@ func _debug_full_restore() -> void:
 			u.second_resource = u.second_max
 		u.refresh_bars()
 	_log("DEBUG: party fully restored", "#e0a050")
-
-
-# Force the next turn to a hero (the one due soonest), whatever the order says.
-func _debug_hero_turn() -> void:
-	var living: Array = heroes.filter(func(h): return not h.dead)
-	if living.is_empty():
-		return
-	var soonest: BattleUnit = living[0]
-	for h in living:
-		if h.next_time < soonest.next_time:
-			soonest = h
-	var best := _next_unit()
-	if best != null and not best.is_hero:
-		soonest.next_time = best.next_time - 0.01
-	_rebuild_turn_bar()
-	_log("DEBUG: %s acts next" % soonest.unit_name, "#e0a050")
 
 
 func _debug_toggle_enemies(off: bool) -> void:
@@ -738,6 +757,11 @@ func _run_battle() -> void:
 	_message("The Decay stirs...")
 	await _wait(0.8)
 	while not battle_over:
+		# Debug turn lock: the chosen hero cuts ahead of everyone, every time.
+		if debug_locked_hero != null and not debug_locked_hero.dead:
+			var soonest := _next_unit()
+			if soonest != null and soonest != debug_locked_hero:
+				debug_locked_hero.next_time = soonest.next_time - 0.01
 		_rebuild_turn_bar()
 		var u := _next_unit()
 		if u == null:
@@ -1137,6 +1161,8 @@ func _show_actions(u: BattleUnit) -> void:
 	var popup := PopupPanel.new()
 	_open_popups.append(popup)
 	popup.window_input.connect(_on_popup_window_input)
+	_main_popup = popup
+	_main_popup_anchor = menu_btn
 	var list := VBoxContainer.new()
 	list.add_theme_constant_override("separation", 4)
 	popup.add_child(list)
@@ -1230,6 +1256,11 @@ func _open_summon_popup(sub: PopupPanel, parent: PopupPanel) -> void:
 var _preview_locked := false
 var second_target: BattleUnit = null  # choose_two abilities (Shrapnel)
 var _open_popups: Array = []  # ability popups to close when a hotkey fires
+var _main_popup: PopupPanel   # the Abilities list (Tab toggles it)
+var _main_popup_anchor: Button
+# Keyboard targeting: Tab cycles the candidates, Space/Enter confirms.
+var _kb_pool: Array = []
+var _kb_idx := -1
 
 
 func _preview_delay(u: BattleUnit, ab: Ability) -> void:
@@ -1301,6 +1332,9 @@ func _build_items_menu() -> MenuButton:
 func _pick_target(pool: Array) -> BattleUnit:
 	for t in pool:
 		t.set_targetable(true)
+	# Tab cycles through the pool, Space/Enter confirms (see _input).
+	_kb_pool = pool
+	_kb_idx = -1
 	var cancel := Button.new()
 	cancel.text = "✕ Cancel"
 	cancel.custom_minimum_size = Vector2(120, 40)
@@ -1308,8 +1342,11 @@ func _pick_target(pool: Array) -> BattleUnit:
 	cancel.pressed.connect(func(): _target_picked.emit(null))
 	ui.add_child(cancel)
 	var chosen: BattleUnit = await _target_picked
+	_kb_pool = []
+	_kb_idx = -1
 	for t in pool:
 		t.set_targetable(false)
+		t.set_highlight(false)
 	cancel.queue_free()
 	return chosen
 
@@ -2160,7 +2197,8 @@ func _do_summon(hunter: BattleUnit, kind: String) -> void:
 		"sprite_scale": 1.4, "max_hp": stats[0] + hunter.companion_hp_bonus,
 		"armor": hunter.armor, "speed": hunter.speed, "stability": hunter.stability,
 		"constitution": hunter.constitution, "abilities": []}
-	var comp := _make_unit(cfg, hunter.position + Vector2(110, -16), stats[1])
+	var comp := _make_unit(cfg, hunter.position + Vector2(110, -16), stats[1],
+		_hero_plate_pos(heroes.size()))
 	comp.is_companion = true
 	comp.companion_kind = kind
 	comp.crit_bonus = hunter.crit_bonus
@@ -2381,6 +2419,13 @@ func _process(delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo \
 			and not sc_active and not autoplay and not battle_over:
+		if event.keycode == KEY_TAB:
+			_on_tab_pressed()
+			return
+		if event.keycode in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
+			if _kb_confirm_target():
+				get_viewport().set_input_as_handled()
+				return
 		_try_ability_hotkey(event.keycode)
 	if not sc_active:
 		return
@@ -2396,7 +2441,39 @@ func _input(event: InputEvent) -> void:
 func _on_popup_window_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo \
 			and not sc_active and not autoplay and not battle_over:
-		_try_ability_hotkey(event.keycode)
+		if event.keycode == KEY_TAB:
+			_on_tab_pressed()
+		else:
+			_try_ability_hotkey(event.keycode)
+
+
+# Tab: toggles the Abilities list during action select; cycles targets while
+# picking one.
+func _on_tab_pressed() -> void:
+	get_viewport().set_input_as_handled()
+	if not _kb_pool.is_empty():
+		_cycle_kb_target()
+	elif current_hero != null and action_panel.visible and _main_popup != null \
+			and is_instance_valid(_main_popup):
+		if _main_popup.visible:
+			_main_popup.hide()
+		else:
+			_open_ability_popup(_main_popup, _main_popup_anchor)
+
+
+func _cycle_kb_target() -> void:
+	if _kb_idx >= 0 and _kb_idx < _kb_pool.size():
+		_kb_pool[_kb_idx].set_highlight(false)
+	_kb_idx = (_kb_idx + 1) % _kb_pool.size()
+	_kb_pool[_kb_idx].set_highlight(true)
+
+
+# Space/Enter confirms the Tab-selected target. False = nothing to confirm.
+func _kb_confirm_target() -> bool:
+	if _kb_pool.is_empty() or _kb_idx < 0:
+		return false
+	_target_picked.emit(_kb_pool[_kb_idx])
+	return true
 
 
 # Q/W/E/R/A/S/D/F pick abilities by slot while the action bar is open.

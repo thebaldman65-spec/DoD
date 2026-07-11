@@ -5,6 +5,29 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-11 — Batch 6: nameplates, Tab controls, turn lock, native-res background</h2>
+<ul>
+<li><b>Nameplates:</b> every unit's name, HP bar, resource bar(s), Break meter, and status
+chips moved off the sprites onto nameplate stacks behind each party — heroes' plates along
+the left screen edge, enemies' along the right. Hovering a plate highlights its unit on the
+field; dead units' plates dim. Both parties are grouped tighter on the field now that the
+sprites carry no UI. Plate styling is a plain placeholder until the full UI asset set
+arrives.</li>
+<li><b>Tab controls:</b> Tab opens/closes the Abilities list while choosing an action; after
+an ability is picked, Tab cycles through the available targets and Space/Enter confirms. A
+full turn is playable from the keyboard: hotkey → Tab → Space → Space on the skill
+check.</li>
+<li><b>Debug turn lock:</b> the battle debug tools moved into a DEBUG ▾ menu (bottom-right)
+and "Hero Turn Now" was replaced by a proper <b>turn lock</b> — pick a hero and every turn
+is theirs until you unlock or switch heroes, for testing a kit over many consecutive
+turns.</li>
+<li><b>Background at native size:</b> battle art is no longer overscanned ~30% — it scales
+to just cover the 1280×720 view (plus a shake margin). The Berserker sheet is the official
+<b>resolution template</b> going forward (figures ≈60–90px in ~124px frames at ×1.25;
+backgrounds authored ≈1280×720, shown native).</li>
+<li><b>Berserker untinted:</b> heroes with their own art keep original file colors — the
+draft-slot tint no longer recolors the Berserker.</li>
+</ul>
 <h2>2026-07-10 — Batch 5: Weaknesses, ability hotkeys, Berserker test sprite, Renewal</h2>
 <ul>
 <li><b>New mechanic — Weaknesses:</b> a unit can be WEAK to a damage type, taking <b>25%

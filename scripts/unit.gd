@@ -64,6 +64,7 @@ var bloodcraze := 0           # heals 30 when an enemy bleeds out
 var statuses: Array = []
 
 var sprite: AnimatedSprite2D
+var _plate_root: Node2D    # nameplate container owned by the battle scene
 var _hp_fill: ColorRect
 var _hp_text: Label
 var _res_fill: ColorRect
@@ -90,7 +91,9 @@ func setup(config: Dictionary) -> void:
 	hp = max_hp
 	# Default scale sized for the 1:1 full-scene camera.
 	_build_sprite(config["sheet_dir"], config.get("sprite_scale", 3.2))
-	_build_bars()
+	_build_target_zone()
+	# Bars/name/chips live on an off-sprite nameplate: the battle scene calls
+	# build_plate() with a root it positions in the party's plate stack.
 
 
 func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
@@ -187,56 +190,76 @@ func _build_sphere_sprite(sprite_scale: float) -> void:
 	sprite.play("idle")
 
 
-func _build_bars() -> void:
-	var bar_y := 50.0
-	# Compact bars hugging the sprite so tall parties fit on screen.
-	add_child(_make_bar_bg(Vector2(-36, bar_y), Vector2(72, 13)))
-	_hp_fill = _make_fill(Vector2(-35, bar_y + 1), Vector2(70, 11), Color(0.30, 0.78, 0.32))
-	add_child(_hp_fill)
-	_hp_text = _make_bar_text(Vector2(-36, bar_y), Vector2(72, 13), 9)
-	add_child(_hp_text)
-	var next_y := bar_y + 15.0
-	if resource_name != "":
-		add_child(_make_bar_bg(Vector2(-36, next_y), Vector2(72, 12)))
-		var res_color := Color(0.85, 0.30, 0.25) if resource_name == "Rage" else \
-			(Color(0.55, 0.85, 0.40) if resource_name == "Focus" else Color(0.30, 0.50, 0.90))
-		_res_fill = _make_fill(Vector2(-35, next_y + 1), Vector2(70, 10), res_color)
-		add_child(_res_fill)
-		_res_text = _make_bar_text(Vector2(-36, next_y), Vector2(72, 12), 8)
-		add_child(_res_text)
-		next_y += 14.0
-	if second_resource_name != "":
-		add_child(_make_bar_bg(Vector2(-36, next_y), Vector2(72, 11)))
-		var res2_color := Color(0.95, 0.80, 0.30) if second_resource_name == "Faith" \
-			else Color(0.75, 0.40, 0.95)
-		_res2_fill = _make_fill(Vector2(-35, next_y + 1), Vector2(70, 9), res2_color)
-		add_child(_res2_fill)
-		_res2_text = _make_bar_text(Vector2(-36, next_y), Vector2(72, 11), 8)
-		add_child(_res2_text)
-		next_y += 13.0
-	add_child(_make_bar_bg(Vector2(-36, next_y), Vector2(72, 12)))
-	_pressure_fill = _make_fill(Vector2(-35, next_y + 1), Vector2(70, 10), Color(0.80, 0.35, 1.0))
-	add_child(_pressure_fill)
-	_pressure_text = _make_bar_text(Vector2(-36, next_y), Vector2(72, 12), 8)
-	add_child(_pressure_text)
+# Nameplate dimensions (plain styling until final UI assets arrive).
+const PLATE_W := 224.0
+const PLATE_BAR_W := 206.0
+
+
+# Builds this unit's nameplate (name, HP/resource/Break bars, status chips)
+# into `root` — a node the battle scene positions in the party's plate stack,
+# NOT a child of the unit (sprites lunge around; plates must not).
+func build_plate(root: Node2D) -> void:
+	_plate_root = root
+	var panel := Panel.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.08, 0.06, 0.10, 0.88)
+	style.border_color = Color(0.32, 0.30, 0.38)
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(4)
+	panel.add_theme_stylebox_override("panel", style)
+	# Hovering a plate highlights its unit on the field (and vice versa is
+	# unnecessary — the plate is always in the same stack slot).
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	panel.mouse_entered.connect(set_highlight.bind(true))
+	panel.mouse_exited.connect(set_highlight.bind(false))
+	root.add_child(panel)
 
 	var name_label := Label.new()
 	name_label.text = unit_name
 	name_label.add_theme_font_override("font", NAME_FONT)
-	name_label.add_theme_font_size_override("font_size", 17)
+	name_label.add_theme_font_size_override("font_size", 16)
 	name_label.add_theme_color_override("font_color", Color(0.92, 0.88, 0.78))
-	name_label.add_theme_constant_override("outline_size", 4)
-	name_label.add_theme_color_override("font_outline_color", Color(0.05, 0.03, 0.08, 0.9))
-	name_label.position = Vector2(-50, -68)
-	name_label.size = Vector2(100, 18)
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(name_label)
+	name_label.position = Vector2(8, 2)
+	name_label.size = Vector2(PLATE_W - 16, 18)
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(name_label)
+
+	var y := 23.0
+	panel.add_child(_make_bar_bg(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 13)))
+	_hp_fill = _make_fill(Vector2(9, y + 1), Vector2(PLATE_BAR_W, 11), Color(0.30, 0.78, 0.32))
+	panel.add_child(_hp_fill)
+	_hp_text = _make_bar_text(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 13), 10)
+	panel.add_child(_hp_text)
+	y += 15.0
+	if resource_name != "":
+		panel.add_child(_make_bar_bg(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 11)))
+		var res_color := Color(0.85, 0.30, 0.25) if resource_name == "Rage" else \
+			(Color(0.55, 0.85, 0.40) if resource_name == "Focus" else Color(0.30, 0.50, 0.90))
+		_res_fill = _make_fill(Vector2(9, y + 1), Vector2(PLATE_BAR_W, 9), res_color)
+		panel.add_child(_res_fill)
+		_res_text = _make_bar_text(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 11), 9)
+		panel.add_child(_res_text)
+		y += 13.0
+	if second_resource_name != "":
+		panel.add_child(_make_bar_bg(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 11)))
+		var res2_color := Color(0.95, 0.80, 0.30) if second_resource_name == "Faith" \
+			else Color(0.75, 0.40, 0.95)
+		_res2_fill = _make_fill(Vector2(9, y + 1), Vector2(PLATE_BAR_W, 9), res2_color)
+		panel.add_child(_res2_fill)
+		_res2_text = _make_bar_text(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 11), 9)
+		panel.add_child(_res2_text)
+		y += 13.0
+	panel.add_child(_make_bar_bg(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 11)))
+	_pressure_fill = _make_fill(Vector2(9, y + 1), Vector2(PLATE_BAR_W, 9), Color(0.80, 0.35, 1.0))
+	panel.add_child(_pressure_fill)
+	_pressure_text = _make_bar_text(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 11), 9)
+	panel.add_child(_pressure_text)
+	y += 13.0
 
 	_chips_root = Node2D.new()
-	_chips_root.position = Vector2(0, next_y + 15.0)
-	add_child(_chips_root)
-
-	_build_target_zone()
+	_chips_root.position = Vector2(10, y + 3.0)
+	panel.add_child(_chips_root)
+	panel.size = Vector2(PLATE_W, y + 24.0)
 
 
 # Text label sized exactly to its bar so centering is pixel-true.
@@ -318,13 +341,13 @@ func _make_fill(pos: Vector2, bar_size: Vector2, color: Color) -> ColorRect:
 
 
 func refresh_bars() -> void:
-	_hp_fill.size.x = 70.0 * clampf(hp / float(max_hp), 0.0, 1.0)
+	_hp_fill.size.x = PLATE_BAR_W * clampf(hp / float(max_hp), 0.0, 1.0)
 	_hp_text.text = "%d/%d" % [hp, max_hp]
 	if _res_fill != null:
-		_res_fill.size.x = 70.0 * clampf(resource / float(max_resource), 0.0, 1.0)
-		_res_text.text = "%d/%d" % [resource, max_resource]
+		_res_fill.size.x = PLATE_BAR_W * clampf(resource / float(max_resource), 0.0, 1.0)
+		_res_text.text = "%s %d/%d" % [resource_name, resource, max_resource]
 	if _res2_fill != null:
-		_res2_fill.size.x = 70.0 * clampf(second_resource / float(second_max), 0.0, 1.0)
+		_res2_fill.size.x = PLATE_BAR_W * clampf(second_resource / float(second_max), 0.0, 1.0)
 		if second_resource_name == "Resonance":
 			_res2_text.text = "%d/%d (+%d%% dmg)" % [second_resource, second_max,
 				second_resource * 15]
@@ -350,8 +373,8 @@ func refresh_bars() -> void:
 				_refresh_chips()
 				break
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
-	_pressure_fill.size.x = 70.0 * pressure_ratio
-	_pressure_text.text = "%d/%d" % [pressure, stability]
+	_pressure_fill.size.x = PLATE_BAR_W * pressure_ratio
+	_pressure_text.text = "Break %d/%d" % [pressure, stability]
 	# Shifts toward hot pink as the unit gets close to Breaking.
 	_pressure_fill.color = Color(0.80, 0.35, 1.0).lerp(Color(1.0, 0.25, 0.55), pressure_ratio)
 
@@ -478,11 +501,8 @@ func _refresh_chips() -> void:
 	var count := statuses.size()
 	if count == 0:
 		return
-	var total_w := 0.0
-	for s in statuses:
-		total_w += (16.0 if String(s.short).length() <= 2 else 34.0) + 2.0
-	var start_x := -(total_w - 2.0) / 2.0
-	var x := start_x
+	# Left-aligned inside the nameplate's chip row.
+	var x := 0.0
 	for i in count:
 		var s: Dictionary = statuses[i]
 		var chip_w := 16.0 if String(s.short).length() <= 2 else 34.0
@@ -601,6 +621,8 @@ func _die() -> void:
 	broken_pending = false
 	statuses.clear()
 	_refresh_chips()
+	if _plate_root != null:
+		_plate_root.modulate = Color(0.52, 0.47, 0.55)
 	play_anim("death")
 
 
@@ -621,6 +643,8 @@ func revive(pct: float) -> void:
 	hp = maxi(int(max_hp * pct), 1)
 	pressure = 0
 	modulate = Color.WHITE
+	if _plate_root != null:
+		_plate_root.modulate = Color.WHITE
 	sprite.self_modulate = _base_tint
 	sprite.play("idle")
 	refresh_bars()
@@ -683,3 +707,11 @@ func _on_anim_finished() -> void:
 	if dead and sprite.animation == "death":
 		sprite.pause()
 		modulate = Color(0.45, 0.4, 0.5)
+
+
+# The plate lives outside this node's tree; take it along when freed
+# (e.g. a Beastmaster companion being replaced).
+func _exit_tree() -> void:
+	if _plate_root != null and is_instance_valid(_plate_root):
+		_plate_root.queue_free()
+		_plate_root = null
