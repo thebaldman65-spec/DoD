@@ -115,10 +115,6 @@ static func cleric_kit() -> Array:
 			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 			"perfect_id": "ward", "perfect_text": "Grants Ward (-50% Pressure taken, 2 turns)",
 			"description": "Restore HP to one ally. Builds Faith."}),
-		Ability.make({"display_name": "Renewal", "cost": 20, "special": "renewal",
-			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
-			"perfect_id": "", "perfect_text": "Also heals 8 HP instantly",
-			"description": "Ally heals 8 HP at the start of each\nof their turns, for 5 turns."}),
 	]
 
 
@@ -306,6 +302,10 @@ static func spec_abilities(spec: String) -> Array:
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "+15 bonus healing",
 					"description": "Heal an ally for 40. Overhealing\nflows back to the Cleric."}),
+				Ability.make({"display_name": "Renewal", "cost": 20, "special": "renewal",
+					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
+					"perfect_id": "", "perfect_text": "Also heals 15 HP instantly",
+					"description": "Ally heals 15 HP at the start of each\nof their turns, for 5 turns."}),
 				Ability.make({"display_name": "Hymn of Hope", "cost": 0, "faith_cost": 30,
 					"special": "hymn", "delay": 4.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Heals 25% instead",

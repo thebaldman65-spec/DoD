@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-09</b></p>
+<p align="right"><b>Last updated: 2026-07-10</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative design reference (the timestamp above is bumped on every
 edit). It supersedes the original concept docs ("Dawn of Decay.docx", "DoD Combat.docx",
@@ -125,7 +125,12 @@ below half HP; Mage Resonance +10% damage
 <li><b>Armor:</b> flat % damage reduction. Fortify +10%; Broken ×0.7; Sunder ×0.65; armor_pierce
 ignores a fraction (Piercing Arrow 50%, Singularity 30%).</li>
 <li><b>Damage types (7):</b> physical, fire, frost, arcane, nature, shadow, holy. Enemies carry
-resist fractions (negative = vulnerable, e.g. the Withered Warden takes +25% fire).</li>
+resist fractions per type.</li>
+<li><b>Weaknesses:</b> a unit can be WEAK to a damage type — it takes <b>25% extra damage</b>
+from it (stored as a negative resist, so weaknesses stack with resists). Hits on a weakness
+flash <b>WEAK!</b> over the target and are tagged in the combat log; weak-to-nature units
+also take amplified Poison ticks. Who is weak to what is per-enemy design (to be assigned;
+currently the Ash-Wrought Tyrant is weak to frost).</li>
 <li><b>Barrier</b> absorbs damage (not BD) before HP.</li>
 </ul>
 <h3>4.8 Break damage &amp; Break</h3>
@@ -154,7 +159,7 @@ caster's snapshotted crit chance.</li>
 vulnerability raises it). Stacks additively with no cap; every new application adds a stack
 AND refreshes the timer. Applied by Orc Archers' Poison Arrow (3 turns), the Withered Warden's
 Roots of Wrath (3 turns), and the Survivalist's Trapper passive (5 turns).</li>
-<li><b>Renewal</b> +8 HP and <b>Focus (status)</b> +10 Mana at turn start.</li>
+<li><b>Renewal</b> +15 HP and <b>Focus (status)</b> +10 Mana at turn start.</li>
 </ul>
 <h3>4.6 Status effects (current roster)</h3>
 <table border="1" cellpadding="4">
@@ -174,7 +179,7 @@ ward.</td></tr>
 <tr><td>Fortify</td><td>+10% armor (Defense Potion).</td></tr>
 <tr><td>Barrier</td><td>Absorbs N incoming damage, then breaks.</td></tr>
 <tr><td>Focus</td><td>+10 Mana each turn.</td></tr>
-<tr><td>Renewal</td><td>+8 HP each turn.</td></tr>
+<tr><td>Renewal</td><td>+15 HP each turn.</td></tr>
 <tr><td>Surge</td><td>+20% attack.</td></tr>
 <tr><td>Mocked</td><td>Must attack the Warrior who mocked them.</td></tr>
 <tr><td>Quick Draw</td><td>All abilities act 50% faster.</td></tr>
@@ -215,7 +220,11 @@ text. No banner text appears at the top of the battle.</p>
 
 <h2>5. Heroes</h2>
 <p>All four classes are drafted every run (one of each). Sprites currently share the Soldier
-sheet, distinguished by slot tints (white / blue / gold / green); distinct art is pending.</p>
+sheet, distinguished by slot tints (white / blue / gold / green); distinct art is pending.
+<b>Test art:</b> a Warrior specced <b>Berserker</b> fights with his own sprite in battle
+(fur-cloaked axeman, native 124px frames at 1.25× battle scale; idle/walk/attack so far —
+hurt, death, and the other attack animations reuse what exists until those clips
+arrive).</p>
 <table border="1" cellpadding="4">
 <tr><th>Class</th><th>HP</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Resource(s)</th></tr>
 <tr><td>Warrior</td><td>154</td><td>25%</td><td>95</td><td>110</td><td>Rage 0–100</td></tr>
@@ -246,8 +255,7 @@ Stacks persist until Death Ray consumes them.</li>
 15 Mana, 2.0, for 3 turns 50% of damage the Mage takes converts into Mana (Perfect: casts at
 1.5 int). (Arcane Surge and Reality Fracture are vaulted — removed but kept for later.)</li>
 <li><b>Cleric:</b> Smite — 22 holy / 16 BD / 2.0 (Perfect: self-heal 8); Mend Wounds — 25 Mana,
-heal 45, 3.0 (Perfect: Ward 2 turns); Renewal — 20 Mana, ally +8 HP/turn for 5 turns, 3.0
-(Perfect: +8 instant).</li>
+heal 45, 3.0 (Perfect: Ward 2 turns). (Renewal moved to the Holy spec 07-10.)</li>
 <li><b>Hunter:</b> Quick Shot — 20 dmg / 14 BD / 2.0 (no perfect bonus).</li>
 </ul>
 
@@ -330,6 +338,8 @@ proc Echo, 3.5 (Perfect: fires a 7th bolt).</li>
 <li><b>Holy (Healer)</b> — Passive <i>Grace</i>: all healing +25%.<br>
 Dawnbreak — 20 Mana, 3.0, heal an ally 40; overheal flows back to the Cleric
 (Perfect: +15 healing).<br>
+Renewal — 20 Mana, 3.0, ally heals 15 HP at the start of each of their turns for 5 turns
+(Perfect: also +15 instantly). Holy-only as of 07-10 (was Cleric core).<br>
 Hymn of Hope — MIRACLE, 30 Faith, 4.0, heal ALL allies 20% max HP (Perfect: 25%).</li>
 <li><b>Devout (Warder)</b> — Passive <i>Devotion Aura</i>: the entire party (Cleric included)
 takes 15% less BD, shown as a battle-long status.<br>
@@ -455,8 +465,8 @@ physical 15%.</td></tr>
 Roots of Wrath — 25 nature/20BD to the whole party + Poison 3t; Wild Growth — heals an ally
 for 20% of its max HP (itself included).</td></tr>
 <tr><td>Ash-Wrought Tyrant (zone 2 boss, stand-in)</td><td>368</td><td>22%</td><td>85</td>
-<td>160</td><td>Chief kit, bigger sprite, 20 starting Rage. Resists: fire 50%, physical 10%,
-frost −25%.</td></tr>
+<td>160</td><td>Chief kit, bigger sprite, 20 starting Rage. Resists: fire 50%, physical 10%.
+WEAK to frost (+25% damage taken).</td></tr>
 </table>
 <p><b>Compositions:</b> every encounter fields <b>3–5 enemies with the types rolled at
 random</b> from the basic pool (Raider / Archer / Shieldmaster / Shaman). Elites only appear
@@ -478,6 +488,11 @@ ticks report their stack multiplier.</li>
 <li><b>Action bar:</b> Basic attack button; <b>Abilities ▾</b> — a button list where hovering
 each entry live-previews its initiative cost on the bar (costs shown, unaffordable entries
 greyed); <b>Items ▾</b>. Guard no longer exists.</li>
+<li><b>Ability hotkeys:</b> <b>Q / W / E / R / A / S / D / F</b> map to ability slots in kit
+order (Q is always the basic attack) — no need to open the Abilities menu. Each button shows
+its key, e.g. "[W] Bloodlust". A hotkey is ignored when the ability is unaffordable or gated
+(Death Ray below 5 Resonance, Kill Command without a living companion), and hotkeys only work
+while the action bar is open — never during targeting or a skill check.</li>
 <li><b>Burger menu:</b> Restart Run (abandons to a fresh draft), Settings (overlay with volume
 + fullscreen — the battle isn't lost), Exit to Main Menu (run resumes from the last saved
 node).</li>
@@ -538,15 +553,19 @@ offers: Full Restore (HP/resources/secondary for the party), <b>Hero Turn Now</b
 turn instantly goes to a hero, whatever the timeline says), and an <b>Enemy attacks OFF</b>
 toggle (enemies skip their turns while checked). The battle scene also runs standalone
 (<code>godot res://scenes/battle.tscn</code>) with a default party and no run state.</li>
-<li><b>Sprites:</b> 100×100 frame strips named Name_Idle/Walk/Attack01–03/Hurt/Death.png;
-new character art must follow this format. New assets arrive in "imported files/".</li>
+<li><b>Sprites:</b> horizontal frame strips named Name_Idle/Walk/Attack01–03/Hurt/Death.png
+(square frames; the stock sheets are 100×100, but units accept any frame size via the
+frame_size config — the Berserker test sheet is 124×124). Partial sheets are fine for
+testing: missing Attack02/03 replay Attack01, and missing Hurt/Death hold the idle frame.
+New assets arrive in "imported files/" (animated GIFs get converted to strips).</li>
 <li><b>Combat pacing:</b> global PACE multiplier 0.85 on battle waits.</li>
 </ul>
 
 <h2>13. Known Gaps / Next Steps</h2>
 <ul>
-<li>Distinct Mage/Cleric/Hunter sprites awaited in imported files; Beastmaster companions use
-placeholder colored spheres until beast art lands.</li>
+<li>Berserker test sprite is in (battle only; draft/spec screens still show the Soldier).
+Its Hurt / Death / second-attack clips are pending, as are distinct Mage/Cleric/Hunter
+sprites; Beastmaster companions use placeholder colored spheres until beast art lands.</li>
 <li>The Withered Warden now has its own kit; the Ash-Wrought Tyrant is still a Chief
 stand-in — unique kit + art planned. Boss art for both pending.</li>
 <li>Hunter spec talent pools need signatures; full rune loot table pending; relic pool (6)

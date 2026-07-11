@@ -1,14 +1,19 @@
 # One combatant on the battlefield: sprite, animations, stats, HP/Pressure bars,
-# and status effects (buffs/debuffs). Built in code from the 100x100 sprite sheets.
+# and status effects (buffs/debuffs). Built in code from horizontal strip
+# sprite sheets (square frames; 100px for the stock sheets, per-unit sizes ok).
 class_name BattleUnit
 extends Node2D
 
 signal clicked
 
-const FRAME_SIZE := 100
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 const OUTLINE_SHADER := preload("res://shaders/outline.gdshader")
 
+# Weakness mechanic: a unit WEAK to a damage type takes 25% extra damage
+# from it (stored as a negative resist, so resists and weaknesses stack).
+const WEAKNESS_EXTRA := 0.25
+
+var frame_size := 100      # square frame edge of this unit's sprite strips
 var unit_name := ""
 var is_hero := true
 var max_hp := 100
@@ -79,6 +84,9 @@ func setup(config: Dictionary) -> void:
 	for key in config:
 		if key != "sheet_dir" and key != "sprite_scale":
 			set(key, config[key])
+	# Weaknesses: listed damage types hit this unit 25% harder.
+	for weak_type in config.get("weak", []):
+		resists[weak_type] = float(resists.get(weak_type, 0.0)) - WEAKNESS_EXTRA
 	hp = max_hp
 	# Default scale sized for the 1:1 full-scene camera.
 	_build_sprite(config["sheet_dir"], config.get("sprite_scale", 3.2))
@@ -100,27 +108,45 @@ func _build_sprite(sheet_dir: String, sprite_scale: float) -> void:
 		"walk": ["Walk", 10, true],
 		"attack01": ["Attack01", 12, false],
 		"attack02": ["Attack02", 12, false],
+		"attack03": ["Attack03", 12, false],
 		"hurt": ["Hurt", 12, false],
 		"death": ["Death", 10, false],
 	}
-	if FileAccess.file_exists("%s/%s_Attack03.png" % [sheet_dir, prefix]):
-		anims["attack03"] = ["Attack03", 12, false]
 	for anim_name in anims:
 		var info: Array = anims[anim_name]
-		var tex: Texture2D = load("%s/%s_%s.png" % [sheet_dir, prefix, info[0]])
+		var path := "%s/%s_%s.png" % [sheet_dir, prefix, info[0]]
+		if not FileAccess.file_exists(path):
+			continue
+		var tex: Texture2D = load(path)
 		if tex == null:
 			continue
 		frames.add_animation(anim_name)
 		frames.set_animation_speed(anim_name, info[1])
 		frames.set_animation_loop(anim_name, info[2])
-		var count := int(tex.get_width() / float(FRAME_SIZE))
+		var count := int(tex.get_width() / float(frame_size))
 		for i in count:
 			var atlas := AtlasTexture.new()
 			atlas.atlas = tex
-			atlas.region = Rect2(i * FRAME_SIZE, 0, FRAME_SIZE, FRAME_SIZE)
+			atlas.region = Rect2(i * frame_size, 0, frame_size, frame_size)
 			frames.add_frame(anim_name, atlas)
 		if anim_name == "idle":
 			_idle_texture = frames.get_frame_texture("idle", 0)
+	# Partial sheets (test art) borrow the closest available look: missing
+	# attack variants replay Attack01; missing Hurt/Death hold the idle frame
+	# (the death pause + dark modulate still read as a corpse).
+	for attack_variant in ["attack02", "attack03"]:
+		if not frames.has_animation(attack_variant) and frames.has_animation("attack01"):
+			frames.add_animation(attack_variant)
+			frames.set_animation_speed(attack_variant, 12)
+			frames.set_animation_loop(attack_variant, false)
+			for i in frames.get_frame_count("attack01"):
+				frames.add_frame(attack_variant, frames.get_frame_texture("attack01", i))
+	for still_anim in ["hurt", "death"]:
+		if not frames.has_animation(still_anim) and _idle_texture != null:
+			frames.add_animation(still_anim)
+			frames.set_animation_speed(still_anim, 10)
+			frames.set_animation_loop(still_anim, false)
+			frames.add_frame(still_anim, _idle_texture)
 	frames.remove_animation("default")
 	sprite = AnimatedSprite2D.new()
 	sprite.sprite_frames = frames
@@ -484,14 +510,16 @@ func _refresh_chips() -> void:
 
 
 # Cropped close-up of the character for the initiative bar (the raw frame
-# is mostly empty space around a small figure).
+# is mostly empty space around a small figure). Crop scales with frame size.
 func portrait() -> Texture2D:
 	var src := _idle_texture as AtlasTexture
 	if src == null:
 		return _idle_texture
 	var crop := AtlasTexture.new()
 	crop.atlas = src.atlas
-	crop.region = Rect2(src.region.position + Vector2(28, 18), Vector2(44, 60))
+	var f := float(frame_size)
+	crop.region = Rect2(src.region.position + Vector2(f * 0.28, f * 0.18),
+		Vector2(f * 0.44, f * 0.60))
 	return crop
 
 

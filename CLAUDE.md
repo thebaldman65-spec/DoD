@@ -51,10 +51,12 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - Screens: main_menu → draft (pick 4 + relics) → spec_choice (permanent) →
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
-## Current systems snapshot (2026-07-09)
+## Current systems snapshot (2026-07-10)
 4 heroes (Warrior/Mage/Cleric/Hunter — one of each), 3 specs each, per-run
-shuffled talent trees, damage types (7) with resists, bleed buildup (100 =
-20% max HP bleedout, ignores armor; poison ticks count as nature damage),
+shuffled talent trees, damage types (7) with resists + Weaknesses (config
+"weak": [types] = +25% damage taken, "WEAK!" feedback; assignments TBD),
+bleed buildup (100 = 20% max HP bleedout, ignores armor; poison ticks count
+as nature damage),
 gold + shop runes (rarity-generated, 2 equip slots), 2 zones (Forest →
 Scarlands). Basic orcs: Raider, red Archer (poison), orange Shieldmaster
 (single-ally 25% ward), blue Shaman (nature caster, party-wide Chain
@@ -75,7 +77,10 @@ values in SPEC_INFO, bosses 160 + stun-immune unless Broken). Talent pools are
 THEMATIC per spec (8 signatures each, T5 = new ability). See master.html §6-7.
 Combat: crit 10%; miss 5% (Dazed +20%); parry 5% heroes / 2.5% enemies;
 Mocking Blow taunt; per-ability initiative ghost preview (no Guard — removed
-by design). Battle debug panel: Hero Turn Now + Enemy attacks OFF toggle. Specs carry archetype
+by design); ability hotkeys Q/W/E/R/A/S/D/F by kit slot (shown on buttons).
+Battle debug panel: Hero Turn Now + Enemy attacks OFF toggle. Renewal is
+Holy-only (15 HP/turn). Berserker has test battle art (124px frames via
+frame_size config; partial sheets fall back — see unit.gd _build_sprite). Specs carry archetype
 tags (Ramp/Rush/Nuker/Pressure/Healer/Warder/Tank/Bruiser) in SPEC_INFO.
 Battle has burger menu (restart/settings overlay/exit); skill checks accept
 Space or left click; no announcer text (combat log only).

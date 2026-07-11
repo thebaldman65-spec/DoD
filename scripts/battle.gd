@@ -12,6 +12,10 @@ const BASIC_DELAY := 2.0
 const PERFECT_HALF := 0.045
 const GOOD_HALF := 0.16
 
+# Ability hotkeys, mapped to ability slots in kit order (shown on the buttons).
+const ABILITY_KEYS: Array = [KEY_Q, KEY_W, KEY_E, KEY_R, KEY_A, KEY_S, KEY_D, KEY_F]
+const ABILITY_KEY_NAMES := ["Q", "W", "E", "R", "A", "S", "D", "F"]
+
 # Visual identity of each status effect: [label, chip tag, color, tooltip]
 const STATUS_INFO := {
 	"slow": ["Slowed", "Sl", Color(0.55, 0.65, 0.9), "-25% speed; turns arrive later."],
@@ -23,7 +27,7 @@ const STATUS_INFO := {
 	"fortify": ["Fortify", "+D", Color(0.55, 0.8, 0.9), "+10% armor."],
 	"barrier": ["Barrier", "Ba", Color(0.40, 0.85, 0.95), "Absorbs incoming damage."],
 	"focus": ["Focus", "Fo", Color(0.35, 0.60, 1.0), "Restores 10 Mana each turn."],
-	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores 8 HP each turn."],
+	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores 15 HP each turn."],
 	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% attack."],
 	"mocked": ["Mocked", "M!", Color(0.95, 0.5, 0.3), "Must attack the Warrior who mocked them."],
 	"poison": ["Poison", "P", Color(0.45, 0.8, 0.3), "Takes 3 nature damage per stack at the\nstart of each turn; new stacks refresh\nthe timer."],
@@ -216,7 +220,7 @@ func _enemy_config(kind: String) -> Dictionary:
 				"resource_name": "Rage", "resource": 20, "max_resource": 100,
 				"abilities": _orc_chief_kit(), "sprite_scale": 4.4,
 				"tint": Color(1.0, 0.55, 0.35),
-				"resists": {"fire": 0.50, "physical": 0.10, "frost": -0.25}}
+				"resists": {"fire": 0.50, "physical": 0.10}, "weak": ["frost"]}
 		"shieldmaster":
 			return {"unit_name": "Orc Shieldmaster", "is_hero": false, "sheet_dir": orc,
 				"max_hp": 150, "armor": 0.25, "speed": 85.0, "stability": 100,
@@ -276,6 +280,12 @@ func _spawn_units() -> void:
 				cfg["second_resource_name"] = "Resonance"
 				cfg["second_resource"] = 0
 				cfg["second_max"] = 5
+			# Test art: the Berserker fights in his own skin (native 124px
+			# frames, scaled to stand shoulder-to-shoulder with the Soldier).
+			if spec == "berserker":
+				cfg["sheet_dir"] = "res://assets/sprites/berserker"
+				cfg["frame_size"] = 124
+				cfg["sprite_scale"] = 1.25
 			Classes.apply_passive(cfg, spec)
 			if Run.active and i < Run.party.size():
 				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
@@ -752,7 +762,7 @@ func _run_battle() -> void:
 					var nat_resist := float(u.resists.get("nature", 0.0))
 					if nat_resist != 0.0:
 						dot_dmg = maxi(int(round(dot_dmg * (1.0 - nat_resist))), 0)
-						stack_tag += " (resisted)" if nat_resist > 0.0 else " (vulnerable!)"
+						stack_tag += " (resisted)" if nat_resist > 0.0 else " (WEAK!)"
 				var info: Array = STATUS_INFO[dot_id]
 				_sfx("hit", -14.0, 0.8)
 				var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
@@ -767,9 +777,9 @@ func _run_battle() -> void:
 			continue
 		# Turn-start regeneration effects.
 		if u.has_status("renewal"):
-			u.heal_amount(8)
-			u.float_text("+8", Color(0.45, 0.9, 0.5))
-			_log("%s regenerates 8 HP (Renewal)" % u.unit_name, "#70d878")
+			u.heal_amount(15)
+			u.float_text("+15", Color(0.45, 0.9, 0.5))
+			_log("%s regenerates 15 HP (Renewal)" % u.unit_name, "#70d878")
 		if u.has_status("focus") and u.resource_name == "Mana":
 			u.resource = mini(u.resource + 10, u.max_resource)
 			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
@@ -1107,10 +1117,11 @@ func _use_item(item_id: String) -> void:
 func _show_actions(u: BattleUnit) -> void:
 	for child in action_box.get_children():
 		child.queue_free()
+	_open_popups.clear()
 	# Basic attack: always its own button.
 	var basic: Ability = u.abilities[0]
 	var basic_btn := Button.new()
-	basic_btn.text = basic.display_name
+	basic_btn.text = "[%s] %s" % [ABILITY_KEY_NAMES[0], basic.display_name]
 	basic_btn.custom_minimum_size = Vector2(105, 40)
 	basic_btn.tooltip_text = _ability_tooltip(u, basic)
 	basic_btn.pressed.connect(_on_ability_button.bind(basic))
@@ -1124,6 +1135,8 @@ func _show_actions(u: BattleUnit) -> void:
 	menu_btn.text = "Abilities ▾"
 	menu_btn.custom_minimum_size = Vector2(112, 40)
 	var popup := PopupPanel.new()
+	_open_popups.append(popup)
+	popup.window_input.connect(_on_popup_window_input)
 	var list := VBoxContainer.new()
 	list.add_theme_constant_override("separation", 4)
 	popup.add_child(list)
@@ -1137,6 +1150,8 @@ func _show_actions(u: BattleUnit) -> void:
 		list.add_child(_ability_popup_button(u, ab, popup))
 	if not summons.is_empty():
 		var sub := PopupPanel.new()
+		_open_popups.append(sub)
+		sub.window_input.connect(_on_popup_window_input)
 		var sub_list := VBoxContainer.new()
 		sub_list.add_theme_constant_override("separation", 4)
 		sub.add_child(sub_list)
@@ -1160,9 +1175,24 @@ func _show_actions(u: BattleUnit) -> void:
 	action_panel.visible = true
 
 
-# One entry in the abilities popup: label with cost, tooltip, hover preview.
+# One place decides "can this ability be picked right now" so the buttons
+# and the hotkeys can never disagree.
+func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
+	if ab.cost > u.resource or ab.faith_cost > u.second_resource:
+		return false
+	if ab.special == "kill_command" and (u.companion == null or u.companion.dead):
+		return false
+	if ab.display_name == "Death Ray" and u.second_resource < 5:
+		return false
+	return true
+
+
+# One entry in the abilities popup: hotkey + label with cost, tooltip, preview.
 func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel) -> Button:
 	var label: String = ab.display_name
+	var key_idx := u.abilities.find(ab)
+	if key_idx >= 0 and key_idx < ABILITY_KEY_NAMES.size():
+		label = "[%s] %s" % [ABILITY_KEY_NAMES[key_idx], label]
 	if ab.cost > 0:
 		label += "   %d %s" % [ab.cost, u.resource_name]
 	elif ab.faith_cost > 0:
@@ -1172,14 +1202,11 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel) -> But
 	ab_btn.custom_minimum_size = Vector2(230, 38)
 	ab_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	ab_btn.tooltip_text = _ability_tooltip(u, ab)
-	var unusable: bool = ab.cost > u.resource or ab.faith_cost > u.second_resource
 	if ab.special == "kill_command" and (u.companion == null or u.companion.dead):
-		unusable = true
 		ab_btn.tooltip_text += "\n(No living companion)"
 	if ab.display_name == "Death Ray" and u.second_resource < 5:
-		unusable = true
 		ab_btn.tooltip_text += "\n(Requires 5 Arcane Resonance)"
-	ab_btn.disabled = unusable
+	ab_btn.disabled = not _ability_usable(u, ab)
 	ab_btn.pressed.connect(_on_popup_ability.bind(popup, ab))
 	ab_btn.mouse_entered.connect(_preview_delay.bind(u, ab))
 	ab_btn.mouse_exited.connect(_clear_delay_preview)
@@ -1202,6 +1229,7 @@ func _open_summon_popup(sub: PopupPanel, parent: PopupPanel) -> void:
 
 var _preview_locked := false
 var second_target: BattleUnit = null  # choose_two abilities (Shrapnel)
+var _open_popups: Array = []  # ability popups to close when a hotkey fires
 
 
 func _preview_delay(u: BattleUnit, ab: Ability) -> void:
@@ -1698,7 +1726,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if resist > 0.0:
 				resist_tag = " (resisted)"
 			elif resist < 0.0:
-				resist_tag = " (vulnerable!)"
+				# Weakness: the hit lands 25%+ harder — call it out loudly.
+				resist_tag = " (WEAK!)"
+				strike_target.float_text("WEAK!", Color(1.0, 0.55, 0.15))
 			_log("%s: %s on %s — %d %s dmg%s%s, +%d BD%s" % [attacker.unit_name,
 				ab.display_name, strike_target.unit_name, final, ab.dmg_type,
 				" CRIT" if is_crit else "", resist_tag, result.get("bd", pr), grade_tag],
@@ -2101,10 +2131,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("heal", -9.0, 1.1)
 			_apply_status(target, "renewal", 5)
 			if is_perfect:
-				target.heal_amount(8)
-				target.float_text("+8", Color(0.4, 0.9, 0.45))
+				target.heal_amount(15)
+				target.float_text("+15", Color(0.4, 0.9, 0.45))
 			_message("%s blesses %s with Renewal" % [attacker.unit_name, target.unit_name])
-			_log("%s: Renewal on %s — 8 HP/turn for 5 turns" % [attacker.unit_name,
+			_log("%s: Renewal on %s — 15 HP/turn for 5 turns" % [attacker.unit_name,
 				target.unit_name], "#70d878")
 
 
@@ -2347,7 +2377,11 @@ func _process(delta: float) -> void:
 
 # Left clicks are handled in _input because UI panels (the check bar itself,
 # the log, portraits) would otherwise swallow them before _unhandled_input.
+# Ability hotkeys live here too so the abilities popup can't swallow them.
 func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo \
+			and not sc_active and not autoplay and not battle_over:
+		_try_ability_hotkey(event.keycode)
 	if not sc_active:
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT \
@@ -2356,6 +2390,30 @@ func _input(event: InputEvent) -> void:
 		if sc_cancel != null and sc_cancel.get_global_rect().has_point(event.position):
 			return
 		_grade_skill_check()
+
+
+# Open ability popups are embedded Windows that swallow keys — forward theirs.
+func _on_popup_window_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo \
+			and not sc_active and not autoplay and not battle_over:
+		_try_ability_hotkey(event.keycode)
+
+
+# Q/W/E/R/A/S/D/F pick abilities by slot while the action bar is open.
+func _try_ability_hotkey(keycode: Key) -> void:
+	if current_hero == null or not action_panel.visible:
+		return
+	var idx := ABILITY_KEYS.find(keycode)
+	if idx < 0 or idx >= current_hero.abilities.size():
+		return
+	var ab: Ability = current_hero.abilities[idx]
+	if not _ability_usable(current_hero, ab):
+		return
+	for p in _open_popups:
+		if is_instance_valid(p) and p.visible:
+			p.hide()
+	get_viewport().set_input_as_handled()
+	_on_ability_button(ab)
 
 
 func _unhandled_input(event: InputEvent) -> void:
