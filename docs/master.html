@@ -478,16 +478,21 @@ index).</p>
 <ul>
 <li><b>Layout:</b> the camera shows the whole battle scene at 1:1 (sprites scaled up to
 compensate — heroes ×3.2, Chief ×3.9, bosses ×4.4; the Berserker's own art runs at ×1.25).
-The battlefield art (Forest / Scarlands) is shown at near-native pixel density — scaled to
-just cover the 1280×720 view plus a screen-shake margin, no more overscan blow-up. Burger
-menu (☰) top-left; initiative bar beside it; combat log top-right (scrolling, color-coded);
-action bar bottom-center on the acting hero's turn. <b>Each party is grouped tight</b>
-(heroes ~x350–430, enemies ~x905–990) and every unit's readouts live on a <b>nameplate</b>
+The battlefield art (Forest / Scarlands) is zoomed out as far as the screen allows — the
+smallest scale that still fills the 1280×720 view (+ shake margin); any smaller would show
+void at the edges, so making scenery read smaller from here means new background art at the
+template density. Burger menu (☰) top-left; initiative bar beside it; combat log top-right
+(scrolling, color-coded, with a small <b>– / Log</b> button to hide or restore it); action
+bar bottom-center on the acting hero's turn. <b>Each party is grouped tight</b> (heroes
+~x350–430, enemies ~x905–990) and every unit's readouts live on a <b>nameplate</b> (180px)
 in a stack behind its party — heroes' plates along the LEFT edge, enemies' along the RIGHT.
-A plate holds the unit's name, HP bar, resource bar(s), Break meter with numeric x/100
-readout, and its status chips (hover for tooltips; Bleed buildup is a chip). Hovering a
-plate highlights its unit on the field; a dead unit's plate dims. Plate visuals are plain
-placeholders until the final UI asset set arrives. Rapid floating combat texts stagger
+A plate holds a <b>portrait</b> (dedicated art if the unit has it — the Berserker does —
+else a sprite close-up), the unit's name, HP bar, resource bar(s), Break meter with numeric
+x/100 readout, and its status chips (hover for tooltips; Bleed buildup is a chip).
+<b>The acting unit's plate glows with a gold border — that IS the turn indicator</b> (the
+old yellow arrow is gone); hovering or Tab-targeting a unit lights its plate too, and
+hovering a plate highlights its unit on the field. A dead unit's plate dims. Plate visuals
+are plain placeholders until the final UI asset set arrives. Rapid floating combat texts stagger
 vertically so they stay readable. The combat log details status effects: Bleed lines show
 buildup and meter value, Poison lines show stack counts and damage per turn, and DoT ticks
 report their stack multiplier.</li>
@@ -504,6 +509,12 @@ with the mouse or fire a hotkey). After an ability is chosen, <b>Tab cycles thro
 available targets</b> (the highlight and ▼ marker follow) and <b>Space or Enter confirms</b>
 the highlighted one — a full keyboard turn is Q/W/E/R… → Tab → Space → Space on the skill
 check. Clicking still works everywhere.</li>
+<li><b>X cancels:</b> whenever a Cancel button is on screen — during targeting or a
+cancellable skill check — pressing <b>X</b> triggers it (the buttons say so:
+"✕ Cancel (X)").</li>
+<li><b>Beastmaster summons</b> keep their slot hotkeys (shown as e.g. "[W/E/R] Summon
+Companion ▸"): pressing W/E/R summons that beast directly without opening the
+submenu.</li>
 <li><b>Burger menu:</b> Restart Run (abandons to a fresh draft), Settings (overlay with volume
 + fullscreen — the battle isn't lost), Exit to Main Menu (run resumes from the last saved
 node).</li>
@@ -511,7 +522,9 @@ node).</li>
 abilities auto-target when only one candidate lives.</li>
 <li><b>Skill check controls: Spacebar or Left Click.</b></li>
 <li><b>Feedback:</b> floating damage text (crit pop-ups), hit flash + knockback, screen shake,
-lunge animations, Break hitstop + fracture flash + camera punch, per-event SFX (bow users —
+attack movement (units with real locomotion art — the Berserker — <b>walk</b> to melee range
+and back with their walk animation, facing their direction of travel; everyone else does the
+short lunge), Break hitstop + fracture flash + camera punch, per-event SFX (bow users —
 the Hunter and Orc Archers — get dedicated attack / impact / blocked sounds; the rest is
 placeholder procedural audio), tinted portraits + hover highlight (outline shader) linking the
 initiative bar to the field.</li>
@@ -528,12 +541,16 @@ dedicated impact clips.</li>
 
 <h2>11. Other Screens</h2>
 <ul>
-<li><b>Party screen:</b> hero list with tinted class icons beside each name, HP/Mana readouts
-and unspent-point highlights; detail page per hero: stats — <b>each stat is its own hover
-tooltip explaining just that stat</b> (talent points are NOT listed here; the count sits above
-the talent tree) — ability chips (hover for numbers), rune equip toggles (2 max), and the
-spec's talent tree with click-to-learn nodes (no requirements text below the tree; lock
-reasons show on the node tooltips).</li>
+<li><b>Party screen:</b> hero list with icons beside each name (a spec's dedicated portrait
+in original colors when it has one — the Berserker does — else the tinted class-sprite
+crop), HP/Mana readouts and unspent-point highlights. <b>Awakened heroes are listed and
+titled by their SPEC name</b> ("Berserker", not "Warrior"); the class name only shows while
+unawakened — the same rule applies to battle nameplates, the initiative bar, and the combat
+log. Detail page per hero: stats — <b>each stat is its own hover tooltip explaining just
+that stat</b> (talent points are NOT listed here; the count sits above the talent tree) —
+ability chips (hover for numbers), rune equip toggles (2 max), and the spec's talent tree
+with click-to-learn nodes (no requirements text below the tree; lock reasons show on the
+node tooltips).</li>
 <li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per party member;
 reached via the 6 shop nodes on every zone map.</li>
 <li><b>Relics screen:</b> collection viewer from the main menu.</li>

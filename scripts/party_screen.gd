@@ -64,10 +64,11 @@ func _draw_list() -> void:
 		var member: Dictionary = Run.party[i]
 		var key: String = member["key"]
 		var spec: String = member.get("spec", "")
-		var spec_name: String = Classes.SPEC_INFO[spec]["name"] if spec != "" else "Unawakened"
+		# Awakened heroes go by their spec name; the class only shows pre-spec.
+		var display: String = Classes.SPEC_INFO[spec]["name"] if spec != "" \
+			else "%s — Unawakened" % key.capitalize()
 		var btn := Button.new()
-		var line := "%s — %s\nHP %d/%d" % [key.capitalize(), spec_name,
-			member["hp"], member["max_hp"]]
+		var line := "%s\nHP %d/%d" % [display, member["hp"], member["max_hp"]]
 		if key != "warrior":
 			line += "    Mana %d/%d" % [member["mana"], member["max_mana"]]
 		var pts: int = member.get("talent_points", 0)
@@ -79,12 +80,14 @@ func _draw_list() -> void:
 		btn.position = Vector2(410, 120 + i * 112)
 		btn.add_theme_font_size_override("font_size", 18)
 		btn.tooltip_text = Classes.CLASS_BLURBS[key]
-		# Class icon beside the name, tinted to match the hero in battle.
-		btn.icon = Classes.class_icon(key)
-		var tint: Color = Classes.HERO_TINTS[i % Classes.HERO_TINTS.size()]
-		for state in ["icon_normal_color", "icon_hover_color", "icon_pressed_color",
-				"icon_focus_color"]:
-			btn.add_theme_color_override(state, tint)
+		# Icon beside the name: the spec's portrait (original colors) when it
+		# has one, else the class sprite crop tinted to match battle.
+		btn.icon = Classes.class_icon(key, spec)
+		if not Classes.SPEC_PORTRAITS.has(spec):
+			var tint: Color = Classes.HERO_TINTS[i % Classes.HERO_TINTS.size()]
+			for state in ["icon_normal_color", "icon_hover_color", "icon_pressed_color",
+					"icon_focus_color"]:
+				btn.add_theme_color_override(state, tint)
 		btn.pressed.connect(_select_hero.bind(i))
 		add_child(btn)
 
@@ -108,7 +111,8 @@ func _draw_detail() -> void:
 			Talents.apply_payload(cfg, rune["payload"], 1)
 	cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
 	var spec_label: String = Classes.SPEC_INFO[spec]["name"] if spec != "" else "Unawakened"
-	_title("%s — %s" % [cfg["unit_name"], spec_label], 20, 34)
+	# Awakened heroes are titled by spec; the class name only shows pre-spec.
+	_title(spec_label if spec != "" else "%s — Unawakened" % cfg["unit_name"], 20, 34)
 
 	# Left column: class blurb, stats, abilities (compact chips, hover detail).
 	var blurb := Label.new()

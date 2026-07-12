@@ -78,15 +78,20 @@ THEMATIC per spec (8 signatures each, T5 = new ability). See master.html §6-7.
 Combat: crit 10%; miss 5% (Dazed +20%); parry 5% heroes / 2.5% enemies;
 Mocking Blow taunt; per-ability initiative ghost preview (no Guard — removed
 by design); ability hotkeys Q/W/E/R/A/S/D/F by kit slot (shown on buttons);
-Tab toggles the ability list / cycles targets, Space confirms. Unit UI lives
-on NAMEPLATE stacks (heroes left edge, enemies right; hover plate =
-highlight unit; plain style until UI assets arrive); parties grouped tight.
-Battle DEBUG ▾ menu (bottom-right): Full Restore, Enemy attacks OFF, per-hero
-turn LOCK (every turn theirs until unlocked). Renewal is Holy-only (15
-HP/turn). Berserker has test battle art, untinted (124px frames via
-frame_size config; partial sheets fall back — see unit.gd _build_sprite).
-Berserker = RESOLUTION TEMPLATE for all future art; battle bg shown at
-near-native size (cover 1328x768, no overscan). Specs carry archetype
+Tab toggles the ability list / cycles targets, Space confirms, X cancels
+(targeting + cancellable skill checks). Unit UI lives on NAMEPLATE stacks
+(180px plates, heroes left edge, enemies right; portrait + name + bars +
+chips; ACTING unit's plate = gold border, that's the turn indicator — no
+arrow; hover/Tab lights plates; plain style until UI assets arrive); parties
+grouped tight; combat log hideable (– button). SPECCED HEROES DISPLAY THEIR
+SPEC NAME everywhere (unit_name = spec; logic keys on unit.hero_key — never
+match display names!). Battle DEBUG ▾ menu (bottom-right): Full Restore,
+Enemy attacks OFF, per-hero turn LOCK (every turn theirs until unlocked).
+Renewal is Holy-only (15 HP/turn). Berserker: test battle art, untinted,
+own portrait (Classes.SPEC_PORTRAITS), walks to melee and back
+(walks_to_target flag; others lunge). Partial sheets fall back — see
+unit.gd _build_sprite. Berserker = RESOLUTION TEMPLATE for all future art;
+battle bg at max zoom-out (cover 1296x736). Specs carry archetype
 tags (Ramp/Rush/Nuker/Pressure/Healer/Warder/Tank/Bruiser) in SPEC_INFO.
 Battle has burger menu (restart/settings overlay/exit); skill checks accept
 Space or left click; no announcer text (combat log only).

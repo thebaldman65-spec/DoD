@@ -14,6 +14,9 @@ const OUTLINE_SHADER := preload("res://shaders/outline.gdshader")
 const WEAKNESS_EXTRA := 0.25
 
 var frame_size := 100      # square frame edge of this unit's sprite strips
+var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
+var hero_key := ""         # class id ("warrior"...) — display name may be the spec
+var walks_to_target := false  # real locomotion: walk to melee range and back
 var unit_name := ""
 var is_hero := true
 var max_hp := 100
@@ -65,6 +68,10 @@ var statuses: Array = []
 
 var sprite: AnimatedSprite2D
 var _plate_root: Node2D    # nameplate container owned by the battle scene
+var _plate_panel: Panel
+var _plate_style: StyleBoxFlat
+var _plate_active := false # gold border: it's this unit's turn
+var _plate_hover := false  # light border: hovered / targeted
 var _hp_fill: ColorRect
 var _hp_text: Label
 var _res_fill: ColorRect
@@ -191,75 +198,119 @@ func _build_sphere_sprite(sprite_scale: float) -> void:
 
 
 # Nameplate dimensions (plain styling until final UI assets arrive).
-const PLATE_W := 224.0
-const PLATE_BAR_W := 206.0
+const PLATE_W := 180.0
+const PLATE_BAR_W := 120.0
+const PLATE_BAR_X := 52.0  # bars sit right of the 44px portrait column
 
 
-# Builds this unit's nameplate (name, HP/resource/Break bars, status chips)
-# into `root` — a node the battle scene positions in the party's plate stack,
-# NOT a child of the unit (sprites lunge around; plates must not).
+# Builds this unit's nameplate (portrait, name, HP/resource/Break bars,
+# status chips) into `root` — a node the battle scene positions in the
+# party's plate stack, NOT a child of the unit (sprites move; plates don't).
 func build_plate(root: Node2D) -> void:
 	_plate_root = root
-	var panel := Panel.new()
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.08, 0.06, 0.10, 0.88)
-	style.border_color = Color(0.32, 0.30, 0.38)
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(4)
-	panel.add_theme_stylebox_override("panel", style)
+	_plate_style = StyleBoxFlat.new()
+	_plate_style.bg_color = Color(0.08, 0.06, 0.10, 0.88)
+	_plate_style.border_color = Color(0.32, 0.30, 0.38)
+	_plate_style.set_border_width_all(1)
+	_plate_style.set_corner_radius_all(4)
+	_plate_panel = Panel.new()
+	_plate_panel.add_theme_stylebox_override("panel", _plate_style)
 	# Hovering a plate highlights its unit on the field (and vice versa is
 	# unnecessary — the plate is always in the same stack slot).
-	panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	panel.mouse_entered.connect(set_highlight.bind(true))
-	panel.mouse_exited.connect(set_highlight.bind(false))
-	root.add_child(panel)
+	_plate_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	_plate_panel.mouse_entered.connect(set_highlight.bind(true))
+	_plate_panel.mouse_exited.connect(set_highlight.bind(false))
+	root.add_child(_plate_panel)
 
 	var name_label := Label.new()
 	name_label.text = unit_name
 	name_label.add_theme_font_override("font", NAME_FONT)
-	name_label.add_theme_font_size_override("font_size", 16)
+	name_label.add_theme_font_size_override("font_size", 13)
 	name_label.add_theme_color_override("font_color", Color(0.92, 0.88, 0.78))
-	name_label.position = Vector2(8, 2)
-	name_label.size = Vector2(PLATE_W - 16, 18)
+	name_label.position = Vector2(6, 2)
+	name_label.size = Vector2(PLATE_W - 12, 16)
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_child(name_label)
+	_plate_panel.add_child(name_label)
 
-	var y := 23.0
-	panel.add_child(_make_bar_bg(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 13)))
-	_hp_fill = _make_fill(Vector2(9, y + 1), Vector2(PLATE_BAR_W, 11), Color(0.30, 0.78, 0.32))
-	panel.add_child(_hp_fill)
-	_hp_text = _make_bar_text(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 13), 10)
-	panel.add_child(_hp_text)
-	y += 15.0
+	var face := TextureRect.new()
+	face.texture = portrait()
+	face.position = Vector2(4, 20)
+	face.custom_minimum_size = Vector2(44, 44)
+	face.size = Vector2(44, 44)
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	face.flip_h = not is_hero
+	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_plate_panel.add_child(face)
+
+	var y := 21.0
+	_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 11)))
+	_hp_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, 9),
+		Color(0.30, 0.78, 0.32))
+	_plate_panel.add_child(_hp_fill)
+	_hp_text = _make_bar_text(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 11), 9)
+	_plate_panel.add_child(_hp_text)
+	y += 13.0
 	if resource_name != "":
-		panel.add_child(_make_bar_bg(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 11)))
+		_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9)))
 		var res_color := Color(0.85, 0.30, 0.25) if resource_name == "Rage" else \
 			(Color(0.55, 0.85, 0.40) if resource_name == "Focus" else Color(0.30, 0.50, 0.90))
-		_res_fill = _make_fill(Vector2(9, y + 1), Vector2(PLATE_BAR_W, 9), res_color)
-		panel.add_child(_res_fill)
-		_res_text = _make_bar_text(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 11), 9)
-		panel.add_child(_res_text)
-		y += 13.0
+		_res_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, 7), res_color)
+		_plate_panel.add_child(_res_fill)
+		_res_text = _make_bar_text(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9), 8)
+		_plate_panel.add_child(_res_text)
+		y += 11.0
 	if second_resource_name != "":
-		panel.add_child(_make_bar_bg(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 11)))
+		_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9)))
 		var res2_color := Color(0.95, 0.80, 0.30) if second_resource_name == "Faith" \
 			else Color(0.75, 0.40, 0.95)
-		_res2_fill = _make_fill(Vector2(9, y + 1), Vector2(PLATE_BAR_W, 9), res2_color)
-		panel.add_child(_res2_fill)
-		_res2_text = _make_bar_text(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 11), 9)
-		panel.add_child(_res2_text)
-		y += 13.0
-	panel.add_child(_make_bar_bg(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 11)))
-	_pressure_fill = _make_fill(Vector2(9, y + 1), Vector2(PLATE_BAR_W, 9), Color(0.80, 0.35, 1.0))
-	panel.add_child(_pressure_fill)
-	_pressure_text = _make_bar_text(Vector2(8, y), Vector2(PLATE_BAR_W + 2, 11), 9)
-	panel.add_child(_pressure_text)
-	y += 13.0
+		_res2_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, 7), res2_color)
+		_plate_panel.add_child(_res2_fill)
+		_res2_text = _make_bar_text(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9), 8)
+		_plate_panel.add_child(_res2_text)
+		y += 11.0
+	_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9)))
+	_pressure_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, 7),
+		Color(0.80, 0.35, 1.0))
+	_plate_panel.add_child(_pressure_fill)
+	_pressure_text = _make_bar_text(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9), 8)
+	_plate_panel.add_child(_pressure_text)
+	y += 11.0
 
+	# Chips run full width under the portrait + bars.
+	var chips_y := maxf(y, 66.0)
 	_chips_root = Node2D.new()
-	_chips_root.position = Vector2(10, y + 3.0)
-	panel.add_child(_chips_root)
-	panel.size = Vector2(PLATE_W, y + 24.0)
+	_chips_root.position = Vector2(6, chips_y + 2.0)
+	_plate_panel.add_child(_chips_root)
+	_plate_panel.size = Vector2(PLATE_W, chips_y + 20.0)
+
+
+# Border states: gold = this unit's turn; light = hovered/targeted.
+func set_plate_active(on: bool) -> void:
+	_plate_active = on
+	_update_plate_border()
+
+
+func _set_plate_hover(on: bool) -> void:
+	_plate_hover = on
+	_update_plate_border()
+
+
+func _update_plate_border() -> void:
+	if _plate_style == null:
+		return
+	if _plate_active:
+		_plate_style.border_color = Color(0.95, 0.80, 0.30)
+		_plate_style.set_border_width_all(2)
+		_plate_style.bg_color = Color(0.13, 0.10, 0.14, 0.92)
+	elif _plate_hover:
+		_plate_style.border_color = Color(0.80, 0.82, 0.90)
+		_plate_style.set_border_width_all(2)
+		_plate_style.bg_color = Color(0.08, 0.06, 0.10, 0.88)
+	else:
+		_plate_style.border_color = Color(0.32, 0.30, 0.38)
+		_plate_style.set_border_width_all(1)
+		_plate_style.bg_color = Color(0.08, 0.06, 0.10, 0.88)
 
 
 # Text label sized exactly to its bar so centering is pixel-true.
@@ -287,8 +338,8 @@ func _build_target_zone() -> void:
 	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
 		_target_btn.add_theme_stylebox_override(state, empty)
 	_target_btn.pressed.connect(func(): clicked.emit())
-	_target_btn.mouse_entered.connect(func(): sprite.self_modulate = _base_tint.lightened(0.45))
-	_target_btn.mouse_exited.connect(func(): sprite.self_modulate = _base_tint)
+	_target_btn.mouse_entered.connect(_on_target_hover.bind(true))
+	_target_btn.mouse_exited.connect(_on_target_hover.bind(false))
 	_target_btn.visible = false
 	add_child(_target_btn)
 
@@ -308,13 +359,20 @@ func set_tint(tint: Color) -> void:
 	sprite.self_modulate = tint
 
 
-# Battlefield highlight driven by hovering the initiative bar: grow the
-# sprite and draw a white outline around it.
+# Battlefield highlight driven by hovering the initiative bar, a nameplate,
+# or Tab-targeting: grow the sprite, draw a white outline, light the plate.
 func set_highlight(on: bool) -> void:
 	var factor := 1.3 if on else 1.0
 	sprite.scale = Vector2(_base_scale * factor, _base_scale * factor)
 	sprite.material.set_shader_parameter("outline_on", on)
 	_target_marker.visible = on or _target_btn.visible
+	_set_plate_hover(on)
+
+
+# Hovering a targetable unit lightens the sprite and lights its nameplate.
+func _on_target_hover(on: bool) -> void:
+	sprite.self_modulate = _base_tint.lightened(0.45) if on else _base_tint
+	_set_plate_hover(on)
 
 
 func set_targetable(on: bool) -> void:
@@ -322,6 +380,7 @@ func set_targetable(on: bool) -> void:
 	_target_marker.visible = on
 	if not on:
 		sprite.self_modulate = _base_tint
+		_set_plate_hover(false)
 
 
 func _make_bar_bg(pos: Vector2, bar_size: Vector2) -> ColorRect:
@@ -505,10 +564,10 @@ func _refresh_chips() -> void:
 	var x := 0.0
 	for i in count:
 		var s: Dictionary = statuses[i]
-		var chip_w := 16.0 if String(s.short).length() <= 2 else 34.0
+		var chip_w := 14.0 if String(s.short).length() <= 2 else 30.0
 		var chip := ColorRect.new()
 		chip.position = Vector2(x, 0)
-		chip.size = Vector2(chip_w, 16)
+		chip.size = Vector2(chip_w, 14)
 		chip.color = s.color
 		chip.mouse_filter = Control.MOUSE_FILTER_STOP
 		chip.tooltip_text = "%s (%s turn%s left)\n%s" % [
@@ -518,20 +577,23 @@ func _refresh_chips() -> void:
 		_chips_root.add_child(chip)
 		var tag := Label.new()
 		tag.text = s.short
-		tag.add_theme_font_size_override("font_size", 9 if chip_w > 16.0 else 10)
+		tag.add_theme_font_size_override("font_size", 8 if chip_w > 14.0 else 9)
 		tag.add_theme_color_override("font_color", Color(0.05, 0.05, 0.08))
 		tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tag.position = chip.position
-		tag.size = Vector2(chip_w, 16)
+		tag.size = Vector2(chip_w, 14)
 		tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		_chips_root.add_child(tag)
 		x += chip_w + 2.0
 
 
-# Cropped close-up of the character for the initiative bar (the raw frame
-# is mostly empty space around a small figure). Crop scales with frame size.
+# Portrait for the initiative bar and nameplate: dedicated art when the unit
+# has it, otherwise a close-up crop of the idle frame (which is mostly empty
+# space around a small figure). Crop scales with frame size.
 func portrait() -> Texture2D:
+	if portrait_path != "" and FileAccess.file_exists(portrait_path):
+		return load(portrait_path)
 	var src := _idle_texture as AtlasTexture
 	if src == null:
 		return _idle_texture

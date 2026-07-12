@@ -5,6 +5,32 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-11 — Batch 7: spec names, portraits, plate polish, X-cancel, walking Berserker</h2>
+<ul>
+<li><b>Spec names everywhere:</b> once awakened, heroes go by their spec — "Berserker", not
+"Warrior" — on battle nameplates, the initiative bar, the combat log, and the party screen
+(list + detail title). The class name only shows pre-awakening. (Internals now key on the
+class id, so the sim bot and bow sounds are unaffected.)</li>
+<li><b>Nameplates polished:</b> ~20% smaller (180px) so the hero stack no longer overlaps,
+and each plate now carries a <b>portrait</b> — dedicated art when the unit has it (the new
+Berserker portrait, also used in the initiative bar and party list), else a sprite close-up.
+<b>The turn indicator is now the plate itself</b>: the acting unit's plate glows with a gold
+border (the yellow ▼ arrow is gone), and hovering or Tab-targeting a unit lights its plate
+white.</li>
+<li><b>X cancels:</b> whenever a Cancel button is on screen (targeting, cancellable skill
+check), the X key presses it.</li>
+<li><b>Walking Berserker:</b> units with real locomotion art walk to melee range and back
+using their walk animation (facing the way they move) instead of the abstract lunge —
+currently the Berserker; new characters get it as their sheets arrive.</li>
+<li><b>Summon hotkeys surfaced:</b> the collapsed "Summon Companion ▸" entry shows its
+beasts' keys ("[W/E/R]") — pressing the key summons directly without opening the
+submenu.</li>
+<li><b>Combat log can hide:</b> a small – button tucks the log away; a "Log" button brings
+it back.</li>
+<li><b>Background at maximum zoom-out:</b> battle art now renders at the smallest scale that
+still fills the screen. Making the scenery read smaller than this needs background art
+authored to the Berserker resolution template (next art milestone).</li>
+</ul>
 <h2>2026-07-11 — Batch 6: nameplates, Tab controls, turn lock, native-res background</h2>
 <ul>
 <li><b>Nameplates:</b> every unit's name, HP bar, resource bar(s), Break meter, and status

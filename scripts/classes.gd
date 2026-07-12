@@ -7,8 +7,17 @@ const HERO_TINTS := [Color.WHITE, Color(0.65, 0.75, 1.0), Color(1.0, 0.9, 0.6),
 	Color(0.7, 1.0, 0.75)]
 
 
-# Cropped close-up of the class's idle sprite, used as a list icon.
-static func class_icon(key: String) -> Texture2D:
+# Dedicated spec portrait art (shown untinted, original colors).
+const SPEC_PORTRAITS := {
+	"berserker": "res://assets/sprites/berserker/Berserker_Portrait.png",
+}
+
+
+# List icon: the spec's portrait when it has one, else a cropped close-up
+# of the class's idle sprite.
+static func class_icon(key: String, spec := "") -> Texture2D:
+	if spec != "" and SPEC_PORTRAITS.has(spec):
+		return load(SPEC_PORTRAITS[spec])
 	var sheet_dir: String = hero_config(key)["sheet_dir"]
 	var prefix: String = sheet_dir.get_file().capitalize()
 	var tex: Texture2D = load("%s/%s_Idle.png" % [sheet_dir, prefix])

@@ -92,7 +92,7 @@ var cam: Camera2D
 var turn_bar: HBoxContainer
 var action_panel: PanelContainer
 var action_box: HBoxContainer
-var active_marker: Label
+var active_unit: BattleUnit  # acting unit — its nameplate glows gold
 
 # Autoplay: heroes act automatically with a simple policy (no skill check UI).
 #   DOD_AUTOPLAY=1 godot --headless          -> one battle with debug prints
@@ -111,6 +111,8 @@ static var sim_done := 0
 static var sim_started_ms := 0
 
 var history: RichTextLabel
+var history_panel: PanelContainer
+var _log_toggle: Button
 
 var sc_root: Control
 var sc_cursor: ColorRect
@@ -171,10 +173,11 @@ func _build_arena() -> void:
 	var tex: Texture2D = load(bg_by_zone.get(zone, bg_by_zone["Forest of Old"]))
 	var art := Sprite2D.new()
 	art.texture = tex
-	# Shown near native pixel density (the Berserker sheet is the resolution
-	# template): cover just the 1280x720 view plus a screen-shake margin,
-	# instead of the old 1680x920 overscan that blew the art up ~30%.
-	var cover := maxf(1328.0 / tex.get_width(), 768.0 / tex.get_height())
+	# Zoomed out as far as the screen allows: the smallest scale that still
+	# fills the 1280x720 view (plus the ±8px screen-shake margin). Any
+	# smaller would show void at the edges. The real fix for oversized
+	# scenery is background art authored to the Berserker resolution template.
+	var cover := maxf(1296.0 / tex.get_width(), 736.0 / tex.get_height())
 	art.scale = Vector2(cover, cover)
 	art.position = Vector2(640, 360)
 	add_child(art)
@@ -200,7 +203,7 @@ const ENEMY_LAYOUTS := {
 }
 # Nameplate stacks: plate i belongs to party slot i (companion = 5th hero slot).
 const HERO_PLATE_X := 8.0
-const ENEMY_PLATE_X := 1048.0  # 1280 - 8 - plate width (224)
+const ENEMY_PLATE_X := 1092.0  # 1280 - 8 - plate width (180)
 const PLATE_TOP := 210.0
 const PLATE_STEP := 88.0
 
@@ -275,6 +278,7 @@ func _spawn_units() -> void:
 	var name_counts := {}
 	for i in hero_keys.size():
 		var cfg := Classes.hero_config(hero_keys[i])
+		cfg["hero_key"] = hero_keys[i]
 		var spec := ""
 		if Run.active and i < Run.party.size():
 			spec = Run.party[i].get("spec", "")
@@ -283,6 +287,8 @@ func _spawn_units() -> void:
 		if spec != "":
 			cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
 			cfg["passive_id"] = Classes.SPEC_INFO[spec]["passive"]
+			# Once awakened, the hero goes by their spec, not their class.
+			cfg["unit_name"] = Classes.SPEC_INFO[spec]["name"]
 			# Role-based break resistance replaces the class base once specced.
 			cfg["constitution"] = Classes.SPEC_INFO[spec].get("constitution",
 				cfg.get("constitution", 100))
@@ -297,6 +303,8 @@ func _spawn_units() -> void:
 				cfg["sheet_dir"] = "res://assets/sprites/berserker"
 				cfg["frame_size"] = 124
 				cfg["sprite_scale"] = 1.25
+				cfg["portrait_path"] = "res://assets/sprites/berserker/Berserker_Portrait.png"
+				cfg["walks_to_target"] = true  # he has real locomotion art
 			Classes.apply_passive(cfg, spec)
 			if Run.active and i < Run.party.size():
 				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
@@ -493,7 +501,7 @@ func _build_ui() -> void:
 	action_panel.add_child(action_box)
 	action_panel.visible = false
 
-	var history_panel := PanelContainer.new()
+	history_panel = PanelContainer.new()
 	history_panel.position = Vector2(968, 8)
 	history_panel.self_modulate = Color(1, 1, 1, 0.85)
 	ui.add_child(history_panel)
@@ -503,13 +511,15 @@ func _build_ui() -> void:
 	history.custom_minimum_size = Vector2(300, 190)
 	history.add_theme_font_size_override("normal_font_size", 12)
 	history_panel.add_child(history)
+	# The log can be tucked away; the little button stays to bring it back.
+	_log_toggle = Button.new()
+	_log_toggle.text = "–"
+	_log_toggle.custom_minimum_size = Vector2(26, 24)
+	_log_toggle.position = Vector2(1242, 10)
+	_log_toggle.tooltip_text = "Hide / show the combat log"
+	_log_toggle.pressed.connect(_toggle_log)
+	ui.add_child(_log_toggle)
 
-	active_marker = Label.new()
-	active_marker.text = "▼"
-	active_marker.add_theme_font_size_override("font_size", 26)
-	active_marker.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
-	active_marker.visible = false
-	add_child(active_marker)
 
 	_build_skill_check_ui()
 
@@ -704,6 +714,13 @@ func _log(text: String, color := "#d8d2c4") -> void:
 	history.append_text("[color=%s]%s[/color]\n" % [color, text])
 
 
+func _toggle_log() -> void:
+	history_panel.visible = not history_panel.visible
+	_log_toggle.text = "–" if history_panel.visible else "Log"
+	_log_toggle.custom_minimum_size = Vector2(26 if history_panel.visible else 48, 24)
+	_log_toggle.position = Vector2(1242 if history_panel.visible else 1220, 10)
+
+
 func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability = null) -> void:
 	for child in turn_bar.get_children():
 		child.queue_free()
@@ -766,8 +783,11 @@ func _run_battle() -> void:
 		var u := _next_unit()
 		if u == null:
 			break
-		active_marker.visible = true
-		active_marker.position = u.position + Vector2(-11, -150)
+		# Turn indicator: the acting unit's nameplate glows gold.
+		if active_unit != null and is_instance_valid(active_unit):
+			active_unit.set_plate_active(false)
+		active_unit = u
+		u.set_plate_active(true)
 		for dot_id in DOT_STATUSES:
 			if u.has_status(dot_id) and not u.dead:
 				# Poison never ticks on the turn it was applied.
@@ -834,7 +854,8 @@ func _run_battle() -> void:
 		else:
 			await _enemy_turn(u)
 		_check_end()
-	active_marker.visible = false
+	if active_unit != null and is_instance_valid(active_unit):
+		active_unit.set_plate_active(false)
 
 
 func _next_unit() -> BattleUnit:
@@ -963,8 +984,8 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 	var target_foe: BattleUnit = _lowest_hp(broken_foes) if not broken_foes.is_empty() \
 		else _lowest_hp(foes)
 	var weakest_ally := _lowest_hp(allies)
-	match u.unit_name:
-		"Warrior":
+	match u.hero_key:
+		"warrior":
 			var pommel := _find_ability(u, "Pommel Strike")
 			if pommel != null and u.resource >= pommel.cost and randf() < 0.35:
 				return [pommel, target_foe]
@@ -979,7 +1000,7 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if overpower != null and u.resource >= overpower.cost:
 				return [overpower, target_foe]
 			return [u.abilities[0], target_foe]          # Strike
-		"Mage":
+		"mage":
 			var mshield := _find_ability(u, "Mana Shield")
 			if mshield != null and u.resource >= mshield.cost \
 					and not u.has_status("mana_shield") and u.resource < 40:
@@ -997,7 +1018,7 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if fbolt != null and u.resource >= fbolt.cost:
 				return [fbolt, target_foe]
 			return [u.abilities[0], target_foe]          # Magic Bolt
-		"Hunter":
+		"hunter":
 			var summon := _find_ability(u, "Summon Canis")
 			if summon != null and u.resource >= summon.cost \
 					and (u.companion == null or u.companion.dead):
@@ -1017,7 +1038,7 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if aimed != null and u.resource >= aimed.cost:
 				return [aimed, target_foe]
 			return [u.abilities[0], target_foe]          # Quick Shot
-		"Cleric":
+		"cleric":
 			var hymn := _find_ability(u, "Hymn of Hope")
 			if hymn != null and u.second_resource >= hymn.faith_cost \
 					and weakest_ally.hp < weakest_ally.max_hp * 0.6:
@@ -1185,11 +1206,24 @@ func _show_actions(u: BattleUnit) -> void:
 			var s_btn := _ability_popup_button(u, ab, popup)
 			s_btn.pressed.connect(sub.hide)
 			sub_list.add_child(s_btn)
+		# Surface the summons' hotkeys on the collapsed entry: pressing the
+		# key summons directly, no need to open the submenu.
+		var key_hints := PackedStringArray()
+		var hint_lines := PackedStringArray()
+		for ab in summons:
+			var ki: int = u.abilities.find(ab)
+			if ki >= 0 and ki < ABILITY_KEY_NAMES.size():
+				key_hints.append(ABILITY_KEY_NAMES[ki])
+				hint_lines.append("[%s] %s" % [ABILITY_KEY_NAMES[ki], ab.display_name])
 		var summon_btn := Button.new()
 		summon_btn.text = "Summon Companion ▸"
+		if not key_hints.is_empty():
+			summon_btn.text = "[%s] Summon Companion ▸" % "/".join(key_hints)
 		summon_btn.custom_minimum_size = Vector2(230, 38)
 		summon_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		summon_btn.tooltip_text = "Choose which beast answers the call.\nOnly one companion at a time."
+		if not hint_lines.is_empty():
+			summon_btn.tooltip_text += "\nHotkeys summon directly:\n" + "\n".join(hint_lines)
 		summon_btn.add_child(sub)
 		summon_btn.pressed.connect(_open_summon_popup.bind(sub, popup))
 		list.add_child(summon_btn)
@@ -1336,9 +1370,9 @@ func _pick_target(pool: Array) -> BattleUnit:
 	_kb_pool = pool
 	_kb_idx = -1
 	var cancel := Button.new()
-	cancel.text = "✕ Cancel"
-	cancel.custom_minimum_size = Vector2(120, 40)
-	cancel.position = Vector2(580, 560)
+	cancel.text = "✕ Cancel (X)"
+	cancel.custom_minimum_size = Vector2(130, 40)
+	cancel.position = Vector2(575, 560)
 	cancel.pressed.connect(func(): _target_picked.emit(null))
 	ui.add_child(cancel)
 	var chosen: BattleUnit = await _target_picked
@@ -1451,9 +1485,10 @@ func _parry_chance(defender: BattleUnit) -> float:
 		+ (0.15 if defender.has_status("parry_up") else 0.0)
 
 
-# Bow users get dedicated attack/impact/blocked sounds.
+# Bow users get dedicated attack/impact/blocked sounds. Keyed on the class
+# id, not the display name — specced heroes are named after their spec.
 func _uses_bow(u: BattleUnit) -> bool:
-	return u.unit_name.begins_with("Hunter") or u.unit_name.begins_with("Orc Archer")
+	return u.hero_key == "hunter" or u.unit_name.begins_with("Orc Archer")
 
 
 # Per-ability impact sounds; falls back to bow/generic hits.
@@ -1477,14 +1512,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	var pr_mult := {"perfect": 1.25, "good": 1.0, "fail": 0.5}[grade] as float
 	var is_perfect := grade == "perfect"
 
-	# Lunge toward the target so attacks visibly connect (specials stay put).
+	# Move toward the target so attacks visibly connect (specials stay put):
+	# units with real locomotion art WALK to melee range; the rest do the
+	# short abstract lunge.
 	var lunge_origin := attacker.position
+	var walked := false
 	if not sim and ab.special == "" and target != attacker:
-		var toward := (target.position - attacker.position).normalized()
-		var lunge_dist := 90.0 if ab.heal == 0 else 40.0
-		var lunge := create_tween()
-		lunge.tween_property(attacker, "position", lunge_origin + toward * lunge_dist, 0.14) \
-			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		if attacker.walks_to_target and ab.heal == 0 and target != null:
+			walked = true
+			var stand := target.position \
+				+ (attacker.position - target.position).normalized() * 95.0
+			await _walk_to(attacker, stand)
+		else:
+			var toward := (target.position - attacker.position).normalized()
+			var lunge_dist := 90.0 if ab.heal == 0 else 40.0
+			var lunge := create_tween()
+			lunge.tween_property(attacker, "position", lunge_origin + toward * lunge_dist, 0.14) \
+				.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 	attacker.play_anim(ab.anim)
 	if _uses_bow(attacker) and ab.damage > 0:
@@ -1935,9 +1979,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if not is_counter:
 			_gain_resonance(attacker, 2 if any_crit else 1)
 	if not sim and attacker.position != lunge_origin:
-		var back := create_tween()
-		back.tween_property(attacker, "position", lunge_origin, 0.18) \
-			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		if walked and not attacker.dead:
+			await _walk_to(attacker, lunge_origin)
+			attacker.sprite.flip_h = not attacker.is_hero  # restore facing
+		elif not walked:
+			var back := create_tween()
+			back.tween_property(attacker, "position", lunge_origin, 0.18) \
+				.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	await _wait(0.45)
 	attacker.return_to_idle()
 	if not is_counter:
@@ -1981,6 +2029,17 @@ func _gain_resonance(caster: BattleUnit, stacks: int) -> void:
 		caster.float_text("Backlash Ward +15 Mana", Color(0.5, 0.7, 1.0))
 		_log("   → Backlash Ward: %s restores 15 Mana" % caster.unit_name, "#b0a8e0")
 	caster.refresh_bars()
+
+
+# Walks a unit (walk animation, facing the way it moves) to a point.
+func _walk_to(u: BattleUnit, dest: Vector2) -> void:
+	u.sprite.flip_h = dest.x < u.position.x  # both sheets face right natively
+	u.play_anim("walk")
+	var dur := clampf(u.position.distance_to(dest) / 650.0, 0.2, 1.1)
+	var tw := create_tween()
+	tw.tween_property(u, "position", dest, dur) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	await tw.finished
 
 
 # Non-attack abilities (buffs, shields, party effects). Effect strength scales
@@ -2365,8 +2424,8 @@ func _run_skill_check(cancellable := false) -> String:
 	sc_cancel = null
 	if cancellable:
 		sc_cancel = Button.new()
-		sc_cancel.text = "✕ Cancel"
-		sc_cancel.custom_minimum_size = Vector2(104, 34)
+		sc_cancel.text = "✕ Cancel (X)"
+		sc_cancel.custom_minimum_size = Vector2(118, 34)
 		sc_cancel.position = Vector2(448, 20)
 		sc_cancel.pressed.connect(_cancel_skill_check)
 		sc_root.add_child(sc_cancel)
@@ -2417,6 +2476,18 @@ func _process(delta: float) -> void:
 # the log, portraits) would otherwise swallow them before _unhandled_input.
 # Ability hotkeys live here too so the abilities popup can't swallow them.
 func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo \
+			and not autoplay and not battle_over:
+		# X cancels whatever cancel is on screen: a skill check or targeting.
+		if event.keycode == KEY_X:
+			if sc_active and sc_cancel != null:
+				_cancel_skill_check()
+				get_viewport().set_input_as_handled()
+				return
+			if not sc_active and not _kb_pool.is_empty():
+				_target_picked.emit(null)
+				get_viewport().set_input_as_handled()
+				return
 	if event is InputEventKey and event.pressed and not event.echo \
 			and not sc_active and not autoplay and not battle_over:
 		if event.keycode == KEY_TAB:
