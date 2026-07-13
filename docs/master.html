@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-11</b></p>
+<p align="right"><b>Last updated: 2026-07-12</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative design reference (the timestamp above is bumped on every
 edit). It supersedes the original concept docs ("Dawn of Decay.docx", "DoD Combat.docx",
@@ -224,7 +224,12 @@ sheet, distinguished by slot tints (white / blue / gold / green); distinct art i
 <b>Test art:</b> a Warrior specced <b>Berserker</b> fights with his own sprite in battle
 (fur-cloaked axeman, native 124px frames at 1.25× battle scale, shown in its original
 colors — no slot tint; idle/walk/attack so far — hurt, death, and the other attack
-animations reuse what exists until those clips arrive).</p>
+animations reuse what exists until those clips arrive). A Mage specced <b>Pyromancer</b>
+wears a second test sprite — a hooded torch-bearer at native 236px, 1:1 scale — as a
+deliberate <b>size experiment</b>: he stands ~55% taller than the Berserker so the two
+densities can be compared in-game before locking the character template (static east-facing
+pose only; attacks hold the pose until animations exist). Own-art specs are listed in
+battle.gd's SPEC_ART table.</p>
 <table border="1" cellpadding="4">
 <tr><th>Class</th><th>HP</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Resource(s)</th></tr>
 <tr><td>Warrior</td><td>154</td><td>25%</td><td>95</td><td>110</td><td>Rage 0–100</td></tr>
@@ -512,9 +517,12 @@ check. Clicking still works everywhere.</li>
 <li><b>X cancels:</b> whenever a Cancel button is on screen — during targeting or a
 cancellable skill check — pressing <b>X</b> triggers it (the buttons say so:
 "✕ Cancel (X)").</li>
-<li><b>Beastmaster summons</b> keep their slot hotkeys (shown as e.g. "[W/E/R] Summon
-Companion ▸"): pressing W/E/R summons that beast directly without opening the
-submenu.</li>
+<li><b>Summon Companion</b> sits at the TOP of the Beastmaster's ability list on hotkey
+<b>W</b>. Selecting it (key or click) opens the <b>beast picker</b> — a small window listing
+Ursus / Canis / Aguila with costs: <b>Tab cycles</b> the options (unaffordable beasts are
+skipped and greyed), <b>Space summons</b> the highlighted one, <b>X closes</b> the picker,
+and clicking works as always. The remaining abilities take the following hotkeys in kit
+order (Barbed Arrow E, Poisoned Arrow R, Kill Command A).</li>
 <li><b>Burger menu:</b> Restart Run (abandons to a fresh draft), Settings (overlay with volume
 + fullscreen — the battle isn't lost), Exit to Main Menu (run resumes from the last saved
 node).</li>

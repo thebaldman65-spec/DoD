@@ -207,6 +207,19 @@ const ENEMY_PLATE_X := 1092.0  # 1280 - 8 - plate width (180)
 const PLATE_TOP := 210.0
 const PLATE_STEP := 88.0
 
+# Specs with their own battle art (everyone else shares the Soldier sheet +
+# slot tint). Values are config overrides; own-art heroes render untinted.
+# The Pyromancer is a SIZE TEST: native 236px frame at 1:1 — intentionally
+# larger than the Berserker template so the two can be compared in-game.
+const SPEC_ART := {
+	"berserker": {"sheet_dir": "res://assets/sprites/berserker", "frame_size": 124,
+		"sprite_scale": 1.25,
+		"portrait_path": "res://assets/sprites/berserker/Berserker_Portrait.png",
+		"walks_to_target": true},
+	"pyromancer": {"sheet_dir": "res://assets/sprites/pyromancer", "frame_size": 236,
+		"sprite_scale": 1.0},
+}
+
 
 func _enemy_config(kind: String) -> Dictionary:
 	var orc := "res://assets/sprites/orc"
@@ -297,14 +310,10 @@ func _spawn_units() -> void:
 				cfg["second_resource_name"] = "Resonance"
 				cfg["second_resource"] = 0
 				cfg["second_max"] = 5
-			# Test art: the Berserker fights in his own skin (native 124px
-			# frames, scaled to stand shoulder-to-shoulder with the Soldier).
-			if spec == "berserker":
-				cfg["sheet_dir"] = "res://assets/sprites/berserker"
-				cfg["frame_size"] = 124
-				cfg["sprite_scale"] = 1.25
-				cfg["portrait_path"] = "res://assets/sprites/berserker/Berserker_Portrait.png"
-				cfg["walks_to_target"] = true  # he has real locomotion art
+			# Specs with their own battle art override the shared Soldier sheet.
+			if SPEC_ART.has(spec):
+				for art_key in SPEC_ART[spec]:
+					cfg[art_key] = SPEC_ART[spec][art_key]
 			Classes.apply_passive(cfg, spec)
 			if Run.active and i < Run.party.size():
 				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
@@ -327,7 +336,7 @@ func _spawn_units() -> void:
 		cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
 		# Heroes with their own art keep original colors — no slot tint.
 		var hero_tint: Color = Classes.HERO_TINTS[i]
-		if spec == "berserker":
+		if SPEC_ART.has(spec):
 			hero_tint = Color.WHITE
 		var u := _make_unit(cfg, HERO_SLOTS[i], hero_tint, _hero_plate_pos(i))
 		u.crit_bonus = cfg.get("crit_bonus", 0.0)
@@ -1163,8 +1172,22 @@ func _show_actions(u: BattleUnit) -> void:
 	for child in action_box.get_children():
 		child.queue_free()
 	_open_popups.clear()
-	# Basic attack: always its own button.
+	_close_summon_picker()
+	# Hotkeys map to menu entries, not raw ability slots: the basic attack is
+	# always Q, "Summon Companion" (when the hero has summons) owns W, and the
+	# remaining abilities take the following keys in kit order.
 	var basic: Ability = u.abilities[0]
+	_menu_entries = [{"ability": basic}]
+	var summons: Array = []
+	for i in range(1, u.abilities.size()):
+		if u.abilities[i].special == "summon":
+			summons.append(u.abilities[i])
+	if not summons.is_empty():
+		_menu_entries.append({"summons": summons})
+	for i in range(1, u.abilities.size()):
+		if u.abilities[i].special != "summon":
+			_menu_entries.append({"ability": u.abilities[i]})
+	# Basic attack: always its own button.
 	var basic_btn := Button.new()
 	basic_btn.text = "[%s] %s" % [ABILITY_KEY_NAMES[0], basic.display_name]
 	basic_btn.custom_minimum_size = Vector2(105, 40)
@@ -1187,46 +1210,20 @@ func _show_actions(u: BattleUnit) -> void:
 	var list := VBoxContainer.new()
 	list.add_theme_constant_override("separation", 4)
 	popup.add_child(list)
-	var summons: Array = []
-	for i in range(1, u.abilities.size()):
-		var ab: Ability = u.abilities[i]
-		# The Beastmaster's summons collapse into one submenu entry.
-		if ab.special == "summon":
-			summons.append(ab)
-			continue
-		list.add_child(_ability_popup_button(u, ab, popup))
-	if not summons.is_empty():
-		var sub := PopupPanel.new()
-		_open_popups.append(sub)
-		sub.window_input.connect(_on_popup_window_input)
-		var sub_list := VBoxContainer.new()
-		sub_list.add_theme_constant_override("separation", 4)
-		sub.add_child(sub_list)
-		for ab in summons:
-			var s_btn := _ability_popup_button(u, ab, popup)
-			s_btn.pressed.connect(sub.hide)
-			sub_list.add_child(s_btn)
-		# Surface the summons' hotkeys on the collapsed entry: pressing the
-		# key summons directly, no need to open the submenu.
-		var key_hints := PackedStringArray()
-		var hint_lines := PackedStringArray()
-		for ab in summons:
-			var ki: int = u.abilities.find(ab)
-			if ki >= 0 and ki < ABILITY_KEY_NAMES.size():
-				key_hints.append(ABILITY_KEY_NAMES[ki])
-				hint_lines.append("[%s] %s" % [ABILITY_KEY_NAMES[ki], ab.display_name])
-		var summon_btn := Button.new()
-		summon_btn.text = "Summon Companion ▸"
-		if not key_hints.is_empty():
-			summon_btn.text = "[%s] Summon Companion ▸" % "/".join(key_hints)
-		summon_btn.custom_minimum_size = Vector2(230, 38)
-		summon_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		summon_btn.tooltip_text = "Choose which beast answers the call.\nOnly one companion at a time."
-		if not hint_lines.is_empty():
-			summon_btn.tooltip_text += "\nHotkeys summon directly:\n" + "\n".join(hint_lines)
-		summon_btn.add_child(sub)
-		summon_btn.pressed.connect(_open_summon_popup.bind(sub, popup))
-		list.add_child(summon_btn)
+	for e_idx in range(1, _menu_entries.size()):
+		var entry: Dictionary = _menu_entries[e_idx]
+		if entry.has("summons"):
+			# Top of the list: opens the beast picker (Tab cycles, Space picks).
+			var group_btn := Button.new()
+			group_btn.text = "[%s] Summon Companion ▸" % ABILITY_KEY_NAMES[e_idx]
+			group_btn.custom_minimum_size = Vector2(230, 38)
+			group_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			group_btn.tooltip_text = "Choose which beast answers the call.\n" \
+				+ "Tab cycles the options, Space summons.\nOnly one companion at a time."
+			group_btn.pressed.connect(_on_summon_group_pressed.bind(popup))
+			list.add_child(group_btn)
+		else:
+			list.add_child(_ability_popup_button(u, entry["ability"], popup, e_idx))
 	popup.popup_hide.connect(_clear_delay_preview)
 	menu_btn.add_child(popup)
 	menu_btn.pressed.connect(_open_ability_popup.bind(popup, menu_btn))
@@ -1248,9 +1245,10 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 
 
 # One entry in the abilities popup: hotkey + label with cost, tooltip, preview.
-func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel) -> Button:
+# `key_idx` is the entry's position in _menu_entries (= its hotkey slot).
+func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
+		key_idx := -1) -> Button:
 	var label: String = ab.display_name
-	var key_idx := u.abilities.find(ab)
 	if key_idx >= 0 and key_idx < ABILITY_KEY_NAMES.size():
 		label = "[%s] %s" % [ABILITY_KEY_NAMES[key_idx], label]
 	if ab.cost > 0:
@@ -1280,11 +1278,85 @@ func _open_ability_popup(popup: PopupPanel, anchor: Button) -> void:
 		int(anchor.global_position.y) - popup.size.y - 6)
 
 
-# Opens the summon submenu beside the main abilities popup.
-func _open_summon_popup(sub: PopupPanel, parent: PopupPanel) -> void:
-	sub.popup()
-	sub.position = Vector2i(parent.position.x + parent.size.x + 4,
-		parent.position.y)
+# ---------- summon picker (Tab cycles, Space summons, X closes) ----------
+
+var _summon_picker: PanelContainer = null
+var _summon_opts: Array = []
+var _summon_btns: Array = []
+var _summon_idx := -1
+
+
+func _on_summon_group_pressed(popup: PopupPanel) -> void:
+	popup.hide()
+	if current_hero != null:
+		_open_summon_picker(current_hero)
+
+
+func _open_summon_picker(u: BattleUnit) -> void:
+	_close_summon_picker()
+	_summon_opts = u.abilities.filter(func(a): return a.special == "summon")
+	if _summon_opts.is_empty():
+		return
+	_summon_picker = PanelContainer.new()
+	_summon_picker.position = Vector2(480, 420)
+	ui.add_child(_summon_picker)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	_summon_picker.add_child(box)
+	var title := Label.new()
+	title.text = "SUMMON —  Tab cycles · Space summons · X closes"
+	title.add_theme_font_size_override("font_size", 12)
+	title.add_theme_color_override("font_color", Color(0.85, 0.80, 0.68))
+	box.add_child(title)
+	_summon_btns = []
+	for i in _summon_opts.size():
+		var ab: Ability = _summon_opts[i]
+		var b := Button.new()
+		b.text = "%s   %d %s" % [ab.display_name, ab.cost, u.resource_name]
+		b.custom_minimum_size = Vector2(320, 40)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.tooltip_text = _ability_tooltip(u, ab)
+		b.disabled = not _ability_usable(u, ab)
+		b.focus_mode = Control.FOCUS_NONE  # highlight is drawn, not focus-based
+		b.pressed.connect(_confirm_summon.bind(i))
+		b.mouse_entered.connect(_preview_delay.bind(u, ab))
+		b.mouse_exited.connect(_clear_delay_preview)
+		box.add_child(b)
+		_summon_btns.append(b)
+	_summon_idx = -1
+	_cycle_summon()  # land on the first affordable beast
+
+
+func _close_summon_picker() -> void:
+	if _summon_picker != null and is_instance_valid(_summon_picker):
+		_summon_picker.queue_free()
+	_summon_picker = null
+	_summon_opts = []
+	_summon_btns = []
+	_summon_idx = -1
+
+
+func _cycle_summon() -> void:
+	if _summon_btns.is_empty():
+		return
+	for step in _summon_btns.size():
+		_summon_idx = (_summon_idx + 1) % _summon_btns.size()
+		if not _summon_btns[_summon_idx].disabled:
+			break
+	for i in _summon_btns.size():
+		_summon_btns[i].modulate = Color(1.0, 0.92, 0.55) if i == _summon_idx \
+			else Color(1, 1, 1)
+	if current_hero != null and _summon_idx >= 0:
+		_preview_delay(current_hero, _summon_opts[_summon_idx])
+
+
+func _confirm_summon(i: int) -> void:
+	if i < 0 or i >= _summon_opts.size() or current_hero == null:
+		return
+	var ab: Ability = _summon_opts[i]
+	if not _ability_usable(current_hero, ab):
+		return
+	_on_ability_button(ab)  # closes the picker via the shared pick funnel
 
 
 var _preview_locked := false
@@ -1292,6 +1364,8 @@ var second_target: BattleUnit = null  # choose_two abilities (Shrapnel)
 var _open_popups: Array = []  # ability popups to close when a hotkey fires
 var _main_popup: PopupPanel   # the Abilities list (Tab toggles it)
 var _main_popup_anchor: Button
+# Hotkey slots for the current hero: {"ability": Ability} or {"summons": [...]}.
+var _menu_entries: Array = []
 # Keyboard targeting: Tab cycles the candidates, Space/Enter confirms.
 var _kb_pool: Array = []
 var _kb_idx := -1
@@ -1308,6 +1382,7 @@ func _clear_delay_preview() -> void:
 
 
 func _on_ability_button(ab: Ability) -> void:
+	_close_summon_picker()
 	_sfx("click", -12.0)
 	_ability_picked.emit(ab)
 
@@ -2478,8 +2553,14 @@ func _process(delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo \
 			and not autoplay and not battle_over:
-		# X cancels whatever cancel is on screen: a skill check or targeting.
+		# X cancels whatever cancel is on screen: the summon picker, a skill
+		# check, or targeting.
 		if event.keycode == KEY_X:
+			if _summon_picker != null:
+				_close_summon_picker()
+				_clear_delay_preview()
+				get_viewport().set_input_as_handled()
+				return
 			if sc_active and sc_cancel != null:
 				_cancel_skill_check()
 				get_viewport().set_input_as_handled()
@@ -2494,6 +2575,10 @@ func _input(event: InputEvent) -> void:
 			_on_tab_pressed()
 			return
 		if event.keycode in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
+			if _summon_picker != null:
+				_confirm_summon(_summon_idx)
+				get_viewport().set_input_as_handled()
+				return
 			if _kb_confirm_target():
 				get_viewport().set_input_as_handled()
 				return
@@ -2518,11 +2603,13 @@ func _on_popup_window_input(event: InputEvent) -> void:
 			_try_ability_hotkey(event.keycode)
 
 
-# Tab: toggles the Abilities list during action select; cycles targets while
-# picking one.
+# Tab: cycles the summon picker when it's open; cycles targets while picking
+# one; otherwise toggles the Abilities list during action select.
 func _on_tab_pressed() -> void:
 	get_viewport().set_input_as_handled()
-	if not _kb_pool.is_empty():
+	if _summon_picker != null:
+		_cycle_summon()
+	elif not _kb_pool.is_empty():
 		_cycle_kb_target()
 	elif current_hero != null and action_panel.visible and _main_popup != null \
 			and is_instance_valid(_main_popup):
@@ -2547,14 +2634,23 @@ func _kb_confirm_target() -> bool:
 	return true
 
 
-# Q/W/E/R/A/S/D/F pick abilities by slot while the action bar is open.
+# Q/W/E/R/A/S/D/F pick menu entries by slot while the action bar is open.
+# The summon group (W on the Beastmaster) opens the beast picker.
 func _try_ability_hotkey(keycode: Key) -> void:
 	if current_hero == null or not action_panel.visible:
 		return
 	var idx := ABILITY_KEYS.find(keycode)
-	if idx < 0 or idx >= current_hero.abilities.size():
+	if idx < 0 or idx >= _menu_entries.size():
 		return
-	var ab: Ability = current_hero.abilities[idx]
+	var entry: Dictionary = _menu_entries[idx]
+	if entry.has("summons"):
+		for p in _open_popups:
+			if is_instance_valid(p) and p.visible:
+				p.hide()
+		get_viewport().set_input_as_handled()
+		_open_summon_picker(current_hero)
+		return
+	var ab: Ability = entry["ability"]
 	if not _ability_usable(current_hero, ab):
 		return
 	for p in _open_popups:

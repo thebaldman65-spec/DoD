@@ -87,11 +87,14 @@ grouped tight; combat log hideable (– button). SPECCED HEROES DISPLAY THEIR
 SPEC NAME everywhere (unit_name = spec; logic keys on unit.hero_key — never
 match display names!). Battle DEBUG ▾ menu (bottom-right): Full Restore,
 Enemy attacks OFF, per-hero turn LOCK (every turn theirs until unlocked).
-Renewal is Holy-only (15 HP/turn). Berserker: test battle art, untinted,
-own portrait (Classes.SPEC_PORTRAITS), walks to melee and back
-(walks_to_target flag; others lunge). Partial sheets fall back — see
-unit.gd _build_sprite. Berserker = RESOLUTION TEMPLATE for all future art;
-battle bg at max zoom-out (cover 1296x736). Specs carry archetype
+Renewal is Holy-only (15 HP/turn). Own-art specs live in battle.gd SPEC_ART
+(untinted): Berserker (124px @1.25, walks to melee — walks_to_target — own
+portrait via Classes.SPEC_PORTRAITS) and Pyromancer (236px @1.0 static — a
+SIZE TEST vs the Berserker template; user comparing before locking the
+template). Partial sheets fall back — see unit.gd _build_sprite. Battle bg
+at max zoom-out (cover 1296x736). Beastmaster: "Summon Companion" = menu
+slot W → beast picker window (Tab cycles, Space summons, X closes); battle
+hotkeys map to _menu_entries slots, NOT raw ability indices. Specs carry archetype
 tags (Ramp/Rush/Nuker/Pressure/Healer/Warder/Tank/Bruiser) in SPEC_INFO.
 Battle has burger menu (restart/settings overlay/exit); skill checks accept
 Space or left click; no announcer text (combat log only).
