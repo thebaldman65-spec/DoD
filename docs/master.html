@@ -107,10 +107,14 @@ returns to the action bar with nothing spent. Enemies and the sim bot always act
 20% more likely to miss. AoE never misses/parries. Multi-hit and random-hit attacks roll miss
 <i>per strike</i> — a missed hit never cancels the follow-up strikes.</li>
 <li><b>Parry:</b> baseline is split by side — <b>heroes parry at 5%, enemies at 2.5%</b> —
-plus parry bonuses (talents, Parry Up). A parry negates the hit and the defender counters with
-their basic attack as a free action (no initiative cost, cannot chain). Broken units cannot
-parry. Multi-hit attacks roll parry per strike; each parried strike triggers a counter, and
-the remaining strikes still land (unless the counter kills the attacker).</li>
+plus parry bonuses (talents, Parry Up). A parried hit still lands but with <b>75% less
+damage AND 75% less Break damage</b> (on-hit statuses can still apply); the log tags it
+"(parried -75%)". Parrying no longer triggers an automatic counter. AoE cannot be parried;
+Broken units cannot parry; multi-hit attacks roll parry per strike.</li>
+<li><b>Counter Attack (term):</b> immediately answering a parry with a basic attack — a free
+action with no initiative cost that cannot chain. Granted only by specific effects (nothing
+grants it yet; the Warrior's Retaliation stance is different — it counters ANY hit taken
+while active).</li>
 <li><b>Crit:</b> 10% base + 25% vs Broken targets + 3% per Mage Resonance stack + talent/spec
 bonuses (+15% with Aguila summoned). Guaranteed: Razor Ice vs Chilled. Resonance builds
 only on the Mage's own casts — parry counters do not grant stacks.</li>
@@ -174,6 +178,9 @@ armor).</td></tr>
 <tr><td>Dazed</td><td>Attacks are 20% more likely to miss (3 turns; Timber Slam).</td></tr>
 <tr><td>Shielded</td><td>Takes 25% less damage — the Orc Shieldmaster's single-ally
 ward.</td></tr>
+<tr><td>Divine Wrath</td><td>+15% damage dealt and +15% speed (Devout).</td></tr>
+<tr><td>Umbral Sigil</td><td>Branded: every other member of this unit's party takes 50% of
+all attack damage it receives (Occultist).</td></tr>
 <tr><td>Sunder</td><td>−35% armor.</td></tr>
 <tr><td>Ward</td><td>Takes 50% less BD.</td></tr>
 <tr><td>Fortify</td><td>+10% armor (Defense Potion).</td></tr>
@@ -259,8 +266,11 @@ Stacks persist until Death Ray consumes them.</li>
 <li><b>Mage:</b> Magic Bolt — 25 arcane / 14 BD / 2.0 (Perfect: +10 Mana); Mana Shield —
 15 Mana, 2.0, for 3 turns 50% of damage the Mage takes converts into Mana (Perfect: casts at
 1.5 int). (Arcane Surge and Reality Fracture are vaulted — removed but kept for later.)</li>
-<li><b>Cleric:</b> Smite — 22 holy / 16 BD / 2.0 (Perfect: self-heal 8); Mend Wounds — 25 Mana,
-heal 45, 3.0 (Perfect: Ward 2 turns). (Renewal moved to the Holy spec 07-10.)</li>
+<li><b>Cleric:</b> Smite — 22 holy / 16 BD / 2.0 (Perfect: self-heal 8; the Occultist's
+Smite is corrupted into <b>Shadowrend</b> — same numbers, shadow damage); Mend Wounds —
+25 Mana, heal 45, 3.0 (Perfect: Ward 2 turns); <b>Resurrection</b> — MIRACLE, 40 Faith,
+4.0, returns a fallen ally to life with 20% health and resource (greyed out while nobody is
+down). (Renewal moved to the Holy spec 07-10.)</li>
 <li><b>Hunter:</b> Quick Shot — 20 dmg / 14 BD / 2.0 (no perfect bonus).</li>
 </ul>
 
@@ -304,7 +314,7 @@ Retaliation — 20 Rage, 3.0, counter every attack on the Warrior for 3 turns
 <li><b>Swordmaster (Bruiser)</b> — Passive <i>Seasoned Fighter</i>: a stance switch — +15%
 damage dealt while above half HP; takes 15% less damage at or below half HP. The spec chip
 shows which side is live.<br>
-Overpower — 20 Rage, 15 dmg / 20 BD / 2.5, +0.5 damage per point of the target's Break meter,
+Overpower — 30 Rage, 15 dmg / 20 BD / 2.5, +0.5 damage per point of the target's Break meter,
 builds 10 Rage (Perfect: +5 bonus Rage).<br>
 Crushing Blow — 20 Rage, 32 dmg / 20 BD / 3.0, Sunders (−35% armor, 3 turns), builds 10 Rage
 (Perfect: +5 bonus BD).<br>
@@ -349,15 +359,22 @@ Hymn of Hope — MIRACLE, 30 Faith, 4.0, heal ALL allies 20% max HP (Perfect: 25
 <li><b>Devout (Warder)</b> — Passive <i>Devotion Aura</i>: the entire party (Cleric included)
 takes 15% less BD, shown as a battle-long status.<br>
 Divine Shield — 30 Mana, 3.0, ally shield absorbing 100 (Perfect: 130).<br>
+Divine Wrath — 25 Mana, 3.0, the whole party deals +15% damage and acts +15% faster for
+3 turns (Perfect: 4 turns).<br>
 Unity — MIRACLE, 25 Faith, 3.0, binds the party's souls: all damage received is split evenly
 among living heroes for 3 turns; BD still lands on the struck hero (Perfect: 4
 turns).</li>
 <li><b>Occultist (Pressure)</b> — Passive <i>Corrupted Channeling</i>: whenever a Crippled
-enemy attacks, a random living hero heals for half the damage it dealt.<br>
+enemy attacks, a random living hero heals for half the damage it dealt. Basic attack:
+<b>Shadowrend</b> (corrupted Smite — 22 shadow / 16 BD / 2.0).<br>
 Hex of Ruin — 20 Mana, 2 random enemies × 15 shadow / 24 BD / 3.0, Cripples both for 3 turns
 (Perfect: 4 turns).<br>
-Mind Flay — MIRACLE, 25 Faith, 3.5, the target attacks its OWN allies for 3 turns with +100%
-Break damage; fizzles to normal behavior if it stands alone (Perfect: +115%).</li>
+Mind Flay — 30 Mana (no longer a Faith Miracle), 3.5, the target attacks its OWN allies for
+3 turns with +100% Break damage; fizzles to normal behavior if it stands alone
+(Perfect: +115%).<br>
+Umbral Sigil — MIRACLE, 20 Faith, 3.0, brands one enemy for 3 turns: every OTHER member of
+its party takes 50% of all attack damage the branded target receives (Perfect: 4
+turns).</li>
 </ul>
 <h3>6.4 Hunter</h3>
 <ul>
@@ -376,7 +393,7 @@ for 10 dmg + 20 BD each.<br>
 Summon Canis — 30 Focus, 3.0. Wolf, 60 HP: 20 dmg, 50% chance to build 20 Bleed.<br>
 Summon Aguila — 30 Focus, 3.0. Eagle, 60 HP: 15 dmg, 50% chance to Sunder (2 turns).<br>
 Barbed Arrow — 20 Focus, 20 dmg / 15 BD / 2.5, Cripples 3 turns (Perfect: 4 turns).<br>
-Poisoned Arrow — 20 Focus, 20 dmg / 15 BD / 2.5, applies 3 stacks of Poison (5 turns)
+Poisoned Arrow — 20 Focus, 20 NATURE dmg / 15 BD / 2.5, applies 3 stacks of Poison (5 turns)
 (Perfect: 4 stacks).<br>
 Kill Command — 30 Focus, 4.0, the companion strikes the target for DOUBLE damage with its
 special effect doubled (guaranteed procs, doubled Bleed, Sunder 4 turns). Requires a living
@@ -392,11 +409,14 @@ Tripwire — 20 Focus, 2.5, for 5 turns the Hunter retaliates against EVERY atta
 enemy — regardless of who they hit (Perfect: 6 turns).<br>
 Explosive Shot — 35 Focus, 10 fire to ALL / 20 BD / 3.0 (Perfect: 12 base damage).<br>
 Shrapnel Charge — 25 Focus, 3.0, a scattering charge that rips TWO chosen enemies for 20
-physical / 25 BD each and leaves both Crippled and Slowed for 3 turns (Perfect: 4
+FIRE / 25 BD each and leaves both Crippled and Slowed for 3 turns (Perfect: 4
 turns). The player picks both targets; each fragment rolls miss/parry separately.</li>
 </ul>
 
 <h2>7. Talents</h2>
+<p><b>Ranks are additive:</b> when a node offers an increase by a specified amount, every
+additional point invested adds the SAME amount again (e.g. "+2 Bleed per rank" at 3 ranks =
++6 Bleed). This holds across all trees, generated and fixed.</p>
 <p><b>Every talent is thematic:</b> each spec's pool (8 signatures, tiered 1–6) supports its
 archetype role and touches its actual kit — no generic dead picks. Every run generates a fresh
 tree: 2 slots per tier drawn from the pool, padded with generic Training talents (Vitality +HP
@@ -454,7 +474,7 @@ Mirror removed 07-09; old unlocks are dropped safely.)</li>
 <tr><td>Orc Raider</td><td>132</td><td>15%</td><td>90</td><td>100</td><td>Slash 34/26BD;
 Sundering Strike 23/22BD, 60% Sunder 2t. Resists: physical 10%.</td></tr>
 <tr><td>Orc Archer (red)</td><td>104</td><td>10%</td><td>100</td><td>85</td><td>Arrow Shot
-21/16BD; Poison Arrow 16/14BD, 70% Poison 3t. Resists: physical 5%.</td></tr>
+21/16BD; Poison Arrow 16 nature/14BD, 70% Poison 3t. Resists: physical 5%.</td></tr>
 <tr><td>Orc Shieldmaster (orange)</td><td>150</td><td>25%</td><td>85</td><td>120</td>
 <td>Shielding — wards an ally (lowest HP first, itself included) with 25% damage reduction
 for 3 turns; only one ally holds the ward at a time, and it ALWAYS re-casts when no ally is
@@ -494,6 +514,8 @@ in a stack behind its party — heroes' plates along the LEFT edge, enemies' alo
 A plate holds a <b>portrait</b> (dedicated art if the unit has it — the Berserker does —
 else a sprite close-up), the unit's name, HP bar, resource bar(s), Break meter with numeric
 x/100 readout, and its status chips (hover for tooltips; Bleed buildup is a chip).
+<b>All battle UI runs ~20% smaller than the first draft</b> (plates 144px, log 240px,
+compact action bar and initiative portraits) so the field dominates the screen.
 <b>The acting unit's plate glows with a gold border — that IS the turn indicator</b> (the
 old yellow arrow is gone); hovering or Tab-targeting a unit lights its plate too, and
 hovering a plate highlights its unit on the field. A dead unit's plate dims. Plate visuals
@@ -514,9 +536,15 @@ with the mouse or fire a hotkey). After an ability is chosen, <b>Tab cycles thro
 available targets</b> (the highlight and ▼ marker follow) and <b>Space or Enter confirms</b>
 the highlighted one — a full keyboard turn is Q/W/E/R… → Tab → Space → Space on the skill
 check. Clicking still works everywhere.</li>
-<li><b>X cancels:</b> whenever a Cancel button is on screen — during targeting or a
-cancellable skill check — pressing <b>X</b> triggers it (the buttons say so:
-"✕ Cancel (X)").</li>
+<li><b>X cancels:</b> whenever a Cancel button is on screen — during targeting, a
+cancellable skill check, or an open picker — pressing <b>X</b> triggers it (the buttons say
+so: "✕ Cancel (X)").</li>
+<li><b>Alt — items:</b> Alt toggles the shared <b>item inventory picker</b> (the "[Alt]
+Items" button opens the same window): Tab cycles the usable items, Space uses the
+highlighted one, X closes. One item per hero per turn, and items never consume the
+turn.</li>
+<li><b>Space continues:</b> on a victory screen, Space (or Enter) presses the primary
+button — Continue / Descend / New Run. Defeat screens still require a click.</li>
 <li><b>Summon Companion</b> sits at the TOP of the Beastmaster's ability list on hotkey
 <b>W</b>. Selecting it (key or click) opens the <b>beast picker</b> — a small window listing
 Ursus / Canis / Aguila with costs: <b>Tab cycles</b> the options (unaffordable beasts are
@@ -595,11 +623,12 @@ testing one hero's kit across many consecutive turns. The battle scene also runs
 frame_size config — the Berserker test sheet is 124×124). Partial sheets are fine for
 testing: missing Attack02/03 replay Attack01, and missing Hurt/Death hold the idle frame.
 New assets arrive in "imported files/" (animated GIFs get converted to strips).</li>
-<li><b>Resolution template (the Berserker):</b> all future art should match the Berserker's
-pixel density. Characters: a standing figure ≈60–90px tall inside a ~124px frame, rendered
-around ×1.25 in battle, original colors (no slot tint on own-art heroes). Battle
-backgrounds: authored at ≈1280×720 (up to ~1670×940) and shown at/near native size — never
-blown up.</li>
+<li><b>Resolution template (the Pyromancer — DECIDED 07-12):</b> the larger sprite size won
+the comparison; all character art going forward matches the Pyromancer: a standing figure
+≈110–120px tall inside a <b>236px frame, rendered at 1:1</b> (never scaled), original
+colors. The Berserker (124px @1.25×) is now legacy-sized and should be re-generated at the
+new template when convenient. Battle backgrounds: authored at ≈1280×720 (up to ~1670×940)
+and shown at/near native size — never blown up.</li>
 <li><b>Combat pacing:</b> global PACE multiplier 0.85 on battle waits.</li>
 </ul>
 

@@ -104,6 +104,7 @@ func _draw_detail() -> void:
 	var spec: String = member.get("spec", "")
 	if spec != "":
 		cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
+		Classes.apply_kit_overrides(cfg, spec)
 		Classes.apply_passive(cfg, spec)
 		Talents.apply_from_tree(cfg, member.get("tree", []), member.get("talents", {}))
 	for rune in member.get("runes", []):

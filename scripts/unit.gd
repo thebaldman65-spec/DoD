@@ -17,6 +17,7 @@ var frame_size := 100      # square frame edge of this unit's sprite strips
 var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
 var hero_key := ""         # class id ("warrior"...) — display name may be the spec
 var walks_to_target := false  # real locomotion: walk to melee range and back
+var counter_attacks := false  # Counter Attack: answers a parry with a basic attack
 var unit_name := ""
 var is_hero := true
 var max_hp := 100
@@ -198,9 +199,9 @@ func _build_sphere_sprite(sprite_scale: float) -> void:
 
 
 # Nameplate dimensions (plain styling until final UI assets arrive).
-const PLATE_W := 180.0
-const PLATE_BAR_W := 120.0
-const PLATE_BAR_X := 52.0  # bars sit right of the 44px portrait column
+const PLATE_W := 144.0
+const PLATE_BAR_W := 96.0
+const PLATE_BAR_X := 42.0  # bars sit right of the 34px portrait column
 
 
 # Builds this unit's nameplate (portrait, name, HP/resource/Break bars,
@@ -225,32 +226,32 @@ func build_plate(root: Node2D) -> void:
 	var name_label := Label.new()
 	name_label.text = unit_name
 	name_label.add_theme_font_override("font", NAME_FONT)
-	name_label.add_theme_font_size_override("font_size", 13)
+	name_label.add_theme_font_size_override("font_size", 11)
 	name_label.add_theme_color_override("font_color", Color(0.92, 0.88, 0.78))
-	name_label.position = Vector2(6, 2)
-	name_label.size = Vector2(PLATE_W - 12, 16)
+	name_label.position = Vector2(5, 1)
+	name_label.size = Vector2(PLATE_W - 10, 14)
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_plate_panel.add_child(name_label)
 
 	var face := TextureRect.new()
 	face.texture = portrait()
-	face.position = Vector2(4, 20)
-	face.custom_minimum_size = Vector2(44, 44)
-	face.size = Vector2(44, 44)
+	face.position = Vector2(3, 16)
+	face.custom_minimum_size = Vector2(34, 34)
+	face.size = Vector2(34, 34)
 	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	face.flip_h = not is_hero
 	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_plate_panel.add_child(face)
 
-	var y := 21.0
-	_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 11)))
-	_hp_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, 9),
+	var y := 17.0
+	_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 10)))
+	_hp_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, 8),
 		Color(0.30, 0.78, 0.32))
 	_plate_panel.add_child(_hp_fill)
-	_hp_text = _make_bar_text(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 11), 9)
+	_hp_text = _make_bar_text(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 10), 8)
 	_plate_panel.add_child(_hp_text)
-	y += 13.0
+	y += 12.0
 	if resource_name != "":
 		_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9)))
 		var res_color := Color(0.85, 0.30, 0.25) if resource_name == "Rage" else \
@@ -278,11 +279,11 @@ func build_plate(root: Node2D) -> void:
 	y += 11.0
 
 	# Chips run full width under the portrait + bars.
-	var chips_y := maxf(y, 66.0)
+	var chips_y := maxf(y, 52.0)
 	_chips_root = Node2D.new()
-	_chips_root.position = Vector2(6, chips_y + 2.0)
+	_chips_root.position = Vector2(5, chips_y + 2.0)
 	_plate_panel.add_child(_chips_root)
-	_plate_panel.size = Vector2(PLATE_W, chips_y + 20.0)
+	_plate_panel.size = Vector2(PLATE_W, chips_y + 17.0)
 
 
 # Border states: gold = this unit's turn; light = hovered/targeted.
@@ -540,6 +541,8 @@ func effective_speed() -> float:
 	var s := speed * (0.75 if (has_status("slow") or has_status("chilled")) else 1.0)
 	if has_status("quickdraw"):
 		s *= 1.5
+	if has_status("wrath"):
+		s *= 1.15
 	return s
 
 
@@ -564,10 +567,10 @@ func _refresh_chips() -> void:
 	var x := 0.0
 	for i in count:
 		var s: Dictionary = statuses[i]
-		var chip_w := 14.0 if String(s.short).length() <= 2 else 30.0
+		var chip_w := 12.0 if String(s.short).length() <= 2 else 26.0
 		var chip := ColorRect.new()
 		chip.position = Vector2(x, 0)
-		chip.size = Vector2(chip_w, 14)
+		chip.size = Vector2(chip_w, 12)
 		chip.color = s.color
 		chip.mouse_filter = Control.MOUSE_FILTER_STOP
 		chip.tooltip_text = "%s (%s turn%s left)\n%s" % [
@@ -577,11 +580,11 @@ func _refresh_chips() -> void:
 		_chips_root.add_child(chip)
 		var tag := Label.new()
 		tag.text = s.short
-		tag.add_theme_font_size_override("font_size", 8 if chip_w > 14.0 else 9)
+		tag.add_theme_font_size_override("font_size", 7 if chip_w > 12.0 else 8)
 		tag.add_theme_color_override("font_color", Color(0.05, 0.05, 0.08))
 		tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tag.position = chip.position
-		tag.size = Vector2(chip_w, 14)
+		tag.size = Vector2(chip_w, 12)
 		tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		_chips_root.add_child(tag)

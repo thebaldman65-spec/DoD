@@ -124,7 +124,23 @@ static func cleric_kit() -> Array:
 			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 			"perfect_id": "ward", "perfect_text": "Grants Ward (-50% Pressure taken, 2 turns)",
 			"description": "Restore HP to one ally. Builds Faith."}),
+		Ability.make({"display_name": "Resurrection", "cost": 0, "faith_cost": 40,
+			"special": "resurrection", "target": Ability.Target.ALLY,
+			"delay": 4.0, "anim": "attack03",
+			"perfect_id": "", "perfect_text": "",
+			"description": "MIRACLE: return a fallen ally to life\nwith 20% health and resource."}),
 	]
+
+
+# Spec kit corruption: the Occultist's Smite is warped into Shadowrend —
+# same numbers, shadow damage. Applied by battle spawn AND the party screen.
+static func apply_kit_overrides(cfg: Dictionary, spec: String) -> void:
+	if spec == "occultist":
+		cfg["abilities"][0] = Ability.make({"display_name": "Shadowrend",
+			"dmg_type": "shadow", "cost": 0, "damage": 22, "pressure": 16,
+			"delay": 2.0, "anim": "attack01",
+			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 8 HP",
+			"description": "Basic strike of gnawing shadow.\nBuilds Faith."})
 
 
 # Archetype outline (design north star for every spec's kit):
@@ -244,7 +260,7 @@ static func spec_abilities(spec: String) -> Array:
 			]
 		"swordmaster":
 			return [
-				Ability.make({"display_name": "Overpower", "cost": 20, "damage": 15,
+				Ability.make({"display_name": "Overpower", "cost": 30, "damage": 15,
 					"pressure": 20, "delay": 2.5, "anim": "attack02", "resource_gain": 10,
 					"perfect_id": "rage5", "perfect_text": "+5 bonus Rage",
 					"description": "Exploits instability: +0.5 damage per\npoint of the target's Break meter.\nBuilds 10 Rage."}),
@@ -326,6 +342,10 @@ static func spec_abilities(spec: String) -> Array:
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Shield absorbs 130 instead",
 					"description": "Grant an ally a holy shield that\nabsorbs 100 damage, then breaks."}),
+				Ability.make({"display_name": "Divine Wrath", "cost": 25, "special": "divine_wrath",
+					"delay": 3.0, "anim": "attack03",
+					"perfect_id": "", "perfect_text": "Lasts 4 turns",
+					"description": "The party surges with holy fury:\n+15% damage and +15% speed\nfor 3 turns."}),
 				Ability.make({"display_name": "Unity", "cost": 0, "faith_cost": 25,
 					"special": "unity", "delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Lasts 4 turns",
@@ -339,10 +359,14 @@ static func spec_abilities(spec: String) -> Array:
 					"applies_status": {"id": "cripple", "turns": 3},
 					"perfect_id": "status_plus", "perfect_text": "Cripple lasts 4 turns",
 					"description": "Curse 2 random enemies: 15 shadow\ndamage each and Crippled for 3 turns."}),
-				Ability.make({"display_name": "Mind Flay", "dmg_type": "shadow", "cost": 0, "faith_cost": 25,
+				Ability.make({"display_name": "Mind Flay", "dmg_type": "shadow", "cost": 30,
 					"special": "mindflay", "delay": 3.5, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "+115% Break damage instead",
-					"description": "MIRACLE: shatter a mind — the target\nattacks its OWN allies for 3 turns with\n+100% Break damage."}),
+					"description": "Shatter a mind — the target attacks\nits OWN allies for 3 turns with\n+100% Break damage."}),
+				Ability.make({"display_name": "Umbral Sigil", "cost": 0, "faith_cost": 20,
+					"special": "umbral_sigil", "delay": 3.0, "anim": "attack02",
+					"perfect_id": "", "perfect_text": "Lasts 4 turns",
+					"description": "MIRACLE: brand a foe — its whole party\ntakes 50% of all attack damage it\nreceives (3 turns)."}),
 			]
 		"beastmaster":
 			return [
@@ -363,7 +387,8 @@ static func spec_abilities(spec: String) -> Array:
 					"applies_status": {"id": "cripple", "turns": 3},
 					"perfect_id": "status_plus", "perfect_text": "Cripple lasts 4 turns",
 					"description": "A cruel barb that Cripples the target\nfor 3 turns."}),
-				Ability.make({"display_name": "Poisoned Arrow", "cost": 20, "damage": 20,
+				Ability.make({"display_name": "Poisoned Arrow", "dmg_type": "nature",
+					"cost": 20, "damage": 20,
 					"pressure": 15, "delay": 2.5, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Applies 4 stacks instead",
 					"description": "A venom-soaked shaft: applies 3 stacks\nof Poison (3 damage per stack per turn,\n5 turns; stacks refresh the timer)."}),
@@ -397,11 +422,12 @@ static func spec_abilities(spec: String) -> Array:
 					"damage": 10, "pressure": 20, "delay": 3.0, "anim": "attack03", "aoe": true,
 					"perfect_id": "", "perfect_text": "Deals 12 damage",
 					"description": "A bursting charge rakes ALL enemies\nwith fire and heavy Break pressure."}),
-				Ability.make({"display_name": "Shrapnel Charge", "cost": 25, "damage": 20,
+				Ability.make({"display_name": "Shrapnel Charge", "dmg_type": "fire",
+					"cost": 25, "damage": 20,
 					"pressure": 25, "delay": 3.0, "anim": "attack03", "choose_two": true,
 					"applies_status": {"id": "cripple", "turns": 3},
 					"perfect_id": "status_plus", "perfect_text": "Cripple and Slowed last 4 turns",
-					"description": "A scattering charge rips TWO chosen\nenemies for 20 physical each, leaving\nthem Crippled and Slowed (3 turns)."}),
+					"description": "A scattering charge rips TWO chosen\nenemies for 20 fire damage each, leaving\nthem Crippled and Slowed (3 turns)."}),
 			]
 	return []
 

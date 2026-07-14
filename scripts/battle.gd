@@ -47,6 +47,8 @@ const STATUS_INFO := {
 	"retaliate": ["Retaliation", "R!", Color(0.95, 0.6, 0.25), "Counters attackers with a basic strike."],
 	"dazed": ["Dazed", "Dz", Color(0.95, 0.7, 0.35), "Attacks are 20% more likely to miss."],
 	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less damage\n(a Shieldmaster's ward)."],
+	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
+	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of all attack damage\nthis unit takes echoes to its\nwhole party."],
 }
 
 # Placeholder SFX (procedurally generated, see repo history; replace with
@@ -203,9 +205,9 @@ const ENEMY_LAYOUTS := {
 }
 # Nameplate stacks: plate i belongs to party slot i (companion = 5th hero slot).
 const HERO_PLATE_X := 8.0
-const ENEMY_PLATE_X := 1092.0  # 1280 - 8 - plate width (180)
+const ENEMY_PLATE_X := 1128.0  # 1280 - 8 - plate width (144)
 const PLATE_TOP := 210.0
-const PLATE_STEP := 88.0
+const PLATE_STEP := 82.0
 
 # Specs with their own battle art (everyone else shares the Soldier sheet +
 # slot tint). Values are config overrides; own-art heroes render untinted.
@@ -314,6 +316,7 @@ func _spawn_units() -> void:
 			if SPEC_ART.has(spec):
 				for art_key in SPEC_ART[spec]:
 					cfg[art_key] = SPEC_ART[spec][art_key]
+			Classes.apply_kit_overrides(cfg, spec)
 			Classes.apply_passive(cfg, spec)
 			if Run.active and i < Run.party.size():
 				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
@@ -419,7 +422,8 @@ func _orc_archer_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Arrow Shot", "damage": 21, "pressure": 16,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Poison Arrow", "damage": 16, "pressure": 14,
+		Ability.make({"display_name": "Poison Arrow", "dmg_type": "nature",
+			"damage": 16, "pressure": 14,
 			"delay": 2.5, "anim": "attack02",
 			"applies_status": {"id": "poison", "turns": 3}, "status_chance": 0.7}),
 	]
@@ -479,10 +483,11 @@ func _build_ui() -> void:
 	add_child(ui)
 
 	# Burger menu: run controls without leaving the battle scene.
+	# (All battle UI runs ~20% smaller than the first draft by design.)
 	var burger := MenuButton.new()
 	burger.text = "☰"
-	burger.custom_minimum_size = Vector2(46, 42)
-	burger.position = Vector2(16, 12)
+	burger.custom_minimum_size = Vector2(37, 34)
+	burger.position = Vector2(12, 10)
 	burger.flat = false
 	var bpop := burger.get_popup()
 	bpop.add_item("Restart Run", 0)
@@ -492,15 +497,15 @@ func _build_ui() -> void:
 	ui.add_child(burger)
 
 	var bar_panel := PanelContainer.new()
-	bar_panel.position = Vector2(70, 12)
+	bar_panel.position = Vector2(56, 10)
 	ui.add_child(bar_panel)
 	turn_bar = HBoxContainer.new()
-	turn_bar.add_theme_constant_override("separation", 4)
+	turn_bar.add_theme_constant_override("separation", 3)
 	bar_panel.add_child(turn_bar)
 
 	var bottom_center := CenterContainer.new()
-	bottom_center.position = Vector2(0, 660)
-	bottom_center.size = Vector2(1280, 56)
+	bottom_center.position = Vector2(0, 668)
+	bottom_center.size = Vector2(1280, 44)
 	bottom_center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui.add_child(bottom_center)
 	action_panel = PanelContainer.new()
@@ -511,20 +516,20 @@ func _build_ui() -> void:
 	action_panel.visible = false
 
 	history_panel = PanelContainer.new()
-	history_panel.position = Vector2(968, 8)
+	history_panel.position = Vector2(1028, 8)
 	history_panel.self_modulate = Color(1, 1, 1, 0.85)
 	ui.add_child(history_panel)
 	history = RichTextLabel.new()
 	history.bbcode_enabled = true
 	history.scroll_following = true
-	history.custom_minimum_size = Vector2(300, 190)
-	history.add_theme_font_size_override("normal_font_size", 12)
+	history.custom_minimum_size = Vector2(240, 152)
+	history.add_theme_font_size_override("normal_font_size", 10)
 	history_panel.add_child(history)
 	# The log can be tucked away; the little button stays to bring it back.
 	_log_toggle = Button.new()
 	_log_toggle.text = "–"
-	_log_toggle.custom_minimum_size = Vector2(26, 24)
-	_log_toggle.position = Vector2(1242, 10)
+	_log_toggle.custom_minimum_size = Vector2(24, 20)
+	_log_toggle.position = Vector2(1246, 9)
 	_log_toggle.tooltip_text = "Hide / show the combat log"
 	_log_toggle.pressed.connect(_toggle_log)
 	ui.add_child(_log_toggle)
@@ -533,53 +538,56 @@ func _build_ui() -> void:
 	_build_skill_check_ui()
 
 
+const SC_TRACK_W := 336.0  # skill check track width (bar UI at -20%)
+
+
 func _build_skill_check_ui() -> void:
 	sc_root = Control.new()
-	sc_root.position = Vector2(420, 470)
+	sc_root.position = Vector2(464, 486)
 	sc_root.visible = false
 	ui.add_child(sc_root)
 
 	var bg := Panel.new()
-	bg.size = Vector2(440, 74)
+	bg.size = Vector2(352, 59)
 	sc_root.add_child(bg)
 
 	var hint := Label.new()
 	hint.text = "SPACE or CLICK!"
-	hint.position = Vector2(0, 4)
-	hint.size = Vector2(440, 18)
+	hint.position = Vector2(0, 3)
+	hint.size = Vector2(352, 14)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.add_theme_font_size_override("font_size", 14)
+	hint.add_theme_font_size_override("font_size", 11)
 	sc_root.add_child(hint)
 
 	var track := ColorRect.new()
-	track.position = Vector2(10, 34)
-	track.size = Vector2(420, 20)
+	track.position = Vector2(8, 27)
+	track.size = Vector2(SC_TRACK_W, 16)
 	track.color = Color(0.15, 0.12, 0.18)
 	sc_root.add_child(track)
 
 	var good_zone := ColorRect.new()
-	good_zone.position = Vector2(10 + (0.5 - GOOD_HALF) * 420, 34)
-	good_zone.size = Vector2(GOOD_HALF * 2 * 420, 20)
+	good_zone.position = Vector2(8 + (0.5 - GOOD_HALF) * SC_TRACK_W, 27)
+	good_zone.size = Vector2(GOOD_HALF * 2 * SC_TRACK_W, 16)
 	good_zone.color = Color(0.35, 0.5, 0.3)
 	sc_root.add_child(good_zone)
 
 	var perfect_zone := ColorRect.new()
-	perfect_zone.position = Vector2(10 + (0.5 - PERFECT_HALF) * 420, 34)
-	perfect_zone.size = Vector2(PERFECT_HALF * 2 * 420, 20)
+	perfect_zone.position = Vector2(8 + (0.5 - PERFECT_HALF) * SC_TRACK_W, 27)
+	perfect_zone.size = Vector2(PERFECT_HALF * 2 * SC_TRACK_W, 16)
 	perfect_zone.color = Color(0.9, 0.8, 0.3)
 	sc_root.add_child(perfect_zone)
 
 	sc_cursor = ColorRect.new()
-	sc_cursor.size = Vector2(5, 28)
-	sc_cursor.position = Vector2(10, 30)
+	sc_cursor.size = Vector2(4, 22)
+	sc_cursor.position = Vector2(8, 24)
 	sc_cursor.color = Color.WHITE
 	sc_root.add_child(sc_cursor)
 
 	sc_result = Label.new()
-	sc_result.position = Vector2(0, 56)
-	sc_result.size = Vector2(440, 18)
+	sc_result.position = Vector2(0, 44)
+	sc_result.size = Vector2(352, 14)
 	sc_result.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sc_result.add_theme_font_size_override("font_size", 15)
+	sc_result.add_theme_font_size_override("font_size", 12)
 	sc_root.add_child(sc_result)
 
 
@@ -590,8 +598,8 @@ func _build_debug_panel() -> void:
 	var menu := MenuButton.new()
 	menu.text = "DEBUG ▾"
 	menu.flat = false
-	menu.custom_minimum_size = Vector2(104, 40)
-	menu.position = Vector2(1160, 668)
+	menu.custom_minimum_size = Vector2(88, 32)
+	menu.position = Vector2(1180, 678)
 	menu.self_modulate = Color(1.0, 0.85, 0.65)
 	ui.add_child(menu)
 	_debug_popup = menu.get_popup()
@@ -726,8 +734,8 @@ func _log(text: String, color := "#d8d2c4") -> void:
 func _toggle_log() -> void:
 	history_panel.visible = not history_panel.visible
 	_log_toggle.text = "–" if history_panel.visible else "Log"
-	_log_toggle.custom_minimum_size = Vector2(26 if history_panel.visible else 48, 24)
-	_log_toggle.position = Vector2(1242 if history_panel.visible else 1220, 10)
+	_log_toggle.custom_minimum_size = Vector2(24 if history_panel.visible else 44, 20)
+	_log_toggle.position = Vector2(1246 if history_panel.visible else 1226, 9)
 
 
 func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability = null) -> void:
@@ -754,7 +762,7 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 		var slot := VBoxContainer.new()
 		var portrait := TextureRect.new()
 		portrait.texture = u.portrait()
-		portrait.custom_minimum_size = Vector2(48, 66)
+		portrait.custom_minimum_size = Vector2(38, 53)
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		portrait.flip_h = not u.is_hero
@@ -767,7 +775,7 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 			portrait.tooltip_text += " (your next turn if you cast this)"
 		slot.add_child(portrait)
 		var stripe := ColorRect.new()
-		stripe.custom_minimum_size = Vector2(48, 4)
+		stripe.custom_minimum_size = Vector2(38, 3)
 		stripe.color = Color(0.35, 0.8, 0.4) if u.is_hero else Color(0.85, 0.3, 0.3)
 		if is_ghost:
 			stripe.color = Color(1.0, 0.85, 0.3)
@@ -927,8 +935,16 @@ func _player_turn(u: BattleUnit) -> void:
 		var used_targeting := false
 		if ab.special in ["rally", "focus", "surge", "shieldwall", "quickdraw",
 				"phoenix", "hymn", "retaliate", "unity", "tripwire", "summon",
-				"mana_shield"]:
+				"mana_shield", "divine_wrath"]:
 			target = u  # self/party effects need no target choice
+		elif ab.special == "resurrection":
+			# Resurrection targets the FALLEN (the usable gate guarantees one).
+			var fallen := heroes.filter(func(h): return h.dead)
+			if fallen.size() == 1:
+				target = fallen[0]
+			elif fallen.size() > 1:
+				used_targeting = true
+				target = await _pick_target(fallen)
 		elif ab.aoe or ab.random_hits > 0:
 			var foes := enemies.filter(func(e): return not e.dead)
 			target = foes[0]  # resolve picks the real targets
@@ -1173,6 +1189,7 @@ func _show_actions(u: BattleUnit) -> void:
 		child.queue_free()
 	_open_popups.clear()
 	_close_summon_picker()
+	_close_item_picker()
 	# Hotkeys map to menu entries, not raw ability slots: the basic attack is
 	# always Q, "Summon Companion" (when the hero has summons) owns W, and the
 	# remaining abilities take the following keys in kit order.
@@ -1190,7 +1207,8 @@ func _show_actions(u: BattleUnit) -> void:
 	# Basic attack: always its own button.
 	var basic_btn := Button.new()
 	basic_btn.text = "[%s] %s" % [ABILITY_KEY_NAMES[0], basic.display_name]
-	basic_btn.custom_minimum_size = Vector2(105, 40)
+	basic_btn.custom_minimum_size = Vector2(84, 32)
+	basic_btn.add_theme_font_size_override("font_size", 13)
 	basic_btn.tooltip_text = _ability_tooltip(u, basic)
 	basic_btn.pressed.connect(_on_ability_button.bind(basic))
 	basic_btn.mouse_entered.connect(_preview_delay.bind(u, basic))
@@ -1201,7 +1219,8 @@ func _show_actions(u: BattleUnit) -> void:
 	# PopupMenu only reports focus from keyboard navigation, not the mouse.
 	var menu_btn := Button.new()
 	menu_btn.text = "Abilities ▾"
-	menu_btn.custom_minimum_size = Vector2(112, 40)
+	menu_btn.custom_minimum_size = Vector2(90, 32)
+	menu_btn.add_theme_font_size_override("font_size", 13)
 	var popup := PopupPanel.new()
 	_open_popups.append(popup)
 	popup.window_input.connect(_on_popup_window_input)
@@ -1216,7 +1235,8 @@ func _show_actions(u: BattleUnit) -> void:
 			# Top of the list: opens the beast picker (Tab cycles, Space picks).
 			var group_btn := Button.new()
 			group_btn.text = "[%s] Summon Companion ▸" % ABILITY_KEY_NAMES[e_idx]
-			group_btn.custom_minimum_size = Vector2(230, 38)
+			group_btn.custom_minimum_size = Vector2(184, 30)
+			group_btn.add_theme_font_size_override("font_size", 13)
 			group_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			group_btn.tooltip_text = "Choose which beast answers the call.\n" \
 				+ "Tab cycles the options, Space summons.\nOnly one companion at a time."
@@ -1239,6 +1259,8 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 		return false
 	if ab.special == "kill_command" and (u.companion == null or u.companion.dead):
 		return false
+	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
+		return false
 	if ab.display_name == "Death Ray" and u.second_resource < 5:
 		return false
 	return true
@@ -1257,11 +1279,14 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 		label += "   %d %s" % [ab.faith_cost, u.second_resource_name]
 	var ab_btn := Button.new()
 	ab_btn.text = label
-	ab_btn.custom_minimum_size = Vector2(230, 38)
+	ab_btn.custom_minimum_size = Vector2(184, 30)
+	ab_btn.add_theme_font_size_override("font_size", 13)
 	ab_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	ab_btn.tooltip_text = _ability_tooltip(u, ab)
 	if ab.special == "kill_command" and (u.companion == null or u.companion.dead):
 		ab_btn.tooltip_text += "\n(No living companion)"
+	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
+		ab_btn.tooltip_text += "\n(No fallen allies)"
 	if ab.display_name == "Death Ray" and u.second_resource < 5:
 		ab_btn.tooltip_text += "\n(Requires 5 Arcane Resonance)"
 	ab_btn.disabled = not _ability_usable(u, ab)
@@ -1313,7 +1338,8 @@ func _open_summon_picker(u: BattleUnit) -> void:
 		var ab: Ability = _summon_opts[i]
 		var b := Button.new()
 		b.text = "%s   %d %s" % [ab.display_name, ab.cost, u.resource_name]
-		b.custom_minimum_size = Vector2(320, 40)
+		b.custom_minimum_size = Vector2(256, 32)
+		b.add_theme_font_size_override("font_size", 13)
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.tooltip_text = _ability_tooltip(u, ab)
 		b.disabled = not _ability_usable(u, ab)
@@ -1383,6 +1409,7 @@ func _clear_delay_preview() -> void:
 
 func _on_ability_button(ab: Ability) -> void:
 	_close_summon_picker()
+	_close_item_picker()
 	_sfx("click", -12.0)
 	_ability_picked.emit(ab)
 
@@ -1416,26 +1443,93 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 	return tip
 
 
-# Dropdown menu for the shared party inventory (one item per character per turn).
-func _build_items_menu() -> MenuButton:
-	var menu := MenuButton.new()
-	menu.text = "Items ▾"
-	menu.custom_minimum_size = Vector2(84, 40)
-	menu.flat = false
-	menu.disabled = item_used
-	if item_used:
-		menu.tooltip_text = "Already used an item this turn."
-	var popup := menu.get_popup()
-	for i in Run.ITEM_IDS.size():
-		var entry: Array = items[Run.ITEM_IDS[i]]
-		popup.add_item("%s  x%d" % [entry[0], entry[1]], i)
-		popup.set_item_tooltip(i, "%s\nDoes not consume the turn." % entry[2])
+# The Items button opens the same picker Alt does (one item per hero per turn).
+func _build_items_menu() -> Button:
+	var btn := Button.new()
+	btn.text = "[Alt] Items"
+	btn.custom_minimum_size = Vector2(76, 32)
+	btn.add_theme_font_size_override("font_size", 13)
+	btn.disabled = item_used
+	btn.tooltip_text = "Already used an item this turn." if item_used \
+		else "Shared party inventory.\nAlt opens · Tab cycles · Space uses · X closes."
+	btn.pressed.connect(_open_item_picker)
+	return btn
+
+
+# ---------- item picker (Alt opens, Tab cycles, Space uses, X closes) ----------
+
+var _item_picker: PanelContainer = null
+var _item_btns: Array = []
+var _item_ids: Array = []
+var _item_idx := -1
+
+
+func _open_item_picker() -> void:
+	if current_hero == null or not action_panel.visible or item_used:
+		return
+	_close_summon_picker()
+	_close_item_picker()
+	_item_picker = PanelContainer.new()
+	_item_picker.position = Vector2(500, 430)
+	ui.add_child(_item_picker)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	_item_picker.add_child(box)
+	var title := Label.new()
+	title.text = "ITEMS —  Tab cycles · Space uses · X closes"
+	title.add_theme_font_size_override("font_size", 10)
+	title.add_theme_color_override("font_color", Color(0.85, 0.80, 0.68))
+	box.add_child(title)
+	_item_btns = []
+	_item_ids = []
+	for id in Run.ITEM_IDS:
+		var entry: Array = items[id]
+		var b := Button.new()
+		b.text = "%s  x%d" % [entry[0], entry[1]]
+		b.custom_minimum_size = Vector2(232, 30)
+		b.add_theme_font_size_override("font_size", 12)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.tooltip_text = "%s\nDoes not consume the turn." % entry[2]
 		var usable: bool = entry[1] > 0
-		if Run.ITEM_IDS[i] == "revive":
+		if id == "revive":
 			usable = usable and heroes.any(func(h): return h.dead)
-		popup.set_item_disabled(i, not usable)
-	popup.id_pressed.connect(func(id: int): _use_item(Run.ITEM_IDS[id]))
-	return menu
+		b.disabled = not usable
+		b.focus_mode = Control.FOCUS_NONE
+		b.pressed.connect(_confirm_item.bind(_item_ids.size()))
+		box.add_child(b)
+		_item_btns.append(b)
+		_item_ids.append(id)
+	_item_idx = -1
+	_cycle_item()
+
+
+func _close_item_picker() -> void:
+	if _item_picker != null and is_instance_valid(_item_picker):
+		_item_picker.queue_free()
+	_item_picker = null
+	_item_btns = []
+	_item_ids = []
+	_item_idx = -1
+
+
+func _cycle_item() -> void:
+	if _item_btns.is_empty() or _item_btns.all(func(b): return b.disabled):
+		return
+	for step in _item_btns.size():
+		_item_idx = (_item_idx + 1) % _item_btns.size()
+		if not _item_btns[_item_idx].disabled:
+			break
+	for i in _item_btns.size():
+		_item_btns[i].modulate = Color(1.0, 0.92, 0.55) if i == _item_idx \
+			else Color(1, 1, 1)
+
+
+func _confirm_item(i: int) -> void:
+	if i < 0 or i >= _item_ids.size() or _item_btns[i].disabled:
+		return
+	var id: String = _item_ids[i]
+	_close_item_picker()
+	_use_item(id)
 
 
 func _pick_target(pool: Array) -> BattleUnit:
@@ -1446,8 +1540,9 @@ func _pick_target(pool: Array) -> BattleUnit:
 	_kb_idx = -1
 	var cancel := Button.new()
 	cancel.text = "✕ Cancel (X)"
-	cancel.custom_minimum_size = Vector2(130, 40)
-	cancel.position = Vector2(575, 560)
+	cancel.custom_minimum_size = Vector2(104, 32)
+	cancel.add_theme_font_size_override("font_size", 12)
+	cancel.position = Vector2(588, 568)
 	cancel.pressed.connect(func(): _target_picked.emit(null))
 	ui.add_child(cancel)
 	var chosen: BattleUnit = await _target_picked
@@ -1644,22 +1739,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
 			target.unit_name], "#909090")
 		await _wait(0.35)
-	elif not is_counter and not ab.aoe and ab.multi_hits == 0 and ab.random_hits == 0 \
-			and not ab.choose_two \
-			and not target.broken and not target.dead and not target.is_companion \
-			and randf() < _parry_chance(target):
-		# Parry negates the hit; the defender immediately counters with
-		# their basic attack (a free action — no rolls, no initiative cost).
-		_stat("attacks")
-		_stat("attack_parry")
-		_sfx("bow_blocked" if _uses_bow(attacker) else "parry", -4.0)
-		target.float_text("PARRY", Color(0.4, 0.9, 1.0))
-		_message("%s parries and counters!" % target.unit_name)
-		_log("%s parries %s — counter attack!" % [target.unit_name,
-			attacker.unit_name], "#50c8e0")
-		await _wait(0.5)
-		attacker.return_to_idle()
-		await _resolve(target, target.abilities[0], attacker, "good", true)
 	else:
 		var strike_targets: Array = [target]
 		if ab.aoe:
@@ -1710,20 +1789,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						strike_target.unit_name], "#909090")
 					await _wait(0.45)
 					continue
-				if not strike_target.broken and not strike_target.is_companion \
-						and randf() < _parry_chance(strike_target):
-					_stat("attacks")
-					_stat("attack_parry")
-					_sfx("bow_blocked" if _uses_bow(attacker) else "parry", -4.0)
-					strike_target.float_text("PARRY", Color(0.4, 0.9, 1.0))
-					_log("%s parries %s — counter attack!" % [strike_target.unit_name,
-						attacker.unit_name], "#50c8e0")
-					await _wait(0.5)
-					await _resolve(strike_target, strike_target.abilities[0], attacker,
-						"good", true)
-					if attacker.dead:
-						break
-					continue
+			# Parry: the strike still lands, but with 75% less damage and 75%
+			# less Break damage. No automatic counter — that is the separate
+			# Counter Attack effect (counter_attacks flag, granted by specific
+			# effects). AoE cannot be parried; Broken units cannot parry.
+			var parried := false
+			if not is_counter and not ab.aoe and not strike_target.broken \
+					and not strike_target.dead and not strike_target.is_companion \
+					and randf() < _parry_chance(strike_target):
+				parried = true
+				_stat("attack_parry")
+				_sfx("bow_blocked" if _uses_bow(attacker) else "parry", -4.0)
+				strike_target.float_text("PARRY", Color(0.4, 0.9, 1.0))
 			var crit_chance := CRIT_CHANCE + (0.25 if strike_target.broken else 0.0)
 			# Resonant Mind: +3% crit per Resonance stack.
 			if attacker.second_resource_name == "Resonance":
@@ -1744,6 +1821,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				is_crit = true
 			any_crit = any_crit or is_crit
 			var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
+			if parried:
+				raw *= 0.25
 			if is_crit:
 				raw *= 2.0 if attacker.passive_id == "lethal_aim" else 1.5
 			# Attacker-side modifiers.
@@ -1752,6 +1831,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 + 0.15 * attacker.second_resource
 			if attacker.has_status("surge"):
 				raw *= 1.2
+			if attacker.has_status("wrath"):
+				raw *= 1.15
 			# Arcane Cannon: the damage (not the recoil) grows with Resonance.
 			if ab.display_name == "Arcane Cannon":
 				raw *= 1.0 + 0.075 * attacker.second_resource
@@ -1822,6 +1903,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			var resonance_boosted: bool = attacker.second_resource_name == "Resonance" \
 				and attacker.second_resource > 0
 			var pr := int(round(ab.pressure * pr_mult * (1.5 if is_crit else 1.0)))
+			if parried:
+				pr = int(round(pr * 0.25))
 			if is_perfect and (ab.perfect_id == "pressure" or ab.aoe):
 				pr = int(pr * 1.5)
 			if is_perfect and ab.display_name == "Crushing Blow":
@@ -1885,6 +1968,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# Weakness: the hit lands 25%+ harder — call it out loudly.
 				resist_tag = " (WEAK!)"
 				strike_target.float_text("WEAK!", Color(1.0, 0.55, 0.15))
+			if parried:
+				resist_tag += " (parried -75%)"
 			_log("%s: %s on %s — %d %s dmg%s%s, +%d BD%s" % [attacker.unit_name,
 				ab.display_name, strike_target.unit_name, final, ab.dmg_type,
 				" CRIT" if is_crit else "", resist_tag, result.get("bd", pr), grade_tag],
@@ -1892,6 +1977,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# VAULTED — Echo passive (kept for future return):
 			# if attacker.passive_id == "echo" and not result.died and randf() < 0.20:
 			#     echo_dmg = max(int(final * 0.25), 1); strike again + "ECHO!" fanfare.
+			# Umbral Sigil: the branded foe's pain echoes through its warband.
+			if not strike_target.is_hero and final > 0 \
+					and strike_target.has_status("umbral_sigil"):
+				var echo := maxi(int(round(final * 0.5)), 1)
+				var echoed := false
+				for fellow in enemies:
+					if fellow.dead or fellow == strike_target:
+						continue
+					echoed = true
+					var echo_result: Dictionary = fellow.take_hit(echo, 0)
+					fellow.float_text("-%d Sigil" % echo, Color(0.65, 0.35, 0.80))
+					if echo_result.died:
+						_stat("enemy_deaths")
+						_sfx("death", -4.0)
+						_message("%s falls!" % fellow.unit_name)
+						_log("† %s dies" % fellow.unit_name, "#e05050")
+				if echoed:
+					_log("   → Umbral Sigil echoes %d to the warband" % echo, "#b070d0")
 			if ab.delay_push > 0.0:
 				strike_target.next_time += ab.delay_push * 100.0 / strike_target.effective_speed()
 			var status_chance := ab.status_chance
@@ -1967,6 +2070,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_message("%s falls!" % strike_target.unit_name)
 				_log("† %s dies" % strike_target.unit_name, "#e05050")
 				await _wait(0.5)
+			# Counter Attack: granted by specific effects — a parry answers
+			# with an immediate basic attack (nothing grants it yet).
+			if parried and strike_target.counter_attacks and not is_counter \
+					and not strike_target.dead and not attacker.dead:
+				_log("%s counter attacks!" % strike_target.unit_name, "#50c8e0")
+				await _wait(0.4)
+				await _resolve(strike_target, strike_target.abilities[0], attacker,
+					"good", true)
+				if attacker.dead:
+					break
 			if (ab.random_hits > 0 or ab.multi_hits > 0) and total_hits > 1:
 				await _wait(0.45)  # sequential strikes land distinctly
 		# Post-strike attacker effects (skipped if a counter felled the attacker).
@@ -2280,6 +2393,32 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s orders %s to savage %s!" % [attacker.unit_name,
 					comp.unit_name, target.unit_name], "#e0a050")
 				await _companion_strike(comp, target, 3.0 if is_perfect else 2.0, true)
+		"resurrection":
+			if target != null and target.dead:
+				target.revive(0.2)
+				target.resource = int(target.max_resource * 0.2)
+				target.refresh_bars()
+				_sfx("heal", -4.0, 0.65)
+				target.float_text("RESURRECTED", Color(0.95, 0.9, 0.55))
+				target.next_time = attacker.next_time \
+					+ BASIC_DELAY * 100.0 / target.effective_speed()
+				_message("MIRACLE — %s returns to life!" % target.unit_name)
+				_log("%s: Resurrection — %s returns at 20%% HP and resource" % [
+					attacker.unit_name, target.unit_name], "#70d878")
+				_rebuild_turn_bar()
+		"divine_wrath":
+			_sfx("heal", -5.0, 0.85)
+			for h in heroes.filter(func(he): return not he.dead):
+				_apply_status(h, "wrath", 4 if is_perfect else 3)
+			_message("%s calls down Divine Wrath!" % attacker.unit_name)
+			_log("%s: Divine Wrath — party deals +15%% damage, +15%% speed" % \
+				attacker.unit_name, "#70d878")
+		"umbral_sigil":
+			_sfx("break", -10.0, 0.7)
+			_apply_status(target, "umbral_sigil", 4 if is_perfect else 3)
+			_message("%s brands %s!" % [attacker.unit_name, target.unit_name])
+			_log("%s: Umbral Sigil on %s — its party shares its pain" % [
+				attacker.unit_name, target.unit_name], "#c070e0")
 		"enemy_shield":
 			# The Shieldmaster's ward: one ally holds it at a time.
 			for a in (enemies if not attacker.is_hero else heroes):
@@ -2500,8 +2639,9 @@ func _run_skill_check(cancellable := false) -> String:
 	if cancellable:
 		sc_cancel = Button.new()
 		sc_cancel.text = "✕ Cancel (X)"
-		sc_cancel.custom_minimum_size = Vector2(118, 34)
-		sc_cancel.position = Vector2(448, 20)
+		sc_cancel.custom_minimum_size = Vector2(94, 28)
+		sc_cancel.add_theme_font_size_override("font_size", 12)
+		sc_cancel.position = Vector2(358, 15)
 		sc_cancel.pressed.connect(_cancel_skill_check)
 		sc_root.add_child(sc_cancel)
 	var grade: String = await _skill_done
@@ -2544,18 +2684,31 @@ func _process(delta: float) -> void:
 		elif sc_pos <= 0.0:
 			sc_pos = 0.0
 			sc_dir = 1.0
-		sc_cursor.position.x = 10.0 + sc_pos * 420.0 - 2.0
+		sc_cursor.position.x = 8.0 + sc_pos * SC_TRACK_W - 1.5
 
 
 # Left clicks are handled in _input because UI panels (the check bar itself,
 # the log, portraits) would otherwise swallow them before _unhandled_input.
 # Ability hotkeys live here too so the abilities popup can't swallow them.
 func _input(event: InputEvent) -> void:
+	# Victory screens: Space/Enter presses the primary continue button.
+	if battle_over and _end_action.is_valid() and event is InputEventKey \
+			and event.pressed and not event.echo \
+			and event.keycode in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
+		get_viewport().set_input_as_handled()
+		var act := _end_action
+		_end_action = Callable()
+		act.call()
+		return
 	if event is InputEventKey and event.pressed and not event.echo \
 			and not autoplay and not battle_over:
-		# X cancels whatever cancel is on screen: the summon picker, a skill
-		# check, or targeting.
+		# X cancels whatever cancel is on screen: a picker, a skill check,
+		# or targeting.
 		if event.keycode == KEY_X:
+			if _item_picker != null:
+				_close_item_picker()
+				get_viewport().set_input_as_handled()
+				return
 			if _summon_picker != null:
 				_close_summon_picker()
 				_clear_delay_preview()
@@ -2571,10 +2724,25 @@ func _input(event: InputEvent) -> void:
 				return
 	if event is InputEventKey and event.pressed and not event.echo \
 			and not sc_active and not autoplay and not battle_over:
+		# Alt toggles the shared item inventory.
+		if event.keycode == KEY_ALT:
+			get_viewport().set_input_as_handled()
+			if _item_picker != null:
+				_close_item_picker()
+			else:
+				for p in _open_popups:
+					if is_instance_valid(p) and p.visible:
+						p.hide()
+				_open_item_picker()
+			return
 		if event.keycode == KEY_TAB:
 			_on_tab_pressed()
 			return
 		if event.keycode in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
+			if _item_picker != null:
+				_confirm_item(_item_idx)
+				get_viewport().set_input_as_handled()
+				return
 			if _summon_picker != null:
 				_confirm_summon(_summon_idx)
 				get_viewport().set_input_as_handled()
@@ -2603,11 +2771,13 @@ func _on_popup_window_input(event: InputEvent) -> void:
 			_try_ability_hotkey(event.keycode)
 
 
-# Tab: cycles the summon picker when it's open; cycles targets while picking
-# one; otherwise toggles the Abilities list during action select.
+# Tab: cycles whichever picker is open; cycles targets while picking one;
+# otherwise toggles the Abilities list during action select.
 func _on_tab_pressed() -> void:
 	get_viewport().set_input_as_handled()
-	if _summon_picker != null:
+	if _item_picker != null:
+		_cycle_item()
+	elif _summon_picker != null:
 		_cycle_summon()
 	elif not _kb_pool.is_empty():
 		_cycle_kb_target()
@@ -2706,7 +2876,7 @@ func _check_end() -> void:
 		if victory:
 			_sfx("victory", -4.0)
 			_show_end("VICTORY", "The Decay recedes... for now.",
-				[["Fight Again", func(): get_tree().reload_current_scene()]])
+				[["Fight Again", func(): get_tree().reload_current_scene()]], true)
 		else:
 			_sfx("defeat", -4.0)
 			_show_end("THE PARTY HAS FALLEN", "The cycle begins anew.",
@@ -2750,16 +2920,16 @@ func _check_end() -> void:
 				boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
 			if Run.has_next_zone():
 				_show_end("THE ZONE IS CLEANSED", boss_text,
-					[["Descend into %s" % Run.ZONES[Run.zone_idx + 1], _next_zone]])
+					[["Descend into %s" % Run.ZONES[Run.zone_idx + 1], _next_zone]], true)
 			else:
 				Run.active = false
 				Run.clear_save()
 				_show_end("THE DECAY RECEDES", boss_text + "\nRun complete!",
-					[["New Run", _start_new_run]])
+					[["New Run", _start_new_run]], true)
 		else:
 			_show_end("VICTORY", "+%d gold. Each hero gains %d talent point%s.%s" % [
 				gold_gain, pts, "" if pts == 1 else "s", elite_text],
-				[["Continue", _to_map]])
+				[["Continue", _to_map]], true)
 	else:
 		Run.active = false
 		Run.clear_save()
@@ -2826,7 +2996,11 @@ func _print_sim_report() -> void:
 	print("=============================================\n")
 
 
-func _show_end(title: String, subtitle: String, buttons: Array) -> void:
+var _end_action := Callable()  # victory screens: Space presses this
+
+
+func _show_end(title: String, subtitle: String, buttons: Array,
+		keyboard_continue := false) -> void:
 	var dim := ColorRect.new()
 	dim.size = Vector2(1280, 720)
 	dim.color = Color(0, 0, 0, 0.55)
@@ -2854,6 +3028,14 @@ func _show_end(title: String, subtitle: String, buttons: Array) -> void:
 		btn.custom_minimum_size = Vector2(240, 44)
 		btn.pressed.connect(entry[1])
 		vbox.add_child(btn)
+	if keyboard_continue and not buttons.is_empty():
+		_end_action = buttons[0][1]
+		var hint := Label.new()
+		hint.text = "— Space to continue —"
+		hint.add_theme_font_size_override("font_size", 12)
+		hint.add_theme_color_override("font_color", Color(0.7, 0.66, 0.58))
+		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		vbox.add_child(hint)
 
 
 # ---------- helpers ----------

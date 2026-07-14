@@ -75,11 +75,14 @@ stacking Poison (3/turn/stack), Chilled = renamed Slow. Break meter 0-100 w/
 numeric readout; CONSTITUTION = break resistance (pressure × 100/con; per-spec
 values in SPEC_INFO, bosses 160 + stun-immune unless Broken). Talent pools are
 THEMATIC per spec (8 signatures each, T5 = new ability). See master.html §6-7.
-Combat: crit 10%; miss 5% (Dazed +20%); parry 5% heroes / 2.5% enemies;
-Mocking Blow taunt; per-ability initiative ghost preview (no Guard — removed
-by design); ability hotkeys Q/W/E/R/A/S/D/F by kit slot (shown on buttons);
-Tab toggles the ability list / cycles targets, Space confirms, X cancels
-(targeting + cancellable skill checks). Unit UI lives on NAMEPLATE stacks
+Combat: crit 10%; miss 5% (Dazed +20%); parry 5% heroes / 2.5% enemies —
+a PARRIED hit lands at 25% damage + 25% BD, no auto-counter ("Counter
+Attack" = parry-answer basic, a defined term; counter_attacks flag, nothing
+grants it yet); Mocking Blow taunt; per-ability initiative ghost preview (no
+Guard — removed by design); ability hotkeys Q/W/E/R/A/S/D/F by kit slot
+(shown on buttons); Tab toggles the ability list / cycles targets / cycles
+pickers, Space confirms, X cancels, Alt = item picker, Space continues past
+victory screens. Talent ranks are ADDITIVE per point (documented). Unit UI lives on NAMEPLATE stacks
 (180px plates, heroes left edge, enemies right; portrait + name + bars +
 chips; ACTING unit's plate = gold border, that's the turn indicator — no
 arrow; hover/Tab lights plates; plain style until UI assets arrive); parties
@@ -87,14 +90,18 @@ grouped tight; combat log hideable (– button). SPECCED HEROES DISPLAY THEIR
 SPEC NAME everywhere (unit_name = spec; logic keys on unit.hero_key — never
 match display names!). Battle DEBUG ▾ menu (bottom-right): Full Restore,
 Enemy attacks OFF, per-hero turn LOCK (every turn theirs until unlocked).
-Renewal is Holy-only (15 HP/turn). Own-art specs live in battle.gd SPEC_ART
-(untinted): Berserker (124px @1.25, walks to melee — walks_to_target — own
-portrait via Classes.SPEC_PORTRAITS) and Pyromancer (236px @1.0 static — a
-SIZE TEST vs the Berserker template; user comparing before locking the
-template). Partial sheets fall back — see unit.gd _build_sprite. Battle bg
-at max zoom-out (cover 1296x736). Beastmaster: "Summon Companion" = menu
-slot W → beast picker window (Tab cycles, Space summons, X closes); battle
-hotkeys map to _menu_entries slots, NOT raw ability indices. Specs carry archetype
+Renewal is Holy-only (15 HP/turn). Cleric core has Resurrection (40 Faith,
+revive 20% hp/resource, targets the fallen); Devout has Divine Wrath
+("wrath" status +15% dmg/speed); Occultist: Shadowrend basic (via
+Classes.apply_kit_overrides — call it wherever kits are assembled!),
+Mind Flay 30 Mana, Umbral Sigil (50% damage echo to the branded enemy's
+party). RESOLUTION TEMPLATE DECIDED 07-12: Pyromancer size wins — author
+characters at 236px frames shown 1:1; Berserker (124px @1.25) is legacy
+until re-generated. Own-art specs live in battle.gd SPEC_ART (untinted).
+Partial sheets fall back — see unit.gd _build_sprite. Battle bg at max
+zoom-out (cover 1296x736). Beastmaster: "Summon Companion" = menu slot W →
+beast picker (Tab/Space/X); hotkeys map to _menu_entries slots, NOT raw
+ability indices. ALL battle UI ~20% smaller (plates 144px, log 240px). Specs carry archetype
 tags (Ramp/Rush/Nuker/Pressure/Healer/Warder/Tank/Bruiser) in SPEC_INFO.
 Battle has burger menu (restart/settings overlay/exit); skill checks accept
 Space or left click; no announcer text (combat log only).
