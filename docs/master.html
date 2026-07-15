@@ -81,7 +81,7 @@ Desktop), gold + party HP readout.</li>
 tooltip; basic actions are 2.0, heavy abilities up to 6.0). Speed 100 is average. Slow status
 reduces effective speed to 75%; Quick Draw raises it by 50%. Some abilities shove the
 <i>target</i> down the timeline (delay_push). The initiative bar (top of screen, 14 slots,
-48×66 portraits) always shows the coming order; <b>hovering any individual ability re-sorts
+38×53 portraits) always shows the coming order; <b>hovering any individual ability re-sorts
 the bar with a gold "ghost" portrait</b> showing where that cast would land your next turn.
 The ghost locks in when the ability is chosen and persists through targeting and the skill
 check.</p>
@@ -137,7 +137,7 @@ also take amplified Poison ticks. Who is weak to what is per-enemy design (to be
 currently the Ash-Wrought Tyrant is weak to frost).</li>
 <li><b>Barrier</b> absorbs damage (not BD) before HP.</li>
 </ul>
-<h3>4.8 Break damage &amp; Break</h3>
+<h3>4.4 Break damage &amp; Break</h3>
 <p>Attacks deal Break damage (BD) — damage against the Break meter — equal to the ability's Break damage (BD) value × grade multiplier (×1.5 on
 crits). <b>Every unit's Break meter is a universal 0–100 scale</b> with a numeric readout on
 the bar. Logged BD is the applied (post-Constitution) value, so the number always matches the
@@ -208,10 +208,11 @@ attack's damage.</td></tr>
 <p>Statuses tick down at the start of the affected unit's turn; negative durations last the
 whole battle. Removed by design: Guard, Marked, Camouflage.</p>
 <h3>4.7 Items in battle</h3>
-<p>The party inventory is shared. Using an item does <b>not</b> consume the turn, but each hero
-may use only one item per turn. Bomb: 50 damage to all enemies. Health Potion: +40 HP.
-Mana Potion: +40 Mana/Rage. Revive Potion: fallen ally returns at 50% HP. Defense Potion:
-party gains Fortify (3 turns).</p>
+<p>The party inventory is shared and opens as a picker via <b>Alt</b> or the "[Alt] Items"
+button (Tab cycles, Space uses, X closes — see §10). Using an item does <b>not</b> consume
+the turn, but each hero may use only one item per turn. Bomb: 50 damage to all enemies.
+Health Potion: +40 HP. Mana Potion: +40 Mana/Rage. Revive Potion: fallen ally returns at 50%
+HP. Defense Potion: party gains Fortify (3 turns).</p>
 <h3>4.8 Enemy AI</h3>
 <p>Enemies hunt the most wounded hero 40% of the time and pick randomly otherwise (they no
 longer pile onto the squishiest target relentlessly); if any hero is Broken they exploit it
@@ -227,16 +228,16 @@ text. No banner text appears at the top of the battle.</p>
 
 <h2>5. Heroes</h2>
 <p>All four classes are drafted every run (one of each). Sprites currently share the Soldier
-sheet, distinguished by slot tints (white / blue / gold / green); distinct art is pending.
-<b>Test art:</b> a Warrior specced <b>Berserker</b> fights with his own sprite in battle
-(fur-cloaked axeman, native 124px frames at 1.25× battle scale, shown in its original
-colors — no slot tint; idle/walk/attack so far — hurt, death, and the other attack
-animations reuse what exists until those clips arrive). A Mage specced <b>Pyromancer</b>
-wears a second test sprite — a hooded torch-bearer at native 236px, 1:1 scale — as a
-deliberate <b>size experiment</b>: he stands ~55% taller than the Berserker so the two
-densities can be compared in-game before locking the character template (static east-facing
-pose only; attacks hold the pose until animations exist). Own-art specs are listed in
-battle.gd's SPEC_ART table.</p>
+sheet, distinguished by slot tints (white / blue / gold / green); distinct art is arriving
+spec by spec. <b>Own art in-game so far</b> (specs listed in battle.gd's SPEC_ART table,
+always shown untinted in original colors): the <b>Pyromancer</b> — a hooded torch-bearer at
+the OFFICIAL template size (236px frames, 1:1 scale; static east-facing pose until his
+animations exist) — and the <b>Berserker</b> — a fur-cloaked axeman with idle / walk /
+attack animations and his own portrait, at the legacy 124px @1.25× size until re-generated
+at the template (his hurt, death, and extra attack clips are also pending; the game falls
+back gracefully meanwhile). The size comparison between the two was run on 07-12 and the
+larger Pyromancer density WON — it is the standard for all future character art
+(see §12).</p>
 <table border="1" cellpadding="4">
 <tr><th>Class</th><th>HP</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Resource(s)</th></tr>
 <tr><td>Warrior</td><td>154</td><td>25%</td><td>95</td><td>110</td><td>Rage 0–100</td></tr>
@@ -382,8 +383,9 @@ turns).</li>
 Ursus: the hunter's attacks deal +25% Break damage; Canis: the hunter's attacks build 15
 Bleed; Aguila: +15% crit chance.<br>
 <b>Companions:</b> one at a time, summoned until it dies or is replaced (placeholder sphere
-sprites: red/blue/green). The three summons live under a single <b>"Summon Companion ▸"</b>
-submenu in the ability list. No skill check to summon, no resource of their own; they have HP,
+sprites: red/blue/green). Summoning goes through the <b>"Summon Companion" beast picker</b>
+at the top of the ability list on hotkey W (see §10). No skill check to summon, no resource
+of their own; they have HP,
 can be targeted by enemies and healed by allies, and inherit the hunter's armor, Constitution,
 and crit chance (talents can add companion HP and damage). They automatically attack
 (physical) whenever the hunter attacks; they take no timeline turns (statuses tick and Breaks
@@ -501,20 +503,21 @@ index).</p>
 
 <h2>10. Battle Screen &amp; Controls</h2>
 <ul>
-<li><b>Layout:</b> the camera shows the whole battle scene at 1:1 (sprites scaled up to
-compensate — heroes ×3.2, Chief ×3.9, bosses ×4.4; the Berserker's own art runs at ×1.25).
-The battlefield art (Forest / Scarlands) is zoomed out as far as the screen allows — the
-smallest scale that still fills the 1280×720 view (+ shake margin); any smaller would show
-void at the edges, so making scenery read smaller from here means new background art at the
-template density. Burger menu (☰) top-left; initiative bar beside it; combat log top-right
-(scrolling, color-coded, with a small <b>– / Log</b> button to hide or restore it); action
-bar bottom-center on the acting hero's turn. <b>Each party is grouped tight</b> (heroes
-~x350–430, enemies ~x905–990) and every unit's readouts live on a <b>nameplate</b> (180px)
-in a stack behind its party — heroes' plates along the LEFT edge, enemies' along the RIGHT.
-A plate holds a <b>portrait</b> (dedicated art if the unit has it — the Berserker does —
-else a sprite close-up), the unit's name, HP bar, resource bar(s), Break meter with numeric
-x/100 readout, and its status chips (hover for tooltips; Bleed buildup is a chip).
-<b>All battle UI runs ~20% smaller than the first draft</b> (plates 144px, log 240px,
+<li><b>Layout:</b> the camera shows the whole battle scene at 1:1 (legacy sprites scaled up
+to compensate — Soldier heroes ×3.2, Chief ×3.9, bosses ×4.4, Berserker ×1.25; the
+Pyromancer's template-size art runs at true 1:1). The battlefield art (Forest / Scarlands)
+is zoomed out as far as the screen allows — the smallest scale that still fills the
+1280×720 view (+ shake margin); any smaller would show void at the edges, so making scenery
+read smaller from here means new background art at the template density. Burger menu (☰)
+top-left; initiative bar beside it; combat log top-right (scrolling, color-coded, with a
+small <b>– / Log</b> button to hide or restore it); action bar bottom-center on the acting
+hero's turn. <b>Each party is grouped tight</b> (heroes ~x350–430, enemies ~x905–990) and
+every unit's readouts live on a <b>144px nameplate</b> in a stack behind its party —
+heroes' plates along the LEFT edge, enemies' along the RIGHT. A plate holds a
+<b>portrait</b> (dedicated art if the unit has it — the Berserker does — else a sprite
+close-up), the unit's name, HP bar, resource bar(s), Break meter with numeric x/100
+readout, and its status chips (hover for tooltips; Bleed buildup is a chip).
+<b>All battle UI runs ~20% smaller than the first draft</b> (144px plates, 240px log,
 compact action bar and initiative portraits) so the field dominates the screen.
 <b>The acting unit's plate glows with a gold border — that IS the turn indicator</b> (the
 old yellow arrow is gone); hovering or Tab-targeting a unit lights its plate too, and
@@ -525,12 +528,14 @@ buildup and meter value, Poison lines show stack counts and damage per turn, and
 report their stack multiplier.</li>
 <li><b>Action bar:</b> Basic attack button; <b>Abilities ▾</b> — a button list where hovering
 each entry live-previews its initiative cost on the bar (costs shown, unaffordable entries
-greyed); <b>Items ▾</b>. Guard no longer exists.</li>
-<li><b>Ability hotkeys:</b> <b>Q / W / E / R / A / S / D / F</b> map to ability slots in kit
-order (Q is always the basic attack) — no need to open the Abilities menu. Each button shows
-its key, e.g. "[W] Bloodlust". A hotkey is ignored when the ability is unaffordable or gated
-(Death Ray below 5 Resonance, Kill Command without a living companion), and hotkeys only work
-while the action bar is open — never during targeting or a skill check.</li>
+greyed); <b>[Alt] Items</b> — opens the item picker. Guard no longer exists.</li>
+<li><b>Ability hotkeys:</b> <b>Q / W / E / R / A / S / D / F</b> map to the ability MENU
+slots in order — Q is always the basic attack, the Beastmaster's "Summon Companion" picker
+holds W, and the remaining abilities follow in kit order. Each button shows its key, e.g.
+"[W] Bloodlust". A hotkey is ignored when the ability is unaffordable or gated (Death Ray
+below 5 Resonance, Kill Command without a living companion, Resurrection with nobody
+fallen), and hotkeys only work while the action bar is open — never during targeting or a
+skill check.</li>
 <li><b>Tab:</b> while choosing an action, Tab opens/closes the <b>Abilities list</b> (browse
 with the mouse or fire a hotkey). After an ability is chosen, <b>Tab cycles through the
 available targets</b> (the highlight and ▼ marker follow) and <b>Space or Enter confirms</b>
@@ -562,8 +567,8 @@ attack movement (units with real locomotion art — the Berserker — <b>walk</b
 and back with their walk animation, facing their direction of travel; everyone else does the
 short lunge), Break hitstop + fracture flash + camera punch, per-event SFX (bow users —
 the Hunter and Orc Archers — get dedicated attack / impact / blocked sounds; the rest is
-placeholder procedural audio), tinted portraits + hover highlight (outline shader) linking the
-initiative bar to the field.</li>
+placeholder procedural audio), and hover highlighting (outline shader + lit nameplate)
+linking the initiative bar, the plates, and the field.</li>
 <li><b>Music:</b> menu track (main menu, draft, settings, relics, and spec choice — party
 setup stays on the menu theme), map track (map, party, shop — continues seamlessly between
 them; boosted +6 dB), battle track in combat. The boss-entry tune plays twice per zone arc:
@@ -620,9 +625,12 @@ testing one hero's kit across many consecutive turns. The battle scene also runs
 (<code>godot res://scenes/battle.tscn</code>) with a default party and no run state.</li>
 <li><b>Sprites:</b> horizontal frame strips named Name_Idle/Walk/Attack01–03/Hurt/Death.png
 (square frames; the stock sheets are 100×100, but units accept any frame size via the
-frame_size config — the Berserker test sheet is 124×124). Partial sheets are fine for
-testing: missing Attack02/03 replay Attack01, and missing Hurt/Death hold the idle frame.
-New assets arrive in "imported files/" (animated GIFs get converted to strips).</li>
+frame_size config — the Berserker sheet is 124×124, the Pyromancer 236×236). Partial sheets
+are fine: missing Attack02/03 replay Attack01, missing Hurt/Death hold the idle frame, and a
+single-frame Idle (the Pyromancer today) simply stands. Dedicated portraits are
+Name_Portrait.png (used on the nameplate, initiative bar, and party list). New assets arrive
+in "imported files/" (animated GIFs get converted to strips; 8-direction rotation GIFs — the
+east-facing frame is extracted).</li>
 <li><b>Resolution template (the Pyromancer — DECIDED 07-12):</b> the larger sprite size won
 the comparison; all character art going forward matches the Pyromancer: a standing figure
 ≈110–120px tall inside a <b>236px frame, rendered at 1:1</b> (never scaled), original
@@ -634,14 +642,21 @@ and shown at/near native size — never blown up.</li>
 
 <h2>13. Known Gaps / Next Steps</h2>
 <ul>
-<li>Berserker test sprite is in (battle only; draft/spec screens still show the Soldier).
-Its Hurt / Death / second-attack clips are pending, as are distinct Mage/Cleric/Hunter
-sprites; Beastmaster companions use placeholder colored spheres until beast art lands.</li>
-<li>The Withered Warden now has its own kit; the Ash-Wrought Tyrant is still a Chief
-stand-in — unique kit + art planned. Boss art for both pending.</li>
-<li>Hunter spec talent pools need signatures; full rune loot table pending; relic pool (6)
-needs growth.</li>
+<li><b>Art pipeline (Aseprite + Pixel Lab):</b> re-generate the Berserker at the 236px
+template (plus his missing Hurt / Death / second-attack clips); animate the Pyromancer
+(currently a static pose); produce the remaining hero specs, portraits for everyone but the
+Berserker, real beast art for the placeholder companion spheres, and — the big lever for
+scenery scale — battle backgrounds authored at the template density. Own art is battle-only
+so far; draft/spec screens still show the Soldier.</li>
+<li><b>Design hooks awaiting assignment:</b> Weaknesses (who is weak to which damage type —
+only the Tyrant's frost weakness is set) and Counter Attack (defined term; no talent or
+ability grants it yet).</li>
+<li>The Withered Warden has its own kit; the Ash-Wrought Tyrant is still a Chief stand-in —
+unique kit + art planned. Boss art for both pending.</li>
+<li>Hunter spec talent pools need signatures; only the Berserker has a designed FIXED talent
+tree; full rune loot table pending; relic pool (5) needs growth.</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>
-<li>Difficulty leans easy for practiced players (sim ~85%); real tuning via playtests.</li>
+<li>The sim bot currently wins ~100% of standard fights (target ≈85%) — difficulty leans
+easy; real tuning comes from playtests.</li>
 </ul>
 </body></html>
