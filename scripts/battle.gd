@@ -57,12 +57,8 @@ const STATUS_INFO := {
 	"undying": ["Undying", "UD", Color(1.0, 0.95, 0.75), "Cannot drop below 1 HP."],
 }
 
-# Buff/Debuff keywords: a DEBUFF is any negative status, a BUFF any positive
-# one. This registry backs talents that count debuffs (Dominant Presence,
-# Iron Will) and future dispels.
-const DEBUFF_IDS := ["slow", "chilled", "burn", "poison", "bleed", "sunder",
-	"mocked", "stunned", "exposed", "cripple", "dazed", "mindflay",
-	"umbral_sigil", "elem_weak", "broken"]
+# Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
+# count debuffs live; battle code reaches it as BattleUnit.DEBUFF_IDS.
 
 # Placeholder SFX (procedurally generated, see repo history; replace with
 # licensed audio later).
@@ -334,6 +330,19 @@ func _spawn_units() -> void:
 			if Run.active and i < Run.party.size():
 				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
 					Run.party[i].get("talents", {}))
+			elif autoplay:
+				# DOD_SIM_TALENTS="bz_bloodcraze:3,wd_toughness:2" force-learns
+				# talents on bot heroes whose spec tree holds the id (test hook).
+				var env_talents := OS.get_environment("DOD_SIM_TALENTS")
+				if env_talents != "":
+					var t_tree := Talents.generate_tree(spec, hero_keys[i])
+					var t_learned := {}
+					for pair in env_talents.split(","):
+						var bits: PackedStringArray = pair.split(":")
+						if not Talents.node_in_tree(t_tree, bits[0]).is_empty():
+							t_learned[bits[0]] = int(bits[1]) if bits.size() > 1 else 1
+					if not t_learned.is_empty():
+						Talents.apply_from_tree(cfg, t_tree, t_learned)
 		# Class passives (every spec of the class, and before awakening).
 		match hero_keys[i]:
 			"cleric":
@@ -375,6 +384,14 @@ func _spawn_units() -> void:
 		var class_passive: Dictionary = Classes.CLASS_PASSIVES[hero_keys[i]]
 		u.add_status("class_passive", class_passive["name"], "◆",
 			Color(0.65, 0.75, 0.9), -1, class_passive["desc"])
+		# Always-on talent buffs carry permanent chips with live counters
+		# (Iron Will refreshes in unit.gd, Crushing Blows in _update_talent_chips).
+		if u.iron_will_ranks > 0:
+			u.add_status("iron_will", "Iron Will", "+0%",
+				Color(0.82, 0.58, 0.36), -1, "")
+		if u.crushing_blows_ranks > 0:
+			u.add_status("crushing_blows", "Crushing Blows", "+0%",
+				Color(0.86, 0.44, 0.30), -1, "")
 		if Run.active and i < Run.party.size():
 			u.hp = clampi(Run.party[i]["hp"], 1, u.max_hp)
 			if u.resource_name == "Mana":
@@ -425,6 +442,7 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
 	u.position = pos
 	add_child(u)
 	u.setup(config)
+	u.log_proc = _log  # unit-side talent procs reach the combat log
 	# The nameplate is a sibling (not a child) so lunges/knockback never move it.
 	var plate := Node2D.new()
 	plate.position = plate_pos
@@ -624,8 +642,9 @@ func _build_skill_check_ui() -> void:
 
 
 # Testing menu (dev builds): a compact DEBUG dropdown bottom-right so it
-# stays clear of the nameplate stacks. Turn lock: pick a hero and EVERY turn
-# is theirs until unlocked or another hero is picked.
+# stays clear of the nameplate stacks. Turn lock: pick a hero and every HERO
+# turn is theirs until unlocked — enemies keep fighting on their own turns
+# (silence them with "Enemy attacks OFF").
 func _build_debug_panel() -> void:
 	var menu := MenuButton.new()
 	menu.text = "DEBUG ▾"
@@ -636,8 +655,9 @@ func _build_debug_panel() -> void:
 	ui.add_child(menu)
 	_debug_popup = menu.get_popup()
 	_debug_popup.add_item("Full Restore", 0)
+	_debug_popup.add_item("Reset cooldowns", 2)
 	_debug_popup.add_check_item("Enemy attacks OFF", 1)
-	_debug_popup.add_separator("Turn lock — stays their turn")
+	_debug_popup.add_separator("Turn lock — all hero turns")
 	for i in heroes.size():
 		_debug_popup.add_radio_check_item("Lock → %s" % heroes[i].unit_name, 10 + i)
 	_debug_popup.id_pressed.connect(_on_debug_menu)
@@ -646,6 +666,9 @@ func _build_debug_panel() -> void:
 func _on_debug_menu(id: int) -> void:
 	if id == 0:
 		_debug_full_restore()
+		return
+	if id == 2:
+		_debug_reset_cooldowns()
 		return
 	if id == 1:
 		var check_idx := _debug_popup.get_item_index(1)
@@ -659,8 +682,8 @@ func _on_debug_menu(id: int) -> void:
 		_debug_popup.set_item_checked(_debug_popup.get_item_index(10 + i),
 			heroes[i] == debug_locked_hero)
 	if debug_locked_hero != null:
-		_log("DEBUG: every turn goes to %s (re-select to unlock)" % hero.unit_name,
-			"#e0a050")
+		_log("DEBUG: every hero turn goes to %s — enemies still act (re-select to unlock)"
+			% hero.unit_name, "#e0a050")
 	else:
 		_log("DEBUG: turn lock released", "#e0a050")
 
@@ -680,6 +703,18 @@ func _debug_full_restore() -> void:
 func _debug_toggle_enemies(off: bool) -> void:
 	debug_enemies_off = off
 	_log("DEBUG: enemy attacks %s" % ("OFF" if off else "back on"), "#e0a050")
+
+
+# Wipes every unit's ability cooldowns (talent internal cooldowns too) so a
+# locked hero can spam their whole kit while testing.
+func _debug_reset_cooldowns() -> void:
+	for u in heroes + companions + enemies:
+		u.cooldowns.clear()
+		u.unrelenting_cd = 0
+	_log("DEBUG: all cooldowns reset", "#e0a050")
+	# Refresh the open action bar so buttons un-grey immediately.
+	if current_hero != null and not current_hero.dead and action_panel.visible:
+		_show_actions(current_hero)
 
 
 func _on_burger(id: int) -> void:
@@ -758,9 +793,12 @@ func _message(_text: String) -> void:
 	pass
 
 
-# Appends one line to the battle history panel.
+# Appends one line to the battle history panel (echoed to stdout in
+# autoplay debug runs so headless tests can grep the combat log).
 func _log(text: String, color := "#d8d2c4") -> void:
 	history.append_text("[color=%s]%s[/color]\n" % [color, text])
+	if debug_prints:
+		print("[LOG] %s" % text)
 
 
 func _toggle_log() -> void:
@@ -823,15 +861,18 @@ func _run_battle() -> void:
 	_message("The Decay stirs...")
 	await _wait(0.8)
 	while not battle_over:
-		# Debug turn lock: the chosen hero cuts ahead of everyone, every time.
-		if debug_locked_hero != null and not debug_locked_hero.dead:
-			var soonest := _next_unit()
-			if soonest != null and soonest != debug_locked_hero:
-				debug_locked_hero.next_time = soonest.next_time - 0.01
+		_update_talent_chips()
 		_rebuild_turn_bar()
 		var u := _next_unit()
 		if u == null:
 			break
+		# Debug turn lock: every HERO turn goes to the locked hero — enemies
+		# still act on their own turns. The displaced hero's clock advances
+		# as if they had taken a basic action, so the timeline keeps flowing.
+		if debug_locked_hero != null and not debug_locked_hero.dead \
+				and u.is_hero and u != debug_locked_hero:
+			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
+			u = debug_locked_hero
 		# Turn indicator: the acting unit's nameplate glows gold.
 		if active_unit != null and is_instance_valid(active_unit):
 			active_unit.set_plate_active(false)
@@ -886,12 +927,24 @@ func _run_battle() -> void:
 			continue
 		u.tick_statuses()
 		u.tick_cooldowns()
-		# Endurance (Warden talent): armor stacks while unhealed by others.
+		# Endurance (Warden talent): armor stacks while unhealed by others,
+		# shown as a buff chip that tracks the current bonus.
 		if u.endurance_ranks > 0:
 			if u.healed_externally:
 				u.endurance_stacks = 0
+				u.remove_status("endurance")
+				_log("   → Talent: Endurance resets (%s was healed)" % u.unit_name,
+					"#b0a8e0")
 			else:
 				u.endurance_stacks += 1
+				var e_pct := 3 * u.endurance_ranks * u.endurance_stacks
+				var e_desc := "Endurance: +3%% armor per rank for every\nturn without an external heal.\nCurrently +%d%% armor (%d-turn streak)." % [
+					e_pct, u.endurance_stacks]
+				if not u.update_status("endurance", "+%d%%" % e_pct, e_desc):
+					u.add_status("endurance", "Endurance", "+%d%%" % e_pct,
+						Color(0.76, 0.68, 0.48), -1, e_desc)
+				_log("   → Talent: Endurance — %s hardens (+%d%% armor)" % [
+					u.unit_name, e_pct], "#b0a8e0")
 			u.healed_externally = false
 		if u.broken_pending:
 			u.broken_pending = false
@@ -928,6 +981,23 @@ func _hero_side() -> Array:
 		if not c.dead:
 			side.append(c)
 	return side
+
+
+# Talent chips whose value depends on battle-wide state (Crushing Blows reads
+# the whole enemy party's bloodloss). Called every loop tick and after bleed
+# changes; Iron Will keeps itself fresh inside unit._refresh_chips instead.
+func _update_talent_chips() -> void:
+	var party_bleed := 0
+	for foe in enemies:
+		if not foe.dead:
+			party_bleed += foe.bleed_buildup
+	for h in heroes:
+		if h.dead or h.crushing_blows_ranks == 0:
+			continue
+		var pen: int = 3 * h.crushing_blows_ranks * int(party_bleed / 20.0)
+		h.update_status("crushing_blows", "+%d%%" % pen,
+			"Crushing Blows: +3%% armor penetration per\nrank for every 20 bloodloss on the enemy\nteam. Currently +%d%% (%d total bloodloss)." % [
+				pen, party_bleed])
 
 
 func _player_turn(u: BattleUnit) -> void:
@@ -971,7 +1041,8 @@ func _player_turn(u: BattleUnit) -> void:
 		var used_targeting := false
 		if ab.special in ["rally", "focus", "surge", "shieldwall", "quickdraw",
 				"phoenix", "hymn", "retaliate", "unity", "tripwire", "summon",
-				"mana_shield", "divine_wrath"]:
+				"mana_shield", "divine_wrath", "shield_block", "hold_the_line",
+				"battle_shout"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "resurrection":
 			# Resurrection targets the FALLEN (the usable gate guarantees one).
@@ -1696,20 +1767,16 @@ func _enemy_support_action(u: BattleUnit) -> Array:
 	return []
 
 
-# How many DEBUFFS this unit currently carries (Iron Will, future dispels).
-func _count_debuffs(u: BattleUnit) -> int:
-	var n := 0
-	for s in u.statuses:
-		if DEBUFF_IDS.has(s.id):
-			n += 1
-	return n
-
-
 # Dominant Presence bookkeeping: the Swordmaster's armor feeds on the
 # debuffs he lands.
 func _note_debuff_applied(source: BattleUnit, status_id: String) -> void:
-	if source != null and source.dominant_ranks > 0 and DEBUFF_IDS.has(status_id):
+	if source != null and source.dominant_ranks > 0 \
+			and BattleUnit.DEBUFF_IDS.has(status_id):
 		source.debuffs_applied += 1
+		_log("   → Talent: Dominant Presence — %s's armor +%d%% (%d debuff%s landed)" % [
+			source.unit_name, 5 * source.dominant_ranks * source.debuffs_applied,
+			source.debuffs_applied, "" if source.debuffs_applied == 1 else "s"],
+			"#b0a8e0")
 
 
 func _lowest_hp(pool: Array) -> BattleUnit:
@@ -1718,6 +1785,25 @@ func _lowest_hp(pool: Array) -> BattleUnit:
 		if h.hp / float(h.max_hp) < best.hp / float(best.max_hp):
 			best = h
 	return best
+
+
+# ADJACENT (keyword): the enemies directly beside the target in formation
+# order — the nearest LIVING neighbor on each side (corpses don't shield
+# their fellows). Used by splash effects like the Sundering talent.
+func _adjacent_enemies(target: BattleUnit) -> Array:
+	var idx := enemies.find(target)
+	if idx < 0:
+		return []
+	var adjacent: Array = []
+	for j in range(idx - 1, -1, -1):
+		if not enemies[j].dead:
+			adjacent.append(enemies[j])
+			break
+	for j in range(idx + 1, enemies.size()):
+		if not enemies[j].dead:
+			adjacent.append(enemies[j])
+			break
+	return adjacent
 
 
 # Base chances for the attack rolls. Many things will modify these later.
@@ -1733,8 +1819,9 @@ func _miss_chance(attacker: BattleUnit) -> float:
 
 func _parry_chance(defender: BattleUnit) -> float:
 	var base := PARRY_CHANCE if defender.is_hero else ENEMY_PARRY_CHANCE
+	# Swordsmanship (talent) deepens the perfect-Pommel parry buff.
 	return base + defender.parry_bonus \
-		+ (0.15 if defender.has_status("parry_up") else 0.0)
+		+ ((0.15 + defender.pommel_parry_bonus) if defender.has_status("parry_up") else 0.0)
 
 
 # Bow users get dedicated attack/impact/blocked sounds. Keyed on the class
@@ -1887,8 +1974,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if not charges.is_empty() and int(charges.get("power", 0)) > 0:
 					did_block = true
 					charges["power"] = int(charges["power"]) - 1
-					if int(charges["power"]) <= 0:
+					var charges_left := int(charges["power"])
+					if charges_left <= 0:
 						strike_target.remove_status("shield_charges")
+					else:
+						# The chip counts down the blocks still owed.
+						strike_target.update_status("shield_charges",
+							"SW%d" % charges_left,
+							"Shieldwall: the next %d attack(s) against\nthis unit are BLOCKED (one charge each)." % charges_left)
 				elif randf() < strike_target.block_chance \
 						+ (0.15 if strike_target.passive_id == "heavy_plating" else 0.0):
 					did_block = true
@@ -1905,9 +1998,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							* strike_target.unkillable_ranks), 1)
 						strike_target.heal_amount(mend)
 						strike_target.float_text("+%d" % mend, Color(0.4, 0.9, 0.45))
+						_log("   → Talent: Unkillable — %s mends %d" % [
+							strike_target.unit_name, mend], "#b0a8e0")
 					# Richocet: the shield answer can ring the attacker's skull.
 					if strike_target.ricochet_ranks > 0 and not attacker.dead \
 							and randf() < 0.05 * strike_target.ricochet_ranks:
+						_log("   → Talent: Richocet — the block staggers %s" % \
+							attacker.unit_name, "#b0a8e0")
 						_apply_status(attacker, "stunned", 1)
 					await _wait(0.4)
 					continue
@@ -2016,7 +2113,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 + attacker.status_power("battle_shout") / 100.0
 			# Iron Will: +5%/rank damage per debuff currently on the Warden.
 			if attacker.iron_will_ranks > 0:
-				raw *= 1.0 + 0.05 * attacker.iron_will_ranks * _count_debuffs(attacker)
+				raw *= 1.0 + 0.05 * attacker.iron_will_ranks * attacker.count_debuffs()
 			# Seasoned Fighter: the offensive stance above half HP.
 			if attacker.passive_id == "seasoned" and attacker.hp > attacker.max_hp * 0.5:
 				raw *= 1.15 + attacker.seasoned_off_bonus
@@ -2183,19 +2280,26 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Crushing Blow (Warden talents): resist shred + BD splash.
 			if ab.display_name == "Crushing Blow" and not strike_target.dead \
 					and attacker.elem_weak_ranks > 0:
-				_apply_status(strike_target, "elem_weak", 3, 5 * attacker.elem_weak_ranks)
+				var shred := 5 * attacker.elem_weak_ranks
+				_apply_status(strike_target, "elem_weak", 3, shred)
+				# The chip carries the talent-scaled number.
+				strike_target.update_status("elem_weak", "-%d%%" % shred,
+					"Elemental Weakness: all non-physical\nresistances reduced by %d%%." % shred,
+					shred)
 				_note_debuff_applied(attacker, "elem_weak")
 			if ab.display_name == "Crushing Blow" and attacker.sundering_ranks > 0 \
 					and attacker.is_hero:
 				var splash_bd := int(round(pr * 0.25 * attacker.sundering_ranks))
 				if splash_bd > 0:
-					for foe in enemies:
-						if foe.dead or foe == strike_target:
-							continue
+					var neighbors := _adjacent_enemies(strike_target)
+					for foe in neighbors:
 						foe.take_hit(0, splash_bd)
 						foe.float_text("+%d BD" % splash_bd, Color(0.8, 0.5, 1.0))
-					_log("   → Sundering: %d BD to the rest of the warband" % splash_bd,
-						"#b0a8e0")
+					if not neighbors.is_empty():
+						_log("   → Talent: Sundering — %d BD to the %d foe%s Adjacent to %s" % [
+							splash_bd, neighbors.size(),
+							"" if neighbors.size() == 1 else "s",
+							strike_target.unit_name], "#b0a8e0")
 			if ab.bleed_build > 0 and not strike_target.dead and randf() <= ab.bleed_chance:
 				_add_bleed_with_burst(strike_target, ab.bleed_build + attacker.bleed_bonus)
 			if ab.display_name == "Mocking Blow" and not strike_target.dead:
@@ -2213,7 +2317,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						and randf() < 0.15 * attacker.tank_spank_ranks:
 					var pals := heroes.filter(func(h): return not h.dead)
 					if not pals.is_empty():
-						_apply_status(pals.pick_random(), "empower", 2)
+						var pal: BattleUnit = pals.pick_random()
+						_log("   → Talent: Tank and Spank — the taunt Empowers %s" % \
+							pal.unit_name, "#b0a8e0")
+						_apply_status(pal, "empower", 2)
 			# Shrapnel: the second debuff (Cripple rides applies_status above).
 			if ab.display_name == "Shrapnel" and not strike_target.dead:
 				_apply_status(strike_target, "slow", 4 if is_perfect else 3)
@@ -2267,7 +2374,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# with an immediate basic attack (nothing grants it yet).
 			if parried and strike_target.counter_attacks and not is_counter \
 					and not strike_target.dead and not attacker.dead:
-				_log("%s counter attacks!" % strike_target.unit_name, "#50c8e0")
+				_log("Talent: Riposte — %s counter attacks!" % strike_target.unit_name,
+					"#50c8e0")
 				await _wait(0.4)
 				await _resolve(strike_target, strike_target.abilities[0], attacker,
 					"good", true)
@@ -2636,6 +2744,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var shout_pct := int(shout_bleed / 20.0)
 			_sfx("crit", -8.0, 0.7)
 			_apply_status(attacker, "battle_shout", 2, shout_pct)
+			# The chip shows the damage gained at the moment of the shout.
+			attacker.update_status("battle_shout", "+%d%%" % shout_pct,
+				"Battle Shout: +%d%% damage for 2 turns\n(from %d blood buildup on the enemy\nparty at the time of the shout)." % [
+					shout_pct, shout_bleed], shout_pct)
 			if is_perfect:
 				attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
 				attacker.float_text("+5 Rage", Color(1.0, 0.5, 0.4))
@@ -2647,6 +2759,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var blocks := 5 if is_perfect else 3
 			_sfx("parry", -6.0, 0.5)
 			_apply_status(attacker, "shield_charges", -1, blocks)
+			# The chip counts the blocks owed (recasting resets the count).
+			attacker.update_status("shield_charges", "SW%d" % blocks,
+				"Shieldwall: the next %d attack(s) against\nthis unit are BLOCKED (one charge each)." % blocks,
+				blocks)
 			_message("%s raises the shield!" % attacker.unit_name)
 			_log("%s: Shieldwall — the next %d attacks will be BLOCKED" % [
 				attacker.unit_name, blocks], "#8c9cc8")
@@ -2865,6 +2981,7 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int) -> void:
 				"#8cc843")
 		_log("   → %s: +%d Bleed (%d/100)" % [victim.unit_name, amount,
 			victim.bleed_buildup], "#e08850")
+	_update_talent_chips()  # Crushing Blows tracks the enemy party's bleed
 
 
 # Unique bonus effects for Perfect skill checks (per ability).
@@ -2907,6 +3024,11 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 				_apply_status(target, "burn", 2)
 		"parry_up":
 			_apply_status(attacker, "parry_up", 3)
+			# Swordsmanship (talent): the buff parries harder — show it.
+			if attacker.pommel_parry_bonus > 0.0:
+				attacker.update_status("parry_up", "P+",
+					"+%d%% parry chance (honed by Swordsmanship)." % \
+					int(round((0.15 + attacker.pommel_parry_bonus) * 100)))
 
 
 # ---------- skill check ----------

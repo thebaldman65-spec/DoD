@@ -13,6 +13,13 @@ const OUTLINE_SHADER := preload("res://shaders/outline.gdshader")
 # from it (stored as a negative resist, so resists and weaknesses stack).
 const WEAKNESS_EXTRA := 0.25
 
+# Buff/Debuff keywords: a DEBUFF is any negative status, a BUFF any positive
+# one. This registry backs talents that count debuffs (Dominant Presence,
+# Iron Will — its chip updates live in _refresh_chips) and future dispels.
+const DEBUFF_IDS := ["slow", "chilled", "burn", "poison", "bleed", "sunder",
+	"mocked", "stunned", "exposed", "cripple", "dazed", "mindflay",
+	"umbral_sigil", "elem_weak", "broken"]
+
 var frame_size := 100      # square frame edge of this unit's sprite strips
 var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
 var hero_key := ""         # class id ("warrior"...) — display name may be the spec
@@ -95,6 +102,23 @@ var seasoned_off_bonus := 0.0 # Aggressive Stance: bigger over-half bonus
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
+
+# Battle-log hook (set by the battle scene) so talent procs that happen
+# inside this unit (Enraged, Unrelenting Assault) reach the combat log.
+var log_proc := Callable()
+
+
+func _proc_log(text: String) -> void:
+	if log_proc.is_valid():
+		log_proc.call(text, "#b0a8e0")
+
+
+func count_debuffs() -> int:
+	var n := 0
+	for s in statuses:
+		if DEBUFF_IDS.has(s.id):
+			n += 1
+	return n
 
 var sprite: AnimatedSprite2D
 var _plate_root: Node2D    # nameplate container owned by the battle scene
@@ -507,6 +531,25 @@ func remove_status(id: String) -> void:
 	_refresh_chips()
 
 
+# Updates a live status chip's tag and tooltip (and optionally its power /
+# remaining turns) without re-announcing it — for chips that show a counter,
+# like Shieldwall charges or Battle Shout's damage bonus.
+# Returns false if the status isn't active.
+func update_status(id: String, short: String, desc: String, power := -1,
+		turns := 0) -> bool:
+	for s in statuses:
+		if s.id == id:
+			s.short = short
+			s.desc = desc
+			if power >= 0:
+				s.power = power
+			if turns > 0:
+				s.turns = turns
+			_refresh_chips()
+			return true
+	return false
+
+
 func get_status(id: String) -> Dictionary:
 	for s in statuses:
 		if s.id == id:
@@ -567,6 +610,11 @@ func tick_statuses() -> void:
 	for s in statuses:
 		if s.id != "broken" and s.turns > 0:
 			s.turns -= 1
+	# Unrelenting Assault: the borrowed Constitution fades with the buff.
+	for s in statuses:
+		if s.id == "unrelenting" and s.turns == 0:
+			constitution -= int(s.get("power", 0))
+			float_text("Unrelenting fades", Color(0.6, 0.65, 0.8))
 	statuses = statuses.filter(func(s): return s.id == "broken" or s.turns != 0)
 	_refresh_chips()
 
@@ -582,6 +630,7 @@ func tick_cooldowns() -> void:
 		enraged_timer -= 1
 		if enraged_timer == 0:
 			enraged_stacks = 0
+			remove_status("enraged")
 			float_text("Enraged fades", Color(0.7, 0.5, 0.4))
 
 
@@ -626,6 +675,16 @@ func effective_armor() -> float:
 
 
 func _refresh_chips() -> void:
+	# Iron Will's chip tracks the live debuff count (this runs on every
+	# status change, so the readout can never go stale).
+	if iron_will_ranks > 0:
+		for s in statuses:
+			if s.id == "iron_will":
+				var n := count_debuffs()
+				var pct := 5 * iron_will_ranks * n
+				s.short = "+%d%%" % pct
+				s.desc = "Iron Will: +5%% damage per rank for every\ndebuff on the Warden.\nCurrently +%d%% (%d debuff%s)." % [
+					pct, n, "" if n == 1 else "s"]
 	for child in _chips_root.get_children():
 		child.queue_free()
 	var count := statuses.size()
@@ -709,18 +768,35 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		float_text("HELD THE LINE", Color(0.95, 0.85, 0.4))
 	if resource_name == "Rage":
 		resource = mini(resource + 10, max_resource)
-	# Enraged (talent): dropping below half HP grants a stacking damage buff.
+	# Enraged (talent): dropping below half HP grants a stacking damage buff,
+	# shown as a chip that tracks the current bonus.
 	if enraged_ranks > 0 and was_above_half and hp <= max_hp * 0.5 and hp > 0:
 		enraged_stacks = mini(enraged_stacks + 1, 3)
 		enraged_timer = 5
-		float_text("ENRAGED x%d" % enraged_stacks, Color(0.9, 0.35, 0.3))
+		var enr_pct := 3 * enraged_ranks * enraged_stacks
+		var enr_desc := "Enraged: +3%% damage per rank per stack,\ngained by dropping below half health\n(max 3 stacks). Currently +%d%% (x%d)." % [
+			enr_pct, enraged_stacks]
+		if update_status("enraged", "+%d%%" % enr_pct, enr_desc, -1, 5):
+			float_text("ENRAGED x%d" % enraged_stacks, Color(0.9, 0.35, 0.3))
+		else:
+			add_status("enraged", "Enraged", "+%d%%" % enr_pct,
+				Color(0.9, 0.35, 0.3), 5, enr_desc)
+		_proc_log("Talent: Enraged — %s rages (+%d%% damage, stack %d)" % [
+			unit_name, enr_pct, enraged_stacks])
 	# Unrelenting Assault (talent): dropping below 25% HP grants Constitution
-	# (at most once every 5 turns).
+	# for 3 turns (at most once every 5 turns).
 	if unrelenting_ranks > 0 and was_above_quarter and hp <= max_hp * 0.25 \
 			and hp > 0 and unrelenting_cd == 0:
-		constitution += 10 * unrelenting_ranks
+		var con_gain := 10 * unrelenting_ranks
+		constitution += con_gain
 		unrelenting_cd = 5
-		float_text("+%d Constitution" % (10 * unrelenting_ranks), Color(0.7, 0.8, 0.95))
+		add_status("unrelenting", "Unrelenting Assault", "+%d" % con_gain,
+			Color(0.7, 0.8, 0.95), 3,
+			"Unrelenting Assault: +%d Constitution for\n3 turns (gained by dropping below 25%%\nhealth; at most once every 5 turns)." % con_gain,
+			con_gain)
+		float_text("+%d Constitution" % con_gain, Color(0.7, 0.8, 0.95))
+		_proc_log("Talent: Unrelenting Assault — %s gains +%d Constitution (3 turns)" % [
+			unit_name, con_gain])
 	# Mana Shield: half the pain flows back as Mana.
 	if has_status("mana_shield") and resource_name == "Mana" and amount > 0:
 		var converted := maxi(int(amount * 0.5), 1)
@@ -772,6 +848,10 @@ func _die() -> void:
 	dead = true
 	broken = false
 	broken_pending = false
+	# Unrelenting's borrowed Constitution can't outlive its buff (revives).
+	var ua := get_status("unrelenting")
+	if not ua.is_empty():
+		constitution -= int(ua.get("power", 0))
 	statuses.clear()
 	_refresh_chips()
 	if _plate_root != null:

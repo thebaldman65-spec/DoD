@@ -5,6 +5,40 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-16 — Batch 11: talent visibility (chips + logs), Adjacent keyword, debug QoL</h2>
+<ul>
+<li><b>New keyword — Adjacent:</b> the enemies directly next to a target in formation
+order (nearest living enemy on each side). <b>Sundering</b> now splashes its Break damage
+only to enemies Adjacent to the Crushing Blow target, not the whole warband.</li>
+<li><b>Buffs are visible:</b> talent effects now show as status chips with live counters —
+Enraged (+% and stacks), Unrelenting Assault (+Constitution), Endurance (armor streak,
+clears on external heals), Iron Will (live +% from current debuffs), Crushing Blows (live
+armor pen from enemy-party bleed), Battle Shout (% gained at cast), Shieldwall (charges
+count down "SW3"→"SW1"), Elemental Weakness (resist reduction from talent ranks).</li>
+<li><b>Unrelenting Assault reworked:</b> the +10 Constitution/rank now lasts <b>3 turns</b>
+(was permanent for the battle); still at most once every 5 turns; fades are announced.</li>
+<li><b>Buff abilities self-cast:</b> Shieldwall, Hold the Line, and Battle Shout no longer
+ask for an enemy target.</li>
+<li><b>Talent procs are logged:</b> every proc writes a "Talent:" line to the combat log —
+Enraged, Unrelenting Assault, Endurance, Unkillable, Richocet, Tank and Spank, Dominant
+Presence, Sundering, Riposte.</li>
+<li><b>Latent talent bug fixed:</b> Swordsmanship's bigger perfect-Pommel parry buff was
+never wired into the parry roll; the parry_up chip now also shows the honed value.</li>
+<li><b>Stats screen fixes:</b> Constitution now uses the spec's value and includes
+Toughness (it previously showed the raw class base); the Seasoned Fighter passive line
+bakes in Aggressive/Defensive Stance ranks, and Blood Frenzy's line reflects
+Unstoppable.</li>
+<li><b>Class passives displayed:</b> draft cards show the class passive under the name;
+the awakening screen shows a "Class Passive" line above the three paths.</li>
+<li><b>Debug menu:</b> new <b>Reset cooldowns</b> command (wipes everyone's cooldowns,
+refreshes the action bar). <b>Turn lock reworked:</b> only HERO turns go to the locked hero
+— enemies keep attacking on their own turns (use Enemy attacks OFF to silence them);
+displaced heroes' clocks advance as if they had acted.</li>
+<li><b>Testing hooks:</b> DOD_SIM_TALENTS="bz_bloodcraze:3,..." force-learns talents on bot
+heroes; autoplay debug runs echo the combat log to stdout ("[LOG] ..."). Bloodcraze was
+verified end-to-end with these hooks after a report it wasn't triggering.</li>
+</ul>
+
 <h2>2026-07-15 — Batch 10: Block, cooldowns, class passives, three fixed talent trees</h2>
 <ul>
 <li><b>New keyword — Block:</b> fully negates an attack (damage, BD, effects). Only pure

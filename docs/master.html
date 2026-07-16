@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-15</b></p>
+<p align="right"><b>Last updated: 2026-07-16</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative design reference (the timestamp above is bumped on every
 edit). It supersedes the original concept docs ("Dawn of Decay.docx", "DoD Combat.docx",
@@ -122,6 +122,10 @@ flashes <b>BLOCK</b> and is logged.</li>
 <li><b>Armor Penetration (keyword):</b> every % of armor penetration negates a % of the
 target's armor (Piercing Arrow 50%, Singularity 30%, the Berserker's Crushing Blows talent).
 It is NOT shown on the character screen.</li>
+<li><b>Adjacent (keyword):</b> the enemies directly next to a target in formation order —
+the nearest LIVING enemy on each side of it (corpses don't shield their fellows, and
+Adjacent never includes the target itself). Splash effects that say "Adjacent" (the
+Warden's Sundering talent) hit at most those two enemies.</li>
 <li><b>Cooldown (keyword, "cd"):</b> the number of the user's turns before the same ability
 can be used again — "7cd" means unusable for 7 turns after use. Every ability now carries a
 cooldown scaled to its strength (basics 0, light hits 2–3, heavies/AoE 3–6, Miracles 5–8,
@@ -197,12 +201,22 @@ ward.</td></tr>
 <tr><td>Umbral Sigil</td><td>Branded: every other member of this unit's party takes 50% of
 all attack damage it receives (Occultist).</td></tr>
 <tr><td>Battle Shout</td><td>+1% damage per 20 blood buildup on the enemy party, snapshotted
-at cast (Berserker talent).</td></tr>
+at cast (Berserker talent). The chip shows the % gained at the moment of the shout.</td></tr>
 <tr><td>Shieldwall (charges)</td><td>The next N attacks against this unit are BLOCKED
-(Warden talent ability).</td></tr>
+(Warden talent ability). The chip counts down the charges left ("SW3" → "SW1").</td></tr>
 <tr><td>High Guard</td><td>Takes 25% less damage (Swordmaster talent, after a parry).</td></tr>
-<tr><td>Elemental Weakness</td><td>Elemental (non-physical) resistances reduced (Warden's
-Crushing Blow talent).</td></tr>
+<tr><td>Elemental Weakness</td><td>Elemental (non-physical) resistances reduced by 5% per
+talent rank (Warden's Crushing Blow talent); the chip shows the reduction ("−15%").</td></tr>
+<tr><td>Enraged</td><td>+3%/rank damage per stack for 5 turns, stacking ×3 (Berserker
+talent, on dropping below half HP); the chip shows the live bonus.</td></tr>
+<tr><td>Unrelenting Assault</td><td>+10 Constitution per rank for 3 turns (Berserker
+talent, on dropping below 25% HP; at most once every 5 turns).</td></tr>
+<tr><td>Endurance</td><td>+3%/rank armor per turn without an external heal (Warden talent);
+the chip tracks the streak and clears when healed.</td></tr>
+<tr><td>Iron Will</td><td>+5%/rank damage per debuff on the Warden (talent); a permanent
+chip whose value follows the live debuff count.</td></tr>
+<tr><td>Crushing Blows</td><td>+3%/rank armor penetration per 20 total enemy-party
+bloodloss (Berserker talent); a permanent chip with the live value.</td></tr>
 <tr><td>Hold the Line</td><td>Takes 50% less Break damage (Warden capstone).</td></tr>
 <tr><td>Undying</td><td>Cannot drop below 1 HP (Warden capstone).</td></tr>
 <tr><td>Sunder</td><td>−35% armor.</td></tr>
@@ -341,7 +355,8 @@ Hack and Slash — 20 Rage, 3 strikes × 10 dmg / 10 BD / 3.0, 3cd, each hit 50%
 to build 25 Bleed (a full 4-strike flurry can bleed a target out), builds 10 Rage
 (Perfect: 4 strikes).<br>
 <i>Talent-granted:</i> Battle Shout — 15 Rage, 2.0, 3cd, +1% damage per 20 blood buildup on
-the enemy party for 2 turns (Perfect: +5 Rage). Rampage — 40 Rage, 3 × 20 physical +
+the enemy party for 2 turns (Perfect: +5 Rage); a self-buff — casts with no target
+selection, and its chip shows the % gained. Rampage — 40 Rage, 3 × 20 physical +
 3 × 10 bloodloss / 3 × 10 BD, 4.0, 5cd; if the target dies, Rampage immediately recasts
 (free) on another enemy and can chain.</li>
 <li><b>Warden (Tank)</b> — Passive <i>Heavy Plating</i>: 15% chance to Block, on top of the
@@ -352,8 +367,9 @@ Mocking Blow — free, 20 dmg / 15 BD / 2.0, 2cd, taunts the target AND one othe
 Crushing Blow (moved from the Swordmaster) — 20 Rage, 32 dmg / 20 BD / 3.0, 3cd, Sunders
 (−35% armor, 3 turns), builds 10 Rage (Perfect: +5 bonus BD).<br>
 <i>Talent-granted:</i> Shieldwall — 25 Rage, 2.0, 3cd, Blocks the next 3 attacks (Perfect:
-5). Hold the Line — 30 Rage, 3.5, 7cd, the party takes 50% less Break damage for 2 turns and
-cannot die for a turn (Perfect: refunds 5 Rage).</li>
+5); a self-buff cast with no target selection whose chip counts the charges left. Hold the
+Line — 30 Rage, 3.5, 7cd, the party takes 50% less Break damage for 2 turns and
+cannot die for a turn (Perfect: refunds 5 Rage); also self-cast, no target selection.</li>
 <li><b>Swordmaster (Bruiser)</b> — Passive <i>Seasoned Fighter</i>: a stance switch — +15%
 damage dealt while above half HP; takes 15% less damage at or below half HP (both sides
 deepen via stance talents). The spec chip shows which side is live.<br>
@@ -481,8 +497,8 @@ Unstoppable (Blood Frenzy +0.5%/rank per step ×3), Enraged (below-50%-HP trigge
 damage buff, 5 turns, stacks ×3). Row 2 — Crushing Blows (3%/rank armor penetration per 20
 enemy-party bleed ×3), Savagery (+5 Bleed/rank on bleed abilities ×3, needs Unstoppable 1),
 Battle Shout (grants the ability), Reckless Fury (+5%/rank damage dealt AND taken ×3, needs
-Unstoppable 1), Unrelenting Assault (below-25%-HP trigger: +10 Constitution/rank, once per 5
-turns ×3). Row 3 — Hemorrhage (enemies at 80/70/60 bloodloss are Crippled ×3 — the threshold
+Unstoppable 1), Unrelenting Assault (below-25%-HP trigger: +10 Constitution/rank for 3
+turns, once per 5 turns ×3). Row 3 — Hemorrhage (enemies at 80/70/60 bloodloss are Crippled ×3 — the threshold
 drops 10 per point), Bloodlust (Hack and Slash strikes an extra time), Vitality (+5% max
 HP/rank ×3). Capstone — Rampage (grants the ability).</p>
 <p><b>Swordmaster tree:</b> Row 1 — Defensive Stance (Seasoned under-half reduction
@@ -502,8 +518,14 @@ mechanic</i>: +5 max HP per prevented debuff), Shieldwall (grants the ability), 
 (<i>PENDING Hardiness</i>: party +15% healing received per prevented debuff), Iron Will
 (+5%/rank damage per debuff on the Warden ×3). Row 3 — Richocet (5%/rank chance to Stun the
 attacker on Block ×3), Endurance (+3%/rank armor per turn without an external heal, resets
-when healed ×3), Sundering (Crushing Blow splashes 25%/rank of its BD to other enemies ×3).
-Capstone — Hold the Line (grants the ability).</p>
+when healed ×3), Sundering (Crushing Blow splashes 25%/rank of its BD to the enemies
+<b>Adjacent</b> to the target ×3). Capstone — Hold the Line (grants the ability).</p>
+<p><b>Talent visibility:</b> every talent proc is written to the combat log with a
+"Talent:" tag (Enraged, Unrelenting Assault, Endurance, Unkillable, Richocet, Tank and
+Spank, Dominant Presence, Sundering, Riposte...), and stateful talent buffs display as
+status chips with live counters — Enraged / Iron Will / Crushing Blows / Battle Shout show
+their current % bonus, Endurance its armor streak, Shieldwall its remaining charges,
+Elemental Weakness the resist reduction, Unrelenting Assault its borrowed Constitution.</p>
 
 <h2>8. Economy</h2>
 <ul>
@@ -642,11 +664,16 @@ titled by their SPEC name</b> ("Berserker", not "Warrior"); the class name only 
 unawakened — the same rule applies to battle nameplates, the initiative bar, and the combat
 log. Detail page per hero: stats — <b>each stat is its own hover tooltip explaining just
 that stat</b> (talent points are NOT listed here; the count sits above the talent tree;
-pure tanks additionally show their <b>Block %</b>) — the class passive + spec passive
+pure tanks additionally show their <b>Block %</b>). Stats mirror the battle spawn math:
+Constitution uses the spec's value plus Toughness, and the spec passive line bakes in
+talent ranks (Aggressive/Defensive Stance, Unstoppable) — the class passive + spec passive
 lines, ability chips (hover for numbers), rune equip toggles (2 max), and the spec's talent
 tree: a 12-node grid with prerequisite connector lines and click-to-learn nodes (lock
 reasons on the node tooltips) for Berserker / Swordmaster / Warden, or <b>"Coming soon."</b>
 for specs whose trees aren't designed yet.</li>
+<li><b>Draft &amp; awakening screens:</b> every class card at the draft shows its CLASS
+PASSIVE under the name, and the awakening (spec choice) screen repeats it in a "Class
+Passive" line under the title — it rides along on every path the class can take.</li>
 <li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per party member;
 reached via the 6 shop nodes on every zone map.</li>
 <li><b>Relics screen:</b> collection viewer from the main menu.</li>
@@ -668,15 +695,21 @@ user://relics.json, user://settings.cfg.</li>
 DOD_SIM_SPECS="berserker,cryomancer,inquisitor,beastmaster" (override the specs the bot
 plays — order: warrior, mage, cleric, hunter),
 DOD_SIM_ENEMIES="boss,shieldmaster,shaman" (force the enemy lineup in autoplay/sim/standalone
-battles). Target ≈85% bot win rate.</li>
+battles), DOD_SIM_TALENTS="bz_bloodcraze:3,wd_toughness:2" (force-learn talents on bot
+heroes whose spec tree holds the id). Autoplay debug runs echo every combat-log line to
+stdout as "[LOG] ..." so headless tests can grep them. Target ≈85% bot win rate.</li>
 <li><b>Testing shortcuts:</b> debug tools are ALWAYS available in dev (unexported) builds;
 exported builds require DOD_DEBUG=1. The map burger menu gains a DEBUG section — +200 gold, +3 talent points for everyone, full heal, jump to the boss tier,
 advance to the next zone, and <b>Reroll Specs</b> (refunds spent talent points, clears all
 specs, and reopens the awakening screen). In battle, a <b>DEBUG ▾ menu</b> (bottom-right)
-offers: Full Restore (HP/resources/secondary for the party), an <b>Enemy attacks OFF</b>
-toggle (enemies skip their turns while checked), and a <b>turn lock</b> — pick a hero and
-EVERY turn is theirs until you unlock (re-select them) or lock a different hero; built for
-testing one hero's kit across many consecutive turns. The battle scene also runs standalone
+offers: Full Restore (HP/resources/secondary for the party), <b>Reset cooldowns</b> (wipes
+every unit's ability and talent internal cooldowns and refreshes the open action bar), an
+<b>Enemy attacks OFF</b> toggle (enemies skip their turns while checked), and a <b>turn
+lock</b> — pick a hero and every HERO turn is theirs until you unlock (re-select them) or
+lock a different hero, while <b>enemies keep attacking on their own turns</b> (combine with
+Enemy attacks OFF to silence them); built for testing one hero's kit under fire. The
+displaced heroes' clocks advance as if they had acted, so the initiative timeline keeps
+flowing. The battle scene also runs standalone
 (<code>godot res://scenes/battle.tscn</code>) with a default party and no run state.</li>
 <li><b>Sprites:</b> horizontal frame strips named Name_Idle/Walk/Attack01–03/Hurt/Death.png
 (square frames; the stock sheets are 100×100, but units accept any frame size via the

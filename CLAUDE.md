@@ -26,11 +26,15 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - Parse: run each scene headless with `--quit-after 90`, grep "SCRIPT ERROR".
 - New `class_name` files need `--headless --import` before they resolve.
 - Balance: `DOD_SIM=50 <godot> --headless --path . res://scenes/battle.tscn`
-  prints a report (target ~85% wins). `DOD_AUTOPLAY=1` = 1 debug battle.
+  prints a report (target ~85% wins). `DOD_AUTOPLAY=1` = 1 debug battle
+  (echoes every combat-log line as "[LOG] ..." — grep it in headless tests;
+  NOTE: the end screen waits for input, so headless autoplay runs never exit
+  on their own — run with a timeout/kill or they pile up as zombies).
   `DOD_SIM_SPECS="berserker,cryomancer,inquisitor,beastmaster"` picks the bot's
   specs (warrior,mage,cleric,hunter order). `DOD_SIM_ENEMIES="boss,shaman,..."`
-  forces the enemy lineup in test battles. `DOD_DEBUG=1` adds map-burger debug
-  items (gold/points/heal/jump-to-boss/next-zone) for late-game testing.
+  forces the enemy lineup in test battles. `DOD_SIM_TALENTS="bz_bloodcraze:3"`
+  force-learns talents on bot heroes whose spec tree has the id. `DOD_DEBUG=1`
+  adds map-burger debug items (gold/points/heal/jump-to-boss/next-zone).
 - GDScript gotchas that bit us: multiline lambdas in call args (use named
   methods), ternaries need parens for type inference, `:=` can't infer from
   untyped funcs, edits via python heredocs (apostrophes!) — use chr(39).
@@ -81,9 +85,18 @@ Attack" = parry-answer basic; Riposte talent grants it); BLOCK = full
 negation (block_chance stat: Warden 5% + Heavy Plating 15%, Shieldmaster
 5%; Shieldwall charges guarantee); COOLDOWNS on all abilities (unit.
 cooldowns, ability_ready; enemies + bot respect them); Armor Pen keyword;
-Buff/Debuff keyword (DEBUFF_IDS in battle.gd). CLASS PASSIVES (all specs):
-Warrior targeted 1.2x, Cleric +15% heals received, Hunter acts first, Mage
-+10 mana/turn. Mocking Blow taunt; ability hotkeys by MENU slot; Tab/Space/
+Buff/Debuff keyword (DEBUFF_IDS in unit.gd); ADJACENT keyword = nearest
+living enemy each side of the target in formation order (_adjacent_enemies;
+Sundering splashes only there). TALENT VISIBILITY (07-16): procs log as
+"Talent: ..." lines (log_proc hook on units for unit-side procs); stateful
+talent buffs are chips w/ live counters (Enraged/Unrelenting 3-turn con/
+Endurance/Iron Will/Crushing Blows/Battle Shout/Shieldwall SW#/Elemental
+Weakness -x%) via unit.update_status + battle._update_talent_chips; buff
+casts (shield_block/hold_the_line/battle_shout) are self-cast, no target.
+CLASS PASSIVES (all specs): Warrior targeted 1.2x, Cleric +15% heals
+received, Hunter acts first, Mage +10 mana/turn — shown on draft cards,
+the awakening screen, and the party sheet (sheet stats mirror battle math:
+spec constitution + Toughness, stance-aware passive text). Mocking Blow taunt; ability hotkeys by MENU slot; Tab/Space/
 X/Alt controls; Space continues victory screens. TALENT TREES ARE FIXED-
 ONLY (berserker/swordmaster/warden 12-node grids, row gating 5/10/15 +
 prereqs, talents.gd; others "coming soon"; Hardiness mechanic PENDING for
@@ -96,7 +109,8 @@ arrow; hover/Tab lights plates; plain style until UI assets arrive); parties
 grouped tight; combat log hideable (– button). SPECCED HEROES DISPLAY THEIR
 SPEC NAME everywhere (unit_name = spec; logic keys on unit.hero_key — never
 match display names!). Battle DEBUG ▾ menu (bottom-right): Full Restore,
-Enemy attacks OFF, per-hero turn LOCK (every turn theirs until unlocked).
+Reset cooldowns, Enemy attacks OFF, per-hero turn LOCK (every HERO turn
+theirs — enemies still act; displaced heroes' clocks tick as if they acted).
 Renewal is Holy-only (15 HP/turn). Cleric core has Resurrection (40 Faith,
 revive 20% hp/resource, targets the fallen); Devout has Divine Wrath
 ("wrath" status +15% dmg/speed); Occultist: Shadowrend basic (via

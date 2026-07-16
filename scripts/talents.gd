@@ -48,7 +48,7 @@ const FIXED_TREES := {
 			"payload": {"stat": {"dmg_bonus": 0.05, "dmg_taken_bonus": 0.05}}},
 		{"id": "bz_unrelenting", "name": "Unrelenting Assault", "ranks": 3, "row": 1, "col": 4,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Dropping below 25% health grants +10 Constitution per rank (at most once every 5 turns).",
+			"desc": "Dropping below 25% health grants +10 Constitution per rank for 3 turns (at most once every 5 turns).",
 			"payload": {"stat": {"unrelenting_ranks": 1}}},
 		# --- row 2 ---
 		{"id": "bz_hemorrhage", "name": "Hemorrhage", "ranks": 3, "row": 2, "col": 1,
@@ -186,7 +186,7 @@ const FIXED_TREES := {
 			"payload": {"stat": {"endurance_ranks": 1}}},
 		{"id": "wd_sundering", "name": "Sundering", "ranks": 3, "row": 2, "col": 3,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Crushing Blow deals 25% per rank of its Break damage to all other enemies.",
+			"desc": "Crushing Blow deals 25% per rank of its Break damage to enemies Adjacent to the target (the living enemy on each side of it).",
 			"payload": {"stat": {"sundering_ranks": 1}}},
 		# --- row 3 (capstone) ---
 		{"id": "wd_hold_line", "name": "Hold the Line", "ranks": 1, "row": 3, "col": 2,

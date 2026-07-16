@@ -97,6 +97,21 @@ func _select_hero(idx: int) -> void:
 	_draw_screen()
 
 
+# Spec passive text with talent-modified numbers baked in, so the sheet
+# reflects Aggressive/Defensive Stance and Unstoppable ranks.
+func _passive_desc_live(cfg: Dictionary, spec: String) -> String:
+	var desc: String = Classes.SPEC_INFO[spec]["passive_desc"]
+	match Classes.SPEC_INFO[spec]["passive"]:
+		"seasoned":
+			desc = "Seasoned Fighter: +%d%% damage above half HP;\ntakes %d%% less damage at or below half HP." % [
+				int(round((0.15 + float(cfg.get("seasoned_off_bonus", 0.0))) * 100)),
+				int(round((0.15 + float(cfg.get("seasoned_def_bonus", 0.0))) * 100))]
+		"bloodrage":
+			desc = "Blood Frenzy: +%s%% damage for every 5%% of health missing." % \
+				String.num(2.0 + float(cfg.get("bloodrage_step_bonus", 0.0)), 1)
+	return desc
+
+
 func _draw_detail() -> void:
 	var member: Dictionary = Run.party[selected]
 	var key: String = member["key"]
@@ -106,11 +121,19 @@ func _draw_detail() -> void:
 		cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
 		Classes.apply_kit_overrides(cfg, spec)
 		Classes.apply_passive(cfg, spec)
+		# Specced heroes use their spec's Constitution (mirrors battle spawn).
+		cfg["constitution"] = Classes.SPEC_INFO[spec].get("constitution",
+			cfg.get("constitution", 100))
 		Talents.apply_from_tree(cfg, member.get("tree", []), member.get("talents", {}))
 	for rune in member.get("runes", []):
 		if rune.get("equipped", false):
 			Talents.apply_payload(cfg, rune["payload"], 1)
 	cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
+	# Toughness (Warden talent): Constitution grows with bulk — same order as
+	# battle spawn (after every max-HP bonus has landed).
+	if cfg.get("toughness_ranks", 0) > 0:
+		cfg["constitution"] = int(cfg.get("constitution", 100)
+			+ 0.05 * cfg["toughness_ranks"] * cfg["max_hp"])
 	var spec_label: String = Classes.SPEC_INFO[spec]["name"] if spec != "" else "Unawakened"
 	# Awakened heroes are titled by spec; the class name only shows pre-spec.
 	_title(spec_label if spec != "" else "%s — Unawakened" % cfg["unit_name"], 20, 34)
@@ -171,7 +194,7 @@ func _draw_detail() -> void:
 	var passive_lines := PackedStringArray(
 		["Class: %s — %s" % [class_p["name"], class_p["desc"]]])
 	if spec != "":
-		passive_lines.append("Passive: %s" % Classes.SPEC_INFO[spec]["passive_desc"])
+		passive_lines.append("Passive: %s" % _passive_desc_live(cfg, spec))
 	var passive_label := Label.new()
 	passive_label.text = "\n".join(passive_lines)
 	passive_label.add_theme_font_size_override("font_size", 13)

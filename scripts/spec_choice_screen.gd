@@ -53,6 +53,18 @@ func _draw_screen() -> void:
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(subtitle)
 
+	# The class passive rides along on every path this class can take.
+	var class_p: Dictionary = Classes.CLASS_PASSIVES[member["key"]]
+	var passive_line := Label.new()
+	passive_line.text = "Class Passive — %s: %s" % [class_p["name"],
+		class_p["desc"].replace("\n", " ")]
+	passive_line.add_theme_font_size_override("font_size", 14)
+	passive_line.add_theme_color_override("font_color", Color(0.82, 0.74, 0.55))
+	passive_line.position = Vector2(0, 110)
+	passive_line.size = Vector2(1280, 20)
+	passive_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	add_child(passive_line)
+
 	var back := Button.new()
 	back.text = "< Back to Draft"
 	back.custom_minimum_size = Vector2(150, 42)
