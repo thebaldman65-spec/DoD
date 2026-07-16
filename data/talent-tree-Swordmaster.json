@@ -1,14 +1,14 @@
 {
   "Skills": [
     {
-      "Skill Name": "Savagery ",
-      "Skill Position": "(9,5)",
+      "Skill Name": "Defensive Stance",
+      "Skill Position": "(8,7)",
       "Skill Position Exact": {
-        "x": 1018,
-        "y": 615
+        "x": 990,
+        "y": 810
       },
       "Skill Level": 1,
-      "Skill Description": "Increases the bleed build up of all Berserker abilities by 2.",
+      "Skill Description": "Seasoned Fighter reduces damage taken while under 50% health by an additional 3%",
       "Skill Max Points": 3,
       "Skill Current Points": 0,
       "Skill Image": "/axe-hammer-grey.png",
@@ -17,126 +17,177 @@
       "Skill Resources": []
     },
     {
-      "Skill Name": "Bloodthirsty ",
-      "Skill Position": "(10,5)",
-      "Skill Position Exact": {
-        "x": 1138,
-        "y": 615
-      },
-      "Skill Level": 1,
-      "Skill Description": "Increase the additional damage given by Blood Frenzy by 3%.",
-      "Skill Max Points": 3,
-      "Skill Current Points": 0,
-      "Skill Image": "/axe-hammer-grey.png",
-      "Skill Dependencies": [],
-      "Skill Prerequisite": "-",
-      "Skill Resources": []
-    },
-    {
-      "Skill Name": "Vitality",
-      "Skill Position": "(11,5)",
-      "Skill Position Exact": {
-        "x": 1258,
-        "y": 615
-      },
-      "Skill Level": 1,
-      "Skill Description": "Increases the Berserker's health by 5%.",
-      "Skill Max Points": 3,
-      "Skill Current Points": 0,
-      "Skill Image": "/axe-hammer-grey.png",
-      "Skill Dependencies": [],
-      "Skill Prerequisite": "-",
-      "Skill Resources": []
-    },
-    {
-      "Skill Name": "Bloodlust",
-      "Skill Position": "(9,7)",
-      "Skill Position Exact": {
-        "x": 1018,
-        "y": 855
-      },
-      "Skill Level": 1,
-      "Skill Description": "Hack and Slash strikes an extra time.",
-      "Skill Max Points": 1,
-      "Skill Current Points": 0,
-      "Skill Image": "/axe-hammer-grey.png",
-      "Skill Dependencies": [],
-      "Skill Prerequisite": "-",
-      "Skill Resources": []
-    },
-    {
-      "Skill Name": "Rampage",
-      "Skill Position": "(10,6)",
-      "Skill Position Exact": {
-        "x": 1138,
-        "y": 735
-      },
-      "Skill Level": 1,
-      "Skill Description": "Grants the ability \"Rampage\". Rampage increases the Berserkers damage by 1% for every 10 points of blood build up on the enemy party. Lasts 1 turn.",
-      "Skill Max Points": 1,
-      "Skill Current Points": 0,
-      "Skill Image": "/axe-hammer-grey.png",
-      "Skill Dependencies": [],
-      "Skill Prerequisite": "-",
-      "Skill Resources": []
-    },
-    {
-      "Skill Name": "Reckless Fury",
-      "Skill Position": "(11,6)",
-      "Skill Position Exact": {
-        "x": 1258,
-        "y": 735
-      },
-      "Skill Level": 1,
-      "Skill Description": "Increase all damage taken, increase all damage felt by 5%",
-      "Skill Max Points": 3,
-      "Skill Current Points": 0,
-      "Skill Image": "/axe-hammer-grey.png",
-      "Skill Dependencies": [],
-      "Skill Prerequisite": "-",
-      "Skill Resources": []
-    },
-    {
-      "Skill Name": "Enraged",
-      "Skill Position": "(11,7)",
-      "Skill Position Exact": {
-        "x": 1258,
-        "y": 855
-      },
-      "Skill Level": 1,
-      "Skill Description": "Every time Berserker receives damage, he gains 1% more damage. Resets after 2 rounds of not receiving damage.",
-      "Skill Max Points": 3,
-      "Skill Current Points": 0,
-      "Skill Image": "/axe-hammer-grey.png",
-      "Skill Dependencies": [],
-      "Skill Prerequisite": "-",
-      "Skill Resources": []
-    },
-    {
-      "Skill Name": "Crushing Force",
-      "Skill Position": "(9,6)",
-      "Skill Position Exact": {
-        "x": 1018,
-        "y": 735
-      },
-      "Skill Level": 1,
-      "Skill Description": "Attacks by Berserker ignore 5% of the targets armor",
-      "Skill Max Points": 3,
-      "Skill Current Points": 0,
-      "Skill Image": "/axe-hammer-grey.png",
-      "Skill Dependencies": [],
-      "Skill Prerequisite": "-",
-      "Skill Resources": []
-    },
-    {
-      "Skill Name": "Bloodcraze",
+      "Skill Name": "Aggressive Stance",
       "Skill Position": "(10,7)",
       "Skill Position Exact": {
-        "x": 1138,
-        "y": 855
+        "x": 1230,
+        "y": 810
       },
       "Skill Level": 1,
-      "Skill Description": "When an enemy bleeds out, Berserker heals for 30hp.",
+      "Skill Description": "Seasoned Fighter increases damage dealt above 50% health by an additional 3%",
+      "Skill Max Points": 3,
+      "Skill Current Points": 0,
+      "Skill Image": "/axe-hammer-grey.png",
+      "Skill Dependencies": [],
+      "Skill Prerequisite": "-",
+      "Skill Resources": []
+    },
+    {
+      "Skill Name": "Swordsmanship",
+      "Skill Position": "(9,7)",
+      "Skill Position Exact": {
+        "x": 1110,
+        "y": 810
+      },
+      "Skill Level": 1,
+      "Skill Description": "Increase the parry chance received by a perfect Pommel Strike by 5%",
+      "Skill Max Points": 3,
+      "Skill Current Points": 0,
+      "Skill Image": "/axe-hammer-grey.png",
+      "Skill Dependencies": [
+        "High Guard",
+        "Riposte "
+      ],
+      "Skill Prerequisite": "-",
+      "Skill Resources": []
+    },
+    {
+      "Skill Name": "Sword Mastery",
+      "Skill Position": "(10,9)",
+      "Skill Position Exact": {
+        "x": 1230,
+        "y": 1050
+      },
+      "Skill Level": 1,
+      "Skill Description": "Increase chance to parry by 3%",
+      "Skill Max Points": 3,
+      "Skill Current Points": 0,
+      "Skill Image": "/axe-hammer-grey.png",
+      "Skill Dependencies": [],
+      "Skill Prerequisite": "-",
+      "Skill Resources": []
+    },
+    {
+      "Skill Name": "Lunge",
+      "Skill Position": "(9,8)",
+      "Skill Position Exact": {
+        "x": 1110,
+        "y": 930
+      },
+      "Skill Level": 1,
+      "Skill Description": "Gain new ability: \"Lunge\" Deal moderate damage and expose the target. While above 50% health, applies Exposed. While below 50% health, applies Cripple.",
+      "Skill Max Points": 1,
+      "Skill Current Points": 0,
+      "Skill Image": "/axe-hammer-grey.png",
+      "Skill Dependencies": [],
+      "Skill Prerequisite": "-",
+      "Skill Resources": []
+    },
+    {
+      "Skill Name": "Precision Strikes",
+      "Skill Position": "(11,8)",
+      "Skill Position Exact": {
+        "x": 1350,
+        "y": 930
+      },
+      "Skill Level": 1,
+      "Skill Description": "Increases critical strike chance against dazed, crippled, and exposed targets by 5%",
+      "Skill Max Points": 3,
+      "Skill Current Points": 0,
+      "Skill Image": "/axe-hammer-grey.png",
+      "Skill Dependencies": [],
+      "Skill Prerequisite": "-",
+      "Skill Resources": []
+    },
+    {
+      "Skill Name": "Opportunist",
+      "Skill Position": "(9,9)",
+      "Skill Position Exact": {
+        "x": 1110,
+        "y": 1050
+      },
+      "Skill Level": 1,
+      "Skill Description": "Counter attack enemy misses by casting Overpower.",
+      "Skill Max Points": 1,
+      "Skill Current Points": 0,
+      "Skill Image": "/axe-hammer-grey.png",
+      "Skill Dependencies": [],
+      "Skill Prerequisite": "-",
+      "Skill Resources": []
+    },
+    {
+      "Skill Name": "Seasoned Fighter",
+      "Skill Position": "(8,9)",
+      "Skill Position Exact": {
+        "x": 990,
+        "y": 1050
+      },
+      "Skill Level": 1,
+      "Skill Description": "Increase the critical strike chance of Lunge and Overpower by 3%",
+      "Skill Max Points": 3,
+      "Skill Current Points": 0,
+      "Skill Image": "/axe-hammer-grey.png",
+      "Skill Dependencies": [],
+      "Skill Prerequisite": "-",
+      "Skill Resources": []
+    },
+    {
+      "Skill Name": "High Guard",
+      "Skill Position": "(8,8)",
+      "Skill Position Exact": {
+        "x": 990,
+        "y": 930
+      },
+      "Skill Level": 1,
+      "Skill Description": "Take 25% less damage for 1 turn after parrying an attack.",
+      "Skill Max Points": 1,
+      "Skill Current Points": 0,
+      "Skill Image": "/axe-hammer-grey.png",
+      "Skill Dependencies": [],
+      "Skill Prerequisite": "Swordsmanship (1)",
+      "Skill Resources": []
+    },
+    {
+      "Skill Name": "Riposte ",
+      "Skill Position": "(10,8)",
+      "Skill Position Exact": {
+        "x": 1230,
+        "y": 930
+      },
+      "Skill Level": 1,
+      "Skill Description": "Immediately counter attack with a Strike after parrying.",
+      "Skill Max Points": 1,
+      "Skill Current Points": 0,
+      "Skill Image": "/axe-hammer-grey.png",
+      "Skill Dependencies": [],
+      "Skill Prerequisite": "Swordsmanship (1)",
+      "Skill Resources": []
+    },
+    {
+      "Skill Name": "Dominant Presence",
+      "Skill Position": "(7,8)",
+      "Skill Position Exact": {
+        "x": 870,
+        "y": 930
+      },
+      "Skill Level": 1,
+      "Skill Description": "Armor value increased by 5% for every debuff you apply.",
+      "Skill Max Points": 3,
+      "Skill Current Points": 0,
+      "Skill Image": "/axe-hammer-grey.png",
+      "Skill Dependencies": [],
+      "Skill Prerequisite": "-",
+      "Skill Resources": []
+    },
+    {
+      "Skill Name": "Execute",
+      "Skill Position": "(9,10)",
+      "Skill Position Exact": {
+        "x": 1110,
+        "y": 1170
+      },
+      "Skill Level": 1,
+      "Skill Description": "Gain new ability: \"Execute\" Deal heavy damage to a target, with a perfect guaranteeing a critical strike. Only usable against targets below 20% health",
       "Skill Max Points": 1,
       "Skill Current Points": 0,
       "Skill Image": "/axe-hammer-grey.png",
@@ -191,12 +242,12 @@
     "skills": [
       {
         "id": 9,
-        "x": 1018,
-        "y": 615,
-        "name": "Savagery ",
+        "x": 990,
+        "y": 810,
+        "name": "Defensive Stance",
         "showActions": false,
         "showTooltip": false,
-        "description": "Increases the bleed build up of all Berserker abilities by 2.",
+        "description": "Seasoned Fighter reduces damage taken while under 50% health by an additional 3%",
         "maxPoints": 3,
         "currentPoints": 0,
         "requiredPoints": 0,
@@ -212,12 +263,12 @@
       },
       {
         "id": 10,
-        "x": 1138,
-        "y": 615,
-        "name": "Bloodthirsty ",
+        "x": 1230,
+        "y": 810,
+        "name": "Aggressive Stance",
         "showActions": false,
         "showTooltip": false,
-        "description": "Increase the additional damage given by Blood Frenzy by 3%.",
+        "description": "Seasoned Fighter increases damage dealt above 50% health by an additional 3%",
         "maxPoints": 3,
         "currentPoints": 0,
         "requiredPoints": 0,
@@ -233,12 +284,12 @@
       },
       {
         "id": 11,
-        "x": 1258,
-        "y": 615,
-        "name": "Vitality",
+        "x": 1110,
+        "y": 810,
+        "name": "Swordsmanship",
         "showActions": false,
         "showTooltip": false,
-        "description": "Increases the Berserker's health by 5%.",
+        "description": "Increase the parry chance received by a perfect Pommel Strike by 5%",
         "maxPoints": 3,
         "currentPoints": 0,
         "requiredPoints": 0,
@@ -254,54 +305,12 @@
       },
       {
         "id": 12,
-        "x": 1018,
-        "y": 855,
-        "name": "Bloodlust",
+        "x": 1230,
+        "y": 1050,
+        "name": "Sword Mastery",
         "showActions": false,
         "showTooltip": false,
-        "description": "Hack and Slash strikes an extra time.",
-        "maxPoints": 1,
-        "currentPoints": 0,
-        "requiredPoints": 0,
-        "image": "/img/skill/axe-hammer-grey.png",
-        "shouldAnimate": true,
-        "resources": [],
-        "size": 60,
-        "borderType": "solid",
-        "shape": "square",
-        "cost": 1,
-        "prerequisiteModeOverride": "global",
-        "exclusiveSkillIds": []
-      },
-      {
-        "id": 13,
-        "x": 1138,
-        "y": 735,
-        "name": "Rampage",
-        "showActions": false,
-        "showTooltip": false,
-        "description": "Grants the ability \"Rampage\". Rampage increases the Berserkers damage by 1% for every 10 points of blood build up on the enemy party. Lasts 1 turn.",
-        "maxPoints": 1,
-        "currentPoints": 0,
-        "requiredPoints": 0,
-        "image": "/img/skill/axe-hammer-grey.png",
-        "shouldAnimate": true,
-        "resources": [],
-        "size": 60,
-        "borderType": "solid",
-        "shape": "square",
-        "cost": 1,
-        "prerequisiteModeOverride": "global",
-        "exclusiveSkillIds": []
-      },
-      {
-        "id": 14,
-        "x": 1258,
-        "y": 735,
-        "name": "Reckless Fury",
-        "showActions": false,
-        "showTooltip": false,
-        "description": "Increase all damage taken, increase all damage felt by 5%",
+        "description": "Increase chance to parry by 3%",
         "maxPoints": 3,
         "currentPoints": 0,
         "requiredPoints": 0,
@@ -317,13 +326,13 @@
       },
       {
         "id": 15,
-        "x": 1258,
-        "y": 855,
-        "name": "Enraged",
+        "x": 1110,
+        "y": 930,
+        "name": "Lunge",
         "showActions": false,
         "showTooltip": false,
-        "description": "Every time Berserker receives damage, he gains 1% more damage. Resets after 2 rounds of not receiving damage.",
-        "maxPoints": 3,
+        "description": "Gain new ability: \"Lunge\" Deal moderate damage and expose the target. While above 50% health, applies Exposed. While below 50% health, applies Cripple.",
+        "maxPoints": 1,
         "currentPoints": 0,
         "requiredPoints": 0,
         "image": "/img/skill/axe-hammer-grey.png",
@@ -338,12 +347,12 @@
       },
       {
         "id": 16,
-        "x": 1018,
-        "y": 735,
-        "name": "Crushing Force",
+        "x": 1350,
+        "y": 930,
+        "name": "Precision Strikes",
         "showActions": false,
         "showTooltip": false,
-        "description": "Attacks by Berserker ignore 5% of the targets armor",
+        "description": "Increases critical strike chance against dazed, crippled, and exposed targets by 5%",
         "maxPoints": 3,
         "currentPoints": 0,
         "requiredPoints": 0,
@@ -359,12 +368,121 @@
       },
       {
         "id": 17,
-        "x": 1138,
-        "y": 855,
-        "name": "Bloodcraze",
+        "x": 1110,
+        "y": 1050,
+        "name": "Opportunist",
         "showActions": false,
         "showTooltip": false,
-        "description": "When an enemy bleeds out, Berserker heals for 30hp.",
+        "description": "Counter attack enemy misses by casting Overpower.",
+        "maxPoints": 1,
+        "currentPoints": 0,
+        "requiredPoints": 0,
+        "image": "/img/skill/axe-hammer-grey.png",
+        "shouldAnimate": true,
+        "resources": [],
+        "size": 60,
+        "borderType": "solid",
+        "shape": "square",
+        "cost": 1,
+        "prerequisiteModeOverride": "global",
+        "exclusiveSkillIds": []
+      },
+      {
+        "id": 29,
+        "x": 990,
+        "y": 1050,
+        "name": "Seasoned Fighter",
+        "showActions": false,
+        "showTooltip": false,
+        "description": "Increase the critical strike chance of Lunge and Overpower by 3%",
+        "maxPoints": 3,
+        "currentPoints": 0,
+        "requiredPoints": 0,
+        "image": "/img/skill/axe-hammer-grey.png",
+        "shouldAnimate": true,
+        "resources": [],
+        "size": 60,
+        "borderType": "solid",
+        "shape": "square",
+        "cost": 1,
+        "prerequisiteModeOverride": "global",
+        "exclusiveSkillIds": []
+      },
+      {
+        "id": 32,
+        "name": "High Guard",
+        "description": "Take 25% less damage for 1 turn after parrying an attack.",
+        "x": 990,
+        "y": 930,
+        "showActions": false,
+        "showTooltip": false,
+        "maxPoints": 1,
+        "currentPoints": 0,
+        "requiredPoints": 0,
+        "image": "/img/skill/axe-hammer-grey.png",
+        "shouldAnimate": true,
+        "resources": [],
+        "size": 60,
+        "borderType": "solid",
+        "shape": "square",
+        "cost": 1,
+        "prerequisiteModeOverride": "global",
+        "exclusiveSkillIds": [
+          33
+        ]
+      },
+      {
+        "id": 33,
+        "name": "Riposte ",
+        "description": "Immediately counter attack with a Strike after parrying.",
+        "x": 1230,
+        "y": 930,
+        "showActions": false,
+        "showTooltip": false,
+        "maxPoints": 1,
+        "currentPoints": 0,
+        "requiredPoints": 0,
+        "image": "/img/skill/axe-hammer-grey.png",
+        "shouldAnimate": true,
+        "resources": [],
+        "size": 60,
+        "borderType": "solid",
+        "shape": "square",
+        "cost": 1,
+        "prerequisiteModeOverride": "global",
+        "exclusiveSkillIds": [
+          32
+        ]
+      },
+      {
+        "id": 38,
+        "x": 870,
+        "y": 930,
+        "name": "Dominant Presence",
+        "showActions": false,
+        "showTooltip": false,
+        "description": "Armor value increased by 5% for every debuff you apply.",
+        "maxPoints": 3,
+        "currentPoints": 0,
+        "requiredPoints": 0,
+        "image": "/img/skill/axe-hammer-grey.png",
+        "shouldAnimate": true,
+        "resources": [],
+        "size": 60,
+        "borderType": "solid",
+        "shape": "square",
+        "cost": 1,
+        "prerequisiteModeOverride": "global",
+        "exclusiveSkillIds": []
+      },
+      {
+        "id": 40,
+        "x": 1110,
+        "y": 1170,
+        "name": "Execute",
+        "showActions": false,
+        "showTooltip": false,
+        "description": "Gain new ability: \"Execute\" Deal heavy damage to a target, with a perfect guaranteeing a critical strike. Only usable against targets below 20% health",
         "maxPoints": 1,
         "currentPoints": 0,
         "requiredPoints": 0,
@@ -379,35 +497,62 @@
         "exclusiveSkillIds": []
       }
     ],
-    "connections": [],
+    "connections": [
+      {
+        "id": "11-32",
+        "from": 11,
+        "to": 32,
+        "hasControlPoint": false,
+        "controlPoint": {
+          "x": 1170,
+          "y": 900
+        },
+        "mutuallyExclusive": false,
+        "dotted": false,
+        "isHovered": false
+      },
+      {
+        "id": "11-33",
+        "from": 11,
+        "to": 33,
+        "hasControlPoint": false,
+        "controlPoint": {
+          "x": 1230,
+          "y": 900
+        },
+        "mutuallyExclusive": false,
+        "dotted": false,
+        "isHovered": false
+      }
+    ],
     "connectingFrom": null,
-    "skillIdCounter": 19,
+    "skillIdCounter": 46,
     "draggedSkill": null,
     "dragOffset": {
-      "x": -30.75,
-      "y": -22.625
+      "x": -33.5,
+      "y": -31
     },
     "draggedElement": {},
     "isDragging": false,
     "isLinking": false,
     "hoveredSkill": null,
     "defaultMaxPoints": 5,
-    "dragStartTime": 1783634877536,
+    "dragStartTime": 1784076671995,
     "dragStartPos": {
-      "x": 1227.25,
-      "y": 832.375
+      "x": 1076.5,
+      "y": 1139
     },
     "dragThreshold": 5,
     "showOptions": false,
     "panStart": {
-      "x": 830,
-      "y": 26
+      "x": 428,
+      "y": 677
     },
     "treePosition": {
-      "x": 28,
-      "y": 165
+      "x": 0,
+      "y": 0
     },
-    "scale": 0.7999999999999999,
+    "scale": 1,
     "minScale": 0.6,
     "maxScale": 2,
     "scaleStep": 0.1,
@@ -427,10 +572,10 @@
     "currentClassDescription": null,
     "inputText": "",
     "isLoading": false,
-    "historyIndex": 33,
+    "historyIndex": 49,
     "maxHistorySize": 50,
     "showImageSelector": false,
-    "selectedImage": "/axe-hammer-grey.png",
+    "selectedImage": null,
     "availableImages": [
       "/axe-hammer-grey.png",
       "/fire-orb.png",
@@ -459,13 +604,13 @@
     "maxPoints": 20,
     "selectionBox": null,
     "initialClick": {
-      "x": 968.5,
-      "y": 1097.375
+      "x": 1231.5,
+      "y": 1297
     },
     "showLoadModal": false,
     "initialPositions": null,
     "prerequisiteMode": "all",
-    "showGenerateControls": false,
+    "showGenerateControls": true,
     "lastPanTime": 0,
     "treeEl": {},
     "imageUrl": "",
@@ -567,8 +712,8 @@
       "logged_in": false
     },
     "showPatreonModal": false,
-    "patreonModalTitle": "Login Required Soon",
-    "patreonModalMessage": "Everyone who logs in with a free Patreon account before January 1st will get Builder Tier for free forever.<br> <br>Starting January 1st, I'll be charging $3 a month (the Builder Tier on Patreon) to host new trees (the share tree online button). All existing trees will continue to be hosted at no cost.<br> <br>You can still save, download, input/upload files locally like normal without an account. It's only new clicks of the share tree online button that you'll need a Builder Tier Patreon account.<br> <br> I've <a href='https://github.com/hdevx/Skill-Tree-Maker' target='_blank'>given the code away for free under MIT License</a>. Feel free to host your own tool with no accounts, contribute features, or use it locally.<br> ",
-    "patreonModalButtonText": "Login with Patreon"
+    "patreonModalTitle": "",
+    "patreonModalMessage": "",
+    "patreonModalButtonText": ""
   }
 }

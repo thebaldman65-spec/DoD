@@ -34,6 +34,7 @@ var status_chance := 1.0 # probability the status lands (1.0 = always)
 var perfect_id := ""     # unique bonus effect on a Perfect skill check
 var perfect_text := ""   # tooltip text for the perfect bonus
 var special := ""        # non-attack effect: rally, barrier, focus, surge, purge, renewal
+var cooldown := 0        # turns before this ability can be used again (0 = none)
 var description := ""
 
 

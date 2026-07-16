@@ -282,21 +282,25 @@ func load_run() -> bool:
 	if not (data is Dictionary):
 		return false
 	party = data["party"]
-	# Migrate members whose spec now uses a designed (fixed) tree but whose
-	# save still carries an old generated one: refund the points, swap trees.
+	# Migrate members whose saved tree predates the current fixed trees
+	# (row-gated): refund the points and swap in the current tree (or an
+	# empty "coming soon" one for specs without a designed tree yet).
 	for member in party:
 		var spec: String = member.get("spec", "")
-		if spec != "" and Talents.FIXED_TREES.has(spec):
-			var tree: Array = member.get("tree", [])
-			var is_fixed: bool = tree.any(func(t): return t.get("gate", "") == "cumulative")
-			if not is_fixed:
-				var learned: Dictionary = member.get("talents", {})
-				var refund := 0
-				for id in learned:
-					refund += int(learned[id])
-				member["talent_points"] = member.get("talent_points", 0) + refund
-				member["talents"] = {}
-				member["tree"] = Talents.generate_tree(spec, member["key"])
+		if spec == "":
+			continue
+		var tree: Array = member.get("tree", [])
+		var is_current: bool = (Talents.has_tree(spec)
+			and tree.any(func(t): return t.get("gate", "") == "row")) \
+			or (not Talents.has_tree(spec) and tree.is_empty())
+		if not is_current:
+			var learned: Dictionary = member.get("talents", {})
+			var refund := 0
+			for id in learned:
+				refund += int(learned[id])
+			member["talent_points"] = member.get("talent_points", 0) + refund
+			member["talents"] = {}
+			member["tree"] = Talents.generate_tree(spec, member["key"])
 	items = data["items"]
 	gold = data["gold"]
 	zone_idx = data["zone_idx"]

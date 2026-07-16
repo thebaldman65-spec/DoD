@@ -6,6 +6,19 @@ class_name Classes
 const HERO_TINTS := [Color.WHITE, Color(0.65, 0.75, 1.0), Color(1.0, 0.9, 0.6),
 	Color(0.7, 1.0, 0.75)]
 
+# Class passives: one per CLASS, active for every spec of that class (and
+# before awakening). Mechanics live in battle.gd, keyed by hero_key.
+const CLASS_PASSIVES := {
+	"warrior": {"name": "Threatening Presence",
+		"desc": "Enemies are 20% more likely to attack the Warrior."},
+	"cleric": {"name": "Holy Conduit",
+		"desc": "All healing the Cleric receives is increased by 15%."},
+	"hunter": {"name": "Tracker",
+		"desc": "Always attacks first in every fight."},
+	"mage": {"name": "Evocation",
+		"desc": "Regenerates an additional 10 Mana per turn."},
+}
+
 
 # Dedicated spec portrait art (shown untinted, original colors).
 const SPEC_PORTRAITS := {
@@ -95,7 +108,7 @@ static func mage_kit() -> Array:
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "mana", "perfect_text": "Restores 10 Mana",
 			"description": "Basic arcane projectile."}),
-		Ability.make({"display_name": "Mana Shield", "cost": 15, "special": "mana_shield",
+		Ability.make({"display_name": "Mana Shield", "cooldown": 4, "cost": 15, "special": "mana_shield",
 			"delay": 2.0, "anim": "attack03",
 			"perfect_id": "", "perfect_text": "Initiative cost 1.5 instead of 2",
 			"description": "Weave a shield of raw mana: 50% of\ndamage the Mage takes converts into\nMana (3 turns)."}),
@@ -120,11 +133,11 @@ static func cleric_kit() -> Array:
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 8 HP",
 			"description": "Basic radiant strike. Builds Faith."}),
-		Ability.make({"display_name": "Mend Wounds", "cost": 25, "heal": 45,
+		Ability.make({"display_name": "Mend Wounds", "cooldown": 2, "cost": 25, "heal": 45,
 			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 			"perfect_id": "ward", "perfect_text": "Grants Ward (-50% Pressure taken, 2 turns)",
 			"description": "Restore HP to one ally. Builds Faith."}),
-		Ability.make({"display_name": "Resurrection", "cost": 0, "faith_cost": 40,
+		Ability.make({"display_name": "Resurrection", "cooldown": 8, "cost": 0, "faith_cost": 40,
 			"special": "resurrection", "target": Ability.Target.ALLY,
 			"delay": 4.0, "anim": "attack03",
 			"perfect_id": "", "perfect_text": "",
@@ -177,18 +190,20 @@ const SPEC_IDS := {
 
 # Spec passives that are plain stat changes live here so both the battle
 # spawner and the character sheet apply them identically.
+# VAULTED — Bulwark (was the Warden passive): +10% armor, +30 Constitution.
 static func apply_passive(cfg: Dictionary, spec: String) -> void:
 	match SPEC_INFO[spec]["passive"]:
-		"bulwark":
-			cfg["armor"] += 0.10
-			cfg["constitution"] += 30
+		"heavy_plating":
+			# The pure tank's Block stat: 5% base; the passive adds another
+			# 15% chance inside the block roll (battle.gd).
+			cfg["block_chance"] = cfg.get("block_chance", 0.0) + 0.05
 
 const SPEC_INFO := {
 	"berserker": {"name": "Berserker", "constitution": 110, "archetype": "Ramp", "passive": "bloodrage",
-		"passive_desc": "Blood Frenzy: up to +40% damage as HP falls.",
+		"passive_desc": "Blood Frenzy: +2% damage for every 5% of health missing.",
 		"blurb": "Reckless savagery — grows stronger as their blood spills."},
-	"warden": {"name": "Warden", "constitution": 110, "archetype": "Tank", "passive": "bulwark",
-		"passive_desc": "Bulwark: +10% armor, +30 Constitution.",
+	"warden": {"name": "Warden", "constitution": 110, "archetype": "Tank", "passive": "heavy_plating",
+		"passive_desc": "Heavy Plating: 15% chance to Block an incoming attack\n(on top of the Warden's 5% base Block).",
 		"blurb": "Protector of the weak — shields allies with their own body."},
 	"swordmaster": {"name": "Swordmaster", "constitution": 120, "archetype": "Bruiser", "passive": "seasoned",
 		"passive_desc": "Seasoned Fighter: +15% damage above half HP;\ntakes 15% less damage at or below half HP.",
@@ -229,63 +244,66 @@ static func spec_abilities(spec: String) -> Array:
 			return [
 				Ability.make({"display_name": "Bloodlust", "cost": 25, "damage": 26,
 					"pressure": 18, "delay": 3.0, "anim": "attack02", "heal_missing": 0.3,
-					"resource_gain": 10,
+					"resource_gain": 10, "cooldown": 3,
 					"perfect_id": "", "perfect_text": "Heals 45% of missing HP instead",
 					"description": "Strike and drink deep: heals the Warrior\nfor 30% of their missing HP. Builds 10 Rage."}),
 				Ability.make({"display_name": "Wildstrikes", "cost": 35, "damage": 16,
 					"pressure": 14, "delay": 4.5, "anim": "attack03", "aoe": true,
-					"bleed_build": 35, "resource_gain": 10,
+					"bleed_build": 35, "resource_gain": 10, "cooldown": 4,
 					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
 					"description": "Savage sweep: hits ALL enemies and\nbuilds 35 Bleed on each. Builds 10 Rage."}),
 				Ability.make({"display_name": "Hack and Slash", "cost": 20, "damage": 10,
 					"pressure": 10, "delay": 3.0, "anim": "attack01", "multi_hits": 3,
-					"bleed_build": 25, "bleed_chance": 0.5, "resource_gain": 10,
+					"bleed_build": 25, "bleed_chance": 0.5, "resource_gain": 10, "cooldown": 3,
 					"perfect_id": "", "perfect_text": "4 strikes instead of 3",
 					"description": "Three savage cuts at one target; each\nhit has a 50% chance to build 25 Bleed —\na full flurry can bleed them out.\nBuilds 10 Rage."}),
 			]
 		"warden":
+			# VAULTED — Shieldwall v1 (party -25% damage, 2 turns) and
+			# Retaliation (counter stance): kept for future return.
 			return [
 				Ability.make({"display_name": "Mocking Blow", "cost": 0, "damage": 20, "pressure": 15,
-					"resource_gain": 20, "delay": 2.0, "anim": "attack01",
+					"resource_gain": 10, "delay": 2.0, "anim": "attack01", "cooldown": 2,
 					"perfect_id": "", "perfect_text": "Taunts last 5 turns",
-					"description": "Strike and humiliate: the target AND\none other enemy must attack the Warrior\nfor 4 turns. Builds 20 Rage."}),
-				Ability.make({"display_name": "Shieldwall", "cost": 25, "special": "shieldwall",
-					"delay": 3.0, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "Lasts 3 turns",
-					"description": "The party takes 25% less damage\nfor 2 turns."}),
-				Ability.make({"display_name": "Retaliation", "cost": 20, "special": "retaliate",
-					"delay": 3.0, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "Stance lasts 4 turns",
-					"description": "For 3 turns, counter every attack\nthat strikes the Warrior."}),
+					"description": "Strike and humiliate: the target AND\none other enemy must attack the Warrior\nfor 4 turns. Builds 10 Rage."}),
+				Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 32,
+					"pressure": 20, "delay": 3.0, "anim": "attack03", "resource_gain": 10,
+					"cooldown": 3,
+					"applies_status": {"id": "sunder", "turns": 3},
+					"perfect_id": "", "perfect_text": "+5 bonus BD",
+					"description": "Moderate damage. Sunders armor\n(-35%) for 3 turns. Builds 10 Rage."}),
 			]
 		"swordmaster":
 			return [
 				Ability.make({"display_name": "Overpower", "cost": 30, "damage": 15,
 					"pressure": 20, "delay": 2.5, "anim": "attack02", "resource_gain": 10,
+					"cooldown": 2,
 					"perfect_id": "rage5", "perfect_text": "+5 bonus Rage",
 					"description": "Exploits instability: +0.5 damage per\npoint of the target's Break meter.\nBuilds 10 Rage."}),
-				Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 32,
-					"pressure": 20, "delay": 3.0, "anim": "attack03", "resource_gain": 10,
-					"applies_status": {"id": "sunder", "turns": 3},
-					"perfect_id": "", "perfect_text": "+5 bonus BD",
-					"description": "Moderate damage. Sunders armor\n(-35%) for 3 turns. Builds 10 Rage."}),
 				Ability.make({"display_name": "Pommel Strike", "cost": 15, "damage": 25,
 					"pressure": 30, "delay": 2.0, "anim": "attack01", "resource_gain": 10,
+					"cooldown": 3,
 					"applies_status": {"id": "stunned", "turns": 1}, "status_chance": 0.5,
 					"perfect_id": "parry_up", "perfect_text": "+15% parry chance for 3 turns",
-					"description": "A skull-ringing bash: 50% chance to Stun\n(75% if the strike crits). Builds 10 Rage.\nBosses resist Stun until Broken."}),
+					"description": "A skull-ringing bash with a keen 25%\ncrit chance: 50% chance to Stun — a crit\nGUARANTEES it. Builds 10 Rage.\nBosses resist Stun until Broken."}),
+				Ability.make({"display_name": "Sweeping Strikes", "cost": 20, "damage": 15,
+					"pressure": 8, "delay": 3.0, "anim": "attack02", "multi_hits": 2,
+					"perfect_extra_hit": false, "resource_gain": 10,
+					"applies_status": {"id": "dazed", "turns": 3},
+					"perfect_id": "", "perfect_text": "+25% crit chance on the second swing",
+					"description": "Two broad cuts that leave the target\nDazed for 3 turns. Builds 10 Rage."}),
 			]
 		"pyromancer":
 			return [
-				Ability.make({"display_name": "Pyroblast", "dmg_type": "fire", "cost": 45,
+				Ability.make({"display_name": "Pyroblast", "cooldown": 5, "dmg_type": "fire", "cost": 45,
 					"damage": 55, "pressure": 20, "delay": 6.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Also sets the target Burning (3 turns)",
 					"description": "A slow, devastating comet of flame.\n+50% damage against Burning targets."}),
-				Ability.make({"display_name": "Flame Surge", "dmg_type": "fire", "cost": 20, "damage": 15,
+				Ability.make({"display_name": "Flame Surge", "cooldown": 3, "dmg_type": "fire", "cost": 20, "damage": 15,
 					"pressure": 10, "delay": 3.0, "anim": "attack02", "aoe": true,
 					"perfect_id": "", "perfect_text": "+15 damage to enemies already Burning",
 					"description": "Cone of fire rakes ALL enemies."}),
-				Ability.make({"display_name": "Phoenix Rebirth", "cost": 0, "special": "phoenix",
+				Ability.make({"display_name": "Phoenix Rebirth", "cooldown": 6, "cost": 0, "special": "phoenix",
 					"delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Only sacrifices 15% HP",
 					"description": "Sacrifice 25% of current HP: fully\nrestore Mana and gain Empower (3 turns)."}),
@@ -296,11 +314,11 @@ static func spec_abilities(spec: String) -> Array:
 					"pressure": 20, "delay": 3.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "+5% crit chance on this cast",
 					"description": "A spear of ice. 50% chance to deal\nDOUBLE damage against unchilled targets."}),
-				Ability.make({"display_name": "Razor Ice", "dmg_type": "frost", "cost": 20, "damage": 15,
+				Ability.make({"display_name": "Razor Ice", "cooldown": 2, "dmg_type": "frost", "cost": 20, "damage": 15,
 					"pressure": 14, "delay": 3.0, "anim": "attack02", "random_hits": 2,
 					"perfect_id": "", "perfect_text": "3 shards instead of 2",
 					"description": "Hurl razor shards at 2 random enemies.\nAlways crits against Chilled targets."}),
-				Ability.make({"display_name": "Blizzard", "dmg_type": "frost", "cost": 30, "damage": 15,
+				Ability.make({"display_name": "Blizzard", "cooldown": 4, "dmg_type": "frost", "cost": 30, "damage": 15,
 					"pressure": 12, "delay": 4.0, "anim": "attack03", "aoe": true,
 					"applies_status": {"id": "chilled", "turns": 2},
 					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
@@ -308,121 +326,121 @@ static func spec_abilities(spec: String) -> Array:
 			]
 		"arcanist":
 			return [
-				Ability.make({"display_name": "Arcane Cannon", "dmg_type": "arcane", "cost": 30, "damage": 30,
+				Ability.make({"display_name": "Arcane Cannon", "cooldown": 2, "dmg_type": "arcane", "cost": 30, "damage": 30,
 					"pressure": 15, "delay": 3.5, "anim": "attack02", "recoil_base": 0.15,
 					"perfect_id": "", "perfect_text": "+5 bonus BD",
 					"description": "Channel raw Resonance into a blast:\n+7.5% DAMAGE per Resonance stack.\nRecoil: the Mage takes 15% of the\ndamage dealt."}),
-				Ability.make({"display_name": "Death Ray", "dmg_type": "arcane", "cost": 0, "damage": 150,
+				Ability.make({"display_name": "Death Ray", "cooldown": 8, "dmg_type": "arcane", "cost": 0, "damage": 150,
 					"pressure": 100, "delay": 8.0, "anim": "attack03",
 					"perfect_id": "mana15", "perfect_text": "Restores 15 Mana",
 					"description": "The stored storm, released: requires\n5 Arcane Resonance and CONSUMES all of\nit. Fixed 150 damage payoff."}),
-				Ability.make({"display_name": "Arcane Barrage", "dmg_type": "arcane", "cost": 25, "damage": 5,
+				Ability.make({"display_name": "Arcane Barrage", "cooldown": 3, "dmg_type": "arcane", "cost": 25, "damage": 5,
 					"pressure": 4, "delay": 3.5, "anim": "attack03", "random_hits": 6,
 					"perfect_id": "", "perfect_text": "Fires a 7th bolt",
 					"description": "Six bolts rake random enemies (30 total\ndamage); every bolt can trigger Echo."}),
 			]
 		"holy":
 			return [
-				Ability.make({"display_name": "Dawnbreak", "cost": 20, "special": "dawnbreak",
+				Ability.make({"display_name": "Dawnbreak", "cooldown": 2, "cost": 20, "special": "dawnbreak",
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "+15 bonus healing",
 					"description": "Heal an ally for 40. Overhealing\nflows back to the Cleric."}),
-				Ability.make({"display_name": "Renewal", "cost": 20, "special": "renewal",
+				Ability.make({"display_name": "Renewal", "cooldown": 4, "cost": 20, "special": "renewal",
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Also heals 15 HP instantly",
 					"description": "Ally heals 15 HP at the start of each\nof their turns, for 5 turns."}),
-				Ability.make({"display_name": "Hymn of Hope", "cost": 0, "faith_cost": 30,
+				Ability.make({"display_name": "Hymn of Hope", "cooldown": 6, "cost": 0, "faith_cost": 30,
 					"special": "hymn", "delay": 4.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Heals 25% instead",
 					"description": "MIRACLE: heal ALL allies for 20%\nof their max HP."}),
 			]
 		"inquisitor":
 			return [
-				Ability.make({"display_name": "Divine Shield", "cost": 30, "special": "divine_shield",
+				Ability.make({"display_name": "Divine Shield", "cooldown": 4, "cost": 30, "special": "divine_shield",
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Shield absorbs 130 instead",
 					"description": "Grant an ally a holy shield that\nabsorbs 100 damage, then breaks."}),
-				Ability.make({"display_name": "Divine Wrath", "cost": 25, "special": "divine_wrath",
+				Ability.make({"display_name": "Divine Wrath", "cooldown": 5, "cost": 25, "special": "divine_wrath",
 					"delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Lasts 4 turns",
 					"description": "The party surges with holy fury:\n+15% damage and +15% speed\nfor 3 turns."}),
-				Ability.make({"display_name": "Unity", "cost": 0, "faith_cost": 25,
+				Ability.make({"display_name": "Unity", "cooldown": 6, "cost": 0, "faith_cost": 25,
 					"special": "unity", "delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Lasts 4 turns",
 					"description": "MIRACLE: bind the party's souls — all\ndamage received is split evenly among\nthem for 3 turns."}),
 			]
 		"occultist":
 			return [
-				Ability.make({"display_name": "Hex of Ruin", "dmg_type": "shadow", "cost": 20, "damage": 15,
+				Ability.make({"display_name": "Hex of Ruin", "cooldown": 3, "dmg_type": "shadow", "cost": 20, "damage": 15,
 					"pressure": 24, "delay": 3.0, "anim": "attack02", "random_hits": 2,
 					"perfect_extra_hit": false,
 					"applies_status": {"id": "cripple", "turns": 3},
 					"perfect_id": "status_plus", "perfect_text": "Cripple lasts 4 turns",
 					"description": "Curse 2 random enemies: 15 shadow\ndamage each and Crippled for 3 turns."}),
-				Ability.make({"display_name": "Mind Flay", "dmg_type": "shadow", "cost": 30,
+				Ability.make({"display_name": "Mind Flay", "cooldown": 5, "dmg_type": "shadow", "cost": 30,
 					"special": "mindflay", "delay": 3.5, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "+115% Break damage instead",
 					"description": "Shatter a mind — the target attacks\nits OWN allies for 3 turns with\n+100% Break damage."}),
-				Ability.make({"display_name": "Umbral Sigil", "cost": 0, "faith_cost": 20,
+				Ability.make({"display_name": "Umbral Sigil", "cooldown": 5, "cost": 0, "faith_cost": 20,
 					"special": "umbral_sigil", "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Lasts 4 turns",
 					"description": "MIRACLE: brand a foe — its whole party\ntakes 50% of all attack damage it\nreceives (3 turns)."}),
 			]
 		"beastmaster":
 			return [
-				Ability.make({"display_name": "Summon Ursus", "cost": 30, "special": "summon",
+				Ability.make({"display_name": "Summon Ursus", "cooldown": 4, "cost": 30, "special": "summon",
 					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
 					"perfect_id": "", "perfect_text": "",
 					"description": "Call the bear (80 HP): attacks with you,\nmauling your target AND a second enemy\nfor 10 damage + 20 Pressure each.\nPack Bond: your attacks deal +25%\nPressure while Ursus prowls."}),
-				Ability.make({"display_name": "Summon Canis", "cost": 30, "special": "summon",
+				Ability.make({"display_name": "Summon Canis", "cooldown": 4, "cost": 30, "special": "summon",
 					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
 					"perfect_id": "", "perfect_text": "",
 					"description": "Call the wolf (60 HP): attacks with you\nfor 20 damage, 50% chance to build\n20 Bleed. Pack Bond: your attacks build\n15 Bleed while Canis hunts."}),
-				Ability.make({"display_name": "Summon Aguila", "cost": 30, "special": "summon",
+				Ability.make({"display_name": "Summon Aguila", "cooldown": 4, "cost": 30, "special": "summon",
 					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
 					"perfect_id": "", "perfect_text": "",
 					"description": "Call the eagle (60 HP): attacks with you\nfor 15 damage, 50% chance to Sunder.\nPack Bond: +15% crit chance while\nAguila circles."}),
-				Ability.make({"display_name": "Barbed Arrow", "cost": 20, "damage": 20,
+				Ability.make({"display_name": "Barbed Arrow", "cooldown": 2, "cost": 20, "damage": 20,
 					"pressure": 15, "delay": 2.5, "anim": "attack02",
 					"applies_status": {"id": "cripple", "turns": 3},
 					"perfect_id": "status_plus", "perfect_text": "Cripple lasts 4 turns",
 					"description": "A cruel barb that Cripples the target\nfor 3 turns."}),
-				Ability.make({"display_name": "Poisoned Arrow", "dmg_type": "nature",
+				Ability.make({"display_name": "Poisoned Arrow", "cooldown": 3, "dmg_type": "nature",
 					"cost": 20, "damage": 20,
 					"pressure": 15, "delay": 2.5, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Applies 4 stacks instead",
 					"description": "A venom-soaked shaft: applies 3 stacks\nof Poison (3 damage per stack per turn,\n5 turns; stacks refresh the timer)."}),
-				Ability.make({"display_name": "Kill Command", "cost": 30, "special": "kill_command",
+				Ability.make({"display_name": "Kill Command", "cooldown": 4, "cost": 30, "special": "kill_command",
 					"delay": 4.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "+50% to the ordered strike",
 					"description": "Order your companion to savage a target:\ndouble damage and doubled special effect.\nRequires a living companion."}),
 			]
 		"sharpshooter":
 			return [
-				Ability.make({"display_name": "Aimed Shot", "cost": 20, "damage": 45,
+				Ability.make({"display_name": "Aimed Shot", "cooldown": 2, "cost": 20, "damage": 45,
 					"pressure": 15, "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "+25% crit on this shot",
 					"description": "A perfect line. Patient, precise, final."}),
-				Ability.make({"display_name": "Powershot", "cost": 25, "damage": 20,
+				Ability.make({"display_name": "Powershot", "cooldown": 3, "cost": 25, "damage": 20,
 					"pressure": 20, "delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "",
 					"description": "+2% damage for every point of the\ntarget's Break bar still EMPTY."}),
-				Ability.make({"display_name": "Quick Draw", "cost": 15, "special": "quickdraw",
+				Ability.make({"display_name": "Quick Draw", "cooldown": 6, "cost": 15, "special": "quickdraw",
 					"delay": 2.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "Lasts 6 turns",
 					"description": "Adrenaline takes over: all your abilities\nact 50% faster for 5 turns."}),
 			]
 		"mystic":
 			return [
-				Ability.make({"display_name": "Tripwire", "cost": 20, "special": "tripwire",
+				Ability.make({"display_name": "Tripwire", "cooldown": 5, "cost": 20, "special": "tripwire",
 					"delay": 2.5, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "Lasts 6 turns",
 					"description": "Rig the ground: for 5 turns, retaliate\nagainst EVERY attacking melee enemy —\neven those striking your allies."}),
-				Ability.make({"display_name": "Explosive Shot", "dmg_type": "fire", "cost": 35,
+				Ability.make({"display_name": "Explosive Shot", "cooldown": 4, "dmg_type": "fire", "cost": 35,
 					"damage": 10, "pressure": 20, "delay": 3.0, "anim": "attack03", "aoe": true,
 					"perfect_id": "", "perfect_text": "Deals 12 damage",
 					"description": "A bursting charge rakes ALL enemies\nwith fire and heavy Break pressure."}),
-				Ability.make({"display_name": "Shrapnel Charge", "dmg_type": "fire",
+				Ability.make({"display_name": "Shrapnel Charge", "cooldown": 3, "dmg_type": "fire",
 					"cost": 25, "damage": 20,
 					"pressure": 25, "delay": 3.0, "anim": "attack03", "choose_two": true,
 					"applies_status": {"id": "cripple", "turns": 3},

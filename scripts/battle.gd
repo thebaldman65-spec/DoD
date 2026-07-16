@@ -49,7 +49,20 @@ const STATUS_INFO := {
 	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less damage\n(a Shieldmaster's ward)."],
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
 	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of all attack damage\nthis unit takes echoes to its\nwhole party."],
+	"battle_shout": ["Battle Shout", "BS", Color(0.95, 0.45, 0.30), "+1% damage per 20 blood buildup\non the enemy party (at cast time)."],
+	"shield_charges": ["Shieldwall", "SW", Color(0.65, 0.72, 0.85), "The next attacks against this unit\nare BLOCKED (one charge each)."],
+	"high_guard": ["High Guard", "HG", Color(0.55, 0.80, 0.95), "Takes 25% less damage."],
+	"elem_weak": ["Elemental Weakness", "EW", Color(0.40, 0.80, 0.75), "Elemental resistances reduced."],
+	"hold_bd": ["Hold the Line", "HL", Color(0.95, 0.82, 0.45), "Takes 50% less Break damage."],
+	"undying": ["Undying", "UD", Color(1.0, 0.95, 0.75), "Cannot drop below 1 HP."],
 }
+
+# Buff/Debuff keywords: a DEBUFF is any negative status, a BUFF any positive
+# one. This registry backs talents that count debuffs (Dominant Presence,
+# Iron Will) and future dispels.
+const DEBUFF_IDS := ["slow", "chilled", "burn", "poison", "bleed", "sunder",
+	"mocked", "stunned", "exposed", "cripple", "dazed", "mindflay",
+	"umbral_sigil", "elem_weak", "broken"]
 
 # Placeholder SFX (procedurally generated, see repo history; replace with
 # licensed audio later).
@@ -253,7 +266,7 @@ func _enemy_config(kind: String) -> Dictionary:
 		"shieldmaster":
 			return {"unit_name": "Orc Shieldmaster", "is_hero": false, "sheet_dir": orc,
 				"max_hp": 150, "armor": 0.25, "speed": 85.0, "stability": 100,
-				"constitution": 120,
+				"constitution": 120, "block_chance": 0.05,
 				"abilities": _orc_shieldmaster_kit(), "tint": Color(1.0, 0.62, 0.2),
 				"resists": {}}
 		"shaman":
@@ -321,6 +334,14 @@ func _spawn_units() -> void:
 			if Run.active and i < Run.party.size():
 				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
 					Run.party[i].get("talents", {}))
+		# Class passives (every spec of the class, and before awakening).
+		match hero_keys[i]:
+			"cleric":
+				cfg["healing_received_mult"] = 1.15  # Holy Conduit
+			"mage":
+				cfg["mana_regen_bonus"] = 10          # Evocation
+		# (Warrior: Threatening Presence lives in enemy targeting;
+		#  Hunter: Tracker sets his opening initiative below.)
 		name_counts[cfg["unit_name"]] = name_counts.get(cfg["unit_name"], 0) + 1
 		if hero_keys.count(hero_keys[i]) > 1:
 			cfg["unit_name"] = "%s %d" % [cfg["unit_name"], name_counts[cfg["unit_name"]]]
@@ -337,6 +358,10 @@ func _spawn_units() -> void:
 				cfg["type_dmg_bonus"] = bonuses
 		# Percentage HP talents (Vitality) apply after every flat bonus.
 		cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
+		# Toughness (Warden talent): Constitution grows with bulk.
+		if cfg.get("toughness_ranks", 0) > 0:
+			cfg["constitution"] = int(cfg.get("constitution", 100)
+				+ 0.05 * cfg["toughness_ranks"] * cfg["max_hp"])
 		# Heroes with their own art keep original colors — no slot tint.
 		var hero_tint: Color = Classes.HERO_TINTS[i]
 		if SPEC_ART.has(spec):
@@ -347,6 +372,9 @@ func _spawn_units() -> void:
 		if spec != "":
 			u.add_status("spec_passive", Classes.SPEC_INFO[spec]["name"], "★",
 				Color(0.9, 0.78, 0.4), -1, Classes.SPEC_INFO[spec]["passive_desc"])
+		var class_passive: Dictionary = Classes.CLASS_PASSIVES[hero_keys[i]]
+		u.add_status("class_passive", class_passive["name"], "◆",
+			Color(0.65, 0.75, 0.9), -1, class_passive["desc"])
 		if Run.active and i < Run.party.size():
 			u.hp = clampi(Run.party[i]["hp"], 1, u.max_hp)
 			if u.resource_name == "Mana":
@@ -385,6 +413,10 @@ func _spawn_units() -> void:
 
 	for u in heroes + enemies:
 		u.next_time = (100.0 / u.speed) * randf_range(0.0, 1.0)
+	# Tracker (Hunter class passive): always attacks first in every fight.
+	for u in heroes:
+		if u.hero_key == "hunter":
+			u.next_time = -0.01
 
 
 func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
@@ -412,7 +444,7 @@ func _orc_raider_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Slash", "damage": 34, "pressure": 26,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Sundering Strike", "damage": 23, "pressure": 22,
+		Ability.make({"display_name": "Sundering Strike", "cooldown": 2, "damage": 23, "pressure": 22,
 			"delay": 2.5, "anim": "attack02",
 			"applies_status": {"id": "sunder", "turns": 2}, "status_chance": 0.6}),
 	]
@@ -422,7 +454,7 @@ func _orc_archer_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Arrow Shot", "damage": 21, "pressure": 16,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Poison Arrow", "dmg_type": "nature",
+		Ability.make({"display_name": "Poison Arrow", "cooldown": 2, "dmg_type": "nature",
 			"damage": 16, "pressure": 14,
 			"delay": 2.5, "anim": "attack02",
 			"applies_status": {"id": "poison", "turns": 3}, "status_chance": 0.7}),
@@ -434,7 +466,7 @@ func _orc_shieldmaster_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Strike", "damage": 28, "pressure": 20,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Shielding", "special": "enemy_shield",
+		Ability.make({"display_name": "Shielding", "cooldown": 3, "special": "enemy_shield",
 			"delay": 2.5, "anim": "attack02", "target": Ability.Target.ALLY,
 			"description": "Wards an ally: 25% less damage taken for 3 turns."}),
 	]
@@ -444,7 +476,7 @@ func _orc_shaman_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Lightning Bolt", "damage": 35, "pressure": 20,
 			"delay": 2.0, "anim": "attack01", "dmg_type": "nature"}),
-		Ability.make({"display_name": "Chain Lightning", "damage": 15, "pressure": 15,
+		Ability.make({"display_name": "Chain Lightning", "cooldown": 3, "damage": 15, "pressure": 15,
 			"delay": 3.0, "anim": "attack02", "dmg_type": "nature", "aoe": true}),
 	]
 
@@ -452,13 +484,13 @@ func _orc_shaman_kit() -> Array:
 # Zone 1 boss: a nature bruiser that dazes, poisons, and tends its escorts.
 func _withered_warden_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Timber Slam", "damage": 60, "pressure": 30,
+		Ability.make({"display_name": "Timber Slam", "cooldown": 2, "damage": 60, "pressure": 30,
 			"delay": 3.0, "anim": "attack01", "dmg_type": "nature",
 			"applies_status": {"id": "dazed", "turns": 3}}),
-		Ability.make({"display_name": "Roots of Wrath", "damage": 25, "pressure": 20,
+		Ability.make({"display_name": "Roots of Wrath", "cooldown": 3, "damage": 25, "pressure": 20,
 			"delay": 3.5, "anim": "attack02", "dmg_type": "nature", "aoe": true,
 			"applies_status": {"id": "poison", "turns": 3}}),
-		Ability.make({"display_name": "Wild Growth", "special": "wild_growth",
+		Ability.make({"display_name": "Wild Growth", "cooldown": 3, "special": "wild_growth",
 			"delay": 2.5, "anim": "attack02", "target": Ability.Target.ALLY,
 			"description": "Heals an ally for 20% of their max health."}),
 	]
@@ -469,9 +501,9 @@ func _orc_chief_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Strike", "damage": 28, "pressure": 26,
 			"resource_gain": 15, "delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 54,
+		Ability.make({"display_name": "Heavy Strike", "cooldown": 3, "cost": 30, "damage": 54,
 			"pressure": 40, "delay": 4.0, "anim": "attack02"}),
-		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 34,
+		Ability.make({"display_name": "Crushing Blow", "cooldown": 3, "cost": 20, "damage": 34,
 			"pressure": 56, "delay": 4.0, "anim": "attack02"}),
 	]
 
@@ -838,7 +870,7 @@ func _run_battle() -> void:
 			continue
 		# Turn-start regeneration effects.
 		if u.has_status("renewal"):
-			u.heal_amount(15)
+			u.heal_amount(15, true)
 			u.float_text("+15", Color(0.45, 0.9, 0.5))
 			_log("%s regenerates 15 HP (Renewal)" % u.unit_name, "#70d878")
 		if u.has_status("focus") and u.resource_name == "Mana":
@@ -853,11 +885,14 @@ func _run_battle() -> void:
 			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
 			continue
 		u.tick_statuses()
-		if u.enraged_ranks > 0:
-			u.turns_since_damaged += 1
-			if u.turns_since_damaged > 2 and u.enraged_stacks > 0:
-				u.enraged_stacks = 0
-				u.float_text("Enraged fades", Color(0.7, 0.5, 0.4))
+		u.tick_cooldowns()
+		# Endurance (Warden talent): armor stacks while unhealed by others.
+		if u.endurance_ranks > 0:
+			if u.healed_externally:
+				u.endurance_stacks = 0
+			else:
+				u.endurance_stacks += 1
+			u.healed_externally = false
 		if u.broken_pending:
 			u.broken_pending = false
 			_message("%s is Broken and loses their turn!" % u.unit_name)
@@ -901,7 +936,8 @@ func _player_turn(u: BattleUnit) -> void:
 	current_hero = u
 	item_used = false
 	if u.resource_name == "Mana":
-		u.resource = mini(u.resource + 12, u.max_resource)
+		# Evocation (Mage class passive) adds mana_regen_bonus.
+		u.resource = mini(u.resource + 12 + u.mana_regen_bonus, u.max_resource)
 		u.refresh_bars()
 	elif u.resource_name == "Focus":
 		u.resource = mini(u.resource + 15, u.max_resource)
@@ -1012,70 +1048,70 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 	match u.hero_key:
 		"warrior":
 			var pommel := _find_ability(u, "Pommel Strike")
-			if pommel != null and u.resource >= pommel.cost and randf() < 0.35:
+			if pommel != null and u.resource >= pommel.cost and u.ability_ready(pommel) and randf() < 0.35:
 				return [pommel, target_foe]
 			var hack := _find_ability(u, "Hack and Slash")
-			if hack != null and u.resource >= hack.cost and randf() < 0.4:
+			if hack != null and u.resource >= hack.cost and u.ability_ready(hack) and randf() < 0.4:
 				return [hack, target_foe]
 			var crushing := _find_ability(u, "Crushing Blow")
-			if crushing != null and u.resource >= crushing.cost \
+			if crushing != null and u.resource >= crushing.cost and u.ability_ready(crushing) \
 					and not target_foe.has_status("sunder"):
 				return [crushing, target_foe]
 			var overpower := _find_ability(u, "Overpower")
-			if overpower != null and u.resource >= overpower.cost:
+			if overpower != null and u.resource >= overpower.cost and u.ability_ready(overpower):
 				return [overpower, target_foe]
 			return [u.abilities[0], target_foe]          # Strike
 		"mage":
 			var mshield := _find_ability(u, "Mana Shield")
-			if mshield != null and u.resource >= mshield.cost \
+			if mshield != null and u.resource >= mshield.cost and u.ability_ready(mshield) \
 					and not u.has_status("mana_shield") and u.resource < 40:
 				return [mshield, u]
 			var flame := _find_ability(u, "Flame Surge")
-			if flame != null and u.resource >= flame.cost and foes.size() >= 2:
+			if flame != null and u.resource >= flame.cost and u.ability_ready(flame) and foes.size() >= 2:
 				return [flame, target_foe]
 			var dray := _find_ability(u, "Death Ray")
-			if dray != null and u.second_resource >= 5:
+			if dray != null and u.second_resource >= 5 and u.ability_ready(dray):
 				return [dray, target_foe]
 			var barrage := _find_ability(u, "Arcane Barrage")
-			if barrage != null and u.resource >= barrage.cost and foes.size() >= 2:
+			if barrage != null and u.resource >= barrage.cost and u.ability_ready(barrage) and foes.size() >= 2:
 				return [barrage, target_foe]
 			var fbolt := _find_ability(u, "Frost Bolt")
-			if fbolt != null and u.resource >= fbolt.cost:
+			if fbolt != null and u.resource >= fbolt.cost and u.ability_ready(fbolt):
 				return [fbolt, target_foe]
 			return [u.abilities[0], target_foe]          # Magic Bolt
 		"hunter":
 			var summon := _find_ability(u, "Summon Canis")
-			if summon != null and u.resource >= summon.cost \
+			if summon != null and u.resource >= summon.cost and u.ability_ready(summon) \
 					and (u.companion == null or u.companion.dead):
 				return [summon, u]
 			var kill_cmd := _find_ability(u, "Kill Command")
-			if kill_cmd != null and u.resource >= kill_cmd.cost \
+			if kill_cmd != null and u.resource >= kill_cmd.cost and u.ability_ready(kill_cmd) \
 					and u.companion != null and not u.companion.dead:
 				return [kill_cmd, target_foe]
 			var parrow := _find_ability(u, "Poisoned Arrow")
-			if parrow != null and u.resource >= parrow.cost and randf() < 0.4 \
+			if parrow != null and u.resource >= parrow.cost and u.ability_ready(parrow) and randf() < 0.4 \
 					and not target_foe.has_status("poison"):
 				return [parrow, target_foe]
 			var shrapnel := _find_ability(u, "Shrapnel Charge")
-			if shrapnel != null and u.resource >= shrapnel.cost and foes.size() >= 2:
+			if shrapnel != null and u.resource >= shrapnel.cost and u.ability_ready(shrapnel) and foes.size() >= 2:
 				return [shrapnel, target_foe]
 			var aimed := _find_ability(u, "Aimed Shot")
-			if aimed != null and u.resource >= aimed.cost:
+			if aimed != null and u.resource >= aimed.cost and u.ability_ready(aimed):
 				return [aimed, target_foe]
 			return [u.abilities[0], target_foe]          # Quick Shot
 		"cleric":
 			var hymn := _find_ability(u, "Hymn of Hope")
-			if hymn != null and u.second_resource >= hymn.faith_cost \
+			if hymn != null and u.second_resource >= hymn.faith_cost and u.ability_ready(hymn) \
 					and weakest_ally.hp < weakest_ally.max_hp * 0.6:
 				return [hymn, u]
 			var unity_ab := _find_ability(u, "Unity")
-			if unity_ab != null and u.second_resource >= unity_ab.faith_cost \
+			if unity_ab != null and u.second_resource >= unity_ab.faith_cost and u.ability_ready(unity_ab) \
 					and weakest_ally.hp < weakest_ally.max_hp * 0.7:
 				return [unity_ab, u]
 			var flay := _find_ability(u, "Mind Flay")
-			if flay != null and u.second_resource >= flay.faith_cost and foes.size() >= 2:
+			if flay != null and u.resource >= flay.cost and u.ability_ready(flay) and foes.size() >= 2:
 				return [flay, target_foe]
-			if weakest_ally.hp < weakest_ally.max_hp * 0.5 and u.resource >= 25:
+			if weakest_ally.hp < weakest_ally.max_hp * 0.5 and u.resource >= 25 and u.ability_ready(u.abilities[1]):
 				return [u.abilities[1], weakest_ally]    # Mend Wounds
 			return [u.abilities[0], target_foe]          # Smite
 	return [u.abilities[0], target_foe]
@@ -1128,7 +1164,7 @@ func _use_item(item_id: String) -> void:
 			if heal_target == null:
 				_refund_item(item_id)
 				return
-			heal_target.heal_amount(40)
+			heal_target.heal_amount(40, true)
 			_sfx("potion", -6.0)
 			heal_target.float_text("+40", Color(0.4, 0.9, 0.45))
 			_message("%s drinks a Health Potion" % heal_target.unit_name)
@@ -1210,6 +1246,7 @@ func _show_actions(u: BattleUnit) -> void:
 	basic_btn.custom_minimum_size = Vector2(84, 32)
 	basic_btn.add_theme_font_size_override("font_size", 13)
 	basic_btn.tooltip_text = _ability_tooltip(u, basic)
+	basic_btn.disabled = not _ability_usable(u, basic)
 	basic_btn.pressed.connect(_on_ability_button.bind(basic))
 	basic_btn.mouse_entered.connect(_preview_delay.bind(u, basic))
 	basic_btn.mouse_exited.connect(_clear_delay_preview)
@@ -1257,9 +1294,15 @@ func _show_actions(u: BattleUnit) -> void:
 func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if ab.cost > u.resource or ab.faith_cost > u.second_resource:
 		return false
+	if not u.ability_ready(ab):
+		return false
 	if ab.special == "kill_command" and (u.companion == null or u.companion.dead):
 		return false
 	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
+		return false
+	# Execute: only usable while an enemy is below 20% health.
+	if ab.display_name == "Execute" \
+			and not enemies.any(func(e): return not e.dead and e.hp < e.max_hp * 0.2):
 		return false
 	if ab.display_name == "Death Ray" and u.second_resource < 5:
 		return false
@@ -1277,6 +1320,8 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 		label += "   %d %s" % [ab.cost, u.resource_name]
 	elif ab.faith_cost > 0:
 		label += "   %d %s" % [ab.faith_cost, u.second_resource_name]
+	if u.cooldown_left(ab) > 0:
+		label += "   (CD %d)" % u.cooldown_left(ab)
 	var ab_btn := Button.new()
 	ab_btn.text = label
 	ab_btn.custom_minimum_size = Vector2(184, 30)
@@ -1422,6 +1467,11 @@ func _on_popup_ability(popup: PopupPanel, ab: Ability) -> void:
 # Tooltip with live damage ranges (includes the unit's current buffs).
 func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 	var tip := ab.description
+	if ab.cooldown > 0:
+		tip += "\nCooldown: %d turns" % ab.cooldown
+		var left := u.cooldown_left(ab)
+		if left > 0:
+			tip += "  (ready in %d)" % left
 	if ab.damage > 0:
 		var buff_mult := 1.0
 		if u.second_resource_name == "Resonance" and ab.display_name != "Death Ray":
@@ -1570,7 +1620,7 @@ func _enemy_turn(u: BattleUnit) -> void:
 			var mf_target: BattleUnit = fellows.pick_random()
 			# Maddened units ATTACK their allies — support abilities stay sheathed.
 			var mf_options: Array = u.abilities.filter(
-				func(a): return a.cost <= u.resource and a.damage > 0)
+				func(a): return a.cost <= u.resource and a.damage > 0 and u.ability_ready(a))
 			_message("%s turns on its allies!" % u.unit_name)
 			_log("%s is maddened — attacks %s!" % [u.unit_name, mf_target.unit_name], "#c070e0")
 			await _wait(0.4)
@@ -1593,9 +1643,10 @@ func _enemy_turn(u: BattleUnit) -> void:
 			return
 	var target: BattleUnit
 	var ab: Ability
-	# Only damaging abilities count as attacks; support casts are chosen above.
+	# Only damaging, off-cooldown abilities count as attacks; support casts
+	# are chosen above.
 	var affordable: Array = u.abilities.filter(
-		func(a): return a.cost <= u.resource and a.damage > 0)
+		func(a): return a.cost <= u.resource and a.damage > 0 and u.ability_ready(a))
 	var broken_heroes := living.filter(func(h): return h.broken)
 	if not broken_heroes.is_empty():
 		# Exploit a Broken hero with the hardest-hitting attack they can afford.
@@ -1608,9 +1659,23 @@ func _enemy_turn(u: BattleUnit) -> void:
 		await _wait(0.4)
 	else:
 		# Prefer finishing off wounded heroes; sometimes spread damage.
-		target = _lowest_hp(living) if randf() < 0.40 else living.pick_random()
+		# Threatening Presence: Warriors draw 20% more of the random picks.
+		target = _lowest_hp(living) if randf() < 0.40 else _threat_pick(living)
 		ab = affordable.pick_random()
 	await _resolve(u, ab, target, "good")
+
+
+# Weighted random target: Warriors weigh 1.2, everyone else 1.0.
+func _threat_pick(pool: Array) -> BattleUnit:
+	var total := 0.0
+	for t in pool:
+		total += 1.2 if t.hero_key == "warrior" else 1.0
+	var roll := randf() * total
+	for t in pool:
+		roll -= 1.2 if t.hero_key == "warrior" else 1.0
+		if roll <= 0.0:
+			return t
+	return pool.back()
 
 
 # Non-attack decisions for enemies with support abilities. Returns
@@ -1619,15 +1684,32 @@ func _enemy_support_action(u: BattleUnit) -> Array:
 	var allies: Array = enemies.filter(func(e): return not e.dead)
 	# Shieldmaster: always keeps exactly one ally Shielded (lowest HP first).
 	var shield_ab := _find_ability(u, "Shielding")
-	if shield_ab != null and not allies.any(func(a): return a.has_status("shielded")):
+	if shield_ab != null and u.ability_ready(shield_ab) \
+			and not allies.any(func(a): return a.has_status("shielded")):
 		return [shield_ab, _lowest_hp(allies)]
 	# Withered Warden: tends the most wounded of its warband (itself included).
 	var growth := _find_ability(u, "Wild Growth")
-	if growth != null:
+	if growth != null and u.ability_ready(growth):
 		var wounded: Array = allies.filter(func(a): return a.hp < a.max_hp * 0.7)
 		if not wounded.is_empty() and randf() < 0.6:
 			return [growth, _lowest_hp(wounded)]
 	return []
+
+
+# How many DEBUFFS this unit currently carries (Iron Will, future dispels).
+func _count_debuffs(u: BattleUnit) -> int:
+	var n := 0
+	for s in u.statuses:
+		if DEBUFF_IDS.has(s.id):
+			n += 1
+	return n
+
+
+# Dominant Presence bookkeeping: the Swordmaster's armor feeds on the
+# debuffs he lands.
+func _note_debuff_applied(source: BattleUnit, status_id: String) -> void:
+	if source != null and source.dominant_ranks > 0 and DEBUFF_IDS.has(status_id):
+		source.debuffs_applied += 1
 
 
 func _lowest_hp(pool: Array) -> BattleUnit:
@@ -1678,6 +1760,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		is_counter := false) -> void:
 	attacker.resource = clampi(attacker.resource - ab.cost + ab.resource_gain, 0, attacker.max_resource)
 	attacker.refresh_bars()
+	if not is_counter:
+		attacker.start_cooldown(ab)
 	var dmg_mult := {"perfect": 1.15, "good": 1.0, "fail": 0.6}[grade] as float
 	var pr_mult := {"perfect": 1.25, "good": 1.0, "fail": 0.5}[grade] as float
 	var is_perfect := grade == "perfect"
@@ -1722,7 +1806,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		var amount := int(ab.heal * dmg_mult)
 		_stat("healing", amount)
 		_sfx("heal", -8.0)
-		target.heal_amount(amount)
+		target.heal_amount(amount, target != attacker)
 		target.float_text("+%d" % amount, Color(0.4, 0.9, 0.45))
 		_message("%s heals %s for %d" % [attacker.unit_name, target.unit_name, amount])
 		_log("%s: %s on %s heals %d%s" % [attacker.unit_name, ab.display_name,
@@ -1739,6 +1823,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
 			target.unit_name], "#909090")
 		await _wait(0.35)
+		await _try_opportunist(target, attacker)
 	else:
 		var strike_targets: Array = [target]
 		if ab.aoe:
@@ -1788,6 +1873,43 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_log("%s: %s on %s — MISS" % [attacker.unit_name, ab.display_name,
 						strike_target.unit_name], "#909090")
 					await _wait(0.45)
+					await _try_opportunist(strike_target, attacker)
+					if attacker.dead:
+						break
+					continue
+			# Block: negates 100% of the hit — damage, Break damage, and on-hit
+			# effects. Sources: Shieldwall charges (guaranteed) or the Block %
+			# stat (+15% from Heavy Plating). Broken units cannot Block.
+			if not is_counter and not strike_target.broken and not strike_target.dead \
+					and not strike_target.is_companion:
+				var did_block := false
+				var charges := strike_target.get_status("shield_charges")
+				if not charges.is_empty() and int(charges.get("power", 0)) > 0:
+					did_block = true
+					charges["power"] = int(charges["power"]) - 1
+					if int(charges["power"]) <= 0:
+						strike_target.remove_status("shield_charges")
+				elif randf() < strike_target.block_chance \
+						+ (0.15 if strike_target.passive_id == "heavy_plating" else 0.0):
+					did_block = true
+				if did_block:
+					_stat("attacks")
+					_stat("attack_block")
+					_sfx("parry", -4.0, 0.6)
+					strike_target.float_text("BLOCK", Color(0.75, 0.8, 0.95))
+					_log("%s BLOCKS %s's %s" % [strike_target.unit_name,
+						attacker.unit_name, ab.display_name], "#8c9cc8")
+					# Unkillable: blocking mends the Warden.
+					if strike_target.unkillable_ranks > 0:
+						var mend := maxi(int(strike_target.max_hp * 0.02
+							* strike_target.unkillable_ranks), 1)
+						strike_target.heal_amount(mend)
+						strike_target.float_text("+%d" % mend, Color(0.4, 0.9, 0.45))
+					# Richocet: the shield answer can ring the attacker's skull.
+					if strike_target.ricochet_ranks > 0 and not attacker.dead \
+							and randf() < 0.05 * strike_target.ricochet_ranks:
+						_apply_status(attacker, "stunned", 1)
+					await _wait(0.4)
 					continue
 			# Parry: the strike still lands, but with 75% less damage and 75%
 			# less Break damage. No automatic counter — that is the separate
@@ -1801,7 +1923,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_stat("attack_parry")
 				_sfx("bow_blocked" if _uses_bow(attacker) else "parry", -4.0)
 				strike_target.float_text("PARRY", Color(0.4, 0.9, 1.0))
-			var crit_chance := CRIT_CHANCE + (0.25 if strike_target.broken else 0.0)
+				# High Guard: a parry hardens the stance for a turn.
+				if strike_target.high_guard > 0:
+					_apply_status(strike_target, "high_guard", 2)
+			# Pommel Strike carries its own keen 25% crit base.
+			var crit_chance := (0.25 if ab.display_name == "Pommel Strike" else CRIT_CHANCE) \
+				+ (0.25 if strike_target.broken else 0.0)
 			# Resonant Mind: +3% crit per Resonance stack.
 			if attacker.second_resource_name == "Resonance":
 				crit_chance += 0.03 * attacker.second_resource
@@ -1811,13 +1938,28 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and not attacker.companion.dead \
 					and attacker.companion.companion_kind == "aguila":
 				crit_chance += 0.15
+			# Precision Strikes: exploits Dazed / Crippled / Exposed targets.
+			if attacker.precision_ranks > 0 and (strike_target.has_status("dazed")
+					or strike_target.has_status("cripple")
+					or strike_target.has_status("exposed")):
+				crit_chance += 0.05 * attacker.precision_ranks
+			# Seasoned Fighter (talent node): sharpens Lunge and Overpower.
+			if attacker.blade_crit_ranks > 0 \
+					and ab.display_name in ["Lunge", "Overpower"]:
+				crit_chance += 0.03 * attacker.blade_crit_ranks
 			if is_perfect and ab.display_name == "Frost Bolt":
 				crit_chance += 0.05
 			if is_perfect and ab.display_name == "Aimed Shot":
 				crit_chance += 0.25
+			# Sweeping Strikes perfect: the second swing cuts truer.
+			if is_perfect and ab.display_name == "Sweeping Strikes" and hit_i == 1:
+				crit_chance += 0.25
 			var is_crit := randf() < crit_chance
 			# Razor Ice always crits against Slowed (chilled) targets.
 			if ab.display_name == "Razor Ice" and strike_target.has_status("chilled"):
+				is_crit = true
+			# Execute perfect: the killing stroke cannot glance.
+			if is_perfect and ab.display_name == "Execute":
 				is_crit = true
 			any_crit = any_crit or is_crit
 			var raw := ab.damage * randf_range(0.9, 1.1) * dmg_mult
@@ -1861,17 +2003,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.25
 			if attacker.has_status("cripple"):
 				raw *= 0.75
+			# Blood Frenzy: +2% damage (plus Unstoppable) per 5% of HP missing.
 			if attacker.passive_id == "bloodrage":
-				raw *= 1.0 + (0.4 + attacker.bloodrage_bonus) \
-					* (1.0 - attacker.hp / float(attacker.max_hp))
-			if attacker.enraged_stacks > 0:
-				raw *= 1.0 + attacker.enraged_stacks / 100.0
-			# Rampage: fury drawn from every open wound on the enemy party.
-			if attacker.has_status("rampage"):
-				raw *= 1.0 + attacker.status_power("rampage") / 100.0
+				var frenzy_steps := int((1.0 - attacker.hp / float(attacker.max_hp)) \
+					* 100.0 / 5.0)
+				raw *= 1.0 + (2.0 + attacker.bloodrage_step_bonus) * frenzy_steps / 100.0
+			# Enraged (talent): stacks from dropping below half HP.
+			if attacker.enraged_stacks > 0 and attacker.enraged_ranks > 0:
+				raw *= 1.0 + 0.03 * attacker.enraged_ranks * attacker.enraged_stacks
+			# Battle Shout: fury fed by the enemy party's open wounds (at cast).
+			if attacker.has_status("battle_shout"):
+				raw *= 1.0 + attacker.status_power("battle_shout") / 100.0
+			# Iron Will: +5%/rank damage per debuff currently on the Warden.
+			if attacker.iron_will_ranks > 0:
+				raw *= 1.0 + 0.05 * attacker.iron_will_ranks * _count_debuffs(attacker)
 			# Seasoned Fighter: the offensive stance above half HP.
 			if attacker.passive_id == "seasoned" and attacker.hp > attacker.max_hp * 0.5:
-				raw *= 1.15
+				raw *= 1.15 + attacker.seasoned_off_bonus
 			raw *= 1.0 + attacker.dmg_bonus + float(attacker.type_dmg_bonus.get(ab.dmg_type, 0.0))
 			# Target-side modifiers.
 			if strike_target.second_resource_name == "Resonance":
@@ -1883,20 +2031,35 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 0.75
 			if strike_target.has_status("exposed"):
 				raw *= 1.15
+			# High Guard: hardened stance after a parry.
+			if strike_target.has_status("high_guard"):
+				raw *= 0.75
 			if strike_target.dmg_taken_bonus > 0.0:
 				raw *= 1.0 + strike_target.dmg_taken_bonus
 			# Seasoned Fighter: the defensive stance at or below half HP.
 			if strike_target.passive_id == "seasoned" \
 					and strike_target.hp <= strike_target.max_hp * 0.5:
-				raw *= 0.85
+				raw *= 0.85 - strike_target.seasoned_def_bonus
 			if debug_prints and attacker.second_resource_name == "Resonance":
 				print("[DBG] %s attacks @%d stacks: base %d -> raw %.1f" % [
 					attacker.unit_name, attacker.second_resource, ab.damage, raw])
 			var resist := float(strike_target.resists.get(ab.dmg_type, 0.0))
+			# Elemental Weakness: Crushing Blow strips non-physical resists.
+			if ab.dmg_type != "physical" and strike_target.has_status("elem_weak"):
+				resist -= strike_target.status_power("elem_weak") / 100.0
 			if resist != 0.0:
 				raw *= 1.0 - resist
+			# Armor Penetration: each % negates a % of the target's armor.
+			# Crushing Blows (talent): pen scales with the enemy party's bleed.
+			var pen := ab.armor_pierce + attacker.pierce_bonus
+			if attacker.crushing_blows_ranks > 0:
+				var party_bleed := 0
+				for foe in enemies:
+					if not foe.dead:
+						party_bleed += foe.bleed_buildup
+				pen += 0.03 * attacker.crushing_blows_ranks * int(party_bleed / 20.0)
 			var effective_armor := strike_target.effective_armor() \
-				* (1.0 - clampf(ab.armor_pierce + attacker.pierce_bonus, 0.0, 1.0))
+				* (1.0 - clampf(pen, 0.0, 1.0))
 			if is_perfect and ab.display_name == "Arcane Rift":
 				effective_armor = 0.0
 			var final := maxi(int(round(raw * (1.0 - effective_armor))), 1)
@@ -1998,9 +2161,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.delay_push > 0.0:
 				strike_target.next_time += ab.delay_push * 100.0 / strike_target.effective_speed()
 			var status_chance := ab.status_chance
-			# Pommel Strike: a crit rings harder — 75% stun instead of 50%.
+			# Pommel Strike: a critical strike GUARANTEES the stun.
 			if ab.display_name == "Pommel Strike" and is_crit:
-				status_chance = 0.75
+				status_chance = 1.0
 			if not result.died and not ab.applies_status.is_empty() \
 					and randf() <= status_chance:
 				var turns: int = ab.applies_status["turns"]
@@ -2010,6 +2173,29 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if ab.applies_status["id"] == "burn":
 					status_meta = int(round((CRIT_CHANCE + attacker.crit_bonus) * 100))
 				_apply_status(strike_target, ab.applies_status["id"], turns, status_meta)
+				_note_debuff_applied(attacker, ab.applies_status["id"])
+			# Lunge: the stance decides the wound — Exposed high, Cripple low.
+			if ab.display_name == "Lunge" and not strike_target.dead:
+				var lunge_status := "exposed" if attacker.hp > attacker.max_hp * 0.5 \
+					else "cripple"
+				_apply_status(strike_target, lunge_status, 3)
+				_note_debuff_applied(attacker, lunge_status)
+			# Crushing Blow (Warden talents): resist shred + BD splash.
+			if ab.display_name == "Crushing Blow" and not strike_target.dead \
+					and attacker.elem_weak_ranks > 0:
+				_apply_status(strike_target, "elem_weak", 3, 5 * attacker.elem_weak_ranks)
+				_note_debuff_applied(attacker, "elem_weak")
+			if ab.display_name == "Crushing Blow" and attacker.sundering_ranks > 0 \
+					and attacker.is_hero:
+				var splash_bd := int(round(pr * 0.25 * attacker.sundering_ranks))
+				if splash_bd > 0:
+					for foe in enemies:
+						if foe.dead or foe == strike_target:
+							continue
+						foe.take_hit(0, splash_bd)
+						foe.float_text("+%d BD" % splash_bd, Color(0.8, 0.5, 1.0))
+					_log("   → Sundering: %d BD to the rest of the warband" % splash_bd,
+						"#b0a8e0")
 			if ab.bleed_build > 0 and not strike_target.dead and randf() <= ab.bleed_chance:
 				_add_bleed_with_burst(strike_target, ab.bleed_build + attacker.bleed_bonus)
 			if ab.display_name == "Mocking Blow" and not strike_target.dead:
@@ -2017,10 +2203,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if mocker_idx >= 0:
 					var taunt_turns := 5 if is_perfect else 4
 					_apply_status(strike_target, "mocked", taunt_turns, mocker_idx)
+					_note_debuff_applied(attacker, "mocked")
 					var others := enemies.filter(
 						func(e): return not e.dead and e != strike_target)
 					if not others.is_empty():
 						_apply_status(others.pick_random(), "mocked", taunt_turns, mocker_idx)
+				# Tank and Spank: the taunt can Empower a random ally.
+				if attacker.tank_spank_ranks > 0 \
+						and randf() < 0.15 * attacker.tank_spank_ranks:
+					var pals := heroes.filter(func(h): return not h.dead)
+					if not pals.is_empty():
+						_apply_status(pals.pick_random(), "empower", 2)
 			# Shrapnel: the second debuff (Cripple rides applies_status above).
 			if ab.display_name == "Shrapnel" and not strike_target.dead:
 				_apply_status(strike_target, "slow", 4 if is_perfect else 3)
@@ -2166,6 +2359,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# count (they made the Mage "start" battles with a stack).
 		if not is_counter:
 			_gain_resonance(attacker, 2 if any_crit else 1)
+		# Rampage: a kill lets it surge onward — an immediate free recast on
+		# another enemy (and it chains while the kills keep coming).
+		if ab.display_name == "Rampage" and attacker.is_hero and not attacker.dead \
+				and target != null and target.dead and not battle_over:
+			var rampage_foes := enemies.filter(func(e): return not e.dead)
+			if not rampage_foes.is_empty():
+				var next_target: BattleUnit = rampage_foes.pick_random()
+				_message("RAMPAGE surges onward!")
+				_log("%s: Rampage surges to %s!" % [attacker.unit_name,
+					next_target.unit_name], "#e05050")
+				await _wait(0.5)
+				await _resolve(attacker, _free_copy(ab), next_target, "good", true)
 	if not sim and attacker.position != lunge_origin:
 		if walked and not attacker.dead:
 			await _walk_to(attacker, lunge_origin)
@@ -2180,6 +2385,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		var eff_delay := ab.delay
 		if grade == "perfect" and ab.display_name == "Mana Shield":
 			eff_delay = 1.5
+		if grade == "perfect" and ab.display_name == "Lunge":
+			eff_delay = 3.0
 		attacker.next_time += eff_delay * 100.0 / attacker.effective_speed()
 
 
@@ -2217,6 +2424,34 @@ func _gain_resonance(caster: BattleUnit, stacks: int) -> void:
 		caster.float_text("Backlash Ward +15 Mana", Color(0.5, 0.7, 1.0))
 		_log("   → Backlash Ward: %s restores 15 Mana" % caster.unit_name, "#b0a8e0")
 	caster.refresh_bars()
+
+
+# A cost/cooldown-free copy of an attack for reaction casts (Opportunist,
+# Rampage recasts) — _resolve always charges ab.cost, so reactions pass a
+# zero-cost twin instead.
+func _free_copy(ab: Ability) -> Ability:
+	return Ability.make({"display_name": ab.display_name, "damage": ab.damage,
+		"pressure": ab.pressure, "dmg_type": ab.dmg_type, "anim": ab.anim,
+		"multi_hits": ab.multi_hits, "bleed_build": ab.bleed_build,
+		"bleed_chance": ab.bleed_chance, "applies_status": ab.applies_status,
+		"status_chance": ab.status_chance,
+		"perfect_extra_hit": ab.perfect_extra_hit})
+
+
+# Opportunist (talent): the Swordmaster answers a whiffed enemy attack with
+# a free Overpower.
+func _try_opportunist(defender: BattleUnit, attacker: BattleUnit) -> void:
+	if defender == null or attacker == null or defender.opportunist <= 0 \
+			or not defender.is_hero or attacker.is_hero \
+			or defender.dead or attacker.dead:
+		return
+	var op := _find_ability(defender, "Overpower")
+	if op == null:
+		return
+	defender.float_text("OPPORTUNIST", Color(0.4, 0.9, 1.0))
+	_log("%s seizes the opening — Opportunist!" % defender.unit_name, "#50c8e0")
+	await _wait(0.4)
+	await _resolve(defender, _free_copy(op), attacker, "good", true)
 
 
 # Walks a unit (walk animation, facing the way it moves) to a point.
@@ -2314,7 +2549,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				base = int(base * 1.25)
 			var missing_hp := target.max_hp - target.hp
 			var applied := mini(base, missing_hp)
-			target.heal_amount(applied)
+			target.heal_amount(applied, target != attacker)
 			target.float_text("+%d" % applied, Color(0.4, 0.9, 0.45))
 			var overflow := base - applied
 			if overflow > 0 and target != attacker:
@@ -2332,7 +2567,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("heal", -4.0, 0.9)
 			for h in heroes.filter(func(he): return not he.dead):
 				var amt := int(h.max_hp * pct)
-				h.heal_amount(amt)
+				h.heal_amount(amt, h != attacker)
 				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
 				_stat("healing", amt)
 			_message("MIRACLE — Hymn of Hope!")
@@ -2345,7 +2580,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("heal", -4.0, 0.8)
 			for h in heroes.filter(func(he): return not he.dead):
 				var amt := int(h.max_hp * sanct_pct)
-				h.heal_amount(amt)
+				h.heal_amount(amt, h != attacker)
 				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
 				_apply_status(h, "shieldwall", 1)
 				_stat("healing", amt)
@@ -2393,6 +2628,40 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s orders %s to savage %s!" % [attacker.unit_name,
 					comp.unit_name, target.unit_name], "#e0a050")
 				await _companion_strike(comp, target, 3.0 if is_perfect else 2.0, true)
+		"battle_shout":
+			var shout_bleed := 0
+			for e in enemies:
+				if not e.dead:
+					shout_bleed += e.bleed_buildup
+			var shout_pct := int(shout_bleed / 20.0)
+			_sfx("crit", -8.0, 0.7)
+			_apply_status(attacker, "battle_shout", 2, shout_pct)
+			if is_perfect:
+				attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
+				attacker.float_text("+5 Rage", Color(1.0, 0.5, 0.4))
+				attacker.refresh_bars()
+			_message("%s roars with bloodlust!" % attacker.unit_name)
+			_log("%s: Battle Shout — +%d%% damage for 2 turns" % [attacker.unit_name,
+				shout_pct], "#70d878")
+		"shield_block":
+			var blocks := 5 if is_perfect else 3
+			_sfx("parry", -6.0, 0.5)
+			_apply_status(attacker, "shield_charges", -1, blocks)
+			_message("%s raises the shield!" % attacker.unit_name)
+			_log("%s: Shieldwall — the next %d attacks will be BLOCKED" % [
+				attacker.unit_name, blocks], "#8c9cc8")
+		"hold_the_line":
+			_sfx("heal", -5.0, 0.6)
+			for h in heroes.filter(func(he): return not he.dead):
+				_apply_status(h, "hold_bd", 2)
+				_apply_status(h, "undying", 2)
+			if is_perfect:
+				attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
+				attacker.float_text("+5 Rage", Color(1.0, 0.5, 0.4))
+				attacker.refresh_bars()
+			_message("%s HOLDS THE LINE!" % attacker.unit_name)
+			_log("%s: Hold the Line — party takes 50%% less BD and cannot die" % \
+				attacker.unit_name, "#70d878")
 		"resurrection":
 			if target != null and target.dead:
 				target.revive(0.2)
@@ -2432,7 +2701,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"wild_growth":
 			var growth := maxi(int(round(target.max_hp * 0.20)), 1)
 			_sfx("heal", -6.0, 0.8)
-			target.heal_amount(growth)
+			target.heal_amount(growth, target != attacker)
 			target.float_text("+%d" % growth, Color(0.4, 0.9, 0.45))
 			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
 			_log("%s: Wild Growth heals %s for %d (20%% max HP)" % [attacker.unit_name,
@@ -2570,9 +2839,11 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int) -> void:
 		if not victim.is_hero:
 			for feaster in heroes:
 				if not feaster.dead and feaster.bloodcraze > 0:
-					feaster.heal_amount(30)
-					feaster.float_text("+30 Bloodcraze", Color(0.85, 0.3, 0.3))
-					_log("   → Bloodcraze: %s feasts (+30 HP)" % feaster.unit_name, "#b0a8e0")
+					var craze := maxi(int(feaster.max_hp * 0.03 * feaster.bloodcraze), 1)
+					feaster.heal_amount(craze)
+					feaster.float_text("+%d Bloodcraze" % craze, Color(0.85, 0.3, 0.3))
+					_log("   → Bloodcraze: %s feasts (+%d HP)" % [feaster.unit_name,
+						craze], "#b0a8e0")
 		_sfx("crit", -5.0, 0.8)
 		_log("   → %s BLEEDS OUT for %d" % [victim.unit_name, bleed_dmg], "#e05050")
 		if bleed_result.died:
@@ -2581,6 +2852,17 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int) -> void:
 			_message("%s falls!" % victim.unit_name)
 			_log("† %s dies" % victim.unit_name, "#e05050")
 	else:
+		# Hemorrhage (talent): enough open wounds leave the enemy Crippled
+		# (threshold 80/70/60 buildup by rank).
+		var hem := 0
+		for h in heroes:
+			if not h.dead:
+				hem = maxi(hem, h.hemorrhage_ranks)
+		if hem > 0 and not victim.is_hero and not victim.has_status("cripple") \
+				and victim.bleed_buildup >= 90 - 10 * hem:
+			_apply_status(victim, "cripple", 2)
+			_log("   → Hemorrhage: %s is Crippled by blood loss" % victim.unit_name,
+				"#8cc843")
 		_log("   → %s: +%d Bleed (%d/100)" % [victim.unit_name, amount,
 			victim.bleed_buildup], "#e08850")
 

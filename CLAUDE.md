@@ -77,12 +77,19 @@ values in SPEC_INFO, bosses 160 + stun-immune unless Broken). Talent pools are
 THEMATIC per spec (8 signatures each, T5 = new ability). See master.html §6-7.
 Combat: crit 10%; miss 5% (Dazed +20%); parry 5% heroes / 2.5% enemies —
 a PARRIED hit lands at 25% damage + 25% BD, no auto-counter ("Counter
-Attack" = parry-answer basic, a defined term; counter_attacks flag, nothing
-grants it yet); Mocking Blow taunt; per-ability initiative ghost preview (no
-Guard — removed by design); ability hotkeys Q/W/E/R/A/S/D/F by kit slot
-(shown on buttons); Tab toggles the ability list / cycles targets / cycles
-pickers, Space confirms, X cancels, Alt = item picker, Space continues past
-victory screens. Talent ranks are ADDITIVE per point (documented). Unit UI lives on NAMEPLATE stacks
+Attack" = parry-answer basic; Riposte talent grants it); BLOCK = full
+negation (block_chance stat: Warden 5% + Heavy Plating 15%, Shieldmaster
+5%; Shieldwall charges guarantee); COOLDOWNS on all abilities (unit.
+cooldowns, ability_ready; enemies + bot respect them); Armor Pen keyword;
+Buff/Debuff keyword (DEBUFF_IDS in battle.gd). CLASS PASSIVES (all specs):
+Warrior targeted 1.2x, Cleric +15% heals received, Hunter acts first, Mage
++10 mana/turn. Mocking Blow taunt; ability hotkeys by MENU slot; Tab/Space/
+X/Alt controls; Space continues victory screens. TALENT TREES ARE FIXED-
+ONLY (berserker/swordmaster/warden 12-node grids, row gating 5/10/15 +
+prereqs, talents.gd; others "coming soon"; Hardiness mechanic PENDING for
+Tenacity/Rally). Talent ranks ADDITIVE. Warrior kits reshuffled 07-15
+(Crushing Blow to Warden, Sweeping Strikes, talent-granted Lunge/Execute/
+Shieldwall v2/Hold the Line/Battle Shout/Rampage-recast). Unit UI lives on NAMEPLATE stacks
 (180px plates, heroes left edge, enemies right; portrait + name + bars +
 chips; ACTING unit's plate = gold border, that's the turn indicator — no
 arrow; hover/Tab lights plates; plain style until UI assets arrive); parties

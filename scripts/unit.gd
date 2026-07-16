@@ -17,7 +17,7 @@ var frame_size := 100      # square frame edge of this unit's sprite strips
 var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
 var hero_key := ""         # class id ("warrior"...) — display name may be the spec
 var walks_to_target := false  # real locomotion: walk to melee range and back
-var counter_attacks := false  # Counter Attack: answers a parry with a basic attack
+var counter_attacks := 0      # Counter Attack: answers a parry with a basic attack
 var unit_name := ""
 var is_hero := true
 var max_hp := 100
@@ -37,11 +37,15 @@ var second_max := 100
 var passive_id := ""       # specialization passive hook (see battle.gd)
 var crit_bonus := 0.0      # from talents
 var parry_bonus := 0.0     # from talents
+var block_chance := 0.0    # Block: fully negates an incoming attack (pure tanks)
 var dmg_bonus := 0.0       # global damage multiplier bonus (relics)
 var type_dmg_bonus := {}   # dmg_type -> bonus fraction (relics)
 var bleed_buildup := 0     # bleeds out at 100
 var resists := {}          # dmg_type -> fraction reduced (negative = vulnerable)
 var abilities: Array = []
+var cooldowns := {}        # ability display_name -> turns until usable again
+var mana_regen_bonus := 0        # class passive: Mage Evocation
+var healing_received_mult := 1.0 # class passive: Cleric Holy Conduit
 
 var broken := false         # Broken: defenses down, crit vulnerable
 var broken_pending := false # will lose its next turn
@@ -54,15 +58,40 @@ var companion_kind := ""    # "ursus" / "canis" / "aguila"
 var companion: BattleUnit   # the Beastmaster's active summon (on the hunter)
 var companion_hp_bonus := 0   # talents: extra HP for summoned companions
 var companion_power := 0      # talents: extra damage on companion attacks
-# Berserker fixed-tree talent stats.
+# Fixed-tree talent stats (0/0.0 = not learned). See talents.gd for sources.
 var bleed_bonus := 0          # Savagery: extra Bleed on bleed-building abilities
-var bloodrage_bonus := 0.0    # Bloodthirsty: widens Blood Frenzy's max bonus
-var pierce_bonus := 0.0       # Crushing Force: attacks ignore extra armor
+var bloodrage_step_bonus := 0.0  # Unstoppable: adds to Blood Frenzy's 2%/step
+var pierce_bonus := 0.0       # flat armor penetration from talents
 var dmg_taken_bonus := 0.0    # Reckless Fury: takes more damage
-var enraged_ranks := 0        # Enraged: +1%/rank damage per hit taken
-var enraged_stacks := 0       # current Enraged bonus (%); resets when unhurt
-var turns_since_damaged := 0
-var bloodcraze := 0           # heals 30 when an enemy bleeds out
+var enraged_ranks := 0        # Enraged: stacks when dropping below 50% HP
+var enraged_stacks := 0       # current Enraged stacks (max 3)
+var enraged_timer := 0        # turns left on the Enraged buff
+var below_half_last := false  # edge detection for Enraged triggers
+var bloodcraze := 0           # Bloodcraze ranks: heal % max HP on enemy bleedout
+var unrelenting_ranks := 0    # Unrelenting Assault: +con when dropping below 25%
+var unrelenting_cd := 0
+var hemorrhage_ranks := 0     # Hemorrhage: cripple at high bleed buildup
+var crushing_blows_ranks := 0 # Crushing Blows: armor pen per enemy-party bleed
+var precision_ranks := 0      # Precision Strikes: crit vs dazed/crippled/exposed
+var opportunist := 0          # Opportunist: counter enemy misses with Overpower
+var blade_crit_ranks := 0     # Seasoned Fighter node: crit for Lunge/Overpower
+var pommel_parry_bonus := 0.0 # Swordsmanship: bigger perfect-Pommel parry buff
+var high_guard := 0           # High Guard: -25% damage 1 turn after parrying
+var dominant_ranks := 0       # Dominant Presence: armor per debuff applied
+var debuffs_applied := 0
+var unkillable_ranks := 0     # Unkillable: heal on block
+var elem_weak_ranks := 0      # Elemental Weakness: Crushing Blow resist shred
+var tank_spank_ranks := 0     # Tank and Spank: Mocking Blow empowers an ally
+var ricochet_ranks := 0       # Richocet: chance to stun on block
+var endurance_ranks := 0      # Endurance: armor per unhealed turn
+var endurance_stacks := 0
+var healed_externally := false
+var iron_will_ranks := 0      # Iron Will: damage per own debuff
+var sundering_ranks := 0      # Sundering: Crushing Blow BD splash
+var tenacity := 0             # PENDING the Hardiness mechanic
+var rally := 0                # PENDING the Hardiness mechanic
+var seasoned_def_bonus := 0.0 # Defensive Stance: deeper under-half reduction
+var seasoned_off_bonus := 0.0 # Aggressive Stance: bigger over-half bonus
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
@@ -416,9 +445,12 @@ func refresh_bars() -> void:
 	if passive_id == "bloodrage":
 		for s in statuses:
 			if s.id == "spec_passive":
-				var bonus := int(round(40.0 * (1.0 - hp / float(max_hp))))
-				s.short = "+%d%%" % bonus
-				s.desc = "Blood Frenzy: currently +%d%% damage\n(scales up to +40%% as HP falls)." % bonus
+				var step := 2.0 + bloodrage_step_bonus
+				var steps := int((1.0 - hp / float(max_hp)) * 100.0 / 5.0)
+				var bonus := step * steps
+				s.short = "+%d%%" % int(round(bonus))
+				s.desc = "Blood Frenzy: +%.1f%% damage per 5%% HP missing.\nCurrently +%.1f%% (%d steps)." % [
+					step, bonus, steps]
 				_refresh_chips()
 				break
 	# Seasoned Fighter chip shows which side of the stance switch is live.
@@ -426,10 +458,12 @@ func refresh_bars() -> void:
 		for s in statuses:
 			if s.id == "spec_passive":
 				var offense := hp > max_hp * 0.5
+				var off_pct := int(round((0.15 + seasoned_off_bonus) * 100))
+				var def_pct := int(round((0.15 + seasoned_def_bonus) * 100))
 				s.short = "+dmg" if offense else "-dmg"
 				s.desc = "Seasoned Fighter: currently %s." % (
-					"+15% damage dealt (above half HP)" if offense
-					else "15% less damage taken (at or below half HP)")
+					("+%d%% damage dealt (above half HP)" % off_pct) if offense
+					else ("%d%% less damage taken (at or below half HP)" % def_pct))
 				_refresh_chips()
 				break
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
@@ -537,6 +571,35 @@ func tick_statuses() -> void:
 	_refresh_chips()
 
 
+# ---------- cooldowns ----------
+
+func tick_cooldowns() -> void:
+	for ab_name in cooldowns.keys():
+		cooldowns[ab_name] = maxi(int(cooldowns[ab_name]) - 1, 0)
+	if unrelenting_cd > 0:
+		unrelenting_cd -= 1
+	if enraged_timer > 0:
+		enraged_timer -= 1
+		if enraged_timer == 0:
+			enraged_stacks = 0
+			float_text("Enraged fades", Color(0.7, 0.5, 0.4))
+
+
+func ability_ready(ab: Ability) -> bool:
+	return int(cooldowns.get(ab.display_name, 0)) <= 0
+
+
+func cooldown_left(ab: Ability) -> int:
+	return int(cooldowns.get(ab.display_name, 0))
+
+
+# +1 because the counter ticks at this unit's next turn start: the ability
+# stays unusable for exactly `cooldown` of its turns after use.
+func start_cooldown(ab: Ability) -> void:
+	if ab.cooldown > 0:
+		cooldowns[ab.display_name] = ab.cooldown + 1
+
+
 func effective_speed() -> float:
 	var s := speed * (0.75 if (has_status("slow") or has_status("chilled")) else 1.0)
 	if has_status("quickdraw"):
@@ -548,13 +611,18 @@ func effective_speed() -> float:
 
 func effective_armor() -> float:
 	var a := armor
+	# Dominant Presence: armor value grows 5%/rank per debuff applied.
+	if dominant_ranks > 0 and debuffs_applied > 0:
+		a *= 1.0 + 0.05 * dominant_ranks * debuffs_applied
+	# Endurance: +3%/rank armor per turn without an external heal.
+	a += 0.03 * endurance_ranks * endurance_stacks
 	if has_status("fortify"):
 		a += 0.10
 	if broken:
 		a *= 0.7
 	if has_status("sunder"):
 		a *= 0.65
-	return a
+	return minf(a, 0.85)
 
 
 func _refresh_chips() -> void:
@@ -632,12 +700,27 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			if s.power <= 0:
 				remove_status("barrier")
 			break
+	var was_above_half := hp > max_hp * 0.5
+	var was_above_quarter := hp > max_hp * 0.25
 	hp = maxi(hp - amount, 0)
+	# Hold the Line: the party cannot die while the blessing holds.
+	if hp == 0 and has_status("undying"):
+		hp = 1
+		float_text("HELD THE LINE", Color(0.95, 0.85, 0.4))
 	if resource_name == "Rage":
 		resource = mini(resource + 10, max_resource)
-	if enraged_ranks > 0 and amount > 0:
-		enraged_stacks += enraged_ranks
-		turns_since_damaged = 0
+	# Enraged (talent): dropping below half HP grants a stacking damage buff.
+	if enraged_ranks > 0 and was_above_half and hp <= max_hp * 0.5 and hp > 0:
+		enraged_stacks = mini(enraged_stacks + 1, 3)
+		enraged_timer = 5
+		float_text("ENRAGED x%d" % enraged_stacks, Color(0.9, 0.35, 0.3))
+	# Unrelenting Assault (talent): dropping below 25% HP grants Constitution
+	# (at most once every 5 turns).
+	if unrelenting_ranks > 0 and was_above_quarter and hp <= max_hp * 0.25 \
+			and hp > 0 and unrelenting_cd == 0:
+		constitution += 10 * unrelenting_ranks
+		unrelenting_cd = 5
+		float_text("+%d Constitution" % (10 * unrelenting_ranks), Color(0.7, 0.8, 0.95))
 	# Mana Shield: half the pain flows back as Mana.
 	if has_status("mana_shield") and resource_name == "Mana" and amount > 0:
 		var converted := maxi(int(amount * 0.5), 1)
@@ -649,6 +732,8 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		pressure_add = int(pressure_add * 0.5)
 	if has_status("devotion"):
 		pressure_add = int(pressure_add * 0.85)
+	if has_status("hold_bd"):
+		pressure_add = int(pressure_add * 0.5)
 	var just_broke := false
 	var applied_bd := 0
 	if not broken:
@@ -673,6 +758,9 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 # Damage from DoT effects (Burn). No Pressure, no hurt animation. Returns true on death.
 func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 	hp = maxi(hp - amount, 0)
+	if hp == 0 and has_status("undying"):
+		hp = 1
+		float_text("HELD THE LINE", Color(0.95, 0.85, 0.4))
 	float_text(label, color)
 	if hp <= 0:
 		_die()
@@ -723,8 +811,13 @@ func recover_from_break() -> void:
 	refresh_bars()
 
 
-func heal_amount(amount: int) -> void:
-	hp = mini(hp + amount, max_hp)
+# Heals respect Holy Conduit (healing_received_mult). `external` marks heals
+# from another unit or an item — the Warden's Endurance talent resets on them.
+func heal_amount(amount: int, external := false) -> void:
+	var final := int(round(amount * healing_received_mult))
+	hp = mini(hp + final, max_hp)
+	if external and final > 0:
+		healed_externally = true
 	refresh_bars()
 
 

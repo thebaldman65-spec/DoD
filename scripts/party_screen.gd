@@ -148,8 +148,12 @@ func _draw_detail() -> void:
 		[["Crit Chance: %d%%" % crit_pct,
 			"Crit Chance — chance to strike for 50% extra damage\n(base 10% plus bonuses)."],
 		["Parry: %d%%" % int(round((0.05 + cfg.get("parry_bonus", 0.0)) * 100)),
-			"Parry — chance to negate a hit and counter with the basic\nattack (base 5% plus bonuses)."]],
+			"Parry — a parried hit deals 75% less damage and\nBreak damage (base 5% plus bonuses)."]],
 	]
+	# Only pure tanks carry a Block stat (the Warden, for now).
+	if cfg.get("block_chance", 0.0) > 0.0:
+		stat_rows[3].append(["Block: %d%%" % int(round(cfg["block_chance"] * 100)),
+			"Block — chance to fully negate an incoming attack:\nno damage, no Break damage, no effects.\nHeavy Plating adds another +15% in battle."])
 	for r in stat_rows.size():
 		var row := HBoxContainer.new()
 		row.position = Vector2(60, 132 + r * 22)
@@ -163,15 +167,19 @@ func _draw_detail() -> void:
 			stat_label.mouse_filter = Control.MOUSE_FILTER_STOP
 			stat_label.tooltip_text = seg[1]
 			row.add_child(stat_label)
+	var class_p: Dictionary = Classes.CLASS_PASSIVES[key]
+	var passive_lines := PackedStringArray(
+		["Class: %s — %s" % [class_p["name"], class_p["desc"]]])
 	if spec != "":
-		var passive_label := Label.new()
-		passive_label.text = "Passive: %s" % Classes.SPEC_INFO[spec]["passive_desc"]
-		passive_label.add_theme_font_size_override("font_size", 15)
-		passive_label.add_theme_color_override("font_color", Color(0.88, 0.85, 0.78))
-		passive_label.position = Vector2(60, 132 + stat_rows.size() * 22)
-		passive_label.size = Vector2(400, 60)
-		passive_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		add_child(passive_label)
+		passive_lines.append("Passive: %s" % Classes.SPEC_INFO[spec]["passive_desc"])
+	var passive_label := Label.new()
+	passive_label.text = "\n".join(passive_lines)
+	passive_label.add_theme_font_size_override("font_size", 13)
+	passive_label.add_theme_color_override("font_color", Color(0.88, 0.85, 0.78))
+	passive_label.position = Vector2(60, 132 + stat_rows.size() * 22)
+	passive_label.size = Vector2(400, 80)
+	passive_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	add_child(passive_label)
 
 	var ability_header := Label.new()
 	ability_header.text = "ABILITIES  (hover for details)"
@@ -259,68 +267,33 @@ func _draw_detail() -> void:
 	if spec == "":
 		tree_header.text = "TALENTS — the %s awakens after your first victory." % key.capitalize()
 		return
+	# Only designed (fixed) trees exist; the rest are on the way.
+	if not Talents.has_tree(spec):
+		tree_header.text = "TALENTS — %s tree" % Classes.SPEC_INFO[spec]["name"]
+		var soon := Label.new()
+		soon.text = "Coming soon."
+		soon.add_theme_font_override("font", NAME_FONT)
+		soon.add_theme_font_size_override("font_size", 30)
+		soon.add_theme_color_override("font_color", Color(0.6, 0.55, 0.5))
+		soon.position = Vector2(500, 300)
+		soon.size = Vector2(744, 40)
+		soon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		add_child(soon)
+		return
 	tree_header.text = "TALENTS — %s tree    (Points: %d)" % [
 		Classes.SPEC_INFO[spec]["name"], member.get("talent_points", 0)]
-
-	var learned: Dictionary = member.get("talents", {})
-	var points: int = member.get("talent_points", 0)
-	var tree: Array = member.get("tree", [])
-	# Designed (fixed) trees render as an icon grid styled after the
-	# "Appearance example" reference; generated trees keep the list panels.
-	if tree.any(func(t): return t.get("gate", "") == "cumulative"):
-		_draw_fixed_tree(tree, learned, points)
-		return
-	var col_w := 380
-	var panel_w := 372
-	var tier_counts := {}
-	for talent in tree:
-		var tier: int = talent["tier"]
-		var idx_in_tier: int = tier_counts.get(tier, 0)
-		tier_counts[tier] = idx_in_tier + 1
-		var panel := PanelContainer.new()
-		panel.position = Vector2(505 + idx_in_tier * col_w, 106 + (tier - 1) * 96)
-		panel.custom_minimum_size = Vector2(panel_w, 88)
-		add_child(panel)
-		var vbox := VBoxContainer.new()
-		vbox.add_theme_constant_override("separation", 2)
-		panel.add_child(vbox)
-		var ranks_have := int(learned.get(talent["id"], 0))
-		var label := Label.new()
-		label.text = "T%d  %s  [%d/%d] — %s" % [talent["tier"], talent["name"],
-			ranks_have, talent["ranks"], talent["desc"]]
-		label.add_theme_font_size_override("font_size", 10)
-		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.custom_minimum_size = Vector2(panel_w - 16, 0)
-		vbox.add_child(label)
-		var learn := Button.new()
-		learn.custom_minimum_size = Vector2(120, 22)
-		learn.add_theme_font_size_override("font_size", 10)
-		var check: Dictionary = Talents.can_learn(tree, talent["id"], learned)
-		if ranks_have >= int(talent["ranks"]):
-			learn.text = "MAXED"
-			learn.disabled = true
-			panel.modulate = Color(0.75, 0.95, 0.75)
-		elif not check["ok"]:
-			learn.text = check["why"]
-			learn.disabled = true
-		elif points < 1:
-			learn.text = "No points"
-			learn.disabled = true
-		else:
-			learn.text = "Learn (1 pt)" if ranks_have == 0 else "Rank up (1 pt)"
-			learn.pressed.connect(_learn_talent.bind(talent["id"]))
-			if ranks_have > 0:
-				panel.modulate = Color(0.85, 0.95, 0.8)
-		vbox.add_child(learn)
+	_draw_fixed_tree(member.get("tree", []), member.get("talents", {}),
+		member.get("talent_points", 0))
 
 
 # ---------- fixed talent tree (styled after the "Appearance example") ----------
 
 const TREE_BACK_POS := Vector2(500, 96)
 const TREE_BACK_SIZE := Vector2(744, 566)
-const TREE_NODE_SIZE := 72.0
-const TREE_COL_X := [614.0, 806.0, 998.0]  # node centers
-const TREE_ROW_Y := [186.0, 356.0, 526.0]
+const TREE_NODE_SIZE := 56.0
+# 5 columns x 4 rows, straight from the generator layout (col/row per node).
+const TREE_COL_X := [570.0, 720.0, 870.0, 1020.0, 1170.0]
+const TREE_ROW_Y := [160.0, 295.0, 430.0, 565.0]
 
 var _tree_tip: PanelContainer
 var _tree_tip_name: Label
@@ -349,13 +322,22 @@ func _draw_fixed_tree(tree: Array, learned: Dictionary, points: int) -> void:
 		h.color = Color(1, 1, 1, 0.05)
 		add_child(h)
 
-	var tier_counts := {}
+	# Prerequisite connectors first, so the lines sit under the nodes.
 	for talent in tree:
-		var tier: int = talent["tier"]
-		var col: int = tier_counts.get(tier, 0)
-		tier_counts[tier] = col + 1
-		var center := Vector2(TREE_COL_X[mini(col, 2)], TREE_ROW_Y[clampi(tier - 1, 0, 2)])
-		_make_tree_node(talent, learned, points, center)
+		var req: String = talent.get("requires", "")
+		if req == "":
+			continue
+		var req_node := Talents.node_in_tree(tree, req)
+		if req_node.is_empty():
+			continue
+		var line := Line2D.new()
+		line.add_point(_node_center(req_node))
+		line.add_point(_node_center(talent))
+		line.width = 2.0
+		line.default_color = Color(0.45, 0.42, 0.5, 0.6)
+		add_child(line)
+	for talent in tree:
+		_make_tree_node(talent, learned, points, _node_center(talent))
 
 	# Shared hover tooltip: black panel, white bold name, yellow description.
 	_tree_tip = PanelContainer.new()
@@ -395,6 +377,11 @@ func _draw_fixed_tree(tree: Array, learned: Dictionary, points: int) -> void:
 	add_child(_tree_tip)
 
 
+func _node_center(talent: Dictionary) -> Vector2:
+	return Vector2(TREE_COL_X[clampi(int(talent.get("col", 2)), 0, 4)],
+		TREE_ROW_Y[clampi(int(talent.get("row", 0)), 0, 3)])
+
+
 func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
 		center: Vector2) -> void:
 	var ranks_have := int(learned.get(talent["id"], 0))
@@ -420,7 +407,7 @@ func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
 	btn.add_theme_stylebox_override("pressed", sb_hover)
 	# Placeholder emblem until node art lands.
 	btn.text = "⚔"
-	btn.add_theme_font_size_override("font_size", 30)
+	btn.add_theme_font_size_override("font_size", 24)
 	btn.add_theme_color_override("font_color",
 		Color(0.30, 0.30, 0.34) if locked else Color(0.58, 0.58, 0.64))
 	btn.add_theme_color_override("font_hover_color", Color(0.75, 0.75, 0.8))

@@ -1,424 +1,215 @@
-# Talent POOLS per specialization, tiered 1-6 by depth (deeper = stronger).
-# Every talent is THEMATIC: it supports the spec's archetype role and touches
-# the spec's actual abilities (tier 5 grants a signature new ability).
-# Each run GENERATES a tree from the pool: 2 slots per tier, padded with
-# generic training talents. Tier N unlocks after (N-1)*2 points spent.
-# Learned talents: {id: ranks}.
+# FIXED talent trees only (designed in the RPG Skill Tree Generator; source
+# JSONs live in data/talent-tree-*.json — this file is their hand-tuned
+# conversion). Specs without a designed tree show "coming soon" on the party
+# screen. Learned talents: {id: ranks}. Ranks are ADDITIVE: every extra point
+# adds the same stated amount again.
+#
+# Gating: rows unlock cumulatively (row 1 needs 5 pts, row 2 needs 10,
+# row 3 — the capstone — needs 15), PLUS explicit per-node prerequisites
+# ("requires" id at "requires_ranks" points).
 class_name Talents
 
-const SLOTS_PER_TIER := 2
-const MAX_TIER := 6
-
-# FIXED trees designed in the RPG Skill Tree Generator (source JSON kept in
-# data/). Gating is cumulative: Tier 2 needs 5 points in Tier 1; Tier 3 needs
-# 10 points across Tiers 1-2. All nodes carry gate = "cumulative".
-const CUMULATIVE_REQ := {1: 0, 2: 5, 3: 10}
+const ROW_REQ := {0: 0, 1: 5, 2: 10, 3: 15}
 
 const FIXED_TREES := {
 	"berserker": [
-		{"id": "bz1", "tier": 1, "ranks": 3, "requires": "", "gate": "cumulative",
-			"name": "Savagery",
-			"desc": "All bleed-building Berserker abilities build +2 more Bleed per rank.",
-			"payload": {"stat": {"bleed_bonus": 2}}},
-		{"id": "bz2", "tier": 1, "ranks": 3, "requires": "", "gate": "cumulative",
-			"name": "Bloodthirsty",
-			"desc": "Blood Frenzy's damage bonus grows by +3% per rank (max 40% -> 49%).",
-			"payload": {"stat": {"bloodrage_bonus": 0.03}}},
-		{"id": "bz3", "tier": 1, "ranks": 3, "requires": "", "gate": "cumulative",
-			"name": "Vitality",
-			"desc": "+5% max HP per rank.",
-			"payload": {"stat": {"max_hp_pct": 0.05}}},
-		{"id": "bz4", "tier": 2, "ranks": 3, "requires": "", "gate": "cumulative",
-			"name": "Crushing Force",
-			"desc": "The Berserker's attacks ignore 5% of the target's armor per rank.",
-			"payload": {"stat": {"pierce_bonus": 0.05}}},
-		{"id": "bz5", "tier": 2, "ranks": 1, "requires": "", "gate": "cumulative",
-			"name": "Rampage",
-			"desc": "New ability: +1% damage per 10 Bleed buildup on the enemy party, for 1 turn (20 Rage).",
-			"payload": {"new_ability": {"display_name": "Rampage", "cost": 20,
-				"special": "rampage", "delay": 2.0, "anim": "attack03",
-				"perfect_id": "", "perfect_text": "+10% more damage",
-				"description": "Scent the blood: +1% damage per 10 Bleed\nbuildup on the enemy party. Lasts 1 turn."}}},
-		{"id": "bz6", "tier": 2, "ranks": 3, "requires": "", "gate": "cumulative",
-			"name": "Reckless Fury",
+		# --- row 0 ---
+		{"id": "bz_bloodcraze", "name": "Bloodcraze", "ranks": 3, "row": 0, "col": 1,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "When an enemy bleeds out, the Berserker heals 3% of max HP per rank.",
+			"payload": {"stat": {"bloodcraze": 1}}},
+		{"id": "bz_unstoppable", "name": "Unstoppable", "ranks": 3, "row": 0, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Blood Frenzy grants +0.5% more damage per rank for every 5% of health missing (2% -> 2.5% / 3% / 3.5%).",
+			"payload": {"stat": {"bloodrage_step_bonus": 0.5}}},
+		{"id": "bz_enraged", "name": "Enraged", "ranks": 3, "row": 0, "col": 3,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Dropping below 50% health grants a +3% per rank damage buff for 5 turns (stacks up to 3 times).",
+			"payload": {"stat": {"enraged_ranks": 1}}},
+		# --- row 1 ---
+		{"id": "bz_crushing_blows", "name": "Crushing Blows", "ranks": 3, "row": 1, "col": 0,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "For every 20 points of bloodloss on the enemy team, gain 3% armor penetration per rank.",
+			"payload": {"stat": {"crushing_blows_ranks": 1}}},
+		{"id": "bz_savagery", "name": "Savagery", "ranks": 3, "row": 1, "col": 1,
+			"gate": "row", "requires": "bz_unstoppable", "requires_ranks": 1,
+			"desc": "All bleed-building Berserker abilities build +5 more Bleed per rank.",
+			"payload": {"stat": {"bleed_bonus": 5}}},
+		{"id": "bz_battle_shout", "name": "Battle Shout", "ranks": 1, "row": 1, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "New ability: Battle Shout — +1% damage for every 20 points of blood buildup on the enemy party, for 2 turns (15 Rage, 3cd).",
+			"payload": {"new_ability": {"display_name": "Battle Shout", "cost": 15,
+				"special": "battle_shout", "delay": 2.0, "anim": "attack03", "cooldown": 3,
+				"perfect_id": "rage5", "perfect_text": "Also grants 5 Rage",
+				"description": "A roar fed by open wounds: +1% damage\nper 20 blood buildup on the enemy party.\nLasts 2 turns."}}},
+		{"id": "bz_reckless", "name": "Reckless Fury", "ranks": 3, "row": 1, "col": 3,
+			"gate": "row", "requires": "bz_unstoppable", "requires_ranks": 1,
 			"desc": "+5% damage dealt AND +5% damage taken per rank.",
 			"payload": {"stat": {"dmg_bonus": 0.05, "dmg_taken_bonus": 0.05}}},
-		{"id": "bz7", "tier": 3, "ranks": 1, "requires": "", "gate": "cumulative",
-			"name": "Bloodlust",
+		{"id": "bz_unrelenting", "name": "Unrelenting Assault", "ranks": 3, "row": 1, "col": 4,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Dropping below 25% health grants +10 Constitution per rank (at most once every 5 turns).",
+			"payload": {"stat": {"unrelenting_ranks": 1}}},
+		# --- row 2 ---
+		{"id": "bz_hemorrhage", "name": "Hemorrhage", "ranks": 3, "row": 2, "col": 1,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Enemies at high bloodloss are Crippled; the threshold drops 10 per rank (80 / 70 / 60 buildup).",
+			"payload": {"stat": {"hemorrhage_ranks": 1}}},
+		{"id": "bz_bloodlust_node", "name": "Bloodlust", "ranks": 1, "row": 2, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
 			"desc": "Hack and Slash strikes an extra time.",
 			"payload": {"ability": "Hack and Slash", "add": {"multi_hits": 1}}},
-		{"id": "bz8", "tier": 3, "ranks": 1, "requires": "", "gate": "cumulative",
-			"name": "Bloodcraze",
-			"desc": "When an enemy bleeds out, the Berserker heals 30 HP.",
-			"payload": {"stat": {"bloodcraze": 1}}},
-		{"id": "bz9", "tier": 3, "ranks": 3, "requires": "", "gate": "cumulative",
-			"name": "Enraged",
-			"desc": "Each hit the Berserker takes grants +1% damage per rank; fades after 2 unhurt turns.",
-			"payload": {"stat": {"enraged_ranks": 1}}},
+		{"id": "bz_vitality", "name": "Vitality", "ranks": 3, "row": 2, "col": 3,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "+5% max HP per rank.",
+			"payload": {"stat": {"max_hp_pct": 0.05}}},
+		# --- row 3 (capstone) ---
+		{"id": "bz_rampage", "name": "Rampage", "ranks": 1, "row": 3, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "New ability: Rampage — strike 3 times for damage and bloodloss; if the target dies, immediately recast on another enemy (40 Rage, 4.0 int, 5cd).",
+			"payload": {"new_ability": {"display_name": "Rampage", "cost": 40,
+				"damage": 20, "pressure": 10, "multi_hits": 3, "bleed_build": 10,
+				"delay": 4.0, "anim": "attack01", "cooldown": 5,
+				"perfect_extra_hit": false,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Three brutal strikes, each building\n10 bloodloss. If the target dies, Rampage\nimmediately recasts on another enemy."}}},
 	],
-}
-
-const POOLS := {
-	# Warden (Tank): armor, Constitution, and a bigger taunt-and-wall toolkit.
-	"warden": [
-		{"id": "w1", "tier": 1, "ranks": 3, "requires": "", "name": "Iron Skin",
-			"desc": "+2% armor per rank.", "payload": {"stat": {"armor": 0.02}}},
-		{"id": "w2", "tier": 2, "ranks": 2, "requires": "", "name": "Immovable",
-			"desc": "+20 Constitution per rank.", "payload": {"stat": {"constitution": 20}}},
-		{"id": "w3", "tier": 3, "ranks": 1, "requires": "w2", "name": "Quick Challenge",
-			"desc": "Mocking Blow costs 1.0 less initiative.",
-			"payload": {"ability": "Mocking Blow", "add": {"delay": -1.0}}},
-		{"id": "w4", "tier": 3, "ranks": 2, "requires": "", "name": "Broad Wall",
-			"desc": "Shieldwall costs 5 less Rage per rank.",
-			"payload": {"ability": "Shieldwall", "add": {"cost": -5}}},
-		{"id": "w5", "tier": 4, "ranks": 2, "requires": "w1", "name": "Guardian's Vigor",
-			"desc": "+12 max HP per rank.", "payload": {"stat": {"max_hp": 12}}},
-		{"id": "w6", "tier": 5, "ranks": 1, "requires": "w4", "name": "Bulwark Slam",
-			"desc": "New ability: 26-damage shield bash, heavy Pressure (20 Rage).",
-			"payload": {"new_ability": {"display_name": "Bulwark Slam", "cost": 20, "damage": 26,
-				"pressure": 30, "delay": 3.0, "anim": "attack02", "resource_gain": 10,
-				"perfect_id": "pressure", "perfect_text": "+60% Pressure",
-				"description": "Slam with the shield's full weight.\nBuilds 10 Rage."}}},
-		{"id": "w7", "tier": 4, "ranks": 2, "requires": "w3", "name": "Heavy Hand",
-			"desc": "Mocking Blow deals +8 damage per rank.",
-			"payload": {"ability": "Mocking Blow", "add": {"damage": 8}}},
-		{"id": "w8", "tier": 6, "ranks": 1, "requires": "w1", "name": "Unbreakable",
-			"desc": "+4% armor.", "payload": {"stat": {"armor": 0.04}}},
-	],
-	# Swordmaster (Bruiser): crits, parries, and Break exploitation.
 	"swordmaster": [
-		{"id": "s1", "tier": 1, "ranks": 3, "requires": "", "name": "Keen Edge",
-			"desc": "+2% crit chance per rank.", "payload": {"stat": {"crit_bonus": 0.02}}},
-		{"id": "s2", "tier": 2, "ranks": 2, "requires": "", "name": "Heavy Pommel",
-			"desc": "Pommel Strike deals +5 damage per rank.",
-			"payload": {"ability": "Pommel Strike", "add": {"damage": 5}}},
-		{"id": "s3", "tier": 3, "ranks": 2, "requires": "s1", "name": "Riposte Training",
-			"desc": "+3% parry chance per rank.", "payload": {"stat": {"parry_bonus": 0.03}}},
-		{"id": "s4", "tier": 3, "ranks": 1, "requires": "", "name": "Efficient Cuts",
-			"desc": "Overpower costs 5 less Rage.",
-			"payload": {"ability": "Overpower", "add": {"cost": -5}}},
-		{"id": "s5", "tier": 4, "ranks": 2, "requires": "", "name": "Sunder Deeper",
-			"desc": "Crushing Blow deals +6 Pressure per rank.",
-			"payload": {"ability": "Crushing Blow", "add": {"pressure": 6}}},
-		{"id": "s6", "tier": 5, "ranks": 1, "requires": "s4", "name": "Flurry",
-			"desc": "New ability: 3 quick strikes at random enemies (25 Rage).",
-			"payload": {"new_ability": {"display_name": "Flurry", "cost": 25, "damage": 12,
-				"pressure": 10, "delay": 3.5, "anim": "attack01", "random_hits": 3,
+		# --- row 0 ---
+		{"id": "sm_def_stance", "name": "Defensive Stance", "ranks": 3, "row": 0, "col": 1,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Seasoned Fighter reduces damage taken while under 50% health by an additional 3% per rank.",
+			"payload": {"stat": {"seasoned_def_bonus": 0.03}}},
+		{"id": "sm_swordsmanship", "name": "Swordsmanship", "ranks": 3, "row": 0, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "A perfect Pommel Strike grants +5% more parry chance per rank.",
+			"payload": {"stat": {"pommel_parry_bonus": 0.05}}},
+		{"id": "sm_agg_stance", "name": "Aggressive Stance", "ranks": 3, "row": 0, "col": 3,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Seasoned Fighter increases damage dealt above 50% health by an additional 3% per rank.",
+			"payload": {"stat": {"seasoned_off_bonus": 0.03}}},
+		# --- row 1 ---
+		{"id": "sm_dominant", "name": "Dominant Presence", "ranks": 3, "row": 1, "col": 0,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Armor value is increased by 5% per rank for every debuff the Swordmaster applies this battle.",
+			"payload": {"stat": {"dominant_ranks": 1}}},
+		{"id": "sm_high_guard", "name": "High Guard", "ranks": 1, "row": 1, "col": 1,
+			"gate": "row", "requires": "sm_swordsmanship", "requires_ranks": 1,
+			"desc": "Take 25% less damage for 1 turn after parrying an attack.",
+			"payload": {"stat": {"high_guard": 1}}},
+		{"id": "sm_lunge", "name": "Lunge", "ranks": 1, "row": 1, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "New ability: Lunge — 35 damage; applies Exposed while above 50% health, Cripple while below (25 Rage, 3.5 int).",
+			"payload": {"new_ability": {"display_name": "Lunge", "cost": 25,
+				"damage": 35, "pressure": 20, "delay": 3.5, "anim": "attack02",
 				"resource_gain": 10,
-				"perfect_id": "", "perfect_text": "4 strikes instead of 3",
-				"description": "A blinding sequence of cuts.\nBuilds 10 Rage."}}},
-		{"id": "s7", "tier": 6, "ranks": 2, "requires": "s5", "name": "Deathblow",
-			"desc": "Overpower deals +5 damage per rank.",
-			"payload": {"ability": "Overpower", "add": {"damage": 5}}},
-		{"id": "s8", "tier": 4, "ranks": 2, "requires": "s3", "name": "Heavier Blows",
-			"desc": "Crushing Blow deals +4 damage per rank.",
-			"payload": {"ability": "Crushing Blow", "add": {"damage": 4}}},
+				"perfect_id": "", "perfect_text": "Initiative cost 3.0 instead",
+				"description": "A committed thrust. Above 50% HP it\nExposes the target; below, it Cripples\nthem (3 turns). Builds 10 Rage."}}},
+		{"id": "sm_riposte", "name": "Riposte", "ranks": 1, "row": 1, "col": 3,
+			"gate": "row", "requires": "sm_swordsmanship", "requires_ranks": 1,
+			"desc": "Counter Attack: immediately answer every parry with a Strike.",
+			"payload": {"stat": {"counter_attacks": 1}}},
+		{"id": "sm_precision", "name": "Precision Strikes", "ranks": 3, "row": 1, "col": 4,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "+5% per rank critical strike chance against Dazed, Crippled, and Exposed targets.",
+			"payload": {"stat": {"precision_ranks": 1}}},
+		# --- row 2 ---
+		{"id": "sm_seasoned_node", "name": "Seasoned Fighter", "ranks": 3, "row": 2, "col": 1,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Lunge and Overpower gain +3% critical strike chance per rank.",
+			"payload": {"stat": {"blade_crit_ranks": 1}}},
+		{"id": "sm_opportunist", "name": "Opportunist", "ranks": 1, "row": 2, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "When an enemy attack misses the Swordmaster, he counter attacks with Overpower (free).",
+			"payload": {"stat": {"opportunist": 1}}},
+		{"id": "sm_sword_mastery", "name": "Sword Mastery", "ranks": 3, "row": 2, "col": 3,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "+3% parry chance per rank.",
+			"payload": {"stat": {"parry_bonus": 0.03}}},
+		# --- row 3 (capstone) ---
+		{"id": "sm_execute", "name": "Execute", "ranks": 1, "row": 3, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "New ability: Execute — 55 damage / 50 BD; only usable against targets below 20% health; a perfect guarantees a crit (30 Rage, 2.0 int, 4cd).",
+			"payload": {"new_ability": {"display_name": "Execute", "cost": 30,
+				"damage": 55, "pressure": 50, "delay": 2.0, "anim": "attack03",
+				"cooldown": 4,
+				"perfect_id": "", "perfect_text": "Guaranteed critical strike",
+				"description": "End them. Only usable against targets\nbelow 20% health."}}},
 	],
-	# Pyromancer (Nuker): cheaper, faster, hotter Pyroblast turns.
-	"pyromancer": [
-		{"id": "p1", "tier": 1, "ranks": 2, "requires": "", "name": "Ember Mind",
-			"desc": "+10 max Mana per rank — fuel for the big turn.",
-			"payload": {"stat": {"max_resource": 10}}},
-		{"id": "p2", "tier": 2, "ranks": 2, "requires": "", "name": "Wildfire",
-			"desc": "Flame Surge deals +4 damage per rank.",
-			"payload": {"ability": "Flame Surge", "add": {"damage": 4}}},
-		{"id": "p3", "tier": 3, "ranks": 2, "requires": "", "name": "Hot Bolts",
-			"desc": "Magic Bolt deals +3 damage per rank.",
-			"payload": {"ability": "Magic Bolt", "add": {"damage": 3}}},
-		{"id": "p4", "tier": 3, "ranks": 2, "requires": "p1", "name": "Kindling",
-			"desc": "Pyroblast costs 5 less Mana per rank.",
-			"payload": {"ability": "Pyroblast", "add": {"cost": -5}}},
-		{"id": "p5", "tier": 4, "ranks": 1, "requires": "p4", "name": "Comet's Descent",
-			"desc": "Pyroblast costs 1.0 less initiative.",
-			"payload": {"ability": "Pyroblast", "add": {"delay": -1.0}}},
-		{"id": "p6", "tier": 5, "ranks": 1, "requires": "p2", "name": "Inferno",
-			"desc": "New ability: engulf ALL enemies, 24 fire damage + Burn (35 Mana).",
-			"payload": {"new_ability": {"display_name": "Inferno", "dmg_type": "fire",
-				"cost": 35, "damage": 24, "pressure": 12, "delay": 4.5, "anim": "attack03",
-				"aoe": true, "applies_status": {"id": "burn", "turns": 3},
-				"perfect_id": "", "perfect_text": "+50% Pressure on every target",
-				"description": "The battlefield becomes a furnace."}}},
-		{"id": "p7", "tier": 6, "ranks": 1, "requires": "p6", "name": "Fire Feeds Fire",
-			"desc": "Inferno costs 10 less Mana.",
-			"payload": {"ability": "Inferno", "add": {"cost": -10}}},
-		{"id": "p8", "tier": 4, "ranks": 2, "requires": "", "name": "Cinder Skin",
-			"desc": "+2% armor per rank.", "payload": {"stat": {"armor": 0.02}}},
-	],
-	# Cryomancer (Nuker): shatter combos against Chilled targets.
-	"cryomancer": [
-		{"id": "c1", "tier": 2, "ranks": 1, "requires": "", "name": "Shard Storm",
-			"desc": "Razor Ice throws an extra shard.",
-			"payload": {"ability": "Razor Ice", "add": {"random_hits": 1}}},
-		{"id": "c2", "tier": 1, "ranks": 2, "requires": "", "name": "Cold Snap",
-			"desc": "Frost Bolt deals +3 damage per rank.",
-			"payload": {"ability": "Frost Bolt", "add": {"damage": 3}}},
-		{"id": "c3", "tier": 3, "ranks": 2, "requires": "", "name": "Frost Armor",
-			"desc": "+2% armor per rank.", "payload": {"stat": {"armor": 0.02}}},
-		{"id": "c4", "tier": 4, "ranks": 2, "requires": "c1", "name": "Sharper Ice",
-			"desc": "Razor Ice deals +3 damage per shard per rank.",
-			"payload": {"ability": "Razor Ice", "add": {"damage": 3}}},
-		{"id": "c5", "tier": 3, "ranks": 2, "requires": "", "name": "Deep Freeze",
-			"desc": "Blizzard deals +8 Pressure per rank.",
-			"payload": {"ability": "Blizzard", "add": {"pressure": 8}}},
-		{"id": "c6", "tier": 5, "ranks": 1, "requires": "c4", "name": "Absolute Zero",
-			"desc": "New ability: 20 frost damage, shoves the target far down the initiative order (30 Mana).",
-			"payload": {"new_ability": {"display_name": "Absolute Zero", "dmg_type": "frost",
-				"cost": 30, "damage": 20, "pressure": 16, "delay": 3.5, "anim": "attack02",
-				"delay_push": 6.0, "applies_status": {"id": "chilled", "turns": 3},
-				"perfect_id": "", "perfect_text": "Also +50% Pressure",
-				"description": "Entomb them in ice and time."}}},
-		{"id": "c7", "tier": 4, "ranks": 2, "requires": "c3", "name": "Glacier Mind",
-			"desc": "+10 max Mana per rank.", "payload": {"stat": {"max_resource": 10}}},
-		{"id": "c8", "tier": 6, "ranks": 2, "requires": "c5", "name": "Shatter",
-			"desc": "Frost Bolt deals +6 damage per rank.",
-			"payload": {"ability": "Frost Bolt", "add": {"damage": 6}}},
-	],
-	# Arcanist (Ramp): stack Resonance, then cash it out harder.
-	"arcanist": [
-		{"id": "a1", "tier": 2, "ranks": 1, "requires": "", "name": "Stable Cannon",
-			"desc": "Arcane Cannon recoil reduced to 1.5% per stack step.",
-			"payload": {"ability": "Arcane Cannon", "set": {"recoil_base": 0.015}}},
-		{"id": "a2", "tier": 1, "ranks": 2, "requires": "", "name": "Focused Blast",
-			"desc": "Arcane Cannon deals +4 damage per rank.",
-			"payload": {"ability": "Arcane Cannon", "add": {"damage": 4}}},
-		{"id": "a3", "tier": 3, "ranks": 2, "requires": "", "name": "Deep Reserves",
-			"desc": "+10 max Mana per rank.", "payload": {"stat": {"max_resource": 10}}},
-		{"id": "a4", "tier": 4, "ranks": 2, "requires": "a2", "name": "Splintering Bolts",
-			"desc": "Arcane Barrage deals +1 damage per bolt per rank.",
-			"payload": {"ability": "Arcane Barrage", "add": {"damage": 1}}},
-		{"id": "a5", "tier": 3, "ranks": 2, "requires": "", "name": "Riftwalker",
-			"desc": "+5 Speed per rank — more casts, more Resonance.",
-			"payload": {"stat": {"speed": 5}}},
-		{"id": "a6", "tier": 5, "ranks": 1, "requires": "a4", "name": "Singularity",
-			"desc": "New ability: 55-damage arcane collapse, ignores 30% armor (40 Mana).",
-			"payload": {"new_ability": {"display_name": "Singularity", "dmg_type": "arcane",
-				"cost": 40, "damage": 55, "pressure": 20, "delay": 5.0, "anim": "attack03",
-				"armor_pierce": 0.3,
-				"perfect_id": "", "perfect_text": "Ignores ALL armor",
-				"description": "Fold space onto a single point."}}},
-		{"id": "a7", "tier": 6, "ranks": 2, "requires": "a6", "name": "Overcharge",
-			"desc": "Singularity deals +5 damage per rank.",
-			"payload": {"ability": "Singularity", "add": {"damage": 5}}},
-		{"id": "a8", "tier": 4, "ranks": 2, "requires": "a3", "name": "Warded Flesh",
-			"desc": "+8 max HP per rank — Resonance invites pain.",
-			"payload": {"stat": {"max_hp": 8}}},
-	],
-	# Holy (Healer): bigger, cheaper healing and faster Miracles.
-	"holy": [
-		{"id": "h1", "tier": 1, "ranks": 2, "requires": "", "name": "Clarity",
-			"desc": "Mend Wounds costs 3 less Mana per rank.",
-			"payload": {"ability": "Mend Wounds", "add": {"cost": -3}}},
-		{"id": "h2", "tier": 2, "ranks": 2, "requires": "", "name": "Deeper Mending",
-			"desc": "Mend Wounds heals +6 per rank.",
-			"payload": {"ability": "Mend Wounds", "add": {"heal": 6}}},
-		{"id": "h3", "tier": 3, "ranks": 2, "requires": "", "name": "Blessed Vitality",
-			"desc": "+8 max HP per rank.", "payload": {"stat": {"max_hp": 8}}},
-		{"id": "h4", "tier": 4, "ranks": 1, "requires": "h2", "name": "Resonant Hymn",
-			"desc": "Hymn of Hope costs 25 Faith.",
-			"payload": {"ability": "Hymn of Hope", "set": {"faith_cost": 25}}},
-		{"id": "h5", "tier": 3, "ranks": 2, "requires": "", "name": "Serenity",
-			"desc": "+10 max Mana per rank.", "payload": {"stat": {"max_resource": 10}}},
-		{"id": "h6", "tier": 5, "ranks": 1, "requires": "h4", "name": "Sanctuary",
-			"desc": "New MIRACLE: party heals 12% and gains Shieldwall (40 Faith).",
-			"payload": {"new_ability": {"display_name": "Sanctuary", "cost": 0, "faith_cost": 40,
-				"special": "sanctuary", "delay": 4.0, "anim": "attack03",
-				"perfect_id": "", "perfect_text": "Heals 18% instead",
-				"description": "Hallowed ground: heal the party 12%\nand halve incoming damage."}}},
-		{"id": "h7", "tier": 4, "ranks": 2, "requires": "h3", "name": "Radiance",
-			"desc": "Smite deals +3 damage per rank.",
-			"payload": {"ability": "Smite", "add": {"damage": 3}}},
-		{"id": "h8", "tier": 6, "ranks": 2, "requires": "h5", "name": "Light Feet",
-			"desc": "+5 Speed per rank — heals arrive sooner.",
-			"payload": {"stat": {"speed": 5}}},
-	],
-	# Devout (Warder): stronger shields, cheaper Unity, sturdier vessel.
-	"inquisitor": [
-		{"id": "i1", "tier": 1, "ranks": 2, "requires": "", "name": "Righteous Fury",
-			"desc": "Smite deals +3 damage per rank.",
-			"payload": {"ability": "Smite", "add": {"damage": 3}}},
-		{"id": "i2", "tier": 2, "ranks": 2, "requires": "", "name": "Hardened Faith",
-			"desc": "+8 max HP per rank.", "payload": {"stat": {"max_hp": 8}}},
-		{"id": "i3", "tier": 4, "ranks": 1, "requires": "i1", "name": "Communion",
-			"desc": "Unity costs 20 Faith.",
-			"payload": {"ability": "Unity", "set": {"faith_cost": 20}}},
-		{"id": "i4", "tier": 3, "ranks": 2, "requires": "", "name": "Bastion of Faith",
-			"desc": "Divine Shield costs 5 less Mana per rank.",
-			"payload": {"ability": "Divine Shield", "add": {"cost": -5}}},
-		{"id": "i5", "tier": 3, "ranks": 2, "requires": "i2", "name": "Unbending",
-			"desc": "+10 Constitution per rank.", "payload": {"stat": {"constitution": 10}}},
-		{"id": "i6", "tier": 5, "ranks": 1, "requires": "i3", "name": "Excommunicate",
-			"desc": "New MIRACLE: 55-damage holy execution (50 Faith).",
-			"payload": {"new_ability": {"display_name": "Excommunicate", "dmg_type": "holy",
-				"cost": 0, "faith_cost": 50, "damage": 55, "pressure": 24, "delay": 4.0,
-				"anim": "attack02",
-				"perfect_id": "pressure", "perfect_text": "+60% Pressure",
-				"description": "Cast them out of the light entirely."}}},
-		{"id": "i7", "tier": 4, "ranks": 1, "requires": "i4", "name": "Watchful Aegis",
-			"desc": "Divine Shield costs 1.0 less initiative.",
-			"payload": {"ability": "Divine Shield", "add": {"delay": -1.0}}},
-		{"id": "i8", "tier": 6, "ranks": 1, "requires": "i6", "name": "Fanaticism",
-			"desc": "Excommunicate costs 40 Faith.",
-			"payload": {"ability": "Excommunicate", "set": {"faith_cost": 40}}},
-	],
-	# Occultist (Pressure): crueler hexes and a fed, sustaining party.
-	"occultist": [
-		{"id": "o1", "tier": 1, "ranks": 2, "requires": "", "name": "Dark Vigor",
-			"desc": "+8 max HP per rank.", "payload": {"stat": {"max_hp": 8}}},
-		{"id": "o2", "tier": 2, "ranks": 2, "requires": "", "name": "Vicious Hex",
-			"desc": "Hex of Ruin deals +3 damage per rank.",
-			"payload": {"ability": "Hex of Ruin", "add": {"damage": 3}}},
-		{"id": "o3", "tier": 4, "ranks": 1, "requires": "o2", "name": "Whispering Madness",
-			"desc": "Mind Flay costs 20 Faith.",
-			"payload": {"ability": "Mind Flay", "set": {"faith_cost": 20}}},
-		{"id": "o4", "tier": 3, "ranks": 2, "requires": "o1", "name": "Occult Reserves",
-			"desc": "+10 max Mana per rank.", "payload": {"stat": {"max_resource": 10}}},
-		{"id": "o5", "tier": 3, "ranks": 2, "requires": "", "name": "Creeping Ruin",
-			"desc": "Hex of Ruin deals +6 Pressure per rank.",
-			"payload": {"ability": "Hex of Ruin", "add": {"pressure": 6}}},
-		{"id": "o6", "tier": 5, "ranks": 1, "requires": "o2", "name": "Soul Leech",
-			"desc": "New ability: 24 shadow damage, heals the Cleric for all damage dealt (30 Mana).",
-			"payload": {"new_ability": {"display_name": "Soul Leech", "dmg_type": "shadow",
-				"cost": 30, "damage": 24, "pressure": 14, "delay": 3.0, "anim": "attack02",
-				"lifesteal": 1.0,
-				"perfect_id": "", "perfect_text": "+50% healing from the drain",
-				"description": "Drink their essence."}}},
-		{"id": "o7", "tier": 6, "ranks": 2, "requires": "o6", "name": "Gluttony",
-			"desc": "Soul Leech deals +3 damage per rank.",
-			"payload": {"ability": "Soul Leech", "add": {"damage": 3}}},
-		{"id": "o8", "tier": 4, "ranks": 2, "requires": "o4", "name": "Bone Ward",
-			"desc": "+10 Constitution per rank.", "payload": {"stat": {"constitution": 10}}},
-	],
-	# Beastmaster (Rush): the beast IS the build — tougher, meaner companions.
-	"beastmaster": [
-		{"id": "bm1", "tier": 1, "ranks": 2, "requires": "", "name": "Caretaker",
-			"desc": "Companions have +15 max HP per rank.",
-			"payload": {"stat": {"companion_hp_bonus": 15}}},
-		{"id": "bm2", "tier": 2, "ranks": 2, "requires": "", "name": "Barbed Tips",
-			"desc": "Barbed Arrow deals +3 damage per rank.",
-			"payload": {"ability": "Barbed Arrow", "add": {"damage": 3}}},
-		{"id": "bm3", "tier": 2, "ranks": 2, "requires": "", "name": "Venom Coating",
-			"desc": "Poisoned Arrow deals +3 damage per rank.",
-			"payload": {"ability": "Poisoned Arrow", "add": {"damage": 3}}},
-		{"id": "bm4", "tier": 3, "ranks": 2, "requires": "bm1", "name": "Savage Bond",
-			"desc": "Companion attacks deal +3 damage per rank.",
-			"payload": {"stat": {"companion_power": 3}}},
-		{"id": "bm5", "tier": 3, "ranks": 2, "requires": "", "name": "Hunter's Pace",
-			"desc": "+5 Speed per rank — more attacks, more beast strikes.",
-			"payload": {"stat": {"speed": 5}}},
-		{"id": "bm6", "tier": 4, "ranks": 1, "requires": "bm3", "name": "Efficient Venom",
-			"desc": "Poisoned Arrow costs 5 less Focus.",
-			"payload": {"ability": "Poisoned Arrow", "add": {"cost": -5}}},
-		{"id": "bm7", "tier": 5, "ranks": 1, "requires": "bm4", "name": "Alpha's Command",
-			"desc": "Kill Command costs 10 less Focus.",
-			"payload": {"ability": "Kill Command", "add": {"cost": -10}}},
-		{"id": "bm8", "tier": 6, "ranks": 2, "requires": "bm4", "name": "Predator's Eye",
-			"desc": "+2% crit chance per rank (companions inherit it).",
-			"payload": {"stat": {"crit_bonus": 0.02}}},
-	],
-	# Sharpshooter (Rush): hit harder and cheaper while the Focus lasts.
-	"sharpshooter": [
-		{"id": "sh1", "tier": 2, "ranks": 2, "requires": "", "name": "Steady Hands",
-			"desc": "Aimed Shot costs 3 less Focus per rank.",
-			"payload": {"ability": "Aimed Shot", "add": {"cost": -3}}},
-		{"id": "sh2", "tier": 5, "ranks": 2, "requires": "sh4", "name": "Deadeye",
-			"desc": "Aimed Shot deals +5 damage per rank.",
-			"payload": {"ability": "Aimed Shot", "add": {"damage": 5}}},
-		{"id": "sh3", "tier": 1, "ranks": 2, "requires": "", "name": "Sharp Quiver",
-			"desc": "Quick Shot deals +3 damage per rank.",
-			"payload": {"ability": "Quick Shot", "add": {"damage": 3}}},
-		{"id": "sh4", "tier": 3, "ranks": 2, "requires": "", "name": "Powder Load",
-			"desc": "Powershot deals +4 damage per rank.",
-			"payload": {"ability": "Powershot", "add": {"damage": 4}}},
-		{"id": "sh5", "tier": 3, "ranks": 1, "requires": "", "name": "Swift Draw",
-			"desc": "Quick Draw costs 5 less Focus.",
-			"payload": {"ability": "Quick Draw", "add": {"cost": -5}}},
-		{"id": "sh6", "tier": 4, "ranks": 3, "requires": "sh3", "name": "Marksman's Focus",
-			"desc": "+2% crit chance per rank — Lethal Aim loves it.",
-			"payload": {"stat": {"crit_bonus": 0.02}}},
-		{"id": "sh7", "tier": 4, "ranks": 1, "requires": "sh4", "name": "Follow-Through",
-			"desc": "Powershot costs 5 less Focus.",
-			"payload": {"ability": "Powershot", "add": {"cost": -5}}},
-		{"id": "sh8", "tier": 6, "ranks": 2, "requires": "sh2", "name": "Executioner",
-			"desc": "Aimed Shot costs 0.5 less initiative per rank.",
-			"payload": {"ability": "Aimed Shot", "add": {"delay": -0.5}}},
-	],
-	# Survivalist (Pressure): traps, powder, and attrition.
-	"mystic": [
-		{"id": "my1", "tier": 1, "ranks": 2, "requires": "", "name": "Hardy",
-			"desc": "+8 max HP per rank — outlast them.",
-			"payload": {"stat": {"max_hp": 8}}},
-		{"id": "my2", "tier": 2, "ranks": 2, "requires": "", "name": "Bigger Powder Charge",
-			"desc": "Explosive Shot deals +2 damage per rank.",
-			"payload": {"ability": "Explosive Shot", "add": {"damage": 2}}},
-		{"id": "my3", "tier": 3, "ranks": 2, "requires": "", "name": "Shrapnel Spread",
-			"desc": "Shrapnel deals +3 damage per rank.",
-			"payload": {"ability": "Shrapnel", "add": {"damage": 3}}},
-		{"id": "my4", "tier": 3, "ranks": 2, "requires": "my1", "name": "Fleet Foot",
-			"desc": "+5 Speed per rank.", "payload": {"stat": {"speed": 5}}},
-		{"id": "my5", "tier": 4, "ranks": 1, "requires": "my2", "name": "Cheap Charges",
-			"desc": "Explosive Shot costs 5 less Focus.",
-			"payload": {"ability": "Explosive Shot", "add": {"cost": -5}}},
-		{"id": "my6", "tier": 4, "ranks": 2, "requires": "", "name": "Wilderness Grit",
-			"desc": "+10 Constitution per rank.", "payload": {"stat": {"constitution": 10}}},
-		{"id": "my7", "tier": 5, "ranks": 1, "requires": "my3", "name": "Serrated Volley",
-			"desc": "New ability: 3 shots at random enemies, each builds 15 Bleed (30 Focus).",
-			"payload": {"new_ability": {"display_name": "Serrated Volley", "cost": 30,
-				"damage": 12, "pressure": 8, "delay": 3.5, "anim": "attack03",
-				"random_hits": 3, "bleed_build": 15,
-				"perfect_id": "", "perfect_text": "4 shots instead of 3",
-				"description": "Jagged arrowheads rip at random foes,\neach building 15 Bleed."}}},
-		{"id": "my8", "tier": 6, "ranks": 1, "requires": "my5", "name": "Chain Reaction",
-			"desc": "Explosive Shot deals +10 Pressure.",
-			"payload": {"ability": "Explosive Shot", "add": {"pressure": 10}}},
+	"warden": [
+		# --- row 0 ---
+		{"id": "wd_tank_spank", "name": "Tank and Spank", "ranks": 3, "row": 0, "col": 1,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Mocking Blow has a 15% chance per rank to Empower a random ally (2 turns).",
+			"payload": {"stat": {"tank_spank_ranks": 1}}},
+		{"id": "wd_unkillable", "name": "Unkillable", "ranks": 3, "row": 0, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Every time you Block an attack, heal for 2% of maximum health per rank.",
+			"payload": {"stat": {"unkillable_ranks": 1}}},
+		{"id": "wd_elem_weak", "name": "Elemental Weakness", "ranks": 3, "row": 0, "col": 3,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Crushing Blow also reduces all elemental resistances of the target by 5% per rank (3 turns).",
+			"payload": {"stat": {"elem_weak_ranks": 1}}},
+		# --- row 1 ---
+		{"id": "wd_toughness", "name": "Toughness", "ranks": 3, "row": 1, "col": 0,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Constitution is increased by 5% of maximum HP per rank.",
+			"payload": {"stat": {"toughness_ranks": 1}}},
+		{"id": "wd_tenacity", "name": "Tenacity", "ranks": 1, "row": 1, "col": 1,
+			"gate": "row", "requires": "wd_unkillable", "requires_ranks": 1,
+			"desc": "Every debuff prevented with Hardiness grants +5 max HP for the battle. (PENDING: the Hardiness mechanic is not designed yet.)",
+			"payload": {"stat": {"tenacity": 1}}},
+		{"id": "wd_shieldwall", "name": "Shieldwall", "ranks": 1, "row": 1, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "New ability: Shieldwall — raise your shield and Block the next 3 attacks; a perfect blocks 5 (25 Rage, 2.0 int, 3cd).",
+			"payload": {"new_ability": {"display_name": "Shieldwall", "cost": 25,
+				"special": "shield_block", "delay": 2.0, "anim": "attack01",
+				"cooldown": 3,
+				"perfect_id": "", "perfect_text": "Blocks 5 attacks instead",
+				"description": "Raise the shield: the next 3 attacks\nagainst the Warden are BLOCKED."}}},
+		{"id": "wd_rally", "name": "Rally", "ranks": 1, "row": 1, "col": 3,
+			"gate": "row", "requires": "wd_unkillable", "requires_ranks": 1,
+			"desc": "Every debuff prevented with Hardiness grants the party +15% healing received for a turn. (PENDING: the Hardiness mechanic is not designed yet.)",
+			"payload": {"stat": {"rally": 1}}},
+		{"id": "wd_iron_will", "name": "Iron Will", "ranks": 3, "row": 1, "col": 4,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "+5% damage per rank for every debuff currently on the Warden.",
+			"payload": {"stat": {"iron_will_ranks": 1}}},
+		# --- row 2 ---
+		{"id": "wd_ricochet", "name": "Richocet", "ranks": 3, "row": 2, "col": 1,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Blocking an attack has a 5% chance per rank to Stun the attacker.",
+			"payload": {"stat": {"ricochet_ranks": 1}}},
+		{"id": "wd_endurance", "name": "Endurance", "ranks": 3, "row": 2, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "+3% armor per rank for every turn the Warden is not healed by an external source (resets when healed).",
+			"payload": {"stat": {"endurance_ranks": 1}}},
+		{"id": "wd_sundering", "name": "Sundering", "ranks": 3, "row": 2, "col": 3,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Crushing Blow deals 25% per rank of its Break damage to all other enemies.",
+			"payload": {"stat": {"sundering_ranks": 1}}},
+		# --- row 3 (capstone) ---
+		{"id": "wd_hold_line", "name": "Hold the Line", "ranks": 1, "row": 3, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "New ability: Hold the Line — the party takes 50% less Break damage for 2 turns and cannot die for a turn (30 Rage, 3.5 int, 7cd).",
+			"payload": {"new_ability": {"display_name": "Hold the Line", "cost": 30,
+				"special": "hold_the_line", "delay": 3.5, "anim": "attack03",
+				"cooldown": 7,
+				"perfect_id": "", "perfect_text": "Refunds 5 Rage",
+				"description": "Embolden the party: 50% less Break\ndamage for 2 turns, and no one can die\nfor a turn."}}},
 	],
 }
 
 
-# Generic training talents pad tiers that lack enough signature picks.
-const FILLER_NAMES := {"max_hp": "Vitality", "speed": "Swiftness",
-	"constitution": "Poise", "armor": "Warding", "crit_bonus": "Precision",
-	"max_resource": "Reserves"}
-const FILLER_DEFS := [
-	["max_hp", "+%d max HP per rank", 6],
-	["speed", "+%d Speed per rank", 3],
-	["constitution", "+%d Constitution per rank", 8],
-	["armor", "+%d%% armor per rank", 0.01],
-	["crit_bonus", "+%d%% crit chance per rank", 0.01],
-]
-const FILLER_MANA := ["max_resource", "+%d max Mana per rank", 6]
+static func has_tree(spec: String) -> bool:
+	return FIXED_TREES.has(spec)
 
 
-# Builds this run's tree for a spec: per tier, shuffle the signature pool,
-# take up to SLOTS_PER_TIER, pad with generic training talents.
-static func generate_tree(spec: String, class_key: String) -> Array:
+static func generate_tree(spec: String, _class_key: String) -> Array:
+	# Fixed trees only; specs without one get an empty tree ("coming soon").
 	if FIXED_TREES.has(spec):
 		return FIXED_TREES[spec].duplicate(true)
-	var tree_nodes: Array = []
-	var pool: Array = POOLS.get(spec, [])
-	for tier in range(1, MAX_TIER + 1):
-		var candidates: Array = pool.filter(func(t): return int(t["tier"]) == tier)
-		candidates.shuffle()
-		var picks: Array = candidates.slice(0, SLOTS_PER_TIER)
-		var filler_n := 0
-		while picks.size() < SLOTS_PER_TIER:
-			picks.append(_make_filler(spec, class_key, tier, filler_n))
-			filler_n += 1
-		tree_nodes.append_array(picks)
-	return tree_nodes
-
-
-static func _make_filler(spec: String, class_key: String, tier: int, n: int) -> Dictionary:
-	var options: Array = FILLER_DEFS.duplicate()
-	if class_key != "warrior":
-		options.append(FILLER_MANA)
-	var pick: Array = options.pick_random()
-	var value = pick[2] * tier
-	var shown: int = int(value * 100) if pick[2] is float else int(value)
-	return {"id": "gen_%s_t%d_%d_%s" % [spec, tier, n, pick[0]], "tier": tier,
-		"ranks": 2, "requires": "",
-		"name": "%s Training" % FILLER_NAMES[pick[0]],
-		"desc": pick[1] % shown,
-		"payload": {"stat": {pick[0]: value}}}
+	return []
 
 
 static func node_in_tree(tree_nodes: Array, id: String) -> Dictionary:
@@ -436,8 +227,13 @@ static func points_spent(learned: Dictionary) -> int:
 	return total
 
 
-static func tier_unlocked(tier: int, learned: Dictionary) -> bool:
-	return points_spent(learned) >= (tier - 1) * 2
+# Points spent in rows strictly below `row` (cumulative row gating).
+static func points_below_row(tree_nodes: Array, learned: Dictionary, row: int) -> int:
+	var total := 0
+	for t in tree_nodes:
+		if int(t.get("row", 0)) < row:
+			total += int(learned.get(t["id"], 0))
+	return total
 
 
 static func can_learn(tree_nodes: Array, id: String, learned: Dictionary) -> Dictionary:
@@ -446,28 +242,19 @@ static func can_learn(tree_nodes: Array, id: String, learned: Dictionary) -> Dic
 		return {"ok": false, "why": "Unknown"}
 	if int(learned.get(id, 0)) >= int(t["ranks"]):
 		return {"ok": false, "why": "Maxed"}
-	if t.get("gate", "") == "cumulative":
-		# Fixed trees: Tier 2 needs 5 pts in Tier 1; Tier 3 needs 10 in 1-2.
-		var tier := int(t["tier"])
-		var need := int(CUMULATIVE_REQ.get(tier, 0))
-		if points_below_tier(tree_nodes, learned, tier) < need:
-			return {"ok": false, "why": "Locked: %d pts in Tiers 1-%d" % [need, tier - 1]}
-		return {"ok": true, "why": ""}
-	if not tier_unlocked(int(t["tier"]), learned):
-		return {"ok": false, "why": "Locked: %d pts spent" % [(int(t["tier"]) - 1) * 2]}
+	var row := int(t.get("row", 0))
+	var need := int(ROW_REQ.get(row, 0))
+	if points_below_row(tree_nodes, learned, row) < need:
+		return {"ok": false, "why": "Locked: %d pts in earlier rows" % need}
+	var req: String = t.get("requires", "")
+	if req != "" and int(learned.get(req, 0)) < int(t.get("requires_ranks", 1)):
+		var req_node := node_in_tree(tree_nodes, req)
+		return {"ok": false, "why": "Locked: needs %s (%d)" % [
+			req_node.get("name", req), int(t.get("requires_ranks", 1))]}
 	return {"ok": true, "why": ""}
 
 
-# Points spent in tiers strictly below `tier` (cumulative gating).
-static func points_below_tier(tree_nodes: Array, learned: Dictionary, tier: int) -> int:
-	var total := 0
-	for t in tree_nodes:
-		if int(t["tier"]) < tier:
-			total += int(learned.get(t["id"], 0))
-	return total
-
-
-# Applies a generated tree's learned talents onto a hero config.
+# Applies a tree's learned talents onto a hero config.
 static func apply_from_tree(cfg: Dictionary, tree_nodes: Array, learned: Dictionary) -> void:
 	for t in tree_nodes:
 		var ranks := int(learned.get(t["id"], 0))
@@ -477,14 +264,13 @@ static func apply_from_tree(cfg: Dictionary, tree_nodes: Array, learned: Diction
 
 
 # Shared payload applicator (talents and shop runes). Stats missing from the
-# config (e.g. companion bonuses) default to 0.
+# config (e.g. talent counters) default to 0; ranks are additive.
 static func apply_payload(cfg: Dictionary, payload: Dictionary, ranks: int) -> void:
 	if payload.has("stat"):
 		for field in payload["stat"]:
-			if field == "crit_bonus" or field == "parry_bonus":
-				cfg[field] = cfg.get(field, 0.0) + payload["stat"][field] * ranks
-			else:
-				cfg[field] = cfg.get(field, 0) + payload["stat"][field] * ranks
+			var v = payload["stat"][field]
+			var base = 0.0 if v is float else 0
+			cfg[field] = cfg.get(field, base) + v * ranks
 	elif payload.has("new_ability"):
 		cfg["abilities"] = cfg["abilities"] + [Ability.make(payload["new_ability"])]
 	elif payload.has("ability"):

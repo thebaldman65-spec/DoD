@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-12</b></p>
+<p align="right"><b>Last updated: 2026-07-15</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative design reference (the timestamp above is bumped on every
 edit). It supersedes the original concept docs ("Dawn of Decay.docx", "DoD Combat.docx",
@@ -112,9 +112,24 @@ damage AND 75% less Break damage</b> (on-hit statuses can still apply); the log 
 "(parried -75%)". Parrying no longer triggers an automatic counter. AoE cannot be parried;
 Broken units cannot parry; multi-hit attacks roll parry per strike.</li>
 <li><b>Counter Attack (term):</b> immediately answering a parry with a basic attack — a free
-action with no initiative cost that cannot chain. Granted only by specific effects (nothing
-grants it yet; the Warrior's Retaliation stance is different — it counters ANY hit taken
-while active).</li>
+action with no initiative cost that cannot chain. Granted only by specific effects (the
+Swordmaster's Riposte talent grants it).</li>
+<li><b>Block (keyword):</b> fully negates an incoming attack — 100% of the damage, the Break
+damage, and its on-hit effects. Governed by <b>Block %</b>, a stat only pure tanks carry
+(currently the Warden: 5% base, +15% from Heavy Plating; the Orc Shieldmaster also blocks at
+5%). Guaranteed blocks come from Shieldwall charges. Broken units cannot Block. A block
+flashes <b>BLOCK</b> and is logged.</li>
+<li><b>Armor Penetration (keyword):</b> every % of armor penetration negates a % of the
+target's armor (Piercing Arrow 50%, Singularity 30%, the Berserker's Crushing Blows talent).
+It is NOT shown on the character screen.</li>
+<li><b>Cooldown (keyword, "cd"):</b> the number of the user's turns before the same ability
+can be used again — "7cd" means unusable for 7 turns after use. Every ability now carries a
+cooldown scaled to its strength (basics 0, light hits 2–3, heavies/AoE 3–6, Miracles 5–8,
+Death Ray/Resurrection 8; a tuning pass is expected). The remaining cooldown shows on the
+ability button ("CD n") and in its tooltip; enemies respect cooldowns too.</li>
+<li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
+positive one. Talents that count debuffs (Dominant Presence, Iron Will) use this
+classification.</li>
 <li><b>Crit:</b> 10% base + 25% vs Broken targets + 3% per Mage Resonance stack + talent/spec
 bonuses (+15% with Aguila summoned). Guaranteed: Razor Ice vs Chilled. Resonance builds
 only on the Mage's own casts — parry counters do not grant stacks.</li>
@@ -181,6 +196,15 @@ ward.</td></tr>
 <tr><td>Divine Wrath</td><td>+15% damage dealt and +15% speed (Devout).</td></tr>
 <tr><td>Umbral Sigil</td><td>Branded: every other member of this unit's party takes 50% of
 all attack damage it receives (Occultist).</td></tr>
+<tr><td>Battle Shout</td><td>+1% damage per 20 blood buildup on the enemy party, snapshotted
+at cast (Berserker talent).</td></tr>
+<tr><td>Shieldwall (charges)</td><td>The next N attacks against this unit are BLOCKED
+(Warden talent ability).</td></tr>
+<tr><td>High Guard</td><td>Takes 25% less damage (Swordmaster talent, after a parry).</td></tr>
+<tr><td>Elemental Weakness</td><td>Elemental (non-physical) resistances reduced (Warden's
+Crushing Blow talent).</td></tr>
+<tr><td>Hold the Line</td><td>Takes 50% less Break damage (Warden capstone).</td></tr>
+<tr><td>Undying</td><td>Cannot drop below 1 HP (Warden capstone).</td></tr>
 <tr><td>Sunder</td><td>−35% armor.</td></tr>
 <tr><td>Ward</td><td>Takes 50% less BD.</td></tr>
 <tr><td>Fortify</td><td>+10% armor (Defense Potion).</td></tr>
@@ -245,6 +269,16 @@ larger Pyromancer density WON — it is the standard for all future character ar
 <tr><td>Cleric</td><td>121</td><td>15%</td><td>85</td><td>100</td><td>Mana 100 + Faith 0–100</td></tr>
 <tr><td>Hunter</td><td>110</td><td>12%</td><td>105</td><td>95</td><td>Focus 100</td></tr>
 </table>
+<h3>5.0 Class passives</h3>
+<p>Each CLASS carries one passive, active for every spec of that class (and before
+awakening). Shown as a ◆ chip in battle and on the party screen.</p>
+<ul>
+<li><b>Warrior — Threatening Presence:</b> enemies are 20% more likely to attack the
+Warrior (weighted into their random target picks).</li>
+<li><b>Cleric — Holy Conduit:</b> all healing the Cleric receives is increased by 15%.</li>
+<li><b>Hunter — Tracker:</b> always attacks first in every fight.</li>
+<li><b>Mage — Evocation:</b> regenerates an additional 10 Mana per turn (22 total).</li>
+</ul>
 <h3>5.1 Resource mechanics</h3>
 <ul>
 <li><b>Rage (Warrior):</b> starts at 0. +5 at the start of each of his turns; +10 whenever he
@@ -297,30 +331,43 @@ Sharpshooter 90, Pyromancer 85, Cryomancer 85.</p>
 
 <h3>6.1 Warrior</h3>
 <ul>
-<li><b>Berserker (Ramp)</b> — Passive <i>Blood Frenzy</i>: up to +40% damage as HP falls.<br>
-Bloodlust — 25 Rage, 26 dmg / 18 BD / 3.0, heals 30% of missing HP, builds 10 Rage
+<li><b>Berserker (Ramp)</b> — Passive <i>Blood Frenzy</i>: +2% damage for every 5% of health
+missing (stepped; the Unstoppable talent raises the 2% to 2.5/3/3.5%).<br>
+Bloodlust — 25 Rage, 26 dmg / 18 BD / 3.0, 3cd, heals 30% of missing HP, builds 10 Rage
 (Perfect: 45% missing HP).<br>
-Wildstrikes — 35 Rage, 16 dmg to ALL / 14 BD / 4.5, +35 Bleed each, builds 10 Rage
+Wildstrikes — 35 Rage, 16 dmg to ALL / 14 BD / 4.5, 4cd, +35 Bleed each, builds 10 Rage
 (Perfect: +50% BD).<br>
-Hack and Slash — 20 Rage, 3 strikes × 10 dmg / 10 BD / 3.0 at one target, each hit 50% chance
+Hack and Slash — 20 Rage, 3 strikes × 10 dmg / 10 BD / 3.0, 3cd, each hit 50% chance
 to build 25 Bleed (a full 4-strike flurry can bleed a target out), builds 10 Rage
-(Perfect: 4 strikes).</li>
-<li><b>Warden (Tank)</b> — Passive <i>Bulwark</i>: +10% armor, +30 Constitution.<br>
-Mocking Blow — free, 20 dmg / 15 BD / 2.0, taunts the target AND one other enemy for 4 turns, builds 20 Rage
-(Perfect: 5 turns).<br>
-Shieldwall — 25 Rage, 3.0, party takes 25% less damage for 2 turns
-(Perfect: 3 turns).<br>
-Retaliation — 20 Rage, 3.0, counter every attack on the Warrior for 3 turns
-(Perfect: 4 turns).</li>
+(Perfect: 4 strikes).<br>
+<i>Talent-granted:</i> Battle Shout — 15 Rage, 2.0, 3cd, +1% damage per 20 blood buildup on
+the enemy party for 2 turns (Perfect: +5 Rage). Rampage — 40 Rage, 3 × 20 physical +
+3 × 10 bloodloss / 3 × 10 BD, 4.0, 5cd; if the target dies, Rampage immediately recasts
+(free) on another enemy and can chain.</li>
+<li><b>Warden (Tank)</b> — Passive <i>Heavy Plating</i>: 15% chance to Block, on top of the
+Warden's <b>5% base Block stat</b> (the only stat-Block character). VAULTED: the old Bulwark
+passive, Retaliation, and the party-wide Shieldwall v1.<br>
+Mocking Blow — free, 20 dmg / 15 BD / 2.0, 2cd, taunts the target AND one other enemy for
+4 turns, builds 10 Rage (Perfect: 5 turns).<br>
+Crushing Blow (moved from the Swordmaster) — 20 Rage, 32 dmg / 20 BD / 3.0, 3cd, Sunders
+(−35% armor, 3 turns), builds 10 Rage (Perfect: +5 bonus BD).<br>
+<i>Talent-granted:</i> Shieldwall — 25 Rage, 2.0, 3cd, Blocks the next 3 attacks (Perfect:
+5). Hold the Line — 30 Rage, 3.5, 7cd, the party takes 50% less Break damage for 2 turns and
+cannot die for a turn (Perfect: refunds 5 Rage).</li>
 <li><b>Swordmaster (Bruiser)</b> — Passive <i>Seasoned Fighter</i>: a stance switch — +15%
-damage dealt while above half HP; takes 15% less damage at or below half HP. The spec chip
-shows which side is live.<br>
-Overpower — 30 Rage, 15 dmg / 20 BD / 2.5, +0.5 damage per point of the target's Break meter,
-builds 10 Rage (Perfect: +5 bonus Rage).<br>
-Crushing Blow — 20 Rage, 32 dmg / 20 BD / 3.0, Sunders (−35% armor, 3 turns), builds 10 Rage
-(Perfect: +5 bonus BD).<br>
-Pommel Strike — 15 Rage, 25 dmg / 30 BD / 2.0, 50% chance to Stun (75% if the strike crits),
-builds 10 Rage (Perfect: +15% parry chance for 3 turns).</li>
+damage dealt while above half HP; takes 15% less damage at or below half HP (both sides
+deepen via stance talents). The spec chip shows which side is live.<br>
+Overpower — 30 Rage, 15 dmg / 20 BD / 2.5, 2cd, +0.5 damage per point of the target's Break
+meter, builds 10 Rage (Perfect: +5 bonus Rage).<br>
+Pommel Strike — 15 Rage, 25 dmg / 30 BD / 2.0, 3cd, has its own <b>25% base crit
+chance</b>; 50% chance to Stun and a crit GUARANTEES the stun, builds 10 Rage
+(Perfect: +15% parry chance for 3 turns, deepened by Swordsmanship).<br>
+Sweeping Strikes — 20 Rage, 2 strikes × 15 dmg / 8 BD, 3.0, no cd, Dazes the target
+3 turns, builds 10 Rage (Perfect: +25% crit on the second swing).<br>
+<i>Talent-granted:</i> Lunge — 25 Rage, 35 dmg / 20 BD, 3.5, applies Exposed above 50%
+health / Cripple below, builds 10 Rage (Perfect: 3.0 initiative). Execute — 30 Rage, 55 dmg
+/ 50 BD, 2.0, 4cd, only usable against targets below 20% health (Perfect: guaranteed
+crit).</li>
 </ul>
 <h3>6.2 Mage</h3>
 <ul>
@@ -416,41 +463,47 @@ turns). The player picks both targets; each fragment rolls miss/parry separately
 </ul>
 
 <h2>7. Talents</h2>
+<p><b>Trees are FIXED and designed, no longer thematic/generated.</b> Three exist so far —
+<b>Berserker, Swordmaster, Warden</b> (designed in the RPG Skill Tree Generator; source
+JSONs in data/talent-tree-*.json). Every other spec shows <b>"Coming soon."</b> on the party
+screen until its tree is designed. Points still accrue from victories (fight 1, elite 2,
+boss 3; Waystone +1) and bank until a tree exists.</p>
 <p><b>Ranks are additive:</b> when a node offers an increase by a specified amount, every
-additional point invested adds the SAME amount again (e.g. "+2 Bleed per rank" at 3 ranks =
-+6 Bleed). This holds across all trees, generated and fixed.</p>
-<p><b>Every talent is thematic:</b> each spec's pool (8 signatures, tiered 1–6) supports its
-archetype role and touches its actual kit — no generic dead picks. Every run generates a fresh
-tree: 2 slots per tier drawn from the pool, padded with generic Training talents (Vitality +HP
-/ Swiftness +Speed / Poise +Constitution / Warding +armor / Precision +crit / Reserves +Mana,
-values scale with tier). Tier N unlocks after (N−1)×2 points are spent. Points come from
-victories: fight 1, elite 2, boss 3 (Waystone relic: +1 at run start). Some talents have
-prerequisites and multiple ranks; every tier-5 talent grants a signature new ability.</p>
-<p><b>Berserker uses the first FIXED tree</b> (designed in the RPG Skill Tree Generator;
-source in data/berserker_tree.json): a 3×3 grid. Tier 1 — Savagery (+2 Bleed on
-bleed-building abilities/rank ×3), Bloodthirsty (Blood Frenzy +3%/rank ×3), Vitality (+5% max
-HP/rank ×3). Tier 2 — Crushing Force (attacks ignore 5% armor/rank ×3), Rampage (new ability:
-+1% damage per 10 Bleed buildup on the enemy party for 1 turn, 20 Rage), Reckless Fury (+5%
-damage dealt AND taken/rank ×3). Tier 3 — Bloodlust (Hack and Slash strikes an extra time),
-Bloodcraze (heal 30 HP when an enemy bleeds out), Enraged (+1%/rank damage per hit taken,
-fades after 2 unhurt turns ×3). <b>Fixed-tree gating:</b> Tier 2 needs 5 points in Tier 1;
-Tier 3 needs 10 points across Tiers 1–2. Fixed trees render as an icon grid styled after the
-"Appearance example" reference: dark backdrop with faint grid lines, square emblem nodes
-(gold border on hover, green when maxed), x/y point counters beneath, black hover tooltip
-with a white bold name and yellow description, click-to-learn. Node art and the backdrop are
-placeholders awaiting final assets. Other specs still use generated pools until their
-fixed trees are designed.</p>
-<p>Generated pool identities — <b>Warden:</b> armor, Constitution, cheaper/faster
-Mocking Blow and Shieldwall, Bulwark Slam. <b>Swordmaster:</b> crit, parry, Pommel damage,
-Crushing Blow BD, Flurry. <b>Pyromancer:</b> Mana pool, cheaper/faster Pyroblast, Flame
-Surge damage, Inferno. <b>Cryomancer:</b> Frost Bolt and shard damage, Blizzard BD,
-Absolute Zero. <b>Arcanist:</b> Cannon/Barrage damage, recoil control, casting speed,
-Singularity. <b>Holy:</b> cheaper and bigger Mend Wounds, cheap Hymn, Sanctuary.
-<b>Devout:</b> cheaper/faster Divine Shield, cheap Unity, Constitution, Excommunicate.
-<b>Occultist:</b> Hex damage and Pressure, cheap Mind Flay, Soul Leech. <b>Beastmaster:</b>
-companion HP and damage, arrow upgrades, cheap Kill Command. <b>Sharpshooter:</b> cheaper and
-harder-hitting Aimed Shot/Powershot, crit for Lethal Aim, faster Aimed Shot. <b>Survivalist:</b>
-Explosive Shot upgrades, Shrapnel damage, Constitution, Serrated Volley (new bleed volley).</p>
+additional point invested adds the SAME amount again (e.g. "+5 Bleed per rank" at 3 ranks =
++15 Bleed).</p>
+<p><b>Layout &amp; gating:</b> each tree is a 12-node grid (3 nodes / 5 nodes / 3 nodes /
+1 capstone across four rows). Rows unlock cumulatively — row 2 at 5 points spent, row 3 at
+10, the capstone at 15 — and some nodes carry explicit prerequisites (drawn as connector
+lines; e.g. Savagery needs 1 point in Unstoppable). Nodes render as emblem squares with
+point counters and hover tooltips; art is placeholder.</p>
+<p><b>Berserker tree:</b> Row 1 — Bloodcraze (heal 3%/rank max HP on enemy bleedout ×3),
+Unstoppable (Blood Frenzy +0.5%/rank per step ×3), Enraged (below-50%-HP trigger: +3%/rank
+damage buff, 5 turns, stacks ×3). Row 2 — Crushing Blows (3%/rank armor penetration per 20
+enemy-party bleed ×3), Savagery (+5 Bleed/rank on bleed abilities ×3, needs Unstoppable 1),
+Battle Shout (grants the ability), Reckless Fury (+5%/rank damage dealt AND taken ×3, needs
+Unstoppable 1), Unrelenting Assault (below-25%-HP trigger: +10 Constitution/rank, once per 5
+turns ×3). Row 3 — Hemorrhage (enemies at 80/70/60 bloodloss are Crippled ×3 — the threshold
+drops 10 per point), Bloodlust (Hack and Slash strikes an extra time), Vitality (+5% max
+HP/rank ×3). Capstone — Rampage (grants the ability).</p>
+<p><b>Swordmaster tree:</b> Row 1 — Defensive Stance (Seasoned under-half reduction
++3%/rank ×3), Swordsmanship (perfect-Pommel parry buff +5%/rank ×3), Aggressive Stance
+(Seasoned over-half bonus +3%/rank ×3). Row 2 — Dominant Presence (armor +5%/rank per debuff
+applied ×3), High Guard (25% less damage for 1 turn after parrying, needs Swordsmanship 1),
+Lunge (grants the ability), Riposte (<b>Counter Attack</b>: answer every parry with a
+Strike, needs Swordsmanship 1), Precision Strikes (+5%/rank crit vs Dazed / Crippled /
+Exposed ×3). Row 3 — Seasoned Fighter (+3%/rank crit for Lunge and Overpower ×3),
+Opportunist (counter enemy misses with a free Overpower), Sword Mastery (+3%/rank parry ×3).
+Capstone — Execute (grants the ability).</p>
+<p><b>Warden tree:</b> Row 1 — Tank and Spank (Mocking Blow 15%/rank chance to Empower a
+random ally ×3), Unkillable (heal 2%/rank max HP on every Block ×3), Elemental Weakness
+(Crushing Blow shreds elemental resists 5%/rank, 3 turns ×3). Row 2 — Toughness
+(Constitution +5%/rank of max HP ×3), Tenacity (<i>PENDING the undefined Hardiness
+mechanic</i>: +5 max HP per prevented debuff), Shieldwall (grants the ability), Rally
+(<i>PENDING Hardiness</i>: party +15% healing received per prevented debuff), Iron Will
+(+5%/rank damage per debuff on the Warden ×3). Row 3 — Richocet (5%/rank chance to Stun the
+attacker on Block ×3), Endurance (+3%/rank armor per turn without an external heal, resets
+when healed ×3), Sundering (Crushing Blow splashes 25%/rank of its BD to other enemies ×3).
+Capstone — Hold the Line (grants the ability).</p>
 
 <h2>8. Economy</h2>
 <ul>
@@ -588,10 +641,12 @@ crop), HP/Mana readouts and unspent-point highlights. <b>Awakened heroes are lis
 titled by their SPEC name</b> ("Berserker", not "Warrior"); the class name only shows while
 unawakened — the same rule applies to battle nameplates, the initiative bar, and the combat
 log. Detail page per hero: stats — <b>each stat is its own hover tooltip explaining just
-that stat</b> (talent points are NOT listed here; the count sits above the talent tree) —
-ability chips (hover for numbers), rune equip toggles (2 max), and the spec's talent tree
-with click-to-learn nodes (no requirements text below the tree; lock reasons show on the
-node tooltips).</li>
+that stat</b> (talent points are NOT listed here; the count sits above the talent tree;
+pure tanks additionally show their <b>Block %</b>) — the class passive + spec passive
+lines, ability chips (hover for numbers), rune equip toggles (2 max), and the spec's talent
+tree: a 12-node grid with prerequisite connector lines and click-to-learn nodes (lock
+reasons on the node tooltips) for Berserker / Swordmaster / Warden, or <b>"Coming soon."</b>
+for specs whose trees aren't designed yet.</li>
 <li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per party member;
 reached via the 6 shop nodes on every zone map.</li>
 <li><b>Relics screen:</b> collection viewer from the main menu.</li>
