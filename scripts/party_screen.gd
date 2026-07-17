@@ -116,14 +116,17 @@ func _draw_detail() -> void:
 	var member: Dictionary = Run.party[selected]
 	var key: String = member["key"]
 	var cfg := Classes.hero_config(key)
+	var base_hp: int = cfg["max_hp"]  # node scaling works off the base
 	var spec: String = member.get("spec", "")
 	if spec != "":
 		cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
 		Classes.apply_kit_overrides(cfg, spec)
 		Classes.apply_passive(cfg, spec)
-		# Specced heroes use their spec's Constitution (mirrors battle spawn).
+		# Specced heroes use their spec's stat block (mirrors battle spawn).
 		cfg["constitution"] = Classes.SPEC_INFO[spec].get("constitution",
 			cfg.get("constitution", 100))
+		cfg["attack"] = Classes.spec_attack(spec)
+		cfg["resists"] = Classes.spec_resists(spec).duplicate()
 		Talents.apply_from_tree(cfg, member.get("tree", []), member.get("talents", {}))
 	for rune in member.get("runes", []):
 		if rune.get("equipped", false):
@@ -134,6 +137,12 @@ func _draw_detail() -> void:
 	if cfg.get("toughness_ranks", 0) > 0:
 		cfg["constitution"] = int(cfg.get("constitution", 100)
 			+ 0.05 * cfg["toughness_ranks"] * cfg["max_hp"])
+	# Node scaling (mirrors battle spawn): +1% of base Attack & HP per win.
+	var base_attack: int = cfg.get("attack", 100)
+	if Run.combat_wins > 0:
+		cfg["attack"] = int(round(base_attack * (1.0 + 0.01 * Run.combat_wins)))
+		cfg["max_hp"] = int(cfg["max_hp"]) \
+			+ int(round(base_hp * 0.01 * Run.combat_wins))
 	var spec_label: String = Classes.SPEC_INFO[spec]["name"] if spec != "" else "Unawakened"
 	# Awakened heroes are titled by spec; the class name only shows pre-spec.
 	_title(spec_label if spec != "" else "%s — Unawakened" % cfg["unit_name"], 20, 34)
@@ -155,15 +164,26 @@ func _draw_detail() -> void:
 		"Rage": "Rage — spent on abilities; +5 at turn start, +10 when hit,\nand attacks build more.",
 		"Focus": "Focus — spent on abilities; +15 at the start of each turn.",
 	}
+	# Resistances: armor's cousins, one per element (0% until specs get
+	# their blocks). Weaknesses would show as negatives.
+	var resist_lines := PackedStringArray()
+	for res_type in ["fire", "frost", "nature", "holy", "shadow", "arcane"]:
+		resist_lines.append("%s: %d%%" % [res_type.capitalize(),
+			int(round(float(cfg.get("resists", {}).get(res_type, 0.0)) * 100))])
 	var stat_rows: Array = [
 		[["HP: %d / %d" % [member["hp"], cfg["max_hp"]],
-			"Health — the hero falls at 0.\nValues include talents and equipped runes."]],
+			"Health — the hero falls at 0.\nValues include talents, equipped runes, and\nnode scaling (+1% of base per combat won)."],
+		["Attack: %d" % cfg.get("attack", 100),
+			"Attack — every ability hits for its listed %% of\nthis. Base %d for the spec's role; +1%% of base\nper combat node won (%d so far this run)." % [
+				base_attack, Run.combat_wins]]],
 		[["%s: %s" % [cfg["resource_name"],
 			("%d / %d" % [member["mana"], cfg["max_resource"]]) if cfg["resource_name"] == "Mana"
 			else "builds in combat"],
 			resource_tips.get(cfg["resource_name"], "")]],
 		[["Armor: %d%%" % int(round(cfg["armor"] * 100)),
-			"Armor — % of incoming damage blocked."],
+			"Armor — % of incoming physical damage blocked."],
+		["Resistances", "Resistances — like armor, but for each element:\n%s\n%s" % [
+			" / ".join(resist_lines.slice(0, 3)), " / ".join(resist_lines.slice(3, 6))]],
 		["Speed: %d" % int(cfg["speed"]),
 			"Speed — how quickly turns arrive (100 = average)."],
 		["Constitution: %d" % cfg.get("constitution", 100),
@@ -171,7 +191,7 @@ func _draw_detail() -> void:
 		[["Crit Chance: %d%%" % crit_pct,
 			"Crit Chance — chance to strike for 50% extra damage\n(base 10% plus bonuses)."],
 		["Parry: %d%%" % int(round((0.05 + cfg.get("parry_bonus", 0.0)) * 100)),
-			"Parry — a parried hit deals 75% less damage and\nBreak damage (base 5% plus bonuses)."]],
+			"Parry — a parried MELEE hit deals 75% less damage\nand Break damage (base 5% plus bonuses; ranged\nattacks can't be parried)."]],
 	]
 	# Only pure tanks carry a Block stat (the Warden, for now).
 	if cfg.get("block_chance", 0.0) > 0.0:
@@ -229,8 +249,12 @@ func _draw_detail() -> void:
 		chip.add_child(chip_label)
 		var tip := ab.description
 		if ab.damage > 0:
-			tip += "\nDamage: %d–%d (%s)   BD: %d" % [int(ab.damage * 0.9),
-				int(round(ab.damage * 1.1)), ab.dmg_type.capitalize(), ab.pressure]
+			# Real numbers from the hero's current Attack, plus the scaling
+			# behind them.
+			var hit := ab.damage * 0.01 * float(cfg.get("attack", 100))
+			tip += "\nDamage: %d–%d (%s)   BD: %d" % [int(hit * 0.9),
+				int(round(hit * 1.1)), ab.dmg_type.capitalize(), ab.pressure]
+			tip += "\nScaling: %d%% of Attack" % ab.damage
 		if ab.heal > 0:
 			tip += "\nHeals: %d" % ab.heal
 		if ab.perfect_text != "":
@@ -459,7 +483,8 @@ func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
 func _show_tree_tip(talent: Dictionary, ranks_have: int, check: Dictionary,
 		points: int, center: Vector2) -> void:
 	_tree_tip_name.text = talent["name"]
-	_tree_tip_desc.text = talent["desc"]
+	# Values reflect the invested points (rank-1 preview when unlearned).
+	_tree_tip_desc.text = Talents.desc_for(talent, ranks_have)
 	var state := "Rank %d/%d" % [ranks_have, int(talent["ranks"])]
 	if ranks_have >= int(talent["ranks"]):
 		state += "  —  MAXED"

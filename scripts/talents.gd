@@ -2,7 +2,9 @@
 # JSONs live in data/talent-tree-*.json — this file is their hand-tuned
 # conversion). Specs without a designed tree show "coming soon" on the party
 # screen. Learned talents: {id: ranks}. Ranks are ADDITIVE: every extra point
-# adds the same stated amount again.
+# adds the same stated amount again. Tooltips never say "per rank" — descs
+# hold a "{v}" placeholder and a "scale" {base, step}; desc_for() renders the
+# value at the invested ranks (rank-1 preview when unlearned).
 #
 # Gating: rows unlock cumulatively (row 1 needs 5 pts, row 2 needs 10,
 # row 3 — the capstone — needs 15), PLUS explicit per-node prerequisites
@@ -16,24 +18,29 @@ const FIXED_TREES := {
 		# --- row 0 ---
 		{"id": "bz_bloodcraze", "name": "Bloodcraze", "ranks": 3, "row": 0, "col": 1,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "When an enemy bleeds out, the Berserker heals 3% of max HP per rank.",
+			"desc": "When an enemy bleeds out, the Berserker heals {v}% of max HP.",
+			"scale": {"step": 3},
 			"payload": {"stat": {"bloodcraze": 1}}},
 		{"id": "bz_unstoppable", "name": "Unstoppable", "ranks": 3, "row": 0, "col": 2,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Blood Frenzy grants +0.5% more damage per rank for every 5% of health missing (2% -> 2.5% / 3% / 3.5%).",
+			"desc": "Blood Frenzy grants {v}% damage for every 5% of health missing (up from the base 2%).",
+			"scale": {"base": 2.0, "step": 0.5},
 			"payload": {"stat": {"bloodrage_step_bonus": 0.5}}},
 		{"id": "bz_enraged", "name": "Enraged", "ranks": 3, "row": 0, "col": 3,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Dropping below 50% health grants a +3% per rank damage buff for 5 turns (stacks up to 3 times).",
+			"desc": "Dropping below 50% health grants a +{v}% damage buff for 5 turns (stacks up to 3 times).",
+			"scale": {"step": 3},
 			"payload": {"stat": {"enraged_ranks": 1}}},
 		# --- row 1 ---
 		{"id": "bz_crushing_blows", "name": "Crushing Blows", "ranks": 3, "row": 1, "col": 0,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "For every 20 points of bloodloss on the enemy team, gain 3% armor penetration per rank.",
+			"desc": "For every 20 points of bloodloss on the enemy team, gain {v}% armor penetration.",
+			"scale": {"step": 3},
 			"payload": {"stat": {"crushing_blows_ranks": 1}}},
 		{"id": "bz_savagery", "name": "Savagery", "ranks": 3, "row": 1, "col": 1,
 			"gate": "row", "requires": "bz_unstoppable", "requires_ranks": 1,
-			"desc": "All bleed-building Berserker abilities build +5 more Bleed per rank.",
+			"desc": "All bleed-building Berserker abilities build +{v} more Bleed.",
+			"scale": {"step": 5},
 			"payload": {"stat": {"bleed_bonus": 5}}},
 		{"id": "bz_battle_shout", "name": "Battle Shout", "ranks": 1, "row": 1, "col": 2,
 			"gate": "row", "requires": "", "requires_ranks": 0,
@@ -44,16 +51,19 @@ const FIXED_TREES := {
 				"description": "A roar fed by open wounds: +1% damage\nper 20 blood buildup on the enemy party.\nLasts 2 turns."}}},
 		{"id": "bz_reckless", "name": "Reckless Fury", "ranks": 3, "row": 1, "col": 3,
 			"gate": "row", "requires": "bz_unstoppable", "requires_ranks": 1,
-			"desc": "+5% damage dealt AND +5% damage taken per rank.",
+			"desc": "+{v}% damage dealt AND +{v}% damage taken.",
+			"scale": {"step": 5},
 			"payload": {"stat": {"dmg_bonus": 0.05, "dmg_taken_bonus": 0.05}}},
 		{"id": "bz_unrelenting", "name": "Unrelenting Assault", "ranks": 3, "row": 1, "col": 4,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Dropping below 25% health grants +10 Constitution per rank for 3 turns (at most once every 5 turns).",
+			"desc": "Dropping below 25% health grants +{v} Constitution for 3 turns (at most once every 5 turns).",
+			"scale": {"step": 10},
 			"payload": {"stat": {"unrelenting_ranks": 1}}},
 		# --- row 2 ---
 		{"id": "bz_hemorrhage", "name": "Hemorrhage", "ranks": 3, "row": 2, "col": 1,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Enemies at high bloodloss are Crippled; the threshold drops 10 per rank (80 / 70 / 60 buildup).",
+			"desc": "Enemies at {v} or more bloodloss are Crippled.",
+			"scale": {"base": 90, "step": -10},
 			"payload": {"stat": {"hemorrhage_ranks": 1}}},
 		{"id": "bz_bloodlust_node", "name": "Bloodlust", "ranks": 1, "row": 2, "col": 2,
 			"gate": "row", "requires": "", "requires_ranks": 0,
@@ -61,7 +71,8 @@ const FIXED_TREES := {
 			"payload": {"ability": "Hack and Slash", "add": {"multi_hits": 1}}},
 		{"id": "bz_vitality", "name": "Vitality", "ranks": 3, "row": 2, "col": 3,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "+5% max HP per rank.",
+			"desc": "+{v}% max HP.",
+			"scale": {"step": 5},
 			"payload": {"stat": {"max_hp_pct": 0.05}}},
 		# --- row 3 (capstone) ---
 		{"id": "bz_rampage", "name": "Rampage", "ranks": 1, "row": 3, "col": 2,
@@ -78,20 +89,24 @@ const FIXED_TREES := {
 		# --- row 0 ---
 		{"id": "sm_def_stance", "name": "Defensive Stance", "ranks": 3, "row": 0, "col": 1,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Seasoned Fighter reduces damage taken while under 50% health by an additional 3% per rank.",
+			"desc": "Seasoned Fighter reduces damage taken while under 50% health by an additional {v}%.",
+			"scale": {"step": 3},
 			"payload": {"stat": {"seasoned_def_bonus": 0.03}}},
 		{"id": "sm_swordsmanship", "name": "Swordsmanship", "ranks": 3, "row": 0, "col": 2,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "A perfect Pommel Strike grants +5% more parry chance per rank.",
+			"desc": "A perfect Pommel Strike grants +{v}% more parry chance.",
+			"scale": {"step": 5},
 			"payload": {"stat": {"pommel_parry_bonus": 0.05}}},
 		{"id": "sm_agg_stance", "name": "Aggressive Stance", "ranks": 3, "row": 0, "col": 3,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Seasoned Fighter increases damage dealt above 50% health by an additional 3% per rank.",
+			"desc": "Seasoned Fighter increases damage dealt above 50% health by an additional {v}%.",
+			"scale": {"step": 3},
 			"payload": {"stat": {"seasoned_off_bonus": 0.03}}},
 		# --- row 1 ---
 		{"id": "sm_dominant", "name": "Dominant Presence", "ranks": 3, "row": 1, "col": 0,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Armor value is increased by 5% per rank for every debuff the Swordmaster applies this battle.",
+			"desc": "Armor value is increased by {v}% for every debuff the Swordmaster applies this battle.",
+			"scale": {"step": 5},
 			"payload": {"stat": {"dominant_ranks": 1}}},
 		{"id": "sm_high_guard", "name": "High Guard", "ranks": 1, "row": 1, "col": 1,
 			"gate": "row", "requires": "sm_swordsmanship", "requires_ranks": 1,
@@ -111,12 +126,14 @@ const FIXED_TREES := {
 			"payload": {"stat": {"counter_attacks": 1}}},
 		{"id": "sm_precision", "name": "Precision Strikes", "ranks": 3, "row": 1, "col": 4,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "+5% per rank critical strike chance against Dazed, Crippled, and Exposed targets.",
+			"desc": "+{v}% critical strike chance against Dazed, Crippled, and Exposed targets.",
+			"scale": {"step": 5},
 			"payload": {"stat": {"precision_ranks": 1}}},
 		# --- row 2 ---
 		{"id": "sm_seasoned_node", "name": "Seasoned Fighter", "ranks": 3, "row": 2, "col": 1,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Lunge and Overpower gain +3% critical strike chance per rank.",
+			"desc": "Lunge and Overpower gain +{v}% critical strike chance.",
+			"scale": {"step": 3},
 			"payload": {"stat": {"blade_crit_ranks": 1}}},
 		{"id": "sm_opportunist", "name": "Opportunist", "ranks": 1, "row": 2, "col": 2,
 			"gate": "row", "requires": "", "requires_ranks": 0,
@@ -124,7 +141,8 @@ const FIXED_TREES := {
 			"payload": {"stat": {"opportunist": 1}}},
 		{"id": "sm_sword_mastery", "name": "Sword Mastery", "ranks": 3, "row": 2, "col": 3,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "+3% parry chance per rank.",
+			"desc": "+{v}% parry chance.",
+			"scale": {"step": 3},
 			"payload": {"stat": {"parry_bonus": 0.03}}},
 		# --- row 3 (capstone) ---
 		{"id": "sm_execute", "name": "Execute", "ranks": 1, "row": 3, "col": 2,
@@ -140,24 +158,28 @@ const FIXED_TREES := {
 		# --- row 0 ---
 		{"id": "wd_tank_spank", "name": "Tank and Spank", "ranks": 3, "row": 0, "col": 1,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Mocking Blow has a 15% chance per rank to Empower a random ally (2 turns).",
+			"desc": "Mocking Blow has a {v}% chance to Empower a random ally (2 turns).",
+			"scale": {"step": 15},
 			"payload": {"stat": {"tank_spank_ranks": 1}}},
 		{"id": "wd_unkillable", "name": "Unkillable", "ranks": 3, "row": 0, "col": 2,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Every time you Block an attack, heal for 2% of maximum health per rank.",
+			"desc": "Every time you Block an attack, heal for {v}% of maximum health.",
+			"scale": {"step": 2},
 			"payload": {"stat": {"unkillable_ranks": 1}}},
 		{"id": "wd_elem_weak", "name": "Elemental Weakness", "ranks": 3, "row": 0, "col": 3,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Crushing Blow also reduces all elemental resistances of the target by 5% per rank (3 turns).",
+			"desc": "Crushing Blow also reduces all elemental resistances of the target by {v}% (3 turns).",
+			"scale": {"step": 5},
 			"payload": {"stat": {"elem_weak_ranks": 1}}},
 		# --- row 1 ---
 		{"id": "wd_toughness", "name": "Toughness", "ranks": 3, "row": 1, "col": 0,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Constitution is increased by 5% of maximum HP per rank.",
+			"desc": "Constitution is increased by {v}% of maximum HP.",
+			"scale": {"step": 5},
 			"payload": {"stat": {"toughness_ranks": 1}}},
 		{"id": "wd_tenacity", "name": "Tenacity", "ranks": 1, "row": 1, "col": 1,
 			"gate": "row", "requires": "wd_unkillable", "requires_ranks": 1,
-			"desc": "Every debuff prevented with Hardiness grants +5 max HP for the battle. (PENDING: the Hardiness mechanic is not designed yet.)",
+			"desc": "Every attack Blocked by Heavy Plating increases maximum health by 5 for the rest of the battle.",
 			"payload": {"stat": {"tenacity": 1}}},
 		{"id": "wd_shieldwall", "name": "Shieldwall", "ranks": 1, "row": 1, "col": 2,
 			"gate": "row", "requires": "", "requires_ranks": 0,
@@ -169,24 +191,28 @@ const FIXED_TREES := {
 				"description": "Raise the shield: the next 3 attacks\nagainst the Warden are BLOCKED."}}},
 		{"id": "wd_rally", "name": "Rally", "ranks": 1, "row": 1, "col": 3,
 			"gate": "row", "requires": "wd_unkillable", "requires_ranks": 1,
-			"desc": "Every debuff prevented with Hardiness grants the party +15% healing received for a turn. (PENDING: the Hardiness mechanic is not designed yet.)",
+			"desc": "Every attack Blocked by Heavy Plating grants the party +15% healing received for 2 turns.",
 			"payload": {"stat": {"rally": 1}}},
 		{"id": "wd_iron_will", "name": "Iron Will", "ranks": 3, "row": 1, "col": 4,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "+5% damage per rank for every debuff currently on the Warden.",
+			"desc": "+{v}% damage for every debuff currently on the Warden.",
+			"scale": {"step": 5},
 			"payload": {"stat": {"iron_will_ranks": 1}}},
 		# --- row 2 ---
 		{"id": "wd_ricochet", "name": "Richocet", "ranks": 3, "row": 2, "col": 1,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Blocking an attack has a 5% chance per rank to Stun the attacker.",
+			"desc": "Blocking an attack has a {v}% chance to Stun the attacker.",
+			"scale": {"step": 5},
 			"payload": {"stat": {"ricochet_ranks": 1}}},
 		{"id": "wd_endurance", "name": "Endurance", "ranks": 3, "row": 2, "col": 2,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "+3% armor per rank for every turn the Warden is not healed by an external source (resets when healed).",
+			"desc": "+{v}% armor for every turn the Warden is not healed by an external source (resets when healed).",
+			"scale": {"step": 1},
 			"payload": {"stat": {"endurance_ranks": 1}}},
 		{"id": "wd_sundering", "name": "Sundering", "ranks": 3, "row": 2, "col": 3,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Crushing Blow deals 25% per rank of its Break damage to enemies Adjacent to the target (the living enemy on each side of it).",
+			"desc": "Crushing Blow deals {v}% of its Break damage to enemies Adjacent to the target (the living enemy on each side of it).",
+			"scale": {"step": 25},
 			"payload": {"stat": {"sundering_ranks": 1}}},
 		# --- row 3 (capstone) ---
 		{"id": "wd_hold_line", "name": "Hold the Line", "ranks": 1, "row": 3, "col": 2,
@@ -217,6 +243,19 @@ static func node_in_tree(tree_nodes: Array, id: String) -> Dictionary:
 		if t["id"] == id:
 			return t
 	return {}
+
+
+# Tooltip text for a node at the player's invested ranks: "{v}" in the desc
+# becomes scale.base + scale.step × ranks (unlearned nodes preview rank 1) —
+# "+3% ... +6% ... +9%" instead of "per rank" phrasing.
+static func desc_for(node: Dictionary, ranks: int) -> String:
+	var desc: String = node["desc"]
+	if node.has("scale"):
+		var sc: Dictionary = node["scale"]
+		var val := float(sc.get("base", 0.0)) \
+			+ float(sc.get("step", 0.0)) * maxi(ranks, 1)
+		desc = desc.replace("{v}", String.num(val, 1))
+	return desc
 
 
 # Points spent in this run's tree = all learned ranks (one tree per hero).

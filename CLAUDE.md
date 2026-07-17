@@ -55,7 +55,31 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - Screens: main_menu → draft (pick 4 + relics) → spec_choice (permanent) →
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
-## Current systems snapshot (2026-07-10)
+## Current systems snapshot (2026-07-16)
+ATTACK & SCALING (07-16): every unit has an Attack stat; ability `damage`
+is a PERCENT of the user's current Attack. Role bases: Damage 100 / Tank 75
+/ Support 50 (Classes.spec_attack; Bruiser = Damage role; per-spec stat
+blocks + "resists" dicts land class by class — spec_resists, 0% now, shown
+via stat-page "Resistances" hover). Heroes: +1% of base Atk/HP per combat
+win (Run.combat_wins, saved); enemies: +2% of base per global node tier
+(zone_idx*FLOORS+floor_idx, replaces zone mult), HP rounded UP to 10s.
+Armor/resists/speed/con/crit/block/parry NEVER scale. DoTs (burn 6%,
+poison 3%/stack) snapshot the applier's Attack ("tick" on the status);
+companions hit for % of the hunter's Attack. Cleric core Smite = 44% (of
+50 Atk); Warden Mocking 27%/Crushing 43%/War Stomp 15%x3 (75 Atk);
+Shieldmaster Strike 37% (75); Shaman 70%/30% (50) + fire/frost 25%,
+nature 50% resists. PARRY IS MELEE-ONLY (attacker.is_ranged — hunter+mage
+ranged among heroes); parries and blocks log their SOURCE (reflexes/Sword
+Mastery/Parry Up; Shieldwall/Heavy Plating/base Block — Warden Tenacity
++5 maxHP battle-long (tenacity_hp_gained excluded from save sync) and
+Rally (party rally_heal +15% healing 2t) proc on HEAVY PLATING blocks
+only). Warden tree v2 (07-16 JSON): Endurance 1%/rank. Talent tooltips:
+desc "{v}" + "scale" {base, step} → Talents.desc_for renders invested
+value (never "per rank"). Saved runs swap tree snapshots for live defs on
+load (refunds orphans). War Stomp: allies regain 10% resource post-cast.
+Class passive NOT on draft cards (awakening screen + party sheet only).
+
+## Older snapshot (2026-07-10)
 4 heroes (Warrior/Mage/Cleric/Hunter — one of each), 3 specs each, per-run
 shuffled talent trees, damage types (7) with resists + Weaknesses (config
 "weak": [types] = +25% damage taken, "WEAK!" feedback; assignments TBD),

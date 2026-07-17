@@ -29,6 +29,7 @@ var unit_name := ""
 var is_hero := true
 var max_hp := 100
 var hp := 100
+var attack := 100          # ability damage = ability % × this (scales per node)
 var armor := 0.15          # fraction of damage blocked (0.25 = 25%)
 var speed := 100.0         # 100 = average; higher acts more often
 var stability := 100       # Break meter size (universal 0-100 scale)
@@ -90,13 +91,14 @@ var unkillable_ranks := 0     # Unkillable: heal on block
 var elem_weak_ranks := 0      # Elemental Weakness: Crushing Blow resist shred
 var tank_spank_ranks := 0     # Tank and Spank: Mocking Blow empowers an ally
 var ricochet_ranks := 0       # Richocet: chance to stun on block
-var endurance_ranks := 0      # Endurance: armor per unhealed turn
+var endurance_ranks := 0      # Endurance: +1%/rank armor per unhealed turn
 var endurance_stacks := 0
 var healed_externally := false
 var iron_will_ranks := 0      # Iron Will: damage per own debuff
-var sundering_ranks := 0      # Sundering: Crushing Blow BD splash
-var tenacity := 0             # PENDING the Hardiness mechanic
-var rally := 0                # PENDING the Hardiness mechanic
+var sundering_ranks := 0      # Sundering: Crushing Blow BD splash to Adjacent
+var tenacity := 0             # Tenacity: +5 max HP per Heavy Plating block
+var tenacity_hp_gained := 0   # battle-long gains (excluded from the run save)
+var rally := 0                # Rally: party +15% healing for 2t per HP block
 var seasoned_def_bonus := 0.0 # Defensive Stance: deeper under-half reduction
 var seasoned_off_bonus := 0.0 # Aggressive Stance: bigger over-half bonus
 
@@ -500,25 +502,31 @@ func refresh_bars() -> void:
 # ---------- status effects ----------
 
 # Adds (or refreshes) a status. `short` is the 1-2 char tag shown on the chip.
+# `tick` = damage per turn for DoTs, snapshotted from the applier's Attack.
 func add_status(id: String, label: String, short: String, color: Color, turns: int,
-		desc := "", power := 0) -> void:
+		desc := "", power := 0, tick := 0) -> void:
 	for s in statuses:
 		if s.id == id:
-			# Poison stacks additively (each stack +3 damage/turn) and every
-			# new application refreshes the timer.
+			# Poison stacks additively (each stack ticks again) and every
+			# new application refreshes the timer (and the tick snapshot).
 			if id == "poison":
 				s.stacks = int(s.get("stacks", 1)) + 1
 				s.turns = turns
+				if tick > 0:
+					s["tick"] = tick
 				s.short = "P%d" % s.stacks
-				s.desc = "Takes %d nature damage at the start of each\nturn (3 per stack); new stacks refresh the timer." % (3 * s.stacks)
+				s.desc = "Takes %d nature damage at the start of each\nturn (%d per stack); new stacks refresh the timer." % [
+					int(s.get("tick", 3)) * s.stacks, int(s.get("tick", 3))]
 				float_text("%s x%d" % [label, s.stacks], color)
 			else:
 				s.turns = maxi(s.turns, turns)
 				s.power = maxi(s.power, power)
+				if tick > 0:
+					s["tick"] = tick
 			_refresh_chips()
 			return
 	var entry := {"id": id, "label": label, "short": short, "color": color,
-		"turns": turns, "desc": desc, "power": power, "stacks": 1}
+		"turns": turns, "desc": desc, "power": power, "stacks": 1, "tick": tick}
 	if id == "poison":
 		entry["fresh"] = true  # no tick on the turn it lands
 	statuses.append(entry)
@@ -663,8 +671,8 @@ func effective_armor() -> float:
 	# Dominant Presence: armor value grows 5%/rank per debuff applied.
 	if dominant_ranks > 0 and debuffs_applied > 0:
 		a *= 1.0 + 0.05 * dominant_ranks * debuffs_applied
-	# Endurance: +3%/rank armor per turn without an external heal.
-	a += 0.03 * endurance_ranks * endurance_stacks
+	# Endurance: +1%/rank armor per turn without an external heal.
+	a += 0.01 * endurance_ranks * endurance_stacks
 	if has_status("fortify"):
 		a += 0.10
 	if broken:
@@ -891,10 +899,14 @@ func recover_from_break() -> void:
 	refresh_bars()
 
 
-# Heals respect Holy Conduit (healing_received_mult). `external` marks heals
-# from another unit or an item — the Warden's Endurance talent resets on them.
+# Heals respect Holy Conduit (healing_received_mult) and the Rally blessing
+# (+15% while Rallied). `external` marks heals from another unit or an item —
+# the Warden's Endurance talent resets on them.
 func heal_amount(amount: int, external := false) -> void:
-	var final := int(round(amount * healing_received_mult))
+	var mult := healing_received_mult
+	if has_status("rally_heal"):
+		mult *= 1.15
+	var final := int(round(amount * mult))
 	hp = mini(hp + final, max_hp)
 	if external and final > 0:
 		healed_externally = true

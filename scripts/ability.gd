@@ -7,7 +7,8 @@ enum Target { ENEMY, ALLY }
 
 var display_name := ""
 var cost := 0            # class resource cost (Rage, Mana...)
-var damage := 0          # base damage before variance/crit/armor
+var damage := 0          # PERCENT of the user's current Attack (100 = a full
+                         # Attack-stat hit) before variance/crit/armor
 var pressure := 0        # Pressure applied to the target on hit
 var heal := 0            # if > 0 this is a healing ability
 var delay := 2.0         # initiative delay added after use (basic = 2)

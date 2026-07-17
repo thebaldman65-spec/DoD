@@ -5,6 +5,45 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-16 — Batch 12: Attack stat &amp; node scaling, Resistances, Warden tree v2, melee-only parry</h2>
+<ul>
+<li><b>Attack stat + % scaling:</b> every unit has an Attack stat; every ability's damage
+is now a PERCENT of the user's current Attack. Base Attack by role: <b>Damage 100 / Tank 75
+/ Support 50</b> (per-spec stat blocks coming class by class). Existing damage numbers were
+converted to preserve current values at base Attack (e.g. Smite 44% of the Cleric's 50).
+<b>Bruiser moved under the Damage role</b> — the Swordmaster attacks at 100.</li>
+<li><b>Node scaling:</b> heroes gain +1% of base Attack and max HP per combat node won
+(persisted as combat_wins); enemies gain +2% of base per node tier across the whole game
+(replaces the old ×1.35-per-zone jump). Armor, Resistances, Speed, Constitution, Crit,
+Block, and Parry never scale. Enemy HP pools are multiples of 10 (rounded up after
+scaling; bases raised: Raider 140, Archer 110, Chief 250, Tyrant 370).</li>
+<li><b>DoTs scale:</b> Burn (6%) and Poison (3%/stack) snapshot the applier's Attack when
+applied. Companion beasts hit for % of the hunter's Attack (10/20/15%).</li>
+<li><b>Resistances (hero stat):</b> six per-element resistances (Fire/Frost/Nature/Holy/
+Shadow/Arcane) that work like armor for their type; hover "Resistances" on the stat page.
+Per-spec values land class by class (0% placeholders today). <b>Orc Shaman:</b> fire 25%,
+frost 25%, nature 50%.</li>
+<li><b>Ability displays:</b> battle tooltips show computed damage from live Attack; the
+stat page shows damage AND "% of Attack"; the awakening screen shows both; the stat page
+gains an <b>Attack</b> row (with scaling explanation and win count).</li>
+<li><b>Melee-only parry:</b> ranged attackers (Hunter, Mage, Orc Archer, Orc Shaman) can no
+longer be parried. Parries log their source — reflexes / Sword Mastery / Parry Up — and
+blocks log theirs — Shieldwall / Heavy Plating / base Block.</li>
+<li><b>Warden tree v2</b> (from the updated tree JSON): <b>Tenacity</b> is live — +5 max HP
+(battle-long) per Heavy Plating block; <b>Rally</b> is live — party +15% healing received
+for 2 turns per Heavy Plating block (new "Rallied" chip); <b>Endurance</b> reduced to
++1%/rank armor per unhealed turn (was 3%). The Hardiness placeholder is gone.</li>
+<li><b>New Warden ability — War Stomp:</b> 20 Rage, 3 shockwaves × 15% Atk / 15 BD to
+random enemies, 3.0 int, 4cd; allies regain 10% of their resource.</li>
+<li><b>Talent tooltips scale with investment:</b> no more "per rank" — the displayed value
+grows as points go in (3% → 6% → 9%; unlearned nodes preview rank 1).</li>
+<li><b>Class passive removed from the draft screen</b> (stays on the awakening screen and
+party sheet).</li>
+<li><b>Saves:</b> loading a run now swaps saved talent-tree snapshots for the live
+definitions (learned ranks carry over; removed/shrunk nodes refund points), so balance
+edits reach old saves.</li>
+</ul>
+
 <h2>2026-07-16 — Batch 11: talent visibility (chips + logs), Adjacent keyword, debug QoL</h2>
 <ul>
 <li><b>New keyword — Adjacent:</b> the enemies directly next to a target in formation

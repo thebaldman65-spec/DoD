@@ -114,11 +114,14 @@ func _draw_screen() -> void:
 		vbox.add_child(scroll)
 		var body := Label.new()
 		var ability_lines := PackedStringArray()
+		var spec_atk := Classes.spec_attack(spec_id)
 		for ab in Classes.spec_abilities(spec_id):
 			var line: String = "• %s" % ab.display_name
 			if ab.damage > 0:
-				line += " — %d–%d %s dmg" % [int(ab.damage * 0.9),
-					int(round(ab.damage * 1.1)), ab.dmg_type.capitalize()]
+				# Numbers from the spec's base Attack (damage is % of Attack).
+				var hit: float = ab.damage * 0.01 * spec_atk
+				line += " — %d–%d %s dmg (%d%% Atk)" % [int(hit * 0.9),
+					int(round(hit * 1.1)), ab.dmg_type.capitalize(), ab.damage]
 			ability_lines.append(line)
 			ability_lines.append("   %s" % ab.description.replace("\n", " "))
 		body.text = "%s\n\nPassive: %s\n\n%s" % [info["blurb"], info["passive_desc"],

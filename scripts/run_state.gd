@@ -26,6 +26,10 @@ const LOOT_POOL := ["health", "health", "mana", "mana", "bomb", "revive", "defen
 var active := false
 var specs_chosen := false  # locked in during the pre-run awakening
 var gold := 0
+# Node scaling: combat victories this run. Heroes gain +1% of base Attack
+# and HP per win (applied at battle spawn; never touches armor/resists/
+# speed/constitution/crit/block/parry).
+var combat_wins := 0
 
 const SAVE_PATH := "user://run_save.bin"
 
@@ -73,6 +77,7 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 			"talents": {}, "runes": []})
 	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
 	gold = 60 + (80 if relic_active("coin") else 0)
+	combat_wins = 0
 	zone_idx = 0
 	zone_name = ZONES[0]
 	zone_idx = 0
@@ -267,6 +272,7 @@ func save_run() -> void:
 		"zone_idx": zone_idx, "zone_name": zone_name, "floor_idx": floor_idx,
 		"node_idx": node_idx, "specs_chosen": specs_chosen,
 		"active_relics": active_relics, "map": map,
+		"combat_wins": combat_wins,
 	}, true)
 
 
@@ -282,25 +288,27 @@ func load_run() -> bool:
 	if not (data is Dictionary):
 		return false
 	party = data["party"]
-	# Migrate members whose saved tree predates the current fixed trees
-	# (row-gated): refund the points and swap in the current tree (or an
-	# empty "coming soon" one for specs without a designed tree yet).
+	# Trees are FIXED definitions in code: always swap the saved snapshot for
+	# the live tree so balance edits reach old saves. Learned ranks carry
+	# over; points in nodes that shrank or vanished are refunded.
 	for member in party:
 		var spec: String = member.get("spec", "")
 		if spec == "":
 			continue
-		var tree: Array = member.get("tree", [])
-		var is_current: bool = (Talents.has_tree(spec)
-			and tree.any(func(t): return t.get("gate", "") == "row")) \
-			or (not Talents.has_tree(spec) and tree.is_empty())
-		if not is_current:
-			var learned: Dictionary = member.get("talents", {})
-			var refund := 0
-			for id in learned:
+		var live_tree := Talents.generate_tree(spec, member["key"])
+		member["tree"] = live_tree
+		var learned: Dictionary = member.get("talents", {})
+		var refund := 0
+		for id in learned.keys():
+			var node := Talents.node_in_tree(live_tree, id)
+			if node.is_empty():
 				refund += int(learned[id])
-			member["talent_points"] = member.get("talent_points", 0) + refund
-			member["talents"] = {}
-			member["tree"] = Talents.generate_tree(spec, member["key"])
+				learned.erase(id)
+			elif int(learned[id]) > int(node["ranks"]):
+				refund += int(learned[id]) - int(node["ranks"])
+				learned[id] = int(node["ranks"])
+		member["talents"] = learned
+		member["talent_points"] = member.get("talent_points", 0) + refund
 	items = data["items"]
 	gold = data["gold"]
 	zone_idx = data["zone_idx"]
@@ -310,6 +318,7 @@ func load_run() -> bool:
 	specs_chosen = data["specs_chosen"]
 	active_relics = data["active_relics"]
 	map = data["map"]
+	combat_wins = int(data.get("combat_wins", 0))
 	encounter = {}
 	active = true
 	return true

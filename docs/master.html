@@ -99,18 +99,35 @@ check.</p>
 returns to the action bar with nothing spent. Enemies and the sim bot always act at "Good" (bot: 20% perfect,
 15% sloppy).</p>
 <h3>4.3 Attack resolution pipeline</h3>
-<p>Per strike, in order: base damage × random variance (0.9–1.1) × grade multiplier × crit
-(×1.5; Sharpshooter passive ×2) × attacker modifiers × target modifiers × (1 − resist) ×
-(1 − effective armor), minimum 1.</p>
+<p>Per strike, in order: <b>ability % × the attacker's current Attack</b> × random variance
+(0.9–1.1) × grade multiplier × crit (×1.5; Sharpshooter passive ×2) × attacker modifiers ×
+target modifiers × (1 − resist) × (1 − effective armor), minimum 1.</p>
 <ul>
+<li><b>Attack (stat) &amp; node scaling:</b> every unit has an Attack stat, and every
+ability's damage is a PERCENT of the user's current Attack (a "45%" ability at 100 Attack
+hits for ~45). Base Attack comes from the spec's role — <b>Damage 100, Tank 75,
+Support 50</b> (per-spec stat blocks are being filled in class by class). <b>Heroes gain +1%
+of base Attack and max HP per combat node won</b> (fight/elite/boss); enemies gain <b>+2% of
+base Attack and HP per node tier</b>, counted across the whole game. Armor, Resistances,
+Speed, Constitution, Crit, Block, and Parry never scale. Damage-over-time effects (Burn 6%,
+Poison 3% per stack) snapshot the applier's Attack when they land. Battle tooltips show the
+computed damage numbers; the hero stat page shows the numbers AND the % scaling behind
+them.</li>
+<li><b>Resistances (stat):</b> heroes now carry a resistance per element — Fire, Frost,
+Nature, Holy, Shadow, Arcane — working exactly like armor but against that damage type
+(negative = weakness). Hover "Resistances" on the stat page to read them; per-spec values
+are being assigned class by class (all 0% until then).</li>
 <li><b>Miss:</b> 5% base chance (single-target, non-counter only); a <b>Dazed</b> attacker is
 20% more likely to miss. AoE never misses/parries. Multi-hit and random-hit attacks roll miss
 <i>per strike</i> — a missed hit never cancels the follow-up strikes.</li>
-<li><b>Parry:</b> baseline is split by side — <b>heroes parry at 5%, enemies at 2.5%</b> —
-plus parry bonuses (talents, Parry Up). A parried hit still lands but with <b>75% less
-damage AND 75% less Break damage</b> (on-hit statuses can still apply); the log tags it
-"(parried -75%)". Parrying no longer triggers an automatic counter. AoE cannot be parried;
-Broken units cannot parry; multi-hit attacks roll parry per strike.</li>
+<li><b>Parry:</b> <b>only MELEE attacks can be parried</b> — ranged attackers (Hunter and
+Mage among heroes; Orc Archers and Shamans among enemies) sail past the blade. Baseline is
+split by side — <b>heroes parry at 5%, enemies at 2.5%</b> — plus parry bonuses (talents,
+Parry Up). A parried hit still lands but with <b>75% less damage AND 75% less Break
+damage</b> (on-hit statuses can still apply); the log names the parry's source — reflexes,
+Sword Mastery, or Parry Up — e.g. "(parried -75% — Sword Mastery)". Parrying no longer
+triggers an automatic counter. AoE cannot be parried; Broken units cannot parry; multi-hit
+attacks roll parry per strike.</li>
 <li><b>Counter Attack (term):</b> immediately answering a parry with a basic attack — a free
 action with no initiative cost that cannot chain. Granted only by specific effects (the
 Swordmaster's Riposte talent grants it).</li>
@@ -118,7 +135,9 @@ Swordmaster's Riposte talent grants it).</li>
 damage, and its on-hit effects. Governed by <b>Block %</b>, a stat only pure tanks carry
 (currently the Warden: 5% base, +15% from Heavy Plating; the Orc Shieldmaster also blocks at
 5%). Guaranteed blocks come from Shieldwall charges. Broken units cannot Block. A block
-flashes <b>BLOCK</b> and is logged.</li>
+flashes <b>BLOCK</b> and the log names its source — "(Shieldwall)", "(Heavy Plating)", or
+"(base Block)" — which matters: the Warden's Tenacity and Rally talents feed on Heavy
+Plating blocks specifically.</li>
 <li><b>Armor Penetration (keyword):</b> every % of armor penetration negates a % of the
 target's armor (Piercing Arrow 50%, Singularity 30%, the Berserker's Crushing Blows talent).
 It is NOT shown on the character screen.</li>
@@ -173,11 +192,13 @@ After the lost turn, the Break meter resets to 0. Ward halves incoming BD; Devot
 <h3>4.5 Bleed &amp; damage over time</h3>
 <ul>
 <li><b>Bleed</b> is a 0–100 buildup meter (chip shows Bl##). Wounding attacks add buildup
-(Wildstrikes 35 always; Hack and Slash 20 at 40% per hit). At 100 the target <b>bleeds out for
+(Wildstrikes 35 always; Hack and Slash 25 at 50% per hit). At 100 the target <b>bleeds out for
 20% max HP</b> and the meter resets. <b>Bleedout damage ignores armor</b> entirely.</li>
-<li><b>Burn:</b> 6 damage at the start of the afflicted unit's turn; ticks can crit using the
-caster's snapshotted crit chance.</li>
-<li><b>Poison:</b> 3 damage per stack at the start of the afflicted unit's turn.
+<li><b>Burn:</b> 6% of the applier's Attack (snapshotted when it lands; ≈6 at 100 Atk) at
+the start of the afflicted unit's turn; ticks can crit using the caster's snapshotted crit
+chance.</li>
+<li><b>Poison:</b> 3% of the applier's Attack per stack (snapshotted; ≈3 at 100 Atk) at the
+start of the afflicted unit's turn.
 <b>Poison counts as nature damage</b> — nature resists reduce the tick (and nature
 vulnerability raises it). Stacks additively with no cap; every new application adds a stack
 AND refreshes the timer. Applied by Orc Archers' Poison Arrow (3 turns), the Withered Warden's
@@ -265,6 +286,9 @@ Ash-Wrought Tyrant build and spend Rage like a Warrior.</p>
 text. No banner text appears at the top of the battle.</p>
 
 <h2>5. Heroes</h2>
+<p><b>All ability damage is a % of the user's Attack</b> (see §4.3); the flat numbers in
+the kit lists below are the values at the class/spec base Attack, before node scaling.
+Heals and shields stay flat — only damage and DoTs scale.</p>
 <p>All four classes are drafted every run (one of each). Sprites currently share the Soldier
 sheet, distinguished by slot tints (white / blue / gold / green); distinct art is arriving
 spec by spec. <b>Own art in-game so far</b> (specs listed in battle.gd's SPEC_ART table,
@@ -328,15 +352,18 @@ down). (Renewal moved to the Holy spec 07-10.)</li>
 choice screen with a mouseover explanation.</p>
 <table border="1" cellpadding="4">
 <tr><th>Role</th><th>Archetype</th><th>Definition</th></tr>
-<tr><td rowspan="4">Damage</td><td>Ramp</td><td>Starts weak, snowballs as the battle progresses.</td></tr>
+<tr><td rowspan="5">Damage (100 Atk)</td><td>Ramp</td><td>Starts weak, snowballs as the battle progresses.</td></tr>
 <tr><td>Rush</td><td>Starts strong; resources dwindle as the fight drags on.</td></tr>
 <tr><td>Nuker</td><td>Banks resources to unleash a single devastating turn; exploits weakened foes.</td></tr>
 <tr><td>Pressure</td><td>Steady damage, debuffs and DoTs, Break pressure.</td></tr>
-<tr><td rowspan="2">Support</td><td>Healer</td><td>Restores lost HP and mana; can revive.</td></tr>
-<tr><td>Warder</td><td>Damage mitigation and protective buffs.</td></tr>
-<tr><td rowspan="2">Tank</td><td>Tank</td><td>Absorbs and redirects damage; buffs the line.</td></tr>
 <tr><td>Bruiser</td><td>Damage/tank hybrid — weakens foes, moderate damage, debuffs.</td></tr>
+<tr><td rowspan="2">Support (50 Atk)</td><td>Healer</td><td>Restores lost HP and mana; can revive.</td></tr>
+<tr><td>Warder</td><td>Damage mitigation and protective buffs.</td></tr>
+<tr><td>Tank (75 Atk)</td><td>Tank</td><td>Absorbs and redirects damage; buffs the line.</td></tr>
 </table>
+<p><b>Role sets base Attack</b> (Damage 100 / Tank 75 / Support 50) until per-spec stat
+blocks land. Bruiser counts as a DAMAGE archetype (moved from Tank 07-16) — the Swordmaster
+attacks at 100.</p>
 <p>Every spec grants one passive plus abilities appended to the core kit. Specs are chosen once
 per run and are permanent. <b>Constitution by spec</b> (role-based Break resistance; class base
 in §5 applies before awakening): Warden 110 (+30 Bulwark = 140), Swordmaster 120, Berserker
@@ -362,10 +389,12 @@ selection, and its chip shows the % gained. Rampage — 40 Rage, 3 × 20 physica
 <li><b>Warden (Tank)</b> — Passive <i>Heavy Plating</i>: 15% chance to Block, on top of the
 Warden's <b>5% base Block stat</b> (the only stat-Block character). VAULTED: the old Bulwark
 passive, Retaliation, and the party-wide Shieldwall v1.<br>
-Mocking Blow — free, 20 dmg / 15 BD / 2.0, 2cd, taunts the target AND one other enemy for
-4 turns, builds 10 Rage (Perfect: 5 turns).<br>
-Crushing Blow (moved from the Swordmaster) — 20 Rage, 32 dmg / 20 BD / 3.0, 3cd, Sunders
-(−35% armor, 3 turns), builds 10 Rage (Perfect: +5 bonus BD).<br>
+Mocking Blow — free, 27% Atk (≈20) / 15 BD / 2.0, 2cd, taunts the target AND one other
+enemy for 4 turns, builds 10 Rage (Perfect: 5 turns).<br>
+Crushing Blow (moved from the Swordmaster) — 20 Rage, 43% Atk (≈32) / 20 BD / 3.0, 3cd,
+Sunders (−35% armor, 3 turns), builds 10 Rage (Perfect: +5 bonus BD).<br>
+<b>War Stomp (NEW 07-16)</b> — 20 Rage, 3 shockwaves × 15% Atk / 15 BD each to RANDOM
+enemies, 3.0 int, 4cd; allies regain 10% of their resource.<br>
 <i>Talent-granted:</i> Shieldwall — 25 Rage, 2.0, 3cd, Blocks the next 3 attacks (Perfect:
 5); a self-buff cast with no target selection whose chip counts the charges left. Hold the
 Line — 30 Rage, 3.5, 7cd, the party takes 50% less Break damage for 2 turns and
@@ -510,16 +539,20 @@ Strike, needs Swordsmanship 1), Precision Strikes (+5%/rank crit vs Dazed / Crip
 Exposed ×3). Row 3 — Seasoned Fighter (+3%/rank crit for Lunge and Overpower ×3),
 Opportunist (counter enemy misses with a free Overpower), Sword Mastery (+3%/rank parry ×3).
 Capstone — Execute (grants the ability).</p>
-<p><b>Warden tree:</b> Row 1 — Tank and Spank (Mocking Blow 15%/rank chance to Empower a
-random ally ×3), Unkillable (heal 2%/rank max HP on every Block ×3), Elemental Weakness
-(Crushing Blow shreds elemental resists 5%/rank, 3 turns ×3). Row 2 — Toughness
-(Constitution +5%/rank of max HP ×3), Tenacity (<i>PENDING the undefined Hardiness
-mechanic</i>: +5 max HP per prevented debuff), Shieldwall (grants the ability), Rally
-(<i>PENDING Hardiness</i>: party +15% healing received per prevented debuff), Iron Will
-(+5%/rank damage per debuff on the Warden ×3). Row 3 — Richocet (5%/rank chance to Stun the
-attacker on Block ×3), Endurance (+3%/rank armor per turn without an external heal, resets
-when healed ×3), Sundering (Crushing Blow splashes 25%/rank of its BD to the enemies
-<b>Adjacent</b> to the target ×3). Capstone — Hold the Line (grants the ability).</p>
+<p><b>Warden tree (updated 07-16 from the new tree JSON):</b> Row 1 — Tank and Spank
+(Mocking Blow 15%/rank chance to Empower a random ally ×3), Unkillable (heal 2%/rank max HP
+on every Block ×3), Elemental Weakness (Crushing Blow shreds elemental resists 5%/rank, 3
+turns ×3). Row 2 — Toughness (Constitution +5%/rank of max HP ×3), <b>Tenacity</b> (LIVE —
+Hardiness is gone: every attack Blocked by <b>Heavy Plating</b> grants +5 max HP for the
+battle; battle-long gains don't leak into the save), Shieldwall (grants the ability),
+<b>Rally</b> (LIVE: every Heavy Plating block Rallies the party — +15% healing received for
+2 turns), Iron Will (+5%/rank damage per debuff on the Warden ×3). Row 3 — Richocet
+(5%/rank chance to Stun the attacker on Block ×3), <b>Endurance</b> (now +1%/rank armor —
+was 3 — per turn without an external heal, resets when healed ×3), Sundering (Crushing Blow
+splashes 25%/rank of its BD to the enemies <b>Adjacent</b> to the target ×3). Capstone —
+Hold the Line (grants the ability).</p>
+<p><b>Tooltip display:</b> talent tooltips never say "per rank" — the number shown grows
+with the points invested (3% → 6% → 9%; unlearned nodes preview the 1-point value).</p>
 <p><b>Talent visibility:</b> every talent proc is written to the combat log with a
 "Talent:" tag (Enraged, Unrelenting Assault, Endurance, Unkillable, Richocet, Tank and
 Spank, Dominant Presence, Sundering, Riposte...), and stateful talent buffs display as
@@ -546,35 +579,41 @@ Mirror removed 07-09; old unlocks are dropped safely.)</li>
 </ul>
 
 <h2>9. Enemies</h2>
+<p>Enemies carry role-based Attack like heroes — <b>Damage 100</b> (Raider, Archer, Chief,
+bosses), <b>Tank 75</b> (Shieldmaster), <b>Support 50</b> (Shaman) — and their ability
+damage is a % of it (the flat numbers below are the tier-0 values). Health pools are
+multiples of 10.</p>
 <table border="1" cellpadding="4">
-<tr><th>Enemy</th><th>HP</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Kit</th></tr>
-<tr><td>Orc Raider</td><td>132</td><td>15%</td><td>90</td><td>100</td><td>Slash 34/26BD;
-Sundering Strike 23/22BD, 60% Sunder 2t. Resists: physical 10%.</td></tr>
-<tr><td>Orc Archer (red)</td><td>104</td><td>10%</td><td>100</td><td>85</td><td>Arrow Shot
-21/16BD; Poison Arrow 16 nature/14BD, 70% Poison 3t. Resists: physical 5%.</td></tr>
-<tr><td>Orc Shieldmaster (orange)</td><td>150</td><td>25%</td><td>85</td><td>120</td>
+<tr><th>Enemy</th><th>HP</th><th>Atk</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Kit</th></tr>
+<tr><td>Orc Raider</td><td>140</td><td>100</td><td>15%</td><td>90</td><td>100</td><td>Slash 34%/26BD;
+Sundering Strike 23%/22BD, 60% Sunder 2t. Resists: physical 10%.</td></tr>
+<tr><td>Orc Archer (red)</td><td>110</td><td>100</td><td>10%</td><td>100</td><td>85</td><td>Arrow Shot
+21%/16BD; Poison Arrow 16% nature/14BD, 70% Poison 3t. Resists: physical 5%.</td></tr>
+<tr><td>Orc Shieldmaster (orange)</td><td>150</td><td>75</td><td>25%</td><td>85</td><td>120</td>
 <td>Shielding — wards an ally (lowest HP first, itself included) with 25% damage reduction
 for 3 turns; only one ally holds the ward at a time, and it ALWAYS re-casts when no ally is
-shielded. Strike 28 physical/20BD.</td></tr>
-<tr><td>Orc Shaman (blue)</td><td>110</td><td>1%</td><td>100</td><td>80</td><td>Ranged
-caster. Lightning Bolt 35 nature/20BD single target; Chain Lightning 15 nature + 15BD to the
-ENTIRE hero party.</td></tr>
-<tr><td>Orc Chief (elite)</td><td>242</td><td>20%</td><td>80</td><td>130</td><td>Rage user:
-Strike 28/26BD +15 Rage; Heavy Strike 30R 54/40BD; Crushing Blow 20R 34/56BD. Resists:
+shielded. Strike 37% physical/20BD (≈28).</td></tr>
+<tr><td>Orc Shaman (blue)</td><td>110</td><td>50</td><td>1%</td><td>100</td><td>80</td><td>Ranged
+caster. Lightning Bolt 70% nature/20BD single target (≈35); Chain Lightning 30% nature +
+15BD to the ENTIRE hero party (≈15). Resists: fire 25%, frost 25%, nature 50%.</td></tr>
+<tr><td>Orc Chief (elite)</td><td>250</td><td>100</td><td>20%</td><td>80</td><td>130</td><td>Rage user:
+Strike 28%/26BD +15 Rage; Heavy Strike 30R 54%/40BD; Crushing Blow 20R 34%/56BD. Resists:
 physical 15%.</td></tr>
-<tr><td>Withered Warden (zone 1 boss)</td><td>500</td><td>35%</td><td>80</td><td>150</td>
-<td>Unique kit, nature resist 75%. Timber Slam — 60 nature/30BD single target + Dazed 3t;
-Roots of Wrath — 25 nature/20BD to the whole party + Poison 3t; Wild Growth — heals an ally
+<tr><td>Withered Warden (zone 1 boss)</td><td>500</td><td>100</td><td>35%</td><td>80</td><td>150</td>
+<td>Unique kit, nature resist 75%. Timber Slam — 60% nature/30BD single target + Dazed 3t;
+Roots of Wrath — 25% nature/20BD to the whole party + Poison 3t; Wild Growth — heals an ally
 for 20% of its max HP (itself included).</td></tr>
-<tr><td>Ash-Wrought Tyrant (zone 2 boss, stand-in)</td><td>368</td><td>22%</td><td>85</td>
+<tr><td>Ash-Wrought Tyrant (zone 2 boss, stand-in)</td><td>370</td><td>100</td><td>22%</td><td>85</td>
 <td>160</td><td>Chief kit, bigger sprite, 20 starting Rage. Resists: fire 50%, physical 10%.
 WEAK to frost (+25% damage taken).</td></tr>
 </table>
 <p><b>Compositions:</b> every encounter fields <b>3–5 enemies with the types rolled at
 random</b> from the basic pool (Raider / Archer / Shieldmaster / Shaman). Elites only appear
 on elite nodes (the Chief + 2–4 random basics) and bosses only on the boss node (boss + 2–4
-random basics). Zone scaling multiplies HP and ability damage ×(1 + 0.35 × zone
-index).</p>
+random basics). <b>Tier scaling (replaces the old ×1.35-per-zone jump):</b> enemy Attack and
+HP grow +2% of base per node tier, counted from the start of the game to its end (a zone
+spans 11 tiers, so zone 2 opens at +22%); scaled HP is rounded UP to the next multiple of
+10. Deeper-zone enemies keep their scorched tint.</p>
 
 <h2>10. Battle Screen &amp; Controls</h2>
 <ul>
@@ -664,16 +703,18 @@ titled by their SPEC name</b> ("Berserker", not "Warrior"); the class name only 
 unawakened — the same rule applies to battle nameplates, the initiative bar, and the combat
 log. Detail page per hero: stats — <b>each stat is its own hover tooltip explaining just
 that stat</b> (talent points are NOT listed here; the count sits above the talent tree;
-pure tanks additionally show their <b>Block %</b>). Stats mirror the battle spawn math:
-Constitution uses the spec's value plus Toughness, and the spec passive line bakes in
-talent ranks (Aggressive/Defensive Stance, Unstoppable) — the class passive + spec passive
-lines, ability chips (hover for numbers), rune equip toggles (2 max), and the spec's talent
+pure tanks additionally show their <b>Block %</b>; the <b>Attack</b> row explains node
+scaling and hovering <b>Resistances</b> lists all six elements). Stats mirror the battle
+spawn math: Constitution uses the spec's value plus Toughness, Attack/HP include node
+scaling, and the spec passive line bakes in talent ranks (Aggressive/Defensive Stance,
+Unstoppable) — the class passive + spec passive lines, ability chips (hover shows real
+numbers AND the "% of Attack" scaling), rune equip toggles (2 max), and the spec's talent
 tree: a 12-node grid with prerequisite connector lines and click-to-learn nodes (lock
 reasons on the node tooltips) for Berserker / Swordmaster / Warden, or <b>"Coming soon."</b>
 for specs whose trees aren't designed yet.</li>
-<li><b>Draft &amp; awakening screens:</b> every class card at the draft shows its CLASS
-PASSIVE under the name, and the awakening (spec choice) screen repeats it in a "Class
-Passive" line under the title — it rides along on every path the class can take.</li>
+<li><b>Awakening screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
+along on every path the class can take) and each ability's damage with its "% Atk" scaling.
+The draft screen stays clean — no passive text there (removed 07-16).</li>
 <li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per party member;
 reached via the 6 shop nodes on every zone map.</li>
 <li><b>Relics screen:</b> collection viewer from the main menu.</li>

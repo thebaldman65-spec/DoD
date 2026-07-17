@@ -4,8 +4,8 @@
       "Skill Name": "Unkillable",
       "Skill Position": "(9,7)",
       "Skill Position Exact": {
-        "x": 1092,
-        "y": 830
+        "x": 1110,
+        "y": 810
       },
       "Skill Level": 1,
       "Skill Description": "Every turn you block an attack, heal for 2% of maximum health.",
@@ -23,8 +23,8 @@
       "Skill Name": "Elemental Weakness",
       "Skill Position": "(10,7)",
       "Skill Position Exact": {
-        "x": 1212,
-        "y": 830
+        "x": 1230,
+        "y": 810
       },
       "Skill Level": 1,
       "Skill Description": "Crushing blow also reduces all elemental resistances of the target by 5%",
@@ -39,8 +39,8 @@
       "Skill Name": "Tank and Spank",
       "Skill Position": "(8,7)",
       "Skill Position Exact": {
-        "x": 972,
-        "y": 830
+        "x": 990,
+        "y": 810
       },
       "Skill Level": 1,
       "Skill Description": "Mocking Blow has a 15% to empower a random ally.",
@@ -55,8 +55,8 @@
       "Skill Name": "Shieldwall",
       "Skill Position": "(9,8)",
       "Skill Position Exact": {
-        "x": 1092,
-        "y": 950
+        "x": 1110,
+        "y": 930
       },
       "Skill Level": 1,
       "Skill Description": "Gain new ability: \"Shieldwall\" Raise your shield and block the next 3 oncoming attacks",
@@ -71,8 +71,8 @@
       "Skill Name": "Richocet ",
       "Skill Position": "(8,9)",
       "Skill Position Exact": {
-        "x": 972,
-        "y": 1070
+        "x": 990,
+        "y": 1050
       },
       "Skill Level": 1,
       "Skill Description": "Blocking an attack has a 5% chance to stun the attacker.",
@@ -87,11 +87,11 @@
       "Skill Name": "Endurance",
       "Skill Position": "(9,9)",
       "Skill Position Exact": {
-        "x": 1092,
-        "y": 1070
+        "x": 1110,
+        "y": 1050
       },
       "Skill Level": 1,
-      "Skill Description": "Increase armor by 3% every turn you are not healed by an external source.",
+      "Skill Description": "Increase armor by 1% every turn you are not healed by an ally.",
       "Skill Max Points": 3,
       "Skill Current Points": 0,
       "Skill Image": "/axe-hammer-grey.png",
@@ -103,8 +103,8 @@
       "Skill Name": "Toughness",
       "Skill Position": "(7,8)",
       "Skill Position Exact": {
-        "x": 852,
-        "y": 950
+        "x": 870,
+        "y": 930
       },
       "Skill Level": 1,
       "Skill Description": "Constitution is increased by 5% of HP",
@@ -119,8 +119,8 @@
       "Skill Name": "Hold the Line",
       "Skill Position": "(9,10)",
       "Skill Position Exact": {
-        "x": 1092,
-        "y": 1190
+        "x": 1110,
+        "y": 1170
       },
       "Skill Level": 1,
       "Skill Description": "Gain new ability: \"Hold the Line\" Embolden your party, reducing break damage taken by 50%, and preventing them from dying for a turn.",
@@ -135,11 +135,11 @@
       "Skill Name": "Tenacity",
       "Skill Position": "(8,8)",
       "Skill Position Exact": {
-        "x": 972,
-        "y": 950
+        "x": 990,
+        "y": 930
       },
       "Skill Level": 1,
-      "Skill Description": "Every time a debuff is prevented with \"Hardiness\", increase maximum hitpoints by 5 for the rest of the battle.",
+      "Skill Description": "Every time an attack is blocked due to Heavy Plate, increase maximum hitpoints by 5 for the rest of the battle.",
       "Skill Max Points": 1,
       "Skill Current Points": 0,
       "Skill Image": "/axe-hammer-grey.png",
@@ -151,11 +151,11 @@
       "Skill Name": "Rally ",
       "Skill Position": "(10,8)",
       "Skill Position Exact": {
-        "x": 1212,
-        "y": 950
+        "x": 1230,
+        "y": 930
       },
       "Skill Level": 1,
-      "Skill Description": "Every time a debuff is prevented with \"Hardiness\", increase healing received by the party by 15% for a turn.",
+      "Skill Description": "Every time an attack is blocked due to Heavy Plate, increase healing received by the party by 15% for 2 turns.",
       "Skill Max Points": 1,
       "Skill Current Points": 0,
       "Skill Image": "/axe-hammer-grey.png",
@@ -167,8 +167,8 @@
       "Skill Name": "Iron Will",
       "Skill Position": "(11,8)",
       "Skill Position Exact": {
-        "x": 1332,
-        "y": 950
+        "x": 1350,
+        "y": 930
       },
       "Skill Level": 1,
       "Skill Description": "Gain 5% damage buff for every debuff you currently have.",
@@ -183,8 +183,8 @@
       "Skill Name": "Sundering",
       "Skill Position": "(10,9)",
       "Skill Position Exact": {
-        "x": 1212,
-        "y": 1070
+        "x": 1230,
+        "y": 1050
       },
       "Skill Level": 1,
       "Skill Description": "Crushing Blow deals 25% of its break damage to adjacent enemies.",
@@ -242,8 +242,8 @@
     "skills": [
       {
         "id": 10,
-        "x": 1092,
-        "y": 830,
+        "x": 1110,
+        "y": 810,
         "name": "Unkillable",
         "showActions": false,
         "showTooltip": false,
@@ -263,8 +263,8 @@
       },
       {
         "id": 11,
-        "x": 1212,
-        "y": 830,
+        "x": 1230,
+        "y": 810,
         "name": "Elemental Weakness",
         "showActions": false,
         "showTooltip": false,
@@ -284,8 +284,8 @@
       },
       {
         "id": 12,
-        "x": 972,
-        "y": 830,
+        "x": 990,
+        "y": 810,
         "name": "Tank and Spank",
         "showActions": false,
         "showTooltip": false,
@@ -305,8 +305,8 @@
       },
       {
         "id": 13,
-        "x": 1092,
-        "y": 950,
+        "x": 1110,
+        "y": 930,
         "name": "Shieldwall",
         "showActions": false,
         "showTooltip": false,
@@ -326,8 +326,8 @@
       },
       {
         "id": 15,
-        "x": 972,
-        "y": 1070,
+        "x": 990,
+        "y": 1050,
         "name": "Richocet ",
         "showActions": false,
         "showTooltip": false,
@@ -347,12 +347,12 @@
       },
       {
         "id": 16,
-        "x": 1092,
-        "y": 1070,
+        "x": 1110,
+        "y": 1050,
         "name": "Endurance",
         "showActions": false,
         "showTooltip": false,
-        "description": "Increase armor by 3% every turn you are not healed by an external source.",
+        "description": "Increase armor by 1% every turn you are not healed by an ally.",
         "maxPoints": 3,
         "currentPoints": 0,
         "requiredPoints": 0,
@@ -368,8 +368,8 @@
       },
       {
         "id": 17,
-        "x": 852,
-        "y": 950,
+        "x": 870,
+        "y": 930,
         "name": "Toughness",
         "showActions": false,
         "showTooltip": false,
@@ -389,8 +389,8 @@
       },
       {
         "id": 19,
-        "x": 1092,
-        "y": 1190,
+        "x": 1110,
+        "y": 1170,
         "name": "Hold the Line",
         "showActions": false,
         "showTooltip": false,
@@ -411,9 +411,9 @@
       {
         "id": 21,
         "name": "Tenacity",
-        "description": "Every time a debuff is prevented with \"Hardiness\", increase maximum hitpoints by 5 for the rest of the battle.",
-        "x": 972,
-        "y": 950,
+        "description": "Every time an attack is blocked due to Heavy Plate, increase maximum hitpoints by 5 for the rest of the battle.",
+        "x": 990,
+        "y": 930,
         "showActions": false,
         "showTooltip": false,
         "maxPoints": 1,
@@ -434,9 +434,9 @@
       {
         "id": 22,
         "name": "Rally ",
-        "description": "Every time a debuff is prevented with \"Hardiness\", increase healing received by the party by 15% for a turn.",
-        "x": 1212,
-        "y": 950,
+        "description": "Every time an attack is blocked due to Heavy Plate, increase healing received by the party by 15% for 2 turns.",
+        "x": 1230,
+        "y": 930,
         "showActions": false,
         "showTooltip": false,
         "maxPoints": 1,
@@ -456,8 +456,8 @@
       },
       {
         "id": 30,
-        "x": 1332,
-        "y": 950,
+        "x": 1350,
+        "y": 930,
         "name": "Iron Will",
         "showActions": false,
         "showTooltip": false,
@@ -477,8 +477,8 @@
       },
       {
         "id": 31,
-        "x": 1212,
-        "y": 1070,
+        "x": 1230,
+        "y": 1050,
         "name": "Sundering",
         "showActions": false,
         "showTooltip": false,
@@ -529,18 +529,18 @@
     "skillIdCounter": 32,
     "draggedSkill": null,
     "dragOffset": {
-      "x": -26.5,
-      "y": -24
+      "x": -18.5,
+      "y": -20
     },
     "draggedElement": {},
     "isDragging": false,
     "isLinking": false,
     "hoveredSkill": null,
     "defaultMaxPoints": 5,
-    "dragStartTime": 1784153762118,
+    "dragStartTime": 1784246536242,
     "dragStartPos": {
-      "x": 825.5,
-      "y": 926
+      "x": 1091.5,
+      "y": 1030
     },
     "dragThreshold": 5,
     "showOptions": false,
@@ -549,8 +549,8 @@
       "y": 437
     },
     "treePosition": {
-      "x": -18,
-      "y": 20
+      "x": 0,
+      "y": 0
     },
     "scale": 1,
     "minScale": 0.6,
@@ -572,7 +572,7 @@
     "currentClassDescription": null,
     "inputText": "",
     "isLoading": false,
-    "historyIndex": 49,
+    "historyIndex": 2,
     "maxHistorySize": 50,
     "showImageSelector": false,
     "selectedImage": null,
@@ -604,8 +604,8 @@
     "maxPoints": 20,
     "selectionBox": null,
     "initialClick": {
-      "x": 784.5,
-      "y": 899
+      "x": 1081.5,
+      "y": 1031
     },
     "showLoadModal": false,
     "initialPositions": null,

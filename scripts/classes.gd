@@ -42,31 +42,34 @@ static func class_icon(key: String, spec := "") -> Texture2D:
 	return crop
 
 
+# Class bases; the spec's Attack (spec_attack) replaces "attack" once
+# awakened. Hunters and Mages attack from range — their hits can't be
+# parried (parry is a melee answer).
 static func hero_config(key: String) -> Dictionary:
 	var soldier := "res://assets/sprites/soldier"
 	match key:
 		"hunter":
 			return {"unit_name": "Hunter", "is_hero": true, "sheet_dir": soldier,
-				"max_hp": 110, "armor": 0.12, "speed": 105.0, "stability": 100,
-				"constitution": 95,
+				"max_hp": 110, "attack": 100, "armor": 0.12, "speed": 105.0,
+				"stability": 100, "constitution": 95, "is_ranged": true,
 				"resource_name": "Focus", "resource": 100, "max_resource": 100,
 				"abilities": kit(key)}
 		"warrior":
 			return {"unit_name": "Warrior", "is_hero": true, "sheet_dir": soldier,
-				"max_hp": 154, "armor": 0.25, "speed": 95.0, "stability": 100,
-				"constitution": 110,
+				"max_hp": 154, "attack": 100, "armor": 0.25, "speed": 95.0,
+				"stability": 100, "constitution": 110,
 				"resource_name": "Rage", "resource": 0, "max_resource": 100,
 				"abilities": kit(key)}
 		"mage":
 			return {"unit_name": "Mage", "is_hero": true, "sheet_dir": soldier,
-				"max_hp": 99, "armor": 0.10, "speed": 110.0, "stability": 100,
-				"constitution": 85,
+				"max_hp": 99, "attack": 100, "armor": 0.10, "speed": 110.0,
+				"stability": 100, "constitution": 85, "is_ranged": true,
 				"resource_name": "Mana", "resource": 100, "max_resource": 100,
 				"abilities": kit(key)}
 		_:
 			return {"unit_name": "Cleric", "is_hero": true, "sheet_dir": soldier,
-				"max_hp": 121, "armor": 0.15, "speed": 85.0, "stability": 100,
-				"constitution": 100,
+				"max_hp": 121, "attack": 50, "armor": 0.15, "speed": 85.0,
+				"stability": 100, "constitution": 100,
 				"resource_name": "Mana", "resource": 100, "max_resource": 100,
 				"second_resource_name": "Faith", "second_resource": 0, "second_max": 100,
 				"abilities": kit(key)}
@@ -129,7 +132,8 @@ static func mage_kit() -> Array:
 
 static func cleric_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Smite", "dmg_type": "holy", "cost": 0, "damage": 22, "pressure": 16,
+		# damage 44 = 44% of the Cleric's 50 Attack -> the familiar 22.
+		Ability.make({"display_name": "Smite", "dmg_type": "holy", "cost": 0, "damage": 44, "pressure": 16,
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 8 HP",
 			"description": "Basic radiant strike. Builds Faith."}),
@@ -161,10 +165,35 @@ static func apply_kit_overrides(cfg: Dictionary, spec: String) -> void:
 #            Rush: starts strong, resources dwindle as it progresses.
 #            Nuker: banks resources for one devastating turn; exploits weakened foes.
 #            Pressure: steady damage, debuffs/DoTs, Break pressure.
+#            Bruiser: damage/tank hybrid, weakens enemies, moderate damage, debuffs.
 #   Support — Healer: restores HP/mana, can revive.
 #             Warder: damage mitigation and buffs.
 #   Tank — Tank: absorbs and redirects damage, buffs.
-#          Bruiser: damage/tank hybrid, weakens enemies, moderate damage, debuffs.
+const ARCHETYPE_ROLE := {
+	"Ramp": "Damage", "Rush": "Damage", "Nuker": "Damage", "Pressure": "Damage",
+	"Bruiser": "Damage", "Healer": "Support", "Warder": "Support", "Tank": "Tank",
+}
+
+# Base ATTACK by role. Ability damage is a PERCENT of the user's current
+# Attack; Attack (and max HP) scale +1% of base per completed combat node.
+const ROLE_ATTACK := {"Damage": 100, "Tank": 75, "Support": 50}
+
+
+# A spec's base Attack: explicit "attack" in SPEC_INFO wins (per-spec stat
+# blocks are coming class by class), else the archetype role's base.
+static func spec_attack(spec: String) -> int:
+	var info: Dictionary = SPEC_INFO[spec]
+	return int(info.get("attack",
+		ROLE_ATTACK[ARCHETYPE_ROLE[info["archetype"]]]))
+
+
+# A spec's innate resistances (fraction reduced per damage type, like armor
+# for that type). Specs override via "resists" in SPEC_INFO — being filled
+# in class by class; missing keys mean 0%.
+static func spec_resists(spec: String) -> Dictionary:
+	return SPEC_INFO[spec].get("resists", {})
+
+
 const ARCHETYPE_DESC := {
 	"Ramp": "Starts weak, snowballs as the battle progresses.",
 	"Rush": "Starts strong; resources dwindle as the fight drags on.",
@@ -261,17 +290,24 @@ static func spec_abilities(spec: String) -> Array:
 		"warden":
 			# VAULTED — Shieldwall v1 (party -25% damage, 2 turns) and
 			# Retaliation (counter stance): kept for future return.
+			# Damage %s are tuned against the Warden's 75 Attack (Tank role):
+			# Mocking 27% ≈ 20, Crushing 43% ≈ 32 — the pre-scaling numbers.
 			return [
-				Ability.make({"display_name": "Mocking Blow", "cost": 0, "damage": 20, "pressure": 15,
+				Ability.make({"display_name": "Mocking Blow", "cost": 0, "damage": 27, "pressure": 15,
 					"resource_gain": 10, "delay": 2.0, "anim": "attack01", "cooldown": 2,
 					"perfect_id": "", "perfect_text": "Taunts last 5 turns",
 					"description": "Strike and humiliate: the target AND\none other enemy must attack the Warrior\nfor 4 turns. Builds 10 Rage."}),
-				Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 32,
+				Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 43,
 					"pressure": 20, "delay": 3.0, "anim": "attack03", "resource_gain": 10,
 					"cooldown": 3,
 					"applies_status": {"id": "sunder", "turns": 3},
 					"perfect_id": "", "perfect_text": "+5 bonus BD",
 					"description": "Moderate damage. Sunders armor\n(-35%) for 3 turns. Builds 10 Rage."}),
+				Ability.make({"display_name": "War Stomp", "cost": 20, "damage": 15,
+					"pressure": 15, "delay": 3.0, "anim": "attack03", "cooldown": 4,
+					"random_hits": 3, "perfect_extra_hit": false,
+					"perfect_id": "", "perfect_text": "",
+					"description": "Slam the earth: 3 shockwaves rip\nrandom enemies for 15% Attack damage\nand 15 BD each. Allies regain 10%\nof their resource."}),
 			]
 		"swordmaster":
 			return [

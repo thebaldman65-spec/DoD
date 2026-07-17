@@ -83,18 +83,8 @@ func _draw_screen() -> void:
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(name_label)
-		# The class passive, right on the card.
-		var class_p: Dictionary = Classes.CLASS_PASSIVES[key]
-		var passive_label := Label.new()
-		passive_label.text = "%s — %s" % [class_p["name"], class_p["desc"].replace("\n", " ")]
-		passive_label.add_theme_font_size_override("font_size", 10)
-		passive_label.add_theme_color_override("font_color", Color(0.72, 0.66, 0.5))
-		passive_label.position = btn.position + Vector2(8, 226)
-		passive_label.size = Vector2(184, 56)
-		passive_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		passive_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		passive_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(passive_label)
+		# (Class passives show at the awakening screen and on the party
+		# sheet — the draft stays clean.)
 
 	# Relic assignment (up to 3 from the earned collection).
 	var relic_header := Label.new()
@@ -102,7 +92,7 @@ func _draw_screen() -> void:
 		if not Relics.unlocked.is_empty() else "RELICS - none earned yet (slay zone bosses)"
 	relic_header.add_theme_font_size_override("font_size", 16)
 	relic_header.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
-	relic_header.position = Vector2(0, 392)  # sits below the passive blurbs
+	relic_header.position = Vector2(0, 386)
 	relic_header.size = Vector2(1280, 22)
 	relic_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(relic_header)
