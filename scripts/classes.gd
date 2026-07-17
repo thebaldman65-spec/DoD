@@ -105,16 +105,17 @@ static func warrior_kit() -> Array:
 	]
 
 
+# VAULTED — Mana Shield (removed from ALL mage specs 07-16, kept for
+# future return): {"display_name": "Mana Shield", "cooldown": 3, "cost": 15,
+#   "special": "mana_shield", "delay": 2.0, "anim": "attack03",
+#   "perfect_text": "Initiative cost 1.5 instead of 2",
+#   "description": "50% of damage taken converts into Mana (3 turns)."}
 static func mage_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Magic Bolt", "dmg_type": "arcane", "cost": 0, "damage": 25, "pressure": 14,
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "mana", "perfect_text": "Restores 10 Mana",
 			"description": "Basic arcane projectile."}),
-		Ability.make({"display_name": "Mana Shield", "cooldown": 3, "cost": 15, "special": "mana_shield",
-			"delay": 2.0, "anim": "attack03",
-			"perfect_id": "", "perfect_text": "Initiative cost 1.5 instead of 2",
-			"description": "Weave a shield of raw mana: 50% of\ndamage the Mage takes converts into\nMana (3 turns)."}),
 	]
 
 
@@ -141,7 +142,7 @@ static func cleric_kit() -> Array:
 			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 			"perfect_id": "ward", "perfect_text": "Grants Ward (-50% Pressure taken, 2 turns)",
 			"description": "Restore HP to one ally. Builds Faith."}),
-		Ability.make({"display_name": "Resurrection", "cooldown": 7, "cost": 0, "faith_cost": 40,
+		Ability.make({"display_name": "Resurrection", "cooldown": 5, "cost": 0, "faith_cost": 40,
 			"special": "resurrection", "target": Ability.Target.ALLY,
 			"delay": 4.0, "anim": "attack03",
 			"perfect_id": "", "perfect_text": "",
@@ -149,8 +150,9 @@ static func cleric_kit() -> Array:
 	]
 
 
-# Spec kit corruption: the Occultist's Smite is warped into Shadowrend —
-# same numbers, shadow damage. Applied by battle spawn AND the party screen.
+# Spec kit corruption: the Occultist's Smite is warped into Shadowrend,
+# the Pyromancer's Magic Bolt burns as Fireball. Applied by battle spawn
+# AND the party screen.
 static func apply_kit_overrides(cfg: Dictionary, spec: String) -> void:
 	if spec == "occultist":
 		cfg["abilities"][0] = Ability.make({"display_name": "Shadowrend",
@@ -158,6 +160,13 @@ static func apply_kit_overrides(cfg: Dictionary, spec: String) -> void:
 			"delay": 2.0, "anim": "attack01",
 			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 8 HP",
 			"description": "Basic strike of gnawing shadow.\nBuilds Faith."})
+	elif spec == "pyromancer":
+		cfg["abilities"][0] = Ability.make({"display_name": "Fireball",
+			"dmg_type": "fire", "cost": 0, "damage": 20, "pressure": 15,
+			"delay": 2.0, "anim": "attack01",
+			"applies_status": {"id": "burn", "turns": 3},
+			"perfect_id": "", "perfect_text": "Deals 25% of Attack instead",
+			"description": "A crackling bolt of flame: applies\n3 turns of Burn (reapplying extends\nthe burn)."})
 
 
 # Archetype outline (design north star for every spec's kit):
@@ -237,8 +246,8 @@ const SPEC_INFO := {
 	"swordmaster": {"name": "Swordmaster", "constitution": 120, "archetype": "Bruiser", "passive": "seasoned",
 		"passive_desc": "Seasoned Fighter: +15% damage above half HP;\ntakes 15% less damage at or below half HP.",
 		"blurb": "Precision and technique — presses hard, then weathers the storm."},
-	"pyromancer": {"name": "Pyromancer", "constitution": 85, "archetype": "Nuker", "passive": "ignite",
-		"passive_desc": "Ignite: damaging spells have 50% chance to Burn (2 turns).",
+	"pyromancer": {"name": "Pyromancer", "constitution": 85, "archetype": "Nuker", "passive": "inferno",
+		"passive_desc": "Inferno Master: +5% damage for each burning enemy (up to +25%).",
 		"blurb": "Aggressive flame — burns that spread and stack."},
 	"cryomancer": {"name": "Cryomancer", "constitution": 85, "archetype": "Nuker", "passive": "chill",
 		"passive_desc": "Chill: damaging spells have 50% chance to apply Chilled (2 turns).",
@@ -330,19 +339,24 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Two broad cuts that leave the target\nDazed for 3 turns. Builds 10 Rage."}),
 			]
 		"pyromancer":
+			# Burn-centric kit (07-16 rework; the core Magic Bolt becomes
+			# Fireball via apply_kit_overrides). VAULTED — kept for future
+			# return: Pyroblast (45 Mana, 55%, 6.0, +50% vs Burning),
+			# Flame Surge (20 Mana, 15% AoE cone), Phoenix Rebirth
+			# (sacrifice 25% HP -> full Mana + Empower).
 			return [
-				Ability.make({"display_name": "Pyroblast", "cooldown": 4, "dmg_type": "fire", "cost": 45,
-					"damage": 55, "pressure": 20, "delay": 6.0, "anim": "attack03",
-					"perfect_id": "", "perfect_text": "Also sets the target Burning (3 turns)",
-					"description": "A slow, devastating comet of flame.\n+50% damage against Burning targets."}),
-				Ability.make({"display_name": "Flame Surge", "cooldown": 2, "dmg_type": "fire", "cost": 20, "damage": 15,
-					"pressure": 10, "delay": 3.0, "anim": "attack02", "aoe": true,
-					"perfect_id": "", "perfect_text": "+15 damage to enemies already Burning",
-					"description": "Cone of fire rakes ALL enemies."}),
-				Ability.make({"display_name": "Phoenix Rebirth", "cooldown": 5, "cost": 0, "special": "phoenix",
-					"delay": 3.0, "anim": "attack03",
-					"perfect_id": "", "perfect_text": "Only sacrifices 15% HP",
-					"description": "Sacrifice 25% of current HP: fully\nrestore Mana and gain Empower (3 turns)."}),
+				Ability.make({"display_name": "Detonation", "cooldown": 2, "dmg_type": "fire", "cost": 20,
+					"damage": 15, "pressure": 20, "delay": 3.0, "anim": "attack02",
+					"perfect_id": "", "perfect_text": "Also applies 1 turn of Burn",
+					"description": "Ignite the wounds: consumes the target's\nBurn, adding its remaining damage\n(tick × turns left) to this hit."}),
+				Ability.make({"display_name": "Wildfire", "cooldown": 3, "dmg_type": "fire", "cost": 20,
+					"damage": 20, "pressure": 10, "delay": 2.0, "anim": "attack02",
+					"perfect_id": "", "perfect_text": "",
+					"description": "Flames leap the gap: spreads the target's\nBurn to Adjacent enemies at half its\nduration (corpses block the spread)."}),
+				Ability.make({"display_name": "Flamewave", "cooldown": 2, "dmg_type": "fire", "cost": 25,
+					"damage": 15, "pressure": 5, "delay": 3.0, "anim": "attack03", "aoe": true,
+					"perfect_id": "", "perfect_text": "+3 turns instead",
+					"description": "A rolling wall of fire rakes ALL\nenemies; those already Burning burn\n2 turns longer."}),
 			]
 		"cryomancer":
 			return [
@@ -366,7 +380,8 @@ static func spec_abilities(spec: String) -> Array:
 					"pressure": 15, "delay": 3.5, "anim": "attack02", "recoil_base": 0.15,
 					"perfect_id": "", "perfect_text": "+5 bonus BD",
 					"description": "Channel raw Resonance into a blast:\n+7.5% DAMAGE per Resonance stack.\nRecoil: the Mage takes 15% of the\ndamage dealt."}),
-				Ability.make({"display_name": "Death Ray", "cooldown": 7, "dmg_type": "arcane", "cost": 0, "damage": 150,
+				# No cooldown — the 5-stack Resonance build-up IS the gate.
+				Ability.make({"display_name": "Death Ray", "dmg_type": "arcane", "cost": 0, "damage": 150,
 					"pressure": 100, "delay": 8.0, "anim": "attack03",
 					"perfect_id": "mana15", "perfect_text": "Restores 15 Mana",
 					"description": "The stored storm, released: requires\n5 Arcane Resonance and CONSUMES all of\nit. Fixed 150 damage payoff."}),
@@ -488,6 +503,6 @@ static func spec_abilities(spec: String) -> Array:
 const CLASS_BLURBS := {
 	"hunter": "Ranged damage. Focus builds with every shot, spent on\nprecision payoffs and primal magic.",
 	"warrior": "Flexible frontliner. Rage builds through attack and pain.",
-	"mage": "Glass cannon. Mana Shield turns pain into fuel; the Arcanist\npath stacks Arcane Resonance for devastating payoffs.",
+	"mage": "Glass cannon. Fire that spreads, frost that controls, and\nraw Resonance banked for devastating payoffs.",
 	"cleric": "Divine vessel. Faith builds with every act, awaiting Miracles.",
 }

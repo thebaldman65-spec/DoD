@@ -145,14 +145,16 @@ Plating blocks specifically.</li>
 <li><b>Armor Penetration (keyword):</b> every % of armor penetration negates a % of the
 target's armor (Piercing Arrow 50%, Singularity 30%, the Berserker's Crushing Blows talent).
 It is NOT shown on the character screen.</li>
-<li><b>Adjacent (keyword):</b> the enemies directly next to a target in formation order —
-the nearest LIVING enemy on each side of it (corpses don't shield their fellows, and
-Adjacent never includes the target itself). Splash effects that say "Adjacent" (the
-Warden's Sundering talent) hit at most those two enemies.</li>
+<li><b>Adjacent (keyword):</b> the enemies DIRECTLY next to a target in formation order,
+one on each side (never the target itself). <b>A dead neighbor NEGATES the adjacent bonus
+on that side</b> — the effect does not jump past a corpse to the next living enemy. Splash
+effects that say "Adjacent" (the Warden's Sundering, the Pyromancer's Wildfire) hit at most
+those two enemies.</li>
 <li><b>Cooldown (keyword, "cd"):</b> the number of the user's turns before the same ability
 can be used again — "6cd" means unusable for 6 turns after use. <b>Every cooldown in the
 game was reduced by 1 turn (07-16)</b>: basics 0, light hits 1–2, heavies/AoE 2–5, Miracles
-4–7, Death Ray/Resurrection 7. The remaining cooldown shows on the
+4–7, Resurrection 5; Death Ray has NO cooldown at all — its 5-stack Resonance build-up
+is the gate. The remaining cooldown shows on the
 ability button ("CD n") and in its tooltip. <b>Enemies do not use cooldowns at all
 (07-16)</b> — their kits are gated by resources and AI conditions instead.</li>
 <li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
@@ -165,7 +167,7 @@ only on the Mage's own casts — parry counters do not grant stacks.</li>
 Blood Frenzy up to +40% as HP falls; Seasoned Fighter +15% above half HP; relic bonuses
 (global +10% dragonbone; fire/holy +20% emberheart); Powershot +2% per 1% of the target's
 EMPTY Break bar; Overpower +0.5 per point of target Break; Frost Bolt 50% chance ×2 vs
-unchilled; Arcane Cannon +7.5%/Resonance stack; Pyroblast +25% vs Burning.</li>
+unchilled; Arcane Cannon +7.5%/Resonance stack; Fireball perfects at 25% of Attack.</li>
 <li><b>Target modifiers:</b> Shieldwall −50%; Exposed +15%; Seasoned Fighter −15% at or
 below half HP; Mage Resonance +10% damage
 <i>taken</i> per stack (the glass-cannon risk).</li>
@@ -201,8 +203,9 @@ After the lost turn, the Break meter resets to 0. Ward halves incoming BD; Devot
 20% max HP</b> and the meter resets. <b>Bleedout damage ignores armor</b> entirely.</li>
 <li><b>Burn:</b> 6% of the applier's Attack (snapshotted when it lands; ≈6 at 100 Atk) at
 the start of the afflicted unit's turn; ticks can crit using the caster's snapshotted crit
-chance. <b>Every reapplication of Burn extends its duration by 3 turns</b> (the timer
-stacks, announced with a "Burn +3 turns" float).</li>
+chance. <b>Reapplication extends duration</b> — every fresh Burn ADDS its applied turns
+to the running timer (a 3-turn Fireball on a burning target = +3 turns, announced with a
+"Burn +N turns" float).</li>
 <li><b>Poison:</b> 3% of the applier's Attack per stack (snapshotted; ≈3 at 100 Atk) at the
 start of the afflicted unit's turn.
 <b>Poison counts as nature damage</b> — nature resists reduce the tick (and nature
@@ -217,7 +220,7 @@ Roots of Wrath (3 turns), and the Survivalist's Trapper passive (5 turns).</li>
 <tr><td>Chilled</td><td>−25% speed (Cryomancer-only frost).</td></tr>
 <tr><td>Slowed</td><td>−25% speed (generic; e.g. Shrapnel Charge).</td></tr>
 <tr><td>Burn</td><td>6% of the applier's Attack at the start of each turn
-(snapshotted). Every REAPPLICATION extends the burn by +3 turns.</td></tr>
+(snapshotted). Reapplication extends duration — new turns ADD to the timer.</td></tr>
 <tr><td>Poison</td><td>3 nature damage per stack each turn (nature resists apply); stacks
 additively, new stacks refresh the timer. Never ticks on the turn it lands.</td></tr>
 <tr><td>Bleed</td><td>Buildup meter; bleeds out for 20% max HP at 100 (ignores
@@ -330,8 +333,7 @@ Warrior (weighted into their random target picks).</li>
 <li><b>Rage (Warrior):</b> starts at 0. +5 at the start of each of his turns; +10 whenever he
 is hit; every attack builds Rage (Strike 20, all spec/talent attacks 10); Perfect Strike +10.
 Eidolon Mirror relic: start battles at 25.</li>
-<li><b>Mana (Mage/Cleric):</b> +12 at the start of their turns; potions/Rally restore more.
-Mage Phoenix Rebirth trades HP for a full refill.</li>
+<li><b>Mana (Mage/Cleric):</b> +12 at the start of their turns; potions/Rally restore more.</li>
 <li><b>Focus (Hunter):</b> +15 at the start of their turns; Perfect basic +10.</li>
 <li><b>Faith (Cleric secondary):</b> +10 per action taken; spent on MIRACLE abilities (no
 Mana cost).</li>
@@ -344,9 +346,10 @@ Stacks persist until Death Ray consumes them.</li>
 <ul>
 <li><b>Warrior:</b> Strike — 23 dmg / 18 BD / delay 2.0, builds 20 Rage
 (Perfect: +10 Rage).</li>
-<li><b>Mage:</b> Magic Bolt — 25 arcane / 14 BD / 2.0 (Perfect: +10 Mana); Mana Shield —
-15 Mana, 2.0, for 3 turns 50% of damage the Mage takes converts into Mana (Perfect: casts at
-1.5 int). (Arcane Surge and Reality Fracture are vaulted — removed but kept for later.)</li>
+<li><b>Mage:</b> Magic Bolt — 25% Atk arcane / 14 BD / 2.0 (Perfect: +10 Mana); the
+Pyromancer's Magic Bolt is reforged into <b>Fireball</b> (see §6.2). (Mana Shield was
+REMOVED from all mage specs 07-16; it, Arcane Surge, and Reality Fracture are vaulted —
+kept for later.)</li>
 <li><b>Cleric:</b> Smite — 22 holy / 16 BD / 2.0 (Perfect: self-heal 8; the Occultist's
 Smite is corrupted into <b>Shadowrend</b> — same numbers, shadow damage); Mend Wounds —
 25 Mana, heal 45, 3.0 (Perfect: Ward 2 turns); <b>Resurrection</b> — MIRACLE, 40 Faith,
@@ -424,12 +427,18 @@ crit).</li>
 </ul>
 <h3>6.2 Mage</h3>
 <ul>
-<li><b>Pyromancer (Nuker)</b> — Passive <i>Ignite</i>: damaging spells 50% chance to Burn
-(2 turns).<br>
-Pyroblast — 45 Mana, 55 fire / 20 BD / 6.0, +25% vs Burning (Perfect: also Burns 3 turns).<br>
-Flame Surge — 20 Mana, 15 fire to ALL / 10 BD / 3.0, no Burn (Perfect: +15 damage to enemies already Burning).<br>
-Phoenix Rebirth — free, 3.0, sacrifice 25% current HP for full Mana + Empower 3 turns
-(Perfect: only 15% HP).</li>
+<li><b>Pyromancer (Nuker, reworked 07-16)</b> — Passive <i>Inferno Master</i>: +5% damage
+for each burning enemy, up to +25% (the spec chip shows the live bonus). Its core Magic
+Bolt is reforged into <b>Fireball</b> — free, 20% Atk fire / 15 BD / 2.0, no cd, applies
+3 turns of Burn (Perfect: hits at 25% of Attack).<br>
+Detonation — 20 Mana, 15% Atk fire / 20 BD / 3.0, 2cd; CONSUMES the target's Burn, adding
+its remaining damage (tick × turns left) to the hit before mitigation (Perfect: also
+applies 1 turn of Burn).<br>
+Wildfire — 20 Mana, 20% Atk fire / 10 BD / 2.0, 3cd; spreads the target's Burn to Adjacent
+enemies at HALF its remaining duration (rounded up; corpses block the spread).<br>
+Flamewave — 25 Mana, 15% Atk fire to ALL / 5 BD / 3.0, 2cd; enemies already Burning burn
+2 turns longer (Perfect: 3 turns).<br>
+VAULTED 07-16 (kept for later): Pyroblast, Flame Surge, Phoenix Rebirth.</li>
 <li><b>Cryomancer (Nuker)</b> — Passive <i>Chill</i>: damaging spells 50% chance to apply
 Chilled (2 turns) — the Cryomancer-only frost slow; generic sources apply Slowed instead.<br>
 Frost Bolt — 25 Mana, 25 frost / 20 BD / 3.0, 50% chance to deal DOUBLE damage against
@@ -440,7 +449,8 @@ Blizzard — 30 Mana, 15 frost to ALL / 12 BD / 4.0 + Chilled 2 turns (Perfect: 
 BD).</li>
 <li><b>Arcanist (Ramp)</b> — Passive <i>Arcane Resonance</i> (the stack mechanic itself; see
 §5.1). The Echo passive is vaulted for future return.<br>
-Death Ray — free, 8.0 int; castable ONLY at 5 Resonance stacks. A fixed 150 arcane / 100 BD
+Death Ray — free, 8.0 int, NO cooldown (the Resonance build-up is the gate); castable ONLY
+at 5 Resonance stacks. A fixed 150% Atk arcane / 100 BD
 payoff (the stacks ARE the damage — the per-stack damage bonus does not double-dip), then
 every stack is consumed (Perfect: restores 15 Mana).<br>
 Arcane Cannon — 30 Mana, 30 arcane / 15 BD / 3.5, +7.5% DAMAGE per Resonance stack; recoil is

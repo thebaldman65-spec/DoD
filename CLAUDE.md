@@ -72,8 +72,24 @@ COOLDOWNS AT ALL (kits carry none; AI gates by resources/conditions; the
 attack, keep it that way or _enemy_turn's pick_random crashes on empty).
 Orc Shaman = support: Healing Wave (25% max HP, lowest sub-40% ally,
 tank/support enemy_role first) + Chain Lightning; Lightning Bolt VAULTED.
-Burn REAPPLICATION extends duration +3 turns (unit.add_status). Log
-itemizes mitigation: "(nature resist -8) (armor -12) (WEAK! +9)".
+Burn REAPPLICATION extends duration by the APPLIED turns (unit.add_status
+burn branch). ADJACENT IS STRICT (07-16): dead neighbor = no bonus on
+that side, never jumps past corpses (_adjacent_enemies). Log itemizes
+mitigation: "(nature resist -8) (armor -12) (WEAK! +9)".
+PYROMANCER REWORK (07-16): passive "inferno" = Inferno Master (+5% dmg
+per burning enemy, cap 25%; live spec chip via _update_talent_chips; the
+old "ignite" on-hit passive is GONE). Core Magic Bolt → Fireball via
+apply_kit_overrides (free, 20% Atk fire, 15BD, burn 3t; perfect = flat
+25% Atk in _resolve). Kit: Detonation (consumes target burn pre-mitigation
+for tick×turns bonus, perfect re-burns 1t), Wildfire (spreads target burn
+to Adjacent at half duration rounded up — captured PRE-hit so kills still
+spread), Flamewave (aoe; burning targets +2t, perfect +3t via
+update_status). VAULTED: Pyroblast, Flame Surge, Phoenix Rebirth, and
+Mana Shield from ALL mage specs (mage core = Magic Bolt only; specials
+"phoenix"/"mana_shield" machinery kept for the vault). Death Ray: NO
+cooldown (5-stack Resonance gate only). Resurrection 5cd. Autoplay mage
+policy = burn loop (Flamewave ≥2 burning / Detonation ≥3 turns / Wildfire
+/ Death Ray / Barrage / Frost Bolt / basic).
 ATTACK & SCALING (07-16): every unit has an Attack stat; ability `damage`
 is a PERCENT of the user's current Attack. Role bases: Damage 100 / Tank 75
 / Support 50 (Classes.spec_attack; Bruiser = Damage role; per-spec stat

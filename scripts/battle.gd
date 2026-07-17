@@ -20,7 +20,7 @@ const ABILITY_KEY_NAMES := ["Q", "W", "E", "R", "A", "S", "D", "F"]
 const STATUS_INFO := {
 	"slow": ["Slowed", "Sl", Color(0.55, 0.65, 0.9), "-25% speed; turns arrive later."],
 	"chilled": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "-25% speed; turns arrive later.\nThe Cryomancer's signature frost."],
-	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Takes 6 damage at the start of each turn."],
+	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Burning: takes damage at the start of each\nturn (6% of the applier's Attack).\nReapplying Burn extends the duration."],
 	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Bleed builds with wounding attacks;\nat 100 the target bleeds out for 20% max HP.\nBleed damage ignores armor."],
 	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-35% armor."],
 	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4), "Takes 50% less Pressure."],
@@ -1043,6 +1043,17 @@ func _update_talent_chips() -> void:
 		h.update_status("crushing_blows", "+%d%%" % pen,
 			"Crushing Blows: +3%% armor penetration per\nrank for every 20 bloodloss on the enemy\nteam. Currently +%d%% (%d total bloodloss)." % [
 				pen, party_bleed])
+	# Inferno Master: the Pyromancer's passive chip tracks burning enemies.
+	var burning := 0
+	for foe in enemies:
+		if not foe.dead and foe.has_status("burn"):
+			burning += 1
+	for h in heroes:
+		if h.dead or h.passive_id != "inferno":
+			continue
+		var inf_pct: int = mini(burning, 5) * 5
+		h.update_status("spec_passive", "+%d%%" % inf_pct,
+			"Inferno Master: +5%% damage for each burning\nenemy (up to +25%%).\nCurrently +%d%% (%d burning)." % [inf_pct, burning])
 
 
 func _player_turn(u: BattleUnit) -> void:
@@ -1182,13 +1193,21 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				return [overpower, target_foe]
 			return [u.abilities[0], target_foe]          # Strike
 		"mage":
-			var mshield := _find_ability(u, "Mana Shield")
-			if mshield != null and u.resource >= mshield.cost and u.ability_ready(mshield) \
-					and not u.has_status("mana_shield") and u.resource < 40:
-				return [mshield, u]
-			var flame := _find_ability(u, "Flame Surge")
-			if flame != null and u.resource >= flame.cost and u.ability_ready(flame) and foes.size() >= 2:
-				return [flame, target_foe]
+			# Pyromancer: keep fires lit, detonate ripe burns, wave wide.
+			var burning_foes := foes.filter(func(e): return e.has_status("burn"))
+			var fwave := _find_ability(u, "Flamewave")
+			if fwave != null and u.resource >= fwave.cost and u.ability_ready(fwave) \
+					and burning_foes.size() >= 2:
+				return [fwave, target_foe]
+			var det := _find_ability(u, "Detonation")
+			if det != null and u.resource >= det.cost and u.ability_ready(det) \
+					and target_foe.has_status("burn") \
+					and int(target_foe.get_status("burn").get("turns", 0)) >= 3:
+				return [det, target_foe]
+			var wfire := _find_ability(u, "Wildfire")
+			if wfire != null and u.resource >= wfire.cost and u.ability_ready(wfire) \
+					and foes.size() >= 2 and target_foe.has_status("burn"):
+				return [wfire, target_foe]
 			var dray := _find_ability(u, "Death Ray")
 			if dray != null and u.second_resource >= 5 and u.ability_ready(dray):
 				return [dray, target_foe]
@@ -1198,7 +1217,7 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			var fbolt := _find_ability(u, "Frost Bolt")
 			if fbolt != null and u.resource >= fbolt.cost and u.ability_ready(fbolt):
 				return [fbolt, target_foe]
-			return [u.abilities[0], target_foe]          # Magic Bolt
+			return [u.abilities[0], target_foe]          # Magic Bolt / Fireball
 		"hunter":
 			var summon := _find_ability(u, "Summon Canis")
 			if summon != null and u.resource >= summon.cost and u.ability_ready(summon) \
@@ -1849,22 +1868,19 @@ func _lowest_hp(pool: Array) -> BattleUnit:
 	return best
 
 
-# ADJACENT (keyword): the enemies directly beside the target in formation
-# order — the nearest LIVING neighbor on each side (corpses don't shield
-# their fellows). Used by splash effects like the Sundering talent.
+# ADJACENT (keyword): the enemies DIRECTLY beside the target in formation
+# order. A dead neighbor NEGATES the adjacent bonus on that side — the
+# effect never jumps past a corpse to the next living enemy. Used by
+# splash effects (Sundering, Wildfire).
 func _adjacent_enemies(target: BattleUnit) -> Array:
 	var idx := enemies.find(target)
 	if idx < 0:
 		return []
 	var adjacent: Array = []
-	for j in range(idx - 1, -1, -1):
-		if not enemies[j].dead:
-			adjacent.append(enemies[j])
-			break
-	for j in range(idx + 1, enemies.size()):
-		if not enemies[j].dead:
-			adjacent.append(enemies[j])
-			break
+	if idx > 0 and not enemies[idx - 1].dead:
+		adjacent.append(enemies[idx - 1])
+	if idx + 1 < enemies.size() and not enemies[idx + 1].dead:
+		adjacent.append(enemies[idx + 1])
 	return adjacent
 
 
@@ -2175,10 +2191,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Arcane Cannon: the damage (not the recoil) grows with Resonance.
 			if ab.display_name == "Arcane Cannon":
 				raw *= 1.0 + 0.075 * attacker.second_resource
-			# Flame Surge perfect: burns feed the fire (+15% Attack).
-			if is_perfect and ab.display_name == "Flame Surge" \
-					and strike_target.has_status("burn"):
-				raw += 0.15 * attacker.attack
 			# Frost Bolt: 50% chance to deal DOUBLE damage to unchilled targets.
 			if ab.display_name == "Frost Bolt" and not strike_target.has_status("chilled") \
 					and randf() < 0.5:
@@ -2186,6 +2198,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				strike_target.float_text("SHATTER x2", Color(0.5, 0.85, 1.0))
 			if is_perfect and ab.display_name == "Explosive Shot":
 				raw = 0.12 * attacker.attack * randf_range(0.9, 1.1)
+			# Fireball perfect: the bolt hits at 25% of Attack instead of 20%.
+			if is_perfect and ab.display_name == "Fireball":
+				raw = 0.25 * attacker.attack * randf_range(0.9, 1.1)
+			# Detonation: consumes the target's Burn — its remaining damage
+			# (tick × turns left) joins this hit before mitigation.
+			var detonated := 0
+			if ab.display_name == "Detonation":
+				var det := strike_target.get_status("burn")
+				if not det.is_empty():
+					detonated = int(det.get("tick", 6)) * maxi(int(det.turns), 0)
+					raw += detonated
+					strike_target.remove_status("burn")
+			# Wildfire: remember the target's Burn before the hit — the
+			# spread happens even if the blast finishes them.
+			var wildfire_burn := {}
+			if ab.display_name == "Wildfire":
+				wildfire_burn = strike_target.get_status("burn").duplicate()
 			# Powershot: +2% damage per 1% of the target's Break bar still EMPTY —
 			# the Rush opener, strongest against untouched foes.
 			if ab.display_name == "Powershot":
@@ -2194,10 +2223,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Overpower: exploits instability — +0.5 damage per point of Break.
 			if ab.display_name == "Overpower":
 				raw += 0.5 * strike_target.pressure
-			if ab.display_name == "Pyroblast" and strike_target.has_status("burn"):
-				raw *= 1.25
 			if attacker.has_status("empower"):
 				raw *= 1.25
+			# Inferno Master: the Pyromancer feeds on every fire still burning.
+			if attacker.passive_id == "inferno":
+				var burning := 0
+				for foe in enemies:
+					if not foe.dead and foe.has_status("burn"):
+						burning += 1
+				raw *= 1.0 + 0.05 * mini(burning, 5)
 			if attacker.has_status("cripple"):
 				raw *= 0.75
 			# Blood Frenzy: +2% damage (plus Unstoppable) per 5% of HP missing.
@@ -2441,11 +2475,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_dot_tick("poison", attacker))
 			# Specialization on-hit passives.
 			if not strike_target.dead:
-				if attacker.passive_id == "ignite" and randf() < 0.5:
-					_apply_status(strike_target, "burn", 3,
-						int(round((CRIT_CHANCE + attacker.crit_bonus) * 100)),
-						_dot_tick("burn", attacker))
-				elif attacker.passive_id == "chill" and randf() < 0.5:
+				if attacker.passive_id == "chill" and randf() < 0.5:
 					_apply_status(strike_target, "chilled", 3)
 				# Pack Bond (Canis): the wolf worries every wound open.
 				if attacker.passive_id == "pack" and attacker.companion != null \
@@ -2457,10 +2487,36 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and not attacker.dead and randf() < 0.25:
 				_apply_status(attacker, "poison", 5, 0,
 					_dot_tick("poison", strike_target))
-			if is_perfect and ab.display_name == "Pyroblast" and not strike_target.dead:
-				_apply_status(strike_target, "burn", 3,
+			# Pyromancer fire package (07-16 kit).
+			if detonated > 0:
+				_log("   → Detonation consumes the Burn (+%d bonus damage)" % detonated,
+					"#e08850")
+			if is_perfect and ab.display_name == "Detonation" and not strike_target.dead:
+				_apply_status(strike_target, "burn", 1,
 					int(round((CRIT_CHANCE + attacker.crit_bonus) * 100)),
 					_dot_tick("burn", attacker))
+			if ab.display_name == "Wildfire" and not wildfire_burn.is_empty():
+				var spread_turns := maxi(int(ceil(int(wildfire_burn.turns) / 2.0)), 1)
+				var neighbors := _adjacent_enemies(strike_target)
+				for foe in neighbors:
+					_apply_status(foe, "burn", spread_turns,
+						int(wildfire_burn.get("power", 0)),
+						int(wildfire_burn.get("tick", 0)))
+				if not neighbors.is_empty():
+					_log("   → Wildfire spreads the Burn to %d Adjacent %s (%d turns)" % [
+						neighbors.size(),
+						"enemy" if neighbors.size() == 1 else "enemies",
+						spread_turns], "#e08850")
+			if ab.display_name == "Flamewave" and not strike_target.dead \
+					and strike_target.has_status("burn"):
+				var fw := strike_target.get_status("burn")
+				var fw_ext := 3 if is_perfect else 2
+				var binfo: Array = STATUS_INFO["burn"]
+				strike_target.update_status("burn", binfo[1], binfo[3], -1,
+					int(fw.turns) + fw_ext)
+				strike_target.float_text("Burn +%d turns" % fw_ext, binfo[2])
+				_log("   → Flamewave stokes %s's Burn (+%d turns)" % [
+					strike_target.unit_name, fw_ext], "#e08850")
 			if is_perfect:
 				_apply_perfect_bonus(attacker, strike_target, ab, result.died)
 			# Retaliation stance: the victim counters with their basic attack.
@@ -2632,6 +2688,12 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		return
 	var info: Array = STATUS_INFO[id]
 	target.add_status(id, info[0], info[1], info[2], turns, info[3], power, tick)
+	if id == "burn":
+		# Reapplication extends duration — log the running total.
+		var bstat := target.get_status("burn")
+		_log("   → Burn on %s (%d turns total)" % [target.unit_name,
+			int(bstat.get("turns", turns))], "#e08850")
+		return
 	if id == "poison":
 		var pstat := target.get_status("poison")
 		var stacks := int(pstat.get("stacks", 1))

@@ -211,7 +211,7 @@ const FIXED_TREES := {
 			"payload": {"stat": {"endurance_ranks": 1}}},
 		{"id": "wd_sundering", "name": "Sundering", "ranks": 3, "row": 2, "col": 3,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Crushing Blow deals {v}% of its Break damage to enemies Adjacent to the target (the living enemy on each side of it).",
+			"desc": "Crushing Blow deals {v}% of its Break damage to enemies Adjacent to the target (dead neighbors block the splash on their side).",
 			"scale": {"step": 25},
 			"payload": {"stat": {"sundering_ranks": 1}}},
 		# --- row 3 (capstone) ---
