@@ -56,13 +56,27 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+ENCOUNTERS = POWER BUDGET (07-16): enemy power {raider/archer 1, sm/shaman
+2, chief 4, boss 7}; every battle rolls budget 8-12 and SPENDS IT EXACTLY
+via themed warbands (Run.THEMES two-step: theme → fill roles; combos
+enumerated in run_state._theme_combos; theme in encounter["theme"], logged
+at battle start; field caps at 6 — ENEMY_LAYOUTS has a 6-slot layout).
+Chiefs off regular fights until global tier 3 (CHIEF_TIER); elite nodes
+roll chief themes, boss nodes Boss Escort. Swarm/Poison Volley only fit
+low budgets (by math). ALL ABILITY COOLDOWNS -1 (07-16). Orc Shaman =
+support: Healing Wave (25% max HP, lowest sub-40% ally, tank/support
+enemy_role first, 2cd) + Chain Lightning; Lightning Bolt VAULTED; enemies
+with no usable attack "bide their time" (guarded — never pick_random on
+empty). Log itemizes mitigation: "(nature resist -8) (armor -12)
+(WEAK! +9)".
 ATTACK & SCALING (07-16): every unit has an Attack stat; ability `damage`
 is a PERCENT of the user's current Attack. Role bases: Damage 100 / Tank 75
 / Support 50 (Classes.spec_attack; Bruiser = Damage role; per-spec stat
 blocks + "resists" dicts land class by class — spec_resists, 0% now, shown
-via stat-page "Resistances" hover). Heroes: +1% of base Atk/HP per combat
-win (Run.combat_wins, saved); enemies: +2% of base per global node tier
-(zone_idx*FLOORS+floor_idx, replaces zone mult), HP rounded UP to 10s.
+via stat-page "Resistances" hover). Heroes: +2% of base Atk/HP per combat
+win (Run.combat_wins, saved); enemies: +4% Atk / +5% HP of base per global
+node tier (zone_idx*FLOORS+floor_idx, replaces zone mult), HP rounded UP
+to 10s.
 Armor/resists/speed/con/crit/block/parry NEVER scale. DoTs (burn 6%,
 poison 3%/stack) snapshot the applier's Attack ("tick" on the status);
 companions hit for % of the hunter's Attack. Cleric core Smite = 44% (of

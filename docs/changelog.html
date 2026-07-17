@@ -5,6 +5,30 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-16 — Batch 13: power-budget warbands, scaling retune, mitigation log, Shaman rework</h2>
+<ul>
+<li><b>Themed encounter generator:</b> every enemy has a power value (Raider 1, Archer 1,
+Shieldmaster 2, Shaman 2, Chief 4, Boss 7); every battle rolls a budget of 8–12 and spends
+it EXACTLY. Two-step generation: pick a theme, then fill its roles — 10 themes (Warband,
+Swarm, Honor Guard, Ritual, Poison Volley, Lightning Storm, Rage Company, Guardian Circle,
+Elite Patrol, Boss Escort). The field now holds up to 6 enemies; the theme is announced in
+the combat log. Chiefs stay out of regular fights until global tier 3; elite nodes always
+roll Chief-led themes, boss nodes always Boss Escort. Verified over 900 generated
+warbands: every one spends its budget exactly.</li>
+<li><b>Scaling retune (linear):</b> heroes +2% of base Attack and +2% of base HP per
+combat win (was 1/1); enemies +4% of base Attack and +5% of base HP per node tier (was
+2/2).</li>
+<li><b>Mitigation amounts in the log:</b> hits now report "(nature resist -8)",
+"(armor -12)", or "(WEAK! +9)" so you can see exactly what defenses ate.</li>
+<li><b>All ability cooldowns reduced by 1 turn</b>, game-wide (heroes, talents, enemies) —
+basics stay 0; Death Ray/Resurrection now 7.</li>
+<li><b>Orc Shaman reworked into a true support:</b> new <b>Healing Wave</b> (heals the most
+wounded ally under 40% HP for 25% of its max HP; friendly tanks and healers first, 2cd);
+<b>Lightning Bolt VAULTED</b> (removed, kept for future return). Enemies with nothing
+usable now "bide their time" instead of erroring; enemy configs carry role tags
+(tank/support/damage) for heal priorities.</li>
+</ul>
+
 <h2>2026-07-16 — Batch 12: Attack stat &amp; node scaling, Resistances, Warden tree v2, melee-only parry</h2>
 <ul>
 <li><b>Attack stat + % scaling:</b> every unit has an Attack stat; every ability's damage

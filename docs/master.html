@@ -47,9 +47,9 @@ node per tier, so <b>10 nodes are interacted with before the boss</b>. Node comp
 fixed deck per zone:</p>
 <table border="1" cellpadding="4">
 <tr><th>Type</th><th>Count</th><th>Share</th><th>Effect</th></tr>
-<tr><td>Fight</td><td>18</td><td>60%</td><td>Battle vs. 3–5 randomly-typed foes (see §9).
-Fights on tiers 6+ have a 25% chance to spawn as an ELITE (tougher composition, double talent
-points, more gold).</td></tr>
+<tr><td>Fight</td><td>18</td><td>60%</td><td>Battle vs. a themed warband bought from a
+power budget (see §9). Fights on tiers 6+ have a 25% chance to spawn as an ELITE (tougher
+themes, double talent points, more gold).</td></tr>
 <tr><td>Rest</td><td>6</td><td>20%</td><td>Party heals 30% max HP and Mage/Cleric recover 30%
 Mana at the waystone.</td></tr>
 <tr><td>Shop</td><td>6</td><td>20%</td><td>The Wandering Peddler: consumables + one rune offer
@@ -106,13 +106,17 @@ target modifiers × (1 − resist) × (1 − effective armor), minimum 1.</p>
 <li><b>Attack (stat) &amp; node scaling:</b> every unit has an Attack stat, and every
 ability's damage is a PERCENT of the user's current Attack (a "45%" ability at 100 Attack
 hits for ~45). Base Attack comes from the spec's role — <b>Damage 100, Tank 75,
-Support 50</b> (per-spec stat blocks are being filled in class by class). <b>Heroes gain +1%
-of base Attack and max HP per combat node won</b> (fight/elite/boss); enemies gain <b>+2% of
-base Attack and HP per node tier</b>, counted across the whole game. Armor, Resistances,
-Speed, Constitution, Crit, Block, and Parry never scale. Damage-over-time effects (Burn 6%,
+Support 50</b> (per-spec stat blocks are being filled in class by class). All scaling is
+LINEAR on the base value: <b>heroes gain +2% of base Attack and +2% of base max HP per
+combat node won</b> (fight/elite/boss); <b>enemies gain +4% of base Attack and +5% of base
+HP per node tier</b>, counted across the whole game. Armor, Resistances, Speed,
+Constitution, Crit, Block, and Parry never scale. Damage-over-time effects (Burn 6%,
 Poison 3% per stack) snapshot the applier's Attack when they land. Battle tooltips show the
 computed damage numbers; the hero stat page shows the numbers AND the % scaling behind
 them.</li>
+<li><b>Mitigation is itemized in the log:</b> every landed hit reports what the defenses
+ate — "(nature resist -8)" for resistances, "(armor -12)" for armor, and "(WEAK! +9)" when
+a Weakness ADDED damage — alongside the parry/block source tags.</li>
 <li><b>Resistances (stat):</b> heroes now carry a resistance per element — Fire, Frost,
 Nature, Holy, Shadow, Arcane — working exactly like armor but against that damage type
 (negative = weakness). Hover "Resistances" on the stat page to read them; per-spec values
@@ -146,9 +150,9 @@ the nearest LIVING enemy on each side of it (corpses don't shield their fellows,
 Adjacent never includes the target itself). Splash effects that say "Adjacent" (the
 Warden's Sundering talent) hit at most those two enemies.</li>
 <li><b>Cooldown (keyword, "cd"):</b> the number of the user's turns before the same ability
-can be used again — "7cd" means unusable for 7 turns after use. Every ability now carries a
-cooldown scaled to its strength (basics 0, light hits 2–3, heavies/AoE 3–6, Miracles 5–8,
-Death Ray/Resurrection 8; a tuning pass is expected). The remaining cooldown shows on the
+can be used again — "6cd" means unusable for 6 turns after use. <b>Every cooldown in the
+game was reduced by 1 turn (07-16)</b>: basics 0, light hits 1–2, heavies/AoE 2–5, Miracles
+4–7, Death Ray/Resurrection 7. The remaining cooldown shows on the
 ability button ("CD n") and in its tooltip; enemies respect cooldowns too.</li>
 <li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
 positive one. Talents that count debuffs (Dominant Presence, Iron Will) use this
@@ -276,11 +280,14 @@ HP. Defense Potion: party gains Fortify (3 turns).</p>
 <p>Enemies hunt the most wounded hero 40% of the time and pick randomly otherwise (they no
 longer pile onto the squishiest target relentlessly); if any hero is Broken they exploit it
 with their hardest affordable hit. Mocked enemies must attack the taunting Warrior — a taunt
-also overrides support casts. <b>Support behaviors run before attacks:</b> the Orc
-Shieldmaster ALWAYS casts Shielding when no ally carries its ward (lowest-HP ally first,
-itself included); the Withered Warden has a 60% chance to cast Wild Growth on the most
-wounded of its warband (itself included) when someone is below 70% HP. The Chief and the
-Ash-Wrought Tyrant build and spend Rage like a Warrior.</p>
+also overrides support casts. <b>Support behaviors run before attacks:</b> the Orc Shaman
+casts Healing Wave on the most wounded ally under 40% HP (friendly tanks and healers
+first); the Orc Shieldmaster ALWAYS casts Shielding when no ally carries its ward
+(lowest-HP ally first, itself included); the Withered Warden has a 60% chance to cast Wild
+Growth on the most wounded of its warband (itself included) when someone is below 70% HP.
+The Chief and the Ash-Wrought Tyrant build and spend Rage like a Warrior. An enemy with
+every ability cooling down and nothing to support <b>bides its time</b> (passes the
+turn).</p>
 <h3>4.9 There is no announcer</h3>
 <p>All battle information lives in the scrolling combat log (top right) and floating combat
 text. No banner text appears at the top of the battle.</p>
@@ -374,44 +381,44 @@ Sharpshooter 90, Pyromancer 85, Cryomancer 85.</p>
 <ul>
 <li><b>Berserker (Ramp)</b> — Passive <i>Blood Frenzy</i>: +2% damage for every 5% of health
 missing (stepped; the Unstoppable talent raises the 2% to 2.5/3/3.5%).<br>
-Bloodlust — 25 Rage, 26 dmg / 18 BD / 3.0, 3cd, heals 30% of missing HP, builds 10 Rage
+Bloodlust — 25 Rage, 26 dmg / 18 BD / 3.0, 2cd, heals 30% of missing HP, builds 10 Rage
 (Perfect: 45% missing HP).<br>
-Wildstrikes — 35 Rage, 16 dmg to ALL / 14 BD / 4.5, 4cd, +35 Bleed each, builds 10 Rage
+Wildstrikes — 35 Rage, 16 dmg to ALL / 14 BD / 4.5, 3cd, +35 Bleed each, builds 10 Rage
 (Perfect: +50% BD).<br>
-Hack and Slash — 20 Rage, 3 strikes × 10 dmg / 10 BD / 3.0, 3cd, each hit 50% chance
+Hack and Slash — 20 Rage, 3 strikes × 10 dmg / 10 BD / 3.0, 2cd, each hit 50% chance
 to build 25 Bleed (a full 4-strike flurry can bleed a target out), builds 10 Rage
 (Perfect: 4 strikes).<br>
-<i>Talent-granted:</i> Battle Shout — 15 Rage, 2.0, 3cd, +1% damage per 20 blood buildup on
+<i>Talent-granted:</i> Battle Shout — 15 Rage, 2.0, 2cd, +1% damage per 20 blood buildup on
 the enemy party for 2 turns (Perfect: +5 Rage); a self-buff — casts with no target
 selection, and its chip shows the % gained. Rampage — 40 Rage, 3 × 20 physical +
-3 × 10 bloodloss / 3 × 10 BD, 4.0, 5cd; if the target dies, Rampage immediately recasts
+3 × 10 bloodloss / 3 × 10 BD, 4.0, 4cd; if the target dies, Rampage immediately recasts
 (free) on another enemy and can chain.</li>
 <li><b>Warden (Tank)</b> — Passive <i>Heavy Plating</i>: 15% chance to Block, on top of the
 Warden's <b>5% base Block stat</b> (the only stat-Block character). VAULTED: the old Bulwark
 passive, Retaliation, and the party-wide Shieldwall v1.<br>
-Mocking Blow — free, 27% Atk (≈20) / 15 BD / 2.0, 2cd, taunts the target AND one other
+Mocking Blow — free, 27% Atk (≈20) / 15 BD / 2.0, 1cd, taunts the target AND one other
 enemy for 4 turns, builds 10 Rage (Perfect: 5 turns).<br>
-Crushing Blow (moved from the Swordmaster) — 20 Rage, 43% Atk (≈32) / 20 BD / 3.0, 3cd,
+Crushing Blow (moved from the Swordmaster) — 20 Rage, 43% Atk (≈32) / 20 BD / 3.0, 2cd,
 Sunders (−35% armor, 3 turns), builds 10 Rage (Perfect: +5 bonus BD).<br>
 <b>War Stomp (NEW 07-16)</b> — 20 Rage, 3 shockwaves × 15% Atk / 15 BD each to RANDOM
-enemies, 3.0 int, 4cd; allies regain 10% of their resource.<br>
-<i>Talent-granted:</i> Shieldwall — 25 Rage, 2.0, 3cd, Blocks the next 3 attacks (Perfect:
+enemies, 3.0 int, 3cd; allies regain 10% of their resource.<br>
+<i>Talent-granted:</i> Shieldwall — 25 Rage, 2.0, 2cd, Blocks the next 3 attacks (Perfect:
 5); a self-buff cast with no target selection whose chip counts the charges left. Hold the
-Line — 30 Rage, 3.5, 7cd, the party takes 50% less Break damage for 2 turns and
+Line — 30 Rage, 3.5, 6cd, the party takes 50% less Break damage for 2 turns and
 cannot die for a turn (Perfect: refunds 5 Rage); also self-cast, no target selection.</li>
 <li><b>Swordmaster (Bruiser)</b> — Passive <i>Seasoned Fighter</i>: a stance switch — +15%
 damage dealt while above half HP; takes 15% less damage at or below half HP (both sides
 deepen via stance talents). The spec chip shows which side is live.<br>
-Overpower — 30 Rage, 15 dmg / 20 BD / 2.5, 2cd, +0.5 damage per point of the target's Break
+Overpower — 30 Rage, 15 dmg / 20 BD / 2.5, 1cd, +0.5 damage per point of the target's Break
 meter, builds 10 Rage (Perfect: +5 bonus Rage).<br>
-Pommel Strike — 15 Rage, 25 dmg / 30 BD / 2.0, 3cd, has its own <b>25% base crit
+Pommel Strike — 15 Rage, 25 dmg / 30 BD / 2.0, 2cd, has its own <b>25% base crit
 chance</b>; 50% chance to Stun and a crit GUARANTEES the stun, builds 10 Rage
 (Perfect: +15% parry chance for 3 turns, deepened by Swordsmanship).<br>
 Sweeping Strikes — 20 Rage, 2 strikes × 15 dmg / 8 BD, 3.0, no cd, Dazes the target
 3 turns, builds 10 Rage (Perfect: +25% crit on the second swing).<br>
 <i>Talent-granted:</i> Lunge — 25 Rage, 35 dmg / 20 BD, 3.5, applies Exposed above 50%
 health / Cripple below, builds 10 Rage (Perfect: 3.0 initiative). Execute — 30 Rage, 55 dmg
-/ 50 BD, 2.0, 4cd, only usable against targets below 20% health (Perfect: guaranteed
+/ 50 BD, 2.0, 3cd, only usable against targets below 20% health (Perfect: guaranteed
 crit).</li>
 </ul>
 <h3>6.2 Mage</h3>
@@ -594,8 +601,11 @@ Sundering Strike 23%/22BD, 60% Sunder 2t. Resists: physical 10%.</td></tr>
 for 3 turns; only one ally holds the ward at a time, and it ALWAYS re-casts when no ally is
 shielded. Strike 37% physical/20BD (≈28).</td></tr>
 <tr><td>Orc Shaman (blue)</td><td>110</td><td>50</td><td>1%</td><td>100</td><td>80</td><td>Ranged
-caster. Lightning Bolt 70% nature/20BD single target (≈35); Chain Lightning 30% nature +
-15BD to the ENTIRE hero party (≈15). Resists: fire 25%, frost 25%, nature 50%.</td></tr>
+support caster. Chain Lightning 30% nature + 15BD to the ENTIRE hero party (≈15), 2cd;
+<b>Healing Wave (NEW 07-16)</b> — heals the most wounded ally under 40% health for 25% of
+its max HP (friendly tanks and healers first), 2cd. With everything cooling down and nobody
+to heal, it "bides its time" (passes the turn). Resists: fire 25%, frost 25%, nature 50%.
+(Lightning Bolt VAULTED 07-16 — removed but kept for future return.)</td></tr>
 <tr><td>Orc Chief (elite)</td><td>250</td><td>100</td><td>20%</td><td>80</td><td>130</td><td>Rage user:
 Strike 28%/26BD +15 Rage; Heavy Strike 30R 54%/40BD; Crushing Blow 20R 34%/56BD. Resists:
 physical 15%.</td></tr>
@@ -607,13 +617,32 @@ for 20% of its max HP (itself included).</td></tr>
 <td>160</td><td>Chief kit, bigger sprite, 20 starting Rage. Resists: fire 50%, physical 10%.
 WEAK to frost (+25% damage taken).</td></tr>
 </table>
-<p><b>Compositions:</b> every encounter fields <b>3–5 enemies with the types rolled at
-random</b> from the basic pool (Raider / Archer / Shieldmaster / Shaman). Elites only appear
-on elite nodes (the Chief + 2–4 random basics) and bosses only on the boss node (boss + 2–4
-random basics). <b>Tier scaling (replaces the old ×1.35-per-zone jump):</b> enemy Attack and
-HP grow +2% of base per node tier, counted from the start of the game to its end (a zone
-spans 11 tiers, so zone 2 opens at +22%); scaled HP is rounded UP to the next multiple of
-10. Deeper-zone enemies keep their scorched tint.</p>
+<p><b>Compositions — the power-budget system (07-16):</b> every enemy carries a power
+value — <b>Raider 1, Archer 1, Shieldmaster 2, Shaman 2, Chief 4, Boss 7</b> — and every
+battle rolls a <b>power budget of 8–12</b> that is ALWAYS spent exactly. Generation is
+two-step: first a <b>theme</b> is chosen (the warband is cohesive, not random), then the
+budget fills that theme's roles. The battlefield holds at most <b>6 enemies</b>; the chosen
+theme opens the combat log ("Enemy warband: Ritual"). Chiefs stay out of REGULAR fights
+until global tier 3; elite nodes always roll a Chief-led theme; boss nodes always roll Boss
+Escort. Themes whose math can't spend a given budget simply don't appear on that roll
+(Swarm and Poison Volley only fit low budgets — they're the "light" encounters).</p>
+<table border="1" cellpadding="4">
+<tr><th>Theme</th><th>Gameplay focus</th><th>Core units</th><th>Nodes</th></tr>
+<tr><td>Warband</td><td>Balanced encounter</td><td>Mix of everything (≥3 kinds)</td><td>fight</td></tr>
+<tr><td>Swarm</td><td>Many weak attackers</td><td>≥4 Raiders/Archers + support pair</td><td>fight</td></tr>
+<tr><td>Honor Guard</td><td>Keep one powerful unit alive</td><td>Chief + ≥2 Shieldmasters</td><td>fight (tier 3+), elite</td></tr>
+<tr><td>Ritual</td><td>Protect the Shamans</td><td>≥2 Shamans + Shieldmaster</td><td>fight</td></tr>
+<tr><td>Poison Volley</td><td>Stack Poison</td><td>Mostly Archers (≥3, majority)</td><td>fight</td></tr>
+<tr><td>Lightning Storm</td><td>Party-wide magic damage</td><td>≥2 Shamans</td><td>fight</td></tr>
+<tr><td>Rage Company</td><td>Chiefs build Rage while others buy time</td><td>Chief(s) + ≥2 Raiders</td><td>fight (tier 3+), elite</td></tr>
+<tr><td>Guardian Circle</td><td>Constant wards</td><td>≥3 Shieldmasters</td><td>fight</td></tr>
+<tr><td>Elite Patrol</td><td>Few high-value enemies (≤4 units)</td><td>Chief + Shieldmaster + Shaman</td><td>elite</td></tr>
+<tr><td>Boss Escort</td><td>Boss supported by specialists</td><td>Boss + support units</td><td>boss</td></tr>
+</table>
+<p><b>Tier scaling:</b> enemy <b>Attack grows +4%</b> and <b>HP +5% of base per node
+tier</b> (linear), counted from the start of the game to its end (a zone spans 11 tiers, so
+zone 2 opens at +44% Attack / +55% HP); scaled HP is rounded UP to the next multiple of 10.
+Deeper-zone enemies keep their scorched tint.</p>
 
 <h2>10. Battle Screen &amp; Controls</h2>
 <ul>

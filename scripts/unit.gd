@@ -59,8 +59,9 @@ var broken := false         # Broken: defenses down, crit vulnerable
 var broken_pending := false # will lose its next turn
 var dead := false
 var next_time := 0.0        # position on the initiative timeline
-var is_ranged := false      # melee/ranged split (Tripwire only punishes melee)
+var is_ranged := false      # ranged units can't be parried; Tripwire skips them
 var is_boss := false        # bosses cannot be Stunned unless Broken
+var enemy_role := ""        # "tank"/"support"/"damage" — heal-AI priorities
 var is_companion := false   # Beastmaster summon: no turns, fights alongside
 var companion_kind := ""    # "ursus" / "canis" / "aguila"
 var companion: BattleUnit   # the Beastmaster's active summon (on the hunter)

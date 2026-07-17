@@ -214,6 +214,8 @@ const ENEMY_LAYOUTS := {
 	4: [Vector2(910, 380), Vector2(990, 450), Vector2(910, 520), Vector2(990, 590)],
 	5: [Vector2(905, 370), Vector2(985, 425), Vector2(905, 480), Vector2(985, 535),
 		Vector2(945, 595)],
+	6: [Vector2(905, 355), Vector2(985, 405), Vector2(905, 455), Vector2(985, 505),
+		Vector2(905, 555), Vector2(985, 600)],
 }
 # Nameplate stacks: plate i belongs to party slot i (companion = 5th hero slot).
 const HERO_PLATE_X := 8.0
@@ -242,6 +244,7 @@ func _enemy_config(kind: String) -> Dictionary:
 	match kind:
 		"chief":
 			return {"unit_name": "Orc Chief", "is_hero": false, "sheet_dir": orc,
+				"enemy_role": "damage",
 				"max_hp": 250, "attack": 100, "armor": 0.20, "speed": 80.0,
 				"stability": 100, "constitution": 130,
 				"resource_name": "Rage", "resource": 0, "max_resource": 100,
@@ -252,13 +255,14 @@ func _enemy_config(kind: String) -> Dictionary:
 			# Zone 1's Withered Warden has its own kit; later bosses are still
 			# Chief stand-ins until their unique kits and art exist.
 			if (Run.zone_idx if Run.active else 0) == 0:
-				return {"unit_name": "Withered Warden", "is_hero": false,
+				return {"unit_name": "Withered Warden", "is_hero": false, "enemy_role": "tank",
 					"sheet_dir": orc, "max_hp": 500, "attack": 100, "armor": 0.35,
 					"speed": 80.0,
 					"stability": 100, "constitution": 150, "is_boss": true,
 					"abilities": _withered_warden_kit(), "sprite_scale": 4.4,
 					"tint": Color(0.7, 1.0, 0.7), "resists": {"nature": 0.75}}
 			return {"unit_name": "Ash-Wrought Tyrant", "is_hero": false, "sheet_dir": orc,
+				"enemy_role": "damage",
 				"max_hp": 370, "attack": 100, "armor": 0.22, "speed": 85.0,
 				"stability": 100, "constitution": 160, "is_boss": true,
 				"resource_name": "Rage", "resource": 20, "max_resource": 100,
@@ -267,12 +271,14 @@ func _enemy_config(kind: String) -> Dictionary:
 				"resists": {"fire": 0.50, "physical": 0.10}, "weak": ["frost"]}
 		"shieldmaster":
 			return {"unit_name": "Orc Shieldmaster", "is_hero": false, "sheet_dir": orc,
+				"enemy_role": "tank",
 				"max_hp": 150, "attack": 75, "armor": 0.25, "speed": 85.0,
 				"stability": 100, "constitution": 120, "block_chance": 0.05,
 				"abilities": _orc_shieldmaster_kit(), "tint": Color(1.0, 0.62, 0.2),
 				"resists": {}}
 		"shaman":
 			return {"unit_name": "Orc Shaman", "is_hero": false, "sheet_dir": orc,
+				"enemy_role": "support",
 				"max_hp": 110, "attack": 50, "armor": 0.01, "speed": 100.0,
 				"stability": 100, "constitution": 80,
 				"is_ranged": true,
@@ -280,6 +286,7 @@ func _enemy_config(kind: String) -> Dictionary:
 				"resists": {"fire": 0.25, "frost": 0.25, "nature": 0.50}}
 		"archer":
 			return {"unit_name": "Orc Archer", "is_hero": false, "sheet_dir": orc,
+				"enemy_role": "damage",
 				"max_hp": 110, "attack": 100, "armor": 0.10, "speed": 100.0,
 				"stability": 100, "constitution": 85,
 				"is_ranged": true,
@@ -287,6 +294,7 @@ func _enemy_config(kind: String) -> Dictionary:
 				"resists": {"physical": 0.05}}
 		_:
 			return {"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
+				"enemy_role": "damage",
 				"max_hp": 140, "attack": 100, "armor": 0.15, "speed": 90.0,
 				"stability": 100, "constitution": 100,
 				"abilities": _orc_raider_kit(), "tint": Color.WHITE,
@@ -382,14 +390,15 @@ func _spawn_units() -> void:
 		if cfg.get("toughness_ranks", 0) > 0:
 			cfg["constitution"] = int(cfg.get("constitution", 100)
 				+ 0.05 * cfg["toughness_ranks"] * cfg["max_hp"])
-		# Node scaling: +1% of BASE Attack and HP per combat node won this
-		# run. Armor/resists/speed/constitution/crit/block/parry never scale
-		# (Toughness above reads the unscaled HP for the same reason).
+		# Node scaling: +2% of BASE Attack and HP per combat node won this
+		# run (linear). Armor/resists/speed/constitution/crit/block/parry
+		# never scale (Toughness above reads the unscaled HP for the same
+		# reason).
 		if Run.active and Run.combat_wins > 0:
 			cfg["attack"] = int(round(int(cfg.get("attack", 100))
-				* (1.0 + 0.01 * Run.combat_wins)))
+				* (1.0 + 0.02 * Run.combat_wins)))
 			cfg["max_hp"] = int(cfg["max_hp"]) \
-				+ int(round(base_hp * 0.01 * Run.combat_wins))
+				+ int(round(base_hp * 0.02 * Run.combat_wins))
 		# Heroes with their own art keep original colors — no slot tint.
 		var hero_tint: Color = Classes.HERO_TINTS[i]
 		if SPEC_ART.has(spec):
@@ -432,21 +441,20 @@ func _spawn_units() -> void:
 		composition = env_comp.split(",")
 	elif Run.active and Run.encounter.has("enemies"):
 		composition = Run.encounter["enemies"]
-	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 5)]
-	# Enemies scale +2% of base Attack and HP per node tier, counted across
-	# the whole game (zone 2's first tier = global tier 11). Health pools
-	# stay multiples of 10 (rounded UP after scaling).
+	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 6)]
+	# Enemies scale linearly per node tier, counted across the whole game
+	# (zone 2's first tier = global tier 11): +4% of base Attack and +5% of
+	# base HP per tier. Health pools stay multiples of 10 (rounded UP).
 	var tier := 0
 	if Run.active:
 		tier = Run.zone_idx * Run.FLOORS + maxi(Run.floor_idx, 0)
-	var tier_mult := 1.0 + 0.02 * tier
 	for i in composition.size():
 		var cfg := _enemy_config(composition[i])
 		var tint: Color = cfg["tint"]
 		cfg.erase("tint")
-		if tier_mult > 1.0:
-			cfg["max_hp"] = int(ceil(cfg["max_hp"] * tier_mult / 10.0) * 10.0)
-			cfg["attack"] = int(round(cfg["attack"] * tier_mult))
+		if tier > 0:
+			cfg["max_hp"] = int(ceil(cfg["max_hp"] * (1.0 + 0.05 * tier) / 10.0) * 10.0)
+			cfg["attack"] = int(round(cfg["attack"] * (1.0 + 0.04 * tier)))
 		if Run.active and Run.zone_idx > 0:
 			# Deeper zones keep their scorched warpaint.
 			tint = tint.lerp(Color(1.0, 0.6, 0.45), 0.35)
@@ -487,7 +495,7 @@ func _orc_raider_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Slash", "damage": 34, "pressure": 26,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Sundering Strike", "cooldown": 2, "damage": 23, "pressure": 22,
+		Ability.make({"display_name": "Sundering Strike", "cooldown": 1, "damage": 23, "pressure": 22,
 			"delay": 2.5, "anim": "attack02",
 			"applies_status": {"id": "sunder", "turns": 2}, "status_chance": 0.6}),
 	]
@@ -497,7 +505,7 @@ func _orc_archer_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Arrow Shot", "damage": 21, "pressure": 16,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Poison Arrow", "cooldown": 2, "dmg_type": "nature",
+		Ability.make({"display_name": "Poison Arrow", "cooldown": 1, "dmg_type": "nature",
 			"damage": 16, "pressure": 14,
 			"delay": 2.5, "anim": "attack02",
 			"applies_status": {"id": "poison", "turns": 3}, "status_chance": 0.7}),
@@ -510,32 +518,36 @@ func _orc_shieldmaster_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Strike", "damage": 37, "pressure": 20,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Shielding", "cooldown": 3, "special": "enemy_shield",
+		Ability.make({"display_name": "Shielding", "cooldown": 2, "special": "enemy_shield",
 			"delay": 2.5, "anim": "attack02", "target": Ability.Target.ALLY,
 			"description": "Wards an ally: 25% less damage taken for 3 turns."}),
 	]
 
 
-# Support-role caster (50 Attack): 70%/30% keep the old 35/15 hits.
+# Support-role caster (50 Attack). VAULTED — Lightning Bolt (removed
+# 07-16, kept for future return): {"display_name": "Lightning Bolt",
+#   "damage": 70, "pressure": 20, "delay": 2.0, "anim": "attack01",
+#   "dmg_type": "nature"}
 func _orc_shaman_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Lightning Bolt", "damage": 70, "pressure": 20,
-			"delay": 2.0, "anim": "attack01", "dmg_type": "nature"}),
-		Ability.make({"display_name": "Chain Lightning", "cooldown": 3, "damage": 30, "pressure": 15,
+		Ability.make({"display_name": "Chain Lightning", "cooldown": 2, "damage": 30, "pressure": 15,
 			"delay": 3.0, "anim": "attack02", "dmg_type": "nature", "aoe": true}),
+		Ability.make({"display_name": "Healing Wave", "cooldown": 2, "special": "healing_wave",
+			"delay": 2.5, "anim": "attack02", "target": Ability.Target.ALLY,
+			"description": "Mends the most wounded ally under 40%\nhealth for 25% of their max HP\n(tanks and healers first)."}),
 	]
 
 
 # Zone 1 boss: a nature bruiser that dazes, poisons, and tends its escorts.
 func _withered_warden_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Timber Slam", "cooldown": 2, "damage": 60, "pressure": 30,
+		Ability.make({"display_name": "Timber Slam", "cooldown": 1, "damage": 60, "pressure": 30,
 			"delay": 3.0, "anim": "attack01", "dmg_type": "nature",
 			"applies_status": {"id": "dazed", "turns": 3}}),
-		Ability.make({"display_name": "Roots of Wrath", "cooldown": 3, "damage": 25, "pressure": 20,
+		Ability.make({"display_name": "Roots of Wrath", "cooldown": 2, "damage": 25, "pressure": 20,
 			"delay": 3.5, "anim": "attack02", "dmg_type": "nature", "aoe": true,
 			"applies_status": {"id": "poison", "turns": 3}}),
-		Ability.make({"display_name": "Wild Growth", "cooldown": 3, "special": "wild_growth",
+		Ability.make({"display_name": "Wild Growth", "cooldown": 2, "special": "wild_growth",
 			"delay": 2.5, "anim": "attack02", "target": Ability.Target.ALLY,
 			"description": "Heals an ally for 20% of their max health."}),
 	]
@@ -546,9 +558,9 @@ func _orc_chief_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Strike", "damage": 28, "pressure": 26,
 			"resource_gain": 15, "delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Heavy Strike", "cooldown": 3, "cost": 30, "damage": 54,
+		Ability.make({"display_name": "Heavy Strike", "cooldown": 2, "cost": 30, "damage": 54,
 			"pressure": 40, "delay": 4.0, "anim": "attack02"}),
-		Ability.make({"display_name": "Crushing Blow", "cooldown": 3, "cost": 20, "damage": 34,
+		Ability.make({"display_name": "Crushing Blow", "cooldown": 2, "cost": 20, "damage": 34,
 			"pressure": 56, "delay": 4.0, "anim": "attack02"}),
 	]
 
@@ -886,6 +898,9 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 func _run_battle() -> void:
 	await _wait(0.6)
 	_message("The Decay stirs...")
+	# The warband's theme opens the log — the composition isn't random.
+	if Run.active and String(Run.encounter.get("theme", "")) != "":
+		_log("Enemy warband: %s" % Run.encounter["theme"], "#c8b880")
 	await _wait(0.8)
 	while not battle_over:
 		_update_talent_chips()
@@ -1723,11 +1738,11 @@ func _enemy_turn(u: BattleUnit) -> void:
 	# damage (falls through to normal behavior if it stands alone).
 	if u.has_status("mindflay"):
 		var fellows := enemies.filter(func(e): return not e.dead and e != u)
-		if not fellows.is_empty():
+		# Maddened units ATTACK their allies — support abilities stay sheathed.
+		var mf_options: Array = u.abilities.filter(
+			func(a): return a.cost <= u.resource and a.damage > 0 and u.ability_ready(a))
+		if not fellows.is_empty() and not mf_options.is_empty():
 			var mf_target: BattleUnit = fellows.pick_random()
-			# Maddened units ATTACK their allies — support abilities stay sheathed.
-			var mf_options: Array = u.abilities.filter(
-				func(a): return a.cost <= u.resource and a.damage > 0 and u.ability_ready(a))
 			_message("%s turns on its allies!" % u.unit_name)
 			_log("%s is maddened — attacks %s!" % [u.unit_name, mf_target.unit_name], "#c070e0")
 			await _wait(0.4)
@@ -1754,6 +1769,13 @@ func _enemy_turn(u: BattleUnit) -> void:
 	# are chosen above.
 	var affordable: Array = u.abilities.filter(
 		func(a): return a.cost <= u.resource and a.damage > 0 and u.ability_ready(a))
+	if affordable.is_empty():
+		# Everything on cooldown and nobody to support (a Shaman between
+		# casts): the turn passes.
+		_log("%s bides its time" % u.unit_name, "#909090")
+		u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
+		await _wait(0.4)
+		return
 	var broken_heroes := living.filter(func(h): return h.broken)
 	if not broken_heroes.is_empty():
 		# Exploit a Broken hero with the hardest-hitting attack they can afford.
@@ -1789,6 +1811,15 @@ func _threat_pick(pool: Array) -> BattleUnit:
 # [ability, ally_target], or [] to fall through to a normal attack.
 func _enemy_support_action(u: BattleUnit) -> Array:
 	var allies: Array = enemies.filter(func(e): return not e.dead)
+	# Shaman: Healing Wave the most wounded ally under 40% health —
+	# friendly tanks and healers first.
+	var wave := _find_ability(u, "Healing Wave")
+	if wave != null and u.ability_ready(wave):
+		var hurt: Array = allies.filter(func(a): return a.hp < a.max_hp * 0.40)
+		if not hurt.is_empty():
+			var prio: Array = hurt.filter(
+				func(a): return a.enemy_role in ["tank", "support"])
+			return [wave, _lowest_hp(prio if not prio.is_empty() else hurt)]
 	# Shieldmaster: always keeps exactly one ally Shielded (lowest HP first).
 	var shield_ab := _find_ability(u, "Shielding")
 	if shield_ab != null and u.ability_ready(shield_ab) \
@@ -2218,7 +2249,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Elemental Weakness: Crushing Blow strips non-physical resists.
 			if ab.dmg_type != "physical" and strike_target.has_status("elem_weak"):
 				resist -= strike_target.status_power("elem_weak") / 100.0
+			# Mitigation is logged with its amounts: what the resist ate
+			# (negative = a Weakness ADDED damage) and what armor blocked.
+			var resist_cut := 0
 			if resist != 0.0:
+				resist_cut = int(round(raw * resist))
 				raw *= 1.0 - resist
 			# Armor Penetration: each % negates a % of the target's armor.
 			# Crushing Blows (talent): pen scales with the enemy party's bleed.
@@ -2234,6 +2269,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if is_perfect and ab.display_name == "Arcane Rift":
 				effective_armor = 0.0
 			var final := maxi(int(round(raw * (1.0 - effective_armor))), 1)
+			# Armor's share, kept consistent with the displayed final number.
+			var armor_cut := maxi(int(round(raw)) - final, 0)
 			var resonance_boosted: bool = attacker.second_resource_name == "Resonance" \
 				and attacker.second_resource > 0
 			var pr := int(round(ab.pressure * pr_mult * (1.5 if is_crit else 1.0)))
@@ -2295,13 +2332,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			else:
 				_sfx(_impact_sfx(attacker, ab))
 				strike_target.float_text("%d" % final, Color(0.95, 0.85, 0.75))
+			# Mitigation report: exact amounts eaten by resist and armor.
 			var resist_tag := ""
-			if resist > 0.0:
-				resist_tag = " (resisted)"
-			elif resist < 0.0:
+			if resist_cut > 0:
+				resist_tag = " (%s resist -%d)" % [ab.dmg_type, resist_cut]
+			elif resist_cut < 0:
 				# Weakness: the hit lands 25%+ harder — call it out loudly.
-				resist_tag = " (WEAK!)"
+				resist_tag = " (WEAK! +%d)" % -resist_cut
 				strike_target.float_text("WEAK!", Color(1.0, 0.55, 0.15))
+			if armor_cut > 0:
+				resist_tag += " (armor -%d)" % armor_cut
 			if parried:
 				resist_tag += " (parried -75%% — %s)" % parry_source
 			_log("%s: %s on %s — %d %s dmg%s%s, +%d BD%s" % [attacker.unit_name,
@@ -2923,6 +2963,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
 			_log("%s: Wild Growth heals %s for %d (20%% max HP)" % [attacker.unit_name,
 				target.unit_name, growth], "#70d878")
+		"healing_wave":
+			var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)
+			_sfx("heal", -6.0, 0.75)
+			target.heal_amount(wave_heal, target != attacker)
+			target.float_text("+%d" % wave_heal, Color(0.4, 0.9, 0.45))
+			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
+			_log("%s: Healing Wave — %s recovers %d (25%% max HP)" % [attacker.unit_name,
+				target.unit_name, wave_heal], "#70d878")
 		"renewal":
 			_sfx("heal", -9.0, 1.1)
 			_apply_status(target, "renewal", 5)

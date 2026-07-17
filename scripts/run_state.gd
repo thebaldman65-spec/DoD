@@ -26,9 +26,9 @@ const LOOT_POOL := ["health", "health", "mana", "mana", "bomb", "revive", "defen
 var active := false
 var specs_chosen := false  # locked in during the pre-run awakening
 var gold := 0
-# Node scaling: combat victories this run. Heroes gain +1% of base Attack
-# and HP per win (applied at battle spawn; never touches armor/resists/
-# speed/constitution/crit/block/parry).
+# Node scaling: combat victories this run. Heroes gain +2% of base Attack
+# and HP per win (linear; applied at battle spawn; never touches armor/
+# resists/speed/constitution/crit/block/parry).
 var combat_wins := 0
 
 const SAVE_PATH := "user://run_save.bin"
@@ -162,27 +162,121 @@ func advance(f: int, i: int) -> void:
 	map[f][i]["visited"] = true
 
 
-# Enemy composition per node type (kinds resolved by battle.gd). Every
-# encounter fields 3-5 enemies with the types rolled at random; elites (the
-# Chief) only appear on elite nodes, and bosses only on the boss node.
-const BASIC_ENEMY_KINDS := ["raider", "archer", "shieldmaster", "shaman"]
+# ---------- themed encounter generation (the budget system) ----------
+
+# Every enemy carries a power value; every battle rolls a power budget of
+# 8–12 and SPENDS IT EXACTLY. Generation is two-step: pick a THEME (a
+# cohesive warband, not a random mob), then fill its roles until the budget
+# is gone. The field holds at most 6 enemies.
+const ENEMY_POWER := {"raider": 1, "archer": 1, "shieldmaster": 2, "shaman": 2,
+	"chief": 4, "boss": 7}
+const MAX_FIELD := 6
+const BUDGET_MIN := 8
+const BUDGET_MAX := 12
+# Chiefs stay out of REGULAR fights until this global node tier (elite and
+# boss nodes are unaffected) so the early road stays survivable.
+const CHIEF_TIER := 3
+
+# pool: kind -> max copies. mins: kind -> required copies. Optional checks:
+# min_units / max_units, min_kinds (distinct kinds), min_weak (Raiders +
+# Archers), majority (that kind fills at least half the slots). nodes:
+# which node types the theme can appear on.
+const THEMES := {
+	"Warband": {"pool": {"raider": 3, "archer": 3, "shieldmaster": 2, "shaman": 2,
+		"chief": 1}, "min_kinds": 3, "nodes": ["fight"]},
+	"Swarm": {"pool": {"raider": 5, "archer": 5, "shieldmaster": 2, "shaman": 2},
+		"min_weak": 4, "min_units": 5, "nodes": ["fight"]},
+	"Honor Guard": {"pool": {"chief": 1, "shieldmaster": 3, "raider": 2, "archer": 2},
+		"mins": {"chief": 1, "shieldmaster": 2}, "nodes": ["fight", "elite"]},
+	"Ritual": {"pool": {"shaman": 3, "shieldmaster": 3, "raider": 2},
+		"mins": {"shaman": 2, "shieldmaster": 1}, "nodes": ["fight"]},
+	"Poison Volley": {"pool": {"archer": 4, "raider": 1, "shieldmaster": 2, "shaman": 1},
+		"mins": {"archer": 3}, "majority": "archer", "nodes": ["fight"]},
+	"Lightning Storm": {"pool": {"shaman": 4, "shieldmaster": 2, "raider": 2, "archer": 2},
+		"mins": {"shaman": 2}, "nodes": ["fight"]},
+	"Rage Company": {"pool": {"chief": 2, "raider": 4, "archer": 2},
+		"mins": {"chief": 1, "raider": 2}, "nodes": ["fight", "elite"]},
+	"Guardian Circle": {"pool": {"shieldmaster": 5, "shaman": 1, "raider": 2, "archer": 2},
+		"mins": {"shieldmaster": 3}, "nodes": ["fight"]},
+	"Elite Patrol": {"pool": {"chief": 2, "shieldmaster": 2, "shaman": 2, "raider": 1,
+		"archer": 1}, "mins": {"chief": 1, "shieldmaster": 1, "shaman": 1},
+		"max_units": 4, "nodes": ["elite"]},
+	"Boss Escort": {"pool": {"boss": 1, "shieldmaster": 2, "shaman": 2, "raider": 2,
+		"archer": 2}, "mins": {"boss": 1}, "nodes": ["boss"]},
+}
+
+var last_theme := ""  # theme of the most recently composed encounter
 
 
 func compose(node_type: String) -> Array:
-	match node_type:
-		"elite":
-			return ["chief"] + _random_basics(randi_range(2, 4))
-		"boss":
-			return ["boss"] + _random_basics(randi_range(2, 4))
-		_:
-			return _random_basics(randi_range(3, 5))
+	var budget := randi_range(BUDGET_MIN, BUDGET_MAX)
+	var tier := zone_idx * FLOORS + maxi(floor_idx, 0)
+	var candidates: Array = []
+	for theme_name in THEMES:
+		if THEMES[theme_name]["nodes"].has(node_type):
+			candidates.append(theme_name)
+	candidates.shuffle()
+	for theme_name in candidates:
+		var combos := _theme_combos(THEMES[theme_name], budget)
+		# Chiefs stay off early regular fights.
+		if node_type == "fight" and tier < CHIEF_TIER:
+			combos = combos.filter(func(c): return not c.has("chief"))
+		if combos.is_empty():
+			continue  # theme can't spend this budget — try another
+		last_theme = theme_name
+		var warband: Array = combos.pick_random()
+		warband.shuffle()
+		return warband
+	# Nothing fit (can't happen while Warband exists) — plain mob fallback.
+	last_theme = "Warband"
+	var fallback: Array = []
+	for i in clampi(budget / 2, 3, 5):
+		fallback.append(["raider", "archer", "shieldmaster", "shaman"].pick_random())
+	return fallback
 
 
-func _random_basics(count: int) -> Array:
-	var kinds: Array = []
-	for i in count:
-		kinds.append(BASIC_ENEMY_KINDS.pick_random())
-	return kinds
+# Every exact-budget warband a theme can field (arrays of enemy kinds).
+func _theme_combos(spec: Dictionary, budget: int) -> Array:
+	var results: Array = []
+	_combo_walk(spec, spec["pool"].keys(), 0, budget, [], results)
+	return results
+
+
+func _combo_walk(spec: Dictionary, kinds: Array, idx: int, left: int,
+		picked: Array, results: Array) -> void:
+	if idx == kinds.size():
+		if left == 0 and _combo_ok(spec, picked):
+			results.append(picked.duplicate())
+		return
+	var kind: String = kinds[idx]
+	var max_units: int = spec.get("max_units", MAX_FIELD)
+	for n in range(0, int(spec["pool"][kind]) + 1):
+		var cost: int = ENEMY_POWER[kind] * n
+		if cost > left or picked.size() + n > max_units:
+			break
+		var next: Array = picked.duplicate()
+		for i in n:
+			next.append(kind)
+		_combo_walk(spec, kinds, idx + 1, left - cost, next, results)
+
+
+func _combo_ok(spec: Dictionary, picked: Array) -> bool:
+	if picked.size() < int(spec.get("min_units", 1)):
+		return false
+	for kind in spec.get("mins", {}):
+		if picked.count(kind) < int(spec["mins"][kind]):
+			return false
+	if picked.count("raider") + picked.count("archer") < int(spec.get("min_weak", 0)):
+		return false
+	if spec.has("majority") and picked.count(spec["majority"]) * 2 < picked.size():
+		return false
+	if spec.has("min_kinds"):
+		var distinct := {}
+		for kind in picked:
+			distinct[kind] = true
+		if distinct.size() < int(spec["min_kinds"]):
+			return false
+	return true
 
 
 func heal_party(pct: float) -> void:

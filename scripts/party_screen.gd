@@ -137,12 +137,12 @@ func _draw_detail() -> void:
 	if cfg.get("toughness_ranks", 0) > 0:
 		cfg["constitution"] = int(cfg.get("constitution", 100)
 			+ 0.05 * cfg["toughness_ranks"] * cfg["max_hp"])
-	# Node scaling (mirrors battle spawn): +1% of base Attack & HP per win.
+	# Node scaling (mirrors battle spawn): +2% of base Attack & HP per win.
 	var base_attack: int = cfg.get("attack", 100)
 	if Run.combat_wins > 0:
-		cfg["attack"] = int(round(base_attack * (1.0 + 0.01 * Run.combat_wins)))
+		cfg["attack"] = int(round(base_attack * (1.0 + 0.02 * Run.combat_wins)))
 		cfg["max_hp"] = int(cfg["max_hp"]) \
-			+ int(round(base_hp * 0.01 * Run.combat_wins))
+			+ int(round(base_hp * 0.02 * Run.combat_wins))
 	var spec_label: String = Classes.SPEC_INFO[spec]["name"] if spec != "" else "Unawakened"
 	# Awakened heroes are titled by spec; the class name only shows pre-spec.
 	_title(spec_label if spec != "" else "%s — Unawakened" % cfg["unit_name"], 20, 34)
@@ -172,9 +172,9 @@ func _draw_detail() -> void:
 			int(round(float(cfg.get("resists", {}).get(res_type, 0.0)) * 100))])
 	var stat_rows: Array = [
 		[["HP: %d / %d" % [member["hp"], cfg["max_hp"]],
-			"Health — the hero falls at 0.\nValues include talents, equipped runes, and\nnode scaling (+1% of base per combat won)."],
+			"Health — the hero falls at 0.\nValues include talents, equipped runes, and\nnode scaling (+2% of base per combat won)."],
 		["Attack: %d" % cfg.get("attack", 100),
-			"Attack — every ability hits for its listed %% of\nthis. Base %d for the spec's role; +1%% of base\nper combat node won (%d so far this run)." % [
+			"Attack — every ability hits for its listed %% of\nthis. Base %d for the spec's role; +2%% of base\nper combat node won (%d so far this run)." % [
 				base_attack, Run.combat_wins]]],
 		[["%s: %s" % [cfg["resource_name"],
 			("%d / %d" % [member["mana"], cfg["max_resource"]]) if cfg["resource_name"] == "Mana"

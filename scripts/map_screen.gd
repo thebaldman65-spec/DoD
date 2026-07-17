@@ -195,7 +195,8 @@ func _on_node_pressed(f: int, i: int) -> void:
 			Run.save_run()
 			get_tree().change_scene_to_file("res://scenes/shop.tscn")
 		_:
-			Run.encounter = {"type": node["type"], "enemies": Run.compose(node["type"])}
+			Run.encounter = {"type": node["type"], "enemies": Run.compose(node["type"]),
+				"theme": Run.last_theme}
 			get_tree().change_scene_to_file("res://scenes/battle.tscn")
 
 
