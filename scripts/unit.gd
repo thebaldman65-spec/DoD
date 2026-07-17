@@ -519,6 +519,13 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 				s.desc = "Takes %d nature damage at the start of each\nturn (%d per stack); new stacks refresh the timer." % [
 					int(s.get("tick", 3)) * s.stacks, int(s.get("tick", 3))]
 				float_text("%s x%d" % [label, s.stacks], color)
+			elif id == "burn":
+				# Reapplied Burn burns LONGER: +3 turns per application.
+				s.turns += 3
+				s.power = maxi(s.power, power)
+				if tick > 0:
+					s["tick"] = tick
+				float_text("Burn +3 turns", color)
 			else:
 				s.turns = maxi(s.turns, turns)
 				s.power = maxi(s.power, power)

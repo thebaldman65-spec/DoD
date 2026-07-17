@@ -153,7 +153,8 @@ Warden's Sundering talent) hit at most those two enemies.</li>
 can be used again — "6cd" means unusable for 6 turns after use. <b>Every cooldown in the
 game was reduced by 1 turn (07-16)</b>: basics 0, light hits 1–2, heavies/AoE 2–5, Miracles
 4–7, Death Ray/Resurrection 7. The remaining cooldown shows on the
-ability button ("CD n") and in its tooltip; enemies respect cooldowns too.</li>
+ability button ("CD n") and in its tooltip. <b>Enemies do not use cooldowns at all
+(07-16)</b> — their kits are gated by resources and AI conditions instead.</li>
 <li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
 positive one. Talents that count debuffs (Dominant Presence, Iron Will) use this
 classification.</li>
@@ -187,7 +188,7 @@ meter; crits deal ×1.5 BD, which is why the same ability moves different meters
 amounts. Resistance comes from <b>Constitution</b>: incoming BD is scaled by
 100/Constitution (100 = neutral; a 160-Constitution boss takes ~38% less Break damage; an
 85-Constitution mage takes ~18% more). Constitution is set per specialization role (see §6),
-raised by talents, the Bulwark passive, and Poise runes. When the meter fills, the unit
+raised by talents and Poise runes. When the meter fills, the unit
 <b>BREAKS</b>: it loses its next
 turn, armor ×0.7, +25% crit chance against it, and enemies actively exploit Broken heroes with
 their hardest affordable attack. <b>Bosses cannot be Stunned unless Broken</b> (stuns fizzle
@@ -200,7 +201,8 @@ After the lost turn, the Break meter resets to 0. Ward halves incoming BD; Devot
 20% max HP</b> and the meter resets. <b>Bleedout damage ignores armor</b> entirely.</li>
 <li><b>Burn:</b> 6% of the applier's Attack (snapshotted when it lands; ≈6 at 100 Atk) at
 the start of the afflicted unit's turn; ticks can crit using the caster's snapshotted crit
-chance.</li>
+chance. <b>Every reapplication of Burn extends its duration by 3 turns</b> (the timer
+stacks, announced with a "Burn +3 turns" float).</li>
 <li><b>Poison:</b> 3% of the applier's Attack per stack (snapshotted; ≈3 at 100 Atk) at the
 start of the afflicted unit's turn.
 <b>Poison counts as nature damage</b> — nature resists reduce the tick (and nature
@@ -214,7 +216,8 @@ Roots of Wrath (3 turns), and the Survivalist's Trapper passive (5 turns).</li>
 <tr><th>Status</th><th>Effect</th></tr>
 <tr><td>Chilled</td><td>−25% speed (Cryomancer-only frost).</td></tr>
 <tr><td>Slowed</td><td>−25% speed (generic; e.g. Shrapnel Charge).</td></tr>
-<tr><td>Burn</td><td>6 damage at the start of each turn.</td></tr>
+<tr><td>Burn</td><td>6% of the applier's Attack at the start of each turn
+(snapshotted). Every REAPPLICATION extends the burn by +3 turns.</td></tr>
 <tr><td>Poison</td><td>3 nature damage per stack each turn (nature resists apply); stacks
 additively, new stacks refresh the timer. Never ticks on the turn it lands.</td></tr>
 <tr><td>Bleed</td><td>Buildup meter; bleeds out for 20% max HP at 100 (ignores
@@ -234,8 +237,8 @@ at cast (Berserker talent). The chip shows the % gained at the moment of the sho
 talent rank (Warden's Crushing Blow talent); the chip shows the reduction ("−15%").</td></tr>
 <tr><td>Enraged</td><td>+3%/rank damage per stack for 5 turns, stacking ×3 (Berserker
 talent, on dropping below half HP); the chip shows the live bonus.</td></tr>
-<tr><td>Unrelenting Assault</td><td>+10 Constitution per rank for 3 turns (Berserker
-talent, on dropping below 25% HP; at most once every 5 turns).</td></tr>
+<tr><td>Unrelenting Assault</td><td>+10 Constitution × ranks invested, for 3 turns
+(Berserker talent, on dropping below 25% HP; at most once every 5 turns).</td></tr>
 <tr><td>Endurance</td><td>+3%/rank armor per turn without an external heal (Warden talent);
 the chip tracks the streak and clears when healed.</td></tr>
 <tr><td>Iron Will</td><td>+5%/rank damage per debuff on the Warden (talent); a permanent
@@ -285,9 +288,7 @@ casts Healing Wave on the most wounded ally under 40% HP (friendly tanks and hea
 first); the Orc Shieldmaster ALWAYS casts Shielding when no ally carries its ward
 (lowest-HP ally first, itself included); the Withered Warden has a 60% chance to cast Wild
 Growth on the most wounded of its warband (itself included) when someone is below 70% HP.
-The Chief and the Ash-Wrought Tyrant build and spend Rage like a Warrior. An enemy with
-every ability cooling down and nothing to support <b>bides its time</b> (passes the
-turn).</p>
+The Chief and the Ash-Wrought Tyrant build and spend Rage like a Warrior.</p>
 <h3>4.9 There is no announcer</h3>
 <p>All battle information lives in the scrolling combat log (top right) and floating combat
 text. No banner text appears at the top of the battle.</p>
@@ -373,7 +374,7 @@ blocks land. Bruiser counts as a DAMAGE archetype (moved from Tank 07-16) — th
 attacks at 100.</p>
 <p>Every spec grants one passive plus abilities appended to the core kit. Specs are chosen once
 per run and are permanent. <b>Constitution by spec</b> (role-based Break resistance; class base
-in §5 applies before awakening): Warden 110 (+30 Bulwark = 140), Swordmaster 120, Berserker
+in §5 applies before awakening): Warden 110, Swordmaster 120, Berserker
 110, Devout 110, Holy 100, Beastmaster 100, Survivalist 100, Occultist 95, Arcanist 90,
 Sharpshooter 90, Pyromancer 85, Cryomancer 85.</p>
 
@@ -575,7 +576,7 @@ Elemental Weakness the resist reduction, Unrelenting Assault its borrowed Consti
 inventory: 2 Health, 1 Mana, 1 Bomb, 1 Revive, 1 Defense.</li>
 <li><b>Runes</b> (run-scoped gear, bought at the Peddler or dropped by elites): rarity roll
 60% Common (×1, 50g, "Cracked"), 30% Rare (×2, 100g, "Polished"), 10% Epic (×3, 160g,
-"Radiant") over templates: +10 max HP / +2% armor / +4 Speed / +12 Stability / +2% crit /
+"Radiant") over templates: +10 max HP / +2% armor / +4 Speed / +12 Constitution / +2% crit /
 +8 max Mana (per rarity multiplier). Each hero can <b>equip 2</b> (toggled on the party
 screen); shop offers avoid duplicates per hero.</li>
 <li><b>Relics</b> (permanent meta): one random unlock per boss kill, stored in
@@ -601,10 +602,9 @@ Sundering Strike 23%/22BD, 60% Sunder 2t. Resists: physical 10%.</td></tr>
 for 3 turns; only one ally holds the ward at a time, and it ALWAYS re-casts when no ally is
 shielded. Strike 37% physical/20BD (≈28).</td></tr>
 <tr><td>Orc Shaman (blue)</td><td>110</td><td>50</td><td>1%</td><td>100</td><td>80</td><td>Ranged
-support caster. Chain Lightning 30% nature + 15BD to the ENTIRE hero party (≈15), 2cd;
-<b>Healing Wave (NEW 07-16)</b> — heals the most wounded ally under 40% health for 25% of
-its max HP (friendly tanks and healers first), 2cd. With everything cooling down and nobody
-to heal, it "bides its time" (passes the turn). Resists: fire 25%, frost 25%, nature 50%.
+support caster. Chain Lightning 30% nature + 15BD to the ENTIRE hero party (≈15);
+<b>Healing Wave</b> — heals the most wounded ally under 40% health for 25% of
+its max HP (friendly tanks and healers first). Resists: fire 25%, frost 25%, nature 50%.
 (Lightning Bolt VAULTED 07-16 — removed but kept for future return.)</td></tr>
 <tr><td>Orc Chief (elite)</td><td>250</td><td>100</td><td>20%</td><td>80</td><td>130</td><td>Rage user:
 Strike 28%/26BD +15 Rage; Heavy Strike 30R 54%/40BD; Crushing Blow 20R 34%/56BD. Resists:
@@ -619,22 +619,26 @@ WEAK to frost (+25% damage taken).</td></tr>
 </table>
 <p><b>Compositions — the power-budget system (07-16):</b> every enemy carries a power
 value — <b>Raider 1, Archer 1, Shieldmaster 2, Shaman 2, Chief 4, Boss 7</b> — and every
-battle rolls a <b>power budget of 8–12</b> that is ALWAYS spent exactly. Generation is
-two-step: first a <b>theme</b> is chosen (the warband is cohesive, not random), then the
-budget fills that theme's roles. The battlefield holds at most <b>6 enemies</b>; the chosen
-theme opens the combat log ("Enemy warband: Ritual"). Chiefs stay out of REGULAR fights
-until global tier 3; elite nodes always roll a Chief-led theme; boss nodes always roll Boss
-Escort. Themes whose math can't spend a given budget simply don't appear on that roll
-(Swarm and Poison Volley only fit low budgets — they're the "light" encounters).</p>
+battle rolls a power budget that is ALWAYS spent exactly. <b>The budget scales across each
+zone</b> (tier = the floor within the zone, 1–11 with the boss on 11): <b>tiers 1–3 roll
+3–6, tiers 4–7 roll 6–9, tiers 8–11 (boss included) roll 10–12</b>. Later zones restart the
+ladder with a NEW enemy roster — different names, abilities, and higher base stats to match
+the reset (the Forest of Old roster is the current focus). Generation is two-step: first a
+<b>theme</b> is chosen (the warband is cohesive, not random), then the budget fills that
+theme's roles. The battlefield holds at most <b>6 enemies</b>; the chosen theme opens the
+combat log ("Enemy warband: Ritual"). <b>Chiefs appear ONLY in elite fights</b>; boss nodes
+always roll Boss Escort. Themes whose math can't spend a given budget don't appear on that
+roll — Swarm and Poison Volley rule the cheap early tiers, the heavy themes take over as
+the budget climbs.</p>
 <table border="1" cellpadding="4">
 <tr><th>Theme</th><th>Gameplay focus</th><th>Core units</th><th>Nodes</th></tr>
-<tr><td>Warband</td><td>Balanced encounter</td><td>Mix of everything (≥3 kinds)</td><td>fight</td></tr>
-<tr><td>Swarm</td><td>Many weak attackers</td><td>≥4 Raiders/Archers + support pair</td><td>fight</td></tr>
-<tr><td>Honor Guard</td><td>Keep one powerful unit alive</td><td>Chief + ≥2 Shieldmasters</td><td>fight (tier 3+), elite</td></tr>
+<tr><td>Warband</td><td>Balanced encounter</td><td>Mix of basics (≥3 kinds, no Chief)</td><td>fight</td></tr>
+<tr><td>Swarm</td><td>Many weak attackers</td><td>≥3 Raiders/Archers</td><td>fight</td></tr>
+<tr><td>Honor Guard</td><td>Keep one powerful unit alive</td><td>Chief + ≥2 Shieldmasters</td><td>elite</td></tr>
 <tr><td>Ritual</td><td>Protect the Shamans</td><td>≥2 Shamans + Shieldmaster</td><td>fight</td></tr>
 <tr><td>Poison Volley</td><td>Stack Poison</td><td>Mostly Archers (≥3, majority)</td><td>fight</td></tr>
 <tr><td>Lightning Storm</td><td>Party-wide magic damage</td><td>≥2 Shamans</td><td>fight</td></tr>
-<tr><td>Rage Company</td><td>Chiefs build Rage while others buy time</td><td>Chief(s) + ≥2 Raiders</td><td>fight (tier 3+), elite</td></tr>
+<tr><td>Rage Company</td><td>Chiefs build Rage while others buy time</td><td>Chief(s) + ≥2 Raiders</td><td>elite</td></tr>
 <tr><td>Guardian Circle</td><td>Constant wards</td><td>≥3 Shieldmasters</td><td>fight</td></tr>
 <tr><td>Elite Patrol</td><td>Few high-value enemies (≤4 units)</td><td>Chief + Shieldmaster + Shaman</td><td>elite</td></tr>
 <tr><td>Boss Escort</td><td>Boss supported by specialists</td><td>Boss + support units</td><td>boss</td></tr>
@@ -773,7 +777,8 @@ exported builds require DOD_DEBUG=1. The map burger menu gains a DEBUG section �
 advance to the next zone, and <b>Reroll Specs</b> (refunds spent talent points, clears all
 specs, and reopens the awakening screen). In battle, a <b>DEBUG ▾ menu</b> (bottom-right)
 offers: Full Restore (HP/resources/secondary for the party), <b>Reset cooldowns</b> (wipes
-every unit's ability and talent internal cooldowns and refreshes the open action bar), an
+the heroes' ability and talent internal cooldowns — enemies carry none — and refreshes the
+open action bar), an
 <b>Enemy attacks OFF</b> toggle (enemies skip their turns while checked), and a <b>turn
 lock</b> — pick a hero and every HERO turn is theirs until you unlock (re-select them) or
 lock a different hero, while <b>enemies keep attacking on their own turns</b> (combine with

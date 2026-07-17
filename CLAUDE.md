@@ -57,18 +57,23 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 
 ## Current systems snapshot (2026-07-16)
 ENCOUNTERS = POWER BUDGET (07-16): enemy power {raider/archer 1, sm/shaman
-2, chief 4, boss 7}; every battle rolls budget 8-12 and SPENDS IT EXACTLY
-via themed warbands (Run.THEMES two-step: theme → fill roles; combos
-enumerated in run_state._theme_combos; theme in encounter["theme"], logged
-at battle start; field caps at 6 — ENEMY_LAYOUTS has a 6-slot layout).
-Chiefs off regular fights until global tier 3 (CHIEF_TIER); elite nodes
-roll chief themes, boss nodes Boss Escort. Swarm/Poison Volley only fit
-low budgets (by math). ALL ABILITY COOLDOWNS -1 (07-16). Orc Shaman =
-support: Healing Wave (25% max HP, lowest sub-40% ally, tank/support
-enemy_role first, 2cd) + Chain Lightning; Lightning Bolt VAULTED; enemies
-with no usable attack "bide their time" (guarded — never pick_random on
-empty). Log itemizes mitigation: "(nature resist -8) (armor -12)
-(WEAK! +9)".
+2, chief 4, boss 7}; every battle SPENDS ITS BUDGET EXACTLY via themed
+warbands (Run.THEMES two-step: theme → fill roles; combos enumerated in
+run_state._theme_combos; theme in encounter["theme"], logged at battle
+start; field caps at 6 — ENEMY_LAYOUTS has a 6-slot layout). BUDGET
+SCALES PER ZONE (Run.battle_budget; in-zone tier = floor_idx+1): t1-3 →
+3-6, t4-7 → 6-9, t8-11 incl boss → 10-12; later zones restart the ladder
+with NEW tougher rosters (TODO — Forest of Old only for now). CHIEFS ONLY
+IN ELITE FIGHTS (Honor Guard/Rage Company/Elite Patrol are elite-node
+themes; Warband pool has no chief). Swarm/Poison Volley only fit low
+budgets (by math). ALL HERO ABILITY COOLDOWNS -1 (07-16); ENEMIES HAVE NO
+COOLDOWNS AT ALL (kits carry none; AI gates by resources/conditions; the
+"bides its time" fallback was removed — every enemy always has a 0-cost
+attack, keep it that way or _enemy_turn's pick_random crashes on empty).
+Orc Shaman = support: Healing Wave (25% max HP, lowest sub-40% ally,
+tank/support enemy_role first) + Chain Lightning; Lightning Bolt VAULTED.
+Burn REAPPLICATION extends duration +3 turns (unit.add_status). Log
+itemizes mitigation: "(nature resist -8) (armor -12) (WEAK! +9)".
 ATTACK & SCALING (07-16): every unit has an Attack stat; ability `damage`
 is a PERCENT of the user's current Attack. Role bases: Damage 100 / Tank 75
 / Support 50 (Classes.spec_attack; Bruiser = Damage role; per-spec stat

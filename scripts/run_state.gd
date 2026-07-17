@@ -164,30 +164,25 @@ func advance(f: int, i: int) -> void:
 
 # ---------- themed encounter generation (the budget system) ----------
 
-# Every enemy carries a power value; every battle rolls a power budget of
-# 8–12 and SPENDS IT EXACTLY. Generation is two-step: pick a THEME (a
-# cohesive warband, not a random mob), then fill its roles until the budget
-# is gone. The field holds at most 6 enemies.
+# Every enemy carries a power value; every battle rolls a power budget and
+# SPENDS IT EXACTLY. Generation is two-step: pick a THEME (a cohesive
+# warband, not a random mob), then fill its roles until the budget is gone.
+# The field holds at most 6 enemies. CHIEFS ONLY APPEAR IN ELITE FIGHTS.
 const ENEMY_POWER := {"raider": 1, "archer": 1, "shieldmaster": 2, "shaman": 2,
 	"chief": 4, "boss": 7}
 const MAX_FIELD := 6
-const BUDGET_MIN := 8
-const BUDGET_MAX := 12
-# Chiefs stay out of REGULAR fights until this global node tier (elite and
-# boss nodes are unaffected) so the early road stays survivable.
-const CHIEF_TIER := 3
 
 # pool: kind -> max copies. mins: kind -> required copies. Optional checks:
 # min_units / max_units, min_kinds (distinct kinds), min_weak (Raiders +
 # Archers), majority (that kind fills at least half the slots). nodes:
 # which node types the theme can appear on.
 const THEMES := {
-	"Warband": {"pool": {"raider": 3, "archer": 3, "shieldmaster": 2, "shaman": 2,
-		"chief": 1}, "min_kinds": 3, "nodes": ["fight"]},
+	"Warband": {"pool": {"raider": 3, "archer": 3, "shieldmaster": 2, "shaman": 2},
+		"min_kinds": 3, "nodes": ["fight"]},
 	"Swarm": {"pool": {"raider": 5, "archer": 5, "shieldmaster": 2, "shaman": 2},
-		"min_weak": 4, "min_units": 5, "nodes": ["fight"]},
+		"min_weak": 3, "min_units": 3, "nodes": ["fight"]},
 	"Honor Guard": {"pool": {"chief": 1, "shieldmaster": 3, "raider": 2, "archer": 2},
-		"mins": {"chief": 1, "shieldmaster": 2}, "nodes": ["fight", "elite"]},
+		"mins": {"chief": 1, "shieldmaster": 2}, "nodes": ["elite"]},
 	"Ritual": {"pool": {"shaman": 3, "shieldmaster": 3, "raider": 2},
 		"mins": {"shaman": 2, "shieldmaster": 1}, "nodes": ["fight"]},
 	"Poison Volley": {"pool": {"archer": 4, "raider": 1, "shieldmaster": 2, "shaman": 1},
@@ -195,7 +190,7 @@ const THEMES := {
 	"Lightning Storm": {"pool": {"shaman": 4, "shieldmaster": 2, "raider": 2, "archer": 2},
 		"mins": {"shaman": 2}, "nodes": ["fight"]},
 	"Rage Company": {"pool": {"chief": 2, "raider": 4, "archer": 2},
-		"mins": {"chief": 1, "raider": 2}, "nodes": ["fight", "elite"]},
+		"mins": {"chief": 1, "raider": 2}, "nodes": ["elite"]},
 	"Guardian Circle": {"pool": {"shieldmaster": 5, "shaman": 1, "raider": 2, "archer": 2},
 		"mins": {"shieldmaster": 3}, "nodes": ["fight"]},
 	"Elite Patrol": {"pool": {"chief": 2, "shieldmaster": 2, "shaman": 2, "raider": 1,
@@ -208,9 +203,21 @@ const THEMES := {
 var last_theme := ""  # theme of the most recently composed encounter
 
 
+# The budget scales across EACH ZONE (tier = the floor within the zone,
+# 1-11 with the boss on 11): tiers 1-3 roll 3-6, tiers 4-7 roll 6-9,
+# tiers 8-11 roll 10-12. Later zones restart the ladder with a tougher
+# roster carrying higher base stats (Forest of Old is the focus for now).
+func battle_budget() -> int:
+	var tier := clampi(floor_idx + 1, 1, FLOORS)
+	if tier <= 3:
+		return randi_range(3, 6)
+	if tier <= 7:
+		return randi_range(6, 9)
+	return randi_range(10, 12)
+
+
 func compose(node_type: String) -> Array:
-	var budget := randi_range(BUDGET_MIN, BUDGET_MAX)
-	var tier := zone_idx * FLOORS + maxi(floor_idx, 0)
+	var budget := battle_budget()
 	var candidates: Array = []
 	for theme_name in THEMES:
 		if THEMES[theme_name]["nodes"].has(node_type):
@@ -218,19 +225,16 @@ func compose(node_type: String) -> Array:
 	candidates.shuffle()
 	for theme_name in candidates:
 		var combos := _theme_combos(THEMES[theme_name], budget)
-		# Chiefs stay off early regular fights.
-		if node_type == "fight" and tier < CHIEF_TIER:
-			combos = combos.filter(func(c): return not c.has("chief"))
 		if combos.is_empty():
 			continue  # theme can't spend this budget — try another
 		last_theme = theme_name
 		var warband: Array = combos.pick_random()
 		warband.shuffle()
 		return warband
-	# Nothing fit (can't happen while Warband exists) — plain mob fallback.
+	# Nothing fit — plain mob fallback (kept as a safety net).
 	last_theme = "Warband"
 	var fallback: Array = []
-	for i in clampi(budget / 2, 3, 5):
+	for i in clampi(budget / 2, 2, 5):
 		fallback.append(["raider", "archer", "shieldmaster", "shaman"].pick_random())
 	return fallback
 

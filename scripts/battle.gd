@@ -495,7 +495,7 @@ func _orc_raider_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Slash", "damage": 34, "pressure": 26,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Sundering Strike", "cooldown": 1, "damage": 23, "pressure": 22,
+		Ability.make({"display_name": "Sundering Strike", "damage": 23, "pressure": 22,
 			"delay": 2.5, "anim": "attack02",
 			"applies_status": {"id": "sunder", "turns": 2}, "status_chance": 0.6}),
 	]
@@ -505,7 +505,7 @@ func _orc_archer_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Arrow Shot", "damage": 21, "pressure": 16,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Poison Arrow", "cooldown": 1, "dmg_type": "nature",
+		Ability.make({"display_name": "Poison Arrow", "dmg_type": "nature",
 			"damage": 16, "pressure": 14,
 			"delay": 2.5, "anim": "attack02",
 			"applies_status": {"id": "poison", "turns": 3}, "status_chance": 0.7}),
@@ -518,7 +518,7 @@ func _orc_shieldmaster_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Strike", "damage": 37, "pressure": 20,
 			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Shielding", "cooldown": 2, "special": "enemy_shield",
+		Ability.make({"display_name": "Shielding", "special": "enemy_shield",
 			"delay": 2.5, "anim": "attack02", "target": Ability.Target.ALLY,
 			"description": "Wards an ally: 25% less damage taken for 3 turns."}),
 	]
@@ -530,9 +530,9 @@ func _orc_shieldmaster_kit() -> Array:
 #   "dmg_type": "nature"}
 func _orc_shaman_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Chain Lightning", "cooldown": 2, "damage": 30, "pressure": 15,
+		Ability.make({"display_name": "Chain Lightning", "damage": 30, "pressure": 15,
 			"delay": 3.0, "anim": "attack02", "dmg_type": "nature", "aoe": true}),
-		Ability.make({"display_name": "Healing Wave", "cooldown": 2, "special": "healing_wave",
+		Ability.make({"display_name": "Healing Wave", "special": "healing_wave",
 			"delay": 2.5, "anim": "attack02", "target": Ability.Target.ALLY,
 			"description": "Mends the most wounded ally under 40%\nhealth for 25% of their max HP\n(tanks and healers first)."}),
 	]
@@ -541,13 +541,13 @@ func _orc_shaman_kit() -> Array:
 # Zone 1 boss: a nature bruiser that dazes, poisons, and tends its escorts.
 func _withered_warden_kit() -> Array:
 	return [
-		Ability.make({"display_name": "Timber Slam", "cooldown": 1, "damage": 60, "pressure": 30,
+		Ability.make({"display_name": "Timber Slam", "damage": 60, "pressure": 30,
 			"delay": 3.0, "anim": "attack01", "dmg_type": "nature",
 			"applies_status": {"id": "dazed", "turns": 3}}),
-		Ability.make({"display_name": "Roots of Wrath", "cooldown": 2, "damage": 25, "pressure": 20,
+		Ability.make({"display_name": "Roots of Wrath", "damage": 25, "pressure": 20,
 			"delay": 3.5, "anim": "attack02", "dmg_type": "nature", "aoe": true,
 			"applies_status": {"id": "poison", "turns": 3}}),
-		Ability.make({"display_name": "Wild Growth", "cooldown": 2, "special": "wild_growth",
+		Ability.make({"display_name": "Wild Growth", "special": "wild_growth",
 			"delay": 2.5, "anim": "attack02", "target": Ability.Target.ALLY,
 			"description": "Heals an ally for 20% of their max health."}),
 	]
@@ -558,9 +558,9 @@ func _orc_chief_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Strike", "damage": 28, "pressure": 26,
 			"resource_gain": 15, "delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Heavy Strike", "cooldown": 2, "cost": 30, "damage": 54,
+		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 54,
 			"pressure": 40, "delay": 4.0, "anim": "attack02"}),
-		Ability.make({"display_name": "Crushing Blow", "cooldown": 2, "cost": 20, "damage": 34,
+		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 34,
 			"pressure": 56, "delay": 4.0, "anim": "attack02"}),
 	]
 
@@ -1740,7 +1740,7 @@ func _enemy_turn(u: BattleUnit) -> void:
 		var fellows := enemies.filter(func(e): return not e.dead and e != u)
 		# Maddened units ATTACK their allies — support abilities stay sheathed.
 		var mf_options: Array = u.abilities.filter(
-			func(a): return a.cost <= u.resource and a.damage > 0 and u.ability_ready(a))
+			func(a): return a.cost <= u.resource and a.damage > 0)
 		if not fellows.is_empty() and not mf_options.is_empty():
 			var mf_target: BattleUnit = fellows.pick_random()
 			_message("%s turns on its allies!" % u.unit_name)
@@ -1768,14 +1768,7 @@ func _enemy_turn(u: BattleUnit) -> void:
 	# Only damaging, off-cooldown abilities count as attacks; support casts
 	# are chosen above.
 	var affordable: Array = u.abilities.filter(
-		func(a): return a.cost <= u.resource and a.damage > 0 and u.ability_ready(a))
-	if affordable.is_empty():
-		# Everything on cooldown and nobody to support (a Shaman between
-		# casts): the turn passes.
-		_log("%s bides its time" % u.unit_name, "#909090")
-		u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
-		await _wait(0.4)
-		return
+		func(a): return a.cost <= u.resource and a.damage > 0)
 	var broken_heroes := living.filter(func(h): return h.broken)
 	if not broken_heroes.is_empty():
 		# Exploit a Broken hero with the hardest-hitting attack they can afford.
@@ -1811,10 +1804,12 @@ func _threat_pick(pool: Array) -> BattleUnit:
 # [ability, ally_target], or [] to fall through to a normal attack.
 func _enemy_support_action(u: BattleUnit) -> Array:
 	var allies: Array = enemies.filter(func(e): return not e.dead)
+	# (Enemies don't use cooldowns — their support casts are gated by the
+	# conditions below and by resources alone.)
 	# Shaman: Healing Wave the most wounded ally under 40% health —
 	# friendly tanks and healers first.
 	var wave := _find_ability(u, "Healing Wave")
-	if wave != null and u.ability_ready(wave):
+	if wave != null:
 		var hurt: Array = allies.filter(func(a): return a.hp < a.max_hp * 0.40)
 		if not hurt.is_empty():
 			var prio: Array = hurt.filter(
@@ -1822,12 +1817,12 @@ func _enemy_support_action(u: BattleUnit) -> Array:
 			return [wave, _lowest_hp(prio if not prio.is_empty() else hurt)]
 	# Shieldmaster: always keeps exactly one ally Shielded (lowest HP first).
 	var shield_ab := _find_ability(u, "Shielding")
-	if shield_ab != null and u.ability_ready(shield_ab) \
+	if shield_ab != null \
 			and not allies.any(func(a): return a.has_status("shielded")):
 		return [shield_ab, _lowest_hp(allies)]
 	# Withered Warden: tends the most wounded of its warband (itself included).
 	var growth := _find_ability(u, "Wild Growth")
-	if growth != null and u.ability_ready(growth):
+	if growth != null:
 		var wounded: Array = allies.filter(func(a): return a.hp < a.max_hp * 0.7)
 		if not wounded.is_empty() and randf() < 0.6:
 			return [growth, _lowest_hp(wounded)]
