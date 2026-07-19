@@ -157,9 +157,20 @@ received, Hunter acts first, Mage +10 mana/turn — shown on draft cards,
 the awakening screen, and the party sheet (sheet stats mirror battle math:
 spec constitution + Toughness, stance-aware passive text). Mocking Blow taunt; ability hotkeys by MENU slot; Tab/Space/
 X/Alt controls; Space continues victory screens. TALENT TREES ARE FIXED-
-ONLY (berserker/swordmaster/warden 12-node grids, row gating 5/10/15 +
-prereqs, talents.gd; others "coming soon"; Hardiness mechanic PENDING for
-Tenacity/Rally). Talent ranks ADDITIVE. Warrior kits reshuffled 07-15
+ONLY (berserker/swordmaster/warden/pyromancer 12-node grids, row gating
+5/10/15 + prereqs, talents.gd; others "coming soon"). Talent ranks
+ADDITIVE. PYROMANCER TREE (07-18): Accelerant (+1%/rank burn tick, in
+_dot_tick), Pyromaniac (+1%/rank inferno step), Super Nova (Detonation
+crit), Invigorating Ashes + Melt Armor (burn-tick site in _run_battle;
+melt = enemy "melted" chip + unit.melted armor shred, in DEBUFF_IDS),
+Molten Core (target-side), Explosive Force (fire-crit burn extend),
+Seeding Embers (unit.burn_at_death captured in _die, harvested in
+_update_talent_chips → "seeding" buff), Ashes of Al'ar (self-revive in
+take_hit/take_tick_damage, 11%/rank, ashes_used once/battle), Implosion
+(Detonation echo via _free_copy). Talent abilities: Flame Shield
+("flame_shield" special+status, self-cast, thorn burn in the Trapper
+block; perfect = pulse ticks all burning) and Firestorm capstone
+(random_hits, 6-8 bolts rolled by display_name in _resolve, 7-9 perfect). Warrior kits reshuffled 07-15
 (Crushing Blow to Warden, Sweeping Strikes, talent-granted Lunge/Execute/
 Shieldwall v2/Hold the Line/Battle Shout/Rampage-recast). Unit UI lives on NAMEPLATE stacks
 (180px plates, heroes left edge, enemies right; portrait + name + bars +

@@ -248,6 +248,12 @@ the chip tracks the streak and clears when healed.</td></tr>
 chip whose value follows the live debuff count.</td></tr>
 <tr><td>Crushing Blows</td><td>+3%/rank armor penetration per 20 total enemy-party
 bloodloss (Berserker talent); a permanent chip with the live value.</td></tr>
+<tr><td>Flame Shield</td><td>Takes 50% less damage; attackers are set Burning for 3 turns
+(Pyromancer talent ability, 2 turns).</td></tr>
+<tr><td>Seeding Embers</td><td>Bonus damage on the next turn, harvested from an enemy that
+died Burning (Pyromancer talent); the chip shows the live %.</td></tr>
+<tr><td>Melt Armor</td><td>Armor burned away for the battle by Burn ticks (Pyromancer
+talent); sits on the ENEMY with the live −% on the chip.</td></tr>
 <tr><td>Hold the Line</td><td>Takes 50% less Break damage (Warden capstone).</td></tr>
 <tr><td>Undying</td><td>Cannot drop below 1 HP (Warden capstone).</td></tr>
 <tr><td>Sunder</td><td>−35% armor.</td></tr>
@@ -438,6 +444,10 @@ Wildfire — 20 Mana, 20% Atk fire / 10 BD / 2.0, 3cd; spreads the target's Burn
 enemies at HALF its remaining duration (rounded up; corpses block the spread).<br>
 Flamewave — 25 Mana, 15% Atk fire to ALL / 5 BD / 3.0, 2cd; enemies already Burning burn
 2 turns longer (Perfect: 3 turns).<br>
+<i>Talent-granted:</i> Flame Shield — 15 Mana, 2.0, 2cd, self-cast: take 50% less damage
+for 2 turns and attackers are set Burning 3 turns (Perfect: also triggers an immediate Burn
+tick on every burning enemy). Firestorm — 30 Mana, 3.5, 4cd, capstone: 6-8 bolts at RANDOM
+enemies for 12% Atk each, each bolt applying 2 turns of Burn (Perfect: 7-9 bolts).<br>
 VAULTED 07-16 (kept for later): Pyroblast, Flame Surge, Phoenix Rebirth.</li>
 <li><b>Cryomancer (Nuker)</b> — Passive <i>Chill</i>: damaging spells 50% chance to apply
 Chilled (2 turns) — the Cryomancer-only frost slow; generic sources apply Slowed instead.<br>
@@ -526,9 +536,9 @@ turns). The player picks both targets; each fragment rolls miss/parry separately
 </ul>
 
 <h2>7. Talents</h2>
-<p><b>Trees are FIXED and designed, no longer thematic/generated.</b> Three exist so far —
-<b>Berserker, Swordmaster, Warden</b> (designed in the RPG Skill Tree Generator; source
-JSONs in data/talent-tree-*.json). Every other spec shows <b>"Coming soon."</b> on the party
+<p><b>Trees are FIXED and designed, no longer thematic/generated.</b> Four exist so far —
+<b>Berserker, Swordmaster, Warden, Pyromancer</b> (designed in the RPG Skill Tree Generator;
+source JSONs in data/talent-tree-*.json). Every other spec shows <b>"Coming soon."</b> on the party
 screen until its tree is designed. Points still accrue from victories (fight 1, elite 2,
 boss 3; Waystone +1) and bank until a tree exists.</p>
 <p><b>Ranks are additive:</b> when a node offers an increase by a specified amount, every
@@ -569,6 +579,16 @@ battle; battle-long gains don't leak into the save), Shieldwall (grants the abil
 was 3 — per turn without an external heal, resets when healed ×3), Sundering (Crushing Blow
 splashes 25%/rank of its BD to the enemies <b>Adjacent</b> to the target ×3). Capstone —
 Hold the Line (grants the ability).</p>
+<p><b>Pyromancer tree (added 07-18):</b> Row 1 — Accelerant (Burn ticks +1%/rank of Attack
+×3), Pyromaniac (Inferno Master step +1%/rank ×3), Super Nova (Detonation +3%/rank crit
+×3). Row 2 — Invigorating Ashes (each Burn tick 5%/rank chance to restore 2% max Mana ×3),
+Molten Core (2%/rank less damage from burning enemies ×3), Flame Shield (grants the
+ability), Explosive Force (fire crits extend the target's Burn +1 turn/rank ×3), Seeding
+Embers (enemy dies Burning: +1%/rank damage per remaining Burn turn, next turn ×3). Row 3 —
+Melt Armor (every Burn tick melts 1%/rank armor off the victim for the battle, shown as an
+enemy chip ×3), Ashes of Al'ar (on death: 11%/rank chance to revive at 25% HP, once per
+battle ×3), Implosion (Detonation 3%/rank chance to strike twice ×3). Capstone — Firestorm
+(grants the ability).</p>
 <p><b>Tooltip display:</b> talent tooltips never say "per rank" — the number shown grows
 with the points invested (3% → 6% → 9%; unlearned nodes preview the 1-point value).</p>
 <p><b>Talent visibility:</b> every talent proc is written to the combat log with a
@@ -753,7 +773,7 @@ scaling, and the spec passive line bakes in talent ranks (Aggressive/Defensive S
 Unstoppable) — the class passive + spec passive lines, ability chips (hover shows real
 numbers AND the "% of Attack" scaling), rune equip toggles (2 max), and the spec's talent
 tree: a 12-node grid with prerequisite connector lines and click-to-learn nodes (lock
-reasons on the node tooltips) for Berserker / Swordmaster / Warden, or <b>"Coming soon."</b>
+reasons on the node tooltips) for Berserker / Swordmaster / Warden / Pyromancer, or <b>"Coming soon."</b>
 for specs whose trees aren't designed yet.</li>
 <li><b>Awakening screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
 along on every path the class can take) and each ability's damage with its "% Atk" scaling.
@@ -826,8 +846,8 @@ only the Tyrant's frost weakness is set) and Counter Attack (defined term; no ta
 ability grants it yet).</li>
 <li>The Withered Warden has its own kit; the Ash-Wrought Tyrant is still a Chief stand-in —
 unique kit + art planned. Boss art for both pending.</li>
-<li>Hunter spec talent pools need signatures; only the Berserker has a designed FIXED talent
-tree; full rune loot table pending; relic pool (5) needs growth.</li>
+<li>Trees still to design: Cryomancer, Arcanist, all three Cleric specs, all three Hunter
+specs; full rune loot table pending; relic pool (5) needs growth.</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>
 <li>The sim bot currently wins ~100% of standard fights (target ≈85%) — difficulty leans
 easy; real tuning comes from playtests.</li>

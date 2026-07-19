@@ -56,6 +56,8 @@ const STATUS_INFO := {
 	"hold_bd": ["Hold the Line", "HL", Color(0.95, 0.82, 0.45), "Takes 50% less Break damage."],
 	"undying": ["Undying", "UD", Color(1.0, 0.95, 0.75), "Cannot drop below 1 HP."],
 	"rally_heal": ["Rallied", "R+", Color(0.95, 0.75, 0.45), "+15% healing received\n(the Warden's Rally)."],
+	"flame_shield": ["Flame Shield", "FS", Color(1.0, 0.55, 0.25), "Takes 50% less damage; attackers\nare set Burning (3 turns)."],
+	"seeding": ["Seeding Embers", "SE", Color(1.0, 0.65, 0.3), "Empowered by a burning death:\nbonus damage on the next turn."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -947,6 +949,27 @@ func _run_battle() -> void:
 				var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
 				_log("%s takes %d %s damage%s" % [u.unit_name, dot_dmg, info[0],
 					stack_tag], "#e08850")
+				# Pyromancer burn-tick talents: mana sipped from the flames,
+				# armor melting off the victim (shown as a chip).
+				if dot_id == "burn" and not u.is_hero:
+					for h in heroes:
+						if h.dead:
+							continue
+						if h.invigorating_ranks > 0 and h.resource_name == "Mana" \
+								and randf() < 0.05 * h.invigorating_ranks:
+							var ash_mana := maxi(int(h.max_resource * 0.02), 1)
+							h.resource = mini(h.resource + ash_mana, h.max_resource)
+							h.refresh_bars()
+							h.float_text("+%d Mana" % ash_mana, Color(0.5, 0.7, 1.0))
+							_log("   → Talent: Invigorating Ashes — %s sips %d Mana" % [
+								h.unit_name, ash_mana], "#b0a8e0")
+						if h.melt_ranks > 0 and not u.dead:
+							u.melted += 0.01 * h.melt_ranks
+							var melt_pct := int(round(u.melted * 100))
+							var melt_desc := "Melt Armor: %d%% armor burned away\nfor the rest of the battle." % melt_pct
+							if not u.update_status("melted", "-%d%%" % melt_pct, melt_desc):
+								u.add_status("melted", "Melt Armor", "-%d%%" % melt_pct,
+									Color(1.0, 0.5, 0.2), -1, melt_desc)
 				await _wait(0.5)
 				if dot_died:
 					_message("%s succumbs to %s!" % [u.unit_name, info[0]])
@@ -1043,7 +1066,8 @@ func _update_talent_chips() -> void:
 		h.update_status("crushing_blows", "+%d%%" % pen,
 			"Crushing Blows: +3%% armor penetration per\nrank for every 20 bloodloss on the enemy\nteam. Currently +%d%% (%d total bloodloss)." % [
 				pen, party_bleed])
-	# Inferno Master: the Pyromancer's passive chip tracks burning enemies.
+	# Inferno Master: the Pyromancer's passive chip tracks burning enemies
+	# (Pyromaniac raises the per-enemy step).
 	var burning := 0
 	for foe in enemies:
 		if not foe.dead and foe.has_status("burn"):
@@ -1051,9 +1075,31 @@ func _update_talent_chips() -> void:
 	for h in heroes:
 		if h.dead or h.passive_id != "inferno":
 			continue
-		var inf_pct: int = mini(burning, 5) * 5
+		var inf_step: int = 5 + h.pyromaniac_ranks
+		var inf_pct: int = mini(burning, 5) * inf_step
 		h.update_status("spec_passive", "+%d%%" % inf_pct,
-			"Inferno Master: +5%% damage for each burning\nenemy (up to +25%%).\nCurrently +%d%% (%d burning)." % [inf_pct, burning])
+			"Inferno Master: +%d%% damage for each burning\nenemy (up to +%d%%).\nCurrently +%d%% (%d burning)." % [
+				inf_step, inf_step * 5, inf_pct, burning])
+	# Seeding Embers: harvest burning deaths (once per corpse).
+	for foe in enemies:
+		if not foe.dead or foe.seeding_consumed or foe.burn_at_death <= 0:
+			continue
+		foe.seeding_consumed = true
+		for h in heroes:
+			if h.dead or h.seeding_ranks == 0:
+				continue
+			var prev: int = maxi(h.status_power("seeding"), 0) \
+				if h.has_status("seeding") else 0
+			var seed_pct: int = prev + h.seeding_ranks * foe.burn_at_death
+			var sinfo: Array = STATUS_INFO["seeding"]
+			var seed_desc := "Seeding Embers: +%d%% damage for the\nnext turn (harvested from a death with\n%d Burn turns left)." % [
+				seed_pct, foe.burn_at_death]
+			if not h.update_status("seeding", "+%d%%" % seed_pct, seed_desc,
+					seed_pct, 2):
+				h.add_status("seeding", sinfo[0], "+%d%%" % seed_pct, sinfo[2],
+					2, seed_desc, seed_pct)
+			_log("   → Talent: Seeding Embers — %s gains +%d%% damage for a turn" % [
+				h.unit_name, seed_pct], "#b0a8e0")
 
 
 func _player_turn(u: BattleUnit) -> void:
@@ -1098,7 +1144,7 @@ func _player_turn(u: BattleUnit) -> void:
 		if ab.special in ["rally", "focus", "surge", "shieldwall", "quickdraw",
 				"phoenix", "hymn", "retaliate", "unity", "tripwire", "summon",
 				"mana_shield", "divine_wrath", "shield_block", "hold_the_line",
-				"battle_shout"]:
+				"battle_shout", "flame_shield"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "resurrection":
 			# Resurrection targets the FALLEN (the usable gate guarantees one).
@@ -1195,6 +1241,14 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 		"mage":
 			# Pyromancer: keep fires lit, detonate ripe burns, wave wide.
 			var burning_foes := foes.filter(func(e): return e.has_status("burn"))
+			var fstorm := _find_ability(u, "Firestorm")
+			if fstorm != null and u.resource >= fstorm.cost and u.ability_ready(fstorm) \
+					and foes.size() >= 3:
+				return [fstorm, target_foe]
+			var fshield := _find_ability(u, "Flame Shield")
+			if fshield != null and u.resource >= fshield.cost and u.ability_ready(fshield) \
+					and not u.has_status("flame_shield") and u.hp < u.max_hp * 0.7:
+				return [fshield, u]
 			var fwave := _find_ability(u, "Flamewave")
 			if fwave != null and u.resource >= fwave.cost and u.ability_ready(fwave) \
 					and burning_foes.size() >= 2:
@@ -2018,6 +2072,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			total_hits = ab.random_hits + (1 if is_perfect and ab.perfect_extra_hit else 0)
 		elif ab.multi_hits > 0:
 			total_hits = ab.multi_hits + (1 if is_perfect and ab.perfect_extra_hit else 0)
+		# Firestorm: 6-8 bolts from the sky (7-9 on a perfect).
+		if ab.display_name == "Firestorm":
+			total_hits = randi_range(6, 8) + (1 if is_perfect else 0)
 		var total_dealt := 0
 		var any_crit := false
 		for hit_i in total_hits:
@@ -2159,6 +2216,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if attacker.blade_crit_ranks > 0 \
 					and ab.display_name in ["Lunge", "Overpower"]:
 				crit_chance += 0.03 * attacker.blade_crit_ranks
+			# Super Nova: Detonation crits harder into the ash.
+			if attacker.supernova_ranks > 0 and ab.display_name == "Detonation":
+				crit_chance += 0.03 * attacker.supernova_ranks
 			if is_perfect and ab.display_name == "Frost Bolt":
 				crit_chance += 0.05
 			if is_perfect and ab.display_name == "Aimed Shot":
@@ -2225,13 +2285,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw += 0.5 * strike_target.pressure
 			if attacker.has_status("empower"):
 				raw *= 1.25
-			# Inferno Master: the Pyromancer feeds on every fire still burning.
+			# Inferno Master: the Pyromancer feeds on every fire still burning
+			# (Pyromaniac deepens the per-enemy step).
 			if attacker.passive_id == "inferno":
 				var burning := 0
 				for foe in enemies:
 					if not foe.dead and foe.has_status("burn"):
 						burning += 1
-				raw *= 1.0 + 0.05 * mini(burning, 5)
+				raw *= 1.0 + 0.01 * (5 + attacker.pyromaniac_ranks) * mini(burning, 5)
+			# Seeding Embers: a burning death fuels the next swing.
+			if attacker.has_status("seeding"):
+				raw *= 1.0 + attacker.status_power("seeding") / 100.0
 			if attacker.has_status("cripple"):
 				raw *= 0.75
 			# Blood Frenzy: +2% damage (plus Unstoppable) per 5% of HP missing.
@@ -2271,6 +2335,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if strike_target.passive_id == "seasoned" \
 					and strike_target.hp <= strike_target.max_hp * 0.5:
 				raw *= 0.85 - strike_target.seasoned_def_bonus
+			# Molten Core: burning attackers bite softer on the Pyromancer.
+			if strike_target.molten_ranks > 0 and attacker.has_status("burn"):
+				raw *= 1.0 - 0.02 * strike_target.molten_ranks
+			# Flame Shield: the fire barrier halves what gets through.
+			if strike_target.has_status("flame_shield"):
+				raw *= 0.5
 			if debug_prints and attacker.second_resource_name == "Resonance":
 				print("[DBG] %s attacks @%d stacks: base %d -> raw %.1f" % [
 					attacker.unit_name, attacker.second_resource, ab.damage, raw])
@@ -2487,6 +2557,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and not attacker.dead and randf() < 0.25:
 				_apply_status(attacker, "poison", 5, 0,
 					_dot_tick("poison", strike_target))
+			# Flame Shield: whoever strikes the shielded Pyromancer ignites.
+			if strike_target.has_status("flame_shield") and not attacker.is_hero \
+					and not attacker.dead:
+				_apply_status(attacker, "burn", 3,
+					int(round((CRIT_CHANCE + strike_target.crit_bonus) * 100)),
+					_dot_tick("burn", strike_target))
 			# Pyromancer fire package (07-16 kit).
 			if detonated > 0:
 				_log("   → Detonation consumes the Burn (+%d bonus damage)" % detonated,
@@ -2517,6 +2593,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				strike_target.float_text("Burn +%d turns" % fw_ext, binfo[2])
 				_log("   → Flamewave stokes %s's Burn (+%d turns)" % [
 					strike_target.unit_name, fw_ext], "#e08850")
+			# Explosive Force: a fire crit fans the flames longer.
+			if is_crit and ab.dmg_type == "fire" and attacker.explosive_ranks > 0 \
+					and not strike_target.dead and strike_target.has_status("burn"):
+				var ef := strike_target.get_status("burn")
+				var ef_info: Array = STATUS_INFO["burn"]
+				strike_target.update_status("burn", ef_info[1], ef_info[3], -1,
+					int(ef.turns) + attacker.explosive_ranks)
+				_log("   → Talent: Explosive Force — the crit extends the Burn (+%d)" % \
+					attacker.explosive_ranks, "#b0a8e0")
 			if is_perfect:
 				_apply_perfect_bonus(attacker, strike_target, ab, result.died)
 			# Retaliation stance: the victim counters with their basic attack.
@@ -2540,6 +2625,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_message("%s falls!" % strike_target.unit_name)
 				_log("† %s dies" % strike_target.unit_name, "#e05050")
 				await _wait(0.5)
+			# Implosion: Detonation can slam twice (free echo strike).
+			if ab.display_name == "Detonation" and not is_counter \
+					and attacker.is_hero and attacker.implosion_ranks > 0 \
+					and not strike_target.dead and not attacker.dead \
+					and randf() < 0.03 * attacker.implosion_ranks:
+				strike_target.float_text("IMPLOSION", Color(1.0, 0.5, 0.15))
+				_log("Talent: Implosion — the Detonation strikes twice!", "#b0a8e0")
+				await _wait(0.35)
+				await _resolve(attacker, _free_copy(ab), strike_target, "good", true)
 			# Counter Attack: granted by specific effects — a parry answers
 			# with an immediate basic attack (nothing grants it yet).
 			if parried and strike_target.counter_attacks and not is_counter \
@@ -2708,10 +2802,14 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 
 
 # DoT strength snapshots the APPLIER's Attack: Burn 6%, Poison 3% per stack.
+# Accelerant (Pyromancer talent) hardens Burn ticks by +1%/rank.
 func _dot_tick(id: String, applier: BattleUnit) -> int:
 	if applier == null or not DOT_STATUSES.has(id):
 		return 0
-	return maxi(int(round(DOT_STATUSES[id] * 0.01 * applier.attack)), 1)
+	var pct: int = DOT_STATUSES[id]
+	if id == "burn":
+		pct += applier.accelerant_ranks
+	return maxi(int(round(pct * 0.01 * applier.attack)), 1)
 
 
 # Arcane Resonance: builds on damaging casts (2 on crit via Arcane Instability);
@@ -3020,6 +3118,29 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
 			_log("%s: Wild Growth heals %s for %d (20%% max HP)" % [attacker.unit_name,
 				target.unit_name, growth], "#70d878")
+		"flame_shield":
+			_sfx("parry", -7.0, 1.1)
+			_apply_status(attacker, "flame_shield", 2)
+			_message("%s ignites the air!" % attacker.unit_name)
+			_log("%s: Flame Shield — 50%% less damage taken; attackers ignite (2 turns)" % \
+				attacker.unit_name, "#70d878")
+			if is_perfect:
+				# The ignition pulse: every burning enemy ticks RIGHT NOW.
+				for foe in enemies:
+					if foe.dead or not foe.has_status("burn"):
+						continue
+					var fs_tick := int(foe.get_status("burn").get("tick", 0))
+					if fs_tick <= 0:
+						fs_tick = DOT_STATUSES["burn"]
+					var fs_died: bool = foe.take_tick_damage(fs_tick,
+						"-%d Burn" % fs_tick, Color(1.0, 0.55, 0.2))
+					_log("   → the ignition pulse burns %s for %d" % [
+						foe.unit_name, fs_tick], "#e08850")
+					if fs_died:
+						_stat("enemy_deaths")
+						_sfx("death", -4.0)
+						_message("%s falls!" % foe.unit_name)
+						_log("† %s dies" % foe.unit_name, "#e05050")
 		"healing_wave":
 			var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)
 			_sfx("heal", -6.0, 0.75)

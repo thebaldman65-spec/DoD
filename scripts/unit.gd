@@ -18,7 +18,7 @@ const WEAKNESS_EXTRA := 0.25
 # Iron Will — its chip updates live in _refresh_chips) and future dispels.
 const DEBUFF_IDS := ["slow", "chilled", "burn", "poison", "bleed", "sunder",
 	"mocked", "stunned", "exposed", "cripple", "dazed", "mindflay",
-	"umbral_sigil", "elem_weak", "broken"]
+	"umbral_sigil", "elem_weak", "melted", "broken"]
 
 var frame_size := 100      # square frame edge of this unit's sprite strips
 var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
@@ -102,6 +102,21 @@ var tenacity_hp_gained := 0   # battle-long gains (excluded from the run save)
 var rally := 0                # Rally: party +15% healing for 2t per HP block
 var seasoned_def_bonus := 0.0 # Defensive Stance: deeper under-half reduction
 var seasoned_off_bonus := 0.0 # Aggressive Stance: bigger over-half bonus
+# Pyromancer tree (07-18). See talents.gd for the node text.
+var accelerant_ranks := 0     # Accelerant: +1%/rank Burn tick strength
+var pyromaniac_ranks := 0     # Pyromaniac: +1%/rank Inferno Master step
+var supernova_ranks := 0      # Super Nova: +3%/rank Detonation crit
+var invigorating_ranks := 0   # Invigorating Ashes: mana back on Burn ticks
+var molten_ranks := 0         # Molten Core: less damage from burning enemies
+var explosive_ranks := 0      # Explosive Force: fire crits extend Burn
+var seeding_ranks := 0        # Seeding Embers: damage from burning deaths
+var melt_ranks := 0           # Melt Armor: Burn ticks shred armor
+var ashes_ranks := 0          # Ashes of Al'ar: chance to self-revive
+var ashes_used := false       # the phoenix rises once per battle
+var implosion_ranks := 0      # Implosion: Detonation can strike twice
+var melted := 0.0             # armor shredded off THIS unit by Melt Armor
+var burn_at_death := 0        # Burn turns left when this unit died (Seeding)
+var seeding_consumed := false # Seeding Embers already harvested this corpse
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
@@ -682,6 +697,8 @@ func effective_armor() -> float:
 		a *= 1.0 + 0.05 * dominant_ranks * debuffs_applied
 	# Endurance: +1%/rank armor per turn without an external heal.
 	a += 0.01 * endurance_ranks * endurance_stacks
+	# Melt Armor: Burn ticks have eaten this much off for the battle.
+	a = maxf(a - melted, 0.0)
 	if has_status("fortify"):
 		a += 0.10
 	if broken:
@@ -783,6 +800,13 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	if hp == 0 and has_status("undying"):
 		hp = 1
 		float_text("HELD THE LINE", Color(0.95, 0.85, 0.4))
+	# Ashes of Al'ar: the phoenix may refuse the grave (once per battle).
+	if hp == 0 and ashes_ranks > 0 and not ashes_used \
+			and randf() < 0.11 * ashes_ranks:
+		ashes_used = true
+		hp = maxi(int(max_hp * 0.25), 1)
+		float_text("REBORN IN ASH", Color(1.0, 0.6, 0.2), true)
+		_proc_log("Talent: Ashes of Al'ar — %s rises from the ashes (25%% HP)" % unit_name)
 	if resource_name == "Rage":
 		resource = mini(resource + 10, max_resource)
 	# Enraged (talent): dropping below half HP grants a stacking damage buff,
@@ -854,6 +878,12 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 	if hp == 0 and has_status("undying"):
 		hp = 1
 		float_text("HELD THE LINE", Color(0.95, 0.85, 0.4))
+	if hp == 0 and ashes_ranks > 0 and not ashes_used \
+			and randf() < 0.11 * ashes_ranks:
+		ashes_used = true
+		hp = maxi(int(max_hp * 0.25), 1)
+		float_text("REBORN IN ASH", Color(1.0, 0.6, 0.2), true)
+		_proc_log("Talent: Ashes of Al'ar — %s rises from the ashes (25%% HP)" % unit_name)
 	float_text(label, color)
 	if hp <= 0:
 		_die()
@@ -869,6 +899,10 @@ func _die() -> void:
 	var ua := get_status("unrelenting")
 	if not ua.is_empty():
 		constitution -= int(ua.get("power", 0))
+	# Seeding Embers reads the Burn this unit died with (harvested later).
+	var burn_stat := get_status("burn")
+	if not burn_stat.is_empty():
+		burn_at_death = maxi(int(burn_stat.get("turns", 0)), 0)
 	statuses.clear()
 	_refresh_chips()
 	if _plate_root != null:
