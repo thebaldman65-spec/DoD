@@ -217,7 +217,12 @@ Roots of Wrath (3 turns), and the Survivalist's Trapper passive (5 turns).</li>
 <h3>4.6 Status effects (current roster)</h3>
 <table border="1" cellpadding="4">
 <tr><th>Status</th><th>Effect</th></tr>
-<tr><td>Chilled</td><td>−25% speed (Cryomancer-only frost).</td></tr>
+<tr><td>Chilled</td><td>STACKING frost (Cryomancer-only, max 4): 1 stack −25% speed,
+2 stacks −50% speed, 3 stacks −50% speed AND −15% damage dealt; <b>4 stacks = FROZEN</b>
+(the stacks reset). Lasts 3 turns; every reapplication RESETS the clock. The chip counts
+stacks ("C2").</td></tr>
+<tr><td>Frozen</td><td>Frozen solid: loses the next turn (a stun — bosses resist unless
+Broken). Reached at 4 stacks of Chilled.</td></tr>
 <tr><td>Slowed</td><td>−25% speed (generic; e.g. Shrapnel Charge).</td></tr>
 <tr><td>Burn</td><td>6% of the applier's Attack at the start of each turn
 (snapshotted). Reapplication extends duration — new turns ADD to the timer.</td></tr>
@@ -369,11 +374,12 @@ down). (Renewal moved to the Holy spec 07-10.)</li>
 choice screen with a mouseover explanation.</p>
 <table border="1" cellpadding="4">
 <tr><th>Role</th><th>Archetype</th><th>Definition</th></tr>
-<tr><td rowspan="5">Damage (100 Atk)</td><td>Ramp</td><td>Starts weak, snowballs as the battle progresses.</td></tr>
+<tr><td rowspan="6">Damage (100 Atk)</td><td>Ramp</td><td>Starts weak, snowballs as the battle progresses.</td></tr>
 <tr><td>Rush</td><td>Starts strong; resources dwindle as the fight drags on.</td></tr>
 <tr><td>Nuker</td><td>Banks resources to unleash a single devastating turn; exploits weakened foes.</td></tr>
 <tr><td>Pressure</td><td>Steady damage, debuffs and DoTs, Break pressure.</td></tr>
 <tr><td>Bruiser</td><td>Damage/tank hybrid — weakens foes, moderate damage, debuffs.</td></tr>
+<tr><td>Control</td><td>Locks the battlefield down — slows, freezes, and shatters.</td></tr>
 <tr><td rowspan="2">Support (50 Atk)</td><td>Healer</td><td>Restores lost HP and mana; can revive.</td></tr>
 <tr><td>Warder</td><td>Damage mitigation and protective buffs.</td></tr>
 <tr><td>Tank (75 Atk)</td><td>Tank</td><td>Absorbs and redirects damage; buffs the line.</td></tr>
@@ -449,14 +455,17 @@ for 2 turns and attackers are set Burning 3 turns (Perfect: also triggers an imm
 tick on every burning enemy). Firestorm — 30 Mana, 3.5, 4cd, capstone: 6-8 bolts at RANDOM
 enemies for 12% Atk each, each bolt applying 2 turns of Burn (Perfect: 7-9 bolts).<br>
 VAULTED 07-16 (kept for later): Pyroblast, Flame Surge, Phoenix Rebirth.</li>
-<li><b>Cryomancer (Nuker)</b> — Passive <i>Chill</i>: damaging spells 50% chance to apply
-Chilled (2 turns) — the Cryomancer-only frost slow; generic sources apply Slowed instead.<br>
-Frost Bolt — 25 Mana, 25 frost / 20 BD / 3.0, 50% chance to deal DOUBLE damage against
-unchilled targets (Perfect: +5% crit on the cast).<br>
-Razor Ice — 20 Mana, 15 frost / 14 BD / 3.0 × 2 random targets, always crits vs Chilled
-(Perfect: 3 shards).<br>
-Blizzard — 30 Mana, 15 frost to ALL / 12 BD / 4.0 + Chilled 2 turns (Perfect: +50%
-BD).</li>
+<li><b>Cryomancer (Control, reworked 07-18)</b> — Passive <i>Shattering</i>: +2% crit
+chance for every enemy Frozen this battle (live chip). Its core Magic Bolt is reforged into
+<b>Frostbolt</b> — free, 20% Atk frost / 15 BD / 2.0, no cd, applies 1 stack of Chilled
+(Perfect: hits at 25% of Attack).<br>
+Razor Ice — 20 Mana, 15% Atk frost / 10 BD / 2.5, 3cd × 3 RANDOM enemies; +3% damage per
+stack of Chilled on each victim (Perfect: unchilled victims gain a stack).<br>
+Blizzard — 35 Mana, 20% Atk frost to ALL / 10 BD / 4.0, 4cd; layers 1-2 stacks of Chilled
+on each victim (Perfect: refunds 5 Mana).<br>
+Ice Lance — 25 Mana, 40% Atk frost / 15 BD / 3.0, 2cd; ALWAYS crits against Frozen targets
+(Perfect: 20 BD instead).<br>
+VAULTED 07-18 (kept for later): the old Frost Bolt spear.</li>
 <li><b>Arcanist (Ramp)</b> — Passive <i>Arcane Resonance</i> (the stack mechanic itself; see
 §5.1). The Echo passive is vaulted for future return.<br>
 Death Ray — free, 8.0 int, NO cooldown (the Resonance build-up is the gate); castable ONLY

@@ -76,6 +76,19 @@ Burn REAPPLICATION extends duration by the APPLIED turns (unit.add_status
 burn branch). ADJACENT IS STRICT (07-16): dead neighbor = no bonus on
 that side, never jumps past corpses (_adjacent_enemies). Log itemizes
 mitigation: "(nature resist -8) (armor -12) (WEAK! +9)".
+CRYOMANCER REWORK (07-18): archetype CONTROL (new, Damage role/100 Atk,
+ARCHETYPE_ROLE+DESC). CHILLED = STACKING debuff (max 4, unit.add_status
+chilled branch + _chilled_desc; reapplication RESETS the 3-turn clock;
+chip "C#"): x1 -25% speed, x2 -50% (effective_speed), x3 also -15% dmg
+dealt (attacker-side in _resolve); 4 stacks → FROZEN in _apply_status
+(stacks reset, frozen = lose next turn like stunned — own block in
+_run_battle; bosses resist unless Broken; unit.was_frozen marks it).
+Passive "shattering" (replaces "chill" on-hit, which is GONE): +2% crit
+per enemy was_frozen this battle (live spec chip). Kit: core → Frostbolt
+via apply_kit_overrides (free, 20% Atk frost, 1 chilled stack, perfect
+flat 25%); Razor Ice v2 (3 random, +3%/chilled stack, perfect chills
+unchilled); Blizzard v2 (aoe, 1-2 stacks each, perfect_id "mana5");
+Ice Lance (auto-crit vs frozen, perfect pr=20). Old Frost Bolt VAULTED.
 PYROMANCER REWORK (07-16): passive "inferno" = Inferno Master (+5% dmg
 per burning enemy, cap 25%; live spec chip via _update_talent_chips; the
 old "ignite" on-hit passive is GONE). Core Magic Bolt → Fireball via

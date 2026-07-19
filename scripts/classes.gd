@@ -167,6 +167,13 @@ static func apply_kit_overrides(cfg: Dictionary, spec: String) -> void:
 			"applies_status": {"id": "burn", "turns": 3},
 			"perfect_id": "", "perfect_text": "Deals 25% of Attack instead",
 			"description": "A crackling bolt of flame: applies\n3 turns of Burn (reapplying extends\nthe burn)."})
+	elif spec == "cryomancer":
+		cfg["abilities"][0] = Ability.make({"display_name": "Frostbolt",
+			"dmg_type": "frost", "cost": 0, "damage": 20, "pressure": 15,
+			"delay": 2.0, "anim": "attack01",
+			"applies_status": {"id": "chilled", "turns": 3},
+			"perfect_id": "", "perfect_text": "Deals 25% of Attack instead",
+			"description": "A shard of biting cold: applies 1 stack\nof Chilled (4 stacks freeze the target\nsolid)."})
 
 
 # Archetype outline (design north star for every spec's kit):
@@ -180,7 +187,8 @@ static func apply_kit_overrides(cfg: Dictionary, spec: String) -> void:
 #   Tank — Tank: absorbs and redirects damage, buffs.
 const ARCHETYPE_ROLE := {
 	"Ramp": "Damage", "Rush": "Damage", "Nuker": "Damage", "Pressure": "Damage",
-	"Bruiser": "Damage", "Healer": "Support", "Warder": "Support", "Tank": "Tank",
+	"Bruiser": "Damage", "Control": "Damage",
+	"Healer": "Support", "Warder": "Support", "Tank": "Tank",
 }
 
 # Base ATTACK by role. Ability damage is a PERCENT of the user's current
@@ -212,6 +220,7 @@ const ARCHETYPE_DESC := {
 	"Warder": "Damage mitigation and protective buffs.",
 	"Tank": "Absorbs and redirects damage; buffs the line.",
 	"Bruiser": "Damage/tank hybrid — weakens foes with moderate damage and debuffs.",
+	"Control": "Locks the battlefield down — slows, freezes, and shatters.",
 }
 
 
@@ -249,8 +258,8 @@ const SPEC_INFO := {
 	"pyromancer": {"name": "Pyromancer", "constitution": 85, "archetype": "Nuker", "passive": "inferno",
 		"passive_desc": "Inferno Master: +5% damage for each burning enemy (up to +25%).",
 		"blurb": "Aggressive flame — burns that spread and stack."},
-	"cryomancer": {"name": "Cryomancer", "constitution": 85, "archetype": "Nuker", "passive": "chill",
-		"passive_desc": "Chill: damaging spells have 50% chance to apply Chilled (2 turns).",
+	"cryomancer": {"name": "Cryomancer", "constitution": 85, "archetype": "Control", "passive": "shattering",
+		"passive_desc": "Shattering: +2% crit chance for every enemy that has been\nFrozen this battle.",
 		"blurb": "Battlefield control — chill, freeze, then shatter."},
 	"arcanist": {"name": "Arcanist", "constitution": 90, "archetype": "Ramp", "passive": "resonance",
 		"passive_desc": "Arcane Resonance: damaging casts build stacks (max 5) — each grants\n+15% damage and +3% crit but +10% damage taken. Max stacks trigger\nBacklash Ward (+15 Mana). Stacks persist until consumed.",
@@ -359,20 +368,23 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "A rolling wall of fire rakes ALL\nenemies; those already Burning burn\n2 turns longer."}),
 			]
 		"cryomancer":
+			# Control kit (07-18 rework; core Magic Bolt becomes Frostbolt via
+			# apply_kit_overrides). VAULTED — kept for future return:
+			# Frost Bolt (25 Mana spear, 50% double vs unchilled).
 			return [
-				Ability.make({"display_name": "Frost Bolt", "dmg_type": "frost", "cost": 25, "damage": 25,
-					"pressure": 20, "delay": 3.0, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "+5% crit chance on this cast",
-					"description": "A spear of ice. 50% chance to deal\nDOUBLE damage against unchilled targets."}),
-				Ability.make({"display_name": "Razor Ice", "cooldown": 1, "dmg_type": "frost", "cost": 20, "damage": 15,
-					"pressure": 14, "delay": 3.0, "anim": "attack02", "random_hits": 2,
-					"perfect_id": "", "perfect_text": "3 shards instead of 2",
-					"description": "Hurl razor shards at 2 random enemies.\nAlways crits against Chilled targets."}),
-				Ability.make({"display_name": "Blizzard", "cooldown": 3, "dmg_type": "frost", "cost": 30, "damage": 15,
-					"pressure": 12, "delay": 4.0, "anim": "attack03", "aoe": true,
-					"applies_status": {"id": "chilled", "turns": 2},
-					"perfect_id": "", "perfect_text": "+50% Pressure on every target",
-					"description": "Storm of ice: hits ALL enemies\nand Chills them."}),
+				Ability.make({"display_name": "Razor Ice", "cooldown": 3, "dmg_type": "frost", "cost": 20,
+					"damage": 15, "pressure": 10, "delay": 2.5, "anim": "attack02",
+					"random_hits": 3, "perfect_extra_hit": false,
+					"perfect_id": "", "perfect_text": "Unchilled victims gain a stack of Chilled",
+					"description": "Razor shards at 3 random enemies:\n+3% damage per stack of Chilled\non each victim."}),
+				Ability.make({"display_name": "Blizzard", "cooldown": 4, "dmg_type": "frost", "cost": 35,
+					"damage": 20, "pressure": 10, "delay": 4.0, "anim": "attack03", "aoe": true,
+					"perfect_id": "mana5", "perfect_text": "Refunds 5 Mana",
+					"description": "Storm of ice rakes ALL enemies,\nlayering 1-2 stacks of Chilled\non each."}),
+				Ability.make({"display_name": "Ice Lance", "cooldown": 2, "dmg_type": "frost", "cost": 25,
+					"damage": 40, "pressure": 15, "delay": 3.0, "anim": "attack02",
+					"perfect_id": "", "perfect_text": "Deals 20 BD instead",
+					"description": "A frozen spear driven deep: ALWAYS\ncrits against Frozen targets."}),
 			]
 		"arcanist":
 			return [

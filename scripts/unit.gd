@@ -16,8 +16,8 @@ const WEAKNESS_EXTRA := 0.25
 # Buff/Debuff keywords: a DEBUFF is any negative status, a BUFF any positive
 # one. This registry backs talents that count debuffs (Dominant Presence,
 # Iron Will — its chip updates live in _refresh_chips) and future dispels.
-const DEBUFF_IDS := ["slow", "chilled", "burn", "poison", "bleed", "sunder",
-	"mocked", "stunned", "exposed", "cripple", "dazed", "mindflay",
+const DEBUFF_IDS := ["slow", "chilled", "frozen", "burn", "poison", "bleed",
+	"sunder", "mocked", "stunned", "exposed", "cripple", "dazed", "mindflay",
 	"umbral_sigil", "elem_weak", "melted", "broken"]
 
 var frame_size := 100      # square frame edge of this unit's sprite strips
@@ -117,6 +117,7 @@ var implosion_ranks := 0      # Implosion: Detonation can strike twice
 var melted := 0.0             # armor shredded off THIS unit by Melt Armor
 var burn_at_death := 0        # Burn turns left when this unit died (Seeding)
 var seeding_consumed := false # Seeding Embers already harvested this corpse
+var was_frozen := false       # has been Frozen this battle (Shattering counts)
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
@@ -534,6 +535,14 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 				s.desc = "Takes %d nature damage at the start of each\nturn (%d per stack); new stacks refresh the timer." % [
 					int(s.get("tick", 3)) * s.stacks, int(s.get("tick", 3))]
 				float_text("%s x%d" % [label, s.stacks], color)
+			elif id == "chilled":
+				# Chilled STACKS (max 4): each application adds a stack and
+				# RESETS the clock; 4 stacks = Frozen (handled by battle.gd).
+				s.stacks = mini(int(s.get("stacks", 1)) + 1, 4)
+				s.turns = turns
+				s.short = "C%d" % s.stacks
+				s.desc = _chilled_desc(int(s.stacks))
+				float_text("Chilled x%d" % s.stacks, color)
 			elif id == "burn":
 				# Reapplied Burn burns LONGER: the fresh application's turns
 				# are ADDED to the running timer.
@@ -553,9 +562,22 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 		"turns": turns, "desc": desc, "power": power, "stacks": 1, "tick": tick}
 	if id == "poison":
 		entry["fresh"] = true  # no tick on the turn it lands
+	if id == "chilled":
+		entry["short"] = "C1"
+		entry["desc"] = _chilled_desc(1)
 	statuses.append(entry)
 	float_text(label, color)
 	_refresh_chips()
+
+
+static func _chilled_desc(stacks: int) -> String:
+	var effect := "-25% speed"
+	if stacks == 2:
+		effect = "-50% speed"
+	elif stacks >= 3:
+		effect = "-50% speed, -15% damage dealt"
+	return "Chilled x%d: %s.\nEach stack resets the 3-turn clock;\nat 4 stacks the victim FREEZES solid." % [
+		stacks, effect]
 
 
 func remove_status(id: String) -> void:
@@ -682,7 +704,13 @@ func start_cooldown(ab: Ability) -> void:
 
 
 func effective_speed() -> float:
-	var s := speed * (0.75 if (has_status("slow") or has_status("chilled")) else 1.0)
+	var s := speed * (0.75 if has_status("slow") else 1.0)
+	# Chilled deepens with stacks: 1 = -25% speed, 2+ = -50%.
+	var chill := status_stacks("chilled") if has_status("chilled") else 0
+	if chill == 1:
+		s *= 0.75
+	elif chill >= 2:
+		s *= 0.5
 	if has_status("quickdraw"):
 		s *= 1.5
 	if has_status("wrath"):
