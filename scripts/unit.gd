@@ -16,9 +16,9 @@ const WEAKNESS_EXTRA := 0.25
 # Buff/Debuff keywords: a DEBUFF is any negative status, a BUFF any positive
 # one. This registry backs talents that count debuffs (Dominant Presence,
 # Iron Will — its chip updates live in _refresh_chips) and future dispels.
-const DEBUFF_IDS := ["slow", "chilled", "frozen", "burn", "poison", "bleed",
-	"sunder", "mocked", "stunned", "exposed", "cripple", "dazed", "mindflay",
-	"umbral_sigil", "elem_weak", "melted", "broken"]
+const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
+	"bleed", "sunder", "mocked", "stunned", "exposed", "cripple", "dazed",
+	"mindflay", "umbral_sigil", "elem_weak", "melted", "broken"]
 
 var frame_size := 100      # square frame edge of this unit's sprite strips
 var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
@@ -984,18 +984,22 @@ func recover_from_break() -> void:
 	refresh_bars()
 
 
-# Heals respect Holy Conduit (healing_received_mult) and the Rally blessing
-# (+15% while Rallied). `external` marks heals from another unit or an item —
-# the Warden's Endurance talent resets on them.
-func heal_amount(amount: int, external := false) -> void:
+# Heals respect Holy Conduit (healing_received_mult), the Rally blessing
+# (+15% while Rallied), and Frostbite (-50%). `external` marks heals from
+# another unit or an item — the Warden's Endurance talent resets on them.
+# Returns the healing that actually landed (after multipliers).
+func heal_amount(amount: int, external := false) -> int:
 	var mult := healing_received_mult
 	if has_status("rally_heal"):
 		mult *= 1.15
+	if has_status("frostbite"):
+		mult *= 0.5
 	var final := int(round(amount * mult))
 	hp = mini(hp + final, max_hp)
 	if external and final > 0:
 		healed_externally = true
 	refresh_bars()
+	return final
 
 
 var _float_stack := 0  # staggers rapid floating texts so they don't overlap

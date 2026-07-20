@@ -13,6 +13,9 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   (newest first); (3) rebuild both docx via `python3 docs/build_docs.py`
   (unwraps paragraphs — plain textutil makes Word spacing weird; exports are
   Arial size 14 by user preference).
+- master.html shows ONLY what is currently in the game (user rule 07-20):
+  no vault lists, no "was/now/moved/reworked/renamed" notes, no decision
+  dates — change history belongs in changelog.html alone.
 - Terminology: damage against the Break meter = "Break damage (BD)" everywhere.
 - `docs/addendum.html` is RETIRED (frozen history; do not update it).
 - User drops new assets in `../imported files/` — always check there.
@@ -84,12 +87,19 @@ chilled application); Piercing Ice (Ice Lance crit_mult), Icy Veins
 Splintering Shards (extra Razor hit roll in total_hits), Whiteout
 (Blizzard daze 2t), Freezing Advance (rime-echo sting), Empowered
 Frostbolt (flat % add). Talent abilities: Rime ("rime" special+status,
-echo in _apply_status chilled branch, _rime_echoing guard stops chains)
-and Shatter capstone (aoe filtered to chilled targets, raw ×stacks,
-usable gate needs a chilled enemy, perfect sets cooldowns["Shatter"]=5).
-Passive "permafrost" (07-20, replaced "shattering"): frozen targets take
-+15% from all sources (target-side in _resolve). Razor Ice v3: 2 random
-@20%, always chills, perfect flat 25%. DEBUG: "Cooldowns OFF" CHECK
+echo in _apply_status chilled branch, _rime_echoing guard stops chains;
+ALSO applies frostbite 2t on cast) and Shatter capstone (aoe filtered to
+chilled targets, raw ×stacks, usable gate needs a chilled enemy, perfect
+sets cooldowns["Shatter"]=5). FROSTBITE STATUS (07-20): healing received
+-50% for 2t (unit.heal_amount mult; heal_amount now RETURNS the final
+healed int; healing_wave/wild_growth display it + log "halved by
+Frostbite"); in DEBUFF_IDS; applied by Rime cast + permafrost on-hit.
+Row-1 talent renamed "Brittle Ice" (id stays cr_frostbite/frostbite_ranks
+— saves keep ranks). Passive "permafrost": frozen targets take +15% from
+all sources (target-side in _resolve) AND frost hits 25% chance to
+frostbite (on-hit passives block in _resolve). Razor Ice v3: 2 random
+@20%, always chills, perfect flat 25%. Blizzard 15% Atk (07-20).
+DEBUG: "Cooldowns OFF" CHECK
 toggle (debug_cooldowns_off — start_cooldown skipped while on; replaces
 the old reset command).
 CRYOMANCER REWORK (07-18): archetype CONTROL (new, Damage role/100 Atk,
@@ -230,5 +240,5 @@ Space or left click; no announcer text (combat log only).
 - Menu background image not yet in imported files (fallback: forest art).
 - Distinct Mage/Cleric/Hunter sprites awaited from user.
 - Boss tri-choice class modifiers deferred (design doc) until 3+ zones.
-- Full rune loot table pending; relic pool needs growth (6 now).
+- Full rune loot table pending; relic pool needs growth (5 now).
 - Sim bot wins ~90%+ with 4 heroes; real difficulty tuning by user playtest.

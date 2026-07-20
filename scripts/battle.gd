@@ -24,7 +24,7 @@ const STATUS_INFO := {
 	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Burning: takes damage at the start of each\nturn (6% of the applier's Attack).\nReapplying Burn extends the duration."],
 	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Bleed builds with wounding attacks;\nat 100 the target bleeds out for 20% max HP.\nBleed damage ignores armor."],
 	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-35% armor."],
-	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4), "Takes 50% less Pressure."],
+	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4), "Takes 50% less Break damage."],
 	"fortify": ["Fortify", "+D", Color(0.55, 0.8, 0.9), "+10% armor."],
 	"barrier": ["Barrier", "Ba", Color(0.40, 0.85, 0.95), "Absorbs incoming damage."],
 	"focus": ["Focus", "Fo", Color(0.35, 0.60, 1.0), "Restores 10 Mana each turn."],
@@ -38,7 +38,7 @@ const STATUS_INFO := {
 	"rampage": ["Rampage", "Rp", Color(0.9, 0.3, 0.3), "+1% damage per 10 Bleed buildup\non the enemy party (at cast time)."],
 	"unity": ["Unity", "Un", Color(0.95, 0.85, 0.4), "Souls bound: all damage received is\nsplit evenly among the party."],
 	"mindflay": ["Mind Flay", "MF", Color(0.75, 0.35, 0.85), "Maddened: attacks its own allies\nwith bonus Break damage."],
-	"devotion": ["Devotion Aura", "DA", Color(0.95, 0.8, 0.45), "The Devout's presence: takes 15%\nless Pressure."],
+	"devotion": ["Devotion Aura", "DA", Color(0.95, 0.8, 0.45), "The Devout's presence: takes 15%\nless Break damage."],
 	"tripwire": ["Tripwire", "TW", Color(0.8, 0.65, 0.35), "Retaliates against every attacking\nmelee enemy for 75% of their damage."],
 	"stunned": ["Stunned", "St", Color(0.95, 0.9, 0.4), "Loses their next turn."],
 	"shieldwall": ["Shieldwall", "SW", Color(0.6, 0.7, 0.9), "Takes 25% less damage."],
@@ -60,6 +60,7 @@ const STATUS_INFO := {
 	"flame_shield": ["Flame Shield", "FS", Color(1.0, 0.55, 0.25), "Takes 50% less damage; attackers\nare set Burning (3 turns)."],
 	"seeding": ["Seeding Embers", "SE", Color(1.0, 0.65, 0.3), "Empowered by a burning death:\nbonus damage on the next turn."],
 	"rime": ["Rime", "Ri", Color(0.75, 0.9, 1.0), "Rimed: every stack of Chilled this\nenemy gains also chills one other\nrandom enemy."],
+	"frostbite": ["Frostbite", "Fb", Color(0.45, 0.70, 0.95), "Frostbitten: healing received\nreduced by 50%."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -1961,7 +1962,7 @@ func _lowest_hp(pool: Array) -> BattleUnit:
 
 
 # Highest rank of a talent stat among LIVING heroes (party-wide talents
-# like Hypothermia, Frostbite, Hungering Cold, Frigid Grip).
+# like Hypothermia, Brittle Ice, Hungering Cold, Frigid Grip).
 func _max_hero_rank(field: String) -> int:
 	var best := 0
 	for h in heroes:
@@ -2279,7 +2280,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Super Nova: Detonation crits harder into the ash.
 			if attacker.supernova_ranks > 0 and ab.display_name == "Detonation":
 				crit_chance += 0.03 * attacker.supernova_ranks
-			# Frostbite (talent): Frozen targets are easier to strike true.
+			# Brittle Ice (talent): Frozen targets are easier to strike true.
 			if strike_target.has_status("frozen"):
 				crit_chance += 0.02 * _max_hero_rank("frostbite_ranks")
 			if is_perfect and ab.display_name == "Aimed Shot":
@@ -2639,6 +2640,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						and not attacker.companion.dead \
 						and attacker.companion.companion_kind == "canis":
 					_add_bleed_with_burst(strike_target, 15)
+				# Permafrost: the deep cold takes root — frost hits can Frostbite.
+				if attacker.passive_id == "permafrost" and ab.dmg_type == "frost" \
+						and randf() < 0.25:
+					_apply_status(strike_target, "frostbite", 2)
 			# Trapper: striking the Survivalist risks a poisoned barb.
 			if strike_target.passive_id == "trapper" and not attacker.is_hero \
 					and not attacker.dead and randf() < 0.25:
@@ -3264,11 +3269,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"wild_growth":
 			var growth := maxi(int(round(target.max_hp * 0.20)), 1)
 			_sfx("heal", -6.0, 0.8)
-			target.heal_amount(growth, target != attacker)
-			target.float_text("+%d" % growth, Color(0.4, 0.9, 0.45))
+			var growth_got := target.heal_amount(growth, target != attacker)
+			target.float_text("+%d" % growth_got, Color(0.4, 0.9, 0.45))
 			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
-			_log("%s: Wild Growth heals %s for %d (20%% max HP)" % [attacker.unit_name,
-				target.unit_name, growth], "#70d878")
+			_log("%s: Wild Growth heals %s for %d (20%% max HP%s)" % [attacker.unit_name,
+				target.unit_name, growth_got,
+				", halved by Frostbite" if target.has_status("frostbite") else ""],
+				"#70d878")
 		"flame_shield":
 			_sfx("parry", -7.0, 1.1)
 			_apply_status(attacker, "flame_shield", 2)
@@ -3295,17 +3302,20 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"rime":
 			_sfx("break", -9.0, 1.4)
 			_apply_status(target, "rime", 4 if is_perfect else 3)
+			_apply_status(target, "frostbite", 2)
 			_message("%s rimes %s!" % [attacker.unit_name, target.unit_name])
 			_log("%s: Rime on %s — its chills will spread (%d turns)" % [
 				attacker.unit_name, target.unit_name, 4 if is_perfect else 3], "#7cc8f0")
 		"healing_wave":
 			var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)
 			_sfx("heal", -6.0, 0.75)
-			target.heal_amount(wave_heal, target != attacker)
-			target.float_text("+%d" % wave_heal, Color(0.4, 0.9, 0.45))
+			var wave_got := target.heal_amount(wave_heal, target != attacker)
+			target.float_text("+%d" % wave_got, Color(0.4, 0.9, 0.45))
 			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
-			_log("%s: Healing Wave — %s recovers %d (25%% max HP)" % [attacker.unit_name,
-				target.unit_name, wave_heal], "#70d878")
+			_log("%s: Healing Wave — %s recovers %d (25%% max HP%s)" % [attacker.unit_name,
+				target.unit_name, wave_got,
+				", halved by Frostbite" if target.has_status("frostbite") else ""],
+				"#70d878")
 		"renewal":
 			_sfx("heal", -9.0, 1.1)
 			_apply_status(target, "renewal", 5)

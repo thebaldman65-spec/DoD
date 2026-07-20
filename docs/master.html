@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-16</b></p>
+<p align="right"><b>Last updated: 2026-07-20</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
-<p><i>The single authoritative design reference (the timestamp above is bumped on every
-edit). It supersedes the original concept docs ("Dawn of Decay.docx", "DoD Combat.docx",
-"DoD Classes.docx", "DoD Run.docx", "DoD UI.docx", "DoD Narrative_Zones.docx") and the
-now-retired Implementation Addendum (frozen as a historical changelog). Engine: Godot 4.7,
-all UI built in code.</i></p>
+<p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
+the present build only (the timestamp above is bumped on every edit); the history of
+changes lives in the changelog. Engine: Godot 4.7, all UI built in code.</i></p>
 
 <h2>1. Concept</h2>
 <p>A turn-based party roguelike. The world is being consumed by <b>the Decay</b>; the player
@@ -65,8 +63,9 @@ strands. The boss tier is a single node.</p>
 talent points, an elite kill drops a rune for a random hero, a random consumable, and a bigger
 gold purse (80–100).</p>
 <ul>
-<li><b>Zones:</b> 1. Forest of Old → 2. The Scarlands. Later zones multiply enemy HP and
-damage by (1 + 0.35 × zone index) and tint enemies redder.</li>
+<li><b>Zones:</b> 1. Forest of Old → 2. The Scarlands. Enemy stats grow with the global
+node tier (see §9); deeper-zone enemies are tinted redder, and later zones field new,
+tougher rosters.</li>
 <li><b>Zone completion:</b> killing the boss awards a relic unlock, big gold, 3 talent points,
 and fully restores the party (HP and Mana) before the descent.</li>
 <li><b>Map screen:</b> zone art background, node ladder, Party button (shows unspent talent
@@ -117,7 +116,7 @@ them.</li>
 <li><b>Mitigation is itemized in the log:</b> every landed hit reports what the defenses
 ate — "(nature resist -8)" for resistances, "(armor -12)" for armor, and "(WEAK! +9)" when
 a Weakness ADDED damage — alongside the parry/block source tags.</li>
-<li><b>Resistances (stat):</b> heroes now carry a resistance per element — Fire, Frost,
+<li><b>Resistances (stat):</b> heroes carry a resistance per element — Fire, Frost,
 Nature, Holy, Shadow, Arcane — working exactly like armor but against that damage type
 (negative = weakness). Hover "Resistances" on the stat page to read them; per-spec values
 are being assigned class by class (all 0% until then).</li>
@@ -129,8 +128,8 @@ Mage among heroes; Orc Archers and Shamans among enemies) sail past the blade. B
 split by side — <b>heroes parry at 5%, enemies at 2.5%</b> — plus parry bonuses (talents,
 Parry Up). A parried hit still lands but with <b>75% less damage AND 75% less Break
 damage</b> (on-hit statuses can still apply); the log names the parry's source — reflexes,
-Sword Mastery, or Parry Up — e.g. "(parried -75% — Sword Mastery)". Parrying no longer
-triggers an automatic counter. AoE cannot be parried; Broken units cannot parry; multi-hit
+Sword Mastery, or Parry Up — e.g. "(parried -75% — Sword Mastery)". Parrying does not
+trigger an automatic counter. AoE cannot be parried; Broken units cannot parry; multi-hit
 attacks roll parry per strike.</li>
 <li><b>Counter Attack (term):</b> immediately answering a parry with a basic attack — a free
 action with no initiative cost that cannot chain. Granted only by specific effects (the
@@ -143,7 +142,7 @@ flashes <b>BLOCK</b> and the log names its source — "(Shieldwall)", "(Heavy Pl
 "(base Block)" — which matters: the Warden's Tenacity and Rally talents feed on Heavy
 Plating blocks specifically.</li>
 <li><b>Armor Penetration (keyword):</b> every % of armor penetration negates a % of the
-target's armor (Piercing Arrow 50%, Singularity 30%, the Berserker's Crushing Blows talent).
+target's armor (currently granted only by the Berserker's Crushing Blows talent).
 It is NOT shown on the character screen.</li>
 <li><b>Adjacent (keyword):</b> the enemies DIRECTLY next to a target in formation order,
 one on each side (never the target itself). <b>A dead neighbor NEGATES the adjacent bonus
@@ -151,12 +150,11 @@ on that side</b> — the effect does not jump past a corpse to the next living e
 effects that say "Adjacent" (the Warden's Sundering, the Pyromancer's Wildfire) hit at most
 those two enemies.</li>
 <li><b>Cooldown (keyword, "cd"):</b> the number of the user's turns before the same ability
-can be used again — "6cd" means unusable for 6 turns after use. <b>Every cooldown in the
-game was reduced by 1 turn (07-16)</b>: basics 0, light hits 1–2, heavies/AoE 2–5, Miracles
-4–7, Resurrection 5; Death Ray has NO cooldown at all — its 5-stack Resonance build-up
-is the gate. The remaining cooldown shows on the
-ability button ("CD n") and in its tooltip. <b>Enemies do not use cooldowns at all
-(07-16)</b> — their kits are gated by resources and AI conditions instead.</li>
+can be used again — "6cd" means unusable for 6 turns after use. Typical bands: basics 0,
+light hits 1–2, heavies/AoE 2–5, Miracles 4–7, Resurrection 5; Death Ray has NO cooldown
+at all — its 5-stack Resonance build-up is the gate. The remaining cooldown shows on the
+ability button ("CD n") and in its tooltip. <b>Enemies do not use cooldowns at
+all</b> — their kits are gated by resources and AI conditions instead.</li>
 <li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
 positive one. Talents that count debuffs (Dominant Presence, Iron Will) use this
 classification.</li>
@@ -167,13 +165,13 @@ only on the Mage's own casts — parry counters do not grant stacks.</li>
 <li><b>Attacker modifiers:</b> Resonance +15%/stack; Surge +20%; Empower +25%; Cripple −25%;
 Blood Frenzy up to +40% as HP falls; Seasoned Fighter +15% above half HP; relic bonuses
 (global +10% dragonbone; fire/holy +20% emberheart); Powershot +2% per 1% of the target's
-EMPTY Break bar; Overpower +0.5 per point of target Break; Frost Bolt 50% chance ×2 vs
-unchilled; Arcane Cannon +7.5%/Resonance stack; Fireball perfects at 25% of Attack.</li>
+EMPTY Break bar; Overpower +0.5 per point of target Break; Arcane Cannon
++7.5%/Resonance stack; Fireball perfects at 25% of Attack.</li>
 <li><b>Target modifiers:</b> Shieldwall −50%; Exposed +15%; Seasoned Fighter −15% at or
 below half HP; Mage Resonance +10% damage
 <i>taken</i> per stack (the glass-cannon risk).</li>
-<li><b>Armor:</b> flat % damage reduction. Fortify +10%; Broken ×0.7; Sunder ×0.65; armor_pierce
-ignores a fraction (Piercing Arrow 50%, Singularity 30%).</li>
+<li><b>Armor:</b> flat % damage reduction. Fortify +10%; Broken ×0.7; Sunder ×0.65; Armor
+Penetration ignores a fraction.</li>
 <li><b>Damage types (7):</b> physical, fire, frost, arcane, nature, shadow, holy. Enemies carry
 resist fractions per type.</li>
 <li><b>Weaknesses:</b> a unit can be WEAK to a damage type — it takes <b>25% extra damage</b>
@@ -224,6 +222,9 @@ Roots of Wrath (3 turns), and the Survivalist's Trapper passive (5 turns).</li>
 stacks ("C2").</td></tr>
 <tr><td>Frozen</td><td>Frozen solid: loses the next turn (a stun — bosses resist unless
 Broken). Reached at 4 stacks of Chilled.</td></tr>
+<tr><td>Frostbite</td><td>Healing received reduced by 50% (2 turns). Inflicted by the
+Cryomancer's Rime and by the Permafrost passive's frost-attack procs (25%
+chance).</td></tr>
 <tr><td>Slowed</td><td>−25% speed (generic; e.g. Shrapnel Charge).</td></tr>
 <tr><td>Burn</td><td>6% of the applier's Attack at the start of each turn
 (snapshotted). Reapplication extends duration — new turns ADD to the timer.</td></tr>
@@ -291,7 +292,7 @@ attack's damage.</td></tr>
 <tr><td>Broken</td><td>Loses next turn; −30% armor; +25% crit taken.</td></tr>
 </table>
 <p>Statuses tick down at the start of the affected unit's turn; negative durations last the
-whole battle. Removed by design: Guard, Marked, Camouflage.</p>
+whole battle.</p>
 <h3>4.7 Items in battle</h3>
 <p>The party inventory is shared and opens as a picker via <b>Alt</b> or the "[Alt] Items"
 button (Tab cycles, Space uses, X closes — see §10). Using an item does <b>not</b> consume
@@ -299,8 +300,8 @@ the turn, but each hero may use only one item per turn. Bomb: 50 damage to all e
 Health Potion: +40 HP. Mana Potion: +40 Mana/Rage. Revive Potion: fallen ally returns at 50%
 HP. Defense Potion: party gains Fortify (3 turns).</p>
 <h3>4.8 Enemy AI</h3>
-<p>Enemies hunt the most wounded hero 40% of the time and pick randomly otherwise (they no
-longer pile onto the squishiest target relentlessly); if any hero is Broken they exploit it
+<p>Enemies hunt the most wounded hero 40% of the time and pick randomly otherwise; if any
+hero is Broken they exploit it
 with their hardest affordable hit. Mocked enemies must attack the taunting Warrior — a taunt
 also overrides support casts. <b>Support behaviors run before attacks:</b> the Orc Shaman
 casts Healing Wave on the most wounded ally under 40% HP (friendly tanks and healers
@@ -324,9 +325,8 @@ the OFFICIAL template size (236px frames, 1:1 scale; static east-facing pose unt
 animations exist) — and the <b>Berserker</b> — a fur-cloaked axeman with idle / walk /
 attack animations and his own portrait, at the legacy 124px @1.25× size until re-generated
 at the template (his hurt, death, and extra attack clips are also pending; the game falls
-back gracefully meanwhile). The size comparison between the two was run on 07-12 and the
-larger Pyromancer density WON — it is the standard for all future character art
-(see §12).</p>
+back gracefully meanwhile). The Pyromancer's density is the template standard for all
+character art (see §12).</p>
 <table border="1" cellpadding="4">
 <tr><th>Class</th><th>HP</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Resource(s)</th></tr>
 <tr><td>Warrior</td><td>154</td><td>25%</td><td>95</td><td>110</td><td>Rage 0–100</td></tr>
@@ -347,8 +347,8 @@ Warrior (weighted into their random target picks).</li>
 <h3>5.1 Resource mechanics</h3>
 <ul>
 <li><b>Rage (Warrior):</b> starts at 0. +5 at the start of each of his turns; +10 whenever he
-is hit; every attack builds Rage (Strike 20, all spec/talent attacks 10); Perfect Strike +10.
-Eidolon Mirror relic: start battles at 25.</li>
+is hit; every attack builds Rage (Strike 20, all spec/talent attacks 10); Perfect Strike
++10.</li>
 <li><b>Mana (Mage/Cleric):</b> +12 at the start of their turns; potions/Rally restore more.</li>
 <li><b>Focus (Hunter):</b> +15 at the start of their turns; Perfect basic +10.</li>
 <li><b>Faith (Cleric secondary):</b> +10 per action taken; spent on MIRACLE abilities (no
@@ -363,14 +363,13 @@ Stacks persist until Death Ray consumes them.</li>
 <li><b>Warrior:</b> Strike — 23 dmg / 18 BD / delay 2.0, builds 20 Rage
 (Perfect: +10 Rage).</li>
 <li><b>Mage:</b> Magic Bolt — 25% Atk arcane / 14 BD / 2.0 (Perfect: +10 Mana); the
-Pyromancer's Magic Bolt is reforged into <b>Fireball</b> (see §6.2). (Mana Shield was
-REMOVED from all mage specs 07-16; it, Arcane Surge, and Reality Fracture are vaulted —
-kept for later.)</li>
+Pyromancer's Magic Bolt is reforged into <b>Fireball</b> and the Cryomancer's into
+<b>Frostbolt</b> (see §6.2).</li>
 <li><b>Cleric:</b> Smite — 22 holy / 16 BD / 2.0 (Perfect: self-heal 8; the Occultist's
 Smite is corrupted into <b>Shadowrend</b> — same numbers, shadow damage); Mend Wounds —
 25 Mana, heal 45, 3.0 (Perfect: Ward 2 turns); <b>Resurrection</b> — MIRACLE, 40 Faith,
 4.0, returns a fallen ally to life with 20% health and resource (greyed out while nobody is
-down). (Renewal moved to the Holy spec 07-10.)</li>
+down).</li>
 <li><b>Hunter:</b> Quick Shot — 20 dmg / 14 BD / 2.0 (no perfect bonus).</li>
 </ul>
 
@@ -390,7 +389,7 @@ choice screen with a mouseover explanation.</p>
 <tr><td>Tank (75 Atk)</td><td>Tank</td><td>Absorbs and redirects damage; buffs the line.</td></tr>
 </table>
 <p><b>Role sets base Attack</b> (Damage 100 / Tank 75 / Support 50) until per-spec stat
-blocks land. Bruiser counts as a DAMAGE archetype (moved from Tank 07-16) — the Swordmaster
+blocks land. Bruiser counts as a DAMAGE archetype — the Swordmaster
 attacks at 100.</p>
 <p>Every spec grants one passive plus abilities appended to the core kit. Specs are chosen once
 per run and are permanent. <b>Constitution by spec</b> (role-based Break resistance; class base
@@ -415,13 +414,12 @@ selection, and its chip shows the % gained. Rampage — 40 Rage, 3 × 20 physica
 3 × 10 bloodloss / 3 × 10 BD, 4.0, 4cd; if the target dies, Rampage immediately recasts
 (free) on another enemy and can chain.</li>
 <li><b>Warden (Tank)</b> — Passive <i>Heavy Plating</i>: 15% chance to Block, on top of the
-Warden's <b>5% base Block stat</b> (the only stat-Block character). VAULTED: the old Bulwark
-passive, Retaliation, and the party-wide Shieldwall v1.<br>
+Warden's <b>5% base Block stat</b> (the only stat-Block character).<br>
 Mocking Blow — free, 27% Atk (≈20) / 15 BD / 2.0, 1cd, taunts the target AND one other
 enemy for 4 turns, builds 10 Rage (Perfect: 5 turns).<br>
-Crushing Blow (moved from the Swordmaster) — 20 Rage, 43% Atk (≈32) / 20 BD / 3.0, 2cd,
+Crushing Blow — 20 Rage, 43% Atk (≈32) / 20 BD / 3.0, 2cd,
 Sunders (−35% armor, 3 turns), builds 10 Rage (Perfect: +5 bonus BD).<br>
-<b>War Stomp (NEW 07-16)</b> — 20 Rage, 3 shockwaves × 15% Atk / 15 BD each to RANDOM
+War Stomp — 20 Rage, 3 shockwaves × 15% Atk / 15 BD each to RANDOM
 enemies, 3.0 int, 3cd; allies regain 10% of their resource.<br>
 <i>Talent-granted:</i> Shieldwall — 25 Rage, 2.0, 2cd, Blocks the next 3 attacks (Perfect:
 5); a self-buff cast with no target selection whose chip counts the charges left. Hold the
@@ -444,7 +442,7 @@ crit).</li>
 </ul>
 <h3>6.2 Mage</h3>
 <ul>
-<li><b>Pyromancer (Nuker, reworked 07-16)</b> — Passive <i>Inferno Master</i>: +5% damage
+<li><b>Pyromancer (Nuker)</b> — Passive <i>Inferno Master</i>: +5% damage
 for each burning enemy, up to +25% (the spec chip shows the live bonus). Its core Magic
 Bolt is reforged into <b>Fireball</b> — free, 20% Atk fire / 15 BD / 2.0, no cd, applies
 3 turns of Burn (Perfect: hits at 25% of Attack).<br>
@@ -458,25 +456,25 @@ Flamewave — 25 Mana, 15% Atk fire to ALL / 5 BD / 3.0, 2cd; enemies already Bu
 <i>Talent-granted:</i> Flame Shield — 15 Mana, 2.0, 2cd, self-cast: take 50% less damage
 for 2 turns and attackers are set Burning 3 turns (Perfect: also triggers an immediate Burn
 tick on every burning enemy). Firestorm — 30 Mana, 3.5, 4cd, capstone: 6-8 bolts at RANDOM
-enemies for 12% Atk each, each bolt applying 2 turns of Burn (Perfect: 7-9 bolts).<br>
-VAULTED 07-16 (kept for later): Pyroblast, Flame Surge, Phoenix Rebirth.</li>
-<li><b>Cryomancer (Control)</b> — Passive <i>Permafrost</i> (07-20, replaces
-Shattering): Frozen enemies take 15% increased damage from ALL sources. Its core Magic
+enemies for 12% Atk each, each bolt applying 2 turns of Burn (Perfect: 7-9 bolts).</li>
+<li><b>Cryomancer (Control)</b> — Passive <i>Permafrost</i>: Frozen enemies take 15%
+increased damage from ALL sources, and the Cryomancer's frost attacks have a 25% chance
+to inflict <b>Frostbite</b> (−50% healing received, 2 turns). Its core Magic
 Bolt is reforged into <b>Frostbolt</b> — free, 20% Atk frost / 15 BD / 2.0, no cd, applies
 1 stack of Chilled (Perfect: hits at 25% of Attack).<br>
 Razor Ice — 20 Mana, 20% Atk frost / 10 BD / 2.5, 3cd × 2 RANDOM enemies; every hit
 applies a stack of Chilled (Perfect: hits at 25% of Attack).<br>
-Blizzard — 35 Mana, 20% Atk frost to ALL / 10 BD / 4.0, 4cd; layers 1-2 stacks of Chilled
+Blizzard — 35 Mana, 15% Atk frost to ALL / 10 BD / 4.0, 4cd; layers 1-2 stacks of Chilled
 on each victim (Perfect: refunds 5 Mana).<br>
 Ice Lance — 25 Mana, 40% Atk frost / 15 BD / 3.0, 2cd; ALWAYS crits against Frozen targets
 (Perfect: 20 BD instead).<br>
-<i>Talent-granted:</i> Rime — 25 Mana, 3.0, 3cd: for 3 turns every stack of Chilled the
+<i>Talent-granted:</i> Rime — 25 Mana, 3.0, 3cd: inflicts Frostbite (−50% healing
+received, 2 turns), and for 3 turns every stack of Chilled the
 target gains also chills one other random enemy (Perfect: 4 turns). Shatter (capstone) —
 30 Mana, 4.0, 5cd: every Chilled enemy takes 10% of Attack PER STACK of Chilled on it;
-only castable while someone is Chilled (Perfect: cooldown becomes 4).<br>
-VAULTED 07-18 (kept for later): the old Frost Bolt spear.</li>
+only castable while someone is Chilled (Perfect: cooldown becomes 4).</li>
 <li><b>Arcanist (Ramp)</b> — Passive <i>Arcane Resonance</i> (the stack mechanic itself; see
-§5.1). The Echo passive is vaulted for future return.<br>
+§5.1).<br>
 Death Ray — free, 8.0 int, NO cooldown (the Resonance build-up is the gate); castable ONLY
 at 5 Resonance stacks. A fixed 150% Atk arcane / 100 BD
 payoff (the stacks ARE the damage — the per-stack damage bonus does not double-dip), then
@@ -484,8 +482,8 @@ every stack is consumed (Perfect: restores 15 Mana).<br>
 Arcane Cannon — 30 Mana, 30 arcane / 15 BD / 3.5, +7.5% DAMAGE per Resonance stack; recoil is
 a flat 15% of damage dealt (Perfect: +5 bonus BD). Unity splits the recoil across
 the party like any other damage.<br>
-Arcane Barrage — 25 Mana, 6 bolts × 5 dmg / 4 BD at random enemies (30 total), every bolt can
-proc Echo, 3.5 (Perfect: fires a 7th bolt).</li>
+Arcane Barrage — 25 Mana, 6 bolts × 5 dmg / 4 BD at random enemies (30 total), 3.5
+(Perfect: fires a 7th bolt).</li>
 </ul>
 <h3>6.3 Cleric</h3>
 <ul>
@@ -493,7 +491,7 @@ proc Echo, 3.5 (Perfect: fires a 7th bolt).</li>
 Dawnbreak — 20 Mana, 3.0, heal an ally 40; overheal flows back to the Cleric
 (Perfect: +15 healing).<br>
 Renewal — 20 Mana, 3.0, ally heals 15 HP at the start of each of their turns for 5 turns
-(Perfect: also +15 instantly). Holy-only as of 07-10 (was Cleric core).<br>
+(Perfect: also +15 instantly).<br>
 Hymn of Hope — MIRACLE, 30 Faith, 4.0, heal ALL allies 20% max HP (Perfect: 25%).</li>
 <li><b>Devout (Warder)</b> — Passive <i>Devotion Aura</i>: the entire party (Cleric included)
 takes 15% less BD, shown as a battle-long status.<br>
@@ -508,7 +506,7 @@ enemy attacks, a random living hero heals for half the damage it dealt. Basic at
 <b>Shadowrend</b> (corrupted Smite — 22 shadow / 16 BD / 2.0).<br>
 Hex of Ruin — 20 Mana, 2 random enemies × 15 shadow / 24 BD / 3.0, Cripples both for 3 turns
 (Perfect: 4 turns).<br>
-Mind Flay — 30 Mana (no longer a Faith Miracle), 3.5, the target attacks its OWN allies for
+Mind Flay — 30 Mana, 3.5, the target attacks its OWN allies for
 3 turns with +100% Break damage; fizzles to normal behavior if it stands alone
 (Perfect: +115%).<br>
 Umbral Sigil — MIRACLE, 20 Faith, 3.0, brands one enemy for 3 turns: every OTHER member of
@@ -554,7 +552,7 @@ turns). The player picks both targets; each fragment rolls miss/parry separately
 </ul>
 
 <h2>7. Talents</h2>
-<p><b>Trees are FIXED and designed, no longer thematic/generated.</b> Five exist so far —
+<p><b>Trees are FIXED and designed.</b> Five exist so far —
 <b>Berserker, Swordmaster, Warden, Pyromancer, Cryomancer</b> (designed in the RPG Skill Tree
 Generator; source JSONs in data/talent-tree-*.json). Every other spec shows <b>"Coming soon."</b> on the party
 screen until its tree is designed. Points still accrue from victories (fight 1, elite 2,
@@ -585,19 +583,19 @@ Strike, needs Swordsmanship 1), Precision Strikes (+5%/rank crit vs Dazed / Crip
 Exposed ×3). Row 3 — Seasoned Fighter (+3%/rank crit for Lunge and Overpower ×3),
 Opportunist (counter enemy misses with a free Overpower), Sword Mastery (+3%/rank parry ×3).
 Capstone — Execute (grants the ability).</p>
-<p><b>Warden tree (updated 07-16 from the new tree JSON):</b> Row 1 — Tank and Spank
+<p><b>Warden tree:</b> Row 1 — Tank and Spank
 (Mocking Blow 15%/rank chance to Empower a random ally ×3), Unkillable (heal 2%/rank max HP
 on every Block ×3), Elemental Weakness (Crushing Blow shreds elemental resists 5%/rank, 3
-turns ×3). Row 2 — Toughness (Constitution +5%/rank of max HP ×3), <b>Tenacity</b> (LIVE —
-Hardiness is gone: every attack Blocked by <b>Heavy Plating</b> grants +5 max HP for the
+turns ×3). Row 2 — Toughness (Constitution +5%/rank of max HP ×3), Tenacity (every attack
+Blocked by <b>Heavy Plating</b> grants +5 max HP for the
 battle; battle-long gains don't leak into the save), Shieldwall (grants the ability),
-<b>Rally</b> (LIVE: every Heavy Plating block Rallies the party — +15% healing received for
+Rally (every Heavy Plating block Rallies the party — +15% healing received for
 2 turns), Iron Will (+5%/rank damage per debuff on the Warden ×3). Row 3 — Richocet
-(5%/rank chance to Stun the attacker on Block ×3), <b>Endurance</b> (now +1%/rank armor —
-was 3 — per turn without an external heal, resets when healed ×3), Sundering (Crushing Blow
+(5%/rank chance to Stun the attacker on Block ×3), Endurance (+1%/rank armor per turn
+without an external heal, resets when healed ×3), Sundering (Crushing Blow
 splashes 25%/rank of its BD to the enemies <b>Adjacent</b> to the target ×3). Capstone —
 Hold the Line (grants the ability).</p>
-<p><b>Pyromancer tree (added 07-18):</b> Row 1 — Accelerant (Burn ticks +1%/rank of Attack
+<p><b>Pyromancer tree:</b> Row 1 — Accelerant (Burn ticks +1%/rank of Attack
 ×3), Pyromaniac (Inferno Master step +1%/rank ×3), Super Nova (Detonation +3%/rank crit
 ×3). Row 2 — Invigorating Ashes (each Burn tick 5%/rank chance to restore 2% max Mana ×3),
 Molten Core (2%/rank less damage from burning enemies ×3), Flame Shield (grants the
@@ -607,8 +605,8 @@ Melt Armor (every Burn tick melts 1%/rank armor off the victim for the battle, s
 enemy chip ×3), Ashes of Al'ar (on death: 11%/rank chance to revive at 25% HP, once per
 battle ×3), Implosion (Detonation 3%/rank chance to strike twice ×3). Capstone — Firestorm
 (grants the ability).</p>
-<p><b>Cryomancer tree (added 07-20):</b> Row 1 — Hungering Cold (Chilled enemies deal
-1%/rank less damage per stack ×3), Frostbite (Frozen enemies 2%/rank likelier to be crit
+<p><b>Cryomancer tree:</b> Row 1 — Hungering Cold (Chilled enemies deal
+1%/rank less damage per stack ×3), Brittle Ice (Frozen enemies 2%/rank likelier to be crit
 ×3), Piercing Ice (Ice Lance +10%/rank crit damage ×3). Row 2 — Hypothermia (enemies take
 1%/rank more damage per Chilled stack ×3), Frigid Grip (each Chilled stack slows 3%/rank
 harder ×3), Rime (grants the ability), Icy Veins (Ice Lance kills empower the next Ice
@@ -639,8 +637,7 @@ screen); shop offers avoid duplicates per hero.</li>
 <li><b>Relics</b> (permanent meta): one random unlock per boss kill, stored in
 user://relics.json; up to 3 equipped per run at the draft. Pool (5): Waystone Shard (+1 talent
 point at run start), Dragonbone Idol (+10% damage), Chalice of Dawn (party heals 10% after
-victories), Gravewrought Coin (+80 starting gold), Emberheart (fire &amp; holy +20%). (Eidolon
-Mirror removed 07-09; old unlocks are dropped safely.)</li>
+victories), Gravewrought Coin (+80 starting gold), Emberheart (fire &amp; holy +20%).</li>
 </ul>
 
 <h2>9. Enemies</h2>
@@ -661,8 +658,8 @@ shielded. Strike 37% physical/20BD (≈28).</td></tr>
 <tr><td>Orc Shaman (blue)</td><td>110</td><td>50</td><td>1%</td><td>100</td><td>80</td><td>Ranged
 support caster. Chain Lightning 30% nature + 15BD to the ENTIRE hero party (≈15);
 <b>Healing Wave</b> — heals the most wounded ally under 40% health for 25% of
-its max HP (friendly tanks and healers first). Resists: fire 25%, frost 25%, nature 50%.
-(Lightning Bolt VAULTED 07-16 — removed but kept for future return.)</td></tr>
+its max HP (friendly tanks and healers first). Resists: fire 25%, frost 25%,
+nature 50%.</td></tr>
 <tr><td>Orc Chief (elite)</td><td>250</td><td>100</td><td>20%</td><td>80</td><td>130</td><td>Rage user:
 Strike 28%/26BD +15 Rage; Heavy Strike 30R 54%/40BD; Crushing Blow 20R 34%/56BD. Resists:
 physical 15%.</td></tr>
@@ -674,7 +671,7 @@ for 20% of its max HP (itself included).</td></tr>
 <td>160</td><td>Chief kit, bigger sprite, 20 starting Rage. Resists: fire 50%, physical 10%.
 WEAK to frost (+25% damage taken).</td></tr>
 </table>
-<p><b>Compositions — the power-budget system (07-16):</b> every enemy carries a power
+<p><b>Compositions — the power-budget system:</b> every enemy carries a power
 value — <b>Raider 1, Archer 1, Shieldmaster 2, Shaman 2, Chief 4, Boss 7</b> — and every
 battle rolls a power budget that is ALWAYS spent exactly. <b>The budget scales across each
 zone</b> (tier = the floor within the zone, 1–11 with the boss on 11): <b>tiers 1–3 roll
@@ -721,10 +718,10 @@ heroes' plates along the LEFT edge, enemies' along the RIGHT. A plate holds a
 <b>portrait</b> (dedicated art if the unit has it — the Berserker does — else a sprite
 close-up), the unit's name, HP bar, resource bar(s), Break meter with numeric x/100
 readout, and its status chips (hover for tooltips; Bleed buildup is a chip).
-<b>All battle UI runs ~20% smaller than the first draft</b> (144px plates, 240px log,
+<b>The battle UI is deliberately compact</b> (144px plates, 240px log,
 compact action bar and initiative portraits) so the field dominates the screen.
-<b>The acting unit's plate glows with a gold border — that IS the turn indicator</b> (the
-old yellow arrow is gone); hovering or Tab-targeting a unit lights its plate too, and
+<b>The acting unit's plate glows with a gold border — that IS the turn
+indicator</b>; hovering or Tab-targeting a unit lights its plate too, and
 hovering a plate highlights its unit on the field. A dead unit's plate dims. Plate visuals
 are plain placeholders until the final UI asset set arrives. Rapid floating combat texts stagger
 vertically so they stay readable. The combat log details status effects: Bleed lines show
@@ -732,7 +729,7 @@ buildup and meter value, Poison lines show stack counts and damage per turn, and
 report their stack multiplier.</li>
 <li><b>Action bar:</b> Basic attack button; <b>Abilities ▾</b> — a button list where hovering
 each entry live-previews its initiative cost on the bar (costs shown, unaffordable entries
-greyed); <b>[Alt] Items</b> — opens the item picker. Guard no longer exists.</li>
+greyed); <b>[Alt] Items</b> — opens the item picker.</li>
 <li><b>Ability hotkeys:</b> <b>Q / W / E / R / A / S / D / F</b> map to the ability MENU
 slots in order — Q is always the basic attack, the Beastmaster's "Summon Companion" picker
 holds W, and the remaining abilities follow in kit order. Each button shows its key, e.g.
@@ -804,7 +801,7 @@ reasons on the node tooltips) for Berserker / Swordmaster / Warden / Pyromancer 
 for specs whose trees aren't designed yet.</li>
 <li><b>Awakening screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
 along on every path the class can take) and each ability's damage with its "% Atk" scaling.
-The draft screen stays clean — no passive text there (removed 07-16).</li>
+The draft screen stays clean — no passive text there.</li>
 <li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per party member;
 reached via the 6 shop nodes on every zone map.</li>
 <li><b>Relics screen:</b> collection viewer from the main menu.</li>
@@ -851,12 +848,11 @@ single-frame Idle (the Pyromancer today) simply stands. Dedicated portraits are
 Name_Portrait.png (used on the nameplate, initiative bar, and party list). New assets arrive
 in "imported files/" (animated GIFs get converted to strips; 8-direction rotation GIFs — the
 east-facing frame is extracted).</li>
-<li><b>Resolution template (the Pyromancer — DECIDED 07-12):</b> the larger sprite size won
-the comparison; all character art going forward matches the Pyromancer: a standing figure
-≈110–120px tall inside a <b>236px frame, rendered at 1:1</b> (never scaled), original
-colors. The Berserker (124px @1.25×) is now legacy-sized and should be re-generated at the
-new template when convenient. Battle backgrounds: authored at ≈1280×720 (up to ~1670×940)
-and shown at/near native size — never blown up.</li>
+<li><b>Resolution template:</b> all character art matches the Pyromancer — a standing
+figure ≈110–120px tall inside a <b>236px frame, rendered at 1:1</b> (never scaled),
+original colors. The Berserker (124px @1.25×) is legacy-sized and should be re-generated
+at the template when convenient. Battle backgrounds: authored at ≈1280×720 (up to
+~1670×940) and shown at/near native size — never blown up.</li>
 <li><b>Combat pacing:</b> global PACE multiplier 0.85 on battle waits.</li>
 </ul>
 
