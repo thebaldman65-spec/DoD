@@ -161,7 +161,8 @@ ability button ("CD n") and in its tooltip. <b>Enemies do not use cooldowns at a
 positive one. Talents that count debuffs (Dominant Presence, Iron Will) use this
 classification.</li>
 <li><b>Crit:</b> 10% base + 25% vs Broken targets + 3% per Mage Resonance stack + talent/spec
-bonuses (+15% with Aguila summoned). Guaranteed: Razor Ice vs Chilled. Resonance builds
+bonuses (+15% with Aguila summoned). Guaranteed: Ice Lance vs Frozen; a perfect Execute.
+Resonance builds
 only on the Mage's own casts — parry counters do not grant stacks.</li>
 <li><b>Attacker modifiers:</b> Resonance +15%/stack; Surge +20%; Empower +25%; Cripple −25%;
 Blood Frenzy up to +40% as HP falls; Seasoned Fighter +15% above half HP; relic bonuses
@@ -257,6 +258,10 @@ bloodloss (Berserker talent); a permanent chip with the live value.</td></tr>
 (Pyromancer talent ability, 2 turns).</td></tr>
 <tr><td>Seeding Embers</td><td>Bonus damage on the next turn, harvested from an enemy that
 died Burning (Pyromancer talent); the chip shows the live %.</td></tr>
+<tr><td>Rallied</td><td>+15% healing received (the Warden's Rally, 2 turns per Heavy
+Plating block).</td></tr>
+<tr><td>Rime</td><td>Every stack of Chilled this enemy gains also chills one other random
+enemy (Cryomancer talent ability).</td></tr>
 <tr><td>Melt Armor</td><td>Armor burned away for the battle by Burn ticks (Pyromancer
 talent); sits on the ENEMY with the live −% on the chip.</td></tr>
 <tr><td>Hold the Line</td><td>Takes 50% less Break damage (Warden capstone).</td></tr>
@@ -455,16 +460,20 @@ for 2 turns and attackers are set Burning 3 turns (Perfect: also triggers an imm
 tick on every burning enemy). Firestorm — 30 Mana, 3.5, 4cd, capstone: 6-8 bolts at RANDOM
 enemies for 12% Atk each, each bolt applying 2 turns of Burn (Perfect: 7-9 bolts).<br>
 VAULTED 07-16 (kept for later): Pyroblast, Flame Surge, Phoenix Rebirth.</li>
-<li><b>Cryomancer (Control, reworked 07-18)</b> — Passive <i>Shattering</i>: +2% crit
-chance for every enemy Frozen this battle (live chip). Its core Magic Bolt is reforged into
-<b>Frostbolt</b> — free, 20% Atk frost / 15 BD / 2.0, no cd, applies 1 stack of Chilled
-(Perfect: hits at 25% of Attack).<br>
-Razor Ice — 20 Mana, 15% Atk frost / 10 BD / 2.5, 3cd × 3 RANDOM enemies; +3% damage per
-stack of Chilled on each victim (Perfect: unchilled victims gain a stack).<br>
+<li><b>Cryomancer (Control)</b> — Passive <i>Permafrost</i> (07-20, replaces
+Shattering): Frozen enemies take 15% increased damage from ALL sources. Its core Magic
+Bolt is reforged into <b>Frostbolt</b> — free, 20% Atk frost / 15 BD / 2.0, no cd, applies
+1 stack of Chilled (Perfect: hits at 25% of Attack).<br>
+Razor Ice — 20 Mana, 20% Atk frost / 10 BD / 2.5, 3cd × 2 RANDOM enemies; every hit
+applies a stack of Chilled (Perfect: hits at 25% of Attack).<br>
 Blizzard — 35 Mana, 20% Atk frost to ALL / 10 BD / 4.0, 4cd; layers 1-2 stacks of Chilled
 on each victim (Perfect: refunds 5 Mana).<br>
 Ice Lance — 25 Mana, 40% Atk frost / 15 BD / 3.0, 2cd; ALWAYS crits against Frozen targets
 (Perfect: 20 BD instead).<br>
+<i>Talent-granted:</i> Rime — 25 Mana, 3.0, 3cd: for 3 turns every stack of Chilled the
+target gains also chills one other random enemy (Perfect: 4 turns). Shatter (capstone) —
+30 Mana, 4.0, 5cd: every Chilled enemy takes 10% of Attack PER STACK of Chilled on it;
+only castable while someone is Chilled (Perfect: cooldown becomes 4).<br>
 VAULTED 07-18 (kept for later): the old Frost Bolt spear.</li>
 <li><b>Arcanist (Ramp)</b> — Passive <i>Arcane Resonance</i> (the stack mechanic itself; see
 §5.1). The Echo passive is vaulted for future return.<br>
@@ -545,9 +554,9 @@ turns). The player picks both targets; each fragment rolls miss/parry separately
 </ul>
 
 <h2>7. Talents</h2>
-<p><b>Trees are FIXED and designed, no longer thematic/generated.</b> Four exist so far —
-<b>Berserker, Swordmaster, Warden, Pyromancer</b> (designed in the RPG Skill Tree Generator;
-source JSONs in data/talent-tree-*.json). Every other spec shows <b>"Coming soon."</b> on the party
+<p><b>Trees are FIXED and designed, no longer thematic/generated.</b> Five exist so far —
+<b>Berserker, Swordmaster, Warden, Pyromancer, Cryomancer</b> (designed in the RPG Skill Tree
+Generator; source JSONs in data/talent-tree-*.json). Every other spec shows <b>"Coming soon."</b> on the party
 screen until its tree is designed. Points still accrue from victories (fight 1, elite 2,
 boss 3; Waystone +1) and bank until a tree exists.</p>
 <p><b>Ranks are additive:</b> when a node offers an increase by a specified amount, every
@@ -598,6 +607,15 @@ Melt Armor (every Burn tick melts 1%/rank armor off the victim for the battle, s
 enemy chip ×3), Ashes of Al'ar (on death: 11%/rank chance to revive at 25% HP, once per
 battle ×3), Implosion (Detonation 3%/rank chance to strike twice ×3). Capstone — Firestorm
 (grants the ability).</p>
+<p><b>Cryomancer tree (added 07-20):</b> Row 1 — Hungering Cold (Chilled enemies deal
+1%/rank less damage per stack ×3), Frostbite (Frozen enemies 2%/rank likelier to be crit
+×3), Piercing Ice (Ice Lance +10%/rank crit damage ×3). Row 2 — Hypothermia (enemies take
+1%/rank more damage per Chilled stack ×3), Frigid Grip (each Chilled stack slows 3%/rank
+harder ×3), Rime (grants the ability), Icy Veins (Ice Lance kills empower the next Ice
+Lance +15%/rank ×3), Splintering Shards (Razor Ice 20%/rank chance of one extra target
+×3). Row 3 — Whiteout (Blizzard victims 15%/rank chance to be Dazed 2 turns ×3), Freezing
+Advance (Rime's spread deals 2%/rank of Attack as frost to the new victim ×3), Empowered
+Frostbolt (Frostbolt +2%/rank of Attack ×3). Capstone — Shatter (grants the ability).</p>
 <p><b>Tooltip display:</b> talent tooltips never say "per rank" — the number shown grows
 with the points invested (3% → 6% → 9%; unlearned nodes preview the 1-point value).</p>
 <p><b>Talent visibility:</b> every talent proc is written to the combat log with a
@@ -782,7 +800,7 @@ scaling, and the spec passive line bakes in talent ranks (Aggressive/Defensive S
 Unstoppable) — the class passive + spec passive lines, ability chips (hover shows real
 numbers AND the "% of Attack" scaling), rune equip toggles (2 max), and the spec's talent
 tree: a 12-node grid with prerequisite connector lines and click-to-learn nodes (lock
-reasons on the node tooltips) for Berserker / Swordmaster / Warden / Pyromancer, or <b>"Coming soon."</b>
+reasons on the node tooltips) for Berserker / Swordmaster / Warden / Pyromancer / Cryomancer, or <b>"Coming soon."</b>
 for specs whose trees aren't designed yet.</li>
 <li><b>Awakening screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
 along on every path the class can take) and each ability's damage with its "% Atk" scaling.
@@ -815,9 +833,9 @@ stdout as "[LOG] ..." so headless tests can grep them. Target ≈85% bot win rat
 exported builds require DOD_DEBUG=1. The map burger menu gains a DEBUG section — +200 gold, +3 talent points for everyone, full heal, jump to the boss tier,
 advance to the next zone, and <b>Reroll Specs</b> (refunds spent talent points, clears all
 specs, and reopens the awakening screen). In battle, a <b>DEBUG ▾ menu</b> (bottom-right)
-offers: Full Restore (HP/resources/secondary for the party), <b>Reset cooldowns</b> (wipes
-the heroes' ability and talent internal cooldowns — enemies carry none — and refreshes the
-open action bar), an
+offers: Full Restore (HP/resources/secondary for the party), a <b>Cooldowns OFF</b>
+toggle (while checked, hero abilities never go on cooldown; existing cooldowns clear on
+enabling — enemies carry none), an
 <b>Enemy attacks OFF</b> toggle (enemies skip their turns while checked), and a <b>turn
 lock</b> — pick a hero and every HERO turn is theirs until you unlock (re-select them) or
 lock a different hero, while <b>enemies keep attacking on their own turns</b> (combine with
@@ -855,8 +873,8 @@ only the Tyrant's frost weakness is set) and Counter Attack (defined term; no ta
 ability grants it yet).</li>
 <li>The Withered Warden has its own kit; the Ash-Wrought Tyrant is still a Chief stand-in —
 unique kit + art planned. Boss art for both pending.</li>
-<li>Trees still to design: Cryomancer, Arcanist, all three Cleric specs, all three Hunter
-specs; full rune loot table pending; relic pool (5) needs growth.</li>
+<li>Trees still to design: Arcanist, all three Cleric specs, all three Hunter specs;
+full rune loot table pending; relic pool (5) needs growth.</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>
 <li>The sim bot currently wins ~100% of standard fights (target ≈85%) — difficulty leans
 easy; real tuning comes from playtests.</li>

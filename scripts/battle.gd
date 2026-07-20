@@ -59,6 +59,7 @@ const STATUS_INFO := {
 	"rally_heal": ["Rallied", "R+", Color(0.95, 0.75, 0.45), "+15% healing received\n(the Warden's Rally)."],
 	"flame_shield": ["Flame Shield", "FS", Color(1.0, 0.55, 0.25), "Takes 50% less damage; attackers\nare set Burning (3 turns)."],
 	"seeding": ["Seeding Embers", "SE", Color(1.0, 0.65, 0.3), "Empowered by a burning death:\nbonus damage on the next turn."],
+	"rime": ["Rime", "Ri", Color(0.75, 0.9, 1.0), "Rimed: every stack of Chilled this\nenemy gains also chills one other\nrandom enemy."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -120,6 +121,8 @@ var sim_target := 0
 var debug_prints := false
 var debug_enemies_off := false  # debug toggle: enemies skip their turns
 var debug_locked_hero: BattleUnit = null  # debug: every turn goes to this hero
+var debug_cooldowns_off := false  # debug toggle: abilities never cool down
+var _rime_echoing := false  # guards Rime chill-echoes from chaining
 var _debug_popup: PopupMenu
 
 # Accumulated across scene reloads within one simulation run.
@@ -697,7 +700,7 @@ func _build_debug_panel() -> void:
 	ui.add_child(menu)
 	_debug_popup = menu.get_popup()
 	_debug_popup.add_item("Full Restore", 0)
-	_debug_popup.add_item("Reset cooldowns", 2)
+	_debug_popup.add_check_item("Cooldowns OFF", 2)
 	_debug_popup.add_check_item("Enemy attacks OFF", 1)
 	_debug_popup.add_separator("Turn lock — all hero turns")
 	for i in heroes.size():
@@ -710,7 +713,17 @@ func _on_debug_menu(id: int) -> void:
 		_debug_full_restore()
 		return
 	if id == 2:
-		_debug_reset_cooldowns()
+		var cd_idx := _debug_popup.get_item_index(2)
+		_debug_popup.set_item_checked(cd_idx, not _debug_popup.is_item_checked(cd_idx))
+		debug_cooldowns_off = _debug_popup.is_item_checked(cd_idx)
+		if debug_cooldowns_off:
+			for u2 in heroes + companions + enemies:
+				u2.cooldowns.clear()
+				u2.unrelenting_cd = 0
+		_log("DEBUG: cooldowns %s" % ("OFF" if debug_cooldowns_off else "back on"),
+			"#e0a050")
+		if current_hero != null and not current_hero.dead and action_panel.visible:
+			_show_actions(current_hero)
 		return
 	if id == 1:
 		var check_idx := _debug_popup.get_item_index(1)
@@ -747,16 +760,7 @@ func _debug_toggle_enemies(off: bool) -> void:
 	_log("DEBUG: enemy attacks %s" % ("OFF" if off else "back on"), "#e0a050")
 
 
-# Wipes every unit's ability cooldowns (talent internal cooldowns too) so a
-# locked hero can spam their whole kit while testing.
-func _debug_reset_cooldowns() -> void:
-	for u in heroes + companions + enemies:
-		u.cooldowns.clear()
-		u.unrelenting_cd = 0
-	_log("DEBUG: all cooldowns reset", "#e0a050")
-	# Refresh the open action bar so buttons un-grey immediately.
-	if current_hero != null and not current_hero.dead and action_panel.visible:
-		_show_actions(current_hero)
+
 
 
 func _on_burger(id: int) -> void:
@@ -1088,17 +1092,6 @@ func _update_talent_chips() -> void:
 		h.update_status("spec_passive", "+%d%%" % inf_pct,
 			"Inferno Master: +%d%% damage for each burning\nenemy (up to +%d%%).\nCurrently +%d%% (%d burning)." % [
 				inf_step, inf_step * 5, inf_pct, burning])
-	# Shattering: the Cryomancer's passive chip counts frozen enemies.
-	var frozen_count := 0
-	for foe in enemies:
-		if foe.was_frozen:
-			frozen_count += 1
-	for h in heroes:
-		if h.dead or h.passive_id != "shattering":
-			continue
-		h.update_status("spec_passive", "+%d%%" % (frozen_count * 2),
-			"Shattering: +2%% crit chance for every enemy\nFrozen this battle.\nCurrently +%d%% (%d frozen)." % [
-				frozen_count * 2, frozen_count])
 	# Seeding Embers: harvest burning deaths (once per corpse).
 	for foe in enemies:
 		if not foe.dead or foe.seeding_consumed or foe.burn_at_death <= 0:
@@ -1287,7 +1280,18 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			var barrage := _find_ability(u, "Arcane Barrage")
 			if barrage != null and u.resource >= barrage.cost and u.ability_ready(barrage) and foes.size() >= 2:
 				return [barrage, target_foe]
-			# Cryomancer: lance the frozen, storm the crowd, shard the rest.
+			# Cryomancer: shatter ripe stacks, rime spreaders, lance the frozen.
+			var shat := _find_ability(u, "Shatter")
+			if shat != null and u.resource >= shat.cost and u.ability_ready(shat):
+				var chill_total := 0
+				for e in foes:
+					chill_total += e.status_stacks("chilled") if e.has_status("chilled") else 0
+				if chill_total >= 4:
+					return [shat, target_foe]
+			var rime_ab := _find_ability(u, "Rime")
+			if rime_ab != null and u.resource >= rime_ab.cost and u.ability_ready(rime_ab) \
+					and foes.size() >= 2 and not target_foe.has_status("rime"):
+				return [rime_ab, target_foe]
 			var lance := _find_ability(u, "Ice Lance")
 			if lance != null and u.resource >= lance.cost and u.ability_ready(lance):
 				var frozen_foes := foes.filter(func(e): return e.has_status("frozen"))
@@ -1526,6 +1530,10 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# Execute: only usable while an enemy is below 20% health.
 	if ab.display_name == "Execute" \
 			and not enemies.any(func(e): return not e.dead and e.hp < e.max_hp * 0.2):
+		return false
+	# Shatter: needs someone Chilled to detonate.
+	if ab.display_name == "Shatter" \
+			and not enemies.any(func(e): return not e.dead and e.has_status("chilled")):
 		return false
 	if ab.display_name == "Death Ray" and u.second_resource < 5:
 		return false
@@ -1952,6 +1960,16 @@ func _lowest_hp(pool: Array) -> BattleUnit:
 	return best
 
 
+# Highest rank of a talent stat among LIVING heroes (party-wide talents
+# like Hypothermia, Frostbite, Hungering Cold, Frigid Grip).
+func _max_hero_rank(field: String) -> int:
+	var best := 0
+	for h in heroes:
+		if not h.dead:
+			best = maxi(best, int(h.get(field)))
+	return best
+
+
 # ADJACENT (keyword): the enemies DIRECTLY beside the target in formation
 # order. A dead neighbor NEGATES the adjacent bonus on that side — the
 # effect never jumps past a corpse to the next living enemy. Used by
@@ -2020,11 +2038,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		is_counter := false) -> void:
 	attacker.resource = clampi(attacker.resource - ab.cost + ab.resource_gain, 0, attacker.max_resource)
 	attacker.refresh_bars()
-	if not is_counter:
+	if not is_counter and not debug_cooldowns_off:
 		attacker.start_cooldown(ab)
 	var dmg_mult := {"perfect": 1.15, "good": 1.0, "fail": 0.6}[grade] as float
 	var pr_mult := {"perfect": 1.25, "good": 1.0, "fail": 0.5}[grade] as float
 	var is_perfect := grade == "perfect"
+	# Shatter perfect: the echo of the blast comes back sooner (4cd).
+	if is_perfect and ab.display_name == "Shatter" and not debug_cooldowns_off:
+		attacker.cooldowns[ab.display_name] = 5  # 4 + the same-turn tick
 
 	# Move toward the target so attacks visibly connect (specials stay put):
 	# units with real locomotion art WALK to melee range; the rest do the
@@ -2089,6 +2110,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if ab.aoe:
 			strike_targets = enemies.filter(func(t): return not t.dead) \
 				if attacker.is_hero else _hero_side()
+			# Shatter only detonates the Chilled.
+			if ab.display_name == "Shatter":
+				strike_targets = strike_targets.filter(
+					func(t): return t.has_status("chilled"))
 		elif ab.choose_two:
 			var second: BattleUnit = second_target
 			if second == null or second.dead or second == target:
@@ -2105,6 +2130,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# Firestorm: 6-8 bolts from the sky (7-9 on a perfect).
 		if ab.display_name == "Firestorm":
 			total_hits = randi_range(6, 8) + (1 if is_perfect else 0)
+		# Splintering Shards: Razor Ice can find one more victim.
+		if ab.display_name == "Razor Ice" and attacker.splinter_ranks > 0 \
+				and randf() < 0.20 * attacker.splinter_ranks:
+			total_hits += 1
+			_log("Talent: Splintering Shards — Razor Ice splinters again!", "#b0a8e0")
 		var total_dealt := 0
 		var any_crit := false
 		for hit_i in total_hits:
@@ -2249,13 +2279,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Super Nova: Detonation crits harder into the ash.
 			if attacker.supernova_ranks > 0 and ab.display_name == "Detonation":
 				crit_chance += 0.03 * attacker.supernova_ranks
-			# Shattering: every enemy Frozen this battle sharpens the edge.
-			if attacker.passive_id == "shattering":
-				var shatter_count := 0
-				for foe in enemies:
-					if foe.was_frozen:
-						shatter_count += 1
-				crit_chance += 0.02 * shatter_count
+			# Frostbite (talent): Frozen targets are easier to strike true.
+			if strike_target.has_status("frozen"):
+				crit_chance += 0.02 * _max_hero_rank("frostbite_ranks")
 			if is_perfect and ab.display_name == "Aimed Shot":
 				crit_chance += 0.25
 			# Sweeping Strikes perfect: the second swing cuts truer.
@@ -2274,7 +2300,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if parried:
 				raw *= 0.25
 			if is_crit:
-				raw *= 2.0 if attacker.passive_id == "lethal_aim" else 1.5
+				var crit_mult := 2.0 if attacker.passive_id == "lethal_aim" else 1.5
+				# Piercing Ice: the lance drives deeper on a crit.
+				if ab.display_name == "Ice Lance":
+					crit_mult += 0.10 * attacker.piercing_ice_ranks
+				raw *= crit_mult
 			# Attacker-side modifiers.
 			if attacker.second_resource_name == "Resonance" \
 					and ab.display_name != "Death Ray":
@@ -2286,12 +2316,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Arcane Cannon: the damage (not the recoil) grows with Resonance.
 			if ab.display_name == "Arcane Cannon":
 				raw *= 1.0 + 0.075 * attacker.second_resource
-			# Frostbolt perfect: the shard bites at 25% of Attack instead.
-			if is_perfect and ab.display_name == "Frostbolt":
+			# Frostbolt / Razor Ice perfects: flat 25% of Attack instead.
+			if is_perfect and ab.display_name in ["Frostbolt", "Razor Ice"]:
 				raw = 0.25 * attacker.attack * randf_range(0.9, 1.1)
-			# Razor Ice: +3% damage per stack of Chilled on the victim.
-			if ab.display_name == "Razor Ice" and strike_target.has_status("chilled"):
-				raw *= 1.0 + 0.03 * strike_target.status_stacks("chilled")
+			# Empowered Frostbolt (talent): the basic bolt bites deeper.
+			if ab.display_name == "Frostbolt" and attacker.emp_frostbolt_ranks > 0:
+				raw += 0.02 * attacker.emp_frostbolt_ranks * attacker.attack
+			# Shatter: 10% of Attack PER Chilled stack on each victim.
+			if ab.display_name == "Shatter":
+				raw *= maxi(strike_target.status_stacks("chilled"), 1)
+			# Icy Veins: a banked kill empowers this lance.
+			if ab.display_name == "Ice Lance" and attacker.icy_veins_charge > 0.0:
+				raw *= 1.0 + attacker.icy_veins_charge
 			if is_perfect and ab.display_name == "Explosive Shot":
 				raw = 0.12 * attacker.attack * randf_range(0.9, 1.1)
 			# Fireball perfect: the bolt hits at 25% of Attack instead of 20%.
@@ -2334,9 +2370,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 + attacker.status_power("seeding") / 100.0
 			if attacker.has_status("cripple"):
 				raw *= 0.75
-			# Chilled x3: frozen muscles swing 15% softer.
-			if attacker.status_stacks("chilled") >= 3:
+			# Chilled x3: frozen muscles swing 15% softer. Hungering Cold
+			# (talent) deepens the malus per stack.
+			var atk_chill := attacker.status_stacks("chilled")
+			if atk_chill >= 3:
 				raw *= 0.85
+			if atk_chill > 0:
+				raw *= 1.0 - 0.01 * _max_hero_rank("hungering_ranks") * atk_chill
 			# Blood Frenzy: +2% damage (plus Unstoppable) per 5% of HP missing.
 			if attacker.passive_id == "bloodrage":
 				var frenzy_steps := int((1.0 - attacker.hp / float(attacker.max_hp)) \
@@ -2377,6 +2417,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Molten Core: burning attackers bite softer on the Pyromancer.
 			if strike_target.molten_ranks > 0 and attacker.has_status("burn"):
 				raw *= 1.0 - 0.02 * strike_target.molten_ranks
+			# Permafrost: Frozen enemies take 15% more from ALL sources.
+			if strike_target.has_status("frozen") and heroes.any(
+					func(h): return not h.dead and h.passive_id == "permafrost"):
+				raw *= 1.15
+			# Hypothermia (talent): the cold opens wounds wider.
+			if not strike_target.is_hero and strike_target.has_status("chilled"):
+				raw *= 1.0 + 0.01 * _max_hero_rank("hypothermia_ranks") \
+					* strike_target.status_stacks("chilled")
 			# Flame Shield: the fire barrier halves what gets through.
 			if strike_target.has_status("flame_shield"):
 				raw *= 0.5
@@ -2637,6 +2685,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				for chill_i in randi_range(1, 2):
 					_apply_status(strike_target, "chilled", 3)
 				_note_debuff_applied(attacker, "chilled")
+				# Whiteout: the storm blinds.
+				if attacker.whiteout_ranks > 0 and not strike_target.dead \
+						and randf() < 0.15 * attacker.whiteout_ranks:
+					_log("   → Talent: Whiteout — %s is blinded by the storm" % \
+						strike_target.unit_name, "#b0a8e0")
+					_apply_status(strike_target, "dazed", 2)
+					_note_debuff_applied(attacker, "dazed")
+			# Icy Veins: an Ice Lance kill banks power for the next lance.
+			if ab.display_name == "Ice Lance" and attacker.is_hero:
+				attacker.icy_veins_charge = 0.0
+				if result.died and attacker.icy_veins_ranks > 0:
+					attacker.icy_veins_charge = 0.15 * attacker.icy_veins_ranks
+					_log("   → Talent: Icy Veins — the next Ice Lance hits +%d%%" % \
+						int(attacker.icy_veins_charge * 100), "#b0a8e0")
 			# Razor Ice perfect: unchilled victims catch the frost.
 			if is_perfect and ab.display_name == "Razor Ice" \
 					and not strike_target.dead \
@@ -2833,16 +2895,41 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		return
 	var info: Array = STATUS_INFO[id]
 	target.add_status(id, info[0], info[1], info[2], turns, info[3], power, tick)
-	# Four stacks of Chilled flash-freeze the victim (the stacks reset).
-	if id == "chilled" and target.status_stacks("chilled") >= 4:
-		target.remove_status("chilled")
-		_log("   → %s FREEZES SOLID (4 stacks of Chilled)" % target.unit_name,
-			"#7cc8f0")
-		if not target.was_frozen:
-			target.was_frozen = true
-		_apply_status(target, "frozen", 1)
-		return
 	if id == "chilled":
+		# Frigid Grip rides every stack: stamp the deeper slow on the victim.
+		target.frigid_bonus = 0.03 * _max_hero_rank("frigid_ranks")
+		# Rime: the chill leaps to one other random enemy (never chains).
+		if target.has_status("rime") and not _rime_echoing:
+			var others := enemies.filter(func(e): return not e.dead and e != target)
+			if not others.is_empty():
+				var echo_t: BattleUnit = others.pick_random()
+				_rime_echoing = true
+				_log("   → Rime spreads the chill to %s" % echo_t.unit_name, "#7cc8f0")
+				_apply_status(echo_t, "chilled", 3)
+				# Freezing Advance: the leap stings.
+				var freeze_adv := _max_hero_rank("freezing_ranks")
+				if freeze_adv > 0 and not echo_t.dead:
+					var fa_atk := 0
+					for h in heroes:
+						if not h.dead and h.freezing_ranks > 0:
+							fa_atk = maxi(fa_atk, h.attack)
+					var fa_dmg := maxi(int(round(0.02 * freeze_adv * fa_atk)), 1)
+					if echo_t.take_tick_damage(fa_dmg, "-%d Frost" % fa_dmg,
+							Color(0.6, 0.85, 1.0)):
+						_sfx("death", -4.0)
+						_log("† %s dies" % echo_t.unit_name, "#e05050")
+					_log("   → Talent: Freezing Advance — %s takes %d frost" % [
+						echo_t.unit_name, fa_dmg], "#b0a8e0")
+				_rime_echoing = false
+		# Four stacks flash-freeze the victim (the stacks reset).
+		if target.status_stacks("chilled") >= 4:
+			target.remove_status("chilled")
+			_log("   → %s FREEZES SOLID (4 stacks of Chilled)" % target.unit_name,
+				"#7cc8f0")
+			if not target.was_frozen:
+				target.was_frozen = true
+			_apply_status(target, "frozen", 1)
+			return
 		_log("   → Chilled on %s (x%d, 3-turn clock reset)" % [target.unit_name,
 			target.status_stacks("chilled")], "#7cc8f0")
 		return
@@ -3205,6 +3292,12 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						_sfx("death", -4.0)
 						_message("%s falls!" % foe.unit_name)
 						_log("† %s dies" % foe.unit_name, "#e05050")
+		"rime":
+			_sfx("break", -9.0, 1.4)
+			_apply_status(target, "rime", 4 if is_perfect else 3)
+			_message("%s rimes %s!" % [attacker.unit_name, target.unit_name])
+			_log("%s: Rime on %s — its chills will spread (%d turns)" % [
+				attacker.unit_name, target.unit_name, 4 if is_perfect else 3], "#7cc8f0")
 		"healing_wave":
 			var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)
 			_sfx("heal", -6.0, 0.75)

@@ -76,6 +76,22 @@ Burn REAPPLICATION extends duration by the APPLIED turns (unit.add_status
 burn branch). ADJACENT IS STRICT (07-16): dead neighbor = no bonus on
 that side, never jumps past corpses (_adjacent_enemies). Log itemizes
 mitigation: "(nature resist -8) (armor -12) (WEAK! +9)".
+CRYOMANCER TREE (07-20, 5th fixed tree): Hungering Cold/Frostbite/
+Hypothermia/Frigid Grip are PARTY-WIDE talent auras read via
+_max_hero_rank(field) (frigid stamps unit.frigid_bonus on victims at
+chilled application); Piercing Ice (Ice Lance crit_mult), Icy Veins
+(unit.icy_veins_charge armed on lance kills, consumed next lance),
+Splintering Shards (extra Razor hit roll in total_hits), Whiteout
+(Blizzard daze 2t), Freezing Advance (rime-echo sting), Empowered
+Frostbolt (flat % add). Talent abilities: Rime ("rime" special+status,
+echo in _apply_status chilled branch, _rime_echoing guard stops chains)
+and Shatter capstone (aoe filtered to chilled targets, raw ×stacks,
+usable gate needs a chilled enemy, perfect sets cooldowns["Shatter"]=5).
+Passive "permafrost" (07-20, replaced "shattering"): frozen targets take
++15% from all sources (target-side in _resolve). Razor Ice v3: 2 random
+@20%, always chills, perfect flat 25%. DEBUG: "Cooldowns OFF" CHECK
+toggle (debug_cooldowns_off — start_cooldown skipped while on; replaces
+the old reset command).
 CRYOMANCER REWORK (07-18): archetype CONTROL (new, Damage role/100 Atk,
 ARCHETYPE_ROLE+DESC). CHILLED = STACKING debuff (max 4, unit.add_status
 chilled branch + _chilled_desc; reapplication RESETS the 3-turn clock;

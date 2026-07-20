@@ -5,6 +5,33 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-20 — Batch 18: Cryomancer talent tree (Rime + Shatter), Permafrost, cd toggle</h2>
+<ul>
+<li><b>Fifth fixed talent tree — Cryomancer</b> (from the new tree JSON), 12 nodes:
+Hungering Cold (Chilled enemies −1%/rank damage per stack), Frostbite (Frozen +2%/rank
+easier to crit), Piercing Ice (Ice Lance +10%/rank crit damage), Hypothermia (+1%/rank
+damage taken per Chilled stack), Frigid Grip (each stack slows 3%/rank harder), Icy Veins
+(Ice Lance kills empower the next lance +15%/rank), Splintering Shards (Razor Ice 20%/rank
+chance of an extra target), Whiteout (Blizzard 15%/rank chance to Daze 2 turns), Freezing
+Advance (Rime spreads sting for 2%/rank of Attack), Empowered Frostbolt (+2%/rank of
+Attack).</li>
+<li><b>New talent-granted abilities:</b> <b>Rime</b> — 25 Mana, 3.0 int, 3cd: for 3 turns,
+every Chilled stack the target gains also chills one other random enemy (Perfect: 4 turns;
+spreads never chain). <b>Shatter</b> (capstone) — 30 Mana, 4.0 int, 5cd: every Chilled
+enemy takes 10% of Attack PER Chilled stack; castable only while someone is Chilled
+(Perfect: 4cd).</li>
+<li><b>Passive changed — Permafrost</b> (replaces Shattering): Frozen enemies take 15%
+increased damage from all sources.</li>
+<li><b>Razor Ice v3:</b> 2 random enemies (was 3), 20% of Attack (was 15%), no more
+per-stack bonus damage, and every hit now ALWAYS applies a Chilled stack (Perfect: 25% of
+Attack).</li>
+<li><b>Debug:</b> "Reset cooldowns" replaced by a <b>Cooldowns OFF</b> toggle — while
+checked, hero abilities never go on cooldown (existing cooldowns clear on enabling).</li>
+<li><b>Master Document audit:</b> found and fixed — the Rallied status missing from the
+status table since Batch 12, the Crit keyword still citing the removed "Razor Ice always
+crits vs Chilled" rule, and the stale Shattering/Razor-v2 Cryomancer block.</li>
+</ul>
+
 <h2>2026-07-18 — Batch 17: Cryomancer rework (Control, Chilled stacks → Frozen, Shattering)</h2>
 <ul>
 <li><b>New archetype — Control</b> (Damage role, 100 Atk): "locks the battlefield down —

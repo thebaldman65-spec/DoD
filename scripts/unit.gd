@@ -117,7 +117,20 @@ var implosion_ranks := 0      # Implosion: Detonation can strike twice
 var melted := 0.0             # armor shredded off THIS unit by Melt Armor
 var burn_at_death := 0        # Burn turns left when this unit died (Seeding)
 var seeding_consumed := false # Seeding Embers already harvested this corpse
-var was_frozen := false       # has been Frozen this battle (Shattering counts)
+var was_frozen := false       # has been Frozen this battle
+# Cryomancer tree (07-20). See talents.gd for the node text.
+var hungering_ranks := 0      # Hungering Cold: chilled enemies hit softer
+var frostbite_ranks := 0      # Frostbite: crits land easier on Frozen
+var piercing_ice_ranks := 0   # Piercing Ice: Ice Lance crit damage
+var hypothermia_ranks := 0    # Hypothermia: chilled enemies take more
+var frigid_ranks := 0         # Frigid Grip: deeper slow per stack
+var frigid_bonus := 0.0       # stamped on VICTIMS when Chilled lands
+var icy_veins_ranks := 0      # Icy Veins: Ice Lance kills empower the next
+var icy_veins_charge := 0.0   # the armed bonus for the next Ice Lance
+var splinter_ranks := 0       # Splintering Shards: Razor Ice extra target
+var whiteout_ranks := 0       # Whiteout: Blizzard can Daze
+var freezing_ranks := 0       # Freezing Advance: Rime spreads sting
+var emp_frostbolt_ranks := 0  # Empowered Frostbolt: bigger basic bolt
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
@@ -705,12 +718,13 @@ func start_cooldown(ab: Ability) -> void:
 
 func effective_speed() -> float:
 	var s := speed * (0.75 if has_status("slow") else 1.0)
-	# Chilled deepens with stacks: 1 = -25% speed, 2+ = -50%.
+	# Chilled deepens with stacks: 1 = -25% speed, 2+ = -50% (Frigid Grip
+	# stamps its extra slow on the victim when the stack lands).
 	var chill := status_stacks("chilled") if has_status("chilled") else 0
 	if chill == 1:
-		s *= 0.75
+		s *= 0.75 - frigid_bonus
 	elif chill >= 2:
-		s *= 0.5
+		s *= maxf(0.5 - frigid_bonus, 0.1)
 	if has_status("quickdraw"):
 		s *= 1.5
 	if has_status("wrath"):
