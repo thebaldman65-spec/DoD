@@ -174,6 +174,13 @@ static func apply_kit_overrides(cfg: Dictionary, spec: String) -> void:
 			"applies_status": {"id": "chilled", "turns": 3},
 			"perfect_id": "", "perfect_text": "Deals 25% of Attack instead",
 			"description": "A shard of biting cold: applies 1 stack\nof Chilled (4 stacks freeze the target\nsolid)."})
+	elif spec == "arcanist":
+		cfg["abilities"][0] = Ability.make({"display_name": "Arcane Explosion",
+			"dmg_type": "arcane", "cost": 0, "damage": 10, "pressure": 10,
+			"delay": 2.0, "anim": "attack01", "random_hits": 2,
+			"perfect_extra_hit": false,
+			"perfect_id": "", "perfect_text": "",
+			"description": "Unstable magic detonates over TWO\nrandom enemies. Builds 1 Resonance\n(2 on a critical strike)."})
 
 
 # Archetype outline (design north star for every spec's kit):
@@ -383,25 +390,27 @@ static func spec_abilities(spec: String) -> Array:
 					"perfect_id": "mana5", "perfect_text": "Refunds 5 Mana",
 					"description": "Storm of ice rakes ALL enemies,\nlayering 1-2 stacks of Chilled\non each."}),
 				Ability.make({"display_name": "Ice Lance", "cooldown": 2, "dmg_type": "frost", "cost": 25,
-					"damage": 40, "pressure": 15, "delay": 3.0, "anim": "attack02",
+					"damage": 35, "pressure": 15, "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Deals 20 BD instead",
 					"description": "A frozen spear driven deep: ALWAYS\ncrits against Frozen targets."}),
 			]
 		"arcanist":
+			# Resonance-engine kit (07-20 rework; core Magic Bolt becomes Arcane
+			# Explosion via apply_kit_overrides). VAULTED — kept for future
+			# return: Death Ray (the 5-stack 150% payoff nuke).
 			return [
-				Ability.make({"display_name": "Arcane Cannon", "cooldown": 1, "dmg_type": "arcane", "cost": 30, "damage": 30,
-					"pressure": 15, "delay": 3.5, "anim": "attack02", "recoil_base": 0.15,
-					"perfect_id": "", "perfect_text": "+5 bonus BD",
-					"description": "Channel raw Resonance into a blast:\n+7.5% DAMAGE per Resonance stack.\nRecoil: the Mage takes 15% of the\ndamage dealt."}),
-				# No cooldown — the 5-stack Resonance build-up IS the gate.
-				Ability.make({"display_name": "Death Ray", "dmg_type": "arcane", "cost": 0, "damage": 150,
-					"pressure": 100, "delay": 8.0, "anim": "attack03",
-					"perfect_id": "mana15", "perfect_text": "Restores 15 Mana",
-					"description": "The stored storm, released: requires\n5 Arcane Resonance and CONSUMES all of\nit. Fixed 150 damage payoff."}),
-				Ability.make({"display_name": "Arcane Barrage", "cooldown": 2, "dmg_type": "arcane", "cost": 25, "damage": 5,
-					"pressure": 4, "delay": 3.5, "anim": "attack03", "random_hits": 6,
+				Ability.make({"display_name": "Arcane Cannon", "cooldown": 2, "dmg_type": "arcane", "cost": 25, "damage": 40,
+					"pressure": 0, "delay": 3.5, "anim": "attack02", "recoil_base": 0.15,
+					"perfect_id": "", "perfect_text": "Costs 3.0 initiative instead",
+					"description": "Channel raw Resonance into a blast:\n+7.5% DAMAGE per Resonance stack;\nBD = 5 x current stacks. Recoil: the\nMage takes 15% of the damage dealt."}),
+				Ability.make({"display_name": "Arcane Barrage", "cooldown": 2, "dmg_type": "arcane", "cost": 20, "damage": 8,
+					"pressure": 3, "delay": 2.5, "anim": "attack03", "random_hits": 6,
 					"perfect_id": "", "perfect_text": "Fires a 7th bolt",
-					"description": "Six bolts rake random enemies\n(30 total damage)."}),
+					"description": "Six bolts hound the weakest: each\nstrikes one of the 2-3 enemies with\nthe lowest health."}),
+				Ability.make({"display_name": "Stabilize", "cooldown": 3, "cost": 0, "damage": 0,
+					"pressure": 0, "special": "stabilize", "delay": 2.0, "anim": "attack01",
+					"perfect_id": "", "perfect_text": "Also heals 5% of max health",
+					"description": "Ground the storm: consumes ALL\nResonance — +5 Mana and +10% damage\nreduction (2 turns) per stack\nconsumed."}),
 			]
 		"holy":
 			return [

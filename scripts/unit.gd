@@ -38,7 +38,8 @@ var pressure := 0
 var resource_name := ""    # "Rage" or "Mana" (heroes only)
 var resource := 0
 var max_resource := 100
-# Secondary class resource: Cleric Faith (0-100), Mage Arcane Resonance (0-5).
+# Secondary class resource: Cleric Faith (0-100), Mage Arcane Resonance
+# (0-5; 0-8 while Overcharge is active).
 var second_resource_name := ""
 var second_resource := 0
 var second_max := 100
@@ -131,6 +132,22 @@ var splinter_ranks := 0       # Splintering Shards: Razor Ice extra target
 var whiteout_ranks := 0       # Whiteout: Blizzard can Daze
 var freezing_ranks := 0       # Freezing Advance: Rime spreads sting
 var emp_frostbolt_ranks := 0  # Empowered Frostbolt: bigger basic bolt
+# Arcanist rework + tree (07-20). See talents.gd for the node text.
+var overcharged := false      # Overcharge is active (max Resonance 8)
+var overcharge_mult := 1.5    # weight of stacks 6-8 (1.65 on a perfect cast)
+var mindfulness_ranks := 0    # Mindfulness: periodic extra cooldown tick
+var mindfulness_counter := 0
+var arcane_mastery_ranks := 0 # Arcane Mastery: +1%/rank crit per stack
+var mana_attune_ranks := 0    # Mana Attunement: mana per stack gained
+var on_edge_ranks := 0        # On the Edge: stacks from surviving low hits
+var conversion_ranks := 0     # Conversion: damage partly paid in Mana
+var critical_mass_ranks := 0  # Critical Mass: every 3rd crit hits harder
+var crit_streak := 0          # crits since the last Critical Mass proc
+var temporal_ranks := 0       # Temporal Rift: crits can echo
+var suppressing_ranks := 0    # Suppressing Fire: Barrage bolts ramp
+var stable_ranks := 0         # Stable Alignment: single-hit damage cap
+var unlimited_ranks := 0      # Unlimited Power: overflow → dmg + max Mana
+var unlimited_surges := 0     # overflow procs banked this battle
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
@@ -494,8 +511,12 @@ func refresh_bars() -> void:
 	if _res2_fill != null:
 		_res2_fill.size.x = PLATE_BAR_W * clampf(second_resource / float(second_max), 0.0, 1.0)
 		if second_resource_name == "Resonance":
+			# Overcharge weights stacks 6-8 harder — show the true bonus.
+			var eff := float(second_resource)
+			if overcharged and second_resource > 5:
+				eff = 5.0 + (second_resource - 5.0) * overcharge_mult
 			_res2_text.text = "%d/%d (+%d%% dmg)" % [second_resource, second_max,
-				second_resource * 15]
+				int(round(eff * 15.0))]
 		else:
 			_res2_text.text = "%s %d/%d" % [second_resource_name, second_resource, second_max]
 	if passive_id == "bloodrage":
@@ -835,6 +856,23 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			if s.power <= 0:
 				remove_status("barrier")
 			break
+	# Conversion (Arcanist talent): part of the pain bleeds off as Mana.
+	if conversion_ranks > 0 and resource_name == "Mana" and amount > 0:
+		var converted := mini(int(round(amount * 0.10 * conversion_ranks)), resource)
+		if converted > 0:
+			amount -= converted
+			resource -= converted
+			float_text("-%d Mana" % converted, Color(0.5, 0.7, 1.0))
+			_proc_log("Talent: Conversion — %s pays %d of the hit in Mana" % [
+				unit_name, converted])
+	# Stable Alignment (Arcanist talent): one attack can only cut so deep.
+	if stable_ranks > 0 and amount > 0:
+		var stable_cap := maxi(int(round(max_hp * (0.40 - 0.05 * stable_ranks))), 1)
+		if amount > stable_cap:
+			float_text("ALIGNED -%d" % (amount - stable_cap), Color(0.75, 0.7, 0.95))
+			_proc_log("Talent: Stable Alignment — the hit is capped at %d (%d%% max HP)" % [
+				stable_cap, 40 - 5 * stable_ranks])
+			amount = stable_cap
 	var was_above_half := hp > max_hp * 0.5
 	var was_above_quarter := hp > max_hp * 0.25
 	hp = maxi(hp - amount, 0)

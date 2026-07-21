@@ -5,6 +5,53 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-20 — Batch 20: Arcanist rework + talent tree (Resonance engine), Ice Lance trim</h2>
+<ul>
+<li><b>Ice Lance damage reduced:</b> 35% of Attack (was 40%).</li>
+<li><b>Arcanist core rework — the Resonance engine.</b> Magic Bolt is reforged into
+<b>Arcane Explosion</b>: free, 10% Atk arcane / 10 BD / 2.0 int, no cd, hits TWO distinct
+random enemies simultaneously and builds 1 Resonance (2 on a crit) like every damaging
+cast (no perfect bonus). <b>Death Ray is REMOVED</b> (vaulted — kept for future
+return).</li>
+<li><b>Arcane Cannon retuned:</b> 25 Mana (was 30), 40% Atk (was 30%), 2cd (was 1),
+<b>BD now scales — 5 × current Resonance stacks</b> (was flat 15); still +7.5% damage
+per stack and 15% recoil. New perfect: the cast costs 3.0 initiative instead of 3.5
+(was +5 BD).</li>
+<li><b>Arcane Barrage retuned:</b> 20 Mana (was 25), 6 bolts × 8% Atk (was 5%), 3 BD per
+bolt (was 4), 2.5 int (was 3.5); bolts now target ONLY the (up to) 3 living enemies with
+the lowest health, so the volley rakes the 2-3 weakest. Perfect still fires a 7th
+bolt.</li>
+<li><b>New core ability — Stabilize:</b> free, 2.0 int, 3cd; consumes ALL Resonance:
++5 Mana and +10% damage reduction (2 turns, "Stabilized" chip) per stack consumed;
+unusable at 0 stacks (Perfect: also heals 5% max HP). Resonance now persists until
+Stabilize consumes it.</li>
+<li><b>Sixth fixed talent tree — Arcanist</b> (from the new tree JSON), 12 nodes:
+Mindfulness (every 6/5/4 turns ALL cooldowns tick 1 extra — turns needed drop 1 per
+point), Arcane Mastery (+1%/rank crit per stack), Mana Attunement (2%/rank max Mana per
+stack gained), Temporal Rift (crits 3%/rank chance to echo 25% at a random enemy), On
+the Edge (surviving a hit below 35/30/25% — threshold drops 5 per point — grants 1
+Resonance), Conversion (10%/rank of damage taken paid as Mana), Critical Mass (every
+3rd crit +20%/rank damage, +10%/rank max Mana), Suppressing Fire (each Barrage bolt
++0.25%/rank of Attack over the previous), Unlimited Power (overflow at max stacks →
++2%/rank damage and +2%/rank max Mana, battle-long, live chip), Stable Alignment (one
+attack cannot remove more than 35/30/25% of max health — cap drops 5 per point).</li>
+<li><b>New talent-granted abilities:</b> <b>Overcharge</b> — 20 Mana, 2.0 int, 5cd, once
+per battle: max Resonance becomes 8; stacks 6-8 weigh 1.5× toward the per-stack passive
+bonuses (damage dealt / crit / damage taken; Perfect: 1.65×); Arcane Cannon +15% recoil
+and Arcane Barrage gains 15% recoil while active. <b>Magi's Wrath</b> (capstone) — 30
+Mana, 15% Atk arcane to ALL enemies, 4.0 int, 4cd; +4% damage per stack, BD = 2.5 ×
+stacks; recoil 15% of damage dealt, −3% per enemy hit (Perfect: costs 3.5
+initiative).</li>
+<li><b>Supporting changes:</b> the Resonance nameplate readout shows the true
+(Overcharge-weighted) damage bonus; talent tooltips now render quarter-percent values
+exactly (Suppressing Fire); the sim bot plays the new rotation (Wrath → Overcharge →
+Stabilize when hurt at full stacks → Cannon → Barrage); Arcane Explosion's two blasts
+always pick distinct enemies while two stand.</li>
+<li>Verified: full-tree autoplay battles — every talent and ability observed proccing in
+the log (Overcharged Cannon recoil 42 on a 139 hit ✓, Stable Alignment capping a boss
+slam at 25% max HP ✓, Unlimited Power compounding ✓); 20-battle sim clean.</li>
+</ul>
+
 <h2>2026-07-20 — Batch 19: Frostbite status, Blizzard tuning, master doc = current-truth-only</h2>
 <ul>
 <li><b>New status — Frostbite:</b> the target's healing received is reduced by 50% for 2

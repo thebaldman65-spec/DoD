@@ -227,6 +227,77 @@ const FIXED_TREES := {
 				"perfect_id": "", "perfect_text": "Cooldown becomes 4 instead",
 				"description": "The cold detonates: every Chilled\nenemy takes 10% of Attack PER STACK\nof Chilled on it."}}},
 	],
+	"arcanist": [
+		# --- row 0 ---
+		{"id": "ar_mindfulness", "name": "Mindfulness", "ranks": 3, "row": 0, "col": 1,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Every {v} of your turns, ALL of your cooldowns tick down 1 extra turn.",
+			"scale": {"base": 7, "step": -1},
+			"payload": {"stat": {"mindfulness_ranks": 1}}},
+		{"id": "ar_mastery", "name": "Arcane Mastery", "ranks": 3, "row": 0, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Each stack of Arcane Resonance grants {v}% extra critical strike chance (on top of the base 3%).",
+			"scale": {"step": 1},
+			"payload": {"stat": {"arcane_mastery_ranks": 1}}},
+		{"id": "ar_attunement", "name": "Mana Attunement", "ranks": 3, "row": 0, "col": 3,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Restore {v}% of your maximum Mana every time you gain a stack of Resonance.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"mana_attune_ranks": 1}}},
+		# --- row 1 ---
+		{"id": "ar_temporal", "name": "Temporal Rift", "ranks": 3, "row": 1, "col": 0,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Critical strikes have a {v}% chance to echo for 25% of their damage against a random enemy.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"temporal_ranks": 1}}},
+		{"id": "ar_on_edge", "name": "On the Edge", "ranks": 3, "row": 1, "col": 1,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Surviving an attack below {v}% health grants 1 stack of Resonance.",
+			"scale": {"base": 40, "step": -5},
+			"payload": {"stat": {"on_edge_ranks": 1}}},
+		{"id": "ar_overcharge", "name": "Overcharge", "ranks": 1, "row": 1, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "New ability: Overcharge — raise your maximum Resonance to 8; stacks beyond 5 give 1.5x their normal bonus. Arcane Cannon recoils 15% harder and Arcane Barrage gains 15% recoil (20 Mana, 2.0 int, 5cd).",
+			"payload": {"new_ability": {"display_name": "Overcharge", "cost": 20,
+				"special": "overcharge", "delay": 2.0, "anim": "attack02", "cooldown": 5,
+				"perfect_id": "", "perfect_text": "Stacks beyond 5 give 1.65x instead",
+				"description": "Push past the limit: maximum\nResonance becomes 8; stacks beyond\n5 give 1.5x their normal bonus.\nArcane Cannon recoils 15% harder;\nArcane Barrage gains 15% recoil."}}},
+		{"id": "ar_conversion", "name": "Conversion", "ranks": 3, "row": 1, "col": 3,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "{v}% of damage taken is lost as Mana instead of health.",
+			"scale": {"step": 10},
+			"payload": {"stat": {"conversion_ranks": 1}}},
+		{"id": "ar_critical_mass", "name": "Critical Mass", "ranks": 3, "row": 1, "col": 4,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Every 3rd critical strike deals {v}% more damage and restores half as much of your maximum Mana.",
+			"scale": {"step": 20},
+			"payload": {"stat": {"critical_mass_ranks": 1}}},
+		# --- row 2 ---
+		{"id": "ar_suppressing", "name": "Suppressing Fire", "ranks": 3, "row": 2, "col": 1,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Each bolt of Arcane Barrage deals {v}% of Attack more than the previous one.",
+			"scale": {"step": 0.25},
+			"payload": {"stat": {"suppressing_ranks": 1}}},
+		{"id": "ar_unlimited", "name": "Unlimited Power", "ranks": 3, "row": 2, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Gaining Resonance while already at maximum stacks instead grants +{v}% damage and +{v}% maximum Mana (stacks all battle).",
+			"scale": {"step": 2},
+			"payload": {"stat": {"unlimited_ranks": 1}}},
+		{"id": "ar_stable", "name": "Stable Alignment", "ranks": 3, "row": 2, "col": 3,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "You cannot lose more than {v}% of your maximum health to a single attack.",
+			"scale": {"base": 40, "step": -5},
+			"payload": {"stat": {"stable_ranks": 1}}},
+		# --- row 3 (capstone) ---
+		{"id": "ar_wrath", "name": "Magi's Wrath", "ranks": 1, "row": 3, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "New ability: Magi's Wrath — 15% of Attack as arcane to ALL enemies, +4% per Resonance stack; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd).",
+			"payload": {"new_ability": {"display_name": "Magi's Wrath", "cost": 30,
+				"dmg_type": "arcane", "damage": 15, "pressure": 0, "aoe": true,
+				"delay": 4.0, "anim": "attack03", "cooldown": 4, "recoil_base": 0.15,
+				"perfect_id": "", "perfect_text": "Costs 3.5 initiative instead",
+				"description": "The storm unchained: rakes the whole\nenemy team, +4% damage per Resonance\nstack; BD = 2.5 x stacks. Recoil 15%\nof damage dealt, -3% per enemy hit."}}},
+	],
 	"pyromancer": [
 		# --- row 0 ---
 		{"id": "py_accelerant", "name": "Accelerant", "ranks": 3, "row": 0, "col": 1,
@@ -399,7 +470,7 @@ static func desc_for(node: Dictionary, ranks: int) -> String:
 		var sc: Dictionary = node["scale"]
 		var val := float(sc.get("base", 0.0)) \
 			+ float(sc.get("step", 0.0)) * maxi(ranks, 1)
-		desc = desc.replace("{v}", String.num(val, 1))
+		desc = desc.replace("{v}", String.num(val, 2))
 	return desc
 
 

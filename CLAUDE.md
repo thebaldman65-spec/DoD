@@ -99,7 +99,33 @@ Row-1 talent renamed "Brittle Ice" (id stays cr_frostbite/frostbite_ranks
 all sources (target-side in _resolve) AND frost hits 25% chance to
 frostbite (on-hit passives block in _resolve). Razor Ice v3: 2 random
 @20%, always chills, perfect flat 25%. Blizzard 15% Atk (07-20).
-DEBUG: "Cooldowns OFF" CHECK
+Ice Lance 35% Atk (07-20).
+ARCANIST REWORK + TREE (07-20, 6th fixed tree): core Magic Bolt →
+Arcane Explosion via apply_kit_overrides (free, 10% × 2 DISTINCT random
+enemies — struck_before filter in the random-hit picker — 10BD, no
+perfect). Kit: Cannon (25M, 40%, BD=5×stacks computed in the pr calc,
+2cd, perfect eff_delay 3.0), Barrage (20M, 8%×6 bolts @ pool of 3
+lowest-HP enemies, 3BD, 2.5, perfect 7th), Stabilize special (free,
+3cd, consumes ALL stacks → +5 Mana/stack + "stabilized" chip 10%/stack
+DR 2t target-side in _resolve; usable gate ≥1 stack; perfect heals 5%
+max HP). DEATH RAY VAULTED ("mana15" perfect machinery kept). Talent
+abilities: Overcharge special (unit.overcharged + overcharge_mult
+1.5/1.65 perfect, second_max=8, once-per-battle gate; Cannon/Barrage
++15% recoil in the recoil block) and Magi's Wrath capstone (aoe 15%,
++4%/stack, BD 2.5×stacks, recoil 15%−3% per enemies_struck, perfect
+eff_delay 3.5). _resonance_power(u) weights stacks 6-8 — used by
+dmg/crit/dmg-taken + tooltip buff_mult + plate readout; Backlash Ward
+fires at the dynamic max. Talents: Mindfulness (extra cooldown tick
+every 7−ranks turns, turn-start block), Arcane Mastery (+1%/rank
+crit/stack), Mana Attunement + Unlimited Power (both inside
+_gain_resonance — overflow branch returns early), Temporal Rift (crit
+echo after the sigil block), On the Edge (post-take_hit in the strike
+loop, threshold (40−5r)%), Conversion + Stable Alignment (unit.take_hit
+— cap (40−5r)% max HP), Critical Mass (crit_streak in the crit branch),
+Suppressing Fire (Barrage ramp in raw calc). Talents.desc_for renders 2
+decimals now (0.25 steps). Bot mage rotation: Wrath ≥3 foes/≥3 stacks →
+Overcharge ≥4 stacks → Stabilize at max stacks under 70% HP → Cannon ≥2
+stacks → Barrage. DEBUG: "Cooldowns OFF" CHECK
 toggle (debug_cooldowns_off — start_cooldown skipped while on; replaces
 the old reset command).
 CRYOMANCER REWORK (07-18): archetype CONTROL (new, Damage role/100 Atk,
@@ -125,10 +151,10 @@ to Adjacent at half duration rounded up — captured PRE-hit so kills still
 spread), Flamewave (aoe; burning targets +2t, perfect +3t via
 update_status). VAULTED: Pyroblast, Flame Surge, Phoenix Rebirth, and
 Mana Shield from ALL mage specs (mage core = Magic Bolt only; specials
-"phoenix"/"mana_shield" machinery kept for the vault). Death Ray: NO
-cooldown (5-stack Resonance gate only). Resurrection 5cd. Autoplay mage
-policy = burn loop (Flamewave ≥2 burning / Detonation ≥3 turns / Wildfire
-/ Death Ray / Barrage / Frost Bolt / basic).
+"phoenix"/"mana_shield" machinery kept for the vault). Resurrection
+5cd. Autoplay mage policy = burn loop (Flamewave ≥2 burning / Detonation
+≥3 turns / Wildfire) then the Arcanist rotation (see the 07-20 ARCANIST
+block above) / Barrage / basic.
 ATTACK & SCALING (07-16): every unit has an Attack stat; ability `damage`
 is a PERCENT of the user's current Attack. Role bases: Damage 100 / Tank 75
 / Support 50 (Classes.spec_attack; Bruiser = Damage role; per-spec stat

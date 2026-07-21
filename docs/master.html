@@ -151,9 +151,8 @@ effects that say "Adjacent" (the Warden's Sundering, the Pyromancer's Wildfire) 
 those two enemies.</li>
 <li><b>Cooldown (keyword, "cd"):</b> the number of the user's turns before the same ability
 can be used again — "6cd" means unusable for 6 turns after use. Typical bands: basics 0,
-light hits 1–2, heavies/AoE 2–5, Miracles 4–7, Resurrection 5; Death Ray has NO cooldown
-at all — its 5-stack Resonance build-up is the gate. The remaining cooldown shows on the
-ability button ("CD n") and in its tooltip. <b>Enemies do not use cooldowns at
+light hits 1–2, heavies/AoE 2–5, Miracles 4–7, Resurrection 5. The remaining cooldown
+shows on the ability button ("CD n") and in its tooltip. <b>Enemies do not use cooldowns at
 all</b> — their kits are gated by resources and AI conditions instead.</li>
 <li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
 positive one. Talents that count debuffs (Dominant Presence, Iron Will) use this
@@ -166,7 +165,8 @@ only on the Mage's own casts — parry counters do not grant stacks.</li>
 Blood Frenzy up to +40% as HP falls; Seasoned Fighter +15% above half HP; relic bonuses
 (global +10% dragonbone; fire/holy +20% emberheart); Powershot +2% per 1% of the target's
 EMPTY Break bar; Overpower +0.5 per point of target Break; Arcane Cannon
-+7.5%/Resonance stack; Fireball perfects at 25% of Attack.</li>
++7.5%/Resonance stack; Magi's Wrath +4%/Resonance stack; Fireball perfects at 25% of
+Attack.</li>
 <li><b>Target modifiers:</b> Shieldwall −50%; Exposed +15%; Seasoned Fighter −15% at or
 below half HP; Mage Resonance +10% damage
 <i>taken</i> per stack (the glass-cannon risk).</li>
@@ -263,6 +263,13 @@ died Burning (Pyromancer talent); the chip shows the live %.</td></tr>
 Plating block).</td></tr>
 <tr><td>Rime</td><td>Every stack of Chilled this enemy gains also chills one other random
 enemy (Cryomancer talent ability).</td></tr>
+<tr><td>Stabilized</td><td>Takes 10% less damage per Resonance stack consumed by
+Stabilize (2 turns; the chip shows the total).</td></tr>
+<tr><td>Overcharged</td><td>Battle-long: maximum Resonance is 8; stacks 6–8 weigh 1.5×
+(1.65× from a perfect cast); Arcane Cannon +15% recoil, Arcane Barrage gains 15%
+recoil.</td></tr>
+<tr><td>Unlimited Power</td><td>Resonance overflow banked as permanent battle power —
+the chip tracks the total % damage and max Mana gained (Arcanist talent).</td></tr>
 <tr><td>Melt Armor</td><td>Armor burned away for the battle by Burn ticks (Pyromancer
 talent); sits on the ENEMY with the live −% on the chip.</td></tr>
 <tr><td>Hold the Line</td><td>Takes 50% less Break damage (Warden capstone).</td></tr>
@@ -330,7 +337,8 @@ character art (see §12).</p>
 <table border="1" cellpadding="4">
 <tr><th>Class</th><th>HP</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Resource(s)</th></tr>
 <tr><td>Warrior</td><td>154</td><td>25%</td><td>95</td><td>110</td><td>Rage 0–100</td></tr>
-<tr><td>Mage</td><td>99</td><td>10%</td><td>110</td><td>85</td><td>Mana 100 (+ Resonance 0–5 as Arcanist)</td></tr>
+<tr><td>Mage</td><td>99</td><td>10%</td><td>110</td><td>85</td><td>Mana 100 (+ Resonance 0–5 as
+Arcanist; 0–8 while Overcharged)</td></tr>
 <tr><td>Cleric</td><td>121</td><td>15%</td><td>85</td><td>100</td><td>Mana 100 + Faith 0–100</td></tr>
 <tr><td>Hunter</td><td>110</td><td>12%</td><td>105</td><td>95</td><td>Focus 100</td></tr>
 </table>
@@ -356,15 +364,18 @@ Mana cost).</li>
 <li><b>Arcane Resonance (ARCANIST passive, 0–5):</b> only the Arcanist spec has the bar.
 +1 per damaging cast (+2 on crits; parry counters grant nothing). Each stack: +15% damage
 dealt, +3% crit, but +10% damage <i>taken</i>. Hitting max triggers Backlash Ward (+15 Mana).
-Stacks persist until Death Ray consumes them.</li>
+Stacks persist until Stabilize consumes them. The Overcharge talent ability raises the cap
+to 8 for the battle — stacks 6–8 weigh 1.5× (1.65× on a perfect cast) toward the per-stack
+bonuses above. The Resonance readout on the nameplate always shows the true damage
+bonus.</li>
 </ul>
 <h3>5.2 Core kits (before specialization)</h3>
 <ul>
 <li><b>Warrior:</b> Strike — 23 dmg / 18 BD / delay 2.0, builds 20 Rage
 (Perfect: +10 Rage).</li>
 <li><b>Mage:</b> Magic Bolt — 25% Atk arcane / 14 BD / 2.0 (Perfect: +10 Mana); the
-Pyromancer's Magic Bolt is reforged into <b>Fireball</b> and the Cryomancer's into
-<b>Frostbolt</b> (see §6.2).</li>
+Pyromancer's Magic Bolt is reforged into <b>Fireball</b>, the Cryomancer's into
+<b>Frostbolt</b>, and the Arcanist's into <b>Arcane Explosion</b> (see §6.2).</li>
 <li><b>Cleric:</b> Smite — 22 holy / 16 BD / 2.0 (Perfect: self-heal 8; the Occultist's
 Smite is corrupted into <b>Shadowrend</b> — same numbers, shadow damage); Mend Wounds —
 25 Mana, heal 45, 3.0 (Perfect: Ward 2 turns); <b>Resurrection</b> — MIRACLE, 40 Faith,
@@ -466,7 +477,7 @@ Razor Ice — 20 Mana, 20% Atk frost / 10 BD / 2.5, 3cd × 2 RANDOM enemies; eve
 applies a stack of Chilled (Perfect: hits at 25% of Attack).<br>
 Blizzard — 35 Mana, 15% Atk frost to ALL / 10 BD / 4.0, 4cd; layers 1-2 stacks of Chilled
 on each victim (Perfect: refunds 5 Mana).<br>
-Ice Lance — 25 Mana, 40% Atk frost / 15 BD / 3.0, 2cd; ALWAYS crits against Frozen targets
+Ice Lance — 25 Mana, 35% Atk frost / 15 BD / 3.0, 2cd; ALWAYS crits against Frozen targets
 (Perfect: 20 BD instead).<br>
 <i>Talent-granted:</i> Rime — 25 Mana, 3.0, 3cd: inflicts Frostbite (−50% healing
 received, 2 turns), and for 3 turns every stack of Chilled the
@@ -474,16 +485,24 @@ target gains also chills one other random enemy (Perfect: 4 turns). Shatter (cap
 30 Mana, 4.0, 5cd: every Chilled enemy takes 10% of Attack PER STACK of Chilled on it;
 only castable while someone is Chilled (Perfect: cooldown becomes 4).</li>
 <li><b>Arcanist (Ramp)</b> — Passive <i>Arcane Resonance</i> (the stack mechanic itself; see
-§5.1).<br>
-Death Ray — free, 8.0 int, NO cooldown (the Resonance build-up is the gate); castable ONLY
-at 5 Resonance stacks. A fixed 150% Atk arcane / 100 BD
-payoff (the stacks ARE the damage — the per-stack damage bonus does not double-dip), then
-every stack is consumed (Perfect: restores 15 Mana).<br>
-Arcane Cannon — 30 Mana, 30 arcane / 15 BD / 3.5, +7.5% DAMAGE per Resonance stack; recoil is
-a flat 15% of damage dealt (Perfect: +5 bonus BD). Unity splits the recoil across
-the party like any other damage.<br>
-Arcane Barrage — 25 Mana, 6 bolts × 5 dmg / 4 BD at random enemies (30 total), 3.5
-(Perfect: fires a 7th bolt).</li>
+§5.1). Its core Magic Bolt is reforged into <b>Arcane Explosion</b> — free, 10% Atk arcane
+/ 10 BD / 2.0, no cd, hits TWO distinct random enemies simultaneously; builds 1 Resonance
+(2 on a crit) like every damaging cast.<br>
+Arcane Cannon — 25 Mana, 40% Atk arcane / 3.5, 2cd; +7.5% DAMAGE per Resonance stack and
+<b>BD = 5 × current stacks</b>; recoil is a flat 15% of damage dealt (Perfect: costs 3.0
+initiative instead). Unity splits the recoil across the party like any other damage.<br>
+Arcane Barrage — 20 Mana, 6 bolts × 8% Atk / 3 BD each, 2.5, 2cd; every bolt strikes one
+of the (up to) 3 living enemies with the LOWEST health — the volley typically rakes 2-3
+of them (Perfect: fires a 7th bolt).<br>
+Stabilize — free, 2.0, 3cd; consumes ALL Resonance stacks: +5 Mana and +10% damage
+reduction (2 turns) per stack consumed. Needs at least 1 stack (Perfect: also heals 5% of
+max health).<br>
+<i>Talent-granted:</i> Overcharge — 20 Mana, 2.0, 5cd, once per battle: maximum Resonance
+becomes 8 for the rest of the battle; stacks 6–8 weigh 1.5× toward the per-stack bonuses;
+Arcane Cannon recoils 15% harder and Arcane Barrage gains 15% recoil (Perfect: 1.65×
+instead). Magi's Wrath (capstone) — 30 Mana, 15% Atk arcane to ALL enemies / 4.0, 4cd;
++4% damage per Resonance stack and BD = 2.5 × stacks; recoil 15% of damage dealt, −3%
+per enemy hit (Perfect: costs 3.5 initiative instead).</li>
 </ul>
 <h3>6.3 Cleric</h3>
 <ul>
@@ -552,8 +571,8 @@ turns). The player picks both targets; each fragment rolls miss/parry separately
 </ul>
 
 <h2>7. Talents</h2>
-<p><b>Trees are FIXED and designed.</b> Five exist so far —
-<b>Berserker, Swordmaster, Warden, Pyromancer, Cryomancer</b> (designed in the RPG Skill Tree
+<p><b>Trees are FIXED and designed.</b> Six exist so far —
+<b>Berserker, Swordmaster, Warden, Pyromancer, Cryomancer, Arcanist</b> (designed in the RPG Skill Tree
 Generator; source JSONs in data/talent-tree-*.json). Every other spec shows <b>"Coming soon."</b> on the party
 screen until its tree is designed. Points still accrue from victories (fight 1, elite 2,
 boss 3; Waystone +1) and bank until a tree exists.</p>
@@ -614,6 +633,19 @@ Lance +15%/rank ×3), Splintering Shards (Razor Ice 20%/rank chance of one extra
 ×3). Row 3 — Whiteout (Blizzard victims 15%/rank chance to be Dazed 2 turns ×3), Freezing
 Advance (Rime's spread deals 2%/rank of Attack as frost to the new victim ×3), Empowered
 Frostbolt (Frostbolt +2%/rank of Attack ×3). Capstone — Shatter (grants the ability).</p>
+<p><b>Arcanist tree:</b> Row 1 — Mindfulness (every 6/5/4 of the Arcanist's turns — the
+count drops 1 per point — ALL cooldowns tick down 1 extra turn ×3), Arcane Mastery (each
+Resonance stack grants +1%/rank extra crit chance ×3), Mana Attunement (restore 2%/rank
+max Mana on every stack gained ×3). Row 2 — Temporal Rift (crits 3%/rank chance to echo
+25% of their damage at a random enemy ×3), On the Edge (surviving an attack below
+35/30/25% health — the threshold drops 5 per point — grants 1 Resonance ×3), Overcharge
+(grants the ability), Conversion (10%/rank of damage taken paid in Mana instead of
+health ×3), Critical Mass (every 3rd crit +20%/rank damage and restores 10%/rank max
+Mana ×3). Row 3 — Suppressing Fire (each Barrage bolt +0.25%/rank of Attack over the
+previous ×3), Unlimited Power (Resonance gained at max stacks becomes +2%/rank damage
+and +2%/rank max Mana, stacking all battle ×3), Stable Alignment (a single attack cannot
+remove more than 35/30/25% of max health — the cap drops 5 per point ×3). Capstone —
+Magi's Wrath (grants the ability).</p>
 <p><b>Tooltip display:</b> talent tooltips never say "per rank" — the number shown grows
 with the points invested (3% → 6% → 9%; unlearned nodes preview the 1-point value).</p>
 <p><b>Talent visibility:</b> every talent proc is written to the combat log with a
@@ -733,10 +765,10 @@ greyed); <b>[Alt] Items</b> — opens the item picker.</li>
 <li><b>Ability hotkeys:</b> <b>Q / W / E / R / A / S / D / F</b> map to the ability MENU
 slots in order — Q is always the basic attack, the Beastmaster's "Summon Companion" picker
 holds W, and the remaining abilities follow in kit order. Each button shows its key, e.g.
-"[W] Bloodlust". A hotkey is ignored when the ability is unaffordable or gated (Death Ray
-below 5 Resonance, Kill Command without a living companion, Resurrection with nobody
-fallen), and hotkeys only work while the action bar is open — never during targeting or a
-skill check.</li>
+"[W] Bloodlust". A hotkey is ignored when the ability is unaffordable or gated (Stabilize
+without a Resonance stack, Kill Command without a living companion, Resurrection with
+nobody fallen), and hotkeys only work while the action bar is open — never during
+targeting or a skill check.</li>
 <li><b>Tab:</b> while choosing an action, Tab opens/closes the <b>Abilities list</b> (browse
 with the mouse or fire a hotkey). After an ability is chosen, <b>Tab cycles through the
 available targets</b> (the highlight and ▼ marker follow) and <b>Space or Enter confirms</b>
@@ -869,7 +901,7 @@ only the Tyrant's frost weakness is set) and Counter Attack (defined term; no ta
 ability grants it yet).</li>
 <li>The Withered Warden has its own kit; the Ash-Wrought Tyrant is still a Chief stand-in —
 unique kit + art planned. Boss art for both pending.</li>
-<li>Trees still to design: Arcanist, all three Cleric specs, all three Hunter specs;
+<li>Trees still to design: all three Cleric specs, all three Hunter specs;
 full rune loot table pending; relic pool (5) needs growth.</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>
 <li>The sim bot currently wins ~100% of standard fights (target ≈85%) — difficulty leans
