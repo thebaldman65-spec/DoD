@@ -120,8 +120,9 @@ every 7−ranks turns, turn-start block), Arcane Mastery (+1%/rank
 crit/stack), Mana Attunement + Unlimited Power (both inside
 _gain_resonance — overflow branch returns early), Temporal Rift (crit
 echo after the sigil block), On the Edge (post-take_hit in the strike
-loop, threshold (40−5r)%), Conversion + Stable Alignment (unit.take_hit
-— cap (40−5r)% max HP), Critical Mass (crit_streak in the crit branch),
+loop, threshold (20+5r)% — RISES with ranks, user-corrected 07-20),
+Conversion + Stable Alignment (unit.take_hit — cap (40−5r)% max HP),
+Critical Mass (crit_streak in the crit branch),
 Suppressing Fire (Barrage ramp in raw calc). Talents.desc_for renders 2
 decimals now (0.25 steps). Bot mage rotation: Wrath ≥3 foes/≥3 stacks →
 Overcharge ≥4 stacks → Stabilize at max stacks under 70% HP → Cannon ≥2

@@ -253,7 +253,7 @@ const FIXED_TREES := {
 		{"id": "ar_on_edge", "name": "On the Edge", "ranks": 3, "row": 1, "col": 1,
 			"gate": "row", "requires": "", "requires_ranks": 0,
 			"desc": "Surviving an attack below {v}% health grants 1 stack of Resonance.",
-			"scale": {"base": 40, "step": -5},
+			"scale": {"base": 20, "step": 5},
 			"payload": {"stat": {"on_edge_ranks": 1}}},
 		{"id": "ar_overcharge", "name": "Overcharge", "ranks": 1, "row": 1, "col": 2,
 			"gate": "row", "requires": "", "requires_ranks": 0,

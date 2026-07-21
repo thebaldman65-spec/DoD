@@ -2599,7 +2599,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if strike_target.is_hero and not result.died \
 					and strike_target.on_edge_ranks > 0 \
 					and strike_target.hp < strike_target.max_hp \
-					* (0.40 - 0.05 * strike_target.on_edge_ranks):
+					* (0.20 + 0.05 * strike_target.on_edge_ranks):
 				_log("   → Talent: On the Edge — %s draws power from the brink" % \
 					strike_target.unit_name, "#b0a8e0")
 				_gain_resonance(strike_target, 1)
