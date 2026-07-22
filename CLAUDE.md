@@ -36,8 +36,12 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   `DOD_SIM_SPECS="berserker,cryomancer,inquisitor,beastmaster"` picks the bot's
   specs (warrior,mage,cleric,hunter order). `DOD_SIM_ENEMIES="boss,shaman,..."`
   forces the enemy lineup in test battles. `DOD_SIM_TALENTS="bz_bloodcraze:3"`
-  force-learns talents on bot heroes whose spec tree has the id. `DOD_DEBUG=1`
-  adds map-burger debug items (gold/points/heal/jump-to-boss/next-zone).
+  force-learns talents on bot heroes whose spec tree has the id.
+  `DOD_SIM_ABILITIES="Resurrection,Divine Plea"` appends pending
+  talent-gated abilities (Classes.pending_talent_ability; Holy only).
+  `DOD_ENEMIES_OFF=1` arms the enemy-skip debug toggle headlessly.
+  `DOD_DEBUG=1` adds map-burger debug items (gold/points/heal/
+  jump-to-boss/next-zone; the talent grant is +200).
 - GDScript gotchas that bit us: multiline lambdas in call args (use named
   methods), ternaries need parens for type inference, `:=` can't infer from
   untyped funcs, edits via python heredocs (apostrophes!) — use chr(39).
@@ -59,6 +63,32 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+HOLY MERCY REWORK (07-22): FAITH IS GONE from all clerics (no second
+resource except Holy; the +10/action build site removed; ability
+faith_cost now = generic secondary cost). MIRACLE keyword retired. Core
+cleric = Smite only (Mend Wounds VAULTED; Resurrection now a Holy
+talent ability). Unity 25 Mana, Umbral Sigil 20 Mana. HEALING RULE:
+ability heals scale off the CASTER'S MAX HEALTH (Smite/Shadowrend
+perfect = 5% max HP; "self_heal" perfect handler). MERCY (Holy only,
+0-5, gold bar): +1 on any party member crossing below 50% HP
+(unit.below_half_cb → battle._on_hero_below_half; fires from take_hit
+AND take_tick_damage, companions excluded); +5% healing done per stack
+HELD (_healing_done_mult — costs deduct BEFORE specials resolve);
+spenders via faith_cost (Hymn 1, Divine Plea 2, Resurrection 3).
+EMPOWER: battle.empower_armed (✦ toggle on action bar + hotkey C, reset
+each turn; bot sets it in the cleric policy) → _consume_empower in
+_resolve_special pays +1 stack and FORCES is_perfect=false. Kit: Heal
+("holy_heal" special, 40% caster HP, empower cleanses via
+unit.purge_debuffs — never strips "broken"), Renewal (tick = 15% caster
+HP snapshotted Mercy-scaled into status tick field; turn-start site
+reads it; empower also blankets caster), Hymn ("hymn", 20/35emp/25perf %
+of each TARGET's max HP), Resurrection (20/25perf/100emp % + renewal on
+empower), Divine Plea ("divine_plea", full heal; empower = purge +
+"sanctified" 3t — _apply_status guard bounces ALL DEBUFF_IDS while
+sanctified). Status expiry now logs "fades from" (unit.tick_statuses);
+STUNNED/FROZEN lost turns tick statuses+cooldowns (fix 07-22). Arcanist
+tuning (07-22): Resonance dmg-taken +5%/stack (was 10); Overcharge
+recoil surcharges REMOVED (weighting = passive trio only).
 ENCOUNTERS = POWER BUDGET (07-16): enemy power {raider/archer 1, sm/shaman
 2, chief 4, boss 7}; every battle SPENDS ITS BUDGET EXACTLY via themed
 warbands (Run.THEMES two-step: theme → fill roles; combos enumerated in

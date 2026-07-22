@@ -38,7 +38,7 @@ var pressure := 0
 var resource_name := ""    # "Rage" or "Mana" (heroes only)
 var resource := 0
 var max_resource := 100
-# Secondary class resource: Cleric Faith (0-100), Mage Arcane Resonance
+# Secondary class resource: Holy Cleric Mercy (0-5), Mage Arcane Resonance
 # (0-5; 0-8 while Overcharge is active).
 var second_resource_name := ""
 var second_resource := 0
@@ -155,6 +155,16 @@ var statuses: Array = []
 # Battle-log hook (set by the battle scene) so talent procs that happen
 # inside this unit (Enraged, Unrelenting Assault) reach the combat log.
 var log_proc := Callable()
+
+# Mercy hook (set by the battle scene on heroes): fires when this unit
+# crosses below 50% health, from any damage source.
+var below_half_cb := Callable()
+
+
+func _check_below_half(was_above: bool) -> void:
+	if is_hero and not is_companion and was_above and hp <= max_hp * 0.5 \
+			and below_half_cb.is_valid():
+		below_half_cb.call(self)
 
 
 func _proc_log(text: String) -> void:
@@ -365,7 +375,7 @@ func build_plate(root: Node2D) -> void:
 		y += 11.0
 	if second_resource_name != "":
 		_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9)))
-		var res2_color := Color(0.95, 0.80, 0.30) if second_resource_name == "Faith" \
+		var res2_color := Color(0.95, 0.80, 0.30) if second_resource_name == "Mercy" \
 			else Color(0.75, 0.40, 0.95)
 		_res2_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, 7), res2_color)
 		_plate_panel.add_child(_res2_fill)
@@ -619,6 +629,16 @@ func remove_status(id: String) -> void:
 	_refresh_chips()
 
 
+# Cleanse: strip every harmful status. Broken stays — it's a Break-meter
+# state, not a dispellable status. Returns how many were removed.
+func purge_debuffs() -> int:
+	var before := statuses.size()
+	statuses = statuses.filter(
+		func(s): return s.id == "broken" or not DEBUFF_IDS.has(s.id))
+	_refresh_chips()
+	return before - statuses.size()
+
+
 # Updates a live status chip's tag and tooltip (and optionally its power /
 # remaining turns) without re-announcing it — for chips that show a counter,
 # like Shieldwall charges or Battle Shout's damage bonus.
@@ -703,6 +723,10 @@ func tick_statuses() -> void:
 		if s.id == "unrelenting" and s.turns == 0:
 			constitution -= int(s.get("power", 0))
 			float_text("Unrelenting fades", Color(0.6, 0.65, 0.8))
+	# Expiries reach the combat log so timers are auditable at a glance.
+	for s in statuses:
+		if s.turns == 0 and s.id != "broken":
+			_proc_log("   → %s fades from %s" % [s.label, unit_name])
 	statuses = statuses.filter(func(s): return s.id == "broken" or s.turns != 0)
 	_refresh_chips()
 
@@ -876,6 +900,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	var was_above_half := hp > max_hp * 0.5
 	var was_above_quarter := hp > max_hp * 0.25
 	hp = maxi(hp - amount, 0)
+	_check_below_half(was_above_half)
 	# Hold the Line: the party cannot die while the blessing holds.
 	if hp == 0 and has_status("undying"):
 		hp = 1
@@ -954,7 +979,9 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 
 # Damage from DoT effects (Burn). No Pressure, no hurt animation. Returns true on death.
 func take_tick_damage(amount: int, label: String, color: Color) -> bool:
+	var tick_was_above := hp > max_hp * 0.5
 	hp = maxi(hp - amount, 0)
+	_check_below_half(tick_was_above)
 	if hp == 0 and has_status("undying"):
 		hp = 1
 		float_text("HELD THE LINE", Color(0.95, 0.85, 0.4))

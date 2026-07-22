@@ -28,7 +28,7 @@ const STATUS_INFO := {
 	"fortify": ["Fortify", "+D", Color(0.55, 0.8, 0.9), "+10% armor."],
 	"barrier": ["Barrier", "Ba", Color(0.40, 0.85, 0.95), "Absorbs incoming damage."],
 	"focus": ["Focus", "Fo", Color(0.35, 0.60, 1.0), "Restores 10 Mana each turn."],
-	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores 15 HP each turn."],
+	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores HP at the start of each\nturn (15% of the caster's max\nhealth, set when cast)."],
 	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% attack."],
 	"mocked": ["Mocked", "M!", Color(0.95, 0.5, 0.3), "Must attack the Warrior who mocked them."],
 	"poison": ["Poison", "P", Color(0.45, 0.8, 0.3), "Takes 3 nature damage per stack at the\nstart of each turn; new stacks refresh\nthe timer."],
@@ -62,8 +62,9 @@ const STATUS_INFO := {
 	"rime": ["Rime", "Ri", Color(0.75, 0.9, 1.0), "Rimed: every stack of Chilled this\nenemy gains also chills one other\nrandom enemy."],
 	"frostbite": ["Frostbite", "Fb", Color(0.45, 0.70, 0.95), "Frostbitten: healing received\nreduced by 50%."],
 	"stabilized": ["Stabilized", "St+", Color(0.55, 0.68, 0.95), "Grounded resonance: takes less\ndamage (10% per stack consumed)."],
-	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Maximum Resonance raised to 8;\nstacks beyond 5 give extra bonus.\nArcane Cannon recoils 15% harder;\nArcane Barrage gains 15% recoil."],
+	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Maximum Resonance raised to 8;\nstacks beyond 5 give extra Resonance\nbonus (damage, crit, damage taken)."],
 	"unlimited": ["Unlimited Power", "UP", Color(0.85, 0.55, 1.0), "Resonance overflow: bonus damage\nand maximum Mana, all battle."],
+	"sanctified": ["Sanctified", "Sf", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -127,6 +128,7 @@ var debug_enemies_off := false  # debug toggle: enemies skip their turns
 var debug_locked_hero: BattleUnit = null  # debug: every turn goes to this hero
 var debug_cooldowns_off := false  # debug toggle: abilities never cool down
 var _rime_echoing := false  # guards Rime chill-echoes from chaining
+var empower_armed := false  # Mercy: the next heal cast spends +1 stack
 var _debug_popup: PopupMenu
 
 # Accumulated across scene reloads within one simulation run.
@@ -151,6 +153,10 @@ func _ready() -> void:
 	sim_target = int(OS.get_environment("DOD_SIM"))
 	sim = sim_target > 0
 	autoplay = sim or OS.get_environment("DOD_AUTOPLAY") == "1"
+	# DOD_ENEMIES_OFF=1 arms the "Enemy attacks OFF" debug toggle from the
+	# environment so headless tests can exercise the skip path.
+	if OS.get_environment("DOD_ENEMIES_OFF") == "1":
+		debug_enemies_off = true
 	debug_prints = autoplay and not sim
 	if sim:
 		Engine.max_fps = 0
@@ -350,6 +356,11 @@ func _spawn_units() -> void:
 				cfg["second_resource_name"] = "Resonance"
 				cfg["second_resource"] = 0
 				cfg["second_max"] = 5
+			# Mercy is the Holy Cleric's passive mechanic alone.
+			if spec == "holy":
+				cfg["second_resource_name"] = "Mercy"
+				cfg["second_resource"] = 0
+				cfg["second_max"] = 5
 			# Specs with their own battle art override the shared Soldier sheet.
 			if SPEC_ART.has(spec):
 				for art_key in SPEC_ART[spec]:
@@ -372,6 +383,16 @@ func _spawn_units() -> void:
 							t_learned[bits[0]] = int(bits[1]) if bits.size() > 1 else 1
 					if not t_learned.is_empty():
 						Talents.apply_from_tree(cfg, t_tree, t_learned)
+				# DOD_SIM_ABILITIES="Resurrection,Divine Plea" appends pending
+				# talent abilities (defs in Classes) to the bot hero whose spec
+				# will own them — a test hook for talent-gated kit pieces whose
+				# tree isn't designed yet (Holy only, for now).
+				var env_abs := OS.get_environment("DOD_SIM_ABILITIES")
+				if env_abs != "" and spec == "holy":
+					for ab_name in env_abs.split(","):
+						var pending := Classes.pending_talent_ability(ab_name.strip_edges())
+						if pending != null:
+							cfg["abilities"] = cfg["abilities"] + [pending]
 		# Class passives (every spec of the class, and before awakening).
 		match hero_keys[i]:
 			"cleric":
@@ -416,6 +437,7 @@ func _spawn_units() -> void:
 		var u := _make_unit(cfg, HERO_SLOTS[i], hero_tint, _hero_plate_pos(i))
 		u.crit_bonus = cfg.get("crit_bonus", 0.0)
 		u.parry_bonus = cfg.get("parry_bonus", 0.0)
+		u.below_half_cb = _on_hero_below_half
 		if spec != "":
 			u.add_status("spec_passive", Classes.SPEC_INFO[spec]["name"], "★",
 				Color(0.9, 0.78, 0.4), -1, Classes.SPEC_INFO[spec]["passive_desc"])
@@ -988,9 +1010,11 @@ func _run_battle() -> void:
 			continue
 		# Turn-start regeneration effects.
 		if u.has_status("renewal"):
-			u.heal_amount(15, true)
-			u.float_text("+15", Color(0.45, 0.9, 0.5))
-			_log("%s regenerates 15 HP (Renewal)" % u.unit_name, "#70d878")
+			# The tick was snapshotted at cast: 15% of the caster's max HP.
+			var ren_amt := maxi(int(u.get_status("renewal").get("tick", 15)), 1)
+			var ren_got := u.heal_amount(ren_amt, true)
+			u.float_text("+%d" % ren_got, Color(0.45, 0.9, 0.5))
+			_log("%s regenerates %d HP (Renewal)" % [u.unit_name, ren_got], "#70d878")
 		if u.has_status("focus") and u.resource_name == "Mana":
 			u.resource = mini(u.resource + 10, u.max_resource)
 			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
@@ -999,6 +1023,9 @@ func _run_battle() -> void:
 			u.remove_status("stunned")
 			u.float_text("STUNNED", Color(0.95, 0.9, 0.4))
 			_log("%s is stunned and loses their turn" % u.unit_name, "#e0d060")
+			# A lost turn still counts: other status timers and cooldowns tick.
+			u.tick_statuses()
+			u.tick_cooldowns()
 			await _wait(0.8)
 			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
 			continue
@@ -1006,6 +1033,9 @@ func _run_battle() -> void:
 			u.remove_status("frozen")
 			u.float_text("FROZEN", Color(0.65, 0.88, 1.0))
 			_log("%s is frozen solid and loses their turn" % u.unit_name, "#7cc8f0")
+			# A lost turn still counts: other status timers and cooldowns tick.
+			u.tick_statuses()
+			u.tick_cooldowns()
 			await _wait(0.8)
 			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
 			continue
@@ -1138,6 +1168,7 @@ func _player_turn(u: BattleUnit) -> void:
 		return  # a companion or DoT already ended it; the loop will notice
 	current_hero = u
 	item_used = false
+	empower_armed = false  # Mercy Empowerment never carries between turns
 	if u.resource_name == "Mana":
 		# Evocation (Mage class passive) adds mana_regen_bonus.
 		u.resource = mini(u.resource + 12 + u.mana_regen_bonus, u.max_resource)
@@ -1361,20 +1392,43 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				return [aimed, target_foe]
 			return [u.abilities[0], target_foe]          # Quick Shot
 		"cleric":
+			# Holy triage first (Mercy spenders), then Devout/Occultist casts.
+			var res_ab := _find_ability(u, "Resurrection")
+			if res_ab != null and u.second_resource >= res_ab.faith_cost \
+					and u.ability_ready(res_ab):
+				var fallen := heroes.filter(func(h): return h.dead)
+				if not fallen.is_empty():
+					empower_armed = u.second_resource >= res_ab.faith_cost + 1
+					return [res_ab, fallen[0]]
+			var dplea := _find_ability(u, "Divine Plea")
+			if dplea != null and u.second_resource >= dplea.faith_cost \
+					and u.ability_ready(dplea) \
+					and weakest_ally.hp < weakest_ally.max_hp * 0.35:
+				empower_armed = u.second_resource >= dplea.faith_cost + 1 \
+					and weakest_ally.count_debuffs() > 0
+				return [dplea, weakest_ally]
 			var hymn := _find_ability(u, "Hymn of Hope")
 			if hymn != null and u.second_resource >= hymn.faith_cost and u.ability_ready(hymn) \
 					and weakest_ally.hp < weakest_ally.max_hp * 0.6:
+				empower_armed = u.second_resource >= hymn.faith_cost + 2
 				return [hymn, u]
+			var hheal := _find_ability(u, "Heal")
+			if hheal != null and u.resource >= hheal.cost and u.ability_ready(hheal) \
+					and weakest_ally.hp < weakest_ally.max_hp * 0.55:
+				return [hheal, weakest_ally]
+			var renew := _find_ability(u, "Renewal")
+			if renew != null and u.resource >= renew.cost and u.ability_ready(renew) \
+					and weakest_ally.hp < weakest_ally.max_hp * 0.8 \
+					and not weakest_ally.has_status("renewal"):
+				return [renew, weakest_ally]
 			var unity_ab := _find_ability(u, "Unity")
-			if unity_ab != null and u.second_resource >= unity_ab.faith_cost and u.ability_ready(unity_ab) \
+			if unity_ab != null and u.resource >= unity_ab.cost and u.ability_ready(unity_ab) \
 					and weakest_ally.hp < weakest_ally.max_hp * 0.7:
 				return [unity_ab, u]
 			var flay := _find_ability(u, "Mind Flay")
 			if flay != null and u.resource >= flay.cost and u.ability_ready(flay) and foes.size() >= 2:
 				return [flay, target_foe]
-			if weakest_ally.hp < weakest_ally.max_hp * 0.5 and u.resource >= 25 and u.ability_ready(u.abilities[1]):
-				return [u.abilities[1], weakest_ally]    # Mend Wounds
-			return [u.abilities[0], target_foe]          # Smite
+			return [u.abilities[0], target_foe]          # Smite / Shadowrend
 	return [u.abilities[0], target_foe]
 
 
@@ -1547,6 +1601,19 @@ func _show_actions(u: BattleUnit) -> void:
 	menu_btn.pressed.connect(_open_ability_popup.bind(popup, menu_btn))
 	action_box.add_child(menu_btn)
 	action_box.add_child(_build_items_menu())
+	# Mercy (Holy Cleric): the Empower toggle arms the next supporting cast
+	# for +1 stack. Empowered casts forgo their perfect bonus.
+	if u.second_resource_name == "Mercy":
+		var emp_btn := Button.new()
+		emp_btn.toggle_mode = true
+		emp_btn.button_pressed = empower_armed
+		emp_btn.text = "✦ Empower (C)"
+		emp_btn.custom_minimum_size = Vector2(112, 32)
+		emp_btn.add_theme_font_size_override("font_size", 13)
+		emp_btn.disabled = u.second_resource < 1
+		emp_btn.tooltip_text = "Spend +1 Mercy to Empower the next\nHeal / Renewal / Hymn / Resurrection /\nDivine Plea. Empowered casts forgo\ntheir perfect bonus. C toggles."
+		emp_btn.toggled.connect(func(on: bool): empower_armed = on)
+		action_box.add_child(emp_btn)
 	action_panel.visible = true
 
 
@@ -2113,11 +2180,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_stat("hero_actions")
 		_stat("use_" + ab.display_name)
 
+	# faith_cost = the secondary-resource price (Mercy for the Holy Cleric).
 	if ab.faith_cost > 0:
 		attacker.second_resource = maxi(attacker.second_resource - ab.faith_cost, 0)
-	# Faith builds from every Cleric action.
-	if attacker.second_resource_name == "Faith":
-		attacker.second_resource = mini(attacker.second_resource + 10, attacker.second_max)
 		attacker.refresh_bars()
 
 	var grade_tag := {"perfect": " [PERFECT]", "good": "", "fail": " [Sloppy]"}[grade] as String
@@ -2472,7 +2537,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			raw *= 1.0 + attacker.dmg_bonus + float(attacker.type_dmg_bonus.get(ab.dmg_type, 0.0))
 			# Target-side modifiers.
 			if strike_target.second_resource_name == "Resonance":
-				raw *= 1.0 + 0.10 * _resonance_power(strike_target)
+				raw *= 1.0 + 0.05 * _resonance_power(strike_target)
 			# Stabilized: grounded resonance blunts incoming blows.
 			if strike_target.has_status("stabilized"):
 				raw *= 1.0 - strike_target.status_power("stabilized") / 100.0
@@ -2885,10 +2950,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_log("   → War Stomp: allies regain 10% of their resource", "#70d878")
 		# Post-strike attacker effects (skipped if a counter felled the attacker).
 		var recoil_pct := ab.recoil_base
-		# Overcharge: pushing past the limit bites back harder.
-		if attacker.overcharged \
-				and ab.display_name in ["Arcane Cannon", "Arcane Barrage"]:
-			recoil_pct += 0.15
 		# Magi's Wrath: spreading the storm dissipates its backlash.
 		if ab.display_name == "Magi's Wrath":
 			recoil_pct = maxf(recoil_pct - 0.03 * enemies_struck, 0.0)
@@ -3009,6 +3070,12 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		target.float_text("IMMUNE", Color(0.75, 0.75, 0.75))
 		_log("   → %s resists the %s (boss — Break them first)" % [target.unit_name,
 			"Stun" if id == "stunned" else "Freeze"], "#909090")
+		return
+	# Sanctified (Divine Plea): the warded shrug off every new debuff.
+	if target.has_status("sanctified") and BattleUnit.DEBUFF_IDS.has(id):
+		target.float_text("SANCTIFIED", Color(0.98, 0.88, 0.55))
+		_log("   → %s is Sanctified — the %s cannot take hold" % [target.unit_name,
+			String(STATUS_INFO[id][0])], "#e8c860")
 		return
 	var info: Array = STATUS_INFO[id]
 	target.add_status(id, info[0], info[1], info[2], turns, info[3], power, tick)
@@ -3134,6 +3201,45 @@ func _resonance_power(u: BattleUnit) -> float:
 	return stacks
 
 
+# Mercy (Holy passive): +5% healing done per stack currently held. Costs
+# are paid before the cast resolves, so a spender heals with what remains.
+func _healing_done_mult(caster: BattleUnit) -> float:
+	if caster.second_resource_name == "Mercy":
+		return 1.0 + 0.05 * caster.second_resource
+	return 1.0
+
+
+# Mercy (Holy passive): an ally's brush with death steels the healer.
+# Fired by unit.below_half_cb whenever a party member crosses below 50%.
+func _on_hero_below_half(low_ally: BattleUnit) -> void:
+	for h in heroes:
+		if h.dead or h.second_resource_name != "Mercy":
+			continue
+		if h.second_resource < h.second_max:
+			h.second_resource += 1
+			h.float_text("+1 Mercy", Color(0.95, 0.8, 0.3))
+			h.refresh_bars()
+			_log("   → Mercy: %s steels themselves (%s falls below half health)" % [
+				h.unit_name, low_ally.unit_name], "#e8c860")
+
+
+# Mercy: arms and pays the Empower surcharge (+1 stack) for a supporting
+# cast. Empowered casts forgo their perfect bonus by design.
+func _consume_empower(attacker: BattleUnit, ab: Ability) -> bool:
+	if not empower_armed:
+		return false
+	empower_armed = false
+	if ab.special not in ["holy_heal", "renewal", "hymn", "resurrection", "divine_plea"]:
+		return false
+	if attacker.second_resource_name != "Mercy" or attacker.second_resource < 1:
+		return false
+	attacker.second_resource -= 1
+	attacker.refresh_bars()
+	attacker.float_text("EMPOWERED", Color(0.95, 0.8, 0.3))
+	_log("   → %s spends 1 Mercy to Empower the cast" % attacker.unit_name, "#e8c860")
+	return true
+
+
 # A cost/cooldown-free copy of an attack for reaction casts (Opportunist,
 # Rampage recasts) — _resolve always charges ab.cost, so reactions pass a
 # zero-cost twin instead.
@@ -3178,6 +3284,10 @@ func _walk_to(u: BattleUnit, dest: Vector2) -> void:
 func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		grade: String, mult: float) -> void:
 	var is_perfect := grade == "perfect"
+	# Mercy Empowerment: pays +1 stack and forfeits the perfect bonus.
+	var empowered := _consume_empower(attacker, ab)
+	if empowered:
+		is_perfect = false
 	match ab.special:
 		"rally":
 			var pressure_cut := 50 if is_perfect else int(30 * mult)
@@ -3252,9 +3362,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Phoenix Rebirth — sacrificed %d HP for full Mana" % [
 				attacker.unit_name, sacrifice], "#70d878")
 		"dawnbreak":
-			var base := int((55 if is_perfect else 40) * mult)
-			if attacker.passive_id == "grace":
-				base = int(base * 1.25)
+			# VAULTED ability's machinery (kept): scales with Mercy like all
+			# Holy healing now does.
+			var base := int((55 if is_perfect else 40) * mult * _healing_done_mult(attacker))
 			var missing_hp := target.max_hp - target.hp
 			var applied := mini(base, missing_hp)
 			target.heal_amount(applied, target != attacker)
@@ -3269,22 +3379,25 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Dawnbreak heals %s for %d (overflow %d to self)" % [
 				attacker.unit_name, target.unit_name, applied, overflow], "#70d878")
 		"hymn":
-			var pct := 0.25 if is_perfect else 0.20
-			if attacker.passive_id == "grace":
-				pct *= 1.25
+			# 20% of each ally's max health; Empowered 35%; perfect 25%.
+			var pct := 0.20
+			if empowered:
+				pct = 0.35
+			elif is_perfect:
+				pct = 0.25
+			pct *= _healing_done_mult(attacker)
 			_sfx("heal", -4.0, 0.9)
-			for h in heroes.filter(func(he): return not he.dead):
+			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
 				var amt := int(h.max_hp * pct)
-				h.heal_amount(amt, h != attacker)
-				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
-				_stat("healing", amt)
-			_message("MIRACLE — Hymn of Hope!")
-			_log("%s: Hymn of Hope — party heals %d%%" % [attacker.unit_name,
-				int(pct * 100)], "#70d878")
+				var got: int = h.heal_amount(amt, h != attacker)
+				h.float_text("+%d" % got, Color(0.4, 0.9, 0.45))
+				_stat("healing", got)
+			_message("%s sings the Hymn of Hope!" % attacker.unit_name)
+			_log("%s: Hymn of Hope — party heals %d%%%s" % [attacker.unit_name,
+				int(round(pct * 100)), " (Empowered)" if empowered else ""], "#70d878")
 		"sanctuary":
-			var sanct_pct := 0.18 if is_perfect else 0.12
-			if attacker.passive_id == "grace":
-				sanct_pct *= 1.25
+			# VAULTED ability's machinery (kept): Mercy-scaled like all heals.
+			var sanct_pct := (0.18 if is_perfect else 0.12) * _healing_done_mult(attacker)
 			_sfx("heal", -4.0, 0.8)
 			for h in heroes.filter(func(he): return not he.dead):
 				var amt := int(h.max_hp * sanct_pct)
@@ -3292,13 +3405,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
 				_apply_status(h, "shieldwall", 1)
 				_stat("healing", amt)
-			_message("MIRACLE — Sanctuary!")
+			_message("Sanctuary!")
 			_log("%s: Sanctuary — party healed and walled" % attacker.unit_name, "#70d878")
 		"unity":
 			_sfx("heal", -5.0, 0.7)
 			for h in heroes.filter(func(he): return not he.dead):
 				_apply_status(h, "unity", 4 if is_perfect else 3)
-			_message("MIRACLE — Unity!")
+			_message("%s binds the party as one!" % attacker.unit_name)
 			_log("%s: Unity — the party's souls are bound" % attacker.unit_name, "#70d878")
 		"mindflay":
 			_sfx("break", -8.0, 1.4)
@@ -3380,16 +3493,24 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, "#70d878")
 		"resurrection":
 			if target != null and target.dead:
-				target.revive(0.2)
-				target.resource = int(target.max_resource * 0.2)
+				var rez_frac := 0.25 if is_perfect else 0.2
+				if empowered:
+					rez_frac = 1.0
+				target.revive(rez_frac)
+				target.resource = int(target.max_resource * rez_frac)
 				target.refresh_bars()
+				if empowered:
+					var rez_tick := maxi(int(round(attacker.max_hp * 0.15
+						* _healing_done_mult(attacker))), 1)
+					_apply_status(target, "renewal", 5, 0, rez_tick)
 				_sfx("heal", -4.0, 0.65)
 				target.float_text("RESURRECTED", Color(0.95, 0.9, 0.55))
 				target.next_time = attacker.next_time \
 					+ BASIC_DELAY * 100.0 / target.effective_speed()
-				_message("MIRACLE — %s returns to life!" % target.unit_name)
-				_log("%s: Resurrection — %s returns at 20%% HP and resource" % [
-					attacker.unit_name, target.unit_name], "#70d878")
+				_message("%s returns to life!" % target.unit_name)
+				_log("%s: Resurrection — %s returns at %d%% HP and resource%s" % [
+					attacker.unit_name, target.unit_name, int(round(rez_frac * 100)),
+					" with Renewal (Empowered)" if empowered else ""], "#70d878")
 				_rebuild_turn_bar()
 		"divine_wrath":
 			_sfx("heal", -5.0, 0.85)
@@ -3484,8 +3605,47 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_apply_status(attacker, "overcharged", -1)
 			attacker.refresh_bars()
 			_message("%s OVERCHARGES!" % attacker.unit_name)
-			_log("%s: Overcharge — max Resonance is now 8; stacks beyond 5 weigh %.2fx (Cannon/Barrage +15%% recoil)" % [
+			_log("%s: Overcharge — max Resonance is now 8; stacks beyond 5 weigh %.2fx" % [
 				attacker.unit_name, attacker.overcharge_mult], "#b085e0")
+		"holy_heal":
+			# 40% of the CASTER's max health, Mercy-scaled.
+			var hh_amt := maxi(int(round(attacker.max_hp * 0.40
+				* _healing_done_mult(attacker))), 1)
+			_sfx("heal", -6.0)
+			var hh_got: int = target.heal_amount(hh_amt, target != attacker)
+			target.float_text("+%d" % hh_got, Color(0.4, 0.9, 0.45))
+			_stat("healing", hh_got)
+			var hh_note := ""
+			if empowered:
+				var purged := target.purge_debuffs()
+				hh_note = " — cleansed %d harmful effect%s (Empowered)" % [
+					purged, "" if purged == 1 else "s"]
+			elif is_perfect:
+				var hh_self := maxi(int(round(attacker.max_hp * 0.05)), 1)
+				var self_got: int = attacker.heal_amount(hh_self)
+				attacker.float_text("+%d" % self_got, Color(0.4, 0.9, 0.45))
+				_stat("healing", self_got)
+			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
+			_log("%s: Heal — %s recovers %d (40%% of the Cleric's health)%s" % [
+				attacker.unit_name, target.unit_name, hh_got, hh_note], "#70d878")
+		"divine_plea":
+			# Spend 2 Mercy: a full heal; Empowered also cleanses and wards.
+			_sfx("heal", -4.0, 0.7)
+			var dp_got: int = target.heal_amount(target.max_hp, target != attacker)
+			target.float_text("+%d" % dp_got, Color(0.4, 0.9, 0.45))
+			_stat("healing", dp_got)
+			var dp_note := ""
+			if empowered:
+				var dp_purged := target.purge_debuffs()
+				_apply_status(target, "sanctified", 3)
+				dp_note = " — cleansed %d and Sanctified 3 turns (Empowered)" % dp_purged
+			elif is_perfect:
+				attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
+				attacker.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
+				attacker.refresh_bars()
+			_message("%s answers with Divine Plea!" % attacker.unit_name)
+			_log("%s: Divine Plea — %s is fully healed (+%d)%s" % [
+				attacker.unit_name, target.unit_name, dp_got, dp_note], "#70d878")
 		"healing_wave":
 			var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)
 			_sfx("heal", -6.0, 0.75)
@@ -3497,14 +3657,27 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				", halved by Frostbite" if target.has_status("frostbite") else ""],
 				"#70d878")
 		"renewal":
+			# Ticks snapshot the CASTER: 15% of their max health per turn,
+			# Mercy-scaled at cast time.
+			var ren_tick := maxi(int(round(attacker.max_hp * 0.15
+				* _healing_done_mult(attacker))), 1)
 			_sfx("heal", -9.0, 1.1)
-			_apply_status(target, "renewal", 5)
+			_apply_status(target, "renewal", 5, 0, ren_tick)
+			target.update_status("renewal", "R+",
+				"Renewal: restores %d HP at the start\nof each turn (15%% of the caster's\nmax health)." % ren_tick)
+			if empowered and target != attacker:
+				_apply_status(attacker, "renewal", 5, 0, ren_tick)
+				attacker.update_status("renewal", "R+",
+					"Renewal: restores %d HP at the start\nof each turn (15%% of the caster's\nmax health)." % ren_tick)
 			if is_perfect:
-				target.heal_amount(15)
-				target.float_text("+15", Color(0.4, 0.9, 0.45))
+				var ren_burst := maxi(int(round(attacker.max_hp * 0.05)), 1)
+				var burst_got: int = target.heal_amount(ren_burst, target != attacker)
+				target.float_text("+%d" % burst_got, Color(0.4, 0.9, 0.45))
+				_stat("healing", burst_got)
 			_message("%s blesses %s with Renewal" % [attacker.unit_name, target.unit_name])
-			_log("%s: Renewal on %s — 15 HP/turn for 5 turns" % [attacker.unit_name,
-				target.unit_name], "#70d878")
+			_log("%s: Renewal on %s — %d HP/turn for 5 turns%s" % [attacker.unit_name,
+				target.unit_name, ren_tick,
+				" (Empowered: the Cleric too)" if empowered else ""], "#70d878")
 
 
 # ---------- Beastmaster companions ----------
@@ -3696,9 +3869,10 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 			attacker.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
 			_log("   → %s restores 10 Mana" % attacker.unit_name, "#b0a8e0")
 		"self_heal":
-			attacker.heal_amount(8)
-			attacker.float_text("+8", Color(0.4, 0.9, 0.45))
-			_log("   → %s recovers 8 HP" % attacker.unit_name, "#b0a8e0")
+			var sh_amt := maxi(int(round(attacker.max_hp * 0.05)), 1)
+			var sh_got := attacker.heal_amount(sh_amt)
+			attacker.float_text("+%d" % sh_got, Color(0.4, 0.9, 0.45))
+			_log("   → %s recovers %d HP" % [attacker.unit_name, sh_got], "#b0a8e0")
 		"sunder":
 			if not target_died:
 				_apply_status(target, "sunder", 2)
@@ -3824,6 +3998,15 @@ func _input(event: InputEvent) -> void:
 			return
 		if event.keycode == KEY_TAB:
 			_on_tab_pressed()
+			return
+		# C toggles Mercy Empowerment while the action bar is open.
+		if event.keycode == KEY_C and action_panel.visible \
+				and current_hero != null \
+				and current_hero.second_resource_name == "Mercy" \
+				and current_hero.second_resource >= 1:
+			empower_armed = not empower_armed
+			_show_actions(current_hero)
+			get_viewport().set_input_as_handled()
 			return
 		if event.keycode in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
 			if _item_picker != null:

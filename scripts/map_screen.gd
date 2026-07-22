@@ -120,7 +120,7 @@ func _draw_screen() -> void:
 	if Run.debug_enabled():
 		bpop.add_separator("DEBUG")
 		bpop.add_item("+200 Gold", 10)
-		bpop.add_item("+3 Talent Points (all)", 11)
+		bpop.add_item("+200 Talent Points (all)", 11)
 		bpop.add_item("Full Heal Party", 12)
 		bpop.add_item("Jump to Boss Tier", 13)
 		bpop.add_item("Advance to Next Zone", 14)
@@ -217,7 +217,7 @@ func _on_burger(id: int) -> void:
 			_draw_screen()
 		11:
 			for member in Run.party:
-				member["talent_points"] = member.get("talent_points", 0) + 3
+				member["talent_points"] = member.get("talent_points", 0) + 200
 			_draw_screen()
 		12:
 			Run.heal_party(1.0)

@@ -71,7 +71,6 @@ static func hero_config(key: String) -> Dictionary:
 				"max_hp": 121, "attack": 50, "armor": 0.15, "speed": 85.0,
 				"stability": 100, "constitution": 100,
 				"resource_name": "Mana", "resource": 100, "max_resource": 100,
-				"second_resource_name": "Faith", "second_resource": 0, "second_max": 100,
 				"abilities": kit(key)}
 
 
@@ -132,22 +131,35 @@ static func mage_kit() -> Array:
 
 
 static func cleric_kit() -> Array:
+	# VAULTED — kept for future return: Mend Wounds (25 Mana flat 45 heal).
+	# Resurrection now belongs to the Holy tree (pending_talent_ability).
 	return [
 		# damage 44 = 44% of the Cleric's 50 Attack -> the familiar 22.
 		Ability.make({"display_name": "Smite", "dmg_type": "holy", "cost": 0, "damage": 44, "pressure": 16,
 			"delay": 2.0, "anim": "attack01",
-			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 8 HP",
-			"description": "Basic radiant strike. Builds Faith."}),
-		Ability.make({"display_name": "Mend Wounds", "cooldown": 1, "cost": 25, "heal": 45,
-			"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
-			"perfect_id": "ward", "perfect_text": "Grants Ward (-50% Break damage taken, 2 turns)",
-			"description": "Restore HP to one ally. Builds Faith."}),
-		Ability.make({"display_name": "Resurrection", "cooldown": 5, "cost": 0, "faith_cost": 40,
-			"special": "resurrection", "target": Ability.Target.ALLY,
-			"delay": 4.0, "anim": "attack03",
-			"perfect_id": "", "perfect_text": "",
-			"description": "MIRACLE: return a fallen ally to life\nwith 20% health and resource."}),
+			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 5% max health",
+			"description": "Basic radiant strike."}),
 	]
+
+
+# Holy talent-granted abilities: the Holy tree isn't designed yet — these
+# defs wait here for its "grants the ability" nodes, and power the
+# DOD_SIM_ABILITIES test hook meanwhile. faith_cost = Mercy stacks.
+static func pending_talent_ability(display_name: String) -> Ability:
+	match display_name:
+		"Resurrection":
+			return Ability.make({"display_name": "Resurrection", "cooldown": 3,
+				"cost": 0, "faith_cost": 3, "special": "resurrection",
+				"target": Ability.Target.ALLY, "delay": 4.0, "anim": "attack03",
+				"perfect_id": "", "perfect_text": "Returns them at 25% instead",
+				"description": "Spend 3 Mercy: return a fallen ally\nto life with 20% health and resource.\nEmpower (+1 Mercy): full health and\nresource, plus 5 turns of Renewal."})
+		"Divine Plea":
+			return Ability.make({"display_name": "Divine Plea", "cooldown": 2,
+				"cost": 0, "faith_cost": 2, "special": "divine_plea",
+				"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "Restores 10 Mana",
+				"description": "Spend 2 Mercy: FULLY heal an ally.\nEmpower (+1 Mercy): also cleanse all\ndebuffs and ward them against new\nones for 3 turns."})
+	return null
 
 
 # Spec kit corruption: the Occultist's Smite is warped into Shadowrend,
@@ -158,8 +170,8 @@ static func apply_kit_overrides(cfg: Dictionary, spec: String) -> void:
 		cfg["abilities"][0] = Ability.make({"display_name": "Shadowrend",
 			"dmg_type": "shadow", "cost": 0, "damage": 22, "pressure": 16,
 			"delay": 2.0, "anim": "attack01",
-			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 8 HP",
-			"description": "Basic strike of gnawing shadow.\nBuilds Faith."})
+			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 5% max health",
+			"description": "Basic strike of gnawing shadow."})
 	elif spec == "pyromancer":
 		cfg["abilities"][0] = Ability.make({"display_name": "Fireball",
 			"dmg_type": "fire", "cost": 0, "damage": 20, "pressure": 15,
@@ -269,11 +281,11 @@ const SPEC_INFO := {
 		"passive_desc": "Permafrost: Frozen enemies take 15% increased damage\nfrom all sources. Frost attacks have a 25% chance to\ninflict Frostbite (-50% healing received, 2 turns).",
 		"blurb": "Battlefield control — chill, freeze, then shatter."},
 	"arcanist": {"name": "Arcanist", "constitution": 90, "archetype": "Ramp", "passive": "resonance",
-		"passive_desc": "Arcane Resonance: damaging casts build stacks (max 5) — each grants\n+15% damage and +3% crit but +10% damage taken. Max stacks trigger\nBacklash Ward (+15 Mana). Stacks persist until consumed.",
+		"passive_desc": "Arcane Resonance: damaging casts build stacks (max 5) — each grants\n+15% damage and +3% crit but +5% damage taken. Max stacks trigger\nBacklash Ward (+15 Mana). Stacks persist until consumed.",
 		"blurb": "Unstable raw magic — stack the storm, then release it."},
-	"holy": {"name": "Holy", "constitution": 100, "archetype": "Healer", "passive": "grace",
-		"passive_desc": "Grace: all healing +25%.",
-		"blurb": "Pure vessel of light — mass healing and shields of faith."},
+	"holy": {"name": "Holy", "constitution": 100, "archetype": "Healer", "passive": "mercy",
+		"passive_desc": "Mercy: gain a stack when an ally falls below 50% health (max 5).\nEach stack: +5% healing done. Spend stacks on Hymn of Hope and\ntalent abilities, or +1 stack to Empower a heal — Empowered casts\nforgo their perfect bonus.",
+		"blurb": "Pure vessel of light — mercy hardens into miracles."},
 	"inquisitor": {"name": "Devout", "constitution": 110, "archetype": "Warder", "passive": "devotion",
 		"passive_desc": "Devotion Aura: the whole party takes 15% less Break damage.",
 		"blurb": "A living shrine — faith made armor for the whole party."},
@@ -413,19 +425,22 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Ground the storm: consumes ALL\nResonance — +5 Mana and +10% damage\nreduction (2 turns) per stack\nconsumed."}),
 			]
 		"holy":
+			# Mercy kit (07-22 rework): heals scale off the CASTER's max
+			# health; Mercy stacks fuel Hymn and Empowered casts. VAULTED —
+			# kept for future return: Dawnbreak (20 Mana flat 40, overflow).
 			return [
-				Ability.make({"display_name": "Dawnbreak", "cooldown": 1, "cost": 20, "special": "dawnbreak",
+				Ability.make({"display_name": "Heal", "cooldown": 1, "cost": 20, "special": "holy_heal",
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
-					"perfect_id": "", "perfect_text": "+15 bonus healing",
-					"description": "Heal an ally for 40. Overhealing\nflows back to the Cleric."}),
+					"perfect_id": "", "perfect_text": "Cleric also recovers 5% max health",
+					"description": "Mend an ally for 40% of the Cleric's\nmax health. Empower (1 Mercy): also\ncleanses all harmful effects."}),
 				Ability.make({"display_name": "Renewal", "cooldown": 3, "cost": 20, "special": "renewal",
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
-					"perfect_id": "", "perfect_text": "Also heals 15 HP instantly",
-					"description": "Ally heals 15 HP at the start of each\nof their turns, for 5 turns."}),
-				Ability.make({"display_name": "Hymn of Hope", "cooldown": 5, "cost": 0, "faith_cost": 30,
-					"special": "hymn", "delay": 4.0, "anim": "attack03",
+					"perfect_id": "", "perfect_text": "Also heals 5% of the Cleric's health instantly",
+					"description": "Ally heals 15% of the Cleric's max\nhealth at the start of each of their\nturns, for 5 turns. Empower (1 Mercy):\nRenewal also blankets the Cleric."}),
+				Ability.make({"display_name": "Hymn of Hope", "cooldown": 2, "cost": 0, "faith_cost": 1,
+					"special": "hymn", "delay": 3.5, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Heals 25% instead",
-					"description": "MIRACLE: heal ALL allies for 20%\nof their max HP."}),
+					"description": "Spend 1 Mercy: heal ALL allies for\n20% of their max health. Empower\n(+1 Mercy): 35% instead."}),
 			]
 		"inquisitor":
 			return [
@@ -437,10 +452,10 @@ static func spec_abilities(spec: String) -> Array:
 					"delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Lasts 4 turns",
 					"description": "The party surges with holy fury:\n+15% damage and +15% speed\nfor 3 turns."}),
-				Ability.make({"display_name": "Unity", "cooldown": 5, "cost": 0, "faith_cost": 25,
+				Ability.make({"display_name": "Unity", "cooldown": 5, "cost": 25,
 					"special": "unity", "delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Lasts 4 turns",
-					"description": "MIRACLE: bind the party's souls — all\ndamage received is split evenly among\nthem for 3 turns."}),
+					"description": "Bind the party's souls — all damage\nreceived is split evenly among them\nfor 3 turns."}),
 			]
 		"occultist":
 			return [
@@ -454,10 +469,10 @@ static func spec_abilities(spec: String) -> Array:
 					"special": "mindflay", "delay": 3.5, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "+115% Break damage instead",
 					"description": "Shatter a mind — the target attacks\nits OWN allies for 3 turns with\n+100% Break damage."}),
-				Ability.make({"display_name": "Umbral Sigil", "cooldown": 4, "cost": 0, "faith_cost": 20,
+				Ability.make({"display_name": "Umbral Sigil", "cooldown": 4, "cost": 20,
 					"special": "umbral_sigil", "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Lasts 4 turns",
-					"description": "MIRACLE: brand a foe — its whole party\ntakes 50% of all attack damage it\nreceives (3 turns)."}),
+					"description": "Brand a foe — its whole party takes\n50% of all attack damage it receives\n(3 turns)."}),
 			]
 		"beastmaster":
 			return [
@@ -526,5 +541,5 @@ const CLASS_BLURBS := {
 	"hunter": "Ranged damage. Focus builds with every shot, spent on\nprecision payoffs and primal magic.",
 	"warrior": "Flexible frontliner. Rage builds through attack and pain.",
 	"mage": "Glass cannon. Fire that spreads, frost that controls, and\nraw Resonance banked for devastating payoffs.",
-	"cleric": "Divine vessel. Faith builds with every act, awaiting Miracles.",
+	"cleric": "Divine vessel of the light — smite, mend, and shepherd the party.",
 }

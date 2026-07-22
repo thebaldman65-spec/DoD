@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-20</b></p>
+<p align="right"><b>Last updated: 2026-07-22</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -151,7 +151,7 @@ effects that say "Adjacent" (the Warden's Sundering, the Pyromancer's Wildfire) 
 those two enemies.</li>
 <li><b>Cooldown (keyword, "cd"):</b> the number of the user's turns before the same ability
 can be used again — "6cd" means unusable for 6 turns after use. Typical bands: basics 0,
-light hits 1–2, heavies/AoE 2–5, Miracles 4–7, Resurrection 5. The remaining cooldown
+light hits 1–2, heavies/AoE 2–5, Resurrection 3. The remaining cooldown
 shows on the ability button ("CD n") and in its tooltip. <b>Enemies do not use cooldowns at
 all</b> — their kits are gated by resources and AI conditions instead.</li>
 <li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
@@ -168,8 +168,9 @@ EMPTY Break bar; Overpower +0.5 per point of target Break; Arcane Cannon
 +7.5%/Resonance stack; Magi's Wrath +4%/Resonance stack; Fireball perfects at 25% of
 Attack.</li>
 <li><b>Target modifiers:</b> Shieldwall −50%; Exposed +15%; Seasoned Fighter −15% at or
-below half HP; Mage Resonance +10% damage
-<i>taken</i> per stack (the glass-cannon risk).</li>
+below half HP; Mage Resonance +5% damage
+<i>taken</i> per stack (the glass-cannon risk); Stabilized −10% per stack
+consumed.</li>
 <li><b>Armor:</b> flat % damage reduction. Fortify +10%; Broken ×0.7; Sunder ×0.65; Armor
 Penetration ignores a fraction.</li>
 <li><b>Damage types (7):</b> physical, fire, frost, arcane, nature, shadow, holy. Enemies carry
@@ -211,7 +212,8 @@ start of the afflicted unit's turn.
 vulnerability raises it). Stacks additively with no cap; every new application adds a stack
 AND refreshes the timer. Applied by Orc Archers' Poison Arrow (3 turns), the Withered Warden's
 Roots of Wrath (3 turns), and the Survivalist's Trapper passive (5 turns).</li>
-<li><b>Renewal</b> +15 HP and <b>Focus (status)</b> +10 Mana at turn start.</li>
+<li><b>Renewal</b> (15% of the caster's max health, snapshotted at cast) and
+<b>Focus (status)</b> +10 Mana at turn start.</li>
 </ul>
 <h3>4.6 Status effects (current roster)</h3>
 <table border="1" cellpadding="4">
@@ -266,8 +268,7 @@ enemy (Cryomancer talent ability).</td></tr>
 <tr><td>Stabilized</td><td>Takes 10% less damage per Resonance stack consumed by
 Stabilize (2 turns; the chip shows the total).</td></tr>
 <tr><td>Overcharged</td><td>Battle-long: maximum Resonance is 8; stacks 6–8 weigh 1.5×
-(1.65× from a perfect cast); Arcane Cannon +15% recoil, Arcane Barrage gains 15%
-recoil.</td></tr>
+(1.65× from a perfect cast) toward the Resonance per-stack bonuses.</td></tr>
 <tr><td>Unlimited Power</td><td>Resonance overflow banked as permanent battle power —
 the chip tracks the total % damage and max Mana gained (Arcanist talent).</td></tr>
 <tr><td>Melt Armor</td><td>Armor burned away for the battle by Burn ticks (Pyromancer
@@ -279,7 +280,10 @@ talent); sits on the ENEMY with the live −% on the chip.</td></tr>
 <tr><td>Fortify</td><td>+10% armor (Defense Potion).</td></tr>
 <tr><td>Barrier</td><td>Absorbs N incoming damage, then breaks.</td></tr>
 <tr><td>Focus</td><td>+10 Mana each turn.</td></tr>
-<tr><td>Renewal</td><td>+15 HP each turn.</td></tr>
+<tr><td>Renewal</td><td>Restores HP at the start of each turn — 15% of the caster's max
+health, snapshotted (and Mercy-scaled) when cast.</td></tr>
+<tr><td>Sanctified</td><td>Immune to new debuffs (Empowered Divine Plea, 3
+turns).</td></tr>
 <tr><td>Surge</td><td>+20% attack.</td></tr>
 <tr><td>Mocked</td><td>Must attack the Warrior who mocked them.</td></tr>
 <tr><td>Quick Draw</td><td>All abilities act 50% faster.</td></tr>
@@ -323,7 +327,9 @@ text. No banner text appears at the top of the battle.</p>
 <h2>5. Heroes</h2>
 <p><b>All ability damage is a % of the user's Attack</b> (see §4.3); the flat numbers in
 the kit lists below are the values at the class/spec base Attack, before node scaling.
-Heals and shields stay flat — only damage and DoTs scale.</p>
+Shields stay flat, and <b>ability healing scales off the CASTER's max health</b> (Heal 40%,
+Renewal 15%/turn, Hymn of Hope reads each target's own health) — a beefier healer heals
+harder.</p>
 <p>All four classes are drafted every run (one of each). Sprites currently share the Soldier
 sheet, distinguished by slot tints (white / blue / gold / green); distinct art is arriving
 spec by spec. <b>Own art in-game so far</b> (specs listed in battle.gd's SPEC_ART table,
@@ -339,7 +345,8 @@ character art (see §12).</p>
 <tr><td>Warrior</td><td>154</td><td>25%</td><td>95</td><td>110</td><td>Rage 0–100</td></tr>
 <tr><td>Mage</td><td>99</td><td>10%</td><td>110</td><td>85</td><td>Mana 100 (+ Resonance 0–5 as
 Arcanist; 0–8 while Overcharged)</td></tr>
-<tr><td>Cleric</td><td>121</td><td>15%</td><td>85</td><td>100</td><td>Mana 100 + Faith 0–100</td></tr>
+<tr><td>Cleric</td><td>121</td><td>15%</td><td>85</td><td>100</td><td>Mana 100 (+ Mercy 0–5 as
+Holy)</td></tr>
 <tr><td>Hunter</td><td>110</td><td>12%</td><td>105</td><td>95</td><td>Focus 100</td></tr>
 </table>
 <h3>5.0 Class passives</h3>
@@ -359,11 +366,16 @@ is hit; every attack builds Rage (Strike 20, all spec/talent attacks 10); Perfec
 +10.</li>
 <li><b>Mana (Mage/Cleric):</b> +12 at the start of their turns; potions/Rally restore more.</li>
 <li><b>Focus (Hunter):</b> +15 at the start of their turns; Perfect basic +10.</li>
-<li><b>Faith (Cleric secondary):</b> +10 per action taken; spent on MIRACLE abilities (no
-Mana cost).</li>
+<li><b>Mercy (HOLY passive, 0–5):</b> only the Holy spec has the bar. +1 stack whenever a
+party member falls below 50% health (any damage source; crossings count each time). Each
+stack held: <b>+5% healing done</b>. Stacks are SPENT on Hymn of Hope (1), Divine Plea (2),
+and Resurrection (3) — costs are paid before the cast resolves, so a spender heals with
+what remains — or on <b>Empowerment</b>: the ✦ Empower toggle (hotkey C) arms the next
+supporting cast for +1 extra stack and a bonus effect. <b>Empowered casts forgo their
+perfect bonus.</b></li>
 <li><b>Arcane Resonance (ARCANIST passive, 0–5):</b> only the Arcanist spec has the bar.
 +1 per damaging cast (+2 on crits; parry counters grant nothing). Each stack: +15% damage
-dealt, +3% crit, but +10% damage <i>taken</i>. Hitting max triggers Backlash Ward (+15 Mana).
+dealt, +3% crit, but +5% damage <i>taken</i>. Hitting max triggers Backlash Ward (+15 Mana).
 Stacks persist until Stabilize consumes them. The Overcharge talent ability raises the cap
 to 8 for the battle — stacks 6–8 weigh 1.5× (1.65× on a perfect cast) toward the per-stack
 bonuses above. The Resonance readout on the nameplate always shows the true damage
@@ -377,10 +389,8 @@ bonus.</li>
 Pyromancer's Magic Bolt is reforged into <b>Fireball</b>, the Cryomancer's into
 <b>Frostbolt</b>, and the Arcanist's into <b>Arcane Explosion</b> (see §6.2).</li>
 <li><b>Cleric:</b> Smite — 22 holy / 16 BD / 2.0 (Perfect: self-heal 8; the Occultist's
-Smite is corrupted into <b>Shadowrend</b> — same numbers, shadow damage); Mend Wounds —
-25 Mana, heal 45, 3.0 (Perfect: Ward 2 turns); <b>Resurrection</b> — MIRACLE, 40 Faith,
-4.0, returns a fallen ally to life with 20% health and resource (greyed out while nobody is
-down).</li>
+Smite is corrupted into <b>Shadowrend</b> — same numbers, shadow damage; both perfects:
+the Cleric recovers 5% max health).</li>
 <li><b>Hunter:</b> Quick Shot — 20 dmg / 14 BD / 2.0 (no perfect bonus).</li>
 </ul>
 
@@ -498,26 +508,36 @@ Stabilize — free, 2.0, 3cd; consumes ALL Resonance stacks: +5 Mana and +10% da
 reduction (2 turns) per stack consumed. Needs at least 1 stack (Perfect: also heals 5% of
 max health).<br>
 <i>Talent-granted:</i> Overcharge — 20 Mana, 2.0, 5cd, once per battle: maximum Resonance
-becomes 8 for the rest of the battle; stacks 6–8 weigh 1.5× toward the per-stack bonuses;
-Arcane Cannon recoils 15% harder and Arcane Barrage gains 15% recoil (Perfect: 1.65×
-instead). Magi's Wrath (capstone) — 30 Mana, 15% Atk arcane to ALL enemies / 4.0, 4cd;
+becomes 8 for the rest of the battle; stacks 6–8 weigh 1.5× toward the Resonance per-stack
+bonuses ONLY — Cannon's, Barrage's, and Magi's Wrath's own per-stack scalings count raw
+stacks (Perfect: 1.65× instead). Magi's Wrath (capstone) — 30 Mana, 15% Atk arcane to ALL enemies / 4.0, 4cd;
 +4% damage per Resonance stack and BD = 2.5 × stacks; recoil 15% of damage dealt, −3%
 per enemy hit (Perfect: costs 3.5 initiative instead).</li>
 </ul>
 <h3>6.3 Cleric</h3>
 <ul>
-<li><b>Holy (Healer)</b> — Passive <i>Grace</i>: all healing +25%.<br>
-Dawnbreak — 20 Mana, 3.0, heal an ally 40; overheal flows back to the Cleric
-(Perfect: +15 healing).<br>
-Renewal — 20 Mana, 3.0, ally heals 15 HP at the start of each of their turns for 5 turns
-(Perfect: also +15 instantly).<br>
-Hymn of Hope — MIRACLE, 30 Faith, 4.0, heal ALL allies 20% max HP (Perfect: 25%).</li>
+<li><b>Holy (Healer)</b> — Passive <i>Mercy</i> (the stack mechanic itself; see §5.1).<br>
+Heal — 20 Mana, 3.0, 1cd; heal an ally for 40% of the Cleric's max health. Empower
+(1 Mercy): also cleanses all harmful effects from the recipient (Perfect: the Cleric
+recovers 5% max health).<br>
+Renewal — 20 Mana, 3.0, 3cd; the ally heals 15% of the Cleric's max health at the start
+of each of their turns for 5 turns (the tick is snapshotted and Mercy-scaled at cast).
+Empower (1 Mercy): Renewal also blankets the Cleric (Perfect: the target also heals 5%
+of the Cleric's health instantly).<br>
+Hymn of Hope — 1 Mercy, 3.5, 2cd; heal ALL allies for 20% of their own max health.
+Empower (+1 Mercy): 35% instead (Perfect: 25%).<br>
+<i>Talent-granted (the Holy tree is still to be designed — both are built and waiting):</i>
+Resurrection — 3 Mercy, 4.0, 3cd; return a fallen ally to life with 20% health and
+resource. Empower (+1 Mercy): they return at FULL health and resource with 5 turns of
+Renewal (Perfect: 25% instead). Divine Plea — 2 Mercy, 3.0, 2cd; FULLY heal an ally.
+Empower (+1 Mercy): also cleanse all their debuffs and Sanctify them against new ones
+for 3 turns (Perfect: restores 10 Mana).</li>
 <li><b>Devout (Warder)</b> — Passive <i>Devotion Aura</i>: the entire party (Cleric included)
 takes 15% less BD, shown as a battle-long status.<br>
 Divine Shield — 30 Mana, 3.0, ally shield absorbing 100 (Perfect: 130).<br>
 Divine Wrath — 25 Mana, 3.0, the whole party deals +15% damage and acts +15% faster for
 3 turns (Perfect: 4 turns).<br>
-Unity — MIRACLE, 25 Faith, 3.0, binds the party's souls: all damage received is split evenly
+Unity — 25 Mana, 3.0, 5cd, binds the party's souls: all damage received is split evenly
 among living heroes for 3 turns; BD still lands on the struck hero (Perfect: 4
 turns).</li>
 <li><b>Occultist (Pressure)</b> — Passive <i>Corrupted Channeling</i>: whenever a Crippled
@@ -528,7 +548,7 @@ Hex of Ruin — 20 Mana, 2 random enemies × 15 shadow / 24 BD / 3.0, Cripples b
 Mind Flay — 30 Mana, 3.5, the target attacks its OWN allies for
 3 turns with +100% Break damage; fizzles to normal behavior if it stands alone
 (Perfect: +115%).<br>
-Umbral Sigil — MIRACLE, 20 Faith, 3.0, brands one enemy for 3 turns: every OTHER member of
+Umbral Sigil — 20 Mana, 3.0, 4cd, brands one enemy for 3 turns: every OTHER member of
 its party takes 50% of all attack damage the branded target receives (Perfect: 4
 turns).</li>
 </ul>
@@ -781,6 +801,10 @@ so: "✕ Cancel (X)").</li>
 Items" button opens the same window): Tab cycles the usable items, Space uses the
 highlighted one, X closes. One item per hero per turn, and items never consume the
 turn.</li>
+<li><b>C — Empower (Holy Cleric):</b> toggles the ✦ Empower button on the action bar
+while at least 1 Mercy is held — the next Heal / Renewal / Hymn / Resurrection / Divine
+Plea spends +1 Mercy for its bonus effect (and forgoes its perfect bonus). The toggle
+disarms after the cast and at the start of every turn.</li>
 <li><b>Space continues:</b> on a victory screen, Space (or Enter) presses the primary
 button — Continue / Descend / New Run. Defeat screens still require a click.</li>
 <li><b>Summon Companion</b> sits at the TOP of the Beastmaster's ability list on hotkey
@@ -856,10 +880,14 @@ DOD_SIM_SPECS="berserker,cryomancer,inquisitor,beastmaster" (override the specs 
 plays — order: warrior, mage, cleric, hunter),
 DOD_SIM_ENEMIES="boss,shieldmaster,shaman" (force the enemy lineup in autoplay/sim/standalone
 battles), DOD_SIM_TALENTS="bz_bloodcraze:3,wd_toughness:2" (force-learn talents on bot
-heroes whose spec tree holds the id). Autoplay debug runs echo every combat-log line to
-stdout as "[LOG] ..." so headless tests can grep them. Target ≈85% bot win rate.</li>
+heroes whose spec tree holds the id), DOD_SIM_ABILITIES="Resurrection,Divine Plea"
+(append pending talent-gated abilities to the bot hero whose spec owns them — Holy only
+for now), DOD_ENEMIES_OFF=1 (arm the "Enemy attacks OFF" debug toggle from the
+environment). Autoplay debug runs echo every combat-log line to
+stdout as "[LOG] ..." so headless tests can grep them; status expiries print as
+"... fades from ..." lines. Target ≈85% bot win rate.</li>
 <li><b>Testing shortcuts:</b> debug tools are ALWAYS available in dev (unexported) builds;
-exported builds require DOD_DEBUG=1. The map burger menu gains a DEBUG section — +200 gold, +3 talent points for everyone, full heal, jump to the boss tier,
+exported builds require DOD_DEBUG=1. The map burger menu gains a DEBUG section — +200 gold, +200 talent points for everyone, full heal, jump to the boss tier,
 advance to the next zone, and <b>Reroll Specs</b> (refunds spent talent points, clears all
 specs, and reopens the awakening screen). In battle, a <b>DEBUG ▾ menu</b> (bottom-right)
 offers: Full Restore (HP/resources/secondary for the party), a <b>Cooldowns OFF</b>
@@ -902,7 +930,10 @@ ability grants it yet).</li>
 <li>The Withered Warden has its own kit; the Ash-Wrought Tyrant is still a Chief stand-in —
 unique kit + art planned. Boss art for both pending.</li>
 <li>Trees still to design: all three Cleric specs, all three Hunter specs;
-full rune loot table pending; relic pool (5) needs growth.</li>
+full rune loot table pending; relic pool (5) needs growth. <b>Until the Holy tree
+lands, Resurrection and Divine Plea are built but unreachable</b> (they are its
+talent-granted abilities) — the Revive Potion is the party's only revive
+meanwhile.</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>
 <li>The sim bot currently wins ~100% of standard fights (target ≈85%) — difficulty leans
 easy; real tuning comes from playtests.</li>

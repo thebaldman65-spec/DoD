@@ -5,6 +5,50 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-22 — Batch 21: Holy Mercy rework, Faith retired, healing scales off caster health</h2>
+<ul>
+<li><b>Healing rule change:</b> ability healing now scales off the CASTER's max health
+(shields stay flat). Smite/Shadowrend perfects heal 5% max health (was flat 8).</li>
+<li><b>Faith is REMOVED from all Cleric specs</b>, along with the MIRACLE keyword and
+core <b>Mend Wounds</b> (vaulted). The Cleric core is Smite alone. <b>Resurrection left
+the core</b> (and Devout/Occultist entirely) — it returns as a Holy talent ability.
+Unity is now 25 Mana; Umbral Sigil is now 20 Mana (both keep their effects and
+cooldowns).</li>
+<li><b>Holy passive replaced — Grace is gone; enter MERCY</b> (secondary resource,
+0–5): +1 stack whenever a party member falls below 50% health; each stack held grants
++5% healing done. Stacks are spent on casts (costs are paid up front, so a spender
+heals with what remains) or on <b>Empowerment</b> — the ✦ Empower toggle (hotkey C)
+arms the next supporting cast for +1 stack and a bonus effect; <b>Empowered casts
+forgo their perfect bonus</b>.</li>
+<li><b>New Holy kit:</b> <b>Heal</b> — 20 Mana, 3.0, 1cd, heals 40% of the Cleric's max
+health (Empower: cleanses all harmful effects; Perfect: Cleric recovers 5%).
+<b>Renewal</b> — now ticks 15% of the CLERIC's max health (snapshotted, Mercy-scaled at
+cast) for 5 turns (Empower: also blankets the Cleric; Perfect: +5% instantly).
+<b>Hymn of Hope</b> — now 1 Mercy, 3.5 int, 2cd, heals the party 20% of their own max
+health (Empower: 35%; Perfect: 25%).</li>
+<li><b>Built and waiting on the Holy tree (talent-gated):</b> <b>Resurrection</b> — 3
+Mercy, 4.0, 3cd, revive at 20% (Empower: FULL health/resource + 5 turns of Renewal;
+Perfect: 25%). <b>Divine Plea</b> — 2 Mercy, 3.0, 2cd, fully heals an ally (Empower:
+cleanse + Sanctified — immune to new debuffs — 3 turns; Perfect: +10 Mana). Until the
+tree lands they are unreachable; the Revive Potion is the only revive.</li>
+<li><b>Arcanist tuning:</b> Resonance's per-stack damage-taken cost drops to <b>+5%</b>
+(was +10%); <b>Overcharge now affects ONLY the Resonance per-stack values</b> — the
+Arcane Cannon/Barrage recoil surcharges are gone, and Cannon/Wrath per-stack scalings
+count raw stacks as before.</li>
+<li><b>Fixes:</b> map debug grant is now +200 talent points (was +3); stunned and
+frozen units now tick their other status timers and cooldowns on the lost turn (timers
+no longer stall while stun/freeze-locking enemies, e.g. with Enemy attacks OFF);
+status expiries are logged ("X fades from Y").</li>
+<li><b>Tooling:</b> DOD_ENEMIES_OFF=1 arms the enemy-skip debug toggle headlessly;
+DOD_SIM_ABILITIES="Resurrection,Divine Plea" appends the pending Holy talent abilities
+to sim bots.</li>
+<li>Verified live: Mercy income on sub-50% crossings, Heal 51 = 40% × 1.05 with a stack
+held, Renewal ticking 18 (23 at 5 stacks) with clean 5-tick expiry, Empowered Hymn
+37–40%, Empowered Divine Plea full-heal + Sanctified bouncing an incoming Poison,
+Empowered Resurrection returning a hero at 100% with Renewal; 20-battle sim 20/20, no
+errors.</li>
+</ul>
+
 <h2>2026-07-20 — Batch 20: Arcanist rework + talent tree (Resonance engine), Ice Lance trim</h2>
 <ul>
 <li><b>Ice Lance damage reduced:</b> 35% of Attack (was 40%).</li>
