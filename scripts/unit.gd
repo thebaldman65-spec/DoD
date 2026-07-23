@@ -165,7 +165,6 @@ var sanctified_ranks := 0     # Sanctified: Mercy spends can refund
 # Devout Conviction + tree (07-23). See talents.gd for the node text.
 var faith_stacks := 0         # Conviction: per-ALLY Faith (0-5)
 var communion_ranks := 0      # Communion: 5-stack procs can spread
-var unwavering_ranks := 0     # Unwavering Faith: deeper per-stack bonus
 var faithful_ranks := 0       # Blessed are the Faithful: bigger 5-stack heal
 var devoutness_ranks := 0     # Devoutness: party-wide BD cut (ex-passive)
 var afterglow_ranks := 0      # Afterglow: heal when Divine Shield breaks

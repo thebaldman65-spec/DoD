@@ -2570,13 +2570,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Blessing of Zeal: kindled allies strike harder.
 			if attacker.has_status("zeal"):
 				raw *= 1.15
-			# Conviction: each Faith stack sharpens the blade (+2% base,
-			# Unwavering Faith deepens it) — while the Devout stands.
-			if attacker.is_hero and attacker.faith_stacks > 0:
-				var f_dev := _living_devout()
-				if f_dev != null:
-					raw *= 1.0 + (0.02 + 0.005 * f_dev.unwavering_ranks) \
-						* attacker.faith_stacks
+			# Conviction: each Faith stack sharpens the blade (+2%) — while
+			# the Devout stands.
+			if attacker.is_hero and attacker.faith_stacks > 0 \
+					and _living_devout() != null:
+				raw *= 1.0 + 0.02 * attacker.faith_stacks
 			# Arcane Cannon: the damage (not the recoil) grows with Resonance.
 			if ab.display_name == "Arcane Cannon":
 				raw *= 1.0 + 0.075 * attacker.second_resource
@@ -2675,13 +2673,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Consecrated Ground: holy footing blunts the blow.
 			if strike_target.has_status("cons_ground"):
 				raw *= 0.85
-			# Conviction: each Faith stack turns the blade (3% base,
-			# Unwavering Faith deepens it) — while the Devout stands.
-			if strike_target.is_hero and strike_target.faith_stacks > 0:
-				var ft_dev := _living_devout()
-				if ft_dev != null:
-					raw *= 1.0 - minf((0.03 + 0.005 * ft_dev.unwavering_ranks) \
-						* strike_target.faith_stacks, 0.9)
+			# Conviction: each Faith stack turns the blade (3%) — while the
+			# Devout stands.
+			if strike_target.is_hero and strike_target.faith_stacks > 0 \
+					and _living_devout() != null:
+				raw *= 1.0 - 0.03 * strike_target.faith_stacks
 			if strike_target.has_status("shieldwall"):
 				raw *= 0.75
 			# Shielded: the Orc Shieldmaster's single-ally ward.
@@ -3397,7 +3393,7 @@ func _grant_divine_shield(devout: BattleUnit, target: BattleUnit, power: int) ->
 	if bstat.is_empty():
 		return
 	bstat["divine"] = true  # only Divine Shield absorbs build Faith
-	bstat["blessed_pct"] = 0.03 * devout.blessed_barrier_ranks
+	bstat["blessed_pct"] = 0.04 * devout.blessed_barrier_ranks
 	bstat["afterglow"] = int(round(devout.max_hp * 0.05 * devout.afterglow_ranks))
 
 
@@ -3423,9 +3419,7 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 	u.faith_stacks = mini(u.faith_stacks + n, 5)
 	if u.faith_stacks < 5:
 		var f_desc := "Conviction: Faith x%d — %d%% damage\nmitigation and +%d%% damage dealt.\nAt 5 stacks: healed for %d%% max\nhealth, and the Faith resets." % [
-			u.faith_stacks,
-			int(round((3.0 + 0.5 * devout.unwavering_ranks) * u.faith_stacks)),
-			int(round((2.0 + 0.5 * devout.unwavering_ranks) * u.faith_stacks)),
+			u.faith_stacks, 3 * u.faith_stacks, 2 * u.faith_stacks,
 			15 + 5 * devout.faithful_ranks]
 		if not u.update_status("faith", "F%d" % u.faith_stacks, f_desc):
 			u.add_status("faith", "Faith", "F%d" % u.faith_stacks,
@@ -3599,13 +3593,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# Absorbs 50% (perfect 55%) of the DEVOUT's max health, carrying
 			# the tree's riders (Blessed Barrier / Afterglow; Covenant fires
 			# through the lethal-save hook).
-			var shield := int(round(attacker.max_hp * (0.55 if is_perfect else 0.50)))
+			var shield := int(round(attacker.max_hp * (0.35 if is_perfect else 0.30)))
 			_sfx("parry", -6.0, 0.6)
 			_grant_divine_shield(attacker, target, shield)
 			_message("%s shields %s (%d)" % [attacker.unit_name, target.unit_name, shield])
 			_log("%s: Divine Shield on %s — absorbs %d (%d%% of the Devout's health)" % [
 				attacker.unit_name, target.unit_name, shield,
-				55 if is_perfect else 50], "#70d878")
+				35 if is_perfect else 30], "#70d878")
 			# Radient Aegis: the shield can echo onto another ally.
 			if attacker.aegis_ranks > 0 and randf() < 0.15 * attacker.aegis_ranks:
 				var aegis_pool := heroes.filter(

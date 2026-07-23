@@ -40,7 +40,7 @@
         "y": 810
       },
       "Skill Level": 1,
-      "Skill Description": "Each stack of Faith grants an additional .5% damage mitigation and damage increase.",
+      "Skill Description": "Increase Clerics max health by 5%.",
       "Skill Max Points": 3,
       "Skill Current Points": 0,
       "Skill Image": "/axe-hammer-grey.png",
@@ -152,7 +152,7 @@
         "y": 1050
       },
       "Skill Level": 1,
-      "Skill Description": "Divine Shield converts 3% of damage absorbed into healing.",
+      "Skill Description": "Divine Shield converts 4% of damage absorbed into healing.",
       "Skill Max Points": 3,
       "Skill Current Points": 0,
       "Skill Image": "/axe-hammer-grey.png",
@@ -184,7 +184,7 @@
         "y": 1170
       },
       "Skill Level": 1,
-      "Skill Description": "Gain ability: \"Bulwark of Fortitude\" all allies gain 100% break damage mitigation, 50% armor, and heal for 10% max hp each turn for 3 turns.",
+      "Skill Description": "Gain ability: \"Bulwark of Fortitude\" all allies gain 100% break damage mitigation, 50% increased armor, and heal for 10% max hp each turn for 3 turns.",
       "Skill Max Points": 1,
       "Skill Current Points": 0,
       "Skill Image": "/axe-hammer-grey.png",
@@ -286,7 +286,7 @@
         "name": "Unwavering Faith",
         "showActions": false,
         "showTooltip": false,
-        "description": "Each stack of Faith grants an additional .5% damage mitigation and damage increase.",
+        "description": "Increase Clerics max health by 5%.",
         "maxPoints": 3,
         "currentPoints": 0,
         "requiredPoints": 0,
@@ -433,7 +433,7 @@
         "name": "Blessed Barrier",
         "showActions": false,
         "showTooltip": false,
-        "description": "Divine Shield converts 3% of damage absorbed into healing.",
+        "description": "Divine Shield converts 4% of damage absorbed into healing.",
         "maxPoints": 3,
         "currentPoints": 0,
         "requiredPoints": 0,
@@ -475,7 +475,7 @@
         "name": "Bulwark of Fortitude",
         "showActions": false,
         "showTooltip": false,
-        "description": "Gain ability: \"Bulwark of Fortitude\" all allies gain 100% break damage mitigation, 50% armor, and heal for 10% max hp each turn for 3 turns.",
+        "description": "Gain ability: \"Bulwark of Fortitude\" all allies gain 100% break damage mitigation, 50% increased armor, and heal for 10% max hp each turn for 3 turns.",
         "maxPoints": 1,
         "currentPoints": 0,
         "requiredPoints": 0,
@@ -495,18 +495,18 @@
     "skillIdCounter": 27,
     "draggedSkill": null,
     "dragOffset": {
-      "x": -25.5,
-      "y": -23
+      "x": -24.5,
+      "y": -28
     },
     "draggedElement": {},
     "isDragging": false,
     "isLinking": false,
     "hoveredSkill": null,
     "defaultMaxPoints": 5,
-    "dragStartTime": 1784841388966,
+    "dragStartTime": 1784846311928,
     "dragStartPos": {
-      "x": 1084.5,
-      "y": 1027
+      "x": 1085.5,
+      "y": 1142
     },
     "dragThreshold": 5,
     "showOptions": false,
@@ -538,7 +538,7 @@
     "currentClassDescription": null,
     "inputText": "",
     "isLoading": false,
-    "historyIndex": 49,
+    "historyIndex": 48,
     "maxHistorySize": 50,
     "showImageSelector": false,
     "selectedImage": null,
@@ -570,8 +570,8 @@
     "maxPoints": 20,
     "selectionBox": null,
     "initialClick": {
-      "x": 1197.5,
-      "y": 1138
+      "x": 1233.5,
+      "y": 1279
     },
     "showLoadModal": false,
     "initialPositions": null,

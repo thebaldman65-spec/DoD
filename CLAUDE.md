@@ -96,11 +96,12 @@ holder (barrier status flag "divine" → unit.shield_absorbed_cb →
 _gain_faith; doubled under "zeal" status — the ×2 lives in
 _gain_faith) — only while a
 living Devout stands (_living_devout gate on gain AND on the
-per-stack combat effects: target-side −(3+0.5×unwavering)%/stack,
-attacker-side +(2+0.5×unwavering)%/stack in _resolve). At 5:
+per-stack combat effects: target-side −3%/stack, attacker-side
++2%/stack in _resolve; Unwavering Faith is now +5%/rank max HP via
+max_hp_pct, 07-23). At 5:
 _gain_faith releases — heal (15+5×faithful)% max, reset, Devout +3%
 max Mana, Communion rolls (0.20×ranks×THEIR stacks per other member).
-Kit: Divine Shield v2 (15 Mana, 50/55% of Devout max HP barrier, 2cd —
+Kit: Divine Shield v2 (15 Mana, 30/35% of Devout max HP barrier, 2cd —
 _grant_divine_shield stamps riders on the barrier status:
 blessed_pct/afterglow; Sacred Covenant via unit.lethal_saved_cb →
 _on_lethal_saved when a barrier eats a killing blow; Radient Aegis

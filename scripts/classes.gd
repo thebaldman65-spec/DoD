@@ -460,8 +460,8 @@ static func spec_abilities(spec: String) -> Array:
 			return [
 				Ability.make({"display_name": "Divine Shield", "cooldown": 2, "cost": 15, "special": "divine_shield",
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack03",
-					"perfect_id": "", "perfect_text": "Absorbs 55% instead",
-					"description": "Grant an ally a holy shield that\nabsorbs 50% of the Devout's max\nhealth, then breaks."}),
+					"perfect_id": "", "perfect_text": "Absorbs 35% instead",
+					"description": "Grant an ally a holy shield that\nabsorbs 30% of the Devout's max\nhealth, then breaks."}),
 				Ability.make({"display_name": "Consecrated Ground", "cooldown": 3, "cost": 25, "special": "cons_ground",
 					"delay": 3.5, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Lasts 3 turns",
