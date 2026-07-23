@@ -282,8 +282,10 @@ talent); sits on the ENEMY with the live −% on the chip.</td></tr>
 <tr><td>Focus</td><td>+10 Mana each turn.</td></tr>
 <tr><td>Renewal</td><td>Restores HP at the start of each turn — 15% of the caster's max
 health, snapshotted (and Mercy-scaled) when cast.</td></tr>
-<tr><td>Sanctified</td><td>Immune to new debuffs (Empowered Divine Plea, 3
+<tr><td>Consecrated</td><td>Immune to new debuffs (Empowered Divine Plea, 3
 turns).</td></tr>
+<tr><td>Holy Capacitor</td><td>Overhealing banked by the talent, shown with a live
+counter; released by the next Heal.</td></tr>
 <tr><td>Surge</td><td>+20% attack.</td></tr>
 <tr><td>Mocked</td><td>Must attack the Warrior who mocked them.</td></tr>
 <tr><td>Quick Draw</td><td>All abilities act 50% faster.</td></tr>
@@ -526,11 +528,11 @@ Empower (1 Mercy): Renewal also blankets the Cleric (Perfect: the target also he
 of the Cleric's health instantly).<br>
 Hymn of Hope — 1 Mercy, 3.5, 2cd; heal ALL allies for 20% of their own max health.
 Empower (+1 Mercy): 35% instead (Perfect: 25%).<br>
-<i>Talent-granted (the Holy tree is still to be designed — both are built and waiting):</i>
+<i>Talent-granted:</i>
 Resurrection — 3 Mercy, 4.0, 3cd; return a fallen ally to life with 20% health and
 resource. Empower (+1 Mercy): they return at FULL health and resource with 5 turns of
 Renewal (Perfect: 25% instead). Divine Plea — 2 Mercy, 3.0, 2cd; FULLY heal an ally.
-Empower (+1 Mercy): also cleanse all their debuffs and Sanctify them against new ones
+Empower (+1 Mercy): also cleanse all their debuffs and Consecrate them against new ones
 for 3 turns (Perfect: restores 10 Mana).</li>
 <li><b>Devout (Warder)</b> — Passive <i>Devotion Aura</i>: the entire party (Cleric included)
 takes 15% less BD, shown as a battle-long status.<br>
@@ -591,8 +593,8 @@ turns). The player picks both targets; each fragment rolls miss/parry separately
 </ul>
 
 <h2>7. Talents</h2>
-<p><b>Trees are FIXED and designed.</b> Six exist so far —
-<b>Berserker, Swordmaster, Warden, Pyromancer, Cryomancer, Arcanist</b> (designed in the RPG Skill Tree
+<p><b>Trees are FIXED and designed.</b> Seven exist so far —
+<b>Berserker, Swordmaster, Warden, Pyromancer, Cryomancer, Arcanist, Holy</b> (designed in the RPG Skill Tree
 Generator; source JSONs in data/talent-tree-*.json). Every other spec shows <b>"Coming soon."</b> on the party
 screen until its tree is designed. Points still accrue from victories (fight 1, elite 2,
 boss 3; Waystone +1) and bank until a tree exists.</p>
@@ -666,6 +668,18 @@ previous ×3), Unlimited Power (Resonance gained at max stacks becomes +2%/rank 
 and +2%/rank max Mana, stacking all battle ×3), Stable Alignment (a single attack cannot
 remove more than 35/30/25% of max health — the cap drops 5 per point ×3). Capstone —
 Magi's Wrath (grants the ability).</p>
+<p><b>Holy tree:</b> Row 1 — Triage (instant heals can CRIT ×1.5 off the Cleric's crit
+chance, and all healing +3%/rank ×3), Heavenly Aura (each Mercy stack grants +5%/rank
+extra healing done, on top of the base 5% ×3), Holy Light (perfect casts restore 1%/rank
+max Mana ×3). Row 2 — Guardian Angel (allies falling below 53/56/59% health earn Mercy —
+the threshold rises 3 per point ×3), Divine Presence (at the end of the Cleric's turn the
+lowest-health ally heals 1%/rank of their max health ×3), Resurrection (grants the
+ability), Last Hope (allies under 25% max health receive 5%/rank more healing ×3), Inner
+Faith (+5%/rank max health ×3). Row 3 — Holy Capacitor (33%/rank of overhealing is
+banked — live chip — and released by the next Heal ×3), On the Mend (Renewal ticks
+5%/rank chance to dispel one harmful effect ×3), Sanctified (spending Mercy has a
+10%/rank chance to consume no stacks ×3). Capstone — Divine Plea (grants the
+ability).</p>
 <p><b>Tooltip display:</b> talent tooltips never say "per rank" — the number shown grows
 with the points invested (3% → 6% → 9%; unlearned nodes preview the 1-point value).</p>
 <p><b>Talent visibility:</b> every talent proc is written to the combat log with a
@@ -853,7 +867,8 @@ scaling, and the spec passive line bakes in talent ranks (Aggressive/Defensive S
 Unstoppable) — the class passive + spec passive lines, ability chips (hover shows real
 numbers AND the "% of Attack" scaling), rune equip toggles (2 max), and the spec's talent
 tree: a 12-node grid with prerequisite connector lines and click-to-learn nodes (lock
-reasons on the node tooltips) for Berserker / Swordmaster / Warden / Pyromancer / Cryomancer, or <b>"Coming soon."</b>
+reasons on the node tooltips) for Berserker / Swordmaster / Warden / Pyromancer /
+Cryomancer / Arcanist / Holy, or <b>"Coming soon."</b>
 for specs whose trees aren't designed yet.</li>
 <li><b>Awakening screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
 along on every path the class can take) and each ability's damage with its "% Atk" scaling.
@@ -929,11 +944,8 @@ only the Tyrant's frost weakness is set) and Counter Attack (defined term; no ta
 ability grants it yet).</li>
 <li>The Withered Warden has its own kit; the Ash-Wrought Tyrant is still a Chief stand-in —
 unique kit + art planned. Boss art for both pending.</li>
-<li>Trees still to design: all three Cleric specs, all three Hunter specs;
-full rune loot table pending; relic pool (5) needs growth. <b>Until the Holy tree
-lands, Resurrection and Divine Plea are built but unreachable</b> (they are its
-talent-granted abilities) — the Revive Potion is the party's only revive
-meanwhile.</li>
+<li>Trees still to design: Devout and Occultist, all three Hunter specs;
+full rune loot table pending; relic pool (5) needs growth.</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>
 <li>The sim bot currently wins ~100% of standard fights (target ≈85%) — difficulty leans
 easy; real tuning comes from playtests.</li>

@@ -227,6 +227,70 @@ const FIXED_TREES := {
 				"perfect_id": "", "perfect_text": "Cooldown becomes 4 instead",
 				"description": "The cold detonates: every Chilled\nenemy takes 10% of Attack PER STACK\nof Chilled on it."}}},
 	],
+	"holy": [
+		# --- row 0 ---
+		{"id": "hl_triage", "name": "Triage", "ranks": 3, "row": 0, "col": 1,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Instant heals can CRIT (x1.5, using your critical strike chance), and all your healing is increased by {v}%.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"triage_ranks": 1}}},
+		{"id": "hl_heavenly", "name": "Heavenly Aura", "ranks": 3, "row": 0, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Each stack of Mercy grants {v}% healing done (up from the base 5%).",
+			"scale": {"base": 5, "step": 5},
+			"payload": {"stat": {"heavenly_ranks": 1}}},
+		{"id": "hl_holy_light", "name": "Holy Light", "ranks": 3, "row": 0, "col": 3,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Perfect casts restore {v}% of your maximum Mana.",
+			"scale": {"step": 1},
+			"payload": {"stat": {"holy_light_ranks": 1}}},
+		# --- row 1 ---
+		{"id": "hl_guardian", "name": "Guardian Angel", "ranks": 3, "row": 1, "col": 0,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Allies falling below {v}% health earn you a stack of Mercy (up from 50%).",
+			"scale": {"base": 50, "step": 3},
+			"payload": {"stat": {"guardian_ranks": 1}}},
+		{"id": "hl_presence", "name": "Divine Presence", "ranks": 3, "row": 1, "col": 1,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "At the end of your turn, the lowest-health ally is healed for {v}% of their maximum health.",
+			"scale": {"step": 1},
+			"payload": {"stat": {"divine_presence_ranks": 1}}},
+		{"id": "hl_resurrection", "name": "Resurrection", "ranks": 1, "row": 1, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "New ability: Resurrection — spend 3 Mercy to return a fallen ally to life with 20% health and resource; Empower (+1 Mercy): full health and resource plus 5 turns of Renewal (4.0 int, 3cd).",
+			"payload": {"grant_ability": "Resurrection"}},
+		{"id": "hl_last_hope", "name": "Last Hope", "ranks": 3, "row": 1, "col": 3,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Allies under 25% of their max health receive {v}% more healing.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"last_hope_ranks": 1}}},
+		{"id": "hl_inner_faith", "name": "Inner Faith", "ranks": 3, "row": 1, "col": 4,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Increases your maximum health by {v}%.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"max_hp_pct": 0.05}}},
+		# --- row 2 ---
+		{"id": "hl_capacitor", "name": "Holy Capacitor", "ranks": 3, "row": 2, "col": 1,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "{v}% of your overhealing is stored and released by your next Heal.",
+			"scale": {"step": 33},
+			"payload": {"stat": {"capacitor_ranks": 1}}},
+		{"id": "hl_on_mend", "name": "On the Mend", "ranks": 3, "row": 2, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Renewal ticks have a {v}% chance to dispel one harmful effect from the bearer.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"on_mend_ranks": 1}}},
+		{"id": "hl_sanctified", "name": "Sanctified", "ranks": 3, "row": 2, "col": 3,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "Spending Mercy has a {v}% chance to consume no stacks.",
+			"scale": {"step": 10},
+			"payload": {"stat": {"sanctified_ranks": 1}}},
+		# --- row 3 (capstone) ---
+		{"id": "hl_divine_plea", "name": "Divine Plea", "ranks": 1, "row": 3, "col": 2,
+			"gate": "row", "requires": "", "requires_ranks": 0,
+			"desc": "New ability: Divine Plea — spend 2 Mercy to FULLY heal an ally; Empower (+1 Mercy): also cleanse all debuffs and Consecrate them against new ones for 3 turns (3.0 int, 2cd).",
+			"payload": {"grant_ability": "Divine Plea"}},
+	],
 	"arcanist": [
 		# --- row 0 ---
 		{"id": "ar_mindfulness", "name": "Mindfulness", "ranks": 3, "row": 0, "col": 1,
@@ -528,6 +592,12 @@ static func apply_payload(cfg: Dictionary, payload: Dictionary, ranks: int) -> v
 			cfg[field] = cfg.get(field, base) + v * ranks
 	elif payload.has("new_ability"):
 		cfg["abilities"] = cfg["abilities"] + [Ability.make(payload["new_ability"])]
+	elif payload.has("grant_ability"):
+		# The ability def lives in Classes (single source shared with the
+		# DOD_SIM_ABILITIES hook), not inline in the node.
+		var granted := Classes.pending_talent_ability(payload["grant_ability"])
+		if granted != null:
+			cfg["abilities"] = cfg["abilities"] + [granted]
 	elif payload.has("ability"):
 		for ab in cfg["abilities"]:
 			if ab.display_name == payload["ability"]:

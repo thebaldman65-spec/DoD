@@ -148,6 +148,20 @@ var suppressing_ranks := 0    # Suppressing Fire: Barrage bolts ramp
 var stable_ranks := 0         # Stable Alignment: single-hit damage cap
 var unlimited_ranks := 0      # Unlimited Power: overflow → dmg + max Mana
 var unlimited_surges := 0     # overflow procs banked this battle
+# Holy tree (07-22). See talents.gd for the node text.
+var triage_ranks := 0         # Triage: instant heals can crit, +3%/rank healing
+var heavenly_ranks := 0       # Heavenly Aura: deeper Mercy stack bonus
+var holy_light_ranks := 0     # Holy Light: mana back on perfect casts
+var guardian_ranks := 0       # Guardian Angel: wider Mercy window
+var mercy_threshold := 0.5    # party-wide stamp (Guardian Angel raises it)
+var divine_presence_ranks := 0 # Divine Presence: end-of-turn drip heal
+var last_hope_ranks := 0      # Last Hope: the nearly-dead heal deeper
+var last_hope_bonus := 0      # party-wide stamp (receiver side of Last Hope)
+var capacitor_ranks := 0      # Holy Capacitor: overheal banks for next Heal
+var stored_overheal := 0      # the banked amount (released by Heal)
+var last_overheal := 0        # overheal of the most recent heal_amount call
+var on_mend_ranks := 0        # On the Mend: Renewal ticks can dispel
+var sanctified_ranks := 0     # Sanctified: Mercy spends can refund
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
@@ -161,9 +175,11 @@ var log_proc := Callable()
 var below_half_cb := Callable()
 
 
+# The threshold is 50% by default; Guardian Angel stamps a higher one on
+# the whole party at spawn.
 func _check_below_half(was_above: bool) -> void:
-	if is_hero and not is_companion and was_above and hp <= max_hp * 0.5 \
-			and below_half_cb.is_valid():
+	if is_hero and not is_companion and was_above \
+			and hp <= max_hp * mercy_threshold and below_half_cb.is_valid():
 		below_half_cb.call(self)
 
 
@@ -629,6 +645,20 @@ func remove_status(id: String) -> void:
 	_refresh_chips()
 
 
+# On the Mend: strip ONE random harmful status (Broken excluded).
+# Returns the removed status label, or "" if nothing was dispellable.
+func dispel_one_debuff() -> String:
+	var candidates: Array = []
+	for s in statuses:
+		if s.id != "broken" and DEBUFF_IDS.has(s.id):
+			candidates.append(s)
+	if candidates.is_empty():
+		return ""
+	var pick: Dictionary = candidates.pick_random()
+	remove_status(pick.id)
+	return pick.label
+
+
 # Cleanse: strip every harmful status. Broken stays — it's a Break-meter
 # state, not a dispellable status. Returns how many were removed.
 func purge_debuffs() -> int:
@@ -899,8 +929,9 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			amount = stable_cap
 	var was_above_half := hp > max_hp * 0.5
 	var was_above_quarter := hp > max_hp * 0.25
+	var was_above_mercy := hp > max_hp * mercy_threshold
 	hp = maxi(hp - amount, 0)
-	_check_below_half(was_above_half)
+	_check_below_half(was_above_mercy)
 	# Hold the Line: the party cannot die while the blessing holds.
 	if hp == 0 and has_status("undying"):
 		hp = 1
@@ -979,7 +1010,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 
 # Damage from DoT effects (Burn). No Pressure, no hurt animation. Returns true on death.
 func take_tick_damage(amount: int, label: String, color: Color) -> bool:
-	var tick_was_above := hp > max_hp * 0.5
+	var tick_was_above := hp > max_hp * mercy_threshold
 	hp = maxi(hp - amount, 0)
 	_check_below_half(tick_was_above)
 	if hp == 0 and has_status("undying"):
@@ -1059,7 +1090,11 @@ func heal_amount(amount: int, external := false) -> int:
 		mult *= 1.15
 	if has_status("frostbite"):
 		mult *= 0.5
+	# Last Hope (Holy talent, party-wide stamp): the nearly-dead heal deeper.
+	if last_hope_bonus > 0 and hp < max_hp * 0.25:
+		mult *= 1.0 + 0.05 * last_hope_bonus
 	var final := int(round(amount * mult))
+	last_overheal = maxi(final - (max_hp - hp), 0)
 	hp = mini(hp + final, max_hp)
 	if external and final > 0:
 		healed_externally = true

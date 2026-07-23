@@ -64,7 +64,8 @@ const STATUS_INFO := {
 	"stabilized": ["Stabilized", "St+", Color(0.55, 0.68, 0.95), "Grounded resonance: takes less\ndamage (10% per stack consumed)."],
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Maximum Resonance raised to 8;\nstacks beyond 5 give extra Resonance\nbonus (damage, crit, damage taken)."],
 	"unlimited": ["Unlimited Power", "UP", Color(0.85, 0.55, 1.0), "Resonance overflow: bonus damage\nand maximum Mana, all battle."],
-	"sanctified": ["Sanctified", "Sf", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
+	"sanctified": ["Consecrated", "Cn", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
+	"capacitor": ["Holy Capacitor", "HC", Color(0.95, 0.9, 0.6), "Stored overhealing, released by\nthe next Heal."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -464,6 +465,19 @@ func _spawn_units() -> void:
 	if heroes.any(func(h): return h.passive_id == "devotion"):
 		for h in heroes:
 			_apply_status(h, "devotion", -1)
+
+	# Guardian Angel raises the Mercy-earning threshold and Last Hope deepens
+	# healing on the nearly-dead — both are the Holy's talents, but the checks
+	# run on WHOEVER is hit/healed, so the ranks are stamped party-wide.
+	var ga_ranks := 0
+	var lh_ranks := 0
+	for h in heroes:
+		ga_ranks = maxi(ga_ranks, h.guardian_ranks)
+		lh_ranks = maxi(lh_ranks, h.last_hope_ranks)
+	if ga_ranks > 0 or lh_ranks > 0:
+		for h in heroes:
+			h.mercy_threshold = 0.5 + 0.03 * ga_ranks
+			h.last_hope_bonus = lh_ranks
 
 	var composition: Array = ["raider", "chief", "archer", "archer"]
 	# DOD_SIM_ENEMIES="boss,shieldmaster,shaman" forces the enemy lineup in
@@ -1011,10 +1025,20 @@ func _run_battle() -> void:
 		# Turn-start regeneration effects.
 		if u.has_status("renewal"):
 			# The tick was snapshotted at cast: 15% of the caster's max HP.
-			var ren_amt := maxi(int(u.get_status("renewal").get("tick", 15)), 1)
+			var ren_stat := u.get_status("renewal")
+			var ren_amt := maxi(int(ren_stat.get("tick", 15)), 1)
 			var ren_got := u.heal_amount(ren_amt, true)
 			u.float_text("+%d" % ren_got, Color(0.45, 0.9, 0.5))
 			_log("%s regenerates %d HP (Renewal)" % [u.unit_name, ren_got], "#70d878")
+			# On the Mend (talent, snapshotted on the status): the tick can
+			# wash one harmful effect away.
+			var mend_ranks := int(ren_stat.get("mend", 0))
+			if mend_ranks > 0 and randf() < 0.05 * mend_ranks:
+				var mended := u.dispel_one_debuff()
+				if mended != "":
+					u.float_text("Mended: %s" % mended, Color(0.5, 0.95, 0.6))
+					_log("   → Talent: On the Mend — Renewal washes the %s off %s" % [
+						mended, u.unit_name], "#b0a8e0")
 		if u.has_status("focus") and u.resource_name == "Mana":
 			u.resource = mini(u.resource + 10, u.max_resource)
 			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
@@ -1265,6 +1289,20 @@ func _player_turn(u: BattleUnit) -> void:
 		_rebuild_turn_bar(u, ab)
 		action_panel.visible = false
 	await _resolve(u, ab, target, grade)
+	# Divine Presence (Holy talent): the light settles on the most wounded
+	# as the Cleric's turn ends.
+	if u.divine_presence_ranks > 0 and not u.dead and not battle_over:
+		var dp_pool := heroes.filter(func(h): return not h.dead and not h.is_companion)
+		if not dp_pool.is_empty():
+			var dp_t := _lowest_hp(dp_pool)
+			if dp_t.hp < dp_t.max_hp:
+				var dp_amt := maxi(int(round(dp_t.max_hp * 0.01
+					* u.divine_presence_ranks * _healing_done_mult(u))), 1)
+				var dp_got: int = dp_t.heal_amount(dp_amt, dp_t != u)
+				dp_t.float_text("+%d" % dp_got, Color(0.4, 0.9, 0.45))
+				_stat("healing", dp_got)
+				_log("   → Talent: Divine Presence — %s mends %d" % [
+					dp_t.unit_name, dp_got], "#b0a8e0")
 	_preview_locked = false
 	current_hero = null
 
@@ -2181,8 +2219,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_stat("use_" + ab.display_name)
 
 	# faith_cost = the secondary-resource price (Mercy for the Holy Cleric).
+	# Sanctified (talent): the spend can be refunded outright.
 	if ab.faith_cost > 0:
-		attacker.second_resource = maxi(attacker.second_resource - ab.faith_cost, 0)
+		if attacker.sanctified_ranks > 0 \
+				and randf() < 0.10 * attacker.sanctified_ranks:
+			attacker.float_text("Mercy preserved", Color(0.95, 0.8, 0.3))
+			_log("   → Talent: Sanctified — the Mercy is not consumed", "#b0a8e0")
+		else:
+			attacker.second_resource = maxi(attacker.second_resource - ab.faith_cost, 0)
+		attacker.refresh_bars()
+	# Holy Light (talent): every perfect cast drips Mana back.
+	if grade == "perfect" and attacker.holy_light_ranks > 0 \
+			and attacker.resource_name == "Mana":
+		var hl_mana := maxi(int(round(attacker.max_resource
+			* 0.01 * attacker.holy_light_ranks)), 1)
+		attacker.resource = mini(attacker.resource + hl_mana, attacker.max_resource)
+		attacker.float_text("+%d Mana" % hl_mana, Color(0.5, 0.7, 1.0))
+		_log("   → Talent: Holy Light — %s restores %d Mana" % [
+			attacker.unit_name, hl_mana], "#b0a8e0")
 		attacker.refresh_bars()
 
 	var grade_tag := {"perfect": " [PERFECT]", "good": "", "fail": " [Sloppy]"}[grade] as String
@@ -3071,10 +3125,10 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		_log("   → %s resists the %s (boss — Break them first)" % [target.unit_name,
 			"Stun" if id == "stunned" else "Freeze"], "#909090")
 		return
-	# Sanctified (Divine Plea): the warded shrug off every new debuff.
+	# Consecrated (Empowered Divine Plea): shrugs off every new debuff.
 	if target.has_status("sanctified") and BattleUnit.DEBUFF_IDS.has(id):
-		target.float_text("SANCTIFIED", Color(0.98, 0.88, 0.55))
-		_log("   → %s is Sanctified — the %s cannot take hold" % [target.unit_name,
+		target.float_text("CONSECRATED", Color(0.98, 0.88, 0.55))
+		_log("   → %s is Consecrated — the %s cannot take hold" % [target.unit_name,
 			String(STATUS_INFO[id][0])], "#e8c860")
 		return
 	var info: Array = STATUS_INFO[id]
@@ -3201,12 +3255,39 @@ func _resonance_power(u: BattleUnit) -> float:
 	return stacks
 
 
-# Mercy (Holy passive): +5% healing done per stack currently held. Costs
-# are paid before the cast resolves, so a spender heals with what remains.
+# Mercy (Holy passive): +5% healing done per stack currently held (Heavenly
+# Aura deepens it by +5%/rank; Triage adds a flat +3%/rank). Costs are paid
+# before the cast resolves, so a spender heals with what remains.
 func _healing_done_mult(caster: BattleUnit) -> float:
+	var m := 1.0
 	if caster.second_resource_name == "Mercy":
-		return 1.0 + 0.05 * caster.second_resource
+		m += (0.05 + 0.05 * caster.heavenly_ranks) * caster.second_resource
+	m += 0.03 * caster.triage_ranks
+	return m
+
+
+# Triage: instant heals can CRIT (x1.5) off the Cleric's crit chance.
+func _heal_crit_mult(caster: BattleUnit) -> float:
+	if caster.triage_ranks > 0 and randf() < CRIT_CHANCE + caster.crit_bonus:
+		return 1.5
 	return 1.0
+
+
+# Holy Capacitor: bank a share of the overheal the last heal spilled;
+# the next Heal releases the whole battery.
+func _bank_overheal(caster: BattleUnit, target: BattleUnit) -> void:
+	if caster.capacitor_ranks <= 0 or target.last_overheal <= 0:
+		return
+	var banked := int(round(target.last_overheal * 0.33 * caster.capacitor_ranks))
+	if banked <= 0:
+		return
+	caster.stored_overheal += banked
+	var cap_desc := "Holy Capacitor: %d overhealing stored,\nreleased by the next Heal." % caster.stored_overheal
+	if not caster.update_status("capacitor", "%d" % caster.stored_overheal, cap_desc):
+		caster.add_status("capacitor", "Holy Capacitor", "%d" % caster.stored_overheal,
+			Color(0.95, 0.9, 0.6), -1, cap_desc)
+	_log("   → Talent: Holy Capacitor banks %d overhealing (%d stored)" % [
+		banked, caster.stored_overheal], "#b0a8e0")
 
 
 # Mercy (Holy passive): an ally's brush with death steels the healer.
@@ -3233,7 +3314,12 @@ func _consume_empower(attacker: BattleUnit, ab: Ability) -> bool:
 		return false
 	if attacker.second_resource_name != "Mercy" or attacker.second_resource < 1:
 		return false
-	attacker.second_resource -= 1
+	# Sanctified (talent): the surcharge can be refunded too.
+	if attacker.sanctified_ranks > 0 and randf() < 0.10 * attacker.sanctified_ranks:
+		attacker.float_text("Mercy preserved", Color(0.95, 0.8, 0.3))
+		_log("   → Talent: Sanctified — the Empowerment costs nothing", "#b0a8e0")
+	else:
+		attacker.second_resource -= 1
 	attacker.refresh_bars()
 	attacker.float_text("EMPOWERED", Color(0.95, 0.8, 0.3))
 	_log("   → %s spends 1 Mercy to Empower the cast" % attacker.unit_name, "#e8c860")
@@ -3388,10 +3474,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			pct *= _healing_done_mult(attacker)
 			_sfx("heal", -4.0, 0.9)
 			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
-				var amt := int(h.max_hp * pct)
+				# Triage: every voice of the hymn rolls its own crit.
+				var h_crit := _heal_crit_mult(attacker)
+				var amt := int(h.max_hp * pct * h_crit)
 				var got: int = h.heal_amount(amt, h != attacker)
-				h.float_text("+%d" % got, Color(0.4, 0.9, 0.45))
+				h.float_text("+%d%s" % [got, "!" if h_crit > 1.0 else ""],
+					Color(0.4, 0.9, 0.45), h_crit > 1.0)
 				_stat("healing", got)
+				_bank_overheal(attacker, h)
 			_message("%s sings the Hymn of Hope!" % attacker.unit_name)
 			_log("%s: Hymn of Hope — party heals %d%%%s" % [attacker.unit_name,
 				int(round(pct * 100)), " (Empowered)" if empowered else ""], "#70d878")
@@ -3503,6 +3593,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					var rez_tick := maxi(int(round(attacker.max_hp * 0.15
 						* _healing_done_mult(attacker))), 1)
 					_apply_status(target, "renewal", 5, 0, rez_tick)
+					if target.has_status("renewal"):
+						target.get_status("renewal")["mend"] = attacker.on_mend_ranks
 				_sfx("heal", -4.0, 0.65)
 				target.float_text("RESURRECTED", Color(0.95, 0.9, 0.55))
 				target.next_time = attacker.next_time \
@@ -3608,13 +3700,23 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Overcharge — max Resonance is now 8; stacks beyond 5 weigh %.2fx" % [
 				attacker.unit_name, attacker.overcharge_mult], "#b085e0")
 		"holy_heal":
-			# 40% of the CASTER's max health, Mercy-scaled.
+			# 40% of the CASTER's max health, Mercy-scaled; Triage can crit;
+			# Holy Capacitor releases its stored overheal here.
+			var hh_crit := _heal_crit_mult(attacker)
 			var hh_amt := maxi(int(round(attacker.max_hp * 0.40
-				* _healing_done_mult(attacker))), 1)
+				* _healing_done_mult(attacker) * hh_crit)), 1)
+			if attacker.stored_overheal > 0:
+				hh_amt += attacker.stored_overheal
+				_log("   → Talent: Holy Capacitor releases %d stored healing" % \
+					attacker.stored_overheal, "#b0a8e0")
+				attacker.stored_overheal = 0
+				attacker.remove_status("capacitor")
 			_sfx("heal", -6.0)
 			var hh_got: int = target.heal_amount(hh_amt, target != attacker)
-			target.float_text("+%d" % hh_got, Color(0.4, 0.9, 0.45))
+			target.float_text("+%d%s" % [hh_got, "!" if hh_crit > 1.0 else ""],
+				Color(0.4, 0.9, 0.45), hh_crit > 1.0)
 			_stat("healing", hh_got)
+			_bank_overheal(attacker, target)
 			var hh_note := ""
 			if empowered:
 				var purged := target.purge_debuffs()
@@ -3626,8 +3728,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.float_text("+%d" % self_got, Color(0.4, 0.9, 0.45))
 				_stat("healing", self_got)
 			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
-			_log("%s: Heal — %s recovers %d (40%% of the Cleric's health)%s" % [
-				attacker.unit_name, target.unit_name, hh_got, hh_note], "#70d878")
+			_log("%s: Heal — %s recovers %d%s (40%% of the Cleric's health)%s" % [
+				attacker.unit_name, target.unit_name, hh_got,
+				" CRIT" if hh_crit > 1.0 else "", hh_note], "#70d878")
 		"divine_plea":
 			# Spend 2 Mercy: a full heal; Empowered also cleanses and wards.
 			_sfx("heal", -4.0, 0.7)
@@ -3638,7 +3741,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			if empowered:
 				var dp_purged := target.purge_debuffs()
 				_apply_status(target, "sanctified", 3)
-				dp_note = " — cleansed %d and Sanctified 3 turns (Empowered)" % dp_purged
+				dp_note = " — cleansed %d and Consecrated 3 turns (Empowered)" % dp_purged
 			elif is_perfect:
 				attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
 				attacker.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
@@ -3665,15 +3768,22 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_apply_status(target, "renewal", 5, 0, ren_tick)
 			target.update_status("renewal", "R+",
 				"Renewal: restores %d HP at the start\nof each turn (15%% of the caster's\nmax health)." % ren_tick)
+			# On the Mend rides the status: ticks can dispel (snapshotted).
+			if target.has_status("renewal"):
+				target.get_status("renewal")["mend"] = attacker.on_mend_ranks
 			if empowered and target != attacker:
 				_apply_status(attacker, "renewal", 5, 0, ren_tick)
 				attacker.update_status("renewal", "R+",
 					"Renewal: restores %d HP at the start\nof each turn (15%% of the caster's\nmax health)." % ren_tick)
+				if attacker.has_status("renewal"):
+					attacker.get_status("renewal")["mend"] = attacker.on_mend_ranks
 			if is_perfect:
-				var ren_burst := maxi(int(round(attacker.max_hp * 0.05)), 1)
+				var ren_burst := maxi(int(round(attacker.max_hp * 0.05
+					* _heal_crit_mult(attacker))), 1)
 				var burst_got: int = target.heal_amount(ren_burst, target != attacker)
 				target.float_text("+%d" % burst_got, Color(0.4, 0.9, 0.45))
 				_stat("healing", burst_got)
+				_bank_overheal(attacker, target)
 			_message("%s blesses %s with Renewal" % [attacker.unit_name, target.unit_name])
 			_log("%s: Renewal on %s — %d HP/turn for 5 turns%s" % [attacker.unit_name,
 				target.unit_name, ren_tick,

@@ -89,6 +89,27 @@ sanctified). Status expiry now logs "fades from" (unit.tick_statuses);
 STUNNED/FROZEN lost turns tick statuses+cooldowns (fix 07-22). Arcanist
 tuning (07-22): Resonance dmg-taken +5%/stack (was 10); Overcharge
 recoil surcharges REMOVED (weighting = passive trio only).
+HOLY TREE (07-22, 7th fixed tree; source JSON was one column right —
+normalized): Triage (triage_ranks: _heal_crit_mult ×1.5 rolls on
+instant heals — holy_heal/hymn-per-target/renewal burst, NOT renewal
+ticks — + flat 3%/rank in _healing_done_mult), Heavenly Aura
+(heavenly_ranks deepens the Mercy per-stack term), Holy Light (perfect
+casts +1%/rank max Mana — block next to the faith_cost deduction),
+Guardian Angel + Last Hope are PARTY-WIDE STAMPS set after spawn
+(unit.mercy_threshold 0.5+0.03r used by _check_below_half in take_hit/
+take_tick_damage; unit.last_hope_bonus applied receiver-side in
+heal_amount when hp<25%), Divine Presence (end of _player_turn drip to
+_lowest_hp), Inner Faith (max_hp_pct payload), Holy Capacitor
+(unit.last_overheal set by every heal_amount; _bank_overheal chips
+"capacitor"; released by the next holy_heal), On the Mend (ranks
+SNAPSHOTTED into the renewal status dict field "mend" at every apply
+site; rolled at the turn-start tick via unit.dispel_one_debuff),
+Sanctified (refund rolls at BOTH spend sites: faith_cost deduction +
+_consume_empower). Res/Divine Plea granted via NEW apply_payload branch
+{"grant_ability": name} → Classes.pending_talent_ability (single
+source with DOD_SIM_ABILITIES). STATUS RENAME: "sanctified" status
+label is now "Consecrated" (chip Cn) — the talent owns the Sanctified
+name; internal id unchanged.
 ENCOUNTERS = POWER BUDGET (07-16): enemy power {raider/archer 1, sm/shaman
 2, chief 4, boss 7}; every battle SPENDS ITS BUDGET EXACTLY via themed
 warbands (Run.THEMES two-step: theme → fill roles; combos enumerated in
