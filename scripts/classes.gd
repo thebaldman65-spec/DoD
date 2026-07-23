@@ -168,7 +168,7 @@ static func pending_talent_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Bulwark of Fortitude", "cooldown": 3,
 				"cost": 30, "special": "bulwark", "delay": 3.5, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "Party instantly heals 5% max health",
-				"description": "The unbreakable stand: for 3 turns\nthe party takes NO Break damage,\ngains +50% armor, and heals 10% of\nmax health each turn."})
+				"description": "The unbreakable stand: for 3 turns\nthe party takes NO Break damage, has\nits armor increased by 50%, and heals\n10% of max health each turn."})
 	return null
 
 
@@ -297,7 +297,7 @@ const SPEC_INFO := {
 		"passive_desc": "Mercy: gain a stack when an ally falls below 50% health (max 5).\nEach stack: +5% healing done. Spend stacks on Hymn of Hope and\ntalent abilities, or +1 stack to Empower a heal — Empowered casts\nforgo their perfect bonus.",
 		"blurb": "Pure vessel of light — mercy hardens into miracles."},
 	"inquisitor": {"name": "Devout", "constitution": 110, "archetype": "Warder", "passive": "conviction",
-		"passive_desc": "Conviction: allies build Faith whenever damage they take is mitigated\n(max 5 stacks; doubled under Blessing of Zeal). Each stack: 3% damage\nmitigation and +2% damage dealt. At 5 stacks the ally is healed for 15%\nof max health, their Faith resets, and the Devout recovers 3% max Mana.",
+		"passive_desc": "Conviction: allies build Faith whenever Divine Shield absorbs damage\nfor them (max 5 stacks; doubled under Blessing of Zeal). Each stack:\n3% damage mitigation and +2% damage dealt. At 5 stacks the ally is\nhealed for 15% of max health, their Faith resets, and the Devout\nrecovers 3% max Mana.",
 		"blurb": "A living shrine — faith made armor for the whole party."},
 	"occultist": {"name": "Occultist", "constitution": 95, "archetype": "Pressure", "passive": "corrupt",
 		"passive_desc": "Corrupted Channeling: when a Crippled enemy attacks, a random\nhero heals for half the damage it dealt.",
@@ -458,7 +458,7 @@ static func spec_abilities(spec: String) -> Array:
 			# Divine Shield. Sacred Resolve (ex-Unity) and Bulwark of Fortitude
 			# are talent-granted (pending_talent_ability).
 			return [
-				Ability.make({"display_name": "Divine Shield", "cooldown": 2, "cost": 30, "special": "divine_shield",
+				Ability.make({"display_name": "Divine Shield", "cooldown": 2, "cost": 15, "special": "divine_shield",
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Absorbs 55% instead",
 					"description": "Grant an ally a holy shield that\nabsorbs 50% of the Devout's max\nhealth, then breaks."}),

@@ -178,6 +178,9 @@ var pulse_ranks := 0          # Healing Pulse: Resolve drips party healing
 # Barrier-lethal hook (set by the battle scene): fires when a Divine
 # Shield absorbs a hit that would otherwise have killed this unit.
 var lethal_saved_cb := Callable()
+# Conviction hook: fires whenever a Divine Shield barrier absorbs damage
+# for this unit (the only source of Faith).
+var shield_absorbed_cb := Callable()
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
@@ -834,9 +837,9 @@ func effective_armor() -> float:
 	a = maxf(a - melted, 0.0)
 	if has_status("fortify"):
 		a += 0.10
-	# Bulwark of Fortitude: the unbreakable stand.
+	# Bulwark of Fortitude: the unbreakable stand (+50% of current armor).
 	if has_status("bulwark"):
-		a += 0.50
+		a *= 1.5
 	if broken:
 		a *= 0.7
 	if has_status("sunder"):
@@ -936,6 +939,10 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 				float_text("+%d" % bb_heal, Color(0.4, 0.9, 0.45))
 				_proc_log("Talent: Blessed Barrier — %s converts %d absorbed into healing" % [
 					unit_name, bb_heal])
+			# Conviction: only Divine Shield absorbs build Faith.
+			if absorbed > 0 and s.get("divine", false) \
+					and shield_absorbed_cb.is_valid():
+				shield_absorbed_cb.call(self)
 			if would_have_died and amount < hp and lethal_saved_cb.is_valid():
 				lethal_saved_cb.call(self)
 			if s.power <= 0:

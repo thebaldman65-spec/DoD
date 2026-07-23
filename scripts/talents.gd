@@ -352,7 +352,7 @@ const FIXED_TREES := {
 		# --- row 3 (capstone) ---
 		{"id": "dv_bulwark", "name": "Bulwark of Fortitude", "ranks": 1, "row": 3, "col": 2,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, gains +50% armor, and heals 10% of max health each turn (30 Mana, 3.5 int, 3cd; Perfect: the party instantly heals 5%).",
+			"desc": "New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.5 int, 3cd; Perfect: the party instantly heals 5%).",
 			"payload": {"grant_ability": "Bulwark of Fortitude"}},
 	],
 	"arcanist": [

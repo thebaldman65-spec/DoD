@@ -66,10 +66,10 @@ const STATUS_INFO := {
 	"unlimited": ["Unlimited Power", "UP", Color(0.85, 0.55, 1.0), "Resonance overflow: bonus damage\nand maximum Mana, all battle."],
 	"sanctified": ["Hallowed", "Hw", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
 	"capacitor": ["Holy Capacitor", "HC", Color(0.95, 0.9, 0.6), "Stored overhealing, released by\nthe next Heal."],
-	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: mitigated hits build\nFaith — 3% mitigation and +2%\ndamage per stack; at 5 the bearer\nis healed and the Faith resets."],
+	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith — 3% mitigation and +2%\ndamage per stack; at 5 the bearer\nis healed and the Faith resets."],
 	"cons_ground": ["Consecrated Ground", "CG", Color(0.9, 0.82, 0.5), "Standing on holy ground: takes 15%\nless damage and reflects 10% of\ndamage taken."],
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
-	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, +50% armor, and 10%\nmax health regained each turn."],
+	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -475,11 +475,12 @@ func _spawn_units() -> void:
 			h.update_status("devotion", "DA",
 				"Devoutness: takes %d%% less\nBreak damage." % (5 * dvn_ranks),
 				5 * dvn_ranks)
-	# Conviction (Devout passive): allies' lethal saves and Faith machinery
-	# hook back into the battle scene.
+	# Conviction (Devout passive): Divine Shield absorbs build Faith, and
+	# lethal saves reward — both hook back into the battle scene.
 	if heroes.any(func(h): return h.passive_id == "conviction"):
 		for h in heroes:
 			h.lethal_saved_cb = _on_lethal_saved
+			h.shield_absorbed_cb = _on_shield_absorbed
 
 	# Guardian Angel raises the Mercy-earning threshold and Last Hope deepens
 	# healing on the nearly-dead — both are the Holy's talents, but the checks
@@ -1509,10 +1510,11 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 					and u.ability_ready(resolve_ab) \
 					and weakest_ally.hp < weakest_ally.max_hp * 0.7:
 				return [resolve_ab, u]
+			# Divine Shield is the Faith engine: keep it rolling.
 			var shield_ab := _find_ability(u, "Divine Shield")
 			if shield_ab != null and u.resource >= shield_ab.cost \
 					and u.ability_ready(shield_ab) \
-					and weakest_ally.hp < weakest_ally.max_hp * 0.6 \
+					and weakest_ally.hp < weakest_ally.max_hp * 0.8 \
 					and not weakest_ally.has_status("barrier"):
 				return [shield_ab, weakest_ally]
 			var ground_ab := _find_ability(u, "Consecrated Ground")
@@ -2471,9 +2473,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 										rinfo[2], 2, rinfo[3])
 							_log("   → Talent: Rally — the party is Rallied (+15% healing, 2 turns)",
 								"#b0a8e0")
-					# Conviction: a Block is total mitigation — Faith flows.
-					if strike_target.is_hero:
-						_gain_faith(strike_target, 1)
 					await _wait(0.4)
 					continue
 			# Parry: the strike still lands, but with 75% less damage and 75%
@@ -2836,17 +2835,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				ab.display_name, strike_target.unit_name, final, ab.dmg_type,
 				" CRIT" if is_crit else "", resist_tag, result.get("bd", pr), grade_tag],
 				"#d8d2c4" if attacker.is_hero else "#e0a0a0")
-			# Conviction: any mitigated hit steels the struck ally — armor,
-			# resists, a parry, or an active damage-reduction ward all count.
-			if strike_target.is_hero and not result.died \
-					and (armor_cut > 0 or resist_cut > 0 or parried
-					or strike_target.has_status("shieldwall")
-					or strike_target.has_status("cons_ground")
-					or strike_target.has_status("stabilized")
-					or strike_target.has_status("high_guard")
-					or strike_target.has_status("bulwark")
-					or strike_target.faith_stacks > 0):
-				_gain_faith(strike_target, 1)
 			# Consecrated Ground: the holy footing bites back.
 			if strike_target.has_status("cons_ground") and not attacker.is_hero \
 					and not attacker.dead and final > 0:
@@ -3408,6 +3396,7 @@ func _grant_divine_shield(devout: BattleUnit, target: BattleUnit, power: int) ->
 	var bstat := target.get_status("barrier")
 	if bstat.is_empty():
 		return
+	bstat["divine"] = true  # only Divine Shield absorbs build Faith
 	bstat["blessed_pct"] = 0.03 * devout.blessed_barrier_ranks
 	bstat["afterglow"] = int(round(devout.max_hp * 0.05 * devout.afterglow_ranks))
 
@@ -3463,6 +3452,11 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 				_log("   → Talent: Communion — %s's fervor spreads to %s" % [
 					u.unit_name, h.unit_name], "#b0a8e0")
 				_gain_faith(h, 1)
+
+
+# Conviction: a Divine Shield soaking a hit steels its holder.
+func _on_shield_absorbed(holder: BattleUnit) -> void:
+	_gain_faith(holder, 1)
 
 
 # Sacred Covenant: a Divine Shield that saved a life rewards its holder.
@@ -3743,7 +3737,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					h.float_text("+%d" % bw_got, Color(0.4, 0.9, 0.45))
 					_stat("healing", bw_got)
 			_message("%s raises the BULWARK OF FORTITUDE!" % attacker.unit_name)
-			_log("%s: Bulwark of Fortitude — no Break damage, +50%% armor, 10%% healing per turn (3 turns)" % \
+			_log("%s: Bulwark of Fortitude — no Break damage, armor +50%%, 10%% healing per turn (3 turns)" % \
 				attacker.unit_name, "#8c9cc8")
 		"mindflay":
 			_sfx("break", -8.0, 1.4)
