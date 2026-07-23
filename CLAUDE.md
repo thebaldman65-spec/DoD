@@ -89,6 +89,33 @@ sanctified). Status expiry now logs "fades from" (unit.tick_statuses);
 STUNNED/FROZEN lost turns tick statuses+cooldowns (fix 07-22). Arcanist
 tuning (07-22): Resonance dmg-taken +5%/stack (was 10); Overcharge
 recoil surcharges REMOVED (weighting = passive trio only).
+DEVOUT CONVICTION REWORK + TREE (07-23, 8th tree): passive "devotion"
+→ "conviction". FAITH = per-ALLY stacks (unit.faith_stacks 0-5, chip
+"F#") gained on MITIGATED hits (post-hit check in the strike loop:
+armor_cut/resist_cut/parried/reduction-status; Blocks too; doubled
+under "zeal" status — the ×2 lives in _gain_faith) — only while a
+living Devout stands (_living_devout gate on gain AND on the
+per-stack combat effects: target-side −(3+0.5×unwavering)%/stack,
+attacker-side +(2+0.5×unwavering)%/stack in _resolve). At 5:
+_gain_faith releases — heal (15+5×faithful)% max, reset, Devout +3%
+max Mana, Communion rolls (0.20×ranks×THEIR stacks per other member).
+Kit: Divine Shield v2 (50/55% of Devout max HP barrier, 2cd —
+_grant_divine_shield stamps riders on the barrier status:
+blessed_pct/afterglow; Sacred Covenant via unit.lethal_saved_cb →
+_on_lethal_saved when a barrier eats a killing blow; Radient Aegis
+echo roll in the special), Consecrated Ground ("cons_ground" party
+status: −15% target-side + 10% reflect after the mitigation log),
+Blessing of Zeal ("zeal" ALLY status: +15% dmg attacker-side, faith
+×2, cooldown −1 on cast). Sacred Resolve = ex-Unity, talent-granted
+(special stays "unity"; Healing Pulse/Cleansing Waters snapshotted
+onto the unity status as "pulse"/"cleanse", ticked in the turn-start
+block). Bulwark of Fortitude capstone ("bulwark" status: pressure_add
+= 0 in take_hit, +0.50 in effective_armor, 10% max HP tick at turn
+start; perfect instant 5% party heal). DIVINE WRATH VAULTED ("wrath"
+status machinery kept). Devoutness talent replaces the aura: devotion
+status power-driven (5×ranks%, unit.take_hit reads status_power).
+STATUS RENAME: "sanctified" label now "Hallowed" (Consecrated belongs
+to Consecrated Ground). Holy Capacitor banks 5%/rank (07-23, was 33).
 HOLY TREE (07-22, 7th fixed tree; source JSON was one column right —
 normalized): Triage (triage_ranks: _heal_crit_mult ×1.5 rolls on
 instant heals — holy_heal/hymn-per-target/renewal burst, NOT renewal

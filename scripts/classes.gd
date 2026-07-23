@@ -159,6 +159,16 @@ static func pending_talent_ability(display_name: String) -> Ability:
 				"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "Restores 10 Mana",
 				"description": "Spend 2 Mercy: FULLY heal an ally.\nEmpower (+1 Mercy): also cleanse all\ndebuffs and ward them against new\nones for 3 turns."})
+		"Sacred Resolve":
+			return Ability.make({"display_name": "Sacred Resolve", "cooldown": 5,
+				"cost": 25, "special": "unity", "delay": 3.0, "anim": "attack03",
+				"perfect_id": "", "perfect_text": "Lasts 4 turns",
+				"description": "Bind the party's souls — all damage\nreceived is split evenly among them\nfor 3 turns (Break damage still lands\non the struck hero)."})
+		"Bulwark of Fortitude":
+			return Ability.make({"display_name": "Bulwark of Fortitude", "cooldown": 3,
+				"cost": 30, "special": "bulwark", "delay": 3.5, "anim": "attack03",
+				"perfect_id": "", "perfect_text": "Party instantly heals 5% max health",
+				"description": "The unbreakable stand: for 3 turns\nthe party takes NO Break damage,\ngains +50% armor, and heals 10% of\nmax health each turn."})
 	return null
 
 
@@ -286,8 +296,8 @@ const SPEC_INFO := {
 	"holy": {"name": "Holy", "constitution": 100, "archetype": "Healer", "passive": "mercy",
 		"passive_desc": "Mercy: gain a stack when an ally falls below 50% health (max 5).\nEach stack: +5% healing done. Spend stacks on Hymn of Hope and\ntalent abilities, or +1 stack to Empower a heal — Empowered casts\nforgo their perfect bonus.",
 		"blurb": "Pure vessel of light — mercy hardens into miracles."},
-	"inquisitor": {"name": "Devout", "constitution": 110, "archetype": "Warder", "passive": "devotion",
-		"passive_desc": "Devotion Aura: the whole party takes 15% less Break damage.",
+	"inquisitor": {"name": "Devout", "constitution": 110, "archetype": "Warder", "passive": "conviction",
+		"passive_desc": "Conviction: allies build Faith whenever damage they take is mitigated\n(max 5 stacks; doubled under Blessing of Zeal). Each stack: 3% damage\nmitigation and +2% damage dealt. At 5 stacks the ally is healed for 15%\nof max health, their Faith resets, and the Devout recovers 3% max Mana.",
 		"blurb": "A living shrine — faith made armor for the whole party."},
 	"occultist": {"name": "Occultist", "constitution": 95, "archetype": "Pressure", "passive": "corrupt",
 		"passive_desc": "Corrupted Channeling: when a Crippled enemy attacks, a random\nhero heals for half the damage it dealt.",
@@ -443,19 +453,23 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Spend 1 Mercy: heal ALL allies for\n20% of their max health. Empower\n(+1 Mercy): 35% instead."}),
 			]
 		"inquisitor":
+			# Conviction kit (07-23 rework). VAULTED — kept for future return:
+			# Divine Wrath (25 Mana party +15% damage/speed) and the old flat
+			# Divine Shield. Sacred Resolve (ex-Unity) and Bulwark of Fortitude
+			# are talent-granted (pending_talent_ability).
 			return [
-				Ability.make({"display_name": "Divine Shield", "cooldown": 3, "cost": 30, "special": "divine_shield",
+				Ability.make({"display_name": "Divine Shield", "cooldown": 2, "cost": 30, "special": "divine_shield",
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack03",
-					"perfect_id": "", "perfect_text": "Shield absorbs 130 instead",
-					"description": "Grant an ally a holy shield that\nabsorbs 100 damage, then breaks."}),
-				Ability.make({"display_name": "Divine Wrath", "cooldown": 4, "cost": 25, "special": "divine_wrath",
-					"delay": 3.0, "anim": "attack03",
+					"perfect_id": "", "perfect_text": "Absorbs 55% instead",
+					"description": "Grant an ally a holy shield that\nabsorbs 50% of the Devout's max\nhealth, then breaks."}),
+				Ability.make({"display_name": "Consecrated Ground", "cooldown": 3, "cost": 25, "special": "cons_ground",
+					"delay": 3.5, "anim": "attack03",
+					"perfect_id": "", "perfect_text": "Lasts 3 turns",
+					"description": "Holy ground blooms underfoot: the\nparty takes 15% less damage and\nreflects 10% of damage taken,\nfor 2 turns."}),
+				Ability.make({"display_name": "Blessing of Zeal", "cooldown": 2, "cost": 20, "special": "zeal",
+					"target": Ability.Target.ALLY, "delay": 2.5, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Lasts 4 turns",
-					"description": "The party surges with holy fury:\n+15% damage and +15% speed\nfor 3 turns."}),
-				Ability.make({"display_name": "Unity", "cooldown": 5, "cost": 25,
-					"special": "unity", "delay": 3.0, "anim": "attack03",
-					"perfect_id": "", "perfect_text": "Lasts 4 turns",
-					"description": "Bind the party's souls — all damage\nreceived is split evenly among them\nfor 3 turns."}),
+					"description": "Kindle an ally: +15% damage for\n3 turns, their cooldowns tick down\n1 turn NOW, and their Faith gain is\ndoubled while the zeal burns."}),
 			]
 		"occultist":
 			return [

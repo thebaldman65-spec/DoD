@@ -162,6 +162,22 @@ var stored_overheal := 0      # the banked amount (released by Heal)
 var last_overheal := 0        # overheal of the most recent heal_amount call
 var on_mend_ranks := 0        # On the Mend: Renewal ticks can dispel
 var sanctified_ranks := 0     # Sanctified: Mercy spends can refund
+# Devout Conviction + tree (07-23). See talents.gd for the node text.
+var faith_stacks := 0         # Conviction: per-ALLY Faith (0-5)
+var communion_ranks := 0      # Communion: 5-stack procs can spread
+var unwavering_ranks := 0     # Unwavering Faith: deeper per-stack bonus
+var faithful_ranks := 0       # Blessed are the Faithful: bigger 5-stack heal
+var devoutness_ranks := 0     # Devoutness: party-wide BD cut (ex-passive)
+var afterglow_ranks := 0      # Afterglow: heal when Divine Shield breaks
+var covenant_ranks := 0       # Sacred Covenant: lethal-save heal + Faith
+var aegis_ranks := 0          # Radient Aegis: Divine Shield can echo
+var blessed_barrier_ranks := 0 # Blessed Barrier: absorbs convert to healing
+var waters_ranks := 0         # Cleansing Waters: Resolve can cleanse
+var pulse_ranks := 0          # Healing Pulse: Resolve drips party healing
+
+# Barrier-lethal hook (set by the battle scene): fires when a Divine
+# Shield absorbs a hit that would otherwise have killed this unit.
+var lethal_saved_cb := Callable()
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
@@ -818,6 +834,9 @@ func effective_armor() -> float:
 	a = maxf(a - melted, 0.0)
 	if has_status("fortify"):
 		a += 0.10
+	# Bulwark of Fortitude: the unbreakable stand.
+	if has_status("bulwark"):
+		a += 0.50
 	if broken:
 		a *= 0.7
 	if has_status("sunder"):
@@ -900,15 +919,33 @@ func return_to_idle() -> void:
 
 # Applies damage + Pressure. Returns what happened so battle.gd can react.
 func take_hit(amount: int, pressure_add: int) -> Dictionary:
-	# Barrier absorbs damage (not Pressure) before HP is touched.
+	# Barrier absorbs damage (not Pressure) before HP is touched. Divine
+	# Shield barriers carry talent riders: Blessed Barrier (absorbs heal),
+	# Sacred Covenant (lethal saves reward), Afterglow (heal on break).
 	for s in statuses:
 		if s.id == "barrier" and s.power > 0:
+			var would_have_died := amount >= hp
 			var absorbed: int = mini(s.power, amount)
 			amount -= absorbed
 			s.power -= absorbed
 			float_text("Absorbed %d" % absorbed, Color(0.4, 0.85, 0.95))
+			var bb_pct := float(s.get("blessed_pct", 0.0))
+			if bb_pct > 0.0 and absorbed > 0:
+				var bb_heal := maxi(int(round(absorbed * bb_pct)), 1)
+				heal_amount(bb_heal)
+				float_text("+%d" % bb_heal, Color(0.4, 0.9, 0.45))
+				_proc_log("Talent: Blessed Barrier — %s converts %d absorbed into healing" % [
+					unit_name, bb_heal])
+			if would_have_died and amount < hp and lethal_saved_cb.is_valid():
+				lethal_saved_cb.call(self)
 			if s.power <= 0:
+				var glow := int(s.get("afterglow", 0))
 				remove_status("barrier")
+				if glow > 0:
+					var glow_got := heal_amount(glow)
+					float_text("+%d" % glow_got, Color(0.95, 0.9, 0.6))
+					_proc_log("Talent: Afterglow — the breaking shield mends %s for %d" % [
+						unit_name, glow_got])
 			break
 	# Conversion (Arcanist talent): part of the pain bleeds off as Mana.
 	if conversion_ranks > 0 and resource_name == "Mana" and amount > 0:
@@ -983,10 +1020,14 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	pressure_add = int(round(pressure_add * 100.0 / maxf(constitution, 1.0)))
 	if has_status("ward"):
 		pressure_add = int(pressure_add * 0.5)
+	# Devoutness (talent, ex-Devotion Aura): power carries the % cut.
 	if has_status("devotion"):
-		pressure_add = int(pressure_add * 0.85)
+		pressure_add = int(pressure_add * (1.0 - status_power("devotion") / 100.0))
 	if has_status("hold_bd"):
 		pressure_add = int(pressure_add * 0.5)
+	# Bulwark of Fortitude: NO Break damage while the stand holds.
+	if has_status("bulwark"):
+		pressure_add = 0
 	var just_broke := false
 	var applied_bd := 0
 	if not broken:

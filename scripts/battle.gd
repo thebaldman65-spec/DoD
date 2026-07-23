@@ -64,8 +64,12 @@ const STATUS_INFO := {
 	"stabilized": ["Stabilized", "St+", Color(0.55, 0.68, 0.95), "Grounded resonance: takes less\ndamage (10% per stack consumed)."],
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Maximum Resonance raised to 8;\nstacks beyond 5 give extra Resonance\nbonus (damage, crit, damage taken)."],
 	"unlimited": ["Unlimited Power", "UP", Color(0.85, 0.55, 1.0), "Resonance overflow: bonus damage\nand maximum Mana, all battle."],
-	"sanctified": ["Consecrated", "Cn", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
+	"sanctified": ["Hallowed", "Hw", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
 	"capacitor": ["Holy Capacitor", "HC", Color(0.95, 0.9, 0.6), "Stored overhealing, released by\nthe next Heal."],
+	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: mitigated hits build\nFaith — 3% mitigation and +2%\ndamage per stack; at 5 the bearer\nis healed and the Faith resets."],
+	"cons_ground": ["Consecrated Ground", "CG", Color(0.9, 0.82, 0.5), "Standing on holy ground: takes 15%\nless damage and reflects 10% of\ndamage taken."],
+	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
+	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, +50% armor, and 10%\nmax health regained each turn."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -460,11 +464,22 @@ func _spawn_units() -> void:
 			u.refresh_bars()
 		heroes.append(u)
 
-	# Devotion Aura (Devout): the whole party takes less Pressure, shown as a
-	# battle-long status on everyone.
-	if heroes.any(func(h): return h.passive_id == "devotion"):
+	# Devoutness (Devout talent, ex-Devotion Aura): the whole party takes
+	# less Break damage — a battle-long status whose power carries the %.
+	var dvn_ranks := 0
+	for h in heroes:
+		dvn_ranks = maxi(dvn_ranks, h.devoutness_ranks)
+	if dvn_ranks > 0:
 		for h in heroes:
-			_apply_status(h, "devotion", -1)
+			_apply_status(h, "devotion", -1, 5 * dvn_ranks)
+			h.update_status("devotion", "DA",
+				"Devoutness: takes %d%% less\nBreak damage." % (5 * dvn_ranks),
+				5 * dvn_ranks)
+	# Conviction (Devout passive): allies' lethal saves and Faith machinery
+	# hook back into the battle scene.
+	if heroes.any(func(h): return h.passive_id == "conviction"):
+		for h in heroes:
+			h.lethal_saved_cb = _on_lethal_saved
 
 	# Guardian Angel raises the Mercy-earning threshold and Last Hope deepens
 	# healing on the nearly-dead — both are the Holy's talents, but the checks
@@ -1039,6 +1054,29 @@ func _run_battle() -> void:
 					u.float_text("Mended: %s" % mended, Color(0.5, 0.95, 0.6))
 					_log("   → Talent: On the Mend — Renewal washes the %s off %s" % [
 						mended, u.unit_name], "#b0a8e0")
+		# Bulwark of Fortitude: the stand knits flesh every turn.
+		if u.has_status("bulwark"):
+			var bw_amt := maxi(int(round(u.max_hp * 0.10)), 1)
+			var bw_tick := u.heal_amount(bw_amt, true)
+			u.float_text("+%d" % bw_tick, Color(0.55, 0.75, 0.95))
+			_log("%s stands fortified — regains %d HP (Bulwark)" % [
+				u.unit_name, bw_tick], "#8c9cc8")
+		# Sacred Resolve riders: Healing Pulse drips, Cleansing Waters wash.
+		if u.has_status("unity"):
+			var ustat := u.get_status("unity")
+			var pulse_amt := int(ustat.get("pulse", 0))
+			if pulse_amt > 0 and not u.is_companion:
+				var pulse_got := u.heal_amount(pulse_amt, true)
+				u.float_text("+%d" % pulse_got, Color(0.4, 0.9, 0.45))
+				_log("   → Talent: Healing Pulse — %s mends %d" % [
+					u.unit_name, pulse_got], "#b0a8e0")
+			var waters := int(ustat.get("cleanse", 0))
+			if waters > 0 and randf() < 0.15 * waters:
+				var washed := u.dispel_one_debuff()
+				if washed != "":
+					u.float_text("Cleansed: %s" % washed, Color(0.5, 0.95, 0.6))
+					_log("   → Talent: Cleansing Waters — the %s washes off %s" % [
+						washed, u.unit_name], "#b0a8e0")
 		if u.has_status("focus") and u.resource_name == "Mana":
 			u.resource = mini(u.resource + 10, u.max_resource)
 			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
@@ -1230,7 +1268,8 @@ func _player_turn(u: BattleUnit) -> void:
 		if ab.special in ["rally", "focus", "surge", "shieldwall", "quickdraw",
 				"phoenix", "hymn", "retaliate", "unity", "tripwire", "summon",
 				"mana_shield", "divine_wrath", "shield_block", "hold_the_line",
-				"battle_shout", "flame_shield", "stabilize", "overcharge"]:
+				"battle_shout", "flame_shield", "stabilize", "overcharge",
+				"cons_ground", "bulwark"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "resurrection":
 			# Resurrection targets the FALLEN (the usable gate guarantees one).
@@ -1459,10 +1498,36 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 					and weakest_ally.hp < weakest_ally.max_hp * 0.8 \
 					and not weakest_ally.has_status("renewal"):
 				return [renew, weakest_ally]
-			var unity_ab := _find_ability(u, "Unity")
-			if unity_ab != null and u.resource >= unity_ab.cost and u.ability_ready(unity_ab) \
+			# Devout: the Conviction toolkit.
+			var bulwark_ab := _find_ability(u, "Bulwark of Fortitude")
+			if bulwark_ab != null and u.resource >= bulwark_ab.cost \
+					and u.ability_ready(bulwark_ab) \
+					and allies.filter(func(h): return h.hp < h.max_hp * 0.7).size() >= 2:
+				return [bulwark_ab, u]
+			var resolve_ab := _find_ability(u, "Sacred Resolve")
+			if resolve_ab != null and u.resource >= resolve_ab.cost \
+					and u.ability_ready(resolve_ab) \
 					and weakest_ally.hp < weakest_ally.max_hp * 0.7:
-				return [unity_ab, u]
+				return [resolve_ab, u]
+			var shield_ab := _find_ability(u, "Divine Shield")
+			if shield_ab != null and u.resource >= shield_ab.cost \
+					and u.ability_ready(shield_ab) \
+					and weakest_ally.hp < weakest_ally.max_hp * 0.6 \
+					and not weakest_ally.has_status("barrier"):
+				return [shield_ab, weakest_ally]
+			var ground_ab := _find_ability(u, "Consecrated Ground")
+			if ground_ab != null and u.resource >= ground_ab.cost \
+					and u.ability_ready(ground_ab) and foes.size() >= 3 \
+					and not u.has_status("cons_ground"):
+				return [ground_ab, u]
+			var zeal_ab := _find_ability(u, "Blessing of Zeal")
+			if zeal_ab != null and u.resource >= zeal_ab.cost and u.ability_ready(zeal_ab):
+				var zeal_t: BattleUnit = allies[0]
+				for zh in allies:
+					if zh.attack > zeal_t.attack:
+						zeal_t = zh
+				if not zeal_t.has_status("zeal"):
+					return [zeal_ab, zeal_t]
 			var flay := _find_ability(u, "Mind Flay")
 			if flay != null and u.resource >= flay.cost and u.ability_ready(flay) and foes.size() >= 2:
 				return [flay, target_foe]
@@ -2406,6 +2471,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 										rinfo[2], 2, rinfo[3])
 							_log("   → Talent: Rally — the party is Rallied (+15% healing, 2 turns)",
 								"#b0a8e0")
+					# Conviction: a Block is total mitigation — Faith flows.
+					if strike_target.is_hero:
+						_gain_faith(strike_target, 1)
 					await _wait(0.4)
 					continue
 			# Parry: the strike still lands, but with 75% less damage and 75%
@@ -2500,6 +2568,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.2
 			if attacker.has_status("wrath"):
 				raw *= 1.15
+			# Blessing of Zeal: kindled allies strike harder.
+			if attacker.has_status("zeal"):
+				raw *= 1.15
+			# Conviction: each Faith stack sharpens the blade (+2% base,
+			# Unwavering Faith deepens it) — while the Devout stands.
+			if attacker.is_hero and attacker.faith_stacks > 0:
+				var f_dev := _living_devout()
+				if f_dev != null:
+					raw *= 1.0 + (0.02 + 0.005 * f_dev.unwavering_ranks) \
+						* attacker.faith_stacks
 			# Arcane Cannon: the damage (not the recoil) grows with Resonance.
 			if ab.display_name == "Arcane Cannon":
 				raw *= 1.0 + 0.075 * attacker.second_resource
@@ -2595,6 +2673,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Stabilized: grounded resonance blunts incoming blows.
 			if strike_target.has_status("stabilized"):
 				raw *= 1.0 - strike_target.status_power("stabilized") / 100.0
+			# Consecrated Ground: holy footing blunts the blow.
+			if strike_target.has_status("cons_ground"):
+				raw *= 0.85
+			# Conviction: each Faith stack turns the blade (3% base,
+			# Unwavering Faith deepens it) — while the Devout stands.
+			if strike_target.is_hero and strike_target.faith_stacks > 0:
+				var ft_dev := _living_devout()
+				if ft_dev != null:
+					raw *= 1.0 - minf((0.03 + 0.005 * ft_dev.unwavering_ranks) \
+						* strike_target.faith_stacks, 0.9)
 			if strike_target.has_status("shieldwall"):
 				raw *= 0.75
 			# Shielded: the Orc Shieldmaster's single-ally ward.
@@ -2748,6 +2836,29 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				ab.display_name, strike_target.unit_name, final, ab.dmg_type,
 				" CRIT" if is_crit else "", resist_tag, result.get("bd", pr), grade_tag],
 				"#d8d2c4" if attacker.is_hero else "#e0a0a0")
+			# Conviction: any mitigated hit steels the struck ally — armor,
+			# resists, a parry, or an active damage-reduction ward all count.
+			if strike_target.is_hero and not result.died \
+					and (armor_cut > 0 or resist_cut > 0 or parried
+					or strike_target.has_status("shieldwall")
+					or strike_target.has_status("cons_ground")
+					or strike_target.has_status("stabilized")
+					or strike_target.has_status("high_guard")
+					or strike_target.has_status("bulwark")
+					or strike_target.faith_stacks > 0):
+				_gain_faith(strike_target, 1)
+			# Consecrated Ground: the holy footing bites back.
+			if strike_target.has_status("cons_ground") and not attacker.is_hero \
+					and not attacker.dead and final > 0:
+				var reflect := maxi(int(round(final * 0.10)), 1)
+				_log("   → Consecrated Ground reflects %d to %s" % [
+					reflect, attacker.unit_name], "#c8b880")
+				if attacker.take_tick_damage(reflect, "-%d Reflect" % reflect,
+						Color(0.9, 0.82, 0.5)):
+					_stat("enemy_deaths")
+					_sfx("death", -4.0)
+					_message("%s falls!" % attacker.unit_name)
+					_log("† %s dies" % attacker.unit_name, "#e05050")
 			# VAULTED — Echo passive (kept for future return):
 			# if attacker.passive_id == "echo" and not result.died and randf() < 0.20:
 			#     echo_dmg = max(int(final * 0.25), 1); strike again + "ECHO!" fanfare.
@@ -3125,10 +3236,10 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		_log("   → %s resists the %s (boss — Break them first)" % [target.unit_name,
 			"Stun" if id == "stunned" else "Freeze"], "#909090")
 		return
-	# Consecrated (Empowered Divine Plea): shrugs off every new debuff.
+	# Hallowed (Empowered Divine Plea): shrugs off every new debuff.
 	if target.has_status("sanctified") and BattleUnit.DEBUFF_IDS.has(id):
-		target.float_text("CONSECRATED", Color(0.98, 0.88, 0.55))
-		_log("   → %s is Consecrated — the %s cannot take hold" % [target.unit_name,
+		target.float_text("HALLOWED", Color(0.98, 0.88, 0.55))
+		_log("   → %s is Hallowed — the %s cannot take hold" % [target.unit_name,
 			String(STATUS_INFO[id][0])], "#e8c860")
 		return
 	var info: Array = STATUS_INFO[id]
@@ -3278,7 +3389,7 @@ func _heal_crit_mult(caster: BattleUnit) -> float:
 func _bank_overheal(caster: BattleUnit, target: BattleUnit) -> void:
 	if caster.capacitor_ranks <= 0 or target.last_overheal <= 0:
 		return
-	var banked := int(round(target.last_overheal * 0.33 * caster.capacitor_ranks))
+	var banked := int(round(target.last_overheal * 0.05 * caster.capacitor_ranks))
 	if banked <= 0:
 		return
 	caster.stored_overheal += banked
@@ -3288,6 +3399,84 @@ func _bank_overheal(caster: BattleUnit, target: BattleUnit) -> void:
 			Color(0.95, 0.9, 0.6), -1, cap_desc)
 	_log("   → Talent: Holy Capacitor banks %d overhealing (%d stored)" % [
 		banked, caster.stored_overheal], "#b0a8e0")
+
+
+# Divine Shield: applies the barrier and stamps the tree's riders on it
+# (Blessed Barrier heal share; Afterglow heal on break).
+func _grant_divine_shield(devout: BattleUnit, target: BattleUnit, power: int) -> void:
+	_apply_status(target, "barrier", -1, power)
+	var bstat := target.get_status("barrier")
+	if bstat.is_empty():
+		return
+	bstat["blessed_pct"] = 0.03 * devout.blessed_barrier_ranks
+	bstat["afterglow"] = int(round(devout.max_hp * 0.05 * devout.afterglow_ranks))
+
+
+# Conviction (Devout passive): the living Devout, or null. Faith stacks
+# only work while their shrine stands.
+func _living_devout() -> BattleUnit:
+	for h in heroes:
+		if not h.dead and h.passive_id == "conviction":
+			return h
+	return null
+
+
+# Conviction: a mitigated hit steels the struck ally. At 5 stacks the
+# ally is healed (Blessed are the Faithful deepens it), Faith resets,
+# the Devout sips Mana, and Communion may spread the fervor.
+func _gain_faith(u: BattleUnit, n: int) -> void:
+	var devout := _living_devout()
+	if devout == null or u.dead or u.is_companion or not u.is_hero:
+		return
+	# Blessing of Zeal: the kindled build Faith twice as fast.
+	if u.has_status("zeal"):
+		n *= 2
+	u.faith_stacks = mini(u.faith_stacks + n, 5)
+	if u.faith_stacks < 5:
+		var f_desc := "Conviction: Faith x%d — %d%% damage\nmitigation and +%d%% damage dealt.\nAt 5 stacks: healed for %d%% max\nhealth, and the Faith resets." % [
+			u.faith_stacks,
+			int(round((3.0 + 0.5 * devout.unwavering_ranks) * u.faith_stacks)),
+			int(round((2.0 + 0.5 * devout.unwavering_ranks) * u.faith_stacks)),
+			15 + 5 * devout.faithful_ranks]
+		if not u.update_status("faith", "F%d" % u.faith_stacks, f_desc):
+			u.add_status("faith", "Faith", "F%d" % u.faith_stacks,
+				Color(0.98, 0.85, 0.45), -1, f_desc)
+		return
+	# The fifth stack: release.
+	u.faith_stacks = 0
+	u.remove_status("faith")
+	var f_heal := maxi(int(round(u.max_hp * (0.15 + 0.05 * devout.faithful_ranks))), 1)
+	var f_got: int = u.heal_amount(f_heal, u != devout)
+	u.float_text("FAITH +%d" % f_got, Color(0.98, 0.85, 0.45))
+	_stat("healing", f_got)
+	var d_mana := maxi(int(round(devout.max_resource * 0.03)), 1)
+	devout.resource = mini(devout.resource + d_mana, devout.max_resource)
+	devout.refresh_bars()
+	_log("   → Conviction: %s's Faith overflows — healed %d; %s recovers %d Mana" % [
+		u.unit_name, f_got, devout.unit_name, d_mana], "#e8c860")
+	# Communion: fervor is contagious (chance scales with the OTHERS' Faith).
+	if devout.communion_ranks > 0:
+		for h in heroes:
+			if h == u or h.dead or h.is_companion or h.faith_stacks <= 0:
+				continue
+			if randf() < 0.20 * devout.communion_ranks * h.faith_stacks:
+				_log("   → Talent: Communion — %s's fervor spreads to %s" % [
+					u.unit_name, h.unit_name], "#b0a8e0")
+				_gain_faith(h, 1)
+
+
+# Sacred Covenant: a Divine Shield that saved a life rewards its holder.
+func _on_lethal_saved(saved: BattleUnit) -> void:
+	var devout := _living_devout()
+	if devout == null or devout.covenant_ranks <= 0:
+		return
+	var cov_heal := maxi(int(round(saved.max_hp * 0.05 * devout.covenant_ranks)), 1)
+	var cov_got: int = saved.heal_amount(cov_heal, saved != devout)
+	saved.float_text("+%d" % cov_got, Color(0.95, 0.9, 0.6))
+	_stat("healing", cov_got)
+	_log("   → Talent: Sacred Covenant — the shield held the line; %s heals %d and keeps the Faith" % [
+		saved.unit_name, cov_got], "#b0a8e0")
+	_gain_faith(saved, devout.covenant_ranks)
 
 
 # Mercy (Holy passive): an ally's brush with death steels the healer.
@@ -3413,12 +3602,26 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s surges with power!" % attacker.unit_name)
 			_log("%s: Arcane Surge — +20%% attack next turn" % attacker.unit_name, "#70d878")
 		"divine_shield":
-			var shield := 130 if is_perfect else 100
+			# Absorbs 50% (perfect 55%) of the DEVOUT's max health, carrying
+			# the tree's riders (Blessed Barrier / Afterglow; Covenant fires
+			# through the lethal-save hook).
+			var shield := int(round(attacker.max_hp * (0.55 if is_perfect else 0.50)))
 			_sfx("parry", -6.0, 0.6)
-			_apply_status(target, "barrier", -1, shield)
+			_grant_divine_shield(attacker, target, shield)
 			_message("%s shields %s (%d)" % [attacker.unit_name, target.unit_name, shield])
-			_log("%s: Divine Shield on %s — absorbs %d" % [attacker.unit_name,
-				target.unit_name, shield], "#70d878")
+			_log("%s: Divine Shield on %s — absorbs %d (%d%% of the Devout's health)" % [
+				attacker.unit_name, target.unit_name, shield,
+				55 if is_perfect else 50], "#70d878")
+			# Radient Aegis: the shield can echo onto another ally.
+			if attacker.aegis_ranks > 0 and randf() < 0.15 * attacker.aegis_ranks:
+				var aegis_pool := heroes.filter(
+					func(h): return not h.dead and h != target and not h.is_companion)
+				if not aegis_pool.is_empty():
+					var aegis_t: BattleUnit = aegis_pool.pick_random()
+					_grant_divine_shield(attacker, aegis_t, shield)
+					aegis_t.float_text("Radient Aegis", Color(0.95, 0.9, 0.6))
+					_log("   → Talent: Radient Aegis — the shield echoes onto %s" % \
+						aegis_t.unit_name, "#b0a8e0")
 		"shieldwall":
 			_sfx("parry", -7.0, 0.5)
 			for h in heroes.filter(func(he): return not he.dead):
@@ -3498,11 +3701,50 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("Sanctuary!")
 			_log("%s: Sanctuary — party healed and walled" % attacker.unit_name, "#70d878")
 		"unity":
+			# Sacred Resolve (talent ability): Healing Pulse and Cleansing
+			# Waters ride the status, snapshotted from the caster.
 			_sfx("heal", -5.0, 0.7)
 			for h in heroes.filter(func(he): return not he.dead):
 				_apply_status(h, "unity", 4 if is_perfect else 3)
+				var ustat: Dictionary = h.get_status("unity")
+				if not ustat.is_empty():
+					ustat["pulse"] = maxi(int(round(attacker.max_hp * 0.02
+						* attacker.pulse_ranks)), 0)
+					ustat["cleanse"] = attacker.waters_ranks
 			_message("%s binds the party as one!" % attacker.unit_name)
-			_log("%s: Unity — the party's souls are bound" % attacker.unit_name, "#70d878")
+			_log("%s: Sacred Resolve — the party's souls are bound (%d turns)" % [
+				attacker.unit_name, 4 if is_perfect else 3], "#70d878")
+		"cons_ground":
+			_sfx("heal", -5.0, 0.6)
+			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
+				_apply_status(h, "cons_ground", 3 if is_perfect else 2)
+			_message("%s consecrates the ground!" % attacker.unit_name)
+			_log("%s: Consecrated Ground — the party takes 15%% less damage and reflects 10%% (%d turns)" % [
+				attacker.unit_name, 3 if is_perfect else 2], "#c8b880")
+		"zeal":
+			_sfx("heal", -6.0, 1.2)
+			_apply_status(target, "zeal", 4 if is_perfect else 3)
+			var zeal_ticked := false
+			for zeal_cd in target.cooldowns.keys():
+				if int(target.cooldowns[zeal_cd]) > 0:
+					target.cooldowns[zeal_cd] = int(target.cooldowns[zeal_cd]) - 1
+					zeal_ticked = true
+			_message("%s kindles %s!" % [attacker.unit_name, target.unit_name])
+			_log("%s: Blessing of Zeal on %s — +15%% damage, Faith gain doubled (%d turns)%s" % [
+				attacker.unit_name, target.unit_name, 4 if is_perfect else 3,
+				"; cooldowns tick 1" if zeal_ticked else ""], "#e8b860")
+		"bulwark":
+			_sfx("parry", -5.0, 0.5)
+			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
+				_apply_status(h, "bulwark", 3)
+				if is_perfect:
+					var bw_heal := maxi(int(round(h.max_hp * 0.05)), 1)
+					var bw_got: int = h.heal_amount(bw_heal, h != attacker)
+					h.float_text("+%d" % bw_got, Color(0.4, 0.9, 0.45))
+					_stat("healing", bw_got)
+			_message("%s raises the BULWARK OF FORTITUDE!" % attacker.unit_name)
+			_log("%s: Bulwark of Fortitude — no Break damage, +50%% armor, 10%% healing per turn (3 turns)" % \
+				attacker.unit_name, "#8c9cc8")
 		"mindflay":
 			_sfx("break", -8.0, 1.4)
 			_apply_status(target, "mindflay", 3, 115 if is_perfect else 100)
@@ -3741,7 +3983,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			if empowered:
 				var dp_purged := target.purge_debuffs()
 				_apply_status(target, "sanctified", 3)
-				dp_note = " — cleansed %d and Consecrated 3 turns (Empowered)" % dp_purged
+				dp_note = " — cleansed %d and Hallowed 3 turns (Empowered)" % dp_purged
 			elif is_perfect:
 				attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
 				attacker.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
