@@ -164,6 +164,18 @@ static func pending_talent_ability(display_name: String) -> Ability:
 				"cost": 25, "special": "unity", "delay": 3.0, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "Lasts 4 turns",
 				"description": "Bind the party's souls — all damage\nreceived is split evenly among them\nfor 3 turns (Break damage still lands\non the struck hero)."})
+		"Mind Flay":
+			return Ability.make({"display_name": "Mind Flay", "cooldown": 2,
+				"dmg_type": "shadow", "cost": 25, "damage": 30, "pressure": 15,
+				"choose_two": true, "delay": 3.0, "anim": "attack03",
+				"applies_status": {"id": "psychosis", "turns": 3},
+				"perfect_id": "status_plus", "perfect_text": "Psychosis lasts 4 turns",
+				"description": "Flay TWO chosen minds: 30% of Attack\nin shadow each and Psychosis for\n3 turns — madness that turns them\non their own."})
+		"Mass Hysteria":
+			return Ability.make({"display_name": "Mass Hysteria", "cooldown": 4,
+				"cost": 30, "special": "hysteria", "delay": 4.0, "anim": "attack03",
+				"perfect_id": "", "perfect_text": "Cooldown becomes 3 instead",
+				"description": "The warband turns on itself: next\nturn every minion strikes a fellow\nwith DOUBLE Break damage, Sundering\nthem for 3 turns."})
 		"Bulwark of Fortitude":
 			return Ability.make({"display_name": "Bulwark of Fortitude", "cooldown": 3,
 				"cost": 30, "special": "bulwark", "delay": 3.5, "anim": "attack03",
@@ -178,10 +190,11 @@ static func pending_talent_ability(display_name: String) -> Ability:
 static func apply_kit_overrides(cfg: Dictionary, spec: String) -> void:
 	if spec == "occultist":
 		cfg["abilities"][0] = Ability.make({"display_name": "Shadowrend",
-			"dmg_type": "shadow", "cost": 0, "damage": 22, "pressure": 16,
+			"dmg_type": "shadow", "cost": 0, "damage": 50, "pressure": 16,
 			"delay": 2.0, "anim": "attack01",
+			"applies_status": {"id": "cripple", "turns": 2},
 			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 5% max health",
-			"description": "Basic strike of gnawing shadow."})
+			"description": "A rending strike of gnawing shadow:\nCripples the target for 2 turns."})
 	elif spec == "pyromancer":
 		cfg["abilities"][0] = Ability.make({"display_name": "Fireball",
 			"dmg_type": "fire", "cost": 0, "damage": 20, "pressure": 15,
@@ -299,8 +312,8 @@ const SPEC_INFO := {
 	"inquisitor": {"name": "Devout", "constitution": 110, "archetype": "Warder", "passive": "conviction",
 		"passive_desc": "Conviction: allies build Faith whenever Divine Shield absorbs damage\nfor them (max 5 stacks; doubled under Blessing of Zeal). Each stack:\n3% damage mitigation and +2% damage dealt. At 5 stacks the ally is\nhealed for 15% of max health, their Faith resets, and the Devout\nrecovers 3% max Mana.",
 		"blurb": "A living shrine — faith made armor for the whole party."},
-	"occultist": {"name": "Occultist", "constitution": 95, "archetype": "Pressure", "passive": "corrupt",
-		"passive_desc": "Corrupted Channeling: when a Crippled enemy attacks, a random\nhero heals for half the damage it dealt.",
+	"occultist": {"name": "Occultist", "constitution": 95, "archetype": "Pressure", "passive": "old_gods",
+		"passive_desc": "Wrath of the Old Gods: your debuffs mark the target with Ruin\n(max 5). Each stack: +2% damage taken; heroes striking a Ruined\ntarget heal 10% of the damage dealt. One turn after reaching 5\nstacks, Ruin detonates — 50% of Attack as shadow damage, and the\nparty heals 15% of the Occultist's max health.",
 		"blurb": "Forbidden rites — leech life and trade blood for power."},
 	"beastmaster": {"name": "Beastmaster", "constitution": 100, "archetype": "Rush", "passive": "pack",
 		"passive_desc": "Pack Bond: changes with the summoned beast — Ursus: +25% Break\ndamage; Canis: attacks build 15 Bleed; Aguila: +15% crit chance.",
@@ -472,21 +485,24 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Kindle an ally: +15% damage for\n3 turns, their cooldowns tick down\n1 turn NOW, and their Faith gain is\ndoubled while the zeal burns."}),
 			]
 		"occultist":
+			# Old Gods kit (07-24 rework). VAULTED — kept for future return:
+			# Umbral Sigil (20 Mana warband brand) and the old Mind Flay
+			# (maddened abilities at +100% BD). Mass Hysteria and the new
+			# Mind Flay are talent-granted (pending_talent_ability).
 			return [
-				Ability.make({"display_name": "Hex of Ruin", "cooldown": 2, "dmg_type": "shadow", "cost": 20, "damage": 15,
-					"pressure": 24, "delay": 3.0, "anim": "attack02", "random_hits": 2,
-					"perfect_extra_hit": false,
-					"applies_status": {"id": "cripple", "turns": 3},
-					"perfect_id": "status_plus", "perfect_text": "Cripple lasts 4 turns",
-					"description": "Curse 2 random enemies: 15 shadow\ndamage each and Crippled for 3 turns."}),
-				Ability.make({"display_name": "Mind Flay", "cooldown": 4, "dmg_type": "shadow", "cost": 30,
-					"special": "mindflay", "delay": 3.5, "anim": "attack03",
-					"perfect_id": "", "perfect_text": "+115% Break damage instead",
-					"description": "Shatter a mind — the target attacks\nits OWN allies for 3 turns with\n+100% Break damage."}),
-				Ability.make({"display_name": "Umbral Sigil", "cooldown": 4, "cost": 20,
-					"special": "umbral_sigil", "delay": 3.0, "anim": "attack02",
-					"perfect_id": "", "perfect_text": "Lasts 4 turns",
-					"description": "Brand a foe — its whole party takes\n50% of all attack damage it receives\n(3 turns)."}),
+				Ability.make({"display_name": "Hex of Ruin", "cooldown": 2, "dmg_type": "shadow", "cost": 20, "damage": 20,
+					"pressure": 15, "delay": 2.5, "anim": "attack02", "choose_three": true,
+					"applies_status": {"id": "exposed", "turns": 3},
+					"perfect_id": "", "perfect_text": "No cooldown",
+					"description": "Curse THREE chosen enemies: 20% of\nAttack in shadow each, leaving them\nExposed for 3 turns."}),
+				Ability.make({"display_name": "Bewitch", "cooldown": 4, "cost": 25,
+					"special": "bewitch", "delay": 3.5, "anim": "attack03",
+					"perfect_id": "", "perfect_text": "The target attacks instantly",
+					"description": "Charm a mind — for 3 turns the target\nbasic-attacks its OWN allies, Dazing\nthem with every strike."}),
+				Ability.make({"display_name": "Dark Pact", "cooldown": 3, "cost": 20,
+					"special": "dark_pact", "delay": 3.0, "anim": "attack02",
+					"perfect_id": "", "perfect_text": "Restores 5 Mana",
+					"description": "Bleed for them: lose 20% max health;\nALL allies heal 15% of their max\nhealth, and the Occultist regains\n30% of max health over 3 turns."}),
 			]
 		"beastmaster":
 			return [

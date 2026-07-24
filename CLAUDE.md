@@ -89,6 +89,42 @@ sanctified). Status expiry now logs "fades from" (unit.tick_statuses);
 STUNNED/FROZEN lost turns tick statuses+cooldowns (fix 07-22). Arcanist
 tuning (07-22): Resonance dmg-taken +5%/stack (was 10); Overcharge
 recoil surcharges REMOVED (weighting = passive trio only).
+OCCULTIST OLD GODS REWORK + TREE (07-24, 9th tree): passive "corrupt"
+→ "old_gods". RUIN = enemy-side stacks (status "ruin", add_status
+branch caps 5, chip "R#", battle-long) gained whenever the Occultist
+applies a debuff (generic applies_status site checks passive_id ==
+"old_gods"; custom sites call _gain_ruin — Bewitch cast/Dazes, Hex
+Decay, Spread, Mirror). Effects gated on _living_occultist(): target
++2%/stack in _resolve; hero strikes on Ruined targets lifesteal
+(10+5×soul_leech)% of final (post-damage block). At 5: "ruin_primed"
+1t → _detonate_ruin at the bearer's turn start (BEFORE tick_statuses;
+50% Occ Atk shadow w/ resist via take_tick_damage + party heal 15% Occ
+max HP). PSYCHOSIS status: 50%/turn in _enemy_turn — supports
+(_psychotic_support matches healing_wave/enemy_shield/wild_growth)
+target HEROES, else 0-cost attack (_cheapest_attack) on a fellow;
+Spread of Madness rolls first (leap + _gain_ruin; bosses excluded).
+DECAY status: 10 BD/turn via take_hit(0,10) at turn start. BEWITCH
+status (ex-mindflay, machinery REPLACED): _bewitched_strike = 0-cost
+attack on a fellow + dazed 2t + ruin; Murderous Intent heals lowest on
+bewitched kills; perfect Bewitch strikes instantly at cast. HYSTERIA
+status (-1t, removed when acted, pre-psychosis in _enemy_turn): 0-cost
+attack copy w/ pressure×2 + sunder 3t. Kit: Shadowrend 50% + cripple
+2t, Hex of Ruin CHOOSE_THREE (new ability flag + third_target +
+targeting loop + strike_targets; perfect ERASES its cooldown), Dark
+Pact ("dark_pact" special: -20% self HP clamp 1, party 15% own-max
+heal, self renewal 3t @10%/turn, invig status = mana tick at turn
+start), talent-granted Mind Flay (choose_two + psychosis
+applies_status w/ status_plus perfect) + Mass Hysteria capstone
+(perfect sets cd 4 = 3+tick). UMBRAL SIGIL + old Mind Flay VAULTED
+(sigil status machinery kept). Boss mind-magic immunity: stunned/
+frozen/psychosis/bewitch/hysteria all resist unless Broken
+(_apply_status guard). Talents: Corrupted Channeling now
+channeling_ranks (25%/rank of a Crippled attacker's damage), Pleasure
+from Pain end-of-_player_turn (1.5%/rank Occ max HP × unique enemy
+debuffs — _unique_enemy_debuffs helper), Dark Infusion attacker-side,
+Broken Will pr-side (replaced the old mindflay pr site), Umbral Mirror
+wraps the enemy→hero applies_status branch. GOTCHA RE-HIT: multiline
+lambda in filter() args = parse error (collapse to one line).
 DEVOUT CONVICTION REWORK + TREE (07-23, 8th tree): passive "devotion"
 → "conviction". FAITH = per-ALLY stacks (unit.faith_stacks 0-5, chip
 "F#") gained ONLY when a DIVINE SHIELD barrier absorbs damage for the

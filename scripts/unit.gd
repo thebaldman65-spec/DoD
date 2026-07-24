@@ -18,7 +18,8 @@ const WEAKNESS_EXTRA := 0.25
 # Iron Will — its chip updates live in _refresh_chips) and future dispels.
 const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	"bleed", "sunder", "mocked", "stunned", "exposed", "cripple", "dazed",
-	"mindflay", "umbral_sigil", "elem_weak", "melted", "broken"]
+	"bewitch", "psychosis", "decay", "ruin", "hysteria",
+	"umbral_sigil", "elem_weak", "melted", "broken"]
 
 var frame_size := 100      # square frame edge of this unit's sprite strips
 var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
@@ -180,6 +181,18 @@ var lethal_saved_cb := Callable()
 # Conviction hook: fires whenever a Divine Shield barrier absorbs damage
 # for this unit (the only source of Faith).
 var shield_absorbed_cb := Callable()
+
+# Occultist tree (07-24). See talents.gd for the node text.
+var emp_hex_ranks := 0        # Empowered Hex: Hex can apply Decay
+var soul_leech_ranks := 0     # Soul Leech: deeper Ruin lifesteal
+var pleasure_ranks := 0       # Pleasure from Pain: heals per unique debuff
+var channeling_ranks := 0     # Corrupted Channeling: crippled attackers feed
+var murderous_ranks := 0      # Murderous Intent: bewitched kills heal
+var invigoration_ranks := 0   # Invigoration: Dark Pact mana regen
+var spread_ranks := 0         # Spread of Madness: Psychosis is contagious
+var infusion_ranks := 0       # Dark Infusion: attack per unique debuff
+var mirror_ranks := 0         # Umbral Mirror: enemy debuffs can reflect
+var broken_will_ranks := 0    # Broken Will: more Break damage dealt
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
@@ -621,6 +634,12 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 				s.short = "C%d" % s.stacks
 				s.desc = _chilled_desc(int(s.stacks))
 				float_text("Chilled x%d" % s.stacks, color)
+			elif id == "ruin":
+				# Ruin STACKS (max 5, battle-long): the Old Gods' mark deepens.
+				s.stacks = mini(int(s.get("stacks", 1)) + 1, 5)
+				s.short = "R%d" % s.stacks
+				s.desc = "Marked by the Old Gods: takes %d%% more\ndamage; heroes striking this unit heal.\nAt 5 stacks Ruin detonates on this\nunit's next turn." % (2 * int(s.stacks))
+				float_text("Ruin x%d" % s.stacks, color)
 			elif id == "burn":
 				# Reapplied Burn burns LONGER: the fresh application's turns
 				# are ADDED to the running timer.

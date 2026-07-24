@@ -37,7 +37,13 @@ const STATUS_INFO := {
 	"mana_shield": ["Mana Shield", "MS", Color(0.35, 0.6, 1.0), "50% of damage taken converts\ninto Mana."],
 	"rampage": ["Rampage", "Rp", Color(0.9, 0.3, 0.3), "+1% damage per 10 Bleed buildup\non the enemy party (at cast time)."],
 	"unity": ["Unity", "Un", Color(0.95, 0.85, 0.4), "Souls bound: all damage received is\nsplit evenly among the party."],
-	"mindflay": ["Mind Flay", "MF", Color(0.75, 0.35, 0.85), "Maddened: attacks its own allies\nwith bonus Break damage."],
+	"bewitch": ["Bewitched", "Bw", Color(0.75, 0.35, 0.85), "Charmed: basic-attacks its own\nallies, Dazing them with every\nstrike."],
+	"psychosis": ["Psychosis", "Py", Color(0.82, 0.42, 0.92), "Madness: 50% each turn to turn on\nits own — attacking a fellow, or\ncasting its helpful magic on the\nenemy side."],
+	"decay": ["Decay", "Dc", Color(0.62, 0.52, 0.35), "Rotting: takes 10 Break damage at\nthe start of each turn."],
+	"ruin": ["Ruin", "R1", Color(0.72, 0.32, 0.82), "Marked by the Old Gods: takes 2%\nmore damage per stack; heroes\nstriking this unit heal. At 5\nstacks Ruin detonates."],
+	"ruin_primed": ["Ruin (primed)", "R!", Color(0.9, 0.3, 0.9), "The Old Gods reach through: Ruin\ndetonates when this unit next\nacts."],
+	"hysteria": ["Mass Hysteria", "MH", Color(0.9, 0.5, 0.9), "Next turn: strikes a fellow with\nDOUBLE Break damage, Sundering\nthem."],
+	"invig": ["Invigoration", "Iv", Color(0.45, 0.6, 0.95), "Restores Mana at the start of\neach turn (Dark Pact talent)."],
 	"devotion": ["Devotion Aura", "DA", Color(0.95, 0.8, 0.45), "The Devout's presence: takes 15%\nless Break damage."],
 	"tripwire": ["Tripwire", "TW", Color(0.8, 0.65, 0.35), "Retaliates against every attacking\nmelee enemy for 75% of their damage."],
 	"stunned": ["Stunned", "St", Color(0.95, 0.9, 0.4), "Loses their next turn."],
@@ -1038,6 +1044,22 @@ func _run_battle() -> void:
 		if u.dead:
 			_check_end()
 			continue
+		# Decay: rot gnaws at the Break meter every turn.
+		if u.has_status("decay") and not u.broken:
+			var decay_result: Dictionary = u.take_hit(0, 10)
+			u.float_text("+%d BD" % decay_result.get("bd", 0), Color(0.62, 0.52, 0.35))
+			_log("%s decays — +%d Break damage" % [u.unit_name,
+				decay_result.get("bd", 0)], "#a09060")
+			if decay_result.broke:
+				_sfx("break", -4.0)
+				_message("%s BREAKS!" % u.unit_name)
+				_log("!! %s BREAKS (Decay)" % u.unit_name, "#c070e0")
+		# Wrath of the Old Gods: a primed Ruin detonates as its bearer stirs.
+		if not u.is_hero and u.has_status("ruin_primed"):
+			_detonate_ruin(u)
+			if u.dead:
+				_check_end()
+				continue
 		# Turn-start regeneration effects.
 		if u.has_status("renewal"):
 			# The tick was snapshotted at cast: 15% of the caster's max HP.
@@ -1081,6 +1103,12 @@ func _run_battle() -> void:
 		if u.has_status("focus") and u.resource_name == "Mana":
 			u.resource = mini(u.resource + 10, u.max_resource)
 			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
+			u.refresh_bars()
+		# Invigoration (Dark Pact talent): the pact drips Mana back.
+		if u.has_status("invig") and u.resource_name == "Mana":
+			var iv_amt := maxi(u.status_power("invig"), 1)
+			u.resource = mini(u.resource + iv_amt, u.max_resource)
+			u.float_text("+%d Mana" % iv_amt, Color(0.45, 0.6, 0.95))
 			u.refresh_bars()
 		if u.has_status("stunned"):
 			u.remove_status("stunned")
@@ -1270,7 +1298,7 @@ func _player_turn(u: BattleUnit) -> void:
 				"phoenix", "hymn", "retaliate", "unity", "tripwire", "summon",
 				"mana_shield", "divine_wrath", "shield_block", "hold_the_line",
 				"battle_shout", "flame_shield", "stabilize", "overcharge",
-				"cons_ground", "bulwark"]:
+				"cons_ground", "bulwark", "dark_pact", "hysteria"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "resurrection":
 			# Resurrection targets the FALLEN (the usable gate guarantees one).
@@ -1296,10 +1324,11 @@ func _player_turn(u: BattleUnit) -> void:
 			else:
 				used_targeting = true
 				target = await _pick_target(pool)
-		# Dual-choice abilities pick a second, different enemy (the bot skips
-		# the click and lets _resolve pick its second target randomly).
+		# Dual/triple-choice abilities pick extra, different enemies (the bot
+		# skips the clicks and lets _resolve pick its extras randomly).
 		second_target = null
-		if target != null and ab.choose_two and not autoplay:
+		third_target = null
+		if target != null and (ab.choose_two or ab.choose_three) and not autoplay:
 			var pool2: Array = enemies.filter(func(e): return not e.dead and e != target)
 			if pool2.size() == 1:
 				second_target = pool2[0]
@@ -1307,6 +1336,16 @@ func _player_turn(u: BattleUnit) -> void:
 				used_targeting = true
 				second_target = await _pick_target(pool2)
 				if second_target == null:
+					target = null  # cancelled: back to the action bar
+		if target != null and ab.choose_three and second_target != null:
+			var pool3: Array = enemies.filter(
+				func(e): return not e.dead and e != target and e != second_target)
+			if pool3.size() == 1:
+				third_target = pool3[0]
+			elif pool3.size() > 1:
+				used_targeting = true
+				third_target = await _pick_target(pool3)
+				if third_target == null:
 					target = null  # cancelled: back to the action bar
 		if target != null:
 			if autoplay:
@@ -1329,6 +1368,19 @@ func _player_turn(u: BattleUnit) -> void:
 		_rebuild_turn_bar(u, ab)
 		action_panel.visible = false
 	await _resolve(u, ab, target, grade)
+	# Pleasure from Pain (Occultist talent): every unique affliction on the
+	# enemy team feeds the party as the Occultist's turn ends.
+	if u.pleasure_ranks > 0 and not u.dead and not battle_over:
+		var pp_uniques := _unique_enemy_debuffs()
+		if pp_uniques > 0:
+			var pp_amt := maxi(int(round(u.max_hp * 0.015 * u.pleasure_ranks
+				* pp_uniques)), 1)
+			for pp_h in heroes.filter(func(h): return not h.dead and not h.is_companion):
+				var pp_got: int = pp_h.heal_amount(pp_amt, pp_h != u)
+				pp_h.float_text("+%d" % pp_got, Color(0.7, 0.4, 0.9))
+				_stat("healing", pp_got)
+			_log("   → Talent: Pleasure from Pain — %d unique debuff%s feed the party (%d each)" % [
+				pp_uniques, "" if pp_uniques == 1 else "s", pp_amt], "#b0a8e0")
 	# Divine Presence (Holy talent): the light settles on the most wounded
 	# as the Cleric's turn ends.
 	if u.divine_presence_ranks > 0 and not u.dead and not battle_over:
@@ -1530,9 +1582,28 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 						zeal_t = zh
 				if not zeal_t.has_status("zeal"):
 					return [zeal_ab, zeal_t]
-			var flay := _find_ability(u, "Mind Flay")
-			if flay != null and u.resource >= flay.cost and u.ability_ready(flay) and foes.size() >= 2:
-				return [flay, target_foe]
+			# Occultist: the Old Gods' toolkit.
+			var pact := _find_ability(u, "Dark Pact")
+			if pact != null and u.resource >= pact.cost and u.ability_ready(pact) \
+					and u.hp > u.max_hp * 0.5 \
+					and allies.filter(func(h): return h.hp < h.max_hp * 0.6).size() >= 2:
+				return [pact, u]
+			var hyst := _find_ability(u, "Mass Hysteria")
+			if hyst != null and u.resource >= hyst.cost and u.ability_ready(hyst) \
+					and foes.size() >= 3:
+				return [hyst, u]
+			var mflay := _find_ability(u, "Mind Flay")
+			if mflay != null and u.resource >= mflay.cost and u.ability_ready(mflay) \
+					and foes.size() >= 2:
+				return [mflay, target_foe]
+			var bwitch := _find_ability(u, "Bewitch")
+			if bwitch != null and u.resource >= bwitch.cost and u.ability_ready(bwitch) \
+					and foes.size() >= 2 and not target_foe.has_status("bewitch") \
+					and not target_foe.is_boss:
+				return [bwitch, target_foe]
+			var hex := _find_ability(u, "Hex of Ruin")
+			if hex != null and u.resource >= hex.cost and u.ability_ready(hex):
+				return [hex, target_foe]
 			return [u.abilities[0], target_foe]          # Smite / Shadowrend
 	return [u.abilities[0], target_foe]
 
@@ -1875,6 +1946,7 @@ func _confirm_summon(i: int) -> void:
 
 var _preview_locked := false
 var second_target: BattleUnit = null  # choose_two abilities (Shrapnel)
+var third_target: BattleUnit = null   # choose_three abilities (Hex of Ruin)
 var _open_popups: Array = []  # ability popups to close when a hotkey fires
 var _main_popup: PopupPanel   # the Abilities list (Tab toggles it)
 var _main_popup_anchor: Button
@@ -2057,20 +2129,60 @@ func _enemy_turn(u: BattleUnit) -> void:
 		await _wait(0.25)
 		return
 	await _wait(0.7)
-	# Mind Flay: the maddened enemy turns on its own allies with bonus Break
-	# damage (falls through to normal behavior if it stands alone).
-	if u.has_status("mindflay"):
-		var fellows := enemies.filter(func(e): return not e.dead and e != u)
-		# Maddened units ATTACK their allies — support abilities stay sheathed.
-		var mf_options: Array = u.abilities.filter(
-			func(a): return a.cost <= u.resource and a.damage > 0)
-		if not fellows.is_empty() and not mf_options.is_empty():
-			var mf_target: BattleUnit = fellows.pick_random()
-			_message("%s turns on its allies!" % u.unit_name)
-			_log("%s is maddened — attacks %s!" % [u.unit_name, mf_target.unit_name], "#c070e0")
+	# Mass Hysteria: the maddened strike a fellow with doubled Break damage,
+	# Sundering them (the status holds until they act).
+	if u.has_status("hysteria"):
+		u.remove_status("hysteria")
+		var hys_fellows := enemies.filter(func(e): return not e.dead and e != u)
+		var hys_basic := _cheapest_attack(u)
+		if not hys_fellows.is_empty() and hys_basic != null:
+			var hys_target: BattleUnit = hys_fellows.pick_random()
+			var hys_copy: Ability = Ability.make({"display_name": hys_basic.display_name,
+				"damage": hys_basic.damage, "pressure": hys_basic.pressure * 2,
+				"dmg_type": hys_basic.dmg_type, "anim": hys_basic.anim,
+				"applies_status": {"id": "sunder", "turns": 3}, "status_chance": 1.0})
+			_message("%s lashes out in hysteria!" % u.unit_name)
+			_log("%s is hysterical — turns on %s!" % [u.unit_name,
+				hys_target.unit_name], "#c070e0")
 			await _wait(0.4)
-			await _resolve(u, mf_options.pick_random(), mf_target, "good")
+			await _resolve(u, hys_copy, hys_target, "good")
 			return
+	# Bewitch: the charmed basic-attack their own, Dazing them (the Daze is
+	# the Occultist's work — it feeds Ruin).
+	if u.has_status("bewitch"):
+		if await _bewitched_strike(u):
+			return
+	# Psychosis: 50% each turn the madness takes the wheel — supports aid
+	# the heroes; the rest maul their own. Spread of Madness is contagious.
+	if u.has_status("psychosis"):
+		var spread_r := _max_hero_rank("spread_ranks")
+		if spread_r > 0 and randf() < 0.15 * spread_r:
+			var sane := enemies.filter(func(e): return not e.dead and e != u and not e.has_status("psychosis") and (not e.is_boss or e.broken))
+			if not sane.is_empty():
+				var infected: BattleUnit = sane.pick_random()
+				_log("   → Talent: Spread of Madness — the psychosis leaps to %s" % \
+					infected.unit_name, "#b0a8e0")
+				_apply_status(infected, "psychosis", 3)
+				_gain_ruin(infected, 1)
+		if randf() < 0.5:
+			var psy_support := _psychotic_support(u)
+			if not psy_support.is_empty():
+				_message("%s aids the enemy in its madness!" % u.unit_name)
+				_log("%s is psychotic — its magic serves the heroes!" % u.unit_name,
+					"#c070e0")
+				await _wait(0.4)
+				await _resolve(u, psy_support[0], psy_support[1], "good")
+				return
+			var psy_fellows := enemies.filter(func(e): return not e.dead and e != u)
+			var psy_basic := _cheapest_attack(u)
+			if not psy_fellows.is_empty() and psy_basic != null:
+				var psy_target: BattleUnit = psy_fellows.pick_random()
+				_message("%s turns on its allies!" % u.unit_name)
+				_log("%s is psychotic — attacks %s!" % [u.unit_name,
+					psy_target.unit_name], "#c070e0")
+				await _wait(0.4)
+				await _resolve(u, psy_basic, psy_target, "good")
+				return
 	var living := _hero_side()
 	if living.is_empty():
 		return
@@ -2258,6 +2370,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	# Shatter perfect: the echo of the blast comes back sooner (4cd).
 	if is_perfect and ab.display_name == "Shatter" and not debug_cooldowns_off:
 		attacker.cooldowns[ab.display_name] = 5  # 4 + the same-turn tick
+	# Hex of Ruin perfect: the curse costs no cooldown at all.
+	if is_perfect and ab.display_name == "Hex of Ruin":
+		attacker.cooldowns.erase(ab.display_name)
+	# Mass Hysteria perfect: the madness returns sooner (3cd).
+	if is_perfect and ab.display_name == "Mass Hysteria" and not debug_cooldowns_off:
+		attacker.cooldowns[ab.display_name] = 4  # 3 + the same-turn tick
 
 	# Move toward the target so attacks visibly connect (specials stay put):
 	# units with real locomotion art WALK to melee range; the rest do the
@@ -2340,7 +2458,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Shatter":
 				strike_targets = strike_targets.filter(
 					func(t): return t.has_status("chilled"))
-		elif ab.choose_two:
+		elif ab.choose_two or ab.choose_three:
 			var second: BattleUnit = second_target
 			if second == null or second.dead or second == target:
 				# Autoplay (or a lone survivor): fall back to another live foe.
@@ -2348,6 +2466,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				second = null if others.is_empty() else others.pick_random()
 			if second != null:
 				strike_targets = [target, second]
+			if ab.choose_three:
+				var third: BattleUnit = third_target
+				if third == null or third.dead or third == target or third == second:
+					var rest := enemies.filter(
+						func(e): return not e.dead and e != target and e != second)
+					third = null if rest.is_empty() else rest.pick_random()
+				if third != null:
+					strike_targets.append(third)
 		var total_hits := strike_targets.size()
 		if ab.random_hits > 0:
 			total_hits = ab.random_hits + (1 if is_perfect and ab.perfect_extra_hit else 0)
@@ -2396,7 +2522,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					continue
 			# Multi-hit attacks roll miss/parry per strike: a blocked or missed
 			# hit never stops the follow-up strikes.
-			if not is_counter and (ab.multi_hits > 0 or ab.random_hits > 0 or ab.choose_two):
+			if not is_counter and (ab.multi_hits > 0 or ab.random_hits > 0
+					or ab.choose_two or ab.choose_three):
 				if randf() < _miss_chance(attacker):
 					_stat("attacks")
 					_stat("attack_miss")
@@ -2575,6 +2702,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if attacker.is_hero and attacker.faith_stacks > 0 \
 					and _living_devout() != null:
 				raw *= 1.0 + 0.02 * attacker.faith_stacks
+			# Dark Infusion: the Occultist feeds on the enemy team's afflictions.
+			if attacker.infusion_ranks > 0:
+				raw *= 1.0 + 0.02 * attacker.infusion_ranks * _unique_enemy_debuffs()
 			# Arcane Cannon: the damage (not the recoil) grows with Resonance.
 			if ab.display_name == "Arcane Cannon":
 				raw *= 1.0 + 0.075 * attacker.second_resource
@@ -2678,6 +2808,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if strike_target.is_hero and strike_target.faith_stacks > 0 \
 					and _living_devout() != null:
 				raw *= 1.0 - 0.03 * strike_target.faith_stacks
+			# Ruin: the Old Gods' mark cracks the target open (+2%/stack).
+			if not strike_target.is_hero and strike_target.has_status("ruin") \
+					and _living_occultist() != null:
+				raw *= 1.0 + 0.02 * strike_target.status_stacks("ruin")
 			if strike_target.has_status("shieldwall"):
 				raw *= 0.75
 			# Shielded: the Orc Shieldmaster's single-ally ward.
@@ -2761,9 +2895,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and not attacker.companion.dead \
 					and attacker.companion.companion_kind == "ursus":
 				pr = int(pr * 1.25)
-			# Mind Flay: maddened attacks batter their own allies' stability.
-			if attacker.has_status("mindflay"):
-				pr = int(pr * (1.0 + attacker.status_power("mindflay") / 100.0))
+			# Broken Will: the Occultist grinds stability down harder.
+			if attacker.broken_will_ranks > 0:
+				pr = int(round(pr * (1.0 + 0.05 * attacker.broken_will_ranks)))
 			_stat("attacks")
 			_stat("attack_landed")
 			if is_crit:
@@ -2774,6 +2908,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_stat("dmg_enemy", final)
 			total_dealt += final
 			enemies_struck += 1
+			# Wrath of the Old Gods: heroes striking a Ruined target drink
+			# deep (10% of damage dealt; Soul Leech deepens the draught).
+			if attacker.is_hero and not strike_target.is_hero and final > 0 \
+					and strike_target.has_status("ruin") and not attacker.dead:
+				var occ_leech := _living_occultist()
+				if occ_leech != null:
+					var leech_pct := 0.10 + 0.05 * occ_leech.soul_leech_ranks
+					var rl_heal := maxi(int(round(final * leech_pct)), 1)
+					var rl_got: int = attacker.heal_amount(rl_heal)
+					attacker.float_text("+%d" % rl_got, Color(0.7, 0.4, 0.9))
+					_stat("healing", rl_got)
 			# Unity: the bound party splits incoming damage evenly (Pressure
 			# still lands on the struck hero alone).
 			if strike_target.is_hero and not strike_target.is_companion \
@@ -2894,9 +3039,34 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var status_meta := 0
 				if ab.applies_status["id"] == "burn":
 					status_meta = int(round((CRIT_CHANCE + attacker.crit_bonus) * 100))
-				_apply_status(strike_target, ab.applies_status["id"], turns, status_meta,
-					_dot_tick(ab.applies_status["id"], attacker))
-				_note_debuff_applied(attacker, ab.applies_status["id"])
+				# Umbral Mirror: an enemy's debuff can rebound onto itself
+				# (and the reflection is the Occultist's work — it feeds Ruin).
+				var mirror_r := _max_hero_rank("mirror_ranks")
+				if not attacker.is_hero and strike_target.is_hero and mirror_r > 0 \
+						and BattleUnit.DEBUFF_IDS.has(ab.applies_status["id"]) \
+						and randf() < 0.10 * mirror_r:
+					_log("   → Talent: Umbral Mirror — the %s rebounds onto %s" % [
+						ab.applies_status["id"].capitalize(), attacker.unit_name],
+						"#b0a8e0")
+					_apply_status(attacker, ab.applies_status["id"], turns, status_meta,
+						_dot_tick(ab.applies_status["id"], attacker))
+					_gain_ruin(attacker, 1)
+				else:
+					_apply_status(strike_target, ab.applies_status["id"], turns, status_meta,
+						_dot_tick(ab.applies_status["id"], attacker))
+					_note_debuff_applied(attacker, ab.applies_status["id"])
+					# Wrath of the Old Gods: the Occultist's debuffs mark Ruin.
+					if attacker.passive_id == "old_gods" and not strike_target.is_hero \
+							and BattleUnit.DEBUFF_IDS.has(ab.applies_status["id"]):
+						_gain_ruin(strike_target, 1)
+				# Empowered Hex: the curse can set the rot in.
+				if ab.display_name == "Hex of Ruin" and attacker.emp_hex_ranks > 0 \
+						and not strike_target.dead \
+						and randf() < 0.25 * attacker.emp_hex_ranks:
+					_apply_status(strike_target, "decay", 3)
+					_gain_ruin(strike_target, 1)
+					_log("   → Talent: Empowered Hex — Decay takes root in %s" % \
+						strike_target.unit_name, "#b0a8e0")
 			# Lunge: the stance decides the wound — Exposed high, Cripple low.
 			if ab.display_name == "Lunge" and not strike_target.dead:
 				var lunge_status := "exposed" if attacker.hp > attacker.max_hp * 0.5 \
@@ -3164,15 +3334,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_sfx("death", -4.0)
 					_message("%s falls!" % attacker.unit_name)
 					_log("† %s dies" % attacker.unit_name, "#e05050")
-		# Corrupted Channeling: a Crippled enemy's violence feeds the party.
+		# Corrupted Channeling (talent): a Crippled enemy's violence feeds
+		# the party — 25%/rank of the damage it dealt.
+		var chan_r := _max_hero_rank("channeling_ranks")
 		if not attacker.is_hero and attacker.has_status("cripple") and total_dealt > 0 \
-				and heroes.any(func(h): return not h.dead and h.passive_id == "corrupt"):
+				and chan_r > 0:
 			var blessed: BattleUnit = heroes.filter(func(h): return not h.dead).pick_random()
-			var leech_heal := maxi(int(total_dealt / 2.0), 1)
-			blessed.heal_amount(leech_heal)
-			blessed.float_text("+%d" % leech_heal, Color(0.7, 0.4, 0.9))
-			_log("   → Corrupted Channeling: %s heals %d" % [blessed.unit_name,
-				leech_heal], "#b0a8e0")
+			var leech_heal := maxi(int(round(total_dealt * 0.25 * chan_r)), 1)
+			var chan_got: int = blessed.heal_amount(leech_heal)
+			blessed.float_text("+%d" % chan_got, Color(0.7, 0.4, 0.9))
+			_stat("healing", chan_got)
+			_log("   → Talent: Corrupted Channeling — %s heals %d" % [blessed.unit_name,
+				chan_got], "#b0a8e0")
 		# Resonance builds only on the Mage's own casts — parry counters don't
 		# count (they made the Mage "start" battles with a stack).
 		if not is_counter:
@@ -3214,11 +3387,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 
 func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		tick := 0) -> void:
-	# Bosses shrug off Stuns (and Freezes) until their guard is Broken.
-	if id in ["stunned", "frozen"] and target.is_boss and not target.broken:
+	# Bosses shrug off Stuns, Freezes, and mind magic until Broken.
+	if id in ["stunned", "frozen", "psychosis", "bewitch", "hysteria"] \
+			and target.is_boss and not target.broken:
 		target.float_text("IMMUNE", Color(0.75, 0.75, 0.75))
 		_log("   → %s resists the %s (boss — Break them first)" % [target.unit_name,
-			"Stun" if id == "stunned" else "Freeze"], "#909090")
+			String(STATUS_INFO[id][0])], "#909090")
 		return
 	# Hallowed (Empowered Divine Plea): shrugs off every new debuff.
 	if target.has_status("sanctified") and BattleUnit.DEBUFF_IDS.has(id):
@@ -3404,6 +3578,132 @@ func _living_devout() -> BattleUnit:
 		if not h.dead and h.passive_id == "conviction":
 			return h
 	return null
+
+
+# The unit's guaranteed 0-cost attack (every enemy kit carries one).
+func _cheapest_attack(u: BattleUnit) -> Ability:
+	for a in u.abilities:
+		if a.damage > 0 and a.cost == 0:
+			return a
+	return null
+
+
+# Bewitch: the charmed strike a fellow with their basic attack, Dazing
+# them (an Occultist-attributed debuff → Ruin). Returns true if it acted.
+func _bewitched_strike(u: BattleUnit) -> bool:
+	var fellows := enemies.filter(func(e): return not e.dead and e != u)
+	var basic := _cheapest_attack(u)
+	if fellows.is_empty() or basic == null:
+		return false
+	var bw_target: BattleUnit = fellows.pick_random()
+	_message("%s turns on its allies!" % u.unit_name)
+	_log("%s is bewitched — attacks %s!" % [u.unit_name, bw_target.unit_name],
+		"#c070e0")
+	await _wait(0.4)
+	await _resolve(u, basic, bw_target, "good")
+	if not bw_target.dead:
+		_apply_status(bw_target, "dazed", 2)
+		_gain_ruin(bw_target, 1)
+	elif bw_target.dead:
+		# Murderous Intent: a bewitched kill feeds the party's darkest hunger.
+		var mi_ranks := _max_hero_rank("murderous_ranks")
+		var occ := _living_occultist()
+		if mi_ranks > 0 and occ != null:
+			var mi_pool := heroes.filter(func(h): return not h.dead and not h.is_companion)
+			if not mi_pool.is_empty():
+				var mi_t := _lowest_hp(mi_pool)
+				var mi_heal := maxi(int(round(occ.max_hp * 0.10 * mi_ranks)), 1)
+				var mi_got: int = mi_t.heal_amount(mi_heal, mi_t != occ)
+				mi_t.float_text("+%d" % mi_got, Color(0.7, 0.4, 0.9))
+				_stat("healing", mi_got)
+				_log("   → Talent: Murderous Intent — %s feeds on the kill (+%d)" % [
+					mi_t.unit_name, mi_got], "#b0a8e0")
+	return true
+
+
+# Psychosis: a maddened support turns its helpful magic on the HERO side.
+# Returns [ability, hero_target] or [] when the unit has no such spell.
+func _psychotic_support(u: BattleUnit) -> Array:
+	var living := _hero_side()
+	if living.is_empty():
+		return []
+	for a in u.abilities:
+		if a.cost > u.resource:
+			continue
+		match a.special:
+			"healing_wave", "wild_growth":
+				return [a, _lowest_hp(living)]
+			"enemy_shield":
+				return [a, living.pick_random()]
+	return []
+
+
+# Wrath of the Old Gods (Occultist passive): the living Occultist, or null.
+func _living_occultist() -> BattleUnit:
+	for h in heroes:
+		if not h.dead and h.passive_id == "old_gods":
+			return h
+	return null
+
+
+# Unique debuff ids across the living enemy team (Pleasure from Pain,
+# Dark Infusion).
+func _unique_enemy_debuffs() -> int:
+	var seen := {}
+	for e in enemies:
+		if e.dead:
+			continue
+		for s in e.statuses:
+			if BattleUnit.DEBUFF_IDS.has(s.id):
+				seen[s.id] = true
+	return seen.size()
+
+
+# Wrath of the Old Gods: every Occultist-applied debuff marks its victim.
+# At 5 stacks the mark is PRIMED — it detonates at the victim's next turn.
+func _gain_ruin(target: BattleUnit, n: int = 1) -> void:
+	var occ := _living_occultist()
+	if occ == null or target.is_hero or target.dead:
+		return
+	for i in n:
+		if target.status_stacks("ruin") >= 5:
+			break
+		_apply_status(target, "ruin", -1)
+	if target.status_stacks("ruin") >= 5 and not target.has_status("ruin_primed"):
+		_apply_status(target, "ruin_primed", 1)
+		_log("   → The Old Gods take notice — %s's Ruin is PRIMED" % \
+			target.unit_name, "#c060d0")
+
+
+# The primed Ruin detonates: shadow damage off the Occultist's Attack and
+# a wave of stolen vitality for the party.
+func _detonate_ruin(target: BattleUnit) -> void:
+	var occ := _living_occultist()
+	target.remove_status("ruin")
+	target.remove_status("ruin_primed")
+	if occ == null or target.dead:
+		return
+	var det_raw := 0.50 * occ.attack * randf_range(0.9, 1.1)
+	var resist := float(target.resists.get("shadow", 0.0))
+	var det_dmg := maxi(int(round(det_raw * (1.0 - resist))), 1)
+	_message("RUIN consumes %s!" % target.unit_name)
+	var det_died := target.take_tick_damage(det_dmg, "-%d RUIN" % det_dmg,
+		Color(0.8, 0.3, 0.9))
+	_stat("dmg_hero_" + occ.unit_name, det_dmg)
+	_log("%s: Wrath of the Old Gods — Ruin detonates on %s for %d shadow" % [
+		occ.unit_name, target.unit_name, det_dmg], "#c060d0")
+	for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
+		var rw_heal := maxi(int(round(occ.max_hp * 0.15)), 1)
+		var rw_got: int = h.heal_amount(rw_heal, h != occ)
+		h.float_text("+%d" % rw_got, Color(0.7, 0.4, 0.9))
+		_stat("healing", rw_got)
+	_log("   → the party feasts on the ruin (15% of the Occultist's health each)",
+		"#b070d0")
+	if det_died:
+		_stat("enemy_deaths")
+		_sfx("death", -4.0)
+		_message("%s falls!" % target.unit_name)
+		_log("† %s dies" % target.unit_name, "#e05050")
 
 
 # Conviction: a mitigated hit steels the struck ally. At 5 stacks the
@@ -3733,12 +4033,53 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s raises the BULWARK OF FORTITUDE!" % attacker.unit_name)
 			_log("%s: Bulwark of Fortitude — no Break damage, armor +50%%, 10%% healing per turn (3 turns)" % \
 				attacker.unit_name, "#8c9cc8")
-		"mindflay":
+		"bewitch":
 			_sfx("break", -8.0, 1.4)
-			_apply_status(target, "mindflay", 3, 115 if is_perfect else 100)
-			_message("%s shatters %s's mind!" % [attacker.unit_name, target.unit_name])
-			_log("%s: Mind Flay — %s turns on its allies" % [attacker.unit_name,
-				target.unit_name], "#c070e0")
+			_apply_status(target, "bewitch", 3)
+			_gain_ruin(target, 1)
+			_message("%s bewitches %s!" % [attacker.unit_name, target.unit_name])
+			_log("%s: Bewitch — %s will turn on its allies (3 turns)" % [
+				attacker.unit_name, target.unit_name], "#c070e0")
+			# Perfect: the charm takes hold INSTANTLY — one strike right now.
+			if is_perfect and target.has_status("bewitch") and not target.dead:
+				await _wait(0.4)
+				await _bewitched_strike(target)
+		"dark_pact":
+			# Blood for blood: the Occultist bleeds so the party may live.
+			var pact_cost := maxi(int(round(attacker.max_hp * 0.20)), 1)
+			attacker.hp = maxi(attacker.hp - pact_cost, 1)
+			attacker.float_text("-%d" % pact_cost, Color(1.0, 0.4, 0.5))
+			attacker.refresh_bars()
+			_sfx("heal", -5.0, 0.6)
+			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
+				var dp_amt := maxi(int(round(h.max_hp * 0.15)), 1)
+				var dp_hgot: int = h.heal_amount(dp_amt, h != attacker)
+				h.float_text("+%d" % dp_hgot, Color(0.7, 0.4, 0.9))
+				_stat("healing", dp_hgot)
+			# The Occultist knits back together over 3 turns (10%/turn).
+			var pact_tick := maxi(int(round(attacker.max_hp * 0.10)), 1)
+			_apply_status(attacker, "renewal", 3, 0, pact_tick)
+			attacker.update_status("renewal", "R+",
+				"Dark Pact: restores %d HP at the start\nof each turn (10%% of max health)." % pact_tick)
+			# Invigoration (talent): the pact also drips Mana back.
+			if attacker.invigoration_ranks > 0:
+				var invig_tick := maxi(int(round(attacker.max_resource
+					* 0.02 * attacker.invigoration_ranks)), 1)
+				_apply_status(attacker, "invig", 3, invig_tick)
+			if is_perfect:
+				attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
+				attacker.float_text("+5 Mana", Color(0.5, 0.7, 1.0))
+				attacker.refresh_bars()
+			_message("%s seals the Dark Pact!" % attacker.unit_name)
+			_log("%s: Dark Pact — bleeds %d; the party heals 15%% of max health" % [
+				attacker.unit_name, pact_cost], "#b070d0")
+		"hysteria":
+			_sfx("break", -6.0, 1.2)
+			for e in enemies.filter(func(en): return not en.dead):
+				_apply_status(e, "hysteria", -1)
+			_message("%s unleashes MASS HYSTERIA!" % attacker.unit_name)
+			_log("%s: Mass Hysteria — the warband turns on itself next turn" % \
+				attacker.unit_name, "#c070e0")
 		"rampage":
 			var total_bleed := 0
 			for e in enemies:

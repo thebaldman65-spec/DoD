@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-23</b></p>
+<p align="right"><b>Last updated: 2026-07-24</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -238,8 +238,20 @@ armor).</td></tr>
 <tr><td>Dazed</td><td>Attacks are 20% more likely to miss (3 turns; Timber Slam).</td></tr>
 <tr><td>Shielded</td><td>Takes 25% less damage — the Orc Shieldmaster's single-ally
 ward.</td></tr>
-<tr><td>Umbral Sigil</td><td>Branded: every other member of this unit's party takes 50% of
-all attack damage it receives (Occultist).</td></tr>
+<tr><td>Ruin</td><td>The Old Gods' mark (Occultist passive, max 5 stacks, battle-long):
++2% damage taken per stack; heroes striking the bearer heal 10% of damage dealt. At 5
+stacks it is PRIMED and detonates on the bearer's next turn.</td></tr>
+<tr><td>Psychosis</td><td>Madness: 50% each turn to turn on its own — attacking a fellow,
+or casting its helpful magic on the hero side instead. Bosses resist unless
+Broken.</td></tr>
+<tr><td>Decay</td><td>Rotting: takes 10 Break damage at the start of each turn (3
+turns).</td></tr>
+<tr><td>Bewitched</td><td>Charmed: basic-attacks its own allies, Dazing them with every
+strike (Occultist's Bewitch, 3 turns).</td></tr>
+<tr><td>Mass Hysteria</td><td>Strikes a fellow with DOUBLE Break damage on its next turn,
+Sundering them (Occultist capstone).</td></tr>
+<tr><td>Invigoration</td><td>Restores Mana at the start of each turn (Dark Pact
+talent).</td></tr>
 <tr><td>Battle Shout</td><td>+1% damage per 20 blood buildup on the enemy party, snapshotted
 at cast (Berserker talent). The chip shows the % gained at the moment of the shout.</td></tr>
 <tr><td>Shieldwall (charges)</td><td>The next N attacks against this unit are BLOCKED
@@ -308,7 +320,6 @@ counter; released by the next Heal.</td></tr>
 <tr><td>Parry Up</td><td>+15% parry chance (Pommel Strike perfect).</td></tr>
 <tr><td>Unity</td><td>Damage received is split evenly among living heroes (BD is
 not).</td></tr>
-<tr><td>Mind Flay</td><td>Attacks its own allies with +100/115% Break damage.</td></tr>
 <tr><td>Devoutness</td><td>Takes 5% less BD per talent rank (battle-long, from the
 Devout's tree).</td></tr>
 <tr><td>Tripwire</td><td>Retaliates against every attacking melee enemy for 75% of their
@@ -562,17 +573,27 @@ evenly among living heroes for 3 turns; BD still lands on the struck hero (Perfe
 turns). Bulwark of Fortitude (capstone) — 30 Mana, 3.5, 3cd; for 3 turns the party
 takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each
 turn (Perfect: the party instantly heals 5%).</li>
-<li><b>Occultist (Pressure)</b> — Passive <i>Corrupted Channeling</i>: whenever a Crippled
-enemy attacks, a random living hero heals for half the damage it dealt. Basic attack:
-<b>Shadowrend</b> (corrupted Smite — 22 shadow / 16 BD / 2.0).<br>
-Hex of Ruin — 20 Mana, 2 random enemies × 15 shadow / 24 BD / 3.0, Cripples both for 3 turns
-(Perfect: 4 turns).<br>
-Mind Flay — 30 Mana, 3.5, the target attacks its OWN allies for
-3 turns with +100% Break damage; fizzles to normal behavior if it stands alone
-(Perfect: +115%).<br>
-Umbral Sigil — 20 Mana, 3.0, 4cd, brands one enemy for 3 turns: every OTHER member of
-its party takes 50% of all attack damage the branded target receives (Perfect: 4
-turns).</li>
+<li><b>Occultist (Pressure)</b> — Passive <i>Wrath of the Old Gods</i>: every debuff the
+Occultist applies marks its victim with <b>Ruin</b> (max 5, battle-long, chip counts
+stacks). Each stack: the target takes +2% damage, and heroes striking it heal 10% of
+the damage dealt (a flat rate while ANY Ruin is on it; the Soul Leech talent deepens
+it). One turn after reaching 5 stacks, Ruin DETONATES: 50% of the Occultist's Attack
+as shadow damage, and every ally heals 15% of the Occultist's max health. The stacks
+only work while the Occultist stands. Basic attack: <b>Shadowrend</b> (corrupted
+Smite — 50% Atk shadow / 16 BD / 2.0, Cripples 2 turns).<br>
+Hex of Ruin — 20 Mana, 2.5, 2cd; curse THREE chosen enemies for 20% Atk shadow / 15 BD
+each, leaving them Exposed 3 turns (Perfect: no cooldown).<br>
+Bewitch — 25 Mana, 3.5, 4cd; the target basic-attacks its OWN allies for 3 turns,
+Dazing them with every strike — charms and Dazes feed Ruin (Perfect: the target attacks
+instantly). Bosses resist unless Broken.<br>
+Dark Pact — 20 Mana, 3.0, 3cd; the Occultist loses 20% max health, ALL allies heal 15%
+of their max health, and the Occultist regains 30% of max health over 3 turns
+(Perfect: +5 Mana).<br>
+<i>Talent-granted:</i> Mind Flay — 25 Mana, 3.0, 2cd; 30% Atk shadow / 15 BD to TWO
+chosen minions, inflicting <b>Psychosis</b> for 3 turns (Perfect: 4 turns). Mass
+Hysteria (capstone) — 30 Mana, 4.0, 4cd; next turn every minion strikes a fellow with
+DOUBLE Break damage, Sundering them 3 turns (Perfect: 3cd). Bosses resist
+both.</li>
 </ul>
 <h3>6.4 Hunter</h3>
 <ul>
@@ -613,8 +634,9 @@ turns). The player picks both targets; each fragment rolls miss/parry separately
 </ul>
 
 <h2>7. Talents</h2>
-<p><b>Trees are FIXED and designed.</b> Eight exist so far —
-<b>Berserker, Swordmaster, Warden, Pyromancer, Cryomancer, Arcanist, Holy, Devout</b> (designed in the RPG Skill Tree
+<p><b>Trees are FIXED and designed.</b> Nine exist so far —
+<b>Berserker, Swordmaster, Warden, Pyromancer, Cryomancer, Arcanist, Holy, Devout,
+Occultist</b> (designed in the RPG Skill Tree
 Generator; source JSONs in data/talent-tree-*.json). Every other spec shows <b>"Coming soon."</b> on the party
 screen until its tree is designed. Points still accrue from victories (fight 1, elite 2,
 boss 3; Waystone +1) and bank until a tree exists.</p>
@@ -713,6 +735,20 @@ converts 4%/rank of what it absorbs into healing ×3), Cleansing Waters (while S
 Resolve holds, each member has a 15%/rank chance per turn to shed one harmful effect
 ×3), Healing Pulse (while Sacred Resolve holds, the party heals 2%/rank of the Devout's
 max health per turn ×3). Capstone — Bulwark of Fortitude (grants the ability).</p>
+<p><b>Occultist tree:</b> Row 1 — Empowered Hex (Hex of Ruin 25%/rank chance per target
+to also apply Decay ×3), Soul Leech (heroes striking a Ruined target heal 15/20/25% of
+damage dealt, up from the base 10% ×3), Pleasure from Pain (at the end of the
+Occultist's turn the party heals 1.5%/rank of the Occultist's max health per UNIQUE
+enemy-team debuff ×3). Row 2 — Corrupted Channeling (a Crippled enemy's attacks heal a
+random hero for 25%/rank of the damage dealt ×3), Murderous Intent (a Bewitched kill
+heals the lowest-health member 10%/rank of the Occultist's max health ×3), Mind Flay
+(grants the ability), Invigoration (Dark Pact also restores 2%/rank max Mana per turn
+for 3 turns ×3), Spread of Madness (Psychosis 15%/rank chance per turn to leap to a
+fellow — the newly maddened gain a Ruin stack ×3). Row 3 — Umbral Mirror (enemy debuffs
+aimed at heroes have a 10%/rank chance to rebound onto the attacker, feeding Ruin ×3),
+Broken Will (the Occultist deals +5%/rank Break damage ×3), Dark Infusion (the
+Occultist deals +2%/rank damage per unique enemy-team debuff ×3). Capstone — Mass
+Hysteria (grants the ability).</p>
 <p><b>Tooltip display:</b> talent tooltips never say "per rank" — the number shown grows
 with the points invested (3% → 6% → 9%; unlearned nodes preview the 1-point value).</p>
 <p><b>Talent visibility:</b> every talent proc is written to the combat log with a
@@ -901,7 +937,7 @@ Unstoppable) — the class passive + spec passive lines, ability chips (hover sh
 numbers AND the "% of Attack" scaling), rune equip toggles (2 max), and the spec's talent
 tree: a 12-node grid with prerequisite connector lines and click-to-learn nodes (lock
 reasons on the node tooltips) for Berserker / Swordmaster / Warden / Pyromancer /
-Cryomancer / Arcanist / Holy / Devout, or <b>"Coming soon."</b>
+Cryomancer / Arcanist / Holy / Devout / Occultist, or <b>"Coming soon."</b>
 for specs whose trees aren't designed yet.</li>
 <li><b>Awakening screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
 along on every path the class can take) and each ability's damage with its "% Atk" scaling.
@@ -977,7 +1013,7 @@ only the Tyrant's frost weakness is set) and Counter Attack (defined term; no ta
 ability grants it yet).</li>
 <li>The Withered Warden has its own kit; the Ash-Wrought Tyrant is still a Chief stand-in —
 unique kit + art planned. Boss art for both pending.</li>
-<li>Trees still to design: Occultist and all three Hunter specs;
+<li>Trees still to design: all three Hunter specs;
 full rune loot table pending; relic pool (5) needs growth.</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>
 <li>The sim bot currently wins ~100% of standard fights (target ≈85%) — difficulty leans
