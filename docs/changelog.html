@@ -5,6 +5,27 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-24 — Batch 26: Beastmaster Ferocity engine + distinct beasts (Bloodied, Frenzy, Quarry)</h2>
+<ul>
+<li><b>New signature resource — Ferocity (0–100, orange bar):</b> the Beastmaster's pack
+blood-meter. Builds as the pack draws blood — +10 on the hunter's own hits (+15 on a crit),
++5 per companion hit (+10 on a crit), and +40 on Kill Command. Above 50 the beast is
+<b>Bloodied</b> (+15% companion strike damage).</li>
+<li><b>New unleash — Frenzy:</b> at a full bar the hunter can spend it as a free action
+(button, or hotkey C) to send the pack berserk for 2 turns — every companion strike hits
+like Kill Command (double damage, doubled special effect). The sim bot pops it when a beast
+is out.</li>
+<li><b>The three beasts now play differently.</b> Ursus keeps +25% Break damage AND now
+<b>Guards</b> the hunter (−15% damage taken while it prowls). Canis keeps its 15-Bleed Pack
+Bond AND now <b>Executes</b> — its strikes deal +50% to prey under 35% HP. Aguila keeps +15%
+crit AND its strikes now mark the <b>Quarry</b> (new debuff): the target takes +10% damage
+from the Beastmaster and their pack for 3 turns.</li>
+<li><b>Kill Command</b> now also grants +40 Ferocity (the order plus its strike), feeding the
+engine instead of sitting apart from it.</li>
+<li>Verified: 40-battle sim with a Beastmaster in the party, 0 script errors, 40/40 clean —
+Ferocity fills, Bloodied/Frenzy/Quarry all fire in combat.</li>
+</ul>
+
 <h2>2026-07-24 — Batch 25: Occultist rework (Wrath of the Old Gods) + talent tree, Psychosis + Decay</h2>
 <ul>
 <li><b>Two new statuses:</b> <b>Psychosis</b> — the maddened enemy has a 50% chance each

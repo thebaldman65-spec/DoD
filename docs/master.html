@@ -324,6 +324,10 @@ not).</td></tr>
 Devout's tree).</td></tr>
 <tr><td>Tripwire</td><td>Retaliates against every attacking melee enemy for 75% of their
 attack's damage.</td></tr>
+<tr><td>Quarry</td><td>Marked by Aguila (Beastmaster): takes +10% damage from the
+Beastmaster and their pack (3 turns).</td></tr>
+<tr><td>Frenzy</td><td>The Beastmaster spent a full Ferocity bar: companion strikes hit like
+Kill Command (double damage, doubled effect) for 2 turns.</td></tr>
 <tr><td>Broken</td><td>Loses next turn; −30% armor; +25% crit taken.</td></tr>
 </table>
 <p>Statuses tick down at the start of the affected unit's turn; negative durations last the
@@ -597,9 +601,17 @@ both.</li>
 </ul>
 <h3>6.4 Hunter</h3>
 <ul>
-<li><b>Beastmaster (Rush)</b> — Passive <i>Pack Bond</i>: changes with the active companion —
-Ursus: the hunter's attacks deal +25% Break damage; Canis: the hunter's attacks build 15
-Bleed; Aguila: +15% crit chance.<br>
+<li><b>Beastmaster (Rush)</b> — Passive <i>Pack Bond</i>: while a beast prowls the hunter gains its
+boon — Ursus: +25% Break damage AND the hunter takes 15% less damage; Canis: the hunter's
+attacks build 15 Bleed AND the wolf savages prey under 35% HP (+50% damage); Aguila: +15% crit
+AND every eagle strike marks the <b>Quarry</b> (the target takes +10% damage from the
+Beastmaster and the pack, 3 turns).<br>
+<b>Ferocity (0–100, orange bar):</b> the pack's blood-meter. Builds as the pack draws blood —
++10 on the hunter's own hits (+15 on a crit), +5 per companion hit (+10 on a crit), and +40 on
+Kill Command (the order plus its strike). Above 50 the beast is <b>Bloodied</b> (+15% companion
+strike damage). At a full bar the hunter may unleash <b>Frenzy</b> — a free action (button, or
+hotkey C): the bar empties and the pack goes berserk for 2 turns, every companion strike
+hitting like Kill Command (double damage, doubled special effect).<br>
 <b>Companions:</b> one at a time, summoned until it dies or is replaced (placeholder sphere
 sprites: red/blue/green). Summoning goes through the <b>"Summon Companion" beast picker</b>
 at the top of the ability list on hotkey W (see §10). No skill check to summon, no resource
@@ -609,15 +621,17 @@ and crit chance (talents can add companion HP and damage). They automatically at
 (physical) whenever the hunter attacks; they take no timeline turns (statuses tick and Breaks
 recover on the hunter's turn).<br>
 Summon Ursus — 30 Focus, 3.0. Bear, 80 HP: strikes the hunter's target AND one other enemy
-for 10 dmg + 20 BD each.<br>
-Summon Canis — 30 Focus, 3.0. Wolf, 60 HP: 20 dmg, 50% chance to build 20 Bleed.<br>
-Summon Aguila — 30 Focus, 3.0. Eagle, 60 HP: 15 dmg, 50% chance to Sunder (2 turns).<br>
+for 10 dmg + 20 BD each. Pack Bond: +25% Break damage, and the hunter takes 15% less damage.<br>
+Summon Canis — 30 Focus, 3.0. Wolf, 60 HP: 20 dmg, 50% chance to build 20 Bleed, +50% to prey
+under 35% HP. Pack Bond: the hunter's attacks build 15 Bleed.<br>
+Summon Aguila — 30 Focus, 3.0. Eagle, 60 HP: 15 dmg, marks the Quarry, 50% chance to Sunder
+(2 turns). Pack Bond: +15% crit.<br>
 Barbed Arrow — 20 Focus, 20 dmg / 15 BD / 2.5, Cripples 3 turns (Perfect: 4 turns).<br>
 Poisoned Arrow — 20 Focus, 20 NATURE dmg / 15 BD / 2.5, applies 3 stacks of Poison (5 turns)
 (Perfect: 4 stacks).<br>
 Kill Command — 30 Focus, 4.0, the companion strikes the target for DOUBLE damage with its
-special effect doubled (guaranteed procs, doubled Bleed, Sunder 4 turns). Requires a living
-companion. (Perfect: triple damage.)</li>
+special effect doubled (guaranteed procs, doubled Bleed, Sunder 4 turns) and grants +40
+Ferocity. Requires a living companion. (Perfect: triple damage.)</li>
 <li><b>Sharpshooter (Rush)</b> — Passive <i>Lethal Aim</i>: crits deal ×2 damage.<br>
 Aimed Shot — 20 Focus, 45 dmg / 15 BD / 3.0 (Perfect: +25% crit).<br>
 Powershot — 25 Focus, 20 dmg / 20 BD / 3.0, +2% damage for every point of the

@@ -76,6 +76,8 @@ const STATUS_INFO := {
 	"cons_ground": ["Consecrated Ground", "CG", Color(0.9, 0.82, 0.5), "Standing on holy ground: takes 15%\nless damage and reflects 10% of\ndamage taken."],
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
 	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],
+	"quarry": ["Quarry", "Qy", Color(0.95, 0.55, 0.25), "Marked by the eagle: takes 10% more\ndamage from the Beastmaster and\ntheir pack."],
+	"frenzy": ["Frenzy", "Fr", Color(0.95, 0.35, 0.20), "The pack is berserk: companion strikes\nhit like Kill Command (double damage,\ndoubled effect)."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -372,6 +374,11 @@ func _spawn_units() -> void:
 				cfg["second_resource_name"] = "Mercy"
 				cfg["second_resource"] = 0
 				cfg["second_max"] = 5
+			# Ferocity drives the Beastmaster's pack (0-100 → Frenzy).
+			if spec == "beastmaster":
+				cfg["second_resource_name"] = "Ferocity"
+				cfg["second_resource"] = 0
+				cfg["second_max"] = 100
 			# Specs with their own battle art override the shared Soldier sheet.
 			if SPEC_ART.has(spec):
 				for art_key in SPEC_ART[spec]:
@@ -1506,6 +1513,12 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if summon != null and u.resource >= summon.cost and u.ability_ready(summon) \
 					and (u.companion == null or u.companion.dead):
 				return [summon, u]
+			# Beastmaster: a full Ferocity bar with a beast out → Frenzy (free).
+			if u.second_resource_name == "Ferocity" \
+					and u.second_resource >= u.second_max \
+					and u.companion != null and not u.companion.dead \
+					and not u.has_status("frenzy"):
+				_unleash_frenzy(u)
 			var kill_cmd := _find_ability(u, "Kill Command")
 			if kill_cmd != null and u.resource >= kill_cmd.cost and u.ability_ready(kill_cmd) \
 					and u.companion != null and not u.companion.dead:
@@ -1790,6 +1803,16 @@ func _show_actions(u: BattleUnit) -> void:
 		emp_btn.tooltip_text = "Spend +1 Mercy to Empower the next\nHeal / Renewal / Hymn / Resurrection /\nDivine Plea. Empowered casts forgo\ntheir perfect bonus. C toggles."
 		emp_btn.toggled.connect(func(on: bool): empower_armed = on)
 		action_box.add_child(emp_btn)
+	# Ferocity (Beastmaster): the Frenzy unleash lights up at a full bar.
+	if u.second_resource_name == "Ferocity":
+		var frz_btn := Button.new()
+		frz_btn.text = "⚔ Frenzy (C)"
+		frz_btn.custom_minimum_size = Vector2(112, 32)
+		frz_btn.add_theme_font_size_override("font_size", 13)
+		frz_btn.disabled = u.second_resource < u.second_max
+		frz_btn.tooltip_text = "Spend a full Ferocity bar: the pack goes\nberserk for 2 turns — companion strikes\nhit like Kill Command. C unleashes."
+		frz_btn.pressed.connect(_unleash_frenzy.bind(u))
+		action_box.add_child(frz_btn)
 	action_panel.visible = true
 
 
@@ -2797,6 +2820,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Target-side modifiers.
 			if strike_target.second_resource_name == "Resonance":
 				raw *= 1.0 + 0.05 * _resonance_power(strike_target)
+			# Quarry (Aguila): the eagle's mark opens the target to the
+			# Beastmaster's own shots (the pack's boost lives in _companion_hit).
+			if strike_target.has_status("quarry") and attacker.is_hero \
+					and attacker.passive_id == "pack":
+				raw *= 1.10
+			# Pack Bond (Ursus): the bear stands between the hunter and harm.
+			if strike_target.is_hero and strike_target.passive_id == "pack" \
+					and strike_target.companion != null \
+					and not strike_target.companion.dead \
+					and strike_target.companion.companion_kind == "ursus":
+				raw *= 0.85
 			# Stabilized: grounded resonance blunts incoming blows.
 			if strike_target.has_status("stabilized"):
 				raw *= 1.0 - strike_target.status_power("stabilized") / 100.0
@@ -3308,7 +3342,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				attacker.heal_amount(drained)
 				attacker.float_text("+%d" % drained, Color(0.4, 0.9, 0.45))
 				_log("   → %s drains %d HP" % [attacker.unit_name, drained], "#70d878")
-		# The Beastmaster's companion strikes alongside the hunter.
+		# The hunter's own blows feed Ferocity, pack at their side or not.
+		if attacker.is_hero and attacker.passive_id == "pack" and ab.damage > 0 \
+				and not is_counter and total_dealt > 0:
+			_gain_ferocity(attacker, 15 if any_crit else 10)
+		# The Beastmaster's companion strikes alongside the hunter — and hits
+		# like Kill Command while Frenzy rides.
 		if attacker.is_hero and attacker.passive_id == "pack" and ab.damage > 0 \
 				and not is_counter and attacker.companion != null \
 				and not attacker.companion.dead:
@@ -3317,7 +3356,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var foes := enemies.filter(func(e): return not e.dead)
 				comp_target = null if foes.is_empty() else _lowest_hp(foes)
 			if comp_target != null:
-				await _companion_strike(attacker.companion, comp_target, 1.0, false)
+				var frenzied := attacker.has_status("frenzy")
+				await _companion_strike(attacker.companion, comp_target,
+					2.0 if frenzied else 1.0, frenzied)
 		# Tripwire: rigged ground bites every attacking melee enemy.
 		if not attacker.is_hero and not attacker.is_ranged and not is_counter \
 				and total_dealt > 0:
@@ -3468,6 +3509,38 @@ func _dot_tick(id: String, applier: BattleUnit) -> int:
 	if id == "burn":
 		pct += applier.accelerant_ranks
 	return maxi(int(round(pct * 0.01 * applier.attack)), 1)
+
+
+# Ferocity: the Beastmaster's pack meter (0-100). Builds as the pack draws
+# blood — the hunter's own hits, companion strikes, and crits. Above 50 the
+# beast is Bloodied (+15% strikes); at 100 the hunter may unleash Frenzy.
+func _gain_ferocity(hunter: BattleUnit, amount: int) -> void:
+	if hunter == null or hunter.dead or hunter.second_resource_name != "Ferocity":
+		return
+	var before := hunter.second_resource
+	hunter.second_resource = mini(hunter.second_resource + amount, hunter.second_max)
+	var gained := hunter.second_resource - before
+	if gained > 0:
+		hunter.float_text("+%d Ferocity" % gained, Color(0.95, 0.55, 0.25))
+		hunter.refresh_bars()
+
+
+# Frenzy: spend a full Ferocity bar to send the pack berserk for 2 turns —
+# companion strikes hit like Kill Command. A free action (like Mercy's
+# Empower): the hunter still takes their turn afterward.
+func _unleash_frenzy(u: BattleUnit) -> void:
+	if u == null or u.second_resource_name != "Ferocity" \
+			or u.second_resource < u.second_max:
+		return
+	u.second_resource = 0
+	u.refresh_bars()
+	_apply_status(u, "frenzy", 2)
+	u.float_text("FRENZY!", Color(0.95, 0.35, 0.20))
+	_sfx("crit", -6.0, 0.7)
+	_message("%s unleashes the pack!" % u.unit_name)
+	_log("%s: FRENZY — the pack goes berserk for 2 turns" % u.unit_name, "#e0704a")
+	if not autoplay and not sim and action_panel.visible:
+		_show_actions(u)
 
 
 # Arcane Resonance: builds on damaging casts (2 on crit via Arcane Instability);
@@ -4113,6 +4186,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s orders %s to savage %s!" % [attacker.unit_name,
 					comp.unit_name, target.unit_name], "#e0a050")
 				await _companion_strike(comp, target, 3.0 if is_perfect else 2.0, true)
+				# The killing order stokes the pack's Ferocity (~+40 with the strike).
+				_gain_ferocity(attacker, 30)
 		"battle_shout":
 			var shout_bleed := 0
 			for e in enemies:
@@ -4391,6 +4466,7 @@ func _do_summon(hunter: BattleUnit, kind: String) -> void:
 		_hero_plate_pos(heroes.size()))
 	comp.is_companion = true
 	comp.companion_kind = kind
+	comp.pack_master = hunter
 	comp.crit_bonus = hunter.crit_bonus
 	comp.companion_power = hunter.companion_power
 	comp.next_time = INF  # never drawn a turn from the timeline
@@ -4409,22 +4485,32 @@ func _companion_strike(comp: BattleUnit, victim: BattleUnit, mult: float,
 	if comp == null or comp.dead or victim == null or victim.dead:
 		return
 	var proc_chance := 1.0 if boosted else 0.5
+	# Bloodied: above 50 Ferocity the beast's blows land 15% harder (damage
+	# only — Break/Bleed still scale with `mult`, not with the frenzy).
+	var dmg_mult := mult
+	if comp.pack_master != null and comp.pack_master.second_resource > 50:
+		dmg_mult *= 1.15
 	# Beast blows are a % of the companion's Attack (inherited from the
 	# hunter, node scaling included): Ursus 10%, Canis 20%, Aguila 15%.
 	match comp.companion_kind:
 		"ursus":
-			await _companion_hit(comp, victim, 0.10 * comp.attack * mult, int(20 * mult))
+			await _companion_hit(comp, victim, 0.10 * comp.attack * dmg_mult, int(20 * mult))
 			# The bear's sweep also mauls the enemy beside the target.
 			var others := enemies.filter(func(e): return not e.dead and e != victim)
 			if not others.is_empty():
 				await _companion_hit(comp, others.pick_random(),
-					0.10 * comp.attack * mult, int(20 * mult))
+					0.10 * comp.attack * dmg_mult, int(20 * mult))
 		"canis":
-			await _companion_hit(comp, victim, 0.20 * comp.attack * mult, 0)
+			# The wolf savages wounded prey (under 35% HP) for +50%.
+			var execute := 1.5 if victim.hp < victim.max_hp * 0.35 else 1.0
+			await _companion_hit(comp, victim, 0.20 * comp.attack * dmg_mult * execute, 0)
 			if not victim.dead and randf() < proc_chance:
 				_add_bleed_with_burst(victim, 40 if boosted else 20)
 		"aguila":
-			await _companion_hit(comp, victim, 0.15 * comp.attack * mult, 0)
+			await _companion_hit(comp, victim, 0.15 * comp.attack * dmg_mult, 0)
+			# Every eagle strike brands the Quarry (pack-only +10% damage).
+			if not victim.dead:
+				_apply_status(victim, "quarry", 3)
 			if not victim.dead and randf() < proc_chance:
 				_apply_status(victim, "sunder", 4 if boosted else 2)
 
@@ -4437,6 +4523,9 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int) -
 	var is_crit := randf() < CRIT_CHANCE + comp.crit_bonus + (0.25 if victim.broken else 0.0)
 	if is_crit:
 		raw *= 1.5
+	# Quarry: the eagle's mark opens the target to the whole pack (+10%).
+	if victim.has_status("quarry"):
+		raw *= 1.10
 	raw *= 1.0 - float(victim.resists.get("physical", 0.0))
 	var final := maxi(int(round(raw * (1.0 - victim.effective_armor()))), 1)
 	var result: Dictionary = victim.take_hit(final, pr)
@@ -4447,6 +4536,9 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int) -
 		victim.hit_react((victim.position - comp.position).normalized())
 	_log("%s: strikes %s for %d%s" % [comp.unit_name, victim.unit_name, final,
 		" CRIT" if is_crit else ""], "#d8b880")
+	# The beast drawing blood feeds the hunter's Ferocity (crits bite deeper).
+	if comp.pack_master != null:
+		_gain_ferocity(comp.pack_master, 10 if is_crit else 5)
 	if result.broke:
 		_stat("breaks_on_enemies" if not victim.is_hero else "breaks_on_heroes")
 		_sfx("break", -3.0)
@@ -4690,6 +4782,14 @@ func _input(event: InputEvent) -> void:
 				and current_hero.second_resource >= 1:
 			empower_armed = not empower_armed
 			_show_actions(current_hero)
+			get_viewport().set_input_as_handled()
+			return
+		# C unleashes Frenzy for the Beastmaster once Ferocity is full.
+		if event.keycode == KEY_C and action_panel.visible \
+				and current_hero != null \
+				and current_hero.second_resource_name == "Ferocity" \
+				and current_hero.second_resource >= current_hero.second_max:
+			_unleash_frenzy(current_hero)
 			get_viewport().set_input_as_handled()
 			return
 		if event.keycode in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
