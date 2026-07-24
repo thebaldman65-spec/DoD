@@ -63,6 +63,28 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+BEASTMASTER FEROCITY + KIT v2 (07-24, Batches 26-27): second resource
+"Ferocity" 0-100 (orange bar, spec config block). _gain_ferocity sites:
+hunter damaging ability +10/+15crit (post-strike-loop, total_dealt>0),
+companion hit +5/+10crit (_companion_hit), Kill Command +30 flat (~+40
+with the strike). >50 = Bloodied (+15% into dmg_mult in _companion_strike
+— damage only, BD/Bleed keep `mult`). Full bar → _unleash_frenzy (FREE
+action: button in _show_actions + KEY_C branch in _input; bot pops it) =
+"frenzy" 2t → co-strike site passes (2.0, true) = Kill-Command-grade.
+Beast hooks: Ursus 0.85 target-side on the hunter (living-ursus gate),
+Canis ×1.5 execute <35% HP (_companion_strike), Aguila strikes apply
+"quarry" 3t (+10% from hunter in _resolve target-side AND pack in
+_companion_hit). comp.pack_master = beast→hunter back-ref (NOT "owner" —
+collides with Node.owner = parse error). KIT v2: Barbed/Poisoned Arrow
+VAULTED. Wild Call ("wild_call" special, modal on companion_kind): ursus
+Guardian's Roar = take_hit(0,10) every enemy + "roar" status (0.75
+target-side) 2t; canis Bloodhowl = _add_bleed_with_burst(e,15) on every
+bleeder; aguila Skycry = quarry 2t field-wide; +10 Ferocity (+20 perf).
+Feral Mending ("feral_mending"): heal companion 25/35%perf of the
+HUNTER'S max HP + purge_debuffs + 10 Ferocity. Both specials sit in the
+no-target list and share kill_command's living-companion gate
+(_ability_usable + button tooltip). Bot: mend <50% beast HP → KC → call
+(canis waits for a bleeder).
 HOLY MERCY REWORK (07-22): FAITH IS GONE from all clerics (no second
 resource except Holy; the +10/action build site removed; ability
 faith_cost now = generic secondary cost). MIRACLE keyword retired. Core

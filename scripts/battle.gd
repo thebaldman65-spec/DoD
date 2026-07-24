@@ -77,6 +77,7 @@ const STATUS_INFO := {
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
 	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],
 	"quarry": ["Quarry", "Qy", Color(0.95, 0.55, 0.25), "Marked by the eagle: takes 10% more\ndamage from the Beastmaster and\ntheir pack."],
+	"roar": ["Guardian's Roar", "GR", Color(0.85, 0.60, 0.30), "The bear stands firm: takes 25%\nless damage."],
 	"frenzy": ["Frenzy", "Fr", Color(0.95, 0.35, 0.20), "The pack is berserk: companion strikes\nhit like Kill Command (double damage,\ndoubled effect)."],
 }
 
@@ -1305,7 +1306,8 @@ func _player_turn(u: BattleUnit) -> void:
 				"phoenix", "hymn", "retaliate", "unity", "tripwire", "summon",
 				"mana_shield", "divine_wrath", "shield_block", "hold_the_line",
 				"battle_shout", "flame_shield", "stabilize", "overcharge",
-				"cons_ground", "bulwark", "dark_pact", "hysteria"]:
+				"cons_ground", "bulwark", "dark_pact", "hysteria",
+				"wild_call", "feral_mending"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "resurrection":
 			# Resurrection targets the FALLEN (the usable gate guarantees one).
@@ -1519,10 +1521,25 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 					and u.companion != null and not u.companion.dead \
 					and not u.has_status("frenzy"):
 				_unleash_frenzy(u)
+			# Tend a wounded beast before pressing the attack.
+			var mend := _find_ability(u, "Feral Mending")
+			if mend != null and u.resource >= mend.cost and u.ability_ready(mend) \
+					and u.companion != null and not u.companion.dead \
+					and u.companion.hp < u.companion.max_hp * 0.5:
+				return [mend, u]
 			var kill_cmd := _find_ability(u, "Kill Command")
 			if kill_cmd != null and u.resource >= kill_cmd.cost and u.ability_ready(kill_cmd) \
 					and u.companion != null and not u.companion.dead:
 				return [kill_cmd, target_foe]
+			# Wild Call: sound off whenever the beast stands (Canis waits for blood).
+			var wcall := _find_ability(u, "Wild Call")
+			if wcall != null and u.resource >= wcall.cost and u.ability_ready(wcall) \
+					and u.companion != null and not u.companion.dead:
+				var wc_ok := true
+				if u.companion.companion_kind == "canis":
+					wc_ok = enemies.any(func(e): return not e.dead and e.bleed_buildup > 0)
+				if wc_ok:
+					return [wcall, u]
 			var parrow := _find_ability(u, "Poisoned Arrow")
 			if parrow != null and u.resource >= parrow.cost and u.ability_ready(parrow) and randf() < 0.4 \
 					and not target_foe.has_status("poison"):
@@ -1823,7 +1840,8 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 		return false
 	if not u.ability_ready(ab):
 		return false
-	if ab.special == "kill_command" and (u.companion == null or u.companion.dead):
+	if ab.special in ["kill_command", "wild_call", "feral_mending"] \
+			and (u.companion == null or u.companion.dead):
 		return false
 	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
 		return false
@@ -1863,7 +1881,8 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	ab_btn.add_theme_font_size_override("font_size", 13)
 	ab_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	ab_btn.tooltip_text = _ability_tooltip(u, ab)
-	if ab.special == "kill_command" and (u.companion == null or u.companion.dead):
+	if ab.special in ["kill_command", "wild_call", "feral_mending"] \
+			and (u.companion == null or u.companion.dead):
 		ab_btn.tooltip_text += "\n(No living companion)"
 	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
 		ab_btn.tooltip_text += "\n(No fallen allies)"
@@ -2855,6 +2874,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.15
 			# High Guard: hardened stance after a parry.
 			if strike_target.has_status("high_guard"):
+				raw *= 0.75
+			# Guardian's Roar: the bear weathers the storm.
+			if strike_target.has_status("roar"):
 				raw *= 0.75
 			if strike_target.dmg_taken_bonus > 0.0:
 				raw *= 1.0 + strike_target.dmg_taken_bonus
@@ -4188,6 +4210,66 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				await _companion_strike(comp, target, 3.0 if is_perfect else 2.0, true)
 				# The killing order stokes the pack's Ferocity (~+40 with the strike).
 				_gain_ferocity(attacker, 30)
+		"wild_call":
+			# Modal command: the effect is the active beast's voice.
+			var wc_comp: BattleUnit = attacker.companion
+			if wc_comp != null and not wc_comp.dead:
+				match wc_comp.companion_kind:
+					"ursus":
+						_sfx("break", -6.0, 0.8)
+						_message("%s: GUARDIAN'S ROAR!" % wc_comp.unit_name)
+						_log("%s: Guardian's Roar — 10 BD to every enemy; the bear digs in" % \
+							wc_comp.unit_name, "#e0a050")
+						_apply_status(wc_comp, "roar", 2)
+						for wc_e in enemies.filter(func(en): return not en.dead):
+							var wc_r: Dictionary = wc_e.take_hit(0, 10)
+							wc_e.float_text("+10 BD", Color(0.8, 0.35, 1.0))
+							if wc_r.broke:
+								_stat("breaks_on_enemies")
+								_sfx("break", -3.0)
+								_message("%s BREAKS!" % wc_e.unit_name)
+								_log("!! %s BREAKS" % wc_e.unit_name, "#c070e0")
+								await _break_impact()
+								_shake()
+					"canis":
+						_sfx("crit", -6.0, 0.6)
+						_message("%s: BLOODHOWL!" % wc_comp.unit_name)
+						var howled := 0
+						for wc_e in enemies.filter(func(en): return not en.dead):
+							if wc_e.bleed_buildup > 0:
+								_add_bleed_with_burst(wc_e, 15)
+								howled += 1
+						if howled > 0:
+							_log("%s: Bloodhowl — +15 Bleed to %d bleeding enem%s" % [
+								wc_comp.unit_name, howled, "y" if howled == 1 else "ies"],
+								"#e05050")
+						else:
+							_log("%s: Bloodhowl — the howl finds no open wounds" % \
+								wc_comp.unit_name, "#909090")
+					"aguila":
+						_sfx("crit", -8.0, 1.3)
+						_message("%s: SKYCRY!" % wc_comp.unit_name)
+						_log("%s: Skycry — every enemy is marked Quarry (2 turns)" % \
+							wc_comp.unit_name, "#e0a050")
+						for wc_e in enemies.filter(func(en): return not en.dead):
+							_apply_status(wc_e, "quarry", 2)
+				_gain_ferocity(attacker, 20 if is_perfect else 10)
+		"feral_mending":
+			var fm_comp: BattleUnit = attacker.companion
+			if fm_comp != null and not fm_comp.dead:
+				var fm_amt := int(attacker.max_hp * (0.35 if is_perfect else 0.25))
+				var fm_healed: int = fm_comp.heal_amount(fm_amt)
+				fm_comp.float_text("+%d" % fm_healed, Color(0.4, 0.9, 0.45))
+				var fm_purged: int = fm_comp.purge_debuffs()
+				_sfx("heal", -5.0, 0.9)
+				_message("%s tends the pack!" % attacker.unit_name)
+				_log("%s: Feral Mending — %s heals %d" % [attacker.unit_name,
+					fm_comp.unit_name, fm_healed], "#70d878")
+				if fm_purged > 0:
+					_log("   → %d debuff(s) cleansed from %s" % [fm_purged,
+						fm_comp.unit_name], "#70d878")
+				fm_comp.refresh_bars()
+				_gain_ferocity(attacker, 10)
 		"battle_shout":
 			var shout_bleed := 0
 			for e in enemies:
