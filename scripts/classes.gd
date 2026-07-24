@@ -502,7 +502,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Dark Pact", "cooldown": 3, "cost": 20,
 					"special": "dark_pact", "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Restores 5 Mana",
-					"description": "Bleed for them: lose 20% max health;\nALL allies heal 15% of their max\nhealth, and the Occultist regains\n30% of max health over 3 turns."}),
+					"description": "Bleed for them: lose 20% max health;\nevery OTHER ally heals 15% of their\nmax health, and the Occultist regains\n30% of max health over 3 turns."}),
 			]
 		"beastmaster":
 			return [

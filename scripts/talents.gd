@@ -370,7 +370,7 @@ const FIXED_TREES := {
 		{"id": "oc_pleasure", "name": "Pleasure from Pain", "ranks": 3, "row": 0, "col": 3,
 			"gate": "row", "requires": "", "requires_ranks": 0,
 			"desc": "At the end of the Occultist's turn, the party heals {v}% of the Occultist's max health for every UNIQUE debuff on the enemy team.",
-			"scale": {"step": 1.5},
+			"scale": {"step": 0.5},
 			"payload": {"stat": {"pleasure_ranks": 1}}},
 		# --- row 1 ---
 		{"id": "oc_channeling", "name": "Corrupted Channeling", "ranks": 3, "row": 1, "col": 0,
@@ -389,7 +389,7 @@ const FIXED_TREES := {
 			"payload": {"grant_ability": "Mind Flay"}},
 		{"id": "oc_invigoration", "name": "Invigoration", "ranks": 3, "row": 1, "col": 3,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Dark Pact also restores {v}% of the Occultist's max Mana per turn for 3 turns.",
+			"desc": "Dark Pact also restores {v}% of the Cleric's max Mana each turn for 3 turns.",
 			"scale": {"step": 2},
 			"payload": {"stat": {"invigoration_ranks": 1}}},
 		{"id": "oc_spread", "name": "Spread of Madness", "ranks": 3, "row": 1, "col": 4,

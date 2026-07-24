@@ -111,7 +111,7 @@ status (-1t, removed when acted, pre-psychosis in _enemy_turn): 0-cost
 attack copy w/ pressure×2 + sunder 3t. Kit: Shadowrend 50% + cripple
 2t, Hex of Ruin CHOOSE_THREE (new ability flag + third_target +
 targeting loop + strike_targets; perfect ERASES its cooldown), Dark
-Pact ("dark_pact" special: -20% self HP clamp 1, party 15% own-max
+Pact ("dark_pact" special: -20% self HP clamp 1, party-EXCEPT-SELF 15% own-max
 heal, self renewal 3t @10%/turn, invig status = mana tick at turn
 start), talent-granted Mind Flay (choose_two + psychosis
 applies_status w/ status_plus perfect) + Mass Hysteria capstone
@@ -120,7 +120,7 @@ applies_status w/ status_plus perfect) + Mass Hysteria capstone
 frozen/psychosis/bewitch/hysteria all resist unless Broken
 (_apply_status guard). Talents: Corrupted Channeling now
 channeling_ranks (25%/rank of a Crippled attacker's damage), Pleasure
-from Pain end-of-_player_turn (1.5%/rank Occ max HP × unique enemy
+from Pain end-of-_player_turn (0.5%/rank Occ max HP × unique enemy
 debuffs — _unique_enemy_debuffs helper), Dark Infusion attacker-side,
 Broken Will pr-side (replaced the old mindflay pr site), Umbral Mirror
 wraps the enemy→hero applies_status branch. GOTCHA RE-HIT: multiline

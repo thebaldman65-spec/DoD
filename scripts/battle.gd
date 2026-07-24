@@ -1373,7 +1373,7 @@ func _player_turn(u: BattleUnit) -> void:
 	if u.pleasure_ranks > 0 and not u.dead and not battle_over:
 		var pp_uniques := _unique_enemy_debuffs()
 		if pp_uniques > 0:
-			var pp_amt := maxi(int(round(u.max_hp * 0.015 * u.pleasure_ranks
+			var pp_amt := maxi(int(round(u.max_hp * 0.005 * u.pleasure_ranks
 				* pp_uniques)), 1)
 			for pp_h in heroes.filter(func(h): return not h.dead and not h.is_companion):
 				var pp_got: int = pp_h.heal_amount(pp_amt, pp_h != u)
@@ -4051,9 +4051,12 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			attacker.float_text("-%d" % pact_cost, Color(1.0, 0.4, 0.5))
 			attacker.refresh_bars()
 			_sfx("heal", -5.0, 0.6)
+			# The pact-maker bleeds; every OTHER party member drinks.
 			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
+				if h == attacker:
+					continue
 				var dp_amt := maxi(int(round(h.max_hp * 0.15)), 1)
-				var dp_hgot: int = h.heal_amount(dp_amt, h != attacker)
+				var dp_hgot: int = h.heal_amount(dp_amt, true)
 				h.float_text("+%d" % dp_hgot, Color(0.7, 0.4, 0.9))
 				_stat("healing", dp_hgot)
 			# The Occultist knits back together over 3 turns (10%/turn).
