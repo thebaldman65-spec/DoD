@@ -63,28 +63,38 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
-BEASTMASTER FEROCITY + KIT v2 (07-24, Batches 26-27): second resource
-"Ferocity" 0-100 (orange bar, spec config block). _gain_ferocity sites:
-hunter damaging ability +10/+15crit (post-strike-loop, total_dealt>0),
-companion hit +5/+10crit (_companion_hit), Kill Command +30 flat (~+40
-with the strike). >50 = Bloodied (+15% into dmg_mult in _companion_strike
-— damage only, BD/Bleed keep `mult`). Full bar → _unleash_frenzy (FREE
-action: button in _show_actions + KEY_C branch in _input; bot pops it) =
-"frenzy" 2t → co-strike site passes (2.0, true) = Kill-Command-grade.
-Beast hooks: Ursus 0.85 target-side on the hunter (living-ursus gate),
-Canis ×1.5 execute <35% HP (_companion_strike), Aguila strikes apply
-"quarry" 3t (+10% from hunter in _resolve target-side AND pack in
-_companion_hit). comp.pack_master = beast→hunter back-ref (NOT "owner" —
-collides with Node.owner = parse error). KIT v2: Barbed/Poisoned Arrow
-VAULTED. Wild Call ("wild_call" special, modal on companion_kind): ursus
-Guardian's Roar = take_hit(0,10) every enemy + "roar" status (0.75
-target-side) 2t; canis Bloodhowl = _add_bleed_with_burst(e,15) on every
-bleeder; aguila Skycry = quarry 2t field-wide; +10 Ferocity (+20 perf).
-Feral Mending ("feral_mending"): heal companion 25/35%perf of the
-HUNTER'S max HP + purge_debuffs + 10 Ferocity. Both specials sit in the
-no-target list and share kill_command's living-companion gate
-(_ability_usable + button tooltip). Bot: mend <50% beast HP → KC → call
-(canis waits for a bleeder).
+BEASTMASTER v3 LOYALTY (07-24, Batch 28; replaces Ferocity/Frenzy/Wild
+Call/Quarry — all machinery REMOVED): archetype RAMP. ALL HUNTERS ON
+MANA (class cfg resource_name; +12/turn shared branch; Quick Shot
+perfect_id "mana"; party_screen Focus tooltip dropped). LOYALTY = dict
+on the HUNTER (unit.loyalty kind→0-5, chip "L#" stamped on the beast
+via _stamp_loyalty_chip): +1 at hunter turn start w/ beast active
+(companion-tick block) + on summon/swap (_do_summon); reset in the
+strike-loop death site (is_companion → pack_master.loyalty[kind]=0).
+Per stack: ×(1+.05L) in _companion_strike; gifts — ursus +3% base HP
+(live in _gain_loyalty + re-applied at spawn), canis bleed 20+2L
+(always, ×2 boosted), aguila pen 0.20L (pen param on _companion_hit).
+At 5: bond doubles. Bonds: ursus Savage Presence (enemy-pick redirect
+15/30% in _enemy_turn else-branch + hunter ×0.90/0.80 target-side),
+canis hunter ×(1+0.15/0.30 per enemy <35%) attacker-side, aguila party
+crit +10/20% (_living_aguila; attacker.is_hero not companion). Arrival
+effects (_arrival_effect, fires on summon AND swap): ursus Guardian's
+Roar (taunt lowest-HP un-mocked — MOCKED POWER ≥100 ENCODES COMPANION
+TAUNTS as 100+hunter_idx, decoded in _enemy_turn — + "roar" 0.75
+target-side 2t), canis Bloodhowl 15 bleed ALL, aguila dive 15% Atk +
+dazed 2t (needs target: summon targeting branch exempts *Aguila from
+the self-cast list; bot passes u → fallback lowest-HP). SWAP: picker
+builds "Swap X" CLONES (10 Mana, delay 1.0, cooldown 0) when companion
+alive; shared cd = cooldowns["Swap Companion"]=3 set in _do_summon on
+was_swap; gates in _ability_usable (begins_with "Swap": shared cd +
+not-active-kind). Kit: summons 20 Mana/3cd (ursus 110hp target+
+_adjacent_enemies 10%, canis 80hp 20%+20bleed, aguila 80hp 20%+exposed
+2t/4t boosted); Marking Shot 25 Mana 2cd 20% (perfect flat 25% via the
+Frostbolt override list; special "marking_shot" = _spirit_strike per
+absent kind, active beast covered by the normal co-strike); Feral
+Mending heals 25/30%perf of the BEAST'S max + purge + 1 Loyalty; KC
+2.0×/boosted, perfect +1 Loyalty. Bot: mend<50% → KC → Marking Shot.
+Shadowrend 50→25%.
 HOLY MERCY REWORK (07-22): FAITH IS GONE from all clerics (no second
 resource except Holy; the +10/action build site removed; ability
 faith_cost now = generic secondary cost). MIRACLE keyword retired. Core

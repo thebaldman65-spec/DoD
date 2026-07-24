@@ -162,7 +162,6 @@ func _draw_detail() -> void:
 	var resource_tips := {
 		"Mana": "Mana — spent on abilities; +12 at the start of each turn.",
 		"Rage": "Rage — spent on abilities; +5 at turn start, +10 when hit,\nand attacks build more.",
-		"Focus": "Focus — spent on abilities; +15 at the start of each turn.",
 	}
 	# Resistances: armor's cousins, one per element (0% until specs get
 	# their blocks). Weaknesses would show as negatives.

@@ -19,7 +19,7 @@ const WEAKNESS_EXTRA := 0.25
 const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	"bleed", "sunder", "mocked", "stunned", "exposed", "cripple", "dazed",
 	"bewitch", "psychosis", "decay", "ruin", "hysteria",
-	"umbral_sigil", "elem_weak", "melted", "quarry", "broken"]
+	"umbral_sigil", "elem_weak", "melted", "broken"]
 
 var frame_size := 100      # square frame edge of this unit's sprite strips
 var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
@@ -68,6 +68,7 @@ var is_companion := false   # Beastmaster summon: no turns, fights alongside
 var companion_kind := ""    # "ursus" / "canis" / "aguila"
 var companion: BattleUnit   # the Beastmaster's active summon (on the hunter)
 var pack_master: BattleUnit  # the hunter this companion belongs to (on the beast)
+var loyalty := {}           # Beastmaster: per-beast Loyalty stacks (on the hunter)
 var companion_hp_bonus := 0   # talents: extra HP for summoned companions
 var companion_power := 0      # talents: extra damage on companion attacks
 # Fixed-tree talent stats (0/0.0 = not learned). See talents.gd for sources.
@@ -424,8 +425,7 @@ func build_plate(root: Node2D) -> void:
 	if second_resource_name != "":
 		_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9)))
 		var res2_color := Color(0.95, 0.80, 0.30) if second_resource_name == "Mercy" \
-			else (Color(0.92, 0.42, 0.20) if second_resource_name == "Ferocity" \
-			else Color(0.75, 0.40, 0.95))
+			else Color(0.75, 0.40, 0.95)
 		_res2_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, 7), res2_color)
 		_plate_panel.add_child(_res2_fill)
 		_res2_text = _make_bar_text(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9), 8)

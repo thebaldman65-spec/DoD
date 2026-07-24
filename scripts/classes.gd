@@ -52,7 +52,7 @@ static func hero_config(key: String) -> Dictionary:
 			return {"unit_name": "Hunter", "is_hero": true, "sheet_dir": soldier,
 				"max_hp": 110, "attack": 100, "armor": 0.12, "speed": 105.0,
 				"stability": 100, "constitution": 95, "is_ranged": true,
-				"resource_name": "Focus", "resource": 100, "max_resource": 100,
+				"resource_name": "Mana", "resource": 100, "max_resource": 100,
 				"abilities": kit(key)}
 		"warrior":
 			return {"unit_name": "Warrior", "is_hero": true, "sheet_dir": soldier,
@@ -90,7 +90,7 @@ static func hunter_kit() -> Array:
 	return [
 		Ability.make({"display_name": "Quick Shot", "cost": 0, "damage": 20, "pressure": 14,
 			"delay": 2.0, "anim": "attack01",
-			"perfect_id": "focus", "perfect_text": "+10 bonus Focus",
+			"perfect_id": "mana", "perfect_text": "+10 bonus Mana",
 			"description": "Basic ranged shot."}),
 	]
 
@@ -190,7 +190,7 @@ static func pending_talent_ability(display_name: String) -> Ability:
 static func apply_kit_overrides(cfg: Dictionary, spec: String) -> void:
 	if spec == "occultist":
 		cfg["abilities"][0] = Ability.make({"display_name": "Shadowrend",
-			"dmg_type": "shadow", "cost": 0, "damage": 50, "pressure": 16,
+			"dmg_type": "shadow", "cost": 0, "damage": 25, "pressure": 16,
 			"delay": 2.0, "anim": "attack01",
 			"applies_status": {"id": "cripple", "turns": 2},
 			"perfect_id": "self_heal", "perfect_text": "Cleric recovers 5% max health",
@@ -315,8 +315,8 @@ const SPEC_INFO := {
 	"occultist": {"name": "Occultist", "constitution": 95, "archetype": "Pressure", "passive": "old_gods",
 		"passive_desc": "Wrath of the Old Gods: your debuffs mark the target with Ruin\n(max 5). Each stack: +2% damage taken; heroes striking a Ruined\ntarget heal 10% of the damage dealt. One turn after reaching 5\nstacks, Ruin detonates — 50% of Attack as shadow damage, and the\nparty heals 15% of the Occultist's max health.",
 		"blurb": "Forbidden rites — leech life and trade blood for power."},
-	"beastmaster": {"name": "Beastmaster", "constitution": 100, "archetype": "Rush", "passive": "pack",
-		"passive_desc": "Pack Bond, by beast — Ursus: +25% Break damage & you take\n15% less damage; Canis: attacks build 15 Bleed & the wolf savages\nprey under 35% HP (+50%); Aguila: +15% crit & strikes mark the\nQuarry (+10% damage from you and the pack). FEROCITY builds as the\npack draws blood (companion strikes, your hits, crits); above 50 the\nbeast is Bloodied (+15% strikes); at 100, unleash Frenzy.",
+	"beastmaster": {"name": "Beastmaster", "constitution": 100, "archetype": "Ramp", "passive": "pack",
+		"passive_desc": "Pack Bond — the active beast grants its boon: Ursus, Savage\nPresence: enemies are drawn to the bear and you take 10% less\ndamage; Canis: +15% damage per enemy under 35% health; Aguila: the\nwhole party gains +10% crit. LOYALTY (per beast, max 5): +1 each\nturn it stands with you and on summon/swap; +5% strike damage per\nstack plus a beast-specific gift; at 5 the boon is DOUBLED. Meters\nlast until that beast dies.",
 		"blurb": "The wilds hunt beside them — every kill is shared."},
 	"sharpshooter": {"name": "Sharpshooter", "constitution": 90, "archetype": "Rush", "passive": "lethal_aim",
 		"passive_desc": "Lethal Aim: critical hits deal x2 damage instead of x1.5.",
@@ -506,30 +506,30 @@ static func spec_abilities(spec: String) -> Array:
 			]
 		"beastmaster":
 			return [
-				Ability.make({"display_name": "Summon Ursus", "cooldown": 3, "cost": 30, "special": "summon",
+				Ability.make({"display_name": "Summon Ursus", "cooldown": 3, "cost": 20, "special": "summon",
 					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
 					"perfect_id": "", "perfect_text": "",
-					"description": "Call the bear (80 HP): attacks with you,\nmauling your target AND a second enemy\nfor 10 damage + 20 BD each.\nPack Bond: +25% Break damage AND you\ntake 15% less damage while Ursus prowls."}),
-				Ability.make({"display_name": "Summon Canis", "cooldown": 3, "cost": 30, "special": "summon",
+					"description": "Call the bear (110 HP): attacks with\nyou, striking your target AND adjacent\nenemies for 10% of your Attack.\nSavage Presence: enemies are drawn to\nUrsus; you take 10% less damage.\nOn arrival: GUARDIAN'S ROAR — taunts\nthe weakest enemy, bear takes 25% less\ndamage for 2 turns.\nLoyalty gift: +3% max health per stack."}),
+				Ability.make({"display_name": "Summon Canis", "cooldown": 3, "cost": 20, "special": "summon",
 					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
 					"perfect_id": "", "perfect_text": "",
-					"description": "Call the wolf (60 HP): attacks with you\nfor 20 damage, 50% chance to build 20\nBleed, and +50% to prey under 35% HP.\nPack Bond: your attacks build 15 Bleed\nwhile Canis hunts."}),
-				Ability.make({"display_name": "Summon Aguila", "cooldown": 3, "cost": 30, "special": "summon",
+					"description": "Call the wolf (80 HP): attacks with you\nfor 20% of your Attack, building\n20 Bleed. Pack Bond: +15% damage per\nenemy under 35% health.\nOn arrival: BLOODHOWL — 15 Bleed\nto every enemy.\nLoyalty gift: +2 Bleed per stack."}),
+				Ability.make({"display_name": "Summon Aguila", "cooldown": 3, "cost": 20, "special": "summon",
 					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
 					"perfect_id": "", "perfect_text": "",
-					"description": "Call the eagle (60 HP): attacks with you\nfor 15 damage, 50% chance to Sunder,\nand marks the Quarry (+10% damage from\nyou and the pack). Pack Bond: +15% crit\nchance while Aguila circles."}),
-				Ability.make({"display_name": "Wild Call", "cooldown": 2, "cost": 20, "special": "wild_call",
-					"delay": 2.0, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "+20 Ferocity instead of +10",
-					"description": "Command the beast to sound off —\nUrsus roars: 10 BD to every enemy, the\nbear takes 25% less damage (2 turns).\nCanis howls: Bleeding enemies gain\n+15 Bleed. Aguila cries: every enemy\nis marked Quarry for 2 turns.\n+10 Ferocity. Needs a living companion."}),
+					"description": "Call the eagle (80 HP): attacks with you\nfor 20% of your Attack, applying\nExposed. Pack Bond: the whole party\ngains +10% crit chance.\nOn arrival: dives a chosen enemy for\n15% of your Attack, Dazing them.\nLoyalty gift: ignores 20% armor\nper stack."}),
+				Ability.make({"display_name": "Marking Shot", "cooldown": 2, "cost": 25, "damage": 20,
+					"pressure": 10, "delay": 3.0, "anim": "attack02", "special": "marking_shot",
+					"perfect_id": "", "perfect_text": "Deals 25% of your Attack instead",
+					"description": "Mark your prey: ALL THREE beasts\nanswer — the summoned one attacks as\nnormal, the others strike as spirits\nwith their Loyalty intact."}),
 				Ability.make({"display_name": "Feral Mending", "cooldown": 2, "cost": 15, "special": "feral_mending",
 					"delay": 2.0, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "Heals 35% of your max health instead",
-					"description": "Tend the bond: heal your companion\nfor 25% of YOUR max health and cleanse\nits debuffs. +10 Ferocity.\nRequires a living companion."}),
+					"perfect_id": "", "perfect_text": "Heals 30% instead",
+					"description": "Tend the bond: heal your companion\nfor 25% of ITS max health, cleanse\nits debuffs, and gain 1 Loyalty.\nRequires a living companion."}),
 				Ability.make({"display_name": "Kill Command", "cooldown": 3, "cost": 30, "special": "kill_command",
 					"delay": 4.0, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "+50% to the ordered strike",
-					"description": "Order your companion to savage a target:\ndouble damage and doubled special effect,\nand gain +40 Ferocity.\nRequires a living companion."}),
+					"perfect_id": "", "perfect_text": "The beast gains 1 Loyalty",
+					"description": "Order your companion to savage a target:\ndouble damage and doubled special effect\n(Aguila's Exposed lasts twice as long).\nRequires a living companion."}),
 			]
 		"sharpshooter":
 			return [
@@ -566,7 +566,7 @@ static func spec_abilities(spec: String) -> Array:
 	return []
 
 const CLASS_BLURBS := {
-	"hunter": "Ranged damage. Focus builds with every shot, spent on\nprecision payoffs and primal magic.",
+	"hunter": "Ranged damage. Mana fuels precision payoffs\nand primal magic.",
 	"warrior": "Flexible frontliner. Rage builds through attack and pain.",
 	"mage": "Glass cannon. Fire that spreads, frost that controls, and\nraw Resonance banked for devastating payoffs.",
 	"cleric": "Divine vessel of the light — smite, mend, and shepherd the party.",

@@ -30,7 +30,7 @@ const STATUS_INFO := {
 	"focus": ["Focus", "Fo", Color(0.35, 0.60, 1.0), "Restores 10 Mana each turn."],
 	"renewal": ["Renewal", "R+", Color(0.45, 0.90, 0.50), "Restores HP at the start of each\nturn (15% of the caster's max\nhealth, set when cast)."],
 	"surge": ["Surge", "A+", Color(0.80, 0.50, 1.0), "+20% attack."],
-	"mocked": ["Mocked", "M!", Color(0.95, 0.5, 0.3), "Must attack the Warrior who mocked them."],
+	"mocked": ["Mocked", "M!", Color(0.95, 0.5, 0.3), "Must attack the taunter."],
 	"poison": ["Poison", "P", Color(0.45, 0.8, 0.3), "Takes 3 nature damage per stack at the\nstart of each turn; new stacks refresh\nthe timer."],
 	"quickdraw": ["Quick Draw", "QD", Color(0.55, 0.85, 0.40), "All abilities act 50% faster;\nturns arrive sooner."],
 	"parry_up": ["Parry Up", "P+", Color(0.4, 0.9, 1.0), "+15% parry chance."],
@@ -76,9 +76,8 @@ const STATUS_INFO := {
 	"cons_ground": ["Consecrated Ground", "CG", Color(0.9, 0.82, 0.5), "Standing on holy ground: takes 15%\nless damage and reflects 10% of\ndamage taken."],
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
 	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],
-	"quarry": ["Quarry", "Qy", Color(0.95, 0.55, 0.25), "Marked by the eagle: takes 10% more\ndamage from the Beastmaster and\ntheir pack."],
 	"roar": ["Guardian's Roar", "GR", Color(0.85, 0.60, 0.30), "The bear stands firm: takes 25%\nless damage."],
-	"frenzy": ["Frenzy", "Fr", Color(0.95, 0.35, 0.20), "The pack is berserk: companion strikes\nhit like Kill Command (double damage,\ndoubled effect)."],
+	"loyalty": ["Loyalty", "L", Color(0.95, 0.75, 0.30), "Devotion to the Beastmaster: +5%\nstrike damage per stack, plus this\nbeast's own gift. At 5 the Pack Bond\nboon is DOUBLED. Lost on death."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -375,11 +374,6 @@ func _spawn_units() -> void:
 				cfg["second_resource_name"] = "Mercy"
 				cfg["second_resource"] = 0
 				cfg["second_max"] = 5
-			# Ferocity drives the Beastmaster's pack (0-100 → Frenzy).
-			if spec == "beastmaster":
-				cfg["second_resource_name"] = "Ferocity"
-				cfg["second_resource"] = 0
-				cfg["second_max"] = 100
 			# Specs with their own battle art override the shared Soldier sheet.
 			if SPEC_ART.has(spec):
 				for art_key in SPEC_ART[spec]:
@@ -1279,8 +1273,9 @@ func _player_turn(u: BattleUnit) -> void:
 		u.resource = mini(u.resource + 5, u.max_resource)
 		u.refresh_bars()
 	# Companions have no turns of their own: their statuses tick (and Breaks
-	# recover) with their master.
+	# recover) with their master. Standing at the hunter's side earns Loyalty.
 	if u.companion != null and not u.companion.dead:
+		_gain_loyalty(u, u.companion.companion_kind)
 		u.companion.tick_statuses()
 		if u.companion.broken:
 			u.companion.broken_pending = false
@@ -1303,12 +1298,16 @@ func _player_turn(u: BattleUnit) -> void:
 	while true:
 		var used_targeting := false
 		if ab.special in ["rally", "focus", "surge", "shieldwall", "quickdraw",
-				"phoenix", "hymn", "retaliate", "unity", "tripwire", "summon",
+				"phoenix", "hymn", "retaliate", "unity", "tripwire",
 				"mana_shield", "divine_wrath", "shield_block", "hold_the_line",
 				"battle_shout", "flame_shield", "stabilize", "overcharge",
 				"cons_ground", "bulwark", "dark_pact", "hysteria",
-				"wild_call", "feral_mending"]:
+				"feral_mending"]:
 			target = u  # self/party effects need no target choice
+		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
+			# Summons are self-casts — except the eagle, whose arrival dive
+			# wants a chosen enemy (falls through to normal targeting).
+			target = u
 		elif ab.special == "resurrection":
 			# Resurrection targets the FALLEN (the usable gate guarantees one).
 			var fallen := heroes.filter(func(h): return h.dead)
@@ -1515,12 +1514,6 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if summon != null and u.resource >= summon.cost and u.ability_ready(summon) \
 					and (u.companion == null or u.companion.dead):
 				return [summon, u]
-			# Beastmaster: a full Ferocity bar with a beast out → Frenzy (free).
-			if u.second_resource_name == "Ferocity" \
-					and u.second_resource >= u.second_max \
-					and u.companion != null and not u.companion.dead \
-					and not u.has_status("frenzy"):
-				_unleash_frenzy(u)
 			# Tend a wounded beast before pressing the attack.
 			var mend := _find_ability(u, "Feral Mending")
 			if mend != null and u.resource >= mend.cost and u.ability_ready(mend) \
@@ -1531,15 +1524,10 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if kill_cmd != null and u.resource >= kill_cmd.cost and u.ability_ready(kill_cmd) \
 					and u.companion != null and not u.companion.dead:
 				return [kill_cmd, target_foe]
-			# Wild Call: sound off whenever the beast stands (Canis waits for blood).
-			var wcall := _find_ability(u, "Wild Call")
-			if wcall != null and u.resource >= wcall.cost and u.ability_ready(wcall) \
-					and u.companion != null and not u.companion.dead:
-				var wc_ok := true
-				if u.companion.companion_kind == "canis":
-					wc_ok = enemies.any(func(e): return not e.dead and e.bleed_buildup > 0)
-				if wc_ok:
-					return [wcall, u]
+			# Marking Shot: call the whole pack down on the target.
+			var mark := _find_ability(u, "Marking Shot")
+			if mark != null and u.resource >= mark.cost and u.ability_ready(mark):
+				return [mark, target_foe]
 			var parrow := _find_ability(u, "Poisoned Arrow")
 			if parrow != null and u.resource >= parrow.cost and u.ability_ready(parrow) and randf() < 0.4 \
 					and not target_foe.has_status("poison"):
@@ -1791,13 +1779,22 @@ func _show_actions(u: BattleUnit) -> void:
 		var entry: Dictionary = _menu_entries[e_idx]
 		if entry.has("summons"):
 			# Top of the list: opens the beast picker (Tab cycles, Space picks).
+			# With a beast already out it becomes the Swap (10 Mana, shared 2cd).
+			var swapping := u.companion != null and not u.companion.dead
 			var group_btn := Button.new()
-			group_btn.text = "[%s] Summon Companion ▸" % ABILITY_KEY_NAMES[e_idx]
+			group_btn.text = "[%s] %s Companion ▸" % [ABILITY_KEY_NAMES[e_idx],
+				"Swap" if swapping else "Summon"]
 			group_btn.custom_minimum_size = Vector2(184, 30)
 			group_btn.add_theme_font_size_override("font_size", 13)
 			group_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-			group_btn.tooltip_text = "Choose which beast answers the call.\n" \
-				+ "Tab cycles the options, Space summons.\nOnly one companion at a time."
+			if swapping:
+				group_btn.tooltip_text = "Swap the active beast (10 %s, 1.0 int,\nshared 2-turn cooldown). The newcomer\narrives with its swap effect and\n+1 Loyalty." % u.resource_name
+				if u.cooldowns.get("Swap Companion", 0) > 0:
+					group_btn.tooltip_text += "\n(Swap recovering: %d turn(s))" % \
+						u.cooldowns["Swap Companion"]
+			else:
+				group_btn.tooltip_text = "Choose which beast answers the call.\n" \
+					+ "Tab cycles the options, Space summons.\nOnly one companion at a time."
 			group_btn.pressed.connect(_on_summon_group_pressed.bind(popup))
 			list.add_child(group_btn)
 		else:
@@ -1820,16 +1817,6 @@ func _show_actions(u: BattleUnit) -> void:
 		emp_btn.tooltip_text = "Spend +1 Mercy to Empower the next\nHeal / Renewal / Hymn / Resurrection /\nDivine Plea. Empowered casts forgo\ntheir perfect bonus. C toggles."
 		emp_btn.toggled.connect(func(on: bool): empower_armed = on)
 		action_box.add_child(emp_btn)
-	# Ferocity (Beastmaster): the Frenzy unleash lights up at a full bar.
-	if u.second_resource_name == "Ferocity":
-		var frz_btn := Button.new()
-		frz_btn.text = "⚔ Frenzy (C)"
-		frz_btn.custom_minimum_size = Vector2(112, 32)
-		frz_btn.add_theme_font_size_override("font_size", 13)
-		frz_btn.disabled = u.second_resource < u.second_max
-		frz_btn.tooltip_text = "Spend a full Ferocity bar: the pack goes\nberserk for 2 turns — companion strikes\nhit like Kill Command. C unleashes."
-		frz_btn.pressed.connect(_unleash_frenzy.bind(u))
-		action_box.add_child(frz_btn)
 	action_panel.visible = true
 
 
@@ -1840,9 +1827,16 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 		return false
 	if not u.ability_ready(ab):
 		return false
-	if ab.special in ["kill_command", "wild_call", "feral_mending"] \
+	if ab.special in ["kill_command", "feral_mending"] \
 			and (u.companion == null or u.companion.dead):
 		return false
+	# Swap Companion: shared cooldown, and never to the beast already out.
+	if ab.special == "summon" and ab.display_name.begins_with("Swap"):
+		if u.cooldowns.get("Swap Companion", 0) > 0 \
+				or u.companion == null or u.companion.dead:
+			return false
+		if u.companion.companion_kind == ab.display_name.get_slice(" ", 1).to_lower():
+			return false
 	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
 		return false
 	# Execute: only usable while an enemy is below 20% health.
@@ -1881,7 +1875,7 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	ab_btn.add_theme_font_size_override("font_size", 13)
 	ab_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	ab_btn.tooltip_text = _ability_tooltip(u, ab)
-	if ab.special in ["kill_command", "wild_call", "feral_mending"] \
+	if ab.special in ["kill_command", "feral_mending"] \
 			and (u.companion == null or u.companion.dead):
 		ab_btn.tooltip_text += "\n(No living companion)"
 	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
@@ -1920,7 +1914,22 @@ func _on_summon_group_pressed(popup: PopupPanel) -> void:
 
 func _open_summon_picker(u: BattleUnit) -> void:
 	_close_summon_picker()
-	_summon_opts = u.abilities.filter(func(a): return a.special == "summon")
+	# With a living beast out, the picker offers SWAPS instead: cheap, quick
+	# clones that share one "Swap Companion" cooldown (set in _do_summon).
+	var swapping := u.companion != null and not u.companion.dead
+	if swapping:
+		_summon_opts = []
+		for a in u.abilities:
+			if a.special != "summon":
+				continue
+			var beast: String = a.display_name.get_slice(" ", 1)
+			_summon_opts.append(Ability.make({"display_name": "Swap " + beast,
+				"cooldown": 0, "cost": 10, "special": "summon", "delay": 1.0,
+				"anim": "attack01", "no_skill_check": true,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Swap the pack: %s arrives with its\nswap effect and +1 Loyalty.\nShared cooldown: 2 turns." % beast}))
+	else:
+		_summon_opts = u.abilities.filter(func(a): return a.special == "summon")
 	if _summon_opts.is_empty():
 		return
 	_summon_picker = PanelContainer.new()
@@ -1930,7 +1939,8 @@ func _open_summon_picker(u: BattleUnit) -> void:
 	box.add_theme_constant_override("separation", 6)
 	_summon_picker.add_child(box)
 	var title := Label.new()
-	title.text = "SUMMON —  Tab cycles · Space summons · X closes"
+	title.text = ("SWAP —  Tab cycles · Space swaps · X closes" if swapping \
+		else "SUMMON —  Tab cycles · Space summons · X closes")
 	title.add_theme_font_size_override("font_size", 12)
 	title.add_theme_color_override("font_color", Color(0.85, 0.80, 0.68))
 	box.add_child(title)
@@ -2231,7 +2241,15 @@ func _enemy_turn(u: BattleUnit) -> void:
 	var is_mocked := false
 	if u.has_status("mocked"):
 		var mocker_idx := u.status_power("mocked")
-		if mocker_idx >= 0 and mocker_idx < heroes.size() and not heroes[mocker_idx].dead:
+		# 100+ encodes a COMPANION taunt: the beast of heroes[idx - 100].
+		if mocker_idx >= 100:
+			var taunt_master_idx := mocker_idx - 100
+			if taunt_master_idx < heroes.size() \
+					and heroes[taunt_master_idx].companion != null \
+					and not heroes[taunt_master_idx].companion.dead:
+				living = [heroes[taunt_master_idx].companion]
+				is_mocked = true
+		elif mocker_idx >= 0 and mocker_idx < heroes.size() and not heroes[mocker_idx].dead:
 			living = [heroes[mocker_idx]]
 			is_mocked = true
 	# Support behaviors (Shielding, Wild Growth) — a taunt forces attacking instead.
@@ -2261,6 +2279,19 @@ func _enemy_turn(u: BattleUnit) -> void:
 		# Threatening Presence: Warriors draw 20% more of the random picks.
 		target = _lowest_hp(living) if randf() < 0.40 else _threat_pick(living)
 		ab = affordable.pick_random()
+		# Savage Presence (Ursus): the bear draws 15% of attacks its way
+		# (30% at full Loyalty).
+		for sp_c in companions:
+			if not sp_c.dead and sp_c.companion_kind == "ursus" \
+					and sp_c.pack_master != null and not sp_c.pack_master.dead \
+					and target != sp_c:
+				var sp_pull := (0.30 if int(sp_c.pack_master.loyalty.get("ursus", 0)) >= 5 \
+					else 0.15)
+				if randf() < sp_pull:
+					target = sp_c
+					_log("   → Savage Presence: %s draws %s's attack" % [
+						sp_c.unit_name, u.unit_name], "#d8b880")
+				break
 	await _resolve(u, ab, target, "good")
 
 
@@ -2672,11 +2703,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				crit_chance += (0.03 + 0.01 * attacker.arcane_mastery_ranks) \
 					* _resonance_power(attacker)
 			crit_chance += attacker.crit_bonus
-			# Pack Bond (Aguila): the eagle sharpens the hunter's eye.
-			if attacker.passive_id == "pack" and attacker.companion != null \
-					and not attacker.companion.dead \
-					and attacker.companion.companion_kind == "aguila":
-				crit_chance += 0.15
+			# Pack Bond (Aguila): the eagle's eyes serve the whole party
+			# (+10% crit; doubled at full Loyalty).
+			var bond_eagle := _living_aguila()
+			if attacker.is_hero and not attacker.is_companion and bond_eagle != null:
+				var eagle_l: int = bond_eagle.pack_master.loyalty.get("aguila", 0)
+				crit_chance += 0.20 if eagle_l >= 5 else 0.10
 			# Precision Strikes: exploits Dazed / Crippled / Exposed targets.
 			if attacker.precision_ranks > 0 and (strike_target.has_status("dazed")
 					or strike_target.has_status("cripple")
@@ -2757,8 +2789,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Arcane Barrage" and attacker.suppressing_ranks > 0 \
 					and hit_i > 0:
 				raw += 0.0025 * attacker.suppressing_ranks * hit_i * attacker.attack
-			# Frostbolt / Razor Ice perfects: flat 25% of Attack instead.
-			if is_perfect and ab.display_name in ["Frostbolt", "Razor Ice"]:
+			# Frostbolt / Razor Ice / Marking Shot perfects: flat 25% of
+			# Attack instead.
+			if is_perfect and ab.display_name in ["Frostbolt", "Razor Ice",
+					"Marking Shot"]:
 				raw = 0.25 * attacker.attack * randf_range(0.9, 1.1)
 			# Empowered Frostbolt (talent): the basic bolt bites deeper.
 			if ab.display_name == "Frostbolt" and attacker.emp_frostbolt_ranks > 0:
@@ -2835,21 +2869,27 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Seasoned Fighter: the offensive stance above half HP.
 			if attacker.passive_id == "seasoned" and attacker.hp > attacker.max_hp * 0.5:
 				raw *= 1.15 + attacker.seasoned_off_bonus
+			# Pack Bond (Canis): the hunter runs down wounded prey — +15%
+			# damage per enemy under 35% health (doubled at full Loyalty).
+			if attacker.is_hero and attacker.passive_id == "pack" \
+					and attacker.companion != null and not attacker.companion.dead \
+					and attacker.companion.companion_kind == "canis":
+				var bm_wounded := enemies.filter(func(en): return not en.dead and en.hp < en.max_hp * 0.35).size()
+				if bm_wounded > 0:
+					var bm_per := 0.30 if int(attacker.loyalty.get("canis", 0)) >= 5 else 0.15
+					raw *= 1.0 + bm_per * bm_wounded
 			raw *= 1.0 + attacker.dmg_bonus + float(attacker.type_dmg_bonus.get(ab.dmg_type, 0.0))
 			# Target-side modifiers.
 			if strike_target.second_resource_name == "Resonance":
 				raw *= 1.0 + 0.05 * _resonance_power(strike_target)
-			# Quarry (Aguila): the eagle's mark opens the target to the
-			# Beastmaster's own shots (the pack's boost lives in _companion_hit).
-			if strike_target.has_status("quarry") and attacker.is_hero \
-					and attacker.passive_id == "pack":
-				raw *= 1.10
-			# Pack Bond (Ursus): the bear stands between the hunter and harm.
+			# Savage Presence (Ursus): the bear stands between the hunter and
+			# harm — 10% less damage taken (20% at full Loyalty).
 			if strike_target.is_hero and strike_target.passive_id == "pack" \
 					and strike_target.companion != null \
 					and not strike_target.companion.dead \
 					and strike_target.companion.companion_kind == "ursus":
-				raw *= 0.85
+				raw *= (0.80 if int(strike_target.loyalty.get("ursus", 0)) >= 5 \
+					else 0.90)
 			# Stabilized: grounded resonance blunts incoming blows.
 			if strike_target.has_status("stabilized"):
 				raw *= 1.0 - strike_target.status_power("stabilized") / 100.0
@@ -2946,11 +2986,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				pr += 5
 			if is_perfect and ab.display_name == "Ice Lance":
 				pr = 20
-			# Pack Bond (Ursus): the bear's weight behind every hit.
-			if attacker.passive_id == "pack" and attacker.companion != null \
-					and not attacker.companion.dead \
-					and attacker.companion.companion_kind == "ursus":
-				pr = int(pr * 1.25)
 			# Broken Will: the Occultist grinds stability down harder.
 			if attacker.broken_will_ranks > 0:
 				pr = int(round(pr * (1.0 + 0.05 * attacker.broken_will_ranks)))
@@ -3183,11 +3218,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_dot_tick("poison", attacker))
 			# Specialization on-hit passives.
 			if not strike_target.dead:
-				# Pack Bond (Canis): the wolf worries every wound open.
-				if attacker.passive_id == "pack" and attacker.companion != null \
-						and not attacker.companion.dead \
-						and attacker.companion.companion_kind == "canis":
-					_add_bleed_with_burst(strike_target, 15)
 				# Permafrost: the deep cold takes root — frost hits can Frostbite.
 				if attacker.passive_id == "permafrost" and ab.dmg_type == "frost" \
 						and randf() < 0.25:
@@ -3290,6 +3320,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_sfx("death", -4.0)
 				_message("%s falls!" % strike_target.unit_name)
 				_log("† %s dies" % strike_target.unit_name, "#e05050")
+				# A beast's death breaks its Loyalty (the meter starts over).
+				if strike_target.is_companion and strike_target.pack_master != null \
+						and int(strike_target.pack_master.loyalty.get(
+						strike_target.companion_kind, 0)) > 0:
+					strike_target.pack_master.loyalty[strike_target.companion_kind] = 0
+					_log("   → %s's Loyalty is broken" % strike_target.unit_name,
+						"#c08850")
 				await _wait(0.5)
 			# Implosion: Detonation can slam twice (free echo strike).
 			if ab.display_name == "Detonation" and not is_counter \
@@ -3364,12 +3401,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				attacker.heal_amount(drained)
 				attacker.float_text("+%d" % drained, Color(0.4, 0.9, 0.45))
 				_log("   → %s drains %d HP" % [attacker.unit_name, drained], "#70d878")
-		# The hunter's own blows feed Ferocity, pack at their side or not.
-		if attacker.is_hero and attacker.passive_id == "pack" and ab.damage > 0 \
-				and not is_counter and total_dealt > 0:
-			_gain_ferocity(attacker, 15 if any_crit else 10)
-		# The Beastmaster's companion strikes alongside the hunter — and hits
-		# like Kill Command while Frenzy rides.
+		# The Beastmaster's companion strikes alongside the hunter.
 		if attacker.is_hero and attacker.passive_id == "pack" and ab.damage > 0 \
 				and not is_counter and attacker.companion != null \
 				and not attacker.companion.dead:
@@ -3378,9 +3410,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var foes := enemies.filter(func(e): return not e.dead)
 				comp_target = null if foes.is_empty() else _lowest_hp(foes)
 			if comp_target != null:
-				var frenzied := attacker.has_status("frenzy")
-				await _companion_strike(attacker.companion, comp_target,
-					2.0 if frenzied else 1.0, frenzied)
+				await _companion_strike(attacker.companion, comp_target, 1.0, false)
 		# Tripwire: rigged ground bites every attacking melee enemy.
 		if not attacker.is_hero and not attacker.is_ranged and not is_counter \
 				and total_dealt > 0:
@@ -3533,36 +3563,54 @@ func _dot_tick(id: String, applier: BattleUnit) -> int:
 	return maxi(int(round(pct * 0.01 * applier.attack)), 1)
 
 
-# Ferocity: the Beastmaster's pack meter (0-100). Builds as the pack draws
-# blood — the hunter's own hits, companion strikes, and crits. Above 50 the
-# beast is Bloodied (+15% strikes); at 100 the hunter may unleash Frenzy.
-func _gain_ferocity(hunter: BattleUnit, amount: int) -> void:
-	if hunter == null or hunter.dead or hunter.second_resource_name != "Ferocity":
+# Loyalty: each beast's devotion to the Beastmaster (0-5, per beast). +1
+# every hunter turn that begins with it active and on every summon/swap-in;
+# +5% strike damage per stack plus a beast-specific gift (Ursus +3% max HP,
+# Canis +2 Bleed, Aguila 20% armor ignored); at 5 the Pack Bond boon is
+# DOUBLED. A beast's meter resets only when it dies.
+func _gain_loyalty(hunter: BattleUnit, kind: String, amount := 1) -> void:
+	if hunter == null or hunter.dead or hunter.passive_id != "pack" or kind == "":
 		return
-	var before := hunter.second_resource
-	hunter.second_resource = mini(hunter.second_resource + amount, hunter.second_max)
-	var gained := hunter.second_resource - before
-	if gained > 0:
-		hunter.float_text("+%d Ferocity" % gained, Color(0.95, 0.55, 0.25))
-		hunter.refresh_bars()
+	var before: int = hunter.loyalty.get(kind, 0)
+	var now := mini(before + amount, 5)
+	hunter.loyalty[kind] = now
+	if now == before:
+		return
+	var comp: BattleUnit = hunter.companion
+	if comp != null and not comp.dead and comp.companion_kind == kind:
+		# Ursus grows with devotion: +3% of base max health per stack.
+		if kind == "ursus":
+			var hp_step: int = int(round(COMPANION_STATS["ursus"][0] * 0.03)) \
+				* (now - before)
+			comp.max_hp += hp_step
+			comp.hp += hp_step
+		comp.float_text("+%d Loyalty" % (now - before), Color(0.95, 0.75, 0.30))
+		_stamp_loyalty_chip(hunter, comp)
+		comp.refresh_bars()
+	if now >= 5 and before < 5:
+		_log("   → %s's Loyalty is absolute — its Pack Bond boon DOUBLES" % \
+			kind.capitalize(), "#e8c860")
 
 
-# Frenzy: spend a full Ferocity bar to send the pack berserk for 2 turns —
-# companion strikes hit like Kill Command. A free action (like Mercy's
-# Empower): the hunter still takes their turn afterward.
-func _unleash_frenzy(u: BattleUnit) -> void:
-	if u == null or u.second_resource_name != "Ferocity" \
-			or u.second_resource < u.second_max:
+# The Loyalty chip lives on the companion (permanent, live counter).
+func _stamp_loyalty_chip(hunter: BattleUnit, comp: BattleUnit) -> void:
+	var stacks: int = hunter.loyalty.get(comp.companion_kind, 0)
+	if stacks <= 0:
 		return
-	u.second_resource = 0
-	u.refresh_bars()
-	_apply_status(u, "frenzy", 2)
-	u.float_text("FRENZY!", Color(0.95, 0.35, 0.20))
-	_sfx("crit", -6.0, 0.7)
-	_message("%s unleashes the pack!" % u.unit_name)
-	_log("%s: FRENZY — the pack goes berserk for 2 turns" % u.unit_name, "#e0704a")
-	if not autoplay and not sim and action_panel.visible:
-		_show_actions(u)
+	var info: Array = STATUS_INFO["loyalty"]
+	var l_desc := "Loyalty %d/5: +%d%% strike damage,\nplus %s's gift. At 5 the Pack\nBond boon is doubled." % [
+		stacks, 5 * stacks, comp.unit_name]
+	if not comp.update_status("loyalty", "L%d" % stacks, l_desc, stacks):
+		comp.add_status("loyalty", info[0], "L%d" % stacks, info[2], -1, l_desc, stacks)
+
+
+# The living eagle whose master still stands grants the party its eyes.
+func _living_aguila() -> BattleUnit:
+	for c in companions:
+		if not c.dead and c.companion_kind == "aguila" \
+				and c.pack_master != null and not c.pack_master.dead:
+			return c
+	return null
 
 
 # Arcane Resonance: builds on damaging casts (2 on crit via Arcane Instability);
@@ -4200,64 +4248,34 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s rigs the ground" % attacker.unit_name)
 			_log("%s: Tripwire set" % attacker.unit_name, "#70d878")
 		"summon":
-			await _do_summon(attacker, ab.display_name.get_slice(" ", 1).to_lower())
+			await _do_summon(attacker, ab.display_name.get_slice(" ", 1).to_lower(),
+				target)
 		"kill_command":
 			var comp: BattleUnit = attacker.companion
 			if comp != null and not comp.dead and target != null and not target.dead:
 				_message("%s: KILL COMMAND!" % attacker.unit_name)
 				_log("%s orders %s to savage %s!" % [attacker.unit_name,
 					comp.unit_name, target.unit_name], "#e0a050")
-				await _companion_strike(comp, target, 3.0 if is_perfect else 2.0, true)
-				# The killing order stokes the pack's Ferocity (~+40 with the strike).
-				_gain_ferocity(attacker, 30)
-		"wild_call":
-			# Modal command: the effect is the active beast's voice.
-			var wc_comp: BattleUnit = attacker.companion
-			if wc_comp != null and not wc_comp.dead:
-				match wc_comp.companion_kind:
-					"ursus":
-						_sfx("break", -6.0, 0.8)
-						_message("%s: GUARDIAN'S ROAR!" % wc_comp.unit_name)
-						_log("%s: Guardian's Roar — 10 BD to every enemy; the bear digs in" % \
-							wc_comp.unit_name, "#e0a050")
-						_apply_status(wc_comp, "roar", 2)
-						for wc_e in enemies.filter(func(en): return not en.dead):
-							var wc_r: Dictionary = wc_e.take_hit(0, 10)
-							wc_e.float_text("+10 BD", Color(0.8, 0.35, 1.0))
-							if wc_r.broke:
-								_stat("breaks_on_enemies")
-								_sfx("break", -3.0)
-								_message("%s BREAKS!" % wc_e.unit_name)
-								_log("!! %s BREAKS" % wc_e.unit_name, "#c070e0")
-								await _break_impact()
-								_shake()
-					"canis":
-						_sfx("crit", -6.0, 0.6)
-						_message("%s: BLOODHOWL!" % wc_comp.unit_name)
-						var howled := 0
-						for wc_e in enemies.filter(func(en): return not en.dead):
-							if wc_e.bleed_buildup > 0:
-								_add_bleed_with_burst(wc_e, 15)
-								howled += 1
-						if howled > 0:
-							_log("%s: Bloodhowl — +15 Bleed to %d bleeding enem%s" % [
-								wc_comp.unit_name, howled, "y" if howled == 1 else "ies"],
-								"#e05050")
-						else:
-							_log("%s: Bloodhowl — the howl finds no open wounds" % \
-								wc_comp.unit_name, "#909090")
-					"aguila":
-						_sfx("crit", -8.0, 1.3)
-						_message("%s: SKYCRY!" % wc_comp.unit_name)
-						_log("%s: Skycry — every enemy is marked Quarry (2 turns)" % \
-							wc_comp.unit_name, "#e0a050")
-						for wc_e in enemies.filter(func(en): return not en.dead):
-							_apply_status(wc_e, "quarry", 2)
-				_gain_ferocity(attacker, 20 if is_perfect else 10)
+				await _companion_strike(comp, target, 2.0, true)
+				# A perfect order deepens the bond.
+				if is_perfect:
+					_gain_loyalty(attacker, comp.companion_kind)
+		"marking_shot":
+			# The mark calls the WHOLE pack: the summoned beast already
+			# strikes with the shot (the normal co-attack); the two absent
+			# beasts answer as spirits, their Loyalty intact.
+			if target != null and not target.dead:
+				var active_kind := ""
+				if attacker.companion != null and not attacker.companion.dead:
+					active_kind = attacker.companion.companion_kind
+				for sp_kind in ["ursus", "canis", "aguila"]:
+					if sp_kind == active_kind or target.dead:
+						continue
+					await _spirit_strike(attacker, sp_kind, target)
 		"feral_mending":
 			var fm_comp: BattleUnit = attacker.companion
 			if fm_comp != null and not fm_comp.dead:
-				var fm_amt := int(attacker.max_hp * (0.35 if is_perfect else 0.25))
+				var fm_amt := int(fm_comp.max_hp * (0.30 if is_perfect else 0.25))
 				var fm_healed: int = fm_comp.heal_amount(fm_amt)
 				fm_comp.float_text("+%d" % fm_healed, Color(0.4, 0.9, 0.45))
 				var fm_purged: int = fm_comp.purge_debuffs()
@@ -4269,7 +4287,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					_log("   → %d debuff(s) cleansed from %s" % [fm_purged,
 						fm_comp.unit_name], "#70d878")
 				fm_comp.refresh_bars()
-				_gain_ferocity(attacker, 10)
+				_gain_loyalty(attacker, fm_comp.companion_kind)
 		"battle_shout":
 			var shout_bleed := 0
 			for e in enemies:
@@ -4525,22 +4543,33 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 
 # kind -> [max HP, sphere tint] (placeholder spheres until beast art exists).
 const COMPANION_STATS := {
-	"ursus": [80, Color(0.9, 0.3, 0.25)],
-	"canis": [60, Color(0.35, 0.55, 0.95)],
-	"aguila": [60, Color(0.35, 0.85, 0.4)],
+	"ursus": [110, Color(0.9, 0.3, 0.25)],
+	"canis": [80, Color(0.35, 0.55, 0.95)],
+	"aguila": [80, Color(0.35, 0.85, 0.4)],
 }
 
 
 # Summons (or replaces) the hunter's companion. It inherits the hunter's
 # armor, stability, and crit chance; it has no resource and takes no turns.
-func _do_summon(hunter: BattleUnit, kind: String) -> void:
+# A swap (replacing a LIVING beast) starts the shared Swap cooldown; the
+# arriving beast keeps its Loyalty, gains +1, and fires its arrival effect.
+func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> void:
+	var was_swap := hunter.companion != null and is_instance_valid(hunter.companion) \
+		and not hunter.companion.dead
 	if hunter.companion != null and is_instance_valid(hunter.companion):
 		companions.erase(hunter.companion)
 		hunter.companion.queue_free()
 		hunter.companion = null
+	if was_swap:
+		hunter.cooldowns["Swap Companion"] = 3  # effective 2 (turn-end tick)
 	var stats: Array = COMPANION_STATS[kind]
+	# Returning beasts keep their Loyalty; Ursus carries its HP gift too.
+	var prior_l: int = int(hunter.loyalty.get(kind, 0))
+	var base_hp: int = stats[0] + hunter.companion_hp_bonus
+	if kind == "ursus":
+		base_hp += int(round(stats[0] * 0.03)) * prior_l
 	var cfg := {"unit_name": kind.capitalize(), "is_hero": true, "sheet_dir": "sphere",
-		"sprite_scale": 1.4, "max_hp": stats[0] + hunter.companion_hp_bonus,
+		"sprite_scale": 1.4, "max_hp": base_hp,
 		"attack": hunter.attack,  # beast blows scale with their master
 		"armor": hunter.armor, "speed": hunter.speed, "stability": hunter.stability,
 		"constitution": hunter.constitution, "abilities": []}
@@ -4556,60 +4585,106 @@ func _do_summon(hunter: BattleUnit, kind: String) -> void:
 	hunter.companion = comp
 	_sfx("heal", -7.0, 0.6)
 	_message("%s answers the call!" % comp.unit_name)
-	_log("%s summons %s" % [hunter.unit_name, comp.unit_name], "#70d878")
+	_log("%s %s %s" % [hunter.unit_name,
+		"swaps in" if was_swap else "summons", comp.unit_name], "#70d878")
+	_gain_loyalty(hunter, kind)
+	_stamp_loyalty_chip(hunter, comp)
 	await _wait(0.5)
+	await _arrival_effect(hunter, comp, target)
 
 
-# One companion attack. `mult` scales damage (Kill Command: x2, x3 on Perfect);
-# `boosted` doubles the special effect (guaranteed procs, doubled Bleed).
+# Summon-and-swap arrival effects: the beast announces itself.
+func _arrival_effect(hunter: BattleUnit, comp: BattleUnit,
+		target: BattleUnit) -> void:
+	match comp.companion_kind:
+		"ursus":
+			# Guardian's Roar: taunt the weakest enemy (preferring one not
+			# already taunted) and dig in for 2 turns.
+			var pool := enemies.filter(func(e): return not e.dead)
+			if pool.is_empty():
+				return
+			var fresh := pool.filter(func(e): return not e.has_status("mocked"))
+			var tgt: BattleUnit = _lowest_hp(fresh if not fresh.is_empty() else pool)
+			_sfx("break", -6.0, 0.8)
+			_message("%s: GUARDIAN'S ROAR!" % comp.unit_name)
+			# Companion taunts encode as 100 + the hunter's party index.
+			var h_idx := heroes.find(hunter)
+			if h_idx >= 0:
+				_apply_status(tgt, "mocked", 2, 100 + h_idx)
+			_apply_status(comp, "roar", 2)
+			_log("%s: Guardian's Roar — %s is taunted; the bear digs in" % [
+				comp.unit_name, tgt.unit_name], "#e0a050")
+		"canis":
+			# Bloodhowl: open wounds across the whole warband.
+			_sfx("crit", -6.0, 0.6)
+			_message("%s: BLOODHOWL!" % comp.unit_name)
+			_log("%s: Bloodhowl — 15 Bleed to every enemy" % comp.unit_name,
+				"#e05050")
+			for e in enemies.filter(func(en): return not en.dead):
+				_add_bleed_with_burst(e, 15)
+		"aguila":
+			# The eagle dives a chosen enemy: 15% of the hunter's Attack, Dazed.
+			var dive: BattleUnit = target
+			if dive == null or dive.dead or dive.is_hero:
+				var foes := enemies.filter(func(e): return not e.dead)
+				dive = null if foes.is_empty() else _lowest_hp(foes)
+			if dive == null:
+				return
+			_sfx("crit", -8.0, 1.3)
+			_message("%s dives %s!" % [comp.unit_name, dive.unit_name])
+			await _companion_hit(comp, dive, 0.15 * hunter.attack, 0)
+			if not dive.dead:
+				_apply_status(dive, "dazed", 2)
+				_log("   → %s is Dazed by the dive" % dive.unit_name, "#e0a050")
+
+
+# One companion attack. `mult` scales damage (Kill Command: x2); `boosted`
+# doubles the special effect (doubled Bleed, Exposed twice as long). Loyalty
+# feeds every blow: +5% per stack, plus the beast's own gift.
 func _companion_strike(comp: BattleUnit, victim: BattleUnit, mult: float,
 		boosted: bool) -> void:
 	if comp == null or comp.dead or victim == null or victim.dead:
 		return
-	var proc_chance := 1.0 if boosted else 0.5
-	# Bloodied: above 50 Ferocity the beast's blows land 15% harder (damage
-	# only — Break/Bleed still scale with `mult`, not with the frenzy).
-	var dmg_mult := mult
-	if comp.pack_master != null and comp.pack_master.second_resource > 50:
-		dmg_mult *= 1.15
+	var l: int = 0
+	if comp.pack_master != null:
+		l = int(comp.pack_master.loyalty.get(comp.companion_kind, 0))
+	var dmg_mult := mult * (1.0 + 0.05 * l)
 	# Beast blows are a % of the companion's Attack (inherited from the
-	# hunter, node scaling included): Ursus 10%, Canis 20%, Aguila 15%.
+	# hunter, node scaling included): Ursus 10% + adjacent, Canis 20%,
+	# Aguila 20%.
 	match comp.companion_kind:
 		"ursus":
-			await _companion_hit(comp, victim, 0.10 * comp.attack * dmg_mult, int(20 * mult))
-			# The bear's sweep also mauls the enemy beside the target.
-			var others := enemies.filter(func(e): return not e.dead and e != victim)
-			if not others.is_empty():
-				await _companion_hit(comp, others.pick_random(),
-					0.10 * comp.attack * dmg_mult, int(20 * mult))
+			await _companion_hit(comp, victim, 0.10 * comp.attack * dmg_mult, 0)
+			# The bear's sweep also mauls the enemies beside the target.
+			for adj in _adjacent_enemies(victim):
+				if not adj.dead:
+					await _companion_hit(comp, adj, 0.10 * comp.attack * dmg_mult, 0)
 		"canis":
-			# The wolf savages wounded prey (under 35% HP) for +50%.
-			var execute := 1.5 if victim.hp < victim.max_hp * 0.35 else 1.0
-			await _companion_hit(comp, victim, 0.20 * comp.attack * dmg_mult * execute, 0)
-			if not victim.dead and randf() < proc_chance:
-				_add_bleed_with_burst(victim, 40 if boosted else 20)
-		"aguila":
-			await _companion_hit(comp, victim, 0.15 * comp.attack * dmg_mult, 0)
-			# Every eagle strike brands the Quarry (pack-only +10% damage).
+			await _companion_hit(comp, victim, 0.20 * comp.attack * dmg_mult, 0)
+			# The wolf always worries the wound open (+2 Bleed per Loyalty).
 			if not victim.dead:
-				_apply_status(victim, "quarry", 3)
-			if not victim.dead and randf() < proc_chance:
-				_apply_status(victim, "sunder", 4 if boosted else 2)
+				_add_bleed_with_burst(victim, (20 + 2 * l) * (2 if boosted else 1))
+		"aguila":
+			await _companion_hit(comp, victim, 0.20 * comp.attack * dmg_mult, 0,
+				0.20 * l)
+			# Every eagle strike lays the prey open.
+			if not victim.dead:
+				_apply_status(victim, "exposed", 4 if boosted else 2)
 
 
 # All beasts deal physical damage using the hunter's inherited crit chance.
-func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int) -> void:
+# `pen` ignores that share of the victim's armor (Aguila's Loyalty gift).
+func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
+		pen := 0.0) -> void:
 	if victim == null or victim.dead:
 		return
 	var raw := (dmg + comp.companion_power) * randf_range(0.9, 1.1)
 	var is_crit := randf() < CRIT_CHANCE + comp.crit_bonus + (0.25 if victim.broken else 0.0)
 	if is_crit:
 		raw *= 1.5
-	# Quarry: the eagle's mark opens the target to the whole pack (+10%).
-	if victim.has_status("quarry"):
-		raw *= 1.10
 	raw *= 1.0 - float(victim.resists.get("physical", 0.0))
-	var final := maxi(int(round(raw * (1.0 - victim.effective_armor()))), 1)
+	var comp_armor := victim.effective_armor() * (1.0 - clampf(pen, 0.0, 1.0))
+	var final := maxi(int(round(raw * (1.0 - comp_armor))), 1)
 	var result: Dictionary = victim.take_hit(final, pr)
 	_sfx("crit" if is_crit else "hit", -4.0 if is_crit else -7.0, 1.1)
 	victim.float_text("%d%s" % [final, "!" if is_crit else ""],
@@ -4618,9 +4693,6 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int) -
 		victim.hit_react((victim.position - comp.position).normalized())
 	_log("%s: strikes %s for %d%s" % [comp.unit_name, victim.unit_name, final,
 		" CRIT" if is_crit else ""], "#d8b880")
-	# The beast drawing blood feeds the hunter's Ferocity (crits bite deeper).
-	if comp.pack_master != null:
-		_gain_ferocity(comp.pack_master, 10 if is_crit else 5)
 	if result.broke:
 		_stat("breaks_on_enemies" if not victim.is_hero else "breaks_on_heroes")
 		_sfx("break", -3.0)
@@ -4636,6 +4708,41 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int) -
 	await _wait(0.35)
 	# No _check_end here: the battle loop checks after the turn fully resolves
 	# (ending mid-resolve reloads the scene under running code in sim mode).
+
+
+# Marking Shot: an absent beast answers as a spirit — same strike profile,
+# its banked Loyalty intact, but no lasting presence on the field.
+func _spirit_strike(hunter: BattleUnit, kind: String, victim: BattleUnit) -> void:
+	if victim == null or victim.dead:
+		return
+	var l: int = int(hunter.loyalty.get(kind, 0))
+	var pct := (0.10 if kind == "ursus" else 0.20)
+	var raw := pct * hunter.attack * (1.0 + 0.05 * l) * randf_range(0.9, 1.1)
+	var is_crit := randf() < CRIT_CHANCE + hunter.crit_bonus \
+		+ (0.25 if victim.broken else 0.0)
+	if is_crit:
+		raw *= 1.5
+	raw *= 1.0 - float(victim.resists.get("physical", 0.0))
+	var pen := ((0.20 * l) if kind == "aguila" else 0.0)
+	var sp_armor := victim.effective_armor() * (1.0 - clampf(pen, 0.0, 1.0))
+	var final := maxi(int(round(raw * (1.0 - sp_armor))), 1)
+	var result: Dictionary = victim.take_hit(final, 0)
+	_sfx("crit" if is_crit else "hit", -6.0, 1.2)
+	victim.float_text("%d%s" % [final, "!" if is_crit else ""],
+		Color(0.7, 0.85, 1.0), is_crit)
+	_log("The spirit of %s answers the mark: %d%s to %s" % [kind.capitalize(),
+		final, " CRIT" if is_crit else "", victim.unit_name], "#9ab8e0")
+	if not victim.dead:
+		if kind == "canis":
+			_add_bleed_with_burst(victim, 20 + 2 * l)
+		elif kind == "aguila":
+			_apply_status(victim, "exposed", 2)
+	if result.died:
+		_stat("enemy_deaths")
+		_sfx("death", -4.0)
+		_message("%s falls!" % victim.unit_name)
+		_log("† %s dies" % victim.unit_name, "#e05050")
+	await _wait(0.3)
 
 
 # Adds bleed buildup (logged) and detonates the bleedout when the meter fills.
@@ -4864,14 +4971,6 @@ func _input(event: InputEvent) -> void:
 				and current_hero.second_resource >= 1:
 			empower_armed = not empower_armed
 			_show_actions(current_hero)
-			get_viewport().set_input_as_handled()
-			return
-		# C unleashes Frenzy for the Beastmaster once Ferocity is full.
-		if event.keycode == KEY_C and action_panel.visible \
-				and current_hero != null \
-				and current_hero.second_resource_name == "Ferocity" \
-				and current_hero.second_resource >= current_hero.second_max:
-			_unleash_frenzy(current_hero)
 			get_viewport().set_input_as_handled()
 			return
 		if event.keycode in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:

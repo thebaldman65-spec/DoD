@@ -324,12 +324,11 @@ not).</td></tr>
 Devout's tree).</td></tr>
 <tr><td>Tripwire</td><td>Retaliates against every attacking melee enemy for 75% of their
 attack's damage.</td></tr>
-<tr><td>Quarry</td><td>Marked by Aguila (Beastmaster): takes +10% damage from the
-Beastmaster and their pack (eagle strikes 3 turns; Skycry 2 turns).</td></tr>
 <tr><td>Guardian's Roar</td><td>The bear stands firm: Ursus takes 25% less damage
-(Wild Call, 2 turns).</td></tr>
-<tr><td>Frenzy</td><td>The Beastmaster spent a full Ferocity bar: companion strikes hit like
-Kill Command (double damage, doubled effect) for 2 turns.</td></tr>
+(on summon/swap, 2 turns).</td></tr>
+<tr><td>Loyalty</td><td>Beastmaster companion chip (0–5, battle-long): +5% strike damage
+per stack plus the beast's gift; at 5 its Pack Bond boon is doubled. Reset when the beast
+dies.</td></tr>
 <tr><td>Broken</td><td>Loses next turn; −30% armor; +25% crit taken.</td></tr>
 </table>
 <p>Statuses tick down at the start of the affected unit's turn; negative durations last the
@@ -377,7 +376,7 @@ character art (see §12).</p>
 Arcanist; 0–8 while Overcharged)</td></tr>
 <tr><td>Cleric</td><td>121</td><td>15%</td><td>85</td><td>100</td><td>Mana 100 (+ Mercy 0–5 as
 Holy)</td></tr>
-<tr><td>Hunter</td><td>110</td><td>12%</td><td>105</td><td>95</td><td>Focus 100</td></tr>
+<tr><td>Hunter</td><td>110</td><td>12%</td><td>105</td><td>95</td><td>Mana 100</td></tr>
 </table>
 <h3>5.0 Class passives</h3>
 <p>Each CLASS carries one passive, active for every spec of that class (and before
@@ -394,8 +393,8 @@ Warrior (weighted into their random target picks).</li>
 <li><b>Rage (Warrior):</b> starts at 0. +5 at the start of each of his turns; +10 whenever he
 is hit; every attack builds Rage (Strike 20, all spec/talent attacks 10); Perfect Strike
 +10.</li>
-<li><b>Mana (Mage/Cleric):</b> +12 at the start of their turns; potions/Rally restore more.</li>
-<li><b>Focus (Hunter):</b> +15 at the start of their turns; Perfect basic +10.</li>
+<li><b>Mana (Mage/Cleric/Hunter):</b> +12 at the start of their turns; the Hunter's Perfect
+basic adds +10; potions/Rally restore more.</li>
 <li><b>Mercy (HOLY passive, 0–5):</b> only the Holy spec has the bar. +1 stack whenever a
 party member falls below 50% health (any damage source; crossings count each time). Each
 stack held: <b>+5% healing done</b>. Stacks are SPENT on Hymn of Hope (1), Divine Plea (2),
@@ -419,9 +418,9 @@ bonus.</li>
 Pyromancer's Magic Bolt is reforged into <b>Fireball</b>, the Cryomancer's into
 <b>Frostbolt</b>, and the Arcanist's into <b>Arcane Explosion</b> (see §6.2).</li>
 <li><b>Cleric:</b> Smite — 22 holy / 16 BD / 2.0 (Perfect: self-heal 8; the Occultist's
-Smite is corrupted into <b>Shadowrend</b> — same numbers, shadow damage; both perfects:
-the Cleric recovers 5% max health).</li>
-<li><b>Hunter:</b> Quick Shot — 20 dmg / 14 BD / 2.0 (no perfect bonus).</li>
+Smite is corrupted into <b>Shadowrend</b> — 25% Atk shadow, Cripples 2 turns; both
+perfects: the Cleric recovers 5% max health).</li>
+<li><b>Hunter:</b> Quick Shot — 20 dmg / 14 BD / 2.0 (Perfect: +10 Mana).</li>
 </ul>
 
 <h2>6. Archetypes &amp; Specializations</h2>
@@ -586,7 +585,7 @@ the damage dealt (a flat rate while ANY Ruin is on it; the Soul Leech talent dee
 it). One turn after reaching 5 stacks, Ruin DETONATES: 50% of the Occultist's Attack
 as shadow damage, and every ally heals 15% of the Occultist's max health. The stacks
 only work while the Occultist stands. Basic attack: <b>Shadowrend</b> (corrupted
-Smite — 50% Atk shadow / 16 BD / 2.0, Cripples 2 turns).<br>
+Smite — 25% Atk shadow / 16 BD / 2.0, Cripples 2 turns).<br>
 Hex of Ruin — 20 Mana, 2.5, 2cd; curse THREE chosen enemies for 20% Atk shadow / 15 BD
 each, leaving them Exposed 3 turns (Perfect: no cooldown).<br>
 Bewitch — 25 Mana, 3.5, 4cd; the target basic-attacks its OWN allies for 3 turns,
@@ -603,53 +602,53 @@ both.</li>
 </ul>
 <h3>6.4 Hunter</h3>
 <ul>
-<li><b>Beastmaster (Rush)</b> — Passive <i>Pack Bond</i>: while a beast prowls the hunter gains its
-boon — Ursus: +25% Break damage AND the hunter takes 15% less damage; Canis: the hunter's
-attacks build 15 Bleed AND the wolf savages prey under 35% HP (+50% damage); Aguila: +15% crit
-AND every eagle strike marks the <b>Quarry</b> (the target takes +10% damage from the
-Beastmaster and the pack, 3 turns).<br>
-<b>Ferocity (0–100, orange bar):</b> the pack's blood-meter. Builds as the pack draws blood —
-+10 on the hunter's own hits (+15 on a crit), +5 per companion hit (+10 on a crit), and +40 on
-Kill Command (the order plus its strike). Above 50 the beast is <b>Bloodied</b> (+15% companion
-strike damage). At a full bar the hunter may unleash <b>Frenzy</b> — a free action (button, or
-hotkey C): the bar empties and the pack goes berserk for 2 turns, every companion strike
-hitting like Kill Command (double damage, doubled special effect).<br>
-<b>Companions:</b> one at a time, summoned until it dies or is replaced (placeholder sphere
-sprites: red/blue/green). Summoning goes through the <b>"Summon Companion" beast picker</b>
-at the top of the ability list on hotkey W (see §10). No skill check to summon, no resource
-of their own; they have HP,
-can be targeted by enemies and healed by allies, and inherit the hunter's armor, Constitution,
-and crit chance (talents can add companion HP and damage). They automatically attack
-(physical) whenever the hunter attacks; they take no timeline turns (statuses tick and Breaks
-recover on the hunter's turn).<br>
-Summon Ursus — 30 Focus, 3.0. Bear, 80 HP: strikes the hunter's target AND one other enemy
-for 10 dmg + 20 BD each. Pack Bond: +25% Break damage, and the hunter takes 15% less damage.<br>
-Summon Canis — 30 Focus, 3.0. Wolf, 60 HP: 20 dmg, 50% chance to build 20 Bleed, +50% to prey
-under 35% HP. Pack Bond: the hunter's attacks build 15 Bleed.<br>
-Summon Aguila — 30 Focus, 3.0. Eagle, 60 HP: 15 dmg, marks the Quarry, 50% chance to Sunder
-(2 turns). Pack Bond: +15% crit.<br>
-Wild Call — 20 Focus, 2.0, 2cd, requires a living companion. A modal command: the effect is
-the active beast's voice — <b>Ursus, Guardian's Roar:</b> 10 BD to every enemy and the bear
-takes 25% less damage for 2 turns; <b>Canis, Bloodhowl:</b> every Bleeding enemy gains +15
-Bleed buildup instantly; <b>Aguila, Skycry:</b> every enemy is marked Quarry for 2 turns.
-Grants +10 Ferocity (Perfect: +20).<br>
-Feral Mending — 15 Focus, 2.0, 2cd, requires a living companion. Heals the companion for 25%
-of the BEASTMASTER'S max health and cleanses its debuffs; +10 Ferocity (Perfect: heals
-35%).<br>
-Kill Command — 30 Focus, 4.0, the companion strikes the target for DOUBLE damage with its
-special effect doubled (guaranteed procs, doubled Bleed, Sunder 4 turns) and grants +40
-Ferocity. Requires a living companion. (Perfect: triple damage.)</li>
+<li><b>Beastmaster (Ramp)</b> — Passive <i>Pack Bond</i>: the active beast grants its boon —
+<b>Ursus, Savage Presence:</b> enemies are 15% more likely to attack the bear, and the hunter
+takes 10% less damage; <b>Canis:</b> the hunter deals +15% damage for EVERY enemy under 35%
+health; <b>Aguila:</b> the hunter and the whole party gain +10% crit chance.<br>
+<b>Loyalty (per beast, 0–5, chip on the companion):</b> a beast gains 1 Loyalty every hunter
+turn that begins with it active, and 1 more each time it is summoned or swapped in. Each stack:
++5% companion strike damage, plus that beast's gift — Ursus +3% max health, Canis +2 Bleed on
+its strikes, Aguila ignores 20% of the target's armor. At 5 stacks the beast's Pack Bond boon
+is DOUBLED. Each beast keeps its own meter for the whole battle; it resets only when that
+beast dies.<br>
+<b>Summon-and-swap effects</b> fire whenever a beast is summoned OR swapped in — Ursus:
+<i>Guardian's Roar</i>, taunting the lowest-health enemy (preferring one not already taunted)
+while the bear takes 25% less damage for 2 turns; Canis: <i>Bloodhowl</i>, 15 Bleed to every
+enemy; Aguila: dives a chosen enemy for 15% of the hunter's Attack, Dazing them.<br>
+<b>Companions:</b> one at a time (placeholder sphere sprites: red/blue/green). Summoning goes
+through the <b>"Summon Companion" beast picker</b> at the top of the ability list on hotkey W
+(see §10); with a beast already out it becomes <b>"Swap Companion"</b> — 10 Mana, 1.0
+initiative, shared 2-turn cooldown, no skill check: the newcomer arrives with its swap effect
+and +1 Loyalty. Companions have HP, can be targeted by enemies and healed by allies, and
+inherit the hunter's armor, Constitution, and crit chance (talents can add companion HP and
+damage). They automatically attack (physical) whenever the hunter attacks; they take no
+timeline turns (statuses tick and Breaks recover on the hunter's turn).<br>
+Summon Ursus — 20 Mana, 3.0, 3cd. Bear, 110 HP: strikes the hunter's target AND adjacent
+enemies for 10% of the hunter's Attack.<br>
+Summon Canis — 20 Mana, 3.0, 3cd. Wolf, 80 HP: strikes the hunter's target for 20% of the
+hunter's Attack, building 20 Bleed.<br>
+Summon Aguila — 20 Mana, 3.0, 3cd. Eagle, 80 HP: strikes the hunter's target for 20% of the
+hunter's Attack, applying Exposed (2 turns).<br>
+Marking Shot — 25 Mana, 3.0, 2cd, 20% Atk / 10 BD: marks the prey and ALL THREE beasts
+answer — the summoned one attacks as normal, the two absent ones strike as spirits with
+their banked Loyalty (Perfect: the shot deals a flat 25% of Attack).<br>
+Feral Mending — 15 Mana, 2.0, 2cd, requires a living companion. Heals the companion for 25%
+of ITS max health, cleanses its debuffs, and grants 1 Loyalty (Perfect: heals 30%).<br>
+Kill Command — 30 Mana, 4.0, 3cd, the companion strikes the target for DOUBLE damage with its
+special effect doubled (doubled Bleed; Aguila's Exposed lasts 4 turns). Requires a living
+companion. (Perfect: the beast gains 1 Loyalty.)</li>
 <li><b>Sharpshooter (Rush)</b> — Passive <i>Lethal Aim</i>: crits deal ×2 damage.<br>
-Aimed Shot — 20 Focus, 45 dmg / 15 BD / 3.0 (Perfect: +25% crit).<br>
-Powershot — 25 Focus, 20 dmg / 20 BD / 3.0, +2% damage for every point of the
+Aimed Shot — 20 Mana, 45 dmg / 15 BD / 3.0 (Perfect: +25% crit).<br>
+Powershot — 25 Mana, 20 dmg / 20 BD / 3.0, +2% damage for every point of the
 target's Break bar still EMPTY (no perfect bonus).<br>
-Quick Draw — 15 Focus, 2.0, all abilities act 50% faster for 5 turns (Perfect: 6 turns).</li>
+Quick Draw — 15 Mana, 2.0, all abilities act 50% faster for 5 turns (Perfect: 6 turns).</li>
 <li><b>Survivalist (Pressure)</b> — Passive <i>Trapper</i>: enemies that strike the Hunter
 have a 25% chance to be Poisoned (5 turns).<br>
-Tripwire — 20 Focus, 2.5, for 5 turns the Hunter retaliates against EVERY attacking melee
+Tripwire — 20 Mana, 2.5, for 5 turns the Hunter retaliates against EVERY attacking melee
 enemy — regardless of who they hit (Perfect: 6 turns).<br>
-Explosive Shot — 35 Focus, 10 fire to ALL / 20 BD / 3.0 (Perfect: 12 base damage).<br>
-Shrapnel Charge — 25 Focus, 3.0, a scattering charge that rips TWO chosen enemies for 20
+Explosive Shot — 35 Mana, 10 fire to ALL / 20 BD / 3.0 (Perfect: 12 base damage).<br>
+Shrapnel Charge — 25 Mana, 3.0, a scattering charge that rips TWO chosen enemies for 20
 FIRE / 25 BD each and leaves both Crippled and Slowed for 3 turns (Perfect: 4
 turns). The player picks both targets; each fragment rolls miss/parry separately.</li>
 </ul>
@@ -915,8 +914,11 @@ button — Continue / Descend / New Run. Defeat screens still require a click.</
 <b>W</b>. Selecting it (key or click) opens the <b>beast picker</b> — a small window listing
 Ursus / Canis / Aguila with costs: <b>Tab cycles</b> the options (unaffordable beasts are
 skipped and greyed), <b>Space summons</b> the highlighted one, <b>X closes</b> the picker,
-and clicking works as always. The remaining abilities take the following hotkeys in kit
-order (Barbed Arrow E, Poisoned Arrow R, Kill Command A).</li>
+and clicking works as always. With a living beast out, the entry reads <b>Swap
+Companion</b> and the picker offers swaps instead (10 Mana, shared 2-turn cooldown; the
+active beast is greyed out). Summoning or swapping in Aguila then asks for a target — its
+arrival dive. The remaining abilities take the following hotkeys in kit order (Marking
+Shot E, Feral Mending R, Kill Command A).</li>
 <li><b>Burger menu:</b> Restart Run (abandons to a fresh draft), Settings (overlay with volume
 + fullscreen — the battle isn't lost), Exit to Main Menu (run resumes from the last saved
 node).</li>
