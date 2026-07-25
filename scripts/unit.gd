@@ -72,6 +72,38 @@ var loyalty := {}           # Beastmaster: per-beast Loyalty stacks (on the hunt
 var bestial_hp_bonus := 0    # Bestial Wrath (Ursus): doubled health, reverted on expiry
 var bestial_armor_bonus := 0.0
 var vigor_hp_bonus := 0      # Spirit Bond perfect: +10% max health, reverted on expiry
+# ---- Beastmaster lane-tree talents (Batch 30; set via cfg by setup()) ----
+var wild_communion_ranks := 0  # Wild Communion: Loyalty step 5% -> +1.5%/rank
+var unbroken_watch := 0      # +1 Loyalty on turns the beast took no damage
+var loyalty_cap_bonus := 0   # Absolute Devotion: ceiling 5 -> 7
+var devoted_fury := 0        # Bestial Wrath +1 turn per 2 Loyalty
+var steadfast_bond := 0      # death halves Loyalty instead of zeroing
+var ancient_pact := 0        # boon TRIPLED at 5; the beast is unhealable
+var lone_bond := 0           # one beast per fight; starts 3, caps 8
+var quick_whistle_ranks := 0 # swap cooldown -1/rank
+var momentum_ranks := 0      # +8%/rank companion dmg per distinct beast fielded
+var shared_devotion := 0     # summon/swap Loyalty goes to every beast
+var herald := 0              # arrival effects strike an extra target
+var menagerie := 0           # absent summoned beasts keep half their boon
+var no_beast_left := 0       # beast death -> next summon free, no cooldown
+var wild_rotation := 0       # swap has no cooldown; Loyalty caps at 2
+var masters_aim_ranks := 0   # Quick Shot +6%/rank of Attack
+var companion_hp_pct := 0.0  # Beast Within: +10%/rank companion max health
+var deep_reserves_ranks := 0 # Spirit Bond +8%/rank max Mana
+var instinctive := 0         # Hunter's Instinct empowers 5 shots
+var symbiosis := 0           # companion strikes restore 2% max Mana
+var vengeance := 0           # beast death -> inherit boon + 30% dmg, 5 turns
+var lone_hunter := 0         # no companion: costs -40%, damage +25%
+var one_soul := 0            # capstone: shared health pool, double Loyalty
+var apex := 0                # capstone: extra Quick Shot strike, KC resets
+var the_pack := 0            # capstone: deferred (coming soon)
+var vengeance_kind := ""     # which boon Vengeance carries while it lasts
+var kinds_summoned := {}     # beasts fielded this fight (Feral Momentum et al)
+var free_summon := false     # No Beast Left: the next summon is free
+var no_heals := false        # Ancient Pact: this beast rejects all healing
+var soul_partner: BattleUnit = null  # One Soul: damage is split with them
+var _soul_guard := false     # re-entry guard while splitting
+var damaged_since_turn := false  # Unbroken Watch bookkeeping
 var companion_hp_bonus := 0   # talents: extra HP for summoned companions
 var companion_power := 0      # talents: extra damage on companion attacks
 # Fixed-tree talent stats (0/0.0 = not learned). See talents.gd for sources.
@@ -945,6 +977,21 @@ func return_to_idle() -> void:
 
 # Applies damage + Pressure. Returns what happened so battle.gd can react.
 func take_hit(amount: int, pressure_add: int) -> Dictionary:
+	if amount > 0:
+		damaged_since_turn = true  # Unbroken Watch bookkeeping
+	# One Soul (Beastmaster capstone): all damage to either half of the
+	# bond is split evenly between hunter and beast.
+	if amount > 1 and not _soul_guard and soul_partner != null \
+			and is_instance_valid(soul_partner) and not soul_partner.dead \
+			and not dead:
+		var shared: int = amount / 2
+		amount -= shared
+		soul_partner._soul_guard = true
+		soul_partner.take_hit(shared, 0)
+		soul_partner._soul_guard = false
+		float_text("Soul-split", Color(0.75, 0.6, 0.95))
+		_proc_log("One Soul: %s shares %d of the wound with %s" % [
+			unit_name, shared, soul_partner.unit_name])
 	# Barrier absorbs damage (not Pressure) before HP is touched. Divine
 	# Shield barriers carry talent riders: Blessed Barrier (absorbs heal),
 	# Sacred Covenant (lethal saves reward), Afterglow (heal on break).
@@ -1156,6 +1203,11 @@ func recover_from_break() -> void:
 # another unit or an item — the Warden's Endurance talent resets on them.
 # Returns the healing that actually landed (after multipliers).
 func heal_amount(amount: int, external := false) -> int:
+	# Ancient Pact: the beast has forsaken all mending.
+	if no_heals:
+		if amount > 0:
+			float_text("PACT", Color(0.6, 0.45, 0.7))
+		return 0
 	var mult := healing_received_mult
 	if has_status("rally_heal"):
 		mult *= 1.15

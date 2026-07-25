@@ -5,6 +5,40 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-25 — Batch 30: Talent overhaul — lane framework (Beastmaster pilot), new economy, boss-trophy abilities</h2>
+<ul>
+<li><b>New talent economy (all specs):</b> 1 point per fight, 2 per elite, 3 per zone boss;
+rests and shops award none (was 2/4/4). One fight, one purchase — a rank always costs
+exactly 1.</li>
+<li><b>Lane framework (pilot: Beastmaster).</b> Three lanes of seven nodes — playstyles,
+never beasts — plus three capstones of which only ONE may ever be taken. Lanes gate on
+points spent in that lane (tier 2 at 3, tier 3 at 6; capstones at 8); the Nth distinct
+node costs ceil(N/3) while extra ranks stay at 1, so a run buys roughly a third of the
+tree. Exclusive pairs stay visible, greyed with the reason. The other nine trees keep
+their classic grids until converted.</li>
+<li><b>Beastmaster lanes:</b> DEVOTION (Wild Communion, Unbroken Watch, Absolute Devotion,
+Devoted Fury, Steadfast Bond, Ancient Pact, Lone Bond), THE PACK (Quick Whistle, Feral
+Momentum, Shared Devotion, Herald, Menagerie, No Beast Left, Wild Rotation), HANDLER
+(Master's Aim, Beast Within, Deep Reserves, Instinctive, Symbiosis, Vengeance, Lone
+Hunter). Capstones: One Soul (shared health pool, double Loyalty), The Pack (two beasts —
+COMING SOON, deferred), Apex Predator (extra Quick Shot strike; Kill Command resets on
+kills). Exclusive forks: Lone Bond / Wild Rotation and Steadfast Bond / Vengeance.</li>
+<li><b>Kit cut to three base abilities</b> (summons, Hunter's Instinct, Kill Command).
+Bestial Wrath and Spirit Bond are demoted into the <b>boss-trophy pool</b> — one pick per
+zone boss, chosen on the Party screen from five: those two plus NEW <b>Primal Surge</b>
+(spend all Loyalty: 15% Atk per stack + 10% damage per stack spent), <b>Call of the Wild</b>
+(all three beasts strike and fire their arrival effects; rides inside the summon picker),
+and <b>Mark of the Hunt</b> (+25% damage from hunter+beast, Mana per strike, cooldown
+resets on the kill — the only pool entry that needs no beast).</li>
+<li><b>Party screen:</b> lane-tree renderer (three columns, capstone shelf, live lane-point
+headers, cost-aware tooltips and clicks, exclusives greyed with the reason) and the
+boss-trophy chooser panel.</li>
+<li>Verified: 13-assertion headless test of gating/costs/exclusives/capstones all green;
+autoplay exercised Primal Surge, Call of the Wild (spirit strikes + arrivals), Herald's
+doubled Bloodhowl, Devoted Fury (5-turn Wrath), One Soul splitting wounds both ways;
+40-battle sim 40/40, 0 script errors.</li>
+</ul>
+
 <h2>2026-07-25 — Batch 29: Beastmaster kit v4 (per-beast Kill Command, Bestial Wrath, Spirit Bond), Blind keyword, fixes</h2>
 <ul>
 <li><b>Fix — Beastmaster opened battles with 12 Mana:</b> the run-state hero table still

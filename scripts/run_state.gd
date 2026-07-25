@@ -440,13 +440,17 @@ func award_gold(node_type: String) -> int:
 
 
 # Combat rewards: every hero gains talent points (fight 1, elite 2, boss 3).
+# Talent economy (Batch 30): 1 per fight, 2 per elite, 3 per zone boss.
+# Rests and shops award none. (When a FINAL boss exists it should award no
+# points — a relic instead — since points earned when nothing follows are
+# unspendable; every boss today is a zone boss.)
 func award_talent_points(node_type: String) -> int:
-	var pts := 2
+	var pts := 1
 	match node_type:
 		"elite":
-			pts = 4
+			pts = 2
 		"boss":
-			pts = 4
+			pts = 3
 	for member in party:
 		member["talent_points"] = member.get("talent_points", 0) + pts
 	return pts

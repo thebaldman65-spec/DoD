@@ -297,7 +297,7 @@ const FIXED_TREES := {
 			"gate": "row", "requires": "", "requires_ranks": 0,
 			"desc": "When a party member reaches 5 Faith, every other member has a ({v} x their own Faith stacks)% chance to gain 1 stack.",
 			"scale": {"step": 20},
-			"payload": {"stat": {"communion_ranks": 1}}},
+			"payload": {"stat": {"wild_communion_ranks": 1}}},
 		{"id": "dv_unwavering", "name": "Unwavering Faith", "ranks": 3, "row": 0, "col": 2,
 			"gate": "row", "requires": "", "requires_ranks": 0,
 			"desc": "Increases the Devout's maximum health by {v}%.",
@@ -635,15 +635,165 @@ const FIXED_TREES := {
 }
 
 
+# ---------- LANE TREES (Batch 30 framework pilot: Beastmaster) ----------
+# Lanes are playstyles, not beasts. A lane opens its own next tier on points
+# spent IN THAT LANE (tier 1 at 3, tier 2 at 6); capstones need 8 in their
+# lane and only ONE capstone may ever be taken. Node pricing: the Nth
+# DISTINCT node you buy costs ceil(N/3) — 1,1,1,2,2,2,3... — while extra
+# ranks in an open node always cost 1. "exclusive_with" pairs bar each
+# other but stay visible (the player must see the door they closed).
+const LANE_TIER_REQ := {0: 0, 1: 3, 2: 6}
+const CAPSTONE_REQ := 8
+const LANE_NAMES := {"devotion": "Devotion", "pack": "The Pack", "handler": "Handler"}
+
+const LANE_TREES := {
+	"beastmaster": [
+		# --- Lane A: Devotion — stay with one beast, steepen the ramp ---
+		{"id": "bm_communion", "name": "Wild Communion", "ranks": 3, "lane": "devotion", "tier": 0,
+			"desc": "Companion strike damage per Loyalty stack rises to {v}% (from the base 5%).",
+			"scale": {"base": 5.0, "step": 1.5},
+			"payload": {"stat": {"wild_communion_ranks": 1}}},
+		{"id": "bm_unbroken", "name": "Unbroken Watch", "ranks": 1, "lane": "devotion", "tier": 0,
+			"desc": "The active beast gains +1 additional Loyalty on any turn it took no damage.",
+			"payload": {"stat": {"unbroken_watch": 1}}},
+		{"id": "bm_absolute", "name": "Absolute Devotion", "ranks": 1, "lane": "devotion", "tier": 1,
+			"desc": "Loyalty ceiling rises from 5 to 7. The doubled Pack Bond still triggers at 5; stacks 6-7 add strike damage and the beast's gift only.",
+			"payload": {"stat": {"loyalty_cap_bonus": 2}}},
+		{"id": "bm_devoted_fury", "name": "Devoted Fury", "ranks": 1, "lane": "devotion", "tier": 1,
+			"desc": "Bestial Wrath lasts 1 turn longer per 2 Loyalty stacks on the active beast.",
+			"payload": {"stat": {"devoted_fury": 1}}},
+		{"id": "bm_steadfast", "name": "Steadfast Bond", "ranks": 1, "lane": "devotion", "tier": 1,
+			"exclusive_with": "bm_vengeance",
+			"desc": "When a beast dies, its Loyalty returns at half rather than resetting to 0.",
+			"payload": {"stat": {"steadfast_bond": 1}}},
+		{"id": "bm_ancient_pact", "name": "Ancient Pact", "ranks": 1, "lane": "devotion", "tier": 2,
+			"desc": "At 5 Loyalty the Pack Bond boon is TRIPLED instead of doubled — but the beast can no longer be healed by ANY source (Spirit Bond and Hunter's Instinct included).",
+			"payload": {"stat": {"ancient_pact": 1}}},
+		{"id": "bm_lone_bond", "name": "Lone Bond", "ranks": 1, "lane": "devotion", "tier": 2,
+			"exclusive_with": "bm_wild_rotation",
+			"desc": "You may summon only ONE beast per fight: it cannot be swapped, and cannot be re-summoned if it dies. Its Loyalty starts at 3 and caps at 8.",
+			"payload": {"stat": {"lone_bond": 1}}},
+		# --- Lane B: The Pack — rotate; swapping becomes the engine ---
+		{"id": "bm_whistle", "name": "Quick Whistle", "ranks": 2, "lane": "pack", "tier": 0,
+			"desc": "Swap Companion's cooldown is reduced by {v} turn(s).",
+			"scale": {"step": 1},
+			"payload": {"stat": {"quick_whistle_ranks": 1}}},
+		{"id": "bm_momentum", "name": "Feral Momentum", "ranks": 3, "lane": "pack", "tier": 0,
+			"desc": "+{v}% companion damage for each DIFFERENT beast summoned this fight.",
+			"scale": {"step": 8},
+			"payload": {"stat": {"momentum_ranks": 1}}},
+		{"id": "bm_shared", "name": "Shared Devotion", "ranks": 1, "lane": "pack", "tier": 1,
+			"desc": "Summoning or swapping grants +1 Loyalty to EVERY beast, not only the arriving one.",
+			"payload": {"stat": {"shared_devotion": 1}}},
+		{"id": "bm_herald", "name": "Herald", "ranks": 1, "lane": "pack", "tier": 1,
+			"desc": "Arrival effects strike an additional target: Guardian's Roar taunts TWO enemies, Aguila's dive hits TWO, and Bloodhowl doubles its Bleed on the bloodiest enemy.",
+			"payload": {"stat": {"herald": 1}}},
+		{"id": "bm_menagerie", "name": "Menagerie", "ranks": 1, "lane": "pack", "tier": 1,
+			"desc": "The Pack Bond boon of every beast summoned this fight stays active at HALF strength while that beast is away.",
+			"payload": {"stat": {"menagerie": 1}}},
+		{"id": "bm_no_beast_left", "name": "No Beast Left", "ranks": 1, "lane": "pack", "tier": 2,
+			"desc": "When a beast dies, your next summon this fight costs no Mana and ignores its cooldown.",
+			"payload": {"stat": {"no_beast_left": 1}}},
+		{"id": "bm_wild_rotation", "name": "Wild Rotation", "ranks": 1, "lane": "pack", "tier": 2,
+			"exclusive_with": "bm_lone_bond",
+			"desc": "Swap Companion has no cooldown and arrival effects always fire. Loyalty caps at 2.",
+			"payload": {"stat": {"wild_rotation": 1}}},
+		# --- Lane C: Handler — your own game: Quick Shot, Mana, loss ---
+		{"id": "bm_masters_aim", "name": "Master's Aim", "ranks": 3, "lane": "handler", "tier": 0,
+			"desc": "Quick Shot deals +{v}% of your Attack.",
+			"scale": {"step": 6},
+			"payload": {"stat": {"masters_aim_ranks": 1}}},
+		{"id": "bm_beast_within", "name": "Beast Within", "ranks": 3, "lane": "handler", "tier": 0,
+			"desc": "+{v}% companion max health.",
+			"scale": {"step": 10},
+			"payload": {"stat": {"companion_hp_pct": 0.10}}},
+		{"id": "bm_reserves", "name": "Deep Reserves", "ranks": 2, "lane": "handler", "tier": 1,
+			"desc": "Spirit Bond restores +{v}% more max Mana.",
+			"scale": {"step": 8},
+			"payload": {"stat": {"deep_reserves_ranks": 1}}},
+		{"id": "bm_instinctive", "name": "Instinctive", "ranks": 1, "lane": "handler", "tier": 1,
+			"desc": "Hunter's Instinct empowers 5 Quick Shots instead of 3.",
+			"payload": {"stat": {"instinctive": 1}}},
+		{"id": "bm_symbiosis", "name": "Symbiosis", "ranks": 1, "lane": "handler", "tier": 1,
+			"desc": "Whenever your companion strikes, you restore 2% max Mana.",
+			"payload": {"stat": {"symbiosis": 1}}},
+		{"id": "bm_vengeance", "name": "Vengeance", "ranks": 1, "lane": "handler", "tier": 2,
+			"exclusive_with": "bm_steadfast",
+			"desc": "When your beast dies you inherit its Pack Bond boon and gain +30% damage, for 5 turns.",
+			"payload": {"stat": {"vengeance": 1}}},
+		{"id": "bm_lone_hunter", "name": "Lone Hunter", "ranks": 1, "lane": "handler", "tier": 2,
+			"desc": "While you have no companion, your abilities cost 40% less Mana and you deal +25% damage.",
+			"payload": {"stat": {"lone_hunter": 1}}},
+		# --- Capstones: take ONE (8 points in the matching lane) ---
+		{"id": "bm_one_soul", "name": "One Soul", "ranks": 1, "lane": "devotion", "tier": 2,
+			"capstone": true,
+			"desc": "You and the active beast share a health pool — all damage to either is split evenly between you. Loyalty gain is doubled.",
+			"payload": {"stat": {"one_soul": 1}}},
+		{"id": "bm_the_pack", "name": "The Pack", "ranks": 1, "lane": "pack", "tier": 2,
+			"capstone": true, "locked_note": "Coming soon.",
+			"desc": "Two beasts may be active at once. Both have 70% max health and their Loyalty ceilings cap at 3. (Coming in a later batch.)",
+			"payload": {"stat": {"the_pack": 1}}},
+		{"id": "bm_apex", "name": "Apex Predator", "ranks": 1, "lane": "handler", "tier": 2,
+			"capstone": true,
+			"desc": "Quick Shot triggers an ADDITIONAL free companion strike, and Kill Command's cooldown resets whenever an enemy dies.",
+			"payload": {"stat": {"apex": 1}}},
+	],
+}
+
+
 static func has_tree(spec: String) -> bool:
-	return FIXED_TREES.has(spec)
+	return FIXED_TREES.has(spec) or LANE_TREES.has(spec)
 
 
 static func generate_tree(spec: String, _class_key: String) -> Array:
-	# Fixed trees only; specs without one get an empty tree ("coming soon").
+	# Lane trees (new framework) first, then classic fixed trees; specs
+	# without either get an empty tree ("coming soon").
+	if LANE_TREES.has(spec):
+		return LANE_TREES[spec].duplicate(true)
 	if FIXED_TREES.has(spec):
 		return FIXED_TREES[spec].duplicate(true)
 	return []
+
+
+static func is_lane_tree(tree_nodes: Array) -> bool:
+	return not tree_nodes.is_empty() and tree_nodes[0].has("lane")
+
+
+# The Nth DISTINCT node bought costs ceil(N/3); extra ranks cost 1.
+static func next_node_cost(learned: Dictionary) -> int:
+	var distinct := 0
+	for node_id in learned:
+		if int(learned[node_id]) > 0:
+			distinct += 1
+	return int(ceil((distinct + 1) / 3.0))
+
+
+static func node_cost(tree_nodes: Array, learned: Dictionary, id: String) -> int:
+	if not is_lane_tree(tree_nodes):
+		return 1
+	if int(learned.get(id, 0)) > 0:
+		return 1
+	return next_node_cost(learned)
+
+
+# Points spent in one lane: each bought lane node contributes the price it
+# cost when purchased (reconstructed from the purchase order; definition
+# order is the fallback for saves without one) plus 1 per extra rank.
+static func lane_points(tree_nodes: Array, learned: Dictionary, order: Array,
+		lane: String) -> int:
+	var buy_order: Array = order.duplicate()
+	if buy_order.is_empty():
+		for t in tree_nodes:
+			if int(learned.get(t["id"], 0)) > 0:
+				buy_order.append(t["id"])
+	var total := 0
+	for i in buy_order.size():
+		var t := node_in_tree(tree_nodes, buy_order[i])
+		if t.is_empty() or int(learned.get(t["id"], 0)) < 1:
+			continue
+		if str(t.get("lane", "")) == lane:
+			total += int(ceil((i + 1) / 3.0)) + (int(learned[t["id"]]) - 1)
+	return total
 
 
 static func node_in_tree(tree_nodes: Array, id: String) -> Dictionary:
@@ -683,12 +833,39 @@ static func points_below_row(tree_nodes: Array, learned: Dictionary, row: int) -
 	return total
 
 
-static func can_learn(tree_nodes: Array, id: String, learned: Dictionary) -> Dictionary:
+static func can_learn(tree_nodes: Array, id: String, learned: Dictionary,
+		order: Array = []) -> Dictionary:
 	var t := node_in_tree(tree_nodes, id)
 	if t.is_empty():
 		return {"ok": false, "why": "Unknown"}
 	if int(learned.get(id, 0)) >= int(t["ranks"]):
 		return {"ok": false, "why": "Maxed"}
+	# Lane trees: lane-tier gating, one-capstone rule, exclusive pairs.
+	if t.has("lane"):
+		if t.has("locked_note"):
+			return {"ok": false, "why": str(t["locked_note"])}
+		var lane := str(t["lane"])
+		var in_lane := lane_points(tree_nodes, learned, order, lane)
+		if t.get("capstone", false):
+			for other in tree_nodes:
+				if other.get("capstone", false) and other["id"] != id \
+						and int(learned.get(other["id"], 0)) > 0:
+					return {"ok": false, "why": "Barred: %s is your capstone" % \
+						other["name"]}
+			if in_lane < CAPSTONE_REQ:
+				return {"ok": false, "why": "Locked: %d pts in %s (have %d)" % [
+					CAPSTONE_REQ, LANE_NAMES.get(lane, lane), in_lane]}
+		else:
+			var lane_need := int(LANE_TIER_REQ.get(int(t.get("tier", 0)), 0))
+			if in_lane < lane_need:
+				return {"ok": false, "why": "Locked: %d pts in %s (have %d)" % [
+					lane_need, LANE_NAMES.get(lane, lane), in_lane]}
+		var excl := str(t.get("exclusive_with", ""))
+		if excl != "" and int(learned.get(excl, 0)) > 0:
+			var excl_node := node_in_tree(tree_nodes, excl)
+			return {"ok": false, "why": "Barred: %s was taken" % \
+				excl_node.get("name", excl)}
+		return {"ok": true, "why": ""}
 	var row := int(t.get("row", 0))
 	var need := int(ROW_REQ.get(row, 0))
 	if points_below_row(tree_nodes, learned, row) < need:

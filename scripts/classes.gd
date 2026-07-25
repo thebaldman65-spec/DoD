@@ -144,6 +144,42 @@ static func cleric_kit() -> Array:
 
 # Holy talent-granted abilities: the Holy tree isn't designed yet — these
 # defs wait here for its "grants the ability" nodes, and power the
+# Beastmaster boss-trophy pool (Batch 30): one pick per zone boss, chosen
+# from these five. Bestial Wrath and Spirit Bond were demoted from the base
+# kit; the other three are new. Order here is the offer order.
+const BEASTMASTER_POOL := ["Bestial Wrath", "Spirit Bond", "Primal Surge",
+	"Call of the Wild", "Mark of the Hunt"]
+
+static func beastmaster_pool_ability(display_name: String) -> Ability:
+	match display_name:
+		"Bestial Wrath":
+			return Ability.make({"display_name": "Bestial Wrath", "cooldown": 3, "cost": 25,
+				"special": "bestial", "delay": 4.0, "anim": "attack01", "no_skill_check": true,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Unleash the beast for 3 turns —\nUrsus: max health DOUBLES, +50%\narmor, taunts 3 random enemies.\nCanis: +50% damage and +10 Bleed on\nits bleeding strikes. Aguila: +25%\ndamage and every strike BLINDS.\nRequires a living companion."})
+		"Spirit Bond":
+			return Ability.make({"display_name": "Spirit Bond", "cooldown": 3, "cost": 20,
+				"special": "spirit_bond", "delay": 2.0, "anim": "attack01",
+				"perfect_id": "", "perfect_text": "Both gain +10% max health for 5 turns",
+				"description": "You and your companion each heal 25%\nof your max health now and 10% more\nnext turn. You restore 15% max Mana\nnow and 5% on each of your next\n2 turns. Requires a living companion."})
+		"Primal Surge":
+			return Ability.make({"display_name": "Primal Surge", "cooldown": 2, "cost": 20,
+				"special": "primal_surge", "delay": 3.0, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "The Loyalty is spent but NOT lost",
+				"description": "Spend ALL Loyalty on the active beast:\nit strikes for 15% of your Attack per\nstack spent, and you gain +10% damage\nfor that many turns. Loyalty resets\nto 0. Requires a beast with Loyalty."})
+		"Call of the Wild":
+			return Ability.make({"display_name": "Call of the Wild", "cooldown": 4, "cost": 30,
+				"special": "call_wild", "delay": 4.0, "anim": "attack01", "no_skill_check": true,
+				"perfect_id": "", "perfect_text": "",
+				"description": "The whole pack answers: all three\nbeasts appear, each striking your\ntarget for 15% of your Attack and\nfiring its arrival effect, then the\nabsent ones depart."})
+		"Mark of the Hunt":
+			return Ability.make({"display_name": "Mark of the Hunt", "cooldown": 3, "cost": 15,
+				"special": "mark_hunt", "delay": 2.0, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "The mark lasts 7 turns",
+				"description": "Mark an enemy for 5 turns: you and\nyour companion deal +25% damage to it\nand every strike on it restores 3%\nof your max Mana. The cooldown resets\nif the marked enemy dies.\nWorks with or without a beast."})
+	return null
+
+
 # DOD_SIM_ABILITIES test hook meanwhile. faith_cost = Mercy stacks.
 static func pending_talent_ability(display_name: String) -> Ability:
 	match display_name:
@@ -522,14 +558,6 @@ static func spec_abilities(spec: String) -> Array:
 					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
 					"perfect_id": "", "perfect_text": "",
 					"description": "Empower your next 3 Quick Shots:\neach deals +10% of your Attack and\nheals your companion for 15% of\nits max health."}),
-				Ability.make({"display_name": "Bestial Wrath", "cooldown": 3, "cost": 25, "special": "bestial",
-					"delay": 4.0, "anim": "attack01", "no_skill_check": true,
-					"perfect_id": "", "perfect_text": "",
-					"description": "Unleash the beast for 3 turns —\nUrsus: max health DOUBLES, +50%\narmor, taunts 3 random enemies.\nCanis: +50% damage and +10 Bleed on\nits bleeding strikes. Aguila: +25%\ndamage and every strike BLINDS.\nRequires a living companion."}),
-				Ability.make({"display_name": "Spirit Bond", "cooldown": 3, "cost": 20, "special": "spirit_bond",
-					"delay": 2.0, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "Both gain +10% max health for 5 turns",
-					"description": "You and your companion each heal 25%\nof your max health now and 10% more\nnext turn. You restore 15% max Mana\nnow and 5% on each of your next\n2 turns. Requires a living companion."}),
 				Ability.make({"display_name": "Kill Command", "cooldown": 3, "cost": 30, "special": "kill_command",
 					"delay": 4.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "The beast gains 1 Loyalty",

@@ -63,6 +63,51 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+TALENT OVERHAUL (07-25, Batch 30): economy 1/2/3 (fight/elite/boss,
+run_state.award_talent_points; final-boss-no-points rule documented but
+unattachable until a final boss exists). LANE FRAMEWORK pilot =
+beastmaster (others stay row-gated flat-cost): Talents.LANE_TREES
+(nodes carry lane/tier/capstone/exclusive_with/locked_note),
+LANE_TIER_REQ {0,3,6}, CAPSTONE_REQ 8-in-lane + only-one-capstone,
+node pricing ceil(N/3) via next_node_cost/node_cost (ranks always 1),
+lane_points reconstructs per-node prices from member["talent_order"]
+(party_screen appends on first rank; definition-order fallback),
+can_learn(tree,id,learned,order) lane branch (locked_note = The Pack
+"Coming soon."). 13-assertion headless test in scratchpad passed.
+Party screen: _draw_lane_tree (LANE_COL_X/ROW_Y consts, capstone
+shelf, live lane-pts headers), _make_tree_node node_size param,
+cost-aware _learn_talent + tooltips, _draw_bm_pick trophy chooser
+(bm_picks_owed → bm_abilities on the member; battle spawn appends via
+Classes.beastmaster_pool_ability; boss victory sets owed).
+BEASTMASTER KIT v5: base = summons + Hunter's Instinct + Kill Command.
+BOSS-TROPHY POOL (Classes.BEASTMASTER_POOL, 1 pick/zone boss): Bestial
+Wrath + Spirit Bond (demoted) + Primal Surge ("primal_surge" special —
+NOT "surge", that id belongs to the old +20% buff! spends loyalty,
+status 1t/stack, perfect keeps stacks) + Call of the Wild ("call_wild",
+rides the summon picker + menu group filter; _ghost_hit spirits +
+_arrival_for_kind(hunter,kind,body,target) refactor, body=null skips
+self-buffs, taunt falls to active beast else hunter) + Mark of the Hunt
+("hunt_mark" status power=hunter idx; +25% hunter/beast sites; 3% mana
+per strike; _on_enemy_death resets its cd). DOD_SIM_ABILITIES now also
+feeds beastmaster pool names. Node hooks: _bond_mult(hunter,kind)
+centralizes boon tiers (1/2/3=Ancient Pact, 0.5=Menagerie via
+kinds_summoned, Vengeance carries vengeance_kind while status lasts) —
+ursus DR + attraction, canis wounded-bond, aguila _party_crit_bonus
+(chip keen_eyes reads it too). _loyalty_cap (5+bonus/7/8 lone/2 wild
+rotation; boon threshold FIXED at 5). _comp_dmg_mult = loyalty step
+(wild_communion_ranks — NOT communion_ranks, that's the Devout's!) ×
+bestial × momentum(kinds_summoned). _on_beast_death (steadfast half /
+vengeance status+kind / no_beast_left free_summon → _eff_cost 0 +
+ready bypass; _eff_cost also lone_hunter ×0.6). One Soul: unit.take_hit
+splits via soul_partner + _soul_guard (proc-logged); Ancient Pact:
+unit.no_heals rejects ALL healing. Unbroken Watch reads
+damaged_since_turn (set in take_hit, cleared at hunter turn start).
+Herald widens arrivals (2 taunts / 2 dives / double howl on bloodiest).
+Apex: extra co-strike on Quick Shot + KC erase in _on_enemy_death.
+Lone Bond: loyalty floor 3 at summon (skips arrival gain), summon gate
+once kinds_summoned non-empty. Master's Aim/Instinctive/Deep Reserves/
+Devoted Fury/Beast Within (companion_hp_pct — % of base; flat
+companion_hp_bonus rides on top) wired at their ability sites.
 BEASTMASTER v3 LOYALTY (07-24, Batch 28; replaces Ferocity/Frenzy/Wild
 Call/Quarry — all machinery REMOVED): archetype RAMP. ALL HUNTERS ON
 MANA (class cfg resource_name; +12/turn shared branch; Quick Shot

@@ -326,10 +326,19 @@ func _draw_detail() -> void:
 		soon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		add_child(soon)
 		return
-	tree_header.text = "TALENTS — %s tree    (Points: %d)" % [
-		Classes.SPEC_INFO[spec]["name"], member.get("talent_points", 0)]
-	_draw_fixed_tree(member.get("tree", []), member.get("talents", {}),
-		member.get("talent_points", 0))
+	if Talents.is_lane_tree(member.get("tree", [])):
+		tree_header.text = "TALENTS — %s lanes    (Points: %d · next node costs %d)" % [
+			Classes.SPEC_INFO[spec]["name"], member.get("talent_points", 0),
+			Talents.next_node_cost(member.get("talents", {}))]
+		_draw_lane_tree(member)
+	else:
+		tree_header.text = "TALENTS — %s tree    (Points: %d)" % [
+			Classes.SPEC_INFO[spec]["name"], member.get("talent_points", 0)]
+		_draw_fixed_tree(member.get("tree", []), member.get("talents", {}),
+			member.get("talent_points", 0))
+	# Beastmaster boss trophies wait on the Party screen until chosen.
+	if spec == "beastmaster" and int(member.get("bm_picks_owed", 0)) > 0:
+		_draw_bm_pick(member)
 
 
 # ---------- fixed talent tree (styled after the "Appearance example") ----------
@@ -384,7 +393,70 @@ func _draw_fixed_tree(tree: Array, learned: Dictionary, points: int) -> void:
 		add_child(line)
 	for talent in tree:
 		_make_tree_node(talent, learned, points, _node_center(talent))
+	_build_tree_tip()
 
+
+# ---------- lane talent tree (Batch 30 framework: Beastmaster pilot) ----------
+
+const LANE_COL_X := [620.0, 872.0, 1124.0]
+const LANE_ROW_Y := [150.0, 206.0, 262.0, 318.0, 374.0, 430.0, 486.0]
+const LANE_CAP_Y := 566.0
+const LANE_ORDER := ["devotion", "pack", "handler"]
+
+
+func _draw_lane_tree(member: Dictionary) -> void:
+	var tree: Array = member.get("tree", [])
+	var learned: Dictionary = member.get("talents", {})
+	var order: Array = member.get("talent_order", [])
+	var points: int = member.get("talent_points", 0)
+	var back := ColorRect.new()
+	back.position = TREE_BACK_POS
+	back.size = TREE_BACK_SIZE
+	back.color = Color(0.05, 0.05, 0.06)
+	add_child(back)
+	# Lane spines + headers with live lane-point counts.
+	for ci in LANE_COL_X.size():
+		var v := ColorRect.new()
+		v.position = Vector2(LANE_COL_X[ci], TREE_BACK_POS.y + 18)
+		v.size = Vector2(1, TREE_BACK_SIZE.y - 30)
+		v.color = Color(1, 1, 1, 0.05)
+		add_child(v)
+		var lane: String = LANE_ORDER[ci]
+		var hdr := Label.new()
+		hdr.text = "%s — %d pts" % [str(Talents.LANE_NAMES[lane]).to_upper(),
+			Talents.lane_points(tree, learned, order, lane)]
+		hdr.add_theme_font_size_override("font_size", 13)
+		hdr.add_theme_color_override("font_color", Color(0.85, 0.75, 0.45))
+		hdr.position = Vector2(LANE_COL_X[ci] - 110, TREE_BACK_POS.y + 6)
+		hdr.size = Vector2(220, 16)
+		hdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		add_child(hdr)
+	# Capstone shelf: one of three, forever.
+	var cap_lbl := Label.new()
+	cap_lbl.text = "— CAPSTONES · take ONE (8 pts in its lane) —"
+	cap_lbl.add_theme_font_size_override("font_size", 12)
+	cap_lbl.add_theme_color_override("font_color", Color(0.7, 0.6, 0.75))
+	cap_lbl.position = Vector2(TREE_BACK_POS.x, LANE_CAP_Y - 52)
+	cap_lbl.size = Vector2(TREE_BACK_SIZE.x, 14)
+	cap_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	add_child(cap_lbl)
+	# Nodes: lanes fill top-down in definition order; capstones on the shelf.
+	var lane_counts := {"devotion": 0, "pack": 0, "handler": 0}
+	for talent in tree:
+		var lane: String = str(talent.get("lane", "devotion"))
+		var col := maxi(LANE_ORDER.find(lane), 0)
+		var center: Vector2
+		if talent.get("capstone", false):
+			center = Vector2(LANE_COL_X[col], LANE_CAP_Y)
+		else:
+			var row: int = clampi(int(lane_counts[lane]), 0, LANE_ROW_Y.size() - 1)
+			center = Vector2(LANE_COL_X[col], LANE_ROW_Y[row])
+			lane_counts[lane] = int(lane_counts[lane]) + 1
+		_make_tree_node(talent, learned, points, center, 44.0)
+	_build_tree_tip()
+
+
+func _build_tree_tip() -> void:
 	# Shared hover tooltip: black panel, white bold name, yellow description.
 	_tree_tip = PanelContainer.new()
 	var tip_style := StyleBoxFlat.new()
@@ -429,16 +501,18 @@ func _node_center(talent: Dictionary) -> Vector2:
 
 
 func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
-		center: Vector2) -> void:
+		center: Vector2, node_size: float = TREE_NODE_SIZE) -> void:
 	var ranks_have := int(learned.get(talent["id"], 0))
 	var check: Dictionary = Talents.can_learn(
-		Run.party[selected].get("tree", []), talent["id"], learned)
-	var locked: bool = not check["ok"] and check["why"].begins_with("Locked")
+		Run.party[selected].get("tree", []), talent["id"], learned,
+		Run.party[selected].get("talent_order", []))
+	var locked: bool = not check["ok"] and (check["why"].begins_with("Locked")
+		or check["why"].begins_with("Barred") or check["why"].begins_with("Coming"))
 	var maxed: bool = ranks_have >= int(talent["ranks"])
 
 	var btn := Button.new()
-	btn.custom_minimum_size = Vector2(TREE_NODE_SIZE, TREE_NODE_SIZE)
-	btn.position = center - Vector2(TREE_NODE_SIZE / 2.0, TREE_NODE_SIZE / 2.0)
+	btn.custom_minimum_size = Vector2(node_size, node_size)
+	btn.position = center - Vector2(node_size / 2.0, node_size / 2.0)
 	btn.focus_mode = Control.FOCUS_NONE
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.10, 0.10, 0.12)
@@ -451,9 +525,9 @@ func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
 	btn.add_theme_stylebox_override("normal", sb)
 	btn.add_theme_stylebox_override("hover", sb_hover)
 	btn.add_theme_stylebox_override("pressed", sb_hover)
-	# Placeholder emblem until node art lands.
-	btn.text = "⚔"
-	btn.add_theme_font_size_override("font_size", 24)
+	# Placeholder emblem until node art lands (capstones wear a crown).
+	btn.text = "♛" if talent.get("capstone", false) else "⚔"
+	btn.add_theme_font_size_override("font_size", 24 if node_size >= 50.0 else 19)
 	btn.add_theme_color_override("font_color",
 		Color(0.30, 0.30, 0.34) if locked else Color(0.58, 0.58, 0.64))
 	btn.add_theme_color_override("font_hover_color", Color(0.75, 0.75, 0.8))
@@ -466,15 +540,15 @@ func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
 
 	var pts_label := Label.new()
 	pts_label.text = "%d/%d" % [ranks_have, int(talent["ranks"])]
-	pts_label.add_theme_font_size_override("font_size", 12)
+	pts_label.add_theme_font_size_override("font_size", 12 if node_size >= 50.0 else 10)
 	var pts_color := Color(0.78, 0.75, 0.7)
 	if maxed:
 		pts_color = Color(0.5, 0.9, 0.55)
 	elif ranks_have > 0:
 		pts_color = Color(0.95, 0.85, 0.4)
 	pts_label.add_theme_color_override("font_color", pts_color)
-	pts_label.position = center + Vector2(-TREE_NODE_SIZE / 2.0, TREE_NODE_SIZE / 2.0 + 4)
-	pts_label.size = Vector2(TREE_NODE_SIZE, 14)
+	pts_label.position = center + Vector2(-node_size / 2.0, node_size / 2.0 + 1)
+	pts_label.size = Vector2(node_size, 14)
 	pts_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(pts_label)
 
@@ -485,14 +559,22 @@ func _show_tree_tip(talent: Dictionary, ranks_have: int, check: Dictionary,
 	# Values reflect the invested points (rank-1 preview when unlearned).
 	_tree_tip_desc.text = Talents.desc_for(talent, ranks_have)
 	var state := "Rank %d/%d" % [ranks_have, int(talent["ranks"])]
+	var cost := Talents.node_cost(Run.party[selected].get("tree", []),
+		Run.party[selected].get("talents", {}), talent["id"])
 	if ranks_have >= int(talent["ranks"]):
 		state += "  —  MAXED"
 	elif not check["ok"]:
 		state += "  —  %s" % check["why"]
-	elif points < 1:
-		state += "  —  no talent points left"
+	elif points < cost:
+		state += "  —  costs %d point%s (have %d)" % [cost,
+			"" if cost == 1 else "s", points]
 	else:
-		state += "  —  click to spend a point"
+		state += "  —  click to spend %d point%s" % [cost,
+			"" if cost == 1 else "s"]
+	if talent.get("exclusive_with", "") != "":
+		var sib := Talents.node_in_tree(Run.party[selected].get("tree", []),
+			talent["exclusive_with"])
+		state += "\nExclusive with %s" % sib.get("name", "its sibling")
 	_tree_tip_state.text = state
 	_tree_tip.visible = true
 	# Sits to the left of the hovered node, like the reference image.
@@ -531,10 +613,68 @@ func _toggle_rune(rune_idx: int) -> void:
 func _learn_talent(talent_id: String) -> void:
 	var member: Dictionary = Run.party[selected]
 	var learned: Dictionary = member.get("talents", {})
-	if member.get("talent_points", 0) < 1 \
-			or not Talents.can_learn(member.get("tree", []), talent_id, learned)["ok"]:
+	var tree: Array = member.get("tree", [])
+	var cost := Talents.node_cost(tree, learned, talent_id)
+	if member.get("talent_points", 0) < cost \
+			or not Talents.can_learn(tree, talent_id, learned,
+			member.get("talent_order", []))["ok"]:
 		return
+	var first_rank := int(learned.get(talent_id, 0)) < 1
 	learned[talent_id] = int(learned.get(talent_id, 0)) + 1
 	member["talents"] = learned
-	member["talent_points"] -= 1
+	member["talent_points"] = int(member.get("talent_points", 0)) - cost
+	# Lane trees price nodes by purchase order — record it.
+	if first_rank and Talents.is_lane_tree(tree):
+		member["talent_order"] = member.get("talent_order", []) + [talent_id]
+	_draw_screen()
+
+
+# ---------- Beastmaster boss trophy: pick 1 of the remaining pool ----------
+
+func _draw_bm_pick(member: Dictionary) -> void:
+	var panel := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.04, 0.04, 0.05, 0.97)
+	style.border_color = Color(0.85, 0.7, 0.35)
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(8)
+	style.content_margin_left = 18.0
+	style.content_margin_right = 18.0
+	style.content_margin_top = 12.0
+	style.content_margin_bottom = 14.0
+	panel.add_theme_stylebox_override("panel", style)
+	panel.position = Vector2(690, 170)
+	panel.z_index = 18
+	add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	panel.add_child(box)
+	var title := Label.new()
+	title.text = "BOSS TROPHY — choose one ability (%d owed)" % \
+		int(member.get("bm_picks_owed", 0))
+	title.add_theme_font_size_override("font_size", 15)
+	title.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
+	box.add_child(title)
+	for pool_name in Classes.BEASTMASTER_POOL:
+		if pool_name in member.get("bm_abilities", []):
+			continue
+		var ab := Classes.beastmaster_pool_ability(pool_name)
+		var b := Button.new()
+		b.text = pool_name
+		b.custom_minimum_size = Vector2(300, 34)
+		b.add_theme_font_size_override("font_size", 14)
+		if ab != null:
+			b.tooltip_text = "%s\n\n%s" % [pool_name, ab.description]
+		b.pressed.connect(_pick_bm_ability.bind(pool_name))
+		box.add_child(b)
+
+
+func _pick_bm_ability(pool_name: String) -> void:
+	var member: Dictionary = Run.party[selected]
+	if int(member.get("bm_picks_owed", 0)) < 1 \
+			or pool_name in member.get("bm_abilities", []):
+		return
+	member["bm_abilities"] = member.get("bm_abilities", []) + [pool_name]
+	member["bm_picks_owed"] = int(member.get("bm_picks_owed", 0)) - 1
+	Run.save_run()
 	_draw_screen()
