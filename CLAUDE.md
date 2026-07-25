@@ -87,14 +87,38 @@ the self-cast list; bot passes u → fallback lowest-HP). SWAP: picker
 builds "Swap X" CLONES (10 Mana, delay 1.0, cooldown 0) when companion
 alive; shared cd = cooldowns["Swap Companion"]=3 set in _do_summon on
 was_swap; gates in _ability_usable (begins_with "Swap": shared cd +
-not-active-kind). Kit: summons 20 Mana/3cd (ursus 110hp target+
-_adjacent_enemies 10%, canis 80hp 20%+20bleed, aguila 80hp 20%+exposed
-2t/4t boosted); Marking Shot 25 Mana 2cd 20% (perfect flat 25% via the
-Frostbolt override list; special "marking_shot" = _spirit_strike per
-absent kind, active beast covered by the normal co-strike); Feral
-Mending heals 25/30%perf of the BEAST'S max + purge + 1 Loyalty; KC
-2.0×/boosted, perfect +1 Loyalty. Bot: mend<50% → KC → Marking Shot.
-Shadowrend 50→25%.
+not-active-kind). Kit v4 (07-25, Batch 29; Marking Shot + Feral Mending REMOVED —
+_spirit_strike deleted): summons 20 Mana/3cd (ursus 110hp target+
+_adjacent_enemies 10%; canis 80hp 20%+20bleed; aguila 80hp 20%+exposed
+2t/4t boosted). BLIND keyword: +50% miss, in DEBUFF_IDS;
+_miss_chance(attacker, defender) — defender param also carries
+ELUSIVENESS (canis/aguila permanent "elusive" chip stamped in
+_do_summon: +25% miss against them); both _resolve miss sites pass the
+defender. KC modal on companion_kind (kc_mult = loyalty × 
+_bestial_dmg_mult): ursus 45%+40BD; canis 3×18% bites +(10+2L+10bestial)
+bleed each + feast 30% self-heal; aguila TWO targets 25% + blind 3t
+(kc_two flag in the targeting flow reuses the choose_two picker; bot
+falls back to _lowest_hp other). Hunter's Instinct "instinct" special
+(no_skill_check): status power=3 chip HI#; Quick Shot raw += 0.10*Atk
+(perfect-override block) + post-strike heal 15% comp max & decrement
+(before the co-strike site). Bestial Wrath "bestial" special
+(no_skill_check, 3t): ursus max_hp×2 + armor×1.5 (bestial_hp/
+armor_bonus fields, reverted in the companion-tick block when the
+status drops) + taunts 3 random (mocked 100+idx); canis ×1.5 dmg +10
+bleed; aguila ×1.25 + blind 2t on strikes (_bestial_dmg_mult feeds
+_companion_strike AND KC). Spirit Bond "spirit_bond": both heal 25%
+own-max + "spirit_heal" 1t (power = 10% own max; hero side processed
+in the pre-tick turn-start block, companion side pre-tick in the
+companion block) + mana 15% now + "spirit_mana" 2t (5%/turn); perfect
+"vigor" 5t = +10% max HP via vigor_hp_bonus (reverted post-tick both
+sides). Gates: kill_command/bestial/spirit_bond need living companion.
+Bot: spirit bond when hurt → bestial → KC → instinct. CHIP FIXES:
+loyalty chip spells the gift + "PACK BOND BOON DOUBLED" at 5;
+"keen_eyes" party chip maintained in _update_talent_chips while
+_living_aguila (+10/20%). FIX 12-mana start: run_state HERO_BASE
+hunter mana 0→100 (old saves keep the low value until a new run).
+Talent points: award_talent_points 2/4/4 (fight/elite/boss).
+Resurrection faith_cost 3→1. Shadowrend 50→25%.
 HOLY MERCY REWORK (07-22): FAITH IS GONE from all clerics (no second
 resource except Holy; the +10/action build site removed; ability
 faith_cost now = generic secondary cost). MIRACLE keyword retired. Core

@@ -149,10 +149,10 @@ static func pending_talent_ability(display_name: String) -> Ability:
 	match display_name:
 		"Resurrection":
 			return Ability.make({"display_name": "Resurrection", "cooldown": 3,
-				"cost": 0, "faith_cost": 3, "special": "resurrection",
+				"cost": 0, "faith_cost": 1, "special": "resurrection",
 				"target": Ability.Target.ALLY, "delay": 4.0, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "Returns them at 25% instead",
-				"description": "Spend 3 Mercy: return a fallen ally\nto life with 20% health and resource.\nEmpower (+1 Mercy): full health and\nresource, plus 5 turns of Renewal."})
+				"description": "Spend 1 Mercy: return a fallen ally\nto life with 20% health and resource.\nEmpower (+1 Mercy): full health and\nresource, plus 5 turns of Renewal."})
 		"Divine Plea":
 			return Ability.make({"display_name": "Divine Plea", "cooldown": 2,
 				"cost": 0, "faith_cost": 2, "special": "divine_plea",
@@ -513,23 +513,27 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Summon Canis", "cooldown": 3, "cost": 20, "special": "summon",
 					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
 					"perfect_id": "", "perfect_text": "",
-					"description": "Call the wolf (80 HP): attacks with you\nfor 20% of your Attack, building\n20 Bleed. Pack Bond: +15% damage per\nenemy under 35% health.\nOn arrival: BLOODHOWL — 15 Bleed\nto every enemy.\nLoyalty gift: +2 Bleed per stack."}),
+					"description": "Call the wolf (80 HP): attacks with you\nfor 20% of your Attack, building\n20 Bleed. Always ELUSIVE: enemies miss\nit 25% more. Pack Bond: +15% damage\nper enemy under 35% health.\nOn arrival: BLOODHOWL — 15 Bleed\nto every enemy.\nLoyalty gift: +2 Bleed per stack."}),
 				Ability.make({"display_name": "Summon Aguila", "cooldown": 3, "cost": 20, "special": "summon",
 					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
 					"perfect_id": "", "perfect_text": "",
-					"description": "Call the eagle (80 HP): attacks with you\nfor 20% of your Attack, applying\nExposed. Pack Bond: the whole party\ngains +10% crit chance.\nOn arrival: dives a chosen enemy for\n15% of your Attack, Dazing them.\nLoyalty gift: ignores 20% armor\nper stack."}),
-				Ability.make({"display_name": "Marking Shot", "cooldown": 2, "cost": 25, "damage": 20,
-					"pressure": 10, "delay": 3.0, "anim": "attack02", "special": "marking_shot",
-					"perfect_id": "", "perfect_text": "Deals 25% of your Attack instead",
-					"description": "Mark your prey: ALL THREE beasts\nanswer — the summoned one attacks as\nnormal, the others strike as spirits\nwith their Loyalty intact."}),
-				Ability.make({"display_name": "Feral Mending", "cooldown": 2, "cost": 15, "special": "feral_mending",
+					"description": "Call the eagle (80 HP): attacks with you\nfor 20% of your Attack, applying\nExposed. Always ELUSIVE: enemies miss\nit 25% more. Pack Bond: the whole\nparty gains +10% crit chance.\nOn arrival: dives a chosen enemy for\n15% of your Attack, Dazing them.\nLoyalty gift: ignores 20% armor\nper stack."}),
+				Ability.make({"display_name": "Hunter's Instinct", "cooldown": 3, "cost": 20, "special": "instinct",
+					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
+					"perfect_id": "", "perfect_text": "",
+					"description": "Empower your next 3 Quick Shots:\neach deals +10% of your Attack and\nheals your companion for 15% of\nits max health."}),
+				Ability.make({"display_name": "Bestial Wrath", "cooldown": 3, "cost": 25, "special": "bestial",
+					"delay": 4.0, "anim": "attack01", "no_skill_check": true,
+					"perfect_id": "", "perfect_text": "",
+					"description": "Unleash the beast for 3 turns —\nUrsus: max health DOUBLES, +50%\narmor, taunts 3 random enemies.\nCanis: +50% damage and +10 Bleed on\nits bleeding strikes. Aguila: +25%\ndamage and every strike BLINDS.\nRequires a living companion."}),
+				Ability.make({"display_name": "Spirit Bond", "cooldown": 3, "cost": 20, "special": "spirit_bond",
 					"delay": 2.0, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "Heals 30% instead",
-					"description": "Tend the bond: heal your companion\nfor 25% of ITS max health, cleanse\nits debuffs, and gain 1 Loyalty.\nRequires a living companion."}),
+					"perfect_id": "", "perfect_text": "Both gain +10% max health for 5 turns",
+					"description": "You and your companion each heal 25%\nof your max health now and 10% more\nnext turn. You restore 15% max Mana\nnow and 5% on each of your next\n2 turns. Requires a living companion."}),
 				Ability.make({"display_name": "Kill Command", "cooldown": 3, "cost": 30, "special": "kill_command",
 					"delay": 4.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "The beast gains 1 Loyalty",
-					"description": "Order your companion to savage a target:\ndouble damage and doubled special effect\n(Aguila's Exposed lasts twice as long).\nRequires a living companion."}),
+					"description": "The order depends on the beast —\nUrsus: mauls for 45% of your Attack\nplus 40 Break damage. Canis: 3 bites\nof 18% Attack, 10 Bleed each; the wolf\nfeasts, healing 30% of its max health.\nAguila: strikes TWO chosen enemies for\n25% Attack, BLINDING them 3 turns.\nRequires a living companion."}),
 			]
 		"sharpshooter":
 			return [

@@ -49,7 +49,7 @@ const HERO_BASE := {
 	"warrior": {"hp": 154, "mana": 0},
 	"mage": {"hp": 99, "mana": 100},
 	"cleric": {"hp": 121, "mana": 100},
-	"hunter": {"hp": 110, "mana": 0},
+	"hunter": {"hp": 110, "mana": 100},
 }
 
 
@@ -441,12 +441,12 @@ func award_gold(node_type: String) -> int:
 
 # Combat rewards: every hero gains talent points (fight 1, elite 2, boss 3).
 func award_talent_points(node_type: String) -> int:
-	var pts := 1
+	var pts := 2
 	match node_type:
 		"elite":
-			pts = 2
+			pts = 4
 		"boss":
-			pts = 3
+			pts = 4
 	for member in party:
 		member["talent_points"] = member.get("talent_points", 0) + pts
 	return pts

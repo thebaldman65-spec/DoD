@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-24</b></p>
+<p align="right"><b>Last updated: 2026-07-25</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -29,8 +29,9 @@ it. Up to 3 unlocked relics may be equipped for the run.</li>
 <li><b>Spec choice:</b> offered per hero after the first victory. Three cards per class, each
 showing the spec name, its <b>archetype</b> in bold (mouseover for the archetype explanation),
 blurb, passive, and full ability details. The choice is permanent for the run.</li>
-<li><b>Victory rewards:</b> gold + talent points for every hero. Fallen heroes return after a
-won battle at 20% max HP ("the Untouched refuse to stay down").</li>
+<li><b>Victory rewards:</b> gold + talent points for every hero — 2 per fight, 4 for elite
+and boss encounters. Fallen heroes return after a won battle at 20% max HP ("the Untouched
+refuse to stay down").</li>
 <li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft.</li>
 <li><b>Saving:</b> auto-save to user://run_save.bin after every completed node AND after
 spec confirmation (including debug rerolls); Continue resumes at the map. Loading migrates
@@ -48,8 +49,8 @@ fixed deck per zone:</p>
 <tr><td>Fight</td><td>18</td><td>60%</td><td>Battle vs. a themed warband bought from a
 power budget (see §9). Fights on tiers 6+ have a 25% chance to spawn as an ELITE (tougher
 themes, double talent points, more gold).</td></tr>
-<tr><td>Rest</td><td>6</td><td>20%</td><td>Party heals 30% max HP and Mage/Cleric recover 30%
-Mana at the waystone.</td></tr>
+<tr><td>Rest</td><td>6</td><td>20%</td><td>Party heals 30% max HP and Mana users
+(Mage/Cleric/Hunter) recover 30% Mana at the waystone.</td></tr>
 <tr><td>Shop</td><td>6</td><td>20%</td><td>The Wandering Peddler: consumables + one rune offer
 per party member (see §8).</td></tr>
 </table>
@@ -66,7 +67,7 @@ gold purse (80–100).</p>
 <li><b>Zones:</b> 1. Forest of Old → 2. The Scarlands. Enemy stats grow with the global
 node tier (see §9); deeper-zone enemies are tinted redder, and later zones field new,
 tougher rosters.</li>
-<li><b>Zone completion:</b> killing the boss awards a relic unlock, big gold, 3 talent points,
+<li><b>Zone completion:</b> killing the boss awards a relic unlock, big gold, 4 talent points,
 and fully restores the party (HP and Mana) before the descent.</li>
 <li><b>Map screen:</b> zone art background, node ladder, Party button (shows unspent talent
 points), read-only Inventory dropdown, burger menu (Restart Run / Quit to Main Menu / Quit to
@@ -121,8 +122,10 @@ Nature, Holy, Shadow, Arcane — working exactly like armor but against that dam
 (negative = weakness). Hover "Resistances" on the stat page to read them; per-spec values
 are being assigned class by class (all 0% until then).</li>
 <li><b>Miss:</b> 5% base chance (single-target, non-counter only); a <b>Dazed</b> attacker is
-20% more likely to miss. AoE never misses/parries. Multi-hit and random-hit attacks roll miss
-<i>per strike</i> — a missed hit never cancels the follow-up strikes.</li>
+20% more likely to miss, a <b>Blinded</b> one 50% more. Attacks against an <b>Elusive</b>
+target (Canis/Aguila) are 25% more likely to miss. AoE never misses/parries. Multi-hit and
+random-hit attacks roll miss <i>per strike</i> — a missed hit never cancels the follow-up
+strikes.</li>
 <li><b>Parry:</b> <b>only MELEE attacks can be parried</b> — ranged attackers (Hunter and
 Mage among heroes; Orc Archers and Shamans among enemies) sail past the blade. Baseline is
 split by side — <b>heroes parry at 5%, enemies at 2.5%</b> — plus parry bonuses (talents,
@@ -236,6 +239,10 @@ additively, new stacks refresh the timer. Never ticks on the turn it lands.</td>
 <tr><td>Bleed</td><td>Buildup meter; bleeds out for 20% max HP at 100 (ignores
 armor).</td></tr>
 <tr><td>Dazed</td><td>Attacks are 20% more likely to miss (3 turns; Timber Slam).</td></tr>
+<tr><td>Blind</td><td>Attacks are 50% more likely to miss (Aguila's Kill Command 3 turns;
+its Bestial Wrath strikes 2 turns).</td></tr>
+<tr><td>Elusiveness</td><td>Canis and Aguila are always Elusive: enemies are 25% more
+likely to miss them.</td></tr>
 <tr><td>Shielded</td><td>Takes 25% less damage — the Orc Shieldmaster's single-ally
 ward.</td></tr>
 <tr><td>Ruin</td><td>The Old Gods' mark (Occultist passive, max 5 stacks, battle-long):
@@ -398,7 +405,7 @@ basic adds +10; potions/Rally restore more.</li>
 <li><b>Mercy (HOLY passive, 0–5):</b> only the Holy spec has the bar. +1 stack whenever a
 party member falls below 50% health (any damage source; crossings count each time). Each
 stack held: <b>+5% healing done</b>. Stacks are SPENT on Hymn of Hope (1), Divine Plea (2),
-and Resurrection (3) — costs are paid before the cast resolves, so a spender heals with
+and Resurrection (1) — costs are paid before the cast resolves, so a spender heals with
 what remains — or on <b>Empowerment</b>: the ✦ Empower toggle (hotkey C) arms the next
 supporting cast for +1 extra stack and a bonus effect. <b>Empowered casts forgo their
 perfect bonus.</b></li>
@@ -556,7 +563,7 @@ of the Cleric's health instantly).<br>
 Hymn of Hope — 1 Mercy, 3.5, 2cd; heal ALL allies for 20% of their own max health.
 Empower (+1 Mercy): 35% instead (Perfect: 25%).<br>
 <i>Talent-granted:</i>
-Resurrection — 3 Mercy, 4.0, 3cd; return a fallen ally to life with 20% health and
+Resurrection — 1 Mercy, 4.0, 3cd; return a fallen ally to life with 20% health and
 resource. Empower (+1 Mercy): they return at FULL health and resource with 5 turns of
 Renewal (Perfect: 25% instead). Divine Plea — 2 Mercy, 3.0, 2cd; FULLY heal an ally.
 Empower (+1 Mercy): also cleanse all their debuffs and Hallow them against new ones
@@ -626,18 +633,27 @@ damage). They automatically attack (physical) whenever the hunter attacks; they 
 timeline turns (statuses tick and Breaks recover on the hunter's turn).<br>
 Summon Ursus — 20 Mana, 3.0, 3cd. Bear, 110 HP: strikes the hunter's target AND adjacent
 enemies for 10% of the hunter's Attack.<br>
-Summon Canis — 20 Mana, 3.0, 3cd. Wolf, 80 HP: strikes the hunter's target for 20% of the
-hunter's Attack, building 20 Bleed.<br>
-Summon Aguila — 20 Mana, 3.0, 3cd. Eagle, 80 HP: strikes the hunter's target for 20% of the
-hunter's Attack, applying Exposed (2 turns).<br>
-Marking Shot — 25 Mana, 3.0, 2cd, 20% Atk / 10 BD: marks the prey and ALL THREE beasts
-answer — the summoned one attacks as normal, the two absent ones strike as spirits with
-their banked Loyalty (Perfect: the shot deals a flat 25% of Attack).<br>
-Feral Mending — 15 Mana, 2.0, 2cd, requires a living companion. Heals the companion for 25%
-of ITS max health, cleanses its debuffs, and grants 1 Loyalty (Perfect: heals 30%).<br>
-Kill Command — 30 Mana, 4.0, 3cd, the companion strikes the target for DOUBLE damage with its
-special effect doubled (doubled Bleed; Aguila's Exposed lasts 4 turns). Requires a living
-companion. (Perfect: the beast gains 1 Loyalty.)</li>
+Summon Canis — 20 Mana, 3.0, 3cd. Wolf, 80 HP, always ELUSIVE: strikes the hunter's target
+for 20% of the hunter's Attack, building 20 Bleed.<br>
+Summon Aguila — 20 Mana, 3.0, 3cd. Eagle, 80 HP, always ELUSIVE: strikes the hunter's target
+for 20% of the hunter's Attack, applying Exposed (2 turns).<br>
+Hunter's Instinct — 20 Mana, 3.0, 3cd (no skill check): empowers the next 3 Quick Shots —
+each deals +10% of the hunter's Attack and heals the companion for 15% of its max health
+(HI# chip counts the shots).<br>
+Bestial Wrath — 25 Mana, 4.0, 3cd, requires a living companion (no skill check): unleashes
+the beast for 3 turns — <b>Ursus:</b> max health DOUBLES, +50% armor, and it taunts 3
+random enemies; <b>Canis:</b> +50% damage and +10 Bleed on its bleeding strikes;
+<b>Aguila:</b> +25% damage and every strike Blinds (2 turns). The borrowed bulk fades when
+the Wrath ends.<br>
+Spirit Bond — 20 Mana, 2.0, 3cd, requires a living companion. Hunter and beast each heal
+25% of their own max health now and 10% more at their next turn; the hunter restores 15%
+max Mana now and 5% at each of the next 2 turn starts (Perfect: both gain +10% max health
+for 5 turns).<br>
+Kill Command — 30 Mana, 4.0, 3cd, requires a living companion. The order is the beast's
+own — <b>Ursus:</b> mauls for 45% of the hunter's Attack + 40 BD; <b>Canis:</b> 3 bites of
+18% Attack, each building 10 Bleed (+2 per Loyalty), then feasts to heal 30% of its max
+health; <b>Aguila:</b> strikes TWO chosen enemies for 25% Attack each, Blinding them 3
+turns. (Perfect: the beast gains 1 Loyalty.)</li>
 <li><b>Sharpshooter (Rush)</b> — Passive <i>Lethal Aim</i>: crits deal ×2 damage.<br>
 Aimed Shot — 20 Mana, 45 dmg / 15 BD / 3.0 (Perfect: +25% crit).<br>
 Powershot — 25 Mana, 20 dmg / 20 BD / 3.0, +2% damage for every point of the
@@ -917,8 +933,8 @@ skipped and greyed), <b>Space summons</b> the highlighted one, <b>X closes</b> t
 and clicking works as always. With a living beast out, the entry reads <b>Swap
 Companion</b> and the picker offers swaps instead (10 Mana, shared 2-turn cooldown; the
 active beast is greyed out). Summoning or swapping in Aguila then asks for a target — its
-arrival dive. The remaining abilities take the following hotkeys in kit order (Marking
-Shot E, Feral Mending R, Kill Command A).</li>
+arrival dive. The remaining abilities take the following hotkeys in kit order (Hunter's
+Instinct E, Bestial Wrath R, Spirit Bond A, Kill Command S).</li>
 <li><b>Burger menu:</b> Restart Run (abandons to a fresh draft), Settings (overlay with volume
 + fullscreen — the battle isn't lost), Exit to Main Menu (run resumes from the last saved
 node).</li>

@@ -19,7 +19,7 @@ const WEAKNESS_EXTRA := 0.25
 const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	"bleed", "sunder", "mocked", "stunned", "exposed", "cripple", "dazed",
 	"bewitch", "psychosis", "decay", "ruin", "hysteria",
-	"umbral_sigil", "elem_weak", "melted", "broken"]
+	"umbral_sigil", "elem_weak", "melted", "blind", "broken"]
 
 var frame_size := 100      # square frame edge of this unit's sprite strips
 var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
@@ -69,6 +69,9 @@ var companion_kind := ""    # "ursus" / "canis" / "aguila"
 var companion: BattleUnit   # the Beastmaster's active summon (on the hunter)
 var pack_master: BattleUnit  # the hunter this companion belongs to (on the beast)
 var loyalty := {}           # Beastmaster: per-beast Loyalty stacks (on the hunter)
+var bestial_hp_bonus := 0    # Bestial Wrath (Ursus): doubled health, reverted on expiry
+var bestial_armor_bonus := 0.0
+var vigor_hp_bonus := 0      # Spirit Bond perfect: +10% max health, reverted on expiry
 var companion_hp_bonus := 0   # talents: extra HP for summoned companions
 var companion_power := 0      # talents: extra damage on companion attacks
 # Fixed-tree talent stats (0/0.0 = not learned). See talents.gd for sources.
