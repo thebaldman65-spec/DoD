@@ -89,6 +89,7 @@ const STATUS_INFO := {
 	"primal_surge": ["Primal Surge", "PS", Color(0.95, 0.60, 0.25), "The spent Loyalty burns on:\n+10% damage dealt."],
 	"hunt_mark": ["Marked", "Mk", Color(0.90, 0.50, 0.20), "Marked by the hunt: the Beastmaster\nand their beast deal +25% damage to\nthis enemy, and their strikes on it\nrestore the hunter's Mana."],
 	"vengeance": ["Vengeance", "Vn", Color(0.85, 0.35, 0.30), "The fallen beast's boon lives on in\nthe hunter: +30% damage, and the\nPack Bond holds."],
+	"held_breath": ["Held Breath", "HB", Color(0.70, 0.90, 0.60), "The next attack is a GUARANTEED\ncritical and ignores all armor."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -399,10 +400,11 @@ func _spawn_units() -> void:
 			if Run.active and i < Run.party.size():
 				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
 					Run.party[i].get("talents", {}))
-				# Beastmaster boss trophies: abilities picked at zone bosses.
+				# Boss trophies: abilities picked at zone bosses (any spec pool).
 				for bm_name in Run.party[i].get("bm_abilities", []):
-					var bm_ab := Classes.beastmaster_pool_ability(bm_name)
-					if bm_ab != null:
+					var bm_ab := Classes.spec_pool_ability(spec, bm_name)
+					if bm_ab != null and not cfg["abilities"].any(
+							func(a): return a.display_name == bm_ab.display_name):
 						cfg["abilities"] = cfg["abilities"] + [bm_ab]
 			elif autoplay:
 				# DOD_SIM_TALENTS="bz_bloodcraze:3,wd_toughness:2" force-learns
@@ -427,11 +429,12 @@ func _spawn_units() -> void:
 						var pending := Classes.pending_talent_ability(ab_name.strip_edges())
 						if pending != null:
 							cfg["abilities"] = cfg["abilities"] + [pending]
-				# The same hook feeds the Beastmaster's boss-trophy pool.
-				if env_abs != "" and spec == "beastmaster":
+				# The same hook feeds any spec's boss-trophy pool.
+				if env_abs != "" and not Classes.spec_pool(spec).is_empty():
 					for ab_name in env_abs.split(","):
-						var bm_pending := Classes.beastmaster_pool_ability(ab_name.strip_edges())
-						if bm_pending != null:
+						var bm_pending := Classes.spec_pool_ability(spec, ab_name.strip_edges())
+						if bm_pending != null and not cfg["abilities"].any(
+								func(a): return a.display_name == bm_pending.display_name):
 							cfg["abilities"] = cfg["abilities"] + [bm_pending]
 		# TESTING AID (Batch 31): pre-grant unlockable abilities (see the
 		# const at the top). Dedupe keys on display_name, so talent-learned
@@ -447,12 +450,19 @@ func _spawn_units() -> void:
 				if tn_grant != null \
 						and not cfg["abilities"].any(func(a): return a.display_name == tn_grant.display_name):
 					cfg["abilities"] = cfg["abilities"] + [tn_grant]
-			if spec == "beastmaster":
-				for pool_name in Classes.BEASTMASTER_POOL:
-					var pool_ab := Classes.beastmaster_pool_ability(pool_name)
-					if pool_ab != null \
-							and not cfg["abilities"].any(func(a): return a.display_name == pool_ab.display_name):
-						cfg["abilities"] = cfg["abilities"] + [pool_ab]
+			for pool_name in Classes.spec_pool(spec):
+				var pool_ab := Classes.spec_pool_ability(spec, pool_name)
+				if pool_ab != null \
+						and not cfg["abilities"].any(func(a): return a.display_name == pool_ab.display_name):
+					cfg["abilities"] = cfg["abilities"] + [pool_ab]
+		# Focus is the Sharpshooter's second resource (0-100; talents move
+		# the ceiling and the starting line). Set AFTER talents so Deep
+		# Focus / Spray of Arrows / Opening Volley are visible in cfg.
+		if spec == "sharpshooter":
+			cfg["second_resource_name"] = "Focus"
+			cfg["second_max"] = (50 if cfg.get("spray", 0) > 0 \
+				else (150 if cfg.get("deep_focus", 0) > 0 else 100))
+			cfg["second_resource"] = 60 if cfg.get("opening_volley", 0) > 0 else 0
 		# Class passives (every spec of the class, and before awakening).
 		match hero_keys[i]:
 			"cleric":
@@ -1412,7 +1422,7 @@ func _player_turn(u: BattleUnit) -> void:
 				"mana_shield", "divine_wrath", "shield_block", "hold_the_line",
 				"battle_shout", "flame_shield", "stabilize", "overcharge",
 				"cons_ground", "bulwark", "dark_pact", "hysteria",
-				"instinct", "bestial", "spirit_bond"]:
+				"instinct", "bestial", "spirit_bond", "hold_breath"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -1665,6 +1675,32 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if hi != null and u.resource >= hi.cost and u.ability_ready(hi) \
 					and not u.has_status("instinct"):
 				return [hi, u]
+			# Sharpshooter: work one target — hold the breath, then spend it.
+			var ss_t: BattleUnit = target_foe
+			if u.last_attack_target != null and not u.last_attack_target.dead:
+				ss_t = u.last_attack_target
+			var hbreath := _find_ability(u, "Hold Breath")
+			if hbreath != null and u.resource >= _eff_cost(u, hbreath) \
+					and u.ability_ready(hbreath) and not u.has_status("held_breath"):
+				return [hbreath, u]
+			var coup := _find_ability(u, "Coup de Grâce")
+			if coup != null and u.second_resource_name == "Focus" \
+					and u.second_resource >= 80 and u.resource >= _eff_cost(u, coup) \
+					and u.ability_ready(coup) and ss_t.hp < ss_t.max_hp * 0.6:
+				return [coup, ss_t]
+			var triple := _find_ability(u, "Triple Shot")
+			if triple != null and u.second_resource >= 60 \
+					and u.resource >= _eff_cost(u, triple) and u.ability_ready(triple):
+				return [triple, ss_t]
+			var called := _find_ability(u, "Called Shot")
+			if called != null and u.resource >= _eff_cost(u, called) \
+					and u.ability_ready(called):
+				called_mode = "sunder" if ss_t.armor > 0.05 else "exposed"
+				return [called, ss_t]
+			var aimed := _find_ability(u, "Aimed Shot")
+			if aimed != null and u.resource >= _eff_cost(u, aimed) \
+					and u.ability_ready(aimed):
+				return [aimed, ss_t]
 			var parrow := _find_ability(u, "Poisoned Arrow")
 			if parrow != null and u.resource >= parrow.cost and u.ability_ready(parrow) and randf() < 0.4 \
 					and not target_foe.has_status("poison"):
@@ -1672,10 +1708,7 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			var shrapnel := _find_ability(u, "Shrapnel Charge")
 			if shrapnel != null and u.resource >= shrapnel.cost and u.ability_ready(shrapnel) and foes.size() >= 2:
 				return [shrapnel, target_foe]
-			var aimed := _find_ability(u, "Aimed Shot")
-			if aimed != null and u.resource >= aimed.cost and u.ability_ready(aimed):
-				return [aimed, target_foe]
-			return [u.abilities[0], target_foe]          # Quick Shot
+			return [u.abilities[0], ss_t]          # Quick Shot works the target
 		"cleric":
 			# Holy triage first (Mercy spenders), then Devout/Occultist casts.
 			var res_ab := _find_ability(u, "Resurrection")
@@ -1963,6 +1996,9 @@ func _show_actions(u: BattleUnit) -> void:
 func _eff_cost(u: BattleUnit, ab: Ability) -> int:
 	if ab.special == "summon" and u.free_summon:
 		return 0
+	# Snap Shot: the first ability of the fight costs nothing.
+	if u.snap_shot > 0 and not u.snap_used and ab.cost > 0:
+		return 0
 	var c := ab.cost
 	if u.lone_hunter > 0 and (u.companion == null or u.companion.dead):
 		c = int(round(c * 0.6))
@@ -2163,6 +2199,7 @@ func _confirm_summon(i: int) -> void:
 
 var _preview_locked := false
 var second_target: BattleUnit = null  # choose_two abilities (Shrapnel)
+var called_mode := ""  # Called Shot's chosen spot ("sunder"/"break"/"exposed")
 var third_target: BattleUnit = null   # choose_three abilities (Hex of Ruin)
 var _open_popups: Array = []  # ability popups to close when a hotkey fires
 var _main_popup: PopupPanel   # the Abilities list (Tab toggles it)
@@ -2188,7 +2225,55 @@ func _on_ability_button(ab: Ability) -> void:
 	_close_summon_picker()
 	_close_item_picker()
 	_sfx("click", -12.0)
+	# Called Shot picks its spot BEFORE targeting (bot auto-picks).
+	if ab.display_name == "Called Shot" and called_mode == "" and not autoplay:
+		_open_called_picker(ab)
+		return
 	_ability_picked.emit(ab)
+
+
+# ---------- Called Shot spot picker (Tab cycles, Space picks, X closes) ----------
+
+var _called_picker: PanelContainer = null
+
+
+func _open_called_picker(ab: Ability) -> void:
+	_close_called_picker()
+	_called_picker = PanelContainer.new()
+	_called_picker.position = Vector2(480, 430)
+	ui.add_child(_called_picker)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	_called_picker.add_child(box)
+	var title := Label.new()
+	title.text = "CALLED SHOT — pick your spot"
+	title.add_theme_font_size_override("font_size", 12)
+	title.add_theme_color_override("font_color", Color(0.85, 0.80, 0.68))
+	box.add_child(title)
+	var modes := [["sunder", "Armor — Sunder (-35%, 2 turns)"],
+		["break", "Break — +30 Break damage"],
+		["exposed", "Flesh — Exposed (3 turns)"]]
+	for m in modes:
+		var b := Button.new()
+		b.text = m[1]
+		b.custom_minimum_size = Vector2(256, 30)
+		b.add_theme_font_size_override("font_size", 13)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.focus_mode = Control.FOCUS_NONE
+		b.pressed.connect(_confirm_called.bind(str(m[0]), ab))
+		box.add_child(b)
+
+
+func _confirm_called(mode: String, ab: Ability) -> void:
+	called_mode = mode
+	_close_called_picker()
+	_ability_picked.emit(ab)
+
+
+func _close_called_picker() -> void:
+	if _called_picker != null and is_instance_valid(_called_picker):
+		_called_picker.queue_free()
+	_called_picker = null
 
 
 func _on_popup_ability(popup: PopupPanel, ab: Ability) -> void:
@@ -2560,6 +2645,10 @@ const CRIT_CHANCE := 0.10
 
 
 func _miss_chance(attacker: BattleUnit, defender: BattleUnit = null) -> float:
+	# No Cover (Sharpshooter): a BYPASS, not a modifier — these attacks
+	# cannot be made to miss by any current or future source.
+	if attacker.no_cover > 0:
+		return 0.0
 	var chance := MISS_CHANCE + (0.20 if attacker.has_status("dazed") else 0.0) \
 		+ (0.50 if attacker.has_status("blind") else 0.0)
 	# Elusiveness: the wolf and the eagle are hard to pin down.
@@ -2607,11 +2696,21 @@ func _impact_sfx(attacker: BattleUnit, ab: Ability) -> String:
 
 func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: String,
 		is_counter := false) -> void:
+	var was_snap := attacker.snap_shot > 0 and not attacker.snap_used \
+		and ab.cost > 0 and not is_counter
 	attacker.resource = clampi(attacker.resource - _eff_cost(attacker, ab) \
 		+ ab.resource_gain, 0, attacker.max_resource)
 	attacker.refresh_bars()
-	if not is_counter and not debug_cooldowns_off:
-		attacker.start_cooldown(ab)
+	if was_snap:
+		# Snap Shot: free, and the cooldown never starts.
+		attacker.snap_used = true
+		_log("   → Snap Shot: no cost, no cooldown", "#b0a8e0")
+	elif not is_counter and not debug_cooldowns_off:
+		# Rapid Fire (capstone): 35% of casts skip their cooldown.
+		if attacker.rapid_fire > 0 and ab.cooldown > 0 and randf() < 0.35:
+			_log("   → Rapid Fire: the cooldown never starts", "#b0a8e0")
+		else:
+			attacker.start_cooldown(ab)
 	var dmg_mult := {"perfect": 1.15, "good": 1.0, "fail": 0.6}[grade] as float
 	var pr_mult := {"perfect": 1.25, "good": 1.0, "fail": 0.5}[grade] as float
 	var is_perfect := grade == "perfect"
@@ -2897,11 +2996,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Brittle Ice (talent): Frozen targets are easier to strike true.
 			if strike_target.has_status("frozen"):
 				crit_chance += 0.02 * _max_hero_rank("frostbite_ranks")
-			if is_perfect and ab.display_name == "Aimed Shot":
-				crit_chance += 0.25
 			# Sweeping Strikes perfect: the second swing cuts truer.
 			if is_perfect and ab.display_name == "Sweeping Strikes" and hit_i == 1:
 				crit_chance += 0.25
+			# Lethal Aim (Sharpshooter): Focus steadies the hand — +0.5% crit
+			# per point; Tunnel Vision commits wholly to the worked target.
+			if attacker.passive_id == "lethal_aim" \
+					and attacker.second_resource_name == "Focus":
+				crit_chance += attacker.second_resource * 0.005
+				if attacker.tunnel_vision > 0:
+					crit_chance += (0.50 if strike_target == attacker.last_attack_target \
+						else -0.50)
 			var is_crit := randf() < crit_chance
 			# Ice Lance: always crits against Frozen targets.
 			if ab.display_name == "Ice Lance" and strike_target.has_status("frozen"):
@@ -2909,13 +3014,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Execute perfect: the killing stroke cannot glance.
 			if is_perfect and ab.display_name == "Execute":
 				is_crit = true
+			# Held Breath: the promised shot cannot glance either.
+			if attacker.has_status("held_breath") and ab.damage > 0 and not is_counter:
+				is_crit = true
 			any_crit = any_crit or is_crit
 			# Ability damage is a PERCENT of the attacker's current Attack.
 			var raw := ab.damage * 0.01 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
 			if parried:
 				raw *= 0.25
 			if is_crit:
-				var crit_mult := 2.0 if attacker.passive_id == "lethal_aim" else 1.5
+				# Lethal Aim x2 base; Executioner's Eye deepens it, Consistent
+				# Aim trades it back to x1.5 for +30% chance.
+				var crit_mult := 1.5
+				if attacker.passive_id == "lethal_aim":
+					crit_mult = 1.5 if attacker.consistent_aim > 0 \
+						else 2.0 + 0.1 * attacker.lethal_eye_ranks
 				# Piercing Ice: the lance drives deeper on a crit.
 				if ab.display_name == "Ice Lance":
 					crit_mult += 0.10 * attacker.piercing_ice_ranks
@@ -2999,11 +3112,42 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			var wildfire_burn := {}
 			if ab.display_name == "Wildfire":
 				wildfire_burn = strike_target.get_status("burn").duplicate()
-			# Powershot: +2% damage per 1% of the target's Break bar still EMPTY —
-			# the Rush opener, strongest against untouched foes.
+			# Powershot (inverted, Batch 32): +2% damage per point of the
+			# target's Break bar already FULL — the team breaks them, the
+			# marksman ends them (+4% with Opportunist's Aim).
 			if ab.display_name == "Powershot":
-				raw *= 1.0 + 2.0 * (1.0 - clampf(
-					strike_target.pressure / float(strike_target.stability), 0.0, 1.0))
+				var ps_step := 4.0 if attacker.opp_aim > 0 else 2.0
+				raw *= 1.0 + ps_step * clampf(
+					strike_target.pressure / float(strike_target.stability), 0.0, 1.0)
+			# One Shot (capstone): at maximum Focus the perfect moment arrives —
+			# Aimed Shot executes below 40% health, doubles above it.
+			var one_shot_exec := false
+			if ab.display_name == "Aimed Shot" and attacker.one_shot > 0 \
+					and attacker.second_resource_name == "Focus" \
+					and attacker.second_resource >= _focus_cap(attacker):
+				if strike_target.hp < strike_target.max_hp * 0.40:
+					one_shot_exec = true
+					_log("%s: ONE SHOT — the moment arrives" % attacker.unit_name,
+						"#e8c860")
+				else:
+					raw *= 2.0
+					_log("%s: One Shot — double damage at full Focus" % \
+						attacker.unit_name, "#e8c860")
+				attacker.second_resource = 0
+				attacker.refresh_bars()
+			# Coup de Grâce: cash out the patience — +1% of the target's
+			# MISSING health per point of Focus spent.
+			if ab.display_name == "Coup de Grâce" \
+					and attacker.second_resource_name == "Focus" \
+					and attacker.second_resource > 0:
+				var cdg := attacker.second_resource
+				attacker.second_resource = 0
+				attacker.refresh_bars()
+				raw += (strike_target.max_hp - strike_target.hp) * 0.01 * cdg
+				_log("   → Coup de Grâce: %d Focus spent" % cdg, "#e0a050")
+			# Bonecracker: the broken are already lost.
+			if strike_target.broken and attacker.bonecracker_ranks > 0:
+				raw *= 1.0 + 0.12 * attacker.bonecracker_ranks
 			# Overpower: exploits instability — +0.5 damage per point of Break.
 			if ab.display_name == "Overpower":
 				raw += 0.5 * strike_target.pressure
@@ -3150,7 +3294,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				* (1.0 - clampf(pen, 0.0, 1.0))
 			if is_perfect and ab.display_name == "Arcane Rift":
 				effective_armor = 0.0
+			# Held Breath's promised shot and Through and Through ignore armor
+			# entirely; a One Shot execution punches through everything.
+			if attacker.through_and_through > 0 \
+					or attacker.has_status("held_breath") or one_shot_exec:
+				effective_armor = 0.0
 			var final := maxi(int(round(raw * (1.0 - effective_armor))), 1)
+			if one_shot_exec:
+				final = maxi(strike_target.hp, final)
 			# Armor's share, kept consistent with the displayed final number.
 			var armor_cut := maxi(int(round(raw)) - final, 0)
 			var resonance_boosted: bool = attacker.second_resource_name == "Resonance" \
@@ -3216,9 +3367,46 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							_message("%s falls!" % h.unit_name)
 							_log("† %s dies" % h.unit_name, "#e05050")
 					final = share
+			var hp_before := strike_target.hp
 			var result: Dictionary = strike_target.take_hit(final, pr)
 			if not sim and not result.died:
 				strike_target.hit_react((strike_target.position - attacker.position).normalized())
+			# Sharpshooter on-crit riders: Perfect Form, Sundering Shot,
+			# Exposed Nerve, Follow-Through, Through and Through's refund.
+			if is_crit and attacker.is_hero and not is_counter:
+				if attacker.perfect_form > 0:
+					_gain_focus(attacker, 20)
+				if attacker.sundering_shot > 0 and not strike_target.dead:
+					strike_target.take_hit(0, 15)
+				if attacker.exposed_nerve > 0 and not strike_target.dead:
+					_apply_status(strike_target, "exposed", 3)
+				if attacker.follow_through > 0 and not attacker.cooldowns.is_empty():
+					for cd_key in attacker.cooldowns.keys():
+						attacker.cooldowns[cd_key] = maxi(
+							int(attacker.cooldowns[cd_key]) - 1, 0)
+					_log("   → Follow-Through: cooldowns tick", "#b0a8e0")
+				if attacker.through_and_through > 0 and ab.cost > 0:
+					attacker.resource = mini(attacker.resource + ab.cost,
+						attacker.max_resource)
+					attacker.refresh_bars()
+			# Overkill: the excess of a killing blow carries onward, full value.
+			if result.died and attacker.overkill > 0 and not strike_target.is_hero:
+				var excess := final - hp_before
+				if excess > 0:
+					var ok_pool := enemies.filter(
+						func(e): return not e.dead and e != strike_target)
+					if not ok_pool.is_empty():
+						var ok_t: BattleUnit = _lowest_hp(ok_pool)
+						var ok_res: Dictionary = ok_t.take_hit(excess, 0)
+						ok_t.float_text("%d Overkill" % excess, Color(0.95, 0.6, 0.3))
+						_log("   → Overkill: %d carries to %s" % [excess,
+							ok_t.unit_name], "#e0a050")
+						if ok_res.died:
+							_stat("enemy_deaths")
+							_sfx("death", -4.0)
+							_message("%s falls!" % ok_t.unit_name)
+							_log("† %s dies" % ok_t.unit_name, "#e05050")
+							_on_enemy_death(ok_t)
 			# On the Edge (talent): surviving a blow at the brink feeds the storm.
 			if strike_target.is_hero and not result.died \
 					and strike_target.on_edge_ranks > 0 \
@@ -3592,6 +3780,54 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				attacker.heal_amount(drained)
 				attacker.float_text("+%d" % drained, Color(0.4, 0.9, 0.45))
 				_log("   → %s drains %d HP" % [attacker.unit_name, drained], "#70d878")
+		# Sharpshooter: the Focus engine, the promised shot's spending, the
+		# pin, the called spot, and the spray's echo.
+		if attacker.is_hero and attacker.passive_id == "lethal_aim" \
+				and ab.damage > 0 and not is_counter and not ab.aoe \
+				and target != null and not target.is_hero:
+			_sharpshooter_focus(attacker, target)
+			if ab.display_name == "Pinning Shot" and not target.dead:
+				_apply_status(target, "dazed", 3)
+			if ab.display_name == "Called Shot" and not target.dead:
+				match called_mode:
+					"break":
+						target.take_hit(0, 30)
+						target.float_text("+30 BD", Color(0.8, 0.35, 1.0))
+						_log("   → Called Shot cracks the Break meter", "#e0a050")
+					"exposed":
+						_apply_status(target, "exposed", 3)
+					_:
+						_apply_status(target, "sunder", 2)
+				called_mode = ""
+			if attacker.has_status("held_breath"):
+				var hb_left := attacker.status_power("held_breath") - 1
+				if hb_left <= 0:
+					attacker.remove_status("held_breath")
+					_log("   → the held breath releases", "#909090")
+				else:
+					var hb_info: Array = STATUS_INFO["held_breath"]
+					attacker.update_status("held_breath", "HB%d" % hb_left,
+						hb_info[3], hb_left)
+			if attacker.spray > 0 and ab.multi_hits == 0 and ab.random_hits == 0:
+				var sp_pool := enemies.filter(
+					func(e): return not e.dead and e != target)
+				if not sp_pool.is_empty():
+					var sp_t: BattleUnit = sp_pool.pick_random()
+					var sp_raw := ab.damage * 0.005 * attacker.attack \
+						* randf_range(0.9, 1.1)
+					sp_raw *= 1.0 - float(sp_t.resists.get("physical", 0.0))
+					var sp_final := maxi(int(round(sp_raw \
+						* (1.0 - sp_t.effective_armor()))), 1)
+					var sp_res: Dictionary = sp_t.take_hit(sp_final, 0)
+					sp_t.float_text("%d Spray" % sp_final, Color(0.9, 0.75, 0.55))
+					_log("   → Spray of Arrows: %d to %s" % [sp_final,
+						sp_t.unit_name], "#d8b880")
+					if sp_res.died:
+						_stat("enemy_deaths")
+						_sfx("death", -4.0)
+						_message("%s falls!" % sp_t.unit_name)
+						_log("† %s dies" % sp_t.unit_name, "#e05050")
+						_on_enemy_death(sp_t)
 		# Hunter's Instinct: each empowered shot also tends the beast.
 		if ab.display_name == "Quick Shot" and not is_counter \
 				and attacker.has_status("instinct"):
@@ -4556,6 +4792,19 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# A perfect order deepens the bond.
 				if is_perfect:
 					_gain_loyalty(attacker, comp.companion_kind)
+		"hold_breath":
+			_gain_focus(attacker, 40)
+			var hb_shots := 2 if attacker.second_nature > 0 else 1
+			var hbi: Array = STATUS_INFO["held_breath"]
+			if not attacker.update_status("held_breath", "HB%d" % hb_shots,
+					hbi[3], hb_shots):
+				attacker.add_status("held_breath", hbi[0], "HB%d" % hb_shots,
+					hbi[2], -1, hbi[3], hb_shots)
+			_sfx("heal", -8.0, 0.6)
+			_message("%s holds their breath..." % attacker.unit_name)
+			_log("%s: Hold Breath — +40 Focus; the next %s guaranteed critical, armor ignored" % [
+				attacker.unit_name,
+				"2 attacks are" if hb_shots == 2 else "attack is a"], "#70d878")
 		"instinct":
 			# Instinctive (talent) deepens the trance to 5 shots.
 			var hi_shots := 5 if attacker.instinctive > 0 else 3
@@ -5264,6 +5513,52 @@ func _bestial_dmg_mult(comp: BattleUnit) -> float:
 	return 1.0
 
 
+# ---------- Sharpshooter Focus ----------
+
+# The Focus ceiling: 100 base, 150 under Deep Focus, 50 under Spray of
+# Arrows (the spread costs the patience).
+func _focus_cap(u: BattleUnit) -> int:
+	if u.spray > 0:
+		return 50
+	if u.deep_focus > 0:
+		return 150
+	return 100
+
+
+func _gain_focus(u: BattleUnit, amount: int) -> void:
+	if u.second_resource_name != "Focus":
+		return
+	var before := u.second_resource
+	u.second_resource = clampi(u.second_resource + amount, 0, _focus_cap(u))
+	if u.second_resource > before:
+		u.float_text("+%d Focus" % (u.second_resource - before),
+			Color(0.55, 0.85, 0.40))
+	u.refresh_bars()
+
+
+# The Focus engine, run after each single-target attack: +20 on working
+# the same enemy as last turn (+10/rank Muscle Memory); switching clears
+# it (halves under Unwavering); a kill retains up to 50.
+func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit) -> void:
+	if attacker.second_resource_name != "Focus" or victim == null:
+		return
+	if victim.dead:
+		attacker.second_resource = mini(attacker.second_resource, 50)
+		attacker.last_attack_target = null
+		attacker.refresh_bars()
+		return
+	if attacker.last_attack_target == victim:
+		_gain_focus(attacker, 20 + 10 * attacker.muscle_memory_ranks)
+	elif attacker.last_attack_target != null:
+		var kept := (attacker.second_resource / 2) if attacker.unwavering > 0 else 0
+		if attacker.second_resource > kept:
+			attacker.float_text("Focus broken" if kept == 0 else "Focus halved",
+				Color(0.65, 0.65, 0.65))
+		attacker.second_resource = kept
+		attacker.refresh_bars()
+	attacker.last_attack_target = victim
+
+
 # A beast has died: Loyalty breaks (or endures at half under Steadfast
 # Bond), Vengeance inherits the boon, and No Beast Left arms a free call.
 func _on_beast_death(comp: BattleUnit) -> void:
@@ -5407,6 +5702,10 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 			attacker.refresh_bars()
 			attacker.float_text("+10 Focus", Color(0.6, 0.9, 0.5))
 			_log("   → %s gains +10 Focus" % attacker.unit_name, "#b0a8e0")
+		"focus20":
+			_gain_focus(attacker, 20)
+			_log("   → Perfect: %s steadies — +20 Focus" % attacker.unit_name,
+				"#b0a8e0")
 		"mana":
 			attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
 			attacker.refresh_bars()
@@ -5740,16 +6039,21 @@ func _check_end() -> void:
 				if pts > 0 else ("+%d gold — the final relic is claimed." % gold_gain)
 			if not relic.is_empty():
 				boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
-			# Beastmaster boss trophy: one ability pick per zone boss, chosen
-			# on the Party screen (from the pool of five).
+			# Boss trophies: one ability pick per zone boss for every spec with
+			# a pool, chosen on the Party screen.
+			var trophy_specs: Array = []
 			for bm_i in Run.party.size():
-				if Run.party[bm_i].get("spec", "") == "beastmaster" \
+				var bm_spec: String = Run.party[bm_i].get("spec", "")
+				if not Classes.spec_pool(bm_spec).is_empty() \
 						and Run.party[bm_i].get("bm_abilities", []).size() \
-						< Classes.BEASTMASTER_POOL.size():
+						< Classes.spec_pool(bm_spec).size():
 					Run.party[bm_i]["bm_picks_owed"] = \
 						int(Run.party[bm_i].get("bm_picks_owed", 0)) + 1
-					boss_text += "\n\nBOSS TROPHY: the Beastmaster may choose a new\nability on the Party screen."
-					Run.save_run()
+					trophy_specs.append(Classes.SPEC_INFO[bm_spec]["name"])
+			if not trophy_specs.is_empty():
+				boss_text += "\n\nBOSS TROPHY: %s may choose a new\nability on the Party screen." % \
+					" and ".join(trophy_specs)
+				Run.save_run()
 			if Run.has_next_zone():
 				_show_end("THE ZONE IS CLEANSED", boss_text,
 					[["Descend into %s" % Run.ZONES[Run.zone_idx + 1], _next_zone]], true)

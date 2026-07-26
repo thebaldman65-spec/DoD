@@ -346,6 +346,9 @@ mark's cooldown).</td></tr>
 (1 turn per stack spent).</td></tr>
 <tr><td>Vengeance</td><td>The Beastmaster's beast died: +30% damage and its Pack Bond boon
 lives on for 5 turns (Vengeance talent).</td></tr>
+<tr><td>Held Breath</td><td>The Sharpshooter's next attack is a GUARANTEED critical and
+ignores all armor (Hold Breath; two attacks with Second Nature — the HB# chip counts
+them).</td></tr>
 <tr><td>Broken</td><td>Loses next turn; −30% armor; +25% crit taken.</td></tr>
 </table>
 <p>Statuses tick down at the start of the affected unit's turn; negative durations last the
@@ -393,7 +396,8 @@ character art (see §12).</p>
 Arcanist; 0–8 while Overcharged)</td></tr>
 <tr><td>Cleric</td><td>121</td><td>15%</td><td>85</td><td>100</td><td>Mana 100 (+ Mercy 0–5 as
 Holy)</td></tr>
-<tr><td>Hunter</td><td>110</td><td>12%</td><td>105</td><td>95</td><td>Mana 100</td></tr>
+<tr><td>Hunter</td><td>110</td><td>12%</td><td>105</td><td>95</td><td>Mana 100 (+ Focus
+0–100 as Sharpshooter)</td></tr>
 </table>
 <h3>5.0 Class passives</h3>
 <p>Each CLASS carries one passive, active for every spec of that class (and before
@@ -412,6 +416,10 @@ is hit; every attack builds Rage (Strike 20, all spec/talent attacks 10); Perfec
 +10.</li>
 <li><b>Mana (Mage/Cleric/Hunter):</b> +12 at the start of their turns; the Hunter's Perfect
 basic adds +10; potions/Rally restore more.</li>
+<li><b>Focus (SHARPSHOOTER passive, 0–100, green second bar):</b> +20 per consecutive
+attack on the same enemy (Muscle Memory adds more), 0 on switching targets (halved under
+Unwavering), up to 50 retained on a kill; talents move the cap to 150 (Deep Focus) or 50
+(Spray of Arrows). Every point: +0.5% crit chance. Spent by Coup de Grâce and One Shot.</li>
 <li><b>Mercy (HOLY passive, 0–5):</b> only the Holy spec has the bar. +1 stack whenever a
 party member falls below 50% health (any damage source; crossings count each time). Each
 stack held: <b>+5% healing done</b>. Stacks are SPENT on Hymn of Hope (1), Divine Plea (2),
@@ -680,11 +688,32 @@ Mark of the Hunt — 15 Mana, 2.0, 3cd. Marks an enemy for 5 turns (Perfect: 7):
 and their beast deal +25% damage to it, and every strike on it restores 3% of the hunter's
 max Mana. The cooldown resets if the marked enemy dies. Works with or without a beast.<br>
 <b>Talent lanes:</b> see §7 — Devotion / The Pack / Handler, the lane framework's pilot.</li>
-<li><b>Sharpshooter (Rush)</b> — Passive <i>Lethal Aim</i>: crits deal ×2 damage.<br>
-Aimed Shot — 20 Mana, 45 dmg / 15 BD / 3.0 (Perfect: +25% crit).<br>
-Powershot — 25 Mana, 20 dmg / 20 BD / 3.0, +2% damage for every point of the
-target's Break bar still EMPTY (no perfect bonus).<br>
-Quick Draw — 15 Mana, 2.0, all abilities act 50% faster for 5 turns (Perfect: 6 turns).</li>
+<li><b>Sharpshooter (Nuker)</b> — Passive <i>Lethal Aim</i>: critical hits deal ×2 damage
+instead of ×1.5, and the marksman runs on <b>FOCUS (0–100, green second bar)</b>: +20
+whenever they attack the enemy they attacked last turn (talents raise the gain and the
+cap), dropped to 0 on switching targets, and up to 50 retained on a kill. Every point of
+Focus grants <b>+0.5% critical chance</b> — five patient shots at one enemy is +50% crit.
+The decision the spec is built around: the enemy you've been working is rarely the enemy
+that most needs to die right now.<br>
+Aimed Shot — 20 Mana, 45 dmg / 15 BD / 3.0, 1cd (Perfect: +20 Focus).<br>
+Powershot — 25 Mana, 20 dmg / 20 BD / 3.0, 2cd: +2% damage for every point of the target's
+Break bar already FULL — the team breaks them, the marksman ends them.<br>
+Hold Breath — 15 Mana, 2.0, 3cd (no skill check): +40 Focus, and the next attack is a
+GUARANTEED critical that ignores all armor.<br>
+<b>BOSS TROPHIES — one pick per zone boss</b> from the pool of five (three more of the
+designed eight land later):<br>
+Quick Draw — 15 Mana, 2.0, 5cd: all abilities act 50% faster for 5 turns (Perfect: 6
+turns).<br>
+Triple Shot — 30 Mana, 3.0, 3cd: three arrows at one target, 18% Atk each, every arrow
+rolling its critical separately.<br>
+Coup de Grâce — 25 Mana, 3.5, 4cd: CONSUMES ALL FOCUS — 25% Atk plus 1% of the target's
+MISSING health per point of Focus spent.<br>
+Pinning Shot — 20 Mana, 2.5, 3cd, 20% Atk: the target is Slowed AND Dazed for 3 turns.<br>
+Called Shot — 25 Mana, 3.0, 3cd, 25% Atk: pick the spot before loosing — Sunder (−35%
+armor, 2 turns), +30 Break damage, or Exposed (3 turns). A picker opens on cast (the bot
+picks armor against armored targets).<br>
+<b>Talent lanes:</b> see §7 — Precision / Penetration / Tempo, the first NODE-GATED
+tree.</li>
 <li><b>Survivalist (Pressure)</b> — Passive <i>Trapper</i>: enemies that strike the Hunter
 have a 25% chance to be Poisoned (5 turns).<br>
 Tripwire — 20 Mana, 2.5, for 5 turns the Hunter retaliates against EVERY attacking melee
@@ -703,13 +732,35 @@ until spent on the Party screen.</p>
 pilot) and the <b>classic fixed grids</b> (the other nine specs, converting lane-by-lane in
 later batches).</p>
 <p><b>Lane framework rules:</b> a tree is three LANES of seven nodes — each lane a
-playstyle, never a specific beast — plus three CAPSTONES of which only ONE may ever be
-taken. A lane opens its own next tier on points spent <i>in that lane</i> (tier 2 at 3
-points, tier 3 at 6); a capstone needs 8 points in its lane. <b>Node pricing:</b> the Nth
-distinct node bought costs ceil(N/3) — 1,1,1,2,2,2,3… — while extra ranks in an open node
-always cost 1, so roughly a third of the tree fits in one run. <b>Exclusive pairs</b> bar
-each other but stay visible, greyed with the reason — the player must see the door they
-closed. Tooltips show the live cost and lane requirement.</p>
+playstyle — plus three CAPSTONES of which only ONE may ever be taken. <b>Node pricing:</b>
+the Nth distinct node bought costs ceil(N/3) — 1,1,1,2,2,2,3… — while extra ranks in an
+open node always cost 1, so roughly a third of the tree fits in one run. <b>Exclusive
+pairs</b> bar each other but stay visible, greyed with the reason — the player must see
+the door they closed. Tooltips show the live cost and lane requirement.<br>
+<b>Two gating models exist.</b> Points-gated trees (Beastmaster and the nine conversions)
+open a lane's tier 2 at 3 points spent in that lane, tier 3 at 6, the capstone at 8.
+<b>Node-gated trees (Sharpshooter, the new model)</b> open tier 2 at 2 NODES bought in the
+lane, tier 3 at 4, the capstone at 6 — with the escalating cost curve, node count is the
+stable gate a player can actually plan against.</p>
+<p><b>Sharpshooter lanes (node-gated):</b><br>
+<b>PRECISION</b> (Focus, crit chance, crit damage) — Steady Hands (+4%/rank crit ×3),
+Perfect Form (crits +20 Focus), Deep Focus (cap 150), Executioner's Eye (crit mult
+→×2.1/2.2/2.3; <i>exclusive with Consistent Aim</i>), Consistent Aim (×1.5 crits but +30%
+chance), Unwavering (switching halves Focus instead of clearing), Tunnel Vision (+50% crit
+vs the worked target, −50% vs others; <i>exclusive with Spray of Arrows</i>).<br>
+<b>PENETRATION</b> (armor, Break, finishing the party's work) — Armor Piercer (ignore
+8%/rank armor ×3), Sundering Shot (crits +15 BD), Bonecracker (+12%/rank vs Broken ×2),
+Opportunist's Aim (Powershot scales +4%/point), Exposed Nerve (crits apply Exposed 3t),
+No Cover (attacks CANNOT be made to miss — a bypass, not a modifier), Overkill (kill
+overflow carries to another enemy at full value).<br>
+<b>TEMPO</b> (speed, cooldowns, Focus acceleration) — Fletcher's Speed (+5 Speed/rank ×3),
+Snap Shot (first ability each fight: free, no cooldown), Muscle Memory (+10/rank Focus
+gain ×2), Opening Volley (start fights at 60 Focus), Follow-Through (crits tick ALL
+cooldowns), Second Nature (Hold Breath covers TWO attacks), Spray of Arrows (single-target
+attacks echo to a random enemy at 50%, Focus caps at 50).<br>
+<b>CAPSTONES</b> — One Shot (Precision: at max Focus, Aimed Shot EXECUTES below 40%
+health, doubles above; Focus resets), Through and Through (Penetration: ignore ALL armor,
+crits refund their Mana), Rapid Fire (Tempo: 35% of casts skip their cooldown).</p>
 <p><b>Beastmaster lanes:</b><br>
 <b>DEVOTION</b> (stay with one beast) — Wild Communion (Loyalty strike step 5%→+1.5%/rank
 ×3), Unbroken Watch (+1 Loyalty on no-damage turns), Absolute Devotion (ceiling 7; boon

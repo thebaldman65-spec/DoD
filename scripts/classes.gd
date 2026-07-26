@@ -144,11 +144,60 @@ static func cleric_kit() -> Array:
 
 # Holy talent-granted abilities: the Holy tree isn't designed yet — these
 # defs wait here for its "grants the ability" nodes, and power the
-# Beastmaster boss-trophy pool (Batch 30): one pick per zone boss, chosen
-# from these five. Bestial Wrath and Spirit Bond were demoted from the base
-# kit; the other three are new. Order here is the offer order.
+# Boss-trophy pools (Batch 30/32): one ability pick per zone boss, chosen
+# from the spec's pool on the Party screen. Order is the offer order. The
+# Sharpshooter ships 5 of its designed 8 (Disengage, Suppressing Fire, and
+# Piercing Arrow drop in later with no restructuring).
+const SPEC_POOLS := {
+	"beastmaster": ["Bestial Wrath", "Spirit Bond", "Primal Surge",
+		"Call of the Wild", "Mark of the Hunt"],
+	"sharpshooter": ["Quick Draw", "Triple Shot", "Coup de Grâce",
+		"Pinning Shot", "Called Shot"],
+}
 const BEASTMASTER_POOL := ["Bestial Wrath", "Spirit Bond", "Primal Surge",
 	"Call of the Wild", "Mark of the Hunt"]
+
+
+static func spec_pool(spec: String) -> Array:
+	return SPEC_POOLS.get(spec, [])
+
+
+static func spec_pool_ability(spec: String, display_name: String) -> Ability:
+	if spec == "sharpshooter":
+		return sharpshooter_pool_ability(display_name)
+	return beastmaster_pool_ability(display_name)
+
+
+static func sharpshooter_pool_ability(display_name: String) -> Ability:
+	match display_name:
+		"Quick Draw":
+			return Ability.make({"display_name": "Quick Draw", "cooldown": 5, "cost": 15,
+				"special": "quickdraw", "delay": 2.0, "anim": "attack01",
+				"perfect_id": "", "perfect_text": "Lasts 6 turns",
+				"description": "Adrenaline takes over: all your abilities\nact 50% faster for 5 turns."})
+		"Triple Shot":
+			return Ability.make({"display_name": "Triple Shot", "cooldown": 3, "cost": 30,
+				"damage": 18, "multi_hits": 2, "pressure": 8, "delay": 3.0, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "",
+				"description": "Three arrows at one target, 18% of\nAttack each — every arrow rolls its\ncritical separately. A crit lottery\nfor a full Focus bar."})
+		"Coup de Grâce":
+			return Ability.make({"display_name": "Coup de Grâce", "cooldown": 4, "cost": 25,
+				"damage": 25, "pressure": 10, "delay": 3.5, "anim": "attack03",
+				"perfect_id": "", "perfect_text": "",
+				"description": "CONSUMES ALL FOCUS: deals 25% of\nAttack plus 1% of the target's\nMISSING health per point of Focus\nspent. Cash out the patience."})
+		"Pinning Shot":
+			return Ability.make({"display_name": "Pinning Shot", "cooldown": 3, "cost": 20,
+				"damage": 20, "pressure": 10, "delay": 2.5, "anim": "attack02",
+				"applies_status": {"id": "slow", "turns": 3},
+				"perfect_id": "", "perfect_text": "",
+				"description": "A shaft through the leg: the target\nis Slowed AND Dazed for 3 turns."})
+		"Called Shot":
+			return Ability.make({"display_name": "Called Shot", "cooldown": 3, "cost": 25,
+				"damage": 25, "pressure": 10, "delay": 3.0, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "",
+				"description": "Pick your spot before loosing:\nSUNDER the target's armor (-35%,\n2 turns), CRACK their Break meter\n(+30 BD), or lay them EXPOSED\n(3 turns)."})
+	return null
+
 
 static func beastmaster_pool_ability(display_name: String) -> Ability:
 	match display_name:
@@ -354,8 +403,8 @@ const SPEC_INFO := {
 	"beastmaster": {"name": "Beastmaster", "constitution": 100, "archetype": "Ramp", "passive": "pack",
 		"passive_desc": "Pack Bond — the active beast grants its boon: Ursus, Savage\nPresence: enemies are drawn to the bear and you take 10% less\ndamage; Canis: +15% damage per enemy under 35% health; Aguila: the\nwhole party gains +10% crit. LOYALTY (per beast, max 5): +1 each\nturn it stands with you and on summon/swap; +5% strike damage per\nstack plus a beast-specific gift; at 5 the boon is DOUBLED. Meters\nlast until that beast dies.",
 		"blurb": "The wilds hunt beside them — every kill is shared."},
-	"sharpshooter": {"name": "Sharpshooter", "constitution": 90, "archetype": "Rush", "passive": "lethal_aim",
-		"passive_desc": "Lethal Aim: critical hits deal x2 damage instead of x1.5.",
+	"sharpshooter": {"name": "Sharpshooter", "constitution": 90, "archetype": "Nuker", "passive": "lethal_aim",
+		"passive_desc": "Lethal Aim: critical hits deal x2 damage instead of\nx1.5. Each consecutive attack against the same enemy\ngrants +20 FOCUS (0-100; lost on switching targets,\n50 retained on a kill), and every point of Focus\ngrants +0.5% critical chance.",
 		"blurb": "Every arrow an execution — patient, precise, final."},
 	"mystic": {"name": "Survivalist", "constitution": 100, "archetype": "Pressure", "passive": "trapper",
 		"passive_desc": "Trapper: enemies that strike the Hunter have a 25% chance\nto be Poisoned (5 turns).",
@@ -567,16 +616,16 @@ static func spec_abilities(spec: String) -> Array:
 			return [
 				Ability.make({"display_name": "Aimed Shot", "cooldown": 1, "cost": 20, "damage": 45,
 					"pressure": 15, "delay": 3.0, "anim": "attack02",
-					"perfect_id": "", "perfect_text": "+25% crit on this shot",
+					"perfect_id": "focus20", "perfect_text": "+20 Focus",
 					"description": "A perfect line. Patient, precise, final."}),
 				Ability.make({"display_name": "Powershot", "cooldown": 2, "cost": 25, "damage": 20,
 					"pressure": 20, "delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "",
-					"description": "+2% damage for every point of the\ntarget's Break bar still EMPTY."}),
-				Ability.make({"display_name": "Quick Draw", "cooldown": 5, "cost": 15, "special": "quickdraw",
-					"delay": 2.0, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "Lasts 6 turns",
-					"description": "Adrenaline takes over: all your abilities\nact 50% faster for 5 turns."}),
+					"description": "+2% damage for every point of the\ntarget's Break bar already FULL —\nthe team breaks them, the marksman\nends them."}),
+				Ability.make({"display_name": "Hold Breath", "cooldown": 3, "cost": 15, "special": "hold_breath",
+					"delay": 2.0, "anim": "attack01", "no_skill_check": true,
+					"perfect_id": "", "perfect_text": "",
+					"description": "Patience made literal: gain +40 Focus,\nand your next attack is a GUARANTEED\ncritical that ignores all armor."}),
 			]
 		"mystic":
 			return [

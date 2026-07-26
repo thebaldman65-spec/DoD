@@ -644,9 +644,104 @@ const FIXED_TREES := {
 # other but stay visible (the player must see the door they closed).
 const LANE_TIER_REQ := {0: 0, 1: 3, 2: 6}
 const CAPSTONE_REQ := 8
+# Node-gated trees (Sharpshooter pilot, Batch 32): tiers open on NODES
+# BOUGHT in the lane instead of points spent — stable against the
+# escalating cost curve. Marked by "node_gated" on the tree's first node.
+const NODE_TIER_REQ := {0: 0, 1: 2, 2: 4}
+const NODE_CAPSTONE_REQ := 6
 const LANE_NAMES := {"devotion": "Devotion", "pack": "The Pack", "handler": "Handler"}
 
 const LANE_TREES := {
+	"sharpshooter": [
+		# NODE-GATED tree (the marker below): tiers open on NODES BOUGHT in
+		# the lane (2/4; capstone at 6), not points — with the escalating
+		# cost curve, node count is the stable, legible gate.
+		# --- Lane A: Precision — Focus, crit chance, crit damage ---
+		{"id": "ss_steady", "name": "Steady Hands", "ranks": 3, "lane": "Precision", "tier": 0,
+			"node_gated": true,
+			"desc": "+{v}% critical chance.", "scale": {"step": 4},
+			"payload": {"stat": {"crit_bonus": 0.04}}},
+		{"id": "ss_perfect_form", "name": "Perfect Form", "ranks": 1, "lane": "Precision", "tier": 0,
+			"desc": "Critical hits grant +20 Focus.",
+			"payload": {"stat": {"perfect_form": 1}}},
+		{"id": "ss_deep_focus", "name": "Deep Focus", "ranks": 1, "lane": "Precision", "tier": 1,
+			"desc": "The Focus cap rises from 100 to 150.",
+			"payload": {"stat": {"deep_focus": 1}}},
+		{"id": "ss_exec_eye", "name": "Executioner's Eye", "ranks": 3, "lane": "Precision", "tier": 1,
+			"exclusive_with": "ss_consistent",
+			"desc": "Lethal Aim's critical multiplier rises to x{v}.",
+			"scale": {"base": 2.0, "step": 0.1},
+			"payload": {"stat": {"lethal_eye_ranks": 1}}},
+		{"id": "ss_consistent", "name": "Consistent Aim", "ranks": 1, "lane": "Precision", "tier": 1,
+			"exclusive_with": "ss_exec_eye",
+			"desc": "Critical hits deal x1.5 again — but you gain +30% critical chance.",
+			"payload": {"stat": {"consistent_aim": 1, "crit_bonus": 0.30}}},
+		{"id": "ss_unwavering", "name": "Unwavering", "ranks": 1, "lane": "Precision", "tier": 2,
+			"desc": "Switching targets HALVES your Focus instead of clearing it.",
+			"payload": {"stat": {"unwavering": 1}}},
+		{"id": "ss_tunnel", "name": "Tunnel Vision", "ranks": 1, "lane": "Precision", "tier": 2,
+			"exclusive_with": "ss_spray",
+			"desc": "+50% critical chance against the enemy you attacked last turn; -50% against every other enemy.",
+			"payload": {"stat": {"tunnel_vision": 1}}},
+		# --- Lane B: Penetration — armor, Break, finishing the party's work ---
+		{"id": "ss_piercer", "name": "Armor Piercer", "ranks": 3, "lane": "Penetration", "tier": 0,
+			"desc": "Your attacks ignore {v}% of the target's armor.", "scale": {"step": 8},
+			"payload": {"stat": {"pierce_bonus": 0.08}}},
+		{"id": "ss_sundering", "name": "Sundering Shot", "ranks": 1, "lane": "Penetration", "tier": 0,
+			"desc": "Critical hits apply 15 Break damage.",
+			"payload": {"stat": {"sundering_shot": 1}}},
+		{"id": "ss_bonecracker", "name": "Bonecracker", "ranks": 2, "lane": "Penetration", "tier": 1,
+			"desc": "+{v}% damage against Broken enemies.", "scale": {"step": 12},
+			"payload": {"stat": {"bonecracker_ranks": 1}}},
+		{"id": "ss_opp_aim", "name": "Opportunist's Aim", "ranks": 1, "lane": "Penetration", "tier": 1,
+			"desc": "Powershot's Break scaling doubles: +4% damage per full point instead of +2%.",
+			"payload": {"stat": {"opp_aim": 1}}},
+		{"id": "ss_exposed_nerve", "name": "Exposed Nerve", "ranks": 1, "lane": "Penetration", "tier": 1,
+			"desc": "Critical hits apply Exposed for 3 turns.",
+			"payload": {"stat": {"exposed_nerve": 1}}},
+		{"id": "ss_no_cover", "name": "No Cover", "ranks": 1, "lane": "Penetration", "tier": 2,
+			"desc": "Your attacks cannot be made to miss: Blind and Dazed do not affect you, and Elusive does not protect against you.",
+			"payload": {"stat": {"no_cover": 1}}},
+		{"id": "ss_overkill", "name": "Overkill", "ranks": 1, "lane": "Penetration", "tier": 2,
+			"desc": "Excess damage from a killing blow carries to another enemy at full value.",
+			"payload": {"stat": {"overkill": 1}}},
+		# --- Lane C: Tempo — speed, cooldowns, Focus acceleration ---
+		{"id": "ss_fletcher", "name": "Fletcher's Speed", "ranks": 3, "lane": "Tempo", "tier": 0,
+			"desc": "+{v} Speed.", "scale": {"step": 5},
+			"payload": {"stat": {"speed": 5.0}}},
+		{"id": "ss_snap", "name": "Snap Shot", "ranks": 1, "lane": "Tempo", "tier": 0,
+			"desc": "The first ability you use each fight costs no Mana and does not start its cooldown.",
+			"payload": {"stat": {"snap_shot": 1}}},
+		{"id": "ss_muscle", "name": "Muscle Memory", "ranks": 2, "lane": "Tempo", "tier": 1,
+			"desc": "Focus gain per attack increases by {v}.", "scale": {"step": 10},
+			"payload": {"stat": {"muscle_memory_ranks": 1}}},
+		{"id": "ss_volley", "name": "Opening Volley", "ranks": 1, "lane": "Tempo", "tier": 1,
+			"desc": "You begin every fight with 60 Focus.",
+			"payload": {"stat": {"opening_volley": 1}}},
+		{"id": "ss_follow", "name": "Follow-Through", "ranks": 1, "lane": "Tempo", "tier": 1,
+			"desc": "Critical hits reduce ALL your cooldowns by 1.",
+			"payload": {"stat": {"follow_through": 1}}},
+		{"id": "ss_second_nature", "name": "Second Nature", "ranks": 1, "lane": "Tempo", "tier": 2,
+			"desc": "Hold Breath's guaranteed critical applies to your next TWO attacks.",
+			"payload": {"stat": {"second_nature": 1}}},
+		{"id": "ss_spray", "name": "Spray of Arrows", "ranks": 1, "lane": "Tempo", "tier": 2,
+			"exclusive_with": "ss_tunnel",
+			"desc": "Your single-target attacks strike one additional random enemy for 50% damage — but Focus can never exceed 50.",
+			"payload": {"stat": {"spray": 1}}},
+		# --- Capstones: take ONE (6 nodes bought in the lane) ---
+		{"id": "ss_one_shot", "name": "One Shot", "ranks": 1, "lane": "Precision", "tier": 2,
+			"capstone": true,
+			"desc": "At maximum Focus, Aimed Shot EXECUTES any enemy below 40% health outright; above 40% it deals double damage. Either way, Focus resets to 0.",
+			"payload": {"stat": {"one_shot": 1}}},
+		{"id": "ss_tnt", "name": "Through and Through", "ranks": 1, "lane": "Penetration", "tier": 2,
+			"capstone": true,
+			"desc": "Your attacks ignore ALL armor, and every critical hit refunds its Mana cost.",
+			"payload": {"stat": {"through_and_through": 1}}},
+		{"id": "ss_rapid", "name": "Rapid Fire", "ranks": 1, "lane": "Tempo", "tier": 2,
+			"capstone": true,
+			"desc": "Each ability you use has a 35% chance not to consume its cooldown.",
+			"payload": {"stat": {"rapid_fire": 1}}},
+	],
 	"beastmaster": [
 		# --- Lane A: Devotion — stay with one beast, steepen the ramp ---
 		{"id": "bm_communion", "name": "Wild Communion", "ranks": 3, "lane": "devotion", "tier": 0,
@@ -1271,6 +1366,21 @@ static func is_lane_tree(tree_nodes: Array) -> bool:
 	return not tree_nodes.is_empty() and tree_nodes[0].has("lane")
 
 
+static func is_node_gated(tree_nodes: Array) -> bool:
+	return not tree_nodes.is_empty() and tree_nodes[0].get("node_gated", false)
+
+
+# Distinct non-capstone nodes bought in a lane (node-gated trees).
+static func lane_nodes_bought(tree_nodes: Array, learned: Dictionary,
+		lane: String) -> int:
+	var n := 0
+	for t in tree_nodes:
+		if str(t.get("lane", "")) == lane and not t.get("capstone", false) \
+				and int(learned.get(t["id"], 0)) > 0:
+			n += 1
+	return n
+
+
 # The Nth DISTINCT node bought costs ceil(N/3); extra ranks cost 1.
 static func next_node_cost(learned: Dictionary) -> int:
 	var distinct := 0
@@ -1357,21 +1467,26 @@ static func can_learn(tree_nodes: Array, id: String, learned: Dictionary,
 		if t.has("locked_note"):
 			return {"ok": false, "why": str(t["locked_note"])}
 		var lane := str(t["lane"])
-		var in_lane := lane_points(tree_nodes, learned, order, lane)
+		var node_gated := is_node_gated(tree_nodes)
+		var in_lane := (lane_nodes_bought(tree_nodes, learned, lane) if node_gated \
+			else lane_points(tree_nodes, learned, order, lane))
+		var unit_word := "nodes in" if node_gated else "pts in"
 		if t.get("capstone", false):
 			for other in tree_nodes:
 				if other.get("capstone", false) and other["id"] != id \
 						and int(learned.get(other["id"], 0)) > 0:
 					return {"ok": false, "why": "Barred: %s is your capstone" % \
 						other["name"]}
-			if in_lane < CAPSTONE_REQ:
-				return {"ok": false, "why": "Locked: %d pts in %s (have %d)" % [
-					CAPSTONE_REQ, LANE_NAMES.get(lane, lane), in_lane]}
+			var cap_need := NODE_CAPSTONE_REQ if node_gated else CAPSTONE_REQ
+			if in_lane < cap_need:
+				return {"ok": false, "why": "Locked: %d %s %s (have %d)" % [
+					cap_need, unit_word, LANE_NAMES.get(lane, lane), in_lane]}
 		else:
-			var lane_need := int(LANE_TIER_REQ.get(int(t.get("tier", 0)), 0))
+			var lane_need := int((NODE_TIER_REQ if node_gated else LANE_TIER_REQ) \
+				.get(int(t.get("tier", 0)), 0))
 			if in_lane < lane_need:
-				return {"ok": false, "why": "Locked: %d pts in %s (have %d)" % [
-					lane_need, LANE_NAMES.get(lane, lane), in_lane]}
+				return {"ok": false, "why": "Locked: %d %s %s (have %d)" % [
+					lane_need, unit_word, LANE_NAMES.get(lane, lane), in_lane]}
 		var excl := str(t.get("exclusive_with", ""))
 		if excl != "" and int(learned.get(excl, 0)) > 0:
 			var excl_node := node_in_tree(tree_nodes, excl)

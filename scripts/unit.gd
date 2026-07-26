@@ -104,6 +104,30 @@ var no_heals := false        # Ancient Pact: this beast rejects all healing
 var soul_partner: BattleUnit = null  # One Soul: damage is split with them
 var _soul_guard := false     # re-entry guard while splitting
 var damaged_since_turn := false  # Unbroken Watch bookkeeping
+# ---- Sharpshooter Focus + lane talents (Batch 32) ----
+var last_attack_target: BattleUnit = null  # Focus: the enemy worked last turn
+var lethal_eye_ranks := 0    # Executioner's Eye: crit mult 2.0 -> +0.1/rank
+var consistent_aim := 0      # crits x1.5 again, +30% crit chance
+var deep_focus := 0          # Focus cap 100 -> 150
+var unwavering := 0          # switching targets halves Focus instead of zeroing
+var perfect_form := 0        # crits grant +20 Focus
+var tunnel_vision := 0       # +50% crit vs the worked target, -50% vs others
+var bonecracker_ranks := 0   # +12%/rank damage vs Broken enemies
+var opp_aim := 0             # Powershot Break scaling doubles
+var sundering_shot := 0      # crits apply 15 Break damage
+var exposed_nerve := 0       # crits apply Exposed 3t
+var no_cover := 0            # attacks cannot be made to miss (bypass, not modifier)
+var overkill := 0            # kill overflow carries to another enemy
+var muscle_memory_ranks := 0 # Focus gain +10/rank
+var opening_volley := 0      # start fights at 60 Focus
+var follow_through := 0      # crits tick all cooldowns by 1
+var second_nature := 0       # Hold Breath covers the next TWO attacks
+var snap_shot := 0           # first ability each fight: free, no cooldown
+var snap_used := false
+var spray := 0               # single-target attacks echo to a random enemy at 50%
+var one_shot := 0            # capstone: max-Focus Aimed Shot executes below 40%
+var through_and_through := 0 # capstone: ignore ALL armor; crits refund Mana
+var rapid_fire := 0          # capstone: 35% chance abilities skip their cooldown
 var companion_hp_bonus := 0   # talents: extra HP for summoned companions
 var companion_power := 0      # talents: extra damage on companion attacks
 # Fixed-tree talent stats (0/0.0 = not learned). See talents.gd for sources.
@@ -460,7 +484,8 @@ func build_plate(root: Node2D) -> void:
 	if second_resource_name != "":
 		_plate_panel.add_child(_make_bar_bg(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9)))
 		var res2_color := Color(0.95, 0.80, 0.30) if second_resource_name == "Mercy" \
-			else Color(0.75, 0.40, 0.95)
+			else (Color(0.55, 0.85, 0.40) if second_resource_name == "Focus" \
+			else Color(0.75, 0.40, 0.95))
 		_res2_fill = _make_fill(Vector2(PLATE_BAR_X + 1, y + 1), Vector2(PLATE_BAR_W, 7), res2_color)
 		_plate_panel.add_child(_res2_fill)
 		_res2_text = _make_bar_text(Vector2(PLATE_BAR_X, y), Vector2(PLATE_BAR_W + 2, 9), 8)

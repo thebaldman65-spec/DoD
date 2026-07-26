@@ -63,6 +63,50 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+SHARPSHOOTER REBUILD (07-25, Batch 32): archetype NUKER. FOCUS = second
+resource 0-100 (green; spawn block sets it AFTER talents so cap reads
+deep_focus 150 / spray 50 / else 100 via _focus_cap; opening_volley
+starts 60). Engine _sharpshooter_focus runs post-single-target-attack:
+same target as last_attack_target → +20+10×muscle_memory (_gain_focus
+clamps to cap); switch → 0 (half w/ unwavering); kill → mini(f,50) +
+last_target null (no reset next shot). Crit: +0.005×focus in the crit
+block (lethal_aim gate) + tunnel_vision ±0.5 keyed to last_attack_target.
+Crit MULT site: lethal_aim = 2.0 + 0.1×lethal_eye_ranks, or 1.5 w/
+consistent_aim (+0.30 crit via payload). AIMED SHOT: the old hidden
+is_perfect name-site (+25% crit) REMOVED; perfect_id "focus20" → +20
+Focus. POWERSHOT INVERTED: ×(1 + step×pressure/stability), step 4 w/
+opp_aim. HOLD BREATH ("hold_breath" special, self-cast list): +40 Focus
++ "held_breath" status power=1 (2 w/ second_nature) → is_crit forced +
+effective_armor 0 (same guard covers through_and_through + one_shot
+exec); consumed post-strike-block by power. ONE SHOT capstone: Aimed at
+focus ≥ cap → <40% hp: one_shot_exec local → final = max(hp, final) +
+armor 0; else raw ×2; focus 0 either way. On-crit riders (strike loop
+after take_hit): perfect_form +20 Focus, sundering_shot take_hit(0,15),
+exposed_nerve exposed 3t, follow_through cooldowns −1 all,
+through_and_through refunds ab.cost. OVERKILL: hp_before captured; died
+→ excess to _lowest_hp other (full death handling + _on_enemy_death).
+SPRAY: post-strike echo 50% (0.005×damage×attack) to random other;
+focus cap 50. NO COVER: _miss_chance returns 0.0 EARLY for attacker
+(bypass, not modifier). SNAP SHOT: _eff_cost 0 for first costed ability
++ was_snap at the deduct site skips start_cooldown; RAPID FIRE: 35%
+skip at the same site. Called Shot: called_mode var + _open_called_
+picker (3 buttons) intercepting _on_ability_button (bot sets mode
+directly: sunder if armor else exposed); effect at the sharpshooter
+post-strike block (sunder 2t / take_hit(0,30) / exposed 3t). Pinning
+Shot: applies_status slow + name-keyed dazed 3t. TROPHY POOLS
+GENERALIZED: Classes.SPEC_POOLS + spec_pool/spec_pool_ability
+(sharpshooter ships 5 of 8: Quick Draw demoted, Triple Shot multi_hits
+2, Coup [raw += missing×0.01×focus, drains], Pinning, Called; Disengage
+/Suppressing Fire/Piercing Arrow later). Boss owed + party picker +
+spawn grants all read the spec pool now (member keys still bm_*).
+TREE = FIRST NODE-GATED LANES ("node_gated": true on the tree's first
+node; is_node_gated + lane_nodes_bought; NODE_TIER_REQ {0,2,4},
+NODE_CAPSTONE_REQ 6 — points-gated trees unchanged). Lanes Precision/
+Penetration/Tempo per the design doc; exclusives ss_exec_eye↔
+ss_consistent, ss_tunnel↔ss_spray. Bot: works ss_t (last target),
+Hold Breath → Coup ≥80 focus & <60% hp → Triple ≥60 → Called → Aimed;
+9th kit entry renders unlabeled (popup guard existed). SIM NOTE:
+sharpshooter leads damage 38% — tuning review flagged.
 ALL TREES ON LANES + ZONE 3 (07-25, Batch 31): Talents.LANE_CONVERSIONS
 converts the 9 classic trees AT BUILD TIME in generate_tree — existing
 node ids/payloads untouched ("map" id→[lane,tier(,"cap")(,excl)]),

@@ -5,6 +5,38 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-25 — Batch 32: Sharpshooter rebuild — Focus, kit v2, node-gated tree, trophy pool</h2>
+<ul>
+<li><b>FOCUS (0–100, green second bar):</b> the spec's spine. +20 whenever the marksman
+attacks the enemy they attacked last turn, dropped to 0 on switching (talents soften it),
+up to 50 retained on a kill. Every point grants +0.5% critical chance. Archetype Rush →
+<b>Nuker</b>; Lethal Aim's ×2 crits stay and the Focus rule folds into the passive.</li>
+<li><b>Base kit:</b> Aimed Shot's dead perfect FIXED (the advertised +25% crit never fired
+— perfect_id was empty; it now grants +20 Focus and the hidden crit site is gone);
+<b>Powershot INVERTED</b> (+2% damage per point of Break bar FULL, not empty — the team
+breaks them, the marksman ends them); new <b>Hold Breath</b> (+40 Focus; next attack is a
+guaranteed critical that ignores all armor). Quick Draw demoted to the trophy pool.</li>
+<li><b>Boss-trophy pool (5 of the designed 8):</b> Quick Draw, Triple Shot (3 arrows,
+separate crit rolls), Coup de Grâce (consumes all Focus: +1% of missing health per point),
+Pinning Shot (Slow + Daze 3t), Called Shot (a spot-picker on cast: Sunder / +30 BD /
+Exposed). Disengage, Suppressing Fire, and Piercing Arrow land later. Trophy plumbing
+(boss award, Party-screen chooser, spawn grants) generalized to per-spec pools.</li>
+<li><b>Talent tree — the first NODE-GATED lanes</b> (tier 2 at 2 nodes bought in the lane,
+tier 3 at 4, capstone at 6; stable against the cost curve): PRECISION (Steady Hands,
+Perfect Form, Deep Focus, Executioner's Eye ↔ Consistent Aim, Unwavering, Tunnel Vision),
+PENETRATION (Armor Piercer, Sundering Shot, Bonecracker, Opportunist's Aim, Exposed Nerve,
+No Cover — a miss BYPASS, not a modifier — and Overkill), TEMPO (Fletcher's Speed, Snap
+Shot, Muscle Memory, Opening Volley, Follow-Through, Second Nature, Spray of Arrows).
+Capstones: One Shot (max-Focus Aimed Shot executes below 40%), Through and Through (no
+armor, crits refund Mana), Rapid Fire (35% of casts skip cooldown). Exclusive forks:
+Tunnel Vision ↔ Spray of Arrows, Executioner's Eye ↔ Consistent Aim.</li>
+<li>Verified: 8-assertion node-gating test green; autoplay showed Triple Shot rolling
+independent crits, Called Shot sundering, Hold Breath releasing, Snap Shot, Follow-Through,
+Spray echoes, Rapid Fire, and One Shot's double-damage branch; 40-battle sim 40/40, 0
+script errors — the Sharpshooter now leads damage share (38%), flagged for tuning
+review.</li>
+</ul>
+
 <h2>2026-07-25 — Batch 31: All nine classic trees convert to lanes; zone 3 + final boss; all unlockables pre-granted for testing</h2>
 <ul>
 <li><b>Every designed tree now uses the lane framework.</b> The nine classic trees

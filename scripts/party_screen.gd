@@ -337,7 +337,8 @@ func _draw_detail() -> void:
 		_draw_fixed_tree(member.get("tree", []), member.get("talents", {}),
 			member.get("talent_points", 0))
 	# Beastmaster boss trophies wait on the Party screen until chosen.
-	if spec == "beastmaster" and int(member.get("bm_picks_owed", 0)) > 0:
+	if not Classes.spec_pool(spec).is_empty() \
+			and int(member.get("bm_picks_owed", 0)) > 0:
 		_draw_bm_pick(member)
 
 
@@ -673,10 +674,11 @@ func _draw_bm_pick(member: Dictionary) -> void:
 	title.add_theme_font_size_override("font_size", 15)
 	title.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
 	box.add_child(title)
-	for pool_name in Classes.BEASTMASTER_POOL:
+	var pick_spec: String = member.get("spec", "")
+	for pool_name in Classes.spec_pool(pick_spec):
 		if pool_name in member.get("bm_abilities", []):
 			continue
-		var ab := Classes.beastmaster_pool_ability(pool_name)
+		var ab: Ability = Classes.spec_pool_ability(pick_spec, pool_name)
 		var b := Button.new()
 		b.text = pool_name
 		b.custom_minimum_size = Vector2(300, 34)
