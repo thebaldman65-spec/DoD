@@ -153,6 +153,8 @@ const SPEC_POOLS := {
 		"Call of the Wild", "Mark of the Hunt"],
 	"sharpshooter": ["Quick Draw", "Triple Shot", "Coup de Grâce",
 		"Pinning Shot", "Called Shot"],
+	"mystic": ["Explosive Shot", "Venom Coating", "Hamstring",
+		"Deadfall", "Harvest"],
 }
 const BEASTMASTER_POOL := ["Bestial Wrath", "Spirit Bond", "Primal Surge",
 	"Call of the Wild", "Mark of the Hunt"]
@@ -165,7 +167,44 @@ static func spec_pool(spec: String) -> Array:
 static func spec_pool_ability(spec: String, display_name: String) -> Ability:
 	if spec == "sharpshooter":
 		return sharpshooter_pool_ability(display_name)
+	if spec == "mystic":
+		return survivalist_pool_ability(display_name)
 	return beastmaster_pool_ability(display_name)
+
+
+# Survivalist trophies (5 of the designed 8 — Blight, Smoke Bomb, and
+# Field Dressing land later with no restructuring).
+static func survivalist_pool_ability(display_name: String) -> Ability:
+	match display_name:
+		"Explosive Shot":
+			return Ability.make({"display_name": "Explosive Shot", "cooldown": 3,
+				"dmg_type": "nature", "cost": 35, "damage": 10, "pressure": 20,
+				"delay": 3.0, "anim": "attack03", "aoe": true,
+				"applies_status": {"id": "poison", "turns": 5},
+				"perfect_id": "", "perfect_text": "Deals 12 damage",
+				"description": "A bursting powder charge rakes ALL\nenemies with nature damage and heavy\nBreak pressure, Poisoning each."})
+		"Venom Coating":
+			return Ability.make({"display_name": "Venom Coating", "cooldown": 5, "cost": 20,
+				"special": "venom_coat", "delay": 2.0, "anim": "attack01", "no_skill_check": true,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Coat your arrows: for 4 turns every\nattack applies Poison and refreshes\nexisting Poison timers."})
+		"Hamstring":
+			return Ability.make({"display_name": "Hamstring", "cooldown": 3, "cost": 25,
+				"damage": 20, "pressure": 10, "delay": 2.5, "anim": "attack02",
+				"applies_status": {"id": "cripple", "turns": 3},
+				"perfect_id": "status_plus", "perfect_text": "Everything lasts 4 turns",
+				"description": "A tearing shot through the leg:\nCripple, Slowed AND Exposed for\n3 turns — three statuses in one cast."})
+		"Deadfall":
+			return Ability.make({"display_name": "Deadfall", "cooldown": 3, "cost": 20,
+				"special": "deadfall", "delay": 2.0, "anim": "attack01", "no_skill_check": true,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Rig an untargeted deadfall: the NEXT\nenemy to act takes 35 nature damage\nand is Stunned for 1 turn. You don't\npick the victim — whoever moves first\npays for it."})
+		"Harvest":
+			return Ability.make({"display_name": "Harvest", "cooldown": 4, "cost": 25,
+				"special": "harvest", "delay": 3.0, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "Heals 150% of the damage",
+				"description": "CONSUME every status on one enemy:\n12% of Attack per status consumed,\nand you heal the same amount.\nCashing out strips your own Trapper\nbonus from the target — spend the\nboard wisely."})
+	return null
 
 
 static func sharpshooter_pool_ability(display_name: String) -> Ability:
@@ -407,7 +446,7 @@ const SPEC_INFO := {
 		"passive_desc": "Lethal Aim: critical hits deal x2 damage instead of\nx1.5. Each consecutive attack against the same enemy\ngrants +20 FOCUS (0-100; lost on switching targets,\n50 retained on a kill), and every point of Focus\ngrants +0.5% critical chance.",
 		"blurb": "Every arrow an execution — patient, precise, final."},
 	"mystic": {"name": "Survivalist", "constitution": 100, "archetype": "Pressure", "passive": "trapper",
-		"passive_desc": "Trapper: enemies that strike the Hunter have a 25% chance\nto be Poisoned (5 turns).",
+		"passive_desc": "Trapper: enemies that strike the Hunter have a 25% chance\nto be Poisoned (5 turns), and the Survivalist's abilities\ndeal +8% damage per DIFFERENT status effect afflicting\nthe target — breadth of control IS the damage.",
 		"blurb": "Endures the wilds and bleeds them dry — traps, powder, and steel."},
 }
 
@@ -633,16 +672,16 @@ static func spec_abilities(spec: String) -> Array:
 					"delay": 2.5, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "Lasts 6 turns",
 					"description": "Rig the ground: for 5 turns, retaliate\nagainst EVERY attacking melee enemy —\neven those striking your allies."}),
-				Ability.make({"display_name": "Explosive Shot", "cooldown": 3, "dmg_type": "fire", "cost": 35,
-					"damage": 10, "pressure": 20, "delay": 3.0, "anim": "attack03", "aoe": true,
-					"perfect_id": "", "perfect_text": "Deals 12 damage",
-					"description": "A bursting charge rakes ALL enemies\nwith fire and heavy Break pressure."}),
-				Ability.make({"display_name": "Shrapnel Charge", "cooldown": 2, "dmg_type": "fire",
+				Ability.make({"display_name": "Shrapnel Charge", "cooldown": 2, "dmg_type": "nature",
 					"cost": 25, "damage": 20,
 					"pressure": 25, "delay": 3.0, "anim": "attack03", "choose_two": true,
 					"applies_status": {"id": "cripple", "turns": 3},
-					"perfect_id": "status_plus", "perfect_text": "Cripple and Slowed last 4 turns",
-					"description": "A scattering charge rips TWO chosen\nenemies for 20 fire damage each, leaving\nthem Crippled and Slowed (3 turns)."}),
+					"perfect_id": "status_plus", "perfect_text": "Adds Slowed; everything lasts 4 turns",
+					"description": "A scattering charge rips TWO chosen\nenemies for 20 nature damage each,\nleaving them Poisoned AND Crippled\n(3 turns). Two statuses on two targets\n— the engine of the hunt."}),
+				Ability.make({"display_name": "Snare Trap", "cooldown": 3, "cost": 20, "special": "snare_trap",
+					"delay": 2.0, "anim": "attack01",
+					"perfect_id": "", "perfect_text": "The Poison lasts 6 turns",
+					"description": "Rig a snare on one enemy: the next\ntime it acts, it is STUNNED for 1 turn\nand Poisoned for 4. Bosses shrug off\nthe stun unless Broken."}),
 			]
 	return []
 

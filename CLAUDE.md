@@ -63,6 +63,50 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+SURVIVALIST REBUILD (07-25, Batch 33; spec id stays "mystic" — NEVER
+rename it, saves/trees key on it): archetype Pressure. TRAPPER v2:
+poison-on-strike clause unchanged; +8% dmg per DIFFERENT status on the
+target via _status_count (counts unit.DEBUFF_IDS minus "broken" —
+snared/caught added to the list). Force of Nature capstone: 0.20/status
+for ALL heroes (checked via _living_hero_with("force_of_nature") —
+generic field scanner using Node.get). Vulture +30% at ≥3. Necrosis:
+poisoned ENEMIES take +20% from all sources (hero strike site +
+_companion_hit; enemy-on-hero excluded). ALL his poison flows through
+_apply_poison(src, victim, turns): tick = 3% src Atk + potent_ranks;
+slow_acting halves tick/doubles turns/sticky; epidemic → turns -1 +
+sticky; virulence_ranks extra applications; sticky flag checked in
+unit.purge_debuffs + dispel (Slow Acting/Epidemic uncleansable).
+_hit_and_run: applying statuses → self elusive 1t (elusive WORKS on
+heroes — no new code needed). TRAPS: "snared" status (power = placer
+hero idx, perfect flag on the status dict) + hero.deadfall_armed (DF#
+chip); both spring at the victim's turn start BEFORE the stunned check
+(_spring_trap: cruel_ranks dmg mult, quick_rigging cripple,
+bone_breaker 30 BD, caught_fast "caught" status → unit.heal_amount
+returns 0). Trap cap gate in _ability_usable (1, or 2 w/
+deadfall_network). Deadfall = untargeted (first enemy to act; 35% Atk).
+KIT: Tripwire + Shrapnel v2 (nature; poison+cripple both targets,
+perfect +slowed/4t via post-strike block iterating [target,
+second_target, third_target] — strike_targets is OUT OF SCOPE there!)
++ Snare Trap. POOL (Classes.survivalist_pool_ability; GOTCHA: match→
+return branches must NOT end '}),'— array-style commas break parse):
+Explosive Shot (nature, poisons), Venom Coating ("venom_coat" status →
+poison every hit), Hamstring (slow+exposed extras + status_plus
+perfect), Deadfall, Harvest (special: _status_count × 12% Atk +
+self-heal ×1.5 perfect; purge first — sticky poison survives the purge
+but was counted, known quirk). Tripwire site v2: ranged gate bypassed
+by snap_shut/whole_forest, ret += 0.10×wire_ranks×Atk, ×cruel,
++bone/caught riders, _on_enemy_death on kills. The Whole Forest:
+tripwire turns -1 at cast + _forest_bite(enemy) after enemy SUPPORT
+casts (attacks covered by the retal block). Epidemic: _run_battle
+start, _apply_poison(-1) all enemies. Turn-start upkeep block (after
+spirit_mana): plague_bearer (3 stacks leap, tick copied from source
+status) + field_medic (dispel_one_debuff on random debuffed ally).
+Ghillie: enemy-target re-pick (40%) after Savage Presence. Improvised:
+cd-skip chain at the deduct site (was_snap → improvised → rapid_fire →
+start_cooldown). Scavenger + creeping_death live in _on_enemy_death.
+Bot: snare → venom coat → hamstring → harvest ≥4 statuses → deadfall
+(uses _ability_usable for trap gates). ONE SHOT TUNED: 35% + never
+bosses (is_boss check; elites fine). SIM: 39/40, Survivalist 24%.
 SHARPSHOOTER REBUILD (07-25, Batch 32): archetype NUKER. FOCUS = second
 resource 0-100 (green; spawn block sets it AFTER talents so cap reads
 deep_focus 150 / spray 50 / else 100 via _focus_cap; opening_volley

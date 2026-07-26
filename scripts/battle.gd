@@ -90,6 +90,9 @@ const STATUS_INFO := {
 	"hunt_mark": ["Marked", "Mk", Color(0.90, 0.50, 0.20), "Marked by the hunt: the Beastmaster\nand their beast deal +25% damage to\nthis enemy, and their strikes on it\nrestore the hunter's Mana."],
 	"vengeance": ["Vengeance", "Vn", Color(0.85, 0.35, 0.30), "The fallen beast's boon lives on in\nthe hunter: +30% damage, and the\nPack Bond holds."],
 	"held_breath": ["Held Breath", "HB", Color(0.70, 0.90, 0.60), "The next attack is a GUARANTEED\ncritical and ignores all armor."],
+	"snared": ["Snared", "Sn", Color(0.75, 0.65, 0.30), "A trap waits underfoot: the next\ntime this enemy acts it is STUNNED\nfor 1 turn and Poisoned."],
+	"caught": ["Caught Fast", "Cf", Color(0.75, 0.55, 0.25), "The trap's teeth hold the wound\nopen: cannot be healed."],
+	"venom_coat": ["Venom Coating", "VC", Color(0.45, 0.80, 0.30), "Coated arrows: every attack applies\nPoison and refreshes its timer."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -1029,6 +1032,14 @@ func _run_battle() -> void:
 	# The warband's theme opens the log — the composition isn't random.
 	if Run.active and String(Run.encounter.get("theme", "")) != "":
 		_log("Enemy warband: %s" % Run.encounter["theme"], "#c8b880")
+	# Epidemic (Survivalist capstone): the rot is already in every vein.
+	for ep_h in heroes:
+		if not ep_h.dead and ep_h.epidemic > 0:
+			for ep_e in enemies:
+				if not ep_e.dead:
+					_apply_poison(ep_h, ep_e, -1)
+			_log("Epidemic: every enemy is already rotting", "#70d878")
+			break
 	await _wait(0.8)
 	while not battle_over:
 		_update_talent_chips()
@@ -1181,6 +1192,61 @@ func _run_battle() -> void:
 			u.resource = mini(u.resource + spm, u.max_resource)
 			u.float_text("+%d Mana" % spm, Color(0.45, 0.6, 0.95))
 			u.refresh_bars()
+		# Survivalist upkeep: Plague Bearer spreads the rot, the Field
+		# Medic tends a random ally.
+		if u.is_hero and not u.dead and u.plague_bearer > 0:
+			var pb_src: Array = enemies.filter(
+				func(e): return not e.dead and e.has_status("poison"))
+			if not pb_src.is_empty():
+				var pb_from: BattleUnit = pb_src.pick_random()
+				var pb_pool: Array = enemies.filter(
+					func(e): return not e.dead and e != pb_from)
+				if not pb_pool.is_empty():
+					var pb_to: BattleUnit = pb_pool.pick_random()
+					var pb_tick: int = int(pb_from.get_status("poison").get("tick", 3))
+					for _pb in 3:
+						_apply_status(pb_to, "poison", 5, 0, pb_tick)
+					_log("   → Plague Bearer: the rot leaps from %s to %s" % [
+						pb_from.unit_name, pb_to.unit_name], "#70d878")
+		if u.is_hero and not u.dead and u.field_medic > 0:
+			var fm_pool: Array = heroes.filter(
+				func(h): return not h.dead and _status_count(h) > 0)
+			if not fm_pool.is_empty():
+				var fm_ally: BattleUnit = fm_pool.pick_random()
+				var fm_washed: String = fm_ally.dispel_one_debuff()
+				if fm_washed != "":
+					fm_ally.float_text("Cleansed: %s" % fm_washed,
+						Color(0.5, 0.95, 0.6))
+					_log("   → Field Medic: %s washes %s off %s" % [
+						u.unit_name, fm_washed, fm_ally.unit_name], "#70d878")
+		# Survivalist traps spring the moment their victim moves: the snare
+		# on this enemy first, then any armed deadfall (whoever acts first).
+		if not u.is_hero and not u.dead and u.has_status("snared"):
+			var sn_idx := u.status_power("snared")
+			var sn_perfect: bool = u.get_status("snared").get("perfect", false)
+			u.remove_status("snared")
+			if sn_idx >= 0 and sn_idx < heroes.size() and not heroes[sn_idx].dead:
+				_message("The snare springs on %s!" % u.unit_name)
+				_log("%s's snare springs on %s" % [heroes[sn_idx].unit_name,
+					u.unit_name], "#c8a860")
+				_spring_trap(heroes[sn_idx], u, 0.0)
+				_apply_poison(heroes[sn_idx], u, 6 if sn_perfect else 4)
+		if not u.is_hero and not u.dead:
+			for df_h in heroes:
+				if not df_h.dead and df_h.deadfall_armed > 0:
+					df_h.deadfall_armed -= 1
+					if df_h.deadfall_armed <= 0:
+						df_h.remove_status("deadfall")
+					else:
+						df_h.update_status("deadfall", "DF%d" % df_h.deadfall_armed,
+							"Deadfall armed: the next enemy to act\nsprings it.", df_h.deadfall_armed)
+					_message("The deadfall springs on %s!" % u.unit_name)
+					_log("%s's deadfall springs on %s" % [df_h.unit_name,
+						u.unit_name], "#c8a860")
+					_spring_trap(df_h, u, 0.35 * df_h.attack)
+					break
+		if u.dead:
+			continue
 		if u.has_status("stunned"):
 			u.remove_status("stunned")
 			u.float_text("STUNNED", Color(0.95, 0.9, 0.4))
@@ -1422,7 +1488,8 @@ func _player_turn(u: BattleUnit) -> void:
 				"mana_shield", "divine_wrath", "shield_block", "hold_the_line",
 				"battle_shout", "flame_shield", "stabilize", "overcharge",
 				"cons_ground", "bulwark", "dark_pact", "hysteria",
-				"instinct", "bestial", "spirit_bond", "hold_breath"]:
+				"instinct", "bestial", "spirit_bond", "hold_breath",
+				"venom_coat", "deadfall"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -1708,6 +1775,26 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			var shrapnel := _find_ability(u, "Shrapnel Charge")
 			if shrapnel != null and u.resource >= shrapnel.cost and u.ability_ready(shrapnel) and foes.size() >= 2:
 				return [shrapnel, target_foe]
+			# Survivalist: rig, poison broadly, then reap the board.
+			var snare := _find_ability(u, "Snare Trap")
+			if snare != null and u.resource >= _eff_cost(u, snare) \
+					and _ability_usable(u, snare):
+				return [snare, target_foe]
+			var vcoat := _find_ability(u, "Venom Coating")
+			if vcoat != null and u.resource >= _eff_cost(u, vcoat) \
+					and u.ability_ready(vcoat) and not u.has_status("venom_coat"):
+				return [vcoat, u]
+			var ham := _find_ability(u, "Hamstring")
+			if ham != null and u.resource >= _eff_cost(u, ham) and u.ability_ready(ham):
+				return [ham, target_foe]
+			var harv := _find_ability(u, "Harvest")
+			if harv != null and u.resource >= _eff_cost(u, harv) \
+					and u.ability_ready(harv) and _status_count(target_foe) >= 4:
+				return [harv, target_foe]
+			var dfall := _find_ability(u, "Deadfall")
+			if dfall != null and u.resource >= _eff_cost(u, dfall) \
+					and _ability_usable(u, dfall):
+				return [dfall, u]
 			return [u.abilities[0], ss_t]          # Quick Shot works the target
 		"cleric":
 			# Holy triage first (Mercy spenders), then Devout/Occultist casts.
@@ -2025,6 +2112,16 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# Lone Bond: one beast per fight — no swaps, no second call.
 	if ab.special == "summon" and u.lone_bond > 0 and not u.kinds_summoned.is_empty():
 		return false
+	# Traps: one active at a time (two under Deadfall Network).
+	if ab.special in ["snare_trap", "deadfall"]:
+		var trap_count := u.deadfall_armed
+		var u_idx := heroes.find(u)
+		for e in enemies:
+			if not e.dead and e.has_status("snared") \
+					and e.status_power("snared") == u_idx:
+				trap_count += 1
+		if trap_count >= (2 if u.deadfall_network > 0 else 1):
+			return false
 	# Swap Companion: shared cooldown (waived by Wild Rotation), and never
 	# to the beast already out.
 	if ab.special == "summon" and ab.display_name.begins_with("Swap"):
@@ -2507,6 +2604,7 @@ func _enemy_turn(u: BattleUnit) -> void:
 		var support := _enemy_support_action(u)
 		if not support.is_empty():
 			await _resolve(u, support[0], support[1], "good")
+			_forest_bite(u)
 			return
 	var target: BattleUnit
 	var ab: Ability
@@ -2541,6 +2639,13 @@ func _enemy_turn(u: BattleUnit) -> void:
 					_log("   → Savage Presence: %s draws %s's attack" % [
 						sp_c.unit_name, u.unit_name], "#d8b880")
 				break
+		# Ghillie Suit: the Survivalist fades into the brush while any
+		# other ally still stands.
+		if target != null and target.is_hero and not target.is_companion \
+				and target.ghillie > 0 and randf() < 0.40:
+			var gh_others: Array = living.filter(func(t): return t != target)
+			if not gh_others.is_empty():
+				target = gh_others.pick_random()
 	await _resolve(u, ab, target, "good")
 
 
@@ -2706,8 +2811,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		attacker.snap_used = true
 		_log("   → Snap Shot: no cost, no cooldown", "#b0a8e0")
 	elif not is_counter and not debug_cooldowns_off:
+		# Improvised (Survivalist): the first ability keeps its cooldown.
+		if attacker.improvised > 0 and not attacker.improvised_used \
+				and ab.cooldown > 0:
+			attacker.improvised_used = true
+			_log("   → Improvised: no cooldown on the opener", "#b0a8e0")
 		# Rapid Fire (capstone): 35% of casts skip their cooldown.
-		if attacker.rapid_fire > 0 and ab.cooldown > 0 and randf() < 0.35:
+		elif attacker.rapid_fire > 0 and ab.cooldown > 0 and randf() < 0.35:
 			_log("   → Rapid Fire: the cooldown never starts", "#b0a8e0")
 		else:
 			attacker.start_cooldown(ab)
@@ -3120,12 +3230,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 + ps_step * clampf(
 					strike_target.pressure / float(strike_target.stability), 0.0, 1.0)
 			# One Shot (capstone): at maximum Focus the perfect moment arrives —
-			# Aimed Shot executes below 40% health, doubles above it.
+			# Aimed Shot executes below 35% health (never bosses; elites are
+			# fair game), doubles otherwise.
 			var one_shot_exec := false
 			if ab.display_name == "Aimed Shot" and attacker.one_shot > 0 \
 					and attacker.second_resource_name == "Focus" \
 					and attacker.second_resource >= _focus_cap(attacker):
-				if strike_target.hp < strike_target.max_hp * 0.40:
+				if strike_target.hp < strike_target.max_hp * 0.35 \
+						and not strike_target.is_boss:
 					one_shot_exec = true
 					_log("%s: ONE SHOT — the moment arrives" % attacker.unit_name,
 						"#e8c860")
@@ -3148,6 +3260,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Bonecracker: the broken are already lost.
 			if strike_target.broken and attacker.bonecracker_ranks > 0:
 				raw *= 1.0 + 0.12 * attacker.bonecracker_ranks
+			# Trapper (Survivalist): breadth of control IS the damage — +8%
+			# per different status on the target. Force of Nature raises it
+			# to +20% and lends it to the WHOLE party.
+			if attacker.is_hero and not attacker.is_companion:
+				var sv_n := _status_count(strike_target)
+				if sv_n > 0:
+					if _living_hero_with("force_of_nature") != null:
+						raw *= 1.0 + 0.20 * sv_n
+					elif attacker.passive_id == "trapper":
+						raw *= 1.0 + 0.08 * sv_n
+				# Vulture: three open wounds is a feast.
+				if attacker.vulture > 0 and sv_n >= 3:
+					raw *= 1.30
+			# Necrosis: the poisoned rot for everyone's blades (enemies only).
+			if not strike_target.is_hero and strike_target.has_status("poison") \
+					and _living_hero_with("necrosis") != null:
+				raw *= 1.20
 			# Overpower: exploits instability — +0.5 damage per point of Break.
 			if ab.display_name == "Overpower":
 				raw += 0.5 * strike_target.pressure
@@ -3780,6 +3909,26 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				attacker.heal_amount(drained)
 				attacker.float_text("+%d" % drained, Color(0.4, 0.9, 0.45))
 				_log("   → %s drains %d HP" % [attacker.unit_name, drained], "#70d878")
+		# Survivalist on-hit package: Shrapnel's poison (perfect adds Slowed),
+		# Hamstring's trio, Coated Blades on basics, Venom Coating on all.
+		if attacker.is_hero and attacker.passive_id == "trapper" \
+				and ab.damage > 0 and not is_counter:
+			var sv_turns := 4 if is_perfect else 3
+			for sv_t in [target, second_target, third_target]:
+				if sv_t == null or sv_t.dead or sv_t.is_hero:
+					continue
+				if ab.display_name == "Shrapnel Charge":
+					_apply_poison(attacker, sv_t, sv_turns)
+					if is_perfect:
+						_apply_status(sv_t, "slow", sv_turns)
+				if ab.display_name == "Hamstring":
+					_apply_status(sv_t, "slow", sv_turns)
+					_apply_status(sv_t, "exposed", sv_turns)
+					_hit_and_run(attacker)
+				if attacker.coated_blades > 0 and ab.cost == 0:
+					_apply_poison(attacker, sv_t, 2)
+				if attacker.has_status("venom_coat"):
+					_apply_poison(attacker, sv_t, 5)
 		# Sharpshooter: the Focus engine, the promised shot's spending, the
 		# pin, the called spot, and the spray's echo.
 		if attacker.is_hero and attacker.passive_id == "lethal_aim" \
@@ -3860,22 +4009,33 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if attacker.apex > 0 and ab.display_name == "Quick Shot" \
 						and not attacker.companion.dead and not comp_target.dead:
 					await _companion_strike(attacker.companion, comp_target, 1.0, false)
-		# Tripwire: rigged ground bites every attacking melee enemy.
-		if not attacker.is_hero and not attacker.is_ranged and not is_counter \
-				and total_dealt > 0:
+		# Tripwire: rigged ground bites every attacking melee enemy (Snap
+		# Shut / The Whole Forest extend it to ranged; Reinforced Wire and
+		# Cruel Devices sharpen it).
+		if not attacker.is_hero and not is_counter and total_dealt > 0:
 			for trapper in heroes:
 				if trapper.dead or not trapper.has_status("tripwire") or attacker.dead:
 					continue
-				var ret := maxi(int(total_dealt * 0.75), 1)
+				if attacker.is_ranged and trapper.snap_shut == 0 \
+						and trapper.whole_forest == 0:
+					continue
+				var ret := maxi(int(total_dealt * 0.75), 1) \
+					+ int(0.10 * trapper.wire_ranks * trapper.attack)
+				ret = int(round(ret * (1.0 + 0.15 * trapper.cruel_ranks)))
 				var ret_result: Dictionary = attacker.take_hit(ret, 0)
 				attacker.float_text("%d Tripwire" % ret, Color(0.8, 0.65, 0.35))
 				_log("   → %s's tripwire rips %s for %d" % [trapper.unit_name,
 					attacker.unit_name, ret], "#50c8e0")
+				if trapper.bone_breaker > 0 and not attacker.dead:
+					attacker.take_hit(0, 30)
+				if trapper.caught_fast > 0 and not attacker.dead:
+					_apply_status(attacker, "caught", 3)
 				if ret_result.died:
 					_stat("enemy_deaths")
 					_sfx("death", -4.0)
 					_message("%s falls!" % attacker.unit_name)
 					_log("† %s dies" % attacker.unit_name, "#e05050")
+					_on_enemy_death(attacker)
 		# Corrupted Channeling (talent): a Crippled enemy's violence feeds
 		# the party — 25%/rank of the damage it dealt.
 		var chan_r := _max_hero_rank("channeling_ranks")
@@ -4739,9 +4899,15 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Mana Shield — damage feeds Mana" % attacker.unit_name, "#70d878")
 		"tripwire":
 			_sfx("click", -8.0, 0.8)
-			_apply_status(attacker, "tripwire", 6 if is_perfect else 5)
+			# The Whole Forest: the wire never comes up again.
+			if attacker.whole_forest > 0:
+				_apply_status(attacker, "tripwire", -1)
+				_log("%s: Tripwire set — the whole forest is rigged" % \
+					attacker.unit_name, "#70d878")
+			else:
+				_apply_status(attacker, "tripwire", 6 if is_perfect else 5)
+				_log("%s: Tripwire set" % attacker.unit_name, "#70d878")
 			_message("%s rigs the ground" % attacker.unit_name)
-			_log("%s: Tripwire set" % attacker.unit_name, "#70d878")
 		"summon":
 			await _do_summon(attacker, ab.display_name.get_slice(" ", 1).to_lower(),
 				target)
@@ -4792,6 +4958,65 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# A perfect order deepens the bond.
 				if is_perfect:
 					_gain_loyalty(attacker, comp.companion_kind)
+		"snare_trap":
+			if target != null and not target.dead:
+				var sn_i := heroes.find(attacker)
+				_apply_status(target, "snared", -1, sn_i)
+				if is_perfect:
+					var sn_st: Dictionary = target.get_status("snared")
+					if not sn_st.is_empty():
+						sn_st["perfect"] = true
+				_sfx("click", -8.0, 0.8)
+				_message("%s rigs a snare under %s" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Snare Trap set beneath %s" % [attacker.unit_name,
+					target.unit_name], "#c8a860")
+				_hit_and_run(attacker)
+		"deadfall":
+			attacker.deadfall_armed += 1
+			if not attacker.update_status("deadfall", "DF%d" % attacker.deadfall_armed,
+					"Deadfall armed: the next enemy to act\nsprings it.", attacker.deadfall_armed):
+				attacker.add_status("deadfall", "Deadfall", "DF%d" % attacker.deadfall_armed,
+					Color(0.75, 0.65, 0.30), -1,
+					"Deadfall armed: the next enemy to act\nsprings it.", attacker.deadfall_armed)
+			_sfx("click", -8.0, 0.7)
+			_message("%s rigs a deadfall..." % attacker.unit_name)
+			_log("%s: Deadfall armed — the next enemy to act pays for it" % \
+				attacker.unit_name, "#c8a860")
+		"venom_coat":
+			_apply_status(attacker, "venom_coat", 4)
+			_sfx("heal", -9.0, 0.7)
+			_message("%s coats their arrows" % attacker.unit_name)
+			_log("%s: Venom Coating — every attack Poisons for 4 turns" % \
+				attacker.unit_name, "#70d878")
+		"harvest":
+			if target != null and not target.dead:
+				var hv_n := _status_count(target)
+				if hv_n <= 0:
+					_log("%s: Harvest — nothing on %s to reap" % [attacker.unit_name,
+						target.unit_name], "#909090")
+				else:
+					target.purge_debuffs()
+					var hv_raw := 0.12 * attacker.attack * hv_n * randf_range(0.9, 1.1)
+					hv_raw *= 1.0 - float(target.resists.get("nature", 0.0))
+					var hv_final := maxi(int(round(hv_raw \
+						* (1.0 - target.effective_armor()))), 1)
+					var hv_res: Dictionary = target.take_hit(hv_final, 0)
+					target.float_text("%d Harvest" % hv_final, Color(0.45, 0.8, 0.3))
+					var hv_heal: int = attacker.heal_amount(
+						int(hv_final * (1.5 if is_perfect else 1.0)))
+					attacker.float_text("+%d" % hv_heal, Color(0.4, 0.9, 0.45))
+					_sfx("crit", -6.0, 0.7)
+					_message("%s reaps the rot!" % attacker.unit_name)
+					_log("%s: Harvest — %d statuses consumed, %d damage, %d healed" % [
+						attacker.unit_name, hv_n, hv_final, hv_heal], "#70d878")
+					attacker.refresh_bars()
+					if hv_res.died:
+						_stat("enemy_deaths")
+						_sfx("death", -4.0)
+						_message("%s falls!" % target.unit_name)
+						_log("† %s dies" % target.unit_name, "#e05050")
+						_on_enemy_death(target)
 		"hold_breath":
 			_gain_focus(attacker, 40)
 			var hb_shots := 2 if attacker.second_nature > 0 else 1
@@ -5460,6 +5685,9 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	if pm != null and victim.has_status("hunt_mark") \
 			and victim.status_power("hunt_mark") == heroes.find(pm):
 		raw *= 1.25
+	# Necrosis: poisoned enemies take more from ALL sources.
+	if victim.has_status("poison") and _living_hero_with("necrosis") != null:
+		raw *= 1.20
 	raw *= 1.0 - float(victim.resists.get("physical", 0.0))
 	var comp_armor := victim.effective_armor() * (1.0 - clampf(pen, 0.0, 1.0))
 	var final := maxi(int(round(raw * (1.0 - comp_armor))), 1)
@@ -5511,6 +5739,112 @@ func _bestial_dmg_mult(comp: BattleUnit) -> float:
 		"aguila":
 			return 1.25
 	return 1.0
+
+
+# ---------- Survivalist: statuses as a resource ----------
+
+# Distinct debuffs on a unit — the Trapper's meter lives on the enemy.
+# Counts the curated DEBUFF_IDS allowlist only, so bookkeeping statuses
+# never inflate it.
+func _status_count(u: BattleUnit) -> int:
+	var n := 0
+	for id in BattleUnit.DEBUFF_IDS:
+		if id != "broken" and u.has_status(id):
+			n += 1
+	return n
+
+
+# The first living hero carrying a talent field (Necrosis, Force of
+# Nature — effects that outlive the attacker's identity).
+func _living_hero_with(field: String) -> BattleUnit:
+	for h in heroes:
+		if not h.dead and not h.is_companion and int(h.get(field)) > 0:
+			return h
+	return null
+
+
+# Every Survivalist poison flows through here: Potent Toxins deepens the
+# tick, Virulence stacks it, Slow Acting halves-and-doubles (sticky),
+# Epidemic makes it permanent and uncleansable.
+func _apply_poison(src: BattleUnit, victim: BattleUnit, turns: int) -> void:
+	if victim == null or victim.dead:
+		return
+	var tick := maxi(int(round(0.03 * src.attack)), 1) + src.potent_ranks
+	var p_turns := turns
+	var sticky := false
+	if src.slow_acting > 0:
+		tick = maxi(int(ceil(tick / 2.0)), 1)
+		if p_turns > 0:
+			p_turns *= 2
+		sticky = true
+	if src.epidemic > 0:
+		p_turns = -1
+		sticky = true
+	for _i in 1 + src.virulence_ranks:
+		_apply_status(victim, "poison", p_turns, 0, tick)
+	if sticky:
+		var ps: Dictionary = victim.get_status("poison")
+		if not ps.is_empty():
+			ps["sticky"] = true
+	_hit_and_run(src)
+
+
+# Hit and Run: laying a status on an enemy melts the Survivalist away.
+func _hit_and_run(src: BattleUnit) -> void:
+	if src != null and not src.dead and src.hit_and_run > 0 \
+			and not src.has_status("elusive"):
+		_apply_status(src, "elusive", 1)
+
+
+# The Whole Forest: even spellwork trips the wire (attacks are covered
+# by the retaliation block — this catches enemy support casts).
+func _forest_bite(enemy: BattleUnit) -> void:
+	for trapper in heroes:
+		if trapper.dead or enemy.dead or trapper.whole_forest == 0 \
+				or not trapper.has_status("tripwire"):
+			continue
+		var fb := maxi(int(trapper.attack * (0.25 + 0.10 * trapper.wire_ranks) \
+			* (1.0 + 0.15 * trapper.cruel_ranks)), 1)
+		var fb_res: Dictionary = enemy.take_hit(fb, 0)
+		enemy.float_text("%d Tripwire" % fb, Color(0.8, 0.65, 0.35))
+		_log("   → the forest bites %s for %d" % [enemy.unit_name, fb], "#50c8e0")
+		if fb_res.died:
+			_stat("enemy_deaths")
+			_sfx("death", -4.0)
+			_message("%s falls!" % enemy.unit_name)
+			_log("† %s dies" % enemy.unit_name, "#e05050")
+			_on_enemy_death(enemy)
+
+
+# A sprung trap's payload: stun, poison, and every Snares-lane cruelty.
+func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float) -> void:
+	if victim == null or victim.dead:
+		return
+	if dmg > 0.0:
+		var tr_raw := dmg * (1.0 + 0.15 * placer.cruel_ranks) \
+			* randf_range(0.9, 1.1)
+		tr_raw *= 1.0 - float(victim.resists.get("nature", 0.0))
+		var tr_final := maxi(int(round(tr_raw * (1.0 - victim.effective_armor()))), 1)
+		var tr_res: Dictionary = victim.take_hit(tr_final, 0)
+		victim.float_text("%d Trap" % tr_final, Color(0.75, 0.65, 0.30))
+		_log("   → the trap bites %s for %d" % [victim.unit_name, tr_final],
+			"#c8a860")
+		if tr_res.died:
+			_stat("enemy_deaths")
+			_sfx("death", -4.0)
+			_message("%s falls!" % victim.unit_name)
+			_log("† %s dies" % victim.unit_name, "#e05050")
+			_on_enemy_death(victim)
+			return
+	_apply_status(victim, "stunned", 1)
+	if placer.quick_rigging > 0:
+		_apply_status(victim, "cripple", 3)
+	if placer.bone_breaker > 0:
+		victim.take_hit(0, 30)
+		victim.float_text("+30 BD", Color(0.8, 0.35, 1.0))
+	if placer.caught_fast > 0:
+		_apply_status(victim, "caught", 3)
+	_hit_and_run(placer)
 
 
 # ---------- Sharpshooter Focus ----------
@@ -5598,6 +5932,25 @@ func _on_enemy_death(victim: BattleUnit) -> void:
 				and heroes[mk_idx].cooldowns.get("Mark of the Hunt", 0) > 0:
 			heroes[mk_idx].cooldowns.erase("Mark of the Hunt")
 			_log("   → The hunt is rewarded: Mark of the Hunt resets", "#b0a8e0")
+	# Scavenger: the Survivalist strips the corpse for supplies.
+	for sc_h in heroes:
+		if not sc_h.dead and sc_h.scavenger_ranks > 0:
+			var scv := int(sc_h.max_resource * 0.08 * sc_h.scavenger_ranks)
+			sc_h.resource = mini(sc_h.resource + scv, sc_h.max_resource)
+			sc_h.float_text("+%d Mana" % scv, Color(0.45, 0.6, 0.95))
+			sc_h.refresh_bars()
+	# Creeping Death: the rot never dies with its host.
+	if victim.has_status("poison") and _living_hero_with("creeping_death") != null:
+		var cd_st: Dictionary = victim.get_status("poison")
+		var cd_pool: Array = enemies.filter(
+			func(e): return not e.dead and e != victim)
+		if not cd_pool.is_empty():
+			var cd_to: BattleUnit = cd_pool.pick_random()
+			for _cd in maxi(int(cd_st.get("stacks", 1)), 1):
+				_apply_status(cd_to, "poison", int(cd_st.get("turns", 5)), 0,
+					int(cd_st.get("tick", 3)))
+			_log("   → Creeping Death: the rot crawls to %s" % cd_to.unit_name,
+				"#70d878")
 
 
 # Every talent that feeds a companion's blows, in one place: Loyalty

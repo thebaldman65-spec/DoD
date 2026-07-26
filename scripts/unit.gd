@@ -19,7 +19,7 @@ const WEAKNESS_EXTRA := 0.25
 const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	"bleed", "sunder", "mocked", "stunned", "exposed", "cripple", "dazed",
 	"bewitch", "psychosis", "decay", "ruin", "hysteria",
-	"umbral_sigil", "elem_weak", "melted", "blind", "broken"]
+	"umbral_sigil", "elem_weak", "melted", "blind", "snared", "caught", "broken"]
 
 var frame_size := 100      # square frame edge of this unit's sprite strips
 var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
@@ -128,6 +128,32 @@ var spray := 0               # single-target attacks echo to a random enemy at 5
 var one_shot := 0            # capstone: max-Focus Aimed Shot executes below 40%
 var through_and_through := 0 # capstone: ignore ALL armor; crits refund Mana
 var rapid_fire := 0          # capstone: 35% chance abilities skip their cooldown
+# ---- Survivalist lane talents + trap state (Batch 33) ----
+var potent_ranks := 0        # Potent Toxins: poison +1/rank per stack
+var coated_blades := 0       # basic attacks apply Poison 2t
+var virulence_ranks := 0     # poison applications add +1 stack/rank
+var slow_acting := 0         # poison half tick, double turns, uncleansable
+var creeping_death := 0      # poisoned deaths pass their stacks onward
+var necrosis := 0            # poisoned enemies take +20% from ALL sources
+var plague_bearer := 0       # turn start: a poisoned enemy spreads 3 stacks
+var wire_ranks := 0          # Reinforced Wire: tripwire +10%/rank of Attack
+var quick_rigging := 0       # Snare Trap cd -1 (payload) + snares Cripple
+var cruel_ranks := 0         # traps deal +15%/rank damage
+var snap_shut := 0           # tripwire also bites ranged attackers
+var caught_fast := 0         # trap victims cannot be healed 3t
+var bone_breaker := 0        # traps apply 30 Break damage
+var deadfall_network := 0    # two traps may be active at once
+var hit_and_run := 0         # applying a status grants Elusive 1t
+var scavenger_ranks := 0     # +8%/rank max Mana on enemy death
+var field_medic := 0         # turn start: cleanse 1 debuff from a random ally
+var vulture := 0             # +30% vs enemies with 3+ different statuses
+var ghillie := 0             # 40% less likely to be targeted while allies live
+var improvised := 0          # first ability each fight starts no cooldown
+var improvised_used := false
+var epidemic := 0            # capstone: all enemies permanently Poisoned
+var whole_forest := 0        # capstone: tripwire never expires, bites everything
+var force_of_nature := 0     # capstone: Trapper bonus 20%/status, party-wide
+var deadfall_armed := 0      # armed untargeted traps waiting to spring
 var companion_hp_bonus := 0   # talents: extra HP for summoned companions
 var companion_power := 0      # talents: extra damage on companion attacks
 # Fixed-tree talent stats (0/0.0 = not learned). See talents.gd for sources.
@@ -761,9 +787,11 @@ func dispel_one_debuff() -> String:
 # Cleanse: strip every harmful status. Broken stays — it's a Break-meter
 # state, not a dispellable status. Returns how many were removed.
 func purge_debuffs() -> int:
+	# Sticky statuses (Slow Acting / Epidemic poison) refuse every cleanse.
 	var before := statuses.size()
 	statuses = statuses.filter(
-		func(s): return s.id == "broken" or not DEBUFF_IDS.has(s.id))
+		func(s): return s.id == "broken" or s.get("sticky", false) \
+			or not DEBUFF_IDS.has(s.id))
 	_refresh_chips()
 	return before - statuses.size()
 
@@ -1232,6 +1260,11 @@ func heal_amount(amount: int, external := false) -> int:
 	if no_heals:
 		if amount > 0:
 			float_text("PACT", Color(0.6, 0.45, 0.7))
+		return 0
+	# Caught Fast: the trap's teeth keep every wound open.
+	if has_status("caught"):
+		if amount > 0:
+			float_text("CAUGHT", Color(0.75, 0.6, 0.3))
 		return 0
 	var mult := healing_received_mult
 	if has_status("rally_heal"):
