@@ -171,36 +171,46 @@ func advance(f: int, i: int) -> void:
 # SPENDS IT EXACTLY. Generation is two-step: pick a THEME (a cohesive
 # warband, not a random mob), then fill its roles until the budget is gone.
 # The field holds at most 6 enemies. CHIEFS ONLY APPEAR IN ELITE FIGHTS.
-const ENEMY_POWER := {"raider": 1, "archer": 1, "shieldmaster": 2, "shaman": 2,
-	"chief": 4, "boss": 7}
 const MAX_FIELD := 6
 
-# pool: kind -> max copies. mins: kind -> required copies. Optional checks:
-# min_units / max_units, min_kinds (distinct kinds), min_weak (Raiders +
-# Archers), majority (that kind fills at least half the slots). nodes:
-# which node types the theme can appear on.
+# THEMES ARE ROLE-BASED (Batch 34): pool keys are ROLES — any enemy tagged
+# with the role (and legal in the current zone) is eligible, so a new
+# enemy joins every theme that wants its role automatically. pool: role ->
+# max units drawn from it. mins: role -> required units. Optional checks:
+# min_units / max_units, min_kinds (distinct KINDS), min_weak (units of
+# power <= 1 — fixed from the old "Raiders + Archers" wording), majority
+# (that role fills at least half the slots). nodes: node types the theme
+# can appear on. Role vocabulary: skirmisher (cheap melee), sniper
+# (ranged damage), bulwark (tank/warder), mender (healer), hexer
+# (debuff caster), brute (heavy power-3 muscle), elite (chief tier),
+# boss.
 const THEMES := {
-	"Warband": {"pool": {"raider": 3, "archer": 3, "shieldmaster": 2, "shaman": 2},
+	"Warband": {"pool": {"skirmisher": 3, "sniper": 3, "bulwark": 2, "mender": 2},
 		"min_kinds": 3, "nodes": ["fight"]},
-	"Swarm": {"pool": {"raider": 5, "archer": 5, "shieldmaster": 2, "shaman": 2},
+	"Swarm": {"pool": {"skirmisher": 5, "sniper": 5, "bulwark": 2, "mender": 2},
 		"min_weak": 3, "min_units": 3, "nodes": ["fight"]},
-	"Honor Guard": {"pool": {"chief": 1, "shieldmaster": 3, "raider": 2, "archer": 2},
-		"mins": {"chief": 1, "shieldmaster": 2}, "nodes": ["elite"]},
-	"Ritual": {"pool": {"shaman": 3, "shieldmaster": 3, "raider": 2},
-		"mins": {"shaman": 2, "shieldmaster": 1}, "nodes": ["fight"]},
-	"Poison Volley": {"pool": {"archer": 4, "raider": 1, "shieldmaster": 2, "shaman": 1},
-		"mins": {"archer": 3}, "majority": "archer", "nodes": ["fight"]},
-	"Lightning Storm": {"pool": {"shaman": 4, "shieldmaster": 2, "raider": 2, "archer": 2},
-		"mins": {"shaman": 2}, "nodes": ["fight"]},
-	"Rage Company": {"pool": {"chief": 2, "raider": 4, "archer": 2},
-		"mins": {"chief": 1, "raider": 2}, "nodes": ["elite"]},
-	"Guardian Circle": {"pool": {"shieldmaster": 5, "shaman": 1, "raider": 2, "archer": 2},
-		"mins": {"shieldmaster": 3}, "nodes": ["fight"]},
-	"Elite Patrol": {"pool": {"chief": 2, "shieldmaster": 2, "shaman": 2, "raider": 1,
-		"archer": 1}, "mins": {"chief": 1, "shieldmaster": 1, "shaman": 1},
+	"Monster Den": {"pool": {"brute": 2, "skirmisher": 2, "hexer": 1, "mender": 1},
+		"mins": {"brute": 1}, "nodes": ["fight"]},
+	"Cursed Company": {"pool": {"hexer": 3, "bulwark": 2, "skirmisher": 2, "sniper": 2},
+		"mins": {"hexer": 2}, "nodes": ["fight"]},
+	"Honor Guard": {"pool": {"elite": 1, "bulwark": 3, "skirmisher": 2, "sniper": 2},
+		"mins": {"elite": 1, "bulwark": 2}, "nodes": ["elite"]},
+	"Ritual": {"pool": {"mender": 3, "hexer": 2, "bulwark": 3, "skirmisher": 2},
+		"mins": {"mender": 2, "bulwark": 1}, "nodes": ["fight"]},
+	"Poison Volley": {"pool": {"sniper": 4, "hexer": 2, "skirmisher": 1, "bulwark": 2,
+		"mender": 1}, "mins": {"sniper": 3}, "majority": "sniper", "nodes": ["fight"]},
+	"Lightning Storm": {"pool": {"mender": 4, "hexer": 2, "bulwark": 2, "skirmisher": 2,
+		"sniper": 2}, "mins": {"mender": 2}, "nodes": ["fight"]},
+	"Rage Company": {"pool": {"elite": 2, "brute": 2, "skirmisher": 4, "sniper": 2},
+		"mins": {"elite": 1, "skirmisher": 2}, "nodes": ["elite"]},
+	"Guardian Circle": {"pool": {"bulwark": 5, "mender": 1, "skirmisher": 2, "sniper": 2},
+		"mins": {"bulwark": 3}, "nodes": ["fight"]},
+	"Elite Patrol": {"pool": {"elite": 2, "bulwark": 2, "mender": 2, "brute": 1,
+		"skirmisher": 1, "sniper": 1},
+		"mins": {"elite": 1, "bulwark": 1, "mender": 1},
 		"max_units": 4, "nodes": ["elite"]},
-	"Boss Escort": {"pool": {"boss": 1, "shieldmaster": 2, "shaman": 2, "raider": 2,
-		"archer": 2}, "mins": {"boss": 1}, "nodes": ["boss"]},
+	"Boss Escort": {"pool": {"boss": 1, "bulwark": 2, "mender": 2, "brute": 2,
+		"skirmisher": 2, "sniper": 2}, "mins": {"boss": 1}, "nodes": ["boss"]},
 }
 
 var last_theme := ""  # theme of the most recently composed encounter
@@ -236,46 +246,90 @@ func compose(node_type: String) -> Array:
 		return warband
 	# Nothing fit — plain mob fallback (kept as a safety net).
 	last_theme = "Warband"
+	var fb_kinds := Enemies.kinds_for_zone((zone_idx + 1) if active else 1) \
+		.filter(func(k): return Enemies.power(k) <= 2)
+	if fb_kinds.is_empty():
+		fb_kinds = ["raider"]
 	var fallback: Array = []
 	for i in clampi(budget / 2, 2, 5):
-		fallback.append(["raider", "archer", "shieldmaster", "shaman"].pick_random())
+		fallback.append(fb_kinds.pick_random())
 	return fallback
 
 
 # Every exact-budget warband a theme can field (arrays of enemy kinds).
+# Roles resolve to the kinds legal in the CURRENT zone; a kind with two
+# role tags is claimed by the first pooled role that wants it, so pool
+# caps never double-count.
 func _theme_combos(spec: Dictionary, budget: int) -> Array:
+	var zone_kinds := Enemies.kinds_for_zone((zone_idx + 1) if active else 1)
+	var role_kinds := {}
+	var claimed := {}
+	for role in spec["pool"]:
+		var lst: Array = []
+		for kind in zone_kinds:
+			if not claimed.has(kind) and Enemies.roles(kind).has(role):
+				lst.append(kind)
+				claimed[kind] = true
+		role_kinds[role] = lst
 	var results: Array = []
-	_combo_walk(spec, spec["pool"].keys(), 0, budget, [], results)
+	_combo_walk(spec, spec["pool"].keys(), role_kinds, 0, budget, [], {}, results)
 	return results
 
 
-func _combo_walk(spec: Dictionary, kinds: Array, idx: int, left: int,
-		picked: Array, results: Array) -> void:
-	if idx == kinds.size():
-		if left == 0 and _combo_ok(spec, picked):
+func _combo_walk(spec: Dictionary, roles: Array, role_kinds: Dictionary,
+		r_idx: int, left: int, picked: Array, role_counts: Dictionary,
+		results: Array) -> void:
+	if r_idx == roles.size():
+		if left == 0 and _combo_ok(spec, picked, role_counts):
 			results.append(picked.duplicate())
 		return
-	var kind: String = kinds[idx]
+	var role: String = roles[r_idx]
+	_role_walk(spec, roles, role_kinds, r_idx, role_kinds[role], 0,
+		int(spec["pool"][role]), left, picked, role_counts, results)
+
+
+# Chooses how many of each kind fill one role's slots (the pool value caps
+# the ROLE total, not each kind).
+func _role_walk(spec: Dictionary, roles: Array, role_kinds: Dictionary,
+		r_idx: int, kinds: Array, k_idx: int, role_left: int, left: int,
+		picked: Array, role_counts: Dictionary, results: Array) -> void:
+	if k_idx == kinds.size() or role_left == 0:
+		_combo_walk(spec, roles, role_kinds, r_idx + 1, left, picked,
+			role_counts, results)
+		return
+	var kind: String = kinds[k_idx]
+	var role: String = roles[r_idx]
 	var max_units: int = spec.get("max_units", MAX_FIELD)
-	for n in range(0, int(spec["pool"][kind]) + 1):
-		var cost: int = ENEMY_POWER[kind] * n
+	var kp := Enemies.power(kind)
+	for n in range(0, role_left + 1):
+		var cost: int = kp * n
 		if cost > left or picked.size() + n > max_units:
 			break
 		var next: Array = picked.duplicate()
 		for i in n:
 			next.append(kind)
-		_combo_walk(spec, kinds, idx + 1, left - cost, next, results)
+		var next_counts: Dictionary = role_counts.duplicate()
+		next_counts[role] = int(next_counts.get(role, 0)) + n
+		_role_walk(spec, roles, role_kinds, r_idx, kinds, k_idx + 1,
+			role_left - n, left - cost, next, next_counts, results)
 
 
-func _combo_ok(spec: Dictionary, picked: Array) -> bool:
+func _combo_ok(spec: Dictionary, picked: Array, role_counts: Dictionary) -> bool:
 	if picked.size() < int(spec.get("min_units", 1)):
 		return false
-	for kind in spec.get("mins", {}):
-		if picked.count(kind) < int(spec["mins"][kind]):
+	for role in spec.get("mins", {}):
+		if int(role_counts.get(role, 0)) < int(spec["mins"][role]):
 			return false
-	if picked.count("raider") + picked.count("archer") < int(spec.get("min_weak", 0)):
-		return false
-	if spec.has("majority") and picked.count(spec["majority"]) * 2 < picked.size():
+	# min_weak counts units of power <= 1 (not any hardcoded kind list).
+	if spec.has("min_weak"):
+		var weak := 0
+		for kind in picked:
+			if Enemies.power(kind) <= 1:
+				weak += 1
+		if weak < int(spec["min_weak"]):
+			return false
+	if spec.has("majority") \
+			and int(role_counts.get(spec["majority"], 0)) * 2 < picked.size():
 		return false
 	if spec.has("min_kinds"):
 		var distinct := {}

@@ -281,69 +281,15 @@ const SPEC_ART := {
 }
 
 
-# Enemy roles set base Attack like hero archetypes do (Damage 100 / Tank 75 /
-# Support 50); ability damage is a % of it. Health pools are multiples of 10.
+# Enemy configs live in data/enemies.json (Batch 34) — this wrapper only
+# resolves the zone-dependent "boss" slot, then hands off to Enemies.
+# Enemy roles set base Attack like hero archetypes (Damage 100 / Tank 75 /
+# Support 50); ability damage is a % of it.
 func _enemy_config(kind: String) -> Dictionary:
-	var orc := "res://assets/sprites/orc"
-	match kind:
-		"chief":
-			return {"unit_name": "Orc Chief", "is_hero": false, "sheet_dir": orc,
-				"enemy_role": "damage",
-				"max_hp": 250, "attack": 100, "armor": 0.20, "speed": 80.0,
-				"stability": 100, "constitution": 130,
-				"resource_name": "Rage", "resource": 0, "max_resource": 100,
-				"abilities": _orc_chief_kit(), "sprite_scale": 3.9,
-				"tint": Color(1.0, 0.75, 0.7),
-				"resists": {"physical": 0.15}}
-		"boss":
-			# The Withered Warden rules both forests (zone 1 AND the final
-			# zone-3 forest); the Scarlands boss is still a Chief stand-in
-			# until its unique kit and art exist.
-			if (Run.zone_idx if Run.active else 0) in [0, 2]:
-				return {"unit_name": "Withered Warden", "is_hero": false, "enemy_role": "tank",
-					"sheet_dir": orc, "max_hp": 500, "attack": 100, "armor": 0.35,
-					"speed": 80.0,
-					"stability": 100, "constitution": 150, "is_boss": true,
-					"abilities": _withered_warden_kit(), "sprite_scale": 4.4,
-					"tint": Color(0.7, 1.0, 0.7), "resists": {"nature": 0.75}}
-			return {"unit_name": "Ash-Wrought Tyrant", "is_hero": false, "sheet_dir": orc,
-				"enemy_role": "damage",
-				"max_hp": 370, "attack": 100, "armor": 0.22, "speed": 85.0,
-				"stability": 100, "constitution": 160, "is_boss": true,
-				"resource_name": "Rage", "resource": 20, "max_resource": 100,
-				"abilities": _orc_chief_kit(), "sprite_scale": 4.4,
-				"tint": Color(1.0, 0.55, 0.35),
-				"resists": {"fire": 0.50, "physical": 0.10}, "weak": ["frost"]}
-		"shieldmaster":
-			return {"unit_name": "Orc Shieldmaster", "is_hero": false, "sheet_dir": orc,
-				"enemy_role": "tank",
-				"max_hp": 150, "attack": 75, "armor": 0.25, "speed": 85.0,
-				"stability": 100, "constitution": 120, "block_chance": 0.05,
-				"abilities": _orc_shieldmaster_kit(), "tint": Color(1.0, 0.62, 0.2),
-				"resists": {}}
-		"shaman":
-			return {"unit_name": "Orc Shaman", "is_hero": false, "sheet_dir": orc,
-				"enemy_role": "support",
-				"max_hp": 110, "attack": 50, "armor": 0.01, "speed": 100.0,
-				"stability": 100, "constitution": 80,
-				"is_ranged": true,
-				"abilities": _orc_shaman_kit(), "tint": Color(0.4, 0.55, 1.0),
-				"resists": {"fire": 0.25, "frost": 0.25, "nature": 0.50}}
-		"archer":
-			return {"unit_name": "Orc Archer", "is_hero": false, "sheet_dir": orc,
-				"enemy_role": "damage",
-				"max_hp": 110, "attack": 100, "armor": 0.10, "speed": 100.0,
-				"stability": 100, "constitution": 85,
-				"is_ranged": true,
-				"abilities": _orc_archer_kit(), "tint": Color(1.0, 0.35, 0.35),
-				"resists": {"physical": 0.05}}
-		_:
-			return {"unit_name": "Orc Raider", "is_hero": false, "sheet_dir": orc,
-				"enemy_role": "damage",
-				"max_hp": 140, "attack": 100, "armor": 0.15, "speed": 90.0,
-				"stability": 100, "constitution": 100,
-				"abilities": _orc_raider_kit(), "tint": Color.WHITE,
-				"resists": {"physical": 0.10}}
+	if kind == "boss":
+		kind = "withered_warden" if (Run.zone_idx if Run.active else 0) in [0, 2] \
+			else "ash_tyrant"
+	return Enemies.config(kind)
 
 
 func _spawn_units() -> void:
@@ -619,80 +565,6 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
 
 func _hero_plate_pos(slot: int) -> Vector2:
 	return Vector2(HERO_PLATE_X, PLATE_TOP + slot * PLATE_STEP)
-
-
-func _orc_raider_kit() -> Array:
-	return [
-		Ability.make({"display_name": "Slash", "damage": 34, "pressure": 26,
-			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Sundering Strike", "damage": 23, "pressure": 22,
-			"delay": 2.5, "anim": "attack02",
-			"applies_status": {"id": "sunder", "turns": 2}, "status_chance": 0.6}),
-	]
-
-
-func _orc_archer_kit() -> Array:
-	return [
-		Ability.make({"display_name": "Arrow Shot", "damage": 21, "pressure": 16,
-			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Poison Arrow", "dmg_type": "nature",
-			"damage": 16, "pressure": 14,
-			"delay": 2.5, "anim": "attack02",
-			"applies_status": {"id": "poison", "turns": 3}, "status_chance": 0.7}),
-	]
-
-
-# The Shieldmaster guards its warband: one ally at a time carries its ward.
-# 37% of its Tank-role 75 Attack ≈ the old flat 28.
-func _orc_shieldmaster_kit() -> Array:
-	return [
-		Ability.make({"display_name": "Strike", "damage": 37, "pressure": 20,
-			"delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Shielding", "special": "enemy_shield",
-			"delay": 2.5, "anim": "attack02", "target": Ability.Target.ALLY,
-			"description": "Wards an ally: 25% less damage taken for 3 turns."}),
-	]
-
-
-# Support-role caster (50 Attack). VAULTED — Lightning Bolt (removed
-# 07-16, kept for future return): {"display_name": "Lightning Bolt",
-#   "damage": 70, "pressure": 20, "delay": 2.0, "anim": "attack01",
-#   "dmg_type": "nature"}
-func _orc_shaman_kit() -> Array:
-	return [
-		Ability.make({"display_name": "Chain Lightning", "damage": 30, "pressure": 15,
-			"delay": 3.0, "anim": "attack02", "dmg_type": "nature", "aoe": true}),
-		Ability.make({"display_name": "Healing Wave", "special": "healing_wave",
-			"delay": 2.5, "anim": "attack02", "target": Ability.Target.ALLY,
-			"description": "Mends the most wounded ally under 40%\nhealth for 25% of their max HP\n(tanks and healers first)."}),
-	]
-
-
-# Zone 1 boss: a nature bruiser that dazes, poisons, and tends its escorts.
-func _withered_warden_kit() -> Array:
-	return [
-		Ability.make({"display_name": "Timber Slam", "damage": 60, "pressure": 30,
-			"delay": 3.0, "anim": "attack01", "dmg_type": "nature",
-			"applies_status": {"id": "dazed", "turns": 3}}),
-		Ability.make({"display_name": "Roots of Wrath", "damage": 25, "pressure": 20,
-			"delay": 3.5, "anim": "attack02", "dmg_type": "nature", "aoe": true,
-			"applies_status": {"id": "poison", "turns": 3}}),
-		Ability.make({"display_name": "Wild Growth", "special": "wild_growth",
-			"delay": 2.5, "anim": "attack02", "target": Ability.Target.ALLY,
-			"description": "Heals an ally for 20% of their max health."}),
-	]
-
-
-# The Chief fights like a weaker Warrior: builds Rage, spends it on heavy hits.
-func _orc_chief_kit() -> Array:
-	return [
-		Ability.make({"display_name": "Strike", "damage": 28, "pressure": 26,
-			"resource_gain": 15, "delay": 2.0, "anim": "attack01"}),
-		Ability.make({"display_name": "Heavy Strike", "cost": 30, "damage": 54,
-			"pressure": 40, "delay": 4.0, "anim": "attack02"}),
-		Ability.make({"display_name": "Crushing Blow", "cost": 20, "damage": 34,
-			"pressure": 56, "delay": 4.0, "anim": "attack02"}),
-	]
 
 
 # ---------- UI ----------
@@ -2677,6 +2549,11 @@ func _enemy_support_action(u: BattleUnit) -> Array:
 			var prio: Array = hurt.filter(
 				func(a): return a.enemy_role in ["tank", "support"])
 			return [wave, _lowest_hp(prio if not prio.is_empty() else hurt)]
+	# Bog Troll: knits its own flesh back together when bloodied (same
+	# healing-wave machinery, self-targeted).
+	var regen := _find_ability(u, "Regenerate")
+	if regen != null and u.hp < u.max_hp * 0.5:
+		return [regen, u]
 	# Shieldmaster: always keeps exactly one ally Shielded (lowest HP first).
 	var shield_ab := _find_ability(u, "Shielding")
 	if shield_ab != null \

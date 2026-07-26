@@ -1,0 +1,819 @@
+{
+ "raider": {
+  "unit_name": "Orc Raider",
+  "power": 1,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   1,
+   2,
+   3
+  ],
+  "enemy_role": "damage",
+  "max_hp": 140,
+  "attack": 100,
+  "armor": 0.15,
+  "speed": 90.0,
+  "stability": 100,
+  "constitution": 100,
+  "tint": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "resists": {
+   "physical": 0.1
+  },
+  "abilities": [
+   {
+    "display_name": "Slash",
+    "damage": 34,
+    "pressure": 26,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Sundering Strike",
+    "damage": 23,
+    "pressure": 22,
+    "delay": 2.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "sunder",
+     "turns": 2
+    },
+    "status_chance": 0.6
+   }
+  ]
+ },
+ "whelp": {
+  "unit_name": "Orc Whelp",
+  "power": 1,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   1,
+   3
+  ],
+  "enemy_role": "damage",
+  "max_hp": 90,
+  "attack": 100,
+  "armor": 0.05,
+  "speed": 115.0,
+  "stability": 100,
+  "constitution": 70,
+  "tint": [
+   0.85,
+   1.0,
+   0.85
+  ],
+  "sprite_scale": 2.9,
+  "resists": {},
+  "abilities": [
+   {
+    "display_name": "Frenzied Nip",
+    "damage": 26,
+    "pressure": 16,
+    "delay": 1.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Reckless Lunge",
+    "damage": 38,
+    "pressure": 20,
+    "delay": 2.5,
+    "anim": "attack02"
+   }
+  ]
+ },
+ "slinger": {
+  "unit_name": "Orc Slinger",
+  "power": 1,
+  "roles": [
+   "sniper"
+  ],
+  "zones": [
+   1,
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 100,
+  "attack": 100,
+  "armor": 0.08,
+  "speed": 100.0,
+  "stability": 100,
+  "constitution": 80,
+  "is_ranged": true,
+  "tint": [
+   0.92,
+   0.82,
+   0.55
+  ],
+  "resists": {},
+  "abilities": [
+   {
+    "display_name": "Stone Sling",
+    "damage": 24,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Skull Crack",
+    "damage": 12,
+    "pressure": 38,
+    "delay": 2.5,
+    "anim": "attack02"
+   }
+  ]
+ },
+ "totemist": {
+  "unit_name": "Orc Totemist",
+  "power": 1,
+  "roles": [
+   "mender"
+  ],
+  "zones": [
+   1,
+   3
+  ],
+  "enemy_role": "support",
+  "max_hp": 90,
+  "attack": 50,
+  "armor": 0.02,
+  "speed": 95.0,
+  "stability": 100,
+  "constitution": 75,
+  "is_ranged": true,
+  "tint": [
+   0.55,
+   0.9,
+   0.9
+  ],
+  "resists": {
+   "nature": 0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Totem Jab",
+    "damage": 30,
+    "pressure": 12,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Healing Wave",
+    "special": "healing_wave",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Mends the most wounded ally under 40%\nhealth for 25% of their max HP."
+   }
+  ]
+ },
+ "archer": {
+  "unit_name": "Orc Archer",
+  "power": 1,
+  "roles": [
+   "sniper",
+   "hexer"
+  ],
+  "zones": [
+   1,
+   2,
+   3
+  ],
+  "enemy_role": "damage",
+  "max_hp": 110,
+  "attack": 100,
+  "armor": 0.1,
+  "speed": 100.0,
+  "stability": 100,
+  "constitution": 85,
+  "is_ranged": true,
+  "tint": [
+   1.0,
+   0.35,
+   0.35
+  ],
+  "resists": {
+   "physical": 0.05
+  },
+  "abilities": [
+   {
+    "display_name": "Arrow Shot",
+    "damage": 21,
+    "pressure": 16,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Poison Arrow",
+    "dmg_type": "nature",
+    "damage": 16,
+    "pressure": 14,
+    "delay": 2.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "poison",
+     "turns": 3
+    },
+    "status_chance": 0.7
+   }
+  ]
+ },
+ "shieldmaster": {
+  "unit_name": "Orc Shieldmaster",
+  "power": 2,
+  "roles": [
+   "bulwark"
+  ],
+  "zones": [
+   1,
+   2,
+   3
+  ],
+  "enemy_role": "tank",
+  "max_hp": 150,
+  "attack": 75,
+  "armor": 0.25,
+  "speed": 85.0,
+  "stability": 100,
+  "constitution": 120,
+  "block_chance": 0.05,
+  "tint": [
+   1.0,
+   0.62,
+   0.2
+  ],
+  "resists": {},
+  "abilities": [
+   {
+    "display_name": "Strike",
+    "damage": 37,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Shielding",
+    "special": "enemy_shield",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Wards an ally: 25% less damage taken for 3 turns."
+   }
+  ]
+ },
+ "shaman": {
+  "unit_name": "Orc Shaman",
+  "power": 2,
+  "roles": [
+   "mender"
+  ],
+  "zones": [
+   1,
+   2,
+   3
+  ],
+  "enemy_role": "support",
+  "max_hp": 110,
+  "attack": 50,
+  "armor": 0.01,
+  "speed": 100.0,
+  "stability": 100,
+  "constitution": 80,
+  "is_ranged": true,
+  "tint": [
+   0.4,
+   0.55,
+   1.0
+  ],
+  "resists": {
+   "fire": 0.25,
+   "frost": 0.25,
+   "nature": 0.5
+  },
+  "abilities": [
+   {
+    "display_name": "Chain Lightning",
+    "damage": 30,
+    "pressure": 15,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "aoe": true
+   },
+   {
+    "display_name": "Healing Wave",
+    "special": "healing_wave",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Mends the most wounded ally under 40%\nhealth for 25% of their max HP\n(tanks and healers first)."
+   }
+  ]
+ },
+ "hexer": {
+  "unit_name": "Orc Hexer",
+  "power": 2,
+  "roles": [
+   "hexer"
+  ],
+  "zones": [
+   1,
+   2,
+   3
+  ],
+  "enemy_role": "support",
+  "max_hp": 120,
+  "attack": 50,
+  "armor": 0.05,
+  "speed": 95.0,
+  "stability": 100,
+  "constitution": 90,
+  "is_ranged": true,
+  "tint": [
+   0.75,
+   0.45,
+   0.95
+  ],
+  "resists": {
+   "shadow": 0.5,
+   "holy": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Hex Bolt",
+    "damage": 44,
+    "pressure": 14,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "shadow"
+   },
+   {
+    "display_name": "Withering Hex",
+    "damage": 24,
+    "pressure": 10,
+    "delay": 2.5,
+    "anim": "attack02",
+    "dmg_type": "shadow",
+    "applies_status": {
+     "id": "exposed",
+     "turns": 2
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Bone Rattle",
+    "damage": 16,
+    "pressure": 34,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "shadow"
+   }
+  ]
+ },
+ "wolfrider": {
+  "unit_name": "Wolfrider",
+  "power": 2,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   1,
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 130,
+  "attack": 100,
+  "armor": 0.12,
+  "speed": 125.0,
+  "stability": 100,
+  "constitution": 95,
+  "tint": [
+   0.7,
+   0.7,
+   0.78
+  ],
+  "sprite_scale": 3.5,
+  "resists": {
+   "physical": 0.05
+  },
+  "abilities": [
+   {
+    "display_name": "Lunging Bite",
+    "damage": 36,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Ride-by Slash",
+    "damage": 28,
+    "pressure": 16,
+    "delay": 2.0,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "cripple",
+     "turns": 2
+    },
+    "status_chance": 0.5
+   }
+  ]
+ },
+ "ashblade": {
+  "unit_name": "Ashblade",
+  "power": 2,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 135,
+  "attack": 100,
+  "armor": 0.15,
+  "speed": 105.0,
+  "stability": 100,
+  "constitution": 95,
+  "tint": [
+   1.0,
+   0.45,
+   0.2
+  ],
+  "resists": {
+   "fire": 0.5
+  },
+  "weak": [
+   "frost"
+  ],
+  "abilities": [
+   {
+    "display_name": "Cinder Slash",
+    "damage": 32,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "fire"
+   },
+   {
+    "display_name": "Flame Lick",
+    "damage": 22,
+    "pressure": 12,
+    "delay": 2.5,
+    "anim": "attack02",
+    "dmg_type": "fire",
+    "applies_status": {
+     "id": "burn",
+     "turns": 2
+    },
+    "status_chance": 0.6
+   }
+  ]
+ },
+ "brute": {
+  "unit_name": "Orc Brute",
+  "power": 3,
+  "roles": [
+   "brute"
+  ],
+  "zones": [
+   1,
+   2,
+   3
+  ],
+  "enemy_role": "damage",
+  "max_hp": 260,
+  "attack": 100,
+  "armor": 0.2,
+  "speed": 75.0,
+  "stability": 100,
+  "constitution": 125,
+  "tint": [
+   0.82,
+   0.56,
+   0.4
+  ],
+  "sprite_scale": 3.7,
+  "resists": {
+   "physical": 0.1
+  },
+  "abilities": [
+   {
+    "display_name": "Smash",
+    "damage": 40,
+    "pressure": 32,
+    "delay": 2.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Overhead Crush",
+    "damage": 28,
+    "pressure": 50,
+    "delay": 3.5,
+    "anim": "attack02"
+   }
+  ]
+ },
+ "bog_troll": {
+  "unit_name": "Bog Troll",
+  "power": 3,
+  "roles": [
+   "brute",
+   "bulwark"
+  ],
+  "zones": [
+   1,
+   3
+  ],
+  "enemy_role": "tank",
+  "max_hp": 300,
+  "attack": 75,
+  "armor": 0.15,
+  "speed": 70.0,
+  "stability": 100,
+  "constitution": 130,
+  "tint": [
+   0.45,
+   0.78,
+   0.5
+  ],
+  "sprite_scale": 3.8,
+  "resists": {
+   "nature": 0.5
+  },
+  "weak": [
+   "fire"
+  ],
+  "abilities": [
+   {
+    "display_name": "Claw",
+    "damage": 40,
+    "pressure": 24,
+    "delay": 2.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Swampy Grasp",
+    "damage": 26,
+    "pressure": 18,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "applies_status": {
+     "id": "slow",
+     "turns": 2
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Regenerate",
+    "special": "healing_wave",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Knits its own rubbery flesh back\ntogether: heals 25% of max health."
+   }
+  ]
+ },
+ "behemoth": {
+  "unit_name": "Rot Behemoth",
+  "power": 3,
+  "roles": [
+   "brute",
+   "hexer"
+  ],
+  "zones": [
+   2,
+   3
+  ],
+  "enemy_role": "damage",
+  "max_hp": 280,
+  "attack": 100,
+  "armor": 0.18,
+  "speed": 65.0,
+  "stability": 100,
+  "constitution": 135,
+  "tint": [
+   0.62,
+   0.5,
+   0.45
+  ],
+  "sprite_scale": 4.0,
+  "resists": {
+   "nature": 0.5,
+   "shadow": 0.25
+  },
+  "weak": [
+   "holy"
+  ],
+  "abilities": [
+   {
+    "display_name": "Rotting Fist",
+    "damage": 38,
+    "pressure": 28,
+    "delay": 2.5,
+    "anim": "attack01",
+    "dmg_type": "nature",
+    "applies_status": {
+     "id": "poison",
+     "turns": 3
+    },
+    "status_chance": 0.5
+   },
+   {
+    "display_name": "Wretched Bellow",
+    "damage": 14,
+    "pressure": 22,
+    "delay": 3.5,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "aoe": true
+   }
+  ]
+ },
+ "chief": {
+  "unit_name": "Orc Chief",
+  "power": 4,
+  "roles": [
+   "elite"
+  ],
+  "zones": [
+   1,
+   2,
+   3
+  ],
+  "enemy_role": "damage",
+  "max_hp": 250,
+  "attack": 100,
+  "armor": 0.2,
+  "speed": 80.0,
+  "stability": 100,
+  "constitution": 130,
+  "resource_name": "Rage",
+  "resource": 0,
+  "max_resource": 100,
+  "tint": [
+   1.0,
+   0.75,
+   0.7
+  ],
+  "sprite_scale": 3.9,
+  "resists": {
+   "physical": 0.15
+  },
+  "abilities": [
+   {
+    "display_name": "Strike",
+    "damage": 28,
+    "pressure": 26,
+    "resource_gain": 15,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Heavy Strike",
+    "cost": 30,
+    "damage": 54,
+    "pressure": 40,
+    "delay": 4.0,
+    "anim": "attack02"
+   },
+   {
+    "display_name": "Crushing Blow",
+    "cost": 20,
+    "damage": 34,
+    "pressure": 56,
+    "delay": 4.0,
+    "anim": "attack02"
+   }
+  ]
+ },
+ "withered_warden": {
+  "unit_name": "Withered Warden",
+  "power": 7,
+  "roles": [
+   "boss"
+  ],
+  "zones": [
+   1,
+   3
+  ],
+  "enemy_role": "tank",
+  "max_hp": 500,
+  "attack": 100,
+  "armor": 0.35,
+  "speed": 80.0,
+  "stability": 100,
+  "constitution": 150,
+  "is_boss": true,
+  "tint": [
+   0.7,
+   1.0,
+   0.7
+  ],
+  "sprite_scale": 4.4,
+  "resists": {
+   "nature": 0.75
+  },
+  "abilities": [
+   {
+    "display_name": "Timber Slam",
+    "damage": 60,
+    "pressure": 30,
+    "delay": 3.0,
+    "anim": "attack01",
+    "dmg_type": "nature",
+    "applies_status": {
+     "id": "dazed",
+     "turns": 3
+    }
+   },
+   {
+    "display_name": "Roots of Wrath",
+    "damage": 25,
+    "pressure": 20,
+    "delay": 3.5,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "aoe": true,
+    "applies_status": {
+     "id": "poison",
+     "turns": 3
+    }
+   },
+   {
+    "display_name": "Wild Growth",
+    "special": "wild_growth",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Heals an ally for 20% of their max health."
+   }
+  ]
+ },
+ "ash_tyrant": {
+  "unit_name": "Ash-Wrought Tyrant",
+  "power": 7,
+  "roles": [
+   "boss"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 370,
+  "attack": 100,
+  "armor": 0.22,
+  "speed": 85.0,
+  "stability": 100,
+  "constitution": 160,
+  "is_boss": true,
+  "resource_name": "Rage",
+  "resource": 20,
+  "max_resource": 100,
+  "tint": [
+   1.0,
+   0.55,
+   0.35
+  ],
+  "sprite_scale": 4.4,
+  "resists": {
+   "fire": 0.5,
+   "physical": 0.1
+  },
+  "weak": [
+   "frost"
+  ],
+  "abilities": [
+   {
+    "display_name": "Strike",
+    "damage": 28,
+    "pressure": 26,
+    "resource_gain": 15,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Heavy Strike",
+    "cost": 30,
+    "damage": 54,
+    "pressure": 40,
+    "delay": 4.0,
+    "anim": "attack02"
+   },
+   {
+    "display_name": "Crushing Blow",
+    "cost": 20,
+    "damage": 34,
+    "pressure": 56,
+    "delay": 4.0,
+    "anim": "attack02"
+   }
+  ]
+ }
+}

@@ -63,6 +63,30 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+ENEMY ROSTER 6→15 (07-25, Batch 34, roguelike push I): all enemy data
+in data/enemies.json → scripts/enemies.gd (class_name Enemies; caches
+JSON; config() restores ints — JSON floats break Ability.make's typed
+set()! — tint [r,g,b]→Color, "target":"ally"→Ability.Target.ALLY;
+AB_INT_KEYS/CFG_INT_KEYS lists). battle._enemy_config = thin wrapper
+(only resolves "boss" by zone → withered_warden / ash_tyrant kinds);
+the old config match + 6 kit funcs DELETED. Support AI additions:
+"Regenerate" (Bog Troll self-heal <50%, reuses healing_wave special).
+THEMES ARE ROLE-BASED (run_state): pool keys = roles (skirmisher/
+sniper/bulwark/mender/hexer/brute/elite/boss); _theme_combos resolves
+roles → Enemies.kinds_for_zone(zone_idx+1) kinds (first pooled role
+CLAIMS a multi-tagged kind so caps never double-count), then
+_combo_walk over roles + _role_walk over kinds within a role's cap;
+_combo_ok mins/majority read role_counts, min_weak = power ≤ 1 (fixed
+from "Raiders+Archers"). ENEMY_POWER const GONE → Enemies.power().
+Zone filtering LIVE (ashblade z2-only, troll z1/3, behemoth z2/3...).
+2 new themes: Monster Den (≥1 brute), Cursed Company (≥2 hexers).
+Swarm min_units stays 3 (4 made budget-3 unsatisfiable). 9 new kinds:
+whelp/slinger/totemist (1), hexer/wolfrider/ashblade (2), brute/
+bog_troll/behemoth (3 — the power-gap fillers). RULE UNCHANGED: every
+enemy's FIRST ability is 0-cost (enemy AI crashes otherwise). Combo
+metric: 364 → 11,344 distinct warbands (test_combos.gd in scratchpad
+asserts satisfiability + MAX_FIELD). Art limit: all kinds tint the orc
+sheet — per-kind art is the known next feel win. Sim 40/40.
 SURVIVALIST REBUILD (07-25, Batch 33; spec id stays "mystic" — NEVER
 rename it, saves/trees key on it): archetype Pressure. TRAPPER v2:
 poison-on-strike clause unchanged; +8% dmg per DIFFERENT status on the

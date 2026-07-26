@@ -5,6 +5,35 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-25 — Batch 34: Roguelike push I — enemy roster 6 → 15, data-driven, role-based themes</h2>
+<ul>
+<li><b>Phase 1 — data extraction:</b> every enemy now lives in <b>data/enemies.json</b>
+(power, roles, zones, stats, resists, tint, kit), loaded by the new Enemies class à la
+Talents/Relics. battle.gd's 120-line config match and six kit functions are gone; adding
+an enemy is a JSON edit.</li>
+<li><b>Phase 2 — the power gap:</b> non-elite powers were only 1 and 2; three power-3
+bruisers (Orc Brute, Bog Troll, Rot Behemoth) fill it, multiplying exact-budget
+expressions.</li>
+<li><b>Phase 3 — role-based themes:</b> theme pools now declare ROLES (skirmisher, sniper,
+bulwark, mender, hexer, brute, elite, boss) instead of kinds — any zone-legal enemy tagged
+with the role is eligible, so new enemies join every fitting theme automatically. min_weak
+now means "units of power ≤ 1" (the old Raiders+Archers landmine is defused). Two new
+themes exploit the roles: <b>Monster Den</b> and <b>Cursed Company</b>.</li>
+<li><b>Phase 4 — nine new kinds:</b> Whelp, Slinger, Totemist (power 1); Hexer, Wolfrider,
+Ashblade (power 2); Brute, Bog Troll (self-Regenerating), Rot Behemoth (power 3) — spread
+across the three zone slots so zone rosters differ (Ashblade is Scarlands-only; the Troll
+haunts the forests). Zone filtering is LIVE in the composer.</li>
+<li><b>The deliverable:</b> distinct exact-budget warbands across the three bands grew
+from <b>364 to 11,300+</b> (31×). Every fight theme is satisfiable across its bands, elite
+/boss themes satisfiable in theirs, MAX_FIELD 6 holds for every generated combination
+(asserted by the headless combo test in the scratchpad).</li>
+<li><i>Art limit, stated plainly:</i> all kinds still share the tinted orc sheet — the
+mechanics transformed, the silhouettes did not. Per-kind art is the next feel win.</li>
+<li>Verified: all nine new kinds fought in autoplay with their kits (Hexer's shadow
+package, Wolfrider cripples, Ashblade burns, Brute's 50-BD crush, Totemist healing through
+the support AI); 40-battle sim 40/40, 0 script errors.</li>
+</ul>
+
 <h2>2026-07-25 — Batch 33: Survivalist rebuild — statuses as the resource; One Shot tuned</h2>
 <ul>
 <li><b>One Shot (Sharpshooter capstone) tuned:</b> the execute threshold drops to 35%, and

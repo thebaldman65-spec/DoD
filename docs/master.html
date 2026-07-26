@@ -1026,61 +1026,75 @@ victories), Gravewrought Coin (+80 starting gold), Emberheart (fire &amp; holy +
 </ul>
 
 <h2>9. Enemies</h2>
-<p>Enemies carry role-based Attack like heroes — <b>Damage 100</b> (Raider, Archer, Chief,
-bosses), <b>Tank 75</b> (Shieldmaster), <b>Support 50</b> (Shaman) — and their ability
-damage is a % of it (the flat numbers below are the tier-0 values). Health pools are
-multiples of 10.</p>
+<p><b>The roster lives in data/enemies.json</b> (Batch 34): every kind declares its power,
+role tags, zone slots, stats, resists, tint, and kit; the Enemies class loads it, so adding
+an enemy is a data edit that automatically enrolls it in every theme wanting its roles.
+Role-based Attack matches heroes — <b>Damage 100 / Tank 75 / Support 50</b> — and ability
+damage is a % of it. <i>Art note: all kinds still share the orc sheet (tint + scale only),
+so new enemies read as tinted orcs until per-kind art lands — a known, accepted limit.</i></p>
 <table border="1" cellpadding="4">
-<tr><th>Enemy</th><th>HP</th><th>Atk</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Kit</th></tr>
-<tr><td>Orc Raider</td><td>140</td><td>100</td><td>15%</td><td>90</td><td>100</td><td>Slash 34%/26BD;
-Sundering Strike 23%/22BD, 60% Sunder 2t. Resists: physical 10%.</td></tr>
-<tr><td>Orc Archer (red)</td><td>110</td><td>100</td><td>10%</td><td>100</td><td>85</td><td>Arrow Shot
-21%/16BD; Poison Arrow 16% nature/14BD, 70% Poison 3t. Resists: physical 5%.</td></tr>
-<tr><td>Orc Shieldmaster (orange)</td><td>150</td><td>75</td><td>25%</td><td>85</td><td>120</td>
-<td>Shielding — wards an ally (lowest HP first, itself included) with 25% damage reduction
-for 3 turns; only one ally holds the ward at a time, and it ALWAYS re-casts when no ally is
-shielded. Strike 37% physical/20BD (≈28).</td></tr>
-<tr><td>Orc Shaman (blue)</td><td>110</td><td>50</td><td>1%</td><td>100</td><td>80</td><td>Ranged
-support caster. Chain Lightning 30% nature + 15BD to the ENTIRE hero party (≈15);
-<b>Healing Wave</b> — heals the most wounded ally under 40% health for 25% of
-its max HP (friendly tanks and healers first). Resists: fire 25%, frost 25%,
-nature 50%.</td></tr>
-<tr><td>Orc Chief (elite)</td><td>250</td><td>100</td><td>20%</td><td>80</td><td>130</td><td>Rage user:
-Strike 28%/26BD +15 Rage; Heavy Strike 30R 54%/40BD; Crushing Blow 20R 34%/56BD. Resists:
-physical 15%.</td></tr>
-<tr><td>Withered Warden (zone 1 boss)</td><td>500</td><td>100</td><td>35%</td><td>80</td><td>150</td>
-<td>Unique kit, nature resist 75%. Timber Slam — 60% nature/30BD single target + Dazed 3t;
-Roots of Wrath — 25% nature/20BD to the whole party + Poison 3t; Wild Growth — heals an ally
-for 20% of its max HP (itself included).</td></tr>
-<tr><td>Ash-Wrought Tyrant (zone 2 boss, stand-in)</td><td>370</td><td>100</td><td>22%</td><td>85</td>
-<td>160</td><td>Chief kit, bigger sprite, 20 starting Rage. Resists: fire 50%, physical 10%.
-WEAK to frost (+25% damage taken).</td></tr>
+<tr><th>Enemy</th><th>Pw</th><th>Roles</th><th>Zones</th><th>HP</th><th>Kit sketch</th></tr>
+<tr><td>Orc Raider</td><td>1</td><td>skirmisher</td><td>1·2·3</td><td>140</td><td>Slash;
+Sundering Strike (60% Sunder 2t).</td></tr>
+<tr><td>Orc Whelp (pale)</td><td>1</td><td>skirmisher</td><td>1·3</td><td>90</td><td>Fast,
+frail: Frenzied Nip; Reckless Lunge.</td></tr>
+<tr><td>Orc Slinger (tan)</td><td>1</td><td>sniper</td><td>1·2</td><td>100</td><td>Ranged:
+Stone Sling; Skull Crack (38 BD — a Break specialist).</td></tr>
+<tr><td>Orc Totemist (teal)</td><td>1</td><td>mender</td><td>1·3</td><td>90</td><td>Weak
+support: Totem Jab; Healing Wave (25% max to the most wounded sub-40% ally).</td></tr>
+<tr><td>Orc Archer (red)</td><td>1</td><td>sniper·hexer</td><td>1·2·3</td><td>110</td>
+<td>Arrow Shot; Poison Arrow (70% Poison 3t).</td></tr>
+<tr><td>Orc Shieldmaster (orange)</td><td>2</td><td>bulwark</td><td>1·2·3</td><td>150</td>
+<td>Strike; Shielding (25% ward, one ally at a time, always re-cast).</td></tr>
+<tr><td>Orc Shaman (blue)</td><td>2</td><td>mender</td><td>1·2·3</td><td>110</td><td>Chain
+Lightning (party-wide nature); Healing Wave. Resists fire/frost 25%, nature 50%.</td></tr>
+<tr><td>Orc Hexer (purple)</td><td>2</td><td>hexer</td><td>1·2·3</td><td>120</td><td>Ranged
+shadow caster: Hex Bolt; Withering Hex (70% Exposed 2t); Bone Rattle (34 BD). Resists
+shadow 50%, WEAK to holy.</td></tr>
+<tr><td>Wolfrider (grey)</td><td>2</td><td>skirmisher</td><td>1·2</td><td>130</td><td>Speed
+125: Lunging Bite; Ride-by Slash (50% Cripple 2t).</td></tr>
+<tr><td>Ashblade (ember)</td><td>2</td><td>skirmisher</td><td>2</td><td>135</td><td>Cinder
+Slash (fire); Flame Lick (60% Burn 2t). Fire resist 50%, WEAK to frost.</td></tr>
+<tr><td>Orc Brute (brown, large)</td><td>3</td><td>brute</td><td>1·2·3</td><td>260</td>
+<td>Smash; Overhead Crush (50 BD).</td></tr>
+<tr><td>Bog Troll (green, large)</td><td>3</td><td>brute·bulwark</td><td>1·3</td><td>300</td>
+<td>Claw; Swampy Grasp (70% Slowed 2t); Regenerate (25% self-heal when bloodied). Nature
+resist 50%, WEAK to fire.</td></tr>
+<tr><td>Rot Behemoth (dun, large)</td><td>3</td><td>brute·hexer</td><td>2·3</td><td>280</td>
+<td>Rotting Fist (50% Poison 3t); Wretched Bellow (party-wide nature + BD). Nature 50%,
+shadow 25%, WEAK to holy.</td></tr>
+<tr><td>Orc Chief (elite)</td><td>4</td><td>elite</td><td>1·2·3</td><td>250</td><td>Rage
+user: Strike (+15 Rage); Heavy Strike 30R; Crushing Blow 20R (56 BD).</td></tr>
+<tr><td>Withered Warden (boss)</td><td>7</td><td>boss</td><td>1·3</td><td>500</td><td>Unique
+kit, nature resist 75%: Timber Slam (Dazed 3t); Roots of Wrath (party Poison); Wild
+Growth.</td></tr>
+<tr><td>Ash-Wrought Tyrant (boss)</td><td>7</td><td>boss</td><td>2</td><td>370</td><td>Chief
+kit, 20 starting Rage. Fire 50%, WEAK to frost.</td></tr>
 </table>
-<p><b>Compositions — the power-budget system:</b> every enemy carries a power
-value — <b>Raider 1, Archer 1, Shieldmaster 2, Shaman 2, Chief 4, Boss 7</b> — and every
-battle rolls a power budget that is ALWAYS spent exactly. <b>The budget scales across each
-zone</b> (tier = the floor within the zone, 1–11 with the boss on 11): <b>tiers 1–3 roll
-3–6, tiers 4–7 roll 6–9, tiers 8–11 (boss included) roll 10–12</b>. Later zones restart the
-ladder with a NEW enemy roster — different names, abilities, and higher base stats to match
-the reset (the Forest of Old roster is the current focus). Generation is two-step: first a
-<b>theme</b> is chosen (the warband is cohesive, not random), then the budget fills that
-theme's roles. The battlefield holds at most <b>6 enemies</b>; the chosen theme opens the
-combat log ("Enemy warband: Ritual"). <b>Chiefs appear ONLY in elite fights</b>; boss nodes
-always roll Boss Escort. Themes whose math can't spend a given budget don't appear on that
-roll — Swarm and Poison Volley rule the cheap early tiers, the heavy themes take over as
-the budget climbs.</p>
+<p><b>Compositions — the power-budget system:</b> every battle rolls a power budget that is
+ALWAYS spent exactly (<b>tiers 1–3 roll 3–6, tiers 4–7 roll 6–9, tiers 8–11 roll
+10–12</b>; the field holds at most <b>6 enemies</b>). Power values now span <b>1, 2, 3, 4,
+and 7</b> — the three power-3 bruisers filled the gap that made exact budgets repetitive.
+Generation is two-step: a <b>theme</b> is chosen, then the budget fills its <b>ROLE
+pools</b> — themes declare roles (skirmisher / sniper / bulwark / mender / hexer / brute /
+elite / boss), and any zone-legal enemy tagged with the role is eligible, so warbands vary
+run to run. min_weak counts units of power ≤ 1. The roster rework grew the distinct
+warband count from <b>364 to over 11,000</b> across the budget bands. Themes that cannot
+spend a given budget simply do not appear on that roll.</p>
 <table border="1" cellpadding="4">
-<tr><th>Theme</th><th>Gameplay focus</th><th>Core units</th><th>Nodes</th></tr>
-<tr><td>Warband</td><td>Balanced encounter</td><td>Mix of basics (≥3 kinds, no Chief)</td><td>fight</td></tr>
-<tr><td>Swarm</td><td>Many weak attackers</td><td>≥3 Raiders/Archers</td><td>fight</td></tr>
-<tr><td>Honor Guard</td><td>Keep one powerful unit alive</td><td>Chief + ≥2 Shieldmasters</td><td>elite</td></tr>
-<tr><td>Ritual</td><td>Protect the Shamans</td><td>≥2 Shamans + Shieldmaster</td><td>fight</td></tr>
-<tr><td>Poison Volley</td><td>Stack Poison</td><td>Mostly Archers (≥3, majority)</td><td>fight</td></tr>
-<tr><td>Lightning Storm</td><td>Party-wide magic damage</td><td>≥2 Shamans</td><td>fight</td></tr>
-<tr><td>Rage Company</td><td>Chiefs build Rage while others buy time</td><td>Chief(s) + ≥2 Raiders</td><td>elite</td></tr>
-<tr><td>Guardian Circle</td><td>Constant wards</td><td>≥3 Shieldmasters</td><td>fight</td></tr>
-<tr><td>Elite Patrol</td><td>Few high-value enemies (≤4 units)</td><td>Chief + Shieldmaster + Shaman</td><td>elite</td></tr>
-<tr><td>Boss Escort</td><td>Boss supported by specialists</td><td>Boss + support units</td><td>boss</td></tr>
+<tr><th>Theme</th><th>Gameplay focus</th><th>Role recipe</th><th>Nodes</th></tr>
+<tr><td>Warband</td><td>Balanced mix</td><td>skirmishers + snipers + bulwark + mender (≥3 kinds)</td><td>fight</td></tr>
+<tr><td>Swarm</td><td>Many weak attackers</td><td>≥3 power-1 units</td><td>fight</td></tr>
+<tr><td>Monster Den</td><td>Big muscle, small escort</td><td>≥1 brute + skirmishers/hexer/mender</td><td>fight</td></tr>
+<tr><td>Cursed Company</td><td>Debuff pressure</td><td>≥2 hexers + guards</td><td>fight</td></tr>
+<tr><td>Honor Guard</td><td>Keep the elite alive</td><td>elite + ≥2 bulwarks</td><td>elite</td></tr>
+<tr><td>Ritual</td><td>Protect the menders</td><td>≥2 menders + bulwark (+hexers)</td><td>fight</td></tr>
+<tr><td>Poison Volley</td><td>Ranged harassment</td><td>≥3 snipers (majority)</td><td>fight</td></tr>
+<tr><td>Lightning Storm</td><td>Party-wide magic</td><td>≥2 menders + hexers</td><td>fight</td></tr>
+<tr><td>Rage Company</td><td>Heavy offence</td><td>elite + brutes + ≥2 skirmishers</td><td>elite</td></tr>
+<tr><td>Guardian Circle</td><td>Constant wards</td><td>≥3 bulwarks</td><td>fight</td></tr>
+<tr><td>Elite Patrol</td><td>Few high-value enemies (≤4)</td><td>elite + bulwark + mender (+brute)</td><td>elite</td></tr>
+<tr><td>Boss Escort</td><td>The boss and its court</td><td>boss + any support roles</td><td>boss</td></tr>
 </table>
 <p><b>Tier scaling:</b> enemy <b>Attack grows +4%</b> and <b>HP +5% of base per node
 tier</b> (linear), counted from the start of the game to its end (a zone spans 11 tiers, so
