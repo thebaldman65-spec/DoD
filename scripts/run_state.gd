@@ -33,7 +33,10 @@ var combat_wins := 0
 
 const SAVE_PATH := "user://run_save.bin"
 
-const ZONES := ["Forest of Old", "The Scarlands"]
+# Zone 3 repeats the Forest of Old for now (same roster/art; enemy stat
+# scaling continues via the global node tier). Its boss — the Withered
+# Warden again — is the FINAL boss.
+const ZONES := ["Forest of Old", "The Scarlands", "Forest of Old"]
 var active_relics: Array = []  # up to 3 relic ids chosen at the draft
 var zone_idx := 0
 var zone_name := "Forest of Old"
@@ -450,7 +453,9 @@ func award_talent_points(node_type: String) -> int:
 		"elite":
 			pts = 2
 		"boss":
-			pts = 3
+			# The FINAL boss awards no talent points (a relic instead) —
+			# points earned when nothing follows are unspendable.
+			pts = 3 if has_next_zone() else 0
 	for member in party:
 		member["talent_points"] = member.get("talent_points", 0) + pts
 	return pts

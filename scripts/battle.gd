@@ -292,9 +292,10 @@ func _enemy_config(kind: String) -> Dictionary:
 				"tint": Color(1.0, 0.75, 0.7),
 				"resists": {"physical": 0.15}}
 		"boss":
-			# Zone 1's Withered Warden has its own kit; later bosses are still
-			# Chief stand-ins until their unique kits and art exist.
-			if (Run.zone_idx if Run.active else 0) == 0:
+			# The Withered Warden rules both forests (zone 1 AND the final
+			# zone-3 forest); the Scarlands boss is still a Chief stand-in
+			# until its unique kit and art exist.
+			if (Run.zone_idx if Run.active else 0) in [0, 2]:
 				return {"unit_name": "Withered Warden", "is_hero": false, "enemy_role": "tank",
 					"sheet_dir": orc, "max_hp": 500, "attack": 100, "armor": 0.35,
 					"speed": 80.0,
@@ -363,6 +364,10 @@ func _spawn_units() -> void:
 			spec = Run.party[i].get("spec", "")
 		elif autoplay:
 			spec = sim_specs[i]
+		# TESTING AID (Batch 31, user-requested): pre-grant every ability that
+		# would normally be unlocked by talents or boss trophies, so the
+		# reworked trees can be reviewed without spending points. Flip this
+		# const to false to restore gated unlocks.
 		if spec != "":
 			cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
 			cfg["passive_id"] = Classes.SPEC_INFO[spec]["passive"]
@@ -428,6 +433,26 @@ func _spawn_units() -> void:
 						var bm_pending := Classes.beastmaster_pool_ability(ab_name.strip_edges())
 						if bm_pending != null:
 							cfg["abilities"] = cfg["abilities"] + [bm_pending]
+		# TESTING AID (Batch 31): pre-grant unlockable abilities (see the
+		# const at the top). Dedupe keys on display_name, so talent-learned
+		# copies never double up.
+		if TEST_GRANT_ALL_ABILITIES and spec != "":
+			for tn in Talents.generate_tree(spec, hero_keys[i]):
+				var tn_pay: Dictionary = tn.get("payload", {})
+				var tn_grant: Ability = null
+				if tn_pay.has("new_ability"):
+					tn_grant = Ability.make(tn_pay["new_ability"])
+				elif tn_pay.has("grant_ability"):
+					tn_grant = Classes.pending_talent_ability(tn_pay["grant_ability"])
+				if tn_grant != null \
+						and not cfg["abilities"].any(func(a): return a.display_name == tn_grant.display_name):
+					cfg["abilities"] = cfg["abilities"] + [tn_grant]
+			if spec == "beastmaster":
+				for pool_name in Classes.BEASTMASTER_POOL:
+					var pool_ab := Classes.beastmaster_pool_ability(pool_name)
+					if pool_ab != null \
+							and not cfg["abilities"].any(func(a): return a.display_name == pool_ab.display_name):
+						cfg["abilities"] = cfg["abilities"] + [pool_ab]
 		# Class passives (every spec of the class, and before awakening).
 		match hero_keys[i]:
 			"cleric":
@@ -2523,6 +2548,11 @@ func _adjacent_enemies(target: BattleUnit) -> Array:
 
 
 # Base chances for the attack rolls. Many things will modify these later.
+# Batch 31 testing aid: pre-grant every talent-gated and boss-trophy
+# ability at spawn so the reworked trees can be reviewed without spending
+# points. Set false to restore gated unlocks.
+const TEST_GRANT_ALL_ABILITIES := true
+
 const MISS_CHANCE := 0.05
 const PARRY_CHANCE := 0.05        # hero baseline
 const ENEMY_PARRY_CHANCE := 0.025 # enemy baseline (half the hero rate)
@@ -5705,7 +5735,9 @@ func _check_end() -> void:
 		_sfx("victory", -4.0)
 		if Run.encounter.get("type", "") == "boss":
 			var relic := Relics.unlock_random()
-			var boss_text := "+%d gold, %d talent points each." % [gold_gain, pts]
+			# The final boss awards no points — the relic IS the reward.
+			var boss_text := ("+%d gold, %d talent points each." % [gold_gain, pts]) \
+				if pts > 0 else ("+%d gold — the final relic is claimed." % gold_gain)
 			if not relic.is_empty():
 				boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
 			# Beastmaster boss trophy: one ability pick per zone boss, chosen

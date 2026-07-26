@@ -63,6 +63,28 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+ALL TREES ON LANES + ZONE 3 (07-25, Batch 31): Talents.LANE_CONVERSIONS
+converts the 9 classic trees AT BUILD TIME in generate_tree — existing
+node ids/payloads untouched ("map" id→[lane,tier(,"cap")(,excl)]),
+~10 invented fillers + 2 invented capstones per spec appended ("new";
+dials + ability tweaks on EXISTING machinery only — flagged for design
+review). One exclusive pair per tree. Party screen derives lane order/
+names from the tree (_tree_lanes; LANE_NAMES.get fallback prints the
+key, so converted lanes use display-string keys) and sorts nodes by
+tier (decorated stable sort). Audit script (scratchpad test_talents.gd)
+checks 24/3/7-7-7 per spec. TESTING AID: battle.gd
+TEST_GRANT_ALL_ABILITIES := true pre-grants every new_ability/
+grant_ability node + the beastmaster pool at spawn (dedupe by
+display_name here AND in apply_payload — flip the const to restore
+gated unlocks). ZONE 3 = "Forest of Old" repeat (ZONES third entry;
+battle bg/map art key off zone_name → free; boss cfg zone check is
+`zone_idx in [0, 2]` → Withered Warden rules both forests, Scarlands
+keeps the Chief stand-in). FINAL BOSS = zone 3's Warden:
+award_talent_points boss branch → 0 when not has_next_zone (victory
+text: "the final relic is claimed"). GOTCHA re-hit: `:=` off
+Ability.make fails inference (make is untyped) — annotate `: Ability`.
+FIX: dv_communion payload restored to communion_ranks (the B29 rename
+script had rewired the Devout onto the beastmaster's field).
 TALENT OVERHAUL (07-25, Batch 30): economy 1/2/3 (fight/elite/boss,
 run_state.award_talent_points; final-boss-no-points rule documented but
 unattachable until a final boss exists). LANE FRAMEWORK pilot =

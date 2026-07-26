@@ -401,7 +401,17 @@ func _draw_fixed_tree(tree: Array, learned: Dictionary, points: int) -> void:
 const LANE_COL_X := [620.0, 872.0, 1124.0]
 const LANE_ROW_Y := [150.0, 206.0, 262.0, 318.0, 374.0, 430.0, 486.0]
 const LANE_CAP_Y := 566.0
-const LANE_ORDER := ["devotion", "pack", "handler"]
+
+
+# Lane order comes from the tree itself (first appearance), so converted
+# classic trees and the Beastmaster pilot both lay out correctly.
+func _tree_lanes(tree: Array) -> Array:
+	var lanes: Array = []
+	for t in tree:
+		var lane := str(t.get("lane", ""))
+		if lane != "" and not lanes.has(lane):
+			lanes.append(lane)
+	return lanes.slice(0, 3)
 
 
 func _draw_lane_tree(member: Dictionary) -> void:
@@ -409,21 +419,22 @@ func _draw_lane_tree(member: Dictionary) -> void:
 	var learned: Dictionary = member.get("talents", {})
 	var order: Array = member.get("talent_order", [])
 	var points: int = member.get("talent_points", 0)
+	var lane_order := _tree_lanes(tree)
 	var back := ColorRect.new()
 	back.position = TREE_BACK_POS
 	back.size = TREE_BACK_SIZE
 	back.color = Color(0.05, 0.05, 0.06)
 	add_child(back)
 	# Lane spines + headers with live lane-point counts.
-	for ci in LANE_COL_X.size():
+	for ci in mini(LANE_COL_X.size(), lane_order.size()):
 		var v := ColorRect.new()
 		v.position = Vector2(LANE_COL_X[ci], TREE_BACK_POS.y + 18)
 		v.size = Vector2(1, TREE_BACK_SIZE.y - 30)
 		v.color = Color(1, 1, 1, 0.05)
 		add_child(v)
-		var lane: String = LANE_ORDER[ci]
+		var lane: String = lane_order[ci]
 		var hdr := Label.new()
-		hdr.text = "%s — %d pts" % [str(Talents.LANE_NAMES[lane]).to_upper(),
+		hdr.text = "%s — %d pts" % [str(Talents.LANE_NAMES.get(lane, lane)).to_upper(),
 			Talents.lane_points(tree, learned, order, lane)]
 		hdr.add_theme_font_size_override("font_size", 13)
 		hdr.add_theme_color_override("font_color", Color(0.85, 0.75, 0.45))
@@ -440,18 +451,25 @@ func _draw_lane_tree(member: Dictionary) -> void:
 	cap_lbl.size = Vector2(TREE_BACK_SIZE.x, 14)
 	cap_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(cap_lbl)
-	# Nodes: lanes fill top-down in definition order; capstones on the shelf.
-	var lane_counts := {"devotion": 0, "pack": 0, "handler": 0}
-	for talent in tree:
-		var lane: String = str(talent.get("lane", "devotion"))
-		var col := maxi(LANE_ORDER.find(lane), 0)
+	# Nodes: lanes fill top-down sorted by tier (converted classic trees mix
+	# existing nodes with fillers, so definition order alone won't do);
+	# capstones sit on the shelf.
+	var lane_counts := {}
+	var sorted_tree: Array = []
+	for ti in tree.size():
+		sorted_tree.append([int(tree[ti].get("tier", 0)) * 100 + ti, tree[ti]])
+	sorted_tree.sort_custom(func(a, b): return a[0] < b[0])
+	for pair in sorted_tree:
+		var talent: Dictionary = pair[1]
+		var lane: String = str(talent.get("lane", ""))
+		var col := maxi(lane_order.find(lane), 0)
 		var center: Vector2
 		if talent.get("capstone", false):
 			center = Vector2(LANE_COL_X[col], LANE_CAP_Y)
 		else:
-			var row: int = clampi(int(lane_counts[lane]), 0, LANE_ROW_Y.size() - 1)
+			var row: int = clampi(int(lane_counts.get(lane, 0)), 0, LANE_ROW_Y.size() - 1)
 			center = Vector2(LANE_COL_X[col], LANE_ROW_Y[row])
-			lane_counts[lane] = int(lane_counts[lane]) + 1
+			lane_counts[lane] = int(lane_counts.get(lane, 0)) + 1
 		_make_tree_node(talent, learned, points, center, 44.0)
 	_build_tree_tip()
 

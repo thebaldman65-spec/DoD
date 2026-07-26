@@ -30,8 +30,9 @@ it. Up to 3 unlocked relics may be equipped for the run.</li>
 showing the spec name, its <b>archetype</b> in bold (mouseover for the archetype explanation),
 blurb, passive, and full ability details. The choice is permanent for the run.</li>
 <li><b>Victory rewards:</b> gold + talent points for every hero — 1 per fight, 2 per elite,
-3 for the zone boss (rests and shops award none). Fallen heroes return after a won battle at
-20% max HP ("the Untouched refuse to stay down").</li>
+3 for a zone boss (rests and shops award none). The FINAL boss awards no talent points —
+points earned when nothing follows are unspendable; its relic is the prize. Fallen heroes
+return after a won battle at 20% max HP ("the Untouched refuse to stay down").</li>
 <li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft.</li>
 <li><b>Saving:</b> auto-save to user://run_save.bin after every completed node AND after
 spec confirmation (including debug rerolls); Continue resumes at the map. Loading migrates
@@ -64,9 +65,11 @@ strands. The boss tier is a single node.</p>
 talent points, an elite kill drops a rune for a random hero, a random consumable, and a bigger
 gold purse (80–100).</p>
 <ul>
-<li><b>Zones:</b> 1. Forest of Old → 2. The Scarlands. Enemy stats grow with the global
-node tier (see §9); deeper-zone enemies are tinted redder, and later zones field new,
-tougher rosters.</li>
+<li><b>Zones:</b> 1. Forest of Old → 2. The Scarlands → 3. Forest of Old (a stand-in
+repeat — same roster and art — until the true third zone is designed). Enemy stats grow
+with the global node tier across all three (see §9); deeper-zone enemies are tinted
+redder. Zone 3's boss is the <b>Withered Warden</b> again, and it is the FINAL boss: the
+run ends on its death.</li>
 <li><b>Zone completion:</b> killing the boss awards a relic unlock, big gold, 3 talent points,
 and fully restores the party (HP and Mana) before the descent.</li>
 <li><b>Map screen:</b> zone art background, node ladder, Party button (shows unspent talent
@@ -728,52 +731,109 @@ Steadfast Bond</i>), Lone Hunter (no companion: costs −40%, damage +25%).<br>
 gain doubled), The Pack (Pack lane: two beasts at once — COMING SOON), Apex Predator
 (Handler: Quick Shot triggers an extra free companion strike; Kill Command resets on every
 enemy death).</p>
-<p><b>Classic fixed trees.</b> Nine exist —
-<b>Berserker, Swordmaster, Warden, Pyromancer, Cryomancer, Arcanist, Holy, Devout,
-Occultist</b> (designed in the RPG Skill Tree
-Generator; source JSONs in data/talent-tree-*.json). Every other spec shows <b>"Coming soon."</b> on the party
-screen until its tree is designed. Points bank until a tree exists.</p>
+<p><b>Every designed tree now uses the lane framework.</b> The nine classic trees
+(<b>Berserker, Swordmaster, Warden, Pyromancer, Cryomancer, Arcanist, Holy, Devout,
+Occultist</b>) converted in Batch 31: their original 12 nodes keep their ids, effects, and
+any invested ranks, re-homed into three lanes, joined by invented filler nodes (numeric
+dials and kit tweaks on existing machinery) and two invented capstones beside the original
+one — <i>all fillers and lane homes await design review</i>. Each converted tree carries one
+exclusive pair. Hunter specs without a designed tree (Sharpshooter, Survivalist) still show
+"Coming soon."</p>
+<p><b>⚠ TESTING STATE:</b> every talent-granted and boss-trophy ability is currently
+<b>PRE-GRANTED at spawn</b> (a flip-off const in battle.gd) so the reworked trees can be
+reviewed without spending points. Talent ability-grant nodes therefore do nothing extra
+while this is on.</p>
+<p><b>Lane homes per converted tree</b> (existing nodes by name; ⊕ marks invented
+fillers/capstones):<br>
+<b>Berserker</b> — Bloodletting: Bloodcraze, Savagery, Crushing Blows, Hemorrhage,
+⊕Gushing Wounds, ⊕Feast of Ruin, ⊕Arterial Rhythm · Fury: Unstoppable, Battle Shout,
+Enraged, Reckless Fury, ⊕Deafening Cry, ⊕Deathwish, ⊕Frenzied Edge · Warpath: Vitality,
+Unrelenting Assault, Bloodlust, ⊕Thick Skin, ⊕Measured Rage, ⊕Relentless, ⊕Bloodied Hide ·
+Capstones: Rampage, ⊕Exsanguination, ⊕Undying Rage · Exclusive: Reckless Fury ↔ Measured
+Rage.<br>
+<b>Swordmaster</b> — Blade: Aggressive Stance, Lunge, Precision Strikes, Seasoned Fighter,
+⊕Keen Edge, ⊕Deep Thrust, ⊕Momentum · Poise: Defensive Stance, High Guard, Dominant
+Presence, ⊕Footwork, ⊕Composure, ⊕Guarded Frame, ⊕Perfect Form · Duelist: Swordsmanship,
+Sword Mastery, Riposte, Opportunist, ⊕Blade Dance, ⊕Punishment, ⊕Flourish · Capstones:
+Execute, ⊕Untouchable, ⊕En Garde · Exclusive: Aggressive ↔ Defensive Stance.<br>
+<b>Warden</b> — Aegis: Unkillable, Toughness, Tenacity, Endurance, ⊕Layered Plating,
+⊕Fortress, ⊕Immovable · Retribution: Richocet, Sundering, Elemental Weakness, ⊕Spiked
+Bulwark, ⊕Shattering Blow, ⊕Grudge, ⊕Stomp Drill · Warlord: Shieldwall, Rally, Iron Will,
+Tank and Spank, ⊕Bannerman, ⊕Veteran's Will, ⊕Taunt Master · Capstones: Hold the Line,
+⊕The Mountain, ⊕Avenger · Exclusive: Grudge ↔ Immovable.<br>
+<b>Pyromancer</b> — Wildfire: Accelerant, Pyromaniac, Seeding Embers, ⊕Kindling,
+⊕Arsonist, ⊕Firebrand, ⊕Spreading Flames · Detonator: Super Nova, Explosive Force, Molten
+Core, Melt Armor, Implosion, ⊕Shockwave, ⊕Focused Blast · Phoenix: Flame Shield,
+Invigorating Ashes, Ashes of Al'ar, ⊕Warm Glow, ⊕Cauterize, ⊕Rekindle, ⊕Undying Flame ·
+Capstones: Firestorm, ⊕Hellfire, ⊕True Phoenix · Exclusive: Firebrand ↔ Cauterize.<br>
+<b>Cryomancer</b> — Deep Freeze: Brittle Ice, Frigid Grip, Whiteout, Freezing Advance,
+⊕Cold Snap, ⊕Glacial Economy, ⊕Bitter Cold · Shatterpoint: Piercing Ice, Empowered
+Frostbolt, Icy Veins, Splintering Shards, ⊕Lance Focus, ⊕Crystal Edge, ⊕Honed Shards ·
+Winter: Hungering Cold, Hypothermia, Rime, ⊕Frost Ward, ⊕Icy Resolve, ⊕Winter's Grasp,
+⊕Numbing Veil · Capstones: Shatter, ⊕Absolute Zero, ⊕Eternal Winter · Exclusive: Bitter
+Cold ↔ Numbing Veil.<br>
+<b>Arcanist</b> — Resonance: Arcane Mastery, Mana Attunement, Unlimited Power,
+⊕Harmonics, ⊕Conduit, ⊕Resonant Core, ⊕Charged Bolts · Overload: Overcharge, On the Edge,
+Critical Mass, ⊕Volatility, ⊕Cannoneer, ⊕Barrage Master, ⊕Meltdown · Control: Mindfulness,
+Temporal Rift, Conversion, Stable Alignment, Suppressing Fire, ⊕Arcane Ward, ⊕Still Mind ·
+Capstones: Magi's Wrath, ⊕Singularity, ⊕Master of Moments · Exclusive: Meltdown ↔ Still
+Mind.<br>
+<b>Holy</b> — Mercy: Heavenly Aura, Holy Light, Sanctified, Resurrection, ⊕Zealous Light,
+⊕Martyr's Vigor, ⊕Ardor · Radiance: Triage, On the Mend, Holy Capacitor, ⊕Soothing Touch,
+⊕Brilliance, ⊕Swift Mending, ⊕Overflow · Sanctuary: Guardian Angel, Inner Faith, Last
+Hope, Divine Presence, ⊕Blessed Vestments, ⊕Serenity, ⊕Beacon · Capstones: Divine Plea,
+⊕Avatar of Mercy, ⊕Living Sanctum · Exclusive: Zealous Light ↔ Serenity.<br>
+<b>Devout</b> — Faith: Communion, Unwavering Faith, Blessed are the Faithful, Sacred
+Covenant, Devoutness, ⊕Fervor, ⊕Binding Oath · Bulwark: Blessed Barrier, Radient Aegis,
+Afterglow, ⊕Warded Robes, ⊕Stalwart, ⊕Bastion, ⊕Unyielding Aegis · Zeal: Sacred Resolve,
+Cleansing Waters, Healing Pulse, ⊕Righteous Fire, ⊕Crusader's Tempo, ⊕Purity, ⊕Lifewell ·
+Capstones: Bulwark of Fortitude, ⊕Apostle, ⊕Judgement · Exclusive: Righteous Fire ↔
+Stalwart.<br>
+<b>Occultist</b> — Ruin: Empowered Hex, Corrupted Channeling, Broken Will, ⊕Grim Focus,
+⊕Deeper Hex, ⊕Unraveling, ⊕Entropy · Madness: Spread of Madness, Mind Flay, Umbral Mirror,
+⊕Whispers, ⊕Delirium, ⊕Cackling Mirror, ⊕Lingering Torment · Leech: Soul Leech,
+Invigoration, Pleasure from Pain, Murderous Intent, ⊕Gluttony, ⊕Pact of Flesh, ⊕Dark
+Barter · Capstones: Mass Hysteria, ⊕Avatar of Ruin, ⊕Soul Glut · Exclusive: Grim Focus ↔
+Pact of Flesh.</p>
 <p><b>Ranks are additive:</b> when a node offers an increase by a specified amount, every
 additional point invested adds the SAME amount again (e.g. "+5 Bleed per rank" at 3 ranks =
 +15 Bleed).</p>
-<p><b>Layout &amp; gating:</b> each tree is a 12-node grid (3 nodes / 5 nodes / 3 nodes /
-1 capstone across four rows). Rows unlock cumulatively — row 2 at 5 points spent, row 3 at
-10, the capstone at 15 — and some nodes carry explicit prerequisites (drawn as connector
-lines; e.g. Savagery needs 1 point in Unstoppable). Nodes render as emblem squares with
-point counters and hover tooltips; art is placeholder.</p>
-<p><b>Berserker tree:</b> Row 1 — Bloodcraze (heal 3%/rank max HP on enemy bleedout ×3),
+<p><b>Layout:</b> every tree renders as three lane columns with live lane-point headers,
+a capstone shelf, emblem-square nodes with point counters, cost-aware hover tooltips, and
+greyed exclusive siblings. Art is placeholder.</p>
+<p><b>Berserker tree:</b> Bloodcraze (heal 3%/rank max HP on enemy bleedout ×3),
 Unstoppable (Blood Frenzy +0.5%/rank per step ×3), Enraged (below-50%-HP trigger: +3%/rank
-damage buff, 5 turns, stacks ×3). Row 2 — Crushing Blows (3%/rank armor penetration per 20
+damage buff, 5 turns, stacks ×3). Crushing Blows (3%/rank armor penetration per 20
 enemy-party bleed ×3), Savagery (+5 Bleed/rank on bleed abilities ×3, needs Unstoppable 1),
 Battle Shout (grants the ability), Reckless Fury (+5%/rank damage dealt AND taken ×3, needs
 Unstoppable 1), Unrelenting Assault (below-25%-HP trigger: +10 Constitution/rank for 3
-turns, once per 5 turns ×3). Row 3 — Hemorrhage (enemies at 80/70/60 bloodloss are Crippled ×3 — the threshold
+turns, once per 5 turns ×3). Hemorrhage (enemies at 80/70/60 bloodloss are Crippled ×3 — the threshold
 drops 10 per point), Bloodlust (Hack and Slash strikes an extra time), Vitality (+5% max
 HP/rank ×3). Capstone — Rampage (grants the ability).</p>
-<p><b>Swordmaster tree:</b> Row 1 — Defensive Stance (Seasoned under-half reduction
+<p><b>Swordmaster tree:</b> Defensive Stance (Seasoned under-half reduction
 +3%/rank ×3), Swordsmanship (perfect-Pommel parry buff +5%/rank ×3), Aggressive Stance
-(Seasoned over-half bonus +3%/rank ×3). Row 2 — Dominant Presence (armor +5%/rank per debuff
+(Seasoned over-half bonus +3%/rank ×3). Dominant Presence (armor +5%/rank per debuff
 applied ×3), High Guard (25% less damage for 1 turn after parrying, needs Swordsmanship 1),
 Lunge (grants the ability), Riposte (<b>Counter Attack</b>: answer every parry with a
 Strike, needs Swordsmanship 1), Precision Strikes (+5%/rank crit vs Dazed / Crippled /
-Exposed ×3). Row 3 — Seasoned Fighter (+3%/rank crit for Lunge and Overpower ×3),
+Exposed ×3). Seasoned Fighter (+3%/rank crit for Lunge and Overpower ×3),
 Opportunist (counter enemy misses with a free Overpower), Sword Mastery (+3%/rank parry ×3).
 Capstone — Execute (grants the ability).</p>
-<p><b>Warden tree:</b> Row 1 — Tank and Spank
+<p><b>Warden tree:</b> Tank and Spank
 (Mocking Blow 15%/rank chance to Empower a random ally ×3), Unkillable (heal 2%/rank max HP
 on every Block ×3), Elemental Weakness (Crushing Blow shreds elemental resists 5%/rank, 3
-turns ×3). Row 2 — Toughness (Constitution +5%/rank of max HP ×3), Tenacity (every attack
+turns ×3). Toughness (Constitution +5%/rank of max HP ×3), Tenacity (every attack
 Blocked by <b>Heavy Plating</b> grants +5 max HP for the
 battle; battle-long gains don't leak into the save), Shieldwall (grants the ability),
 Rally (every Heavy Plating block Rallies the party — +15% healing received for
-2 turns), Iron Will (+5%/rank damage per debuff on the Warden ×3). Row 3 — Richocet
+2 turns), Iron Will (+5%/rank damage per debuff on the Warden ×3). Richocet
 (5%/rank chance to Stun the attacker on Block ×3), Endurance (+1%/rank armor per turn
 without an external heal, resets when healed ×3), Sundering (Crushing Blow
 splashes 25%/rank of its BD to the enemies <b>Adjacent</b> to the target ×3). Capstone —
 Hold the Line (grants the ability).</p>
-<p><b>Pyromancer tree:</b> Row 1 — Accelerant (Burn ticks +1%/rank of Attack
+<p><b>Pyromancer tree:</b> Accelerant (Burn ticks +1%/rank of Attack
 ×3), Pyromaniac (Inferno Master step +1%/rank ×3), Super Nova (Detonation +3%/rank crit
-×3). Row 2 — Invigorating Ashes (each Burn tick 5%/rank chance to restore 2% max Mana ×3),
+×3). Invigorating Ashes (each Burn tick 5%/rank chance to restore 2% max Mana ×3),
 Molten Core (2%/rank less damage from burning enemies ×3), Flame Shield (grants the
 ability), Explosive Force (fire crits extend the target's Burn +1 turn/rank ×3), Seeding
 Embers (enemy dies Burning: +1%/rank damage per remaining Burn turn, next turn ×3). Row 3 —
@@ -781,63 +841,63 @@ Melt Armor (every Burn tick melts 1%/rank armor off the victim for the battle, s
 enemy chip ×3), Ashes of Al'ar (on death: 11%/rank chance to revive at 25% HP, once per
 battle ×3), Implosion (Detonation 3%/rank chance to strike twice ×3). Capstone — Firestorm
 (grants the ability).</p>
-<p><b>Cryomancer tree:</b> Row 1 — Hungering Cold (Chilled enemies deal
+<p><b>Cryomancer tree:</b> Hungering Cold (Chilled enemies deal
 1%/rank less damage per stack ×3), Brittle Ice (Frozen enemies 2%/rank likelier to be crit
-×3), Piercing Ice (Ice Lance +10%/rank crit damage ×3). Row 2 — Hypothermia (enemies take
+×3), Piercing Ice (Ice Lance +10%/rank crit damage ×3). Hypothermia (enemies take
 1%/rank more damage per Chilled stack ×3), Frigid Grip (each Chilled stack slows 3%/rank
 harder ×3), Rime (grants the ability), Icy Veins (Ice Lance kills empower the next Ice
 Lance +15%/rank ×3), Splintering Shards (Razor Ice 20%/rank chance of one extra target
-×3). Row 3 — Whiteout (Blizzard victims 15%/rank chance to be Dazed 2 turns ×3), Freezing
+×3). Whiteout (Blizzard victims 15%/rank chance to be Dazed 2 turns ×3), Freezing
 Advance (Rime's spread deals 2%/rank of Attack as frost to the new victim ×3), Empowered
 Frostbolt (Frostbolt +2%/rank of Attack ×3). Capstone — Shatter (grants the ability).</p>
-<p><b>Arcanist tree:</b> Row 1 — Mindfulness (every 6/5/4 of the Arcanist's turns — the
+<p><b>Arcanist tree:</b> Mindfulness (every 6/5/4 of the Arcanist's turns — the
 count drops 1 per point — ALL cooldowns tick down 1 extra turn ×3), Arcane Mastery (each
 Resonance stack grants +1%/rank extra crit chance ×3), Mana Attunement (restore 2%/rank
-max Mana on every stack gained ×3). Row 2 — Temporal Rift (crits 3%/rank chance to echo
+max Mana on every stack gained ×3). Temporal Rift (crits 3%/rank chance to echo
 25% of their damage at a random enemy ×3), On the Edge (surviving an attack below
 25/30/35% health — the threshold rises 5 per point — grants 1 Resonance ×3), Overcharge
 (grants the ability), Conversion (10%/rank of damage taken paid in Mana instead of
 health ×3), Critical Mass (every 3rd crit +20%/rank damage and restores 10%/rank max
-Mana ×3). Row 3 — Suppressing Fire (each Barrage bolt +0.25%/rank of Attack over the
+Mana ×3). Suppressing Fire (each Barrage bolt +0.25%/rank of Attack over the
 previous ×3), Unlimited Power (Resonance gained at max stacks becomes +2%/rank damage
 and +2%/rank max Mana, stacking all battle ×3), Stable Alignment (a single attack cannot
 remove more than 35/30/25% of max health — the cap drops 5 per point ×3). Capstone —
 Magi's Wrath (grants the ability).</p>
-<p><b>Holy tree:</b> Row 1 — Triage (instant heals can CRIT ×1.5 off the Cleric's crit
+<p><b>Holy tree:</b> Triage (instant heals can CRIT ×1.5 off the Cleric's crit
 chance, and all healing +3%/rank ×3), Heavenly Aura (each Mercy stack grants +5%/rank
 extra healing done, on top of the base 5% ×3), Holy Light (perfect casts restore 1%/rank
-max Mana ×3). Row 2 — Guardian Angel (allies falling below 53/56/59% health earn Mercy —
+max Mana ×3). Guardian Angel (allies falling below 53/56/59% health earn Mercy —
 the threshold rises 3 per point ×3), Divine Presence (at the end of the Cleric's turn the
 lowest-health ally heals 1%/rank of their max health ×3), Resurrection (grants the
 ability), Last Hope (allies under 25% max health receive 5%/rank more healing ×3), Inner
-Faith (+5%/rank max health ×3). Row 3 — Holy Capacitor (5%/rank of overhealing is
+Faith (+5%/rank max health ×3). Holy Capacitor (5%/rank of overhealing is
 banked — live chip — and released by the next Heal ×3), On the Mend (Renewal ticks
 5%/rank chance to dispel one harmful effect ×3), Sanctified (spending Mercy has a
 10%/rank chance to consume no stacks ×3). Capstone — Divine Plea (grants the
 ability).</p>
-<p><b>Devout tree:</b> Row 1 — Communion (a member reaching 5 Faith gives every other
+<p><b>Devout tree:</b> Communion (a member reaching 5 Faith gives every other
 member a (20/rank × their own stacks)% chance to gain 1 ×3), Unwavering Faith (+5%/rank
 max health ×3), Blessed are the Faithful
-(the 5-stack heal restores 20/25/30% max health ×3). Row 2 — Devoutness (the party
+(the 5-stack heal restores 20/25/30% max health ×3). Devoutness (the party
 takes 5%/rank less Break damage ×3), Afterglow (a breaking Divine Shield heals its
 holder 5%/rank of the Devout's max health ×3), Sacred Resolve (grants the ability),
 Sacred Covenant (a Divine Shield that prevents lethal damage heals its holder 5%/rank
 max health and grants 1 Faith per rank ×3), Radient Aegis (casting Divine Shield has a
-15%/rank chance to echo onto another ally ×3). Row 3 — Blessed Barrier (Divine Shield
+15%/rank chance to echo onto another ally ×3). Blessed Barrier (Divine Shield
 converts 4%/rank of what it absorbs into healing ×3), Cleansing Waters (while Sacred
 Resolve holds, each member has a 15%/rank chance per turn to shed one harmful effect
 ×3), Healing Pulse (while Sacred Resolve holds, the party heals 2%/rank of the Devout's
 max health per turn ×3). Capstone — Bulwark of Fortitude (grants the ability).</p>
-<p><b>Occultist tree:</b> Row 1 — Empowered Hex (Hex of Ruin 25%/rank chance per target
+<p><b>Occultist tree:</b> Empowered Hex (Hex of Ruin 25%/rank chance per target
 to also apply Decay ×3), Soul Leech (heroes striking a Ruined target heal 15/20/25% of
 damage dealt, up from the base 10% ×3), Pleasure from Pain (at the end of the
 Occultist's turn the party heals 0.5%/rank of the Occultist's max health per UNIQUE
-enemy-team debuff ×3). Row 2 — Corrupted Channeling (a Crippled enemy's attacks heal a
+enemy-team debuff ×3). Corrupted Channeling (a Crippled enemy's attacks heal a
 random hero for 25%/rank of the damage dealt ×3), Murderous Intent (a Bewitched kill
 heals the lowest-health member 10%/rank of the Occultist's max health ×3), Mind Flay
 (grants the ability), Invigoration (Dark Pact also restores 2%/rank max Mana per turn
 for 3 turns ×3), Spread of Madness (Psychosis 15%/rank chance per turn to leap to a
-fellow — the newly maddened gain a Ruin stack ×3). Row 3 — Umbral Mirror (enemy debuffs
+fellow — the newly maddened gain a Ruin stack ×3). Umbral Mirror (enemy debuffs
 aimed at heroes have a 10%/rank chance to rebound onto the attacker, feeding Ruin ×3),
 Broken Will (the Occultist deals +5%/rank Break damage ×3), Dark Infusion (the
 Occultist deals +2%/rank damage per unique enemy-team debuff ×3). Capstone — Mass
