@@ -5,6 +5,30 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-26 — Batch 41: "All spec abilities unlocked" is a debug toggle — sims stop lying</h2>
+<ul>
+<li><b>The Batch 31 review aid stops skewing every test:</b> TEST_GRANT_ALL_ABILITIES —
+the compile-time constant that pre-granted every talent-gated and boss-trophy ability at
+spawn, stuck ON since the tree rework — is now a <b>runtime toggle in the battle DEBUG
+menu ("All spec abilities unlocked"), default OFF</b>. Grants land at spawn, so a flip
+applies from the next battle; the setting sticks for the whole session. Headless runs arm
+it with DOD_SIM_GRANT_ALL=1.</li>
+<li><b>The unskewed baseline, first look:</b> default sims now measure real gated
+progression — <b>88% wins</b> with base kits against the documented ~85% target, versus
+100% with everything granted. A meaningful slice of the long-standing "sims win 100%"
+gap was this aid, not game balance. All sim numbers in earlier entries were measured
+full-kit; future baselines are gated unless stated.</li>
+<li><b>A false alarm, documented for posterity:</b> the toggle initially appeared to hang
+every sim — a hunk-by-hunk bisection rebuilt the change to byte-identical code that
+passed, proving the hangs were macOS's user-idle throttle (the machine had been
+unattended), not the edit. The project guide now records BOTH sim-hang failure modes and
+the discriminator (DOD_SIM_DEBUG reproduces a real deadlock; the throttle shows
+banner-only output and clears when retried at an active keyboard).</li>
+<li>Verified: gated sims 7/8 with base-kit ability usage only (no talent/trophy names in
+the report); grant-all sims 8/8 with Firestorm/Called Shot/Resurrection present; parse
+clean.</li>
+</ul>
+
 <h2>2026-07-26 — Batch 40: Persistent profile — the unlocks substrate, chronicle only</h2>
 <ul>
 <li><b>Scoped deliberately down:</b> the roadmap marks persistent unlocks "sketch only;

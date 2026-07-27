@@ -177,13 +177,21 @@ battle (push_error + default lineup when nothing fits); report prints
 the theme header. Sim dmg attribution now credits DoT ticks by lane
 owner (poison→Survivalist, burn→Pyromancer — heroes never DoT each
 other), companion hits→pack_master, trap/tripwire/forest bites→their
-hero. SIM-HANG FIX + GOTCHA: any `await _pick_target`/`_ability_picked`
-reachable in autoplay = the whole sim run hangs at ~2% CPU (idle frame
-loop; looks like OS throttling — it is not). Resurrection's multi-fallen
-picker did exactly that (bot now takes fallen[0]); the targeting loop's
-cancelled-branch also basic-attack-fallbacks + push_warning under
-autoplay so NO null target can ever hang a sim again. New modal/picker
-flows MUST bot-guard their awaits.
+hero. SIM-HANG GOTCHA — TWO look-alike failure modes, both ~1-2% CPU:
+(1) REAL await-deadlock: any `await _pick_target`/`_ability_picked`
+reachable in autoplay hangs the run forever. Resurrection's
+multi-fallen picker did this (bot now takes fallen[0]); the targeting
+loop's cancelled-branch basic-attack-fallbacks + push_warning under
+autoplay. New modal/picker flows MUST bot-guard their awaits.
+(2) macOS USER-IDLE THROTTLE: when the user is away from the keyboard
+~10+ min, new headless Godots crawl at banner-only output — IDENTICAL
+code passes on retry once the user is active (caffeinate flags did NOT
+reliably beat it; Batch 41's "broken" toggle was this, proven by
+hunk-by-hunk bisection landing on byte-identical working code).
+DISCRIMINATOR before blaming code: rerun with DOD_SIM_DEBUG=1 — a
+deadlock's log tail names a mid-battle action and reproduces every
+time; the throttle shows banner-only and vanishes when retried while
+the user is active. git-stash-vs-HEAD is the definitive code check.
 ENEMY ROSTER 6→15 (07-25, Batch 34, roguelike push I): all enemy data
 in data/enemies.json → scripts/enemies.gd (class_name Enemies; caches
 JSON; config() restores ints — JSON floats break Ability.make's typed
@@ -305,11 +313,11 @@ review). One exclusive pair per tree. Party screen derives lane order/
 names from the tree (_tree_lanes; LANE_NAMES.get fallback prints the
 key, so converted lanes use display-string keys) and sorts nodes by
 tier (decorated stable sort). Audit script (scratchpad test_talents.gd)
-checks 24/3/7-7-7 per spec. TESTING AID: battle.gd
-TEST_GRANT_ALL_ABILITIES := true pre-grants every new_ability/
-grant_ability node + the beastmaster pool at spawn (dedupe by
-display_name here AND in apply_payload — flip the const to restore
-gated unlocks). ZONE 3 = "Forest of Old" repeat (ZONES third entry;
+checks 24/3/7-7-7 per spec. TESTING AID (Batch 41: now the RUNTIME
+static battle.debug_grant_all, DEFAULT OFF — battle DEBUG menu check
+"All spec abilities unlocked (next battle)" or DOD_SIM_GRANT_ALL=1)
+pre-grants every new_ability/grant_ability node + the spec pools at
+spawn (dedupe by display_name here AND in apply_payload). ZONE 3 = "Forest of Old" repeat (ZONES third entry;
 battle bg/map art key off zone_name → free; boss cfg zone check is
 `zone_idx in [0, 2]` → Withered Warden rules both forests, Scarlands
 keeps the Chief stand-in). FINAL BOSS = zone 3's Warden:

@@ -185,6 +185,10 @@ func _ready() -> void:
 	# Run.active_relics regardless of Run.active).
 	if OS.get_environment("DOD_SIM_RELICS") != "":
 		Run.active_relics = OS.get_environment("DOD_SIM_RELICS").split(",")
+	# DOD_SIM_GRANT_ALL=1: full-kit sims (every talent/trophy ability
+	# pre-granted) — the default measures real gated progression.
+	if OS.get_environment("DOD_SIM_GRANT_ALL") == "1":
+		debug_grant_all = true
 	autoplay = sim or OS.get_environment("DOD_AUTOPLAY") == "1"
 	# DOD_ENEMIES_OFF=1 arms the "Enemy attacks OFF" debug toggle from the
 	# environment so headless tests can exercise the skip path.
@@ -393,10 +397,10 @@ func _spawn_units() -> void:
 						if bm_pending != null and not cfg["abilities"].any(
 								func(a): return a.display_name == bm_pending.display_name):
 							cfg["abilities"] = cfg["abilities"] + [bm_pending]
-		# TESTING AID (Batch 31): pre-grant unlockable abilities (see the
-		# const at the top). Dedupe keys on display_name, so talent-learned
-		# copies never double up.
-		if TEST_GRANT_ALL_ABILITIES and spec != "":
+		# Review aid: pre-grant unlockable abilities when the DEBUG toggle
+		# is armed (see debug_grant_all). Dedupe keys on display_name, so
+		# talent-learned copies never double up.
+		if debug_grant_all and spec != "":
 			for tn in Talents.generate_tree(spec, hero_keys[i]):
 				var tn_pay: Dictionary = tn.get("payload", {})
 				var tn_grant: Ability = null
@@ -761,6 +765,8 @@ func _build_debug_panel() -> void:
 	_debug_popup.add_item("Full Restore", 0)
 	_debug_popup.add_check_item("Cooldowns OFF", 2)
 	_debug_popup.add_check_item("Enemy attacks OFF", 1)
+	_debug_popup.add_check_item("All spec abilities unlocked (next battle)", 3)
+	_debug_popup.set_item_checked(_debug_popup.get_item_index(3), debug_grant_all)
 	_debug_popup.add_separator("Turn lock — all hero turns")
 	for i in heroes.size():
 		_debug_popup.add_radio_check_item("Lock → %s" % heroes[i].unit_name, 10 + i)
@@ -788,6 +794,15 @@ func _on_debug_menu(id: int) -> void:
 		var check_idx := _debug_popup.get_item_index(1)
 		_debug_popup.set_item_checked(check_idx, not _debug_popup.is_item_checked(check_idx))
 		_debug_toggle_enemies(_debug_popup.is_item_checked(check_idx))
+		return
+	if id == 3:
+		# Grants land at spawn, so the flip applies from the next battle
+		# (the session keeps the setting — it's a static).
+		var ga_idx := _debug_popup.get_item_index(3)
+		_debug_popup.set_item_checked(ga_idx, not _debug_popup.is_item_checked(ga_idx))
+		debug_grant_all = _debug_popup.is_item_checked(ga_idx)
+		_log("DEBUG: all spec abilities %s from the NEXT battle on" % (
+			"UNLOCKED" if debug_grant_all else "gated again"), "#e0a050")
 		return
 	# Turn lock radio: clicking the active hero again unlocks.
 	var hero: BattleUnit = heroes[id - 10]
@@ -2707,10 +2722,13 @@ func _adjacent_enemies(target: BattleUnit) -> Array:
 
 
 # Base chances for the attack rolls. Many things will modify these later.
-# Batch 31 testing aid: pre-grant every talent-gated and boss-trophy
-# ability at spawn so the reworked trees can be reviewed without spending
-# points. Set false to restore gated unlocks.
-const TEST_GRANT_ALL_ABILITIES := true
+# Review aid (Batch 41; was the Batch 31 const): pre-grant every
+# talent-gated and boss-trophy ability at spawn. Now a RUNTIME toggle in
+# the battle DEBUG menu, default OFF so sims and normal play measure the
+# real gated progression. Static: the toggle sticks for the whole
+# session (grants land at spawn, so flips apply from the next battle).
+# DOD_SIM_GRANT_ALL=1 arms it for headless full-kit runs.
+static var debug_grant_all := false
 
 const MISS_CHANCE := 0.05
 const PARRY_CHANCE := 0.05        # hero baseline
