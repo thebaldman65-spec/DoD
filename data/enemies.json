@@ -799,28 +799,42 @@
   },
   "abilities": [
    {
-    "display_name": "Strike",
-    "damage": 28,
-    "pressure": 26,
+    "display_name": "Cinder Cleave",
+    "dmg_type": "fire",
+    "damage": 30,
+    "pressure": 24,
     "resource_gain": 15,
     "delay": 2.0,
     "anim": "attack01"
    },
    {
-    "display_name": "Heavy Strike",
+    "display_name": "Immolating Wave",
+    "dmg_type": "fire",
     "cost": 30,
-    "damage": 54,
-    "pressure": 40,
-    "delay": 4.0,
-    "anim": "attack02"
+    "damage": 18,
+    "pressure": 14,
+    "delay": 3.5,
+    "anim": "attack02",
+    "aoe": true,
+    "applies_status": {
+     "id": "burn",
+     "turns": 2
+    },
+    "status_chance": 0.8
    },
    {
-    "display_name": "Crushing Blow",
+    "display_name": "Tyrant's Verdict",
+    "dmg_type": "fire",
     "cost": 20,
-    "damage": 34,
-    "pressure": 56,
+    "damage": 44,
+    "pressure": 40,
     "delay": 4.0,
-    "anim": "attack02"
+    "anim": "attack02",
+    "applies_status": {
+     "id": "sunder",
+     "turns": 2
+    },
+    "status_chance": 0.7
    }
   ]
  }

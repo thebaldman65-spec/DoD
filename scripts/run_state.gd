@@ -243,6 +243,22 @@ func compose_test(theme_name: String, budget: int, zone := 1) -> Array:
 # 1-11 with the boss on 11): tiers 1-3 roll 3-6, tiers 4-7 roll 6-9,
 # tiers 8-11 roll 10-12. Later zones restart the ladder with a tougher
 # roster carrying higher base stats (Forest of Old is the focus for now).
+# Enemy stat scaling is zone-local (Batch 36): every zone replays the
+# 1..11 tier ladder and its position in the run applies a flat base
+# multiplier. Keyed by SLOT, not zone identity — the Forest of Old is
+# x1.0 as the opener and x2.2 when revisited as the finale — and slots
+# past the authored list continue the ~x1.5 step, so adding a 4th zone
+# is data work, never formula work.
+const ZONE_BASE_MULTS := [1.0, 1.5, 2.2]
+
+
+func zone_base_mult(slot: int) -> float:
+	if slot <= ZONE_BASE_MULTS.size():
+		return ZONE_BASE_MULTS[maxi(slot, 1) - 1]
+	return ZONE_BASE_MULTS[ZONE_BASE_MULTS.size() - 1] \
+		* pow(1.5, slot - ZONE_BASE_MULTS.size())
+
+
 func battle_budget(tier := -1) -> int:
 	if tier <= 0:
 		tier = floor_idx + 1

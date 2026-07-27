@@ -116,8 +116,12 @@ ability's damage is a PERCENT of the user's current Attack (a "45%" ability at 1
 hits for ~45). Base Attack comes from the spec's role — <b>Damage 100, Tank 75,
 Support 50</b> (per-spec stat blocks are being filled in class by class). All scaling is
 LINEAR on the base value: <b>heroes gain +2% of base Attack and +2% of base max HP per
-combat node won</b> (fight/elite/boss); <b>enemies gain +4% of base Attack and +5% of base
-HP per node tier</b>, counted across the whole game. Armor, Resistances, Speed,
+combat node won</b> (fight/elite/boss); <b>enemy scaling is zone-local</b> — each zone
+replays its own tier ladder at <b>+4% of base Attack and +5% of base HP per tier (1–11)</b>,
+multiplied by the zone's <b>slot in the run: 1st zone ×1.0, 2nd ×1.5, 3rd ×2.2</b> (keyed
+by position, not identity — the Forest of Old is ×1.0 as the opener and ×2.2 as the
+finale; slots past the third continue the ~×1.5 step, so adding zones never touches the
+formula). Armor, Resistances, Speed,
 Constitution, Crit, Block, and Parry never scale. Damage-over-time effects (Burn 6%,
 Poison 3% per stack) snapshot the applier's Attack when they land. Battle tooltips show the
 computed damage numbers; the hero stat page shows the numbers AND the % scaling behind
@@ -1086,8 +1090,10 @@ soft to arcane (magic pierces plate).</td></tr>
 <tr><td>Withered Warden (boss)</td><td>7</td><td>boss</td><td>1·3</td><td>500</td><td>Unique
 kit: Timber Slam (Dazed 3t); Roots of Wrath (party Poison); Wild Growth. Nature resist 50%;
 soft to fire (withered wood burns) — both scoutable on the map from tier 1.</td></tr>
-<tr><td>Ash-Wrought Tyrant (boss)</td><td>7</td><td>boss</td><td>2</td><td>370</td><td>Chief
-kit, 20 starting Rage. Fire 50%, physical 10%; soft to frost.</td></tr>
+<tr><td>Ash-Wrought Tyrant (boss)</td><td>7</td><td>boss</td><td>2</td><td>370</td><td>Rage
+user (20 starting), unique fire kit: Cinder Cleave (+15 Rage); Immolating Wave 30R
+(party-wide fire, 80% Burn 2t); Tyrant's Verdict 20R (heavy fire, 70% Sunder 2t). Fire
+50%, physical 10%; soft to frost.</td></tr>
 </table>
 <p><b>Compositions — the power-budget system:</b> every battle rolls a power budget that is
 ALWAYS spent exactly (<b>tiers 1–3 roll 3–6, tiers 4–7 roll 6–9, tiers 8–11 roll

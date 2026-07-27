@@ -63,6 +63,20 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+SCALING REBASE (07-26, Batch 36): enemy stats are ZONE-LOCAL —
+battle.gd spawn block does base × Run.zone_base_mult(zone_idx+1) ×
+(1 + rate × zone_tier), zone_tier = clampi(floor_idx+1, 1, 11), rates
+unchanged (+4% Atk / +5% HP, HP ceil to 10s). ZONE_BASE_MULTS [1.0,
+1.5, 2.2] keyed by SLOT (Forest is 1.0 as opener, 2.2 as finale);
+slots past 3 auto-continue ×1.5 geometric — never touch the formula
+for new zones. Standalone sims stay unscaled (zone_tier 0). Old→new
+at entries: z2 ×1.55→1.58 HP / ×1.44→1.56 Atk, z3 ×2.10→2.31 /
+×1.88→2.29; zone ENDS run much hotter by design (z3 boss ×3.41/×3.17).
+ASH TYRANT KIT v2 (chief clone GONE): Cinder Cleave 0-cost fire +15
+Rage / Immolating Wave 30R aoe fire burn 80% 2t / Tyrant's Verdict 20R
+44% fire + sunder 70% 2t. Warden's z3 reprise stays BY DESIGN. Zone
+roster audit: all 3 pools distinct, every theme satisfiable across its
+full budget band in every zone (scratchpad test_zone_rosters.gd).
 RESISTS & VULNERABILITIES EVERYWHERE (07-26, Batch 35, roguelike push
 II): every kind in enemies.json now carries resists AND vulns as
 NEGATIVE RESISTS — the "weak" arrays are GONE from the data (unit.gd

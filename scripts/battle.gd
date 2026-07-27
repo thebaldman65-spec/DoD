@@ -539,19 +539,25 @@ func _spawn_units() -> void:
 	elif Run.active and Run.encounter.has("enemies"):
 		composition = Run.encounter["enemies"]
 	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 6)]
-	# Enemies scale linearly per node tier, counted across the whole game
-	# (zone 2's first tier = global tier 11): +4% of base Attack and +5% of
-	# base HP per tier. Health pools stay multiples of 10 (rounded UP).
-	var tier := 0
+	# Scaling rebase (Batch 36): each zone runs its OWN 1..11 tier ladder
+	# (+4% Attack / +5% HP of base per tier), and the zone's SLOT in the
+	# run applies a flat base multiplier on top (1st zone x1.0, 2nd x1.5,
+	# 3rd x2.2 — Run.zone_base_mult, position not identity). Health pools
+	# stay multiples of 10 (rounded UP). Standalone battles stay unscaled.
+	var zone_tier := 0
+	var slot_mult := 1.0
 	if Run.active:
-		tier = Run.zone_idx * Run.FLOORS + maxi(Run.floor_idx, 0)
+		zone_tier = clampi(Run.floor_idx + 1, 1, Run.FLOORS)
+		slot_mult = Run.zone_base_mult(Run.zone_idx + 1)
 	for i in composition.size():
 		var cfg := _enemy_config(composition[i])
 		var tint: Color = cfg["tint"]
 		cfg.erase("tint")
-		if tier > 0:
-			cfg["max_hp"] = int(ceil(cfg["max_hp"] * (1.0 + 0.05 * tier) / 10.0) * 10.0)
-			cfg["attack"] = int(round(cfg["attack"] * (1.0 + 0.04 * tier)))
+		if zone_tier > 0:
+			cfg["max_hp"] = int(ceil(cfg["max_hp"] * slot_mult
+				* (1.0 + 0.05 * zone_tier) / 10.0) * 10.0)
+			cfg["attack"] = int(round(cfg["attack"] * slot_mult
+				* (1.0 + 0.04 * zone_tier)))
 		if Run.active and Run.zone_idx > 0:
 			# Deeper zones keep their scorched warpaint.
 			tint = tint.lerp(Color(1.0, 0.6, 0.45), 0.35)
