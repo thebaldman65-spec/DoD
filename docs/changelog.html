@@ -5,6 +5,34 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-26 — Batch 37: Zone rotation — authored slot pools behind a flag</h2>
+<ul>
+<li><b>Zone identity is a first-class def now:</b> ZONE_DEFS maps each zone to its display
+name, its boss kind, and a <b>roster id per slot it can host</b> — the Forest of Old
+fields roster 1 as the opener and the tougher roster 3 as the finale. The enemies.json
+"zones" tags officially mean ROSTER ids (they travel with the zone, never with run
+position); the boss is resolved from the zone def, replacing the old slot-keyed
+check.</li>
+<li><b>Authored slot pools, not a flat pool:</b> SLOT_POOLS lists candidates per position;
+a run draws one zone per slot. <b>Random draws sit behind DOD_ZONE_ROTATION=1</b> and the
+default remains the fixed order — with today's single-candidate pools both modes draw
+identically, exactly the "build behind a flag until the pool fills" plan. The drawn
+sequence persists in the save (pre-rotation saves rebuild the fixed order); the victory
+screen's "Descend into..." button reads the actual next draw.</li>
+<li><b>The 11-tier invariant is documented where it bites:</b> talent income (~35
+points/run) assumes 3 zones × 11 tiers; every zone shares the same FLOORS ladder, and a
+future zone that wants a different length forces a cost-curve revisit first.</li>
+<li><b>What this batch does NOT do:</b> author new zones. Slot 1 and 3 want second
+candidates (an opener and a true finale) before the flag flips on — that is design + art
+work, and the recipe is now four data touches (zone def, slot candidacy, roster tags,
+background art keys) with zero formula edits.</li>
+<li>Verified headless: fixed-order equivalence across all three slots (name/roster/boss/
+next-zone peek), slot-2 boss node pre-rolls the Ash Tyrant, save/load keeps the draw,
+legacy saves fall back to fixed order, 20 flagged draws all stay inside their authored
+pools; theme satisfiability re-audited at 36/36 cells; parse + themed-sim smokes
+clean.</li>
+</ul>
+
 <h2>2026-07-26 — Batch 36: Scaling rebase — zone-local ladders, and the Tyrant earns a kit</h2>
 <ul>
 <li><b>Enemy scaling is zone-local now:</b> the global node-tier counter is gone. Each zone

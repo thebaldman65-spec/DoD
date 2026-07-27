@@ -290,8 +290,8 @@ const SPEC_ART := {
 # Support 50); ability damage is a % of it.
 func _enemy_config(kind: String) -> Dictionary:
 	if kind == "boss":
-		kind = "withered_warden" if (Run.zone_idx if Run.active else 0) in [0, 2] \
-			else "ash_tyrant"
+		# The zone def owns its boss (rotation-safe — never keyed on slot).
+		kind = Run.boss_kind() if Run.active else "withered_warden"
 	return Enemies.config(kind)
 
 
@@ -522,7 +522,7 @@ func _spawn_units() -> void:
 	elif env_theme != "":
 		# DOD_SIM_THEME="Cursed Company" rolls a fresh warband of that theme
 		# for EVERY sim battle (DOD_SIM_BUDGET, default 6, sets the exact
-		# power spend; DOD_SIM_ZONE, default 1, picks the roster) — the
+		# power spend; DOD_SIM_ZONE, default 1, picks the ROSTER id) — the
 		# resist-matrix harness samples a theme's whole combo space.
 		var t_budget := 6
 		if OS.get_environment("DOD_SIM_BUDGET") != "":
@@ -6349,7 +6349,7 @@ func _check_end() -> void:
 				Run.save_run()
 			if Run.has_next_zone():
 				_show_end("THE ZONE IS CLEANSED", boss_text,
-					[["Descend into %s" % Run.ZONES[Run.zone_idx + 1], _next_zone]], true)
+					[["Descend into %s" % Run.next_zone_name(), _next_zone]], true)
 			else:
 				Run.active = false
 				Run.clear_save()

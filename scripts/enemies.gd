@@ -47,12 +47,14 @@ static func resists_for(kind: String) -> Dictionary:
 	return _load().get(kind, {}).get("resists", {})
 
 
-# Kinds that may appear in a zone (1-based; unknown kinds never match).
-static func kinds_for_zone(zone: int) -> Array:
+# Kinds belonging to a ROSTER (the JSON "zones" tags are roster ids —
+# a zone def in run_state maps each slot it can host to one of these,
+# so rosters travel with zone identity, never with run position).
+static func kinds_for_roster(roster: int) -> Array:
 	var out: Array = []
 	for kind in _load():
-		if _load()[kind].get("zones", []).has(float(zone)) \
-				or _load()[kind].get("zones", []).has(zone):
+		if _load()[kind].get("zones", []).has(float(roster)) \
+				or _load()[kind].get("zones", []).has(roster):
 			out.append(kind)
 	return out
 

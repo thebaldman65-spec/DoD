@@ -33,13 +33,33 @@ var combat_wins := 0
 
 const SAVE_PATH := "user://run_save.bin"
 
-# Zone 3 repeats the Forest of Old for now (same roster/art; enemy stat
-# scaling continues via the global node tier). Its boss — the Withered
-# Warden again — is the FINAL boss.
-const ZONES := ["Forest of Old", "The Scarlands", "Forest of Old"]
+# Zone rotation (Batch 37): a run is SLOT_COUNT zone slots and each
+# slot draws ONE zone from its authored candidate pool — zones are
+# designed FOR a position (openers are not finales), so pools are
+# per-slot, never flat. Every zone runs the same FLOORS tiers: the
+# talent economy (~35 points/run) assumes 3 zones x 11 tiers, so a new
+# zone keeps 11 tiers or the cost curve gets revisited. A zone def
+# carries its display name (art + save key), its boss kind, and a
+# roster id per slot it can host — roster ids are what the "zones"
+# tags in enemies.json actually mean. The Forest of Old hosts slots 1
+# AND 3: roster 1 as the opener, the tougher roster 3 as the finale.
+# Random draws stay behind DOD_ZONE_ROTATION=1 (fixed first-candidate
+# order otherwise) until each pool holds ~2 candidates; with today's
+# single-candidate pools both modes draw identically.
+# Adding a zone = ZONE_DEFS entry + SLOT_POOLS candidacy + roster tags
+# in enemies.json + zone_name keys in the battle/map background dicts.
+const SLOT_COUNT := 3
+const ZONE_DEFS := {
+	"forest": {"name": "Forest of Old", "boss": "withered_warden",
+		"rosters": {1: 1, 3: 3}},
+	"scarlands": {"name": "The Scarlands", "boss": "ash_tyrant",
+		"rosters": {2: 2}},
+}
+const SLOT_POOLS := [["forest"], ["scarlands"], ["forest"]]
 var active_relics: Array = []  # up to 3 relic ids chosen at the draft
 var zone_idx := 0
 var zone_name := "Forest of Old"
+var zone_draw: Array = []  # this run's drawn zone ids, one per slot
 var party: Array = []      # [{key, hp, max_hp}] snapshots between battles
 var items := {}            # item id -> count (shared inventory)
 var map: Array = []        # map[floor] = [{type, links: [next-floor idx], visited}]
@@ -82,9 +102,8 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	gold = 60 + (80 if relic_active("coin") else 0)
 	combat_wins = 0
 	zone_idx = 0
-	zone_name = ZONES[0]
-	zone_idx = 0
-	zone_name = ZONES[0]
+	draw_zones()
+	_enter_zone()
 	floor_idx = -1
 	node_idx = -1
 	encounter = {}
@@ -226,11 +245,11 @@ var last_theme := ""  # theme of the most recently composed encounter
 
 
 # Test hook (DOD_SIM_THEME): one warband of the named theme at an exact
-# budget and zone, ignoring run state. Empty array when nothing fits.
-func compose_test(theme_name: String, budget: int, zone := 1) -> Array:
+# budget and roster, ignoring run state. Empty array when nothing fits.
+func compose_test(theme_name: String, budget: int, roster := 1) -> Array:
 	if not THEMES.has(theme_name):
 		return []
-	var combos := _theme_combos(THEMES[theme_name], budget, zone)
+	var combos := _theme_combos(THEMES[theme_name], budget, roster)
 	if combos.is_empty():
 		return []
 	last_theme = theme_name
@@ -287,7 +306,7 @@ func compose(node_type: String, tier := -1) -> Array:
 		return warband
 	# Nothing fit — plain mob fallback (kept as a safety net).
 	last_theme = "Warband"
-	var fb_kinds := Enemies.kinds_for_zone((zone_idx + 1) if active else 1) \
+	var fb_kinds := Enemies.kinds_for_roster(active_roster() if active else 1) \
 		.filter(func(k): return Enemies.power(k) <= 2)
 	if fb_kinds.is_empty():
 		fb_kinds = ["raider"]
@@ -301,10 +320,10 @@ func compose(node_type: String, tier := -1) -> Array:
 # Roles resolve to the kinds legal in the CURRENT zone; a kind with two
 # role tags is claimed by the first pooled role that wants it, so pool
 # caps never double-count.
-func _theme_combos(spec: Dictionary, budget: int, zone := -1) -> Array:
-	if zone <= 0:
-		zone = (zone_idx + 1) if active else 1
-	var zone_kinds := Enemies.kinds_for_zone(zone)
+func _theme_combos(spec: Dictionary, budget: int, roster := -1) -> Array:
+	if roster <= 0:
+		roster = active_roster() if active else 1
+	var zone_kinds := Enemies.kinds_for_roster(roster)
 	var role_kinds := {}
 	var claimed := {}
 	for role in spec["pool"]:
@@ -441,15 +460,55 @@ func generate_rune(class_key: String) -> Dictionary:
 	}
 
 
+func rotation_enabled() -> bool:
+	return OS.get_environment("DOD_ZONE_ROTATION") == "1"
+
+
+# One zone id per slot for this run. Fixed order = each pool's first
+# author; the rotation flag draws randomly within the authored pools.
+func draw_zones() -> void:
+	zone_draw = []
+	for slot in SLOT_COUNT:
+		var pool: Array = SLOT_POOLS[slot]
+		zone_draw.append(pool.pick_random() if rotation_enabled() else pool[0])
+
+
+func current_zone_id() -> String:
+	if zone_draw.is_empty():
+		draw_zones()
+	return zone_draw[clampi(zone_idx, 0, SLOT_COUNT - 1)]
+
+
+func next_zone_name() -> String:
+	if zone_idx + 1 >= SLOT_COUNT:
+		return ""
+	return ZONE_DEFS[zone_draw[zone_idx + 1]]["name"]
+
+
+# The enemy pool this zone fields AT ITS CURRENT SLOT (the Forest is
+# roster 1 as the opener, roster 3 as the finale).
+func active_roster() -> int:
+	var rosters: Dictionary = ZONE_DEFS[current_zone_id()]["rosters"]
+	return int(rosters.get(zone_idx + 1, rosters.values().front()))
+
+
+func boss_kind() -> String:
+	return ZONE_DEFS[current_zone_id()]["boss"]
+
+
+func _enter_zone() -> void:
+	zone_name = ZONE_DEFS[current_zone_id()]["name"]
+
+
 func has_next_zone() -> bool:
-	return zone_idx < ZONES.size() - 1
+	return zone_idx < SLOT_COUNT - 1
 
 
 # Move to the next zone: fresh map, path reset; the party is fully
 # restored as a reward for cleansing the zone.
 func advance_zone() -> void:
 	zone_idx += 1
-	zone_name = ZONES[zone_idx]
+	_enter_zone()
 	floor_idx = -1
 	node_idx = -1
 	encounter = {}
@@ -467,7 +526,8 @@ func save_run() -> void:
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	file.store_var({
 		"version": 1, "party": party, "items": items, "gold": gold,
-		"zone_idx": zone_idx, "zone_name": zone_name, "floor_idx": floor_idx,
+		"zone_idx": zone_idx, "zone_name": zone_name, "zone_draw": zone_draw,
+		"floor_idx": floor_idx,
 		"node_idx": node_idx, "specs_chosen": specs_chosen,
 		"active_relics": active_relics, "map": map,
 		"combat_wins": combat_wins,
@@ -511,6 +571,11 @@ func load_run() -> bool:
 	gold = data["gold"]
 	zone_idx = data["zone_idx"]
 	zone_name = data["zone_name"]
+	zone_draw = data.get("zone_draw", [])
+	if zone_draw.is_empty():
+		# Saves from before zone rotation ran the fixed order.
+		for slot in SLOT_COUNT:
+			zone_draw.append(SLOT_POOLS[slot][0])
 	floor_idx = data["floor_idx"]
 	node_idx = data["node_idx"]
 	specs_chosen = data["specs_chosen"]

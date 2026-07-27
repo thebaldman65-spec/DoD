@@ -63,6 +63,22 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+ZONE ROTATION (07-26, Batch 37): run = SLOT_COUNT(3) slots, each draws
+a zone id from SLOT_POOLS (authored PER SLOT — openers are not
+finales). Run.ZONE_DEFS: id → {name (art/save key), boss kind,
+rosters: {slot: roster_id}} — forest is {1:1, 3:3}, scarlands {2:2}.
+The old ZONES const is GONE; enemies.json "zones" tags = ROSTER ids
+(Enemies.kinds_for_roster — kinds_for_zone renamed);
+Run.active_roster()/boss_kind()/next_zone_name()/current_zone_id() are
+the accessors (battle boss branch + victory descend-button use them).
+zone_draw persists in the save (missing key = pre-rotation → fixed
+order rebuild). DOD_ZONE_ROTATION=1 randomizes draws within pools;
+default = fixed first-candidate order (identical while pools hold one
+candidate each). 11-TIER INVARIANT: talent economy assumes 3×11 tiers
+— a zone with a different tier count forces a cost-curve revisit.
+Adding a zone = ZONE_DEFS + SLOT_POOLS + roster tags + bg-art keys
+(battle.gd + map_screen.gd dicts). DOD_SIM_ZONE env = roster id.
+Scratchpad test_rotation.gd covers order/save/legacy/pool-membership.
 SCALING REBASE (07-26, Batch 36): enemy stats are ZONE-LOCAL —
 battle.gd spawn block does base × Run.zone_base_mult(zone_idx+1) ×
 (1 + rate × zone_tier), zone_tier = clampi(floor_idx+1, 1, 11), rates
