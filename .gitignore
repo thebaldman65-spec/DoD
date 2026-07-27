@@ -1,3 +1,5 @@
 # Godot-generated cache/import files
 .godot/
 *.import
+.DS_Store
+*.tmp
