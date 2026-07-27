@@ -172,6 +172,10 @@ func _draw_screen() -> void:
 				btn.modulate = Color(0.55, 0.52, 0.6)
 			btn.pressed.connect(Music.click)
 			btn.pressed.connect(_on_node_pressed.bind(f, i))
+			# Scouting hover: combat nodes reveal their warband and what it
+			# resists / crumples to, so routing and talent picks can answer.
+			if node.has("enemies"):
+				btn.tooltip_text = _warband_tooltip(node)
 			add_child(btn)
 
 
@@ -195,8 +199,13 @@ func _on_node_pressed(f: int, i: int) -> void:
 			Run.save_run()
 			get_tree().change_scene_to_file("res://scenes/shop.tscn")
 		_:
-			Run.encounter = {"type": node["type"], "enemies": Run.compose(node["type"]),
-				"theme": Run.last_theme}
+			# Pre-rolled at map birth; saves from before that compose here.
+			var warband: Array = node.get("enemies", [])
+			if warband.is_empty():
+				warband = Run.compose(node["type"])
+				node["theme"] = Run.last_theme
+			Run.encounter = {"type": node["type"], "enemies": warband,
+				"theme": node.get("theme", "Warband")}
 			get_tree().change_scene_to_file("res://scenes/battle.tscn")
 
 
@@ -245,6 +254,57 @@ func _on_burger(id: int) -> void:
 			Run.specs_chosen = false
 			Run.save_run()
 			get_tree().change_scene_to_file("res://scenes/spec_choice.tscn")
+
+
+# The hover card for a combat node: theme, lineup, and the warband's
+# damage-type identity — how many units resist a type and how many are
+# vulnerable to it ("Resists: Nature x3 / Soft to: Fire x2").
+func _warband_tooltip(node: Dictionary) -> String:
+	var kinds: Array = node["enemies"]
+	var counts := {}
+	for kind in kinds:
+		counts[kind] = int(counts.get(kind, 0)) + 1
+	var name_parts := PackedStringArray()
+	for kind in counts:
+		var label: String = Enemies.unit_name(kind)
+		if counts[kind] > 1:
+			label = "%dx %s" % [counts[kind], label]
+		name_parts.append(label)
+	# Units resisting / vulnerable per damage type, counted so one odd
+	# member never masquerades as the whole band's identity. Token trims
+	# (the 5-15% physical hides) stay off the card — only resists that
+	# change a fight plan (25%+) count; every vulnerability counts.
+	var resist_units := {}
+	var vuln_units := {}
+	for kind in kinds:
+		var res: Dictionary = Enemies.resists_for(kind)
+		for dtype in res:
+			if float(res[dtype]) >= 0.2:
+				resist_units[dtype] = int(resist_units.get(dtype, 0)) + 1
+			elif float(res[dtype]) < 0.0:
+				vuln_units[dtype] = int(vuln_units.get(dtype, 0)) + 1
+	var text := "%s\n%s" % [String(node.get("theme", "Warband")),
+		", ".join(name_parts)]
+	var hard := _type_counts_line(resist_units)
+	if hard != "":
+		text += "\nResists: %s" % hard
+	var soft := _type_counts_line(vuln_units)
+	if soft != "":
+		text += "\nSoft to: %s" % soft
+	return text
+
+
+# "Nature x3, Shadow x2" — biggest cluster first, bare name for singles.
+func _type_counts_line(units_by_type: Dictionary) -> String:
+	var types: Array = units_by_type.keys()
+	types.sort_custom(func(a, b): return units_by_type[a] > units_by_type[b])
+	var parts := PackedStringArray()
+	for dtype in types:
+		var label: String = String(dtype).capitalize()
+		if units_by_type[dtype] > 1:
+			label += " x%d" % units_by_type[dtype]
+		parts.append(label)
+	return ", ".join(parts)
 
 
 func _toast(text: String) -> void:

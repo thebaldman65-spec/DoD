@@ -467,6 +467,10 @@ func build_plate(root: Node2D) -> void:
 	_plate_panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	_plate_panel.mouse_entered.connect(set_highlight.bind(true))
 	_plate_panel.mouse_exited.connect(set_highlight.bind(false))
+	# Hovering the plate also answers "what hurts this thing": the unit's
+	# resist/vulnerability card (static snapshot — live shreds like
+	# Elemental Weakness stay on their status chips).
+	_plate_panel.tooltip_text = resist_summary()
 	root.add_child(_plate_panel)
 
 	var name_label := Label.new()
@@ -577,6 +581,27 @@ func _make_bar_text(pos: Vector2, bar_size: Vector2, font_size: int) -> Label:
 
 
 # Invisible click zone over the sprite, shown only while picking a target.
+# The hover card: what this unit shrugs off and what cuts deep. Reads the
+# final resists dict (weaknesses already folded in as negative values).
+func resist_summary() -> String:
+	var hard := PackedStringArray()
+	var soft := PackedStringArray()
+	for dtype in resists:
+		var v := float(resists[dtype])
+		if v > 0.005:
+			hard.append("%s %d%%" % [String(dtype).capitalize(), int(round(v * 100.0))])
+		elif v < -0.005:
+			soft.append("%s +%d%%" % [String(dtype).capitalize(), int(round(-v * 100.0))])
+	if hard.is_empty() and soft.is_empty():
+		return "%s\nNo resistances." % unit_name
+	var text := unit_name
+	if not hard.is_empty():
+		text += "\nResists: %s" % ", ".join(hard)
+	if not soft.is_empty():
+		text += "\nVulnerable: %s damage taken" % ", ".join(soft)
+	return text
+
+
 func _build_target_zone() -> void:
 	_target_btn = Button.new()
 	_target_btn.position = Vector2(-70, -110)
@@ -588,6 +613,8 @@ func _build_target_zone() -> void:
 	_target_btn.pressed.connect(func(): clicked.emit())
 	_target_btn.mouse_entered.connect(_on_target_hover.bind(true))
 	_target_btn.mouse_exited.connect(_on_target_hover.bind(false))
+	# While picking a target, hovering a body shows its resist card too.
+	_target_btn.tooltip_text = resist_summary()
 	_target_btn.visible = false
 	add_child(_target_btn)
 

@@ -37,6 +37,16 @@ static func roles(kind: String) -> Array:
 	return _load().get(kind, {}).get("roles", [])
 
 
+static func unit_name(kind: String) -> String:
+	return str(_load().get(kind, {}).get("unit_name", kind.capitalize()))
+
+
+# Resist profile straight from the data (dmg_type -> fraction; negative =
+# vulnerable). The map screen reads this to preview a warband's identity.
+static func resists_for(kind: String) -> Dictionary:
+	return _load().get(kind, {}).get("resists", {})
+
+
 # Kinds that may appear in a zone (1-based; unknown kinds never match).
 static func kinds_for_zone(zone: int) -> Array:
 	var out: Array = []

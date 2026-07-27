@@ -185,7 +185,10 @@ func _ready() -> void:
 	# environment so headless tests can exercise the skip path.
 	if OS.get_environment("DOD_ENEMIES_OFF") == "1":
 		debug_enemies_off = true
-	debug_prints = autoplay and not sim
+	# DOD_SIM_DEBUG=1 echoes every combat-log line even in sim mode — the
+	# tail of a hung run names the exact action that never resolved.
+	debug_prints = (autoplay and not sim) \
+		or OS.get_environment("DOD_SIM_DEBUG") == "1"
 	if sim:
 		Engine.max_fps = 0
 		if sim_started_ms == 0:
@@ -513,8 +516,26 @@ func _spawn_units() -> void:
 	# DOD_SIM_ENEMIES="boss,shieldmaster,shaman" forces the enemy lineup in
 	# autoplay/sim/standalone battles (testing hook, like DOD_SIM_SPECS).
 	var env_comp := OS.get_environment("DOD_SIM_ENEMIES")
+	var env_theme := OS.get_environment("DOD_SIM_THEME")
 	if env_comp != "":
 		composition = env_comp.split(",")
+	elif env_theme != "":
+		# DOD_SIM_THEME="Cursed Company" rolls a fresh warband of that theme
+		# for EVERY sim battle (DOD_SIM_BUDGET, default 6, sets the exact
+		# power spend; DOD_SIM_ZONE, default 1, picks the roster) — the
+		# resist-matrix harness samples a theme's whole combo space.
+		var t_budget := 6
+		if OS.get_environment("DOD_SIM_BUDGET") != "":
+			t_budget = maxi(int(OS.get_environment("DOD_SIM_BUDGET")), 1)
+		var t_zone := 1
+		if OS.get_environment("DOD_SIM_ZONE") != "":
+			t_zone = maxi(int(OS.get_environment("DOD_SIM_ZONE")), 1)
+		var themed: Array = Run.compose_test(env_theme, t_budget, t_zone)
+		if themed.is_empty():
+			push_error("DOD_SIM_THEME: no %s warband fits budget %d in zone %d" % [
+				env_theme, t_budget, t_zone])
+		else:
+			composition = themed
 	elif Run.active and Run.encounter.has("enemies"):
 		composition = Run.encounter["enemies"]
 	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 6)]
@@ -953,6 +974,22 @@ func _run_battle() -> void:
 					if nat_resist != 0.0:
 						dot_dmg = maxi(int(round(dot_dmg * (1.0 - nat_resist))), 0)
 						stack_tag += " (resisted)" if nat_resist > 0.0 else " (WEAK!)"
+				if dot_id == "burn":
+					# Burn is fire damage: fire resists shrug the tick the same
+					# way nature resists shrug poison (fire-proof stays true).
+					var fire_resist := float(u.resists.get("fire", 0.0))
+					if fire_resist != 0.0:
+						dot_dmg = maxi(int(round(dot_dmg * (1.0 - fire_resist))), 0)
+						stack_tag += " (resisted)" if fire_resist > 0.0 else " (WEAK!)"
+				# Sim bookkeeping: tick damage credits the spec that owns the
+				# lane (heroes never poison/burn each other, so the status
+				# names its owner: poison = Survivalist, burn = Pyromancer).
+				if sim and not u.is_hero and dot_dmg > 0:
+					var dot_owner := "Survivalist" if dot_id == "poison" else "Pyromancer"
+					for dh in heroes:
+						if dh.unit_name == dot_owner:
+							_stat("dmg_hero_" + dot_owner, dot_dmg)
+							break
 				var info: Array = STATUS_INFO[dot_id]
 				_sfx("hit", -14.0, 0.8)
 				var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
@@ -1370,7 +1407,11 @@ func _player_turn(u: BattleUnit) -> void:
 		elif ab.special == "resurrection":
 			# Resurrection targets the FALLEN (the usable gate guarantees one).
 			var fallen := heroes.filter(func(h): return h.dead)
-			if fallen.size() == 1:
+			if autoplay and not fallen.is_empty():
+				# The bot cannot click the picker — with 2+ fallen it would
+				# await a target forever and hang the whole sim run.
+				target = fallen[0]
+			elif fallen.size() == 1:
 				target = fallen[0]
 			elif fallen.size() > 1:
 				used_targeting = true
@@ -1431,6 +1472,15 @@ func _player_turn(u: BattleUnit) -> void:
 			if grade != "cancel":
 				break
 		# Cancelled: back to the action bar to pick something else.
+		if autoplay:
+			# The bot has no action bar to return to — a null target here is
+			# a targeting bug; fall back to the basic attack on the first
+			# living enemy so a sim NEVER hangs awaiting a click.
+			push_warning("autoplay: null target for %s — basic-attack fallback"
+				% ab.display_name)
+			ab = u.abilities[0]
+			auto_target = enemies.filter(func(e): return not e.dead).front()
+			continue
 		_preview_locked = false
 		_rebuild_turn_bar()
 		_show_actions(u)
@@ -3900,6 +3950,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					+ int(0.10 * trapper.wire_ranks * trapper.attack)
 				ret = int(round(ret * (1.0 + 0.15 * trapper.cruel_ranks)))
 				var ret_result: Dictionary = attacker.take_hit(ret, 0)
+				_stat("dmg_hero_" + trapper.unit_name, ret)
 				attacker.float_text("%d Tripwire" % ret, Color(0.8, 0.65, 0.35))
 				_log("   → %s's tripwire rips %s for %d" % [trapper.unit_name,
 					attacker.unit_name, ret], "#50c8e0")
@@ -5569,6 +5620,10 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	var comp_armor := victim.effective_armor() * (1.0 - clampf(pen, 0.0, 1.0))
 	var final := maxi(int(round(raw * (1.0 - comp_armor))), 1)
 	var result: Dictionary = victim.take_hit(final, pr)
+	# Sim bookkeeping: the beast's damage is the hunter's damage.
+	if not victim.is_hero:
+		var comp_credit: BattleUnit = pm if pm != null else comp
+		_stat("dmg_hero_" + comp_credit.unit_name, final)
 	_sfx("crit" if is_crit else "hit", -4.0 if is_crit else -7.0, 1.1)
 	victim.float_text("%d%s" % [final, "!" if is_crit else ""],
 		Color(1.0, 0.45, 0.15) if is_crit else Color(0.9, 0.75, 0.55), is_crit)
@@ -5683,6 +5738,7 @@ func _forest_bite(enemy: BattleUnit) -> void:
 		var fb := maxi(int(trapper.attack * (0.25 + 0.10 * trapper.wire_ranks) \
 			* (1.0 + 0.15 * trapper.cruel_ranks)), 1)
 		var fb_res: Dictionary = enemy.take_hit(fb, 0)
+		_stat("dmg_hero_" + trapper.unit_name, fb)
 		enemy.float_text("%d Tripwire" % fb, Color(0.8, 0.65, 0.35))
 		_log("   → the forest bites %s for %d" % [enemy.unit_name, fb], "#50c8e0")
 		if fb_res.died:
@@ -5703,6 +5759,7 @@ func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float) -> void:
 		tr_raw *= 1.0 - float(victim.resists.get("nature", 0.0))
 		var tr_final := maxi(int(round(tr_raw * (1.0 - victim.effective_armor()))), 1)
 		var tr_res: Dictionary = victim.take_hit(tr_final, 0)
+		_stat("dmg_hero_" + placer.unit_name, tr_final)
 		victim.float_text("%d Trap" % tr_final, Color(0.75, 0.65, 0.30))
 		_log("   → the trap bites %s for %d" % [victim.unit_name, tr_final],
 			"#c8a860")
@@ -6327,6 +6384,9 @@ func _print_sim_report() -> void:
 	var landed := maxf(sim_stats.get("attack_landed", 0.0), 1.0)
 	var elapsed := (Time.get_ticks_msec() - sim_started_ms) / 1000.0
 	print("\n===== DAWN OF DECAY — SIMULATION REPORT =====")
+	if OS.get_environment("DOD_SIM_THEME") != "":
+		print("Theme: %s (budget %s, zone %s)" % [OS.get_environment("DOD_SIM_THEME"),
+			OS.get_environment("DOD_SIM_BUDGET"), OS.get_environment("DOD_SIM_ZONE")])
 	print("Battles: %d   Wins: %d (%.0f%%)   Sim time: %.1fs" % [int(battles),
 		int(sim_stats.get("wins", 0.0)), 100.0 * sim_stats.get("wins", 0.0) / battles, elapsed])
 	print("Avg rounds/battle (hero turns / 3): %.1f" % [

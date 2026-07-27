@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-25</b></p>
+<p align="right"><b>Last updated: 2026-07-26</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -55,6 +55,11 @@ themes, double talent points, more gold).</td></tr>
 <tr><td>Shop</td><td>6</td><td>20%</td><td>The Wandering Peddler: consumables + one rune offer
 per party member (see §8).</td></tr>
 </table>
+<p><b>Warbands are pre-rolled at map birth and scoutable:</b> every combat node carries its
+warband from the moment the map is generated, and <b>hovering the node shows the theme, the
+full lineup, and the band's damage-type identity</b> — how many units resist a type and how
+many are soft to it ("Resists: Nature x3 / Soft to: Fire x2"). The boss escort is readable
+from tier 1, so resist counterplay can shape routing and talent picks all zone long.</p>
 <p>The deck is shuffled and dealt 3 per tier (tier 1 is guaranteed at least one fight so runs
 open with combat). <b>Connectivity is deliberately limited:</b> every node links to its own
 column on the next tier, plus a 70% chance of ONE adjacent column — never all three. The player
@@ -179,13 +184,16 @@ below half HP; Mage Resonance +5% damage
 consumed.</li>
 <li><b>Armor:</b> flat % damage reduction. Fortify +10%; Broken ×0.7; Sunder ×0.65; Armor
 Penetration ignores a fraction.</li>
-<li><b>Damage types (7):</b> physical, fire, frost, arcane, nature, shadow, holy. Enemies carry
-resist fractions per type.</li>
-<li><b>Weaknesses:</b> a unit can be WEAK to a damage type — it takes <b>25% extra damage</b>
-from it (stored as a negative resist, so weaknesses stack with resists). Hits on a weakness
-flash <b>WEAK!</b> over the target and are tagged in the combat log; weak-to-nature units
-also take amplified Poison ticks. Who is weak to what is per-enemy design (to be assigned;
-currently the Ash-Wrought Tyrant is weak to frost).</li>
+<li><b>Damage types (7):</b> physical, fire, frost, arcane, nature, shadow, holy. Every enemy
+kind carries a deliberate resist AND vulnerability profile (see the bestiary §9) — themes
+inherit them, so a warband reads strong against some damage types and soft to others, and
+the theme name carries tactical information.</li>
+<li><b>Vulnerabilities:</b> a unit can be soft to a damage type — a negative resist, typically
+<b>25% extra damage</b> taken from it. Hits on a vulnerability flash <b>WEAK!</b> over the
+target and are tagged in the combat log; nature-soft units also take amplified Poison ticks
+(and fire-soft units amplified Burn ticks). Vulnerabilities are counterplay, never hidden:
+they show on the map's warband hover BEFORE committing to a fight, and on every unit's
+nameplate hover in battle.</li>
 <li><b>Barrier</b> absorbs damage (not BD) before HP.</li>
 </ul>
 <h3>4.4 Break damage &amp; Break</h3>
@@ -210,9 +218,10 @@ Devoutness talent cuts it 5% per rank; Bulwark of Fortitude negates it entirely.
 20% max HP</b> and the meter resets. <b>Bleedout damage ignores armor</b> entirely.</li>
 <li><b>Burn:</b> 6% of the applier's Attack (snapshotted when it lands; ≈6 at 100 Atk) at
 the start of the afflicted unit's turn; ticks can crit using the caster's snapshotted crit
-chance. <b>Reapplication extends duration</b> — every fresh Burn ADDS its applied turns
-to the running timer (a 3-turn Fireball on a burning target = +3 turns, announced with a
-"Burn +N turns" float).</li>
+chance. <b>Burn counts as fire damage</b> — fire resists reduce the tick and fire
+vulnerability raises it, exactly as nature does for Poison. <b>Reapplication extends
+duration</b> — every fresh Burn ADDS its applied turns to the running timer (a 3-turn
+Fireball on a burning target = +3 turns, announced with a "Burn +N turns" float).</li>
 <li><b>Poison:</b> 3% of the applier's Attack per stack (snapshotted; ≈3 at 100 Atk) at the
 start of the afflicted unit's turn.
 <b>Poison counts as nature damage</b> — nature resists reduce the tick (and nature
@@ -1035,41 +1044,50 @@ so new enemies read as tinted orcs until per-kind art lands — a known, accepte
 <table border="1" cellpadding="4">
 <tr><th>Enemy</th><th>Pw</th><th>Roles</th><th>Zones</th><th>HP</th><th>Kit sketch</th></tr>
 <tr><td>Orc Raider</td><td>1</td><td>skirmisher</td><td>1·2·3</td><td>140</td><td>Slash;
-Sundering Strike (60% Sunder 2t).</td></tr>
+Sundering Strike (60% Sunder 2t). Physical resist 10% — otherwise the neutral
+baseline orc.</td></tr>
 <tr><td>Orc Whelp (pale)</td><td>1</td><td>skirmisher</td><td>1·3</td><td>90</td><td>Fast,
-frail: Frenzied Nip; Reckless Lunge.</td></tr>
+frail: Frenzied Nip; Reckless Lunge. Soft to nature AND shadow (young flesh, weak
+will).</td></tr>
 <tr><td>Orc Slinger (tan)</td><td>1</td><td>sniper</td><td>1·2</td><td>100</td><td>Ranged:
-Stone Sling; Skull Crack (38 BD — a Break specialist).</td></tr>
+Stone Sling; Skull Crack (38 BD — a Break specialist). Soft to frost (bare sling
+fingers).</td></tr>
 <tr><td>Orc Totemist (teal)</td><td>1</td><td>mender</td><td>1·3</td><td>90</td><td>Weak
-support: Totem Jab; Healing Wave (25% max to the most wounded sub-40% ally).</td></tr>
+support: Totem Jab; Healing Wave (25% max to the most wounded sub-40% ally). Nature resist
+25%; soft to shadow (spirit-open).</td></tr>
 <tr><td>Orc Archer (red)</td><td>1</td><td>sniper·hexer</td><td>1·2·3</td><td>110</td>
-<td>Arrow Shot; Poison Arrow (70% Poison 3t).</td></tr>
+<td>Arrow Shot; Poison Arrow (70% Poison 3t). Physical resist 5%; soft to frost.</td></tr>
 <tr><td>Orc Shieldmaster (orange)</td><td>2</td><td>bulwark</td><td>1·2·3</td><td>150</td>
-<td>Strike; Shielding (25% ward, one ally at a time, always re-cast).</td></tr>
+<td>Strike; Shielding (25% ward, one ally at a time, always re-cast). Physical resist 15%;
+soft to arcane (the shield stops steel, not raw magic).</td></tr>
 <tr><td>Orc Shaman (blue)</td><td>2</td><td>mender</td><td>1·2·3</td><td>110</td><td>Chain
-Lightning (party-wide nature); Healing Wave. Resists fire/frost 25%, nature 50%.</td></tr>
+Lightning (party-wide nature); Healing Wave. Resists fire/frost 25%, nature 50%; soft to
+shadow (corruptible spirits).</td></tr>
 <tr><td>Orc Hexer (purple)</td><td>2</td><td>hexer</td><td>1·2·3</td><td>120</td><td>Ranged
 shadow caster: Hex Bolt; Withering Hex (70% Exposed 2t); Bone Rattle (34 BD). Resists
-shadow 50%, WEAK to holy.</td></tr>
+shadow 50%; soft to holy AND nature.</td></tr>
 <tr><td>Wolfrider (grey)</td><td>2</td><td>skirmisher</td><td>1·2</td><td>130</td><td>Speed
-125: Lunging Bite; Ride-by Slash (50% Cripple 2t).</td></tr>
+125: Lunging Bite; Ride-by Slash (50% Cripple 2t). Physical resist 5%; soft to nature
+(living beast — poison rips through).</td></tr>
 <tr><td>Ashblade (ember)</td><td>2</td><td>skirmisher</td><td>2</td><td>135</td><td>Cinder
-Slash (fire); Flame Lick (60% Burn 2t). Fire resist 50%, WEAK to frost.</td></tr>
+Slash (fire); Flame Lick (60% Burn 2t). Fire resist 50%; soft to frost.</td></tr>
 <tr><td>Orc Brute (brown, large)</td><td>3</td><td>brute</td><td>1·2·3</td><td>260</td>
-<td>Smash; Overhead Crush (50 BD).</td></tr>
+<td>Smash; Overhead Crush (50 BD). Physical resist 10%; soft to shadow (dumb muscle, weak
+mind).</td></tr>
 <tr><td>Bog Troll (green, large)</td><td>3</td><td>brute·bulwark</td><td>1·3</td><td>300</td>
 <td>Claw; Swampy Grasp (70% Slowed 2t); Regenerate (25% self-heal when bloodied). Nature
-resist 50%, WEAK to fire.</td></tr>
+resist 50%; soft to fire.</td></tr>
 <tr><td>Rot Behemoth (dun, large)</td><td>3</td><td>brute·hexer</td><td>2·3</td><td>280</td>
 <td>Rotting Fist (50% Poison 3t); Wretched Bellow (party-wide nature + BD). Nature 50%,
-shadow 25%, WEAK to holy.</td></tr>
+shadow 25%; soft to holy.</td></tr>
 <tr><td>Orc Chief (elite)</td><td>4</td><td>elite</td><td>1·2·3</td><td>250</td><td>Rage
-user: Strike (+15 Rage); Heavy Strike 30R; Crushing Blow 20R (56 BD).</td></tr>
+user: Strike (+15 Rage); Heavy Strike 30R; Crushing Blow 20R (56 BD). Physical resist 15%;
+soft to arcane (magic pierces plate).</td></tr>
 <tr><td>Withered Warden (boss)</td><td>7</td><td>boss</td><td>1·3</td><td>500</td><td>Unique
-kit, nature resist 75%: Timber Slam (Dazed 3t); Roots of Wrath (party Poison); Wild
-Growth.</td></tr>
+kit: Timber Slam (Dazed 3t); Roots of Wrath (party Poison); Wild Growth. Nature resist 50%;
+soft to fire (withered wood burns) — both scoutable on the map from tier 1.</td></tr>
 <tr><td>Ash-Wrought Tyrant (boss)</td><td>7</td><td>boss</td><td>2</td><td>370</td><td>Chief
-kit, 20 starting Rage. Fire 50%, WEAK to frost.</td></tr>
+kit, 20 starting Rage. Fire 50%, physical 10%; soft to frost.</td></tr>
 </table>
 <p><b>Compositions — the power-budget system:</b> every battle rolls a power budget that is
 ALWAYS spent exactly (<b>tiers 1–3 roll 3–6, tiers 4–7 roll 6–9, tiers 8–11 roll
@@ -1116,7 +1134,9 @@ every unit's readouts live on a <b>144px nameplate</b> in a stack behind its par
 heroes' plates along the LEFT edge, enemies' along the RIGHT. A plate holds a
 <b>portrait</b> (dedicated art if the unit has it — the Berserker does — else a sprite
 close-up), the unit's name, HP bar, resource bar(s), Break meter with numeric x/100
-readout, and its status chips (hover for tooltips; Bleed buildup is a chip).
+readout, and its status chips (hover for tooltips; Bleed buildup is a chip). <b>Hovering a
+plate (or a body while targeting) shows the unit's resist card</b> — what it resists and
+what it is vulnerable to — so counterplay is never hidden information.
 <b>The battle UI is deliberately compact</b> (144px plates, 240px log,
 compact action bar and initiative portraits) so the field dominates the screen.
 <b>The acting unit's plate glows with a gold border — that IS the turn

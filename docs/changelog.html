@@ -5,6 +5,47 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-26 — Batch 35: Roguelike push II — resists &amp; vulnerabilities everywhere, scoutable warbands</h2>
+<ul>
+<li><b>Resist/vulnerability pass across the whole roster:</b> every enemy kind now carries a
+deliberate profile — resists AND softness, expressed as negative resists (the separate
+"weak" arrays are folded in and retired from the data). New vulnerabilities: Whelp
+nature+shadow, Slinger/Archer frost, Shieldmaster+Chief arcane (magic pierces plate),
+Totemist/Shaman/Brute shadow, Wolfrider+Hexer nature. Shieldmaster gains the physical 15%
+his shield always promised.</li>
+<li><b>Theme identity follows:</b> warbands now read strong/soft as bands — Honor Guard and
+Guardian Circle crumple to arcane, Ritual and Lightning Storm to shadow, Swarm melts to
+casters, the snipers of Poison Volley to frost, and both Boss Escorts carry an elemental
+answer (fire vs the Warden, frost vs the Tyrant).</li>
+<li><b>Withered Warden audit (design-review flag):</b> nature resist 75% → <b>50%</b>, and
+the withered wood is <b>soft to fire (+25%)</b>. The Survivalist's poison lane is dampened
+against him — visibly, as deliberate counterplay — no longer quartered into feeling
+broken.</li>
+<li><b>Resists are never hidden information now:</b> (1) <b>warbands are pre-rolled at map
+birth</b> and every combat node's hover shows theme, lineup, and aggregate identity
+("Resists: Nature x3 / Soft to: Fire x2") — the boss escort is scoutable from tier 1, so
+routing and talent points can answer it; (2) in battle, <b>hovering any nameplate or a
+body while targeting shows the unit's resist card</b>; (3) the combat log keeps itemizing
+what each resist ate. Saves from before this batch keep composing on node entry
+(fallback), new maps carry their warbands.</li>
+<li><b>Burn is now fire-typed on the tick</b>, mirroring poison's nature typing: fire
+resists shrug part of the burn, fire-soft targets (both forest bosses' escorts beware)
+take amplified ticks. Fire-proof kinds finally read true against the Pyromancer.</li>
+<li><b>Sim harness — the theme matrix:</b> DOD_SIM_THEME (+ DOD_SIM_BUDGET / DOD_SIM_ZONE)
+rolls a fresh warband of one theme every sim battle; the report prints the theme header.
+Sim damage attribution now credits DoT ticks (poison → Survivalist, burn → Pyromancer),
+companion strikes (→ the Beastmaster), traps, and tripwire bites to their owners, so
+damage-share numbers finally reflect the specs that damage indirectly.</li>
+<li><b>Sim deadlock fixed (latent, surfaced by the matrix):</b> the Resurrection target
+picker awaited a mouse click even in bot battles — with two or more fallen heroes the
+whole sim run hung forever at idle CPU. The bot now revives the first fallen; the
+targeting loop additionally falls back to a basic attack (with a warning) on ANY null bot
+target, so no picker can ever hang a sim again.</li>
+<li>Verified: 12-spec × 14-warband-config damage-share matrix simmed headless (3 party
+rotations × 25 battles per cell batch); parse checks clean on battle/map/menu; map
+pre-roll asserted across a zone advance by a headless script.</li>
+</ul>
+
 <h2>2026-07-25 — Batch 34: Roguelike push I — enemy roster 6 → 15, data-driven, role-based themes</h2>
 <ul>
 <li><b>Phase 1 — data extraction:</b> every enemy now lives in <b>data/enemies.json</b>

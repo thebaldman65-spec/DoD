@@ -63,6 +63,37 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+RESISTS & VULNERABILITIES EVERYWHERE (07-26, Batch 35, roguelike push
+II): every kind in enemies.json now carries resists AND vulns as
+NEGATIVE RESISTS — the "weak" arrays are GONE from the data (unit.gd
+still folds config "weak" for compat; don't reintroduce them). New
+vulns: whelp nat+shad, slinger/archer frost, shieldmaster+chief arcane,
+totemist/shaman/brute shadow, wolfrider+hexer nature; shieldmaster
+gains phys 0.15. WARDEN AUDITED: nature 0.75→0.5 + fire -0.25 (the
+Survivalist poison lane is dampened-not-dead; pyro = boss counter).
+BURN TICKS ARE FIRE-TYPED at the DoT site (mirrors poison's nature
+block; "(resisted)"/"(WEAK!)" tags). MAPS PRE-ROLL WARBANDS at
+_generate_map (node["enemies"]+["theme"], compose(type, f+1) via
+battle_budget(tier)); map click uses stored warband (fallback composes
+for old saves); node hover = _warband_tooltip (theme, lineup,
+"Resists: Nature x3 / Soft to: Fire x2" — resist counts SKIP entries
+< 0.2 so 5-15% physical trims stay off the identity card; vulns always
+count). Battle: plate hover + targeting hover = unit.resist_summary()
+(exact %s, weak folded; static — elem_weak shreds stay on chips).
+Enemies.unit_name/resists_for read raw JSON for the map. SIM MATRIX
+HARNESS: DOD_SIM_THEME="Cursed Company" (+DOD_SIM_BUDGET def 6,
+DOD_SIM_ZONE def 1) re-rolls that theme via Run.compose_test each sim
+battle (push_error + default lineup when nothing fits); report prints
+the theme header. Sim dmg attribution now credits DoT ticks by lane
+owner (poison→Survivalist, burn→Pyromancer — heroes never DoT each
+other), companion hits→pack_master, trap/tripwire/forest bites→their
+hero. SIM-HANG FIX + GOTCHA: any `await _pick_target`/`_ability_picked`
+reachable in autoplay = the whole sim run hangs at ~2% CPU (idle frame
+loop; looks like OS throttling — it is not). Resurrection's multi-fallen
+picker did exactly that (bot now takes fallen[0]); the targeting loop's
+cancelled-branch also basic-attack-fallbacks + push_warning under
+autoplay so NO null target can ever hang a sim again. New modal/picker
+flows MUST bot-guard their awaits.
 ENEMY ROSTER 6→15 (07-25, Batch 34, roguelike push I): all enemy data
 in data/enemies.json → scripts/enemies.gd (class_name Enemies; caches
 JSON; config() restores ints — JSON floats break Ability.make's typed

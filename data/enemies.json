@@ -70,7 +70,10 @@
    0.85
   ],
   "sprite_scale": 2.9,
-  "resists": {},
+  "resists": {
+   "nature": -0.25,
+   "shadow": -0.25
+  },
   "abilities": [
    {
     "display_name": "Frenzied Nip",
@@ -111,7 +114,9 @@
    0.82,
    0.55
   ],
-  "resists": {},
+  "resists": {
+   "frost": -0.25
+  },
   "abilities": [
    {
     "display_name": "Stone Sling",
@@ -153,7 +158,8 @@
    0.9
   ],
   "resists": {
-   "nature": 0.25
+   "nature": 0.25,
+   "shadow": -0.25
   },
   "abilities": [
    {
@@ -199,7 +205,8 @@
    0.35
   ],
   "resists": {
-   "physical": 0.05
+   "physical": 0.05,
+   "frost": -0.25
   },
   "abilities": [
    {
@@ -248,7 +255,10 @@
    0.62,
    0.2
   ],
-  "resists": {},
+  "resists": {
+   "physical": 0.15,
+   "arcane": -0.25
+  },
   "abilities": [
    {
     "display_name": "Strike",
@@ -294,7 +304,8 @@
   "resists": {
    "fire": 0.25,
    "frost": 0.25,
-   "nature": 0.5
+   "nature": 0.5,
+   "shadow": -0.25
   },
   "abilities": [
    {
@@ -342,7 +353,8 @@
   ],
   "resists": {
    "shadow": 0.5,
-   "holy": -0.25
+   "holy": -0.25,
+   "nature": -0.25
   },
   "abilities": [
    {
@@ -400,7 +412,8 @@
   ],
   "sprite_scale": 3.5,
   "resists": {
-   "physical": 0.05
+   "physical": 0.05,
+   "nature": -0.25
   },
   "abilities": [
    {
@@ -446,11 +459,9 @@
    0.2
   ],
   "resists": {
-   "fire": 0.5
+   "fire": 0.5,
+   "frost": -0.25
   },
-  "weak": [
-   "frost"
-  ],
   "abilities": [
    {
     "display_name": "Cinder Slash",
@@ -500,7 +511,8 @@
   ],
   "sprite_scale": 3.7,
   "resists": {
-   "physical": 0.1
+   "physical": 0.1,
+   "shadow": -0.25
   },
   "abilities": [
    {
@@ -544,11 +556,9 @@
   ],
   "sprite_scale": 3.8,
   "resists": {
-   "nature": 0.5
+   "nature": 0.5,
+   "fire": -0.25
   },
-  "weak": [
-   "fire"
-  ],
   "abilities": [
    {
     "display_name": "Claw",
@@ -606,11 +616,9 @@
   "sprite_scale": 4.0,
   "resists": {
    "nature": 0.5,
-   "shadow": 0.25
+   "shadow": 0.25,
+   "holy": -0.25
   },
-  "weak": [
-   "holy"
-  ],
   "abilities": [
    {
     "display_name": "Rotting Fist",
@@ -664,7 +672,8 @@
   ],
   "sprite_scale": 3.9,
   "resists": {
-   "physical": 0.15
+   "physical": 0.15,
+   "arcane": -0.25
   },
   "abilities": [
    {
@@ -718,7 +727,8 @@
   ],
   "sprite_scale": 4.4,
   "resists": {
-   "nature": 0.75
+   "nature": 0.5,
+   "fire": -0.25
   },
   "abilities": [
    {
@@ -784,11 +794,9 @@
   "sprite_scale": 4.4,
   "resists": {
    "fire": 0.5,
-   "physical": 0.1
+   "physical": 0.1,
+   "frost": -0.25
   },
-  "weak": [
-   "frost"
-  ],
   "abilities": [
    {
     "display_name": "Strike",

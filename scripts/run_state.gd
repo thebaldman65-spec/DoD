@@ -145,6 +145,15 @@ func _generate_map() -> void:
 			if not has_inbound:
 				var nearest := 0 if b == 1 else int(round(j * float(a - 1) / float(maxi(b - 1, 1))))
 				map[f][nearest]["links"].append(j)
+	# Warbands are pre-rolled at map birth: every combat node carries its
+	# enemies + theme, so the map can show what resists what BEFORE the
+	# player commits (scouting resists is counterplay, not a spoiler).
+	# The click handler still composes on the spot for pre-change saves.
+	for f in FLOORS:
+		for node in map[f]:
+			if node["type"] in ["fight", "elite", "boss"]:
+				node["enemies"] = compose(node["type"], f + 1)
+				node["theme"] = last_theme
 
 
 # Node indices on the next floor the player may move to.
@@ -216,12 +225,28 @@ const THEMES := {
 var last_theme := ""  # theme of the most recently composed encounter
 
 
+# Test hook (DOD_SIM_THEME): one warband of the named theme at an exact
+# budget and zone, ignoring run state. Empty array when nothing fits.
+func compose_test(theme_name: String, budget: int, zone := 1) -> Array:
+	if not THEMES.has(theme_name):
+		return []
+	var combos := _theme_combos(THEMES[theme_name], budget, zone)
+	if combos.is_empty():
+		return []
+	last_theme = theme_name
+	var warband: Array = combos.pick_random()
+	warband.shuffle()
+	return warband
+
+
 # The budget scales across EACH ZONE (tier = the floor within the zone,
 # 1-11 with the boss on 11): tiers 1-3 roll 3-6, tiers 4-7 roll 6-9,
 # tiers 8-11 roll 10-12. Later zones restart the ladder with a tougher
 # roster carrying higher base stats (Forest of Old is the focus for now).
-func battle_budget() -> int:
-	var tier := clampi(floor_idx + 1, 1, FLOORS)
+func battle_budget(tier := -1) -> int:
+	if tier <= 0:
+		tier = floor_idx + 1
+	tier = clampi(tier, 1, FLOORS)
 	if tier <= 3:
 		return randi_range(3, 6)
 	if tier <= 7:
@@ -229,8 +254,8 @@ func battle_budget() -> int:
 	return randi_range(10, 12)
 
 
-func compose(node_type: String) -> Array:
-	var budget := battle_budget()
+func compose(node_type: String, tier := -1) -> Array:
+	var budget := battle_budget(tier)
 	var candidates: Array = []
 	for theme_name in THEMES:
 		if THEMES[theme_name]["nodes"].has(node_type):
@@ -260,8 +285,10 @@ func compose(node_type: String) -> Array:
 # Roles resolve to the kinds legal in the CURRENT zone; a kind with two
 # role tags is claimed by the first pooled role that wants it, so pool
 # caps never double-count.
-func _theme_combos(spec: Dictionary, budget: int) -> Array:
-	var zone_kinds := Enemies.kinds_for_zone((zone_idx + 1) if active else 1)
+func _theme_combos(spec: Dictionary, budget: int, zone := -1) -> Array:
+	if zone <= 0:
+		zone = (zone_idx + 1) if active else 1
+	var zone_kinds := Enemies.kinds_for_zone(zone)
 	var role_kinds := {}
 	var claimed := {}
 	for role in spec["pool"]:
