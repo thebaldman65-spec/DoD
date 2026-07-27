@@ -7,11 +7,13 @@ const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 const NODE_LABELS := {
 	"fight": "Fight", "elite": "ELITE", "rest": "Rest",
 	"treasure": "Loot", "boss": "BOSS", "shop": "Shop",
+	"event": "???",
 }
 const NODE_COLORS := {
 	"fight": Color(0.75, 0.72, 0.65), "elite": Color(0.95, 0.55, 0.3),
 	"rest": Color(0.5, 0.85, 0.55), "treasure": Color(0.95, 0.85, 0.4),
 	"boss": Color(0.9, 0.3, 0.35), "shop": Color(0.5, 0.8, 0.95),
+	"event": Color(0.78, 0.55, 0.95),
 }
 
 
@@ -198,6 +200,18 @@ func _on_node_pressed(f: int, i: int) -> void:
 		"shop":
 			Run.save_run()
 			get_tree().change_scene_to_file("res://scenes/shop.tscn")
+		"event":
+			# Events are drawn at the door, never pre-rolled — "???" nodes
+			# stay a mystery on the map (unlike scoutable warbands).
+			Run.pending_event = Events.pick(Run)
+			if Run.pending_event == "":
+				Run.save_run()
+				_draw_screen()
+				_toast("The road is quiet. Nothing happens.")
+			else:
+				Run.seen_events.append(Run.pending_event)
+				Run.save_run()
+				get_tree().change_scene_to_file("res://scenes/event.tscn")
 		_:
 			# Pre-rolled at map birth; saves from before that compose here.
 			var warband: Array = node.get("enemies", [])

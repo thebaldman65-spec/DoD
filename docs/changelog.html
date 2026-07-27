@@ -5,6 +5,43 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-26 — Batch 38: Event nodes — "???" on the map, a verb vocabulary underneath</h2>
+<ul>
+<li><b>New node type: Event ("???", violet).</b> The zone deck is now 17 fights / 5 rest /
+5 shops / 3 events (the ~1 talent point the lost fight cost per run returns through
+point-granting events). Events are drawn AT THE DOOR — never pre-rolled, never scoutable —
+weighted, requirement-filtered, and non-repeating per run (seen ids persist in the save;
+the filter relaxes only when the pool exhausts).</li>
+<li><b>The load-bearing part is the schema, not the content:</b> data/events.json +
+an Events static class with a dispatch table of <b>12 effect verbs</b> (gold, gold_pct,
+heal_pct, damage_pct — floors at 1 HP, events never kill — mana_pct, max_hp_pct,
+attack_pct banked on the member and applied at battle spawn, talent_points, item,
+random_item, revive_pct, relic_grant with a +40g full-slots fallback), <b>4 target
+selectors</b> (party / random / lowest_hp / class:&lt;key&gt;) and <b>6 requirement
+conditions</b> (min_gold, max_gold, zone_slot, has_item, spec_in_party, fallen_hero) that
+gate events at selection and grey out choices with the reason. Adding an event is a JSON
+edit; adding a verb is one handler. The run object is injected, so the whole system tests
+headless without autoloads.</li>
+<li><b>16 events ship</b> (spec floor was 15; schema built for 40+): free boons, priced
+boons, gambles, curses, two spec-flavored (Survivalist's trapper camp, a mages-only
+obelisk), three zone-gated (the Old Spring, a Scarlands mirage, the finale's Warden
+echo), a relic dig, and the Cairn of the Fallen — which only appears when someone is dead
+and raises all the fallen at 35%.</li>
+<li><b>New event screen</b> (scenes/event.tscn, code-built like every screen): zone art,
+title, flavor text, choice buttons with requirement tooltips, outcome + itemized effect
+summary, Continue to the map. Quitting mid-event forfeits it (the node stays spent) —
+documented, deliberate.</li>
+<li><b>Save format bumped to v2</b> (adds seen_events; zone_draw from Batch 37 rides the
+same bump). Loading remains explicitly tolerant of v1 saves via defaulted fields — no
+player state is dropped.</li>
+<li>Verified headless: schema audit of all 16 events (verbs/targets/requirements all in
+vocabulary), every effect of every choice applied against a live run with clamps holding
+(gold ≥ 0, 1 ≤ hp ≤ max_hp, max_hp ≥ 10), damage_pct provably non-lethal, revive/relic
+edge cases, gated events never drawn in slot 1, no repeats before pool exhaustion,
+seen_events save round-trip, and a full map → ??? → choice → outcome → map click-through.
+Sim discipline: 40/40 before and after (events touch no combat path).</li>
+</ul>
+
 <h2>2026-07-26 — Batch 37: Zone rotation — authored slot pools behind a flag</h2>
 <ul>
 <li><b>Zone identity is a first-class def now:</b> ZONE_DEFS maps each zone to its display

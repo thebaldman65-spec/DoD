@@ -63,6 +63,29 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+EVENT NODES (07-26, Batch 38): deck now 17 fight/5 rest/5 shop/3 event
+("???" violet, map click → Events.pick(Run) → seen_events append →
+event.tscn; drawn AT THE DOOR, never pre-rolled). data/events.json +
+scripts/events.gd (class_name Events; RUN OBJECT INJECTED into every
+static — never reads autoloads, so --script tests drive a bare
+run_state). VOCABULARY (the extensible core): 12 verbs (gold/gold_pct/
+heal_pct/damage_pct floors at 1hp — events NEVER kill/mana_pct/
+max_hp_pct floor 10/attack_pct → member.event_attack_pct read at
+battle spawn hero block/talent_points/item/random_item/revive_pct/
+relic_grant → active_relics if <3 else +40g), targets party|random|
+lowest_hp|class:<key> (living only), requires min_gold/max_gold/
+zone_slot/has_item/spec_in_party/fallen_hero (event-level filters the
+draw, choice-level greys the button w/ tooltip). Weighted
+non-repeating: seen filter drops only on exhaustion. SAVE v2:
++seen_events (+zone_draw); load tolerant of v1 via .get defaults.
+pending_event NOT saved (quit mid-event forfeits, node stays spent).
+16 events (3 zone-gated via zone_slot, 2 spec-gated, fallen_cairn
+needs a dead hero). Scratchpad: test_events.gd (schema+clamps+draws)
++ test_event_flow.gd (map→???→choice→outcome→map). Sim 40/40 flat
+(events touch no combat). ROADMAP NOTE: user declined roadmap Batch 1
+(attrition/wounds) — never implement it; roadmap batches 2-6 = game
+batches 34-38; batch 7 (relics 5→25, tier common/rare for
+relic_grant pools) + 8 (persistent unlocks) remain.
 ZONE ROTATION (07-26, Batch 37): run = SLOT_COUNT(3) slots, each draws
 a zone id from SLOT_POOLS (authored PER SLOT — openers are not
 finales). Run.ZONE_DEFS: id → {name (art/save key), boss kind,

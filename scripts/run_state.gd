@@ -6,10 +6,14 @@ extends Node
 # 10 tiers × 3 nodes = 30 interconnected nodes, plus the boss tier on top.
 const FLOORS := 11  # 10 pickable tiers + the boss tier
 const NODES_PER_TIER := 3
-# Fixed node composition per zone: 60% fights, 20% rest, 20% shops.
-const FIGHT_NODES := 18
-const REST_NODES := 6
-const SHOP_NODES := 6
+# Fixed node composition per zone: 17 fights / 5 rest / 5 shop / 3 event.
+# Events replaced one rest, one shop and one fight; the ~1 talent point
+# per run that the lost fight cost comes back through point-granting
+# events (Blood Altar, Training Grounds, Warden's Echo).
+const FIGHT_NODES := 17
+const REST_NODES := 5
+const SHOP_NODES := 5
+const EVENT_NODES := 3
 
 # All item metadata lives here; battle and map both read it.
 const ITEM_IDS := ["health", "mana", "bomb", "revive", "defense"]
@@ -66,6 +70,9 @@ var map: Array = []        # map[floor] = [{type, links: [next-floor idx], visit
 var floor_idx := -1        # -1 = run not started; player picks from floor 0
 var node_idx := -1
 var encounter := {}        # {"type": ..., "enemies": ["raider", ...]} for the next battle
+var seen_events: Array = []  # event ids drawn this run (non-repeating pool)
+var pending_event := ""    # event id the event screen resolves (not saved:
+                           # quitting mid-event forfeits it, node stays spent)
 
 
 const HERO_BASE := {
@@ -107,6 +114,8 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	floor_idx = -1
 	node_idx = -1
 	encounter = {}
+	seen_events = []
+	pending_event = ""
 	_generate_map()
 
 
@@ -119,6 +128,8 @@ func _generate_map() -> void:
 		deck.append("rest")
 	for i in SHOP_NODES:
 		deck.append("shop")
+	for i in EVENT_NODES:
+		deck.append("event")
 	deck.shuffle()
 	# The run should open with combat: tier 1 holds at least one fight.
 	if not deck.slice(0, NODES_PER_TIER).has("fight"):
@@ -524,10 +535,12 @@ func save_run() -> void:
 	if not active:
 		return
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	# v2 (Batch 38): + seen_events, zone_draw. Loading stays tolerant of
+	# older saves via .get defaults — never drop player state silently.
 	file.store_var({
-		"version": 1, "party": party, "items": items, "gold": gold,
+		"version": 2, "party": party, "items": items, "gold": gold,
 		"zone_idx": zone_idx, "zone_name": zone_name, "zone_draw": zone_draw,
-		"floor_idx": floor_idx,
+		"floor_idx": floor_idx, "seen_events": seen_events,
 		"node_idx": node_idx, "specs_chosen": specs_chosen,
 		"active_relics": active_relics, "map": map,
 		"combat_wins": combat_wins,
@@ -582,6 +595,8 @@ func load_run() -> bool:
 	active_relics = data["active_relics"]
 	map = data["map"]
 	combat_wins = int(data.get("combat_wins", 0))
+	seen_events = data.get("seen_events", [])
+	pending_event = ""
 	encounter = {}
 	active = true
 	return true

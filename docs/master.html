@@ -47,14 +47,28 @@ node per tier, so <b>10 nodes are interacted with before the boss</b>. Node comp
 fixed deck per zone:</p>
 <table border="1" cellpadding="4">
 <tr><th>Type</th><th>Count</th><th>Share</th><th>Effect</th></tr>
-<tr><td>Fight</td><td>18</td><td>60%</td><td>Battle vs. a themed warband bought from a
+<tr><td>Fight</td><td>17</td><td>~57%</td><td>Battle vs. a themed warband bought from a
 power budget (see §9). Fights on tiers 6+ have a 25% chance to spawn as an ELITE (tougher
 themes, double talent points, more gold).</td></tr>
-<tr><td>Rest</td><td>6</td><td>20%</td><td>Party heals 30% max HP and Mana users
+<tr><td>Rest</td><td>5</td><td>~17%</td><td>Party heals 30% max HP and Mana users
 (Mage/Cleric/Hunter) recover 30% Mana at the waystone.</td></tr>
-<tr><td>Shop</td><td>6</td><td>20%</td><td>The Wandering Peddler: consumables + one rune offer
+<tr><td>Shop</td><td>5</td><td>~17%</td><td>The Wandering Peddler: consumables + one rune offer
 per party member (see §8).</td></tr>
+<tr><td>Event</td><td>3</td><td>10%</td><td>A "???" node — something unexpected happens.
+Drawn at the door from data/events.json (weighted, requirement-filtered, non-repeating per
+run), never pre-rolled: mystery is the point. See the Events paragraph below.</td></tr>
 </table>
+<p><b>Events:</b> an event presents flavor text and 2+ choices; choices whose requirements
+fail are greyed with the reason. Effects speak a fixed <b>verb vocabulary</b> — gold /
+gold_pct / heal_pct / damage_pct (never kills: floors at 1 HP) / mana_pct / max_hp_pct /
+attack_pct (permanent for the run, applied at battle spawn) / talent_points / item /
+random_item / revive_pct (the fallen return) / relic_grant (random inactive relic; +40 gold
+when slots are full) — aimed by <b>target selectors</b> (party, random, lowest_hp,
+class:&lt;key&gt;) and gated by <b>requirement conditions</b> (min_gold, max_gold, zone_slot,
+has_item, spec_in_party, fallen_hero). Adding an event is a JSON edit; adding a verb is one
+handler. 16 events ship now (three zone-gated, two spec-gated, one needing a fallen hero);
+the schema is built for 40+. Seen events persist in the save and never repeat within a run
+until the pool exhausts.</p>
 <p><b>Warbands are pre-rolled at map birth and scoutable:</b> every combat node carries its
 warband from the moment the map is generated, and <b>hovering the node shows the theme, the
 full lineup, and the band's damage-type identity</b> — how many units resist a type and how

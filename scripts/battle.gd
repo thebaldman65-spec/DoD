@@ -452,6 +452,12 @@ func _spawn_units() -> void:
 				* (1.0 + 0.02 * Run.combat_wins)))
 			cfg["max_hp"] = int(cfg["max_hp"]) \
 				+ int(round(base_hp * 0.02 * Run.combat_wins))
+		# Event boons/curses: attack_pct effects bank a permanent-for-run
+		# multiplier on the party member (Events "attack_pct" verb).
+		if Run.active and i < Run.party.size():
+			var ev_atk: float = Run.party[i].get("event_attack_pct", 0.0)
+			if ev_atk != 0.0:
+				cfg["attack"] = int(round(int(cfg["attack"]) * (1.0 + ev_atk)))
 		# Heroes with their own art keep original colors — no slot tint.
 		var hero_tint: Color = Classes.HERO_TINTS[i]
 		if SPEC_ART.has(spec):
