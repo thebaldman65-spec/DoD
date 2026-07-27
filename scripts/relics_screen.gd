@@ -23,6 +23,11 @@ func _ready() -> void:
 
 	var hint := Label.new()
 	hint.text = "Slay zone bosses to unlock relics. Assign up to 3 when drafting a party."
+	# The persistent profile's public face: pure chronicle, gates nothing.
+	if Profile.completions_total() + Profile.wipes_total() > 0:
+		hint.text += "\nCycles survived: %d   •   Cycles lost: %d   •   Events witnessed: %d of %d" % [
+			Profile.completions_total(), Profile.wipes_total(),
+			Profile.distinct_events_seen(), Events.ids().size()]
 	hint.add_theme_font_size_override("font_size", 14)
 	hint.add_theme_color_override("font_color", Color(0.6, 0.55, 0.5))
 	hint.position = Vector2(0, 112)

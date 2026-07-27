@@ -5,6 +5,30 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-26 — Batch 40: Persistent profile — the unlocks substrate, chronicle only</h2>
+<ul>
+<li><b>Scoped deliberately down:</b> the roadmap marks persistent unlocks "sketch only;
+expect a dedicated design pass" and forbids starting "until the difficulty baseline is
+stable" — and the baseline is not stable (sims win 100%, partly because the attrition
+batch was declined by design). So this batch ships the SUBSTRATE and the SKETCH, and
+gates nothing.</li>
+<li><b>Persistent profile</b> at user://profile.json, outside the run save: runs
+started / completed / wiped per spec (booked at spec lock-in, final-boss kill, and the
+defeat screen), bosses killed by kind, events seen with repeat counts, zones cleared.
+Five surgical hook sites; sims can never write to it (verified: 10 headless battles
+leave no profile file). The Relics screen shows the chronicle — "Cycles survived /
+Cycles lost / Events witnessed" — once anything has happened.</li>
+<li><b>The design sketch</b> lives at persistent-unlocks-sketch.md (workspace root):
+three proposed unlock tracks (relic-pool growth past 25, event-pool growth past 16 via
+a new requirement family, alternate capstones after N spec completions), the
+additive-content-never-power principle restated, and the open questions the design pass
+must answer — including whether unlocks read account-wide or per-spec, and whether wipes
+feed progression.</li>
+<li>Verified headless: counter accumulation per spec/kind/id, repeat-event counts,
+disk round-trip across a cold reload, missing-file tolerance, sim purity; parse checks
+clean across battle/map/menu/relics/spec_choice.</li>
+</ul>
+
 <h2>2026-07-26 — Batch 39: Relics 5 → 25 — a hook vocabulary, tiers, and loadout spread</h2>
 <ul>
 <li><b>The audit came first, as specified:</b> relics could previously attach to exactly

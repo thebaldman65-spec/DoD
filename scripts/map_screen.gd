@@ -213,6 +213,7 @@ func _on_node_pressed(f: int, i: int) -> void:
 				_toast("The road is quiet. Nothing happens.")
 			else:
 				Run.seen_events.append(Run.pending_event)
+				Profile.note_event(Run.pending_event)
 				Run.save_run()
 				get_tree().change_scene_to_file("res://scenes/event.tscn")
 		_:

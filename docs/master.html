@@ -1062,6 +1062,12 @@ across the equipped set, so stacking is well-defined. Adding a relic on an exist
 pure data. Highlights: Waystone Shard grants <b>+3</b> talent points; the elemental trio
 (Emberheart / Frostbound Sigil / Nightbloom Charm) covers all six damage schools; Prism Veil
 gives 10% resistance to every element; The King's Ledger compounds gold.</li>
+<li><b>Persistent profile</b> (user://profile.json, outside the run save): counts runs
+started/completed/wiped per spec, bosses killed by kind, events seen (with repeats), and
+zones cleared. <b>Chronicle only — it gates nothing</b>; the Relics screen shows the
+tally ("Cycles survived / lost / Events witnessed"). It is the substrate for a future
+persistent-unlocks design pass (sketch: persistent-unlocks-sketch.md in the workspace);
+sims never write to it.</li>
 </ul>
 
 <h2>9. Enemies</h2>

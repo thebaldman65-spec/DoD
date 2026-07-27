@@ -63,6 +63,21 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+PERSISTENT PROFILE (07-26, Batch 40): scripts/profile.gd (class_name
+Profile), user://profile.json OUTSIDE the run save — save_path is a
+static VAR (not const) so tests redirect it. Counts runs started
+(spec_choice _finish_and_fade) / completed (final-boss branch) / wiped
+(defeat branch, Run.active-gated) PER SPEC (a run books all 4;
+read-side totals divide by 4), bosses_killed by kind + zones_cleared
+(boss victory branch), events_seen with repeat counts (map event
+click). CHRONICLE ONLY — GATES NOTHING (roadmap Batch 8 says "sketch
+only" + baseline-stability precondition unmet; the user DECLINED the
+attrition batch, see memory). Relics screen hint shows the tally when
+non-zero. Sims never write it (no Run.active / no encounter type at
+the hook sites — verified). Design sketch for the future pass:
+../persistent-unlocks-sketch.md (3 tracks: relic pool growth past 25,
+event unlock requirement family, alternate capstones after N spec
+completions — all awaiting the designer). Scratchpad test_profile.gd.
 RELICS 5→25 (07-26, Batch 39): relics.gd POOL entries carry tier
 (common|rare — 17/8) + "hooks" dict; ALL effects flow through the
 19-hook vocabulary AUDITED ATOP relics.gd (each hook read at exactly

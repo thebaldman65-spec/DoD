@@ -153,6 +153,8 @@ func _finish_and_fade() -> void:
 	# Persist immediately: without this, quitting before the next node made
 	# Continue resurrect the old specs and talent trees.
 	Run.save_run()
+	# The persistent profile counts the run from the moment specs lock in.
+	Profile.note_run_started(Run.party.map(func(m): return m.get("spec", "")))
 	Music.play_intro_then("boss_intro", "map")
 	var fade := ColorRect.new()
 	fade.size = Vector2(1280, 720)

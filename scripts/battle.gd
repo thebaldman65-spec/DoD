@@ -6396,10 +6396,15 @@ func _check_end() -> void:
 				boss_text += "\n\nBOSS TROPHY: %s may choose a new\nability on the Party screen." % \
 					" and ".join(trophy_specs)
 				Run.save_run()
+			# Persistent profile: boss kills and zone clears always count;
+			# the final boss also books a completed run for every spec.
+			Profile.note_boss(Run.boss_kind())
+			Profile.note_zone_cleared()
 			if Run.has_next_zone():
 				_show_end("THE ZONE IS CLEANSED", boss_text,
 					[["Descend into %s" % Run.next_zone_name(), _next_zone]], true)
 			else:
+				Profile.note_completion(Run.party.map(func(m): return m.get("spec", "")))
 				Run.active = false
 				Run.clear_save()
 				_show_end("THE DECAY RECEDES", boss_text + "\nRun complete!",
@@ -6409,6 +6414,10 @@ func _check_end() -> void:
 				gold_gain, pts, "" if pts == 1 else "s", elite_text],
 				[["Continue", _to_map]], true)
 	else:
+		# Wipes count toward the profile only for real runs (sims never
+		# carry Run.active).
+		if Run.active:
+			Profile.note_wipe(Run.party.map(func(m): return m.get("spec", "")))
 		Run.active = false
 		Run.clear_save()
 		_sfx("defeat", -4.0)
