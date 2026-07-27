@@ -127,6 +127,10 @@ func _draw_screen() -> void:
 		bpop.add_item("Jump to Boss Tier", 13)
 		bpop.add_item("Advance to Next Zone", 14)
 		bpop.add_item("Reroll Specs", 15)
+		# Review aid: battles spawn with every talent/trophy ability
+		# pre-granted while checked (session-scoped, never saved).
+		bpop.add_check_item("All Spec Abilities Unlocked", 16)
+		bpop.set_item_checked(bpop.get_item_index(16), Run.debug_grant_all)
 	bpop.id_pressed.connect(_on_burger)
 	add_child(burger)
 
@@ -258,6 +262,11 @@ func _on_burger(id: int) -> void:
 			Run.advance_zone()
 			Run.save_run()
 			_draw_screen()
+		16:
+			Run.debug_grant_all = not Run.debug_grant_all
+			_draw_screen()
+			_toast("DEBUG: all spec abilities %s" % (
+				"UNLOCKED for every battle" if Run.debug_grant_all else "gated again"))
 		15:
 			# Debug spec swap: refund spent points, clear specs, re-awaken.
 			for member in Run.party:

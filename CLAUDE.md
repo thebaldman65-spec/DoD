@@ -313,11 +313,13 @@ review). One exclusive pair per tree. Party screen derives lane order/
 names from the tree (_tree_lanes; LANE_NAMES.get fallback prints the
 key, so converted lanes use display-string keys) and sorts nodes by
 tier (decorated stable sort). Audit script (scratchpad test_talents.gd)
-checks 24/3/7-7-7 per spec. TESTING AID (Batch 41: now the RUNTIME
-static battle.debug_grant_all, DEFAULT OFF — battle DEBUG menu check
-"All spec abilities unlocked (next battle)" or DOD_SIM_GRANT_ALL=1)
-pre-grants every new_ability/grant_ability node + the spec pools at
-spawn (dedupe by display_name here AND in apply_payload). ZONE 3 = "Forest of Old" repeat (ZONES third entry;
+checks 24/3/7-7-7 per spec. TESTING AID (Batch 41, relocated next
+day per user: Run.debug_grant_all, DEFAULT OFF, session-scoped never
+saved — MAP BURGER check "All Spec Abilities Unlocked" id 16, or
+DOD_SIM_GRANT_ALL=1) pre-grants every new_ability/grant_ability node
++ the spec pools at spawn (dedupe by display_name here AND in
+apply_payload). Toggle lives on the MAP (not battle — grants land at
+spawn, so a mid-battle flip could never apply). ZONE 3 = "Forest of Old" repeat (ZONES third entry;
 battle bg/map art key off zone_name → free; boss cfg zone check is
 `zone_idx in [0, 2]` → Withered Warden rules both forests, Scarlands
 keeps the Chief stand-in). FINAL BOSS = zone 3's Warden:

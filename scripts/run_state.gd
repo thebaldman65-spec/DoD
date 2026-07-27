@@ -71,6 +71,10 @@ var floor_idx := -1        # -1 = run not started; player picks from floor 0
 var node_idx := -1
 var encounter := {}        # {"type": ..., "enemies": ["raider", ...]} for the next battle
 var seen_events: Array = []  # event ids drawn this run (non-repeating pool)
+# Debug (map burger): pre-grant every talent/trophy ability at battle
+# spawn. Session-scoped, never saved; DOD_SIM_GRANT_ALL=1 arms it for
+# headless full-kit runs. Default OFF so tests measure gated kits.
+var debug_grant_all := false
 var pending_event := ""    # event id the event screen resolves (not saved:
                            # quitting mid-event forfeits it, node stays spent)
 

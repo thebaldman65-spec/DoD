@@ -9,10 +9,11 @@ when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 <ul>
 <li><b>The Batch 31 review aid stops skewing every test:</b> TEST_GRANT_ALL_ABILITIES —
 the compile-time constant that pre-granted every talent-gated and boss-trophy ability at
-spawn, stuck ON since the tree rework — is now a <b>runtime toggle in the battle DEBUG
-menu ("All spec abilities unlocked"), default OFF</b>. Grants land at spawn, so a flip
-applies from the next battle; the setting sticks for the whole session. Headless runs arm
-it with DOD_SIM_GRANT_ALL=1.</li>
+spawn, stuck ON since the tree rework — is now a <b>runtime toggle in the MAP burger's
+DEBUG section ("All Spec Abilities Unlocked"), default OFF</b> (moved from the battle
+DEBUG menu the next day at the user's call: grants land at spawn, so the decision belongs
+on the map, before a fight — not inside one where it could never apply). Session-scoped,
+never saved. Headless runs arm it with DOD_SIM_GRANT_ALL=1.</li>
 <li><b>The unskewed baseline, first look:</b> default sims now measure real gated
 progression — <b>88% wins</b> with base kits against the documented ~85% target, versus
 100% with everything granted. A meaningful slice of the long-standing "sims win 100%"

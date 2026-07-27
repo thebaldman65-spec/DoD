@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-26</b></p>
+<p align="right"><b>Last updated: 2026-07-27</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1298,15 +1298,15 @@ stdout as "[LOG] ..." so headless tests can grep them; status expiries print as
 "... fades from ..." lines. Target ≈85% bot win rate.</li>
 <li><b>Testing shortcuts:</b> debug tools are ALWAYS available in dev (unexported) builds;
 exported builds require DOD_DEBUG=1. The map burger menu gains a DEBUG section — +200 gold, +200 talent points for everyone, full heal, jump to the boss tier,
-advance to the next zone, and <b>Reroll Specs</b> (refunds spent talent points, clears all
-specs, and reopens the awakening screen). In battle, a <b>DEBUG ▾ menu</b> (bottom-right)
+advance to the next zone, <b>Reroll Specs</b> (refunds spent talent points, clears all
+specs, and reopens the awakening screen), and an <b>All Spec Abilities Unlocked</b> toggle
+(while checked, battles spawn with every talent-gated and trophy ability pre-granted —
+session-scoped, never saved, default OFF so normal play and sims measure real gated
+progression; headless runs arm it with DOD_SIM_GRANT_ALL=1). In battle, a <b>DEBUG ▾ menu</b> (bottom-right)
 offers: Full Restore (HP/resources/secondary for the party), a <b>Cooldowns OFF</b>
 toggle (while checked, hero abilities never go on cooldown; existing cooldowns clear on
 enabling — enemies carry none), an
-<b>Enemy attacks OFF</b> toggle (enemies skip their turns while checked), an <b>All spec
-abilities unlocked</b> toggle (pre-grants every talent-gated and trophy ability — applies
-from the NEXT battle since grants land at spawn; sticks for the session; default OFF so
-normal play and sims measure real gated progression), and a <b>turn
+<b>Enemy attacks OFF</b> toggle (enemies skip their turns while checked), and a <b>turn
 lock</b> — pick a hero and every HERO turn is theirs until you unlock (re-select them) or
 lock a different hero, while <b>enemies keep attacking on their own turns</b> (combine with
 Enemy attacks OFF to silence them); built for testing one hero's kit under fire. The
