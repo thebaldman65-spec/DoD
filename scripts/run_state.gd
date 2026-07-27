@@ -93,6 +93,16 @@ func relic_active(id: String) -> bool:
 	return active_relics.has(id)
 
 
+# Aggregated relic hooks (see the vocabulary audit atop relics.gd):
+# scalar hooks sum, dict hooks merge, across this run's active relics.
+func relic_add(hook: String) -> float:
+	return Relics.hook_add(active_relics, hook)
+
+
+func relic_dict(hook: String) -> Dictionary:
+	return Relics.hook_dict(active_relics, hook)
+
+
 func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []) -> void:
 	active = true
 	specs_chosen = false
@@ -103,10 +113,12 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 		var base: Dictionary = HERO_BASE[key]
 		party.append({"key": key, "hp": base["hp"], "max_hp": base["hp"],
 			"mana": base["mana"], "max_mana": 100, "spec": "",
-			"talent_points": 1 if relic_active("waystone") else 0,
+			"talent_points": int(relic_add("start_talent_points")),
 			"talents": {}, "runes": []})
 	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
-	gold = 60 + (80 if relic_active("coin") else 0)
+	for id in relic_dict("start_items"):
+		items[id] = int(items.get(id, 0)) + int(relic_dict("start_items")[id])
+	gold = 60 + int(relic_add("start_gold"))
 	combat_wins = 0
 	zone_idx = 0
 	draw_zones()
@@ -615,6 +627,7 @@ func award_gold(node_type: String) -> int:
 			amount = randi_range(80, 100)
 		"boss":
 			amount = randi_range(110, 130)
+	amount = int(round(amount * (1.0 + relic_add("gold_find_mult"))))
 	gold += amount
 	return amount
 

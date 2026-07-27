@@ -202,12 +202,15 @@ static func apply(run: Node, fx: Dictionary) -> String:
 			return "%s return%s at %d%% health" % [", ".join(raised),
 				"s" if raised.size() == 1 else "", int(round(amount * 100))]
 		"relic_grant":
+			# Optional {"tier": "common"|"rare"} narrows the pool (Batch 39
+			# tiering exists exactly so events can promise rarity).
 			var active: Array = run.get("active_relics")
 			if active.size() >= 3:
 				run.set("gold", int(run.get("gold")) + 40)
 				return "relic slots full — +40 gold instead"
-			var pool: Array = Relics.POOL.keys().filter(
-				func(id): return not active.has(id))
+			var want_tier := String(fx.get("tier", ""))
+			var pool: Array = Relics.POOL.keys().filter(func(id): return not active.has(id) \
+				and (want_tier == "" or String(Relics.POOL[id].get("tier", "common")) == want_tier))
 			if pool.is_empty():
 				run.set("gold", int(run.get("gold")) + 40)
 				return "nothing left to unearth — +40 gold instead"

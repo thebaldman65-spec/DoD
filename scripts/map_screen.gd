@@ -186,11 +186,14 @@ func _on_node_pressed(f: int, i: int) -> void:
 	Run.advance(f, i)
 	match node["type"]:
 		"rest":
-			Run.heal_party(0.3)
-			Run.restore_mana(0.3)
+			# Cairnmoss Poultice and kin deepen the waystone's rest.
+			var rest_pct := 0.3 + Run.relic_add("rest_heal_add")
+			Run.heal_party(rest_pct)
+			Run.restore_mana(rest_pct)
 			Run.save_run()
 			_draw_screen()
-			_toast("The party rests by the waystone (+30% HP & Mana)")
+			_toast("The party rests by the waystone (+%d%% HP & Mana)"
+				% int(round(rest_pct * 100)))
 		"treasure":
 			var id := Run.random_loot()
 			Run.items[id] = Run.items.get(id, 0) + 1

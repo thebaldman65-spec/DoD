@@ -1052,9 +1052,16 @@ inventory: 2 Health, 1 Mana, 1 Bomb, 1 Revive, 1 Defense.</li>
 +8 max Mana (per rarity multiplier). Each hero can <b>equip 2</b> (toggled on the party
 screen); shop offers avoid duplicates per hero.</li>
 <li><b>Relics</b> (permanent meta): one random unlock per boss kill, stored in
-user://relics.json; up to 3 equipped per run at the draft. Pool (5): Waystone Shard (+1 talent
-point at run start), Dragonbone Idol (+10% damage), Chalice of Dawn (party heals 10% after
-victories), Gravewrought Coin (+80 starting gold), Emberheart (fire &amp; holy +20%).</li>
+user://relics.json; up to 3 equipped per run at the draft (scrolling shelf; events can slot
+a run-scoped extra via relic_grant). <b>Pool: 25 relics — 17 common, 8 rare (◆)</b> — every
+effect expressed through an audited <b>hook vocabulary</b> (19 hooks, listed atop relics.gd:
+run-start gold/points/items, party stat boosts at battle spawn — attack, typed damage, max
+HP, armor, speed, crit, Constitution, resistances, resource floor — victory heal/mana/gold,
+gold-find, rest bonus, shop discount, elite loot). Scalar hooks SUM and dict hooks merge
+across the equipped set, so stacking is well-defined. Adding a relic on an existing hook is
+pure data. Highlights: Waystone Shard grants <b>+3</b> talent points; the elemental trio
+(Emberheart / Frostbound Sigil / Nightbloom Charm) covers all six damage schools; Prism Veil
+gives 10% resistance to every element; The King's Ledger compounds gold.</li>
 </ul>
 
 <h2>9. Enemies</h2>

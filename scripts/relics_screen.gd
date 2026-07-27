@@ -31,23 +31,35 @@ func _ready() -> void:
 	add_child(hint)
 
 	Relics.load_data()
-	var i := 0
-	for id in Relics.POOL:
+	# 25 relics need a scrolling shelf; commons first, rares (◆) after.
+	var scroll := ScrollContainer.new()
+	scroll.position = Vector2(140, 150)
+	scroll.custom_minimum_size = Vector2(1020, 470)
+	scroll.size = Vector2(1020, 470)
+	add_child(scroll)
+	var grid := GridContainer.new()
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 16)
+	grid.add_theme_constant_override("v_separation", 14)
+	scroll.add_child(grid)
+	var ordered: Array = Relics.POOL.keys()
+	ordered.sort_custom(func(a, b): return String(Relics.POOL[a].get("tier", "common")) \
+		< String(Relics.POOL[b].get("tier", "common")))
+	for id in ordered:
 		var owned: bool = Relics.unlocked.has(id)
 		var panel := PanelContainer.new()
-		panel.position = Vector2(170 + (i % 3) * 330, 160 + (i / 3) * 160)
-		panel.custom_minimum_size = Vector2(300, 140)
+		panel.custom_minimum_size = Vector2(320, 128)
 		if not owned:
 			panel.modulate = Color(0.5, 0.45, 0.55)
-		add_child(panel)
+		grid.add_child(panel)
 		var label := Label.new()
 		var info: Dictionary = Relics.POOL[id]
-		label.text = "%s\n\n%s" % [info["name"] if owned else "? ? ?",
+		var tier_tag := "  ◆ RARE" if String(info.get("tier", "common")) == "rare" else ""
+		label.text = "%s\n\n%s" % [(info["name"] + tier_tag) if owned else "? ? ?",
 			info["desc"] if owned else "A shape lost to the Decay.\nSlay a boss to recover it."]
 		label.add_theme_font_size_override("font_size", 14)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		panel.add_child(label)
-		i += 1
 
 	var back := Button.new()
 	back.text = "< Back"

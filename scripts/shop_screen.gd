@@ -73,7 +73,7 @@ func _draw_screen() -> void:
 	add_child(items_header)
 	var row := 0
 	for id in Run.ITEM_IDS:
-		var price: int = ITEM_PRICES[id]
+		var price := _price(ITEM_PRICES[id])
 		var btn := Button.new()
 		btn.text = "%s — %dg   (have %d)" % [Run.ITEM_INFO[id][0], price, Run.items.get(id, 0)]
 		btn.custom_minimum_size = Vector2(360, 46)
@@ -110,9 +110,9 @@ func _draw_screen() -> void:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		vbox.add_child(label)
 		var buy := Button.new()
-		buy.text = "Buy — %dg" % rune["price"]
+		buy.text = "Buy — %dg" % _price(rune["price"])
 		buy.custom_minimum_size = Vector2(140, 34)
-		buy.disabled = Run.gold < rune["price"]
+		buy.disabled = Run.gold < _price(rune["price"])
 		buy.pressed.connect(_buy_rune.bind(i))
 		vbox.add_child(buy)
 
@@ -126,8 +126,13 @@ func _draw_screen() -> void:
 	add_child(leave)
 
 
+# Peddler's Lodestone and kin: every listed price honors the discount.
+func _price(base: int) -> int:
+	return maxi(int(round(base * (1.0 - Run.relic_add("shop_discount")))), 1)
+
+
 func _buy_item(id: String) -> void:
-	var price: int = ITEM_PRICES[id]
+	var price := _price(ITEM_PRICES[id])
 	if Run.gold < price:
 		return
 	Run.gold -= price
@@ -138,9 +143,9 @@ func _buy_item(id: String) -> void:
 func _buy_rune(offer_idx: int) -> void:
 	var offer: Dictionary = offers[offer_idx]
 	var rune: Dictionary = offer["rune"]
-	if Run.gold < rune["price"]:
+	if Run.gold < _price(rune["price"]):
 		return
-	Run.gold -= rune["price"]
+	Run.gold -= _price(rune["price"])
 	var member: Dictionary = Run.party[offer["member_idx"]]
 	var runes: Array = member.get("runes", [])
 	runes.append(rune)

@@ -5,6 +5,44 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-26 — Batch 39: Relics 5 → 25 — a hook vocabulary, tiers, and loadout spread</h2>
+<ul>
+<li><b>The audit came first, as specified:</b> relics could previously attach to exactly
+five hardcoded sites. The batch generalizes that into an <b>audited hook vocabulary of 19
+hooks</b> (documented atop relics.gd with the site each reads at): run-start economy, nine
+party-stat boosts at battle spawn, three victory rewards, gold-find, rest depth, shop
+discount, elite loot. Scalar hooks sum, dict hooks merge per key — stacking is
+well-defined, and a new relic on an existing hook is pure data. Declared OUT (needs
+plumbing, deliberately deferred): on-kill/per-turn procs, revive-on-death, enemy-side
+auras, DoT/Break-damage multipliers.</li>
+<li><b>25 relics, tiered:</b> 17 common / 8 rare, feeding Batch 38's relic_grant — which
+now accepts a tier filter (the Collector's Grave digs up a guaranteed RARE). New commons
+include the elemental trio (Frostbound Sigil, Nightbloom Charm alongside Emberheart —
+all six damage schools covered), Peddler's Lodestone (shop −20%), Cairnmoss Poultice
+(rest 45%), Bottled Storm (35% resource floor), Wardrums (+15 Constitution). New rares:
+Runed Bulwark, Prism Veil (10% all-element resistance), Cracked Hourglass, The King's
+Ledger, Horn of the First War, Martyr's Knucklebone, Tollkeeper's Bell. Dragonbone Idol
+retiered rare.</li>
+<li><b>Waystone Shard rebalanced:</b> +1 → <b>+3 talent points</b> at run start — a real
+tier-one investment against the ~35-point economy instead of a rounding error.</li>
+<li><b>UI kept honest at 25:</b> the draft's relic shelf and the collection gallery both
+scroll now (the old fixed grids overflowed the screen past ~9 relics); rares wear a ◆ and
+sort after commons in the gallery.</li>
+<li><b>Loadout spread (DOD_SIM_RELICS harness, 40 battles each):</b> baseline 8.8
+rounds/battle and 0.53 hero deaths; OFFENSE (Dragonbone/Whetstone/Emberheart) shortens
+fights 16% to 7.4 rounds; DEFENSE (Oxheart/Ironbark/Prism Veil) cuts deaths 28% to 0.38
+with 88% survivor HP; TEMPO reads flat in standalone sims — found and noted honestly:
+Bottled Storm is a no-op there because standalone heroes start with full resource; its
+value only exists across a real run's mana carryover. Win rate stays 100% in all four
+loadouts — the win-rate ceiling documented since the attrition batch was declined;
+variance lives in the secondary metrics.</li>
+<li>Verified headless: pool shape (25/17/8), every hook key inside the vocabulary,
+aggregation math (scalars sum, the elemental trio merges to six schools), run-start hooks
+land (+3 points, 140 gold, satchel items), gold_find_mult scales award_gold exactly,
+tiered relic_grant draws rare-only; parse checks clean across battle/map/menu/draft/
+relics/event.</li>
+</ul>
+
 <h2>2026-07-26 — Batch 38: Event nodes — "???" on the map, a verb vocabulary underneath</h2>
 <ul>
 <li><b>New node type: Event ("???", violet).</b> The zone deck is now 17 fights / 5 rest /

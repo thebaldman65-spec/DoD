@@ -63,6 +63,28 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-07-16)
+RELICS 5→25 (07-26, Batch 39): relics.gd POOL entries carry tier
+(common|rare — 17/8) + "hooks" dict; ALL effects flow through the
+19-hook vocabulary AUDITED ATOP relics.gd (each hook read at exactly
+one site). Aggregation: Relics.hook_add/hook_dict over
+Run.active_relics via Run.relic_add/relic_dict — scalars SUM, dicts
+merge per key. Sites: new_run (start_gold/points/items), battle hero
+spawn relic block (OUTSIDE the Run.active gate so DOD_SIM_RELICS
+loadouts work standalone; attack→dmg_bonus, types→type_dmg_bonus,
+max_hp→max_hp_pct stacks with Vitality, armor/speed/crit/con/resists,
+resource_floor AFTER member-mana sync), victory block (heal/mana/
+gold), award_gold (gold_find_mult), map rest (rest_heal_add), shop
+_price() (discount, min 1g), elite spoils (loot_extra). WAYSTONE
+REBALANCED +1→+3 pts. relic_active() legacy-kept but no site uses it.
+events relic_grant takes {"tier": "..."} (collectors_grave digs a
+guaranteed rare). Draft shelf + relics gallery are SCROLLING grids now
+(fixed grids overflowed past ~9 relics); rares wear ◆. DECLARED OUT
+(plumbing): on-kill/per-turn procs, revive-on-death, enemy auras,
+DoT/BD mults. GOTCHA: stormflask (resource_floor) is a NO-OP in
+standalone sims — heroes spawn full there; only real runs carry mana.
+Loadout spread 40×4: offense −16% rounds, defense −28% deaths, win%
+pinned 100% (attrition declined → ceiling; variance = secondary
+metrics). Scratchpad test_relics.gd.
 EVENT NODES (07-26, Batch 38): deck now 17 fight/5 rest/5 shop/3 event
 ("???" violet, map click → Events.pick(Run) → seen_events append →
 event.tscn; drawn AT THE DOOR, never pre-rolled). data/events.json +

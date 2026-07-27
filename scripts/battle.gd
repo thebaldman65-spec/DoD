@@ -180,6 +180,11 @@ var sc_dir := 1.0
 func _ready() -> void:
 	sim_target = int(OS.get_environment("DOD_SIM"))
 	sim = sim_target > 0
+	# DOD_SIM_RELICS="dragonbone,whetstone" arms a relic loadout for
+	# standalone sims (the loadout-spread harness; relic hooks read
+	# Run.active_relics regardless of Run.active).
+	if OS.get_environment("DOD_SIM_RELICS") != "":
+		Run.active_relics = OS.get_environment("DOD_SIM_RELICS").split(",")
 	autoplay = sim or OS.get_environment("DOD_AUTOPLAY") == "1"
 	# DOD_ENEMIES_OFF=1 arms the "Enemy attacks OFF" debug toggle from the
 	# environment so headless tests can exercise the skip path.
@@ -430,13 +435,31 @@ func _spawn_units() -> void:
 			for rune in Run.party[i].get("runes", []):
 				if rune.get("equipped", false):
 					Talents.apply_payload(cfg, rune["payload"], 1)
-			if Run.relic_active("dragonbone"):
-				cfg["dmg_bonus"] = cfg.get("dmg_bonus", 0.0) + 0.10
-			if Run.relic_active("emberheart"):
+		# Relic hooks (see the audit atop relics.gd): numeric boons
+		# aggregate across the run's relics. Outside the Run.active gate so
+		# DOD_SIM_RELICS loadouts drive the same code in standalone sims.
+		if not Run.active_relics.is_empty():
+			cfg["dmg_bonus"] = cfg.get("dmg_bonus", 0.0) \
+				+ Run.relic_add("hero_attack_mult")
+			var relic_types := Run.relic_dict("dmg_type_mult")
+			if not relic_types.is_empty():
 				var bonuses: Dictionary = cfg.get("type_dmg_bonus", {})
-				bonuses["fire"] = bonuses.get("fire", 0.0) + 0.20
-				bonuses["holy"] = bonuses.get("holy", 0.0) + 0.20
+				for dtype in relic_types:
+					bonuses[dtype] = float(bonuses.get(dtype, 0.0)) + relic_types[dtype]
 				cfg["type_dmg_bonus"] = bonuses
+			cfg["max_hp_pct"] = cfg.get("max_hp_pct", 0.0) \
+				+ Run.relic_add("hero_max_hp_mult")
+			cfg["armor"] = float(cfg.get("armor", 0.0)) + Run.relic_add("hero_armor_add")
+			cfg["speed"] = float(cfg.get("speed", 100.0)) + Run.relic_add("hero_speed_add")
+			cfg["crit_bonus"] = cfg.get("crit_bonus", 0.0) + Run.relic_add("hero_crit_add")
+			cfg["constitution"] = int(cfg.get("constitution", 100)
+				+ Run.relic_add("hero_con_add"))
+			var relic_resists := Run.relic_dict("hero_resist_add")
+			if not relic_resists.is_empty():
+				var res: Dictionary = cfg.get("resists", {})
+				for dtype in relic_resists:
+					res[dtype] = float(res.get(dtype, 0.0)) + relic_resists[dtype]
+				cfg["resists"] = res
 		# Percentage HP talents (Vitality) apply after every flat bonus.
 		cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
 		# Toughness (Warden talent): Constitution grows with bulk.
@@ -484,6 +507,13 @@ func _spawn_units() -> void:
 			u.hp = clampi(Run.party[i]["hp"], 1, u.max_hp)
 			if u.resource_name == "Mana":
 				u.resource = clampi(Run.party[i].get("mana", u.resource), 0, u.max_resource)
+			u.refresh_bars()
+		# Bottled Storm: battles open with a floor under the resource tank
+		# (Rage included — the warrior walks in already angry). After the
+		# member-mana sync so the floor never gets overwritten.
+		var res_floor := Run.relic_add("resource_floor_pct")
+		if res_floor > 0.0 and u.max_resource > 0:
+			u.resource = maxi(u.resource, int(res_floor * u.max_resource))
 			u.refresh_bars()
 		heroes.append(u)
 
@@ -6327,8 +6357,21 @@ func _check_end() -> void:
 			elite_text = "\n\nELITE SPOILS\n%s (%s) — for the %s, equip it from the Party tab\n+1 %s" % [
 				rune["name"], rune["desc"], looter["key"].capitalize(),
 				Run.ITEM_INFO[drop_id][0]]
-		if Run.relic_active("chalice"):
-			Run.heal_party(0.10)
+			# Gravelight Lantern: the spoils pile runs deeper.
+			for extra_i in int(Run.relic_add("loot_extra")):
+				var extra_id: String = Run.random_loot()
+				Run.items[extra_id] = Run.items.get(extra_id, 0) + 1
+				elite_text += "\n+1 %s (Gravelight Lantern)" % Run.ITEM_INFO[extra_id][0]
+		# Victory relic hooks: healing chalices, mana hourglasses, toll gold.
+		var v_heal := Run.relic_add("victory_heal_pct")
+		if v_heal > 0.0:
+			Run.heal_party(v_heal)
+		var v_mana := Run.relic_add("victory_mana_pct")
+		if v_mana > 0.0:
+			Run.restore_mana(v_mana)
+		var v_gold := int(Run.relic_add("victory_gold"))
+		if v_gold > 0:
+			Run.gold += v_gold
 		Run.save_run()
 		_sfx("victory", -4.0)
 		if Run.encounter.get("type", "") == "boss":

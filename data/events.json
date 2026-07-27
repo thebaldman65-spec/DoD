@@ -293,7 +293,7 @@
     "label": "Dig (the dead object)",
     "effects": [
      {"effect": "damage_pct", "amount": 0.1, "target": "party"},
-     {"effect": "relic_grant"}
+     {"effect": "relic_grant", "tier": "rare"}
     ],
     "outcome": "Cold hands rake you as you lift the collector's prize free."
    },

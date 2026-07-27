@@ -96,22 +96,33 @@ func _draw_screen() -> void:
 	relic_header.size = Vector2(1280, 22)
 	relic_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(relic_header)
-	var shown := 0
+	# The collection grows toward 25 — the grid lives in a scroll box so a
+	# full trophy shelf never spills over the Begin button.
+	var scroll := ScrollContainer.new()
+	scroll.position = Vector2(160, 414)
+	scroll.custom_minimum_size = Vector2(980, 200)
+	scroll.size = Vector2(980, 200)
+	add_child(scroll)
+	var grid := GridContainer.new()
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 12)
+	grid.add_theme_constant_override("v_separation", 10)
+	scroll.add_child(grid)
 	for id in Relics.unlocked:
 		var info: Dictionary = Relics.POOL[id]
 		var rbtn := Button.new()
 		var on: bool = relic_picks.has(id)
-		rbtn.text = ("[ON]  " if on else "") + info["name"]
-		rbtn.custom_minimum_size = Vector2(280, 40)
-		rbtn.position = Vector2(190 + (shown % 3) * 310, 418 + (shown / 3) * 52)
-		rbtn.tooltip_text = info["desc"]
+		var tier_tag := " ◆" if String(info.get("tier", "common")) == "rare" else ""
+		rbtn.text = ("[ON]  " if on else "") + info["name"] + tier_tag
+		rbtn.custom_minimum_size = Vector2(305, 40)
+		rbtn.tooltip_text = "%s\n%s" % [String(info.get("tier", "common")).to_upper(),
+			info["desc"]]
 		if on:
 			rbtn.modulate = Color(1.0, 0.9, 0.5)
 		elif relic_picks.size() >= 3:
 			rbtn.disabled = true
 		rbtn.pressed.connect(_toggle_relic.bind(id))
-		add_child(rbtn)
-		shown += 1
+		grid.add_child(rbtn)
 
 	var start := Button.new()
 	start.text = "Begin the Run"
