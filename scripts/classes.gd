@@ -485,13 +485,18 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Wildstrikes", "cost": 35, "damage": 16,
 					"pressure": 14, "delay": 4.5, "anim": "attack03", "aoe": true,
 					"bleed_build": 35, "resource_gain": 10, "cooldown": 3,
-					"perfect_id": "", "perfect_text": "+50% BD on every target",
+					"perfect_id": "", "perfect_text": "+50% Bleed buildup on every target",
 					"description": "Savage sweep: hits ALL enemies and\nbuilds 35 Bleed on each. Builds 10 Rage."}),
 				Ability.make({"display_name": "Hack and Slash", "cost": 20, "damage": 10,
 					"pressure": 10, "delay": 3.0, "anim": "attack01", "multi_hits": 3,
 					"bleed_build": 25, "bleed_chance": 0.5, "resource_gain": 10, "cooldown": 2,
 					"perfect_id": "", "perfect_text": "4 strikes instead of 3",
 					"description": "Three savage cuts at one target; each\nhit has a 50% chance to build 25 Bleed —\na full flurry can bleed them out.\nBuilds 10 Rage."}),
+				Ability.make({"display_name": "Blood Price", "cost": 0,
+					"special": "blood_price", "delay": 2.0, "anim": "attack02",
+					"cooldown": 3,
+					"perfect_id": "", "perfect_text": "The health cost is halved",
+					"description": "Open his own veins: pays 15% of\ncurrent health (never lethal) for\n30 Rage and +25% damage for 2 turns.\nBlood Frenzy wakes when HE says so."}),
 			]
 		"warden":
 			# VAULTED — Shieldwall v1 (party -25% damage, 2 turns) and

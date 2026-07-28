@@ -4,6 +4,28 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Blood Price (Batch B) — 2026-07-27
+
+**Why the ability exists:** Blood Frenzy rewards being low, but nothing
+in the kit let him *choose* to go low — enemies decided when he got
+strong. Blood Price is the throttle. Costing **current** (not max)
+health makes it cheap as an opener and a real gamble when low: the
+same button reads differently at 175 HP and at 50.
+
+**Why it can never kill him:** a self-execute button on the party's
+aggro magnet is a trap for new players and a degenerate bot line in
+sims. The 1-HP floor keeps the gamble in damage-taken space, where the
+Frenzy floor already banks it.
+
+**Why Wildstrikes' perfect moved to bleed:** a bleed spec's perfect
+should pay in bleed. The +50% BD ride came free from the generic aoe
+perfect rule, not from a design decision.
+
+**Sim note for the next conversation:** hero deaths/battle rose 0.34 →
+0.42 with the rotation casting Blood Price 1.7×/battle. Self-inflicted
+damage on the aggro magnet was the predicted cost; whether 0.42 is
+acceptable is a designer call, not a code fix.
+
 ## Berserker rework — 2026-07-27
 
 **The core problem:** Blood Frenzy read his own HP, Bleed read enemy

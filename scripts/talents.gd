@@ -65,7 +65,10 @@ const FIXED_TREES := {
 			"desc": "Enemies at {v} or more bloodloss are Crippled.",
 			"scale": {"base": 90, "step": -10},
 			"payload": {"stat": {"hemorrhage_ranks": 1}}},
-		{"id": "bz_bloodlust_node", "name": "Bloodlust", "ranks": 1, "row": 2, "col": 2,
+		# "Flurry" since 07-27 — the ability Bloodlust kept the name; the id
+		# stays bz_bloodlust_node so saved ranks survive (the cr_frostbite →
+		# "Brittle Ice" trick).
+		{"id": "bz_bloodlust_node", "name": "Flurry", "ranks": 1, "row": 2, "col": 2,
 			"gate": "row", "requires": "", "requires_ranks": 0,
 			"desc": "Hack and Slash strikes an extra time.",
 			"payload": {"ability": "Hack and Slash", "add": {"multi_hits": 1}}},

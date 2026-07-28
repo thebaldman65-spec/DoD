@@ -5,6 +5,36 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-27 — Batch B: Blood Price — the Berserker chooses when the Frenzy wakes</h2>
+<ul>
+<li><b>Blood Price, new base-kit ability (4th kit slot):</b> 0 Rage, 2.0 delay, 3cd,
+self-cast with no target selection (the Battle Shout pattern — no await reachable in
+autoplay). Pays <b>15% of CURRENT health</b>, clamped so it can never kill him, for
+<b>30 Rage and +25% damage dealt for 2 turns</b> (chip shows the buff and turns left;
+Perfect: the health cost is halved). The self-cut banks its Blood Frenzy floor
+immediately, like any hit taken. Why: Blood Frenzy rewarded being low but the enemy
+decided when that happened — this is the throttle, cheap as an opener and a real gamble
+when low.</li>
+<li><b>Wildstrikes' perfect pays in bleed:</b> +50% Bleed buildup on every target
+(was +50% BD — a bleed spec's perfect should pay in bleed). Wildstrikes is carved out
+of the generic aoe perfect-BD boost; other aoe abilities keep it.</li>
+<li><b>Talent node "Bloodlust" → "Flurry"</b> (Hack and Slash extra strike; id stays
+bz_bloodlust_node so saved ranks survive — the Brittle Ice trick). The ability Bloodlust
+and the node were two different things wearing one name.</li>
+<li><b>Bot rotation (berserker-specific, deterministic):</b> Blood Price when Rage
+&lt; 60 and HP &gt; 40% → Wildstrikes at 3+ enemies → Rampage if affordable → Hack and
+Slash → Bloodlust below 50% HP → Strike. Without it the sim never casts the new kit and
+would have reported an untested ability as balanced.</li>
+<li><b>Verified — gated 200-battle sim (base kits, standard party):</b> 200/200 wins
+(100%, the known ceiling), 8.4 rounds/battle, hero deaths/battle 0.42 (Batch A measured
+0.34 — Blood Price is self-inflicted damage on the party's aggro magnet; flagged for
+the designer, not tuned away silently), survivors at 69% HP. Damage share: Cryomancer
+37% / Beastmaster 32% / <b>Berserker 28%</b> (under the ~30% flag line) / Devout 4%.
+Blood Price 1.7 casts/battle, Wildstrikes 1.0, Hack and Slash 2.1, Bloodlust 0.4.
+Autoplay log confirms casts at full and partial health (26 then 22 HP paid). Parse
+clean.</li>
+</ul>
+
 <h2>2026-07-26 — Batch 41: "All spec abilities unlocked" is a debug toggle — sims stop lying</h2>
 <ul>
 <li><b>The Batch 31 review aid stops skewing every test:</b> TEST_GRANT_ALL_ABILITIES —

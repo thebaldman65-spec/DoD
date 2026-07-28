@@ -57,6 +57,7 @@ const STATUS_INFO := {
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
 	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of all attack damage\nthis unit takes echoes to its\nwhole party."],
 	"battle_shout": ["Battle Shout", "BS", Color(0.95, 0.45, 0.30), "+1% damage per 20 blood buildup\non the enemy party (at cast time)."],
+	"blood_price": ["Blood Price", "BP", Color(0.85, 0.25, 0.25), "Paid in his own blood:\n+25% damage dealt."],
 	"shield_charges": ["Shieldwall", "SW", Color(0.65, 0.72, 0.85), "The next attacks against this unit\nare BLOCKED (one charge each)."],
 	"high_guard": ["High Guard", "HG", Color(0.55, 0.80, 0.95), "Takes 25% less damage."],
 	"elem_weak": ["Elemental Weakness", "EW", Color(0.40, 0.80, 0.75), "Elemental resistances reduced."],
@@ -1452,8 +1453,8 @@ func _player_turn(u: BattleUnit) -> void:
 		if ab.special in ["rally", "focus", "surge", "shieldwall", "quickdraw",
 				"phoenix", "hymn", "retaliate", "unity", "tripwire",
 				"mana_shield", "divine_wrath", "shield_block", "hold_the_line",
-				"battle_shout", "flame_shield", "stabilize", "overcharge",
-				"cons_ground", "bulwark", "dark_pact", "hysteria",
+				"battle_shout", "blood_price", "flame_shield", "stabilize",
+				"overcharge", "cons_ground", "bulwark", "dark_pact", "hysteria",
 				"instinct", "bestial", "spirit_bond", "hold_breath",
 				"venom_coat", "deadfall"]:
 			target = u  # self/party effects need no target choice
@@ -1590,6 +1591,30 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 	var weakest_ally := _lowest_hp(allies)
 	match u.hero_key:
 		"warrior":
+			# Berserker rotation (deterministic — the generic warrior policy
+			# below never casts his kit, so sims would call an untested kit
+			# "balanced"): Blood Price to throttle the Frenzy while healthy,
+			# sweep wide, then grind single targets.
+			if u.passive_id == "bloodrage":
+				var bprice := _find_ability(u, "Blood Price")
+				if bprice != null and u.ability_ready(bprice) \
+						and u.resource < 60 and u.hp > u.max_hp * 0.4:
+					return [bprice, u]
+				var wild := _find_ability(u, "Wildstrikes")
+				if wild != null and u.resource >= wild.cost and u.ability_ready(wild) \
+						and foes.size() >= 3:
+					return [wild, target_foe]
+				var ramp := _find_ability(u, "Rampage")
+				if ramp != null and u.resource >= ramp.cost and u.ability_ready(ramp):
+					return [ramp, target_foe]
+				var bz_hack := _find_ability(u, "Hack and Slash")
+				if bz_hack != null and u.resource >= bz_hack.cost and u.ability_ready(bz_hack):
+					return [bz_hack, target_foe]
+				var blust := _find_ability(u, "Bloodlust")
+				if blust != null and u.resource >= blust.cost and u.ability_ready(blust) \
+						and u.hp < u.max_hp * 0.5:
+					return [blust, target_foe]
+				return [u.abilities[0], target_foe]  # Strike
 			var pommel := _find_ability(u, "Pommel Strike")
 			if pommel != null and u.resource >= pommel.cost and u.ability_ready(pommel) and randf() < 0.35:
 				return [pommel, target_foe]
@@ -3295,6 +3320,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Battle Shout: fury fed by the enemy party's open wounds (at cast).
 			if attacker.has_status("battle_shout"):
 				raw *= 1.0 + attacker.status_power("battle_shout") / 100.0
+			# Blood Price: strength bought with his own blood.
+			if attacker.has_status("blood_price"):
+				raw *= 1.25
 			# Iron Will: +5%/rank damage per debuff currently on the Warden.
 			if attacker.iron_will_ranks > 0:
 				raw *= 1.0 + 0.05 * attacker.iron_will_ranks * attacker.count_debuffs()
@@ -3428,7 +3456,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					* (1.5 if is_crit else 1.0)))
 			if parried:
 				pr = int(round(pr * 0.25))
-			if is_perfect and (ab.perfect_id == "pressure" or ab.aoe):
+			# Wildstrikes opts out: its perfect pays in Bleed, not BD (07-27).
+			if is_perfect and (ab.perfect_id == "pressure" or ab.aoe) \
+					and ab.display_name != "Wildstrikes":
 				pr = int(pr * 1.5)
 			if is_perfect and ab.display_name == "Crushing Blow":
 				pr += 5
@@ -3673,7 +3703,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							"" if neighbors.size() == 1 else "s",
 							strike_target.unit_name], "#b0a8e0")
 			if ab.bleed_build > 0 and not strike_target.dead and randf() <= ab.bleed_chance:
-				_add_bleed_with_burst(strike_target, ab.bleed_build + attacker.bleed_bonus)
+				var bleed_amt := ab.bleed_build + attacker.bleed_bonus
+				# A bleed spec's perfect pays in bleed: Wildstrikes builds
+				# +50% on every target it sweeps.
+				if is_perfect and ab.display_name == "Wildstrikes":
+					bleed_amt = int(round(bleed_amt * 1.5))
+				_add_bleed_with_burst(strike_target, bleed_amt)
 			if ab.display_name == "Mocking Blow" and not strike_target.dead:
 				var mocker_idx := heroes.find(attacker)
 				if mocker_idx >= 0:
@@ -5153,6 +5188,28 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					target.unit_name])
 				_log("%s: Mark of the Hunt — %s is marked (%d turns)" % [
 					attacker.unit_name, target.unit_name, mk_turns], "#e0a050")
+		"blood_price":
+			# Blood for fury: pays 15% of CURRENT health (half on a perfect),
+			# clamped so the price can never kill him. Cost scales with what
+			# he has — cheap opener, real gamble when low. This is how the
+			# Berserker CHOOSES when Blood Frenzy wakes instead of waiting
+			# for the enemy to decide it.
+			var bp_cost := maxi(int(round(attacker.hp * (0.075 if is_perfect else 0.15))), 1)
+			attacker.hp = maxi(attacker.hp - bp_cost, 1)
+			attacker.float_text("-%d" % bp_cost, Color(1.0, 0.4, 0.5))
+			# The self-cut banks its Frenzy floor immediately, like any hit
+			# taken (Batch A rule: dives count even if healed away).
+			if attacker.passive_id == "bloodrage":
+				attacker.frenzy_bonus()
+			_sfx("crit", -8.0, 0.7)
+			attacker.resource = mini(attacker.resource + 30, attacker.max_resource)
+			attacker.float_text("+30 Rage", Color(1.0, 0.5, 0.4))
+			_apply_status(attacker, "blood_price", 2)
+			attacker.refresh_bars()
+			_message("%s pays the Blood Price!" % attacker.unit_name)
+			_log("%s: Blood Price — bleeds %d HP for 30 Rage and +25%% damage (2 turns)%s" % [
+				attacker.unit_name, bp_cost,
+				" [PERFECT: cost halved]" if is_perfect else ""], "#e05050")
 		"battle_shout":
 			var shout_bleed := 0
 			for e in enemies:
