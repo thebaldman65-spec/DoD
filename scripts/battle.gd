@@ -507,6 +507,7 @@ func _spawn_units() -> void:
 		var u := _make_unit(cfg, HERO_SLOTS[i], hero_tint, _hero_plate_pos(i))
 		u.crit_bonus = cfg.get("crit_bonus", 0.0)
 		u.parry_bonus = cfg.get("parry_bonus", 0.0)
+		u.parry_chance = cfg.get("parry_chance", -1.0)
 		u.below_half_cb = _on_hero_below_half
 		if spec != "":
 			u.add_status("spec_passive", Classes.SPEC_INFO[spec]["name"], "★",
@@ -1493,7 +1494,7 @@ func _player_turn(u: BattleUnit) -> void:
 				"battle_shout", "blood_price", "flame_shield", "stabilize",
 				"overcharge", "cons_ground", "bulwark", "dark_pact", "hysteria",
 				"instinct", "bestial", "spirit_bond", "hold_breath",
-				"venom_coat", "deadfall"]:
+				"venom_coat", "deadfall", "guard_change"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -1651,6 +1652,37 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				if blust != null and u.resource >= blust.cost and u.ability_ready(blust) \
 						and u.hp < u.max_hp * 0.5:
 					return [blust, target_foe]
+				return [u.abilities[0], target_foe]  # Strike
+			# Swordmaster rotation (deterministic): keep the right guard up,
+			# then spend the Break his kit builds — Overpower gated on the
+			# meter is how the sim proves the Break engine pays out.
+			if u.passive_id == "seasoned":
+				var gchange := _find_ability(u, "Guard Change")
+				var sm_want := "defensive" if u.hp < u.max_hp * 0.45 else "aggressive"
+				if gchange != null and u.ability_ready(gchange) and u.stance != sm_want:
+					return [gchange, u]
+				var sm_exec := _find_ability(u, "Execute")
+				if sm_exec != null and u.resource >= sm_exec.cost \
+						and _ability_usable(u, sm_exec):
+					var sm_prey := foes.filter(func(e): return e.hp < e.max_hp * 0.2)
+					if not sm_prey.is_empty():
+						return [sm_exec, _lowest_hp(sm_prey)]
+				var sm_pommel := _find_ability(u, "Pommel Strike")
+				if sm_pommel != null and u.resource >= sm_pommel.cost \
+						and u.ability_ready(sm_pommel):
+					return [sm_pommel, target_foe]
+				var sm_over := _find_ability(u, "Overpower")
+				if sm_over != null and u.resource >= sm_over.cost \
+						and u.ability_ready(sm_over) and target_foe.pressure > 40:
+					return [sm_over, target_foe]
+				var sm_lunge := _find_ability(u, "Lunge")
+				if sm_lunge != null and u.resource >= sm_lunge.cost \
+						and u.ability_ready(sm_lunge):
+					return [sm_lunge, target_foe]
+				var sm_sweep := _find_ability(u, "Sweeping Strikes")
+				if sm_sweep != null and u.resource >= sm_sweep.cost \
+						and u.ability_ready(sm_sweep) and foes.size() >= 3:
+					return [sm_sweep, target_foe]
 				return [u.abilities[0], target_foe]  # Strike
 			var pommel := _find_ability(u, "Pommel Strike")
 			if pommel != null and u.resource >= pommel.cost and u.ability_ready(pommel) and randf() < 0.35:
@@ -2807,13 +2839,18 @@ func _miss_chance(attacker: BattleUnit, defender: BattleUnit = null) -> float:
 
 
 # One parry roll, attributed to the slice it landed in so the log can name
-# the source: base reflexes, the Sword Mastery talent, or the perfect-Pommel
-# Parry Up buff (deepened by Swordsmanship). "" = no parry.
+# the source: base reflexes, the Sword Mastery talent, or the Parry Up buff
+# (deepened by Swordsmanship). "" = no parry. A spec stat block can replace
+# the baseline outright (Swordmaster 12%); Parry Up's power carries its %
+# (0 = the classic 15 from a perfect Pommel; Guard Change grants 10).
 func _roll_parry(defender: BattleUnit) -> String:
-	var base := PARRY_CHANCE if defender.is_hero else ENEMY_PARRY_CHANCE
+	var base := defender.parry_chance if defender.parry_chance >= 0.0 \
+		else (PARRY_CHANCE if defender.is_hero else ENEMY_PARRY_CHANCE)
 	var talent := defender.parry_bonus
-	var buff := ((0.15 + defender.pommel_parry_bonus)
-		if defender.has_status("parry_up") else 0.0)
+	var buff := 0.0
+	if defender.has_status("parry_up"):
+		var pw := defender.status_power("parry_up")
+		buff = (pw if pw > 0 else 15) / 100.0 + defender.pommel_parry_bonus
 	var roll := randf()
 	if roll < base:
 		return "reflexes"
@@ -3373,9 +3410,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Iron Will: +5%/rank damage per debuff currently on the Warden.
 			if attacker.iron_will_ranks > 0:
 				raw *= 1.0 + 0.05 * attacker.iron_will_ranks * attacker.count_debuffs()
-			# Seasoned Fighter: the offensive stance above half HP.
-			if attacker.passive_id == "seasoned" and attacker.hp > attacker.max_hp * 0.5:
-				raw *= 1.15 + attacker.seasoned_off_bonus
+			# Seasoned Fighter: the chosen stance decides the blade's weight —
+			# Aggressive presses (talent-deepened), Defensive pulls the cut.
+			if attacker.passive_id == "seasoned":
+				raw *= (1.15 + attacker.seasoned_off_bonus) \
+					if attacker.stance == "aggressive" else 0.90
 			# Pack Bond (Canis): the hunter runs down wounded prey — +15%
 			# damage per enemy under 35% health, scaled by the bond tier.
 			if attacker.is_hero and attacker.passive_id == "pack":
@@ -3436,10 +3475,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 0.75
 			if strike_target.dmg_taken_bonus > 0.0:
 				raw *= 1.0 + strike_target.dmg_taken_bonus
-			# Seasoned Fighter: the defensive stance at or below half HP.
-			if strike_target.passive_id == "seasoned" \
-					and strike_target.hp <= strike_target.max_hp * 0.5:
-				raw *= 0.85 - strike_target.seasoned_def_bonus
+			# Seasoned Fighter: the guard decides what gets through — Defensive
+			# turns blows aside (talent-deepened), Aggressive leaves openings.
+			if strike_target.passive_id == "seasoned":
+				raw *= 1.10 if strike_target.stance == "aggressive" \
+					else (0.85 - strike_target.seasoned_def_bonus)
 			# Molten Core: burning attackers bite softer on the Pyromancer.
 			if strike_target.molten_ranks > 0 and attacker.has_status("burn"):
 				raw *= 1.0 - 0.02 * strike_target.molten_ranks
@@ -5276,6 +5316,43 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s roars with bloodlust!" % attacker.unit_name)
 			_log("%s: Battle Shout — +%d%% damage for 2 turns" % [attacker.unit_name,
 				shout_pct], "#70d878")
+		"guard_change":
+			# The swap itself (Rage and cooldown already handled generically).
+			attacker.stance = "defensive" if attacker.stance == "aggressive" \
+				else "aggressive"
+			var gc_label := "Aggressive" if attacker.stance == "aggressive" \
+				else "Defensive"
+			_sfx("parry", -6.0, 0.8)
+			attacker.float_text("%s Stance" % gc_label, Color(0.4, 0.9, 1.0))
+			attacker.refresh_bars()  # restamps the stance chip
+			# The pivot presses the opening he already made: 15 BD to the
+			# un-Broken enemy nearest to Breaking (auto-picked — the ability
+			# takes no target, keeping autoplay await-free).
+			var gc_mark: BattleUnit = null
+			for e in enemies:
+				if not e.dead and not e.broken \
+						and (gc_mark == null or e.pressure > gc_mark.pressure):
+					gc_mark = e
+			var gc_bd_txt := ""
+			if gc_mark != null:
+				var gc_res: Dictionary = gc_mark.take_hit(0, 15)
+				gc_mark.float_text("+%d BD" % int(gc_res["bd"]), Color(0.8, 0.35, 1.0))
+				gc_bd_txt = "; %d BD to %s" % [int(gc_res["bd"]), gc_mark.unit_name]
+				if gc_res["broke"]:
+					_stat("breaks_on_enemies")
+					_sfx("break", -3.0)
+					_message("%s BREAKS!" % gc_mark.unit_name)
+					_log("!! %s BREAKS" % gc_mark.unit_name, "#c070e0")
+					await _break_impact()
+			if is_perfect:
+				_apply_status(attacker, "parry_up", 2, 10)
+				attacker.update_status("parry_up", "P+",
+					"+%d%% parry chance." % (10
+					+ int(round(attacker.pommel_parry_bonus * 100))))
+			_message("%s shifts his guard — %s!" % [attacker.unit_name, gc_label])
+			_log("%s: Guard Change — %s stance%s%s" % [attacker.unit_name,
+				gc_label, gc_bd_txt,
+				" [PERFECT: +10% parry, 2 turns]" if is_perfect else ""], "#70d878")
 		"shield_block":
 			var blocks := 5 if is_perfect else 3
 			_sfx("parry", -6.0, 0.5)
@@ -6218,7 +6295,9 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 			if not target_died:
 				_apply_status(target, "burn", 2, 0, _dot_tick("burn", attacker))
 		"parry_up":
-			_apply_status(attacker, "parry_up", 3)
+			# Power carries the % so weaker sources (Guard Change's 10) never
+			# overwrite this one — status refresh keeps the higher power.
+			_apply_status(attacker, "parry_up", 3, 15)
 			# Swordsmanship (talent): the buff parries harder — show it.
 			if attacker.pommel_parry_bonus > 0.0:
 				attacker.update_status("parry_up", "P+",

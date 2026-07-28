@@ -4,7 +4,42 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
-## Blood Price (Batch B) — 2026-07-27
+## Swordmaster stances (Batch D) — 2026-07-28
+
+**Why the passive had to change:** the old Seasoned Fighter was a
+stance switch the player couldn't switch — HP decided which side was
+live, so it was a consolation prize: healthy, have damage; hurt, have
+armour. Nothing to build around, no skill expression. A master of
+technique who cannot choose his own guard is backwards; the fantasy IS
+the choice of guard.
+
+**Why each stance carries a downside** (+10% taken / −10% dealt): if
+Aggressive were strictly free damage, Defensive would be the only
+"decision" and only when dying — the old passive with extra steps. The
+downsides make the swap a trade at every health total.
+
+**Why Guard Change isn't a free action:** actions that don't consume a
+turn need engine support that doesn't exist, and a full-turn swap is
+too dear in a 7–9 round fight. So the swap does double duty — stance,
+15 BD, 15 Rage — at 1.5 initiative. If playtesting still finds it too
+expensive, the fallback is building true free actions (flagged, not
+guessed at).
+
+**Why the BD auto-targets the highest Break meter:** the ability takes
+no target so autoplay can never hang on a picker (the sim-hang rule),
+and thematically the swordsman presses the opening he already made.
+Un-Broken only — BD on a Broken enemy is a dead stat.
+
+**Why he gets a 12% parry BASE:** seven tree nodes touch parry off a
+5% base, so their payoffs almost never fired — over-invested,
+under-rewarded. Raising the base makes every parry node and both
+counter-attack payoffs live without touching them (that's Batch E's
+job). Stat identity mirrors the Warden: one Block-stat character, one
+parry-stat character.
+
+**Why 165 HP / 22% armor:** between the Berserker (175/15, glass
+brawler) and the Warden-to-come — the technician reads as the middle
+warrior at a glance.
 
 **Why the ability exists:** Blood Frenzy rewards being low, but nothing
 in the kit let him *choose* to go low — enemies decided when he got

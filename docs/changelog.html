@@ -5,6 +5,55 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-28 — Batch D: Swordmaster — stances become a choice</h2>
+<ul>
+<li><b>The diagnosis:</b> Seasoned Fighter was a stance switch the player couldn't switch —
+HP decided which side was live (+15% damage above half, −15% taken at or below), making it
+a consolation prize, not a decision. For a spec literally called Swordmaster, a master of
+technique who cannot choose his own guard was backwards.</li>
+<li><b>Seasoned Fighter v2 — the player owns the swap:</b> AGGRESSIVE (+15% damage dealt,
++10% damage taken) vs DEFENSIVE (−15% damage taken, −10% damage dealt); every battle opens
+Aggressive. The HP threshold is gone entirely. The spec chip shows the live guard (AGG/DEF)
+with both stances' numbers in the tooltip; the party sheet mirrors it.</li>
+<li><b>Guard Change (new base-kit ability):</b> 0 Rage, 1.5 initiative, 1cd, self-cast with
+no target selection (Battle Shout pattern — no await reachable in autoplay). Switches
+stance, deals 15 BD to the un-Broken enemy nearest to Breaking (auto-picked: the swordsman
+presses the opening he already made), builds 15 Rage (Perfect: +10% parry, 2 turns).
+Deliberately NOT a free action — turn-less actions need engine support, so the swap does
+double duty at a bargain initiative; the 1cd stops back-to-back spam. <b>Designer call
+flagged:</b> if playtesting shows the swap still costs too much tempo, the fallback is a
+genuine free action.</li>
+<li><b>Stat block (SPEC_INFO + apply_spec_stats):</b> 165 HP / 22% armor / <b>12% parry —
+parry_chance is a new stat-block field</b> that replaces the 5% hero baseline outright,
+making the Swordmaster the only parry-stat character as the Warden is the only Block-stat
+one (his seven parry-touching talent nodes finally have a base worth deepening).
+Constitution stays 120, Attack the role 100. The two landed stat blocks (Berserker's
+Batch A 175/15% included) are now documented in §6.1 — Batch A had deferred its docs
+here.</li>
+<li><b>Parry Up is now power-driven:</b> the status carries its % (Pommel perfect 15,
+Guard Change perfect 10) and the stronger application wins — the two sources coexist
+without overwriting each other. Swordsmanship deepens both.</li>
+<li><b>The stance talents stop being an either/or:</b> Aggressive/Defensive Stance keep
+their ids and payloads (+3%/rank each side's upside) but the exclusive_with pair is
+REMOVED — the player owns the swap, so deepening both guards is a real build. Batch E
+rebuilds the tree; this batch only stopped the payloads reading a threshold that no
+longer exists.</li>
+<li><b>Bot rotation (swordmaster-specific, deterministic):</b> Guard Change on stance
+mismatch (Defensive below 45% HP, Aggressive above) → Execute on sub-20% prey → Pommel
+Strike → Overpower when the target's Break meter is above 40 (the gate that proves the
+Break engine pays) → Lunge → Sweeping Strikes at 3+ enemies → Strike.</li>
+<li><b>Verified — gated 200-battle sim (swordmaster,cryomancer,inquisitor,beastmaster):</b>
+200/200 wins (the saturated ceiling — this is a crash test, not a balance measurement),
+9.0 rounds/battle, hero deaths/battle 0.27 (vs 0.43 with the Berserker party — the
+technician shields the line), survivors 73%. Damage share: Swordmaster 33% / Cryomancer
+33% / Beastmaster 30% / Devout 4%. <b>Breaks on enemies 1.33/battle vs 1.01</b> — the
+Break engine visible in aggregate. 20-battle debug run: Guard Change cast in BOTH
+directions (6 Defensive, 1 Aggressive), Overpower's scaling visible in the log (35 dmg
+mid-meter → 57 on a Broken Chief). Standard Berserker-party 200 also clean (untouched by
+design). Parse clean, both scenes; stat-block assertions (165/22%/12%, sheet shows 12%,
+no Berserker bleed-through) pass headless.</li>
+</ul>
+
 <h2>2026-07-27 — Batch C: the Berserker tree becomes a designed set of lanes</h2>
 <ul>
 <li><b>The tree moves from the Batch 31 conversion into a purpose-designed LANE_TREES

@@ -47,6 +47,7 @@ var second_max := 100
 var passive_id := ""       # specialization passive hook (see battle.gd)
 var crit_bonus := 0.0      # from talents
 var parry_bonus := 0.0     # from talents
+var parry_chance := -1.0   # spec stat-block base; -1 = role baseline (battle.gd)
 var block_chance := 0.0    # Block: fully negates an incoming attack (pure tanks)
 var dmg_bonus := 0.0       # global damage multiplier bonus (relics)
 var type_dmg_bonus := {}   # dmg_type -> bonus fraction (relics)
@@ -204,8 +205,9 @@ var sundering_ranks := 0      # Sundering: Crushing Blow BD splash to Adjacent
 var tenacity := 0             # Tenacity: +5 max HP per Heavy Plating block
 var tenacity_hp_gained := 0   # battle-long gains (excluded from the run save)
 var rally := 0                # Rally: party +15% healing for 2t per HP block
-var seasoned_def_bonus := 0.0 # Defensive Stance: deeper under-half reduction
-var seasoned_off_bonus := 0.0 # Aggressive Stance: bigger over-half bonus
+var seasoned_def_bonus := 0.0 # Defensive Stance: deeper damage-taken cut
+var seasoned_off_bonus := 0.0 # Aggressive Stance: bigger damage-dealt bonus
+var stance := "aggressive"    # Swordmaster guard (aggressive|defensive), fresh each battle
 # Pyromancer tree (07-18). See talents.gd for the node text.
 var accelerant_ranks := 0     # Accelerant: +1%/rank Burn tick strength
 var pyromaniac_ranks := 0     # Pyromaniac: +1%/rank Inferno Master step
@@ -720,17 +722,17 @@ func refresh_bars() -> void:
 					step, live, keep_pct, floor_pct]
 				_refresh_chips()
 				break
-	# Seasoned Fighter chip shows which side of the stance switch is live.
+	# Seasoned Fighter chip shows which guard is live; the tooltip carries
+	# both stances' numbers so the swap is an informed choice.
 	if passive_id == "seasoned":
 		for s in statuses:
 			if s.id == "spec_passive":
-				var offense := hp > max_hp * 0.5
+				var aggressive := stance == "aggressive"
 				var off_pct := int(round((0.15 + seasoned_off_bonus) * 100))
 				var def_pct := int(round((0.15 + seasoned_def_bonus) * 100))
-				s.short = "+dmg" if offense else "-dmg"
-				s.desc = "Seasoned Fighter: currently %s." % (
-					("+%d%% damage dealt (above half HP)" % off_pct) if offense
-					else ("%d%% less damage taken (at or below half HP)" % def_pct))
+				s.short = "AGG" if aggressive else "DEF"
+				s.desc = "Seasoned Fighter — current stance: %s.\nAGGRESSIVE: +%d%% damage dealt, +10%% damage taken.\nDEFENSIVE: %d%% less damage taken, -10%% damage dealt.\nGuard Change swaps (battles open Aggressive)." % [
+					"AGGRESSIVE" if aggressive else "DEFENSIVE", off_pct, def_pct]
 				_refresh_chips()
 				break
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)

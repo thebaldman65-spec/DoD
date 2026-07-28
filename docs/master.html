@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-27</b></p>
+<p align="right"><b>Last updated: 2026-07-28</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -160,7 +160,9 @@ strikes.</li>
 <li><b>Parry:</b> <b>only MELEE attacks can be parried</b> — ranged attackers (Hunter and
 Mage among heroes; Orc Archers and Shamans among enemies) sail past the blade. Baseline is
 split by side — <b>heroes parry at 5%, enemies at 2.5%</b> — plus parry bonuses (talents,
-Parry Up). A parried hit still lands but with <b>75% less damage AND 75% less Break
+Parry Up). A spec's stat block can replace the hero baseline outright: <b>the Swordmaster
+parries at 12%</b>, the game's only parry-STAT character, exactly as the Warden is its only
+Block-stat one. A parried hit still lands but with <b>75% less damage AND 75% less Break
 damage</b> (on-hit statuses can still apply); the log names the parry's source — reflexes,
 Sword Mastery, or Parry Up — e.g. "(parried -75% — Sword Mastery)". Parrying does not
 trigger an automatic counter. AoE cannot be parried; Broken units cannot parry; multi-hit
@@ -359,7 +361,8 @@ counter; released by the next Heal.</td></tr>
 <tr><td>Exposed</td><td>Takes 15% more damage.</td></tr>
 <tr><td>Cripple</td><td>−25% damage dealt.</td></tr>
 <tr><td>Retaliation</td><td>Counters attackers with a basic strike.</td></tr>
-<tr><td>Parry Up</td><td>+15% parry chance (Pommel Strike perfect).</td></tr>
+<tr><td>Parry Up</td><td>Raised parry chance: +15% from a perfect Pommel Strike (3 turns),
++10% from a perfect Guard Change (2 turns); the stronger application wins.</td></tr>
 <tr><td>Unity</td><td>Damage received is split evenly among living heroes (BD is
 not).</td></tr>
 <tr><td>Devoutness</td><td>Takes 5% less BD per talent rank (battle-long, from the
@@ -512,7 +515,10 @@ Sharpshooter 90, Pyromancer 85, Cryomancer 85.</p>
 
 <h3>6.1 Warrior</h3>
 <ul>
-<li><b>Berserker (Ramp)</b> — Passive <i>Blood Frenzy</i>: +2% damage for every 5% of health
+<li><b>Berserker (Ramp)</b> — <b>Stat block:</b> 175 HP / 15% armor / +10% shadow &amp;
+nature resist, −15% frost (the glass brawler: a bigger visible pool over mitigation —
+more Frenzy runway, more Rage from being hit).<br>
+Passive <i>Blood Frenzy</i>: +2% damage for every 5% of health
 missing (stepped; the Unstoppable talent raises the 2% to 2.5/3/3.5%). Half the highest
 bonus reached each battle is kept as a RATCHETING FLOOR — the live bonus never drops below
 it, so his fury never fully cools (the Scar Tissue talent deepens the floor to 60/70/75%
@@ -545,9 +551,13 @@ enemies, 3.0 int, 3cd; allies regain 10% of their resource.<br>
 5); a self-buff cast with no target selection whose chip counts the charges left. Hold the
 Line — 30 Rage, 3.5, 6cd, the party takes 50% less Break damage for 2 turns and
 cannot die for a turn (Perfect: refunds 5 Rage); also self-cast, no target selection.</li>
-<li><b>Swordmaster (Bruiser)</b> — Passive <i>Seasoned Fighter</i>: a stance switch — +15%
-damage dealt while above half HP; takes 15% less damage at or below half HP (both sides
-deepen via stance talents). The spec chip shows which side is live.<br>
+<li><b>Swordmaster (Bruiser)</b> — <b>Stat block:</b> 165 HP / 22% armor / <b>12%
+parry</b> (the technician; the only parry-stat character — see §4.3).<br>
+Passive <i>Seasoned Fighter</i>: fights in one of <b>two stances the PLAYER controls</b> —
+AGGRESSIVE (+15% damage dealt, +10% damage taken) or DEFENSIVE (15% less damage taken,
+−10% damage dealt). Every battle opens Aggressive; Guard Change swaps. The spec chip
+names the live stance (AGG/DEF) with both stances' numbers in its tooltip, and the
+stance talents deepen each side's upside.<br>
 Overpower — 30 Rage, 15 dmg / 20 BD / 2.5, 1cd, +0.5 damage per point of the target's Break
 meter, builds 10 Rage (Perfect: +5 bonus Rage).<br>
 Pommel Strike — 15 Rage, 25 dmg / 30 BD / 2.0, 2cd, has its own <b>25% base crit
@@ -555,6 +565,11 @@ chance</b>; 50% chance to Stun and a crit GUARANTEES the stun, builds 10 Rage
 (Perfect: +15% parry chance for 3 turns, deepened by Swordsmanship).<br>
 Sweeping Strikes — 20 Rage, 2 strikes × 15 dmg / 8 BD, 3.0, no cd, Dazes the target
 3 turns, builds 10 Rage (Perfect: +25% crit on the second swing).<br>
+Guard Change — 0 Rage, 1.5 int, 1cd; a self-cast with no target selection: switches
+stance, deals <b>15 BD to the un-Broken enemy nearest to Breaking</b> (auto-picked —
+the swordsman presses the opening he already made) and builds 15 Rage (Perfect: +10%
+parry chance for 2 turns). Deliberately not a free action: the swap does double duty —
+stance, pressure, refuel — at a bargain initiative instead.<br>
 <i>Talent-granted:</i> Lunge — 25 Rage, 35 dmg / 20 BD, 3.5, applies Exposed above 50%
 health / Cripple below, builds 10 Rage (Perfect: 3.0 initiative). Execute — 30 Rage, 55 dmg
 / 50 BD, 2.0, 3cd, only usable against targets below 20% health (Perfect: guaranteed
@@ -953,9 +968,11 @@ additional point invested adds the SAME amount again (e.g. "+5 Bleed per rank" a
 <p><b>Layout:</b> every tree renders as three lane columns with live lane-point headers,
 a capstone shelf, emblem-square nodes with point counters, cost-aware hover tooltips, and
 greyed exclusive siblings. Art is placeholder.</p>
-<p><b>Swordmaster tree:</b> Defensive Stance (Seasoned under-half reduction
-+3%/rank ×3), Swordsmanship (perfect-Pommel parry buff +5%/rank ×3), Aggressive Stance
-(Seasoned over-half bonus +3%/rank ×3). Dominant Presence (armor +5%/rank per debuff
+<p><b>Swordmaster tree:</b> Defensive Stance (the Defensive stance blocks an additional
+3%/rank damage taken ×3), Swordsmanship (perfect-Pommel parry buff +5%/rank ×3),
+Aggressive Stance (the Aggressive stance deals an additional 3%/rank damage ×3) — the two
+stance nodes are complementary, not exclusive: the player owns the swap, so deepening both
+guards is a real build. Dominant Presence (armor +5%/rank per debuff
 applied ×3), High Guard (25% less damage for 1 turn after parrying, needs Swordsmanship 1),
 Lunge (grants the ability), Riposte (<b>Counter Attack</b>: answer every parry with a
 Strike, needs Swordsmanship 1), Precision Strikes (+5%/rank crit vs Dazed / Crippled /

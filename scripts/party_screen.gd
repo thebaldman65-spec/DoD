@@ -103,7 +103,7 @@ func _passive_desc_live(cfg: Dictionary, spec: String) -> String:
 	var desc: String = Classes.SPEC_INFO[spec]["passive_desc"]
 	match Classes.SPEC_INFO[spec]["passive"]:
 		"seasoned":
-			desc = "Seasoned Fighter: +%d%% damage above half HP;\ntakes %d%% less damage at or below half HP." % [
+			desc = "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +%d%% damage dealt, +10%% damage taken.\nDEFENSIVE — %d%% less damage taken, -10%% damage dealt.\nStarts each battle Aggressive; Guard Change swaps." % [
 				int(round((0.15 + float(cfg.get("seasoned_off_bonus", 0.0))) * 100)),
 				int(round((0.15 + float(cfg.get("seasoned_def_bonus", 0.0))) * 100))]
 		"bloodrage":
@@ -190,8 +190,10 @@ func _draw_detail() -> void:
 			"Constitution — Break resistance: incoming Break damage is\nscaled by 100/Constitution (100 = neutral, higher = tougher\nto Break)."]],
 		[["Crit Chance: %d%%" % crit_pct,
 			"Crit Chance — chance to strike for 50% extra damage\n(base 10% plus bonuses)."],
-		["Parry: %d%%" % int(round((0.05 + cfg.get("parry_bonus", 0.0)) * 100)),
-			"Parry — a parried MELEE hit deals 75% less damage\nand Break damage (base 5% plus bonuses; ranged\nattacks can't be parried)."]],
+		["Parry: %d%%" % int(round((float(cfg.get("parry_chance", 0.05))
+				+ float(cfg.get("parry_bonus", 0.0))) * 100)),
+			"Parry — a parried MELEE hit deals 75%% less damage\nand Break damage (base %d%% for this hero plus\nbonuses; ranged attacks can't be parried)." % \
+			int(round(float(cfg.get("parry_chance", 0.05)) * 100))]],
 	]
 	# Only pure tanks carry a Block stat (the Warden, for now).
 	if cfg.get("block_chance", 0.0) > 0.0:

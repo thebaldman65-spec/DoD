@@ -384,6 +384,8 @@ static func spec_resists(spec: String) -> Dictionary:
 # Berserker leads — 175 HP / 15% armor keeps his effective HP against
 # physical within 0.3% of the old 154 / 25%, trading mitigation for a
 # bigger visible pool: more Frenzy runway, more Rage from being hit).
+# parry_chance replaces the hero baseline outright (the Swordmaster is
+# the only parry-stat character, as the Warden is the only Block one).
 static func apply_spec_stats(cfg: Dictionary, spec: String) -> void:
 	if spec == "" or not SPEC_INFO.has(spec):
 		return
@@ -395,6 +397,8 @@ static func apply_spec_stats(cfg: Dictionary, spec: String) -> void:
 		cfg["max_hp"] = int(info["max_hp"])
 	if info.has("armor"):
 		cfg["armor"] = float(info["armor"])
+	if info.has("parry_chance"):
+		cfg["parry_chance"] = float(info["parry_chance"])
 
 
 const ARCHETYPE_DESC := {
@@ -441,7 +445,8 @@ const SPEC_INFO := {
 		"passive_desc": "Heavy Plating: 15% chance to Block an incoming attack\n(on top of the Warden's 5% base Block).",
 		"blurb": "Protector of the weak — shields allies with their own body."},
 	"swordmaster": {"name": "Swordmaster", "constitution": 120, "archetype": "Bruiser", "passive": "seasoned",
-		"passive_desc": "Seasoned Fighter: +15% damage above half HP;\ntakes 15% less damage at or below half HP.",
+		"max_hp": 165, "armor": 0.22, "parry_chance": 0.12,
+		"passive_desc": "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +15% damage dealt, +10% damage taken.\nDEFENSIVE — 15% less damage taken, -10% damage dealt.\nStarts each battle Aggressive; Guard Change swaps.",
 		"blurb": "Precision and technique — presses hard, then weathers the storm."},
 	"pyromancer": {"name": "Pyromancer", "constitution": 85, "archetype": "Nuker", "passive": "inferno",
 		"passive_desc": "Inferno Master: +5% damage for each burning enemy (up to +25%).",
@@ -539,6 +544,14 @@ static func spec_abilities(spec: String) -> Array:
 					"applies_status": {"id": "dazed", "turns": 3},
 					"perfect_id": "", "perfect_text": "+25% crit chance on the second swing",
 					"description": "Two broad cuts that leave the target\nDazed for 3 turns. Builds 10 Rage."}),
+				# Not a free action on purpose: turn-less actions need engine
+				# support, so the swap does double duty — stance, pressure,
+				# refuel — at a bargain 1.5 initiative. The 1cd stops spam.
+				Ability.make({"display_name": "Guard Change", "cost": 0,
+					"special": "guard_change", "delay": 1.5, "anim": "attack01",
+					"cooldown": 1, "resource_gain": 15,
+					"perfect_id": "", "perfect_text": "+10% parry chance for 2 turns",
+					"description": "Shift to the other stance mid-flow.\nThe pivot presses the opening: 15 BD\nto the enemy nearest to Breaking.\nBuilds 15 Rage."}),
 			]
 		"pyromancer":
 			# Burn-centric kit (07-16 rework; the core Magic Bolt becomes

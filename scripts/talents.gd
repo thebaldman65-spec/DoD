@@ -18,7 +18,7 @@ const FIXED_TREES := {
 		# --- row 0 ---
 		{"id": "sm_def_stance", "name": "Defensive Stance", "ranks": 3, "row": 0, "col": 1,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Seasoned Fighter reduces damage taken while under 50% health by an additional {v}%.",
+			"desc": "The Defensive stance blocks an additional {v}% damage taken.",
 			"scale": {"step": 3},
 			"payload": {"stat": {"seasoned_def_bonus": 0.03}}},
 		{"id": "sm_swordsmanship", "name": "Swordsmanship", "ranks": 3, "row": 0, "col": 2,
@@ -28,7 +28,7 @@ const FIXED_TREES := {
 			"payload": {"stat": {"pommel_parry_bonus": 0.05}}},
 		{"id": "sm_agg_stance", "name": "Aggressive Stance", "ranks": 3, "row": 0, "col": 3,
 			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Seasoned Fighter increases damage dealt above 50% health by an additional {v}%.",
+			"desc": "The Aggressive stance grants an additional {v}% damage dealt.",
 			"scale": {"step": 3},
 			"payload": {"stat": {"seasoned_off_bonus": 0.03}}},
 		# --- row 1 ---
@@ -1001,9 +1001,12 @@ const LANE_TREES := {
 const LANE_CONVERSIONS := {
 	"swordmaster": {
 		"map": {
-			"sm_agg_stance": ["Blade", 0, "", "sm_def_stance"], "sm_lunge": ["Blade", 0],
+			# The stance nodes stopped being an either/or with Seasoned Fighter
+			# v2 (Batch D): the player owns the swap, so deepening BOTH guards
+			# is a real build — the exclusivity is gone.
+			"sm_agg_stance": ["Blade", 0], "sm_lunge": ["Blade", 0],
 			"sm_precision": ["Blade", 1], "sm_seasoned_node": ["Blade", 1],
-			"sm_def_stance": ["Poise", 0, "", "sm_agg_stance"], "sm_high_guard": ["Poise", 1],
+			"sm_def_stance": ["Poise", 0], "sm_high_guard": ["Poise", 1],
 			"sm_dominant": ["Poise", 1],
 			"sm_swordsmanship": ["Duelist", 0], "sm_sword_mastery": ["Duelist", 0],
 			"sm_riposte": ["Duelist", 1], "sm_opportunist": ["Duelist", 1],
