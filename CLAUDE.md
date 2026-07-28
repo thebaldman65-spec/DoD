@@ -12,7 +12,8 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   its "Last updated" timestamp; (2) add an entry to `docs/changelog.html`
   (newest first); (3) rebuild both docx via `python3 docs/build_docs.py`
   (unwraps paragraphs — plain textutil makes Word spacing weird; exports are
-  Arial size 14 by user preference).
+  Arial size 14 by user preference); (4) append a short "why" entry to
+  docs/design-notes.md — rationale only, not instructions.
 - master.html shows ONLY what is currently in the game (user rule 07-20):
   no vault lists, no "was/now/moved/reworked/renamed" notes, no decision
   dates — change history belongs in changelog.html alone.
