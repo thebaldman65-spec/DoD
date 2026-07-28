@@ -22,7 +22,7 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - User drops new assets in `../imported files/` — always check there.
   New character sprites need the Soldier format: 100x100 frame strips named
   `Name_Idle/Walk/Attack01-03/Hurt/Death.png`.
-- Commit after each change batch. Launch the game for playtesting via
+- Commit AND PUSH (origin/main) after each change batch. Launch the game for playtesting via
   `/Applications/Godot.app/Contents/MacOS/Godot --path <this dir>` (background,
   watch stderr for errors).
 
