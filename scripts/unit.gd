@@ -159,6 +159,9 @@ var companion_power := 0      # talents: extra damage on companion attacks
 # Fixed-tree talent stats (0/0.0 = not learned). See talents.gd for sources.
 var bleed_bonus := 0          # Savagery: extra Bleed on bleed-building abilities
 var bloodrage_step_bonus := 0.0  # Unstoppable: adds to Blood Frenzy's 2%/step
+var frenzy_floor := 0.0  # Blood Frenzy v2: half the peak bonus this battle
+                         # (fraction; ratchets up, never resets mid-battle —
+                         # units are built fresh each battle)
 var pierce_bonus := 0.0       # flat armor penetration from talents
 var dmg_taken_bonus := 0.0    # Reckless Fury: takes more damage
 var enraged_ranks := 0        # Enraged: stacks when dropping below 50% HP
@@ -695,11 +698,12 @@ func refresh_bars() -> void:
 		for s in statuses:
 			if s.id == "spec_passive":
 				var step := 2.0 + bloodrage_step_bonus
-				var steps := int((1.0 - hp / float(max_hp)) * 100.0 / 5.0)
-				var bonus := step * steps
-				s.short = "+%d%%" % int(round(bonus))
-				s.desc = "Blood Frenzy: +%.1f%% damage per 5%% HP missing.\nCurrently +%.1f%% (%d steps)." % [
-					step, bonus, steps]
+				var live := frenzy_bonus() * 100.0
+				var floor_pct := frenzy_floor * 100.0
+				s.short = "+%d%% (floor %d%%)" % [int(round(live)),
+					int(round(floor_pct))]
+				s.desc = "Blood Frenzy: +%.1f%% damage per 5%% HP missing.\nCurrently +%.1f%%. The floor — half the highest\nbonus reached this battle — is +%.1f%%\nand never falls." % [
+					step, live, floor_pct]
 				_refresh_chips()
 				break
 	# Seasoned Fighter chip shows which side of the stance switch is live.
@@ -1056,6 +1060,19 @@ func return_to_idle() -> void:
 # ---------- damage / healing ----------
 
 # Applies damage + Pressure. Returns what happened so battle.gd can react.
+# Blood Frenzy v2 (Berserker passive): +step per full 5% of health
+# missing, with a RATCHETING FLOOR — half the highest bonus reached
+# this battle; the live bonus never drops below it. Returns the bonus
+# as a fraction (0.14 = +14%) and ratchets as a side effect: called
+# where damage is read AND after every hit taken, so a dive that gets
+# healed away before his next attack still banks its floor.
+func frenzy_bonus() -> float:
+	var step := (2.0 + bloodrage_step_bonus) / 100.0
+	var current := int((1.0 - hp / float(max_hp)) * 100.0 / 5.0) * step
+	frenzy_floor = maxf(frenzy_floor, current * 0.5)
+	return maxf(current, frenzy_floor)
+
+
 func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	if amount > 0:
 		damaged_since_turn = true  # Unbroken Watch bookkeeping
@@ -1202,6 +1219,9 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		_die()
 	elif not just_broke:
 		play_anim("hurt")
+	# Blood Frenzy v2: every hit taken banks its floor immediately.
+	if passive_id == "bloodrage" and not dead:
+		frenzy_bonus()
 	refresh_bars()
 	return {"died": dead, "broke": just_broke, "bd": applied_bd}
 
@@ -1220,6 +1240,9 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 		hp = maxi(int(max_hp * 0.25), 1)
 		float_text("REBORN IN ASH", Color(1.0, 0.6, 0.2), true)
 		_proc_log("Talent: Ashes of Al'ar — %s rises from the ashes (25%% HP)" % unit_name)
+	# Blood Frenzy v2: tick-driven dives bank their floor too.
+	if passive_id == "bloodrage" and not dead:
+		frenzy_bonus()
 	float_text(label, color)
 	if hp <= 0:
 		_die()

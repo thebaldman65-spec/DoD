@@ -377,6 +377,26 @@ static func spec_resists(spec: String) -> Dictionary:
 	return SPEC_INFO[spec].get("resists", {})
 
 
+# THE spec stat block, one source of truth: the battle spawn and the
+# party sheet both call this (master.html §11 — the two must never
+# drift; same precedent as apply_passive). Constitution/Attack/resists
+# always; max_hp and armor only once a spec declares them (the
+# Berserker leads — 175 HP / 15% armor keeps his effective HP against
+# physical within 0.3% of the old 154 / 25%, trading mitigation for a
+# bigger visible pool: more Frenzy runway, more Rage from being hit).
+static func apply_spec_stats(cfg: Dictionary, spec: String) -> void:
+	if spec == "" or not SPEC_INFO.has(spec):
+		return
+	var info: Dictionary = SPEC_INFO[spec]
+	cfg["constitution"] = info.get("constitution", cfg.get("constitution", 100))
+	cfg["attack"] = spec_attack(spec)
+	cfg["resists"] = spec_resists(spec).duplicate()
+	if info.has("max_hp"):
+		cfg["max_hp"] = int(info["max_hp"])
+	if info.has("armor"):
+		cfg["armor"] = float(info["armor"])
+
+
 const ARCHETYPE_DESC := {
 	"Ramp": "Starts weak, snowballs as the battle progresses.",
 	"Rush": "Starts strong; resources dwindle as the fight drags on.",
@@ -413,7 +433,9 @@ static func apply_passive(cfg: Dictionary, spec: String) -> void:
 
 const SPEC_INFO := {
 	"berserker": {"name": "Berserker", "constitution": 110, "archetype": "Ramp", "passive": "bloodrage",
-		"passive_desc": "Blood Frenzy: +2% damage for every 5% of health missing.",
+		"max_hp": 175, "armor": 0.15,
+		"resists": {"shadow": 0.10, "nature": 0.10, "frost": -0.15},
+		"passive_desc": "Blood Frenzy: +2% damage for every 5% of health missing.\nHalf the highest bonus reached each battle is kept as a\nfloor — his fury never fully cools.",
 		"blurb": "Reckless savagery — grows stronger as their blood spills."},
 	"warden": {"name": "Warden", "constitution": 110, "archetype": "Tank", "passive": "heavy_plating",
 		"passive_desc": "Heavy Plating: 15% chance to Block an incoming attack\n(on top of the Warden's 5% base Block).",

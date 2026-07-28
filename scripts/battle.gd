@@ -312,10 +312,19 @@ func _spawn_units() -> void:
 			hero_keys.append(member["key"])
 	# DOD_SIM_SPECS="berserker,cryomancer,inquisitor,beastmaster" overrides the
 	# specs used by autoplay/sim battles (order: warrior, mage, cleric, hunter).
-	var sim_specs := ["swordmaster", "pyromancer", "holy", "sharpshooter"]
+	var default_specs := ["swordmaster", "pyromancer", "holy", "sharpshooter"]
+	var sim_specs := default_specs
 	var env_specs := OS.get_environment("DOD_SIM_SPECS")
 	if env_specs != "":
-		sim_specs = env_specs.split(",")
+		sim_specs = Array(env_specs.split(","))
+		# A short list used to index past the end at spawn — _spawn_units
+		# aborted mid-loop and the enemy-less battle counted as a hollow
+		# 0.2s "victory". Pad with the defaults and say so instead.
+		while sim_specs.size() < hero_keys.size():
+			var pad: String = default_specs[mini(sim_specs.size(), 3)]
+			push_warning("DOD_SIM_SPECS: %d entries for %d heroes — slot %d padded with %s"
+				% [sim_specs.size(), hero_keys.size(), sim_specs.size() + 1, pad])
+			sim_specs.append(pad)
 	var name_counts := {}
 	for i in hero_keys.size():
 		var cfg := Classes.hero_config(hero_keys[i])
@@ -335,13 +344,10 @@ func _spawn_units() -> void:
 			cfg["passive_id"] = Classes.SPEC_INFO[spec]["passive"]
 			# Once awakened, the hero goes by their spec, not their class.
 			cfg["unit_name"] = Classes.SPEC_INFO[spec]["name"]
-			# Role-based break resistance replaces the class base once specced.
-			cfg["constitution"] = Classes.SPEC_INFO[spec].get("constitution",
-				cfg.get("constitution", 100))
-			# Spec stat block: Attack by role (Tank 75 / Damage 100 / Support
-			# 50 until per-spec values land) and innate resistances.
-			cfg["attack"] = Classes.spec_attack(spec)
-			cfg["resists"] = Classes.spec_resists(spec).duplicate()
+			# Spec stat block (constitution/Attack/resists, plus max_hp and
+			# armor once a spec declares them) — the party sheet calls the
+			# SAME helper, so the two can never drift.
+			Classes.apply_spec_stats(cfg, spec)
 			# Arcane Resonance is the Arcanist's passive mechanic alone.
 			if spec == "arcanist":
 				cfg["second_resource_name"] = "Resonance"
@@ -358,6 +364,11 @@ func _spawn_units() -> void:
 					cfg[art_key] = SPEC_ART[spec][art_key]
 			Classes.apply_kit_overrides(cfg, spec)
 			Classes.apply_passive(cfg, spec)
+			# Spec stat blocks may override max_hp (Berserker 175): re-read
+			# the scaling baseline AFTER the spec block so node scaling
+			# (+2% of base per win) compounds off the spec's base, not the
+			# class's 154 — the ordering trap from the batch doc.
+			base_hp = cfg["max_hp"]
 			if Run.active and i < Run.party.size():
 				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
 					Run.party[i].get("talents", {}))
@@ -3273,11 +3284,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 0.85
 			if atk_chill > 0:
 				raw *= 1.0 - 0.01 * _max_hero_rank("hungering_ranks") * atk_chill
-			# Blood Frenzy: +2% damage (plus Unstoppable) per 5% of HP missing.
+			# Blood Frenzy v2: +2% (plus Unstoppable) per 5% missing, never
+			# below the ratcheting floor (half this battle's peak bonus) —
+			# the unit-side helper ratchets and returns in one motion.
 			if attacker.passive_id == "bloodrage":
-				var frenzy_steps := int((1.0 - attacker.hp / float(attacker.max_hp)) \
-					* 100.0 / 5.0)
-				raw *= 1.0 + (2.0 + attacker.bloodrage_step_bonus) * frenzy_steps / 100.0
+				raw *= 1.0 + attacker.frenzy_bonus()
 			# Enraged (talent): stacks from dropping below half HP.
 			if attacker.enraged_stacks > 0 and attacker.enraged_ranks > 0:
 				raw *= 1.0 + 0.03 * attacker.enraged_ranks * attacker.enraged_stacks

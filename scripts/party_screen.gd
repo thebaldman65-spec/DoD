@@ -107,7 +107,7 @@ func _passive_desc_live(cfg: Dictionary, spec: String) -> String:
 				int(round((0.15 + float(cfg.get("seasoned_off_bonus", 0.0))) * 100)),
 				int(round((0.15 + float(cfg.get("seasoned_def_bonus", 0.0))) * 100))]
 		"bloodrage":
-			desc = "Blood Frenzy: +%s%% damage for every 5%% of health missing." % \
+			desc = "Blood Frenzy: +%s%% damage for every 5%% of health missing.\nHalf the highest bonus reached each battle is kept as a\nfloor — his fury never fully cools." % \
 				String.num(2.0 + float(cfg.get("bloodrage_step_bonus", 0.0)), 1)
 	return desc
 
@@ -122,11 +122,12 @@ func _draw_detail() -> void:
 		cfg["abilities"] = cfg["abilities"] + Classes.spec_abilities(spec)
 		Classes.apply_kit_overrides(cfg, spec)
 		Classes.apply_passive(cfg, spec)
-		# Specced heroes use their spec's stat block (mirrors battle spawn).
-		cfg["constitution"] = Classes.SPEC_INFO[spec].get("constitution",
-			cfg.get("constitution", 100))
-		cfg["attack"] = Classes.spec_attack(spec)
-		cfg["resists"] = Classes.spec_resists(spec).duplicate()
+		# Specced heroes use their spec's stat block — the SAME helper the
+		# battle spawn calls, so sheet and nameplate can never drift.
+		Classes.apply_spec_stats(cfg, spec)
+		# Spec blocks may override max_hp (Berserker 175): re-read the
+		# scaling baseline after the block, mirroring the battle spawn.
+		base_hp = cfg["max_hp"]
 		Talents.apply_from_tree(cfg, member.get("tree", []), member.get("talents", {}))
 	for rune in member.get("runes", []):
 		if rune.get("equipped", false):
