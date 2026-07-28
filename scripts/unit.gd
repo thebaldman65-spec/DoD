@@ -162,6 +162,18 @@ var bloodrage_step_bonus := 0.0  # Unstoppable: adds to Blood Frenzy's 2%/step
 var frenzy_floor := 0.0  # Blood Frenzy v2: half the peak bonus this battle
                          # (fraction; ratchets up, never resets mid-battle —
                          # units are built fresh each battle)
+var scar_tissue_ranks := 0    # Scar Tissue: floor keeps 60/70/75% of the peak
+var scent_ranks := 0          # Scent of Blood: +3%/rank damage per bleedout
+var blood_tithe_ranks := 0    # Blood Tithe: 15/rank Rage per enemy bleedout
+var arterial_ranks := 0       # Arterial Spray: 25%/rank buildup transfer
+var deathwish_ranks := 0      # Deathwish: +6%/rank damage below 35% health
+var bloodied_momentum_ranks := 0  # Bloodied Momentum: 15/rank Rage per kill
+var second_wind := 0          # Second Wind: first drop below 25% grants 40 Rage
+var second_wind_used := false
+var exsanguination := 0       # capstone: 35% bleedouts, full buildup chains on
+var undying_rage := 0         # capstone: below 25% cannot die, +50% damage
+var undying_rage_used := false
+var bleedouts_this_battle := 0  # enemies bled out so far (Scent of Blood)
 var pierce_bonus := 0.0       # flat armor penetration from talents
 var dmg_taken_bonus := 0.0    # Reckless Fury: takes more damage
 var enraged_ranks := 0        # Enraged: stacks when dropping below 50% HP
@@ -700,10 +712,12 @@ func refresh_bars() -> void:
 				var step := 2.0 + bloodrage_step_bonus
 				var live := frenzy_bonus() * 100.0
 				var floor_pct := frenzy_floor * 100.0
+				# Scar Tissue rewrites how much of the peak the floor keeps.
+				var keep_pct: int = [50, 60, 70, 75][clampi(scar_tissue_ranks, 0, 3)]
 				s.short = "+%d%% (floor %d%%)" % [int(round(live)),
 					int(round(floor_pct))]
-				s.desc = "Blood Frenzy: +%.1f%% damage per 5%% HP missing.\nCurrently +%.1f%%. The floor — half the highest\nbonus reached this battle — is +%.1f%%\nand never falls." % [
-					step, live, floor_pct]
+				s.desc = "Blood Frenzy: +%.1f%% damage per 5%% HP missing.\nCurrently +%.1f%%. The floor — %d%% of the highest\nbonus reached this battle — is +%.1f%%\nand never falls." % [
+					step, live, keep_pct, floor_pct]
 				_refresh_chips()
 				break
 	# Seasoned Fighter chip shows which side of the stance switch is live.
@@ -1069,7 +1083,13 @@ func return_to_idle() -> void:
 func frenzy_bonus() -> float:
 	var step := (2.0 + bloodrage_step_bonus) / 100.0
 	var current := int((1.0 - hp / float(max_hp)) * 100.0 / 5.0) * step
-	frenzy_floor = maxf(frenzy_floor, current * 0.5)
+	# Scar Tissue: the floor keeps 60/70/75% of the peak instead of half.
+	var keep: float = [0.5, 0.6, 0.7, 0.75][clampi(scar_tissue_ranks, 0, 3)]
+	if current * keep > frenzy_floor:
+		frenzy_floor = current * keep
+		if scar_tissue_ranks > 0:
+			_proc_log("Talent: Scar Tissue — %s's Frenzy floor scars in at +%d%%" % [
+				unit_name, int(round(frenzy_floor * 100.0))])
 	return maxf(current, frenzy_floor)
 
 
@@ -1140,6 +1160,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			amount = stable_cap
 	var was_above_half := hp > max_hp * 0.5
 	var was_above_quarter := hp > max_hp * 0.25
+	var was_below_deathwish := hp < max_hp * 0.35
 	var was_above_mercy := hp > max_hp * mercy_threshold
 	hp = maxi(hp - amount, 0)
 	_check_below_half(was_above_mercy)
@@ -1147,6 +1168,13 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	if hp == 0 and has_status("undying"):
 		hp = 1
 		float_text("HELD THE LINE", Color(0.95, 0.85, 0.4))
+	# Undying Rage (capstone): once per battle, death itself is refused —
+	# the killing hit ends the rage at 1 HP.
+	if hp == 0 and undying_rage > 0 and not undying_rage_used:
+		undying_rage_used = true
+		hp = 1
+		float_text("UNDYING RAGE", Color(0.95, 0.25, 0.2), true)
+		_proc_log("Capstone: Undying Rage — %s refuses to die (1 HP; the rage ends)" % unit_name)
 	# Ashes of Al'ar: the phoenix may refuse the grave (once per battle).
 	if hp == 0 and ashes_ranks > 0 and not ashes_used \
 			and randf() < 0.11 * ashes_ranks:
@@ -1185,6 +1213,20 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		float_text("+%d Constitution" % con_gain, Color(0.7, 0.8, 0.95))
 		_proc_log("Talent: Unrelenting Assault — %s gains +%d Constitution (3 turns)" % [
 			unit_name, con_gain])
+	# Second Wind (talent): the first dive below 25% each battle becomes
+	# a turn, not just a scare.
+	if second_wind > 0 and not second_wind_used and was_above_quarter \
+			and hp <= max_hp * 0.25 and hp > 0:
+		second_wind_used = true
+		resource = mini(resource + 40, max_resource)
+		float_text("SECOND WIND +40 Rage", Color(1.0, 0.5, 0.4))
+		_proc_log("Talent: Second Wind — %s surges back (+40 Rage)" % unit_name)
+	# Deathwish (talent): crossing under 35% health, the edge sharpens.
+	if deathwish_ranks > 0 and not was_below_deathwish \
+			and hp < max_hp * 0.35 and hp > 0:
+		float_text("DEATHWISH +%d%%" % (6 * deathwish_ranks), Color(0.9, 0.3, 0.3))
+		_proc_log("Talent: Deathwish — %s deals +%d%% damage below 35%% health" % [
+			unit_name, 6 * deathwish_ranks])
 	# Mana Shield: half the pain flows back as Mana.
 	if has_status("mana_shield") and resource_name == "Mana" and amount > 0:
 		var converted := maxi(int(amount * 0.5), 1)
@@ -1234,6 +1276,11 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 	if hp == 0 and has_status("undying"):
 		hp = 1
 		float_text("HELD THE LINE", Color(0.95, 0.85, 0.4))
+	if hp == 0 and undying_rage > 0 and not undying_rage_used:
+		undying_rage_used = true
+		hp = 1
+		float_text("UNDYING RAGE", Color(0.95, 0.25, 0.2), true)
+		_proc_log("Capstone: Undying Rage — %s refuses to die (1 HP; the rage ends)" % unit_name)
 	if hp == 0 and ashes_ranks > 0 and not ashes_used \
 			and randf() < 0.11 * ashes_ranks:
 		ashes_used = true

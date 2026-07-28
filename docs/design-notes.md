@@ -53,3 +53,19 @@ compounds much harder on him.
 Crushing Blows and Battle Shout both read — the payoff punished the
 setup. The Bloodletting lane is being split into "keep wounds open"
 versus "burst them" so the reset becomes a choice rather than a bug.
+
+**Berserker lanes (Batch C):** Bloodletting now pays at the burst four
+ways — heal, Rage, transfer, and a permanent damage ramp — so the
+meter reset the previous note flagged becomes a choice rather than a
+loss. No node was deleted in the re-spec: ids are save-keys, and a
+re-spec that renames beats a refund that orphans. The dull dials went
+first because two were literal duplicates of neighbouring nodes
+(Gushing/Savagery, Feast/Bloodcraze), and a duplicate is a wasted
+decision. Scent of Blood is the one node that compounds over a fight —
+a "Ramp" archetype was strangely missing one. Scar Tissue deepens the
+Batch A floor rather than adding a new number: talents near a passive
+should make the passive read better, not longer. Undying Rage reuses
+Hold the Line's death-refusal instead of a second code path — one
+rule, two doors. Measured Rage moved beside Reckless Fury because an
+exclusive pair split across lanes reads as a bug: the player must see
+both doors in one column.

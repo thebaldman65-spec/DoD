@@ -513,7 +513,10 @@ Sharpshooter 90, Pyromancer 85, Cryomancer 85.</p>
 <h3>6.1 Warrior</h3>
 <ul>
 <li><b>Berserker (Ramp)</b> — Passive <i>Blood Frenzy</i>: +2% damage for every 5% of health
-missing (stepped; the Unstoppable talent raises the 2% to 2.5/3/3.5%).<br>
+missing (stepped; the Unstoppable talent raises the 2% to 2.5/3/3.5%). Half the highest
+bonus reached each battle is kept as a RATCHETING FLOOR — the live bonus never drops below
+it, so his fury never fully cools (the Scar Tissue talent deepens the floor to 60/70/75%
+of the peak). The floor banks on every hit taken, even one healed away.<br>
 Bloodlust — 25 Rage, 26 dmg / 18 BD / 3.0, 2cd, heals 30% of missing HP, builds 10 Rage
 (Perfect: 45% missing HP).<br>
 Wildstrikes — 35 Rage, 16 dmg to ALL / 14 BD / 4.5, 3cd, +35 Bleed each, builds 10 Rage
@@ -789,20 +792,45 @@ own Trapper bonus from the target.<br>
 <p><b>Economy:</b> talent points come from victories alone — <b>1 per fight, 2 per elite,
 3 per zone boss</b> (rests and shops award none; Waystone +1 at run start). Points bank
 until spent on the Party screen.</p>
-<p><b>Two tree formats exist.</b> The <b>LANE framework</b> (new — the Beastmaster is its
-pilot) and the <b>classic fixed grids</b> (the other nine specs, converting lane-by-lane in
-later batches).</p>
+<p><b>Every tree is a lane tree.</b> Four are purpose-designed on the lane framework
+(<b>Berserker, Sharpshooter, Survivalist, Beastmaster</b>); the other eight are Batch 31
+conversions of their classic grids awaiting the same treatment.</p>
 <p><b>Lane framework rules:</b> a tree is three LANES of seven nodes — each lane a
 playstyle — plus three CAPSTONES of which only ONE may ever be taken. <b>Node pricing:</b>
 the Nth distinct node bought costs ceil(N/3) — 1,1,1,2,2,2,3… — while extra ranks in an
 open node always cost 1, so roughly a third of the tree fits in one run. <b>Exclusive
 pairs</b> bar each other but stay visible, greyed with the reason — the player must see
 the door they closed. Tooltips show the live cost and lane requirement.<br>
-<b>Two gating models exist.</b> Points-gated trees (Beastmaster and the nine conversions)
+<b>Two gating models exist.</b> Points-gated trees (Beastmaster and the eight conversions)
 open a lane's tier 2 at 3 points spent in that lane, tier 3 at 6, the capstone at 8.
-<b>Node-gated trees (Sharpshooter, the new model)</b> open tier 2 at 2 NODES bought in the
-lane, tier 3 at 4, the capstone at 6 — with the escalating cost curve, node count is the
-stable gate a player can actually plan against.</p>
+<b>Node-gated trees (Berserker, Sharpshooter, Survivalist)</b> open tier 2 at 2 NODES
+bought in the lane, tier 3 at 4, the capstone at 6 — with the escalating cost curve, node
+count is the stable gate a player can actually plan against.</p>
+<p><b>Berserker lanes (node-gated):</b><br>
+<b>BLOODLETTING</b> (wounds as an engine: keep bleed high, or burst it) — Savagery (+5
+Bleed/rank on bleed abilities ×3), Bloodcraze (heal 3%/rank max HP on enemy bleedout ×3),
+Crushing Blows (3%/rank armor pen per 20 enemy-party bleed ×3), Hemorrhage (enemies at
+80/70/60 bloodloss are Crippled ×3), Scent of Blood (+3%/rank damage per enemy bled out
+this battle ×3), Arterial Spray (bleedouts transfer 25%/rank of the buildup to another
+living enemy ×2), Blood Tithe (bleedouts grant 15/rank Rage ×2).<br>
+<b>FURY</b> (the risk dial) — Unstoppable (Blood Frenzy step 2%→+0.5%/rank ×3; raises the
+floor too), Battle Shout (grants the ability — its bleed scaling is deliberate cross-lane
+synergy), Enraged (below-50% trigger: +3%/rank damage, 5 turns, stacks ×3), Reckless Fury
+(+5%/rank damage dealt AND taken ×3; <i>exclusive with Measured Rage</i>), Measured Rage
+(take 8% less damage; <i>exclusive with Reckless Fury</i>), Scar Tissue (the Frenzy floor
+holds 60/70/75% of the peak instead of 50%), Deathwish (+6%/rank damage while below 35%
+health ×3).<br>
+<b>WARPATH</b> (momentum: keep swinging, or survive to keep swinging) — Vitality (+5%/rank
+max HP ×3), Deafening Cry (Battle Shout cooldown −1), Unrelenting Assault (below-25%
+trigger: +10/rank Constitution, 3 turns, once per 5 ×3), Flurry (Hack and Slash strikes an
+extra time), Bloodied Momentum (enemy deaths grant 15/rank Rage ×2), Relentless (Hack and
+Slash costs 5/rank less Rage ×2), Second Wind (first drop below 25% health each battle:
++40 Rage).<br>
+<b>CAPSTONES</b> — Exsanguination (Bloodletting: bleedout deals 35% max HP and the full
+100 buildup surges to another living enemy, chaining across the field — each chain visits
+an enemy once), Undying Rage (Fury: below 25% health he cannot die and deals +50% damage;
+the hit that would have killed him ends it at 1 HP, once per battle), Rampage (Warpath:
+grants the ability — three strikes that recast free on a kill).</p>
 <p><b>Sharpshooter lanes (node-gated):</b><br>
 <b>PRECISION</b> (Focus, crit chance, crit damage) — Steady Hands (+4%/rank crit ×3),
 Perfect Form (crits +20 Focus), Deep Focus (cap 150), Executioner's Eye (crit mult
@@ -864,26 +892,17 @@ Steadfast Bond</i>), Lone Hunter (no companion: costs −40%, damage +25%).<br>
 gain doubled), The Pack (Pack lane: two beasts at once — COMING SOON), Apex Predator
 (Handler: Quick Shot triggers an extra free companion strike; Kill Command resets on every
 enemy death).</p>
-<p><b>Every designed tree now uses the lane framework.</b> The nine classic trees
-(<b>Berserker, Swordmaster, Warden, Pyromancer, Cryomancer, Arcanist, Holy, Devout,
-Occultist</b>) converted in Batch 31: their original 12 nodes keep their ids, effects, and
-any invested ranks, re-homed into three lanes, joined by invented filler nodes (numeric
-dials and kit tweaks on existing machinery) and two invented capstones beside the original
-one — <i>all fillers and lane homes await design review</i>. Each converted tree carries one
-exclusive pair. Hunter specs without a designed tree (Sharpshooter, Survivalist) still show
-"Coming soon."</p>
-<p><b>⚠ TESTING STATE:</b> every talent-granted and boss-trophy ability is currently
-<b>PRE-GRANTED at spawn</b> (a flip-off const in battle.gd) so the reworked trees can be
-reviewed without spending points. Talent ability-grant nodes therefore do nothing extra
-while this is on.</p>
+<p><b>Eight classic trees remain conversions</b> (<b>Swordmaster, Warden, Pyromancer,
+Cryomancer, Arcanist, Holy, Devout, Occultist</b>, from Batch 31): their original 12 nodes
+keep their ids, effects, and any invested ranks, re-homed into three lanes, joined by
+invented filler nodes (numeric dials and kit tweaks on existing machinery) and two
+invented capstones beside the original one — <i>all fillers and lane homes await design
+review</i>. Each converted tree carries one exclusive pair.</p>
+<p><b>Review aid:</b> the map burger's "All Spec Abilities Unlocked" toggle (default OFF,
+session-only; DOD_SIM_GRANT_ALL=1 headless) pre-grants every talent-granted and
+boss-trophy ability at spawn, so reworked kits can be reviewed without spending points.</p>
 <p><b>Lane homes per converted tree</b> (existing nodes by name; ⊕ marks invented
 fillers/capstones):<br>
-<b>Berserker</b> — Bloodletting: Bloodcraze, Savagery, Crushing Blows, Hemorrhage,
-⊕Gushing Wounds, ⊕Feast of Ruin, ⊕Arterial Rhythm · Fury: Unstoppable, Battle Shout,
-Enraged, Reckless Fury, ⊕Deafening Cry, ⊕Deathwish, ⊕Frenzied Edge · Warpath: Vitality,
-Unrelenting Assault, Flurry, ⊕Thick Skin, ⊕Measured Rage, ⊕Relentless, ⊕Bloodied Hide ·
-Capstones: Rampage, ⊕Exsanguination, ⊕Undying Rage · Exclusive: Reckless Fury ↔ Measured
-Rage.<br>
 <b>Swordmaster</b> — Blade: Aggressive Stance, Lunge, Precision Strikes, Seasoned Fighter,
 ⊕Keen Edge, ⊕Deep Thrust, ⊕Momentum · Poise: Defensive Stance, High Guard, Dominant
 Presence, ⊕Footwork, ⊕Composure, ⊕Guarded Frame, ⊕Perfect Form · Duelist: Swordsmanship,
@@ -934,15 +953,6 @@ additional point invested adds the SAME amount again (e.g. "+5 Bleed per rank" a
 <p><b>Layout:</b> every tree renders as three lane columns with live lane-point headers,
 a capstone shelf, emblem-square nodes with point counters, cost-aware hover tooltips, and
 greyed exclusive siblings. Art is placeholder.</p>
-<p><b>Berserker tree:</b> Bloodcraze (heal 3%/rank max HP on enemy bleedout ×3),
-Unstoppable (Blood Frenzy +0.5%/rank per step ×3), Enraged (below-50%-HP trigger: +3%/rank
-damage buff, 5 turns, stacks ×3). Crushing Blows (3%/rank armor penetration per 20
-enemy-party bleed ×3), Savagery (+5 Bleed/rank on bleed abilities ×3, needs Unstoppable 1),
-Battle Shout (grants the ability), Reckless Fury (+5%/rank damage dealt AND taken ×3, needs
-Unstoppable 1), Unrelenting Assault (below-25%-HP trigger: +10 Constitution/rank for 3
-turns, once per 5 turns ×3). Hemorrhage (enemies at 80/70/60 bloodloss are Crippled ×3 — the threshold
-drops 10 per point), Flurry (Hack and Slash strikes an extra time), Vitality (+5% max
-HP/rank ×3). Capstone — Rampage (grants the ability).</p>
 <p><b>Swordmaster tree:</b> Defensive Stance (Seasoned under-half reduction
 +3%/rank ×3), Swordsmanship (perfect-Pommel parry buff +5%/rank ×3), Aggressive Stance
 (Seasoned over-half bonus +3%/rank ×3). Dominant Presence (armor +5%/rank per debuff

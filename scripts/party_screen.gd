@@ -446,7 +446,8 @@ func _draw_lane_tree(member: Dictionary) -> void:
 		add_child(hdr)
 	# Capstone shelf: one of three, forever.
 	var cap_lbl := Label.new()
-	cap_lbl.text = "— CAPSTONES · take ONE (8 pts in its lane) —"
+	cap_lbl.text = "— CAPSTONES · take ONE (%s in its lane) —" % \
+		("6 nodes" if Talents.is_node_gated(tree) else "8 pts")
 	cap_lbl.add_theme_font_size_override("font_size", 12)
 	cap_lbl.add_theme_color_override("font_color", Color(0.7, 0.6, 0.75))
 	cap_lbl.position = Vector2(TREE_BACK_POS.x, LANE_CAP_Y - 52)

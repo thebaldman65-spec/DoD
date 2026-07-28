@@ -58,6 +58,9 @@ const STATUS_INFO := {
 	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of all attack damage\nthis unit takes echoes to its\nwhole party."],
 	"battle_shout": ["Battle Shout", "BS", Color(0.95, 0.45, 0.30), "+1% damage per 20 blood buildup\non the enemy party (at cast time)."],
 	"blood_price": ["Blood Price", "BP", Color(0.85, 0.25, 0.25), "Paid in his own blood:\n+25% damage dealt."],
+	"scent": ["Scent of Blood", "SB", Color(0.85, 0.3, 0.3), "Fed by bleedouts: bonus damage for\neach enemy bled out this battle."],
+	"deathwish": ["Deathwish", "DW", Color(0.9, 0.3, 0.3), "Below 35% health: bonus damage —\nnothing left to lose."],
+	"undying_rage": ["Undying Rage", "UR", Color(0.95, 0.25, 0.2), "Below 25% health: cannot die and\n+50% damage. The hit that would have\nkilled him ends it at 1 HP\n(once per battle)."],
 	"shield_charges": ["Shieldwall", "SW", Color(0.65, 0.72, 0.85), "The next attacks against this unit\nare BLOCKED (one charge each)."],
 	"high_guard": ["High Guard", "HG", Color(0.55, 0.80, 0.95), "Takes 25% less damage."],
 	"elem_weak": ["Elemental Weakness", "EW", Color(0.40, 0.80, 0.75), "Elemental resistances reduced."],
@@ -1380,6 +1383,40 @@ func _update_talent_chips() -> void:
 					2, seed_desc, seed_pct)
 			_log("   → Talent: Seeding Embers — %s gains +%d%% damage for a turn" % [
 				h.unit_name, seed_pct], "#b0a8e0")
+	# Scent of Blood: the ramp chip counts the battle's bleedouts.
+	for h in heroes:
+		if h.dead or h.scent_ranks == 0 or h.bleedouts_this_battle == 0:
+			continue
+		var sc_pct: int = 3 * h.scent_ranks * h.bleedouts_this_battle
+		var sc_desc := "Scent of Blood: +%d%% damage per enemy\nbled out this battle. Currently +%d%%\n(%d bleedouts)." % [
+			3 * h.scent_ranks, sc_pct, h.bleedouts_this_battle]
+		if not h.update_status("scent", "+%d%%" % sc_pct, sc_desc, sc_pct):
+			var sc_info: Array = STATUS_INFO["scent"]
+			h.add_status("scent", sc_info[0], "+%d%%" % sc_pct, sc_info[2], -1,
+				sc_desc, sc_pct)
+	# Deathwish / Undying Rage: edge-state chips that light while the
+	# Berserker rides low health.
+	for h in heroes:
+		if h.dead or h.is_companion:
+			continue
+		if h.deathwish_ranks > 0:
+			if h.hp < h.max_hp * 0.35:
+				var dw_pct: int = 6 * h.deathwish_ranks
+				var dw_desc := "Deathwish: +%d%% damage while below\n35%% health." % dw_pct
+				if not h.update_status("deathwish", "+%d%%" % dw_pct, dw_desc, dw_pct):
+					var dw_info: Array = STATUS_INFO["deathwish"]
+					h.add_status("deathwish", dw_info[0], "+%d%%" % dw_pct,
+						dw_info[2], -1, dw_desc, dw_pct)
+			elif h.has_status("deathwish"):
+				h.remove_status("deathwish")
+		if h.undying_rage > 0:
+			if not h.undying_rage_used and h.hp < h.max_hp * 0.25:
+				if not h.has_status("undying_rage"):
+					var ur_info: Array = STATUS_INFO["undying_rage"]
+					h.add_status("undying_rage", ur_info[0], "UNDYING", ur_info[2],
+						-1, ur_info[3])
+			elif h.has_status("undying_rage"):
+				h.remove_status("undying_rage")
 
 
 func _player_turn(u: BattleUnit) -> void:
@@ -3323,6 +3360,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Blood Price: strength bought with his own blood.
 			if attacker.has_status("blood_price"):
 				raw *= 1.25
+			# Scent of Blood: every bleedout this battle feeds the fury.
+			if attacker.scent_ranks > 0 and attacker.bleedouts_this_battle > 0:
+				raw *= 1.0 + 0.03 * attacker.scent_ranks * attacker.bleedouts_this_battle
+			# Deathwish: nothing left to lose below 35% health.
+			if attacker.deathwish_ranks > 0 and attacker.hp < attacker.max_hp * 0.35:
+				raw *= 1.0 + 0.06 * attacker.deathwish_ranks
+			# Undying Rage: the refusal burns while he rides below a quarter.
+			if attacker.undying_rage > 0 and not attacker.undying_rage_used \
+					and attacker.hp < attacker.max_hp * 0.25:
+				raw *= 1.5
 			# Iron Will: +5%/rank damage per debuff currently on the Warden.
 			if attacker.iron_will_ranks > 0:
 				raw *= 1.0 + 0.05 * attacker.iron_will_ranks * attacker.count_debuffs()
@@ -5978,6 +6025,15 @@ func _on_enemy_death(victim: BattleUnit) -> void:
 				and heroes[mk_idx].cooldowns.get("Mark of the Hunt", 0) > 0:
 			heroes[mk_idx].cooldowns.erase("Mark of the Hunt")
 			_log("   → The hunt is rewarded: Mark of the Hunt resets", "#b0a8e0")
+	# Bloodied Momentum: every kill feeds the Berserker's swing.
+	for mo_h in heroes:
+		if not mo_h.dead and mo_h.bloodied_momentum_ranks > 0:
+			var mo_rage := 15 * int(mo_h.bloodied_momentum_ranks)
+			mo_h.resource = mini(mo_h.resource + mo_rage, mo_h.max_resource)
+			mo_h.float_text("+%d Rage" % mo_rage, Color(1.0, 0.5, 0.4))
+			mo_h.refresh_bars()
+			_log("   → Bloodied Momentum: %s drinks the kill (+%d Rage)" % [
+				mo_h.unit_name, mo_rage], "#b0a8e0")
 	# Scavenger: the Survivalist strips the corpse for supplies.
 	for sc_h in heroes:
 		if not sc_h.dead and sc_h.scavenger_ranks > 0:
@@ -6017,11 +6073,15 @@ func _comp_dmg_mult(comp: BattleUnit) -> float:
 # Adds bleed buildup (logged) and detonates the bleedout when the meter fills.
 # Bleedout damage IGNORES armor (take_hit applies none — armor only reduces
 # attack damage inside _resolve) and respects Unity's soul-binding.
-func _add_bleed_with_burst(victim: BattleUnit, amount: int) -> void:
+func _add_bleed_with_burst(victim: BattleUnit, amount: int,
+		chain_hops: Array = []) -> void:
 	if victim.dead:
 		return
 	if victim.add_bleed(amount):
-		var bleed_dmg := maxi(int(victim.max_hp * 0.20), 1)
+		# Exsanguination (capstone): enemy bleedouts hit for 35% instead.
+		var exsang := not victim.is_hero \
+			and _living_hero_with("exsanguination") != null
+		var bleed_dmg := maxi(int(victim.max_hp * (0.35 if exsang else 0.20)), 1)
 		if victim.is_hero and not victim.is_companion and victim.has_status("unity"):
 			var bound := heroes.filter(func(h): return not h.dead)
 			if bound.size() > 1:
@@ -6038,6 +6098,10 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int) -> void:
 		var bleed_result: Dictionary = victim.take_hit(bleed_dmg, 0)
 		victim.float_text("BLEEDOUT %d" % bleed_dmg, Color(0.9, 0.15, 0.2), true)
 		if not victim.is_hero:
+			# The battle's bleedout tally — every hero carries the counter
+			# (Scent of Blood reads it attacker-side).
+			for tally_h in heroes:
+				tally_h.bleedouts_this_battle += 1
 			for feaster in heroes:
 				if not feaster.dead and feaster.bloodcraze > 0:
 					var craze := maxi(int(feaster.max_hp * 0.03 * feaster.bloodcraze), 1)
@@ -6045,6 +6109,22 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int) -> void:
 					feaster.float_text("+%d Bloodcraze" % craze, Color(0.85, 0.3, 0.3))
 					_log("   → Bloodcraze: %s feasts (+%d HP)" % [feaster.unit_name,
 						craze], "#b0a8e0")
+			# Blood Tithe: the bleedout pays its toll in Rage.
+			for bt_h in heroes:
+				if not bt_h.dead and bt_h.blood_tithe_ranks > 0:
+					var tithe := 15 * int(bt_h.blood_tithe_ranks)
+					bt_h.resource = mini(bt_h.resource + tithe, bt_h.max_resource)
+					bt_h.float_text("+%d Rage" % tithe, Color(1.0, 0.5, 0.4))
+					bt_h.refresh_bars()
+					_log("   → Blood Tithe: %s collects %d Rage" % [
+						bt_h.unit_name, tithe], "#b0a8e0")
+			# Scent of Blood: the ramp deepens with every bleedout.
+			for sc_h in heroes:
+				if not sc_h.dead and sc_h.scent_ranks > 0:
+					_log("   → Scent of Blood: %s sharpens (+%d%% damage, %d bleedouts)" % [
+						sc_h.unit_name,
+						3 * sc_h.scent_ranks * sc_h.bleedouts_this_battle,
+						sc_h.bleedouts_this_battle], "#b0a8e0")
 		_sfx("crit", -5.0, 0.8)
 		_log("   → %s BLEEDS OUT for %d" % [victim.unit_name, bleed_dmg], "#e05050")
 		if bleed_result.died:
@@ -6056,6 +6136,22 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int) -> void:
 				_on_beast_death(victim)
 			elif not victim.is_hero:
 				_on_enemy_death(victim)
+		# Arterial Spray / Exsanguination: the burst blood finds a new host.
+		# Each chain visits an enemy at most once, so a full-buildup wave
+		# sweeps the field and stops.
+		if not victim.is_hero:
+			var t_pct := (1.0 if exsang else 0.25 * _max_hero_rank("arterial_ranks"))
+			if t_pct > 0.0:
+				chain_hops.append(victim)
+				var hosts: Array = enemies.filter(
+					func(e): return not e.dead and e != victim and not chain_hops.has(e))
+				if not hosts.is_empty():
+					var host: BattleUnit = hosts.pick_random()
+					var surge := int(round(100.0 * t_pct))
+					_log("   → %s: %d Bleed surges to %s" % [
+						("Exsanguination" if exsang else "Arterial Spray"),
+						surge, host.unit_name], "#e08850")
+					_add_bleed_with_burst(host, surge, chain_hops)
 	else:
 		# Hemorrhage (talent): enough open wounds leave the enemy Crippled
 		# (threshold 80/70/60 buildup by rank).

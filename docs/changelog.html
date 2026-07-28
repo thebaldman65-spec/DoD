@@ -5,6 +5,44 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-27 — Batch C: the Berserker tree becomes a designed set of lanes</h2>
+<ul>
+<li><b>The tree moves from the Batch 31 conversion into a purpose-designed LANE_TREES
+entry</b> — node-gated like Sharpshooter/Survivalist (tiers open at 2/4 nodes bought in
+the lane, capstone at 6). No node was deleted: every id survives, so saved ranks migrate
+(over-cap ranks refund the difference on load, the existing loader rule). Lanes:
+Bloodletting / Fury / Warpath.</li>
+<li><b>Seven fillers re-specced in place</b> (same ids, new effects): Gushing Wounds →
+<b>Scent of Blood</b> (+3%/rank damage per enemy bled out this battle — the compounding
+ramp the archetype was missing), Feast of Ruin → <b>Blood Tithe</b> (bleedouts grant
+15/rank Rage — Bleed and Rage touch for the first time), Arterial Rhythm → <b>Arterial
+Spray</b> (bleedouts transfer 25%/rank of the buildup to another living enemy), Frenzied
+Edge → <b>Scar Tissue</b> (the Frenzy floor holds 60/70/75% of the peak instead of 50%),
+<b>Deathwish</b> (flat +4%/rank → +6%/rank while below 35% health), Thick Skin →
+<b>Bloodied Momentum</b> (enemy deaths grant 15/rank Rage; ranks 3→2), Bloodied Hide →
+<b>Second Wind</b> (first drop below 25% each battle: +40 Rage; ranks 2→1).</li>
+<li><b>Both invented capstones re-specced:</b> Exsanguination (was a passive stat pile) —
+<b>bleedout deals 35% max HP and its full 100 buildup surges to another living enemy</b>,
+chaining across the field (each wave visits an enemy once). Undying Rage (was +12% HP /
+−5% taken; moved Warpath → Fury) — <b>below 25% health he cannot die and deals +50%
+damage</b>; the hit that would have killed him ends it at 1 HP, once per battle (reuses
+Hold the Line's undying machinery, not a second path).</li>
+<li><b>Node moves:</b> Measured Rage joins its exclusive partner Reckless Fury in Fury
+(a cross-lane exclusive read as a bug), Deafening Cry to Warpath (a cooldown node is
+tempo, not fury), Rampage caps Warpath (chain-on-kill is momentum's payoff).</li>
+<li><b>New machinery:</b> a bleedouts_this_battle counter on BattleUnit (fresh per
+battle, like the Frenzy floor); bleed-transfer chains with a visited guard; live chips
+for Scent of Blood, Deathwish, and Undying Rage; the party screen's capstone shelf now
+reads "6 nodes" on node-gated trees instead of the hardcoded "8 pts".</li>
+<li><b>Verified:</b> parse clean on battle + party scenes; tree audit 24/3/7-7-7 across
+all 12 specs plus Berserker gating/exclusive/payload checks (46 asserts). Every
+re-specced node AND both re-specced capstones fire in forced-learn autoplay battles —
+Exsanguination chained 100-Bleed surges Behemoth → Brute → Bog Troll with 35% bleedouts,
+Undying Rage caught a lethal hit at 1 HP. Gated 200-battle sim: <b>200/200 wins</b>,
+8.3 rounds/battle, hero deaths/battle 0.45, survivors 71% HP; damage share Cryomancer
+36% / Beastmaster 34% / <b>Berserker 25%</b> / Devout 4%.</li>
+</ul>
+
 <h2>2026-07-27 — Batch B: Blood Price — the Berserker chooses when the Frenzy wakes</h2>
 <ul>
 <li><b>Blood Price, new base-kit ability (4th kit slot):</b> 0 Rage, 2.0 delay, 3cd,

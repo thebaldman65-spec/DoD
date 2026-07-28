@@ -14,80 +14,6 @@ class_name Talents
 const ROW_REQ := {0: 0, 1: 5, 2: 10, 3: 15}
 
 const FIXED_TREES := {
-	"berserker": [
-		# --- row 0 ---
-		{"id": "bz_bloodcraze", "name": "Bloodcraze", "ranks": 3, "row": 0, "col": 1,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "When an enemy bleeds out, the Berserker heals {v}% of max HP.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"bloodcraze": 1}}},
-		{"id": "bz_unstoppable", "name": "Unstoppable", "ranks": 3, "row": 0, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Blood Frenzy grants {v}% damage for every 5% of health missing (up from the base 2%).",
-			"scale": {"base": 2.0, "step": 0.5},
-			"payload": {"stat": {"bloodrage_step_bonus": 0.5}}},
-		{"id": "bz_enraged", "name": "Enraged", "ranks": 3, "row": 0, "col": 3,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Dropping below 50% health grants a +{v}% damage buff for 5 turns (stacks up to 3 times).",
-			"scale": {"step": 3},
-			"payload": {"stat": {"enraged_ranks": 1}}},
-		# --- row 1 ---
-		{"id": "bz_crushing_blows", "name": "Crushing Blows", "ranks": 3, "row": 1, "col": 0,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "For every 20 points of bloodloss on the enemy team, gain {v}% armor penetration.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"crushing_blows_ranks": 1}}},
-		{"id": "bz_savagery", "name": "Savagery", "ranks": 3, "row": 1, "col": 1,
-			"gate": "row", "requires": "bz_unstoppable", "requires_ranks": 1,
-			"desc": "All bleed-building Berserker abilities build +{v} more Bleed.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"bleed_bonus": 5}}},
-		{"id": "bz_battle_shout", "name": "Battle Shout", "ranks": 1, "row": 1, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "New ability: Battle Shout — +1% damage for every 20 points of blood buildup on the enemy party, for 2 turns (15 Rage, 2cd).",
-			"payload": {"new_ability": {"display_name": "Battle Shout", "cost": 15,
-				"special": "battle_shout", "delay": 2.0, "anim": "attack03", "cooldown": 2,
-				"perfect_id": "rage5", "perfect_text": "Also grants 5 Rage",
-				"description": "A roar fed by open wounds: +1% damage\nper 20 blood buildup on the enemy party.\nLasts 2 turns."}}},
-		{"id": "bz_reckless", "name": "Reckless Fury", "ranks": 3, "row": 1, "col": 3,
-			"gate": "row", "requires": "bz_unstoppable", "requires_ranks": 1,
-			"desc": "+{v}% damage dealt AND +{v}% damage taken.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"dmg_bonus": 0.05, "dmg_taken_bonus": 0.05}}},
-		{"id": "bz_unrelenting", "name": "Unrelenting Assault", "ranks": 3, "row": 1, "col": 4,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Dropping below 25% health grants +{v} Constitution for 3 turns (at most once every 5 turns).",
-			"scale": {"step": 10},
-			"payload": {"stat": {"unrelenting_ranks": 1}}},
-		# --- row 2 ---
-		{"id": "bz_hemorrhage", "name": "Hemorrhage", "ranks": 3, "row": 2, "col": 1,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Enemies at {v} or more bloodloss are Crippled.",
-			"scale": {"base": 90, "step": -10},
-			"payload": {"stat": {"hemorrhage_ranks": 1}}},
-		# "Flurry" since 07-27 — the ability Bloodlust kept the name; the id
-		# stays bz_bloodlust_node so saved ranks survive (the cr_frostbite →
-		# "Brittle Ice" trick).
-		{"id": "bz_bloodlust_node", "name": "Flurry", "ranks": 1, "row": 2, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Hack and Slash strikes an extra time.",
-			"payload": {"ability": "Hack and Slash", "add": {"multi_hits": 1}}},
-		{"id": "bz_vitality", "name": "Vitality", "ranks": 3, "row": 2, "col": 3,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "+{v}% max HP.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"max_hp_pct": 0.05}}},
-		# --- row 3 (capstone) ---
-		{"id": "bz_rampage", "name": "Rampage", "ranks": 1, "row": 3, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "New ability: Rampage — strike 3 times for damage and bloodloss; if the target dies, immediately recast on another enemy (40 Rage, 4.0 int, 4cd).",
-			"payload": {"new_ability": {"display_name": "Rampage", "cost": 40,
-				"damage": 20, "pressure": 10, "multi_hits": 3, "bleed_build": 10,
-				"delay": 4.0, "anim": "attack01", "cooldown": 4,
-				"perfect_extra_hit": false,
-				"perfect_id": "", "perfect_text": "",
-				"description": "Three brutal strikes, each building\n10 bloodloss. If the target dies, Rampage\nimmediately recasts on another enemy."}}},
-	],
 	"swordmaster": [
 		# --- row 0 ---
 		{"id": "sm_def_stance", "name": "Defensive Stance", "ranks": 3, "row": 0, "col": 1,
@@ -655,6 +581,145 @@ const NODE_CAPSTONE_REQ := 6
 const LANE_NAMES := {"devotion": "Devotion", "pack": "The Pack", "handler": "Handler"}
 
 const LANE_TREES := {
+	"berserker": [
+		# Purpose-designed lanes (Batch C, 07-27) — NODE-GATED (tiers open
+		# on nodes bought in the lane: 2/4, capstone at 6). The 12 original
+		# nodes keep their ids and payloads verbatim; the Batch 31 conversion
+		# fillers were re-specced IN PLACE (same ids, new effects), so saved
+		# ranks migrate and nobody gets a refund.
+		# --- Lane A: Bloodletting — wounds as an engine: keep bleed high,
+		# or burst it. Bleedout is no longer just a meter reset. ---
+		{"id": "bz_savagery", "name": "Savagery", "ranks": 3, "lane": "Bloodletting", "tier": 0,
+			"node_gated": true,
+			"desc": "All bleed-building Berserker abilities build +{v} more Bleed.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"bleed_bonus": 5}}},
+		{"id": "bz_bloodcraze", "name": "Bloodcraze", "ranks": 3, "lane": "Bloodletting", "tier": 0,
+			"desc": "When an enemy bleeds out, the Berserker heals {v}% of max HP.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"bloodcraze": 1}}},
+		{"id": "bz_crushing_blows", "name": "Crushing Blows", "ranks": 3, "lane": "Bloodletting", "tier": 1,
+			"desc": "For every 20 points of bloodloss on the enemy team, gain {v}% armor penetration.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"crushing_blows_ranks": 1}}},
+		{"id": "bz_hemorrhage", "name": "Hemorrhage", "ranks": 3, "lane": "Bloodletting", "tier": 1,
+			"desc": "Enemies at {v} or more bloodloss are Crippled.",
+			"scale": {"base": 90, "step": -10},
+			"payload": {"stat": {"hemorrhage_ranks": 1}}},
+		# Re-spec (was Gushing Wounds, a Savagery duplicate; same id, so
+		# saved ranks carry — the cr_frostbite "Brittle Ice" trick). The
+		# compounding ramp the archetype was missing.
+		{"id": "bz_gushing", "name": "Scent of Blood", "ranks": 3, "lane": "Bloodletting", "tier": 1,
+			"desc": "+{v}% damage for each enemy that has bled out this battle.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"scent_ranks": 1}}},
+		# Re-spec (was Arterial Rhythm, +4 BD on Hack and Slash).
+		{"id": "bz_arterial", "name": "Arterial Spray", "ranks": 2, "lane": "Bloodletting", "tier": 2,
+			"desc": "When an enemy bleeds out, {v}% of its blood buildup transfers to another living enemy.",
+			"scale": {"step": 25},
+			"payload": {"stat": {"arterial_ranks": 1}}},
+		# Re-spec (was Feast of Ruin, a Bloodcraze duplicate). The first
+		# node that ties Bleed to Rage — those systems never touched.
+		{"id": "bz_feast", "name": "Blood Tithe", "ranks": 2, "lane": "Bloodletting", "tier": 2,
+			"desc": "An enemy bleeding out grants the Berserker {v} Rage.",
+			"scale": {"step": 15},
+			"payload": {"stat": {"blood_tithe_ranks": 1}}},
+		# --- Lane B: Fury — the risk dial: how far over the edge? ---
+		{"id": "bz_unstoppable", "name": "Unstoppable", "ranks": 3, "lane": "Fury", "tier": 0,
+			"desc": "Blood Frenzy grants {v}% damage for every 5% of health missing (up from the base 2%).",
+			"scale": {"base": 2.0, "step": 0.5},
+			"payload": {"stat": {"bloodrage_step_bonus": 0.5}}},
+		# Stays in Fury: a Rage-spent buff. Its bleed scaling is deliberate
+		# cross-lane synergy — splashing into Bloodletting makes it better.
+		{"id": "bz_battle_shout", "name": "Battle Shout", "ranks": 1, "lane": "Fury", "tier": 0,
+			"desc": "New ability: Battle Shout — +1% damage for every 20 points of blood buildup on the enemy party, for 2 turns (15 Rage, 2cd).",
+			"payload": {"new_ability": {"display_name": "Battle Shout", "cost": 15,
+				"special": "battle_shout", "delay": 2.0, "anim": "attack03", "cooldown": 2,
+				"perfect_id": "rage5", "perfect_text": "Also grants 5 Rage",
+				"description": "A roar fed by open wounds: +1% damage\nper 20 blood buildup on the enemy party.\nLasts 2 turns."}}},
+		{"id": "bz_enraged", "name": "Enraged", "ranks": 3, "lane": "Fury", "tier": 1,
+			"desc": "Dropping below 50% health grants a +{v}% damage buff for 5 turns (stacks up to 3 times).",
+			"scale": {"step": 3},
+			"payload": {"stat": {"enraged_ranks": 1}}},
+		{"id": "bz_reckless", "name": "Reckless Fury", "ranks": 3, "lane": "Fury", "tier": 1,
+			"exclusive_with": "bz_measured",
+			"desc": "+{v}% damage dealt AND +{v}% damage taken.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"dmg_bonus": 0.05, "dmg_taken_bonus": 0.05}}},
+		# Moved from Warpath: its exclusive partner lives here — the player
+		# should see both doors in one column.
+		{"id": "bz_measured", "name": "Measured Rage", "ranks": 1, "lane": "Fury", "tier": 1,
+			"exclusive_with": "bz_reckless",
+			"desc": "Take 8% less damage. A steadier hand than Reckless Fury.",
+			"payload": {"stat": {"dmg_taken_bonus": -0.08}}},
+		# Re-spec (was Frenzied Edge, +2% crit): deepens the Blood Frenzy
+		# floor directly — the lane's signature.
+		{"id": "bz_frenzied_edge", "name": "Scar Tissue", "ranks": 3, "lane": "Fury", "tier": 2,
+			"desc": "The Blood Frenzy floor holds 60/70/75% of your peak bonus (instead of 50%).",
+			"payload": {"stat": {"scar_tissue_ranks": 1}}},
+		# Re-spec (was a flat +4% damage dial): same name, now conditional.
+		{"id": "bz_deathwish", "name": "Deathwish", "ranks": 3, "lane": "Fury", "tier": 2,
+			"desc": "+{v}% damage dealt while below 35% health.",
+			"scale": {"step": 6},
+			"payload": {"stat": {"deathwish_ranks": 1}}},
+		# --- Lane C: Warpath — momentum: keep swinging, or survive to
+		# keep swinging. ---
+		{"id": "bz_vitality", "name": "Vitality", "ranks": 3, "lane": "Warpath", "tier": 0,
+			"desc": "+{v}% max HP.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"max_hp_pct": 0.05}}},
+		# Moved from Fury: a cooldown node is tempo, not fury.
+		{"id": "bz_warcry", "name": "Deafening Cry", "ranks": 1, "lane": "Warpath", "tier": 0,
+			"desc": "Battle Shout's cooldown is reduced by 1 turn.",
+			"payload": {"ability": "Battle Shout", "add": {"cooldown": -1}}},
+		{"id": "bz_unrelenting", "name": "Unrelenting Assault", "ranks": 3, "lane": "Warpath", "tier": 1,
+			"desc": "Dropping below 25% health grants +{v} Constitution for 3 turns (at most once every 5 turns).",
+			"scale": {"step": 10},
+			"payload": {"stat": {"unrelenting_ranks": 1}}},
+		# "Flurry" since 07-27 — the ability Bloodlust kept the name; the id
+		# stays bz_bloodlust_node so saved ranks survive (the cr_frostbite →
+		# "Brittle Ice" trick).
+		{"id": "bz_bloodlust_node", "name": "Flurry", "ranks": 1, "lane": "Warpath", "tier": 1,
+			"desc": "Hack and Slash strikes an extra time.",
+			"payload": {"ability": "Hack and Slash", "add": {"multi_hits": 1}}},
+		# Re-spec (was Thick Skin, flat -3% damage taken; ranks 3 → 2 — the
+		# loader refunds any over-cap saved rank).
+		{"id": "bz_thick_skin", "name": "Bloodied Momentum", "ranks": 2, "lane": "Warpath", "tier": 1,
+			"desc": "When an enemy is slain, the Berserker gains {v} Rage.",
+			"scale": {"step": 15},
+			"payload": {"stat": {"bloodied_momentum_ranks": 1}}},
+		{"id": "bz_relentless", "name": "Relentless", "ranks": 2, "lane": "Warpath", "tier": 2,
+			"desc": "Hack and Slash costs {v} less Rage.",
+			"scale": {"step": 5},
+			"payload": {"ability": "Hack and Slash", "add": {"cost": -5}}},
+		# Re-spec (was Bloodied Hide, +3% armor; ranks 2 → 1): the near-death
+		# moment becomes a turn instead of just a scare.
+		{"id": "bz_bloodied_hide", "name": "Second Wind", "ranks": 1, "lane": "Warpath", "tier": 2,
+			"desc": "The first time you drop below 25% health each battle, immediately gain 40 Rage.",
+			"payload": {"stat": {"second_wind": 1}}},
+		# --- Capstones: take ONE (6 nodes bought in the lane) ---
+		# Re-spec (was a passive stat pile: +10 Bleed, Hemorrhage one step).
+		{"id": "bz_exsanguinate", "name": "Exsanguination", "ranks": 1, "lane": "Bloodletting", "tier": 2,
+			"capstone": true,
+			"desc": "Bleedout deals 35% of max HP (up from 20%), and the victim's full blood buildup surges to another living enemy — chaining across the field.",
+			"payload": {"stat": {"exsanguination": 1}}},
+		# Re-spec (was +12% HP / -5% damage taken) and moved from Warpath:
+		# the risk capstone belongs to Fury.
+		{"id": "bz_undying", "name": "Undying Rage", "ranks": 1, "lane": "Fury", "tier": 2,
+			"capstone": true,
+			"desc": "While below 25% health the Berserker cannot die and deals +50% damage. The hit that would have killed him ends the rage at 1 HP (once per battle).",
+			"payload": {"stat": {"undying_rage": 1}}},
+		# Moved from Fury: chain-on-kill is momentum's payoff.
+		{"id": "bz_rampage", "name": "Rampage", "ranks": 1, "lane": "Warpath", "tier": 2,
+			"capstone": true,
+			"desc": "New ability: Rampage — strike 3 times for damage and bloodloss; if the target dies, immediately recast on another enemy (40 Rage, 4.0 int, 4cd).",
+			"payload": {"new_ability": {"display_name": "Rampage", "cost": 40,
+				"damage": 20, "pressure": 10, "multi_hits": 3, "bleed_build": 10,
+				"delay": 4.0, "anim": "attack01", "cooldown": 4,
+				"perfect_extra_hit": false,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Three brutal strikes, each building\n10 bloodloss. If the target dies, Rampage\nimmediately recasts on another enemy."}}},
+	],
 	"mystic": [
 		# Survivalist — NODE-GATED (tiers open on nodes bought in the lane:
 		# 2/4, capstone at 6). Lanes: Venom / Snares / Guerilla.
@@ -934,58 +999,6 @@ const LANE_TREES := {
 # exclusive_id]. "new" holds the invented filler nodes — numeric dials and
 # kit tweaks on existing machinery only, placed for the designer to review.
 const LANE_CONVERSIONS := {
-	"berserker": {
-		"map": {
-			"bz_bloodcraze": ["Bloodletting", 0], "bz_savagery": ["Bloodletting", 0],
-			"bz_crushing_blows": ["Bloodletting", 1], "bz_hemorrhage": ["Bloodletting", 1],
-			"bz_unstoppable": ["Fury", 0], "bz_battle_shout": ["Fury", 0],
-			"bz_enraged": ["Fury", 1], "bz_reckless": ["Fury", 1, "", "bz_measured"],
-			"bz_vitality": ["Warpath", 0], "bz_unrelenting": ["Warpath", 1],
-			"bz_bloodlust_node": ["Warpath", 1],
-			"bz_rampage": ["Fury", 2, "cap"],
-		},
-		"new": [
-			{"id": "bz_gushing", "name": "Gushing Wounds", "ranks": 3, "lane": "Bloodletting", "tier": 1,
-				"desc": "Bleed-building abilities build {v} more Bleed.", "scale": {"step": 3},
-				"payload": {"stat": {"bleed_bonus": 3}}},
-			{"id": "bz_feast", "name": "Feast of Ruin", "ranks": 2, "lane": "Bloodletting", "tier": 2,
-				"desc": "Bloodcraze feasting heals {v}% more max HP per bleedout.", "scale": {"step": 3},
-				"payload": {"stat": {"bloodcraze": 1}}},
-			{"id": "bz_arterial", "name": "Arterial Rhythm", "ranks": 2, "lane": "Bloodletting", "tier": 2,
-				"desc": "Hack and Slash builds +{v} Break damage.", "scale": {"step": 4},
-				"payload": {"ability": "Hack and Slash", "add": {"pressure": 4}}},
-			{"id": "bz_warcry", "name": "Deafening Cry", "ranks": 1, "lane": "Fury", "tier": 1,
-				"desc": "Battle Shout's cooldown is reduced by 1 turn.",
-				"payload": {"ability": "Battle Shout", "add": {"cooldown": -1}}},
-			{"id": "bz_deathwish", "name": "Deathwish", "ranks": 3, "lane": "Fury", "tier": 2,
-				"desc": "+{v}% damage dealt.", "scale": {"step": 4},
-				"payload": {"stat": {"dmg_bonus": 0.04}}},
-			{"id": "bz_frenzied_edge", "name": "Frenzied Edge", "ranks": 3, "lane": "Fury", "tier": 2,
-				"desc": "+{v}% crit chance.", "scale": {"step": 2},
-				"payload": {"stat": {"crit_bonus": 0.02}}},
-			{"id": "bz_thick_skin", "name": "Thick Skin", "ranks": 3, "lane": "Warpath", "tier": 0,
-				"desc": "Take {v}% less damage.", "scale": {"step": 3},
-				"payload": {"stat": {"dmg_taken_bonus": -0.03}}},
-			{"id": "bz_measured", "name": "Measured Rage", "ranks": 1, "lane": "Warpath", "tier": 1,
-				"exclusive_with": "bz_reckless",
-				"desc": "Take 8% less damage. A steadier hand than Reckless Fury.",
-				"payload": {"stat": {"dmg_taken_bonus": -0.08}}},
-			{"id": "bz_relentless", "name": "Relentless", "ranks": 2, "lane": "Warpath", "tier": 2,
-				"desc": "Hack and Slash costs {v} less Rage.", "scale": {"step": 5},
-				"payload": {"ability": "Hack and Slash", "add": {"cost": -5}}},
-			{"id": "bz_bloodied_hide", "name": "Bloodied Hide", "ranks": 2, "lane": "Warpath", "tier": 2,
-				"desc": "+{v}% armor.", "scale": {"step": 3},
-				"payload": {"stat": {"armor": 0.03}}},
-			{"id": "bz_exsanguinate", "name": "Exsanguination", "ranks": 1, "lane": "Bloodletting", "tier": 2,
-				"capstone": true,
-				"desc": "The blood must flow: +10 Bleed on every bleed-building ability, and Hemorrhage bites at one threshold lower.",
-				"payload": {"stat": {"bleed_bonus": 10, "hemorrhage_ranks": 1}}},
-			{"id": "bz_undying", "name": "Undying Rage", "ranks": 1, "lane": "Warpath", "tier": 2,
-				"capstone": true,
-				"desc": "+12% max health and take 5% less damage.",
-				"payload": {"stat": {"max_hp_pct": 0.12, "dmg_taken_bonus": -0.05}}},
-		],
-	},
 	"swordmaster": {
 		"map": {
 			"sm_agg_stance": ["Blade", 0, "", "sm_def_stance"], "sm_lunge": ["Blade", 0],
