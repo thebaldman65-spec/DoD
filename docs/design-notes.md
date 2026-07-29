@@ -104,3 +104,19 @@ Hold the Line's death-refusal instead of a second code path — one
 rule, two doors. Measured Rage moved beside Reckless Fury because an
 exclusive pair split across lanes reads as a bug: the player must see
 both doors in one column.
+
+**Swordmaster (Batch E) — one loop, not three hobbies:** the kit held
+parry, stun, and Break as parallel interests until the boss
+stun-immunity rule turned them into one machine — Break is the key,
+stun is the door, the Broken window is the room. Everything now serves
+that loop: Pommel's stun went from a coin flip to a promise (priced in
+Rage and cooldown, not odds), Shatterpoint is the moment he chooses to
+turn the key, and its free Overpower drives through the door the
+instant it opens. Overpower used to peak just before the Break and
+fall off a cliff when the meter reset; the hold-them-Broken rider
+makes it good on both sides of the Break, so a one-turn window becomes
+a window worth building toward. Lunge reads the stance instead of a
+health threshold Batch D made vestigial — the player picks the wound,
+and Guard Change gets a second reason to exist. Execute answers to the
+loop too: a capstone should pay off the spec's own setup, not stay a
+generic low-HP snipe.

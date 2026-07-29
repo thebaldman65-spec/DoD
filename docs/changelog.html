@@ -5,6 +5,58 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-28 — Batch E: Swordmaster — the Bruiser identity</h2>
+<ul>
+<li><b>The diagnosis:</b> the kit was three hobbies — parry, stun, Break — until the boss
+stun-immunity rule turned them into one loop: <b>Break is the key, stun is the door, and
+the Broken window (loses a turn, armor ×0.7, +25% crit taken) is the room.</b> He doesn't
+out-damage you or out-last you — he takes your guard apart and walks in. (The tree pass
+previously penciled in as Batch E moves to Batch F; the tree is untouched here beyond
+Lunge/Execute description text.)</li>
+<li><b>Pommel Strike — the stun is a promise:</b> ALWAYS Stuns for 1 turn — the 50% roll
+and its crit-guarantee are gone, and the reliability is priced in cost and cooldown
+instead: 20 Rage (was 15), 3cd (was 2). Keeps its own 25% base crit and the perfect
+(+15% parry, 3 turns). The "Bosses resist Stun until Broken" line stays on the button —
+it is the most important sentence in his kit.</li>
+<li><b>Overpower — payoff on both sides of the Break:</b> 25 Rage (was 30); +0.5 damage
+per point of the target's Break meter unchanged, and NEW: a hit against an
+already-Broken target holds them Broken ONE TURN LONGER (unit-side counter consumed at
+the lost-turn site; a hit that CAUSES the Break doesn't also extend it). The meter reset
+used to make Overpower peak just before the Break and fall off a cliff — now it builds
+the window, then keeps them in it.</li>
+<li><b>Shatterpoint — new base-kit ability:</b> 30 Rage, 20 dmg / 40 BD, 3.0 initiative,
+4cd — the heaviest Break blow in the kit, the timing he chooses. If this hit BREAKS the
+target, the Swordmaster immediately casts Overpower on it FOR FREE — the
+Rampage/Implosion free-recast machinery, no Rage cost, no cooldown consumed — straight
+into a Broken-target Overpower that extends the window it just opened (Perfect: +15
+bonus BD).</li>
+<li><b>Sweeping Strikes:</b> Break damage 8 → 12 per hit (24 across both swings) — the
+Break specialist's weakest BD contribution no longer is.</li>
+<li><b>Lunge rekeyed to stance:</b> Aggressive → Exposed, Defensive → Cripple. The old
+above/below-50%-health split was vestigial once Batch D removed the HP threshold from
+the passive; now the player picks the wound, and Guard Change gains a second reason to
+exist.</li>
+<li><b>Execute rekeyed to the identity:</b> usable against targets below 20% health OR
+against a Broken target — Break sets up his own finisher instead of leaving Execute a
+generic low-HP snipe.</li>
+<li><b>Bot rotation (deterministic):</b> Guard Change on stance mismatch (Defensive
+below 45% HP) → Execute on sub-20% or Broken prey → Shatterpoint when the target's
+meter is 55+ (timed so the Break lands on that very hit — the gate that demonstrates
+the chain) → Pommel Strike unless the target is a boss still unbroken → Overpower at
+40+ meter or on Broken targets → Lunge → Sweeping Strikes at 3+ enemies → Strike.</li>
+<li><b>Verified — gated 200-battle sim (swordmaster,cryomancer,inquisitor,
+beastmaster):</b> 200/200 wins (the saturated ceiling — crash test, not a balance
+measurement), 9.1 rounds/battle, hero deaths/battle 0.26, survivors' HP 74%. Damage
+share: Cryomancer 33% / Swordmaster 32% / Beastmaster 31% / Devout 4%. <b>Breaks on
+enemies 1.70/battle (vs 1.01 in Batch D)</b> — the loop visible in aggregate;
+uses/battle Pommel 2.2, Overpower 1.5, Shatterpoint 1.1. Berserker-party 200 also
+200/200 (8.3 rounds — untouched by design). Debug battles: the Shatterpoint → BREAKS →
+free-Overpower chain fires; every Pommel cast lands its stun (parried casts included —
+parry cuts damage and BD, never the status); a boss shows the IMMUNE flag while
+unbroken, then eats a Pommel crit-stun once Broken, and the log shows "Overpower holds
+Withered Warden Broken one turn longer". Parse clean.</li>
+</ul>
+
 <h2>2026-07-28 — Batch D: Swordmaster — stances become a choice</h2>
 <ul>
 <li><b>The diagnosis:</b> Seasoned Fighter was a stance switch the player couldn't switch —

@@ -60,6 +60,7 @@ var healing_received_mult := 1.0 # class passive: Cleric Holy Conduit
 
 var broken := false         # Broken: defenses down, crit vulnerable
 var broken_pending := false # will lose its next turn
+var broken_extra_turns := 0 # Overpower holds the Broken window open longer
 var dead := false
 var next_time := 0.0        # position on the initiative timeline
 var is_ranged := false      # ranged units can't be parried; Tripwire skips them
@@ -1303,6 +1304,7 @@ func _die() -> void:
 	dead = true
 	broken = false
 	broken_pending = false
+	broken_extra_turns = 0
 	# Unrelenting's borrowed Constitution can't outlive its buff (revives).
 	var ua := get_status("unrelenting")
 	if not ua.is_empty():
@@ -1344,6 +1346,7 @@ func revive(pct: float) -> void:
 
 func recover_from_break() -> void:
 	broken = false
+	broken_extra_turns = 0
 	pressure = 0
 	modulate = Color.WHITE
 	remove_status("broken")

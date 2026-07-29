@@ -1289,7 +1289,13 @@ func _run_battle() -> void:
 			_message("%s is Broken and loses their turn!" % u.unit_name)
 			_log("%s loses their turn (Broken)" % u.unit_name, "#c070e0")
 			await _wait(1.0)
-			u.recover_from_break()
+			if u.broken_extra_turns > 0:
+				# Overpower held the wound open — the window runs on.
+				u.broken_extra_turns -= 1
+				u.broken_pending = true
+				_log("%s stays Broken (held by Overpower)" % u.unit_name, "#c070e0")
+			else:
+				u.recover_from_break()
 			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
 			continue
 		if u.is_hero:
@@ -1654,8 +1660,10 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 					return [blust, target_foe]
 				return [u.abilities[0], target_foe]  # Strike
 			# Swordmaster rotation (deterministic): keep the right guard up,
-			# then spend the Break his kit builds — Overpower gated on the
-			# meter is how the sim proves the Break engine pays out.
+			# then run the Bruiser loop — Shatterpoint timed to land the
+			# Break (55+ on the meter) is how the sim proves the
+			# Break-into-free-Overpower chain fires; Overpower spends the
+			# meter and holds Broken targets down.
 			if u.passive_id == "seasoned":
 				var gchange := _find_ability(u, "Guard Change")
 				var sm_want := "defensive" if u.hp < u.max_hp * 0.45 else "aggressive"
@@ -1664,16 +1672,23 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				var sm_exec := _find_ability(u, "Execute")
 				if sm_exec != null and u.resource >= sm_exec.cost \
 						and _ability_usable(u, sm_exec):
-					var sm_prey := foes.filter(func(e): return e.hp < e.max_hp * 0.2)
+					var sm_prey := foes.filter(func(e): return e.hp < e.max_hp * 0.2 or e.broken)
 					if not sm_prey.is_empty():
 						return [sm_exec, _lowest_hp(sm_prey)]
+				var sm_shatter := _find_ability(u, "Shatterpoint")
+				if sm_shatter != null and u.resource >= sm_shatter.cost \
+						and u.ability_ready(sm_shatter) and not target_foe.broken \
+						and target_foe.pressure >= 55:
+					return [sm_shatter, target_foe]
 				var sm_pommel := _find_ability(u, "Pommel Strike")
 				if sm_pommel != null and u.resource >= sm_pommel.cost \
-						and u.ability_ready(sm_pommel):
+						and u.ability_ready(sm_pommel) \
+						and not (target_foe.is_boss and not target_foe.broken):
 					return [sm_pommel, target_foe]
 				var sm_over := _find_ability(u, "Overpower")
 				if sm_over != null and u.resource >= sm_over.cost \
-						and u.ability_ready(sm_over) and target_foe.pressure > 40:
+						and u.ability_ready(sm_over) \
+						and (target_foe.pressure >= 40 or target_foe.broken):
 					return [sm_over, target_foe]
 				var sm_lunge := _find_ability(u, "Lunge")
 				if sm_lunge != null and u.resource >= sm_lunge.cost \
@@ -2206,9 +2221,11 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 			return false
 	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
 		return false
-	# Execute: only usable while an enemy is below 20% health.
+	# Execute: needs an enemy below 20% health — or a Broken one; the
+	# Bruiser's own loop sets up his finisher.
 	if ab.display_name == "Execute" \
-			and not enemies.any(func(e): return not e.dead and e.hp < e.max_hp * 0.2):
+			and not enemies.any(func(e): return not e.dead \
+			and (e.hp < e.max_hp * 0.2 or e.broken)):
 		return false
 	# Shatter: needs someone Chilled to detonate.
 	if ab.display_name == "Shatter" \
@@ -3549,6 +3566,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				pr = int(pr * 1.5)
 			if is_perfect and ab.display_name == "Crushing Blow":
 				pr += 5
+			if is_perfect and ab.display_name == "Shatterpoint":
+				pr += 15
 			if is_perfect and ab.display_name == "Ice Lance":
 				pr = 20
 			# Broken Will: the Occultist grinds stability down harder.
@@ -3596,9 +3615,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							_log("† %s dies" % h.unit_name, "#e05050")
 					final = share
 			var hp_before := strike_target.hp
+			var was_broken := strike_target.broken
 			var result: Dictionary = strike_target.take_hit(final, pr)
 			if not sim and not result.died:
 				strike_target.hit_react((strike_target.position - attacker.position).normalized())
+			# Overpower: a blow into an already-Broken guard holds the wound
+			# open — the target stays Broken one turn longer (window-extender;
+			# a hit that CAUSES the Break doesn't also extend it).
+			if ab.display_name == "Overpower" and was_broken \
+					and attacker.is_hero and not strike_target.dead:
+				strike_target.broken_extra_turns += 1
+				strike_target.float_text("HELD BROKEN", Color(0.8, 0.4, 1.0))
+				_log("   → Overpower holds %s Broken one turn longer" % \
+					strike_target.unit_name, "#c070e0")
 			# Sharpshooter on-crit riders: Perfect Form, Sundering Shot,
 			# Exposed Nerve, Follow-Through, Through and Through's refund.
 			if is_crit and attacker.is_hero and not is_counter:
@@ -3721,9 +3750,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.delay_push > 0.0:
 				strike_target.next_time += ab.delay_push * 100.0 / strike_target.effective_speed()
 			var status_chance := ab.status_chance
-			# Pommel Strike: a critical strike GUARANTEES the stun.
-			if ab.display_name == "Pommel Strike" and is_crit:
-				status_chance = 1.0
 			if not result.died and not ab.applies_status.is_empty() \
 					and randf() <= status_chance:
 				var turns: int = ab.applies_status["turns"]
@@ -3760,9 +3786,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_gain_ruin(strike_target, 1)
 					_log("   → Talent: Empowered Hex — Decay takes root in %s" % \
 						strike_target.unit_name, "#b0a8e0")
-			# Lunge: the stance decides the wound — Exposed high, Cripple low.
+			# Lunge: the stance decides the wound — Aggressive Exposes,
+			# Defensive Cripples; Guard Change is how the player picks.
 			if ab.display_name == "Lunge" and not strike_target.dead:
-				var lunge_status := "exposed" if attacker.hp > attacker.max_hp * 0.5 \
+				var lunge_status := "exposed" if attacker.stance == "aggressive" \
 					else "cripple"
 				_apply_status(strike_target, lunge_status, 3)
 				_note_debuff_applied(attacker, lunge_status)
@@ -3932,6 +3959,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				elif not strike_target.is_hero:
 					_on_enemy_death(strike_target)
 				await _wait(0.5)
+			# Shatterpoint: a Break torn open on this very hit — the
+			# Swordmaster drives straight through with a free Overpower
+			# (no Rage, no cooldown; the Rampage/Implosion recast pattern).
+			if ab.display_name == "Shatterpoint" and result.broke \
+					and attacker.is_hero and not attacker.dead \
+					and not strike_target.dead and not battle_over:
+				var sp_over := _find_ability(attacker, "Overpower")
+				if sp_over != null:
+					strike_target.float_text("SHATTERPOINT", Color(0.8, 0.4, 1.0))
+					_log("%s: Shatterpoint drives through the Break — free Overpower!" % \
+						attacker.unit_name, "#c070e0")
+					await _wait(0.4)
+					await _resolve(attacker, _free_copy(sp_over), strike_target,
+						"good", true)
 			# Mark of the Hunt: every strike on the marked prey feeds the
 			# hunter's Mana (3% max per hit).
 			if attacker.is_hero and attacker.passive_id == "pack" \
