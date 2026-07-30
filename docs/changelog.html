@@ -5,6 +5,90 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-30 — Batch F: the Swordmaster tree becomes a designed set of lanes</h2>
+<ul>
+<li><b>The diagnosis:</b> Duelist and Poise were the same lane twice — Swordsmanship, Sword
+Mastery, Riposte and Opportunist in one column, High Guard and Composure in the other, all
+six answering "what happens when I'm hit" — while <b>not one node in all 24 touched
+Break</b>, the spec's entire engine since Batch E. So all parry consolidated into POISE,
+and Duelist became <b>BREAKER</b>: Break generation and Broken-window exploitation.</li>
+<li><b>The tree moves from the Batch 31 conversion into a purpose-designed LANE_TREES
+entry</b> — node-gated like Berserker/Sharpshooter/Survivalist (tiers open at 2/4 nodes
+bought in the lane, capstone at 6). Lanes: Blade / Poise / Breaker. No node was deleted:
+every id survives, so saved ranks migrate (the two rank reductions refund on load —
+verified headless: a pre-change save loads with ranks intact and 2 over-cap points
+refunded).</li>
+<li><b>Nine fillers re-specced in place</b> (same ids, new effects): Keen Edge →
+<b>Killing Edge</b> (flat +2%/rank crit → +4%/rank crit WHILE IN THE AGGRESSIVE STANCE —
+the stance gets an identity past its flat +15%), Momentum → <b>Overwhelm</b> (flat
++3%/rank damage → +3%/rank per debuff on the target; pairs with Precision Strikes — one
+crits into debuffs, the other damages into them), Deep Thrust → <b>Tempo</b> (+5 Pommel
+damage → switching stance grants +10%/rank damage for 1 turn; ranks 3→2), Footwork →
+<b>Bracing</b> (+3%/rank armor → +8/rank Constitution while in the Defensive stance;
+ranks 2→3), Composure → <b>Deflection</b> (flat −4%/rank damage taken → <b>parry works
+against RANGED attacks too</b>; ranks 2→1 — parry was melee-only, so a 12%-base stat with
+six feeding nodes did nothing in half the game's fights; this is the node that makes a
+parry build viable, priced at tier 2), Flourish → <b>Pressure Point</b> (−5 Sweeping cost
+→ Pommel Strike +8/rank BD; ranks 2→3), Blade Dance → <b>Sunder Guard</b> (+2%/rank parry
+→ Shatterpoint +8/rank BD), Perfect Form → <b>No Quarter</b> (a Swordsmanship duplicate →
+Breaking an enemy grants 15/rank Rage, at BOTH Break sites — strikes and Guard Change's
+15 BD; the Break refunds the Overpower you want to spend inside the window), Punishment
+(+6 Overpower damage → <b>Overpower +15%/rank against Broken targets</b>).</li>
+<li><b>The exclusive pair moved into the fork that matters:</b> Aggressive ↔ Defensive
+Stance died in Batch D (the player owns the swap; both guards are a real build — confirmed
+still gone). The new pair is in-lane at Breaker tier 2: <b>Punishment ↔ Off Balance</b>
+(Guarded Frame re-specced: +5%/rank max HP → ALL the Swordmaster's damage +5%/rank against
+Broken targets; ranks 2→3) — pile the Broken payoff into one button, or spread it across
+the kit. Narrow and big, or broad and small.</li>
+<li><b>Both invented capstones re-specced:</b> <b>Untouchable</b> (was +5% parry / −5%
+taken) — while in the Defensive stance, parried attacks deal NOTHING (damage, Break
+damage, and the universal min-1 floor all zeroed; the log reads "parried — UNTOUCHABLE")
+and every parry answers with a FREE Pommel Strike via the Opportunist recast machinery —
+with Batch E's guaranteed stun, every parry is also a stun. In Defensive it replaces
+Riposte's Strike counter; statuses still land through parries (the Batch E rule — parry
+never blocks the rider). <b>Guard Breaker</b> (was En Garde, +4% crit / +4% parry) — when
+a Broken enemy recovers, its meter refills to <b>50</b> instead of resetting to 0: the
+lane's thesis as a win condition, they never get their guard back. Execute caps Blade
+unchanged.</li>
+<li><b>Node moves:</b> Sword Mastery, Swordsmanship and Riposte to Poise (all parry in one
+column), Dominant Presence and Opportunist to Breaker (debuff-fed armor and punished
+misses are pressure bookkeeping, not poise).</li>
+<li><b>New machinery:</b> twelve unit-side talent fields; a wall_parry flag threaded
+through the strike resolution (damage, BD, the min-1 floor, and the mitigation tag all
+respect the absolute parry); stance-keyed chips for Killing Edge and Bracing that light
+with the guard and log once per lighting; a Tempo status chip stamped by Guard Change;
+Guard Breaker hooks the Broken-recovery site; Deflection widens the parry gate itself.
+<b>Bot rule:</b> a healthy Tempo build now pivots Guard Change on cooldown for the buff —
+the button the spec turns on, pressed like the designer means it.</li>
+<li><b>Sim-line note for future batches:</b> DOD_SIM alone never echoes combat logs — a
+forced-learn grep needs DOD_SIM_DEBUG=1 (the Batch F verify line as first written grepped
+silence). The working line: <code>DOD_SIM=6 DOD_SIM_DEBUG=1 DOD_SIM_TALENTS="sm_keen_edge:3,
+sm_momentum_sm:3,sm_deep_thrust:2,sm_footwork:3,sm_composure:1,sm_sword_mastery:3,
+sm_flourish:3,sm_blade_dance:3,sm_perfect_form:2,sm_punish:3"
+DOD_SIM_SPECS="swordmaster,cryomancer,inquisitor,beastmaster"
+DOD_SIM_ENEMIES="archer,archer,shaman,raider"</code> (run B swaps in sm_guarded:3,
+sm_untouchable:1, sm_en_garde:1).</li>
+<li><b>Verified:</b> parse clean on battle + party scenes; tree audit 24/3/7-7-7 across
+all 12 specs plus Swordmaster structure/gating/exclusive/payload checks (89 asserts, the
+Batch C suite extended). <b>Every re-specced node and both re-specced capstones fire in
+forced-learn sims</b> — proc counts over 6 battles: Killing Edge 17, Overwhelm 29, Tempo
+71, Bracing 15, Deflection 3, Pressure Point 11, Sunder Guard 6, No Quarter 9, Punishment
+6; run B: Off Balance 10, Untouchable 2 (0 dmg / 0 BD confirmed in the log), Guard
+Breaker 2 (meter refills to 50 after the lost turn). The grep earned its keep: it caught
+the min-1 damage floor leaking 1 damage through Untouchable's absolute parry — fixed.
+Gated 200-battle sim (swordmaster,cryomancer,inquisitor,beastmaster): <b>200/200 wins</b>,
+9.2 rounds/battle, hero deaths/battle 0.24, survivors' HP 74%, damage share Cryomancer
+33% / Swordmaster 32% / Beastmaster 31% / Devout 4%, Breaks on enemies 1.74/battle — the
+Batch E baseline held (no talents learned in gated sims, so identical numbers = no
+regression in the shared strike/parry/counter paths the batch touched). Berserker-party
+200 control: 199/200 (8.3 rounds, deaths 0.46, shares 36/33/27/4 — the Batch C shape;
+every new hook gates on talent fields that are zero there, and the single loss sits
+inside ordinary warband variance at 0.46 deaths/battle).</li>
+<li><b>Docs housekeeping:</b> master.html's party-screen bullet still described the
+pre-lane "12-node grid with prerequisite connector lines" — corrected in passing to the
+lane-columns truth.</li>
+</ul>
+
 <h2>2026-07-28 — Batch E: Swordmaster — the Bruiser identity</h2>
 <ul>
 <li><b>The diagnosis:</b> the kit was three hobbies — parry, stun, Break — until the boss

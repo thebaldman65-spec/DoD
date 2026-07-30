@@ -14,75 +14,6 @@ class_name Talents
 const ROW_REQ := {0: 0, 1: 5, 2: 10, 3: 15}
 
 const FIXED_TREES := {
-	"swordmaster": [
-		# --- row 0 ---
-		{"id": "sm_def_stance", "name": "Defensive Stance", "ranks": 3, "row": 0, "col": 1,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "The Defensive stance blocks an additional {v}% damage taken.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"seasoned_def_bonus": 0.03}}},
-		{"id": "sm_swordsmanship", "name": "Swordsmanship", "ranks": 3, "row": 0, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "A perfect Pommel Strike grants +{v}% more parry chance.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"pommel_parry_bonus": 0.05}}},
-		{"id": "sm_agg_stance", "name": "Aggressive Stance", "ranks": 3, "row": 0, "col": 3,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "The Aggressive stance grants an additional {v}% damage dealt.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"seasoned_off_bonus": 0.03}}},
-		# --- row 1 ---
-		{"id": "sm_dominant", "name": "Dominant Presence", "ranks": 3, "row": 1, "col": 0,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Armor value is increased by {v}% for every debuff the Swordmaster applies this battle.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"dominant_ranks": 1}}},
-		{"id": "sm_high_guard", "name": "High Guard", "ranks": 1, "row": 1, "col": 1,
-			"gate": "row", "requires": "sm_swordsmanship", "requires_ranks": 1,
-			"desc": "Take 25% less damage for 1 turn after parrying an attack.",
-			"payload": {"stat": {"high_guard": 1}}},
-		{"id": "sm_lunge", "name": "Lunge", "ranks": 1, "row": 1, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "New ability: Lunge — 35 damage; applies Exposed in Aggressive stance, Cripple in Defensive (25 Rage, 3.5 int).",
-			"payload": {"new_ability": {"display_name": "Lunge", "cost": 25,
-				"damage": 35, "pressure": 20, "delay": 3.5, "anim": "attack02",
-				"resource_gain": 10,
-				"perfect_id": "", "perfect_text": "Initiative cost 3.0 instead",
-				"description": "A committed thrust. In Aggressive\nstance it Exposes the target; in\nDefensive it Cripples them (3 turns).\nBuilds 10 Rage."}}},
-		{"id": "sm_riposte", "name": "Riposte", "ranks": 1, "row": 1, "col": 3,
-			"gate": "row", "requires": "sm_swordsmanship", "requires_ranks": 1,
-			"desc": "Counter Attack: immediately answer every parry with a Strike.",
-			"payload": {"stat": {"counter_attacks": 1}}},
-		{"id": "sm_precision", "name": "Precision Strikes", "ranks": 3, "row": 1, "col": 4,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "+{v}% critical strike chance against Dazed, Crippled, and Exposed targets.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"precision_ranks": 1}}},
-		# --- row 2 ---
-		{"id": "sm_seasoned_node", "name": "Seasoned Fighter", "ranks": 3, "row": 2, "col": 1,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Lunge and Overpower gain +{v}% critical strike chance.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"blade_crit_ranks": 1}}},
-		{"id": "sm_opportunist", "name": "Opportunist", "ranks": 1, "row": 2, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "When an enemy attack misses the Swordmaster, he counter attacks with Overpower (free).",
-			"payload": {"stat": {"opportunist": 1}}},
-		{"id": "sm_sword_mastery", "name": "Sword Mastery", "ranks": 3, "row": 2, "col": 3,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "+{v}% parry chance.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"parry_bonus": 0.03}}},
-		# --- row 3 (capstone) ---
-		{"id": "sm_execute", "name": "Execute", "ranks": 1, "row": 3, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "New ability: Execute — 55 damage / 50 BD; usable against targets below 20% health or Broken; a perfect guarantees a crit (30 Rage, 2.0 int, 3cd).",
-			"payload": {"new_ability": {"display_name": "Execute", "cost": 30,
-				"damage": 55, "pressure": 50, "delay": 2.0, "anim": "attack03",
-				"cooldown": 3,
-				"perfect_id": "", "perfect_text": "Guaranteed critical strike",
-				"description": "End them. Only usable against targets\nbelow 20% health — or Broken ones."}}},
-	],
 	"cryomancer": [
 		# --- row 0 ---
 		{"id": "cr_hungering", "name": "Hungering Cold", "ranks": 3, "row": 0, "col": 1,
@@ -720,6 +651,156 @@ const LANE_TREES := {
 				"perfect_id": "", "perfect_text": "",
 				"description": "Three brutal strikes, each building\n10 bloodloss. If the target dies, Rampage\nimmediately recasts on another enemy."}}},
 	],
+	"swordmaster": [
+		# Purpose-designed lanes (Batch F, 07-30) — NODE-GATED (tiers open
+		# on nodes bought in the lane: 2/4, capstone at 6). Every id
+		# survives and re-specs in place, so saved ranks migrate. Duelist
+		# and Poise were the same lane twice (all parry and defence), while
+		# NOTHING in the tree touched Break — the kit's engine since Batch
+		# E. So all parry lives in Poise now, and Duelist became BREAKER:
+		# Break generation and Broken-window exploitation.
+		# --- Lane A: Blade — damage, crit, and the Aggressive stance. ---
+		{"id": "sm_agg_stance", "name": "Aggressive Stance", "ranks": 3, "lane": "Blade", "tier": 0,
+			"node_gated": true,
+			"desc": "The Aggressive stance grants an additional {v}% damage dealt.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"seasoned_off_bonus": 0.03}}},
+		{"id": "sm_lunge", "name": "Lunge", "ranks": 1, "lane": "Blade", "tier": 0,
+			"desc": "New ability: Lunge — 35 damage; applies Exposed in Aggressive stance, Cripple in Defensive (25 Rage, 3.5 int).",
+			"payload": {"new_ability": {"display_name": "Lunge", "cost": 25,
+				"damage": 35, "pressure": 20, "delay": 3.5, "anim": "attack02",
+				"resource_gain": 10,
+				"perfect_id": "", "perfect_text": "Initiative cost 3.0 instead",
+				"description": "A committed thrust. In Aggressive\nstance it Exposes the target; in\nDefensive it Cripples them (3 turns).\nBuilds 10 Rage."}}},
+		# Re-spec (was Keen Edge, flat +2% crit; same id, so saved ranks
+		# carry): keyed to the stance — Aggressive gets an identity past
+		# its flat +15%.
+		{"id": "sm_keen_edge", "name": "Killing Edge", "ranks": 3, "lane": "Blade", "tier": 0,
+			"desc": "+{v}% critical strike chance while in the Aggressive stance.",
+			"scale": {"step": 4},
+			"payload": {"stat": {"killing_edge_ranks": 1}}},
+		{"id": "sm_precision", "name": "Precision Strikes", "ranks": 3, "lane": "Blade", "tier": 1,
+			"desc": "+{v}% critical strike chance against Dazed, Crippled, and Exposed targets.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"precision_ranks": 1}}},
+		{"id": "sm_seasoned_node", "name": "Seasoned Fighter", "ranks": 3, "lane": "Blade", "tier": 1,
+			"desc": "Lunge and Overpower gain +{v}% critical strike chance.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"blade_crit_ranks": 1}}},
+		# Re-spec (was Momentum, a flat +3% damage dial): pairs with
+		# Precision Strikes — one crits into debuffs, this damages into
+		# them.
+		{"id": "sm_momentum_sm", "name": "Overwhelm", "ranks": 3, "lane": "Blade", "tier": 2,
+			"desc": "+{v}% damage for every debuff on the target.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"overwhelm_ranks": 1}}},
+		# Re-spec (was Deep Thrust, +5 Pommel damage; ranks 3 → 2 — the
+		# loader refunds the over-cap rank): pays for pressing the button
+		# the whole spec turns on.
+		{"id": "sm_deep_thrust", "name": "Tempo", "ranks": 2, "lane": "Blade", "tier": 2,
+			"desc": "Switching stance grants +{v}% damage for 1 turn.",
+			"scale": {"step": 10},
+			"payload": {"stat": {"tempo_ranks": 1}}},
+		# --- Lane B: Poise — the defensive half, and ALL the parry
+		# (Swordsmanship, Sword Mastery and Riposte move in from Duelist:
+		# everything that answers being hit lives here). ---
+		{"id": "sm_def_stance", "name": "Defensive Stance", "ranks": 3, "lane": "Poise", "tier": 0,
+			"desc": "The Defensive stance blocks an additional {v}% damage taken.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"seasoned_def_bonus": 0.03}}},
+		# Moved from Duelist: parry belongs with the guard.
+		{"id": "sm_sword_mastery", "name": "Sword Mastery", "ranks": 3, "lane": "Poise", "tier": 0,
+			"desc": "+{v}% parry chance.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"parry_bonus": 0.03}}},
+		# Re-spec (was Footwork, +3% armor; ranks 2 → 3): Defensive stance
+		# comes to mean "hard to Break", not just "takes less damage".
+		{"id": "sm_footwork", "name": "Bracing", "ranks": 3, "lane": "Poise", "tier": 0,
+			"desc": "+{v} Constitution while in the Defensive stance.",
+			"scale": {"step": 8},
+			"payload": {"stat": {"bracing_ranks": 1}}},
+		# Moved from Duelist.
+		{"id": "sm_swordsmanship", "name": "Swordsmanship", "ranks": 3, "lane": "Poise", "tier": 1,
+			"desc": "A perfect Pommel Strike grants +{v}% more parry chance.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"pommel_parry_bonus": 0.05}}},
+		{"id": "sm_high_guard", "name": "High Guard", "ranks": 1, "lane": "Poise", "tier": 1,
+			"desc": "Take 25% less damage for 1 turn after parrying an attack.",
+			"payload": {"stat": {"high_guard": 1}}},
+		# Moved from Duelist: the parry payoff sits behind the parry lane.
+		{"id": "sm_riposte", "name": "Riposte", "ranks": 1, "lane": "Poise", "tier": 2,
+			"desc": "Counter Attack: immediately answer every parry with a Strike.",
+			"payload": {"stat": {"counter_attacks": 1}}},
+		# Re-spec (was Composure, flat -4% damage taken; ranks 2 → 1): the
+		# node that makes a parry build viable — without it the whole
+		# cluster is dead weight against archers and casters.
+		{"id": "sm_composure", "name": "Deflection", "ranks": 1, "lane": "Poise", "tier": 2,
+			"desc": "The Swordmaster's parry works against RANGED attacks too — arrows and spells alike.",
+			"payload": {"stat": {"deflection": 1}}},
+		# --- Lane C: Breaker (was Duelist) — fill their meter, then live
+		# in the window. This lane did not exist before. ---
+		# Re-spec (was Flourish, -5 Sweeping Strikes cost; ranks 2 → 3).
+		{"id": "sm_flourish", "name": "Pressure Point", "ranks": 3, "lane": "Breaker", "tier": 0,
+			"desc": "Pommel Strike deals +{v} more Break damage.",
+			"scale": {"step": 8},
+			"payload": {"stat": {"pressure_point_ranks": 1}}},
+		# Re-spec (was Blade Dance, +2% parry — parry's home is Poise now).
+		{"id": "sm_blade_dance", "name": "Sunder Guard", "ranks": 3, "lane": "Breaker", "tier": 0,
+			"desc": "Shatterpoint deals +{v} more Break damage.",
+			"scale": {"step": 8},
+			"payload": {"stat": {"sunder_guard_ranks": 1}}},
+		# Moved from Poise: debuff-fed armor is pressure bookkeeping.
+		{"id": "sm_dominant", "name": "Dominant Presence", "ranks": 3, "lane": "Breaker", "tier": 1,
+			"desc": "Armor value is increased by {v}% for every debuff the Swordmaster applies this battle.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"dominant_ranks": 1}}},
+		# Moved from Duelist.
+		{"id": "sm_opportunist", "name": "Opportunist", "ranks": 1, "lane": "Breaker", "tier": 1,
+			"desc": "When an enemy attack misses the Swordmaster, he counter attacks with Overpower (free).",
+			"payload": {"stat": {"opportunist": 1}}},
+		# Re-spec (was Perfect Form, a Swordsmanship duplicate): closes the
+		# loop — the Break refunds Rage toward the Overpower you want to
+		# spend inside the window you just opened.
+		{"id": "sm_perfect_form", "name": "No Quarter", "ranks": 2, "lane": "Breaker", "tier": 1,
+			"desc": "Breaking an enemy grants the Swordmaster {v} Rage.",
+			"scale": {"step": 15},
+			"payload": {"stat": {"no_quarter_ranks": 1}}},
+		# Re-spec (was +6 Overpower damage). Exclusive fork with Off
+		# Balance: pile everything into Overpower, or spread it wide.
+		{"id": "sm_punish", "name": "Punishment", "ranks": 3, "lane": "Breaker", "tier": 2,
+			"exclusive_with": "sm_guarded",
+			"desc": "Overpower deals +{v}% damage against Broken targets.",
+			"scale": {"step": 15},
+			"payload": {"stat": {"punishment_ranks": 1}}},
+		# Re-spec (was Guarded Frame, +5% max health; ranks 2 → 3): the
+		# broad half of the fork.
+		{"id": "sm_guarded", "name": "Off Balance", "ranks": 3, "lane": "Breaker", "tier": 2,
+			"exclusive_with": "sm_punish",
+			"desc": "All the Swordmaster's damage is increased by {v}% against Broken targets.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"off_balance_ranks": 1}}},
+		# --- Capstones: take ONE (6 nodes bought in the lane) ---
+		{"id": "sm_execute", "name": "Execute", "ranks": 1, "lane": "Blade", "tier": 2,
+			"capstone": true,
+			"desc": "New ability: Execute — 55 damage / 50 BD; usable against targets below 20% health or Broken; a perfect guarantees a crit (30 Rage, 2.0 int, 3cd).",
+			"payload": {"new_ability": {"display_name": "Execute", "cost": 30,
+				"damage": 55, "pressure": 50, "delay": 2.0, "anim": "attack03",
+				"cooldown": 3,
+				"perfect_id": "", "perfect_text": "Guaranteed critical strike",
+				"description": "End them. Only usable against targets\nbelow 20% health — or Broken ones."}}},
+		# Re-spec (was +5% parry / -5% damage taken): the Defensive stance
+		# becomes a genuine wall against melee — and every parry a stun.
+		{"id": "sm_untouchable", "name": "Untouchable", "ranks": 1, "lane": "Poise", "tier": 2,
+			"capstone": true,
+			"desc": "While in the Defensive stance, parried attacks deal NO damage instead of 25%, and every parry is answered with a free Pommel Strike.",
+			"payload": {"stat": {"untouchable": 1}}},
+		# Re-spec (was En Garde, +4% crit / +4% parry): the lane's thesis
+		# as a win condition — they never get their guard back.
+		{"id": "sm_en_garde", "name": "Guard Breaker", "ranks": 1, "lane": "Breaker", "tier": 2,
+			"capstone": true,
+			"desc": "When a Broken enemy recovers, its Break meter refills to 50 instead of resetting to 0.",
+			"payload": {"stat": {"guard_breaker": 1}}},
+	],
 	"mystic": [
 		# Survivalist — NODE-GATED (tiers open on nodes bought in the lane:
 		# 2/4, capstone at 6). Lanes: Venom / Snares / Guerilla.
@@ -999,60 +1080,6 @@ const LANE_TREES := {
 # exclusive_id]. "new" holds the invented filler nodes — numeric dials and
 # kit tweaks on existing machinery only, placed for the designer to review.
 const LANE_CONVERSIONS := {
-	"swordmaster": {
-		"map": {
-			# The stance nodes stopped being an either/or with Seasoned Fighter
-			# v2 (Batch D): the player owns the swap, so deepening BOTH guards
-			# is a real build — the exclusivity is gone.
-			"sm_agg_stance": ["Blade", 0], "sm_lunge": ["Blade", 0],
-			"sm_precision": ["Blade", 1], "sm_seasoned_node": ["Blade", 1],
-			"sm_def_stance": ["Poise", 0], "sm_high_guard": ["Poise", 1],
-			"sm_dominant": ["Poise", 1],
-			"sm_swordsmanship": ["Duelist", 0], "sm_sword_mastery": ["Duelist", 0],
-			"sm_riposte": ["Duelist", 1], "sm_opportunist": ["Duelist", 1],
-			"sm_execute": ["Blade", 2, "cap"],
-		},
-		"new": [
-			{"id": "sm_keen_edge", "name": "Keen Edge", "ranks": 3, "lane": "Blade", "tier": 1,
-				"desc": "+{v}% crit chance.", "scale": {"step": 2},
-				"payload": {"stat": {"crit_bonus": 0.02}}},
-			{"id": "sm_deep_thrust", "name": "Deep Thrust", "ranks": 3, "lane": "Blade", "tier": 2,
-				"desc": "Pommel Strike deals {v} more damage.", "scale": {"step": 5},
-				"payload": {"ability": "Pommel Strike", "add": {"damage": 5}}},
-			{"id": "sm_momentum_sm", "name": "Momentum", "ranks": 3, "lane": "Blade", "tier": 2,
-				"desc": "+{v}% damage dealt.", "scale": {"step": 3},
-				"payload": {"stat": {"dmg_bonus": 0.03}}},
-			{"id": "sm_footwork", "name": "Footwork", "ranks": 2, "lane": "Poise", "tier": 0,
-				"desc": "+{v}% armor.", "scale": {"step": 3},
-				"payload": {"stat": {"armor": 0.03}}},
-			{"id": "sm_composure", "name": "Composure", "ranks": 2, "lane": "Poise", "tier": 1,
-				"desc": "Take {v}% less damage.", "scale": {"step": 4},
-				"payload": {"stat": {"dmg_taken_bonus": -0.04}}},
-			{"id": "sm_guarded", "name": "Guarded Frame", "ranks": 2, "lane": "Poise", "tier": 2,
-				"desc": "+{v}% max health.", "scale": {"step": 5},
-				"payload": {"stat": {"max_hp_pct": 0.05}}},
-			{"id": "sm_perfect_form", "name": "Perfect Form", "ranks": 2, "lane": "Poise", "tier": 2,
-				"desc": "The perfect-Pommel parry buff deepens another {v}%.", "scale": {"step": 5},
-				"payload": {"stat": {"pommel_parry_bonus": 0.05}}},
-			{"id": "sm_blade_dance", "name": "Blade Dance", "ranks": 3, "lane": "Duelist", "tier": 1,
-				"desc": "+{v}% parry chance.", "scale": {"step": 2},
-				"payload": {"stat": {"parry_bonus": 0.02}}},
-			{"id": "sm_punish", "name": "Punishment", "ranks": 3, "lane": "Duelist", "tier": 2,
-				"desc": "Overpower deals {v} more damage.", "scale": {"step": 6},
-				"payload": {"ability": "Overpower", "add": {"damage": 6}}},
-			{"id": "sm_flourish", "name": "Flourish", "ranks": 2, "lane": "Duelist", "tier": 2,
-				"desc": "Sweeping Strikes costs {v} less Rage.", "scale": {"step": 5},
-				"payload": {"ability": "Sweeping Strikes", "add": {"cost": -5}}},
-			{"id": "sm_untouchable", "name": "Untouchable", "ranks": 1, "lane": "Poise", "tier": 2,
-				"capstone": true,
-				"desc": "+5% parry and take 5% less damage.",
-				"payload": {"stat": {"parry_bonus": 0.05, "dmg_taken_bonus": -0.05}}},
-			{"id": "sm_en_garde", "name": "En Garde", "ranks": 1, "lane": "Duelist", "tier": 2,
-				"capstone": true,
-				"desc": "+4% crit and +4% parry — the duel is always on the Swordmaster's terms.",
-				"payload": {"stat": {"crit_bonus": 0.04, "parry_bonus": 0.04}}},
-		],
-	},
 	"cryomancer": {
 		"map": {
 			"cr_frostbite": ["Deep Freeze", 0], "cr_frigid": ["Deep Freeze", 1],

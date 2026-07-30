@@ -120,3 +120,24 @@ health threshold Batch D made vestigial — the player picks the wound,
 and Guard Change gets a second reason to exist. Execute answers to the
 loop too: a capstone should pay off the spec's own setup, not stay a
 generic low-HP snipe.
+
+**Swordmaster tree (Batch F) — the engine finally got a lane:** Duelist
+and Poise were the same lane twice — six nodes all answering "what
+happens when I'm hit" split across two columns — while not one node in
+all 24 touched Break, the spec's entire engine since Batch E. A tree
+should mirror the kit's verbs, so all parry consolidated into Poise
+(where High Guard already lived) and Duelist became Breaker: fill the
+meter, then live inside the window. The stance exclusive died in
+Batch D for the same reason the new one lives in Breaker: exclusives
+are only interesting when both doors are real builds of the SAME plan,
+and Punishment ↔ Off Balance is exactly that fork — pile the Broken
+payoff into one button, or spread it across the kit. Deflection is the
+tree's most important single node: parry was melee-only, so a 12%-base
+stat with six feeding nodes did nothing in half the game's fights —
+one rank turns a dead cluster into a build. Bracing rekeys Defensive
+stance from "takes less" to "cannot be moved," which is what raising a
+guard means. Tempo pays the player for pressing Guard Change, the
+button the whole spec turns on; the bot now pivots on cooldown when
+healthy for the same reason. Guard Breaker is the Breaker thesis
+stated as a win condition: the meter half-refills on recovery, so the
+guard never truly returns.

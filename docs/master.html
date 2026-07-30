@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-28</b></p>
+<p align="right"><b>Last updated: 2026-07-30</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -854,6 +854,31 @@ Slash costs 5/rank less Rage ×2), Second Wind (first drop below 25% health each
 an enemy once), Undying Rage (Fury: below 25% health he cannot die and deals +50% damage;
 the hit that would have killed him ends it at 1 HP, once per battle), Rampage (Warpath:
 grants the ability — three strikes that recast free on a kill).</p>
+<p><b>Swordmaster lanes (node-gated):</b><br>
+<b>BLADE</b> (damage, crit, and the Aggressive stance) — Aggressive Stance (the Aggressive
+stance deals an additional 3%/rank damage ×3), Lunge (grants the ability), Killing Edge
+(+4%/rank crit while in the Aggressive stance ×3), Precision Strikes (+5%/rank crit vs
+Dazed / Crippled / Exposed ×3), Seasoned Fighter (+3%/rank crit for Lunge and Overpower ×3),
+Overwhelm (+3%/rank damage per debuff on the target ×3), Tempo (switching stance grants
++10%/rank damage for 1 turn ×2).<br>
+<b>POISE</b> (the defensive half, and ALL the parry) — Defensive Stance (the Defensive
+stance blocks an additional 3%/rank damage taken ×3), Sword Mastery (+3%/rank parry ×3),
+Bracing (+8/rank Constitution while in the Defensive stance ×3), Swordsmanship
+(perfect-Pommel parry buff +5%/rank ×3), High Guard (25% less damage for 1 turn after a
+parry), Riposte (<b>Counter Attack</b>: answer every parry with a Strike), Deflection
+(parry works against RANGED attacks too — arrows and spells alike).<br>
+<b>BREAKER</b> (fill their meter, then live in the window) — Pressure Point (Pommel Strike
++8/rank BD ×3), Sunder Guard (Shatterpoint +8/rank BD ×3), Dominant Presence (armor
++5%/rank per debuff applied ×3), Opportunist (counter enemy misses with a free Overpower),
+No Quarter (Breaking an enemy grants 15/rank Rage ×2), Punishment (Overpower +15%/rank
+damage against Broken targets ×3; <i>exclusive with Off Balance</i>), Off Balance (ALL the
+Swordmaster's damage +5%/rank against Broken targets ×3; <i>exclusive with
+Punishment</i>).<br>
+<b>CAPSTONES</b> — Execute (Blade: grants the ability), Untouchable (Poise: while in the
+Defensive stance, parried attacks deal NOTHING — no damage, no Break damage, the floor of
+1 included — and every parry is answered with a free Pommel Strike, so every parry is also
+a stun), Guard Breaker (Breaker: when a Broken enemy recovers, its Break meter refills to
+50 instead of resetting to 0 — the guard never truly returns).</p>
 <p><b>Sharpshooter lanes (node-gated):</b><br>
 <b>PRECISION</b> (Focus, crit chance, crit damage) — Steady Hands (+4%/rank crit ×3),
 Perfect Form (crits +20 Focus), Deep Focus (cap 150), Executioner's Eye (crit mult
@@ -915,7 +940,7 @@ Steadfast Bond</i>), Lone Hunter (no companion: costs −40%, damage +25%).<br>
 gain doubled), The Pack (Pack lane: two beasts at once — COMING SOON), Apex Predator
 (Handler: Quick Shot triggers an extra free companion strike; Kill Command resets on every
 enemy death).</p>
-<p><b>Eight classic trees remain conversions</b> (<b>Swordmaster, Warden, Pyromancer,
+<p><b>Seven classic trees remain conversions</b> (<b>Warden, Pyromancer,
 Cryomancer, Arcanist, Holy, Devout, Occultist</b>, from Batch 31): their original 12 nodes
 keep their ids, effects, and any invested ranks, re-homed into three lanes, joined by
 invented filler nodes (numeric dials and kit tweaks on existing machinery) and two
@@ -926,11 +951,6 @@ session-only; DOD_SIM_GRANT_ALL=1 headless) pre-grants every talent-granted and
 boss-trophy ability at spawn, so reworked kits can be reviewed without spending points.</p>
 <p><b>Lane homes per converted tree</b> (existing nodes by name; ⊕ marks invented
 fillers/capstones):<br>
-<b>Swordmaster</b> — Blade: Aggressive Stance, Lunge, Precision Strikes, Seasoned Fighter,
-⊕Keen Edge, ⊕Deep Thrust, ⊕Momentum · Poise: Defensive Stance, High Guard, Dominant
-Presence, ⊕Footwork, ⊕Composure, ⊕Guarded Frame, ⊕Perfect Form · Duelist: Swordsmanship,
-Sword Mastery, Riposte, Opportunist, ⊕Blade Dance, ⊕Punishment, ⊕Flourish · Capstones:
-Execute, ⊕Untouchable, ⊕En Garde · Exclusive: Aggressive ↔ Defensive Stance.<br>
 <b>Warden</b> — Aegis: Unkillable, Toughness, Tenacity, Endurance, ⊕Layered Plating,
 ⊕Fortress, ⊕Immovable · Retribution: Richocet, Sundering, Elemental Weakness, ⊕Spiked
 Bulwark, ⊕Shattering Blow, ⊕Grudge, ⊕Stomp Drill · Warlord: Shieldwall, Rally, Iron Will,
@@ -976,17 +996,6 @@ additional point invested adds the SAME amount again (e.g. "+5 Bleed per rank" a
 <p><b>Layout:</b> every tree renders as three lane columns with live lane-point headers,
 a capstone shelf, emblem-square nodes with point counters, cost-aware hover tooltips, and
 greyed exclusive siblings. Art is placeholder.</p>
-<p><b>Swordmaster tree:</b> Defensive Stance (the Defensive stance blocks an additional
-3%/rank damage taken ×3), Swordsmanship (perfect-Pommel parry buff +5%/rank ×3),
-Aggressive Stance (the Aggressive stance deals an additional 3%/rank damage ×3) — the two
-stance nodes are complementary, not exclusive: the player owns the swap, so deepening both
-guards is a real build. Dominant Presence (armor +5%/rank per debuff
-applied ×3), High Guard (25% less damage for 1 turn after parrying, needs Swordsmanship 1),
-Lunge (grants the ability), Riposte (<b>Counter Attack</b>: answer every parry with a
-Strike, needs Swordsmanship 1), Precision Strikes (+5%/rank crit vs Dazed / Crippled /
-Exposed ×3). Seasoned Fighter (+3%/rank crit for Lunge and Overpower ×3),
-Opportunist (counter enemy misses with a free Overpower), Sword Mastery (+3%/rank parry ×3).
-Capstone — Execute (grants the ability).</p>
 <p><b>Warden tree:</b> Tank and Spank
 (Mocking Blow 15%/rank chance to Empower a random ally ×3), Unkillable (heal 2%/rank max HP
 on every Block ×3), Elemental Weakness (Crushing Blow shreds elemental resists 5%/rank, 3
@@ -1300,10 +1309,8 @@ spawn math: Constitution uses the spec's value plus Toughness, Attack/HP include
 scaling, and the spec passive line bakes in talent ranks (Aggressive/Defensive Stance,
 Unstoppable) — the class passive + spec passive lines, ability chips (hover shows real
 numbers AND the "% of Attack" scaling), rune equip toggles (2 max), and the spec's talent
-tree: a 12-node grid with prerequisite connector lines and click-to-learn nodes (lock
-reasons on the node tooltips) for Berserker / Swordmaster / Warden / Pyromancer /
-Cryomancer / Arcanist / Holy / Devout / Occultist, or <b>"Coming soon."</b>
-for specs whose trees aren't designed yet.</li>
+tree: three lane columns with live lane-point headers, a capstone shelf, and
+click-to-learn nodes (lock reasons on the node tooltips) for all twelve specs.</li>
 <li><b>Awakening screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
 along on every path the class can take) and each ability's damage with its "% Atk" scaling.
 The draft screen stays clean — no passive text there.</li>

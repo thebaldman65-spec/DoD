@@ -209,6 +209,19 @@ var rally := 0                # Rally: party +15% healing for 2t per HP block
 var seasoned_def_bonus := 0.0 # Defensive Stance: deeper damage-taken cut
 var seasoned_off_bonus := 0.0 # Aggressive Stance: bigger damage-dealt bonus
 var stance := "aggressive"    # Swordmaster guard (aggressive|defensive), fresh each battle
+# Swordmaster lanes (Batch F). See talents.gd for the node text.
+var killing_edge_ranks := 0   # Killing Edge: +4%/rank crit while Aggressive
+var overwhelm_ranks := 0      # Overwhelm: +3%/rank damage per debuff on the target
+var tempo_ranks := 0          # Tempo: stance switch grants +10%/rank damage 1 turn
+var bracing_ranks := 0        # Bracing: +8/rank Constitution while Defensive
+var deflection := 0           # Deflection: parry works against ranged attacks
+var pressure_point_ranks := 0 # Pressure Point: Pommel Strike +8/rank BD
+var sunder_guard_ranks := 0   # Sunder Guard: Shatterpoint +8/rank BD
+var no_quarter_ranks := 0     # No Quarter: Breaking an enemy grants 15/rank Rage
+var punishment_ranks := 0     # Punishment: Overpower +15%/rank vs Broken
+var off_balance_ranks := 0    # Off Balance: all damage +5%/rank vs Broken
+var untouchable := 0          # Untouchable: Defensive parries negate + Pommel counter
+var guard_breaker := 0        # Guard Breaker: Broken recovery refills the meter to 50
 # Pyromancer tree (07-18). See talents.gd for the node text.
 var accelerant_ranks := 0     # Accelerant: +1%/rank Burn tick strength
 var pyromaniac_ranks := 0     # Pyromaniac: +1%/rank Inferno Master step
@@ -1236,7 +1249,9 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		resource = mini(resource + converted, max_resource)
 		float_text("+%d Mana" % converted, Color(0.5, 0.7, 1.0))
 	# Constitution: break resistance (100 = neutral; higher takes less Pressure).
-	pressure_add = int(round(pressure_add * 100.0 / maxf(constitution, 1.0)))
+	# Bracing (Swordmaster talent): the raised guard is harder to Break.
+	var eff_con := constitution + ((8 * bracing_ranks) if stance == "defensive" else 0)
+	pressure_add = int(round(pressure_add * 100.0 / maxf(eff_con, 1.0)))
 	if has_status("ward"):
 		pressure_add = int(pressure_add * 0.5)
 	# Devoutness (talent, ex-Devotion Aura): power carries the % cut.
