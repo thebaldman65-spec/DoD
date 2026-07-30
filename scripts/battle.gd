@@ -1535,7 +1535,7 @@ func _player_turn(u: BattleUnit) -> void:
 				"battle_shout", "blood_price", "flame_shield", "stabilize",
 				"overcharge", "cons_ground", "bulwark", "dark_pact", "hysteria",
 				"instinct", "bestial", "spirit_bond", "hold_breath",
-				"venom_coat", "deadfall", "guard_change"]:
+				"venom_coat", "deadfall", "guard_change", "interpose"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -1737,6 +1737,41 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				if sm_sweep != null and u.resource >= sm_sweep.cost \
 						and u.ability_ready(sm_sweep) and foes.size() >= 3:
 					return [sm_sweep, target_foe]
+				return [u.abilities[0], target_foe]  # Strike
+			# Warden rotation (deterministic): cover the party when it bleeds,
+			# wall up under pressure, keep the taunt and Sunder live, refuel
+			# the line, grind. Mocking Blow is free and builds 10 Rage — his
+			# engine — so it is never skipped once its taunt has lapsed.
+			if u.passive_id == "heavy_plating":
+				var wd_idx := heroes.find(u)
+				var wd_inter := _find_ability(u, "Interpose")
+				if wd_inter != null and u.resource >= wd_inter.cost \
+						and u.ability_ready(wd_inter) \
+						and allies.filter(func(h): return not h.is_companion \
+						and h != u and h.hp < h.max_hp * 0.6).size() >= 2:
+					return [wd_inter, u]
+				var wd_wall := _find_ability(u, "Shieldwall")
+				if wd_wall != null and u.resource >= wd_wall.cost \
+						and u.ability_ready(wd_wall) \
+						and (u.hp < u.max_hp * 0.5 or foes.size() >= 3):
+					return [wd_wall, u]
+				var wd_mock := _find_ability(u, "Mocking Blow")
+				if wd_mock != null and u.ability_ready(wd_mock) \
+						and not foes.any(func(e): return e.has_status("mocked") \
+						and e.status_power("mocked") == wd_idx):
+					return [wd_mock, target_foe]
+				var wd_crush := _find_ability(u, "Crushing Blow")
+				if wd_crush != null and u.resource >= wd_crush.cost \
+						and u.ability_ready(wd_crush) \
+						and not target_foe.has_status("sunder"):
+					return [wd_crush, target_foe]
+				var wd_stomp := _find_ability(u, "War Stomp")
+				if wd_stomp != null and u.resource >= wd_stomp.cost \
+						and u.ability_ready(wd_stomp) \
+						and allies.filter(func(h): return h != u \
+						and h.resource_name != "" \
+						and h.resource < h.max_resource * 0.7).size() >= 2:
+					return [wd_stomp, target_foe]
 				return [u.abilities[0], target_foe]  # Strike
 			var pommel := _find_ability(u, "Pommel Strike")
 			if pommel != null and u.resource >= pommel.cost and u.ability_ready(pommel) and randf() < 0.35:
@@ -3150,7 +3185,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							"Shieldwall: the next %d attack(s) against\nthis unit are BLOCKED (one charge each)." % charges_left)
 				else:
 					# One roll, attributed to whichever slice it landed in.
-					var plating := 0.15 if strike_target.passive_id == "heavy_plating" else 0.0
+					# Heavy Plating v2: the passive's 15% plus the pity ramp —
+					# +8% per unblocked hit, so blocks arrive on a cadence
+					# instead of whenever the dice feel like it.
+					var plating := (0.15 + strike_target.plating_bonus) \
+						if strike_target.passive_id == "heavy_plating" else 0.0
 					var block_roll := randf()
 					if block_roll < strike_target.block_chance:
 						block_source = "base Block"
@@ -3163,6 +3202,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					strike_target.float_text("BLOCK", Color(0.75, 0.8, 0.95))
 					_log("%s BLOCKS %s's %s (%s)" % [strike_target.unit_name,
 						attacker.unit_name, ab.display_name, block_source], "#8c9cc8")
+					# Any Block resets the Heavy Plating climb (the chip follows).
+					if strike_target.passive_id == "heavy_plating" \
+							and strike_target.plating_bonus > 0.0:
+						strike_target.plating_bonus = 0.0
+						strike_target.refresh_bars()
+						_log("   → Heavy Plating: the climbing bonus resets", "#8c9cc8")
 					# Unkillable: blocking mends the Warden.
 					if strike_target.unkillable_ranks > 0:
 						var mend := maxi(int(strike_target.max_hp * 0.02
@@ -3196,6 +3241,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 								"#b0a8e0")
 					await _wait(0.4)
 					continue
+				elif strike_target.passive_id == "heavy_plating" \
+						and strike_target.plating_bonus < 0.40:
+					# The hit got through — the plating learns: +8% Block per
+					# unblocked attack (cap +40%). Bad-luck protection, not
+					# choice: the on-block talents are guaranteed to fire on a
+					# dependable cadence. The chip shows the live total.
+					strike_target.plating_bonus = minf(
+						strike_target.plating_bonus + 0.08, 0.40)
+					strike_target.refresh_bars()
+					_log("   → Heavy Plating: %s's Block chance climbs to %d%%" % [
+						strike_target.unit_name,
+						int(round((strike_target.block_chance + 0.15
+						+ strike_target.plating_bonus) * 100.0))], "#8c9cc8")
 			# Parry: the strike still lands, but with 75% less damage and 75%
 			# less Break damage. ONLY MELEE attacks can be parried — bows and
 			# spells (is_ranged attackers) sail past the blade — unless the
@@ -4121,16 +4179,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						break
 			if (ab.random_hits > 0 or ab.multi_hits > 0) and total_hits > 1:
 				await _wait(0.45)  # sequential strikes land distinctly
-		# War Stomp: the tremor rallies the line — allies regain 10% resource.
+		# War Stomp: the tremor rallies the line — allies regain 10% resource
+		# (20% on a perfect cast; the damage is a 75-Attack tank's, the
+		# party refuel is the real payload).
 		if ab.display_name == "War Stomp" and attacker.is_hero and not attacker.dead:
+			var stomp_pct := 0.20 if is_perfect else 0.10
 			for h in heroes:
 				if h.dead or h == attacker or h.resource_name == "":
 					continue
-				var stomp_gain := maxi(int(h.max_resource * 0.10), 1)
+				var stomp_gain := maxi(int(h.max_resource * stomp_pct), 1)
 				h.resource = mini(h.resource + stomp_gain, h.max_resource)
 				h.float_text("+%d %s" % [stomp_gain, h.resource_name], Color(0.5, 0.8, 1.0))
 				h.refresh_bars()
-			_log("   → War Stomp: allies regain 10% of their resource", "#70d878")
+			_log("   → War Stomp: allies regain %d%% of their resource%s" % [
+				int(round(stomp_pct * 100)),
+				" [PERFECT]" if is_perfect else ""], "#70d878")
 		# Post-strike attacker effects (skipped if a counter felled the attacker).
 		var recoil_pct := ab.recoil_base
 		# Magi's Wrath: spreading the storm dissipates its backlash.
@@ -5532,7 +5595,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				gc_label, gc_bd_txt,
 				" [PERFECT: +10% parry, 2 turns]" if is_perfect else ""], "#70d878")
 		"shield_block":
-			var blocks := 5 if is_perfect else 3
+			# Shield Mastery (the re-specced wd_shieldwall node) deepens
+			# every cast, the perfect one included.
+			var blocks := (5 if is_perfect else 3) + attacker.shield_mastery_ranks
 			_sfx("parry", -6.0, 0.5)
 			_apply_status(attacker, "shield_charges", -1, blocks)
 			# The chip counts the blocks owed (recasting resets the count).
@@ -5542,6 +5607,29 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s raises the shield!" % attacker.unit_name)
 			_log("%s: Shieldwall — the next %d attacks will be BLOCKED" % [
 				attacker.unit_name, blocks], "#8c9cc8")
+		"interpose":
+			# The tank verb the kit was missing: cover the whole line. Rides
+			# the existing shield_charges status — it already counts down,
+			# renders a chip, and outranks the block roll. Charges ADD to any
+			# the ally is holding (a prior Interpose or the Warden's own wall).
+			_sfx("parry", -6.0, 0.5)
+			for h in heroes:
+				if h.dead or h.is_companion:
+					continue
+				if h == attacker and not is_perfect:
+					continue
+				var sw_held := maxi(h.status_power("shield_charges"), 0) \
+					if h.has_status("shield_charges") else 0
+				var sw_total := sw_held + 1
+				_apply_status(h, "shield_charges", -1, sw_total)
+				h.update_status("shield_charges", "SW%d" % sw_total,
+					"Shieldwall: the next %d attack(s) against\nthis unit are BLOCKED (one charge each)." % sw_total,
+					sw_total)
+				h.float_text("COVERED", Color(0.75, 0.8, 0.95))
+			_message("%s covers the line!" % attacker.unit_name)
+			_log("%s: Interpose — every ally gains a Shieldwall charge%s" % [
+				attacker.unit_name,
+				" [PERFECT: the Warden too]" if is_perfect else ""], "#8c9cc8")
 		"hold_the_line":
 			_sfx("heal", -5.0, 0.6)
 			for h in heroes.filter(func(he): return not he.dead):

@@ -198,7 +198,7 @@ func _draw_detail() -> void:
 	# Only pure tanks carry a Block stat (the Warden, for now).
 	if cfg.get("block_chance", 0.0) > 0.0:
 		stat_rows[3].append(["Block: %d%%" % int(round(cfg["block_chance"] * 100)),
-			"Block — chance to fully negate an incoming attack:\nno damage, no Break damage, no effects.\nHeavy Plating adds another +15% in battle."])
+			"Block — chance to fully negate an incoming attack:\nno damage, no Break damage, no effects.\nHeavy Plating adds another +15% in battle, and every\nunblocked hit adds +8% more (cap +40%) until a\nBlock lands and resets the climb."])
 	for r in stat_rows.size():
 		var row := HBoxContainer.new()
 		row.position = Vector2(60, 132 + r * 22)

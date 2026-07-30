@@ -206,6 +206,10 @@ var sundering_ranks := 0      # Sundering: Crushing Blow BD splash to Adjacent
 var tenacity := 0             # Tenacity: +5 max HP per Heavy Plating block
 var tenacity_hp_gained := 0   # battle-long gains (excluded from the run save)
 var rally := 0                # Rally: party +15% healing for 2t per HP block
+var shield_mastery_ranks := 0 # Shield Mastery: Shieldwall grants +1 charge/rank
+var plating_bonus := 0.0      # Heavy Plating v2: +8% Block per unblocked hit
+                              # (cap +40%; any Block resets it; fresh per battle
+                              # like frenzy_floor — units are built each battle)
 var seasoned_def_bonus := 0.0 # Defensive Stance: deeper damage-taken cut
 var seasoned_off_bonus := 0.0 # Aggressive Stance: bigger damage-dealt bonus
 var stance := "aggressive"    # Swordmaster guard (aggressive|defensive), fresh each battle
@@ -734,6 +738,18 @@ func refresh_bars() -> void:
 					int(round(floor_pct))]
 				s.desc = "Blood Frenzy: +%.1f%% damage per 5%% HP missing.\nCurrently +%.1f%%. The floor — %d%% of the highest\nbonus reached this battle — is +%.1f%%\nand never falls." % [
 					step, live, keep_pct, floor_pct]
+				_refresh_chips()
+				break
+	# Heavy Plating chip shows the LIVE total Block chance — the whole value
+	# of the pity ramp is the player watching it climb toward the next Block.
+	if passive_id == "heavy_plating":
+		for s in statuses:
+			if s.id == "spec_passive":
+				var total := (block_chance + 0.15 + plating_bonus) * 100.0
+				s.short = "Block %d%%" % int(round(total))
+				s.desc = "Heavy Plating: +15%% Block chance on top of the\n%d%% base. Every unblocked attack adds +8%% for the\nrest of the battle (now +%d%%, cap +40%%); Blocking\nresets the bonus. Total Block chance: %d%%." % [
+					int(round(block_chance * 100.0)),
+					int(round(plating_bonus * 100.0)), int(round(total))]
 				_refresh_chips()
 				break
 	# Seasoned Fighter chip shows which guard is live; the tooltip carries

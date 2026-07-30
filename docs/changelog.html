@@ -5,6 +5,58 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-30 — Batch G: Warden — the wall you can rely on</h2>
+<ul>
+<li><b>The diagnosis:</b> Block was his identity and he had no say in it — a flat 20%
+roll, with four talents (Unkillable, Tenacity, Rally, Richocet) paying off on a Block a
+bad streak could refuse to supply. A tank's fantasy isn't gambling, it's RELIABILITY.
+He also had no way to take a hit for someone — the purest tank verb in the genre wasn't
+in the kit.</li>
+<li><b>Stat block</b> (via the same apply_spec_stats helper as the other Warriors, so the
+battle spawn and the party sheet can never drift): <b>200 HP / 32% armor / Constitution
+130 / 10% base Block</b> (block_chance joins the spec-stat vocabulary alongside the
+Swordmaster's parry_chance) / +15% fire &amp; frost resist, −20% arcane. Attack stays 75
+(Tank role). Effective HP against physical ≈294 — versus the Berserker's 206 and the
+Swordmaster's 212, before Block — and Con 130 makes him the hardest hero to Break. The
+arcane hole is deliberate: enemy casters keep a real line on him.</li>
+<li><b>Heavy Plating v2 — reliability, not luck:</b> +15% Block chance, and every attack
+against the Warden that is NOT Blocked raises his Block chance by <b>+8% for the rest of
+the battle (cap +40%)</b>; any Block resets the bonus. Starting at 25%, an unlucky streak
+climbs 33 → 41 → 49 → 57 → 65%. It deliberately doesn't let him CHOOSE to Block (that
+would undercut Shieldwall) — it guarantees the on-Block talents fire on a dependable
+cadence of roughly every third attack. The spec chip shows the LIVE total as it climbs
+(one fresh-per-battle var on the unit, incremented and reset at the block-roll site; both
+moves are logged, and block sources still log correctly — verified in autoplay).</li>
+<li><b>Shieldwall is base kit now</b> — his one moment of control over the signature
+mechanic was locked behind a talent. Moved into spec_abilities unchanged (25 Rage, 2.0,
+2cd, Blocks 3 / Perfect 5). The wd_shieldwall node is re-specced <b>in place, same id</b>
+(saves keep their ranks) as <b>Shield Mastery</b>: Shieldwall grants +1 charge per rank,
+2 ranks, perfect casts included.</li>
+<li><b>NEW — Interpose</b> (25 Rage, 2.5 int, 4cd, self-cast, no target selection): every
+OTHER living ally gains 1 Shieldwall charge — the next attack against them is BLOCKED
+(Perfect: the Warden gains one too). Charges ADD to any already held, and it rides the
+existing shield_charges machinery — chip, countdown, and block priority all came free.
+The tank verb the kit was missing, and the party feels him even on turns nothing targets
+him.</li>
+<li><b>War Stomp's empty perfect got its payload:</b> allies regain 20% of their resource
+instead of 10% — the refuel is the real cargo on a 75-Attack tank, so that's what the
+perfect deepens.</li>
+<li><b>Bot rotation</b> (deterministic, so sims exercise the real kit): Interpose when 2+
+allies are below 60% HP → Shieldwall below 50% HP or vs 3+ enemies → Mocking Blow whenever
+HIS taunt has lapsed (free + 10 Rage — his engine, never skipped) → Crushing Blow if
+Sunder is down → War Stomp when 2+ allies are below 70% resource → Strike.</li>
+<li><b>Sim (200 battles, warden/cryomancer/inquisitor/beastmaster):</b> 200/200 wins,
+9.6 avg rounds, <b>hero deaths 0.03/battle</b> (the Berserker party's own 200-run: 0.48),
+enemy damage dealt 137/battle (Berserker party: 246), Breaks suffered 0.35/battle (1.04),
+survivors at 81% HP. Warden damage share 18% — a tank's share. Whole kit exercised
+(Mocking 2.0 / Crushing 2.1 / Shieldwall 1.4 / Stomp 0.4 / Interpose 0.1 per battle;
+Interpose is rare because the bot only reaches for it when the party is actually hurt,
+which this comp rarely is). Standard-party 200-run unchanged at 200/200 — no regression.
+Autoplay verified the loop end to end: climbs 33 → 41 → 49 logged on unblocked hits,
+reset on the next Block, and an Interpose charge saved the Cryomancer from a boss Timber
+Slam.</li>
+</ul>
+
 <h2>2026-07-30 — Batch F: the Swordmaster tree becomes a designed set of lanes</h2>
 <ul>
 <li><b>The diagnosis:</b> Duelist and Poise were the same lane twice — Swordsmanship, Sword

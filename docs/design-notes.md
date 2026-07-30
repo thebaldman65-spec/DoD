@@ -141,3 +141,28 @@ button the whole spec turns on; the bot now pivots on cooldown when
 healthy for the same reason. Guard Breaker is the Breaker thesis
 stated as a win condition: the meter half-refills on recovery, so the
 guard never truly returns.
+
+**Warden kit (Batch G) — reliability is the tank's agency:** Block was
+his identity and he had no say in it: a flat 20% roll, with four
+talents paying off on Block — heals, max-HP banking, party healing,
+stuns — that a bad streak could simply switch off. That was the same
+fault the other two Warriors had, and it lands hardest on a tank,
+because the tank fantasy isn't gambling: the party needs to KNOW he
+will hold. The pity ramp (+8% per unblocked hit, reset on any Block)
+deliberately doesn't let him choose the moment — that would undercut
+Shieldwall, which IS the chosen moment — it guarantees the moment
+arrives on a dependable cadence, roughly every third attack, that a
+party can be built around. The chip shows the live total because a
+promise only reads as a promise if the player can watch it being
+kept. Shieldwall graduated to the base kit for the same reason: a
+spec's one point of control over its signature mechanic cannot live
+behind a talent wall. Interpose adds the verb every tank kit in the
+genre is measured by — take the hit FOR someone — and rides the
+existing Shieldwall-charge machinery, so the purest tank moment costs
+no new systems. War Stomp's perfect finally got a payload because the
+ability's real cargo was always the party refuel, not a 75-Attack
+character's damage. The stat block (200 HP / 32% armor / Con 130 /
+fire+frost plate with an arcane hole) makes the three Warriors
+unmistakable at a glance — the Berserker is the pool, the Swordmaster
+the blade, the Warden the wall — and the arcane hole keeps the wall
+honest: enemy casters have a real line on him.

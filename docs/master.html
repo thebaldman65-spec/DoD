@@ -171,12 +171,14 @@ attacks roll parry per strike.</li>
 action with no initiative cost that cannot chain. Granted only by specific effects (the
 Swordmaster's Riposte talent grants it).</li>
 <li><b>Block (keyword):</b> fully negates an incoming attack — 100% of the damage, the Break
-damage, and its on-hit effects. Governed by <b>Block %</b>, a stat only pure tanks carry
-(currently the Warden: 5% base, +15% from Heavy Plating; the Orc Shieldmaster also blocks at
-5%). Guaranteed blocks come from Shieldwall charges. Broken units cannot Block. A block
-flashes <b>BLOCK</b> and the log names its source — "(Shieldwall)", "(Heavy Plating)", or
-"(base Block)" — which matters: the Warden's Tenacity and Rally talents feed on Heavy
-Plating blocks specifically.</li>
+damage, and its on-hit effects. Governed by <b>Block %</b>, a SPEC STAT only pure tanks
+carry (currently the Warden: 10% base, +15% from Heavy Plating, plus Heavy Plating's
+climbing bonus — +8% per unblocked attack, cap +40%, reset whenever a Block lands; the Orc
+Shieldmaster also blocks at 5%). Guaranteed blocks come from Shieldwall charges — the
+Warden's own casts and the charges Interpose hands the party. Broken units cannot Block.
+A block flashes <b>BLOCK</b> and the log names its source — "(Shieldwall)",
+"(Heavy Plating)", or "(base Block)" — which matters: the Warden's Tenacity and Rally
+talents feed on Heavy Plating blocks specifically.</li>
 <li><b>Armor Penetration (keyword):</b> every % of armor penetration negates a % of the
 target's armor (currently granted only by the Berserker's Crushing Blows talent).
 It is NOT shown on the character screen.</li>
@@ -509,9 +511,9 @@ blocks land. Bruiser counts as a DAMAGE archetype — the Swordmaster
 attacks at 100.</p>
 <p>Every spec grants one passive plus abilities appended to the core kit. Specs are chosen once
 per run and are permanent. <b>Constitution by spec</b> (role-based Break resistance; class base
-in §5 applies before awakening): Warden 110, Swordmaster 120, Berserker
-110, Devout 110, Holy 100, Beastmaster 100, Survivalist 100, Occultist 95, Arcanist 90,
-Sharpshooter 90, Pyromancer 85, Cryomancer 85.</p>
+in §5 applies before awakening): Warden 130 (the hardest hero to Break), Swordmaster 120,
+Berserker 110, Devout 110, Holy 100, Beastmaster 100, Survivalist 100, Occultist 95,
+Arcanist 90, Sharpshooter 90, Pyromancer 85, Cryomancer 85.</p>
 
 <h3>6.1 Warrior</h3>
 <ul>
@@ -539,18 +541,32 @@ the enemy party for 2 turns (Perfect: +5 Rage); a self-buff — casts with no ta
 selection, and its chip shows the % gained. Rampage — 40 Rage, 3 × 20 physical +
 3 × 10 bloodloss / 3 × 10 BD, 4.0, 4cd; if the target dies, Rampage immediately recasts
 (free) on another enemy and can chain.</li>
-<li><b>Warden (Tank)</b> — Passive <i>Heavy Plating</i>: 15% chance to Block, on top of the
-Warden's <b>5% base Block stat</b> (the only stat-Block character).<br>
+<li><b>Warden (Tank)</b> — <b>Stat block:</b> 200 HP / 32% armor / <b>10% base Block</b>
+(the only Block-stat character) / Constitution 130 / +15% fire &amp; frost resist, −20%
+arcane (the wall: roughly double the Berserker's effective durability against physical and
+the hardest hero in the party to Break; plate turns aside fire and frost, but raw arcane
+goes straight through it — enemy casters have a real line on him).<br>
+Passive <i>Heavy Plating</i>: <b>+15% Block chance</b>, and every attack against the Warden
+that is NOT Blocked raises his Block chance by <b>+8% for the rest of the battle (cap
++40%)</b>; any Block resets the bonus. Bad-luck protection, not choice: Blocks arrive on a
+dependable cadence — roughly every third attack — instead of whenever the dice allow, so
+the on-Block talents can actually be planned around. The spec chip shows the <b>LIVE total
+Block chance</b> as it climbs.<br>
 Mocking Blow — free, 27% Atk (≈20) / 15 BD / 2.0, 1cd, taunts the target AND one other
 enemy for 4 turns, builds 10 Rage (Perfect: 5 turns).<br>
 Crushing Blow — 20 Rage, 43% Atk (≈32) / 20 BD / 3.0, 2cd,
 Sunders (−35% armor, 3 turns), builds 10 Rage (Perfect: +5 bonus BD).<br>
 War Stomp — 20 Rage, 3 shockwaves × 15% Atk / 15 BD each to RANDOM
-enemies, 3.0 int, 3cd; allies regain 10% of their resource.<br>
-<i>Talent-granted:</i> Shieldwall — 25 Rage, 2.0, 2cd, Blocks the next 3 attacks (Perfect:
-5); a self-buff cast with no target selection whose chip counts the charges left. Hold the
-Line — 30 Rage, 3.5, 6cd, the party takes 50% less Break damage for 2 turns and
-cannot die for a turn (Perfect: refunds 5 Rage); also self-cast, no target selection.</li>
+enemies, 3.0 int, 3cd; allies regain 10% of their resource (Perfect: 20% instead).<br>
+Shieldwall — 25 Rage, 2.0, 2cd, Blocks the next 3 attacks (Perfect: 5); a self-buff cast
+with no target selection whose chip counts the charges left; the Shield Mastery talent
+adds +1 charge per rank to every cast.<br>
+Interpose — 25 Rage, 2.5 int, 4cd, self-cast with no target selection: every OTHER living
+ally gains 1 Shieldwall charge — the next attack against them is BLOCKED (Perfect: the
+Warden gains a charge too). Charges ADD to any the ally is already holding.<br>
+<i>Talent-granted:</i> Hold the Line — 30 Rage, 3.5, 6cd, the party takes 50% less Break
+damage for 2 turns and cannot die for a turn (Perfect: refunds 5 Rage); self-cast, no
+target selection.</li>
 <li><b>Swordmaster (Bruiser)</b> — <b>Stat block:</b> 165 HP / 22% armor / <b>12%
 parry</b> (the technician; the only parry-stat character — see §4.3).<br>
 Passive <i>Seasoned Fighter</i>: fights in one of <b>two stances the PLAYER controls</b> —
@@ -1001,7 +1017,8 @@ greyed exclusive siblings. Art is placeholder.</p>
 on every Block ×3), Elemental Weakness (Crushing Blow shreds elemental resists 5%/rank, 3
 turns ×3). Toughness (Constitution +5%/rank of max HP ×3), Tenacity (every attack
 Blocked by <b>Heavy Plating</b> grants +5 max HP for the
-battle; battle-long gains don't leak into the save), Shieldwall (grants the ability),
+battle; battle-long gains don't leak into the save), Shield Mastery (Shieldwall Blocks
++1 more attack per rank, the perfect cast included ×2),
 Rally (every Heavy Plating block Rallies the party — +15% healing received for
 2 turns), Iron Will (+5%/rank damage per debuff on the Warden ×3). Richocet
 (5%/rank chance to Stun the attacker on Block ×3), Endurance (+1%/rank armor per turn

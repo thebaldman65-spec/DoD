@@ -399,6 +399,8 @@ static func apply_spec_stats(cfg: Dictionary, spec: String) -> void:
 		cfg["armor"] = float(info["armor"])
 	if info.has("parry_chance"):
 		cfg["parry_chance"] = float(info["parry_chance"])
+	if info.has("block_chance"):
+		cfg["block_chance"] = float(info["block_chance"])
 
 
 const ARCHETYPE_DESC := {
@@ -431,9 +433,10 @@ const SPEC_IDS := {
 static func apply_passive(cfg: Dictionary, spec: String) -> void:
 	match SPEC_INFO[spec]["passive"]:
 		"heavy_plating":
-			# The pure tank's Block stat: 5% base; the passive adds another
-			# 15% chance inside the block roll (battle.gd).
-			cfg["block_chance"] = cfg.get("block_chance", 0.0) + 0.05
+			# The Warden's Block stat moved into the spec stat block (Batch G:
+			# 10% base via apply_spec_stats); the passive's +15% and its
+			# climbing pity bonus live inside the block roll (battle.gd).
+			pass
 
 const SPEC_INFO := {
 	"berserker": {"name": "Berserker", "constitution": 110, "archetype": "Ramp", "passive": "bloodrage",
@@ -441,8 +444,10 @@ const SPEC_INFO := {
 		"resists": {"shadow": 0.10, "nature": 0.10, "frost": -0.15},
 		"passive_desc": "Blood Frenzy: +2% damage for every 5% of health missing.\nHalf the highest bonus reached each battle is kept as a\nfloor — his fury never fully cools.",
 		"blurb": "Reckless savagery — grows stronger as their blood spills."},
-	"warden": {"name": "Warden", "constitution": 110, "archetype": "Tank", "passive": "heavy_plating",
-		"passive_desc": "Heavy Plating: 15% chance to Block an incoming attack\n(on top of the Warden's 5% base Block).",
+	"warden": {"name": "Warden", "constitution": 130, "archetype": "Tank", "passive": "heavy_plating",
+		"max_hp": 200, "armor": 0.32, "block_chance": 0.10,
+		"resists": {"fire": 0.15, "frost": 0.15, "arcane": -0.20},
+		"passive_desc": "Heavy Plating: +15% Block chance. Every attack against\nthe Warden that is NOT Blocked raises his Block chance\nby 8% for the rest of the battle (up to +40%);\nBlocking resets the bonus.",
 		"blurb": "Protector of the weak — shields allies with their own body."},
 	"swordmaster": {"name": "Swordmaster", "constitution": 120, "archetype": "Bruiser", "passive": "seasoned",
 		"max_hp": 165, "armor": 0.22, "parry_chance": 0.12,
@@ -522,8 +527,21 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "War Stomp", "cost": 20, "damage": 15,
 					"pressure": 15, "delay": 3.0, "anim": "attack03", "cooldown": 3,
 					"random_hits": 3, "perfect_extra_hit": false,
-					"perfect_id": "", "perfect_text": "",
+					"perfect_id": "", "perfect_text": "Allies regain 20% of their resource instead",
 					"description": "Slam the earth: 3 shockwaves rip\nrandom enemies for 15% Attack damage\nand 15 BD each. Allies regain 10%\nof their resource."}),
+				# Shieldwall graduated from the talent tree (Batch G): his one
+				# moment of control over the Block identity belongs in the base
+				# kit. The wd_shieldwall node is now Shield Mastery (+charges).
+				Ability.make({"display_name": "Shieldwall", "cost": 25,
+					"special": "shield_block", "delay": 2.0, "anim": "attack01",
+					"cooldown": 2,
+					"perfect_id": "", "perfect_text": "Blocks 5 attacks instead",
+					"description": "Raise the shield: the next 3 attacks\nagainst the Warden are BLOCKED."}),
+				Ability.make({"display_name": "Interpose", "cost": 25,
+					"special": "interpose", "delay": 2.5, "anim": "attack01",
+					"cooldown": 4,
+					"perfect_id": "", "perfect_text": "The Warden gains a charge too",
+					"description": "Throw the wall wide: every other ally\ngains a Shieldwall charge — the next\nattack against them is BLOCKED."}),
 			]
 		"swordmaster":
 			return [
