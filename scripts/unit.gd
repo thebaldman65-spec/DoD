@@ -343,7 +343,8 @@ var lethal_saved_cb := Callable()
 # for this unit (the only source of Faith).
 var shield_absorbed_cb := Callable()
 
-# Occultist tree (07-24). See talents.gd for the node text.
+# Occultist tree (07-24; lanes re-specced Batch L 07-30). See talents.gd
+# for the node text.
 var emp_hex_ranks := 0        # Empowered Hex: Hex can apply Decay
 var soul_leech_ranks := 0     # Soul Leech: deeper Ruin lifesteal
 var pleasure_ranks := 0       # Pleasure from Pain: heals per unique debuff
@@ -354,6 +355,19 @@ var spread_ranks := 0         # Spread of Madness: Psychosis is contagious
 var infusion_ranks := 0       # Dark Infusion: attack per unique debuff
 var mirror_ranks := 0         # Umbral Mirror: enemy debuffs can reflect
 var broken_will_ranks := 0    # Broken Will: more Break damage dealt
+var deep_hex_ranks := 0       # Deeper Hex: Ruin stacks bite harder
+var grim_ranks := 0           # Grim Focus: detonations hit harder
+var entropy_ranks := 0        # Entropy: any Ruin grinds Break each turn
+var unravel_ranks := 0        # Unraveling: detonations seed Ruin in others
+var whispers_ranks := 0       # Whispers: Psychosis seizes more often
+var delirium_ranks := 0       # Delirium: maddened strikes mark the victim
+var cackling_ranks := 0       # Cackling Mirror: fellow-strikes heal the party
+var torment_ranks := 0        # Lingering Torment: expired madness leaves Decay
+var gluttony_ranks := 0       # Gluttony: deeper Ruin lifesteal (own dial)
+var pact_flesh_ranks := 0     # Pact of Flesh: Dark Pact bleeds less
+var barter_ranks := 0         # Dark Barter: Dark Pact heals deeper
+var avatar_ruin := 0          # capstone: detonations keep their stacks
+var soul_glut := 0            # capstone: the Ruin lifesteal feeds everyone
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
@@ -361,6 +375,11 @@ var statuses: Array = []
 # Battle-log hook (set by the battle scene) so talent procs that happen
 # inside this unit (Enraged, Unrelenting Assault) reach the combat log.
 var log_proc := Callable()
+
+# Status-expiry hook (set by the battle scene): fires once per status
+# that ticks out naturally, AFTER the expired entries are filtered away —
+# so a handler may safely apply new statuses (Lingering Torment).
+var status_expired_cb := Callable()
 
 # Mercy hook (set by the battle scene on heroes): fires when this unit
 # crosses below 50% health, from any damage source.
@@ -1000,11 +1019,18 @@ func tick_statuses() -> void:
 			constitution -= int(s.get("power", 0))
 			float_text("Unrelenting fades", Color(0.6, 0.65, 0.8))
 	# Expiries reach the combat log so timers are auditable at a glance.
+	var expired: Array = []
 	for s in statuses:
 		if s.turns == 0 and s.id != "broken":
 			_proc_log("   → %s fades from %s" % [s.label, unit_name])
+			expired.append(s.id)
 	statuses = statuses.filter(func(s): return s.id == "broken" or s.turns != 0)
 	_refresh_chips()
+	# The hook runs last: the list is already clean, so handlers can
+	# apply fresh statuses without racing the filter above.
+	if status_expired_cb.is_valid():
+		for expired_id in expired:
+			status_expired_cb.call(self, expired_id)
 
 
 # ---------- cooldowns ----------

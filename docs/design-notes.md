@@ -257,3 +257,30 @@ every absorb into a heal — the win condition the Faith lane was
 pointing at all along — and Judgement gives a support spec a seat in
 a damage party by paying out the one currency he never touches:
 Break pressure, straight into the Swordmaster's loop.
+
+**Occultist lanes (Batch L) — three good ideas, one loop:** the
+07-24 rework left him the most mechanically complete spec in the game
+— Ruin, Psychosis, Decay, Bewitch and Hysteria all interlock — but the
+three lanes never fed one another: Madness turned enemies on their
+fellows, Ruin built toward detonation, Leech converted suffering into
+health, and nothing converted madness into Ruin or either into
+healing. Delirium and Cackling Mirror are the batch: a maddened enemy
+striking its fellow now marks the victim with Ruin and pours a share
+of the wound into the party, so the tree's flashiest moment (an enemy
+turning) advances the meter AND the health bars — three lanes running
+one loop. Entropy exists because he is a Pressure spec and the mark
+should grind on its own — and because a Ruin engine that emits Break
+damage buys him a seat next to the Swordmaster the way Judgement did
+for the Devout. Whispers is a reliability fix disguised as a dial: at
+50%, half of every Psychosis was a wasted turn and the lane felt like
+a coin, not a plan. The exclusive moved in-lane (Pact of Flesh ↔ Dark
+Barter) onto the one ability where he trades his body for the party's
+— pay less, or get more — because a fork should be a question about
+ONE thing. Avatar of Ruin is the natural end state of a lane built on
+filling a meter (the maxed target becomes a recurring bomb, kept safe
+by construction: seeded Ruin only primes, and primes only fire at
+their bearer's own turn). Soul Glut makes the "lesser healer" real
+through his own mechanic rather than borrowed Holy tools — every
+hero's strike into a Ruined enemy is party sustain — keeping the
+healing philosophies distinct: Holy restores, the Devout prevents,
+the Occultist siphons.

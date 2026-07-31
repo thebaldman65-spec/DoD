@@ -5,6 +5,68 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-31 — Batch L: the Occultist tree becomes a designed set of lanes</h2>
+<ul>
+<li><b>The diagnosis:</b> the Occultist is the most mechanically complete spec in the
+game — Ruin, Psychosis, Decay, Bewitch and Hysteria all interlock — but his three
+lanes never talked to each other: Madness turned enemies on their fellows, Ruin built
+toward detonation, Leech converted suffering into health, and nothing converted
+madness into Ruin or either into healing. The conversion fillers were "deepen another
+node" steps and Mana discounts, and the exclusive ran cross-lane (Grim Focus ↔ Pact
+of Flesh), which reads as a bug.</li>
+<li><b>Occultist is now a purpose-designed node-gated lane tree</b> (tiers at 2/4
+nodes in-lane, capstone at 6) — Ruin (the detonation engine), Madness (enemies turned
+on each other), Leech (suffering into sustain). Every id survives and the fillers
+re-spec in place, so saved ranks migrate; Grim Focus and Pact of Flesh shrank (3 → 2
+ranks) and the loader refunds the extra point. The conversion entry is gone; the 11
+mapped original nodes moved verbatim (Dark Infusion was already dropped by the Batch
+31 conversion and stays out).</li>
+<li><b>The lanes now feed one another.</b> Delirium: a Psychotic, Bewitched or
+Hysterical enemy striking a fellow marks the victim with 1 Ruin per rank — Madness
+generates Ruin. Cackling Mirror: any enemy striking a fellow heals the party for
+3%/rank of the damage dealt — Madness generates healing. After this batch, turning an
+enemy on its own builds toward a detonation AND sustains the party: three lanes
+running one loop instead of three.</li>
+<li><b>Ruin becomes the detonation engine it promised.</b> Grim Focus re-specs from a
+flat damage dial onto the blast itself (+25%/rank). Deeper Hex widens every stack's
+crack (target takes 3/4/5% more damage per stack, up from the base 2%). Entropy is
+the Pressure archetype made literal — any Ruin at all grinds 5/rank Break damage at
+its bearer's every turn, feeding the Swordmaster's Broken-window loop. Unraveling
+seeds 1/rank Ruin in every OTHER enemy when a detonation fires — the next meter is
+already filling. The chain caps at one propagation per detonation by construction:
+seeded enemies only get primed, and primed Ruin detonates at its bearer's own turn
+start, never inside another detonation.</li>
+<li><b>Madness stops wasting turns.</b> Whispers raises Psychosis's seize chance to
+60/70/80% (up from the base 50%, where half of every Psychosis was a dead turn).
+Lingering Torment: an expiring madness effect — Psychosis and Bewitch ticking out, or
+Hysteria consumed by its strike — leaves Decay for 2/rank turns (a status-expiry hook
+now runs on every unit for it).</li>
+<li><b>Leech forks in-lane.</b> Gluttony gets its own dial (+3%/rank Ruin lifesteal
+atop Soul Leech's). The new exclusive is Pact of Flesh ↔ Dark Barter — one ability,
+pay less or get more: Dark Pact bleeds 10%/rank less (free at two ranks) or heals the
+party 25/35% of each member's max health (up from 15%).</li>
+<li><b>New capstones.</b> Avatar of Ruin (Ruin): detonations no longer consume their
+stacks — a target held at 5 detonates again at the start of each of its turns, a
+recurring bomb. Soul Glut (Leech): whenever a hero heals by striking a Ruined target,
+the whole party heals the same amount — the "lesser healer" becomes a real one
+through his own mechanic (Holy restores, the Devout prevents, the Occultist
+siphons).</li>
+<li><b>Doc hygiene:</b> §7 also dropped a stale pre-Batch-K "Devout tree" paragraph
+that had survived alongside K's lane entry.</li>
+<li><b>Verified:</b> battle + party scenes parse clean; the lane audit passes 24
+nodes / 3 capstones / 7-7-7 with the Pact of Flesh ↔ Dark Barter exclusive symmetric
+and in-lane (the cross-lane pair is gone); forced-learn sims (DOD_SIM_TALENTS=
+"oc_grim:2,oc_deep_hex:3,oc_unravel:3,oc_entropy:3,oc_whispers:3,oc_delirium:2,
+oc_cackling:2,oc_torment:2,oc_gluttony:3,oc_barter:2", specs berserker/cryomancer/
+occultist/beastmaster) show every re-specced node firing — Delirium marking
+fellow-strike victims, Entropy breaking an enemy on its own, Torment curdling an
+expired Bewitch into Decay, detonations chaining through Unraveling across a full
+field with no recursion; capstone runs proved Avatar of Ruin re-detonating the same
+Chief on consecutive turns, Soul Glut echoing party-wide, Pact of Flesh bleeding 0 at
+two ranks, and Dark Barter healing 35%; ./sim.sh 200: 200/200 wins, 8.3 avg rounds,
+0.27 hero deaths/battle — the no-talent baseline is untouched.</li>
+</ul>
+
 <h2>2026-07-30 — Batch K: the Devout tree becomes a designed set of lanes</h2>
 <ul>
 <li><b>The diagnosis:</b> Conviction promised a party-wide Faith system, but Faith had
