@@ -201,7 +201,7 @@ var ricochet_ranks := 0       # Richocet: chance to stun on block
 var endurance_ranks := 0      # Endurance: +1%/rank armor per unhealed turn
 var endurance_stacks := 0
 var healed_externally := false
-var iron_will_ranks := 0      # Iron Will: damage per own debuff
+var iron_will_ranks := 0      # Iron Will: -4%/rank damage taken per own debuff
 var sundering_ranks := 0      # Sundering: Crushing Blow BD splash to Adjacent
 var tenacity := 0             # Tenacity: +5 max HP per Heavy Plating block
 var tenacity_hp_gained := 0   # battle-long gains (excluded from the run save)
@@ -210,6 +210,21 @@ var shield_mastery_ranks := 0 # Shield Mastery: Shieldwall grants +1 charge/rank
 var plating_bonus := 0.0      # Heavy Plating v2: +8% Block per unblocked hit
                               # (cap +40%; any Block resets it; fresh per battle
                               # like frenzy_floor — units are built each battle)
+# Warden lanes (Batch H). See talents.gd for the node text.
+var plate_discipline_ranks := 0  # Plate Discipline: the plating climbs +3%/rank faster
+var battered_ranks := 0       # Battered Not Broken: blocks shed 8/rank own Break
+var provoke_ranks := 0        # Provoke: Mocking Blow taunts +1 foe/rank
+var spite_ranks := 0          # Spite: attackers take 8%/rank of dealt damage back
+var bruising_ranks := 0       # Bruising Guard: blocks deal 10/rank BD to the attacker
+var grudge_ranks := 0         # Grudge: +6%/rank damage vs enemies he taunts
+var rallying_stomp_ranks := 0 # Rallying Stomp: War Stomp refuels +5%/rank more
+var bulwark_line_ranks := 0   # Bulwark Line: Interpose grants +1 charge/rank
+var shared_vigil_ranks := 0   # Shared Vigil: allies -3%/rank damage while he's >50% HP
+var steadfast_ranks := 0      # Steadfast: absorbs 15%/rank of a blow felling an ally
+var immovable := 0            # Immovable (capstone): cannot be Broken
+var immovable_noted := false  # one proc log per battle, not one per hit
+var vengeful_guardian := 0    # Vengeful Guardian (capstone): first block each turn
+var vengeful_ready := true    # answers with Crushing Blow; re-arms at his turn
 var seasoned_def_bonus := 0.0 # Defensive Stance: deeper damage-taken cut
 var seasoned_off_bonus := 0.0 # Aggressive Stance: bigger damage-dealt bonus
 var stance := "aggressive"    # Swordmaster guard (aggressive|defensive), fresh each battle
@@ -1039,9 +1054,9 @@ func _refresh_chips() -> void:
 		for s in statuses:
 			if s.id == "iron_will":
 				var n := count_debuffs()
-				var pct := 5 * iron_will_ranks * n
-				s.short = "+%d%%" % pct
-				s.desc = "Iron Will: +5%% damage per rank for every\ndebuff on the Warden.\nCurrently +%d%% (%d debuff%s)." % [
+				var pct := 4 * iron_will_ranks * n
+				s.short = "-%d%%" % pct
+				s.desc = "Iron Will: takes 4%% less damage per rank\nfor every debuff on the Warden.\nCurrently -%d%% (%d debuff%s)." % [
 					pct, n, "" if n == 1 else "s"]
 	for child in _chips_root.get_children():
 		child.queue_free()
@@ -1277,6 +1292,12 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		pressure_add = int(pressure_add * 0.5)
 	# Bulwark of Fortitude: NO Break damage while the stand holds.
 	if has_status("bulwark"):
+		pressure_add = 0
+	# Immovable (Warden capstone): he cannot be Broken, ever.
+	if immovable > 0 and pressure_add > 0:
+		if not immovable_noted:
+			immovable_noted = true
+			_proc_log("Capstone: Immovable — %s cannot be Broken" % unit_name)
 		pressure_add = 0
 	var just_broke := false
 	var applied_bd := 0

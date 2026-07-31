@@ -422,75 +422,6 @@ const FIXED_TREES := {
 				"perfect_id": "", "perfect_text": "Hits 7-9 times instead",
 				"description": "The sky ignites: 6-8 bolts rake random\nenemies for 12% of Attack, each one\nsetting its victim Burning (2 turns\nper bolt — repeats stack)."}}},
 	],
-	"warden": [
-		# --- row 0 ---
-		{"id": "wd_tank_spank", "name": "Tank and Spank", "ranks": 3, "row": 0, "col": 1,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Mocking Blow has a {v}% chance to Empower a random ally (2 turns).",
-			"scale": {"step": 15},
-			"payload": {"stat": {"tank_spank_ranks": 1}}},
-		{"id": "wd_unkillable", "name": "Unkillable", "ranks": 3, "row": 0, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Every time you Block an attack, heal for {v}% of maximum health.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"unkillable_ranks": 1}}},
-		{"id": "wd_elem_weak", "name": "Elemental Weakness", "ranks": 3, "row": 0, "col": 3,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Crushing Blow also reduces all elemental resistances of the target by {v}% (3 turns).",
-			"scale": {"step": 5},
-			"payload": {"stat": {"elem_weak_ranks": 1}}},
-		# --- row 1 ---
-		{"id": "wd_toughness", "name": "Toughness", "ranks": 3, "row": 1, "col": 0,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Constitution is increased by {v}% of maximum HP.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"toughness_ranks": 1}}},
-		{"id": "wd_tenacity", "name": "Tenacity", "ranks": 1, "row": 1, "col": 1,
-			"gate": "row", "requires": "wd_unkillable", "requires_ranks": 1,
-			"desc": "Every attack Blocked by Heavy Plating increases maximum health by 5 for the rest of the battle.",
-			"payload": {"stat": {"tenacity": 1}}},
-		# Re-specced in Batch G (id kept — saves keep their ranks): the
-		# ability itself moved into the base kit, so the node deepens it.
-		{"id": "wd_shieldwall", "name": "Shield Mastery", "ranks": 2, "row": 1, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Shieldwall Blocks {v} more attack(s) (the perfect cast included).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"shield_mastery_ranks": 1}}},
-		{"id": "wd_rally", "name": "Rally", "ranks": 1, "row": 1, "col": 3,
-			"gate": "row", "requires": "wd_unkillable", "requires_ranks": 1,
-			"desc": "Every attack Blocked by Heavy Plating grants the party +15% healing received for 2 turns.",
-			"payload": {"stat": {"rally": 1}}},
-		{"id": "wd_iron_will", "name": "Iron Will", "ranks": 3, "row": 1, "col": 4,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "+{v}% damage for every debuff currently on the Warden.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"iron_will_ranks": 1}}},
-		# --- row 2 ---
-		{"id": "wd_ricochet", "name": "Richocet", "ranks": 3, "row": 2, "col": 1,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Blocking an attack has a {v}% chance to Stun the attacker.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"ricochet_ranks": 1}}},
-		{"id": "wd_endurance", "name": "Endurance", "ranks": 3, "row": 2, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "+{v}% armor for every turn the Warden is not healed by an external source (resets when healed).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"endurance_ranks": 1}}},
-		{"id": "wd_sundering", "name": "Sundering", "ranks": 3, "row": 2, "col": 3,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Crushing Blow deals {v}% of its Break damage to enemies Adjacent to the target (dead neighbors block the splash on their side).",
-			"scale": {"step": 25},
-			"payload": {"stat": {"sundering_ranks": 1}}},
-		# --- row 3 (capstone) ---
-		{"id": "wd_hold_line", "name": "Hold the Line", "ranks": 1, "row": 3, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "New ability: Hold the Line — the party takes 50% less Break damage for 2 turns and cannot die for a turn (30 Rage, 3.5 int, 6cd).",
-			"payload": {"new_ability": {"display_name": "Hold the Line", "cost": 30,
-				"special": "hold_the_line", "delay": 3.5, "anim": "attack03",
-				"cooldown": 6,
-				"perfect_id": "", "perfect_text": "Refunds 5 Rage",
-				"description": "Embolden the party: 50% less Break\ndamage for 2 turns, and no one can die\nfor a turn."}}},
-	],
 }
 
 
@@ -799,6 +730,160 @@ const LANE_TREES := {
 			"capstone": true,
 			"desc": "When a Broken enemy recovers, its Break meter refills to 50 instead of resetting to 0.",
 			"payload": {"stat": {"guard_breaker": 1}}},
+	],
+	"warden": [
+		# Purpose-designed lanes (Batch H, 07-30) — NODE-GATED (tiers open
+		# on nodes bought in the lane: 2/4, capstone at 6). Every id
+		# survives and re-specs in place, so saved ranks migrate (no new
+		# rank cap is below its old one — nobody gets a refund). Half the
+		# old tree was damage dials on a 75-Attack tank, so the offensive
+		# payloads convert into currencies he actually spends: mitigation,
+		# Break pressure, threat, and party protection.
+		# --- Lane A: Plate — mitigation and the block payoffs.
+		# Everything that answers being hit. ---
+		{"id": "wd_unkillable", "name": "Unkillable", "ranks": 3, "lane": "Plate", "tier": 0,
+			"node_gated": true,
+			"desc": "Every time you Block an attack, heal for {v}% of maximum health.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"unkillable_ranks": 1}}},
+		{"id": "wd_toughness", "name": "Toughness", "ranks": 3, "lane": "Plate", "tier": 0,
+			"desc": "Constitution is increased by {v}% of maximum HP.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"toughness_ranks": 1}}},
+		{"id": "wd_endurance", "name": "Endurance", "ranks": 3, "lane": "Plate", "tier": 0,
+			"desc": "+{v}% armor for every turn the Warden is not healed by an external source (resets when healed).",
+			"scale": {"step": 1},
+			"payload": {"stat": {"endurance_ranks": 1}}},
+		{"id": "wd_tenacity", "name": "Tenacity", "ranks": 1, "lane": "Plate", "tier": 1,
+			"desc": "Every attack Blocked by Heavy Plating increases maximum health by 5 for the rest of the battle.",
+			"payload": {"stat": {"tenacity": 1}}},
+		{"id": "wd_shieldwall", "name": "Shield Mastery", "ranks": 2, "lane": "Plate", "tier": 1,
+			"desc": "Shieldwall Blocks {v} more attack(s) (the perfect cast included).",
+			"scale": {"step": 1},
+			"payload": {"stat": {"shield_mastery_ranks": 1}}},
+		# Re-spec (was Layered Plating, a flat armor dial; same id, so saved
+		# ranks carry): the lane's signature — tightens the cadence of the
+		# Batch G pity ramp, so blocks arrive every second hit instead of
+		# every third and every on-Block talent fires more often.
+		{"id": "wd_plating", "name": "Plate Discipline", "ranks": 3, "lane": "Plate", "tier": 1,
+			"desc": "Heavy Plating's climbing Block bonus grows +{v}% faster per unblocked hit (8% becomes 11/14/17%).",
+			"scale": {"step": 3},
+			"payload": {"stat": {"plate_discipline_ranks": 1}}},
+		# Re-spec (was Immovable, a flat damage-taken dial — that NAME moved
+		# to the Plate capstone): a Broken unit cannot Block at all, so
+		# getting Broken switches his identity off. Blocking holds that off.
+		{"id": "wd_immovable", "name": "Battered Not Broken", "ranks": 3, "lane": "Plate", "tier": 2,
+			"desc": "Blocking an attack removes {v} Break from the Warden's own meter.",
+			"scale": {"step": 8},
+			"payload": {"stat": {"battered_ranks": 1}}},
+		# --- Lane B: Threat — he wants to be hit. This lane is what
+		# happens to whoever obliges. ---
+		{"id": "wd_ricochet", "name": "Richocet", "ranks": 3, "lane": "Threat", "tier": 0,
+			"desc": "Blocking an attack has a {v}% chance to Stun the attacker.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"ricochet_ranks": 1}}},
+		# Re-spec (was Taunt Master, -1 Mocking cooldown; ranks 1 → 2): the
+		# taunt engine widens — more of the room swings at the wall.
+		{"id": "wd_taunt_master", "name": "Provoke", "ranks": 2, "lane": "Threat", "tier": 0,
+			"desc": "Mocking Blow taunts {v} additional foe(s).",
+			"scale": {"step": 1},
+			"payload": {"stat": {"provoke_ranks": 1}}},
+		# Re-spec IN MEANING (same id, same name, same idea — adversity
+		# makes him stronger — converted into the currency a tank banks):
+		# was +5%/rank DAMAGE per debuff, ~14 damage at full stack on a
+		# 75-Attack character.
+		{"id": "wd_iron_will", "name": "Iron Will", "ranks": 3, "lane": "Threat", "tier": 1,
+			"desc": "The Warden takes {v}% less damage for every debuff currently on him.",
+			"scale": {"step": 4},
+			"payload": {"stat": {"iron_will_ranks": 1}}},
+		{"id": "wd_sundering", "name": "Sundering", "ranks": 3, "lane": "Threat", "tier": 1,
+			"desc": "Crushing Blow deals {v}% of its Break damage to enemies Adjacent to the target (dead neighbors block the splash on their side).",
+			"scale": {"step": 25},
+			"payload": {"stat": {"sundering_ranks": 1}}},
+		# Re-spec (was Spiked Bulwark, a Richocet deepener). Exclusive fork
+		# with Bruising Guard: the punishment you soak becomes damage, or
+		# becomes Break pressure.
+		{"id": "wd_spiked", "name": "Spite", "ranks": 3, "lane": "Threat", "tier": 1,
+			"exclusive_with": "wd_shatter_guard",
+			"desc": "Attackers that damage the Warden take {v}% of that damage back.",
+			"scale": {"step": 8},
+			"payload": {"stat": {"spite_ranks": 1}}},
+		# Re-spec (was Shattering Blow, +5 Crushing damage): the more
+		# interesting half of the fork — on a character who blocks
+		# constantly and is attacked more than anyone, this quietly makes
+		# him a Break engine for the whole party.
+		{"id": "wd_shatter_guard", "name": "Bruising Guard", "ranks": 3, "lane": "Threat", "tier": 1,
+			"exclusive_with": "wd_spiked",
+			"desc": "Blocking an attack deals {v} Break damage to the attacker.",
+			"scale": {"step": 10},
+			"payload": {"stat": {"bruising_ranks": 1}}},
+		# Re-spec (same name, was a flat +3% damage dial): the damage he
+		# does keep is aimed at whoever he's holding.
+		{"id": "wd_grudge", "name": "Grudge", "ranks": 3, "lane": "Threat", "tier": 2,
+			"desc": "+{v}% damage against enemies currently taunted by the Warden.",
+			"scale": {"step": 6},
+			"payload": {"stat": {"grudge_ranks": 1}}},
+		# --- Lane C: Banner — the half that protects other people. ---
+		{"id": "wd_tank_spank", "name": "Tank and Spank", "ranks": 3, "lane": "Banner", "tier": 0,
+			"desc": "Mocking Blow has a {v}% chance to Empower a random ally (2 turns).",
+			"scale": {"step": 15},
+			"payload": {"stat": {"tank_spank_ranks": 1}}},
+		{"id": "wd_rally", "name": "Rally", "ranks": 1, "lane": "Banner", "tier": 0,
+			"desc": "Every attack Blocked by Heavy Plating grants the party +15% healing received for 2 turns.",
+			"payload": {"stat": {"rally": 1}}},
+		# Re-spec (was Stomp Drill, -5 War Stomp cost): deepens the refuel —
+		# the real cargo on a 75-Attack tank's aoe.
+		{"id": "wd_stomp_drill", "name": "Rallying Stomp", "ranks": 3, "lane": "Banner", "tier": 0,
+			"desc": "War Stomp restores {v}% more resource to allies.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"rallying_stomp_ranks": 1}}},
+		{"id": "wd_elem_weak", "name": "Elemental Weakness", "ranks": 3, "lane": "Banner", "tier": 1,
+			"desc": "Crushing Blow also reduces all elemental resistances of the target by {v}% (3 turns).",
+			"scale": {"step": 5},
+			"payload": {"stat": {"elem_weak_ranks": 1}}},
+		# Re-spec (was Bannerman, a flat max-HP dial): the Batch G tank verb
+		# deepens — the cover he throws gets thicker.
+		{"id": "wd_bannerman", "name": "Bulwark Line", "ranks": 2, "lane": "Banner", "tier": 1,
+			"desc": "Interpose grants each ally {v} additional Shieldwall charge(s).",
+			"scale": {"step": 1},
+			"payload": {"stat": {"bulwark_line_ranks": 1}}},
+		# Re-spec (was Fortress, a flat max-HP dial): conditional on the
+		# Warden being healthy — the party's mitigation depends on keeping
+		# him standing, so healing him is protecting everyone.
+		{"id": "wd_fortress", "name": "Shared Vigil", "ranks": 3, "lane": "Banner", "tier": 1,
+			"desc": "Allies take {v}% less damage while the Warden is above 50% health.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"shared_vigil_ranks": 1}}},
+		# Re-spec (was Veteran's Will, an Iron Will deepener): the lane's
+		# thesis in one node — he eats what would have killed you.
+		{"id": "wd_veteran", "name": "Steadfast", "ranks": 3, "lane": "Banner", "tier": 2,
+			"desc": "When damage would drop an ally below 20% health, the Warden absorbs {v}% of it instead.",
+			"scale": {"step": 15},
+			"payload": {"stat": {"steadfast_ranks": 1}}},
+		# --- Capstones: take ONE (6 nodes bought in the lane) ---
+		# Re-spec (was The Mountain, a stat pile; the name comes from the
+		# old wd_immovable filler): being Broken is the one thing that
+		# turns a block build off — this removes it. Precedent: the
+		# Devout's Bulwark of Fortitude.
+		{"id": "wd_mountain", "name": "Immovable", "ranks": 1, "lane": "Plate", "tier": 2,
+			"capstone": true,
+			"desc": "The Warden cannot be Broken, and his Block chance is increased by 20%.",
+			"payload": {"stat": {"immovable": 1, "block_chance": 0.20}}},
+		# Re-spec (was Avenger, a Richocet/Sundering stat pile). Once per
+		# TURN, not per block — at his block rate against a full field,
+		# per-block would be absurd.
+		{"id": "wd_avenger", "name": "Vengeful Guardian", "ranks": 1, "lane": "Threat", "tier": 2,
+			"capstone": true,
+			"desc": "The first attack the Warden Blocks each turn is answered with a free Crushing Blow.",
+			"payload": {"stat": {"vengeful_guardian": 1}}},
+		{"id": "wd_hold_line", "name": "Hold the Line", "ranks": 1, "lane": "Banner", "tier": 2,
+			"capstone": true,
+			"desc": "New ability: Hold the Line — the party takes 50% less Break damage for 2 turns and cannot die for a turn (30 Rage, 3.5 int, 6cd).",
+			"payload": {"new_ability": {"display_name": "Hold the Line", "cost": 30,
+				"special": "hold_the_line", "delay": 3.5, "anim": "attack03",
+				"cooldown": 6,
+				"perfect_id": "", "perfect_text": "Refunds 5 Rage",
+				"description": "Embolden the party: 50% less Break\ndamage for 2 turns, and no one can die\nfor a turn."}}},
 	],
 	"mystic": [
 		# Survivalist — NODE-GATED (tiers open on nodes bought in the lane:
@@ -1400,59 +1485,6 @@ const LANE_CONVERSIONS := {
 				"capstone": true,
 				"desc": "Ashes of Al'ar revives two steps stronger and +5% max health.",
 				"payload": {"stat": {"ashes_ranks": 2, "max_hp_pct": 0.05}}},
-		],
-	},
-	"warden": {
-		"map": {
-			"wd_unkillable": ["Aegis", 0], "wd_toughness": ["Aegis", 1],
-			"wd_tenacity": ["Aegis", 1], "wd_endurance": ["Aegis", 1],
-			"wd_ricochet": ["Retribution", 0], "wd_sundering": ["Retribution", 1],
-			"wd_elem_weak": ["Retribution", 1],
-			"wd_shieldwall": ["Warlord", 0], "wd_rally": ["Warlord", 1],
-			"wd_iron_will": ["Warlord", 1], "wd_tank_spank": ["Warlord", 1],
-			"wd_hold_line": ["Warlord", 2, "cap"],
-		},
-		"new": [
-			{"id": "wd_plating", "name": "Layered Plating", "ranks": 2, "lane": "Aegis", "tier": 0,
-				"desc": "+{v}% armor.", "scale": {"step": 4},
-				"payload": {"stat": {"armor": 0.04}}},
-			{"id": "wd_fortress", "name": "Fortress", "ranks": 2, "lane": "Aegis", "tier": 2,
-				"desc": "+{v}% max health.", "scale": {"step": 5},
-				"payload": {"stat": {"max_hp_pct": 0.05}}},
-			{"id": "wd_immovable", "name": "Immovable", "ranks": 2, "lane": "Aegis", "tier": 2,
-				"exclusive_with": "wd_grudge",
-				"desc": "Take {v}% less damage.", "scale": {"step": 4},
-				"payload": {"stat": {"dmg_taken_bonus": -0.04}}},
-			{"id": "wd_spiked", "name": "Spiked Bulwark", "ranks": 2, "lane": "Retribution", "tier": 0,
-				"desc": "Richocet returns another step of the damage.",
-				"payload": {"stat": {"ricochet_ranks": 1}}},
-			{"id": "wd_shatter_guard", "name": "Shattering Blow", "ranks": 3, "lane": "Retribution", "tier": 1,
-				"desc": "Crushing Blow deals {v} more damage.", "scale": {"step": 5},
-				"payload": {"ability": "Crushing Blow", "add": {"damage": 5}}},
-			{"id": "wd_grudge", "name": "Grudge", "ranks": 3, "lane": "Retribution", "tier": 2,
-				"exclusive_with": "wd_immovable",
-				"desc": "+{v}% damage dealt.", "scale": {"step": 3},
-				"payload": {"stat": {"dmg_bonus": 0.03}}},
-			{"id": "wd_stomp_drill", "name": "Stomp Drill", "ranks": 2, "lane": "Retribution", "tier": 2,
-				"desc": "War Stomp costs {v} less Rage.", "scale": {"step": 5},
-				"payload": {"ability": "War Stomp", "add": {"cost": -5}}},
-			{"id": "wd_bannerman", "name": "Bannerman", "ranks": 2, "lane": "Warlord", "tier": 0,
-				"desc": "+{v}% max health.", "scale": {"step": 4},
-				"payload": {"stat": {"max_hp_pct": 0.04}}},
-			{"id": "wd_veteran", "name": "Veteran's Will", "ranks": 2, "lane": "Warlord", "tier": 2,
-				"desc": "Iron Will hardens another step per debuff.",
-				"payload": {"stat": {"iron_will_ranks": 1}}},
-			{"id": "wd_taunt_master", "name": "Taunt Master", "ranks": 1, "lane": "Warlord", "tier": 2,
-				"desc": "Mocking Blow's cooldown is reduced by 1 turn.",
-				"payload": {"ability": "Mocking Blow", "add": {"cooldown": -1}}},
-			{"id": "wd_mountain", "name": "The Mountain", "ranks": 1, "lane": "Aegis", "tier": 2,
-				"capstone": true,
-				"desc": "+10% max health and +5% armor.",
-				"payload": {"stat": {"max_hp_pct": 0.10, "armor": 0.05}}},
-			{"id": "wd_avenger", "name": "Avenger", "ranks": 1, "lane": "Retribution", "tier": 2,
-				"capstone": true,
-				"desc": "Richocet returns two steps more and Sundering splashes a step harder.",
-				"payload": {"stat": {"ricochet_ranks": 2, "sundering_ranks": 1}}},
 		],
 	},
 }

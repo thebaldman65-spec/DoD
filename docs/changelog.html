@@ -5,6 +5,62 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-30 — Batch H: the Warden tree becomes a designed set of lanes</h2>
+<ul>
+<li><b>The diagnosis:</b> half the converted tree was damage on a 75-Attack character.
+Iron Will granted +5%/rank damage per debuff — at full investment with three debuffs
+that's +45% of a number so small the bonus was about fourteen damage. Tank-role Attack
+means every offensive node is dead weight. So the offensive payloads were converted into
+currencies a tank actually spends: <b>mitigation, Break pressure, threat, and party
+protection.</b></li>
+<li><b>The tree moves from the Batch 31 conversion into a purpose-designed LANE_TREES
+entry</b> — node-gated like Berserker/Swordmaster (tiers open at 2/4 nodes bought in the
+lane, capstone at 6). Lanes: <b>Plate / Threat / Banner</b>. No node was deleted: every id
+survives and re-specs in place, and no new rank cap sits below its old one, so a
+pre-change save loads with every rank intact and zero refunds.</li>
+<li><b>Iron Will keeps its name and its idea</b> — adversity makes him stronger —
+converted into the currency a tank banks: the Warden takes <b>4%/rank LESS damage per
+debuff on him</b> (was +damage). Three debuffs at full ranks is 36% less damage taken
+instead of +14 damage. The permanent chip now reads "-X%" and follows the live count.</li>
+<li><b>Ten fillers re-specced in place</b> (same ids, new effects): Layered Plating →
+<b>Plate Discipline</b> (the Heavy Plating climb steepens +3%/rank — 11/14/17% per
+unblocked hit, so blocks arrive every second hit instead of every third), Immovable-the-
+filler → <b>Battered Not Broken</b> (blocks remove 8/rank Break from his own meter — a
+Broken unit cannot Block at all, so blocking now holds his identity on), Taunt Master →
+<b>Provoke</b> (Mocking Blow taunts +1 foe/rank), Spiked Bulwark → <b>Spite</b>
+(attackers take 8%/rank of dealt damage back), Shattering Blow → <b>Bruising Guard</b>
+(blocks deal 10/rank BD to the attacker — the most-attacked hero becomes a quiet party
+Break engine), Grudge → <b>Grudge v2</b> (+6%/rank damage vs enemies HIS taunt holds),
+Stomp Drill → <b>Rallying Stomp</b> (War Stomp refuels +5%/rank more), Bannerman →
+<b>Bulwark Line</b> (Interpose grants +1 charge/rank per ally), Fortress → <b>Shared
+Vigil</b> (allies take 3%/rank less damage while the Warden is above 50% health),
+Veteran's Will → <b>Steadfast</b> (damage that would drop an ally below 20% health: the
+Warden absorbs 15%/rank of it — battle-layer split with full death bookkeeping, Pressure
+stays on the struck hero like Unity).</li>
+<li><b>Both invented capstones re-specced:</b> The Mountain → <b>Immovable</b> (Plate:
+the Warden CANNOT be Broken — Break damage is refused at the same take_hit gate as the
+Devout's Bulwark of Fortitude — and +20% Block chance), Avenger → <b>Vengeful
+Guardian</b> (Threat: the FIRST attack he Blocks each turn is answered with a free
+Crushing Blow via the Opportunist counter machinery — once per turn, re-armed at his
+turn start; per-block would be absurd at his block rate). Hold the Line caps Banner
+unchanged.</li>
+<li><b>Exclusives:</b> the old invented cross-lane pair (Immovable ↔ Grudge) is gone —
+cross-lane exclusives read as bugs rather than choices (no Tenacity ↔ Rally link existed
+in code). The one pair is <b>Spite ↔ Bruising Guard</b>, in-lane and a genuine fork:
+convert the punishment you soak into damage, or into Break pressure.</li>
+<li><b>Audit:</b> all twelve trees 24/3/7-7-7 plus warden structure (node gating, lane
+homes, rank caps, exclusive barring both ways, zero-refund migration) — 134 asserts
+green. <b>Forced-learn verification:</b> every one of the twelve re-specced payloads
+demonstrably fires in sim logs (standard comp for the always-on nodes; a forced
+boss/chief/shaman/brute lineup to trigger Bulwark Line, Steadfast and the capstones);
+Provoke at 2 ranks drags 3 foes, Bulwark Line at 2 ranks grants 3 charges, Vengeful
+Guardian proced 57 times across ~100 Warden turns — the per-turn cap holds.</li>
+<li><b>Sim (200 battles, warden/cryomancer/inquisitor/beastmaster, no talents):</b>
+200/200 wins, 9.6 avg rounds, hero deaths 0.08/battle, enemy damage 140/battle, Breaks
+on heroes 0.39/battle, Warden damage share 19% — the Batch G baseline holds through the
+rewired block/taunt/Stomp/Interpose sites. Standard-party 200 regression: 200/200.</li>
+</ul>
+
 <h2>2026-07-30 — Batch G: Warden — the wall you can rely on</h2>
 <ul>
 <li><b>The diagnosis:</b> Block was his identity and he had no say in it — a flat 20%

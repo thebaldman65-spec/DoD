@@ -309,10 +309,10 @@ talent rank (Warden's Crushing Blow talent); the chip shows the reduction ("−1
 talent, on dropping below half HP); the chip shows the live bonus.</td></tr>
 <tr><td>Unrelenting Assault</td><td>+10 Constitution × ranks invested, for 3 turns
 (Berserker talent, on dropping below 25% HP; at most once every 5 turns).</td></tr>
-<tr><td>Endurance</td><td>+3%/rank armor per turn without an external heal (Warden talent);
+<tr><td>Endurance</td><td>+1%/rank armor per turn without an external heal (Warden talent);
 the chip tracks the streak and clears when healed.</td></tr>
-<tr><td>Iron Will</td><td>+5%/rank damage per debuff on the Warden (talent); a permanent
-chip whose value follows the live debuff count.</td></tr>
+<tr><td>Iron Will</td><td>Takes 4%/rank LESS damage per debuff on the Warden (talent); a
+permanent chip whose value follows the live debuff count.</td></tr>
 <tr><td>Crushing Blows</td><td>+3%/rank armor penetration per 20 total enemy-party
 bloodloss (Berserker talent); a permanent chip with the live value.</td></tr>
 <tr><td>Flame Shield</td><td>Takes 50% less damage; attackers are set Burning for 3 turns
@@ -566,7 +566,8 @@ ally gains 1 Shieldwall charge — the next attack against them is BLOCKED (Perf
 Warden gains a charge too). Charges ADD to any the ally is already holding.<br>
 <i>Talent-granted:</i> Hold the Line — 30 Rage, 3.5, 6cd, the party takes 50% less Break
 damage for 2 turns and cannot die for a turn (Perfect: refunds 5 Rage); self-cast, no
-target selection.</li>
+target selection.<br>
+<b>Talent lanes:</b> see §7 — Plate / Threat / Banner, node-gated.</li>
 <li><b>Swordmaster (Bruiser)</b> — <b>Stat block:</b> 165 HP / 22% armor / <b>12%
 parry</b> (the technician; the only parry-stat character — see §4.3).<br>
 Passive <i>Seasoned Fighter</i>: fights in one of <b>two stances the PLAYER controls</b> —
@@ -895,6 +896,32 @@ Defensive stance, parried attacks deal NOTHING — no damage, no Break damage, t
 1 included — and every parry is answered with a free Pommel Strike, so every parry is also
 a stun), Guard Breaker (Breaker: when a Broken enemy recovers, its Break meter refills to
 50 instead of resetting to 0 — the guard never truly returns).</p>
+<p><b>Warden lanes (node-gated):</b><br>
+<b>PLATE</b> (mitigation and the block payoffs — everything that answers being hit) —
+Unkillable (heal 2%/rank max HP on every Block ×3), Toughness (Constitution +5%/rank of
+max HP ×3), Endurance (+1%/rank armor per unhealed turn ×3), Tenacity (+5 max HP per
+Heavy Plating block, battle-long), Shield Mastery (Shieldwall +1 charge/rank ×2), Plate
+Discipline (the Heavy Plating climb steepens +3%/rank — 11/14/17% per unblocked hit ×3),
+Battered Not Broken (Blocking removes 8/rank Break from his own meter ×3).<br>
+<b>THREAT</b> (he wants to be hit; this lane is what happens to whoever obliges) —
+Richocet (5%/rank chance to Stun the attacker on Block ×3), Provoke (Mocking Blow taunts
++1 foe/rank ×2), Iron Will (takes 4%/rank LESS damage per debuff on him ×3), Sundering
+(Crushing Blow splashes 25%/rank of its BD to Adjacent ×3), Spite (attackers take 8%/rank
+of the damage they deal him back ×3; <i>exclusive with Bruising Guard</i>), Bruising
+Guard (Blocking deals 10/rank BD to the attacker ×3; <i>exclusive with Spite</i>), Grudge
+(+6%/rank damage against enemies HIS taunt holds ×3).<br>
+<b>BANNER</b> (the half that protects other people) — Tank and Spank (Mocking Blow
+15%/rank chance to Empower a random ally ×3), Rally (Heavy Plating blocks grant the party
++15% healing received, 2 turns), Rallying Stomp (War Stomp restores +5%/rank more
+resource ×3), Elemental Weakness (Crushing Blow shreds elemental resists 5%/rank, 3 turns
+×3), Bulwark Line (Interpose grants each ally +1 charge/rank ×2), Shared Vigil (allies
+take 3%/rank less damage while the Warden is above 50% health ×3), Steadfast (damage that
+would drop an ally below 20% health: the Warden absorbs 15%/rank of it ×3).<br>
+<b>CAPSTONES</b> — Immovable (Plate: the Warden CANNOT be Broken and his Block chance is
++20%), Vengeful Guardian (Threat: the FIRST attack he Blocks each turn is answered with a
+free Crushing Blow — Sundering and Elemental Weakness riders included), Hold the Line
+(Banner: grants the ability — 50% less party Break damage for 2 turns and no one can die
+for a turn).</p>
 <p><b>Sharpshooter lanes (node-gated):</b><br>
 <b>PRECISION</b> (Focus, crit chance, crit damage) — Steady Hands (+4%/rank crit ×3),
 Perfect Form (crits +20 Focus), Deep Focus (cap 150), Executioner's Eye (crit mult
@@ -956,7 +983,7 @@ Steadfast Bond</i>), Lone Hunter (no companion: costs −40%, damage +25%).<br>
 gain doubled), The Pack (Pack lane: two beasts at once — COMING SOON), Apex Predator
 (Handler: Quick Shot triggers an extra free companion strike; Kill Command resets on every
 enemy death).</p>
-<p><b>Seven classic trees remain conversions</b> (<b>Warden, Pyromancer,
+<p><b>Six classic trees remain conversions</b> (<b>Pyromancer,
 Cryomancer, Arcanist, Holy, Devout, Occultist</b>, from Batch 31): their original 12 nodes
 keep their ids, effects, and any invested ranks, re-homed into three lanes, joined by
 invented filler nodes (numeric dials and kit tweaks on existing machinery) and two
@@ -967,11 +994,6 @@ session-only; DOD_SIM_GRANT_ALL=1 headless) pre-grants every talent-granted and
 boss-trophy ability at spawn, so reworked kits can be reviewed without spending points.</p>
 <p><b>Lane homes per converted tree</b> (existing nodes by name; ⊕ marks invented
 fillers/capstones):<br>
-<b>Warden</b> — Aegis: Unkillable, Toughness, Tenacity, Endurance, ⊕Layered Plating,
-⊕Fortress, ⊕Immovable · Retribution: Richocet, Sundering, Elemental Weakness, ⊕Spiked
-Bulwark, ⊕Shattering Blow, ⊕Grudge, ⊕Stomp Drill · Warlord: Shieldwall, Rally, Iron Will,
-Tank and Spank, ⊕Bannerman, ⊕Veteran's Will, ⊕Taunt Master · Capstones: Hold the Line,
-⊕The Mountain, ⊕Avenger · Exclusive: Grudge ↔ Immovable.<br>
 <b>Pyromancer</b> — Wildfire: Accelerant, Pyromaniac, Seeding Embers, ⊕Kindling,
 ⊕Arsonist, ⊕Firebrand, ⊕Spreading Flames · Detonator: Super Nova, Explosive Force, Molten
 Core, Melt Armor, Implosion, ⊕Shockwave, ⊕Focused Blast · Phoenix: Flame Shield,

@@ -166,3 +166,26 @@ fire+frost plate with an arcane hole) makes the three Warriors
 unmistakable at a glance — the Berserker is the pool, the Swordmaster
 the blade, the Warden the wall — and the arcane hole keeps the wall
 honest: enemy casters have a real line on him.
+
+**Warden tree (Batch H) — a tank can't spend damage:** half the
+converted tree was damage nodes on a 75-Attack character. Iron Will's
+old payoff — +45% of a number that small — was about fourteen damage
+at full investment: mathematically a bonus, experientially a shrug.
+Every offensive payload was therefore converted into a currency a
+tank actually banks — mitigation (Iron Will now takes 4%/rank LESS
+per debuff, so being covered in filth is armor, same name, same
+fantasy, working direction), Break pressure (Bruising Guard turns
+the most-attacked character into a quiet Break engine for the whole
+party), threat (Provoke widens the taunt; Grudge aims his remaining
+damage at whoever he holds), and party protection (Shared Vigil pays
+the party for keeping HIM healthy, which makes healing the tank feel
+like healing everyone — the right incentive loop; Steadfast is the
+lane's thesis in one node: he eats what would have killed you).
+Battered Not Broken exists because a Broken unit cannot Block at all
+— Broken doesn't just hurt this spec, it switches its identity off —
+so blocking now works to hold that fate off, and the Immovable
+capstone removes it outright (precedent: the Devout's Bulwark of
+Fortitude). Vengeful Guardian is once per TURN, not per block: at his
+block rate against a full field, per-block would be a free rotation.
+The Spite ↔ Bruising Guard exclusive is in-lane where a fork reads
+as a choice; the old cross-lane pair read as a bug and is gone.
