@@ -262,13 +262,14 @@ Roots of Wrath (3 turns), and the Survivalist's Trapper passive (5 turns).</li>
 <tr><th>Status</th><th>Effect</th></tr>
 <tr><td>Chilled</td><td>STACKING frost (Cryomancer-only, max 4): 1 stack −25% speed,
 2 stacks −50% speed, 3 stacks −50% speed AND −15% damage dealt; <b>4 stacks = FROZEN</b>
-(the stacks reset). Lasts 3 turns; every reapplication RESETS the clock. The chip counts
-stacks ("C2").</td></tr>
-<tr><td>Frozen</td><td>Frozen solid: loses the next turn (a stun — bosses resist unless
-Broken). Reached at 4 stacks of Chilled.</td></tr>
+— the freeze leaves <b>1 stack</b> in place. Stacks the Cryomancer applies <b>never
+expire</b> (Permafrost); Chilled from any other source lasts 3 turns, every reapplication
+resetting the clock. The chip counts stacks ("C2").</td></tr>
+<tr><td>Frozen</td><td>Frozen solid: skips their turns while the ice holds (1 turn,
+more under Cold Snap; a stun — bosses resist unless Broken). Reached at 4 stacks of
+Chilled.</td></tr>
 <tr><td>Frostbite</td><td>Healing received reduced by 50% (2 turns). Inflicted by the
-Cryomancer's Rime and by the Permafrost passive's frost-attack procs (25%
-chance).</td></tr>
+Cryomancer's Rime on cast.</td></tr>
 <tr><td>Slowed</td><td>−25% speed (generic; e.g. Shrapnel Charge).</td></tr>
 <tr><td>Burn</td><td>6% of the applier's Attack at the start of each turn
 (snapshotted). Reapplication extends duration — new turns ADD to the timer.</td></tr>
@@ -628,22 +629,25 @@ enemies for 12% Atk each, each bolt applying 2 turns of Burn (Perfect: 7-9 bolts
 resist, −20% fire (the Pyromancer's reflection — each mage is armoured in his own
 element and soft to his opposite, so a fire warband and a frost warband ask genuinely
 different questions of the same party).<br>
-Passive <i>Permafrost</i>: Frozen enemies take 15%
-increased damage from ALL sources, and the Cryomancer's frost attacks have a 25% chance
-to inflict <b>Frostbite</b> (−50% healing received, 2 turns). Its core Magic
+Passive <i>Permafrost</i>: Chilled stacks applied by the
+Cryomancer <b>never expire</b>, and Frozen enemies take 15% increased damage from ALL
+sources. When an enemy Freezes, its stacks drop to <b>1</b> instead of 0 — the payoff
+keeps the engine warm. Its core Magic
 Bolt is reforged into <b>Frostbolt</b> — free, 20% Atk frost / 15 BD / 2.0, no cd, applies
 1 stack of Chilled (Perfect: hits at 25% of Attack).<br>
-Razor Ice — 20 Mana, 20% Atk frost / 10 BD / 2.5, 3cd × 2 RANDOM enemies; every hit
-applies a stack of Chilled (Perfect: hits at 25% of Attack).<br>
-Blizzard — 35 Mana, 15% Atk frost to ALL / 10 BD / 4.0, 4cd; layers 1-2 stacks of Chilled
+Razor Ice — 20 Mana, 20% Atk frost / 10 BD / 2.5, 3cd; THREE shards driven into a SINGLE
+chosen target, every shard applying a stack of Chilled (Perfect: hits at 25% of
+Attack).<br>
+Blizzard — 30 Mana, 15% Atk frost to ALL / 10 BD / 3.5, 4cd; layers 1-2 stacks of Chilled
 on each victim (Perfect: refunds 5 Mana).<br>
-Ice Lance — 25 Mana, 35% Atk frost / 15 BD / 3.0, 2cd; ALWAYS crits against Frozen targets
-(Perfect: 20 BD instead).<br>
+Ice Lance — 25 Mana, 35% Atk frost / 15 BD / 3.0, 2cd; +10% of Attack per Chilled stack
+on the target, and ALWAYS crits against Frozen targets (Perfect: 20 BD instead).<br>
 <i>Talent-granted:</i> Rime — 25 Mana, 3.0, 3cd: inflicts Frostbite (−50% healing
 received, 2 turns), and for 3 turns every stack of Chilled the
 target gains also chills one other random enemy (Perfect: 4 turns). Shatter (capstone) —
 30 Mana, 4.0, 5cd: every Chilled enemy takes 10% of Attack PER STACK of Chilled on it;
-only castable while someone is Chilled (Perfect: cooldown becomes 4).</li>
+only castable while someone is Chilled (Perfect: cooldown becomes 4).<br>
+<b>Talent lanes:</b> see §7 — Deep Freeze / Shatterpoint / Winter, node-gated.</li>
 <li><b>Arcanist (Ramp)</b> — <b>Stat block:</b> 155 HP / 6% armor / +20% arcane &amp;
 +10% shadow resist, −15% physical (the most health and the least armour in the class:
 Resonance bills him +5% damage taken per stack and Arcane Cannon recoils 15% of its
@@ -1143,23 +1147,42 @@ Pyromancer's fire damage ignores enemy fire resistance), Cataclysm (Detonation: 
 resolves, it fires again at the burning enemy with the most Burn remaining for 60% of
 its damage and BD, chaining up to 3 additional times, each 60% of the one before; every
 link consumes its target's Burn as normal).</p>
-<p><b>Two classic trees remain conversions</b> (<b>Cryomancer, Arcanist</b>, from
-Batch 31): their original 12 nodes
+<p><b>Cryomancer lanes (node-gated):</b><br>
+<b>DEEP FREEZE</b> (reaching and holding Frozen) — Brittle Ice (Frozen enemies 2%/rank
+likelier to be crit, party-wide ×3), Frigid Grip (each Chilled stack slows 3%/rank harder
+×3), Whiteout (Blizzard victims 15%/rank chance to be Dazed 2 turns ×3), Freezing Advance
+(when an enemy Freezes, the Cryomancer's next attack against it deals +10%/rank damage
+×3), Cold Snap (Frozen lasts 1 additional turn/rank; <i>exclusive with Bitter Cold</i>
+×2), Bitter Cold (Freezing an enemy applies 1 stack/rank of Chilled to every other enemy;
+<i>exclusive with Cold Snap</i> ×3), Glacial Economy (Freezing an enemy restores 5%/rank
+of the Cryomancer's max Mana ×2).<br>
+<b>SHATTERPOINT</b> (the burst payoff) — Piercing Ice (Ice Lance +10%/rank crit damage
+×3), Empowered Frostbolt (Frostbolt +2%/rank of Attack ×3), Icy Veins (Ice Lance kills
+empower the next Ice Lance +15%/rank ×3), Splintering Shards (Razor Ice 20%/rank chance
+to strike a FOURTH time ×3), Lance Focus (Ice Lance costs 5/rank less Mana ×2), Crystal
+Edge (Ice Lance deals +5%/rank of Attack per Chilled stack on top of the base 10% ×3),
+Honed Shards (critical hits with Ice Lance apply 1 stack/rank of Chilled ×2).<br>
+<b>WINTER</b> (the field aura) — Hungering Cold (Chilled enemies deal 1%/rank less damage
+per stack ×3), Hypothermia (enemies take 1%/rank more damage per Chilled stack ×3), Rime
+(grants the ability), Frost Ward (the Cryomancer takes 4%/rank less damage from Chilled
+enemies ×3), Icy Resolve (Rime lasts 1 additional turn/rank ×2), Winter's Grasp (at the
+start of each of the Cryomancer's turns, 1 random Chilled enemy per rank gains a stack
+×3), Numbing Veil (Chilled enemies 5%/rank chance to miss ×3).<br>
+<b>CAPSTONES</b> — Shatter (Shatterpoint: grants the ability), Absolute Zero (Deep
+Freeze: Freezing no longer reduces the target's Chilled stacks — they hold at 4, and it
+refreezes the moment its freeze ends), Eternal Winter (Winter: EVERY enemy gains 1 stack
+of Chilled at the start of each of the Cryomancer's turns).</p>
+<p><b>One classic tree remains a conversion</b> (<b>Arcanist</b>, from
+Batch 31): its original 12 nodes
 keep their ids, effects, and any invested ranks, re-homed into three lanes, joined by
 invented filler nodes (numeric dials and kit tweaks on existing machinery) and two
 invented capstones beside the original one — <i>all fillers and lane homes await design
-review</i>. Each converted tree carries one exclusive pair.</p>
+review</i>. The converted tree carries one exclusive pair.</p>
 <p><b>Review aid:</b> the map burger's "All Spec Abilities Unlocked" toggle (default OFF,
 session-only; DOD_SIM_GRANT_ALL=1 headless) pre-grants every talent-granted and
 boss-trophy ability at spawn, so reworked kits can be reviewed without spending points.</p>
 <p><b>Lane homes per converted tree</b> (existing nodes by name; ⊕ marks invented
 fillers/capstones):<br>
-<b>Cryomancer</b> — Deep Freeze: Brittle Ice, Frigid Grip, Whiteout, Freezing Advance,
-⊕Cold Snap, ⊕Glacial Economy, ⊕Bitter Cold · Shatterpoint: Piercing Ice, Empowered
-Frostbolt, Icy Veins, Splintering Shards, ⊕Lance Focus, ⊕Crystal Edge, ⊕Honed Shards ·
-Winter: Hungering Cold, Hypothermia, Rime, ⊕Frost Ward, ⊕Icy Resolve, ⊕Winter's Grasp,
-⊕Numbing Veil · Capstones: Shatter, ⊕Absolute Zero, ⊕Eternal Winter · Exclusive: Bitter
-Cold ↔ Numbing Veil.<br>
 <b>Arcanist</b> — Resonance: Arcane Mastery, Mana Attunement, Unlimited Power,
 ⊕Harmonics, ⊕Conduit, ⊕Resonant Core, ⊕Charged Bolts · Overload: Overcharge, On the Edge,
 Critical Mass, ⊕Volatility, ⊕Cannoneer, ⊕Barrage Master, ⊕Meltdown · Control: Mindfulness,
@@ -1172,15 +1195,6 @@ additional point invested adds the SAME amount again (e.g. "+5 Bleed per rank" a
 <p><b>Layout:</b> every tree renders as three lane columns with live lane-point headers,
 a capstone shelf, emblem-square nodes with point counters, cost-aware hover tooltips, and
 greyed exclusive siblings. Art is placeholder.</p>
-<p><b>Cryomancer tree:</b> Hungering Cold (Chilled enemies deal
-1%/rank less damage per stack ×3), Brittle Ice (Frozen enemies 2%/rank likelier to be crit
-×3), Piercing Ice (Ice Lance +10%/rank crit damage ×3). Hypothermia (enemies take
-1%/rank more damage per Chilled stack ×3), Frigid Grip (each Chilled stack slows 3%/rank
-harder ×3), Rime (grants the ability), Icy Veins (Ice Lance kills empower the next Ice
-Lance +15%/rank ×3), Splintering Shards (Razor Ice 20%/rank chance of one extra target
-×3). Whiteout (Blizzard victims 15%/rank chance to be Dazed 2 turns ×3), Freezing
-Advance (Rime's spread deals 2%/rank of Attack as frost to the new victim ×3), Empowered
-Frostbolt (Frostbolt +2%/rank of Attack ×3). Capstone — Shatter (grants the ability).</p>
 <p><b>Arcanist tree:</b> Mindfulness (every 6/5/4 of the Arcanist's turns — the
 count drops 1 per point — ALL cooldowns tick down 1 extra turn ×3), Arcane Mastery (each
 Resonance stack grants +1%/rank extra crit chance ×3), Mana Attunement (restore 2%/rank

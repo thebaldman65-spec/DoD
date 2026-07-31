@@ -320,3 +320,24 @@ stack one target tall, then spread, is the combo the bot rarely
 finds but a player will. The 50% sim damage share is flagged, not
 tuned: this batch's brief was making the loop exist; the number is
 the difficulty pass's dial.
+
+**Cryomancer (Batch O) — Permafrost now means what its name says:**
+his own win condition needed 4 Chilled stacks on one target while his
+main applier hit 2 random enemies, every reapplication reset a shared
+3-turn clock so whole piles evaporated at once, and the freeze wiped
+the stacks — the payoff destroyed the engine, the same fault the
+Berserker's bleedout and the Pyromancer's detonation had. Permafrost
+is ground that doesn't thaw, so the fix starts at the root: stacks he
+applies never expire, which turns Blizzard's field-wide 1-2 stacks
+from evaporation into preparation and makes every Frostbolt progress
+that keeps. Razor Ice concentrates (three shards, one chosen target)
+because Control means choosing WHO freezes; the freeze leaves 1 stack
+(all 4 under Absolute Zero) so Hypothermia and Hungering Cold keep
+ticking through the payoff; and a boss that resists the freeze keeps
+sitting on its stacks, which converts the old wasted-freeze-on-boss
+into a held threat that springs the moment it Breaks. The Frostbite
+clause left the passive because −50% healing is dead weight against
+the many warbands with no healer — Rime keeps it where it is chosen.
+The 46% sim damage share (36% before) is recorded, not tuned: this
+batch's brief was making the cold hold; the number is the difficulty
+pass's dial.

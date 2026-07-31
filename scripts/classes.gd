@@ -464,7 +464,7 @@ const SPEC_INFO := {
 	"cryomancer": {"name": "Cryomancer", "constitution": 85, "archetype": "Control", "passive": "permafrost",
 		"max_hp": 135, "armor": 0.08,
 		"resists": {"frost": 0.30, "fire": -0.20},
-		"passive_desc": "Permafrost: Frozen enemies take 15% increased damage\nfrom all sources. Frost attacks have a 25% chance to\ninflict Frostbite (-50% healing received, 2 turns).",
+		"passive_desc": "Permafrost: Chilled stacks applied by the Cryomancer\nnever expire. Frozen enemies take 15% increased damage\nfrom all sources.",
 		"blurb": "Battlefield control — chill, freeze, then shatter."},
 	# The Arcanist's health bar is a resource he spends (like the Devout's):
 	# Resonance bills him +5% damage taken per stack and Cannon recoils 15%,
@@ -615,24 +615,25 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "A rolling wall of fire rakes ALL\nenemies: applies 2 turns of Burn;\nthose already Burning burn 2 turns\nlonger instead."}),
 			]
 		"cryomancer":
-			# Control kit (07-18 rework; core Magic Bolt becomes Frostbolt via
-			# apply_kit_overrides). VAULTED — kept for future return:
-			# Frost Bolt (25 Mana spear, 50% double vs unchilled).
+			# Control kit (Batch O: Razor Ice concentrates on ONE target — the
+			# spec's win condition is 4 stacks on a chosen enemy, so its main
+			# applier stopped scattering them). VAULTED — kept for future
+			# return: Frost Bolt (25 Mana spear, 50% double vs unchilled).
 			return [
 				Ability.make({"display_name": "Razor Ice", "cooldown": 3, "dmg_type": "frost", "cost": 20,
 					"damage": 20, "pressure": 10, "delay": 2.5, "anim": "attack02",
-					"random_hits": 2, "perfect_extra_hit": false,
+					"multi_hits": 3, "perfect_extra_hit": false,
 					"applies_status": {"id": "chilled", "turns": 3},
 					"perfect_id": "", "perfect_text": "Deals 25% of Attack instead",
-					"description": "Razor shards at 2 random enemies;\nevery hit applies a stack of Chilled."}),
-				Ability.make({"display_name": "Blizzard", "cooldown": 4, "dmg_type": "frost", "cost": 35,
-					"damage": 15, "pressure": 10, "delay": 4.0, "anim": "attack03", "aoe": true,
+					"description": "Three razor shards driven into ONE\ntarget; every shard applies a stack\nof Chilled."}),
+				Ability.make({"display_name": "Blizzard", "cooldown": 4, "dmg_type": "frost", "cost": 30,
+					"damage": 15, "pressure": 10, "delay": 3.5, "anim": "attack03", "aoe": true,
 					"perfect_id": "mana5", "perfect_text": "Refunds 5 Mana",
 					"description": "Storm of ice rakes ALL enemies,\nlayering 1-2 stacks of Chilled\non each."}),
 				Ability.make({"display_name": "Ice Lance", "cooldown": 2, "dmg_type": "frost", "cost": 25,
 					"damage": 35, "pressure": 15, "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Deals 20 BD instead",
-					"description": "A frozen spear driven deep: ALWAYS\ncrits against Frozen targets."}),
+					"description": "A frozen spear driven deep: +10% of\nAttack per Chilled stack on the target,\nand it ALWAYS crits against Frozen\ntargets."}),
 			]
 		"arcanist":
 			# Resonance-engine kit (07-20 rework; core Magic Bolt becomes Arcane

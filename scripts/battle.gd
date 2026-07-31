@@ -20,7 +20,7 @@ const ABILITY_KEY_NAMES := ["Q", "W", "E", "R", "A", "S", "D", "F"]
 const STATUS_INFO := {
 	"slow": ["Slowed", "Sl", Color(0.55, 0.65, 0.9), "-25% speed; turns arrive later."],
 	"chilled": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "Stacking frost: 1 = -25% speed,\n2 = -50%, 3 = also -15% damage;\n4 stacks FREEZE the victim."],
-	"frozen": ["Frozen", "Fz", Color(0.65, 0.88, 1.0), "Frozen solid: loses their next turn."],
+	"frozen": ["Frozen", "Fz", Color(0.65, 0.88, 1.0), "Frozen solid: skips their turns until\nthe ice thaws."],
 	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Burning: takes damage at the start of each\nturn (6% of the applier's Attack).\nReapplying Burn extends the duration."],
 	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Bleed builds with wounding attacks;\nat 100 the target bleeds out for 20% max HP.\nBleed damage ignores armor."],
 	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-35% armor."],
@@ -163,6 +163,7 @@ var debug_enemies_off := false  # debug toggle: enemies skip their turns
 var debug_locked_hero: BattleUnit = null  # debug: every turn goes to this hero
 var debug_cooldowns_off := false  # debug toggle: abilities never cool down
 var _rime_echoing := false  # guards Rime chill-echoes from chaining
+var _bitter_echoing := false  # guards Bitter Cold freezes from cascading forever
 var empower_armed := false  # Mercy: the next heal cast spends +1 stack
 var _debug_popup: PopupMenu
 
@@ -1241,6 +1242,28 @@ func _run_battle() -> void:
 				u.refresh_bars()
 				_log("   → Talent: Living Flame — the blaze feeds %s (+%d Mana)" % [
 					u.unit_name, lf_mana], "#b0a8e0")
+		# Cryomancer upkeep (Batch O): the winter advances on its own.
+		# Eternal Winter chills EVERYONE first; Winter's Grasp then deepens
+		# the cold on those already caught.
+		if u.is_hero and not u.dead and u.eternal_winter > 0:
+			var ew_pool: Array = enemies.filter(func(e): return not e.dead)
+			if not ew_pool.is_empty():
+				_log("   → Capstone: Eternal Winter — the cold claims the field",
+					"#7cc8f0")
+				for ew_e in ew_pool:
+					if not ew_e.dead:
+						_apply_status(ew_e, "chilled", 3, 0, 0, u)
+		if u.is_hero and not u.dead and u.grasp_ranks > 0:
+			var wg_pool: Array = enemies.filter(
+				func(e): return not e.dead and e.has_status("chilled"))
+			wg_pool.shuffle()
+			var wg_n := mini(u.grasp_ranks, wg_pool.size())
+			for wg_i in wg_n:
+				var wg_e: BattleUnit = wg_pool[wg_i]
+				if not wg_e.dead:
+					_log("   → Talent: Winter's Grasp — the cold sinks deeper into %s" % \
+						wg_e.unit_name, "#b0a8e0")
+					_apply_status(wg_e, "chilled", 3, 0, 0, u)
 		# Survivalist upkeep: Plague Bearer spreads the rot, the Field
 		# Medic tends a random ally.
 		if u.is_hero and not u.dead and u.plague_bearer > 0:
@@ -1328,12 +1351,19 @@ func _run_battle() -> void:
 			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
 			continue
 		if u.has_status("frozen"):
-			u.remove_status("frozen")
 			u.float_text("FROZEN", Color(0.65, 0.88, 1.0))
 			_log("%s is frozen solid and loses their turn" % u.unit_name, "#7cc8f0")
-			# A lost turn still counts: other status timers and cooldowns tick.
+			# A lost turn still counts: status timers and cooldowns tick — the
+			# freeze itself thaws one step here too (Cold Snap freezes hold
+			# for extra turns, so the ice may outlast this loss).
 			u.tick_statuses()
 			u.tick_cooldowns()
+			# Absolute Zero: a thaw at 4 held stacks refreezes on the spot.
+			if not u.has_status("frozen") and u.status_stacks("chilled") >= 4 \
+					and _living_hero_with("absolute_zero") != null:
+				_log("   → Capstone: Absolute Zero — %s cannot thaw" % u.unit_name,
+					"#7cc8f0")
+				_apply_status(u, "frozen", 1 + _max_hero_rank("cold_snap_ranks"))
 			await _wait(0.8)
 			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
 			continue
@@ -1964,31 +1994,40 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			var barrage := _find_ability(u, "Arcane Barrage")
 			if barrage != null and u.resource >= barrage.cost and u.ability_ready(barrage) and foes.size() >= 2:
 				return [barrage, target_foe]
-			# Cryomancer: shatter ripe stacks, rime spreaders, lance the frozen.
-			var shat := _find_ability(u, "Shatter")
-			if shat != null and u.resource >= shat.cost and u.ability_ready(shat):
-				var chill_total := 0
-				for e in foes:
-					chill_total += e.status_stacks("chilled") if e.has_status("chilled") else 0
-				if chill_total >= 4:
-					return [shat, target_foe]
-			var rime_ab := _find_ability(u, "Rime")
-			if rime_ab != null and u.resource >= rime_ab.cost and u.ability_ready(rime_ab) \
-					and foes.size() >= 2 and not target_foe.has_status("rime"):
-				return [rime_ab, target_foe]
+			# Cryomancer (Batch O): CONCENTRATE — razor the chilled toward 4,
+			# lance the frozen, and let the default bolt keep feeding the
+			# deepest pile instead of spreading thin.
+			var most_chilled: BattleUnit = null
+			for e in foes:
+				if e.has_status("chilled") and (most_chilled == null \
+						or e.status_stacks("chilled") > most_chilled.status_stacks("chilled")):
+					most_chilled = e
+			var razor := _find_ability(u, "Razor Ice")
+			if razor != null and u.resource >= razor.cost and u.ability_ready(razor) \
+					and most_chilled != null:
+				return [razor, most_chilled]
 			var lance := _find_ability(u, "Ice Lance")
 			if lance != null and u.resource >= lance.cost and u.ability_ready(lance):
 				var frozen_foes := foes.filter(func(e): return e.has_status("frozen"))
 				if not frozen_foes.is_empty():
 					return [lance, frozen_foes[0]]
+				if most_chilled != null and most_chilled.status_stacks("chilled") >= 3:
+					return [lance, most_chilled]
 			var bliz := _find_ability(u, "Blizzard")
 			if bliz != null and u.resource >= bliz.cost and u.ability_ready(bliz) \
-					and foes.size() >= 2:
+					and foes.filter(func(e): return e.status_stacks("chilled") < 2).size() >= 3:
 				return [bliz, target_foe]
-			var razor := _find_ability(u, "Razor Ice")
-			if razor != null and u.resource >= razor.cost and u.ability_ready(razor) \
-					and foes.size() >= 2:
-				return [razor, target_foe]
+			var rime_ab := _find_ability(u, "Rime")
+			if rime_ab != null and u.resource >= rime_ab.cost and u.ability_ready(rime_ab):
+				var rime_t: BattleUnit = most_chilled if most_chilled != null else target_foe
+				if not rime_t.has_status("rime"):
+					return [rime_ab, rime_t]
+			var shat := _find_ability(u, "Shatter")
+			if shat != null and u.resource >= shat.cost and u.ability_ready(shat) \
+					and foes.filter(func(e): return e.has_status("chilled")).size() >= 2:
+				return [shat, target_foe]
+			if u.passive_id == "permafrost" and most_chilled != null:
+				return [u.abilities[0], most_chilled]    # Frostbolt the deepest pile
 			return [u.abilities[0], target_foe]          # basic bolt
 		"hunter":
 			var summon := _find_ability(u, "Summon Canis")
@@ -3073,6 +3112,9 @@ func _miss_chance(attacker: BattleUnit, defender: BattleUnit = null) -> float:
 		return 0.0
 	var chance := MISS_CHANCE + (0.20 if attacker.has_status("dazed") else 0.0) \
 		+ (0.50 if attacker.has_status("blind") else 0.0)
+	# Numbing Veil (Cryomancer talent): chilled fingers fumble the blow.
+	if not attacker.is_hero and attacker.has_status("chilled"):
+		chance += 0.05 * _max_hero_rank("numbing_ranks")
 	# Elusiveness: the wolf and the eagle are hard to pin down.
 	if defender != null and defender.has_status("elusive"):
 		chance += 0.25
@@ -3613,9 +3655,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Shatter: 10% of Attack PER Chilled stack on each victim.
 			if ab.display_name == "Shatter":
 				raw *= maxi(strike_target.status_stacks("chilled"), 1)
+			# Ice Lance (Batch O): the stored cold detonates — +10% of Attack
+			# per Chilled stack on the target (Crystal Edge deepens the take).
+			if ab.display_name == "Ice Lance" \
+					and strike_target.status_stacks("chilled") > 0:
+				raw += (0.10 + 0.05 * attacker.crystal_edge_ranks) \
+					* strike_target.status_stacks("chilled") * attacker.attack
 			# Icy Veins: a banked kill empowers this lance.
 			if ab.display_name == "Ice Lance" and attacker.icy_veins_charge > 0.0:
 				raw *= 1.0 + attacker.icy_veins_charge
+			# Freezing Advance: the first strike after the freeze bites deeper
+			# (the mark is spent by the strike loop's last hit).
+			if attacker.freezing_ranks > 0 and strike_target.freezing_adv_mark \
+					and ab.damage > 0:
+				raw *= 1.0 + 0.10 * attacker.freezing_ranks
 			if is_perfect and ab.display_name == "Explosive Shot":
 				raw = 0.12 * attacker.attack * randf_range(0.9, 1.1)
 			# Fireball perfect: the bolt hits at 25% of Attack instead of 20%.
@@ -3726,6 +3779,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 0.85
 			if atk_chill > 0:
 				raw *= 1.0 - 0.01 * _max_hero_rank("hungering_ranks") * atk_chill
+			# Frost Ward: the Cryomancer reads the chilled swing coming.
+			if not attacker.is_hero and atk_chill > 0 \
+					and strike_target.frost_ward_ranks > 0:
+				raw *= 1.0 - 0.04 * strike_target.frost_ward_ranks
 			# Blood Frenzy v2: +2% (plus Unstoppable) per 5% missing, never
 			# below the ratcheting floor (half this battle's peak bonus) —
 			# the unit-side helper ratchets and returns in one motion.
@@ -4268,7 +4325,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_gain_ruin(attacker, 1)
 				else:
 					_apply_status(strike_target, ab.applies_status["id"], turns, status_meta,
-						_dot_tick(ab.applies_status["id"], attacker))
+						_dot_tick(ab.applies_status["id"], attacker), attacker)
 					_note_debuff_applied(attacker, ab.applies_status["id"])
 					# Wrath of the Old Gods: the Occultist's debuffs mark Ruin.
 					if attacker.passive_id == "old_gods" and not strike_target.is_hero \
@@ -4353,12 +4410,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				for stack_i in (4 if is_perfect else 3):
 					_apply_status(strike_target, "poison", 5, 0,
 						_dot_tick("poison", attacker))
-			# Specialization on-hit passives.
-			if not strike_target.dead:
-				# Permafrost: the deep cold takes root — frost hits can Frostbite.
-				if attacker.passive_id == "permafrost" and ab.dmg_type == "frost" \
-						and randf() < 0.25:
-					_apply_status(strike_target, "frostbite", 2)
+			# (Permafrost's old on-hit Frostbite clause left in Batch O — the
+			# status lives on where it is CHOSEN: Rime applies it on cast.)
 			# Trapper: striking the Survivalist risks a poisoned barb.
 			if strike_target.passive_id == "trapper" and not attacker.is_hero \
 					and not attacker.dead and randf() < 0.25:
@@ -4470,7 +4523,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Blizzard: 1-2 stacks of Chilled settle on each victim.
 			if ab.display_name == "Blizzard" and not strike_target.dead:
 				for chill_i in randi_range(1, 2):
-					_apply_status(strike_target, "chilled", 3)
+					_apply_status(strike_target, "chilled", 3, 0, 0, attacker)
 				_note_debuff_applied(attacker, "chilled")
 				# Whiteout: the storm blinds.
 				if attacker.whiteout_ranks > 0 and not strike_target.dead \
@@ -4486,12 +4539,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					attacker.icy_veins_charge = 0.15 * attacker.icy_veins_ranks
 					_log("   → Talent: Icy Veins — the next Ice Lance hits +%d%%" % \
 						int(attacker.icy_veins_charge * 100), "#b0a8e0")
-			# Razor Ice perfect: unchilled victims catch the frost.
-			if is_perfect and ab.display_name == "Razor Ice" \
-					and not strike_target.dead \
-					and not strike_target.has_status("chilled") \
-					and not strike_target.has_status("frozen"):
-				_apply_status(strike_target, "chilled", 3)
+			# Honed Shards: a critical lance splinters into fresh cold.
+			if is_crit and ab.display_name == "Ice Lance" and not strike_target.dead \
+					and attacker.honed_shards_ranks > 0:
+				_log("   → Talent: Honed Shards — the crit leaves its splinters", "#b0a8e0")
+				for _hs_i in attacker.honed_shards_ranks:
+					if not strike_target.dead:
+						_apply_status(strike_target, "chilled", 3, 0, 0, attacker)
 				_note_debuff_applied(attacker, "chilled")
 			# Explosive Force: a fire crit fans the flames longer.
 			if is_crit and ab.dmg_type == "fire" and attacker.explosive_ranks > 0 \
@@ -4690,6 +4744,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				attacker.heal_amount(drained)
 				attacker.float_text("+%d" % drained, Color(0.4, 0.9, 0.45))
 				_log("   → %s drains %d HP" % [attacker.unit_name, drained], "#70d878")
+		# Freezing Advance: the whole attack rode the opening — spend the mark.
+		if attacker.is_hero and attacker.freezing_ranks > 0 and ab.damage > 0 \
+				and not is_counter:
+			for fa_t in strike_targets:
+				if fa_t.freezing_adv_mark:
+					fa_t.freezing_adv_mark = false
+					_log("   → Talent: Freezing Advance — the opening is taken (+%d%%)" % (
+						10 * attacker.freezing_ranks), "#b0a8e0")
 		# Survivalist on-hit package: Shrapnel's poison (perfect adds Slowed),
 		# Hamstring's trio, Coated Blades on basics, Venom Coating on all.
 		if attacker.is_hero and attacker.passive_id == "trapper" \
@@ -4870,7 +4932,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 
 
 func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
-		tick := 0) -> void:
+		tick := 0, src: BattleUnit = null) -> void:
 	# Bosses shrug off Stuns, Freezes, and mind magic until Broken.
 	if id in ["stunned", "frozen", "psychosis", "bewitch", "hysteria"] \
 			and target.is_boss and not target.broken:
@@ -4885,7 +4947,14 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 			String(STATUS_INFO[id][0])], "#e8c860")
 		return
 	var info: Array = STATUS_INFO[id]
-	target.add_status(id, info[0], info[1], info[2], turns, info[3], power, tick)
+	# Permafrost: Chilled stacks the Cryomancer applies NEVER expire (-1 =
+	# battle-long). Scoped to the src — enemy-applied chill keeps the
+	# 3-turn clock.
+	var eff_turns := turns
+	if id == "chilled" and src != null and src.is_hero \
+			and src.passive_id == "permafrost":
+		eff_turns = -1
+	target.add_status(id, info[0], info[1], info[2], eff_turns, info[3], power, tick)
 	if id == "chilled":
 		# Frigid Grip rides every stack: stamp the deeper slow on the victim.
 		target.frigid_bonus = 0.03 * _max_hero_rank("frigid_ranks")
@@ -4896,33 +4965,58 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 				var echo_t: BattleUnit = others.pick_random()
 				_rime_echoing = true
 				_log("   → Rime spreads the chill to %s" % echo_t.unit_name, "#7cc8f0")
-				_apply_status(echo_t, "chilled", 3)
-				# Freezing Advance: the leap stings.
-				var freeze_adv := _max_hero_rank("freezing_ranks")
-				if freeze_adv > 0 and not echo_t.dead:
-					var fa_atk := 0
-					for h in heroes:
-						if not h.dead and h.freezing_ranks > 0:
-							fa_atk = maxi(fa_atk, h.attack)
-					var fa_dmg := maxi(int(round(0.02 * freeze_adv * fa_atk)), 1)
-					if echo_t.take_tick_damage(fa_dmg, "-%d Frost" % fa_dmg,
-							Color(0.6, 0.85, 1.0)):
-						_sfx("death", -4.0)
-						_log("† %s dies" % echo_t.unit_name, "#e05050")
-					_log("   → Talent: Freezing Advance — %s takes %d frost" % [
-						echo_t.unit_name, fa_dmg], "#b0a8e0")
+				_apply_status(echo_t, "chilled", 3, 0, 0, src)
 				_rime_echoing = false
-		# Four stacks flash-freeze the victim (the stacks reset).
-		if target.status_stacks("chilled") >= 4:
-			target.remove_status("chilled")
-			_log("   → %s FREEZES SOLID (4 stacks of Chilled)" % target.unit_name,
-				"#7cc8f0")
-			if not target.was_frozen:
+		# Four stacks flash-freeze the victim — unless the ice already holds
+		# them (a boss just keeps sitting on its stacks until Broken).
+		if target.status_stacks("chilled") >= 4 and not target.has_status("frozen"):
+			_apply_status(target, "frozen", 1 + _max_hero_rank("cold_snap_ranks"))
+			if target.has_status("frozen"):
 				target.was_frozen = true
-			_apply_status(target, "frozen", 1)
+				# Batch O: the payoff keeps an ember — the freeze leaves 1
+				# stack instead of wiping the pile (Absolute Zero holds all 4).
+				var kept := 4 if _living_hero_with("absolute_zero") != null else 1
+				target.set_chilled_stacks(kept)
+				_log("   → %s FREEZES SOLID (4 stacks of Chilled — x%d remains)" % [
+					target.unit_name, kept], "#7cc8f0")
+				# Freezing Advance: the Cryomancer's next strike on this
+				# victim bites deeper — arm the mark.
+				if _max_hero_rank("freezing_ranks") > 0:
+					target.freezing_adv_mark = true
+				# Glacial Economy: every freeze pays its caster back in Mana.
+				var gl_h := _living_hero_with("glacial_ranks")
+				if gl_h != null and gl_h.resource_name == "Mana":
+					var gl_mana := maxi(int(round(gl_h.max_resource * 0.05
+						* gl_h.glacial_ranks)), 1)
+					gl_h.resource = mini(gl_h.resource + gl_mana, gl_h.max_resource)
+					gl_h.float_text("+%d Mana" % gl_mana, Color(0.5, 0.7, 1.0))
+					gl_h.refresh_bars()
+					_log("   → Talent: Glacial Economy — the freeze returns %d Mana" % \
+						gl_mana, "#b0a8e0")
+				# Bitter Cold: the freeze rolls outward — every OTHER enemy
+				# catches stacks. One cascade at a time: a freeze the spread
+				# itself causes never re-spreads (that way lies the ice age).
+				var bc_h := _living_hero_with("bitter_cold_ranks")
+				if bc_h != null and not _bitter_echoing:
+					_bitter_echoing = true
+					var bc_pool := enemies.filter(
+						func(e): return not e.dead and e != target)
+					if not bc_pool.is_empty():
+						_log("   → Talent: Bitter Cold — the freeze rolls across the field",
+							"#b0a8e0")
+						for bc_e in bc_pool:
+							for _bc_i in bc_h.bitter_cold_ranks:
+								if not bc_e.dead:
+									_apply_status(bc_e, "chilled", 3, 0, 0, bc_h)
+					_bitter_echoing = false
 			return
-		_log("   → Chilled on %s (x%d, 3-turn clock reset)" % [target.unit_name,
-			target.status_stacks("chilled")], "#7cc8f0")
+		var pile := target.get_status("chilled")
+		if int(pile.get("turns", 3)) < 0:
+			_log("   → Chilled on %s (x%d — Permafrost: never thaws)" % [target.unit_name,
+				target.status_stacks("chilled")], "#7cc8f0")
+		else:
+			_log("   → Chilled on %s (x%d, 3-turn clock reset)" % [target.unit_name,
+				target.status_stacks("chilled")], "#7cc8f0")
 		return
 	if id == "burn":
 		# Reapplication extends duration — log the running total.
@@ -6380,11 +6474,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						_log("† %s dies" % foe.unit_name, "#e05050")
 		"rime":
 			_sfx("break", -9.0, 1.4)
-			_apply_status(target, "rime", 4 if is_perfect else 3)
+			# Icy Resolve (talent): the hoarfrost roots deeper.
+			var rime_turns := (4 if is_perfect else 3) + attacker.icy_resolve_ranks
+			_apply_status(target, "rime", rime_turns)
 			_apply_status(target, "frostbite", 2)
 			_message("%s rimes %s!" % [attacker.unit_name, target.unit_name])
 			_log("%s: Rime on %s — its chills will spread (%d turns)" % [
-				attacker.unit_name, target.unit_name, 4 if is_perfect else 3], "#7cc8f0")
+				attacker.unit_name, target.unit_name, rime_turns], "#7cc8f0")
 		"stabilize":
 			# Consumes every Resonance stack: Mana back and a damage-reduction
 			# ward that scales with the stacks grounded.

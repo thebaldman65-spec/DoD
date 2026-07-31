@@ -272,19 +272,31 @@ var white_heat_ranks := 0     # White Heat: forced crit vs tall Burns
 var avatar_flame := 0         # capstone: no Inferno cap, fire pierces resist
 var cataclysm := 0            # capstone: Detonation chains down the field
 var was_frozen := false       # has been Frozen this battle
-# Cryomancer tree (07-20). See talents.gd for the node text.
+# Cryomancer tree (Batch O lanes). See talents.gd for the node text.
 var hungering_ranks := 0      # Hungering Cold: chilled enemies hit softer
-var frostbite_ranks := 0      # Frostbite: crits land easier on Frozen
+var frostbite_ranks := 0      # Brittle Ice: crits land easier on Frozen
 var piercing_ice_ranks := 0   # Piercing Ice: Ice Lance crit damage
 var hypothermia_ranks := 0    # Hypothermia: chilled enemies take more
 var frigid_ranks := 0         # Frigid Grip: deeper slow per stack
 var frigid_bonus := 0.0       # stamped on VICTIMS when Chilled lands
 var icy_veins_ranks := 0      # Icy Veins: Ice Lance kills empower the next
 var icy_veins_charge := 0.0   # the armed bonus for the next Ice Lance
-var splinter_ranks := 0       # Splintering Shards: Razor Ice extra target
+var splinter_ranks := 0       # Splintering Shards: Razor Ice 4th strike
 var whiteout_ranks := 0       # Whiteout: Blizzard can Daze
-var freezing_ranks := 0       # Freezing Advance: Rime spreads sting
+var freezing_ranks := 0       # Freezing Advance: next hit on the frozen
+var freezing_adv_mark := false # stamped on the VICTIM when it Freezes
 var emp_frostbolt_ranks := 0  # Empowered Frostbolt: bigger basic bolt
+var cold_snap_ranks := 0      # Cold Snap: Frozen holds extra turns
+var bitter_cold_ranks := 0    # Bitter Cold: freezes chill the field
+var glacial_ranks := 0        # Glacial Economy: Mana back per freeze
+var crystal_edge_ranks := 0   # Crystal Edge: deeper Lance stack scaling
+var honed_shards_ranks := 0   # Honed Shards: Lance crits apply Chilled
+var frost_ward_ranks := 0     # Frost Ward: less damage from the Chilled
+var icy_resolve_ranks := 0    # Icy Resolve: Rime lasts longer
+var grasp_ranks := 0          # Winter's Grasp: chilled foes gain stacks
+var numbing_ranks := 0        # Numbing Veil: chilled enemies can miss
+var absolute_zero := 0        # capstone: freezes keep all 4 stacks
+var eternal_winter := 0       # capstone: the whole field chills each turn
 # Arcanist rework + tree (07-20). See talents.gd for the node text.
 var overcharged := false      # Overcharge is active (max Resonance 8)
 var overcharge_mult := 1.5    # weight of stacks 6-8 (1.65 on a perfect cast)
@@ -870,10 +882,12 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 			elif id == "chilled":
 				# Chilled STACKS (max 4): each application adds a stack and
 				# RESETS the clock; 4 stacks = Frozen (handled by battle.gd).
+				# Permafrost applications arrive with turns -1: the pile stops
+				# thawing the moment the Cryomancer touches it.
 				s.stacks = mini(int(s.get("stacks", 1)) + 1, 4)
 				s.turns = turns
 				s.short = "C%d" % s.stacks
-				s.desc = _chilled_desc(int(s.stacks))
+				s.desc = _chilled_desc(int(s.stacks), turns < 0)
 				float_text("Chilled x%d" % s.stacks, color)
 			elif id == "ruin":
 				# Ruin STACKS (max 5, battle-long): the Old Gods' mark deepens.
@@ -902,25 +916,39 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 		entry["fresh"] = true  # no tick on the turn it lands
 	if id == "chilled":
 		entry["short"] = "C1"
-		entry["desc"] = _chilled_desc(1)
+		entry["desc"] = _chilled_desc(1, turns < 0)
 	statuses.append(entry)
 	float_text(label, color)
 	_refresh_chips()
 
 
-static func _chilled_desc(stacks: int) -> String:
+static func _chilled_desc(stacks: int, permanent := false) -> String:
 	var effect := "-25% speed"
 	if stacks == 2:
 		effect = "-50% speed"
 	elif stacks >= 3:
 		effect = "-50% speed, -15% damage dealt"
-	return "Chilled x%d: %s.\nEach stack resets the 3-turn clock;\nat 4 stacks the victim FREEZES solid." % [
-		stacks, effect]
+	var clock := "Permafrost: this chill never thaws" if permanent \
+		else "Each stack resets the 3-turn clock"
+	return "Chilled x%d: %s.\n%s;\nat 4 stacks the victim FREEZES solid." % [
+		stacks, effect, clock]
 
 
 func remove_status(id: String) -> void:
 	statuses = statuses.filter(func(s): return s.id != id)
 	_refresh_chips()
+
+
+# Batch O: a Freeze no longer wipes the Chilled pile — battle.gd sets the
+# surviving stack count directly (chip and tooltip follow along).
+func set_chilled_stacks(n: int) -> void:
+	for s in statuses:
+		if s.id == "chilled":
+			s.stacks = clampi(n, 1, 4)
+			s.short = "C%d" % s.stacks
+			s.desc = _chilled_desc(int(s.stacks), int(s.turns) < 0)
+			_refresh_chips()
+			return
 
 
 # On the Mend: strip ONE random harmful status (Broken excluded).

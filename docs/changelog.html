@@ -5,6 +5,78 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-31 — Batch O: the Cryomancer's cold finally holds</h2>
+<ul>
+<li><b>The diagnosis:</b> his win condition was 4 Chilled stacks on ONE target, but his
+main applier (Razor Ice) scattered stacks across 2 RANDOM enemies, every reapplication
+reset a shared 3-turn clock so whole piles evaporated at once, and the freeze itself
+WIPED the stacks — deleting Hypothermia and Hungering Cold, the per-stack auras, at the
+exact moment they mattered. Concentrating 4 stacks on a chosen enemy was close to luck,
+and the payoff destroyed the engine (the same fault the Berserker's bleedout and the
+Pyromancer's detonation had). Half the passive was dead weight besides: a 25% Frostbite
+proc whose −50% healing does nothing against the many warbands with no healer.</li>
+<li><b>Permafrost v2 — the name has always meant this:</b> Chilled stacks applied by the
+Cryomancer <b>never expire</b> (scoped to HIS applications; chill from any other source
+keeps the 3-turn clock). Frozen enemies still take 15% increased damage from all sources.
+The Frostbite clause leaves the passive — Rime still applies it on cast, where the status
+is chosen rather than rolled. And <b>freezing now leaves 1 Chilled stack instead of 0</b>
+(the Berserker's Frenzy-floor principle: cashing in shouldn't erase the engine), so the
+rebuild starts from something and the per-stack auras keep ticking. A boss that resists
+the freeze keeps sitting on all 4 stacks — Break it, chill it once, and the ice takes
+hold.</li>
+<li><b>Kit:</b> Razor Ice concentrates instead of scattering — THREE shards at a SINGLE
+chosen target, one stack each (20 Mana / 20% Atk / 10 BD / 2.5 / 3cd unchanged; Perfect
+still 25% per shard). Blizzard is worth its cost at 30 Mana and 3.5 initiative (was
+35/4.0) — with permanent stacks its field-wide 1-2 stacks are real preparation, not
+evaporation. Ice Lance gains +10% of Attack per Chilled stack on the target (65% at
+three stacks) — it finally pulls its weight BEFORE the freeze, not just during the
+auto-crit.</li>
+<li><b>Tree: the Cryomancer moves off the Batch 31 conversion onto purpose-designed
+node-gated lanes</b> (tiers at 2/4 nodes in-lane, capstone at 6): DEEP FREEZE reaches
+and holds Frozen, SHATTERPOINT is the burst payoff, WINTER is the field aura. Every id
+survives and the twelve conversion fillers re-spec in place, so saved ranks migrate:
+Cold Snap (was a Frostbolt dial → Frozen +1 turn/rank ×2) ↔ Bitter Cold (was a flat
+damage dial → every freeze chills the whole field 1 stack/rank ×3) as the new IN-LANE
+exclusive — depth against breadth; Glacial Economy (was a Blizzard discount → freezes
+return 5%/rank max Mana ×2), Freezing Advance (re-spec: was a Rime rider in the wrong
+lane → his next attack on a fresh freeze +10%/rank ×3), Splintering Shards (re-spec:
+was an extra RANDOM target that fought the win condition → a 20%/rank chance at a
+FOURTH shard, 60% at rank 3 to freeze out of one Razor Ice), Lance Focus (unchanged
+concept, −5 Mana/rank ×2), Crystal Edge (was a crit dial → Lance +5%/rank per stack
+×3), Honed Shards (was a Razor dial → Lance crits apply 1 stack/rank ×2), Frost Ward
+(was +armor → 4%/rank less damage from Chilled enemies ×3), Icy Resolve (was +max HP →
+Rime +1 turn/rank ×2), Winter's Grasp (was a Frigid dial → 1 random Chilled enemy/rank
+gains a stack at his turn start ×3), Numbing Veil (was a damage-taken dial → Chilled
+enemies 5%/rank chance to miss ×3). Capstones: Shatter (unchanged), Absolute Zero
+(re-spec: freezes keep ALL 4 stacks and the target refreezes the moment its freeze
+ends — total lockdown, every per-stack aura permanently maxed against it), Eternal
+Winter (re-spec: EVERY enemy gains a stack at the start of each of his turns —
+inevitability).</li>
+<li><b>Bot rotation</b> per the design doc: Razor Ice at the most-chilled target →
+Ice Lance against the Frozen, else at 3+ stacks → Blizzard when 3+ enemies hold fewer
+than 2 stacks → Rime → Shatter when 2+ enemies are Chilled → Frostbolt at the MOST
+CHILLED target, which is what makes the bot demonstrate concentration instead of
+spreading.</li>
+<li><b>Verified live:</b> both scenes parse clean; the talent audit passes — all lane
+trees 24 nodes / 3 caps / 7-7-7, every Cryomancer id survives, Cold Snap ↔ Bitter Cold
+bars both ways, every payload lands on a real unit field. Autoplay receipts: Blizzard
+preps the field ("never thaws" on every stack), Razor concentrates the Chief to a
+freeze, the freeze leaves x1 (15 of 15 freezes in the 8-battle sample), the pile
+rebuilds 2-3-4 and refreezes the SAME target — the cycle the spec was designed around;
+an uncritted 59-damage Ice Lance at 3 stacks (35% + 30% — the formula lands exact).
+Forced-talent sims: Bitter Cold cascades one freeze into two more (the re-entry guard
+holds — no ice age), Glacial refunds 10 Mana per freeze in the chain, Winter's Grasp
+and Eternal Winter advance the field each turn, Absolute Zero holds x4 through the
+freeze, Freezing Advance lands its +30%. Freezes per battle 1.5 → 1.9 (8-battle
+A/B) with battles 12% SHORTER — per-round freeze rate +35% — and lost-turns-to-freeze
+nearly tripled (3 → 8): the old freezes clustered at battle's end where the lost turn
+never came; these land mid-fight. <b>Sim line (200 battles, standard party): 200/200
+wins, Cryomancer damage share 46% (277/battle), Razor Ice 2.0 / Ice Lance 1.2 /
+Frostbolt 2.7 casts per battle.</b> He was the flagged outlier at 36% before the batch;
+the rise was expected and is RECORDED, not tuned — that dial belongs to the difficulty
+pass, where it can be measured properly.</li>
+</ul>
+
 <h2>2026-07-31 — Batch N: the Pyromancer's burn engine finally ignites</h2>
 <ul>
 <li><b>The diagnosis:</b> Flamewave extended Burn but never APPLIED it — the spec's only
