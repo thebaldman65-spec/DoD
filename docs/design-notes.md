@@ -284,3 +284,20 @@ through his own mechanic rather than borrowed Holy tools — every
 hero's strike into a Ruined enemy is party sustain — keeping the
 healing philosophies distinct: Holy restores, the Devout prevents,
 the Occultist siphons.
+
+**Mage stat blocks (Batch M) — the Arcanist carries the most health
+in the class because his health bar is a resource, not a buffer:**
+Resonance bills him +5% damage taken per stack (25% at 5, and
+Overcharge pushes the cap to 8) and Arcane Cannon recoils a flat 15%
+of the damage it deals back onto him — he pays for his own power in
+health, the way the Devout's party pays in shields. So he gets the
+biggest pool of the three (155) and the least armour (6%), with a
+physical vulnerability because raw energy in robes stops nothing
+that closes the distance. The Pyromancer and Cryomancer take no such
+penalty — they are symmetrical glass cannons (135 / 8%), built as
+mirror images: each armoured in his own element, soft to his
+opposite, so it reads instantly on the warband resist card and a
+fire warband asks the party a genuinely different question than a
+frost one. The Cryomancer's 36% damage share was deliberately NOT
+touched — that is the difficulty pass's job, where it can be
+measured, not a change to smuggle inside a stat block.

@@ -5,6 +5,46 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-31 — Batch M: the Mage spec stat blocks land</h2>
+<ul>
+<li><b>All three Mage specs get their own health, armour and resists</b> via the per-spec
+stat block (apply_spec_stats — same helper on the battle spawn and the party sheet, so the
+two surfaces cannot drift; a headless parity script asserted both build chains agree on
+every stat for all three). The class base — 99 HP / 10% armor — retires at awakening:
+<b>Pyromancer 135 HP / 8% / +30% fire, −20% frost</b> · <b>Cryomancer 135 HP / 8% /
++30% frost, −20% fire</b> · <b>Arcanist 155 HP / 6% / +20% arcane, +10% shadow, −15%
+physical</b>. Constitution and Attack were already live (85/85/90; all three are
+Damage-role 100, so no Attack override).</li>
+<li><b>Why the Arcanist carries the most health and the least armour:</b> his health bar
+is a resource he spends — Resonance bills him +5% damage taken per stack (25% at 5;
+Overcharge raises the cap to 8) and Arcane Cannon recoils a flat 15% of the damage it
+deals — so the Ramp archetype needs the pool to survive its own payoff. The physical
+vulnerability is the flavor cost: raw energy in robes, anything that closes the distance
+hurts. The Pyromancer and Cryomancer take no such penalty and are built as deliberate
+mirror images — each armoured in his own element, soft to his opposite.</li>
+<li><b>"physical" confirmed a live resist key before shipping:</b> it is the DEFAULT
+dmg_type (ability.gd) — untyped melee IS physical — and both attack directions read the
+victim's resist at the same _resolve site; 22 of the enemy roster's 37 damage abilities
+are physical-typed. Autoplay receipt: "Orc Raider: Sundering Strike on Arcanist — 25
+physical dmg (WEAK! +3) (armor −1)". One nuance logged: no enemy DEALS frost today, so
+the frost half of the twins' mirror (Pyromancer's weakness, Cryomancer's shrug) is
+identity awaiting future frost warbands; the fire half bites both ways right now
+(ashblade, Ash Tyrant, and fire-typed Burn ticks).</li>
+<li><b>Party-sheet fix in passing:</b> the Resistances hover listed only the six
+elements; physical joined the list (the battle plate's hover card already shows it — the
+Arcanist's −15% must read identically on both surfaces).</li>
+<li><b>Verified live:</b> both scenes parse clean. Standard sim, 200 battles before →
+after: wins 200/200 → 200/200, hero deaths/battle 0.32 → 0.28, survivors' avg HP 72% →
+75%, Cryomancer damage share 36% → 37% (207 → 216/battle — the flagged outlier is the
+difficulty pass's job; the block deliberately adds no damage). Arcanist-party sim
+(berserker,arcanist,inquisitor,beastmaster), 200 battles before → after: wins 199 →
+200/200, hero deaths/battle 0.94 → 0.86, survivors' avg HP 62% → 65%, Arcanist share 44%
+→ 48% (269 → 295/battle) — living longer IS his ramp: the extra health converts to more
+Resonance turns, and the party's one loss disappears. He remains the bleediest lineup by
+far (0.86 vs the standard party's 0.28 deaths/battle) — his surcharge is the design, and
+he stays on the watch list for the difficulty pass.</li>
+</ul>
+
 <h2>2026-07-31 — Batch L: the Occultist tree becomes a designed set of lanes</h2>
 <ul>
 <li><b>The diagnosis:</b> the Occultist is the most mechanically complete spec in the

@@ -164,10 +164,11 @@ func _draw_detail() -> void:
 		"Mana": "Mana — spent on abilities; +12 at the start of each turn.",
 		"Rage": "Rage — spent on abilities; +5 at turn start, +10 when hit,\nand attacks build more.",
 	}
-	# Resistances: armor's cousins, one per element (0% until specs get
-	# their blocks). Weaknesses would show as negatives.
+	# Resistances: armor's cousins, one per damage type — physical included,
+	# since spec blocks can carry it (the Arcanist is soft to it) and the
+	# battle plate's hover card lists it. Weaknesses show as negatives.
 	var resist_lines := PackedStringArray()
-	for res_type in ["fire", "frost", "nature", "holy", "shadow", "arcane"]:
+	for res_type in ["physical", "fire", "frost", "nature", "holy", "shadow", "arcane"]:
 		resist_lines.append("%s: %d%%" % [res_type.capitalize(),
 			int(round(float(cfg.get("resists", {}).get(res_type, 0.0)) * 100))])
 	var stat_rows: Array = [
@@ -182,8 +183,8 @@ func _draw_detail() -> void:
 			resource_tips.get(cfg["resource_name"], "")]],
 		[["Armor: %d%%" % int(round(cfg["armor"] * 100)),
 			"Armor — % of incoming physical damage blocked."],
-		["Resistances", "Resistances — like armor, but for each element:\n%s\n%s" % [
-			" / ".join(resist_lines.slice(0, 3)), " / ".join(resist_lines.slice(3, 6))]],
+		["Resistances", "Resistances — like armor, but per damage type:\n%s\n%s" % [
+			" / ".join(resist_lines.slice(0, 4)), " / ".join(resist_lines.slice(4, 7))]],
 		["Speed: %d" % int(cfg["speed"]),
 			"Speed — how quickly turns arrive (100 = average)."],
 		["Constitution: %d" % cfg.get("constitution", 100),

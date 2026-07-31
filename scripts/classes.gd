@@ -453,13 +453,26 @@ const SPEC_INFO := {
 		"max_hp": 165, "armor": 0.22, "parry_chance": 0.12,
 		"passive_desc": "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +15% damage dealt, +10% damage taken.\nDEFENSIVE — 15% less damage taken, -10% damage dealt.\nStarts each battle Aggressive; Guard Change swaps.",
 		"blurb": "Precision and technique — presses hard, then weathers the storm."},
+	# The Pyromancer and Cryomancer are mirror-image glass cannons: armoured
+	# in their own element, soft to the opposite — a fire warband and a frost
+	# warband ask different questions of the same party.
 	"pyromancer": {"name": "Pyromancer", "constitution": 85, "archetype": "Nuker", "passive": "inferno",
+		"max_hp": 135, "armor": 0.08,
+		"resists": {"fire": 0.30, "frost": -0.20},
 		"passive_desc": "Inferno Master: +5% damage for each burning enemy (up to +25%).",
 		"blurb": "Aggressive flame — burns that spread and stack."},
 	"cryomancer": {"name": "Cryomancer", "constitution": 85, "archetype": "Control", "passive": "permafrost",
+		"max_hp": 135, "armor": 0.08,
+		"resists": {"frost": 0.30, "fire": -0.20},
 		"passive_desc": "Permafrost: Frozen enemies take 15% increased damage\nfrom all sources. Frost attacks have a 25% chance to\ninflict Frostbite (-50% healing received, 2 turns).",
 		"blurb": "Battlefield control — chill, freeze, then shatter."},
+	# The Arcanist's health bar is a resource he spends (like the Devout's):
+	# Resonance bills him +5% damage taken per stack and Cannon recoils 15%,
+	# so he carries the class's biggest pool — and no armor to speak of,
+	# because raw energy in robes stops nothing that closes the distance.
 	"arcanist": {"name": "Arcanist", "constitution": 90, "archetype": "Ramp", "passive": "resonance",
+		"max_hp": 155, "armor": 0.06,
+		"resists": {"arcane": 0.20, "shadow": 0.10, "physical": -0.15},
 		"passive_desc": "Arcane Resonance: damaging casts build stacks (max 5) — each grants\n+15% damage and +3% crit but +5% damage taken. Max stacks trigger\nBacklash Ward (+15 Mana). Stacks persist until consumed.",
 		"blurb": "Unstable raw magic — stack the storm, then release it."},
 	"holy": {"name": "Holy", "constitution": 100, "archetype": "Healer", "passive": "mercy",
