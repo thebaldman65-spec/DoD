@@ -185,8 +185,7 @@ It is NOT shown on the character screen.</li>
 <li><b>Adjacent (keyword):</b> the enemies DIRECTLY next to a target in formation order,
 one on each side (never the target itself). <b>A dead neighbor NEGATES the adjacent bonus
 on that side</b> — the effect does not jump past a corpse to the next living enemy. Splash
-effects that say "Adjacent" (the Warden's Sundering, the Pyromancer's Wildfire) hit at most
-those two enemies.</li>
+effects that say "Adjacent" (the Warden's Sundering) hit at most those two enemies.</li>
 <li><b>Cooldown (keyword, "cd"):</b> the number of the user's turns before the same ability
 can be used again — "6cd" means unusable for 6 turns after use. Typical bands: basics 0,
 light hits 1–2, heavies/AoE 2–5, Resurrection 3. The remaining cooldown
@@ -611,17 +610,20 @@ Passive <i>Inferno Master</i>: +5% damage
 for each burning enemy, up to +25% (the spec chip shows the live bonus). Its core Magic
 Bolt is reforged into <b>Fireball</b> — free, 20% Atk fire / 15 BD / 2.0, no cd, applies
 3 turns of Burn (Perfect: hits at 25% of Attack).<br>
-Detonation — 20 Mana, 15% Atk fire / 20 BD / 3.0, 2cd; CONSUMES the target's Burn, adding
-its remaining damage (tick × turns left) to the hit before mitigation (Perfect: also
-applies 1 turn of Burn).<br>
-Wildfire — 20 Mana, 20% Atk fire / 10 BD / 2.0, 3cd; spreads the target's Burn to Adjacent
-enemies at HALF its remaining duration (rounded up; corpses block the spread).<br>
-Flamewave — 25 Mana, 15% Atk fire to ALL / 5 BD / 3.0, 2cd; enemies already Burning burn
-2 turns longer (Perfect: 3 turns).<br>
+Detonation — 25 Mana, 25% Atk fire / 20 BD / 3.0, 2cd; CONSUMES the target's Burn, adding
+150% of its remaining damage (tick × turns left × 1.5) to the hit before mitigation
+(Perfect: also applies 2 turns of Burn).<br>
+Wildfire — 20 Mana, 20% Atk fire / 10 BD / 2.0, 3cd; spreads the target's Burn to EVERY
+other living enemy at HALF its remaining duration (rounded up; the Burn is captured
+before the hit, so a killing blast still spreads).<br>
+Flamewave — 25 Mana, 15% Atk fire to ALL / 5 BD / 3.0, 2cd; applies 2 turns of Burn to
+every enemy — those already Burning burn 2 turns longer instead (Perfect: 3 turns either
+way).<br>
 <i>Talent-granted:</i> Flame Shield — 15 Mana, 2.0, 2cd, self-cast: take 50% less damage
 for 2 turns and attackers are set Burning 3 turns (Perfect: also triggers an immediate Burn
 tick on every burning enemy). Firestorm — 30 Mana, 3.5, 4cd, capstone: 6-8 bolts at RANDOM
-enemies for 12% Atk each, each bolt applying 2 turns of Burn (Perfect: 7-9 bolts).</li>
+enemies for 12% Atk each, each bolt applying 2 turns of Burn (Perfect: 7-9 bolts).<br>
+<b>Talent lanes:</b> see §7 — Kindling / Inferno / Detonation, node-gated.</li>
 <li><b>Cryomancer (Control)</b> — <b>Stat block:</b> 135 HP / 8% armor / +30% frost
 resist, −20% fire (the Pyromancer's reflection — each mage is armoured in his own
 element and soft to his opposite, so a fire warband and a frost warband ask genuinely
@@ -862,20 +864,20 @@ own Trapper bonus from the target.<br>
 <p><b>Economy:</b> talent points come from victories alone — <b>1 per fight, 2 per elite,
 3 per zone boss</b> (rests and shops award none; Waystone +1 at run start). Points bank
 until spent on the Party screen.</p>
-<p><b>Every tree is a lane tree.</b> Nine are purpose-designed on the lane framework
-(<b>Berserker, Swordmaster, Warden, Holy, Devout, Occultist, Sharpshooter, Survivalist,
-Beastmaster</b>); the other three are Batch 31 conversions of their classic grids awaiting
-the same treatment.</p>
+<p><b>Every tree is a lane tree.</b> Ten are purpose-designed on the lane framework
+(<b>Berserker, Swordmaster, Warden, Holy, Devout, Occultist, Pyromancer, Sharpshooter,
+Survivalist, Beastmaster</b>); the other two are Batch 31 conversions of their classic
+grids awaiting the same treatment.</p>
 <p><b>Lane framework rules:</b> a tree is three LANES of seven nodes — each lane a
 playstyle — plus three CAPSTONES of which only ONE may ever be taken. <b>Node pricing:</b>
 the Nth distinct node bought costs ceil(N/3) — 1,1,1,2,2,2,3… — while extra ranks in an
 open node always cost 1, so roughly a third of the tree fits in one run. <b>Exclusive
 pairs</b> bar each other but stay visible, greyed with the reason — the player must see
 the door they closed. Tooltips show the live cost and lane requirement.<br>
-<b>Two gating models exist.</b> Points-gated trees (Beastmaster and the three conversions)
+<b>Two gating models exist.</b> Points-gated trees (Beastmaster and the two conversions)
 open a lane's tier 2 at 3 points spent in that lane, tier 3 at 6, the capstone at 8.
 <b>Node-gated trees (Berserker, Swordmaster, Warden, Holy, Devout, Occultist,
-Sharpshooter, Survivalist)</b>
+Pyromancer, Sharpshooter, Survivalist)</b>
 open tier 2 at 2 NODES bought in the lane, tier 3 at 4, the capstone at 6 — with the
 escalating cost curve, node count is the stable gate a player can actually plan
 against.</p>
@@ -1111,8 +1113,38 @@ health, up from the base 15%; <i>exclusive with Pact of Flesh</i> ×2).<br>
 target held at 5 Ruin detonates again at the start of each of its turns), Mass Hysteria
 (Madness: grants the ability), Soul Glut (Leech: whenever a hero heals by striking a
 Ruined target, the whole party heals the same amount).</p>
-<p><b>Three classic trees remain conversions</b> (<b>Pyromancer,
-Cryomancer, Arcanist</b>, from Batch 31): their original 12 nodes
+<p><b>Pyromancer lanes (node-gated):</b><br>
+<b>KINDLING</b> (building the fire) — Accelerant (Burn ticks deal +1%/rank of Attack ×3),
+Explosive Force (crits with fire abilities extend the target's Burn +1 turn/rank ×3),
+Invigorating Ashes (each Burn tick 5%/rank chance to restore 2% max Mana ×3), Flame
+Shield (grants the ability — attackers ignite themselves on it), Conflagration (Flamewave
+applies +1 turn/rank of Burn, fresh fires and extensions alike ×2), Cinder Trail
+(Fireball also applies 1 turn/rank of Burn to one random other enemy ×2), Ember Wind (an
+enemy dying Burning passes its remaining Burn to a random living enemy).<br>
+<b>INFERNO</b> (profiting while it burns) — Pyromaniac (Inferno Master grants +1%/rank
+more per burning enemy ×3), Molten Core (take 2%/rank less damage from burning enemies
+×3), Melt Armor (every Burn tick melts 1%/rank armor off the victim for the battle ×3),
+Heat Haze (Inferno Master counts 1/rank more burning enemies before capping, 5 up to 8;
+<i>exclusive with Scorched Earth</i> ×3), Scorched Earth (burning enemies deal 5%/rank
+less damage; <i>exclusive with Heat Haze</i> ×3), Ashes of Al'ar (on death 11%/rank
+chance to revive at 25% HP, once per battle ×3), Living Flame (while 3 or more enemies
+burn, regain 3%/rank max Mana each turn ×2).<br>
+<b>DETONATION</b> (cashing it in: every node is a different answer to "how do I get more
+out of one Detonation") — Super Nova (Detonation +3%/rank crit chance ×3), Implosion
+(Detonation 3%/rank chance to strike twice ×3), Seeding Embers (an enemy dying Burning
+grants +1%/rank damage per remaining Burn turn for the next turn ×3), Chain Reaction
+(Detonation splashes 20%/rank of its damage to every other burning enemy ×3), Fuse
+(Detonation 15%/rank chance to reset its own cooldown ×2), Blast Radius (Detonation
+consumes 25%/rank more of the target's remaining Burn damage ×3), White Heat (Detonation
+always crits a target with 5+ turns of Burn — 4+ at rank 2 ×2).<br>
+<b>CAPSTONES</b> — Firestorm (Kindling: grants the ability), Avatar of Flame (Inferno:
+Inferno Master loses its cap — every burning enemy grants its full bonus — and the
+Pyromancer's fire damage ignores enemy fire resistance), Cataclysm (Detonation: after it
+resolves, it fires again at the burning enemy with the most Burn remaining for 60% of
+its damage and BD, chaining up to 3 additional times, each 60% of the one before; every
+link consumes its target's Burn as normal).</p>
+<p><b>Two classic trees remain conversions</b> (<b>Cryomancer, Arcanist</b>, from
+Batch 31): their original 12 nodes
 keep their ids, effects, and any invested ranks, re-homed into three lanes, joined by
 invented filler nodes (numeric dials and kit tweaks on existing machinery) and two
 invented capstones beside the original one — <i>all fillers and lane homes await design
@@ -1122,11 +1154,6 @@ session-only; DOD_SIM_GRANT_ALL=1 headless) pre-grants every talent-granted and
 boss-trophy ability at spawn, so reworked kits can be reviewed without spending points.</p>
 <p><b>Lane homes per converted tree</b> (existing nodes by name; ⊕ marks invented
 fillers/capstones):<br>
-<b>Pyromancer</b> — Wildfire: Accelerant, Pyromaniac, Seeding Embers, ⊕Kindling,
-⊕Arsonist, ⊕Firebrand, ⊕Spreading Flames · Detonator: Super Nova, Explosive Force, Molten
-Core, Melt Armor, Implosion, ⊕Shockwave, ⊕Focused Blast · Phoenix: Flame Shield,
-Invigorating Ashes, Ashes of Al'ar, ⊕Warm Glow, ⊕Cauterize, ⊕Rekindle, ⊕Undying Flame ·
-Capstones: Firestorm, ⊕Hellfire, ⊕True Phoenix · Exclusive: Firebrand ↔ Cauterize.<br>
 <b>Cryomancer</b> — Deep Freeze: Brittle Ice, Frigid Grip, Whiteout, Freezing Advance,
 ⊕Cold Snap, ⊕Glacial Economy, ⊕Bitter Cold · Shatterpoint: Piercing Ice, Empowered
 Frostbolt, Icy Veins, Splintering Shards, ⊕Lance Focus, ⊕Crystal Edge, ⊕Honed Shards ·
@@ -1145,16 +1172,6 @@ additional point invested adds the SAME amount again (e.g. "+5 Bleed per rank" a
 <p><b>Layout:</b> every tree renders as three lane columns with live lane-point headers,
 a capstone shelf, emblem-square nodes with point counters, cost-aware hover tooltips, and
 greyed exclusive siblings. Art is placeholder.</p>
-<p><b>Pyromancer tree:</b> Accelerant (Burn ticks +1%/rank of Attack
-×3), Pyromaniac (Inferno Master step +1%/rank ×3), Super Nova (Detonation +3%/rank crit
-×3). Invigorating Ashes (each Burn tick 5%/rank chance to restore 2% max Mana ×3),
-Molten Core (2%/rank less damage from burning enemies ×3), Flame Shield (grants the
-ability), Explosive Force (fire crits extend the target's Burn +1 turn/rank ×3), Seeding
-Embers (enemy dies Burning: +1%/rank damage per remaining Burn turn, next turn ×3). Row 3 —
-Melt Armor (every Burn tick melts 1%/rank armor off the victim for the battle, shown as an
-enemy chip ×3), Ashes of Al'ar (on death: 11%/rank chance to revive at 25% HP, once per
-battle ×3), Implosion (Detonation 3%/rank chance to strike twice ×3). Capstone — Firestorm
-(grants the ability).</p>
 <p><b>Cryomancer tree:</b> Hungering Cold (Chilled enemies deal
 1%/rank less damage per stack ×3), Brittle Ice (Frozen enemies 2%/rank likelier to be crit
 ×3), Piercing Ice (Ice Lance +10%/rank crit damage ×3). Hypothermia (enemies take

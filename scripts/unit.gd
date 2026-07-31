@@ -256,6 +256,21 @@ var implosion_ranks := 0      # Implosion: Detonation can strike twice
 var melted := 0.0             # armor shredded off THIS unit by Melt Armor
 var burn_at_death := 0        # Burn turns left when this unit died (Seeding)
 var seeding_consumed := false # Seeding Embers already harvested this corpse
+# Pyromancer Batch N lanes (07-31). See talents.gd for the node text.
+var conflagration_ranks := 0  # Conflagration: Flamewave applies +1 turn/rank
+var cinder_trail_ranks := 0   # Cinder Trail: Fireball embers a second enemy
+var ember_wind := 0           # Ember Wind: burning deaths pass the flame on
+var ember_consumed := false   # Ember Wind already released this corpse
+var burn_tick_at_death := 0   # tick snapshot for the Ember Wind transfer
+var heat_haze_ranks := 0      # Heat Haze: Inferno Master cap 5 -> +1/rank
+var scorched_ranks := 0       # Scorched Earth: burning enemies swing softer
+var living_flame_ranks := 0   # Living Flame: mana while 3+ enemies burn
+var chain_reaction_ranks := 0 # Chain Reaction: Detonation splashes the burning
+var fuse_ranks := 0           # Fuse: Detonation can reset its own cooldown
+var blast_radius_ranks := 0   # Blast Radius: deeper Burn consumption
+var white_heat_ranks := 0     # White Heat: forced crit vs tall Burns
+var avatar_flame := 0         # capstone: no Inferno cap, fire pierces resist
+var cataclysm := 0            # capstone: Detonation chains down the field
 var was_frozen := false       # has been Frozen this battle
 # Cryomancer tree (07-20). See talents.gd for the node text.
 var hungering_ranks := 0      # Hungering Cold: chilled enemies hit softer
@@ -1442,10 +1457,12 @@ func _die() -> void:
 	var ua := get_status("unrelenting")
 	if not ua.is_empty():
 		constitution -= int(ua.get("power", 0))
-	# Seeding Embers reads the Burn this unit died with (harvested later).
+	# Seeding Embers reads the Burn this unit died with (harvested later);
+	# Ember Wind also needs the tick snapshot to pass the flame on whole.
 	var burn_stat := get_status("burn")
 	if not burn_stat.is_empty():
 		burn_at_death = maxi(int(burn_stat.get("turns", 0)), 0)
+		burn_tick_at_death = maxi(int(burn_stat.get("tick", 0)), 0)
 	statuses.clear()
 	_refresh_chips()
 	if _plate_root != null:

@@ -5,6 +5,63 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-31 — Batch N: the Pyromancer's burn engine finally ignites</h2>
+<ul>
+<li><b>The diagnosis:</b> Flamewave extended Burn but never APPLIED it — the spec's only
+AoE could not start a fire — and Wildfire's spread was strict-Adjacent, so corpses choked
+it. The only reliable igniter was the single-target Fireball, which made Inferno Master's
+five-burning-enemy cap physically unreachable: the passive promised a payoff the kit
+could not deliver.</li>
+<li><b>Kit:</b> Flamewave now applies 2 turns of Burn to every enemy — already-burning
+targets gain +2 turns instead, the existing behaviour (Perfect: 3 either way). Wildfire
+spreads the target's Burn to EVERY other living enemy at half duration rounded up (was
+Adjacent-only and corpse-blocked; the pre-hit capture stays, so a killing blast still
+spreads). Detonation becomes a real Nuker payoff: 25 Mana (was 20), 25% Atk (was 15%),
+and it consumes 150% of the burn's remaining damage (tick × turns left × 1.5; Perfect
+re-applies 2 turns, was 1). It stays single-target — hitting the whole field is a talent
+build, not a baseline.</li>
+<li><b>Tree: Pyromancer is now a purpose-designed node-gated lane tree</b> (tiers at 2/4
+nodes in-lane, capstone at 6) — the first Mage on lanes, and the lanes are named for the
+loop itself: KINDLING builds the fire, INFERNO profits while it burns, DETONATION cashes
+it in. Every id survives and the twelve conversion fillers re-spec in place, so saved
+ranks migrate: Arsonist→Conflagration (Flamewave +1 Burn turn/rank ×2),
+Kindling→Cinder Trail (Fireball embers one random other enemy 1 turn/rank ×2), Spreading
+Flames→Ember Wind (an enemy dying Burning passes its remaining Burn to a random living
+enemy), Firebrand→Heat Haze (Inferno Master cap 5 → 8 ×3) ↔ Cauterize→Scorched Earth
+(burning enemies deal 5%/rank less ×3) as the in-lane exclusive — the same burning field
+read as multiplier or as smother — Undying Flame→Living Flame (3%/rank max Mana per turn
+while 3+ burn ×2), Warm Glow→Chain Reaction (Detonation splashes 20%/rank of its damage
+to every other burning enemy ×3), Rekindle→Fuse (Detonation 15%/rank chance to reset its
+cooldown ×2), Shockwave→Blast Radius (consume +25%/rank more ×3), Focused Blast→White
+Heat (Detonation always crits vs 5+ turn burns, 4+ at rank 2 ×2), True Phoenix→Avatar of
+Flame (Inferno Master uncapped + fire ignores enemy fire resistance), Hellfire→Cataclysm
+(after Detonation resolves it chains to the burning enemy with the most Burn left at 60%
+power — damage and BD — up to 3 more links, each 60% of the one before, HARD-CAPPED at 4
+hits total; each link consumes its target's Burn, so the chain starves itself).</li>
+<li><b>Bot rotation</b> per the design doc: Flamewave when 2+ enemies aren't burning →
+Wildfire when one target holds 4+ turns and 2+ enemies aren't burning → Detonation
+against the enemy with the MOST remaining Burn at 3+ turns → Firestorm → Fireball. One
+honest note: in bot hands Wildfire almost never fires (0.0 casts/battle over 200) —
+Flamewave's higher priority keeps the whole field lit, which pre-empts Wildfire's own
+gate. It remains the stack-then-spread combo button for human play, and the machinery is
+verified live ("Wildfire spreads the Burn to 4 other enemies").</li>
+<li><b>Verified live:</b> both scenes parse clean; the talent audit passes — all twelve
+trees 24 nodes / 3 caps / 7-7-7, every Pyromancer id survives, the exclusive bars both
+ways, capstone gating at 6 nodes. Autoplay receipts: one Flamewave lights the field
+(4-5 "Burn on ..." lines → Inferno Master live at +20-25%, where the old kit rarely
+passed +10%); "Detonation on Withered Warden — 96 fire dmg CRIT ... consumes the Burn
+(+79 bonus damage)" against a 5-turn burn (tick 6 × 5 × 1.5 × 1.75 Blast Radius — the
+formula lands exact); Cataclysm chains 60% → 36% walking down the stacks; Chain Reaction
+leaps to 4 burning enemies; Ember Wind passes dead enemies' flames on; Living Flame and
+Fuse proc on cue; Avatar of Flame's Burn ticks on a fire-resistant Shaman land untrimmed
+(no "(resisted)" tag). Standard-party sim unaffected (199/200 wins). Pyromancer-party
+sim (berserker,pyromancer,inquisitor,beastmaster), 200 battles: <b>200/200 wins,
+Pyromancer damage share 50% (293/battle)</b>, Flamewave 1.8 / Detonation 1.4 / Fireball
+3.8 casts per battle. <b>Flagged for the difficulty pass:</b> 50% share on the BASE kit
+is the hottest lead in the game (the Sharpshooter's 38% drew the same flag in Batch 32).
+The loop working is this batch's brief; the number is the designer's dial.</li>
+</ul>
+
 <h2>2026-07-31 — Batch M: the Mage spec stat blocks land</h2>
 <ul>
 <li><b>All three Mage specs get their own health, armour and resists</b> via the per-spec

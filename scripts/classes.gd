@@ -601,18 +601,18 @@ static func spec_abilities(spec: String) -> Array:
 			# Flame Surge (20 Mana, 15% AoE cone), Phoenix Rebirth
 			# (sacrifice 25% HP -> full Mana + Empower).
 			return [
-				Ability.make({"display_name": "Detonation", "cooldown": 2, "dmg_type": "fire", "cost": 20,
-					"damage": 15, "pressure": 20, "delay": 3.0, "anim": "attack02",
-					"perfect_id": "", "perfect_text": "Also applies 1 turn of Burn",
-					"description": "Ignite the wounds: consumes the target's\nBurn, adding its remaining damage\n(tick × turns left) to this hit."}),
+				Ability.make({"display_name": "Detonation", "cooldown": 2, "dmg_type": "fire", "cost": 25,
+					"damage": 25, "pressure": 20, "delay": 3.0, "anim": "attack02",
+					"perfect_id": "", "perfect_text": "Also applies 2 turns of Burn",
+					"description": "Ignite the wounds: consumes the target's\nBurn, adding 150% of its remaining\ndamage (tick × turns left × 1.5)\nto this hit."}),
 				Ability.make({"display_name": "Wildfire", "cooldown": 3, "dmg_type": "fire", "cost": 20,
 					"damage": 20, "pressure": 10, "delay": 2.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "",
-					"description": "Flames leap the gap: spreads the target's\nBurn to Adjacent enemies at half its\nduration (corpses block the spread)."}),
+					"description": "Flames leap every gap: spreads the\ntarget's Burn to EVERY other living\nenemy at half its duration (rounded up)."}),
 				Ability.make({"display_name": "Flamewave", "cooldown": 2, "dmg_type": "fire", "cost": 25,
 					"damage": 15, "pressure": 5, "delay": 3.0, "anim": "attack03", "aoe": true,
-					"perfect_id": "", "perfect_text": "+3 turns instead",
-					"description": "A rolling wall of fire rakes ALL\nenemies; those already Burning burn\n2 turns longer."}),
+					"perfect_id": "", "perfect_text": "3 turns of Burn instead",
+					"description": "A rolling wall of fire rakes ALL\nenemies: applies 2 turns of Burn;\nthose already Burning burn 2 turns\nlonger instead."}),
 			]
 		"cryomancer":
 			# Control kit (07-18 rework; core Magic Bolt becomes Frostbolt via

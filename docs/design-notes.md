@@ -301,3 +301,22 @@ fire warband asks the party a genuinely different question than a
 frost one. The Cryomancer's 36% damage share was deliberately NOT
 touched — that is the difficulty pass's job, where it can be
 measured, not a change to smuggle inside a stat block.
+
+**Pyromancer burn engine (Batch N) — the kit could not reach its own
+passive:** Flamewave extended Burn without ever applying it (the
+spec's only AoE could not start a fire) and Wildfire's spread was
+strict-Adjacent, so corpses choked it — which left single-target
+Fireball as the only reliable igniter and made Inferno Master's
+five-burning-enemy cap physically unreachable. One clause fixes the
+spec: Flamewave now ignites (2 turns to every enemy) and the whole
+loop exists — Kindling builds the fire, Inferno profits while it
+burns, Detonation cashes it in. Detonation stays a single-target
+nuke on purpose: which enemy to cash in is the decision the player
+makes, and hitting the whole field is a talent build (Chain
+Reaction, Cataclysm), not a baseline. Wildfire keeps its identity
+against Flamewave by scaling: Flamewave is a flat 2 turns to
+everyone, Wildfire copies HALF of one stacked burn to everyone —
+stack one target tall, then spread, is the combo the bot rarely
+finds but a player will. The 50% sim damage share is flagged, not
+tuned: this batch's brief was making the loop exist; the number is
+the difficulty pass's dial.
