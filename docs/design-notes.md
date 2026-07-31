@@ -189,3 +189,21 @@ Fortitude). Vengeful Guardian is once per TURN, not per block: at his
 block rate against a full field, per-block would be a free rotation.
 The Spite ↔ Bruising Guard exclusive is in-lane where a fork reads
 as a choice; the old cross-lane pair read as a bug and is gone.
+
+**Cleric stat blocks (Batch I) — max HP is an output stat:** for every
+Cleric spec, maximum health sets output, not just survivability,
+because the whole class heals in percentages of the caster's own
+maximum — Heal 40%, Renewal 15%/tick, Divine Shield 30%, Afterglow,
+Healing Pulse, the Faith release, the Ruin detonation, Dark Pact's
+regrowth. So the pools were set tall (150/175/155 against a 121 class
+base) and the armour spread carries the identity instead: the Devout
+wears 18% as the armoured shrine, the Holy 10% as cloth, the
+Occultist 8% because he already pays for power in blood. The Devout
+is the tallest BY DESIGN — his bulk is the party's bulk. The
+Occultist's planned −20% holy weakness died in the roster audit:
+nothing in any warband deals holy damage, and a vulnerability that
+never bites is flavour text wearing a stat's clothes. Fire replaced
+it — the only swap that keeps every entry in his resist block live
+somewhere in the run (shadow vs hexers, nature vs both forests, fire
+vs the burn zone) — and it reads right: the cleansing flame is what
+corruption should fear.

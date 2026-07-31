@@ -5,6 +5,36 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-30 — Batch I: the Cleric spec stat blocks land</h2>
+<ul>
+<li><b>All three Cleric specs get their own health, armour and resists</b> via the
+per-spec stat block (apply_spec_stats, same helper on the battle spawn and the party
+sheet, so the two surfaces cannot drift). The class base — 121 HP / 15% armor — retires
+at awakening: <b>Holy 150 HP / 10% / +20% holy, −15% shadow</b> · <b>Devout 175 HP /
+18% / +15% holy, +10% fire, −10% shadow</b> · <b>Occultist 155 HP / 8% / +25% shadow,
++10% nature, −20% fire</b>. Constitution and Attack were already live (100/110/95;
+Support 50, the Occultist's Pressure archetype attacks at 100).</li>
+<li><b>Why the pools are tall: Cleric max HP is an OUTPUT stat.</b> Heal is 40% of the
+Holy's maximum, Renewal ticks 15% of it; Divine Shield absorbs 30% of the Devout's, and
+Afterglow, Healing Pulse and the Faith release all pay out from the same number; the
+Occultist's Ruin detonation and Dark Pact trade in his. A beefier cleric doesn't just
+survive longer — it heals harder.</li>
+<li><b>The Occultist's planned holy weakness was swapped for fire.</b> The enemy roster
+audit found NOTHING that deals holy damage (dealt types today: physical everywhere;
+nature from archer, shaman, bog troll, behemoth and the Withered Warden; fire from the
+ashblade and the Ash Tyrant; shadow from the hexer) — a −20% that never bites is not a
+weakness. Fire keeps every entry in his block live across the run: shadow resist against
+z2's hexers, nature resist against both forests, and the burn zone gets a real line on
+him — cleansing flame finds the corrupt.</li>
+<li><b>Verified live:</b> Divine Shield absorbs <b>53</b> at spawn (was 36 off the class
+base; perfect 61) — proportional to the HP bump, so nothing upstream still reads the
+class base. Both scenes parse clean; the party-sheet numbers and the battle nameplate
+agree for all three specs. Sim, 200 battles before → after: wins 100% → 100% (the known
+ceiling), hero deaths/battle 0.39 → 0.35, survivors' average HP 69% → 74%, healing
+landed/battle 1 → 4. A stale code comment over the Divine Shield special (it still said
+50/55%) was corrected to the real 30/35%.</li>
+</ul>
+
 <h2>2026-07-30 — Batch H: the Warden tree becomes a designed set of lanes</h2>
 <ul>
 <li><b>The diagnosis:</b> half the converted tree was damage on a 75-Attack character.

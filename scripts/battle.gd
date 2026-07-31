@@ -5135,7 +5135,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s surges with power!" % attacker.unit_name)
 			_log("%s: Arcane Surge — +20%% attack next turn" % attacker.unit_name, "#70d878")
 		"divine_shield":
-			# Absorbs 50% (perfect 55%) of the DEVOUT's max health, carrying
+			# Absorbs 30% (perfect 35%) of the DEVOUT's max health, carrying
 			# the tree's riders (Blessed Barrier / Afterglow; Covenant fires
 			# through the lethal-save hook).
 			var shield := int(round(attacker.max_hp * (0.35 if is_perfect else 0.30)))
