@@ -300,6 +300,18 @@ var stored_overheal := 0      # the banked amount (released by Heal)
 var last_overheal := 0        # overheal of the most recent heal_amount call
 var on_mend_ranks := 0        # On the Mend: Renewal ticks can dispel
 var sanctified_ranks := 0     # Sanctified: Mercy spends can refund
+# Holy tree v2 (Batch J, 07-30). See talents.gd for the node text.
+var cascade_ranks := 0        # Radiant Cascade: crit heals splash onward
+var overflow_ranks := 0       # Overflow: overhealing spills onward
+var zealous_mercy := 0        # Zealous Light: battle-opening Mercy
+var ardor_ranks := 0          # Ardor: held Mercy makes Empower free
+var mercy_cap_bonus := 0      # Martyr's Vigor: Mercy ceiling 5 -> 6 -> 7
+var vestments_ranks := 0      # Blessed Vestments: Renewal bearers take less
+var beacon_ranks := 0         # Beacon: turn-start pulse on the nearly-dead
+var serenity := 0             # Serenity: the Cleric's rank (spawn stamps it)
+var serenity_guard := false   # party-wide stamp: one lethal save is banked
+var avatar_of_mercy := 0      # capstone: Mercy per turn, Empower free
+var living_sanctum := 0       # capstone: single-ally heals echo party-wide
 # Devout Conviction + tree (07-23). See talents.gd for the node text.
 var faith_stacks := 0         # Conviction: per-ALLY Faith (0-5)
 var communion_ranks := 0      # Communion: 5-stack procs can spread
@@ -341,6 +353,9 @@ var log_proc := Callable()
 # Mercy hook (set by the battle scene on heroes): fires when this unit
 # crosses below 50% health, from any damage source.
 var below_half_cb := Callable()
+# Serenity hook (set by the battle scene alongside serenity_guard): fires
+# when the guard saves this unit, so the battle can spend it party-wide.
+var serenity_cb := Callable()
 
 
 # The threshold is 50% by default; Guardian Angel stamps a higher one on
@@ -1229,6 +1244,13 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		hp = maxi(int(max_hp * 0.25), 1)
 		float_text("REBORN IN ASH", Color(1.0, 0.6, 0.2), true)
 		_proc_log("Talent: Ashes of Al'ar — %s rises from the ashes (25%% HP)" % unit_name)
+	# Serenity (Holy talent): the party's last net, after a unit's own
+	# saves — once per battle, the first lethal blow lands at 1 HP. The
+	# battle scene spends the guard party-wide via the callback.
+	if hp == 0 and serenity_guard and serenity_cb.is_valid():
+		hp = 1
+		float_text("SERENITY", Color(0.95, 0.9, 0.55), true)
+		serenity_cb.call(self)
 	if resource_name == "Rage":
 		resource = mini(resource + 10, max_resource)
 	# Enraged (talent): dropping below half HP grants a stacking damage buff,
@@ -1342,6 +1364,11 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 		hp = maxi(int(max_hp * 0.25), 1)
 		float_text("REBORN IN ASH", Color(1.0, 0.6, 0.2), true)
 		_proc_log("Talent: Ashes of Al'ar — %s rises from the ashes (25%% HP)" % unit_name)
+	# Serenity (Holy talent): the net catches tick deaths too.
+	if hp == 0 and serenity_guard and serenity_cb.is_valid():
+		hp = 1
+		float_text("SERENITY", Color(0.95, 0.9, 0.55), true)
+		serenity_cb.call(self)
 	# Blood Frenzy v2: tick-driven dives bank their floor too.
 	if passive_id == "bloodrage" and not dead:
 		frenzy_bonus()

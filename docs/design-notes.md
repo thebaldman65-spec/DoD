@@ -207,3 +207,26 @@ it — the only swap that keeps every entry in his resist block live
 somewhere in the run (shadow vs hexers, nature vs both forests, fire
 vs the burn zone) — and it reads right: the cleansing flame is what
 corruption should fear.
+
+**Holy lanes (Batch J) — the tree finally touches Empower:** six of
+twenty-four nodes were "deepen another node," and two of the three
+capstones were +2 ranks of something already owned — a capstone should
+be a new way to win, not a bigger number on a thing you have. And
+nothing anywhere touched Empower, the ✦ spend-a-stack-forgo-the-perfect
+toggle that is the most interesting decision in her kit (the same shape
+as the Swordmaster's Break having no lane before Batch F). So Mercy
+became the lane that runs the economy end to end: Zealous Light fixes
+the cold open (she started every fight at zero — Hymn uncastable on
+turn one, the held-stack bonus nonexistent), Ardor turns Empower from a
+surcharge into a rhythm (bank to the threshold, spend freely above it —
+holding was already rewarded, so the threshold is a live choice, not
+bookkeeping), and Avatar of Mercy makes the engine unconditional. The
+Radiance fork asks one question — what happens to healing that would
+have been wasted? — and answers it twice: Cascade pays crit investment,
+Overflow pays raw output. In-lane, where a fork reads as a choice; the
+old cross-lane Zealous ↔ Serenity pair read as a bug and is gone.
+Serenity itself became the safety net's signature (a guaranteed
+once-per-battle save beats a passive -8%), checked AFTER a unit's own
+death-refusals so the Berserker's rage still gets its moment. Living
+Sanctum echoes single-ally healing only — Hymn already IS the party,
+and an echo that echoed itself would be a balance loop, not a fantasy.

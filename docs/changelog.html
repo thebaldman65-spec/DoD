@@ -5,6 +5,62 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-30 — Batch J: the Holy tree becomes a designed set of lanes</h2>
+<ul>
+<li><b>The diagnosis:</b> six of the twenty-four converted nodes were "deepen another
+node," and two of the three capstones were the same trick — Avatar of Mercy was +2
+Heavenly Aura steps, Living Sanctum +2 Guardian Angel steps. Worse, nothing in the
+entire tree touched <b>Empower</b>, the most interesting decision in the kit, and the
+Zealous Light ↔ Serenity exclusive ran across lanes, which read as a bug. hl_martyr
+even duplicated hl_inner_faith (both wrote max_hp_pct).</li>
+<li><b>Holy is now a purpose-designed node-gated lane tree</b> (tiers at 2/4 nodes
+in-lane, capstone at 6) — Radiance (throughput) / Mercy (the resource economy) /
+Sanctuary (the safety net). Every id survives and re-specs in place, so saved ranks
+migrate; only Serenity's cap shrank (2 → 1) and the loader refunds the extra point.
+The conversion entry is gone; unchanged payloads moved verbatim.</li>
+<li><b>The Mercy lane now runs the whole economy.</b> Zealous Light: begin each battle
+with 1 Mercy per rank (×3) — Mercy was purely reactive, Hymn literally uncastable on
+turn one. Ardor: while holding 4+ Mercy (3+ at rank 2), Empowering consumes no stack —
+bank to the threshold, then Empower freely. Martyr's Vigor: the Mercy ceiling rises to
+6, then 7. Avatar of Mercy (capstone): +1 Mercy at the start of each of her turns and
+Empower costs no stack — it supersedes Ardor and Sanctified in the no-cost chain
+(either/or, never a double refund).</li>
+<li><b>Radiance forks on wasted healing:</b> Radiant Cascade (a CRITICAL heal splashes
+25%/rank onto the lowest-health other ally — needs Triage to fire at all) is exclusive
+with Overflow (15%/rank of any overhealing spills onto the lowest-health other ally,
+reading the same overheal Capacitor banks from, at the same three sites: Heal, Hymn
+voices, Renewal's perfect burst). In-lane, one decision, two builds.</li>
+<li><b>Sanctuary stops healing after the fact:</b> Blessed Vestments (allies with
+Renewal take 5%/rank less damage — target-side, while the Cleric stands), Beacon (at
+the start of each of her turns, every ally below 25% heals 5%/rank of their max — no
+cast spent), Serenity (once per battle, the FIRST ally to take lethal damage survives
+at 1 HP; checked after a unit's own saves like Undying Rage and Ashes, and spent
+party-wide). Living Sanctum (capstone): all the healing she grants a single ally —
+Heal, Renewal casts AND ticks (snapshotted on the status), Divine Plea — also heals
+the whole party for 25% of its value; Hymn is already the whole party, so it does not
+echo itself, and echoes never echo.</li>
+<li><b>Verified:</b> both scenes parse clean; the talent audit passes 24 / 3 capstones /
+7-7-7 for all 12 specs plus the Batch J checks (node-gated, all 24 ids preserved,
+in-lane exclusive, old cross-lane pair gone, gating and capstone bars behave). Every
+re-specced node fires in forced-learn sims (30 battles: Zealous 30, Martyr 30, Ardor 19,
+Cascade 9, Overflow 64, Vestments 49, Beacon 5, Serenity 2; capstones separately:
+Avatar 57, Sanctum 55 over 10). The user's real pre-change save loads with ranks
+intact, and a synthetic hl_serenity:2 save migrates to 1 with the point refunded
+(the live save was byte-restored after the test).</li>
+<li><b>Balance watch:</b> sim 200 with no talents is flat against the pre-change
+baseline (wins 100% → 100%, healing/battle 168 → 157, deaths 0.31 → 0.28 — noise;
+every new hook is rank-gated). With the full 18-point forced loadout, healing/battle
+rises 168 → 295 and deaths drop to 0.20 — Zealous Light and the Mercy multiplier
+compound exactly as the design doc predicted; flagged for playtest tuning.</li>
+<li><b>Docs housekeeping in the same pass:</b> §7's framework counts still said "four
+purpose-designed / eight conversions" (stale since Batches F and H) — now seven and
+five, with the node-gated list corrected; a leftover pre-lanes "Warden tree" paragraph
+(contradicting Batch H's block) was removed, as was the old row-tree Holy paragraph.
+The batch doc's report of a missing Mercy lane in §7 was already fixed in an earlier
+docs pass — the lane was present; the entry is now replaced wholesale by the designed
+tree.</li>
+</ul>
+
 <h2>2026-07-30 — Batch I: the Cleric spec stat blocks land</h2>
 <ul>
 <li><b>All three Cleric specs get their own health, armour and resists</b> via the

@@ -434,6 +434,13 @@ func _spawn_units() -> void:
 				if pool_ab != null \
 						and not cfg["abilities"].any(func(a): return a.display_name == pool_ab.display_name):
 					cfg["abilities"] = cfg["abilities"] + [pool_ab]
+		# Mercy talents move the ceiling and the starting line — re-read
+		# them AFTER talents so Martyr's Vigor / Zealous Light are visible
+		# in cfg (the Sharpshooter Focus pattern below).
+		if spec == "holy":
+			cfg["second_max"] = 5 + int(cfg.get("mercy_cap_bonus", 0))
+			cfg["second_resource"] = mini(int(cfg.get("zealous_mercy", 0)),
+				int(cfg["second_max"]))
 		# Focus is the Sharpshooter's second resource (0-100; talents move
 		# the ceiling and the starting line). Set AFTER talents so Deep
 		# Focus / Spray of Arrows / Opening Volley are visible in cfg.
@@ -570,6 +577,13 @@ func _spawn_units() -> void:
 		for h in heroes:
 			h.mercy_threshold = 0.5 + 0.03 * ga_ranks
 			h.last_hope_bonus = lh_ranks
+
+	# Serenity (Holy talent): the whole party carries one banked lethal
+	# save — stamped like the rest, spent for everyone via the callback.
+	if heroes.any(func(h): return h.serenity > 0):
+		for h in heroes:
+			h.serenity_guard = true
+			h.serenity_cb = _on_serenity_save
 
 	var composition: Array = ["raider", "chief", "archer", "archer"]
 	# DOD_SIM_ENEMIES="boss,shieldmaster,shaman" forces the enemy lineup in
@@ -990,6 +1004,17 @@ func _run_battle() -> void:
 	# The warband's theme opens the log — the composition isn't random.
 	if Run.active and String(Run.encounter.get("theme", "")) != "":
 		_log("Enemy warband: %s" % Run.encounter["theme"], "#c8b880")
+	# Zealous Light / Martyr's Vigor (Holy talents): the Cleric opens the
+	# battle with Mercy already in hand, and a deeper well to keep it in.
+	for zl_h in heroes:
+		if zl_h.dead or zl_h.second_resource_name != "Mercy":
+			continue
+		if zl_h.mercy_cap_bonus > 0:
+			_log("Talent: Martyr's Vigor — %s's Mercy ceiling rises to %d" % [
+				zl_h.unit_name, zl_h.second_max], "#b0a8e0")
+		if zl_h.zealous_mercy > 0 and zl_h.second_resource > 0:
+			_log("Talent: Zealous Light — %s opens with %d Mercy" % [
+				zl_h.unit_name, zl_h.second_resource], "#b0a8e0")
 	# Epidemic (Survivalist capstone): the rot is already in every vein.
 	for ep_h in heroes:
 		if not ep_h.dead and ep_h.epidemic > 0:
@@ -1121,6 +1146,12 @@ func _run_battle() -> void:
 					u.float_text("Mended: %s" % mended, Color(0.5, 0.95, 0.6))
 					_log("   → Talent: On the Mend — Renewal washes the %s off %s" % [
 						mended, u.unit_name], "#b0a8e0")
+			# Living Sanctum (snapshotted on the status): the Cleric's
+			# Renewal ticks echo to the party while she stands.
+			if ren_stat.get("sanctum", false) and ren_got > 0:
+				var sn_c := _living_hero_with("living_sanctum")
+				if sn_c != null:
+					_sanctum_echo(sn_c, ren_got)
 		# Bulwark of Fortitude: the stand knits flesh every turn.
 		if u.has_status("bulwark"):
 			var bw_amt := maxi(int(round(u.max_hp * 0.10)), 1)
@@ -1193,6 +1224,27 @@ func _run_battle() -> void:
 						Color(0.5, 0.95, 0.6))
 					_log("   → Field Medic: %s washes %s off %s" % [
 						u.unit_name, fm_washed, fm_ally.unit_name], "#70d878")
+		# Avatar of Mercy (Holy capstone): the well refills on its own.
+		if u.is_hero and not u.dead and u.avatar_of_mercy > 0 \
+				and u.second_resource_name == "Mercy" \
+				and u.second_resource < u.second_max:
+			u.second_resource += 1
+			u.float_text("+1 Mercy", Color(0.95, 0.8, 0.3))
+			u.refresh_bars()
+			_log("   → Capstone: Avatar of Mercy — the well rises (%d/%d)" % [
+				u.second_resource, u.second_max], "#e8c860")
+		# Beacon (Holy talent): as the Cleric's turn begins, her light
+		# reaches everyone at death's door — no cast spent.
+		if u.is_hero and not u.dead and u.beacon_ranks > 0:
+			for bc_h in heroes.filter(
+					func(h): return not h.dead and not h.is_companion and h.hp < h.max_hp * 0.25):
+				var bc_amt := maxi(int(round(bc_h.max_hp * 0.05 * u.beacon_ranks
+					* _healing_done_mult(u))), 1)
+				var bc_got: int = bc_h.heal_amount(bc_amt, bc_h != u)
+				bc_h.float_text("+%d" % bc_got, Color(0.95, 0.9, 0.6))
+				_stat("healing", bc_got)
+				_log("   → Talent: Beacon — the light finds %s (+%d)" % [
+					bc_h.unit_name, bc_got], "#b0a8e0")
 		# Survivalist traps spring the moment their victim moves: the snare
 		# on this enemy first, then any armed deadfall (whoever acts first).
 		if not u.is_hero and not u.dead and u.has_status("snared"):
@@ -1969,19 +2021,22 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 					and u.ability_ready(res_ab):
 				var fallen := heroes.filter(func(h): return h.dead)
 				if not fallen.is_empty():
-					empower_armed = u.second_resource >= res_ab.faith_cost + 1
+					empower_armed = u.avatar_of_mercy > 0 \
+						or u.second_resource >= res_ab.faith_cost + 1
 					return [res_ab, fallen[0]]
 			var dplea := _find_ability(u, "Divine Plea")
 			if dplea != null and u.second_resource >= dplea.faith_cost \
 					and u.ability_ready(dplea) \
 					and weakest_ally.hp < weakest_ally.max_hp * 0.35:
-				empower_armed = u.second_resource >= dplea.faith_cost + 1 \
+				empower_armed = (u.avatar_of_mercy > 0 \
+					or u.second_resource >= dplea.faith_cost + 1) \
 					and weakest_ally.count_debuffs() > 0
 				return [dplea, weakest_ally]
 			var hymn := _find_ability(u, "Hymn of Hope")
 			if hymn != null and u.second_resource >= hymn.faith_cost and u.ability_ready(hymn) \
 					and weakest_ally.hp < weakest_ally.max_hp * 0.6:
-				empower_armed = u.second_resource >= hymn.faith_cost + 2
+				empower_armed = u.avatar_of_mercy > 0 \
+					or u.second_resource >= hymn.faith_cost + 2
 				return [hymn, u]
 			var hheal := _find_ability(u, "Heal")
 			if hheal != null and u.resource >= hheal.cost and u.ability_ready(hheal) \
@@ -2237,7 +2292,7 @@ func _show_actions(u: BattleUnit) -> void:
 		emp_btn.text = "✦ Empower (C)"
 		emp_btn.custom_minimum_size = Vector2(112, 32)
 		emp_btn.add_theme_font_size_override("font_size", 13)
-		emp_btn.disabled = u.second_resource < 1
+		emp_btn.disabled = u.second_resource < 1 and u.avatar_of_mercy <= 0
 		emp_btn.tooltip_text = "Spend +1 Mercy to Empower the next\nHeal / Renewal / Hymn / Resurrection /\nDivine Plea. Empowered casts forgo\ntheir perfect bonus. C toggles."
 		emp_btn.toggled.connect(func(on: bool): empower_armed = on)
 		action_box.add_child(emp_btn)
@@ -3680,6 +3735,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_log("   → Talent: Shared Vigil — %s is covered (-%d%%)" % [
 						strike_target.unit_name,
 						3 * sv_w.shared_vigil_ranks], "#b0a8e0")
+			# Blessed Vestments: Renewal wraps its bearer in cloth-of-light
+			# — the blessing rides the status, while the Cleric stands.
+			if strike_target.is_hero and not strike_target.is_companion \
+					and strike_target.has_status("renewal"):
+				var bv_w := _living_hero_with("vestments_ranks")
+				if bv_w != null:
+					raw *= 1.0 - 0.05 * bv_w.vestments_ranks
+					_log("   → Talent: Blessed Vestments — Renewal shields %s (-%d%%)" % [
+						strike_target.unit_name,
+						5 * bv_w.vestments_ranks], "#b0a8e0")
 			# Ruin: the Old Gods' mark cracks the target open (+2%/stack).
 			if not strike_target.is_hero and strike_target.has_status("ruin") \
 					and _living_occultist() != null:
@@ -4804,6 +4869,78 @@ func _bank_overheal(caster: BattleUnit, target: BattleUnit) -> void:
 		banked, caster.stored_overheal], "#b0a8e0")
 
 
+# Radiant Cascade: a critical heal splashes a share of its value onto the
+# lowest-health OTHER ally (needs Triage — nothing else crits a heal).
+func _radiant_cascade(caster: BattleUnit, healed: int, primary: BattleUnit) -> void:
+	if caster.cascade_ranks <= 0 or healed <= 0:
+		return
+	var cc_pool: Array = heroes.filter(
+		func(h): return not h.dead and not h.is_companion and h != primary)
+	if cc_pool.is_empty():
+		return
+	var cc_t: BattleUnit = _lowest_hp(cc_pool)
+	if cc_t.hp >= cc_t.max_hp:
+		return
+	var cc_amt := int(round(healed * 0.25 * caster.cascade_ranks))
+	if cc_amt <= 0:
+		return
+	var cc_got: int = cc_t.heal_amount(cc_amt, cc_t != caster)
+	cc_t.float_text("+%d" % cc_got, Color(0.95, 0.9, 0.6))
+	_stat("healing", cc_got)
+	_log("   → Talent: Radiant Cascade — the crit splashes %d onto %s" % [
+		cc_got, cc_t.unit_name], "#b0a8e0")
+
+
+# Overflow: a share of the overheal spills onto the lowest-health OTHER
+# ally at once. Reads the same overheal Holy Capacitor banks from, at the
+# same three sites (Heal, Hymn voices, Renewal's perfect burst).
+func _overflow_spill(caster: BattleUnit, target: BattleUnit) -> void:
+	if caster.overflow_ranks <= 0 or target.last_overheal <= 0:
+		return
+	var ov_pool: Array = heroes.filter(
+		func(h): return not h.dead and not h.is_companion and h != target)
+	if ov_pool.is_empty():
+		return
+	var ov_t: BattleUnit = _lowest_hp(ov_pool)
+	if ov_t.hp >= ov_t.max_hp:
+		return
+	var ov_amt := int(round(target.last_overheal * 0.15 * caster.overflow_ranks))
+	if ov_amt <= 0:
+		return
+	var ov_got: int = ov_t.heal_amount(ov_amt, ov_t != caster)
+	ov_t.float_text("+%d" % ov_got, Color(0.95, 0.9, 0.6))
+	_stat("healing", ov_got)
+	_log("   → Talent: Overflow — %d overhealing spills onto %s" % [
+		ov_got, ov_t.unit_name], "#b0a8e0")
+
+
+# Living Sanctum (capstone): every heal the Cleric grants a single ally
+# washes over the whole party at a quarter strength. Hymn is already the
+# whole party, and the echo never echoes itself.
+func _sanctum_echo(caster: BattleUnit, value: int) -> void:
+	if caster.living_sanctum <= 0 or value <= 0:
+		return
+	var ls_amt := int(round(value * 0.25))
+	if ls_amt <= 0:
+		return
+	for ls_h in heroes.filter(func(he): return not he.dead and not he.is_companion):
+		var ls_got: int = ls_h.heal_amount(ls_amt, ls_h != caster)
+		if ls_got > 0:
+			ls_h.float_text("+%d" % ls_got, Color(0.95, 0.9, 0.6))
+			_stat("healing", ls_got)
+	_log("   → Capstone: Living Sanctum — the light washes over the party (%d each)" % \
+		ls_amt, "#b0a8e0")
+
+
+# Serenity: the banked lethal save is spent for the WHOLE party the moment
+# it catches someone (the unit-side check floors the hit at 1 HP).
+func _on_serenity_save(saved: BattleUnit) -> void:
+	for h in heroes:
+		h.serenity_guard = false
+	_log("   → Talent: Serenity — %s survives the killing blow at 1 HP" % \
+		saved.unit_name, "#b0a8e0")
+
+
 # Divine Shield: applies the barrier and stamps the tree's riders on it
 # (Blessed Barrier heal share; Afterglow heal on break).
 func _grant_divine_shield(devout: BattleUnit, target: BattleUnit, power: int) -> void:
@@ -5034,10 +5171,22 @@ func _consume_empower(attacker: BattleUnit, ab: Ability) -> bool:
 	empower_armed = false
 	if ab.special not in ["holy_heal", "renewal", "hymn", "resurrection", "divine_plea"]:
 		return false
-	if attacker.second_resource_name != "Mercy" or attacker.second_resource < 1:
+	if attacker.second_resource_name != "Mercy":
 		return false
+	# Avatar of Mercy makes Empower unconditional — no stack even needed.
+	if attacker.second_resource < 1 and attacker.avatar_of_mercy <= 0:
+		return false
+	# The no-cost checks are either/or — never a double refund: Avatar of
+	# Mercy (unconditional) supersedes Ardor (held-Mercy threshold), and
+	# Sanctified only rolls when a stack would actually be spent.
+	if attacker.avatar_of_mercy > 0:
+		_log("   → Capstone: Avatar of Mercy — the Empowerment costs nothing", "#b0a8e0")
+	elif attacker.ardor_ranks > 0 \
+			and attacker.second_resource >= 5 - attacker.ardor_ranks:
+		attacker.float_text("Mercy preserved", Color(0.95, 0.8, 0.3))
+		_log("   → Talent: Ardor — held Mercy carries the Empowerment; no stack is consumed", "#b0a8e0")
 	# Sanctified (talent): the surcharge can be refunded too.
-	if attacker.sanctified_ranks > 0 and randf() < 0.10 * attacker.sanctified_ranks:
+	elif attacker.sanctified_ranks > 0 and randf() < 0.10 * attacker.sanctified_ranks:
 		attacker.float_text("Mercy preserved", Color(0.95, 0.8, 0.3))
 		_log("   → Talent: Sanctified — the Empowerment costs nothing", "#b0a8e0")
 	else:
@@ -5218,6 +5367,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					Color(0.4, 0.9, 0.45), h_crit > 1.0)
 				_stat("healing", got)
 				_bank_overheal(attacker, h)
+				_overflow_spill(attacker, h)
+				if h_crit > 1.0:
+					_radiant_cascade(attacker, got, h)
 			_message("%s sings the Hymn of Hope!" % attacker.unit_name)
 			_log("%s: Hymn of Hope — party heals %d%%%s" % [attacker.unit_name,
 				int(round(pct * 100)), " (Empowered)" if empowered else ""], "#70d878")
@@ -5781,6 +5933,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					_apply_status(target, "renewal", 5, 0, rez_tick)
 					if target.has_status("renewal"):
 						target.get_status("renewal")["mend"] = attacker.on_mend_ranks
+						target.get_status("renewal")["sanctum"] = attacker.living_sanctum > 0
 				_sfx("heal", -4.0, 0.65)
 				target.float_text("RESURRECTED", Color(0.95, 0.9, 0.55))
 				target.next_time = attacker.next_time \
@@ -5903,6 +6056,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				Color(0.4, 0.9, 0.45), hh_crit > 1.0)
 			_stat("healing", hh_got)
 			_bank_overheal(attacker, target)
+			_overflow_spill(attacker, target)
+			if hh_crit > 1.0:
+				_radiant_cascade(attacker, hh_got, target)
+			_sanctum_echo(attacker, hh_got)
 			var hh_note := ""
 			if empowered:
 				var purged := target.purge_debuffs()
@@ -5923,6 +6080,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var dp_got: int = target.heal_amount(target.max_hp, target != attacker)
 			target.float_text("+%d" % dp_got, Color(0.4, 0.9, 0.45))
 			_stat("healing", dp_got)
+			_sanctum_echo(attacker, dp_got)
 			var dp_note := ""
 			if empowered:
 				var dp_purged := target.purge_debuffs()
@@ -5954,22 +6112,31 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_apply_status(target, "renewal", 5, 0, ren_tick)
 			target.update_status("renewal", "R+",
 				"Renewal: restores %d HP at the start\nof each turn (15%% of the caster's\nmax health)." % ren_tick)
-			# On the Mend rides the status: ticks can dispel (snapshotted).
+			# On the Mend and Living Sanctum ride the status (snapshotted):
+			# ticks can dispel, and can echo to the party.
 			if target.has_status("renewal"):
 				target.get_status("renewal")["mend"] = attacker.on_mend_ranks
+				target.get_status("renewal")["sanctum"] = attacker.living_sanctum > 0
 			if empowered and target != attacker:
 				_apply_status(attacker, "renewal", 5, 0, ren_tick)
 				attacker.update_status("renewal", "R+",
 					"Renewal: restores %d HP at the start\nof each turn (15%% of the caster's\nmax health)." % ren_tick)
 				if attacker.has_status("renewal"):
 					attacker.get_status("renewal")["mend"] = attacker.on_mend_ranks
+					attacker.get_status("renewal")["sanctum"] = attacker.living_sanctum > 0
 			if is_perfect:
-				var ren_burst := maxi(int(round(attacker.max_hp * 0.05
-					* _heal_crit_mult(attacker))), 1)
+				# Triage: the burst can crit (captured so Radiant Cascade
+				# knows to splash).
+				var rb_crit := _heal_crit_mult(attacker)
+				var ren_burst := maxi(int(round(attacker.max_hp * 0.05 * rb_crit)), 1)
 				var burst_got: int = target.heal_amount(ren_burst, target != attacker)
 				target.float_text("+%d" % burst_got, Color(0.4, 0.9, 0.45))
 				_stat("healing", burst_got)
 				_bank_overheal(attacker, target)
+				_overflow_spill(attacker, target)
+				if rb_crit > 1.0:
+					_radiant_cascade(attacker, burst_got, target)
+				_sanctum_echo(attacker, burst_got)
 			_message("%s blesses %s with Renewal" % [attacker.unit_name, target.unit_name])
 			_log("%s: Renewal on %s — %d HP/turn for 5 turns%s" % [attacker.unit_name,
 				target.unit_name, ren_tick,
@@ -6811,7 +6978,8 @@ func _input(event: InputEvent) -> void:
 		if event.keycode == KEY_C and action_panel.visible \
 				and current_hero != null \
 				and current_hero.second_resource_name == "Mercy" \
-				and current_hero.second_resource >= 1:
+				and (current_hero.second_resource >= 1 \
+					or current_hero.avatar_of_mercy > 0):
 			empower_armed = not empower_armed
 			_show_actions(current_hero)
 			get_viewport().set_input_as_handled()

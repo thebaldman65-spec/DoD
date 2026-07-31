@@ -87,70 +87,6 @@ const FIXED_TREES := {
 				"perfect_id": "", "perfect_text": "Cooldown becomes 4 instead",
 				"description": "The cold detonates: every Chilled\nenemy takes 10% of Attack PER STACK\nof Chilled on it."}}},
 	],
-	"holy": [
-		# --- row 0 ---
-		{"id": "hl_triage", "name": "Triage", "ranks": 3, "row": 0, "col": 1,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Instant heals can CRIT (x1.5, using your critical strike chance), and all your healing is increased by {v}%.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"triage_ranks": 1}}},
-		{"id": "hl_heavenly", "name": "Heavenly Aura", "ranks": 3, "row": 0, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Each stack of Mercy grants {v}% healing done (up from the base 5%).",
-			"scale": {"base": 5, "step": 5},
-			"payload": {"stat": {"heavenly_ranks": 1}}},
-		{"id": "hl_holy_light", "name": "Holy Light", "ranks": 3, "row": 0, "col": 3,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Perfect casts restore {v}% of your maximum Mana.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"holy_light_ranks": 1}}},
-		# --- row 1 ---
-		{"id": "hl_guardian", "name": "Guardian Angel", "ranks": 3, "row": 1, "col": 0,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Allies falling below {v}% health earn you a stack of Mercy (up from 50%).",
-			"scale": {"base": 50, "step": 3},
-			"payload": {"stat": {"guardian_ranks": 1}}},
-		{"id": "hl_presence", "name": "Divine Presence", "ranks": 3, "row": 1, "col": 1,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "At the end of your turn, the lowest-health ally is healed for {v}% of their maximum health.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"divine_presence_ranks": 1}}},
-		{"id": "hl_resurrection", "name": "Resurrection", "ranks": 1, "row": 1, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "New ability: Resurrection — spend 3 Mercy to return a fallen ally to life with 20% health and resource; Empower (+1 Mercy): full health and resource plus 5 turns of Renewal (4.0 int, 3cd).",
-			"payload": {"grant_ability": "Resurrection"}},
-		{"id": "hl_last_hope", "name": "Last Hope", "ranks": 3, "row": 1, "col": 3,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Allies under 25% of their max health receive {v}% more healing.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"last_hope_ranks": 1}}},
-		{"id": "hl_inner_faith", "name": "Inner Faith", "ranks": 3, "row": 1, "col": 4,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Increases your maximum health by {v}%.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"max_hp_pct": 0.05}}},
-		# --- row 2 ---
-		{"id": "hl_capacitor", "name": "Holy Capacitor", "ranks": 3, "row": 2, "col": 1,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "{v}% of your overhealing is stored and released by your next Heal.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"capacitor_ranks": 1}}},
-		{"id": "hl_on_mend", "name": "On the Mend", "ranks": 3, "row": 2, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Renewal ticks have a {v}% chance to dispel one harmful effect from the bearer.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"on_mend_ranks": 1}}},
-		{"id": "hl_sanctified", "name": "Sanctified", "ranks": 3, "row": 2, "col": 3,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Spending Mercy has a {v}% chance to consume no stacks.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"sanctified_ranks": 1}}},
-		# --- row 3 (capstone) ---
-		{"id": "hl_divine_plea", "name": "Divine Plea", "ranks": 1, "row": 3, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "New ability: Divine Plea — spend 2 Mercy to FULLY heal an ally; Empower (+1 Mercy): also cleanse all debuffs and Consecrate them against new ones for 3 turns (3.0 int, 2cd).",
-			"payload": {"grant_ability": "Divine Plea"}},
-	],
 	"inquisitor": [
 		# --- row 0 ---
 		{"id": "dv_communion", "name": "Communion", "ranks": 3, "row": 0, "col": 1,
@@ -885,6 +821,153 @@ const LANE_TREES := {
 				"perfect_id": "", "perfect_text": "Refunds 5 Rage",
 				"description": "Embolden the party: 50% less Break\ndamage for 2 turns, and no one can die\nfor a turn."}}},
 	],
+	"holy": [
+		# Purpose-designed lanes (Batch J, 07-30) — NODE-GATED (tiers open
+		# on nodes bought in the lane: 2/4, capstone at 6). Every id
+		# survives and re-specs in place, so saved ranks migrate (only
+		# hl_serenity's cap shrank 2 → 1 — the loader refunds the extra
+		# rank). Six of the old 24 nodes were "deepen another node" and two
+		# of the three capstones were +2 ranks of something already owned;
+		# worse, NOTHING touched Empower — the most interesting decision in
+		# the kit. The Mercy lane now runs the resource economy end to end:
+		# earning stacks, holding them, spending them, and Empower itself.
+		# --- Lane A: Radiance — throughput: bigger heals, cheaper heals,
+		# less waste. ---
+		{"id": "hl_triage", "name": "Triage", "ranks": 3, "lane": "Radiance", "tier": 0,
+			"node_gated": true,
+			"desc": "Instant heals can CRIT (x1.5, using your critical strike chance), and all your healing is increased by {v}%.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"triage_ranks": 1}}},
+		{"id": "hl_soothe", "name": "Soothing Touch", "ranks": 2, "lane": "Radiance", "tier": 0,
+			"desc": "Renewal costs {v} less Mana.", "scale": {"step": 5},
+			"payload": {"ability": "Renewal", "add": {"cost": -5}}},
+		{"id": "hl_on_mend", "name": "On the Mend", "ranks": 3, "lane": "Radiance", "tier": 1,
+			"desc": "Renewal ticks have a {v}% chance to dispel one harmful effect from the bearer.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"on_mend_ranks": 1}}},
+		{"id": "hl_capacitor", "name": "Holy Capacitor", "ranks": 3, "lane": "Radiance", "tier": 1,
+			"desc": "{v}% of your overhealing is stored and released by your next Heal.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"capacitor_ranks": 1}}},
+		{"id": "hl_swift", "name": "Swift Mending", "ranks": 1, "lane": "Radiance", "tier": 2,
+			"desc": "Heal's cooldown is reduced by 1 turn.",
+			"payload": {"ability": "Heal", "add": {"cooldown": -1}}},
+		# Re-spec (was Brilliance, a Triage deepener; same id, so saved
+		# ranks carry). One half of the wasted-healing fork: crit
+		# investment pays out sideways — it needs Triage to fire at all.
+		{"id": "hl_brilliance", "name": "Radiant Cascade", "ranks": 2, "lane": "Radiance", "tier": 2,
+			"exclusive_with": "hl_overflow",
+			"desc": "A CRITICAL heal also splashes {v}% of its value onto the lowest-health other ally.",
+			"scale": {"step": 25},
+			"payload": {"stat": {"cascade_ranks": 1}}},
+		# Re-spec (was a Holy Capacitor deepener): the other half of the
+		# fork — raw output spills over instead of banking. Pairs with
+		# Capacitor, which drinks from the same overheal.
+		{"id": "hl_overflow", "name": "Overflow", "ranks": 2, "lane": "Radiance", "tier": 2,
+			"exclusive_with": "hl_brilliance",
+			"desc": "{v}% of any overhealing spills onto the lowest-health other ally immediately.",
+			"scale": {"step": 15},
+			"payload": {"stat": {"overflow_ranks": 1}}},
+		# --- Lane B: Mercy — the resource economy: earning stacks,
+		# spending stacks, and Empower. The lane that didn't exist. ---
+		{"id": "hl_heavenly", "name": "Heavenly Aura", "ranks": 3, "lane": "Mercy", "tier": 0,
+			"desc": "Each stack of Mercy grants {v}% healing done (up from the base 5%).",
+			"scale": {"base": 5, "step": 5},
+			"payload": {"stat": {"heavenly_ranks": 1}}},
+		{"id": "hl_holy_light", "name": "Holy Light", "ranks": 3, "lane": "Mercy", "tier": 0,
+			"desc": "Perfect casts restore {v}% of your maximum Mana.",
+			"scale": {"step": 1},
+			"payload": {"stat": {"holy_light_ranks": 1}}},
+		# Re-spec (was +4% damage on a 50-Attack healer, and half of a
+		# cross-lane exclusive that read as a bug): Mercy is purely
+		# reactive — she started every fight at zero, Hymn uncastable on
+		# turn one. Now she opens with a working kit.
+		{"id": "hl_zealous", "name": "Zealous Light", "ranks": 3, "lane": "Mercy", "tier": 0,
+			"desc": "The Cleric begins each battle with {v} Mercy.",
+			"scale": {"step": 1},
+			"payload": {"stat": {"zealous_mercy": 1}}},
+		{"id": "hl_sanctified", "name": "Sanctified", "ranks": 3, "lane": "Mercy", "tier": 1,
+			"desc": "Spending Mercy has a {v}% chance to consume no stacks.",
+			"scale": {"step": 10},
+			"payload": {"stat": {"sanctified_ranks": 1}}},
+		{"id": "hl_resurrection", "name": "Resurrection", "ranks": 1, "lane": "Mercy", "tier": 1,
+			"desc": "New ability: Resurrection — spend 3 Mercy to return a fallen ally to life with 20% health and resource; Empower (+1 Mercy): full health and resource plus 5 turns of Renewal (4.0 int, 3cd).",
+			"payload": {"grant_ability": "Resurrection"}},
+		# Re-spec (was a Heavenly Aura deepener): the Empower support the
+		# tree never had, and a rhythm rather than a discount — bank to
+		# the threshold, then Empower freely until you drop below it.
+		# Holding Mercy is already rewarded by the healing bonus, so this
+		# deepens a decision that is genuinely live.
+		{"id": "hl_ardor", "name": "Ardor", "ranks": 2, "lane": "Mercy", "tier": 1,
+			"desc": "While the Cleric holds {v} or more Mercy, Empowering consumes no stack.",
+			"scale": {"base": 5, "step": -1},
+			"payload": {"stat": {"ardor_ranks": 1}}},
+		# Re-spec (was an Inner Faith duplicate — both wrote max_hp_pct):
+		# the lane's payoff. A bigger cap is more held bonus AND more
+		# banked spenders at once.
+		{"id": "hl_martyr", "name": "Martyr's Vigor", "ranks": 2, "lane": "Mercy", "tier": 2,
+			"desc": "Mercy's maximum rises to {v}.",
+			"scale": {"base": 5, "step": 1},
+			"payload": {"stat": {"mercy_cap_bonus": 1}}},
+		# --- Lane C: Sanctuary — the safety net: keeping people from
+		# dying, rather than healing them after. ---
+		{"id": "hl_guardian", "name": "Guardian Angel", "ranks": 3, "lane": "Sanctuary", "tier": 0,
+			"desc": "Allies falling below {v}% health earn you a stack of Mercy (up from 50%).",
+			"scale": {"base": 50, "step": 3},
+			"payload": {"stat": {"guardian_ranks": 1}}},
+		{"id": "hl_presence", "name": "Divine Presence", "ranks": 3, "lane": "Sanctuary", "tier": 0,
+			"desc": "At the end of your turn, the lowest-health ally is healed for {v}% of their maximum health.",
+			"scale": {"step": 1},
+			"payload": {"stat": {"divine_presence_ranks": 1}}},
+		{"id": "hl_last_hope", "name": "Last Hope", "ranks": 3, "lane": "Sanctuary", "tier": 1,
+			"desc": "Allies under 25% of their max health receive {v}% more healing.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"last_hope_ranks": 1}}},
+		{"id": "hl_inner_faith", "name": "Inner Faith", "ranks": 3, "lane": "Sanctuary", "tier": 1,
+			"desc": "Increases your maximum health by {v}%.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"max_hp_pct": 0.05}}},
+		# Re-spec (was +3% armor): Renewal becomes a protective tool as
+		# well as a heal — and the Radiance lane gains a reason to splash.
+		{"id": "hl_vestments", "name": "Blessed Vestments", "ranks": 2, "lane": "Sanctuary", "tier": 1,
+			"desc": "Allies with Renewal on them take {v}% less damage.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"vestments_ranks": 1}}},
+		# Re-spec (was a Divine Presence deepener): triage that happens
+		# without spending a turn.
+		{"id": "hl_beacon", "name": "Beacon", "ranks": 2, "lane": "Sanctuary", "tier": 2,
+			"desc": "At the start of each of the Cleric's turns, every ally below 25% health heals {v}% of their maximum health.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"beacon_ranks": 1}}},
+		# Re-spec (was flat -4% damage taken, and the other half of the
+		# cross-lane exclusive; ranks 2 → 1 — the loader refunds the
+		# over-cap rank): the safety net's signature moment.
+		{"id": "hl_serenity", "name": "Serenity", "ranks": 1, "lane": "Sanctuary", "tier": 2,
+			"desc": "Once per battle, the first ally to take lethal damage survives at 1 HP instead.",
+			"payload": {"stat": {"serenity": 1}}},
+		# --- Capstones: take ONE (6 nodes bought in the lane) ---
+		{"id": "hl_divine_plea", "name": "Divine Plea", "ranks": 1, "lane": "Radiance", "tier": 2,
+			"capstone": true,
+			"desc": "New ability: Divine Plea — spend 2 Mercy to FULLY heal an ally; Empower (+1 Mercy): also cleanse all debuffs and Consecrate them against new ones for 3 turns (3.0 int, 2cd).",
+			"payload": {"grant_ability": "Divine Plea"}},
+		# Re-spec (was +2 Heavenly Aura steps): Mercy turns from a
+		# reactive trickle into an engine, and Empower goes unconditional
+		# — the payoff for a lane built on the resource. Supersedes Ardor
+		# rather than stacking with it (the free-Empower checks are
+		# either/or, never a double refund).
+		{"id": "hl_avatar", "name": "Avatar of Mercy", "ranks": 1, "lane": "Mercy", "tier": 2,
+			"capstone": true,
+			"desc": "The Cleric gains 1 Mercy at the start of each of her turns, and Empower costs no stack.",
+			"payload": {"stat": {"avatar_of_mercy": 1}}},
+		# Re-spec (was +2 Guardian Angel steps): every heal she grants a
+		# single ally becomes a party heal — the fantasy the lane name
+		# was always promising. (Hymn is already the whole party, so it
+		# does not echo itself.)
+		{"id": "hl_sanctum", "name": "Living Sanctum", "ranks": 1, "lane": "Sanctuary", "tier": 2,
+			"capstone": true,
+			"desc": "All the healing the Cleric grants a single ally — Heal, Renewal and its ticks, Divine Plea — also heals the whole party for 25% of its value.",
+			"payload": {"stat": {"living_sanctum": 1}}},
+	],
 	"mystic": [
 		# Survivalist — NODE-GATED (tiers open on nodes bought in the lane:
 		# 2/4, capstone at 6). Lanes: Venom / Snares / Guerilla.
@@ -1215,59 +1298,6 @@ const LANE_CONVERSIONS := {
 				"capstone": true,
 				"desc": "Hungering Cold deepens two steps and +6% max health.",
 				"payload": {"stat": {"hungering_ranks": 2, "max_hp_pct": 0.06}}},
-		],
-	},
-	"holy": {
-		"map": {
-			"hl_heavenly": ["Mercy", 0], "hl_holy_light": ["Mercy", 0],
-			"hl_sanctified": ["Mercy", 1], "hl_resurrection": ["Mercy", 1],
-			"hl_triage": ["Radiance", 0], "hl_on_mend": ["Radiance", 1],
-			"hl_capacitor": ["Radiance", 1],
-			"hl_guardian": ["Sanctuary", 0], "hl_inner_faith": ["Sanctuary", 0],
-			"hl_last_hope": ["Sanctuary", 1], "hl_presence": ["Sanctuary", 1],
-			"hl_divine_plea": ["Radiance", 2, "cap"],
-		},
-		"new": [
-			{"id": "hl_zealous", "name": "Zealous Light", "ranks": 2, "lane": "Mercy", "tier": 2,
-				"exclusive_with": "hl_serenity",
-				"desc": "+{v}% damage dealt.", "scale": {"step": 4},
-				"payload": {"stat": {"dmg_bonus": 0.04}}},
-			{"id": "hl_martyr", "name": "Martyr's Vigor", "ranks": 2, "lane": "Mercy", "tier": 2,
-				"desc": "+{v}% max health.", "scale": {"step": 5},
-				"payload": {"stat": {"max_hp_pct": 0.05}}},
-			{"id": "hl_ardor", "name": "Ardor", "ranks": 2, "lane": "Mercy", "tier": 1,
-				"desc": "Heavenly Aura deepens the per-stack Mercy term another step.",
-				"payload": {"stat": {"heavenly_ranks": 1}}},
-			{"id": "hl_soothe", "name": "Soothing Touch", "ranks": 2, "lane": "Radiance", "tier": 0,
-				"desc": "Renewal costs {v} less Mana.", "scale": {"step": 5},
-				"payload": {"ability": "Renewal", "add": {"cost": -5}}},
-			{"id": "hl_brilliance", "name": "Brilliance", "ranks": 2, "lane": "Radiance", "tier": 1,
-				"desc": "Triage deepens: another {v}% healing done.", "scale": {"step": 3},
-				"payload": {"stat": {"triage_ranks": 1}}},
-			{"id": "hl_swift", "name": "Swift Mending", "ranks": 1, "lane": "Radiance", "tier": 2,
-				"desc": "Heal's cooldown is reduced by 1 turn.",
-				"payload": {"ability": "Heal", "add": {"cooldown": -1}}},
-			{"id": "hl_overflow", "name": "Overflow", "ranks": 2, "lane": "Radiance", "tier": 2,
-				"desc": "Holy Capacitor banks another {v}% overheal.", "scale": {"step": 5},
-				"payload": {"stat": {"capacitor_ranks": 1}}},
-			{"id": "hl_vestments", "name": "Blessed Vestments", "ranks": 2, "lane": "Sanctuary", "tier": 1,
-				"desc": "+{v}% armor.", "scale": {"step": 3},
-				"payload": {"stat": {"armor": 0.03}}},
-			{"id": "hl_serenity", "name": "Serenity", "ranks": 2, "lane": "Sanctuary", "tier": 2,
-				"exclusive_with": "hl_zealous",
-				"desc": "Take {v}% less damage.", "scale": {"step": 4},
-				"payload": {"stat": {"dmg_taken_bonus": -0.04}}},
-			{"id": "hl_beacon", "name": "Beacon", "ranks": 2, "lane": "Sanctuary", "tier": 2,
-				"desc": "Divine Presence drips another step of healing.",
-				"payload": {"stat": {"divine_presence_ranks": 1}}},
-			{"id": "hl_avatar", "name": "Avatar of Mercy", "ranks": 1, "lane": "Mercy", "tier": 2,
-				"capstone": true,
-				"desc": "Heavenly Aura deepens two steps and +5% max health.",
-				"payload": {"stat": {"heavenly_ranks": 2, "max_hp_pct": 0.05}}},
-			{"id": "hl_sanctum", "name": "Living Sanctum", "ranks": 1, "lane": "Sanctuary", "tier": 2,
-				"capstone": true,
-				"desc": "Guardian Angel deepens two steps and the Cleric takes 5% less damage.",
-				"payload": {"stat": {"guardian_ranks": 2, "dmg_taken_bonus": -0.05}}},
 		],
 	},
 	"inquisitor": {

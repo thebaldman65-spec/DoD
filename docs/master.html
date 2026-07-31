@@ -469,7 +469,9 @@ stack held: <b>+5% healing done</b>. Stacks are SPENT on Hymn of Hope (1), Divin
 and Resurrection (1) — costs are paid before the cast resolves, so a spender heals with
 what remains — or on <b>Empowerment</b>: the ✦ Empower toggle (hotkey C) arms the next
 supporting cast for +1 extra stack and a bonus effect. <b>Empowered casts forgo their
-perfect bonus.</b></li>
+perfect bonus.</b> Talents move the economy: the ceiling (Martyr's Vigor, to 6/7), the
+opening stacks (Zealous Light), and the Empower surcharge itself (Ardor and Avatar of
+Mercy can waive it — see §7).</li>
 <li><b>Arcane Resonance (ARCANIST passive, 0–5):</b> only the Arcanist spec has the bar.
 +1 per damaging cast (+2 on crits; parry counters grant nothing). Each stack: +15% damage
 dealt, +3% crit, but +5% damage <i>taken</i>. Hitting max triggers Backlash Ward (+15 Mana).
@@ -674,7 +676,8 @@ Resurrection — 1 Mercy, 4.0, 3cd; return a fallen ally to life with 20% health
 resource. Empower (+1 Mercy): they return at FULL health and resource with 5 turns of
 Renewal (Perfect: 25% instead). Divine Plea — 2 Mercy, 3.0, 2cd; FULLY heal an ally.
 Empower (+1 Mercy): also cleanse all their debuffs and Hallow them against new ones
-for 3 turns (Perfect: restores 10 Mana).</li>
+for 3 turns (Perfect: restores 10 Mana).<br>
+<b>Talent lanes:</b> see §7 — Radiance / Mercy / Sanctuary, node-gated.</li>
 <li><b>Devout (Warder)</b> — <b>Stat block:</b> 175 HP / 18% armor / +15% holy &amp;
 +10% fire resist, −10% shadow (the armoured priest, and the tallest health pool of the
 three BY DESIGN — Divine Shield, Afterglow, Healing Pulse and the Faith release all pay
@@ -844,20 +847,21 @@ own Trapper bonus from the target.<br>
 <p><b>Economy:</b> talent points come from victories alone — <b>1 per fight, 2 per elite,
 3 per zone boss</b> (rests and shops award none; Waystone +1 at run start). Points bank
 until spent on the Party screen.</p>
-<p><b>Every tree is a lane tree.</b> Four are purpose-designed on the lane framework
-(<b>Berserker, Sharpshooter, Survivalist, Beastmaster</b>); the other eight are Batch 31
-conversions of their classic grids awaiting the same treatment.</p>
+<p><b>Every tree is a lane tree.</b> Seven are purpose-designed on the lane framework
+(<b>Berserker, Swordmaster, Warden, Holy, Sharpshooter, Survivalist, Beastmaster</b>); the
+other five are Batch 31 conversions of their classic grids awaiting the same treatment.</p>
 <p><b>Lane framework rules:</b> a tree is three LANES of seven nodes — each lane a
 playstyle — plus three CAPSTONES of which only ONE may ever be taken. <b>Node pricing:</b>
 the Nth distinct node bought costs ceil(N/3) — 1,1,1,2,2,2,3… — while extra ranks in an
 open node always cost 1, so roughly a third of the tree fits in one run. <b>Exclusive
 pairs</b> bar each other but stay visible, greyed with the reason — the player must see
 the door they closed. Tooltips show the live cost and lane requirement.<br>
-<b>Two gating models exist.</b> Points-gated trees (Beastmaster and the eight conversions)
+<b>Two gating models exist.</b> Points-gated trees (Beastmaster and the five conversions)
 open a lane's tier 2 at 3 points spent in that lane, tier 3 at 6, the capstone at 8.
-<b>Node-gated trees (Berserker, Sharpshooter, Survivalist)</b> open tier 2 at 2 NODES
-bought in the lane, tier 3 at 4, the capstone at 6 — with the escalating cost curve, node
-count is the stable gate a player can actually plan against.</p>
+<b>Node-gated trees (Berserker, Swordmaster, Warden, Holy, Sharpshooter, Survivalist)</b>
+open tier 2 at 2 NODES bought in the lane, tier 3 at 4, the capstone at 6 — with the
+escalating cost curve, node count is the stable gate a player can actually plan
+against.</p>
 <p><b>Berserker lanes (node-gated):</b><br>
 <b>BLOODLETTING</b> (wounds as an engine: keep bleed high, or burst it) — Savagery (+5
 Bleed/rank on bleed abilities ×3), Bloodcraze (heal 3%/rank max HP on enemy bleedout ×3),
@@ -934,6 +938,36 @@ would drop an ally below 20% health: the Warden absorbs 15%/rank of it ×3).<br>
 free Crushing Blow — Sundering and Elemental Weakness riders included), Hold the Line
 (Banner: grants the ability — 50% less party Break damage for 2 turns and no one can die
 for a turn).</p>
+<p><b>Holy lanes (node-gated):</b><br>
+<b>RADIANCE</b> (throughput: bigger heals, cheaper heals, less waste) — Triage (instant
+heals can CRIT ×1.5 off the Cleric's crit chance; all healing +3%/rank ×3), Soothing
+Touch (Renewal costs 5/rank less Mana ×2), On the Mend (Renewal ticks 5%/rank chance to
+dispel ×3), Holy Capacitor (5%/rank of overhealing banks, released by the next Heal ×3),
+Swift Mending (Heal cooldown −1), Radiant Cascade (a CRITICAL heal splashes 25%/rank of
+its value onto the lowest-health other ally ×2; <i>exclusive with Overflow</i>), Overflow
+(15%/rank of any overhealing spills onto the lowest-health other ally immediately,
+reading the same overheal Capacitor banks from ×2; <i>exclusive with Radiant
+Cascade</i>).<br>
+<b>MERCY</b> (the resource economy: earning stacks, holding them, spending them, and
+Empower) — Heavenly Aura (each held stack grants +5%/rank healing done atop the base 5%
+×3), Holy Light (perfect casts restore 1%/rank max Mana ×3), Zealous Light (the Cleric
+begins every battle with 1 Mercy/rank ×3), Sanctified (Mercy spends have a 10%/rank
+chance to consume nothing ×3), Resurrection (grants the ability), Ardor (while holding 4
+or more Mercy — 3 or more at rank 2 — Empowering consumes no stack ×2), Martyr's Vigor
+(Mercy's ceiling rises to 6, then 7 ×2).<br>
+<b>SANCTUARY</b> (the safety net: keeping people from dying, rather than healing them
+after) — Guardian Angel (the Mercy threshold rises 3%/rank from 50% ×3), Divine Presence
+(end of the Cleric's turn: the lowest ally heals 1%/rank of their max ×3), Last Hope
+(allies under 25% health receive 5%/rank more healing ×3), Inner Faith (+5%/rank max
+health ×3), Blessed Vestments (allies with Renewal on them take 5%/rank less damage ×2),
+Beacon (at the start of each of the Cleric's turns, every ally below 25% health heals
+5%/rank of their max ×2), Serenity (once per battle, the first ally to take lethal
+damage survives at 1 HP).<br>
+<b>CAPSTONES</b> — Divine Plea (Radiance: grants the ability), Avatar of Mercy (Mercy:
++1 Mercy at the start of each of her turns, and Empower costs no stack — it supersedes
+Ardor, never a double refund), Living Sanctum (Sanctuary: all the healing she grants a
+single ally — Heal, Renewal and its ticks, Divine Plea — also heals the whole party for
+25% of its value; Hymn is already the whole party, so it does not echo itself).</p>
 <p><b>Sharpshooter lanes (node-gated):</b><br>
 <b>PRECISION</b> (Focus, crit chance, crit damage) — Steady Hands (+4%/rank crit ×3),
 Perfect Form (crits +20 Focus), Deep Focus (cap 150), Executioner's Eye (crit mult
@@ -995,8 +1029,8 @@ Steadfast Bond</i>), Lone Hunter (no companion: costs −40%, damage +25%).<br>
 gain doubled), The Pack (Pack lane: two beasts at once — COMING SOON), Apex Predator
 (Handler: Quick Shot triggers an extra free companion strike; Kill Command resets on every
 enemy death).</p>
-<p><b>Six classic trees remain conversions</b> (<b>Pyromancer,
-Cryomancer, Arcanist, Holy, Devout, Occultist</b>, from Batch 31): their original 12 nodes
+<p><b>Five classic trees remain conversions</b> (<b>Pyromancer,
+Cryomancer, Arcanist, Devout, Occultist</b>, from Batch 31): their original 12 nodes
 keep their ids, effects, and any invested ranks, re-homed into three lanes, joined by
 invented filler nodes (numeric dials and kit tweaks on existing machinery) and two
 invented capstones beside the original one — <i>all fillers and lane homes await design
@@ -1023,11 +1057,6 @@ Critical Mass, ⊕Volatility, ⊕Cannoneer, ⊕Barrage Master, ⊕Meltdown · Co
 Temporal Rift, Conversion, Stable Alignment, Suppressing Fire, ⊕Arcane Ward, ⊕Still Mind ·
 Capstones: Magi's Wrath, ⊕Singularity, ⊕Master of Moments · Exclusive: Meltdown ↔ Still
 Mind.<br>
-<b>Holy</b> — Mercy: Heavenly Aura, Holy Light, Sanctified, Resurrection, ⊕Zealous Light,
-⊕Martyr's Vigor, ⊕Ardor · Radiance: Triage, On the Mend, Holy Capacitor, ⊕Soothing Touch,
-⊕Brilliance, ⊕Swift Mending, ⊕Overflow · Sanctuary: Guardian Angel, Inner Faith, Last
-Hope, Divine Presence, ⊕Blessed Vestments, ⊕Serenity, ⊕Beacon · Capstones: Divine Plea,
-⊕Avatar of Mercy, ⊕Living Sanctum · Exclusive: Zealous Light ↔ Serenity.<br>
 <b>Devout</b> — Faith: Communion, Unwavering Faith, Blessed are the Faithful, Sacred
 Covenant, Devoutness, ⊕Fervor, ⊕Binding Oath · Bulwark: Blessed Barrier, Radient Aegis,
 Afterglow, ⊕Warded Robes, ⊕Stalwart, ⊕Bastion, ⊕Unyielding Aegis · Zeal: Sacred Resolve,
@@ -1046,19 +1075,6 @@ additional point invested adds the SAME amount again (e.g. "+5 Bleed per rank" a
 <p><b>Layout:</b> every tree renders as three lane columns with live lane-point headers,
 a capstone shelf, emblem-square nodes with point counters, cost-aware hover tooltips, and
 greyed exclusive siblings. Art is placeholder.</p>
-<p><b>Warden tree:</b> Tank and Spank
-(Mocking Blow 15%/rank chance to Empower a random ally ×3), Unkillable (heal 2%/rank max HP
-on every Block ×3), Elemental Weakness (Crushing Blow shreds elemental resists 5%/rank, 3
-turns ×3). Toughness (Constitution +5%/rank of max HP ×3), Tenacity (every attack
-Blocked by <b>Heavy Plating</b> grants +5 max HP for the
-battle; battle-long gains don't leak into the save), Shield Mastery (Shieldwall Blocks
-+1 more attack per rank, the perfect cast included ×2),
-Rally (every Heavy Plating block Rallies the party — +15% healing received for
-2 turns), Iron Will (+5%/rank damage per debuff on the Warden ×3). Richocet
-(5%/rank chance to Stun the attacker on Block ×3), Endurance (+1%/rank armor per turn
-without an external heal, resets when healed ×3), Sundering (Crushing Blow
-splashes 25%/rank of its BD to the enemies <b>Adjacent</b> to the target ×3). Capstone —
-Hold the Line (grants the ability).</p>
 <p><b>Pyromancer tree:</b> Accelerant (Burn ticks +1%/rank of Attack
 ×3), Pyromaniac (Inferno Master step +1%/rank ×3), Super Nova (Detonation +3%/rank crit
 ×3). Invigorating Ashes (each Burn tick 5%/rank chance to restore 2% max Mana ×3),
@@ -1091,18 +1107,6 @@ previous ×3), Unlimited Power (Resonance gained at max stacks becomes +2%/rank 
 and +2%/rank max Mana, stacking all battle ×3), Stable Alignment (a single attack cannot
 remove more than 35/30/25% of max health — the cap drops 5 per point ×3). Capstone —
 Magi's Wrath (grants the ability).</p>
-<p><b>Holy tree:</b> Triage (instant heals can CRIT ×1.5 off the Cleric's crit
-chance, and all healing +3%/rank ×3), Heavenly Aura (each Mercy stack grants +5%/rank
-extra healing done, on top of the base 5% ×3), Holy Light (perfect casts restore 1%/rank
-max Mana ×3). Guardian Angel (allies falling below 53/56/59% health earn Mercy —
-the threshold rises 3 per point ×3), Divine Presence (at the end of the Cleric's turn the
-lowest-health ally heals 1%/rank of their max health ×3), Resurrection (grants the
-ability), Last Hope (allies under 25% max health receive 5%/rank more healing ×3), Inner
-Faith (+5%/rank max health ×3). Holy Capacitor (5%/rank of overhealing is
-banked — live chip — and released by the next Heal ×3), On the Mend (Renewal ticks
-5%/rank chance to dispel one harmful effect ×3), Sanctified (spending Mercy has a
-10%/rank chance to consume no stacks ×3). Capstone — Divine Plea (grants the
-ability).</p>
 <p><b>Devout tree:</b> Communion (a member reaching 5 Faith gives every other
 member a (20/rank × their own stacks)% chance to gain 1 ×3), Unwavering Faith (+5%/rank
 max health ×3), Blessed are the Faithful
