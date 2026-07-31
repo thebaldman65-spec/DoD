@@ -321,8 +321,20 @@ var afterglow_ranks := 0      # Afterglow: heal when Divine Shield breaks
 var covenant_ranks := 0       # Sacred Covenant: lethal-save heal + Faith
 var aegis_ranks := 0          # Radient Aegis: Divine Shield can echo
 var blessed_barrier_ranks := 0 # Blessed Barrier: absorbs convert to healing
-var waters_ranks := 0         # Cleansing Waters: Resolve can cleanse
-var pulse_ranks := 0          # Healing Pulse: Resolve drips party healing
+var waters_ranks := 0         # Cleansing Waters: either banner can cleanse
+var pulse_ranks := 0          # Healing Pulse: either banner drips healing
+# Devout Batch K lanes (07-30): the purpose-designed tree's new hooks.
+var fervor_ranks := 0         # Fervor: Consecrated Ground drips Faith
+var oath_ranks := 0           # Binding Oath: releases keep stacks
+var warded_ranks := 0         # Warded Robes: armor rider on the shield
+var stalwart_ranks := 0       # Stalwart: Divine Shield absorbs more
+var unyielding_ranks := 0     # Unyielding Aegis: shield re-forms once
+var righteous_ranks := 0      # Righteous Fire: deeper Cons. Ground reflect
+var crusade_ranks := 0        # Crusader's Tempo: Zeal ticks more cooldown
+var purity_ranks := 0         # Purity: Zeal carries a Divine Shield
+var lifewell_ranks := 0       # Lifewell: reflected damage heals the party
+var apostle := 0              # capstone: releases keep all 5 stacks
+var judgement := 0            # capstone: Cons. Ground punishes attackers
 
 # Barrier-lethal hook (set by the battle scene): fires when a Divine
 # Shield absorbs a hit that would otherwise have killed this unit.
@@ -1052,6 +1064,11 @@ func effective_armor() -> float:
 	a = maxf(a - melted, 0.0)
 	if has_status("fortify"):
 		a += 0.10
+	# Warded Robes (a Divine Shield rider): the barrier hardens its
+	# holder while it holds.
+	var ward := float(get_status("barrier").get("warded", 0.0))
+	if ward > 0.0:
+		a += ward
 	# Bulwark of Fortitude: the unbreakable stand (+50% of current armor).
 	if has_status("bulwark"):
 		a *= 1.5
@@ -1196,7 +1213,18 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 				lethal_saved_cb.call(self)
 			if s.power <= 0:
 				var glow := int(s.get("afterglow", 0))
-				remove_status("barrier")
+				# Unyielding Aegis: the breaking shield re-forms once per
+				# cast at a share of its original strength (Afterglow still
+				# fires — the shield DID break).
+				var reform_pct := float(s.get("unyielding_pct", 0.0))
+				if reform_pct > 0.0:
+					s.power = maxi(int(round(int(s.get("original", 0)) * reform_pct)), 1)
+					s["unyielding_pct"] = 0.0
+					float_text("Re-formed %d" % s.power, Color(0.4, 0.85, 0.95))
+					_proc_log("Talent: Unyielding Aegis — %s's shield re-forms at %d" % [
+						unit_name, s.power])
+				else:
+					remove_status("barrier")
 				if glow > 0:
 					var glow_got := heal_amount(glow)
 					float_text("+%d" % glow_got, Color(0.95, 0.9, 0.6))

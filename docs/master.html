@@ -698,7 +698,8 @@ cooldowns tick down 1 turn immediately, and their Faith gain is doubled while it
 evenly among living heroes for 3 turns; BD still lands on the struck hero (Perfect: 4
 turns). Bulwark of Fortitude (capstone) — 30 Mana, 3.5, 3cd; for 3 turns the party
 takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each
-turn (Perfect: the party instantly heals 5%).</li>
+turn (Perfect: the party instantly heals 5%).<br>
+<b>Talent lanes:</b> see §7 — Bulwark / Faith / Zeal, node-gated.</li>
 <li><b>Occultist (Pressure)</b> — <b>Stat block:</b> 155 HP / 8% armor / +25% shadow &amp;
 +10% nature resist, −20% fire (the least armour in the party — robes and appetite — but a
 real pool to spend from, because Dark Pact pays in his blood and his heals key off his
@@ -847,18 +848,20 @@ own Trapper bonus from the target.<br>
 <p><b>Economy:</b> talent points come from victories alone — <b>1 per fight, 2 per elite,
 3 per zone boss</b> (rests and shops award none; Waystone +1 at run start). Points bank
 until spent on the Party screen.</p>
-<p><b>Every tree is a lane tree.</b> Seven are purpose-designed on the lane framework
-(<b>Berserker, Swordmaster, Warden, Holy, Sharpshooter, Survivalist, Beastmaster</b>); the
-other five are Batch 31 conversions of their classic grids awaiting the same treatment.</p>
+<p><b>Every tree is a lane tree.</b> Eight are purpose-designed on the lane framework
+(<b>Berserker, Swordmaster, Warden, Holy, Devout, Sharpshooter, Survivalist,
+Beastmaster</b>); the other four are Batch 31 conversions of their classic grids awaiting
+the same treatment.</p>
 <p><b>Lane framework rules:</b> a tree is three LANES of seven nodes — each lane a
 playstyle — plus three CAPSTONES of which only ONE may ever be taken. <b>Node pricing:</b>
 the Nth distinct node bought costs ceil(N/3) — 1,1,1,2,2,2,3… — while extra ranks in an
 open node always cost 1, so roughly a third of the tree fits in one run. <b>Exclusive
 pairs</b> bar each other but stay visible, greyed with the reason — the player must see
 the door they closed. Tooltips show the live cost and lane requirement.<br>
-<b>Two gating models exist.</b> Points-gated trees (Beastmaster and the five conversions)
+<b>Two gating models exist.</b> Points-gated trees (Beastmaster and the four conversions)
 open a lane's tier 2 at 3 points spent in that lane, tier 3 at 6, the capstone at 8.
-<b>Node-gated trees (Berserker, Swordmaster, Warden, Holy, Sharpshooter, Survivalist)</b>
+<b>Node-gated trees (Berserker, Swordmaster, Warden, Holy, Devout, Sharpshooter,
+Survivalist)</b>
 open tier 2 at 2 NODES bought in the lane, tier 3 at 4, the capstone at 6 — with the
 escalating cost curve, node count is the stable gate a player can actually plan
 against.</p>
@@ -968,6 +971,39 @@ damage survives at 1 HP).<br>
 Ardor, never a double refund), Living Sanctum (Sanctuary: all the healing she grants a
 single ally — Heal, Renewal and its ticks, Divine Plea — also heals the whole party for
 25% of its value; Hymn is already the whole party, so it does not echo itself).</p>
+<p><b>Devout lanes (node-gated):</b><br>
+<b>BULWARK</b> (the shield itself — Faith comes FROM absorbs, so the shield lane is the
+engine block of the whole Conviction system) — Blessed Barrier (4%/rank of absorbed
+damage becomes healing for the holder ×3), Radient Aegis (15%/rank chance the shield
+echoes onto another ally ×3), Afterglow (on break the holder heals 5%/rank of the
+Devout's max health ×3), Warded Robes (+10%/rank armor for the holder while the shield
+holds ×2), Stalwart (the shield absorbs 35/40/45% of the Devout's max health ×3;
+<i>exclusive with Bastion</i>), Bastion (Divine Shield's cooldown −1 — a bigger shield,
+or a more frequent one; <i>exclusive with Stalwart</i>), Unyielding Aegis (a breaking
+shield immediately re-forms at 30%/rank of its original strength, once per cast ×2).<br>
+<b>FAITH</b> (the stack economy: earn faster, keep longer, spend deeper) — Communion
+(5-stack releases spread: 20%/rank × their own stacks chance for each other member ×3),
+Unwavering Faith (+5%/rank max health — his output stat ×3), Devoutness (the party takes
+5%/rank less Break damage ×3), Blessed are the Faithful (the release heal restores
+20/25/30% max health ×3), Sacred Covenant (a lethal save heals 5%/rank max health and
+grants that many Faith ×3), Fervor (while Consecrated Ground holds, every ally gains
+1 Faith per rank at the start of their turn ×2 — Faith's second source, and its only
+party-wide one), Binding Oath (a release keeps 1 Faith per rank instead of resetting to
+zero ×2).<br>
+<b>ZEAL</b> (everything else he casts) — Cleansing Waters (while Consecrated Ground or
+Sacred Resolve holds, each member has a 15%/rank chance per turn to shed one harmful
+effect ×3), Righteous Fire (Consecrated Ground reflects 15/20/25% of damage taken ×3),
+Sacred Resolve (grants the ability), Healing Pulse (while either banner holds, the party
+heals 2%/rank of the Devout's max health per turn ×3), Crusader's Tempo (Blessing of
+Zeal ticks its target's cooldowns down 1 additional turn per rank ×2), Purity (Blessing
+of Zeal also grants its target a true Divine Shield absorbing 10%/rank of the Devout's
+max health — it builds Faith like any other ×2), Lifewell (damage reflected by
+Consecrated Ground heals the party for 20%/rank of the amount reflected ×3).<br>
+<b>CAPSTONES</b> — Bulwark of Fortitude (Bulwark: grants the ability), Apostle (Faith:
+releases no longer consume stacks — an ally at 5 Faith stays at 5, and every further
+gain triggers the release again), Judgement (Zeal: while Consecrated Ground holds, every
+enemy that damages a hero is Sundered for 2 turns and takes Break damage equal to 20% of
+the damage it dealt).</p>
 <p><b>Sharpshooter lanes (node-gated):</b><br>
 <b>PRECISION</b> (Focus, crit chance, crit damage) — Steady Hands (+4%/rank crit ×3),
 Perfect Form (crits +20 Focus), Deep Focus (cap 150), Executioner's Eye (crit mult
@@ -1029,8 +1065,8 @@ Steadfast Bond</i>), Lone Hunter (no companion: costs −40%, damage +25%).<br>
 gain doubled), The Pack (Pack lane: two beasts at once — COMING SOON), Apex Predator
 (Handler: Quick Shot triggers an extra free companion strike; Kill Command resets on every
 enemy death).</p>
-<p><b>Five classic trees remain conversions</b> (<b>Pyromancer,
-Cryomancer, Arcanist, Devout, Occultist</b>, from Batch 31): their original 12 nodes
+<p><b>Four classic trees remain conversions</b> (<b>Pyromancer,
+Cryomancer, Arcanist, Occultist</b>, from Batch 31): their original 12 nodes
 keep their ids, effects, and any invested ranks, re-homed into three lanes, joined by
 invented filler nodes (numeric dials and kit tweaks on existing machinery) and two
 invented capstones beside the original one — <i>all fillers and lane homes await design
@@ -1057,12 +1093,6 @@ Critical Mass, ⊕Volatility, ⊕Cannoneer, ⊕Barrage Master, ⊕Meltdown · Co
 Temporal Rift, Conversion, Stable Alignment, Suppressing Fire, ⊕Arcane Ward, ⊕Still Mind ·
 Capstones: Magi's Wrath, ⊕Singularity, ⊕Master of Moments · Exclusive: Meltdown ↔ Still
 Mind.<br>
-<b>Devout</b> — Faith: Communion, Unwavering Faith, Blessed are the Faithful, Sacred
-Covenant, Devoutness, ⊕Fervor, ⊕Binding Oath · Bulwark: Blessed Barrier, Radient Aegis,
-Afterglow, ⊕Warded Robes, ⊕Stalwart, ⊕Bastion, ⊕Unyielding Aegis · Zeal: Sacred Resolve,
-Cleansing Waters, Healing Pulse, ⊕Righteous Fire, ⊕Crusader's Tempo, ⊕Purity, ⊕Lifewell ·
-Capstones: Bulwark of Fortitude, ⊕Apostle, ⊕Judgement · Exclusive: Righteous Fire ↔
-Stalwart.<br>
 <b>Occultist</b> — Ruin: Empowered Hex, Corrupted Channeling, Broken Will, ⊕Grim Focus,
 ⊕Deeper Hex, ⊕Unraveling, ⊕Entropy · Madness: Spread of Madness, Mind Flay, Umbral Mirror,
 ⊕Whispers, ⊕Delirium, ⊕Cackling Mirror, ⊕Lingering Torment · Leech: Soul Leech,

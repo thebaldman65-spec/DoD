@@ -45,7 +45,9 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   jump-to-boss/next-zone; the talent grant is +200).
 - GDScript gotchas that bit us: multiline lambdas in call args (use named
   methods), ternaries need parens for type inference, `:=` can't infer from
-  untyped funcs, edits via python heredocs (apostrophes!) — use chr(39).
+  untyped funcs, edits via python heredocs (apostrophes!) — use chr(39),
+  min()/max() are numeric-only (String args = runtime error mid-_init and
+  a headless --script run then idles forever — compare with < instead).
 
 ## Architecture (all UI built in code, no editor scenes)
 - `scripts/run_state.gd` (autoload `Run`): party/items/gold/map/zones, save

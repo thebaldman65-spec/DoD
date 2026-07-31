@@ -5,6 +5,67 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-30 — Batch K: the Devout tree becomes a designed set of lanes</h2>
+<ul>
+<li><b>The diagnosis:</b> Conviction promised a party-wide Faith system, but Faith had
+exactly ONE source — Divine Shield absorbing damage — a single-target ability on a
+2-turn cooldown, so most of the party sat at zero for most of the fight. Blessing of
+Zeal doubled a Faith gain its target almost never had, and the bot made it worse by
+shielding the weakest ally while kindling the hardest hitter — the two never met (the
+doubling did literally nothing in every sim). Structurally: Faith and Bulwark were one
+lane split in half (Faith comes FROM shields), three of Zeal's seven nodes were riders
+on Sacred Resolve — itself a node in that lane — and the exclusive ran cross-lane
+(Righteous Fire ↔ Stalwart), which reads as a bug.</li>
+<li><b>Devout is now a purpose-designed node-gated lane tree</b> (tiers at 2/4 nodes
+in-lane, capstone at 6) — Bulwark (the shield itself), Faith (the stack economy), Zeal
+(everything else he casts). Every id survives and the fillers re-spec in place, so
+saved ranks migrate; only Bastion's cap shrank (2 → 1) and the loader refunds the
+extra point. The conversion entry is gone; unchanged payloads moved verbatim. Spec id
+stays "inquisitor" (legacy — saves and trees key on it).</li>
+<li><b>Faith gets its second source.</b> Fervor: while Consecrated Ground holds, every
+ally gains 1 Faith per rank at the start of their turn — party-wide, riding a base-kit
+cast, so Conviction finally behaves like the system its description promises (and
+Consecrated Ground is worth casting beyond its mitigation). Binding Oath: releases
+keep 1 Faith per rank instead of resetting, so allies live in the useful 3–5 band.</li>
+<li><b>Bulwark owns the shield.</b> Warded Robes re-specs onto the shield itself
+(+10%/rank armor while it holds, a rider stamped at grant). Stalwart deepens the
+absorb (35/40/45% of the Devout's max health) and forks IN-LANE against Bastion
+(Divine Shield cooldown −1): a bigger shield, or a more frequent one — the second fork
+directly attacks the one-source-on-a-2cd problem. Unyielding Aegis re-forms a breaking
+shield at 30%/rank of its original strength, once per cast (Afterglow still fires —
+the shield did break).</li>
+<li><b>Zeal loses its dead-lane risk.</b> Cleansing Waters and Healing Pulse key off
+EITHER banner now — Consecrated Ground or Sacred Resolve — read live off the living
+Devout (no more cast-time snapshot), so skipping Sacred Resolve no longer strands two
+three-rank nodes. Righteous Fire re-specs from a flat damage dial to Consecrated
+Ground's reflect (15/20/25%); Lifewell converts the reflected damage into party
+healing (20%/rank) — together the ground becomes a healing engine. Crusader's Tempo
+deepens the blessing's cast-time cooldown tick (1 extra turn per rank, ×2). Purity
+gives Blessing of Zeal a Divine Shield of its own (10%/rank of the Devout's max
+health) — flagged divine through the same grant path as every other shield, so it
+builds Faith and the doubling finally travels WITH a source.</li>
+<li><b>New capstones.</b> Apostle (Faith): releases no longer consume stacks — an ally
+at 5 stays at 5 and every further gain re-triggers the release (a Communion
+chain-guard now stops release cascades from recursing forever, which Apostle made
+possible). Judgement (Zeal): while Consecrated Ground holds, every enemy that damages
+a hero is Sundered 2 turns and takes Break damage equal to 20% of what it dealt — a
+party role that is neither healing nor damage, and plays straight into the
+Swordmaster's Break loop.</li>
+<li><b>Bot fix:</b> Blessing of Zeal now targets whoever holds a Divine Shield
+(highest Attack only as fallback), so the shield+zeal combo actually occurs in sims
+instead of never.</li>
+<li><b>Verified:</b> battle + party scenes parse clean; the lane audit passes 24
+nodes / 3 capstones / 7-7-7 with the Stalwart ↔ Bastion exclusive symmetric and
+in-lane; forced-learn sims (DOD_SIM_TALENTS="dv_fervor:2,dv_oath:2,dv_warded:2,
+dv_stalwart:3,dv_unyielding:2,dv_righteous:3,dv_crusade:2,dv_purity:2,dv_lifewell:3",
+specs berserker/cryomancer/inquisitor/beastmaster) show every new node firing and
+Faith stacks standing on ALL FOUR allies at once (releases on two different heroes);
+a capstone run proved the Apostle engine (30 releases across 2 battles, no
+recursion), Judgement (12 sentences passed), and Pulse/Waters firing under
+Consecrated Ground with Sacred Resolve unlearned; ./sim.sh 200: 200/200 wins,
+8.4 avg rounds, 0.30 hero deaths/battle — the no-talent baseline is untouched.</li>
+</ul>
+
 <h2>2026-07-30 — Batch J: the Holy tree becomes a designed set of lanes</h2>
 <ul>
 <li><b>The diagnosis:</b> six of the twenty-four converted nodes were "deepen another

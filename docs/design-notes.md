@@ -230,3 +230,30 @@ once-per-battle save beats a passive -8%), checked AFTER a unit's own
 death-refusals so the Berserker's rage still gets its moment. Living
 Sanctum echoes single-ally healing only — Hymn already IS the party,
 and an echo that echoed itself would be a balance loop, not a fantasy.
+
+**Devout lanes (Batch K) — Faith gets its second source:** Conviction
+described a party-wide system that had exactly one single-target
+source on a 2-turn cooldown — Divine Shield's absorbs — so most of
+the party sat at zero Faith for most of every fight, and Blessing of
+Zeal doubled a gain its target never had (the bot shielding the
+weakest while kindling the hardest hitter meant the two abilities
+never even met). Fervor is the batch: Faith drips off Consecrated
+Ground, party-wide, riding a base-kit cast rather than a talent — the
+passive finally behaves like its own description, and the ground is
+worth casting for more than its mitigation. The lanes reorganize
+around subjects instead of accidents: Bulwark owns the shield (Faith
+comes FROM it — a shield lane and a Faith lane were one idea split in
+half), Faith owns the stacks, Zeal owns everything else he casts. The
+Stalwart ↔ Bastion fork moved in-lane and asks the shield lane's only
+real question — bigger, or more often? — and "more often" doubles as
+the second fix for the one-source drought. Cleansing Waters and
+Healing Pulse key off either banner now because three nodes riding a
+node inside their own lane meant skipping Sacred Resolve killed
+nearly half of Zeal. Purity exists because doubled Faith gain should
+carry a Faith source with it; its shield goes through the same grant
+path as every other so the divine flag (the Faith trigger) can never
+be forgotten. Apostle parks the party at maximum Conviction and turns
+every absorb into a heal — the win condition the Faith lane was
+pointing at all along — and Judgement gives a support spec a seat in
+a damage party by paying out the one currency he never touches:
+Break pressure, straight into the Swordmaster's loop.
