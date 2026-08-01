@@ -481,3 +481,28 @@ that gold and items MATTER without making the bot clever enough to be
 unattributable, and both flag off (DOD_SIM_SHOPS/DOD_SIM_ITEMS) to
 reproduce the old floor. Nothing was tuned in this batch by design —
 Batch T owns the numbers; this batch tells us what T's numbers mean.
+
+## 2026-08-01 — Batch V: enemies that ask questions
+
+Sixteen enemy kinds shared three special behaviours between them
+(a shield, two heals), so fights had no decisions in them while the
+heroes had nothing but: Burn into Detonation, Chilled into Freeze,
+Ruin into detonation, Break into stuns — engines idling against stat
+blocks. The rule for every new kind: pose a question a specific hero
+spec is the answer to. Not a counter — a question; the player should
+feel a reason to have BROUGHT someone. The Ritual Chanter asks "do
+you commit to stacking?" (its cleanse strips the longest-lasting
+debuff — one Chilled stack at a time, never the pile, or the answer
+stops being a question and becomes a wall). The Ash Hurler asks "can
+you interrupt it?" — the game's first telegraphed mechanic, and its
+Constitution 90 IS the design: Breaking the wind-up is the
+Swordmaster's whole loop given a reason to exist. The Bloodcaller
+asks "what order do you kill in?" with no right answer — AoE feeds
+it, focus leaves the warband standing. The Grave Totem asks "did you
+bring the right damage type?" — trivially Broken, physically
+resistant, and 50% soft to fire and holy, a resist puzzle whose
+answer is party composition. The same batch caps mender-tagged kinds
+at two per warband, counted by tag rather than by claiming pool: the
+generator could previously roll three or four healers (2,007 such
+warbands existed), and two heals plus a cleanse is a wall, which is
+the one thing a question must never be.

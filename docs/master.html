@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-01 (Batch U)</b></p>
+<p align="right"><b>Last updated: 2026-08-01 (Batch V)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1309,6 +1309,19 @@ shadow 50%; soft to holy AND nature.</td></tr>
 (living beast — poison rips through).</td></tr>
 <tr><td>Ashblade (ember)</td><td>2</td><td>skirmisher</td><td>2</td><td>135</td><td>Cinder
 Slash (fire); Flame Lick (60% Burn 2t). Fire resist 50%; soft to frost.</td></tr>
+<tr><td>Orc Ritual Chanter (pale gold)</td><td>2</td><td>mender</td><td>1·2·3</td><td>105</td>
+<td>Fast (speed 105) ranged support: Warding Chant; Cleansing Rite — strips the
+longest-lasting debuff from EACH ally (Chilled thaws one stack at a time, never the pile;
+sticky poisons and meters hold). Holy resist 25%; soft to shadow AND physical — kill it
+first, or play around it.</td></tr>
+<tr><td>Orc Bloodcaller (crimson)</td><td>2</td><td>hexer</td><td>1·2·3</td><td>125</td>
+<td>Ragged Cut; Blood Tribute (shadow) — +25% damage and Break damage per ally fallen this
+battle: unremarkable fresh, hits like a Chief as the last one standing. The kill-order
+question, stated as an enemy. Shadow resist 25%; soft to holy AND nature.</td></tr>
+<tr><td>Grave Totem (dusk, large)</td><td>2</td><td>mender·hexer</td><td>1·3</td><td>80</td>
+<td>Speed 130, trivially Broken (Con 60): Grasping Roots (nature, 60% Cripple 2t); Dark
+Vigil — every living ally regains 6% of its OWN max health. Physical resist 35%, shadow
+50%; soft to fire AND holy at 50% — a resist puzzle, not a stat check.</td></tr>
 <tr><td>Orc Brute (brown, large)</td><td>3</td><td>brute</td><td>1·2·3</td><td>260</td>
 <td>Smash; Overhead Crush (50 BD). Physical resist 10%; soft to shadow (dumb muscle, weak
 mind).</td></tr>
@@ -1318,6 +1331,11 @@ resist 50%; soft to fire.</td></tr>
 <tr><td>Rot Behemoth (dun, large)</td><td>3</td><td>brute·hexer</td><td>2·3</td><td>280</td>
 <td>Rotting Fist (50% Poison 3t); Wretched Bellow (party-wide nature + BD). Nature 50%,
 shadow 25%; soft to holy.</td></tr>
+<tr><td>Ash Hurler (ember, large)</td><td>3</td><td>brute·sniper</td><td>2·3</td><td>190</td>
+<td>Slow (speed 60) ranged siege — <b>the game's first telegraphed enemy mechanic</b>:
+Ember Lob (fire); Siege Stone, a visible wind-up that lands NEXT turn as heavy party-wide
+damage — Breaking, Freezing, or Stunning the charger cancels the throw outright. Softest
+Break target of any power-3 (Con 90), by design. Fire resist 50%; soft to frost.</td></tr>
 <tr><td>Orc Chief (elite)</td><td>4</td><td>elite</td><td>1·2·3</td><td>250</td><td>Rage
 user: Strike (+15 Rage); Heavy Strike 30R; Crushing Blow 20R (56 BD). Physical resist 15%;
 soft to arcane (magic pierces plate).</td></tr>
@@ -1338,12 +1356,14 @@ an elite that can't afford an elite theme isn't one), and <b>the boss node keeps
 10–12 band</b>: the Escort composition is authored content, and the step up from tier 10
 into the boss chamber is the zone's sharpest — by design. The field holds at most
 <b>6 enemies</b>. Power values now span <b>1, 2, 3, 4,
-and 7</b> — the three power-3 bruisers filled the gap that made exact budgets repetitive.
+and 7</b> — the power-3 bruisers filled the gap that made exact budgets repetitive.
 Generation is two-step: a <b>theme</b> is chosen, then the budget fills its <b>ROLE
 pools</b> — themes declare roles (skirmisher / sniper / bulwark / mender / hexer / brute /
 elite / boss), and any zone-legal enemy tagged with the role is eligible, so warbands vary
-run to run. min_weak counts units of power ≤ 1. The roster rework grew the distinct
-warband count from <b>364 to over 11,000</b> across the budget bands. Themes that cannot
+run to run. min_weak counts units of power ≤ 1. <b>No warband ever fields more than two
+mender-tagged kinds</b>, counted by role tag no matter which pool claimed them — two heals
+plus a cleanse is a wall rather than a question. The distinct
+warband count now exceeds <b>23,500</b> across the budget bands. Themes that cannot
 spend a given budget simply do not appear on that roll.</p>
 <table border="1" cellpadding="4">
 <tr><th>Theme</th><th>Gameplay focus</th><th>Role recipe</th><th>Nodes</th></tr>
@@ -1360,9 +1380,10 @@ spend a given budget simply do not appear on that roll.</p>
 <tr><td>Elite Patrol</td><td>Few high-value enemies (≤4)</td><td>elite + bulwark + mender (+brute)</td><td>elite</td></tr>
 <tr><td>Boss Escort</td><td>The boss and its court</td><td>boss + any support roles</td><td>boss</td></tr>
 </table>
-<p><b>Tier scaling:</b> enemy <b>Attack grows +4%</b> and <b>HP +5% of base per node
-tier</b> (linear), counted from the start of the game to its end (a zone spans 11 tiers, so
-zone 2 opens at +44% Attack / +55% HP); scaled HP is rounded UP to the next multiple of 10.
+<p><b>Tier scaling is zone-local:</b> every zone replays the 1–11 tier ladder — enemy
+<b>Attack grows +2%</b> and <b>HP +2.5% of base per tier within the zone</b>, on top of a
+flat base multiplier keyed to the zone's SLOT in the run (<b>×1.0 / ×1.5 / ×2.2</b> for
+slots 1–3); scaled HP is rounded UP to the next multiple of 10.
 Deeper-zone enemies keep their scorched tint.</p>
 
 <h2>10. Battle Screen &amp; Controls</h2>

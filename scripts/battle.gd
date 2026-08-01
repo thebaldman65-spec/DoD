@@ -1407,6 +1407,15 @@ func _run_battle() -> void:
 					break
 		if u.dead:
 			continue
+		# Wind-up cancel (Batch V): a charger who loses this turn loses the
+		# blow with it — Broken, Frozen, and Stunned all drop the stone.
+		if u.has_status("charging"):
+			if u.has_status("stunned"):
+				_cancel_charge(u, "STUNNED")
+			elif u.has_status("frozen"):
+				_cancel_charge(u, "FROZEN")
+			elif u.broken_pending:
+				_cancel_charge(u, "BROKEN")
 		if u.has_status("stunned"):
 			u.remove_status("stunned")
 			u.float_text("STUNNED", Color(0.95, 0.9, 0.4))
@@ -2969,6 +2978,26 @@ func _enemy_turn(u: BattleUnit) -> void:
 		await _wait(0.25)
 		return
 	await _wait(0.7)
+	# Wind-up landing (Batch V): the hoisted blow comes down — resolved as a
+	# plain attack copy (the Hysteria pattern), and the landing IS this
+	# turn's whole action. Cancels never reach here: the turn loop drops the
+	# charge before a Broken, Frozen, or Stunned charger gets a turn.
+	if u.has_status("charging"):
+		var ch_name := str(u.get_status("charging").get("ability", ""))
+		u.remove_status("charging")
+		var ch_stored := _find_ability(u, ch_name)
+		var ch_pool := _hero_side()
+		if ch_stored != null and not ch_pool.is_empty():
+			var ch_copy: Ability = Ability.make({"display_name": ch_stored.display_name,
+				"damage": ch_stored.damage, "pressure": ch_stored.pressure,
+				"dmg_type": ch_stored.dmg_type, "anim": ch_stored.anim,
+				"delay": ch_stored.delay, "aoe": ch_stored.aoe})
+			_message("%s's %s comes down!" % [u.unit_name, ch_stored.display_name])
+			_log("%s unleashes the charged %s!" % [u.unit_name,
+				ch_stored.display_name], "#e08850")
+			await _wait(0.4)
+			await _resolve(u, ch_copy, ch_pool.pick_random(), "good")
+		return
 	# Mass Hysteria: the maddened strike a fellow with doubled Break damage,
 	# Sundering them (the status holds until they act).
 	if u.has_status("hysteria"):
@@ -3140,6 +3169,11 @@ func _enemy_support_action(u: BattleUnit) -> Array:
 	var regen := _find_ability(u, "Regenerate")
 	if regen != null and u.hp < u.max_hp * 0.5:
 		return [regen, u]
+	# Ritual Chanter: sweeps the warband's afflictions whenever any ally
+	# carries one worth stripping (sticky poisons and meters don't count).
+	var rite := _find_ability(u, "Cleansing Rite")
+	if rite != null and allies.any(func(a): return not _cleansable_debuffs(a).is_empty()):
+		return [rite, u]
 	# Shieldmaster: always keeps exactly one ally Shielded (lowest HP first).
 	var shield_ab := _find_ability(u, "Shielding")
 	if shield_ab != null \
@@ -3151,7 +3185,45 @@ func _enemy_support_action(u: BattleUnit) -> Array:
 		var wounded: Array = allies.filter(func(a): return a.hp < a.max_hp * 0.7)
 		if not wounded.is_empty() and randf() < 0.6:
 			return [growth, _lowest_hp(wounded)]
+	# Grave Totem: pulses while the chip damage adds up — two or more
+	# wounded bodies make the vigil worth the turn.
+	var vigil := _find_ability(u, "Dark Vigil")
+	if vigil != null:
+		var nicked: Array = allies.filter(func(a): return a.hp < a.max_hp)
+		if nicked.size() >= 2:
+			return [vigil, u]
 	return []
+
+
+# The wind-up dies with the lost turn: the stored blow never lands. Loud
+# on purpose — cancelling the charge is the counterplay the Ash Hurler
+# exists to teach (Batch V).
+func _cancel_charge(u: BattleUnit, cause: String) -> void:
+	var pending := str(u.get_status("charging").get("ability", "the blow"))
+	u.remove_status("charging")
+	u.float_text("CHARGE LOST", Color(1.0, 0.62, 0.3))
+	_message("%s's %s is cancelled!" % [u.unit_name, pending])
+	_log("!! %s is %s mid-charge — the %s slips from its grasp (CANCELLED)" % [
+		u.unit_name, cause, pending], "#e08850")
+
+
+# Everything a Cleansing Rite may strip: harmful, not a meter state
+# (Broken and the Bleed buildup stay), never sticky (Slow Acting /
+# Epidemic poison refuse every cleanse, this one included).
+func _cleansable_debuffs(u: BattleUnit) -> Array:
+	var out: Array = []
+	for s in u.statuses:
+		if BattleUnit.DEBUFF_IDS.has(s.id) and not (s.id in ["broken", "bleed"]) \
+				and not s.get("sticky", false):
+			out.append(s)
+	return out
+
+
+# Remaining turns for "longest-remaining" comparisons: battle-long
+# statuses (turns < 0 — Permafrost chill, Ruin) outlast everything.
+func _turns_left(s: Dictionary) -> int:
+	var t := int(s.get("turns", 0))
+	return 999 if t < 0 else t
 
 
 # Dominant Presence bookkeeping: the Swordmaster's armor feeds on the
@@ -5542,7 +5614,7 @@ func _psychotic_support(u: BattleUnit) -> Array:
 		if a.cost > u.resource:
 			continue
 		match a.special:
-			"healing_wave", "wild_growth":
+			"healing_wave", "wild_growth", "totem_pulse", "cleanse_allies":
 				return [a, _lowest_hp(living)]
 			"enemy_shield":
 				return [a, living.pick_random()]
@@ -6625,6 +6697,89 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				target.unit_name, growth_got,
 				", halved by Frostbite" if target.has_status("frostbite") else ""],
 				"#70d878")
+		"cleanse_allies":
+			# Ritual Chanter (Batch V): strips the LONGEST-remaining debuff
+			# from each living ally. Chilled loses a single stack, never the
+			# pile — one cast must not erase four turns of Cryomancer work.
+			# The side follows the TARGET so a psychotic chanter aids heroes.
+			_sfx("heal", -8.0, 1.2)
+			var rite_side: Array = heroes if target.is_hero else enemies
+			var rite_hits := 0
+			_message("%s intones a Cleansing Rite!" % attacker.unit_name)
+			for cl_a in rite_side:
+				if cl_a.dead:
+					continue
+				var cl_opts := _cleansable_debuffs(cl_a)
+				if cl_opts.is_empty():
+					continue
+				var cl_pick: Dictionary = cl_opts[0]
+				for cl_s in cl_opts:
+					if _turns_left(cl_s) > _turns_left(cl_pick):
+						cl_pick = cl_s
+				rite_hits += 1
+				cl_a.float_text("Cleansed", Color(0.95, 0.9, 0.55))
+				if cl_pick.id == "chilled" and int(cl_pick.get("stacks", 1)) > 1:
+					cl_a.set_chilled_stacks(int(cl_pick.get("stacks", 1)) - 1)
+					_log("   → Cleansing Rite thaws one stack of Chilled on %s (x%d remains)" % [
+						cl_a.unit_name, cl_a.status_stacks("chilled")], "#e8d090")
+				else:
+					cl_a.remove_status(cl_pick.id)
+					# Ruin and its primer travel together — the rite averts
+					# the detonation, not just the mark.
+					if cl_pick.id == "ruin":
+						cl_a.remove_status("ruin_primed")
+					_log("   → Cleansing Rite strips %s from %s" % [cl_pick.label,
+						cl_a.unit_name], "#e8d090")
+			if rite_hits == 0:
+				_log("%s: Cleansing Rite finds nothing to strip" % attacker.unit_name,
+					"#909090")
+		"windup":
+			# Ash Hurler (Batch V): the blow is TELEGRAPHED — nothing lands
+			# now. The stored ability resolves at this unit's next turn;
+			# Break, Freeze, or Stun the charger and it never lands at all
+			# (the turn loop owns both the landing and the cancel).
+			_sfx("break", -10.0, 0.5)
+			attacker.add_status("charging", "Charging", "!!", Color(1.0, 0.62, 0.3), -1,
+				"%s lands at this unit's next turn:\nheavy damage to the whole party.\nBreak, Freeze, or Stun the charger\nto cancel the blow." % ab.display_name)
+			var wu := attacker.get_status("charging")
+			if not wu.is_empty():
+				wu["ability"] = ab.display_name
+			_message("%s hoists a massive blow!" % attacker.unit_name)
+			_log("%s is charging %s — it lands next turn! (Break, Freeze, or Stun cancels it)" % [
+				attacker.unit_name, ab.display_name], "#e08850")
+		"blood_tribute":
+			# Orc Bloodcaller (Batch V): every fallen ally feeds the rite —
+			# +25% damage and Break damage per corpse. Resolved as a plain
+			# attack copy (the Hysteria pattern) so armor, resists, and
+			# crits all apply normally.
+			var bt_fallen := enemies.filter(func(e): return e.dead).size()
+			var bt_mult := 1.0 + 0.25 * bt_fallen
+			if bt_fallen > 0:
+				_log("%s: Blood Tribute — %d fallen feed the rite (+%d%% damage and Break)" % [
+					attacker.unit_name, bt_fallen, 25 * bt_fallen], "#c04868")
+			var bt_copy: Ability = Ability.make({"display_name": ab.display_name,
+				"damage": int(round(ab.damage * bt_mult)),
+				"pressure": int(round(ab.pressure * bt_mult)),
+				"dmg_type": ab.dmg_type, "anim": ab.anim, "delay": ab.delay})
+			await _resolve(attacker, bt_copy, target, grade)
+		"totem_pulse":
+			# Grave Totem (Batch V): every living ally knits back 6% of its
+			# OWN maximum — weak per body, real across a full field. The
+			# side follows the TARGET (psychosis turns it on the heroes).
+			_sfx("heal", -7.0, 0.65)
+			var tp_side: Array = heroes if target.is_hero else enemies
+			var tp_total := 0
+			for tp_a in tp_side:
+				if tp_a.dead:
+					continue
+				var tp_amt := maxi(int(round(tp_a.max_hp * 0.06)), 1)
+				var tp_got: int = tp_a.heal_amount(tp_amt, tp_a != attacker)
+				tp_total += tp_got
+				if tp_got > 0:
+					tp_a.float_text("+%d" % tp_got, Color(0.55, 0.5, 0.75))
+			_message("%s pulses with dark vigil..." % attacker.unit_name)
+			_log("%s: Dark Vigil — every ally regains 6%% of its own health (%d in all)" % [
+				attacker.unit_name, tp_total], "#70d878")
 		"flame_shield":
 			_sfx("parry", -7.0, 1.1)
 			_apply_status(attacker, "flame_shield", 2)

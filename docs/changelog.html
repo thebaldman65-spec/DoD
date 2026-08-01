@@ -5,6 +5,73 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-01 — Batch V: enemies that ask questions</h2>
+<ul>
+<li><b>Four new enemy kinds, each posing a question a specific hero spec answers</b> —
+the roster's sixteen kinds shared three special behaviours between them
+(<code>enemy_shield</code>, <code>healing_wave</code>, <code>wild_growth</code>), so
+enemies never engaged the heroes' status engines. No existing enemy's stats changed
+(Batch T just tuned the curve against that roster). The new kinds: <b>Orc Ritual
+Chanter</b> (power 2, mender, all rosters — fast, fragile, physically soft),
+<b>Ash Hurler</b> (power 3, brute·sniper, rosters 2–3 — slow ranged siege),
+<b>Orc Bloodcaller</b> (power 2, hexer, all rosters), and <b>Grave Totem</b> (power 2,
+mender·hexer, rosters 1–3 forest slots — Con 60 but physical resist 35%, fire/holy
+vulnerable 50%).</li>
+<li><b>Four new special behaviours</b> (the batch's working title said three; the data
+design needed four). <code>cleanse_allies</code> — Cleansing Rite strips the
+longest-remaining debuff from each living ally, with guardrails: Chilled thaws ONE stack
+(a single cast must not erase four turns of Cryomancer work), stripping Ruin also clears
+its primer, sticky poisons (Slow Acting/Epidemic) refuse it, and Broken/Bleed are meter
+states it never touches. <code>windup</code> — Siege Stone applies a visible
+<b>Charging</b> chip on cast and resolves the following turn as a party-wide attack
+through the normal pipeline; being <b>Broken, Frozen, or Stunned while charging cancels
+it entirely</b>, loudly logged — the first telegraphed enemy mechanic.
+<code>blood_tribute</code> — +25% damage and Break damage per enemy fallen this battle,
+resolved as a scaled attack copy so armor/resists/crits apply. <code>totem_pulse</code> —
+Dark Vigil heals every living ally 6% of its own max HP. All four ride the
+condition-gated support AI (the Chanter casts when any ally carries a strippable debuff,
+the Totem when two or more allies are wounded), and a psychotic Chanter or Totem turns
+its magic on the heroes, like every other enemy support.</li>
+<li><b>Mender cap:</b> the theme generator could roll three and four healer warbands
+(2,007 distinct ones existed — Ritual and Lightning Storm pools go to 3–4); with a
+cleanse joining the roster, that is a wall, not a question. <code>_combo_ok</code> now
+rejects any warband with more than two mender-TAGGED kinds, counted by role tag no
+matter which pool claimed them (a Grave Totem drawn through a hexer pool still heals).
+Theme-safety audit (recreated <code>test_zone_rosters.gd</code>): satisfiability
+matrices before/after show <b>no theme lost a single budget in any roster</b> — the new
+kinds only added rolls (Swarm r2 now reaches 10–12, Poison Volley r2 reaches 12) — and
+the Rot Behemoth still appears in roster-2 brute slots alongside the Hurler. Distinct
+warbands: <b>11,344 → 23,561</b>.</li>
+<li><b>Verified headless</b> (forced-lineup autoplay battles): a Cleansing Rite stripped
+Pyromancer Burns; a Siege Stone charge resolved the following turn party-wide; Blood
+Tribute logged +25% after one death; Dark Vigil pulsed 53 HP across a five-body
+warband; and the load-bearing one — <b>a Swordmaster Break cancelled a mid-charge
+Siege Stone</b> ("slips from its grasp — CANCELLED"), with a Pommel-Strike stun
+cancelling another. Zero script errors; map-screen resist preview reads the new kinds
+from the same JSON as everything else.</li>
+<li><b>Doc repair while in §9:</b> the tier-scaling paragraph still described the
+pre-Batch-36 game-long ladder at the pre-Batch-T rates (+4%/+5%); corrected to
+zone-local +2%/+2.5% atop the ×1.0/1.5/2.2 slot multipliers.</li>
+<li><b>Re-measure (report only, nothing tuned — Batch T owns the numbers):</b>
+sweep 200, roster 1: <b>100 / 100 / 98.5 / 97.5%</b> wins at budgets 3/6/9/12 vs
+Batch R's 100/100/98/93.5 — mid budgets flat, top band EASIER (+4pts; deaths/battle
+at 12 fell ~1.3–1.5 → 1.00), inverting the batch's own prediction. Two causes: the
+Hurler is rosters 2–3 only, so the roster-1 sweep never sees the one kind meant to
+spike the top; and the mender cap deleted the 3–4-healer warbands that lived exactly
+in the top budgets. Run 50 (route=default, economy on, vs Batch U's matching row):
+completions <b>6% → 14%</b>, wipe median <b>z1 t9-10 → z2 t6</b> — the wipe median
+moved MORE than one tier, so per this batch's own rule that is a tuning conversation
+to have separately, not a silent adjustment. The z1 curve itself is unchanged (t8
+ratio 0.99 in band, t9-10 at 0.86/0.84, boss 0.72 vs T's 0.70; 33/50 runs reach the
+z1 boss, 94% win) — the easing is concentrated where heal-wall warbands used to
+grind runs down, which points at the cap, not the kinds. Caveats stated: n=50
+completion counts are noisy (7 vs 3 runs); the corroborating signals are the median
+shift and the sweep's top-band death drop. z2/z3 tails sit where U left them
+(z2 t10 0.65, z3 t9-10 0.50/0.51, z3 boss 0.41). Damage share: Cryomancer 40–48%
+falling with field size, Devout 3–5% — the outlier pass's targets are untouched by
+this batch.</li>
+</ul>
+
 <h2>2026-08-01 — Batch U: an honest floor</h2>
 <ul>
 <li><b>Harness batch, zero tuning</b> — Batch T owns the numbers; this batch establishes

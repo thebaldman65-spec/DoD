@@ -458,6 +458,16 @@ func _combo_ok(spec: Dictionary, picked: Array, role_counts: Dictionary) -> bool
 			distinct[kind] = true
 		if distinct.size() < int(spec["min_kinds"]):
 			return false
+	# Healers stack into walls (Batch V): cap mender-TAGGED kinds at 2 per
+	# warband no matter which pool claimed them — a Grave Totem drawn
+	# through a hexer pool still heals, and two heals plus a cleanse is a
+	# wall rather than a question.
+	var menders := 0
+	for kind in picked:
+		if Enemies.roles(kind).has("mender"):
+			menders += 1
+	if menders > 2:
+		return false
 	return true
 
 
