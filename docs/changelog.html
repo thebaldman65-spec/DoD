@@ -5,6 +5,43 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-31 — Batch Q: Hunter stat blocks + The Pack goes live</h2>
+<ul>
+<li><b>All three Hunter specs get their stat blocks</b> (the last class without them —
+every spec in the game now carries one): Beastmaster 160 HP / 15% armor / +20% nature,
++5% physical; Sharpshooter 140 HP / 10% armor / +10% nature, −10% physical; Survivalist
+170 HP / 18% armor / +25% nature, +10% shadow, −15% arcane. Constitutions unchanged
+(100/90/100), Attack stays 100 for all three. The Beastmaster's armor sits below the
+Survivalist's on purpose: companions inherit it at summon, so it multiplies across up to
+three bodies (verified live — beasts spawn with the spec's 15%, not the old class base).
+The Sharpshooter's flagged 38% damage share was deliberately NOT touched — that belongs
+to the difficulty pass, where it can be measured.</li>
+<li><b>The Pack capstone is implemented</b> — the Beastmaster's take-one-of-three was
+really take-one-of-two, with a visible node the player could never buy. Now: TWO beasts
+active at once, both strike when the hunter attacks, each keeps its own Loyalty meter and
+grants its own Pack Bond boon; summoning a third replaces whichever active beast has
+lower Loyalty (never two of the same kind). Kill Command fires on BOTH beasts (tooltip
+says so; if the prey falls mid-order the pack turns on the next weakest), Hunter's
+Instinct mends both, Bestial Wrath takes both, Spirit Bond flows through both, and
+Primal Surge spends every beast's Loyalty for the summed burn. One beast dying leaves
+the other standing with its meter intact.</li>
+<li><b>Under the hood:</b> the hunter's single companion reference became an array —
+the single-beast case is a one-element array, so no companion code path forks (the
+rescope trigger in the batch never fired). Beast plates stack below the party in the
+first free slot, and a replaced beast now frees its nameplate (a longstanding silent
+leak). The bot summons a second beast under The Pack (wolf, then eagle).</li>
+<li><b>Checked before shipping:</b> capstone exclusivity holds (One Soul / Apex Predator
+can never coexist with The Pack — the one-capstone rule bars them), and the feared
+Ursus + Aguila pairing is fine: the two boons ride different pipelines (hunter-only
+damage-taken multiplier vs party-wide crit), nothing compounds.</li>
+<li><b>Sim 200 (berserker/cryomancer/inquisitor/beastmaster):</b> 200/200 wins, 0.17 hero
+deaths/battle, 7.4 rounds avg; damage share Cryomancer 45% / Beastmaster 31% / Berserker
+21% / Devout 3%. With The Pack force-learned (100 battles): 100/100, Beastmaster 31→32%,
+party crit 12.7→17.3% (Aguila's boon working party-wide), enemy damage taken 210→182 —
+a healthy capstone, not a degenerate one. Win rate stays saturated; the difficulty pass
+is next.</li>
+</ul>
+
 <h2>2026-07-31 — Batch P: the Arcanist's ramp stops flatlining</h2>
 <ul>
 <li><b>The diagnosis:</b> Resonance built +1 per damaging cast, capped at 5, and persisted

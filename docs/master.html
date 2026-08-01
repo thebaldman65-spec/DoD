@@ -757,7 +757,10 @@ both.<br>
 </ul>
 <h3>6.4 Hunter</h3>
 <ul>
-<li><b>Beastmaster (Ramp)</b> — Passive <i>Pack Bond</i>: the active beast grants its boon —
+<li><b>Beastmaster (Ramp)</b> — <b>Stat block:</b> 160 HP / 15% armor / +20% nature resist,
++5% physical (the armor is a multiplier across up to three bodies — companions inherit it
+at summon — so it sits below the Survivalist's despite similar Constitution).<br>
+Passive <i>Pack Bond</i>: the active beast grants its boon —
 <b>Ursus, Savage Presence:</b> enemies are 15% more likely to attack the bear, and the hunter
 takes 10% less damage; <b>Canis:</b> the hunter deals +15% damage for EVERY enemy under 35%
 health; <b>Aguila:</b> the hunter and the whole party gain +10% crit chance.<br>
@@ -773,11 +776,12 @@ the doubling threshold itself never moves from 5.)<br>
 <i>Guardian's Roar</i>, taunting the lowest-health enemy (preferring one not already taunted)
 while the bear takes 25% less damage for 2 turns; Canis: <i>Bloodhowl</i>, 15 Bleed to every
 enemy; Aguila: dives a chosen enemy for 15% of the hunter's Attack, Dazing them.<br>
-<b>Companions:</b> one at a time (placeholder sphere sprites: red/blue/green). Summoning goes
+<b>Companions:</b> one at a time — two under The Pack capstone (placeholder sphere sprites:
+red/blue/green; never two of the same kind). Summoning goes
 through the <b>"Summon Companion" beast picker</b> at the top of the ability list on hotkey W
-(see §10); with a beast already out it becomes <b>"Swap Companion"</b> — 10 Mana, 1.0
+(see §10); at beast capacity it becomes <b>"Swap Companion"</b> — 10 Mana, 1.0
 initiative, shared 2-turn cooldown, no skill check: the newcomer arrives with its swap effect
-and +1 Loyalty. Companions have HP, can be targeted by enemies and healed by allies, and
+and +1 Loyalty (under The Pack it replaces whichever active beast has lower Loyalty). Companions have HP, can be targeted by enemies and healed by allies, and
 inherit the hunter's armor, Constitution, and crit chance (talents can add companion HP and
 damage). They automatically attack (physical) whenever the hunter attacks; they take no
 timeline turns (statuses tick and Breaks recover on the hunter's turn).<br>
@@ -788,13 +792,14 @@ for 20% of the hunter's Attack, building 20 Bleed.<br>
 Summon Aguila — 20 Mana, 3.0, 3cd. Eagle, 80 HP, always ELUSIVE: strikes the hunter's target
 for 20% of the hunter's Attack, applying Exposed (2 turns).<br>
 Hunter's Instinct — 20 Mana, 3.0, 3cd (no skill check): empowers the next 3 Quick Shots —
-each deals +10% of the hunter's Attack and heals the companion for 15% of its max health
-(HI# chip counts the shots).<br>
+each deals +10% of the hunter's Attack and heals every active beast for 15% of its max
+health (HI# chip counts the shots).<br>
 Kill Command — 30 Mana, 4.0, 3cd, requires a living companion. The order is the beast's
 own — <b>Ursus:</b> mauls for 45% of the hunter's Attack + 40 BD; <b>Canis:</b> 3 bites of
 18% Attack, each building 10 Bleed (+2 per Loyalty), then feasts to heal 30% of its max
 health; <b>Aguila:</b> strikes TWO chosen enemies for 25% Attack each, Blinding them 3
-turns. (Perfect: the beast gains 1 Loyalty.)<br>
+turns. Under The Pack BOTH beasts obey the order; if the prey falls mid-order the rest of
+the pack turns on the next weakest. (Perfect: each beast that obeyed gains 1 Loyalty.)<br>
 <b>BOSS TROPHIES — one ability pick per zone boss</b>, chosen on the Party screen from the
 pool of five (the base kit is the three summons, Hunter's Instinct, and Kill Command):<br>
 Bestial Wrath — 25 Mana, 4.0, 3cd, requires a living companion (no skill check): unleashes
@@ -818,7 +823,10 @@ Mark of the Hunt — 15 Mana, 2.0, 3cd. Marks an enemy for 5 turns (Perfect: 7):
 and their beast deal +25% damage to it, and every strike on it restores 3% of the hunter's
 max Mana. The cooldown resets if the marked enemy dies. Works with or without a beast.<br>
 <b>Talent lanes:</b> see §7 — Devotion / The Pack / Handler, the lane framework's pilot.</li>
-<li><b>Sharpshooter (Nuker)</b> — Passive <i>Lethal Aim</i>: critical hits deal ×2 damage
+<li><b>Sharpshooter (Nuker)</b> — <b>Stat block:</b> 140 HP / 10% armor / Constitution 90 /
++10% nature resist, −10% physical (the lightest of the three: a marksman who wants to be at
+range and pays for being reached).<br>
+Passive <i>Lethal Aim</i>: critical hits deal ×2 damage
 instead of ×1.5, and the marksman runs on <b>FOCUS (0–100, green second bar)</b>: +20
 whenever they attack the enemy they attacked last turn (talents raise the gain and the
 cap), dropped to 0 on switching targets, and up to 50 retained on a kill. Every point of
@@ -844,7 +852,11 @@ armor, 2 turns), +30 Break damage, or Exposed (3 turns). A picker opens on cast 
 picks armor against armored targets).<br>
 <b>Talent lanes:</b> see §7 — Precision / Penetration / Tempo, the first NODE-GATED
 tree.</li>
-<li><b>Survivalist (Pressure)</b> — Passive <i>Trapper</i>: enemies that strike the Hunter
+<li><b>Survivalist (Pressure)</b> — <b>Stat block:</b> 170 HP / 18% armor / +25% nature
+resist, +10% shadow, −15% arcane (the toughest Hunter by design — his passive rewards being
+struck and Tripwire wants him in the fray; deep nature affinity from a life spent in it,
+while raw arcane is the thing the woods teach nothing about).<br>
+Passive <i>Trapper</i>: enemies that strike the Hunter
 have a 25% chance to be Poisoned (5 turns), and the Survivalist's abilities deal <b>+8%
 damage per DIFFERENT status effect</b> afflicting the target (the curated debuff list only)
 — breadth of control IS the damage. Five different debuffs beat fifty stacks of one; his
@@ -1087,7 +1099,9 @@ Instinctive (Hunter's Instinct empowers 5 shots), Symbiosis (companion strikes r
 max Mana), Vengeance (beast death → inherit its boon +30% damage 5 turns; <i>exclusive with
 Steadfast Bond</i>), Lone Hunter (no companion: costs −40%, damage +25%).<br>
 <b>CAPSTONES</b> — One Soul (Devotion: hunter and beast split ALL damage evenly; Loyalty
-gain doubled), The Pack (Pack lane: two beasts at once — COMING SOON), Apex Predator
+gain doubled), The Pack (Pack lane: TWO beasts active at once — both strike when the hunter
+attacks, each keeps its own Loyalty meter and grants its own Pack Bond boon; summoning a
+third replaces whichever active beast has lower Loyalty), Apex Predator
 (Handler: Quick Shot triggers an extra free companion strike; Kill Command resets on every
 enemy death).</p>
 <p><b>Occultist lanes (node-gated):</b><br>

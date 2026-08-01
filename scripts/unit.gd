@@ -68,7 +68,8 @@ var is_boss := false        # bosses cannot be Stunned unless Broken
 var enemy_role := ""        # "tank"/"support"/"damage" — heal-AI priorities
 var is_companion := false   # Beastmaster summon: no turns, fights alongside
 var companion_kind := ""    # "ursus" / "canis" / "aguila"
-var companion: BattleUnit   # the Beastmaster's active summon (on the hunter)
+var beasts: Array = []      # the Beastmaster's active summons (on the hunter;
+							# one element normally, two under The Pack)
 var pack_master: BattleUnit  # the hunter this companion belongs to (on the beast)
 var loyalty := {}           # Beastmaster: per-beast Loyalty stacks (on the hunter)
 var bestial_hp_bonus := 0    # Bestial Wrath (Ursus): doubled health, reverted on expiry
@@ -98,7 +99,7 @@ var vengeance := 0           # beast death -> inherit boon + 30% dmg, 5 turns
 var lone_hunter := 0         # no companion: costs -40%, damage +25%
 var one_soul := 0            # capstone: shared health pool, double Loyalty
 var apex := 0                # capstone: extra Quick Shot strike, KC resets
-var the_pack := 0            # capstone: deferred (coming soon)
+var the_pack := 0            # capstone: two beasts active at once
 var vengeance_kind := ""     # which boon Vengeance carries while it lasts
 var kinds_summoned := {}     # beasts fielded this fight (Feral Momentum et al)
 var free_summon := false     # No Beast Left: the next summon is free
@@ -583,6 +584,15 @@ func _build_sphere_sprite(sprite_scale: float) -> void:
 const PLATE_W := 144.0
 const PLATE_BAR_W := 96.0
 const PLATE_BAR_X := 42.0  # bars sit right of the 34px portrait column
+
+
+# Frees the sibling nameplate along with the unit — companion cleanup:
+# a replaced beast must give its plate slot back (queue_free alone leaves
+# the plate behind, because it is NOT a child of the unit).
+func free_plate() -> void:
+	if _plate_root != null and is_instance_valid(_plate_root):
+		_plate_root.queue_free()
+	_plate_root = null
 
 
 # Builds this unit's nameplate (portrait, name, HP/resource/Break bars,

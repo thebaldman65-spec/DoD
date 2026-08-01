@@ -1637,39 +1637,39 @@ func _player_turn(u: BattleUnit) -> void:
 		u.refresh_bars()
 	# Companions have no turns of their own: their statuses tick (and Breaks
 	# recover) with their master. Standing at the hunter's side earns Loyalty.
-	if u.companion != null and not u.companion.dead:
-		_gain_loyalty(u, u.companion.companion_kind)
+	for tick_b in _beasts(u):
+		_gain_loyalty(u, tick_b.companion_kind)
 		# Unbroken Watch: an unbloodied beast grows more devoted.
-		if u.unbroken_watch > 0 and not u.companion.damaged_since_turn:
-			_gain_loyalty(u, u.companion.companion_kind)
-		u.companion.damaged_since_turn = false
+		if u.unbroken_watch > 0 and not tick_b.damaged_since_turn:
+			_gain_loyalty(u, tick_b.companion_kind)
+		tick_b.damaged_since_turn = false
 		# Spirit Bond's delayed mending lands before the timers tick away.
-		if u.companion.has_status("spirit_heal"):
-			var csb: int = u.companion.heal_amount(
-				maxi(u.companion.status_power("spirit_heal"), 1))
-			u.companion.float_text("+%d" % csb, Color(0.4, 0.9, 0.45))
-			_log("   → Spirit Bond mends %s for %d" % [u.companion.unit_name,
+		if tick_b.has_status("spirit_heal"):
+			var csb: int = tick_b.heal_amount(
+				maxi(tick_b.status_power("spirit_heal"), 1))
+			tick_b.float_text("+%d" % csb, Color(0.4, 0.9, 0.45))
+			_log("   → Spirit Bond mends %s for %d" % [tick_b.unit_name,
 				csb], "#70d878")
-		u.companion.tick_statuses()
+		tick_b.tick_statuses()
 		# Bestial Wrath / Vigor fading: the borrowed bulk leaves the beast.
-		if not u.companion.has_status("bestial") \
-				and (u.companion.bestial_hp_bonus > 0 \
-				or u.companion.bestial_armor_bonus > 0.0):
-			u.companion.max_hp -= u.companion.bestial_hp_bonus
-			u.companion.hp = clampi(u.companion.hp, 1, u.companion.max_hp)
-			u.companion.armor -= u.companion.bestial_armor_bonus
-			u.companion.bestial_hp_bonus = 0
-			u.companion.bestial_armor_bonus = 0.0
-			u.companion.refresh_bars()
-			_log("%s's Bestial Wrath subsides" % u.companion.unit_name, "#909090")
-		if not u.companion.has_status("vigor") and u.companion.vigor_hp_bonus > 0:
-			u.companion.max_hp -= u.companion.vigor_hp_bonus
-			u.companion.hp = clampi(u.companion.hp, 1, u.companion.max_hp)
-			u.companion.vigor_hp_bonus = 0
-			u.companion.refresh_bars()
-		if u.companion.broken:
-			u.companion.broken_pending = false
-			u.companion.recover_from_break()
+		if not tick_b.has_status("bestial") \
+				and (tick_b.bestial_hp_bonus > 0 \
+				or tick_b.bestial_armor_bonus > 0.0):
+			tick_b.max_hp -= tick_b.bestial_hp_bonus
+			tick_b.hp = clampi(tick_b.hp, 1, tick_b.max_hp)
+			tick_b.armor -= tick_b.bestial_armor_bonus
+			tick_b.bestial_hp_bonus = 0
+			tick_b.bestial_armor_bonus = 0.0
+			tick_b.refresh_bars()
+			_log("%s's Bestial Wrath subsides" % tick_b.unit_name, "#909090")
+		if not tick_b.has_status("vigor") and tick_b.vigor_hp_bonus > 0:
+			tick_b.max_hp -= tick_b.vigor_hp_bonus
+			tick_b.hp = clampi(tick_b.hp, 1, tick_b.max_hp)
+			tick_b.vigor_hp_bonus = 0
+			tick_b.refresh_bars()
+		if tick_b.broken:
+			tick_b.broken_pending = false
+			tick_b.recover_from_break()
 	_show_actions(u)
 	var ab: Ability
 	var auto_target: BattleUnit = null
@@ -1730,8 +1730,8 @@ func _player_turn(u: BattleUnit) -> void:
 		# Dual/triple-choice abilities pick extra, different enemies (the bot
 		# skips the clicks and lets _resolve pick its extras randomly).
 		# Aguila's Kill Command strikes two chosen targets.
-		var kc_two := ab.special == "kill_command" and u.companion != null \
-			and not u.companion.dead and u.companion.companion_kind == "aguila"
+		var kc_two := ab.special == "kill_command" \
+			and _beasts(u).any(func(b): return b.companion_kind == "aguila")
 		second_target = null
 		third_target = null
 		if target != null and (ab.choose_two or ab.choose_three or kc_two) \
@@ -2041,33 +2041,38 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				return [u.abilities[0], most_chilled]    # Frostbolt the deepest pile
 			return [u.abilities[0], target_foe]          # basic bolt
 		"hunter":
-			var summon := _find_ability(u, "Summon Canis")
-			if summon != null and u.resource >= summon.cost and u.ability_ready(summon) \
-					and (u.companion == null or u.companion.dead):
-				return [summon, u]
+			# Fill every free beast slot (The Pack fields two: wolf, then
+			# eagle; the bear when a preferred call is down).
+			var bot_beasts: Array = _beasts(u)
+			if bot_beasts.size() < _beast_cap(u):
+				for want in ["canis", "aguila", "ursus"]:
+					if bot_beasts.any(func(b): return b.companion_kind == want):
+						continue
+					var summon := _find_ability(u, "Summon " + want.capitalize())
+					if summon != null and _ability_usable(u, summon):
+						return [summon, u]
 			# Spirit Bond when the pack is hurting.
 			var sbond := _find_ability(u, "Spirit Bond")
 			if sbond != null and u.resource >= sbond.cost and u.ability_ready(sbond) \
-					and u.companion != null and not u.companion.dead \
+					and not bot_beasts.is_empty() \
 					and (u.hp < u.max_hp * 0.6 \
-					or u.companion.hp < u.companion.max_hp * 0.5):
+					or bot_beasts.any(func(b): return b.hp < b.max_hp * 0.5)):
 				return [sbond, u]
-			# Unleash the beast, then give the big order.
+			# Unleash the beasts, then give the big order.
 			var bw := _find_ability(u, "Bestial Wrath")
 			if bw != null and u.resource >= bw.cost and u.ability_ready(bw) \
-					and u.companion != null and not u.companion.dead \
-					and not u.companion.has_status("bestial"):
+					and bot_beasts.any(func(b): return not b.has_status("bestial")):
 				return [bw, u]
 			var kill_cmd := _find_ability(u, "Kill Command")
 			if kill_cmd != null and u.resource >= kill_cmd.cost and u.ability_ready(kill_cmd) \
-					and u.companion != null and not u.companion.dead:
+					and not bot_beasts.is_empty():
 				return [kill_cmd, target_foe]
 			# Boss trophies, when owned: surge a deep bond, call the pack
 			# into a crowd, keep a mark burning.
 			var ps := _find_ability(u, "Primal Surge")
 			if ps != null and _ability_usable(u, ps) \
-					and u.companion != null and not u.companion.dead \
-					and int(u.loyalty.get(u.companion.companion_kind, 0)) >= 4:
+					and bot_beasts.any(func(b): \
+					return int(u.loyalty.get(b.companion_kind, 0)) >= 4):
 				return [ps, target_foe]
 			var cotw := _find_ability(u, "Call of the Wild")
 			if cotw != null and _ability_usable(u, cotw) \
@@ -2391,7 +2396,7 @@ func _show_actions(u: BattleUnit) -> void:
 		if entry.has("summons"):
 			# Top of the list: opens the beast picker (Tab cycles, Space picks).
 			# With a beast already out it becomes the Swap (10 Mana, shared 2cd).
-			var swapping := u.companion != null and not u.companion.dead
+			var swapping := _beasts(u).size() >= _beast_cap(u)
 			var group_btn := Button.new()
 			group_btn.text = "[%s] %s Companion ▸" % [ABILITY_KEY_NAMES[e_idx],
 				"Swap" if swapping else "Summon"]
@@ -2400,12 +2405,16 @@ func _show_actions(u: BattleUnit) -> void:
 			group_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			if swapping:
 				group_btn.tooltip_text = "Swap the active beast (10 %s, 1.0 int,\nshared 2-turn cooldown). The newcomer\narrives with its swap effect and\n+1 Loyalty." % u.resource_name
+				if u.the_pack > 0:
+					group_btn.tooltip_text += "\nThe newcomer replaces the beast\nwith lower Loyalty."
 				if u.cooldowns.get("Swap Companion", 0) > 0:
 					group_btn.tooltip_text += "\n(Swap recovering: %d turn(s))" % \
 						u.cooldowns["Swap Companion"]
 			else:
 				group_btn.tooltip_text = "Choose which beast answers the call.\n" \
-					+ "Tab cycles the options, Space summons.\nOnly one companion at a time."
+					+ "Tab cycles the options, Space summons.\n" \
+					+ ("The Pack: two beasts run at once." if u.the_pack > 0 \
+					else "Only one companion at a time.")
 			group_btn.pressed.connect(_on_summon_group_pressed.bind(popup))
 			list.add_child(group_btn)
 		else:
@@ -2440,7 +2449,7 @@ func _eff_cost(u: BattleUnit, ab: Ability) -> int:
 	if u.snap_shot > 0 and not u.snap_used and ab.cost > 0:
 		return 0
 	var c := ab.cost
-	if u.lone_hunter > 0 and (u.companion == null or u.companion.dead):
+	if u.lone_hunter > 0 and _beasts(u).is_empty():
 		c = int(round(c * 0.6))
 	return c
 
@@ -2454,13 +2463,12 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 			and not (ab.special == "summon" and u.free_summon):
 		return false
 	if ab.special in ["kill_command", "bestial", "spirit_bond"] \
-			and (u.companion == null or u.companion.dead):
+			and _beasts(u).is_empty():
 		return false
 	# Primal Surge needs a beast with Loyalty to spend.
 	if ab.special == "primal_surge":
-		if u.companion == null or u.companion.dead:
-			return false
-		if int(u.loyalty.get(u.companion.companion_kind, 0)) < 1:
+		if not _beasts(u).any(func(b): \
+				return int(u.loyalty.get(b.companion_kind, 0)) >= 1):
 			return false
 	# Lone Bond: one beast per fight — no swaps, no second call.
 	if ab.special == "summon" and u.lone_bond > 0 and not u.kinds_summoned.is_empty():
@@ -2475,14 +2483,16 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 				trap_count += 1
 		if trap_count >= (2 if u.deadfall_network > 0 else 1):
 			return false
-	# Swap Companion: shared cooldown (waived by Wild Rotation), and never
-	# to the beast already out.
+	# Never a second beast of a kind already fielded (Loyalty keys on kind).
+	if ab.special == "summon" and _beasts(u).any(func(b): \
+			return b.companion_kind == ab.display_name.get_slice(" ", 1).to_lower()):
+		return false
+	# Swap Companion: shared cooldown (waived by Wild Rotation), and only
+	# with a beast out to replace.
 	if ab.special == "summon" and ab.display_name.begins_with("Swap"):
-		if u.companion == null or u.companion.dead:
+		if _beasts(u).is_empty():
 			return false
 		if u.cooldowns.get("Swap Companion", 0) > 0 and u.wild_rotation == 0:
-			return false
-		if u.companion.companion_kind == ab.display_name.get_slice(" ", 1).to_lower():
 			return false
 	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
 		return false
@@ -2526,7 +2536,7 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	ab_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	ab_btn.tooltip_text = _ability_tooltip(u, ab)
 	if ab.special in ["kill_command", "bestial", "spirit_bond"] \
-			and (u.companion == null or u.companion.dead):
+			and _beasts(u).is_empty():
 		ab_btn.tooltip_text += "\n(No living companion)"
 	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
 		ab_btn.tooltip_text += "\n(No fallen allies)"
@@ -2564,20 +2574,23 @@ func _on_summon_group_pressed(popup: PopupPanel) -> void:
 
 func _open_summon_picker(u: BattleUnit) -> void:
 	_close_summon_picker()
-	# With a living beast out, the picker offers SWAPS instead: cheap, quick
+	# At beast capacity the picker offers SWAPS instead: cheap, quick
 	# clones that share one "Swap Companion" cooldown (set in _do_summon).
-	var swapping := u.companion != null and not u.companion.dead
+	var swapping := _beasts(u).size() >= _beast_cap(u)
 	if swapping:
 		_summon_opts = []
 		for a in u.abilities:
 			if a.special != "summon":
 				continue
 			var beast: String = a.display_name.get_slice(" ", 1)
+			var swap_desc := "Swap the pack: %s arrives with its\nswap effect and +1 Loyalty.\nShared cooldown: 2 turns." % beast
+			if u.the_pack > 0:
+				swap_desc += "\nReplaces the beast with lower Loyalty."
 			_summon_opts.append(Ability.make({"display_name": "Swap " + beast,
 				"cooldown": 0, "cost": 10, "special": "summon", "delay": 1.0,
 				"anim": "attack01", "no_skill_check": true,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Swap the pack: %s arrives with its\nswap effect and +1 Loyalty.\nShared cooldown: 2 turns." % beast}))
+				"description": swap_desc}))
 	else:
 		_summon_opts = u.abilities.filter(func(a): return a.special == "summon")
 	# Call of the Wild (boss trophy) rides in the group in both modes.
@@ -2954,13 +2967,21 @@ func _enemy_turn(u: BattleUnit) -> void:
 	if u.has_status("mocked"):
 		var mocker_idx := u.status_power("mocked")
 		# 100+ encodes a COMPANION taunt: the beast of heroes[idx - 100].
+		# The pull prefers the bear (it does the roaring); any living
+		# beast answers otherwise.
 		if mocker_idx >= 100:
 			var taunt_master_idx := mocker_idx - 100
-			if taunt_master_idx < heroes.size() \
-					and heroes[taunt_master_idx].companion != null \
-					and not heroes[taunt_master_idx].companion.dead:
-				living = [heroes[taunt_master_idx].companion]
-				is_mocked = true
+			if taunt_master_idx < heroes.size():
+				var tm_beasts: Array = _beasts(heroes[taunt_master_idx])
+				var puller: BattleUnit = null
+				for tb in tm_beasts:
+					if tb.companion_kind == "ursus":
+						puller = tb
+				if puller == null and not tm_beasts.is_empty():
+					puller = tm_beasts[0]
+				if puller != null:
+					living = [puller]
+					is_mocked = true
 		elif mocker_idx >= 0 and mocker_idx < heroes.size() and not heroes[mocker_idx].dead:
 			living = [heroes[mocker_idx]]
 			is_mocked = true
@@ -3878,8 +3899,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					raw *= 1.10
 				if attacker.has_status("vengeance"):
 					raw *= 1.30
-				if attacker.lone_hunter > 0 \
-						and (attacker.companion == null or attacker.companion.dead):
+				if attacker.lone_hunter > 0 and _beasts(attacker).is_empty():
 					raw *= 1.25
 				if strike_target.has_status("hunt_mark") \
 						and strike_target.status_power("hunt_mark") == heroes.find(attacker):
@@ -4859,16 +4879,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_message("%s falls!" % sp_t.unit_name)
 						_log("† %s dies" % sp_t.unit_name, "#e05050")
 						_on_enemy_death(sp_t)
-		# Hunter's Instinct: each empowered shot also tends the beast.
+		# Hunter's Instinct: each empowered shot also tends every beast.
 		if ab.display_name == "Quick Shot" and not is_counter \
 				and attacker.has_status("instinct"):
-			if attacker.companion != null and not attacker.companion.dead:
-				var hi_heal: int = attacker.companion.heal_amount(
-					int(attacker.companion.max_hp * 0.15))
-				attacker.companion.float_text("+%d" % hi_heal, Color(0.4, 0.9, 0.45))
-				attacker.companion.refresh_bars()
+			for hi_b in _beasts(attacker):
+				var hi_heal: int = hi_b.heal_amount(int(hi_b.max_hp * 0.15))
+				hi_b.float_text("+%d" % hi_heal, Color(0.4, 0.9, 0.45))
+				hi_b.refresh_bars()
 				_log("   → Instinct mends %s for %d" % [
-					attacker.companion.unit_name, hi_heal], "#70d878")
+					hi_b.unit_name, hi_heal], "#70d878")
 			var hi_left := attacker.status_power("instinct") - 1
 			if hi_left <= 0:
 				attacker.remove_status("instinct")
@@ -4877,20 +4896,22 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var hi_info: Array = STATUS_INFO["instinct"]
 				attacker.update_status("instinct", "HI%d" % hi_left,
 					hi_info[3], hi_left)
-		# The Beastmaster's companion strikes alongside the hunter.
+		# The Beastmaster's beasts strike alongside the hunter (The Pack:
+		# both fire; a beast whose prey just fell picks the next weakest).
 		if attacker.is_hero and attacker.passive_id == "pack" and ab.damage > 0 \
-				and not is_counter and attacker.companion != null \
-				and not attacker.companion.dead:
+				and not is_counter:
 			var comp_target: BattleUnit = target
-			if comp_target == null or comp_target.is_hero or comp_target.dead:
-				var foes := enemies.filter(func(e): return not e.dead)
-				comp_target = null if foes.is_empty() else _lowest_hp(foes)
-			if comp_target != null:
-				await _companion_strike(attacker.companion, comp_target, 1.0, false)
+			for cs_b in _beasts(attacker):
+				if comp_target == null or comp_target.is_hero or comp_target.dead:
+					var foes := enemies.filter(func(e): return not e.dead)
+					comp_target = null if foes.is_empty() else _lowest_hp(foes)
+				if comp_target == null:
+					break
+				await _companion_strike(cs_b, comp_target, 1.0, false)
 				# Apex Predator: the basic shot looses the beast twice.
 				if attacker.apex > 0 and ab.display_name == "Quick Shot" \
-						and not attacker.companion.dead and not comp_target.dead:
-					await _companion_strike(attacker.companion, comp_target, 1.0, false)
+						and not cs_b.dead and not comp_target.dead:
+					await _companion_strike(cs_b, comp_target, 1.0, false)
 		# Tripwire: rigged ground bites every attacking melee enemy (Snap
 		# Shut / The Whole Forest extend it to ranged; Reinforced Wire and
 		# Cruel Devices sharpen it).
@@ -5110,8 +5131,9 @@ func _dot_tick(id: String, applier: BattleUnit) -> int:
 func _bond_mult(hunter: BattleUnit, kind: String) -> float:
 	if hunter == null or hunter.dead or hunter.passive_id != "pack":
 		return 0.0
-	var comp: BattleUnit = hunter.companion
-	if comp != null and not comp.dead and comp.companion_kind == kind:
+	# The Pack: each active beast grants its own boon — this check simply
+	# matches any of them.
+	if _beasts(hunter).any(func(b): return b.companion_kind == kind):
 		if int(hunter.loyalty.get(kind, 0)) >= 5:
 			return 3.0 if hunter.ancient_pact > 0 else 2.0
 		return 1.0
@@ -5149,8 +5171,11 @@ func _gain_loyalty(hunter: BattleUnit, kind: String, amount := 1) -> void:
 	hunter.loyalty[kind] = now
 	if now == before:
 		return
-	var comp: BattleUnit = hunter.companion
-	if comp != null and not comp.dead and comp.companion_kind == kind:
+	var comp: BattleUnit = null
+	for gl_b in _beasts(hunter):
+		if gl_b.companion_kind == kind:
+			comp = gl_b
+	if comp != null:
 		# Ursus grows with devotion: +3% of base max health per stack.
 		if kind == "ursus":
 			var hp_step: int = int(round(COMPANION_STATS["ursus"][0] * 0.03)) \
@@ -6042,51 +6067,62 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				target)
 		"kill_command":
 			# The order is the beast's own: maul, feast, or blinding dive.
-			var comp: BattleUnit = attacker.companion
-			if comp != null and not comp.dead and target != null and not target.dead:
-				var kc_l: int = int(attacker.loyalty.get(comp.companion_kind, 0))
-				var kc_mult := _comp_dmg_mult(comp)
+			# The Pack: BOTH beasts obey; if the prey falls mid-order the
+			# rest of the pack turns on the next weakest.
+			var kc_beasts: Array = _beasts(attacker)
+			if not kc_beasts.is_empty() and target != null and not target.dead:
 				_message("%s: KILL COMMAND!" % attacker.unit_name)
-				_log("%s orders %s to savage %s!" % [attacker.unit_name,
-					comp.unit_name, target.unit_name], "#e0a050")
-				match comp.companion_kind:
-					"ursus":
-						await _companion_hit(comp, target,
-							0.45 * comp.attack * kc_mult, 40)
-					"canis":
-						var kc_bleed := 10 + 2 * kc_l \
-							+ (10 if comp.has_status("bestial") else 0)
-						for _bite in 3:
-							if target.dead or comp.dead:
-								break
-							await _companion_hit(comp, target,
-								0.18 * comp.attack * kc_mult, 0)
-							if not target.dead:
-								_add_bleed_with_burst(target, kc_bleed)
-						if not comp.dead:
-							var kc_heal: int = comp.heal_amount(
-								int(comp.max_hp * 0.30))
-							comp.float_text("+%d" % kc_heal, Color(0.4, 0.9, 0.45))
-							comp.refresh_bars()
-							_log("   → %s feasts — heals %d" % [comp.unit_name,
-								kc_heal], "#70d878")
-					"aguila":
-						var kc_second: BattleUnit = second_target
-						if kc_second == null or kc_second.dead or kc_second == target:
-							var kc_pool := enemies.filter(
-								func(e): return not e.dead and e != target)
-							kc_second = (null if kc_pool.is_empty() \
-								else _lowest_hp(kc_pool))
-						for kc_t in [target, kc_second]:
-							if kc_t == null or kc_t.dead:
-								continue
-							await _companion_hit(comp, kc_t,
-								0.25 * comp.attack * kc_mult, 0, 0.20 * kc_l)
-							if not kc_t.dead:
-								_apply_status(kc_t, "blind", 3)
-				# A perfect order deepens the bond.
-				if is_perfect:
-					_gain_loyalty(attacker, comp.companion_kind)
+				var kc_target: BattleUnit = target
+				for comp in kc_beasts:
+					if comp.dead:
+						continue
+					if kc_target == null or kc_target.dead:
+						var kc_next := enemies.filter(func(e): return not e.dead)
+						if kc_next.is_empty():
+							break
+						kc_target = _lowest_hp(kc_next)
+					var kc_l: int = int(attacker.loyalty.get(comp.companion_kind, 0))
+					var kc_mult := _comp_dmg_mult(comp)
+					_log("%s orders %s to savage %s!" % [attacker.unit_name,
+						comp.unit_name, kc_target.unit_name], "#e0a050")
+					match comp.companion_kind:
+						"ursus":
+							await _companion_hit(comp, kc_target,
+								0.45 * comp.attack * kc_mult, 40)
+						"canis":
+							var kc_bleed := 10 + 2 * kc_l \
+								+ (10 if comp.has_status("bestial") else 0)
+							for _bite in 3:
+								if kc_target.dead or comp.dead:
+									break
+								await _companion_hit(comp, kc_target,
+									0.18 * comp.attack * kc_mult, 0)
+								if not kc_target.dead:
+									_add_bleed_with_burst(kc_target, kc_bleed)
+							if not comp.dead:
+								var kc_heal: int = comp.heal_amount(
+									int(comp.max_hp * 0.30))
+								comp.float_text("+%d" % kc_heal, Color(0.4, 0.9, 0.45))
+								comp.refresh_bars()
+								_log("   → %s feasts — heals %d" % [comp.unit_name,
+									kc_heal], "#70d878")
+						"aguila":
+							var kc_second: BattleUnit = second_target
+							if kc_second == null or kc_second.dead or kc_second == kc_target:
+								var kc_pool := enemies.filter(
+									func(e): return not e.dead and e != kc_target)
+								kc_second = (null if kc_pool.is_empty() \
+									else _lowest_hp(kc_pool))
+							for kc_t in [kc_target, kc_second]:
+								if kc_t == null or kc_t.dead:
+									continue
+								await _companion_hit(comp, kc_t,
+									0.25 * comp.attack * kc_mult, 0, 0.20 * kc_l)
+								if not kc_t.dead:
+									_apply_status(kc_t, "blind", 3)
+					# A perfect order deepens the bond.
+					if is_perfect:
+						_gain_loyalty(attacker, comp.companion_kind)
 		"snare_trap":
 			if target != null and not target.dead:
 				var sn_i := heroes.find(attacker)
@@ -6172,8 +6208,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Hunter's Instinct — the next %d Quick Shots are empowered" % [
 				attacker.unit_name, hi_shots], "#70d878")
 		"bestial":
-			var bw_comp: BattleUnit = attacker.companion
-			if bw_comp != null and not bw_comp.dead:
+			# The Pack: the wrath takes every beast at once.
+			for bw_comp in _beasts(attacker):
 				# Devoted Fury: deep Loyalty stretches the Wrath.
 				var bw_turns := 3
 				if attacker.devoted_fury > 0:
@@ -6211,30 +6247,35 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						_log("%s: Bestial Wrath — +25%% damage and Blinding strikes for 3 turns" % \
 							bw_comp.unit_name, "#e0a050")
 		"spirit_bond":
-			var sb_comp: BattleUnit = attacker.companion
-			if sb_comp != null and not sb_comp.dead:
+			# The Pack: the bond flows through every beast (the hunter's own
+			# share — heal, Mana, regen — lands once).
+			var sb_beasts: Array = _beasts(attacker)
+			if not sb_beasts.is_empty():
 				_sfx("heal", -5.0, 0.7)
 				_message("%s shares the spirit bond!" % attacker.unit_name)
 				var sb_self: int = attacker.heal_amount(int(attacker.max_hp * 0.25))
 				attacker.float_text("+%d" % sb_self, Color(0.4, 0.9, 0.45))
-				var sb_beast: int = sb_comp.heal_amount(int(sb_comp.max_hp * 0.25))
-				sb_comp.float_text("+%d" % sb_beast, Color(0.4, 0.9, 0.45))
 				# Deep Reserves (talent) widens the flow.
 				var sb_mana := int(attacker.max_resource \
 					* (0.15 + 0.08 * attacker.deep_reserves_ranks))
 				attacker.resource = mini(attacker.resource + sb_mana,
 					attacker.max_resource)
-				_log("%s: Spirit Bond — heals %d, %s heals %d, +%d Mana" % [
-					attacker.unit_name, sb_self, sb_comp.unit_name, sb_beast,
-					sb_mana], "#70d878")
+				_log("%s: Spirit Bond — heals %d, +%d Mana" % [
+					attacker.unit_name, sb_self, sb_mana], "#70d878")
 				_apply_status(attacker, "spirit_heal", 1,
 					int(attacker.max_hp * 0.10))
-				_apply_status(sb_comp, "spirit_heal", 1,
-					int(sb_comp.max_hp * 0.10))
 				_apply_status(attacker, "spirit_mana", 2,
 					int(attacker.max_resource * 0.05))
+				for sb_comp in sb_beasts:
+					var sb_beast: int = sb_comp.heal_amount(int(sb_comp.max_hp * 0.25))
+					sb_comp.float_text("+%d" % sb_beast, Color(0.4, 0.9, 0.45))
+					_log("   → the bond mends %s for %d" % [sb_comp.unit_name,
+						sb_beast], "#70d878")
+					_apply_status(sb_comp, "spirit_heal", 1,
+						int(sb_comp.max_hp * 0.10))
+					sb_comp.refresh_bars()
 				if is_perfect:
-					for sb_u in [attacker, sb_comp]:
+					for sb_u in [attacker] + sb_beasts:
 						if sb_u.vigor_hp_bonus > 0:
 							continue  # never stack the borrowed health
 						sb_u.vigor_hp_bonus = int(sb_u.max_hp * 0.10)
@@ -6242,31 +6283,36 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						sb_u.hp += sb_u.vigor_hp_bonus
 						_apply_status(sb_u, "vigor", 5)
 						sb_u.refresh_bars()
-					_log("   → Perfect: both gain +10%% max health for 5 turns",
+					_log("   → Perfect: all gain +10%% max health for 5 turns",
 						"#70d878")
 				attacker.refresh_bars()
-				sb_comp.refresh_bars()
 		"primal_surge":
-			# Spend ALL Loyalty: the beast erupts, the hunter burns on.
-			var ps_comp: BattleUnit = attacker.companion
-			if ps_comp != null and not ps_comp.dead and target != null \
-					and not target.dead:
-				var ps_l: int = int(attacker.loyalty.get(ps_comp.companion_kind, 0))
-				if ps_l > 0:
-					_message("%s: PRIMAL SURGE!" % attacker.unit_name)
+			# Spend ALL Loyalty: every beast erupts, the hunter burns on
+			# for the TOTAL stacks spent across the pack.
+			if target != null and not target.dead:
+				var ps_total := 0
+				for ps_comp in _beasts(attacker):
+					var ps_l: int = int(attacker.loyalty.get(ps_comp.companion_kind, 0))
+					if ps_l <= 0 or target.dead:
+						continue
+					if ps_total == 0:
+						_message("%s: PRIMAL SURGE!" % attacker.unit_name)
+					ps_total += ps_l
 					_log("%s: Primal Surge — %s spends %d Loyalty" % [
 						attacker.unit_name, ps_comp.unit_name, ps_l], "#e0a050")
 					await _companion_hit(ps_comp, target,
 						0.15 * ps_l * attacker.attack * _bestial_dmg_mult(ps_comp), 0)
-					_apply_status(attacker, "primal_surge", ps_l)
 					# Perfect: the fire takes nothing with it.
 					if not is_perfect:
 						attacker.loyalty[ps_comp.companion_kind] = 0
 						ps_comp.remove_status("loyalty")
 					else:
+						_stamp_loyalty_chip(attacker, ps_comp)
+				if ps_total > 0:
+					_apply_status(attacker, "primal_surge", ps_total)
+					if is_perfect:
 						_log("   → Perfect: the Loyalty is spent but not lost",
 							"#70d878")
-						_stamp_loyalty_chip(attacker, ps_comp)
 		"call_wild":
 			# The whole pack answers: every beast strikes and announces
 			# itself; the absent ones return to the wild after.
@@ -6274,17 +6320,18 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_message("%s: CALL OF THE WILD!" % attacker.unit_name)
 				_log("%s sounds the Call of the Wild!" % attacker.unit_name,
 					"#e0a050")
-				var cw_active := ""
-				if attacker.companion != null and not attacker.companion.dead:
-					cw_active = attacker.companion.companion_kind
+				var cw_beasts: Array = _beasts(attacker)
 				for cw_kind in ["ursus", "canis", "aguila"]:
 					attacker.kinds_summoned[cw_kind] = true
 					if target.dead:
 						break
-					if cw_kind == cw_active:
-						await _companion_strike(attacker.companion, target, 1.0, false)
-						await _arrival_for_kind(attacker, cw_kind,
-							attacker.companion, target)
+					var cw_b: BattleUnit = null
+					for cwb in cw_beasts:
+						if cwb.companion_kind == cw_kind and not cwb.dead:
+							cw_b = cwb
+					if cw_b != null:
+						await _companion_strike(cw_b, target, 1.0, false)
+						await _arrival_for_kind(attacker, cw_kind, cw_b, target)
 					else:
 						await _ghost_hit(attacker, cw_kind, target,
 							0.15 * attacker.attack)
@@ -6700,18 +6747,56 @@ const COMPANION_STATS := {
 }
 
 
-# Summons (or replaces) the hunter's companion. It inherits the hunter's
-# armor, stability, and crit chance; it has no resource and takes no turns.
-# A swap (replacing a LIVING beast) starts the shared Swap cooldown; the
-# arriving beast keeps its Loyalty, gains +1, and fires its arrival effect.
-func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> void:
-	var was_swap := hunter.companion != null and is_instance_valid(hunter.companion) \
-		and not hunter.companion.dead
-	if hunter.companion != null and is_instance_valid(hunter.companion):
-		companions.erase(hunter.companion)
-		hunter.companion.queue_free()
-		hunter.companion = null
+# The hunter's LIVING beasts. Every companion site loops over this — the
+# single-beast case is simply a one-element array, so the paths never fork.
+func _beasts(hunter: BattleUnit) -> Array:
+	if hunter == null:
+		return []
+	return hunter.beasts.filter(func(b): return is_instance_valid(b) and not b.dead)
+
+
+# How many beasts the hunter may field at once (The Pack capstone: two).
+func _beast_cap(hunter: BattleUnit) -> int:
+	return 2 if hunter.the_pack > 0 else 1
+
+
+# Removes a beast from the field entirely (replaced, or a corpse cleaned
+# up by the next call). Its plate goes with it — a corpse's lingers only
+# until then.
+func _free_beast(hunter: BattleUnit, comp: BattleUnit) -> void:
+	hunter.beasts.erase(comp)
+	if not is_instance_valid(comp):
+		return
+	companions.erase(comp)
+	if hunter.soul_partner == comp:
 		hunter.soul_partner = null
+	comp.free_plate()
+	comp.queue_free()
+
+
+# Summons the hunter's next beast (The Pack fields two). At capacity the
+# call REPLACES the living beast with lower Loyalty. The newcomer inherits
+# the hunter's armor, stability, and crit chance; it has no resource and
+# takes no turns. A swap (replacing a LIVING beast) starts the shared Swap
+# cooldown; the arriving beast keeps its Loyalty, gains +1, and fires its
+# arrival effect.
+func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> void:
+	# Fallen beasts leave the field on the next call, exactly as the
+	# single-beast flow always did.
+	for old in hunter.beasts.duplicate():
+		if not is_instance_valid(old) or old.dead:
+			_free_beast(hunter, old)
+	var was_swap := false
+	if _beasts(hunter).size() >= _beast_cap(hunter):
+		# Replace whichever active beast holds the lower Loyalty.
+		var living_b: Array = _beasts(hunter)
+		var out: BattleUnit = living_b[0]
+		for b in living_b:
+			if int(hunter.loyalty.get(b.companion_kind, 0)) \
+					< int(hunter.loyalty.get(out.companion_kind, 0)):
+				out = b
+		was_swap = true
+		_free_beast(hunter, out)
 	if was_swap and hunter.wild_rotation == 0:
 		# Quick Whistle shaves the shared swap cooldown (base effective 2).
 		hunter.cooldowns["Swap Companion"] = maxi(3 - hunter.quick_whistle_ranks, 1)
@@ -6735,8 +6820,16 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 		"attack": hunter.attack,  # beast blows scale with their master
 		"armor": hunter.armor, "speed": hunter.speed, "stability": hunter.stability,
 		"constitution": hunter.constitution, "abilities": []}
-	var comp := _make_unit(cfg, hunter.position + Vector2(110, -16), stats[1],
-		_hero_plate_pos(heroes.size()))
+	# Plate slots continue the hero stack: the first free one below the party.
+	var plate_slot := heroes.size()
+	var used_slots: Array = hunter.beasts.map(
+		func(b): return int(b.get_meta("plate_slot", -1)))
+	while plate_slot in used_slots:
+		plate_slot += 1
+	var comp := _make_unit(cfg, hunter.position + Vector2(110, -16)
+		+ Vector2(58, 52) * (plate_slot - heroes.size()), stats[1],
+		_hero_plate_pos(plate_slot))
+	comp.set_meta("plate_slot", plate_slot)
 	comp.is_companion = true
 	comp.companion_kind = kind
 	comp.pack_master = hunter
@@ -6744,7 +6837,7 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 	comp.companion_power = hunter.companion_power
 	comp.next_time = INF  # never drawn a turn from the timeline
 	companions.append(comp)
-	hunter.companion = comp
+	hunter.beasts.append(comp)
 	_sfx("heal", -7.0, 0.6)
 	_message("%s answers the call!" % comp.unit_name)
 	_log("%s %s %s" % [hunter.unit_name,
@@ -6809,8 +6902,7 @@ func _arrival_for_kind(hunter: BattleUnit, kind: String, body: BattleUnit,
 				if h_idx >= 0:
 					# Companion taunts encode as 100 + the hunter's index; a
 					# bodiless roar pulls to the active beast, else the hunter.
-					if body != null or (hunter.companion != null \
-							and not hunter.companion.dead):
+					if body != null or not _beasts(hunter).is_empty():
 						_apply_status(tgt, "mocked", 2, 100 + h_idx)
 					else:
 						_apply_status(tgt, "mocked", 2, h_idx)

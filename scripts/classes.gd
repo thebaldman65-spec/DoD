@@ -490,13 +490,27 @@ const SPEC_INFO := {
 		"resists": {"shadow": 0.25, "nature": 0.10, "fire": -0.20},
 		"passive_desc": "Wrath of the Old Gods: your debuffs mark the target with Ruin\n(max 5). Each stack: +2% damage taken; heroes striking a Ruined\ntarget heal 10% of the damage dealt. One turn after reaching 5\nstacks, Ruin detonates — 50% of Attack as shadow damage, and the\nparty heals 15% of the Occultist's max health.",
 		"blurb": "Forbidden rites — leech life and trade blood for power."},
+	# Hunter stat blocks (Batch Q). The Beastmaster's armor is a multiplier
+	# across up to three bodies — companions inherit it at summon — so it
+	# sits below the Survivalist's despite similar Constitution.
 	"beastmaster": {"name": "Beastmaster", "constitution": 100, "archetype": "Ramp", "passive": "pack",
+		"max_hp": 160, "armor": 0.15,
+		"resists": {"nature": 0.20, "physical": 0.05},
 		"passive_desc": "Pack Bond — the active beast grants its boon: Ursus, Savage\nPresence: enemies are drawn to the bear and you take 10% less\ndamage; Canis: +15% damage per enemy under 35% health; Aguila: the\nwhole party gains +10% crit. LOYALTY (per beast, max 5): +1 each\nturn it stands with you and on summon/swap; +5% strike damage per\nstack plus a beast-specific gift; at 5 the boon is DOUBLED. Meters\nlast until that beast dies.",
 		"blurb": "The wilds hunt beside them — every kill is shared."},
+	# The lightest Hunter: a marksman who wants to be at range and pays for
+	# being reached.
 	"sharpshooter": {"name": "Sharpshooter", "constitution": 90, "archetype": "Nuker", "passive": "lethal_aim",
+		"max_hp": 140, "armor": 0.10,
+		"resists": {"nature": 0.10, "physical": -0.10},
 		"passive_desc": "Lethal Aim: critical hits deal x2 damage instead of\nx1.5. Each consecutive attack against the same enemy\ngrants +20 FOCUS (0-100; lost on switching targets,\n50 retained on a kill), and every point of Focus\ngrants +0.5% critical chance.",
 		"blurb": "Every arrow an execution — patient, precise, final."},
+	# The toughest Hunter by design: his passive rewards being struck and
+	# Tripwire wants him in the fray. Deep nature affinity from a life
+	# spent in it; raw arcane is the thing the woods teach nothing about.
 	"mystic": {"name": "Survivalist", "constitution": 100, "archetype": "Pressure", "passive": "trapper",
+		"max_hp": 170, "armor": 0.18,
+		"resists": {"nature": 0.25, "shadow": 0.10, "arcane": -0.15},
 		"passive_desc": "Trapper: enemies that strike the Hunter have a 25% chance\nto be Poisoned (5 turns), and the Survivalist's abilities\ndeal +8% damage per DIFFERENT status effect afflicting\nthe target — breadth of control IS the damage.",
 		"blurb": "Endures the wilds and bleeds them dry — traps, powder, and steel."},
 }
@@ -731,7 +745,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Kill Command", "cooldown": 3, "cost": 30, "special": "kill_command",
 					"delay": 4.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "The beast gains 1 Loyalty",
-					"description": "The order depends on the beast —\nUrsus: mauls for 45% of your Attack\nplus 40 Break damage. Canis: 3 bites\nof 18% Attack, 10 Bleed each; the wolf\nfeasts, healing 30% of its max health.\nAguila: strikes TWO chosen enemies for\n25% Attack, BLINDING them 3 turns.\nRequires a living companion."}),
+					"description": "The order depends on the beast —\nUrsus: mauls for 45% of your Attack\nplus 40 Break damage. Canis: 3 bites\nof 18% Attack, 10 Bleed each; the wolf\nfeasts, healing 30% of its max health.\nAguila: strikes TWO chosen enemies for\n25% Attack, BLINDING them 3 turns.\nRequires a living companion.\nThe Pack: BOTH beasts obey."}),
 			]
 		"sharpshooter":
 			return [

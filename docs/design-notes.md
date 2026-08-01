@@ -363,3 +363,22 @@ permanently hot, the penalty barely bites) against Still Mind (vent
 constantly, venting costs almost nothing) — never stabilise, or
 stabilise all the time. Suppressing Fire and Temporal Rift moved to
 Overload because a Barrage ramp and a crit echo were never Control.
+
+**Hunter close-out (Batch Q) — a visible node the player can never buy
+is worse than no node:** the Beastmaster shipped three capstones and
+one of them didn't exist, so take-one-of-three was really
+take-one-of-two — every run that pushed 8 points into the Pack lane
+hit a "Coming soon" wall at the payoff. The Pack now does what its
+node always promised: two beasts at once, both striking, each with
+its own meter and boon, a third call replacing the lower Loyalty.
+The companion plumbing became an array with the single beast as a
+one-element case precisely so no code path forks — the alternative
+(a second named slot) would have meant two branches through every
+companion site forever. Kill Command orders BOTH beasts because a
+capstone should make the spec's signature button better, not pose a
+bookkeeping question. The stat blocks close the last class without
+them: the Beastmaster wears less armour than the Survivalist despite
+similar Constitution because companions inherit it — his armour is
+worn by up to three bodies. The Sharpshooter stays the flagged damage
+outlier on purpose; with the win rate saturated at 100%, tuning him
+now would be tuning blind. That's the difficulty pass's job.
