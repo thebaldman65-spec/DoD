@@ -5,6 +5,80 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-01 — Batch T: close the gap</h2>
+<ul>
+<li><b>The first tuning batch of the difficulty-convergence arc</b>, staged and measured:
+one change, then <code>./sim.sh --run 50</code>, then decide whether the next stage was
+needed. Baseline (Batch S): 0/50 completions, 40 of 50 wipes in zone 1 tiers 4–7, the
+measured power ratio crossing under 1.0 exactly where the budget ladder stepped 3–6 →
+6–9. Target: ratio 1.0–1.3 at every zone-1 tier; the bot floor reaching the zone-1 boss
+in most runs. No spec's damage numbers were touched (the Cryomancer/Sharpshooter/Devout
+outlier pass is deliberately deferred until it can be measured over a stable curve —
+their shares held at 39/27-ish/4% through all three stages, so the overtune is
+tier-independent and will still be there to measure).</li>
+<li><b>Stage 1 — the awakening HP sync (correctness, not tuning):</b> spec stat blocks
+raise max HP at the awakening, but current HP stayed at the class base until the first
+victory sync — the party entered its first specced fight at ~75% health. New
+<code>Run.sync_spec_hp</code> raises current HP by the same amount as the max-HP raise
+(never to full: damage already taken is preserved), called from BOTH awakening paths —
+the spec-choice screen and the run sim's direct assignment. <b>Measured alone:</b> still
+0/50 completions and the ratio table barely moved (it reads max stats, as predicted) —
+but tier-4 win rate jumped 44% → 79%, tier-8 20% → 56%, and a run crossed into zone 2
+for the first time. Ratios z1: t1 1.21 / t3 1.15 / t4 0.77 / t6 0.80 / t8 0.57 /
+t10 0.72.</li>
+<li><b>Stage 2 — the budget ladder became a ramp:</b> three bands over eleven tiers meant
+two discontinuities with the wipes sitting on the first; now a tier's fight budget rolls
+<code>3 + floor((tier−1)/2)</code> to that +2 (t1 3–5 ... t10 7–9). Two guards preserved
+authored content: <b>elite budgets floor at 6</b> (the cheapest elite theme, Rage
+Company, costs 6 in every roster — below that an elite node silently degraded to the
+plain-mob fallback while still paying elite rewards) and <b>the boss node keeps its
+10–12 band</b> (the Escort composition is authored, so the tier-10 → boss step is now the
+zone's sharpest — accepted, see stage 3's table). <b>Measured:</b> the tier-4 cliff is
+gone (ratio 0.77 → 1.16, win 44% → 97%); 9 runs reached the z1 boss, 5 entered zone 2, 1
+reached zone 3; talent income rose 3.8 → 5.7 points/hero/run as the attrition loop
+started unwinding. The wall moved to t7–t10 (0.73–0.78). Ratios z1: t1 1.42 / t2 1.28 /
+t3 1.13 / t4 1.16 / t5 0.92 / t6 0.94 / t7 0.78 / t8 0.73 / t9 0.75 / t10 0.75 /
+boss 0.57.</li>
+<li><b>Stage 3 — enemy tier scaling halved</b> (its condition — tiers 7–11 still below
+1.0 — was met): <b>+4% Attack / +5% HP per tier → +2% / +2.5%</b>. The zone slot
+multiplier (×1.0 / ×1.5 / ×2.2) is untouched, so between-zone escalation still carries
+the run's progression arc; what fell is the second multiplicative source compounding on
+the budget ramp <i>within</i> a zone. <b>Measured: the first completed runs in the
+game's history</b> — 2/50 full three-zone clears; 20/50 reached the z1 boss (70% win
+there), 14 cleared zone 1. Talent income 9.3 points/hero/run (2.4× baseline). Ratios z1:
+t1 1.37 / t2 1.42 / t3 1.28 / t4 1.20 / t5 1.01 / t6 1.03 / t7 0.95 / t8 0.95 /
+t9 0.87 / t10 0.78 / boss 0.70.</li>
+<li><b>Stage 4 — talent income: SKIPPED, and the skip is the finding.</b> Its trigger was
+"only if stages 1–3 leave the mid-band short," and the mid-band (t4–7) closed at
+0.95–1.20 with 78–100% win rates. What remains short is the zone-1 <i>tail</i> (t9 0.87,
+t10 0.78) and the deliberately-kept boss step (0.70) — one extra point per zone moves
+party power ~1–2% and cannot close that; spending an economy change there would buy
+nothing measurable. The 3×11-tier economy invariant stands untouched.</li>
+<li><b>Where the target landed:</b> tiers 3–8 sit in the 1.0–1.3 band; t1–t2 overshoot it
+(1.37/1.42 — the ramp's 3–5 floor makes the opening gentler than the band's letter;
+<b>designer's call whether gentle onboarding outranks the metric</b>); t9–t10 and the
+boss remain below. The difficulty line itself — 40% of floor runs reaching the z1 boss,
+28% clearing zone 1, 4% full clears, remembering the floor bot never rests while a fight
+is reachable, never buys, never drinks — <b>is the designer's taste question, flagged
+not assumed</b>. If the tail wants closing later, the levers are the ramp's slope or the
+boss band, not spec numbers.</li>
+<li><b>Sweep comparability note:</b> the end-of-batch <code>./sim.sh --sweep 200</code>
+still probes fixed budgets 3/6/9/12 unscaled — those rows remain directly comparable to
+the Batch R and Batch S baselines even though the ladder that FEEDS budgets to real runs
+changed. The sweep measures kit-vs-budget; the run harness measures the ladder. Do not
+read one as contradicting the other. The end-of-batch sweep proved the point by
+replicating Batch S within noise: win% 100/100/100/99 at budgets 3/6/9/12, Cryomancer
+share 49/43/40/38% — the standalone rows didn't feel Batch T at all, which is exactly
+what "the run ladder changed, the kits didn't" should look like.</li>
+<li><b>Verification:</b> the three correctness gates (hero win scaling, talent spend
+conservation, enemy tier×slot scaling) were recreated as
+<code>test_run_harness.gd</code> and re-run green after every stage; a budget-ramp probe
+pinned the observed rolls per tier (t1 3–5 ... t10 7–9, boss 10–12); a theme
+satisfiability probe mapped every theme × budget 3–12 × roster before the ramp shipped
+(that map is what surfaced the elite floor and confirmed plain fights satisfiable at
+every budget ≥3 in all rosters).</li>
+</ul>
+
 <h2>2026-08-01 — Batch S: measure a real run</h2>
 <ul>
 <li><b>No tuning ships in this batch</b> — like Batch R, it produces numbers. Two new

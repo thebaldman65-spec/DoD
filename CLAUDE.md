@@ -56,10 +56,34 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   Cryomancer share FALLS with field size (49%→38%, budgets 3→12) = baseline
   overtune, fix his NUMBERS not his AoE; fields are empty entering round 3
   at every budget; --run 50 floor = 0/50 completions, wipes cluster z1
-  t4-7 where the budget ladder steps 3-6→6-9 and the measured power ratio
-  crosses under 1.0 (1.25 t1 → 0.80 t4-6 → 0.55 t8) — early attrition
-  throttles the progression meant to close the gap (2.8 pts/hero/run
-  earned at the floor vs the ~35 the economy assumes). Batch R baseline
+  t4-7 where the budget ladder stepped 3-6→6-9 (pre-T) and the measured
+  power ratio crossed under 1.0 (1.25 t1 → 0.80 t4-6 → 0.55 t8) — early
+  attrition throttles the progression meant to close the gap (2.8
+  pts/hero/run earned at the floor vs the ~35 the economy assumes).
+  BATCH T (08-01) closed it, staged + measured per stage: (1) awakening
+  HP sync — Run.sync_spec_hp raises current HP by the spec block's
+  max-HP delta, never to full; called from BOTH paths (spec screen
+  _choose + RunSim.start_run) — alone took t4 win 44%→79%; (2) budget
+  ladder → continuous ramp (see ENCOUNTERS below) — killed the t4
+  cliff (ratio 0.77→1.16); (3) tier scaling halved to +2% Atk/+2.5% HP
+  (slot mults untouched) → FIRST completions: 2/50 full clears, 20/50
+  reach the z1 boss (70% win), z1 ratios t3-8 in band (0.95-1.28),
+  t1-2 high (1.37/1.42), t9-10 low (0.87/0.78), boss 0.70 (boss kept
+  its 10-12 band by design — tail levers are ramp slope or boss band,
+  never spec numbers); (4) income stage SKIPPED — mid-band closed
+  without it; income self-recovered 3.8→9.3 pts/hero/run (the
+  attrition→income loop unwinding IS the mechanism of every gain).
+  Damage shares stable through all stages (Cryo 38-39%) = overtune is
+  tier-independent; outlier pass still deferred. Sweep rows probe fixed
+  budgets 3/6/9/12 unscaled → stay comparable to Batch R/S baselines
+  even though the run ladder changed — never read one against the
+  other. test_run_harness.gd RECREATED (scratchpad dies with its
+  session): gate 1 win scaling + HP-sync asserts, gate 2 talent
+  conservation via ceil(N/3) price replay (converted lane trees KEEP
+  multi-rank nodes — extra ranks cost 1), gate 3 enemy tier×slot at
+  the new rates; plus probes for ramp rolls and theme satisfiability
+  (elite themes need budget ≥6 in every roster — hence the elite
+  floor). Batch R baseline
   (gated kits, 200/budget, win% at budgets 3/6/9/12): roster 1
   100/100/98/93.5, roster 2 100/100/97.5/88.5, roster 3 100/100/99.5/98.5;
   deaths/battle climb 0.01→1.3-1.5 — attrition is the sensitive dial. The
@@ -179,7 +203,7 @@ Scratchpad test_rotation.gd covers order/save/legacy/pool-membership.
 SCALING REBASE (07-26, Batch 36): enemy stats are ZONE-LOCAL —
 battle.gd spawn block does base × Run.zone_base_mult(zone_idx+1) ×
 (1 + rate × zone_tier), zone_tier = clampi(floor_idx+1, 1, 11), rates
-unchanged (+4% Atk / +5% HP, HP ceil to 10s). ZONE_BASE_MULTS [1.0,
+HALVED by Batch T (+2% Atk / +2.5% HP, HP ceil to 10s). ZONE_BASE_MULTS [1.0,
 1.5, 2.2] keyed by SLOT (Forest is 1.0 as opener, 2.2 as finale);
 slots past 3 auto-continue ×1.5 geometric — never touch the formula
 for new zones. Standalone sims stay unscaled (zone_tier 0). Old→new
@@ -582,10 +606,14 @@ ENCOUNTERS = POWER BUDGET (07-16): enemy power {raider/archer 1, sm/shaman
 2, chief 4, boss 7}; every battle SPENDS ITS BUDGET EXACTLY via themed
 warbands (Run.THEMES two-step: theme → fill roles; combos enumerated in
 run_state._theme_combos; theme in encounter["theme"], logged at battle
-start; field caps at 6 — ENEMY_LAYOUTS has a 6-slot layout). BUDGET
-SCALES PER ZONE (Run.battle_budget; in-zone tier = floor_idx+1): t1-3 →
-3-6, t4-7 → 6-9, t8-11 incl boss → 10-12; later zones restart the ladder
-with NEW tougher rosters (TODO — Forest of Old only for now). CHIEFS ONLY
+start; field caps at 6 — ENEMY_LAYOUTS has a 6-slot layout). BUDGET IS
+A RAMP PER ZONE (Batch T; Run.battle_budget; in-zone tier = floor_idx+1):
+fight tiers roll lo..lo+2, lo = 3+floor((tier-1)/2) → t1 3-5 … t10 7-9;
+boss tier 11 KEEPS 10-12 (Escort is authored content); compose() floors
+ELITE budgets at 6 (cheapest elite theme = Rage Company at 6 in every
+roster — below that the node degrades to the plain-mob fallback while
+still paying elite rewards); later zones restart the ladder with tougher
+rosters. CHIEFS ONLY
 IN ELITE FIGHTS (Honor Guard/Rage Company/Elite Patrol are elite-node
 themes; Warband pool has no chief). Swarm/Poison Volley only fit low
 budgets (by math). ALL HERO ABILITY COOLDOWNS -1 (07-16); ENEMIES HAVE NO
@@ -680,9 +708,9 @@ is a PERCENT of the user's current Attack. Role bases: Damage 100 / Tank 75
 / Support 50 (Classes.spec_attack; Bruiser = Damage role; per-spec stat
 blocks + "resists" dicts land class by class — spec_resists, 0% now, shown
 via stat-page "Resistances" hover). Heroes: +2% of base Atk/HP per combat
-win (Run.combat_wins, saved); enemies: +4% Atk / +5% HP of base per global
-node tier (zone_idx*FLOORS+floor_idx, replaces zone mult), HP rounded UP
-to 10s.
+win (Run.combat_wins, saved); enemies: +2% Atk / +2.5% HP of base per
+zone-local tier (Batch 36 zone rebase, rates halved Batch T), HP rounded
+UP to 10s.
 Armor/resists/speed/con/crit/block/parry NEVER scale. DoTs (burn 6%,
 poison 3%/stack) snapshot the applier's Attack ("tick" on the status);
 companions hit for % of the hunter's Attack. Cleric core Smite = 44% (of

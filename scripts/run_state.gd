@@ -310,9 +310,10 @@ func compose_budget(budget: int, roster := 1) -> Array:
 
 
 # The budget scales across EACH ZONE (tier = the floor within the zone,
-# 1-11 with the boss on 11): tiers 1-3 roll 3-6, tiers 4-7 roll 6-9,
-# tiers 8-11 roll 10-12. Later zones restart the ladder with a tougher
-# roster carrying higher base stats (Forest of Old is the focus for now).
+# 1-11 with the boss on 11) as a continuous ramp (Batch T): the old three
+# bands (3-6 / 6-9 / 10-12) put a cliff exactly at tier 4, and 40 of 50
+# simulated wipes landed on it. Later zones restart the ladder with a
+# tougher roster carrying higher base stats.
 # Enemy stat scaling is zone-local (Batch 36): every zone replays the
 # 1..11 tier ladder and its position in the run applies a flat base
 # multiplier. Keyed by SLOT, not zone identity — the Forest of Old is
@@ -333,15 +334,22 @@ func battle_budget(tier := -1) -> int:
 	if tier <= 0:
 		tier = floor_idx + 1
 	tier = clampi(tier, 1, FLOORS)
-	if tier <= 3:
-		return randi_range(3, 6)
-	if tier <= 7:
-		return randi_range(6, 9)
-	return randi_range(10, 12)
+	if tier >= FLOORS:
+		# The boss node keeps its band: the Escort composition (boss 7 +
+		# power 3-5 of company) is authored content, not the fight ladder.
+		return randi_range(10, 12)
+	var lo := 3 + int(floor((tier - 1) * 0.5))  # t1:3  t4:4  t7:6  t10:7
+	return randi_range(lo, lo + 2)              # t1:3-5  t4:4-6  t10:7-9
 
 
 func compose(node_type: String, tier := -1) -> Array:
 	var budget := battle_budget(tier)
+	# The ramp's tier-6 roll can dip to 5, but the cheapest elite theme
+	# (Rage Company) needs 6 in every roster — below that an elite node
+	# would silently degrade to the plain-mob fallback while still paying
+	# elite rewards. Floor it; elite means elite.
+	if node_type == "elite":
+		budget = maxi(budget, 6)
 	var candidates: Array = []
 	for theme_name in THEMES:
 		if THEMES[theme_name]["nodes"].has(node_type):
@@ -457,6 +465,26 @@ func heal_party(pct: float) -> void:
 	for member in party:
 		if member["hp"] > 0:
 			member["hp"] = mini(member["hp"] + int(member["max_hp"] * pct), member["max_hp"])
+
+
+# Awakening HP sync (Batch T): spec stat blocks raise max HP, but the
+# member snapshot keeps the class base until the first victory sync — the
+# party entered its first specced fight at ~75% health. Raise current HP
+# by the same amount as the max (never to full: matching the raise
+# preserves any damage already taken). Both awakening paths call this —
+# the spec-choice screen and the run sim's direct assignment.
+func sync_spec_hp(idx: int) -> void:
+	var member: Dictionary = party[idx]
+	var spec := String(member.get("spec", ""))
+	if spec == "" or not Classes.SPEC_INFO.has(spec):
+		return
+	var info: Dictionary = Classes.SPEC_INFO[spec]
+	if not info.has("max_hp"):
+		return
+	var delta := int(info["max_hp"]) - int(member["max_hp"])
+	if delta > 0 and int(member["hp"]) > 0:
+		member["max_hp"] = int(info["max_hp"])
+		member["hp"] = int(member["hp"]) + delta
 
 
 # Resting restores spirit as well as flesh (Mage/Cleric mana pools).

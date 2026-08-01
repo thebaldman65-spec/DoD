@@ -85,6 +85,7 @@ static func start_run(run: Node) -> void:
 		var spec: String = specs[i] if i < specs.size() else default_specs[i]
 		run.party[i]["spec"] = spec
 		run.party[i]["tree"] = Talents.generate_tree(spec, run.party[i]["key"])
+		run.sync_spec_hp(i)  # awakening HP sync — same call as the spec screen
 	run.specs_chosen = true
 	_run_spent = 0
 	if not walk_to_next_fight(run):

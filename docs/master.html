@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-01</b></p>
+<p align="right"><b>Last updated: 2026-08-01 (Batch T)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -136,7 +136,7 @@ hits for ~45). Base Attack comes from the spec's role — <b>Damage 100, Tank 75
 Support 50</b> (per-spec stat blocks are being filled in class by class). All scaling is
 LINEAR on the base value: <b>heroes gain +2% of base Attack and +2% of base max HP per
 combat node won</b> (fight/elite/boss); <b>enemy scaling is zone-local</b> — each zone
-replays its own tier ladder at <b>+4% of base Attack and +5% of base HP per tier (1–11)</b>,
+replays its own tier ladder at <b>+2% of base Attack and +2.5% of base HP per tier (1–11)</b>,
 multiplied by the zone's <b>slot in the run: 1st zone ×1.0, 2nd ×1.5, 3rd ×2.2</b> (keyed
 by position, not identity — the Forest of Old is ×1.0 as the opener and ×2.2 as the
 finale; slots past the third continue the ~×1.5 step, so adding zones never touches the
@@ -518,7 +518,9 @@ choice screen with a mouseover explanation.</p>
 blocks land. Bruiser counts as a DAMAGE archetype — the Swordmaster
 attacks at 100.</p>
 <p>Every spec grants one passive plus abilities appended to the core kit. Specs are chosen once
-per run and are permanent. <b>Constitution by spec</b> (role-based Break resistance; class base
+per run and are permanent. When a spec's stat block raises max HP above the class base,
+<b>current HP rises by the same amount at the awakening</b> — the hero keeps any damage
+already taken, never walks into the next fight pre-wounded by their own promotion. <b>Constitution by spec</b> (role-based Break resistance; class base
 in §5 applies before awakening): Warden 130 (the hardest hero to Break), Swordmaster 120,
 Berserker 110, Devout 110, Holy 100, Beastmaster 100, Survivalist 100, Occultist 95,
 Arcanist 90, Sharpshooter 90, Pyromancer 85, Cryomancer 85.</p>
@@ -1328,8 +1330,14 @@ user (20 starting), unique fire kit: Cinder Cleave (+15 Rage); Immolating Wave 3
 50%, physical 10%; soft to frost.</td></tr>
 </table>
 <p><b>Compositions — the power-budget system:</b> every battle rolls a power budget that is
-ALWAYS spent exactly (<b>tiers 1–3 roll 3–6, tiers 4–7 roll 6–9, tiers 8–11 roll
-10–12</b>; the field holds at most <b>6 enemies</b>). Power values now span <b>1, 2, 3, 4,
+ALWAYS spent exactly. Fight budgets climb a <b>continuous ramp</b> across the zone: a
+tier's roll spans <b>3 + half the tiers already climbed (rounded down), plus 0–2</b> —
+tiers 1–2 roll 3–5, tiers 3–4 roll 4–6, tiers 5–6 roll 5–7, tiers 7–8 roll 6–8, tiers
+9–10 roll 7–9. <b>Elite fights never roll below 6</b> (the cheapest elite theme's price —
+an elite that can't afford an elite theme isn't one), and <b>the boss node keeps its own
+10–12 band</b>: the Escort composition is authored content, and the step up from tier 10
+into the boss chamber is the zone's sharpest — by design. The field holds at most
+<b>6 enemies</b>. Power values now span <b>1, 2, 3, 4,
 and 7</b> — the three power-3 bruisers filled the gap that made exact budgets repetitive.
 Generation is two-step: a <b>theme</b> is chosen, then the budget fills its <b>ROLE
 pools</b> — themes declare roles (skirmisher / sniper / bulwark / mender / hexer / brute /

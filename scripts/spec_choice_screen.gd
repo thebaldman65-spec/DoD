@@ -143,6 +143,7 @@ func _choose(idx: int, spec_id: String) -> void:
 	Music.click()
 	Run.party[idx]["spec"] = spec_id
 	Run.party[idx]["tree"] = Talents.generate_tree(spec_id, Run.party[idx]["key"])
+	Run.sync_spec_hp(idx)
 	_draw_screen()
 
 

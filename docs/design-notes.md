@@ -4,6 +4,38 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Closing the difficulty gap (Batch T) — 2026-08-01
+
+**Why the curve had to move and not the heroes:** across a zone, enemy
+power grew ~3.5x — budget 4.5 → 11 average compounded with tier scaling
+— against the party's ~1.12x from node scaling. The counterweight the
+economy assumed (roughly 35 talent points a run) was gated behind
+surviving long enough to earn it, and runs died at tier 5 holding 2.8
+points per hero. That is a feedback loop, not an offset: attrition
+throttled the very income meant to answer the enemy curve, which is why
+small hero-side nudges could never move it and the batch attacked the
+enemy curve first. The proof is in the income column — untouched by any
+stage, it rose 3.8 → 9.3 points per hero per run purely because the
+party lived longer, and those points are what carried runs deeper still.
+
+**Why the ladder is a ramp:** two discontinuities over eleven tiers put
+40 of 50 wipes on the first step. A player reads a difficulty cliff as
+their own failure; a slope they read as the game escalating. The boss
+node keeps its old band on purpose — the step INTO the boss chamber is
+the one place a cliff is the message.
+
+**Why the first fight no longer starts hurt:** the awakening raised the
+ceiling but not the water line — a promotion that arrived pre-wounded.
+Correctness, not tuning; it shipped first and measured separately so
+the tuning stages sat on an honest baseline.
+
+**What was deliberately left:** tiers 1–2 read above the 1.0–1.3 band
+(gentle onboarding vs the metric's letter) and tiers 9–10 below it; the
+skipped talent-income stage is the record that the mid-band no longer
+needed it. Where the difficulty line belongs — the floor bot reaches
+the zone-1 boss in 40% of runs, clears the game in 4% — is the
+designer's taste question, not a solved equation.
+
 ## Swordmaster stances (Batch D) — 2026-07-28
 
 **Why the passive had to change:** the old Seasoned Fighter was a
