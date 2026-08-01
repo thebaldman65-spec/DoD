@@ -151,7 +151,36 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - Screens: main_menu → draft (pick 4 + relics) → spec_choice (permanent) →
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
-## Current systems snapshot (2026-07-16)
+## Current systems snapshot (2026-08-01)
+ENEMIES THAT ASK QUESTIONS (08-01, Batch V): 4 kinds — chanter (mender,
+z1-3), hurler (brute·sniper, z2-3), bloodcaller (hexer, z1-3),
+grave_totem (mender·hexer, z1/3) — and 4 new specials, NO existing
+enemy stats touched. cleanse_allies: longest-remaining debuff stripped
+from EACH ally (side follows the TARGET so psychosis flips it);
+chilled thaws ONE stack via set_chilled_stacks; ruin takes ruin_primed
+with it; broken/bleed are meter states it skips; sticky poison holds
+(_cleansable_debuffs / _turns_left helpers — turns<0 = 999). windup:
+"charging" status (turns -1, pending name stashed on the status dict);
+landing at the unit's next turn as an Ability.make copy resolved
+through _resolve (Hysteria pattern); turn loop cancels BEFORE the
+stunned/frozen/broken_pending branches via _cancel_charge — the log
+says "BROKEN mid-charge ... CANCELLED", keep it grep-stable.
+blood_tribute: +25% dmg/BD per dead enemy, scaled attack copy.
+totem_pulse: 6% of each ally's OWN max. AI gates in
+_enemy_support_action (rite: any ally strippable; vigil: ≥2 wounded);
+hurler/bloodcaller need none (damage>0 → affordable pool).
+MENDER CAP (run_state._combo_ok): >2 mender-TAGGED kinds per warband
+rejected, counted by role tag not claiming pool (totem via hexer pool
+still heals) — the old generator held 2,007 3-4-healer warbands.
+Satisfiability matrices before/after: NO theme lost a budget; distinct
+warbands 11,344 → 23,561 (test_zone_rosters.gd recreated in scratchpad
+— diff vs a HEAD worktree needs --import there first). RE-MEASURE
+FLAG, DELIBERATELY UNTUNED: sweep top band 93.5→97.5% (deaths 1.3-1.5
+→1.00), run completions 6→14%, wipe median z1 t9-10 → z2 t6 — moved
+>1 tier, attribution = the cap deleting top-budget heal walls (z1
+curve shape unchanged, t8 0.99/boss 0.72; roster-1 sweeps never see
+the hurler). Tuning is a separate conversation; outlier pass (Cryo
+40-48%, Devout 3-5%) unchanged and still next.
 PERSISTENT PROFILE (07-26, Batch 40): scripts/profile.gd (class_name
 Profile), user://profile.json OUTSIDE the run save — save_path is a
 static VAR (not const) so tests redirect it. Counts runs started
