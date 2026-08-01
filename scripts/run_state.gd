@@ -77,6 +77,10 @@ var seen_events: Array = []  # event ids drawn this run (non-repeating pool)
 var debug_grant_all := false
 var pending_event := ""    # event id the event screen resolves (not saved:
                            # quitting mid-event forfeits it, node stays spent)
+# RunSim harness (Batch S): simulated runs live entirely in memory — while
+# set, save_run/clear_save are no-ops so a sim can never touch (or delete)
+# the player's real save file.
+var sim_run := false
 
 
 const HERO_BASE := {
@@ -568,7 +572,7 @@ func advance_zone() -> void:
 # ---------- persistence (saved after every completed node) ----------
 
 func save_run() -> void:
-	if not active:
+	if not active or sim_run:
 		return
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	# v2 (Batch 38): + seen_events, zone_draw. Loading stays tolerant of
@@ -639,6 +643,8 @@ func load_run() -> bool:
 
 
 func clear_save() -> void:
+	if sim_run:
+		return
 	if has_save():
 		DirAccess.remove_absolute(SAVE_PATH)
 

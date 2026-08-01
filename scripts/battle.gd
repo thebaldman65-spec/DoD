@@ -158,6 +158,10 @@ var active_unit: BattleUnit  # acting unit — its nameplate glows gold
 var autoplay := false
 var sim := false
 var sim_target := 0
+# Full-run harness (Batch S): DOD_SIM_RUN=N plays N complete runs with
+# progression on both sides — RunSim owns run setup, the map walk between
+# battles, and the final report; this scene just fights the battles.
+var run_sim := false
 var debug_prints := false
 var debug_enemies_off := false  # debug toggle: enemies skip their turns
 var debug_locked_hero: BattleUnit = null  # debug: every turn goes to this hero
@@ -179,6 +183,11 @@ static var sim_started_ms := 0
 const SWEEP_BUDGETS := [3, 6, 9, 12]
 static var sweep_stats := []
 var sweep := false
+# Field-size proxy (Batch S): enemies still standing when round 3 opens
+# (timeline t >= 200) — how long a wide field stays wide, which is what
+# AoE actually feeds on. Recorded once per battle; battles that end
+# before round 3 record their end-state count (a win records 0).
+var _r3_recorded := false
 
 var history: RichTextLabel
 var history_panel: PanelContainer
@@ -195,12 +204,17 @@ var sc_dir := 1.0
 
 func _ready() -> void:
 	sim_target = int(OS.get_environment("DOD_SIM"))
-	sim = sim_target > 0
-	sweep = sim and OS.get_environment("DOD_SIM_SWEEP") == "1"
+	run_sim = int(OS.get_environment("DOD_SIM_RUN")) > 0
+	sim = sim_target > 0 or run_sim
+	sweep = sim_target > 0 and OS.get_environment("DOD_SIM_SWEEP") == "1"
+	if run_sim and not RunSim.active:
+		RunSim.begin(Run, int(OS.get_environment("DOD_SIM_RUN")))
 	# DOD_SIM_RELICS="dragonbone,whetstone" arms a relic loadout for
 	# standalone sims (the loadout-spread harness; relic hooks read
-	# Run.active_relics regardless of Run.active).
-	if OS.get_environment("DOD_SIM_RELICS") != "":
+	# Run.active_relics regardless of Run.active). Run-sim mode arms its
+	# relics at the draft instead — overriding here every battle would
+	# clobber relics granted mid-run by events.
+	if OS.get_environment("DOD_SIM_RELICS") != "" and not run_sim:
 		Run.active_relics = OS.get_environment("DOD_SIM_RELICS").split(",")
 	# DOD_SIM_GRANT_ALL=1: full-kit sims (every talent/trophy ability
 	# pre-granted) — the default measures real gated progression.
@@ -224,6 +238,10 @@ func _ready() -> void:
 	_build_ui()
 	_build_sfx_pool()
 	_spawn_units()
+	if run_sim:
+		# Measure both sides as spawned — talents, scaling and slot
+		# multiplier live (the run report's power table).
+		RunSim.note_battle_start(Run, heroes, enemies, sim_stats)
 	if Run.debug_enabled() and not autoplay:
 		_build_debug_panel()
 	if not sim:
@@ -1040,6 +1058,7 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 # ---------- battle loop ----------
 
 func _run_battle() -> void:
+	_stat("enemy_count", enemies.size())
 	await _wait(0.6)
 	_message("The Decay stirs...")
 	# The warband's theme opens the log — the composition isn't random.
@@ -1071,6 +1090,12 @@ func _run_battle() -> void:
 		var u := _next_unit()
 		if u == null:
 			break
+		# Field-size proxy: count the enemies still standing as round 3 opens
+		# (every unit at speed 100 acts once per 100 timeline ticks).
+		if sim and not _r3_recorded and u.next_time >= 200.0:
+			_r3_recorded = true
+			_stat("enemies_alive_r3",
+				enemies.filter(func(e): return not e.dead).size())
 		# Debug turn lock: every HERO turn goes to the locked hero — enemies
 		# still act on their own turns. The displaced hero's clock advances
 		# as if they had taken a basic action, so the timeline keeps flowing.
@@ -7775,12 +7800,24 @@ func _check_end() -> void:
 	if sim:
 		sim_done += 1
 		_stat("battles")
+		# Fights that never reached round 3 record their end state (a win
+		# counts 0 standing — the field emptied before AoE could feed).
+		if not _r3_recorded:
+			_r3_recorded = true
+			_stat("enemies_alive_r3",
+				enemies.filter(func(e): return not e.dead).size())
 		if victory:
 			_stat("wins")
 		for h in heroes:
 			if not h.dead:
 				_stat("surviving_hero_hp_pct", h.hp / float(h.max_hp))
 				_stat("surviving_heroes")
+		if run_sim:
+			# RunSim replays the real victory/defeat flow (minus UI and
+			# persistence), walks the map to the next fight, and reloads
+			# this scene — or prints the run report and quits.
+			RunSim.on_battle_end(Run, self, victory)
+			return
 		if sweep and sim_done % sim_target == 0:
 			# Stage boundary: bank this budget's stats, start the next clean.
 			var stage := int(sim_done / float(sim_target))
@@ -7982,16 +8019,41 @@ func _print_sweep_report() -> void:
 		zone if zone != "" else "1",
 		theme if theme != "" else "all fight themes",
 		OS.get_environment("DOD_SIM_SPECS")])
-	print("budget   battles   wins    win%   rounds   deaths/battle")
+	print("budget   battles   wins    win%   rounds   deaths/battle   foes   alive@r3")
 	for i in sweep_stats.size():
 		var s: Dictionary = sweep_stats[i]
 		var b := maxf(s.get("battles", 0.0), 1.0)
-		print("%4d %9d %8d %6.0f%% %8.1f %11.2f" % [SWEEP_BUDGETS[i], int(b),
+		print("%4d %9d %8d %6.0f%% %8.1f %11.2f %8.1f %8.1f" % [SWEEP_BUDGETS[i], int(b),
 			int(s.get("wins", 0.0)), 100.0 * s.get("wins", 0.0) / b,
 			s.get("hero_actions", 0.0) / b / 3.0,
-			s.get("hero_deaths", 0.0) / b])
+			s.get("hero_deaths", 0.0) / b,
+			s.get("enemy_count", 0.0) / b,
+			s.get("enemies_alive_r3", 0.0) / b])
+	# The field-size confound, made visible: a hero whose share climbs with
+	# enemy count is an AoE outlier (the fix is the AoE); a share that stays
+	# flat across budgets is plain overtuning (the fix is the numbers).
+	print("Damage share per budget:")
+	for i in sweep_stats.size():
+		print("%4d   %s" % [SWEEP_BUDGETS[i], _share_line(sweep_stats[i])])
 	print("Sim time: %.1fs" % elapsed)
 	print("=============================================\n")
+
+
+# "Berserker 30% | Cryomancer 45% | ..." from one banked stats dict.
+# Keys are sorted so every budget row lists heroes in the same order.
+func _share_line(s: Dictionary) -> String:
+	var total := 0.0
+	var names: Array = []
+	for key in s:
+		if key.begins_with("dmg_hero_"):
+			total += s[key]
+			names.append(key)
+	names.sort()
+	var parts := PackedStringArray()
+	for key in names:
+		parts.append("%s %.0f%%" % [key.trim_prefix("dmg_hero_"),
+			100.0 * s[key] / maxf(total, 1.0)])
+	return " | ".join(parts)
 
 
 var _end_action := Callable()  # victory screens: Space presses this

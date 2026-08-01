@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-07-31</b></p>
+<p align="right"><b>Last updated: 2026-08-01</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1496,15 +1496,34 @@ stdout as "[LOG] ..." so headless tests can grep them; status expiries print as
 "... fades from ..." lines.</li>
 <li><b>Difficulty sweep:</b> <code>./sim.sh --sweep N</code> (DOD_SIM_SWEEP=1) runs N
 battles at EACH power budget 3/6/9/12 with a fresh warband rolled per battle from the
-fight-node themes, and prints win rate, rounds, and hero deaths per budget — the
-difficulty curve. DOD_SIM_ZONE picks the roster, DOD_SIM_THEME narrows the roll to one
-theme. Sweep enemies are UNSCALED (no tier stat scaling) and sweep heroes carry base
-kits, so the sweep isolates the composition axis; a real tier-8+ fight is harder than
-its budget row. Without --sweep, plain sims fight a fixed raider/chief/archer/archer
-lineup (power 7, unscaled) — fine for kit smoke tests, meaningless for difficulty.
-Win-rate targets attach to a budget, never to "the sim": the ≈85% target describes
-the top of the ladder (see the changelog's Batch R sweep table for the measured
-curve).</li>
+fight-node themes, and prints — per budget — win rate, rounds, hero deaths, average
+enemy count, average enemies still alive entering round 3 (the field-size proxy AoE
+feeds on), and each hero's damage share. DOD_SIM_ZONE picks the roster, DOD_SIM_THEME
+narrows the roll to one theme — and because the share breakdown is per budget, a themed
+sweep reads out one theme's damage-share profile for free (the follow-up tool for any
+AoE-vs-numbers question). Sweep enemies are UNSCALED (no tier stat scaling) and sweep
+heroes carry base kits, so the sweep isolates the composition axis; a real tier-8+
+fight is harder than its budget row. Without --sweep, plain sims fight a fixed
+raider/chief/archer/archer lineup (power 7, unscaled) — fine for kit smoke tests,
+meaningless for difficulty. Win-rate targets attach to a budget, never to "the sim":
+the ≈85% target describes the top of the ladder (see the changelog's Batch R sweep
+table for the measured curve).</li>
+<li><b>Run harness:</b> <code>./sim.sh --run N</code> (DOD_SIM_RUN=N, default 50) plays
+N COMPLETE runs headlessly — real 30-node maps, real warbands at real budgets WITH
+enemy tier scaling and the zone slot multiplier, HP/mana/items carried between battles,
+talent points earned and spent, elite runes and boss trophies collected, all three zone
+slots — and prints the run report: completion/wipe rates, wipe tier distribution,
+per-tier win/death/HP averages, and the measured party-vs-warband power table (the
+progression counterweight, measured instead of modelled). The bot is dumb on purpose;
+every policy is printed in the report header. DOD_SIM_ROUTE picks the route policy
+("default" = fight &gt; elite, rest only when no combat is offered and someone is under
+60% HP; "elites" prefers elites), DOD_SIM_BUILDS="spec:LaneName,..." names the talent
+lane each spec buys down (default: the tree's first lane, cheapest node first, capstone
+the moment its gate opens), DOD_SIM_TROPHIES lists preferred boss-trophy picks (default:
+first in the spec's pool), DOD_SIM_RELICS arms relics at the draft. v1 exclusions,
+reported in the output: shops buy nothing and the bot never uses items — the result is
+a FLOOR on real play. Simulated runs live entirely in memory (Run.sim_run): they never
+touch the player's save, relic unlocks, or profile.</li>
 <li><b>Testing shortcuts:</b> debug tools are ALWAYS available in dev (unexported) builds;
 exported builds require DOD_DEBUG=1. The map burger menu gains a DEBUG section — +200 gold, +200 talent points for everyone, full heal, jump to the boss tier,
 advance to the next zone, <b>Reroll Specs</b> (refunds spent talent points, clears all

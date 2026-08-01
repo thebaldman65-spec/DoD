@@ -5,6 +5,123 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-01 — Batch S: measure a real run</h2>
+<ul>
+<li><b>No tuning ships in this batch</b> — like Batch R, it produces numbers. Two new
+instruments: the sweep now reports damage share and field size per budget, and
+<code>./sim.sh --run N</code> plays N complete runs with progression on both sides and
+reports where they end.</li>
+<li><b>Sweep, part 1 — damage share and field size per budget:</b> every budget row now
+carries average enemy count, average enemies still alive entering round 3 (the
+field-size proxy AoE actually feeds on), and each hero's damage share at that budget —
+the previous report pooled share across the whole sweep, so an AoE spec's share was one
+number smeared across every field size. Because DOD_SIM_THEME narrows the sweep to one
+theme, a themed sweep now reads out per-theme damage share for free — the follow-up
+tool for whichever answer the field-size breakdown gives. The full report:
+<pre>===== DAWN OF DECAY — DIFFICULTY SWEEP =====
+Zone roster: 1   Themes: all fight themes   Specs: berserker,cryomancer,inquisitor,beastmaster
+budget   battles   wins    win%   rounds   deaths/battle   foes   alive@r3
+   3       200      200    100%      4.5        0.01      2.6      0.0
+   6       200      200    100%      7.0        0.27      4.4      0.0
+   9       200      196     98%      9.2        0.61      5.5      0.1
+  12       200      187     94%     10.8        1.18      5.9      0.3
+Damage share per budget:
+   3   Beastmaster 22% | Berserker 25% | Cryomancer 49% | Devout 4%
+   6   Beastmaster 29% | Berserker 24% | Cryomancer 44% | Devout 3%
+   9   Beastmaster 31% | Berserker 26% | Cryomancer 40% | Devout 4%
+  12   Beastmaster 31% | Berserker 26% | Cryomancer 38% | Devout 4%
+=============================================</pre></li>
+<li><b>The Cryomancer verdict the breakdown gives:</b> his damage share is 49% at budget 3, where the average field is 2.6 bodies, and it FALLS as fields widen — 44% / 40% / 38% at budgets 6 / 9 / 12 (4.4 / 5.5 / 5.9 foes). That is the opposite of the AoE-outlier signature the batch set out to test for, and the new alive-at-round-3 column explains why AoE never gets to feed: fields are functionally empty entering round 3 at every budget (0.0-0.3 enemies standing) — wide fields do not stay wide. The Cryomancer is overtuned at the BASELINE — his small-field/single-target output carries the overage, and more bodies dilute him toward the pack. The fix, when a tuning batch takes it up, is his numbers, not his AoE. (For a second opinion the themed sweep now exists: DOD_SIM_THEME="Swarm" ./sim.sh --sweep reads out his share against the widest fields the game rolls.)</li>
+<li><b>Run harness, part 2 —</b> <code>./sim.sh --run N</code> (DOD_SIM_RUN=N, default
+50) plays complete runs: a real <code>Run.new_run</code>, the real 30-node deck (17
+fight / 5 rest / 5 shop / 3 event), a tier-by-tier walk, real warbands at real budgets
+WITH tier stat scaling and the zone slot multiplier, state carried between battles
+exactly as a real run carries it (HP, mana, items; cooldowns reset per fight; node
+scaling accumulating; talent points banked and spent), all three zone slots or death.
+The bot is dumb on purpose — a clever bot makes numbers unattributable — and every
+policy prints in the report header: route DOD_SIM_ROUTE (default = fight &gt; elite;
+rest only when no combat is offered and someone is under 60% HP), talent builds
+DOD_SIM_BUILDS (default = each tree's first lane, cheapest node first, capstone the
+moment its gate opens, spillover to the next lane when bought out), boss trophies
+DOD_SIM_TROPHIES (default = first in the spec's pool, resolved instantly), relics
+DOD_SIM_RELICS (armed at the draft), elite rune spoils auto-equip while a slot is
+free, events take the first valid choice.</li>
+<li><b>What the run harness INCLUDES</b> (the paragraph that matters): hero talents
+(earned at the real 1/2/3 economy AND spent), boss trophies, elite runes (equipped),
+relics if armed, event outcomes including mid-run relic grants, node scaling (+2% per
+win), enemy tier scaling (+4% Atk / +5% HP per tier), the zone slot multiplier
+(x1.0/x1.5/x2.2), HP/mana carry between fights, the 20%-HP return of the fallen after
+victories, rest heals, elite/boss gold and loot, all real map decks and warband
+pre-rolls. <b>What it EXCLUDES (v1):</b> shop purchases (gold accrues unspent — the
+report is a FLOOR on real play, not an estimate), item use in battle (the bot never
+drinks a potion it carries), and any routing intelligence (combat always outranks a
+rest node, so the bot fights at 45% HP where a human would rest). Deaths/fight counts
+companion deaths too, same as the sweep's metric. Simulated runs live entirely in
+memory: Run.sim_run makes save_run/clear_save no-ops, and RunSim never touches
+Relics.unlock_random or the Profile chronicle.</li>
+<li><b>The report</b> (50 runs, default policies, gated kits):
+<pre>===== DAWN OF DECAY — RUN REPORT =====
+Runs: 50    Completed: 0 (0%)    Wiped: 50 (100%)
+Policies: route=default builds=default(first lane) shops=OFF(v1: result is a floor) relics=none
+          trophies=first-in-pool runes=auto-equip(2 slots) events=first-valid
+Specs: berserker,cryomancer,inquisitor,beastmaster
+
+Wipe tier distribution:
+  zone 1: t1-3 x5   t4-7 x40  t8-10 x5   boss x0
+  zone 2: t1-3 x0   t4-7 x0   t8-10 x0   boss x0
+  zone 3: t1-3 x0   t4-7 x0   t8-10 x0   boss x0
+
+Per-tier averages (all runs reaching that tier):
+  zone tier   fights   win%   deaths/fight   party HP% entering
+  z1  t1        50    100%       0.20           75%
+  z1  t2        28     96%       0.46           54%
+  z1  t3        33     88%       1.09           55%
+  z1  t4        34     44%       2.94           47%
+  z1  t5        22     45%       2.86           44%
+  z1  t6         9     44%       2.89           46%
+  z1  t7         8     50%       2.50           58%
+  z1  t8         5     20%       3.80           45%
+  z1  t10        1      0%       5.00           56%
+
+Party power vs warband power, measured (not modelled):
+  zone tier   party Atk   party effHP   warband Atk   warband effHP   ratio
+  z1  t1        350           754           330             513      1.25
+  z1  t2        357           770           297             501      1.36
+  z1  t3        361           778           343             563      1.21
+  z1  t4        365           787           484             937      0.80
+  z1  t5        369           797           481             954      0.80
+  z1  t6        373           803           482             973      0.80
+  z1  t7        370           797           600            1092      0.67
+  z1  t8        376           812           607            1681      0.55
+  z1  t10       406           875           805            1608      0.52
+
+Damage share across all runs: Beastmaster 29% | Berserker 30% | Cryomancer 38% | Devout 4%
+Talent points per hero per run: earned 2.8   spent 2.8 (banked 0.0)
+Events fired: arcane_obelisk x1, blood_altar x1, collectors_grave x2, deserters_stash x1, waystone_cache x3, withered_shrine x1
+Excluded from v1: shop purchases (gold accrues unspent), item use in battle (the bot never drinks).
+=============================================</pre></li>
+<li><b>The finding — progression does NOT close the gap at the floor:</b> zero of 50
+runs completed; none even reached the zone-1 boss (one made tier 10 and died there).
+Wipes cluster at tiers 4-7 (40 of 50) — exactly where the budget ladder steps from 3-6
+to 6-9 and the measured power ratio crosses under 1.0 (1.25 at tier 1, 0.80 at tiers
+4-6, 0.55 by tier 8). The deeper reading: early attrition THROTTLES progression — runs
+that die at tier 5 have earned ~3 talent points per hero, so the counterweight that is
+supposed to answer the x3+ enemy curve (roughly 35 points, trophies, relics) never
+gets fielded. This is a floor, not the player experience — the bot never rests while a
+fight is reachable, never buys, never drinks — but the shape is real: the game's
+difficulty curve front-loads its wall into the first zone's midsection, and the
+progression engine can't spin up fast enough to meet it. The three correctness gates
+passed before any of this was collected (scripted test: hero Attack x1.64 after 32
+wins; 40 granted points = 40 paid + 0 banked with a capstone taken; raider Attack
+104/132/198/290 across z1t1/z1t8/z2t8/z3t8 — tier ladder and slot multiplier both
+live).</li>
+<li><b>Also:</b> plain <code>./sim.sh N</code> regression-checked (20/20, report
+unchanged); the party enters its first fight at ~75% HP by design inheritance — spec
+stat blocks raise max HP at awakening but current HP stays at the class base until the
+first victory sync, in real runs and simulated ones alike (recorded here, not
+changed).</li>
+</ul>
+
 <h2>2026-07-31 — Batch R: fix the instrument</h2>
 <ul>
 <li><b>The hypothesis, verified and corrected:</b> the batch went in blaming the

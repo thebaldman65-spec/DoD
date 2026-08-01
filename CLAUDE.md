@@ -33,7 +33,33 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   lineup (power 7, unscaled) — kit smoke tests only; its win% carries NO
   difficulty signal (Batch R). `./sim.sh --sweep N` (DOD_SIM_SWEEP=1) = N
   battles at EACH budget 3/6/9/12, fresh fight-theme warband per battle,
-  enemies unscaled (`DOD_SIM_ZONE` picks the roster). Batch R baseline
+  enemies unscaled (`DOD_SIM_ZONE` picks the roster); per budget it also
+  prints avg enemy count, avg enemies alive entering round 3, and per-hero
+  damage share (Batch S — a DOD_SIM_THEME'd sweep = per-theme share for
+  free). `./sim.sh --run N` (DOD_SIM_RUN=N, def 50) = N COMPLETE runs with
+  progression BOTH sides (tier scaling + slot mult, HP/mana/item carry,
+  points earned AND spent, elite runes auto-equipped, trophies) → run
+  report: wipe distribution, per-tier averages, measured party-vs-warband
+  power table. Policies env-set + printed: DOD_SIM_ROUTE (default|elites),
+  DOD_SIM_BUILDS="spec:Lane,...", DOD_SIM_TROPHIES, DOD_SIM_RELICS (draft).
+  v1 floor: shops buy NOTHING, bot never drinks items. RunSim
+  (scripts/run_sim.gd statics, Run injected Events-style) owns setup/map
+  walk/report; battle.gd hooks: _ready begin+note_battle_start, _check_end
+  sim branch → RunSim.on_battle_end. Run.sim_run=true makes
+  save_run/clear_save NO-OPS (sims can never touch the real save) and no
+  Profile/Relics.unlock calls exist in RunSim. GOTCHA: children added in a
+  SceneTree script's _initialize never fire _ready (root not ready) — park
+  scene-spawning tests on the first process_frame (scratchpad
+  test_run_harness.gd = the 3 correctness gates: hero win scaling, talent
+  spend conservation, enemy tier×slot scaling — rerun it before trusting
+  any --run report after touching spawn/scaling code). Batch S verdicts:
+  Cryomancer share FALLS with field size (49%→38%, budgets 3→12) = baseline
+  overtune, fix his NUMBERS not his AoE; fields are empty entering round 3
+  at every budget; --run 50 floor = 0/50 completions, wipes cluster z1
+  t4-7 where the budget ladder steps 3-6→6-9 and the measured power ratio
+  crosses under 1.0 (1.25 t1 → 0.80 t4-6 → 0.55 t8) — early attrition
+  throttles the progression meant to close the gap (2.8 pts/hero/run
+  earned at the floor vs the ~35 the economy assumes). Batch R baseline
   (gated kits, 200/budget, win% at budgets 3/6/9/12): roster 1
   100/100/98/93.5, roster 2 100/100/97.5/88.5, roster 3 100/100/99.5/98.5;
   deaths/battle climb 0.01→1.3-1.5 — attrition is the sensitive dial. The

@@ -403,3 +403,27 @@ heroes grow +2% per win while zone-1 warbands grow ~3.5x across the
 ladder — the gap is meant to be closed by talents, trophies, and
 relics, and whether it IS closed is now a measurable question instead
 of a guess.
+
+**Measure a real run (Batch S) — two instruments the tuning list was
+waiting on:** damage share had only ever been measured against one
+field size — the fixed four-enemy lineup, and then the sweep's pooled
+report — while the flagged outlier (the Cryomancer at 45%) is an AoE
+control spec whose share against a six-body Swarm and a two-body
+elite band are different questions with different answers. The sweep
+now breaks out damage share, average enemy count, and enemies still
+standing at round 3 PER BUDGET, because field size is the confound
+that makes the Cryomancer question answerable: a share that climbs
+with enemy count is an AoE problem, a flat one is a numbers problem,
+and those are different batches. And no tool had ever simulated the
+progression that is supposed to close the enemy scaling gap — Batch R
+measured warbands growing ~3.5x across a zone against the party's
+x1.12 from node scaling, and the entire counterweight (roughly 35
+talent points, trophies, relics, elite runes) had never once been in
+a simulated fight. The run harness plays whole runs with progression
+on both sides and measures the two power curves instead of modelling
+them. Its bot is dumb on purpose — every choice is a fixed policy
+printed in the report header, because a clever bot makes numbers
+unattributable; shops buy nothing in v1 so the result reads as a
+floor on real play, not an estimate of it. Whether progression closes
+the gap is the central balance question of the game, and it now has a
+measuring stick.
