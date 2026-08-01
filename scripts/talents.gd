@@ -1,91 +1,22 @@
-# FIXED talent trees only (designed in the RPG Skill Tree Generator; source
-# JSONs live in data/talent-tree-*.json — this file is their hand-tuned
-# conversion). Specs without a designed tree show "coming soon" on the party
-# screen. Learned talents: {id: ranks}. Ranks are ADDITIVE: every extra point
-# adds the same stated amount again. Tooltips never say "per rank" — descs
-# hold a "{v}" placeholder and a "scale" {base, step}; desc_for() renders the
-# value at the invested ranks (rank-1 preview when unlearned).
+# Talent trees. All 12 specs are LANE TREES now (Batch P retired the last
+# classic tree); the FIXED_TREES row-gating machinery below stays for any
+# future spec that ships row-gated first. Learned talents: {id: ranks}.
+# Ranks are ADDITIVE: every extra point adds the same stated amount again.
+# Tooltips never say "per rank" — descs hold a "{v}" placeholder and a
+# "scale" {base, step}; desc_for() renders the value at the invested ranks
+# (rank-1 preview when unlearned).
 #
-# Gating: rows unlock cumulatively (row 1 needs 5 pts, row 2 needs 10,
-# row 3 — the capstone — needs 15), PLUS explicit per-node prerequisites
-# ("requires" id at "requires_ranks" points).
+# Classic-tree gating (unused while FIXED_TREES is empty): rows unlock
+# cumulatively (row 1 needs 5 pts, row 2 needs 10, row 3 — the capstone —
+# needs 15), PLUS explicit per-node prerequisites.
 class_name Talents
 
 const ROW_REQ := {0: 0, 1: 5, 2: 10, 3: 15}
 
-const FIXED_TREES := {
-	"arcanist": [
-		# --- row 0 ---
-		{"id": "ar_mindfulness", "name": "Mindfulness", "ranks": 3, "row": 0, "col": 1,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Every {v} of your turns, ALL of your cooldowns tick down 1 extra turn.",
-			"scale": {"base": 7, "step": -1},
-			"payload": {"stat": {"mindfulness_ranks": 1}}},
-		{"id": "ar_mastery", "name": "Arcane Mastery", "ranks": 3, "row": 0, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Each stack of Arcane Resonance grants {v}% extra critical strike chance (on top of the base 3%).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"arcane_mastery_ranks": 1}}},
-		{"id": "ar_attunement", "name": "Mana Attunement", "ranks": 3, "row": 0, "col": 3,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Restore {v}% of your maximum Mana every time you gain a stack of Resonance.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"mana_attune_ranks": 1}}},
-		# --- row 1 ---
-		{"id": "ar_temporal", "name": "Temporal Rift", "ranks": 3, "row": 1, "col": 0,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Critical strikes have a {v}% chance to echo for 25% of their damage against a random enemy.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"temporal_ranks": 1}}},
-		{"id": "ar_on_edge", "name": "On the Edge", "ranks": 3, "row": 1, "col": 1,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Surviving an attack below {v}% health grants 1 stack of Resonance.",
-			"scale": {"base": 20, "step": 5},
-			"payload": {"stat": {"on_edge_ranks": 1}}},
-		{"id": "ar_overcharge", "name": "Overcharge", "ranks": 1, "row": 1, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "New ability: Overcharge — raise your maximum Resonance to 8; stacks beyond 5 give 1.5x their normal Resonance bonus (20 Mana, 2.0 int, 5cd).",
-			"payload": {"new_ability": {"display_name": "Overcharge", "cost": 20,
-				"special": "overcharge", "delay": 2.0, "anim": "attack02", "cooldown": 5,
-				"perfect_id": "", "perfect_text": "Stacks beyond 5 give 1.65x instead",
-				"description": "Push past the limit: maximum\nResonance becomes 8; stacks beyond\n5 give 1.5x their normal Resonance\nbonus (damage, crit, damage taken)."}}},
-		{"id": "ar_conversion", "name": "Conversion", "ranks": 3, "row": 1, "col": 3,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "{v}% of damage taken is lost as Mana instead of health.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"conversion_ranks": 1}}},
-		{"id": "ar_critical_mass", "name": "Critical Mass", "ranks": 3, "row": 1, "col": 4,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Every 3rd critical strike deals {v}% more damage and restores half as much of your maximum Mana.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"critical_mass_ranks": 1}}},
-		# --- row 2 ---
-		{"id": "ar_suppressing", "name": "Suppressing Fire", "ranks": 3, "row": 2, "col": 1,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Each bolt of Arcane Barrage deals {v}% of Attack more than the previous one.",
-			"scale": {"step": 0.25},
-			"payload": {"stat": {"suppressing_ranks": 1}}},
-		{"id": "ar_unlimited", "name": "Unlimited Power", "ranks": 3, "row": 2, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "Gaining Resonance while already at maximum stacks instead grants +{v}% damage and +{v}% maximum Mana (stacks all battle).",
-			"scale": {"step": 2},
-			"payload": {"stat": {"unlimited_ranks": 1}}},
-		{"id": "ar_stable", "name": "Stable Alignment", "ranks": 3, "row": 2, "col": 3,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "You cannot lose more than {v}% of your maximum health to a single attack.",
-			"scale": {"base": 40, "step": -5},
-			"payload": {"stat": {"stable_ranks": 1}}},
-		# --- row 3 (capstone) ---
-		{"id": "ar_wrath", "name": "Magi's Wrath", "ranks": 1, "row": 3, "col": 2,
-			"gate": "row", "requires": "", "requires_ranks": 0,
-			"desc": "New ability: Magi's Wrath — 15% of Attack as arcane to ALL enemies, +4% per Resonance stack; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd).",
-			"payload": {"new_ability": {"display_name": "Magi's Wrath", "cost": 30,
-				"dmg_type": "arcane", "damage": 15, "pressure": 0, "aoe": true,
-				"delay": 4.0, "anim": "attack03", "cooldown": 4, "recoil_base": 0.15,
-				"perfect_id": "", "perfect_text": "Costs 3.5 initiative instead",
-				"description": "The storm unchained: rakes the whole\nenemy team, +4% damage per Resonance\nstack; BD = 2.5 x stacks. Recoil 15%\nof damage dealt, -3% per enemy hit."}}},
-	],
-}
+# Empty since Batch P (07-31): the Arcanist — the last classic tree —
+# went lanes. The row-gating machinery stays for any future spec that
+# ships row-gated first.
+const FIXED_TREES := {}
 
 
 # ---------- LANE TREES (Batch 30 framework pilot: Beastmaster) ----------
@@ -819,6 +750,154 @@ const LANE_TREES := {
 			"desc": "EVERY enemy gains 1 stack of Chilled at the start of each of the Cryomancer's turns.",
 			"payload": {"stat": {"eternal_winter": 1}}},
 	],
+	"arcanist": [
+		# Purpose-designed lanes (Batch P, 07-31) — NODE-GATED (tiers open
+		# on nodes bought in the lane: 2/4, capstone at 6). Every id
+		# survives: the 12 originals keep their payloads verbatim
+		# (ar_suppressing and ar_temporal move Control → Overload, where a
+		# Barrage ramp and a crit echo belong) and the Batch 31 fillers
+		# re-spec IN PLACE (same ids, new effects), so saved ranks migrate
+		# and nobody gets a refund.
+		# --- Lane A: Resonance — the stack engine: ramp faster, cap
+		# higher, and keep getting paid at the ceiling. ---
+		{"id": "ar_mastery", "name": "Arcane Mastery", "ranks": 3, "lane": "Resonance", "tier": 0,
+			"node_gated": true,
+			"desc": "Each stack of Arcane Resonance grants {v}% extra critical strike chance (on top of the base 3%).",
+			"scale": {"step": 1},
+			"payload": {"stat": {"arcane_mastery_ranks": 1}}},
+		{"id": "ar_attunement", "name": "Mana Attunement", "ranks": 3, "lane": "Resonance", "tier": 0,
+			"desc": "Restore {v}% of your maximum Mana every time you gain a stack of Resonance.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"mana_attune_ranks": 1}}},
+		# Re-spec (was an Arcane Mastery duplicate; same id, so saved ranks
+		# carry). Ramps him off the FREE basic — the weak opening turns
+		# shorten without spending Mana.
+		{"id": "ar_harmonics", "name": "Harmonics", "ranks": 2, "lane": "Resonance", "tier": 0,
+			"desc": "Arcane Explosion grants {v} additional Resonance.",
+			"scale": {"step": 1},
+			"payload": {"stat": {"harmonics_ranks": 1}}},
+		# Re-spec (was a Mana Attunement echo): the passive's core dial.
+		{"id": "ar_conduit", "name": "Conduit", "ranks": 3, "lane": "Resonance", "tier": 1,
+			"desc": "Each Resonance stack grants +{v}% damage (on top of the base 15%).",
+			"scale": {"step": 2},
+			"payload": {"stat": {"conduit_ranks": 1}}},
+		# Re-spec (was +4% max health): straightforward runway — more
+		# ceiling to climb (Overcharge's raised cap climbs with it).
+		{"id": "ar_core", "name": "Resonant Core", "ranks": 2, "lane": "Resonance", "tier": 1,
+			"desc": "Maximum Resonance rises by {v} (Overcharge's raised cap climbs the same amount).",
+			"scale": {"step": 1},
+			"payload": {"stat": {"resonant_core_ranks": 1}}},
+		{"id": "ar_unlimited", "name": "Unlimited Power", "ranks": 3, "lane": "Resonance", "tier": 2,
+			"desc": "Gaining Resonance while already at maximum stacks instead grants +{v}% damage and +{v}% maximum Mana (stacks all battle).",
+			"scale": {"step": 2},
+			"payload": {"stat": {"unlimited_ranks": 1}}},
+		# Re-spec (was flat Explosion damage): pay for staying hot.
+		{"id": "ar_charged", "name": "Charged Bolts", "ranks": 3, "lane": "Resonance", "tier": 2,
+			"desc": "While at maximum Resonance, damaging casts restore {v}% of your maximum Mana.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"charged_bolts_ranks": 1}}},
+		# --- Lane B: Overload — the risk half: crits, echoes, and the
+		# big spenders escalating with the bill attached. ---
+		{"id": "ar_critical_mass", "name": "Critical Mass", "ranks": 3, "lane": "Overload", "tier": 0,
+			"desc": "Every 3rd critical strike deals {v}% more damage and restores half as much of your maximum Mana.",
+			"scale": {"step": 20},
+			"payload": {"stat": {"critical_mass_ranks": 1}}},
+		# Moved from Control: a crit echo is pure offence.
+		{"id": "ar_temporal", "name": "Temporal Rift", "ranks": 3, "lane": "Overload", "tier": 0,
+			"desc": "Critical strikes have a {v}% chance to echo for 25% of their damage against a random enemy.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"temporal_ranks": 1}}},
+		{"id": "ar_overcharge", "name": "Overcharge", "ranks": 1, "lane": "Overload", "tier": 1,
+			"desc": "New ability: Overcharge — raise your maximum Resonance to 8; stacks beyond 5 give 1.5x their normal Resonance bonus (20 Mana, 2.0 int, 5cd).",
+			"payload": {"new_ability": {"display_name": "Overcharge", "cost": 20,
+				"special": "overcharge", "delay": 2.0, "anim": "attack02", "cooldown": 5,
+				"perfect_id": "", "perfect_text": "Stacks beyond 5 give 1.65x instead",
+				"description": "Push past the limit: maximum\nResonance becomes 8; stacks beyond\n5 give 1.5x their normal Resonance\nbonus (damage, crit, damage taken)."}}},
+		# Moved from Control: an offensive Barrage ramp belongs here.
+		{"id": "ar_suppressing", "name": "Suppressing Fire", "ranks": 3, "lane": "Overload", "tier": 1,
+			"desc": "Each bolt of Arcane Barrage deals {v}% of Attack more than the previous one.",
+			"scale": {"step": 0.25},
+			"payload": {"stat": {"suppressing_ranks": 1}}},
+		# Re-spec (was flat Cannon damage): the per-stack term instead.
+		{"id": "ar_cannoneer", "name": "Cannoneer", "ranks": 3, "lane": "Overload", "tier": 1,
+			"desc": "Arcane Cannon deals +{v}% damage per Resonance stack (on top of the base 7.5%).",
+			"scale": {"step": 2.5},
+			"payload": {"stat": {"cannoneer_ranks": 1}}},
+		# Re-spec (was a Barrage Mana discount): more bolts instead.
+		{"id": "ar_barrister", "name": "Barrage Master", "ranks": 2, "lane": "Overload", "tier": 2,
+			"desc": "Arcane Barrage fires {v} additional bolt(s).",
+			"scale": {"step": 1},
+			"payload": {"ability": "Arcane Barrage", "add": {"random_hits": 1}}},
+		# Re-spec (was flat crit; its old cross-lane exclusive is retired —
+		# the fork lives in Control now): the lane's thesis in one node —
+		# pure escalation with the bill attached.
+		{"id": "ar_volatility", "name": "Volatility", "ranks": 3, "lane": "Overload", "tier": 2,
+			"desc": "Arcane Cannon and Magi's Wrath deal +{v}% damage, and their recoil rises +{v}%.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"volatility_ranks": 1}}},
+		# --- Lane C: Control — surviving what you built. The risk answer
+		# is a fork: run hot forever, or vent constantly. ---
+		{"id": "ar_mindfulness", "name": "Mindfulness", "ranks": 3, "lane": "Control", "tier": 0,
+			"desc": "Every {v} of your turns, ALL of your cooldowns tick down 1 extra turn.",
+			"scale": {"base": 7, "step": -1},
+			"payload": {"stat": {"mindfulness_ranks": 1}}},
+		{"id": "ar_conversion", "name": "Conversion", "ranks": 3, "lane": "Control", "tier": 0,
+			"desc": "{v}% of damage taken is lost as Mana instead of health.",
+			"scale": {"step": 10},
+			"payload": {"stat": {"conversion_ranks": 1}}},
+		{"id": "ar_on_edge", "name": "On the Edge", "ranks": 3, "lane": "Control", "tier": 1,
+			"desc": "Surviving an attack below {v}% health grants 1 stack of Resonance.",
+			"scale": {"base": 20, "step": 5},
+			"payload": {"stat": {"on_edge_ranks": 1}}},
+		{"id": "ar_stable", "name": "Stable Alignment", "ranks": 3, "lane": "Control", "tier": 1,
+			"desc": "You cannot lose more than {v}% of your maximum health to a single attack.",
+			"scale": {"base": 40, "step": -5},
+			"payload": {"stat": {"stable_ranks": 1}}},
+		# Re-spec (was +3% armor). One side of the sharpest fork the spec
+		# can offer: run permanently hot — the penalty barely bites...
+		{"id": "ar_ward", "name": "Arcane Ward", "ranks": 3, "lane": "Control", "tier": 1,
+			"exclusive_with": "ar_still",
+			"desc": "The Resonance damage-taken penalty falls {v}% per stack (from the base 5%).",
+			"scale": {"step": 1},
+			"payload": {"stat": {"arcane_ward_ranks": 1}}},
+		# Re-spec (was flat damage reduction). ...or vent often and
+		# cheaply, because venting no longer erases you.
+		{"id": "ar_still", "name": "Still Mind", "ranks": 2, "lane": "Control", "tier": 1,
+			"exclusive_with": "ar_ward",
+			"desc": "Stabilize leaves {v} additional stacks standing (on top of its floor of 2).",
+			"scale": {"step": 1},
+			"payload": {"stat": {"still_mind_ranks": 1}}},
+		# Re-spec (was Meltdown, a +dmg/+taken dial; same id, so saved
+		# ranks carry). Pairs with Conversion: a committed Control build
+		# turns nearly all self-inflicted damage into fuel.
+		{"id": "ar_meltdown", "name": "Feedback Loop", "ranks": 3, "lane": "Control", "tier": 2,
+			"desc": "{v}% of recoil damage is paid as Mana instead of health.",
+			"scale": {"step": 10},
+			"payload": {"stat": {"feedback_ranks": 1}}},
+		# --- Capstones: take ONE (6 nodes bought in the lane) ---
+		# Re-spec (was a stat pile): the natural end of a lane about the
+		# resource itself — unlimited scaling, risk capped where it
+		# already hurts. (Overflow payouts never fire: there is no max.)
+		{"id": "ar_singularity", "name": "Singularity", "ranks": 1, "lane": "Resonance", "tier": 2,
+			"capstone": true,
+			"desc": "Resonance has NO maximum. The damage-taken penalty stops rising past 5 stacks.",
+			"payload": {"stat": {"singularity": 1}}},
+		{"id": "ar_wrath", "name": "Magi's Wrath", "ranks": 1, "lane": "Overload", "tier": 2,
+			"capstone": true,
+			"desc": "New ability: Magi's Wrath — 15% of Attack as arcane to ALL enemies, +4% per Resonance stack; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd).",
+			"payload": {"new_ability": {"display_name": "Magi's Wrath", "cost": 30,
+				"dmg_type": "arcane", "damage": 15, "pressure": 0, "aoe": true,
+				"delay": 4.0, "anim": "attack03", "cooldown": 4, "recoil_base": 0.15,
+				"perfect_id": "", "perfect_text": "Costs 3.5 initiative instead",
+				"description": "The storm unchained: rakes the whole\nenemy team, +4% damage per Resonance\nstack; BD = 2.5 x stacks. Recoil 15%\nof damage dealt, -3% per enemy hit."}}},
+		# Re-spec (was a Temporal Rift / Mindfulness bundle): removes the
+		# Stabilize trade entirely — full defensive value, full offensive
+		# value, every three turns.
+		{"id": "ar_timelord", "name": "Master of Moments", "ranks": 1, "lane": "Control", "tier": 2,
+			"capstone": true,
+			"desc": "Stabilize consumes no stacks at all — it grants its Mana and damage reduction from your current stacks and leaves them intact.",
+			"payload": {"stat": {"master_moments": 1}}},
+	],
 	"holy": [
 		# Purpose-designed lanes (Batch J, 07-30) — NODE-GATED (tiers open
 		# on nodes bought in the lane: 2/4, capstone at 6). Every id
@@ -1544,62 +1623,9 @@ const LANE_TREES := {
 # untouched): id -> [lane, tier] / [lane, tier, "cap"] / [lane, tier, "",
 # exclusive_id]. "new" holds the invented filler nodes — numeric dials and
 # kit tweaks on existing machinery only, placed for the designer to review.
-const LANE_CONVERSIONS := {
-	"arcanist": {
-		"map": {
-			"ar_mastery": ["Resonance", 0], "ar_attunement": ["Resonance", 1],
-			"ar_unlimited": ["Resonance", 1],
-			"ar_overcharge": ["Overload", 0], "ar_on_edge": ["Overload", 1],
-			"ar_critical_mass": ["Overload", 1],
-			"ar_mindfulness": ["Control", 0], "ar_temporal": ["Control", 1],
-			"ar_conversion": ["Control", 1], "ar_stable": ["Control", 1],
-			"ar_suppressing": ["Control", 2],
-			"ar_wrath": ["Overload", 2, "cap"],
-		},
-		"new": [
-			{"id": "ar_harmonics", "name": "Harmonics", "ranks": 2, "lane": "Resonance", "tier": 0,
-				"desc": "Arcane Mastery hums another {v}% crit per stack.", "scale": {"step": 1},
-				"payload": {"stat": {"arcane_mastery_ranks": 1}}},
-			{"id": "ar_conduit", "name": "Conduit", "ranks": 2, "lane": "Resonance", "tier": 1,
-				"desc": "Mana Attunement returns another step on overflow.",
-				"payload": {"stat": {"mana_attune_ranks": 1}}},
-			{"id": "ar_core", "name": "Resonant Core", "ranks": 2, "lane": "Resonance", "tier": 2,
-				"desc": "+{v}% max health.", "scale": {"step": 4},
-				"payload": {"stat": {"max_hp_pct": 0.04}}},
-			{"id": "ar_charged", "name": "Charged Bolts", "ranks": 3, "lane": "Resonance", "tier": 2,
-				"desc": "Arcane Explosion deals {v} more damage per bolt.", "scale": {"step": 3},
-				"payload": {"ability": "Arcane Explosion", "add": {"damage": 3}}},
-			{"id": "ar_volatility", "name": "Volatility", "ranks": 3, "lane": "Overload", "tier": 0,
-				"desc": "+{v}% crit chance.", "scale": {"step": 2},
-				"payload": {"stat": {"crit_bonus": 0.02}}},
-			{"id": "ar_cannoneer", "name": "Cannoneer", "ranks": 3, "lane": "Overload", "tier": 1,
-				"desc": "Arcane Cannon deals {v} more damage.", "scale": {"step": 6},
-				"payload": {"ability": "Arcane Cannon", "add": {"damage": 6}}},
-			{"id": "ar_barrister", "name": "Barrage Master", "ranks": 2, "lane": "Overload", "tier": 2,
-				"desc": "Arcane Barrage costs {v} less Mana.", "scale": {"step": 5},
-				"payload": {"ability": "Arcane Barrage", "add": {"cost": -5}}},
-			{"id": "ar_meltdown", "name": "Meltdown", "ranks": 2, "lane": "Overload", "tier": 2,
-				"exclusive_with": "ar_still",
-				"desc": "+{v}% damage dealt AND +{v}% damage taken.", "scale": {"step": 4},
-				"payload": {"stat": {"dmg_bonus": 0.04, "dmg_taken_bonus": 0.04}}},
-			{"id": "ar_ward", "name": "Arcane Ward", "ranks": 2, "lane": "Control", "tier": 0,
-				"desc": "+{v}% armor.", "scale": {"step": 3},
-				"payload": {"stat": {"armor": 0.03}}},
-			{"id": "ar_still", "name": "Still Mind", "ranks": 2, "lane": "Control", "tier": 2,
-				"exclusive_with": "ar_meltdown",
-				"desc": "Take {v}% less damage.", "scale": {"step": 4},
-				"payload": {"stat": {"dmg_taken_bonus": -0.04}}},
-			{"id": "ar_singularity", "name": "Singularity", "ranks": 1, "lane": "Resonance", "tier": 2,
-				"capstone": true,
-				"desc": "Arcane Mastery deepens two steps and Unlimited Power one.",
-				"payload": {"stat": {"arcane_mastery_ranks": 2, "unlimited_ranks": 1}}},
-			{"id": "ar_timelord", "name": "Master of Moments", "ranks": 1, "lane": "Control", "tier": 2,
-				"capstone": true,
-				"desc": "Temporal Rift echoes two steps deeper and Mindfulness one.",
-				"payload": {"stat": {"temporal_ranks": 2, "mindfulness_ranks": 1}}},
-		],
-	},
-}
+# Empty since Batch P (07-31): the Arcanist conversion was the last one
+# standing; its fillers re-specced in place inside LANE_TREES.
+const LANE_CONVERSIONS := {}
 
 
 static func has_tree(spec: String) -> bool:

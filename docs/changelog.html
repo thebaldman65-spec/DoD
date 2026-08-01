@@ -5,6 +5,65 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-31 — Batch P: the Arcanist's ramp stops flatlining</h2>
+<ul>
+<li><b>The diagnosis:</b> Resonance built +1 per damaging cast, capped at 5, and persisted
+all battle — so a RAMP spec hit its ceiling around turn five of a 7-9 round fight and
+then every further cast wasted its own mechanic. Backlash Ward paid exactly once per
+battle (it fired only on the transition INTO max), and Unlimited Power — one talent in
+one lane — was the only fix, which no spec should need just to stop wasting its
+resource. Stabilize was a reset, not a decision: it consumed ALL stacks, +75% damage to
+zero in one cast, which is why the bot only ever pulled it as a panic button.</li>
+<li><b>Backlash Ward repeats:</b> EVERY Resonance gain that arrives while already at
+maximum restores 15 Mana — a maxed Arcanist is a Mana engine fuelling the Cannon and
+Wrath casts he wants to be making at full stacks. Unlimited Power's overflow branch
+still takes priority when learned (verified in the log: Ward on the climb, Power at the
+top).</li>
+<li><b>Stabilize leaves 2:</b> consumes only the stacks ABOVE 2 — +5 Mana and +10%
+damage reduction (2 turns) per stack consumed, unusable at 2 or fewer, Perfect still
+heals 5%. At 5 stacks that is 15 Mana and 30% reduction while KEEPING +30% damage and
+the crit. The deliberate trade: the emergency full-vent got weaker (no more 50-80%
+walls) in exchange for venting often without erasing himself — the Berserker's Frenzy
+floor, the Pyromancer's ember, the Cryomancer's remainder.</li>
+<li><b>Tree: the Arcanist moves off the last Batch 31 conversion onto purpose-designed
+node-gated lanes</b> (tiers at 2/4 nodes in-lane, capstone at 6) — every tree in the
+game is now purpose-built. RESONANCE is the stack engine, OVERLOAD the risk half,
+CONTROL survival. Suppressing Fire and Temporal Rift move Control → Overload (an
+offensive Barrage ramp and a crit echo were never Control). Every id survives and the
+twelve conversion fillers re-spec in place, so saved ranks migrate: Harmonics (was an
+Arcane Mastery duplicate → Arcane Explosion +1 Resonance/rank ×2), Conduit (was an
+Attunement echo → +2%/rank damage per stack ×3), Resonant Core (was +max HP → max
+Resonance +1/rank ×2), Charged Bolts (was an Explosion dial → damaging casts at max
+restore 5%/rank max Mana ×3), Cannoneer (was flat Cannon damage → its per-stack term
++2.5%/rank ×3), Barrage Master (was a Mana discount → +1 bolt/rank ×2), Volatility (was
+flat crit → Cannon and Wrath +5%/rank damage AND recoil ×3), Arcane Ward (was +armor →
+the damage-taken penalty falls 1%/rank per stack ×3), Still Mind (was flat damage
+reduction → Stabilize leaves +1 stack/rank ×2), Feedback Loop (was Meltdown, a
+dmg-dealt/taken dial → 10%/rank of recoil paid as Mana ×3, pairing with Conversion so a
+committed Control build turns self-harm into fuel). The cross-lane Meltdown ↔ Still Mind
+exclusive is gone; <b>the new exclusive is Arcane Ward ↔ Still Mind, in-lane in
+Control</b> — run permanently hot, or vent constantly for almost nothing: never
+stabilise, or stabilise all the time.</li>
+<li><b>Capstones:</b> Magi's Wrath (Overload, unchanged), Singularity (was a stat pile →
+Resonance has NO maximum, the damage-taken penalty stops rising past 5 stacks; with no
+cap there is no overflow, so Ward/Power payouts retire for that build), Master of
+Moments (was a stat bundle → Stabilize consumes nothing and pays full value from current
+stacks, every 3 turns).</li>
+<li><b>Bot rotation:</b> Stabilize at 4+ stacks below 80% health (was max-stacks below
+70% — correct for a full reset, far too conservative for a vent). The sim bot now vents
+0.9 times per battle instead of almost never.</li>
+<li><b>Verified live:</b> both scenes parse clean; the lane audit passes (all 12 trees
+24 nodes / 3 capstones / 7-7-7; arcanist node-gated, exclusive pair in-lane, all 24 ids
+preserved). Autoplay: Backlash Ward fires three casts in a row at max; Stabilize logs
+"3 stacks vented (2 remain)" and the bot vents mid-fight repeatedly; with Unlimited
+Power force-learned the overflow converts instead of triggering the Ward; Charged Bolts,
+Feedback Loop, Resonant Core (cap 7), Singularity (9 banked, no Ward) and Master of
+Moments ("5 stacks channelled, none consumed") all proc on cue. Sim 200 ×
+berserker/arcanist/inquisitor/beastmaster: <b>199/200 wins, 8.0 rounds avg, Arcanist 47%
+damage share</b> (286/battle; recorded, not tuned — win% sits at the pre-difficulty-pass
+ceiling), Stabilize 0.9 uses/battle.</li>
+</ul>
+
 <h2>2026-07-31 — Batch O: the Cryomancer's cold finally holds</h2>
 <ul>
 <li><b>The diagnosis:</b> his win condition was 4 Chilled stacks on ONE target, but his

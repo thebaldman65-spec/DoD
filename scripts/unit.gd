@@ -313,6 +313,18 @@ var suppressing_ranks := 0    # Suppressing Fire: Barrage bolts ramp
 var stable_ranks := 0         # Stable Alignment: single-hit damage cap
 var unlimited_ranks := 0      # Unlimited Power: overflow → dmg + max Mana
 var unlimited_surges := 0     # overflow procs banked this battle
+# Arcanist lane tree (Batch P, 07-31). See talents.gd for the node text.
+var harmonics_ranks := 0      # Harmonics: Arcane Explosion grants extra stacks
+var conduit_ranks := 0        # Conduit: deeper per-stack damage bonus
+var resonant_core_ranks := 0  # Resonant Core: +1 max Resonance per rank
+var charged_bolts_ranks := 0  # Charged Bolts: Mana per damaging cast at max
+var cannoneer_ranks := 0      # Cannoneer: Cannon's per-stack damage deepens
+var volatility_ranks := 0     # Volatility: Cannon/Wrath damage AND recoil up
+var arcane_ward_ranks := 0    # Arcane Ward: Resonance dmg-taken penalty falls
+var still_mind_ranks := 0     # Still Mind: Stabilize leaves extra stacks
+var feedback_ranks := 0       # Feedback Loop: recoil partly paid as Mana
+var singularity := 0          # capstone: no Resonance cap, penalty stops at 5
+var master_moments := 0       # capstone: Stabilize consumes no stacks
 # Holy tree (07-22). See talents.gd for the node text.
 var triage_ranks := 0         # Triage: instant heals can crit, +3%/rank healing
 var heavenly_ranks := 0       # Heavenly Aura: deeper Mercy stack bonus
@@ -804,14 +816,22 @@ func refresh_bars() -> void:
 		_res_fill.size.x = PLATE_BAR_W * clampf(resource / float(max_resource), 0.0, 1.0)
 		_res_text.text = "%s %d/%d" % [resource_name, resource, max_resource]
 	if _res2_fill != null:
-		_res2_fill.size.x = PLATE_BAR_W * clampf(second_resource / float(second_max), 0.0, 1.0)
+		# Singularity has no cap — the bar reads against the old 5-stack line.
+		var res2_ref := 5.0 if singularity > 0 else float(second_max)
+		_res2_fill.size.x = PLATE_BAR_W * clampf(second_resource / res2_ref, 0.0, 1.0)
 		if second_resource_name == "Resonance":
-			# Overcharge weights stacks 6-8 harder — show the true bonus.
+			# Overcharge weights stacks past 5 harder — show the true bonus
+			# (Conduit deepens the per-stack term; Singularity has no cap).
 			var eff := float(second_resource)
 			if overcharged and second_resource > 5:
 				eff = 5.0 + (second_resource - 5.0) * overcharge_mult
-			_res2_text.text = "%d/%d (+%d%% dmg)" % [second_resource, second_max,
-				int(round(eff * 15.0))]
+			var per_stack := 15.0 + 2.0 * conduit_ranks
+			if singularity > 0:
+				_res2_text.text = "%d (+%d%% dmg)" % [second_resource,
+					int(round(eff * per_stack))]
+			else:
+				_res2_text.text = "%d/%d (+%d%% dmg)" % [second_resource, second_max,
+					int(round(eff * per_stack))]
 		else:
 			_res2_text.text = "%s %d/%d" % [second_resource_name, second_resource, second_max]
 	if passive_id == "bloodrage":

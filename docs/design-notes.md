@@ -341,3 +341,25 @@ the many warbands with no healer — Rime keeps it where it is chosen.
 The 46% sim damage share (36% before) is recorded, not tuned: this
 batch's brief was making the cold hold; the number is the difficulty
 pass's dial.
+
+**Arcanist (Batch P) — a ramp that doesn't flatline:** Resonance
+built +1 per cast, capped at 5, and persisted all battle, so a Ramp
+spec reached its ceiling around turn five of a 7-9 round fight and
+then every further cast wasted its own mechanic — Backlash Ward paid
+exactly once because it fired only on the TRANSITION to max, and the
+one talent that fixed it (Unlimited Power) shouldn't be the price of a
+spec not wasting its resource. Now every gain at the cap restores 15
+Mana: the ramp keeps paying in a different currency once it can't pay
+in stacks, and it fuels exactly the Cannon and Wrath casts a maxed
+Arcanist wants to make. Stabilize was the other half of the problem —
+his only risk lever consumed ALL stacks, taking him from +75% damage
+to zero in one cast, which is why the bot only pulled it as a panic
+button. It vents only the stacks above 2 now (the Berserker's Frenzy
+floor, the Pyromancer's ember, the Cryomancer's remainder: spending
+shouldn't delete the engine), a deliberate trade — the emergency
+full-vent got weaker in exchange for venting often. The tree's new
+exclusive is the sharpest fork the spec can offer: Arcane Ward (run
+permanently hot, the penalty barely bites) against Still Mind (vent
+constantly, venting costs almost nothing) — never stabilise, or
+stabilise all the time. Suppressing Fire and Temporal Rift moved to
+Overload because a Barrage ramp and a crit echo were never Control.

@@ -435,6 +435,14 @@ func _spawn_units() -> void:
 				if pool_ab != null \
 						and not cfg["abilities"].any(func(a): return a.display_name == pool_ab.display_name):
 					cfg["abilities"] = cfg["abilities"] + [pool_ab]
+		# Resonance talents move the ceiling — re-read AFTER talents so
+		# Resonant Core / Singularity are visible in cfg (the Mercy pattern
+		# below). Singularity: no maximum (99 is "never reached in practice";
+		# Backlash Ward / Unlimited Power overflow simply never fires).
+		if spec == "arcanist":
+			cfg["second_max"] = 5 + int(cfg.get("resonant_core_ranks", 0))
+			if int(cfg.get("singularity", 0)) > 0:
+				cfg["second_max"] = 99
 		# Mercy talents move the ceiling and the starting line — re-read
 		# them AFTER talents so Martyr's Vigor / Zealous Light are visible
 		# in cfg (the Sharpshooter Focus pattern below).
@@ -1982,10 +1990,13 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if ocharge != null and u.resource >= ocharge.cost and u.ability_ready(ocharge) \
 					and not u.overcharged and u.second_resource >= 4:
 				return [ocharge, u]
+			# Stabilize is a valve now, not a reset — vent early and often
+			# (Batch P; _ability_usable covers the Still Mind floor).
 			var stab := _find_ability(u, "Stabilize")
 			if stab != null and u.ability_ready(stab) \
-					and u.second_resource >= u.second_max \
-					and u.hp < u.max_hp * 0.7:
+					and u.second_resource >= 4 \
+					and u.hp < u.max_hp * 0.8 \
+					and _ability_usable(u, stab):
 				return [stab, u]
 			var cannon := _find_ability(u, "Arcane Cannon")
 			if cannon != null and u.resource >= cannon.cost and u.ability_ready(cannon) \
@@ -2485,8 +2496,9 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if ab.display_name == "Shatter" \
 			and not enemies.any(func(e): return not e.dead and e.has_status("chilled")):
 		return false
-	# Stabilize: nothing to consume without a stack banked.
-	if ab.special == "stabilize" and u.second_resource < 1:
+	# Stabilize: nothing to vent unless stacks sit above the floor (2, plus
+	# Still Mind ranks).
+	if ab.special == "stabilize" and u.second_resource <= 2 + u.still_mind_ranks:
 		return false
 	# Overcharge: the limit only breaks once per battle.
 	if ab.special == "overcharge" and u.overcharged:
@@ -2518,8 +2530,8 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 		ab_btn.tooltip_text += "\n(No living companion)"
 	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
 		ab_btn.tooltip_text += "\n(No fallen allies)"
-	if ab.special == "stabilize" and u.second_resource < 1:
-		ab_btn.tooltip_text += "\n(Requires at least 1 Resonance)"
+	if ab.special == "stabilize" and u.second_resource <= 2 + u.still_mind_ranks:
+		ab_btn.tooltip_text += "\n(Requires more than %d Resonance)" % (2 + u.still_mind_ranks)
 	if ab.special == "overcharge" and u.overcharged:
 		ab_btn.tooltip_text += "\n(Already Overcharged)"
 	ab_btn.disabled = not _ability_usable(u, ab)
@@ -2733,7 +2745,7 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 	if ab.damage > 0:
 		var buff_mult := 1.0
 		if u.second_resource_name == "Resonance":
-			buff_mult *= 1.0 + 0.15 * _resonance_power(u)
+			buff_mult *= 1.0 + (0.15 + 0.02 * u.conduit_ranks) * _resonance_power(u)
 		if u.has_status("surge"):
 			buff_mult *= 1.2
 		if u.has_status("empower"):
@@ -3612,9 +3624,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						attacker.refresh_bars()
 						_log("   → Talent: Critical Mass — +%d%% damage, +%d Mana" % [
 							20 * attacker.critical_mass_ranks, cm_mana], "#b0a8e0")
-			# Attacker-side modifiers.
+			# Attacker-side modifiers (Conduit deepens the base 15%/stack).
 			if attacker.second_resource_name == "Resonance":
-				raw *= 1.0 + 0.15 * _resonance_power(attacker)
+				raw *= 1.0 + (0.15 + 0.02 * attacker.conduit_ranks) \
+					* _resonance_power(attacker)
 			if attacker.has_status("surge"):
 				raw *= 1.2
 			if attacker.has_status("wrath"):
@@ -3630,12 +3643,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Dark Infusion: the Occultist feeds on the enemy team's afflictions.
 			if attacker.infusion_ranks > 0:
 				raw *= 1.0 + 0.02 * attacker.infusion_ranks * _unique_enemy_debuffs()
-			# Arcane Cannon: the damage (not the recoil) grows with Resonance.
+			# Arcane Cannon: the damage (not the recoil) grows with Resonance
+			# (Cannoneer deepens the base 7.5%/stack).
 			if ab.display_name == "Arcane Cannon":
-				raw *= 1.0 + 0.075 * attacker.second_resource
+				raw *= 1.0 + (0.075 + 0.025 * attacker.cannoneer_ranks) \
+					* attacker.second_resource
 			# Magi's Wrath: the storm feeds on banked Resonance.
 			if ab.display_name == "Magi's Wrath":
 				raw *= 1.0 + 0.04 * attacker.second_resource
+			# Volatility: the big spenders escalate — recoil rises to match
+			# (the bill lands in the recoil block).
+			if attacker.volatility_ranks > 0 \
+					and ab.display_name in ["Arcane Cannon", "Magi's Wrath"]:
+				raw *= 1.0 + 0.05 * attacker.volatility_ranks
 			# Suppressing Fire: every Barrage bolt bites harder than the last.
 			if ab.display_name == "Arcane Barrage" and attacker.suppressing_ranks > 0 \
 					and hit_i > 0:
@@ -3865,9 +3885,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						and strike_target.status_power("hunt_mark") == heroes.find(attacker):
 					raw *= 1.25
 			raw *= 1.0 + attacker.dmg_bonus + float(attacker.type_dmg_bonus.get(ab.dmg_type, 0.0))
-			# Target-side modifiers.
+			# Target-side modifiers. Arcane Ward softens the Resonance penalty
+			# (5% → 2%/stack); Singularity stops it rising past 5 stacks.
 			if strike_target.second_resource_name == "Resonance":
-				raw *= 1.0 + 0.05 * _resonance_power(strike_target)
+				var res_pen := _resonance_power(strike_target)
+				if strike_target.singularity > 0:
+					res_pen = minf(res_pen, 5.0)
+				raw *= 1.0 + (0.05 - 0.01 * strike_target.arcane_ward_ranks) * res_pen
 			# Savage Presence (Ursus): the bear stands between the hunter and
 			# harm — 10% less damage taken, scaled by the bond tier.
 			if strike_target.is_hero and strike_target.passive_id == "pack":
@@ -4705,6 +4729,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				" [PERFECT]" if is_perfect else ""], "#70d878")
 		# Post-strike attacker effects (skipped if a counter felled the attacker).
 		var recoil_pct := ab.recoil_base
+		# Volatility: escalation's bill — Cannon and Wrath recoil harder.
+		if attacker.volatility_ranks > 0 \
+				and ab.display_name in ["Arcane Cannon", "Magi's Wrath"]:
+			recoil_pct += 0.05 * attacker.volatility_ranks
 		# Magi's Wrath: spreading the storm dissipates its backlash.
 		if ab.display_name == "Magi's Wrath":
 			recoil_pct = maxf(recoil_pct - 0.03 * enemies_struck, 0.0)
@@ -4723,6 +4751,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							_stat("hero_deaths")
 							_sfx("death", -4.0)
 							_log("† %s dies" % h.unit_name, "#e05050")
+			# Feedback Loop (talent): part of the backlash is paid as Mana
+			# instead of health (pairs with Conversion — self-harm into fuel).
+			if attacker.feedback_ranks > 0 and attacker.resource_name == "Mana":
+				var fb_mana := mini(int(round(recoil * 0.10 * attacker.feedback_ranks)),
+					mini(attacker.resource, recoil))
+				if fb_mana > 0:
+					attacker.resource -= fb_mana
+					recoil -= fb_mana
+					attacker.float_text("-%d Mana" % fb_mana, Color(0.5, 0.7, 1.0))
+					_log("   → Talent: Feedback Loop — %d of the recoil paid as Mana" % \
+						fb_mana, "#b0a8e0")
 			var recoil_died := attacker.take_tick_damage(recoil, "-%d Recoil" % recoil,
 				Color(1.0, 0.4, 0.5))
 			_log("   → %s recoils for %d" % [attacker.unit_name, recoil], "#e08850")
@@ -4895,7 +4934,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# Resonance builds only on the Mage's own casts — parry counters don't
 		# count (they made the Mage "start" battles with a stack).
 		if not is_counter:
-			_gain_resonance(attacker, 2 if any_crit else 1)
+			# Charged Bolts (talent): a damaging cast made AT the ceiling
+			# vents power as Mana (checked before the gain lands).
+			if attacker.second_resource_name == "Resonance" \
+					and attacker.charged_bolts_ranks > 0 \
+					and attacker.second_resource >= attacker.second_max:
+				var cb_mana := maxi(int(round(attacker.max_resource * 0.05
+					* attacker.charged_bolts_ranks)), 1)
+				attacker.resource = mini(attacker.resource + cb_mana,
+					attacker.max_resource)
+				attacker.float_text("+%d Mana" % cb_mana, Color(0.5, 0.7, 1.0))
+				_log("   → Talent: Charged Bolts — %s recovers %d Mana" % [
+					attacker.unit_name, cb_mana], "#b0a8e0")
+			var res_gain := 2 if any_crit else 1
+			# Harmonics (talent): the free basic ramps the engine faster.
+			if ab.display_name == "Arcane Explosion" and attacker.harmonics_ranks > 0:
+				res_gain += attacker.harmonics_ranks
+			_gain_resonance(attacker, res_gain)
 		# Rampage: a kill lets it surge onward — an immediate free recast on
 		# another enemy (and it chains while the kills keep coming).
 		if ab.display_name == "Rampage" and attacker.is_hero and not attacker.dead \
@@ -5145,8 +5200,8 @@ func _party_crit_bonus() -> float:
 
 
 # Arcane Resonance: builds on damaging casts (2 on crit via Arcane Instability);
-# hitting max stacks triggers Backlash Ward (+15 Mana). Stacks persist until
-# Stabilize consumes them. Overcharge raises the cap to 8.
+# every gain at max stacks triggers Backlash Ward (+15 Mana). Stacks persist
+# until Stabilize vents the ones above its floor. Overcharge raises the cap.
 func _gain_resonance(caster: BattleUnit, stacks: int) -> void:
 	if caster.second_resource_name != "Resonance":
 		return
@@ -5181,8 +5236,10 @@ func _gain_resonance(caster: BattleUnit, stacks: int) -> void:
 				caster.float_text("+%d Mana" % att_mana, Color(0.5, 0.7, 1.0))
 				_log("   → Talent: Mana Attunement — %s sips %d Mana" % [
 					caster.unit_name, att_mana], "#b0a8e0")
-	# Backlash Ward: hitting max stacks restores Mana.
-	if caster.second_resource == caster.second_max and before < caster.second_max:
+	# Backlash Ward: EVERY gain at max stacks restores Mana (Batch P) — the
+	# ramp keeps paying in a different currency once it can't pay in stacks.
+	# Unlimited Power's overflow branch above still takes priority.
+	if caster.second_resource == caster.second_max:
 		caster.resource = mini(caster.resource + 15, caster.max_resource)
 		caster.float_text("Backlash Ward +15 Mana", Color(0.5, 0.7, 1.0))
 		_log("   → Backlash Ward: %s restores 15 Mana" % caster.unit_name, "#b0a8e0")
@@ -6482,10 +6539,16 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Rime on %s — its chills will spread (%d turns)" % [
 				attacker.unit_name, target.unit_name, rime_turns], "#7cc8f0")
 		"stabilize":
-			# Consumes every Resonance stack: Mana back and a damage-reduction
-			# ward that scales with the stacks grounded.
-			var st_stacks := attacker.second_resource
-			attacker.second_resource = 0
+			# Vents the Resonance stacks ABOVE the floor (2, raised by Still
+			# Mind): Mana back and a damage-reduction ward per stack consumed.
+			# A tactical valve, not a reset — the engine keeps running (Batch P).
+			var st_floor := 2 + attacker.still_mind_ranks
+			var st_stacks := attacker.second_resource - st_floor
+			if attacker.master_moments > 0:
+				# Master of Moments: full value from every stack, none consumed.
+				st_stacks = attacker.second_resource
+			else:
+				attacker.second_resource = st_floor
 			var st_mana := 5 * st_stacks
 			attacker.resource = mini(attacker.resource + st_mana, attacker.max_resource)
 			var st_dr := 10 * st_stacks
@@ -6501,18 +6564,27 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.float_text("+%d" % st_heal, Color(0.4, 0.9, 0.45))
 			attacker.refresh_bars()
 			_message("%s stabilizes!" % attacker.unit_name)
-			_log("%s: Stabilize — %d stacks grounded: +%d Mana, -%d%% damage taken (2 turns)" % [
-				attacker.unit_name, st_stacks, st_mana, st_dr], "#b085e0")
+			if attacker.master_moments > 0:
+				_log("%s: Stabilize (Master of Moments) — %d stacks channelled, none consumed: +%d Mana, -%d%% damage taken (2 turns)" % [
+					attacker.unit_name, st_stacks, st_mana, st_dr], "#b085e0")
+			else:
+				_log("%s: Stabilize — %d stacks vented (%d remain): +%d Mana, -%d%% damage taken (2 turns)" % [
+					attacker.unit_name, st_stacks, attacker.second_resource,
+					st_mana, st_dr], "#b085e0")
 		"overcharge":
 			attacker.overcharged = true
 			attacker.overcharge_mult = 1.65 if is_perfect else 1.5
-			attacker.second_max = 8
+			# Resonant Core raises both ceilings; Singularity has none to raise.
+			if attacker.singularity == 0:
+				attacker.second_max = 8 + attacker.resonant_core_ranks
 			_sfx("perfect", -6.0, 0.8)
 			_apply_status(attacker, "overcharged", -1)
 			attacker.refresh_bars()
 			_message("%s OVERCHARGES!" % attacker.unit_name)
-			_log("%s: Overcharge — max Resonance is now 8; stacks beyond 5 weigh %.2fx" % [
-				attacker.unit_name, attacker.overcharge_mult], "#b085e0")
+			_log("%s: Overcharge — max Resonance is now %s; stacks beyond 5 weigh %.2fx" % [
+				attacker.unit_name,
+				("unlimited" if attacker.singularity > 0 else str(attacker.second_max)),
+				attacker.overcharge_mult], "#b085e0")
 		"holy_heal":
 			# 40% of the CASTER's max health, Mercy-scaled; Triage can crit;
 			# Holy Capacitor releases its stored overheal here.

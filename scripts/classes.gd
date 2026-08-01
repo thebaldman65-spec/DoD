@@ -651,7 +651,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Stabilize", "cooldown": 3, "cost": 0, "damage": 0,
 					"pressure": 0, "special": "stabilize", "delay": 2.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "Also heals 5% of max health",
-					"description": "Ground the storm: consumes ALL\nResonance — +5 Mana and +10% damage\nreduction (2 turns) per stack\nconsumed."}),
+					"description": "Vent the storm: consumes all\nResonance ABOVE 2 — +5 Mana and +10%\ndamage reduction (2 turns) per stack\nconsumed. Unusable at 2 or fewer."}),
 			]
 		"holy":
 			# Mercy kit (07-22 rework): heals scale off the CASTER's max

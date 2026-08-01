@@ -325,8 +325,9 @@ Plating block).</td></tr>
 enemy (Cryomancer talent ability).</td></tr>
 <tr><td>Stabilized</td><td>Takes 10% less damage per Resonance stack consumed by
 Stabilize (2 turns; the chip shows the total).</td></tr>
-<tr><td>Overcharged</td><td>Battle-long: maximum Resonance is 8; stacks 6–8 weigh 1.5×
-(1.65× from a perfect cast) toward the Resonance per-stack bonuses.</td></tr>
+<tr><td>Overcharged</td><td>Battle-long: maximum Resonance is 8 (raised further by
+Resonant Core); stacks past 5 weigh 1.5× (1.65× from a perfect cast) toward the Resonance
+per-stack bonuses.</td></tr>
 <tr><td>Unlimited Power</td><td>Resonance overflow banked as permanent battle power —
 the chip tracks the total % damage and max Mana gained (Arcanist talent).</td></tr>
 <tr><td>Melt Armor</td><td>Armor burned away for the battle by Burn ticks (Pyromancer
@@ -472,13 +473,18 @@ supporting cast for +1 extra stack and a bonus effect. <b>Empowered casts forgo 
 perfect bonus.</b> Talents move the economy: the ceiling (Martyr's Vigor, to 6/7), the
 opening stacks (Zealous Light), and the Empower surcharge itself (Ardor and Avatar of
 Mercy can waive it — see §7).</li>
-<li><b>Arcane Resonance (ARCANIST passive, 0–5):</b> only the Arcanist spec has the bar.
-+1 per damaging cast (+2 on crits; parry counters grant nothing). Each stack: +15% damage
-dealt, +3% crit, but +5% damage <i>taken</i>. Hitting max triggers Backlash Ward (+15 Mana).
-Stacks persist until Stabilize consumes them. The Overcharge talent ability raises the cap
-to 8 for the battle — stacks 6–8 weigh 1.5× (1.65× on a perfect cast) toward the per-stack
-bonuses above. The Resonance readout on the nameplate always shows the true damage
-bonus.</li>
+<li><b>Arcane Resonance (ARCANIST passive, 0–5 base):</b> only the Arcanist spec has the
+bar. +1 per damaging cast (+2 on crits; parry counters grant nothing; Harmonics deepens
+Arcane Explosion's gain). Each stack: +15% damage dealt (Conduit deepens it), +3% crit,
+but +5% damage <i>taken</i> (Arcane Ward softens it). <b>Backlash Ward:</b> EVERY gain
+that arrives at maximum stacks restores 15 Mana instead — the maxed engine keeps paying,
+in Mana rather than stacks (Unlimited Power's overflow conversion takes priority when
+learned). Stacks persist until Stabilize vents the ones above its floor of 2. Talents
+move the ceiling: Resonant Core (+1/rank), the Overcharge talent ability (cap 8 plus
+Resonant Core for the battle — stacks past 5 weigh 1.5×, 1.65× on a perfect cast, toward
+the per-stack bonuses above), and Singularity (no cap at all; the damage-taken penalty
+stops rising past 5 stacks). The Resonance readout on the nameplate always shows the true
+damage bonus.</li>
 </ul>
 <h3>5.2 Core kits (before specialization)</h3>
 <ul>
@@ -664,15 +670,18 @@ initiative instead). Unity splits the recoil across the party like any other dam
 Arcane Barrage — 20 Mana, 6 bolts × 8% Atk / 3 BD each, 2.5, 2cd; every bolt strikes one
 of the (up to) 3 living enemies with the LOWEST health — the volley typically rakes 2-3
 of them (Perfect: fires a 7th bolt).<br>
-Stabilize — free, 2.0, 3cd; consumes ALL Resonance stacks: +5 Mana and +10% damage
-reduction (2 turns) per stack consumed. Needs at least 1 stack (Perfect: also heals 5% of
-max health).<br>
+Stabilize — free, 2.0, 3cd; consumes the Resonance stacks ABOVE 2: +5 Mana and +10%
+damage reduction (2 turns) per stack consumed — a mid-fight vent that keeps the engine
+warm (+30% damage and the crit remain at the floor), not a reset. Unusable at 2 stacks
+or fewer (Perfect: also heals 5% of max health).<br>
 <i>Talent-granted:</i> Overcharge — 20 Mana, 2.0, 5cd, once per battle: maximum Resonance
-becomes 8 for the rest of the battle; stacks 6–8 weigh 1.5× toward the Resonance per-stack
-bonuses ONLY — Cannon's, Barrage's, and Magi's Wrath's own per-stack scalings count raw
-stacks (Perfect: 1.65× instead). Magi's Wrath (capstone) — 30 Mana, 15% Atk arcane to ALL enemies / 4.0, 4cd;
+becomes 8 (raised further by Resonant Core) for the rest of the battle; stacks past 5
+weigh 1.5× toward the Resonance per-stack bonuses ONLY — Cannon's, Barrage's, and Magi's
+Wrath's own per-stack scalings count raw stacks (Perfect: 1.65× instead). Magi's Wrath
+(capstone) — 30 Mana, 15% Atk arcane to ALL enemies / 4.0, 4cd;
 +4% damage per Resonance stack and BD = 2.5 × stacks; recoil 15% of damage dealt, −3%
-per enemy hit (Perfect: costs 3.5 initiative instead).</li>
+per enemy hit (Perfect: costs 3.5 initiative instead).<br>
+<b>Talent lanes:</b> see §7 — Resonance / Overload / Control, node-gated.</li>
 </ul>
 <h3>6.3 Cleric</h3>
 <ul>
@@ -868,23 +877,19 @@ own Trapper bonus from the target.<br>
 <p><b>Economy:</b> talent points come from victories alone — <b>1 per fight, 2 per elite,
 3 per zone boss</b> (rests and shops award none; Waystone +1 at run start). Points bank
 until spent on the Party screen.</p>
-<p><b>Every tree is a lane tree.</b> Ten are purpose-designed on the lane framework
-(<b>Berserker, Swordmaster, Warden, Holy, Devout, Occultist, Pyromancer, Sharpshooter,
-Survivalist, Beastmaster</b>); the other two are Batch 31 conversions of their classic
-grids awaiting the same treatment.</p>
+<p><b>Every tree is a lane tree, and every one is purpose-designed</b> on the lane
+framework — all twelve specs.</p>
 <p><b>Lane framework rules:</b> a tree is three LANES of seven nodes — each lane a
 playstyle — plus three CAPSTONES of which only ONE may ever be taken. <b>Node pricing:</b>
 the Nth distinct node bought costs ceil(N/3) — 1,1,1,2,2,2,3… — while extra ranks in an
 open node always cost 1, so roughly a third of the tree fits in one run. <b>Exclusive
 pairs</b> bar each other but stay visible, greyed with the reason — the player must see
 the door they closed. Tooltips show the live cost and lane requirement.<br>
-<b>Two gating models exist.</b> Points-gated trees (Beastmaster and the two conversions)
-open a lane's tier 2 at 3 points spent in that lane, tier 3 at 6, the capstone at 8.
-<b>Node-gated trees (Berserker, Swordmaster, Warden, Holy, Devout, Occultist,
-Pyromancer, Sharpshooter, Survivalist)</b>
-open tier 2 at 2 NODES bought in the lane, tier 3 at 4, the capstone at 6 — with the
-escalating cost curve, node count is the stable gate a player can actually plan
-against.</p>
+<b>Two gating models exist.</b> The Beastmaster is points-gated: a lane's tier 2 opens
+at 3 points spent in that lane, tier 3 at 6, the capstone at 8. <b>Every other tree is
+node-gated:</b> tier 2 opens at 2 NODES bought in the lane, tier 3 at 4, the capstone at
+6 — with the escalating cost curve, node count is the stable gate a player can actually
+plan against.</p>
 <p><b>Berserker lanes (node-gated):</b><br>
 <b>BLOODLETTING</b> (wounds as an engine: keep bleed high, or burst it) — Savagery (+5
 Bleed/rank on bleed abilities ×3), Bloodcraze (heal 3%/rank max HP on enemy bleedout ×3),
@@ -1172,42 +1177,46 @@ start of each of the Cryomancer's turns, 1 random Chilled enemy per rank gains a
 Freeze: Freezing no longer reduces the target's Chilled stacks — they hold at 4, and it
 refreezes the moment its freeze ends), Eternal Winter (Winter: EVERY enemy gains 1 stack
 of Chilled at the start of each of the Cryomancer's turns).</p>
-<p><b>One classic tree remains a conversion</b> (<b>Arcanist</b>, from
-Batch 31): its original 12 nodes
-keep their ids, effects, and any invested ranks, re-homed into three lanes, joined by
-invented filler nodes (numeric dials and kit tweaks on existing machinery) and two
-invented capstones beside the original one — <i>all fillers and lane homes await design
-review</i>. The converted tree carries one exclusive pair.</p>
+<p><b>Arcanist lanes (node-gated):</b><br>
+<b>RESONANCE</b> (the stack engine: ramp faster, cap higher, keep getting paid at the
+ceiling) — Arcane Mastery (+1%/rank crit per stack ×3), Mana Attunement (restore 2%/rank
+max Mana on every stack gained ×3), Harmonics (Arcane Explosion grants 1/rank additional
+Resonance ×2), Conduit (each stack grants +2%/rank damage on top of the base 15% ×3),
+Resonant Core (maximum Resonance +1/rank — Overcharge's raised cap climbs the same
+amount ×2), Unlimited Power (Resonance gained at max stacks becomes +2%/rank damage and
++2%/rank max Mana, stacking all battle — takes priority over Backlash Ward ×3), Charged
+Bolts (while at maximum Resonance, damaging casts restore 5%/rank max Mana ×3).<br>
+<b>OVERLOAD</b> (the risk half: crits, echoes, and the big spenders escalating with the
+bill attached) — Critical Mass (every 3rd crit +20%/rank damage and restores 10%/rank
+max Mana ×3), Temporal Rift (crits 3%/rank chance to echo 25% of their damage at a
+random enemy ×3), Overcharge (grants the ability), Suppressing Fire (each Barrage bolt
++0.25%/rank of Attack over the previous ×3), Cannoneer (Arcane Cannon +2.5%/rank damage
+per Resonance stack on top of the base 7.5% ×3), Barrage Master (Arcane Barrage fires
+1/rank additional bolt ×2), Volatility (Arcane Cannon and Magi's Wrath +5%/rank damage
+AND +5%/rank recoil ×3).<br>
+<b>CONTROL</b> (surviving what you built — the fork: run hot forever, or vent
+constantly) — Mindfulness (every 6/5/4 of his turns ALL cooldowns tick down 1 extra turn
+×3), Conversion (10%/rank of damage taken paid as Mana instead of health ×3), On the
+Edge (surviving an attack below 25/30/35% health grants 1 Resonance ×3), Stable
+Alignment (a single attack cannot remove more than 35/30/25% of max health ×3), Arcane
+Ward (the Resonance damage-taken penalty falls 1%/rank per stack, 5% → 2% ×3;
+<i>exclusive with Still Mind</i>), Still Mind (Stabilize leaves 1/rank additional stack
+standing ×2; <i>exclusive with Arcane Ward</i>), Feedback Loop (10%/rank of recoil
+damage paid as Mana instead of health ×3).<br>
+<b>CAPSTONES</b> — Singularity (Resonance: NO maximum — the damage-taken penalty stops
+rising past 5 stacks; with no cap to hit, Backlash Ward and Unlimited Power overflow
+never fire), Magi's Wrath (Overload: grants the ability), Master of Moments (Control:
+Stabilize consumes no stacks at all — full Mana and damage-reduction value from current
+stacks, every cast).</p>
 <p><b>Review aid:</b> the map burger's "All Spec Abilities Unlocked" toggle (default OFF,
 session-only; DOD_SIM_GRANT_ALL=1 headless) pre-grants every talent-granted and
 boss-trophy ability at spawn, so reworked kits can be reviewed without spending points.</p>
-<p><b>Lane homes per converted tree</b> (existing nodes by name; ⊕ marks invented
-fillers/capstones):<br>
-<b>Arcanist</b> — Resonance: Arcane Mastery, Mana Attunement, Unlimited Power,
-⊕Harmonics, ⊕Conduit, ⊕Resonant Core, ⊕Charged Bolts · Overload: Overcharge, On the Edge,
-Critical Mass, ⊕Volatility, ⊕Cannoneer, ⊕Barrage Master, ⊕Meltdown · Control: Mindfulness,
-Temporal Rift, Conversion, Stable Alignment, Suppressing Fire, ⊕Arcane Ward, ⊕Still Mind ·
-Capstones: Magi's Wrath, ⊕Singularity, ⊕Master of Moments · Exclusive: Meltdown ↔ Still
-Mind.</p>
 <p><b>Ranks are additive:</b> when a node offers an increase by a specified amount, every
 additional point invested adds the SAME amount again (e.g. "+5 Bleed per rank" at 3 ranks =
 +15 Bleed).</p>
 <p><b>Layout:</b> every tree renders as three lane columns with live lane-point headers,
 a capstone shelf, emblem-square nodes with point counters, cost-aware hover tooltips, and
 greyed exclusive siblings. Art is placeholder.</p>
-<p><b>Arcanist tree:</b> Mindfulness (every 6/5/4 of the Arcanist's turns — the
-count drops 1 per point — ALL cooldowns tick down 1 extra turn ×3), Arcane Mastery (each
-Resonance stack grants +1%/rank extra crit chance ×3), Mana Attunement (restore 2%/rank
-max Mana on every stack gained ×3). Temporal Rift (crits 3%/rank chance to echo
-25% of their damage at a random enemy ×3), On the Edge (surviving an attack below
-25/30/35% health — the threshold rises 5 per point — grants 1 Resonance ×3), Overcharge
-(grants the ability), Conversion (10%/rank of damage taken paid in Mana instead of
-health ×3), Critical Mass (every 3rd crit +20%/rank damage and restores 10%/rank max
-Mana ×3). Suppressing Fire (each Barrage bolt +0.25%/rank of Attack over the
-previous ×3), Unlimited Power (Resonance gained at max stacks becomes +2%/rank damage
-and +2%/rank max Mana, stacking all battle ×3), Stable Alignment (a single attack cannot
-remove more than 35/30/25% of max health — the cap drops 5 per point ×3). Capstone —
-Magi's Wrath (grants the ability).</p>
 <p><b>Tooltip display:</b> talent tooltips never say "per rank" — the number shown grows
 with the points invested (3% → 6% → 9%; unlearned nodes preview the 1-point value).</p>
 <p><b>Talent visibility:</b> every talent proc is written to the combat log with a
