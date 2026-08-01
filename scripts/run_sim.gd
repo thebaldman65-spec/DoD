@@ -8,9 +8,34 @@
 # THE BOT IS DUMB ON PURPOSE. Every decision is a fixed, legible policy
 # printed in the report header — a clever bot would make the numbers
 # unattributable. We measure what the SYSTEMS do, not what a good player does.
-#   Route (DOD_SIM_ROUTE)    default: fight > elite; no combat offered ->
-#                            rest if any hero < 60% HP, else shop, else
-#                            event. "elites" flips to elite > fight.
+#   Route (DOD_SIM_ROUTE)    three policies, one axis: how much recovery
+#                            the bot allows itself (Batch U). "greedy" =
+#                            the Batch S floor byte for byte: fight >
+#                            elite always; rest only when no combat is
+#                            offered AND a hero sits under 60%. "default"
+#                            rests when AVERAGE party HP < 65% and a rest
+#                            is on offer, else fight > elite > shop >
+#                            event. "cautious" = the same at 80%. The
+#                            spread between the three IS the deliverable:
+#                            one number is a point, three are a band that
+#                            real play sits inside. "elites" kept as-is
+#                            (greedy ladder, elite > fight).
+#   Shops (DOD_SIM_SHOPS)    on by default (Batch U): heal-first (any
+#                            hero < 50% buys one Health Potion each),
+#                            then the priciest affordable offer not
+#                            already carried — runes included, but only
+#                            onto a member with a free slot (equipped at
+#                            purchase; the sim has no party screen). No
+#                            buy ever drops gold below the 40g reserve —
+#                            a later heal stays reachable. "off" = the
+#                            v1 floor: buy nothing.
+#   Items (DOD_SIM_ITEMS)    on by default (Batch U): a hero opening a
+#                            turn below 35% HP drinks a carried Health
+#                            Potion before acting — nothing else, no
+#                            offensive or pre-emptive use. "off" = the
+#                            v1 floor: carried items are never drunk.
+#                            Run sims only — sweep/standalone battles
+#                            stay dry so Batch R/S baselines hold.
 #   Talents (DOD_SIM_BUILDS) "spec:LaneName,..." — buy down that lane
 #                            cheapest node first, capstone the moment its
 #                            gate opens; default = each tree's first lane;
@@ -18,8 +43,6 @@
 #                            the target lane is bought out.
 #   Trophies (DOD_SIM_TROPHIES) comma list of preferred ability names;
 #                            default = first unowned in the spec's pool.
-#   Shops                    BUY NOTHING (v1) — the result is a FLOOR on
-#                            real play, not an estimate.
 #   Events                   take the first valid choice; the report
 #                            counts which events fired.
 #   Relics (DOD_SIM_RELICS)  armed at the draft; none by default.
@@ -47,7 +70,20 @@ static var boss_nodes_sum := 0.0  # avg distinct nodes owned entering a boss
 static var boss_entries := 0
 static var route := "default"
 static var builds := {}           # spec -> target lane name
+static var shops_on := true       # Batch U shop policy (DOD_SIM_SHOPS=off -> v1 floor)
+static var items_on := true       # Batch U drink policy (DOD_SIM_ITEMS=off -> v1 floor)
+static var rest_offered := 0      # walk steps where a rest node was reachable
+static var rest_taken := 0        # rest nodes actually entered
+static var items_used := 0        # potions drunk in battle (battle.gd increments)
+static var items_left := 0.0      # consumables still carried when a run ends
+static var gold_earned := 0.0     # everything a run ever held (start + income)
+static var gold_spent := 0.0      # what the shop policy paid out
+static var gold_unspent := 0.0    # balance at wipe or completion
+static var heals_bought := 0      # rule 1: potions for the wounded
+static var restock_bought := 0    # rule 2: consumables bought back at count 0
+static var runes_bought := 0      # rule 2: runes bought (equipped at purchase)
 static var _run_spent := 0        # points paid this run
+static var _run_gold_spent := 0   # gold paid this run (shop policy only)
 static var _cur_tier := ""        # tier key of the battle in flight
 static var _deaths_before := 0.0  # sim_stats hero_deaths before this battle
 
@@ -59,9 +95,11 @@ static func begin(run: Node, n: int) -> void:
 	route = OS.get_environment("DOD_SIM_ROUTE")
 	if route == "":
 		route = "default"
-	elif not route in ["default", "elites"]:
+	elif not route in ["greedy", "default", "cautious", "elites"]:
 		push_warning("DOD_SIM_ROUTE '%s' unknown — using default" % route)
 		route = "default"
+	shops_on = not OS.get_environment("DOD_SIM_SHOPS") in ["off", "0"]
+	items_on = not OS.get_environment("DOD_SIM_ITEMS") in ["off", "0"]
 	for pair in OS.get_environment("DOD_SIM_BUILDS").split(",", false):
 		var bits: PackedStringArray = pair.split(":")
 		if bits.size() == 2:
@@ -88,6 +126,7 @@ static func start_run(run: Node) -> void:
 		run.sync_spec_hp(i)  # awakening HP sync — same call as the spec screen
 	run.specs_chosen = true
 	_run_spent = 0
+	_run_gold_spent = 0
 	if not walk_to_next_fight(run):
 		push_error("RunSim: no combat node reachable from the gate")
 
@@ -119,28 +158,146 @@ static func walk_to_next_fight(run: Node) -> bool:
 				run.heal_party(rest_pct)
 				run.restore_mana(rest_pct)
 			"shop":
-				pass  # v1 policy: buy nothing (reported as an exclusion)
+				if shops_on:
+					_shop_visit(run)
+				# DOD_SIM_SHOPS=off: window-shop, buy nothing (the v1 floor).
 			"event":
 				_resolve_event(run)
 	return false
 
 
-# The route policy. Combat first (order set by DOD_SIM_ROUTE), then the
-# recovery ladder: hurt parties rest, healthy ones window-shop.
+# The route policy (Batch U). greedy/elites keep the Batch S ladder byte
+# for byte — combat first, recovery only when no combat is offered — so
+# the old floor stays comparable. default/cautious rest on purpose: below
+# the threshold (65%/80% average party HP) a reachable rest node outranks
+# everything, which is the single behaviour the old harness lacked.
 static func _pick_node(run: Node, f: int, reach: Array) -> int:
-	var hurt := false
-	for m in run.party:
-		if int(m["hp"]) > 0 \
-				and float(m["hp"]) / float(m["max_hp"]) < 0.6:
-			hurt = true
+	var rest_at := -1
+	for i in reach:
+		if String(run.map[f][i]["type"]) == "rest":
+			rest_at = i
+			break
+	if rest_at >= 0:
+		rest_offered += 1
 	var prefs: Array = ["boss"]
-	prefs += ["elite", "fight"] if route == "elites" else ["fight", "elite"]
-	prefs += ["rest", "shop", "event"] if hurt else ["shop", "event", "rest"]
+	if route in ["greedy", "elites"]:
+		var hurt := false
+		for m in run.party:
+			if int(m["hp"]) > 0 \
+					and float(m["hp"]) / float(m["max_hp"]) < 0.6:
+				hurt = true
+		prefs += ["elite", "fight"] if route == "elites" else ["fight", "elite"]
+		prefs += ["rest", "shop", "event"] if hurt else ["shop", "event", "rest"]
+	else:
+		var threshold := 0.80 if route == "cautious" else 0.65
+		if rest_at >= 0 and _avg_hp(run) < threshold:
+			rest_taken += 1
+			return rest_at
+		prefs += ["fight", "elite", "shop", "event", "rest"]
 	for want in prefs:
 		for i in reach:
 			if String(run.map[f][i]["type"]) == want:
+				if want == "rest":
+					rest_taken += 1
 				return i
 	return reach[0]
+
+
+static func _avg_hp(run: Node) -> float:
+	var total := 0.0
+	for m in run.party:
+		total += float(m["hp"]) / maxf(float(m["max_hp"]), 1.0)
+	return total / maxf(run.party.size(), 1.0)
+
+
+# ---------- the shop policy (Batch U) ----------
+
+# Prices mirror shop_screen.gd (flat, no tier scaling; only the relic
+# discount moves them). Stock never runs out; runes are one per member
+# per visit, dupes re-rolled, price set by rarity (50/100/160).
+const ITEM_PRICES := {"health": 30, "mana": 30, "bomb": 45, "revive": 80,
+	"defense": 40}
+const GOLD_RESERVE := 40  # no purchase may dip below this — heals stay reachable
+
+
+static func _price(run: Node, base: int) -> int:
+	return maxi(int(round(base * (1.0 - run.relic_add("shop_discount")))), 1)
+
+
+# The Peddler boiled to policy: (1) any hero under half health buys one
+# Health Potion each; (2) then the priciest affordable offer not already
+# carried — consumables at count 0, or a rune for a member with a free
+# slot (equipped at purchase: the sim has no party screen, so an
+# unequippable rune would be dead gold and is never offered to it);
+# (3) every purchase respects the reserve.
+static func _shop_visit(run: Node) -> void:
+	var heal_price := _price(run, ITEM_PRICES["health"])
+	for m in run.party:
+		if float(m["hp"]) / float(m["max_hp"]) < 0.5 \
+				and run.gold - heal_price >= GOLD_RESERVE:
+			run.gold -= heal_price
+			_run_gold_spent += heal_price
+			run.items["health"] = int(run.items.get("health", 0)) + 1
+			heals_bought += 1
+	var offers := _roll_rune_offers(run)
+	for guard in 32:  # each buy shrinks the offer set; 32 = runaway insurance
+		var best_item := ""
+		var best_offer := -1
+		var best_price := -1
+		for id in run.ITEM_IDS:
+			if int(run.items.get(id, 0)) > 0:
+				continue  # already carried
+			var p := _price(run, int(ITEM_PRICES[id]))
+			if run.gold - p >= GOLD_RESERVE and p > best_price:
+				best_item = id
+				best_offer = -1
+				best_price = p
+		for i in offers.size():
+			var rp := _price(run, int(offers[i]["rune"]["price"]))
+			if run.gold - rp >= GOLD_RESERVE and rp > best_price:
+				best_item = ""
+				best_offer = i
+				best_price = rp
+		if best_item == "" and best_offer < 0:
+			return
+		run.gold -= best_price
+		_run_gold_spent += best_price
+		if best_item != "":
+			run.items[best_item] = int(run.items.get(best_item, 0)) + 1
+			restock_bought += 1
+		else:
+			var offer: Dictionary = offers[best_offer]
+			var rune: Dictionary = offer["rune"]
+			rune["equipped"] = true
+			var member: Dictionary = run.party[offer["member_idx"]]
+			member["runes"] = member.get("runes", []) + [rune]
+			runes_bought += 1
+			offers.remove_at(best_offer)
+
+
+# One rune per party member, dupes re-rolled (shop_screen._roll_offers),
+# minus members with both slots worn — the sim never holds a rune it
+# cannot equip.
+static func _roll_rune_offers(run: Node) -> Array:
+	var offers: Array = []
+	for i in run.party.size():
+		var member: Dictionary = run.party[i]
+		var worn := 0
+		var owned_names: Array = []
+		for r in member.get("runes", []):
+			owned_names.append(r["name"])
+			if r.get("equipped", false):
+				worn += 1
+		if worn >= 2:
+			continue
+		var rune: Dictionary = run.generate_rune(member["key"])
+		for attempt in 4:
+			if not owned_names.has(rune["name"]):
+				break
+			rune = run.generate_rune(member["key"])
+		if not owned_names.has(rune["name"]):
+			offers.append({"member_idx": i, "rune": rune})
+	return offers
 
 
 # The event screen boiled down to policy: draw at the door, take the first
@@ -267,6 +424,13 @@ static func _finish_run(run: Node, battle, done: bool) -> void:
 	talent_spent += _run_spent
 	for m in run.party:
 		talent_left += int(m.get("talent_points", 0))
+	# Gold ledger (Batch U): earned = everything the run ever held (start
+	# gold + income, net of event losses), so earned = spent + unspent.
+	gold_spent += _run_gold_spent
+	gold_unspent += run.gold
+	gold_earned += run.gold + _run_gold_spent
+	for id in run.items:
+		items_left += int(run.items[id])
 	if runs_done < runs_target:
 		start_run(run)
 		battle.get_tree().reload_current_scene()
@@ -389,8 +553,13 @@ static func _print_report(battle) -> void:
 	var relics_env := OS.get_environment("DOD_SIM_RELICS")
 	var troph := OS.get_environment("DOD_SIM_TROPHIES")
 	var builds_env := OS.get_environment("DOD_SIM_BUILDS")
-	print("Policies: route=%s builds=%s shops=OFF(v1: result is a floor) relics=%s" % [
-		route, builds_env if builds_env != "" else "default(first lane)",
+	var shops_desc := "on(heal<50% first, then priciest unowned incl. runes; 40g reserve)" \
+		if shops_on else "OFF(v1 floor: buy nothing)"
+	var items_desc := "on(drink Health Potion <35% HP)" \
+		if items_on else "OFF(v1 floor: never drinks)"
+	print("Policies: route=%s shops=%s" % [route, shops_desc])
+	print("          items=%s builds=%s relics=%s" % [items_desc,
+		builds_env if builds_env != "" else "default(first lane)",
 		relics_env if relics_env != "" else "none"])
 	print("          trophies=%s runes=auto-equip(2 slots) events=first-valid" % [
 		troph if troph != "" else "first-in-pool"])
@@ -463,5 +632,43 @@ static func _print_report(battle) -> void:
 	for id in ev_ids:
 		ev_parts.append("%s x%d" % [id, event_counts[id]])
 	print("Events fired: %s" % (", ".join(ev_parts) if not ev_parts.is_empty() else "none"))
-	print("Excluded from v1: shop purchases (gold accrues unspent), item use in battle (the bot never drinks).")
+
+	# Batch U additions: what the run economy actually did.
+	print("Gold per run: earned %.0f   spent %.0f   unspent at end %.0f" % [
+		gold_earned / runs, gold_spent / runs, gold_unspent / runs])
+	if shops_on:
+		print("Shop buys per run: heals %.1f   restock %.1f   runes %.1f" % [
+			heals_bought / runs, restock_bought / runs, runes_bought / runs])
+	print("Items: used %.1f/run   carried unused at end %.1f" % [
+		items_used / runs, items_left / runs])
+	# The single most diagnostic line in the batch: how much recovery the
+	# walk was offered versus how much the policy allowed itself.
+	print("Rests taken: %.1f/run   (nodes offered: %.1f/run)" % [
+		rest_taken / runs, rest_offered / runs])
+
+	# One machine-comparable row per invocation — the three-policy matrix
+	# is assembled from these across runs (median wipe tier counts the
+	# whole ladder: absolute tier = (zone-1)*11 + tier).
+	var med_desc := "none"
+	if not wipes.is_empty():
+		var abs_tiers: Array = []
+		for w in wipes:
+			abs_tiers.append((int(w["zone"]) - 1) * 11 + int(w["tier"]))
+		abs_tiers.sort()
+		var n := abs_tiers.size()
+		var med: float = float(abs_tiers[n / 2]) if n % 2 == 1 \
+			else (abs_tiers[n / 2 - 1] + abs_tiers[n / 2]) / 2.0
+		var mz := int(ceil(med / 11.0))
+		var mt := med - (mz - 1) * 11.0
+		med_desc = "%.1f (z%d t%.1f)" % [med, mz, mt]
+	var r8_desc := "n/a"
+	if tier_stats.has("1,8"):
+		var t8: Dictionary = tier_stats["1,8"]
+		var f8: float = maxf(t8["fights"], 1.0)
+		r8_desc = "%.2f" % sqrt((t8["p_atk"] / f8) * (t8["p_ehp"] / f8) \
+			/ maxf((t8["e_atk"] / f8) * (t8["e_ehp"] / f8), 1.0))
+	print("Matrix row: route=%s  completions=%.0f%%  wipe median tier=%s  ratio@z1t8=%s" % [
+		route, 100.0 * completed / runs, med_desc, r8_desc])
+
+	print("Still excluded: bomb/revive/defense/mana items never used in battle (only the <35% heal drink); no pre-emptive or offensive item use; routing sees one tier ahead only, no map lookahead; shop rune picks ignore build synergy (priciest first).")
 	print("=============================================\n")

@@ -459,3 +459,25 @@ unattributable; shops buy nothing in v1 so the result reads as a
 floor on real play, not an estimate of it. Whether progression closes
 the gap is the central balance question of the game, and it now has a
 measuring stick.
+
+2026-08-01 — Batch U: an honest floor. The wipe cluster every tuning
+decision leaned on was measured by a bot that walked past every rest
+node into fights at 45% health — five of thirty map nodes are rests
+and the old route policy treated them as a last resort behind combat,
+so some unknown share of the tiers-4-7 cluster was a routing artefact
+rather than a difficulty fact, and the two questions could not be
+separated until the harness could play cautiously. The fix is three
+route policies, deliberately dumb and one axis apart: greedy keeps
+the old floor byte for byte so every prior number stays comparable,
+default rests below 65% average party HP, cautious below 80%. One
+number is a point; three are a band, and real play sits somewhere
+inside it. The same batch retires the two loudest exclusions — shops
+now buy (heal-first, then the priciest offer that fits, never dipping
+below a 40-gold reserve so the next heal is always reachable; runes
+only onto a free slot because the sim cannot visit a party screen)
+and heroes drink a carried Health Potion when a turn opens below 35%
+health. Both policies are conservative on purpose: they establish
+that gold and items MATTER without making the bot clever enough to be
+unattributable, and both flag off (DOD_SIM_SHOPS/DOD_SIM_ITEMS) to
+reproduce the old floor. Nothing was tuned in this batch by design —
+Batch T owns the numbers; this batch tells us what T's numbers mean.

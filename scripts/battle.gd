@@ -1729,6 +1729,19 @@ func _player_turn(u: BattleUnit) -> void:
 		if tick_b.broken:
 			tick_b.broken_pending = false
 			tick_b.recover_from_break()
+	# Batch U drink policy: a hero opening a turn below 35% HP drinks a
+	# carried Health Potion before any other action — nothing cleverer, so
+	# the effect stays attributable. Run sims only (RunSim.items_on):
+	# standalone and sweep battles stay dry to keep the R/S baselines.
+	if autoplay and RunSim.active and RunSim.items_on and not u.is_companion \
+			and u.hp < u.max_hp * 0.35 and int(items["health"][1]) > 0:
+		items["health"][1] -= 1
+		item_used = true
+		var drank: int = u.heal_amount(40, true)
+		u.float_text("+%d" % drank, Color(0.4, 0.9, 0.45))
+		_log("Item: Health Potion — %s +%d HP (bot)" % [u.unit_name, drank],
+			"#e0c060")
+		RunSim.items_used += 1
 	_show_actions(u)
 	var ab: Ability
 	var auto_target: BattleUnit = null

@@ -12,8 +12,15 @@
 #                               sides (tier scaling, zone multipliers, talents
 #                               earned AND spent, trophies, HP carried) —
 #                               prints the run report. Policies via
-#                               DOD_SIM_ROUTE / DOD_SIM_BUILDS /
-#                               DOD_SIM_TROPHIES / DOD_SIM_RELICS.
+#                               DOD_SIM_ROUTE (greedy|default|cautious|elites:
+#                               greedy = the Batch S floor, never rests while
+#                               combat is offered; default rests under 65%
+#                               avg HP, cautious under 80%) /
+#                               DOD_SIM_SHOPS=off / DOD_SIM_ITEMS=off (both
+#                               on by default: heal-first shopping with a
+#                               40g reserve, drink a Health Potion under
+#                               35% HP) / DOD_SIM_BUILDS / DOD_SIM_TROPHIES /
+#                               DOD_SIM_RELICS.
 # DOD_SIM_GRANT_ALL=1 ./sim.sh ... for full-kit runs.
 cd "$(dirname "$0")"
 sweep=""

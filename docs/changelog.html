@@ -5,6 +5,79 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-01 — Batch U: an honest floor</h2>
+<ul>
+<li><b>Harness batch, zero tuning</b> — Batch T owns the numbers; this batch establishes
+what they mean. Batch S's floor was measured by a bot that walked past every rest node
+into fights at 45% health, bought nothing, and never drank a potion it carried — so an
+unknown share of the tiers-4–7 wipe cluster was routing artefact, not difficulty fact.
+The harness now plays three route policies (<code>DOD_SIM_ROUTE</code>):
+<b>greedy</b> keeps the old ladder byte for byte (fight &gt; elite always; rest only
+when no combat is offered and someone is under 60%), <b>default</b> rests when average
+party HP falls below 65% and a rest is reachable, <b>cautious</b> rests below 80%.
+Shops are played (heal-first: any hero under 50% buys a Health Potion each; then the
+priciest affordable offer not already carried — runes included, only onto a member
+with a free slot, equipped at purchase; no buy dips below the 40g reserve;
+<code>DOD_SIM_SHOPS=off</code> restores the buy-nothing floor). In battle a hero
+opening a turn below 35% HP drinks a carried Health Potion before acting
+(<code>DOD_SIM_ITEMS=off</code> restores the never-drinks floor; sweep/standalone
+battles always stay dry). The report adds the run economy — gold earned/spent/unspent,
+items used and carried unused, rests taken versus offered — and a machine-comparable
+matrix row per invocation.</li>
+<li><b>Shop schema, reported before the policy was set:</b> five consumables at flat
+prices (Health/Mana Potion 30g, Defense 40g, Bomb 45g, Revive 80g), unlimited stock,
+no tier scaling, only the relic discount moves prices; plus one rune offer per party
+member per visit (Common 50g / Rare 100g / Epic 160g — permanent run-scoped stat
+boosts, one copy each). A run STARTS carrying all five consumables, so "the priciest
+item not already carried" buys almost nothing on its own — runes are the shop's only
+real gold sink, which is why the purchase rule covers them.</li>
+<li><b>The four-row matrix</b> (50 runs each; the control row reproduces the Batch T
+floor before anything else is read — 2/50 completions, 22 z1-boss entries at 82%,
+Cryomancer 40%, boss ratio 0.69: the baseline is controlled):
+<pre>
+Route policy          Completions   Wipe median      Ratio @ z1 t8
+greedy (floor ctrl*)      4%          z1 t10             0.90
+greedy                    0%          z1 t9              0.98
+default                   6%          z1 boss            0.89
+cautious                  8%          z1 boss            0.97
+* shops+items OFF — the Batch S/T floor. Ratio@t8 wobble (0.89–0.98)
+  is sampling noise: ~20 fights land on that tier per row.
+</pre></li>
+<li><b>Verdict — routing was NOT the story.</b> The spread between greedy and cautious
+is 0–4% → 8% completions: real, roughly a doubling of the old floor, and far too small
+to reframe the difficulty question. Even resting at 80%, buying runes and drinking
+potions, 46/50 runs still wipe. The z1 t4–7 cluster thins (15 → 10 wipes) and the
+survivors die later (wipe median moves t9–10 → the z1 boss; z1-boss wipes 4 → 7), but
+the curve's shape survives every policy. Batch T's calibration was NOT made against a
+misleadingly depressed floor — its stage-3 numbers stand, and the deferred levers stay
+what they were: the z1 tail (t9–boss 0.86/0.82/0.68), the z2–z3 collapse (0.66 by z2
+t7, 0.37–0.43 at the z3 tail — no 40 HP potion closes a 2× effective-power gap), and
+the outlier pass (Cryomancer 38–40% and Devout 4% at the honest floor too — the
+overtune is policy-independent, ready to measure).</li>
+<li><b>Rests offered versus taken — the diagnostic line:</b> taken went 1.6/run (floor
+control) → 2.6/run (cautious) against 3.3–3.9 offered. Five rest nodes exist per zone
+map, but one-step reachability means the walk is only ever OFFERED about four, and the
+most cautious policy uses two and a half. The recovery the old harness left on the
+table was ~one extra rest per run — party HP entering z1 t7 rose 55% → 62% — not the
+five-rests-a-zone the node deck implies. Route planning toward rests (map lookahead)
+is the one lever this batch deliberately did not model.</li>
+<li><b>The gold pile was real:</b> the floor accrued 422g unspent per run. The policy
+converts about half (spent 222–225/run: ~2.2 runes, ~1.5 heal potions, the rest
+reserve-blocked or unaffordable at death) and the bot drinks 3.8–4.3 potions per run —
+worth roughly +2–4 completion points and one wipe-band of depth, no more. The
+exclusions were costing measurement honesty, not hiding a solved game.</li>
+<li><b>Deeper reads now on record:</b> the honest floor puts 60% of cautious runs at
+the z1 boss (77% win there, ≈46% of runs clear zone 1 vs 28% under Batch T's floor) —
+zone 1 is roughly right; runs die in zones 2–3 where the measured ratio collapses
+regardless of policy. Talent income at the honest floor: 11.4–12.2 pts/hero/run
+(economy assumes ~35 — the gap is depth-of-run, not award rates).</li>
+<li><b>Verification:</b> the three correctness gates re-run green (recovered from the
+Batch T scratchpad); headless parse clean; the greedy control reproduced Batch T
+within noise BEFORE the policy rows were read, per the batch's stop-rule. Simulated
+runs still never touch the save/relics/profile — the shop policy spends
+<code>Run.gold</code> in memory only.</li>
+</ul>
+
 <h2>2026-08-01 — Batch T: close the gap</h2>
 <ul>
 <li><b>The first tuning batch of the difficulty-convergence arc</b>, staged and measured:

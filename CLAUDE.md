@@ -40,9 +40,20 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   progression BOTH sides (tier scaling + slot mult, HP/mana/item carry,
   points earned AND spent, elite runes auto-equipped, trophies) → run
   report: wipe distribution, per-tier averages, measured party-vs-warband
-  power table. Policies env-set + printed: DOD_SIM_ROUTE (default|elites),
+  power table + run economy (gold earned/spent/unspent, items used/left,
+  rests taken vs offered) + a per-invocation "Matrix row" line for
+  cross-policy assembly. Policies env-set + printed: DOD_SIM_ROUTE
+  (greedy|default|cautious|elites — Batch U: greedy = the Batch S floor
+  byte-for-byte, never rests while combat is offered; default rests when
+  AVG party HP <65% and a rest is reachable; cautious <80%; run all three
+  for the band real play sits inside), DOD_SIM_SHOPS=off / DOD_SIM_ITEMS=off
+  (both default ON: shops heal-first — hero <50% buys a Health Potion each —
+  then priciest affordable offer not carried, runes incl. but only onto a
+  free slot + equipped at purchase, never dipping under the 40g reserve;
+  battle bot drinks a carried Health Potion opening a turn <35% HP, run
+  sims ONLY — sweep/standalone stay dry so R/S baselines hold),
   DOD_SIM_BUILDS="spec:Lane,...", DOD_SIM_TROPHIES, DOD_SIM_RELICS (draft).
-  v1 floor: shops buy NOTHING, bot never drinks items. RunSim
+  RunSim
   (scripts/run_sim.gd statics, Run injected Events-style) owns setup/map
   walk/report; battle.gd hooks: _ready begin+note_battle_start, _check_end
   sim branch → RunSim.on_battle_end. Run.sim_run=true makes
@@ -74,10 +85,27 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   without it; income self-recovered 3.8→9.3 pts/hero/run (the
   attrition→income loop unwinding IS the mechanism of every gain).
   Damage shares stable through all stages (Cryo 38-39%) = overtune is
-  tier-independent; outlier pass still deferred. Sweep rows probe fixed
-  budgets 3/6/9/12 unscaled → stay comparable to Batch R/S baselines
-  even though the run ladder changed — never read one against the
-  other. test_run_harness.gd RECREATED (scratchpad dies with its
+  tier-independent; outlier pass still deferred. BATCH U (08-01)
+  verdicts — ROUTING WAS NOT THE STORY: 4-row matrix at 50 runs
+  (greedy floor-control shops/items off = T reproduced: 2/50, 22 boss
+  entries 82%, boss ratio 0.69 — baseline controlled), then greedy/
+  default/cautious with the economy on = 0%/6%/8% completions, wipe
+  median t9-10 → z1 boss. Even at 80% rest threshold 46/50 wipe; the
+  t4-7 cluster thins 15→10 but the curve's shape survives every
+  policy, so T's calibration was NOT depressed-floor artifact and the
+  tail levers stand (z1 t9-boss 0.86/0.82/0.68; z2 collapses by t7
+  0.66; z3 tail 0.37-0.43). Rests: even cautious is only OFFERED ~4
+  /run (1-step reachability hides the deck's 5/zone) and takes 2.6 vs
+  floor's 1.6 — the old harness left ~1 rest/run on the table, not 5.
+  Gold pile was real (422g/run unspent at the floor); policy spends
+  ~half (2.2 runes + 1.5 heals/run, 40g reserve blocks the rest),
+  bot drinks 3.8-4.3 potions/run — all worth +2-4 completion pts.
+  Honest-floor reads: 60% of cautious runs reach the z1 boss (77%
+  win, ~46% clear z1 vs T-floor's 28%) — Z1 IS ROUGHLY RIGHT, RUNS
+  DIE IN Z2-Z3; Cryo 38-40%/Devout 4% at the honest floor too →
+  outlier pass finally has ground to stand on. Matrix rows come from
+  the per-invocation "Matrix row:" report line — assemble across
+  runs, never rerun one row against another batch's flags. test_run_harness.gd RECREATED (scratchpad dies with its
   session): gate 1 win scaling + HP-sync asserts, gate 2 talent
   conservation via ceil(N/3) price replay (converted lane trees KEEP
   multi-rank nodes — extra ranks cost 1), gate 3 enemy tier×slot at
