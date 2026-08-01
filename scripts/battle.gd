@@ -172,6 +172,14 @@ static var sim_stats := {}
 static var sim_done := 0
 static var sim_started_ms := 0
 
+# Difficulty sweep (DOD_SIM_SWEEP=1, sim.sh --sweep): run sim_target battles
+# at EACH budget on the ladder and print a win-rate table — a curve where the
+# single-budget report can only show one dot. sweep_stats banks each finished
+# stage's sim_stats dict, in SWEEP_BUDGETS order.
+const SWEEP_BUDGETS := [3, 6, 9, 12]
+static var sweep_stats := []
+var sweep := false
+
 var history: RichTextLabel
 var history_panel: PanelContainer
 var _log_toggle: Button
@@ -188,6 +196,7 @@ var sc_dir := 1.0
 func _ready() -> void:
 	sim_target = int(OS.get_environment("DOD_SIM"))
 	sim = sim_target > 0
+	sweep = sim and OS.get_environment("DOD_SIM_SWEEP") == "1"
 	# DOD_SIM_RELICS="dragonbone,whetstone" arms a relic loadout for
 	# standalone sims (the loadout-spread harness; relic hooks read
 	# Run.active_relics regardless of Run.active).
@@ -601,6 +610,28 @@ func _spawn_units() -> void:
 	var env_theme := OS.get_environment("DOD_SIM_THEME")
 	if env_comp != "":
 		composition = env_comp.split(",")
+	elif sweep:
+		# DOD_SIM_SWEEP=1: this battle belongs to stage sim_done/sim_target —
+		# roll a fresh warband at that stage's budget every battle.
+		# DOD_SIM_THEME narrows the roll to one theme; otherwise any
+		# fight-node theme, mirroring the real map draw. DOD_SIM_ZONE picks
+		# the roster (default 1). Enemy stats stay UNSCALED here (tier 0),
+		# so the sweep isolates the composition axis alone.
+		var sw_stage := int(sim_done / float(sim_target))
+		var sw_budget: int = SWEEP_BUDGETS[mini(sw_stage, SWEEP_BUDGETS.size() - 1)]
+		var sw_zone := 1
+		if OS.get_environment("DOD_SIM_ZONE") != "":
+			sw_zone = maxi(int(OS.get_environment("DOD_SIM_ZONE")), 1)
+		var sw_band: Array = []
+		if env_theme != "":
+			sw_band = Run.compose_test(env_theme, sw_budget, sw_zone)
+		else:
+			sw_band = Run.compose_budget(sw_budget, sw_zone)
+		if sw_band.is_empty():
+			push_error("DOD_SIM_SWEEP: no warband fits budget %d in zone %d" % [
+				sw_budget, sw_zone])
+		else:
+			composition = sw_band
 	elif env_theme != "":
 		# DOD_SIM_THEME="Cursed Company" rolls a fresh warband of that theme
 		# for EVERY sim battle (DOD_SIM_BUDGET, default 6, sets the exact
@@ -7750,10 +7781,21 @@ func _check_end() -> void:
 			if not h.dead:
 				_stat("surviving_hero_hp_pct", h.hp / float(h.max_hp))
 				_stat("surviving_heroes")
-		if sim_done < sim_target:
+		if sweep and sim_done % sim_target == 0:
+			# Stage boundary: bank this budget's stats, start the next clean.
+			var stage := int(sim_done / float(sim_target))
+			print("sweep: budget %d done — %d/%d wins" % [SWEEP_BUDGETS[stage - 1],
+				int(sim_stats.get("wins", 0.0)), int(sim_stats.get("battles", 0.0))])
+			sweep_stats.append(sim_stats)
+			sim_stats = {}
+		var total_target := sim_target * (SWEEP_BUDGETS.size() if sweep else 1)
+		if sim_done < total_target:
 			get_tree().reload_current_scene()
 		else:
-			_print_sim_report()
+			if sweep:
+				_print_sweep_report()
+			else:
+				_print_sim_report()
 			get_tree().quit()
 		return
 	if not Run.active:
@@ -7772,7 +7814,7 @@ func _check_end() -> void:
 	for id in items:
 		Run.items[id] = items[id][1]
 	if victory:
-		# Node scaling: every combat victory grows the party (+1% of base
+		# Node scaling: every combat victory grows the party (+2% of base
 		# Attack and HP at the next spawn).
 		Run.combat_wins += 1
 		for i in heroes.size():
@@ -7926,6 +7968,29 @@ func _print_sim_report() -> void:
 		if key.begins_with("use_"):
 			usage_parts.append("%s %.1f" % [key.trim_prefix("use_"), sim_stats[key] / battles])
 	print("Hero ability uses/battle: %s" % " | ".join(usage_parts))
+	print("=============================================\n")
+
+
+# Sweep report (DOD_SIM_SWEEP=1): one row per budget stage. Rounds reuses
+# the single-report metric (hero turns / 3) so the two stay comparable.
+func _print_sweep_report() -> void:
+	var elapsed := (Time.get_ticks_msec() - sim_started_ms) / 1000.0
+	var zone := OS.get_environment("DOD_SIM_ZONE")
+	var theme := OS.get_environment("DOD_SIM_THEME")
+	print("\n===== DAWN OF DECAY — DIFFICULTY SWEEP =====")
+	print("Zone roster: %s   Themes: %s   Specs: %s" % [
+		zone if zone != "" else "1",
+		theme if theme != "" else "all fight themes",
+		OS.get_environment("DOD_SIM_SPECS")])
+	print("budget   battles   wins    win%   rounds   deaths/battle")
+	for i in sweep_stats.size():
+		var s: Dictionary = sweep_stats[i]
+		var b := maxf(s.get("battles", 0.0), 1.0)
+		print("%4d %9d %8d %6.0f%% %8.1f %11.2f" % [SWEEP_BUDGETS[i], int(b),
+			int(s.get("wins", 0.0)), 100.0 * s.get("wins", 0.0) / b,
+			s.get("hero_actions", 0.0) / b / 3.0,
+			s.get("hero_deaths", 0.0) / b])
+	print("Sim time: %.1fs" % elapsed)
 	print("=============================================\n")
 
 

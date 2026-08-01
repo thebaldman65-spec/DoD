@@ -382,3 +382,24 @@ similar Constitution because companions inherit it — his armour is
 worn by up to three bodies. The Sharpshooter stays the flagged damage
 outlier on purpose; with the win rate saturated at 100%, tuning him
 now would be tuning blind. That's the difficulty pass's job.
+
+**Fix the instrument (Batch R) — the 100% win rate was two hundred
+copies of one easy fight:** every balance number the project has
+collected came from `./sim.sh`, and `./sim.sh` never varied the
+encounter. The hypothesis going in blamed the DOD_SIM_BUDGET default
+of 6; the truth was one step worse — that default only applies when a
+theme is forced, and the plain sim ignores the budget system entirely,
+spawning the same hardcoded raider/chief/archer/archer lineup (power
+7, unscaled, pre-dating the theme system) for every single battle. So
+two hundred battles measured one easy early-game fight two hundred
+times, with nothing varying but dice. A 100% win rate against that
+lineup is correct and meaningless, and the ~85% target had no
+encounter attached to it. The sweep exists so a win rate is always a
+curve across the budget ladder, never a single saturated point — and
+the first honest curve shows the game already gets harder with budget
+alone, before enemy tier scaling (+4%/+5% per tier, which the sweep
+deliberately excludes) is even in the picture. The companion finding:
+heroes grow +2% per win while zone-1 warbands grow ~3.5x across the
+ladder — the gap is meant to be closed by talents, trophies, and
+relics, and whether it IS closed is now a measurable question instead
+of a guess.

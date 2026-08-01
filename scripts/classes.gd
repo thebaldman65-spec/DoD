@@ -358,7 +358,7 @@ const ARCHETYPE_ROLE := {
 }
 
 # Base ATTACK by role. Ability damage is a PERCENT of the user's current
-# Attack; Attack (and max HP) scale +1% of base per completed combat node.
+# Attack; Attack (and max HP) scale +2% of base per completed combat node.
 const ROLE_ATTACK := {"Damage": 100, "Tank": 75, "Support": 50}
 
 

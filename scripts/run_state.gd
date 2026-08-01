@@ -285,6 +285,26 @@ func compose_test(theme_name: String, budget: int, roster := 1) -> Array:
 	return warband
 
 
+# Sweep hook (DOD_SIM_SWEEP): one warband at an EXACT budget, drawn from a
+# random fight-node theme — the real map's draw minus the budget roll.
+# Ignores run state. Empty array when no fight theme can spend the budget.
+func compose_budget(budget: int, roster := 1) -> Array:
+	var candidates: Array = []
+	for theme_name in THEMES:
+		if THEMES[theme_name]["nodes"].has("fight"):
+			candidates.append(theme_name)
+	candidates.shuffle()
+	for theme_name in candidates:
+		var combos := _theme_combos(THEMES[theme_name], budget, roster)
+		if combos.is_empty():
+			continue  # theme can't spend this budget — try another
+		last_theme = theme_name
+		var warband: Array = combos.pick_random()
+		warband.shuffle()
+		return warband
+	return []
+
+
 # The budget scales across EACH ZONE (tier = the floor within the zone,
 # 1-11 with the boss on 11): tiers 1-3 roll 3-6, tiers 4-7 roll 6-9,
 # tiers 8-11 roll 10-12. Later zones restart the ladder with a tougher

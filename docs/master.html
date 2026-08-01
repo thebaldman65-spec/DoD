@@ -1493,7 +1493,18 @@ heroes whose spec tree holds the id), DOD_SIM_ABILITIES="Resurrection,Divine Ple
 for now), DOD_ENEMIES_OFF=1 (arm the "Enemy attacks OFF" debug toggle from the
 environment). Autoplay debug runs echo every combat-log line to
 stdout as "[LOG] ..." so headless tests can grep them; status expiries print as
-"... fades from ..." lines. Target ≈85% bot win rate.</li>
+"... fades from ..." lines.</li>
+<li><b>Difficulty sweep:</b> <code>./sim.sh --sweep N</code> (DOD_SIM_SWEEP=1) runs N
+battles at EACH power budget 3/6/9/12 with a fresh warband rolled per battle from the
+fight-node themes, and prints win rate, rounds, and hero deaths per budget — the
+difficulty curve. DOD_SIM_ZONE picks the roster, DOD_SIM_THEME narrows the roll to one
+theme. Sweep enemies are UNSCALED (no tier stat scaling) and sweep heroes carry base
+kits, so the sweep isolates the composition axis; a real tier-8+ fight is harder than
+its budget row. Without --sweep, plain sims fight a fixed raider/chief/archer/archer
+lineup (power 7, unscaled) — fine for kit smoke tests, meaningless for difficulty.
+Win-rate targets attach to a budget, never to "the sim": the ≈85% target describes
+the top of the ladder (see the changelog's Batch R sweep table for the measured
+curve).</li>
 <li><b>Testing shortcuts:</b> debug tools are ALWAYS available in dev (unexported) builds;
 exported builds require DOD_DEBUG=1. The map burger menu gains a DEBUG section — +200 gold, +200 talent points for everyone, full heal, jump to the boss tier,
 advance to the next zone, <b>Reroll Specs</b> (refunds spent talent points, clears all
@@ -1543,7 +1554,9 @@ unique kit + art planned. Boss art for both pending.</li>
 <li>Trees still to design: all three Hunter specs;
 full rune loot table pending; relic pool (5) needs growth.</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>
-<li>The sim bot currently wins ~100% of standard fights (target ≈85%) — difficulty leans
-easy; real tuning comes from playtests.</li>
+<li>Difficulty tuning is pending an honest baseline: the old "~100% win rate" figure
+measured a single fixed unscaled lineup and carried no information. The sweep
+(<code>./sim.sh --sweep</code>) now reads win rate per budget; tuning decisions design
+against that curve plus playtests.</li>
 </ul>
 </body></html>

@@ -5,6 +5,96 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-07-31 — Batch R: fix the instrument</h2>
+<ul>
+<li><b>The hypothesis, verified and corrected:</b> the batch went in blaming the
+DOD_SIM_BUDGET default of 6. Reality is one step worse: that default only applies when
+DOD_SIM_THEME forces a theme, and the plain sim never touches the budget system at all —
+every <code>./sim.sh</code> battle fought the same hardcoded raider/chief/archer/archer
+lineup (power 7, a shape from before the theme system existed) at completely unscaled
+stats, with a chief that regular fight nodes can't even roll (chiefs are elite-node
+only). Two hundred battles measured one easy fight two hundred times; nothing varied
+but dice. The hypothesis's conclusion — the 100% win rate was correct and meaningless —
+stands unchanged.</li>
+<li><b>What the harness actually simulates</b> (the answers every past sim number rests
+on): (1) every battle spawns a FRESH party at base power — the scene reloads between
+battles and only the stats dictionary survives. (2) Node scaling never applies: the +2%
+Attack/HP per win is gated on an active run and sims never have one — the sim models
+turn-one-of-the-game forever. (3) Talent points are never earned or spent; heroes fight
+with base kits plus spec abilities only. (4) Relics and boss trophies are absent (the
+DOD_SIM_RELICS / DOD_SIM_ABILITIES hooks exist but sim.sh never arms them). (5) Between
+battles of the old sim NOTHING varied but combat dice: initiative jitter,
+miss/parry/crit rolls, and the bot's fixed skill-check profile (20% perfect / 65% good /
+15% fail). Items refresh to standalone defaults every battle. In short: every damage
+share, round count, and win rate ever collected described base-kit heroes fighting one
+unscaled early-game lineup.</li>
+<li><b>The new instrument:</b> <code>./sim.sh --sweep N</code> (DOD_SIM_SWEEP=1) runs N
+battles at EACH budget 3/6/9/12 and prints win rate, rounds, and hero deaths per
+budget. Every battle rolls a FRESH warband from the fight-node themes at that exact
+budget (new Run.compose_budget — the real map's draw minus the budget roll).
+DOD_SIM_ZONE picks the roster, DOD_SIM_THEME narrows the roll to one theme, and plain
+<code>./sim.sh N</code> is unchanged. Sweep enemies carry NO tier stat scaling and
+sweep heroes carry base kits — the sweep isolates the composition axis on purpose. It
+samples fight themes only: real tier-6+ fights are 25% elite-themed and the boss brings
+an escort, so top-band rows understate the real top of the ladder.</li>
+<li><b>The measured curve</b> (200 battles per budget per roster, gated kits,
+berserker/cryomancer/inquisitor/beastmaster; cells are win% — deaths/battle — avg
+rounds):
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Budget</th><th>Roster 1 (Forest)</th><th>Roster 2 (Scarlands)</th>
+<th>Roster 3 (Forest finale)</th></tr>
+<tr><td>3</td><td>100% — 0.01 — 4.6</td><td>100% — 0.01 — 4.8</td>
+<td>100% — 0.01 — 4.7</td></tr>
+<tr><td>6</td><td>100% — 0.24 — 6.8</td><td>100% — 0.15 — 6.8</td>
+<td>100% — 0.17 — 6.9</td></tr>
+<tr><td>9</td><td>98.0% — 0.65 — 9.3</td><td>97.5% — 0.74 — 8.8</td>
+<td>99.5% — 0.41 — 9.5</td></tr>
+<tr><td>12</td><td>93.5% — 1.25 — 10.7</td><td>88.5% — 1.51 — 10.1</td>
+<td>98.5% — 0.74 — 11.5</td></tr>
+</table>
+The curve is real: saturation through budget 6, first losses at 9, and a meaningful
+spread at 12. Attrition moves earlier and harder than win rate — deaths per battle grow
+a hundredfold across the ladder while win% barely leaves the ceiling, so deaths/battle
+is the sensitive dial and win% the blunt one.</li>
+<li><b>Roster finding (not a bug, recorded as asked):</b> zones 1 and 3 do NOT differ
+only by scaling — roster 3 genuinely swaps slinger/wolfrider for the behemoth — but at
+equal budget and unscaled stats roster 3 reads EASIEST (98.5% vs 93.5% / 88.5% at
+budget 12): its budgets buy fewer, bigger bodies, and fewer enemy actions per round is
+safer for the party. Zone 3's intended difficulty rests almost entirely on the x2.2
+slot multiplier the sweep deliberately excludes. Roster 2 is the hardest composition
+pool.</li>
+<li><b>The two scaling curves</b> (zone 1 ladder, budget-band midpoints; party = test
+party base totals with node scaling at the expected 17-fights-per-30-nodes pace;
+warband = roster-1 fight kinds' mean Attack/effective-HP per power point (58.7 / 100.1)
+times budget times tier scaling; effective HP = HP ÷ (1 − armor); hero talents,
+trophies, relics, items and enemy elite/boss kinds all excluded):
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Tier</th><th>Budget</th><th>Party Atk</th><th>Party eff. HP</th>
+<th>Warband Atk</th><th>Warband eff. HP</th></tr>
+<tr><td>1</td><td>4.5</td><td>350</td><td>754</td><td>275</td><td>473</td></tr>
+<tr><td>4</td><td>7.5</td><td>364</td><td>784</td><td>511</td><td>901</td></tr>
+<tr><td>8</td><td>11</td><td>378</td><td>815</td><td>853</td><td>1541</td></tr>
+<tr><td>11</td><td>11</td><td>392</td><td>845</td><td>930</td><td>1706</td></tr>
+</table>
+ENEMIES grow faster, and it is not close: warband Attack x3.4 and effective HP x3.6
+across a zone against the party's x1.12 from node scaling. Across zones the enemy side
+restarts its ladder at x1.5 then x2.2 base while hero wins keep compounding (~x1.14 at
+zone 2 entry, ~x1.26 at zone 3 entry) — still far apart on raw stats. The entire
+counterweight is what the table excludes: roughly 35 talent points a run, boss
+trophies, relics, items, and kit ramps. Whether that closes a x3 gap is now a
+measurable question instead of a mood.</li>
+<li><b>Baseline corrected:</b> the recorded "88% gated" figure was 7 wins in EIGHT
+battles — noise, not a baseline — and the ~85% target had no encounter attached.
+Both citations (CLAUDE.md, Master Document §16) now point at the sweep table above;
+the ~85% target is read as describing top-band (budget 10-12) encounters, where
+composition alone already lands 88-98% before tier scaling enters. No tuning ships in
+this batch — these numbers are the reference the next balance decision designs
+against.</li>
+<li><b>Also:</b> two stale comments claiming node scaling is +1% per win were corrected
+to the code's actual +2% (battle.gd victory block, classes.gd ROLE_ATTACK); the code
+itself is untouched.</li>
+</ul>
+
 <h2>2026-07-31 — Batch Q: Hunter stat blocks + The Pack goes live</h2>
 <ul>
 <li><b>All three Hunter specs get their stat blocks</b> (the last class without them —

@@ -29,8 +29,16 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 ## Verify before shipping
 - Parse: run each scene headless with `--quit-after 90`, grep "SCRIPT ERROR".
 - New `class_name` files need `--headless --import` before they resolve.
-- Balance: `DOD_SIM=50 <godot> --headless --path . res://scenes/battle.tscn`
-  prints a report (target ~85% wins). `DOD_AUTOPLAY=1` = 1 debug battle
+- Balance: `./sim.sh N` = N battles of the FIXED raider/chief/archer/archer
+  lineup (power 7, unscaled) — kit smoke tests only; its win% carries NO
+  difficulty signal (Batch R). `./sim.sh --sweep N` (DOD_SIM_SWEEP=1) = N
+  battles at EACH budget 3/6/9/12, fresh fight-theme warband per battle,
+  enemies unscaled (`DOD_SIM_ZONE` picks the roster). Batch R baseline
+  (gated kits, 200/budget, win% at budgets 3/6/9/12): roster 1
+  100/100/98/93.5, roster 2 100/100/97.5/88.5, roster 3 100/100/99.5/98.5;
+  deaths/battle climb 0.01→1.3-1.5 — attrition is the sensitive dial. The
+  ~85% target describes top-band (budget 10-12) encounters; tune against
+  the curve, never one point. `DOD_AUTOPLAY=1` = 1 debug battle
   (echoes every combat-log line as "[LOG] ..." — grep it in headless tests;
   NOTE: the end screen waits for input, so headless autoplay runs never exit
   on their own — run with a timeout/kill or they pile up as zombies).
