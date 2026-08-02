@@ -556,3 +556,17 @@ lesson is the batch's own: an instrument that has only ever pointed at
 the same four subjects is not measuring the game, it is measuring the
 four subjects — and everything it never pointed at accumulates faults in
 the dark.
+
+## 2026-08-02 — the difficulty question, closed
+
+Batches V and W both ended by handing the same question back to the
+designer: the mender cap moved the wipe median more than a tier, and
+Batch V's own rule says a move that size is a decision, not a side
+effect. The answer is that the current difficulty stands — good for now,
+and fine-tuning it needs many human playtesters rather than another sim
+pass. That is the right call for a reason the sims themselves keep
+demonstrating: the bot is a floor, not a player. It never retreats, never
+optimises a build, never plays around a telegraph, and Batch W showed it
+cannot even be trusted to represent the roster evenly unless explicitly
+told to rotate. A floor tells you where the game is unplayable; only
+humans tell you where it is fun. Further difficulty work waits on them.

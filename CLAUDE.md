@@ -250,9 +250,12 @@ FLAG, DELIBERATELY UNTUNED: sweep top band 93.5→97.5% (deaths 1.3-1.5
 →1.00), run completions 6→14%, wipe median z1 t9-10 → z2 t6 — moved
 >1 tier, attribution = the cap deleting top-budget heal walls (z1
 curve shape unchanged, t8 0.99/boss 0.72; roster-1 sweeps never see
-the hurler). Tuning is a separate conversation; the outlier pass ran
-as Batch W (below) and the wipe-median question is STILL OPEN for the
-designer.
+the hurler). The outlier pass ran as Batch W (below). THE WIPE-MEDIAN
+QUESTION IS CLOSED (08-02): the designer accepted the current
+difficulty — "it's good for now, to fine tune it we will need many
+human play testers." Do NOT reopen difficulty as a sim batch and do
+not propose ramp-slope/boss-band changes unsolicited; the next input
+on difficulty is human playtest data.
 PERSISTENT PROFILE (07-26, Batch 40): scripts/profile.gd (class_name
 Profile), user://profile.json OUTSIDE the run save — save_path is a
 static VAR (not const) so tests redirect it. Counts runs started
