@@ -188,6 +188,15 @@ var sweep := false
 # AoE actually feeds on. Recorded once per battle; battles that end
 # before round 3 record their end-state count (a win records 0).
 var _r3_recorded := false
+# Stalemate guard (Batch W, sims only): a fight neither side can finish —
+# see the guard in _run_battle. ~12 rounds is a long real battle; 10 units
+# x 60 rounds is far past anything legitimate.
+const STALEMATE_TURNS := 600
+var stalemate := false
+# Batch W: this battle's dmg/heal/prevented per hero — banked into the
+# per-spec share pools at battle end (rotation needs "share of the battles
+# this spec was IN", which the stage totals can't give).
+var _b_slice := {}
 
 var history: RichTextLabel
 var history_panel: PanelContainer
@@ -360,6 +369,12 @@ func _spawn_units() -> void:
 			push_warning("DOD_SIM_SPECS: %d entries for %d heroes — slot %d padded with %s"
 				% [sim_specs.size(), hero_keys.size(), sim_specs.size() + 1, pad])
 			sim_specs.append(pad)
+	# Batch W (DOD_SIM_ROTATE=1): cycle the spec in each class slot across
+	# successive battles so all twelve specs get measured. Standalone/sweep
+	# battles only — run sims rotate per RUN in RunSim.start_run (a mid-run
+	# spec change would be a different game). Overrides DOD_SIM_SPECS.
+	if not Run.active and OS.get_environment("DOD_SIM_ROTATE") == "1":
+		sim_specs = Classes.rotated_specs(sim_done)
 	var name_counts := {}
 	for i in hero_keys.size():
 		var cfg := Classes.hero_config(hero_keys[i])
@@ -600,6 +615,10 @@ func _spawn_units() -> void:
 		for h in heroes:
 			h.lethal_saved_cb = _on_lethal_saved
 			h.shield_absorbed_cb = _on_shield_absorbed
+	# Batch W: barrier absorbs feed the contribution ledger (the handler
+	# banks only in sim mode, so real play pays nothing for the wire).
+	for h in heroes:
+		h.prevented_cb = _on_barrier_prevented
 
 	# Guardian Angel raises the Mercy-earning threshold and Last Hope deepens
 	# healing on the nearly-dead — both are the Holy's talents, but the checks
@@ -999,8 +1018,15 @@ func _message(_text: String) -> void:
 
 # Appends one line to the battle history panel (echoed to stdout in
 # autoplay debug runs so headless tests can grep the combat log).
+# SIMS SKIP THE PANEL (Batch W): nothing can read it headlessly, and every
+# appended line allocates TextServer RIDs that a long verbose battle
+# exhausts — past the limit each _log call spews an 8-line engine
+# backtrace, which turned a 13-minute sweep into hours and a 500 MB log.
+# DOD_SIM_DEBUG=1 still prints, so the deadlock-vs-throttle discriminator
+# is unaffected.
 func _log(text: String, color := "#d8d2c4") -> void:
-	history.append_text("[color=%s]%s[/color]\n" % [color, text])
+	if not sim:
+		history.append_text("[color=%s]%s[/color]\n" % [color, text])
 	if debug_prints:
 		print("[LOG] %s" % text)
 
@@ -1087,7 +1113,30 @@ func _run_battle() -> void:
 			_log("Epidemic: every enemy is already rotting", "#70d878")
 			break
 	await _wait(0.8)
+	var _turns_taken := 0
 	while not battle_over:
+		# STALEMATE GUARD (Batch W, SIMS ONLY — real play is untouched).
+		# Some kits carry unbounded battle-long accumulators (the Warden's
+		# Endurance stacks armor 1%/rank per unhealed turn with NO cap, and
+		# Tenacity grows max HP per block), so a fight he cannot lose and
+		# cannot win runs forever: one run sat at 97,521% armor for 90
+		# minutes. A sim must never hang on that. NOT a balance fix — the
+		# underlying kit bug is the designer's call; this only stops the
+		# harness from wedging, and every trip is COUNTED and REPORTED so
+		# the cap can never pass silently.
+		if sim and _turns_taken >= STALEMATE_TURNS:
+			_stat("stalemates")
+			_log("STALEMATE: battle exceeded %d unit turns — force-ended" % \
+				STALEMATE_TURNS, "#e05050")
+			# Scored as a NON-win without touching anyone's HP: marking a side
+			# dead would either inflate hero_deaths or hand out a free victory.
+			# The party failed to resolve the fight, so the run ends here — the
+			# conservative read, and the stalemate count says how many outcomes
+			# were manufactured this way.
+			stalemate = true
+			_check_end()
+			return
+		_turns_taken += 1
 		_update_talent_chips()
 		_rebuild_turn_bar()
 		var u := _next_unit()
@@ -1189,6 +1238,7 @@ func _run_battle() -> void:
 		# Decay: rot gnaws at the Break meter every turn.
 		if u.has_status("decay") and not u.broken:
 			var decay_result: Dictionary = u.take_hit(0, 10)
+			_stat_bd(String(u.get_status("decay").get("src_name", "")), 10)
 			u.float_text("+%d BD" % decay_result.get("bd", 0), Color(0.62, 0.52, 0.35))
 			_log("%s decays — +%d Break damage" % [u.unit_name,
 				decay_result.get("bd", 0)], "#a09060")
@@ -1202,6 +1252,7 @@ func _run_battle() -> void:
 			var ent_occ := _living_occultist()
 			if ent_occ != null and ent_occ.entropy_ranks > 0:
 				var ent_result: Dictionary = u.take_hit(0, 5 * ent_occ.entropy_ranks)
+				_stat_bd(ent_occ, 5 * ent_occ.entropy_ranks)
 				u.float_text("+%d BD" % ent_result.get("bd", 0), Color(0.62, 0.52, 0.35))
 				_log("   → Talent: Entropy — Ruin grinds %s (+%d Break damage)" % [
 					u.unit_name, ent_result.get("bd", 0)], "#b0a8e0")
@@ -1223,6 +1274,9 @@ func _run_battle() -> void:
 			var ren_got := u.heal_amount(ren_amt, true)
 			u.float_text("+%d" % ren_got, Color(0.45, 0.9, 0.5))
 			_log("%s regenerates %d HP (Renewal)" % [u.unit_name, ren_got], "#70d878")
+			# Batch W: ticks are the caster's healing too (src stamped at
+			# cast; pre-W the "healing" line never counted ticks at all).
+			_stat_heal(String(ren_stat.get("src_name", "")), ren_got)
 			# On the Mend (talent, snapshotted on the status): the tick can
 			# wash one harmful effect away.
 			var mend_ranks := int(ren_stat.get("mend", 0))
@@ -1376,7 +1430,7 @@ func _run_battle() -> void:
 					* _healing_done_mult(u))), 1)
 				var bc_got: int = bc_h.heal_amount(bc_amt, bc_h != u)
 				bc_h.float_text("+%d" % bc_got, Color(0.95, 0.9, 0.6))
-				_stat("healing", bc_got)
+				_stat_heal(u, bc_got)
 				_log("   → Talent: Beacon — the light finds %s (+%d)" % [
 					bc_h.unit_name, bc_got], "#b0a8e0")
 		# Survivalist traps spring the moment their victim moves: the snare
@@ -1875,7 +1929,7 @@ func _player_turn(u: BattleUnit) -> void:
 			for pp_h in heroes.filter(func(h): return not h.dead and not h.is_companion):
 				var pp_got: int = pp_h.heal_amount(pp_amt, pp_h != u)
 				pp_h.float_text("+%d" % pp_got, Color(0.7, 0.4, 0.9))
-				_stat("healing", pp_got)
+				_stat_heal(u, pp_got)
 			_log("   → Talent: Pleasure from Pain — %d unique debuff%s feed the party (%d each)" % [
 				pp_uniques, "" if pp_uniques == 1 else "s", pp_amt], "#b0a8e0")
 	# Divine Presence (Holy talent): the light settles on the most wounded
@@ -1889,7 +1943,7 @@ func _player_turn(u: BattleUnit) -> void:
 					* u.divine_presence_ranks * _healing_done_mult(u))), 1)
 				var dp_got: int = dp_t.heal_amount(dp_amt, dp_t != u)
 				dp_t.float_text("+%d" % dp_got, Color(0.4, 0.9, 0.45))
-				_stat("healing", dp_got)
+				_stat_heal(u, dp_got)
 				_log("   → Talent: Divine Presence — %s mends %d" % [
 					dp_t.unit_name, dp_got], "#b0a8e0")
 	_preview_locked = false
@@ -3246,6 +3300,15 @@ func _lowest_hp(pool: Array) -> BattleUnit:
 	return best
 
 
+# The living hero carrying a passive, or null (Batch W: attribution for
+# passive-driven mitigation like the Chilled swing malus).
+func _living_hero_passive(pid: String) -> BattleUnit:
+	for h in heroes:
+		if not h.dead and h.passive_id == pid:
+			return h
+	return null
+
+
 # Highest rank of a talent stat among LIVING heroes (party-wide talents
 # like Hypothermia, Brittle Ice, Hungering Cold, Frigid Grip).
 func _max_hero_rank(field: String) -> int:
@@ -3431,7 +3494,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		await _resolve_special(attacker, ab, target, grade, dmg_mult)
 	elif ab.heal > 0:
 		var amount := int(ab.heal * dmg_mult)
-		_stat("healing", amount)
+		_stat_heal(attacker, amount)
 		_sfx("heal", -8.0)
 		target.heal_amount(amount, target != attacker)
 		target.float_text("+%d" % amount, Color(0.4, 0.9, 0.45))
@@ -3571,6 +3634,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if block_source != "":
 					_stat("attacks")
 					_stat("attack_block")
+					# Batch W: what the blocked swing would have carried — the
+					# nominal hit through the blocker's armor (variance, crits
+					# and riders can't be known for a hit never rolled).
+					# Shieldwall charges credit their stamped caster, so an
+					# Interpose block is the Warden's work on any ally.
+					if strike_target.is_hero and ab.damage > 0:
+						var pv_owner := ""
+						if block_source == "Shieldwall":
+							pv_owner = String(charges.get("src_name", ""))
+						if pv_owner == "":
+							pv_owner = strike_target.unit_name
+						_prev(pv_owner, ab.damage * 0.01 * attacker.attack
+							* (1.0 - strike_target.effective_armor()))
 					_sfx("parry", -4.0, 0.6)
 					strike_target.float_text("BLOCK", Color(0.75, 0.8, 0.95))
 					_log("%s BLOCKS %s's %s (%s)" % [strike_target.unit_name,
@@ -3610,6 +3686,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							and not attacker.is_hero:
 						var bg_bd := 10 * strike_target.bruising_ranks
 						attacker.take_hit(0, bg_bd)
+						_stat_bd(strike_target, bg_bd)
 						attacker.float_text("+%d BD" % bg_bd, Color(0.8, 0.5, 1.0))
 						_log("   → Talent: Bruising Guard — the block deals %d Break damage to %s" % [
 							bg_bd, attacker.unit_name], "#b0a8e0")
@@ -3763,7 +3840,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Ability damage is a PERCENT of the attacker's current Attack.
 			var raw := ab.damage * 0.01 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
 			if parried:
+				var pv_was := raw
 				raw *= 0.0 if wall_parry else 0.25
+				if strike_target.is_hero:
+					_prev(strike_target, pv_was - raw)
 			if is_crit:
 				# Lethal Aim x2 base; Executioner's Eye deepens it, Consistent
 				# Aim trades it back to x1.5 for +30% chance.
@@ -3840,11 +3920,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Shatter: 10% of Attack PER Chilled stack on each victim.
 			if ab.display_name == "Shatter":
 				raw *= maxi(strike_target.status_stacks("chilled"), 1)
-			# Ice Lance (Batch O): the stored cold detonates — +10% of Attack
-			# per Chilled stack on the target (Crystal Edge deepens the take).
+			# Ice Lance (Batch O, halved Batch W): the stored cold detonates —
+			# +5% of Attack per Chilled stack on the target (Crystal Edge
+			# deepens the take). Batch O's +10%, stacked on permanent stacks
+			# and an auto-crit, made this clause the whole kit; +5% keeps the
+			# reason-to-exist without the excess.
 			if ab.display_name == "Ice Lance" \
 					and strike_target.status_stacks("chilled") > 0:
-				raw += (0.10 + 0.05 * attacker.crystal_edge_ranks) \
+				raw += (0.05 + 0.05 * attacker.crystal_edge_ranks) \
 					* strike_target.status_stacks("chilled") * attacker.attack
 			# Icy Veins: a banked kill empowers this lance.
 			if ab.display_name == "Ice Lance" and attacker.icy_veins_charge > 0.0:
@@ -3960,14 +4043,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Chilled x3: frozen muscles swing 15% softer. Hungering Cold
 			# (talent) deepens the malus per stack.
 			var atk_chill := attacker.status_stacks("chilled")
+			var pv_chill := raw
 			if atk_chill >= 3:
 				raw *= 0.85
 			if atk_chill > 0:
 				raw *= 1.0 - 0.01 * _max_hero_rank("hungering_ranks") * atk_chill
+			if not attacker.is_hero and strike_target.is_hero and pv_chill > raw:
+				_prev(_living_hero_passive("permafrost"), pv_chill - raw)
 			# Frost Ward: the Cryomancer reads the chilled swing coming.
 			if not attacker.is_hero and atk_chill > 0 \
 					and strike_target.frost_ward_ranks > 0:
+				var pv_was := raw
 				raw *= 1.0 - 0.04 * strike_target.frost_ward_ranks
+				_prev(strike_target, pv_was - raw)
 			# Blood Frenzy v2: +2% (plus Unstoppable) per 5% missing, never
 			# below the ratcheting floor (half this battle's peak bonus) —
 			# the unit-side helper ratchets and returns in one motion.
@@ -4061,18 +4149,28 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if strike_target.is_hero and strike_target.passive_id == "pack":
 				var sp_ursus := _bond_mult(strike_target, "ursus")
 				if sp_ursus > 0.0:
+					var pv_was := raw
 					raw *= 1.0 - 0.10 * sp_ursus
+					_prev(strike_target, pv_was - raw)
 			# Stabilized: grounded resonance blunts incoming blows.
 			if strike_target.has_status("stabilized"):
+				var pv_was := raw
 				raw *= 1.0 - strike_target.status_power("stabilized") / 100.0
+				if strike_target.is_hero:
+					_prev(strike_target, pv_was - raw)
 			# Consecrated Ground: holy footing blunts the blow.
 			if strike_target.has_status("cons_ground"):
+				var pv_was := raw
 				raw *= 0.85
+				if strike_target.is_hero:
+					_prev(_living_devout(), pv_was - raw)
 			# Conviction: each Faith stack turns the blade (3%) — while the
 			# Devout stands.
 			if strike_target.is_hero and strike_target.faith_stacks > 0 \
 					and _living_devout() != null:
+				var pv_was := raw
 				raw *= 1.0 - 0.03 * strike_target.faith_stacks
+				_prev(_living_devout(), pv_was - raw)
 			# Iron Will: adversity hardens the Warden — 4%/rank less damage
 			# taken per debuff on him (the chip tracks the live total; the
 			# floor is a sanity clamp for absurd debuff piles).
@@ -4080,7 +4178,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var iw_n := strike_target.count_debuffs()
 				if iw_n > 0:
 					var iw_pct := 4 * strike_target.iron_will_ranks * iw_n
+					var pv_was := raw
 					raw *= maxf(1.0 - 0.01 * iw_pct, 0.1)
+					_prev(strike_target, pv_was - raw)
 					_log("   → Talent: Iron Will — -%d%% (%d debuffs)" % [
 						iw_pct, iw_n], "#b0a8e0")
 			# Shared Vigil: the line holds while the Warden stands tall —
@@ -4089,7 +4189,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var sv_w := _living_hero_with("shared_vigil_ranks")
 				if sv_w != null and sv_w != strike_target \
 						and sv_w.hp > sv_w.max_hp * 0.5:
+					var pv_was := raw
 					raw *= 1.0 - 0.03 * sv_w.shared_vigil_ranks
+					_prev(sv_w, pv_was - raw)
 					_log("   → Talent: Shared Vigil — %s is covered (-%d%%)" % [
 						strike_target.unit_name,
 						3 * sv_w.shared_vigil_ranks], "#b0a8e0")
@@ -4099,7 +4201,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and strike_target.has_status("renewal"):
 				var bv_w := _living_hero_with("vestments_ranks")
 				if bv_w != null:
+					var pv_was := raw
 					raw *= 1.0 - 0.05 * bv_w.vestments_ranks
+					_prev(bv_w, pv_was - raw)
 					_log("   → Talent: Blessed Vestments — Renewal shields %s (-%d%%)" % [
 						strike_target.unit_name,
 						5 * bv_w.vestments_ranks], "#b0a8e0")
@@ -4111,7 +4215,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					raw *= 1.0 + (0.02 + 0.01 * ruin_occ.deep_hex_ranks) \
 						* strike_target.status_stacks("ruin")
 			if strike_target.has_status("shieldwall"):
+				var pv_was := raw
 				raw *= 0.75
+				if strike_target.is_hero:
+					var sw_src := String(strike_target.get_status("shieldwall").get("src_name", ""))
+					_prev(sw_src if sw_src != "" else strike_target.unit_name, pv_was - raw)
 			# Shielded: the Orc Shieldmaster's single-ally ward.
 			if strike_target.has_status("shielded"):
 				raw *= 0.75
@@ -4119,20 +4227,31 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.15
 			# High Guard: hardened stance after a parry.
 			if strike_target.has_status("high_guard"):
+				var pv_was := raw
 				raw *= 0.75
+				if strike_target.is_hero:
+					_prev(strike_target, pv_was - raw)
 			# Guardian's Roar: the bear weathers the storm.
 			if strike_target.has_status("roar"):
+				var pv_was := raw
 				raw *= 0.75
+				if strike_target.is_hero:
+					_prev(strike_target, pv_was - raw)
 			if strike_target.dmg_taken_bonus > 0.0:
 				raw *= 1.0 + strike_target.dmg_taken_bonus
 			# Seasoned Fighter: the guard decides what gets through — Defensive
 			# turns blows aside (talent-deepened), Aggressive leaves openings.
 			if strike_target.passive_id == "seasoned":
+				var pv_was := raw
 				raw *= 1.10 if strike_target.stance == "aggressive" \
 					else (0.85 - strike_target.seasoned_def_bonus)
+				if raw < pv_was:
+					_prev(strike_target, pv_was - raw)
 			# Molten Core: burning attackers bite softer on the Pyromancer.
 			if strike_target.molten_ranks > 0 and attacker.has_status("burn"):
+				var pv_was := raw
 				raw *= 1.0 - 0.02 * strike_target.molten_ranks
+				_prev(strike_target, pv_was - raw)
 			# Permafrost: Frozen enemies take 15% more from ALL sources.
 			if strike_target.has_status("frozen") and heroes.any(
 					func(h): return not h.dead and h.passive_id == "permafrost"):
@@ -4143,7 +4262,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					* strike_target.status_stacks("chilled")
 			# Flame Shield: the fire barrier halves what gets through.
 			if strike_target.has_status("flame_shield"):
+				var pv_was := raw
 				raw *= 0.5
+				if strike_target.is_hero:
+					_prev(strike_target, pv_was - raw)
 			if debug_prints and attacker.second_resource_name == "Resonance":
 				print("[DBG] %s attacks @%d stacks: base %d -> raw %.1f" % [
 					attacker.unit_name, attacker.second_resource, ab.damage, raw])
@@ -4247,7 +4369,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var rl_heal := maxi(int(round(final * leech_pct)), 1)
 					var rl_got: int = attacker.heal_amount(rl_heal)
 					attacker.float_text("+%d" % rl_got, Color(0.7, 0.4, 0.9))
-					_stat("healing", rl_got)
+					_stat_heal(occ_leech, rl_got)
 					# The base draught stays silent (float text only); the
 					# deepened one logs so the talent's work is auditable.
 					if occ_leech.gluttony_ranks > 0:
@@ -4261,7 +4383,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 								continue
 							var sg_got: int = sg_h.heal_amount(rl_heal, sg_h != occ_leech)
 							sg_h.float_text("+%d" % sg_got, Color(0.7, 0.4, 0.9))
-							_stat("healing", sg_got)
+							_stat_heal(occ_leech, sg_got)
 						_log("   → Talent: Soul Glut — the whole party drinks (+%d each)" % \
 							rl_heal, "#b0a8e0")
 			# Madness plumbing (Batch L): an enemy striking its FELLOW feeds
@@ -4281,7 +4403,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						for ck_h in heroes.filter(func(he): return not he.dead and not he.is_companion):
 							var ck_got: int = ck_h.heal_amount(ck_amt, ck_h != mad_occ)
 							ck_h.float_text("+%d" % ck_got, Color(0.7, 0.4, 0.9))
-							_stat("healing", ck_got)
+							_stat_heal(mad_occ, ck_got)
 						_log("   → Talent: Cackling Mirror — the party drinks %d from the wound" % \
 							ck_amt, "#b0a8e0")
 			# Unity: the bound party splits incoming damage evenly (Pressure
@@ -4328,6 +4450,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			var hp_before := strike_target.hp
 			var was_broken := strike_target.broken
 			var result: Dictionary = strike_target.take_hit(final, pr)
+			if attacker.is_hero and not strike_target.is_hero and pr > 0:
+				_stat_bd(attacker, pr)
 			if not sim and not result.died:
 				strike_target.hit_react((strike_target.position - attacker.position).normalized())
 			# Overpower: a blow into an already-Broken guard holds the wound
@@ -4346,6 +4470,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_gain_focus(attacker, 20)
 				if attacker.sundering_shot > 0 and not strike_target.dead:
 					strike_target.take_hit(0, 15)
+					_stat_bd(attacker, 15)
 				if attacker.exposed_nerve > 0 and not strike_target.dead:
 					_apply_status(strike_target, "exposed", 3)
 				if attacker.follow_through > 0 and not attacker.cooldowns.is_empty():
@@ -4437,7 +4562,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							continue
 						var well_got: int = wh.heal_amount(well, wh != cg_dv)
 						wh.float_text("+%d" % well_got, Color(0.4, 0.9, 0.45))
-						_stat("healing", well_got)
+						_stat_heal(cg_dv, well_got)
 					_log("   → Talent: Lifewell — the reflected pain mends the party for %d" % \
 						well, "#b0a8e0")
 				# Judgement: the ground passes sentence on the attacker.
@@ -4445,6 +4570,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_apply_status(attacker, "sunder", 2)
 					var jd_bd := maxi(int(round(final * 0.20)), 1)
 					var jd_result: Dictionary = attacker.take_hit(0, jd_bd)
+					_stat_bd(cg_dv, jd_bd)
 					_log("   → Talent: Judgement — %s is Sundered and takes %d Break damage" % [
 						attacker.unit_name, jd_result.get("bd", jd_bd)], "#b0a8e0")
 					if jd_result.get("broke", false):
@@ -4551,6 +4677,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var neighbors := _adjacent_enemies(strike_target)
 					for foe in neighbors:
 						foe.take_hit(0, splash_bd)
+						_stat_bd(attacker, splash_bd)
 						foe.float_text("+%d BD" % splash_bd, Color(0.8, 0.5, 1.0))
 					if not neighbors.is_empty():
 						_log("   → Talent: Sundering — %d BD to the %d foe%s Adjacent to %s" % [
@@ -4987,6 +5114,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				match called_mode:
 					"break":
 						target.take_hit(0, 30)
+						_stat_bd(attacker, 30)
 						target.float_text("+30 BD", Color(0.8, 0.35, 1.0))
 						_log("   → Called Shot cracks the Break meter", "#e0a050")
 					"exposed":
@@ -5076,6 +5204,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					attacker.unit_name, ret], "#50c8e0")
 				if trapper.bone_breaker > 0 and not attacker.dead:
 					attacker.take_hit(0, 30)
+					_stat_bd(trapper, 30)
 				if trapper.caught_fast > 0 and not attacker.dead:
 					_apply_status(attacker, "caught", 3)
 				if ret_result.died:
@@ -5093,7 +5222,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			var leech_heal := maxi(int(round(total_dealt * 0.25 * chan_r)), 1)
 			var chan_got: int = blessed.heal_amount(leech_heal)
 			blessed.float_text("+%d" % chan_got, Color(0.7, 0.4, 0.9))
-			_stat("healing", chan_got)
+			_stat_heal(_living_hero_with("channeling_ranks"), chan_got)
 			_log("   → Talent: Corrupted Channeling — %s heals %d" % [blessed.unit_name,
 				chan_got], "#b0a8e0")
 		# Resonance builds only on the Mage's own casts — parry counters don't
@@ -5175,6 +5304,18 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 			and src.passive_id == "permafrost":
 		eff_turns = -1
 	target.add_status(id, info[0], info[1], info[2], eff_turns, info[3], power, tick)
+	# Batch W: the debuffer's ledger — statuses a hero lands on OTHERS
+	# (only sites that pass src are counted; the changelog owns the list).
+	# The src name also rides the status so mitigation it later performs
+	# (Shieldwall charges, the shieldwall ward) can credit its caster.
+	if src != null:
+		if src.is_hero and target != src:
+			var st_name := _contrib_name(src)
+			if st_name != "" and st_name != "(unattributed)":
+				_stat("st_hero_" + st_name)
+		var st_stamp := target.get_status(id)
+		if not st_stamp.is_empty():
+			st_stamp["src_name"] = src.unit_name
 	if id == "chilled":
 		# Frigid Grip rides every stack: stamp the deeper slow on the victim.
 		target.frigid_bonus = 0.03 * _max_hero_rank("frigid_ranks")
@@ -5195,6 +5336,10 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 				target.was_frozen = true
 				# Batch O: the payoff keeps an ember — the freeze leaves 1
 				# stack instead of wiping the pile (Absolute Zero holds all 4).
+				# Batch W MEASURED the wipe (0 remains) and put the ember back:
+				# 200/budget sweeps read 47/42/40/38% vs the ember's
+				# 49/42/39/39% — noise. His share is structural (auto-crit +
+				# shard concentration + permanence), not this knob's to fix.
 				var kept := 4 if _living_hero_with("absolute_zero") != null else 1
 				target.set_chilled_stacks(kept)
 				_log("   → %s FREEZES SOLID (4 stacks of Chilled — x%d remains)" % [
@@ -5476,7 +5621,7 @@ func _radiant_cascade(caster: BattleUnit, healed: int, primary: BattleUnit) -> v
 		return
 	var cc_got: int = cc_t.heal_amount(cc_amt, cc_t != caster)
 	cc_t.float_text("+%d" % cc_got, Color(0.95, 0.9, 0.6))
-	_stat("healing", cc_got)
+	_stat_heal(caster, cc_got)
 	_log("   → Talent: Radiant Cascade — the crit splashes %d onto %s" % [
 		cc_got, cc_t.unit_name], "#b0a8e0")
 
@@ -5499,7 +5644,7 @@ func _overflow_spill(caster: BattleUnit, target: BattleUnit) -> void:
 		return
 	var ov_got: int = ov_t.heal_amount(ov_amt, ov_t != caster)
 	ov_t.float_text("+%d" % ov_got, Color(0.95, 0.9, 0.6))
-	_stat("healing", ov_got)
+	_stat_heal(caster, ov_got)
 	_log("   → Talent: Overflow — %d overhealing spills onto %s" % [
 		ov_got, ov_t.unit_name], "#b0a8e0")
 
@@ -5517,7 +5662,7 @@ func _sanctum_echo(caster: BattleUnit, value: int) -> void:
 		var ls_got: int = ls_h.heal_amount(ls_amt, ls_h != caster)
 		if ls_got > 0:
 			ls_h.float_text("+%d" % ls_got, Color(0.95, 0.9, 0.6))
-			_stat("healing", ls_got)
+			_stat_heal(caster, ls_got)
 	_log("   → Capstone: Living Sanctum — the light washes over the party (%d each)" % \
 		ls_amt, "#b0a8e0")
 
@@ -5542,6 +5687,7 @@ func _grant_divine_shield(devout: BattleUnit, target: BattleUnit, power: int) ->
 	if bstat.is_empty():
 		return
 	bstat["divine"] = true  # only Divine Shield absorbs build Faith
+	bstat["src"] = devout.unit_name  # Batch W: absorbs credit the caster
 	bstat["blessed_pct"] = 0.04 * devout.blessed_barrier_ranks
 	bstat["afterglow"] = int(round(devout.max_hp * 0.05 * devout.afterglow_ranks))
 	bstat["warded"] = 0.10 * devout.warded_ranks
@@ -5598,7 +5744,7 @@ func _bewitched_strike(u: BattleUnit) -> bool:
 				var mi_heal := maxi(int(round(occ.max_hp * 0.10 * mi_ranks)), 1)
 				var mi_got: int = mi_t.heal_amount(mi_heal, mi_t != occ)
 				mi_t.float_text("+%d" % mi_got, Color(0.7, 0.4, 0.9))
-				_stat("healing", mi_got)
+				_stat_heal(occ, mi_got)
 				_log("   → Talent: Murderous Intent — %s feeds on the kill (+%d)" % [
 					mi_t.unit_name, mi_got], "#b0a8e0")
 	return true
@@ -5668,7 +5814,7 @@ func _gain_ruin(target: BattleUnit, n: int = 1) -> void:
 	for i in n:
 		if target.status_stacks("ruin") >= 5:
 			break
-		_apply_status(target, "ruin", -1)
+		_apply_status(target, "ruin", -1, 0, 0, occ)
 	if target.status_stacks("ruin") >= 5 and not target.has_status("ruin_primed"):
 		_apply_status(target, "ruin_primed", 1)
 		_log("   → The Old Gods take notice — %s's Ruin is PRIMED" % \
@@ -5703,7 +5849,7 @@ func _detonate_ruin(target: BattleUnit) -> void:
 		var rw_heal := maxi(int(round(occ.max_hp * 0.15)), 1)
 		var rw_got: int = h.heal_amount(rw_heal, h != occ)
 		h.float_text("+%d" % rw_got, Color(0.7, 0.4, 0.9))
-		_stat("healing", rw_got)
+		_stat_heal(occ, rw_got)
 	_log("   → the party feasts on the ruin (15% of the Occultist's health each)",
 		"#b070d0")
 	# Unraveling: the blast seeds Ruin in every OTHER enemy. One propagation
@@ -5779,7 +5925,7 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 	var f_heal := maxi(int(round(u.max_hp * (0.15 + 0.05 * devout.faithful_ranks))), 1)
 	var f_got: int = u.heal_amount(f_heal, u != devout)
 	u.float_text("FAITH +%d" % f_got, Color(0.98, 0.85, 0.45))
-	_stat("healing", f_got)
+	_stat_heal(devout, f_got)
 	var d_mana := maxi(int(round(devout.max_resource * 0.03)), 1)
 	devout.resource = mini(devout.resource + d_mana, devout.max_resource)
 	devout.refresh_bars()
@@ -5817,7 +5963,7 @@ func _on_lethal_saved(saved: BattleUnit) -> void:
 	var cov_heal := maxi(int(round(saved.max_hp * 0.05 * devout.covenant_ranks)), 1)
 	var cov_got: int = saved.heal_amount(cov_heal, saved != devout)
 	saved.float_text("+%d" % cov_got, Color(0.95, 0.9, 0.6))
-	_stat("healing", cov_got)
+	_stat_heal(devout, cov_got)
 	_log("   → Talent: Sacred Covenant — the shield held the line; %s heals %d and keeps the Faith" % [
 		saved.unit_name, cov_got], "#b0a8e0")
 	_gain_faith(saved, devout.covenant_ranks)
@@ -5940,6 +6086,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var power := 50 if is_perfect else int(35 * mult)
 			_sfx("parry", -8.0, 0.7)
 			_apply_status(target, "barrier", 3, power)
+			# Batch W: absorbs credit the caster in the contribution ledger.
+			var ab_stat := target.get_status("barrier")
+			if not ab_stat.is_empty():
+				ab_stat["src"] = attacker.unit_name
 			_message("%s shields %s (%d)" % [attacker.unit_name, target.unit_name, power])
 			_log("%s: Arcane Barrier on %s — absorbs %d" % [attacker.unit_name,
 				target.unit_name, power], "#70d878")
@@ -6021,7 +6171,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.heal_amount(overflow)
 				attacker.float_text("+%d" % overflow, Color(0.4, 0.9, 0.45))
 			_sfx("heal", -6.0)
-			_stat("healing", base)
+			_stat_heal(attacker, base)
 			_message("%s calls the dawn" % attacker.unit_name)
 			_log("%s: Dawnbreak heals %s for %d (overflow %d to self)" % [
 				attacker.unit_name, target.unit_name, applied, overflow], "#70d878")
@@ -6041,7 +6191,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var got: int = h.heal_amount(amt, h != attacker)
 				h.float_text("+%d%s" % [got, "!" if h_crit > 1.0 else ""],
 					Color(0.4, 0.9, 0.45), h_crit > 1.0)
-				_stat("healing", got)
+				_stat_heal(attacker, got)
 				_bank_overheal(attacker, h)
 				_overflow_spill(attacker, h)
 				if h_crit > 1.0:
@@ -6057,8 +6207,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var amt := int(h.max_hp * sanct_pct)
 				h.heal_amount(amt, h != attacker)
 				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
-				_apply_status(h, "shieldwall", 1)
-				_stat("healing", amt)
+				_apply_status(h, "shieldwall", 1, 0, 0, attacker)
+				_stat_heal(attacker, amt)
 			_message("Sanctuary!")
 			_log("%s: Sanctuary — party healed and walled" % attacker.unit_name, "#70d878")
 		"unity":
@@ -6114,7 +6264,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					var bw_heal := maxi(int(round(h.max_hp * 0.05)), 1)
 					var bw_got: int = h.heal_amount(bw_heal, h != attacker)
 					h.float_text("+%d" % bw_got, Color(0.4, 0.9, 0.45))
-					_stat("healing", bw_got)
+					_stat_heal(attacker, bw_got)
 			_message("%s raises the BULWARK OF FORTITUDE!" % attacker.unit_name)
 			_log("%s: Bulwark of Fortitude — no Break damage, armor +50%%, 10%% healing per turn (3 turns)" % \
 				attacker.unit_name, "#8c9cc8")
@@ -6151,13 +6301,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var dp_amt := maxi(int(round(h.max_hp * pact_heal_pct)), 1)
 				var dp_hgot: int = h.heal_amount(dp_amt, true)
 				h.float_text("+%d" % dp_hgot, Color(0.7, 0.4, 0.9))
-				_stat("healing", dp_hgot)
+				_stat_heal(attacker, dp_hgot)
 			if attacker.barter_ranks > 0:
 				_log("   → Talent: Dark Barter — the party drinks %d%% (up from 15%%)" % \
 					int(round(pact_heal_pct * 100)), "#b0a8e0")
 			# The Occultist knits back together over 3 turns (10%/turn).
 			var pact_tick := maxi(int(round(attacker.max_hp * 0.10)), 1)
-			_apply_status(attacker, "renewal", 3, 0, pact_tick)
+			_apply_status(attacker, "renewal", 3, 0, pact_tick, attacker)
 			attacker.update_status("renewal", "R+",
 				"Dark Pact: restores %d HP at the start\nof each turn (10%% of max health)." % pact_tick)
 			# Invigoration (talent): the pact also drips Mana back.
@@ -6560,6 +6710,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var gc_bd_txt := ""
 			if gc_mark != null:
 				var gc_res: Dictionary = gc_mark.take_hit(0, 15)
+				_stat_bd(attacker, 15)
 				gc_mark.float_text("+%d BD" % int(gc_res["bd"]), Color(0.8, 0.35, 1.0))
 				gc_bd_txt = "; %d BD to %s" % [int(gc_res["bd"]), gc_mark.unit_name]
 				if gc_res["broke"]:
@@ -6592,7 +6743,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# every cast, the perfect one included.
 			var blocks := (5 if is_perfect else 3) + attacker.shield_mastery_ranks
 			_sfx("parry", -6.0, 0.5)
-			_apply_status(attacker, "shield_charges", -1, blocks)
+			_apply_status(attacker, "shield_charges", -1, blocks, 0, attacker)
 			# The chip counts the blocks owed (recasting resets the count).
 			attacker.update_status("shield_charges", "SW%d" % blocks,
 				"Shieldwall: the next %d attack(s) against\nthis unit are BLOCKED (one charge each)." % blocks,
@@ -6616,7 +6767,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var sw_held := maxi(h.status_power("shield_charges"), 0) \
 					if h.has_status("shield_charges") else 0
 				var sw_total := sw_held + sw_grant
-				_apply_status(h, "shield_charges", -1, sw_total)
+				_apply_status(h, "shield_charges", -1, sw_total, 0, attacker)
 				h.update_status("shield_charges", "SW%d" % sw_total,
 					"Shieldwall: the next %d attack(s) against\nthis unit are BLOCKED (one charge each)." % sw_total,
 					sw_total)
@@ -6651,7 +6802,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				if empowered:
 					var rez_tick := maxi(int(round(attacker.max_hp * 0.15
 						* _healing_done_mult(attacker))), 1)
-					_apply_status(target, "renewal", 5, 0, rez_tick)
+					_apply_status(target, "renewal", 5, 0, rez_tick, attacker)
 					if target.has_status("renewal"):
 						target.get_status("renewal")["mend"] = attacker.on_mend_ranks
 						target.get_status("renewal")["sanctum"] = attacker.living_sanctum > 0
@@ -6875,7 +7026,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var hh_got: int = target.heal_amount(hh_amt, target != attacker)
 			target.float_text("+%d%s" % [hh_got, "!" if hh_crit > 1.0 else ""],
 				Color(0.4, 0.9, 0.45), hh_crit > 1.0)
-			_stat("healing", hh_got)
+			_stat_heal(attacker, hh_got)
 			_bank_overheal(attacker, target)
 			_overflow_spill(attacker, target)
 			if hh_crit > 1.0:
@@ -6890,7 +7041,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var hh_self := maxi(int(round(attacker.max_hp * 0.05)), 1)
 				var self_got: int = attacker.heal_amount(hh_self)
 				attacker.float_text("+%d" % self_got, Color(0.4, 0.9, 0.45))
-				_stat("healing", self_got)
+				_stat_heal(attacker, self_got)
 			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
 			_log("%s: Heal — %s recovers %d%s (40%% of the Cleric's health)%s" % [
 				attacker.unit_name, target.unit_name, hh_got,
@@ -6900,7 +7051,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("heal", -4.0, 0.7)
 			var dp_got: int = target.heal_amount(target.max_hp, target != attacker)
 			target.float_text("+%d" % dp_got, Color(0.4, 0.9, 0.45))
-			_stat("healing", dp_got)
+			_stat_heal(attacker, dp_got)
 			_sanctum_echo(attacker, dp_got)
 			var dp_note := ""
 			if empowered:
@@ -6930,7 +7081,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var ren_tick := maxi(int(round(attacker.max_hp * 0.15
 				* _healing_done_mult(attacker))), 1)
 			_sfx("heal", -9.0, 1.1)
-			_apply_status(target, "renewal", 5, 0, ren_tick)
+			_apply_status(target, "renewal", 5, 0, ren_tick, attacker)
 			target.update_status("renewal", "R+",
 				"Renewal: restores %d HP at the start\nof each turn (15%% of the caster's\nmax health)." % ren_tick)
 			# On the Mend and Living Sanctum ride the status (snapshotted):
@@ -6939,7 +7090,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				target.get_status("renewal")["mend"] = attacker.on_mend_ranks
 				target.get_status("renewal")["sanctum"] = attacker.living_sanctum > 0
 			if empowered and target != attacker:
-				_apply_status(attacker, "renewal", 5, 0, ren_tick)
+				_apply_status(attacker, "renewal", 5, 0, ren_tick, attacker)
 				attacker.update_status("renewal", "R+",
 					"Renewal: restores %d HP at the start\nof each turn (15%% of the caster's\nmax health)." % ren_tick)
 				if attacker.has_status("renewal"):
@@ -6952,7 +7103,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var ren_burst := maxi(int(round(attacker.max_hp * 0.05 * rb_crit)), 1)
 				var burst_got: int = target.heal_amount(ren_burst, target != attacker)
 				target.float_text("+%d" % burst_got, Color(0.4, 0.9, 0.45))
-				_stat("healing", burst_got)
+				_stat_heal(attacker, burst_got)
 				_bank_overheal(attacker, target)
 				_overflow_spill(attacker, target)
 				if rb_crit > 1.0:
@@ -7284,6 +7435,8 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	if not victim.is_hero:
 		var comp_credit: BattleUnit = pm if pm != null else comp
 		_stat("dmg_hero_" + comp_credit.unit_name, final)
+		if pr > 0:
+			_stat_bd(comp_credit, pr)
 	_sfx("crit" if is_crit else "hit", -4.0 if is_crit else -7.0, 1.1)
 	victim.float_text("%d%s" % [final, "!" if is_crit else ""],
 		Color(1.0, 0.45, 0.15) if is_crit else Color(0.9, 0.75, 0.55), is_crit)
@@ -7435,6 +7588,7 @@ func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float) -> void:
 		_apply_status(victim, "cripple", 3)
 	if placer.bone_breaker > 0:
 		victim.take_hit(0, 30)
+		_stat_bd(placer, 30)
 		victim.float_text("+30 BD", Color(0.8, 0.35, 1.0))
 	if placer.caught_fast > 0:
 		_apply_status(victim, "caught", 3)
@@ -7963,8 +8117,8 @@ func _grade_skill_check() -> void:
 func _check_end() -> void:
 	if battle_over:
 		return
-	var victory := enemies.all(func(e): return e.dead)
-	var defeat := heroes.all(func(h): return h.dead)
+	var victory := enemies.all(func(e): return e.dead) and not stalemate
+	var defeat := heroes.all(func(h): return h.dead) or stalemate
 	if not victory and not defeat:
 		return
 	battle_over = true
@@ -7983,6 +8137,21 @@ func _check_end() -> void:
 			if not h.dead:
 				_stat("surviving_hero_hp_pct", h.hp / float(h.max_hp))
 				_stat("surviving_heroes")
+		# Batch W: per-spec sample counts + share pools. A rotated report
+		# needs "this spec's slice of the battles it was IN"; for a fixed
+		# party the pool equals the stage total, so old shares reproduce.
+		var b_dmg_total := 0.0
+		var b_all_total := 0.0
+		for k in _b_slice:
+			b_all_total += _b_slice[k]
+			if String(k).begins_with("dmg_hero_"):
+				b_dmg_total += _b_slice[k]
+		for h in heroes:
+			if h.is_companion:
+				continue
+			_stat("n_hero_" + h.unit_name)
+			_stat("pool_dmg_hero_" + h.unit_name, b_dmg_total)
+			_stat("pool_all_hero_" + h.unit_name, b_all_total)
 		if run_sim:
 			# RunSim replays the real victory/defeat flow (minus UI and
 			# persistence), walks the map to the next fight, and reloads
@@ -8176,6 +8345,11 @@ func _print_sim_report() -> void:
 		if key.begins_with("use_"):
 			usage_parts.append("%s %.1f" % [key.trim_prefix("use_"), sim_stats[key] / battles])
 	print("Hero ability uses/battle: %s" % " | ".join(usage_parts))
+	if sim_stats.get("stalemates", 0.0) > 0:
+		print("STALEMATES force-ended: %d of %d battles (scored as losses)" % [
+			int(sim_stats.get("stalemates", 0.0)), int(battles)])
+	print("Per-hero contribution (avg per battle present):")
+	print(_contrib_table(sim_stats))
 	print("=============================================\n")
 
 
@@ -8186,10 +8360,13 @@ func _print_sweep_report() -> void:
 	var zone := OS.get_environment("DOD_SIM_ZONE")
 	var theme := OS.get_environment("DOD_SIM_THEME")
 	print("\n===== DAWN OF DECAY — DIFFICULTY SWEEP =====")
+	var sw_specs := OS.get_environment("DOD_SIM_SPECS")
+	if OS.get_environment("DOD_SIM_ROTATE") == "1":
+		sw_specs = "rotating all twelve (DOD_SIM_ROTATE=1)"
 	print("Zone roster: %s   Themes: %s   Specs: %s" % [
 		zone if zone != "" else "1",
 		theme if theme != "" else "all fight themes",
-		OS.get_environment("DOD_SIM_SPECS")])
+		sw_specs])
 	print("budget   battles   wins    win%   rounds   deaths/battle   foes   alive@r3")
 	for i in sweep_stats.size():
 		var s: Dictionary = sweep_stats[i]
@@ -8206,12 +8383,28 @@ func _print_sweep_report() -> void:
 	print("Damage share per budget:")
 	for i in sweep_stats.size():
 		print("%4d   %s" % [SWEEP_BUDGETS[i], _share_line(sweep_stats[i])])
+	# Batch W: the contribution block per budget — support specs measured
+	# in something other than damage, sample counts beside every row.
+	var sw_stale := 0
+	for st_s in sweep_stats:
+		sw_stale += int(st_s.get("stalemates", 0.0))
+	if sw_stale > 0:
+		print("STALEMATES force-ended: %d battles total (scored as losses)" % sw_stale)
+	print("Contribution per budget (avg per battle present):")
+	for i in sweep_stats.size():
+		print("  budget %d:" % SWEEP_BUDGETS[i])
+		print(_contrib_table(sweep_stats[i]))
 	print("Sim time: %.1fs" % elapsed)
 	print("=============================================\n")
 
 
 # "Berserker 30% | Cryomancer 45% | ..." from one banked stats dict.
 # Keys are sorted so every budget row lists heroes in the same order.
+# Batch W: the denominator is the spec's own pool — the party damage of
+# the battles that spec was IN. For a fixed party the pool equals the
+# old stage total, so pre-W shares reproduce; under rotation it is the
+# only denominator that means anything, and the sample count is printed
+# beside it so a thin cell is visible as thin.
 func _share_line(s: Dictionary) -> String:
 	var total := 0.0
 	var names: Array = []
@@ -8220,11 +8413,51 @@ func _share_line(s: Dictionary) -> String:
 			total += s[key]
 			names.append(key)
 	names.sort()
+	var rotating := OS.get_environment("DOD_SIM_ROTATE") == "1"
 	var parts := PackedStringArray()
 	for key in names:
-		parts.append("%s %.0f%%" % [key.trim_prefix("dmg_hero_"),
-			100.0 * s[key] / maxf(total, 1.0)])
+		var hero: String = key.trim_prefix("dmg_hero_")
+		var pool: float = s.get("pool_dmg_hero_" + hero, 0.0)
+		if pool <= 0.0:
+			pool = total
+		var part := "%s %.0f%%" % [hero, 100.0 * s[key] / maxf(pool, 1.0)]
+		if rotating:
+			part += " (n=%d)" % int(s.get("n_hero_" + hero, 0.0))
+		parts.append(part)
 	return " | ".join(parts)
+
+
+# Batch W: the per-hero contribution block. dmg%/contrib% run against
+# per-spec pools (the party's output over the battles that spec was in),
+# so fixed and rotated parties read on the same 4-hero basis. "prev" is
+# instrumented mitigation (blocks, barriers, stances, Faith...) — base
+# armor and resists are deliberately not a contribution. "st" counts
+# statuses landed on others where the applier is known.
+func _contrib_table(s: Dictionary) -> String:
+	var names: Array = []
+	for key in s:
+		if key.begins_with("n_hero_"):
+			names.append(key.trim_prefix("n_hero_"))
+	names.sort()
+	var lines := PackedStringArray()
+	lines.append("  hero               n   dmg/b  dmg%  heal/b  prev/b   BD/b  st/b  contrib%")
+	for hero in names:
+		var n: float = maxf(s.get("n_hero_" + hero, 0.0), 1.0)
+		var dmg: float = s.get("dmg_hero_" + hero, 0.0)
+		var heal: float = s.get("heal_hero_" + hero, 0.0)
+		var prev: float = s.get("prev_hero_" + hero, 0.0)
+		var bd: float = s.get("bd_hero_" + hero, 0.0)
+		var st: float = s.get("st_hero_" + hero, 0.0)
+		var dpool: float = maxf(s.get("pool_dmg_hero_" + hero, 0.0), 1.0)
+		var apool: float = maxf(s.get("pool_all_hero_" + hero, 0.0), 1.0)
+		lines.append("  %-16s %4d %7.0f %4.0f%% %7.0f %7.0f %6.0f %5.1f %7.0f%%" % [
+			hero, int(n), dmg / n, 100.0 * dmg / dpool, heal / n, prev / n,
+			bd / n, st / n, 100.0 * (dmg + heal + prev) / apool])
+	var un: float = s.get("prev_hero_(unattributed)", 0.0)
+	if un > 0.0:
+		lines.append("  prevented, unattributed: %.0f/battle" % \
+			(un / maxf(s.get("battles", 0.0), 1.0)))
+	return "\n".join(lines)
 
 
 var _end_action := Callable()  # victory screens: Space presses this
@@ -8285,6 +8518,75 @@ func _wait(seconds: float) -> void:
 func _stat(key: String, amount := 1.0) -> void:
 	if sim:
 		sim_stats[key] = sim_stats.get(key, 0.0) + amount
+		# Batch W: battle-local slice of the contribution metrics — summed
+		# into the per-spec share pools when this battle ends.
+		if key.begins_with("dmg_hero_") or key.begins_with("heal_hero_") \
+				or key.begins_with("prev_hero_"):
+			_b_slice[key] = _b_slice.get(key, 0.0) + amount
+
+
+# ---------- Batch W: the contribution ledger ----------
+
+# One name for "whose contribution was that": a BattleUnit (companions
+# route to their hunter — the beast's work is the Beastmaster's), a bare
+# name string, or null. "" = an enemy — the caller banks nothing;
+# "(unattributed)" = a real event whose owner the site couldn't name,
+# reported as its own bucket rather than dropped (a known gap is useful,
+# a silent one isn't).
+func _contrib_name(owner) -> String:
+	if owner is BattleUnit:
+		var u: BattleUnit = owner
+		if u.is_companion:
+			if u.pack_master == null or not is_instance_valid(u.pack_master):
+				return "(unattributed)"
+			u = u.pack_master
+		return u.unit_name if u.is_hero else ""
+	if owner is String and String(owner) != "":
+		return String(owner)
+	return "(unattributed)"
+
+
+# Damage prevented, credited to the hero whose ability, status, or roll
+# turned it away. Instrumented at the mitigation sites that already
+# compute a delta — base armor and resists are deliberately NOT counted
+# (a stat block isn't a contribution; blocks, barriers, stances, Faith
+# and friends are).
+func _prev(owner, cut: float) -> void:
+	if not sim or cut <= 0.0:
+		return
+	var name := _contrib_name(owner)
+	if name != "":
+		_stat("prev_hero_" + name, cut)
+
+
+# Healing done, credited to the hero whose KIT produced it — lifesteal a
+# debuff grants credits the debuffer, not the striker. Always feeds the
+# old aggregate "healing" stat so that line stays comparable.
+func _stat_heal(owner, amount: float) -> void:
+	_stat("healing", amount)
+	if not sim or amount <= 0.0:
+		return
+	var name := _contrib_name(owner)
+	if name != "":
+		_stat("heal_hero_" + name, amount)
+
+
+# Break damage a hero sent at the meter — the pre-Constitution BD value,
+# the same units ability text speaks in.
+func _stat_bd(owner, amount: float) -> void:
+	if not sim or amount <= 0.0:
+		return
+	var name := _contrib_name(owner)
+	if name != "":
+		_stat("bd_hero_" + name, amount)
+
+
+# Barrier absorbs report through the unit callback (unit.gd can't reach
+# the stats directly): credit the caster stamped on the barrier, else the
+# unattributed bucket. Only hero-side barriers are the party's ledger.
+func _on_barrier_prevented(src_name: String, absorbed: int, holder: BattleUnit) -> void:
+	if holder.is_hero:
+		_prev(src_name, float(absorbed))
 
 
 var _sfx_players: Array = []

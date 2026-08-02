@@ -22,6 +22,10 @@
 #                               35% HP) / DOD_SIM_BUILDS / DOD_SIM_TROPHIES /
 #                               DOD_SIM_RELICS.
 # DOD_SIM_GRANT_ALL=1 ./sim.sh ... for full-kit runs.
+# DOD_SIM_ROTATE=1 ./sim.sh ... cycles the spec in each class slot across
+#   successive battles (sweep/standalone) or runs (--run), so all TWELVE
+#   specs get measured — per-spec shares come with sample counts. The
+#   fixed default party stays the default for A/B against prior batches.
 cd "$(dirname "$0")"
 sweep=""
 runs=""

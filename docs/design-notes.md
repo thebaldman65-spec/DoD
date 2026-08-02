@@ -506,3 +506,53 @@ at two per warband, counted by tag rather than by claiming pool: the
 generator could previously roll three or four healers (2,007 such
 warbands existed), and two heals plus a cleanse is a wall, which is
 the one thing a question must never be.
+
+## 2026-08-01 — Batch W: the outlier pass measures before it designs
+
+Every simulation in this project had run the same four specs —
+berserker, cryomancer, inquisitor, beastmaster, the default in
+sim.sh, the sweep, and the run harness — so eight of the twelve
+specs had NEVER appeared in a damage-share report. The number we
+kept citing as the game's worst outlier (Sharpshooter 38%) predated
+half the roster's rework and came from a party we no longer test:
+we were tuning against a fossil. Rotation (DOD_SIM_ROTATE=1) exists
+so a claim about a spec must come with a sample count attached.
+
+Second, three specs were invisible rather than weak: damage share
+was the only per-hero metric, so the Devout's 3–5% was an artefact
+of asking a Warder how much damage he does. His work — barrier
+absorbs, Faith mitigation, Break pressure — happened off the books.
+The contribution metrics (healing done, damage prevented, Break
+damage, statuses applied) are not balance targets; they exist so
+"is this spec doing anything?" has an answer before anyone reaches
+for a number to change. Base armor and resists are deliberately NOT
+counted as prevention: a stat block is not a contribution, and if
+they were counted every frontliner would read as a guardian angel.
+
+Third, the Cryomancer: his share FELL as fields widened (48% at
+budget 3 → 40% at 12), which acquits his AoE — an AoE outlier
+climbs with field size. The culprit is concentrated single-target
+burst, and the mechanism is Batch O's Ice Lance clause (+10% of
+Attack per Chilled stack) sitting on top of permanent stacks and an
+auto-crit. Halving the clause to +5% keeps its purpose (a reason to
+lance outside the Frozen window) and removes the excess. Permafrost
+permanence and Razor Ice's three shards stay: they fixed a real
+structural fault, and reverting them would reintroduce it. One
+change at a time; the freeze-remainder knob (Batch O's declared
+lever) stays in reserve, measured before touched.
+
+The rotation's first outing found three latent harness/kit faults that
+eight-never-simulated specs had been hiding: _log building a UI text
+buffer in headless sims until the TextServer RID pool blew (a 13-minute
+sweep became 3 hours and 500 MB), a run harness that printed nothing
+until the very end so slow was indistinguishable from stuck, and — the
+real one — the Warden's Endurance stacking armor with no cap. That last
+is a genuine softlock: armor grows each unhealed turn, which makes him
+unkillable, which makes the fight longer, which grows armor. Measured at
++97,521%. It is a design fix, not a harness fix, so it is reported and
+left for the designer; the sims get a counted, loss-scored stalemate
+guard so the instrument can never wedge on a kit bug again. The general
+lesson is the batch's own: an instrument that has only ever pointed at
+the same four subjects is not measuring the game, it is measuring the
+four subjects — and everything it never pointed at accumulates faults in
+the dark.

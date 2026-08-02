@@ -427,6 +427,24 @@ const SPEC_IDS := {
 }
 
 
+# Batch W (DOD_SIM_ROTATE=1): the sim rotation schedule, shared by the
+# sweep (n = battle index) and the run harness (n = run index). The base
+# n term makes any 3 consecutive counters sample each class's three specs
+# exactly once — evenness is guaranteed regardless of where a sweep stage
+# starts. The drift terms (advancing every 3 and 9 counters) reshuffle
+# which specs land TOGETHER, so a spec is measured across many party
+# mixes instead of one fixed trio.
+static func rotated_specs(n: int) -> Array:
+	var order := ["warrior", "mage", "cleric", "hunter"]
+	var third := int(n / 3.0)
+	var ninth := int(n / 9.0)
+	var out: Array = []
+	for i in order.size():
+		var drift: int = third * i + (ninth if i >= 2 else 0)
+		out.append(SPEC_IDS[order[i]][(n + i + drift) % 3])
+	return out
+
+
 # Spec passives that are plain stat changes live here so both the battle
 # spawner and the character sheet apply them identically.
 # VAULTED — Bulwark (was the Warden passive): +10% armor, +30 Constitution.
@@ -647,7 +665,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Ice Lance", "cooldown": 2, "dmg_type": "frost", "cost": 25,
 					"damage": 35, "pressure": 15, "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Deals 20 BD instead",
-					"description": "A frozen spear driven deep: +10% of\nAttack per Chilled stack on the target,\nand it ALWAYS crits against Frozen\ntargets."}),
+					"description": "A frozen spear driven deep: +5% of\nAttack per Chilled stack on the target,\nand it ALWAYS crits against Frozen\ntargets."}),
 			]
 		"arcanist":
 			# Resonance-engine kit (07-20 rework; core Magic Bolt becomes Arcane

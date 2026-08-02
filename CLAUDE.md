@@ -52,7 +52,9 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   free slot + equipped at purchase, never dipping under the 40g reserve;
   battle bot drinks a carried Health Potion opening a turn <35% HP, run
   sims ONLY — sweep/standalone stay dry so R/S baselines hold),
-  DOD_SIM_BUILDS="spec:Lane,...", DOD_SIM_TROPHIES, DOD_SIM_RELICS (draft).
+  DOD_SIM_BUILDS="spec:Lane,...", DOD_SIM_TROPHIES, DOD_SIM_RELICS (draft),
+  DOD_SIM_ROTATE=1 (Batch W: rotate all twelve specs; see the Batch W
+  block below — shares then carry sample counts).
   RunSim
   (scripts/run_sim.gd statics, Run injected Events-style) owns setup/map
   walk/report; battle.gd hooks: _ready begin+note_battle_start, _check_end
@@ -152,6 +154,75 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-08-01)
+BATCH W (08-01) — THE OUTLIER PASS, MEASURE-FIRST. Every prior sim ran
+the SAME four specs, so 8 of 12 had never been measured and the cited
+"worst outlier" (Sharpshooter 38%) predated half the roster's rework.
+DOD_SIM_ROTATE=1 cycles each class slot's spec across battles (sweep/
+standalone) or RUNS (--run; never mid-run) via Classes.rotated_specs(n)
+— any 3 consecutive counters cover each class's 3 specs, drift terms
+vary WHICH specs pair up (27 parties, n=66-67/spec per 200). Shares
+print sample counts and divide by the spec's OWN pool (party damage of
+the battles it was in), so a fixed party reproduces pre-W numbers and
+a rotated one stays on the same 4-hero basis. Fixed default party
+UNCHANGED — rotation is opt-in, prior-batch A/B still valid.
+CONTRIBUTION METRICS (both reports): heal/prevented/BD/statuses per
+hero + a normalised contribution share. Prevented is INSTRUMENTED at
+existing mitigation deltas (parry, Block incl. Interpose charges →
+the granting Warden, barrier absorbs → the caster via status "src",
+Shieldwall, stance, Faith, Iron Will, Shared Vigil, Consecrated
+Ground, Blessed Vestments, Savage Presence, Frost Ward, Molten Core,
+Flame Shield, Chilled swing malus), never derived; unattributable →
+its own bucket (measured 0-1/battle). BASE ARMOR/RESISTS DELIBERATELY
+EXCLUDED (a stat block is not a contribution). Helpers: _prev /
+_stat_heal / _stat_bd / _contrib_name (companions route to their
+hunter); _apply_status stamps "src_name" so later mitigation can
+credit the caster. TWELVE-SPEC SHARES (rotated sweep, b3/6/9/12):
+Pyro 42/46/46/47 (CLIMBS = true AoE outlier, THE REAL ONE, left
+untouched per the brief — next conversation), Arcanist 43/44/38/34,
+Cryo 38/39/40/37, Sharpshooter 36/33/32/35, Swordmaster 32/25/26/27,
+Survivalist 25/25/25/26, Beastmaster 17/25/28/26, Berserker
+21/20/22/21, Warden 18/16/17/18, Occultist 11/14/16/16, Holy
+13/9/6/8, Devout 4/3/4/5. Rotated curve 100/98/92/82% wins — a
+rotating field is HARDER than the fixed party (100/100/100/96), so
+the standard test party is one of the STRONGER compositions, not a
+neutral one. SUPPORTS ARE NOT WEAK, THEY WERE INVISIBLE: Holy 431
+heal/b = 33% contribution (HIGHEST at b12) off 8% damage; Devout 136
+prevented; Warden 165; Occultist 102 heal. CRYOMANCER: Ice Lance
++10%→+5%/stack — BARELY MOVED HIM (control 49/42/39/39 vs V's 48→40,
+and he casts it a real 1.1x/battle). Second lever measured ALONE per
+the brief (freeze remainder 1→0): 47/42/40/38 = noise → REVERTED,
+ember stays. His fixed-party 40-48% was partly an INSTRUMENT ARTEFACT:
+that party carries the Devout (3-5%), so the other three split ~96%
+and every share in it is inflated; rotated he is 37-40% and his own
+classmates read 34-47% — typical for a mage, and the mage CLASS
+out-damaging the roster is the real question. Permafrost permanence
+and Razor Ice's 3 shards NOT touched (they fixed a structural fault).
+ROTATED RUN 50 (route=default, economy on): completions 12%, wipe
+median z1 t9.0, ratio@z1t8 0.97 (vs V's fixed-party 14% / z2 t6) —
+rotation is harder in the run harness too. Warden 206 prevented/b and
+33% CONTRIBUTION = HIGHEST of any spec; Holy 28% contrib off 5%
+damage (337 heal/b). Per-spec battle counts vary (n=129 Swordmaster
+to n=273 Warden) because durable parties survive deeper; runs sampled
+per spec are even (16-17).
+WARDEN ENDURANCE BUG — OPEN, DESIGNER'S CALL, NOT FIXED IN W:
+unit.endurance_stacks increments every unhealed turn and is NEVER
+capped; effective_armor() adds 1%/rank per stack. Measured +97,521%
+armor in a rotated run (Unkillable mending 7,607/block, Tenacity's
+uncapped +5 max HP/block feeding it). SELF-REINFORCING: more armor →
+unkillable → more turns → more armor → the battle CANNOT END. This is
+a REAL-PLAY SOFTLOCK, not a sim artefact. Never seen before because
+the fixed party has no Warden and the sweep grants no talents — only
+the run harness buys them. Knobs: cap endurance_stacks; bound
+tenacity_hp_gained.
+STALEMATE GUARD (battle.gd STALEMATE_TURNS=600, SIMS ONLY): a battle
+past ~60 rounds is force-ended, scored a LOSS (never a win — that
+would inflate completions), no HP touched (death stats stay honest),
+and COUNTED + PRINTED in all three reports (never a silent cap).
+Measured 5 trips across a 50-run invocation. Validated: at 25 turns it
+fires 8/8 and reports; at 600 a 40-battle sim is 40/40 with zero.
+LIMITATION (stated): "Hero ability uses/battle" divides by ALL
+battles, so under rotation it reads ~3x low; the contribution table
+divides by n correctly.
 ENEMIES THAT ASK QUESTIONS (08-01, Batch V): 4 kinds — chanter (mender,
 z1-3), hurler (brute·sniper, z2-3), bloodcaller (hexer, z1-3),
 grave_totem (mender·hexer, z1/3) — and 4 new specials, NO existing
@@ -179,8 +250,9 @@ FLAG, DELIBERATELY UNTUNED: sweep top band 93.5→97.5% (deaths 1.3-1.5
 →1.00), run completions 6→14%, wipe median z1 t9-10 → z2 t6 — moved
 >1 tier, attribution = the cap deleting top-budget heal walls (z1
 curve shape unchanged, t8 0.99/boss 0.72; roster-1 sweeps never see
-the hurler). Tuning is a separate conversation; outlier pass (Cryo
-40-48%, Devout 3-5%) unchanged and still next.
+the hurler). Tuning is a separate conversation; the outlier pass ran
+as Batch W (below) and the wipe-median question is STILL OPEN for the
+designer.
 PERSISTENT PROFILE (07-26, Batch 40): scripts/profile.gd (class_name
 Profile), user://profile.json OUTSIDE the run save — save_path is a
 static VAR (not const) so tests redirect it. Counts runs started
@@ -295,7 +367,8 @@ battle (push_error + default lineup when nothing fits); report prints
 the theme header. Sim dmg attribution now credits DoT ticks by lane
 owner (poison→Survivalist, burn→Pyromancer — heroes never DoT each
 other), companion hits→pack_master, trap/tripwire/forest bites→their
-hero. SIM-HANG GOTCHA — TWO look-alike failure modes, both ~1-2% CPU:
+hero. SIM-HANG GOTCHA — THREE look-alike failure modes; CHECK CPU FIRST,
+it splits them: ~1-2% = (1) or (2), 30-50% with a growing log = (3).
 (1) REAL await-deadlock: any `await _pick_target`/`_ability_picked`
 reachable in autoplay hangs the run forever. Resurrection's
 multi-fallen picker did this (bot now takes fallen[0]); the targeting
@@ -306,10 +379,23 @@ autoplay. New modal/picker flows MUST bot-guard their awaits.
 code passes on retry once the user is active (caffeinate flags did NOT
 reliably beat it; Batch 41's "broken" toggle was this, proven by
 hunk-by-hunk bisection landing on byte-identical working code).
-DISCRIMINATOR before blaming code: rerun with DOD_SIM_DEBUG=1 — a
-deadlock's log tail names a mid-battle action and reproduces every
-time; the throttle shows banner-only and vanishes when retried while
-the user is active. git-stash-vs-HEAD is the definitive code check.
+(3) TEXTSERVER RID EXHAUSTION (found Batch W, FIXED there): _log used
+to append to the history RichTextLabel even in sim mode. Nothing can
+read it headlessly, and every line allocates TextServer RIDs; a long
+verbose battle exhausts the pool, after which EVERY _log call emits an
+8-line engine backtrace ("Element limit reached" / 'Parameter "mem" is
+null' at _allocate_rid). A 13-minute sweep ran 3+ hours and wrote a
+500 MB log while still making forward progress — so it looks like a
+hang but is really I/O thrash. _log now skips the panel when `sim`;
+if this ever returns, the tell is stderr volume, not a stalled tail.
+It surfaced only under DOD_SIM_ROTATE because the never-simulated
+specs (Holy/Occultist/Survivalist) log several times more per battle.
+DISCRIMINATOR before blaming code: check %CPU and the log's SIZE, then
+rerun with DOD_SIM_DEBUG=1 — a deadlock's log tail names a mid-battle
+action and reproduces every time; the throttle shows banner-only and
+vanishes when retried while the user is active; RID exhaustion spews
+engine backtraces with a GDScript frame pointing at _log.
+git-stash-vs-HEAD is the definitive code check.
 ENEMY ROSTER 6→15 (07-25, Batch 34, roguelike push I): all enemy data
 in data/enemies.json → scripts/enemies.gd (class_name Enemies; caches
 JSON; config() restores ints — JSON floats break Ability.make's typed
@@ -420,8 +506,11 @@ NODE_CAPSTONE_REQ 6 — points-gated trees unchanged). Lanes Precision/
 Penetration/Tempo per the design doc; exclusives ss_exec_eye↔
 ss_consistent, ss_tunnel↔ss_spray. Bot: works ss_t (last target),
 Hold Breath → Coup ≥80 focus & <60% hp → Triple ≥60 → Called → Aimed;
-9th kit entry renders unlabeled (popup guard existed). SIM NOTE:
-sharpshooter leads damage 38% — tuning review flagged.
+9th kit entry renders unlabeled (popup guard existed). SIM NOTE
+SUPERSEDED (Batch W): the "sharpshooter leads damage 38%" flag was a
+STALE number from the old fixed party, measured before Batches D-Q
+rebuilt half the roster. Re-measured across all twelve specs he is
+32-36% — mid-pack, not the worst outlier. Never tune against it.
 ALL TREES ON LANES + ZONE 3 (07-25, Batch 31): Talents.LANE_CONVERSIONS
 converts the 9 classic trees AT BUILD TIME in generate_tree — existing
 node ids/payloads untouched ("map" id→[lane,tier(,"cap")(,excl)]),
@@ -703,7 +792,8 @@ Row-1 talent renamed "Brittle Ice" (id stays cr_frostbite/frostbite_ranks
 all sources (target-side in _resolve) AND frost hits 25% chance to
 frostbite (on-hit passives block in _resolve). Razor Ice v3: 2 random
 @20%, always chills, perfect flat 25%. Blizzard 15% Atk (07-20).
-Ice Lance 35% Atk (07-20).
+Ice Lance 35% Atk (07-20) +5% of Atk per Chilled stack (Batch W
+halved it from Batch O's +10%; Crystal Edge still +5%/rank on top).
 ARCANIST REWORK + TREE (07-20, 6th fixed tree): core Magic Bolt →
 Arcane Explosion via apply_kit_overrides (free, 10% × 2 DISTINCT random
 enemies — struck_before filter in the random-hit picker — 10BD, no

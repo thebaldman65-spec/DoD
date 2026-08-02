@@ -382,6 +382,7 @@ var lethal_saved_cb := Callable()
 # Conviction hook: fires whenever a Divine Shield barrier absorbs damage
 # for this unit (the only source of Faith).
 var shield_absorbed_cb := Callable()
+var prevented_cb := Callable()  # Batch W sim ledger: barrier absorbs → (src_name, absorbed, holder)
 
 # Occultist tree (07-24; lanes re-specced Batch L 07-30). See talents.gd
 # for the node text.
@@ -1308,6 +1309,11 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			if absorbed > 0 and s.get("divine", false) \
 					and shield_absorbed_cb.is_valid():
 				shield_absorbed_cb.call(self)
+			# Batch W: the absorb is prevented damage — report it with the
+			# caster stamped on the barrier ("" lands in the unattributed
+			# bucket battle-side).
+			if absorbed > 0 and prevented_cb.is_valid():
+				prevented_cb.call(String(s.get("src", "")), absorbed, self)
 			if would_have_died and amount < hp and lethal_saved_cb.is_valid():
 				lethal_saved_cb.call(self)
 			if s.power <= 0:

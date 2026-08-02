@@ -86,6 +86,7 @@ static var _run_spent := 0        # points paid this run
 static var _run_gold_spent := 0   # gold paid this run (shop policy only)
 static var _cur_tier := ""        # tier key of the battle in flight
 static var _deaths_before := 0.0  # sim_stats hero_deaths before this battle
+static var spec_runs := {}        # Batch W: spec display name -> runs sampled
 
 
 static func begin(run: Node, n: int) -> void:
@@ -119,11 +120,19 @@ static func start_run(run: Node) -> void:
 	var env := OS.get_environment("DOD_SIM_SPECS")
 	if env != "":
 		specs = Array(env.split(","))
+	# Batch W (DOD_SIM_ROTATE=1): cycle each class slot's spec across
+	# successive RUNS — a spec never changes mid-run (that would be a
+	# different game), but all twelve get sampled across the invocation.
+	# Overrides DOD_SIM_SPECS.
+	if OS.get_environment("DOD_SIM_ROTATE") == "1":
+		specs = Classes.rotated_specs(runs_done)
 	for i in run.party.size():
 		var spec: String = specs[i] if i < specs.size() else default_specs[i]
 		run.party[i]["spec"] = spec
 		run.party[i]["tree"] = Talents.generate_tree(spec, run.party[i]["key"])
 		run.sync_spec_hp(i)  # awakening HP sync — same call as the spec screen
+		var run_sn := String(Classes.SPEC_INFO[spec]["name"])
+		spec_runs[run_sn] = int(spec_runs.get(run_sn, 0)) + 1
 	run.specs_chosen = true
 	_run_spent = 0
 	_run_gold_spent = 0
@@ -431,6 +440,12 @@ static func _finish_run(run: Node, battle, done: bool) -> void:
 	gold_earned += run.gold + _run_gold_spent
 	for id in run.items:
 		items_left += int(run.items[id])
+	# Progress line (Batch W), mirroring the sweep's per-stage marker: the run
+	# report only prints at the very end, so without this a long invocation is
+	# indistinguishable from a hung one for its entire life.
+	print("run %d/%d — %s (%d completed so far)" % [runs_done, runs_target,
+		("COMPLETED" if done else "wiped z%d t%d" % [run.zone_idx + 1,
+		run.floor_idx + 1]), completed])
 	if runs_done < runs_target:
 		start_run(run)
 		battle.get_tree().reload_current_scene()
@@ -563,7 +578,10 @@ static func _print_report(battle) -> void:
 		relics_env if relics_env != "" else "none"])
 	print("          trophies=%s runes=auto-equip(2 slots) events=first-valid" % [
 		troph if troph != "" else "first-in-pool"])
-	print("Specs: %s" % OS.get_environment("DOD_SIM_SPECS"))
+	var specs_desc := OS.get_environment("DOD_SIM_SPECS")
+	if OS.get_environment("DOD_SIM_ROTATE") == "1":
+		specs_desc = "rotating all twelve (DOD_SIM_ROTATE=1)"
+	print("Specs: %s" % specs_desc)
 
 	print("\nWipe tier distribution:")
 	for z in range(1, 4):
@@ -620,6 +638,19 @@ static func _print_report(battle) -> void:
 
 	print("\nDamage share across all runs: %s" % \
 		battle._share_line(battle.sim_stats))
+	if OS.get_environment("DOD_SIM_ROTATE") == "1":
+		var rp := PackedStringArray()
+		var rp_names: Array = spec_runs.keys()
+		rp_names.sort()
+		for rn in rp_names:
+			rp.append("%s x%d" % [rn, int(spec_runs[rn])])
+		print("Runs sampled per spec: %s" % ", ".join(rp))
+	var rs_stale := int(battle.sim_stats.get("stalemates", 0.0))
+	if rs_stale > 0:
+		print("STALEMATES force-ended: %d battles (scored as losses — a fight "
+			% rs_stale + "neither side could finish; see CLAUDE.md Batch W)")
+	print("Per-spec contribution (avg per battle present):")
+	print(battle._contrib_table(battle.sim_stats))
 	var earned := talent_spent + talent_left
 	print("Talent points per hero per run: earned %.1f   spent %.1f (banked %.1f)" % [
 		earned / runs / 4.0, talent_spent / runs / 4.0, talent_left / runs / 4.0])
