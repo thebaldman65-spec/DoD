@@ -221,10 +221,10 @@ NEITHER SIDE CAN FINISH. It is STRUCTURAL, not a talent bug: any
 last-hero-standing durable-but-low-damage survivor vs a healing warband
 reproduces it. Rotation exposed it because rotated parties include
 low-damage comps the fixed party never formed. Rate ~0.9% of battles
-(6 per ~700). OPEN DESIGN QUESTION for real play (a human hits an
-unwinnable-unloseable fight): the game has no resolution mechanism when
-neither side can close — options are a turn limit, escalating pressure,
-or a flee/forfeit. The two fixes above are kept as hygiene on their own
+(6 per ~700). DEFERRED BY THE DESIGNER 08-02 — "we can ignore it for now." Do NOT
+propose a fix unsolicited. (If it is ever picked up: a human hitting
+this state is stuck in an unwinnable-unloseable fight, and the options
+are a turn limit, escalating pressure, or a flee/forfeit action.) The two fixes above are kept as hygiene on their own
 merits, NOT as fixes for this.
 STALEMATE GUARD (battle.gd STALEMATE_TURNS=600, SIMS ONLY): a battle
 past ~60 rounds is force-ended, scored a LOSS (never a win — that
