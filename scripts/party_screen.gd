@@ -265,14 +265,16 @@ func _draw_detail() -> void:
 		chip.tooltip_text = tip
 		add_child(chip)
 
-	# Runes: equip up to 2 (run-scoped, bought at shops).
+	# Runes: equip slots grow with the run (Run.rune_slots — recomputed on
+	# every draw, so a save loaded mid-zone reads its true cap immediately).
 	var runes: Array = member.get("runes", [])
+	var slot_cap := Run.rune_slots()
 	var rune_header := Label.new()
 	var equipped_count := 0
 	for rune in runes:
 		if rune.get("equipped", false):
 			equipped_count += 1
-	rune_header.text = "RUNES  (%d/2 equipped)" % equipped_count
+	rune_header.text = "RUNES  (%d/%d equipped)" % [equipped_count, slot_cap]
 	rune_header.add_theme_font_size_override("font_size", 15)
 	rune_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
 	rune_header.position = Vector2(60, 520)
@@ -284,27 +286,39 @@ func _draw_detail() -> void:
 		none.add_theme_color_override("font_color", Color(0.55, 0.52, 0.5))
 		none.position = Vector2(60, 548)
 		add_child(none)
-	for i in mini(runes.size(), 4):
+	# The pouch can outgrow the page (elite drops have no cap), so the rows
+	# live in a scroller — every owned rune renders, never a silent cut.
+	var rune_scroll := ScrollContainer.new()
+	rune_scroll.position = Vector2(55, 544)
+	rune_scroll.size = Vector2(450, 720 - 544 - 8)
+	rune_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child(rune_scroll)
+	var rune_rows := VBoxContainer.new()
+	rune_rows.add_theme_constant_override("separation", 6)
+	rune_scroll.add_child(rune_rows)
+	for i in runes.size():
 		var rune: Dictionary = runes[i]
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		rune_rows.add_child(row)
 		var toggle := Button.new()
 		var is_on: bool = rune.get("equipped", false)
 		toggle.text = "Unequip" if is_on else "Equip"
 		toggle.custom_minimum_size = Vector2(80, 26)
-		toggle.position = Vector2(60, 546 + i * 34)
 		toggle.add_theme_font_size_override("font_size", 11)
-		toggle.disabled = not is_on and equipped_count >= 2
+		toggle.disabled = not is_on and equipped_count >= slot_cap
 		toggle.pressed.connect(_toggle_rune.bind(i))
-		add_child(toggle)
+		row.add_child(toggle)
 		var rune_label := Label.new()
-		var equip_tag := "✦ " if rune.get("equipped", false) else ""
+		var equip_tag := "✦ " if is_on else ""
 		rune_label.text = "%s%s — %s" % [equip_tag, rune["name"], rune["desc"]]
 		rune_label.add_theme_font_size_override("font_size", 12)
 		rune_label.add_theme_color_override("font_color",
-			Color(0.45, 0.9, 0.5) if rune.get("equipped", false)
+			Color(0.45, 0.9, 0.5) if is_on
 			else rune.get("rarity_color", Color(0.8, 0.8, 0.8)))
-		rune_label.position = Vector2(150, 550 + i * 34)
-		rune_label.size = Vector2(330, 20)
-		add_child(rune_label)
+		rune_label.custom_minimum_size = Vector2(330, 20)
+		rune_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		row.add_child(rune_label)
 
 	# Right side: the chosen spec's talent tree lives on this same page.
 	var tree_header := Label.new()
@@ -344,6 +358,11 @@ func _draw_detail() -> void:
 	if not Classes.spec_pool(spec).is_empty() \
 			and int(member.get("bm_picks_owed", 0)) > 0:
 		_draw_bm_pick(member)
+	# Elite rune caches wait here too (Batch X pick-of-3, the trophy-picker
+	# pattern; candidates were rolled at drop time and stored).
+	if int(member.get("rune_picks_owed", 0)) > 0 \
+			and not member.get("rune_candidates", []).is_empty():
+		_draw_rune_pick(member)
 
 
 # ---------- fixed talent tree (styled after the "Appearance example") ----------
@@ -628,7 +647,7 @@ func _toggle_rune(rune_idx: int) -> void:
 		for r in runes:
 			if r.get("equipped", false):
 				equipped_count += 1
-		if equipped_count >= 2:
+		if equipped_count >= Run.rune_slots():
 			return
 		rune["equipped"] = true
 	_draw_screen()
@@ -692,6 +711,67 @@ func _draw_bm_pick(member: Dictionary) -> void:
 			b.tooltip_text = "%s\n\n%s" % [pool_name, ab.description]
 		b.pressed.connect(_pick_bm_ability.bind(pool_name))
 		box.add_child(b)
+
+
+func _draw_rune_pick(member: Dictionary) -> void:
+	var panel := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.04, 0.04, 0.05, 0.97)
+	style.border_color = Color(0.75, 0.45, 1.0)
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(8)
+	style.content_margin_left = 18.0
+	style.content_margin_right = 18.0
+	style.content_margin_top = 12.0
+	style.content_margin_bottom = 14.0
+	panel.add_theme_stylebox_override("panel", style)
+	# Below the trophy panel's spot so simultaneous picks never overlap.
+	panel.position = Vector2(690, 430)
+	panel.z_index = 18
+	add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	panel.add_child(box)
+	var title := Label.new()
+	title.text = "ELITE RUNE CACHE — choose one (%d owed)" % \
+		int(member.get("rune_picks_owed", 0))
+	title.add_theme_font_size_override("font_size", 15)
+	title.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
+	box.add_child(title)
+	var triple: Array = member["rune_candidates"][0]
+	for i in triple.size():
+		var rune: Dictionary = triple[i]
+		var b := Button.new()
+		b.text = "%s  [%s]" % [rune["name"], rune["rarity"]]
+		b.custom_minimum_size = Vector2(320, 34)
+		b.add_theme_font_size_override("font_size", 13)
+		b.add_theme_color_override("font_color",
+			rune.get("rarity_color", Color(0.8, 0.8, 0.8)))
+		b.tooltip_text = "%s\n%s\nWorth %dg at the Peddler" % [
+			rune["name"], rune["desc"], int(rune.get("price", 0))]
+		b.pressed.connect(_pick_rune.bind(i))
+		box.add_child(b)
+
+
+func _pick_rune(idx: int) -> void:
+	var member: Dictionary = Run.party[selected]
+	var queue: Array = member.get("rune_candidates", [])
+	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty():
+		return
+	var triple: Array = queue.pop_front()
+	member["rune_candidates"] = queue
+	var rune: Dictionary = triple[clampi(idx, 0, triple.size() - 1)]
+	# Auto-equip while a slot is free — the pick already happens on the
+	# Party screen; save the extra click.
+	var worn := 0
+	for r in member.get("runes", []):
+		if r.get("equipped", false):
+			worn += 1
+	rune["equipped"] = worn < Run.rune_slots()
+	member["runes"] = member.get("runes", []) + [rune]
+	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
+	Run.save_run()
+	_draw_screen()
 
 
 func _pick_bm_ability(pool_name: String) -> void:

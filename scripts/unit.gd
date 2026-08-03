@@ -173,6 +173,13 @@ var deathwish_ranks := 0      # Deathwish: +6%/rank damage below 35% health
 var bloodied_momentum_ranks := 0  # Bloodied Momentum: 15/rank Rage per kill
 var second_wind := 0          # Second Wind: first drop below 25% grants 40 Rage
 var second_wind_used := false
+# Batch X authored-rune fields — each read at exactly ONE battle.gd site
+# (the relics hook-audit discipline; the changelog lists the sites):
+var blood_pact := 0           # Exsanguination rune: NEGATIVE threshold shift —
+                              # enemy bleedouts pop at 100+pact and pay 15%
+var rune_lifesteal := 0.0     # Vampiric Rune: attacks heal this fraction of damage dealt
+var rune_execute_bonus := 0.0 # Reaper rune: bonus damage vs targets under 35% HP
+var rune_bd_bonus := 0.0      # Breaker runes: Break-damage multiplier bonus
 var exsanguination := 0       # capstone: 35% bleedouts, full buildup chains on
 var undying_rage := 0         # capstone: below 25% cannot die, +50% damage
 var undying_rage_used := false

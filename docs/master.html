@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-02 (Batch W)</b></p>
+<p align="right"><b>Last updated: 2026-08-02 (Batch X)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -81,7 +81,8 @@ gets a route choice most tiers but can only drift one column per step, so reachi
 elite or shop takes planning; every node keeps at least one inbound path so the map never
 strands. The boss tier is a single node.</p>
 <p><b>Elites are the snowball engine:</b> a skilled player routes toward them. On top of double
-talent points, an elite kill drops a rune for a random hero, a random consumable, and a bigger
+talent points, an elite kill drops a <b>rune cache</b> for a random hero — three candidates
+rolled at the kill, one chosen on the Party screen — plus a random consumable and a bigger
 gold purse (80–100).</p>
 <ul>
 <li><b>Zones — authored slots:</b> a run is <b>three zone slots</b>, and each slot draws
@@ -1248,11 +1249,23 @@ Elemental Weakness the resist reduction, Unrelenting Assault its borrowed Consti
 110–130.</li>
 <li><b>Consumable prices:</b> Health 30, Mana 30, Bomb 45, Revive 80, Defense 40. Starting
 inventory: 2 Health, 1 Mana, 1 Bomb, 1 Revive, 1 Defense.</li>
-<li><b>Runes</b> (run-scoped gear, bought at the Peddler or dropped by elites): rarity roll
-60% Common (×1, 50g, "Cracked"), 30% Rare (×2, 100g, "Polished"), 10% Epic (×3, 160g,
-"Radiant") over templates: +10 max HP / +2% armor / +4 Speed / +12 Constitution / +2% crit /
-+8 max Mana (per rarity multiplier). Each hero can <b>equip 2</b> (toggled on the party
-screen); shop offers avoid duplicates per hero.</li>
+<li><b>Runes</b> (run-scoped gear, bought at the Peddler or chosen from elite caches — the
+in-run power source that scales with depth): an <b>authored pool</b> (data/runes.json).
+<b>Rarity means kind, not magnitude:</b> Common = flat stat adds (the six generated
+"Cracked" templates remain the filler family: +10 max HP / +2% armor / +4 Speed / +12
+Constitution / +2% crit / +8 max Mana; 50g), Rare ("Polished", 100g) alters an existing
+ability's numbers or grants a talent-like effect (talent-counter runes STACK with the
+talent), Epic ("Radiant", 160g) grants an ability, changes a damage type, or inverts a
+rule. <b>Scarred</b> runes — a flag on Rare/Epic with their own prefix and colour — buy a
+larger upside with a real cost, and are priced below their clean peers so the trade shows
+in the shop. Rarity odds deepen with the zone slot: 60/30/10 → 40/40/20 → 25/45/30
+(Common/Rare/Epic). <b>Eligibility:</b> every rune declares a scope — universal,
+class-wide, or spec-only, so the awakening shapes the loot table — and ability-modifying
+runes only roll for heroes who actually own the named ability (boss trophies included).
+<b>Equip slots grow with the run: 2 → 3 → 4</b> by zone (toggled on the party screen; the
+zone-victory screen announces each new slot). Shop offers avoid duplicates per hero, and
+an exhausted pool falls back to the Common family — the offer list never comes back
+empty.</li>
 <li><b>Relics</b> (permanent meta): one random unlock per boss kill, stored in
 user://relics.json; up to 3 equipped per run at the draft (scrolling shelf; events can slot
 a run-scoped extra via relic_grant). <b>Pool: 25 relics — 17 common, 8 rare (◆)</b> — every
@@ -1489,7 +1502,8 @@ scaling and hovering <b>Resistances</b> lists all six elements). Stats mirror th
 spawn math: Constitution uses the spec's value plus Toughness, Attack/HP include node
 scaling, and the spec passive line bakes in talent ranks (Aggressive/Defensive Stance,
 Unstoppable) — the class passive + spec passive lines, ability chips (hover shows real
-numbers AND the "% of Attack" scaling), rune equip toggles (2 max), and the spec's talent
+numbers AND the "% of Attack" scaling), rune equip toggles (slots grow 2/3/4 by zone; the
+pouch list scrolls), and the spec's talent
 tree: three lane columns with live lane-point headers, a capstone shelf, and
 click-to-learn nodes (lock reasons on the node tooltips) for all twelve specs.</li>
 <li><b>Awakening screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
@@ -1611,8 +1625,8 @@ only the Tyrant's frost weakness is set) and Counter Attack (defined term; no ta
 ability grants it yet).</li>
 <li>The Withered Warden has its own kit; the Ash-Wrought Tyrant is still a Chief stand-in —
 unique kit + art planned. Boss art for both pending.</li>
-<li>Trees still to design: all three Hunter specs;
-full rune loot table pending; relic pool (5) needs growth.</li>
+<li>Spec rune sets still to author: Mage, Cleric, and Hunter specs — one batch per class,
+the way stat blocks and trees shipped (the Warrior's three specs are the Batch X pilot).</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>
 <li>Difficulty tuning is pending an honest baseline: the old "~100% win rate" figure
 measured a single fixed unscaled lineup and carried no information. The sweep

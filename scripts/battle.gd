@@ -4098,6 +4098,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 + 0.06 * attacker.grudge_ranks
 				_log("   → Talent: Grudge — +%d%% against his taunted mark" % (
 					6 * attacker.grudge_ranks), "#b0a8e0")
+			# Rune of the Reaper (rune_execute_bonus, its only read site):
+			# wounded prey — targets below 35% health — takes extra.
+			if attacker.rune_execute_bonus > 0.0 \
+					and strike_target.hp < strike_target.max_hp * 0.35:
+				raw *= 1.0 + attacker.rune_execute_bonus
+				_log("   → Rune: the Reaper takes the wounded (+%d%%)" % int(round(
+					attacker.rune_execute_bonus * 100)), "#b0a8e0")
 			# Seasoned Fighter: the chosen stance decides the blade's weight —
 			# Aggressive presses (talent-deepened), Defensive pulls the cut.
 			if attacker.passive_id == "seasoned":
@@ -4358,6 +4365,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Broken Will: the Occultist grinds stability down harder.
 			if attacker.broken_will_ranks > 0:
 				pr = int(round(pr * (1.0 + 0.05 * attacker.broken_will_ranks)))
+			# Breaker runes (rune_bd_bonus, its only read site): every blow
+			# lands heavier on the meter.
+			if attacker.rune_bd_bonus > 0.0 and pr > 0:
+				pr = int(round(pr * (1.0 + attacker.rune_bd_bonus)))
+				_log("   → Rune: +%d%% Break damage" % int(round(
+					attacker.rune_bd_bonus * 100)), "#b0a8e0")
 			_stat("attacks")
 			_stat("attack_landed")
 			if is_crit:
@@ -5077,6 +5090,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			attacker.heal_amount(leech)
 			attacker.float_text("+%d" % leech, Color(0.4, 0.9, 0.45))
 			_log("   → %s leeches %d HP" % [attacker.unit_name, leech], "#70d878")
+		# Vampiric Rune (rune_lifesteal, its only read site): every damaging
+		# strike drinks, on top of any ability lifesteal.
+		if attacker.rune_lifesteal > 0.0 and total_dealt > 0 and not attacker.dead:
+			var rl_leech := maxi(int(total_dealt * attacker.rune_lifesteal), 1)
+			attacker.heal_amount(rl_leech)
+			attacker.float_text("+%d" % rl_leech, Color(0.4, 0.9, 0.45))
+			_log("   → Rune: %s drinks %d HP" % [attacker.unit_name, rl_leech], "#70d878")
 		if ab.heal_missing > 0.0 and not attacker.dead:
 			var drain_frac := 0.45 if is_perfect else ab.heal_missing
 			var missing_hp := attacker.max_hp - attacker.hp
@@ -7743,11 +7763,29 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 		chain_hops: Array = []) -> void:
 	if victim.dead:
 		return
-	if victim.add_bleed(amount):
+	# Rune of Exsanguination (blood_pact, a NEGATIVE threshold shift; its
+	# only battle.gd read site): enemy veins open early — the meter pops at
+	# 100+pact, and the bleedout pays 15% of max HP instead of 20%.
+	# (_living_hero_with wants positives, so scan for the negative here.)
+	var pact := 0
+	if not victim.is_hero:
+		for pact_h in heroes:
+			if not pact_h.dead and not pact_h.is_companion and pact_h.blood_pact < 0:
+				pact = pact_h.blood_pact
+				break
+	# Forced only when the rune actually matters — a meter that would top
+	# 100 on its own pops the normal way (still at the pact's 15%).
+	var forced: bool = pact < 0 and victim.bleed_buildup + amount >= 100 + pact \
+		and victim.bleed_buildup + amount < 100
+	if forced:
+		_log("   → Rune: Exsanguination opens the vein early (bleedout at %d)" % (
+			100 + pact), "#b0a8e0")
+	if victim.add_bleed((100 - victim.bleed_buildup) if forced else amount):
 		# Exsanguination (capstone): enemy bleedouts hit for 35% instead.
 		var exsang := not victim.is_hero \
 			and _living_hero_with("exsanguination") != null
-		var bleed_dmg := maxi(int(victim.max_hp * (0.35 if exsang else 0.20)), 1)
+		var pact_pct := 0.35 if exsang else (0.15 if pact < 0 else 0.20)
+		var bleed_dmg := maxi(int(victim.max_hp * pact_pct), 1)
 		if victim.is_hero and not victim.is_companion and victim.has_status("unity"):
 			var bound := heroes.filter(func(h): return not h.dead)
 			if bound.size() > 1:
@@ -8223,13 +8261,19 @@ func _check_end() -> void:
 		var elite_text := ""
 		if Run.encounter.get("type", "") == "elite":
 			var looter: Dictionary = Run.party.pick_random()
-			var rune: Dictionary = Run.generate_rune(looter["key"])
-			looter["runes"] = looter.get("runes", []) + [rune]
 			var drop_id: String = Run.random_loot()
 			Run.items[drop_id] = Run.items.get(drop_id, 0) + 1
-			elite_text = "\n\nELITE SPOILS\n%s (%s) — for the %s, equip it from the Party tab\n+1 %s" % [
-				rune["name"], rune["desc"], looter["key"].capitalize(),
-				Run.ITEM_INFO[drop_id][0]]
+			elite_text = "\n\nELITE SPOILS\n+1 %s" % Run.ITEM_INFO[drop_id][0]
+			# Rune pick-of-3 (Batch X): candidates rolled NOW and stored on
+			# the member (never rerolled), chosen on the Party screen via
+			# the boss-trophy picker pattern. Empty = runes off — the
+			# spoils keep the item.
+			var candidates: Array = Run.roll_rune_candidates(looter)
+			if not candidates.is_empty():
+				looter["rune_candidates"] = looter.get("rune_candidates", []) + [candidates]
+				looter["rune_picks_owed"] = int(looter.get("rune_picks_owed", 0)) + 1
+				elite_text += "\nRUNE CACHE: the %s may choose one of three\nrunes on the Party screen." % \
+					looter["key"].capitalize()
 			# Gravelight Lantern: the spoils pile runs deeper.
 			for extra_i in int(Run.relic_add("loot_extra")):
 				var extra_id: String = Run.random_loot()
@@ -8274,6 +8318,10 @@ func _check_end() -> void:
 			Profile.note_boss(Run.boss_kind())
 			Profile.note_zone_cleared()
 			if Run.has_next_zone():
+				# The next zone opens another rune slot (Run.rune_slots is
+				# 2 + zone_idx, which has not advanced yet).
+				boss_text += "\n\nA NEW RUNE SLOT opens for every hero in %s (%d total)." % [
+					Run.next_zone_name(), Run.rune_slots() + 1]
 				_show_end("THE ZONE IS CLEANSED", boss_text,
 					[["Descend into %s" % Run.next_zone_name(), _next_zone]], true)
 			else:

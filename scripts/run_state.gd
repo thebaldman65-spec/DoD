@@ -510,43 +510,48 @@ func random_loot() -> String:
 
 # ---------- rune generation (shared by the Peddler and elite drops) ----------
 
-# Rarity scales both power and price. Runes are run-scoped.
-const RUNE_RARITIES := [
-	{"key": "common", "label": "Common", "mult": 1, "price": 50, "prefix": "Cracked",
-		"color": Color(0.8, 0.8, 0.8)},
-	{"key": "rare", "label": "Rare", "mult": 2, "price": 100, "prefix": "Polished",
-		"color": Color(0.45, 0.65, 1.0)},
-	{"key": "epic", "label": "Epic", "mult": 3, "price": 160, "prefix": "Radiant",
-		"color": Color(0.75, 0.45, 1.0)},
-]
-const RUNE_TEMPLATES := [
-	{"noun": "Vitality", "stat": "max_hp", "base": 10, "fmt": "+%d max HP"},
-	{"noun": "Warding", "stat": "armor", "base": 0.02, "fmt": "+%d%% armor"},
-	{"noun": "Swiftness", "stat": "speed", "base": 4, "fmt": "+%d Speed"},
-	{"noun": "Poise", "stat": "constitution", "base": 12, "fmt": "+%d Constitution"},
-	{"noun": "Precision", "stat": "crit_bonus", "base": 0.02, "fmt": "+%d%% crit chance"},
-	{"noun": "Springs", "stat": "max_resource", "base": 8, "fmt": "+%d max Mana"},
-]
+# Rune slots grow with the run: 2 in the first zone, 3 in the second, 4 in
+# the third. No cap — a fourth zone would give 5, matching the
+# ZONE_BASE_MULTS discipline (slots past the third continue formulaically).
+# Derived from zone_idx, so saves need no new field.
+func rune_slots() -> int:
+	return 2 + zone_idx
+
+# Runes mode (sim matrix flag, Batch X): full = the authored pool
+# (default), stats = the generated Common family only (approximately the
+# pre-Batch-X behaviour), off = no runes generated, offered, or dropped.
+func runes_mode() -> String:
+	var m := OS.get_environment("DOD_SIM_RUNES")
+	return m if m in ["off", "stats"] else "full"
 
 
-func generate_rune(class_key: String) -> Dictionary:
-	var pool := RUNE_TEMPLATES.filter(
-		func(t): return not (t["stat"] == "max_resource" and class_key == "warrior"))
-	var template: Dictionary = pool.pick_random()
-	var roll := randf()
-	var rarity: Dictionary = RUNE_RARITIES[0] if roll < 0.6 \
-		else (RUNE_RARITIES[1] if roll < 0.9 else RUNE_RARITIES[2])
-	var value = template["base"] * rarity["mult"]
-	var shown: int = int(value * 100) if template["base"] is float else int(value)
-	return {
-		"name": "%s Rune of %s" % [rarity["prefix"], template["noun"]],
-		"rarity": rarity["label"],
-		"rarity_color": rarity["color"],
-		"price": rarity["price"],
-		"desc": template["fmt"] % shown,
-		"payload": {"stat": {template["stat"]: value}},
-		"equipped": false,
-	}
+# Takes the MEMBER dict (Batch X) so eligibility can read the spec, the
+# trophies, and the owned pouch. Returns {} when runes are off — every
+# call site skips empties. The pool lives in data/runes.json (Runes).
+func generate_rune(member: Dictionary) -> Dictionary:
+	match runes_mode():
+		"off":
+			return {}
+		"stats":
+			return Runes.template_rune(String(member["key"]))
+	return Runes.generate(member, zone_idx + 1)
+
+
+# Elite pick-of-3 (Batch X): the three candidates are rolled AT DROP TIME
+# and stored on the member — they never reroll on a screen open, and they
+# ride the party dict into the save. Empty when runes are off.
+func roll_rune_candidates(member: Dictionary) -> Array:
+	var out: Array = []
+	for i in 3:
+		var rune := generate_rune(member)
+		if rune.is_empty():
+			return []
+		for attempt in 4:
+			if not out.any(func(c): return c["name"] == rune["name"]):
+				break
+			rune = generate_rune(member)
+		out.append(rune)
+	return out
 
 
 func rotation_enabled() -> bool:

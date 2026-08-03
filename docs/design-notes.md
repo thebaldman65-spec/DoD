@@ -4,6 +4,47 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Runes become a build system (Batch X) — 2026-08-02
+
+**Why an authored pool and not a bigger generator:** relics got a
+19-hook vocabulary and 25 authored entries; events got 12 verbs and 16
+authored entries; runes had six stat templates and a rarity multiplier.
+The design work simply never happened there. Generated numbers can make
+a hero bigger; only authored trade-offs make two runs *different* — the
+same precedent that carried relics and events. The batch was cheap for
+one reason: `Talents.apply_payload` already had every branch the system
+needs, so authoring became a JSON edit, not new machinery.
+
+**Why rarity means kind rather than magnitude:** ×1/×2/×3 on a stat
+stick is one decision repeated three times at three prices. Common =
+stat, Rare = alters your abilities, Epic = changes a rule gives each
+tier its own *question*, and the zone-slot weight shift (60/30/10 →
+25/45/30) means the answers get more interesting exactly as the run
+deepens.
+
+**Why slots grow with the run:** every prior batch measured the same
+wall — zone 1 roughly right, runs die in zones 2–3 against a ×2.2 base
+multiplier, with no in-run power source that keeps pace with depth.
+Nodes are +2% linear, talents are bounded by the tree, relics never
+grow. A third and fourth rune slot is depth-scaling power that is also
+a *decision* each time, and it rode ahead of the pool so the two levers
+could be measured apart.
+
+**Why one rune per talent lane plus a splash-payer:** the lanes already
+exist and are already named on the party screen, so hanging runes on
+them makes build variety structural rather than hoped-for — the
+Berserker who finds the Bloodletting rune plays a different run from
+the one who finds the Fury rune, and both are legible.
+
+**Why scarred is a flag, not a rarity:** a downside is a modifier on a
+promise, not a tier of power. Pricing scarred *below* clean makes the
+trade visible in the shop before the tooltip is ever read.
+
+**Why the elite drop became a pick of 3:** elites are the reward the
+map is supposed to be routed toward, and a random rune on a random hero
+was the least agency in the game. The candidates roll at drop time and
+are stored, so save-scumming a screen open rerolls nothing.
+
 ## Closing the difficulty gap (Batch T) — 2026-08-01
 
 **Why the curve had to move and not the heroes:** across a zone, enemy

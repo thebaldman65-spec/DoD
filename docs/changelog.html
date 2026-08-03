@@ -5,6 +5,102 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-02 — Batch X: runes become a build system</h2>
+<ul>
+<li><b>Why:</b> every prior batch measured the same wall — zone 1 roughly right, runs die
+in zones 2–3 — and the party had <b>no in-run power source that keeps pace with depth</b>
+(nodes +2% linear, talents bounded, relics flat). Runs also needed to differ from each
+other: relics and events got authored vocabularies; runes had six stat templates and a
+multiplier. Runes were already plumbed end to end, so they got both jobs. <b>No new
+payload machinery</b> — everything routes through the existing
+<code>Talents.apply_payload</code> branches.</li>
+
+<li><b>Slot growth (stage 1, landed and measured ALONE):</b> rune slots are now
+<code>Run.rune_slots()</code> = 2/3/4 by zone slot, no cap (a 4th zone gives 5). Every
+hardcoded 2 routed through the accessor (party-screen equip cap + header, run-sim elite
+auto-equip and shop free-slot check); the zone-victory screen announces the new slot. No
+save migration — the count derives from <code>zone_idx</code>. <b>Latent bug fixed:</b>
+the party screen drew at most 4 rune rows, so a pouch of 5+ silently hid runes; the rows
+now live in a scroller and every owned rune renders. Measured alone against the OLD
+generator: 8% completions, wipe median z1 t11, ratio@z1t8 0.97 — noise-range vs the
+old-generator baseline, as expected with only ~2.6 runes bought per run (the 2-slot cap
+was rarely binding). The slot lever waits on a pool worth filling slots with.</li>
+
+<li><b>Authored pool (stages 2–3):</b> <code>scripts/runes.gd</code> wrapping
+<code>data/runes.json</code> (the Enemies/Events/Relics pattern) — <b>26 authored runes</b>:
+5 universal, 9 class (3 per class, all four classes ON PURPOSE — a Warrior-only pool
+would make any Warrior share shift a pool-depth artefact, the Batch W denominator
+lesson), and 12 Warrior spec runes as the pilot (Berserker/Swordmaster/Warden). Spec sets
+follow the <b>one-rune-per-talent-lane rule</b> (one deepens each lane, one pays for
+splashing out), so build variety is structural. <b>Rarity means kind</b> (Common = stat,
+the six old templates surviving as the filler family and exhaustion floor; Rare = alters
+an ability or grants a talent-like effect, counter fields stacking with the talent by
+design; Epic = grants an ability / changes a damage type / inverts a rule), weights
+shifting by zone slot 60/30/10 → 40/40/20 → 25/45/30, formulaic past 3. <b>Scarred</b> is
+a boolean flag on Rare/Epic (own prefix + colour, every payload carries a negative term,
+priced BELOW the clean peer). <b>Eligibility:</b> scope universal / class:&lt;key&gt; /
+spec:&lt;id&gt;, and ability-payload runes carry <code>requires_ability</code> checked
+against the derivable kit (core + spec + kit-override renames + boss trophies) — the
+<code>apply_payload</code> ability branch matches display names and a rune naming an
+unowned ability is a silent dud, so eligibility is load-bearing. Exhausted pools widen,
+then fall back to the Common family — offers never come back empty. JSON payload numbers
+are int-restored on load (the Enemies <code>AB_INT_KEYS</code> lesson).</li>
+
+<li><b>New cfg fields — 4 of the sanctioned 4, each read at exactly ONE battle.gd site</b>
+(the relics hook-audit precedent), each logging a grep-stable <code>"Rune:"</code> line:
+<code>blood_pact</code> (Exsanguination: enemy bleedouts pop at 85 for 15% max HP — read
+in <code>_add_bleed_with_burst</code>), <code>rune_lifesteal</code> (Vampiric Rune — read
+beside the ability-lifesteal block in the strike loop), <code>rune_execute_bonus</code>
+(Reaper: +damage below 35% HP — read in the raw-damage block by Grudge), and
+<code>rune_bd_bonus</code> (Breaker runes: Break-damage multiplier — read in the pressure
+block after Broken Will). Everything else in the pool rides existing fields and existing
+ability names.</li>
+
+<li><b>Elite pick-of-3 (stage 4):</b> the elite drop is no longer a random rune onto a
+random hero — <b>three candidates roll at drop time</b>, are stored on the member
+(<code>rune_candidates</code> queue + <code>rune_picks_owed</code> mirroring
+<code>bm_picks_owed</code>, saved with the run, never rerolled on a screen open), and the
+pick resolves on the Party screen via the boss-trophy picker pattern; the chosen rune
+auto-equips while a slot is free. Sim bot policy, printed in the report header: build-lane
+match → spec-scoped → first candidate.</li>
+
+<li><b>Measured (route=default, economy on, 50 runs per row; DOD_SIM_RUNES flag:
+off/stats/full):</b>
+<br>— control first: <code>--sweep 200</code> fixed party at <code>off</code> reproduces
+Batch W within noise (win 100/100/98/96, deaths 0.01→0.96, Cryo 49/42/40/37) — the
+baseline is controlled, no read-site regression.
+<br>— <b>off</b> = 4% completions, wipe median z2 t2.5, ratio@z1t8 0.98, 0 runes/run.
+<br>— <b>stats</b> (≈ pre-batch generator) = 2%, z1 t11, 0.94, 1.7 runes bought/run.
+<br>— <b>full</b> (authored pool) = 6%, z1 t11, 0.98, 2.9 runes bought/run.
+<br>— stage-1-alone row (slots grown, old generator): 8%, z1 t11, 0.97.
+<br><b>Reading (report, not tune — Batch T owns the difficulty numbers):</b> at n=50 the
+three rows sit 2–6% — the authored pool at current authored power does NOT move
+completions beyond noise; the z2 mid-band ratio nudges up under <code>full</code>
+(z2 t7 0.73→0.85; z3 tail 0.44–0.73 → 0.45–0.73) but the z2/z3 collapse survives. The
+depth question stays open, and the next lever is authored rune POWER (a data edit), not
+machinery. Damage shares are flat across rows (Berserker 28/28/28, Cryo 38/39/39) — no
+Warrior-favouring shift materialised at current power.
+<br><b>Artefact warning 1:</b> only the Warrior has spec runes this batch — any future
+damage-share or contribution shift favouring Warrior specs is POOL DEPTH, not balance;
+do not tune on it.
+<br><b>Artefact warning 2:</b> the rotated sweep's twelve-spec table is only comparable
+to Batch W at <code>DOD_SIM_RUNES=off</code> — say so wherever that table is reproduced.
+<br><b>Comparator honesty:</b> the Batch V fixed-party row (14%, z2 t6) does NOT
+reproduce on the current build even at <code>off</code> — Batch W's stalemate guard
+(stuck battles now scored as losses) sits between. Matrix rows are only comparable
+within one batch's flags, per the standing rule.</li>
+
+<li><b>Verification:</b> scratchpad <code>test_runes.gd</code> (920 checks: schema,
+ability-existence + requires_ability, stat-field existence, scarred negative terms +
+underpricing, scope/trophy eligibility incl. the bm_abilities case, exhaustion floor,
+int restoration through <code>Ability.make</code>, payload application, rarity-weight
+sums, <code>rune_slots</code> 2/3/4 + no-cap, save round-trip incl. stored candidates,
+sim purity) — all pass. Live proof <code>test_rune_battle.gd</code>: a headless autoplay
+battle with the Warpath and Exsanguination runes equipped shows the altered Hack and
+Slash (+30 Bleed) and the scarred early bleedout ("bleedout at 85") in the combat log.
+Parse checks clean across all ten scenes.</li>
+</ul>
+
 <h2>2026-08-01 — Batch W: the outlier pass (measure first)</h2>
 <ul>
 <li><b>The gap that mattered more than the outlier:</b> every sim in this project had

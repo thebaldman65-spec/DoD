@@ -1,0 +1,181 @@
+{
+	"anchor": {
+		"name": "Anchor Rune", "rarity": "common", "scope": "universal", "price": 50,
+		"desc": "+12% armor, -10 Speed.",
+		"payload": {"stat": {"armor": 0.12, "speed": -10.0}}
+	},
+	"glass": {
+		"name": "Glass Rune", "rarity": "rare", "scope": "universal", "price": 75,
+		"scarred": true,
+		"desc": "+8% crit chance — but +15% damage taken.",
+		"payload": {"stat": {"crit_bonus": 0.08, "dmg_taken_bonus": 0.15}}
+	},
+	"reaper": {
+		"name": "Rune of the Reaper", "rarity": "rare", "scope": "universal", "price": 100,
+		"desc": "+15% damage against enemies below 35% health.",
+		"payload": {"stat": {"rune_execute_bonus": 0.15}}
+	},
+	"colossus": {
+		"name": "Rune of the Colossus", "rarity": "rare", "scope": "universal", "price": 100,
+		"desc": "+8% max health.",
+		"payload": {"stat": {"max_hp_pct": 0.08}}
+	},
+	"vampiric": {
+		"name": "Vampiric Rune", "rarity": "epic", "scope": "universal", "price": 120,
+		"scarred": true,
+		"desc": "Attacks drink 10% of damage dealt as health — but heals received are 30% weaker.",
+		"payload": {"stat": {"rune_lifesteal": 0.1, "healing_received_mult": -0.3}}
+	},
+
+	"old_wrath": {
+		"name": "Rune of Old Wrath", "rarity": "rare", "scope": "class:warrior", "price": 100,
+		"desc": "He walks in already angry: battles begin with 20 Rage.",
+		"payload": {"stat": {"resource": 20}}
+	},
+	"warriors_edge": {
+		"name": "Rune of the Whetted Edge", "rarity": "rare", "scope": "class:warrior", "price": 100,
+		"requires_ability": "Strike",
+		"desc": "Strike hits for +8% of Attack and builds 5 more Rage.",
+		"payload": {"ability": "Strike", "add": {"damage": 8, "resource_gain": 5}}
+	},
+	"emberforged": {
+		"name": "Emberforged Rune", "rarity": "epic", "scope": "class:warrior", "price": 160,
+		"requires_ability": "Strike",
+		"desc": "Strike burns as FIRE damage and hits for +5% of Attack.",
+		"payload": {"ability": "Strike", "set": {"dmg_type": "fire"}, "add": {"damage": 5}}
+	},
+
+	"wellspring": {
+		"name": "Rune of the Wellspring", "rarity": "rare", "scope": "class:mage", "price": 100,
+		"desc": "Recover 5 more Mana at the start of each turn.",
+		"payload": {"stat": {"mana_regen_bonus": 5}}
+	},
+	"reckless_channeling": {
+		"name": "Rune of Reckless Channeling", "rarity": "rare", "scope": "class:mage", "price": 75,
+		"scarred": true,
+		"desc": "+10% damage dealt — but -10% max health.",
+		"payload": {"stat": {"dmg_bonus": 0.1, "max_hp_pct": -0.1}}
+	},
+	"comet": {
+		"name": "Rune of the Comet", "rarity": "epic", "scope": "class:mage", "price": 160,
+		"desc": "Grants COMET: a crushing arcane blow (50% of Attack, 30 Mana, 3-turn cooldown).",
+		"payload": {"new_ability": {"display_name": "Comet",
+			"dmg_type": "arcane", "cost": 30, "damage": 50, "pressure": 25,
+			"delay": 3.0, "cooldown": 3, "anim": "attack03",
+			"perfect_id": "", "perfect_text": "",
+			"description": "A rune-called star falls on one enemy:\n50% of Attack in arcane damage."}}
+	},
+
+	"zealotry": {
+		"name": "Rune of Zealotry", "rarity": "rare", "scope": "class:cleric", "price": 100,
+		"requires_ability": "Smite",
+		"desc": "Smite hits for +20% of Attack.",
+		"payload": {"ability": "Smite", "add": {"damage": 20}}
+	},
+	"martyr": {
+		"name": "Rune of the Martyr", "rarity": "rare", "scope": "class:cleric", "price": 75,
+		"scarred": true,
+		"desc": "Heals received are 15% stronger — but -8 Speed.",
+		"payload": {"stat": {"healing_received_mult": 0.15, "speed": -8.0}}
+	},
+	"binding_souls": {
+		"name": "Rune of Binding Souls", "rarity": "epic", "scope": "class:cleric", "price": 160,
+		"desc": "Grants SACRED RESOLVE: bind the party's souls, splitting all damage taken for 3 turns.",
+		"payload": {"grant_ability": "Sacred Resolve"}
+	},
+
+	"true_flight": {
+		"name": "Rune of True Flight", "rarity": "rare", "scope": "class:hunter", "price": 100,
+		"requires_ability": "Quick Shot",
+		"desc": "Quick Shot hits for +8% of Attack.",
+		"payload": {"ability": "Quick Shot", "add": {"damage": 8}}
+	},
+	"wolfs_hunger": {
+		"name": "Rune of the Wolf's Hunger", "rarity": "rare", "scope": "class:hunter", "price": 75,
+		"scarred": true,
+		"desc": "+12% damage dealt — but -8% armor.",
+		"payload": {"stat": {"dmg_bonus": 0.12, "armor": -0.08}}
+	},
+	"hoarfrost_points": {
+		"name": "Rune of Hoarfrost Points", "rarity": "epic", "scope": "class:hunter", "price": 160,
+		"requires_ability": "Quick Shot",
+		"desc": "Quick Shot flies frost-tipped: FROST damage, +5% of Attack.",
+		"payload": {"ability": "Quick Shot", "set": {"dmg_type": "frost"}, "add": {"damage": 5}}
+	},
+
+	"exsanguination": {
+		"name": "Rune of Exsanguination", "rarity": "epic", "scope": "spec:berserker",
+		"price": 120, "scarred": true, "lane": "Bloodletting",
+		"desc": "Enemies bleed out at 85 buildup — but the bleedout tears only 15% of max health.",
+		"payload": {"stat": {"blood_pact": -15}}
+	},
+	"boiling_blood": {
+		"name": "Rune of Boiling Blood", "rarity": "rare", "scope": "spec:berserker",
+		"price": 100, "lane": "Fury",
+		"desc": "Blood Frenzy grants +0.5% more damage for every 5% of health missing.",
+		"payload": {"stat": {"bloodrage_step_bonus": 0.5}}
+	},
+	"warpath": {
+		"name": "Rune of the Warpath", "rarity": "rare", "scope": "spec:berserker",
+		"price": 100, "lane": "Warpath",
+		"requires_ability": "Hack and Slash",
+		"desc": "Hack and Slash costs 5 less Rage and builds +5 Bleed per cut.",
+		"payload": {"ability": "Hack and Slash", "add": {"cost": -5, "bleed_build": 5}}
+	},
+	"broad_path": {
+		"name": "Rune of the Broad Path", "rarity": "rare", "scope": "spec:berserker",
+		"price": 100,
+		"desc": "A little of every road: +5 Bleed on bleed-building blows, Blood Frenzy +0.25%/step, +15 max health.",
+		"payload": {"stat": {"bleed_bonus": 5, "bloodrage_step_bonus": 0.25, "max_hp": 15}}
+	},
+
+	"bared_guard": {
+		"name": "Rune of the Bared Guard", "rarity": "rare", "scope": "spec:swordmaster",
+		"price": 75, "scarred": true, "lane": "Blade",
+		"desc": "Aggressive Stance deals +10% more — but Defensive Stance no longer reduces damage taken.",
+		"payload": {"stat": {"seasoned_off_bonus": 0.1, "seasoned_def_bonus": -0.15}}
+	},
+	"still_wrist": {
+		"name": "Rune of the Still Wrist", "rarity": "rare", "scope": "spec:swordmaster",
+		"price": 100, "lane": "Poise",
+		"desc": "+4% Parry; a perfect Pommel Strike's parry blessing is 5% stronger.",
+		"payload": {"stat": {"parry_bonus": 0.04, "pommel_parry_bonus": 0.05}}
+	},
+	"shattered_guard": {
+		"name": "Rune of the Shattered Guard", "rarity": "rare", "scope": "spec:swordmaster",
+		"price": 100, "lane": "Breaker",
+		"desc": "+25% Break damage on every blow.",
+		"payload": {"stat": {"rune_bd_bonus": 0.25}}
+	},
+	"duelist": {
+		"name": "Rune of the Duelist", "rarity": "rare", "scope": "spec:swordmaster",
+		"price": 100,
+		"desc": "A little of every art: +3% crit, +3% Parry, +10% Break damage.",
+		"payload": {"stat": {"crit_bonus": 0.03, "parry_bonus": 0.03, "rune_bd_bonus": 0.1}}
+	},
+
+	"iron_promise": {
+		"name": "Rune of the Iron Promise", "rarity": "rare", "scope": "spec:warden",
+		"price": 75, "scarred": true, "lane": "Plate",
+		"desc": "+10% Block chance — but -10 Speed.",
+		"payload": {"stat": {"block_chance": 0.1, "speed": -10.0}}
+	},
+	"grudges": {
+		"name": "Rune of Grudges", "rarity": "rare", "scope": "spec:warden",
+		"price": 100, "lane": "Threat",
+		"desc": "+6% damage against enemies held by his taunt (stacks with the Grudge talent).",
+		"payload": {"stat": {"grudge_ranks": 1}}
+	},
+	"standard": {
+		"name": "Rune of the Standard", "rarity": "rare", "scope": "spec:warden",
+		"price": 100, "lane": "Banner",
+		"desc": "Allies take 3% less damage while he stands above half health (stacks with Shared Vigil).",
+		"payload": {"stat": {"shared_vigil_ranks": 1}}
+	},
+	"sentinel": {
+		"name": "Rune of the Sentinel", "rarity": "rare", "scope": "spec:warden",
+		"price": 100,
+		"desc": "A little of every duty: +4% Block, +4% max health, +10% Break damage.",
+		"payload": {"stat": {"block_chance": 0.04, "max_hp_pct": 0.04, "rune_bd_bonus": 0.1}}
+	}
+}

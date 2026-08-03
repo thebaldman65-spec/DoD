@@ -153,7 +153,56 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - Screens: main_menu → draft (pick 4 + relics) → spec_choice (permanent) →
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
-## Current systems snapshot (2026-08-01)
+## Current systems snapshot (2026-08-02)
+BATCH X (08-02) — RUNES BECOME A BUILD SYSTEM. Slots grow with the run:
+Run.rune_slots() = 2 + zone_idx, NO cap (4th zone = 5), every old
+hardcoded 2 routed through it (party equip cap+header, run_sim elite
+auto-equip + shop free-slot check); zone-victory text announces the new
+slot; no save field (derives from zone_idx). Party-screen rune rows now
+a ScrollContainer (old code silently hid rows past 4). POOL:
+scripts/runes.gd wraps data/runes.json (Enemies/Events pattern) — 26
+authored: 5 universal, 3×4 class, 12 warrior-spec (one per talent lane
++ a splash-payer per spec; entries carry "lane" for the bot). RARITY =
+KIND (common stat sticks incl. the 6 old TEMPLATES as filler+exhaustion
+floor / rare ability-alter or talent-like / epic grant-ability,
+type-change, rule-invert), weights per zone slot 60/30/10→40/40/20→
+25/45/30 formulaic past 3 (Runes.rarity_weights). SCARRED = flag on
+rare/epic, own prefix "Scarred"+crimson, payload MUST carry a negative
+term, priced BELOW clean peer. ELIGIBILITY (load-bearing): scope
+universal|class:<key>|spec:<id>; ability payloads carry
+requires_ability checked vs Runes.kit_names (core + spec_abilities +
+apply_kit_overrides renames + bm_abilities trophies) — apply_payload
+matches display_name, an unowned name is a SILENT DUD. Exhausted pool
+widens rarity then falls to the Common family — offers never empty.
+JSON ints restored on load (Runes.STAT_INT_KEYS/_ranks suffix/
+AB_INT_KEYS — the Ability.make typed-set gotcha). generate_rune now
+takes the MEMBER dict; returns {} when off. 4 NEW cfg fields (cap was
+4), each ONE battle.gd read site + "Rune:" log: blood_pact (neg shift:
+enemy bleedout at 100+pact for 15%, _add_bleed_with_burst — scans for
+negatives itself, _living_hero_with wants >0), rune_lifesteal (strike
+loop by ab.lifesteal), rune_execute_bonus (<35% HP, raw block by
+Grudge), rune_bd_bonus (pr block after Broken Will). ELITE PICK-OF-3:
+Run.roll_rune_candidates at drop time → member rune_candidates (queue
+of triples) + rune_picks_owed (bm_picks_owed mirror), saved with the
+party dict, resolved on the Party screen via the trophy-picker pattern
+(auto-equips while a slot is free); sim policy build-lane→spec→first
+(_pick_rune_candidate). DOD_SIM_RUNES=full(def)|stats(old generator)|
+off(none anywhere) — printed in the run-report policy header. MEASURED
+(route=default, economy on, n=50/row): control sweep at off reproduces
+W (100/100/98/96, Cryo 49/42/40/37); off 4% / stats 2% / full 6%
+completions, ratio@z1t8 0.94-0.98 — the pool at CURRENT authored power
+does not move completions beyond noise; z2 t7 ratio 0.73→0.85 under
+full but the z2/z3 collapse survives; shares flat (Berserker 28% all
+rows). NEXT LEVER = authored rune power (data edit, not machinery).
+ARTEFACT WARNINGS: (1) only the Warrior has spec runes — any
+Warrior-favouring share shift is pool depth, never tune on it; (2) the
+rotated twelve-spec table only compares to Batch W at
+DOD_SIM_RUNES=off. Batch V's 14% row does NOT reproduce on this build
+even at off (W's stalemate guard sits between) — never compare rows
+across batches. Scratchpad test_runes.gd (920 checks) +
+test_rune_battle.gd (live log proof: "+30 Bleed" altered H&S, scarred
+"bleedout at 85"). Mage/Cleric/Hunter spec rune sets = one batch per
+class, next.
 BATCH W (08-01) — THE OUTLIER PASS, MEASURE-FIRST. Every prior sim ran
 the SAME four specs, so 8 of 12 had never been measured and the cited
 "worst outlier" (Sharpshooter 38%) predated half the roster's rework.
@@ -976,5 +1025,6 @@ Space or left click; no announcer text (combat log only).
 - Menu background image not yet in imported files (fallback: forest art).
 - Distinct Mage/Cleric/Hunter sprites awaited from user.
 - Boss tri-choice class modifiers deferred (design doc) until 3+ zones.
-- Full rune loot table pending; relic pool needs growth (5 now).
+- Spec rune sets for Mage/Cleric/Hunter pending (one batch per class;
+  Warrior shipped as the Batch X pilot).
 - Sim bot wins ~90%+ with 4 heroes; real difficulty tuning by user playtest.

@@ -46,7 +46,10 @@
 #   Events                   take the first valid choice; the report
 #                            counts which events fired.
 #   Relics (DOD_SIM_RELICS)  armed at the draft; none by default.
-#   Elite rune spoils        auto-equip while a slot (max 2) is free.
+#   Elite rune spoils        pick-of-3 resolved instantly: build-lane
+#                            match first, then spec-scoped, else the
+#                            first candidate; auto-equip while a slot
+#                            (Run.rune_slots: 2/3/4 by zone) is free.
 #
 # NEVER PERSISTS: Run.sim_run gates save_run/clear_save, and this file
 # never calls Relics.unlock_random or any Profile hook — a simulated run
@@ -285,7 +288,7 @@ static func _shop_visit(run: Node) -> void:
 
 
 # One rune per party member, dupes re-rolled (shop_screen._roll_offers),
-# minus members with both slots worn — the sim never holds a rune it
+# minus members with every slot worn — the sim never holds a rune it
 # cannot equip.
 static func _roll_rune_offers(run: Node) -> Array:
 	var offers: Array = []
@@ -297,13 +300,15 @@ static func _roll_rune_offers(run: Node) -> Array:
 			owned_names.append(r["name"])
 			if r.get("equipped", false):
 				worn += 1
-		if worn >= 2:
+		if worn >= run.rune_slots():
 			continue
-		var rune: Dictionary = run.generate_rune(member["key"])
+		var rune: Dictionary = run.generate_rune(member)
+		if rune.is_empty():
+			continue  # DOD_SIM_RUNES=off — no rune offers at all
 		for attempt in 4:
 			if not owned_names.has(rune["name"]):
 				break
-			rune = run.generate_rune(member["key"])
+			rune = run.generate_rune(member)
 		if not owned_names.has(rune["name"]):
 			offers.append({"member_idx": i, "rune": rune})
 	return offers
@@ -388,14 +393,21 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 	run.award_gold(node_type)
 	if node_type == "elite":
 		var looter: Dictionary = run.party.pick_random()
-		var rune: Dictionary = run.generate_rune(looter["key"])
-		# Policy: spoils auto-equip while one of the 2 slots is free.
-		var worn := 0
-		for r in looter.get("runes", []):
-			if r.get("equipped", false):
-				worn += 1
-		rune["equipped"] = worn < 2
-		looter["runes"] = looter.get("runes", []) + [rune]
+		# Pick-of-3 (Batch X), resolved instantly by bot policy — dumb and
+		# printed in the report header: prefer a candidate whose lane
+		# matches the spec's DOD_SIM_BUILDS target lane, then any
+		# spec-scoped candidate, else the first. Auto-equip while a slot
+		# (Run.rune_slots) is free. Empty = DOD_SIM_RUNES=off — the elite
+		# still drops its item.
+		var candidates: Array = run.roll_rune_candidates(looter)
+		if not candidates.is_empty():
+			var rune: Dictionary = _pick_rune_candidate(looter, candidates)
+			var worn := 0
+			for r in looter.get("runes", []):
+				if r.get("equipped", false):
+					worn += 1
+			rune["equipped"] = worn < run.rune_slots()
+			looter["runes"] = looter.get("runes", []) + [rune]
 		var drop_id: String = run.random_loot()
 		run.items[drop_id] = int(run.items.get(drop_id, 0)) + 1
 		for extra_i in int(run.relic_add("loot_extra")):
@@ -511,6 +523,22 @@ static func _target_lane(spec: String, tree: Array) -> String:
 	return String(tree[0].get("lane", ""))
 
 
+# Elite pick-of-3 policy: the candidate whose lane matches the build's
+# target lane, else any spec-scoped candidate, else the first.
+static func _pick_rune_candidate(member: Dictionary, candidates: Array) -> Dictionary:
+	var spec := String(member.get("spec", ""))
+	var tree: Array = member.get("tree", [])
+	var target := _target_lane(spec, tree) if not tree.is_empty() else ""
+	if target != "":
+		for c in candidates:
+			if String(c.get("lane", "")) == target:
+				return c
+	for c in candidates:
+		if String(c.get("scope", "")) == "spec:%s" % spec:
+			return c
+	return candidates[0]
+
+
 # The next node the policy buys: the target lane's capstone the moment its
 # gate opens, else the cheapest learnable node in the target lane (ties go
 # to the lower tier), else spillover into the other lanes in tree order.
@@ -576,8 +604,13 @@ static func _print_report(battle) -> void:
 	print("          items=%s builds=%s relics=%s" % [items_desc,
 		builds_env if builds_env != "" else "default(first lane)",
 		relics_env if relics_env != "" else "none"])
-	print("          trophies=%s runes=auto-equip(2 slots) events=first-valid" % [
+	print("          trophies=%s runes=elite-pick(lane>spec>first)+auto-equip(2/3/4 slots) events=first-valid" % [
 		troph if troph != "" else "first-in-pool"])
+	# Mirrors Run.runes_mode() without touching the autoload (RunSim reads
+	# no autoloads — the injection discipline).
+	var runes_env := OS.get_environment("DOD_SIM_RUNES")
+	var runes_mode := runes_env if runes_env in ["off", "stats"] else "full"
+	print("          runes_pool=%s (DOD_SIM_RUNES: full=authored pool, stats=Common family, off=none)" % runes_mode)
 	var specs_desc := OS.get_environment("DOD_SIM_SPECS")
 	if OS.get_environment("DOD_SIM_ROTATE") == "1":
 		specs_desc = "rotating all twelve (DOD_SIM_ROTATE=1)"

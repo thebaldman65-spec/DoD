@@ -24,14 +24,18 @@ func _roll_offers() -> void:
 	offers = []
 	for i in Run.party.size():
 		var member: Dictionary = Run.party[i]
-		var rune: Dictionary = Run.generate_rune(member["key"])
+		# The member dict (Batch X): eligibility reads spec, trophies, and
+		# the owned pouch. Empty = runes off (DOD_SIM_RUNES) — no offer.
+		var rune: Dictionary = Run.generate_rune(member)
+		if rune.is_empty():
+			continue
 		var owned_names: Array = []
 		for owned in member.get("runes", []):
 			owned_names.append(owned["name"])
 		for attempt in 4:
 			if not owned_names.has(rune["name"]):
 				break
-			rune = Run.generate_rune(member["key"])
+			rune = Run.generate_rune(member)
 		if not owned_names.has(rune["name"]):
 			offers.append({"member_idx": i, "rune": rune})
 
