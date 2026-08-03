@@ -5,6 +5,84 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-03 — Batch Y: the map node economy (alpha-scoped)</h2>
+<ul>
+<li><b>Why:</b> the map was documented as a route-planning surface, but two generation
+rules made that aspirational. The 70% adjacent-link roll left <b>53% of nodes reaching
+exactly one node</b> (measured — worse than the 30% the rule implies, because an edge
+column could roll its adjacent out of range and get nothing), and the 30-card deal was
+blind to position: nothing guaranteed a rest in the back half, a shop before the boss, or
+an elite near your path. Measured before any change (route=default, economy on, n=50):
+<b>1.58 reachable nodes per step, a real choice on 34% of steps</b> (≥2 reachable AND not
+all one type), rests ever-reachable 4.3 of 9.0 dealt. The player was walking, not routing.
+This batch targets a <b>rough playable alpha</b> — legibility and agency are the
+deliverables; difficulty stays deliberately unsettled (Batch T owns the numbers, and the
+designer closed difficulty pending human playtesters).</li>
+
+<li><b>Instrumentation first (stage 0):</b> the run report gained a <b>route agency</b>
+block — reachable nodes per step, % of steps offering a real choice, taken-vs-offered per
+node type, and dealt-vs-ever-reachable per type — and the pre-change baseline above was
+recorded before a single generation rule moved. The Matrix row line now carries
+<code>map=</code>, <code>diff=</code> and <code>choice=</code> fields.</li>
+
+<li><b>Links (stage 1):</b> every node now links to its own column <b>plus at least one
+adjacent column, guaranteed</b>; a middle column links to both neighbours 25% of the time.
+The inbound-path guarantee is unchanged, and the pre-boss funnel to a single boss node
+stays by design. The old generator is preserved verbatim behind <b>DOD_SIM_MAP=old</b> —
+every pre-Y baseline row (including DOD_SIM_ROUTE=greedy as the Batch S floor) only
+reproduces at map=old.</li>
+
+<li><b>The structured deal (stage 2):</b> the deck stays 17/5/5/3, but the deal is
+constrained — <b>no tier deals three of a kind</b>; at least one rest in tiers 2–5 AND one
+in tiers 6–10; at least one shop in tiers 7–10; and at least one elite per zone (the 25%
+roll on tiers 6+ gets a floor, applied after the roll). Every map is also guaranteed a
+single walkable route touching <b>2 rests + a shop + an elite</b>, checked by a graph walk
+at generation. Dealing is rejection sampling (bounded at 40 reshuffles) with a
+deterministic swap repair and an authored last-resort arrangement — generation can never
+fail. Measured: ~7% of maps use the swap repair; repaired maps satisfy every constraint.</li>
+
+<li><b>Validator (stage 3):</b> scratchpad <code>test_map_economy.gd</code> — 500 new maps
++ 50 old-gate maps, <b>37,710/37,710 checks</b>: composition conserved, no homogeneous
+tier, no stranded node, boss reachable from every gate node, the 2-rest/shop/elite route
+exists (independent DP, never trusting the generator's own check), zero single-link nodes
+(mean 2.09 links/node, 80% of nodes offer a typed choice), and the old gate really is the
+old corridor (53% single-link nodes reappear at map=old).</li>
+
+<li><b>Legibility (stage 4):</b> non-combat nodes answer on hover — the rest quotes its
+<b>actual heal percentage including relic bonuses</b>, the shop states its stock, and the
+"???" event says outright that what waits is unknown (mystery by design, not a blank). A
+<b>ladder readout</b> ("Tier 7 of 10 — the Withered Warden waits") replaces the static
+subtitle. The roads out of the current node <b>glow gold</b>; visited / reachable /
+unreachable nodes sit in three clearly separate reads.</li>
+
+<li><b>The Road (stage 5, ALPHA TESTING AFFORDANCE — not a balance decision):</b> the
+draft offers <b>Standard</b> (ZONE_BASE_MULTS exactly as they are) or <b>Wanderer</b>
+(enemies at 70% strength, one multiplier folded into the single
+<code>zone_base_mult</code> read site — trivially removable when difficulty is actually
+decided). Saved with the run (save v3, tolerant load). Sims arm it via
+<b>DOD_SIM_DIFFICULTY</b> (default standard) so no baseline row can be contaminated. It
+exists because a tester who never reaches zone 3 cannot say whether the game is fun; it
+does NOT supersede Batch T, and no other number was adjusted around it.</li>
+
+<li><b>Measured (route=default, economy on, n=50/row):</b> control at map=old reproduces
+the baseline within noise (0% completions, ratio@z1t8 0.97, choice 36%) — the batch is
+readable. New map: <b>choice rate 34% → 80%</b>, reachable/step 1.58 → 2.16, elites
+ever-reachable 1.2 → 2.2 per run, completions 0% → 4% (said in advance: completions were
+expected to rise as a consequence of agency, and the effect at standard is small). New map
++ Wanderer: <b>58% completions, wipe median z3 t5</b> — a competent tester now sees all
+three zones and the finale, which is the affordance doing exactly its job (z1 ratio 1.44 =
+z1 is easy on Wanderer, accepted for the alpha).</li>
+
+<li><b>Honest artifact, not tuned away:</b> with real choice, the fixed bot's
+fight-first preference now binds — shops taken fell 1.6 → 0.6/run (of 5.7 offered) and
+unspent gold doubled, because <b>the old corridor was force-feeding the bot the economy</b>
+(shops used to be the only reachable node). The agency numbers are the deliverable; the
+bot's spending habits are a policy artifact a human player will not share.</li>
+
+<li><b>Saves:</b> a pre-Y save keeps its old map and old deal — correct, never migrated;
+nothing at runtime assumes the new guarantees hold on a loaded map.</li>
+</ul>
+
 <h2>2026-08-02 — Batch X: runes become a build system</h2>
 <ul>
 <li><b>Why:</b> every prior batch measured the same wall — zone 1 roughly right, runs die

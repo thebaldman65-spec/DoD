@@ -111,9 +111,11 @@ func relic_dict(hook: String) -> Dictionary:
 	return Relics.hook_dict(active_relics, hook)
 
 
-func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []) -> void:
+func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = [],
+		diff := "standard") -> void:
 	active = true
 	specs_chosen = false
+	difficulty = diff if DIFFICULTY_MULTS.has(diff) else "standard"
 	active_relics = relics.slice(0, 3)
 	clear_save()
 	party = []
@@ -139,7 +141,43 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	_generate_map()
 
 
+# Map generation mode (Batch Y): "new" = guaranteed-adjacent links + the
+# structured deal below. DOD_SIM_MAP=old keeps the pre-Y generator (70%
+# link roll, blind deal) so every pre-Y baseline row stays reproducible —
+# DOD_SIM_ROUTE=greedy reproduces the Batch S floor ONLY at DOD_SIM_MAP=old.
+func map_mode() -> String:
+	return "old" if OS.get_environment("DOD_SIM_MAP") == "old" else "new"
+
+
+# Validator counters (Batch Y), cumulative across every map this session:
+# deal reshuffles, decks that needed the swap repair, and links the route
+# guarantee had to add. A high repair rate means the deal constraints are
+# over-tight and want loosening, not more retries.
+var map_deal_retries := 0
+var map_deal_repairs := 0
+var map_route_links_added := 0
+
+
 func _generate_map() -> void:
+	if map_mode() == "old":
+		_generate_map_old()
+	else:
+		_generate_map_new()
+	# Warbands are pre-rolled at map birth: every combat node carries its
+	# enemies + theme, so the map can show what resists what BEFORE the
+	# player commits (scouting resists is counterplay, not a spoiler).
+	# The click handler still composes on the spot for pre-change saves.
+	for f in FLOORS:
+		for node in map[f]:
+			if node["type"] in ["fight", "elite", "boss"]:
+				node["enemies"] = compose(node["type"], f + 1)
+				node["theme"] = last_theme
+
+
+# The pre-Batch-Y generator, kept verbatim behind DOD_SIM_MAP=old: the
+# blind 30-card deal and the 70% adjacent-link roll (30% of nodes reached
+# exactly one node — the corridor Batch Y exists to remove).
+func _generate_map_old() -> void:
 	# Shuffle a fixed deck of 30 node types, deal 3 per tier, boss on top.
 	var deck: Array = []
 	for i in FIGHT_NODES:
@@ -185,25 +223,247 @@ func _generate_map() -> void:
 				if extra >= 0 and extra < b and not links.has(extra):
 					links.append(extra)
 			map[f][i]["links"] = links
-		# Every next-floor node needs at least one inbound path.
-		for j in b:
-			var has_inbound := false
-			for i in a:
-				if map[f][i]["links"].has(j):
-					has_inbound = true
-					break
-			if not has_inbound:
-				var nearest := 0 if b == 1 else int(round(j * float(a - 1) / float(maxi(b - 1, 1))))
-				map[f][nearest]["links"].append(j)
-	# Warbands are pre-rolled at map birth: every combat node carries its
-	# enemies + theme, so the map can show what resists what BEFORE the
-	# player commits (scouting resists is counterplay, not a spoiler).
-	# The click handler still composes on the spot for pre-change saves.
-	for f in FLOORS:
+		_guarantee_inbound(f)
+
+
+# Batch Y generation: the deck stays 17/5/5/3 but the deal is structured
+# (no three-of-a-kind tier, recovery spread across both halves, a shop in
+# the boss run-up), every node keeps a real choice ahead, at least one
+# elite sits on the board, and a single legal route can always touch
+# 2 rests + a shop + an elite.
+func _generate_map_new() -> void:
+	var deck := _deal_deck()
+	map = []
+	for f in FLOORS - 1:
+		var row: Array = []
+		for i in NODES_PER_TIER:
+			var kind: String = deck[f * NODES_PER_TIER + i]
+			# Deeper fights can spawn as elites (still fights, tougher + richer).
+			if kind == "fight" and f >= 5 and randf() < 0.25:
+				kind = "elite"
+			row.append({"type": kind, "links": [], "visited": false})
+		map.append(row)
+	map.append([{"type": "boss", "links": [], "visited": false}])
+	# Elite floor: elites still roll at 25% on tiers 6+, but a zone whose
+	# rolls all came up empty silently removes the snowball engine and the
+	# rune-cache source — upgrade one deep fight when that happens.
+	var has_elite := false
+	for f in FLOORS - 1:
 		for node in map[f]:
-			if node["type"] in ["fight", "elite", "boss"]:
-				node["enemies"] = compose(node["type"], f + 1)
-				node["theme"] = last_theme
+			if String(node["type"]) == "elite":
+				has_elite = true
+	if not has_elite:
+		var deep_fights: Array = []  # [floor, idx] on tiers 6+
+		for f in range(5, FLOORS - 1):
+			for i in map[f].size():
+				if String(map[f][i]["type"]) == "fight":
+					deep_fights.append([f, i])
+		if not deep_fights.is_empty():
+			var pick: Array = deep_fights.pick_random()
+			map[pick[0]][pick[1]]["type"] = "elite"
+	# Links: own column plus AT LEAST one adjacent, guaranteed (the 70%
+	# roll is gone — it made 30% of nodes a corridor). A middle column
+	# with two neighbours links to both 25% of the time. The boss tier
+	# still collapses to a single node: the pre-boss funnel is correct
+	# and stays.
+	for f in FLOORS - 1:
+		var a: int = map[f].size()
+		var b: int = map[f + 1].size()
+		for i in a:
+			var base := 0 if a == 1 else int(round(i * float(b - 1) / float(maxi(a - 1, 1))))
+			var links: Array = [base]
+			var adjacents: Array = []
+			for extra in [base - 1, base + 1]:
+				if extra >= 0 and extra < b:
+					adjacents.append(extra)
+			if not adjacents.is_empty():
+				adjacents.shuffle()
+				links.append(adjacents[0])
+				if adjacents.size() > 1 and randf() < 0.25:
+					links.append(adjacents[1])
+			links.sort()
+			map[f][i]["links"] = links
+		_guarantee_inbound(f)
+	_ensure_key_route()
+
+
+# Every next-floor node needs at least one inbound path (shared by both
+# generators, kept exactly as the pre-Y pass).
+func _guarantee_inbound(f: int) -> void:
+	var a: int = map[f].size()
+	var b: int = map[f + 1].size()
+	for j in b:
+		var has_inbound := false
+		for i in a:
+			if map[f][i]["links"].has(j):
+				has_inbound = true
+				break
+		if not has_inbound:
+			var nearest := 0 if b == 1 else int(round(j * float(a - 1) / float(maxi(b - 1, 1))))
+			map[f][nearest]["links"].append(j)
+
+
+# ---------- the structured deal (Batch Y) ----------
+
+# The canonical legal arrangement, used only when sampling AND the swap
+# repair both fail (the validator shows this is ~never) — generation must
+# never fail, so the floor is authored. Composition is the same 17/5/5/3.
+const DECK_FALLBACK := [
+	"fight", "fight", "shop",
+	"fight", "rest", "fight",
+	"fight", "fight", "event",
+	"fight", "shop", "fight",
+	"fight", "rest", "fight",
+	"fight", "event", "fight",
+	"fight", "shop", "rest",
+	"fight", "fight", "shop",
+	"fight", "rest", "event",
+	"shop", "rest", "fight",
+]
+
+
+# Deal by rejection sampling with a bounded retry budget, then targeted
+# swaps — never a failure, never an unbounded loop.
+func _deal_deck() -> Array:
+	var deck: Array = []
+	for i in FIGHT_NODES:
+		deck.append("fight")
+	for i in REST_NODES:
+		deck.append("rest")
+	for i in SHOP_NODES:
+		deck.append("shop")
+	for i in EVENT_NODES:
+		deck.append("event")
+	for attempt in 40:
+		deck.shuffle()
+		if _deck_violations(deck) == 0:
+			return deck
+		map_deal_retries += 1
+	_repair_deck(deck)
+	map_deal_repairs += 1
+	return deck
+
+
+# The stage-2 constraints, counted so the repair can hill-climb:
+# 1. tier 1 opens with combat (the pre-Y rule, folded in);
+# 2. no tier deals three of a kind — every tier is a real choice;
+# 3. recovery is spread: a rest in tiers 2-5 AND one in tiers 6-10;
+# 4. a shop in tiers 7-10 — boss gold and deep rarity weights need a
+#    place to land.
+func _deck_violations(deck: Array) -> int:
+	var n := NODES_PER_TIER
+	var v := 0
+	if not deck.slice(0, n).has("fight"):
+		v += 1
+	for t in FLOORS - 1:
+		if String(deck[t * n]) == String(deck[t * n + 1]) \
+				and String(deck[t * n + 1]) == String(deck[t * n + 2]):
+			v += 1
+	if not deck.slice(n, 5 * n).has("rest"):
+		v += 1
+	if not deck.slice(5 * n, deck.size()).has("rest"):
+		v += 1
+	if not deck.slice(6 * n, deck.size()).has("shop"):
+		v += 1
+	return v
+
+
+# Targeted swap repair: greedily apply any single swap that strictly
+# lowers the violation count. The count is bounded and strictly falls, so
+# this terminates; if no single swap helps (never seen — belt and braces)
+# the authored fallback arrangement lands as-is.
+func _repair_deck(deck: Array) -> void:
+	var v := _deck_violations(deck)
+	while v > 0:
+		var improved := false
+		for i in deck.size():
+			if improved:
+				break
+			for j in range(i + 1, deck.size()):
+				if String(deck[i]) == String(deck[j]):
+					continue
+				var tmp: String = deck[i]
+				deck[i] = deck[j]
+				deck[j] = tmp
+				var nv := _deck_violations(deck)
+				if nv < v:
+					v = nv
+					improved = true
+					break
+				deck[j] = deck[i]
+				deck[i] = tmp
+		if not improved:
+			for i in deck.size():
+				deck[i] = DECK_FALLBACK[i]
+			return
+
+
+# ---------- the key-route guarantee (Batch Y) ----------
+
+# Stage 2's promise is only real if a single legal ROUTE can touch the
+# recovery, the shop, and the elite — nodes merely existing on the board
+# is a suggestion, not a plan. When no route satisfies everything, widen
+# the graph by adding missing adjacent links (nearest tier first) until
+# one does: link additions only ever increase choice, so this converges
+# and never degrades the map.
+func _ensure_key_route() -> void:
+	if _route_satisfied():
+		return
+	for f in FLOORS - 1:
+		var a: int = map[f].size()
+		var b: int = map[f + 1].size()
+		for i in a:
+			var base := 0 if a == 1 else int(round(i * float(b - 1) / float(maxi(a - 1, 1))))
+			for extra in [base - 1, base + 1]:
+				if extra >= 0 and extra < b and not map[f][i]["links"].has(extra):
+					map[f][i]["links"].append(extra)
+					map[f][i]["links"].sort()
+					map_route_links_added += 1
+					if _route_satisfied():
+						return
+	# Even the fully linked graph lacks a satisfying route — with rests
+	# spread across both halves this should be unreachable; the validator
+	# greps for it.
+	push_warning("map: no single route reaches 2 rests + shop + elite fully linked")
+
+
+# Requirement coverage as a bitmask: bit 0/1 = first and second rest,
+# bit 2 = shop, bit 3 = elite. 15 = a route the player could plan for.
+func _route_mask_after(kind: String, mask: int) -> int:
+	match kind:
+		"rest":
+			if mask & 1 == 0:
+				return mask | 1
+			return mask | 2
+		"shop":
+			return mask | 4
+		"elite":
+			return mask | 8
+	return mask
+
+
+# Forward DP over the link graph: per node, the set of coverage masks any
+# route from tier 1 can arrive with (at most 16 masks x 3 nodes a tier).
+func _route_satisfied() -> bool:
+	var cur := {}  # node idx on the current floor -> {mask: true}
+	for i in map[0].size():
+		var m := _route_mask_after(String(map[0][i]["type"]), 0)
+		cur[i] = {m: true}
+	for f in FLOORS - 1:
+		var next := {}
+		for i in cur:
+			for j in map[f][int(i)]["links"]:
+				var kind := String(map[f + 1][j]["type"])
+				if not next.has(j):
+					next[j] = {}
+				for m in cur[i]:
+					next[j][_route_mask_after(kind, int(m))] = true
+		cur = next
+	for i in cur:
+		for m in cur[i]:
+			if int(m) == 15:
+				return true
+	return false
 
 
 # Node indices on the next floor the player may move to.
@@ -322,12 +582,28 @@ func compose_budget(budget: int, roster := 1) -> Array:
 # is data work, never formula work.
 const ZONE_BASE_MULTS := [1.0, 1.5, 2.2]
 
+# Alpha difficulty affordance (Batch Y): a TESTING lever, not a balance
+# decision — Batch T still owns the numbers and nothing else in the game
+# bends to accommodate this. "wanderer" exists so a competent tester can
+# see all three zones and the finale; at standard numbers most alpha
+# feedback would describe one third of the content. ONE multiplier folded
+# into zone_base_mult — the single site battle spawn reads — so it is
+# trivially removable when difficulty is actually decided. Chosen at the
+# draft, saved with the run; sims arm it via DOD_SIM_DIFFICULTY (default
+# standard) so it can never contaminate a baseline row.
+const DIFFICULTY_MULTS := {"standard": 1.0, "wanderer": 0.7}
+var difficulty := "standard"
+
+
+func difficulty_mult() -> float:
+	return float(DIFFICULTY_MULTS.get(difficulty, 1.0))
+
 
 func zone_base_mult(slot: int) -> float:
 	if slot <= ZONE_BASE_MULTS.size():
-		return ZONE_BASE_MULTS[maxi(slot, 1) - 1]
+		return ZONE_BASE_MULTS[maxi(slot, 1) - 1] * difficulty_mult()
 	return ZONE_BASE_MULTS[ZONE_BASE_MULTS.size() - 1] \
-		* pow(1.5, slot - ZONE_BASE_MULTS.size())
+		* pow(1.5, slot - ZONE_BASE_MULTS.size()) * difficulty_mult()
 
 
 func battle_budget(tier := -1) -> int:
@@ -618,10 +894,14 @@ func save_run() -> void:
 	if not active or sim_run:
 		return
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
-	# v2 (Batch 38): + seen_events, zone_draw. Loading stays tolerant of
-	# older saves via .get defaults — never drop player state silently.
+	# v2 (Batch 38): + seen_events, zone_draw. v3 (Batch Y): + difficulty.
+	# Loading stays tolerant of older saves via .get defaults — never drop
+	# player state silently. NOTE: a pre-Y save also keeps its old map
+	# (70% links, blind deal) — correct, never migrated; nothing at
+	# runtime may assume the Batch Y map guarantees hold on a loaded map.
 	file.store_var({
-		"version": 2, "party": party, "items": items, "gold": gold,
+		"version": 3, "party": party, "items": items, "gold": gold,
+		"difficulty": difficulty,
 		"zone_idx": zone_idx, "zone_name": zone_name, "zone_draw": zone_draw,
 		"floor_idx": floor_idx, "seen_events": seen_events,
 		"node_idx": node_idx, "specs_chosen": specs_chosen,
@@ -678,6 +958,9 @@ func load_run() -> bool:
 	active_relics = data["active_relics"]
 	map = data["map"]
 	combat_wins = int(data.get("combat_wins", 0))
+	difficulty = String(data.get("difficulty", "standard"))
+	if not DIFFICULTY_MULTS.has(difficulty):
+		difficulty = "standard"
 	seen_events = data.get("seen_events", [])
 	pending_event = ""
 	encounter = {}

@@ -4,6 +4,54 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The map node economy (Batch Y) — 2026-08-03
+
+**Why the map came before more tuning:** the map was documented as a
+route-planning surface, but two generation rules made that aspirational.
+The 70% adjacent-link roll left most nodes reaching one or two nodes —
+measured, **53% of nodes reached exactly one** (worse than the 30% the
+rule implies, because edge columns could roll an out-of-range neighbour
+and end up with nothing). And the 30-card deal was blind to position:
+nothing guaranteed a rest in the back half, a shop before the boss, or
+an elite anywhere near your path. Measured before the change: **1.58
+reachable nodes per step and a real choice on 34% of steps**. A map
+that offers one reachable node most of the time is a corridor with
+decoration — the player is walking, not routing, and every system that
+assumes routing (rest economy, elite snowballing, shop timing) quietly
+under-delivers. That was Batch U's rest finding in different clothes:
+the deck said 5 rests per zone, the walk could reach about half.
+
+**Why constraints on the deal rather than a smarter deck:** the deck
+composition (17/5/5/3) is a tuned quantity; what failed was *placement*.
+Constraining the deal (no three-of-a-kind tier, recovery spread across
+both halves, a shop in the boss run-up, an elite floor) keeps the
+composition intact and only removes the degenerate arrangements. The
+route guarantee — one walkable route touching two rests, a shop, and an
+elite — is checked with a graph walk at generation, because nodes
+merely existing is a suggestion, not a plan.
+
+**Why this is an alpha batch, not a balance batch:** the target is a
+rough playable alpha — a build a human can sit with for a couple of
+hours and form an honest opinion about whether the game is fun.
+Legibility and agency are the deliverables; wider reachability makes
+the game easier as a side effect (more rests and shops get taken), and
+that is *reported, not compensated for* — Batch T still owns the
+difficulty numbers and the designer closed difficulty pending human
+playtesters. Same logic for the **Wanderer** road: at current numbers
+almost no runs see zone 3, so almost no honest feedback about a third
+of the game exists. Wanderer is one multiplier folded into the zone
+ladder (one number, one read site, trivially removable), labelled a
+testing affordance everywhere it appears, and defaulted off in every
+sim so no baseline row can be contaminated.
+
+**Why the tooltips say what the event does not:** rests and shops now
+state exactly what they do (the rest quotes its real heal percentage,
+relics included) because a tester's first read of the screen should be
+"these are my options." The event stays "???" on purpose — but the
+tooltip *says* it is unknown instead of staying blank, because "the
+designers didn't write this" and "this is a mystery" read identically
+as silence.
+
 ## Runes become a build system (Batch X) — 2026-08-02
 
 **Why an authored pool and not a bigger generator:** relics got a

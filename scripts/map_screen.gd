@@ -71,10 +71,17 @@ func _draw_screen() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
+	# The ladder readout (Batch Y): a tester should never count rows to
+	# know how far in they are — or what waits at the top.
+	var boss_name: String = Enemies.unit_name(Run.boss_kind())
 	var subtitle := Label.new()
-	subtitle.text = "Choose your path through the Decay"
+	if Run.floor_idx < 0:
+		subtitle.text = "10 tiers stand between you and the %s" % boss_name
+	else:
+		subtitle.text = "Tier %d of 10 — the %s waits" % [
+			mini(Run.floor_idx + 1, 10), boss_name]
 	subtitle.add_theme_font_size_override("font_size", 15)
-	subtitle.add_theme_color_override("font_color", Color(0.6, 0.55, 0.5))
+	subtitle.add_theme_color_override("font_color", Color(0.72, 0.64, 0.52))
 	subtitle.position = Vector2(0, 62)
 	subtitle.size = Vector2(1280, 20)
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -147,15 +154,19 @@ func _draw_screen() -> void:
 		popup.set_item_disabled(i, true)  # display only; items are used in battle
 	add_child(inv)
 
-	# Path lines first so nodes draw over them.
+	# Path lines first so nodes draw over them. The roads out of the
+	# party's current node glow — "these are my options" should be the
+	# first read of the screen, not a deduction.
 	for f in Run.FLOORS - 1:
 		for i in Run.map[f].size():
+			var from_here: bool = f == Run.floor_idx and i == Run.node_idx
 			for j in Run.map[f][i]["links"]:
 				var line := Line2D.new()
 				line.add_point(_node_pos(f, i))
 				line.add_point(_node_pos(f + 1, j))
-				line.width = 3.0
-				line.default_color = Color(0.35, 0.3, 0.4, 0.6)
+				line.width = 5.0 if from_here else 3.0
+				line.default_color = Color(0.85, 0.72, 0.35, 0.9) if from_here \
+					else Color(0.32, 0.28, 0.38, 0.5)
 				add_child(line)
 
 	var next_floor := Run.floor_idx + 1
@@ -169,19 +180,36 @@ func _draw_screen() -> void:
 			btn.position = _node_pos(f, i) - Vector2(46, 18)
 			var is_reachable: bool = f == next_floor and reachable.has(i)
 			btn.disabled = not is_reachable
+			# Three states, three clearly separate reads (Batch Y): visited
+			# is history (dim green), reachable is an option (full node
+			# colour, bigger), everything else recedes into the dark.
 			if node["visited"]:
-				btn.modulate = Color(0.55, 0.75, 0.55)
+				btn.modulate = Color(0.48, 0.66, 0.48)
 			elif is_reachable:
 				btn.modulate = NODE_COLORS[node["type"]]
 				btn.add_theme_font_size_override("font_size", 17)
 			else:
-				btn.modulate = Color(0.55, 0.52, 0.6)
+				btn.modulate = Color(0.42, 0.40, 0.47)
 			btn.pressed.connect(Music.click)
 			btn.pressed.connect(_on_node_pressed.bind(f, i))
 			# Scouting hover: combat nodes reveal their warband and what it
-			# resists / crumples to, so routing and talent picks can answer.
+			# resists / crumples to; non-combat nodes state what they do
+			# (Batch Y) — the event alone stays a deliberate mystery, and
+			# says so instead of saying nothing.
 			if node.has("enemies"):
 				btn.tooltip_text = _warband_tooltip(node)
+			else:
+				match String(node["type"]):
+					"rest":
+						btn.tooltip_text = ("Waystone: the party rests, " +
+							"recovering %d%% HP and Mana.") % int(round(
+							(0.3 + Run.relic_add("rest_heal_add")) * 100))
+					"shop":
+						btn.tooltip_text = ("The Peddler: consumables, and " +
+							"a rune offer for each hero.")
+					"event":
+						btn.tooltip_text = ("No scout returns with the same " +
+							"story. What waits here is unknown.")
 			add_child(btn)
 
 

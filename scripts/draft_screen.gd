@@ -11,6 +11,7 @@ const CLASS_TINTS := {
 
 var picks: Array = []         # selection order = battle position
 var relic_picks: Array = []   # up to 3 relic ids
+var difficulty := "standard"  # alpha affordance (Batch Y) — see run_state
 
 
 func _ready() -> void:
@@ -124,6 +125,35 @@ func _draw_screen() -> void:
 		rbtn.pressed.connect(_toggle_relic.bind(id))
 		grid.add_child(rbtn)
 
+	# The road chosen at the draft (Batch Y, alpha testing affordance):
+	# Wanderer softens the zone multipliers so a tester can see the whole
+	# game — it is not a balance statement and touches no other number.
+	var diff_label := Label.new()
+	diff_label.text = "THE ROAD"
+	diff_label.add_theme_font_size_override("font_size", 13)
+	diff_label.add_theme_color_override("font_color", Color(0.6, 0.55, 0.5))
+	diff_label.position = Vector2(60, 626)
+	diff_label.size = Vector2(320, 18)
+	add_child(diff_label)
+	var diff_info := {
+		"standard": ["Standard", "The Decay at full strength — the game as designed."],
+		"wanderer": ["Wanderer", "A gentler road: enemies at 70% strength, so you can " +
+			"see every zone. A testing aid while difficulty is tuned."],
+	}
+	var dx := 60
+	for key in ["standard", "wanderer"]:
+		var dbtn := Button.new()
+		dbtn.text = ("[*] " if difficulty == key else "") + diff_info[key][0]
+		dbtn.tooltip_text = diff_info[key][1]
+		dbtn.custom_minimum_size = Vector2(150, 44)
+		dbtn.position = Vector2(dx, 646)
+		if difficulty == key:
+			dbtn.modulate = Color(1.0, 0.9, 0.5)
+		dbtn.pressed.connect(Music.click)
+		dbtn.pressed.connect(_set_difficulty.bind(key))
+		add_child(dbtn)
+		dx += 160
+
 	var start := Button.new()
 	start.text = "Begin the Run"
 	start.custom_minimum_size = Vector2(260, 56)
@@ -157,6 +187,11 @@ func _toggle_relic(id: String) -> void:
 	_draw_screen()
 
 
+func _set_difficulty(key: String) -> void:
+	difficulty = key
+	_draw_screen()
+
+
 func _start_run() -> void:
-	Run.new_run(picks.duplicate(), relic_picks.duplicate())
+	Run.new_run(picks.duplicate(), relic_picks.duplicate(), difficulty)
 	get_tree().change_scene_to_file("res://scenes/spec_choice.tscn")

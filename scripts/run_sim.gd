@@ -90,6 +90,20 @@ static var _run_gold_spent := 0   # gold paid this run (shop policy only)
 static var _cur_tier := ""        # tier key of the battle in flight
 static var _deaths_before := 0.0  # sim_stats hero_deaths before this battle
 static var spec_runs := {}        # Batch W: spec display name -> runs sampled
+# Route agency (Batch Y): is the map a route-planning surface or a corridor?
+# Counted at every PICK STEP of the walk (the gate pick, each tier, the boss
+# funnel) — a step "offers a real choice" only when >=2 nodes are reachable
+# AND they are not all the same type. Deck-vs-seen is the "the deck says 15
+# rests, the player could reach 5" line: dealt = nodes in the zone maps as
+# generated; seen = nodes that were reachable at some step of the taken path.
+static var walk_steps := 0        # pick steps across all runs
+static var reach_sum := 0         # reachable nodes summed over those steps
+static var choice_steps := 0      # steps with a real choice (count + type)
+static var type_offered := {}     # type -> steps where one was reachable
+static var type_taken := {}       # type -> nodes actually entered
+static var deck_present := {}     # type -> nodes dealt into zone maps
+static var deck_seen := {}        # type -> nodes ever reachable on the walk
+static var _seen_nodes := {}      # "f,i" once-guard, reset per zone map
 
 
 static func begin(run: Node, n: int) -> void:
@@ -117,7 +131,12 @@ static func start_run(run: Node) -> void:
 	var relics: Array = []
 	if OS.get_environment("DOD_SIM_RELICS") != "":
 		relics = Array(OS.get_environment("DOD_SIM_RELICS").split(","))
-	run.new_run(["warrior", "mage", "cleric", "hunter"], relics)
+	# Alpha difficulty affordance (Batch Y): default standard, so no
+	# baseline row can be contaminated by a forgotten env var.
+	var diff := OS.get_environment("DOD_SIM_DIFFICULTY")
+	if not diff in ["standard", "wanderer"]:
+		diff = "standard"
+	run.new_run(["warrior", "mage", "cleric", "hunter"], relics, diff)
 	var default_specs := ["berserker", "cryomancer", "inquisitor", "beastmaster"]
 	var specs := default_specs
 	var env := OS.get_environment("DOD_SIM_SPECS")
@@ -151,9 +170,28 @@ static func walk_to_next_fight(run: Node) -> bool:
 		var reach: Array = run.reachable()
 		if reach.is_empty():
 			return false
+		if run.floor_idx < 0:
+			_tally_map(run)  # fresh zone map: book its dealt composition
 		var f: int = run.floor_idx + 1
+		# Route agency (Batch Y): what this step offered, before the pick.
+		walk_steps += 1
+		reach_sum += reach.size()
+		var reach_types := {}
+		for r in reach:
+			var ty := String(run.map[f][r]["type"])
+			reach_types[ty] = true
+			var seen_key := "%d,%d" % [f, r]
+			if not _seen_nodes.has(seen_key):
+				_seen_nodes[seen_key] = true
+				deck_seen[ty] = int(deck_seen.get(ty, 0)) + 1
+		if reach.size() >= 2 and reach_types.size() >= 2:
+			choice_steps += 1
+		for ty in reach_types:
+			type_offered[ty] = int(type_offered.get(ty, 0)) + 1
 		var idx := _pick_node(run, f, reach)
 		var node: Dictionary = run.map[f][idx]
+		type_taken[String(node["type"])] = \
+			int(type_taken.get(String(node["type"]), 0)) + 1
 		run.advance(f, idx)
 		match String(node["type"]):
 			"fight", "elite", "boss":
@@ -213,6 +251,17 @@ static func _pick_node(run: Node, f: int, reach: Array) -> int:
 					rest_taken += 1
 				return i
 	return reach[0]
+
+
+# Book a freshly generated zone map: what the deal actually put on the
+# board (elites counted as their own type — they are the rune-cache
+# source), and reset the per-map seen-guard for the ever-reachable count.
+static func _tally_map(run: Node) -> void:
+	_seen_nodes = {}
+	for f in run.map.size():
+		for node in run.map[f]:
+			var ty := String(node["type"])
+			deck_present[ty] = int(deck_present.get(ty, 0)) + 1
 
 
 static func _avg_hp(run: Node) -> float:
@@ -611,6 +660,12 @@ static func _print_report(battle) -> void:
 	var runes_env := OS.get_environment("DOD_SIM_RUNES")
 	var runes_mode := runes_env if runes_env in ["off", "stats"] else "full"
 	print("          runes_pool=%s (DOD_SIM_RUNES: full=authored pool, stats=Common family, off=none)" % runes_mode)
+	var map_mode := "old" if OS.get_environment("DOD_SIM_MAP") == "old" else "new"
+	var diff := OS.get_environment("DOD_SIM_DIFFICULTY")
+	if not diff in ["standard", "wanderer"]:
+		diff = "standard"
+	print("          map=%s (DOD_SIM_MAP=old reproduces the pre-Y links+deal)  difficulty=%s (DOD_SIM_DIFFICULTY; alpha testing affordance, NOT balance)" % [
+		map_mode, diff])
 	var specs_desc := OS.get_environment("DOD_SIM_SPECS")
 	if OS.get_environment("DOD_SIM_ROTATE") == "1":
 		specs_desc = "rotating all twelve (DOD_SIM_ROTATE=1)"
@@ -710,6 +765,25 @@ static func _print_report(battle) -> void:
 	print("Rests taken: %.1f/run   (nodes offered: %.1f/run)" % [
 		rest_taken / runs, rest_offered / runs])
 
+	# Route agency (Batch Y): the batch's headline pair is choice rate
+	# before vs after the link/deal rework — completions are a consequence.
+	var steps := maxf(float(walk_steps), 1.0)
+	print("\nRoute agency:")
+	print("  Reachable nodes per step: %.2f    steps offering a real choice: %.0f%% (%d of %d)" % [
+		reach_sum / steps, 100.0 * choice_steps / steps, choice_steps,
+		walk_steps])
+	var off_parts := PackedStringArray()
+	var deck_parts := PackedStringArray()
+	for ty in ["fight", "elite", "rest", "shop", "event", "boss"]:
+		off_parts.append("%s %.1f/%.1f" % [ty,
+			float(type_taken.get(ty, 0)) / runs,
+			float(type_offered.get(ty, 0)) / runs])
+		deck_parts.append("%s %.1f/%.1f" % [ty,
+			float(deck_seen.get(ty, 0)) / runs,
+			float(deck_present.get(ty, 0)) / runs])
+	print("  Taken vs offered per run:  %s" % "   ".join(off_parts))
+	print("  Ever reachable vs dealt per run:  %s" % "   ".join(deck_parts))
+
 	# One machine-comparable row per invocation — the three-policy matrix
 	# is assembled from these across runs (median wipe tier counts the
 	# whole ladder: absolute tier = (zone-1)*11 + tier).
@@ -731,8 +805,9 @@ static func _print_report(battle) -> void:
 		var f8: float = maxf(t8["fights"], 1.0)
 		r8_desc = "%.2f" % sqrt((t8["p_atk"] / f8) * (t8["p_ehp"] / f8) \
 			/ maxf((t8["e_atk"] / f8) * (t8["e_ehp"] / f8), 1.0))
-	print("Matrix row: route=%s  completions=%.0f%%  wipe median tier=%s  ratio@z1t8=%s" % [
-		route, 100.0 * completed / runs, med_desc, r8_desc])
+	print("Matrix row: route=%s  map=%s  diff=%s  completions=%.0f%%  wipe median tier=%s  ratio@z1t8=%s  choice=%.0f%%" % [
+		route, map_mode, diff, 100.0 * completed / runs, med_desc, r8_desc,
+		100.0 * choice_steps / steps])
 
 	print("Still excluded: bomb/revive/defense/mana items never used in battle (only the <35% heal drink); no pre-emptive or offensive item use; routing sees one tier ahead only, no map lookahead; shop rune picks ignore build synergy (priciest first).")
 	print("=============================================\n")

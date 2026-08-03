@@ -54,7 +54,12 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   sims ONLY — sweep/standalone stay dry so R/S baselines hold),
   DOD_SIM_BUILDS="spec:Lane,...", DOD_SIM_TROPHIES, DOD_SIM_RELICS (draft),
   DOD_SIM_ROTATE=1 (Batch W: rotate all twelve specs; see the Batch W
-  block below — shares then carry sample counts).
+  block below — shares then carry sample counts), DOD_SIM_MAP=old (Batch
+  Y: the pre-Y map generator — 70% link roll, blind deal; EVERY pre-Y
+  baseline row incl. greedy-as-the-Batch-S-floor only reproduces at
+  map=old), DOD_SIM_DIFFICULTY=wanderer (Batch Y alpha affordance,
+  enemies x0.7 through zone_base_mult; default standard — NEVER set on a
+  baseline row).
   RunSim
   (scripts/run_sim.gd statics, Run injected Events-style) owns setup/map
   walk/report; battle.gd hooks: _ready begin+note_battle_start, _check_end
@@ -153,7 +158,54 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - Screens: main_menu → draft (pick 4 + relics) → spec_choice (permanent) →
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
-## Current systems snapshot (2026-08-02)
+## Current systems snapshot (2026-08-03)
+BATCH Y (08-03) — THE MAP NODE ECONOMY (alpha-scoped: legibility and
+agency were the deliverables, difficulty deliberately left to Batch T
+and human playtesters). DIAGNOSIS MEASURED FIRST: the old 70% link roll
+made 53% of nodes single-link (WORSE than the 30% the rule implies —
+edge columns rolled adjacents out of range), and the blind 30-card deal
+constrained nothing; baseline agency (route=default, economy on, n=50)
+= 1.58 reachable/step, real choice on 34% of steps, rests
+ever-reachable 4.3 of 9.0 dealt. NEW GENERATOR (run_state): every node
+links own column + >=1 adjacent GUARANTEED (25% both where a middle
+column has two); deal stays 17/5/5/3 but rejection-sampled (40-shuffle
+budget -> hill-climb swap repair -> authored fallback, never fails,
+~7% of maps repair) against: no three-of-a-kind tier, rest in t2-5 AND
+t6-10, shop in t7-10, >=1 elite/zone (floor AFTER the 25% roll); a
+walkable 2-rest+shop+elite route is guaranteed by DP at generation
+(_ensure_key_route adds links if missing — validator shows ~11 adds
+per 500 maps). OLD GENERATOR KEPT VERBATIM at DOD_SIM_MAP=old.
+RUN-REPORT ROUTE-AGENCY BLOCK (stage 0, run_sim): reachable/step,
+choice %, taken-vs-offered and dealt-vs-ever-reachable per node type;
+Matrix row gains map=/diff=/choice= fields — pre-Y rows have no such
+fields, never compare across. MEASURED (route=default, n=50/row):
+control at map=old reproduces baseline (0% completions, ratio@z1t8
+0.97, choice 36%); new map choice 34%->80%, reach/step 1.58->2.16,
+completions 0->4%, ratio@z1t8 0.95 (said in advance: completions rise
+as a CONSEQUENCE of agency; report, don't tune). HONEST ARTIFACT: the
+bot's fight-first prefs now BIND — shops taken 1.6->0.6/run of 5.7
+offered, unspent gold doubled; the old corridor was force-feeding the
+bot the economy. Do NOT tune the shop/economy on route=default rows
+alone. DIFFICULTY AFFORDANCE (draft "The Road"): standard | wanderer
+(x0.7), ONE mult inside zone_base_mult (the single read site — battle
+spawn), saved with run (save v3), DOD_SIM_DIFFICULTY env; ALPHA
+TESTING AID, NOT BALANCE — wanderer row: 58% completions, wipe median
+z3 t5, z1 ratio 1.44 (easy z1 accepted; a tester can now see the whole
+game). LEGIBILITY: rest/shop tooltips state what they do (rest quotes
+real heal % incl. relics), event tooltip says "unknown" ON PURPOSE
+(mystery stated, not blank); ladder readout "Tier 7 of 10 — the
+<boss> waits" (Enemies.unit_name(Run.boss_kind())); roads out of the
+current node glow gold; visited/reachable/unreachable are three
+separated reads. SAVES: pre-Y saves keep old maps+links, NEVER
+migrated — no runtime code may assume the new guarantees hold on a
+loaded map. Scratchpad test_map_economy.gd (dies with the session):
+500 new + 50 old maps, 37,710 checks — composition conserved, no
+homogeneous tier, no stranded node, boss reachable from every gate,
+independent-DP route check (2-rest state = bits 0+1, full mask 15),
+mean links 2.09/node, 80% node choice rate, zero single-link new
+nodes, old gate re-shows the 53% corridor; plus zone_base_mult
+difficulty probes. Policy smokes: greedy/default/cautious ordering
+survives wider reachability (greedy rests least, cautious most).
 BATCH X (08-02) — RUNES BECOME A BUILD SYSTEM. Slots grow with the run:
 Run.rune_slots() = 2 + zone_idx, NO cap (4th zone = 5), every old
 hardcoded 2 routed through it (party equip cap+header, run_sim elite

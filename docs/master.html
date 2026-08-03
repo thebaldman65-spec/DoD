@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-02 (Batch X)</b></p>
+<p align="right"><b>Last updated: 2026-08-03 (Batch Y)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -25,7 +25,9 @@ next zone (party fully restored) → final boss → run complete.</p>
 viewer), Settings (master volume, fullscreen — persisted to user://settings.cfg), Exit.</li>
 <li><b>Draft:</b> heroes shown as sprite cards; click to select. Selection order = battle
 position (slot order also sets each hero's tint). One of each class — picking a duplicate moves
-it. Up to 3 unlocked relics may be equipped for the run.</li>
+it. Up to 3 unlocked relics may be equipped for the run. <b>The Road</b> picks the run's
+difficulty: <b>Standard</b> (the game as designed) or <b>Wanderer</b> (enemies at 70%
+strength — an alpha testing aid so a tester can see every zone; saved with the run).</li>
 <li><b>Spec choice:</b> offered per hero after the first victory. Three cards per class, each
 showing the spec name, its <b>archetype</b> in bold (mouseover for the archetype explanation),
 blurb, passive, and full ability details. The choice is permanent for the run.</li>
@@ -74,12 +76,19 @@ warband from the moment the map is generated, and <b>hovering the node shows the
 full lineup, and the band's damage-type identity</b> — how many units resist a type and how
 many are soft to it ("Resists: Nature x3 / Soft to: Fire x2"). The boss escort is readable
 from tier 1, so resist counterplay can shape routing and talent picks all zone long.</p>
-<p>The deck is shuffled and dealt 3 per tier (tier 1 is guaranteed at least one fight so runs
-open with combat). <b>Connectivity is deliberately limited:</b> every node links to its own
-column on the next tier, plus a 70% chance of ONE adjacent column — never all three. The player
-gets a route choice most tiers but can only drift one column per step, so reaching a specific
-elite or shop takes planning; every node keeps at least one inbound path so the map never
-strands. The boss tier is a single node.</p>
+<p>The deck is shuffled and dealt 3 per tier under <b>structural constraints</b>: tier 1
+holds at least one fight so runs open with combat; <b>no tier deals three of a kind</b>, so
+every tier presents at least two node types; at least one rest lands in tiers 2–5 and
+another in tiers 6–10, so recovery is spread across the climb; and a shop always waits in
+tiers 7–10, so boss gold and the deepest rune rarities have somewhere to land. At least one
+elite always spawns (the 25% roll on tiers 6+ gets a floor of one per zone).</p>
+<p><b>Connectivity guarantees a choice:</b> every node links to its own column on the next
+tier plus at least one adjacent column — a middle column links to both neighbours 25% of the
+time. The player always has at least two roads forward but can only drift one column per
+step, so reaching a specific elite or shop takes planning; every node keeps at least one
+inbound path so the map never strands. Every map also contains at least one walkable route
+that touches two rests, a shop, and an elite — the map is a route-planning surface, not a
+corridor. The boss tier is a single node: the last pre-boss tier funnels by design.</p>
 <p><b>Elites are the snowball engine:</b> a skilled player routes toward them. On top of double
 talent points, an elite kill drops a <b>rune cache</b> for a random hero — three candidates
 rolled at the kill, one chosen on the Party screen — plus a random consumable and a bigger
@@ -97,9 +106,14 @@ the stat multiplier (§4.3). The finale's boss — the <b>Withered Warden</b> ag
 design — is the FINAL boss: the run ends on its death.</li>
 <li><b>Zone completion:</b> killing the boss awards a relic unlock, big gold, 3 talent points,
 and fully restores the party (HP and Mana) before the descent.</li>
-<li><b>Map screen:</b> zone art background, node ladder, Party button (shows unspent talent
-points), read-only Inventory dropdown, burger menu (Restart Run / Quit to Main Menu / Quit to
-Desktop), gold + party HP readout.</li>
+<li><b>Map screen:</b> zone art background, node ladder with a <b>tier readout</b> ("Tier 7
+of 10 — the Withered Warden waits"), Party button (shows unspent talent points), read-only
+Inventory dropdown, burger menu (Restart Run / Quit to Main Menu / Quit to Desktop), gold +
+party HP readout. The roads out of the party's current node glow gold; visited nodes are dim
+green, reachable nodes wear their full type colour, everything else recedes grey. <b>Every
+node answers on hover:</b> combat nodes scout their warband (§3 above), rests state their
+actual heal percentage (relic bonuses included), shops state their stock, and the "???"
+event says outright that what waits is unknown — mystery by design, not a blank.</li>
 </ul>
 
 <h2>4. Combat System</h2>
