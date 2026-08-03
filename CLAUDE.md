@@ -204,16 +204,23 @@ rotation is harder in the run harness too. Warden 206 prevented/b and
 damage (337 heal/b). Per-spec battle counts vary (n=129 Swordmaster
 to n=273 Warden) because durable parties survive deeper; runs sampled
 per spec are even (16-17).
-WARDEN ENDURANCE BUG — OPEN, DESIGNER'S CALL, NOT FIXED IN W:
-unit.endurance_stacks increments every unhealed turn and is NEVER
-capped; effective_armor() adds 1%/rank per stack. Measured +97,521%
-armor in a rotated run (Unkillable mending 7,607/block, Tenacity's
-uncapped +5 max HP/block feeding it). SELF-REINFORCING: more armor →
-unkillable → more turns → more armor → the battle CANNOT END. This is
-a REAL-PLAY SOFTLOCK, not a sim artefact. Never seen before because
-the fixed party has no Warden and the sweep grants no talents — only
-the run harness buys them. Knobs: cap endurance_stacks; bound
-tenacity_hp_gained.
+WARDEN SOFTLOCK — DIAGNOSIS CORRECTED 08-02, STILL OPEN. The visible
+symptom was Endurance reporting +97,521% armor, but effective_armor()
+has ALWAYS ended in minf(a, 0.85), so that number never reached the
+damage path — the chip was lying, it was not the mechanism. THE REAL
+RUNAWAY IS TENACITY -> UNKILLABLE: Tenacity adds +5 max HP per Heavy
+Plating block with NO bound (unit.tenacity_hp_gained, battle-long) and
+Unkillable mends 2%/rank of MAX HP per block, so each block enlarges
+the pool the next block heals from. Measured max HP ~127,000 and mends
+of 7,607/block; at the 0.85 armor clamp he takes 15% of incoming and
+out-heals it forever, so the battle CANNOT END — a REAL-PLAY SOFTLOCK.
+Endurance was capped at +75% (08-02, user's call) which stops the chip
+lying but CANNOT fix this: the Warden sits at the 0.85 clamp after
+~18 unhealed turns either way. THE FIX STILL OWED: bound
+tenacity_hp_gained, or make Unkillable's mend read base max HP rather
+than the inflated pool. Never seen before because the fixed party has
+no Warden and the sweep grants no talents — only the run harness buys
+them.
 STALEMATE GUARD (battle.gd STALEMATE_TURNS=600, SIMS ONLY): a battle
 past ~60 rounds is force-ended, scored a LOSS (never a win — that
 would inflate completions), no HP touched (death stats stay honest),

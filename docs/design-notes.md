@@ -570,3 +570,25 @@ optimises a build, never plays around a telegraph, and Batch W showed it
 cannot even be trusted to represent the roster evenly unless explicitly
 told to rotate. A floor tells you where the game is unplayable; only
 humans tell you where it is fun. Further difficulty work waits on them.
+
+## 2026-08-02 — the Warden softlock, and a lying chip
+
+The first diagnosis was wrong and the correction is the interesting part.
+Endurance was reporting +97,521% armor, so Endurance looked like the
+runaway. But effective_armor() has always ended in minf(a, 0.85): that
+number never touched the damage path. The chip was lying, not driving —
+and a lying readout is a good way to send an investigator at the wrong
+subsystem, which is exactly what it did.
+
+The real loop is Tenacity feeding Unkillable. Tenacity grants +5 max HP
+per Heavy Plating block with no bound, and Unkillable mends a PERCENTAGE
+of max HP per block. Each block therefore enlarges the pool the next
+block heals from — a percentage heal reading off a quantity that the same
+trigger inflates. Max HP reached ~127,000 and each block mended 7,607.
+At the armor clamp he takes 15% of incoming damage and out-heals it
+forever, so the fight cannot end.
+
+The general shape worth remembering: a percentage effect should never
+read off a value that its own trigger grows without bound. Capping
+Endurance at +75% was still right — a readout must never advertise what
+the damage path cannot grant — but it fixes the display, not the loop.

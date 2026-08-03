@@ -1158,8 +1158,13 @@ func effective_armor() -> float:
 	# Dominant Presence: armor value grows 5%/rank per debuff applied.
 	if dominant_ranks > 0 and debuffs_applied > 0:
 		a *= 1.0 + 0.05 * dominant_ranks * debuffs_applied
-	# Endurance: +1%/rank armor per turn without an external heal.
-	a += 0.01 * endurance_ranks * endurance_stacks
+	# Endurance: +1%/rank armor per turn without an external heal, CAPPED at
+	# +75% (Batch W, 08-02). The streak itself is uncapped, so a long fight
+	# used to report absurd bonuses (+97,521% was measured); the final
+	# minf(a, 0.85) below always clamped the real value, so the cap mostly
+	# stops the chip and the log from lying — but it also bounds the term
+	# for any future armor source that reads it before the clamp.
+	a += minf(0.01 * endurance_ranks * endurance_stacks, 0.75)
 	# Melt Armor: Burn ticks have eaten this much off for the battle.
 	a = maxf(a - melted, 0.0)
 	if has_status("fortify"):

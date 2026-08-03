@@ -1538,7 +1538,9 @@ func _run_battle() -> void:
 					"#b0a8e0")
 			else:
 				u.endurance_stacks += 1
-				var e_pct := 1 * u.endurance_ranks * u.endurance_stacks
+				# Capped at +75% to match effective_armor() — the chip must
+				# never advertise a bonus the damage path cannot grant.
+				var e_pct := mini(1 * u.endurance_ranks * u.endurance_stacks, 75)
 				var e_desc := "Endurance: +%d%% armor for every turn\nwithout an external heal.\nCurrently +%d%% armor (%d-turn streak)." % [
 					u.endurance_ranks, e_pct, u.endurance_stacks]
 				if not u.update_status("endurance", "+%d%%" % e_pct, e_desc):

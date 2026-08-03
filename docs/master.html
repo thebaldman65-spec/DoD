@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-01 (Batch W)</b></p>
+<p align="right"><b>Last updated: 2026-08-02 (Batch W)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -309,7 +309,7 @@ talent rank (Warden's Crushing Blow talent); the chip shows the reduction ("−1
 talent, on dropping below half HP); the chip shows the live bonus.</td></tr>
 <tr><td>Unrelenting Assault</td><td>+10 Constitution × ranks invested, for 3 turns
 (Berserker talent, on dropping below 25% HP; at most once every 5 turns).</td></tr>
-<tr><td>Endurance</td><td>+1%/rank armor per turn without an external heal (Warden talent);
+<tr><td>Endurance</td><td>+1%/rank armor per turn without an external heal, capped at +75% (Warden talent);
 the chip tracks the streak and clears when healed.</td></tr>
 <tr><td>Iron Will</td><td>Takes 4%/rank LESS damage per debuff on the Warden (talent); a
 permanent chip whose value follows the live debuff count.</td></tr>
@@ -957,7 +957,7 @@ a stun), Guard Breaker (Breaker: when a Broken enemy recovers, its Break meter r
 <p><b>Warden lanes (node-gated):</b><br>
 <b>PLATE</b> (mitigation and the block payoffs — everything that answers being hit) —
 Unkillable (heal 2%/rank max HP on every Block ×3), Toughness (Constitution +5%/rank of
-max HP ×3), Endurance (+1%/rank armor per unhealed turn ×3), Tenacity (+5 max HP per
+max HP ×3), Endurance (+1%/rank armor per unhealed turn, capped +75% ×3), Tenacity (+5 max HP per
 Heavy Plating block, battle-long), Shield Mastery (Shieldwall +1 charge/rank ×2), Plate
 Discipline (the Heavy Plating climb steepens +3%/rank — 11/14/17% per unblocked hit ×3),
 Battered Not Broken (Blocking removes 8/rank Break from his own meter ×3).<br>

@@ -128,18 +128,27 @@ prevented per battle and 33% contribution — the highest of any spec in the run
 (337 healing/battle). On damage share alone, the game's two most valuable specs looked
 unremarkable and near-worthless respectively.</li>
 
-<li><b>WARDEN BUG FOUND (real play, not a sim artefact — NOT fixed here, it is a design
-call):</b> <code>endurance_stacks</code> increments every turn the Warden goes without an
-external heal and is <b>never capped</b>, while <code>effective_armor()</code> adds
-1%/rank per stack. In a long fight this runs away: a rotated run was measured at
-<b>+97,521% armor</b>, mending 7,607 per block via Unkillable, with Tenacity's uncapped
-+5 max HP per block feeding it. The loop is self-reinforcing — more armor means nothing
-can kill him, which means more turns, which means more armor — so the battle can NEVER
-end. In real play that is a softlock, not just a slow sim. It had never surfaced because
-the fixed test party contains no Warden and the sweep grants no talents; only the run
-harness buys them, so rotation put a talent-invested Warden into a long fight for the
-first time. Suggested knobs (designer's call): cap Endurance stacks, and cap or bound
-Tenacity's battle-long max-HP growth.</li>
+<li><b>WARDEN SOFTLOCK FOUND (real play, not a sim artefact) — diagnosis corrected on
+08-02.</b> The symptom was Endurance reporting <b>+97,521% armor</b>, and that is what
+this entry first blamed. It was wrong: <code>effective_armor()</code> has always ended in
+<code>minf(a, 0.85)</code>, so the runaway number never reached the damage path — the chip
+was lying, not driving. <b>The real loop is Tenacity feeding Unkillable:</b> Tenacity adds
++5 max HP per Heavy Plating block with no bound (battle-long), and Unkillable mends
+2%/rank of <i>max HP</i> per block — so every block enlarges the pool that the next block
+heals from. Measured: max HP ~127,000, mends of 7,607 per block. Sitting at the 0.85 armor
+clamp he takes 15% of incoming damage and out-heals it indefinitely, so the battle can
+never end. In real play that is a softlock, not just a slow sim. It had never surfaced
+because the fixed test party contains no Warden and the sweep grants no talents; only the
+run harness buys them, so rotation put a talent-invested Warden into a long fight for the
+first time.</li>
+
+<li><b>Endurance capped at +75% armor</b> (08-02, at the designer's direction). This stops
+the chip and combat log advertising a bonus the damage path can never grant, and bounds the
+term for any future armor source that reads it before the clamp. <b>It does not close the
+softlock</b>, and was not expected to: with base armor 0.32 the Warden reaches the 0.85
+clamp after roughly 18 unhealed turns with or without the cap. The fix still owed is to
+bound <code>tenacity_hp_gained</code>, or to have Unkillable mend off base max HP rather
+than the inflated pool — a spec design call left with the designer.</li>
 
 <li><b>Stalemate guard (SIMS ONLY, real play untouched):</b> a battle exceeding 600 unit
 turns (~60 rounds; a long real battle is 4-12) is force-ended. Scored as a <b>loss</b>,
