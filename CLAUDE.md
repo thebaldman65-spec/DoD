@@ -204,23 +204,28 @@ rotation is harder in the run harness too. Warden 206 prevented/b and
 damage (337 heal/b). Per-spec battle counts vary (n=129 Swordmaster
 to n=273 Warden) because durable parties survive deeper; runs sampled
 per spec are even (16-17).
-WARDEN SOFTLOCK — DIAGNOSIS CORRECTED 08-02, STILL OPEN. The visible
-symptom was Endurance reporting +97,521% armor, but effective_armor()
-has ALWAYS ended in minf(a, 0.85), so that number never reached the
-damage path — the chip was lying, it was not the mechanism. THE REAL
-RUNAWAY IS TENACITY -> UNKILLABLE: Tenacity adds +5 max HP per Heavy
-Plating block with NO bound (unit.tenacity_hp_gained, battle-long) and
-Unkillable mends 2%/rank of MAX HP per block, so each block enlarges
-the pool the next block heals from. Measured max HP ~127,000 and mends
-of 7,607/block; at the 0.85 armor clamp he takes 15% of incoming and
-out-heals it forever, so the battle CANNOT END — a REAL-PLAY SOFTLOCK.
-Endurance was capped at +75% (08-02, user's call) which stops the chip
-lying but CANNOT fix this: the Warden sits at the 0.85 clamp after
-~18 unhealed turns either way. THE FIX STILL OWED: bound
-tenacity_hp_gained, or make Unkillable's mend read base max HP rather
-than the inflated pool. Never seen before because the fixed party has
-no Warden and the sweep grants no talents — only the run harness buys
-them.
+ENDLESS-BATTLE / STALEMATE — CAUSE ESTABLISHED 08-02 BY EVIDENCE, after
+TWO wrong diagnoses. Symptom: run sims wedge on a battle that never
+ends. (1) First blamed Endurance's +97,521% armor — WRONG,
+effective_armor() has always ended in minf(a, 0.85) so it never reached
+the damage path; the chip was lying. (2) Then blamed Tenacity feeding
+Unkillable (max HP ~127,000, mends 7,607/block) — a REAL bug and now
+fixed, but NOT the cause: fixing it left the stalemate rate unchanged
+(5 → 6 per 50 runs). (3) ACTUAL CAUSE, from the debug log of a stalled
+battle: the party is down to ONE surviving Warden (169 of 169 hero
+actions in the final window are his) against a 5-strong warband holding
+a Shaman + Totemist + Shieldmaster — 92 heal/shield events in the same
+window. He cannot die (0.85 armor clamp + Block + Unkillable) and his
+~17-damage single-target strike cannot out-pace five enemies' healing.
+NEITHER SIDE CAN FINISH. It is STRUCTURAL, not a talent bug: any
+last-hero-standing durable-but-low-damage survivor vs a healing warband
+reproduces it. Rotation exposed it because rotated parties include
+low-damage comps the fixed party never formed. Rate ~0.9% of battles
+(6 per ~700). OPEN DESIGN QUESTION for real play (a human hits an
+unwinnable-unloseable fight): the game has no resolution mechanism when
+neither side can close — options are a turn limit, escalating pressure,
+or a flee/forfeit. The two fixes above are kept as hygiene on their own
+merits, NOT as fixes for this.
 STALEMATE GUARD (battle.gd STALEMATE_TURNS=600, SIMS ONLY): a battle
 past ~60 rounds is force-ended, scored a LOSS (never a win — that
 would inflate completions), no HP touched (death stats stay honest),

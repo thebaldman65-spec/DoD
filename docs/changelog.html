@@ -146,9 +146,36 @@ first time.</li>
 the chip and combat log advertising a bonus the damage path can never grant, and bounds the
 term for any future armor source that reads it before the clamp. <b>It does not close the
 softlock</b>, and was not expected to: with base armor 0.32 the Warden reaches the 0.85
-clamp after roughly 18 unhealed turns with or without the cap. The fix still owed is to
-bound <code>tenacity_hp_gained</code>, or to have Unkillable mend off base max HP rather
-than the inflated pool — a spec design call left with the designer.</li>
+clamp after roughly 18 unhealed turns with or without the cap.</li>
+
+<li><b>SOFTLOCK FIXED (08-02, designer chose the Unkillable side):</b> Unkillable now mends
+2%/rank of <b>base max HP</b> — <code>max_hp - tenacity_hp_gained</code>, the same "true
+max" idiom the end-of-battle save sync already uses — instead of the live pool. Tenacity is
+untouched and still grants +5 max HP per Heavy Plating block; the two simply no longer feed
+each other off their shared trigger. Verified with a talent-invested Warden
+(<code>DOD_SIM_TALENTS="wd_unkillable:3,wd_tenacity:1"</code>): the mend is a flat
+<b>12 across 56 blocks</b> (6% of base 200) where it previously climbed to 7,607.
+<b>The rule this teaches, worth applying to future kits: a percentage effect must never
+read off a value that its own trigger inflates.</b></li>
+
+<li><b>...but it did NOT close the endless battle, and the cause is now established by
+evidence.</b> Re-running the rotated 50-run after the fix left the stalemate count
+unchanged (5 → 6 of ~700 battles), which retired the second diagnosis as well. The debug
+log of an actual stalled battle shows what is really happening: <b>the party is down to a
+single surviving Warden</b> — 169 of 169 hero actions in the final window are his — facing
+a five-strong warband holding a Shaman, a Totemist and a Shieldmaster, with <b>92
+heal/shield events in that same window</b>. He cannot die (0.85 armor clamp, Block,
+Unkillable) and his ~17-damage single-target strike cannot out-pace five enemies' healing.
+<b>Neither side can finish.</b> This is structural, not a talent bug: any
+last-hero-standing durable-but-low-damage survivor against a healing warband reproduces
+it, and rotation exposed it because rotated parties form low-damage compositions the fixed
+test party never did. Both earlier fixes are kept on their own merits — an absurd 7,607
+mend and a lying armor chip were each worth removing — but neither was the cause, and this
+entry previously said otherwise.
+<b>Open design question for real play:</b> a human who reaches this state is stuck in an
+unwinnable, unloseable fight; the game currently has no resolution mechanism. Options are a
+turn limit, escalating pressure on both sides, or a flee/forfeit action — a design call
+left with the designer. Sims are covered by the counted stalemate guard.</li>
 
 <li><b>Stalemate guard (SIMS ONLY, real play untouched):</b> a battle exceeding 600 unit
 turns (~60 rounds; a long real battle is 4-12) is force-ended. Scored as a <b>loss</b>,

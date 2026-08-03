@@ -592,3 +592,26 @@ The general shape worth remembering: a percentage effect should never
 read off a value that its own trigger grows without bound. Capping
 Endurance at +75% was still right — a readout must never advertise what
 the damage path cannot grant — but it fixes the display, not the loop.
+
+The fix chosen was the Unkillable side rather than a cap on Tenacity:
+Unkillable now mends off base max HP, so Tenacity keeps its full
+identity (+5 max HP per block, unbounded, battle-long) while the
+compounding link is simply cut. Cutting a bad dependency beats capping a
+good effect — the cap would have bounded the symptom and left the same
+trap in place for the next talent that reads max HP off a block trigger.
+
+Then the fix was measured, and the stalemate rate did not move (5 → 6 per
+50 runs). So that diagnosis was wrong too. The debug log of an actual
+stalled battle settles it: one surviving Warden, three dead teammates,
+against five enemies including two healers and a shieldmaster — 92
+heal/shield events while he lands 17-damage strikes. He cannot die and
+cannot kill. The runaway armor and the runaway mend were both things
+that HAPPEN during a battle that lasts thirty thousand turns, not things
+that cause one. Two diagnoses in a row mistook a symptom for a mechanism
+because each was found by reading the log for the most alarming number
+rather than asking what the log said about who was still standing.
+
+The real question this raises is a design one: the game has no way to
+resolve a fight neither side can finish. A durable low-damage survivor
+against a healing warband is a legitimate board state, reachable in real
+play, and today it simply never ends.

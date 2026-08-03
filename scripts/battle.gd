@@ -3659,9 +3659,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						strike_target.plating_bonus = 0.0
 						strike_target.refresh_bars()
 						_log("   → Heavy Plating: the climbing bonus resets", "#8c9cc8")
-					# Unkillable: blocking mends the Warden.
+					# Unkillable: blocking mends the Warden — 2%/rank of the
+					# pool he brought INTO the battle, not the one Tenacity
+					# grows during it. Both talents trigger on the same Heavy
+					# Plating block, so reading live max_hp made every block
+					# enlarge the pool the next block healed from: a runaway
+					# that reached ~127,000 max HP and 7,607 per mend, and a
+					# battle neither side could ever end (Batch W, 08-02).
+					# Same "true max" idiom the end-of-battle save sync uses.
 					if strike_target.unkillable_ranks > 0:
-						var mend := maxi(int(strike_target.max_hp * 0.02
+						var unkill_base: int = strike_target.max_hp \
+							- strike_target.tenacity_hp_gained
+						var mend := maxi(int(unkill_base * 0.02
 							* strike_target.unkillable_ranks), 1)
 						strike_target.heal_amount(mend)
 						strike_target.float_text("+%d" % mend, Color(0.4, 0.9, 0.45))
