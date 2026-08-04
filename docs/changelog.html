@@ -5,6 +5,219 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-03 — Batch AA: Mage and Cleric rune sets, and a forfeit</h2>
+<ul>
+<li><b>Why:</b> Batch X shipped the rune system with the <b>Warrior</b> as its pilot —
+universal runes, class runes for all four classes, and four spec runes each for the
+Berserker, Swordmaster and Warden. Nine of twelve specs still drew nothing but stat sticks
+and class runes, which means three quarters of the roster was still testing as the
+pre-Batch-X game. With Y (the map) and Z (the alpha shell) landed, this was the last
+content gap standing between the build and a fair playtest. This batch does <b>Mage and
+Cleric</b>; the Hunter follows in his own batch, because the companion machinery is the
+most idiosyncratic in the game and deserves a pass rather than being the tired third of
+three.</li>
+
+<li><b>24 spec runes</b> (data/runes.json, 29 → 53 entries), four per spec: <b>one per
+talent lane, read out of <code>Talents.LANE_TREES</code> rather than any written list, plus
+one splash</b> that pays for reaching out of a lane. Exactly one scarred rune per spec, in
+its lane; splashes are always clean. Three of the twenty-four are Epic, the rest Rare.
+<ul>
+<li><b>Pyromancer</b> — <i>Cinder Trail</i> (Kindling: Fireball spreads 1 turn of Burn,
+Flamewave burns 1 turn longer), <b>Scarred <i>White Flame</i></b> (Inferno, Epic: enemy
+resistance to his damage is 30% thinner and Inferno Master gains +1% per burning enemy —
+for −12% max health), <i>Blast Radius</i> (Detonation: consumes 25% more remaining Burn,
++3% crit), <i>Long Burn</i> (splash).</li>
+<li><b>Cryomancer</b> — <i>Bitter Grip</i> (Deep Freeze: Chilled slows 3% harder, Frozen
+enemies 2% likelier to be crit — party-wide), <i>Honed Lance</i> (Shatterpoint: Ice Lance
+−5 Mana, +5% of Attack), <b>Scarred <i>Killing Cold</i></b> (Winter: +2% damage per Chilled
+stack and Chilled enemies miss 5% more, but heals he receives are 25% weaker),
+<i>Long Winter</i> (splash).</li>
+<li><b>Arcanist</b> — <i>Resonant Core</i> (Resonance: max Resonance +1, +2% damage per
+stack), <i>Seventh Bolt</i> (Overload: Arcane Barrage fires a seventh bolt),
+<b>Scarred <i>Unquiet Mind</i></b> (Control: cooldowns tick an extra turn every sixth, and
+a fifth of Cannon's recoil is paid in Mana instead of blood — for 8 less Mana regenerated
+each turn), <i>Wide Current</i> (splash).</li>
+<li><b>Holy</b> — <i>Triage Ward</i> (Radiance: instant heals can crit, +3% healing, 5% of
+overhealing banked), <b><i>Last Rites</i></b> (Mercy, Epic: grants <b>Resurrection</b>),
+<b>Scarred <i>Sleepless Vigil</i></b> (Sanctuary: passive party healing at both ends of her
+turn, for −10 Speed), <i>Open Hand</i> (splash — she opens each battle holding 1
+Mercy).</li>
+<li><b>Devout</b> — <i>Warded Robes</i> (Bulwark: Divine Shield heals 4% of what it absorbs,
++10% armor while it stands), <i>Binding Oath</i> (Faith: a release leaves 1 stack standing
+and heals 5% more), <b>Scarred <i>Burning Censer</i></b> (Zeal: Consecrated Ground reflects
+10% more and the reflection mends the party, for −12% max health), <i>Standing Vow</i>
+(splash).</li>
+<li><b>Occultist</b> — <i>Deepening Ruin</i> (Ruin: +1% damage taken per stack, 5 Break
+damage per turn to anything Ruined), <b><i>Flayed Mind</i></b> (Madness, Epic: grants
+<b>Mind Flay</b>), <b>Scarred <i>Hollow Chalice</i></b> (Leech: the party drinks 5% more
+from Ruined targets and the Ruin lifesteal takes 3% more, but heals <i>he</i> receives are
+30% weaker), <i>Whispering Dark</i> (splash).</li>
+</ul></li>
+
+<li><b>The cost of the batch in machinery: ONE new cfg field</b> (the cap was four).
+<code>rune_resist_pierce</code> (float, BattleUnit) — a target's <b>positive</b> resistance
+to the attacker's damage type is thinned by this fraction; weaknesses are untouched, so the
+rune can never shrink a vulnerability. <b>Its only read site is battle.gd's resist block,
+immediately after Avatar of Flame's ignore-fire-resistance branch</b>, and it logs
+"<code>Rune: the flame bites through resistance</code>". Everything else in the batch rides
+counters the talent trees already read — which is the point of the design, not a shortcut.</li>
+
+<li><b>Fixed — a whole class of silent dud</b>: the second-resource ceilings (the
+Arcanist's Resonance max, Holy's Mercy max and starting Mercy, the Sharpshooter's Focus
+cap and opening Focus) were derived from <code>cfg</code> <b>before</b> the rune-apply
+block ran. Any rune writing <code>resonant_core_ranks</code>,
+<code>mercy_cap_bonus</code> or <code>zealous_mercy</code> applied cleanly and did
+<b>nothing</b>. The three derivation blocks now sit immediately <i>after</i> runes apply.
+Talent behaviour is unchanged (talents already applied further up) and no shipped rune
+touched those fields, so this changes nothing that existed — but the very next Hunter batch
+would have hit it on the Sharpshooter's Focus flags. <code>test_runes.gd</code> now asserts
+the call-site order directly so it cannot silently move back.</li>
+
+<li><b>One-line guard, no behaviour change:</b> <code>heal_amount</code> now floors the
+healing multiplier at zero. <code>healing_received_mult</code> is a running sum of rune
+terms, and a negative one would quietly turn every heal into damage that bypasses death
+handling. No reachable loadout gets there — the worst case is −0.6 against a 1.0 or 1.15
+base — but this batch adds two more negative sources, and "silently" is the failure mode
+the whole batch exists to close.</li>
+
+<li><b>Rune roll call in the log:</b> most spec runes ride an existing talent counter, so
+their effect surfaces on that talent's proc line rather than one of their own (the Batch X
+precedent — <i>Grudges</i> and <i>The Standard</i> behave the same way). One grep-stable
+<code>Rune: &lt;hero&gt;: &lt;rune name&gt;</code> line per equipped rune is now written
+when the battle opens, so every rune a hero carries is visible in a log a tester pastes
+back.</li>
+
+<li><b>Forfeit Run — the alpha escape hatch (NOT a stalemate fix).</b> The endless-battle
+state diagnosed on 08-02 remains a <b>deferred, open balance question</b>. What changed is
+that the guard which handles it is <b>sims only</b>: real play had no resolution mechanism
+at all, so at the measured ~0.9% of battles a tester doing five runs had roughly a
+one-in-three chance of landing in a fight that cannot end, with force-quitting the
+application as the only exit — which costs the run and comes back as "it froze" rather than
+as an opinion.
+<ul>
+<li><b>Forfeit Run</b> in the battle burger, alongside Restart Run and Exit to Main Menu,
+behind a confirmation. It ends the run <b>exactly as a wipe does</b>, so there is nothing
+to exploit and no balance thought required: forfeiting is strictly worse than winning.</li>
+<li>It routes into Batch Z's <b>run summary</b>, whose outcome line reads
+<b>"Forfeited — Zone N …"</b>, never "Wiped", with its own title colour. The final
+battle's lineup is still reported (the fight the tester walked away from is the most useful
+line in the summary), and the summary text goes to the clipboard like any other.</li>
+<li><b>A reason, chosen on the confirm dialog:</b> this fight will not end / too hard / not
+enjoying it / something broke / just stopping. It lands in the summary and in the
+Copy-summary text — every forfeit becomes labelled feedback, which is most of the value of
+shipping the action during an alpha.</li>
+<li><b>Its own Profile bucket</b> (<code>forfeits</code>, plus
+<code>Profile.note_forfeit</code> / <code>forfeits_total()</code>) — <b>not</b>
+<code>note_wipe</code>. A forfeit is not a defeat, and folding them together corrupts the
+chronicle the moment testers start using the exit. The summary's chronicle line grows a
+"Cycles abandoned" figure, shown only once there are any.</li>
+<li><b>Never reachable in sims or autoplay.</b> The menu entry is not even built when
+<code>sim</code>, <code>autoplay</code> or <code>Run.sim_run</code> is armed, and the
+forfeit itself re-checks — same guard discipline Batch Z used on the orientation cards, and
+verified the same way (profile and save bytes identical before and after).</li>
+<li><b>A nudge, not a force-end:</b> in real play only, past the same turn count the sim
+guard uses (<code>FORFEIT_NUDGE_TURNS = STALEMATE_TURNS</code>), a one-line non-blocking
+hint appears saying the fight is not resolving and that Forfeit is in the menu. It <b>does
+not end the battle, touch HP, or alter any outcome</b>, it fires once, and it never fires
+in a sim — a tester who does not know the burger holds an exit is still trapped, which is
+the whole reason it exists.</li>
+</ul></li>
+
+<li><b>Measured — control first, at <code>route=default</code>, n=50 per row,
+<code>map=new</code>, <code>difficulty=standard</code>:</b>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>rune pool</th><th>completions</th><th>wipe median</th><th>ratio @ z1 t8</th><th>choice</th></tr>
+<tr><td><b>off</b> (control)</td><td>6%</td><td>z1 t11.0</td><td>0.99</td><td>78%</td></tr>
+<tr><td>stats</td><td>8%</td><td>z1 t10.0</td><td>0.93</td><td>75%</td></tr>
+<tr><td>full</td><td>4%</td><td>z1 t11.0</td><td>1.05</td><td>78%</td></tr>
+</table>
+The control reproduces the current build (Batch X's <code>off</code> row was 4%, Batch Y's
+new-map row 4% at choice 80%) — nothing else in the batch was readable until it did. The
+whole off/stats/full spread is <b>four points at n=50, which is two runs</b>: the authored
+pool at current power still does not move completions beyond noise, exactly Batch X's
+finding, and the ordering of the three rows <i>flipped</i> between batches, which is itself
+evidence that the differences are noise and not signal. Damage shares are flat
+(Cryomancer 39% off → 38% full, Devout 4% → 4%). <b>Reported, not tuned.</b></li>
+
+<li><b>Measured — a rotated pair, so all six new sets are actually exercised</b>
+(<code>DOD_SIM_ROTATE=1</code>, n=60 each, its own control because the fixed test party
+only contains two of the six specs):
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>rotated</th><th>completions</th><th>wipe median</th><th>ratio @ z1 t8</th><th>choice</th></tr>
+<tr><td><b>off</b> (control)</td><td>15%</td><td>z1 t9.0</td><td>1.01</td><td>79%</td></tr>
+<tr><td>full</td><td>17%</td><td>z1 t11.0</td><td>1.02</td><td>78%</td></tr>
+</table>
+Two points of completions at n=60 is one run. <b>Contribution share, off → full:</b>
+Pyromancer 36→32, Warden 29→36, Holy 29→28, Survivalist 29→30, Cryomancer 26→27,
+Sharpshooter 25→20, Swordmaster 23→25, Arcanist 22→21, Occultist 19→15, Beastmaster 19→18,
+Devout 15→13, Berserker 15→16.
+<ul>
+<li><b>Holy is the spec this batch was told to read on contribution, not damage — and she
+does not move:</b> 29% → 28% contribution off a 5–6% damage share, ~339 → ~329 healing per
+battle. That reproduces Batch W's "28% contribution off 5% damage share, 337 heal/battle"
+almost exactly. Her runes did not measurably change her at this sampling.</li>
+<li><b>The most likely reason is dilution, and it applies to the whole batch:</b> the party
+buys about <b>2.4 runes per run</b> at the shop plus its elite-cache picks, spread across
+four heroes. The mage and cleric spec pools just tripled, so a given Holy is carrying at
+most one or two of her four — the pool got deeper without any single hero getting more
+runes. That is a property of the rune economy, not of these entries, and it is the thing to
+look at before concluding the entries are underpowered.</li>
+<li><b>Do not read the cleric support numbers as a direction.</b> The Devout's healing per
+battle went 10 → 14 in the fixed-party pair and 25 → 13 in the rotated pair. Opposite
+signs on the same change is noise, and reporting only the flattering half would have been
+the mistake.</li>
+<li><b>The flipped artefact warning is already visible in this table.</b> The Sharpshooter
+— a Hunter, with no spec runes — falls 25% → 20%, the largest drop of any spec. That is
+pool depth. Do not tune on it.</li>
+</ul></li>
+
+<li><b>The artefact warning FLIPS, and Batch X's wording must not be carried forward.</b>
+Batch X warned that only the Warrior had spec runes, so any Warrior-favouring share shift
+was pool depth. After this batch, <b>Warrior, Mage and Cleric have spec rune sets and the
+Hunter does not</b>. Any contribution or damage-share shift that <i>disfavours</i> the
+Beastmaster, Sharpshooter or Survivalist is pool depth, not balance. Do not tune on it.
+Difficulty remains closed pending human playtesters.</li>
+
+<li><b>Verified.</b> <code>test_runes.gd</code> extended, <b>1523 checks</b>: schema
+(one payload branch per entry — <code>apply_payload</code> is an if/elif chain, so a second
+branch is silently dropped), <code>requires_ability</code> present, self-consistent and
+<i>reachable in some eligible hero's derivable kit</i>, scarred-carries-a-real-cost,
+scarred-priced-under-its-clean-peer, scope leak-proofing in both directions, int
+restoration, exhaustion. Four new drift alarms: <b>every stat field a rune writes must be a
+real BattleUnit property or a cfg field battle.gd consumes</b> (a typo is a dud, not a
+crash — <code>set()</code> silently drops unknown names); <b>something must actually read
+it</b>; <b>no rune may write one half of an exclusive talent pair</b> (a rune must not hand
+back a road the tree made the player decline); and the <b>call-site ordering</b> assertion
+above. The <b>coverage assertion</b> the batch was asked for: every Warrior, Mage and
+Cleric spec has exactly four spec runes, one per lane in its own
+<code>LANE_TREES</code> entry plus exactly one splash — this is what catches a lane being
+renamed later. New <code>test_forfeit.gd</code>, <b>57 checks</b> (booked as a forfeit and
+not a wipe, run over, save gone, summary survives <code>clear_save</code> and says
+Forfeited with its reason, every reason string reaches the summary, cancel is harmless;
+unreachable under each of <code>sim</code> / <code>autoplay</code> / <code>sim_run</code>
+including firing the burger id directly, with profile and save bytes identical; the nudge
+fires once, ends nothing, moves no HP, and never fires in a sim). New
+<code>test_rune_battle.gd</code>, <b>46 checks</b> across three live autoplay battles —
+every rune of a spec equipped at once, the ordering fix proven live (Holy opens with Mercy
+in hand, the Arcanist's ceiling reads 6), counters proven to <i>sum</i> when two runes feed
+one, the Ice Lance and Arcane Barrage ability payloads landing on the real Ability objects,
+Resurrection and Mind Flay granted, and the <b>live-value chip</b> gotcha checked directly:
+the Pyromancer's Inferno Master readout shows the rune-boosted step, not the talent-only
+one. The White Flame's read site is proven against a deliberately fire-resistant warband,
+because a raider lineup would have left it unexercised. Headless parse: all 10 scenes,
+0 SCRIPT ERROR.</li>
+
+<li><b>Reported, not changed (two doc-in-code drifts found while authoring).</b> (1) The
+Holy tree's <i>Resurrection</i> node text says "spend <b>3</b> Mercy"; the ability's
+<code>faith_cost</code> is <b>1</b>, and the code is what runs. This is in-game UI text, so
+it is worse than a doc drift — but which number is wrong is a design call, not a
+transcription one, so it is flagged rather than silently reconciled. (2) Batch X's rule that
+"every scarred payload carries a negative term" is not literally true of the shipped Glass
+Rune, whose cost is <code>+0.15 dmg_taken_bonus</code> — a positive number that <i>is</i>
+the penalty. The schema check now knows about penalty-signed fields rather than rejecting a
+rune that already ships.</li>
+</ul>
+
 <h2>2026-08-03 — Batch Z: the alpha shell — glossary, orientation, run summary</h2>
 <ul>
 <li><b>Why:</b> Batch Y made the map a decision surface; this batch makes the run

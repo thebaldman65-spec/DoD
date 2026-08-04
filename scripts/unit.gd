@@ -180,6 +180,10 @@ var blood_pact := 0           # Exsanguination rune: NEGATIVE threshold shift �
 var rune_lifesteal := 0.0     # Vampiric Rune: attacks heal this fraction of damage dealt
 var rune_execute_bonus := 0.0 # Reaper rune: bonus damage vs targets under 35% HP
 var rune_bd_bonus := 0.0      # Breaker runes: Break-damage multiplier bonus
+# Batch AA authored-rune field, same discipline:
+var rune_resist_pierce := 0.0 # White Flame rune: thins a target's POSITIVE
+                              # resistance to the attacker's damage type; a
+                              # weakness (negative resist) is left alone
 var exsanguination := 0       # capstone: 35% bleedouts, full buildup chains on
 var undying_rage := 0         # capstone: below 25% cannot die, +50% damage
 var undying_rage_used := false
@@ -1608,6 +1612,12 @@ func heal_amount(amount: int, external := false) -> int:
 	# Last Hope (Holy talent, party-wide stamp): the nearly-dead heal deeper.
 	if last_hope_bonus > 0 and hp < max_hp * 0.25:
 		mult *= 1.0 + 0.05 * last_hope_bonus
+	# Batch AA guard: healing may be reduced to nothing, never INVERTED. The
+	# multiplier is a running sum of rune terms (Vampiric, Killing Cold, the
+	# Hollow Chalice…) and a negative one would quietly turn every heal into
+	# damage that bypasses death handling. No reachable loadout gets there
+	# today — this is here so a future rune cannot open the hole silently.
+	mult = maxf(mult, 0.0)
 	var final := int(round(amount * mult))
 	last_overheal = maxi(final - (max_hp - hp), 0)
 	hp = mini(hp + final, max_hp)

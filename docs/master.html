@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-03 (Batch Z)</b></p>
+<p align="right"><b>Last updated: 2026-08-03 (Batch AA)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -20,6 +20,12 @@ timing skill check on every action — the player's execution matters as much as
 <b>Map</b> (node climbing) → <b>Battles / Rest / Shop / ???</b> → after the first victory,
 <b>Spec Choice</b> (permanent) → <b>Party screen</b> (talents, runes) → … → <b>Zone Boss</b> →
 next zone (party fully restored) → final boss → run complete.</p>
+<p>A run ends in one of three ways: <b>completion</b> (the final boss falls), a <b>wipe</b>
+(every hero down), or a <b>forfeit</b> — the player abandons the run from the battle burger
+menu, behind a confirmation. A forfeit ends the run <b>exactly as a wipe does</b> (save
+cleared, party reset), so it carries no advantage; the player picks a reason from a short
+list, and it is recorded as a forfeit rather than a defeat everywhere it is counted. All
+three route into the same <b>run summary</b> (§11a).</p>
 <ul>
 <li><b>Main menu:</b> New Game, Continue (enabled when a save exists), Relics (collection
 viewer), Settings (master volume, fullscreen — persisted to user://settings.cfg), Exit.</li>
@@ -1280,7 +1286,16 @@ runes only roll for heroes who actually own the named ability (boss trophies inc
 <b>Equip slots grow with the run: 2 → 3 → 4</b> by zone (toggled on the party screen; the
 zone-victory screen announces each new slot). Shop offers avoid duplicates per hero, and
 an exhausted pool falls back to the Common family — the offer list never comes back
-empty.</li>
+empty.
+<br><b>Spec coverage: 53 authored runes</b> — 5 universal, 4 class-wide × 3 classes (the
+Warrior carries 3), and <b>4 spec runes for each of nine specs</b>: all three Warrior specs,
+all three Mage specs, all three Cleric specs. <b>The three Hunter specs have no spec runes
+yet</b> — they draw universal and class runes only. Each set is built to one rule:
+<b>one rune per talent lane, plus one splash</b> that carries a term from every lane and
+pays for reaching outside one. Exactly one rune per set is Scarred, and it sits on a lane;
+splashes are always clean. The per-lane rule is what makes a rune a build decision rather
+than a power increment — the same rune is worth more to a hero whose points went elsewhere
+than to one already deep in that lane.</li>
 <li><b>Relics</b> (permanent meta): one random unlock per boss kill, stored in
 user://relics.json; up to 3 equipped per run at the draft (scrolling shelf; events can slot
 a run-scoped extra via relic_grant). <b>Pool: 25 relics — 17 common, 8 rare (◆)</b> — every
@@ -1294,8 +1309,10 @@ pure data. Highlights: Waystone Shard grants <b>+3</b> talent points; the elemen
 schools; Prism Veil
 gives 10% resistance to every element; The King's Ledger compounds gold.</li>
 <li><b>Persistent profile</b> (user://profile.json, outside the run save): counts runs
-started/completed/wiped per spec, bosses killed by kind, events seen (with repeats), and
-zones cleared. <b>Chronicle only — it gates nothing</b>; the Relics screen shows the
+started/completed/wiped/<b>forfeited</b> per spec, bosses killed by kind, events seen (with
+repeats), and zones cleared. <b>Forfeits are their own bucket, never folded into wipes</b> —
+abandoning a run is not the same event as dying in one, and mixing them would make the
+wipe count unreadable the moment the exit gets used. <b>Chronicle only — it gates nothing</b>; the Relics screen shows the
 tally ("Cycles survived / lost / Events witnessed"). It is the substrate for a future
 persistent-unlocks design pass (sketch: persistent-unlocks-sketch.md in the workspace);
 sims never write to it.</li>
@@ -1480,9 +1497,13 @@ active beast is greyed out). Summoning or swapping in Aguila then asks for a tar
 arrival dive. Call of the Wild (when owned) joins the picker as a fourth entry. The
 remaining abilities take the following hotkeys in kit order (Hunter's Instinct E, Kill
 Command R; boss-trophy abilities follow as they are earned).</li>
-<li><b>Burger menu:</b> Restart Run (abandons to a fresh draft), Settings (overlay with volume
-+ fullscreen — the battle isn't lost), Exit to Main Menu (run resumes from the last saved
-node).</li>
+<li><b>Burger menu:</b> Restart Run (abandons to a fresh draft), <b>Forfeit Run</b> (ends the
+run where it stands, behind a confirmation with a reason picker — see §2 and §11a),
+Glossary, Settings (overlay with volume + fullscreen — the battle isn't lost), Exit to Main
+Menu (run resumes from the last saved node).</li>
+<li><b>Stalemate hint:</b> if a single battle runs to an absurd length, a one-line
+non-blocking note appears saying the fight is not resolving and that Forfeit Run is in the
+menu. It appears once and changes nothing about the battle — no HP, no outcome.</li>
 <li><b>Targeting:</b> click a highlighted unit (cancel button available); single-target
 abilities auto-target when only one candidate lives.</li>
 <li><b>Skill check controls: Spacebar or Left Click.</b></li>
@@ -1584,13 +1605,15 @@ marker, the gold and green windows, and what each grade is worth (Perfect +15% d
 is that execution matters as much as the build — a player who never notices the window is
 playing a materially worse game and would report it as shallow.</li>
 </ul>
-<p><b>The run summary</b> replaces both end panels — defeat and completion. It reports the
-outcome and depth reached, the final battle (type, theme, and lineup) and which heroes fell,
+<p><b>The run summary</b> replaces both end panels, and serves all three endings — completion,
+wipe, and forfeit. It reports the outcome and depth reached (<b>"Forfeited — Zone N …"</b>
+reads distinctly from "Wiped", in its own colour, and carries the <b>reason</b> the player
+picked), the final battle (type, theme, and lineup) and which heroes fell,
 the party as it stood (per hero: spec, talent count with its <b>lane spread</b>, runes
 equipped, trophies taken), <b>damage share per hero across the whole run</b>, the run economy
 (battles won, elites taken, gold earned / spent / unspent, rests, events seen, relics
-carried), and a chronicle line — cycles survived and cycles lost — so a session of runs
-accumulates into something visible. A <b>Copy summary</b> button puts a plain-text version on
+carried), and a chronicle line — cycles survived, cycles lost, and cycles abandoned once
+there are any — so a session of runs accumulates into something visible. A <b>Copy summary</b> button puts a plain-text version on
 the clipboard: a wipe becomes a report the player can paste back to the designer, which is
 feedback data with no telemetry to build.</p>
 <p><b>Two structural rules behind it:</b> (1) the summary <b>snapshots run state before the
@@ -1710,8 +1733,9 @@ only the Tyrant's frost weakness is set) and Counter Attack (defined term; no ta
 ability grants it yet).</li>
 <li>The Withered Warden has its own kit; the Ash-Wrought Tyrant is still a Chief stand-in —
 unique kit + art planned. Boss art for both pending.</li>
-<li>Spec rune sets still to author: Mage, Cleric, and Hunter specs — one batch per class,
-the way stat blocks and trees shipped (the Warrior's three specs are the Batch X pilot).</li>
+<li>Spec rune sets still to author: the three <b>Hunter</b> specs — its own batch, because
+the companion machinery is the most idiosyncratic in the game. Warrior, Mage and Cleric
+sets are shipped.</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>
 <li>Difficulty tuning is pending an honest baseline: the old "~100% win rate" figure
 measured a single fixed unscaled lineup and carried no information. The sweep

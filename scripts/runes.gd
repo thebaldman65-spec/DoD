@@ -56,7 +56,11 @@ const TEMPLATES := [
 const AB_INT_KEYS := ["damage", "pressure", "cost", "cooldown", "resource_gain",
 	"multi_hits", "random_hits", "faith_cost", "bleed_build"]
 const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
-	"resource", "bleed_bonus", "mana_regen_bonus", "blood_pact"]
+	"resource", "bleed_bonus", "mana_regen_bonus", "blood_pact",
+	# Batch AA: int counters that do NOT end in "_ranks" and so would slip
+	# through as floats — BattleUnit.setup() pushes cfg straight into typed
+	# vars, and a float into an int var is a runtime error, not a rounding.
+	"zealous_mercy", "mercy_cap_bonus"]
 
 static var _data := {}
 

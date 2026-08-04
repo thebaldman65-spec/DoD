@@ -4,6 +4,107 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Mage and Cleric rune sets, and a forfeit (Batch AA) — 2026-08-03
+
+**Why one rune per lane is a mechanism and not a hope.** Batch X built
+the rune system and left the obvious question open: what stops an
+authored pool from becoming twelve slightly different damage stat
+sticks? The answer is the authoring rule, not the machinery. Each spec
+gets exactly one rune per talent lane plus one that pays for splashing
+out of a lane, and each lane rune writes that lane's *own* counters. A
+Pyromancer who has sunk his points into Detonation and finds the
+Kindling rune is being handed the top of a road he did not take — the
+rune is worth taking precisely because it is off-build, and it is worth
+*less* to the player already deep in Kindling, who has the talent
+version. That asymmetry is what makes a rune a build decision rather
+than a power increment: the same rune has different value to two heroes
+of the same spec, decided by where their points went. The splash rune is
+the counterweight — one term from each lane, so the player who wants
+breadth can buy breadth instead of being forced sideways. Without the
+per-lane rule the pool converges on "whatever is numerically largest"
+and every hero of a spec ends the run with the same three runes, which
+is the outcome the whole system exists to avoid.
+
+**Why the counters are stacked and not duplicated.** A rune writing
+`entropy_ranks` gives the Occultist the Entropy talent's effect at one
+rank, and stacks with the talent if he owns it. That was Batch X's
+design and it is the reason this batch needed only ONE new cfg field for
+twenty-four runes: the lanes are already a vocabulary of small, read
+effects, and a rune is a way to buy one word of it out of order. The
+alternative — bespoke rune-only fields — would have meant twenty-four
+new read sites in battle.gd, twenty-four chances for a silent dud, and a
+second parallel effect vocabulary that drifts away from the first.
+
+**Why the mage sets trade in element and the cleric sets trade in
+direction.** The Pyromancer and Cryomancer are deliberate mirror images,
+each armoured in his own element and soft to the opposite, so their
+interesting runes are the ones that push on that identity rather than
+adding damage: the White Flame thins the *resistance* his fire meets
+(the one place the mirror actually bites) and charges him max health for
+it. The Cleric's three specs are three answers to the same problem —
+Holy restores, the Devout prevents, the Occultist siphons — so every
+cleric splash rune carries a healing-flavoured term, letting each of the
+three reach a little way toward *restoring* without becoming the
+healer. Reaching toward a neighbour is the interesting direction; being
+able to replace a neighbour is not.
+
+**What the measurement actually said, and why it does not mean the
+entries are weak.** Twenty-four runes moved nothing beyond noise —
+completions, damage shares and contribution shares all land where the
+control put them, and Holy in particular reproduces her Batch W numbers
+almost exactly. The tempting conclusion is that the entries are
+underpowered and the next lever is bigger numbers. The measurement does
+not support that, because it cannot: the party buys about 2.4 runes a
+run and picks a few from elite caches, spread across four heroes, and
+this batch roughly *tripled* the mage and cleric spec pools. Deepening a
+pool without changing how many draws a hero gets makes each individual
+entry rarer, not stronger — a given Holy now carries one or two of her
+four. If rune power is ever the thing to move, the honest first question
+is whether heroes see enough runes for authored power to be legible at
+all; raising numbers to compensate for a draw rate would be tuning the
+wrong dial and would land badly the day the draw rate changes.
+
+**Why the Arcanist and Occultist scars are not paid in blood.** Both
+already bill their own health as a resource — Resonance charges +5%
+damage taken per stack and Arcane Cannon recoils 15%; the Occultist's
+Leech lane and the Pact of Flesh / Dark Barter choice are literally his
+body traded for the party's. A scarred rune that adds damage taken
+*compounds* with a cost the spec is already paying, and at the wrong
+number it converts a ramp into a coin flip. So the Arcanist's scar is
+paid in Mana (his cooldown relief comes with a regeneration cut, and his
+recoil relief drains the same pool) and the Occultist's is paid in heals
+*received* — the chalice fills for everyone but him. The rule
+generalises: a scar should cost a resource the spec is not already
+mortgaging, or it stops being a trade and becomes a multiplier on an
+existing risk.
+
+**Why Holy's runes will look like they did nothing.** She was measured at
+28% contribution off a 5% damage share. Any rune that improves her
+improves a number the damage line cannot see, so the temptation is to
+hand her damage instead, which would make her a worse Holy. Her set
+buys healing throughput, an extra Mercy in hand, and — the epic —
+Resurrection without the Mercy-lane investment. Judge them on the
+contribution table. This is the same denominator lesson that made the
+Sharpshooter's "38%" a stale artefact.
+
+**Why an alpha needs an exit from a state the designer has deliberately
+not fixed.** The endless-battle stalemate is a balance question, and it
+is open on purpose. But "open" and "unescapable" are different things.
+The guard that handles it is sims-only; a human who hits it — about one
+in three testers doing five runs — can only force-quit, which costs the
+run and arrives back as "the game froze" rather than as an opinion.
+Forfeit does not resolve the stalemate and must never be described as if
+it did; it converts an unrecoverable state into a recorded one. Ending
+the run exactly as a wipe does is what makes it free of balance
+consequence: forfeiting is strictly worse than winning, so there is
+nothing to exploit and no number to tune. The reason picker is most of
+the value — a forfeit with "this fight will not end" attached is a bug
+report, and a forfeit with "not enjoying it" attached is the single most
+useful sentence an alpha can produce. And the forfeit books its own
+Profile bucket rather than a wipe, because the moment testers start
+using the exit, a chronicle that folds the two together stops being able
+to answer how often the party actually died.
+
 ## The map node economy (Batch Y) — 2026-08-03
 
 **Why the map came before more tuning:** the map was documented as a

@@ -482,29 +482,6 @@ func _spawn_units() -> void:
 				if pool_ab != null \
 						and not cfg["abilities"].any(func(a): return a.display_name == pool_ab.display_name):
 					cfg["abilities"] = cfg["abilities"] + [pool_ab]
-		# Resonance talents move the ceiling — re-read AFTER talents so
-		# Resonant Core / Singularity are visible in cfg (the Mercy pattern
-		# below). Singularity: no maximum (99 is "never reached in practice";
-		# Backlash Ward / Unlimited Power overflow simply never fires).
-		if spec == "arcanist":
-			cfg["second_max"] = 5 + int(cfg.get("resonant_core_ranks", 0))
-			if int(cfg.get("singularity", 0)) > 0:
-				cfg["second_max"] = 99
-		# Mercy talents move the ceiling and the starting line — re-read
-		# them AFTER talents so Martyr's Vigor / Zealous Light are visible
-		# in cfg (the Sharpshooter Focus pattern below).
-		if spec == "holy":
-			cfg["second_max"] = 5 + int(cfg.get("mercy_cap_bonus", 0))
-			cfg["second_resource"] = mini(int(cfg.get("zealous_mercy", 0)),
-				int(cfg["second_max"]))
-		# Focus is the Sharpshooter's second resource (0-100; talents move
-		# the ceiling and the starting line). Set AFTER talents so Deep
-		# Focus / Spray of Arrows / Opening Volley are visible in cfg.
-		if spec == "sharpshooter":
-			cfg["second_resource_name"] = "Focus"
-			cfg["second_max"] = (50 if cfg.get("spray", 0) > 0 \
-				else (150 if cfg.get("deep_focus", 0) > 0 else 100))
-			cfg["second_resource"] = 60 if cfg.get("opening_volley", 0) > 0 else 0
 		# Class passives (every spec of the class, and before awakening).
 		match hero_keys[i]:
 			"cleric":
@@ -520,6 +497,37 @@ func _spawn_units() -> void:
 			for rune in Run.party[i].get("runes", []):
 				if rune.get("equipped", false):
 					Talents.apply_payload(cfg, rune["payload"], 1)
+					# Batch AA roll call: most spec runes ride an EXISTING
+					# talent counter, so their effect surfaces on that
+					# talent's proc line rather than one of their own. One
+					# grep-stable "Rune:" line at spawn means every equipped
+					# rune is still visible in a log a tester pastes back.
+					_rune_roll_call.append("%s: %s" % [cfg["unit_name"], rune["name"]])
+		# SECOND-RESOURCE CEILINGS — derived LAST, from whatever cfg holds by
+		# now. Batch AA moved this block down from above the class passives:
+		# it used to run before runes applied, so a rune writing
+		# resonant_core_ranks / mercy_cap_bonus / zealous_mercy (or the
+		# Sharpshooter's Focus flags) was read too early and did NOTHING —
+		# exactly the silent dud the rune schema exists to prevent. Talent
+		# behaviour is unchanged: talents already applied further up.
+		# Singularity: no maximum (99 is "never reached in practice";
+		# Backlash Ward / Unlimited Power overflow simply never fires).
+		if spec == "arcanist":
+			cfg["second_max"] = 5 + int(cfg.get("resonant_core_ranks", 0))
+			if int(cfg.get("singularity", 0)) > 0:
+				cfg["second_max"] = 99
+		# Mercy: Martyr's Vigor moves the ceiling, Zealous Light the start.
+		if spec == "holy":
+			cfg["second_max"] = 5 + int(cfg.get("mercy_cap_bonus", 0))
+			cfg["second_resource"] = mini(int(cfg.get("zealous_mercy", 0)),
+				int(cfg["second_max"]))
+		# Focus is the Sharpshooter's second resource (0-100; Deep Focus /
+		# Spray of Arrows move the ceiling, Opening Volley the start).
+		if spec == "sharpshooter":
+			cfg["second_resource_name"] = "Focus"
+			cfg["second_max"] = (50 if cfg.get("spray", 0) > 0 \
+				else (150 if cfg.get("deep_focus", 0) > 0 else 100))
+			cfg["second_resource"] = 60 if cfg.get("opening_volley", 0) > 0 else 0
 		# Relic hooks (see the audit atop relics.gd): numeric boons
 		# aggregate across the run's relics. Outside the Run.active gate so
 		# DOD_SIM_RELICS loadouts drive the same code in standalone sims.
@@ -768,6 +776,12 @@ func _build_ui() -> void:
 	burger.flat = false
 	var bpop := burger.get_popup()
 	bpop.add_item("Restart Run", 0)
+	# Batch AA: the tester's exit from a fight that will not end. Real play
+	# only — the entry is never even BUILT under sim/autoplay, so no code
+	# path can reach a forfeit from the harness (same guard discipline as
+	# Batch Z's orientation cards; _do_forfeit re-checks anyway).
+	if _forfeit_allowed():
+		bpop.add_item("Forfeit Run", 4)
 	bpop.add_item("Glossary", 3)
 	bpop.add_item("Settings", 1)
 	bpop.add_item("Exit to Main Menu", 2)
@@ -811,6 +825,19 @@ func _build_ui() -> void:
 	_log_toggle.tooltip_text = "Hide / show the combat log"
 	_log_toggle.pressed.connect(_toggle_log)
 	ui.add_child(_log_toggle)
+
+	# Batch AA: the stalemate nudge. A plain label with input ignored — it can
+	# never take a click from a live skill check, and it does NOT gate
+	# _modal_open(). Hidden until the fight has run absurdly long.
+	_forfeit_nudge = Label.new()
+	_forfeit_nudge.position = Vector2(56, 52)
+	_forfeit_nudge.size = Vector2(700, 20)
+	_forfeit_nudge.visible = false
+	_forfeit_nudge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_forfeit_nudge.add_theme_font_size_override("font_size", 13)
+	_forfeit_nudge.add_theme_color_override("font_color", Color(0.85, 0.7, 0.4))
+	_forfeit_nudge.text = "This fight is not resolving — Forfeit Run is in the ☰ menu."
+	ui.add_child(_forfeit_nudge)
 
 
 	_build_skill_check_ui()
@@ -958,6 +985,128 @@ func _on_burger(id: int) -> void:
 			get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 		3:
 			_open_glossary()
+		4:
+			_open_forfeit_confirm()
+
+
+# ---------- Batch AA: Forfeit Run (the alpha escape hatch) ----------
+#
+# THIS IS NOT A FIX FOR THE STALEMATE. The last-hero-standing-vs-healing-
+# warband state (08-02) is a balance question the designer has deliberately
+# left open, and the STALEMATE_TURNS guard that handles it is SIMS ONLY.
+# Real play had no resolution mechanism at all: at the measured ~0.9% of
+# battles a tester doing five runs lands in an unendable fight about a
+# third of the time, and their only exit was force-quitting — which loses
+# the run and gets reported as a freeze rather than as an opinion.
+# Forfeiting ends the run EXACTLY as a wipe does, so it can never be
+# exploited and needs no balance thought: it is strictly worse than winning.
+const FORFEIT_REASONS := [
+	["stuck", "This fight will not end"],
+	["hard", "Too hard"],
+	["bored", "Not enjoying it"],
+	["bug", "Something broke"],
+	["stop", "Just stopping"],
+]
+
+var _rune_roll_call: Array = []  # "hero: rune name" per equipped rune, logged at battle open
+var _forfeit_panel: Control = null
+var _forfeit_nudge: Label = null
+var _forfeit_nudged := false
+
+# The nudge fires at the same order of magnitude as the sim's force-end, but
+# it is a DIFFERENT thing: the guard ends a sim battle, this ends nothing.
+const FORFEIT_NUDGE_TURNS := STALEMATE_TURNS
+
+
+# One line, once, real play only. It ends nothing, touches no HP and alters
+# no outcome — it only tells a tester that the exit exists.
+func _maybe_nudge_forfeit(turns_taken: int) -> void:
+	if _forfeit_nudged or turns_taken < FORFEIT_NUDGE_TURNS:
+		return
+	if not _forfeit_allowed():
+		return
+	_forfeit_nudged = true
+	if _forfeit_nudge != null and is_instance_valid(_forfeit_nudge):
+		_forfeit_nudge.visible = true
+	_log("This fight is not resolving. Forfeit Run waits in the ☰ menu.", "#d9b168")
+
+
+# Real play, inside a live run, and nothing the harness drives. Checked when
+# the menu entry is BUILT and again when the forfeit actually fires.
+func _forfeit_allowed() -> bool:
+	return Run.active and not Run.sim_run and not sim and not autoplay
+
+
+func _open_forfeit_confirm() -> void:
+	if not _forfeit_allowed() or battle_over:
+		return
+	if _forfeit_panel != null and is_instance_valid(_forfeit_panel):
+		return
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var dim := ColorRect.new()
+	dim.size = Vector2(1280, 720)
+	dim.color = Color(0, 0, 0, 0.7)
+	overlay.add_child(dim)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := PanelContainer.new()
+	center.add_child(panel)
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 8)
+	panel.add_child(vbox)
+
+	var title := Label.new()
+	title.text = "FORFEIT THIS RUN?"
+	title.add_theme_font_size_override("font_size", 28)
+	title.add_theme_color_override("font_color", Color(0.9, 0.45, 0.45))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title)
+	var body := Label.new()
+	body.text = "The run ends here, exactly as a wipe would.\nThis cannot be undone.\n\nWhy are you stopping? (it goes in the summary)"
+	body.add_theme_font_size_override("font_size", 14)
+	body.add_theme_color_override("font_color", Color(0.78, 0.74, 0.66))
+	body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(body)
+	for pair in FORFEIT_REASONS:
+		var btn := Button.new()
+		btn.text = String(pair[1])
+		btn.custom_minimum_size = Vector2(360, 38)
+		btn.pressed.connect(_do_forfeit.bind(String(pair[0]), String(pair[1])))
+		vbox.add_child(btn)
+	var cancel := Button.new()
+	cancel.text = "Keep fighting"
+	cancel.custom_minimum_size = Vector2(360, 42)
+	cancel.pressed.connect(_close_forfeit_confirm)
+	vbox.add_child(cancel)
+	ui.add_child(overlay)
+	_forfeit_panel = overlay
+
+
+func _close_forfeit_confirm() -> void:
+	if _forfeit_panel != null and is_instance_valid(_forfeit_panel):
+		_forfeit_panel.queue_free()
+	_forfeit_panel = null
+
+
+# Ends the run down the SAME path a wipe takes (snapshot -> Run.active
+# false -> clear_save -> summary), with two differences that keep the data
+# honest: the Profile books a forfeit rather than a wipe, and the summary's
+# outcome line reads "forfeited", never "wiped".
+func _do_forfeit(reason_id: String, reason_label: String) -> void:
+	if not _forfeit_allowed() or battle_over:
+		return
+	_close_forfeit_confirm()
+	battle_over = true
+	Profile.note_forfeit(Run.party.map(func(m): return m.get("spec", "")))
+	# Snapshot BEFORE the clear — the Batch Z rule, unchanged.
+	var snap := _run_snapshot("forfeit", "")
+	snap["forfeit_reason"] = reason_label
+	snap["forfeit_reason_id"] = reason_id
+	Run.active = false
+	Run.clear_save()
+	_show_run_summary(snap)
 
 
 # Batch Z: the glossary in battle. The panel itself is inert Control UI —
@@ -1114,6 +1263,8 @@ func _run_battle() -> void:
 	# The warband's theme opens the log — the composition isn't random.
 	if Run.active and String(Run.encounter.get("theme", "")) != "":
 		_log("Enemy warband: %s" % Run.encounter["theme"], "#c8b880")
+	for carried in _rune_roll_call:
+		_log("Rune: %s" % carried, "#b0a8e0")
 	# Zealous Light / Martyr's Vigor (Holy talents): the Cleric opens the
 	# battle with Mercy already in hand, and a deeper well to keep it in.
 	for zl_h in heroes:
@@ -1157,6 +1308,10 @@ func _run_battle() -> void:
 			stalemate = true
 			_check_end()
 			return
+		# Batch AA: real play gets a NUDGE at the same depth, never a
+		# force-end. The balance question stays open; the tester stops
+		# being trapped by it.
+		_maybe_nudge_forfeit(_turns_taken)
 		_turns_taken += 1
 		_update_talent_chips()
 		_rebuild_turn_bar()
@@ -4313,6 +4468,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# (weaknesses — negative resists — still count in full).
 			if ab.dmg_type == "fire" and attacker.avatar_flame > 0 and resist > 0.0:
 				resist = 0.0
+			# Rune of the White Flame (rune_resist_pierce, its ONLY read site):
+			# a POSITIVE resistance is thinned by this fraction. Weaknesses are
+			# untouched — the rune never shrinks a vulnerability.
+			if attacker.rune_resist_pierce > 0.0 and resist > 0.0:
+				resist = maxf(resist * (1.0 - attacker.rune_resist_pierce), 0.0)
+				_log("   → Rune: the flame bites through resistance (-%d%% of it)" % \
+					int(round(attacker.rune_resist_pierce * 100)), "#b0a8e0")
 			# Elemental Weakness: Crushing Blow strips non-physical resists.
 			if ab.dmg_type != "physical" and strike_target.has_status("elem_weak"):
 				resist -= strike_target.status_power("elem_weak") / 100.0
@@ -8238,7 +8400,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 # True while an overlay owns input (see _input).
 func _modal_open() -> bool:
-	return _hint_active or (_glossary != null and is_instance_valid(_glossary))
+	return _hint_active or (_glossary != null and is_instance_valid(_glossary)) \
+		or (_forfeit_panel != null and is_instance_valid(_forfeit_panel))
 
 
 func _grade_skill_check() -> void:
@@ -8699,6 +8862,7 @@ func _run_snapshot(outcome: String, closing_text: String) -> Dictionary:
 		# tester reads includes the run they just finished.
 		"cycles_survived": Profile.completions_total(),
 		"cycles_lost": Profile.wipes_total(),
+		"cycles_abandoned": Profile.forfeits_total(),
 	}
 
 
@@ -8714,16 +8878,27 @@ func _summary_lines(snap: Dictionary) -> Array:
 		lines.append(["p", "Run complete — all %d zones cleansed (%s difficulty)." % [
 			Run.SLOT_COUNT, snap["difficulty"]]])
 	else:
-		lines.append(["h", "THE PARTY HAS FALLEN"])
 		var depth := ""
 		if snap["encounter_type"] == "boss":
 			depth = "facing the %s" % snap["boss_name"]
 		else:
 			depth = "Tier %d of 10" % mini(int(snap["tier"]), 10)
-		lines.append(["p", "Wiped — Zone %d (%s), %s (%s difficulty)." % [
-			snap["zone_num"], snap["zone_name"], depth, snap["difficulty"]]])
+		# Batch AA: a forfeit is reported as a forfeit. Folding it into the
+		# wipe wording would poison every alpha wipe-rate a tester pastes back.
+		if snap["outcome"] == "forfeit":
+			lines.append(["h", "THE RUN IS ABANDONED"])
+			lines.append(["p", "Forfeited — Zone %d (%s), %s (%s difficulty)." % [
+				snap["zone_num"], snap["zone_name"], depth, snap["difficulty"]]])
+			lines.append(["p", "Reason given: %s." % \
+				String(snap.get("forfeit_reason", "not stated"))])
+		else:
+			lines.append(["h", "THE PARTY HAS FALLEN"])
+			lines.append(["p", "Wiped — Zone %d (%s), %s (%s difficulty)." % [
+				snap["zone_num"], snap["zone_name"], depth, snap["difficulty"]]])
 	# --- what ended it ---
-	if snap["outcome"] == "wipe":
+	# A forfeit reports the same block: the fight the tester walked away
+	# from is the most useful thing in the whole summary.
+	if snap["outcome"] != "complete":
 		var kind_label: String = {"fight": "A fight", "elite": "An ELITE fight",
 			"boss": "The zone boss"}.get(snap["encounter_type"], "A fight")
 		lines.append(["s", "The final battle"])
@@ -8767,8 +8942,13 @@ func _summary_lines(snap: Dictionary) -> Array:
 		lines.append(["p", "Relics carried: %s" % ", ".join(relic_names)])
 	# --- the chronicle ---
 	lines.append(["s", "The chronicle"])
-	lines.append(["p", "Cycles survived: %d   Cycles lost to the Decay: %d" % [
-		int(snap["cycles_survived"]), int(snap["cycles_lost"])]])
+	var chronicle := "Cycles survived: %d   Cycles lost to the Decay: %d" % [
+		int(snap["cycles_survived"]), int(snap["cycles_lost"])]
+	# Forfeits are shown only once there are any — the counter never
+	# advertises the escape hatch to a tester who has not used it.
+	if int(snap.get("cycles_abandoned", 0)) > 0:
+		chronicle += "   Cycles abandoned: %d" % int(snap["cycles_abandoned"])
+	lines.append(["p", chronicle])
 	return lines
 
 
@@ -8849,6 +9029,9 @@ func _show_run_summary(snap: Dictionary) -> void:
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	if snap["outcome"] == "complete":
 		title_label.add_theme_color_override("font_color", Color(0.95, 0.85, 0.45))
+	elif snap["outcome"] == "forfeit":
+		# Its own colour: abandoning a run is not the same event as dying in one.
+		title_label.add_theme_color_override("font_color", Color(0.72, 0.68, 0.6))
 	else:
 		title_label.add_theme_color_override("font_color", Color(0.9, 0.45, 0.45))
 	vbox.add_child(title_label)

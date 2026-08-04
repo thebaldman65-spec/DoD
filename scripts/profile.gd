@@ -20,7 +20,7 @@ static func _load() -> Dictionary:
 	if not loaded:
 		loaded = true
 		data = {"version": 1, "runs_started": {}, "runs_completed": {},
-			"wipes": {}, "bosses_killed": {}, "events_seen": {},
+			"wipes": {}, "forfeits": {}, "bosses_killed": {}, "events_seen": {},
 			"zones_cleared": 0, "flags": {}}
 		if FileAccess.file_exists(save_path):
 			var file := FileAccess.open(save_path, FileAccess.READ)
@@ -58,6 +58,15 @@ static func note_wipe(specs: Array) -> void:
 	for spec in specs:
 		if String(spec) != "":
 			_bump("wipes", String(spec))
+
+
+# Batch AA: a forfeit is NOT a defeat. It books its own bucket so the
+# chronicle stays honest the moment testers start using the escape hatch —
+# folding forfeits into wipes would make every alpha wipe-rate unreadable.
+static func note_forfeit(specs: Array) -> void:
+	for spec in specs:
+		if String(spec) != "":
+			_bump("forfeits", String(spec))
 
 
 static func note_boss(kind: String) -> void:
@@ -105,6 +114,13 @@ static func wipes_total() -> int:
 	var total := 0
 	for spec in _load()["wipes"]:
 		total += int(_load()["wipes"][spec])
+	return total / 4
+
+
+static func forfeits_total() -> int:
+	var total := 0
+	for spec in _load().get("forfeits", {}):
+		total += int(_load()["forfeits"][spec])
 	return total / 4
 
 

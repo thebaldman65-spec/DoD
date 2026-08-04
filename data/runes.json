@@ -177,5 +177,157 @@
 		"price": 100,
 		"desc": "A little of every duty: +4% Block, +4% max health, +10% Break damage.",
 		"payload": {"stat": {"block_chance": 0.04, "max_hp_pct": 0.04, "rune_bd_bonus": 0.1}}
+	},
+
+	"cinder_trail": {
+		"name": "Rune of the Cinder Trail", "rarity": "rare", "scope": "spec:pyromancer",
+		"price": 100, "lane": "Kindling",
+		"desc": "Fireball also sets one other enemy Burning for 1 turn, and Flamewave burns 1 turn longer.",
+		"payload": {"stat": {"cinder_trail_ranks": 1, "conflagration_ranks": 1}}
+	},
+	"white_flame": {
+		"name": "Rune of the White Flame", "rarity": "epic", "scope": "spec:pyromancer",
+		"price": 120, "scarred": true, "lane": "Inferno",
+		"desc": "Enemy resistance to his damage is 30% thinner and Inferno Master grants +1% per burning enemy — but -12% max health.",
+		"payload": {"stat": {"rune_resist_pierce": 0.3, "pyromaniac_ranks": 1, "max_hp_pct": -0.12}}
+	},
+	"blast_radius": {
+		"name": "Rune of the Blast Radius", "rarity": "rare", "scope": "spec:pyromancer",
+		"price": 100, "lane": "Detonation",
+		"desc": "Detonation consumes 25% more of the target's remaining Burn and gains +3% critical strike chance.",
+		"payload": {"stat": {"blast_radius_ranks": 1, "supernova_ranks": 1}}
+	},
+	"long_burn": {
+		"name": "Rune of the Long Burn", "rarity": "rare", "scope": "spec:pyromancer",
+		"price": 100,
+		"desc": "A little of every fire: Burn ticks +1% of Attack, burning enemies hit him 2% softer, Detonation +3% crit.",
+		"payload": {"stat": {"accelerant_ranks": 1, "molten_ranks": 1, "supernova_ranks": 1}}
+	},
+
+	"bitter_grip": {
+		"name": "Rune of the Bitter Grip", "rarity": "rare", "scope": "spec:cryomancer",
+		"price": 100, "lane": "Deep Freeze",
+		"desc": "Every stack of Chilled slows 3% harder, and Frozen enemies are 2% likelier to be struck critically — by anyone.",
+		"payload": {"stat": {"frigid_ranks": 1, "frostbite_ranks": 1}}
+	},
+	"honed_lance": {
+		"name": "Rune of the Honed Lance", "rarity": "rare", "scope": "spec:cryomancer",
+		"price": 100, "lane": "Shatterpoint",
+		"requires_ability": "Ice Lance",
+		"desc": "Ice Lance costs 5 less Mana and drives 5% of Attack deeper.",
+		"payload": {"ability": "Ice Lance", "add": {"cost": -5, "damage": 5}}
+	},
+	"killing_cold": {
+		"name": "Rune of the Killing Cold", "rarity": "rare", "scope": "spec:cryomancer",
+		"price": 75, "scarred": true, "lane": "Winter",
+		"desc": "Enemies take 2% more damage per Chilled stack and Chilled enemies miss 5% more — but heals he receives are 25% weaker.",
+		"payload": {"stat": {"hypothermia_ranks": 2, "numbing_ranks": 1, "healing_received_mult": -0.25}}
+	},
+	"long_winter": {
+		"name": "Rune of the Long Winter", "rarity": "rare", "scope": "spec:cryomancer",
+		"price": 100,
+		"desc": "A little of every cold: Chilled slows 3% harder, Ice Lance +5% of Attack per stack, Chilled enemies hit 1% softer per stack.",
+		"payload": {"stat": {"frigid_ranks": 1, "crystal_edge_ranks": 1, "hungering_ranks": 1}}
+	},
+
+	"resonant_core": {
+		"name": "Rune of the Resonant Core", "rarity": "rare", "scope": "spec:arcanist",
+		"price": 100, "lane": "Resonance",
+		"desc": "Maximum Arcane Resonance rises by 1, and every stack grants +2% more damage.",
+		"payload": {"stat": {"resonant_core_ranks": 1, "conduit_ranks": 1}}
+	},
+	"seventh_bolt": {
+		"name": "Rune of the Seventh Bolt", "rarity": "rare", "scope": "spec:arcanist",
+		"price": 100, "lane": "Overload",
+		"requires_ability": "Arcane Barrage",
+		"desc": "Arcane Barrage looses a seventh bolt.",
+		"payload": {"ability": "Arcane Barrage", "add": {"random_hits": 1}}
+	},
+	"unquiet_mind": {
+		"name": "Rune of the Unquiet Mind", "rarity": "rare", "scope": "spec:arcanist",
+		"price": 75, "scarred": true, "lane": "Control",
+		"desc": "Cooldowns tick an extra turn every sixth turn, and a fifth of Cannon's recoil is paid in Mana, not blood — but 8 less Mana a turn.",
+		"payload": {"stat": {"mindfulness_ranks": 1, "feedback_ranks": 2, "mana_regen_bonus": -8}}
+	},
+	"wide_current": {
+		"name": "Rune of the Wide Current", "rarity": "rare", "scope": "spec:arcanist",
+		"price": 100,
+		"desc": "A little of every current: +1% crit per stack, every third crit hits 20% harder, surviving a blow under 25% health grants a stack.",
+		"payload": {"stat": {"arcane_mastery_ranks": 1, "critical_mass_ranks": 1, "on_edge_ranks": 1}}
+	},
+
+	"triage_ward": {
+		"name": "Rune of the Triage Ward", "rarity": "rare", "scope": "spec:holy",
+		"price": 100, "lane": "Radiance",
+		"desc": "Her instant heals can critically strike and mend 3% harder, and 5% of her overhealing is stored for the next Heal.",
+		"payload": {"stat": {"triage_ranks": 1, "capacitor_ranks": 1}}
+	},
+	"last_rites": {
+		"name": "Rune of the Last Rites", "rarity": "epic", "scope": "spec:holy",
+		"price": 160, "lane": "Mercy",
+		"desc": "Grants RESURRECTION: spend 1 Mercy to return a fallen ally to life with 20% health and resource.",
+		"payload": {"grant_ability": "Resurrection"}
+	},
+	"sleepless_vigil": {
+		"name": "Rune of the Sleepless Vigil", "rarity": "rare", "scope": "spec:holy",
+		"price": 75, "scarred": true, "lane": "Sanctuary",
+		"desc": "The most wounded ally heals 2% as her turn ends; allies under a quarter heal 5% as it starts — but -10 Speed.",
+		"payload": {"stat": {"divine_presence_ranks": 2, "beacon_ranks": 1, "speed": -10.0}}
+	},
+	"open_hand": {
+		"name": "Rune of the Open Hand", "rarity": "rare", "scope": "spec:holy",
+		"price": 100,
+		"desc": "A little of every grace: +3% healing, she opens each battle holding 1 Mercy, and allies under a quarter heal 5% more.",
+		"payload": {"stat": {"triage_ranks": 1, "zealous_mercy": 1, "last_hope_ranks": 1}}
+	},
+
+	"warded_robes": {
+		"name": "Rune of the Warded Robes", "rarity": "rare", "scope": "spec:inquisitor",
+		"price": 100, "lane": "Bulwark",
+		"desc": "Divine Shield turns 4% of what it absorbs into healing, and its holder wears +10% armor while it stands.",
+		"payload": {"stat": {"blessed_barrier_ranks": 1, "warded_ranks": 1}}
+	},
+	"binding_oath": {
+		"name": "Rune of the Binding Oath", "rarity": "rare", "scope": "spec:inquisitor",
+		"price": 100, "lane": "Faith",
+		"desc": "A Faith release leaves 1 stack standing instead of nothing, and heals 5% more of the bearer's max health.",
+		"payload": {"stat": {"oath_ranks": 1, "faithful_ranks": 1}}
+	},
+	"burning_censer": {
+		"name": "Rune of the Burning Censer", "rarity": "rare", "scope": "spec:inquisitor",
+		"price": 75, "scarred": true, "lane": "Zeal",
+		"desc": "Consecrated Ground reflects 10% more and the reflection mends the party for a fifth of it — but -12% max health.",
+		"payload": {"stat": {"righteous_ranks": 2, "lifewell_ranks": 1, "max_hp_pct": -0.12}}
+	},
+	"standing_vow": {
+		"name": "Rune of the Standing Vow", "rarity": "rare", "scope": "spec:inquisitor",
+		"price": 100,
+		"desc": "A little of every vow: Divine Shield heals 4% of what it absorbs, -5% party Break damage, holy ground mends 2% each turn.",
+		"payload": {"stat": {"blessed_barrier_ranks": 1, "devoutness_ranks": 1, "pulse_ranks": 1}}
+	},
+
+	"deepening_ruin": {
+		"name": "Rune of the Deepening Ruin", "rarity": "rare", "scope": "spec:occultist",
+		"price": 100, "lane": "Ruin",
+		"desc": "Every stack of Ruin makes its bearer take 1% more damage, and anything bearing Ruin takes 5 Break damage at the start of its turn.",
+		"payload": {"stat": {"deep_hex_ranks": 1, "entropy_ranks": 1}}
+	},
+	"flayed_mind": {
+		"name": "Rune of the Flayed Mind", "rarity": "epic", "scope": "spec:occultist",
+		"price": 160, "lane": "Madness",
+		"desc": "Grants MIND FLAY: 30% of Attack in shadow to two chosen enemies, leaving both Psychotic for 3 turns.",
+		"payload": {"grant_ability": "Mind Flay"}
+	},
+	"hollow_chalice": {
+		"name": "Rune of the Hollow Chalice", "rarity": "rare", "scope": "spec:occultist",
+		"price": 75, "scarred": true, "lane": "Leech",
+		"desc": "Heroes drink 5% more from Ruined targets and the Ruin lifesteal takes 3% more — but heals HE receives are 30% weaker.",
+		"payload": {"stat": {"soul_leech_ranks": 1, "gluttony_ranks": 1, "healing_received_mult": -0.3}}
+	},
+	"whispering_dark": {
+		"name": "Rune of the Whispering Dark", "rarity": "rare", "scope": "spec:occultist",
+		"price": 100,
+		"desc": "A little of every rite: +5% Break damage, Psychosis spreads 15% more readily, enemy afflictions mend the party each turn.",
+		"payload": {"stat": {"broken_will_ranks": 1, "spread_ranks": 1, "pleasure_ranks": 1}}
 	}
 }

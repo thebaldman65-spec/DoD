@@ -159,6 +159,88 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-08-03)
+BATCH AA (08-03) — MAGE + CLERIC SPEC RUNES, AND A FORFEIT. 24 spec runes
+(runes.json 29 -> 53 entries), 4 per spec, ONE PER LANE READ OUT OF
+Talents.LANE_TREES + one splash; exactly 1 scarred per set, ON a lane
+(splashes always clean); 3 epics (White Flame, Last Rites -> grants
+Resurrection, Flayed Mind -> grants Mind Flay). Spec coverage is now
+Warrior+Mage+Cleric; HUNTER HAS NO SPEC RUNES. ONE new cfg field for the
+whole batch (cap was 4): rune_resist_pierce (float on BattleUnit) — thins a
+target's POSITIVE resist to the attacker's type, weaknesses untouched; ONE
+read site, battle.gd's resist block right after the avatar_flame branch,
+logs "Rune: the flame bites through resistance". Everything else rides
+talent counter fields (the point of the design: 24 runes, 0 new read
+sites). ORDERING BUG FIXED — the second-resource CEILING blocks (arcanist
+resonant_core_ranks/singularity, holy mercy_cap_bonus/zealous_mercy,
+sharpshooter spray/deep_focus/opening_volley) were derived from cfg BEFORE
+the rune-apply block; any rune writing them applied cleanly and did
+NOTHING. They now sit immediately AFTER runes apply (talents unchanged —
+they apply further up; the class-passive block still ASSIGNS
+healing_received_mult/mana_regen_bonus, so runes must stay AFTER it or the
+Martyr/Wellspring runes break). test_runes.gd asserts the call-site order
+so it cannot move back — the Hunter batch would have hit this on Focus.
+AUTHORING RULES THAT ARE NOW TESTED, NOT JUST WRITTEN: no rune may write
+one half of an EXCLUSIVE talent pair (heat_haze/scorched, cold_snap/
+bitter_cold, arcane_ward/still_mind, cascade/overflow, stalwart/bastion,
+pact_flesh/barter); every stat field must be a real BattleUnit property or
+a cfg field battle.gd consumes (set() SILENTLY DROPS unknown names — a typo
+is a dud, not a crash) AND something must actually read it; payload carries
+exactly ONE branch (apply_payload is an if/elif chain — a second branch is
+dropped). unit.heal_amount now FLOORS the healing multiplier at 0 —
+healing_received_mult is a running sum of rune terms and a negative one
+would turn every heal into damage that bypasses death handling (worst
+reachable case is -0.6 vs a 1.0/1.15 base, so this is a guard, not a fix).
+Scarred = "a real cost", NOT literally a negative number: Batch
+X's Glass Rune pays +0.15 dmg_taken_bonus, so the check knows a
+PENALTY_FIELDS list. RUNE ROLL CALL: most spec runes ride an existing
+talent's proc line, so battle open now logs one grep-stable
+"Rune: <hero>: <rune name>" per equipped rune. FORFEIT RUN (battle burger,
+real play only) — AN ESCAPE HATCH, NOT A STALEMATE FIX; the balance
+question stays deferred and open. Confirm dialog + 5-reason picker
+(FORFEIT_REASONS); ends the run EXACTLY as a wipe (snapshot -> Run.active
+false -> clear_save -> Batch Z summary) so there is nothing to exploit;
+summary outcome reads "Forfeited" with its own colour + the reason + the
+final battle's lineup; Profile.note_forfeit -> its OWN "forfeits" bucket
+(never note_wipe) + forfeits_total(); chronicle gains "Cycles abandoned"
+only when >0. Guard: _forfeit_allowed() = Run.active and not Run.sim_run
+and not sim and not autoplay — the menu entry is not even BUILT under a
+harness, and _do_forfeit re-checks. NUDGE (real play only,
+FORFEIT_NUDGE_TURNS = STALEMATE_TURNS): one non-blocking label + log line,
+fires ONCE, ENDS NOTHING and touches no HP. MEASURED (route=default,
+map=new, diff=standard, n=50): control off = 6% completions / wipe median
+z1 t11 / ratio@z1t8 0.99 / choice 78% (reproduces X's off row and Y's new
+map) — stats 8% / 0.93, full 4% / 1.05. The whole spread is TWO RUNS at
+n=50: authored pool at current power still does not move completions beyond
+noise (X's finding), and the off/stats/full ORDER FLIPPED between batches,
+which is itself the evidence. Shares flat (Cryo 39->38, Devout 4->4).
+ROTATED PAIR (DOD_SIM_ROTATE=1, n=60 each, its OWN control — the fixed
+party holds only 2 of the 6 new-set specs): off 15% / wipe median z1 t9 /
+1.01, full 17% / z1 t11 / 1.02 = one run apart. Contribution off->full:
+Pyro 36->32, Warden 29->36, Holy 29->28, Survivalist 29->30, Cryo 26->27,
+Sharpshooter 25->20, Swordmaster 23->25, Arcanist 22->21, Occultist 19->15,
+Beastmaster 19->18, Devout 15->13, Berserker 15->16. HOLY DOES NOT MOVE —
+28-29% contribution off 5-6% damage, ~330 heal/b, reproducing Batch W
+exactly. LIKELY CAUSE IS DILUTION AND IT APPLIES TO THE WHOLE BATCH: the
+party buys ~2.4 shop runes/run plus elite picks across FOUR heroes, and the
+mage/cleric spec pools just tripled — a given Holy carries 1-2 of her 4.
+Look at the rune ECONOMY before concluding the entries are underpowered.
+DO NOT read the cleric support numbers as a direction: Devout heal/b went
+10->14 fixed-party and 25->13 rotated — opposite signs, i.e. noise.
+ARTEFACT WARNING NOW FLIPS — do NOT carry Batch X's wording:
+any share/contribution shift DISFAVOURING Beastmaster/Sharpshooter/
+Survivalist is POOL DEPTH, not balance — and it is ALREADY VISIBLE
+(Sharpshooter 25->20 contribution, the largest drop in the rotated pair).
+Difficulty still closed pending human playtesters. VERIFIED (scratchpad, dies with the session):
+test_runes.gd 1523 checks, test_forfeit.gd 57, test_rune_battle.gd 46 (3
+live autoplay battles, every rune of a spec equipped at once; ordering fix
+proven live — Holy opens holding Mercy, Arcanist ceiling reads 6; counters
+proven to SUM when two runes feed one; the Pyromancer's Inferno chip shows
+the rune-boosted step — the live-value-chip gotcha; White Flame proven
+against a deliberately fire-resistant warband because a raider lineup never
+exercises it). Headless parse: all 10 scenes, 0 SCRIPT ERROR. REPORTED NOT
+CHANGED: the Holy tree's Resurrection NODE TEXT says "spend 3 Mercy" but
+the ability's faith_cost is 1 — in-game UI text, and which number is wrong
+is a design call.
 BATCH Z (08-03) — THE ALPHA SHELL: glossary, orientation, run summary.
 Content-free by design; the deliverable is LEGIBILITY (Y made the map a
 decision surface, Z makes the run readable). STAGE 0 RECONCILE: all of
@@ -328,15 +410,17 @@ completions, ratio@z1t8 0.94-0.98 — the pool at CURRENT authored power
 does not move completions beyond noise; z2 t7 ratio 0.73→0.85 under
 full but the z2/z3 collapse survives; shares flat (Berserker 28% all
 rows). NEXT LEVER = authored rune power (data edit, not machinery).
-ARTEFACT WARNINGS: (1) only the Warrior has spec runes — any
-Warrior-favouring share shift is pool depth, never tune on it; (2) the
+ARTEFACT WARNINGS: (1) SUPERSEDED BY BATCH AA — as written, "only the
+Warrior has spec runes, so any Warrior-favouring share shift is pool
+depth"; coverage is now Warrior+Mage+Cleric and the warning points the
+OTHER WAY (see the AA block); (2) the
 rotated twelve-spec table only compares to Batch W at
 DOD_SIM_RUNES=off. Batch V's 14% row does NOT reproduce on this build
 even at off (W's stalemate guard sits between) — never compare rows
 across batches. Scratchpad test_runes.gd (920 checks) +
 test_rune_battle.gd (live log proof: "+30 Bleed" altered H&S, scarred
-"bleedout at 85"). Mage/Cleric/Hunter spec rune sets = one batch per
-class, next.
+"bleedout at 85"). Mage/Cleric spec rune sets shipped in Batch AA;
+HUNTER is the last one owing, in its own batch.
 BATCH W (08-01) — THE OUTLIER PASS, MEASURE-FIRST. Every prior sim ran
 the SAME four specs, so 8 of 12 had never been measured and the cited
 "worst outlier" (Sharpshooter 38%) predated half the roster's rework.
@@ -408,7 +492,12 @@ low-damage comps the fixed party never formed. Rate ~0.9% of battles
 propose a fix unsolicited. (If it is ever picked up: a human hitting
 this state is stuck in an unwinnable-unloseable fight, and the options
 are a turn limit, escalating pressure, or a flee/forfeit action.) The two fixes above are kept as hygiene on their own
-merits, NOT as fixes for this.
+merits, NOT as fixes for this. BATCH AA (08-03) SHIPPED FORFEIT RUN — READ
+THIS CAREFULLY: it is an ESCAPE HATCH FOR A HUMAN, NOT A FIX. The balance
+question is still deferred and still open; the stalemate can still happen
+and nothing about it changed. Forfeit only means a trapped tester can end
+the run deliberately instead of force-quitting. Do NOT record this as
+resolved and do NOT propose the balance fix unsolicited.
 STALEMATE GUARD (battle.gd STALEMATE_TURNS=600, SIMS ONLY): a battle
 past ~60 rounds is force-ended, scored a LOSS (never a win — that
 would inflate completions), no HP touched (death stats stay honest),
