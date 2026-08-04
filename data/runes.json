@@ -329,5 +329,81 @@
 		"price": 100,
 		"desc": "A little of every rite: +5% Break damage, Psychosis spreads 15% more readily, enemy afflictions mend the party each turn.",
 		"payload": {"stat": {"broken_will_ranks": 1, "spread_ranks": 1, "pleasure_ranks": 1}}
+	},
+
+	"deep_bond": {
+		"name": "Rune of the Deep Bond", "rarity": "rare", "scope": "spec:beastmaster",
+		"price": 100, "lane": "devotion",
+		"desc": "Loyalty climbs one stack higher, and every stack drives the beast 1.5% harder.",
+		"payload": {"stat": {"loyalty_cap_bonus": 1, "wild_communion_ranks": 1}}
+	},
+	"turning_pack": {
+		"name": "Rune of the Turning Pack", "rarity": "rare", "scope": "spec:beastmaster",
+		"price": 100, "lane": "pack",
+		"desc": "Swap Companion returns a turn sooner, and each different beast fielded this fight adds +8% companion damage.",
+		"payload": {"stat": {"quick_whistle_ranks": 1, "momentum_ranks": 1}}
+	},
+	"loosened_straps": {
+		"name": "Rune of the Loosened Straps", "rarity": "rare", "scope": "spec:beastmaster",
+		"price": 75, "scarred": true, "lane": "handler",
+		"desc": "Quick Shot flies 12% of Attack harder — but he sheds 8% armor, and every beast he calls wears his plate.",
+		"payload": {"stat": {"masters_aim_ranks": 2, "armor": -0.08}}
+	},
+	"shared_wild": {
+		"name": "Rune of the Shared Wild", "rarity": "rare", "scope": "spec:beastmaster",
+		"price": 100,
+		"desc": "A little of every bond: +1.5% companion damage per Loyalty stack, +8% per different beast fielded, +5% companion health.",
+		"payload": {"stat": {"wild_communion_ranks": 1, "momentum_ranks": 1, "companion_hp_pct": 0.05}}
+	},
+
+	"deep_sight": {
+		"name": "Rune of the Deep Sight", "rarity": "rare", "scope": "spec:sharpshooter",
+		"price": 100, "lane": "Precision",
+		"desc": "His Focus climbs to 150 instead of 100, and critical hits pour 20 more into it.",
+		"payload": {"stat": {"deep_focus": 1, "perfect_form": 1}}
+	},
+	"narrow_gap": {
+		"name": "Rune of the Narrow Gap", "rarity": "rare", "scope": "spec:sharpshooter",
+		"price": 100, "lane": "Penetration",
+		"desc": "His arrows ignore 8% more armor and bite 12% deeper into Broken enemies.",
+		"payload": {"stat": {"pierce_bonus": 0.08, "bonecracker_ranks": 1}}
+	},
+	"long_draw": {
+		"name": "Rune of the Long Draw", "rarity": "rare", "scope": "spec:sharpshooter",
+		"price": 75, "scarred": true, "lane": "Tempo",
+		"desc": "He opens every fight holding 60 Focus and gathers 10 more per attack — but the draw is slow: -10 Speed.",
+		"payload": {"stat": {"opening_volley": 1, "muscle_memory_ranks": 1, "speed": -10.0}}
+	},
+	"level_aim": {
+		"name": "Rune of the Level Aim", "rarity": "rare", "scope": "spec:sharpshooter",
+		"price": 100,
+		"desc": "A little of every angle: 4% more armor ignored, +10 Focus per attack, +12% damage against Broken enemies.",
+		"payload": {"stat": {"pierce_bonus": 0.04, "muscle_memory_ranks": 1, "bonecracker_ranks": 1}}
+	},
+
+	"weeping_wound": {
+		"name": "Rune of the Weeping Wound", "rarity": "rare", "scope": "spec:mystic",
+		"price": 100, "lane": "Venom",
+		"desc": "His basic attack leaves Poison behind for 2 turns, and every stack bites 2 harder.",
+		"payload": {"stat": {"coated_blades": 1, "potent_ranks": 2}}
+	},
+	"quick_spring": {
+		"name": "Rune of the Quick Spring", "rarity": "rare", "scope": "spec:mystic",
+		"price": 100, "lane": "Snares",
+		"requires_ability": "Snare Trap",
+		"desc": "Snare Trap costs 5 less Mana and comes back a turn sooner.",
+		"payload": {"ability": "Snare Trap", "add": {"cost": -5, "cooldown": -1}}
+	},
+	"carrion_wake": {
+		"name": "Rune of the Carrion Wake", "rarity": "rare", "scope": "spec:mystic",
+		"price": 75, "scarred": true, "lane": "Guerilla",
+		"desc": "He strikes 30% harder at anything wearing three afflictions and drinks 16% max Mana from every death — but -12% max health.",
+		"payload": {"stat": {"vulture": 1, "scavenger_ranks": 2, "max_hp_pct": -0.12}}
+	},
+	"long_hunt": {
+		"name": "Rune of the Long Hunt", "rarity": "rare", "scope": "spec:mystic",
+		"price": 100,
+		"desc": "A little of every trick: +1 Poison damage per stack, +15% trap damage, Tripwire answers with 10% more of his Attack.",
+		"payload": {"stat": {"potent_ranks": 1, "cruel_ranks": 1, "wire_ranks": 1}}
 	}
 }

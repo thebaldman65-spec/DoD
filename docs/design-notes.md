@@ -4,6 +4,107 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Hunter rune sets and a Shieldwall rework (Batch AB) — 2026-08-03
+
+**Shieldwall and Interpose were one verb pointed in two directions.**
+Both granted `shield_charges`; both fully negated the next attacks; one
+aimed at the Warden and one at everyone else. Two abilities, one idea —
+and the self-directed half was strictly the stronger of the two, because
+a charge spent on the Warden is spent on the unit the enemies are
+already taunted onto. A kit that spends two of its five slots saying the
+same word twice has one fewer thing to say. Interpose keeps the
+guarantee, because covering the *line* is the thing only a tank can do
+and it has no substitute. Shieldwall gives the guarantee up and becomes
+a stance: +25% Block chance, two turns. He guarantees safety for the
+party and gambles for himself.
+
+**Why the gamble is not simply a smaller guarantee.** Tenacity and Rally
+feed on Heavy Plating blocks specifically, and Shieldwall's charges
+never triggered them — a charge *bypasses* the block roll rather than
+winning it, so the Warden's two payoff talents sat idle through exactly
+the turns he was most protected. Moving the bonus into the roll changes
+what a block IS: every block Shieldwall buys is a Heavy Plating block,
+so it grows his max HP and rallies the party's healing. He trades hard
+denial for an engine. That is the whole ability, and it is why the trade
+is written into the ability description rather than left for a player to
+discover — a trade nobody can see is not a trade, it is a nerf with
+extra words.
+
+There is a second-order effect worth stating because it is a real cost,
+not a bonus: Heavy Plating's climbing bonus resets on any Block, so more
+blocks mean a higher floor and a shorter climb. His mitigation gets less
+spiky and more even. Whether that is better is a playtest question, not
+a sim question.
+
+**A note on what the measurement can and cannot say.** The Warden-party
+rows below show damage-prevented attributed to him falling by roughly a
+third — which is exactly what trading three guaranteed blocks for a 25%
+chance should do, and it is the honest headline. What those rows CANNOT
+show is the other half of the trade, because a standalone sim spends no
+talent points: Tenacity and Rally are not in the party at all, so the
+engine the ability now feeds is switched off in the very measurement
+used to price it. The number is real and it is also only half the
+ledger. The other half is measured in `test_shieldwall.gd`, where the
+stance is isolated and its blocks are shown to drive Tenacity directly.
+
+**The fossil.** The `raw *= 0.75` branch was Shieldwall v1 — a
+party-wide percentage ward Batch G replaced and Batch Z later found
+still sitting in the damage path. Deleting it is hygiene, not a change:
+no ability, enemy or rune carried the specials that applied it. Worth
+recording *why* it survived two batches — it read like a plausible
+mistuned version of a live ability rather than the corpse of a dead one,
+which is the general shape of the risk. A vault comment that names what
+was vaulted (this one did) is what made the call decidable.
+
+**Zero new machinery for twelve runes.** The Hunter sets add no cfg
+fields at all — the budget was four, Batch AA spent one for
+twenty-four, this one spends none. Every entry rides a talent counter
+that already has a read site. That is not thrift for its own sake: a
+rune whose effect flows through an existing talent's code path is a rune
+that cannot silently do nothing, because the talent proves the path
+works.
+
+**The traps this class posed, and what was done about each.** The
+Beastmaster's numbers land on up to three bodies — companions inherit
+his armor at summon and per-beast terms count twice under The Pack — so
+his scarred rune puts its *cost* on armor (-8%) and its upside on Quick
+Shot, which is his own body only. The multiplication is named in the
+rune's own text ("every beast he calls wears his plate") rather than
+left as a hidden tax. The same property has been true of the class-wide
+Wolf's Hunger rune since Batch X and was never written down; it is
+written down now. No Hunter rune carries a healing term, deliberately:
+Ancient Pact makes `no_heals` reject all healing, so a healing-flavoured
+Beastmaster rune is a dead rune for anyone deep in Devotion — the same
+silent dud as an unowned ability name, reached through a talent instead
+of a kit. The Survivalist's meter lives on the *enemy* as Poison stacks,
+so his runes write enemy-side effects and were not forced into the
+second-resource mould the other eleven specs share.
+
+**Two Sharpshooter runes deliberately write Focus ceilings.** Batch AA
+moved the ceiling derivations below the rune-apply block specifically
+because "the Hunter batch would have hit this on Focus", and then had
+nothing in the pool that actually wrote one. Deep Sight (cap 150) and
+the Long Draw (opens at 60) are the first runes to exercise that fix for
+real, which is why `test_runes.gd` now also asserts the pool CONTAINS
+such a rune: an ordering assertion guarding a road nothing drives on
+proves nothing.
+
+**Two known partial overlaps, stated rather than hidden.** The Deep
+Bond's ceiling term does nothing for a Beastmaster who took Lone Bond
+(cap 8) or Wild Rotation (cap 2), because those talents *replace* the
+ceiling rather than add to it; the Deep Sight's cap does nothing for a
+Sharpshooter running Spray of Arrows (cap 50), for the same reason. In
+both cases the rune's other term still applies, so neither is a silent
+dud — it is the ordinary case of a rune being worth less to a build that
+already went that way, which is the per-lane rule working. It is written
+down here so a later batch does not rediscover it as a bug.
+
+**No epic in the Hunter twelve, on purpose.** Rarity means kind here,
+not magnitude: epic is reserved for granting an ability, changing a
+damage type, or inverting a rule. Nothing in these sets does any of
+those, so calling one epic would have been a price tag pretending to be
+a category. Five of the nine existing spec sets have no epic either.
+
 ## Mage and Cleric rune sets, and a forfeit (Batch AA) — 2026-08-03
 
 **Why one rune per lane is a mechanism and not a hope.** Batch X built

@@ -47,7 +47,12 @@ const STATUS_INFO := {
 	"devotion": ["Devotion Aura", "DA", Color(0.95, 0.8, 0.45), "The Devout's presence: takes 15%\nless Break damage."],
 	"tripwire": ["Tripwire", "TW", Color(0.8, 0.65, 0.35), "Retaliates against every attacking\nmelee enemy for 75% of their damage."],
 	"stunned": ["Stunned", "St", Color(0.95, 0.9, 0.4), "Loses their next turn."],
-	"shieldwall": ["Shieldwall", "SW", Color(0.6, 0.7, 0.9), "Takes 25% less damage."],
+	# Batch AB: the Warden's stance. The old percentage ward of the same id
+	# (Shieldwall v1, "-25% damage") was a fossil and is gone — this is the
+	# live ability: it raises the Block ROLL rather than bypassing it, so
+	# the blocks it buys are Heavy Plating blocks and feed Tenacity/Rally.
+	"shieldwall": ["Shieldwall", "SW", Color(0.6, 0.7, 0.9),
+		"Braced: bonus Block chance while\nthe stance holds."],
 	"empower": ["Empower", "+A", Color(0.95, 0.45, 0.35), "+25% damage dealt."],
 	"exposed": ["Exposed", "E", Color(0.95, 0.9, 0.4), "Takes 15% more damage."],
 	"cripple": ["Cripple", "C", Color(0.5, 0.4, 0.55), "-25% damage dealt."],
@@ -61,7 +66,10 @@ const STATUS_INFO := {
 	"scent": ["Scent of Blood", "SB", Color(0.85, 0.3, 0.3), "Fed by bleedouts: bonus damage for\neach enemy bled out this battle."],
 	"deathwish": ["Deathwish", "DW", Color(0.9, 0.3, 0.3), "Below 35% health: bonus damage —\nnothing left to lose."],
 	"undying_rage": ["Undying Rage", "UR", Color(0.95, 0.25, 0.2), "Below 25% health: cannot die and\n+50% damage. The hit that would have\nkilled him ends it at 1 HP\n(once per battle)."],
-	"shield_charges": ["Shieldwall", "SW", Color(0.65, 0.72, 0.85), "The next attacks against this unit\nare BLOCKED (one charge each)."],
+	# Interpose is the only source of guaranteed charges since Batch AB, so
+	# the label follows the charges rather than the ability that stopped
+	# granting them — the block log names this as its source.
+	"shield_charges": ["Interpose", "IP", Color(0.65, 0.72, 0.85), "The next attacks against this unit\nare BLOCKED (one charge each)."],
 	"high_guard": ["High Guard", "HG", Color(0.55, 0.80, 0.95), "Takes 25% less damage."],
 	"tempo": ["Tempo", "T+", Color(0.4, 0.9, 1.0), "The pivot's momentum: bonus damage\nfor one turn (granted by switching\nstance)."],
 	"killing_edge": ["Killing Edge", "KE", Color(0.95, 0.5, 0.35), "The Aggressive guard hunts the\nopening: bonus critical chance while\nthe stance holds."],
@@ -193,6 +201,10 @@ var _r3_recorded := false
 # x 60 rounds is far past anything legitimate.
 const STALEMATE_TURNS := 600
 var stalemate := false
+# Shieldwall (Batch AB): the Block chance the Warden's stance adds, in
+# percent. It rides the Heavy Plating slice of the block roll on purpose —
+# see the "shield_block" special and the roll itself.
+const SHIELDWALL_BLOCK := 25
 # Batch W: this battle's dmg/heal/prevented per hero — banked into the
 # per-spec share pools at battle end (rotation needs "share of the battles
 # this spec was IN", which the stage totals can't give).
@@ -1780,6 +1792,12 @@ func _hero_side() -> Array:
 # the whole enemy party's bloodloss). Called every loop tick and after bleed
 # changes; Iron Will keeps itself fresh inside unit._refresh_chips instead.
 func _update_talent_chips() -> void:
+	# Heavy Plating's live-total chip lives in refresh_bars, which only HP
+	# changes drive — Shieldwall's stance moves that total on its own clock,
+	# so re-read it on the same cadence as every other live chip.
+	for wd in heroes:
+		if not wd.dead and wd.passive_id == "heavy_plating":
+			wd.refresh_bars()
 	# Pack Bond (Aguila): the party-wide crit boon shows as a live buff chip.
 	var ee_bonus := _party_crit_bonus()
 	for h in heroes:
@@ -2000,7 +2018,7 @@ func _player_turn(u: BattleUnit) -> void:
 	var grade := "good"
 	while true:
 		var used_targeting := false
-		if ab.special in ["rally", "focus", "surge", "shieldwall", "quickdraw",
+		if ab.special in ["rally", "focus", "surge", "quickdraw",
 				"phoenix", "hymn", "retaliate", "unity", "tripwire",
 				"mana_shield", "divine_wrath", "shield_block", "hold_the_line",
 				"battle_shout", "blood_price", "flame_shield", "stabilize",
@@ -3780,14 +3798,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						break
 					continue
 			# Block: negates 100% of the hit — damage, Break damage, and on-hit
-			# effects. Sources (logged): Shieldwall charges (guaranteed), the
+			# effects. Sources (logged): Interpose charges (guaranteed), the
 			# base Block stat, or Heavy Plating. Broken units cannot Block.
 			if not is_counter and not strike_target.broken and not strike_target.dead \
 					and not strike_target.is_companion:
 				var block_source := ""
 				var charges := strike_target.get_status("shield_charges")
 				if not charges.is_empty() and int(charges.get("power", 0)) > 0:
-					block_source = "Shieldwall"
+					block_source = "Interpose"
 					charges["power"] = int(charges["power"]) - 1
 					var charges_left := int(charges["power"])
 					if charges_left <= 0:
@@ -3795,8 +3813,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					else:
 						# The chip counts down the blocks still owed.
 						strike_target.update_status("shield_charges",
-							"SW%d" % charges_left,
-							"Shieldwall: the next %d attack(s) against\nthis unit are BLOCKED (one charge each)." % charges_left)
+							"IP%d" % charges_left,
+							"Interpose: the next %d attack(s) against\nthis unit are BLOCKED (one charge each)." % charges_left)
 				else:
 					# One roll, attributed to whichever slice it landed in.
 					# Heavy Plating v2: the passive's 15% plus the pity ramp —
@@ -3804,6 +3822,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# instead of whenever the dice feel like it.
 					var plating := (0.15 + strike_target.plating_bonus) \
 						if strike_target.passive_id == "heavy_plating" else 0.0
+					# Shieldwall (Batch AB) rides the SAME slice on purpose: the
+					# stance raises the Block roll instead of bypassing it, so
+					# the blocks it buys are Heavy Plating blocks and DO feed
+					# Tenacity and Rally. That trade is the whole ability.
+					if strike_target.has_status("shieldwall"):
+						plating += 0.01 * maxi(
+							strike_target.status_power("shieldwall"), 0)
 					var block_roll := randf()
 					if block_roll < strike_target.block_chance:
 						block_source = "base Block"
@@ -3815,11 +3840,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# Batch W: what the blocked swing would have carried — the
 					# nominal hit through the blocker's armor (variance, crits
 					# and riders can't be known for a hit never rolled).
-					# Shieldwall charges credit their stamped caster, so an
-					# Interpose block is the Warden's work on any ally.
+					# Interpose charges credit their stamped caster, so a
+					# covered ally's block is the Warden's work. Batch AB:
+					# Shieldwall is no longer its own mitigation site — the
+					# stance's blocks land in this roll and are credited to
+					# the blocker below. Counted once, never lost.
 					if strike_target.is_hero and ab.damage > 0:
 						var pv_owner := ""
-						if block_source == "Shieldwall":
+						if block_source == "Interpose":
 							pv_owner = String(charges.get("src_name", ""))
 						if pv_owner == "":
 							pv_owner = strike_target.unit_name
@@ -4408,12 +4436,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if ruin_occ != null:
 					raw *= 1.0 + (0.02 + 0.01 * ruin_occ.deep_hex_ranks) \
 						* strike_target.status_stacks("ruin")
-			if strike_target.has_status("shieldwall"):
-				var pv_was := raw
-				raw *= 0.75
-				if strike_target.is_hero:
-					var sw_src := String(strike_target.get_status("shieldwall").get("src_name", ""))
-					_prev(sw_src if sw_src != "" else strike_target.unit_name, pv_was - raw)
 			# Shielded: the Orc Shieldmaster's single-ally ward.
 			if strike_target.has_status("shielded"):
 				raw *= 0.75
@@ -5521,7 +5543,7 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 	# Batch W: the debuffer's ledger — statuses a hero lands on OTHERS
 	# (only sites that pass src are counted; the changelog owns the list).
 	# The src name also rides the status so mitigation it later performs
-	# (Shieldwall charges, the shieldwall ward) can credit its caster.
+	# (Interpose charges, barrier absorbs) can credit its caster.
 	if src != null:
 		if src.is_hero and target != src:
 			var st_name := _contrib_name(src)
@@ -6344,12 +6366,6 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					aegis_t.float_text("Radient Aegis", Color(0.95, 0.9, 0.6))
 					_log("   → Talent: Radient Aegis — the shield echoes onto %s" % \
 						aegis_t.unit_name, "#b0a8e0")
-		"shieldwall":
-			_sfx("parry", -7.0, 0.5)
-			for h in heroes.filter(func(he): return not he.dead):
-				_apply_status(h, "shieldwall", 3 if is_perfect else 2)
-			_message("%s raises the shieldwall!" % attacker.unit_name)
-			_log("%s: Shieldwall — party takes 25%% less damage" % attacker.unit_name, "#70d878")
 		"quickdraw":
 			_sfx("click", -6.0, 1.3)
 			_apply_status(attacker, "quickdraw", 6 if is_perfect else 5)
@@ -6415,16 +6431,17 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				int(round(pct * 100)), " (Empowered)" if empowered else ""], "#70d878")
 		"sanctuary":
 			# VAULTED ability's machinery (kept): Mercy-scaled like all heals.
+			# Batch AB: it used to hand out a Shieldwall v1 ward as well; that
+			# status is gone with the fossil, so the vault keeps the heal only.
 			var sanct_pct := (0.18 if is_perfect else 0.12) * _healing_done_mult(attacker)
 			_sfx("heal", -4.0, 0.8)
 			for h in heroes.filter(func(he): return not he.dead):
 				var amt := int(h.max_hp * sanct_pct)
 				h.heal_amount(amt, h != attacker)
 				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
-				_apply_status(h, "shieldwall", 1, 0, 0, attacker)
 				_stat_heal(attacker, amt)
 			_message("Sanctuary!")
-			_log("%s: Sanctuary — party healed and walled" % attacker.unit_name, "#70d878")
+			_log("%s: Sanctuary — party healed" % attacker.unit_name, "#70d878")
 		"unity":
 			# Sacred Resolve (talent ability). Healing Pulse and Cleansing
 			# Waters are no longer snapshotted here — they read the living
@@ -6953,23 +6970,31 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				gc_label, gc_bd_txt,
 				" [PERFECT: +10% parry, 2 turns]" if is_perfect else ""], "#70d878")
 		"shield_block":
-			# Shield Mastery (the re-specced wd_shieldwall node) deepens
-			# every cast, the perfect one included.
-			var blocks := (5 if is_perfect else 3) + attacker.shield_mastery_ranks
+			# Batch AB — Shieldwall is a STANCE, not a charge grant: it raises
+			# his Block chance instead of bypassing the roll. He guarantees
+			# safety for the line (Interpose) and gambles for himself. The
+			# bonus rides the Heavy Plating slice of the roll, so the blocks
+			# it buys wake Tenacity and Rally — the trade the ability is for.
+			# Shield Mastery (the re-specced wd_shieldwall node) now buys
+			# DURATION, the perfect cast included.
+			var wall_turns := (3 if is_perfect else 2) + attacker.shield_mastery_ranks
 			_sfx("parry", -6.0, 0.5)
-			_apply_status(attacker, "shield_charges", -1, blocks, 0, attacker)
-			# The chip counts the blocks owed (recasting resets the count).
-			attacker.update_status("shield_charges", "SW%d" % blocks,
-				"Shieldwall: the next %d attack(s) against\nthis unit are BLOCKED (one charge each)." % blocks,
-				blocks)
-			_message("%s raises the shield!" % attacker.unit_name)
-			_log("%s: Shieldwall — the next %d attacks will be BLOCKED" % [
-				attacker.unit_name, blocks], "#8c9cc8")
+			_apply_status(attacker, "shieldwall", wall_turns, SHIELDWALL_BLOCK,
+				0, attacker)
+			# Live-total chip, in Heavy Plating's house style.
+			attacker.update_status("shieldwall", "+%d%% Block" % SHIELDWALL_BLOCK,
+				"Shieldwall: +%d%% Block chance for %d more turn(s).\nThese count as Heavy Plating blocks." % [
+					SHIELDWALL_BLOCK, wall_turns], SHIELDWALL_BLOCK)
+			attacker.refresh_bars()
+			_message("%s sets the wall!" % attacker.unit_name)
+			_log("%s: Shieldwall — +%d%% Block chance for %d turns" % [
+				attacker.unit_name, SHIELDWALL_BLOCK, wall_turns], "#8c9cc8")
 		"interpose":
 			# The tank verb the kit was missing: cover the whole line. Rides
 			# the existing shield_charges status — it already counts down,
 			# renders a chip, and outranks the block roll. Charges ADD to any
-			# the ally is holding (a prior Interpose or the Warden's own wall).
+			# the ally is holding. Since Batch AB this is the ONLY source of
+			# guaranteed charges, which is why the block log names it.
 			_sfx("parry", -6.0, 0.5)
 			# Bulwark Line thickens the cover: +1 charge per rank per ally.
 			var sw_grant := 1 + attacker.bulwark_line_ranks
@@ -6982,15 +7007,15 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					if h.has_status("shield_charges") else 0
 				var sw_total := sw_held + sw_grant
 				_apply_status(h, "shield_charges", -1, sw_total, 0, attacker)
-				h.update_status("shield_charges", "SW%d" % sw_total,
-					"Shieldwall: the next %d attack(s) against\nthis unit are BLOCKED (one charge each)." % sw_total,
+				h.update_status("shield_charges", "IP%d" % sw_total,
+					"Interpose: the next %d attack(s) against\nthis unit are BLOCKED (one charge each)." % sw_total,
 					sw_total)
 				h.float_text("COVERED", Color(0.75, 0.8, 0.95))
 			if attacker.bulwark_line_ranks > 0:
 				_log("   → Talent: Bulwark Line — each ally gains %d charges" % \
 					sw_grant, "#b0a8e0")
 			_message("%s covers the line!" % attacker.unit_name)
-			_log("%s: Interpose — every ally gains a Shieldwall charge%s" % [
+			_log("%s: Interpose — every ally gains a shield charge%s" % [
 				attacker.unit_name,
 				" [PERFECT: the Warden too]" if is_perfect else ""], "#8c9cc8")
 		"hold_the_line":

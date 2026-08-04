@@ -218,7 +218,7 @@ var sundering_ranks := 0      # Sundering: Crushing Blow BD splash to Adjacent
 var tenacity := 0             # Tenacity: +5 max HP per Heavy Plating block
 var tenacity_hp_gained := 0   # battle-long gains (excluded from the run save)
 var rally := 0                # Rally: party +15% healing for 2t per HP block
-var shield_mastery_ranks := 0 # Shield Mastery: Shieldwall grants +1 charge/rank
+var shield_mastery_ranks := 0 # Shield Mastery: Shieldwall's stance +1 turn/rank
 var plating_bonus := 0.0      # Heavy Plating v2: +8% Block per unblocked hit
                               # (cap +40%; any Block resets it; fresh per battle
                               # like frenzy_floor — units are built each battle)
@@ -875,11 +875,21 @@ func refresh_bars() -> void:
 	if passive_id == "heavy_plating":
 		for s in statuses:
 			if s.id == "spec_passive":
-				var total := (block_chance + 0.15 + plating_bonus) * 100.0
+				# Shieldwall's stance rides the same slice of the roll, so the
+				# live total has to carry it or the readout lies while it holds.
+				var wall := 0.0
+				if has_status("shieldwall"):
+					wall = 0.01 * maxi(status_power("shieldwall"), 0)
+				var wall_line := ""
+				if wall > 0.0:
+					wall_line = "\nShieldwall's stance adds +%d%% while it holds." % \
+						int(round(wall * 100.0))
+				var total := (block_chance + 0.15 + plating_bonus + wall) * 100.0
 				s.short = "Block %d%%" % int(round(total))
-				s.desc = "Heavy Plating: +15%% Block chance on top of the\n%d%% base. Every unblocked attack adds +8%% for the\nrest of the battle (now +%d%%, cap +40%%); Blocking\nresets the bonus. Total Block chance: %d%%." % [
+				s.desc = "Heavy Plating: +15%% Block chance on top of the\n%d%% base. Every unblocked attack adds +8%% for the\nrest of the battle (now +%d%%, cap +40%%); Blocking\nresets the bonus.%s\nTotal Block chance: %d%%." % [
 					int(round(block_chance * 100.0)),
-					int(round(plating_bonus * 100.0)), int(round(total))]
+					int(round(plating_bonus * 100.0)), wall_line,
+					int(round(total))]
 				_refresh_chips()
 				break
 	# Seasoned Fighter chip shows which guard is live; the tooltip carries

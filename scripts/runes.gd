@@ -60,7 +60,11 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# Batch AA: int counters that do NOT end in "_ranks" and so would slip
 	# through as floats — BattleUnit.setup() pushes cfg straight into typed
 	# vars, and a float into an int var is a runtime error, not a rounding.
-	"zealous_mercy", "mercy_cap_bonus"]
+	"zealous_mercy", "mercy_cap_bonus",
+	# Batch AB: the Hunter trees are full of these — flag talents whose
+	# payload is a bare 1. Same trap, same list.
+	"loyalty_cap_bonus", "deep_focus", "perfect_form", "opening_volley",
+	"coated_blades", "vulture"]
 
 static var _data := {}
 

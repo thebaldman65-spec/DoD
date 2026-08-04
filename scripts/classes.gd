@@ -560,8 +560,10 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Open his own veins: pays 15% of\ncurrent health (never lethal) for\n30 Rage and +25% damage for 2 turns.\nBlood Frenzy wakes when HE says so."}),
 			]
 		"warden":
-			# VAULTED — Shieldwall v1 (party -25% damage, 2 turns) and
-			# Retaliation (counter stance): kept for future return.
+			# VAULTED — Retaliation (counter stance): kept for future return.
+			# Shieldwall v1 (party -25% damage, 2 turns) was DELETED in Batch
+			# AB: Batch G had already replaced it and its leftover machinery
+			# was applying nothing. The live Shieldwall is the Block stance.
 			# Damage %s are tuned against the Warden's 75 Attack (Tank role):
 			# Mocking 27% ≈ 20, Crushing 43% ≈ 32 — the pre-scaling numbers.
 			return [
@@ -582,17 +584,20 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Slam the earth: 3 shockwaves rip\nrandom enemies for 15% Attack damage\nand 15 BD each. Allies regain 10%\nof their resource."}),
 				# Shieldwall graduated from the talent tree (Batch G): his one
 				# moment of control over the Block identity belongs in the base
-				# kit. The wd_shieldwall node is now Shield Mastery (+charges).
+				# kit. Batch AB made it a STANCE — it and Interpose were the
+				# same verb pointed two ways, and the self-directed half was
+				# the stronger. He now guarantees the line and gambles for
+				# himself; the wd_shieldwall node buys duration.
 				Ability.make({"display_name": "Shieldwall", "cost": 25,
 					"special": "shield_block", "delay": 2.0, "anim": "attack01",
 					"cooldown": 2,
-					"perfect_id": "", "perfect_text": "Blocks 5 attacks instead",
-					"description": "Raise the shield: the next 3 attacks\nagainst the Warden are BLOCKED."}),
+					"perfect_id": "", "perfect_text": "Holds a third turn",
+					"description": "Set the wall: +25% Block chance for\n2 turns. These count as HEAVY PLATING\nblocks, so they feed Tenacity and\nRally — Interpose's charges never do."}),
 				Ability.make({"display_name": "Interpose", "cost": 25,
 					"special": "interpose", "delay": 2.5, "anim": "attack01",
 					"cooldown": 4,
 					"perfect_id": "", "perfect_text": "The Warden gains a charge too",
-					"description": "Throw the wall wide: every other ally\ngains a Shieldwall charge — the next\nattack against them is BLOCKED."}),
+					"description": "Throw the wall wide: every other ally\ngains a shield charge — the next\nattack against them is BLOCKED."}),
 			]
 		"swordmaster":
 			return [

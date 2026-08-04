@@ -159,6 +159,147 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-08-03)
+BATCH AB (08-03) — HUNTER SPEC RUNES + SHIELDWALL AS A BLOCK STANCE.
+TWO CORRECTIONS FIRST. (a) The Holy tree's Resurrection NODE TEXT said
+"spend 3 Mercy"; faith_cost has always been 1 — the DESIGN CALL WAS MADE,
+1 is correct, node text fixed. Everything else (ability desc, Last Rites
+rune, glossary res_mercy/res_empower, master.html) already said 1.
+(b) SHIELDWALL v1 FOSSIL DELETED — the `raw *= 0.75` branch Batch Z found
+was v1's corpse (party -25%, replaced by Batch G), NOT a mistuned live
+ability. Removed: damage-path branch, the vaulted "shieldwall" special
+that applied it, its self-cast-list entry, the vaulted Sanctuary's
+shieldwall grant, master.html's "Shieldwall -25%" target modifier.
+CHECKED BEFORE DELETING, as the brief demanded: the two remaining
+`_apply_status(..., "shieldwall", ...)` callers were VAULTED match
+branches no ability/enemy/rune references — nothing live applied it, so
+this stayed hygiene. Glossary never carried it (its drift alarm covers
+DEBUFF_IDS; Shieldwall is a buff) — no stale entry to fix.
+SHIELDWALL IS NOW A STANCE. It and Interpose were ONE VERB POINTED TWO
+WAYS (both granted shield_charges, both fully negated) and the
+self-directed half was the stronger. Interpose keeps the guarantee;
+Shieldwall grants NO charges and gives +25% Block chance for 2 turns (3
+perfect), +1 turn per Shield Mastery rank. 25 Rage / 2.0 / 2cd /
+self-cast unchanged. const SHIELDWALL_BLOCK := 25; status id "shieldwall"
+REUSED (the fossil's id, new meaning), power = the percent.
+THE LOAD-BEARING BIT: the bonus is added to the `plating` slice of the
+block roll, NOT to block_chance — so the blocks it buys label AND count
+as HEAVY PLATING blocks, which is what makes them feed Tenacity and Rally
+(charges never did). Say this in the ability description; it is the whole
+trade. wd_shieldwall RE-SPECCED IN PLACE (same id, saved ranks migrate,
+no refund): "+1 charge/rank" -> "+1 turn of stance/rank", 2 ranks.
+BLOCK-SOURCE LABELS FOLLOW THE CHARGES: charge blocks now log
+"(Interpose)" and the chip reads "IP3" (STATUS_INFO shield_charges label
++ both update_status sites). PREVENTED-DAMAGE: Shieldwall is no longer
+its own mitigation site — the credit belongs to the block roll's existing
+_prev call, counted ONCE, not lost (the measured ~30% drop, not ~100%, is
+the proof). Heavy Plating's live-total CHIP folds the stance in
+(unit.gd refresh_bars) and _update_talent_chips re-reads it every turn —
+without that the readout lies while the stance holds.
+12 HUNTER SPEC RUNES (runes.json 53 -> 65; ALL TWELVE SPECS NOW COVERED),
+4 each for beastmaster/sharpshooter/mystic, one per lane out of
+LANE_TREES + 1 splash, exactly 1 scarred per set ON a lane. ZERO new cfg
+fields (cap was 4; AA spent 1 for 24 runes) — every entry rides an
+existing talent counter's read site. Beastmaster lanes are LOWERCASE
+(devotion/pack/handler); Sharpshooter Precision/Penetration/Tempo;
+Survivalist Venom/Snares/Guerilla. Runes.STAT_INT_KEYS GAINED SIX
+(loyalty_cap_bonus, deep_focus, perfect_form, opening_volley,
+coated_blades, vulture) — Hunter flag talents whose payload is a bare 1
+and which do NOT end in "_ranks", i.e. the exact AA float-into-int trap.
+TRAPS HANDLED: wild_communion_ranks NEVER communion_ranks (Devout's);
+companions inherit the hunter's ARMOR at summon and per-beast terms
+double under The Pack, so the Beastmaster's scarred rune puts its COST on
+armor (-8%, and its text says "every beast he calls wears his plate")
+and its upside on Quick Shot — the same multiplication has been true of
+class:hunter wolfs_hunger since Batch X and was never written down; NO
+Hunter rune carries a healing term (Ancient Pact's no_heals would make it
+a dead rune); the Survivalist's meter lives on the ENEMY so his runes
+write Poison-side effects. TWO SHARPSHOOTER RUNES WRITE FOCUS CEILINGS
+(deep_focus 150, opening_volley 60) — the FIRST runes to exercise AA's
+call-site ordering fix for real; test_runes now also asserts the POOL
+CONTAINS such a rune (an ordering assertion guarding a road nothing
+drives on proves nothing). No epic in the twelve: rarity means KIND
+(grant/type-change/rule-invert) and none of these do that; 5 of the 9
+prior spec sets have no epic either.
+**THE BATCH AA ARTEFACT WARNING IS RETIRED — do NOT resurrect it.** Its
+wording ("any shift disfavouring Beastmaster/Sharpshooter/Survivalist is
+pool depth, not balance", pointing at Sharpshooter 25->20) expires here:
+all twelve specs have sets, so the twelve-spec contribution table is
+internally comparable for the first time since Batch X.
+MEASURED — STAGE 2 ALONE, BEFORE STAGE 3 EXISTED (standalone sim, Batch G
+Warden party warden/cryomancer/inquisitor/beastmaster, 200 battles;
+standalone sims never equip runes, so these rows are stage 2 only).
+FIXED: deaths/b 0.02->0.03, survivors' HP 86->84%, enemy dmg/b 126->148,
+WARDEN PREVENTED 65->47/b, contribution 23->21%, damage share flat 17%.
+ROTATED: deaths/b 0.21->0.20, prevented 70->49, contribution 20->19%.
+HONEST READ: prevented falls ~a third, exactly what trading 3 guaranteed
+blocks for a 25% chance does; deaths do not move. THE ROWS CANNOT SEE THE
+OTHER HALF — a standalone sim spends NO talent points, so Tenacity and
+Rally are absent from the very measurement used to price an ability whose
+purpose is now to feed them. That half is proven in test_shieldwall.gd.
+NOT A STALEMATE FIX, and must not be recorded as one — the balance
+question stays deferred and open.
+TENACITY NUMBER (asked for): a held-open Warden battle with Shield
+Mastery 2 + Tenacity + Rally reached max HP 200 -> 240 over 9 blocks.
+Unbounded still, but nowhere near the old runaway (~127,000, Batch W).
+MEASURED — STAGE 3 / RUNE ROWS (route=default, map=new, diff=standard).
+CONTROL off n=50: 6% completions / ratio@z1t8 1.00 / choice 78% =
+REPRODUCES AA's off row (6% / 0.99 / 78%). FIXED PAIR n=50: off 6% ->
+full 2% (ratio 1.00 -> 0.91). ROTATED PAIR n=60 each, its own control:
+off 8% -> full 13% (ratio 0.94 -> 1.00). **THE ORDER FLIPPED BETWEEN THE
+TWO PAIRS INSIDE ONE BATCH** — fixed says runes cost 2 completions,
+rotated says they gain 3; the whole spread is a handful of runs. AA's
+finding reproduced without needing two batches: the authored pool at
+CURRENT power does not move completions beyond noise. Open lever is
+still authored rune POWER (runes.json data edit, not machinery).
+NOISE CALIBRATION WORTH KEEPING: the default sim party is berserker/
+cryomancer/inquisitor/beastmaster — NO WARDEN — and the control runs
+runes=off, so that row is a genuine NULL-CHANGE control (nothing in this
+batch can reach it). Its wipe median still read z2 t5 vs AA's z1 t11 —
+but the distributions are near-identical (23 vs 25 z1 wipes of 47) and
+the median sits ON the z1/z2 boundary, so a TWO-RUN difference flips the
+zone it reports. **The wipe median is a knife-edge stat at n=50; never
+quote it as a trend on its own.**
+TWELVE-SPEC CONTRIBUTION TABLE, INTERNALLY COMPARABLE FOR THE FIRST TIME
+SINCE BATCH X (rotated, off->full): Pyro 34->33, Survivalist 29->32,
+Holy 29->29, Warden 25->25, Sharpshooter 24->25, Arcanist 23->25, Cryo
+27->24, Swordmaster 24->23, Beastmaster 20->21, Occultist 19->19,
+Berserker 18->19, Devout 14->15. All three HUNTER specs read slightly
+UP — the direction AA's (now retired) warning predicted would be DOWN
+while their pool was thin. Everything is within a couple of points =
+noise-sized. Pyromancer still tops the table, as Batch W measured and
+deliberately left alone.
+RUNE ECONOMY, REPORTED NOT CHANGED (dilution stays open, NOT this
+batch's job): acquisition is 2.2 runes/run fixed (1.4 shop + 0.8 elite)
+and 2.8 rotated (1.6 + 1.2) across FOUR heroes = ~0.55-0.7 per hero per
+run. The pool grew by 12 while per-hero acquisition did not move, so a
+Hunter still ends a run carrying 1-2 of his 4. NOTE the "~2.4 shop
+runes/run" figure quoted in briefs is PRE-Y: since Batch Y the bot's
+fight-first preference binds and it takes 0.7 of 5.1 shops offered.
+VERIFIED (scratchpad, dies with the session): test_runes.gd 1961 checks
+(coverage now spans ALL TWELVE specs read out of Classes.SPEC_IDS +
+"exactly 1 scarred, on a lane" + a POSITIVE CONTROL asserting the
+exclusive-pair alarm still watches 15 named fields, so a rename cannot
+silently stop it watching); test_shieldwall.gd 53 checks — its core is a
+CAUSAL PAIR, not an inference: base Block pinned to 0, Heavy Plating's
+15% cancelled by holding plating_bonus at -0.15 and Interpose stripped
+from his kit, so the ONLY live slice is the stance's 25% — STANCE UP 6
+blocks / 56 attacks / Tenacity +30 max HP vs CONTROL 0 blocks / 50
+attacks / +0; test_rune_battle.gd 84 checks (3 Hunter passes added: the
+Beastmaster forced to TWO beasts via bm_the_pack + direct _do_summon,
+both wearing his rune-reduced armor; the Sharpshooter's Focus cap reading
+150 and opening on 60 = the ordering fix live; Snare Trap at 15 Mana /
+2cd = the ability branch). Headless parse: all 10 scenes, 0 SCRIPT ERROR.
+GOTCHA (cost a rerun): test_rune_battle's White Flame check was a coin
+flip on WHICH enemy the bot burned — its warband is now ashblade/hurler/
+shaman, ALL fire-resistant, so any fire hit exercises the one read site.
+HOUSEKEEPING, DESIGNER-APPROVED: the nine data/talent-tree-*.json design
+sources (216K) are DELETED. Nothing had read them since Batch P emptied
+FIXED_TREES/LANE_CONVERSIONS, and they had drifted into being actively
+misleading — the Warden file still promised "block the next 3 oncoming
+attacks" — while sitting in data/, where a future batch would reasonably
+look for ground truth. Recoverable from git history if ever wanted.
+**Talents.LANE_TREES is the ONLY source of tree truth; do not restore a
+JSON mirror of it.**
 BATCH AA (08-03) — MAGE + CLERIC SPEC RUNES, AND A FORFEIT. 24 spec runes
 (runes.json 29 -> 53 entries), 4 per spec, ONE PER LANE READ OUT OF
 Talents.LANE_TREES + one splash; exactly 1 scarred per set, ON a lane
@@ -226,10 +367,11 @@ mage/cleric spec pools just tripled — a given Holy carries 1-2 of her 4.
 Look at the rune ECONOMY before concluding the entries are underpowered.
 DO NOT read the cleric support numbers as a direction: Devout heal/b went
 10->14 fixed-party and 25->13 rotated — opposite signs, i.e. noise.
-ARTEFACT WARNING NOW FLIPS — do NOT carry Batch X's wording:
-any share/contribution shift DISFAVOURING Beastmaster/Sharpshooter/
-Survivalist is POOL DEPTH, not balance — and it is ALREADY VISIBLE
-(Sharpshooter 25->20 contribution, the largest drop in the rotated pair).
+ARTEFACT WARNING **RETIRED BY BATCH AB — DO NOT RESURRECT IT.** As
+written it read: "any share/contribution shift DISFAVOURING Beastmaster/
+Sharpshooter/Survivalist is POOL DEPTH, not balance — already visible at
+Sharpshooter 25->20." That expired the moment the Hunter got its sets;
+all twelve specs are covered and the table is internally comparable.
 Difficulty still closed pending human playtesters. VERIFIED (scratchpad, dies with the session):
 test_runes.gd 1523 checks, test_forfeit.gd 57, test_rune_battle.gd 46 (3
 live autoplay battles, every rune of a spec equipped at once; ordering fix
@@ -306,7 +448,10 @@ clamps, all 9 resources, BOTH talent gate models, run structure) — Batch
 Y's §3 episode did not repeat. 8 fixes: (1) SHIELDWALL documented −50%,
 code is −25% (raw *= 0.75) — wrong at 2 master sites AND the in-game
 combat log said "takes half damage" (log fixed too; the status tooltip
-was already right, so doc+tooltip had been contradicting each other);
+was already right, so doc+tooltip had been contradicting each other).
+**SUPERSEDED BY BATCH AB: that −25% was Shieldwall v1's FOSSIL, not the
+live ability — the whole branch is deleted. No percentage Shieldwall
+ward exists; Shieldwall is a +25% Block-chance stance.**
 (2) Waystone Shard §7 "+1 talent point" vs relic's +3 (§8 already said
 3); (3) run-flow line "Battles / Rest / Loot" → no Loot nodes exist;
 (4) Poison table "3 nature damage/stack" flat vs 3% of applier Attack
@@ -410,17 +555,17 @@ completions, ratio@z1t8 0.94-0.98 — the pool at CURRENT authored power
 does not move completions beyond noise; z2 t7 ratio 0.73→0.85 under
 full but the z2/z3 collapse survives; shares flat (Berserker 28% all
 rows). NEXT LEVER = authored rune power (data edit, not machinery).
-ARTEFACT WARNINGS: (1) SUPERSEDED BY BATCH AA — as written, "only the
-Warrior has spec runes, so any Warrior-favouring share shift is pool
-depth"; coverage is now Warrior+Mage+Cleric and the warning points the
-OTHER WAY (see the AA block); (2) the
+ARTEFACT WARNINGS: (1) SUPERSEDED BY AA, THEN RETIRED BY AB — as
+written, "only the Warrior has spec runes, so any Warrior-favouring
+share shift is pool depth"; all twelve specs are covered now and no
+pool-depth caveat applies (see the AB block); (2) the
 rotated twelve-spec table only compares to Batch W at
 DOD_SIM_RUNES=off. Batch V's 14% row does NOT reproduce on this build
 even at off (W's stalemate guard sits between) — never compare rows
 across batches. Scratchpad test_runes.gd (920 checks) +
 test_rune_battle.gd (live log proof: "+30 Bleed" altered H&S, scarred
-"bleedout at 85"). Mage/Cleric spec rune sets shipped in Batch AA;
-HUNTER is the last one owing, in its own batch.
+"bleedout at 85"). Mage/Cleric spec rune sets shipped in Batch AA, the
+HUNTER in Batch AB — spec rune coverage is COMPLETE.
 BATCH W (08-01) — THE OUTLIER PASS, MEASURE-FIRST. Every prior sim ran
 the SAME four specs, so 8 of 12 had never been measured and the cited
 "worst outlier" (Sharpshooter 38%) predated half the roster's rework.
@@ -436,7 +581,7 @@ CONTRIBUTION METRICS (both reports): heal/prevented/BD/statuses per
 hero + a normalised contribution share. Prevented is INSTRUMENTED at
 existing mitigation deltas (parry, Block incl. Interpose charges →
 the granting Warden, barrier absorbs → the caster via status "src",
-Shieldwall, stance, Faith, Iron Will, Shared Vigil, Consecrated
+stance, Faith, Iron Will, Shared Vigil, Consecrated
 Ground, Blessed Vestments, Savage Presence, Frost Ward, Molten Core,
 Flame Shield, Chilled swing malus), never derived; unattributable →
 its own bucket (measured 0-1/battle). BASE ARMOR/RESISTS DELIBERATELY
@@ -1154,7 +1299,7 @@ companions hit for % of the hunter's Attack. Cleric core Smite = 44% (of
 Shieldmaster Strike 37% (75); Shaman 70%/30% (50) + fire/frost 25%,
 nature 50% resists. PARRY IS MELEE-ONLY (attacker.is_ranged — hunter+mage
 ranged among heroes); parries and blocks log their SOURCE (reflexes/Sword
-Mastery/Parry Up; Shieldwall/Heavy Plating/base Block — Warden Tenacity
+Mastery/Parry Up; Interpose/Heavy Plating/base Block — Warden Tenacity
 +5 maxHP battle-long (tenacity_hp_gained excluded from save sync) and
 Rally (party rally_heal +15% healing 2t) proc on HEAVY PLATING blocks
 only). Warden tree v2 (07-16 JSON): Endurance 1%/rank. Talent tooltips:
@@ -1191,14 +1336,14 @@ Combat: crit 10%; miss 5% (Dazed +20%); parry 5% heroes / 2.5% enemies —
 a PARRIED hit lands at 25% damage + 25% BD, no auto-counter ("Counter
 Attack" = parry-answer basic; Riposte talent grants it); BLOCK = full
 negation (block_chance stat: Warden 5% + Heavy Plating 15%, Shieldmaster
-5%; Shieldwall charges guarantee); COOLDOWNS on all abilities (unit.
+5%; Warden Shieldwall +25% for 2t; Interpose charges guarantee); COOLDOWNS on all abilities (unit.
 cooldowns, ability_ready; enemies + bot respect them); Armor Pen keyword;
 Buff/Debuff keyword (DEBUFF_IDS in unit.gd); ADJACENT keyword = nearest
 living enemy each side of the target in formation order (_adjacent_enemies;
 Sundering splashes only there). TALENT VISIBILITY (07-16): procs log as
 "Talent: ..." lines (log_proc hook on units for unit-side procs); stateful
 talent buffs are chips w/ live counters (Enraged/Unrelenting 3-turn con/
-Endurance/Iron Will/Crushing Blows/Battle Shout/Shieldwall SW#/Elemental
+Endurance/Iron Will/Crushing Blows/Battle Shout/Shieldwall +25%/Interpose IP#/Elemental
 Weakness -x%) via unit.update_status + battle._update_talent_chips; buff
 casts (shield_block/hold_the_line/battle_shout) are self-cast, no target.
 CLASS PASSIVES (all specs): Warrior targeted 1.2x, Cleric +15% heals
@@ -1250,6 +1395,7 @@ Space or left click; no announcer text (combat log only).
 - Menu background image not yet in imported files (fallback: forest art).
 - Distinct Mage/Cleric/Hunter sprites awaited from user.
 - Boss tri-choice class modifiers deferred (design doc) until 3+ zones.
-- Spec rune sets for Mage/Cleric/Hunter pending (one batch per class;
-  Warrior shipped as the Batch X pilot).
+- Spec rune coverage COMPLETE (Warrior X, Mage+Cleric AA, Hunter AB).
+  The open lever remains authored rune POWER — a runes.json data edit,
+  not machinery — and the dilution question (see the AB block).
 - Sim bot wins ~90%+ with 4 heroes; real difficulty tuning by user playtest.

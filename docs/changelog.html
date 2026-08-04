@@ -5,6 +5,162 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-03 — Batch AB: Hunter rune sets, a Shieldwall rework, two corrections</h2>
+<ul>
+<li><b>Correction — Resurrection costs 1 Mercy.</b> The Holy tree's Resurrection node text
+said "spend 3 Mercy"; the ability has always cost 1. Batch AA flagged it rather than
+picking a side because it was a design call. The call: <b>1 is correct, the node text was
+wrong</b>. Fixed. The ability description, the Last Rites rune, the glossary's Mercy and
+Empower entries and the Master Document all already said 1 — the node was the only liar.</li>
+
+<li><b>Correction — the Shieldwall v1 fossil is deleted.</b> There have been two
+Shieldwalls. Version 1 was a party-wide percentage ward ("−25% damage, 2 turns"); Batch G
+replaced it with the charge-based version, and Batch Z found the <code>raw *= 0.75</code>
+branch still sitting in the damage path. It was v1's corpse, not a mistuned live ability.
+Gone: the damage-path branch, the status's percentage blurb, the vaulted "shieldwall"
+special that applied it, its entry in the self-cast list, and the Master Document's
+"Shieldwall −25%" target modifier. <b>Nothing live applied it</b> — the two remaining
+callers were vaulted match branches (the v1 ability itself and the vaulted Sanctuary) that
+no ability, enemy or rune references, which is why this is hygiene and not a change. The
+glossary was checked and never carried the fossil: its drift alarm covers
+<code>DEBUFF_IDS</code>, and Shieldwall is a buff.</li>
+
+<li><b>Shieldwall is now a Block STANCE.</b> Shieldwall and Interpose were the same verb
+pointed in two directions — both granted charges, both fully negated attacks, one at the
+Warden and one at everyone else — and the self-directed half was the stronger.
+<b>Interpose keeps the guaranteed charges. Shieldwall stops granting them and raises his
+Block chance instead:</b> +25% for 2 turns (Perfect: 3). 25 Rage, 2.0 initiative, 2cd,
+self-cast — unchanged. A status chip reads "+25% Block" and his Heavy Plating passive chip
+folds the bonus into its live total, so the readout never lies while the stance holds.</li>
+
+<li><b>The trade, which is the point:</b> the bonus rides the <b>Heavy Plating slice</b> of
+the block roll, so every block Shieldwall buys <i>is</i> a Heavy Plating block — and
+Tenacity and Rally feed on Heavy Plating blocks specifically, which Shieldwall's charges
+never triggered. He trades hard denial for an engine. It is stated in the ability
+description, because a trade a player cannot see is not a trade.</li>
+
+<li><b>Shield Mastery re-specced in place</b> (<code>wd_shieldwall</code>, same id, so
+saved ranks migrate and nobody is refunded): "+1 Shieldwall charge per rank" became
+<b>"+1 turn of stance per rank"</b>, 2 ranks.</li>
+
+<li><b>Block-source labels follow the charges.</b> Interpose is now the only source of
+guaranteed blocks, so a charge block logs <b>"(Interpose)"</b>, not "(Shieldwall)", and
+the charge chip reads "IP3" instead of "SW3". The log stays honest about what produced a
+block, which matters because two talents key off that distinction.</li>
+
+<li><b>Prevented-damage instrumentation:</b> Shieldwall is no longer credited as its own
+mitigation site — the credit now belongs to the block roll, which was already instrumented
+and credits the blocker. Counted once, and not lost.</li>
+
+<li><b>Twelve Hunter spec runes</b> (data/runes.json, 53 → 65 entries), four each for the
+Beastmaster, Sharpshooter and Survivalist, under the Batch X/AA rules: one rune per talent
+lane read out of <code>LANE_TREES</code> plus one splash, exactly one scarred per set and
+it sits on a lane, one payload branch per entry. <b>This completes spec coverage: all
+twelve specs now have a set.</b>
+<br><b>Beastmaster</b> — Deep Bond (Loyalty ceiling +1, +1.5% companion damage per stack),
+Turning Pack (swap cooldown −1, +8% per different beast fielded), <i>Scarred</i> Loosened
+Straps (Quick Shot +12% of Attack, −8% armor), Shared Wild (splash).
+<br><b>Sharpshooter</b> — Deep Sight (Focus cap 150, crits grant +20 Focus), Narrow Gap
+(+8% armor ignored, +12% vs Broken), <i>Scarred</i> Long Draw (opens on 60 Focus, +10
+Focus per attack, −10 Speed), Level Aim (splash).
+<br><b>Survivalist</b> — Weeping Wound (basic attacks Poison, +2 damage per stack), Quick
+Spring (Snare Trap −5 Mana, −1 cooldown), <i>Scarred</i> Carrion Wake (+30% vs 3+
+afflictions, 16% max Mana per death, −12% max health), Long Hunt (splash).</li>
+
+<li><b>Zero new cfg fields</b> — the budget was four and Batch AA spent one for
+twenty-four runes; this batch spends none. Every entry rides a talent counter that already
+has a read site.</li>
+
+<li><b>The Hunter-specific traps, handled:</b> the runes write
+<code>wild_communion_ranks</code>, never the Devout's <code>communion_ranks</code>;
+companions inherit the hunter's armor at summon and per-beast terms double under The Pack,
+so the Beastmaster's scarred rune puts its cost on armor and says so in its own text
+("every beast he calls wears his plate") and its upside on Quick Shot; no Hunter rune
+carries a healing term, because Ancient Pact's <code>no_heals</code> would make one a dead
+rune; the Survivalist's runes write enemy-side (Poison) effects, since his meter lives on
+the enemy. Two Sharpshooter runes deliberately write Focus <i>ceilings</i> — the first
+runes to exercise Batch AA's call-site ordering fix for real.</li>
+
+<li><b>THE ARTEFACT WARNING IS RETIRED.</b> Batch AA's standing caveat — "any
+share/contribution shift disfavouring Beastmaster/Sharpshooter/Survivalist is pool depth,
+not balance" — <b>expires with this batch</b> and must not be carried forward. All twelve
+specs now have four spec runes each, so the twelve-spec contribution table is internally
+comparable for the first time since Batch X. AA's reading of the Sharpshooter (25 → 20
+contribution) expires with it.</li>
+
+<li><b>Measured — Shieldwall, its own row, before stage 3 existed</b> (standalone sim,
+Batch G's Warden party: warden/cryomancer/inquisitor/beastmaster, 200 battles).
+<br><i>Fixed party:</i> deaths/battle 0.02 → 0.03, survivors' avg HP 86% → 84%, enemy
+damage dealt/battle 126 → 148, <b>Warden damage prevented 65 → 47/battle</b>, Warden
+contribution 23% → 21%, damage share flat at 17%.
+<br><i>Rotated (DOD_SIM_ROTATE=1, 200 battles):</i> deaths/battle 0.21 → 0.20, <b>Warden
+prevented 70 → 49</b>, contribution 20% → 19%.
+<br><b>Read honestly:</b> prevented falls by about a third, which is exactly what trading
+three guaranteed blocks for a 25% chance should do, and deaths/battle does not move. What
+these rows CANNOT show is the other half of the trade — a standalone sim spends no talent
+points, so Tenacity and Rally are absent from the very measurement used to price an
+ability whose whole purpose is now to feed them. That half is measured directly in
+<code>test_shieldwall.gd</code> instead.
+<br><b>Not a stalemate fix and not recorded as one.</b> Reducing the Warden's
+self-denial makes the "cannot die, cannot kill" state marginally harder to reach; that is
+a side effect. The balance question stays deferred and open.</li>
+
+<li><b>Measured — the rune rows</b> (<code>--run</code>, route=default, map=new,
+diff=standard).
+<br><i>Control first, runes=off, n=50:</i> completions <b>6%</b>, ratio@z1t8 <b>1.00</b>,
+choice <b>78%</b> — reproducing Batch AA's off row (6% / 0.99 / 78%) exactly.
+<br><i>Fixed party, n=50:</i> off 6% → full <b>2%</b> (ratio 1.00 → 0.91).
+<br><i>Rotated pair, n=60 each, its own control:</i> off <b>8%</b> → full <b>13%</b>
+(ratio 0.94 → 1.00).
+<br><b>Read honestly: the order FLIPPED between the two pairs inside this one batch</b> —
+the fixed pair says runes cost 2 completions, the rotated pair says they gain 3, and the
+whole spread is a handful of runs at n=50–60. That is Batch AA's finding reproduced
+without needing two batches to see it, and it says the same thing: <b>the authored pool at
+its current power does not move completions beyond noise.</b> The open lever is still
+authored rune POWER — a runes.json data edit, not machinery.</li>
+
+<li><b>A sharper calibration of the noise, offered because it was free.</b> The default
+sim party is berserker/cryomancer/inquisitor/beastmaster — <b>no Warden</b> — and the
+control row runs with runes off, so that row is a genuine <i>null-change</i> control:
+nothing in this batch can reach it. Its wipe median still read z2 t5 against AA's z1 t11.
+The distributions are near-identical (23 vs 25 zone-1 wipes out of 47); the median simply
+sits <i>on</i> the z1/z2 boundary, so a two-run difference flips which zone it reports.
+<b>The wipe median is a knife-edge statistic at this sample size and should not be quoted
+as a trend on its own.</b></li>
+
+<li><b>The twelve-spec contribution table, internally comparable at last</b> (rotated,
+off → full): Pyromancer 34 → 33, Survivalist 29 → 32, Holy 29 → 29, Warden 25 → 25,
+Sharpshooter 24 → 25, Arcanist 23 → 25, Cryomancer 27 → 24, Swordmaster 24 → 23,
+Beastmaster 20 → 21, Occultist 19 → 19, Berserker 18 → 19, Devout 14 → 15. The three
+Hunter specs all read slightly UP — the direction AA's artefact warning predicted would be
+<i>down</i> while their pool was thin. Everything here is within a couple of points, i.e.
+noise-sized; the Pyromancer remains the top contributor, as Batch W measured and
+deliberately left alone.</li>
+
+<li><b>Rune economy, reported not changed</b> (the dilution question stays open and is not
+this batch's job): the party acquires <b>2.2 runes per run</b> at the fixed party (1.4
+shop + 0.8 elite) and <b>2.8 rotated</b> (1.6 + 1.2), across four heroes — roughly
+<b>0.55–0.7 runes per hero per run</b>. The pool just grew by twelve entries while
+per-hero acquisition did not move, so a given Hunter still finishes a run carrying one or
+two of his four. Note the brief's "~2.4 shop runes/run" is a pre-Batch-Y figure: since Y
+the bot's fight-first preference binds and it takes only 0.7 of 5.1 shops offered.</li>
+
+<li><b>Difficulty stays closed</b> pending human playtesters — nothing here reopens it.</li>
+
+<li><b>Verified:</b> <code>test_runes.gd</code> 1961 checks (coverage now spans all twelve
+specs read out of <code>Classes.SPEC_IDS</code>, plus "exactly one scarred, on a lane" and
+a positive control proving the exclusive-pair alarm still watches fifteen named fields);
+<code>test_shieldwall.gd</code> 53 checks; <code>test_rune_battle.gd</code> 84 checks
+(three live Hunter battles, every rune of a spec equipped at once, the Beastmaster checked
+at TWO beasts); headless parse across all 10 scenes, 0 SCRIPT ERROR.</li>
+
+<li><b>Measured — Tenacity, the number asked for.</b> In a held-open Warden battle
+(Shield Mastery 2, Tenacity and Rally learned) his max HP went <b>200 → 240</b> over
+9 blocks. More Heavy Plating blocks do mean faster Tenacity growth and its +5 max HP is
+still unbounded, but this is nowhere near the old runaway (~127,000 max HP, Batch W, fixed
+by cutting the Unkillable compounding link on 08-02).</li>
+</ul>
+
 <h2>2026-08-03 — Batch AA: Mage and Cleric rune sets, and a forfeit</h2>
 <ul>
 <li><b>Why:</b> Batch X shipped the rune system with the <b>Warrior</b> as its pilot —

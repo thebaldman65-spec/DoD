@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-03 (Batch AA)</b></p>
+<p align="right"><b>Last updated: 2026-08-03 (Batch AB)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -195,11 +195,13 @@ Swordmaster's Riposte talent grants it).</li>
 damage, and its on-hit effects. Governed by <b>Block %</b>, a SPEC STAT only pure tanks
 carry (currently the Warden: 10% base, +15% from Heavy Plating, plus Heavy Plating's
 climbing bonus — +8% per unblocked attack, cap +40%, reset whenever a Block lands; the Orc
-Shieldmaster also blocks at 5%). Guaranteed blocks come from Shieldwall charges — the
-Warden's own casts and the charges Interpose hands the party. Broken units cannot Block.
-A block flashes <b>BLOCK</b> and the log names its source — "(Shieldwall)",
+Shieldmaster also blocks at 5%). The Warden's Shieldwall adds a further +25% while its
+stance holds, on the Heavy Plating slice of the roll. Guaranteed blocks come from
+<b>Interpose charges</b> alone — one charge, one blocked attack. Broken units cannot Block.
+A block flashes <b>BLOCK</b> and the log names its source — "(Interpose)",
 "(Heavy Plating)", or "(base Block)" — which matters: the Warden's Tenacity and Rally
-talents feed on Heavy Plating blocks specifically.</li>
+talents feed on Heavy Plating blocks specifically, and so, therefore, do the blocks
+Shieldwall buys.</li>
 <li><b>Armor Penetration (keyword):</b> every % of armor penetration negates a % of the
 target's armor (currently granted only by the Berserker's Crushing Blows talent).
 It is NOT shown on the character screen.</li>
@@ -225,7 +227,7 @@ Blood Frenzy up to +40% as HP falls; Seasoned Fighter +15% above half HP; relic 
 EMPTY Break bar; Overpower +0.5 per point of target Break; Arcane Cannon
 +7.5%/Resonance stack; Magi's Wrath +4%/Resonance stack; Fireball perfects at 25% of
 Attack.</li>
-<li><b>Target modifiers:</b> Shieldwall −25%; Exposed +15%; Seasoned Fighter −15% at or
+<li><b>Target modifiers:</b> Exposed +15%; Seasoned Fighter −15% at or
 below half HP; Mage Resonance +5% damage
 <i>taken</i> per stack (the glass-cannon risk); Stabilized −10% per stack
 consumed.</li>
@@ -322,8 +324,12 @@ Sundering them (Occultist capstone).</td></tr>
 talent).</td></tr>
 <tr><td>Battle Shout</td><td>+1% damage per 20 blood buildup on the enemy party, snapshotted
 at cast (Berserker talent). The chip shows the % gained at the moment of the shout.</td></tr>
-<tr><td>Shieldwall (charges)</td><td>The next N attacks against this unit are BLOCKED
-(Warden talent ability). The chip counts down the charges left ("SW3" → "SW1").</td></tr>
+<tr><td>Interpose (charges)</td><td>The next N attacks against this unit are BLOCKED
+(granted by the Warden's Interpose). The chip counts down the charges left
+("IP3" → "IP1").</td></tr>
+<tr><td>Shieldwall</td><td>+25% Block chance while the stance holds (the Warden's
+Shieldwall). Counts as Heavy Plating for Tenacity and Rally; the chip reads
+"+25% Block" and his passive chip folds it into the live total.</td></tr>
 <tr><td>High Guard</td><td>Takes 25% less damage (Swordmaster talent, after a parry).</td></tr>
 <tr><td>Elemental Weakness</td><td>Elemental (non-physical) resistances reduced by 5% per
 talent rank (Warden's Crushing Blow talent); the chip shows the reduction ("−15%").</td></tr>
@@ -381,7 +387,7 @@ counter; released by the next Heal.</td></tr>
 <tr><td>Mocked</td><td>Must attack the Warrior who mocked them.</td></tr>
 <tr><td>Quick Draw</td><td>All abilities act 50% faster.</td></tr>
 <tr><td>Stunned</td><td>Loses their next turn.</td></tr>
-<tr><td>Shieldwall</td><td>Takes 25% less damage.</td></tr>
+<tr><td>Shieldwall</td><td>+25% Block chance while the stance holds.</td></tr>
 <tr><td>Empower</td><td>+25% damage dealt.</td></tr>
 <tr><td>Exposed</td><td>Takes 15% more damage.</td></tr>
 <tr><td>Cripple</td><td>−25% damage dealt.</td></tr>
@@ -590,12 +596,14 @@ Crushing Blow — 20 Rage, 43% Atk (≈32) / 20 BD / 3.0, 2cd,
 Sunders (−35% armor, 3 turns), builds 10 Rage (Perfect: +5 bonus BD).<br>
 War Stomp — 20 Rage, 3 shockwaves × 15% Atk / 15 BD each to RANDOM
 enemies, 3.0 int, 3cd; allies regain 10% of their resource (Perfect: 20% instead).<br>
-Shieldwall — 25 Rage, 2.0, 2cd, Blocks the next 3 attacks (Perfect: 5); a self-buff cast
-with no target selection whose chip counts the charges left; the Shield Mastery talent
-adds +1 charge per rank to every cast.<br>
+Shieldwall — 25 Rage, 2.0, 2cd, self-cast with no target selection: +25% Block chance for
+2 turns (Perfect: 3). The blocks it buys count as <b>Heavy Plating</b> blocks, so they feed
+Tenacity and Rally — which Interpose's charges never do. The chip reads "+25% Block"; the
+Shield Mastery talent adds +1 turn per rank to every cast.<br>
 Interpose — 25 Rage, 2.5 int, 4cd, self-cast with no target selection: every OTHER living
-ally gains 1 Shieldwall charge — the next attack against them is BLOCKED (Perfect: the
-Warden gains a charge too). Charges ADD to any the ally is already holding.<br>
+ally gains 1 shield charge — the next attack against them is BLOCKED (Perfect: the
+Warden gains a charge too). Charges ADD to any the ally is already holding, and are the
+only guaranteed blocks in the game.<br>
 <i>Talent-granted:</i> Hold the Line — 30 Rage, 3.5, 6cd, the party takes 50% less Break
 damage for 2 turns and cannot die for a turn (Perfect: refunds 5 Rage); self-cast, no
 target selection.<br>
@@ -980,7 +988,7 @@ a stun), Guard Breaker (Breaker: when a Broken enemy recovers, its Break meter r
 <b>PLATE</b> (mitigation and the block payoffs — everything that answers being hit) —
 Unkillable (heal 2%/rank of BASE max HP on every Block — base excludes Tenacity's in-battle gains ×3), Toughness (Constitution +5%/rank of
 max HP ×3), Endurance (+1%/rank armor per unhealed turn, capped +75% ×3), Tenacity (+5 max HP per
-Heavy Plating block, battle-long), Shield Mastery (Shieldwall +1 charge/rank ×2), Plate
+Heavy Plating block, battle-long), Shield Mastery (Shieldwall's stance holds +1 turn/rank ×2), Plate
 Discipline (the Heavy Plating climb steepens +3%/rank — 11/14/17% per unblocked hit ×3),
 Battered Not Broken (Blocking removes 8/rank Break from his own meter ×3).<br>
 <b>THREAT</b> (he wants to be hit; this lane is what happens to whoever obliges) —
@@ -1261,7 +1269,8 @@ with the points invested (3% → 6% → 9%; unlearned nodes preview the 1-point 
 "Talent:" tag (Enraged, Unrelenting Assault, Endurance, Unkillable, Richocet, Tank and
 Spank, Dominant Presence, Sundering, Riposte...), and stateful talent buffs display as
 status chips with live counters — Enraged / Iron Will / Crushing Blows / Battle Shout show
-their current % bonus, Endurance its armor streak, Shieldwall its remaining charges,
+their current % bonus, Endurance its armor streak, Shieldwall its Block bonus and Interpose
+its remaining charges,
 Elemental Weakness the resist reduction, Unrelenting Assault its borrowed Constitution.</p>
 
 <h2>8. Economy</h2>
@@ -1287,10 +1296,9 @@ runes only roll for heroes who actually own the named ability (boss trophies inc
 zone-victory screen announces each new slot). Shop offers avoid duplicates per hero, and
 an exhausted pool falls back to the Common family — the offer list never comes back
 empty.
-<br><b>Spec coverage: 53 authored runes</b> — 5 universal, 4 class-wide × 3 classes (the
-Warrior carries 3), and <b>4 spec runes for each of nine specs</b>: all three Warrior specs,
-all three Mage specs, all three Cleric specs. <b>The three Hunter specs have no spec runes
-yet</b> — they draw universal and class runes only. Each set is built to one rule:
+<br><b>Spec coverage: 65 authored runes</b> — 5 universal, 3 class-wide for each of the four
+classes, and <b>4 spec runes for every one of the twelve specs</b>. Each set is
+built to one rule:
 <b>one rune per talent lane, plus one splash</b> that carries a term from every lane and
 pays for reaching outside one. Exactly one rune per set is Scarred, and it sits on a lane;
 splashes are always clean. The per-lane rule is what makes a rune a build decision rather
@@ -1733,9 +1741,6 @@ only the Tyrant's frost weakness is set) and Counter Attack (defined term; no ta
 ability grants it yet).</li>
 <li>The Withered Warden has its own kit; the Ash-Wrought Tyrant is still a Chief stand-in —
 unique kit + art planned. Boss art for both pending.</li>
-<li>Spec rune sets still to author: the three <b>Hunter</b> specs — its own batch, because
-the companion machinery is the most idiosyncratic in the game. Warrior, Mage and Cleric
-sets are shipped.</li>
 <li>Boss tri-choice class modifiers deferred until 3+ zones exist.</li>
 <li>Difficulty tuning is pending an honest baseline: the old "~100% win rate" figure
 measured a single fixed unscaled lineup and carried no information. The sweep

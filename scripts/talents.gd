@@ -16,6 +16,11 @@ const ROW_REQ := {0: 0, 1: 5, 2: 10, 3: 15}
 # Empty since Batch P (07-31): the Arcanist — the last classic tree —
 # went lanes. The row-gating machinery stays for any future spec that
 # ships row-gated first.
+# The nine data/talent-tree-*.json design sources were DELETED in Batch AB:
+# nothing had read them since Batch P, and their text had drifted far enough
+# to mislead (the Warden file still promised the pre-AB Shieldwall). They are
+# recoverable from git history; the live trees are LANE_TREES below, and that
+# is the only source of tree truth.
 const FIXED_TREES := {}
 
 
@@ -351,8 +356,11 @@ const LANE_TREES := {
 		{"id": "wd_tenacity", "name": "Tenacity", "ranks": 1, "lane": "Plate", "tier": 1,
 			"desc": "Every attack Blocked by Heavy Plating increases maximum health by 5 for the rest of the battle.",
 			"payload": {"stat": {"tenacity": 1}}},
+		# Re-spec (Batch AB, same id so saved ranks migrate and nobody is
+		# refunded): Shieldwall stopped granting charges, so "+1 charge/rank"
+		# stopped meaning anything. The stance's length is the dial now.
 		{"id": "wd_shieldwall", "name": "Shield Mastery", "ranks": 2, "lane": "Plate", "tier": 1,
-			"desc": "Shieldwall Blocks {v} more attack(s) (the perfect cast included).",
+			"desc": "Shieldwall's stance holds {v} turn(s) longer (the perfect cast included).",
 			"scale": {"step": 1},
 			"payload": {"stat": {"shield_mastery_ranks": 1}}},
 		# Re-spec (was Layered Plating, a flat armor dial; same id, so saved
@@ -438,7 +446,7 @@ const LANE_TREES := {
 		# Re-spec (was Bannerman, a flat max-HP dial): the Batch G tank verb
 		# deepens — the cover he throws gets thicker.
 		{"id": "wd_bannerman", "name": "Bulwark Line", "ranks": 2, "lane": "Banner", "tier": 1,
-			"desc": "Interpose grants each ally {v} additional Shieldwall charge(s).",
+			"desc": "Interpose grants each ally {v} additional shield charge(s).",
 			"scale": {"step": 1},
 			"payload": {"stat": {"bulwark_line_ranks": 1}}},
 		# Re-spec (was Fortress, a flat max-HP dial): conditional on the
@@ -968,7 +976,7 @@ const LANE_TREES := {
 			"scale": {"step": 10},
 			"payload": {"stat": {"sanctified_ranks": 1}}},
 		{"id": "hl_resurrection", "name": "Resurrection", "ranks": 1, "lane": "Mercy", "tier": 1,
-			"desc": "New ability: Resurrection — spend 3 Mercy to return a fallen ally to life with 20% health and resource; Empower (+1 Mercy): full health and resource plus 5 turns of Renewal (4.0 int, 3cd).",
+			"desc": "New ability: Resurrection — spend 1 Mercy to return a fallen ally to life with 20% health and resource; Empower (+1 Mercy): full health and resource plus 5 turns of Renewal (4.0 int, 3cd).",
 			"payload": {"grant_ability": "Resurrection"}},
 		# Re-spec (was a Heavenly Aura deepener): the Empower support the
 		# tree never had, and a rhythm rather than a discount — bank to
