@@ -268,7 +268,7 @@ func _ready() -> void:
 		# Measure both sides as spawned — talents, scaling and slot
 		# multiplier live (the run report's power table).
 		RunSim.note_battle_start(Run, heroes, enemies, sim_stats)
-	if Run.debug_enabled() and not autoplay:
+	if _debug_allowed():
 		_build_debug_panel()
 	if not sim:
 		# Boss fights open with the entry tune, capped so the battle track
@@ -930,7 +930,21 @@ func _build_debug_panel() -> void:
 	_debug_popup.id_pressed.connect(_on_debug_menu)
 
 
+# A dev build, real play, and nothing the harness drives (Batch AC —
+# mirrors _forfeit_allowed). Checked when the DEBUG menu is BUILT and
+# again when an item fires, so an id sent straight into the dispatch
+# fails the same way the missing menu does.
+func _debug_allowed() -> bool:
+	return Run.debug_enabled() and not Run.sim_run and not sim and not autoplay
+
+
 func _on_debug_menu(id: int) -> void:
+	if not _debug_allowed():
+		return
+	# The second and last honesty write site (the other is the map burger
+	# dispatch): every battle debug item trips the flag from here, so the
+	# run summary can never claim a debug-touched run is clean data.
+	Run.debug_used = true
 	if id == 0:
 		_debug_full_restore()
 		return
@@ -8625,8 +8639,11 @@ func _check_end() -> void:
 				[["Continue", _to_map]], true)
 	else:
 		# Wipes count toward the profile only for real runs (sims never
-		# carry Run.active).
-		if Run.active:
+		# carry Run.active). Batch AC: nor does dying in a DEBUG-SUMMONED
+		# fight — the run really is over, but "cycles lost to the Decay"
+		# should not count a fight the tester conjured out of a menu. This
+		# is the one Profile booking a summoned node can reach.
+		if Run.active and not Run.debug_summon:
 			Profile.note_wipe(Run.party.map(func(m): return m.get("spec", "")))
 		# Batch Z: snapshot BEFORE the clear (see the completion branch).
 		var wipe_snap := _run_snapshot("wipe", "")
@@ -8883,6 +8900,7 @@ func _run_snapshot(outcome: String, closing_text: String) -> Dictionary:
 		"events_seen": Run.seen_events.size(),
 		"combat_wins": Run.combat_wins,
 		"tally": Run.tally.duplicate(true),
+		"debug_used": Run.debug_used,
 		# Chronicle: noted AFTER Profile booked this run, so the tally the
 		# tester reads includes the run they just finished.
 		"cycles_survived": Profile.completions_total(),
@@ -8920,6 +8938,13 @@ func _summary_lines(snap: Dictionary) -> Array:
 			lines.append(["h", "THE PARTY HAS FALLEN"])
 			lines.append(["p", "Wiped — Zone %d (%s), %s (%s difficulty)." % [
 				snap["zone_num"], snap["zone_name"], depth, snap["difficulty"]]])
+	# The honesty flag (Batch AC), directly under the title so it cannot be
+	# missed and cannot be scrolled past — and inserted into the SAME line
+	# list the Copy button serialises, which is the half that actually
+	# reaches feedback.
+	if bool(snap.get("debug_used", false)):
+		lines.insert(1, ["w",
+			"DEBUG TOOLS WERE USED IN THIS RUN — not a clean data point."])
 	# --- what ended it ---
 	# A forfeit reports the same block: the fight the tester walked away
 	# from is the most useful thing in the whole summary.
@@ -9074,6 +9099,8 @@ func _show_run_summary(snap: Dictionary) -> void:
 		match String(lines[i][0]):
 			"s":
 				bb.append("\n[color=#d9b168][b]%s[/b][/color]" % lines[i][1])
+			"w":
+				bb.append("[color=#ff5aa0][b]%s[/b][/color]" % lines[i][1])
 			_:
 				bb.append(String(lines[i][1]))
 	body.text = "\n".join(bb)

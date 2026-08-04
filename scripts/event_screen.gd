@@ -72,9 +72,10 @@ func _draw_screen() -> void:
 		btn.text = String(choice["label"])
 		btn.custom_minimum_size = Vector2(560, 46)
 		var req: Dictionary = choice.get("requires", {})
-		if not Events.requires_met(Run, req):
+		var fail := Events.failed_reason(Run, req)
+		if fail != "":
 			btn.disabled = true
-			btn.tooltip_text = _req_text(req)
+			btn.tooltip_text = fail
 		else:
 			btn.pressed.connect(Music.click)
 			btn.pressed.connect(_choose.bind(choice))
@@ -139,11 +140,3 @@ func _show_outcome(outcome: String, lines: PackedStringArray) -> void:
 	btn.pressed.connect(Music.click)
 	btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/map.tscn"))
 	vbox.add_child(btn)
-
-
-func _req_text(req: Dictionary) -> String:
-	if req.has("min_gold"):
-		return "Needs %d gold." % int(req["min_gold"])
-	if req.has("has_item"):
-		return "Needs a %s." % Run.ITEM_INFO[String(req["has_item"])][0]
-	return "The party cannot do this."

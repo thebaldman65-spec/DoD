@@ -4,6 +4,63 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The tester's workbench (Batch AC) — 2026-08-04
+
+**A debug tool that can reach a shop makes some summaries lies, and the
+summary is the alpha's feedback channel.** That is the whole reason the
+honesty flag shipped in the same batch as the capability rather than
+after it. Batch Z built the run summary specifically so a tester can
+paste a wipe report straight back as feedback — depth, build, damage
+split, economy, what killed them. It is telemetry-grade data with no
+telemetry to build, and its entire value rests on the reader being able
+to trust that the numbers describe a real run. The moment a tool exists
+that pours +200 gold into a run or teleports the party into a shop, some
+fraction of those reports describe something else, and nothing on the
+page would say so. A designer reading twenty pasted summaries has no way
+to tell the three poisoned ones apart.
+
+The flag costs one boolean and two lines of code, and it is written at
+the top of each debug dispatch rather than on each item — seven write
+sites would eventually become six, and the one that got forgotten would
+be the one a tester used. Once set it never clears, including when a
+check item is unchecked, because "I turned it off again" is not the same
+claim as "this run was clean". A tool whose safety depends on the tester
+remembering to be careful is not safe.
+
+**Why free travel books its tally and a summoned node does not.** These
+look like the same feature and they are opposites. Free travel puts the
+party somewhere the map would not have let them go — but once there,
+they really fought that fight, at that tier, and really spent that gold.
+Suppressing the record would produce a run whose ledger disagrees with
+its own history, which is a worse lie than the one the flag exists to
+prevent. A summoned node is the reverse: the party never went anywhere,
+the board is untouched, and the fight happened in a kind of parenthesis.
+Booking it would silently inflate the economy line of a report someone
+is going to read as data. The rule that falls out is simple — *record
+what happened to the party, not what the tester conjured* — and it is
+also why dying in a summoned fight ends the run but does not count as a
+cycle lost.
+
+**The event picker is the item that justifies the batch.** The other
+tools save time; this one enables something that was previously
+impossible. Events draw at the door, filter by requirement, and never
+repeat within a run, so a designer could not choose which event to look
+at, could not see one twice, and after three visits a zone had none left
+to give. Authoring an event and then being unable to look at it is a
+content pipeline with no feedback loop in it. Making
+requirement-*failing* events selectable is the same argument pushed one
+step: the branches a designer most needs to see are the ones the game
+normally hides, and the event screen's own guards still run, so nothing
+is being faked — only reached.
+
+And once any event is addressable by id, a headless test can walk all of
+them. That fell out of the picker for free and is the first real
+coverage the events vocabulary has ever had; it is worth noticing that
+the *testability* was a consequence of the *tooling*, not a separate
+piece of work. Data-driven systems trade a compile-time error for a
+silent one, and the price of that trade is a sweep that exercises every
+row of the data.
+
 ## Hunter rune sets and a Shieldwall rework (Batch AB) — 2026-08-03
 
 **Shieldwall and Interpose were one verb pointed in two directions.**

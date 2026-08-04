@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-03 (Batch AB)</b></p>
+<p align="right"><b>Last updated: 2026-08-04 (Batch AC)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1623,7 +1623,9 @@ equipped, trophies taken), <b>damage share per hero across the whole run</b>, th
 carried), and a chronicle line — cycles survived, cycles lost, and cycles abandoned once
 there are any — so a session of runs accumulates into something visible. A <b>Copy summary</b> button puts a plain-text version on
 the clipboard: a wipe becomes a report the player can paste back to the designer, which is
-feedback data with no telemetry to build.</p>
+feedback data with no telemetry to build. If any debug tool was used at any point in the
+run, the summary opens with <code>DEBUG TOOLS WERE USED IN THIS RUN — not a clean data
+point.</code> — in the panel and in the clipboard text both (see §12, Testing shortcuts).</p>
 <p><b>Two structural rules behind it:</b> (1) the summary <b>snapshots run state before the
 save is cleared</b>, never by reordering the save logic — a run that stays resumable after
 death is a worse bug than a missing summary. (2) The per-run ledger (damage per hero, gold,
@@ -1696,12 +1698,49 @@ pre-emptive or offensive item use, routing sees one tier ahead only, and shop ru
 picks ignore build synergy. Simulated runs live entirely in memory (Run.sim_run): they
 never touch the player's save, relic unlocks, or profile.</li>
 <li><b>Testing shortcuts:</b> debug tools are ALWAYS available in dev (unexported) builds;
-exported builds require DOD_DEBUG=1. The map burger menu gains a DEBUG section — +200 gold, +200 talent points for everyone, full heal, jump to the boss tier,
+exported builds require DOD_DEBUG=1 (and DOD_DEBUG=0 forces the gate shut in a dev build,
+which is how the headless tests stand where an exported build stands). The map burger menu
+gains a DEBUG section — +200 gold, +200 talent points for everyone, full heal, jump to the boss tier,
 advance to the next zone, <b>Reroll Specs</b> (refunds spent talent points, clears all
 specs, and reopens the awakening screen), and an <b>All Spec Abilities Unlocked</b> toggle
 (while checked, battles spawn with every talent-gated and trophy ability pre-granted —
 session-scoped, never saved, default OFF so normal play and sims measure real gated
-progression; headless runs arm it with DOD_SIM_GRANT_ALL=1). In battle, a <b>DEBUG ▾ menu</b> (bottom-right)
+progression; headless runs arm it with DOD_SIM_GRANT_ALL=1).</li>
+<li><b>Reaching any node on demand.</b> Two tools sit in the same DEBUG section.
+<b>Free Travel</b> is a check item: while it is on, <i>every</i> node on the board is
+clickable — every tier, ignoring links and ignoring where the party stands, backwards as
+well as forwards. Clicking one advances the run <b>honestly</b>: the party really moves,
+the node is really marked visited, the tier readout reads the real tier, a fight is scaled
+by the tier it actually sits on, and the node books its tally and its Profile entry exactly
+as it would have. Nodes the toggle alone makes reachable are drawn as a fourth state,
+separate from visited / reachable / unreachable: a desaturated fill inside a magenta debug
+outline, with a <code>[DEBUG]</code> tooltip prefix, and a <code>DEBUG: FREE TRAVEL</code>
+marker sits in the corner while it is on.
+<br><b>Test a node ▸</b> is a submenu — Shop, Rest, ??? Event, Fight, Elite — that runs one
+<b>in place</b>. A summoned node does not move the party, does not touch the tier, and does
+not mark anything visited; the board is exactly as it was when the tester returns.
+Everything else is real: a summoned shop has real offers and spends real gold, a summoned
+rest really heals, a summoned fight is a real battle at the current tier's scaling, with
+real rewards. (There is no Summon Boss: "Jump to Boss Tier" already goes there.)</li>
+<li><b>Debug visits do not count.</b> A summoned node is excluded from the two records that
+are read as data: it never bumps the run ledger (battles, gold, rests, elites, damage) and
+never books anything in the persistent Profile — including the wipe, if the party dies in a
+summoned fight. One session flag guards all of it. Free travel is the opposite case and is
+deliberately excluded from this rule: the party really is there and really did the thing.</li>
+<li><b>The event picker.</b> "??? Event" does not draw an event — it lists <i>every</i>
+event in data/events.json by title and id, each row stating whether its requirements
+currently pass or, if not, which condition failed (read from the same check that filters the
+real draw, so the two can never disagree). <b>Requirement-failing events are selectable on
+purpose</b> — testing the greyed-out branches is the point, and the event screen still runs
+its own guards. Already-seen events are repeatable, and picking one neither burns the
+run's draw pool nor tells the chronicle.</li>
+<li><b>The honesty flag.</b> Using any debug tool, on either menu, marks the run for the
+rest of its life (saved with it; unchecking a toggle never clears it). The end-of-run
+summary then opens with <code>DEBUG TOOLS WERE USED IN THIS RUN — not a clean data
+point.</code>, in the panel and in the <b>Copy summary</b> clipboard text both, because the
+summary is the alpha's feedback channel and a debug-touched run is not a data point.
+Simulated runs can never set it: they load neither the map nor the battle menus.</li>
+<li>In battle, a <b>DEBUG ▾ menu</b> (bottom-right)
 offers: Full Restore (HP/resources/secondary for the party), a <b>Cooldowns OFF</b>
 toggle (while checked, hero abilities never go on cooldown; existing cooldowns clear on
 enabling — enemies carry none), an

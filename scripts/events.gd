@@ -88,34 +88,55 @@ static func _eligible(run: Node, seen: Array) -> Array:
 
 
 static func requires_met(run: Node, req: Dictionary) -> bool:
+	return failed_reason(run, req) == ""
+
+
+# The single implementation of the requirement check (Batch AC): returns
+# "" when the requirement is met, otherwise a human sentence naming the
+# FIRST condition that failed. requires_met above is this function read as
+# a boolean, so the greyed-out choice tooltip on the event screen and the
+# pass/fail column in the debug event picker can never disagree with the
+# gate that actually filters the draw.
+static func failed_reason(run: Node, req: Dictionary) -> String:
 	if req.is_empty():
-		return true
+		return ""
 	if req.has("min_gold") and int(run.get("gold")) < int(req["min_gold"]):
-		return false
+		return "Needs %d gold (party has %d)." % [int(req["min_gold"]),
+			int(run.get("gold"))]
 	if req.has("max_gold") and int(run.get("gold")) > int(req["max_gold"]):
-		return false
+		return "Needs %d gold or less (party has %d)." % [int(req["max_gold"]),
+			int(run.get("gold"))]
 	if req.has("zone_slot") and not _slot_listed(req["zone_slot"],
 			int(run.get("zone_idx")) + 1):
-		return false
+		var slots := PackedStringArray()
+		for slot in req["zone_slot"]:
+			slots.append(str(int(slot)))
+		return "Only in zone %s (party is in zone %d)." % [
+			"/".join(slots), int(run.get("zone_idx")) + 1]
 	if req.has("has_item"):
 		var items: Dictionary = run.get("items")
 		if int(items.get(String(req["has_item"]), 0)) <= 0:
-			return false
+			return "Needs a %s." % run.ITEM_INFO[String(req["has_item"])][0]
 	if req.has("spec_in_party"):
 		var found := false
+		var names := PackedStringArray()
+		for spec in req["spec_in_party"]:
+			names.append(String(Classes.SPEC_INFO.get(String(spec), {}).get(
+				"name", spec)))
 		for member in run.get("party"):
 			if req["spec_in_party"].has(String(member.get("spec", ""))):
 				found = true
 		if not found:
-			return false
+			return "Needs one of: %s, in the party." % ", ".join(names)
 	if req.has("fallen_hero"):
 		var any_fallen := false
 		for member in run.get("party"):
 			if int(member["hp"]) <= 0:
 				any_fallen = true
 		if bool(req["fallen_hero"]) != any_fallen:
-			return false
-	return true
+			return "Needs a fallen hero." if bool(req["fallen_hero"]) \
+				else "Needs the whole party standing."
+	return ""
 
 
 # JSON arrays hold floats; slots are ints — compare loosely.

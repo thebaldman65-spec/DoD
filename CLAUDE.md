@@ -135,7 +135,9 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   talent-gated abilities (Classes.pending_talent_ability; Holy only).
   `DOD_ENEMIES_OFF=1` arms the enemy-skip debug toggle headlessly.
   `DOD_DEBUG=1` adds map-burger debug items (gold/points/heal/
-  jump-to-boss/next-zone; the talent grant is +200).
+  jump-to-boss/next-zone; the talent grant is +200) in an EXPORTED build;
+  `DOD_DEBUG=0` FORCES THE GATE SHUT in a dev build (Batch AC — the only
+  way a headless test can stand where an exported build stands).
 - GDScript gotchas that bit us: multiline lambdas in call args (use named
   methods), ternaries need parens for type inference, `:=` can't infer from
   untyped funcs, edits via python heredocs (apostrophes!) — use chr(39),
@@ -158,7 +160,125 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - Screens: main_menu → draft (pick 4 + relics) → spec_choice (permanent) →
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
-## Current systems snapshot (2026-08-03)
+## Current systems snapshot (2026-08-04)
+BATCH AC (08-04) — THE TESTER'S WORKBENCH: reach any node on demand.
+DEBUG/TESTING AFFORDANCES ONLY — no balance, no content, no difficulty
+(difficulty stays CLOSED pending human playtesters). Designer's ask
+verbatim in substance: "I need some way to access any node on the map
+for testing — often I want to test the shop or the ???, but I have to
+fight through the other nodes to get to them."
+STAGE 0 RECONCILE (asserted in the test, not just remembered): map
+burger DEBUG ids 10-16 and the battle `DEBUG ▾` menu already existed and
+are UNTOUCHED. New map ids start at 20, the event picker at 100. NO
+"Summon Boss" (Jump to Boss Tier id 13 already goes there) and LOOT IS
+LISTED NOWHERE — the treasure node type is dead code (no generator has
+dealt one since the Batch 38 deck); its click handler is left exactly as
+Batch Z recorded it.
+THE HONESTY FLAG: `Run.debug_used`, SAVE v5 (tolerant — a v4 save loads
+it false). Written in EXACTLY TWO PLACES, both at the top of a debug
+dispatch (map_screen._on_burger, battle._on_debug_menu), so every debug
+item INCLUDING the pre-AC ones trips it without seven write sites. Check
+items trip it when toggled ON; unchecking NEVER clears it. The run
+summary opens with "DEBUG TOOLS WERE USED IN THIS RUN — not a clean data
+point." via a new "w" line tag — rendered in the panel AND carried into
+the Copy-summary clipboard text (the half that reaches feedback). Sims
+can never set it (RunSim loads neither scene).
+FREE TRAVEL (map DEBUG check item id 20, session-scoped, never saved):
+every node on the board clickable, any tier, ignoring links and
+position, backwards too. Goes through the EXISTING `_on_node_pressed` —
+no parallel branch — so the run advances HONESTLY: floor_idx/node_idx/
+visited true, real tier readout, real save, fight scaled by the tier it
+sits on, AND IT BOOKS ITS TALLY AND PROFILE ENTRY (correct: the party
+really is there). FOUR clearly separate reads, not three plus an
+ambiguity — debug-only-reachable = node colour pulled toward grey and
+dimmed inside a magenta outline (`DEBUG_OUTLINE`, a colour nothing else
+uses) + `[DEBUG] ` tooltip prefix + a corner `DEBUG: FREE TRAVEL`
+marker. A VISITED debug-reachable node keeps its dim-green history fill
+and only gains the outline (judgement call — "where I have been" must
+survive the toggle).
+TEST A NODE ▸ (submenu, ids 21-25: Shop/Rest/??? Event/Fight/Elite):
+entered IN PLACE. Does not move the party, does not touch floor_idx/
+node_idx, marks NOTHING visited. Everything else real (real shop offers
+and gold, real heal, real battle at current tier scaling, real rewards).
+"DEBUG VISITS DON'T COUNT" IS ONE GUARD, NOT FOUR: session-scoped
+`Run.debug_summon`, set at the summon and cleared in map_screen._ready
+(the return point of every summon that leaves the map; the in-place rest
+clears it itself). CHECKED AT EXACTLY THREE SITES — Run.tally_add,
+Run.tally_damage, and battle.gd's wipe branch, which turned out to be
+the ONLY Profile booking a summoned node can reach (no boss is
+summonable; the picker never calls Profile.note_event nor appends to
+Run.seen_events in the first place). DYING IN A SUMMONED FIGHT ends the
+run but books NO wipe.
+WARBAND: `Run.compose(node_type)` — the SAME call `_generate_map` makes,
+already defaulting to the party's current tier, so NO extraction was
+needed and there is still exactly one warband generator. Elite goes
+through the elite path (keeps the budget floor of 6).
+EVENT PICKER (id 23 -> a full-screen list, per-event ids 100+): does NOT
+call Events.pick. Lists EVERY event in data/events.json alphabetically by
+title with its id and a live pass/FAIL column naming the failing
+condition. REQUIREMENT-FAILING EVENTS ARE SELECTABLE ON PURPOSE (the
+greyed-out branches are the point; the event screen still runs its own
+guards). Seen events repeat; picking one does NOT append seen_events and
+does NOT Profile.note_event.
+ONE REQUIREMENT CHECK, REUSED NOT COPIED: `Events.failed_reason(run,
+req)` ("" when met, else the first failing condition as a sentence) is
+now the single implementation and `Events.requires_met` is that function
+read as a boolean. The picker column, the event screen's greyed-choice
+tooltip and the gate that filters the real draw are therefore the same
+code. event_screen's private `_req_text` is GONE (it knew 2 of the 6
+conditions and said "The party cannot do this" for the rest).
+DOUBLE GATE: the DEBUG section is not BUILT unless debug_enabled(), and
+firing an id straight into the dispatch is refused too (pre-AC ids 10-16
+were previously protected only by not being drawn). battle.gd gained
+`_debug_allowed()` = debug_enabled() and not sim_run and not sim and not
+autoplay — mirrors `_forfeit_allowed()`, checked at BUILD and at FIRE.
+VERIFIED (scratchpad, dies with the session): test_debug_access.gd 378
+checks — surface/ids/submenu contents, gate-closed with ids FIRED
+DIRECTLY, sim+autoplay+sim_run on both menus, flag round-trip through
+v5 + v4 tolerance + summary + clipboard, summoned rest/shop/fight
+booking NOTHING while the SAME THREE VIA REAL NODE PATHS BOOK BOTH (a
+guard that is always on proves nothing), board untouched, free travel
+forwards AND backwards, sim_run byte-identity. test_events_all.gd 2,613
+checks — 16 events x 32 choices, 142 dispatch applications, each choice
+run twice (healthy party + stressed: hero down, no gold, no items),
+vocabulary asserted (no unknown verb/selector/requirement key/item/spec/
+class id) and the verbs' promises proven (gold never negative, max HP
+floor 10, EVENTS NEVER KILL). NO EVENT FAILED. Headless parse: all 10
+scenes, 0 SCRIPT ERROR.
+SIM PURITY PROVEN, NOT ASSERTED (this batch touches ONE thing a sim
+reads: Events.requires_met, which RunSim calls at an event node). 50-run
+rows, same flags: PRE (dc7ce03) route=default map=new diff=standard
+completions=2% / wipe median z1 t11.0 / ratio@z1t8=0.92 / choice=79%;
+POST completions=4% / z1 t11.0 / 0.98 / 77%. Median IDENTICAL, rest is
+a 1-2 run spread at n=50 = the known noise band. Row reproduces. Plus
+profile.json + run_save.bin + relics.json hashed before/after a real
+DOD_SIM_RUN invocation = BYTE-IDENTICAL.
+GOTCHAS WORTH KEEPING: (1) `PopupMenu.add_submenu_node_item` AUTO-ASSIGNS
+the submenu parent's id from its item INDEX — which landed on 13, "Jump
+to Boss Tier". Always pass an explicit id (the parent carries 9,
+deliberately below the debug block). (1b) Whether Godot ALSO delivers a
+submenu press to the PARENT popup could NOT be determined headlessly —
+`PopupMenu.activate_item` HANGS without a display. Both popups feed
+`_on_burger`, so it drops a repeat of the same id INSIDE ONE FRAME
+(`_burger_id_this_frame` + set_deferred reset) — correct whichever way
+the engine behaves. Tested both ways: same-frame double press rests
+once, and the guard does not leak to the next frame. (2) An autoplay battle paces on
+REAL timers (only `sim` mode skips them) and takes ~40 wall-clock
+seconds / ~5,700 frames; a frame budget does not bound it. Headless
+tests set `Engine.time_scale = 50.0` — it scales the SceneTreeTimers the
+battle waits on and NOTHING else (same combat decisions), turning the
+battle into ~1.5s / ~160 frames. (3) macOS has no `timeout` binary — a
+`timeout ... | grep -c "SCRIPT ERROR"` parse check silently reports 0
+errors for every scene because "command not found" contains no match.
+Use `--quit-after N` and no wrapper.
+REPORTED NOT ACTED ON (designer's call): (a) treasure/Loot is now the
+only node type a debug menu cannot reach — delete it or deal it again;
+(b) a summoned fight still increments `Run.combat_wins` (real
+progression, left real deliberately), so a debug-touched summary's
+"Battles won: X of Y" can read X > Y — cosmetic, and sims cannot see it;
+(c) `gold_pct` is an authored effect verb NO event uses — the sweep now
+fires it directly so it cannot rot, but it is either a content gap or a
+line to delete.
 BATCH AB (08-03) — HUNTER SPEC RUNES + SHIELDWALL AS A BLOCK STANCE.
 TWO CORRECTIONS FIRST. (a) The Holy tree's Resurrection NODE TEXT said
 "spend 3 Mercy"; faith_cost has always been 1 — the DESIGN CALL WAS MADE,

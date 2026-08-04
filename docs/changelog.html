@@ -5,6 +5,188 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-04 — Batch AC: the tester's workbench — reach any node, on demand</h2>
+<ul>
+<li><b>Why.</b> From the designer: <i>"I need some way to access any node on the map for
+testing — often I want to test the shop or the ???, but I have to fight through the other
+nodes to get to them."</i> The DEBUG section only had tools that move the party <i>forward
+past everything</i> (Jump to Boss Tier, Advance to Next Zone). A shop was guaranteed only in
+tiers 7–10, so testing shop behaviour cost six-plus fights; a <i>specific</i> event could not
+be tested at all, because events are drawn at the door, filtered by requirement, and never
+repeat within a run — three visits and the zone has none left to give. This batch is
+debug/testing affordances only: no balance change, no content, no difficulty. Difficulty
+stays closed pending human playtesters.</li>
+
+<li><b>Stage 0 — what already existed and was left alone.</b> The map burger already had a
+DEBUG section on ids 10–16 (+200 Gold, +200 Talent Points, Full Heal Party, Jump to Boss
+Tier, Advance to Next Zone, Reroll Specs, and the "All Spec Abilities Unlocked" check item),
+built behind <code>Run.debug_enabled()</code> and dispatched in <code>_on_burger</code>; the
+battle scene already had its <code>DEBUG ▾</code> menu (Full Restore, Cooldowns OFF, Enemy
+attacks OFF, per-hero turn lock). All of it is untouched and none of it was
+re-implemented. New map ids start at <b>20</b> so nothing collides with 10–16, and the event
+picker's per-event ids start at <b>100</b>. No "Summon Boss" was added — Jump to Boss Tier
+already goes there — and <b>Loot is listed nowhere</b>: the <code>treasure</code> node type
+is dead code no generator has dealt since the Batch 38 deck, and its existing click handler
+was left exactly as Batch Z recorded it.</li>
+
+<li><b>The honesty flag ships in the same batch as the capability.</b>
+<code>Run.debug_used</code>, saved with the run (<b>save v5</b>, tolerant load — a v4 save
+loads with it <code>false</code>). Written in <b>exactly two places</b>, both at the top of a
+debug dispatch — the map burger's and the battle menu's — so every debug item, the pre-AC
+ones included, trips it without seven separate write sites. Check items trip it when toggled
+<i>on</i>; unchecking never clears it, because a run that was debug-touched stays
+debug-touched. The run summary then opens with <code>DEBUG TOOLS WERE USED IN THIS RUN — not
+a clean data point.</code>, in the panel <i>and</i> in the <b>Copy summary</b> clipboard text,
+which is the half that actually reaches feedback.</li>
+
+<li><b>Free Travel</b> — a check item, session-scoped, never saved, default OFF. While it is
+on, every node on the board is clickable: every tier, ignoring links and ignoring the
+party's position, backwards as well as forwards. Clicking one <b>advances the run
+honestly</b> — it goes through the existing <code>_on_node_pressed</code> path with no
+parallel branch, so <code>floor_idx</code>/<code>node_idx</code>/<code>visited</code> are all
+true afterwards, the tier readout reads the real tier, the save is a real save, and a
+free-travelled fight is scaled by the tier it actually sits on. It therefore <i>does</i> book
+its tally and its Profile entry, which is correct: the party really is there and really did
+the thing. <code>debug_used</code> is what marks the run.</li>
+
+<li><b>Legibility of free travel, which matters more than it sounds:</b> a tester must never
+confuse a debug-reachable node with a genuinely reachable one, or they will report their own
+toggle as a bug. Debug-only-reachable nodes are a <b>fourth</b> read, not a third with an
+ambiguity — the node's own colour pulled toward grey and dimmed, inside a magenta outline no
+node type or state uses — with a <code>[DEBUG]</code> tooltip prefix and a
+<code>DEBUG: FREE TRAVEL</code> marker in the corner while the toggle is on. Judgement call
+made and worth stating: a <i>visited</i> node keeps its dim-green history fill and gains the
+outline, rather than being repainted, so "where I have been" survives the toggle.</li>
+
+<li><b>Test a node ▸</b> — a DEBUG submenu with <b>Shop, Rest, ??? Event, Fight, Elite</b>,
+entered <b>in place</b>. A summoned node does not move the party, does not touch
+<code>floor_idx</code>/<code>node_idx</code>, and does not mark anything visited; the board is
+exactly as it was when the tester returns. Everything else runs for real: a summoned shop is
+a real shop screen with real offers and real gold, a summoned rest heals for real, a summoned
+fight is a real battle at the current tier's scaling with real rewards.</li>
+
+<li><b>"Debug visits don't count" is one guard, not four.</b> A single session-scoped
+<code>Run.debug_summon</code> is set for the duration of a summoned node and cleared when it
+resolves (in <code>map_screen._ready</code>, the return point of every summon that leaves the
+map; the rest resolves in place and clears it itself). It is checked at exactly three sites:
+<code>Run.tally_add</code> and <code>Run.tally_damage</code> — which between them cover
+battles, gold earned and spent, rests, elites and per-hero damage — and the battle scene's
+wipe branch, which turned out to be the <b>only</b> Profile booking a summoned node can
+reach at all (no boss is summonable, and the event picker never calls
+<code>Profile.note_event</code> or appends to <code>Run.seen_events</code> in the first
+place). <b>Judgement call, stated rather than buried:</b> dying in a summoned fight really
+does end the run, but it does not book a wipe — "cycles lost to the Decay" should not count a
+fight conjured out of a menu.</li>
+
+<li><b>The summoned warband uses the generator, not a copy of it.</b>
+<code>Run.compose(node_type)</code> is the same call <code>_generate_map</code> makes to roll
+each node's warband, and it already defaults to the party's current tier — so no extraction
+or refactor was needed and there is still exactly one warband generator in the project. An
+elite summons through the elite path, keeping the budget floor of 6 that makes an elite an
+elite.</li>
+
+<li><b>The event picker</b> — the highest-value item in the batch, because today a specific
+event cannot be tested at all. "??? Event" does <i>not</i> call <code>Events.pick()</code>: it
+lists <b>every</b> event in data/events.json, alphabetically by title, with its id, and states
+per row whether its requirements currently <b>pass</b> or <b>fail</b> — and on failure, which
+condition failed and by how much ("Needs 120 gold (party has 40)"). <b>Requirement-failing
+events are still selectable</b>, because testing the greyed-out branches is the point; the
+event runs through the normal event screen so its own guards behave exactly as they would in
+play. Already-seen events are repeatable, and picking one does not append to
+<code>Run.seen_events</code> and does not call <code>Profile.note_event</code>.</li>
+
+<li><b>One implementation of the requirement check, reused rather than copied.</b> The event
+screen's private greyed-out-choice explainer became
+<code>Events.failed_reason(run, req)</code> — returns "" when met, otherwise a sentence naming
+the first failing condition — and <code>Events.requires_met</code> is now that function read
+as a boolean. The picker's pass/fail column, the event screen's tooltip and the gate that
+filters the real draw are therefore the same code and can never disagree. The old explainer
+only knew two of the six conditions and said "The party cannot do this" for the rest; all six
+now speak.</li>
+
+<li><b>Not in this batch, and deliberately:</b> no fight/warband picker (choosing theme and
+budget from the UI touches the encounter generator); no resurrection of the Loot node type;
+no Summon Boss; and none of it exists in exported builds — everything sits behind the
+existing <code>Run.debug_enabled()</code> gate.</li>
+
+<li><b>Hardening that came free.</b> The debug block is now gated <i>twice</i>: the section is
+not built unless <code>debug_enabled()</code>, and firing a debug id straight into the
+dispatch is refused as well (previously the pre-AC ids 10–16 were protected only by not being
+drawn). The battle menu gained the matching <code>_debug_allowed()</code> —
+<code>debug_enabled() and not sim_run and not sim and not autoplay</code>, mirroring
+<code>_forfeit_allowed()</code> — checked when the menu is built and again when an item fires.
+<code>DOD_DEBUG=0</code> now forces the gate shut in a dev build, which is the only way a
+headless test can stand where an exported build stands and prove the items are unreachable.</li>
+
+<li><b>The all-events smoke test — real coverage the project has never had.</b> The events
+vocabulary is data-driven (12 verbs aimed by 4 target selectors, gated by 6 requirement
+conditions), so a typo in a JSON edit was silent until a tester met it. Now that the picker
+can address any event by id, <code>test_events_all.gd</code> walks the lot:
+<b>16 events × 32 choices, 142 dispatch applications, 2,613 checks, 0 failures.</b> Every
+choice is applied twice — once against a healthy party, once against a stressed one (a hero
+down, no gold, no items) — and the vocabulary itself is asserted: no unknown verb, no unknown
+target selector, no unknown requirement key, no unreachable item/spec/class id, and the
+invariants the verbs promise (gold never negative, max HP never under 10, and events never
+kill). <b>No event failed.</b></li>
+
+<li><b>Verified</b> (scratchpad, dies with the session): <code>test_debug_access.gd</code>
+<b>378 checks, 0 failures</b> — the surface itself (ids, submenu contents, no Loot, no Boss,
+and the submenu parent's id); the picker listing every event with a pass/fail row, sorted by
+title, every one of them selectable including the failing ones, refusing to stack a second
+overlay, and arming an event without burning the draw pool or writing the Profile; every
+debug id unreachable with the gate shut <i>and</i> fired directly; the same under each of sim / autoplay / sim_run on both menus; the honesty flag set
+by every item, surviving save v5, loading false from a v4 save, and reaching both the summary
+panel and the clipboard text; a summoned rest, shop and fight leaving the ledger and the
+Profile untouched <b>and the same three via a real node path moving both</b> (a guard that is
+always on proves nothing); a summoned node leaving the board untouched; free travel to an
+arbitrary (f, i) forwards <i>and</i> backwards; and the profile and run-save bytes identical
+across a sim_run pass. Headless parse: all 10 scenes, 0 SCRIPT ERROR.</li>
+
+<li><b>Sim purity, proven rather than asserted.</b> This batch touches exactly one thing a
+sim reads — <code>Events.requires_met</code>, which RunSim calls when it resolves an event
+node — so a 50-run row was measured on this build against the same flags at HEAD, not
+assumed. <b>Pre-batch</b> (dc7ce03): <code>route=default map=new diff=standard
+completions=2% wipe median z1 t11.0 ratio@z1t8=0.92 choice=79%</code>. <b>This build</b>:
+<code>completions=4% wipe median z1 t11.0 ratio@z1t8=0.98 choice=77%</code>. The wipe median
+is identical, and the rest is a one-to-two-run spread at n=50 — the noise band Batches X, AA
+and AB each measured independently. The row reproduces. Separately, <code>profile.json</code>,
+<code>run_save.bin</code> and <code>relics.json</code> were hashed before and after a real
+<code>DOD_SIM_RUN</code> invocation and are <b>byte-identical</b>.</li>
+
+<li><b>Reported, not acted on</b> (all three are the designer's call):
+<ol>
+<li>The <code>treasure</code>/Loot dead node type is now the only node type a debug menu
+cannot reach, which makes it slightly more conspicuous. Whether to delete it or deal it again
+is a decision this batch does not make.</li>
+<li>A summoned fight is excluded from the run ledger but still increments
+<code>Run.combat_wins</code>, which is real progression (+2% Attack and HP per win) and was
+left real deliberately, since a summoned fight is supposed to run for real. The visible
+consequence is cosmetic: in a debug-touched run the summary's "Battles won: X of Y" can read
+X greater than Y. Sims cannot see any of it — they never reach a summoned node.</li>
+<li><code>gold_pct</code> is an authored effect verb that <b>no event in the game uses</b>.
+The sweep now fires it directly so it cannot rot unnoticed, but a verb with no data driving it
+is either a gap in the content or a line to delete.</li>
+</ol></li>
+
+<li><b>Gotchas worth recording.</b> (1) <code>PopupMenu.add_submenu_node_item</code>
+auto-assigns the submenu parent's id from its item <i>index</i> — which landed on <b>13</b>,
+i.e. "Jump to Boss Tier". The parent now carries an explicit id (9, deliberately below the
+debug block, because opening a submenu is not yet using a debug tool). (2) Whether Godot also
+delivers a submenu press to the parent popup <b>could not be determined headlessly</b>:
+<code>PopupMenu.activate_item</code> hangs without a display. Both popups feed the one
+dispatch, and a doubled "Test a node ▸ Rest" would heal the party twice, so the dispatch
+drops a repeat of the same id <i>inside one frame</i> — correct whichever way the engine
+behaves, and no human clicks twice in a frame. Tested both ways round: two presses in one
+frame rest once, and the guard does not leak into the next frame. (3) An autoplay battle
+paces itself on real timers (only <code>sim</code> mode skips them) and takes ~40 wall-clock
+seconds / ~5,700 frames, so a frame budget does not bound it; the headless tests set
+<code>Engine.time_scale</code>, which scales the timers the battle waits on and nothing else
+— the same battle in ~1.5s with identical combat decisions. (4) macOS has no
+<code>timeout</code> binary, so a <code>timeout … | grep -c "SCRIPT ERROR"</code> parse check
+reports a clean zero for every scene while running nothing at all. Use
+<code>--quit-after</code> and no wrapper.</li>
+</ul>
+
 <h2>2026-08-03 — Batch AB: Hunter rune sets, a Shieldwall rework, two corrections</h2>
 <ul>
 <li><b>Correction — Resurrection costs 1 Mercy.</b> The Holy tree's Resurrection node text

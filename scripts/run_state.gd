@@ -75,6 +75,31 @@ var seen_events: Array = []  # event ids drawn this run (non-repeating pool)
 # spawn. Session-scoped, never saved; DOD_SIM_GRANT_ALL=1 arms it for
 # headless full-kit runs. Default OFF so tests measure gated kits.
 var debug_grant_all := false
+
+# THE HONESTY FLAG (Batch AC). Batch Z built the run summary so a tester
+# can paste a wipe report straight back as feedback. The moment a run has
+# had +200 gold poured into it or has teleported to a shop, that summary
+# is not a data point — and nothing on it would say so. Saved with the
+# run (v5); once true it never clears, because a run that was
+# debug-touched stays debug-touched. Written in exactly TWO places, both
+# at the top of a debug dispatch: map_screen._on_burger and
+# battle._on_debug_menu. Sims can never set it (RunSim loads neither
+# scene, and the menus do not exist off the scene tree).
+var debug_used := false
+
+# Free Travel (Batch AC, map burger check item): while on, every node on
+# the board is clickable, ignoring links and position. Session-scoped,
+# never saved. The click still runs the normal path, so the run advances
+# honestly — debug_used above is what marks the run, not a fake board.
+var debug_free_travel := false
+
+# Node summoning (Batch AC): set for the duration of a summoned node and
+# cleared when it resolves. A summoned node is entered IN PLACE and runs
+# for real, but it must not corrupt the two records testers and sims
+# read — so this flag switches OFF the run ledger (tally_add /
+# tally_damage below) and the one Profile booking a summoned node can
+# reach (battle.gd's wipe branch). Never saved.
+var debug_summon := false
 var pending_event := ""    # event id the event screen resolves (not saved:
                            # quitting mid-event forfeits it, node stays spent)
 # RunSim harness (Batch S): simulated runs live entirely in memory — while
@@ -97,6 +122,12 @@ func reset_tally() -> void:
 
 
 func tally_add(key: String, amount := 1) -> void:
+	# Batch AC: a debug-summoned node never happened as far as the ledger
+	# is concerned. Its gold, rests, battles and elites stay out, so a
+	# summoned shop cannot silently inflate the economy line of a summary
+	# a tester pastes back as feedback.
+	if debug_summon:
+		return
 	if tally.is_empty():
 		reset_tally()
 	tally[key] = int(tally.get(key, 0)) + amount
@@ -106,6 +137,8 @@ func tally_add(key: String, amount := 1) -> void:
 # spec display name once awakened) — the same naming space the sim
 # reports use, banked once per battle from the battle scene.
 func tally_damage(hero_name: String, amount: float) -> void:
+	if debug_summon:
+		return
 	if tally.is_empty():
 		reset_tally()
 	var dmg: Dictionary = tally.get("damage", {})
@@ -122,9 +155,14 @@ const HERO_BASE := {
 
 
 # Debug tooling is always available in dev (unexported) builds; exported
-# builds need DOD_DEBUG=1 explicitly.
+# builds need DOD_DEBUG=1 explicitly. DOD_DEBUG=0 forces the gate SHUT in
+# a dev build (Batch AC) — the only way a headless test can stand where
+# an exported build stands and prove every debug entry is unreachable.
 func debug_enabled() -> bool:
-	return OS.is_debug_build() or OS.get_environment("DOD_DEBUG") == "1"
+	var env := OS.get_environment("DOD_DEBUG")
+	if env == "0":
+		return false
+	return OS.is_debug_build() or env == "1"
 
 
 func relic_active(id: String) -> bool:
@@ -168,6 +206,10 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	encounter = {}
 	seen_events = []
 	pending_event = ""
+	# A fresh run starts clean, and starts un-summoned and un-travelled.
+	debug_used = false
+	debug_summon = false
+	debug_free_travel = false
 	reset_tally()
 	_generate_map()
 
@@ -926,14 +968,15 @@ func save_run() -> void:
 		return
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	# v2 (Batch 38): + seen_events, zone_draw. v3 (Batch Y): + difficulty.
-	# v4 (Batch Z): + tally (the run ledger). Loading stays tolerant of
-	# older saves via .get defaults — never drop player state silently.
+	# v4 (Batch Z): + tally (the run ledger). v5 (Batch AC): + debug_used
+	# (the honesty flag). Loading stays tolerant of older saves via .get
+	# defaults — never drop player state silently.
 	# NOTE: a pre-Y save also keeps its old map (70% links, blind deal) —
 	# correct, never migrated; nothing at runtime may assume the Batch Y
 	# map guarantees hold on a loaded map.
 	file.store_var({
-		"version": 4, "party": party, "items": items, "gold": gold,
-		"tally": tally,
+		"version": 5, "party": party, "items": items, "gold": gold,
+		"tally": tally, "debug_used": debug_used,
 		"difficulty": difficulty,
 		"zone_idx": zone_idx, "zone_name": zone_name, "zone_draw": zone_draw,
 		"floor_idx": floor_idx, "seen_events": seen_events,
@@ -1000,6 +1043,12 @@ func load_run() -> bool:
 	tally = data.get("tally", {})
 	if tally.is_empty():
 		reset_tally()
+	# A pre-AC (v4) save loads with the honesty flag false — it predates
+	# every tool that could have set it. The session-scoped toggles are
+	# never saved, so a resumed run always resumes with them off.
+	debug_used = bool(data.get("debug_used", false))
+	debug_summon = false
+	debug_free_travel = false
 	pending_event = ""
 	encounter = {}
 	active = true
