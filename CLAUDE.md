@@ -59,7 +59,14 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   baseline row incl. greedy-as-the-Batch-S-floor only reproduces at
   map=old), DOD_SIM_DIFFICULTY=wanderer (Batch Y alpha affordance,
   enemies x0.7 through zone_base_mult; default standard — NEVER set on a
-  baseline row).
+  baseline row), DOD_SIM_RUNE_ECON=rich / DOD_SIM_RUNE_POWER=<mult>
+  (Batch AD EXPERIMENT ARMS — measurement only, never shipped; UNLIKE
+  every other flag here they are gated on Run.sim_run as well as the env,
+  so a stale export cannot put a real run in an arm. rich = all 4 slots
+  from t1 + a spec-eligible authored rune granted at each zone half-mark;
+  power = a multiplier on authored payload UPSIDE only, costs held,
+  tpl_* stat sticks untouched. Post-AD Matrix rows carry econ=/power=/
+  depth= fields; pre-AD rows do not — never compare across).
   RunSim
   (scripts/run_sim.gd statics, Run injected Events-style) owns setup/map
   walk/report; battle.gd hooks: _ready begin+note_battle_start, _check_end
@@ -161,6 +168,91 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-08-04)
+BATCH AD (08-04) — THE RUNE ECONOMY, MEASURED. NO CONTENT CHANGE, and
+that is the finding, not a shortfall. Instrumentation + two sim-only
+experiment arms; runes.json is BYTE-UNCHANGED.
+**THE HEADLINE, and it overturns how every prior rune row was read: POWER
+and DILUTION were never alternatives — they are two factors of one
+product, both near zero, and EACH PERFECTLY MASKS THE OTHER.** Fixed
+party n=100, primary metric depth reached (resolvable difference +/-3.9
+tiers): control 16.97 / rich-only 16.12 / power-x3-only 16.49 / BOTH
+27.13 (completions 8% / 6% / 12% / 61%). Replicated rotated (all twelve
+specs) n=100: 14.78 / 14.71 / 14.94 / 22.83 (12% / 12% / 15% / 43%) —
+rich alone delivered 2.27 spec runes per hero against the control's 0.17
+and moved depth by -0.07 tiers and completions by ZERO points. **Any
+experiment that varies one factor at a time is GUARANTEED to report "no
+effect" whichever explanation is true — which is exactly what AA and AB
+did.** Do not re-run a one-factor rune experiment.
+POWER ALONE IS CLOSED AT ANY REACHABLE MAGNITUDE (acquisition
+untouched): x1 16.97 / x3 16.49 / x6 17.07 / x10 17.93 — a TENFOLD
+magnitude increase moves the primary metric 0.96 tiers against +/-3.9.
+ONCE ACQUISITION IS FIXED the dose-response is smooth and the number is
+much smaller than anyone assumed: rich+x1 16.12 / x1.5 20.50 / x2 23.75
+/ x3 27.13 — **detectable at ~x1.5, unambiguous by x2**. So a runes.json
+magnitude pass authored against TODAY's numbers would be roughly double
+what is wanted. Threshold-like because the run economy compounds (Batch
+T's attrition->income loop).
+**STAGE 0b — THE INSTRUMENT WAS THE PROBLEM, and this changes how EVERY
+future row is read. COMPLETIONS IS DEMOTED TO SECONDARY.** At n=50 the
+resolvable difference between two rows is ~15 PERCENTAGE POINTS, so
+AA/AB's 4->6%, 6->2%, 8->13% "noise" verdicts were unfalsifiable rather
+than wrong. Proof found by accident: the SAME COMMIT (7ec7f97) on the
+SAME FLAGS measured 4% (AC), 10%, and 8%. **PRIMARY IS NOW `depth
+reached`** — mean absolute tier at run end, 1-33, every run contributing
+one sample. The report prints an INSTRUMENT RESOLUTION block ABOVE the
+numbers it qualifies (mean/SD/SE + the resolvable difference at
+n=50/100/150). Measured at n=100: depth +/-3.9 tiers, ratio@z1t8 +/-0.09,
+completions +/-10.7 pts. **`ratio@z1t8` IS SURVIVAL-CONDITIONED** (49-76
+of 100 runs reached t8 across these rows) — an arm that helps weak runs
+live longer ADDS weak runs to the sample and pushes the mean DOWN; also
+the block's per-run mean and the Matrix row's pooled figure are DIFFERENT
+ESTIMATORS of the same tier. Depth has neither problem.
+RUNE ECONOMY BLOCK (run report, stage 0a): offered/bought/equipped split
+shop vs elite cache, refusals BY REASON (no free slot / unaffordable /
+duplicate), elite runes won with no slot, slots available vs filled, and
+what each hero wears split spec/class/universal/stat-stick. Header states
+the confounder: the bot takes 0.6 of 5.4 shops offered, so sim
+acquisition is A FLOOR ON THE BOT'S ROUTING, not a human's — and NO route
+policy ranks a shop above a fight, so that ceiling is unreachable by
+route choice (gap reported, no policy invented mid-batch).
+LEVER VERDICTS FOR THE DESIGNER (reported, NOT chosen): control row gold
+earned 582 / spent 151 / **unspent 431**, slots **2.80 available per hero
+and 0.58 filled = 21%**, shops 0.6 of 5.4 taken, rests 2.3 of 5.6, elite
+caches 0.82/run. **OPENING THE THIRD SLOT EARLIER IS A DEAD LEVER —
+remove it from the list**: the party leaves 79% of the slots it already
+owns empty. Rarity re-pricing is cheap/safe/small (across a run price is
+NOT the constraint — the party dies holding 431g — yet AT THE COUNTER it
+binds, 1.04 of 2.56 offers refused, because the counter is reached 0.6
+times a run). Biggest levers by touch rate: a rune offer at rest nodes
+(2.3/run vs the shop's 0.6) and a starting rune at the draft (+1.00/hero,
+front-loaded where runs die). A second elite cache is small (~+0.2/hero).
+"Change nothing and measure a human first" is a real option — the shop
+rate is a BOT floor.
+GOTCHA THE ARM'S OWN POSITIVE CONTROL CAUGHT: **`blood_pact` RUNS
+BACKWARDS** — Exsanguination's -15 is its BENEFIT (bleedout at 85), so a
+sign-based cost test holds it and the rune goes inert. Named
+`Runes.INVERTED_STAT_FIELDS` beside `PENALTY_FIELDS` (positive = cost on
+both). Rows already running were THROWN AWAY and re-run, not caveated.
+VERIFIED: test_runes.gd EXTENDED 1,961 -> **3,085 checks, 0 failures**
+(purity gate with env set + sim_run false; cost-list drift alarm; every
+entry's costs held and benefits scaled at x3 with sign and int/float type
+preserved; x1.0 proven to be the identity; the whole SCALED pool re-run
+through the schema + scarred checks). test_rune_battle.gd 84 -> **91**: a
+Berserker spawned three times (no runes / x1 / x3) and read off the LIVE
+unit as deltas — blood_pact -15->-45, crit_bonus +.08->+.24,
+dmg_taken_bonus +.15->+.15 HELD. Save files byte-identical with BOTH arms
+armed. Control reproduces pre-batch HEAD from a clean worktree at matched
+n=100 (median z1 t11.0 identical, completions 6% vs 8%, choice 79% vs
+78%). Headless parse: all 10 scenes, 0 SCRIPT ERROR.
+REPORTED NOT ACTED ON: (a) Pyromancer 35->42% and Sharpshooter 25->19%
+are the only twelve-spec contribution moves >5pts, and only under the
+combined arm — the Pyro direction is Batch W's known AoE-scales-with-
+field-size signature; per-spec n is only ~33 under rotation. (b) The Rune
+of Exsanguination's scarred audit passes on a term that is actually its
+BENEFIT — its real cost (15% vs 20% bleedout) is a battle.gd constant no
+audit can see. (c) test_rune_battle's White Flame check is FLAKY
+(~1 run in 3 — the bot must land a fire hit); pre-existing, do not read
+it as a regression. (d) treasure/Loot still outstanding from AC.
 BATCH AC (08-04) — THE TESTER'S WORKBENCH: reach any node on demand.
 DEBUG/TESTING AFFORDANCES ONLY — no balance, no content, no difficulty
 (difficulty stays CLOSED pending human playtesters). Designer's ask

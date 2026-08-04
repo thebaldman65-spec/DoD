@@ -859,11 +859,53 @@ func random_loot() -> String:
 
 # ---------- rune generation (shared by the Peddler and elite drops) ----------
 
+# ---------- Batch AD: the two experiment arms (MEASUREMENT ONLY) ----------
+#
+# Three batches authored the rune pool and twice the measurement came back
+# "the authored pool at current power does not move completions beyond
+# noise". Two hypotheses were named and never separated: the entries are
+# too WEAK, or they never ARRIVE (acquisition is ~0.55-0.7 runes per hero
+# per run, out of the four written for that spec). These two flags move one
+# variable each so the next measurement can tell them apart.
+#
+# NEITHER SHIPS AS A DEFAULT, and both are gated on `sim_run` as well as on
+# the env var — that gate is the load-bearing half. DOD_SIM_RUNES and the
+# other harness flags read the environment unconditionally, so a player
+# with a stale export in their shell would silently be in an experiment
+# arm; these two cannot be, because a real run never sets sim_run. Asserted
+# in test_runes.gd, not just intended.
+const RICH_SLOTS := 4  # DOD_SIM_RUNE_ECON=rich: every slot open from tier 1
+
+
+# "rich" = acquisition raised, authored content untouched.
+func rune_econ() -> String:
+	if not sim_run:
+		return "normal"
+	return "rich" if OS.get_environment("DOD_SIM_RUNE_ECON") == "rich" else "normal"
+
+
+# A blanket multiplier on authored rune magnitudes, acquisition untouched.
+# 1.0 = off. Junk or non-positive values fall back to 1.0 rather than
+# quietly zeroing every payload in the pool.
+func rune_power() -> float:
+	if not sim_run:
+		return 1.0
+	var raw := OS.get_environment("DOD_SIM_RUNE_POWER")
+	if raw == "":
+		return 1.0
+	var m := raw.to_float()
+	return m if m > 0.0 else 1.0
+
+
 # Rune slots grow with the run: 2 in the first zone, 3 in the second, 4 in
 # the third. No cap — a fourth zone would give 5, matching the
 # ZONE_BASE_MULTS discipline (slots past the third continue formulaically).
 # Derived from zone_idx, so saves need no new field.
+# The slot ladder is a structural half of dilution — a run that dies in
+# zone 2 never owned a third slot — so the rich arm opens them all at once.
 func rune_slots() -> int:
+	if rune_econ() == "rich":
+		return maxi(RICH_SLOTS, 2 + zone_idx)
 	return 2 + zone_idx
 
 # Runes mode (sim matrix flag, Batch X): full = the authored pool
@@ -883,7 +925,45 @@ func generate_rune(member: Dictionary) -> Dictionary:
 			return {}
 		"stats":
 			return Runes.template_rune(String(member["key"]))
-	return Runes.generate(member, zone_idx + 1)
+	return _apply_rune_power(Runes.generate(member, zone_idx + 1))
+
+
+# The single choke point for the power arm: generate_rune is the only path
+# that turns an authored entry into a rune instance a hero can wear, so
+# scaling here covers the Peddler, the elite cache and the rich arm's
+# grants at once. Generated stat sticks (tpl_*) are NOT authored content
+# and are deliberately left alone — the hypothesis under test is about the
+# authored pool, and moving the filler family too would blur the arms.
+func _apply_rune_power(rune: Dictionary) -> Dictionary:
+	var mult := rune_power()
+	if rune.is_empty() or is_equal_approx(mult, 1.0) \
+			or String(rune.get("id", "")).begins_with("tpl_"):
+		return rune
+	rune["payload"] = Runes.scale_payload(rune["payload"], mult)
+	return rune
+
+
+# DOD_SIM_RUNE_ECON=rich: the crudest probe that answers "what happens when
+# the runes actually arrive" — a spec-eligible authored rune handed over
+# rather than shopped for. Prefers the four written for THIS spec, because
+# those are the entries the dilution question is actually about; falls back
+# to the ordinary roll when the spec's set is exhausted. Honours
+# DOD_SIM_RUNES (nothing under off, stat sticks under stats) so the arms
+# still compose with the Batch X matrix flag.
+func grant_rune(member: Dictionary) -> Dictionary:
+	if runes_mode() != "full":
+		return generate_rune(member)
+	var owned: Array = []
+	for r in member.get("runes", []):
+		owned.append(String(r["name"]))
+	var spec_scope := "spec:%s" % String(member.get("spec", ""))
+	var spec_ids: Array = []
+	for id in Runes.eligible_ids(member, "", owned):
+		if String(Runes.config(id).get("scope", "")) == spec_scope:
+			spec_ids.append(id)
+	if spec_ids.is_empty():
+		return generate_rune(member)
+	return _apply_rune_power(Runes.build(String(spec_ids.pick_random())))
 
 
 # Elite pick-of-3 (Batch X): the three candidates are rolled AT DROP TIME

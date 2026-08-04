@@ -252,6 +252,86 @@ static func build(id: String) -> Dictionary:
 	}
 
 
+# ---------- Batch AD: the power probe (DOD_SIM_RUNE_POWER) ----------
+#
+# A blanket multiplier on the numeric MAGNITUDES of an authored payload,
+# for the stage-1 experiment arm only (Run.rune_power gates it on sim_run —
+# nothing here reads the environment). It scales the UPSIDE and holds every
+# COST at its authored value, deliberately: the arm asks "are the entries
+# too weak", and a multiplier that grew the drawbacks in step would answer
+# a different question. That makes the arm strictly generous to scarred
+# runes, which is why it is a probe and not a design.
+#
+# A cost is found two ways. Usually it is a NEGATIVE value on an ordinary
+# field (-10 Speed, -0.3 healing received, -8% armor). Sometimes it is a
+# POSITIVE value on a field where positive IS the cost — PENALTY_FIELDS,
+# which exists entirely because of the Glass Rune's dmg_taken_bonus. A
+# naive `v * mult` would scale that penalty up and quietly make the rune
+# worse the harder the arm pushed.
+#
+# NOT SCALED, each for a reason worth stating out loud rather than hiding:
+#   grant_ability / new_ability — there is no magnitude to scale. Four
+#     entries (Comet, Binding Souls, Last Rites, Flayed Mind) are therefore
+#     identical in every arm, and the power arm cannot speak for them.
+#   "set" fields — absolute assignments (a damage TYPE, a status duration),
+#     not magnitudes.
+#   ability "cost" / "cooldown" — INVERTED fields, where the benefit is
+#     already a negative number. Scaling -5 Rage to -15 makes an ability
+#     nearly free and -1 cooldown to -3 makes it negative: that measures
+#     "what if abilities were free", not "what if runes were stronger". One
+#     rune (Rune of the Quick Spring) is wholly unscaled as a result.
+# Fields where a POSITIVE number is the rune's price: "+15% damage taken"
+# is a cost even though the term reads +0.15. The Glass Rune is why this
+# list exists.
+const PENALTY_FIELDS := ["dmg_taken_bonus"]
+# Fields that run BACKWARDS — a negative number is the rune's promise, not
+# its price. blood_pact shifts the bleedout threshold DOWN from 100 (the
+# Rune of Exsanguination's -15 pops enemy veins at 85), so sign alone reads
+# its whole benefit as a drawback and holds it: without this list that rune
+# is inert in every arm, which is how it was caught (the power arm's
+# positive control failed on it).
+const INVERTED_STAT_FIELDS := ["blood_pact"]
+const INVERTED_AB_FIELDS := ["cost", "cooldown"]
+
+
+# True when this value is the payload's price rather than its promise. Both
+# named lists invert the sign test for the same reason from opposite ends —
+# on either, a positive number is what the rune charges you.
+static func is_cost(field: String, value: float) -> bool:
+	if PENALTY_FIELDS.has(field) or INVERTED_STAT_FIELDS.has(field):
+		return value > 0.0
+	return value < 0.0
+
+
+# Type is PRESERVED, not re-derived: by the time a payload reaches here
+# _typed_payload has already restored the ints, and pushing a float into a
+# typed BattleUnit var is a runtime error, not a rounding (the Batch AA
+# trap). An int field therefore scales to a rounded int.
+static func _scaled(v, mult: float):
+	if v is int:
+		return int(round(float(v) * mult))
+	return float(v) * mult
+
+
+static func scale_payload(payload: Dictionary, mult: float) -> Dictionary:
+	if is_equal_approx(mult, 1.0):
+		return payload
+	var out: Dictionary = payload.duplicate(true)
+	for field in out.get("stat", {}):
+		var v = out["stat"][field]
+		if not (v is int or v is float) or is_cost(String(field), float(v)):
+			continue
+		out["stat"][field] = _scaled(v, mult)
+	for field in out.get("add", {}):
+		var av = out["add"][field]
+		if not (av is int or av is float) or INVERTED_AB_FIELDS.has(field):
+			continue
+		if float(av) < 0.0:
+			continue  # a negative add on a normal field is a cost
+		out["add"][field] = _scaled(av, mult)
+	return out
+
+
 static func _typed_payload(p: Dictionary) -> Dictionary:
 	var out: Dictionary = p.duplicate(true)
 	if out.has("stat"):

@@ -104,6 +104,33 @@ static var type_taken := {}       # type -> nodes actually entered
 static var deck_present := {}     # type -> nodes dealt into zone maps
 static var deck_seen := {}        # type -> nodes ever reachable on the walk
 static var _seen_nodes := {}      # "f,i" once-guard, reset per zone map
+# ---------- Rune economy (Batch AD) ----------
+# Nothing about the rune ECONOMY was visible in a run report before this
+# batch: three batches authored the pool and every measurement of it
+# confounded "the entries are weak" with "the entries never arrive". These
+# count the second half. Split by SOURCE, because the shop and the elite
+# cache fail differently — the shop fails on gold and on the bot walking
+# past it, the cache fails on a slot that has not opened yet.
+static var rune_shop_offered := 0   # rune offers actually put on the counter
+static var rune_elite_offered := 0  # cache candidates shown (3 per cache)
+static var rune_elite_taken := 0    # caches resolved — one rune each
+static var rune_elite_equipped := 0 # ...of those, worn (a slot was free)
+static var rune_refused_noslot := 0 # never offered: every slot already worn
+static var rune_refused_gold := 0   # offered, left on the counter: 40g reserve
+static var rune_refused_dupe := 0   # re-roll kept landing on an owned rune
+static var rune_granted := 0        # DOD_SIM_RUNE_ECON=rich only
+static var slots_avail_sum := 0.0   # summed over heroes at run end
+static var slots_filled_sum := 0.0
+static var worn_kind := {}          # spec|class|universal|stick -> runes worn
+# ---------- Stage 0b: per-run samples ----------
+# Completions is a binary read on a 2-6% event: at n=50 the difference
+# between "2%" and "6%" is TWO RUNS, and two batches concluded "noise" from
+# an instrument that could not have seen anything smaller than a large
+# effect. These are the continuous metrics that replace it as primary —
+# stored per RUN so the report can print a spread, not just a point.
+static var depth_reached: Array = []  # absolute tier at run end, 1..33
+static var r8_samples: Array = []     # one ratio@z1t8 per run that fought it
+static var _run_r8 := -1.0
 
 
 static func begin(run: Node, n: int) -> void:
@@ -158,6 +185,7 @@ static func start_run(run: Node) -> void:
 	run.specs_chosen = true
 	_run_spent = 0
 	_run_gold_spent = 0
+	_run_r8 = -1.0
 	if not walk_to_next_fight(run):
 		push_error("RunSim: no combat node reachable from the gate")
 
@@ -167,6 +195,7 @@ static func start_run(run: Node) -> void:
 # which a well-formed map can't produce before the boss.
 static func walk_to_next_fight(run: Node) -> bool:
 	for step in 64:  # a zone is 11 tiers — 64 is "impossible map" insurance
+		_rich_top_up(run)
 		var reach: Array = run.reachable()
 		if reach.is_empty():
 			return false
@@ -214,6 +243,42 @@ static func walk_to_next_fight(run: Node) -> bool:
 			"event":
 				_resolve_event(run)
 	return false
+
+
+# DOD_SIM_RUNE_ECON=rich (Batch AD): top every hero up to the milestone
+# target, one spec-eligible rune at a time. Under this arm every slot is
+# open from tier 1 (Run.rune_slots), so the four runes written for a spec
+# reach their hero by the middle of zone 2 instead of never — measured
+# acquisition at the fixed party is 0.55-0.7 per hero PER RUN.
+#
+# Milestones are deliberately crude — 1 rune early in zone 1, 2 late, then
+# +1 per half-zone to the slot cap. This is a probe, not an economy: it
+# does not have to be shippable, it has to answer "what happens when the
+# runes actually arrive?". The shop and the cache keep running underneath
+# it, so the arm raises acquisition without removing a channel.
+static func _rich_top_up(run: Node) -> void:
+	if run.rune_econ() != "rich":
+		return
+	var half := 1 if run.floor_idx + 1 < 6 else 2
+	var target: int = mini(run.zone_idx * 2 + half, run.rune_slots())
+	for m in run.party:
+		var worn := 0
+		var owned_names: Array = []
+		for r in m.get("runes", []):
+			owned_names.append(String(r["name"]))
+			if r.get("equipped", false):
+				worn += 1
+		while worn < target:
+			var rune: Dictionary = run.grant_rune(m)
+			# Empty = runes off; a dupe means the eligible pool is spent for
+			# this hero. Either way, stop asking rather than spin.
+			if rune.is_empty() or owned_names.has(String(rune["name"])):
+				break
+			rune["equipped"] = true
+			m["runes"] = m.get("runes", []) + [rune]
+			owned_names.append(String(rune["name"]))
+			rune_granted += 1
+			worn += 1
 
 
 # The route policy (Batch U). greedy/elites keep the Batch S ladder byte
@@ -320,7 +385,7 @@ static func _shop_visit(run: Node) -> void:
 				best_offer = i
 				best_price = rp
 		if best_item == "" and best_offer < 0:
-			return
+			break  # nothing affordable left — the leftovers are counted below
 		run.gold -= best_price
 		_run_gold_spent += best_price
 		if best_item != "":
@@ -334,6 +399,10 @@ static func _shop_visit(run: Node) -> void:
 			member["runes"] = member.get("runes", []) + [rune]
 			runes_bought += 1
 			offers.remove_at(best_offer)
+	# A rune the party could not have taken is not a rune the economy
+	# delivered (Batch AD). Anything still on the counter outlived the gold:
+	# the buy loop only stops when nothing clears the 40g reserve.
+	rune_refused_gold += offers.size()
 
 
 # One rune per party member, dupes re-rolled (shop_screen._roll_offers),
@@ -350,6 +419,7 @@ static func _roll_rune_offers(run: Node) -> Array:
 			if r.get("equipped", false):
 				worn += 1
 		if worn >= run.rune_slots():
+			rune_refused_noslot += 1
 			continue
 		var rune: Dictionary = run.generate_rune(member)
 		if rune.is_empty():
@@ -360,6 +430,9 @@ static func _roll_rune_offers(run: Node) -> Array:
 			rune = run.generate_rune(member)
 		if not owned_names.has(rune["name"]):
 			offers.append({"member_idx": i, "rune": rune})
+			rune_shop_offered += 1
+		else:
+			rune_refused_dupe += 1
 	return offers
 
 
@@ -391,16 +464,31 @@ static func note_battle_start(run: Node, heroes: Array, enemies: Array,
 	t["fights"] += 1.0
 	var hp_sum := 0.0
 	var living := 0.0
+	var p_atk := 0.0
+	var p_ehp := 0.0
+	var e_atk := 0.0
+	var e_ehp := 0.0
 	for h in heroes:
-		t["p_atk"] += h.attack
-		t["p_ehp"] += h.max_hp / maxf(1.0 - clampf(h.armor, 0.0, 0.95), 0.05)
+		p_atk += h.attack
+		p_ehp += h.max_hp / maxf(1.0 - clampf(h.armor, 0.0, 0.95), 0.05)
 		if not h.dead:
 			hp_sum += h.hp / float(h.max_hp)
 			living += 1.0
+	t["p_atk"] += p_atk
+	t["p_ehp"] += p_ehp
 	t["hp_pct"] += hp_sum / maxf(living, 1.0)
 	for e in enemies:
-		t["e_atk"] += e.attack
-		t["e_ehp"] += e.max_hp / maxf(1.0 - clampf(e.armor, 0.0, 0.95), 0.05)
+		e_atk += e.attack
+		e_ehp += e.max_hp / maxf(1.0 - clampf(e.armor, 0.0, 0.95), 0.05)
+	t["e_atk"] += e_atk
+	t["e_ehp"] += e_ehp
+	# Stage 0b: the SAME ratio the report has always headlined, kept per RUN
+	# so it carries a spread instead of a single pooled point. z1t8 is the
+	# established comparison tier (the Matrix row's ratio@z1t8) and nearly
+	# every run reaches it, which is what makes it a usable primary metric
+	# where completions is not.
+	if _cur_tier == "1,8":
+		_run_r8 = sqrt((p_atk * p_ehp) / maxf(e_atk * e_ehp, 1.0))
 	# Correctness check 2 (the batch doc): heroes must enter the boss with
 	# a real build, not base kits.
 	if String(run.encounter.get("type", "")) == "boss":
@@ -450,12 +538,16 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		# still drops its item.
 		var candidates: Array = run.roll_rune_candidates(looter)
 		if not candidates.is_empty():
+			rune_elite_offered += candidates.size()
 			var rune: Dictionary = _pick_rune_candidate(looter, candidates)
 			var worn := 0
 			for r in looter.get("runes", []):
 				if r.get("equipped", false):
 					worn += 1
 			rune["equipped"] = worn < run.rune_slots()
+			rune_elite_taken += 1
+			if rune["equipped"]:
+				rune_elite_equipped += 1
 			looter["runes"] = looter.get("runes", []) + [rune]
 		var drop_id: String = run.random_loot()
 		run.items[drop_id] = int(run.items.get(drop_id, 0)) + 1
@@ -501,6 +593,35 @@ static func _finish_run(run: Node, battle, done: bool) -> void:
 	gold_earned += run.gold + _run_gold_spent
 	for id in run.items:
 		items_left += int(run.items[id])
+	# Stage 0b primary metric: how far the run actually got, on the same
+	# absolute ladder the wipe median uses ((zone-1)*11 + tier, so a full
+	# clear is 33). A mean over per-run samples, never a median — the median
+	# is the knife-edge statistic Batch AB caught flipping a whole zone on a
+	# two-run difference.
+	depth_reached.append(run.zone_idx * 11 + run.floor_idx + 1)
+	if _run_r8 >= 0.0:
+		r8_samples.append(_run_r8)
+	# Stage 0a: the slot ladder and what is actually worn on it. Slots open
+	# on boss kills, so a run that ends in zone 1 never owned a third slot —
+	# that is a structural half of dilution and nobody had measured it.
+	for m in run.party:
+		slots_avail_sum += run.rune_slots()
+		var spec_scope := "spec:%s" % String(m.get("spec", ""))
+		var worn := 0
+		for r in m.get("runes", []):
+			if not r.get("equipped", false):
+				continue
+			worn += 1
+			var scope := String(r.get("scope", "universal"))
+			var kind := "universal"
+			if String(r.get("id", "")).begins_with("tpl_"):
+				kind = "stick"  # the generated Common family, not authored
+			elif scope == spec_scope:
+				kind = "spec"
+			elif scope.begins_with("class:"):
+				kind = "class"
+			worn_kind[kind] = int(worn_kind.get(kind, 0)) + 1
+		slots_filled_sum += worn
 	# Progress line (Batch W), mirroring the sweep's per-stage marker: the run
 	# report only prints at the very end, so without this a long invocation is
 	# indistinguishable from a hung one for its entire life.
@@ -636,6 +757,42 @@ static func _tier(key: String) -> Dictionary:
 
 # ---------- the report ----------
 
+# Stage 0b's arithmetic. Nothing clever: a mean, a sample SD, and the
+# smallest difference two same-sized rows could actually resolve. The point
+# is not statistical rigour, it is that the project has never had ANY
+# statement of what its instrument can see, and "completions at n=50 cannot
+# distinguish a 3-point change from noise" is worth more than a formal
+# power calculation nobody runs.
+static func _mean(xs: Array) -> float:
+	if xs.is_empty():
+		return 0.0
+	var s := 0.0
+	for x in xs:
+		s += float(x)
+	return s / xs.size()
+
+
+static func _sd(xs: Array) -> float:
+	if xs.size() < 2:
+		return 0.0
+	var m := _mean(xs)
+	var s := 0.0
+	for x in xs:
+		s += pow(float(x) - m, 2.0)
+	return sqrt(s / (xs.size() - 1))
+
+
+# Minimum detectable difference between two independent rows of n samples
+# each, at 80% power and alpha 0.05 two-sided: 2.8 * SD * sqrt(2/n). Rough
+# by design and labelled as such.
+static func _mde(sd: float, n: int) -> float:
+	return 2.8 * sd * sqrt(2.0 / maxf(float(n), 1.0))
+
+
+static func _resolution_line(sd: float, n: int, fmt: String) -> String:
+	return "      resolves a difference of %s (n=%d)   %s at n=100   %s at n=150" % [
+		fmt % _mde(sd, n), n, fmt % _mde(sd, 100), fmt % _mde(sd, 150)]
+
 static func _print_report(battle) -> void:
 	var runs := maxf(float(runs_done), 1.0)
 	print("\n===== DAWN OF DECAY — RUN REPORT =====")
@@ -670,6 +827,78 @@ static func _print_report(battle) -> void:
 	if OS.get_environment("DOD_SIM_ROTATE") == "1":
 		specs_desc = "rotating all twelve (DOD_SIM_ROTATE=1)"
 	print("Specs: %s" % specs_desc)
+	# Batch AD experiment arms — printed here so a row is reproducible from
+	# its own header, and so a row that IS in an arm can never be mistaken
+	# for a baseline.
+	var econ_env := OS.get_environment("DOD_SIM_RUNE_ECON")
+	var econ_desc := "rich(all slots open from t1 + spec-eligible grants at zone half-marks)" \
+		if econ_env == "rich" else "normal"
+	var power_env := OS.get_environment("DOD_SIM_RUNE_POWER")
+	var power_mult := power_env.to_float() if power_env != "" else 1.0
+	if power_mult <= 0.0:
+		power_mult = 1.0
+	print("          EXPERIMENT ARMS (Batch AD, sim-only, off by default, never shipped):")
+	print("            rune_econ=%s (DOD_SIM_RUNE_ECON)" % econ_desc)
+	print("            rune_power=x%.2f (DOD_SIM_RUNE_POWER: scales authored payload UPSIDE only —" % power_mult)
+	print("              costs held at authored value; grant/new_ability, \"set\" fields and")
+	print("              ability cost/cooldown reductions have no magnitude to scale)")
+	# THE CONFOUNDER, stated in the header rather than buried in a comment.
+	var shops_taken: float = float(type_taken.get("shop", 0)) / runs
+	var shops_seen: float = float(type_offered.get("shop", 0)) / runs
+	print("KNOWN CONFOUNDER on every rune number below: since Batch Y the bot's fight-first")
+	print("  preference BINDS — it takes %.1f of %.1f shops offered per run. Sim rune" % [
+		shops_taken, shops_seen])
+	print("  acquisition is a FLOOR ON THE BOT'S ROUTING, not an estimate of a human's.")
+	print("  No route policy in this harness ranks a shop above a fight (greedy/default/")
+	print("  cautious/elites all put combat first), so the ceiling is NOT reachable by")
+	print("  changing route — that gap is reported, not papered over with a policy")
+	print("  invented mid-batch. DOD_SIM_RUNE_ECON=rich is what supplies the ceiling.")
+
+	# ---------- Stage 0b: what this instrument can actually see ----------
+	# Printed BEFORE the numbers it qualifies, on purpose. Two batches read
+	# a 4-point completions move as "noise" without ever establishing that
+	# the instrument could not have resolved anything smaller than a large
+	# effect. It could not. Completions is demoted to secondary here and
+	# always carries its band.
+	var n_runs := int(runs_done)
+	var d_mean := _mean(depth_reached)
+	var d_sd := _sd(depth_reached)
+	var r8_mean := _mean(r8_samples)
+	var r8_sd := _sd(r8_samples)
+	var p := float(completed) / runs
+	# A row with 0 or 100% completions has zero binomial variance, which
+	# would print an absurd "resolves 0 points". Clamp to the half-run
+	# continuity floor so the band stays honest at the edges.
+	var p_adj := clampf(p, 0.5 / runs, 1.0 - 0.5 / runs)
+	var p_sd := sqrt(p_adj * (1.0 - p_adj))
+	print("\nINSTRUMENT RESOLUTION (Batch AD stage 0b) — read this before the numbers:")
+	print("  PRIMARY   depth reached      mean %.2f  SD %.2f  SE %.2f   (absolute tier, 1-33; a full clear is 33)" % [
+		d_mean, d_sd, d_sd / sqrt(maxf(float(n_runs), 1.0))])
+	print(_resolution_line(d_sd, n_runs, "%.2f tiers"))
+	print("  PRIMARY   ratio@z1t8        mean %.3f  SD %.3f  SE %.3f   (%d of %d runs reached t8)" % [
+		r8_mean, r8_sd, r8_sd / sqrt(maxf(float(r8_samples.size()), 1.0)),
+		r8_samples.size(), n_runs])
+	print(_resolution_line(r8_sd, maxi(r8_samples.size(), 1), "%.3f"))
+	# TWO CAVEATS, both found by running Batch AD's arms rather than reasoned
+	# out in advance. (1) This is the mean of PER-RUN ratios; the Matrix row
+	# below reports the POOLED aggregate it has always reported, so the two
+	# differ slightly by construction — same tier, different estimator, and
+	# only the pooled one compares to pre-AD rows. (2) The sample is
+	# CONDITIONED ON SURVIVAL: only runs that reach z1 t8 contribute. An
+	# intervention that helps weak runs live longer ADDS weak runs to the
+	# sample and pushes this mean DOWN while making the game easier. Depth
+	# reached has no such bias, which is why it is the primary of the two.
+	print("            ^ mean of per-run ratios (the Matrix row's ratio@z1t8 is the pooled")
+	print("              aggregate — same tier, different estimator). SURVIVAL-CONDITIONED:")
+	print("              an arm that changes who reaches t8 changes this sample's makeup.")
+	print("  SECONDARY completions       %.0f%% (%d of %d)   95%% band +/-%.1f pts" % [
+		100.0 * p, completed, n_runs, 100.0 * 1.96 * p_sd / sqrt(runs)])
+	print(_resolution_line(100.0 * p_sd, n_runs, "%.1f pts"))
+	print("            ^ AT THIS n, COMPLETIONS CANNOT DISTINGUISH A SMALL CHANGE FROM NOISE.")
+	print("              Never quote it on its own; it is a binary read on a 2-6% event.")
+	print("  SECONDARY wipe median       knife-edge at n=50 (Batch AB: a true null-change")
+	print("            control moved it a whole zone on a two-run difference). Reported below,")
+	print("            never quoted as a trend on its own.")
 
 	print("\nWipe tier distribution:")
 	for z in range(1, 4):
@@ -765,6 +994,39 @@ static func _print_report(battle) -> void:
 	print("Rests taken: %.1f/run   (nodes offered: %.1f/run)" % [
 		rest_taken / runs, rest_offered / runs])
 
+	# ---------- Rune economy (Batch AD stage 0a) ----------
+	# The half of the rune question no measurement has ever shown. Read it
+	# next to the gold line above: unspent gold beside empty slots is a
+	# specific diagnosis, and a different one from empty slots beside no
+	# gold at all.
+	print("\nRune economy (per run):")
+	print("  Shop     offered %.2f   bought %.2f   (every shop rune is equipped at purchase)" % [
+		rune_shop_offered / runs, runes_bought / runs])
+	print("  Elite    candidates %.2f (%.2f caches x3)   taken %.2f   equipped %.2f" % [
+		rune_elite_offered / runs, rune_elite_taken / runs,
+		rune_elite_taken / runs, rune_elite_equipped / runs])
+	if rune_granted > 0:
+		print("  GRANTED  %.2f   <-- DOD_SIM_RUNE_ECON=rich is ON; this row is an experiment arm" % [
+			rune_granted / runs])
+	print("  Acquired per hero per run: %.2f   (the four written for a spec are the target)" % [
+		(runes_bought + rune_elite_taken + rune_granted) / runs / 4.0])
+	print("  Shop offers refused:  no free slot %.2f   unaffordable (40g reserve) %.2f   duplicate %.2f" % [
+		rune_refused_noslot / runs, rune_refused_gold / runs, rune_refused_dupe / runs])
+	print("  Elite runes won with no free slot: %.2f/run  (pouched, not worn)" % [
+		(rune_elite_taken - rune_elite_equipped) / runs])
+	print("  Shops walked past: %.1f of %.1f offered   <-- the dominant refusal, and it is ROUTING" % [
+		float(type_offered.get("shop", 0) - type_taken.get("shop", 0)) / runs,
+		float(type_offered.get("shop", 0)) / runs])
+	var heroes_seen := maxf(slots_avail_sum, 1.0)
+	print("  Slots at run end: %.2f available per hero, %.2f filled (%.0f%%)" % [
+		slots_avail_sum / runs / 4.0, slots_filled_sum / runs / 4.0,
+		100.0 * slots_filled_sum / heroes_seen])
+	var kind_parts := PackedStringArray()
+	for kind in ["spec", "class", "universal", "stick"]:
+		kind_parts.append("%s %.2f" % [kind, float(worn_kind.get(kind, 0)) / runs / 4.0])
+	print("  Worn per hero at run end, by kind: %s" % "   ".join(kind_parts))
+	print("    (spec = one of the FOUR authored for that spec; stick = the generated Common family)")
+
 	# Route agency (Batch Y): the batch's headline pair is choice rate
 	# before vs after the link/deal rework — completions are a consequence.
 	var steps := maxf(float(walk_steps), 1.0)
@@ -805,8 +1067,16 @@ static func _print_report(battle) -> void:
 		var f8: float = maxf(t8["fights"], 1.0)
 		r8_desc = "%.2f" % sqrt((t8["p_atk"] / f8) * (t8["p_ehp"] / f8) \
 			/ maxf((t8["e_atk"] / f8) * (t8["e_ehp"] / f8), 1.0))
-	print("Matrix row: route=%s  map=%s  diff=%s  completions=%.0f%%  wipe median tier=%s  ratio@z1t8=%s  choice=%.0f%%" % [
-		route, map_mode, diff, 100.0 * completed / runs, med_desc, r8_desc,
+	# Batch AD adds econ=/power=/depth= — the arms a row was in, and the new
+	# PRIMARY metric with its spread. Pre-AD rows carry none of these three
+	# fields, which is the same never-compare-across-batches rule Batch Y's
+	# map=/diff=/choice= fields established.
+	print("Matrix row: route=%s  map=%s  diff=%s  econ=%s  power=x%.2f  depth=%.2f+/-%.2f  ratio@z1t8=%s  completions=%.0f%%  wipe median tier=%s  choice=%.0f%%" % [
+		route, map_mode, diff,
+		("rich" if OS.get_environment("DOD_SIM_RUNE_ECON") == "rich" else "normal"),
+		power_mult, _mean(depth_reached),
+		_sd(depth_reached) / sqrt(maxf(float(runs_done), 1.0)),
+		r8_desc, 100.0 * completed / runs, med_desc,
 		100.0 * choice_steps / steps])
 
 	print("Still excluded: bomb/revive/defense/mana items never used in battle (only the <35% heal drink); no pre-emptive or offensive item use; routing sees one tier ahead only, no map lookahead; shop rune picks ignore build synergy (priciest first).")

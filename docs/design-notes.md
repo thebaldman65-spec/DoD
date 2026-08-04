@@ -1036,3 +1036,48 @@ simulation harness's own statistics path stays the single source of
 truth for balance numbers. In both cases the rule is the same: when a
 new feature wants to reach into load-bearing machinery, give the feature
 its own path instead.
+
+## Batch AD — the instrument was the finding
+
+Two batches in a row concluded that the authored rune pool "does not move
+completions beyond noise". Both were right about the number and wrong to
+draw a conclusion from it, and the reason is worth recording because it
+will happen again in some other system.
+
+Completions sat at 2–12% on samples of fifty runs. That is one to six
+runs. The smallest difference two fifty-run rows can actually distinguish,
+at that rate, is something like fifteen percentage points — so a genuine
+and large improvement would have been reported as noise in exactly the
+same words. The measurement was not wrong; it was incapable, and nobody
+had ever written down what it was capable of. The proof turned up for
+free while setting the batch's control: the same commit, on the same
+flags, measured three separate times, returned four per cent, ten per
+cent and eight per cent. Nothing had changed at all.
+
+The fix was not a bigger experiment. It was a better metric. Depth
+reached — how far up the ladder a run actually got, averaged over runs —
+gives every single run a vote instead of asking each one a yes/no
+question about a rare event. It resolves a real difference at a quarter
+of the sample size, and it turned a question two batches could not answer
+into one that a single afternoon of rows answered decisively. Completions
+was never the thing anyone cared about; it was just the number that was
+easy to print.
+
+There is a second lesson underneath the first, and it is the sharper one.
+The batch existed to separate two hypotheses — the runes are too weak, or
+the runes never arrive — on the assumption that one of them was right.
+Neither was. Raising acquisition alone moved nothing. Raising power alone
+moved nothing. Doing both together moved the primary metric by ten tiers
+and completions from eight per cent to sixty-one. The two candidate
+causes were never alternatives; they were two factors of one product,
+both near zero, each perfectly masking the other. Any experiment that
+varied one at a time — which is every experiment run on this system so
+far, including the careful ones — was guaranteed to report "no effect"
+no matter which explanation was true.
+
+So the habit worth keeping is not "measure before you change things",
+which this project already does. It is: when two explanations are offered
+for one null result, check whether they multiply before assuming they
+compete. And write down what your instrument can see *before* you ask it
+a question, because an instrument that cannot resolve the answer will
+still cheerfully print one.

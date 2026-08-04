@@ -5,6 +5,254 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-04 — Batch AD: the rune economy — power and dilution are one finding</h2>
+<ul>
+<li><b>Why.</b> Three batches authored the rune pool — X built the machinery and the
+Warrior's set, AA did Mage and Cleric, AB did the Hunter — and twice, independently, the
+measurement came back the same: <i>the authored pool at current power does not move
+completions beyond noise</i>. A whole system, the shop's entire stock and the elite cache's
+entire payoff, measured as inert. Two explanations had been named and never separated:
+the entries are too <b>weak</b>, or they never <b>arrive</b> (acquisition measured at
+0.55–0.7 runes per hero per run, out of the four written for that spec). Every prior
+measurement confounded them, and that mattered practically: raise power while dilution is
+the real cause and the entries are over-tuned the moment acquisition is fixed — an error a
+human playtester would find instead of us. This batch separates them. It is measure-first
+in the Batch U/W/Y mould and it <b>ships no content change</b>, because that is what the
+data says to do.</li>
+
+<li><b>Stage 0b first, because the instrument was the problem.</b> Before any arm ran, the
+report was made to state what it can actually resolve. <b>Completions is close to useless as
+a primary metric at the sample sizes this project has been using.</b> Recent rows sit at
+2–12% on n=50 — one to six runs — and the resolvable difference between two 50-run rows, at
+80% power, is <b>about 15 percentage points</b>. Batches AA and AB read 4%→6%, 6%→2% and
+8%→13% as "noise". They were noise; but that instrument would have called a genuine
+ten-point improvement noise too. Two batches concluded from a measurement that could not
+have seen the effect either way.
+<br>The proof arrived by accident. The <i>same commit</i> (7ec7f97), the <i>same flags</i>,
+measured three times, returned <b>4% (Batch AC), 10%, and 8%</b> completions. Six points of
+spread with nothing changed at all.</li>
+
+<li><b>What replaced it.</b> <b>Depth reached</b> — the absolute tier a run ends on, 1–33,
+as a <i>mean</i> over per-run samples — is now the PRIMARY metric. Every run contributes
+one sample, so it carries far more information per run than a binary win, and unlike the
+wipe median it is not a knife-edge statistic. The run report now prints an <b>INSTRUMENT
+RESOLUTION</b> block <i>above</i> the numbers it qualifies, giving mean/SD/SE for each
+metric and the smallest difference two rows could resolve at n=50/100/150. Completions and
+the wipe median are demoted to SECONDARY and always quoted with their band.
+<br>At <b>n=100</b>, measured: depth resolves <b>±3.9 tiers</b>, ratio@z1t8 <b>±0.09</b>,
+completions <b>±10.7 points</b>. All rows in this batch were run at n=100 for that reason.</li>
+
+<li><b>A metric caveat found by running the arms, worth more than the metric.</b>
+<code>ratio@z1t8</code> is <b>conditioned on survival</b> — only runs that reach zone 1 tier
+8 contribute one. Across this batch's rows that sample was 49, 59, 62 and 76 runs of 100,
+because the arms changed how many runs get there. An intervention that helps weak runs
+survive to t8 <i>lowers</i> the mean ratio at t8 by adding weak runs to the sample. Depth
+reached has no such bias. <b>Read ratio@z1t8 with its n attached, and never as a lone
+primary.</b></li>
+
+<li><b>Stage 0a — the rune economy is now visible.</b> Nothing about it had ever been in a
+run report. The new block gives, per run: runes offered/bought/equipped <b>split by source</b>
+(shop vs elite cache); shop offers refused <b>and why</b> (no free slot / unaffordable /
+duplicate); elite runes won with no slot to wear them in; <b>slots available vs filled</b> at
+run end; and what each hero is actually wearing, split <b>spec / class / universal / stat
+stick</b>. The header states the known confounder rather than burying it in a comment: since
+Batch Y the bot's fight-first preference binds, it takes 0.6 of 5.4 shops offered, and sim
+rune acquisition is therefore <b>a floor on the bot's routing, not an estimate of a human's</b>.
+<b>No route policy in the harness ranks a shop above a fight</b> (greedy, default, cautious and
+elites all put combat first), so the acquisition ceiling is not reachable by changing route.
+That gap is reported rather than papered over with a policy invented mid-batch — the
+<code>rich</code> arm is what supplies the ceiling instead.</li>
+
+<li><b>Stage 1 — two flags, one variable each.</b> Both are <b>sim-only, off by default and
+never shipped</b>.
+<ul>
+<li><code>DOD_SIM_RUNE_ECON=rich</code> — acquisition raised, <b>authored content
+untouched</b>: every slot open from tier 1, plus a spec-eligible authored rune granted at
+each zone half-mark, so the four runes written for a spec reach their hero by the middle of
+zone 2 instead of never. Crude on purpose; it is a probe, not an economy.</li>
+<li><code>DOD_SIM_RUNE_POWER=&lt;mult&gt;</code> — a blanket multiplier on authored payload
+magnitudes, <b>acquisition untouched</b>. It scales the <b>upside only</b> and holds every
+cost at its authored value, deliberately: a multiplier that grew the drawbacks in step would
+answer a different question. Generated stat sticks are not authored content and do not move.
+Named exclusions, stated rather than hidden: <code>grant_ability</code>/<code>new_ability</code>
+have no magnitude (four entries — Comet, Binding Souls, Last Rites, Flayed Mind — are
+identical in every arm, and the power arm cannot speak for them); <code>set</code> fields are
+absolute assignments; and ability <code>cost</code>/<code>cooldown</code> reductions are
+inverted fields, where scaling −5 Rage to −15 would measure "what if abilities were free"
+(one rune, the Quick Spring, is wholly unscaled as a result).</li>
+</ul></li>
+
+<li><b>The purity gate is the load-bearing half.</b> Every other harness flag reads the
+environment unconditionally, so a stale <code>export</code> in a shell changes a real game.
+These two are gated on <code>sim_run</code> as well as on the variable, so <b>a player's run
+can never be silently in an experiment arm</b>. Asserted, not intended: the test sets both
+variables, leaves <code>sim_run</code> false, and checks that nothing happens — then sets
+<code>sim_run</code> and checks that the arms actually arm, because a gate that is always
+closed proves nothing. Junk values (<code>banana</code>, <code>-2</code>, <code>0</code>)
+fall back to ×1.0 rather than zeroing every payload in the pool.</li>
+
+<li><b>The interpretation rule, committed in writing BEFORE the first arm ran.</b> Deciding
+what counts as an answer after seeing the rows is how a measure-first batch turns into a
+rationalisation, so the rule was written down first: <i>"moves the needle" means a difference
+larger than the resolvable effect size the row itself prints</i>. <code>rich</code> moves it
+alone → dilution, stop and bring levers to the designer. <code>power</code> moves it alone →
+the entries are underpowered, do a magnitude pass. Both move it → report the sizes, the
+designer picks. Neither at any reachable magnitude → runes are decorative, and say so
+plainly. And explicitly: <i>"if neither single arm moves the metric but the pair does, the two
+are jointly necessary — report it as such rather than attributing the movement to either flag
+alone."</i> That last clause is the one the data landed on.</li>
+
+<li><b>The four rows — fixed party, n=100 each</b> (route=default, map=new, diff=standard).
+Depth reached is the primary; the resolvable difference is <b>±3.9 tiers</b>.
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>row</th><th>acquired /hero</th><th>spec runes worn /hero</th><th>DEPTH (primary)</th>
+<th>vs control</th><th>completions</th><th>wipe median</th></tr>
+<tr><td>control</td><td>0.58</td><td>0.18</td><td><b>16.97 ±0.99</b></td><td>—</td><td>8% ±5.3</td><td>z1 t11.0</td></tr>
+<tr><td><code>rich</code></td><td>2.93</td><td>2.54</td><td><b>16.12 ±0.94</b></td><td>−0.85 <i>(no)</i></td><td>6% ±4.7</td><td>z1 t11.0</td></tr>
+<tr><td><code>power</code> ×3</td><td>0.50</td><td>0.14</td><td><b>16.49 ±0.95</b></td><td>−0.48 <i>(no)</i></td><td>12% ±6.4</td><td>z1 t11.0</td></tr>
+<tr><td><code>rich+power</code></td><td>3.92</td><td>3.15</td><td><b>27.13 ±0.92</b></td><td><b>+10.16 MOVED</b></td><td>61% ±9.6</td><td>z2 t7.0</td></tr>
+</table></li>
+
+<li><b>Replicated across all twelve specs.</b> A fixed party can only ever roll <b>16 of the
+48</b> spec-scoped runes, so it is structurally blind to two-thirds of the authored pool. The
+whole table was re-run at <code>DOD_SIM_ROTATE=1</code>, n=100 each, and reproduces:
+control depth <b>14.78 ±1.06</b> / 12% — <code>rich</code> <b>14.71 ±1.01</b> / 12%
+(a change of <b>−0.07 tiers and exactly zero completion points</b> while delivering 2.27 spec
+runes per hero against the control's 0.17) — <code>power</code>×3 <b>14.94 ±1.06</b> / 15% —
+<code>rich+power</code> <b>22.83 ±1.20</b> / 43%. Two independent parties, same shape:
+<b>neither alone, both together</b>.</li>
+
+<li><b>THE FINDING: the two hypotheses were never alternatives.</b> They are two factors of
+one product, both near zero, and <b>each perfectly masks the other</b>. Raise acquisition
+alone — five times the runes, fourteen times the spec runes worn — and nothing happens,
+because at authored magnitudes four runes are worth about what one is worth: nothing. Raise
+power alone and nothing happens, because a multiplier on a rune nobody is wearing multiplies
+zero. Any experiment that varies one factor at a time is <i>guaranteed</i> to report "no
+effect" whichever explanation is true — which is exactly what Batch AA and Batch AB did, and
+they were not careless. <b>The pool is not weak and it is not diluted. It is both, and either
+fix alone is worthless.</b></li>
+
+<li><b>"At any reachable magnitude" — closed, not assumed.</b> The power arm was pushed until
+it ran out of road, acquisition untouched:
+<br><code>×1 → depth 16.97 · ×3 → 16.49 · ×6 → 17.07 · ×10 → 17.93</code>
+<br>A <b>tenfold</b> increase in every authored magnitude in the game moves the primary metric
+by <b>0.96 tiers</b>, against a resolvable difference of ±3.9. Power alone is not a live lever
+at any multiplier a designer would ever ship, and now that is measured rather than supposed.</li>
+
+<li><b>And the dose-response once acquisition is fixed — the number the designer actually
+needs.</b> With <code>rich</code> held on and the multiplier swept:
+<br><code>×1 → depth 16.12 · ×1.5 → 20.50 · ×2 → 23.75 · ×3 → 27.13</code>
+<br>Smooth, monotone, roughly +3.5 tiers per half-step. <b>The effect becomes detectable at
+about ×1.5 and is unambiguous by ×2</b> — so if acquisition is fixed, the magnitude pass this
+project has been contemplating for three batches needs to be far smaller than ×3. The response
+is threshold-like rather than linear because the run economy compounds (Batch T:
+<i>"the attrition→income loop unwinding IS the mechanism of every gain"</i>) — a small edge in
+zone 1 buys the gold and talent points that buy the next edge.</li>
+
+<li><b>Stage 2 — the batch ends with NO CONTENT CHANGE, because that is what the data says.</b>
+The brief allowed this and it is the correct outcome, not a shortfall. A
+<code>runes.json</code> magnitude pass is precisely the change measured to be <b>inert on its
+own at ×3, ×6 and ×10</b>. Shipping one now would also over-tune: the dose-response says
+~×1.5–2 is enough <i>once the runes arrive</i>, so a pass authored against today's numbers
+would be roughly double what is wanted, and the error would surface in a human playtest rather
+than here — the exact failure the brief predicted. Acquisition is an economy decision and
+belongs to the designer. So: instrumentation and the finding ship; the levers are laid out
+below and <b>not chosen</b>.</li>
+
+<li><b>The levers, with what the data says about each — designer's call, not this batch's.</b>
+Measured at the control row: gold <b>earned 582 / spent 151 / unspent 431</b> per run, slots
+<b>2.80 available per hero and 0.58 filled (21%)</b>, shops <b>0.6 taken of 5.4 offered</b>,
+elite caches <b>0.82 per run</b>, rests <b>2.3 taken of 5.6 offered</b>.
+<ul>
+<li><b>Open the third slot earlier — DEAD LEVER, remove it from the list.</b> The party
+already leaves <b>79% of the slots it owns empty</b>. It cannot fill the ladder it has;
+lengthening the ladder changes nothing. (This is the brief's explicit ask, answered: slots are
+not the binding constraint.)</li>
+<li><b>Rarity re-pricing (50/100/160) — cheap, safe, small.</b> Two facts that look
+contradictory and are not: across a run <b>price is not the constraint</b> (the party dies
+holding 431 gold, enough for four rare runes), yet <b>at the counter it binds</b> (1.04 of
+2.56 offers per run refused as unaffordable). Both are true because the party reaches a shop
+only 0.6 times per run, so most gold is earned after the last shop it will ever see.
+Re-pricing converts at most about one extra offer per run and leaves the pile untouched.</li>
+<li><b>A rune offer at rest nodes — the largest sim-measurable lever.</b> Rests are entered
+<b>2.3 times per run against the shop's 0.6</b> — nearly four times the touch rate — and the
+party has 431 unspent gold to convert. Cost: it dilutes what a rest node <i>is</i>.</li>
+<li><b>A second elite cache — small.</b> Elites are taken 0.8 per run and each cache dresses
+one hero, so doubling it adds roughly 0.2 runes per hero per run. It is also gated on
+surviving deep enough to meet elites.</li>
+<li><b>A starting rune at the draft — the biggest single jump, and front-loaded.</b> +1.00 per
+hero immediately, landing in zone 1 where the runs actually die (control wipe median: the
+zone-1 boss), and visible to a player in their first ten minutes.</li>
+<li><b>Change nothing yet, and measure a human first.</b> A real option, not a cop-out: the
+0.6-of-5.4 shop rate is <b>the bot's routing floor</b>, and a human who deliberately routes
+through shops may already acquire several times what the sim does. Difficulty is closed
+pending playtesters; acquisition may deserve the same treatment.</li>
+</ul></li>
+
+<li><b>A bug the arm's own positive control caught.</b> The power multiplier decides what is
+a benefit and what is a cost by <i>sign</i> — but <code>blood_pact</code> runs backwards. The
+Rune of Exsanguination's <code>-15</code> is its whole <i>promise</i> (enemy veins open at 85
+buildup instead of 100), and read by sign alone it looked like a drawback and was held, leaving
+that rune <b>inert in every arm</b>. It surfaced because the test asserts that every entry not
+on a named <code>UNSCALABLE</code> list must actually respond to the arm — an assertion that
+exists precisely so a silently-unmoved entry is a failure rather than a shrug. Fixed with a
+named <code>INVERTED_STAT_FIELDS</code> list beside the existing <code>PENALTY_FIELDS</code>,
+and the rows that had already started were <b>thrown away and re-run</b> rather than
+caveated.</li>
+
+<li><b>Verification.</b>
+<ul>
+<li><b>Purity, asserted rather than intended:</b> with both variables exported and
+<code>sim_run</code> false, <code>rune_econ()</code> stays <code>normal</code>,
+<code>rune_power()</code> stays 1.0, the slot ladder stays 2/3/4 and an authored payload is
+untouched — then the same env under <code>sim_run</code> arms both, because a gate that is
+always closed proves nothing.</li>
+<li><b>The control IS the regression test.</b> Pre-batch <code>HEAD</code> (7ec7f97) re-run
+from a clean git worktree at the same n=100 and the same flags: completions <b>6%</b>, wipe
+median <b>z1 t11.0</b>, ratio@z1t8 <b>1.00</b>, choice <b>79%</b>. This batch's control arm:
+completions <b>8%</b>, wipe median <b>z1 t11.0</b> (identical), ratio <b>0.92</b>, choice
+<b>78%</b>. Everything inside its band. Worth noting for its own sake: four measurements of
+the <i>unchanged</i> build span 0.92–1.00 on ratio and 4–10% on completions.</li>
+<li><b>Save files byte-identical</b> across a real <code>DOD_SIM_RUN</code> invocation with
+<i>both arms armed</i> — profile.json, run_save.bin and relics.json hashed before and after.</li>
+<li><code>test_runes.gd</code> <b>extended, not replaced</b> — 1,961 checks → <b>3,085, zero
+failures</b>. New: the purity gate; a drift alarm asserting the shipped cost lists match the
+scarred audit's; every entry's cost held and every benefit scaled at ×3 with sign and
+int/float type preserved; ×1.0 proven to be the identity (a control row that was not a control
+would void the batch); and the whole scaled pool re-run through the existing schema and
+scarred checks, because stage 2 could have raised magnitudes for real.</li>
+<li><code>test_rune_battle.gd</code> — 84 → <b>91 checks</b>. A dictionary being right is not
+the same as a payload reaching a hero, and the live-value gotcha has bitten twice. A Berserker
+is spawned three times (no runes / ×1 / ×3) and the three shapes are read straight off the
+unit as deltas: <code>blood_pact</code> −15 → −45 (the inverted benefit, live),
+<code>crit_bonus</code> +0.08 → +0.24 (ordinary benefit), <code>dmg_taken_bonus</code> +0.15 →
++0.15 (a cost, held).</li>
+<li><b>Headless parse:</b> all ten scenes, <code>--quit-after 90</code>, <b>zero</b>
+SCRIPT ERROR.</li>
+</ul></li>
+
+<li><b>Reported, not acted on.</b>
+<ul>
+<li><b>The Pyromancer and the Sharpshooter are the only specs that move more than 5 points</b>
+in the twelve-spec contribution table, and only under the combined arm — Pyromancer 35%→42%,
+Sharpshooter 25%→19%. The Pyromancer's direction is exactly the AoE-scales-with-field-size
+signature Batch W measured and deliberately left alone; deeper runs mean bigger fields. Per-spec
+sampling is only ~33 runs of 100 under rotation, so the band is wide. A balance finding,
+reported.</li>
+<li><b>The Rune of Exsanguination's "cost" is not in its payload at all.</b> Its scarred audit
+passes on the <code>-15 blood_pact</code> term — which this batch established is its
+<i>benefit</i>. The actual cost (the bleedout tears 15% of max HP instead of 20%) is a constant
+in battle.gd that no audit can see. The check passes for the wrong reason; whether that matters
+is an authoring call.</li>
+<li><b>A pre-existing flaky assertion</b> in <code>test_rune_battle.gd</code>: the White Flame
+check needs the bot to actually land a fire hit during its battle and fails roughly one run in
+three. Untouched by this batch, and the same fact is covered by a spawn-time assertion, but a
+future batch should not read it as a regression.</li>
+<li><b>The <code>treasure</code>/Loot node type</b> is still outstanding from Batch AC —
+delete it or deal it again. Still not called.</li>
+</ul></li>
+</ul>
+
 <h2>2026-08-04 — Batch AC: the tester's workbench — reach any node, on demand</h2>
 <ul>
 <li><b>Why.</b> From the designer: <i>"I need some way to access any node on the map for
