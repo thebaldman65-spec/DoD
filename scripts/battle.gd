@@ -197,6 +197,11 @@ var stalemate := false
 # per-spec share pools at battle end (rotation needs "share of the battles
 # this spec was IN", which the stage totals can't give).
 var _b_slice := {}
+# Batch Z: this battle's per-hero damage in REAL play, banked into the run
+# ledger (Run.tally) at battle end so the run summary can show a whole-run
+# damage share. Written only when `sim` is false — RunSim keeps its own
+# stats path and must never double-count.
+var _run_slice := {}
 
 var history: RichTextLabel
 var history_panel: PanelContainer
@@ -763,6 +768,7 @@ func _build_ui() -> void:
 	burger.flat = false
 	var bpop := burger.get_popup()
 	bpop.add_item("Restart Run", 0)
+	bpop.add_item("Glossary", 3)
 	bpop.add_item("Settings", 1)
 	bpop.add_item("Exit to Main Menu", 2)
 	bpop.id_pressed.connect(_on_burger)
@@ -950,6 +956,21 @@ func _on_burger(id: int) -> void:
 			_open_settings_overlay()
 		2:  # The run resumes from the last saved map node.
 			get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+		3:
+			_open_glossary()
+
+
+# Batch Z: the glossary in battle. The panel itself is inert Control UI —
+# the only battle-specific work is gating this scene's raw _input while it
+# is open (clicks are handled in _input here, so without the gate a click
+# on the panel could grade a live skill check underneath it).
+var _glossary: GlossaryPanel = null
+
+
+func _open_glossary() -> void:
+	if _glossary != null and is_instance_valid(_glossary):
+		return
+	_glossary = GlossaryPanel.open(ui)
 
 
 # In-battle settings: a small overlay so the fight isn't lost to a scene change.
@@ -6166,7 +6187,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			for h in heroes.filter(func(he): return not he.dead):
 				_apply_status(h, "shieldwall", 3 if is_perfect else 2)
 			_message("%s raises the shieldwall!" % attacker.unit_name)
-			_log("%s: Shieldwall — party takes half damage" % attacker.unit_name, "#70d878")
+			_log("%s: Shieldwall — party takes 25%% less damage" % attacker.unit_name, "#70d878")
 		"quickdraw":
 			_sfx("click", -6.0, 1.3)
 			_apply_status(attacker, "quickdraw", 6 if is_perfect else 5)
@@ -7935,6 +7956,16 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 # ---------- skill check ----------
 
 func _run_skill_check(cancellable := false) -> String:
+	# First-run orientation (Batch Z): the design's own framing is that the
+	# player's execution matters as much as the build — a tester who never
+	# notices the timing window is playing a materially worse game. One
+	# card, once ever (Profile flag). Real play only: sims and autoplay
+	# roll their grades and never reach this function's UI path, and the
+	# guard keeps standalone test battles from writing the profile.
+	if not sim and not autoplay and Run.active and not Run.sim_run \
+			and not Profile.flag("skill_check_taught"):
+		await _show_skill_check_hint()
+		Profile.set_flag("skill_check_taught")
 	sc_pos = 0.0
 	sc_dir = 1.0
 	sc_result.text = ""
@@ -7980,6 +8011,53 @@ func _cancel_skill_check() -> void:
 		_skill_done.emit("cancel")
 
 
+# The one-time pointer at the timing bar. Modal on purpose: the check has
+# not started sweeping yet (sc_active is still false, so clicks and Space
+# grade nothing), and the card holds the turn until the player dismisses
+# it — nothing about the timeline moves while it waits.
+signal _hint_done
+
+var _hint_active := false
+
+
+func _show_skill_check_hint() -> void:
+	_hint_active = true
+	var dim := ColorRect.new()
+	dim.size = Vector2(1280, 720)
+	dim.color = Color(0, 0, 0, 0.6)
+	ui.add_child(dim)
+	var panel := PanelContainer.new()
+	panel.position = Vector2(400, 250)
+	ui.add_child(panel)
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 10)
+	panel.add_child(vbox)
+	var title := Label.new()
+	title.text = "YOUR HAND MATTERS"
+	title.add_theme_font_size_override("font_size", 26)
+	title.add_theme_color_override("font_color", Color(0.95, 0.85, 0.45))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title)
+	var body := Label.new()
+	body.text = ("Every action runs a timing check: a marker sweeps the bar\n" +
+		"below — press SPACE or CLICK to stop it.\n\n" +
+		"    Gold center  =  PERFECT: +15% damage, +25% Break, bonus effects\n" +
+		"    Green band   =  Good: full effect\n" +
+		"    Outside      =  Sloppy: only 60% damage, half Break\n\n" +
+		"Your timing decides as much as your build does.")
+	body.add_theme_font_size_override("font_size", 15)
+	vbox.add_child(body)
+	var btn := Button.new()
+	btn.text = "Got it — try me"
+	btn.custom_minimum_size = Vector2(200, 42)
+	btn.pressed.connect(func(): _hint_done.emit())
+	vbox.add_child(btn)
+	await _hint_done
+	_hint_active = false
+	dim.queue_free()
+	panel.queue_free()
+
+
 func _process(delta: float) -> void:
 	if sc_active:
 		sc_pos += sc_dir * delta / 0.72
@@ -7996,6 +8074,12 @@ func _process(delta: float) -> void:
 # the log, portraits) would otherwise swallow them before _unhandled_input.
 # Ability hotkeys live here too so the abilities popup can't swallow them.
 func _input(event: InputEvent) -> void:
+	# A modal is up (glossary panel or the one-time skill-check card): it
+	# owns all input — its own buttons work through normal GUI — and
+	# nothing here may fire, or a click could grade a check or pick a
+	# target through the overlay.
+	if _modal_open():
+		return
 	# Victory screens: Space/Enter presses the primary continue button.
 	if battle_over and _end_action.is_valid() and event is InputEventKey \
 			and event.pressed and not event.echo \
@@ -8146,8 +8230,15 @@ func _try_ability_hotkey(keycode: Key) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _modal_open():
+		return
 	if sc_active and event.is_action_pressed("ui_accept"):
 		_grade_skill_check()
+
+
+# True while an overlay owns input (see _input).
+func _modal_open() -> bool:
+	return _hint_active or (_glossary != null and is_instance_valid(_glossary))
 
 
 func _grade_skill_check() -> void:
@@ -8239,6 +8330,12 @@ func _check_end() -> void:
 	# Run mode: sync state back and route through the map.
 	for id in items:
 		Run.items[id] = items[id][1]
+	# Batch Z: bank this battle's hero damage into the run ledger while the
+	# battle scene still exists — the scene reloads between fights, so
+	# anything not banked here dies with it.
+	Run.tally_add("battles")
+	for key in _run_slice:
+		Run.tally_damage(String(key).trim_prefix("dmg_hero_"), _run_slice[key])
 	if victory:
 		# Node scaling: every combat victory grows the party (+2% of base
 		# Attack and HP at the next spawn).
@@ -8260,6 +8357,7 @@ func _check_end() -> void:
 		# bigger gold purse — the snowball reward for hunting elites.
 		var elite_text := ""
 		if Run.encounter.get("type", "") == "elite":
+			Run.tally_add("elites")
 			var looter: Dictionary = Run.party.pick_random()
 			var drop_id: String = Run.random_loot()
 			Run.items[drop_id] = Run.items.get(drop_id, 0) + 1
@@ -8326,10 +8424,13 @@ func _check_end() -> void:
 					[["Descend into %s" % Run.next_zone_name(), _next_zone]], true)
 			else:
 				Profile.note_completion(Run.party.map(func(m): return m.get("spec", "")))
+				# Batch Z: the summary needs the run state clear_save destroys
+				# — snapshot FIRST, never reorder the save logic (a reordering
+				# that leaves a dead run resumable is the worse bug).
+				var comp_snap := _run_snapshot("complete", boss_text)
 				Run.active = false
 				Run.clear_save()
-				_show_end("THE DECAY RECEDES", boss_text + "\nRun complete!",
-					[["New Run", _start_new_run]], true)
+				_show_run_summary(comp_snap)
 		else:
 			_show_end("VICTORY", "+%d gold. Each hero gains %d talent point%s.%s" % [
 				gold_gain, pts, "" if pts == 1 else "s", elite_text],
@@ -8339,11 +8440,12 @@ func _check_end() -> void:
 		# carry Run.active).
 		if Run.active:
 			Profile.note_wipe(Run.party.map(func(m): return m.get("spec", "")))
+		# Batch Z: snapshot BEFORE the clear (see the completion branch).
+		var wipe_snap := _run_snapshot("wipe", "")
 		Run.active = false
 		Run.clear_save()
 		_sfx("defeat", -4.0)
-		_show_end("THE PARTY HAS FALLEN", "The Decay claims this cycle.",
-			[["New Run", _start_new_run]])
+		_show_run_summary(wipe_snap)
 
 
 func _next_zone() -> void:
@@ -8561,6 +8663,240 @@ func _show_end(title: String, subtitle: String, buttons: Array,
 		vbox.add_child(hint)
 
 
+# ---------- the run summary (Batch Z) ----------
+
+# Everything the summary screen reports, captured while it still exists:
+# clear_save() destroys the run save and the draft resets the party, so
+# the snapshot is taken BEFORE either. Pure data — safe to hold across
+# the clear and to serialize into the copy-out text.
+func _run_snapshot(outcome: String, closing_text: String) -> Dictionary:
+	var fallen: Array = []
+	for h in heroes:
+		if h.dead and not h.is_companion:
+			fallen.append(h.unit_name)
+	var enemy_names: Array = []
+	for kind in Run.encounter.get("enemies", []):
+		enemy_names.append(Enemies.unit_name(String(kind)))
+	return {
+		"outcome": outcome,
+		"closing_text": closing_text,
+		"zone_num": Run.zone_idx + 1,
+		"zone_name": Run.zone_name,
+		"tier": clampi(Run.floor_idx + 1, 1, Run.FLOORS),
+		"boss_name": Enemies.unit_name(Run.boss_kind()),
+		"encounter_type": String(Run.encounter.get("type", "fight")),
+		"encounter_theme": String(Run.encounter.get("theme", "Warband")),
+		"enemy_names": enemy_names,
+		"fallen": fallen,
+		"party": Run.party.duplicate(true),
+		"gold": Run.gold,
+		"difficulty": Run.difficulty,
+		"relics": Run.active_relics.duplicate(),
+		"events_seen": Run.seen_events.size(),
+		"combat_wins": Run.combat_wins,
+		"tally": Run.tally.duplicate(true),
+		# Chronicle: noted AFTER Profile booked this run, so the tally the
+		# tester reads includes the run they just finished.
+		"cycles_survived": Profile.completions_total(),
+		"cycles_lost": Profile.wipes_total(),
+	}
+
+
+# One text for both surfaces: the on-screen panel renders it (with bbcode
+# headers added) and the Copy button puts the plain version on the
+# clipboard — every wipe becomes a report a tester can paste back.
+func _summary_lines(snap: Dictionary) -> Array:
+	var lines: Array = []
+	var tally: Dictionary = snap.get("tally", {})
+	# --- outcome and depth ---
+	if snap["outcome"] == "complete":
+		lines.append(["h", "THE DECAY RECEDES"])
+		lines.append(["p", "Run complete — all %d zones cleansed (%s difficulty)." % [
+			Run.SLOT_COUNT, snap["difficulty"]]])
+	else:
+		lines.append(["h", "THE PARTY HAS FALLEN"])
+		var depth := ""
+		if snap["encounter_type"] == "boss":
+			depth = "facing the %s" % snap["boss_name"]
+		else:
+			depth = "Tier %d of 10" % mini(int(snap["tier"]), 10)
+		lines.append(["p", "Wiped — Zone %d (%s), %s (%s difficulty)." % [
+			snap["zone_num"], snap["zone_name"], depth, snap["difficulty"]]])
+	# --- what ended it ---
+	if snap["outcome"] == "wipe":
+		var kind_label: String = {"fight": "A fight", "elite": "An ELITE fight",
+			"boss": "The zone boss"}.get(snap["encounter_type"], "A fight")
+		lines.append(["s", "The final battle"])
+		lines.append(["p", "%s — %s: %s." % [kind_label, snap["encounter_theme"],
+			", ".join(snap["enemy_names"])]])
+		if not (snap["fallen"] as Array).is_empty():
+			lines.append(["p", "Fallen: %s." % ", ".join(snap["fallen"])])
+	elif String(snap.get("closing_text", "")) != "":
+		lines.append(["s", "The final victory"])
+		lines.append(["p", String(snap["closing_text"]).replace("\n\n", "\n")])
+	# --- the party as it stood ---
+	lines.append(["s", "The party as it stood"])
+	for member in snap["party"]:
+		lines.append(["p", _member_summary(member)])
+	# --- damage share ---
+	var dmg: Dictionary = tally.get("damage", {})
+	var total := 0.0
+	for hero_name in dmg:
+		total += float(dmg[hero_name])
+	if total > 0.0:
+		lines.append(["s", "Damage share (whole run)"])
+		var names: Array = dmg.keys()
+		names.sort_custom(func(a, b): return float(dmg[a]) > float(dmg[b]))
+		var parts := PackedStringArray()
+		for hero_name in names:
+			parts.append("%s %d%%" % [hero_name,
+				int(round(100.0 * float(dmg[hero_name]) / total))])
+		lines.append(["p", "  |  ".join(parts)])
+	# --- the run economy ---
+	lines.append(["s", "The run in numbers"])
+	lines.append(["p", "Battles won: %d of %d   Elites taken: %d" % [
+		snap["combat_wins"], int(tally.get("battles", 0)), int(tally.get("elites", 0))]])
+	lines.append(["p", "Gold: %d earned in combat, %d spent at shops, %d unspent" % [
+		int(tally.get("gold_earned", 0)), int(tally.get("gold_spent", 0)), snap["gold"]]])
+	lines.append(["p", "Rests taken: %d   Events seen: %d" % [
+		int(tally.get("rests", 0)), snap["events_seen"]]])
+	if not (snap["relics"] as Array).is_empty():
+		var relic_names := PackedStringArray()
+		for id in snap["relics"]:
+			relic_names.append(String(Relics.POOL.get(String(id), {}).get("name", id)))
+		lines.append(["p", "Relics carried: %s" % ", ".join(relic_names)])
+	# --- the chronicle ---
+	lines.append(["s", "The chronicle"])
+	lines.append(["p", "Cycles survived: %d   Cycles lost to the Decay: %d" % [
+		int(snap["cycles_survived"]), int(snap["cycles_lost"])]])
+	return lines
+
+
+# One party member, one line: class/spec, talent lane spread, runes, trophies.
+func _member_summary(member: Dictionary) -> String:
+	var spec := String(member.get("spec", ""))
+	var spec_name: String = Classes.SPEC_INFO[spec]["name"] \
+		if Classes.SPEC_INFO.has(spec) else String(member["key"]).capitalize()
+	var text := "%s (%s)" % [spec_name, String(member["key"]).capitalize()]
+	# Lane spread from the member's own tree: nodes owned per lane, in the
+	# tree's lane order (the same derivation the Party screen uses).
+	var learned: Dictionary = member.get("talents", {})
+	var lane_counts := {}
+	var lane_order: Array = []
+	var node_count := 0
+	for node in member.get("tree", []):
+		var lane := String(node.get("lane", ""))
+		if lane != "" and not lane_order.has(lane):
+			lane_order.append(lane)
+		if learned.has(node["id"]):
+			node_count += 1
+			if lane != "":
+				lane_counts[lane] = int(lane_counts.get(lane, 0)) + 1
+	if node_count > 0:
+		var lane_parts := PackedStringArray()
+		for lane in lane_order:
+			if int(lane_counts.get(lane, 0)) > 0:
+				lane_parts.append("%s %d" % [Talents.LANE_NAMES.get(lane, lane),
+					lane_counts[lane]])
+		text += " — %d talent%s (%s)" % [node_count, "" if node_count == 1 else "s",
+			", ".join(lane_parts)]
+	else:
+		text += " — no talents learned"
+	var rune_names := PackedStringArray()
+	for rune in member.get("runes", []):
+		rune_names.append(String(rune["name"]))
+	if not rune_names.is_empty():
+		text += "\n    Runes: %s" % ", ".join(rune_names)
+	var trophies: Array = member.get("bm_abilities", [])
+	if not trophies.is_empty():
+		text += "\n    Trophies: %s" % ", ".join(trophies)
+	return text
+
+
+func _summary_plain_text(snap: Dictionary) -> String:
+	var out := PackedStringArray()
+	out.append("=== DAWN OF DECAY — RUN SUMMARY ===")
+	for line in _summary_lines(snap):
+		match String(line[0]):
+			"h":
+				out.append(String(line[1]))
+			"s":
+				out.append("")
+				out.append("-- %s --" % line[1])
+			_:
+				out.append(String(line[1]))
+	return "\n".join(out)
+
+
+func _show_run_summary(snap: Dictionary) -> void:
+	var dim := ColorRect.new()
+	dim.size = Vector2(1280, 720)
+	dim.color = Color(0, 0, 0, 0.72)
+	ui.add_child(dim)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	ui.add_child(center)
+	var panel := PanelContainer.new()
+	center.add_child(panel)
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 10)
+	panel.add_child(vbox)
+
+	var lines := _summary_lines(snap)
+	var title_label := Label.new()
+	title_label.text = String(lines[0][1])
+	title_label.add_theme_font_size_override("font_size", 34)
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	if snap["outcome"] == "complete":
+		title_label.add_theme_color_override("font_color", Color(0.95, 0.85, 0.45))
+	else:
+		title_label.add_theme_color_override("font_color", Color(0.9, 0.45, 0.45))
+	vbox.add_child(title_label)
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(760, 470)
+	vbox.add_child(scroll)
+	var body := RichTextLabel.new()
+	body.bbcode_enabled = true
+	body.fit_content = true
+	body.custom_minimum_size = Vector2(740, 0)
+	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var bb := PackedStringArray()
+	for i in range(1, lines.size()):
+		match String(lines[i][0]):
+			"s":
+				bb.append("\n[color=#d9b168][b]%s[/b][/color]" % lines[i][1])
+			_:
+				bb.append(String(lines[i][1]))
+	body.text = "\n".join(bb)
+	scroll.add_child(body)
+
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_child(row)
+	var copy_btn := Button.new()
+	copy_btn.text = "Copy summary"
+	copy_btn.custom_minimum_size = Vector2(200, 44)
+	copy_btn.pressed.connect(func():
+		DisplayServer.clipboard_set(_summary_plain_text(snap))
+		copy_btn.text = "Copied!")
+	row.add_child(copy_btn)
+	var new_run := Button.new()
+	new_run.text = "New Run"
+	new_run.custom_minimum_size = Vector2(200, 44)
+	new_run.pressed.connect(_start_new_run)
+	row.add_child(new_run)
+
+	_end_action = _start_new_run
+	var hint := Label.new()
+	hint.text = "— Space for a new run —"
+	hint.add_theme_font_size_override("font_size", 12)
+	hint.add_theme_color_override("font_color", Color(0.7, 0.66, 0.58))
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(hint)
+
+
 # ---------- helpers ----------
 
 const PACE := 0.85  # global combat pacing multiplier (lower = faster fights)
@@ -8582,6 +8918,9 @@ func _stat(key: String, amount := 1.0) -> void:
 		if key.begins_with("dmg_hero_") or key.begins_with("heal_hero_") \
 				or key.begins_with("prev_hero_"):
 			_b_slice[key] = _b_slice.get(key, 0.0) + amount
+	elif key.begins_with("dmg_hero_"):
+		# Batch Z: real play banks hero damage for the run summary.
+		_run_slice[key] = _run_slice.get(key, 0.0) + amount
 
 
 # ---------- Batch W: the contribution ledger ----------

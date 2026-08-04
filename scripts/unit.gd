@@ -1221,6 +1221,12 @@ func _refresh_chips() -> void:
 			s.label, s.turns, "" if s.turns == 1 else "s", s.desc]
 		if s.id == "broken" or s.turns < 0:
 			chip.tooltip_text = "%s\n%s" % [s.label, s.desc]
+		# Batch Z: a chip surfaces its glossary line when it has one and the
+		# chip's own text doesn't already say the same thing — the highest-
+		# value contextual door into the glossary.
+		var gl_short := Glossary.status_short(String(s.id))
+		if gl_short != "" and gl_short != String(s.desc):
+			chip.tooltip_text += "\n— %s (see Glossary)" % gl_short
 		_chips_root.add_child(chip)
 		var tag := Label.new()
 		tag.text = s.short

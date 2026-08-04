@@ -159,6 +159,88 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-08-03)
+BATCH Z (08-03) — THE ALPHA SHELL: glossary, orientation, run summary.
+Content-free by design; the deliverable is LEGIBILITY (Y made the map a
+decision surface, Z makes the run readable). STAGE 0 RECONCILE: all of
+Y's stage-4 map legibility shipped and was verified present (tooltips,
+ladder readout, gold roads, 3-state nodes) — Z only ADDED a burger entry
++ the framing card; no duplicate tier readout or tooltip path exists.
+GLOSSARY: data/glossary.json + scripts/glossary.gd (class_name Glossary;
+Enemies/Events pattern — adding a term is a JSON edit). 66 entries, 7
+categories (combat/statuses/damage/resources/progression/gear/run);
+schema id/term/category/short/long/see_also. WRITTEN FROM THE CODE, not
+master.html — that rule is load-bearing (Batch Y's 70%-vs-53% link drift
+is the precedent; a glossary teaching intent is worse than none).
+scripts/glossary_panel.gd (class_name GlossaryPanel, extends Control):
+GlossaryPanel.open(parent) from the MAP burger, PARTY screen, BATTLE
+burger. IN BATTLE IT IS INERT — no awaits/timers, and battle.gd's
+_input/_unhandled_input early-return while `_glossary` is valid (without
+that gate a click on the panel grades the live skill check underneath).
+Contextual hook: unit.gd _refresh_chips appends Glossary.status_short(id)
+to a chip tooltip when it adds info. Ability-tooltip + resource-bar hooks
+DEFERRED (stated, not silently dropped). ORIENTATION: two one-time cards
+on NEW Profile flags (profile.gd "flags" bucket + flag/set_flag; set on
+DISMISSAL so quitting mid-card re-shows it) — (1) map framing card
+"THE CLIMB" (map_screen._maybe_show_framing, gated floor_idx<0 and not
+sim_run), (2) the SKILL-CHECK POINTER inside _run_skill_check before the
+bar sweeps (gated `not sim and not autoplay and Run.active and not
+Run.sim_run`) = the batch's highest-value item (a tester who never sees
+the timing window reports the combat as shallow). RUN SUMMARY: replaces
+BOTH end panels. battle.gd _run_snapshot/_summary_lines/_member_summary/
+_summary_plain_text/_show_run_summary. TWO GOTCHAS HANDLED AS SPECIFIED:
+(a) SNAPSHOT BEFORE Run.clear_save() in both branches — the save logic
+was NOT reordered (a resumable dead run is worse than a missing
+summary); (b) the run ledger lives on Run (Run.tally + reset_tally/
+tally_add/tally_damage), NOT the battle scene (it reloads between
+fights). battle _stat writes `_run_slice` ONLY when `sim` is false →
+RunSim's stats path untouched, no double-count; banked once per battle at
+the top of the run-mode end block. Bump sites: award_gold (gold_earned),
+shop buy item/rune (gold_spent), map rest (rests), battle end
+(battles/elites/damage). SAVE v4 = +tally; load tolerant (pre-Z saves
+start a ledger mid-run). "Copy summary" → DisplayServer.clipboard_set
+(a wipe becomes a pasteable report — feedback data, no telemetry).
+VERIFIED: scratchpad test_glossary.gd 859 checks (schema, see_also
+resolution, no dup ids/terms, + THE DRIFT ALARMS: every
+BattleUnit.DEBUFF_IDS status, every damage school incl. a sweep of every
+resists key in enemies.json, and a SPEC_RESOURCE map asserted to cover
+Classes.SPEC_INFO exactly — a new spec/status FAILS the test until the
+glossary learns it); test_run_summary.gd 23 checks (ledger sums across
+simulated scene reloads = per-battle totals, sim _stat leaves _run_slice
+empty, snapshot survives clear_save + is a deep copy, summary text builds
+from the snapshot alone, save v4 round-trip, pre-Z self-heal; backs up
+and restores the REAL save); test_glossary_battle.gd 6 checks (autoplay
+battle, panel opened mid-fight, timeline clock still advances, closes
+clean, no profile written); test_sim_purity.gd 17 checks (sim_run armed
+through the whole Z path; save/clear no-ops; BOTH orientation gates
+evaluated false for every sim/autoplay combination; user:// profile,
+run_save and relics hashed before/after = byte-identical). Headless
+parse: all 10 scenes, 0 SCRIPT ERROR. GOTCHA RE-HIT: a --script test
+must park on the first process_frame — autoloads (Run) are NOT in the
+tree during _initialize, and get_node("/root/Run") there returns null and
+idles forever. DOC DRIFT AUDIT (the valuable output): all
+load-bearing machinery MATCHED (timeline formula, skill-check windows +
+mults, Break, crit/miss/parry, 7-school resist pipeline + 85%/1-dmg
+clamps, all 9 resources, BOTH talent gate models, run structure) — Batch
+Y's §3 episode did not repeat. 8 fixes: (1) SHIELDWALL documented −50%,
+code is −25% (raw *= 0.75) — wrong at 2 master sites AND the in-game
+combat log said "takes half damage" (log fixed too; the status tooltip
+was already right, so doc+tooltip had been contradicting each other);
+(2) Waystone Shard §7 "+1 talent point" vs relic's +3 (§8 already said
+3); (3) run-flow line "Battles / Rest / Loot" → no Loot nodes exist;
+(4) Poison table "3 nature damage/stack" flat vs 3% of applier Attack
+(§4.5 was right — they agree ONLY at exactly 100 Atk, which is why it
+survived); (5) relic trio "all six damage schools" → seven exist, trio
+covers the six NON-PHYSICAL; (6) party-screen "Resistances lists all six
+elements" → seven, physical included; (7) "6 shop nodes" → 5;
+(8) CLAUDE.md "26 authored" runes → 29 + Batch-28 "2/4/4" talent points
+superseded by 1/2/3 since Batch 30 (annotated in place). SHAPE OF THE
+DRIFT: none was a system behaving unexpectedly — all were NUMBERS THAT
+MOVED ONCE AND LEFT A COPY BEHIND, i.e. exactly what a doc-sourced
+glossary would have taught every tester as fact.
+DEAD CODE RECORDED, NOT REMOVED: the "treasure"/Loot node type has a
+label, colour and click handler in map_screen.gd but NEITHER generator
+has dealt one since the Batch 38 deck (17/5/5/3) — the glossary does not
+mention Loot nodes because a tester will never see one.
 BATCH Y (08-03) — THE MAP NODE ECONOMY (alpha-scoped: legibility and
 agency were the deliverables, difficulty deliberately left to Batch T
 and human playtesters). DIAGNOSIS MEASURED FIRST: the old 70% link roll
@@ -212,7 +294,7 @@ hardcoded 2 routed through it (party equip cap+header, run_sim elite
 auto-equip + shop free-slot check); zone-victory text announces the new
 slot; no save field (derives from zone_idx). Party-screen rune rows now
 a ScrollContainer (old code silently hid rows past 4). POOL:
-scripts/runes.gd wraps data/runes.json (Enemies/Events pattern) — 26
+scripts/runes.gd wraps data/runes.json (Enemies/Events pattern) — 29
 authored: 5 universal, 3×4 class, 12 warrior-spec (one per talent lane
 + a splash-payer per spec; entries carry "lane" for the bot). RARITY =
 KIND (common stat sticks incl. the 6 old TEMPLATES as filler+exhaustion
@@ -750,7 +832,9 @@ loyalty chip spells the gift + "PACK BOND BOON DOUBLED" at 5;
 "keen_eyes" party chip maintained in _update_talent_chips while
 _living_aguila (+10/20%). FIX 12-mana start: run_state HERO_BASE
 hunter mana 0→100 (old saves keep the low value until a new run).
-Talent points: award_talent_points 2/4/4 (fight/elite/boss).
+Talent points: award_talent_points 2/4/4 (fight/elite/boss) — SUPERSEDED
+by Batch 30's 1/2/3 (final boss 0); the live code has never been 2/4/4
+since. (Stale line found + flagged by Batch Z's glossary pass.)
 Resurrection faith_cost 3→1. Shadowrend 50→25%.
 HOLY MERCY REWORK (07-22): FAITH IS GONE from all clerics (no second
 resource except Holy; the +10/action build site removed; ability

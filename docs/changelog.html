@@ -5,6 +5,133 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-03 — Batch Z: the alpha shell — glossary, orientation, run summary</h2>
+<ul>
+<li><b>Why:</b> Batch Y made the map a decision surface; this batch makes the run
+<b>legible</b> — the other half of a rough playable alpha. A first-time tester had to
+absorb the initiative timeline, skill checks, Pressure/Break, seven damage schools,
+bleed buildup, five spec resources, lane-gated talents, runes, trophies, and relics with
+<b>no explanation anywhere in the build</b> — every tooltip explains a number, nothing
+explained a system. And a wipe reported two lines and a New Run button: twenty minutes of
+play, no record. A confused tester answers "what confused me," not "was it fun."</li>
+
+<li><b>Stage 0 — Batch Y reconciliation:</b> checked before writing any map code. All of
+Y's stage-4 legibility items were present and live: rest/shop/event tooltips, the
+"Tier N of 10 — the &lt;boss&gt; waits" ladder readout, gold roads out of the current
+node, and the three-state visited/reachable/unreachable reads. Nothing was
+re-implemented; this batch only ADDED a Glossary entry to the existing map burger and
+the framing card. No duplicate tier readouts or tooltip paths exist.</li>
+
+<li><b>The glossary (stage 1):</b> <code>data/glossary.json</code> +
+<code>scripts/glossary.gd</code> (the Enemies/Events/Relics/Runes pattern — adding an
+entry is a JSON edit). <b>66 entries</b> across seven categories: combat flow (initiative,
+skill check, Pressure &amp; Break, crit/miss/parry, fallen heroes), all 25 debuffs the
+battle code can apply plus Quick Draw, the seven damage schools + resists, all nine
+resources (Rage, Mana, Resonance, Mercy, Empower, Faith, Focus, Loyalty, Ruin),
+progression (lanes, the ceil(N/3) curve, points, trophies, node scaling), gear (runes,
+scarred runes, <b>relics-vs-runes</b> — its own entry, the most confusable distinction in
+the game), and the run itself. <b>Every entry was written from the code</b>, with numbers
+verified at the read sites, not from the master doc (see the drift list below). The panel
+(<code>scripts/glossary_panel.gd</code>) opens from the map burger, the Party screen, and
+the battle burger; a category tree on the left, entry text with cross-links on the right.
+In battle it is pure Control UI — no awaits, nothing that touches the timeline — and the
+battle scene gates its raw <code>_input</code> while the panel is open so a click cannot
+grade a live skill check through the overlay. Contextual hooks: <b>status chips</b> now
+append their glossary one-liner to their tooltip when it adds information. Ability-tooltip
+and resource-bar hooks were considered and <b>deferred</b> (the chip hook is the
+high-value one; the stage was already large).</li>
+
+<li><b>First-run orientation (stage 2):</b> two things, neither a tutorial. (1) A
+skippable <b>framing card</b> on the first map of a first run — what a run is, boss →
+descend → three zones, death ends the run, bosses leave permanent relics. (2) A one-time
+<b>pointer at the skill check</b> when the first battle's first timing bar would appear —
+the marker, the gold/green windows, and the multipliers (+15%/+25% Break on Perfect, 60%/
+half Break on Sloppy), because a tester who never notices the timing window is playing a
+materially worse game and will report it as shallow. Both are gated on
+<b>Profile flags</b> (new <code>flags</code> bucket + <code>flag/set_flag</code>), set on
+dismissal so a returning tester is never re-taught. Sims and autoplay cannot trip either:
+the card lives in the map scene (RunSim never loads scenes) behind a
+<code>sim_run</code> guard, and the pointer requires
+<code>not sim and not autoplay and Run.active</code> — verified by test.</li>
+
+<li><b>The run summary (stage 3):</b> both end panels — defeat and completion — replaced
+by a real summary screen: outcome and depth ("Wiped — Zone 2 (The Scarlands), Tier 6 of
+10"), the final battle's type/theme/lineup and who fell, each hero's spec with talent
+count, <b>lane spread</b>, runes, and trophies, <b>damage share across the whole run</b>,
+the run economy (battles won, elites taken, gold earned/spent/unspent, rests, events),
+relics carried, and a chronicle line (cycles survived / lost) so a session of runs
+accumulates into something visible. A <b>Copy summary</b> button puts a plain-text
+version on the clipboard — every wipe becomes a report a tester can paste straight back,
+feedback data with no telemetry built. Plumbing, both the easy-to-get-wrong pieces done
+as specified: the summary <b>snapshots the run state BEFORE <code>clear_save()</code></b>
+(the save logic was NOT reordered — a dead-but-resumable run is a worse bug than a
+missing summary), and the new <b>run ledger lives on <code>Run</code></b>
+(<code>Run.tally</code>, save v4, tolerant load), banked from a battle-local slice at
+battle end because the battle scene reloads between fights. <code>_stat</code> writes the
+real-play slice only when <code>sim</code> is false, so RunSim's stats path is untouched
+and nothing double-counts. Ledger bump sites: battles/elites and damage (battle end, real
+runs only), combat gold (<code>award_gold</code>), shop spend, rests.</li>
+
+<li><b>Doc drift found by writing the glossary from code — the audit list.</b> Every
+system glossed was re-derived from its read sites and then checked against the master
+doc. The <b>load-bearing machinery held</b>: the timeline formula, the skill-check
+windows and multipliers, Break, crit/miss/parry, the seven-school resist pipeline and
+its 85%/1-damage clamps, all nine resources, the talent gates (both models, correctly
+distinguished), and the run structure all matched the code exactly. Batch Y's §3 episode
+did not repeat. <b>Eight corrections landed:</b>
+<ol>
+<li><b>Shieldwall was documented at −50%; the code does −25%</b>
+(<code>raw *= 0.75</code>) — wrong in two places (the target-modifier list and the
+status roster). The in-game status tooltip already said 25%, so the doc and the tooltip
+had been contradicting each other. <b>The combat log was lying too</b> ("party takes
+half damage") and was fixed as part of this batch — a legibility batch does not ship a
+string that misstates a number to the player's face.</li>
+<li><b>Waystone Shard: §7 said +1 talent point at run start, the relic grants +3</b> —
+and §8 of the same document already said +3. Self-contradiction resolved to the code.</li>
+<li>The run-flow line advertised <b>"Battles / Rest / Loot"</b>. There are no Loot
+nodes (see below); corrected to Battles / Rest / Shop / ???.</li>
+<li>The status table gave Poison as <b>"3 nature damage per stack"</b> (flat). It is
+<b>3% of the applier's Attack</b> — the same document's §4.5 said so correctly. The two
+agree only at exactly 100 Attack, which is why it survived this long.</li>
+<li>The relic line said the elemental trio "covers all six damage schools" — the game
+has <b>seven</b>; the trio covers the six <b>non-physical</b> ones.</li>
+<li>The Party-screen description said hovering Resistances "lists all six elements" —
+it lists <b>seven</b>, physical included.</li>
+<li>The Peddler was reached via <b>"the 6 shop nodes"</b>; the deck holds <b>5</b>.</li>
+<li>CLAUDE.md: the rune line headlined "26 authored" while its own components
+(5 universal + 3×4 class + 12 warrior-spec) add to <b>29</b>, which is what
+<code>data/runes.json</code> holds; and a stale Batch-28 line still gave talent income
+as 2/4/4, superseded by <b>1/2/3</b> since Batch 30. Both corrected.</li>
+</ol>
+Note the shape of these: none is a system working differently than designed. They are
+<b>numbers that moved once and left a copy behind</b> — which is precisely the drift a
+glossary written from the doc would have taught to every tester as fact.</li>
+
+<li><b>Dead code recorded, not removed:</b> the <code>treasure</code>/"Loot" node type
+still has a label, a colour, and a live click handler in <code>map_screen.gd</code>, but
+<b>neither map generator has dealt one</b> since the Batch 38 deck (17 fight / 5 rest /
+5 shop / 3 event) — elites are in-place upgrades of fights, and the boss is appended, so
+the four dealt types are all a player ever sees. Left in place rather than removed
+mid-batch; the glossary does not mention Loot nodes, because no tester will ever meet
+one.</li>
+
+<li><b>Verification (stage 4):</b> scratchpad <code>test_glossary.gd</code> — <b>859
+checks</b>: schema (id/term/category/short/long, see_also resolution, no duplicate ids or
+terms), coverage alarms (every <code>BattleUnit.DEBUFF_IDS</code> status, every damage
+school incl. a sweep of every resist key in <code>enemies.json</code>, and a spec→resource
+map asserted to cover <code>Classes.SPEC_INFO</code> exactly — a new spec or status fails
+the test until the glossary learns it). <code>test_run_summary.gd</code> — 23 checks: the
+ledger accumulates across simulated scene reloads and matches per-battle totals, sim-mode
+<code>_stat</code> leaves the run slice alone, the snapshot survives
+<code>clear_save</code> and is a deep copy, summary text formats from the snapshot alone,
+save v4 round-trips the ledger, pre-Z saves self-heal (the real save file is backed up
+and restored around the test). <code>test_glossary_battle.gd</code> — an autoplay battle
+opens the panel mid-fight: the timeline keeps advancing under the open panel, closes
+clean, battle carries on, and no profile file is written. Headless parse: all ten scenes,
+zero script errors. Sim purity: a DOD_SIM_RUN run leaves profile.json and run_save.bin
+byte-identical (hash-checked).</li>
+</ul>
+
 <h2>2026-08-03 — Batch Y: the map node economy (alpha-scoped)</h2>
 <ul>
 <li><b>Why:</b> the map was documented as a route-planning surface, but two generation

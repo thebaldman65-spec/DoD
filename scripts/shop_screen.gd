@@ -140,6 +140,7 @@ func _buy_item(id: String) -> void:
 	if Run.gold < price:
 		return
 	Run.gold -= price
+	Run.tally_add("gold_spent", price)
 	Run.items[id] = Run.items.get(id, 0) + 1
 	_draw_screen()
 
@@ -150,6 +151,7 @@ func _buy_rune(offer_idx: int) -> void:
 	if Run.gold < _price(rune["price"]):
 		return
 	Run.gold -= _price(rune["price"])
+	Run.tally_add("gold_spent", _price(rune["price"]))
 	var member: Dictionary = Run.party[offer["member_idx"]]
 	var runes: Array = member.get("runes", [])
 	runes.append(rune)

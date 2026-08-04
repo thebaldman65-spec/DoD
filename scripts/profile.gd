@@ -21,7 +21,7 @@ static func _load() -> Dictionary:
 		loaded = true
 		data = {"version": 1, "runs_started": {}, "runs_completed": {},
 			"wipes": {}, "bosses_killed": {}, "events_seen": {},
-			"zones_cleared": 0}
+			"zones_cleared": 0, "flags": {}}
 		if FileAccess.file_exists(save_path):
 			var file := FileAccess.open(save_path, FileAccess.READ)
 			var read: Variant = JSON.parse_string(file.get_as_text())
@@ -70,6 +70,20 @@ static func note_event(id: String) -> void:
 
 static func note_zone_cleared() -> void:
 	_load()["zones_cleared"] = int(_load()["zones_cleared"]) + 1
+	_save()
+
+
+# One-shot flags (Batch Z): the first-run orientation gates on these so a
+# returning tester is never re-taught. Write sites live in real-play-only
+# UI flow — sims must never reach them (checked in test_run_summary.gd).
+static func flag(name: String) -> bool:
+	return bool(_load().get("flags", {}).get(name, false))
+
+
+static func set_flag(name: String) -> void:
+	var flags: Dictionary = _load().get("flags", {})
+	flags[name] = true
+	_load()["flags"] = flags
 	_save()
 
 

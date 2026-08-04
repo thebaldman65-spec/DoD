@@ -32,6 +32,15 @@ func _draw_screen() -> void:
 	back.pressed.connect(_on_back)
 	add_child(back)
 
+	# Batch Z: the glossary panel — reachable everywhere a build decision
+	# gets made, and talents are the biggest one.
+	var glossary_btn := Button.new()
+	glossary_btn.text = "Glossary"
+	glossary_btn.custom_minimum_size = Vector2(110, 42)
+	glossary_btn.position = Vector2(140, 16)
+	glossary_btn.pressed.connect(func(): GlossaryPanel.open(self))
+	add_child(glossary_btn)
+
 	if selected < 0:
 		_draw_list()
 	else:

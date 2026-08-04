@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-03 (Batch Y)</b></p>
+<p align="right"><b>Last updated: 2026-08-03 (Batch Z)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -17,7 +17,7 @@ timing skill check on every action — the player's execution matters as much as
 
 <h2>2. Run Flow</h2>
 <p><b>Main Menu</b> → <b>Draft</b> (pick 4 heroes + equip up to 3 relics) →
-<b>Map</b> (node climbing) → <b>Battles / Rest / Loot</b> → after the first victory,
+<b>Map</b> (node climbing) → <b>Battles / Rest / Shop / ???</b> → after the first victory,
 <b>Spec Choice</b> (permanent) → <b>Party screen</b> (talents, runes) → … → <b>Zone Boss</b> →
 next zone (party fully restored) → final boss → run complete.</p>
 <ul>
@@ -219,7 +219,7 @@ Blood Frenzy up to +40% as HP falls; Seasoned Fighter +15% above half HP; relic 
 EMPTY Break bar; Overpower +0.5 per point of target Break; Arcane Cannon
 +7.5%/Resonance stack; Magi's Wrath +4%/Resonance stack; Fireball perfects at 25% of
 Attack.</li>
-<li><b>Target modifiers:</b> Shieldwall −50%; Exposed +15%; Seasoned Fighter −15% at or
+<li><b>Target modifiers:</b> Shieldwall −25%; Exposed +15%; Seasoned Fighter −15% at or
 below half HP; Mage Resonance +5% damage
 <i>taken</i> per stack (the glass-cannon risk); Stabilized −10% per stack
 consumed.</li>
@@ -288,7 +288,8 @@ Cryomancer's Rime on cast.</td></tr>
 <tr><td>Slowed</td><td>−25% speed (generic; e.g. Shrapnel Charge).</td></tr>
 <tr><td>Burn</td><td>6% of the applier's Attack at the start of each turn
 (snapshotted). Reapplication extends duration — new turns ADD to the timer.</td></tr>
-<tr><td>Poison</td><td>3 nature damage per stack each turn (nature resists apply); stacks
+<tr><td>Poison</td><td>3% of the applier's Attack in nature damage per stack each turn
+(nature resists apply); stacks
 additively, new stacks refresh the timer. Never ticks on the turn it lands.</td></tr>
 <tr><td>Bleed</td><td>Buildup meter; bleeds out for 20% max HP at 100 (ignores
 armor).</td></tr>
@@ -374,7 +375,7 @@ counter; released by the next Heal.</td></tr>
 <tr><td>Mocked</td><td>Must attack the Warrior who mocked them.</td></tr>
 <tr><td>Quick Draw</td><td>All abilities act 50% faster.</td></tr>
 <tr><td>Stunned</td><td>Loses their next turn.</td></tr>
-<tr><td>Shieldwall</td><td>Takes 50% less damage.</td></tr>
+<tr><td>Shieldwall</td><td>Takes 25% less damage.</td></tr>
 <tr><td>Empower</td><td>+25% damage dealt.</td></tr>
 <tr><td>Exposed</td><td>Takes 15% more damage.</td></tr>
 <tr><td>Cripple</td><td>−25% damage dealt.</td></tr>
@@ -904,7 +905,7 @@ own Trapper bonus from the target.<br>
 
 <h2>7. Talents</h2>
 <p><b>Economy:</b> talent points come from victories alone — <b>1 per fight, 2 per elite,
-3 per zone boss</b> (rests and shops award none; Waystone +1 at run start). Points bank
+3 per zone boss</b> (rests and shops award none; Waystone Shard +3 at run start). Points bank
 until spent on the Party screen.</p>
 <p><b>Every tree is a lane tree, and every one is purpose-designed</b> on the lane
 framework — all twelve specs.</p>
@@ -1289,7 +1290,8 @@ HP, armor, speed, crit, Constitution, resistances, resource floor — victory he
 gold-find, rest bonus, shop discount, elite loot). Scalar hooks SUM and dict hooks merge
 across the equipped set, so stacking is well-defined. Adding a relic on an existing hook is
 pure data. Highlights: Waystone Shard grants <b>+3</b> talent points; the elemental trio
-(Emberheart / Frostbound Sigil / Nightbloom Charm) covers all six damage schools; Prism Veil
+(Emberheart / Frostbound Sigil / Nightbloom Charm) covers all six non-physical damage
+schools; Prism Veil
 gives 10% resistance to every element; The King's Ledger compounds gold.</li>
 <li><b>Persistent profile</b> (user://profile.json, outside the run save): counts runs
 started/completed/wiped per spec, bosses killed by kind, events seen (with repeats), and
@@ -1512,7 +1514,8 @@ unawakened — the same rule applies to battle nameplates, the initiative bar, a
 log. Detail page per hero: stats — <b>each stat is its own hover tooltip explaining just
 that stat</b> (talent points are NOT listed here; the count sits above the talent tree;
 pure tanks additionally show their <b>Block %</b>; the <b>Attack</b> row explains node
-scaling and hovering <b>Resistances</b> lists all six elements). Stats mirror the battle
+scaling and hovering <b>Resistances</b> lists all seven schools, physical included).
+Stats mirror the battle
 spawn math: Constitution uses the spec's value plus Toughness, Attack/HP include node
 scaling, and the spec passive line bakes in talent ranks (Aggressive/Defensive Stance,
 Unstoppable) — the class passive + spec passive lines, ability chips (hover shows real
@@ -1524,11 +1527,79 @@ click-to-learn nodes (lock reasons on the node tooltips) for all twelve specs.</
 along on every path the class can take) and each ability's damage with its "% Atk" scaling.
 The draft screen stays clean — no passive text there.</li>
 <li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per party member;
-reached via the 6 shop nodes on every zone map.</li>
+reached via the 5 shop nodes on every zone map.</li>
 <li><b>Relics screen:</b> collection viewer from the main menu.</li>
+<li><b>Glossary panel:</b> see §11a — reachable from the map burger, the Party screen, and
+the battle burger.</li>
+<li><b>Run summary:</b> see §11b — replaces both end-of-run panels.</li>
 <li><b>Settings:</b> master volume slider, fullscreen toggle; persisted; also available
 mid-battle via the burger.</li>
 </ul>
+
+<h2>11a. The Glossary</h2>
+<p><b>Why it exists:</b> the tooltip culture explains <b>numbers</b> — a warband's resists,
+an ability's real damage, a talent's live value. Nothing explained a <b>system</b>. A player
+who does not know what Pressure does, or that Bleed never decays, or that relics outlive a
+run while runes do not, is playing a different game than the one that was built.</p>
+<p><b>Shape:</b> an authored pool in <code>data/glossary.json</code> read by
+<code>scripts/glossary.gd</code> — the same data pattern as Enemies / Events / Relics /
+Runes, so adding a term is a JSON edit and needs no code. Each entry carries an
+<code>id</code>, <code>term</code>, <code>category</code>, a one-line <code>short</code>
+(used for inline surfacing), the full <code>long</code> explanation, and optional
+<code>see_also</code> ids that render as working cross-links.</p>
+<p><b>Coverage — seven categories:</b> <b>Combat flow</b> (the initiative timeline and what
+delay does, the skill check, Pressure &amp; Break, crit / miss / parry, the fallen returning
+at 20%), <b>Statuses</b> (every debuff the battle code can apply, plus Quick Draw),
+<b>Damage types</b> (all seven schools and how resists and vulnerabilities read),
+<b>Resources</b> (Rage and Mana, plus every spec resource: Resonance, Mercy, Empower, Faith,
+Focus, Loyalty, Ruin), <b>Progression</b> (lanes and their node gates, the ceil(N/3) cost
+curve, the one-capstone rule, talent point income, boss trophies, node scaling),
+<b>Items &amp; gear</b> (runes, scarred runes, consumables, and <b>relics versus runes</b>
+as its own entry — permanent-across-runs versus run-scoped is the single most confusable
+distinction in the game), and <b>The Run</b> (zones and tiers, node types, elites, events,
+what a wipe costs, the difficulty choice).</p>
+<p><b>Surfacing:</b> a panel from the map burger, the Party screen, and the battle burger —
+a category tree on the left, the entry on the right with clickable cross-links. In battle it
+is inert: pure Control UI with no awaits or timers, and the battle scene suspends its own
+raw input handling while the panel is open so a click cannot grade a live skill check
+through the overlay. The timeline keeps running underneath, unchanged. <b>Contextual
+entry point:</b> a status chip's tooltip appends its glossary line when that adds
+information — the chip explains the effect, the glossary line names the system.</p>
+<p><b>Authoring rule (load-bearing):</b> entries are written from the CODE, at the read
+sites, never from this document. A glossary that teaches intent rather than behaviour is
+worse than none — it would make a tester confidently wrong instead of merely uncertain.
+Where an entry and this document disagreed, the code won and the document was corrected.</p>
+
+<h2>11b. First-Run Orientation &amp; the Run Summary</h2>
+<p><b>Orientation</b> — two cards, neither a tutorial mode, both dismissible and both shown
+<b>once ever</b> (gated on persistent Profile flags, set on dismissal, so a returning player
+is never re-taught):</p>
+<ul>
+<li><b>The framing card,</b> on the first map of a first run: what a run <i>is</i> — climb
+the tiers, kill the zone boss, three zones, death ends the run, but a felled boss leaves a
+relic behind forever.</li>
+<li><b>The skill-check pointer,</b> at the first timing bar of the first battle: the sweeping
+marker, the gold and green windows, and what each grade is worth (Perfect +15% damage and
++25% Break plus per-ability bonuses; Sloppy 60% damage and half Break). The design's premise
+is that execution matters as much as the build — a player who never notices the window is
+playing a materially worse game and would report it as shallow.</li>
+</ul>
+<p><b>The run summary</b> replaces both end panels — defeat and completion. It reports the
+outcome and depth reached, the final battle (type, theme, and lineup) and which heroes fell,
+the party as it stood (per hero: spec, talent count with its <b>lane spread</b>, runes
+equipped, trophies taken), <b>damage share per hero across the whole run</b>, the run economy
+(battles won, elites taken, gold earned / spent / unspent, rests, events seen, relics
+carried), and a chronicle line — cycles survived and cycles lost — so a session of runs
+accumulates into something visible. A <b>Copy summary</b> button puts a plain-text version on
+the clipboard: a wipe becomes a report the player can paste back to the designer, which is
+feedback data with no telemetry to build.</p>
+<p><b>Two structural rules behind it:</b> (1) the summary <b>snapshots run state before the
+save is cleared</b>, never by reordering the save logic — a run that stays resumable after
+death is a worse bug than a missing summary. (2) The per-run ledger (damage per hero, gold,
+elites, rests, battles) lives on the <b>Run</b> autoload, not the battle scene, because the
+battle scene reloads between fights; it is banked once per battle from a battle-local slice,
+written only in real play so the simulation harness's own statistics path can never
+double-count it.</p>
 
 <h2>12. Technical Reference</h2>
 <ul>

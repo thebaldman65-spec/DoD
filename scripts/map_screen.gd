@@ -23,6 +23,56 @@ func _ready() -> void:
 		return
 	Music.play("map")
 	_draw_screen()
+	_maybe_show_framing()
+
+
+# First-run orientation (Batch Z): a skippable framing card between the
+# draft and the first map — what a run IS. Once ever (Profile flag, set on
+# dismissal so quitting mid-card re-shows it). Sims never load this scene
+# (RunSim walks Run directly), and the sim_run guard keeps it that way if
+# one ever does.
+func _maybe_show_framing() -> void:
+	if Run.floor_idx >= 0 or Run.sim_run or Profile.flag("run_framing_seen"):
+		return
+	var dim := ColorRect.new()
+	dim.size = Vector2(1280, 720)
+	dim.color = Color(0, 0, 0, 0.72)
+	dim.z_index = 90
+	add_child(dim)
+	var panel := PanelContainer.new()
+	panel.position = Vector2(340, 200)
+	panel.z_index = 91
+	add_child(panel)
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 12)
+	panel.add_child(vbox)
+	var title := Label.new()
+	title.text = "THE CLIMB"
+	title.add_theme_font_override("font", NAME_FONT)
+	title.add_theme_font_size_override("font_size", 34)
+	title.add_theme_color_override("font_color", Color(0.85, 0.78, 0.62))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title)
+	var body := Label.new()
+	body.text = ("A run climbs this map one node at a time: 10 tiers, then the\n" +
+		"zone boss at the top. Kill the boss and the party descends into the\n" +
+		"next zone — three zones stand between you and the end of the run.\n\n" +
+		"Death ends the run and takes everything with it — gold, talents,\n" +
+		"runes. But every boss you fell leaves a RELIC behind, unlocked\n" +
+		"forever and yours to carry into the next attempt.\n\n" +
+		"Hover any node to scout it before you commit.")
+	body.add_theme_font_size_override("font_size", 15)
+	body.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
+	vbox.add_child(body)
+	var btn := Button.new()
+	btn.text = "Begin the climb"
+	btn.custom_minimum_size = Vector2(220, 44)
+	btn.pressed.connect(Music.click)
+	btn.pressed.connect(func():
+		Profile.set_flag("run_framing_seen")
+		dim.queue_free()
+		panel.queue_free())
+	vbox.add_child(btn)
 
 
 func _node_pos(f: int, i: int) -> Vector2:
@@ -123,6 +173,7 @@ func _draw_screen() -> void:
 	burger.flat = false
 	var bpop := burger.get_popup()
 	bpop.add_item("Restart Run", 0)
+	bpop.add_item("Glossary", 3)
 	bpop.add_item("Quit to Main Menu", 1)
 	bpop.add_item("Quit to Desktop", 2)
 	# Testing shortcuts (always on in dev builds).
@@ -222,6 +273,7 @@ func _on_node_pressed(f: int, i: int) -> void:
 			var rest_pct := 0.3 + Run.relic_add("rest_heal_add")
 			Run.heal_party(rest_pct)
 			Run.restore_mana(rest_pct)
+			Run.tally_add("rests")
 			Run.save_run()
 			_draw_screen()
 			_toast("The party rests by the waystone (+%d%% HP & Mana)"
@@ -271,6 +323,8 @@ func _on_burger(id: int) -> void:
 		2:
 			Run.save_run()
 			get_tree().quit()
+		3:
+			GlossaryPanel.open(self)
 		10:  # DEBUG entries below
 			Run.gold += 200
 			_draw_screen()

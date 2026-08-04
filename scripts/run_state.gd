@@ -82,6 +82,36 @@ var pending_event := ""    # event id the event screen resolves (not saved:
 # the player's real save file.
 var sim_run := false
 
+# The run ledger (Batch Z): everything the end-of-run summary reports,
+# accumulated across battles and map nodes. It lives here because the
+# battle scene reloads between fights — anything scene-local dies with
+# the fight. Keys are created on demand (tally_add) so pre-Z saves load
+# clean. RunSim never reads it, and under sim_run it can only ever be an
+# in-memory scratch (save_run is a no-op there), so sim purity holds.
+var tally := {}
+
+
+func reset_tally() -> void:
+	tally = {"damage": {}, "gold_earned": 0, "gold_spent": 0,
+		"elites": 0, "rests": 0, "battles": 0}
+
+
+func tally_add(key: String, amount := 1) -> void:
+	if tally.is_empty():
+		reset_tally()
+	tally[key] = int(tally.get(key, 0)) + amount
+
+
+# Per-hero damage across the whole run, keyed by battle unit_name (the
+# spec display name once awakened) — the same naming space the sim
+# reports use, banked once per battle from the battle scene.
+func tally_damage(hero_name: String, amount: float) -> void:
+	if tally.is_empty():
+		reset_tally()
+	var dmg: Dictionary = tally.get("damage", {})
+	dmg[hero_name] = float(dmg.get(hero_name, 0.0)) + amount
+	tally["damage"] = dmg
+
 
 const HERO_BASE := {
 	"warrior": {"hp": 154, "mana": 0},
@@ -138,6 +168,7 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	encounter = {}
 	seen_events = []
 	pending_event = ""
+	reset_tally()
 	_generate_map()
 
 
@@ -895,12 +926,14 @@ func save_run() -> void:
 		return
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	# v2 (Batch 38): + seen_events, zone_draw. v3 (Batch Y): + difficulty.
-	# Loading stays tolerant of older saves via .get defaults — never drop
-	# player state silently. NOTE: a pre-Y save also keeps its old map
-	# (70% links, blind deal) — correct, never migrated; nothing at
-	# runtime may assume the Batch Y map guarantees hold on a loaded map.
+	# v4 (Batch Z): + tally (the run ledger). Loading stays tolerant of
+	# older saves via .get defaults — never drop player state silently.
+	# NOTE: a pre-Y save also keeps its old map (70% links, blind deal) —
+	# correct, never migrated; nothing at runtime may assume the Batch Y
+	# map guarantees hold on a loaded map.
 	file.store_var({
-		"version": 3, "party": party, "items": items, "gold": gold,
+		"version": 4, "party": party, "items": items, "gold": gold,
+		"tally": tally,
 		"difficulty": difficulty,
 		"zone_idx": zone_idx, "zone_name": zone_name, "zone_draw": zone_draw,
 		"floor_idx": floor_idx, "seen_events": seen_events,
@@ -962,6 +995,11 @@ func load_run() -> bool:
 	if not DIFFICULTY_MULTS.has(difficulty):
 		difficulty = "standard"
 	seen_events = data.get("seen_events", [])
+	# Pre-Z saves carry no ledger: start one mid-run rather than crash the
+	# summary — its counts just begin at the load point.
+	tally = data.get("tally", {})
+	if tally.is_empty():
+		reset_tally()
 	pending_event = ""
 	encounter = {}
 	active = true
@@ -985,6 +1023,7 @@ func award_gold(node_type: String) -> int:
 			amount = randi_range(110, 130)
 	amount = int(round(amount * (1.0 + relic_add("gold_find_mult"))))
 	gold += amount
+	tally_add("gold_earned", amount)
 	return amount
 
 

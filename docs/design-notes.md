@@ -704,3 +704,76 @@ The real question this raises is a design one: the game has no way to
 resolve a fight neither side can finish. A durable low-damage survivor
 against a healing warband is a legitimate board state, reachable in real
 play, and today it simply never ends.
+
+## 2026-08-03 — Batch Z: an alpha exists to answer one question
+
+An alpha is not a small version of the game. It is an instrument for
+answering a single question — *is this fun?* — and every property it has
+should be judged by whether it sharpens or blunts that answer.
+
+Judged that way, the build had two holes that had nothing to do with
+content. At the front, a tester met an initiative timeline, a timing
+check on every action, Pressure and Break, seven damage schools with
+resists and vulnerabilities, a bleed meter that pops at 100, five
+different spec resources, lane-gated talents on a rising cost curve,
+runes with scopes and scars, boss trophies, and relics — with no
+explanation anywhere. The tooltips are good, but every one of them
+explains a *number*: this warband resists nature, this talent gives 4%
+per rank. None of them explains a *system*. A tester who does not know
+what Pressure does is not playing the game that was built, and their
+feedback describes their confusion instead of the design. That is not a
+tester failing; that is the instrument returning noise.
+
+At the back, twenty minutes of play ended in two lines of text and a
+button. No depth reached, no cause of death, no record of the build that
+had just been assembled and lost. Both of the things a run ought to
+produce were being thrown away: the player's sense of closure, and the
+designer's data. A tester playing five runs in a session got five voids.
+
+So this batch built the shell rather than more content — a glossary, two
+orientation cards, and a real run summary. The glossary is deliberately
+data-only (`glossary.json`, the same pattern as enemies and events), and
+its authoring rule is the load-bearing part: **entries are written from
+the code, never from the master document**. Batch Y is why. There, a
+documented 70%-adjacent-link rule turned out to produce 53% single-link
+nodes in practice, because the rule as written and the rule as
+implemented had drifted apart. A glossary written from the doc would
+teach a tester the intent and then let them be confidently wrong about
+the game in front of them — which is worse than teaching them nothing,
+because uncertainty at least prompts a question. Writing all sixty-six
+entries from the read sites also served as an audit: this time the
+document held up, and the corrections it did need were small (a relic
+line saying "six damage schools" where the game has seven non-physical
+plus physical, a shop-node count off by one, two stale lines in
+CLAUDE.md). That the audit came back nearly clean is worth recording;
+the discipline is working.
+
+The one-time pointer at the skill check is the highest-value item in the
+batch, and it is worth being explicit about why. The design's premise is
+that the player's execution matters as much as their build. A tester who
+never notices there is a timing window on every action experiences a
+game where their choices are only half-connected to outcomes — and will
+report, accurately from where they sit, that it feels shallow. That is a
+review of the onboarding masquerading as a review of the combat system.
+One card, shown once, removes an entire category of false feedback.
+
+The run summary's Copy button deserves its own line. It is four lines of
+code and it converts every wipe into a structured report a tester can
+paste back — the run's depth, the party's build, the damage split, the
+economy, and what killed them. That is telemetry-grade feedback with no
+telemetry to build, no consent question, and no infrastructure. When the
+cheap version of a thing gets 80% of the value, build the cheap version.
+
+Two implementation choices were made against the tempting alternative,
+both for the same reason. The summary needed run state that
+`clear_save()` destroys, and the obvious fix — clear the save *after*
+showing the summary — would have opened a window where a dead run is
+still resumable. A missing summary is a disappointment; a resurrectable
+corpse is a corrupt save. So the summary takes a snapshot first and the
+save logic was not touched. Likewise, the per-run damage ledger had to
+live outside the battle scene, because that scene reloads between
+fights; it went onto `Run`, and it writes only in real play so the
+simulation harness's own statistics path stays the single source of
+truth for balance numbers. In both cases the rule is the same: when a
+new feature wants to reach into load-bearing machinery, give the feature
+its own path instead.
