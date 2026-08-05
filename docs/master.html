@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-04 (Batch AC)</b></p>
+<p align="right"><b>Last updated: 2026-08-04 (Batch AE)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -17,8 +17,9 @@ timing skill check on every action — the player's execution matters as much as
 
 <h2>2. Run Flow</h2>
 <p><b>Main Menu</b> → <b>Draft</b> (pick 4 heroes + equip up to 3 relics) →
-<b>Map</b> (node climbing) → <b>Battles / Rest / Shop / ???</b> → after the first victory,
-<b>Spec Choice</b> (permanent) → <b>Party screen</b> (talents, runes) → … → <b>Zone Boss</b> →
+<b>Spec Choice</b> (permanent; each hero is also dealt an awakening rune to choose) →
+<b>Map</b> (node climbing) → <b>Battles / Rest / Shop / ???</b> →
+<b>Party screen</b> (talents, runes) → … → <b>Zone Boss</b> →
 next zone (party fully restored) → final boss → run complete.</p>
 <p>A run ends in one of three ways: <b>completion</b> (the final boss falls), a <b>wipe</b>
 (every hero down), or a <b>forfeit</b> — the player abandons the run from the battle burger
@@ -1296,6 +1297,11 @@ runes only roll for heroes who actually own the named ability (boss trophies inc
 zone-victory screen announces each new slot). Shop offers avoid duplicates per hero, and
 an exhausted pool falls back to the Common family — the offer list never comes back
 empty.
+<br><b>Every hero starts the run choosing a rune.</b> At spec confirmation — specs locked,
+before the first map — each hero is dealt <b>three eligible candidates and picks one</b>,
+resolved on the Party screen exactly as an elite cache is, and worn immediately (two slots
+are already open). The opening deal rolls on the ordinary zone-slot-1 table, so it leans
+Common. The map's Party button badges and pulses while any pick is unspent.
 <br><b>Spec coverage: 65 authored runes</b> — 5 universal, 3 class-wide for each of the four
 classes, and <b>4 spec runes for every one of the twelve specs</b>. Each set is
 built to one rule:
@@ -1549,7 +1555,9 @@ spawn math: Constitution uses the spec's value plus Toughness, Attack/HP include
 scaling, and the spec passive line bakes in talent ranks (Aggressive/Defensive Stance,
 Unstoppable) — the class passive + spec passive lines, ability chips (hover shows real
 numbers AND the "% of Attack" scaling), rune equip toggles (slots grow 2/3/4 by zone; the
-pouch list scrolls), and the spec's talent
+pouch list scrolls), any <b>owed rune pick</b> (the awakening rune and elite caches both
+wait here as a choice of three, and the hero-list row announces which heroes owe one), and
+the spec's talent
 tree: three lane columns with live lane-point headers, a capstone shelf, and
 click-to-learn nodes (lock reasons on the node tooltips) for all twelve specs.</li>
 <li><b>Awakening screen:</b> shows the CLASS PASSIVE in a line under the title (it rides

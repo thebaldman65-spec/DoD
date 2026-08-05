@@ -119,6 +119,15 @@ static var rune_refused_noslot := 0 # never offered: every slot already worn
 static var rune_refused_gold := 0   # offered, left on the counter: 40g reserve
 static var rune_refused_dupe := 0   # re-roll kept landing on an owned rune
 static var rune_granted := 0        # DOD_SIM_RUNE_ECON=rich only
+# Batch AE: the third source, and the only one that is SHIPPED rather than
+# an arm. Split out because it fails differently again — it cannot fail on
+# gold, on routing, or on a closed slot, which is the whole reason it was
+# the lever chosen.
+static var rune_start_offered := 0     # opening candidates shown (3 per hero)
+static var rune_start_taken := 0       # picks resolved — one rune each
+static var rune_start_equipped := 0    # ...of those, worn (a slot was free)
+static var rune_start_spec := 0        # ...of those, spec-scoped
+static var rune_start_spec_avail := 0  # triples holding >=1 spec-scoped option
 static var slots_avail_sum := 0.0   # summed over heroes at run end
 static var slots_filled_sum := 0.0
 static var worn_kind := {}          # spec|class|universal|stick -> runes worn
@@ -182,6 +191,10 @@ static func start_run(run: Node) -> void:
 		run.sync_spec_hp(i)  # awakening HP sync — same call as the spec screen
 		var run_sn := String(Classes.SPEC_INFO[spec]["name"])
 		spec_runs[run_sn] = int(spec_runs.get(run_sn, 0)) + 1
+	# Batch AE: the sim gets the opening pick too, resolved through the same
+	# _pick_rune_candidate policy the elite cache uses — otherwise the
+	# harness measures a different game than the one shipping.
+	_resolve_start_runes(run)
 	run.specs_chosen = true
 	_run_spent = 0
 	_run_gold_spent = 0
@@ -693,6 +706,46 @@ static func _target_lane(spec: String, tree: Array) -> String:
 	return String(tree[0].get("lane", ""))
 
 
+# The starting rune (Batch AE), resolved instantly by the SAME policy the
+# elite cache uses. Every hero owns two slots at run start, so in practice
+# the pick always lands worn — the equipped check is here because a
+# resolution path that assumes a free slot would be a lie the moment
+# anything upstream changes.
+#
+# rune_start_spec vs rune_start_spec_avail is the report-back the brief
+# asked for, and the pair matters: the bot's policy PREFERS a spec-scoped
+# candidate, so "how often the pick was spec" is an upper bound on a naive
+# player, while "how often a spec rune was among the three" is the roller's
+# own hit rate and the number a spec-weighted opening would move.
+static func _resolve_start_runes(run: Node) -> void:
+	if run.grant_start_runes() < 1:
+		return
+	for m in run.party:
+		var queue: Array = m.get("rune_candidates", [])
+		while int(m.get("rune_picks_owed", 0)) > 0 and not queue.is_empty():
+			var triple: Array = queue.pop_front()
+			var spec_scope := "spec:%s" % String(m.get("spec", ""))
+			rune_start_offered += triple.size()
+			for c in triple:
+				if String(c.get("scope", "")) == spec_scope:
+					rune_start_spec_avail += 1
+					break
+			var rune: Dictionary = _pick_rune_candidate(m, triple)
+			var worn := 0
+			for r in m.get("runes", []):
+				if r.get("equipped", false):
+					worn += 1
+			rune["equipped"] = worn < run.rune_slots()
+			rune_start_taken += 1
+			if rune["equipped"]:
+				rune_start_equipped += 1
+			if String(rune.get("scope", "")) == spec_scope:
+				rune_start_spec += 1
+			m["runes"] = m.get("runes", []) + [rune]
+			m["rune_picks_owed"] = int(m.get("rune_picks_owed", 0)) - 1
+		m["rune_candidates"] = queue
+
+
 # Elite pick-of-3 policy: the candidate whose lane matches the build's
 # target lane, else any spec-scoped candidate, else the first.
 static func _pick_rune_candidate(member: Dictionary, candidates: Array) -> Dictionary:
@@ -1005,11 +1058,24 @@ static func _print_report(battle) -> void:
 	print("  Elite    candidates %.2f (%.2f caches x3)   taken %.2f   equipped %.2f" % [
 		rune_elite_offered / runs, rune_elite_taken / runs,
 		rune_elite_taken / runs, rune_elite_equipped / runs])
+	# Read straight from the env, as the Matrix row reads the econ arm: the
+	# start rune is not gated on sim_run, so there is no Run to ask.
+	if OS.get_environment("DOD_SIM_START_RUNE") != "off":
+		print("  Start    candidates %.2f (%.2f picks x3)   taken %.2f   equipped %.2f" % [
+			rune_start_offered / runs, rune_start_taken / runs,
+			rune_start_taken / runs, rune_start_equipped / runs])
+		var st := maxf(float(rune_start_taken), 1.0)
+		print("    opening pick was spec-scoped %.0f%% of the time; a spec rune was among the three %.0f%%" % [
+			100.0 * rune_start_spec / st, 100.0 * rune_start_spec_avail / st])
+		print("    (the bot PREFERS a spec candidate, so the first figure is an upper bound on a naive player;")
+		print("     the second is the roller's own hit rate — the number a spec-weighted opening would move)")
+	else:
+		print("  Start    OFF (DOD_SIM_START_RUNE=off) — this row reproduces the pre-AE economy")
 	if rune_granted > 0:
 		print("  GRANTED  %.2f   <-- DOD_SIM_RUNE_ECON=rich is ON; this row is an experiment arm" % [
 			rune_granted / runs])
 	print("  Acquired per hero per run: %.2f   (the four written for a spec are the target)" % [
-		(runes_bought + rune_elite_taken + rune_granted) / runs / 4.0])
+		(runes_bought + rune_elite_taken + rune_granted + rune_start_taken) / runs / 4.0])
 	print("  Shop offers refused:  no free slot %.2f   unaffordable (40g reserve) %.2f   duplicate %.2f" % [
 		rune_refused_noslot / runs, rune_refused_gold / runs, rune_refused_dupe / runs])
 	print("  Elite runes won with no free slot: %.2f/run  (pouched, not worn)" % [
@@ -1071,9 +1137,10 @@ static func _print_report(battle) -> void:
 	# PRIMARY metric with its spread. Pre-AD rows carry none of these three
 	# fields, which is the same never-compare-across-batches rule Batch Y's
 	# map=/diff=/choice= fields established.
-	print("Matrix row: route=%s  map=%s  diff=%s  econ=%s  power=x%.2f  depth=%.2f+/-%.2f  ratio@z1t8=%s  completions=%.0f%%  wipe median tier=%s  choice=%.0f%%" % [
+	print("Matrix row: route=%s  map=%s  diff=%s  econ=%s  start=%s  power=x%.2f  depth=%.2f+/-%.2f  ratio@z1t8=%s  completions=%.0f%%  wipe median tier=%s  choice=%.0f%%" % [
 		route, map_mode, diff,
 		("rich" if OS.get_environment("DOD_SIM_RUNE_ECON") == "rich" else "normal"),
+		("off" if OS.get_environment("DOD_SIM_START_RUNE") == "off" else "on"),
 		power_mult, _mean(depth_reached),
 		_sd(depth_reached) / sqrt(maxf(float(runs_done), 1.0)),
 		r8_desc, 100.0 * completed / runs, med_desc,

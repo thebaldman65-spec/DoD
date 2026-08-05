@@ -5,6 +5,241 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-04 — Batch AE: the runes turn on, and the magnitude pass does not</h2>
+<ul>
+<li><b>Why.</b> Batch AD established that rune power and rune dilution were never
+alternatives — they are two factors of one product, both near zero, each masking the
+other — and it deliberately shipped no content change, putting the acquisition lever in
+front of the designer instead. <b>The designer chose: a starting rune at the awakening.</b>
+On AD's own reading that is +1.00 rune per hero, landing in zone 1 where runs actually die,
+and visible to a player inside the first ten minutes. This batch ships that lever. It was
+also meant to ship the magnitude that lever requires, and <b>it does not</b> — the evidence
+did not survive its own replication, and that refusal is the batch's second deliverable.</li>
+
+<li><b>The rule that changed, stated plainly.</b> Difficulty has been closed since 08-02
+pending human playtesters. <b>This batch knowingly moves it</b>, because turning runes on is
+the largest single difficulty lever in the project and there is no version of fixing the
+rune system that does not move it. The designer accepted this explicitly. What it did not
+license: no target (there is no completion rate this batch aimed at), no compensation
+(nothing was nerfed to offset the gain), and no second lever.</li>
+
+<li><b>Stage 1 — the starting rune, and where it is granted.</b> Not at the draft:
+<b>at spec confirmation</b>. Specs are chosen after the draft, and spec-scoped runes are the
+authored content that currently reaches nobody — a rune rolled before a hero has a spec
+cannot be one of them. The hook is the run-start beat in <code>spec_choice</code> where
+<code>Profile.note_run_started</code> was already booked: specs locked, party built, before
+the first map exists.
+<br><b>What is granted is a pick of three, per hero</b> — not a random grant. Batch X's own
+reasoning for making the elite cache a pick-of-3 was that "a random rune on a random hero
+was the least agency in the game", and the opening pick is the most visible gear decision
+in a run. It rolls through the <b>existing</b> <code>Run.roll_rune_candidates</code> with its
+normal scope eligibility and rarity weights (zone slot 1 leans Common — an appropriately
+modest opening gift), queues on the member exactly as an elite cache does, and resolves on
+the Party screen through the same trophy-picker. <b>No new gear machinery exists in this
+batch.</b> Two slots are already open at run start, so the pick is worn immediately.
+<br><b>Exactly once per hero per run, and it is the saved data that says so.</b> A
+<code>start_rune_granted</code> marker rides inside the party dict, so a v5 save carries it
+with no version bump and no migration, and neither a resumed run nor the debug spec swap
+(which re-opens the spec screen) can deal a second one. <b>Save version stays v5.</b></li>
+
+<li><b>Stage 1 — the player cannot walk past it.</b> Four owed picks sitting silently on the
+Party screen would defeat the entire point of choosing a front-loaded lever, so the existing
+owed-work affordance carries it rather than a new modal. The map's Party button badges
+<code>(4 runes!)</code>, takes the rune purple (which outranks the talent gold), and
+<b>pulses</b> until the picks are spent. The Party screen opens on the hero <i>list</i>, one
+click short of the picker, so each owed hero's row reads <code>◆ 1 RUNE TO CHOOSE</code> in
+the same purple — a gap found by testing the real scenes rather than reasoning about them. A
+one-shot first-map toast points at the Party screen, and it <b>chains off the Batch Z framing
+card's dismissal</b> so the two never talk over each other.
+<br><b>The sim gets it too</b>, resolved through the existing <code>_pick_rune_candidate</code>
+policy — otherwise the harness would measure a different game than the one shipping.
+<code>DOD_SIM_START_RUNE=off</code> reproduces the pre-AE economy. Default <b>on</b>, and
+unlike AD's two arms it is <b>not</b> gated on <code>sim_run</code>, because it is shipped
+content rather than an experiment. Post-AE Matrix rows carry a <code>start=</code> field;
+pre-AE rows do not, so never compare across.</li>
+
+<li><b>Stage 2 — the correction that made the sweep necessary.</b> AD's "detectable at ×1.5,
+unambiguous by ×2" <b>was measured with <code>rich</code> acquisition held on</b> — all four
+slots open from tier 1 plus a granted rune at every zone half-mark, which delivered 2.93–3.92
+runes acquired per hero. One starting rune delivers about a third of that. <b>A dose-response
+curve cannot be read across acquisition levels</b>, so authoring ×1.5 on the strength of AD's
+number would have been authoring against conditions that will not exist in the shipped game.
+The whole sweep was re-run at the acquisition level this batch actually ships: starting rune
+on, <code>DOD_SIM_RUNE_ECON</code> off, <code>DOD_SIM_RUNE_POWER</code> across ×1 / ×1.5 / ×2 /
+×2.5 / ×3.</li>
+
+<li><b>Stage 2 — the sweep is three dose levels, not five, and that is a property of the
+data.</b> <code>Runes.scale_payload</code> rounds integer terms. 82 of the pool's 107 scalable
+benefit terms are integers and 52 of those are a bare <code>1</code> — which rounds to
+<code>2</code> at <i>both</i> ×1.5 and ×2, and to <code>3</code> at <i>both</i> ×2.5 and ×3.
+Between ×1.5 and ×2, <b>62 of 82 integer terms are frozen and 23 of 65 entries are
+byte-identical</b>. So the five swept points are really ×1, {×1.5, ×2}, {×2.5, ×3}, and the
+near-equality measured inside each pair is the expected result rather than a surprise.
+<br>The corollary is worth more than the caveat: between ×1.5 and ×2 the <i>floats</i> grow by
+a third while the integers hold, and depth does not move; between ×2 and ×2.5 the integers step
+2→3 and depth does. <b>The pool's power lives in its talent-counter grants, not in its stat
+percentages.</b></li>
+
+<li><b>Stage 2 — the rows.</b> Fixed party, n=200 per row, route=default, map=new,
+diff=standard, start=on. Primary metric is depth reached; the resolvable difference for each
+pair is the report's own 80%-power figure.
+<br><code>×1 15.12 | ×1.5 17.71 | ×2 16.86 | ×2.5 18.98 | ×3 18.98</code> (SD ≈ 9.4)
+<br>Against the ×1 baseline: ×1.5 <b>+2.59</b> (resolvable 2.64 — <i>misses by five
+hundredths of a tier</i>), ×2 <b>+1.74</b> (2.63), ×2.5 <b>+3.86</b> (2.74 — <b>clears</b>),
+×3 <b>+3.86</b> (2.64 — clears). Completions ran 4% / 12% / 9% / 14% / 16% with a band of
+±5.5 points. <b>×1.5 is an underpowered result and is recorded as one, not as "noise"</b> —
+pooling the {×1.5, ×2} level to n=400 still lands at +2.17 against a resolvable 2.25.</li>
+
+<li><b>Stage 2 — and then the replication did not.</b> The rotated arm exists because a fixed
+party can only ever roll 16 of the 48 spec-scoped runes, and AD's finding only earned its
+confidence because it reproduced across both. At n=100 it read ×1 15.48 / ×1.5 17.48 / ×2
+15.84 / ×2.5 15.79 / ×3 15.65 — an ordering with no dose-response in it at all. <b>That was not
+treated as a refutation</b>, because at n=100 the rotated arm's resolvable difference is
+<b>±4.28 tiers, larger than the +3.86 it was being asked to replicate</b>: it could not have
+seen the fixed-party result even if that result were perfectly real. Reading it as "no effect"
+would have been precisely the AA/AB failure Batch AD diagnosed.
+<br>So the two decisive rotated rows were re-run at <b>n=300 each</b> (2×150, pooled), bringing
+the resolvable difference to 2.52 — comfortably smaller than the effect it was hunting.
+<br><code>rotated ×1 15.21 (SD 10.64, n=300) → ×2.5 17.15 (SD 11.40, n=300) = +1.94, resolvable
+2.52 — does NOT clear.</code>
+<br>The instrument could have seen it. It did not. <b>That is a failure to replicate rather
+than an underpowered null</b>, and the distinction is the entire reason the rows were re-run.</li>
+
+<li><b>Stage 2 — the decision rule, applied as committed.</b> The rule was written down before
+any row was readable: the smallest multiplier at or below ×2.5 that clears the resolvable
+difference gets authored; if nothing at or below ×2.5 clears, <b>stop and author nothing</b>,
+because the finding is then that one starting rune is not enough acquisition at any sane
+magnitude and the designer needs a second lever before a magnitude pass means anything.
+<b>×2.5 cleared on one arm and not on the other, so nothing cleared on the evidence as a
+whole. The batch stopped. <code>data/runes.json</code> is byte-unchanged.</b></li>
+
+<li><b>Reported, and deliberately not acted on.</b> Both arms are individually significant at
+the conventional five per cent level (t = 3.94 fixed, t = 2.15 rotated); they are <i>not</i>
+statistically distinguishable from each other (Q = 2.08 on 1 df); and an inverse-variance
+combination of the two gives <b>+2.82 tiers, SE 0.663</b>, which would clear. All of that is
+true. It is also an analysis chosen <i>after</i> seeing the rows — the project's "resolvable
+difference" is an 80%-power design threshold, deliberately stricter than a significance test,
+and it is the threshold this batch's rule named in advance. Relaxing it afterwards is the
+exact flexibility that made AA's and AB's verdicts unfalsifiable. <b>The designer now has both
+numbers and can overrule the threshold deliberately; that call is theirs and it is not this
+batch's.</b>
+<br>Noise calibration worth keeping: the two n=150 halves of the <i>same</i> rotated ×2.5 arm
+measured <b>16.39 and 17.91</b> — 1.52 tiers apart with nothing whatsoever changed.</li>
+
+<li><b>Stage 3 — not run, and what it would have been.</b> The pass is fully worked out and
+recorded rather than applied, so the next batch does not repeat the analysis: benefits and
+<b>costs scaled in step</b> (AD's arm scaled upside only and held costs, which would have
+buffed every scarred rune twice), 59 of 65 entries moving, and all 59 descriptions rewritten
+against their <i>read sites</i> rather than their payload values, because most rank grants
+state their effect and not their rank count. Three findings came out of preparing it and they
+outlive it:
+<br>(a) <b>Five rune fields are read as booleans</b> — <code>coated_blades</code>,
+<code>deep_focus</code>, <code>perfect_form</code>, <code>opening_volley</code> and
+<code>vulture</code> are all <code>if x &gt; 0</code> gates in front of hard-coded constants.
+Scaling them is a silent no-op. <b>This is a correction to Batch AD</b>: its power arm scaled
+them like any other integer, so its ×3 / ×6 / ×10 rows never actually multiplied those terms.
+It also means the <b>Rune of the Deep Sight carries nothing but boolean fields and cannot move
+under any magnitude pass at all</b>, joining Comet, Binding Souls, Last Rites, Flayed Mind and
+the Quick Spring on the unscalable list — six entries, not five.
+<br>(b) <b>A proportional cost on <code>healing_received_mult</code> would have crossed a
+clamp.</b> The field is a running sum onto a 1.0 base and <code>unit.heal_amount</code> floors
+it at zero. Vampiric (universal) plus the Occultist's Hollow Chalice sums to −1.50 at ×2.5, so
+the clamp would have turned two runes into "you cannot be healed at all" — a rule change
+wearing a magnitude change's clothes, with nothing crashing to announce it. Batch AA's guard
+comment says "no reachable loadout gets there today"; that was a claim about the data, and
+nothing had been checking it. <b>Now something does.</b>
+<br>(c) <b>Two effects are non-linear in their own field</b> and cannot take a proportional
+scale: <code>on_edge_ranks</code> is a threshold with a base (<code>0.20 + 0.05 × ranks</code>,
+so 1→3 ranks moves it 25%→35%, not 75%) and <code>mindfulness_ranks</code> is an interval
+(<code>counter &gt;= 7 − ranks</code>, where the talent's own 3 ranks plus a rune's 3 would make
+every Arcanist cooldown tick double <i>every turn</i>).</li>
+
+<li><b>Stage 4 — what the acquisition change actually did.</b> Control is
+<code>start=off</code> at the batch's own HEAD, measured <i>before</i> stage 3 was considered,
+so "control" means the game as it stood and not "the new numbers minus the starting rune".
+Matched n, matched flags.
+<br><b>The lever landed exactly as designed, and this half is near-deterministic:</b>
+runes acquired per hero per run <b>0.56 → 1.47</b>; slots filled per hero <b>0.56 → 1.46
+(20% → 55%)</b>; and the number the whole rune arc has been about — <b>authored SPEC runes worn
+per hero — 0.16 → 0.49, a tripling</b>. A hero now visibly wears an authored spec rune in
+roughly half of runs instead of one in six.
+<br><b>The difficulty half did not move.</b> Fixed party n=200: depth <b>16.07 → 15.12</b>
+(<b>−0.95</b>, resolvable 2.54), completions 3% → 4%. Rotated n=300: depth <b>14.89 → 15.21</b>
+(<b>+0.32</b>, resolvable 2.39), completions 10% → 16% against a band of ±7.7 points. Opposite
+signs, both far inside the noise. The per-tier power ratio curve is unchanged in shape
+(z1t8 0.97→0.95, z1t10 0.88→0.86, z1 boss 0.74→0.75) and the wipe distribution keeps its
+cluster.
+<br><b>This independently reproduces Batch AD's central claim at a different acquisition
+magnitude.</b> AD measured its <code>rich</code> arm — acquisition raised, power untouched —
+at <b>−0.85 tiers</b>. AE raised acquisition by a smaller, shippable amount and measured
+<b>−0.95</b>. Acquisition alone still moves nothing, which is exactly why the magnitude half
+mattered and exactly why its failure to replicate leaves the product where AD found it.</li>
+
+<li><b>Stage 4 — the sentence the designer asked for, unhedged.</b>
+<b>The game did not get measurably easier: depth reached moved −0.95 tiers on the fixed party
+and +0.32 on the rotated one, both well inside the ±2.5 tiers this instrument can resolve, so
+the starting rune tripled how much authored rune content a hero actually wears and bought no
+detectable difficulty change.</b> Nothing was nerfed to offset it, because there was nothing
+to offset.</li>
+
+<li><b>Stage 4 — the twelve-spec contribution table, rotated, at per-spec n≈100.</b> AD flagged
+Pyromancer 35→42% and Sharpshooter 25→19% as the only moves over 5 points under its combined
+arm, at per-spec n≈33. <b>Neither reproduces here.</b> Pyromancer 36→34, Sharpshooter 25→26,
+and <i>no</i> spec moves more than 3 points: Survivalist 30→32, Holy 28→27, Warden 26→26,
+Cryomancer 27→26, Swordmaster 22→24, Arcanist 24→21, Beastmaster 19→20, Occultist 19→20,
+Berserker 18→18, Devout 14→14. Consistent with AD's own note that those two moves appeared
+only under the combined arm.</li>
+
+<li><b>Verified.</b> <code>test_runes.gd</code> <b>3,085 → 3,248 checks, 0 failures</b> —
+extended, not replaced, with three new alarms that exist because of what stage 3's preparation
+turned up: every boolean-read field is asserted to <i>still</i> be a boolean gate in battle.gd
+(so the day one becomes arithmetic, the test says so and the pool may start using it) and to
+carry no rune value above 1; the reachable <code>healing_received_mult</code> sum is asserted to
+leave the multiplier above the clamp; and the opening triple is asserted to contain a
+spec-scoped rune within a wide 20–70% band, so a future spec batch or a
+<code>RARITY_WEIGHTS</code> change reports its effect on the opening pick. That test
+independently measured the rate at <b>42%</b>, matching the sim's 36–42%.
+<br>New: <code>test_start_rune.gd</code> <b>131 checks</b> (dealt exactly once per hero;
+survives a save/load round-trip without rerolling; never dealt twice on a resumed run nor after
+the debug spec swap; a marker-less pre-AE save loads clean and is not retro-fitted; the off flag
+works with <code>sim_run</code> false; <code>DOD_SIM_RUNES=off</code> leaves no owed pick
+pointing at an empty queue; the sim's policy resolves it and resolving twice is a no-op; a
+<code>sim_run</code> party never reaches <code>user://run_save.bin</code>) and
+<code>test_start_rune_ui.gd</code> <b>31 checks</b> against the real scenes (the map badge, its
+colour, that it is <i>pulsing</i>, the hero-list rows, the picker offering the three
+<i>saved</i> candidates, spending one clearing panel and badge together, the control showing no
+badge and no nudge, and the nudge waiting behind the framing card and arriving after it).
+<code>test_rune_battle.gd</code> 91 checks, 0 failures — including the known-flaky White Flame
+check, which passed this run. <code>test_run_harness.gd</code> gates 1/2/3 all PASS, rerun
+before any <code>--run</code> row in this batch was trusted. Purity: <code>profile.json</code>
+and <code>relics.json</code> byte-identical across a real <code>DOD_SIM_RUN</code> with the AE
+start rune on <i>and</i> both AD arms armed, and <code>run_save.bin</code> never created.
+Headless parse: all ten scenes, <b>0 SCRIPT ERROR</b>.</li>
+
+<li><b>Report back, not decided.</b>
+<br>(a) <b>Should the opening pick be spec-weighted?</b> <b>Yes, on the numbers.</b> The
+ordinary roller puts a spec-scoped rune among the three only <b>36–42%</b> of the time, and the
+sim's policy — which <i>prefers</i> a spec candidate — took one at exactly that rate, i.e. it
+takes one whenever one is there. The ceiling is the roller's hit rate, not the policy's. This
+is why spec-worn landed at 0.49 rather than the 1.18 the brief projected, and a spec-weighted
+opening is a one-line change that would roughly double it.
+<br>(b) <b>Six entries now cannot move under any magnitude pass</b>, not five: Comet, Binding
+Souls, Last Rites and Flayed Mind (ability grants), the Quick Spring (inverted cost/cooldown),
+and <b>the Rune of the Deep Sight</b>, whose only two fields are boolean-read. If a magnitude
+pass ever lands they are all relatively weaker by the whole multiplier, and the Deep Sight is
+the one nobody had noticed.
+<br>(c) <b>Whether difficulty needs its own batch:</b> on this evidence, <b>no</b> — this batch
+spent difficulty budget and the meter did not move. Wanderer (×0.7) is untouched and still
+earning its place, since Standard has not moved.
+<br>(d) <b>The <code>treasure</code>/Loot node type</b> remains outstanding since Batch AC —
+five batches now.
+<br>(e) The magnitude pass is <b>prepared and recorded, not applied</b>: scaling with costs in
+step, four hand-held costs with their reasons, and 59 rewritten descriptions. If the designer
+adds the second acquisition lever (a rune offer at rest nodes, touched 2.3×/run against the
+shop's 0.6, or a second elite cache), the sweep should be re-run at <i>that</i> acquisition
+level — for the same reason this batch could not reuse AD's.</li>
+</ul>
+
 <h2>2026-08-04 — Batch AD: the rune economy — power and dilution are one finding</h2>
 <ul>
 <li><b>Why.</b> Three batches authored the rune pool — X built the machinery and the

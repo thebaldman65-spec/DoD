@@ -66,7 +66,13 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   from t1 + a spec-eligible authored rune granted at each zone half-mark;
   power = a multiplier on authored payload UPSIDE only, costs held,
   tpl_* stat sticks untouched. Post-AD Matrix rows carry econ=/power=/
-  depth= fields; pre-AD rows do not — never compare across).
+  depth= fields; pre-AD rows do not — never compare across),
+  DOD_SIM_START_RUNE=off (Batch AE — reproduces the PRE-AE economy by
+  suppressing the awakening pick-of-3. Default ON, and UNLIKE the two AD
+  arms above it is NOT gated on Run.sim_run, because it is SHIPPED
+  CONTENT rather than an experiment arm; a control row has to be
+  reachable from real play or the comparison is unreproducible. Post-AE
+  Matrix rows carry start=; pre-AE rows do not).
   RunSim
   (scripts/run_sim.gd statics, Run injected Events-style) owns setup/map
   walk/report; battle.gd hooks: _ready begin+note_battle_start, _check_end
@@ -168,6 +174,121 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-08-04)
+BATCH AE (08-04) — THE STARTING RUNE SHIPS; THE MAGNITUDE PASS DOES NOT,
+and the refusal is the second deliverable. runes.json is BYTE-UNCHANGED for
+the second batch running.
+STAGE 1 — SHIPPED. One PICK OF THREE per hero, dealt at SPEC CONFIRMATION
+(spec_choice._finish_and_fade, beside Profile.note_run_started) and NOT at
+the draft: specs are chosen after the draft, so a rune rolled earlier can
+never be one of the spec-scoped entries this whole arc is about. Rolled
+through the EXISTING Run.roll_rune_candidates at zone slot 1 (leans Common),
+queued as rune_candidates/rune_picks_owed, resolved on the Party screen by
+the SAME trophy-picker the elite cache uses. NO new gear machinery. Once per
+hero per run is a property of the SAVED DATA — a `start_rune_granted` marker
+inside the party dict, so SAVE STAYS v5, no migration, and neither a resumed
+run nor the debug spec swap can deal a second. Candidates carry
+`source: "start"` so the picker panel names itself honestly ("AWAKENING
+RUNE" vs "ELITE RUNE CACHE") when both are owed.
+VISIBILITY (the point of a FRONT-LOADED lever): map Party button badges
+"(N runes!)" in the rune purple (which OUTRANKS the talent gold) and PULSES;
+the Party screen opens on the hero LIST, one click short of the picker, so
+each owed row reads "◆ N RUNE(S) TO CHOOSE" in the same purple — a real gap
+found by testing the scenes, not by reasoning; a one-shot first-map toast
+CHAINS OFF the Batch Z framing card's dismissal so they never overlap.
+FLAG: DOD_SIM_START_RUNE=off reproduces the pre-AE economy. Default ON and —
+UNLIKE AD's two arms — NOT gated on sim_run, because it is shipped content.
+Matrix rows now carry start=; pre-AE rows do not, never compare across.
+Sim resolves it via the existing _pick_rune_candidate in RunSim.start_run.
+STAGE 2 — THE CORRECTION, then the stop. AD's "detectable at x1.5" was
+measured with `rich` acquisition HELD ON (~3x what one starting rune gives);
+A DOSE-RESPONSE CURVE CANNOT BE READ ACROSS ACQUISITION LEVELS, so the whole
+sweep was re-run at the level AE ships. FIXED PARTY n=200: x1 15.12 / x1.5
+17.71 / x2 16.86 / x2.5 18.98 / x3 18.98 — x2.5 is the smallest clearing its
+MDE (+3.86 vs 2.74); x1.5 MISSES BY 0.05 TIERS and is recorded as
+UNDERPOWERED, not as noise. ROTATED, re-run at n=300 BECAUSE n=100's MDE
+(+/-4.28) was LARGER THAN THE EFFECT IT WAS ASKED TO REPLICATE: x1 15.21 ->
+x2.5 17.15 = +1.94 vs MDE 2.52 — DOES NOT CLEAR. The instrument could have
+seen it and did not: a FAILURE TO REPLICATE, not an underpowered null. The
+pre-registered rule said stop, so the batch STOPPED AND AUTHORED NOTHING.
+REPORTED NOT ACTED ON: both arms are individually significant at .05
+(t=3.94 / t=2.15), they are not distinguishable from each other (Q=2.08,
+1 df), and an inverse-variance combination gives +2.82 (SE 0.663) which
+WOULD clear — but that analysis was chosen AFTER seeing the rows, and the
+"resolvable difference" is an 80%-POWER threshold deliberately stricter than
+a significance test. The designer may overrule it; this batch may not.
+NOISE CALIBRATION: two n=150 halves of the SAME rotated x2.5 arm read 16.39
+and 17.91 (1.52 tiers apart, nothing changed); two identical n=150 rotated
+CONTROL halves read completions 7% and 14%.
+THREE FINDINGS FROM THE PASS THAT NEVER RAN — these outlive it:
+(1) FIVE RUNE FIELDS ARE READ AS BOOLEANS and scaling them is a SILENT
+NO-OP: coated_blades, deep_focus, perfect_form, opening_volley, vulture
+(all `if x > 0` in front of hard-coded constants). THIS IS A CORRECTION TO
+BATCH AD — its power arm scaled them, so its x3/x6/x10 rows never actually
+multiplied those terms. Consequence: the Rune of the DEEP SIGHT carries
+NOTHING BUT boolean fields and cannot move under ANY magnitude pass, so the
+unscalable list is SIX entries (comet, binding_souls, last_rites,
+flayed_mind, quick_spring, deep_sight), not five.
+(2) ROUNDING COLLAPSES THE SWEEP FROM FIVE DOSES TO THREE. 82 of 107
+scalable benefit terms are ints and 52 are a bare 1, which rounds to 2 at
+BOTH x1.5 and x2 and to 3 at BOTH x2.5 and x3 — 62 of 82 int terms frozen,
+23 of 65 entries byte-identical, per pair. Corollary worth more than the
+caveat: the floats grow a third between x1.5 and x2 and depth does not move;
+the ints step 2->3 between x2 and x2.5 and it does. THE POOL'S POWER LIVES
+IN ITS TALENT-COUNTER GRANTS, NOT ITS STAT PERCENTAGES.
+(3) A PROPORTIONAL COST ON healing_received_mult CROSSES A CLAMP. It is a
+running SUM onto 1.0 and unit.heal_amount floors it at 0; universal Vampiric
+plus the Occultist's Hollow Chalice sums to -1.50 at x2.5, so the clamp
+would silently turn two runes into "you cannot be healed at all" — a RULE
+change wearing a magnitude change's clothes, with nothing crashing. Batch
+AA's guard comment claimed "no reachable loadout gets there today"; nothing
+had been checking it. NOW test_runes DOES.
+Also non-linear and un-scalable proportionally: on_edge_ranks (a threshold
+with a base, 0.20 + 0.05*ranks) and mindfulness_ranks (an interval,
+counter >= 7 - ranks).
+STAGE 4 — DIFFICULTY MOVEMENT. Control = start=off measured BEFORE stage 3
+was considered, so it means the game as it stood. THE ACQUISITION HALF
+LANDED AND IS NEAR-DETERMINISTIC: acquired/hero 0.56 -> 1.47, slots filled
+0.56 -> 1.46 (20% -> 55%), and AUTHORED SPEC RUNES WORN PER HERO 0.16 ->
+0.49 (TRIPLED). THE DIFFICULTY HALF DID NOT MOVE: fixed n=200 depth 16.07 ->
+15.12 (-0.95, MDE 2.54), completions 3% -> 4%; rotated n=300 depth 14.89 ->
+15.21 (+0.32, MDE 2.39), completions 10% -> 16% vs a +/-7.7 band. OPPOSITE
+SIGNS, both far inside noise; ratio curve unchanged in shape (z1t8
+0.97->0.95, z1 boss 0.74->0.75). THIS INDEPENDENTLY REPRODUCES AD's CENTRAL
+CLAIM at a different magnitude — AD's rich-only arm measured -0.85 tiers,
+AE's shippable acquisition measured -0.95. ACQUISITION ALONE STILL MOVES
+NOTHING. THE ONE-SENTENCE ANSWER: the game did not get measurably easier —
+the starting rune tripled how much authored rune content a hero wears and
+bought no detectable difficulty change. Nothing was nerfed to offset it
+because there was nothing to offset.
+TWELVE-SPEC TABLE (rotated, per-spec n~100, vs AD's ~33): FLAT. AD's flagged
+Pyromancer 35->42 and Sharpshooter 25->19 DO NOT REPRODUCE (36->34 and
+25->26); no spec moves more than 3 points.
+VERIFIED: test_runes.gd 3,085 -> 3,248 checks, 0 failures (extended, not
+replaced) with three NEW alarms — every boolean-read field asserted to STILL
+be a boolean gate in battle.gd and to carry no rune value above 1; the
+reachable healing_received_mult sum asserted to stay above the clamp; the
+opening triple asserted to hold a spec rune within a wide 20-70% band (it
+measured 42%, matching the sim's 36-42%). NEW test_start_rune.gd 131 checks
+and test_start_rune_ui.gd 31 checks (the real map/party scenes: badge,
+colour, that it PULSES, list rows, picker offering the three SAVED
+candidates, spending clearing both, control showing nothing, nudge waiting
+behind the framing card). test_rune_battle.gd 91/0 (flaky White Flame check
+passed). test_run_harness.gd gates 1/2/3 PASS, rerun before any --run row
+was trusted. Purity: profile.json + relics.json byte-identical across a real
+DOD_SIM_RUN with the start rune ON and both AD arms armed; run_save.bin
+never created. Headless parse: all 10 scenes, 0 SCRIPT ERROR.
+REPORT BACK (designer's call, not taken): (a) SPEC-WEIGHT THE OPENING PICK —
+the ordinary roller puts a spec rune in the triple only 36-42% of the time
+and the bot takes one whenever there is one, so the ROLLER is the ceiling;
+this is why spec-worn landed at 0.49 and not the 1.18 projected, and a
+spec-weighted opening roughly doubles it for one line. (b) six entries are
+magnitude-proof, incl. the Deep Sight nobody had noticed. (c) difficulty
+does NOT need its own batch on this evidence; Wanderer x0.7 untouched.
+(d) treasure/Loot STILL outstanding since AC — five batches. (e) the
+magnitude pass is PREPARED AND RECORDED, not applied; if a second
+acquisition lever lands (rest-node rune offer, touched 2.3/run vs the shop's
+0.6, or a second elite cache) THE SWEEP MUST BE RE-RUN AT THAT ACQUISITION
+LEVEL — the same reason AE could not reuse AD's.
 BATCH AD (08-04) — THE RUNE ECONOMY, MEASURED. NO CONTENT CHANGE, and
 that is the finding, not a shortfall. Instrumentation + two sim-only
 experiment arms; runes.json is BYTE-UNCHANGED.

@@ -983,6 +983,65 @@ func roll_rune_candidates(member: Dictionary) -> Array:
 	return out
 
 
+# ---------- Batch AE: the starting rune ----------
+#
+# One pick of three per hero, dealt at SPEC CONFIRMATION rather than at the
+# draft, and that is not a quibble: specs are chosen AFTER the draft, and
+# the spec-scoped entries are the authored content that currently reaches
+# nobody — a rune rolled before a hero has a spec cannot be one of them.
+# Rolled through the ordinary roll_rune_candidates above, with its normal
+# scope eligibility and rarity weights (zone slot 1 leans common, an
+# appropriately modest opening gift), and resolved on the Party screen by
+# the same trophy-picker the elite cache already uses. No new gear
+# machinery exists in this batch.
+#
+# UNLIKE Batch AD's two arms this is SHIPPED CONTENT rather than an
+# experiment, so it is ON by default and is NOT gated on sim_run.
+# DOD_SIM_START_RUNE=off reproduces the pre-AE economy so control rows stay
+# reachable; post-AE Matrix rows carry a start= field and pre-AE rows do
+# not, which is the usual never-compare-across-batches rule.
+func start_rune_enabled() -> bool:
+	return OS.get_environment("DOD_SIM_START_RUNE") != "off"
+
+
+# Deal every un-granted hero their opening pick; returns how many were
+# dealt. The per-member marker is what makes "exactly once per run" a
+# property of the SAVED DATA rather than of the call site — it rides inside
+# the party dict, so a v5 save carries it with no version bump and no
+# migration, and neither a resumed run nor the debug spec swap (which
+# re-opens the spec screen) can ever deal a second one.
+func grant_start_runes() -> int:
+	if not start_rune_enabled():
+		return 0
+	var granted := 0
+	for member in party:
+		if bool(member.get("start_rune_granted", false)):
+			continue
+		var candidates: Array = roll_rune_candidates(member)
+		if candidates.is_empty():
+			continue  # DOD_SIM_RUNES=off — there is nothing to deal
+		# The source rides on the candidates so the Party screen can name
+		# the panel honestly when a start pick and an elite cache are owed
+		# at the same time. It is a label, not a mechanism.
+		for c in candidates:
+			c["source"] = "start"
+		member["start_rune_granted"] = true
+		member["rune_candidates"] = member.get("rune_candidates", []) + [candidates]
+		member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) + 1
+		granted += 1
+	return granted
+
+
+# Owed rune picks across the whole party. The map's Party button badge and
+# its first-map nudge both read this — a pick sitting silently on the Party
+# screen would defeat the point of choosing a front-loaded lever.
+func owed_rune_picks() -> int:
+	var n := 0
+	for member in party:
+		n += int(member.get("rune_picks_owed", 0))
+	return n
+
+
 func rotation_enabled() -> bool:
 	return OS.get_environment("DOD_ZONE_ROTATION") == "1"
 

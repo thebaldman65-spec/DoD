@@ -84,6 +84,15 @@ func _draw_list() -> void:
 		if pts > 0:
 			line += "    ● %d POINTS TO SPEND" % pts
 			btn.modulate = Color(1.0, 0.92, 0.55)
+		# Batch AE: the picker lives one click deeper, on the hero's own
+		# page, so the list has to say who is owed one — the map badge gets
+		# the player to this screen and would otherwise abandon them here.
+		# An owed pick outranks unspent points for the same reason it does
+		# on the map: the player already knows about points.
+		var owed: int = int(member.get("rune_picks_owed", 0))
+		if owed > 0 and not member.get("rune_candidates", []).is_empty():
+			line += "    ◆ %d RUNE%s TO CHOOSE" % [owed, "" if owed == 1 else "S"]
+			btn.modulate = Color(0.85, 0.6, 1.0)
 		btn.text = line
 		btn.custom_minimum_size = Vector2(460, 88)
 		btn.position = Vector2(410, 120 + i * 112)
@@ -742,12 +751,19 @@ func _draw_rune_pick(member: Dictionary) -> void:
 	box.add_theme_constant_override("separation", 8)
 	panel.add_child(box)
 	var title := Label.new()
-	title.text = "ELITE RUNE CACHE — choose one (%d owed)" % \
-		int(member.get("rune_picks_owed", 0))
+	var triple: Array = member["rune_candidates"][0]
+	# Batch AE: a start pick and an elite cache can be owed at once (the
+	# queue keeps them in order), so the heading names the one actually
+	# being resolved rather than assuming the cache.
+	var src := "elite"
+	if not triple.is_empty():
+		src = String(triple[0].get("source", "elite"))
+	title.text = "%s — choose one (%d owed)" % [
+		("AWAKENING RUNE" if src == "start" else "ELITE RUNE CACHE"),
+		int(member.get("rune_picks_owed", 0))]
 	title.add_theme_font_size_override("font_size", 15)
 	title.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
 	box.add_child(title)
-	var triple: Array = member["rune_candidates"][0]
 	for i in triple.size():
 		var rune: Dictionary = triple[i]
 		var b := Button.new()

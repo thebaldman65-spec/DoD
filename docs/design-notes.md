@@ -1081,3 +1081,66 @@ for one null result, check whether they multiply before assuming they
 compete. And write down what your instrument can see *before* you ask it
 a question, because an instrument that cannot resolve the answer will
 still cheerfully print one.
+
+## Batch AE — the lever went on, the magnitude did not
+
+Batch AD found a system worth ten tiers of depth that was switched off, and
+it deliberately did not choose which switch to throw. The designer chose:
+one starting rune, dealt at the awakening, where a run can still be saved
+by it and where a player will see it in the first ten minutes. That part is
+straightforward and it shipped.
+
+The interesting part is the half that did not ship.
+
+AD had measured a dose-response for rune magnitude and found it "detectable
+at ×1.5, unambiguous by ×2". Those numbers were measured with acquisition
+held at the `rich` arm — four slots open from tier one and a free rune at
+every zone half-mark, about three times what one starting rune delivers.
+A dose-response curve cannot be read across acquisition levels, so the
+whole sweep was re-run at the level this batch actually ships. That much
+was planned.
+
+What was not planned is that the re-run split. On the fixed party the
+answer was clean: ×2.5 moved depth by +3.86 tiers against a resolvable
+difference of 2.74, and ×1.5 and ×2 did not clear. On the rotated party —
+all twelve specs, the arm that exists because a fixed party can only ever
+roll sixteen of the forty-eight spec runes — the same ×2.5 moved depth by
++1.94 against a resolvable 2.52. Not a reversal. Not noise either. Just
+short, on an instrument that had been deliberately powered up until it
+could have seen the fixed-party result and then did not see it.
+
+The rule for what to do had been written down before any row was read, and
+it said stop. So the batch stopped, and `runes.json` is byte-unchanged for
+the second batch running.
+
+That is worth recording because the temptation to do otherwise was
+specific and strong. A perfectly respectable statistician would point out
+that both arms are individually significant at the five per cent level,
+that they are not distinguishable from one another, and that combining
+them gives +2.82 tiers with an interval nowhere near zero. All of that is
+true and all of it is in the changelog. It is also an analysis chosen after
+seeing the numbers, and choosing the analysis after seeing the numbers is
+exactly how batches AA and AB produced two "no effect" verdicts that could
+not have detected an effect. The threshold was set in advance precisely so
+that it could be inconvenient later. Being overruled is the designer's
+privilege; being quietly relaxed by the person who set it is not.
+
+Three things fell out of preparing the pass that never ran, and they are
+the batch's real gift to whoever runs it next. Five rune fields are read as
+booleans — `if deep_focus > 0` and a hard-coded 150 — so scaling them is a
+no-op in the data and would have been a lie in the tooltip; AD's own ×3,
+×6 and ×10 arms never actually multiplied them. Rounding collapses the
+sweep from five doses to three, because more than half the pool's benefit
+terms are a bare `1` that rounds to `2` at both ×1.5 and ×2. And a
+proportional cost on three runes that write `healing_received_mult` would
+have summed past the floor `heal_amount` clamps at, silently converting
+"heals are weaker" into "you cannot be healed at all" — a rule change
+wearing a magnitude change's clothes, which is the single most expensive
+kind of mistake a data pass can make, because nothing crashes.
+
+The habit worth keeping: when a result holds in one arm and not the other,
+the useful question is not "which arm do I believe" but "was the second arm
+capable of seeing it". If it was not, buy more samples. If it was, you have
+a finding about generality, not about magnitude — and a magnitude pass
+authored on the strength of one party composition would have been tuned to
+that party.

@@ -35,7 +35,8 @@ func _ready() -> void:
 	Run.debug_summon = false
 	Music.play("map")
 	_draw_screen()
-	_maybe_show_framing()
+	if not _maybe_show_framing():
+		_maybe_nudge_runes()
 
 
 # First-run orientation (Batch Z): a skippable framing card between the
@@ -43,9 +44,9 @@ func _ready() -> void:
 # dismissal so quitting mid-card re-shows it). Sims never load this scene
 # (RunSim walks Run directly), and the sim_run guard keeps it that way if
 # one ever does.
-func _maybe_show_framing() -> void:
+func _maybe_show_framing() -> bool:
 	if Run.floor_idx >= 0 or Run.sim_run or Profile.flag("run_framing_seen"):
-		return
+		return false
 	var dim := ColorRect.new()
 	dim.size = Vector2(1280, 720)
 	dim.color = Color(0, 0, 0, 0.72)
@@ -83,8 +84,22 @@ func _maybe_show_framing() -> void:
 	btn.pressed.connect(func():
 		Profile.set_flag("run_framing_seen")
 		dim.queue_free()
-		panel.queue_free())
+		panel.queue_free()
+		_maybe_nudge_runes())
 	vbox.add_child(btn)
+	return true
+
+
+# Batch AE: the opening rune pick is dealt on the spec screen and waits on
+# the Party screen, so the map is where a player first has the chance to
+# walk past it. The pulsing Party badge is the persistent affordance; this
+# is the push that makes the FIRST map unmissable. Per run, not once ever
+# (the card above is a tutorial, this is live state), and it chains off the
+# framing card's dismissal so the two never talk over each other.
+func _maybe_nudge_runes() -> void:
+	if Run.sim_run or Run.floor_idx >= 0 or Run.owed_rune_picks() < 1:
+		return
+	_toast("Each hero has a rune to choose — open the Party screen.")
 
 
 func _node_pos(f: int, i: int) -> Vector2:
@@ -169,14 +184,35 @@ func _draw_screen() -> void:
 	var unspent := 0
 	for member in Run.party:
 		unspent += member.get("talent_points", 0)
-	party_btn.text = "Party" if unspent == 0 else "Party  (%d pts!)" % unspent
+	# Batch AE: owed rune picks badge the same button unspent points do —
+	# the existing affordance, not a new one. A start pick that sits
+	# unnoticed on the Party screen would defeat the entire point of
+	# choosing a FRONT-LOADED lever, so when runes are owed the badge takes
+	# the rune purple (which outranks the talent gold) and the button
+	# breathes until the picks are spent.
+	var owed := Run.owed_rune_picks()
+	var badges := PackedStringArray()
 	if unspent > 0:
+		badges.append("%d pts!" % unspent)
+	if owed > 0:
+		badges.append("%d runes!" % owed)
+	party_btn.text = "Party" if badges.is_empty() \
+		else "Party  (%s)" % " · ".join(badges)
+	if owed > 0:
+		party_btn.modulate = Color(0.85, 0.6, 1.0)
+	elif unspent > 0:
 		party_btn.modulate = Color(1.0, 0.9, 0.45)
 	party_btn.custom_minimum_size = Vector2(150, 42)
 	party_btn.position = Vector2(20, 16)
 	party_btn.pressed.connect(Music.click)
 	party_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/party.tscn"))
 	add_child(party_btn)
+	if owed > 0:
+		# Bound to the button, so the redraw that clears the owed count
+		# takes the pulse with it.
+		var pulse := create_tween().bind_node(party_btn).set_loops()
+		pulse.tween_property(party_btn, "modulate:a", 0.5, 0.55)
+		pulse.tween_property(party_btn, "modulate:a", 1.0, 0.55)
 
 	var burger := MenuButton.new()
 	burger.text = "☰"
