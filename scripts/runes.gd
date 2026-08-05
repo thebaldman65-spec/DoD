@@ -186,6 +186,43 @@ static func generate(member: Dictionary, zone_slot: int) -> Dictionary:
 	return build(pick)
 
 
+# Batch AF: generate() above, restricted to the entries written for THIS
+# member's spec. The machinery is deliberately identical — rarity still
+# rolls on the zone slot's weights and an exhausted rarity still widens to
+# the whole subset — so the guaranteed candidate is an ORDINARY roll that
+# happens to draw from a smaller pool, not a forced Epic.
+#
+# Returns {} when the spec has no eligible entry (an unmet
+# requires_ability, or a member with no spec at all). That empty is the
+# caller's signal to fall back to an ordinary roll of three; it NEVER
+# substitutes a stat stick, because filler would satisfy the guarantee's
+# letter while defeating the thing it exists for.
+static func generate_spec(member: Dictionary, zone_slot: int) -> Dictionary:
+	var spec := String(member.get("spec", ""))
+	if spec == "":
+		return {}
+	var owned: Array = []
+	for r in member.get("runes", []):
+		owned.append(String(r["name"]))
+	var scope := "spec:%s" % spec
+	var pool := _scoped_ids(eligible_ids(member, _roll_rarity(zone_slot), owned), scope)
+	if pool.is_empty():
+		pool = _scoped_ids(eligible_ids(member, "", owned), scope)
+	if pool.is_empty():
+		return {}
+	return build(String(pool.pick_random()))
+
+
+# eligible_ids returns authored ids only (never a "tpl:" marker), so this
+# filter can read each entry's scope straight off the config.
+static func _scoped_ids(ids: Array, scope: String) -> Array:
+	var out: Array = []
+	for id in ids:
+		if String(config(id).get("scope", "")) == scope:
+			out.append(id)
+	return out
+
+
 static func _template_markers(member: Dictionary, owned_names: Array) -> Array:
 	var out: Array = []
 	for t in TEMPLATES:

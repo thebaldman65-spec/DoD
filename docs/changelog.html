@@ -5,6 +5,107 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-04 — Batch AF: the opening pick offers a rune for your spec</h2>
+<ul>
+<li><b>Why — the number that prompted it.</b> Batch AE shipped the starting rune and measured
+it delivering <b>0.49 spec runes worn per hero against the 1.18 projected</b>. AE's own
+diagnosis found the cause and it was not the lever: the ordinary roller put a spec-scoped
+rune among the three only <b>36–42%</b> of the time, and the sim's policy — which already
+<i>prefers</i> a spec candidate — took one at exactly that rate, i.e. whenever one was there.
+<b>The ceiling was the roller's hit rate, not the policy's.</b> A player sits under the same
+ceiling, and the opening pick is the most visible gear decision in a run. This batch raises
+the offer rate and changes nothing else.</li>
+
+<li><b>Guarantee, not weighting — and that was the design choice.</b> <b>The opening triple
+always contains one spec-scoped candidate</b> where the hero's spec pool has an eligible
+entry; the other two roll normally. A weighting nudges a probability and leaves the outcome
+mushy. A guarantee makes the opening pick a reliable <i>question</i> — do I take the rune
+written for my spec, or the generic one that is stronger right now? — and that question can
+only be asked if it is always on the table. One candidate, not two: a triple of spec runes
+is not a question, it is a menu.</li>
+
+<li><b>Only the opening pick.</b> <code>Run.roll_rune_candidates</code> is shared with the
+elite cache, so the guarantee is an <b>opt-in parameter defaulted off</b> and exactly one
+caller arms it. The elite cache and every other caller produce identical rolls. This is
+<i>asserted</i>, not assumed — the test seeds the global RNG and replays a verbatim copy of
+the pre-AF loop against the default path, because "it looks the same" proves nothing about a
+random roll, and it re-checks the call sites so a future batch cannot quietly arm it.</li>
+
+<li><b>What the guaranteed candidate is.</b> A normal roll <i>within</i> the spec-scoped
+subset — same rarity roll on the zone slot, same widen-on-exhaustion — <b>not a forced
+Epic</b>. Measured over 600 rolls per spec, the four specs that own an Epic draw it ~25% of
+the time, which is what an unconstrained draw over their four gives. The three candidates
+stay distinct, and the guaranteed one is shuffled into a random slot so its position is not
+a tell. <b>Fallback, silent and safe:</b> if the spec subset is empty — an unmet
+<code>requires_ability</code>, an exhausted set — the pick falls back to an ordinary roll of
+three. No error, no empty slot, no half-filled triple.</li>
+
+<li><b>What this batch is not.</b> Not a magnitude pass — <b><code>runes.json</code> is
+byte-unchanged for the third batch running</b>, and that is the intent, not an accident. The
+designer has closed the rune-magnitude question; the six magnitude-proof entries Batch AE
+catalogued are left exactly as they are. No change to the elite cache, the shop roll or any
+other rune source. No second acquisition lever. No sim policy change —
+<code>_pick_rune_candidate</code> already preferred a spec candidate, which is precisely why
+raising the offer rate is the whole intervention.</li>
+
+<li><b>Measured — the acquisition half, and it is near-deterministic.</b> Fixed party, n=200
+per row, control is <code>specopen=off</code> (AE's opening with the starting rune still on,
+so the pair isolates <i>this</i> change rather than re-measuring AE).
+<br><b>Offer rate 41% → 100%, with ZERO fallbacks</b> across 800 opening triples — no spec
+hit the fallback path, which is expected: all twelve specs have four entries and the only
+gates on them are core kit abilities.
+<br><b>Spec runes worn per hero at run end: 0.56 → 1.15</b> (AE measured 0.49; the control
+reproduces it). The pick was spec-scoped 100% of the time against the control's 41% — the
+policy's rate tracks the offer rate exactly, which is AE's diagnosis confirmed from the
+other side.
+<br><b>The finding worth keeping: this is a COMPOSITION change, not an acquisition-volume
+one.</b> Runes acquired per hero barely moved (1.62 → 1.67) and slots filled barely moved
+(1.58 → 1.64 of 2.7–2.8 available, 59% → 58%). What changed is what fills them — spec
+0.56 → 1.15 while class 0.16 → 0.10, universal 0.32 → 0.16 and stat sticks 0.54 → 0.23. The
+party does not wear more runes; it wears authored spec content where it used to wear
+filler.</li>
+
+<li><b>Measured — the difficulty half, reported as information.</b> There is no gate to fail
+here and no target to hit; nothing in this batch is conditional on the number.
+<b>Depth 15.89 → 17.14 = +1.25 tiers against a resolvable difference of 2.72</b> (n=200,
+80% power) — <b>it does not clear</b>, and is reported as movement inside noise, not as an
+effect. Completions 7% → 6% (resolvable 6.9 pts), ratio@z1t8 0.97 → 0.98, wipe median
+identical at z1 t11.0. Consistent with Batch AD's and AE's central claim that acquisition
+alone moves nothing detectable — and the composition finding above explains why: the party
+wears about the same number of runes, just better-targeted ones. <b>Nothing was compensated,
+because there is nothing measurable to compensate.</b></li>
+
+<li><b>Reported, not acted on.</b> <b>No spec rune in the pool is Common</b> — all 44 are
+Rare plus 4 Epics. So inside the spec subset the zone-slot-1 Common lean has almost nothing
+to bind on, and the guaranteed slot is always Rare-or-better where it used to be ~60%
+Common. "The opening gift stays modest" is delivered by the pool's own composition rather
+than by the rarity weighting; a designer who wants the opening gift smaller would author
+Common spec entries, not re-weight the roll. Also still outstanding: <code>treasure</code>
+/Loot, untouched since Batch AC, six batches.</li>
+
+<li><b>Flag and Matrix rows.</b> <code>DOD_SIM_SPEC_OPENING=off</code> reproduces AE's
+opening while leaving the starting rune itself ON. Like the AE flag and unlike Batch AD's
+two arms it is shipped content, so it is on by default and <b>not</b> gated on
+<code>sim_run</code> — a control a real build cannot reach is a control nobody can
+reproduce. Post-AF Matrix rows carry <code>specopen=</code>; pre-AF rows do not and are not
+comparable.</li>
+
+<li><b>Verified.</b> <code>test_start_rune.gd</code> extended <b>131 → 233 checks</b>, 0
+failures — AE's 131 pass unchanged (the run prints the AE and AF subtotals separately) and
+AF adds 102: the guarantee holding across <b>250 rolls for each of all twelve specs</b>, not
+the four a fixed party draws; the seeded-RNG replay proving the default path unchanged; the
+fallback <i>forced</i> two ways (a hero who already owns all four of their spec's runes, and
+a member with no spec) and asserted to yield three valid distinct candidates and no error;
+the Epic share bounded so rarity weighting cannot be bypassed; the guaranteed rune proven
+never to be a stat stick and never pinned to one slot; the flag's default, its off state, and
+its independence from <code>sim_run</code>. <code>test_start_rune_ui.gd</code> 31/0
+unchanged, <code>test_runes.gd</code> 3,248/0, <code>test_rune_battle.gd</code> 91/0.
+<code>test_run_harness.gd</code> gates 1/2/3 PASS, rerun before either <code>--run</code> row
+was trusted. Purity: <code>profile.json</code> and <code>relics.json</code> byte-identical
+across a real <code>DOD_SIM_RUN</code>, <code>run_save.bin</code> never created. Headless
+parse: all ten scenes, 0 SCRIPT ERROR.</li>
+</ul>
+
 <h2>2026-08-04 — Batch AE: the runes turn on, and the magnitude pass does not</h2>
 <ul>
 <li><b>Why.</b> Batch AD established that rune power and rune dilution were never

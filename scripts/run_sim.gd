@@ -128,6 +128,12 @@ static var rune_start_taken := 0       # picks resolved — one rune each
 static var rune_start_equipped := 0    # ...of those, worn (a slot was free)
 static var rune_start_spec := 0        # ...of those, spec-scoped
 static var rune_start_spec_avail := 0  # triples holding >=1 spec-scoped option
+# Batch AF: the guarantee's own failure count, measured from the OUTCOME
+# rather than from a signal the roller hands back. A triple dealt with the
+# guarantee on and no spec-scoped rune in it means the spec subset was
+# empty and the silent fallback fired — which is the property worth
+# watching, and it would also catch a seed that was rolled and then lost.
+static var rune_start_fallback := {}   # spec id -> triples that fell back
 static var slots_avail_sum := 0.0   # summed over heroes at run end
 static var slots_filled_sum := 0.0
 static var worn_kind := {}          # spec|class|universal|stick -> runes worn
@@ -724,12 +730,21 @@ static func _resolve_start_runes(run: Node) -> void:
 		var queue: Array = m.get("rune_candidates", [])
 		while int(m.get("rune_picks_owed", 0)) > 0 and not queue.is_empty():
 			var triple: Array = queue.pop_front()
-			var spec_scope := "spec:%s" % String(m.get("spec", ""))
+			var spec_id := String(m.get("spec", ""))
+			var spec_scope := "spec:%s" % spec_id
 			rune_start_offered += triple.size()
+			var had_spec := false
 			for c in triple:
 				if String(c.get("scope", "")) == spec_scope:
 					rune_start_spec_avail += 1
+					had_spec = true
 					break
+			# Batch AF: with the guarantee on, a triple without a spec rune
+			# can only mean the spec subset was empty and the fallback
+			# fired. Named per spec, because "which spec" is the whole
+			# report-back — a bare count would not say what to author.
+			if not had_spec and run.spec_opening_enabled():
+				rune_start_fallback[spec_id] = int(rune_start_fallback.get(spec_id, 0)) + 1
 			var rune: Dictionary = _pick_rune_candidate(m, triple)
 			var worn := 0
 			for r in m.get("runes", []):
@@ -1068,7 +1083,25 @@ static func _print_report(battle) -> void:
 		print("    opening pick was spec-scoped %.0f%% of the time; a spec rune was among the three %.0f%%" % [
 			100.0 * rune_start_spec / st, 100.0 * rune_start_spec_avail / st])
 		print("    (the bot PREFERS a spec candidate, so the first figure is an upper bound on a naive player;")
-		print("     the second is the roller's own hit rate — the number a spec-weighted opening would move)")
+		print("     the second is the OFFER RATE — AE measured 36-42% here and named it the ceiling)")
+		# Batch AF: the guarantee, and its escape hatch, reported together.
+		# The second number is the one that can quietly rot — a spec whose
+		# only entries grow a requires_ability nobody has would fall back
+		# forever and nothing else in this report would notice.
+		if OS.get_environment("DOD_SIM_SPEC_OPENING") != "off":
+			var fb := 0
+			for spec_id in rune_start_fallback:
+				fb += int(rune_start_fallback[spec_id])
+			if fb < 1:
+				print("    SPEC-GUARANTEED OPENING is ON: 0 fallbacks — every triple held a spec rune")
+			else:
+				var parts := PackedStringArray()
+				for spec_id in rune_start_fallback:
+					parts.append("%s %d" % [spec_id, int(rune_start_fallback[spec_id])])
+				print("    SPEC-GUARANTEED OPENING is ON: %d fallbacks (spec subset empty) — %s" % [
+					fb, "  ".join(parts)])
+		else:
+			print("    SPEC-GUARANTEED OPENING is OFF (DOD_SIM_SPEC_OPENING=off) — this row is AE's opening")
 	else:
 		print("  Start    OFF (DOD_SIM_START_RUNE=off) — this row reproduces the pre-AE economy")
 	if rune_granted > 0:
@@ -1136,11 +1169,14 @@ static func _print_report(battle) -> void:
 	# Batch AD adds econ=/power=/depth= — the arms a row was in, and the new
 	# PRIMARY metric with its spread. Pre-AD rows carry none of these three
 	# fields, which is the same never-compare-across-batches rule Batch Y's
-	# map=/diff=/choice= fields established.
-	print("Matrix row: route=%s  map=%s  diff=%s  econ=%s  start=%s  power=x%.2f  depth=%.2f+/-%.2f  ratio@z1t8=%s  completions=%.0f%%  wipe median tier=%s  choice=%.0f%%" % [
+	# map=/diff=/choice= fields established. Batch AF adds specopen=, so a
+	# row measured under the guaranteed opening is identifiable at a glance;
+	# pre-AF rows carry no such field and are not comparable.
+	print("Matrix row: route=%s  map=%s  diff=%s  econ=%s  start=%s  specopen=%s  power=x%.2f  depth=%.2f+/-%.2f  ratio@z1t8=%s  completions=%.0f%%  wipe median tier=%s  choice=%.0f%%" % [
 		route, map_mode, diff,
 		("rich" if OS.get_environment("DOD_SIM_RUNE_ECON") == "rich" else "normal"),
 		("off" if OS.get_environment("DOD_SIM_START_RUNE") == "off" else "on"),
+		("off" if OS.get_environment("DOD_SIM_SPEC_OPENING") == "off" else "on"),
 		power_mult, _mean(depth_reached),
 		_sd(depth_reached) / sqrt(maxf(float(runs_done), 1.0)),
 		r8_desc, 100.0 * completed / runs, med_desc,

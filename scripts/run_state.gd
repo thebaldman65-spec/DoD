@@ -966,12 +966,41 @@ func grant_rune(member: Dictionary) -> Dictionary:
 	return _apply_rune_power(Runes.build(String(spec_ids.pick_random())))
 
 
+# Batch AF: the guaranteed spec-scoped candidate, rolled through
+# Runes.generate_spec so it keeps the ordinary rarity weighting inside the
+# smaller pool. Empty under DOD_SIM_RUNES=off/stats — neither mode has an
+# authored pool to guarantee anything out of, so the guarantee correctly
+# becomes a no-op and those control rows stay reproducible.
+func _generate_spec_rune(member: Dictionary) -> Dictionary:
+	if runes_mode() != "full":
+		return {}
+	return _apply_rune_power(Runes.generate_spec(member, zone_idx + 1))
+
+
 # Elite pick-of-3 (Batch X): the three candidates are rolled AT DROP TIME
 # and stored on the member — they never reroll on a screen open, and they
 # ride the party dict into the save. Empty when runes are off.
-func roll_rune_candidates(member: Dictionary) -> Array:
+#
+# guarantee_spec (Batch AF) is OPT-IN AND DEFAULTED OFF, which is the whole
+# reason it is a parameter rather than a behaviour change: the elite cache
+# and every other caller keep rolling exactly what they rolled before, and
+# that is asserted in the tests rather than assumed. Only the opening pick
+# passes true. When it is on, one spec-scoped rune is seeded first and the
+# other two roll normally around it — they dedupe against the seed for
+# free, because the distinctness retry already scans `out`. The triple is
+# shuffled afterwards so the guaranteed rune does not always sit in slot 1,
+# which would turn a real choice into a positional tell.
+#
+# If the spec subset is empty the seed comes back {} and the loop simply
+# fills all three the ordinary way: a silent, safe fallback, never an error
+# and never a half-filled triple.
+func roll_rune_candidates(member: Dictionary, guarantee_spec := false) -> Array:
 	var out: Array = []
-	for i in 3:
+	if guarantee_spec:
+		var seed_rune := _generate_spec_rune(member)
+		if not seed_rune.is_empty():
+			out.append(seed_rune)
+	while out.size() < 3:
 		var rune := generate_rune(member)
 		if rune.is_empty():
 			return []
@@ -980,6 +1009,8 @@ func roll_rune_candidates(member: Dictionary) -> Array:
 				break
 			rune = generate_rune(member)
 		out.append(rune)
+	if guarantee_spec:
+		out.shuffle()
 	return out
 
 
@@ -989,11 +1020,13 @@ func roll_rune_candidates(member: Dictionary) -> Array:
 # draft, and that is not a quibble: specs are chosen AFTER the draft, and
 # the spec-scoped entries are the authored content that currently reaches
 # nobody — a rune rolled before a hero has a spec cannot be one of them.
-# Rolled through the ordinary roll_rune_candidates above, with its normal
-# scope eligibility and rarity weights (zone slot 1 leans common, an
-# appropriately modest opening gift), and resolved on the Party screen by
-# the same trophy-picker the elite cache already uses. No new gear
-# machinery exists in this batch.
+# Rolled through roll_rune_candidates above with its normal scope
+# eligibility and rarity weights, and resolved on the Party screen by the
+# same trophy-picker the elite cache already uses. No new gear machinery
+# exists in this batch. BATCH AF amends one line of this: the opening pick
+# is the one caller that arms the spec guarantee, so one of the three is
+# always a rune written for the hero's spec and the other two roll on the
+# ordinary zone-slot-1 table.
 #
 # UNLIKE Batch AD's two arms this is SHIPPED CONTENT rather than an
 # experiment, so it is ON by default and is NOT gated on sim_run.
@@ -1002,6 +1035,23 @@ func roll_rune_candidates(member: Dictionary) -> Array:
 # not, which is the usual never-compare-across-batches rule.
 func start_rune_enabled() -> bool:
 	return OS.get_environment("DOD_SIM_START_RUNE") != "off"
+
+
+# Batch AF: the opening triple always holds a rune written for the hero's
+# spec. AE measured the ordinary roller offering one only 36-42% of the
+# time and the sim's policy taking one at exactly that rate — the ceiling
+# was the ROLLER, not the policy, so raising the offer rate is the whole
+# intervention.
+#
+# DOD_SIM_SPEC_OPENING=off reproduces AE's opening (an ordinary roll of
+# three) while leaving the starting rune itself ON, which is what makes
+# this batch's own control row isolate THIS change rather than re-measuring
+# AE. Like the AE flag and unlike the AD arms it is SHIPPED CONTENT, so it
+# is on by default and NOT gated on sim_run — a control a real build cannot
+# reach is a control nobody can reproduce. Post-AF Matrix rows carry
+# specopen=; pre-AF rows do not, and are not comparable.
+func spec_opening_enabled() -> bool:
+	return OS.get_environment("DOD_SIM_SPEC_OPENING") != "off"
 
 
 # Deal every un-granted hero their opening pick; returns how many were
@@ -1017,7 +1067,7 @@ func grant_start_runes() -> int:
 	for member in party:
 		if bool(member.get("start_rune_granted", false)):
 			continue
-		var candidates: Array = roll_rune_candidates(member)
+		var candidates: Array = roll_rune_candidates(member, spec_opening_enabled())
 		if candidates.is_empty():
 			continue  # DOD_SIM_RUNES=off — there is nothing to deal
 		# The source rides on the candidates so the Party screen can name

@@ -4,6 +4,52 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The opening pick offers a rune for your spec (Batch AF) — 2026-08-04
+
+**The lever was never weak; the thing it was allowed to offer was.**
+Batch AE shipped the starting rune and measured it delivering 0.49 spec
+runes per hero against the 1.18 projected. The obvious reading — the
+lever is too small, make it bigger — was the wrong one, and AE's own
+diagnosis said so: the ordinary roller put a spec-scoped rune among the
+three only 36–42% of the time, and the sim's policy took one at exactly
+that rate. The policy already preferred a spec candidate. It was taking
+one *whenever there was one*. The ceiling was the roller's hit rate, and
+no amount of magnitude on the entries would have moved a number that was
+really about how often they were on the table.
+
+That is worth writing down because three batches went the other way.
+AA, AB and AD all asked whether the authored pool was strong enough, and
+AD's honest answer — power and dilution are two factors of one product,
+each masking the other — still framed the fix as a magnitude question.
+Raising an offer rate beat three batches of arguing about magnitudes,
+and it cost one opt-in parameter.
+
+**Guarantee, not weight.** A weighting would have nudged a probability
+and left the outcome mushy — sometimes your spec rune is there, usually
+it is, and the player never quite learns what to expect. A guarantee
+makes the opening pick a reliable *question*: do I take the rune written
+for my spec, or the generic one that is stronger right now? That
+question is worth putting in front of a player in their first ten
+minutes, and it can only be asked if it is always on the table. The same
+reasoning is why the guarantee is one candidate and not two — a triple
+of spec runes is not a question, it is a menu.
+
+**Opt-in and defaulted off, because the roller is shared.** The elite
+cache calls the same function, and a guarantee that leaked into it would
+have been invisible until a Matrix row drifted several batches from now.
+The parameter defaults to off and exactly one caller arms it; the test
+asserts that by seeding the RNG and replaying the pre-AF loop against
+the default path, because "it looks the same" proves nothing about a
+random roll.
+
+**The fallback is silent on purpose.** If a hero's spec has no eligible
+entry — an unmet `requires_ability`, a spec whose set is exhausted — the
+pick falls back to an ordinary roll of three. No error, no empty slot,
+no half-filled triple. A guarantee that announces its own failure to the
+player is worse than one that quietly degrades to the thing that came
+before it, and the sim reports the fallback count so the failure is
+visible to the designer instead.
+
 ## The tester's workbench (Batch AC) — 2026-08-04
 
 **A debug tool that can reach a shop makes some summaries lies, and the

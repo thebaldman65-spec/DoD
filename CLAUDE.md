@@ -72,7 +72,12 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   arms above it is NOT gated on Run.sim_run, because it is SHIPPED
   CONTENT rather than an experiment arm; a control row has to be
   reachable from real play or the comparison is unreproducible. Post-AE
-  Matrix rows carry start=; pre-AE rows do not).
+  Matrix rows carry start=; pre-AE rows do not),
+  DOD_SIM_SPEC_OPENING=off (Batch AF — drops the GUARANTEE that the
+  opening triple holds a spec-scoped rune, reproducing AE's opening
+  WITH THE STARTING RUNE STILL ON; that is what makes AF's control
+  isolate AF rather than re-measure AE. Shipped content, so default ON
+  and NOT gated on sim_run. Post-AF Matrix rows carry specopen=).
   RunSim
   (scripts/run_sim.gd statics, Run injected Events-style) owns setup/map
   walk/report; battle.gd hooks: _ready begin+note_battle_start, _check_end
@@ -174,6 +179,82 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-08-04)
+BATCH AF (08-04) — THE OPENING PICK OFFERS A RUNE FOR YOUR SPEC. One
+change, small on purpose. runes.json BYTE-UNCHANGED for the THIRD batch
+running, and that is the intent — THE DESIGNER HAS CLOSED THE RUNE-
+MAGNITUDE QUESTION. No multiplier pass, now or later; AE's six magnitude-
+proof entries (Comet, Binding Souls, Last Rites, Flayed Mind, Quick
+Spring, Deep Sight) are left exactly as they are, they only mattered as a
+caveat on a pass that is no longer coming.
+WHY: AE measured 0.49 spec runes worn/hero against the 1.18 projected and
+its own diagnosis found the cause — the ordinary roller put a spec rune
+among the three only 36-42% of the time and the policy took one at
+EXACTLY that rate. THE CEILING WAS THE ROLLER, NOT THE POLICY.
+STAGE 1 — GUARANTEE, NOT WEIGHTING. The opening triple ALWAYS holds one
+spec-scoped candidate where the spec pool has an eligible entry; the other
+two roll normally. A weighting nudges a probability and leaves the outcome
+mushy; a guarantee makes the opening pick a reliable QUESTION (my spec's
+rune, or the generic one that is stronger right now?). One candidate not
+two — a triple of spec runes is a menu, not a question.
+MACHINERY: `Runes.generate_spec(member, zone_slot)` = generate() with the
+pool restricted to `spec:<id>` — SAME rarity roll, SAME widen-on-
+exhaustion, so it is an ORDINARY roll in a smaller pool, NOT a forced
+Epic. Returns {} when the subset is empty and NEVER substitutes a stat
+stick (filler would satisfy the guarantee's letter and defeat its point).
+`Run._generate_spec_rune` wraps it through the AD power choke point and
+returns {} under DOD_SIM_RUNES=off/stats (no authored pool = the guarantee
+is correctly a no-op, so those control rows still reproduce).
+THE SHARED-ROLLER RULE: `roll_rune_candidates(member, guarantee_spec :=
+false)` — OPT-IN, DEFAULTED OFF. The elite cache (run_sim + battle.gd,
+both `roll_rune_candidates(looter)`) rolls byte-identically; EXACTLY ONE
+caller arms it, `grant_start_runes`. The seeded rune goes in FIRST so the
+other two dedupe against it for free, then the triple is SHUFFLED (a fixed
+position would turn a real choice into a positional tell). Fallback is
+SILENT: empty subset -> ordinary roll of three, no error, no empty slot.
+FLAG: DOD_SIM_SPEC_OPENING=off reproduces AE's opening WITH THE STARTING
+RUNE STILL ON — that is what makes AF's own control isolate THIS change
+instead of re-measuring AE. Shipped content, so ON by default and NOT
+gated on sim_run (like the AE flag, unlike AD's arms). Matrix rows carry
+specopen=; pre-AF rows do not.
+MEASURED (fixed party, n=200/row, control=specopen=off). THE ACQUISITION
+HALF LANDED: offer rate 41% -> 100% with ZERO FALLBACKS across 800
+triples; opening pick spec-scoped 41% -> 100%; SPEC RUNES WORN PER HERO
+0.56 -> 1.15 (AE measured 0.49; the control reproduces it).
+**THE FINDING WORTH KEEPING: THIS IS A COMPOSITION CHANGE, NOT AN
+ACQUISITION-VOLUME ONE.** Acquired/hero 1.62 -> 1.67 and slots filled
+1.58 -> 1.64 (59% -> 58%) — both flat. What moved is WHAT FILLS THEM:
+spec 0.56 -> 1.15 while class 0.16 -> 0.10, universal 0.32 -> 0.16, stat
+sticks 0.54 -> 0.23. The party does not wear MORE runes, it wears authored
+spec content where it wore filler.
+DIFFICULTY HALF, INFORMATION ONLY (no gate, no target, nothing
+conditional): depth 15.89 -> 17.14 = +1.25 tiers vs a RESOLVABLE
+DIFFERENCE OF 2.72 — DOES NOT CLEAR. Completions 7% -> 6% (resolvable 6.9
+pts), ratio@z1t8 0.97 -> 0.98, wipe median IDENTICAL z1 t11.0. Reproduces
+AD's and AE's central claim that acquisition alone moves nothing
+detectable, and the composition finding explains WHY. NOTHING COMPENSATED.
+REPORTED NOT ACTED ON: (a) **NO SPEC RUNE IN THE POOL IS COMMON** — all 44
+are Rare + 4 Epics, so inside the spec subset the zone-1 Common lean has
+nearly nothing to bind on and the guaranteed slot is always Rare-or-better
+where it used to be ~60% Common. "The opening gift stays modest" comes
+from the POOL'S COMPOSITION, not the rarity weighting; a smaller opening
+gift means authoring Common spec entries, not re-weighting the roll.
+(b) treasure/Loot STILL outstanding since AC — six batches.
+VERIFIED: test_start_rune.gd 131 -> 233 checks, 0 failures (EXTENDED, and
+it prints the AE/AF subtotals separately so "AE's 131 still pass" is a
+number you can read off the output). The 102 AF checks: the guarantee held
+across 250 rolls for EACH OF ALL TWELVE SPECS (not the four a fixed party
+draws); the default path proven unchanged by SEEDING THE GLOBAL RNG and
+replaying a verbatim pre-AF loop against it (plus call-site asserts, so a
+future batch cannot quietly arm the elite cache); the fallback FORCED two
+ways (a hero owning all four of his spec's runes, and a member with no
+spec) and asserted to give three valid distinct candidates and no error;
+the Epic share bounded 8-45% over 600 rolls so rarity cannot be bypassed;
+never a stat stick, never pinned to one slot. test_start_rune_ui.gd 31/0
+UNCHANGED, test_runes.gd 3,248/0, test_rune_battle.gd 91/0 (flaky White
+Flame passed). test_run_harness gates 1/2/3 PASS before either --run row
+was trusted. Purity: profile.json + relics.json byte-identical across a
+real DOD_SIM_RUN; run_save.bin never created. Headless parse: all 10
+scenes, 0 SCRIPT ERROR.
 BATCH AE (08-04) — THE STARTING RUNE SHIPS; THE MAGNITUDE PASS DOES NOT,
 and the refusal is the second deliverable. runes.json is BYTE-UNCHANGED for
 the second batch running.
