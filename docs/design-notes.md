@@ -1407,3 +1407,42 @@ that competes on conditions.
 It also means the completion rate is the wrong instrument here. It reads 0%
 on both sides and cannot tell them apart; depth and wipe median can. When
 the class batches land, those two are the pair to watch.
+
+## The duplicate rune triple — retry-and-hope is not a dedupe
+
+The pick-of-3 rune offer could show the same rune twice, about one triple in
+a hundred. The mechanism is worth writing down because the shape recurs.
+
+The roller drew each candidate independently and, on a collision, rerolled
+up to four times — then appended the result **unchecked**. Two independent
+ways to lose. Every reroll could collide, which on a small per-rarity pool
+is not remote. And the check sat at the *top* of the retry loop, so the
+final reroll was never tested at all: four checks covering five draws, the
+fifth appended blind. Either alone would have been enough.
+
+The deeper problem is that rejection sampling was being used as a
+correctness mechanism. It is a fine way to make something *likely*; it
+cannot make something *guaranteed*, because the failure branch always
+exists and someone has to decide what happens there. Here the failure branch
+had quietly been decided as "ship the duplicate."
+
+The fix was to stop sampling and start excluding: the names already in the
+triple ride the same channel the owned pouch already used, so the pool a
+candidate is drawn from does not contain its siblings. A rune already in the
+offer is exactly as unavailable as one already worn — the same question, so
+the same answer. That makes the duplicate unreachable rather than unlikely,
+and it deleted the retry loop rather than tuning its bound.
+
+The test story is the interesting half. Batch AF had frozen a **verbatim
+copy of the old loop** as a reference and asserted the default path matched
+it on a shared seed. The intent was right — prove the new `guarantee_spec`
+parameter changed nothing for existing callers — but the implementation
+pinned the bug in place: any correct fix to the roller necessarily broke it,
+because the reference *was* the defect. A frozen transcription is a sharp
+instrument for "did this change by accident" and a trap for "should this
+change on purpose"; it needs to move when the thing it mirrors is
+deliberately corrected, and the commit that moves it is the one that has to
+justify why. What was genuinely missing was simpler: the default path had no
+distinctness assertion of its own. Only the guaranteed path checked, which
+is why this showed up as an intermittent failure on one spec instead of a
+flat statement that the roller was wrong.

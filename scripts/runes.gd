@@ -167,10 +167,20 @@ static func _roll_rarity(zone_slot: int) -> String:
 # back to the Common stat family — an empty offer list is a silent
 # regression, not a design statement. Dedupe against the pouch is by
 # final display name (call-site retry loops keep working on top).
-static func generate(member: Dictionary, zone_slot: int) -> Dictionary:
+# exclude_names (Batch AI fix): names that are unavailable for this draw
+# even though the hero does not own them — in practice, the candidates
+# already sitting in the triple being rolled. It rides the SAME channel as
+# the owned pouch because it is the same question: a rune already in the
+# offer is exactly as unavailable as one already worn. Threading it here
+# makes a multi-draw roll a draw WITHOUT REPLACEMENT, which is what the
+# callers always wanted; the alternative — roll and retry on a collision —
+# is only probabilistically right and fails outright on a small pool.
+static func generate(member: Dictionary, zone_slot: int,
+		exclude_names: Array = []) -> Dictionary:
 	var owned: Array = []
 	for r in member.get("runes", []):
 		owned.append(String(r["name"]))
+	owned.append_array(exclude_names)
 	var rarity := _roll_rarity(zone_slot)
 	var pool := eligible_ids(member, rarity, owned)
 	if rarity == "common":
@@ -238,18 +248,38 @@ static func _template_markers(member: Dictionary, owned_names: Array) -> Array:
 # (60/30/10 with magnitude scaling ×1/2/3) — DOD_SIM_RUNES=stats runs on
 # exactly this. A named rarity pins magnitude AND price (the Common floor
 # inside full mode); noun pins the template (pool draws).
-static func template_rune(class_key: String, rarity_key := "", noun := "") -> Dictionary:
+static func template_rune(class_key: String, rarity_key := "", noun := "",
+		exclude_names: Array = []) -> Dictionary:
 	var pool := TEMPLATES.filter(
 		func(t): return not (t["stat"] == "max_resource" and class_key == "warrior"))
-	var template: Dictionary = pool.pick_random()
+	var template: Dictionary
+	var rk := rarity_key
+	if exclude_names.is_empty():
+		# The original order — pool pick, then the rarity roll — kept byte
+		# for byte, because every caller but the triple roller lands here
+		# and RNG ordering is what a sim baseline is made of.
+		template = pool.pick_random()
+		if rk == "":
+			var roll := randf()
+			rk = "common" if roll < 0.6 else ("rare" if roll < 0.9 else "epic")
+	else:
+		# Drawing without replacement: a stat stick's NAME is its rarity and
+		# its noun together, so the rarity has to be rolled before the noun
+		# pool can be filtered. A noun already spent at this rarity is out;
+		# the same noun at another rarity is a different rune and stays in.
+		if rk == "":
+			var roll2 := randf()
+			rk = "common" if roll2 < 0.6 else ("rare" if roll2 < 0.9 else "epic")
+		var prefix: String = RARITIES[rk]["prefix"]
+		var open_pool := pool.filter(func(t): return not exclude_names.has(
+			"%s Rune of %s" % [prefix, t["noun"]]))
+		# Every noun spent at this rarity is the exhausted case; six nouns
+		# against at most two exclusions means it cannot happen today.
+		template = (open_pool if not open_pool.is_empty() else pool).pick_random()
 	if noun != "":
 		for t in TEMPLATES:
 			if t["noun"] == noun:
 				template = t
-	var rk := rarity_key
-	if rk == "":
-		var roll := randf()
-		rk = "common" if roll < 0.6 else ("rare" if roll < 0.9 else "epic")
 	var rar: Dictionary = RARITIES[rk]
 	var value = template["base"] * rar["mult"]
 	var shown: int = int(value * 100) if template["base"] is float else int(value)

@@ -188,6 +188,22 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-08-06)
+FIX (08-06) — THE RUNE TRIPLE COULD HOLD A DUPLICATE (~1 in 100). The
+pick-of-3 roller drew each candidate independently, retried 4x on a
+collision, then APPENDED UNCHECKED — and the check sat at the TOP of the
+retry loop, so 4 checks covered 5 draws and the 5th went in blind. Fixed
+by DRAWING WITHOUT REPLACEMENT: `generate_rune(member, exclude_names)` ->
+`Runes.generate(member, slot, exclude_names)` folds the names already in
+the triple into the SAME list the owned pouch uses, so the pool cannot
+contain a sibling. `Runes.template_rune` takes exclude_names too (stats
+mode); with it EMPTY the RNG order is byte-identical, so no other caller
+moved. 0 dupes in 4000 triples, both paths. NOTE: the DEFAULT path had the
+same bug, so its roll sequence DID move (fewer draws, smaller pool) — the
+Batch AF test that pinned it against a verbatim copy of the OLD loop was
+re-transcribed to the corrected one, and a distinctness assertion added
+(the default path never had one, which is why only the guaranteed path
+caught this, intermittently). test_start_rune is now 239 checks.
+
 BATCH AI (08-06) — TALENT TREE STRUCTURE. Every tree is 3 lanes x 7
 MUTUALLY EXCLUSIVE ROWS + a capstone row (row 8) = 24 nodes. A row holds
 one node per lane, the player picks ONE, the other two grey out for good

@@ -5,6 +5,33 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-06 — Fix: a rune triple could offer the same rune twice</h2>
+<ul>
+<li><b>The pick-of-3 rune offer could contain a duplicate</b> — roughly one triple in a
+hundred, which surfaced as an intermittent test failure on the Warden and, in play, as an
+awakening or elite cache that presented the same choice twice. The roller drew each
+candidate independently and, on a collision, rerolled up to four times — then
+<b>appended the result unchecked</b>. Two ways to lose: every reroll could collide, and
+the last reroll was never tested at all (the check sat at the top of the retry loop, so
+four checks covered five draws). On a small per-rarity pool both were reachable.</li>
+
+<li><b>Fixed by drawing without replacement instead of rolling and hoping.</b> The names
+already in the triple now ride the same exclusion channel the owned pouch already used —
+a rune sitting in the offer is exactly as unavailable as one already worn — so the pool a
+candidate is picked from cannot contain its siblings. A duplicate is not merely unlikely,
+it is unreachable. Measured 0 duplicates in 4,000 triples on both the guaranteed and the
+ordinary path, where the old roller produced them on both.</li>
+
+<li><b>The default path changed too, deliberately.</b> It had the same defect (it just
+needed three unlucky draws rather than a seeded one), so the fix reaches it, and its roll
+sequence moves: fewer random numbers, because the wasted retries are gone, and a smaller
+pool for draws two and three. The Batch AF test that pinned this path against a
+<i>verbatim copy of the old loop</i> was re-transcribed to the corrected one — keeping the
+old copy frozen would have asserted the bug had to stay forever. Its distinctness
+assertion is new: the default path never had one, which is why only the guaranteed path
+ever caught this, and only sometimes.</li>
+</ul>
+
 <h2>2026-08-06 — Batch AI: talent tree structure — seven rows, eight decisions</h2>
 <ul>
 <li><b>Every tree is now seven mutually exclusive ROWS plus a capstone row.</b> A row holds

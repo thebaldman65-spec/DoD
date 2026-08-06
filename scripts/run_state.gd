@@ -1002,13 +1002,17 @@ func runes_mode() -> String:
 # Takes the MEMBER dict (Batch X) so eligibility can read the spec, the
 # trophies, and the owned pouch. Returns {} when runes are off — every
 # call site skips empties. The pool lives in data/runes.json (Runes).
-func generate_rune(member: Dictionary) -> Dictionary:
+# exclude_names: names this draw may not return even though the hero does
+# not own them — the candidates already in the triple being rolled. Empty
+# for every ordinary single-rune caller (shop, elite cache), so their
+# behaviour is untouched.
+func generate_rune(member: Dictionary, exclude_names: Array = []) -> Dictionary:
 	match runes_mode():
 		"off":
 			return {}
 		"stats":
-			return Runes.template_rune(String(member["key"]))
-	return _apply_rune_power(Runes.generate(member, zone_idx + 1))
+			return Runes.template_rune(String(member["key"]), "", "", exclude_names)
+	return _apply_rune_power(Runes.generate(member, zone_idx + 1, exclude_names))
 
 
 # The single choke point for the power arm: generate_rune is the only path
@@ -1070,7 +1074,7 @@ func _generate_spec_rune(member: Dictionary) -> Dictionary:
 # that is asserted in the tests rather than assumed. Only the opening pick
 # passes true. When it is on, one spec-scoped rune is seeded first and the
 # other two roll normally around it — they dedupe against the seed for
-# free, because the distinctness retry already scans `out`. The triple is
+# free, because every draw excludes whatever is already in `out`. The triple is
 # shuffled afterwards so the guaranteed rune does not always sit in slot 1,
 # which would turn a real choice into a positional tell.
 #
@@ -1084,13 +1088,18 @@ func roll_rune_candidates(member: Dictionary, guarantee_spec := false) -> Array:
 		if not seed_rune.is_empty():
 			out.append(seed_rune)
 	while out.size() < 3:
-		var rune := generate_rune(member)
+		# Draw WITHOUT REPLACEMENT: everything already in the triple is
+		# excluded from the pool this draw picks out of, so a duplicate is
+		# not merely unlikely, it is unreachable. (This used to roll and
+		# retry four times on a collision and then append the fourth
+		# result unchecked — which on a small per-rarity pool emitted the
+		# same rune twice roughly one triple in a hundred.)
+		var taken: Array = []
+		for c in out:
+			taken.append(String(c["name"]))
+		var rune := generate_rune(member, taken)
 		if rune.is_empty():
 			return []
-		for attempt in 4:
-			if not out.any(func(c): return c["name"] == rune["name"]):
-				break
-			rune = generate_rune(member)
 		out.append(rune)
 	if guarantee_spec:
 		out.shuffle()

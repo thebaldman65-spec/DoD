@@ -361,20 +361,30 @@ func _triple_legal(triple: Array, m: Dictionary) -> bool:
 # The direct assertion the brief asked for, and it has to be direct: the
 # roll is random, so "it looks the same" proves nothing. Seeding the global
 # RNG makes the sequence reproducible, and the comparison runs against a
-# VERBATIM copy of the pre-AF loop written out below. Same seed, same
-# generate_rune, same dedupe retry — if the default path consumed one extra
-# random number, or consumed them in a different order, these diverge.
+# VERBATIM copy of the default loop written out below — if the default path
+# consumed one extra random number, or consumed them in a different order,
+# these diverge.
+#
+# THE REFERENCE WAS RE-TRANSCRIBED (Batch AI). It used to be a copy of the
+# PRE-AF loop, which rolled and retried on a collision and then appended the
+# fourth result UNCHECKED — so on a small per-rarity pool it emitted the
+# same rune twice, about one triple in a hundred. That is now fixed by
+# drawing without replacement, which necessarily changes the default path:
+# fewer random numbers (no wasted retries) and a smaller pool for draws 2
+# and 3. Freezing the old copy here would have meant asserting the bug had
+# to stay forever, so the reference moved with the fix and the distinctness
+# assertion below is new — it is the check whose absence let the bug live
+# on this path unseen while the guaranteed path caught it intermittently.
 
-func _preaf_roll(run: Node, member: Dictionary) -> Array:
+func _default_roll(run: Node, member: Dictionary) -> Array:
 	var out: Array = []
 	for i in 3:
-		var rune: Dictionary = run.generate_rune(member)
+		var taken: Array = []
+		for c in out:
+			taken.append(String(c["name"]))
+		var rune: Dictionary = run.generate_rune(member, taken)
 		if rune.is_empty():
 			return []
-		for attempt in 4:
-			if not out.any(func(c): return c["name"] == rune["name"]):
-				break
-			rune = run.generate_rune(member)
 		out.append(rune)
 	return out
 
@@ -389,11 +399,17 @@ func _af_other_callers_unchanged(run: Node) -> void:
 		var before: Array = []
 		seed(20260804)
 		for i in 40:
-			before.append(_preaf_roll(run, m))
+			before.append(_default_roll(run, m))
 		var same := true
+		var distinct := 0
 		for i in before.size():
 			var a: Array = before[i]
 			var b: Array = after[i]
+			var names := {}
+			for c in b:
+				names[String(c["name"])] = true
+			if names.size() == b.size():
+				distinct += 1
 			if a.size() != b.size():
 				same = false
 				break
@@ -401,7 +417,12 @@ func _af_other_callers_unchanged(run: Node) -> void:
 				if String(a[j]["name"]) != String(b[j]["name"]):
 					same = false
 					break
-		ok(same, "%s: the default roll diverged from the pre-AF loop on a shared seed" % spec)
+		ok(same, "%s: the default roll diverged from its written-out reference on a shared seed" % spec)
+		# The default path deduped by retry-and-hope until Batch AI and had
+		# no assertion of its own; only the guaranteed path's zero-tolerance
+		# check ever caught it, and only sometimes.
+		ok(distinct == after.size(), "%s: %d default triples contained a duplicate" % [
+			spec, after.size() - distinct])
 
 	# The elite cache is the caller that matters, so assert it AT ITS CALL
 	# SITES rather than trusting the default. A future batch adding a bare
