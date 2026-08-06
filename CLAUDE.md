@@ -188,6 +188,110 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-08-06)
+BATCH AK (08-06) — SWORDMASTER KIT CORRECTION + ALL 24 NODES. The first of
+the four class batches AI promised. One spec only; the other ten trees and
+enemy tuning are UNTOUCHED.
+KIT: opening three = Overpower, Pommel Strike, GUARD CHANGE. Spec pool =
+Sweeping Strikes, SHATTERPOINT, Lunge, Execute. This is AH's own flag being
+answered — Guard Change is the ONLY stance swap in the game and four nodes
+read the stance, so trimming it made a quarter of the tree inert.
+Shatterpoint only accelerates a Break he reaches otherwise, so it is the
+safe piece to move the other way. Guard Change's def moved OUT of
+`trimmed_kit_ability` into the live kit and Shatterpoint's moved IN —
+EXACTLY ONE DEF EACH, which is the whole point of the resolver stack.
+Guard Change is now in NO pool (the class pool has excluded it since AH:
+`stance` defaults aggressive on every unit). AH's 3-per-kit / 5-trims
+counts are unchanged; test_batch_ah's trim dict was re-pointed IN PLACE
+with the reason in the file.
+MAGNITUDES: a node is a ROW now, not one of three ranks — priced against
+the two doors it closes, which came out 3-4x the old rank-1 values across
+the board. Stances 3%->12%, Sword Mastery 3%->12% parry, Killing Edge
+4%->15%, Bracing +8->+30 Con, Dominant 5%->15%/debuff, Precision
+5%->20%, Seasoned Fighter node 3%->15%, No Quarter 15->45 Rage, Overwhelm
+3%->8%/debuff, Punishment 15%->60%, Tempo 10%->30%, Off Balance 5%->20%,
+Pressure Point +8->+30 BD, High Guard 25%/1turn -> 40%/2turns (status
+turns 2->3; the +1 is the hero-turn tick offset). EVERY ID SURVIVES, so
+saved picks migrate and NO SAVE VERSION MOVES (still v6).
+THREE NODES CHANGED WHAT THEY DO: (1) SUNDER GUARD re-pointed from
+Shatterpoint (which §1 makes earnable) to GUARD CHANGE — 40 BD to EVERY
+living enemy instead of 15 to the single nearest-to-Breaking mark; the old
+target survives as a BONUS (+40 BD on Shatterpoint if he owns it). (2)
+SWORDSMANSHIP: flat parry -> a perfect Guard Change grants +25% parry for
+2 turns. (3) OFF BALANCE + PUNISHMENT stopped being an exclusive pair (they
+are rows 7 and 6 now, both reachable) — with Punishment taken, Off Balance
+WIDENS the window (Exposed/Crippled count) instead of stacking a second
+"+% vs Broken". Also: RIPOSTE answers with a free OVERPOWER not a Strike,
+and OPPORTUNIST answers a PARRY as well as a whiff — same answer from two
+lanes, so A PARRY FIRES ONE COUNTER, not two (log names the payer;
+Untouchable's Pommel still wins in Defensive).
+NEW PAYLOAD KEYS in apply_payload, both opt-in and both arrays of full
+payloads: `also` = extra payloads applied alongside, each with its OWN
+`condition` (one node, two halves — Sunder Guard's owns_ability hook, Off
+Balance's has_node widening); `upgrade` = payloads applied INSTEAD of
+granting when the new_ability is already in cfg["abilities"].
+CORRECTION TO THE BATCH DOC: it asked for `owns_ability` on the Lunge,
+Shatterpoint AND Execute checks. IT IS THE WRONG INSTRUMENT FOR TWO OF
+THEM — a learned node's own grant is itself in `Talents.ability_names()`,
+so after taking sm_lunge, owns_ability(member,"Lunge") is true regardless
+of where Lunge came from. The only honest question is "was it in the kit
+when the tree ran", and cfg["abilities"] is what knows that (earned picks
+go on BEFORE the tree at both call sites — the AH ordering fix). Only
+Shatterpoint's hook uses owns_ability, because no node grants it.
+Seasoned Fighter's Lunge half is a CAST-SITE name check, not a stat, so a
+Lunge earned AFTER the node still benefits.
+UPGRADE PATHS: Lunge and Execute sit in the spec pool AND the tree. Node
+on an unowned ability = grant; on an owned one = upgrade. Lunge -> 15 Rage
++ BOTH Exposed and Crippled whatever the stance (`lunge_upgraded`).
+Execute -> threshold 20%->35% and FREE vs a Broken target
+(`execute_upgraded`). `_eff_cost` took an OPTIONAL target arg for that;
+with no target it reads "a Broken enemy is alive", which is what lights
+the button, and _player_turn NARROWS the pick to Broken targets when he
+cannot pay full price so the two checks can never disagree.
+NEW FIELDS: guard_change_bd, sunder_guard_bd, swordsmanship_parry (REPLACES
+pommel_parry_bonus), off_balance_wide, lunge_upgraded, execute_upgraded.
+RUNE REPAIRED IN PASSING — THE RUNE OF THE STILL WRIST. It wrote
+`pommel_parry_bonus` and advertised "a perfect Pommel Strike's parry
+blessing", which stopped existing in BATCH AH when Pommel's perfect became
+the boss Stun; it has been half-dead for two batches and the rename would
+have killed it. Re-pointed to `swordsmanship_parry` + desc names Guard
+Change. THAT IS WHY THE FIELD IS ADDITIVE ON TOP OF THE ABILITY'S OWN 10%
+(node 0.15, rune 0.05, so the sm_swordsmanship scale reads {base 10, step
+15} = 25 rendered): a max() would leave the rune silently inert alone.
+Alone 15% / node 25% / both 30%. runes.json is NO LONGER byte-unchanged —
+this is a dead-field repair, NOT the magnitude pass the designer closed in
+AF.
+VERIFIED: NEW test_batch_ak.gd 524 checks / 0 failures, stable 3/3 (kit
+swap + single-def property, every pool entry of all 12 specs and 4 classes
+still resolving, all 24 nodes' id/row/lane/magnitude AND tooltip — two
+hand-written places — both conditional halves firing/dark/inert-on-empty-
+ctx, both upgrade paths in BOTH acquisition orders, and a live battle for
+the BD spread, the parry spike, the parry counter, Execute's pricing and
+the upgraded Lunge). Its live half spawns battles WITHOUT autoplay so
+nothing acts on its own, and forces determinism with parry_chance=1.0 +
+`no_cover` (the Sharpshooter's existing miss BYPASS) rather than retrying.
+Regression: test_batch_ai 2042/0, test_batch_ah 4284/0, test_batch_ah_battle
+62/0, test_runes 3130/0, test_start_rune 239/0, test_start_rune_ui 31/0,
+run-harness gates 1/2/3 PASS. 10 scenes, 0 SCRIPT ERROR.
+KNOWN-BAD, NOT OURS: test_rune_battle 91/1 (the Inferno chip check).
+It reproduces 3 OF 3 ON UNMODIFIED HEAD in a clean worktree — CLAUDE.md's
+"intermittent" note is out of date, it is a standing defect in that check.
+MEASURED AND FLAGGED, NOT NERFED — SUNDER GUARD IS THE BIGGEST NODE IN THE
+TREE BY A DISTANCE. Fixed smoke lineup, 60 battles, that node alone forced:
+his BD/battle 158 -> 649 and the PARTY's Breaks/battle 1.33 -> 5.43 (4.1x
+both). His own damage share FALLS 29% -> 23% — he spends the turns pivoting
+instead of swinging, and what he is actually doing is opening windows for
+the other three. That is the node as the batch specified it (40 BD to every
+enemy on a 0-Rage 1cd button), so it ships as written. Smoke lineup = NO
+difficulty signal (Batch R); these are kit-mechanics ratios only.
+NO DIFFICULTY MEASUREMENT WAS RUN, deliberately: this is a content
+re-author of ONE spec, and the sim's damage-share instrument reads a fixed
+four-hero party, so a single-spec re-tune has no honest control row. The
+sim smoke test (./sim.sh) is a kit smoke test only and carries no
+difficulty signal (Batch R).
+GOTCHA: `timeout` IS NOT ON THIS SHELL (no coreutils). A headless loop
+written as `timeout 60 godot ...` returns EMPTY and a `grep -c "SCRIPT
+ERROR"` over it reads 0 — a FALSE PASS that looks exactly like a clean
+parse. Use Godot's own `--quit-after N` instead.
 FIX (08-06) — THE RUNE TRIPLE COULD HOLD A DUPLICATE (~1 in 100). The
 pick-of-3 roller drew each candidate independently, retried 4x on a
 collision, then APPENDED UNCHECKED — and the check sat at the TOP of the

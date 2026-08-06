@@ -165,144 +165,203 @@ const LANE_TREES := {
 				"description": "Three brutal strikes, each building\n10 bloodloss. If the target dies, Rampage\nimmediately recasts on another enemy."}}},
 	],
 	"swordmaster": [
-		# Purpose-designed lanes (Batch F, 07-30). Batch AI re-cut the tiers
-		# into 7 exclusive rows + a capstone row. Every id
-		# survives and re-specs in place, so saved ranks migrate. Duelist
-		# and Poise were the same lane twice (all parry and defence), while
-		# NOTHING in the tree touched Break — the kit's engine since Batch
-		# E. So all parry lives in Poise now, and Duelist became BREAKER:
-		# Break generation and Broken-window exploitation.
+		# Purpose-designed lanes (Batch F, 07-30); Batch AI re-cut the tiers
+		# into 7 exclusive rows + a capstone row; BATCH AK re-authored all
+		# 24 nodes for that structure. Every id survives and re-specs in
+		# place, so saved ranks migrate. Duelist and Poise were the same
+		# lane twice (all parry and defence), while NOTHING in the tree
+		# touched Break — the kit's engine since Batch E. So all parry
+		# lives in Poise now, and Duelist became BREAKER: Break generation
+		# and Broken-window exploitation.
+		#
+		# BATCH AK, the shape of the re-author. The rows are exclusive, so
+		# a number that was one of three ranks is now the whole node and
+		# has to be worth a row; every magnitude below is priced against
+		# the two doors it closes, not against its own old rank 1. Three
+		# nodes changed what they DO rather than how much:
+		#   - Sunder Guard pointed at Shatterpoint, an ability §1 makes
+		#     earnable, so it now points at the Guard Change §1 guarantees
+		#     him — and pays extra if he draws Shatterpoint anyway.
+		#   - Swordsmanship was a flat number he owned; it is now a spike
+		#     he earns on the skill check.
+		#   - Punishment and Off Balance used to be an exclusive pair in
+		#     one lane. Split across rows 6 and 7 they are both reachable,
+		#     and two "damage versus Broken" nodes stacking would be
+		#     redundant rather than interesting — so the second one widens
+		#     what counts as a window instead of adding to the same number.
 		# --- Lane A: Blade — damage, crit, and the Aggressive stance. ---
 		{"id": "sm_agg_stance", "name": "Aggressive Stance", "ranks": 1, "lane": "Blade", "row": 1,
 			"desc": "The Aggressive stance grants an additional {v}% damage dealt.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"seasoned_off_bonus": 0.03}}},
+			"scale": {"step": 12},
+			"payload": {"stat": {"seasoned_off_bonus": 0.12}}},
+		# Batch AK: the grant is unchanged, but Lunge also sits in the spec
+		# pool — so a hero who earned it there gets the node's UPGRADE
+		# instead of a second copy of the same button.
 		{"id": "sm_lunge", "name": "Lunge", "ranks": 1, "lane": "Blade", "row": 2,
-			"desc": "New ability: Lunge — 35 damage; applies Exposed in Aggressive stance, Cripple in Defensive (25 Rage, 3.5 int).",
+			"desc": "New ability: Lunge — 35 damage; applies Exposed in Aggressive stance, Cripple in Defensive (25 Rage, 3.5 int). If Lunge was already earned, this UPGRADES it instead: 15 Rage, and it applies BOTH Exposed and Crippled whatever the guard.",
 			"payload": {"new_ability": {"display_name": "Lunge", "cost": 25,
 				"damage": 35, "pressure": 20, "delay": 3.5, "anim": "attack02",
 				"resource_gain": 10,
 				"perfect_id": "", "perfect_text": "Initiative cost 3.0 instead",
-				"description": "A committed thrust. In Aggressive\nstance it Exposes the target; in\nDefensive it Cripples them (3 turns).\nBuilds 10 Rage."}}},
+				"description": "A committed thrust. In Aggressive\nstance it Exposes the target; in\nDefensive it Cripples them (3 turns).\nBuilds 10 Rage."},
+				"upgrade": [
+					{"stat": {"lunge_upgraded": 1}},
+					{"ability": "Lunge", "set": {"cost": 15,
+						"description": "A committed thrust that Exposes AND\nCripples the target for 3 turns —\nwhatever guard he holds.\nBuilds 10 Rage."}},
+				]}},
 		# Re-spec (was Keen Edge, flat +2% crit; same id, so saved ranks
 		# carry): keyed to the stance — Aggressive gets an identity past
 		# its flat +15%.
 		{"id": "sm_keen_edge", "name": "Killing Edge", "ranks": 1, "lane": "Blade", "row": 3,
 			"desc": "+{v}% critical strike chance while in the Aggressive stance.",
-			"scale": {"step": 4},
+			"scale": {"step": 15},
 			"payload": {"stat": {"killing_edge_ranks": 1}}},
 		{"id": "sm_precision", "name": "Precision Strikes", "ranks": 1, "lane": "Blade", "row": 4,
 			"desc": "+{v}% critical strike chance against Dazed, Crippled, and Exposed targets.",
-			"scale": {"step": 5},
+			"scale": {"step": 20},
 			"payload": {"stat": {"precision_ranks": 1}}},
+		# The Lunge half is an ability hook resolved at the CAST site, not
+		# at apply time: Lunge is both this lane's row-2 node and a spec
+		# pool entry, so a Lunge earned AFTER this node was taken has to
+		# benefit too — which a stat written once at spawn could not do.
 		{"id": "sm_seasoned_node", "name": "Seasoned Fighter", "ranks": 1, "lane": "Blade", "row": 5,
-			"desc": "Lunge and Overpower gain +{v}% critical strike chance.",
-			"scale": {"step": 3},
+			"desc": "Overpower gains +{v}% critical strike chance — and Lunge too, if he has it.",
+			"scale": {"step": 15},
 			"payload": {"stat": {"blade_crit_ranks": 1}}},
 		# Re-spec (was Momentum, a flat +3% damage dial): pairs with
 		# Precision Strikes — one crits into debuffs, this damages into
 		# them.
 		{"id": "sm_momentum_sm", "name": "Overwhelm", "ranks": 1, "lane": "Blade", "row": 6,
 			"desc": "+{v}% damage for every debuff on the target.",
-			"scale": {"step": 3},
+			"scale": {"step": 8},
 			"payload": {"stat": {"overwhelm_ranks": 1}}},
-		# Re-spec (was Deep Thrust, +5 Pommel damage; ranks 3 → 2 — the
-		# loader refunds the over-cap rank): pays for pressing the button
-		# the whole spec turns on.
+		# Re-spec (was Deep Thrust, +5 Pommel damage): pays for pressing
+		# the button the whole spec turns on.
 		{"id": "sm_deep_thrust", "name": "Tempo", "ranks": 1, "lane": "Blade", "row": 7,
 			"desc": "Switching stance grants +{v}% damage for 1 turn.",
-			"scale": {"step": 10},
+			"scale": {"step": 30},
 			"payload": {"stat": {"tempo_ranks": 1}}},
 		# --- Lane B: Poise — the defensive half, and ALL the parry
 		# (Swordsmanship, Sword Mastery and Riposte move in from Duelist:
 		# everything that answers being hit lives here). ---
 		{"id": "sm_def_stance", "name": "Defensive Stance", "ranks": 1, "lane": "Poise", "row": 1,
 			"desc": "The Defensive stance blocks an additional {v}% damage taken.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"seasoned_def_bonus": 0.03}}},
+			"scale": {"step": 12},
+			"payload": {"stat": {"seasoned_def_bonus": 0.12}}},
 		# Moved from Duelist: parry belongs with the guard.
 		{"id": "sm_sword_mastery", "name": "Sword Mastery", "ranks": 1, "lane": "Poise", "row": 2,
 			"desc": "+{v}% parry chance.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"parry_bonus": 0.03}}},
-		# Re-spec (was Footwork, +3% armor; ranks 2 → 3): Defensive stance
-		# comes to mean "hard to Break", not just "takes less damage".
+			"scale": {"step": 12},
+			"payload": {"stat": {"parry_bonus": 0.12}}},
+		# Re-spec (was Footwork, +3% armor): Defensive stance comes to mean
+		# "hard to Break", not just "takes less damage".
 		{"id": "sm_footwork", "name": "Bracing", "ranks": 1, "lane": "Poise", "row": 3,
 			"desc": "+{v} Constitution while in the Defensive stance.",
-			"scale": {"step": 8},
+			"scale": {"step": 30},
 			"payload": {"stat": {"bracing_ranks": 1}}},
-		# Moved from Duelist.
-		# Batch AH re-pointed this node in place: Pommel Strike's perfect is
-		# now the boss Stun, so the parry buff it used to deepen no longer
-		# exists. The mechanic was ALREADY shared with Guard Change's
-		# perfect, so the node keeps its id (saved ranks migrate) and its
-		# stat name; only the wording moves to the source that still pays.
+		# Re-spec (Batch AK; the id and the Guard Change site both survive
+		# from Batch AH, only the shape of the reward changed): a flat
+		# parry number he owned becomes a spike he earns on the skill
+		# check. Same total parry over a fight only if he keeps hitting
+		# perfects — which is the point.
+		# `swordsmanship_parry` is ADDITIVE on top of the perfect's own 10%,
+		# which is what the scale's base/step spell out: 10 from the ability,
+		# 15 from this node, 25 rendered. It is additive rather than a
+		# replacement because the Rune of the Still Wrist pays into the same
+		# field — a max() would leave that rune silently inert on its own.
 		{"id": "sm_swordsmanship", "name": "Swordsmanship", "ranks": 1, "lane": "Poise", "row": 4,
-			"desc": "A perfect Guard Change grants +{v}% more parry chance.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"pommel_parry_bonus": 0.05}}},
+			"desc": "A PERFECT Guard Change grants +{v}% parry chance for 2 turns, instead of the usual 10%.",
+			"scale": {"base": 10, "step": 15},
+			"payload": {"stat": {"swordsmanship_parry": 0.15}}},
 		{"id": "sm_high_guard", "name": "High Guard", "ranks": 1, "lane": "Poise", "row": 5,
-			"desc": "Take 25% less damage for 1 turn after parrying an attack.",
+			"desc": "Take 40% less damage for 2 turns after parrying an attack.",
 			"payload": {"stat": {"high_guard": 1}}},
 		# Moved from Duelist: the parry payoff sits behind the parry lane.
+		# Batch AK upgraded the counter from a basic Strike to a free
+		# Overpower — it reuses Opportunist's recast machinery, so the two
+		# parry answers in this tree finally speak the same language.
 		{"id": "sm_riposte", "name": "Riposte", "ranks": 1, "lane": "Poise", "row": 6,
-			"desc": "Counter Attack: immediately answer every parry with a Strike.",
+			"desc": "Counter Attack: immediately answer every parry with a free Overpower.",
 			"payload": {"stat": {"counter_attacks": 1}}},
-		# Re-spec (was Composure, flat -4% damage taken; ranks 2 → 1): the
-		# node that makes a parry build viable — without it the whole
-		# cluster is dead weight against archers and casters.
+		# Re-spec (was Composure, flat -4% damage taken): the node that
+		# makes a parry build viable — without it the whole cluster is dead
+		# weight against archers and casters. Unchanged in Batch AK: it is
+		# binary and already large.
 		{"id": "sm_composure", "name": "Deflection", "ranks": 1, "lane": "Poise", "row": 7,
 			"desc": "The Swordmaster's parry works against RANGED attacks too — arrows and spells alike.",
 			"payload": {"stat": {"deflection": 1}}},
 		# --- Lane C: Breaker (was Duelist) — fill their meter, then live
 		# in the window. This lane did not exist before. ---
-		# Re-spec (was Flourish, -5 Sweeping Strikes cost; ranks 2 → 3).
+		# Re-spec (was Flourish, -5 Sweeping Strikes cost).
 		{"id": "sm_flourish", "name": "Pressure Point", "ranks": 1, "lane": "Breaker", "row": 1,
-			"desc": "Pommel Strike deals +{v} more Break damage.",
-			"scale": {"step": 8},
+			"desc": "Pommel Strike deals +{v} Break damage.",
+			"scale": {"step": 30},
 			"payload": {"stat": {"pressure_point_ranks": 1}}},
-		# Re-spec (was Blade Dance, +2% parry — parry's home is Poise now).
+		# Re-spec (Batch AK; was "Shatterpoint +8 Break damage"). The old
+		# node pointed at an ability he may never draw. This one points at
+		# the ability the kit correction GUARANTEES him, and the `also`
+		# half pays extra if he draws the other anyway.
 		{"id": "sm_blade_dance", "name": "Sunder Guard", "ranks": 1, "lane": "Breaker", "row": 2,
-			"desc": "Shatterpoint deals +{v} more Break damage.",
-			"scale": {"step": 8},
-			"payload": {"stat": {"sunder_guard_ranks": 1}}},
+			"desc": "Guard Change deals {v} Break damage to EVERY enemy (up from 15 to one). If he also owns Shatterpoint, that deals +40 Break damage as well.",
+			"scale": {"step": 40},
+			"payload": {"stat": {"guard_change_bd": 40},
+				"also": [
+					{"condition": {"owns_ability": "Shatterpoint"},
+						"stat": {"sunder_guard_bd": 40}},
+				]}},
 		# Moved from Poise: debuff-fed armor is pressure bookkeeping.
 		{"id": "sm_dominant", "name": "Dominant Presence", "ranks": 1, "lane": "Breaker", "row": 3,
-			"desc": "Armor value is increased by {v}% for every debuff the Swordmaster applies this battle.",
-			"scale": {"step": 5},
+			"desc": "Armor value is increased by {v}% for every debuff the Swordmaster has applied this battle.",
+			"scale": {"step": 15},
 			"payload": {"stat": {"dominant_ranks": 1}}},
-		# Moved from Duelist.
+		# Moved from Duelist. Batch AK widened the trigger: a parried blow
+		# is as much an opening as a whiffed one, and it makes the node
+		# live in the Defensive guard the rest of the tree keeps selling.
 		{"id": "sm_opportunist", "name": "Opportunist", "ranks": 1, "lane": "Breaker", "row": 4,
-			"desc": "When an enemy attack misses the Swordmaster, he counter attacks with Overpower (free).",
+			"desc": "When an enemy attack MISSES the Swordmaster or is PARRIED, he counter attacks with Overpower (free).",
 			"payload": {"stat": {"opportunist": 1}}},
 		# Re-spec (was Perfect Form, a Swordsmanship duplicate): closes the
 		# loop — the Break refunds Rage toward the Overpower you want to
 		# spend inside the window you just opened.
 		{"id": "sm_perfect_form", "name": "No Quarter", "ranks": 1, "lane": "Breaker", "row": 5,
 			"desc": "Breaking an enemy grants the Swordmaster {v} Rage.",
-			"scale": {"step": 15},
+			"scale": {"step": 45},
 			"payload": {"stat": {"no_quarter_ranks": 1}}},
-		# Re-spec (was +6 Overpower damage). Exclusive fork with Off
-		# Balance: pile everything into Overpower, or spread it wide.
+		# Re-spec (was +6 Overpower damage). No longer exclusive with Off
+		# Balance — they sit in different rows now, and taking both widens
+		# the window instead of doubling the number.
 		{"id": "sm_punish", "name": "Punishment", "ranks": 1, "lane": "Breaker", "row": 6,
 			"desc": "Overpower deals +{v}% damage against Broken targets.",
-			"scale": {"step": 15},
+			"scale": {"step": 60},
 			"payload": {"stat": {"punishment_ranks": 1}}},
-		# Re-spec (was Guarded Frame, +5% max health; ranks 2 → 3): the
-		# broad half of the fork.
+		# Re-spec (was Guarded Frame, +5% max health): the broad half. The
+		# `also` half is the cross-row condition — with Punishment taken it
+		# widens what counts as a window rather than stacking onto the same
+		# "versus Broken" number.
 		{"id": "sm_guarded", "name": "Off Balance", "ranks": 1, "lane": "Breaker", "row": 7,
-			"desc": "All the Swordmaster's damage is increased by {v}% against Broken targets.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"off_balance_ranks": 1}}},
+			"desc": "All the Swordmaster's damage is increased by {v}% against Broken targets. If Punishment was taken, it applies against Exposed and Crippled targets too.",
+			"scale": {"step": 20},
+			"payload": {"stat": {"off_balance_ranks": 1},
+				"also": [
+					{"condition": {"has_node": "sm_punish"},
+						"stat": {"off_balance_wide": 1}},
+				]}},
 		# --- Capstones (row 8): take ONE, no lane requirement ---
+		# Batch AK: Execute also sits in the spec pool, so a hero who
+		# earned it there gets the UPGRADE instead of a second copy.
 		{"id": "sm_execute", "name": "Execute", "ranks": 1, "lane": "Blade", "row": 8,
 			"capstone": true,
-			"desc": "New ability: Execute — 55 damage / 50 BD; usable against targets below 20% health or Broken; a perfect guarantees a crit (30 Rage, 2.0 int, 3cd).",
+			"desc": "New ability: Execute — 55 damage / 50 BD; usable against targets below 20% health or Broken; a perfect guarantees a crit (30 Rage, 2.0 int, 3cd). If Execute was already earned, this UPGRADES it instead: the threshold rises to 35% health, and it costs NO Rage against a Broken target.",
 			"payload": {"new_ability": {"display_name": "Execute", "cost": 30,
 				"damage": 55, "pressure": 50, "delay": 2.0, "anim": "attack03",
 				"cooldown": 3,
 				"perfect_id": "", "perfect_text": "Guaranteed critical strike",
-				"description": "End them. Only usable against targets\nbelow 20% health — or Broken ones."}}},
+				"description": "End them. Only usable against targets\nbelow 20% health — or Broken ones."},
+				"upgrade": [
+					{"stat": {"execute_upgraded": 1}},
+					{"ability": "Execute", "set": {
+						"description": "End them. Usable against targets below\n35% health — or Broken ones, and\nagainst a Broken target it is FREE."}},
+				]}},
 		# Re-spec (was +5% parry / -5% damage taken): the Defensive stance
 		# becomes a genuine wall against melee — and every parry a stun.
 		{"id": "sm_untouchable", "name": "Untouchable", "ranks": 1, "lane": "Poise", "row": 8,
@@ -1799,6 +1858,19 @@ static func apply_from_tree(cfg: Dictionary, tree_nodes: Array,
 #
 # "condition" is THE one read site for payload gating (Batch AI §5): a
 # payload that names a condition does nothing at all unless it holds.
+#
+# Batch AK added two sub-payload lists, because a node can have two halves
+# that answer different questions:
+#   "also"    — extra payloads applied alongside this one, each carrying its
+#               OWN condition. That is how a node says "and if you took X
+#               as well, this widens" without a second node id.
+#   "upgrade" — extra payloads applied INSTEAD of granting, when the hero
+#               already owns the new_ability from an earned pick. It cannot
+#               be written as an `also` + owns_ability condition, because a
+#               learned node's own grant is itself in ability_names() — the
+#               only honest question is "was it already in the kit when the
+#               tree ran", and the abilities list is what knows that. Both
+#               call sites apply earned picks BEFORE the tree, deliberately.
 static func apply_payload(cfg: Dictionary, payload: Dictionary, ranks: int,
 		ctx: Dictionary = {}) -> void:
 	if not condition_met(payload.get("condition", {}), ctx):
@@ -1813,6 +1885,9 @@ static func apply_payload(cfg: Dictionary, payload: Dictionary, ranks: int,
 		# Never double-grant (the Batch 31 testing aid pre-grants these).
 		if not cfg["abilities"].any(func(a): return a.display_name == nab.display_name):
 			cfg["abilities"] = cfg["abilities"] + [nab]
+		else:
+			for up in payload.get("upgrade", []):
+				apply_payload(cfg, up, ranks, ctx)
 	elif payload.has("grant_ability"):
 		# The ability def lives in Classes (single source shared with the
 		# DOD_SIM_ABILITIES hook), not inline in the node.
@@ -1829,3 +1904,8 @@ static func apply_payload(cfg: Dictionary, payload: Dictionary, ranks: int,
 					ab.set(field, payload["set"][field])
 				if payload.has("status_turns") and not ab.applies_status.is_empty():
 					ab.applies_status["turns"] = payload["status_turns"]
+	# The node's second half, if it has one. Each entry is a full payload
+	# and re-enters at the top, so its own `condition` is read at the same
+	# single site — no second gate anywhere.
+	for extra in payload.get("also", []):
+		apply_payload(cfg, extra, ranks, ctx)

@@ -159,7 +159,9 @@ const SPEC_POOLS := {
 	# Warrior.
 	"berserker": ["Blood Price", "Battle Shout", "Rampage"],
 	"warden": ["War Stomp", "Interpose", "Hold the Line", "Retaliation"],
-	"swordmaster": ["Sweeping Strikes", "Guard Change", "Lunge", "Execute"],
+	# Batch AK: Guard Change came OUT of this pool and back into the opening
+	# three; Shatterpoint went the other way.
+	"swordmaster": ["Sweeping Strikes", "Shatterpoint", "Lunge", "Execute"],
 	# Mage.
 	"pyromancer": ["Flame Shield", "Firestorm"],
 	"cryomancer": ["Rime", "Shatter"],
@@ -371,15 +373,18 @@ static func trimmed_kit_ability(display_name: String) -> Ability:
 				"applies_status": {"id": "dazed", "turns": 3},
 				"perfect_id": "", "perfect_text": "+25% crit chance on the second swing",
 				"description": "Two broad cuts that leave the target\nDazed for 3 turns. Builds 10 Rage."})
-		"Guard Change":
-			# Not a free action on purpose: turn-less actions need engine
-			# support, so the swap does double duty — stance, pressure,
-			# refuel — at a bargain 1.5 initiative. The 1cd stops spam.
-			return Ability.make({"display_name": "Guard Change", "cost": 0,
-				"special": "guard_change", "delay": 1.5, "anim": "attack01",
-				"cooldown": 1, "resource_gain": 15,
-				"perfect_id": "", "perfect_text": "+10% parry chance for 2 turns",
-				"description": "Shift to the other stance mid-flow.\nThe pivot presses the opening: 15 BD\nto the enemy nearest to Breaking.\nBuilds 15 Rage."})
+		# Batch AK: Guard Change went BACK into the opening three and
+		# Shatterpoint took its place here. Guard Change is the only stance
+		# swap in the game, and four nodes of the Swordmaster's tree read
+		# the stance — trimming it turned a quarter of his tree inert.
+		# Shatterpoint only accelerates a Break he reaches by other means,
+		# so it is the safe piece to make earnable.
+		"Shatterpoint":
+			return Ability.make({"display_name": "Shatterpoint", "cost": 30,
+				"damage": 20, "pressure": 40, "delay": 3.0, "anim": "attack03",
+				"cooldown": 4,
+				"perfect_id": "", "perfect_text": "+15 bonus BD",
+				"description": "Find the flaw and split it — his\nheaviest Break blow. If this hit\nBREAKS the target, he instantly casts\nOverpower on them for free."})
 	return null
 
 
@@ -685,7 +690,7 @@ const SPEC_INFO := {
 		"blurb": "Protector of the weak — shields allies with their own body."},
 	"swordmaster": {"name": "Swordmaster", "constitution": 120, "archetype": "Bruiser", "passive": "seasoned",
 		"max_hp": 165, "armor": 0.22, "parry_chance": 0.12,
-		"passive_desc": "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +15% damage dealt, +10% damage taken.\nDEFENSIVE — 15% less damage taken, -10% damage dealt.\nStarts each battle Aggressive; the earnable\nGuard Change swaps.",
+		"passive_desc": "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +15% damage dealt, +10% damage taken.\nDEFENSIVE — 15% less damage taken, -10% damage dealt.\nStarts each battle Aggressive; Guard Change swaps.",
 		"blurb": "Precision and technique — presses hard, then weathers the storm."},
 	# The Pyromancer and Cryomancer are mirror-image glass cannons: armoured
 	# in their own element, soft to the opposite — a fire warband and a frost
@@ -814,10 +819,16 @@ static func spec_abilities(spec: String) -> Array:
 					"applies_status": {"id": "stunned", "turns": 1},
 					"perfect_id": "", "perfect_text": "The Stun lands even on a boss.",
 					"description": "A skull-ringing bash with a keen 25%\ncrit chance: ALWAYS Stuns for 1 turn.\nBuilds 10 Rage.\nBosses resist Stun until Broken —\nunless the strike is PERFECT."}),
-				Ability.make({"display_name": "Shatterpoint", "cost": 30, "damage": 20,
-					"pressure": 40, "delay": 3.0, "anim": "attack03", "cooldown": 4,
-					"perfect_id": "", "perfect_text": "+15 bonus BD",
-					"description": "Find the flaw and split it — his\nheaviest Break blow. If this hit\nBREAKS the target, he instantly casts\nOverpower on them for free."}),
+				# Batch AK put Guard Change back in the opening three (see
+				# trimmed_kit_ability for why) — not a free action on
+				# purpose: turn-less actions need engine support, so the
+				# swap does double duty (stance, pressure, refuel) at a
+				# bargain 1.5 initiative. The 1cd stops spam.
+				Ability.make({"display_name": "Guard Change", "cost": 0,
+					"special": "guard_change", "delay": 1.5, "anim": "attack01",
+					"cooldown": 1, "resource_gain": 15,
+					"perfect_id": "", "perfect_text": "+10% parry chance for 2 turns",
+					"description": "Shift to the other stance mid-flow.\nThe pivot presses the opening: 15 BD\nto the enemy nearest to Breaking.\nBuilds 15 Rage."}),
 			]
 		"pyromancer":
 			# Burn-centric kit (07-16 rework; the core Magic Bolt becomes

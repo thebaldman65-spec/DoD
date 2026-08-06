@@ -76,7 +76,7 @@ const STATUS_INFO := {
 	# the label follows the charges rather than the ability that stopped
 	# granting them — the block log names this as its source.
 	"shield_charges": ["Interpose", "IP", Color(0.65, 0.72, 0.85), "The next attacks against this unit\nare BLOCKED (one charge each)."],
-	"high_guard": ["High Guard", "HG", Color(0.55, 0.80, 0.95), "Takes 25% less damage."],
+	"high_guard": ["High Guard", "HG", Color(0.55, 0.80, 0.95), "Takes 40% less damage."],
 	"tempo": ["Tempo", "T+", Color(0.4, 0.9, 1.0), "The pivot's momentum: bonus damage\nfor one turn (granted by switching\nstance)."],
 	"killing_edge": ["Killing Edge", "KE", Color(0.95, 0.5, 0.35), "The Aggressive guard hunts the\nopening: bonus critical chance while\nthe stance holds."],
 	"bracing": ["Bracing", "Br", Color(0.55, 0.80, 0.95), "The raised guard is harder to Break:\nbonus Constitution while the Defensive\nstance holds."],
@@ -1965,7 +1965,7 @@ func _update_talent_chips() -> void:
 		if h.killing_edge_ranks > 0:
 			if h.stance == "aggressive":
 				if not h.has_status("killing_edge"):
-					var ke_pct: int = 4 * h.killing_edge_ranks
+					var ke_pct: int = 15 * h.killing_edge_ranks
 					var ke_info: Array = STATUS_INFO["killing_edge"]
 					h.add_status("killing_edge", ke_info[0], "+%d%%" % ke_pct,
 						ke_info[2], -1, ke_info[3])
@@ -1976,7 +1976,7 @@ func _update_talent_chips() -> void:
 		if h.bracing_ranks > 0:
 			if h.stance == "defensive":
 				if not h.has_status("bracing"):
-					var br_con: int = 8 * h.bracing_ranks
+					var br_con: int = 30 * h.bracing_ranks
 					var br_info: Array = STATUS_INFO["bracing"]
 					h.add_status("bracing", br_info[0], "+%d" % br_con,
 						br_info[2], -1, br_info[3])
@@ -2103,6 +2103,13 @@ func _player_turn(u: BattleUnit) -> void:
 				pool = _hero_side()
 			else:
 				pool = enemies.filter(func(e): return not e.dead)
+				# Upgraded Execute he cannot actually pay for: the button is
+				# lit by the FREE cast, so the pick narrows to the targets
+				# that discount covers (Batch AK). Without this the two
+				# checks could disagree and quietly zero his Rage.
+				if ab.display_name == "Execute" and u.execute_upgraded > 0 \
+						and ab.cost > u.resource:
+					pool = pool.filter(func(e): return e.broken)
 			if pool.size() == 1:
 				target = pool[0]
 			else:
@@ -2243,14 +2250,26 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				var sm_want := "defensive" if u.hp < u.max_hp * 0.45 else "aggressive"
 				# Tempo makes the swap itself profitable: a healthy Tempo
 				# build pivots on cooldown for the buff and swaps right back.
+				# Sunder Guard does the same for a different reason — the
+				# pivot IS his party-wide Break blow, free and on a 1cd, so
+				# it is worth pressing while anyone still has a guard up.
+				var sm_sunder: bool = u.guard_change_bd > 0 \
+					and foes.any(func(e): return not e.broken)
 				if gchange != null and u.ability_ready(gchange) \
-						and (u.stance != sm_want \
+						and (u.stance != sm_want or sm_sunder \
 						or (u.tempo_ranks > 0 and u.hp > u.max_hp * 0.6)):
 					return [gchange, u]
 				var sm_exec := _find_ability(u, "Execute")
-				if sm_exec != null and u.resource >= sm_exec.cost \
-						and _ability_usable(u, sm_exec):
-					var sm_prey := foes.filter(func(e): return e.hp < e.max_hp * 0.2 or e.broken)
+				if sm_exec != null and _ability_usable(u, sm_exec):
+					# _ability_usable already priced the cast (the upgraded
+					# copy is free against a Broken target) and checked the
+					# threshold, so the bot only picks a legal victim — a
+					# Broken one when full price is out of reach.
+					var sm_thr := 0.35 if u.execute_upgraded > 0 else 0.2
+					var sm_prey: Array = (foes.filter(func(e): return e.broken) \
+						if u.resource < sm_exec.cost \
+						else foes.filter(func(e): return e.broken \
+							or e.hp < e.max_hp * sm_thr))
 					if not sm_prey.is_empty():
 						return [sm_exec, _lowest_hp(sm_prey)]
 				var sm_shatter := _find_ability(u, "Shatterpoint")
@@ -2827,12 +2846,22 @@ func _show_actions(u: BattleUnit) -> void:
 
 # The Mana an ability actually costs this unit right now: Lone Hunter
 # hunts cheap without a beast; No Beast Left arms one free summon.
-func _eff_cost(u: BattleUnit, ab: Ability) -> int:
+func _eff_cost(u: BattleUnit, ab: Ability, target: BattleUnit = null) -> int:
 	if ab.special == "summon" and u.free_summon:
 		return 0
 	# Snap Shot: the first ability of the fight costs nothing.
 	if u.snap_shot > 0 and not u.snap_used and ab.cost > 0:
 		return 0
+	# Execute, upgraded by its own capstone landing on an earned Execute:
+	# free against a Broken target. With no target in hand — the button's
+	# own affordability question — a living Broken enemy is enough to light
+	# it, and _player_turn narrows the pick to exactly those (Batch AK).
+	if ab.display_name == "Execute" and u.execute_upgraded > 0:
+		if target != null:
+			if target.broken:
+				return 0
+		elif enemies.any(func(e): return not e.dead and e.broken):
+			return 0
 	var c := ab.cost
 	if u.lone_hunter > 0 and _beasts(u).is_empty():
 		c = int(round(c * 0.6))
@@ -2882,10 +2911,12 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
 		return false
 	# Execute: needs an enemy below 20% health — or a Broken one; the
-	# Bruiser's own loop sets up his finisher.
+	# Bruiser's own loop sets up his finisher. The upgraded copy raises the
+	# threshold to 35%.
+	var exec_thr := 0.35 if u.execute_upgraded > 0 else 0.2
 	if ab.display_name == "Execute" \
 			and not enemies.any(func(e): return not e.dead \
-			and (e.hp < e.max_hp * 0.2 or e.broken)):
+			and (e.hp < e.max_hp * exec_thr or e.broken)):
 		return false
 	# Shatter: needs someone Chilled to detonate.
 	if ab.display_name == "Shatter" \
@@ -3542,7 +3573,7 @@ func _note_debuff_applied(source: BattleUnit, status_id: String) -> void:
 			and BattleUnit.DEBUFF_IDS.has(status_id):
 		source.debuffs_applied += 1
 		_log("   → Talent: Dominant Presence — %s's armor +%d%% (%d debuff%s landed)" % [
-			source.unit_name, 5 * source.dominant_ranks * source.debuffs_applied,
+			source.unit_name, 15 * source.dominant_ranks * source.debuffs_applied,
 			source.debuffs_applied, "" if source.debuffs_applied == 1 else "s"],
 			"#b0a8e0")
 
@@ -3617,10 +3648,12 @@ func _miss_chance(attacker: BattleUnit, defender: BattleUnit = null) -> float:
 
 
 # One parry roll, attributed to the slice it landed in so the log can name
-# the source: base reflexes, the Sword Mastery talent, or the Parry Up buff
-# (deepened by Swordsmanship). "" = no parry. A spec stat block can replace
-# the baseline outright (Swordmaster 12%); Parry Up's power carries its %
-# (0 = the classic 15 from a perfect Pommel; Guard Change grants 10).
+# the source: base reflexes, the Sword Mastery talent, or the Parry Up buff.
+# "" = no parry. A spec stat block can replace the baseline outright
+# (Swordmaster 12%); Parry Up's power carries its whole % (0 = the classic
+# 15; a perfect Guard Change grants 10, or 25 with Swordsmanship — Batch AK
+# moved that node's magnitude INTO the granted power, so the chip's live
+# number and the roll can never disagree).
 func _roll_parry(defender: BattleUnit) -> String:
 	var base := defender.parry_chance if defender.parry_chance >= 0.0 \
 		else (PARRY_CHANCE if defender.is_hero else ENEMY_PARRY_CHANCE)
@@ -3628,7 +3661,7 @@ func _roll_parry(defender: BattleUnit) -> String:
 	var buff := 0.0
 	if defender.has_status("parry_up"):
 		var pw := defender.status_power("parry_up")
-		buff = (pw if pw > 0 else 15) / 100.0 + defender.pommel_parry_bonus
+		buff = (pw if pw > 0 else 15) / 100.0
 	var roll := randf()
 	if roll < base:
 		return "reflexes"
@@ -3662,7 +3695,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		is_counter := false) -> void:
 	var was_snap := attacker.snap_shot > 0 and not attacker.snap_used \
 		and ab.cost > 0 and not is_counter
-	attacker.resource = clampi(attacker.resource - _eff_cost(attacker, ab) \
+	attacker.resource = clampi(attacker.resource - _eff_cost(attacker, ab, target) \
 		+ ab.resource_gain, 0, attacker.max_resource)
 	attacker.refresh_bars()
 	if was_snap:
@@ -4069,7 +4102,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						strike_target.unit_name, "#b0a8e0")
 				# High Guard: a parry hardens the stance for a turn.
 				if strike_target.high_guard > 0:
-					_apply_status(strike_target, "high_guard", 2)
+					_apply_status(strike_target, "high_guard", 3)
 			# Pommel Strike carries its own keen 25% crit base.
 			var crit_chance := (0.25 if ab.display_name == "Pommel Strike" else CRIT_CHANCE) \
 				+ (0.25 if strike_target.broken else 0.0)
@@ -4087,14 +4120,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if attacker.precision_ranks > 0 and (strike_target.has_status("dazed")
 					or strike_target.has_status("cripple")
 					or strike_target.has_status("exposed")):
-				crit_chance += 0.05 * attacker.precision_ranks
+				crit_chance += 0.20 * attacker.precision_ranks
 			# Seasoned Fighter (talent node): sharpens Lunge and Overpower.
 			if attacker.blade_crit_ranks > 0 \
 					and ab.display_name in ["Lunge", "Overpower"]:
-				crit_chance += 0.03 * attacker.blade_crit_ranks
+				crit_chance += 0.15 * attacker.blade_crit_ranks
 			# Killing Edge: the Aggressive guard hunts the opening.
 			if attacker.killing_edge_ranks > 0 and attacker.stance == "aggressive":
-				crit_chance += 0.04 * attacker.killing_edge_ranks
+				crit_chance += 0.15 * attacker.killing_edge_ranks
 			# Super Nova: Detonation crits harder into the ash.
 			if attacker.supernova_ranks > 0 and ab.display_name == "Detonation":
 				crit_chance += 0.03 * attacker.supernova_ranks
@@ -4396,26 +4429,38 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if attacker.overwhelm_ranks > 0:
 				var ow_n := _status_count(strike_target)
 				if ow_n > 0:
-					var ow_pct := 3 * attacker.overwhelm_ranks * ow_n
+					var ow_pct := 8 * attacker.overwhelm_ranks * ow_n
 					raw *= 1.0 + 0.01 * ow_pct
 					_log("   → Talent: Overwhelm — +%d%% (%d debuffs)" % [
 						ow_pct, ow_n], "#b0a8e0")
 			# Tempo: the pivot's momentum rides the next cut.
 			if attacker.has_status("tempo"):
 				raw *= 1.0 + attacker.status_power("tempo") / 100.0
-			# Punishment / Off Balance (exclusive pair): the Broken window
-			# pays out — narrow and big through Overpower, or broad and
-			# small through the whole kit.
-			if strike_target.broken:
-				if attacker.punishment_ranks > 0 \
-						and ab.display_name == "Overpower":
-					raw *= 1.0 + 0.15 * attacker.punishment_ranks
-					_log("   → Talent: Punishment — Overpower +%d%% vs Broken" % (
-						15 * attacker.punishment_ranks), "#b0a8e0")
-				if attacker.off_balance_ranks > 0:
-					raw *= 1.0 + 0.05 * attacker.off_balance_ranks
-					_log("   → Talent: Off Balance — +%d%% vs Broken" % (
-						5 * attacker.off_balance_ranks), "#b0a8e0")
+			# Punishment: the narrow, big half of the Broken window — all of
+			# it through Overpower.
+			if strike_target.broken and attacker.punishment_ranks > 0 \
+					and ab.display_name == "Overpower":
+				raw *= 1.0 + 0.60 * attacker.punishment_ranks
+				_log("   → Talent: Punishment — Overpower +%d%% vs Broken" % (
+					60 * attacker.punishment_ranks), "#b0a8e0")
+			# Off Balance: the broad half — the whole kit, but smaller. The
+			# two stopped being an exclusive pair in Batch AK (different
+			# rows), so with Punishment ALSO taken this widens what counts
+			# as a window instead of stacking a second number onto Broken:
+			# Exposed and Crippled targets pay out too.
+			if attacker.off_balance_ranks > 0:
+				var ob_word := ""
+				if strike_target.broken:
+					ob_word = "Broken"
+				elif attacker.off_balance_wide > 0:
+					if strike_target.has_status("exposed"):
+						ob_word = "Exposed"
+					elif strike_target.has_status("cripple"):
+						ob_word = "Crippled"
+				if ob_word != "":
+					raw *= 1.0 + 0.20 * attacker.off_balance_ranks
+					_log("   → Talent: Off Balance — +%d%% vs %s" % [
+						20 * attacker.off_balance_ranks, ob_word], "#b0a8e0")
 			# Pack Bond (Canis): the hunter runs down wounded prey — +15%
 			# damage per enemy under 35% health, scaled by the bond tier.
 			if attacker.is_hero and attacker.passive_id == "pack":
@@ -4521,7 +4566,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# High Guard: hardened stance after a parry.
 			if strike_target.has_status("high_guard"):
 				var pv_was := raw
-				raw *= 0.75
+				raw *= 0.60
 				if strike_target.is_hero:
 					_prev(strike_target, pv_was - raw)
 			# Guardian's Roar: the bear weathers the storm.
@@ -4632,18 +4677,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				pr += 15
 			if is_perfect and ab.display_name == "Ice Lance":
 				pr = 20
-			# Pressure Point / Sunder Guard: the Breaker lane loads his two
-			# Break blows heavier.
+			# Pressure Point: the Breaker lane loads his opening Break blow.
 			if attacker.pressure_point_ranks > 0 \
 					and ab.display_name == "Pommel Strike":
-				pr += 8 * attacker.pressure_point_ranks
+				pr += 30 * attacker.pressure_point_ranks
 				_log("   → Talent: Pressure Point — +%d BD" % (
-					8 * attacker.pressure_point_ranks), "#b0a8e0")
-			if attacker.sunder_guard_ranks > 0 \
+					30 * attacker.pressure_point_ranks), "#b0a8e0")
+			# Sunder Guard's ability hook: the node is pointed at Guard
+			# Change (see the guard_change handler), and pays this second
+			# time only if he also drew Shatterpoint from a pool.
+			if attacker.sunder_guard_bd > 0 \
 					and ab.display_name == "Shatterpoint":
-				pr += 8 * attacker.sunder_guard_ranks
-				_log("   → Talent: Sunder Guard — +%d BD" % (
-					8 * attacker.sunder_guard_ranks), "#b0a8e0")
+				pr += attacker.sunder_guard_bd
+				_log("   → Talent: Sunder Guard — +%d BD" % \
+					attacker.sunder_guard_bd, "#b0a8e0")
 			# Broken Will: the Occultist grinds stability down harder.
 			if attacker.broken_will_ranks > 0:
 				pr = int(round(pr * (1.0 + 0.05 * attacker.broken_will_ranks)))
@@ -4964,11 +5011,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						strike_target.unit_name, "#b0a8e0")
 			# Lunge: the stance decides the wound — Aggressive Exposes,
 			# Defensive Cripples; Guard Change is how the player picks.
+			# UPGRADED (the sm_lunge node landing on a Lunge he already
+			# earned): both wounds, whatever guard he holds.
 			if ab.display_name == "Lunge" and not strike_target.dead:
-				var lunge_status := "exposed" if attacker.stance == "aggressive" \
-					else "cripple"
-				_apply_status(strike_target, lunge_status, 3)
-				_note_debuff_applied(attacker, lunge_status)
+				var lunge_hits: Array = ["exposed", "cripple"] \
+					if attacker.lunge_upgraded > 0 \
+					else ["exposed" if attacker.stance == "aggressive" else "cripple"]
+				for lunge_status in lunge_hits:
+					_apply_status(strike_target, lunge_status, 3)
+					_note_debuff_applied(attacker, lunge_status)
 			# Crushing Blow (Warden talents): resist shred + BD splash.
 			if ab.display_name == "Crushing Blow" and not strike_target.dead \
 					and attacker.elem_weak_ranks > 0:
@@ -5193,7 +5244,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# fuel for the Overpower he wants to spend in the window.
 				if attacker.no_quarter_ranks > 0 and attacker.is_hero \
 						and not attacker.dead and not strike_target.is_hero:
-					var nq_gain := 15 * attacker.no_quarter_ranks
+					var nq_gain := 45 * attacker.no_quarter_ranks
 					attacker.resource = mini(attacker.resource + nq_gain,
 						attacker.max_resource)
 					attacker.refresh_bars()
@@ -5276,7 +5327,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					cat_mult *= 0.6
 			# Counter Attack: a parry answers back. Untouchable (Defensive
 			# stance only) answers with a free Pommel Strike — every parry
-			# is also a stun; otherwise Riposte answers with a basic Strike.
+			# is also a stun. Batch AK: Riposte answers with a free
+			# OVERPOWER instead of a basic Strike, riding the recast
+			# machinery Opportunist already used — and Opportunist now
+			# answers a parry as well as a whiff. They are the SAME answer
+			# bought from two different lanes, so a parry fires ONE
+			# counter; the log names the node that paid for it.
 			if parried and not is_counter \
 					and not strike_target.dead and not attacker.dead:
 				var ut_pommel: Ability = _find_ability(strike_target, "Pommel Strike") \
@@ -5290,14 +5346,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						"good", true)
 					if attacker.dead:
 						break
-				elif strike_target.counter_attacks:
-					_log("Talent: Riposte — %s counter attacks!" % strike_target.unit_name,
-						"#50c8e0")
-					await _wait(0.4)
-					await _resolve(strike_target, strike_target.abilities[0], attacker,
-						"good", true)
-					if attacker.dead:
-						break
+				elif strike_target.counter_attacks or strike_target.opportunist > 0:
+					var rp_over := _find_ability(strike_target, "Overpower")
+					if rp_over != null:
+						_log("Talent: %s — %s answers the parry with Overpower!" % [
+							"Riposte" if strike_target.counter_attacks \
+							else "Opportunist", strike_target.unit_name], "#50c8e0")
+						await _wait(0.4)
+						await _resolve(strike_target, _free_copy(rp_over), attacker,
+							"good", true)
+						if attacker.dead:
+							break
 			if (ab.random_hits > 0 or ab.multi_hits > 0) and total_hits > 1:
 				await _wait(0.45)  # sequential strikes land distinctly
 		# War Stomp: the tremor rallies the line — allies regain 10% resource
@@ -6374,7 +6433,9 @@ func _free_copy(ab: Ability) -> Ability:
 
 
 # Opportunist (talent): the Swordmaster answers a whiffed enemy attack with
-# a free Overpower.
+# a free Overpower. The PARRY half of the node lives in _resolve's counter
+# block instead, beside Riposte and Untouchable — a parried hit still lands,
+# so its answer has to wait until the strike has fully resolved.
 func _try_opportunist(defender: BattleUnit, attacker: BattleUnit) -> void:
 	if defender == null or attacker == null or defender.opportunist <= 0 \
 			or not defender.is_hero or attacker.is_hero \
@@ -7058,7 +7119,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			attacker.refresh_bars()  # restamps the stance chip
 			# Tempo: the pivot itself becomes an attack — momentum for a turn.
 			if attacker.tempo_ranks > 0:
-				var tp_pct := 10 * attacker.tempo_ranks
+				var tp_pct := 30 * attacker.tempo_ranks
 				_apply_status(attacker, "tempo", 2, tp_pct)
 				attacker.update_status("tempo", "+%d%%" % tp_pct,
 					"Tempo: +%d%% damage for one turn\n(granted by switching stance)." % tp_pct,
@@ -7067,43 +7128,65 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					"#b0a8e0")
 			# The pivot presses the opening he already made: 15 BD to the
 			# un-Broken enemy nearest to Breaking (auto-picked — the ability
-			# takes no target, keeping autoplay await-free).
-			var gc_mark: BattleUnit = null
-			for e in enemies:
-				if not e.dead and not e.broken \
-						and (gc_mark == null or e.pressure > gc_mark.pressure):
-					gc_mark = e
+			# takes no target, keeping autoplay await-free). SUNDER GUARD
+			# re-points that node at THIS site (Batch AK): 40 BD, and to
+			# EVERY living enemy rather than the single mark.
+			var gc_wide := attacker.guard_change_bd > 0
+			var gc_bd: int = attacker.guard_change_bd if gc_wide else 15
+			var gc_marks: Array = []
+			if gc_wide:
+				gc_marks = enemies.filter(func(e): return not e.dead)
+				if not gc_marks.is_empty():
+					_log("   → Talent: Sunder Guard — the pivot sunders every guard (%d BD)" % \
+						gc_bd, "#b0a8e0")
+			else:
+				var gc_mark: BattleUnit = null
+				for e in enemies:
+					if not e.dead and not e.broken \
+							and (gc_mark == null or e.pressure > gc_mark.pressure):
+						gc_mark = e
+				if gc_mark != null:
+					gc_marks = [gc_mark]
 			var gc_bd_txt := ""
-			if gc_mark != null:
-				var gc_res: Dictionary = gc_mark.take_hit(0, 15)
-				_stat_bd(attacker, 15)
-				gc_mark.float_text("+%d BD" % int(gc_res["bd"]), Color(0.8, 0.35, 1.0))
-				gc_bd_txt = "; %d BD to %s" % [int(gc_res["bd"]), gc_mark.unit_name]
+			for gc_hit in gc_marks:
+				var gc_res: Dictionary = gc_hit.take_hit(0, gc_bd)
+				_stat_bd(attacker, gc_bd)
+				gc_hit.float_text("+%d BD" % int(gc_res["bd"]), Color(0.8, 0.35, 1.0))
+				gc_bd_txt += "%s %d BD to %s" % [";" if gc_bd_txt == "" else ",",
+					int(gc_res["bd"]), gc_hit.unit_name]
 				if gc_res["broke"]:
 					_stat("breaks_on_enemies")
 					_sfx("break", -3.0)
-					_message("%s BREAKS!" % gc_mark.unit_name)
-					_log("!! %s BREAKS" % gc_mark.unit_name, "#c070e0")
+					_message("%s BREAKS!" % gc_hit.unit_name)
+					_log("!! %s BREAKS" % gc_hit.unit_name, "#c070e0")
 					await _break_impact()
 					# No Quarter pays on this Break too — the swap that lands
 					# the final Break refunds its own Overpower.
 					if attacker.no_quarter_ranks > 0:
-						var gc_nq := 15 * attacker.no_quarter_ranks
+						var gc_nq := 45 * attacker.no_quarter_ranks
 						attacker.resource = mini(attacker.resource + gc_nq,
 							attacker.max_resource)
 						attacker.refresh_bars()
 						attacker.float_text("+%d Rage" % gc_nq, Color(1.0, 0.5, 0.4))
 						_log("   → Talent: No Quarter — the Break grants %s +%d Rage" % [
 							attacker.unit_name, gc_nq], "#b0a8e0")
+			# The perfect's parry spike. SWORDSMANSHIP (and the Still Wrist
+			# rune, which pays into the same field) raises the GRANT itself
+			# rather than adding a second number at the roll, so the chip's
+			# live counter is exactly what _roll_parry reads.
+			var gc_parry := 10 + int(round(attacker.swordsmanship_parry * 100.0))
 			if is_perfect:
-				_apply_status(attacker, "parry_up", 2, 10)
-				attacker.update_status("parry_up", "P+",
-					"+%d%% parry chance." % (10
-					+ int(round(attacker.pommel_parry_bonus * 100))))
+				if attacker.swordsmanship_parry > 0.0:
+					_log("   → Talent: Swordsmanship — the perfect pivot buys +%d%% parry for 2 turns" % \
+						gc_parry, "#b0a8e0")
+				_apply_status(attacker, "parry_up", 2, gc_parry)
+				attacker.update_status("parry_up", "+%d%%" % gc_parry,
+					"+%d%% parry chance." % gc_parry, gc_parry)
 			_message("%s shifts his guard — %s!" % [attacker.unit_name, gc_label])
 			_log("%s: Guard Change — %s stance%s%s" % [attacker.unit_name,
 				gc_label, gc_bd_txt,
-				" [PERFECT: +10% parry, 2 turns]" if is_perfect else ""], "#70d878")
+				(" [PERFECT: +%d%% parry, 2 turns]" % gc_parry) if is_perfect \
+				else ""], "#70d878")
 		"shield_block":
 			# Batch AB — Shieldwall is a STANCE, not a charge grant: it raises
 			# his Block chance instead of bypassing the roll. He guarantees

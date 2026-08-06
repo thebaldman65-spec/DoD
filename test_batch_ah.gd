@@ -57,9 +57,15 @@ func _test_kits() -> void:
 		ok(Classes.kit(class_key).size() == 1,
 			"%s core kit is one basic attack" % class_key)
 	# The five trims are gone from their kits and earnable instead.
+	# BATCH AK CORRECTED ONE OF THEM: Guard Change went back into the
+	# Swordmaster's opening three and Shatterpoint took its place in the
+	# pool. AH itself flagged the problem — Guard Change is the only stance
+	# swap in the game and four of his nodes read the stance — so this is
+	# the correction landing, not AH's rule weakening. The COUNT is what AH
+	# was really about, and it is still five and still 3-per-kit above.
 	var trims := {"Blood Price": "berserker", "War Stomp": "warden",
 		"Interpose": "warden", "Sweeping Strikes": "swordmaster",
-		"Guard Change": "swordmaster"}
+		"Shatterpoint": "swordmaster"}
 	for name in trims:
 		var spec: String = trims[name]
 		ok(not Classes.spec_abilities(spec).any(func(a): return a.display_name == name),
@@ -407,7 +413,7 @@ func _test_doc_matches_code() -> void:
 	# The stamp moves with every batch that touches the doc; what this line
 	# is really guarding is that the doc was touched AT ALL when the code
 	# below it changed. Bump it, do not delete it.
-	ok(doc.contains("Last updated: 2026-08-06 (Batch AI)"),
+	ok(doc.contains("Last updated: 2026-08-06 (Batch AK)"),
 		"master.html carries the current batch's stamp")
 	for spec in Classes.SPEC_POOLS:
 		var listed: String = ", ".join(Classes.SPEC_POOLS[spec])

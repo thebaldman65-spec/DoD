@@ -203,10 +203,10 @@ var unrelenting_cd := 0
 var hemorrhage_ranks := 0     # Hemorrhage: cripple at high bleed buildup
 var crushing_blows_ranks := 0 # Crushing Blows: armor pen per enemy-party bleed
 var precision_ranks := 0      # Precision Strikes: crit vs dazed/crippled/exposed
-var opportunist := 0          # Opportunist: counter enemy misses with Overpower
+var opportunist := 0          # Opportunist: counter enemy misses AND parries with Overpower
 var blade_crit_ranks := 0     # Seasoned Fighter node: crit for Lunge/Overpower
-var pommel_parry_bonus := 0.0 # Swordsmanship: bigger perfect-Pommel parry buff
-var high_guard := 0           # High Guard: -25% damage 1 turn after parrying
+var swordsmanship_parry := 0.0 # Swordsmanship: the perfect Guard Change parry spike
+var high_guard := 0           # High Guard: -40% damage 2 turns after parrying
 var dominant_ranks := 0       # Dominant Presence: armor per debuff applied
 var debuffs_applied := 0
 var unkillable_ranks := 0     # Unkillable: heal on block
@@ -243,17 +243,23 @@ var vengeful_ready := true    # answers with Crushing Blow; re-arms at his turn
 var seasoned_def_bonus := 0.0 # Defensive Stance: deeper damage-taken cut
 var seasoned_off_bonus := 0.0 # Aggressive Stance: bigger damage-dealt bonus
 var stance := "aggressive"    # Swordmaster guard (aggressive|defensive), fresh each battle
-# Swordmaster lanes (Batch F). See talents.gd for the node text.
-var killing_edge_ranks := 0   # Killing Edge: +4%/rank crit while Aggressive
-var overwhelm_ranks := 0      # Overwhelm: +3%/rank damage per debuff on the target
-var tempo_ranks := 0          # Tempo: stance switch grants +10%/rank damage 1 turn
-var bracing_ranks := 0        # Bracing: +8/rank Constitution while Defensive
+# Swordmaster lanes (Batch F; magnitudes re-authored in Batch AK, where a
+# node became a whole exclusive row instead of one of three ranks). See
+# talents.gd for the node text.
+var killing_edge_ranks := 0   # Killing Edge: +15% crit while Aggressive
+var overwhelm_ranks := 0      # Overwhelm: +8% damage per debuff on the target
+var tempo_ranks := 0          # Tempo: stance switch grants +30% damage 1 turn
+var bracing_ranks := 0        # Bracing: +30 Constitution while Defensive
 var deflection := 0           # Deflection: parry works against ranged attacks
-var pressure_point_ranks := 0 # Pressure Point: Pommel Strike +8/rank BD
-var sunder_guard_ranks := 0   # Sunder Guard: Shatterpoint +8/rank BD
-var no_quarter_ranks := 0     # No Quarter: Breaking an enemy grants 15/rank Rage
-var punishment_ranks := 0     # Punishment: Overpower +15%/rank vs Broken
-var off_balance_ranks := 0    # Off Balance: all damage +5%/rank vs Broken
+var pressure_point_ranks := 0 # Pressure Point: Pommel Strike +30 BD
+var guard_change_bd := 0      # Sunder Guard: Guard Change's BD, to EVERY enemy
+var sunder_guard_bd := 0      # Sunder Guard: +BD on Shatterpoint, if he owns it
+var no_quarter_ranks := 0     # No Quarter: Breaking an enemy grants 45 Rage
+var punishment_ranks := 0     # Punishment: Overpower +60% vs Broken
+var off_balance_ranks := 0    # Off Balance: all damage +20% vs Broken
+var off_balance_wide := 0     # Off Balance + Punishment: Exposed/Crippled count too
+var lunge_upgraded := 0       # Lunge node on an earned Lunge: both debuffs, any stance
+var execute_upgraded := 0     # Execute capstone on an earned Execute: 35%, free vs Broken
 var untouchable := 0          # Untouchable: Defensive parries negate + Pommel counter
 var guard_breaker := 0        # Guard Breaker: Broken recovery refills the meter to 50
 # Pyromancer tree (07-18). See talents.gd for the node text.
@@ -1181,7 +1187,7 @@ func effective_armor() -> float:
 	var a := armor
 	# Dominant Presence: armor value grows 5%/rank per debuff applied.
 	if dominant_ranks > 0 and debuffs_applied > 0:
-		a *= 1.0 + 0.05 * dominant_ranks * debuffs_applied
+		a *= 1.0 + 0.15 * dominant_ranks * debuffs_applied
 	# Endurance: +1%/rank armor per turn without an external heal, CAPPED at
 	# +75% (Batch W, 08-02). The streak itself is uncapped, so a long fight
 	# used to report absurd bonuses (+97,521% was measured); the final
@@ -1471,7 +1477,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		float_text("+%d Mana" % converted, Color(0.5, 0.7, 1.0))
 	# Constitution: break resistance (100 = neutral; higher takes less Pressure).
 	# Bracing (Swordmaster talent): the raised guard is harder to Break.
-	var eff_con := constitution + ((8 * bracing_ranks) if stance == "defensive" else 0)
+	var eff_con := constitution + ((30 * bracing_ranks) if stance == "defensive" else 0)
 	pressure_add = int(round(pressure_add * 100.0 / maxf(eff_con, 1.0)))
 	if has_status("ward"):
 		pressure_add = int(pressure_add * 0.5)

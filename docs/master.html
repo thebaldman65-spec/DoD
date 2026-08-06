@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-06 (Batch AI)</b></p>
+<p align="right"><b>Last updated: 2026-08-06 (Batch AK)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -215,9 +215,12 @@ damage</b> (on-hit statuses can still apply); the log names the parry's source �
 Sword Mastery, or Parry Up — e.g. "(parried -75% — Sword Mastery)". Parrying does not
 trigger an automatic counter. AoE cannot be parried; Broken units cannot parry; multi-hit
 attacks roll parry per strike.</li>
-<li><b>Counter Attack (term):</b> immediately answering a parry with a basic attack — a free
-action with no initiative cost that cannot chain. Granted only by specific effects (the
-Swordmaster's Riposte talent grants it).</li>
+<li><b>Counter Attack (term):</b> immediately answering a parry — a free action with no
+initiative cost that cannot chain. Granted only by specific effects, all of them the
+Swordmaster's: <b>Riposte</b> and <b>Opportunist</b> both answer a parry with a free
+<b>Overpower</b> (a parry fires ONE counter even if he holds both), and the
+<b>Untouchable</b> capstone answers with a free Pommel Strike instead while he is in the
+Defensive stance. Opportunist also answers an enemy attack that MISSES.</li>
 <li><b>Block (keyword):</b> fully negates an incoming attack — 100% of the damage, the Break
 damage, and its on-hit effects. Governed by <b>Block %</b>, a SPEC STAT only pure tanks
 carry (currently the Warden: 10% base, +15% from Heavy Plating, plus Heavy Plating's
@@ -358,7 +361,7 @@ gained at the moment of the shout.</td></tr>
 <tr><td>Shieldwall</td><td>+25% Block chance while the stance holds (the Warden's
 Shieldwall). Counts as Heavy Plating for Tenacity and Rally; the chip reads
 "+25% Block" and his passive chip folds it into the live total.</td></tr>
-<tr><td>High Guard</td><td>Takes 25% less damage (Swordmaster talent, after a parry).</td></tr>
+<tr><td>High Guard</td><td>Takes 40% less damage for 2 turns (Swordmaster talent, after a parry).</td></tr>
 <tr><td>Elemental Weakness</td><td>Elemental (non-physical) resistances reduced by 5% per
 talent rank (Warden's Crushing Blow talent); the chip shows the reduction ("−15%").</td></tr>
 <tr><td>Enraged</td><td>+3% damage per stack for 5 turns, stacking &times;3 (Berserker
@@ -420,8 +423,9 @@ counter; released by the next Heal.</td></tr>
 <tr><td>Exposed</td><td>Takes 15% more damage.</td></tr>
 <tr><td>Cripple</td><td>−25% damage dealt.</td></tr>
 <tr><td>Retaliation</td><td>Counters attackers with a basic strike.</td></tr>
-<tr><td>Parry Up</td><td>Raised parry chance: +10% from a perfect Guard Change
-(2 turns); the stronger application wins.</td></tr>
+<tr><td>Parry Up</td><td>Raised parry chance for 2 turns, from a perfect Guard Change:
++10% base, +15% more with the Swordsmanship talent and +5% more with the Rune of the Still
+Wrist. The chip carries the live number, which is exactly what the parry roll reads.</td></tr>
 <tr><td>Unity</td><td>Damage received is split evenly among living heroes (BD is
 not).</td></tr>
 <tr><td>Devoutness</td><td>Takes 5% less BD per talent rank (battle-long, from the
@@ -599,7 +603,7 @@ talent has already granted is never offered again.</p>
 <tr><th>Spec</th><th>Opens with</th><th>Spec pool (earnable)</th></tr>
 <tr><td><b>Berserker</b></td><td>Bloodlust, Wildstrikes, Hack and Slash</td><td>Blood Price, Battle Shout, Rampage</td></tr>
 <tr><td><b>Warden</b></td><td>Mocking Blow, Crushing Blow, Shieldwall</td><td>War Stomp, Interpose, Hold the Line, Retaliation</td></tr>
-<tr><td><b>Swordmaster</b></td><td>Overpower, Pommel Strike, Shatterpoint</td><td>Sweeping Strikes, Guard Change, Lunge, Execute</td></tr>
+<tr><td><b>Swordmaster</b></td><td>Overpower, Pommel Strike, Guard Change</td><td>Sweeping Strikes, Shatterpoint, Lunge, Execute</td></tr>
 <tr><td><b>Pyromancer</b></td><td>Detonation, Wildfire, Flamewave</td><td>Flame Shield, Firestorm</td></tr>
 <tr><td><b>Cryomancer</b></td><td>Razor Ice, Blizzard, Ice Lance</td><td>Rime, Shatter</td></tr>
 <tr><td><b>Arcanist</b></td><td>Arcane Cannon, Arcane Barrage, Stabilize</td><td>Overcharge, Magi's Wrath</td></tr>
@@ -693,9 +697,9 @@ target selection.<br>
 parry</b> (the technician; the only parry-stat character — see §4.3).<br>
 Passive <i>Seasoned Fighter</i>: fights in one of <b>two stances the PLAYER controls</b> —
 AGGRESSIVE (+15% damage dealt, +10% damage taken) or DEFENSIVE (15% less damage taken,
-−10% damage dealt). Every battle opens Aggressive; <b>Guard Change swaps — and Guard
-Change is earnable (§6a), so a Swordmaster who has not taken it back fights every battle
-Aggressive</b>. The spec chip
+−10% damage dealt). Every battle opens Aggressive and <b>Guard Change swaps</b> — it is in
+his opening three, because it is the only stance swap in the game and four of his talent
+nodes read the stance. The spec chip
 names the live stance (AGG/DEF) with both stances' numbers in its tooltip, and the
 stance talents deepen each side's upside.<br>
 His kit is one loop: Break is the key, Stun is the door, and the Broken window is the
@@ -706,24 +710,27 @@ extender — good on both sides of the Break), builds 10 Rage (Perfect: +5 bonus
 Pommel Strike — 20 Rage, 25 dmg / 30 BD / 2.0, 3cd, has its own <b>25% base crit
 chance</b> and <b>ALWAYS Stuns for 1 turn</b>; bosses resist Stun until Broken, builds
 10 Rage (Perfect: the Stun lands even on an unbroken boss).<br>
-Shatterpoint — 30 Rage, 20 dmg / <b>40 BD</b> / 3.0, 4cd — his heaviest Break blow, the
-timing he chooses; if this hit BREAKS the target, the Swordmaster immediately casts
-<b>Overpower on it for FREE</b> (no Rage, no cooldown) — straight through the opening,
-into the rider that extends the window it just opened (Perfect: +15 bonus BD).<br>
-<i>Earnable (§6a):</i> Sweeping Strikes — 20 Rage, 2 strikes × 15 dmg / 12 BD,
-3.0, no cd, Dazes the target
-3 turns, builds 10 Rage (Perfect: +25% crit on the second swing).<br>
-<i>Earnable (§6a):</i> Guard Change — 0 Rage, 1.5 int, 1cd; a self-cast with
-no target selection: switches
+Guard Change — 0 Rage, 1.5 int, 1cd; a self-cast with no target selection: switches
 stance, deals <b>15 BD to the un-Broken enemy nearest to Breaking</b> (auto-picked —
 the swordsman presses the opening he already made) and builds 15 Rage (Perfect: +10%
 parry chance for 2 turns). Deliberately not a free action: the swap does double duty —
-stance, pressure, refuel — at a bargain initiative instead.<br>
-<i>Talent-granted:</i> Lunge — 25 Rage, 35 dmg / 20 BD, 3.5, the stance picks the wound:
-Exposed in Aggressive, Cripple in Defensive (3 turns), builds 10 Rage (Perfect: 3.0
-initiative). Execute — 30 Rage, 55 dmg / 50 BD, 2.0, 3cd, usable against targets below
-20% health OR against a Broken target — the loop sets up his own finisher (Perfect:
-guaranteed crit).</li>
+stance, pressure, refuel — at a bargain initiative instead. The <b>Sunder Guard</b> talent
+re-points it: 40 BD to EVERY enemy.<br>
+<i>Earnable (§6a):</i> Shatterpoint — 30 Rage, 20 dmg / <b>40 BD</b> / 3.0, 4cd — his
+heaviest Break blow, the timing he chooses; if this hit BREAKS the target, the Swordmaster
+immediately casts <b>Overpower on it for FREE</b> (no Rage, no cooldown) — straight through
+the opening, into the rider that extends the window it just opened (Perfect: +15 bonus BD).<br>
+<i>Earnable (§6a):</i> Sweeping Strikes — 20 Rage, 2 strikes × 15 dmg / 12 BD,
+3.0, no cd, Dazes the target
+3 turns, builds 10 Rage (Perfect: +25% crit on the second swing).<br>
+<i>Earnable (§6a) or talent-granted:</i> Lunge — 25 Rage, 35 dmg / 20 BD, 3.5, the stance
+picks the wound: Exposed in Aggressive, Cripple in Defensive (3 turns), builds 10 Rage
+(Perfect: 3.0 initiative). Execute — 30 Rage, 55 dmg / 50 BD, 2.0, 3cd, usable against
+targets below 20% health OR against a Broken target — the loop sets up his own finisher
+(Perfect: guaranteed crit). <b>Both sit in the spec pool AND the talent tree, so a hero who
+earned one first gets the node's UPGRADE instead of a second copy</b>: Lunge drops to 15
+Rage and applies BOTH wounds whatever the guard; Execute's threshold rises to 35% health
+and it costs no Rage against a Broken target.</li>
 </ul>
 <h3>6.2 Mage</h3>
 <ul>
@@ -1049,14 +1056,14 @@ separately, and the map's Party button badges both.</p>
 <p><b>Swordmaster</b> — <b>BLADE</b> (damage, crit, and the Aggressive stance) · <b>POISE</b> (the defensive half, and ALL the parry) · <b>BREAKER</b> (fill their meter, then live in the window)</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Blade</th><th>Poise</th><th>Breaker</th></tr>
-<tr><td>1</td><td><b>Aggressive Stance</b> — The Aggressive stance grants an additional 3.0% damage dealt.</td><td><b>Defensive Stance</b> — The Defensive stance blocks an additional 3.0% damage taken.</td><td><b>Pressure Point</b> — Pommel Strike deals +8.0 more Break damage.</td></tr>
-<tr><td>2</td><td><b>Lunge</b> — New ability: Lunge — 35 damage; applies Exposed in Aggressive stance, Cripple in Defensive (25 Rage, 3.5 int).</td><td><b>Sword Mastery</b> — +3.0% parry chance.</td><td><b>Sunder Guard</b> — Shatterpoint deals +8.0 more Break damage.</td></tr>
-<tr><td>3</td><td><b>Killing Edge</b> — +4.0% critical strike chance while in the Aggressive stance.</td><td><b>Bracing</b> — +8.0 Constitution while in the Defensive stance.</td><td><b>Dominant Presence</b> — Armor value is increased by 5.0% for every debuff the Swordmaster applies this battle.</td></tr>
-<tr><td>4</td><td><b>Precision Strikes</b> — +5.0% critical strike chance against Dazed, Crippled, and Exposed targets.</td><td><b>Swordsmanship</b> — A perfect Guard Change grants +5.0% more parry chance.</td><td><b>Opportunist</b> — When an enemy attack misses the Swordmaster, he counter attacks with Overpower (free).</td></tr>
-<tr><td>5</td><td><b>Seasoned Fighter</b> — Lunge and Overpower gain +3.0% critical strike chance.</td><td><b>High Guard</b> — Take 25% less damage for 1 turn after parrying an attack.</td><td><b>No Quarter</b> — Breaking an enemy grants the Swordmaster 15.0 Rage.</td></tr>
-<tr><td>6</td><td><b>Overwhelm</b> — +3.0% damage for every debuff on the target.</td><td><b>Riposte</b> — Counter Attack: immediately answer every parry with a Strike.</td><td><b>Punishment</b> — Overpower deals +15.0% damage against Broken targets.</td></tr>
-<tr><td>7</td><td><b>Tempo</b> — Switching stance grants +10.0% damage for 1 turn.</td><td><b>Deflection</b> — The Swordmaster&#x27;s parry works against RANGED attacks too — arrows and spells alike.</td><td><b>Off Balance</b> — All the Swordmaster&#x27;s damage is increased by 5.0% against Broken targets.</td></tr>
-<tr><td>CAP</td><td><b>Execute</b> — New ability: Execute — 55 damage / 50 BD; usable against targets below 20% health or Broken; a perfect guarantees a crit (30 Rage, 2.0 int, 3cd).</td><td><b>Untouchable</b> — While in the Defensive stance, parried attacks deal NO damage instead of 25%, and every parry is answered with a free Pommel Strike.</td><td><b>Guard Breaker</b> — When a Broken enemy recovers, its Break meter refills to 50 instead of resetting to 0.</td></tr>
+<tr><td>1</td><td><b>Aggressive Stance</b> — The Aggressive stance grants an additional 12% damage dealt.</td><td><b>Defensive Stance</b> — The Defensive stance blocks an additional 12% damage taken.</td><td><b>Pressure Point</b> — Pommel Strike deals +30 Break damage.</td></tr>
+<tr><td>2</td><td><b>Lunge</b> — New ability: Lunge — 35 damage; applies Exposed in Aggressive stance, Cripple in Defensive (25 Rage, 3.5 int). If Lunge was already earned, this UPGRADES it instead: 15 Rage, and it applies BOTH Exposed and Crippled whatever the guard.</td><td><b>Sword Mastery</b> — +12% parry chance.</td><td><b>Sunder Guard</b> — Guard Change deals 40 Break damage to EVERY enemy (up from 15 to one). If he also owns Shatterpoint, that deals +40 Break damage as well.</td></tr>
+<tr><td>3</td><td><b>Killing Edge</b> — +15% critical strike chance while in the Aggressive stance.</td><td><b>Bracing</b> — +30 Constitution while in the Defensive stance.</td><td><b>Dominant Presence</b> — Armor value is increased by 15% for every debuff the Swordmaster has applied this battle.</td></tr>
+<tr><td>4</td><td><b>Precision Strikes</b> — +20% critical strike chance against Dazed, Crippled, and Exposed targets.</td><td><b>Swordsmanship</b> — A PERFECT Guard Change grants +25% parry chance for 2 turns, instead of the usual 10%.</td><td><b>Opportunist</b> — When an enemy attack MISSES the Swordmaster or is PARRIED, he counter attacks with Overpower (free).</td></tr>
+<tr><td>5</td><td><b>Seasoned Fighter</b> — Overpower gains +15% critical strike chance — and Lunge too, if he has it.</td><td><b>High Guard</b> — Take 40% less damage for 2 turns after parrying an attack.</td><td><b>No Quarter</b> — Breaking an enemy grants the Swordmaster 45 Rage.</td></tr>
+<tr><td>6</td><td><b>Overwhelm</b> — +8% damage for every debuff on the target.</td><td><b>Riposte</b> — Counter Attack: immediately answer every parry with a free Overpower.</td><td><b>Punishment</b> — Overpower deals +60% damage against Broken targets.</td></tr>
+<tr><td>7</td><td><b>Tempo</b> — Switching stance grants +30% damage for 1 turn.</td><td><b>Deflection</b> — The Swordmaster&#x27;s parry works against RANGED attacks too — arrows and spells alike.</td><td><b>Off Balance</b> — All the Swordmaster&#x27;s damage is increased by 20% against Broken targets. If Punishment was taken, it applies against Exposed and Crippled targets too.</td></tr>
+<tr><td>CAP</td><td><b>Execute</b> — New ability: Execute — 55 damage / 50 BD; usable against targets below 20% health or Broken; a perfect guarantees a crit (30 Rage, 2.0 int, 3cd). If Execute was already earned, this UPGRADES it instead: the threshold rises to 35% health, and it costs NO Rage against a Broken target.</td><td><b>Untouchable</b> — While in the Defensive stance, parried attacks deal NO damage instead of 25%, and every parry is answered with a free Pommel Strike.</td><td><b>Guard Breaker</b> — When a Broken enemy recovers, its Break meter refills to 50 instead of resetting to 0.</td></tr>
 </table>
 <p><b>Warden</b> — <b>PLATE</b> (mitigation and the block payoffs — everything that answers being hit) · <b>THREAT</b> (he wants to be hit; this lane is what happens to whoever obliges) · <b>BANNER</b> (the half that protects other people)</p>
 <table border="1" cellpadding="4">
@@ -1744,11 +1751,6 @@ unique kit + art planned. Boss art for both pending.</li>
 Fire and Piercing Arrow, and the Survivalist's Blight, Smoke Bomb and Field Dressing. Both
 spec pools ship at five of their designed eight; the cross-fill rule keeps every offer at
 three without them.</li>
-<li><b>The Swordmaster's stance needs a decision.</b> Guard Change is his only stance swap
-and it is now earnable, so until he takes it he fights every battle Aggressive and four
-Poise/Blade talent nodes have nothing to act on. Either Guard Change returns to his opening
-three (displacing one of Overpower / Pommel Strike / Shatterpoint) or the stance gets a
-second swap route.</li>
 <li>Difficulty tuning is pending an honest baseline: the old "~100% win rate" figure
 measured a single fixed unscaled lineup and carried no information. The sweep
 (<code>./sim.sh --sweep</code>) now reads win rate per budget; tuning decisions design

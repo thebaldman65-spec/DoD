@@ -4,6 +4,76 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A node is a row now (Batch AK) — 2026-08-06
+
+**The re-author is not a tuning pass, it is a re-pricing after a structural
+change.** Batch AI made the rows mutually exclusive: a node is no longer
+one of three ranks you might buy on the way to something else, it is the
+whole row, and the two beside it are shut for good. AI said so and said
+the numbers would be wrong until the class batches landed — rank-1 values
+sitting where a full row's worth of power belongs, about a third of what
+the slot is worth. So the question for each of the Swordmaster's 24 nodes
+was not "is this a good number" but "is this worth closing two doors
+for", and the answer was consistently no by a factor of three or four.
+That is where 3% → 12% and 15 Rage → 45 Rage come from; they are one
+decision applied 24 times, not 24 decisions.
+
+**Point a node at what the hero is guaranteed, not at what he might
+draw.** Sunder Guard read "Shatterpoint +8 Break damage" — and the kit
+correction in the same batch made Shatterpoint earnable, so the node could
+be bought by a hero who never sees the ability it modifies. A node that
+might do nothing is worse than a weak node, because the player cannot
+price it at purchase. Re-pointing it at Guard Change fixes that (he always
+has Guard Change now), and keeping the Shatterpoint clause as a *bonus*
+rather than the payload costs nothing: a lucky draw makes a good node
+better instead of making a dead node live.
+
+**Two nodes that do the same thing to the same target are not a choice,
+they are an arithmetic problem.** Punishment and Off Balance were an
+exclusive pair in one lane — pile it into Overpower, or spread it across
+the kit. The row re-cut put them in different rows, so both are reachable,
+and "+60% vs Broken" plus "+20% vs Broken" is just +92% vs Broken with
+extra steps. Widening what counts as a window instead — Exposed and
+Crippled join Broken — keeps the second pick meaningful without touching
+the first number. The general shape: when a re-structure makes two
+exclusive options simultaneous, change what the second one *does*, not how
+much it does.
+
+**A trigger that fires on the skill check is worth more than the same
+number sitting on a sheet.** Swordsmanship was a flat parry bonus he owned
+from purchase. As a spike on a perfect Guard Change it is the same
+expected value only if he keeps hitting the check, which makes the button
+press worth caring about — and the Swordmaster is the spec whose whole
+identity is choosing when to pivot. The magnitude went up to pay for the
+variance.
+
+**One answer, one counter.** Riposte and Opportunist both ended up
+answering a parry with a free Overpower, from two different lanes, both
+reachable. Letting them stack would have paid a parry build twice for
+buying the same idea twice, and a parry build already has High Guard,
+Deflection and Untouchable pulling in the same direction. The rule is that
+a parry fires one counter; what Opportunist still owns alone is the whiff.
+
+**Grant-or-upgrade is what an ability in two places has to do.** Lunge and
+Execute sit in the spec pool and in the tree. Before, drawing one from the
+pool made the node worthless and vice versa — a dead pick either way,
+decided by an order the player does not control. Upgrading the copy he has
+turns the collision into a reward for it. The check for "does he already
+have it" has to be the abilities list rather than `owns_ability`, because
+a learned node's own grant is in `ability_names()` — the question is not
+"can he cast it" but "could he cast it before this tree ran", and only the
+kit that was assembled first can answer that.
+
+**A rune pointing at a deleted mechanic is a bug, not a tuning question.**
+The Rune of the Still Wrist promised to deepen "a perfect Pommel Strike's
+parry blessing" — which Batch AH removed when it converted that perfect to
+the boss Stun. Nothing failed; the rune just quietly did nothing, and the
+shop kept charging 100 gold for it. The magnitude question the designer
+closed in Batch AF is about how strong runes are, and this was never that.
+It also decided the shape of the new field: additive, because the talent
+and the rune both pay into it and a max() would have re-created the same
+silent nothing.
+
 ## Three to start, six to earn (Batch AH) — 2026-08-05
 
 **A kit that is complete on turn one has nothing to say for the rest of

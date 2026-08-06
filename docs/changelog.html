@@ -5,6 +5,119 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-06 — Batch AK: the Swordmaster kit correction and his 24 nodes</h2>
+<ul>
+<li><b>Guard Change is back in the opening three; Shatterpoint is earnable in its
+place.</b> Batch AH's trim named the Swordmaster's three keepers and made Guard Change
+earnable — and Guard Change is the only stance swap in the game. Until he earned it back
+he fought every battle Aggressive, half of Seasoned Fighter was inert and four talent
+nodes sold him nothing. AH shipped it as written and flagged it rather than
+reinterpreting the instruction; this is the flag being answered. Shatterpoint only
+accelerates a Break he reaches by other means, so it is the safe piece to move the other
+way. The count AH actually cared about is unchanged: three abilities at the start, six
+earned over a run, five trims across the twelve specs.</li>
+
+<li><b>Exactly one definition of each, still.</b> Guard Change's def moved out of
+<code>trimmed_kit_ability()</code> and into the live kit; Shatterpoint's went the other
+way. Neither name now exists in two places, which is the property the whole resolver
+arrangement is for. Guard Change is in no pool at all — the class pool has excluded it
+since AH (a sibling has no stance to swap), and it no longer needs a spec-pool entry.</li>
+
+<li><b>All 24 tree nodes re-authored for row exclusivity.</b> Every id survives, so saved
+picks migrate and no save version moves. The rows have been mutually exclusive since Batch
+AI, which means a node is no longer one of three ranks — it is the whole row, priced
+against the two doors it closes. Concretely: the stance nodes 3% → 12%, Sword Mastery 3% →
+12% parry, Killing Edge 4% → 15% crit, Bracing +8 → +30 Constitution, Dominant Presence 5%
+→ 15% armor per debuff, Precision Strikes 5% → 20% crit, Seasoned Fighter 3% → 15%, No
+Quarter 15 → 45 Rage, Overwhelm 3% → 8% per debuff, Punishment 15% → 60%, Tempo 10% → 30%,
+Off Balance 5% → 20%, Pressure Point +8 → +30 BD, High Guard 25% for 1 turn → 40% for
+2.</li>
+
+<li><b>Sunder Guard now points at an ability he is guaranteed.</b> It read "Shatterpoint
++8 Break damage" — an ability he may never draw, and after the correction above, one he
+starts without. It now re-points Guard Change: <b>40 Break damage to EVERY enemy</b>
+instead of 15 to the single mark. The old target did not disappear so much as become a
+bonus — if he owns Shatterpoint anyway, that gains +40 BD too. A node aimed at a
+guaranteed button that pays extra on a lucky draw is strictly better than one aimed only
+at the draw.</li>
+
+<li><b>Swordsmanship became a spike he earns rather than a number he owns.</b> A perfect
+Guard Change now grants <b>+25% parry for 2 turns</b> (the ability's own 10% plus the
+node's 15). It rides the existing Parry Up chip with a live counter, and the whole value
+now lives in the granted status power rather than being added again at the roll — so what
+the chip says is exactly what the parry roll reads.</li>
+
+<li><b>Riposte answers with a free Overpower instead of a basic Strike</b>, reusing the
+recast machinery Opportunist already had. <b>Opportunist now answers a parry as well as a
+whiff.</b> They are the same answer bought from two different lanes and both are reachable
+(rows 6 and 4), so a parry fires <b>one</b> counter, not two; the log names the node that
+paid for it. The Untouchable capstone's free Pommel Strike still takes precedence in the
+Defensive stance.</li>
+
+<li><b>Punishment and Off Balance stopped being an exclusive pair.</b> Split across rows 6
+and 7 they are both reachable, and two "+% versus Broken" numbers stacking would be
+redundant rather than interesting. So with Punishment also taken, Off Balance <b>widens
+what counts as a window</b> — Exposed and Crippled targets pay out too — instead of adding
+to the same number.</li>
+
+<li><b>Lunge and Execute sit in the spec pool AND the tree, so the node upgrades a copy he
+already earned.</b> Lunge drops to 15 Rage and applies both Exposed and Crippled whatever
+the guard; Execute's threshold rises from 20% to 35% health and it costs no Rage against a
+Broken target. Neither is ever granted twice, in either order of acquisition.</li>
+
+<li><b>New payload machinery, two keys.</b> <code>also</code> holds extra payloads applied
+alongside the main one, each carrying its own <code>condition</code> — that is how one node
+has two halves under different conditions (Sunder Guard's Shatterpoint hook,
+<code>owns_ability</code>; Off Balance's widening, <code>has_node</code>) without a second
+node id. <code>upgrade</code> holds payloads applied <i>instead of granting</i> when the
+ability is already in the kit. <b>The batch asked for <code>owns_ability</code> on all
+three checks and it is the wrong instrument for two of them:</b> a learned node's own grant
+is itself in <code>ability_names()</code>, so after taking the Lunge node
+<code>owns_ability(member, "Lunge")</code> is true no matter where Lunge came from. The
+only honest question is "was it in the kit when the tree ran", and the abilities list is
+what knows that. Shatterpoint's hook does use <code>owns_ability</code>, because no node
+grants Shatterpoint.</li>
+
+<li><b>The Rune of the Still Wrist was repaired in passing.</b> It wrote
+<code>pommel_parry_bonus</code> and advertised "a perfect Pommel Strike's parry blessing" —
+a blessing that stopped existing in Batch AH, when Pommel's perfect became the boss Stun.
+It has been half-dead since, and this batch's field rename would have killed it outright.
+It now pays into the live field and names Guard Change. That field is additive rather than
+a replacement for exactly this reason: a max() against the talent's value would have left
+the rune silently inert on its own. Rune alone = a 15% grant, node alone = 25%, both =
+30%.</li>
+
+<li><b>Verified:</b> new <code>test_batch_ak.gd</code>, 524 checks / 0 failures, stable
+across three runs — the kit swap and its single-definition property, every pool entry of
+all twelve specs and four classes still resolving, all 24 nodes' id/row/lane/magnitude,
+both tooltip and payload (they are two hand-written places), both conditional halves firing
+and staying dark including on an empty ctx, both upgrade paths in both acquisition orders,
+and a live battle for the BD spread, the parry spike, the parry counter, Execute's pricing
+and the upgraded Lunge. Regression: test_batch_ai 2,042/0, test_batch_ah 4,284/0 (its
+Guard Change trim assertion re-pointed, with the reason in the file), test_batch_ah_battle
+62/0, test_runes 3,130/0, test_start_rune 239/0, test_start_rune_ui 31/0, run-harness gates
+1/2/3 PASS. Headless parse: all 10 scenes, 0 SCRIPT ERROR.
+<b>One pre-existing failure, not caused by this batch and not fixed by it:</b>
+test_rune_battle 91/1, the Inferno chip check — it reproduces 3 of 3 on unmodified HEAD in
+a clean worktree, so it is a standing defect in that check rather than a regression.</li>
+
+<li><b>Measured, and flagged rather than second-guessed: Sunder Guard is the largest
+single node in the tree by a distance.</b> On the fixed smoke-test lineup (60 battles, one
+node forced, everything else at default) it takes the Swordmaster's Break damage from 158
+to <b>649 per battle</b> and the party's Breaks from 1.33 to <b>5.43 per battle</b> — 4.1x
+on both. His own damage share <i>falls</i>, 29% to 23%, because he spends those turns
+pivoting instead of swinging; what he is really doing is opening windows for the other
+three. That is the node as the batch specified it (40 BD to every enemy, on a 0-Rage
+1-cooldown button), so it ships as written and this is the note rather than a quiet nerf.
+The smoke-test lineup carries no difficulty signal (Batch R) — these are kit-mechanics
+ratios, not a balance verdict.</li>
+
+<li><b>Not in this batch:</b> the other ten trees and enemy tuning, both untouched as
+instructed. No difficulty measurement was run — this is a content re-author of one spec,
+and the sim's damage-share instrument reads a fixed four-hero party, so a single-spec
+re-tune has no honest control row.</li>
+</ul>
+
 <h2>2026-08-06 — Fix: a rune triple could offer the same rune twice</h2>
 <ul>
 <li><b>The pick-of-3 rune offer could contain a duplicate</b> — roughly one triple in a
