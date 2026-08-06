@@ -77,7 +77,13 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   opening triple holds a spec-scoped rune, reproducing AE's opening
   WITH THE STARTING RUNE STILL ON; that is what makes AF's control
   isolate AF rather than re-measure AE. Shipped content, so default ON
-  and NOT gated on sim_run. Post-AF Matrix rows carry specopen=).
+  and NOT gated on sim_run. Post-AF Matrix rows carry specopen=),
+  DOD_SIM_MINIBOSS=off (Batch AH — reproduces the PRE-AH MAP: ten dealt
+  tiers, the full 17-fight deck, no guaranteed mini-boss and so no
+  mini-boss ability award. Shipped content, default ON, NOT gated on
+  sim_run. It is an honest control for the MAP HALF ONLY: kits still
+  open at 3 abilities with it off, because the trim is structural and
+  has no switch. Post-AH Matrix rows carry mb=).
   RunSim
   (scripts/run_sim.gd statics, Run injected Events-style) owns setup/map
   walk/report; battle.gd hooks: _ready begin+note_battle_start, _check_end
@@ -179,6 +185,110 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-08-05)
+BATCH AH (08-05) — ABILITY PROGRESSION. Every hero opens with its core
+attack plus EXACTLY 3 spec abilities and EARNS 6 more (2/zone: mini-boss +
+zone boss). NO NEW ABILITIES WERE WRITTEN — every pool entry is a trimmed
+kit piece, a talent grant, a sibling spec's ability, or a vault whose
+`special` never left battle.gd. TRIMMED: Blood Price (bz), War Stomp +
+Interpose (wd), Sweeping Strikes + Guard Change (sm). Beastmaster was
+ALREADY at 3 under the batch's own rule (the Summon picker = one slot,
+which the action bar has always done) — so were Pyro/Cryo/Arcanist/Holy/
+Devout/Occultist/Sharpshooter/Survivalist.
+POOLS: `Classes.SPEC_POOLS` now all 12; `Classes.CLASS_POOLS` is NEW (4).
+`class_pool()`, `class_of_spec()`, `pool_ability()` (THE resolver — reads
+kit pieces back out of the LIVE kits and talent grants out of the LIVE
+trees, so a pool copy can never drift), `vault_ability()`,
+`trimmed_kit_ability()`. `Talents.granted_ability(name)` is the talent
+side of that, and classes.gd -> Talents is a live cycle that GDScript
+resolves fine (proven, not assumed).
+CURATION RULE (class pools only): an entry must FUNCTION for a sibling.
+OUT: faith_cost (Hymn/Resurrection/Divine Plea), Burn consumers
+(Detonation, Wildfire), Chilled-gated (Shatter), Resonance
+(Arcane Cannon/Magi's Wrath/Stabilize/Overcharge), companion/Loyalty
+(Bestial Wrath/Spirit Bond/Primal Surge), Focus-spender (Coup de Grâce),
+STANCE (Lunge, Guard Change — `stance` defaults "aggressive" on EVERY
+unit, so a sibling's Lunge could only ever Expose), and the named identity
+pieces (3 summons, Kill Command, Hex of Ruin). The line: an ability is
+class-pool-eligible when its PRIMARY effect resolves without the spec
+mechanic; dead riders/perfects are noted, not disqualifying.
+VAULT UNSEALED: Rallying Shout, Retaliation, Mana Shield, Arcane Surge,
+Reality Fracture, Phoenix Rebirth, Dawnbreak, Sanctuary, Divine Wrath,
+Umbral Sigil. NOT revivable — Pyroblast, Flame Surge, Frost Bolt, Death
+Ray, Mend Wounds: their specials went with them, so they are prose in a
+comment and reviving = AUTHORING.
+OFFER: `Run.roll_ability_offer(member)` = 1 spec + 2 class, unowned,
+cross-filling either way. THE SPEC DRAW LEADS (deliberately NOT shuffled
+like the rune triple — the pools OVERLAP, so nothing in the name says
+which pool an entry came from; the party screen tints entry 0 gold).
+`Run.award_ability_pick` stores the triple on `bm_candidates` (queue) +
+`bm_picks_owed`; storage stays `bm_abilities`; SAVE STAYS v5.
+`Run.owned_ability_names` counts talent-LEARNED grants too.
+SPAWN-ORDERING FIX: earned abilities now go on BEFORE
+`Talents.apply_from_tree` in BOTH battle.gd and the party sheet — several
+talents MODIFY an ability, and Deafening Cry would have missed a
+pool-bought Battle Shout. apply_from_tree already refuses to double-grant.
+MINI-BOSS: `Run.MINIBOSS_TIER` = (FLOORS-1)/2 = 5 (displayed tier 6), ALL
+3 columns, unroutable. Elite themes + elite budget floor, every enemy at
+`battle.MINIBOSS_HP_MULT` = 1.5 max HP, attack UNTOUCHED. Elite gold, 2
+talent points, one ability pick; NO item drop and NO rune cache (the AE/AF
+rune economy is left alone deliberately). Deck: 27 cards over 9 tiers,
+paid for out of FIGHT cards only (17->14) — rest/shop/event byte-identical
+so the run-economy dials never moved. `_lay_rows` is shared by both
+generators; `_deck_window` states the constraint windows in TIER terms;
+`DECK_FALLBACK_MB` is the 27-card floor. FLAG `DOD_SIM_MINIBOSS=off`
+reproduces the PRE-AH MAP only (kits still open at 3 — the trim has no
+switch). Post-AH Matrix rows carry `mb=`.
+ACTION BAR: no cap, no swap step. `ABILITY_KEYS`/`ABILITY_KEY_NAMES` gained
+G as the 9th (the batch's "ability 10 = Shift+Q" only lands with nine plain
+keys); slot 10-18 = SHIFT + the same key, label "[⇧Q] Blood Price"
+(`_hotkey_name`). A real run tops out at 10 abilities = exactly one Shift
+slot. Both `_try_ability_hotkey` call sites pass `event.shift_pressed`.
+EIGHT PERFECTS -> RELIABILITY CHECKS: Hack and Slash (bleed on all 3, no
+4th strike), Blizzard (2 stacks always, no Mana refund), Pommel Strike
+(Stun on an unbroken boss, no parry buff), Snare Trap (same; Poison flat
+4), Firestorm (even spread, no extra bolts), Arcane Barrage (no repeat
+while an unstruck enemy stands, no 7th bolt), Triple Shot (one guaranteed
+crit), Deadfall (GAINED a skill check; perfect names the victim, and an
+aimed trap RELEASES if its mark dies so a perfect is never worth less).
+Firestorm + Barrage are ONE mechanic (round-robin `_spread_struck`, per
+cast). Boss immunity has exactly ONE escape: an explicit `force` arg on
+`_apply_status` (+ `force_stun` on `_spring_trap`) — a call-site-visible
+exception, not a name check inside. LIVE BUG FOUND: Triple Shot fired TWO
+arrows (`multi_hits` 2 against its own name/description) with a SILENT
+perfect third; now multi_hits 3, perfect_extra_hit off.
+VERIFIED: test_batch_ah.gd 4,263/0 (incl. a forward DP proving no route
+reaches the boss without crossing the mini-boss row), test_batch_ah_battle
+44/0 (live: ordering fix, ⇧Q in a real bar, both force paths, Freeze
+immunity untouched, mini-boss HP vs its own elite self, the Party SHEET
+showing earned abilities). Regression: test_runes 3,248/0, test_start_rune
+233/0, test_start_rune_ui 31/0, run-harness gates 1/2/3 PASS,
+test_rune_battle 91/1 (a Batch AG Inferno-chip check that reads the chip
+before any Burn exists — the SAME single failure unmodified code gives 6/6).
+ITS WHITE FLAME CHECK WAS FIXED: it read a LOG LINE, so it raced how long a
+fight lasts, and the kit trim shortened fights enough that the Pyromancer
+sometimes never took a turn (0 fire casts in ~50% of runs; restoring Blood
+Price made it 6/6, which pinned the cause). The pass now FORCES one fire hit
+onto a resistant enemy. 10 scenes, 0 SCRIPT ERROR.
+MEASURED (n=100/arm, control mb=off): acquisition landed — abilities/hero/run
+1.18 -> 3.02 (the ceiling of 6 is not the target; a run only reaches 2.0
+mini-bosses + 1.3 bosses). Difficulty did NOT move on depth: 20.15 -> 20.49
+vs an MDE of 3.57, ratio@z1t8 1.00 -> 0.95, wipe median z2 t8 -> z2 t10
+(DEEPER). Completions 9% -> 0% nominally clears 8.2pts (z=3.07) but is
+RECORDED NOT BELIEVED: AE's own noise calibration read 7% and 14% off two
+identical halves of one arm, and a discarded same-code pass read 12% and 4%.
+Depth is the low-variance metric. THE ONE REAL COST IS ROUTE AGENCY: choice
+77% -> 71%, rests taken 2.3 -> 1.9 — a row with one node type in all three
+columns has no decision in it, which is exactly what unroutable buys.
+NOT DONE, and it is a contradiction in the batch: §2 asks for six UNSHIPPED
+abilities (Disengage/Suppressing Fire/Piercing Arrow, Blight/Smoke Bomb/
+Field Dressing) while the header says "No new abilities are written in this
+batch" and gives no specs for any of them. Header won; both Hunter pools
+ship at 5. Cross-fill keeps every offer at 3 regardless.
+FLAGGED FOR THE DESIGNER: GUARD CHANGE. The batch named the Swordmaster's
+three keepers, which makes Guard Change earnable — and it is his ONLY
+stance swap, so until he earns it back he fights every battle Aggressive,
+half of Seasoned Fighter is inert, and four talent nodes sell him nothing.
+Shipped as written rather than silently reinterpreted; one-line fix.
 BATCH AG (08-05) — COMBAT TUNING, seven changes. (1) WILDSTRIKES gets
 `bleed_chance` 0.5 (it had NONE, so it defaulted to 1.0 and landed 35 on
 all four every cast); its perfect now GUARANTEES the roll on every target

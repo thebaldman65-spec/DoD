@@ -4,6 +4,91 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Three to start, six to earn (Batch AH) — 2026-08-05
+
+**A kit that is complete on turn one has nothing to say for the rest of
+the run.** Every spec shipped with its whole identity already in hand;
+the only things that changed across a run were numbers — talent ranks,
+rune payloads, tier scaling. Progression you can *read on the action bar*
+is a different kind of thing from progression you read on a stat sheet,
+and this batch buys it with content that already existed. Nothing new was
+written: everything earnable is either an ability trimmed out of an
+opening kit, an ability a talent already grants, an ability a sibling spec
+already starts with, or a vaulted one whose machinery never left the code.
+
+**Two pools, because "any ability" and "your spec's abilities" are both
+wrong.** A pool of only your spec's leftovers makes six awards feel like
+a checklist — you know the whole list by award two, and by award four you
+are taking what is left. A pool of everything makes an awakening
+meaningless. One spec draw and two class draws keeps the spec's identity
+the *reliable* part of the offer and puts the surprise in the other two:
+a Cryomancer who earns Flamewave is still a Cryomancer, but he is one who
+now has an answer to a frost-resistant band.
+
+**The curation rule is the whole design of the class pool.** An ability
+that arrives dead is worse than no offer at all, because the player spent
+a real choice on it and only finds out two fights later. So the test is
+not "is this thematically close" but "does this FUNCTION for a sibling" —
+and applying it strictly is what makes the pool trustworthy. Arcane
+Cannon is the clearest case: handed to a Pyromancer it deals 40% of
+Attack, zero Break damage, and recoils 15% of what it dealt. It is not a
+weaker version of the Arcanist's nuke, it is strictly worse than his
+basic attack. The line I settled on and applied uniformly: an ability
+belongs to the class pool when its PRIMARY effect resolves without the
+spec-only mechanic; riders and perfect bonuses that quietly no-op are
+worth a note, not an exclusion. That keeps Hold Breath (a guaranteed
+armour-ignoring crit, with a dead Focus rider) and drops Coup de Grâce
+(which spends Focus and does nothing else).
+
+**Guard Change is the honest cost of following an instruction.** The
+batch named the Swordmaster's three keepers, and the arithmetic put Guard
+Change in the pool — which means until he earns it back, he cannot swap
+stance, half of Seasoned Fighter is inert, and four of his talent nodes
+sell him something he cannot use. I shipped it as written and flagged it,
+rather than quietly substituting Sweeping Strikes back in, because the
+designer named those three explicitly and a silent reinterpretation is
+the worse failure. It is a one-line fix if he disagrees.
+
+**The mini-boss is a floor, not a spike.** The reason it takes the whole
+row is that an *avoidable* guaranteed fight is a contradiction: routing
+around it is exactly what a player optimising the map would do, and then
+the zone's progression beat only lands for players who were not paying
+attention. Giving it a boss's health rather than a boss's damage was the
+other half of that: it should be the fight that tests whether your kit
+can sustain, not the one that decides the run on a bad initiative roll.
+The measured consequence is that it is *not* a spike — it is a long
+fight, and that is what "between an elite and a boss" turned out to mean
+mechanically.
+
+**Paying for it out of the fight cards was the conservative choice on
+purpose.** The row could have been taken out of the deck proportionally,
+which would have cost roughly half a rest and half a shop per zone. Every
+run-economy number this project has measured since Batch T — gold earned
+and unspent, rests offered versus taken, shops walked past, rune
+acquisition — is anchored to 5/5/3. Changing a structural thing and an
+economic thing in the same batch means the next measurement cannot tell
+you which one moved. So the mini-boss is paid for entirely in fights, and
+the economy dials are byte-identical.
+
+**Reliability perfects, continued.** Batch AG converted Wildstrikes and
+wrote down why: on a wide, swingy ability, magnitude on top of variance
+is just more variance, while removing the roll is something the player
+can feel and plan around. This batch applies that to seven more, and the
+useful discovery is that the rule *finds bugs*. Triple Shot had
+`multi_hits: 2` and an empty `perfect_text`, which meant it fired two
+arrows and a Perfect silently added a third that no tooltip mentioned —
+an ability called Triple Shot, firing two. Nobody would have found that
+by reading the file; the rule found it by asking "what magnitude does this
+Perfect add, and can it go?"
+
+**One escape from the boss immunity, spelled out at the call site.** Two
+of the eight perfects buy their way past a rule the whole game leans on
+(bosses shrug off Stun until Broken). The tempting implementation is a
+name check inside `_apply_status` — and it would have been three lines
+shorter. An explicit `force` argument costs a parameter and puts the
+exception where a reader can see what bought it, which matters more for a
+rule that is load-bearing for boss design than for one that is not.
+
 ## The opening pick offers a rune for your spec (Batch AF) — 2026-08-04
 
 **The lever was never weak; the thing it was allowed to offer was.**

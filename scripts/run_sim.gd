@@ -115,6 +115,10 @@ static var rune_shop_offered := 0   # rune offers actually put on the counter
 static var rune_elite_offered := 0  # cache candidates shown (3 per cache)
 static var rune_elite_taken := 0    # caches resolved — one rune each
 static var rune_elite_equipped := 0 # ...of those, worn (a slot was free)
+# Batch AH: the earnable-ability economy — offers shown and picks taken
+# (2 awards a zone, 6 a run, when both pools still hold something).
+static var ability_offered := 0
+static var ability_taken := 0
 static var rune_refused_noslot := 0 # never offered: every slot already worn
 static var rune_refused_gold := 0   # offered, left on the counter: 40g reserve
 static var rune_refused_dupe := 0   # re-roll kept landing on an owned rune
@@ -242,7 +246,7 @@ static func walk_to_next_fight(run: Node) -> bool:
 			int(type_taken.get(String(node["type"]), 0)) + 1
 		run.advance(f, idx)
 		match String(node["type"]):
-			"fight", "elite", "boss":
+			"fight", "elite", "miniboss", "boss":
 				# Pre-rolled at map birth, same as the real map click.
 				var warband: Array = node.get("enemies", [])
 				if warband.is_empty():
@@ -581,6 +585,10 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		run.restore_mana(v_mana)
 	run.gold += int(run.relic_add("victory_gold"))
 	var run_over := false
+	# Batch AH: the mini-boss pays an ability pick too — same offer, same
+	# policy, half a zone earlier.
+	if node_type == "miniboss":
+		_award_trophies(run)
 	if node_type == "boss":
 		_award_trophies(run)  # never Relics.unlock_random — that persists
 		if run.has_next_zone():
@@ -656,30 +664,29 @@ static func _finish_run(run: Node, battle, done: bool) -> void:
 		battle.get_tree().quit()
 
 
-# Boss trophies, resolved instantly instead of owed to the party screen:
-# DOD_SIM_TROPHIES names win when available, else pool order.
+# Ability awards (Batch AH: mini-boss AND zone boss), resolved instantly
+# instead of owed to the party screen. The bot rolls the SAME offer-of-3 a
+# player would see (Run.roll_ability_offer) and picks from THAT, so a sim
+# can never take an ability the real flow would not have offered it.
+# DOD_SIM_TROPHIES names win when they are in the offer, else offer order.
 static func _award_trophies(run: Node) -> void:
 	var wanted: Array = []
 	for trophy_name in OS.get_environment("DOD_SIM_TROPHIES").split(",", false):
 		wanted.append(trophy_name.strip_edges())
 	for m in run.party:
-		var pool: Array = Classes.spec_pool(String(m.get("spec", "")))
-		if pool.is_empty():
-			continue
-		var owned: Array = m.get("bm_abilities", [])
-		if owned.size() >= pool.size():
+		var offer: Array = run.roll_ability_offer(m)
+		if offer.is_empty():
 			continue
 		var pick := ""
 		for trophy_name in wanted:
-			if trophy_name in pool and not trophy_name in owned:
+			if trophy_name in offer:
 				pick = trophy_name
 				break
 		if pick == "":
-			for trophy_name in pool:
-				if not trophy_name in owned:
-					pick = trophy_name
-					break
-		m["bm_abilities"] = owned + [pick]
+			pick = String(offer[0])
+		m["bm_abilities"] = m.get("bm_abilities", []) + [pick]
+		ability_offered += offer.size()
+		ability_taken += 1
 
 
 # Spend every point the policy can: same bookkeeping as the party screen's
@@ -1062,6 +1069,15 @@ static func _print_report(battle) -> void:
 	print("Rests taken: %.1f/run   (nodes offered: %.1f/run)" % [
 		rest_taken / runs, rest_offered / runs])
 
+	# ---------- Ability economy (Batch AH) ----------
+	# Six awards a run (a mini-boss and a boss in each of three zones), three
+	# choices each. "taken" below the ceiling means a hero ran its two pools
+	# dry, which is the only way an award can pass a hero by.
+	print("\nAbility economy (per run, per hero):")
+	print("  Awards   offers %.2f (%.2f picks x3)   taken %.2f   ceiling 6.00" % [
+		ability_offered / runs / 4.0, ability_taken / runs / 4.0,
+		ability_taken / runs / 4.0])
+
 	# ---------- Rune economy (Batch AD stage 0a) ----------
 	# The half of the rune question no measurement has ever shown. Read it
 	# next to the gold line above: unspent gold beside empty slots is a
@@ -1135,7 +1151,7 @@ static func _print_report(battle) -> void:
 		walk_steps])
 	var off_parts := PackedStringArray()
 	var deck_parts := PackedStringArray()
-	for ty in ["fight", "elite", "rest", "shop", "event", "boss"]:
+	for ty in ["fight", "elite", "miniboss", "rest", "shop", "event", "boss"]:
 		off_parts.append("%s %.1f/%.1f" % [ty,
 			float(type_taken.get(ty, 0)) / runs,
 			float(type_offered.get(ty, 0)) / runs])
@@ -1172,11 +1188,12 @@ static func _print_report(battle) -> void:
 	# map=/diff=/choice= fields established. Batch AF adds specopen=, so a
 	# row measured under the guaranteed opening is identifiable at a glance;
 	# pre-AF rows carry no such field and are not comparable.
-	print("Matrix row: route=%s  map=%s  diff=%s  econ=%s  start=%s  specopen=%s  power=x%.2f  depth=%.2f+/-%.2f  ratio@z1t8=%s  completions=%.0f%%  wipe median tier=%s  choice=%.0f%%" % [
+	print("Matrix row: route=%s  map=%s  diff=%s  econ=%s  start=%s  specopen=%s  mb=%s  power=x%.2f  depth=%.2f+/-%.2f  ratio@z1t8=%s  completions=%.0f%%  wipe median tier=%s  choice=%.0f%%" % [
 		route, map_mode, diff,
 		("rich" if OS.get_environment("DOD_SIM_RUNE_ECON") == "rich" else "normal"),
 		("off" if OS.get_environment("DOD_SIM_START_RUNE") == "off" else "on"),
 		("off" if OS.get_environment("DOD_SIM_SPEC_OPENING") == "off" else "on"),
+		("off" if OS.get_environment("DOD_SIM_MINIBOSS") == "off" else "on"),
 		power_mult, _mean(depth_reached),
 		_sd(depth_reached) / sqrt(maxf(float(runs_done), 1.0)),
 		r8_desc, 100.0 * completed / runs, med_desc,

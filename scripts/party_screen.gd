@@ -89,6 +89,12 @@ func _draw_list() -> void:
 		# the player to this screen and would otherwise abandon them here.
 		# An owed pick outranks unspent points for the same reason it does
 		# on the map: the player already knows about points.
+		# Batch AH: an owed ABILITY reads the same way, in the trophy gold.
+		var owed_ab: int = int(member.get("bm_picks_owed", 0))
+		if owed_ab > 0:
+			line += "    ◆ %d %s TO CHOOSE" % [owed_ab,
+				"ABILITY" if owed_ab == 1 else "ABILITIES"]
+			btn.modulate = Color(0.95, 0.85, 0.4)
 		var owed: int = int(member.get("rune_picks_owed", 0))
 		if owed > 0 and not member.get("rune_candidates", []).is_empty():
 			line += "    ◆ %d RUNE%s TO CHOOSE" % [owed, "" if owed == 1 else "S"]
@@ -121,7 +127,7 @@ func _passive_desc_live(cfg: Dictionary, spec: String) -> String:
 	var desc: String = Classes.SPEC_INFO[spec]["passive_desc"]
 	match Classes.SPEC_INFO[spec]["passive"]:
 		"seasoned":
-			desc = "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +%d%% damage dealt, +10%% damage taken.\nDEFENSIVE — %d%% less damage taken, -10%% damage dealt.\nStarts each battle Aggressive; Guard Change swaps." % [
+			desc = "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +%d%% damage dealt, +10%% damage taken.\nDEFENSIVE — %d%% less damage taken, -10%% damage dealt.\nStarts each battle Aggressive; the earnable\nGuard Change swaps." % [
 				int(round((0.15 + float(cfg.get("seasoned_off_bonus", 0.0))) * 100)),
 				int(round((0.15 + float(cfg.get("seasoned_def_bonus", 0.0))) * 100))]
 		"bloodrage":
@@ -146,6 +152,15 @@ func _draw_detail() -> void:
 		# Spec blocks may override max_hp (Berserker 175): re-read the
 		# scaling baseline after the block, mirroring the battle spawn.
 		base_hp = cfg["max_hp"]
+		# Earned abilities (Batch AH) — BEFORE the tree, exactly as the
+		# battle spawn orders them, so a talent that modifies a pool-bought
+		# ability shows the same numbers here that it will in the fight.
+		# Six of a full kit's ten come from here; the sheet has to show them.
+		for bm_name in member.get("bm_abilities", []):
+			var bm_ab := Classes.spec_pool_ability(spec, String(bm_name))
+			if bm_ab != null and not cfg["abilities"].any(
+					func(a): return a.display_name == bm_ab.display_name):
+				cfg["abilities"] = cfg["abilities"] + [bm_ab]
 		Talents.apply_from_tree(cfg, member.get("tree", []), member.get("talents", {}))
 	for rune in member.get("runes", []):
 		if rune.get("equipped", false):
@@ -372,9 +387,9 @@ func _draw_detail() -> void:
 			Classes.SPEC_INFO[spec]["name"], member.get("talent_points", 0)]
 		_draw_fixed_tree(member.get("tree", []), member.get("talents", {}),
 			member.get("talent_points", 0))
-	# Beastmaster boss trophies wait on the Party screen until chosen.
-	if not Classes.spec_pool(spec).is_empty() \
-			and int(member.get("bm_picks_owed", 0)) > 0:
+	# Earned abilities wait on the Party screen until chosen (Batch AH: every
+	# spec has pools now, so the old "does this spec have one" gate is gone).
+	if int(member.get("bm_picks_owed", 0)) > 0:
 		_draw_bm_pick(member)
 	# Elite rune caches wait here too (Batch X pick-of-3, the trophy-picker
 	# pattern; candidates were rolled at drop time and stored).
@@ -690,7 +705,7 @@ func _learn_talent(talent_id: String) -> void:
 	_draw_screen()
 
 
-# ---------- Beastmaster boss trophy: pick 1 of the remaining pool ----------
+# ---------- the ability award: pick 1 of the three offered (Batch AH) ----------
 
 func _draw_bm_pick(member: Dictionary) -> void:
 	var panel := PanelContainer.new()
@@ -711,20 +726,40 @@ func _draw_bm_pick(member: Dictionary) -> void:
 	box.add_theme_constant_override("separation", 8)
 	panel.add_child(box)
 	var title := Label.new()
-	title.text = "BOSS TROPHY — choose one ability (%d owed)" % \
+	title.text = "NEW ABILITY — choose one (%d owed)" % \
 		int(member.get("bm_picks_owed", 0))
 	title.add_theme_font_size_override("font_size", 15)
 	title.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
 	box.add_child(title)
 	var pick_spec: String = member.get("spec", "")
-	for pool_name in Classes.spec_pool(pick_spec):
-		if pool_name in member.get("bm_abilities", []):
-			continue
+	# Batch AH: the offer is the stored triple rolled when the award
+	# dropped. A run saved before AH owes picks with no triple behind them —
+	# roll one on the spot so those saves resolve instead of dead-ending.
+	var queue: Array = member.get("bm_candidates", [])
+	if queue.is_empty():
+		queue = [Run.roll_ability_offer(member)]
+		member["bm_candidates"] = queue
+		Run.save_run()
+	var sub := Label.new()
+	sub.text = "one from your spec, two from your class"
+	sub.add_theme_font_size_override("font_size", 12)
+	sub.add_theme_color_override("font_color", Color(0.62, 0.58, 0.5))
+	box.add_child(sub)
+	var offer: Array = queue[0]
+	var spec_names: Array = Classes.spec_pool(pick_spec)
+	for i in offer.size():
+		var pool_name := String(offer[i])
 		var ab: Ability = Classes.spec_pool_ability(pick_spec, pool_name)
 		var b := Button.new()
 		b.text = pool_name
 		b.custom_minimum_size = Vector2(300, 34)
 		b.add_theme_font_size_override("font_size", 14)
+		# The spec draw LEADS the offer and wears the spec gold, so "which
+		# of these three is mine" is answered on the button rather than in
+		# a player's head — the pools overlap, so the name cannot say it.
+		if i == 0 and spec_names.has(pool_name):
+			b.text = "◆ %s" % pool_name
+			b.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
 		if ab != null:
 			b.tooltip_text = "%s\n\n%s" % [pool_name, ab.description]
 		b.pressed.connect(_pick_bm_ability.bind(pool_name))
@@ -804,6 +839,12 @@ func _pick_bm_ability(pool_name: String) -> void:
 	if int(member.get("bm_picks_owed", 0)) < 1 \
 			or pool_name in member.get("bm_abilities", []):
 		return
+	# Spend the triple this pick came from, exactly like the rune picker:
+	# the other two options are gone, not banked for the next award.
+	var queue: Array = member.get("bm_candidates", [])
+	if not queue.is_empty():
+		queue.pop_front()
+		member["bm_candidates"] = queue
 	member["bm_abilities"] = member.get("bm_abilities", []) + [pool_name]
 	member["bm_picks_owed"] = int(member.get("bm_picks_owed", 0)) - 1
 	Run.save_run()

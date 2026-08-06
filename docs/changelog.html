@@ -5,6 +5,238 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-05 — Batch AH: ability progression — three to start, six to earn</h2>
+<ul>
+<li><b>Every hero now opens a run with its core attack plus exactly THREE spec abilities,
+and earns six more over the run.</b> Nothing was written for this batch: every earnable
+ability already existed as a kit piece, a talent grant, or a vaulted one whose machinery
+never left battle.gd. <b>Trimmed out of their opening kits and made earnable:</b> the
+Berserker's <b>Blood Price</b>; the Warden's <b>War Stomp</b> and <b>Interpose</b>; the
+Swordmaster's <b>Sweeping Strikes</b> and <b>Guard Change</b>. Pyromancer, Cryomancer,
+Arcanist, Holy, Devout, Occultist, Sharpshooter and Survivalist already held exactly three
+and were left alone — and so was the <b>Beastmaster</b>, which is already at three under the
+batch's own counting rule: the Summon Companion picker is ONE slot however many beasts it
+offers (the action bar has always grouped them that way), plus Hunter's Instinct and Kill
+Command.</li>
+
+<li><b>WARDEN AND SWORDMASTER — the judgment calls, and their reasons.</b> The Warden keeps
+<b>Mocking Blow</b> (his only 0-cost Rage generator: without it he cannot afford his own
+opening), <b>Crushing Blow</b> (his damage and his Sunder) and <b>Shieldwall</b> (the Block
+identity Batch G deliberately promoted out of the tree and into the base kit). War Stomp is a
+mid-fight AoE, and Batch AB already found that <b>Interpose and Shieldwall are the same verb
+pointed two ways</b> — so the redundant half is the one that becomes earnable.
+<b>GUARD CHANGE IS FLAGGED, NOT ARGUED WITH.</b> The batch named the Swordmaster's three
+keepers explicitly, which leaves Guard Change earnable — and Guard Change is the ONLY way to
+swap stance, so until a Swordmaster earns it back he fights every battle Aggressive and half
+of Seasoned Fighter is inert. His tree still sells four stance nodes that would sit dead
+beside it. That is a real consequence of an explicit instruction, so it shipped as written
+and is recorded here rather than quietly reinterpreted.</li>
+
+<li><b>Two pools, and a curation rule with teeth.</b> <b>SPEC_POOLS</b> now covers all twelve
+specs: each spec's own trims, its talent-granted abilities, and its own vaulted ones.
+<b>CLASS_POOLS</b> is new — four entries holding the sibling specs' abilities plus the
+class's vaulted ones. <b>An entry only reaches a class pool if it FUNCTIONS for a sibling.</b>
+Excluded and why: <b>Hymn of Hope, Resurrection, Divine Plea</b> (faith_cost — Mercy is
+Holy-only, Faith is Devout-only, and a sibling has no stacks to pay with); <b>Detonation</b>
+and <b>Wildfire</b> (Burn consumers, and Wildfire is hard-gated with nothing alight);
+<b>Shatter</b> (hard-gated with nobody Chilled); <b>Arcane Cannon, Magi's Wrath, Stabilize,
+Overcharge</b> (Resonance — the first two scale their damage AND their entire Break
+contribution off stacks a sibling never builds, so they land as strictly-worse basics; the
+last two are outright no-ops); <b>Bestial Wrath, Spirit Bond, Primal Surge</b> (a living
+companion or Loyalty); <b>Coup de Grâce</b> (consumes all Focus); <b>Lunge</b> and
+<b>Guard Change</b> (the Swordmaster's stance — <code>stance</code> defaults to "aggressive"
+on every unit, so a sibling's Lunge could only ever Expose and never Cripple, which is half
+an ability); and the three named identity pieces, <b>the summons, Kill Command</b> and
+<b>Hex of Ruin</b>. Kept with their inert riders noted rather than excluded: <b>Hold
+Breath</b> and <b>Aimed Shot</b> (the Focus they grant is a rider; a guaranteed
+armour-ignoring crit and a 45% hit are the abilities), <b>Arcane Surge</b> and <b>Reality
+Fracture</b> (the +20% attack and the six-point initiative shove are the abilities; the
+Resonance line is a rider), <b>Mark of the Hunt</b> (its +25% keys on the caster's index, not
+on the Pack passive — only the Mana drip is Beastmaster-only), <b>Hunter's Instinct</b>
+(it empowers Quick Shot, which every Hunter spec has).</li>
+
+<li><b>The vault, unsealed — and the five that could not come back.</b> Returning as earnable
+picks, all on machinery that never left battle.gd: <b>Rallying Shout</b> (warrior),
+<b>Retaliation</b> (Warden), <b>Mana Shield, Arcane Surge, Reality Fracture, Phoenix
+Rebirth</b> (mage), <b>Dawnbreak, Sanctuary, Divine Wrath</b> (cleric), <b>Umbral Sigil</b>
+(Occultist). <b>Pyroblast, Flame Surge, Frost Bolt, Death Ray and Mend Wounds did NOT</b>:
+their <code>special</code> handlers went with them, so they exist only as prose in a comment
+and reviving them would mean AUTHORING them — which this batch's own opening line forbids.
+The three restored abilities whose full dicts survived (Mana Shield, Arcane Surge, Reality
+Fracture) came back verbatim; the other seven needed a cost/cooldown/initiative wrapper
+around effects the code already defines exactly, and those numbers are new and are the one
+place this batch made a balance judgment.</li>
+
+<li><b>NOT DONE, and it is a contradiction in the batch, not an omission.</b> §2 asks for six
+UNSHIPPED abilities to be added — Disengage, Suppressing Fire and Piercing Arrow for the
+Sharpshooter, Blight, Smoke Bomb and Field Dressing for the Survivalist. The batch's own
+first paragraph says "No new abilities are written in this batch", and no costs, damage,
+mechanics or descriptions were given for any of the six. Authoring them would have been six
+abilities' worth of undirected design, so the header rule won and the two Hunter pools ship
+at five entries each. <b>Nothing is blocked by this</b> — the cross-fill rule keeps every
+offer at three regardless.</li>
+
+<li><b>Each award offers 3 abilities the hero does not own: 1 from its spec pool, 2 from its
+class pool.</b> Either side fills for the other when its own runs dry, so an offer only
+shrinks below three once BOTH are nearly exhausted; measured over all twelve specs, six
+awards a run, every offer stays at three. <b>THE SPEC DRAW LEADS THE OFFER</b> and wears the
+trophy gold on the Party screen. That is a deliberate departure from the rune picker, which
+shuffles its triple: there the blindness IS the question, but the two ability pools OVERLAP
+by design (a spec's own talent grants sit in both), so nothing in the NAME says which pool
+an entry came from and hiding it would just withhold something the player has earned the
+right to know. The triple is rolled the moment the award drops and stored on the member (the
+rune-cache pattern), so re-opening the screen never rerolls it. Storage stays
+<code>bm_abilities</code>; the new <code>bm_candidates</code> queue is another key on the
+party dict, so <b>the save stays v5 with no migration</b>, and a run saved before this batch
+that owes a pick rolls its triple on the spot rather than dead-ending.</li>
+
+<li><b>A SPAWN-ORDERING BUG, found by making abilities earnable.</b> Earned abilities used to
+be appended AFTER <code>Talents.apply_from_tree</code>. Several talents MODIFY an ability
+rather than grant one — and Battle Shout is both talent-granted and talent-modified, so a
+Berserker who bought Deafening Cry and then EARNED Battle Shout from the pool would have had
+the -1 cooldown silently miss it. Earned abilities now go on BEFORE the tree;
+<code>apply_from_tree</code> already refuses to double-grant a name it can see, so the
+talent-bought path is unchanged.</li>
+
+<li><b>ONE GUARANTEED MINI-BOSS PER ZONE, on the middle row.</b> Tier 6 is now the zone's
+mini-boss and it occupies <b>all three columns</b>, so no route goes around it. It is a
+combat node between elite and boss: an <b>elite warband carrying a boss-tier health pool</b>
+— every enemy at <b>×1.5 max HP, attack untouched</b>, which puts a chief's 250 at 375, in
+among the two authored bosses at 370 and 500. It pays <b>elite gold (80–100) and 2 talent
+points</b>, and its own spoil is an <b>ability pick</b> — no consumable, no rune cache, so
+the rune economy AE and AF measured is left alone. The <b>zone boss now awards an ability
+pick too</b>, on top of its existing 3 talent points. Two picks a zone, six a run.</li>
+
+<li><b>The map deal absorbs it without touching the run economy.</b> The mini-boss row is
+AUTHORED, not dealt, so the deck now deals <b>27 cards into nine tiers</b> — and it is paid
+for out of the FIGHT cards alone (<b>17 → 14</b>). Rest 5, shop 5 and event 3 are
+byte-identical, which is the point: a zone trades three ordinary fight OFFERS for one
+guaranteed hard fight, and the economy dials that drive gold, healing and rune access do not
+move. The structural constraints are now stated in TIER terms and converted to card slices,
+so lifting a row out of the deal cannot silently shift a window; a second 27-card authored
+fallback (<code>DECK_FALLBACK_MB</code>) matches the new composition. Elites still roll at
+25% on tiers 6+, which in practice means tiers 7–10 now, with the existing
+one-elite-per-zone floor unchanged.</li>
+
+<li><b>FLAG: <code>DOD_SIM_MINIBOSS=off</code></b> reproduces the pre-AH map — ten dealt
+tiers, the full 17-fight deck, no mini-boss and so no mini-boss award. Shipped content, so it
+defaults ON and, like the AE and AF flags and unlike AD's experiment arms, it is NOT gated on
+<code>sim_run</code>. <b>It is an honest control for the MAP half of this batch only</b>: kit
+sizes still open at three with it off, because the trim is structural and has no switch. Post-AH
+Matrix rows carry <code>mb=</code>; pre-AH rows do not, so never compare across.</li>
+
+<li><b>The action bar has no cap and no swap step.</b> A hero holds every ability it earns.
+Abilities 1–9 keep their hotkeys — with <b>G added as the ninth</b>, which the batch's own
+worked example requires ("ability 10 = Shift+Q" only lands if nine plain keys exist) — and
+<b>ability 10 onward binds to Shift + the same key in the same order</b>, up to 18 at
+Shift+G. The button carries the modifier: "[⇧Q] Blood Price". Shift hotkeys route through
+the same <code>_ability_usable</code> gate and the same two fenced call sites, so they are
+ignored when the ability is unaffordable or gated and inactive during targeting or a skill
+check. A real run tops out at core + 3 + 6 = <b>10 abilities</b>, so exactly one Shift slot
+is reachable in play; the harness stresses it to eighteen anyway.</li>
+
+<li><b>Eight Perfect skill checks became RELIABILITY checks.</b> In each the Perfect removes
+a chance roll instead of adding magnitude, and the old bonus is gone: <b>Hack and Slash</b>
+lands its Bleed on all three strikes (loses the 4th strike); <b>Blizzard</b> puts 2 stacks of
+Chilled on every enemy instead of 1–2 (loses the 5-Mana refund); <b>Pommel Strike</b> lands
+its Stun on an unbroken boss (loses the parry buff); <b>Snare Trap</b> the same (loses the
+extra Poison turns — Poison is a flat 4 either way now); <b>Firestorm</b> spreads its bolts
+evenly across the living instead of scattering them (loses the extra bolts);
+<b>Arcane Barrage</b> never strikes the same enemy twice while an unstruck one stands (loses
+the 7th bolt); <b>Triple Shot</b> pays out one guaranteed critical; and <b>Deadfall</b>
+gained a skill check it never had so it could have a Perfect at all — a perfect rig lets the
+player NAME the victim. Wildstrikes was already converted in Batch AG and was left alone.</li>
+
+<li><b>Three implementation notes from that conversion.</b> (1) The two scatter perfects —
+Firestorm and Arcane Barrage — are ONE mechanic under two framings: deal the target pool
+round-robin and refill it only once it empties. "Every enemy takes an even share" and "no two
+bolts strike the same enemy" are the same rule described from different ends. (2) The boss
+Stun immunity now has exactly one escape, an explicit <code>force</code> argument on
+<code>_apply_status</code> rather than a name check inside it — so the exception is visible
+at the call site that bought it, and Freeze, Psychosis, Bewitch and Hysteria are untouched.
+(3) An AIMED Deadfall waits for its mark, and <b>releases if the mark dies first</b>, so a
+perfect rig can never be worth less than an ordinary one.</li>
+
+<li><b>A LIVE BUG, exposed by the rule.</b> <b>Triple Shot fired TWO arrows.</b> Its
+<code>multi_hits</code> was 2 while its name, its description ("Three arrows at one target")
+and the master document all said three — and because <code>perfect_extra_hit</code> defaults
+to true and its <code>perfect_text</code> was empty, a Perfect silently added the third with
+no tooltip anywhere admitting it. Removing the undocumented magnitude perfect is what this
+batch's rule demands, and doing it would have left an ability called Triple Shot firing two
+arrows forever. <b>multi_hits is now 3</b> and the extra hit is off.</li>
+
+<li><b>Two knock-ons the conversion left behind, cleaned up.</b> (1) <b>Swordsmanship</b>
+read "a perfect Pommel Strike grants +5%/rank more parry chance" — and Pommel Strike's
+perfect is now the boss Stun. The mechanic was ALREADY shared with Guard Change's perfect,
+so the node is re-pointed in place: same id (saved ranks migrate), same stat, wording moved
+to the source that still pays it. (2) The <code>parry_up</code> and <code>mana5</code>
+perfect_id handlers had no callers left — Pommel Strike and Blizzard were the only ones —
+so they are gone. Guard Change applies its own parry buff inline and is unaffected. Nothing
+in runes.json or the talent trees writes a perfect_id except <code>rage5</code>, so the two
+removals are provably unreachable rather than probably.</li>
+
+<li><b>Visibility.</b> Owed ability picks badge the map's Party button in the trophy gold and
+pulse it (rune purple still outranks them), and the Party screen's hero list marks the owed
+row — the same affordance chain Batch AE built for runes, because a pick left unchosen is a
+hero walking into the next tier a third weaker than intended. The picker's heading is now
+"NEW ABILITY — choose one" with the subtitle "one from your spec, two from your class"; the
+map gains a <b>WARDEN</b> node label in a colour between the elite's orange and the boss's
+red, and a "Mini-boss" entry in the debug summon menu.</li>
+
+<li><b>VERIFIED.</b> New <code>test_batch_ah.gd</code>: <b>4,263 checks, 0 failures</b> —
+every spec's kit counted at three, all 100 pool entries resolved to an Ability, the curation
+rule asserted rather than trusted (no faith_cost, no summon/Kill Command/Hex of Ruin, no
+passive-gated special in any class pool), pool copies proven identical to the kit and talent
+copies they mirror, the offer shape and the six-award sequence checked for all twelve specs,
+cross-fill and both-pools-dry forced, a talent-learned ability proven un-offerable, and the
+mini-boss row proven to be exactly one row, on the middle tier, full width, with a forward
+DP showing <b>no route reaches the boss without crossing it</b>. New
+<code>test_batch_ah_battle.gd</code>: <b>41 checks, 0 failures</b> in a spawned battle —
+an earned class-pool ability reaching the kit, Deafening Cry finding a POOL-bought Battle
+Shout (the ordering fix), the action bar handing slot 10 its ⇧Q, the boss Stun immunity
+holding for an ordinary cast and yielding to a forced one through both routes
+(<code>_apply_status</code> and <code>_spring_trap</code>), Freeze immunity proven untouched
+by the new argument's default, and mini-boss enemies measured against their own elite
+selves. Regression: <code>test_runes.gd</code> 3,248/0, <code>test_start_rune.gd</code>
+233/0, <code>test_start_rune_ui.gd</code> 31/0, <code>test_run_harness.gd</code> gates 1/2/3
+PASS, <code>test_rune_battle.gd</code> 91/1 — the same single failure the unmodified code gives
+6 runs out of 6 (a Batch AG Inferno-chip check that reads the chip before any Burn is on the
+field). <b>That harness needed one fix, and the fix is worth recording:</b> its White Flame
+check reads a LOG LINE, which made it a race against how long a fight lasts — and trimming
+the Berserker's kit shortened fights enough that the Pyromancer sometimes never took a turn
+(0 fire casts in ~50% of runs; restoring Blood Price made it 6/6 again, which is how the
+cause was pinned). A check that depends on the bot happening to get a turn cannot fail
+honestly, so the pass now FORCES one fire hit onto a resistant enemy instead of hoping for
+one: 6/6 stable, and the flake is gone rather than tolerated. Headless parse: all 10
+scenes, 0 SCRIPT ERROR.</li>
+
+<li><b>MEASURED (n=100 runs each, route=default, control = <code>mb=off</code>).</b>
+<b>THE ACQUISITION HALF LANDED:</b> abilities earned per hero per run <b>1.18 → 3.02</b>
+(offers 3.54 → 9.06), and the ceiling of 6 is not the target — the average run only reaches
+2.0 mini-bosses and 1.3 zone bosses, so 3.02 is very nearly every award a run actually
+survives to collect. Talent points 19.1 → 21.0 and gold 711 → 808, both exactly the
+mini-boss's own payout. Mini-boss nodes taken 2.0 of 2.0 offered: <b>unroutable in practice,
+not just on paper</b>.
+<br><b>THE DIFFICULTY HALF DID NOT MOVE, on the metric built to see it:</b> depth 20.15 →
+20.49 = <b>+0.34 tiers against a resolvable difference of 3.57</b> — nowhere near clearing,
+and remarkable in itself, since the treatment fights two extra hard battles a run to reach
+the same place. ratio@z1t8 1.00 → 0.95, flat. Wipe median moved z2 t8 → <b>z2 t10, deeper</b>.
+<br><b>REPORTED, NOT ACTED ON — the one row that disagrees.</b> Completions read
+<b>9% → 0%</b>, which nominally clears its own 8.2-point threshold (z=3.07). It is recorded
+rather than believed, for two reasons stated together: (a) Batch AE's noise calibration
+measured <b>7% and 14% from two identical halves of one arm</b>, so a 9-point completion
+swing is inside this instrument's known noise, and (b) an earlier n=100 pass over the same
+code — discarded because two background jobs wrote the same file and corrupted it — produced
+completion rows of 12% and 4%. Depth is the low-variance metric and depth says nothing moved.
+<br><b>ROUTE AGENCY IS THE ONE REAL COST, and it is by design:</b> steps offering a genuine
+choice <b>77% → 71%</b>, and rests taken 2.3 → 1.9. A row with one node type in all three
+columns is a row with no decision in it — that is what "cannot be routed around" buys, and
+one tier in eleven is the price. Fights taken fall 14.4 → 12.7 and elites 1.1 → 0.9, both
+the arithmetic of three fight cards leaving the deck.
+<br><b>PURITY:</b> profile.json and relics.json byte-identical across both arms;
+run_save.bin never created.</li>
+</ul>
+
 <h2>2026-08-05 — Batch AG: combat tuning — reliability, Burn turns, and the tempo of self-buffs</h2>
 <ul>
 <li><b>Wildstrikes trades magnitude for reliability.</b> The sweep had <b>no

@@ -7,13 +7,16 @@ const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 const NODE_LABELS := {
 	"fight": "Fight", "elite": "ELITE", "rest": "Rest",
 	"treasure": "Loot", "boss": "BOSS", "shop": "Shop",
-	"event": "???",
+	"event": "???", "miniboss": "WARDEN",
 }
 const NODE_COLORS := {
 	"fight": Color(0.75, 0.72, 0.65), "elite": Color(0.95, 0.55, 0.3),
 	"rest": Color(0.5, 0.85, 0.55), "treasure": Color(0.95, 0.85, 0.4),
 	"boss": Color(0.9, 0.3, 0.35), "shop": Color(0.5, 0.8, 0.95),
 	"event": Color(0.78, 0.55, 0.95),
+	# Between the elite's orange and the boss's red, because that is exactly
+	# where the node sits.
+	"miniboss": Color(0.95, 0.42, 0.32),
 }
 
 # Debug-only-reachable nodes (Batch AC) wear this outline — a colour no
@@ -21,7 +24,7 @@ const NODE_COLORS := {
 # for one of the three real ones.
 const DEBUG_OUTLINE := Color(1.0, 0.35, 0.85)
 # Burger ids: 0-3 are the real entries, 10-16 the pre-AC debug block,
-# 20-25 this batch's, and 100+ one per event in the picker.
+# 20-26 the summon block, and 100+ one per event in the picker.
 const PICKER_ID_BASE := 100
 
 
@@ -70,6 +73,9 @@ func _maybe_show_framing() -> bool:
 	body.text = ("A run climbs this map one node at a time: 10 tiers, then the\n" +
 		"zone boss at the top. Kill the boss and the party descends into the\n" +
 		"next zone — three zones stand between you and the end of the run.\n\n" +
+		"Halfway up, the whole tier is one MINI-BOSS — there is no way\n" +
+		"around it. It and the zone boss each let every hero choose a NEW\n" +
+		"ABILITY on the Party screen: two a zone, six across a run.\n\n" +
 		"Death ends the run and takes everything with it — gold, talents,\n" +
 		"runes. But every boss you fell leaves a RELIC behind, unlocked\n" +
 		"forever and yours to carry into the next attempt.\n\n" +
@@ -191,15 +197,25 @@ func _draw_screen() -> void:
 	# the rune purple (which outranks the talent gold) and the button
 	# breathes until the picks are spent.
 	var owed := Run.owed_rune_picks()
+	# Batch AH: owed ABILITY picks badge the same button for the same reason
+	# — two a zone is the batch's whole progression curve, and a pick left
+	# unchosen is a hero fighting the next tier a third weaker than intended.
+	var owed_abs := Run.owed_ability_picks()
 	var badges := PackedStringArray()
 	if unspent > 0:
 		badges.append("%d pts!" % unspent)
+	if owed_abs > 0:
+		badges.append("%d abilities!" % owed_abs)
 	if owed > 0:
 		badges.append("%d runes!" % owed)
 	party_btn.text = "Party" if badges.is_empty() \
 		else "Party  (%s)" % " · ".join(badges)
+	# Colour precedence: rune purple over ability gold over talent gold —
+	# the same "loudest unspent thing wins" rule Batch AE set.
 	if owed > 0:
 		party_btn.modulate = Color(0.85, 0.6, 1.0)
+	elif owed_abs > 0:
+		party_btn.modulate = Color(0.95, 0.85, 0.4)
 	elif unspent > 0:
 		party_btn.modulate = Color(1.0, 0.9, 0.45)
 	party_btn.custom_minimum_size = Vector2(150, 42)
@@ -207,7 +223,7 @@ func _draw_screen() -> void:
 	party_btn.pressed.connect(Music.click)
 	party_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/party.tscn"))
 	add_child(party_btn)
-	if owed > 0:
+	if owed > 0 or owed_abs > 0:
 		# Bound to the button, so the redraw that clears the owed count
 		# takes the pulse with it.
 		var pulse := create_tween().bind_node(party_btn).set_loops()
@@ -249,6 +265,7 @@ func _draw_screen() -> void:
 		summon.add_item("??? Event", 23)
 		summon.add_item("Fight", 24)
 		summon.add_item("Elite", 25)
+		summon.add_item("Mini-boss", 26)
 		# Boss deliberately absent: "Jump to Boss Tier" (13) already goes
 		# there, and a second path to the same place is a second thing to
 		# keep working.
@@ -536,6 +553,8 @@ func _on_burger(id: int) -> void:
 			_summon("fight")
 		25:
 			_summon("elite")
+		26:
+			_summon("miniboss")
 		_:
 			if id >= PICKER_ID_BASE:
 				var ids := _event_picker_ids()

@@ -85,9 +85,9 @@ static func config(id: String) -> Dictionary:
 
 
 # The hero's derivable kit, by display name: core kit + spec abilities +
-# kit-override renames + boss trophies. Do NOT skip the trophy list —
-# several runes attach to trophy abilities, exactly the ones a hero may
-# not have.
+# kit-override renames + EARNED abilities (Batch AH: six a run, from either
+# pool). Do NOT skip the earned list — several runes attach to abilities a
+# hero only has because it picked them.
 static func kit_names(member: Dictionary) -> Array:
 	var cfg: Dictionary = Classes.hero_config(String(member["key"]))
 	var spec := String(member.get("spec", ""))

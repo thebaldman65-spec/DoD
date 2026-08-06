@@ -249,8 +249,13 @@ const LANE_TREES := {
 			"scale": {"step": 8},
 			"payload": {"stat": {"bracing_ranks": 1}}},
 		# Moved from Duelist.
+		# Batch AH re-pointed this node in place: Pommel Strike's perfect is
+		# now the boss Stun, so the parry buff it used to deepen no longer
+		# exists. The mechanic was ALREADY shared with Guard Change's
+		# perfect, so the node keeps its id (saved ranks migrate) and its
+		# stat name; only the wording moves to the source that still pays.
 		{"id": "sm_swordsmanship", "name": "Swordsmanship", "ranks": 3, "lane": "Poise", "tier": 1,
-			"desc": "A perfect Pommel Strike grants +{v}% more parry chance.",
+			"desc": "A perfect Guard Change grants +{v}% more parry chance.",
 			"scale": {"step": 5},
 			"payload": {"stat": {"pommel_parry_bonus": 0.05}}},
 		{"id": "sm_high_guard", "name": "High Guard", "ranks": 1, "lane": "Poise", "tier": 1,
@@ -602,7 +607,7 @@ const LANE_TREES := {
 				"dmg_type": "fire", "damage": 12, "pressure": 8, "random_hits": 6,
 				"perfect_extra_hit": false, "delay": 3.5, "anim": "attack03", "cooldown": 4,
 				"applies_status": {"id": "burn", "turns": 2},
-				"perfect_id": "", "perfect_text": "Hits 7-9 times instead",
+				"perfect_id": "", "perfect_text": "Every enemy takes an even share.",
 				"description": "The sky ignites: 6-8 bolts rake random\nenemies for 12% of Attack, each one\nsetting its victim Burning (2 turns\nper bolt — repeats stack)."}}},
 		{"id": "py_rebirth", "name": "Avatar of Flame", "ranks": 1, "lane": "Inferno", "tier": 2,
 			"capstone": true,
@@ -1632,6 +1637,21 @@ const LANE_TREES := {
 # Empty since Batch P (07-31): the Arcanist conversion was the last one
 # standing; its fillers re-specced in place inside LANE_TREES.
 const LANE_CONVERSIONS := {}
+
+
+# Every ability a talent NODE grants, by display name — the single source
+# the earnable pools read, so a pool copy can never drift from the copy a
+# talent purchase hands out.
+static func granted_ability(display_name: String) -> Ability:
+	for spec_key in LANE_TREES:
+		for node in LANE_TREES[spec_key]:
+			var pay: Dictionary = node.get("payload", {})
+			if pay.has("new_ability") \
+					and String(pay["new_ability"]["display_name"]) == display_name:
+				return Ability.make(pay["new_ability"])
+			if pay.has("grant_ability") and String(pay["grant_ability"]) == display_name:
+				return Classes.pending_talent_ability(display_name)
+	return null
 
 
 static func has_tree(spec: String) -> bool:

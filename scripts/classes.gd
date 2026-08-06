@@ -142,13 +142,34 @@ static func cleric_kit() -> Array:
 	]
 
 
-# Holy talent-granted abilities: the Holy tree isn't designed yet — these
-# defs wait here for its "grants the ability" nodes, and power the
-# Boss-trophy pools (Batch 30/32): one ability pick per zone boss, chosen
-# from the spec's pool on the Party screen. Order is the offer order. The
-# Sharpshooter ships 5 of its designed 8 (Disengage, Suppressing Fire, and
-# Piercing Arrow drop in later with no restructuring).
+# ---------- the earnable pools (Batch AH) ----------
+#
+# Every hero starts with its core attack plus exactly 3 spec abilities and
+# EARNS 6 more over a run — two per zone, one from the mini-boss and one
+# from the zone boss. Each award offers 3 abilities the hero does not own:
+# 1 from its SPEC_POOLS entry and 2 from its class's CLASS_POOLS entry
+# (Run.roll_ability_offer). Nothing here is new content: a pool entry is
+# either an ability trimmed out of a starting kit, an ability a talent node
+# grants, an ability another spec of the same class starts with, or a
+# vaulted ability whose machinery never left battle.gd.
+#
+# SPEC_POOLS — what only THIS spec can earn: its own trims, its own
+# talent-granted abilities, and its own vaulted ones.
 const SPEC_POOLS := {
+	# Warrior.
+	"berserker": ["Blood Price", "Battle Shout", "Rampage"],
+	"warden": ["War Stomp", "Interpose", "Hold the Line", "Retaliation"],
+	"swordmaster": ["Sweeping Strikes", "Guard Change", "Lunge", "Execute"],
+	# Mage.
+	"pyromancer": ["Flame Shield", "Firestorm"],
+	"cryomancer": ["Rime", "Shatter"],
+	"arcanist": ["Overcharge", "Magi's Wrath"],
+	# Cleric. The three Mercy/Faith spenders can only ever be spec picks —
+	# a sibling has no stacks to pay them with.
+	"holy": ["Resurrection", "Divine Plea"],
+	"inquisitor": ["Sacred Resolve", "Bulwark of Fortitude"],
+	"occultist": ["Mind Flay", "Mass Hysteria", "Umbral Sigil"],
+	# Hunter — the three pools that shipped in Batch 30/32, unchanged.
 	"beastmaster": ["Bestial Wrath", "Spirit Bond", "Primal Surge",
 		"Call of the Wild", "Mark of the Hunt"],
 	"sharpshooter": ["Quick Draw", "Triple Shot", "Coup de Grâce",
@@ -156,24 +177,216 @@ const SPEC_POOLS := {
 	"mystic": ["Explosive Shot", "Venom Coating", "Hamstring",
 		"Deadfall", "Harvest"],
 }
-const BEASTMASTER_POOL := ["Bestial Wrath", "Spirit Bond", "Primal Surge",
-	"Call of the Wild", "Mark of the Hunt"]
+
+# CLASS_POOLS — what ANY spec of the class can earn: the sibling specs'
+# abilities plus the class's vaulted ones. CURATION RULE: an entry has to
+# FUNCTION for a sibling. Anything that costs a spec-exclusive secondary
+# resource (faith_cost), reads a passive the taker will not have (Burn to
+# consume, Resonance to spend, Loyalty or a living beast, the Swordmaster's
+# stance), or is a spec's signature identity piece (the summons, Kill
+# Command, Hex of Ruin) stays in SPEC_POOLS only. The changelog lists every
+# exclusion and its reason.
+const CLASS_POOLS := {
+	"warrior": ["Bloodlust", "Wildstrikes", "Hack and Slash", "Blood Price",
+		"Battle Shout", "Rampage", "Mocking Blow", "Crushing Blow", "War Stomp",
+		"Shieldwall", "Interpose", "Hold the Line", "Overpower", "Pommel Strike",
+		"Shatterpoint", "Sweeping Strikes", "Execute", "Rallying Shout"],
+	"mage": ["Flamewave", "Flame Shield", "Firestorm", "Razor Ice", "Blizzard",
+		"Ice Lance", "Rime", "Arcane Barrage", "Mana Shield", "Arcane Surge",
+		"Reality Fracture", "Phoenix Rebirth"],
+	"cleric": ["Heal", "Renewal", "Divine Shield", "Consecrated Ground",
+		"Blessing of Zeal", "Sacred Resolve", "Bulwark of Fortitude", "Bewitch",
+		"Dark Pact", "Mind Flay", "Mass Hysteria", "Dawnbreak", "Sanctuary",
+		"Divine Wrath"],
+	"hunter": ["Hunter's Instinct", "Mark of the Hunt", "Aimed Shot", "Powershot",
+		"Hold Breath", "Quick Draw", "Triple Shot", "Pinning Shot", "Called Shot",
+		"Tripwire", "Shrapnel Charge", "Snare Trap", "Explosive Shot",
+		"Venom Coating", "Hamstring", "Deadfall", "Harvest"],
+}
 
 
 static func spec_pool(spec: String) -> Array:
 	return SPEC_POOLS.get(spec, [])
 
 
+static func class_pool(class_name_key: String) -> Array:
+	return CLASS_POOLS.get(class_name_key, [])
+
+
+# The class a spec belongs to ("" when the spec is unknown/unawakened).
+static func class_of_spec(spec: String) -> String:
+	for class_key in SPEC_IDS:
+		if SPEC_IDS[class_key].has(spec):
+			return class_key
+	return ""
+
+
+# Resolve a pool NAME to its Ability, from either pool. The `spec` argument
+# survives from the Batch 30 signature and only steers the three hunter
+# trophy tables; everything else resolves by name alone, because a display
+# name is unique across the whole game.
 static func spec_pool_ability(spec: String, display_name: String) -> Ability:
 	if spec == "sharpshooter":
-		return sharpshooter_pool_ability(display_name)
+		var ss := sharpshooter_pool_ability(display_name)
+		if ss != null:
+			return ss
 	if spec == "mystic":
-		return survivalist_pool_ability(display_name)
-	return beastmaster_pool_ability(display_name)
+		var sv := survivalist_pool_ability(display_name)
+		if sv != null:
+			return sv
+	return pool_ability(display_name)
 
 
-# Survivalist trophies (5 of the designed 8 — Blight, Smoke Bomb, and
-# Field Dressing land later with no restructuring).
+# THE resolver. Order matters only for speed — no name lives in two of
+# these. Nothing here holds a second copy of an ability that exists
+# elsewhere: kit pieces are read back out of the living kits and
+# talent-granted ones out of the living trees, so a pool copy can never
+# drift from the copy the kit or the talent hands out.
+static func pool_ability(display_name: String) -> Ability:
+	var beast := beastmaster_pool_ability(display_name)
+	if beast != null:
+		return beast
+	var ss := sharpshooter_pool_ability(display_name)
+	if ss != null:
+		return ss
+	var sv := survivalist_pool_ability(display_name)
+	if sv != null:
+		return sv
+	var pend := pending_talent_ability(display_name)
+	if pend != null:
+		return pend
+	var trimmed := trimmed_kit_ability(display_name)
+	if trimmed != null:
+		return trimmed
+	var vault := vault_ability(display_name)
+	if vault != null:
+		return vault
+	# Another spec of the same class starts with it — read the live kit.
+	for class_key in SPEC_IDS:
+		for spec_id in SPEC_IDS[class_key]:
+			for ab in spec_abilities(spec_id):
+				if ab.display_name == display_name:
+					return ab
+	# A talent node grants it (new_ability payloads live in the trees).
+	return Talents.granted_ability(display_name)
+
+
+# ---------- the vault, unsealed ----------
+#
+# Abilities that left a kit but never left the code: every one of these
+# still has its `special` handler in battle.gd, so they return as earnable
+# picks without a line of new mechanics. FIVE could NOT come back, because
+# their machinery went with them: Pyroblast, Flame Surge, Frost Bolt, Death
+# Ray and Mend Wounds are prose in a comment, not code, and reviving them
+# would mean AUTHORING them. Three of the ten below (Mana Shield, Arcane
+# Surge, Reality Fracture) kept their full dicts in the vault comments and
+# come back verbatim; the other seven needed a cost/cooldown/initiative
+# wrapper around effects the handler already defines exactly, and THOSE
+# NUMBERS ARE NEW — the one balance judgment this batch made.
+static func vault_ability(display_name: String) -> Ability:
+	match display_name:
+		"Rallying Shout":
+			return Ability.make({"display_name": "Rallying Shout", "cost": 25,
+				"special": "rally", "delay": 2.5, "anim": "attack03", "cooldown": 3,
+				"perfect_id": "", "perfect_text": "-50 Pressure and +30% resource instead",
+				"description": "Raise the line: the whole party sheds\n30 Pressure, and every other ally\nregains 20% of their resource."})
+		"Retaliation":
+			return Ability.make({"display_name": "Retaliation", "cost": 20,
+				"special": "retaliate", "delay": 2.0, "anim": "attack01", "cooldown": 3,
+				"perfect_id": "", "perfect_text": "Holds a 4th turn",
+				"description": "Set the counter-stance: for 3 turns\nevery attacker is answered with a\nbasic strike."})
+		"Mana Shield":
+			return Ability.make({"display_name": "Mana Shield", "cooldown": 3,
+				"cost": 15, "special": "mana_shield", "delay": 2.0, "anim": "attack03",
+				"perfect_id": "", "perfect_text": "Initiative cost 1.5 instead of 2",
+				"description": "50% of damage taken converts into\nMana (3 turns)."})
+		"Arcane Surge":
+			return Ability.make({"display_name": "Arcane Surge", "cost": 15,
+				"special": "surge", "delay": 3.0, "anim": "attack03", "cooldown": 3,
+				"perfect_id": "", "perfect_text": "+2 Resonance instead of +1",
+				"description": "+20% attack on your next turn.\nAn Arcanist also banks 1 Resonance."})
+		"Reality Fracture":
+			return Ability.make({"display_name": "Reality Fracture",
+				"dmg_type": "arcane", "cost": 20, "damage": 15, "pressure": 14,
+				"delay": 2.0, "anim": "attack03", "delay_push": 6.0, "cooldown": 3,
+				"perfect_id": "", "perfect_text": "An Arcanist also banks 1 Resonance",
+				"description": "Shove the target far down the\ninitiative order."})
+		"Phoenix Rebirth":
+			return Ability.make({"display_name": "Phoenix Rebirth", "cost": 0,
+				"special": "phoenix", "delay": 2.0, "anim": "attack03", "cooldown": 4,
+				"perfect_id": "", "perfect_text": "Costs 15% of health instead",
+				"description": "Burn your own life for power: pay 25%\nof current health for FULL resource\nand 3 turns of Empower (+25% damage)."})
+		"Dawnbreak":
+			return Ability.make({"display_name": "Dawnbreak", "cost": 20,
+				"special": "dawnbreak", "target": Ability.Target.ALLY,
+				"delay": 3.0, "anim": "attack02", "cooldown": 2,
+				"perfect_id": "", "perfect_text": "Heals 55 instead of 40",
+				"description": "Call the dawn: heal an ally 40.\nWhatever overflows their bar heals\nthe caster instead."})
+		"Sanctuary":
+			return Ability.make({"display_name": "Sanctuary", "cost": 30,
+				"special": "sanctuary", "delay": 3.5, "anim": "attack03", "cooldown": 4,
+				"perfect_id": "", "perfect_text": "Heals 18% instead of 12%",
+				"description": "Ground made safe: every ally heals\n12% of their max health."})
+		"Divine Wrath":
+			return Ability.make({"display_name": "Divine Wrath", "cost": 25,
+				"special": "divine_wrath", "delay": 2.5, "anim": "attack03", "cooldown": 4,
+				"perfect_id": "", "perfect_text": "Lasts 4 turns",
+				"description": "The light answers: the whole party\ndeals +15% damage and acts 15%\nfaster for 3 turns."})
+		"Umbral Sigil":
+			return Ability.make({"display_name": "Umbral Sigil", "cooldown": 4,
+				"cost": 20, "special": "umbral_sigil", "delay": 3.0, "anim": "attack03",
+				"perfect_id": "", "perfect_text": "Lasts 4 turns",
+				"description": "Brand one enemy for 3 turns: half of\nevery attack it suffers echoes through\nits whole warband."})
+	return null
+
+
+# ---------- abilities trimmed out of a starting kit (Batch AH) ----------
+#
+# These left their spec's opening three and became earnable. The defs live
+# here rather than in spec_abilities() so there is still exactly one copy.
+static func trimmed_kit_ability(display_name: String) -> Ability:
+	match display_name:
+		"Blood Price":
+			return Ability.make({"display_name": "Blood Price", "cost": 0,
+				"special": "blood_price", "delay": 1.5, "anim": "attack02",
+				"cooldown": 3,
+				"perfect_id": "", "perfect_text": "The health cost is halved",
+				"description": "Open his own veins: pays 15% of\ncurrent health (never lethal) for\n30 Rage and +25% damage for 2 turns.\nBlood Frenzy wakes when HE says so."})
+		"War Stomp":
+			return Ability.make({"display_name": "War Stomp", "cost": 20, "damage": 15,
+				"pressure": 15, "delay": 3.0, "anim": "attack03", "cooldown": 3,
+				"random_hits": 3, "perfect_extra_hit": false,
+				"perfect_id": "", "perfect_text": "Allies regain 20% of their resource instead",
+				"description": "Slam the earth: 3 shockwaves rip\nrandom enemies for 15% Attack damage\nand 15 BD each. Allies regain 10%\nof their resource."})
+		"Interpose":
+			return Ability.make({"display_name": "Interpose", "cost": 25,
+				"special": "interpose", "delay": 2.0, "anim": "attack01",
+				"cooldown": 4,
+				"perfect_id": "", "perfect_text": "The Warden gains a charge too",
+				"description": "Throw the wall wide: every other ally\ngains a shield charge — the next\nattack against them is BLOCKED."})
+		"Sweeping Strikes":
+			return Ability.make({"display_name": "Sweeping Strikes", "cost": 20,
+				"damage": 15, "pressure": 12, "delay": 3.0, "anim": "attack02",
+				"multi_hits": 2, "perfect_extra_hit": false, "resource_gain": 10,
+				"applies_status": {"id": "dazed", "turns": 3},
+				"perfect_id": "", "perfect_text": "+25% crit chance on the second swing",
+				"description": "Two broad cuts that leave the target\nDazed for 3 turns. Builds 10 Rage."})
+		"Guard Change":
+			# Not a free action on purpose: turn-less actions need engine
+			# support, so the swap does double duty — stance, pressure,
+			# refuel — at a bargain 1.5 initiative. The 1cd stops spam.
+			return Ability.make({"display_name": "Guard Change", "cost": 0,
+				"special": "guard_change", "delay": 1.5, "anim": "attack01",
+				"cooldown": 1, "resource_gain": 15,
+				"perfect_id": "", "perfect_text": "+10% parry chance for 2 turns",
+				"description": "Shift to the other stance mid-flow.\nThe pivot presses the opening: 15 BD\nto the enemy nearest to Breaking.\nBuilds 15 Rage."})
+	return null
+
+
+# The Survivalist's spec pool — 5 of the designed 8. Blight, Smoke Bomb and
+# Field Dressing are still unwritten (Batch AH asked for them and its own
+# opening line forbade authoring new abilities; the header won). Adding
+# them later is a list edit and a def, no restructuring.
 static func survivalist_pool_ability(display_name: String) -> Ability:
 	match display_name:
 		"Explosive Shot":
@@ -196,9 +409,9 @@ static func survivalist_pool_ability(display_name: String) -> Ability:
 				"description": "A tearing shot through the leg:\nCripple, Slowed AND Exposed for\n3 turns — three statuses in one cast."})
 		"Deadfall":
 			return Ability.make({"display_name": "Deadfall", "cooldown": 3, "cost": 20,
-				"special": "deadfall", "delay": 2.0, "anim": "attack01", "no_skill_check": true,
-				"perfect_id": "", "perfect_text": "",
-				"description": "Rig an untargeted deadfall: the NEXT\nenemy to act takes 35 nature damage\nand is Stunned for 1 turn. You don't\npick the victim — whoever moves first\npays for it."})
+				"special": "deadfall", "delay": 2.0, "anim": "attack01",
+				"perfect_id": "", "perfect_text": "Choose who the trap takes.",
+				"description": "Rig an untargeted deadfall: the NEXT\nenemy to act takes 35 nature damage\nand is Stunned for 1 turn. You don't\npick the victim — whoever moves first\npays for it. A PERFECT rig lets you\nname them."})
 		"Harvest":
 			return Ability.make({"display_name": "Harvest", "cooldown": 4, "cost": 25,
 				"special": "harvest", "delay": 3.0, "anim": "attack02",
@@ -207,6 +420,8 @@ static func survivalist_pool_ability(display_name: String) -> Ability:
 	return null
 
 
+# The Sharpshooter's spec pool — 5 of the designed 8, for the same reason
+# as the Survivalist's above (Disengage, Suppressing Fire, Piercing Arrow).
 static func sharpshooter_pool_ability(display_name: String) -> Ability:
 	match display_name:
 		"Quick Draw":
@@ -216,8 +431,9 @@ static func sharpshooter_pool_ability(display_name: String) -> Ability:
 				"description": "Adrenaline takes over: all your abilities\nact 50% faster for 5 turns."})
 		"Triple Shot":
 			return Ability.make({"display_name": "Triple Shot", "cooldown": 3, "cost": 30,
-				"damage": 18, "multi_hits": 2, "pressure": 8, "delay": 3.0, "anim": "attack02",
-				"perfect_id": "", "perfect_text": "",
+				"damage": 18, "multi_hits": 3, "pressure": 8, "delay": 3.0, "anim": "attack02",
+				"perfect_extra_hit": false,
+				"perfect_id": "", "perfect_text": "One arrow is a guaranteed critical.",
 				"description": "Three arrows at one target, 18% of\nAttack each — every arrow rolls its\ncritical separately. A crit lottery\nfor a full Focus bar."})
 		"Coup de Grâce":
 			return Ability.make({"display_name": "Coup de Grâce", "cooldown": 4, "cost": 25,
@@ -469,7 +685,7 @@ const SPEC_INFO := {
 		"blurb": "Protector of the weak — shields allies with their own body."},
 	"swordmaster": {"name": "Swordmaster", "constitution": 120, "archetype": "Bruiser", "passive": "seasoned",
 		"max_hp": 165, "armor": 0.22, "parry_chance": 0.12,
-		"passive_desc": "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +15% damage dealt, +10% damage taken.\nDEFENSIVE — 15% less damage taken, -10% damage dealt.\nStarts each battle Aggressive; Guard Change swaps.",
+		"passive_desc": "Seasoned Fighter: fights in one of two stances.\nAGGRESSIVE — +15% damage dealt, +10% damage taken.\nDEFENSIVE — 15% less damage taken, -10% damage dealt.\nStarts each battle Aggressive; the earnable\nGuard Change swaps.",
 		"blurb": "Precision and technique — presses hard, then weathers the storm."},
 	# The Pyromancer and Cryomancer are mirror-image glass cannons: armoured
 	# in their own element, soft to the opposite — a fire warband and a frost
@@ -550,14 +766,10 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Savage sweep: hits ALL enemies; each\nhas a 50% chance to build 35 Bleed.\nBuilds 10 Rage."}),
 				Ability.make({"display_name": "Hack and Slash", "cost": 20, "damage": 10,
 					"pressure": 10, "delay": 3.0, "anim": "attack01", "multi_hits": 3,
+					"perfect_extra_hit": false,
 					"bleed_build": 25, "bleed_chance": 0.5, "resource_gain": 10, "cooldown": 2,
-					"perfect_id": "", "perfect_text": "4 strikes instead of 3",
+					"perfect_id": "", "perfect_text": "Bleed lands on every strike.",
 					"description": "Three savage cuts at one target; each\nhit has a 50% chance to build 25 Bleed —\na full flurry can bleed them out.\nBuilds 10 Rage."}),
-				Ability.make({"display_name": "Blood Price", "cost": 0,
-					"special": "blood_price", "delay": 1.5, "anim": "attack02",
-					"cooldown": 3,
-					"perfect_id": "", "perfect_text": "The health cost is halved",
-					"description": "Open his own veins: pays 15% of\ncurrent health (never lethal) for\n30 Rage and +25% damage for 2 turns.\nBlood Frenzy wakes when HE says so."}),
 			]
 		"warden":
 			# VAULTED — Retaliation (counter stance): kept for future return.
@@ -577,11 +789,6 @@ static func spec_abilities(spec: String) -> Array:
 					"applies_status": {"id": "sunder", "turns": 3},
 					"perfect_id": "", "perfect_text": "+5 bonus BD",
 					"description": "Moderate damage. Sunders armor\n(-35%) for 3 turns. Builds 10 Rage."}),
-				Ability.make({"display_name": "War Stomp", "cost": 20, "damage": 15,
-					"pressure": 15, "delay": 3.0, "anim": "attack03", "cooldown": 3,
-					"random_hits": 3, "perfect_extra_hit": false,
-					"perfect_id": "", "perfect_text": "Allies regain 20% of their resource instead",
-					"description": "Slam the earth: 3 shockwaves rip\nrandom enemies for 15% Attack damage\nand 15 BD each. Allies regain 10%\nof their resource."}),
 				# Shieldwall graduated from the talent tree (Batch G): his one
 				# moment of control over the Block identity belongs in the base
 				# kit. Batch AB made it a STANCE — it and Interpose were the
@@ -593,11 +800,6 @@ static func spec_abilities(spec: String) -> Array:
 					"cooldown": 2,
 					"perfect_id": "", "perfect_text": "Holds a third turn",
 					"description": "Set the wall: +25% Block chance for\n2 turns. These count as HEAVY PLATING\nblocks, so they feed Tenacity and\nRally — Interpose's charges never do."}),
-				Ability.make({"display_name": "Interpose", "cost": 25,
-					"special": "interpose", "delay": 2.0, "anim": "attack01",
-					"cooldown": 4,
-					"perfect_id": "", "perfect_text": "The Warden gains a charge too",
-					"description": "Throw the wall wide: every other ally\ngains a shield charge — the next\nattack against them is BLOCKED."}),
 			]
 		"swordmaster":
 			return [
@@ -610,26 +812,12 @@ static func spec_abilities(spec: String) -> Array:
 					"pressure": 30, "delay": 2.0, "anim": "attack01", "resource_gain": 10,
 					"cooldown": 3,
 					"applies_status": {"id": "stunned", "turns": 1},
-					"perfect_id": "parry_up", "perfect_text": "+15% parry chance for 3 turns",
-					"description": "A skull-ringing bash with a keen 25%\ncrit chance: ALWAYS Stuns for 1 turn.\nBuilds 10 Rage.\nBosses resist Stun until Broken."}),
+					"perfect_id": "", "perfect_text": "The Stun lands even on a boss.",
+					"description": "A skull-ringing bash with a keen 25%\ncrit chance: ALWAYS Stuns for 1 turn.\nBuilds 10 Rage.\nBosses resist Stun until Broken —\nunless the strike is PERFECT."}),
 				Ability.make({"display_name": "Shatterpoint", "cost": 30, "damage": 20,
 					"pressure": 40, "delay": 3.0, "anim": "attack03", "cooldown": 4,
 					"perfect_id": "", "perfect_text": "+15 bonus BD",
 					"description": "Find the flaw and split it — his\nheaviest Break blow. If this hit\nBREAKS the target, he instantly casts\nOverpower on them for free."}),
-				Ability.make({"display_name": "Sweeping Strikes", "cost": 20, "damage": 15,
-					"pressure": 12, "delay": 3.0, "anim": "attack02", "multi_hits": 2,
-					"perfect_extra_hit": false, "resource_gain": 10,
-					"applies_status": {"id": "dazed", "turns": 3},
-					"perfect_id": "", "perfect_text": "+25% crit chance on the second swing",
-					"description": "Two broad cuts that leave the target\nDazed for 3 turns. Builds 10 Rage."}),
-				# Not a free action on purpose: turn-less actions need engine
-				# support, so the swap does double duty — stance, pressure,
-				# refuel — at a bargain 1.5 initiative. The 1cd stops spam.
-				Ability.make({"display_name": "Guard Change", "cost": 0,
-					"special": "guard_change", "delay": 1.5, "anim": "attack01",
-					"cooldown": 1, "resource_gain": 15,
-					"perfect_id": "", "perfect_text": "+10% parry chance for 2 turns",
-					"description": "Shift to the other stance mid-flow.\nThe pivot presses the opening: 15 BD\nto the enemy nearest to Breaking.\nBuilds 15 Rage."}),
 			]
 		"pyromancer":
 			# Burn-centric kit (07-16 rework; the core Magic Bolt becomes
@@ -666,7 +854,7 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Three razor shards driven into ONE\ntarget; every shard applies a stack\nof Chilled."}),
 				Ability.make({"display_name": "Blizzard", "cooldown": 4, "dmg_type": "frost", "cost": 30,
 					"damage": 15, "pressure": 10, "delay": 3.5, "anim": "attack03", "aoe": true,
-					"perfect_id": "mana5", "perfect_text": "Refunds 5 Mana",
+					"perfect_id": "", "perfect_text": "Two stacks of Chilled on every enemy.",
 					"description": "Storm of ice rakes ALL enemies,\nlayering 1-2 stacks of Chilled\non each."}),
 				Ability.make({"display_name": "Ice Lance", "cooldown": 2, "dmg_type": "frost", "cost": 25,
 					"damage": 35, "pressure": 15, "delay": 3.0, "anim": "attack02",
@@ -684,7 +872,8 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Channel raw Resonance into a blast:\n+7.5% DAMAGE per Resonance stack;\nBD = 5 x current stacks. Recoil: the\nMage takes 15% of the damage dealt."}),
 				Ability.make({"display_name": "Arcane Barrage", "cooldown": 2, "dmg_type": "arcane", "cost": 20, "damage": 8,
 					"pressure": 3, "delay": 2.5, "anim": "attack03", "random_hits": 6,
-					"perfect_id": "", "perfect_text": "Fires a 7th bolt",
+					"perfect_extra_hit": false,
+					"perfect_id": "", "perfect_text": "No two bolts strike the same enemy.",
 					"description": "Six bolts hound the weakest: each\nstrikes one of the 2-3 enemies with\nthe lowest health."}),
 				Ability.make({"display_name": "Stabilize", "cooldown": 3, "cost": 0, "damage": 0,
 					"pressure": 0, "special": "stabilize", "delay": 1.5, "anim": "attack01",
@@ -800,8 +989,8 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "A scattering charge rips TWO chosen\nenemies for 20 nature damage each,\nleaving them Poisoned AND Crippled\n(3 turns). Two statuses on two targets\n— the engine of the hunt."}),
 				Ability.make({"display_name": "Snare Trap", "cooldown": 3, "cost": 20, "special": "snare_trap",
 					"delay": 2.0, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "The Poison lasts 6 turns",
-					"description": "Rig a snare on one enemy: the next\ntime it acts, it is STUNNED for 1 turn\nand Poisoned for 4. Bosses shrug off\nthe stun unless Broken."}),
+					"perfect_id": "", "perfect_text": "The Stun lands even on a boss.",
+					"description": "Rig a snare on one enemy: the next\ntime it acts, it is STUNNED for 1 turn\nand Poisoned for 4. Bosses shrug off\nthe stun unless Broken — unless the\nsnare was rigged PERFECTLY."}),
 			]
 	return []
 

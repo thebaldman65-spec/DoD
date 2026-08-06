@@ -159,6 +159,7 @@ var epidemic := 0            # capstone: all enemies permanently Poisoned
 var whole_forest := 0        # capstone: tripwire never expires, bites everything
 var force_of_nature := 0     # capstone: Trapper bonus 20%/status, party-wide
 var deadfall_armed := 0      # armed untargeted traps waiting to spring
+var deadfall_aims: Array = [] # Batch AH: enemy indices a PERFECT rig named
 var companion_hp_bonus := 0   # talents: extra HP for summoned companions
 var companion_power := 0      # talents: extra damage on companion attacks
 # Fixed-tree talent stats (0/0.0 = not learned). See talents.gd for sources.

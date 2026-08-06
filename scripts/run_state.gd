@@ -15,6 +15,29 @@ const REST_NODES := 5
 const SHOP_NODES := 5
 const EVENT_NODES := 3
 
+# Batch AH: one guaranteed MINI-BOSS per zone, on the exact middle row of
+# the eleven. It occupies the WHOLE row — all three columns — so no route
+# goes around it, and the deck is dealt into the nine tiers that remain.
+# The row it replaces was a combat row, so it is paid for out of the FIGHT
+# cards alone (17 -> 14): the recovery/shop/event counts that drive the run
+# economy stay byte-identical, and a zone trades three ordinary fight
+# OFFERS for one guaranteed hard fight.
+const MINIBOSS_TIER := (FLOORS - 1) / 2  # index 5 = the displayed tier 6
+# A 27-card authored floor for the mini-boss deal, the twin of
+# DECK_FALLBACK below (generation must never fail, so the floor is
+# authored rather than hoped for).
+const DECK_FALLBACK_MB := [
+	"fight", "fight", "shop",
+	"fight", "rest", "fight",
+	"fight", "fight", "event",
+	"fight", "shop", "fight",
+	"fight", "rest", "fight",
+	"fight", "event", "shop",
+	"fight", "shop", "rest",
+	"fight", "rest", "event",
+	"shop", "rest", "fight",
+]
+
 # All item metadata lives here; battle and map both read it.
 const ITEM_IDS := ["health", "mana", "bomb", "revive", "defense"]
 const ITEM_INFO := {
@@ -231,6 +254,27 @@ var map_deal_repairs := 0
 var map_route_links_added := 0
 
 
+# DOD_SIM_MINIBOSS=off reproduces the PRE-AH MAP: ten dealt tiers, the full
+# 17-fight deck, no guaranteed mini-boss and so no mini-boss award. Shipped
+# content, so it defaults ON and — like the AE/AF flags and unlike AD's
+# experiment arms — it is NOT gated on sim_run. It is an honest control for
+# the MAP half of this batch only: kits still open at 3 abilities with it
+# off, because the trim is structural and has no switch.
+func miniboss_on() -> bool:
+	return OS.get_environment("DOD_SIM_MINIBOSS") != "off"
+
+
+# The tiers the deck is dealt into, in order: every pickable tier except
+# the mini-boss row, which is authored rather than dealt.
+func dealt_tiers() -> Array:
+	var out: Array = []
+	for f in FLOORS - 1:
+		if miniboss_on() and f == MINIBOSS_TIER:
+			continue
+		out.append(f)
+	return out
+
+
 func _generate_map() -> void:
 	if map_mode() == "old":
 		_generate_map_old()
@@ -242,7 +286,7 @@ func _generate_map() -> void:
 	# The click handler still composes on the spot for pre-change saves.
 	for f in FLOORS:
 		for node in map[f]:
-			if node["type"] in ["fight", "elite", "boss"]:
+			if node["type"] in ["fight", "elite", "miniboss", "boss"]:
 				node["enemies"] = compose(node["type"], f + 1)
 				node["theme"] = last_theme
 
@@ -251,9 +295,11 @@ func _generate_map() -> void:
 # blind 30-card deal and the 70% adjacent-link roll (30% of nodes reached
 # exactly one node — the corridor Batch Y exists to remove).
 func _generate_map_old() -> void:
-	# Shuffle a fixed deck of 30 node types, deal 3 per tier, boss on top.
+	# Shuffle a fixed deck of node types, deal 3 per DEALT tier, boss on top.
+	# (Batch AH: the mini-boss row is authored, so the deal is 27 cards over
+	# nine tiers unless DOD_SIM_MINIBOSS=off puts the pre-AH 30 back.)
 	var deck: Array = []
-	for i in FIGHT_NODES:
+	for i in FIGHT_NODES - (NODES_PER_TIER if miniboss_on() else 0):
 		deck.append("fight")
 	for i in REST_NODES:
 		deck.append("rest")
@@ -270,16 +316,7 @@ func _generate_map_old() -> void:
 				deck[0] = deck[j]
 				deck[j] = tmp
 				break
-	map = []
-	for f in FLOORS - 1:
-		var row: Array = []
-		for i in NODES_PER_TIER:
-			var kind: String = deck[f * NODES_PER_TIER + i]
-			# Deeper fights can spawn as elites (still fights, tougher + richer).
-			if kind == "fight" and f >= 5 and randf() < 0.25:
-				kind = "elite"
-			row.append({"type": kind, "links": [], "visited": false})
-		map.append(row)
+	map = _lay_rows(deck)
 	map.append([{"type": "boss", "links": [], "visited": false}])
 	# Link each node to 1-2 nodes on the next floor: its own column, plus a
 	# 70% chance of ONE adjacent column. Never all three — the player gets a
@@ -306,16 +343,7 @@ func _generate_map_old() -> void:
 # 2 rests + a shop + an elite.
 func _generate_map_new() -> void:
 	var deck := _deal_deck()
-	map = []
-	for f in FLOORS - 1:
-		var row: Array = []
-		for i in NODES_PER_TIER:
-			var kind: String = deck[f * NODES_PER_TIER + i]
-			# Deeper fights can spawn as elites (still fights, tougher + richer).
-			if kind == "fight" and f >= 5 and randf() < 0.25:
-				kind = "elite"
-			row.append({"type": kind, "links": [], "visited": false})
-		map.append(row)
+	map = _lay_rows(deck)
 	map.append([{"type": "boss", "links": [], "visited": false}])
 	# Elite floor: elites still roll at 25% on tiers 6+, but a zone whose
 	# rolls all came up empty silently removes the snowball engine and the
@@ -328,6 +356,8 @@ func _generate_map_new() -> void:
 	if not has_elite:
 		var deep_fights: Array = []  # [floor, idx] on tiers 6+
 		for f in range(5, FLOORS - 1):
+			if miniboss_on() and f == MINIBOSS_TIER:
+				continue
 			for i in map[f].size():
 				if String(map[f][i]["type"]) == "fight":
 					deep_fights.append([f, i])
@@ -358,6 +388,32 @@ func _generate_map_new() -> void:
 			map[f][i]["links"] = links
 		_guarantee_inbound(f)
 	_ensure_key_route()
+
+
+# Deal the pickable rows (shared by both generators). The mini-boss row is
+# AUTHORED, not dealt: all three of its columns are the same fight, so the
+# player meets it whichever way they came. Everything downstream — linking,
+# inbound guarantees, the route DP, the map screen — already reads rows by
+# their real size and type, so nothing else has to know.
+func _lay_rows(deck: Array) -> Array:
+	var rows: Array = []
+	var pos := 0
+	for f in FLOORS - 1:
+		var row: Array = []
+		if miniboss_on() and f == MINIBOSS_TIER:
+			for i in NODES_PER_TIER:
+				row.append({"type": "miniboss", "links": [], "visited": false})
+			rows.append(row)
+			continue
+		for i in NODES_PER_TIER:
+			var kind: String = deck[pos * NODES_PER_TIER + i]
+			# Deeper fights can spawn as elites (still fights, tougher + richer).
+			if kind == "fight" and f >= 5 and randf() < 0.25:
+				kind = "elite"
+			row.append({"type": kind, "links": [], "visited": false})
+		rows.append(row)
+		pos += 1
+	return rows
 
 
 # Every next-floor node needs at least one inbound path (shared by both
@@ -399,7 +455,8 @@ const DECK_FALLBACK := [
 # swaps — never a failure, never an unbounded loop.
 func _deal_deck() -> Array:
 	var deck: Array = []
-	for i in FIGHT_NODES:
+	# The mini-boss row eats three FIGHT cards and nothing else.
+	for i in FIGHT_NODES - (NODES_PER_TIER if miniboss_on() else 0):
 		deck.append("fight")
 	for i in REST_NODES:
 		deck.append("rest")
@@ -425,20 +482,41 @@ func _deal_deck() -> Array:
 #    place to land.
 func _deck_violations(deck: Array) -> int:
 	var n := NODES_PER_TIER
+	var tiers := dealt_tiers()
 	var v := 0
 	if not deck.slice(0, n).has("fight"):
 		v += 1
-	for t in FLOORS - 1:
+	for t in tiers.size():
 		if String(deck[t * n]) == String(deck[t * n + 1]) \
 				and String(deck[t * n + 1]) == String(deck[t * n + 2]):
 			v += 1
-	if not deck.slice(n, 5 * n).has("rest"):
+	# The windows are stated in TIER terms and converted to card slices, so
+	# lifting the mini-boss row out of the deal cannot silently move them.
+	var early := _deck_window(deck, tiers, 1, 4)     # displayed tiers 2-5
+	var late := _deck_window(deck, tiers, 5, 9)      # displayed tiers 6-10
+	var boss_run_up := _deck_window(deck, tiers, 6, 9)  # displayed tiers 7-10
+	if not early.has("rest"):
 		v += 1
-	if not deck.slice(5 * n, deck.size()).has("rest"):
+	if not late.has("rest"):
 		v += 1
-	if not deck.slice(6 * n, deck.size()).has("shop"):
+	if not boss_run_up.has("shop"):
 		v += 1
 	return v
+
+
+# The cards dealt into tier indices [lo, hi] inclusive, skipping whichever
+# tier the mini-boss took.
+func _deck_window(deck: Array, tiers: Array, lo: int, hi: int) -> Array:
+	var first := -1
+	var last := -1
+	for pos in tiers.size():
+		if int(tiers[pos]) >= lo and int(tiers[pos]) <= hi:
+			if first < 0:
+				first = pos
+			last = pos
+	if first < 0:
+		return []
+	return deck.slice(first * NODES_PER_TIER, (last + 1) * NODES_PER_TIER)
 
 
 # Targeted swap repair: greedily apply any single swap that strictly
@@ -466,8 +544,9 @@ func _repair_deck(deck: Array) -> void:
 				deck[j] = deck[i]
 				deck[i] = tmp
 		if not improved:
+			var floor_deck: Array = DECK_FALLBACK_MB if miniboss_on() else DECK_FALLBACK
 			for i in deck.size():
-				deck[i] = DECK_FALLBACK[i]
+				deck[i] = floor_deck[i]
 			return
 
 
@@ -697,11 +776,15 @@ func compose(node_type: String, tier := -1) -> Array:
 	# (Rage Company) needs 6 in every roster — below that an elite node
 	# would silently degrade to the plain-mob fallback while still paying
 	# elite rewards. Floor it; elite means elite.
-	if node_type == "elite":
+	if node_type in ["elite", "miniboss"]:
 		budget = maxi(budget, 6)
+	# The mini-boss draws from the ELITE themes (Batch AH: "elite stats with
+	# a boss-tier health pool" — the composition is an elite's, and the
+	# health multiplier that makes it a mini-boss is applied at spawn).
+	var theme_key := "elite" if node_type == "miniboss" else node_type
 	var candidates: Array = []
 	for theme_name in THEMES:
-		if THEMES[theme_name]["nodes"].has(node_type):
+		if THEMES[theme_name]["nodes"].has(theme_key):
 			candidates.append(theme_name)
 	candidates.shuffle()
 	for theme_name in candidates:
@@ -1014,6 +1097,79 @@ func roll_rune_candidates(member: Dictionary, guarantee_spec := false) -> Array:
 	return out
 
 
+# ---------- Batch AH: the earnable-ability offer ----------
+#
+# One award = 3 abilities the hero does not already own: 1 drawn from its
+# SPEC_POOLS entry and 2 from its class's CLASS_POOLS entry. When one side
+# is exhausted the other fills for it, so an offer only shrinks below 3
+# once the hero has taken nearly everything BOTH pools hold. Rolled at the
+# moment the award drops and stored on the member (the rune-cache pattern),
+# so re-opening the Party screen never rerolls the question.
+#
+# THE SPEC DRAW LEADS. The two pools overlap by design — a spec's own
+# talent grants sit in both — so nothing in the NAME says which pool an
+# entry came from, and the picker needs to be able to say "this one is
+# yours". Order carries it, and the Party screen tints the first entry to
+# make it visible. (The rune picker shuffles its triple for the opposite
+# reason: there the blindness IS the question. Here it would just hide
+# something the player has earned the right to know.)
+func roll_ability_offer(member: Dictionary) -> Array:
+	var spec := String(member.get("spec", ""))
+	if spec == "":
+		return []
+	var owned: Array = owned_ability_names(member)
+	var spec_left: Array = Classes.spec_pool(spec).filter(
+		func(n): return not owned.has(n))
+	var class_left: Array = Classes.class_pool(Classes.class_of_spec(spec)).filter(
+		func(n): return not owned.has(n))
+	spec_left.shuffle()
+	class_left.shuffle()
+	var offer: Array = []
+	if not spec_left.is_empty():
+		var spec_pick: String = spec_left.pop_front()
+		offer.append(spec_pick)
+		# The pools overlap on purpose (a spec's talent grants sit in both);
+		# an offer must never show the same ability twice.
+		class_left.erase(spec_pick)
+	while offer.size() < 3 and not class_left.is_empty():
+		offer.append(class_left.pop_front())
+	while offer.size() < 3 and not spec_left.is_empty():
+		var fill: String = spec_left.pop_front()
+		if not offer.has(fill):
+			offer.append(fill)
+	return offer
+
+
+# Every ability display name the hero can already cast: core kit + spec kit
+# + kit-override renames + earned picks, PLUS anything a learned talent
+# node grants. Without the talent half a Berserker who bought Battle Shout
+# in the tree could be offered it again as a pick that does nothing.
+func owned_ability_names(member: Dictionary) -> Array:
+	var names: Array = Runes.kit_names(member)
+	var learned: Dictionary = member.get("talents", {})
+	for node in member.get("tree", []):
+		if int(learned.get(String(node.get("id", "")), 0)) < 1:
+			continue
+		var pay: Dictionary = node.get("payload", {})
+		if pay.has("new_ability"):
+			names.append(String(pay["new_ability"]["display_name"]))
+		elif pay.has("grant_ability"):
+			names.append(String(pay["grant_ability"]))
+	return names
+
+
+# Queue one ability award on a hero: the offer is rolled NOW and stored, so
+# the pick waiting on the Party screen is the pick that dropped. Returns
+# false when nothing is left to offer (both pools exhausted, or no spec).
+func award_ability_pick(member: Dictionary) -> bool:
+	var offer := roll_ability_offer(member)
+	if offer.is_empty():
+		return false
+	member["bm_candidates"] = member.get("bm_candidates", []) + [offer]
+	member["bm_picks_owed"] = int(member.get("bm_picks_owed", 0)) + 1
+	return true
+
+
 # ---------- Batch AE: the starting rune ----------
 #
 # One pick of three per hero, dealt at SPEC CONFIRMATION rather than at the
@@ -1089,6 +1245,16 @@ func owed_rune_picks() -> int:
 	var n := 0
 	for member in party:
 		n += int(member.get("rune_picks_owed", 0))
+	return n
+
+
+# Batch AH: six ability picks a run land on the Party screen the same way
+# the rune caches do, so they badge the same button. An earned ability that
+# sits unnoticed is the exact failure the AE badge exists to prevent.
+func owed_ability_picks() -> int:
+	var n := 0
+	for member in party:
+		n += int(member.get("bm_picks_owed", 0))
 	return n
 
 
@@ -1254,8 +1420,9 @@ func clear_save() -> void:
 func award_gold(node_type: String) -> int:
 	var amount := randi_range(25, 35)
 	match node_type:
-		"elite":
+		"elite", "miniboss":
 			# Elites pay out hard — seeking them out is how skilled players snowball.
+			# The mini-boss matches them: its own spoil is the ability pick.
 			amount = randi_range(80, 100)
 		"boss":
 			amount = randi_range(110, 130)
@@ -1273,7 +1440,7 @@ func award_gold(node_type: String) -> int:
 func award_talent_points(node_type: String) -> int:
 	var pts := 1
 	match node_type:
-		"elite":
+		"elite", "miniboss":
 			pts = 2
 		"boss":
 			# The FINAL boss awards no talent points (a relic instead) —

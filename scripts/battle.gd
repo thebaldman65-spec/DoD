@@ -12,9 +12,15 @@ const BASIC_DELAY := 2.0
 const PERFECT_HALF := 0.045
 const GOOD_HALF := 0.16
 
-# Ability hotkeys, mapped to ability slots in kit order (shown on the buttons).
-const ABILITY_KEYS: Array = [KEY_Q, KEY_W, KEY_E, KEY_R, KEY_A, KEY_S, KEY_D, KEY_F]
-const ABILITY_KEY_NAMES := ["Q", "W", "E", "R", "A", "S", "D", "F"]
+# Ability hotkeys, mapped to ability slots in kit order (shown on the
+# buttons). Batch AH: there is no cap on how many abilities a hero holds,
+# so slot 10 onward binds to SHIFT + the same key in the same order.
+const ABILITY_KEYS: Array = [KEY_Q, KEY_W, KEY_E, KEY_R, KEY_A, KEY_S, KEY_D,
+	KEY_F, KEY_G]
+const ABILITY_KEY_NAMES := ["Q", "W", "E", "R", "A", "S", "D", "F", "G"]
+
+# Batch AH: the mini-boss node is an elite warband wearing a boss's health.
+const MINIBOSS_HP_MULT := 1.5
 
 # Visual identity of each status effect: [label, chip tag, color, tooltip]
 const STATUS_INFO := {
@@ -437,14 +443,18 @@ func _spawn_units() -> void:
 			# class's 154 — the ordering trap from the batch doc.
 			base_hp = cfg["max_hp"]
 			if Run.active and i < Run.party.size():
-				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
-					Run.party[i].get("talents", {}))
-				# Boss trophies: abilities picked at zone bosses (any spec pool).
+				# Earned abilities (mini-boss and boss picks) go on BEFORE the
+				# tree: several talents MODIFY an ability rather than grant it,
+				# and Deafening Cry has to find a pool-bought Battle Shout the
+				# same way it finds a talent-bought one. apply_from_tree already
+				# refuses to double-grant a name it can see.
 				for bm_name in Run.party[i].get("bm_abilities", []):
 					var bm_ab := Classes.spec_pool_ability(spec, bm_name)
 					if bm_ab != null and not cfg["abilities"].any(
 							func(a): return a.display_name == bm_ab.display_name):
 						cfg["abilities"] = cfg["abilities"] + [bm_ab]
+				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
+					Run.party[i].get("talents", {}))
 			elif autoplay:
 				# DOD_SIM_TALENTS="bz_bloodcraze:3,wd_toughness:2" force-learns
 				# talents on bot heroes whose spec tree holds the id (test hook).
@@ -468,8 +478,8 @@ func _spawn_units() -> void:
 						var pending := Classes.pending_talent_ability(ab_name.strip_edges())
 						if pending != null:
 							cfg["abilities"] = cfg["abilities"] + [pending]
-				# The same hook feeds any spec's boss-trophy pool.
-				if env_abs != "" and not Classes.spec_pool(spec).is_empty():
+				# The same hook feeds either earnable pool, by name.
+				if env_abs != "":
 					for ab_name in env_abs.split(","):
 						var bm_pending := Classes.spec_pool_ability(spec, ab_name.strip_edges())
 						if bm_pending != null and not cfg["abilities"].any(
@@ -489,7 +499,8 @@ func _spawn_units() -> void:
 				if tn_grant != null \
 						and not cfg["abilities"].any(func(a): return a.display_name == tn_grant.display_name):
 					cfg["abilities"] = cfg["abilities"] + [tn_grant]
-			for pool_name in Classes.spec_pool(spec):
+			for pool_name in Classes.spec_pool(spec) \
+					+ Classes.class_pool(Classes.class_of_spec(spec)):
 				var pool_ab := Classes.spec_pool_ability(spec, pool_name)
 				if pool_ab != null \
 						and not cfg["abilities"].any(func(a): return a.display_name == pool_ab.display_name):
@@ -731,11 +742,20 @@ func _spawn_units() -> void:
 		var cfg := _enemy_config(composition[i])
 		var tint: Color = cfg["tint"]
 		cfg.erase("tint")
+		# The mini-boss (Batch AH): an elite warband with a BOSS-TIER health
+		# pool and nothing else changed. x1.5 puts a chief's 250 at 375, in
+		# among the two authored bosses (370 / 500), so the node reads as
+		# "between an elite and a boss" the way it is meant to — a longer
+		# fight, not a harder-hitting one.
+		var mb_hp := MINIBOSS_HP_MULT \
+			if Run.active and Run.encounter.get("type", "") == "miniboss" else 1.0
 		if zone_tier > 0:
-			cfg["max_hp"] = int(ceil(cfg["max_hp"] * slot_mult
+			cfg["max_hp"] = int(ceil(cfg["max_hp"] * slot_mult * mb_hp
 				* (1.0 + 0.025 * zone_tier) / 10.0) * 10.0)
 			cfg["attack"] = int(round(cfg["attack"] * slot_mult
 				* (1.0 + 0.02 * zone_tier)))
+		elif mb_hp > 1.0:
+			cfg["max_hp"] = int(ceil(cfg["max_hp"] * mb_hp / 10.0) * 10.0)
 		if Run.active and Run.zone_idx > 0:
 			# Deeper zones keep their scorched warpaint.
 			tint = tint.lerp(Color(1.0, 0.6, 0.45), 0.35)
@@ -1645,11 +1665,25 @@ func _run_battle() -> void:
 				_message("The snare springs on %s!" % u.unit_name)
 				_log("%s's snare springs on %s" % [heroes[sn_idx].unit_name,
 					u.unit_name], "#c8a860")
-				_spring_trap(heroes[sn_idx], u, 0.0)
-				_apply_poison(heroes[sn_idx], u, 6 if sn_perfect else 4)
+				# A perfectly rigged snare holds a boss (Batch AH); the Poison is
+				# a flat 4 turns either way now.
+				_spring_trap(heroes[sn_idx], u, 0.0, sn_perfect)
+				_apply_poison(heroes[sn_idx], u, 4)
 		if not u.is_hero and not u.dead:
 			for df_h in heroes:
 				if not df_h.dead and df_h.deadfall_armed > 0:
+					# Batch AH: an AIMED deadfall (a perfect rig) waits for the
+					# one it was set for. An aim whose victim is already dead is
+					# released rather than wasted, so a perfect can never be
+					# worth LESS than an ordinary rig.
+					df_h.deadfall_aims = df_h.deadfall_aims.filter(
+						func(ix): return ix >= 0 and ix < enemies.size() \
+							and not enemies[ix].dead)
+					var df_here := enemies.find(u)
+					if df_h.deadfall_aims.has(df_here):
+						df_h.deadfall_aims.erase(df_here)
+					elif df_h.deadfall_aims.size() >= df_h.deadfall_armed:
+						continue  # every armed trap is spoken for, and not for you
 					df_h.deadfall_armed -= 1
 					if df_h.deadfall_armed <= 0:
 						df_h.remove_status("deadfall")
@@ -2748,7 +2782,7 @@ func _show_actions(u: BattleUnit) -> void:
 			# With a beast already out it becomes the Swap (10 Mana, shared 2cd).
 			var swapping := _beasts(u).size() >= _beast_cap(u)
 			var group_btn := Button.new()
-			group_btn.text = "[%s] %s Companion ▸" % [ABILITY_KEY_NAMES[e_idx],
+			group_btn.text = "[%s] %s Companion ▸" % [_hotkey_name(e_idx),
 				"Swap" if swapping else "Summon"]
 			group_btn.custom_minimum_size = Vector2(184, 30)
 			group_btn.add_theme_font_size_override("font_size", 13)
@@ -2875,8 +2909,9 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 		key_idx := -1) -> Button:
 	var label: String = ab.display_name
-	if key_idx >= 0 and key_idx < ABILITY_KEY_NAMES.size():
-		label = "[%s] %s" % [ABILITY_KEY_NAMES[key_idx], label]
+	var hk := _hotkey_name(key_idx)
+	if hk != "":
+		label = "[%s] %s" % [hk, label]
 	if ab.cost > 0:
 		label += "   %d %s" % [ab.cost, u.resource_name]
 	elif ab.faith_cost > 0:
@@ -3763,9 +3798,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			total_hits = ab.random_hits + (1 if is_perfect and ab.perfect_extra_hit else 0)
 		elif ab.multi_hits > 0:
 			total_hits = ab.multi_hits + (1 if is_perfect and ab.perfect_extra_hit else 0)
-		# Firestorm: 6-8 bolts from the sky (7-9 on a perfect).
+		# Firestorm: 6-8 bolts from the sky. The perfect no longer adds a
+		# bolt (Batch AH) — it aims the ones you already have.
 		if ab.display_name == "Firestorm":
-			total_hits = randi_range(6, 8) + (1 if is_perfect else 0)
+			total_hits = randi_range(6, 8)
 		# Splintering Shards: Razor Ice can find one more victim.
 		if ab.display_name == "Razor Ice" and attacker.splinter_ranks > 0 \
 				and randf() < 0.20 * attacker.splinter_ranks:
@@ -3774,6 +3810,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		var total_dealt := 0
 		var enemies_struck := 0  # landed strikes (Magi's Wrath recoil fades per hit)
 		var struck_before: BattleUnit = null  # last random-hit victim (Explosion)
+		# Batch AH: victims already hit by THIS cast, for the two scatter
+		# perfects that spread instead of adding a bolt. Per cast, so a
+		# second Barrage next turn starts from a clean board.
+		var _spread_struck := {}
 		var any_crit := false
 		for hit_i in total_hits:
 			var strike_target: BattleUnit
@@ -3788,12 +3828,26 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if ab.display_name == "Arcane Barrage" and live_pool.size() > 3:
 					live_pool.sort_custom(func(a, b): return a.hp < b.hp)
 					live_pool = live_pool.slice(0, 3)
+				# Batch AH — the two scatter perfects buy AIM, not volume:
+				# Firestorm spreads its bolts evenly across the living, and
+				# Arcane Barrage never strikes the same enemy twice while an
+				# unstruck one still stands. One mechanic, two framings: deal
+				# the pool round-robin, refilling only once it empties.
+				if is_perfect and not is_counter \
+						and ab.display_name in ["Firestorm", "Arcane Barrage"]:
+					var fresh: Array = live_pool.filter(
+						func(t): return not _spread_struck.has(t))
+					if fresh.is_empty():
+						_spread_struck.clear()
+						fresh = live_pool
+					live_pool = fresh
 				# Arcane Explosion: the two blasts land on DISTINCT enemies
 				# whenever two still stand.
 				if ab.display_name == "Arcane Explosion" and hit_i > 0 \
 						and live_pool.size() > 1 and struck_before != null:
 					live_pool = live_pool.filter(func(t): return t != struck_before)
 				strike_target = live_pool.pick_random()
+				_spread_struck[strike_target] = true
 				struck_before = strike_target
 			elif ab.multi_hits > 0:
 				# Repeated strikes on the chosen target; stop if it falls.
@@ -4070,6 +4124,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				is_crit = true
 			# Execute perfect: the killing stroke cannot glance.
 			if is_perfect and ab.display_name == "Execute":
+				is_crit = true
+			# Triple Shot perfect (Batch AH): the crit lottery still rolls,
+			# but one arrow is paid up front — the LAST one, so a crit the
+			# volley already rolled is never spent covering the guarantee.
+			if is_perfect and ab.display_name == "Triple Shot" \
+					and hit_i == total_hits - 1 and not any_crit:
 				is_crit = true
 			# Held Breath: the promised shot cannot glance either.
 			if attacker.has_status("held_breath") and ab.damage > 0 and not is_counter:
@@ -4883,8 +4943,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_dot_tick(ab.applies_status["id"], attacker))
 					_gain_ruin(attacker, 1)
 				else:
+					# Pommel Strike's perfect (Batch AH) is the Stun landing on an
+					# unbroken boss — reliability where it was a parry buff.
 					_apply_status(strike_target, ab.applies_status["id"], turns, status_meta,
-						_dot_tick(ab.applies_status["id"], attacker), attacker)
+						_dot_tick(ab.applies_status["id"], attacker), attacker,
+						is_perfect and ab.display_name == "Pommel Strike")
 					_note_debuff_applied(attacker, ab.applies_status["id"])
 					# Wrath of the Old Gods: the Occultist's debuffs mark Ruin.
 					if attacker.passive_id == "old_gods" and not strike_target.is_hero \
@@ -4929,11 +4992,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							splash_bd, neighbors.size(),
 							"" if neighbors.size() == 1 else "s",
 							strike_target.unit_name], "#b0a8e0")
-			# A bleed spec's perfect pays in bleed — but Wildstrikes pays in
-			# RELIABILITY, not magnitude (Batch AG): the sweep's 50% roll is
-			# waived, so all four targets take the full 35.
+			# A bleed spec's perfect pays in RELIABILITY, not magnitude: the
+			# 50% roll is waived for the cast. Wildstrikes since Batch AG (all
+			# four targets take the full 35), Hack and Slash since AH (all
+			# three strikes land their 25 instead of buying a fourth strike).
 			var bleed_roll := ab.bleed_chance
-			if is_perfect and ab.display_name == "Wildstrikes":
+			if is_perfect and ab.display_name in ["Wildstrikes", "Hack and Slash"]:
 				bleed_roll = 1.0
 			if ab.bleed_build > 0 and not strike_target.dead and randf() <= bleed_roll:
 				_add_bleed_with_burst(strike_target,
@@ -5071,7 +5135,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_dot_tick("burn", attacker))
 			# Blizzard: 1-2 stacks of Chilled settle on each victim.
 			if ab.display_name == "Blizzard" and not strike_target.dead:
-				for chill_i in randi_range(1, 2):
+				# The perfect buys RELIABILITY, not magnitude (Batch AH): the
+				# 1-2 roll is waived and every enemy takes the full 2.
+				for chill_i in (2 if is_perfect else randi_range(1, 2)):
 					_apply_status(strike_target, "chilled", 3, 0, 0, attacker)
 				_note_debuff_applied(attacker, "chilled")
 				# Whiteout: the storm blinds.
@@ -5521,10 +5587,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		attacker.next_time += eff_delay * 100.0 / attacker.effective_speed()
 
 
+# `force` is the ONE way past the boss immunity, and it exists for exactly
+# two callers: the Pommel Strike and Snare Trap perfects, whose whole
+# payoff since Batch AH is that the Stun lands on an unbroken boss. It is
+# an explicit argument rather than a name check inside here, so the
+# exception stays visible at the call site that bought it.
 func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
-		tick := 0, src: BattleUnit = null) -> void:
+		tick := 0, src: BattleUnit = null, force := false) -> void:
 	# Bosses shrug off Stuns, Freezes, and mind magic until Broken.
-	if id in ["stunned", "frozen", "psychosis", "bewitch", "hysteria"] \
+	if not force and id in ["stunned", "frozen", "psychosis", "bewitch", "hysteria"] \
 			and target.is_boss and not target.broken:
 		target.float_text("IMMUNE", Color(0.75, 0.75, 0.75))
 		_log("   → %s resists the %s (boss — Break them first)" % [target.unit_name,
@@ -6700,6 +6771,24 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_hit_and_run(attacker)
 		"deadfall":
 			attacker.deadfall_armed += 1
+			# Batch AH: Deadfall gained a skill check, and its perfect buys
+			# the one thing the trap never gave you — a say in WHO it takes.
+			# The pick happens after the check, because "you got a perfect,
+			# now choose" is the whole point; cancelling just leaves the
+			# trap untargeted, which is its ordinary behaviour anyway.
+			if is_perfect and not autoplay:
+				var df_pool := enemies.filter(func(e): return not e.dead)
+				var df_aim: BattleUnit = null
+				if df_pool.size() == 1:
+					df_aim = df_pool[0]
+				elif df_pool.size() > 1:
+					_message("Name the one the deadfall takes")
+					df_aim = await _pick_target(df_pool)
+				if df_aim != null:
+					attacker.deadfall_aims.append(enemies.find(df_aim))
+					df_aim.float_text("MARKED", Color(0.75, 0.65, 0.30))
+					_log("   → the deadfall is rigged for %s alone" % \
+						df_aim.unit_name, "#c8a860")
 			if not attacker.update_status("deadfall", "DF%d" % attacker.deadfall_armed,
 					"Deadfall armed: the next enemy to act\nsprings it.", attacker.deadfall_armed):
 				attacker.add_status("deadfall", "Deadfall", "DF%d" % attacker.deadfall_armed,
@@ -7911,7 +8000,8 @@ func _forest_bite(enemy: BattleUnit) -> void:
 
 
 # A sprung trap's payload: stun, poison, and every Snares-lane cruelty.
-func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float) -> void:
+func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float,
+		force_stun := false) -> void:
 	if victim == null or victim.dead:
 		return
 	if dmg > 0.0:
@@ -7931,7 +8021,7 @@ func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float) -> void:
 			_log("† %s dies" % victim.unit_name, "#e05050")
 			_on_enemy_death(victim)
 			return
-	_apply_status(victim, "stunned", 1)
+	_apply_status(victim, "stunned", 1, 0, 0, null, force_stun)
 	if placer.quick_rigging > 0:
 		_apply_status(victim, "cripple", 3)
 	if placer.bone_breaker > 0:
@@ -8203,11 +8293,6 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 			attacker.refresh_bars()
 			attacker.float_text("+15 Mana", Color(0.5, 0.7, 1.0))
 			_log("   → %s restores 15 Mana" % attacker.unit_name, "#b0a8e0")
-		"mana5":
-			attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
-			attacker.refresh_bars()
-			attacker.float_text("+5 Mana", Color(0.5, 0.7, 1.0))
-			_log("   → %s recovers 5 Mana" % attacker.unit_name, "#b0a8e0")
 		"rage5":
 			attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
 			attacker.refresh_bars()
@@ -8238,15 +8323,6 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 		"burn":
 			if not target_died:
 				_apply_status(target, "burn", 2, 0, _dot_tick("burn", attacker))
-		"parry_up":
-			# Power carries the % so weaker sources (Guard Change's 10) never
-			# overwrite this one — status refresh keeps the higher power.
-			_apply_status(attacker, "parry_up", 3, 15)
-			# Swordsmanship (talent): the buff parries harder — show it.
-			if attacker.pommel_parry_bonus > 0.0:
-				attacker.update_status("parry_up", "P+",
-					"+%d%% parry chance (honed by Swordsmanship)." % \
-					int(round((0.15 + attacker.pommel_parry_bonus) * 100)))
 
 
 # ---------- skill check ----------
@@ -8445,7 +8521,7 @@ func _input(event: InputEvent) -> void:
 			if _kb_confirm_target():
 				get_viewport().set_input_as_handled()
 				return
-		_try_ability_hotkey(event.keycode)
+		_try_ability_hotkey(event.keycode, event.shift_pressed)
 	if not sc_active:
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT \
@@ -8463,7 +8539,7 @@ func _on_popup_window_input(event: InputEvent) -> void:
 		if event.keycode == KEY_TAB:
 			_on_tab_pressed()
 		else:
-			_try_ability_hotkey(event.keycode)
+			_try_ability_hotkey(event.keycode, event.shift_pressed)
 
 
 # Tab: cycles whichever picker is open; cycles targets while picking one;
@@ -8499,13 +8575,35 @@ func _kb_confirm_target() -> bool:
 	return true
 
 
-# Q/W/E/R/A/S/D/F pick menu entries by slot while the action bar is open.
-# The summon group (W on the Beastmaster) opens the beast picker.
-func _try_ability_hotkey(keycode: Key) -> void:
+# The label a menu slot wears, "" when the slot is past every hotkey.
+# Batch AH: heroes hold as many abilities as they earn, so slots 10-18 bind
+# to SHIFT + the same nine keys in the same order — ability 10 is Shift+Q.
+# The ⇧ rides the button label because a hotkey nobody can see is not one.
+func _hotkey_name(key_idx: int) -> String:
+	if key_idx < 0:
+		return ""
+	var n := ABILITY_KEY_NAMES.size()
+	if key_idx < n:
+		return String(ABILITY_KEY_NAMES[key_idx])
+	if key_idx < n * 2:
+		return "⇧%s" % ABILITY_KEY_NAMES[key_idx - n]
+	return ""
+
+
+# Q/W/E/R/A/S/D/F/G pick menu entries by slot while the action bar is open,
+# and SHIFT + the same key picks slots 10-18. The summon group (W on the
+# Beastmaster) opens the beast picker. Gating is unchanged: the entry still
+# has to pass _ability_usable, and both call sites are already fenced off
+# during a skill check, an open picker, and autoplay.
+func _try_ability_hotkey(keycode: Key, shifted := false) -> void:
 	if current_hero == null or not action_panel.visible:
 		return
 	var idx := ABILITY_KEYS.find(keycode)
-	if idx < 0 or idx >= _menu_entries.size():
+	if idx < 0:
+		return
+	if shifted:
+		idx += ABILITY_KEYS.size()
+	if idx >= _menu_entries.size():
 		return
 	var entry: Dictionary = _menu_entries[idx]
 	if entry.has("summons"):
@@ -8674,6 +8772,16 @@ func _check_end() -> void:
 				var extra_id: String = Run.random_loot()
 				Run.items[extra_id] = Run.items.get(extra_id, 0) + 1
 				elite_text += "\n+1 %s (Gravelight Lantern)" % Run.ITEM_INFO[extra_id][0]
+		# The mini-boss (Batch AH): elite gold and elite points, and its OWN
+		# spoil is the ability pick — no consumable, no rune cache. Two picks
+		# a zone, six a run.
+		if Run.encounter.get("type", "") == "miniboss":
+			Run.tally_add("elites")
+			var mb_specs: Array = _award_ability_picks()
+			elite_text = "\n\nTHE WAY IS OPEN"
+			if not mb_specs.is_empty():
+				elite_text += "\nNEW ABILITY: %s may choose one of three\non the Party screen." % \
+					" and ".join(mb_specs)
 		# Victory relic hooks: healing chalices, mana hourglasses, toll gold.
 		var v_heal := Run.relic_add("victory_heal_pct")
 		if v_heal > 0.0:
@@ -8693,19 +8801,11 @@ func _check_end() -> void:
 				if pts > 0 else ("+%d gold — the final relic is claimed." % gold_gain)
 			if not relic.is_empty():
 				boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
-			# Boss trophies: one ability pick per zone boss for every spec with
-			# a pool, chosen on the Party screen.
-			var trophy_specs: Array = []
-			for bm_i in Run.party.size():
-				var bm_spec: String = Run.party[bm_i].get("spec", "")
-				if not Classes.spec_pool(bm_spec).is_empty() \
-						and Run.party[bm_i].get("bm_abilities", []).size() \
-						< Classes.spec_pool(bm_spec).size():
-					Run.party[bm_i]["bm_picks_owed"] = \
-						int(Run.party[bm_i].get("bm_picks_owed", 0)) + 1
-					trophy_specs.append(Classes.SPEC_INFO[bm_spec]["name"])
+			# One ability pick per zone boss, for EVERY hero (Batch AH — the
+			# zone's mini-boss pays the other one).
+			var trophy_specs: Array = _award_ability_picks()
 			if not trophy_specs.is_empty():
-				boss_text += "\n\nBOSS TROPHY: %s may choose a new\nability on the Party screen." % \
+				boss_text += "\n\nNEW ABILITY: %s may choose one of three\non the Party screen." % \
 					" and ".join(trophy_specs)
 				Run.save_run()
 			# Persistent profile: boss kills and zone clears always count;
@@ -8969,6 +9069,20 @@ func _show_end(title: String, subtitle: String, buttons: Array,
 # clear_save() destroys the run save and the draft resets the party, so
 # the snapshot is taken BEFORE either. Pure data — safe to hold across
 # the clear and to serialize into the copy-out text.
+# Batch AH: queue one ability pick on every hero and return the spec names
+# that got one, for the victory card. A hero whose two pools are exhausted
+# is silently skipped — the offer is rolled here, so "nothing left" is a
+# fact the roll knows and the card never has to guess at.
+func _award_ability_picks() -> Array:
+	var named: Array = []
+	for member in Run.party:
+		if Run.award_ability_pick(member):
+			named.append(Classes.SPEC_INFO[member["spec"]]["name"] \
+				if Classes.SPEC_INFO.has(member.get("spec", "")) \
+				else String(member["key"]).capitalize())
+	return named
+
+
 func _run_snapshot(outcome: String, closing_text: String) -> Dictionary:
 	var fallen: Array = []
 	for h in heroes:
@@ -9045,6 +9159,7 @@ func _summary_lines(snap: Dictionary) -> Array:
 	# from is the most useful thing in the whole summary.
 	if snap["outcome"] != "complete":
 		var kind_label: String = {"fight": "A fight", "elite": "An ELITE fight",
+			"miniboss": "The zone's MINI-BOSS",
 			"boss": "The zone boss"}.get(snap["encounter_type"], "A fight")
 		lines.append(["s", "The final battle"])
 		lines.append(["p", "%s — %s: %s." % [kind_label, snap["encounter_theme"],
@@ -9132,9 +9247,9 @@ func _member_summary(member: Dictionary) -> String:
 		rune_names.append(String(rune["name"]))
 	if not rune_names.is_empty():
 		text += "\n    Runes: %s" % ", ".join(rune_names)
-	var trophies: Array = member.get("bm_abilities", [])
-	if not trophies.is_empty():
-		text += "\n    Trophies: %s" % ", ".join(trophies)
+	var earned: Array = member.get("bm_abilities", [])
+	if not earned.is_empty():
+		text += "\n    Earned abilities: %s" % ", ".join(earned)
 	return text
 
 
