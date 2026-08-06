@@ -178,7 +178,48 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - Screens: main_menu → draft (pick 4 + relics) → spec_choice (permanent) →
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
-## Current systems snapshot (2026-08-04)
+## Current systems snapshot (2026-08-05)
+BATCH AG (08-05) — COMBAT TUNING, seven changes. (1) WILDSTRIKES gets
+`bleed_chance` 0.5 (it had NONE, so it defaulted to 1.0 and landed 35 on
+all four every cast); its perfect now GUARANTEES the roll on every target
+instead of granting +50% buildup — the `is_perfect * 1.5` clause is gone,
+the perfect sets the roll to 1.0 for the cast. A perfect on a wide swingy
+ability buys RELIABILITY, not magnitude. (2) INFERNO MASTER counts total
+BURN TURNS on the enemy team, not burning heads: step = 1.0 + 0.2*
+pyromaniac_ranks %/turn, cap = 25*step + 10*heat_haze_ranks %. Ceilings
++25 / +40 (Pyro 3) / +70 (Pyro 3 + Haze 3, was 64). Pyromaniac now raises
+the cap WITH the step. Helpers `_total_burn_turns()` and `_inferno_mult(u,
+turns)` are shared by the damage calc, the spec chip and Wildfire.
+CONSUMPTION ORDERING was a live bug — Detonation stripped the burn BEFORE
+the passive block ran, so the consuming cast was paid on the ashes;
+`inferno_turns` is now captured at the top of each strike, before
+Detonation's `remove_status`. (3) WILDFIRE reworked into the wide payoff:
+a `special` ("wildfire", no target pick, gated OUT with nothing alight
+like Shatter), 20 Mana / 3cd / 2.5 delay / 10 BD, consumes ONE turn of
+Burn from EVERY burning enemy for 18% of Attack each (perfect: 2 turns,
+damage twice to anyone holding 2+). Old spread code path REMOVED. Its
+inferno read is taken pre-consumption. Autoplay mage loop retargeted:
+Flamewave builds (unburnt>=2), Wildfire at 3+ burning, Detonation still
+takes the ripest. (4) BATTLE SHOUT is party-wide: power = 8 + total enemy
+bleed/20, applied to EVERY living hero (companions excluded — their damage
+runs through `_companion_hit`, which never reads the status). Delay 1.5.
+Deafening Cry is `bz_warcry` (not bz_deafening) and still -1 cooldown.
+(5) RAZOR ICE 20 dmg/20 cost -> 15 dmg/25 cost — the first cut at the
+Cryomancer overtune S and U both measured. (6) SELF-BUFF DELAYS -0.5,
+floor 1.5, on the 15 named PLUS five the sweep found: Quick Draw,
+Overcharge, Hold Breath -> 1.5, Tripwire -> 2.0, Hold the Line -> 3.0.
+JUDGED OUT and why: Deadfall/Snare Trap/Mass Hysteria are pointed AT the
+enemy team (the rule's letter caught them; the section title "self-buff"
+is what settled it), Dark Pact heals, the three Summons field a unit and
+Aguila takes an enemy target so the trio would have split, Guard Change is
+already at the floor. Heals excluded by the rule. (7) BUG — CALL OF THE
+WILD LOCKED OUT LONE BOND. It writes kinds_summoned for all three kinds as
+Feral Momentum/Menagerie bookkeeping; the Lone Bond gate read `not
+kinds_summoned.is_empty()` as "you spent your beast", so one cast closed
+every summon for the fight. FIX: `BattleUnit.beast_committed`, set ONLY in
+`_do_summon`, and the gate reads that. kinds_summoned untouched. Two
+questions sharing one variable is fine until an ability makes them
+disagree — the fix is a second variable, not a cleverer read of the first.
 BATCH AF (08-04) — THE OPENING PICK OFFERS A RUNE FOR YOUR SPEC. One
 change, small on purpose. runes.json BYTE-UNCHANGED for the THIRD batch
 running, and that is the intent — THE DESIGNER HAS CLOSED THE RUNE-
@@ -1423,7 +1464,8 @@ damaged_since_turn (set in take_hit, cleared at hunter turn start).
 Herald widens arrivals (2 taunts / 2 dives / double howl on bloodiest).
 Apex: extra co-strike on Quick Shot + KC erase in _on_enemy_death.
 Lone Bond: loyalty floor 3 at summon (skips arrival gain), summon gate
-once kinds_summoned non-empty. Master's Aim/Instinctive/Deep Reserves/
+once beast_committed (Batch AG — it read kinds_summoned, which Call of
+the Wild also writes, and that locked out every summon). Master's Aim/Instinctive/Deep Reserves/
 Devoted Fury/Beast Within (companion_hp_pct — % of base; flat
 companion_hp_bonus rides on top) wired at their ability sites.
 BEASTMASTER v3 LOYALTY (07-24, Batch 28; replaces Ferocity/Frenzy/Wild
@@ -1684,8 +1726,9 @@ via apply_kit_overrides (free, 20% Atk frost, 1 chilled stack, perfect
 flat 25%); Razor Ice v2 (3 random, +3%/chilled stack, perfect chills
 unchilled); Blizzard v2 (aoe, 1-2 stacks each, perfect_id "mana5");
 Ice Lance (auto-crit vs frozen, perfect pr=20). Old Frost Bolt VAULTED.
-PYROMANCER REWORK (07-16): passive "inferno" = Inferno Master (+5% dmg
-per burning enemy, cap 25%; live spec chip via _update_talent_chips; the
+PYROMANCER REWORK (07-16; the passive and Wildfire are SUPERSEDED BY
+BATCH AG above — read that block, not this one): passive "inferno" =
+Inferno Master (+5% dmg per burning enemy, cap 25%; live spec chip via _update_talent_chips; the
 old "ignite" on-hit passive is GONE). Core Magic Bolt → Fireball via
 apply_kit_overrides (free, 20% Atk fire, 15BD, burn 3t; perfect = flat
 25% Atk in _resolve). Kit: Detonation (consumes target burn pre-mitigation

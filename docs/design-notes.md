@@ -1190,3 +1190,73 @@ capable of seeing it". If it was not, buy more samples. If it was, you have
 a finding about generality, not about magnitude — and a magnitude pass
 authored on the strength of one party composition would have been tuned to
 that party.
+
+
+## Batch AG — what a Perfect should buy
+
+Four of the seven changes in this batch are the same idea wearing different
+clothes: an ability was charging for something it was not really selling.
+
+Wildstrikes is the clearest case. It had no `bleed_chance` at all, which
+meant the field defaulted to 1.0 and nobody noticed, because "35 Bleed on
+every enemy, every time" reads like a designed number rather than a missing
+one. Its Perfect then sold +50% on top of a guarantee — a magnitude bonus
+on an ability whose whole problem was that it never missed. Moving the
+reliability to 50% and making the Perfect *buy the guarantee back* costs
+the ability nothing on paper and changes what the skill check feels like
+entirely. A wide, swingy sweep should reward hitting the timing with
+certainty, not with more of what it was already certain to do.
+
+Inferno Master had a subtler version of the same fault. Counting burning
+enemies rewards the Pyromancer for the one thing his kit does almost for
+free — Flamewave puts a fire on everyone — and pays him nothing for the
+thing his talent lanes actually spend points on, which is making each of
+those fires deeper. Accelerant, Conflagration, Explosive Force and Cinder
+Trail all grow Burn *turns*, and the passive was blind to every one of
+them. Counting turns instead makes the lane's own investments legible in
+the number on the chip. Pyromaniac raising the cap along with the step is
+part of that: a node that deepens a rate against a fixed ceiling is a node
+that stops working the moment you buy the third rank.
+
+The consumption-ordering fix is the one that was a plain bug rather than a
+design fault, and it is worth naming because it is the kind that never
+crashes. Detonation stripped its target's Burn before the passive block
+ran, so the cast that spent the field was paid on the ashes. Nobody would
+have reported it — the damage number was always plausible.
+
+Wildfire's rework is a scope decision more than a power one. Copying one
+target's Burn to everyone at half duration is a *setup* tool, and the
+Pyromancer's problem was never setup; Flamewave is setup. Worse, it worked
+against Detonation, since diluting the deepest fire on the board is the
+exact opposite of what the payoff ability wants. Two abilities that both
+cash in a burning field should ask different questions of it, and now they
+do: one deep fire, or a wide one.
+
+Battle Shout is the odd one out, and the fault there was naming. A shout
+is a thing other people hear. Making it party-wide and giving it a flat +8%
+floor turns it from a solo cooldown that happened to be loud into the
+warcry it was always described as — and the flat term matters more than the
+scaling one, because the old version was worth almost nothing in the
+opening turns when a berserker most wants to spend Rage.
+
+On the initiative sweep: the rule as written ("a `special`, no damage, no
+healing, no enemy target") catches more than the intent behind it, and the
+section title — *self-buff* initiative costs — is what settled the
+borderline cases. Deadfall, Snare Trap and Mass Hysteria all satisfy the
+letter of the rule and are all pointed squarely at the enemy team; the
+Summons satisfy it too, but a summon fields a unit rather than buffing
+anyone, and Aguila takes an enemy target, so applying the rule literally
+would have made two of the three cheaper and left the eagle behind. Where
+a mechanical rule and its stated purpose disagree, the purpose is the
+better guide — and the disagreements are worth reporting rather than
+silently resolving, because the designer is the one who gets to overrule
+either.
+
+The Lone Bond bug is a reminder about shared bookkeeping. `kinds_summoned`
+was written for Feral Momentum and Menagerie, which want to know "has this
+kind ever been on the field". Lone Bond then borrowed it to answer a
+different question — "have you spent your one summon" — and the two
+questions agreed right up until Call of the Wild wrote all three kinds
+without summoning anything. Two questions sharing one variable is fine
+until an ability makes them disagree; the fix is a second variable, not a
+cleverer read of the first.

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-04 (Batch AF)</b></p>
+<p align="right"><b>Last updated: 2026-08-05 (Batch AG)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -265,8 +265,8 @@ Devoutness talent cuts it 5% per rank; Bulwark of Fortitude negates it entirely.
 <h3>4.5 Bleed &amp; damage over time</h3>
 <ul>
 <li><b>Bleed</b> is a 0–100 buildup meter (chip shows Bl##). Wounding attacks add buildup
-(Wildstrikes 35 always; Hack and Slash 25 at 50% per hit). At 100 the target <b>bleeds out for
-20% max HP</b> and the meter resets. <b>Bleedout damage ignores armor</b> entirely.</li>
+(Wildstrikes 35 at 50% per target; Hack and Slash 25 at 50% per hit). At 100 the target
+<b>bleeds out for 20% max HP</b> and the meter resets. <b>Bleedout damage ignores armor</b> entirely.</li>
 <li><b>Burn:</b> 6% of the applier's Attack (snapshotted when it lands; ≈6 at 100 Atk) at
 the start of the afflicted unit's turn; ticks can crit using the caster's snapshotted crit
 chance. <b>Burn counts as fire damage</b> — fire resists reduce the tick and fire
@@ -324,8 +324,9 @@ strike (Occultist's Bewitch, 3 turns).</td></tr>
 Sundering them (Occultist capstone).</td></tr>
 <tr><td>Invigoration</td><td>Restores Mana at the start of each turn (Dark Pact
 talent).</td></tr>
-<tr><td>Battle Shout</td><td>+1% damage per 20 blood buildup on the enemy party, snapshotted
-at cast (Berserker talent). The chip shows the % gained at the moment of the shout.</td></tr>
+<tr><td>Battle Shout</td><td>+8% damage, plus 1% per 20 blood buildup on the enemy party,
+snapshotted at cast and given to the WHOLE party (Berserker talent). The chip shows the %
+gained at the moment of the shout.</td></tr>
 <tr><td>Interpose (charges)</td><td>The next N attacks against this unit are BLOCKED
 (granted by the Warden's Interpose). The chip counts down the charges left
 ("IP3" → "IP1").</td></tr>
@@ -567,18 +568,19 @@ it, so his fury never fully cools (the Scar Tissue talent deepens the floor to 6
 of the peak). The floor banks on every hit taken, even one healed away.<br>
 Bloodlust — 25 Rage, 26 dmg / 18 BD / 3.0, 2cd, heals 30% of missing HP, builds 10 Rage
 (Perfect: 45% missing HP).<br>
-Wildstrikes — 35 Rage, 16 dmg to ALL / 14 BD / 4.5, 3cd, +35 Bleed each, builds 10 Rage
-(Perfect: +50% Bleed buildup on every target).<br>
+Wildstrikes — 35 Rage, 16 dmg to ALL / 14 BD / 4.5, 3cd, builds 10 Rage; each target has a
+50% chance to take +35 Bleed (Perfect: the Bleed lands on EVERY target).<br>
 Hack and Slash — 20 Rage, 3 strikes × 10 dmg / 10 BD / 3.0, 2cd, each hit 50% chance
 to build 25 Bleed (a full 4-strike flurry can bleed a target out), builds 10 Rage
 (Perfect: 4 strikes).<br>
-Blood Price — 0 Rage, 2.0, 3cd; a self-buff that casts with no target selection: pays
+Blood Price — 0 Rage, 1.5, 3cd; a self-buff that casts with no target selection: pays
 15% of CURRENT health (never lethal — the cost stops at 1 HP) for 30 Rage and +25%
 damage dealt for 2 turns; the chip shows the buff and turns remaining
 (Perfect: the health cost is halved).<br>
-<i>Talent-granted:</i> Battle Shout — 15 Rage, 2.0, 2cd, +1% damage per 20 blood buildup on
-the enemy party for 2 turns (Perfect: +5 Rage); a self-buff — casts with no target
-selection, and its chip shows the % gained. Rampage — 40 Rage, 3 × 20 physical +
+<i>Talent-granted:</i> Battle Shout — 15 Rage, 1.5, 2cd; the WHOLE party (companions excluded)
+gains +8% damage, plus 1% for every 20 points of blood buildup on the enemy party, for
+2 turns (Perfect: +5 Rage); casts with no target selection, and every hero's chip shows the
+% gained. Rampage — 40 Rage, 3 × 20 physical +
 3 × 10 bloodloss / 3 × 10 BD, 4.0, 4cd; if the target dies, Rampage immediately recasts
 (free) on another enemy and can chain.</li>
 <li><b>Warden (Tank)</b> — <b>Stat block:</b> 200 HP / 32% armor / <b>10% base Block</b>
@@ -598,15 +600,15 @@ Crushing Blow — 20 Rage, 43% Atk (≈32) / 20 BD / 3.0, 2cd,
 Sunders (−35% armor, 3 turns), builds 10 Rage (Perfect: +5 bonus BD).<br>
 War Stomp — 20 Rage, 3 shockwaves × 15% Atk / 15 BD each to RANDOM
 enemies, 3.0 int, 3cd; allies regain 10% of their resource (Perfect: 20% instead).<br>
-Shieldwall — 25 Rage, 2.0, 2cd, self-cast with no target selection: +25% Block chance for
+Shieldwall — 25 Rage, 1.5, 2cd, self-cast with no target selection: +25% Block chance for
 2 turns (Perfect: 3). The blocks it buys count as <b>Heavy Plating</b> blocks, so they feed
 Tenacity and Rally — which Interpose's charges never do. The chip reads "+25% Block"; the
 Shield Mastery talent adds +1 turn per rank to every cast.<br>
-Interpose — 25 Rage, 2.5 int, 4cd, self-cast with no target selection: every OTHER living
+Interpose — 25 Rage, 2.0 int, 4cd, self-cast with no target selection: every OTHER living
 ally gains 1 shield charge — the next attack against them is BLOCKED (Perfect: the
 Warden gains a charge too). Charges ADD to any the ally is already holding, and are the
 only guaranteed blocks in the game.<br>
-<i>Talent-granted:</i> Hold the Line — 30 Rage, 3.5, 6cd, the party takes 50% less Break
+<i>Talent-granted:</i> Hold the Line — 30 Rage, 3.0, 6cd, the party takes 50% less Break
 damage for 2 turns and cannot die for a turn (Perfect: refunds 5 Rage); self-cast, no
 target selection.<br>
 <b>Talent lanes:</b> see §7 — Plate / Threat / Banner, node-gated.</li>
@@ -647,20 +649,24 @@ guaranteed crit).</li>
 <li><b>Pyromancer (Nuker)</b> — <b>Stat block:</b> 135 HP / 8% armor / +30% fire
 resist, −20% frost (the burning glass: armoured in his own element, soft to its
 opposite — the Cryomancer's deliberate mirror image).<br>
-Passive <i>Inferno Master</i>: +5% damage
-for each burning enemy, up to +25% (the spec chip shows the live bonus). Its core Magic
+Passive <i>Inferno Master</i>: +1% damage
+for every TURN of Burn standing on the enemy team, up to +25% (the spec chip shows the live
+bonus and the live turn count). Its core Magic
 Bolt is reforged into <b>Fireball</b> — free, 20% Atk fire / 15 BD / 2.0, no cd, applies
 3 turns of Burn (Perfect: hits at 25% of Attack).<br>
 Detonation — 25 Mana, 25% Atk fire / 20 BD / 3.0, 2cd; CONSUMES the target's Burn, adding
 150% of its remaining damage (tick × turns left × 1.5) to the hit before mitigation
 (Perfect: also applies 2 turns of Burn).<br>
-Wildfire — 20 Mana, 20% Atk fire / 10 BD / 2.0, 3cd; spreads the target's Burn to EVERY
-other living enemy at HALF its remaining duration (rounded up; the Burn is captured
-before the hit, so a killing blast still spreads).<br>
+Wildfire — 20 Mana, 10 BD / 2.5, 3cd, no target selection; consumes ONE turn of Burn from
+EVERY burning enemy, each taking 18% of Attack in fire for it (an enemy down to its last
+turn simply loses its Burn; enemies that are not burning are untouched, and the ability
+cannot be cast with nothing alight). Inferno Master is measured BEFORE the consumption, so
+the cast that empties the field is still paid for it (Perfect: takes 2 turns from each
+instead, dealing the damage twice to anyone holding 2+).<br>
 Flamewave — 25 Mana, 15% Atk fire to ALL / 5 BD / 3.0, 2cd; applies 2 turns of Burn to
 every enemy — those already Burning burn 2 turns longer instead (Perfect: 3 turns either
 way).<br>
-<i>Talent-granted:</i> Flame Shield — 15 Mana, 2.0, 2cd, self-cast: take 50% less damage
+<i>Talent-granted:</i> Flame Shield — 15 Mana, 1.5, 2cd, self-cast: take 50% less damage
 for 2 turns and attackers are set Burning 3 turns (Perfect: also triggers an immediate Burn
 tick on every burning enemy). Firestorm — 30 Mana, 3.5, 4cd, capstone: 6-8 bolts at RANDOM
 enemies for 12% Atk each, each bolt applying 2 turns of Burn (Perfect: 7-9 bolts).<br>
@@ -675,7 +681,7 @@ sources. When an enemy Freezes, its stacks drop to <b>1</b> instead of 0 — the
 keeps the engine warm. Its core Magic
 Bolt is reforged into <b>Frostbolt</b> — free, 20% Atk frost / 15 BD / 2.0, no cd, applies
 1 stack of Chilled (Perfect: hits at 25% of Attack).<br>
-Razor Ice — 20 Mana, 20% Atk frost / 10 BD / 2.5, 3cd; THREE shards driven into a SINGLE
+Razor Ice — 25 Mana, 15% Atk frost / 10 BD / 2.5, 3cd; THREE shards driven into a SINGLE
 chosen target, every shard applying a stack of Chilled (Perfect: hits at 25% of
 Attack).<br>
 Blizzard — 30 Mana, 15% Atk frost to ALL / 10 BD / 3.5, 4cd; layers 1-2 stacks of Chilled
@@ -704,11 +710,11 @@ initiative instead). Unity splits the recoil across the party like any other dam
 Arcane Barrage — 20 Mana, 6 bolts × 8% Atk / 3 BD each, 2.5, 2cd; every bolt strikes one
 of the (up to) 3 living enemies with the LOWEST health — the volley typically rakes 2-3
 of them (Perfect: fires a 7th bolt).<br>
-Stabilize — free, 2.0, 3cd; consumes the Resonance stacks ABOVE 2: +5 Mana and +10%
+Stabilize — free, 1.5, 3cd; consumes the Resonance stacks ABOVE 2: +5 Mana and +10%
 damage reduction (2 turns) per stack consumed — a mid-fight vent that keeps the engine
 warm (+30% damage and the crit remain at the floor), not a reset. Unusable at 2 stacks
 or fewer (Perfect: also heals 5% of max health).<br>
-<i>Talent-granted:</i> Overcharge — 20 Mana, 2.0, 5cd, once per battle: maximum Resonance
+<i>Talent-granted:</i> Overcharge — 20 Mana, 1.5, 5cd, once per battle: maximum Resonance
 becomes 8 (raised further by Resonant Core) for the rest of the battle; stacks past 5
 weigh 1.5× toward the Resonance per-stack bonuses ONLY — Cannon's, Barrage's, and Magi's
 Wrath's own per-stack scalings count raw stacks (Perfect: 1.65× instead). Magi's Wrath
@@ -749,16 +755,16 @@ Passive <i>Conviction</i>: allies build <b>Faith</b> whenever
 under Blessing of Zeal; the stacks only work while the Devout stands). Each stack: 3%
 damage mitigation and +2% damage dealt. At 5 stacks the ally is healed for 15% of max
 health, their Faith resets, and the Devout recovers 3% max Mana.<br>
-Divine Shield — 15 Mana, 3.0, 2cd; an ally shield absorbing 30% of the Devout's max
+Divine Shield — 15 Mana, 2.5, 2cd; an ally shield absorbing 30% of the Devout's max
 health, then it breaks (Perfect: 35%).<br>
-Consecrated Ground — 25 Mana, 3.5, 3cd; the party takes 15% less damage and reflects
+Consecrated Ground — 25 Mana, 3.0, 3cd; the party takes 15% less damage and reflects
 10% of damage taken, for 2 turns (Perfect: 3 turns).<br>
-Blessing of Zeal — 20 Mana, 2.5, 2cd; an ally deals +15% damage for 3 turns, their
+Blessing of Zeal — 20 Mana, 2.0, 2cd; an ally deals +15% damage for 3 turns, their
 cooldowns tick down 1 turn immediately, and their Faith gain is doubled while it holds
 (Perfect: 4 turns).<br>
-<i>Talent-granted:</i> Sacred Resolve — 25 Mana, 3.0, 5cd; all damage received is split
+<i>Talent-granted:</i> Sacred Resolve — 25 Mana, 2.5, 5cd; all damage received is split
 evenly among living heroes for 3 turns; BD still lands on the struck hero (Perfect: 4
-turns). Bulwark of Fortitude (capstone) — 30 Mana, 3.5, 3cd; for 3 turns the party
+turns). Bulwark of Fortitude (capstone) — 30 Mana, 3.0, 3cd; for 3 turns the party
 takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each
 turn (Perfect: the party instantly heals 5%).<br>
 <b>Talent lanes:</b> see §7 — Bulwark / Faith / Zeal, node-gated.</li>
@@ -825,7 +831,7 @@ Summon Canis — 20 Mana, 3.0, 3cd. Wolf, 80 HP, always ELUSIVE: strikes the hun
 for 20% of the hunter's Attack, building 20 Bleed.<br>
 Summon Aguila — 20 Mana, 3.0, 3cd. Eagle, 80 HP, always ELUSIVE: strikes the hunter's target
 for 20% of the hunter's Attack, applying Exposed (2 turns).<br>
-Hunter's Instinct — 20 Mana, 3.0, 3cd (no skill check): empowers the next 3 Quick Shots —
+Hunter's Instinct — 20 Mana, 2.5, 3cd (no skill check): empowers the next 3 Quick Shots —
 each deals +10% of the hunter's Attack and heals every active beast for 15% of its max
 health (HI# chip counts the shots).<br>
 Kill Command — 30 Mana, 4.0, 3cd, requires a living companion. The order is the beast's
@@ -836,12 +842,12 @@ turns. Under The Pack BOTH beasts obey the order; if the prey falls mid-order th
 the pack turns on the next weakest. (Perfect: each beast that obeyed gains 1 Loyalty.)<br>
 <b>BOSS TROPHIES — one ability pick per zone boss</b>, chosen on the Party screen from the
 pool of five (the base kit is the three summons, Hunter's Instinct, and Kill Command):<br>
-Bestial Wrath — 25 Mana, 4.0, 3cd, requires a living companion (no skill check): unleashes
+Bestial Wrath — 25 Mana, 3.5, 3cd, requires a living companion (no skill check): unleashes
 the beast for 3 turns (+1 turn per 2 Loyalty with Devoted Fury) — <b>Ursus:</b> max health
 DOUBLES, +50% armor, and it taunts 3 random enemies; <b>Canis:</b> +50% damage and +10 Bleed
 on its bleeding strikes; <b>Aguila:</b> +25% damage and every strike Blinds (2 turns). The
 borrowed bulk fades when the Wrath ends.<br>
-Spirit Bond — 20 Mana, 2.0, 3cd, requires a living companion. Hunter and beast each heal
+Spirit Bond — 20 Mana, 1.5, 3cd, requires a living companion. Hunter and beast each heal
 25% of their own max health now and 10% more at their next turn; the hunter restores 15%
 max Mana now and 5% at each of the next 2 turn starts (Perfect: both gain +10% max health
 for 5 turns).<br>
@@ -870,11 +876,11 @@ that most needs to die right now.<br>
 Aimed Shot — 20 Mana, 45 dmg / 15 BD / 3.0, 1cd (Perfect: +20 Focus).<br>
 Powershot — 25 Mana, 20 dmg / 20 BD / 3.0, 2cd: +2% damage for every point of the target's
 Break bar already FULL — the team breaks them, the marksman ends them.<br>
-Hold Breath — 15 Mana, 2.0, 3cd (no skill check): +40 Focus, and the next attack is a
+Hold Breath — 15 Mana, 1.5, 3cd (no skill check): +40 Focus, and the next attack is a
 GUARANTEED critical that ignores all armor.<br>
 <b>BOSS TROPHIES — one pick per zone boss</b> from the pool of five (three more of the
 designed eight land later):<br>
-Quick Draw — 15 Mana, 2.0, 5cd: all abilities act 50% faster for 5 turns (Perfect: 6
+Quick Draw — 15 Mana, 1.5, 5cd: all abilities act 50% faster for 5 turns (Perfect: 6
 turns).<br>
 Triple Shot — 30 Mana, 3.0, 3cd: three arrows at one target, 18% Atk each, every arrow
 rolling its critical separately.<br>
@@ -895,7 +901,7 @@ have a 25% chance to be Poisoned (5 turns), and the Survivalist's abilities deal
 damage per DIFFERENT status effect</b> afflicting the target (the curated debuff list only)
 — breadth of control IS the damage. Five different debuffs beat fifty stacks of one; his
 meter lives on the enemy.<br>
-Tripwire — 20 Mana, 2.5, 4cd, for 5 turns the Hunter retaliates against EVERY attacking
+Tripwire — 20 Mana, 2.0, 4cd, for 5 turns the Hunter retaliates against EVERY attacking
 melee enemy — regardless of who they hit (Perfect: 6 turns).<br>
 Shrapnel Charge — 25 Mana, 3.0, 2cd, rips TWO chosen enemies for 20 NATURE / 25 BD each,
 leaving both Poisoned AND Crippled 3 turns (Perfect: adds Slowed; everything lasts 4). Each
@@ -907,7 +913,7 @@ One trap at a time (two under Deadfall Network).<br>
 and Field Dressing of the designed eight land later):<br>
 Explosive Shot — 35 Mana, 3.0, 3cd: 10 NATURE to ALL / 20 BD, Poisoning each (Perfect: 12
 base).<br>
-Venom Coating — 20 Mana, 2.0, 5cd (no skill check): for 4 turns every attack applies
+Venom Coating — 20 Mana, 1.5, 5cd (no skill check): for 4 turns every attack applies
 Poison and refreshes its timers.<br>
 Hamstring — 25 Mana, 2.5, 3cd, 20% Atk: Cripple, Slowed AND Exposed — three statuses in
 one cast (Perfect: 4 turns each).<br>
@@ -944,8 +950,8 @@ Crushing Blows (3%/rank armor pen per 20 enemy-party bleed ×3), Hemorrhage (ene
 this battle ×3), Arterial Spray (bleedouts transfer 25%/rank of the buildup to another
 living enemy ×2), Blood Tithe (bleedouts grant 15/rank Rage ×2).<br>
 <b>FURY</b> (the risk dial) — Unstoppable (Blood Frenzy step 2%→+0.5%/rank ×3; raises the
-floor too), Battle Shout (grants the ability — its bleed scaling is deliberate cross-lane
-synergy), Enraged (below-50% trigger: +3%/rank damage, 5 turns, stacks ×3), Reckless Fury
+floor too), Battle Shout (grants the ability — a party-wide warcry; its bleed scaling is deliberate
+cross-lane synergy), Enraged (below-50% trigger: +3%/rank damage, 5 turns, stacks ×3), Reckless Fury
 (+5%/rank damage dealt AND taken ×3; <i>exclusive with Measured Rage</i>), Measured Rage
 (take 8% less damage; <i>exclusive with Reckless Fury</i>), Scar Tissue (the Frenzy floor
 holds 60/70/75% of the peak instead of 50%), Deathwish (+6%/rank damage while below 35%
@@ -1178,10 +1184,10 @@ Shield (grants the ability — attackers ignite themselves on it), Conflagration
 applies +1 turn/rank of Burn, fresh fires and extensions alike ×2), Cinder Trail
 (Fireball also applies 1 turn/rank of Burn to one random other enemy ×2), Ember Wind (an
 enemy dying Burning passes its remaining Burn to a random living enemy).<br>
-<b>INFERNO</b> (profiting while it burns) — Pyromaniac (Inferno Master grants +1%/rank
-more per burning enemy ×3), Molten Core (take 2%/rank less damage from burning enemies
-×3), Melt Armor (every Burn tick melts 1%/rank armor off the victim for the battle ×3),
-Heat Haze (Inferno Master counts 1/rank more burning enemies before capping, 5 up to 8;
+<b>INFERNO</b> (profiting while it burns) — Pyromaniac (Inferno Master grants +0.2%/rank
+more per turn of Burn on the enemy team, and its cap rises to match ×3), Molten Core (take
+2%/rank less damage from burning enemies ×3), Melt Armor (every Burn tick melts 1%/rank armor off the victim for the battle ×3),
+Heat Haze (Inferno Master's cap rises 10%/rank, +25% up to +70% alongside Pyromaniac 3;
 <i>exclusive with Scorched Earth</i> ×3), Scorched Earth (burning enemies deal 5%/rank
 less damage; <i>exclusive with Heat Haze</i> ×3), Ashes of Al'ar (on death 11%/rank
 chance to revive at 25% HP, once per battle ×3), Living Flame (while 3 or more enemies
@@ -1195,7 +1201,8 @@ grants +1%/rank damage per remaining Burn turn for the next turn ×3), Chain Rea
 consumes 25%/rank more of the target's remaining Burn damage ×3), White Heat (Detonation
 always crits a target with 5+ turns of Burn — 4+ at rank 2 ×2).<br>
 <b>CAPSTONES</b> — Firestorm (Kindling: grants the ability), Avatar of Flame (Inferno:
-Inferno Master loses its cap — every burning enemy grants its full bonus — and the
+Inferno Master loses its cap — every turn of Burn on the enemy team grants its full bonus —
+and the
 Pyromancer's fire damage ignores enemy fire resistance), Cataclysm (Detonation: after it
 resolves, it fires again at the burning enemy with the most Burn remaining for 60% of
 its damage and BD, chaining up to 3 additional times, each 60% of the one before; every

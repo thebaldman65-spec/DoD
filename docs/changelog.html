@@ -5,6 +5,94 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-05 — Batch AG: combat tuning — reliability, Burn turns, and the tempo of self-buffs</h2>
+<ul>
+<li><b>Wildstrikes trades magnitude for reliability.</b> The sweep had <b>no
+<code>bleed_chance</code></b>, so it defaulted to 1.0 and put a guaranteed 35 Bleed on every
+enemy — 140 buildup across a four-wide field, every cast, with no roll to lose. It now carries
+<b><code>bleed_chance</code> 0.5</b> like Hack and Slash, and <b>the Perfect changed what it
+buys</b>: instead of +50% buildup on every target it now <b>guarantees the roll on all of
+them</b> (four × 35, no bonus). The skill check is a reliability check now, not a magnitude
+one — which is what a Perfect on a wide, swingy ability should be. The per-target roll already
+lived in the strike loop; the Perfect simply treats the chance as 1.0 for the cast.</li>
+
+<li><b>Inferno Master counts Burn TURNS, not burning heads.</b> The passive read the number of
+enemies alight, which meant a single enemy burning for six turns was worth exactly as much as
+one burning for one, and the Pyromancer's own build-the-fire loop (Flamewave extensions,
+Conflagration, Accelerant) fed it nothing. It now reads the <b>total Burn turns standing on the
+enemy team</b>: step = <code>1.0 + 0.2 × Pyromaniac ranks</code> percent per turn, cap =
+<code>25 × step + 10 × Heat Haze ranks</code> percent. <b>Ceilings: +25% base, +40% at
+Pyromaniac 3, +70% with Heat Haze 3 on top</b> (was 64%). Pyromaniac now raises the cap along
+with the step — the old node bought a deeper step against a fixed ceiling. Avatar of Flame
+still removes the cap and still burns through fire resistance.</li>
+
+<li><b>Consumption ordering, which was a live bug.</b> Detonation removed its target's Burn
+<i>before</i> the passive block ran, so the cast that spent the field was paid on the field it
+had already emptied. Both Detonation and the reworked Wildfire now <b>measure the total before
+their own consumption</b>: the consuming cast gets full credit, and only subsequent turns see
+the thinner field.</li>
+
+<li><b>Wildfire is the wide payoff now.</b> The old version copied one target's Burn to
+everyone at half duration — a setup tool that made the Pyromancer's own Detonation worse by
+diluting the deep fire he was building. It is now a <b><code>special</code> with no target
+selection</b>: <b>20 Mana, 3cd, 2.5 initiative, 10 BD</b>, consuming <b>one turn of Burn from
+every burning enemy</b>, each taking <b>18% of Attack in fire</b> for it. An enemy on its last
+turn simply loses its Burn; enemies that are not burning are untouched. <b>Perfect takes two
+turns from each</b>, dealing the damage twice to anyone holding 2+. Detonation is unchanged —
+the two now ask different questions of the same field (one deep fire, or a wide one).</li>
+
+<li><b>Wildfire cannot be cast into an empty field</b>, on the same rule as Shatter: with
+nothing alight the ability does literally nothing, so it is gated out of the menu rather than
+eating 20 Mana and a turn. The autoplay/sim pyromancer loop was retargeted with it — Flamewave
+builds, Wildfire harvests at 3+ burning, Detonation still cashes the deepest single fire.</li>
+
+<li><b>Battle Shout is a party-wide warcry.</b> It was a <i>self</i>-buff scaling off the enemy
+party's bloodloss, which meant it read as a warcry and behaved as a solo cooldown — and at low
+buildup it was worth nearly nothing. Power is now <b>8 + (total enemy bleed buildup / 20)</b>
+and it lands on <b>every living hero</b> (companions excluded — the beast's damage runs through
+its own path). Duration 2 turns and the +5 Rage Perfect are unchanged; Deafening Cry still
+takes a turn off its cooldown. The damage clause already read the status per unit, so it works
+party-wide untouched.</li>
+
+<li><b>Razor Ice: damage 20 → 15, cost 20 → 25.</b> Three shards, 3 Chilled stacks, 3cd and the
+25%-of-Attack Perfect all unchanged. This is the first cut against the Cryomancer overtune
+Batch S identified and Batch U confirmed at the honest floor (38–40% damage share across every
+budget and every routing policy) — his numbers, not his AoE.</li>
+
+<li><b>Self-buff initiative costs cut 0.5 (floor 1.5).</b> Buffing yourself or the party costs
+a turn <i>and</i> the tempo of a long initiative delay, and the double charge was pushing whole
+categories of ability out of real rotations. Applied to the fifteen named: Blood Price, Battle
+Shout, Shieldwall, Flame Shield, Stabilize and Spirit Bond → 1.5; Interpose and Blessing of
+Zeal → 2.0; Divine Shield, Sacred Resolve and Hunter's Instinct → 2.5; Consecrated Ground,
+Bulwark of Fortitude and Hold the Line → 3.0; Bestial Wrath → 3.5.</li>
+
+<li><b>The sweep for unlisted abilities matching the rule</b> (a <code>special</code> handler,
+<code>damage: 0</code>, no healing, no enemy target) <b>found five</b>: Quick Draw and
+Overcharge (both named in advance) and Hold Breath → 1.5, Tripwire → 2.0, Hold the Line → 3.0.
+<b>Judged out, and why:</b> Deadfall, Snare Trap and Mass Hysteria are pointed <i>at</i> the
+enemy team even though they need no target pick; Dark Pact heals; the three Summons field a
+unit rather than buff anyone, and Aguila takes an enemy target, so including them would have
+split the trio; Guard Change already sits at the 1.5 floor. Heals were excluded by the rule —
+Heal, Renewal, Hymn of Hope, Divine Plea and Resurrection keep their delays.</li>
+
+<li><b>Bug: Call of the Wild permanently locked a Lone Bond hunter out of summoning.</b> Call
+of the Wild writes <code>kinds_summoned[kind] = true</code> for all three beasts as bookkeeping
+for Feral Momentum and Menagerie. The Lone Bond gate in <code>_ability_usable</code> read
+<code>not kinds_summoned.is_empty()</code> as "you have spent your one beast" — so a single
+Call of the Wild marked all three kinds and closed every summon for the rest of the fight.
+<b>Fix:</b> a separate <code>beast_committed</code> flag on BattleUnit, set only in
+<code>_do_summon</code> (a real summon), and the gate reads that. <code>kinds_summoned</code> is
+untouched — Feral Momentum and Menagerie keep reading it and Call of the Wild keeps writing it.
+The AI path goes through <code>_ability_usable</code>, so autoplay and the sims inherit the
+fix.</li>
+
+<li><b>Verified.</b> Headless parse clean on all four touched scripts; 40-battle sims on the
+standard party and on a pyromancer party — <b>0 SCRIPT ERRORs</b>, Wildfire firing 0.8×/battle
+through the new handler. Autoplay log checks confirm the Wildstrikes Perfect landing 35 (not
+52) on all four targets, and Wildfire tearing 1 turn from 6 enemies for 101 and 2 turns from 5
+for 96 on a Perfect.</li>
+</ul>
+
 <h2>2026-08-04 — Batch AF: the opening pick offers a rune for your spec</h2>
 <ul>
 <li><b>Why — the number that prompted it.</b> Batch AE shipped the starting rune and measured

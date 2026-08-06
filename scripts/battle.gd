@@ -61,7 +61,7 @@ const STATUS_INFO := {
 	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less damage\n(a Shieldmaster's ward)."],
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
 	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of all attack damage\nthis unit takes echoes to its\nwhole party."],
-	"battle_shout": ["Battle Shout", "BS", Color(0.95, 0.45, 0.30), "+1% damage per 20 blood buildup\non the enemy party (at cast time)."],
+	"battle_shout": ["Battle Shout", "BS", Color(0.95, 0.45, 0.30), "+8% damage, plus 1% per 20 blood\nbuildup on the enemy party (at cast time)."],
 	"blood_price": ["Blood Price", "BP", Color(0.85, 0.25, 0.25), "Paid in his own blood:\n+25% damage dealt."],
 	"scent": ["Scent of Blood", "SB", Color(0.85, 0.3, 0.3), "Fed by bleedouts: bonus damage for\neach enemy bled out this battle."],
 	"deathwish": ["Deathwish", "DW", Color(0.9, 0.3, 0.3), "Below 35% health: bonus damage —\nnothing left to lose."],
@@ -1837,24 +1837,24 @@ func _update_talent_chips() -> void:
 		h.update_status("crushing_blows", "+%d%%" % pen,
 			"Crushing Blows: +3%% armor penetration per\nrank for every 20 bloodloss on the enemy\nteam. Currently +%d%% (%d total bloodloss)." % [
 				pen, party_bleed])
-	# Inferno Master: the Pyromancer's passive chip tracks burning enemies
-	# (Pyromaniac raises the per-enemy step).
-	var burning := 0
-	for foe in enemies:
-		if not foe.dead and foe.has_status("burn"):
-			burning += 1
+	# Inferno Master: the Pyromancer's passive chip tracks the enemy team's
+	# total Burn TURNS (Pyromaniac raises the per-turn step and the cap with
+	# it; Heat Haze raises the cap alone).
+	var burn_turns := _total_burn_turns()
 	for h in heroes:
 		if h.dead or h.passive_id != "inferno":
 			continue
-		var inf_step: int = 5 + h.pyromaniac_ranks
-		var inf_cap: int = 5 + h.heat_haze_ranks
-		var inf_n: int = burning if h.avatar_flame > 0 else mini(burning, inf_cap)
-		var inf_pct: int = inf_n * inf_step
+		var inf_step: float = 1.0 + 0.2 * h.pyromaniac_ranks
+		var inf_cap: float = 25.0 * inf_step + 10.0 * h.heat_haze_ranks
+		var inf_pct: float = burn_turns * inf_step
+		if h.avatar_flame == 0:
+			inf_pct = minf(inf_pct, inf_cap)
 		var inf_cap_txt := ("no cap — Avatar of Flame" if h.avatar_flame > 0 \
-			else "up to +%d%%" % (inf_step * inf_cap))
-		h.update_status("spec_passive", "+%d%%" % inf_pct,
-			"Inferno Master: +%d%% damage for each burning\nenemy (%s).\nCurrently +%d%% (%d burning)." % [
-				inf_step, inf_cap_txt, inf_pct, burning])
+			else "up to +%d%%" % int(round(inf_cap)))
+		h.update_status("spec_passive", "+%d%%" % int(round(inf_pct)),
+			"Inferno Master: +%s%% damage for every turn\nof Burn on the enemy team (%s).\nCurrently +%d%% (%d Burn turns)." % [
+				String.num(inf_step, 1), inf_cap_txt, int(round(inf_pct)),
+				burn_turns])
 	# Seeding Embers: harvest burning deaths (once per corpse).
 	for foe in enemies:
 		if not foe.dead or foe.seeding_consumed or foe.burn_at_death <= 0:
@@ -2038,7 +2038,8 @@ func _player_turn(u: BattleUnit) -> void:
 				"battle_shout", "blood_price", "flame_shield", "stabilize",
 				"overcharge", "cons_ground", "bulwark", "dark_pact", "hysteria",
 				"instinct", "bestial", "spirit_bond", "hold_breath",
-				"venom_coat", "deadfall", "guard_change", "interpose"]:
+				"venom_coat", "deadfall", "guard_change", "interpose",
+				"wildfire"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -2295,9 +2296,10 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				return [overpower, target_foe]
 			return [u.abilities[0], target_foe]          # Strike
 		"mage":
-			# Pyromancer (Batch N loop): Flamewave builds the fire, Wildfire
-			# copies a grown burn to the field, Detonation cashes in whoever
-			# holds the MOST — that targeting is the point of the loop.
+			# Pyromancer (Batch N loop, Batch AG rework): Flamewave builds the
+			# fire, Wildfire harvests a WIDE field for free damage, and
+			# Detonation cashes in whoever holds the MOST — that targeting is
+			# the point of the loop.
 			var burning_foes := foes.filter(func(e): return e.has_status("burn"))
 			var unburnt: int = foes.size() - burning_foes.size()
 			var ripest: BattleUnit = null
@@ -2315,10 +2317,13 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if fwave != null and u.resource >= fwave.cost and u.ability_ready(fwave) \
 					and unburnt >= 2:
 				return [fwave, target_foe]
+			# Wildfire is the wide payoff now: it wants a line already alight,
+			# not one deep fire to copy. Held to 3+ so Detonation still gets
+			# its single-target cash-out.
 			var wfire := _find_ability(u, "Wildfire")
 			if wfire != null and u.resource >= wfire.cost and u.ability_ready(wfire) \
-					and ripest_turns >= 4 and unburnt >= 2:
-				return [wfire, ripest]
+					and burning_foes.size() >= 3:
+				return [wfire, u]
 			var det := _find_ability(u, "Detonation")
 			if det != null and u.resource >= det.cost and u.ability_ready(det) \
 					and ripest_turns >= 3:
@@ -2816,7 +2821,7 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 				return int(u.loyalty.get(b.companion_kind, 0)) >= 1):
 			return false
 	# Lone Bond: one beast per fight — no swaps, no second call.
-	if ab.special == "summon" and u.lone_bond > 0 and not u.kinds_summoned.is_empty():
+	if ab.special == "summon" and u.lone_bond > 0 and u.beast_committed:
 		return false
 	# Traps: one active at a time (two under Deadfall Network).
 	if ab.special in ["snare_trap", "deadfall"]:
@@ -2850,6 +2855,10 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# Shatter: needs someone Chilled to detonate.
 	if ab.display_name == "Shatter" \
 			and not enemies.any(func(e): return not e.dead and e.has_status("chilled")):
+		return false
+	# Wildfire: there has to be fire to drag (same rule as Shatter).
+	if ab.special == "wildfire" \
+			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
 		return false
 	# Stabilize: nothing to vent unless stacks sit above the floor (2, plus
 	# Still Mind ranks).
@@ -3532,7 +3541,7 @@ func _max_hero_rank(field: String) -> int:
 # ADJACENT (keyword): the enemies DIRECTLY beside the target in formation
 # order. A dead neighbor NEGATES the adjacent bonus on that side — the
 # effect never jumps past a corpse to the next living enemy. Used by
-# splash effects (Sundering, Wildfire).
+# splash effects (Sundering).
 func _adjacent_enemies(target: BattleUnit) -> Array:
 	var idx := enemies.find(target)
 	if idx < 0:
@@ -4171,6 +4180,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Fireball perfect: the bolt hits at 25% of Attack instead of 20%.
 			if is_perfect and ab.display_name == "Fireball":
 				raw = 0.25 * attacker.attack * randf_range(0.9, 1.1)
+			# Inferno Master reads the field as it stands BEFORE this strike
+			# eats any of it — Detonation's own consumption must not shrink
+			# the bonus the consuming cast is paid (Batch AG).
+			var inferno_turns := _total_burn_turns()
 			# Detonation: consumes the target's Burn — 150% of its remaining
 			# damage (tick × turns left × 1.5) joins this hit before
 			# mitigation. Blast Radius deepens the consumption +25%/rank.
@@ -4183,11 +4196,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						* (1.0 + 0.25 * attacker.blast_radius_ranks)))
 					raw += detonated
 					strike_target.remove_status("burn")
-			# Wildfire: remember the target's Burn before the hit — the
-			# spread happens even if the blast finishes them.
-			var wildfire_burn := {}
-			if ab.display_name == "Wildfire":
-				wildfire_burn = strike_target.get_status("burn").duplicate()
 			# Powershot (inverted, Batch 32): +2% damage per point of the
 			# target's Break bar already FULL — the team breaks them, the
 			# marksman ends them (+4% with Opportunist's Aim).
@@ -4248,17 +4256,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw += 0.5 * strike_target.pressure
 			if attacker.has_status("empower"):
 				raw *= 1.25
-			# Inferno Master: the Pyromancer feeds on every fire still burning
-			# (Pyromaniac deepens the per-enemy step; Heat Haze raises the
-			# cap 5 -> up to 8; Avatar of Flame removes it entirely).
-			if attacker.passive_id == "inferno":
-				var burning := 0
-				for foe in enemies:
-					if not foe.dead and foe.has_status("burn"):
-						burning += 1
-				var inf_n: int = burning if attacker.avatar_flame > 0 \
-					else mini(burning, 5 + attacker.heat_haze_ranks)
-				raw *= 1.0 + 0.01 * (5 + attacker.pyromaniac_ranks) * inf_n
+			# Inferno Master: the Pyromancer feeds on every TURN of fire still
+			# standing on the enemy team (see _inferno_mult — Pyromaniac
+			# deepens the step and the cap, Heat Haze the cap alone, Avatar
+			# of Flame removes it).
+			raw *= _inferno_mult(attacker, inferno_turns)
 			# Seeding Embers: a burning death fuels the next swing.
 			if attacker.has_status("seeding"):
 				raw *= 1.0 + attacker.status_power("seeding") / 100.0
@@ -4927,13 +4929,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							splash_bd, neighbors.size(),
 							"" if neighbors.size() == 1 else "s",
 							strike_target.unit_name], "#b0a8e0")
-			if ab.bleed_build > 0 and not strike_target.dead and randf() <= ab.bleed_chance:
-				var bleed_amt := ab.bleed_build + attacker.bleed_bonus
-				# A bleed spec's perfect pays in bleed: Wildstrikes builds
-				# +50% on every target it sweeps.
-				if is_perfect and ab.display_name == "Wildstrikes":
-					bleed_amt = int(round(bleed_amt * 1.5))
-				_add_bleed_with_burst(strike_target, bleed_amt)
+			# A bleed spec's perfect pays in bleed — but Wildstrikes pays in
+			# RELIABILITY, not magnitude (Batch AG): the sweep's 50% roll is
+			# waived, so all four targets take the full 35.
+			var bleed_roll := ab.bleed_chance
+			if is_perfect and ab.display_name == "Wildstrikes":
+				bleed_roll = 1.0
+			if ab.bleed_build > 0 and not strike_target.dead and randf() <= bleed_roll:
+				_add_bleed_with_burst(strike_target,
+					ab.bleed_build + attacker.bleed_bonus)
 			if ab.display_name == "Mocking Blow" and not strike_target.dead:
 				var mocker_idx := heroes.find(attacker)
 				if mocker_idx >= 0:
@@ -5037,19 +5041,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_log("   → Talent: Chain Reaction — the blast leaps to %d burning %s" % [
 						cr_struck, "enemy" if cr_struck == 1 else "enemies"],
 						"#b0a8e0")
-			if ab.display_name == "Wildfire" and not wildfire_burn.is_empty():
-				var spread_turns := maxi(int(ceil(int(wildfire_burn.turns) / 2.0)), 1)
-				var spread_to: Array = enemies.filter(
-					func(e): return not e.dead and e != strike_target)
-				for foe in spread_to:
-					_apply_status(foe, "burn", spread_turns,
-						int(wildfire_burn.get("power", 0)),
-						int(wildfire_burn.get("tick", 0)))
-				if not spread_to.is_empty():
-					_log("   → Wildfire spreads the Burn to %d other %s (%d turns)" % [
-						spread_to.size(),
-						"enemy" if spread_to.size() == 1 else "enemies",
-						spread_turns], "#e08850")
 			if ab.display_name == "Flamewave" and not strike_target.dead:
 				# Batch N ignite clause: the wave STARTS fires now — 2 turns
 				# (3 perfect), and those already Burning gain the same as an
@@ -5661,6 +5652,37 @@ func _dot_tick(id: String, applier: BattleUnit) -> int:
 	if id == "burn":
 		pct += applier.accelerant_ranks
 	return maxi(int(round(pct * 0.01 * applier.attack)), 1)
+
+
+# Inferno Master's fuel (Batch AG): the TOTAL turns of Burn standing on the
+# enemy team, not the number of enemies alight. One enemy burning for six
+# turns now feeds the passive exactly as hard as six burning for one.
+func _total_burn_turns() -> int:
+	var total := 0
+	for foe in enemies:
+		if foe.dead:
+			continue
+		var b: Dictionary = foe.get_status("burn")
+		if not b.is_empty():
+			total += maxi(int(b.get("turns", 0)), 0)
+	return total
+
+
+# The Inferno Master multiplier for a measured field total. Pyromaniac deepens
+# the per-turn step AND lifts the cap with it; Heat Haze lifts the cap alone;
+# Avatar of Flame removes it. Ceilings: +25% base, +40% at Pyromaniac 3, +70%
+# with Heat Haze 3 on top.
+# Abilities that CONSUME Burn (Detonation, Wildfire) pass the total they
+# measured BEFORE their own consumption — the consuming cast gets full credit,
+# and only subsequent turns see the thinner field.
+func _inferno_mult(u: BattleUnit, burn_turns: int) -> float:
+	if u == null or u.passive_id != "inferno":
+		return 1.0
+	var step := 1.0 + 0.2 * u.pyromaniac_ranks
+	var pct := burn_turns * step
+	if u.avatar_flame == 0:
+		pct = minf(pct, 25.0 * step + 10.0 * u.heat_haze_ranks)
+	return 1.0 + 0.01 * pct
 
 
 # Pack Bond strength for a hunter and a beast kind, all talents applied:
@@ -6908,24 +6930,33 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, bp_cost,
 				" [PERFECT: cost halved]" if is_perfect else ""], "#e05050")
 		"battle_shout":
+			# Batch AG: a real warcry — a flat +8% for the WHOLE party, with
+			# the enemy party's bloodloss on top. Companions don't hear it.
 			var shout_bleed := 0
 			for e in enemies:
 				if not e.dead:
 					shout_bleed += e.bleed_buildup
-			var shout_pct := int(shout_bleed / 20.0)
+			var shout_pct := 8 + int(shout_bleed / 20.0)
 			_sfx("crit", -8.0, 0.7)
-			_apply_status(attacker, "battle_shout", 2, shout_pct)
 			# The chip shows the damage gained at the moment of the shout.
-			attacker.update_status("battle_shout", "+%d%%" % shout_pct,
-				"Battle Shout: +%d%% damage for 2 turns\n(from %d blood buildup on the enemy\nparty at the time of the shout)." % [
-					shout_pct, shout_bleed], shout_pct)
+			var shout_desc := "Battle Shout: +%d%% damage for 2 turns\n(+8%% base, plus 1%% per 20 of the %d\nblood buildup on the enemy party at\nthe time of the shout)." % [
+				shout_pct, shout_bleed]
+			var shout_n := 0
+			for h in heroes:
+				if h.dead:
+					continue
+				_apply_status(h, "battle_shout", 2, shout_pct)
+				h.update_status("battle_shout", "+%d%%" % shout_pct, shout_desc,
+					shout_pct)
+				shout_n += 1
 			if is_perfect:
 				attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
 				attacker.float_text("+5 Rage", Color(1.0, 0.5, 0.4))
 				attacker.refresh_bars()
 			_message("%s roars with bloodlust!" % attacker.unit_name)
-			_log("%s: Battle Shout — +%d%% damage for 2 turns" % [attacker.unit_name,
-				shout_pct], "#70d878")
+			_log("%s: Battle Shout — +%d%% damage for 2 turns to %d %s" % [
+				attacker.unit_name, shout_pct, shout_n,
+				"hero" if shout_n == 1 else "heroes"], "#70d878")
 		"guard_change":
 			# The swap itself (Rage and cooldown already handled generically).
 			attacker.stance = "defensive" if attacker.stance == "aggressive" \
@@ -7184,6 +7215,66 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s pulses with dark vigil..." % attacker.unit_name)
 			_log("%s: Dark Vigil — every ally regains 6%% of its own health (%d in all)" % [
 				attacker.unit_name, tp_total], "#70d878")
+		"wildfire":
+			# Batch AG: the wide payoff. Drag the fire down the whole line —
+			# every burning enemy loses a turn of Burn (two on a perfect) and
+			# eats 18% of Attack in fire for each turn taken. Enemies that
+			# aren't alight are untouched; one with a single turn left simply
+			# loses its Burn. The Inferno Master read is taken BEFORE any of
+			# it is spent, so the cast that empties the field is still paid
+			# for the field it emptied — only later turns see the ash.
+			var wf_inferno := _inferno_mult(attacker, _total_burn_turns())
+			var wf_take := 2 if is_perfect else 1
+			var wf_binfo: Array = STATUS_INFO["burn"]
+			var wf_struck := 0
+			var wf_total := 0
+			var wf_turns := 0
+			for foe in enemies:
+				if foe.dead or not foe.has_status("burn"):
+					continue
+				var wf_st: Dictionary = foe.get_status("burn")
+				var wf_left: int = maxi(int(wf_st.get("turns", 0)), 0)
+				if wf_left <= 0:
+					continue
+				var wf_spent: int = mini(wf_take, wf_left)
+				# Spend the fire first so the chip agrees with the hit.
+				if wf_left - wf_spent <= 0:
+					foe.remove_status("burn")
+				else:
+					foe.update_status("burn", wf_binfo[1], wf_binfo[3], -1,
+						wf_left - wf_spent)
+				var wf_raw := 0.18 * wf_spent * attacker.attack * mult \
+					* wf_inferno * randf_range(0.9, 1.1)
+				# Avatar of Flame burns through fire resistance here too.
+				var wf_res := float(foe.resists.get("fire", 0.0))
+				if attacker.avatar_flame > 0:
+					wf_res = 0.0
+				wf_raw *= 1.0 - wf_res
+				var wf_final := maxi(int(round(wf_raw \
+					* (1.0 - foe.effective_armor()))), 1)
+				var wf_hit: Dictionary = foe.take_hit(wf_final, ab.pressure)
+				_stat("dmg_hero_" + attacker.unit_name, wf_final)
+				_stat_bd(attacker, ab.pressure)
+				wf_struck += 1
+				wf_total += wf_final
+				wf_turns += wf_spent
+				foe.float_text("%d Wildfire" % wf_final, Color(1.0, 0.55, 0.2))
+				if wf_hit.died:
+					_stat("enemy_deaths")
+					_sfx("death", -4.0)
+					_message("%s falls!" % foe.unit_name)
+					_log("† %s dies" % foe.unit_name, "#e05050")
+					_on_enemy_death(foe)
+			if wf_struck == 0:
+				_log("%s: Wildfire — nothing on the field is burning" % \
+					attacker.unit_name, "#909090")
+			else:
+				_sfx("bomb", -8.0, 1.1)
+				_message("%s drags the fire through them!" % attacker.unit_name)
+				_log("%s: Wildfire — %d turn%s of Burn torn from %d %s for %d damage%s" % [
+					attacker.unit_name, wf_turns, "" if wf_turns == 1 else "s",
+					wf_struck, "enemy" if wf_struck == 1 else "enemies",
+					wf_total, " [PERFECT]" if is_perfect else ""], "#e08850")
 		"flame_shield":
 			_sfx("parry", -7.0, 1.1)
 			_apply_status(attacker, "flame_shield", 2)
@@ -7479,6 +7570,10 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 		comp.add_status("elusive", el_info[0], el_info[1], el_info[2], -1, el_info[3])
 	# Feral Momentum / Menagerie bookkeeping: this beast has been fielded.
 	hunter.kinds_summoned[kind] = true
+	# Lone Bond's gate: only a REAL summon spends the one beast. Call of the
+	# Wild writes kinds_summoned for the talents above but never comes
+	# through here, so it can no longer lock the hunter out of summoning.
+	hunter.beast_committed = true
 	# Ancient Pact: the beast is beyond all mending.
 	if hunter.ancient_pact > 0:
 		comp.no_heals = true

@@ -102,6 +102,8 @@ var apex := 0                # capstone: extra Quick Shot strike, KC resets
 var the_pack := 0            # capstone: two beasts active at once
 var vengeance_kind := ""     # which boon Vengeance carries while it lasts
 var kinds_summoned := {}     # beasts fielded this fight (Feral Momentum et al)
+var beast_committed := false # Lone Bond: a REAL summon has been spent (Call
+                             # of the Wild writes kinds_summoned but never this)
 var free_summon := false     # No Beast Left: the next summon is free
 var no_heals := false        # Ancient Pact: this beast rejects all healing
 var soul_partner: BattleUnit = null  # One Soul: damage is split with them
@@ -255,7 +257,7 @@ var untouchable := 0          # Untouchable: Defensive parries negate + Pommel c
 var guard_breaker := 0        # Guard Breaker: Broken recovery refills the meter to 50
 # Pyromancer tree (07-18). See talents.gd for the node text.
 var accelerant_ranks := 0     # Accelerant: +1%/rank Burn tick strength
-var pyromaniac_ranks := 0     # Pyromaniac: +1%/rank Inferno Master step
+var pyromaniac_ranks := 0     # Pyromaniac: +0.2%/rank Inferno Master step (cap rides it)
 var supernova_ranks := 0      # Super Nova: +3%/rank Detonation crit
 var invigorating_ranks := 0   # Invigorating Ashes: mana back on Burn ticks
 var molten_ranks := 0         # Molten Core: less damage from burning enemies
@@ -274,7 +276,7 @@ var cinder_trail_ranks := 0   # Cinder Trail: Fireball embers a second enemy
 var ember_wind := 0           # Ember Wind: burning deaths pass the flame on
 var ember_consumed := false   # Ember Wind already released this corpse
 var burn_tick_at_death := 0   # tick snapshot for the Ember Wind transfer
-var heat_haze_ranks := 0      # Heat Haze: Inferno Master cap 5 -> +1/rank
+var heat_haze_ranks := 0      # Heat Haze: Inferno Master cap +10%/rank
 var scorched_ranks := 0       # Scorched Earth: burning enemies swing softer
 var living_flame_ranks := 0   # Living Flame: mana while 3+ enemies burn
 var chain_reaction_ranks := 0 # Chain Reaction: Detonation splashes the burning

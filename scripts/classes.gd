@@ -185,7 +185,7 @@ static func survivalist_pool_ability(display_name: String) -> Ability:
 				"description": "A bursting powder charge rakes ALL\nenemies with nature damage and heavy\nBreak pressure, Poisoning each."})
 		"Venom Coating":
 			return Ability.make({"display_name": "Venom Coating", "cooldown": 5, "cost": 20,
-				"special": "venom_coat", "delay": 2.0, "anim": "attack01", "no_skill_check": true,
+				"special": "venom_coat", "delay": 1.5, "anim": "attack01", "no_skill_check": true,
 				"perfect_id": "", "perfect_text": "",
 				"description": "Coat your arrows: for 4 turns every\nattack applies Poison and refreshes\nexisting Poison timers."})
 		"Hamstring":
@@ -211,7 +211,7 @@ static func sharpshooter_pool_ability(display_name: String) -> Ability:
 	match display_name:
 		"Quick Draw":
 			return Ability.make({"display_name": "Quick Draw", "cooldown": 5, "cost": 15,
-				"special": "quickdraw", "delay": 2.0, "anim": "attack01",
+				"special": "quickdraw", "delay": 1.5, "anim": "attack01",
 				"perfect_id": "", "perfect_text": "Lasts 6 turns",
 				"description": "Adrenaline takes over: all your abilities\nact 50% faster for 5 turns."})
 		"Triple Shot":
@@ -242,12 +242,12 @@ static func beastmaster_pool_ability(display_name: String) -> Ability:
 	match display_name:
 		"Bestial Wrath":
 			return Ability.make({"display_name": "Bestial Wrath", "cooldown": 3, "cost": 25,
-				"special": "bestial", "delay": 4.0, "anim": "attack01", "no_skill_check": true,
+				"special": "bestial", "delay": 3.5, "anim": "attack01", "no_skill_check": true,
 				"perfect_id": "", "perfect_text": "",
 				"description": "Unleash the beast for 3 turns —\nUrsus: max health DOUBLES, +50%\narmor, taunts 3 random enemies.\nCanis: +50% damage and +10 Bleed on\nits bleeding strikes. Aguila: +25%\ndamage and every strike BLINDS.\nRequires a living companion."})
 		"Spirit Bond":
 			return Ability.make({"display_name": "Spirit Bond", "cooldown": 3, "cost": 20,
-				"special": "spirit_bond", "delay": 2.0, "anim": "attack01",
+				"special": "spirit_bond", "delay": 1.5, "anim": "attack01",
 				"perfect_id": "", "perfect_text": "Both gain +10% max health for 5 turns",
 				"description": "You and your companion each heal 25%\nof your max health now and 10% more\nnext turn. You restore 15% max Mana\nnow and 5% on each of your next\n2 turns. Requires a living companion."})
 		"Primal Surge":
@@ -285,7 +285,7 @@ static func pending_talent_ability(display_name: String) -> Ability:
 				"description": "Spend 2 Mercy: FULLY heal an ally.\nEmpower (+1 Mercy): also cleanse all\ndebuffs and ward them against new\nones for 3 turns."})
 		"Sacred Resolve":
 			return Ability.make({"display_name": "Sacred Resolve", "cooldown": 5,
-				"cost": 25, "special": "unity", "delay": 3.0, "anim": "attack03",
+				"cost": 25, "special": "unity", "delay": 2.5, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "Lasts 4 turns",
 				"description": "Bind the party's souls — all damage\nreceived is split evenly among them\nfor 3 turns (Break damage still lands\non the struck hero)."})
 		"Mind Flay":
@@ -302,7 +302,7 @@ static func pending_talent_ability(display_name: String) -> Ability:
 				"description": "The warband turns on itself: next\nturn every minion strikes a fellow\nwith DOUBLE Break damage, Sundering\nthem for 3 turns."})
 		"Bulwark of Fortitude":
 			return Ability.make({"display_name": "Bulwark of Fortitude", "cooldown": 3,
-				"cost": 30, "special": "bulwark", "delay": 3.5, "anim": "attack03",
+				"cost": 30, "special": "bulwark", "delay": 3.0, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "Party instantly heals 5% max health",
 				"description": "The unbreakable stand: for 3 turns\nthe party takes NO Break damage, has\nits armor increased by 50%, and heals\n10% of max health each turn."})
 	return null
@@ -477,7 +477,7 @@ const SPEC_INFO := {
 	"pyromancer": {"name": "Pyromancer", "constitution": 85, "archetype": "Nuker", "passive": "inferno",
 		"max_hp": 135, "armor": 0.08,
 		"resists": {"fire": 0.30, "frost": -0.20},
-		"passive_desc": "Inferno Master: +5% damage for each burning enemy (up to +25%).",
+		"passive_desc": "Inferno Master: +1% damage for every turn of Burn on the enemy team (up to +25%).",
 		"blurb": "Aggressive flame — burns that spread and stack."},
 	"cryomancer": {"name": "Cryomancer", "constitution": 85, "archetype": "Control", "passive": "permafrost",
 		"max_hp": 135, "armor": 0.08,
@@ -545,16 +545,16 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Strike and drink deep: heals the Warrior\nfor 30% of their missing HP. Builds 10 Rage."}),
 				Ability.make({"display_name": "Wildstrikes", "cost": 35, "damage": 16,
 					"pressure": 14, "delay": 4.5, "anim": "attack03", "aoe": true,
-					"bleed_build": 35, "resource_gain": 10, "cooldown": 3,
-					"perfect_id": "", "perfect_text": "+50% Bleed buildup on every target",
-					"description": "Savage sweep: hits ALL enemies and\nbuilds 35 Bleed on each. Builds 10 Rage."}),
+					"bleed_build": 35, "bleed_chance": 0.5, "resource_gain": 10, "cooldown": 3,
+					"perfect_id": "", "perfect_text": "Bleed lands on every target",
+					"description": "Savage sweep: hits ALL enemies; each\nhas a 50% chance to build 35 Bleed.\nBuilds 10 Rage."}),
 				Ability.make({"display_name": "Hack and Slash", "cost": 20, "damage": 10,
 					"pressure": 10, "delay": 3.0, "anim": "attack01", "multi_hits": 3,
 					"bleed_build": 25, "bleed_chance": 0.5, "resource_gain": 10, "cooldown": 2,
 					"perfect_id": "", "perfect_text": "4 strikes instead of 3",
 					"description": "Three savage cuts at one target; each\nhit has a 50% chance to build 25 Bleed —\na full flurry can bleed them out.\nBuilds 10 Rage."}),
 				Ability.make({"display_name": "Blood Price", "cost": 0,
-					"special": "blood_price", "delay": 2.0, "anim": "attack02",
+					"special": "blood_price", "delay": 1.5, "anim": "attack02",
 					"cooldown": 3,
 					"perfect_id": "", "perfect_text": "The health cost is halved",
 					"description": "Open his own veins: pays 15% of\ncurrent health (never lethal) for\n30 Rage and +25% damage for 2 turns.\nBlood Frenzy wakes when HE says so."}),
@@ -589,12 +589,12 @@ static func spec_abilities(spec: String) -> Array:
 				# the stronger. He now guarantees the line and gambles for
 				# himself; the wd_shieldwall node buys duration.
 				Ability.make({"display_name": "Shieldwall", "cost": 25,
-					"special": "shield_block", "delay": 2.0, "anim": "attack01",
+					"special": "shield_block", "delay": 1.5, "anim": "attack01",
 					"cooldown": 2,
 					"perfect_id": "", "perfect_text": "Holds a third turn",
 					"description": "Set the wall: +25% Block chance for\n2 turns. These count as HEAVY PLATING\nblocks, so they feed Tenacity and\nRally — Interpose's charges never do."}),
 				Ability.make({"display_name": "Interpose", "cost": 25,
-					"special": "interpose", "delay": 2.5, "anim": "attack01",
+					"special": "interpose", "delay": 2.0, "anim": "attack01",
 					"cooldown": 4,
 					"perfect_id": "", "perfect_text": "The Warden gains a charge too",
 					"description": "Throw the wall wide: every other ally\ngains a shield charge — the next\nattack against them is BLOCKED."}),
@@ -643,9 +643,10 @@ static func spec_abilities(spec: String) -> Array:
 					"perfect_id": "", "perfect_text": "Also applies 2 turns of Burn",
 					"description": "Ignite the wounds: consumes the target's\nBurn, adding 150% of its remaining\ndamage (tick × turns left × 1.5)\nto this hit."}),
 				Ability.make({"display_name": "Wildfire", "cooldown": 3, "dmg_type": "fire", "cost": 20,
-					"damage": 20, "pressure": 10, "delay": 2.0, "anim": "attack02",
-					"perfect_id": "", "perfect_text": "",
-					"description": "Flames leap every gap: spreads the\ntarget's Burn to EVERY other living\nenemy at half its duration (rounded up)."}),
+					"damage": 0, "pressure": 10, "delay": 2.5, "anim": "attack02",
+					"special": "wildfire",
+					"perfect_id": "", "perfect_text": "Consumes 2 turns from each instead",
+					"description": "Drag the fire through them all: every\nburning enemy loses a turn of Burn and\ntakes 18% of Attack in fire."}),
 				Ability.make({"display_name": "Flamewave", "cooldown": 2, "dmg_type": "fire", "cost": 25,
 					"damage": 15, "pressure": 5, "delay": 3.0, "anim": "attack03", "aoe": true,
 					"perfect_id": "", "perfect_text": "3 turns of Burn instead",
@@ -657,8 +658,8 @@ static func spec_abilities(spec: String) -> Array:
 			# applier stopped scattering them). VAULTED — kept for future
 			# return: Frost Bolt (25 Mana spear, 50% double vs unchilled).
 			return [
-				Ability.make({"display_name": "Razor Ice", "cooldown": 3, "dmg_type": "frost", "cost": 20,
-					"damage": 20, "pressure": 10, "delay": 2.5, "anim": "attack02",
+				Ability.make({"display_name": "Razor Ice", "cooldown": 3, "dmg_type": "frost", "cost": 25,
+					"damage": 15, "pressure": 10, "delay": 2.5, "anim": "attack02",
 					"multi_hits": 3, "perfect_extra_hit": false,
 					"applies_status": {"id": "chilled", "turns": 3},
 					"perfect_id": "", "perfect_text": "Deals 25% of Attack instead",
@@ -686,7 +687,7 @@ static func spec_abilities(spec: String) -> Array:
 					"perfect_id": "", "perfect_text": "Fires a 7th bolt",
 					"description": "Six bolts hound the weakest: each\nstrikes one of the 2-3 enemies with\nthe lowest health."}),
 				Ability.make({"display_name": "Stabilize", "cooldown": 3, "cost": 0, "damage": 0,
-					"pressure": 0, "special": "stabilize", "delay": 2.0, "anim": "attack01",
+					"pressure": 0, "special": "stabilize", "delay": 1.5, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "Also heals 5% of max health",
 					"description": "Vent the storm: consumes all\nResonance ABOVE 2 — +5 Mana and +10%\ndamage reduction (2 turns) per stack\nconsumed. Unusable at 2 or fewer."}),
 			]
@@ -715,15 +716,15 @@ static func spec_abilities(spec: String) -> Array:
 			# are talent-granted (pending_talent_ability).
 			return [
 				Ability.make({"display_name": "Divine Shield", "cooldown": 2, "cost": 15, "special": "divine_shield",
-					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack03",
+					"target": Ability.Target.ALLY, "delay": 2.5, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Absorbs 35% instead",
 					"description": "Grant an ally a holy shield that\nabsorbs 30% of the Devout's max\nhealth, then breaks."}),
 				Ability.make({"display_name": "Consecrated Ground", "cooldown": 3, "cost": 25, "special": "cons_ground",
-					"delay": 3.5, "anim": "attack03",
+					"delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Lasts 3 turns",
 					"description": "Holy ground blooms underfoot: the\nparty takes 15% less damage and\nreflects 10% of damage taken,\nfor 2 turns."}),
 				Ability.make({"display_name": "Blessing of Zeal", "cooldown": 2, "cost": 20, "special": "zeal",
-					"target": Ability.Target.ALLY, "delay": 2.5, "anim": "attack02",
+					"target": Ability.Target.ALLY, "delay": 2.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Lasts 4 turns",
 					"description": "Kindle an ally: +15% damage for\n3 turns, their cooldowns tick down\n1 turn NOW, and their Faith gain is\ndoubled while the zeal burns."}),
 			]
@@ -762,7 +763,7 @@ static func spec_abilities(spec: String) -> Array:
 					"perfect_id": "", "perfect_text": "",
 					"description": "Call the eagle (80 HP): attacks with you\nfor 20% of your Attack, applying\nExposed. Always ELUSIVE: enemies miss\nit 25% more. Pack Bond: the whole\nparty gains +10% crit chance.\nOn arrival: dives a chosen enemy for\n15% of your Attack, Dazing them.\nLoyalty gift: ignores 20% armor\nper stack."}),
 				Ability.make({"display_name": "Hunter's Instinct", "cooldown": 3, "cost": 20, "special": "instinct",
-					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
+					"delay": 2.5, "anim": "attack01", "no_skill_check": true,
 					"perfect_id": "", "perfect_text": "",
 					"description": "Empower your next 3 Quick Shots:\neach deals +10% of your Attack and\nheals your companion for 15% of\nits max health."}),
 				Ability.make({"display_name": "Kill Command", "cooldown": 3, "cost": 30, "special": "kill_command",
@@ -781,14 +782,14 @@ static func spec_abilities(spec: String) -> Array:
 					"perfect_id": "", "perfect_text": "",
 					"description": "+2% damage for every point of the\ntarget's Break bar already FULL —\nthe team breaks them, the marksman\nends them."}),
 				Ability.make({"display_name": "Hold Breath", "cooldown": 3, "cost": 15, "special": "hold_breath",
-					"delay": 2.0, "anim": "attack01", "no_skill_check": true,
+					"delay": 1.5, "anim": "attack01", "no_skill_check": true,
 					"perfect_id": "", "perfect_text": "",
 					"description": "Patience made literal: gain +40 Focus,\nand your next attack is a GUARANTEED\ncritical that ignores all armor."}),
 			]
 		"mystic":
 			return [
 				Ability.make({"display_name": "Tripwire", "cooldown": 4, "cost": 20, "special": "tripwire",
-					"delay": 2.5, "anim": "attack01",
+					"delay": 2.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "Lasts 6 turns",
 					"description": "Rig the ground: for 5 turns, retaliate\nagainst EVERY attacking melee enemy —\neven those striking your allies."}),
 				Ability.make({"display_name": "Shrapnel Charge", "cooldown": 2, "dmg_type": "nature",

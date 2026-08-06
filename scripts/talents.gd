@@ -92,11 +92,11 @@ const LANE_TREES := {
 		# Stays in Fury: a Rage-spent buff. Its bleed scaling is deliberate
 		# cross-lane synergy — splashing into Bloodletting makes it better.
 		{"id": "bz_battle_shout", "name": "Battle Shout", "ranks": 1, "lane": "Fury", "tier": 0,
-			"desc": "New ability: Battle Shout — +1% damage for every 20 points of blood buildup on the enemy party, for 2 turns (15 Rage, 2cd).",
+			"desc": "New ability: Battle Shout — the whole party gains +8% damage, plus 1% for every 20 points of blood buildup on the enemy party, for 2 turns (15 Rage, 2cd).",
 			"payload": {"new_ability": {"display_name": "Battle Shout", "cost": 15,
-				"special": "battle_shout", "delay": 2.0, "anim": "attack03", "cooldown": 2,
+				"special": "battle_shout", "delay": 1.5, "anim": "attack03", "cooldown": 2,
 				"perfect_id": "rage5", "perfect_text": "Also grants 5 Rage",
-				"description": "A roar fed by open wounds: +1% damage\nper 20 blood buildup on the enemy party.\nLasts 2 turns."}}},
+				"description": "A roar the whole party answers: +8%\ndamage, plus 1% per 20 blood buildup\non the enemy party. Lasts 2 turns."}}},
 		{"id": "bz_enraged", "name": "Enraged", "ranks": 3, "lane": "Fury", "tier": 1,
 			"desc": "Dropping below 50% health grants a +{v}% damage buff for 5 turns (stacks up to 3 times).",
 			"scale": {"step": 3},
@@ -480,9 +480,9 @@ const LANE_TREES := {
 			"payload": {"stat": {"vengeful_guardian": 1}}},
 		{"id": "wd_hold_line", "name": "Hold the Line", "ranks": 1, "lane": "Banner", "tier": 2,
 			"capstone": true,
-			"desc": "New ability: Hold the Line — the party takes 50% less Break damage for 2 turns and cannot die for a turn (30 Rage, 3.5 int, 6cd).",
+			"desc": "New ability: Hold the Line — the party takes 50% less Break damage for 2 turns and cannot die for a turn (30 Rage, 3.0 int, 6cd).",
 			"payload": {"new_ability": {"display_name": "Hold the Line", "cost": 30,
-				"special": "hold_the_line", "delay": 3.5, "anim": "attack03",
+				"special": "hold_the_line", "delay": 3.0, "anim": "attack03",
 				"cooldown": 6,
 				"perfect_id": "", "perfect_text": "Refunds 5 Rage",
 				"description": "Embolden the party: 50% less Break\ndamage for 2 turns, and no one can die\nfor a turn."}}},
@@ -509,9 +509,9 @@ const LANE_TREES := {
 			"scale": {"step": 5},
 			"payload": {"stat": {"invigorating_ranks": 1}}},
 		{"id": "py_flame_shield", "name": "Flame Shield", "ranks": 1, "lane": "Kindling", "tier": 1,
-			"desc": "New ability: Flame Shield — take 50% less damage for 2 turns and attackers are set Burning for 3 turns (15 Mana, 2.0 int, 2cd).",
+			"desc": "New ability: Flame Shield — take 50% less damage for 2 turns and attackers are set Burning for 3 turns (15 Mana, 1.5 int, 2cd).",
 			"payload": {"new_ability": {"display_name": "Flame Shield", "cost": 15,
-				"special": "flame_shield", "delay": 2.0, "anim": "attack03", "cooldown": 2,
+				"special": "flame_shield", "delay": 1.5, "anim": "attack03", "cooldown": 2,
 				"perfect_id": "", "perfect_text": "Also triggers a Burn tick on every burning enemy",
 				"description": "A barrier of living flame: take 50%\nless damage for 2 turns, and whoever\nstrikes the Pyromancer is set Burning\n(3 turns)."}}},
 		# Conflagration: the build button builds harder.
@@ -530,8 +530,7 @@ const LANE_TREES := {
 			"payload": {"stat": {"ember_wind": 1}}},
 		# --- Lane B: Inferno — profiting while it burns. ---
 		{"id": "py_pyromaniac", "name": "Pyromaniac", "ranks": 3, "lane": "Inferno", "tier": 0,
-			"desc": "Inferno Master grants {v}% damage per burning enemy (up from the base 5%).",
-			"scale": {"base": 5, "step": 1},
+			"desc": "Inferno Master grants +0.2% damage per turn of Burn on the enemy team, and its cap rises to match.",
 			"payload": {"stat": {"pyromaniac_ranks": 1}}},
 		{"id": "py_molten", "name": "Molten Core", "ranks": 3, "lane": "Inferno", "tier": 0,
 			"desc": "Take {v}% less damage from burning enemies.",
@@ -545,8 +544,7 @@ const LANE_TREES := {
 		# damage multiplier, or as a smother on the enemy's output.
 		{"id": "py_firebrand", "name": "Heat Haze", "ranks": 3, "lane": "Inferno", "tier": 1,
 			"exclusive_with": "py_cauterize",
-			"desc": "Inferno Master counts {v} additional burning enemy(ies) before capping (5 -> 8).",
-			"scale": {"step": 1},
+			"desc": "Inferno Master's cap rises by 10%.",
 			"payload": {"stat": {"heat_haze_ranks": 1}}},
 		{"id": "py_cauterize", "name": "Scorched Earth", "ranks": 3, "lane": "Inferno", "tier": 1,
 			"exclusive_with": "py_firebrand",
@@ -608,7 +606,7 @@ const LANE_TREES := {
 				"description": "The sky ignites: 6-8 bolts rake random\nenemies for 12% of Attack, each one\nsetting its victim Burning (2 turns\nper bolt — repeats stack)."}}},
 		{"id": "py_rebirth", "name": "Avatar of Flame", "ranks": 1, "lane": "Inferno", "tier": 2,
 			"capstone": true,
-			"desc": "Inferno Master has no cap — every burning enemy grants its full bonus — and the Pyromancer's fire damage ignores enemy fire resistance.",
+			"desc": "Inferno Master has no cap — every turn of Burn on the enemy team grants its full bonus — and the Pyromancer's fire damage ignores enemy fire resistance.",
 			"payload": {"stat": {"avatar_flame": 1}}},
 		# Cataclysm: the "detonate them all" fantasy as something earned —
 		# and it still rewards a good first target, since the chain walks
@@ -816,9 +814,9 @@ const LANE_TREES := {
 			"scale": {"step": 3},
 			"payload": {"stat": {"temporal_ranks": 1}}},
 		{"id": "ar_overcharge", "name": "Overcharge", "ranks": 1, "lane": "Overload", "tier": 1,
-			"desc": "New ability: Overcharge — raise your maximum Resonance to 8; stacks beyond 5 give 1.5x their normal Resonance bonus (20 Mana, 2.0 int, 5cd).",
+			"desc": "New ability: Overcharge — raise your maximum Resonance to 8; stacks beyond 5 give 1.5x their normal Resonance bonus (20 Mana, 1.5 int, 5cd).",
 			"payload": {"new_ability": {"display_name": "Overcharge", "cost": 20,
-				"special": "overcharge", "delay": 2.0, "anim": "attack02", "cooldown": 5,
+				"special": "overcharge", "delay": 1.5, "anim": "attack02", "cooldown": 5,
 				"perfect_id": "", "perfect_text": "Stacks beyond 5 give 1.65x instead",
 				"description": "Push past the limit: maximum\nResonance becomes 8; stacks beyond\n5 give 1.5x their normal Resonance\nbonus (damage, crit, damage taken)."}}},
 		# Moved from Control: an offensive Barrage ramp belongs here.
@@ -1154,7 +1152,7 @@ const LANE_TREES := {
 			"scale": {"base": 10, "step": 5},
 			"payload": {"stat": {"righteous_ranks": 1}}},
 		{"id": "dv_resolve", "name": "Sacred Resolve", "ranks": 1, "lane": "Zeal", "tier": 1,
-			"desc": "New ability: Sacred Resolve — all damage received is split evenly among living heroes for 3 turns; Break damage still lands on the struck hero (25 Mana, 3.0 int, 5cd; Perfect: 4 turns).",
+			"desc": "New ability: Sacred Resolve — all damage received is split evenly among living heroes for 3 turns; Break damage still lands on the struck hero (25 Mana, 2.5 int, 5cd; Perfect: 4 turns).",
 			"payload": {"grant_ability": "Sacred Resolve"}},
 		# Re-spec: either banner keeps the pulse beating (was Resolve only).
 		{"id": "dv_pulse", "name": "Healing Pulse", "ranks": 3, "lane": "Zeal", "tier": 1,
@@ -1183,7 +1181,7 @@ const LANE_TREES := {
 		# --- Capstones: take ONE (6 nodes bought in the lane) ---
 		{"id": "dv_bulwark", "name": "Bulwark of Fortitude", "ranks": 1, "lane": "Bulwark", "tier": 2,
 			"capstone": true,
-			"desc": "New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.5 int, 3cd; Perfect: the party instantly heals 5%).",
+			"desc": "New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.0 int, 3cd; Perfect: the party instantly heals 5%).",
 			"payload": {"grant_ability": "Bulwark of Fortitude"}},
 		# Re-spec (was two Faithful steps + a Covenant step): the Faith
 		# lane as a win condition — the party parks at max mitigation and
