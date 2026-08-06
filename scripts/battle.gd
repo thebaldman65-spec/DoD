@@ -454,7 +454,7 @@ func _spawn_units() -> void:
 							func(a): return a.display_name == bm_ab.display_name):
 						cfg["abilities"] = cfg["abilities"] + [bm_ab]
 				Talents.apply_from_tree(cfg, Run.party[i].get("tree", []),
-					Run.party[i].get("talents", {}))
+					Run.party[i].get("talents", {}), Run.party[i])
 			elif autoplay:
 				# DOD_SIM_TALENTS="bz_bloodcraze:3,wd_toughness:2" force-learns
 				# talents on bot heroes whose spec tree holds the id (test hook).
@@ -519,7 +519,8 @@ func _spawn_units() -> void:
 		if Run.active and i < Run.party.size():
 			for rune in Run.party[i].get("runes", []):
 				if rune.get("equipped", false):
-					Talents.apply_payload(cfg, rune["payload"], 1)
+					Talents.apply_payload(cfg, rune["payload"], 1,
+						{"learned": Run.party[i].get("talents", {}), "member": Run.party[i]})
 					# Batch AA roll call: most spec runes ride an EXISTING
 					# talent counter, so their effect surfaces on that
 					# talent's proc line rather than one of their own. One
@@ -8747,6 +8748,10 @@ func _check_end() -> void:
 			if heroes[i].resource_name == "Mana":
 				Run.party[i]["mana"] = heroes[i].resource
 		var pts := Run.award_talent_points(Run.encounter.get("type", "fight"))
+		# Elites pay into the SEPARATE flex purse (Batch AI §6): a point that
+		# cannot open a new row, only force a second node into one already
+		# picked.
+		var flex_pts := Run.award_talent_flex(Run.encounter.get("type", "fight"))
 		var gold_gain := Run.award_gold(Run.encounter.get("type", "fight"))
 		# Elite spoils: a rune for a random hero + a consumable on top of the
 		# bigger gold purse — the snowball reward for hunting elites.
@@ -8829,8 +8834,16 @@ func _check_end() -> void:
 				Run.clear_save()
 				_show_run_summary(comp_snap)
 		else:
-			_show_end("VICTORY", "+%d gold. Each hero gains %d talent point%s.%s" % [
-				gold_gain, pts, "" if pts == 1 else "s", elite_text],
+			# Regular fights pay no points at all now — say what WAS won
+			# rather than "+0 talent points".
+			var win_text := "+%d gold." % gold_gain
+			if pts > 0:
+				win_text += " Each hero gains %d talent point%s." % [
+					pts, "" if pts == 1 else "s"]
+			if flex_pts > 0:
+				win_text += " Each hero gains %d ELITE point%s — spend it on a\nsecond node in a row already picked." % [
+					flex_pts, "" if flex_pts == 1 else "s"]
+			_show_end("VICTORY", win_text + elite_text,
 				[["Continue", _to_map]], true)
 	else:
 		# Wipes count toward the profile only for real runs (sims never

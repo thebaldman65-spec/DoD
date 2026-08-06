@@ -173,8 +173,11 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   (user://run_save.bin, auto-saved after every node), relic slots (max 3).
 - `scripts/settings.gd` (autoload `Settings`): volume/fullscreen.
 - `scripts/classes.gd`: hero configs, core kits, spec info/abilities, passives.
-- `scripts/talents.gd`: tiered pools (1-6), per-run generated trees (2/tier),
-  {id: ranks} learned dicts, `apply_payload` shared with shop runes.
+- `scripts/talents.gd`: 12 fixed trees, each 3 lanes x 7 exclusive ROWS + a
+  capstone row (Batch AI). {id: ranks} learned dicts (ranks always 1 now).
+  `apply_payload` shared with shop runes, and the ONE read site for a
+  payload's `condition`. Owns `ability_names` (Run.owned_ability_names
+  forwards to it — autoloads don't resolve inside a class_name script).
 - `scripts/relics.gd`: permanent unlocks (user://relics.json), 1 per boss kill.
 - `scripts/battle.gd`: the big one — initiative timeline, Pressure/Break,
   skill checks, statuses, AoE/random-hits, damage types + resists, items,
@@ -184,7 +187,47 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - Screens: main_menu → draft (pick 4 + relics) → spec_choice (permanent) →
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
-## Current systems snapshot (2026-08-05)
+## Current systems snapshot (2026-08-06)
+BATCH AI (08-06) — TALENT TREE STRUCTURE. Every tree is 3 lanes x 7
+MUTUALLY EXCLUSIVE ROWS + a capstone row (row 8) = 24 nodes. A row holds
+one node per lane, the player picks ONE, the other two grey out for good
+(and an untaken node's tooltip names the two it would close). Row 1 open;
+row N needs row N-1. Row 8 opens at 7/7, take one, NO LANE PURITY. EVERY
+node = 1 point, `ranks: 1`, no exceptions; a complete tree is 8 nodes.
+POINT SUPPLY MATCHES IT EXACTLY: spec choice 1 (Run.award_spec_point, from
+BOTH the spec screen and RunSim.start_run — the sync_spec_hp pattern),
+mini-boss 1, zone boss 2, fight 0, final boss 0 = 8 guaranteed.
+ELITES pay 1 into a SEPARATE purse `talent_flex` (Run.award_talent_flex):
+it can NEVER open a row, only buy a SECOND node in a row already picked;
+the third stays shut. `can_learn` returns {ok, why, pool} — pool names
+which purse pays ("points"/"flex"), and every call site charges from it.
+RETIRED AND DELETED (not left unreachable): LANE_TIER_REQ, NODE_TIER_REQ,
+CAPSTONE_REQ, NODE_CAPSTONE_REQ, ROW_REQ, FIXED_TREES, LANE_CONVERSIONS,
+next_node_cost, node_cost, lane_nodes_bought, lane_points,
+points_below_row, is_node_gated, is_lane_tree, node_gated, the per-node
+`tier`, member["talent_order"], and party_screen's classic-tree renderer.
+HOOKS FOR THE CLASS BATCHES (built, no node uses them yet):
+`Talents.has_node(learned, id)`, `Talents.owns_ability(member, name)`
+(reads Talents.ability_names = the action bar's own list), and
+`payload.condition` = {"has_node": id} / {"owns_ability": name} / both,
+gated at ONE site in apply_payload — NO ctx means INERT, deliberately.
+apply_from_tree/apply_payload take the member + a ctx dict now; the
+test_runes `_ordering` grep string moved with it.
+SAVE v6: a pre-AI save is WIPED and its purse re-issued on the new
+schedule (Run._migrate_trees / _batch_ai_point_schedule) — the old ranked,
+point-priced purchases have no honest translation.
+test_batch_ai.gd (2042 checks) pins all of it. test_runes' exclusive-pair
+alarm is RETIRED with its reasoning in the file: at row granularity every
+spec rune would trip it. EXPECTED: structurally correct, NUMERICALLY WEAK
+— rows lopsided, single-rank = old rank-1 values (~1/3 power). DO NOT
+TUNE; the four class batches re-author all 252 nodes. MEASURED (30 runs
+each side, same flags): depth 17.10+/-1.55 -> 13.40+/-0.86 (bands don't
+overlap), wipe median z2 t7.5 -> z1 t11.0, nodes entering a boss 5.0 ->
+2.6, points/hero/run 17.4 -> 3.6. ratio@z1t8 FLAT (0.97 -> 0.98) and
+completions 0% BOTH SIDES — the stat line barely moved, the lost power was
+all CONDITIONAL/PROC. So completions cannot tell the two apart; DEPTH and
+WIPE MEDIAN are the pair to watch when the class batches land.
+
 BATCH AH (08-05) — ABILITY PROGRESSION. Every hero opens with its core
 attack plus EXACTLY 3 spec abilities and EARNS 6 more (2/zone: mini-boss +
 zone boss). NO NEW ABILITIES WERE WRITTEN — every pool entry is a trimmed

@@ -5,6 +5,100 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-06 — Batch AI: talent tree structure — seven rows, eight decisions</h2>
+<ul>
+<li><b>Every tree is now seven mutually exclusive ROWS plus a capstone row.</b> A row holds
+one node per lane and the player picks exactly one of the three; that pick shuts the other
+two permanently. They stay visible and greyed with the reason in the tooltip — the player
+must see the door they closed — and a node not yet taken names the two doors taking it
+would shut. Rows were assigned mechanically from the existing data: within each lane,
+nodes ordered by their old tier then by definition order, numbered 1–7. Every lane had
+exactly seven non-capstone nodes, so the mapping was one-to-one and nothing moved on
+screen. <b>exclusive_with is gone</b> — sixteen authored pairs across nine specs, all
+superseded by row exclusivity.</li>
+
+<li><b>Row 1 is open from the start; row N opens when row N−1 has been picked.</b> The
+capstones become row 8: open at 7/7, take one, <b>from any lane — the lane-purity
+requirement is gone</b>. <b>Every node costs 1 point and holds a single rank</b>, no
+exceptions. A complete tree is 8 nodes.</li>
+
+<li><b>THE POINT SUPPLY NOW MATCHES THE TREE EXACTLY.</b> 1 for confirming a spec (paid at
+the awakening, from both the spec screen and the sim's start_run — the sync_spec_hp
+pattern), 1 per mini-boss, 2 per zone boss, 0 for regular fights, 0 for the final boss.
+A three-zone run guarantees 1 + 3 + 4 = <b>8 points, exactly one complete tree</b>. The
+question stops being "how many nodes can I afford" and becomes "which eight".</li>
+
+<li><b>ELITE POINTS ARE A SEPARATE PURSE (§6 of the brief, taken rather than cut).</b> An
+elite kill pays 1 — 0–3 a run. They cannot open a new row. The only thing they buy is a
+second node in a row already picked, forcing that one row's door back open; the third node
+in that row stays shut forever. This is what makes hunting elites read as "widen a choice I
+already made" rather than "climb the tree faster", and it keeps the guaranteed 8 honest.
+Normal points can never buy a second node in a row, and the sim's bot spends normal points
+before flex (flex can never open a row, so banking a normal point to spend flex is strictly
+worse).</li>
+
+<li><b>Retired machinery, deleted rather than left unreachable:</b> LANE_TIER_REQ,
+NODE_TIER_REQ, CAPSTONE_REQ, NODE_CAPSTONE_REQ, ROW_REQ, FIXED_TREES, LANE_CONVERSIONS,
+next_node_cost, node_cost, lane_nodes_bought, lane_points, points_below_row, is_node_gated,
+is_lane_tree, the node_gated flag, the per-node tier field, and member["talent_order"]
+(which existed only to replay the ceil(N/3) price curve). The party screen's classic-tree
+renderer went with FIXED_TREES. <code>desc_for()</code> stays — it already rendered {v} at
+rank 1 for unlearned previews, which is now the only case there is.</li>
+
+<li><b>HOOKS FOR THE FOUR CLASS BATCHES (§5), built but not yet used by any node.</b>
+<code>Talents.has_node(learned, id)</code> — was this node taken.
+<code>Talents.owns_ability(member, name)</code> — does the hero have this ability from ANY
+source: starting kit, kit override, mini-boss/boss pick, or talent grant. A payload may
+now carry a <code>condition</code> ({"has_node": id} / {"owns_ability": name}, or both),
+evaluated at ONE read site inside apply_payload; a conditional payload with no context is
+inert rather than silently unconditional, because an effect that fails to appear is a bug
+you can see. Both statics are callable from battle.gd at resolve time.</li>
+
+<li><b>owned_ability_names moved from Run to Talents, and this is load-bearing.</b> §5 asked
+owns_ability to read the same list the action bar reads, and it could not: GDScript does not
+resolve autoload identifiers inside a <code>class_name</code> script (the same constraint
+that makes RunSim take Run injected). So the implementation now lives as
+<code>Talents.ability_names(member)</code> and <code>Run.owned_ability_names</code> forwards
+to it — one list, not two copies that could drift. The Talents → Runes → Classes → Talents
+cycle this creates resolves fine (verified headless, not assumed).</li>
+
+<li><b>Save migration:</b> save version 6. A save from before this batch holds learned
+talents under the old ranked, point-priced scheme — ranks that no longer exist, bought at
+prices that no longer exist — so there is no honest translation. The tree is WIPED and the
+purse re-issued on the new schedule: 1 for the spec choice, 2 per zone boss cleared, 1 per
+mini-boss cleared (zone bosses counted by zone_idx, since a zone is only left by killing
+its boss; the mini-boss sits at a fixed tier, so "cleared" is "past that tier"). The player
+re-picks their eight rows with a full purse. Same-version saves keep the old behaviour.</li>
+
+<li><b>Test coverage:</b> new <code>test_batch_ai.gd</code> (2042 checks) pins the shape of
+all twelve trees, the row gating, the elite crack including that no row ever holds three,
+the hooks, payload conditions, the 8-point economy and the migration. The run harness's
+gate 2 (talent spend conservation) was rewritten for flat pricing and now also asserts a
+fed hero lands on a complete tree with a capstone. <b>test_runes.gd's exclusive-pair alarm
+was RETIRED, with its reasoning left in the file:</b> it watched authored pairs, and at row
+granularity every spec rune in the game would trip it — that is the alarm asking a question
+the design no longer answers the same way. Whether a rune should grant a counter whose node
+sits in a row the player passed on is a real question for the class batches to answer with
+the nodes, and then re-arm.</li>
+
+<li><b>EXPECTED STATE, stated plainly: the tree is structurally correct and numerically
+weak.</b> Rows are lopsided, because the 21 existing nodes per spec were authored to stack
+within a lane rather than compete across a row — Savagery and Hemorrhage were built to be
+taken together and now sit as alternatives. Several rows have one obviously correct pick.
+Single-rank values are the old rank-1 values, so roughly a third of their intended power.
+None of this was tuned or re-homed to compensate: the four class batches re-author all 252
+nodes.<br>
+<b>Measured, 30 runs each side, same flags (route=default, map=new, standard, all shipped
+content on):</b> depth 17.10&plusmn;1.55 → <b>13.40&plusmn;0.86</b> (bands do not overlap —
+runs now die a full zone earlier); wipe median z2 t7.5 → <b>z1 t11.0</b>; talent nodes owned
+entering a boss 5.0 → <b>2.6</b>; points earned per hero per run 17.4 → <b>3.6</b> (partly
+the new schedule, partly that shorter runs collect less — a run that went the distance would
+bank exactly 8). <b>ratio@z1t8 is flat, 0.97 → 0.98</b>, and completions are 0% both sides:
+the party's raw stat ratio barely moved, so what was lost is the conditional and proc power
+the extra ranks were paying for. These are readings of placeholder content, not a difficulty
+signal — do not tune against them until the nodes are written.</li>
+</ul>
+
 <h2>2026-08-05 — Batch AH: ability progression — three to start, six to earn</h2>
 <ul>
 <li><b>Every hero now opens a run with its core attack plus exactly THREE spec abilities,

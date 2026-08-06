@@ -1345,3 +1345,65 @@ questions agreed right up until Call of the Wild wrote all three kinds
 without summoning anything. Two questions sharing one variable is fine
 until an ability makes them disagree; the fix is a second variable, not a
 cleverer read of the first.
+
+## Batch AI — eight decisions, not an income curve
+
+The old tree asked "how many nodes can I afford". The escalating ceil(N/3)
+price curve, the multi-rank nodes and the ~35 points a run all pointed the
+same way: talents were a budget you filled, and the interesting question was
+allocation. Row exclusivity replaces that with a different question
+entirely — "which eight" — and the numbers now enforce it. A run pays
+exactly as many points as a complete tree costs, so no build is ever short
+of points and no build ever has spare ones. Nothing is bought. Eight things
+are *chosen*, and each choice visibly costs the two it was chosen over.
+
+That is why the greyed siblings matter more than they look. A node the
+player can no longer take is not clutter to hide; it is the price of the
+node they did take, and the only place that price is ever shown. The same
+reasoning runs forward: a node not yet taken names the two doors it would
+close, so the cost is legible *before* the click as well as after.
+
+The elite purse (§6 of the brief, taken rather than cut) is the one crack,
+and its shape was the interesting call. Elite points could have been ordinary
+points that simply arrive faster — but that would put elite-hunting back into
+the income game the batch just left, and would break the guarantee that a run
+buys exactly one tree. Restricting them to a *second node in a row already
+picked* keeps the row count fixed at eight and makes the reward legible as
+something else: not "climb faster" but "widen a choice I already made". The
+third node in the row stays shut, so even a lucky run never gets a whole row
+for free.
+
+Two implementation notes worth keeping. First, `owns_ability` could not read
+`Run.owned_ability_names` from a static in a `class_name` script — GDScript
+does not resolve autoload identifiers there, the same constraint that already
+made RunSim take Run injected. The fix was to move the implementation to
+`Talents.ability_names` and have Run forward to it, which is better than what
+the brief asked for: the two are now literally the same function rather than
+two lists that agree today. Second, a payload whose `condition` is evaluated
+with no context is inert rather than unconditional. Both directions are
+defensible; inert was chosen because an effect that silently fails to appear
+is a bug someone will notice, and one that silently applies everywhere is not.
+
+The tree ships structurally correct and numerically weak, and that was the
+instruction rather than an oversight. Rows are lopsided because the 21
+existing nodes per spec were authored to *stack* within a lane — Savagery and
+Hemorrhage were designed to be taken together and now sit as alternatives —
+and single-rank values are the old rank-1 values, roughly a third of their
+intended power. Tuning any of it now would be tuning content that four
+batches are about to delete.
+
+The size of the drop was worth measuring anyway, and one number in it is
+more interesting than the rest. Thirty runs each side, same flags: depth
+17.10±1.55 → 13.40±0.86, wipe median z2 t7.5 → z1 t11.0. Runs die a full
+zone earlier, which is the expected shape. But **ratio@z1t8 — the measured
+party-vs-warband power — barely moved, 0.97 → 0.98.** The party's raw stat
+ratio is nearly unchanged; what vanished was conditional and proc power,
+the armor pen per 20 bloodloss and the +3% per bled-out enemy that extra
+ranks were buying. That is a useful thing to know before authoring 252
+nodes: the ranks were never carrying the stat line, so a row that competes
+on flat stats will feel much heavier than its numbers suggest next to one
+that competes on conditions.
+
+It also means the completion rate is the wrong instrument here. It reads 0%
+on both sides and cannot tell them apart; depth and wipe median can. When
+the class batches land, those two are the pair to watch.

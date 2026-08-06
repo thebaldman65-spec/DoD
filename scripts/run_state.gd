@@ -215,7 +215,7 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 		party.append({"key": key, "hp": base["hp"], "max_hp": base["hp"],
 			"mana": base["mana"], "max_mana": 100, "spec": "",
 			"talent_points": int(relic_add("start_talent_points")),
-			"talents": {}, "runes": []})
+			"talent_flex": 0, "talents": {}, "runes": []})
 	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
 	for id in relic_dict("start_items"):
 		items[id] = int(items.get(id, 0)) + int(relic_dict("start_items")[id])
@@ -1144,18 +1144,12 @@ func roll_ability_offer(member: Dictionary) -> Array:
 # + kit-override renames + earned picks, PLUS anything a learned talent
 # node grants. Without the talent half a Berserker who bought Battle Shout
 # in the tree could be offered it again as a pick that does nothing.
+# THE implementation moved to Talents.ability_names in Batch AI so a node's
+# `condition` could read it — autoload identifiers do not resolve inside a
+# class_name script, so the list had to live on the class side of the fence.
+# This stays as the name every screen already calls.
 func owned_ability_names(member: Dictionary) -> Array:
-	var names: Array = Runes.kit_names(member)
-	var learned: Dictionary = member.get("talents", {})
-	for node in member.get("tree", []):
-		if int(learned.get(String(node.get("id", "")), 0)) < 1:
-			continue
-		var pay: Dictionary = node.get("payload", {})
-		if pay.has("new_ability"):
-			names.append(String(pay["new_ability"]["display_name"]))
-		elif pay.has("grant_ability"):
-			names.append(String(pay["grant_ability"]))
-	return names
+	return Talents.ability_names(member)
 
 
 # Queue one ability award on a hero: the offer is rolled NOW and stored, so
@@ -1324,13 +1318,16 @@ func save_run() -> void:
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	# v2 (Batch 38): + seen_events, zone_draw. v3 (Batch Y): + difficulty.
 	# v4 (Batch Z): + tally (the run ledger). v5 (Batch AC): + debug_used
-	# (the honesty flag). Loading stays tolerant of older saves via .get
-	# defaults — never drop player state silently.
+	# (the honesty flag). v6 (Batch AI): the ROW tree — members carry
+	# talent_flex and no talent_order, and anything older has its tree wiped
+	# and its points re-issued on load (_migrate_trees). Loading stays
+	# tolerant of older saves via .get defaults — never drop player state
+	# silently.
 	# NOTE: a pre-Y save also keeps its old map (70% links, blind deal) —
 	# correct, never migrated; nothing at runtime may assume the Batch Y
 	# map guarantees hold on a loaded map.
 	file.store_var({
-		"version": 5, "party": party, "items": items, "gold": gold,
+		"version": 6, "party": party, "items": items, "gold": gold,
 		"tally": tally, "debug_used": debug_used,
 		"difficulty": difficulty,
 		"zone_idx": zone_idx, "zone_name": zone_name, "zone_draw": zone_draw,
@@ -1353,27 +1350,7 @@ func load_run() -> bool:
 	if not (data is Dictionary):
 		return false
 	party = data["party"]
-	# Trees are FIXED definitions in code: always swap the saved snapshot for
-	# the live tree so balance edits reach old saves. Learned ranks carry
-	# over; points in nodes that shrank or vanished are refunded.
-	for member in party:
-		var spec: String = member.get("spec", "")
-		if spec == "":
-			continue
-		var live_tree := Talents.generate_tree(spec, member["key"])
-		member["tree"] = live_tree
-		var learned: Dictionary = member.get("talents", {})
-		var refund := 0
-		for id in learned.keys():
-			var node := Talents.node_in_tree(live_tree, id)
-			if node.is_empty():
-				refund += int(learned[id])
-				learned.erase(id)
-			elif int(learned[id]) > int(node["ranks"]):
-				refund += int(learned[id]) - int(node["ranks"])
-				learned[id] = int(node["ranks"])
-		member["talents"] = learned
-		member["talent_points"] = member.get("talent_points", 0) + refund
+	var save_version := int(data.get("version", 0))
 	items = data["items"]
 	gold = data["gold"]
 	zone_idx = data["zone_idx"]
@@ -1398,6 +1375,7 @@ func load_run() -> bool:
 	tally = data.get("tally", {})
 	if tally.is_empty():
 		reset_tally()
+	_migrate_trees(save_version)
 	# A pre-AC (v4) save loads with the honesty flag false — it predates
 	# every tool that could have set it. The session-scoped toggles are
 	# never saved, so a resumed run always resumes with them off.
@@ -1408,6 +1386,61 @@ func load_run() -> bool:
 	encounter = {}
 	active = true
 	return true
+
+
+# Trees are FIXED definitions in code: always swap the saved snapshot for
+# the live tree so balance edits reach old saves.
+#
+# A pre-Batch-AI save (version < 6) holds `learned` under the old ranked,
+# point-priced scheme — ranks that no longer exist, bought at prices that no
+# longer exist. There is no honest way to translate those purchases into
+# row picks, so the tree is WIPED and the points are re-issued on the new
+# schedule: what a run standing here would have earned. The player re-picks
+# their eight rows with a full purse; nothing is quietly lost.
+#
+# Same-version saves keep the old behaviour: ranks carry, and points in nodes
+# that shrank or vanished are refunded.
+func _migrate_trees(save_version: int) -> void:
+	var to_batch_ai := save_version < 6
+	for member in party:
+		var spec: String = member.get("spec", "")
+		if spec == "":
+			continue
+		var live_tree := Talents.generate_tree(spec, member["key"])
+		member["tree"] = live_tree
+		var learned: Dictionary = member.get("talents", {})
+		if to_batch_ai:
+			member["talents"] = {}
+			member["talent_points"] = _batch_ai_point_schedule()
+			member["talent_flex"] = 0
+			member.erase("talent_order")  # prices are flat now: nothing to replay
+			continue
+		var refund := 0
+		for id in learned.keys():
+			var node := Talents.node_in_tree(live_tree, id)
+			if node.is_empty():
+				refund += int(learned[id])
+				learned.erase(id)
+			elif int(learned[id]) > int(node["ranks"]):
+				refund += int(learned[id]) - int(node["ranks"])
+				learned[id] = int(node["ranks"])
+		member["talents"] = learned
+		member["talent_points"] = member.get("talent_points", 0) + refund
+
+
+# Points a Batch AI run standing at this spot would have banked: 1 for the
+# spec choice, 1 per mini-boss cleared, 2 per zone boss cleared. Zone bosses
+# are counted by zone_idx (you only leave a zone by killing its boss); the
+# mini-boss sits at a fixed tier, so "cleared" is just "past that tier".
+# The FINAL zone's boss pays nothing, and you cannot have cleared it and
+# still be loading a run — so zone_idx is the whole count.
+func _batch_ai_point_schedule() -> int:
+	var pts := 1 if specs_chosen else 0
+	pts += 2 * zone_idx                      # zone bosses behind us
+	pts += zone_idx                          # their mini-bosses
+	if miniboss_on() and floor_idx > MINIBOSS_TIER:
+		pts += 1                             # this zone's mini-boss too
+	return pts
 
 
 func clear_save() -> void:
@@ -1432,20 +1465,47 @@ func award_gold(node_type: String) -> int:
 	return amount
 
 
-# Combat rewards: every hero gains talent points (fight 1, elite 2, boss 3).
-# Talent economy (Batch 30): 1 per fight, 2 per elite, 3 per zone boss.
-# Rests and shops award none. (When a FINAL boss exists it should award no
-# points — a relic instead — since points earned when nothing follows are
-# unspendable; every boss today is a zone boss.)
+# Combat rewards, Batch AI: a run hands out EXACTLY as many points as a
+# complete tree costs. Spec choice 1 + mini-boss 1 x3 + zone boss 2 x2 = 8,
+# and a tree is 8 nodes. Regular fights pay nothing — the tree is no longer
+# an income curve you grind, it is a set of eight decisions.
+#   spec choice   1   (award_spec_point, on confirming the spec)
+#   mini-boss     1
+#   zone boss     2   (the FINAL boss 0 — nothing follows it to spend on)
+#   fight/rest    0
+#   ELITE         1, into the FLEX purse (talent_flex) — see below.
 func award_talent_points(node_type: String) -> int:
-	var pts := 1
+	var pts := 0
 	match node_type:
-		"elite", "miniboss":
-			pts = 2
+		"miniboss":
+			pts = 1
 		"boss":
 			# The FINAL boss awards no talent points (a relic instead) —
 			# points earned when nothing follows are unspendable.
-			pts = 3 if has_next_zone() else 0
-	for member in party:
-		member["talent_points"] = member.get("talent_points", 0) + pts
+			pts = 2 if has_next_zone() else 0
+	if pts > 0:
+		for member in party:
+			member["talent_points"] = member.get("talent_points", 0) + pts
 	return pts
+
+
+# Elite points are a SEPARATE purse (Batch AI §6). They cannot open a new
+# row; the only thing they buy is a second node in a row already picked,
+# which is why hunting elites reads as "widen a choice I already made"
+# rather than "climb the tree faster".
+func award_talent_flex(node_type: String) -> int:
+	if node_type != "elite":
+		return 0
+	for member in party:
+		member["talent_flex"] = member.get("talent_flex", 0) + 1
+	return 1
+
+
+# The point the awakening pays, granted the moment a spec is confirmed —
+# from BOTH paths (the spec screen and RunSim.start_run), the sync_spec_hp
+# pattern. Row 1 is open from the start, so this is the point that lets the
+# player act on the choice they just made.
+func award_spec_point(idx: int) -> void:
+	if idx < 0 or idx >= party.size():
+		return
+	party[idx]["talent_points"] = int(party[idx].get("talent_points", 0)) + 1

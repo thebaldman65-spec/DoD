@@ -141,9 +141,14 @@ func _draw_screen() -> void:
 
 func _choose(idx: int, spec_id: String) -> void:
 	Music.click()
+	# The awakening pays the first talent point (Batch AI) — but only the
+	# first time, so the debug spec-swap cannot mint one per re-pick.
+	var first_time: bool = String(Run.party[idx].get("spec", "")) == ""
 	Run.party[idx]["spec"] = spec_id
 	Run.party[idx]["tree"] = Talents.generate_tree(spec_id, Run.party[idx]["key"])
 	Run.sync_spec_hp(idx)
+	if first_time:
+		Run.award_spec_point(idx)
 	_draw_screen()
 
 

@@ -84,6 +84,13 @@ func _draw_list() -> void:
 		if pts > 0:
 			line += "    ● %d POINTS TO SPEND" % pts
 			btn.modulate = Color(1.0, 0.92, 0.55)
+		# Elite points say so by name: they buy a different thing (a second
+		# node in a row already picked), so folding them into the same count
+		# would send the player looking for a row they cannot open.
+		var flex_pts: int = member.get("talent_flex", 0)
+		if flex_pts > 0:
+			line += "    ● %d ELITE" % flex_pts
+			btn.modulate = Color(1.0, 0.92, 0.55)
 		# Batch AE: the picker lives one click deeper, on the hero's own
 		# page, so the list has to say who is owed one — the map badge gets
 		# the player to this screen and would otherwise abandon them here.
@@ -161,10 +168,12 @@ func _draw_detail() -> void:
 			if bm_ab != null and not cfg["abilities"].any(
 					func(a): return a.display_name == bm_ab.display_name):
 				cfg["abilities"] = cfg["abilities"] + [bm_ab]
-		Talents.apply_from_tree(cfg, member.get("tree", []), member.get("talents", {}))
+		Talents.apply_from_tree(cfg, member.get("tree", []), member.get("talents", {}),
+			member)
 	for rune in member.get("runes", []):
 		if rune.get("equipped", false):
-			Talents.apply_payload(cfg, rune["payload"], 1)
+			Talents.apply_payload(cfg, rune["payload"], 1,
+				{"learned": member.get("talents", {}), "member": member})
 	cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
 	# Toughness (Warden talent): Constitution grows with bulk — same order as
 	# battle spawn (after every max-HP bonus has landed).
@@ -377,16 +386,11 @@ func _draw_detail() -> void:
 		soon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		add_child(soon)
 		return
-	if Talents.is_lane_tree(member.get("tree", [])):
-		tree_header.text = "TALENTS — %s lanes    (Points: %d · next node costs %d)" % [
-			Classes.SPEC_INFO[spec]["name"], member.get("talent_points", 0),
-			Talents.next_node_cost(member.get("talents", {}))]
-		_draw_lane_tree(member)
-	else:
-		tree_header.text = "TALENTS — %s tree    (Points: %d)" % [
-			Classes.SPEC_INFO[spec]["name"], member.get("talent_points", 0)]
-		_draw_fixed_tree(member.get("tree", []), member.get("talents", {}),
-			member.get("talent_points", 0))
+	var flex: int = member.get("talent_flex", 0)
+	tree_header.text = "TALENTS — %s    (Points: %d%s)" % [
+		Classes.SPEC_INFO[spec]["name"], member.get("talent_points", 0),
+		"" if flex < 1 else " · Elite: %d" % flex]
+	_draw_lane_tree(member)
 	# Earned abilities wait on the Party screen until chosen (Batch AH: every
 	# spec has pools now, so the old "does this spec have one" gate is gone).
 	if int(member.get("bm_picks_owed", 0)) > 0:
@@ -398,70 +402,24 @@ func _draw_detail() -> void:
 		_draw_rune_pick(member)
 
 
-# ---------- fixed talent tree (styled after the "Appearance example") ----------
+# ---------- the talent tree: 3 lanes x 7 rows + a capstone row ----------
 
 const TREE_BACK_POS := Vector2(500, 96)
 const TREE_BACK_SIZE := Vector2(744, 566)
 const TREE_NODE_SIZE := 56.0
-# 5 columns x 4 rows, straight from the generator layout (col/row per node).
-const TREE_COL_X := [570.0, 720.0, 870.0, 1020.0, 1170.0]
-const TREE_ROW_Y := [160.0, 295.0, 430.0, 565.0]
 
 var _tree_tip: PanelContainer
 var _tree_tip_name: Label
 var _tree_tip_desc: Label
 var _tree_tip_state: Label
 
-
-func _draw_fixed_tree(tree: Array, learned: Dictionary, points: int) -> void:
-	# Dark backdrop (placeholder until dedicated tree art lands).
-	var back := ColorRect.new()
-	back.position = TREE_BACK_POS
-	back.size = TREE_BACK_SIZE
-	back.color = Color(0.05, 0.05, 0.06)
-	add_child(back)
-	# Faint grid lines through the node rows/columns, like the reference.
-	for cx in TREE_COL_X:
-		var v := ColorRect.new()
-		v.position = Vector2(cx, TREE_BACK_POS.y)
-		v.size = Vector2(1, TREE_BACK_SIZE.y)
-		v.color = Color(1, 1, 1, 0.05)
-		add_child(v)
-	for cy in TREE_ROW_Y:
-		var h := ColorRect.new()
-		h.position = Vector2(TREE_BACK_POS.x, cy)
-		h.size = Vector2(TREE_BACK_SIZE.x, 1)
-		h.color = Color(1, 1, 1, 0.05)
-		add_child(h)
-
-	# Prerequisite connectors first, so the lines sit under the nodes.
-	for talent in tree:
-		var req: String = talent.get("requires", "")
-		if req == "":
-			continue
-		var req_node := Talents.node_in_tree(tree, req)
-		if req_node.is_empty():
-			continue
-		var line := Line2D.new()
-		line.add_point(_node_center(req_node))
-		line.add_point(_node_center(talent))
-		line.width = 2.0
-		line.default_color = Color(0.45, 0.42, 0.5, 0.6)
-		add_child(line)
-	for talent in tree:
-		_make_tree_node(talent, learned, points, _node_center(talent))
-	_build_tree_tip()
-
-
-# ---------- lane talent tree (Batch 30 framework: Beastmaster pilot) ----------
-
 const LANE_COL_X := [620.0, 872.0, 1124.0]
 const LANE_ROW_Y := [150.0, 206.0, 262.0, 318.0, 374.0, 430.0, 486.0]
 const LANE_CAP_Y := 566.0
 
 
-# Lane order comes from the tree itself (first appearance), so converted
-# classic trees and the Beastmaster pilot both lay out correctly.
+# Lane order comes from the tree itself (first appearance) — the columns
+# read left to right in the order the tree was authored.
 func _tree_lanes(tree: Array) -> Array:
 	var lanes: Array = []
 	for t in tree:
@@ -474,15 +432,17 @@ func _tree_lanes(tree: Array) -> Array:
 func _draw_lane_tree(member: Dictionary) -> void:
 	var tree: Array = member.get("tree", [])
 	var learned: Dictionary = member.get("talents", {})
-	var order: Array = member.get("talent_order", [])
 	var points: int = member.get("talent_points", 0)
+	var flex: int = member.get("talent_flex", 0)
 	var lane_order := _tree_lanes(tree)
 	var back := ColorRect.new()
 	back.position = TREE_BACK_POS
 	back.size = TREE_BACK_SIZE
 	back.color = Color(0.05, 0.05, 0.06)
 	add_child(back)
-	# Lane spines + headers with live lane-point counts.
+	# Lane spines + headers with the count of nodes taken in each lane. Lanes
+	# no longer gate anything (rows do), so this is a read of the build the
+	# player has assembled, not a requirement they are working toward.
 	for ci in mini(LANE_COL_X.size(), lane_order.size()):
 		var v := ColorRect.new()
 		v.position = Vector2(LANE_COL_X[ci], TREE_BACK_POS.y + 18)
@@ -490,45 +450,41 @@ func _draw_lane_tree(member: Dictionary) -> void:
 		v.color = Color(1, 1, 1, 0.05)
 		add_child(v)
 		var lane: String = lane_order[ci]
+		var taken := 0
+		for t in tree:
+			if str(t.get("lane", "")) == lane and int(learned.get(t["id"], 0)) > 0:
+				taken += 1
 		var hdr := Label.new()
-		hdr.text = "%s — %d pts" % [str(Talents.LANE_NAMES.get(lane, lane)).to_upper(),
-			Talents.lane_points(tree, learned, order, lane)]
+		hdr.text = "%s — %d" % [
+			str(Talents.LANE_NAMES.get(lane, lane)).to_upper(), taken]
 		hdr.add_theme_font_size_override("font_size", 13)
 		hdr.add_theme_color_override("font_color", Color(0.85, 0.75, 0.45))
 		hdr.position = Vector2(LANE_COL_X[ci] - 110, TREE_BACK_POS.y + 6)
 		hdr.size = Vector2(220, 16)
 		hdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		add_child(hdr)
-	# Capstone shelf: one of three, forever.
+	# Row 8: the capstone shelf. Any lane — the seven rows above are the
+	# whole requirement.
 	var cap_lbl := Label.new()
-	cap_lbl.text = "— CAPSTONES · take ONE (%s in its lane) —" % \
-		("6 nodes" if Talents.is_node_gated(tree) else "8 pts")
+	cap_lbl.text = "— CAPSTONE · take ONE —"
 	cap_lbl.add_theme_font_size_override("font_size", 12)
 	cap_lbl.add_theme_color_override("font_color", Color(0.7, 0.6, 0.75))
-	cap_lbl.position = Vector2(TREE_BACK_POS.x, LANE_CAP_Y - 52)
+	# Clear of row 7's own label, which sits just under its node.
+	cap_lbl.position = Vector2(TREE_BACK_POS.x, LANE_CAP_Y - 36)
 	cap_lbl.size = Vector2(TREE_BACK_SIZE.x, 14)
 	cap_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(cap_lbl)
-	# Nodes: lanes fill top-down sorted by tier (converted classic trees mix
-	# existing nodes with fillers, so definition order alone won't do);
-	# capstones sit on the shelf.
-	var lane_counts := {}
-	var sorted_tree: Array = []
-	for ti in tree.size():
-		sorted_tree.append([int(tree[ti].get("tier", 0)) * 100 + ti, tree[ti]])
-	sorted_tree.sort_custom(func(a, b): return a[0] < b[0])
-	for pair in sorted_tree:
-		var talent: Dictionary = pair[1]
+	# A node sits at [its lane's column, its row]. Rows 1-7 stack down the
+	# lanes; row 8 is the shelf.
+	for talent in tree:
 		var lane: String = str(talent.get("lane", ""))
 		var col := maxi(lane_order.find(lane), 0)
-		var center: Vector2
-		if talent.get("capstone", false):
-			center = Vector2(LANE_COL_X[col], LANE_CAP_Y)
-		else:
-			var row: int = clampi(int(lane_counts.get(lane, 0)), 0, LANE_ROW_Y.size() - 1)
-			center = Vector2(LANE_COL_X[col], LANE_ROW_Y[row])
-			lane_counts[lane] = int(lane_counts.get(lane, 0)) + 1
-		_make_tree_node(talent, learned, points, center, 44.0)
+		var row := int(talent.get("row", 1))
+		# (ternaries need the explicit type here — the CLAUDE.md gotcha)
+		var y: float = LANE_CAP_Y if row >= Talents.CAPSTONE_ROW \
+			else LANE_ROW_Y[clampi(row - 1, 0, LANE_ROW_Y.size() - 1)]
+		var center := Vector2(LANE_COL_X[col], y)
+		_make_tree_node(talent, learned, points, center, 44.0, flex)
 	_build_tree_tip()
 
 
@@ -571,20 +527,20 @@ func _build_tree_tip() -> void:
 	add_child(_tree_tip)
 
 
-func _node_center(talent: Dictionary) -> Vector2:
-	return Vector2(TREE_COL_X[clampi(int(talent.get("col", 2)), 0, 4)],
-		TREE_ROW_Y[clampi(int(talent.get("row", 0)), 0, 3)])
-
-
 func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
-		center: Vector2, node_size: float = TREE_NODE_SIZE) -> void:
+		center: Vector2, node_size: float = TREE_NODE_SIZE, flex: int = 0) -> void:
 	var ranks_have := int(learned.get(talent["id"], 0))
 	var check: Dictionary = Talents.can_learn(
-		Run.party[selected].get("tree", []), talent["id"], learned,
-		Run.party[selected].get("talent_order", []))
-	var locked: bool = not check["ok"] and (check["why"].begins_with("Locked")
-		or check["why"].begins_with("Barred") or check["why"].begins_with("Coming"))
+		Run.party[selected].get("tree", []), talent["id"], learned)
 	var maxed: bool = ranks_have >= int(talent["ranks"])
+	# Greyed = the player cannot take this right now. That covers rows they
+	# have not reached, capstones before 7/7, doors a sibling shut for good,
+	# AND a sibling only an elite point could force open while they hold
+	# none — the door is still shut, the tooltip says with what key.
+	var locked: bool = (not check["ok"] and (check["why"].begins_with("Locked")
+		or check["why"].begins_with("Closed") or check["why"].begins_with("Barred")
+		or check["why"].begins_with("Coming"))) \
+		or (check["ok"] and check["pool"] == "flex" and flex < 1)
 
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(node_size, node_size)
@@ -610,18 +566,21 @@ func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
 	if locked:
 		btn.modulate = Color(0.62, 0.62, 0.62)
 	btn.pressed.connect(_on_tree_node_pressed.bind(talent["id"]))
-	btn.mouse_entered.connect(_show_tree_tip.bind(talent, ranks_have, check, points, center))
+	btn.mouse_entered.connect(_show_tree_tip.bind(talent, ranks_have, check, points,
+		center, flex))
 	btn.mouse_exited.connect(_hide_tree_tip)
 	add_child(btn)
 
+	# Row number under the node: the whole gate, stated where the eye is.
 	var pts_label := Label.new()
-	pts_label.text = "%d/%d" % [ranks_have, int(talent["ranks"])]
-	pts_label.add_theme_font_size_override("font_size", 12 if node_size >= 50.0 else 10)
-	var pts_color := Color(0.78, 0.75, 0.7)
+	var row := int(talent.get("row", 1))
+	pts_label.text = "TAKEN" if ranks_have > 0 \
+		else ("CAP" if row >= Talents.CAPSTONE_ROW else "row %d" % row)
+	pts_label.add_theme_font_size_override("font_size",
+		11 if node_size >= 50.0 else 9)
+	var pts_color := Color(0.45, 0.44, 0.42)
 	if maxed:
 		pts_color = Color(0.5, 0.9, 0.55)
-	elif ranks_have > 0:
-		pts_color = Color(0.95, 0.85, 0.4)
 	pts_label.add_theme_color_override("font_color", pts_color)
 	pts_label.position = center + Vector2(-node_size / 2.0, node_size / 2.0 + 1)
 	pts_label.size = Vector2(node_size, 14)
@@ -630,27 +589,33 @@ func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
 
 
 func _show_tree_tip(talent: Dictionary, ranks_have: int, check: Dictionary,
-		points: int, center: Vector2) -> void:
+		points: int, center: Vector2, flex: int = 0) -> void:
 	_tree_tip_name.text = talent["name"]
-	# Values reflect the invested points (rank-1 preview when unlearned).
 	_tree_tip_desc.text = Talents.desc_for(talent, ranks_have)
-	var state := "Rank %d/%d" % [ranks_have, int(talent["ranks"])]
-	var cost := Talents.node_cost(Run.party[selected].get("tree", []),
-		Run.party[selected].get("talents", {}), talent["id"])
-	if ranks_have >= int(talent["ranks"]):
-		state += "  —  MAXED"
+	var row := int(talent.get("row", 1))
+	var state := "Capstone" if row >= Talents.CAPSTONE_ROW else "Row %d of %d" % [
+		row, Talents.ROWS]
+	if ranks_have > 0:
+		state += "  —  TAKEN"
 	elif not check["ok"]:
 		state += "  —  %s" % check["why"]
-	elif points < cost:
-		state += "  —  costs %d point%s (have %d)" % [cost,
-			"" if cost == 1 else "s", points]
+	elif check["pool"] == "flex":
+		# The elite-point crack: say what it costs and what it buys, both.
+		state += "  —  %s" % check["why"]
+		state += "\n%s" % ("Click to spend 1 ELITE point (have %d)" % flex if flex > 0
+			else "Needs 1 elite point (have 0)")
+	elif points < 1:
+		state += "  —  costs 1 point (have 0)"
 	else:
-		state += "  —  click to spend %d point%s" % [cost,
-			"" if cost == 1 else "s"]
-	if talent.get("exclusive_with", "") != "":
-		var sib := Talents.node_in_tree(Run.party[selected].get("tree", []),
-			talent["exclusive_with"])
-		state += "\nExclusive with %s" % sib.get("name", "its sibling")
+		state += "  —  click to spend 1 point"
+	if ranks_have < 1 and row < Talents.CAPSTONE_ROW and check["pool"] != "flex":
+		# Name the doors this pick would shut, before it shuts them.
+		var siblings := PackedStringArray()
+		for sib in Talents.row_nodes(Run.party[selected].get("tree", []), row):
+			if String(sib["id"]) != String(talent["id"]):
+				siblings.append(String(sib["name"]))
+		if not siblings.is_empty():
+			state += "\nTaking it closes %s" % " and ".join(siblings)
 	_tree_tip_state.text = state
 	_tree_tip.visible = true
 	# Sits to the left of the hovered node, like the reference image.
@@ -686,22 +651,22 @@ func _toggle_rune(rune_idx: int) -> void:
 	_draw_screen()
 
 
+# Every node costs exactly 1. can_learn says which purse pays: "points" for
+# a normal pick, "flex" for a second node in a row an elite point forces
+# back open.
 func _learn_talent(talent_id: String) -> void:
 	var member: Dictionary = Run.party[selected]
 	var learned: Dictionary = member.get("talents", {})
 	var tree: Array = member.get("tree", [])
-	var cost := Talents.node_cost(tree, learned, talent_id)
-	if member.get("talent_points", 0) < cost \
-			or not Talents.can_learn(tree, talent_id, learned,
-			member.get("talent_order", []))["ok"]:
+	var check := Talents.can_learn(tree, talent_id, learned)
+	if not check["ok"]:
 		return
-	var first_rank := int(learned.get(talent_id, 0)) < 1
-	learned[talent_id] = int(learned.get(talent_id, 0)) + 1
+	var purse := "talent_flex" if check["pool"] == "flex" else "talent_points"
+	if int(member.get(purse, 0)) < 1:
+		return
+	learned[talent_id] = 1
 	member["talents"] = learned
-	member["talent_points"] = int(member.get("talent_points", 0)) - cost
-	# Lane trees price nodes by purchase order — record it.
-	if first_rank and Talents.is_lane_tree(tree):
-		member["talent_order"] = member.get("talent_order", []) + [talent_id]
+	member[purse] = int(member.get(purse, 0)) - 1
 	_draw_screen()
 
 

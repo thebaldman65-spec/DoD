@@ -103,43 +103,62 @@ func _gate_talent_conservation() -> void:
 		run.party[i]["spec"] = SPECS[i]
 		run.party[i]["tree"] = Talents.generate_tree(SPECS[i], run.party[i]["key"])
 		run.sync_spec_hp(i)
-	# A mid-run income stream: 8 fights + 2 elites + 1 zone boss = 15 each.
-	for f in 8:
-		run.award_talent_points("fight")
+	# Batch AI income: the awakening pays 1, mini-bosses 1, zone bosses 2,
+	# fights nothing. A full 3-zone run is 1 + 3 + 4 = 8 per hero — exactly
+	# one complete tree — so this books the whole run's supply.
+	for i in run.party.size():
+		run.award_spec_point(i)
+	for zone in 3:
+		for f in 3:
+			run.award_talent_points("fight")   # pays nothing, on purpose
+		run.award_talent_points("miniboss")
+		run.zone_idx = zone
+		run.award_talent_points("boss")
+	# Elites pay into the SEPARATE flex purse.
 	for e in 2:
-		run.award_talent_points("elite")
-	run.award_talent_points("boss")
+		run.award_talent_flex("elite")
 	var before := 0
+	var before_flex := 0
 	for m in run.party:
 		before += int(m["talent_points"])
-	_check("income booked (15 x 4 heroes)", before, 60)
+		before_flex += int(m.get("talent_flex", 0))
+	_check("income booked (8 x 4 heroes)", before, 32)
+	_check("elite purse booked (2 x 4 heroes)", before_flex, 8)
 	RunSim._run_spent = 0
 	RunSim._spend_talents(run)
 	var after := 0
+	var after_flex := 0
 	for m in run.party:
 		after += int(m["talent_points"])
-	_check("ledger: earned - banked == spent", before - after, RunSim._run_spent)
+		after_flex += int(m.get("talent_flex", 0))
+	_check("ledger: earned - banked == spent",
+		(before - after) + (before_flex - after_flex), RunSim._run_spent)
 	_check("something was bought", RunSim._run_spent > 0, true)
-	# Replay every purchase through the price function — first ranks in the
-	# recorded order (the Nth distinct node costs ceil(N/3)), extra ranks at
-	# 1 point each. The party screen's reconstruction must land on the same
-	# total as the sim's ledger.
+	# Replay every purchase at the flat price: 1 point a node, no exceptions.
+	# The count of learned nodes IS the points paid.
 	var replay_total := 0
 	for m in run.party:
 		var tree: Array = m["tree"]
-		_check("lane tree (%s)" % m["spec"], Talents.is_lane_tree(tree), true)
-		var order: Array = m.get("talent_order", [])
 		var learned: Dictionary = m.get("talents", {})
-		_check("order covers learned (%s)" % m["spec"], order.size(), learned.size())
-		var replay := {}
-		for id in order:
-			replay_total += Talents.node_cost(tree, replay, String(id))
-			replay[String(id)] = 1
+		_check("no talent_order left (%s)" % m["spec"], m.has("talent_order"), false)
 		for id in learned:
-			_check("rank >= 1 (%s/%s)" % [m["spec"], id], int(learned[id]) >= 1, true)
-			replay_total += int(learned[id]) - 1  # extra ranks cost 1 apiece
+			_check("single rank (%s/%s)" % [m["spec"], id], int(learned[id]), 1)
+			var node := Talents.node_in_tree(tree, String(id))
+			_check("node is in the tree (%s/%s)" % [m["spec"], id], node.is_empty(), false)
+		replay_total += Talents.points_spent(learned)
+		# 8 points buys 8 nodes: seven rows and a capstone. The two elite
+		# points widen two of those rows, so a fully-fed hero lands on 10.
+		_check("complete tree (%s)" % m["spec"], learned.size(), 10)
+		_check("capstone taken (%s)" % m["spec"],
+			Talents.has_capstone(tree, learned), true)
 		_check("bank not negative (%s)" % m["spec"],
 			int(m["talent_points"]) >= 0, true)
+		_check("elite purse not negative (%s)" % m["spec"],
+			int(m.get("talent_flex", 0)) >= 0, true)
+		# No row ever holds three.
+		for row in range(1, Talents.CAPSTONE_ROW + 1):
+			_check("row %d <= 2 picks (%s)" % [row, m["spec"]],
+				Talents.row_picks(tree, learned, row).size() <= Talents.MAX_PER_ROW, true)
 	_check("price replay == points paid", replay_total, RunSim._run_spent)
 
 

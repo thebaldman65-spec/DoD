@@ -36,11 +36,13 @@
 #                            v1 floor: carried items are never drunk.
 #                            Run sims only — sweep/standalone battles
 #                            stay dry so Batch R/S baselines hold.
-#   Talents (DOD_SIM_BUILDS) "spec:LaneName,..." — buy down that lane
-#                            cheapest node first, capstone the moment its
-#                            gate opens; default = each tree's first lane;
-#                            spillover continues into the next lane once
-#                            the target lane is bought out.
+#   Talents (DOD_SIM_BUILDS) "spec:LaneName,..." — buy that lane's node in
+#                            every row, top to bottom, then its capstone
+#                            (Batch AI: a lane holds one node per row, so
+#                            this is always a complete 8-node build).
+#                            Default = each tree's first lane. Elite points
+#                            go to the second node in the lowest row that
+#                            has one, from the next lane in tree order.
 #   Trophies (DOD_SIM_TROPHIES) comma list of preferred ability names;
 #                            default = first unowned in the spec's pool.
 #   Events                   take the first valid choice; the report
@@ -199,6 +201,7 @@ static func start_run(run: Node) -> void:
 		run.party[i]["spec"] = spec
 		run.party[i]["tree"] = Talents.generate_tree(spec, run.party[i]["key"])
 		run.sync_spec_hp(i)  # awakening HP sync — same call as the spec screen
+		run.award_spec_point(i)  # Batch AI: the awakening's own talent point
 		var run_sn := String(Classes.SPEC_INFO[spec]["name"])
 		spec_runs[run_sn] = int(spec_runs.get(run_sn, 0)) + 1
 	# Batch AE: the sim gets the opening pick too, resolved through the same
@@ -550,6 +553,7 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 			run.party[i]["mana"] = h.resource
 	var node_type := String(run.encounter.get("type", "fight"))
 	run.award_talent_points(node_type)
+	run.award_talent_flex(node_type)
 	run.award_gold(node_type)
 	if node_type == "elite":
 		var looter: Dictionary = run.party.pick_random()
@@ -612,7 +616,7 @@ static func _finish_run(run: Node, battle, done: bool) -> void:
 		completed += 1
 	talent_spent += _run_spent
 	for m in run.party:
-		talent_left += int(m.get("talent_points", 0))
+		talent_left += int(m.get("talent_points", 0)) + int(m.get("talent_flex", 0))
 	# Gold ledger (Batch U): earned = everything the run ever held (start
 	# gold + income, net of event losses), so earned = spent + unspent.
 	gold_spent += _run_gold_spent
@@ -690,7 +694,8 @@ static func _award_trophies(run: Node) -> void:
 
 
 # Spend every point the policy can: same bookkeeping as the party screen's
-# _learn_talent (cost, ranks, purchase order), driven by _next_buy.
+# _learn_talent (1 point a node, the purse can_learn names), driven by
+# _next_buy.
 static func _spend_talents(run: Node) -> void:
 	for m in run.party:
 		var tree: Array = m.get("tree", [])
@@ -702,14 +707,13 @@ static func _spend_talents(run: Node) -> void:
 			if buy == "":
 				break
 			var learned: Dictionary = m.get("talents", {})
-			var cost := Talents.node_cost(tree, learned, buy)
-			var first_rank := int(learned.get(buy, 0)) < 1
-			learned[buy] = int(learned.get(buy, 0)) + 1
+			var purse := "talent_flex" \
+				if Talents.can_learn(tree, buy, learned)["pool"] == "flex" \
+				else "talent_points"
+			learned[buy] = 1
 			m["talents"] = learned
-			m["talent_points"] = int(m.get("talent_points", 0)) - cost
-			_run_spent += cost
-			if first_rank and Talents.is_lane_tree(tree):
-				m["talent_order"] = m.get("talent_order", []) + [buy]
+			m[purse] = int(m.get(purse, 0)) - 1
+			_run_spent += 1
 
 
 static func _target_lane(spec: String, tree: Array) -> String:
@@ -784,41 +788,38 @@ static func _pick_rune_candidate(member: Dictionary, candidates: Array) -> Dicti
 	return candidates[0]
 
 
-# The next node the policy buys: the target lane's capstone the moment its
-# gate opens, else the cheapest learnable node in the target lane (ties go
-# to the lower tier), else spillover into the other lanes in tree order.
-# "" = nothing affordable/learnable — bank the points.
+# The next node the policy buys (Batch AI: rows, not lanes).
+#   Normal points: the target lane's node in the lowest open row, and the
+#   target lane's capstone once the shelf opens. A lane holds exactly one
+#   node per row, so a pure-lane build is always available — no spillover
+#   rule is needed to keep the bot spending.
+#   Elite points: a SECOND node in the lowest row that has one pick, taken
+#   from the next lane in tree order. Deliberately dumb and deterministic;
+#   the flex purse is 0-3 points a run and no policy question rides on it.
+# "" = nothing learnable with either purse — bank the points.
 static func _next_buy(m: Dictionary, tree: Array, target: String) -> String:
 	var learned: Dictionary = m.get("talents", {})
-	var order: Array = m.get("talent_order", [])
-	var pts := int(m.get("talent_points", 0))
 	var lanes: Array = [target]
 	for t in tree:
 		var lane := String(t.get("lane", ""))
 		if not lane in lanes:
 			lanes.append(lane)
-	for lane in lanes:
-		var best := ""
-		var best_cost := 999
-		var best_tier := 999
-		for t in tree:
-			if String(t.get("lane", "")) != lane:
-				continue
-			var id := String(t["id"])
-			if not Talents.can_learn(tree, id, learned, order)["ok"]:
-				continue
-			var cost := Talents.node_cost(tree, learned, id)
-			if cost > pts:
-				continue
-			if t.get("capstone", false):
-				return id
-			var tier := int(t.get("tier", 0))
-			if cost < best_cost or (cost == best_cost and tier < best_tier):
-				best = id
-				best_cost = cost
-				best_tier = tier
-		if best != "":
-			return best
+	# Normal points first — they are the only purse that can open a row, so
+	# spending flex while a normal point sits banked would be strictly worse.
+	var purses: Array = []
+	if int(m.get("talent_points", 0)) > 0:
+		purses.append("points")
+	if int(m.get("talent_flex", 0)) > 0:
+		purses.append("flex")
+	for want_pool in purses:
+		for row in range(1, Talents.CAPSTONE_ROW + 1):
+			for lane in lanes:
+				for t in Talents.row_nodes(tree, row):
+					if String(t.get("lane", "")) != lane:
+						continue
+					var check := Talents.can_learn(tree, String(t["id"]), learned)
+					if check["ok"] and check["pool"] == want_pool:
+						return String(t["id"])
 	return ""
 
 

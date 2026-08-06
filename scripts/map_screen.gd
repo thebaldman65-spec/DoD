@@ -189,7 +189,10 @@ func _draw_screen() -> void:
 	var party_btn := Button.new()
 	var unspent := 0
 	for member in Run.party:
-		unspent += member.get("talent_points", 0)
+		# Elite points badge the button too — an unspent one is exactly as
+		# invisible on the map as an unspent normal point, and it is the
+		# rarer of the two.
+		unspent += member.get("talent_points", 0) + member.get("talent_flex", 0)
 	# Batch AE: owed rune picks badge the same button unspent points do —
 	# the existing affordance, not a new one. A start pick that sits
 	# unnoticed on the Party screen would defeat the entire point of
@@ -526,12 +529,31 @@ func _on_burger(id: int) -> void:
 				"UNLOCKED for every battle" if Run.debug_grant_all else "gated again"))
 		15:
 			# Debug spec swap: refund spent points, clear specs, re-awaken.
+			# Nodes cost 1 apiece, and elite picks refund into their own
+			# purse. The spec-choice point comes back OFF, because
+			# re-awakening will pay it again — otherwise every swap mints one.
 			for member in Run.party:
+				if String(member.get("spec", "")) == "":
+					continue  # never awakened: nothing to refund, nothing paid
 				var learned: Dictionary = member.get("talents", {})
-				var spent := 0
+				var tree: Array = member.get("tree", [])
+				var normal := 0
+				var elite := 0
 				for talent_id in learned:
-					spent += int(learned[talent_id])
-				member["talent_points"] = member.get("talent_points", 0) + spent
+					if int(learned[talent_id]) < 1:
+						continue
+					var node := Talents.node_in_tree(tree, String(talent_id))
+					var row := int(node.get("row", 1))
+					# A row holding two picks bought the second with an
+					# elite point; the first (definition order) was normal.
+					var picks: Array = Talents.row_picks(tree, learned, row)
+					if picks.size() > 1 and String(picks[0]) != String(talent_id):
+						elite += 1
+					else:
+						normal += 1
+				member["talent_points"] = maxi(
+					member.get("talent_points", 0) + normal - 1, 0)
+				member["talent_flex"] = member.get("talent_flex", 0) + elite
 				member["spec"] = ""
 				member["talents"] = {}
 				member["tree"] = []

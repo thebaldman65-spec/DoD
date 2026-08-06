@@ -289,50 +289,25 @@ func _coverage(data: Dictionary) -> void:
 	ok(specs_seen == 12, "expected 12 specs, walked %d" % specs_seen)
 
 
-# ---------- exclusive pairs ----------
+# ---------- row exclusivity ----------
 
-# The tree makes some choices mutually exclusive. A rune writing one side's
-# counter would hand a player the road they declined, which is a design
-# decision no rune should be able to overrule silently.
-func _exclusives(data: Dictionary) -> void:
-	var barred := {}
-	for key in Classes.SPEC_IDS:
-		for spec in Classes.SPEC_IDS[key]:
-			for node in Talents.generate_tree(spec, key):
-				if String(node.get("exclusive_with", "")) == "":
-					continue
-				for field in node.get("payload", {}).get("stat", {}):
-					barred["%s/%s" % [spec, field]] = String(node["id"])
-	for id in data:
-		var scope := String(data[id].get("scope", ""))
-		if not scope.begins_with("spec:"):
-			continue
-		var spec := scope.trim_prefix("spec:")
-		for field in data[id].get("payload", {}).get("stat", {}):
-			var probe_key := "%s/%s" % [spec, field]
-			ok(not barred.has(probe_key),
-				"%s: writes '%s', one half of the exclusive pair %s" % [
-					id, field, barred.get(probe_key, "")])
-	# POSITIVE CONTROL. The alarm above reads the trees, so it silently stops
-	# watching anything a rename drops out of them. These are the pairs the
-	# batches called out by name; if one vanishes, the barred map is wrong,
-	# not the design.
-	var must_bar := {
-		"beastmaster/lone_bond": "Lone Bond", "beastmaster/wild_rotation": "Wild Rotation",
-		"beastmaster/steadfast_bond": "Steadfast Bond", "beastmaster/vengeance": "Vengeance",
-		"mystic/virulence_ranks": "Virulence", "mystic/slow_acting": "Slow Acting",
-		"mystic/deadfall_network": "Deadfall Network", "mystic/plague_bearer": "Plague Bearer",
-		"sharpshooter/spray": "Spray of Arrows", "sharpshooter/tunnel_vision": "Tunnel Vision",
-		"pyromancer/heat_haze_ranks": "Firebrand", "cryomancer/cold_snap_ranks": "Cold Snap",
-		"arcanist/arcane_ward_ranks": "Arcane Ward", "holy/cascade_ranks": "Radiant Cascade",
-		"inquisitor/stalwart_ranks": "Stalwart", "occultist/pact_flesh_ranks": "Pact Flesh",
-		"warden/spite_ranks": "Spite", "berserker/dmg_taken_bonus": "Reckless",
-		"swordmaster/punishment_ranks": "Punishment",
-	}
-	for probe_key in must_bar:
-		ok(barred.has(probe_key),
-			"exclusive alarm no longer watches %s (%s) — a rename slipped through" % [
-				probe_key, must_bar[probe_key]])
+# RETIRED IN BATCH AI, deliberately and with the reasoning left in place.
+#
+# The alarm this replaces watched authored "exclusive_with" pairs: a rune
+# writing one side's counter would hand a player the road they declined.
+# Batch AI deleted exclusive_with — EVERY row is now three mutually
+# exclusive options, so at row granularity the old test would fire on
+# nearly every spec rune in the game. That is not 24 violations; it is the
+# alarm asking a question the design no longer answers the same way.
+#
+# What replaced it in kind: the coverage test above still pins one rune per
+# lane per spec, and Batch AI's own harness (test_batch_ai.gd) pins the row
+# structure itself. What is NOT covered, and is a real question for the four
+# class batches that re-author all 252 nodes: whether a rune should be able
+# to grant a counter whose node sits in a row the player passed on. Author
+# the answer with the nodes, then bring an alarm back that states it.
+func _exclusives(_data: Dictionary) -> void:
+	pass
 
 
 # ---------- call-site ordering ----------
@@ -342,7 +317,7 @@ func _exclusives(data: Dictionary) -> void:
 # the regression alarm: if the derivations ever move back above the rune
 # block, every ceiling rune becomes a silent dud again.
 func _ordering(battle_src: String) -> void:
-	var rune_at := battle_src.find("Talents.apply_payload(cfg, rune[\"payload\"], 1)")
+	var rune_at := battle_src.find("Talents.apply_payload(cfg, rune[\"payload\"], 1,")
 	ok(rune_at >= 0, "battle.gd: the rune apply site is gone")
 	# Batch AA moved these derivations below the rune block. The Focus three
 	# were the reason ("the Hunter batch would have hit this on Focus") and

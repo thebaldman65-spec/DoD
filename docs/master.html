@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-05 (Batch AH)</b></p>
+<p align="right"><b>Last updated: 2026-08-06 (Batch AI)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -39,15 +39,18 @@ strength — an alpha testing aid so a tester can see every zone; saved with the
 <li><b>Spec choice:</b> offered per hero after the first victory. Three cards per class, each
 showing the spec name, its <b>archetype</b> in bold (mouseover for the archetype explanation),
 blurb, passive, and full ability details. The choice is permanent for the run.</li>
-<li><b>Victory rewards:</b> gold + talent points for every hero — 1 per fight, 2 per elite,
-2 for the mini-boss, 3 for a zone boss (rests and shops award none). The mini-boss and the
-zone boss also each hand every hero <b>an ability pick, three offered</b> (§6a). The FINAL boss awards no talent points —
+<li><b>Victory rewards:</b> gold for every fight, and talent points on the beats that
+matter — <b>1 for confirming a spec, 1 per mini-boss, 2 per zone boss</b> (§7). Regular
+fights and rests award none. An <b>elite</b> pays 1 into the separate ELITE purse, which
+can only widen a row already picked. The mini-boss and the zone boss also each hand every
+hero <b>an ability pick, three offered</b> (§6a). The FINAL boss awards no talent points —
 points earned when nothing follows are unspendable; its relic is the prize. Fallen heroes
 return after a won battle at 20% max HP ("the Untouched refuse to stay down").</li>
 <li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft.</li>
 <li><b>Saving:</b> auto-save to user://run_save.bin after every completed node AND after
 spec confirmation (including debug rerolls); Continue resumes at the map. Loading migrates
-members to newer fixed talent trees (points refunded) when a save predates them. Run end
+members to newer fixed talent trees when a save predates them; a save from before the
+row trees (§7) has its picks wiped and its points re-issued on the current schedule. Run end
 (win or wipe) clears the save.</li>
 </ul>
 
@@ -105,11 +108,12 @@ corridor. The boss tier is a single node: the last pre-boss tier funnels by desi
 that stands between an elite and a boss: an <b>elite warband carrying a boss-tier health
 pool</b> (every enemy at 1.5&times; its usual maximum, attack untouched — a longer fight, not
 a harder-hitting one). It occupies all three columns of its row, so every route through the
-zone goes through it. It pays <b>elite gold (80–100) and 2 talent points</b>, and its own
+zone goes through it. It pays <b>elite gold (80–100) and 1 talent point</b>, and its own
 spoil is an <b>ability pick</b> (§6a): with the zone boss's pick that is two a zone, six a
 run.</p>
-<p><b>Elites are the snowball engine:</b> a skilled player routes toward them. On top of double
-talent points, an elite kill drops a <b>rune cache</b> for a random hero — three candidates
+<p><b>Elites are the snowball engine:</b> a skilled player routes toward them. An elite
+kill pays <b>1 ELITE talent point</b> — a point that cannot open a new row, only force a
+second node into one already picked (§7) — and drops a <b>rune cache</b> for a random hero — three candidates
 rolled at the kill, one chosen on the Party screen — plus a random consumable and a bigger
 gold purse (80–100).</p>
 <ul>
@@ -123,7 +127,7 @@ pool holds ~2 candidates; every zone keeps the same 11-tier ladder so the talent
 (~35 points/run) never shifts. Deeper-slot enemies are tinted redder, and the slot sets
 the stat multiplier (§4.3). The finale's boss — the <b>Withered Warden</b> again, by
 design — is the FINAL boss: the run ends on its death.</li>
-<li><b>Zone completion:</b> killing the boss awards a relic unlock, big gold, 3 talent points,
+<li><b>Zone completion:</b> killing the boss awards a relic unlock, big gold, 2 talent points,
 an <b>ability pick for every hero</b> (§6a), and fully restores the party (HP and Mana)
 before the descent.</li>
 <li><b>Map screen:</b> zone art background, node ladder with a <b>tier readout</b> ("Tier 7
@@ -282,7 +286,7 @@ turn, armor ×0.7, +25% crit chance against it, and enemies actively exploit Bro
 their hardest affordable attack. <b>Bosses cannot be Stunned unless Broken</b> (stuns fizzle
 with an IMMUNE flag). Breaking triggers hitstop, a purple fracture flash, and a camera punch.
 After the lost turn, the Break meter resets to 0. Ward halves incoming BD; the Devout's
-Devoutness talent cuts it 5% per rank; Bulwark of Fortitude negates it entirely.</p>
+Devoutness talent cuts it 5%; Bulwark of Fortitude negates it entirely.</p>
 <h3>4.5 Bleed &amp; damage over time</h3>
 <ul>
 <li><b>Bleed</b> is a 0–100 buildup meter (chip shows Bl##). Wounding attacks add buildup
@@ -357,15 +361,15 @@ Shieldwall). Counts as Heavy Plating for Tenacity and Rally; the chip reads
 <tr><td>High Guard</td><td>Takes 25% less damage (Swordmaster talent, after a parry).</td></tr>
 <tr><td>Elemental Weakness</td><td>Elemental (non-physical) resistances reduced by 5% per
 talent rank (Warden's Crushing Blow talent); the chip shows the reduction ("−15%").</td></tr>
-<tr><td>Enraged</td><td>+3%/rank damage per stack for 5 turns, stacking ×3 (Berserker
+<tr><td>Enraged</td><td>+3% damage per stack for 5 turns, stacking &times;3 (Berserker
 talent, on dropping below half HP); the chip shows the live bonus.</td></tr>
 <tr><td>Unrelenting Assault</td><td>+10 Constitution × ranks invested, for 3 turns
 (Berserker talent, on dropping below 25% HP; at most once every 5 turns).</td></tr>
-<tr><td>Endurance</td><td>+1%/rank armor per turn without an external heal, capped at +75% (Warden talent);
+<tr><td>Endurance</td><td>+1% armor per turn without an external heal, capped at +75% (Warden talent);
 the chip tracks the streak and clears when healed.</td></tr>
-<tr><td>Iron Will</td><td>Takes 4%/rank LESS damage per debuff on the Warden (talent); a
+<tr><td>Iron Will</td><td>Takes 4% LESS damage per debuff on the Warden (talent); a
 permanent chip whose value follows the live debuff count.</td></tr>
-<tr><td>Crushing Blows</td><td>+3%/rank armor penetration per 20 total enemy-party
+<tr><td>Crushing Blows</td><td>+3% armor penetration per 20 total enemy-party
 bloodloss (Berserker talent); a permanent chip with the live value.</td></tr>
 <tr><td>Flame Shield</td><td>Takes 50% less damage; attackers are set Burning for 3 turns
 (Pyromancer talent ability, 2 turns).</td></tr>
@@ -532,7 +536,7 @@ but +5% damage <i>taken</i> (Arcane Ward softens it). <b>Backlash Ward:</b> EVER
 that arrives at maximum stacks restores 15 Mana instead — the maxed engine keeps paying,
 in Mana rather than stacks (Unlimited Power's overflow conversion takes priority when
 learned). Stacks persist until Stabilize vents the ones above its floor of 2. Talents
-move the ceiling: Resonant Core (+1/rank), the Overcharge talent ability (cap 8 plus
+move the ceiling: Resonant Core (+1), the Overcharge talent ability (cap 8 plus
 Resonant Core for the battle — stacks past 5 weigh 1.5×, 1.65× on a perfect cast, toward
 the per-stack bonuses above), and Singularity (no cap at all; the damage-taken penalty
 stops rising past 5 stacks). The Resonance readout on the nameplate always shows the true
@@ -675,7 +679,7 @@ enemies, 3.0 int, 3cd; allies regain 10% of their resource (Perfect: 20% instead
 Shieldwall — 25 Rage, 1.5, 2cd, self-cast with no target selection: +25% Block chance for
 2 turns (Perfect: 3). The blocks it buys count as <b>Heavy Plating</b> blocks, so they feed
 Tenacity and Rally — which Interpose's charges never do. The chip reads "+25% Block"; the
-Shield Mastery talent adds +1 turn per rank to every cast.<br>
+Shield Mastery talent adds +1 turn to every cast.<br>
 <i>Earnable (§6a):</i> Interpose — 25 Rage, 2.0 int, 4cd, self-cast with no
 target selection: every OTHER living
 ally gains 1 shield charge — the next attack against them is BLOCKED (Perfect: the
@@ -684,7 +688,7 @@ only guaranteed blocks in the game.<br>
 <i>Talent-granted:</i> Hold the Line — 30 Rage, 3.0, 6cd, the party takes 50% less Break
 damage for 2 turns and cannot die for a turn (Perfect: refunds 5 Rage); self-cast, no
 target selection.<br>
-<b>Talent lanes:</b> see §7 — Plate / Threat / Banner, node-gated.</li>
+<b>Talent lanes:</b> see §7 — Plate / Threat / Banner.</li>
 <li><b>Swordmaster (Bruiser)</b> — <b>Stat block:</b> 165 HP / 22% armor / <b>12%
 parry</b> (the technician; the only parry-stat character — see §4.3).<br>
 Passive <i>Seasoned Fighter</i>: fights in one of <b>two stances the PLAYER controls</b> —
@@ -748,7 +752,7 @@ for 2 turns and attackers are set Burning 3 turns (Perfect: also triggers an imm
 tick on every burning enemy). Firestorm — 30 Mana, 3.5, 4cd, capstone: 6-8 bolts at RANDOM
 enemies for 12% Atk each, each bolt applying 2 turns of Burn (Perfect: the bolts spread
 evenly across the living instead of falling at random).<br>
-<b>Talent lanes:</b> see §7 — Kindling / Inferno / Detonation, node-gated.</li>
+<b>Talent lanes:</b> see §7 — Kindling / Inferno / Detonation.</li>
 <li><b>Cryomancer (Control)</b> — <b>Stat block:</b> 135 HP / 8% armor / +30% frost
 resist, −20% fire (the Pyromancer's reflection — each mage is armoured in his own
 element and soft to his opposite, so a fire warband and a frost warband ask genuinely
@@ -771,7 +775,7 @@ received, 2 turns), and for 3 turns every stack of Chilled the
 target gains also chills one other random enemy (Perfect: 4 turns). Shatter (capstone) —
 30 Mana, 4.0, 5cd: every Chilled enemy takes 10% of Attack PER STACK of Chilled on it;
 only castable while someone is Chilled (Perfect: cooldown becomes 4).<br>
-<b>Talent lanes:</b> see §7 — Deep Freeze / Shatterpoint / Winter, node-gated.</li>
+<b>Talent lanes:</b> see §7 — Deep Freeze / Shatterpoint / Winter.</li>
 <li><b>Arcanist (Ramp)</b> — <b>Stat block:</b> 155 HP / 6% armor / +20% arcane &amp;
 +10% shadow resist, −15% physical (the most health and the least armour in the class:
 Resonance bills him +5% damage taken per stack and Arcane Cannon recoils 15% of its
@@ -799,7 +803,7 @@ Wrath's own per-stack scalings count raw stacks (Perfect: 1.65× instead). Magi'
 (capstone) — 30 Mana, 15% Atk arcane to ALL enemies / 4.0, 4cd;
 +4% damage per Resonance stack and BD = 2.5 × stacks; recoil 15% of damage dealt, −3%
 per enemy hit (Perfect: costs 3.5 initiative instead).<br>
-<b>Talent lanes:</b> see §7 — Resonance / Overload / Control, node-gated.</li>
+<b>Talent lanes:</b> see §7 — Resonance / Overload / Control.</li>
 </ul>
 <h3>6.3 Cleric</h3>
 <ul>
@@ -823,7 +827,7 @@ resource. Empower (+1 Mercy): they return at FULL health and resource with 5 tur
 Renewal (Perfect: 25% instead). Divine Plea — 2 Mercy, 3.0, 2cd; FULLY heal an ally.
 Empower (+1 Mercy): also cleanse all their debuffs and Hallow them against new ones
 for 3 turns (Perfect: restores 10 Mana).<br>
-<b>Talent lanes:</b> see §7 — Radiance / Mercy / Sanctuary, node-gated.</li>
+<b>Talent lanes:</b> see §7 — Radiance / Mercy / Sanctuary.</li>
 <li><b>Devout (Warder)</b> — <b>Stat block:</b> 175 HP / 18% armor / +15% holy &amp;
 +10% fire resist, −10% shadow (the armoured priest, and the tallest health pool of the
 three BY DESIGN — Divine Shield, Afterglow, Healing Pulse and the Faith release all pay
@@ -845,7 +849,7 @@ evenly among living heroes for 3 turns; BD still lands on the struck hero (Perfe
 turns). Bulwark of Fortitude (capstone) — 30 Mana, 3.0, 3cd; for 3 turns the party
 takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each
 turn (Perfect: the party instantly heals 5%).<br>
-<b>Talent lanes:</b> see §7 — Bulwark / Faith / Zeal, node-gated.</li>
+<b>Talent lanes:</b> see §7 — Bulwark / Faith / Zeal.</li>
 <li><b>Occultist (Pressure)</b> — <b>Stat block:</b> 155 HP / 8% armor / +25% shadow &amp;
 +10% nature resist, −20% fire (the least armour in the party — robes and appetite — but a
 real pool to spend from, because Dark Pact pays in his blood and his heals key off his
@@ -871,7 +875,7 @@ chosen minions, inflicting <b>Psychosis</b> for 3 turns (Perfect: 4 turns). Mass
 Hysteria (capstone) — 30 Mana, 4.0, 4cd; next turn every minion strikes a fellow with
 DOUBLE Break damage, Sundering them 3 turns (Perfect: 3cd). Bosses resist
 both.<br>
-<b>Talent lanes:</b> see §7 — Ruin / Madness / Leech, node-gated.</li>
+<b>Talent lanes:</b> see §7 — Ruin / Madness / Leech.</li>
 </ul>
 <h3>6.4 Hunter</h3>
 <ul>
@@ -940,7 +944,7 @@ summon picker, not on its own hotkey.<br>
 Mark of the Hunt — 15 Mana, 2.0, 3cd. Marks an enemy for 5 turns (Perfect: 7): the hunter
 and their beast deal +25% damage to it, and every strike on it restores 3% of the hunter's
 max Mana. The cooldown resets if the marked enemy dies. Works with or without a beast.<br>
-<b>Talent lanes:</b> see §7 — Devotion / The Pack / Handler, the lane framework's pilot.</li>
+<b>Talent lanes:</b> see §7 — Devotion / The Pack / Handler.</li>
 <li><b>Sharpshooter (Nuker)</b> — <b>Stat block:</b> 140 HP / 10% armor / Constitution 90 /
 +10% nature resist, −10% physical (the lightest of the three: a marksman who wants to be at
 range and pays for being reached).<br>
@@ -968,8 +972,7 @@ Pinning Shot — 20 Mana, 2.5, 3cd, 20% Atk: the target is Slowed AND Dazed for 
 Called Shot — 25 Mana, 3.0, 3cd, 25% Atk: pick the spot before loosing — Sunder (−35%
 armor, 2 turns), +30 Break damage, or Exposed (3 turns). A picker opens on cast (the bot
 picks armor against armored targets).<br>
-<b>Talent lanes:</b> see §7 — Precision / Penetration / Tempo, the first NODE-GATED
-tree.</li>
+<b>Talent lanes:</b> see §7 — Precision / Penetration / Tempo.</li>
 <li><b>Survivalist (Pressure)</b> — <b>Stat block:</b> 170 HP / 18% armor / +25% nature
 resist, +10% shadow, −15% arcane (the toughest Hunter by design — his passive rewards being
 struck and Tripwire wants him in the fray; deep nature affinity from a life spent in it,
@@ -1002,358 +1005,199 @@ an aimed trap waits for its mark, and releases if the mark dies first).<br>
 Harvest — 25 Mana, 3.0, 4cd: CONSUME every status on one enemy — 12% Atk per status
 consumed, healing yourself the same amount (Perfect: heals 150%). Cashing out strips your
 own Trapper bonus from the target.<br>
-<b>Talent lanes:</b> see §7 — Venom / Snares / Guerilla, node-gated.</li>
+<b>Talent lanes:</b> see §7 — Venom / Snares / Guerilla.</li>
 </ul>
 
 <h2>7. Talents</h2>
-<p><b>Economy:</b> talent points come from victories alone — <b>1 per fight, 2 per elite,
-2 per mini-boss, 3 per zone boss</b> (rests and shops award none; Waystone Shard +3 at run start). Points bank
-until spent on the Party screen.</p>
-<p><b>Every tree is a lane tree, and every one is purpose-designed</b> on the lane
-framework — all twelve specs.</p>
-<p><b>Lane framework rules:</b> a tree is three LANES of seven nodes — each lane a
-playstyle — plus three CAPSTONES of which only ONE may ever be taken. <b>Node pricing:</b>
-the Nth distinct node bought costs ceil(N/3) — 1,1,1,2,2,2,3… — while extra ranks in an
-open node always cost 1, so roughly a third of the tree fits in one run. <b>Exclusive
-pairs</b> bar each other but stay visible, greyed with the reason — the player must see
-the door they closed. Tooltips show the live cost and lane requirement.<br>
-<b>Two gating models exist.</b> The Beastmaster is points-gated: a lane's tier 2 opens
-at 3 points spent in that lane, tier 3 at 6, the capstone at 8. <b>Every other tree is
-node-gated:</b> tier 2 opens at 2 NODES bought in the lane, tier 3 at 4, the capstone at
-6 — with the escalating cost curve, node count is the stable gate a player can actually
-plan against.</p>
-<p><b>Berserker lanes (node-gated):</b><br>
-<b>BLOODLETTING</b> (wounds as an engine: keep bleed high, or burst it) — Savagery (+5
-Bleed/rank on bleed abilities ×3), Bloodcraze (heal 3%/rank max HP on enemy bleedout ×3),
-Crushing Blows (3%/rank armor pen per 20 enemy-party bleed ×3), Hemorrhage (enemies at
-80/70/60 bloodloss are Crippled ×3), Scent of Blood (+3%/rank damage per enemy bled out
-this battle ×3), Arterial Spray (bleedouts transfer 25%/rank of the buildup to another
-living enemy ×2), Blood Tithe (bleedouts grant 15/rank Rage ×2).<br>
-<b>FURY</b> (the risk dial) — Unstoppable (Blood Frenzy step 2%→+0.5%/rank ×3; raises the
-floor too), Battle Shout (grants the ability — a party-wide warcry; its bleed scaling is deliberate
-cross-lane synergy), Enraged (below-50% trigger: +3%/rank damage, 5 turns, stacks ×3), Reckless Fury
-(+5%/rank damage dealt AND taken ×3; <i>exclusive with Measured Rage</i>), Measured Rage
-(take 8% less damage; <i>exclusive with Reckless Fury</i>), Scar Tissue (the Frenzy floor
-holds 60/70/75% of the peak instead of 50%), Deathwish (+6%/rank damage while below 35%
-health ×3).<br>
-<b>WARPATH</b> (momentum: keep swinging, or survive to keep swinging) — Vitality (+5%/rank
-max HP ×3), Deafening Cry (Battle Shout cooldown −1), Unrelenting Assault (below-25%
-trigger: +10/rank Constitution, 3 turns, once per 5 ×3), Flurry (Hack and Slash strikes an
-extra time), Bloodied Momentum (enemy deaths grant 15/rank Rage ×2), Relentless (Hack and
-Slash costs 5/rank less Rage ×2), Second Wind (first drop below 25% health each battle:
-+40 Rage).<br>
-<b>CAPSTONES</b> — Exsanguination (Bloodletting: bleedout deals 35% max HP and the full
-100 buildup surges to another living enemy, chaining across the field — each chain visits
-an enemy once), Undying Rage (Fury: below 25% health he cannot die and deals +50% damage;
-the hit that would have killed him ends it at 1 HP, once per battle), Rampage (Warpath:
-grants the ability — three strikes that recast free on a kill).</p>
-<p><b>Swordmaster lanes (node-gated):</b><br>
-<b>BLADE</b> (damage, crit, and the Aggressive stance) — Aggressive Stance (the Aggressive
-stance deals an additional 3%/rank damage ×3), Lunge (grants the ability), Killing Edge
-(+4%/rank crit while in the Aggressive stance ×3), Precision Strikes (+5%/rank crit vs
-Dazed / Crippled / Exposed ×3), Seasoned Fighter (+3%/rank crit for Lunge and Overpower ×3),
-Overwhelm (+3%/rank damage per debuff on the target ×3), Tempo (switching stance grants
-+10%/rank damage for 1 turn ×2).<br>
-<b>POISE</b> (the defensive half, and ALL the parry) — Defensive Stance (the Defensive
-stance blocks an additional 3%/rank damage taken ×3), Sword Mastery (+3%/rank parry ×3),
-Bracing (+8/rank Constitution while in the Defensive stance ×3), Swordsmanship
-(perfect-Guard-Change parry buff +5%/rank ×3), High Guard (25% less damage for 1 turn after a
-parry), Riposte (<b>Counter Attack</b>: answer every parry with a Strike), Deflection
-(parry works against RANGED attacks too — arrows and spells alike).<br>
-<b>BREAKER</b> (fill their meter, then live in the window) — Pressure Point (Pommel Strike
-+8/rank BD ×3), Sunder Guard (Shatterpoint +8/rank BD ×3), Dominant Presence (armor
-+5%/rank per debuff applied ×3), Opportunist (counter enemy misses with a free Overpower),
-No Quarter (Breaking an enemy grants 15/rank Rage ×2), Punishment (Overpower +15%/rank
-damage against Broken targets ×3; <i>exclusive with Off Balance</i>), Off Balance (ALL the
-Swordmaster's damage +5%/rank against Broken targets ×3; <i>exclusive with
-Punishment</i>).<br>
-<b>CAPSTONES</b> — Execute (Blade: grants the ability), Untouchable (Poise: while in the
-Defensive stance, parried attacks deal NOTHING — no damage, no Break damage, the floor of
-1 included — and every parry is answered with a free Pommel Strike, so every parry is also
-a stun), Guard Breaker (Breaker: when a Broken enemy recovers, its Break meter refills to
-50 instead of resetting to 0 — the guard never truly returns).</p>
-<p><b>Warden lanes (node-gated):</b><br>
-<b>PLATE</b> (mitigation and the block payoffs — everything that answers being hit) —
-Unkillable (heal 2%/rank of BASE max HP on every Block — base excludes Tenacity's in-battle gains ×3), Toughness (Constitution +5%/rank of
-max HP ×3), Endurance (+1%/rank armor per unhealed turn, capped +75% ×3), Tenacity (+5 max HP per
-Heavy Plating block, battle-long), Shield Mastery (Shieldwall's stance holds +1 turn/rank ×2), Plate
-Discipline (the Heavy Plating climb steepens +3%/rank — 11/14/17% per unblocked hit ×3),
-Battered Not Broken (Blocking removes 8/rank Break from his own meter ×3).<br>
-<b>THREAT</b> (he wants to be hit; this lane is what happens to whoever obliges) —
-Richocet (5%/rank chance to Stun the attacker on Block ×3), Provoke (Mocking Blow taunts
-+1 foe/rank ×2), Iron Will (takes 4%/rank LESS damage per debuff on him ×3), Sundering
-(Crushing Blow splashes 25%/rank of its BD to Adjacent ×3), Spite (attackers take 8%/rank
-of the damage they deal him back ×3; <i>exclusive with Bruising Guard</i>), Bruising
-Guard (Blocking deals 10/rank BD to the attacker ×3; <i>exclusive with Spite</i>), Grudge
-(+6%/rank damage against enemies HIS taunt holds ×3).<br>
-<b>BANNER</b> (the half that protects other people) — Tank and Spank (Mocking Blow
-15%/rank chance to Empower a random ally ×3), Rally (Heavy Plating blocks grant the party
-+15% healing received, 2 turns), Rallying Stomp (War Stomp restores +5%/rank more
-resource ×3), Elemental Weakness (Crushing Blow shreds elemental resists 5%/rank, 3 turns
-×3), Bulwark Line (Interpose grants each ally +1 charge/rank ×2), Shared Vigil (allies
-take 3%/rank less damage while the Warden is above 50% health ×3), Steadfast (damage that
-would drop an ally below 20% health: the Warden absorbs 15%/rank of it ×3).<br>
-<b>CAPSTONES</b> — Immovable (Plate: the Warden CANNOT be Broken and his Block chance is
-+20%), Vengeful Guardian (Threat: the FIRST attack he Blocks each turn is answered with a
-free Crushing Blow — Sundering and Elemental Weakness riders included), Hold the Line
-(Banner: grants the ability — 50% less party Break damage for 2 turns and no one can die
-for a turn).</p>
-<p><b>Holy lanes (node-gated):</b><br>
-<b>RADIANCE</b> (throughput: bigger heals, cheaper heals, less waste) — Triage (instant
-heals can CRIT ×1.5 off the Cleric's crit chance; all healing +3%/rank ×3), Soothing
-Touch (Renewal costs 5/rank less Mana ×2), On the Mend (Renewal ticks 5%/rank chance to
-dispel ×3), Holy Capacitor (5%/rank of overhealing banks, released by the next Heal ×3),
-Swift Mending (Heal cooldown −1), Radiant Cascade (a CRITICAL heal splashes 25%/rank of
-its value onto the lowest-health other ally ×2; <i>exclusive with Overflow</i>), Overflow
-(15%/rank of any overhealing spills onto the lowest-health other ally immediately,
-reading the same overheal Capacitor banks from ×2; <i>exclusive with Radiant
-Cascade</i>).<br>
-<b>MERCY</b> (the resource economy: earning stacks, holding them, spending them, and
-Empower) — Heavenly Aura (each held stack grants +5%/rank healing done atop the base 5%
-×3), Holy Light (perfect casts restore 1%/rank max Mana ×3), Zealous Light (the Cleric
-begins every battle with 1 Mercy/rank ×3), Sanctified (Mercy spends have a 10%/rank
-chance to consume nothing ×3), Resurrection (grants the ability), Ardor (while holding 4
-or more Mercy — 3 or more at rank 2 — Empowering consumes no stack ×2), Martyr's Vigor
-(Mercy's ceiling rises to 6, then 7 ×2).<br>
-<b>SANCTUARY</b> (the safety net: keeping people from dying, rather than healing them
-after) — Guardian Angel (the Mercy threshold rises 3%/rank from 50% ×3), Divine Presence
-(end of the Cleric's turn: the lowest ally heals 1%/rank of their max ×3), Last Hope
-(allies under 25% health receive 5%/rank more healing ×3), Inner Faith (+5%/rank max
-health ×3), Blessed Vestments (allies with Renewal on them take 5%/rank less damage ×2),
-Beacon (at the start of each of the Cleric's turns, every ally below 25% health heals
-5%/rank of their max ×2), Serenity (once per battle, the first ally to take lethal
-damage survives at 1 HP).<br>
-<b>CAPSTONES</b> — Divine Plea (Radiance: grants the ability), Avatar of Mercy (Mercy:
-+1 Mercy at the start of each of her turns, and Empower costs no stack — it supersedes
-Ardor, never a double refund), Living Sanctum (Sanctuary: all the healing she grants a
-single ally — Heal, Renewal and its ticks, Divine Plea — also heals the whole party for
-25% of its value; Hymn is already the whole party, so it does not echo itself).</p>
-<p><b>Devout lanes (node-gated):</b><br>
-<b>BULWARK</b> (the shield itself — Faith comes FROM absorbs, so the shield lane is the
-engine block of the whole Conviction system) — Blessed Barrier (4%/rank of absorbed
-damage becomes healing for the holder ×3), Radient Aegis (15%/rank chance the shield
-echoes onto another ally ×3), Afterglow (on break the holder heals 5%/rank of the
-Devout's max health ×3), Warded Robes (+10%/rank armor for the holder while the shield
-holds ×2), Stalwart (the shield absorbs 35/40/45% of the Devout's max health ×3;
-<i>exclusive with Bastion</i>), Bastion (Divine Shield's cooldown −1 — a bigger shield,
-or a more frequent one; <i>exclusive with Stalwart</i>), Unyielding Aegis (a breaking
-shield immediately re-forms at 30%/rank of its original strength, once per cast ×2).<br>
-<b>FAITH</b> (the stack economy: earn faster, keep longer, spend deeper) — Communion
-(5-stack releases spread: 20%/rank × their own stacks chance for each other member ×3),
-Unwavering Faith (+5%/rank max health — his output stat ×3), Devoutness (the party takes
-5%/rank less Break damage ×3), Blessed are the Faithful (the release heal restores
-20/25/30% max health ×3), Sacred Covenant (a lethal save heals 5%/rank max health and
-grants that many Faith ×3), Fervor (while Consecrated Ground holds, every ally gains
-1 Faith per rank at the start of their turn ×2 — Faith's second source, and its only
-party-wide one), Binding Oath (a release keeps 1 Faith per rank instead of resetting to
-zero ×2).<br>
-<b>ZEAL</b> (everything else he casts) — Cleansing Waters (while Consecrated Ground or
-Sacred Resolve holds, each member has a 15%/rank chance per turn to shed one harmful
-effect ×3), Righteous Fire (Consecrated Ground reflects 15/20/25% of damage taken ×3),
-Sacred Resolve (grants the ability), Healing Pulse (while either banner holds, the party
-heals 2%/rank of the Devout's max health per turn ×3), Crusader's Tempo (Blessing of
-Zeal ticks its target's cooldowns down 1 additional turn per rank ×2), Purity (Blessing
-of Zeal also grants its target a true Divine Shield absorbing 10%/rank of the Devout's
-max health — it builds Faith like any other ×2), Lifewell (damage reflected by
-Consecrated Ground heals the party for 20%/rank of the amount reflected ×3).<br>
-<b>CAPSTONES</b> — Bulwark of Fortitude (Bulwark: grants the ability), Apostle (Faith:
-releases no longer consume stacks — an ally at 5 Faith stays at 5, and every further
-gain triggers the release again), Judgement (Zeal: while Consecrated Ground holds, every
-enemy that damages a hero is Sundered for 2 turns and takes Break damage equal to 20% of
-the damage it dealt).</p>
-<p><b>Sharpshooter lanes (node-gated):</b><br>
-<b>PRECISION</b> (Focus, crit chance, crit damage) — Steady Hands (+4%/rank crit ×3),
-Perfect Form (crits +20 Focus), Deep Focus (cap 150), Executioner's Eye (crit mult
-→×2.1/2.2/2.3; <i>exclusive with Consistent Aim</i>), Consistent Aim (×1.5 crits but +30%
-chance), Unwavering (switching halves Focus instead of clearing), Tunnel Vision (+50% crit
-vs the worked target, −50% vs others; <i>exclusive with Spray of Arrows</i>).<br>
-<b>PENETRATION</b> (armor, Break, finishing the party's work) — Armor Piercer (ignore
-8%/rank armor ×3), Sundering Shot (crits +15 BD), Bonecracker (+12%/rank vs Broken ×2),
-Opportunist's Aim (Powershot scales +4%/point), Exposed Nerve (crits apply Exposed 3t),
-No Cover (attacks CANNOT be made to miss — a bypass, not a modifier), Overkill (kill
-overflow carries to another enemy at full value).<br>
-<b>TEMPO</b> (speed, cooldowns, Focus acceleration) — Fletcher's Speed (+5 Speed/rank ×3),
-Snap Shot (first ability each fight: free, no cooldown), Muscle Memory (+10/rank Focus
-gain ×2), Opening Volley (start fights at 60 Focus), Follow-Through (crits tick ALL
-cooldowns), Second Nature (Hold Breath covers TWO attacks), Spray of Arrows (single-target
-attacks echo to a random enemy at 50%, Focus caps at 50).<br>
-<b>CAPSTONES</b> — One Shot (Precision: at max Focus, Aimed Shot EXECUTES any non-boss
-enemy below 35% health outright — elites included; otherwise double damage; Focus resets),
-Through and Through (Penetration: ignore ALL armor, crits refund their Mana), Rapid Fire
-(Tempo: 35% of casts skip their cooldown).</p>
-<p><b>Survivalist lanes (node-gated):</b><br>
-<b>VENOM</b> (poison as a damage engine) — Potent Toxins (+1/rank poison per stack ×3),
-Coated Blades (basics Poison 2t), Virulence (+1 stack/rank on applications ×2;
-<i>exclusive with Slow Acting</i>), Slow Acting (half tick, double duration, uncleansable),
-Creeping Death (poisoned deaths pass their stacks on), Necrosis (poisoned enemies take
-+20% from ALL sources), Plague Bearer (turn start: the rot leaps 3 stacks; <i>exclusive
-with Deadfall Network</i>).<br>
-<b>SNARES</b> (traps, retaliation, denial) — Reinforced Wire (tripwire +10%/rank of Attack
-×3), Quick Rigging (Snare cd −1, springs also Cripple), Cruel Devices (traps +15%/rank
-×2), Snap Shut (tripwire bites ranged too), Caught Fast (trap victims unhealable 3t), Bone
-Breaker (traps +30 BD), Deadfall Network (TWO traps at once).<br>
-<b>GUERILLA</b> (survival and party utility) — Woodcraft (+6%/rank max HP ×3), Hit and Run
-(applying a status grants Elusive 1t), Scavenger (+8%/rank max Mana per enemy death ×2),
-Field Medic (turn start: cleanse a random ally), Vulture (+30% vs enemies with 3+
-statuses), Ghillie Suit (40% less likely to be targeted while allies stand), Improvised
-(first ability starts no cooldown).<br>
-<b>CAPSTONES</b> — Epidemic (Venom: every enemy PERMANENTLY Poisoned; his poison never
-cleanses or expires), The Whole Forest (Snares: Tripwire never expires and bites on every
-enemy action — melee, ranged, or spellwork), Force of Nature (Guerilla: Trapper's bonus
-rises to +20% per status and applies to the ENTIRE party).</p>
-<p><b>Beastmaster lanes:</b><br>
-<b>DEVOTION</b> (stay with one beast) — Wild Communion (Loyalty strike step 5%→+1.5%/rank
-×3), Unbroken Watch (+1 Loyalty on no-damage turns), Absolute Devotion (ceiling 7; boon
-still doubles at 5), Devoted Fury (Bestial Wrath +1 turn per 2 Loyalty), Steadfast Bond
-(death halves Loyalty instead of zeroing; <i>exclusive with Vengeance</i>), Ancient Pact
-(boon TRIPLED at 5, but the beast can never be healed), Lone Bond (ONE unswappable beast
-per fight; Loyalty starts 3, caps 8; <i>exclusive with Wild Rotation</i>).<br>
-<b>THE PACK</b> (rotate) — Quick Whistle (swap cooldown −1/rank ×2), Feral Momentum (+8%/rank
-companion damage per different beast fielded ×3), Shared Devotion (summon/swap Loyalty goes
-to EVERY beast), Herald (arrival effects strike an extra target), Menagerie (absent summoned
-beasts keep half their boon), No Beast Left (beast death → next summon free, no cooldown),
-Wild Rotation (swap has no cooldown; Loyalty caps 2; <i>exclusive with Lone Bond</i>).<br>
-<b>HANDLER</b> (your own game) — Master's Aim (Quick Shot +6%/rank Attack ×3), Beast Within
-(+10%/rank companion max health ×3), Deep Reserves (Spirit Bond +8%/rank max Mana ×2),
-Instinctive (Hunter's Instinct empowers 5 shots), Symbiosis (companion strikes restore 2%
-max Mana), Vengeance (beast death → inherit its boon +30% damage 5 turns; <i>exclusive with
-Steadfast Bond</i>), Lone Hunter (no companion: costs −40%, damage +25%).<br>
-<b>CAPSTONES</b> — One Soul (Devotion: hunter and beast split ALL damage evenly; Loyalty
-gain doubled), The Pack (Pack lane: TWO beasts active at once — both strike when the hunter
-attacks, each keeps its own Loyalty meter and grants its own Pack Bond boon; summoning a
-third replaces whichever active beast has lower Loyalty), Apex Predator
-(Handler: Quick Shot triggers an extra free companion strike; Kill Command resets on every
-enemy death).</p>
-<p><b>Occultist lanes (node-gated):</b><br>
-<b>RUIN</b> (the detonation engine: stack the mark, blow it, chain it) — Empowered Hex
-(Hex of Ruin 25%/rank chance per target to also apply Decay ×3), Deeper Hex (each Ruin
-stack makes its bearer take 3/4/5% more damage, up from the base 2% ×3), Corrupted
-Channeling (a Crippled enemy's attacks heal a random hero for 25%/rank of the damage
-dealt ×3), Broken Will (the Occultist deals +5%/rank Break damage ×3), Grim Focus (Ruin
-detonations deal +25%/rank damage ×2), Entropy (enemies bearing any Ruin take 5/rank
-Break damage at the start of each of their turns ×3), Unraveling (a detonation seeds
-1/rank Ruin in every other enemy ×3).<br>
-<b>MADNESS</b> (enemies turned on each other — and the betrayal now feeds the other two
-lanes) — Spread of Madness (Psychosis 15%/rank chance per turn to leap to a fellow, the
-newly maddened gaining a Ruin stack ×3), Whispers (Psychosis seizes its victim 60/70/80%
-of the time, up from the base 50% ×3), Mind Flay (grants the ability), Umbral Mirror
-(enemy debuffs aimed at heroes have a 10%/rank chance to rebound onto the attacker,
-feeding Ruin ×3), Delirium (a Psychotic, Bewitched or Hysterical enemy striking a fellow
-marks the victim with 1/rank Ruin ×2), Cackling Mirror (an enemy striking a fellow heals
-the party for 3%/rank of the damage dealt ×2), Lingering Torment (an expiring madness
-effect leaves Decay for 2/rank turns ×2).<br>
-<b>LEECH</b> (suffering into sustain: Holy restores, the Devout prevents, the Occultist
-siphons) — Soul Leech (heroes striking a Ruined target heal 15/20/25% of damage dealt, up
-from the base 10% ×3), Invigoration (Dark Pact also restores 2%/rank max Mana per turn
-for 3 turns ×3), Gluttony (the Ruin lifesteal drinks another 3%/rank of the damage dealt
-×3), Pleasure from Pain (at the end of the Occultist's turn the party heals 0.5%/rank of
-his max health per UNIQUE enemy-team debuff ×3), Murderous Intent (a Bewitched kill heals
-the lowest-health member 10%/rank of the Occultist's max health ×3), Pact of Flesh (Dark
-Pact bleeds 10%/rank less of his max health — free at two ranks; <i>exclusive with Dark
-Barter</i> ×2), Dark Barter (Dark Pact heals the party 25/35% of each member's max
-health, up from the base 15%; <i>exclusive with Pact of Flesh</i> ×2).<br>
-<b>CAPSTONES</b> — Avatar of Ruin (Ruin: detonations no longer consume their stacks — a
-target held at 5 Ruin detonates again at the start of each of its turns), Mass Hysteria
-(Madness: grants the ability), Soul Glut (Leech: whenever a hero heals by striking a
-Ruined target, the whole party heals the same amount).</p>
-<p><b>Pyromancer lanes (node-gated):</b><br>
-<b>KINDLING</b> (building the fire) — Accelerant (Burn ticks deal +1%/rank of Attack ×3),
-Explosive Force (crits with fire abilities extend the target's Burn +1 turn/rank ×3),
-Invigorating Ashes (each Burn tick 5%/rank chance to restore 2% max Mana ×3), Flame
-Shield (grants the ability — attackers ignite themselves on it), Conflagration (Flamewave
-applies +1 turn/rank of Burn, fresh fires and extensions alike ×2), Cinder Trail
-(Fireball also applies 1 turn/rank of Burn to one random other enemy ×2), Ember Wind (an
-enemy dying Burning passes its remaining Burn to a random living enemy).<br>
-<b>INFERNO</b> (profiting while it burns) — Pyromaniac (Inferno Master grants +0.2%/rank
-more per turn of Burn on the enemy team, and its cap rises to match ×3), Molten Core (take
-2%/rank less damage from burning enemies ×3), Melt Armor (every Burn tick melts 1%/rank armor off the victim for the battle ×3),
-Heat Haze (Inferno Master's cap rises 10%/rank, +25% up to +70% alongside Pyromaniac 3;
-<i>exclusive with Scorched Earth</i> ×3), Scorched Earth (burning enemies deal 5%/rank
-less damage; <i>exclusive with Heat Haze</i> ×3), Ashes of Al'ar (on death 11%/rank
-chance to revive at 25% HP, once per battle ×3), Living Flame (while 3 or more enemies
-burn, regain 3%/rank max Mana each turn ×2).<br>
-<b>DETONATION</b> (cashing it in: every node is a different answer to "how do I get more
-out of one Detonation") — Super Nova (Detonation +3%/rank crit chance ×3), Implosion
-(Detonation 3%/rank chance to strike twice ×3), Seeding Embers (an enemy dying Burning
-grants +1%/rank damage per remaining Burn turn for the next turn ×3), Chain Reaction
-(Detonation splashes 20%/rank of its damage to every other burning enemy ×3), Fuse
-(Detonation 15%/rank chance to reset its own cooldown ×2), Blast Radius (Detonation
-consumes 25%/rank more of the target's remaining Burn damage ×3), White Heat (Detonation
-always crits a target with 5+ turns of Burn — 4+ at rank 2 ×2).<br>
-<b>CAPSTONES</b> — Firestorm (Kindling: grants the ability), Avatar of Flame (Inferno:
-Inferno Master loses its cap — every turn of Burn on the enemy team grants its full bonus —
-and the
-Pyromancer's fire damage ignores enemy fire resistance), Cataclysm (Detonation: after it
-resolves, it fires again at the burning enemy with the most Burn remaining for 60% of
-its damage and BD, chaining up to 3 additional times, each 60% of the one before; every
-link consumes its target's Burn as normal).</p>
-<p><b>Cryomancer lanes (node-gated):</b><br>
-<b>DEEP FREEZE</b> (reaching and holding Frozen) — Brittle Ice (Frozen enemies 2%/rank
-likelier to be crit, party-wide ×3), Frigid Grip (each Chilled stack slows 3%/rank harder
-×3), Whiteout (Blizzard victims 15%/rank chance to be Dazed 2 turns ×3), Freezing Advance
-(when an enemy Freezes, the Cryomancer's next attack against it deals +10%/rank damage
-×3), Cold Snap (Frozen lasts 1 additional turn/rank; <i>exclusive with Bitter Cold</i>
-×2), Bitter Cold (Freezing an enemy applies 1 stack/rank of Chilled to every other enemy;
-<i>exclusive with Cold Snap</i> ×3), Glacial Economy (Freezing an enemy restores 5%/rank
-of the Cryomancer's max Mana ×2).<br>
-<b>SHATTERPOINT</b> (the burst payoff) — Piercing Ice (Ice Lance +10%/rank crit damage
-×3), Empowered Frostbolt (Frostbolt +2%/rank of Attack ×3), Icy Veins (Ice Lance kills
-empower the next Ice Lance +15%/rank ×3), Splintering Shards (Razor Ice 20%/rank chance
-to strike a FOURTH time ×3), Lance Focus (Ice Lance costs 5/rank less Mana ×2), Crystal
-Edge (Ice Lance deals +5%/rank of Attack per Chilled stack on top of the base 5% ×3),
-Honed Shards (critical hits with Ice Lance apply 1 stack/rank of Chilled ×2).<br>
-<b>WINTER</b> (the field aura) — Hungering Cold (Chilled enemies deal 1%/rank less damage
-per stack ×3), Hypothermia (enemies take 1%/rank more damage per Chilled stack ×3), Rime
-(grants the ability), Frost Ward (the Cryomancer takes 4%/rank less damage from Chilled
-enemies ×3), Icy Resolve (Rime lasts 1 additional turn/rank ×2), Winter's Grasp (at the
-start of each of the Cryomancer's turns, 1 random Chilled enemy per rank gains a stack
-×3), Numbing Veil (Chilled enemies 5%/rank chance to miss ×3).<br>
-<b>CAPSTONES</b> — Shatter (Shatterpoint: grants the ability), Absolute Zero (Deep
-Freeze: Freezing no longer reduces the target's Chilled stacks — they hold at 4, and it
-refreezes the moment its freeze ends), Eternal Winter (Winter: EVERY enemy gains 1 stack
-of Chilled at the start of each of the Cryomancer's turns).</p>
-<p><b>Arcanist lanes (node-gated):</b><br>
-<b>RESONANCE</b> (the stack engine: ramp faster, cap higher, keep getting paid at the
-ceiling) — Arcane Mastery (+1%/rank crit per stack ×3), Mana Attunement (restore 2%/rank
-max Mana on every stack gained ×3), Harmonics (Arcane Explosion grants 1/rank additional
-Resonance ×2), Conduit (each stack grants +2%/rank damage on top of the base 15% ×3),
-Resonant Core (maximum Resonance +1/rank — Overcharge's raised cap climbs the same
-amount ×2), Unlimited Power (Resonance gained at max stacks becomes +2%/rank damage and
-+2%/rank max Mana, stacking all battle — takes priority over Backlash Ward ×3), Charged
-Bolts (while at maximum Resonance, damaging casts restore 5%/rank max Mana ×3).<br>
-<b>OVERLOAD</b> (the risk half: crits, echoes, and the big spenders escalating with the
-bill attached) — Critical Mass (every 3rd crit +20%/rank damage and restores 10%/rank
-max Mana ×3), Temporal Rift (crits 3%/rank chance to echo 25% of their damage at a
-random enemy ×3), Overcharge (grants the ability), Suppressing Fire (each Barrage bolt
-+0.25%/rank of Attack over the previous ×3), Cannoneer (Arcane Cannon +2.5%/rank damage
-per Resonance stack on top of the base 7.5% ×3), Barrage Master (Arcane Barrage fires
-1/rank additional bolt ×2), Volatility (Arcane Cannon and Magi's Wrath +5%/rank damage
-AND +5%/rank recoil ×3).<br>
-<b>CONTROL</b> (surviving what you built — the fork: run hot forever, or vent
-constantly) — Mindfulness (every 6/5/4 of his turns ALL cooldowns tick down 1 extra turn
-×3), Conversion (10%/rank of damage taken paid as Mana instead of health ×3), On the
-Edge (surviving an attack below 25/30/35% health grants 1 Resonance ×3), Stable
-Alignment (a single attack cannot remove more than 35/30/25% of max health ×3), Arcane
-Ward (the Resonance damage-taken penalty falls 1%/rank per stack, 5% → 2% ×3;
-<i>exclusive with Still Mind</i>), Still Mind (Stabilize leaves 1/rank additional stack
-standing ×2; <i>exclusive with Arcane Ward</i>), Feedback Loop (10%/rank of recoil
-damage paid as Mana instead of health ×3).<br>
-<b>CAPSTONES</b> — Singularity (Resonance: NO maximum — the damage-taken penalty stops
-rising past 5 stacks; with no cap to hit, Backlash Ward and Unlimited Power overflow
-never fire), Magi's Wrath (Overload: grants the ability), Master of Moments (Control:
-Stabilize consumes no stacks at all — full Mana and damage-reduction value from current
-stacks, every cast).</p>
+<p><b>Structure:</b> every tree is <b>three LANES × seven ROWS, plus a capstone row</b> —
+24 nodes, and all twelve specs are purpose-designed on it.</p>
+<p><b>A row holds one node per lane, and the player picks exactly ONE of the three.</b>
+That pick locks the other two in that row permanently: they stay visible and greyed,
+with the reason in the tooltip — the player must see the door they closed. Before a pick
+is made, the tooltip also names the two doors it would shut.</p>
+<p><b>Row 1 is open from the start; row N opens when row N−1 has been picked.</b> There is
+no lane requirement anywhere — a build can zig-zag across all three lanes, or run straight
+down one.</p>
+<p><b>The capstone row (row 8)</b> opens when all seven rows are picked. Take one, from any
+lane; there is no lane-purity requirement.</p>
+<p><b>Every node costs exactly 1 point and holds a single rank</b> — no exceptions, no
+ranked investment, no escalating price curve. <b>A complete tree is 8 nodes.</b></p>
+<p><b>Economy:</b> <b>1 point for choosing a spec</b> (paid the moment the awakening is
+confirmed), <b>1 per mini-boss, 2 per zone boss</b>. Regular fights, rests and shops award
+none, and the FINAL boss awards none — points earned when nothing follows are unspendable.
+A three-zone run therefore guarantees <b>1 + 3 + 4 = 8 points: exactly one complete
+tree</b>, so the question is never "how many nodes can I afford" but "which eight". (The
+Waystone Shard relic's +3 at run start and the point-granting events are earliness, not
+extra nodes.)</p>
+<p><b>ELITE POINTS are a separate purse.</b> An elite kill pays 1 (0–3 a run — elites are a
+25% roll on tiers 7+). They cannot open a new row. The only thing they buy is a
+<b>second node in a row already picked</b>, forcing that one row's door back open. The
+third node in that row stays shut forever. The Party screen shows the two purses
+separately, and the map's Party button badges both.</p>
+<p><b>Berserker</b> — <b>BLOODLETTING</b> (wounds as an engine: keep bleed high, or burst it) · <b>FURY</b> (the risk dial) · <b>WARPATH</b> (momentum: keep swinging, or survive to keep swinging)</p>
+<table border="1" cellpadding="4">
+<tr><th>Row</th><th>Bloodletting</th><th>Fury</th><th>Warpath</th></tr>
+<tr><td>1</td><td><b>Savagery</b> — All bleed-building Berserker abilities build +5.0 more Bleed.</td><td><b>Unstoppable</b> — Blood Frenzy grants 2.5% damage for every 5% of health missing (up from the base 2%).</td><td><b>Vitality</b> — +5.0% max HP.</td></tr>
+<tr><td>2</td><td><b>Bloodcraze</b> — When an enemy bleeds out, the Berserker heals 3.0% of max HP.</td><td><b>Battle Shout</b> — New ability: Battle Shout — the whole party gains +8% damage, plus 1% for every 20 points of blood buildup on the enemy party, for 2 turns (15 Rage, 2cd).</td><td><b>Deafening Cry</b> — Battle Shout&#x27;s cooldown is reduced by 1 turn.</td></tr>
+<tr><td>3</td><td><b>Crushing Blows</b> — For every 20 points of bloodloss on the enemy team, gain 3.0% armor penetration.</td><td><b>Enraged</b> — Dropping below 50% health grants a +3.0% damage buff for 5 turns (stacks up to 3 times).</td><td><b>Unrelenting Assault</b> — Dropping below 25% health grants +10.0 Constitution for 3 turns (at most once every 5 turns).</td></tr>
+<tr><td>4</td><td><b>Hemorrhage</b> — Enemies at 80.0 or more bloodloss are Crippled.</td><td><b>Reckless Fury</b> — +5.0% damage dealt AND +5.0% damage taken.</td><td><b>Flurry</b> — Hack and Slash strikes an extra time.</td></tr>
+<tr><td>5</td><td><b>Scent of Blood</b> — +3.0% damage for each enemy that has bled out this battle.</td><td><b>Measured Rage</b> — Take 8% less damage. A steadier hand than Reckless Fury.</td><td><b>Bloodied Momentum</b> — When an enemy is slain, the Berserker gains 15.0 Rage.</td></tr>
+<tr><td>6</td><td><b>Arterial Spray</b> — When an enemy bleeds out, 25.0% of its blood buildup transfers to another living enemy.</td><td><b>Scar Tissue</b> — The Blood Frenzy floor holds 60/70/75% of your peak bonus (instead of 50%).</td><td><b>Relentless</b> — Hack and Slash costs 5.0 less Rage.</td></tr>
+<tr><td>7</td><td><b>Blood Tithe</b> — An enemy bleeding out grants the Berserker 15.0 Rage.</td><td><b>Deathwish</b> — +6.0% damage dealt while below 35% health.</td><td><b>Second Wind</b> — The first time you drop below 25% health each battle, immediately gain 40 Rage.</td></tr>
+<tr><td>CAP</td><td><b>Exsanguination</b> — Bleedout deals 35% of max HP (up from 20%), and the victim&#x27;s full blood buildup surges to another living enemy — chaining across the field.</td><td><b>Undying Rage</b> — While below 25% health the Berserker cannot die and deals +50% damage. The hit that would have killed him ends the rage at 1 HP (once per battle).</td><td><b>Rampage</b> — New ability: Rampage — strike 3 times for damage and bloodloss; if the target dies, immediately recast on another enemy (40 Rage, 4.0 int, 4cd).</td></tr>
+</table>
+<p><b>Swordmaster</b> — <b>BLADE</b> (damage, crit, and the Aggressive stance) · <b>POISE</b> (the defensive half, and ALL the parry) · <b>BREAKER</b> (fill their meter, then live in the window)</p>
+<table border="1" cellpadding="4">
+<tr><th>Row</th><th>Blade</th><th>Poise</th><th>Breaker</th></tr>
+<tr><td>1</td><td><b>Aggressive Stance</b> — The Aggressive stance grants an additional 3.0% damage dealt.</td><td><b>Defensive Stance</b> — The Defensive stance blocks an additional 3.0% damage taken.</td><td><b>Pressure Point</b> — Pommel Strike deals +8.0 more Break damage.</td></tr>
+<tr><td>2</td><td><b>Lunge</b> — New ability: Lunge — 35 damage; applies Exposed in Aggressive stance, Cripple in Defensive (25 Rage, 3.5 int).</td><td><b>Sword Mastery</b> — +3.0% parry chance.</td><td><b>Sunder Guard</b> — Shatterpoint deals +8.0 more Break damage.</td></tr>
+<tr><td>3</td><td><b>Killing Edge</b> — +4.0% critical strike chance while in the Aggressive stance.</td><td><b>Bracing</b> — +8.0 Constitution while in the Defensive stance.</td><td><b>Dominant Presence</b> — Armor value is increased by 5.0% for every debuff the Swordmaster applies this battle.</td></tr>
+<tr><td>4</td><td><b>Precision Strikes</b> — +5.0% critical strike chance against Dazed, Crippled, and Exposed targets.</td><td><b>Swordsmanship</b> — A perfect Guard Change grants +5.0% more parry chance.</td><td><b>Opportunist</b> — When an enemy attack misses the Swordmaster, he counter attacks with Overpower (free).</td></tr>
+<tr><td>5</td><td><b>Seasoned Fighter</b> — Lunge and Overpower gain +3.0% critical strike chance.</td><td><b>High Guard</b> — Take 25% less damage for 1 turn after parrying an attack.</td><td><b>No Quarter</b> — Breaking an enemy grants the Swordmaster 15.0 Rage.</td></tr>
+<tr><td>6</td><td><b>Overwhelm</b> — +3.0% damage for every debuff on the target.</td><td><b>Riposte</b> — Counter Attack: immediately answer every parry with a Strike.</td><td><b>Punishment</b> — Overpower deals +15.0% damage against Broken targets.</td></tr>
+<tr><td>7</td><td><b>Tempo</b> — Switching stance grants +10.0% damage for 1 turn.</td><td><b>Deflection</b> — The Swordmaster&#x27;s parry works against RANGED attacks too — arrows and spells alike.</td><td><b>Off Balance</b> — All the Swordmaster&#x27;s damage is increased by 5.0% against Broken targets.</td></tr>
+<tr><td>CAP</td><td><b>Execute</b> — New ability: Execute — 55 damage / 50 BD; usable against targets below 20% health or Broken; a perfect guarantees a crit (30 Rage, 2.0 int, 3cd).</td><td><b>Untouchable</b> — While in the Defensive stance, parried attacks deal NO damage instead of 25%, and every parry is answered with a free Pommel Strike.</td><td><b>Guard Breaker</b> — When a Broken enemy recovers, its Break meter refills to 50 instead of resetting to 0.</td></tr>
+</table>
+<p><b>Warden</b> — <b>PLATE</b> (mitigation and the block payoffs — everything that answers being hit) · <b>THREAT</b> (he wants to be hit; this lane is what happens to whoever obliges) · <b>BANNER</b> (the half that protects other people)</p>
+<table border="1" cellpadding="4">
+<tr><th>Row</th><th>Plate</th><th>Threat</th><th>Banner</th></tr>
+<tr><td>1</td><td><b>Unkillable</b> — Every time you Block an attack, heal for 2.0% of maximum health.</td><td><b>Richocet</b> — Blocking an attack has a 5.0% chance to Stun the attacker.</td><td><b>Tank and Spank</b> — Mocking Blow has a 15.0% chance to Empower a random ally (2 turns).</td></tr>
+<tr><td>2</td><td><b>Toughness</b> — Constitution is increased by 5.0% of maximum HP.</td><td><b>Provoke</b> — Mocking Blow taunts 1.0 additional foe(s).</td><td><b>Rally</b> — Every attack Blocked by Heavy Plating grants the party +15% healing received for 2 turns.</td></tr>
+<tr><td>3</td><td><b>Endurance</b> — +1.0% armor for every turn the Warden is not healed by an external source (resets when healed).</td><td><b>Iron Will</b> — The Warden takes 4.0% less damage for every debuff currently on him.</td><td><b>Rallying Stomp</b> — War Stomp restores 5.0% more resource to allies.</td></tr>
+<tr><td>4</td><td><b>Tenacity</b> — Every attack Blocked by Heavy Plating increases maximum health by 5 for the rest of the battle.</td><td><b>Sundering</b> — Crushing Blow deals 25.0% of its Break damage to enemies Adjacent to the target (dead neighbors block the splash on their side).</td><td><b>Elemental Weakness</b> — Crushing Blow also reduces all elemental resistances of the target by 5.0% (3 turns).</td></tr>
+<tr><td>5</td><td><b>Shield Mastery</b> — Shieldwall&#x27;s stance holds 1.0 turn(s) longer (the perfect cast included).</td><td><b>Spite</b> — Attackers that damage the Warden take 8.0% of that damage back.</td><td><b>Bulwark Line</b> — Interpose grants each ally 1.0 additional shield charge(s).</td></tr>
+<tr><td>6</td><td><b>Plate Discipline</b> — Heavy Plating&#x27;s climbing Block bonus grows +3.0% faster per unblocked hit (8% becomes 11/14/17%).</td><td><b>Bruising Guard</b> — Blocking an attack deals 10.0 Break damage to the attacker.</td><td><b>Shared Vigil</b> — Allies take 3.0% less damage while the Warden is above 50% health.</td></tr>
+<tr><td>7</td><td><b>Battered Not Broken</b> — Blocking an attack removes 8.0 Break from the Warden&#x27;s own meter.</td><td><b>Grudge</b> — +6.0% damage against enemies currently taunted by the Warden.</td><td><b>Steadfast</b> — When damage would drop an ally below 20% health, the Warden absorbs 15.0% of it instead.</td></tr>
+<tr><td>CAP</td><td><b>Immovable</b> — The Warden cannot be Broken, and his Block chance is increased by 20%.</td><td><b>Vengeful Guardian</b> — The first attack the Warden Blocks each turn is answered with a free Crushing Blow.</td><td><b>Hold the Line</b> — New ability: Hold the Line — the party takes 50% less Break damage for 2 turns and cannot die for a turn (30 Rage, 3.0 int, 6cd).</td></tr>
+</table>
+<p><b>Holy</b> — <b>RADIANCE</b> (throughput: bigger heals, cheaper heals, less waste) · <b>MERCY</b> (the resource economy: earning stacks, holding them, spending them, and
+Empower) · <b>SANCTUARY</b> (the safety net: keeping people from dying, rather than healing them
+after)</p>
+<table border="1" cellpadding="4">
+<tr><th>Row</th><th>Radiance</th><th>Mercy</th><th>Sanctuary</th></tr>
+<tr><td>1</td><td><b>Triage</b> — Instant heals can CRIT (x1.5, using your critical strike chance), and all your healing is increased by 3.0%.</td><td><b>Heavenly Aura</b> — Each stack of Mercy grants 10.0% healing done (up from the base 5%).</td><td><b>Guardian Angel</b> — Allies falling below 53.0% health earn you a stack of Mercy (up from 50%).</td></tr>
+<tr><td>2</td><td><b>Soothing Touch</b> — Renewal costs 5.0 less Mana.</td><td><b>Holy Light</b> — Perfect casts restore 1.0% of your maximum Mana.</td><td><b>Divine Presence</b> — At the end of your turn, the lowest-health ally is healed for 1.0% of their maximum health.</td></tr>
+<tr><td>3</td><td><b>On the Mend</b> — Renewal ticks have a 5.0% chance to dispel one harmful effect from the bearer.</td><td><b>Zealous Light</b> — The Cleric begins each battle with 1.0 Mercy.</td><td><b>Last Hope</b> — Allies under 25% of their max health receive 5.0% more healing.</td></tr>
+<tr><td>4</td><td><b>Holy Capacitor</b> — 5.0% of your overhealing is stored and released by your next Heal.</td><td><b>Sanctified</b> — Spending Mercy has a 10.0% chance to consume no stacks.</td><td><b>Inner Faith</b> — Increases your maximum health by 5.0%.</td></tr>
+<tr><td>5</td><td><b>Swift Mending</b> — Heal&#x27;s cooldown is reduced by 1 turn.</td><td><b>Resurrection</b> — New ability: Resurrection — spend 1 Mercy to return a fallen ally to life with 20% health and resource; Empower (+1 Mercy): full health and resource plus 5 turns of Renewal (4.0 int, 3cd).</td><td><b>Blessed Vestments</b> — Allies with Renewal on them take 5.0% less damage.</td></tr>
+<tr><td>6</td><td><b>Radiant Cascade</b> — A CRITICAL heal also splashes 25.0% of its value onto the lowest-health other ally.</td><td><b>Ardor</b> — While the Cleric holds 4.0 or more Mercy, Empowering consumes no stack.</td><td><b>Beacon</b> — At the start of each of the Cleric&#x27;s turns, every ally below 25% health heals 5.0% of their maximum health.</td></tr>
+<tr><td>7</td><td><b>Overflow</b> — 15.0% of any overhealing spills onto the lowest-health other ally immediately.</td><td><b>Martyr&#x27;s Vigor</b> — Mercy&#x27;s maximum rises to 6.0.</td><td><b>Serenity</b> — Once per battle, the first ally to take lethal damage survives at 1 HP instead.</td></tr>
+<tr><td>CAP</td><td><b>Divine Plea</b> — New ability: Divine Plea — spend 2 Mercy to FULLY heal an ally; Empower (+1 Mercy): also cleanse all debuffs and Consecrate them against new ones for 3 turns (3.0 int, 2cd).</td><td><b>Avatar of Mercy</b> — The Cleric gains 1 Mercy at the start of each of her turns, and Empower costs no stack.</td><td><b>Living Sanctum</b> — All the healing the Cleric grants a single ally — Heal, Renewal and its ticks, Divine Plea — also heals the whole party for 25% of its value.</td></tr>
+</table>
+<p><b>Devout</b> — <b>BULWARK</b> (the shield itself — Faith comes FROM absorbs, so the shield lane is the
+engine block of the whole Conviction system) · <b>FAITH</b> (the stack economy: earn faster, keep longer, spend deeper) · <b>ZEAL</b> (everything else he casts)</p>
+<table border="1" cellpadding="4">
+<tr><th>Row</th><th>Bulwark</th><th>Faith</th><th>Zeal</th></tr>
+<tr><td>1</td><td><b>Blessed Barrier</b> — Divine Shield converts 4.0% of the damage it absorbs into healing for its holder.</td><td><b>Communion</b> — When a party member reaches 5 Faith, every other member has a (20.0 x their own Faith stacks)% chance to gain 1 stack.</td><td><b>Cleansing Waters</b> — While Consecrated Ground or Sacred Resolve holds, each party member has a 15.0% chance each turn to be cleansed of one harmful effect.</td></tr>
+<tr><td>2</td><td><b>Radient Aegis</b> — Casting Divine Shield has a 15.0% chance to cast it again on another ally.</td><td><b>Unwavering Faith</b> — Increases the Devout&#x27;s maximum health by 5.0%.</td><td><b>Righteous Fire</b> — Consecrated Ground reflects 15.0% of damage taken (up from the base 10%).</td></tr>
+<tr><td>3</td><td><b>Afterglow</b> — When Divine Shield breaks, its holder is healed for 5.0% of the Devout&#x27;s max health.</td><td><b>Devoutness</b> — The entire party takes 5.0% less Break damage.</td><td><b>Sacred Resolve</b> — New ability: Sacred Resolve — all damage received is split evenly among living heroes for 3 turns; Break damage still lands on the struck hero (25 Mana, 2.5 int, 5cd; Perfect: 4 turns).</td></tr>
+<tr><td>4</td><td><b>Warded Robes</b> — While Divine Shield holds, its holder has +10.0% armor.</td><td><b>Blessed are the Faithful</b> — The heal at 5 stacks of Faith restores 20.0% max health (up from the base 15%).</td><td><b>Healing Pulse</b> — While Consecrated Ground or Sacred Resolve holds, the party heals 2.0% of the Devout&#x27;s max health each turn.</td></tr>
+<tr><td>5</td><td><b>Stalwart</b> — Divine Shield absorbs 35.0% of the Devout&#x27;s max health (up from the base 30%).</td><td><b>Sacred Covenant</b> — Should Divine Shield prevent lethal damage, its holder is healed for 5.0% max health and gains 1 Faith stack.</td><td><b>Crusader&#x27;s Tempo</b> — Blessing of Zeal ticks its target&#x27;s cooldowns down 1.0 additional turn(s) on cast.</td></tr>
+<tr><td>6</td><td><b>Bastion</b> — Divine Shield&#x27;s cooldown is reduced by 1 turn.</td><td><b>Fervor</b> — While Consecrated Ground holds, every ally gains 1.0 Faith at the start of their turn.</td><td><b>Purity</b> — Blessing of Zeal also grants its target a Divine Shield absorbing 10.0% of the Devout&#x27;s max health.</td></tr>
+<tr><td>7</td><td><b>Unyielding Aegis</b> — When Divine Shield breaks, it immediately re-forms at 30.0% of its original strength (once per cast).</td><td><b>Binding Oath</b> — When an ally&#x27;s Faith releases at 5 stacks, they keep 1.0 instead of resetting to zero.</td><td><b>Lifewell</b> — Damage reflected by Consecrated Ground heals the party for 20.0% of the amount reflected.</td></tr>
+<tr><td>CAP</td><td><b>Bulwark of Fortitude</b> — New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.0 int, 3cd; Perfect: the party instantly heals 5%).</td><td><b>Apostle</b> — Faith releases no longer consume stacks: an ally at 5 Faith stays at 5, and every further Faith gain triggers the release again.</td><td><b>Judgement</b> — While Consecrated Ground holds, every enemy that damages a hero is Sundered for 2 turns and takes Break damage equal to 20% of the damage it dealt.</td></tr>
+</table>
+<p><b>Sharpshooter</b> — <b>PRECISION</b> (Focus, crit chance, crit damage) · <b>PENETRATION</b> (armor, Break, finishing the party's work) · <b>TEMPO</b> (speed, cooldowns, Focus acceleration)</p>
+<table border="1" cellpadding="4">
+<tr><th>Row</th><th>Precision</th><th>Penetration</th><th>Tempo</th></tr>
+<tr><td>1</td><td><b>Steady Hands</b> — +4.0% critical chance.</td><td><b>Armor Piercer</b> — Your attacks ignore 8.0% of the target&#x27;s armor.</td><td><b>Fletcher&#x27;s Speed</b> — +5.0 Speed.</td></tr>
+<tr><td>2</td><td><b>Perfect Form</b> — Critical hits grant +20 Focus.</td><td><b>Sundering Shot</b> — Critical hits apply 15 Break damage.</td><td><b>Snap Shot</b> — The first ability you use each fight costs no Mana and does not start its cooldown.</td></tr>
+<tr><td>3</td><td><b>Deep Focus</b> — The Focus cap rises from 100 to 150.</td><td><b>Bonecracker</b> — +12.0% damage against Broken enemies.</td><td><b>Muscle Memory</b> — Focus gain per attack increases by 10.0.</td></tr>
+<tr><td>4</td><td><b>Executioner&#x27;s Eye</b> — Lethal Aim&#x27;s critical multiplier rises to x2.1.</td><td><b>Opportunist&#x27;s Aim</b> — Powershot&#x27;s Break scaling doubles: +4% damage per full point instead of +2%.</td><td><b>Opening Volley</b> — You begin every fight with 60 Focus.</td></tr>
+<tr><td>5</td><td><b>Consistent Aim</b> — Critical hits deal x1.5 again — but you gain +30% critical chance.</td><td><b>Exposed Nerve</b> — Critical hits apply Exposed for 3 turns.</td><td><b>Follow-Through</b> — Critical hits reduce ALL your cooldowns by 1.</td></tr>
+<tr><td>6</td><td><b>Unwavering</b> — Switching targets HALVES your Focus instead of clearing it.</td><td><b>No Cover</b> — Your attacks cannot be made to miss: Blind and Dazed do not affect you, and Elusive does not protect against you.</td><td><b>Second Nature</b> — Hold Breath&#x27;s guaranteed critical applies to your next TWO attacks.</td></tr>
+<tr><td>7</td><td><b>Tunnel Vision</b> — +50% critical chance against the enemy you attacked last turn; -50% against every other enemy.</td><td><b>Overkill</b> — Excess damage from a killing blow carries to another enemy at full value.</td><td><b>Spray of Arrows</b> — Your single-target attacks strike one additional random enemy for 50% damage — but Focus can never exceed 50.</td></tr>
+<tr><td>CAP</td><td><b>One Shot</b> — At maximum Focus, Aimed Shot EXECUTES any non-boss enemy below 35% health outright (elites included); otherwise it deals double damage. Either way, Focus resets to 0.</td><td><b>Through and Through</b> — Your attacks ignore ALL armor, and every critical hit refunds its Mana cost.</td><td><b>Rapid Fire</b> — Each ability you use has a 35% chance not to consume its cooldown.</td></tr>
+</table>
+<p><b>Survivalist</b> — <b>VENOM</b> (poison as a damage engine) · <b>SNARES</b> (traps, retaliation, denial) · <b>GUERILLA</b> (survival and party utility)</p>
+<table border="1" cellpadding="4">
+<tr><th>Row</th><th>Venom</th><th>Snares</th><th>Guerilla</th></tr>
+<tr><td>1</td><td><b>Potent Toxins</b> — Your Poison deals +1.0 damage per stack.</td><td><b>Reinforced Wire</b> — Tripwire&#x27;s retaliation deals +10.0% of your Attack.</td><td><b>Woodcraft</b> — +6.0% max Health.</td></tr>
+<tr><td>2</td><td><b>Coated Blades</b> — Your basic attack applies Poison for 2 turns.</td><td><b>Quick Rigging</b> — Snare Trap&#x27;s cooldown is reduced by 1, and its spring also applies Cripple.</td><td><b>Hit and Run</b> — Whenever you apply a status to an enemy, you gain Elusive for 1 turn.</td></tr>
+<tr><td>3</td><td><b>Virulence</b> — Your Poison applications add +1.0 extra stack(s).</td><td><b>Cruel Devices</b> — Your traps deal +15.0% damage.</td><td><b>Scavenger</b> — Restore 8.0% max Mana whenever an enemy dies.</td></tr>
+<tr><td>4</td><td><b>Slow Acting</b> — Your Poison deals HALF damage but lasts TWICE as long and cannot be cleansed.</td><td><b>Snap Shut</b> — Tripwire also retaliates against RANGED attackers, not only melee.</td><td><b>Field Medic</b> — At the start of your turn, cleanse one debuff from a random ally.</td></tr>
+<tr><td>5</td><td><b>Creeping Death</b> — When a Poisoned enemy dies, its Poison stacks transfer to another enemy.</td><td><b>Caught Fast</b> — Enemies caught by your traps cannot be healed for 3 turns.</td><td><b>Vulture</b> — +30% damage against enemies afflicted by 3 or more different statuses.</td></tr>
+<tr><td>6</td><td><b>Necrosis</b> — Poisoned enemies take +20% damage from ALL sources, not just yours.</td><td><b>Bone Breaker</b> — Your traps apply 30 Break damage when they spring.</td><td><b>Ghillie Suit</b> — Enemies are 40% less likely to target you while another ally lives.</td></tr>
+<tr><td>7</td><td><b>Plague Bearer</b> — At the start of your turn, one Poisoned enemy spreads 3 Poison stacks to another.</td><td><b>Deadfall Network</b> — You may have TWO traps active at once.</td><td><b>Improvised</b> — The first ability you use each fight does not start its cooldown.</td></tr>
+<tr><td>CAP</td><td><b>Epidemic</b> — Every enemy is PERMANENTLY Poisoned, and your Poison cannot be cleansed or expire.</td><td><b>The Whole Forest</b> — Tripwire never expires and bites on EVERY enemy action — melee, ranged, or spellwork.</td><td><b>Force of Nature</b> — Trapper&#x27;s bonus rises to +20% per different status — and applies to your ENTIRE party&#x27;s damage.</td></tr>
+</table>
+<p><b>Beastmaster</b> — <b>DEVOTION</b> (stay with one beast) · <b>THE PACK</b> (rotate) · <b>HANDLER</b> (your own game)</p>
+<table border="1" cellpadding="4">
+<tr><th>Row</th><th>Devotion</th><th>The Pack</th><th>Handler</th></tr>
+<tr><td>1</td><td><b>Wild Communion</b> — Companion strike damage per Loyalty stack rises to 6.5% (from the base 5%).</td><td><b>Quick Whistle</b> — Swap Companion&#x27;s cooldown is reduced by 1.0 turn(s).</td><td><b>Master&#x27;s Aim</b> — Quick Shot deals +6.0% of your Attack.</td></tr>
+<tr><td>2</td><td><b>Unbroken Watch</b> — The active beast gains +1 additional Loyalty on any turn it took no damage.</td><td><b>Feral Momentum</b> — +8.0% companion damage for each DIFFERENT beast summoned this fight.</td><td><b>Beast Within</b> — +10.0% companion max health.</td></tr>
+<tr><td>3</td><td><b>Absolute Devotion</b> — Loyalty ceiling rises from 5 to 7. The doubled Pack Bond still triggers at 5; stacks 6-7 add strike damage and the beast&#x27;s gift only.</td><td><b>Shared Devotion</b> — Summoning or swapping grants +1 Loyalty to EVERY beast, not only the arriving one.</td><td><b>Deep Reserves</b> — Spirit Bond restores +8.0% more max Mana.</td></tr>
+<tr><td>4</td><td><b>Devoted Fury</b> — Bestial Wrath lasts 1 turn longer per 2 Loyalty stacks on the active beast.</td><td><b>Herald</b> — Arrival effects strike an additional target: Guardian&#x27;s Roar taunts TWO enemies, Aguila&#x27;s dive hits TWO, and Bloodhowl doubles its Bleed on the bloodiest enemy.</td><td><b>Instinctive</b> — Hunter&#x27;s Instinct empowers 5 Quick Shots instead of 3.</td></tr>
+<tr><td>5</td><td><b>Steadfast Bond</b> — When a beast dies, its Loyalty returns at half rather than resetting to 0.</td><td><b>Menagerie</b> — The Pack Bond boon of every beast summoned this fight stays active at HALF strength while that beast is away.</td><td><b>Symbiosis</b> — Whenever your companion strikes, you restore 2% max Mana.</td></tr>
+<tr><td>6</td><td><b>Ancient Pact</b> — At 5 Loyalty the Pack Bond boon is TRIPLED instead of doubled — but the beast can no longer be healed by ANY source (Spirit Bond and Hunter&#x27;s Instinct included).</td><td><b>No Beast Left</b> — When a beast dies, your next summon this fight costs no Mana and ignores its cooldown.</td><td><b>Vengeance</b> — When your beast dies you inherit its Pack Bond boon and gain +30% damage, for 5 turns.</td></tr>
+<tr><td>7</td><td><b>Lone Bond</b> — You may summon only ONE beast per fight: it cannot be swapped, and cannot be re-summoned if it dies. Its Loyalty starts at 3 and caps at 8.</td><td><b>Wild Rotation</b> — Swap Companion has no cooldown and arrival effects always fire. Loyalty caps at 2.</td><td><b>Lone Hunter</b> — While you have no companion, your abilities cost 40% less Mana and you deal +25% damage.</td></tr>
+<tr><td>CAP</td><td><b>One Soul</b> — You and the active beast share a health pool — all damage to either is split evenly between you. Loyalty gain is doubled.</td><td><b>The Pack</b> — TWO beasts may be active at once: both strike when you attack, and each keeps its own Loyalty meter and grants its own Pack Bond boon. Summoning a third replaces whichever active beast has lower Loyalty.</td><td><b>Apex Predator</b> — Quick Shot triggers an ADDITIONAL free companion strike, and Kill Command&#x27;s cooldown resets whenever an enemy dies.</td></tr>
+</table>
+<p><b>Occultist</b> — <b>RUIN</b> (the detonation engine: stack the mark, blow it, chain it) · <b>MADNESS</b> (enemies turned on each other — and the betrayal now feeds the other two
+lanes) · <b>LEECH</b> (suffering into sustain: Holy restores, the Devout prevents, the Occultist
+siphons)</p>
+<table border="1" cellpadding="4">
+<tr><th>Row</th><th>Ruin</th><th>Madness</th><th>Leech</th></tr>
+<tr><td>1</td><td><b>Empowered Hex</b> — Hex of Ruin has a 25.0% chance per target to also apply Decay (10 Break damage per turn, 3 turns).</td><td><b>Spread of Madness</b> — Psychosis has a 15.0% chance per turn to spread to a fellow minion — the newly maddened gain a stack of Ruin.</td><td><b>Soul Leech</b> — Heroes striking a Ruined target heal 15.0% of the damage dealt (up from the base 10%).</td></tr>
+<tr><td>2</td><td><b>Deeper Hex</b> — Each stack of Ruin makes its bearer take 3.0% more damage (up from the base 2%).</td><td><b>Whispers</b> — Psychosis takes the wheel 60.0% of the time (up from the base 50%).</td><td><b>Invigoration</b> — Dark Pact also restores 2.0% of the Cleric&#x27;s max Mana each turn for 3 turns.</td></tr>
+<tr><td>3</td><td><b>Corrupted Channeling</b> — Whenever a Crippled enemy attacks, a random hero heals for 25.0% of the damage it dealt.</td><td><b>Mind Flay</b> — New ability: Mind Flay — 30% of Attack in shadow to TWO chosen minions, inflicting Psychosis for 3 turns (25 Mana, 3.0 int, 2cd; Perfect: 4 turns).</td><td><b>Gluttony</b> — The Ruin lifesteal drinks another 3.0% of the damage dealt.</td></tr>
+<tr><td>4</td><td><b>Broken Will</b> — The Occultist deals 5.0% more Break damage.</td><td><b>Umbral Mirror</b> — When an enemy would debuff a hero, there is a 10.0% chance the debuff reflects back onto it instead (and counts toward Ruin).</td><td><b>Pleasure from Pain</b> — At the end of the Occultist&#x27;s turn, the party heals 0.5% of the Occultist&#x27;s max health for every UNIQUE debuff on the enemy team.</td></tr>
+<tr><td>5</td><td><b>Grim Focus</b> — Ruin detonations deal 25.0% more damage.</td><td><b>Delirium</b> — When a Psychotic, Bewitched or Hysterical enemy strikes a fellow, the victim gains 1.0 Ruin.</td><td><b>Murderous Intent</b> — When a Bewitched enemy kills one of its fellows, the lowest-health party member heals 10.0% of the Occultist&#x27;s max health.</td></tr>
+<tr><td>6</td><td><b>Entropy</b> — Enemies bearing any Ruin take 5.0 Break damage at the start of each of their turns.</td><td><b>Cackling Mirror</b> — When an enemy strikes a fellow, the party heals 3.0% of the damage dealt.</td><td><b>Pact of Flesh</b> — Dark Pact bleeds 10.0% less of the Occultist&#x27;s max health (from its base cost of 20%).</td></tr>
+<tr><td>7</td><td><b>Unraveling</b> — When Ruin detonates, every other enemy gains 1.0 Ruin.</td><td><b>Lingering Torment</b> — When a madness effect expires, it leaves Decay behind for 2.0 turns (10 Break damage per turn).</td><td><b>Dark Barter</b> — Dark Pact heals the party for 25.0% of each member&#x27;s max health (up from the base 15%).</td></tr>
+<tr><td>CAP</td><td><b>Avatar of Ruin</b> — Ruin detonations no longer consume their stacks: a target held at 5 Ruin detonates again at the start of each of its turns.</td><td><b>Mass Hysteria</b> — New ability: Mass Hysteria — next turn every minion strikes a fellow with DOUBLE Break damage, Sundering them for 3 turns (30 Mana, 4.0 int, 4cd; Perfect: 3cd).</td><td><b>Soul Glut</b> — Whenever a hero heals by striking a Ruined target, the whole party heals for the same amount.</td></tr>
+</table>
+<p><b>Pyromancer</b> — <b>KINDLING</b> (building the fire) · <b>INFERNO</b> (profiting while it burns) · <b>DETONATION</b> (cashing it in: every node is a different answer to "how do I get more
+out of one Detonation")</p>
+<table border="1" cellpadding="4">
+<tr><th>Row</th><th>Kindling</th><th>Inferno</th><th>Detonation</th></tr>
+<tr><td>1</td><td><b>Accelerant</b> — Your Burn ticks deal +1.0% of Attack (on top of the base 6%).</td><td><b>Pyromaniac</b> — Inferno Master grants +0.2% damage per turn of Burn on the enemy team, and its cap rises to match.</td><td><b>Super Nova</b> — Detonation gains +3.0% critical strike chance.</td></tr>
+<tr><td>2</td><td><b>Explosive Force</b> — Critical hits with fire abilities extend the target&#x27;s Burn by 1.0 turn(s).</td><td><b>Molten Core</b> — Take 2.0% less damage from burning enemies.</td><td><b>Implosion</b> — Detonation has a 3.0% chance to strike twice.</td></tr>
+<tr><td>3</td><td><b>Invigorating Ashes</b> — Every Burn tick has a 5.0% chance to restore 2% of the Pyromancer&#x27;s max Mana.</td><td><b>Melt Armor</b> — Every Burn tick melts the victim&#x27;s armor by 1.0% for the rest of the battle.</td><td><b>Seeding Embers</b> — When an enemy dies while Burning, gain 1.0% damage per Burn turn it had left, for your next turn.</td></tr>
+<tr><td>4</td><td><b>Flame Shield</b> — New ability: Flame Shield — take 50% less damage for 2 turns and attackers are set Burning for 3 turns (15 Mana, 1.5 int, 2cd).</td><td><b>Heat Haze</b> — Inferno Master&#x27;s cap rises by 10%.</td><td><b>Chain Reaction</b> — Detonation splashes 20.0% of its damage to every other burning enemy.</td></tr>
+<tr><td>5</td><td><b>Conflagration</b> — Flamewave applies +1.0 turn(s) of Burn (fresh fires and extensions alike).</td><td><b>Scorched Earth</b> — Burning enemies deal 5.0% less damage.</td><td><b>Fuse</b> — Detonation has a 15.0% chance to reset its own cooldown.</td></tr>
+<tr><td>6</td><td><b>Cinder Trail</b> — Fireball also applies 1.0 turn(s) of Burn to one random other enemy.</td><td><b>Ashes of Al&#x27;ar</b> — Upon death: 11.0% chance to revive with 25% health (once per battle).</td><td><b>Blast Radius</b> — Detonation consumes 25.0% more of the target&#x27;s remaining Burn damage.</td></tr>
+<tr><td>7</td><td><b>Ember Wind</b> — When an enemy dies Burning, its remaining Burn transfers to a random living enemy.</td><td><b>Living Flame</b> — While 3 or more enemies burn, regain 3.0% of max Mana each turn.</td><td><b>White Heat</b> — Detonation always critically strikes a target with 5+ turns of Burn (4+ at rank 2).</td></tr>
+<tr><td>CAP</td><td><b>Firestorm</b> — New ability: Firestorm — rain fire on 6-8 random enemies for 12% of Attack each, applying Burn (30 Mana, 3.5 int, 4cd).</td><td><b>Avatar of Flame</b> — Inferno Master has no cap — every turn of Burn on the enemy team grants its full bonus — and the Pyromancer&#x27;s fire damage ignores enemy fire resistance.</td><td><b>Cataclysm</b> — After Detonation resolves, it fires again at the burning enemy with the most Burn remaining for 60% of its damage, chaining up to 3 additional times (each 60% of the one before).</td></tr>
+</table>
+<p><b>Cryomancer</b> — <b>DEEP FREEZE</b> (reaching and holding Frozen) · <b>SHATTERPOINT</b> (the burst payoff) · <b>WINTER</b> (the field aura)</p>
+<table border="1" cellpadding="4">
+<tr><th>Row</th><th>Deep Freeze</th><th>Shatterpoint</th><th>Winter</th></tr>
+<tr><td>1</td><td><b>Brittle Ice</b> — Frozen enemies are 2.0% more likely to be struck by a critical hit (party-wide).</td><td><b>Piercing Ice</b> — Ice Lance gains 10.0% critical strike damage.</td><td><b>Hungering Cold</b> — Chilled enemies deal 1.0% less damage per stack of Chilled.</td></tr>
+<tr><td>2</td><td><b>Frigid Grip</b> — Every stack of Chilled slows 3.0% harder.</td><td><b>Empowered Frostbolt</b> — Frostbolt deals an extra 2.0% of Attack.</td><td><b>Hypothermia</b> — Enemies take 1.0% more damage per stack of Chilled.</td></tr>
+<tr><td>3</td><td><b>Whiteout</b> — Enemies hit by Blizzard have a 15.0% chance to become Dazed (2 turns).</td><td><b>Icy Veins</b> — Killing an enemy with Ice Lance empowers your next Ice Lance by 15.0%.</td><td><b>Rime</b> — New ability: Rime — inflicts Frostbite (-50% healing received, 2 turns); for 3 turns, every stack of Chilled the target gains also chills one other random enemy (25 Mana, 3.0 int, 3cd).</td></tr>
+<tr><td>4</td><td><b>Freezing Advance</b> — When an enemy Freezes, the Cryomancer&#x27;s next attack against it deals +10.0% damage.</td><td><b>Splintering Shards</b> — Razor Ice has a 20.0% chance to strike a fourth time.</td><td><b>Frost Ward</b> — The Cryomancer takes 4.0% less damage from Chilled enemies.</td></tr>
+<tr><td>5</td><td><b>Cold Snap</b> — Frozen lasts 1.0 additional turn(s).</td><td><b>Lance Focus</b> — Ice Lance costs 5.0 less Mana.</td><td><b>Icy Resolve</b> — Rime lasts 1.0 additional turn(s).</td></tr>
+<tr><td>6</td><td><b>Bitter Cold</b> — Freezing an enemy applies 1.0 stack(s) of Chilled to every other enemy.</td><td><b>Crystal Edge</b> — Ice Lance deals an extra 5.0% of Attack per Chilled stack (on top of the base 10%).</td><td><b>Winter&#x27;s Grasp</b> — At the start of each of the Cryomancer&#x27;s turns, 1.0 random Chilled enemy(ies) gain a stack.</td></tr>
+<tr><td>7</td><td><b>Glacial Economy</b> — Freezing an enemy restores 5.0% of the Cryomancer&#x27;s maximum Mana.</td><td><b>Honed Shards</b> — Critical hits with Ice Lance apply 1.0 stack(s) of Chilled.</td><td><b>Numbing Veil</b> — Chilled enemies have a 5.0% chance to miss.</td></tr>
+<tr><td>CAP</td><td><b>Absolute Zero</b> — Freezing an enemy no longer reduces its Chilled stacks — they hold at 4, and the target refreezes the moment its freeze ends.</td><td><b>Shatter</b> — New ability: Shatter — deal 10% of Attack × their Chilled stacks to EVERY Chilled enemy (30 Mana, 4.0 int, 5cd).</td><td><b>Eternal Winter</b> — EVERY enemy gains 1 stack of Chilled at the start of each of the Cryomancer&#x27;s turns.</td></tr>
+</table>
+<p><b>Arcanist</b> — <b>RESONANCE</b> (the stack engine: ramp faster, cap higher, keep getting paid at the
+ceiling) · <b>OVERLOAD</b> (the risk half: crits, echoes, and the big spenders escalating with the
+bill attached) · <b>CONTROL</b> (surviving what you built — the fork: run hot forever, or vent
+constantly)</p>
+<table border="1" cellpadding="4">
+<tr><th>Row</th><th>Resonance</th><th>Overload</th><th>Control</th></tr>
+<tr><td>1</td><td><b>Arcane Mastery</b> — Each stack of Arcane Resonance grants 1.0% extra critical strike chance (on top of the base 3%).</td><td><b>Critical Mass</b> — Every 3rd critical strike deals 20.0% more damage and restores half as much of your maximum Mana.</td><td><b>Mindfulness</b> — Every 6.0 of your turns, ALL of your cooldowns tick down 1 extra turn.</td></tr>
+<tr><td>2</td><td><b>Mana Attunement</b> — Restore 2.0% of your maximum Mana every time you gain a stack of Resonance.</td><td><b>Temporal Rift</b> — Critical strikes have a 3.0% chance to echo for 25% of their damage against a random enemy.</td><td><b>Conversion</b> — 10.0% of damage taken is lost as Mana instead of health.</td></tr>
+<tr><td>3</td><td><b>Harmonics</b> — Arcane Explosion grants 1.0 additional Resonance.</td><td><b>Overcharge</b> — New ability: Overcharge — raise your maximum Resonance to 8; stacks beyond 5 give 1.5x their normal Resonance bonus (20 Mana, 1.5 int, 5cd).</td><td><b>On the Edge</b> — Surviving an attack below 25.0% health grants 1 stack of Resonance.</td></tr>
+<tr><td>4</td><td><b>Conduit</b> — Each Resonance stack grants +2.0% damage (on top of the base 15%).</td><td><b>Suppressing Fire</b> — Each bolt of Arcane Barrage deals 0.25% of Attack more than the previous one.</td><td><b>Stable Alignment</b> — You cannot lose more than 35.0% of your maximum health to a single attack.</td></tr>
+<tr><td>5</td><td><b>Resonant Core</b> — Maximum Resonance rises by 1.0 (Overcharge&#x27;s raised cap climbs the same amount).</td><td><b>Cannoneer</b> — Arcane Cannon deals +2.5% damage per Resonance stack (on top of the base 7.5%).</td><td><b>Arcane Ward</b> — The Resonance damage-taken penalty falls 1.0% per stack (from the base 5%).</td></tr>
+<tr><td>6</td><td><b>Unlimited Power</b> — Gaining Resonance while already at maximum stacks instead grants +2.0% damage and +2.0% maximum Mana (stacks all battle).</td><td><b>Barrage Master</b> — Arcane Barrage fires 1.0 additional bolt(s).</td><td><b>Still Mind</b> — Stabilize leaves 1.0 additional stacks standing (on top of its floor of 2).</td></tr>
+<tr><td>7</td><td><b>Charged Bolts</b> — While at maximum Resonance, damaging casts restore 5.0% of your maximum Mana.</td><td><b>Volatility</b> — Arcane Cannon and Magi&#x27;s Wrath deal +5.0% damage, and their recoil rises +5.0%.</td><td><b>Feedback Loop</b> — 10.0% of recoil damage is paid as Mana instead of health.</td></tr>
+<tr><td>CAP</td><td><b>Singularity</b> — Resonance has NO maximum. The damage-taken penalty stops rising past 5 stacks.</td><td><b>Magi&#x27;s Wrath</b> — New ability: Magi&#x27;s Wrath — 15% of Attack as arcane to ALL enemies, +4% per Resonance stack; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd).</td><td><b>Master of Moments</b> — Stabilize consumes no stacks at all — it grants its Mana and damage reduction from your current stacks and leaves them intact.</td></tr>
+</table>
 <p><b>Review aid:</b> the map burger's "All Spec Abilities Unlocked" toggle (default OFF,
 session-only; DOD_SIM_GRANT_ALL=1 headless) pre-grants every talent-granted ability and
 both earnable pools at spawn, so reworked kits can be reviewed without spending points.</p>
-<p><b>Ranks are additive:</b> when a node offers an increase by a specified amount, every
-additional point invested adds the SAME amount again (e.g. "+5 Bleed per rank" at 3 ranks =
-+15 Bleed).</p>
-<p><b>Layout:</b> every tree renders as three lane columns with live lane-point headers,
-a capstone shelf, emblem-square nodes with point counters, cost-aware hover tooltips, and
-greyed exclusive siblings. Art is placeholder.</p>
-<p><b>Tooltip display:</b> talent tooltips never say "per rank" — the number shown grows
-with the points invested (3% → 6% → 9%; unlearned nodes preview the 1-point value).</p>
+<p><b>Layout:</b> every tree renders as three lane columns — seven rows deep, with a
+capstone shelf underneath. Lane headers count the nodes taken in each lane (a read of the
+build, not a requirement). Each node is an emblem square labelled with its row number, and
+greys out the moment it is unreachable — a row not yet open, a door a sibling shut, or a
+capstone before 7/7. Art is placeholder.</p>
+<p><b>Tooltip display:</b> a node's tooltip shows its row, its one value, what it costs and
+from which purse, and — for a node not yet taken — the names of the two siblings taking it
+would close. A closed sibling says what closed it and that an elite point can force it.</p>
 <p><b>Talent visibility:</b> every talent proc is written to the combat log with a
 "Talent:" tag (Enraged, Unrelenting Assault, Endurance, Unkillable, Richocet, Tank and
 Spank, Dominant Presence, Sundering, Riposte...), and stateful talent buffs display as
@@ -1366,8 +1210,10 @@ Elemental Weakness the resist reduction, Unrelenting Assault its borrowed Consti
 <ul>
 <li><b>Gold:</b> start 60 (+80 with Gravewrought Coin). Fight 25–35, elite and mini-boss
 80–100, boss 110–130.</li>
-<li><b>Talent points:</b> fight 1, elite 2, mini-boss 2, zone boss 3 (the FINAL boss awards
-none — its relic is the reward).</li>
+<li><b>Talent points:</b> spec choice 1, mini-boss 1, zone boss 2, fight 0 — 8 across a
+three-zone run, exactly one complete tree. An elite pays 1 into the separate ELITE purse,
+which can only widen a row already picked (§7). The FINAL boss awards none — its relic is
+the reward.</li>
 <li><b>Abilities:</b> two picks per zone, six per run — one from the mini-boss, one from the
 zone boss, three offered each time (see §6a).</li>
 <li><b>Consumable prices:</b> Health 30, Mana 30, Bomb 45, Revive 80, Defense 40. Starting
@@ -1656,8 +1502,9 @@ numbers AND the "% of Attack" scaling), rune equip toggles (slots grow 2/3/4 by 
 pouch list scrolls), any <b>owed rune pick</b> (the awakening rune and elite caches both
 wait here as a choice of three, and the hero-list row announces which heroes owe one), and
 the spec's talent
-tree: three lane columns with live lane-point headers, a capstone shelf, and
-click-to-learn nodes (lock reasons on the node tooltips) for all twelve specs.</li>
+tree: three lane columns seven rows deep, a capstone shelf, and click-to-learn nodes
+(row number on the node, lock and closed reasons on the tooltips) for all twelve specs.
+The header shows both purses — normal points and, when the hero holds any, ELITE points.</li>
 <li><b>Awakening screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
 along on every path the class can take) and each ability's damage with its "% Atk" scaling.
 The draft screen stays clean — no passive text there.</li>
@@ -1687,8 +1534,8 @@ delay does, the skill check, Pressure &amp; Break, crit / miss / parry, the fall
 at 20%), <b>Statuses</b> (every debuff the battle code can apply, plus Quick Draw),
 <b>Damage types</b> (all seven schools and how resists and vulnerabilities read),
 <b>Resources</b> (Rage and Mana, plus every spec resource: Resonance, Mercy, Empower, Faith,
-Focus, Loyalty, Ruin), <b>Progression</b> (lanes and their node gates, the ceil(N/3) cost
-curve, the one-capstone rule, talent point income, boss trophies, node scaling),
+Focus, Loyalty, Ruin), <b>Progression</b> (the seven exclusive rows and the capstone row,
+the flat 1-point price, talent point income, boss trophies, node scaling),
 <b>Items &amp; gear</b> (runes, scarred runes, consumables, and <b>relics versus runes</b>
 as its own entry — permanent-across-runs versus run-scoped is the single most confusable
 distinction in the game), and <b>The Run</b> (zones and tiers, node types, elites, events,

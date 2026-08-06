@@ -278,8 +278,10 @@ func _test_map(RunState) -> void:
 	run.new_run()
 	run.party[0]["spec"] = "berserker"
 	var before: int = run.party[0].get("talent_points", 0)
-	ok(run.award_talent_points("miniboss") == 2, "the mini-boss pays 2 talent points")
-	ok(run.party[0]["talent_points"] == before + 2, "...to every hero")
+	# Batch AI re-cut the schedule: 1 for the mini-boss, out of a run total
+	# of exactly 8 (spec choice 1 + 3 mini-bosses + 2 zone bosses x2).
+	ok(run.award_talent_points("miniboss") == 1, "the mini-boss pays 1 talent point")
+	ok(run.party[0]["talent_points"] == before + 1, "...to every hero")
 	var gold_before: int = run.gold
 	var paid: int = run.award_gold("miniboss")
 	ok(paid >= 80 and paid <= 130, "the mini-boss pays elite gold (%d)" % paid)
@@ -402,8 +404,11 @@ func _test_doc_matches_code() -> void:
 		ok(false, "docs/master.html is readable")
 		return
 	var doc := f.get_as_text()
-	ok(doc.contains("Last updated: 2026-08-05 (Batch AH)"),
-		"master.html carries this batch's stamp")
+	# The stamp moves with every batch that touches the doc; what this line
+	# is really guarding is that the doc was touched AT ALL when the code
+	# below it changed. Bump it, do not delete it.
+	ok(doc.contains("Last updated: 2026-08-06 (Batch AI)"),
+		"master.html carries the current batch's stamp")
 	for spec in Classes.SPEC_POOLS:
 		var listed: String = ", ".join(Classes.SPEC_POOLS[spec])
 		ok(doc.contains(listed),
