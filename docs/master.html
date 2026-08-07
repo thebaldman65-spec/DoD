@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-06 (Batch AL)</b></p>
+<p align="right"><b>Last updated: 2026-08-07 (Batch AN)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -11,17 +11,18 @@ changes lives in the changelog. Engine: Godot 4.7, all UI built in code.</i></p>
 <p>A turn-based party roguelike. The world is being consumed by <b>the Decay</b>; the player
 commands <b>the Untouched</b> — four heroes immune to it — through zone after zone of corrupted
 enemies. Runs are short, buildcrafted, and repeatable: draft a party, awaken permanent
-specializations, climb a node map, defeat the zone boss, descend deeper. Death ends the run but
+specializations, walk a road of fixed encounters, defeat the zone boss, descend deeper. Death ends the run but
 feeds a permanent relic collection (meta-progression). Combat is timeline-initiative with a
 timing skill check on every action — the player's execution matters as much as their build.</p>
 
 <h2>2. Run Flow</h2>
 <p><b>Main Menu</b> → <b>Draft</b> (pick 4 heroes + equip up to 3 relics) →
-<b>Spec Choice</b> (permanent; each hero is also dealt an awakening rune to choose, one of
-its three candidates always written for that spec) →
-<b>Map</b> (node climbing) → <b>Battles / Rest / Shop / ???</b> →
-<b>Party screen</b> (talents, runes) → … → <b>Zone Boss</b> →
-next zone (party fully restored) → final boss → run complete.</p>
+<b>Spec Choice</b> (permanent; heroes begin with <b>no runes</b> and three empty slots) →
+<b>Map</b> (the road) → <b>Offer</b> (three bargains, before every fight and elite) →
+<b>Battle</b> → sometimes <b>Shop</b> and/or <b>???</b> → back to the map → …
+→ <b>Mini-boss</b> → … → <b>Zone Boss</b> → next zone (party fully restored) →
+<b>end boss</b> → run complete. Talents, runes and picks are all handled on the map's hero
+cards; there is no separate Party screen.</p>
 <p>A run ends in one of three ways: <b>completion</b> (the final boss falls), a <b>wipe</b>
 (every hero down), or a <b>forfeit</b> — the player abandons the run from the battle burger
 menu, behind a confirmation. A forfeit ends the run <b>exactly as a wipe does</b> (save
@@ -39,40 +40,98 @@ strength — an alpha testing aid so a tester can see every zone; saved with the
 <li><b>Spec choice:</b> offered per hero after the first victory. Three cards per class, each
 showing the spec name, its <b>archetype</b> in bold (mouseover for the archetype explanation),
 blurb, passive, and full ability details. The choice is permanent for the run.</li>
-<li><b>Victory rewards:</b> gold for every fight, and talent points on the beats that
-matter — <b>1 for confirming a spec, 1 per mini-boss, 2 per zone boss</b> (§7). Regular
-fights and rests award none. An <b>elite</b> pays 1 into the separate ELITE purse, which
-can only widen a row already picked. The mini-boss and the zone boss also each hand every
-hero <b>an ability pick, three offered</b> (§6a). The FINAL boss awards no talent points —
-points earned when nothing follows are unspendable; its relic is the prize. Fallen heroes
-return after a won battle at 20% max HP ("the Untouched refuse to stay down").</li>
+<li><b>Victory rewards:</b> gold for every fight, and <b>clearing any encounter heals the
+party 15% of max HP</b> — there is no resting, so this is the whole recovery curve (the
+Chalice of Dawn relic stacks its 10% on top for 25%). Talent points come from the beats
+that matter — <b>1 for confirming a spec, then 1 apiece from every elite, mini-boss and
+boss</b>, the final boss included (§7). Regular fights award none. The <b>mini-boss</b>
+hands every hero a <b>generic ability upgrade, three offered</b>; <b>zone bosses 1 and 2</b>
+hand every hero an <b>ability pick, three offered, drawn from that hero's spec pool only</b>
+(§6a). The <b>final boss</b> awards a relic unlock and big gold and <i>ends the run</i> — no
+ability pick, because nothing follows it to use one on. Fallen heroes return after a won
+battle at 20% max HP ("the Untouched refuse to stay down").</li>
 <li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft.</li>
-<li><b>Saving:</b> auto-save to user://run_save.bin after every completed node AND after
-spec confirmation (including debug rerolls); Continue resumes at the map. Loading migrates
-members to newer fixed talent trees when a save predates them; a save from before the
-row trees (§7) has its picks wiped and its points re-issued on the current schedule. Run end
-(win or wipe) clears the save.</li>
+<li><b>Saving:</b> auto-save to user://run_save.bin (format v7) after every completed
+encounter AND after spec confirmation (including debug rerolls); Continue resumes at the
+map. Loading swaps each member's saved tree snapshot for the live definition, so balance
+edits reach a run in flight, and refunds points sunk into nodes that no longer exist. A
+save older than v7 describes a branching board this build cannot walk, so it is <b>refused
+and cleared</b> rather than half-loaded. Run end (win or wipe) clears the save.</li>
 </ul>
 
-<h2>3. Zones &amp; the Node Map</h2>
-<p><b>Structure rules:</b> every zone is a ladder of <b>10 tiers plus the boss tier</b>. Each
-tier holds <b>3 nodes</b> — and the player picks exactly one node per tier, so <b>10 nodes are
-interacted with before the boss</b>. The <b>middle tier (tier 6) is the zone's MINI-BOSS</b>:
-it occupies all three of its columns, so it cannot be routed around. The remaining nine tiers
-are dealt from a fixed 27-card deck:</p>
+<h2>3. Zones &amp; the Road</h2>
+<p><b>Structure rules:</b> a run is <b>3 zones &times; 12 encounters = 36</b>, and every zone
+has the <b>identical</b> shape. Nothing is dealt and nothing is rolled — the shape below
+<i>is</i> the zone:</p>
 <table border="1" cellpadding="4">
-<tr><th>Type</th><th>Count</th><th>Share</th><th>Effect</th></tr>
-<tr><td>Fight</td><td>14</td><td>~52%</td><td>Battle vs. a themed warband bought from a
-power budget (see §9). Fights on tiers 7+ have a 25% chance to spawn as an ELITE (tougher
-themes, double talent points, more gold).</td></tr>
-<tr><td>Rest</td><td>5</td><td>~19%</td><td>Party heals 30% max HP and Mana users
-(Mage/Cleric/Hunter) recover 30% Mana at the waystone.</td></tr>
-<tr><td>Shop</td><td>5</td><td>~19%</td><td>The Wandering Peddler: consumables + one rune offer
-per party member (see §8).</td></tr>
-<tr><td>Event</td><td>3</td><td>11%</td><td>A "???" node — something unexpected happens.
-Drawn at the door from data/events.json (weighted, requirement-filtered, non-repeating per
-run), never pre-rolled: mystery is the point. See the Events paragraph below.</td></tr>
+<tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th>
+<th>9</th><th>10</th><th>11</th><th>12</th></tr>
+<tr><td>Fight</td><td>Fight</td><td><b>ELITE</b></td><td>Fight</td><td>Fight</td>
+<td><b>MINI-BOSS</b></td><td>Fight</td><td>Fight</td><td><b>ELITE</b></td><td>Fight</td>
+<td>Fight</td><td><b>BOSS</b></td></tr>
 </table>
+<p>Zone 3's boss is the <b>end boss</b>: the run ends on its death. There is no route to
+plan — the only forward move is the next encounter — so the run's decisions live on the
+<b>offer screen</b> (§3a) rather than in routing.</p>
+<p><b>The road reads RIGHT TO LEFT:</b> encounter 1 sits on the right edge and the boss on
+the left. Each encounter is a dot on the line; the current position is marked, cleared dots
+dim, and dots ahead show their type by colour. <b>Hovering a dot scouts it</b> — theme, full
+lineup, and the band's damage-type identity ("Resists: Nature x3 / Soft to: Fire x2"), from
+the moment the zone is generated. <b>Mini-boss and boss dots show their type but not their
+identity:</b> the player learns which boss they drew only by fighting the mini-boss.</p>
+<p><b>The mini-boss holds the middle of every zone.</b> Encounter 6 is an <b>elite warband
+carrying a boss-tier health pool</b> (every enemy at 1.5&times; its usual maximum, attack
+untouched — a longer fight, not a harder-hitting one). It pays <b>elite gold (80&ndash;100)
+and 1 talent point</b>, and its own spoil is a <b>generic ability upgrade</b> (§6a). No
+modifier and no offer precedes it: mini-bosses and bosses are fixed encounters.</p>
+<p><b>Elites are the snowball engine.</b> An elite kill pays <b>1 talent point</b>, drops a
+<b>rune cache</b> for a random hero (three candidates rolled at the kill, one chosen on that
+hero's card), plus a random consumable and a bigger gold purse (80&ndash;100).</p>
+
+<h3>3a. The offer &mdash; three bargains</h3>
+<p>Before every <b>fight and elite</b> encounter — not mini-bosses, not bosses — the player is
+shown <b>3 options</b> and picks one. Each option is one <b>modifier</b> plus one
+<b>reward</b>, both visible before choosing. There is no decline.</p>
+<p>A modifier is a condition that <b>binds both parties</b> for that battle. Each carries a
+<b>severity of 1&ndash;4</b>, and <b>the reward table reads that severity</b> — so authoring a
+modifier means authoring one number, not a pairing. Severity is <b>flat</b>, authored per
+modifier, and <b>deliberately ignores party composition</b>: a modifier that happens to be
+cheap for your build is a good deal you earned by building that way. <b>Every offer holds at
+least one option of severity 1 or 2</b>, so a wounded party always has a survivable choice —
+guaranteed by construction, not by rejecting rolls.</p>
+<p>The reward pays <b>on victory</b>: the modifier is the price, and the reward is what
+clearing the fight under it bought.</p>
+<table border="1" cellpadding="4">
+<tr><th>Modifier</th><th>Severity</th><th>Effect (both parties)</th></tr>
+<tr><td>Overgrown</td><td>1</td><td>Both parties begin the fight at 70% health.</td></tr>
+<tr><td>Tinderbox</td><td>2</td><td>All fire damage +25%, whoever deals it.</td></tr>
+<tr><td>Frenzied</td><td>2</td><td>Everyone acts 30% faster. Cooldowns are unchanged.</td></tr>
+<tr><td>Brittle</td><td>3</td><td>All attacks ignore armor, on both sides.</td></tr>
+<tr><td>Warded</td><td>3</td><td>All abilities cost 25% more. Basic attacks are free.</td></tr>
+<tr><td>Bloodless</td><td>4</td><td>No healing for anyone. Bleed and damage-over-time still
+tick.</td></tr>
+</table>
+<table border="1" cellpadding="4">
+<tr><th>Severity</th><th>Reward (one of these, rolled)</th></tr>
+<tr><td>1</td><td>40 gold</td></tr>
+<tr><td>2</td><td>80 gold, <b>or</b> a random potion</td></tr>
+<tr><td>3</td><td>140 gold, <b>or</b> a random rune from the current pool</td></tr>
+<tr><td>4</td><td>220 gold, <b>or</b> a random rune, <b>or</b> a merchant follows the
+fight</td></tr>
+</table>
+
+<h3>3b. What follows an encounter</h3>
+<p>Shops and events are <b>scheduled</b> now, not placed on a board. Both roll once, on the
+victory screen, after any cleared <b>fight or elite</b>:</p>
+<ul>
+<li><b>Merchant &mdash; 40%</b>, with a <b>floor</b>: if 4 encounters pass with no merchant,
+the next cleared one guarantees a merchant. The severity-4 reward option guarantees one on
+demand. Shop contents are unchanged — consumables at existing prices, one rune offer per hero
+per visit, duplicates avoided.</li>
+<li><b>Event &mdash; 25%</b>, drawn from the existing pool with its requirement gating
+intact.</li>
+</ul>
+<p>When both roll, the merchant resolves first, then the event, then the map.</p>
 <p><b>Events:</b> an event presents flavor text and 2+ choices; choices whose requirements
 fail are greyed with the reason. Effects speak a fixed <b>verb vocabulary</b> — gold /
 gold_pct / heal_pct / damage_pct (never kills: floors at 1 HP) / mana_pct / max_hp_pct /
@@ -84,38 +143,17 @@ has_item, spec_in_party, fallen_hero). Adding an event is a JSON edit; adding a 
 handler. 16 events ship now (three zone-gated, two spec-gated, one needing a fallen hero);
 the schema is built for 40+. Seen events persist in the save and never repeat within a run
 until the pool exhausts.</p>
-<p><b>Warbands are pre-rolled at map birth and scoutable:</b> every combat node carries its
-warband from the moment the map is generated, and <b>hovering the node shows the theme, the
-full lineup, and the band's damage-type identity</b> — how many units resist a type and how
-many are soft to it ("Resists: Nature x3 / Soft to: Fire x2"). The boss escort is readable
-from tier 1, so resist counterplay can shape routing and talent picks all zone long.</p>
-<p>The deck is shuffled and dealt 3 per dealt tier under <b>structural constraints</b>:
-tier 1 holds at least one fight so runs open with combat; <b>no tier deals three of a
-kind</b>, so every tier presents at least two node types; at least one rest lands in tiers
-2–5 and another in tiers 7–10, so recovery is spread across the climb; and a shop always
-waits in tiers 7–10, so boss gold and the deepest rune rarities have somewhere to land. At
-least one elite always spawns (the 25% roll on tiers 7+ gets a floor of one per zone). The
-mini-boss row is authored rather than dealt, and it is paid for out of the FIGHT cards
-alone — the rest/shop/event counts that drive the run economy are unchanged.</p>
-<p><b>Connectivity guarantees a choice:</b> every node links to its own column on the next
-tier plus at least one adjacent column — a middle column links to both neighbours 25% of the
-time. The player always has at least two roads forward but can only drift one column per
-step, so reaching a specific elite or shop takes planning; every node keeps at least one
-inbound path so the map never strands. Every map also contains at least one walkable route
-that touches two rests, a shop, and an elite — the map is a route-planning surface, not a
-corridor. The boss tier is a single node: the last pre-boss tier funnels by design.</p>
-<p><b>The mini-boss holds the middle of every zone.</b> Tier 6 is one guaranteed fight
-that stands between an elite and a boss: an <b>elite warband carrying a boss-tier health
-pool</b> (every enemy at 1.5&times; its usual maximum, attack untouched — a longer fight, not
-a harder-hitting one). It occupies all three columns of its row, so every route through the
-zone goes through it. It pays <b>elite gold (80–100) and 1 talent point</b>, and its own
-spoil is an <b>ability pick</b> (§6a): with the zone boss's pick that is two a zone, six a
-run.</p>
-<p><b>Elites are the snowball engine:</b> a skilled player routes toward them. An elite
-kill pays <b>1 ELITE talent point</b> — a point that cannot open a new row, only force a
-second node into one already picked (§7) — and drops a <b>rune cache</b> for a random hero — three candidates
-rolled at the kill, one chosen on the Party screen — plus a random consumable and a bigger
-gold purse (80–100).</p>
+
+<h3>3c. Attrition and potions</h3>
+<p><b>There is no resting.</b> Clearing any encounter heals the party <b>15% of max HP</b>
+(the Chalice of Dawn relic's 10% stacks on top). <b>Potions are usable on the map screen</b>,
+not only in battle: the inventory is interactive and targets a hero from the stat cards. The
+Bomb is battle-only (nothing on the road to throw it at) and the Defense Potion is
+battle-only (its 3 turns mean nothing outside a fight); both say so on hover.
+<b>Potion cap: 6 per item type</b> — purchases and drops above the cap are <b>refused with a
+message</b> rather than silently lost, and the shop greys a full stack rather than taking the
+gold.</p>
+
 <ul>
 <li><b>Zones — authored slots:</b> a run is <b>three zone slots</b>, and each slot draws
 one zone from its own authored candidate pool — zones are designed FOR a position
@@ -123,22 +161,24 @@ one zone from its own authored candidate pool — zones are designed FOR a posit
 slot it can host. The current pools run fixed: 1. Forest of Old (roster 1) → 2. The
 Scarlands (roster 2) → 3. Forest of Old as the finale (tougher roster 3 — behemoths walk
 the old woods). Random slot draws sit behind the DOD_ZONE_ROTATION=1 flag until each
-pool holds ~2 candidates; every zone keeps the same 11-tier ladder so the talent economy
-(~35 points/run) never shifts. Deeper-slot enemies are tinted redder, and the slot sets
+pool holds ~2 candidates; every zone keeps the same 12-encounter shape so the talent
+economy never shifts. Deeper-slot enemies are tinted redder, and the slot sets
 the stat multiplier (§4.3). The finale's boss — the <b>Withered Warden</b> again, by
 design — is the FINAL boss: the run ends on its death.</li>
-<li><b>Zone completion:</b> killing the boss awards a relic unlock, big gold, 2 talent points,
-an <b>ability pick for every hero</b> (§6a), and fully restores the party (HP and Mana)
-before the descent.</li>
-<li><b>Map screen:</b> zone art background, node ladder with a <b>tier readout</b> ("Tier 7
-of 10 — the Withered Warden waits"), Party button (badges unspent talent points, owed ability picks and owed rune picks, and
-pulses while a pick waits), read-only
-Inventory dropdown, burger menu (Restart Run / Quit to Main Menu / Quit to Desktop), gold +
-party HP readout. The roads out of the party's current node glow gold; visited nodes are dim
-green, reachable nodes wear their full type colour, everything else recedes grey. <b>Every
-node answers on hover:</b> combat nodes scout their warband (§3 above), rests state their
-actual heal percentage (relic bonuses included), shops state their stock, and the "???"
-event says outright that what waits is unknown — mystery by design, not a blank.</li>
+<li><b>Zone completion:</b> killing zone 1's or zone 2's boss awards a relic unlock, gold,
+1 talent point, an <b>ability pick for every hero</b> (§6a), and fully restores the party
+(HP and Mana) before the descent.</li>
+<li><b>Map screen:</b> zone art background, the road with a <b>position readout</b>
+("Zone 2 of 3 — encounter 7 of 12 (19 of 36) — the Ash Tyrant waits"), and <b>all four hero
+stat cards</b>. Each card carries portrait, spec name, HP bar with numbers, resource bar,
+<b>three rune slots</b> (filled or empty — click one to open that hero's pouch), and an
+unspent-talent badge; <b>clicking a card opens that hero's talent tree and full sheet</b>.
+Owed ability picks, ability upgrades and rune picks are resolved <b>on the card itself</b>.
+Also on screen: gold, the interactive potion inventory (§3c), and the burger menu (Restart
+Run / Glossary / Quit to Main Menu / Quit to Desktop). There is no Party button and no
+separate Party screen. The cleared stretch of road is lit gold, cleared dots are dim green,
+the next dot wears its full type colour and is the only one clickable, everything ahead
+recedes grey.</li>
 </ul>
 
 <h2>4. Combat System</h2>
@@ -512,7 +552,7 @@ Holy)</td></tr>
 </table>
 <h3>5.0 Class passives</h3>
 <p>Each CLASS carries one passive, active for every spec of that class (and before
-awakening). Shown as a ◆ chip in battle and on the party screen.</p>
+awakening). Shown as a ◆ chip in battle and on the hero sheet.</p>
 <ul>
 <li><b>Warrior — Threatening Presence:</b> enemies are 20% more likely to attack the
 Warrior (weighted into their random target picks).</li>
@@ -594,15 +634,20 @@ Arcanist 90, Sharpshooter 90, Pyromancer 85, Cryomancer 85.</p>
 
 <h3>6a. Ability progression</h3>
 <p>Every hero <b>opens a run with its core attack plus exactly 3 spec abilities</b>, and
-<b>earns 6 more over the run</b> — one from the mini-boss and one from the zone boss in each
-of the three zones. There is no cap and no swap step: a hero simply holds everything it has
-taken, so a full run ends at core + 3 + 6 = 10 abilities.</p>
-<p><b>Each award offers 3 abilities the hero does not already own: 1 drawn from its SPEC
-pool and 2 from its CLASS pool.</b> The spec draw leads the offer and wears the trophy gold
-on the Party screen, so "which of these three is mine" is answered on the button. If one
-pool runs dry the other fills for it; only when both are nearly exhausted does an offer
-shrink below three. The pick uses the same Party-screen picker the rune caches use, and the
-triple is rolled the moment the award drops — re-opening the screen never rerolls it.</p>
+<b>earns 2 more over the run</b> — one from zone 1's boss and one from zone 2's. The end boss
+awards none: the run is over and the pick would be dead value. There is no cap and no swap
+step, so a full run ends at core + 3 + 2 = 6 abilities.</p>
+<p><b>Each award offers up to 3 abilities the hero does not already own, drawn from its SPEC
+pool only.</b> Abilities are spec-locked: the class-pool draw is gone. Spec pools are 2–5
+deep, so an offer shows what exists rather than padding — a hero deep into its pool may be
+offered two. The pick is resolved on that hero's map card, and the triple is rolled the
+moment the award drops — re-opening the card never rerolls it.</p>
+<p><b>The mini-boss award is different in kind:</b> a <b>generic ability upgrade</b>, chosen
+from three, attached to one ability the hero already owns. Upgrades <b>stack</b> on the same
+ability, but the <b>same upgrade cannot be taken twice in a run</b>. The placeholder pool of
+four, until the dozen are authored: <b>Honed</b> (+50% damage), <b>Quickened</b> (−2
+cooldown), <b>Effortless</b> (costs no resource), <b>Swift</b> (+2 initiative speed). Three
+awards a run, one per mini-boss.</p>
 <p><b>The SPEC pool</b> holds what only that spec can earn: the abilities trimmed out of its
 opening three, the abilities its talent tree grants, and its own vaulted ones. An ability a
 talent has already granted is never offered again.</p>
@@ -1040,17 +1085,20 @@ lane; there is no lane-purity requirement.</p>
 <p><b>Every node costs exactly 1 point and holds a single rank</b> — no exceptions, no
 ranked investment, no escalating price curve. <b>A complete tree is 8 nodes.</b></p>
 <p><b>Economy:</b> <b>1 point for choosing a spec</b> (paid the moment the awakening is
-confirmed), <b>1 per mini-boss, 2 per zone boss</b>. Regular fights, rests and shops award
-none, and the FINAL boss awards none — points earned when nothing follows are unspendable.
-A three-zone run therefore guarantees <b>1 + 3 + 4 = 8 points: exactly one complete
-tree</b>, so the question is never "how many nodes can I afford" but "which eight". (The
-Waystone Shard relic's +3 at run start and the point-granting events are earliness, not
-extra nodes.)</p>
-<p><b>ELITE POINTS are a separate purse.</b> An elite kill pays 1 (0–3 a run — elites are a
-25% roll on tiers 7+). They cannot open a new row. The only thing they buy is a
-<b>second node in a row already picked</b>, forcing that one row's door back open. The
-third node in that row stays shut forever. The Party screen shows the two purses
-separately, and the map's Party button badges both.</p>
+confirmed), then <b>1 apiece from every elite, mini-boss and boss</b> — the end boss
+included. Regular fights award none. A zone holds 4 point-paying encounters (2 elites, a
+mini-boss, a boss), so a three-zone run pays <b>12 from the road plus the awakening's 1 =
+13</b>, against a complete tree of 8. <b>The surplus buys row flexibility</b>, and it does so
+by arithmetic rather than by a second wallet: rows are mutually exclusive and there are only
+eight of them, so a purse can open at most 8 rows and anything beyond that has nowhere to go
+<i>but</i> second nodes in rows already picked. (The Waystone Shard relic's +3 at run start
+and the point-granting events are earliness, not extra nodes.)</p>
+<p><b>THE SURPLUS buys second nodes.</b> With 13 points against 8 rows, five points cannot
+open anything — so they buy a <b>second node in a row already picked</b>, forcing that one
+row's door back open. <b>The third node in that row stays shut forever.</b> A separate
+"surplus" purse still exists in the data (old saves, and any future relic that wants to
+grant flexibility without granting climb); it is spent first when it holds anything, and
+ordinary points cover these picks when it is empty.</p>
 <p><b>Berserker</b> — <b>BLOODLETTING</b> (wounds as an engine: keep bleed high, or burst it) · <b>FURY</b> (the risk dial) · <b>WARPATH</b> (momentum: keep swinging, or survive to keep swinging)</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Bloodletting</th><th>Fury</th><th>Warpath</th></tr>
@@ -1228,12 +1276,12 @@ Elemental Weakness the resist reduction, Unrelenting Assault its borrowed Consti
 <ul>
 <li><b>Gold:</b> start 60 (+80 with Gravewrought Coin). Fight 25–35, elite and mini-boss
 80–100, boss 110–130.</li>
-<li><b>Talent points:</b> spec choice 1, mini-boss 1, zone boss 2, fight 0 — 8 across a
-three-zone run, exactly one complete tree. An elite pays 1 into the separate ELITE purse,
-which can only widen a row already picked (§7). The FINAL boss awards none — its relic is
-the reward.</li>
-<li><b>Abilities:</b> two picks per zone, six per run — one from the mini-boss, one from the
-zone boss, three offered each time (see §6a).</li>
+<li><b>Talent points:</b> spec choice 1, then elite 1 / mini-boss 1 / boss 1 and fight 0 —
+4 a zone, 12 a run, 13 with the awakening, against a complete tree of 8 (§7).</li>
+<li><b>Abilities:</b> <b>two picks per run</b>, from zone 1's and zone 2's bosses, three
+offered each time and drawn from that hero's <b>spec pool only</b>. The end boss awards none.
+Each <b>mini-boss</b> instead awards a <b>generic ability upgrade</b>, three offered — three a
+run (see §6a).</li>
 <li><b>Consumable prices:</b> Health 30, Mana 30, Bomb 45, Revive 80, Defense 40. Starting
 inventory: 2 Health, 1 Mana, 1 Bomb, 1 Revive, 1 Defense.</li>
 <li><b>Runes</b> (run-scoped gear, bought at the Peddler or chosen from elite caches — the
@@ -1249,20 +1297,16 @@ in the shop. Rarity odds deepen with the zone slot: 60/30/10 → 40/40/20 → 25
 (Common/Rare/Epic). <b>Eligibility:</b> every rune declares a scope — universal,
 class-wide, or spec-only, so the awakening shapes the loot table — and ability-modifying
 runes only roll for heroes who actually own the named ability (boss trophies included).
-<b>Equip slots grow with the run: 2 → 3 → 4</b> by zone (toggled on the party screen; the
-zone-victory screen announces each new slot). Shop offers avoid duplicates per hero, and
+<b>Three equip slots, flat, from run start</b> — no growth ladder (swapped on the hero's
+map card). Shop offers avoid duplicates per hero, and
 an exhausted pool falls back to the Common family — the offer list never comes back
 empty.
-<br><b>Every hero starts the run choosing a rune.</b> At spec confirmation — specs locked,
-before the first map — each hero is dealt <b>three eligible candidates and picks one</b>,
-resolved on the Party screen exactly as an elite cache is, and worn immediately (two slots
-are already open). <b>One of the three is always a rune written for that hero's spec</b>,
-drawn as an ordinary roll inside that spec's own four rather than at a forced rarity; the
-other two roll on the ordinary zone-slot-1 table, so they lean Common. The opening pick is
-the only deal that carries this guarantee — elite caches roll all three normally. <b>The
-three are always distinct:</b> every candidate is drawn from a pool that already excludes
-the ones beside it, so a triple can never offer the same rune twice. The map's Party button
-badges and pulses while any pick is unspent.
+<br><b>Heroes begin the run with no runes and three empty slots.</b> The first rune comes
+from the Peddler, an elite cache, or a severity-3-or-4 bargain. Every pick-of-three is
+resolved on that hero's map card, and <b>the three are always distinct</b>: each candidate is
+drawn from a pool that already excludes the ones beside it, so a triple can never offer the
+same rune twice. A card whose hero owes a pick wears the rune-purple border until it is
+spent.
 <br><b>Spec coverage: 65 authored runes</b> — 5 universal, 3 class-wide for each of the four
 classes, and <b>4 spec runes for every one of the twelve specs</b>. Each set is
 built to one rule:
@@ -1277,7 +1321,9 @@ a run-scoped extra via relic_grant). <b>Pool: 25 relics — 17 common, 8 rare (�
 effect expressed through an audited <b>hook vocabulary</b> (19 hooks, listed atop relics.gd:
 run-start gold/points/items, party stat boosts at battle spawn — attack, typed damage, max
 HP, armor, speed, crit, Constitution, resistances, resource floor — victory heal/mana/gold,
-gold-find, rest bonus, shop discount, elite loot). Scalar hooks SUM and dict hooks merge
+gold-find, shop discount, elite loot; the <code>rest_heal_add</code> hook is DEAD — rest
+nodes no longer exist, and the two relics carrying it, Cairnmoss Poultice and Martyr's
+Knucklebone, are left as written pending a design pass). Scalar hooks SUM and dict hooks merge
 across the equipped set, so stacking is well-defined. Adding a relic on an existing hook is
 pure data. Highlights: Waystone Shard grants <b>+3</b> talent points; the elemental trio
 (Emberheart / Frostbound Sigil / Nightbloom Charm) covers all six non-physical damage
@@ -1505,10 +1551,9 @@ dedicated impact clips.</li>
 
 <h2>11. Other Screens</h2>
 <ul>
-<li><b>Party screen:</b> hero list with icons beside each name (a spec's dedicated portrait
-in original colors when it has one — the Berserker does — else the tinted class-sprite
-crop), HP/Mana readouts and unspent-point highlights. <b>Awakened heroes are listed and
-titled by their SPEC name</b> ("Berserker", not "Warrior"); the class name only shows while
+<li><b>Hero sheet</b> (opened by clicking a card on the map — the list view is gone, because
+the map's four cards are the party list): a row of four buttons flips between heroes without
+returning to the map. <b>Awakened heroes are titled by their SPEC name</b> ("Berserker", not "Warrior"); the class name only shows while
 unawakened — the same rule applies to battle nameplates, the initiative bar, and the combat
 log. Detail page per hero: stats — <b>each stat is its own hover tooltip explaining just
 that stat</b> (talent points are NOT listed here; the count sits above the talent tree;
@@ -1518,20 +1563,24 @@ Stats mirror the battle
 spawn math: Constitution uses the spec's value plus Toughness, Attack/HP include node
 scaling, and the spec passive line bakes in talent ranks (Aggressive/Defensive Stance,
 Unstoppable) — the class passive + spec passive lines, ability chips (hover shows real
-numbers AND the "% of Attack" scaling), rune equip toggles (slots grow 2/3/4 by zone; the
-pouch list scrolls), any <b>owed rune pick</b> (the awakening rune and elite caches both
-wait here as a choice of three, and the hero-list row announces which heroes owe one), and
-the spec's talent
-tree: three lane columns seven rows deep, a capstone shelf, and click-to-learn nodes
-(row number on the node, lock and closed reasons on the tooltips) for all twelve specs.
-The header shows both purses — normal points and, when the hero holds any, ELITE points.</li>
+numbers AND the "% of Attack" scaling), a <b>read-only</b> rune list (three flat slots;
+equipping happens on the map card, so one place writes it), and the spec's talent tree:
+three lane columns seven rows deep, a capstone shelf, and click-to-learn nodes (row number
+on the node, lock and closed reasons on the tooltips) for all twelve specs. The header shows
+the point purse and, when the hero holds any, the surplus purse. Owed ability, upgrade and
+rune picks are resolved on the map card, not here.</li>
 <li><b>Awakening screen:</b> shows the CLASS PASSIVE in a line under the title (it rides
 along on every path the class can take) and each ability's damage with its "% Atk" scaling.
 The draft screen stays clean — no passive text there.</li>
 <li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per party member;
-reached via the 5 shop nodes on every zone map.</li>
+reached when a cleared fight or elite schedules one (§3b). A consumable already at its cap of
+6 greys its own button rather than taking the gold.</li>
+<li><b>Offer screen:</b> three bargain cards before every fight and elite (§3a) — severity
+number, a four-pip severity bar, the modifier's name and effect, and what it pays on victory.
+The party's HP and the warband being faced are both on screen, because choosing a
+severity-4 bargain at 30% health should be an informed decision.</li>
 <li><b>Relics screen:</b> collection viewer from the main menu.</li>
-<li><b>Glossary panel:</b> see §11a — reachable from the map burger, the Party screen, and
+<li><b>Glossary panel:</b> see §11a — reachable from the map burger, the hero sheet, and
 the battle burger.</li>
 <li><b>Run summary:</b> see §11b — replaces both end-of-run panels.</li>
 <li><b>Settings:</b> master volume slider, fullscreen toggle; persisted; also available
@@ -1560,7 +1609,7 @@ the flat 1-point price, talent point income, boss trophies, node scaling),
 as its own entry — permanent-across-runs versus run-scoped is the single most confusable
 distinction in the game), and <b>The Run</b> (zones and tiers, node types, elites, events,
 what a wipe costs, the difficulty choice).</p>
-<p><b>Surfacing:</b> a panel from the map burger, the Party screen, and the battle burger —
+<p><b>Surfacing:</b> a panel from the map burger, the hero sheet, and the battle burger —
 a category tree on the left, the entry on the right with clickable cross-links. In battle it
 is inert: pure Control UI with no awaits or timers, and the battle scene suspends its own
 raw input handling while the panel is open so a click cannot grade a live skill check
@@ -1644,19 +1693,21 @@ meaningless for difficulty. Win-rate targets attach to a budget, never to "the s
 the ≈85% target describes the top of the ladder (see the changelog's Batch R sweep
 table for the measured curve).</li>
 <li><b>Run harness:</b> <code>./sim.sh --run N</code> (DOD_SIM_RUN=N, default 50) plays
-N COMPLETE runs headlessly — real 30-node maps, real warbands at real budgets WITH
-enemy tier scaling and the zone slot multiplier, HP/mana/items carried between battles,
-talent points earned and spent, elite runes and boss trophies collected, all three zone
-slots — and prints the run report: completion/wipe rates, wipe tier distribution,
-per-tier win/death/HP averages, and the measured party-vs-warband power table (the
+N COMPLETE runs headlessly — the real 36-encounter road, real warbands at real budgets
+WITH enemy tier scaling and the zone slot multiplier, HP/mana/items carried between
+battles, talent points earned and spent, elite runes and boss picks collected, all three
+zone slots — and prints the run report: completion/wipe rates, wipe distribution,
+per-slot win/death/HP averages, and the measured party-vs-warband power table (the
 progression counterweight, measured instead of modelled), plus the run economy: gold
-earned/spent/unspent, items used and carried unused, and rests taken versus rests
-offered. The bot is dumb on purpose; every policy is printed in the report header.
-DOD_SIM_ROUTE picks the route policy — "greedy" never rests while combat is offered
-(the original harness floor, kept so old numbers stay comparable), "default" rests when
-average party HP falls under 65% and a rest node is reachable, "cautious" rests under
-80%, "elites" is greedy preferring elites; running all three main policies gives a band
-that real play sits inside, not a single point. Shops are played by policy (heal-first:
+earned/spent/unspent, items used and carried unused, merchants met and events fired, and
+<b>which bargains the bot accepted with their average severity</b> — the one agency a run
+has left, and so the most diagnostic line in the report. The bot is dumb on purpose; every
+policy is printed in the report header. Its bargain policy is severity-extreme: it takes
+the harshest option offered while the party is above 60% average HP and the mildest once
+it is below, which exercises both ends of the table without pretending to model a payoff.
+DOD_SIM_ROUTE is retained but has nothing left to choose — a line has no route decision,
+and the report's "choice" figure reads 0% forever by design rather than being deleted.
+Shops are played by policy (heal-first:
 any hero under 50% HP buys a Health Potion; then the priciest affordable offer not
 already carried, runes included but only onto a member with a free slot, equipped at
 purchase; no buy dips below the 40g reserve — DOD_SIM_SHOPS=off restores the old
@@ -1666,10 +1717,12 @@ standalone battles always stay dry so their baselines hold).
 DOD_SIM_BUILDS="spec:LaneName,..." names the talent
 lane each spec buys down (default: the tree's first lane, cheapest node first, capstone
 the moment its gate opens), DOD_SIM_TROPHIES lists preferred ability picks (default:
-the spec draw that leads the offer), DOD_SIM_RELICS arms relics at the draft, and
-DOD_SIM_MINIBOSS=off reproduces the pre-mini-boss map (ten dealt tiers, the full 17-fight
-deck, and so no mini-boss ability award — a control for the map half of Batch AH only,
-since kit sizes have no switch). Still excluded,
+the first offer entry), and DOD_SIM_RELICS arms relics at the draft. <b>DOD_SIM_MAP,
+DOD_SIM_MINIBOSS, DOD_SIM_START_RUNE and DOD_SIM_SPEC_OPENING are retired</b> — the
+branching map, the dealt mini-boss row and the opening rune pick they controlled no longer
+exist, so a Matrix row now reads <code>map=line</code> and carries no such fields. <b>Rows
+from before the road are not comparable with rows after it:</b> even <code>depth</code>
+changed units (36 encounters, not 33 tiers). Still excluded,
 stated in the output: bomb/revive/defense/mana items are never used in battle, no
 pre-emptive or offensive item use, routing sees one tier ahead only, and shop rune
 picks ignore build synergy. Simulated runs live entirely in memory (Run.sim_run): they

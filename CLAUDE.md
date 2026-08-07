@@ -54,36 +54,23 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   sims ONLY — sweep/standalone stay dry so R/S baselines hold),
   DOD_SIM_BUILDS="spec:Lane,...", DOD_SIM_TROPHIES, DOD_SIM_RELICS (draft),
   DOD_SIM_ROTATE=1 (Batch W: rotate all twelve specs; see the Batch W
-  block below — shares then carry sample counts), DOD_SIM_MAP=old (Batch
-  Y: the pre-Y map generator — 70% link roll, blind deal; EVERY pre-Y
-  baseline row incl. greedy-as-the-Batch-S-floor only reproduces at
-  map=old), DOD_SIM_DIFFICULTY=wanderer (Batch Y alpha affordance,
-  enemies x0.7 through zone_base_mult; default standard — NEVER set on a
-  baseline row), DOD_SIM_RUNE_ECON=rich / DOD_SIM_RUNE_POWER=<mult>
-  (Batch AD EXPERIMENT ARMS — measurement only, never shipped; UNLIKE
-  every other flag here they are gated on Run.sim_run as well as the env,
-  so a stale export cannot put a real run in an arm. rich = all 4 slots
-  from t1 + a spec-eligible authored rune granted at each zone half-mark;
-  power = a multiplier on authored payload UPSIDE only, costs held,
-  tpl_* stat sticks untouched. Post-AD Matrix rows carry econ=/power=/
-  depth= fields; pre-AD rows do not — never compare across),
-  DOD_SIM_START_RUNE=off (Batch AE — reproduces the PRE-AE economy by
-  suppressing the awakening pick-of-3. Default ON, and UNLIKE the two AD
-  arms above it is NOT gated on Run.sim_run, because it is SHIPPED
-  CONTENT rather than an experiment arm; a control row has to be
-  reachable from real play or the comparison is unreproducible. Post-AE
-  Matrix rows carry start=; pre-AE rows do not),
-  DOD_SIM_SPEC_OPENING=off (Batch AF — drops the GUARANTEE that the
-  opening triple holds a spec-scoped rune, reproducing AE's opening
-  WITH THE STARTING RUNE STILL ON; that is what makes AF's control
-  isolate AF rather than re-measure AE. Shipped content, so default ON
-  and NOT gated on sim_run. Post-AF Matrix rows carry specopen=),
-  DOD_SIM_MINIBOSS=off (Batch AH — reproduces the PRE-AH MAP: ten dealt
-  tiers, the full 17-fight deck, no guaranteed mini-boss and so no
-  mini-boss ability award. Shipped content, default ON, NOT gated on
-  sim_run. It is an honest control for the MAP HALF ONLY: kits still
-  open at 3 abilities with it off, because the trim is structural and
-  has no switch. Post-AH Matrix rows carry mb=).
+  block below — shares then carry sample counts),
+  DOD_SIM_DIFFICULTY=wanderer (Batch Y alpha affordance, enemies x0.7
+  through zone_base_mult; default standard — NEVER set on a baseline
+  row), DOD_SIM_RUNE_ECON=rich / DOD_SIM_RUNE_POWER=<mult> (Batch AD
+  EXPERIMENT ARMS — measurement only, never shipped; UNLIKE every other
+  flag here they are gated on Run.sim_run as well as the env, so a stale
+  export cannot put a real run in an arm. rich = all slots from t1 + a
+  spec-eligible authored rune granted at each zone half-mark; power = a
+  multiplier on authored payload UPSIDE only, costs held, tpl_* stat
+  sticks untouched).
+  RETIRED IN BATCH AN, along with the features they controlled:
+  DOD_SIM_MAP (there is no branching generator to reproduce),
+  DOD_SIM_MINIBOSS (the mini-boss is structural now — slot 6 of a fixed
+  line), DOD_SIM_START_RUNE and DOD_SIM_SPEC_OPENING (heroes begin with
+  no runes). Matrix rows read `map=line`, carry no start=/specopen=/mb=
+  field, and report depth out of 36 SLOTS rather than 33 tiers — so NO
+  PRE-AN ROW IS COMPARABLE WITH A POST-AN ONE, on any field.
   RunSim
   (scripts/run_sim.gd statics, Run injected Events-style) owns setup/map
   walk/report; battle.gd hooks: _ready begin+note_battle_start, _check_end
@@ -169,8 +156,10 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   a headless --script run then idles forever — compare with < instead).
 
 ## Architecture (all UI built in code, no editor scenes)
-- `scripts/run_state.gd` (autoload `Run`): party/items/gold/map/zones, save
-  (user://run_save.bin, auto-saved after every node), relic slots (max 3).
+- `scripts/run_state.gd` (autoload `Run`): party/items/gold/the LINE/zones,
+  save (user://run_save.bin v7, auto-saved after every slot), relic slots
+  (max 3), the offer table (MODIFIERS/REWARDS), merchant+event scheduling,
+  and the ability-upgrade pool.
 - `scripts/settings.gd` (autoload `Settings`): volume/fullscreen.
 - `scripts/classes.gd`: hero configs, core kits, spec info/abilities, passives.
 - `scripts/talents.gd`: 12 fixed trees, each 3 lanes x 7 exclusive ROWS + a
@@ -185,9 +174,148 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - `scripts/unit.gd`: combatant node (sheet animations, bars, status chips,
   bleed buildup meter, outline shader hover).
 - Screens: main_menu → draft (pick 4 + relics) → spec_choice (permanent) →
-  map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
+  map (THE hub: the road, four hero cards, potions, burger) → offer (before
+  every fight/elite) → battle → sometimes shop and/or event → back to map.
+  party.tscn is the HERO SHEET now, opened from a card.
 
-## Current systems snapshot (2026-08-06)
+## Current systems snapshot (2026-08-07)
+BATCH AN (08-07) — MAP SCAFFOLD. The branching node map is GONE; a run is a
+LINE of 3 zones x 12 slots = 36. Every zone is the IDENTICAL authored shape
+(Run.ZONE_SHAPE): fight fight ELITE fight fight MINI-BOSS fight fight ELITE
+fight fight BOSS. Zone 3's boss is the end boss. Renders RIGHT TO LEFT (slot 1
+right edge, boss left) — flagged as unconventional, shipped as specified; it
+is SLOT_X_START/SLOT_X_STEP in map_screen.gd if it flips.
+REWARDS AND MODIFIERS IN THIS BATCH ARE PLACEHOLDERS, deliberately — the point
+was a playable 36-slot run to feel the pacing before 66 pieces of content get
+authored against it.
+DELETED, NOT LEFT UNREACHABLE (test_batch_an pins each as ABSENT): FLOORS,
+NODES_PER_TIER, FIGHT/REST/SHOP/EVENT_NODES, both DECK_FALLBACK tables,
+MINIBOSS_TIER, _deal_deck/_deck_violations/_repair_deck, the link graph,
+_guarantee_inbound, _ensure_key_route/_route_satisfied, map_mode(),
+miniboss_on(), dealt_tiers(), award_talent_flex(), roll_ability_offer(),
+grant_start_runes()/start_rune_enabled()/spec_opening_enabled()/
+_generate_spec_rune(), ALL REST NODES, and the edge-column adjacency rule WITH
+its documented-70%/actual-53% bug (it needed deleting, not fixing). The reason
+the test pins absence: that bug survived three batches because the code still
+resolved and still disagreed with its own comment.
+STATE: `Run.map` is a FLAT 12-slot Array of {type,visited,enemies,theme};
+`slot_idx` replaces floor_idx/node_idx everywhere. reachable() returns exactly
+one slot; advance(slot) takes ONE arg. battle_budget reads the SLOT number
+(1-12) and Batch T's ramp is unchanged byte-for-byte (it was fitted against
+depth, and a line is nothing but depth). SAVE v7, and a pre-v7 save is REFUSED
+AND CLEARED on load — a party at tier 7 column 2 has no honest position on a
+line with no columns (the Batch AI call about ranked purchases, applied to the
+board). _migrate_trees() lost its save_version arg with the pre-AI branch.
+THE OFFER (§3, new scenes/offer.tscn + scripts/offer_screen.gd): 3 bargains
+before every FIGHT and ELITE, none before mini-bosses/bosses. One MODIFIER
+(binds BOTH parties) + one REWARD, both visible, no decline. Severity 1-4 is
+FLAT and authored per modifier; REWARDS is keyed on it. THE FLOOR — every
+offer holds a severity 1 or 2 — is guaranteed BY CONSTRUCTION (first draw out
+of the low pool), never by rejecting rolls. Reward pays ON VICTORY: the
+modifier is the price, and "a merchant follows the fight" cannot precede the
+fight it follows.
+SIX PLACEHOLDER MODIFIERS, four new BattleUnit fields with ONE read site each:
+mod_ignore_armor (Brittle -> effective_armor returns 0.0 BEFORE every armor
+source), mod_speed_mult (Frenzied 1.3 -> effective_speed), mod_no_heals
+(Bloodless -> heal_amount, at the top with the other absolute refusals so
+Bleed/DoT still tick), mod_cost_mult (Warded 1.25 -> battle._eff_cost, applied
+AFTER every discount and NEVER added to a zero — "basic attacks are free"
+describes the kit, Strike is cost 0 already). Overgrown and Tinderbox need no
+field: hp clamp at spawn, and the existing type_dmg_bonus["fire"] hook.
+Stamped by battle._apply_battle_modifier() AFTER spawn and BEFORE the opening
+initiative roll (Frenzied must be on the board before next_time seeds off
+speed).
+MAP SCREEN IS THE PARTY SCREEN. Four hero cards (portrait, spec, HP bar with
+numbers, resource bar, THREE rune slots, unspent badge); card click -> talent
+tree, rune slot click -> pouch overlay; owed ability/upgrade/rune picks resolve
+ON THE CARD. Potions usable on the map (bomb + defense stay battle-only and say
+why). Party button and list view DELETED — party_screen.gd is now the HERO
+SHEET, entered for Run.hero_screen_idx with a 4-button switcher, and its runes
+are READ-ONLY (one place writes `equipped`).
+REWARDS RE-CUT: mini-boss -> generic ABILITY UPGRADE pick-of-3 (placeholder
+pool of 4 in Run.ABILITY_UPGRADES; upgrades STACK on one ability, the SAME
+upgrade never twice — stored on the member as `upgrades`=[{id,ability}], and
+NOTE: nothing reads them at battle spawn yet, they are recorded only). Zone
+bosses 1-2 -> ability pick from the SPEC POOL ONLY (Classes.CLASS_POOLS is
+left standing and still resolves; nothing reads it). End boss -> relic + gold
++ run ends, no pick.
+SCHEDULING (§5/§7): merchant 40% after a cleared fight/elite with a FLOOR of 4
+dry slots; event 25%. BOTH rolled ONCE on the victory screen and queued on
+`Run.pending_after` — rolling from the map would re-roll every redraw and the
+floor would mean nothing. Run.next_after_scene() is THE one place that answers
+"where next"; shop and event screens both call it on leave.
+ATTRITION: no rests. Clearing ANY slot heals 15% via Run.victory_heal_pct(),
+which rides the SAME victory_heal_pct relic hook (Chalice stacks -> 25%, one
+read site). ITEM CAP 6 per type: Run.add_item() returns what LANDED and every
+grant goes through it; the shop greys a full stack rather than taking gold.
+TALENT POINTS: 1 apiece from elite/miniboss/boss INCLUDING the end boss, 0
+from fights = 4/zone, 12/run, +1 awakening = 13 against an 8-node tree. ONE
+PURSE: at 12-vs-8 the row exclusivity does the barring AI's flex purse existed
+to do, so `talent_flex` survives but nothing feeds it. `Talents.purse_for`
+(NEW) is the single site deciding which wallet pays — flex first, normal
+points after; hero sheet AND RunSim._spend_talents both call it.
+THE ONE ARITHMETIC DEVIATION, FLAGGED NOT SILENT: §8 says 12/run and a surplus
+of 4. The awakening point (award_spec_point) was KEPT because §8 enumerates
+SLOT types and the awakening is not a slot — so the real totals are 13 and 5.
+Removing it would push the first talent pick from "the moment you choose a
+spec" out to slot 3, a live design change the batch never asks for.
+test_batch_ai pins 13 explicitly, so the designer deciding otherwise trips it.
+RUNES: 3 slots FLAT from run start (rune_slots() ignores zone_idx now), heroes
+start with NONE. roll_rune_candidates lost its guarantee_spec param with AF's
+opening pick. Rune CONTENT untouched — the rebuild is its own batch.
+SIM: walk_to_next_fight walks the line (one slot, no _pick_node, no rest
+policy). Bot bargain policy is SEVERITY-EXTREME (harshest above 60% avg HP,
+mildest below). Report gains merchants/events/bargains-taken/avg-severity and
+loses the rest lines. RETIRED FLAGS: DOD_SIM_MAP, DOD_SIM_MINIBOSS,
+DOD_SIM_START_RUNE, DOD_SIM_SPEC_OPENING — all four controlled things that no
+longer exist. Matrix row reads `map=line` and carries none of them; depth= is
+out of 36 now, not 33, so NO PRE-AN ROW IS COMPARABLE. `choice=` is retained
+and reads 0% forever BY DESIGN (a missing metric reads as a broken
+instrument; a zero reads as a line).
+VERIFIED: NEW test_batch_an.gd 5667 checks / 0 failures, stable 3/3 (the
+line's shape and one-way walk, every deleted name pinned ABSENT, 2000 sampled
+offers for the floor and for severity-matched rewards, all six modifiers on
+BOTH parties in a LIVE battle at the read site each implements, a NO-modifier
+battle proving the pre-AN path is untouched, upgrade stacking/never-twice,
+spec-only ability draws, the merchant floor DRIVEN not sampled, the item cap
+refusing, flat 3 rune slots). Regression: test_batch_ah 5416/0 (its §3 offer
+and §4 map sections RE-POINTED IN PLACE with the reason in the file),
+test_batch_ah_battle 65/0 (owed-pick affordance re-pointed to the card),
+test_batch_ai 2036/0 (schedule + migration re-pointed), test_batch_aj 389/0,
+test_batch_ak 524/0, test_batch_al 556/0, test_runes 2982/0, run-harness gates
+1/2/3 PASS. 11 scenes + every script compile, 0 SCRIPT ERROR.
+DELETED WITH THEIR FEATURE: test_start_rune.gd, test_start_rune_ui.gd.
+KNOWN-BAD, NOT OURS: test_rune_battle 91/1 (the Inferno chip check).
+NEW SCRATCH GATES (keep them; they catch what --check-only cannot):
+`check_parse.gd` force-loads every script AND scene so an autoload-dependent
+compile error fails loudly, and `check_flow.gd` instantiates every screen this
+batch touched against a live run and fails a screen that builds < 5 nodes.
+GOTCHA THE FIRST RUN HIT: `root.process_frame` DOES NOT EXIST — process_frame
+is a SceneTree signal and `root` is a Window. Awaiting it never returns, and
+because Godot buffers stdout when not a TTY the run produces ZERO OUTPUT and
+looks like a silent hang rather than an error. Use bare `process_frame`.
+SECOND GOTCHA: `--quit-after N` KILLS a --script test mid-run and it prints
+nothing — the suites that spawn live battles (ak/al/rune_battle) must run
+WITHOUT it.
+NOT DONE, deliberately, per "Not in this batch": no new abilities, modifiers,
+runes, upgrades or boss pairs authored; the nine unauthored talent trees
+untouched; Cairnmoss Poultice NOT re-specced (its rest_heal_add hook is dead
+and stays noted — Martyr's Knucklebone carries the same dead hook alongside a
+live victory_heal_pct, so it is half-dead rather than dead).
+NO EVENT IS BROKEN BY §7 (the batch asked for a list): the event requirement
+vocabulary is min_gold / max_gold / zone_slot / has_item / spec_in_party /
+fallen_hero — there has never been a rest-node or shop-node condition, so
+nothing was gated on one and nothing silently stopped firing. Four events
+mention a waystone/merchant/camp in FLAVOUR only (waystone_cache,
+abandoned_wagon, old_trapper, mushroom_ring) and all still fire.
+REPORTED NOT ACTED ON: (a) the three point-granting events (Blood Altar,
+Training Grounds, Warden's Echo) now pay into an economy that is already 5
+points in surplus — they were sized against Batch AI's exact-8 purse. (b)
+ability UPGRADES are recorded on the member but nothing reads them at battle
+spawn: the pick is real and persists, the effect is not wired, which is
+correct for a placeholder pool but must not be mistaken for a working feature.
+(c) `Talents.desc_for` still renders String.num(v, 2) so tooltips read
+"+25.00%" — pre-dates this batch, affects all twelve trees, one-line fix.
 BATCH AL (08-06) — WARDEN, ALL 24 NODES. The third of the four class batches
 AI promised. One spec only; the other nine trees and enemy tuning are
 UNTOUCHED.

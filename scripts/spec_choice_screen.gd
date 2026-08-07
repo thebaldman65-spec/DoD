@@ -155,11 +155,9 @@ func _choose(idx: int, spec_id: String) -> void:
 # All specs confirmed: the boss-entry tune plays over a fade to black, then the
 # node map appears (map music waits for the tune to finish).
 func _finish_and_fade() -> void:
-	# Batch AE: the opening pick-of-3, dealt at the run-start beat — specs
-	# locked, party built, before the first map exists. It waits on the
-	# Party screen like an elite cache; the map badges it so nobody starts
-	# the climb without noticing.
-	Run.grant_start_runes()
+	# Batch AN deleted Batch AF/AE's opening rune pick-of-3 that used to be
+	# dealt here. Heroes now begin with NO runes and three empty slots, and
+	# the first rune comes from the Peddler, an elite, or a rich bargain.
 	Run.specs_chosen = true
 	# Persist immediately: without this, quitting before the next node made
 	# Continue resurrect the old specs and talent trees.

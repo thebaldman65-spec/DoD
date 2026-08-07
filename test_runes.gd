@@ -407,8 +407,11 @@ func _arm_purity(run: Node) -> void:
 		run.zone_idx = z
 		ok(run.rune_econ() == "normal", "flags unset: rune_econ should be normal")
 		ok(is_equal_approx(run.rune_power(), 1.0), "flags unset: rune_power should be 1.0")
-		ok(run.rune_slots() == 2 + z,
-			"flags unset: rune_slots should be the shipped 2/3/4 ladder at zone %d" % z)
+		# Batch AN §9: THREE SLOTS FLAT from run start. The 2/3/4 growth
+		# ladder is gone, so the assertion is that the zone does NOT move it.
+		ok(run.rune_slots() == 3,
+			"flags unset: rune_slots is a flat 3 at zone %d (got %d)" % [
+				z, run.rune_slots()])
 
 	# 2. Both SET, but NOT a sim: the flags must be unreachable.
 	OS.set_environment("DOD_SIM_RUNE_ECON", "rich")
@@ -419,8 +422,8 @@ func _arm_purity(run: Node) -> void:
 			"REAL PLAY WITH THE ENV SET reached the rich arm — purity violated")
 		ok(is_equal_approx(run.rune_power(), 1.0),
 			"REAL PLAY WITH THE ENV SET reached the power arm — purity violated")
-		ok(run.rune_slots() == 2 + z,
-			"REAL PLAY WITH THE ENV SET moved the slot ladder at zone %d" % z)
+		ok(run.rune_slots() == 3,
+			"REAL PLAY WITH THE ENV SET moved the flat 3 slots at zone %d" % z)
 	var real_rune: Dictionary = run._apply_rune_power(Runes.build("glass"))
 	ok(is_equal_approx(float(real_rune["payload"]["stat"]["crit_bonus"]), 0.08),
 		"REAL PLAY WITH THE ENV SET scaled a rune payload — purity violated")

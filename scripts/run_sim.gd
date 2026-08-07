@@ -77,8 +77,17 @@ static var route := "default"
 static var builds := {}           # spec -> target lane name
 static var shops_on := true       # Batch U shop policy (DOD_SIM_SHOPS=off -> v1 floor)
 static var items_on := true       # Batch U drink policy (DOD_SIM_ITEMS=off -> v1 floor)
-static var rest_offered := 0      # walk steps where a rest node was reachable
-static var rest_taken := 0        # rest nodes actually entered
+# Batch AN §3: what the bot took at the offer screen. offer_severity_sum /
+# offer_count is the run\'s average accepted severity — the one number that
+# says whether the bargain table is being used as a lever or ignored.
+static var offer_taken := {}      # modifier id -> times accepted
+static var offer_severity_sum := 0
+static var offer_count := 0
+static var upgrade_taken := 0     # mini-boss ability upgrades resolved
+# What FOLLOWED cleared slots (§5/§7): merchants and events are scheduled
+# now, not dealt onto the board.
+static var merchants_seen := 0
+static var events_seen := 0
 static var items_used := 0        # potions drunk in battle (battle.gd increments)
 static var items_left := 0.0      # consumables still carried when a run ends
 static var gold_earned := 0.0     # everything a run ever held (start + income)
@@ -129,17 +138,6 @@ static var rune_granted := 0        # DOD_SIM_RUNE_ECON=rich only
 # an arm. Split out because it fails differently again — it cannot fail on
 # gold, on routing, or on a closed slot, which is the whole reason it was
 # the lever chosen.
-static var rune_start_offered := 0     # opening candidates shown (3 per hero)
-static var rune_start_taken := 0       # picks resolved — one rune each
-static var rune_start_equipped := 0    # ...of those, worn (a slot was free)
-static var rune_start_spec := 0        # ...of those, spec-scoped
-static var rune_start_spec_avail := 0  # triples holding >=1 spec-scoped option
-# Batch AF: the guarantee's own failure count, measured from the OUTCOME
-# rather than from a signal the roller hands back. A triple dealt with the
-# guarantee on and no spec-scoped rune in it means the spec subset was
-# empty and the silent fallback fired — which is the property worth
-# watching, and it would also catch a seed that was rolled and then lost.
-static var rune_start_fallback := {}   # spec id -> triples that fell back
 static var slots_avail_sum := 0.0   # summed over heroes at run end
 static var slots_filled_sum := 0.0
 static var worn_kind := {}          # spec|class|universal|stick -> runes worn
@@ -207,7 +205,6 @@ static func start_run(run: Node) -> void:
 	# Batch AE: the sim gets the opening pick too, resolved through the same
 	# _pick_rune_candidate policy the elite cache uses — otherwise the
 	# harness measures a different game than the one shipping.
-	_resolve_start_runes(run)
 	run.specs_chosen = true
 	_run_spent = 0
 	_run_gold_spent = 0
@@ -216,59 +213,72 @@ static func start_run(run: Node) -> void:
 		push_error("RunSim: no combat node reachable from the gate")
 
 
-# Walk the map tier by tier, resolving non-combat nodes in place, until a
-# combat node is entered (its encounter is set). False = nothing to fight,
-# which a well-formed map can't produce before the boss.
+# Walk the LINE (Batch AN). Every slot is combat, so there is nothing to
+# resolve in place any more — the walk advances one slot and returns with an
+# encounter armed. The loop survives because the shop and the event are now
+# things that FOLLOW a cleared slot rather than things standing on the board;
+# they are resolved by on_battle_end, not here.
+#
+# ROUTE AGENCY IS STRUCTURALLY ZERO NOW and the counters say so rather than
+# being deleted: walk_steps still climbs, reach_sum tracks it exactly, and
+# choice_steps stays 0 for every run. A report line that reads "choice 0%"
+# is the honest description of a line; a missing line would just look like
+# the instrument broke.
 static func walk_to_next_fight(run: Node) -> bool:
-	for step in 64:  # a zone is 11 tiers — 64 is "impossible map" insurance
-		_rich_top_up(run)
-		var reach: Array = run.reachable()
-		if reach.is_empty():
-			return false
-		if run.floor_idx < 0:
-			_tally_map(run)  # fresh zone map: book its dealt composition
-		var f: int = run.floor_idx + 1
-		# Route agency (Batch Y): what this step offered, before the pick.
-		walk_steps += 1
-		reach_sum += reach.size()
-		var reach_types := {}
-		for r in reach:
-			var ty := String(run.map[f][r]["type"])
-			reach_types[ty] = true
-			var seen_key := "%d,%d" % [f, r]
-			if not _seen_nodes.has(seen_key):
-				_seen_nodes[seen_key] = true
-				deck_seen[ty] = int(deck_seen.get(ty, 0)) + 1
-		if reach.size() >= 2 and reach_types.size() >= 2:
-			choice_steps += 1
-		for ty in reach_types:
-			type_offered[ty] = int(type_offered.get(ty, 0)) + 1
-		var idx := _pick_node(run, f, reach)
-		var node: Dictionary = run.map[f][idx]
-		type_taken[String(node["type"])] = \
-			int(type_taken.get(String(node["type"]), 0)) + 1
-		run.advance(f, idx)
-		match String(node["type"]):
-			"fight", "elite", "miniboss", "boss":
-				# Pre-rolled at map birth, same as the real map click.
-				var warband: Array = node.get("enemies", [])
-				if warband.is_empty():
-					warband = run.compose(node["type"])
-					node["theme"] = run.last_theme
-				run.encounter = {"type": node["type"], "enemies": warband,
-					"theme": node.get("theme", "Warband")}
-				return true
-			"rest":
-				var rest_pct: float = 0.3 + run.relic_add("rest_heal_add")
-				run.heal_party(rest_pct)
-				run.restore_mana(rest_pct)
-			"shop":
-				if shops_on:
-					_shop_visit(run)
-				# DOD_SIM_SHOPS=off: window-shop, buy nothing (the v1 floor).
-			"event":
-				_resolve_event(run)
-	return false
+	_rich_top_up(run)
+	var reach: Array = run.reachable()
+	if reach.is_empty():
+		return false
+	if run.slot_idx < 0:
+		_tally_map(run)  # fresh zone: book its (fixed) composition
+	var s := int(reach[0])
+	walk_steps += 1
+	reach_sum += reach.size()
+	var node: Dictionary = run.map[s]
+	var ty := String(node["type"])
+	type_offered[ty] = int(type_offered.get(ty, 0)) + 1
+	type_taken[ty] = int(type_taken.get(ty, 0)) + 1
+	var seen_key := str(s)
+	if not _seen_nodes.has(seen_key):
+		_seen_nodes[seen_key] = true
+		deck_seen[ty] = int(deck_seen.get(ty, 0)) + 1
+	run.advance(s)
+	# §3: the offer. The bot takes the SEVEREST bargain it is offered while
+	# the party is healthy and the MILDEST once it is hurt — the crudest
+	# policy that exercises both ends of the severity table, and the one a
+	# cautious human most resembles. It is a policy, not a recommendation.
+	if ty in ["fight", "elite"]:
+		_take_offer(run)
+	var warband: Array = node.get("enemies", [])
+	if warband.is_empty():
+		warband = run.compose(ty, s + 1)
+		node["theme"] = run.last_theme
+	run.encounter = {"type": ty, "enemies": warband,
+		"theme": node.get("theme", "Warband")}
+	return true
+
+
+# The bot's bargain policy. Healthy (>=60% average party HP) it takes the
+# highest severity offered; hurt, the lowest — which the §3 floor
+# guarantees is always a 1 or a 2.
+static func _take_offer(run: Node) -> void:
+	var offer: Array = run.roll_offer()
+	if offer.is_empty():
+		return
+	var hurt := _avg_hp(run) < 0.60
+	var best: Dictionary = offer[0]
+	for option in offer:
+		# (explicit types: `run` is an untyped Node here, so := cannot infer
+		# from its methods — the CLAUDE.md gotcha)
+		var sev: int = run.modifier_severity(String(option["modifier"]))
+		var cur: int = run.modifier_severity(String(best["modifier"]))
+		if (hurt and sev < cur) or (not hurt and sev > cur):
+			best = option
+	offer_taken[String(best["modifier"])] = \
+		int(offer_taken.get(String(best["modifier"]), 0)) + 1
+	offer_severity_sum += int(run.modifier_severity(String(best["modifier"])))
+	offer_count += 1
+	run.accept_offer(best)
 
 
 # DOD_SIM_RUNE_ECON=rich (Batch AD): top every hero up to the milestone
@@ -285,7 +295,7 @@ static func walk_to_next_fight(run: Node) -> bool:
 static func _rich_top_up(run: Node) -> void:
 	if run.rune_econ() != "rich":
 		return
-	var half := 1 if run.floor_idx + 1 < 6 else 2
+	var half := 1 if run.slot_idx + 1 < 6 else 2
 	var target: int = mini(run.zone_idx * 2 + half, run.rune_slots())
 	for m in run.party:
 		var worn := 0
@@ -307,52 +317,14 @@ static func _rich_top_up(run: Node) -> void:
 			worn += 1
 
 
-# The route policy (Batch U). greedy/elites keep the Batch S ladder byte
-# for byte — combat first, recovery only when no combat is offered — so
-# the old floor stays comparable. default/cautious rest on purpose: below
-# the threshold (65%/80% average party HP) a reachable rest node outranks
-# everything, which is the single behaviour the old harness lacked.
-static func _pick_node(run: Node, f: int, reach: Array) -> int:
-	var rest_at := -1
-	for i in reach:
-		if String(run.map[f][i]["type"]) == "rest":
-			rest_at = i
-			break
-	if rest_at >= 0:
-		rest_offered += 1
-	var prefs: Array = ["boss"]
-	if route in ["greedy", "elites"]:
-		var hurt := false
-		for m in run.party:
-			if int(m["hp"]) > 0 \
-					and float(m["hp"]) / float(m["max_hp"]) < 0.6:
-				hurt = true
-		prefs += ["elite", "fight"] if route == "elites" else ["fight", "elite"]
-		prefs += ["rest", "shop", "event"] if hurt else ["shop", "event", "rest"]
-	else:
-		var threshold := 0.80 if route == "cautious" else 0.65
-		if rest_at >= 0 and _avg_hp(run) < threshold:
-			rest_taken += 1
-			return rest_at
-		prefs += ["fight", "elite", "shop", "event", "rest"]
-	for want in prefs:
-		for i in reach:
-			if String(run.map[f][i]["type"]) == want:
-				if want == "rest":
-					rest_taken += 1
-				return i
-	return reach[0]
-
-
 # Book a freshly generated zone map: what the deal actually put on the
 # board (elites counted as their own type — they are the rune-cache
 # source), and reset the per-map seen-guard for the ever-reachable count.
 static func _tally_map(run: Node) -> void:
 	_seen_nodes = {}
-	for f in run.map.size():
-		for node in run.map[f]:
-			var ty := String(node["type"])
-			deck_present[ty] = int(deck_present.get(ty, 0)) + 1
+	for node in run.map:
+		var ty := String(node["type"])
+		deck_present[ty] = int(deck_present.get(ty, 0)) + 1
 
 
 static func _avg_hp(run: Node) -> float:
@@ -484,7 +456,7 @@ static func _resolve_event(run: Node) -> void:
 # the measured curve lands in the same units as the modelled one.
 static func note_battle_start(run: Node, heroes: Array, enemies: Array,
 		stats: Dictionary) -> void:
-	_cur_tier = "%d,%d" % [run.zone_idx + 1, run.floor_idx + 1]
+	_cur_tier = "%d,%d" % [run.zone_idx + 1, run.slot_idx + 1]
 	_deaths_before = stats.get("hero_deaths", 0.0)
 	var t := _tier(_cur_tier)
 	t["fights"] += 1.0
@@ -537,7 +509,7 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 	for id in battle.items:
 		run.items[id] = battle.items[id][1]
 	if not victory:
-		wipes.append({"zone": run.zone_idx + 1, "tier": run.floor_idx + 1})
+		wipes.append({"zone": run.zone_idx + 1, "tier": run.slot_idx + 1})
 		_finish_run(run, battle, false)
 		return
 	t["wins"] += 1.0
@@ -553,7 +525,6 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 			run.party[i]["mana"] = h.resource
 	var node_type := String(run.encounter.get("type", "fight"))
 	run.award_talent_points(node_type)
-	run.award_talent_flex(node_type)
 	run.award_gold(node_type)
 	if node_type == "elite":
 		var looter: Dictionary = run.party.pick_random()
@@ -576,29 +547,41 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 			if rune["equipped"]:
 				rune_elite_equipped += 1
 			looter["runes"] = looter.get("runes", []) + [rune]
-		var drop_id: String = run.random_loot()
-		run.items[drop_id] = int(run.items.get(drop_id, 0)) + 1
+		# Batch AN §6: drops honour the six-per-type cap, through the same
+		# Run.add_item every other grant uses — a sim that could stockpile
+		# past the cap would report an economy the game cannot produce.
+		run.add_item(run.random_loot())
 		for extra_i in int(run.relic_add("loot_extra")):
-			var extra_id: String = run.random_loot()
-			run.items[extra_id] = int(run.items.get(extra_id, 0)) + 1
-	var v_heal: float = run.relic_add("victory_heal_pct")
-	if v_heal > 0.0:
-		run.heal_party(v_heal)
+			run.add_item(run.random_loot())
+	# §6: clearing ANY slot heals 15%, with the relic stacking on top.
+	run.heal_party(run.victory_heal_pct())
 	var v_mana: float = run.relic_add("victory_mana_pct")
 	if v_mana > 0.0:
 		run.restore_mana(v_mana)
 	run.gold += int(run.relic_add("victory_gold"))
+	# §3: the accepted bargain pays out, and the modifier is cleared.
+	var bargain: Dictionary = run.claim_reward()
+	var merchant_owed: bool = bool(bargain.get("shop", false))
 	var run_over := false
-	# Batch AH: the mini-boss pays an ability pick too — same offer, same
-	# policy, half a zone earlier.
+	# §4: the mini-boss pays an ABILITY UPGRADE now, not an ability.
 	if node_type == "miniboss":
-		_award_trophies(run)
+		_award_upgrades(run)
 	if node_type == "boss":
-		_award_trophies(run)  # never Relics.unlock_random — that persists
+		# The END boss awards no ability pick (§4) — nothing follows it.
 		if run.has_next_zone():
+			_award_trophies(run)  # never Relics.unlock_random — that persists
 			run.advance_zone()
 		else:
 			run_over = true
+	# §5 and §7: what follows a cleared fight or elite, resolved by the same
+	# rolls the victory screen makes.
+	if merchant_owed or run.roll_merchant(node_type):
+		merchants_seen += 1
+		if shops_on:
+			_shop_visit(run)
+	if run.roll_event(node_type):
+		events_seen += 1
+		_resolve_event(run)
 	_spend_talents(run)  # the post-battle party screen, boiled to policy
 	if run_over:
 		_finish_run(run, battle, true)
@@ -629,7 +612,7 @@ static func _finish_run(run: Node, battle, done: bool) -> void:
 	# clear is 33). A mean over per-run samples, never a median — the median
 	# is the knife-edge statistic Batch AB caught flipping a whole zone on a
 	# two-run difference.
-	depth_reached.append(run.zone_idx * 11 + run.floor_idx + 1)
+	depth_reached.append(run.zone_idx * run.SLOTS_PER_ZONE + run.slot_idx + 1)
 	if _run_r8 >= 0.0:
 		r8_samples.append(_run_r8)
 	# Stage 0a: the slot ladder and what is actually worn on it. Slots open
@@ -658,7 +641,7 @@ static func _finish_run(run: Node, battle, done: bool) -> void:
 	# indistinguishable from a hung one for its entire life.
 	print("run %d/%d — %s (%d completed so far)" % [runs_done, runs_target,
 		("COMPLETED" if done else "wiped z%d t%d" % [run.zone_idx + 1,
-		run.floor_idx + 1]), completed])
+		run.slot_idx + 1]), completed])
 	if runs_done < runs_target:
 		start_run(run)
 		battle.get_tree().reload_current_scene()
@@ -668,7 +651,20 @@ static func _finish_run(run: Node, battle, done: bool) -> void:
 		battle.get_tree().quit()
 
 
-# Ability awards (Batch AH: mini-boss AND zone boss), resolved instantly
+# Batch AN §4: the mini-boss award is a generic ABILITY UPGRADE, chosen
+# from three. The bot takes the FIRST offer entry — the four placeholders
+# are not comparable without a payoff model, and a policy that pretended to
+# rank them would be inventing a preference this batch has no basis for.
+static func _award_upgrades(run: Node) -> void:
+	for m in run.party:
+		var offer: Array = run.roll_upgrade_offer(m)
+		if offer.is_empty():
+			continue
+		m["upgrades"] = m.get("upgrades", []) + [(offer[0] as Dictionary).duplicate()]
+		upgrade_taken += 1
+
+
+# Ability awards (zone bosses only since Batch AN), resolved instantly
 # instead of owed to the party screen. The bot rolls the SAME offer-of-3 a
 # player would see (Run.roll_ability_offer) and picks from THAT, so a sim
 # can never take an ability the real flow would not have offered it.
@@ -678,7 +674,7 @@ static func _award_trophies(run: Node) -> void:
 	for trophy_name in OS.get_environment("DOD_SIM_TROPHIES").split(",", false):
 		wanted.append(trophy_name.strip_edges())
 	for m in run.party:
-		var offer: Array = run.roll_ability_offer(m)
+		var offer: Array = run.roll_spec_ability_offer(m)
 		if offer.is_empty():
 			continue
 		var pick := ""
@@ -707,9 +703,15 @@ static func _spend_talents(run: Node) -> void:
 			if buy == "":
 				break
 			var learned: Dictionary = m.get("talents", {})
-			var purse := "talent_flex" \
-				if Talents.can_learn(tree, buy, learned)["pool"] == "flex" \
-				else "talent_points"
+			# Batch AN: `Talents.purse_for` decides, exactly as the hero
+			# sheet does — flex first while it holds anything, ordinary
+			# points after. Reading `pool` raw here would strand the surplus
+			# in the bank, and the sim would report a tree three nodes
+			# shallower than a player's.
+			var purse := Talents.purse_for(m,
+				Talents.can_learn(tree, buy, learned))
+			if purse == "":
+				break
 			learned[buy] = 1
 			m["talents"] = learned
 			m[purse] = int(m.get(purse, 0)) - 1
@@ -723,57 +725,6 @@ static func _target_lane(spec: String, tree: Array) -> String:
 	return String(tree[0].get("lane", ""))
 
 
-# The starting rune (Batch AE), resolved instantly by the SAME policy the
-# elite cache uses. Every hero owns two slots at run start, so in practice
-# the pick always lands worn — the equipped check is here because a
-# resolution path that assumes a free slot would be a lie the moment
-# anything upstream changes.
-#
-# rune_start_spec vs rune_start_spec_avail is the report-back the brief
-# asked for, and the pair matters: the bot's policy PREFERS a spec-scoped
-# candidate, so "how often the pick was spec" is an upper bound on a naive
-# player, while "how often a spec rune was among the three" is the roller's
-# own hit rate and the number a spec-weighted opening would move.
-static func _resolve_start_runes(run: Node) -> void:
-	if run.grant_start_runes() < 1:
-		return
-	for m in run.party:
-		var queue: Array = m.get("rune_candidates", [])
-		while int(m.get("rune_picks_owed", 0)) > 0 and not queue.is_empty():
-			var triple: Array = queue.pop_front()
-			var spec_id := String(m.get("spec", ""))
-			var spec_scope := "spec:%s" % spec_id
-			rune_start_offered += triple.size()
-			var had_spec := false
-			for c in triple:
-				if String(c.get("scope", "")) == spec_scope:
-					rune_start_spec_avail += 1
-					had_spec = true
-					break
-			# Batch AF: with the guarantee on, a triple without a spec rune
-			# can only mean the spec subset was empty and the fallback
-			# fired. Named per spec, because "which spec" is the whole
-			# report-back — a bare count would not say what to author.
-			if not had_spec and run.spec_opening_enabled():
-				rune_start_fallback[spec_id] = int(rune_start_fallback.get(spec_id, 0)) + 1
-			var rune: Dictionary = _pick_rune_candidate(m, triple)
-			var worn := 0
-			for r in m.get("runes", []):
-				if r.get("equipped", false):
-					worn += 1
-			rune["equipped"] = worn < run.rune_slots()
-			rune_start_taken += 1
-			if rune["equipped"]:
-				rune_start_equipped += 1
-			if String(rune.get("scope", "")) == spec_scope:
-				rune_start_spec += 1
-			m["runes"] = m.get("runes", []) + [rune]
-			m["rune_picks_owed"] = int(m.get("rune_picks_owed", 0)) - 1
-		m["rune_candidates"] = queue
-
-
-# Elite pick-of-3 policy: the candidate whose lane matches the build's
-# target lane, else any spec-scoped candidate, else the first.
 static func _pick_rune_candidate(member: Dictionary, candidates: Array) -> Dictionary:
 	var spec := String(member.get("spec", ""))
 	var tree: Array = member.get("tree", [])
@@ -793,10 +744,15 @@ static func _pick_rune_candidate(member: Dictionary, candidates: Array) -> Dicti
 #   target lane's capstone once the shelf opens. A lane holds exactly one
 #   node per row, so a pure-lane build is always available — no spillover
 #   rule is needed to keep the bot spending.
-#   Elite points: a SECOND node in the lowest row that has one pick, taken
-#   from the next lane in tree order. Deliberately dumb and deterministic;
-#   the flex purse is 0-3 points a run and no policy question rides on it.
-# "" = nothing learnable with either purse — bank the points.
+#   Surplus: a SECOND node in the lowest row that has one pick, taken from
+#   the next lane in tree order. Deliberately dumb and deterministic.
+# "" = nothing learnable with anything the hero is carrying — bank it.
+#
+# BATCH AN: the ROW picks still come first and the SECOND-node picks second,
+# which is the ordering that matters — climbing before widening. What
+# changed is that ordinary points can now pay for the widening once the
+# eight rows are spent, so the second pass runs on `talent_points` too
+# rather than only on a flex purse nothing feeds any more.
 static func _next_buy(m: Dictionary, tree: Array, target: String) -> String:
 	var learned: Dictionary = m.get("talents", {})
 	var lanes: Array = [target]
@@ -804,21 +760,19 @@ static func _next_buy(m: Dictionary, tree: Array, target: String) -> String:
 		var lane := String(t.get("lane", ""))
 		if not lane in lanes:
 			lanes.append(lane)
-	# Normal points first — they are the only purse that can open a row, so
-	# spending flex while a normal point sits banked would be strictly worse.
-	var purses: Array = []
-	if int(m.get("talent_points", 0)) > 0:
-		purses.append("points")
-	if int(m.get("talent_flex", 0)) > 0:
-		purses.append("flex")
-	for want_pool in purses:
+	if int(m.get("talent_points", 0)) < 1 and int(m.get("talent_flex", 0)) < 1:
+		return ""
+	# Row picks before second-node picks: climbing beats widening while a
+	# row is still unopened.
+	for want_pool in ["points", "flex"]:
 		for row in range(1, Talents.CAPSTONE_ROW + 1):
 			for lane in lanes:
 				for t in Talents.row_nodes(tree, row):
 					if String(t.get("lane", "")) != lane:
 						continue
 					var check := Talents.can_learn(tree, String(t["id"]), learned)
-					if check["ok"] and check["pool"] == want_pool:
+					if check["ok"] and check["pool"] == want_pool \
+							and Talents.purse_for(m, check) != "":
 						return String(t["id"])
 	return ""
 
@@ -893,12 +847,10 @@ static func _print_report(battle) -> void:
 	var runes_env := OS.get_environment("DOD_SIM_RUNES")
 	var runes_mode := runes_env if runes_env in ["off", "stats"] else "full"
 	print("          runes_pool=%s (DOD_SIM_RUNES: full=authored pool, stats=Common family, off=none)" % runes_mode)
-	var map_mode := "old" if OS.get_environment("DOD_SIM_MAP") == "old" else "new"
 	var diff := OS.get_environment("DOD_SIM_DIFFICULTY")
 	if not diff in ["standard", "wanderer"]:
 		diff = "standard"
-	print("          map=%s (DOD_SIM_MAP=old reproduces the pre-Y links+deal)  difficulty=%s (DOD_SIM_DIFFICULTY; alpha testing affordance, NOT balance)" % [
-		map_mode, diff])
+	print("          map=line (Batch AN: 3 zones x 12 fixed slots; DOD_SIM_MAP/MINIBOSS/START_RUNE/SPEC_OPENING are RETIRED with the branching map)  difficulty=%s (DOD_SIM_DIFFICULTY; alpha testing affordance, NOT balance)" % diff)
 	var specs_desc := OS.get_environment("DOD_SIM_SPECS")
 	if OS.get_environment("DOD_SIM_ROTATE") == "1":
 		specs_desc = "rotating all twelve (DOD_SIM_ROTATE=1)"
@@ -1065,19 +1017,33 @@ static func _print_report(battle) -> void:
 			heals_bought / runs, restock_bought / runs, runes_bought / runs])
 	print("Items: used %.1f/run   carried unused at end %.1f" % [
 		items_used / runs, items_left / runs])
-	# The single most diagnostic line in the batch: how much recovery the
-	# walk was offered versus how much the policy allowed itself.
-	print("Rests taken: %.1f/run   (nodes offered: %.1f/run)" % [
-		rest_taken / runs, rest_offered / runs])
+	# Batch AN: rests are gone, so the recovery line is the per-slot heal and
+	# what the bot bought instead. The bargain line replaces the route line
+	# as the batch\'s most diagnostic: it is the only agency a run has left.
+	print("Merchants met: %.2f/run   Events: %.2f/run" % [
+		merchants_seen / runs, events_seen / runs])
+	if offer_count > 0:
+		var sev_avg := offer_severity_sum / float(offer_count)
+		var mods := PackedStringArray()
+		var mod_ids: Array = offer_taken.keys()
+		mod_ids.sort_custom(func(a, b): return int(offer_taken[a]) > int(offer_taken[b]))
+		for mid in mod_ids:
+			mods.append("%s %.2f" % [String(mid),
+				int(offer_taken[mid]) / float(runs)])
+		print("Bargains taken: %.1f/run   avg severity %.2f" % [
+			offer_count / runs, sev_avg])
+		print("   by modifier (per run): %s" % "   ".join(mods))
 
 	# ---------- Ability economy (Batch AH) ----------
 	# Six awards a run (a mini-boss and a boss in each of three zones), three
 	# choices each. "taken" below the ceiling means a hero ran its two pools
 	# dry, which is the only way an award can pass a hero by.
 	print("\nAbility economy (per run, per hero):")
-	print("  Awards   offers %.2f (%.2f picks x3)   taken %.2f   ceiling 6.00" % [
+	print("  Awards   offers %.2f (%.2f picks x3)   taken %.2f   ceiling 2.00 (zone bosses only)" % [
 		ability_offered / runs / 4.0, ability_taken / runs / 4.0,
 		ability_taken / runs / 4.0])
+	print("  Upgrades %.2f/hero/run taken   ceiling 3.00 (one per mini-boss)" % [
+		upgrade_taken / runs / 4.0])
 
 	# ---------- Rune economy (Batch AD stage 0a) ----------
 	# The half of the rune question no measurement has ever shown. Read it
@@ -1090,49 +1056,19 @@ static func _print_report(battle) -> void:
 	print("  Elite    candidates %.2f (%.2f caches x3)   taken %.2f   equipped %.2f" % [
 		rune_elite_offered / runs, rune_elite_taken / runs,
 		rune_elite_taken / runs, rune_elite_equipped / runs])
-	# Read straight from the env, as the Matrix row reads the econ arm: the
-	# start rune is not gated on sim_run, so there is no Run to ask.
-	if OS.get_environment("DOD_SIM_START_RUNE") != "off":
-		print("  Start    candidates %.2f (%.2f picks x3)   taken %.2f   equipped %.2f" % [
-			rune_start_offered / runs, rune_start_taken / runs,
-			rune_start_taken / runs, rune_start_equipped / runs])
-		var st := maxf(float(rune_start_taken), 1.0)
-		print("    opening pick was spec-scoped %.0f%% of the time; a spec rune was among the three %.0f%%" % [
-			100.0 * rune_start_spec / st, 100.0 * rune_start_spec_avail / st])
-		print("    (the bot PREFERS a spec candidate, so the first figure is an upper bound on a naive player;")
-		print("     the second is the OFFER RATE — AE measured 36-42% here and named it the ceiling)")
-		# Batch AF: the guarantee, and its escape hatch, reported together.
-		# The second number is the one that can quietly rot — a spec whose
-		# only entries grow a requires_ability nobody has would fall back
-		# forever and nothing else in this report would notice.
-		if OS.get_environment("DOD_SIM_SPEC_OPENING") != "off":
-			var fb := 0
-			for spec_id in rune_start_fallback:
-				fb += int(rune_start_fallback[spec_id])
-			if fb < 1:
-				print("    SPEC-GUARANTEED OPENING is ON: 0 fallbacks — every triple held a spec rune")
-			else:
-				var parts := PackedStringArray()
-				for spec_id in rune_start_fallback:
-					parts.append("%s %d" % [spec_id, int(rune_start_fallback[spec_id])])
-				print("    SPEC-GUARANTEED OPENING is ON: %d fallbacks (spec subset empty) — %s" % [
-					fb, "  ".join(parts)])
-		else:
-			print("    SPEC-GUARANTEED OPENING is OFF (DOD_SIM_SPEC_OPENING=off) — this row is AE's opening")
-	else:
-		print("  Start    OFF (DOD_SIM_START_RUNE=off) — this row reproduces the pre-AE economy")
 	if rune_granted > 0:
 		print("  GRANTED  %.2f   <-- DOD_SIM_RUNE_ECON=rich is ON; this row is an experiment arm" % [
 			rune_granted / runs])
 	print("  Acquired per hero per run: %.2f   (the four written for a spec are the target)" % [
-		(runes_bought + rune_elite_taken + rune_granted + rune_start_taken) / runs / 4.0])
+		(runes_bought + rune_elite_taken + rune_granted) / runs / 4.0])
 	print("  Shop offers refused:  no free slot %.2f   unaffordable (40g reserve) %.2f   duplicate %.2f" % [
 		rune_refused_noslot / runs, rune_refused_gold / runs, rune_refused_dupe / runs])
 	print("  Elite runes won with no free slot: %.2f/run  (pouched, not worn)" % [
 		(rune_elite_taken - rune_elite_equipped) / runs])
-	print("  Shops walked past: %.1f of %.1f offered   <-- the dominant refusal, and it is ROUTING" % [
-		float(type_offered.get("shop", 0) - type_taken.get("shop", 0)) / runs,
-		float(type_offered.get("shop", 0)) / runs])
+	# Batch AN: nothing is "walked past" any more — the merchant is scheduled
+	# rather than dealt onto a board a route could miss, so the old dominant
+	# refusal (ROUTING) is structurally gone and the remaining refusals above
+	# are the whole story.
 	var heroes_seen := maxf(slots_avail_sum, 1.0)
 	print("  Slots at run end: %.2f available per hero, %.2f filled (%.0f%%)" % [
 		slots_avail_sum / runs / 4.0, slots_filled_sum / runs / 4.0,
@@ -1183,22 +1119,23 @@ static func _print_report(battle) -> void:
 		var f8: float = maxf(t8["fights"], 1.0)
 		r8_desc = "%.2f" % sqrt((t8["p_atk"] / f8) * (t8["p_ehp"] / f8) \
 			/ maxf((t8["e_atk"] / f8) * (t8["e_ehp"] / f8), 1.0))
-	# Batch AD adds econ=/power=/depth= — the arms a row was in, and the new
-	# PRIMARY metric with its spread. Pre-AD rows carry none of these three
-	# fields, which is the same never-compare-across-batches rule Batch Y's
-	# map=/diff=/choice= fields established. Batch AF adds specopen=, so a
-	# row measured under the guaranteed opening is identifiable at a glance;
-	# pre-AF rows carry no such field and are not comparable.
-	print("Matrix row: route=%s  map=%s  diff=%s  econ=%s  start=%s  specopen=%s  mb=%s  power=x%.2f  depth=%.2f+/-%.2f  ratio@z1t8=%s  completions=%.0f%%  wipe median tier=%s  choice=%.0f%%" % [
-		route, map_mode, diff,
+	# BATCH AN ROWS ARE NOT COMPARABLE WITH ANY EARLIER ROW, and the field
+	# list says so rather than leaving it to be noticed: map= now reads
+	# `line` and start=/specopen=/mb= are GONE, because the flags behind them
+	# went with the branching map. depth= is out of 36 slots now, not 33
+	# tiers, so even the primary metric changed units. A row carrying
+	# `map=line` is an AN-or-later row; anything else predates the line.
+	# choice= is retained and will read 0% forever — a line has no route
+	# decision, and a missing field would look like a broken instrument.
+	print("Matrix row: route=%s  map=line  diff=%s  econ=%s  power=x%.2f  bargain_sev=%.2f  depth=%.2f+/-%.2f (of 36)  ratio@z1t8=%s  completions=%.0f%%  wipe median slot=%s  choice=%.0f%%" % [
+		route, diff,
 		("rich" if OS.get_environment("DOD_SIM_RUNE_ECON") == "rich" else "normal"),
-		("off" if OS.get_environment("DOD_SIM_START_RUNE") == "off" else "on"),
-		("off" if OS.get_environment("DOD_SIM_SPEC_OPENING") == "off" else "on"),
-		("off" if OS.get_environment("DOD_SIM_MINIBOSS") == "off" else "on"),
-		power_mult, _mean(depth_reached),
+		power_mult,
+		(offer_severity_sum / float(maxi(offer_count, 1))),
+		_mean(depth_reached),
 		_sd(depth_reached) / sqrt(maxf(float(runs_done), 1.0)),
 		r8_desc, 100.0 * completed / runs, med_desc,
 		100.0 * choice_steps / steps])
 
-	print("Still excluded: bomb/revive/defense/mana items never used in battle (only the <35% heal drink); no pre-emptive or offensive item use; routing sees one tier ahead only, no map lookahead; shop rune picks ignore build synergy (priciest first).")
+	print("Still excluded: bomb/revive/defense/mana items never used in battle (only the <35% heal drink); no pre-emptive or offensive item use; potions are never drunk ON THE MAP (Batch AN made them usable there and the bot does not); the bargain policy is severity-extreme only, never a read of the modifier against the party; shop rune picks ignore build synergy (priciest first).")
 	print("=============================================\n")

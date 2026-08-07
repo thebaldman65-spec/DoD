@@ -1,17 +1,24 @@
-# Party overview: pick a hero from the list, then one compact page shows
-# their stats, class explanation, abilities, and their spec's talent tree.
-# Specs are permanent once chosen (after the first victory).
+# The HERO SHEET: one compact page showing a hero's stats, class
+# explanation, abilities, runes and their spec's talent tree.
+#
+# BATCH AN DELETED THE LIST VIEW. The map screen carries all four hero cards
+# now, so it IS the party list — this page is only ever entered for a
+# specific hero (Run.hero_screen_idx, set by the card that was clicked) and
+# Back returns to the map. The rune-EQUIP and pick flows moved onto the card
+# too; runes are shown here as a read-only summary of what the hero is
+# wearing, because the sheet is where their numbers are already explained.
 extends Node2D
 
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
-var selected := -1  # party index; -1 = list view
+var selected := 0  # party index; always a real hero now
 
 
 func _ready() -> void:
 	if not Run.active:
 		get_tree().change_scene_to_file.call_deferred("res://scenes/main_menu.tscn")
 		return
+	selected = clampi(Run.hero_screen_idx, 0, maxi(Run.party.size() - 1, 0))
 	Music.play("map")
 	_draw_screen()
 
@@ -41,18 +48,38 @@ func _draw_screen() -> void:
 	glossary_btn.pressed.connect(func(): GlossaryPanel.open(self))
 	add_child(glossary_btn)
 
-	if selected < 0:
-		_draw_list()
-	else:
-		_draw_detail()
+	_draw_hero_switcher()
+	_draw_detail()
 
 
 func _on_back() -> void:
-	if selected < 0:
-		get_tree().change_scene_to_file("res://scenes/map.tscn")
-	else:
-		selected = -1
-		_draw_screen()
+	Run.save_run()
+	get_tree().change_scene_to_file("res://scenes/map.tscn")
+
+
+# The list view is gone, but flipping between four heroes without going back
+# to the map is worth one row of buttons — comparing two trees is a normal
+# thing to want to do.
+func _draw_hero_switcher() -> void:
+	for i in Run.party.size():
+		var member: Dictionary = Run.party[i]
+		var spec := String(member.get("spec", ""))
+		var btn := Button.new()
+		btn.text = Classes.SPEC_INFO[spec]["name"] if spec != "" \
+			else String(member["key"]).capitalize()
+		btn.custom_minimum_size = Vector2(150, 28)
+		# Under the title, not beside it: a centred title and a centred row of
+		# four buttons collide in the middle of the screen.
+		btn.position = Vector2(324 + i * 158, 46)
+		btn.add_theme_font_size_override("font_size", 12)
+		btn.disabled = i == selected
+		var pts: int = int(member.get("talent_points", 0)) \
+			+ int(member.get("talent_flex", 0))
+		if pts > 0 and i != selected:
+			btn.modulate = Color(1.0, 0.9, 0.45)
+		btn.pressed.connect(Music.click)
+		btn.pressed.connect(_select_hero.bind(i))
+		add_child(btn)
 
 
 func _title(text: String, y: float, size: int = 40) -> void:
@@ -65,62 +92,6 @@ func _title(text: String, y: float, size: int = 40) -> void:
 	label.size = Vector2(1280, size + 10)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(label)
-
-
-func _draw_list() -> void:
-	_title("The Untouched", 30)
-	for i in Run.party.size():
-		var member: Dictionary = Run.party[i]
-		var key: String = member["key"]
-		var spec: String = member.get("spec", "")
-		# Awakened heroes go by their spec name; the class only shows pre-spec.
-		var display: String = Classes.SPEC_INFO[spec]["name"] if spec != "" \
-			else "%s — Unawakened" % key.capitalize()
-		var btn := Button.new()
-		var line := "%s\nHP %d/%d" % [display, member["hp"], member["max_hp"]]
-		if key != "warrior":
-			line += "    Mana %d/%d" % [member["mana"], member["max_mana"]]
-		var pts: int = member.get("talent_points", 0)
-		if pts > 0:
-			line += "    ● %d POINTS TO SPEND" % pts
-			btn.modulate = Color(1.0, 0.92, 0.55)
-		# Elite points say so by name: they buy a different thing (a second
-		# node in a row already picked), so folding them into the same count
-		# would send the player looking for a row they cannot open.
-		var flex_pts: int = member.get("talent_flex", 0)
-		if flex_pts > 0:
-			line += "    ● %d ELITE" % flex_pts
-			btn.modulate = Color(1.0, 0.92, 0.55)
-		# Batch AE: the picker lives one click deeper, on the hero's own
-		# page, so the list has to say who is owed one — the map badge gets
-		# the player to this screen and would otherwise abandon them here.
-		# An owed pick outranks unspent points for the same reason it does
-		# on the map: the player already knows about points.
-		# Batch AH: an owed ABILITY reads the same way, in the trophy gold.
-		var owed_ab: int = int(member.get("bm_picks_owed", 0))
-		if owed_ab > 0:
-			line += "    ◆ %d %s TO CHOOSE" % [owed_ab,
-				"ABILITY" if owed_ab == 1 else "ABILITIES"]
-			btn.modulate = Color(0.95, 0.85, 0.4)
-		var owed: int = int(member.get("rune_picks_owed", 0))
-		if owed > 0 and not member.get("rune_candidates", []).is_empty():
-			line += "    ◆ %d RUNE%s TO CHOOSE" % [owed, "" if owed == 1 else "S"]
-			btn.modulate = Color(0.85, 0.6, 1.0)
-		btn.text = line
-		btn.custom_minimum_size = Vector2(460, 88)
-		btn.position = Vector2(410, 120 + i * 112)
-		btn.add_theme_font_size_override("font_size", 18)
-		btn.tooltip_text = Classes.CLASS_BLURBS[key]
-		# Icon beside the name: the spec's portrait (original colors) when it
-		# has one, else the class sprite crop tinted to match battle.
-		btn.icon = Classes.class_icon(key, spec)
-		if not Classes.SPEC_PORTRAITS.has(spec):
-			var tint: Color = Classes.HERO_TINTS[i % Classes.HERO_TINTS.size()]
-			for state in ["icon_normal_color", "icon_hover_color", "icon_pressed_color",
-					"icon_focus_color"]:
-				btn.add_theme_color_override(state, tint)
-		btn.pressed.connect(_select_hero.bind(i))
-		add_child(btn)
 
 
 func _select_hero(idx: int) -> void:
@@ -188,7 +159,7 @@ func _draw_detail() -> void:
 			+ int(round(base_hp * 0.02 * Run.combat_wins))
 	var spec_label: String = Classes.SPEC_INFO[spec]["name"] if spec != "" else "Unawakened"
 	# Awakened heroes are titled by spec; the class name only shows pre-spec.
-	_title(spec_label if spec != "" else "%s — Unawakened" % cfg["unit_name"], 20, 34)
+	_title(spec_label if spec != "" else "%s — Unawakened" % cfg["unit_name"], 6, 30)
 
 	# Left column: class blurb, stats, abilities (compact chips, hover detail).
 	var blurb := Label.new()
@@ -307,8 +278,11 @@ func _draw_detail() -> void:
 		chip.tooltip_text = tip
 		add_child(chip)
 
-	# Runes: equip slots grow with the run (Run.rune_slots — recomputed on
-	# every draw, so a save loaded mid-zone reads its true cap immediately).
+	# Runes: THREE SLOTS FLAT from run start (Batch AN §9 — the 2/3/4 growth
+	# ladder is gone). READ-ONLY here: equipping happens on the map card, so
+	# there is one place that writes `equipped` and this page can be what it
+	# is good at — showing the numbers those runes are already producing in
+	# the stat block above.
 	var runes: Array = member.get("runes", [])
 	var slot_cap := Run.rune_slots()
 	var rune_header := Label.new()
@@ -316,7 +290,8 @@ func _draw_detail() -> void:
 	for rune in runes:
 		if rune.get("equipped", false):
 			equipped_count += 1
-	rune_header.text = "RUNES  (%d/%d equipped)" % [equipped_count, slot_cap]
+	rune_header.text = "RUNES  (%d/%d equipped — swap them on the map)" % [
+		equipped_count, slot_cap]
 	rune_header.add_theme_font_size_override("font_size", 15)
 	rune_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
 	rune_header.position = Vector2(60, 520)
@@ -338,19 +313,19 @@ func _draw_detail() -> void:
 	var rune_rows := VBoxContainer.new()
 	rune_rows.add_theme_constant_override("separation", 6)
 	rune_scroll.add_child(rune_rows)
-	for i in runes.size():
-		var rune: Dictionary = runes[i]
+	for rune_entry in runes:
+		var rune: Dictionary = rune_entry
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
 		rune_rows.add_child(row)
-		var toggle := Button.new()
+		var state := Label.new()
 		var is_on: bool = rune.get("equipped", false)
-		toggle.text = "Unequip" if is_on else "Equip"
-		toggle.custom_minimum_size = Vector2(80, 26)
-		toggle.add_theme_font_size_override("font_size", 11)
-		toggle.disabled = not is_on and equipped_count >= slot_cap
-		toggle.pressed.connect(_toggle_rune.bind(i))
-		row.add_child(toggle)
+		state.text = "WORN" if is_on else "pouch"
+		state.custom_minimum_size = Vector2(56, 20)
+		state.add_theme_font_size_override("font_size", 11)
+		state.add_theme_color_override("font_color",
+			Color(0.45, 0.9, 0.5) if is_on else Color(0.5, 0.48, 0.5))
+		row.add_child(state)
 		var rune_label := Label.new()
 		var equip_tag := "✦ " if is_on else ""
 		rune_label.text = "%s%s — %s" % [equip_tag, rune["name"], rune["desc"]]
@@ -358,7 +333,7 @@ func _draw_detail() -> void:
 		rune_label.add_theme_color_override("font_color",
 			Color(0.45, 0.9, 0.5) if is_on
 			else rune.get("rarity_color", Color(0.8, 0.8, 0.8)))
-		rune_label.custom_minimum_size = Vector2(330, 20)
+		rune_label.custom_minimum_size = Vector2(354, 20)
 		rune_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(rune_label)
 
@@ -389,17 +364,11 @@ func _draw_detail() -> void:
 	var flex: int = member.get("talent_flex", 0)
 	tree_header.text = "TALENTS — %s    (Points: %d%s)" % [
 		Classes.SPEC_INFO[spec]["name"], member.get("talent_points", 0),
-		"" if flex < 1 else " · Elite: %d" % flex]
+		"" if flex < 1 else " · Surplus: %d" % flex]
 	_draw_lane_tree(member)
-	# Earned abilities wait on the Party screen until chosen (Batch AH: every
-	# spec has pools now, so the old "does this spec have one" gate is gone).
-	if int(member.get("bm_picks_owed", 0)) > 0:
-		_draw_bm_pick(member)
-	# Elite rune caches wait here too (Batch X pick-of-3, the trophy-picker
-	# pattern; candidates were rolled at drop time and stored).
-	if int(member.get("rune_picks_owed", 0)) > 0 \
-			and not member.get("rune_candidates", []).is_empty():
-		_draw_rune_pick(member)
+	# Batch AN: owed ability, upgrade and rune picks resolve on the MAP CARD,
+	# not here. This page is the sheet — what the hero is, and what their
+	# points can buy.
 
 
 # ---------- the talent tree: 3 lanes x 7 rows + a capstone row ----------
@@ -537,10 +506,15 @@ func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
 	# have not reached, capstones before 7/7, doors a sibling shut for good,
 	# AND a sibling only an elite point could force open while they hold
 	# none — the door is still shut, the tooltip says with what key.
+	# Greyed = the player cannot take this right now. That covers rows they
+	# have not reached, capstones before 7/7, and doors a sibling shut for
+	# good. A second-node pick is NOT greyed for want of a flex point any
+	# more: Batch AN lets ordinary points cover it, so the only thing that
+	# closes it is having no points at all — which purse_for answers.
 	var locked: bool = (not check["ok"] and (check["why"].begins_with("Locked")
 		or check["why"].begins_with("Closed") or check["why"].begins_with("Barred")
 		or check["why"].begins_with("Coming"))) \
-		or (check["ok"] and check["pool"] == "flex" and flex < 1)
+		or (check["ok"] and Talents.purse_for(Run.party[selected], check) == "")
 
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(node_size, node_size)
@@ -600,10 +574,15 @@ func _show_tree_tip(talent: Dictionary, ranks_have: int, check: Dictionary,
 	elif not check["ok"]:
 		state += "  —  %s" % check["why"]
 	elif check["pool"] == "flex":
-		# The elite-point crack: say what it costs and what it buys, both.
+		# The second-node crack: say what it costs and out of which purse.
 		state += "  —  %s" % check["why"]
-		state += "\n%s" % ("Click to spend 1 ELITE point (have %d)" % flex if flex > 0
-			else "Needs 1 elite point (have 0)")
+		var purse := Talents.purse_for(Run.party[selected], check)
+		if purse == "talent_flex":
+			state += "\nClick to spend 1 SURPLUS point (have %d)" % flex
+		elif purse == "talent_points":
+			state += "\nClick to spend 1 point (have %d)" % points
+		else:
+			state += "\nNeeds 1 point (have 0)"
 	elif points < 1:
 		state += "  —  costs 1 point (have 0)"
 	else:
@@ -634,26 +613,11 @@ func _on_tree_node_pressed(talent_id: String) -> void:
 	_learn_talent(talent_id)
 
 
-func _toggle_rune(rune_idx: int) -> void:
-	var member: Dictionary = Run.party[selected]
-	var runes: Array = member.get("runes", [])
-	var rune: Dictionary = runes[rune_idx]
-	if rune.get("equipped", false):
-		rune["equipped"] = false
-	else:
-		var equipped_count := 0
-		for r in runes:
-			if r.get("equipped", false):
-				equipped_count += 1
-		if equipped_count >= Run.rune_slots():
-			return
-		rune["equipped"] = true
-	_draw_screen()
-
-
-# Every node costs exactly 1. can_learn says which purse pays: "points" for
-# a normal pick, "flex" for a second node in a row an elite point forces
-# back open.
+# Every node costs exactly 1. `Talents.purse_for` decides which purse pays
+# — flex first while it holds anything, normal points after (Batch AN: one
+# purse of 12 against an 8-node tree, so the surplus buys second nodes on
+# its own). Asking the helper rather than reading `pool` raw is what keeps
+# the greying, the tooltip and the spend from ever disagreeing.
 func _learn_talent(talent_id: String) -> void:
 	var member: Dictionary = Run.party[selected]
 	var learned: Dictionary = member.get("talents", {})
@@ -661,156 +625,11 @@ func _learn_talent(talent_id: String) -> void:
 	var check := Talents.can_learn(tree, talent_id, learned)
 	if not check["ok"]:
 		return
-	var purse := "talent_flex" if check["pool"] == "flex" else "talent_points"
-	if int(member.get(purse, 0)) < 1:
+	var purse := Talents.purse_for(member, check)
+	if purse == "":
 		return
 	learned[talent_id] = 1
 	member["talents"] = learned
 	member[purse] = int(member.get(purse, 0)) - 1
-	_draw_screen()
-
-
-# ---------- the ability award: pick 1 of the three offered (Batch AH) ----------
-
-func _draw_bm_pick(member: Dictionary) -> void:
-	var panel := PanelContainer.new()
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.04, 0.04, 0.05, 0.97)
-	style.border_color = Color(0.85, 0.7, 0.35)
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(8)
-	style.content_margin_left = 18.0
-	style.content_margin_right = 18.0
-	style.content_margin_top = 12.0
-	style.content_margin_bottom = 14.0
-	panel.add_theme_stylebox_override("panel", style)
-	panel.position = Vector2(690, 170)
-	panel.z_index = 18
-	add_child(panel)
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 8)
-	panel.add_child(box)
-	var title := Label.new()
-	title.text = "NEW ABILITY — choose one (%d owed)" % \
-		int(member.get("bm_picks_owed", 0))
-	title.add_theme_font_size_override("font_size", 15)
-	title.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
-	box.add_child(title)
-	var pick_spec: String = member.get("spec", "")
-	# Batch AH: the offer is the stored triple rolled when the award
-	# dropped. A run saved before AH owes picks with no triple behind them —
-	# roll one on the spot so those saves resolve instead of dead-ending.
-	var queue: Array = member.get("bm_candidates", [])
-	if queue.is_empty():
-		queue = [Run.roll_ability_offer(member)]
-		member["bm_candidates"] = queue
-		Run.save_run()
-	var sub := Label.new()
-	sub.text = "one from your spec, two from your class"
-	sub.add_theme_font_size_override("font_size", 12)
-	sub.add_theme_color_override("font_color", Color(0.62, 0.58, 0.5))
-	box.add_child(sub)
-	var offer: Array = queue[0]
-	var spec_names: Array = Classes.spec_pool(pick_spec)
-	for i in offer.size():
-		var pool_name := String(offer[i])
-		var ab: Ability = Classes.spec_pool_ability(pick_spec, pool_name)
-		var b := Button.new()
-		b.text = pool_name
-		b.custom_minimum_size = Vector2(300, 34)
-		b.add_theme_font_size_override("font_size", 14)
-		# The spec draw LEADS the offer and wears the spec gold, so "which
-		# of these three is mine" is answered on the button rather than in
-		# a player's head — the pools overlap, so the name cannot say it.
-		if i == 0 and spec_names.has(pool_name):
-			b.text = "◆ %s" % pool_name
-			b.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
-		if ab != null:
-			b.tooltip_text = "%s\n\n%s" % [pool_name, ab.description]
-		b.pressed.connect(_pick_bm_ability.bind(pool_name))
-		box.add_child(b)
-
-
-func _draw_rune_pick(member: Dictionary) -> void:
-	var panel := PanelContainer.new()
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.04, 0.04, 0.05, 0.97)
-	style.border_color = Color(0.75, 0.45, 1.0)
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(8)
-	style.content_margin_left = 18.0
-	style.content_margin_right = 18.0
-	style.content_margin_top = 12.0
-	style.content_margin_bottom = 14.0
-	panel.add_theme_stylebox_override("panel", style)
-	# Below the trophy panel's spot so simultaneous picks never overlap.
-	panel.position = Vector2(690, 430)
-	panel.z_index = 18
-	add_child(panel)
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 8)
-	panel.add_child(box)
-	var title := Label.new()
-	var triple: Array = member["rune_candidates"][0]
-	# Batch AE: a start pick and an elite cache can be owed at once (the
-	# queue keeps them in order), so the heading names the one actually
-	# being resolved rather than assuming the cache.
-	var src := "elite"
-	if not triple.is_empty():
-		src = String(triple[0].get("source", "elite"))
-	title.text = "%s — choose one (%d owed)" % [
-		("AWAKENING RUNE" if src == "start" else "ELITE RUNE CACHE"),
-		int(member.get("rune_picks_owed", 0))]
-	title.add_theme_font_size_override("font_size", 15)
-	title.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
-	box.add_child(title)
-	for i in triple.size():
-		var rune: Dictionary = triple[i]
-		var b := Button.new()
-		b.text = "%s  [%s]" % [rune["name"], rune["rarity"]]
-		b.custom_minimum_size = Vector2(320, 34)
-		b.add_theme_font_size_override("font_size", 13)
-		b.add_theme_color_override("font_color",
-			rune.get("rarity_color", Color(0.8, 0.8, 0.8)))
-		b.tooltip_text = "%s\n%s\nWorth %dg at the Peddler" % [
-			rune["name"], rune["desc"], int(rune.get("price", 0))]
-		b.pressed.connect(_pick_rune.bind(i))
-		box.add_child(b)
-
-
-func _pick_rune(idx: int) -> void:
-	var member: Dictionary = Run.party[selected]
-	var queue: Array = member.get("rune_candidates", [])
-	if int(member.get("rune_picks_owed", 0)) < 1 or queue.is_empty():
-		return
-	var triple: Array = queue.pop_front()
-	member["rune_candidates"] = queue
-	var rune: Dictionary = triple[clampi(idx, 0, triple.size() - 1)]
-	# Auto-equip while a slot is free — the pick already happens on the
-	# Party screen; save the extra click.
-	var worn := 0
-	for r in member.get("runes", []):
-		if r.get("equipped", false):
-			worn += 1
-	rune["equipped"] = worn < Run.rune_slots()
-	member["runes"] = member.get("runes", []) + [rune]
-	member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) - 1
-	Run.save_run()
-	_draw_screen()
-
-
-func _pick_bm_ability(pool_name: String) -> void:
-	var member: Dictionary = Run.party[selected]
-	if int(member.get("bm_picks_owed", 0)) < 1 \
-			or pool_name in member.get("bm_abilities", []):
-		return
-	# Spend the triple this pick came from, exactly like the rune picker:
-	# the other two options are gone, not banked for the next award.
-	var queue: Array = member.get("bm_candidates", [])
-	if not queue.is_empty():
-		queue.pop_front()
-		member["bm_candidates"] = queue
-	member["bm_abilities"] = member.get("bm_abilities", []) + [pool_name]
-	member["bm_picks_owed"] = int(member.get("bm_picks_owed", 0)) - 1
 	Run.save_run()
 	_draw_screen()

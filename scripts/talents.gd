@@ -1954,9 +1954,21 @@ static func points_spent(learned: Dictionary) -> int:
 
 # Returns {ok, why, pool}. "pool" names which purse pays:
 #   "points" — a normal pick: the frontier row, or the capstone shelf.
-#   "flex"   — a SECOND node in a row already picked. Only elite points buy
-#              these, and only ever a second (never a third).
-# "why" prefixes matter to the party screen's greying: Locked / Closed /
+#   "flex"   — a SECOND node in a row already picked, and only ever a second
+#              (never a third).
+#
+# BATCH AN CHANGED WHO CAN PAY FOR A "flex" PICK, not which picks are flex.
+# Batch AI had 8 points against an 8-node tree, so a normal point had to be
+# BARRED from second nodes or the tree could be climbed faster than the
+# schedule intended. At AN's 12 against 8 the shape does the barring by
+# itself — rows are mutually exclusive and there are only eight of them, so
+# a purse can open at most 8 rows and any surplus has nowhere to go BUT
+# second nodes. The flex purse survives and is spent FIRST when it holds
+# anything (old saves, and any future relic granting flexibility without
+# granting climb); normal points cover it when it is empty. See
+# `purse_for` — every call site asks it rather than reading `pool` raw.
+#
+# "why" prefixes matter to the hero screen's greying: Locked / Closed /
 # Barred / Maxed.
 static func can_learn(tree_nodes: Array, id: String, learned: Dictionary) -> Dictionary:
 	var t := node_in_tree(tree_nodes, id)
@@ -1996,11 +2008,27 @@ static func can_learn(tree_nodes: Array, id: String, learned: Dictionary) -> Dic
 			others.append(String(node_in_tree(tree_nodes, pid).get("name", pid)))
 		return {"ok": false, "pool": "",
 			"why": "Closed: row %d already holds %s" % [row, " and ".join(others)]}
-	# One sibling taken: the door is shut, but an elite point forces it.
+	# One sibling taken: the door is shut, but a surplus point forces it.
 	var sib := node_in_tree(tree_nodes, String(picks[0]))
 	return {"ok": true, "pool": "flex",
-		"why": "Closed by %s — an elite point forces it open" % \
+		"why": "Closed by %s — a surplus point forces it open" % \
 			sib.get("name", picks[0])}
+
+
+# WHICH PURSE ACTUALLY PAYS, given what the member is carrying. One place
+# decides it so the hero screen's greying, its tooltip and the spend itself
+# can never disagree — the bug shape that hid Measured Rage for two batches
+# was exactly two read sites answering one question.
+# Returns "" when nothing in the member's purses can cover the pick.
+static func purse_for(member: Dictionary, check: Dictionary) -> String:
+	if not bool(check.get("ok", false)):
+		return ""
+	if String(check.get("pool", "")) == "flex":
+		# Flex is spent first while it lasts; normal points cover it after.
+		if int(member.get("talent_flex", 0)) > 0:
+			return "talent_flex"
+		return "talent_points" if int(member.get("talent_points", 0)) > 0 else ""
+	return "talent_points" if int(member.get("talent_points", 0)) > 0 else ""
 
 
 # ---------- applying a tree ----------

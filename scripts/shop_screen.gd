@@ -78,12 +78,20 @@ func _draw_screen() -> void:
 	var row := 0
 	for id in Run.ITEM_IDS:
 		var price := _price(ITEM_PRICES[id])
+		var have := int(Run.items.get(id, 0))
+		var full: bool = Run.item_full(id)
 		var btn := Button.new()
-		btn.text = "%s — %dg   (have %d)" % [Run.ITEM_INFO[id][0], price, Run.items.get(id, 0)]
+		btn.text = "%s — %dg   (have %d/%d)%s" % [Run.ITEM_INFO[id][0], price,
+			have, Run.ITEM_CAP, "  FULL" if full else ""]
 		btn.custom_minimum_size = Vector2(360, 46)
 		btn.position = Vector2(140, 162 + row * 56)
-		btn.tooltip_text = Run.ITEM_INFO[id][1]
-		btn.disabled = Run.gold < price
+		# Batch AN §6: a full stack greys the button rather than taking the
+		# gold. Refusing at the door is the honest half of the cap — refusing
+		# after payment would be theft with a message attached.
+		btn.tooltip_text = Run.ITEM_INFO[id][1] + (
+			"\n\nThe party can carry %d of these, and already does." % Run.ITEM_CAP
+			if full else "")
+		btn.disabled = Run.gold < price or full
 		btn.pressed.connect(_buy_item.bind(id))
 		add_child(btn)
 		row += 1
@@ -125,8 +133,11 @@ func _draw_screen() -> void:
 	leave.custom_minimum_size = Vector2(220, 48)
 	leave.position = Vector2(530, 640)
 	leave.pressed.connect(func():
+		# Batch AN: a fight can queue a merchant AND an event behind it, so
+		# leaving asks the run where to go rather than assuming the map.
+		var next := Run.next_after_scene()
 		Run.save_run()
-		get_tree().change_scene_to_file("res://scenes/map.tscn"))
+		get_tree().change_scene_to_file(next))
 	add_child(leave)
 
 
@@ -137,11 +148,15 @@ func _price(base: int) -> int:
 
 func _buy_item(id: String) -> void:
 	var price := _price(ITEM_PRICES[id])
-	if Run.gold < price:
+	# The cap is checked BEFORE the gold moves, so a purchase that cannot
+	# land never costs anything (the button is greyed too — this is the
+	# second gate, for the hotkey and the test that fires it directly).
+	if Run.gold < price or Run.item_full(id):
+		return
+	if Run.add_item(id) < 1:
 		return
 	Run.gold -= price
 	Run.tally_add("gold_spent", price)
-	Run.items[id] = Run.items.get(id, 0) + 1
 	_draw_screen()
 
 

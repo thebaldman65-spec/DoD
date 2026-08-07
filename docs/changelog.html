@@ -5,6 +5,134 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-07 — Batch AN: the map scaffold</h2>
+<p><i>Rewards and modifiers in this batch are <b>PLACEHOLDERS</b> drawn from content that
+already exists. The point is to make a full 36-encounter run playable so the pacing can be
+felt before 66 pieces of new content are authored against it. Nothing here is final art or
+final content.</i></p>
+<ul>
+<li><b>The branching node map is gone; a run is a LINE.</b> 3 zones × 12 encounters = 36,
+and every zone has the identical shape: fight, fight, ELITE, fight, fight, MINI-BOSS, fight,
+fight, ELITE, fight, fight, BOSS. Zone 3's boss is the end boss. The road renders
+<b>right to left</b> — encounter 1 on the right edge, the boss on the left. (Horizontal
+run-maps conventionally read left-to-right, so an English-reading player may parse the boss
+end as the start; this was flagged, chosen anyway, and is two constants if it flips.)</li>
+
+<li><b>Deleted rather than left unreachable:</b> <code>FLOORS</code>,
+<code>NODES_PER_TIER</code>, the deck composition constants
+(<code>FIGHT_NODES</code>/<code>REST_NODES</code>/<code>SHOP_NODES</code>/<code>EVENT_NODES</code>),
+both <code>DECK_FALLBACK</code> tables, <code>MINIBOSS_TIER</code>, the rejection-sampling
+deal and its swap repair, the link graph, the inbound guarantee, and the forward-DP
+key-route check. <b>All rest nodes</b> and the rest-heal path go with them. So does the
+edge-column adjacency rule <i>and its documented-70%/actual-53% bug</i> — it needed deleting,
+not fixing. Batch AF's starting rune pick is deleted too: heroes now begin with no runes and
+empty slots. A test pins each of these as ABSENT, because a constant that still resolves is
+a constant a later batch reads by accident.</li>
+
+<li><b>New: the offer screen.</b> Before every fight and elite — not mini-bosses, not bosses
+— the player is shown <b>three bargains</b> and takes one. A bargain is one <b>modifier</b>
+(a condition binding BOTH parties for that battle) plus one <b>reward</b>, both visible
+before choosing, with no decline. Each modifier carries a <b>severity of 1–4</b> and the
+reward table reads it, so authoring a modifier is authoring one number rather than a
+pairing. Severity is <b>flat</b> and deliberately ignores party composition — a modifier
+that happens to be cheap for your build is a good deal you earned by building that way.
+<b>Every offer holds at least one option of severity 1 or 2</b>, guaranteed by construction
+rather than by rejecting rolls, so a wounded party always has a survivable choice. The
+reward pays <b>on victory</b>: the modifier is the price, and the "a merchant follows the
+fight" reward settles that a reward cannot precede the fight it follows.</li>
+
+<li><b>Six placeholder modifiers</b>, to be replaced by the authored 20 — each built out of
+a hook battle.gd already had, each landing at exactly one read site: <b>Overgrown</b> (1,
+both parties open at 70% health), <b>Tinderbox</b> (2, all fire +25%), <b>Frenzied</b> (2,
+everyone acts 30% faster, cooldowns unchanged), <b>Brittle</b> (3, all attacks ignore
+armor), <b>Warded</b> (3, abilities cost 25% more, basics free), <b>Bloodless</b> (4, no
+healing for anyone; Bleed and damage-over-time still tick). NOTE on Warded: basic attacks
+are cost 0 already, so "basic attacks are free" describes the kit rather than changing it —
+the multiplier is written to never add to a zero, which is the line that keeps it true.</li>
+
+<li><b>Placeholder rewards, existing content only.</b> Severity 1: 40 gold. 2: 80 gold or a
+random potion. 3: 140 gold or a random rune. 4: 220 gold, a random rune, or a merchant
+follows the fight.</li>
+
+<li><b>The map screen is the party screen now.</b> All four hero stat cards live on it —
+portrait, spec name, HP bar with numbers, resource bar, three rune slots (filled or empty),
+unspent-talent badge. Clicking a card opens that hero's talent tree; clicking a rune slot
+opens their pouch. Owed ability, upgrade and rune picks resolve <b>on the card</b>. The
+Party button and its separate screen are gone; the old Party screen survives as the
+<b>hero sheet</b>, entered for one hero with a four-button switcher and its list view
+deleted.</li>
+
+<li><b>Rewards re-cut.</b> The <b>mini-boss</b> now awards a <b>generic ability upgrade</b>
+chosen from three, attached to an ability the hero owns — upgrades stack on the same
+ability, but the same upgrade never comes twice in a run. Placeholder pool of four until the
+dozen are authored: Honed (+50% damage), Quickened (−2 cooldown), Effortless (no resource
+cost), Swift (+2 initiative speed). <b>Zone 1 and 2 bosses</b> award an ability pick from
+three, drawn <b>from the hero's spec pool only</b> — the class-pool draw Batch AH added is
+dropped, abilities are spec-locked now. (<code>Classes.CLASS_POOLS</code> is left standing
+and still resolves; nothing reads it, and reopening the class draw is one line.) The
+<b>end boss</b> awards a relic unlock, big gold, and ends the run — no ability pick, because
+nothing follows it.</li>
+
+<li><b>The shop is scheduled, not placed.</b> 40% chance of a merchant after any cleared
+fight or elite, with a <b>floor</b>: four encounters without one and the next is guaranteed.
+Plus the severity-4 reward, which guarantees one on demand. Both the merchant and the
+25% <b>event</b> roll are made <b>once, on the victory screen</b>, and queued — rolling them
+from the map would re-roll on every redraw and the floor would mean nothing.</li>
+
+<li><b>Attrition: no rest nodes.</b> Clearing any encounter heals the party <b>15% of max
+HP</b>, riding the same <code>victory_heal_pct</code> hook the Chalice of Dawn already used,
+so the relic's 10% stacks on top for 25% and there is still exactly one read site for "how
+much does a victory heal". <b>Potions are usable on the map screen</b>, targeting a hero
+from the stat cards (the Bomb and the Defense Potion stay battle-only and say why on hover).
+<b>Potion cap: 6 per item type</b> — purchases and drops above it are refused with a message
+rather than silently lost, and the shop greys a full stack rather than taking the gold.</li>
+
+<li><b>Talent points: 1 apiece from elites, mini-bosses and bosses</b> — the end boss
+included, where it used to pay nothing. Regular fights award none. That is 4 a zone, 12 a
+run, against an 8-node tree. <b>The two purses became one</b>, and the arithmetic is why:
+Batch AI had 8 points against 8 nodes, so an elite point had to be BARRED from second nodes
+or the tree could be climbed faster than intended. At 12 against 8 the shape does the
+barring by itself — rows are mutually exclusive and there are only eight, so a purse can
+open at most 8 rows and the surplus has nowhere to go but second nodes. The flex purse
+survives in the data and is spent first when it holds anything; ordinary points cover these
+picks when it is empty.</li>
+
+<li><b>Runes: three slots, flat, from run start.</b> The 2 → 3 → 4 growth ladder is gone.
+Heroes start with none. Rune content is unchanged in this batch — the rebuild (deleting
+ability-granting and talent-rank runes, authoring ~36 double-edged ones) is its own
+batch.</li>
+
+<li><b>SAVE v7, and pre-v7 saves are REFUSED and cleared on load.</b> A pre-v7 save holds a
+[tier][column] board with links, rest nodes and a mini-boss row; there is no honest way to
+place a party standing at tier 7 column 2 onto a line with no columns. Same call Batch AI
+made about ranked talent purchases — a wipe that says so beats a migration that invents
+state.</li>
+
+<li><b>Sim harness:</b> the map walk follows the line, the bot takes bargains by a
+severity-extreme policy (harshest above 60% average party HP, mildest below), and the report
+gains merchants-met, events-fired, bargains-taken and average accepted severity while losing
+the rest lines. <b>DOD_SIM_MAP, DOD_SIM_MINIBOSS, DOD_SIM_START_RUNE and
+DOD_SIM_SPEC_OPENING are retired</b> with the features they controlled; a Matrix row now
+reads <code>map=line</code> and carries none of those fields. <b>Rows from before the road
+are not comparable with rows after it</b> — even <code>depth</code> changed units (36
+encounters, not 33 tiers). "Route agency" is retained and reads <b>0% forever</b> by design:
+a line has no route decision, and a missing figure would look like a broken instrument.</li>
+
+<li><b>Verified:</b> new <code>test_batch_an.gd</code>, 5,667 checks / 0 failures, stable
+3/3 — the line's shape and its one-way-forward walk, every deleted constant and function
+pinned ABSENT, 2,000 sampled offers for the severity-1-or-2 floor (0 misses) and for
+severity-matched rewards, all six modifiers stamped on BOTH parties in a live battle and
+checked at the read site each one implements, a no-modifier battle proving the pre-AN path
+is untouched, the upgrade pool's stacking and never-twice rules, spec-only ability draws, the
+merchant floor driven rather than sampled (no drought exceeds four), the item cap refusing
+rather than swallowing, and the flat three rune slots. Regression: test_batch_ah 5,416/0,
+test_batch_ah_battle 65/0, test_batch_ai 2,036/0, test_batch_aj 389/0, test_batch_ak 524/0,
+test_batch_al 556/0, test_runes 2,982/0, run-harness gates 1/2/3 PASS, 11 scenes and every
+script compiling with 0 SCRIPT ERROR. Known-bad and not ours: test_rune_battle 91/1, the
+Inferno chip check Batch AK recorded as a standing defect. <code>test_start_rune.gd</code>
+and <code>test_start_rune_ui.gd</code> are deleted with the feature they pinned.</li>
+</ul>
+
 <h2>2026-08-06 — Batch AL: the Warden's 24 nodes</h2>
 <ul>
 <li><b>All 24 tree nodes re-authored for row exclusivity.</b> The third of the four class

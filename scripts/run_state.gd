@@ -1,42 +1,26 @@
 # Run-level state (autoload "Run"): the party, shared inventory, and the
-# Spire-style node map. Persists across scene switches within one run.
+# run's fixed line of slots. Persists across scene switches within one run.
 extends Node
 
-# Zone structure rules: the player interacts with 10 nodes before the boss.
-# 10 tiers × 3 nodes = 30 interconnected nodes, plus the boss tier on top.
-const FLOORS := 11  # 10 pickable tiers + the boss tier
-const NODES_PER_TIER := 3
-# Fixed node composition per zone: 17 fights / 5 rest / 5 shop / 3 event.
-# Events replaced one rest, one shop and one fight; the ~1 talent point
-# per run that the lost fight cost comes back through point-granting
-# events (Blood Altar, Training Grounds, Warden's Echo).
-const FIGHT_NODES := 17
-const REST_NODES := 5
-const SHOP_NODES := 5
-const EVENT_NODES := 3
-
-# Batch AH: one guaranteed MINI-BOSS per zone, on the exact middle row of
-# the eleven. It occupies the WHOLE row — all three columns — so no route
-# goes around it, and the deck is dealt into the nine tiers that remain.
-# The row it replaces was a combat row, so it is paid for out of the FIGHT
-# cards alone (17 -> 14): the recovery/shop/event counts that drive the run
-# economy stay byte-identical, and a zone trades three ordinary fight
-# OFFERS for one guaranteed hard fight.
-const MINIBOSS_TIER := (FLOORS - 1) / 2  # index 5 = the displayed tier 6
-# A 27-card authored floor for the mini-boss deal, the twin of
-# DECK_FALLBACK below (generation must never fail, so the floor is
-# authored rather than hoped for).
-const DECK_FALLBACK_MB := [
-	"fight", "fight", "shop",
-	"fight", "rest", "fight",
-	"fight", "fight", "event",
-	"fight", "shop", "fight",
-	"fight", "rest", "fight",
-	"fight", "event", "shop",
-	"fight", "shop", "rest",
-	"fight", "rest", "event",
-	"shop", "rest", "fight",
-]
+# Batch AN: A RUN IS A LINE, not a branching map. 3 zones x 12 slots = 36,
+# and every zone has the IDENTICAL shape — so the player always knows what
+# is coming and the run's decisions live in the offer screen (§3) rather
+# than in route planning. Nothing is dealt, nothing is rolled: the shape
+# below IS the zone.
+#
+# RETIRED WITH THE BRANCHING MAP (Batch Y/AH machinery, all deleted rather
+# than left unreachable): FLOORS, NODES_PER_TIER, the deck composition
+# constants FIGHT_NODES/REST_NODES/SHOP_NODES/EVENT_NODES, both
+# DECK_FALLBACK tables, MINIBOSS_TIER, the rejection-sampling deal and its
+# swap repair, the link graph, the edge-column adjacency rule (and with it
+# the documented-70%/actual-53% bug — it needed no fix, it needed deleting),
+# the inbound guarantee, and the forward-DP key-route check. ALL REST NODES
+# go too; attrition is answered by the per-slot victory heal in §6 instead.
+const SLOTS_PER_ZONE := 12
+const ZONE_SHAPE := ["fight", "fight", "elite", "fight", "fight", "miniboss",
+	"fight", "fight", "elite", "fight", "fight", "boss"]
+# The boss of the LAST zone is the end boss: the run ends on its death.
+const BOSS_SLOT := SLOTS_PER_ZONE - 1
 
 # All item metadata lives here; battle and map both read it.
 const ITEM_IDS := ["health", "mana", "bomb", "revive", "defense"]
@@ -49,6 +33,11 @@ const ITEM_INFO := {
 }
 # Potions drop more often than the heavy items.
 const LOOT_POOL := ["health", "health", "mana", "mana", "bomb", "revive", "defense"]
+# Batch AN §6: six of each item type, and that is the whole stack. A
+# purchase or a drop above the cap is REFUSED with a message rather than
+# swallowed — a reward that silently evaporates reads as a bug, and the
+# shop must be able to grey the button rather than take the gold.
+const ITEM_CAP := 6
 
 var active := false
 var specs_chosen := false  # locked in during the pre-run awakening
@@ -89,11 +78,35 @@ var zone_name := "Forest of Old"
 var zone_draw: Array = []  # this run's drawn zone ids, one per slot
 var party: Array = []      # [{key, hp, max_hp}] snapshots between battles
 var items := {}            # item id -> count (shared inventory)
-var map: Array = []        # map[floor] = [{type, links: [next-floor idx], visited}]
-var floor_idx := -1        # -1 = run not started; player picks from floor 0
-var node_idx := -1
+# Batch AN: the line. map[slot] = {type, visited, enemies, theme} for the
+# 12 slots of the CURRENT zone — one dict per slot, no columns and no
+# links, because there is only ever one way forward.
+var map: Array = []
+var slot_idx := -1         # -1 = zone not entered; 0..11 = standing on that slot
 var encounter := {}        # {"type": ..., "enemies": ["raider", ...]} for the next battle
 var seen_events: Array = []  # event ids drawn this run (non-repeating pool)
+# Batch AN §5: the merchant is scheduled, not always available. 40% after
+# any cleared fight or elite slot, with a FLOOR — four cleared slots
+# without a merchant and the next one is guaranteed. The counter is what
+# makes the floor a property of the run rather than of a lucky streak, so
+# it is saved.
+var slots_since_merchant := 0
+# The modifier the player accepted at the offer screen, live for exactly
+# one battle (§3). Cleared when that battle resolves. Not saved: quitting
+# between the offer and the fight forfeits the offer, and the slot is
+# re-offered — the same shape as pending_event.
+var pending_modifier := ""
+var pending_reward := {}   # the reward the accepted option pays on victory
+# Which hero the sheet opens onto (Batch AN: the map cards ARE the party
+# list, so the sheet is always entered for a specific hero). Session-scoped
+# — a resumed run opens the map, never a sheet.
+var hero_screen_idx := 0
+# §5/§7: what a cleared fight queued behind it — "shop" and/or "event", in
+# the order they resolve. Rolled ONCE on the victory screen and popped by
+# the screens, so a redraw can never re-roll the merchant and the four-slot
+# drought floor stays meaningful. Saved: the queue is earned state, and a
+# player who quits on the victory screen should still meet the merchant.
+var pending_after: Array = []
 # Debug (map burger): pre-grant every talent/trophy ability at battle
 # spawn. Session-scoped, never saved; DOD_SIM_GRANT_ALL=1 arms it for
 # headless full-kit runs. Default OFF so tests measure gated kits.
@@ -219,16 +232,22 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
 	for id in relic_dict("start_items"):
 		items[id] = int(items.get(id, 0)) + int(relic_dict("start_items")[id])
+	# Relic start_items can push a stack past the cap on its own.
+	for id in items:
+		items[id] = mini(int(items[id]), ITEM_CAP)
 	gold = 60 + int(relic_add("start_gold"))
 	combat_wins = 0
 	zone_idx = 0
 	draw_zones()
 	_enter_zone()
-	floor_idx = -1
-	node_idx = -1
+	slot_idx = -1
+	slots_since_merchant = 0
 	encounter = {}
 	seen_events = []
 	pending_event = ""
+	pending_modifier = ""
+	pending_reward = {}
+	pending_after = []
 	# A fresh run starts clean, and starts un-summoned and un-travelled.
 	debug_used = false
 	debug_summon = false
@@ -237,403 +256,57 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	_generate_map()
 
 
-# Map generation mode (Batch Y): "new" = guaranteed-adjacent links + the
-# structured deal below. DOD_SIM_MAP=old keeps the pre-Y generator (70%
-# link roll, blind deal) so every pre-Y baseline row stays reproducible —
-# DOD_SIM_ROUTE=greedy reproduces the Batch S floor ONLY at DOD_SIM_MAP=old.
-func map_mode() -> String:
-	return "old" if OS.get_environment("DOD_SIM_MAP") == "old" else "new"
+# ---------- the line (Batch AN) ----------
 
-
-# Validator counters (Batch Y), cumulative across every map this session:
-# deal reshuffles, decks that needed the swap repair, and links the route
-# guarantee had to add. A high repair rate means the deal constraints are
-# over-tight and want loosening, not more retries.
-var map_deal_retries := 0
-var map_deal_repairs := 0
-var map_route_links_added := 0
-
-
-# DOD_SIM_MINIBOSS=off reproduces the PRE-AH MAP: ten dealt tiers, the full
-# 17-fight deck, no guaranteed mini-boss and so no mini-boss award. Shipped
-# content, so it defaults ON and — like the AE/AF flags and unlike AD's
-# experiment arms — it is NOT gated on sim_run. It is an honest control for
-# the MAP half of this batch only: kits still open at 3 abilities with it
-# off, because the trim is structural and has no switch.
-func miniboss_on() -> bool:
-	return OS.get_environment("DOD_SIM_MINIBOSS") != "off"
-
-
-# The tiers the deck is dealt into, in order: every pickable tier except
-# the mini-boss row, which is authored rather than dealt.
-func dealt_tiers() -> Array:
-	var out: Array = []
-	for f in FLOORS - 1:
-		if miniboss_on() and f == MINIBOSS_TIER:
-			continue
-		out.append(f)
-	return out
-
-
+# One zone = the authored shape, in order. There is no deal, no shuffle, no
+# rejection sampling and no fallback table, because there is nothing left to
+# fail: every zone is the same twelve slots, and a slot's only variable is
+# the warband standing on it.
 func _generate_map() -> void:
-	if map_mode() == "old":
-		_generate_map_old()
-	else:
-		_generate_map_new()
-	# Warbands are pre-rolled at map birth: every combat node carries its
-	# enemies + theme, so the map can show what resists what BEFORE the
-	# player commits (scouting resists is counterplay, not a spoiler).
-	# The click handler still composes on the spot for pre-change saves.
-	for f in FLOORS:
-		for node in map[f]:
-			if node["type"] in ["fight", "elite", "miniboss", "boss"]:
-				node["enemies"] = compose(node["type"], f + 1)
-				node["theme"] = last_theme
+	map = []
+	for s in SLOTS_PER_ZONE:
+		var slot := {"type": String(ZONE_SHAPE[s]), "visited": false}
+		# Warbands are pre-rolled at map birth, exactly as the branching map
+		# did it: every slot carries its enemies + theme, so hovering a dot can
+		# show what resists what BEFORE the player commits. Scouting resists is
+		# counterplay, not a spoiler.
+		slot["enemies"] = compose(String(slot["type"]), s + 1)
+		slot["theme"] = last_theme
+		map.append(slot)
 
 
-# The pre-Batch-Y generator, kept verbatim behind DOD_SIM_MAP=old: the
-# blind 30-card deal and the 70% adjacent-link roll (30% of nodes reached
-# exactly one node — the corridor Batch Y exists to remove).
-func _generate_map_old() -> void:
-	# Shuffle a fixed deck of node types, deal 3 per DEALT tier, boss on top.
-	# (Batch AH: the mini-boss row is authored, so the deal is 27 cards over
-	# nine tiers unless DOD_SIM_MINIBOSS=off puts the pre-AH 30 back.)
-	var deck: Array = []
-	for i in FIGHT_NODES - (NODES_PER_TIER if miniboss_on() else 0):
-		deck.append("fight")
-	for i in REST_NODES:
-		deck.append("rest")
-	for i in SHOP_NODES:
-		deck.append("shop")
-	for i in EVENT_NODES:
-		deck.append("event")
-	deck.shuffle()
-	# The run should open with combat: tier 1 holds at least one fight.
-	if not deck.slice(0, NODES_PER_TIER).has("fight"):
-		for j in range(NODES_PER_TIER, deck.size()):
-			if deck[j] == "fight":
-				var tmp: String = deck[0]
-				deck[0] = deck[j]
-				deck[j] = tmp
-				break
-	map = _lay_rows(deck)
-	map.append([{"type": "boss", "links": [], "visited": false}])
-	# Link each node to 1-2 nodes on the next floor: its own column, plus a
-	# 70% chance of ONE adjacent column. Never all three — the player gets a
-	# choice most tiers but can only drift one column per step, so reaching a
-	# specific elite or shop takes route planning.
-	for f in FLOORS - 1:
-		var a: int = map[f].size()
-		var b: int = map[f + 1].size()
-		for i in a:
-			var base := 0 if a == 1 else int(round(i * float(b - 1) / float(maxi(a - 1, 1))))
-			var links: Array = [base]
-			if randf() < 0.70:
-				var extra := base + (1 if randf() < 0.5 else -1)
-				if extra >= 0 and extra < b and not links.has(extra):
-					links.append(extra)
-			map[f][i]["links"] = links
-		_guarantee_inbound(f)
-
-
-# Batch Y generation: the deck stays 17/5/5/3 but the deal is structured
-# (no three-of-a-kind tier, recovery spread across both halves, a shop in
-# the boss run-up), every node keeps a real choice ahead, at least one
-# elite sits on the board, and a single legal route can always touch
-# 2 rests + a shop + an elite.
-func _generate_map_new() -> void:
-	var deck := _deal_deck()
-	map = _lay_rows(deck)
-	map.append([{"type": "boss", "links": [], "visited": false}])
-	# Elite floor: elites still roll at 25% on tiers 6+, but a zone whose
-	# rolls all came up empty silently removes the snowball engine and the
-	# rune-cache source — upgrade one deep fight when that happens.
-	var has_elite := false
-	for f in FLOORS - 1:
-		for node in map[f]:
-			if String(node["type"]) == "elite":
-				has_elite = true
-	if not has_elite:
-		var deep_fights: Array = []  # [floor, idx] on tiers 6+
-		for f in range(5, FLOORS - 1):
-			if miniboss_on() and f == MINIBOSS_TIER:
-				continue
-			for i in map[f].size():
-				if String(map[f][i]["type"]) == "fight":
-					deep_fights.append([f, i])
-		if not deep_fights.is_empty():
-			var pick: Array = deep_fights.pick_random()
-			map[pick[0]][pick[1]]["type"] = "elite"
-	# Links: own column plus AT LEAST one adjacent, guaranteed (the 70%
-	# roll is gone — it made 30% of nodes a corridor). A middle column
-	# with two neighbours links to both 25% of the time. The boss tier
-	# still collapses to a single node: the pre-boss funnel is correct
-	# and stays.
-	for f in FLOORS - 1:
-		var a: int = map[f].size()
-		var b: int = map[f + 1].size()
-		for i in a:
-			var base := 0 if a == 1 else int(round(i * float(b - 1) / float(maxi(a - 1, 1))))
-			var links: Array = [base]
-			var adjacents: Array = []
-			for extra in [base - 1, base + 1]:
-				if extra >= 0 and extra < b:
-					adjacents.append(extra)
-			if not adjacents.is_empty():
-				adjacents.shuffle()
-				links.append(adjacents[0])
-				if adjacents.size() > 1 and randf() < 0.25:
-					links.append(adjacents[1])
-			links.sort()
-			map[f][i]["links"] = links
-		_guarantee_inbound(f)
-	_ensure_key_route()
-
-
-# Deal the pickable rows (shared by both generators). The mini-boss row is
-# AUTHORED, not dealt: all three of its columns are the same fight, so the
-# player meets it whichever way they came. Everything downstream — linking,
-# inbound guarantees, the route DP, the map screen — already reads rows by
-# their real size and type, so nothing else has to know.
-func _lay_rows(deck: Array) -> Array:
-	var rows: Array = []
-	var pos := 0
-	for f in FLOORS - 1:
-		var row: Array = []
-		if miniboss_on() and f == MINIBOSS_TIER:
-			for i in NODES_PER_TIER:
-				row.append({"type": "miniboss", "links": [], "visited": false})
-			rows.append(row)
-			continue
-		for i in NODES_PER_TIER:
-			var kind: String = deck[pos * NODES_PER_TIER + i]
-			# Deeper fights can spawn as elites (still fights, tougher + richer).
-			if kind == "fight" and f >= 5 and randf() < 0.25:
-				kind = "elite"
-			row.append({"type": kind, "links": [], "visited": false})
-		rows.append(row)
-		pos += 1
-	return rows
-
-
-# Every next-floor node needs at least one inbound path (shared by both
-# generators, kept exactly as the pre-Y pass).
-func _guarantee_inbound(f: int) -> void:
-	var a: int = map[f].size()
-	var b: int = map[f + 1].size()
-	for j in b:
-		var has_inbound := false
-		for i in a:
-			if map[f][i]["links"].has(j):
-				has_inbound = true
-				break
-		if not has_inbound:
-			var nearest := 0 if b == 1 else int(round(j * float(a - 1) / float(maxi(b - 1, 1))))
-			map[f][nearest]["links"].append(j)
-
-
-# ---------- the structured deal (Batch Y) ----------
-
-# The canonical legal arrangement, used only when sampling AND the swap
-# repair both fail (the validator shows this is ~never) — generation must
-# never fail, so the floor is authored. Composition is the same 17/5/5/3.
-const DECK_FALLBACK := [
-	"fight", "fight", "shop",
-	"fight", "rest", "fight",
-	"fight", "fight", "event",
-	"fight", "shop", "fight",
-	"fight", "rest", "fight",
-	"fight", "event", "fight",
-	"fight", "shop", "rest",
-	"fight", "fight", "shop",
-	"fight", "rest", "event",
-	"shop", "rest", "fight",
-]
-
-
-# Deal by rejection sampling with a bounded retry budget, then targeted
-# swaps — never a failure, never an unbounded loop.
-func _deal_deck() -> Array:
-	var deck: Array = []
-	# The mini-boss row eats three FIGHT cards and nothing else.
-	for i in FIGHT_NODES - (NODES_PER_TIER if miniboss_on() else 0):
-		deck.append("fight")
-	for i in REST_NODES:
-		deck.append("rest")
-	for i in SHOP_NODES:
-		deck.append("shop")
-	for i in EVENT_NODES:
-		deck.append("event")
-	for attempt in 40:
-		deck.shuffle()
-		if _deck_violations(deck) == 0:
-			return deck
-		map_deal_retries += 1
-	_repair_deck(deck)
-	map_deal_repairs += 1
-	return deck
-
-
-# The stage-2 constraints, counted so the repair can hill-climb:
-# 1. tier 1 opens with combat (the pre-Y rule, folded in);
-# 2. no tier deals three of a kind — every tier is a real choice;
-# 3. recovery is spread: a rest in tiers 2-5 AND one in tiers 6-10;
-# 4. a shop in tiers 7-10 — boss gold and deep rarity weights need a
-#    place to land.
-func _deck_violations(deck: Array) -> int:
-	var n := NODES_PER_TIER
-	var tiers := dealt_tiers()
-	var v := 0
-	if not deck.slice(0, n).has("fight"):
-		v += 1
-	for t in tiers.size():
-		if String(deck[t * n]) == String(deck[t * n + 1]) \
-				and String(deck[t * n + 1]) == String(deck[t * n + 2]):
-			v += 1
-	# The windows are stated in TIER terms and converted to card slices, so
-	# lifting the mini-boss row out of the deal cannot silently move them.
-	var early := _deck_window(deck, tiers, 1, 4)     # displayed tiers 2-5
-	var late := _deck_window(deck, tiers, 5, 9)      # displayed tiers 6-10
-	var boss_run_up := _deck_window(deck, tiers, 6, 9)  # displayed tiers 7-10
-	if not early.has("rest"):
-		v += 1
-	if not late.has("rest"):
-		v += 1
-	if not boss_run_up.has("shop"):
-		v += 1
-	return v
-
-
-# The cards dealt into tier indices [lo, hi] inclusive, skipping whichever
-# tier the mini-boss took.
-func _deck_window(deck: Array, tiers: Array, lo: int, hi: int) -> Array:
-	var first := -1
-	var last := -1
-	for pos in tiers.size():
-		if int(tiers[pos]) >= lo and int(tiers[pos]) <= hi:
-			if first < 0:
-				first = pos
-			last = pos
-	if first < 0:
-		return []
-	return deck.slice(first * NODES_PER_TIER, (last + 1) * NODES_PER_TIER)
-
-
-# Targeted swap repair: greedily apply any single swap that strictly
-# lowers the violation count. The count is bounded and strictly falls, so
-# this terminates; if no single swap helps (never seen — belt and braces)
-# the authored fallback arrangement lands as-is.
-func _repair_deck(deck: Array) -> void:
-	var v := _deck_violations(deck)
-	while v > 0:
-		var improved := false
-		for i in deck.size():
-			if improved:
-				break
-			for j in range(i + 1, deck.size()):
-				if String(deck[i]) == String(deck[j]):
-					continue
-				var tmp: String = deck[i]
-				deck[i] = deck[j]
-				deck[j] = tmp
-				var nv := _deck_violations(deck)
-				if nv < v:
-					v = nv
-					improved = true
-					break
-				deck[j] = deck[i]
-				deck[i] = tmp
-		if not improved:
-			var floor_deck: Array = DECK_FALLBACK_MB if miniboss_on() else DECK_FALLBACK
-			for i in deck.size():
-				deck[i] = floor_deck[i]
-			return
-
-
-# ---------- the key-route guarantee (Batch Y) ----------
-
-# Stage 2's promise is only real if a single legal ROUTE can touch the
-# recovery, the shop, and the elite — nodes merely existing on the board
-# is a suggestion, not a plan. When no route satisfies everything, widen
-# the graph by adding missing adjacent links (nearest tier first) until
-# one does: link additions only ever increase choice, so this converges
-# and never degrades the map.
-func _ensure_key_route() -> void:
-	if _route_satisfied():
-		return
-	for f in FLOORS - 1:
-		var a: int = map[f].size()
-		var b: int = map[f + 1].size()
-		for i in a:
-			var base := 0 if a == 1 else int(round(i * float(b - 1) / float(maxi(a - 1, 1))))
-			for extra in [base - 1, base + 1]:
-				if extra >= 0 and extra < b and not map[f][i]["links"].has(extra):
-					map[f][i]["links"].append(extra)
-					map[f][i]["links"].sort()
-					map_route_links_added += 1
-					if _route_satisfied():
-						return
-	# Even the fully linked graph lacks a satisfying route — with rests
-	# spread across both halves this should be unreachable; the validator
-	# greps for it.
-	push_warning("map: no single route reaches 2 rests + shop + elite fully linked")
-
-
-# Requirement coverage as a bitmask: bit 0/1 = first and second rest,
-# bit 2 = shop, bit 3 = elite. 15 = a route the player could plan for.
-func _route_mask_after(kind: String, mask: int) -> int:
-	match kind:
-		"rest":
-			if mask & 1 == 0:
-				return mask | 1
-			return mask | 2
-		"shop":
-			return mask | 4
-		"elite":
-			return mask | 8
-	return mask
-
-
-# Forward DP over the link graph: per node, the set of coverage masks any
-# route from tier 1 can arrive with (at most 16 masks x 3 nodes a tier).
-func _route_satisfied() -> bool:
-	var cur := {}  # node idx on the current floor -> {mask: true}
-	for i in map[0].size():
-		var m := _route_mask_after(String(map[0][i]["type"]), 0)
-		cur[i] = {m: true}
-	for f in FLOORS - 1:
-		var next := {}
-		for i in cur:
-			for j in map[f][int(i)]["links"]:
-				var kind := String(map[f + 1][j]["type"])
-				if not next.has(j):
-					next[j] = {}
-				for m in cur[i]:
-					next[j][_route_mask_after(kind, int(m))] = true
-		cur = next
-	for i in cur:
-		for m in cur[i]:
-			if int(m) == 15:
-				return true
-	return false
-
-
-# Node indices on the next floor the player may move to.
+# The slot the player may enter next: always exactly one, and none once the
+# boss is behind them. Still an Array, because that is the shape the map
+# screen and the sim already iterate — a line is a graph with one edge.
 func reachable() -> Array:
-	if floor_idx < 0:
-		var all := []
-		for i in map[0].size():
-			all.append(i)
-		return all
-	if floor_idx >= FLOORS - 1:
+	if slot_idx + 1 >= SLOTS_PER_ZONE:
 		return []
-	return map[floor_idx][node_idx]["links"]
+	return [slot_idx + 1]
 
 
-func advance(f: int, i: int) -> void:
-	floor_idx = f
-	node_idx = i
-	map[f][i]["visited"] = true
+func advance(slot: int) -> void:
+	slot_idx = slot
+	map[slot]["visited"] = true
+
+
+func slot_type(slot: int) -> String:
+	if slot < 0 or slot >= map.size():
+		return ""
+	return String(map[slot]["type"])
+
+
+# Where the party stands in the WHOLE run, 1-36 — the readout the zone
+# header and the run summary both want. 0 before the first slot is entered.
+func run_slot_number() -> int:
+	if slot_idx < 0:
+		return zone_idx * SLOTS_PER_ZONE
+	return zone_idx * SLOTS_PER_ZONE + slot_idx + 1
+
+
+# The end boss is the last zone's boss and nothing else. Every other boss
+# opens the next zone.
+func is_end_boss_slot(slot: int) -> bool:
+	return slot == BOSS_SLOT and not has_next_zone()
 
 
 # ---------- themed encounter generation (the budget system) ----------
@@ -758,16 +431,20 @@ func zone_base_mult(slot: int) -> float:
 		* pow(1.5, slot - ZONE_BASE_MULTS.size()) * difficulty_mult()
 
 
+# The tier is the SLOT NUMBER now (1-12), not a dealt row. The continuous
+# ramp Batch T fitted is kept byte-for-byte — it was fitted against slot
+# DEPTH, and a line is nothing but depth — so slot 12's boss band and the
+# t1:3-5 opening are exactly what they were.
 func battle_budget(tier := -1) -> int:
 	if tier <= 0:
-		tier = floor_idx + 1
-	tier = clampi(tier, 1, FLOORS)
-	if tier >= FLOORS:
-		# The boss node keeps its band: the Escort composition (boss 7 +
+		tier = slot_idx + 1
+	tier = clampi(tier, 1, SLOTS_PER_ZONE)
+	if tier >= SLOTS_PER_ZONE:
+		# The boss slot keeps its band: the Escort composition (boss 7 +
 		# power 3-5 of company) is authored content, not the fight ladder.
 		return randi_range(10, 12)
-	var lo := 3 + int(floor((tier - 1) * 0.5))  # t1:3  t4:4  t7:6  t10:7
-	return randi_range(lo, lo + 2)              # t1:3-5  t4:4-6  t10:7-9
+	var lo := 3 + int(floor((tier - 1) * 0.5))  # t1:3  t4:4  t7:6  t11:8
+	return randi_range(lo, lo + 2)              # t1:3-5  t4:4-6  t11:8-10
 
 
 func compose(node_type: String, tier := -1) -> Array:
@@ -980,16 +657,15 @@ func rune_power() -> float:
 	return m if m > 0.0 else 1.0
 
 
-# Rune slots grow with the run: 2 in the first zone, 3 in the second, 4 in
-# the third. No cap — a fourth zone would give 5, matching the
-# ZONE_BASE_MULTS discipline (slots past the third continue formulaically).
-# Derived from zone_idx, so saves need no new field.
-# The slot ladder is a structural half of dilution — a run that dies in
-# zone 2 never owned a third slot — so the rich arm opens them all at once.
+# Batch AN §9: THREE SLOTS, FLAT, FROM RUN START. The 2/3/4 growth ladder
+# is gone — it was a structural half of rune dilution (a run that died in
+# zone 2 never owned a third slot), and with the line the growth is one
+# fewer moving part between the player and a build they can plan. Heroes
+# still begin with NO runes; the slots start empty.
 func rune_slots() -> int:
 	if rune_econ() == "rich":
-		return maxi(RICH_SLOTS, 2 + zone_idx)
-	return 2 + zone_idx
+		return RICH_SLOTS
+	return 3
 
 # Runes mode (sim matrix flag, Batch X): full = the authored pool
 # (default), stats = the generated Common family only (approximately the
@@ -1053,40 +729,18 @@ func grant_rune(member: Dictionary) -> Dictionary:
 	return _apply_rune_power(Runes.build(String(spec_ids.pick_random())))
 
 
-# Batch AF: the guaranteed spec-scoped candidate, rolled through
-# Runes.generate_spec so it keeps the ordinary rarity weighting inside the
-# smaller pool. Empty under DOD_SIM_RUNES=off/stats — neither mode has an
-# authored pool to guarantee anything out of, so the guarantee correctly
-# becomes a no-op and those control rows stay reproducible.
-func _generate_spec_rune(member: Dictionary) -> Dictionary:
-	if runes_mode() != "full":
-		return {}
-	return _apply_rune_power(Runes.generate_spec(member, zone_idx + 1))
-
-
 # Elite pick-of-3 (Batch X): the three candidates are rolled AT DROP TIME
 # and stored on the member — they never reroll on a screen open, and they
 # ride the party dict into the save. Empty when runes are off.
 #
-# guarantee_spec (Batch AF) is OPT-IN AND DEFAULTED OFF, which is the whole
-# reason it is a parameter rather than a behaviour change: the elite cache
-# and every other caller keep rolling exactly what they rolled before, and
-# that is asserted in the tests rather than assumed. Only the opening pick
-# passes true. When it is on, one spec-scoped rune is seeded first and the
-# other two roll normally around it — they dedupe against the seed for
-# free, because every draw excludes whatever is already in `out`. The triple is
-# shuffled afterwards so the guaranteed rune does not always sit in slot 1,
-# which would turn a real choice into a positional tell.
-#
-# If the spec subset is empty the seed comes back {} and the loop simply
-# fills all three the ordinary way: a silent, safe fallback, never an error
-# and never a half-filled triple.
-func roll_rune_candidates(member: Dictionary, guarantee_spec := false) -> Array:
+# BATCH AN deleted the `guarantee_spec` parameter along with Batch AF's
+# starting rune: it had exactly one caller (the opening pick) and nothing
+# else ever passed true, so with the opening pick gone the flag was a
+# parameter no reachable path could set. `_generate_spec_rune`,
+# `start_rune_enabled`, `spec_opening_enabled` and `grant_start_runes` went
+# with it — heroes now begin with no runes and three empty slots.
+func roll_rune_candidates(member: Dictionary) -> Array:
 	var out: Array = []
-	if guarantee_spec:
-		var seed_rune := _generate_spec_rune(member)
-		if not seed_rune.is_empty():
-			out.append(seed_rune)
 	while out.size() < 3:
 		# Draw WITHOUT REPLACEMENT: everything already in the triple is
 		# excluded from the pool this draw picks out of, so a duplicate is
@@ -1101,149 +755,12 @@ func roll_rune_candidates(member: Dictionary, guarantee_spec := false) -> Array:
 		if rune.is_empty():
 			return []
 		out.append(rune)
-	if guarantee_spec:
-		out.shuffle()
 	return out
 
 
-# ---------- Batch AH: the earnable-ability offer ----------
-#
-# One award = 3 abilities the hero does not already own: 1 drawn from its
-# SPEC_POOLS entry and 2 from its class's CLASS_POOLS entry. When one side
-# is exhausted the other fills for it, so an offer only shrinks below 3
-# once the hero has taken nearly everything BOTH pools hold. Rolled at the
-# moment the award drops and stored on the member (the rune-cache pattern),
-# so re-opening the Party screen never rerolls the question.
-#
-# THE SPEC DRAW LEADS. The two pools overlap by design — a spec's own
-# talent grants sit in both — so nothing in the NAME says which pool an
-# entry came from, and the picker needs to be able to say "this one is
-# yours". Order carries it, and the Party screen tints the first entry to
-# make it visible. (The rune picker shuffles its triple for the opposite
-# reason: there the blindness IS the question. Here it would just hide
-# something the player has earned the right to know.)
-func roll_ability_offer(member: Dictionary) -> Array:
-	var spec := String(member.get("spec", ""))
-	if spec == "":
-		return []
-	var owned: Array = owned_ability_names(member)
-	var spec_left: Array = Classes.spec_pool(spec).filter(
-		func(n): return not owned.has(n))
-	var class_left: Array = Classes.class_pool(Classes.class_of_spec(spec)).filter(
-		func(n): return not owned.has(n))
-	spec_left.shuffle()
-	class_left.shuffle()
-	var offer: Array = []
-	if not spec_left.is_empty():
-		var spec_pick: String = spec_left.pop_front()
-		offer.append(spec_pick)
-		# The pools overlap on purpose (a spec's talent grants sit in both);
-		# an offer must never show the same ability twice.
-		class_left.erase(spec_pick)
-	while offer.size() < 3 and not class_left.is_empty():
-		offer.append(class_left.pop_front())
-	while offer.size() < 3 and not spec_left.is_empty():
-		var fill: String = spec_left.pop_front()
-		if not offer.has(fill):
-			offer.append(fill)
-	return offer
-
-
-# Every ability display name the hero can already cast: core kit + spec kit
-# + kit-override renames + earned picks, PLUS anything a learned talent
-# node grants. Without the talent half a Berserker who bought Battle Shout
-# in the tree could be offered it again as a pick that does nothing.
-# THE implementation moved to Talents.ability_names in Batch AI so a node's
-# `condition` could read it — autoload identifiers do not resolve inside a
-# class_name script, so the list had to live on the class side of the fence.
-# This stays as the name every screen already calls.
-func owned_ability_names(member: Dictionary) -> Array:
-	return Talents.ability_names(member)
-
-
-# Queue one ability award on a hero: the offer is rolled NOW and stored, so
-# the pick waiting on the Party screen is the pick that dropped. Returns
-# false when nothing is left to offer (both pools exhausted, or no spec).
-func award_ability_pick(member: Dictionary) -> bool:
-	var offer := roll_ability_offer(member)
-	if offer.is_empty():
-		return false
-	member["bm_candidates"] = member.get("bm_candidates", []) + [offer]
-	member["bm_picks_owed"] = int(member.get("bm_picks_owed", 0)) + 1
-	return true
-
-
-# ---------- Batch AE: the starting rune ----------
-#
-# One pick of three per hero, dealt at SPEC CONFIRMATION rather than at the
-# draft, and that is not a quibble: specs are chosen AFTER the draft, and
-# the spec-scoped entries are the authored content that currently reaches
-# nobody — a rune rolled before a hero has a spec cannot be one of them.
-# Rolled through roll_rune_candidates above with its normal scope
-# eligibility and rarity weights, and resolved on the Party screen by the
-# same trophy-picker the elite cache already uses. No new gear machinery
-# exists in this batch. BATCH AF amends one line of this: the opening pick
-# is the one caller that arms the spec guarantee, so one of the three is
-# always a rune written for the hero's spec and the other two roll on the
-# ordinary zone-slot-1 table.
-#
-# UNLIKE Batch AD's two arms this is SHIPPED CONTENT rather than an
-# experiment, so it is ON by default and is NOT gated on sim_run.
-# DOD_SIM_START_RUNE=off reproduces the pre-AE economy so control rows stay
-# reachable; post-AE Matrix rows carry a start= field and pre-AE rows do
-# not, which is the usual never-compare-across-batches rule.
-func start_rune_enabled() -> bool:
-	return OS.get_environment("DOD_SIM_START_RUNE") != "off"
-
-
-# Batch AF: the opening triple always holds a rune written for the hero's
-# spec. AE measured the ordinary roller offering one only 36-42% of the
-# time and the sim's policy taking one at exactly that rate — the ceiling
-# was the ROLLER, not the policy, so raising the offer rate is the whole
-# intervention.
-#
-# DOD_SIM_SPEC_OPENING=off reproduces AE's opening (an ordinary roll of
-# three) while leaving the starting rune itself ON, which is what makes
-# this batch's own control row isolate THIS change rather than re-measuring
-# AE. Like the AE flag and unlike the AD arms it is SHIPPED CONTENT, so it
-# is on by default and NOT gated on sim_run — a control a real build cannot
-# reach is a control nobody can reproduce. Post-AF Matrix rows carry
-# specopen=; pre-AF rows do not, and are not comparable.
-func spec_opening_enabled() -> bool:
-	return OS.get_environment("DOD_SIM_SPEC_OPENING") != "off"
-
-
-# Deal every un-granted hero their opening pick; returns how many were
-# dealt. The per-member marker is what makes "exactly once per run" a
-# property of the SAVED DATA rather than of the call site — it rides inside
-# the party dict, so a v5 save carries it with no version bump and no
-# migration, and neither a resumed run nor the debug spec swap (which
-# re-opens the spec screen) can ever deal a second one.
-func grant_start_runes() -> int:
-	if not start_rune_enabled():
-		return 0
-	var granted := 0
-	for member in party:
-		if bool(member.get("start_rune_granted", false)):
-			continue
-		var candidates: Array = roll_rune_candidates(member, spec_opening_enabled())
-		if candidates.is_empty():
-			continue  # DOD_SIM_RUNES=off — there is nothing to deal
-		# The source rides on the candidates so the Party screen can name
-		# the panel honestly when a start pick and an elite cache are owed
-		# at the same time. It is a label, not a mechanism.
-		for c in candidates:
-			c["source"] = "start"
-		member["start_rune_granted"] = true
-		member["rune_candidates"] = member.get("rune_candidates", []) + [candidates]
-		member["rune_picks_owed"] = int(member.get("rune_picks_owed", 0)) + 1
-		granted += 1
-	return granted
-
-
-# Owed rune picks across the whole party. The map's Party button badge and
-# its first-map nudge both read this — a pick sitting silently on the Party
-# screen would defeat the point of choosing a front-loaded lever.
+# Owed rune picks across the whole party. The hero cards badge on this —
+# a pick sitting silently behind a click is the failure the badge exists to
+# prevent.
 func owed_rune_picks() -> int:
 	var n := 0
 	for member in party:
@@ -1251,14 +768,42 @@ func owed_rune_picks() -> int:
 	return n
 
 
-# Batch AH: six ability picks a run land on the Party screen the same way
-# the rune caches do, so they badge the same button. An earned ability that
-# sits unnoticed is the exact failure the AE badge exists to prevent.
+# Ability picks (zone bosses) waiting to be chosen, across the party.
 func owed_ability_picks() -> int:
 	var n := 0
 	for member in party:
 		n += int(member.get("bm_picks_owed", 0))
 	return n
+
+
+# Every ability display name the hero can already cast: core kit + spec kit
+# + kit-override renames + earned picks, PLUS anything a learned talent node
+# grants. Without the talent half a Berserker who bought Battle Shout in the
+# tree could be offered it again as a pick that does nothing.
+# THE implementation lives in Talents.ability_names (Batch AI) so a node's
+# `condition` can read it — autoload identifiers do not resolve inside a
+# class_name script, so the list had to live on the class side of the fence.
+# This stays as the name every screen already calls.
+func owned_ability_names(member: Dictionary) -> Array:
+	return Talents.ability_names(member)
+
+
+# Queue one ability award on a hero: the offer is rolled NOW and stored, so
+# the pick waiting on the hero card is the pick that dropped. Returns false
+# when nothing is left to offer (spec pool exhausted, or no spec).
+#
+# BATCH AN §4 re-pointed this at the SPEC POOL ONLY — the 1-spec-plus-2-class
+# draw Batch AH built is dropped, because abilities are spec-locked now.
+# `Classes.CLASS_POOLS` / `class_pool()` are left standing and still resolve;
+# nothing in the run reads them any more, so re-opening the class draw is a
+# one-line change if the designer wants it back.
+func award_ability_pick(member: Dictionary) -> bool:
+	var offer := roll_spec_ability_offer(member)
+	if offer.is_empty():
+		return false
+	member["bm_candidates"] = member.get("bm_candidates", []) + [offer]
+	member["bm_picks_owed"] = int(member.get("bm_picks_owed", 0)) + 1
+	return true
 
 
 func rotation_enabled() -> bool:
@@ -1310,9 +855,11 @@ func has_next_zone() -> bool:
 func advance_zone() -> void:
 	zone_idx += 1
 	_enter_zone()
-	floor_idx = -1
-	node_idx = -1
+	slot_idx = -1
 	encounter = {}
+	pending_modifier = ""
+	pending_reward = {}
+	pending_after = []
 	for member in party:
 		member["hp"] = member["max_hp"]
 		member["mana"] = member["max_mana"]
@@ -1332,16 +879,22 @@ func save_run() -> void:
 	# and its points re-issued on load (_migrate_trees). Loading stays
 	# tolerant of older saves via .get defaults — never drop player state
 	# silently.
-	# NOTE: a pre-Y save also keeps its old map (70% links, blind deal) —
-	# correct, never migrated; nothing at runtime may assume the Batch Y
-	# map guarantees hold on a loaded map.
+	# v7 (Batch AN): the LINE. `map` is a flat 12-slot array and the party's
+	# position is one `slot_idx` — a pre-v7 save holds a [tier][column] board
+	# with links, rest nodes and a mini-boss row, and there is no honest way
+	# to place a party standing at tier 7 column 2 onto a line that no longer
+	# has columns. Those saves are REFUSED and cleared on load (see
+	# load_run), which is the same call Batch AI made about ranked talent
+	# purchases: a wipe that says so beats a migration that invents state.
 	file.store_var({
-		"version": 6, "party": party, "items": items, "gold": gold,
+		"version": 7, "party": party, "items": items, "gold": gold,
 		"tally": tally, "debug_used": debug_used,
 		"difficulty": difficulty,
 		"zone_idx": zone_idx, "zone_name": zone_name, "zone_draw": zone_draw,
-		"floor_idx": floor_idx, "seen_events": seen_events,
-		"node_idx": node_idx, "specs_chosen": specs_chosen,
+		"slot_idx": slot_idx, "seen_events": seen_events,
+		"slots_since_merchant": slots_since_merchant,
+		"pending_after": pending_after,
+		"specs_chosen": specs_chosen,
 		"active_relics": active_relics, "map": map,
 		"combat_wins": combat_wins,
 	}, true)
@@ -1358,8 +911,14 @@ func load_run() -> bool:
 	var data: Variant = file.get_var(true)
 	if not (data is Dictionary):
 		return false
-	party = data["party"]
 	var save_version := int(data.get("version", 0))
+	# Batch AN: a pre-v7 save describes a board this build cannot render or
+	# walk. Refuse it and delete it, rather than half-loading a run whose
+	# every "next node" call would index a dictionary that is not there.
+	if save_version < 7:
+		clear_save()
+		return false
+	party = data["party"]
 	items = data["items"]
 	gold = data["gold"]
 	zone_idx = data["zone_idx"]
@@ -1369,8 +928,9 @@ func load_run() -> bool:
 		# Saves from before zone rotation ran the fixed order.
 		for slot in SLOT_COUNT:
 			zone_draw.append(SLOT_POOLS[slot][0])
-	floor_idx = data["floor_idx"]
-	node_idx = data["node_idx"]
+	slot_idx = int(data["slot_idx"])
+	slots_since_merchant = int(data.get("slots_since_merchant", 0))
+	pending_after = data.get("pending_after", [])
 	specs_chosen = data["specs_chosen"]
 	active_relics = data["active_relics"]
 	map = data["map"]
@@ -1384,7 +944,7 @@ func load_run() -> bool:
 	tally = data.get("tally", {})
 	if tally.is_empty():
 		reset_tally()
-	_migrate_trees(save_version)
+	_migrate_trees()
 	# A pre-AC (v4) save loads with the honesty flag false — it predates
 	# every tool that could have set it. The session-scoped toggles are
 	# never saved, so a resumed run always resumes with them off.
@@ -1392,6 +952,8 @@ func load_run() -> bool:
 	debug_summon = false
 	debug_free_travel = false
 	pending_event = ""
+	pending_modifier = ""
+	pending_reward = {}
 	encounter = {}
 	active = true
 	return true
@@ -1400,17 +962,11 @@ func load_run() -> bool:
 # Trees are FIXED definitions in code: always swap the saved snapshot for
 # the live tree so balance edits reach old saves.
 #
-# A pre-Batch-AI save (version < 6) holds `learned` under the old ranked,
-# point-priced scheme — ranks that no longer exist, bought at prices that no
-# longer exist. There is no honest way to translate those purchases into
-# row picks, so the tree is WIPED and the points are re-issued on the new
-# schedule: what a run standing here would have earned. The player re-picks
-# their eight rows with a full purse; nothing is quietly lost.
-#
-# Same-version saves keep the old behaviour: ranks carry, and points in nodes
-# that shrank or vanished are refunded.
-func _migrate_trees(save_version: int) -> void:
-	var to_batch_ai := save_version < 6
+# Batch AN dropped the pre-Batch-AI branch that used to live here: only v7
+# saves reach this function now (load_run refuses anything older), and every
+# v7 save was written by a build whose trees are already rows. Ranks carry,
+# and points in nodes that shrank or vanished are refunded.
+func _migrate_trees() -> void:
 	for member in party:
 		var spec: String = member.get("spec", "")
 		if spec == "":
@@ -1418,12 +974,6 @@ func _migrate_trees(save_version: int) -> void:
 		var live_tree := Talents.generate_tree(spec, member["key"])
 		member["tree"] = live_tree
 		var learned: Dictionary = member.get("talents", {})
-		if to_batch_ai:
-			member["talents"] = {}
-			member["talent_points"] = _batch_ai_point_schedule()
-			member["talent_flex"] = 0
-			member.erase("talent_order")  # prices are flat now: nothing to replay
-			continue
 		var refund := 0
 		for id in learned.keys():
 			var node := Talents.node_in_tree(live_tree, id)
@@ -1435,21 +985,6 @@ func _migrate_trees(save_version: int) -> void:
 				learned[id] = int(node["ranks"])
 		member["talents"] = learned
 		member["talent_points"] = member.get("talent_points", 0) + refund
-
-
-# Points a Batch AI run standing at this spot would have banked: 1 for the
-# spec choice, 1 per mini-boss cleared, 2 per zone boss cleared. Zone bosses
-# are counted by zone_idx (you only leave a zone by killing its boss); the
-# mini-boss sits at a fixed tier, so "cleared" is just "past that tier".
-# The FINAL zone's boss pays nothing, and you cannot have cleared it and
-# still be loading a run — so zone_idx is the whole count.
-func _batch_ai_point_schedule() -> int:
-	var pts := 1 if specs_chosen else 0
-	pts += 2 * zone_idx                      # zone bosses behind us
-	pts += zone_idx                          # their mini-bosses
-	if miniboss_on() and floor_idx > MINIBOSS_TIER:
-		pts += 1                             # this zone's mini-boss too
-	return pts
 
 
 func clear_save() -> void:
@@ -1474,40 +1009,38 @@ func award_gold(node_type: String) -> int:
 	return amount
 
 
-# Combat rewards, Batch AI: a run hands out EXACTLY as many points as a
-# complete tree costs. Spec choice 1 + mini-boss 1 x3 + zone boss 2 x2 = 8,
-# and a tree is 8 nodes. Regular fights pay nothing — the tree is no longer
-# an income curve you grind, it is a set of eight decisions.
-#   spec choice   1   (award_spec_point, on confirming the spec)
-#   mini-boss     1
-#   zone boss     2   (the FINAL boss 0 — nothing follows it to spend on)
-#   fight/rest    0
-#   ELITE         1, into the FLEX purse (talent_flex) — see below.
+# Combat rewards, Batch AN §8: points come from ELITES, MINI-BOSSES and
+# BOSSES only, one apiece. Regular fights award none.
+#   elite       1   x2 per zone
+#   mini-boss   1   x1 per zone
+#   zone boss   1   x1 per zone   (the END boss pays one too — see below)
+#   fight       0
+# = 4 per zone, 12 per run, against an 8-node tree.
+#
+# ONE PURSE, and that is the change from Batch AI. AI split elite points
+# into a separate `talent_flex` because 8 points against an 8-node tree left
+# no room for a second node in a row — a normal point had to be barred from
+# buying one or the tree could be climbed faster. At 12 against 8 the SHAPE
+# does the barring instead: rows are mutually exclusive and there are only
+# eight of them, so a purse of 12 can open at most 8 rows and the surplus
+# has nowhere to go BUT second nodes. That is §8's "the 4 surplus buy row
+# flexibility exactly as Batch AI §6 already allows", arrived at by
+# arithmetic rather than by a second wallet. `talent_flex` survives as a
+# purse that is spent FIRST when it holds anything (old saves, and any
+# future relic that wants to grant flexibility without granting climb).
+#
+# NOTE FOR THE DESIGNER: the awakening's own point (award_spec_point, Batch
+# AI) is UNCHANGED and still paid, so the real total is 13 and the surplus
+# is 5, not 4. §8 enumerates SLOT types and the awakening is not a slot, so
+# it was left standing rather than silently deleted — removing it would push
+# the first talent pick from "the moment you choose a spec" out to slot 3,
+# which is a live design decision this batch does not ask for.
 func award_talent_points(node_type: String) -> int:
-	var pts := 0
-	match node_type:
-		"miniboss":
-			pts = 1
-		"boss":
-			# The FINAL boss awards no talent points (a relic instead) —
-			# points earned when nothing follows are unspendable.
-			pts = 2 if has_next_zone() else 0
+	var pts := 1 if node_type in ["elite", "miniboss", "boss"] else 0
 	if pts > 0:
 		for member in party:
 			member["talent_points"] = member.get("talent_points", 0) + pts
 	return pts
-
-
-# Elite points are a SEPARATE purse (Batch AI §6). They cannot open a new
-# row; the only thing they buy is a second node in a row already picked,
-# which is why hunting elites reads as "widen a choice I already made"
-# rather than "climb the tree faster".
-func award_talent_flex(node_type: String) -> int:
-	if node_type != "elite":
-		return 0
-	for member in party:
-		member["talent_flex"] = member.get("talent_flex", 0) + 1
-	return 1
 
 
 # The point the awakening pays, granted the moment a spec is confirmed —
@@ -1518,3 +1051,308 @@ func award_spec_point(idx: int) -> void:
 	if idx < 0 or idx >= party.size():
 		return
 	party[idx]["talent_points"] = int(party[idx].get("talent_points", 0)) + 1
+
+
+# ---------- Batch AN §6: the item cap ----------
+
+# Every grant of a consumable goes through here. Returns how many actually
+# landed, so the caller can say "refused" instead of pretending. The cap is
+# per ITEM TYPE, not per pouch: six Health Potions and six Bombs is legal.
+func add_item(id: String, count := 1) -> int:
+	var have := int(items.get(id, 0))
+	var room := maxi(ITEM_CAP - have, 0)
+	var landed := mini(count, room)
+	if landed > 0:
+		items[id] = have + landed
+	return landed
+
+
+func item_full(id: String) -> bool:
+	return int(items.get(id, 0)) >= ITEM_CAP
+
+
+# ---------- Batch AN §3: the offer ----------
+#
+# Before every FIGHT and ELITE slot the player is shown three options and
+# picks one. Each option is one MODIFIER plus one REWARD, both visible
+# before choosing, and the reward is read off the modifier's SEVERITY —
+# authoring a modifier is therefore authoring one number, not a pairing.
+#
+# SEVERITY IS FLAT and deliberately ignores party composition. A modifier
+# that happens to be cheap for your build is a good deal you EARNED by
+# building that way; a severity that read the party would quietly tax every
+# build for being good at something.
+#
+# PLACEHOLDERS. These six exist so a 36-slot run is playable end to end and
+# the pacing can be FELT before the authored 20 are written. Every one is
+# built out of a hook battle.gd already has.
+const MODIFIERS := {
+	"overgrown": {"name": "Overgrown", "severity": 1,
+		"desc": "Both parties begin the fight at 70% health."},
+	"tinderbox": {"name": "Tinderbox", "severity": 2,
+		"desc": "All fire damage +25%, whoever deals it."},
+	"frenzied": {"name": "Frenzied", "severity": 2,
+		"desc": "Everyone acts 30% faster. Cooldowns are unchanged."},
+	"brittle": {"name": "Brittle", "severity": 3,
+		"desc": "All attacks ignore armor, on both sides."},
+	"warded": {"name": "Warded", "severity": 3,
+		"desc": "All abilities cost 25% more. Basic attacks are free."},
+	"bloodless": {"name": "Bloodless", "severity": 4,
+		"desc": "No healing for anyone. Bleed and damage-over-time still tick."},
+}
+
+# The reward table reads severity and nothing else. Each entry is the list
+# of reward KINDS that severity may pay; the offer picks one at random, so
+# a severity-4 option is sometimes gold and sometimes the merchant.
+#   gold   {amount}      flat gold on victory
+#   potion {}            one random consumable
+#   rune   {}            one rune from the current pool, for a random hero
+#   shop   {}            a merchant follows the fight (the §5 on-demand path)
+const REWARDS := {
+	1: [{"kind": "gold", "amount": 40}],
+	2: [{"kind": "gold", "amount": 80}, {"kind": "potion"}],
+	3: [{"kind": "gold", "amount": 140}, {"kind": "rune"}],
+	4: [{"kind": "gold", "amount": 220}, {"kind": "rune"}, {"kind": "shop"}],
+}
+
+
+func modifier_name(id: String) -> String:
+	return String(MODIFIERS.get(id, {}).get("name", ""))
+
+
+func modifier_severity(id: String) -> int:
+	return int(MODIFIERS.get(id, {}).get("severity", 0))
+
+
+func reward_text(reward: Dictionary) -> String:
+	match String(reward.get("kind", "")):
+		"gold":
+			return "%d gold" % int(reward.get("amount", 0))
+		"potion":
+			return "A random potion"
+		"rune":
+			return "A random rune"
+		"shop":
+			return "A merchant follows the fight"
+	return ""
+
+
+# Three distinct modifiers, each paired with one reward its severity allows.
+#
+# THE FLOOR IS THE POINT: every offer holds at least one option of severity
+# 1 or 2, so a party down to its last few HP always has a survivable choice.
+# It is enforced by CONSTRUCTION (the first draw comes from the low pool)
+# rather than by rejecting rolls, so it cannot fail on an unlucky table.
+func roll_offer() -> Array:
+	var low: Array = []
+	var rest: Array = []
+	for id in MODIFIERS:
+		if modifier_severity(String(id)) <= 2:
+			low.append(String(id))
+		else:
+			rest.append(String(id))
+	low.shuffle()
+	rest.shuffle()
+	var picked: Array = []
+	if not low.is_empty():
+		picked.append(low.pop_front())
+	# Fill the other two from everything left, low and high together, so the
+	# guarantee raises the floor without capping the ceiling.
+	var pool: Array = low + rest
+	pool.shuffle()
+	while picked.size() < 3 and not pool.is_empty():
+		picked.append(pool.pop_front())
+	var offer: Array = []
+	for id in picked:
+		var sev := modifier_severity(String(id))
+		var choices: Array = REWARDS.get(sev, REWARDS[1])
+		offer.append({"modifier": String(id),
+			"reward": (choices.pick_random() as Dictionary).duplicate()})
+	offer.shuffle()
+	return offer
+
+
+# The accepted option, armed for the battle about to start.
+func accept_offer(option: Dictionary) -> void:
+	pending_modifier = String(option.get("modifier", ""))
+	pending_reward = (option.get("reward", {}) as Dictionary).duplicate()
+
+
+# Pay the accepted option's reward. Called on VICTORY — the modifier is the
+# price and the reward is what clearing it under that price bought, which is
+# also the only reading the "a merchant follows the fight" reward supports.
+# Returns the human line the victory screen prints, and whether a merchant
+# is owed.
+func claim_reward() -> Dictionary:
+	var reward := pending_reward
+	pending_reward = {}
+	pending_modifier = ""
+	if reward.is_empty():
+		return {"text": "", "shop": false}
+	match String(reward.get("kind", "")):
+		"gold":
+			var amount := int(round(int(reward.get("amount", 0))
+				* (1.0 + relic_add("gold_find_mult"))))
+			gold += amount
+			tally_add("gold_earned", amount)
+			return {"text": "+%d gold (the bargain)" % amount, "shop": false}
+		"potion":
+			var id: String = random_loot()
+			if add_item(id) < 1:
+				return {"text": "The bargain offered a %s — the party is already carrying six."
+					% ITEM_INFO[id][0], "shop": false}
+			return {"text": "+1 %s (the bargain)" % ITEM_INFO[id][0], "shop": false}
+		"rune":
+			var looter: Dictionary = party.pick_random()
+			var candidates: Array = roll_rune_candidates(looter)
+			if candidates.is_empty():
+				return {"text": "", "shop": false}  # runes off
+			looter["rune_candidates"] = looter.get("rune_candidates", []) + [candidates]
+			looter["rune_picks_owed"] = int(looter.get("rune_picks_owed", 0)) + 1
+			return {"text": "RUNE (the bargain): the %s may choose one of three."
+				% String(looter["key"]).capitalize(), "shop": false}
+		"shop":
+			# Guaranteed on demand — and it resets the §5 drought counter,
+			# because the party HAS just seen a merchant.
+			slots_since_merchant = 0
+			return {"text": "A merchant follows the fight.", "shop": true}
+	return {"text": "", "shop": false}
+
+
+# ---------- Batch AN §5 and §7: what follows a cleared slot ----------
+
+const MERCHANT_CHANCE := 0.40
+const MERCHANT_FLOOR := 4    # cleared slots without one before it is forced
+const EVENT_CHANCE := 0.25
+
+
+# Rolls the merchant for a just-cleared FIGHT or ELITE slot. The floor is
+# checked BEFORE the roll, so four dry slots guarantee the fifth rather than
+# merely improving its odds.
+func roll_merchant(node_type: String) -> bool:
+	if not node_type in ["fight", "elite"]:
+		return false
+	if slots_since_merchant >= MERCHANT_FLOOR or randf() < MERCHANT_CHANCE:
+		slots_since_merchant = 0
+		return true
+	slots_since_merchant += 1
+	return false
+
+
+func roll_event(node_type: String) -> bool:
+	return node_type in ["fight", "elite"] and randf() < EVENT_CHANCE
+
+
+# THE one place that answers "where does the party go when this screen is
+# done". Pops the next queued interstitial and returns its scene, or the map
+# when the queue is empty. Shop and event both call it on leave, so a fight
+# that rolled both resolves shop -> event -> map without either screen
+# knowing the other exists.
+func next_after_scene() -> String:
+	while not pending_after.is_empty():
+		var next := String(pending_after[0])
+		pending_after = pending_after.slice(1)
+		if next == "shop":
+			return "res://scenes/shop.tscn"
+		if next == "event":
+			pending_event = Events.pick(self)
+			if pending_event == "":
+				continue  # nothing eligible right now — try the next entry
+			seen_events.append(pending_event)
+			Profile.note_event(pending_event)
+			return "res://scenes/event.tscn"
+	return "res://scenes/map.tscn"
+
+
+# ---------- Batch AN §6: attrition ----------
+
+# Clearing ANY slot heals the party this much. It rides the SAME
+# `victory_heal_pct` hook the Chalice of Dawn already uses rather than a new
+# one, so the relic's 10% stacks on top for 25% and there is still exactly
+# one read site for "how much does a victory heal".
+const SLOT_HEAL_PCT := 0.15
+
+
+func victory_heal_pct() -> float:
+	return SLOT_HEAL_PCT + relic_add("victory_heal_pct")
+
+
+# ---------- Batch AN §4: the mini-boss ability upgrade ----------
+#
+# A generic upgrade attaches to ONE ability the hero already owns and makes
+# it better. Upgrades STACK on the same ability (two different upgrades on
+# Overpower is legal) but the SAME upgrade cannot be taken twice in a run —
+# a run of "+50% damage" three times over is a number, not a decision.
+#
+# PLACEHOLDER POOL OF FOUR until the dozen are authored. Stored on the
+# member as `upgrades` = [{id, ability}], read at battle spawn.
+const ABILITY_UPGRADES := {
+	"up_damage": {"name": "Honed", "desc": "+50% damage."},
+	"up_cooldown": {"name": "Quickened", "desc": "-2 turns cooldown (minimum 0)."},
+	"up_free": {"name": "Effortless", "desc": "Costs no resource."},
+	"up_speed": {"name": "Swift", "desc": "+2 initiative speed (arrives sooner)."},
+}
+
+
+func upgrade_name(id: String) -> String:
+	return String(ABILITY_UPGRADES.get(id, {}).get("name", id))
+
+
+func upgrade_desc(id: String) -> String:
+	return String(ABILITY_UPGRADES.get(id, {}).get("desc", ""))
+
+
+# Has this hero already taken this upgrade, on any ability?
+func has_upgrade(member: Dictionary, id: String) -> bool:
+	for up in member.get("upgrades", []):
+		if String(up.get("id", "")) == id:
+			return true
+	return false
+
+
+# Three {id, ability} candidates: an upgrade the hero has not taken, paired
+# with an ability they can actually cast. Fewer than three when the hero has
+# taken most of the pool — the picker shows what exists rather than padding.
+func roll_upgrade_offer(member: Dictionary) -> Array:
+	var abilities: Array = owned_ability_names(member).filter(
+		func(n): return String(n) != "Strike")
+	if abilities.is_empty():
+		return []
+	var ids: Array = ABILITY_UPGRADES.keys().filter(
+		func(id): return not has_upgrade(member, String(id)))
+	ids.shuffle()
+	var offer: Array = []
+	for id in ids.slice(0, 3):
+		offer.append({"id": String(id), "ability": String(abilities.pick_random())})
+	return offer
+
+
+func award_upgrade_pick(member: Dictionary) -> bool:
+	var offer := roll_upgrade_offer(member)
+	if offer.is_empty():
+		return false
+	member["up_candidates"] = member.get("up_candidates", []) + [offer]
+	member["up_picks_owed"] = int(member.get("up_picks_owed", 0)) + 1
+	return true
+
+
+func owed_upgrade_picks() -> int:
+	var n := 0
+	for member in party:
+		n += int(member.get("up_picks_owed", 0))
+	return n
+
+
+# Batch AN §4: zone bosses draw from the hero's SPEC POOL ONLY — the class
+# draw Batch AH added is dropped, abilities are spec-locked now. Spec pools
+# are 2-5 deep, so this offers what exists and fills short rather than
+# padding from somewhere the batch just closed off.
+func roll_spec_ability_offer(member: Dictionary) -> Array:
+	var spec := String(member.get("spec", ""))
+	if spec == "":
+		return []
+	var owned: Array = owned_ability_names(member)
+	var left: Array = Classes.spec_pool(spec).filter(
+		func(n): return not owned.has(n))
+	left.shuffle()
+	return left.slice(0, 3)

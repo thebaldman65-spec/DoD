@@ -331,22 +331,21 @@ func _test_save_round_trip() -> void:
 			"...with the same three names in the same order")
 	ok(int(run.party[0].get("bm_picks_owed", 0)) == 1, "and the pick is still owed")
 
-	# A run saved BEFORE this batch owes picks with no triple behind them.
-	# The Party screen has to roll one rather than dead-end.
+	# BATCH AN RETIRED THE CASE THIS USED TO COVER. The Party screen used to
+	# roll a triple on the spot for a pre-AH save that owed a pick with no
+	# candidates behind it; pre-v7 saves are refused outright now (the board
+	# changed shape), so that path is unreachable and the picker has moved
+	# onto the map card. What is still worth pinning is the invariant the old
+	# repair existed to protect: an owed pick always has a triple behind it,
+	# because award_ability_pick is the only thing that can owe one and it
+	# banks the candidates in the same call.
 	run.party[0]["bm_candidates"] = []
-	run.party[0]["bm_picks_owed"] = 1
-	run.active = true
-	var scene: Node = load("res://scenes/party.tscn").instantiate()
-	root.add_child(scene)
-	for _i in 6:
-		await process_frame
-	scene.selected = 0
-	scene._draw_screen()
-	for _i in 6:
-		await process_frame
+	run.party[0]["bm_picks_owed"] = 0
+	ok(run.award_ability_pick(run.party[0]),
+		"a fresh award is accepted")
+	ok(int(run.party[0].get("bm_picks_owed", 0)) == 1, "...owing exactly one")
 	ok((run.party[0].get("bm_candidates", []) as Array).size() == 1,
-		"a pre-AH save owing a pick rolls its triple on the spot")
-	scene.free()
+		"...with its triple banked in the same call — never owed without one")
 
 
 # ---------- 7. the owed-pick affordance chain ----------
@@ -367,36 +366,38 @@ func _test_owed_badges() -> void:
 	run.award_ability_pick(run.party[0])
 	run.award_ability_pick(run.party[2])
 	ok(run.owed_ability_picks() == 2, "two owed after two awards")
-	# The map badge.
+	# BATCH AN MOVED THE AFFORDANCE, so the check follows it. The Party
+	# button and its hero list are gone: all four cards live on the map, and
+	# an owed pick is resolved ON the card. Both halves of the old chain are
+	# still here — the map says who is owed something, and the buttons that
+	# resolve it are on the same screen — they are just one screen now.
 	var map_scene: Node = load("res://scenes/map.tscn").instantiate()
 	root.add_child(map_scene)
 	for _i in 6:
 		await process_frame
-	var badged := false
+	var headings := 0
+	var offer_buttons := 0
 	var walk: Array = [map_scene]
 	while not walk.is_empty():
 		var n: Node = walk.pop_back()
 		for c in n.get_children():
 			walk.append(c)
-		if n is Button and String(n.get("text")).contains("2 abilities!"):
-			badged = true
-	ok(badged, "the map's Party button badges the owed picks")
-	map_scene.free()
-	# The Party screen's hero list.
-	var party_scene: Node = load("res://scenes/party.tscn").instantiate()
-	root.add_child(party_scene)
-	for _i in 6:
-		await process_frame
-	var rows := 0
-	walk = [party_scene]
+		if n is Label and String(n.get("text")).contains("NEW ABILITY"):
+			headings += 1
+		if n is Button and String(n.get("text")).contains("1 ability"):
+			offer_buttons += 1
+	ok(headings == 2, "both owed heroes show the pick ON their card (got %d)" % headings)
+	# The badge line names the count on each owed card.
+	var badges := 0
+	walk = [map_scene]
 	while not walk.is_empty():
-		var n2: Node = walk.pop_back()
-		for c in n2.get_children():
+		var n3: Node = walk.pop_back()
+		for c in n3.get_children():
 			walk.append(c)
-		if n2 is Button and String(n2.get("text")).contains("ABILITY TO CHOOSE"):
-			rows += 1
-	ok(rows == 2, "both owed heroes are marked in the list (got %d)" % rows)
-	party_scene.free()
+		if n3 is Label and String(n3.get("text")).contains("1 ability"):
+			badges += 1
+	ok(badges == 2, "...and both cards badge it (got %d)" % badges)
+	map_scene.free()
 
 
 # ---------- 8. Deadfall's perfect: the one HUMAN-ONLY path ----------

@@ -144,28 +144,43 @@ func _test_offers(RunState) -> void:
 		for spec in Classes.SPEC_IDS[class_key]:
 			var spec_pool: Array = Classes.spec_pool(spec)
 			var class_pool: Array = Classes.class_pool(class_key)
-			# A fresh hero's FIRST offer: 1 spec + 2 class, exactly.
+			# BATCH AN §4 RE-POINTED THIS IN PLACE. AH offered 1 spec + 2
+			# class; abilities are SPEC-LOCKED now, so every entry must come
+			# from the spec pool and the class pool is not consulted at all.
+			# The question the check asks is unchanged — "is the offer drawn
+			# from the pool the design says it is" — so it rides the
+			# mechanism that is load-bearing today rather than being deleted.
+			# The size assertion loosened with it: spec pools are 2-5 deep,
+			# and an offer of three is impossible out of a pool of two.
 			for trial in 40:
 				var m := {"key": class_key, "spec": spec, "bm_abilities": [],
 					"tree": [], "talents": {}}
-				var offer: Array = run.roll_ability_offer(m)
-				ok(offer.size() == 3, "%s is offered 3" % spec)
-				# The pools OVERLAP on purpose (a spec's own talent grants
-				# sit in both), so "which pool did this come from" cannot be
-				# read off the name. What is testable is the documented
-				# shape: the spec draw LEADS, the class draws follow.
-				ok(spec_pool.has(offer[0]),
-					"%s leads with its spec draw (got %s)" % [spec, offer])
-				ok(class_pool.has(offer[1]) and class_pool.has(offer[2]),
-					"%s follows with two class draws (got %s)" % [spec, offer])
+				var offer: Array = run.roll_spec_ability_offer(m)
+				ok(not offer.is_empty(), "%s is offered something" % spec)
+				ok(offer.size() == mini(3, spec_pool.size()),
+					"%s is offered min(3, pool) = %d (got %d)" % [
+						spec, mini(3, spec_pool.size()), offer.size()])
+				for n in offer:
+					ok(spec_pool.has(n),
+						"%s draws only from its SPEC pool (got %s)" % [spec, n])
+					ok(not class_pool.has(n) or spec_pool.has(n),
+						"%s: nothing arrives via the class pool alone" % spec)
 				ok(offer.size() == _unique(offer).size(),
 					"%s offer holds no duplicate" % spec)
-			# Six awards over a run, and none of them repeats an owned one.
+			# Batch AN: TWO awards over a run, not six — the mini-boss pays
+			# an upgrade now, so only the two zone bosses pay abilities.
+			# Nothing is ever re-offered, and the offer SHRINKS as the pool
+			# empties rather than repeating or crashing.
 			var m2 := {"key": class_key, "spec": spec, "bm_abilities": [],
 				"tree": [], "talents": {}}
-			for award in 6:
-				var offer2: Array = run.roll_ability_offer(m2)
-				ok(offer2.size() == 3, "%s award %d still offers 3" % [spec, award + 1])
+			for award in 2:
+				var offer2: Array = run.roll_spec_ability_offer(m2)
+				if offer2.is_empty():
+					ok(m2["bm_abilities"].size() >= spec_pool.size(),
+						"%s only runs dry once its pool is spent" % spec)
+					break
+				ok(offer2.size() <= 3, "%s award %d offers at most 3" % [
+					spec, award + 1])
 				for n in offer2:
 					ok(not m2["bm_abilities"].has(n),
 						"%s is never re-offered to %s" % [n, spec])
@@ -177,43 +192,17 @@ func _test_offers(RunState) -> void:
 			ok(int(m3.get("bm_picks_owed", 0)) == 1, "%s owes one pick" % spec)
 			ok((m3.get("bm_candidates", []) as Array).size() == 1,
 				"%s banked the triple it was shown" % spec)
-	# CROSS-FILL: a hero holding its whole spec pool still gets 3 from the
-	# class pool, and vice versa.
-	var mm := {"key": "berserker", "spec": "berserker", "tree": [], "talents": {},
+	# CROSS-FILL IS GONE WITH THE CLASS DRAW (Batch AN §4). A hero holding
+	# its whole spec pool is offered NOTHING, and award_ability_pick reports
+	# false rather than banking an empty triple the card would then render as
+	# a heading with no buttons under it.
+	var mm := {"key": "warrior", "spec": "berserker", "tree": [], "talents": {},
 		"bm_abilities": Classes.spec_pool("berserker").duplicate()}
-	mm["key"] = "warrior"
-	var filled: Array = mm["bm_abilities"]
-	var cross: Array = run.roll_ability_offer(mm)
-	ok(cross.size() == 3, "an exhausted spec pool fills from the class pool")
-	for n in cross:
-		ok(not filled.has(n), "cross-fill never re-offers an owned ability")
-	# Exhaust EVERYTHING: the offer shrinks rather than repeating or crashing.
-	var all_names: Array = Classes.spec_pool("berserker").duplicate()
-	for n in Classes.class_pool("warrior"):
-		if not all_names.has(n):
-			all_names.append(n)
-	var me := {"key": "warrior", "spec": "berserker", "tree": [], "talents": {},
-		"bm_abilities": all_names}
-	ok(run.roll_ability_offer(me).is_empty(), "both pools dry -> an empty offer")
-	ok(not run.award_ability_pick(me), "and no pick is owed for an empty offer")
-	# A hero with no spec is never offered anything.
-	var ms := {"key": "warrior", "spec": "", "bm_abilities": [], "tree": [],
-		"talents": {}}
-	ok(run.roll_ability_offer(ms).is_empty(), "an unawakened hero is offered nothing")
-	# A talent-BOUGHT ability is owned for offer purposes.
-	var tree: Array = Talents.generate_tree("berserker", "warrior")
-	var bs_id := ""
-	for node in tree:
-		if String(node.get("name", "")) == "Battle Shout":
-			bs_id = String(node["id"])
-	ok(bs_id != "", "the Berserker tree still holds Battle Shout")
-	var mt := {"key": "warrior", "spec": "berserker", "bm_abilities": [],
-		"tree": tree, "talents": {bs_id: 1}}
-	ok(run.owned_ability_names(mt).has("Battle Shout"),
-		"a talent-learned Battle Shout counts as owned")
-	for trial2 in 60:
-		ok(not run.roll_ability_offer(mt).has("Battle Shout"),
-			"a talent-learned ability is never offered again")
+	var cross: Array = run.roll_spec_ability_offer(mm)
+	ok(cross.is_empty(), "an exhausted spec pool offers nothing (got %s)" % cross)
+	ok(not run.award_ability_pick(mm),
+		"award_ability_pick refuses when there is nothing to offer")
+	ok(int(mm.get("bm_picks_owed", 0)) == 0, "...and owes no pick")
 	run.free()
 
 
@@ -230,56 +219,54 @@ func _unique(arr: Array) -> Array:
 func _test_map(RunState) -> void:
 	print("\n§4 the mini-boss")
 	var run = RunState.new()
-	OS.set_environment("DOD_SIM_MINIBOSS", "")
-	for trial in 120:
+	# BATCH AN REPLACED THE BOARD THIS SECTION USED TO PIN. There is no deck,
+	# no row and no route: a zone is a fixed line of 12 slots, so "no route
+	# goes around the mini-boss" is true by construction rather than by a
+	# forward DP. What survives is the question that still has meaning —
+	# every zone puts exactly one mini-boss in it, always in the same place,
+	# and the player cannot reach the boss without passing it.
+	for trial in 60:
 		run.new_run()
-		var mb_rows := 0
-		for f in run.FLOORS:
-			var all_mb := true
-			var any_mb := false
-			for n in run.map[f]:
-				if String(n["type"]) == "miniboss":
-					any_mb = true
-				else:
-					all_mb = false
-			if any_mb:
-				ok(all_mb, "the mini-boss owns EVERY node in its row")
-				ok(f == run.MINIBOSS_TIER, "the mini-boss sits on the middle tier")
-				ok(run.map[f].size() == run.NODES_PER_TIER,
-					"the mini-boss row is a full-width row")
-				mb_rows += 1
-		ok(mb_rows == 1, "exactly one mini-boss row per zone")
-		# Unavoidable: every legal route crosses it.
-		ok(_every_route_crosses(run, run.MINIBOSS_TIER),
-			"no route goes around the mini-boss")
-		# Composition: the deck's economy nodes are untouched by the change.
+		ok(run.map.size() == run.SLOTS_PER_ZONE,
+			"a zone is %d slots" % run.SLOTS_PER_ZONE)
 		var counts := {}
-		for f in run.FLOORS - 1:
-			for n in run.map[f]:
-				counts[String(n["type"])] = int(counts.get(String(n["type"]), 0)) + 1
-		ok(int(counts.get("rest", 0)) == run.REST_NODES, "still 5 rest nodes")
-		ok(int(counts.get("shop", 0)) == run.SHOP_NODES, "still 5 shop nodes")
-		ok(int(counts.get("event", 0)) == run.EVENT_NODES, "still 3 event nodes")
-		ok(int(counts.get("fight", 0)) + int(counts.get("elite", 0))
-			== run.FIGHT_NODES - run.NODES_PER_TIER,
-			"the mini-boss row was paid for out of the fight cards")
-		ok(int(counts.get("miniboss", 0)) == run.NODES_PER_TIER,
-			"three mini-boss nodes, one row")
-	# The control flag puts the pre-AH map back.
-	OS.set_environment("DOD_SIM_MINIBOSS", "off")
-	for trial2 in 40:
-		run.new_run()
-		var mb := 0
-		var fights := 0
-		for f in run.FLOORS - 1:
-			for n in run.map[f]:
-				if String(n["type"]) == "miniboss":
-					mb += 1
-				elif String(n["type"]) in ["fight", "elite"]:
-					fights += 1
-		ok(mb == 0, "DOD_SIM_MINIBOSS=off deals no mini-boss")
-		ok(fights == run.FIGHT_NODES, "...and the full 17-fight deck comes back")
-	OS.set_environment("DOD_SIM_MINIBOSS", "")
+		var mb_at := -1
+		for s in run.map.size():
+			var ty := String(run.map[s]["type"])
+			counts[ty] = int(counts.get(ty, 0)) + 1
+			if ty == "miniboss":
+				mb_at = s
+		ok(int(counts.get("miniboss", 0)) == 1, "exactly one mini-boss per zone")
+		ok(mb_at == 5, "the mini-boss sits at slot 6 (index 5), always")
+		ok(int(counts.get("boss", 0)) == 1, "one boss, and it is the last slot")
+		ok(String(run.map[run.BOSS_SLOT]["type"]) == "boss",
+			"the boss is the last slot")
+		ok(int(counts.get("elite", 0)) == 2, "two elites per zone")
+		ok(int(counts.get("fight", 0)) == 8, "eight ordinary fights per zone")
+		ok(int(counts.get("rest", 0)) == 0, "no rest slots exist any more")
+		ok(int(counts.get("shop", 0)) == 0, "the shop is scheduled, never dealt")
+		ok(int(counts.get("event", 0)) == 0, "events are scheduled, never dealt")
+		# Unavoidable by construction: the only way past slot 6 is through it.
+		ok(mb_at < run.BOSS_SLOT, "the mini-boss stands before the boss")
+	# Every zone is the SAME line — that is the batch's whole premise.
+	run.new_run()
+	var first: Array = []
+	for s in run.map.size():
+		first.append(String(run.map[s]["type"]))
+	run.advance_zone()
+	var second: Array = []
+	for s in run.map.size():
+		second.append(String(run.map[s]["type"]))
+	ok(first == second, "every zone has the identical shape")
+	ok(first == run.ZONE_SHAPE, "...and it is the authored ZONE_SHAPE")
+	# Only one slot is ever reachable, and it is the next one.
+	run.new_run()
+	for s in run.SLOTS_PER_ZONE:
+		var reach: Array = run.reachable()
+		ok(reach.size() == 1, "exactly one slot forward at slot %d" % s)
+		ok(int(reach[0]) == s, "...and it is the next one")
+		run.advance(int(reach[0]))
+	ok(run.reachable().is_empty(), "nothing follows the boss")
 	# Rewards: elite-tier points and gold, and its own ability pick.
 	run.new_run()
 	run.party[0]["spec"] = "berserker"
@@ -413,7 +400,7 @@ func _test_doc_matches_code() -> void:
 	# The stamp moves with every batch that touches the doc; what this line
 	# is really guarding is that the doc was touched AT ALL when the code
 	# below it changed. Bump it, do not delete it.
-	ok(doc.contains("Last updated: 2026-08-06 (Batch AL)"),
+	ok(doc.contains("Last updated: 2026-08-07 (Batch AN)"),
 		"master.html carries the current batch's stamp")
 	for spec in Classes.SPEC_POOLS:
 		var listed: String = ", ".join(Classes.SPEC_POOLS[spec])

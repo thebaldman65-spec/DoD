@@ -753,7 +753,7 @@ func _spawn_units() -> void:
 	var zone_tier := 0
 	var slot_mult := 1.0
 	if Run.active:
-		zone_tier = clampi(Run.floor_idx + 1, 1, Run.FLOORS)
+		zone_tier = clampi(Run.slot_idx + 1, 1, Run.SLOTS_PER_ZONE)
 		slot_mult = Run.zone_base_mult(Run.zone_idx + 1)
 	for i in composition.size():
 		var cfg := _enemy_config(composition[i])
@@ -779,12 +779,55 @@ func _spawn_units() -> void:
 		enemies.append(_make_unit(cfg, layout[i], tint,
 			Vector2(ENEMY_PLATE_X, PLATE_TOP + i * PLATE_STEP)))
 
+	_apply_battle_modifier()
 	for u in heroes + enemies:
 		u.next_time = (100.0 / u.speed) * randf_range(0.0, 1.0)
 	# Tracker (Hunter class passive): always attacks first in every fight.
 	for u in heroes:
 		if u.hero_key == "hunter":
 			u.next_time = -0.01
+
+
+# ---------- Batch AN §3: the battle modifier ----------
+#
+# The bargain the player accepted at the offer screen, stamped onto every
+# combatant on BOTH sides once they all exist. Each modifier is one field
+# write (or one stat nudge) and nothing else — no per-modifier branch in the
+# damage pipeline — because the four unit-side fields each have exactly one
+# read site and the two stat-side ones use hooks that already existed.
+#
+# Applied AFTER spawn and BEFORE the opening initiative roll: Frenzied has
+# to be on the board before `next_time` is seeded off speed, or the first
+# turn order would be the unmodified one.
+func _apply_battle_modifier() -> void:
+	if not Run.active or Run.pending_modifier == "":
+		return
+	var mod_id := String(Run.pending_modifier)
+	if not Run.MODIFIERS.has(mod_id):
+		return
+	var cfg: Dictionary = Run.MODIFIERS[mod_id]
+	for u in heroes + enemies:
+		match mod_id:
+			"overgrown":
+				# BOTH parties begin at 70% health. Heroes are clamped to
+				# their CURRENT hp as well, so an already-wounded party is
+				# never healed up to 70% by a modifier that only ever takes.
+				u.hp = maxi(mini(u.hp, int(round(u.max_hp * 0.7))), 1)
+				u.refresh_bars()
+			"tinderbox":
+				# The existing typed-damage hook the Emberheart relic uses.
+				u.type_dmg_bonus["fire"] = \
+					float(u.type_dmg_bonus.get("fire", 0.0)) + 0.25
+			"frenzied":
+				u.mod_speed_mult = 1.3
+			"brittle":
+				u.mod_ignore_armor = true
+			"warded":
+				u.mod_cost_mult = 1.25
+			"bloodless":
+				u.mod_no_heals = true
+	_log("[b]%s[/b] — %s" % [String(cfg["name"]).to_upper(), String(cfg["desc"])],
+		"#d0a0e0")
 
 
 func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
@@ -2903,6 +2946,14 @@ func _eff_cost(u: BattleUnit, ab: Ability, target: BattleUnit = null) -> int:
 	var c := ab.cost
 	if u.lone_hunter > 0 and _beasts(u).is_empty():
 		c = int(round(c * 0.6))
+	# Warded (Batch AN): abilities cost more, basic attacks stay free. The
+	# multiplier lands on the FINAL cost, after every discount, so a Lone
+	# Hunter's 60% and the ward compose instead of racing. Nothing is added
+	# to a zero: Strike and its kin are cost 0 already, which is the whole of
+	# "basic attacks are free" — the clause describes the kit rather than
+	# changing it, and this is the line that keeps it true.
+	if c > 0 and not is_equal_approx(u.mod_cost_mult, 1.0):
+		c = maxi(int(round(c * u.mod_cost_mult)), 1)
 	return c
 
 
@@ -9011,104 +9062,99 @@ func _check_end() -> void:
 			Run.party[i]["max_hp"] = save_max
 			if heroes[i].resource_name == "Mana":
 				Run.party[i]["mana"] = heroes[i].resource
-		var pts := Run.award_talent_points(Run.encounter.get("type", "fight"))
-		# Elites pay into the SEPARATE flex purse (Batch AI §6): a point that
-		# cannot open a new row, only force a second node into one already
-		# picked.
-		var flex_pts := Run.award_talent_flex(Run.encounter.get("type", "fight"))
-		var gold_gain := Run.award_gold(Run.encounter.get("type", "fight"))
-		# Elite spoils: a rune for a random hero + a consumable on top of the
-		# bigger gold purse — the snowball reward for hunting elites.
-		var elite_text := ""
-		if Run.encounter.get("type", "") == "elite":
-			Run.tally_add("elites")
-			var looter: Dictionary = Run.party.pick_random()
-			var drop_id: String = Run.random_loot()
-			Run.items[drop_id] = Run.items.get(drop_id, 0) + 1
-			elite_text = "\n\nELITE SPOILS\n+1 %s" % Run.ITEM_INFO[drop_id][0]
-			# Rune pick-of-3 (Batch X): candidates rolled NOW and stored on
-			# the member (never rerolled), chosen on the Party screen via
-			# the boss-trophy picker pattern. Empty = runes off — the
-			# spoils keep the item.
-			var candidates: Array = Run.roll_rune_candidates(looter)
-			if not candidates.is_empty():
-				looter["rune_candidates"] = looter.get("rune_candidates", []) + [candidates]
-				looter["rune_picks_owed"] = int(looter.get("rune_picks_owed", 0)) + 1
-				elite_text += "\nRUNE CACHE: the %s may choose one of three\nrunes on the Party screen." % \
-					looter["key"].capitalize()
-			# Gravelight Lantern: the spoils pile runs deeper.
-			for extra_i in int(Run.relic_add("loot_extra")):
-				var extra_id: String = Run.random_loot()
-				Run.items[extra_id] = Run.items.get(extra_id, 0) + 1
-				elite_text += "\n+1 %s (Gravelight Lantern)" % Run.ITEM_INFO[extra_id][0]
-		# The mini-boss (Batch AH): elite gold and elite points, and its OWN
-		# spoil is the ability pick — no consumable, no rune cache. Two picks
-		# a zone, six a run.
-		if Run.encounter.get("type", "") == "miniboss":
-			Run.tally_add("elites")
-			var mb_specs: Array = _award_ability_picks()
-			elite_text = "\n\nTHE WAY IS OPEN"
-			if not mb_specs.is_empty():
-				elite_text += "\nNEW ABILITY: %s may choose one of three\non the Party screen." % \
-					" and ".join(mb_specs)
-		# Victory relic hooks: healing chalices, mana hourglasses, toll gold.
-		var v_heal := Run.relic_add("victory_heal_pct")
-		if v_heal > 0.0:
-			Run.heal_party(v_heal)
+		var node_type := String(Run.encounter.get("type", "fight"))
+		# Batch AN §8: 1 point for an elite, a mini-boss or a boss — including
+		# the END boss, which used to pay nothing. Ordinary fights pay none. One
+		# purse now; the flex purse is no longer fed (see award_talent_points
+		# for why the arithmetic closes without it).
+		var pts := Run.award_talent_points(node_type)
+		var gold_gain := Run.award_gold(node_type)
+		# §6: clearing ANY slot heals the party. This is the whole of the
+		# rest-node replacement, and it rides the SAME relic hook the Chalice of
+		# Dawn already used, so the relic\'s 10% stacks on top of the base 15%.
+		Run.heal_party(Run.victory_heal_pct())
 		var v_mana := Run.relic_add("victory_mana_pct")
 		if v_mana > 0.0:
 			Run.restore_mana(v_mana)
 		var v_gold := int(Run.relic_add("victory_gold"))
 		if v_gold > 0:
 			Run.gold += v_gold
+		# §3: the accepted bargain pays out. claim_reward CLEARS the pending
+		# modifier as well, which is why it is called on the victory path even
+		# when there is nothing to pay — nothing may leak into the next battle.
+		var bargain := Run.claim_reward()
+		var reward_text := String(bargain.get("text", ""))
+		var merchant_owed: bool = bool(bargain.get("shop", false))
+		var spoils := ""
+		if reward_text != "":
+			spoils += "\n\nTHE BARGAIN\n%s" % reward_text
+		# Elite spoils: a rune for a random hero + a consumable on top of the
+		# bigger gold purse — the snowball reward for hunting elites.
+		if node_type == "elite":
+			Run.tally_add("elites")
+			var looter: Dictionary = Run.party.pick_random()
+			spoils += "\n\nELITE SPOILS"
+			spoils += _drop_item_line(Run.random_loot())
+			# Rune pick-of-3 (Batch X): candidates rolled NOW and stored on the
+			# member (never rerolled), chosen on the hero card. Empty = runes
+			# off — the spoils keep the item.
+			var candidates: Array = Run.roll_rune_candidates(looter)
+			if not candidates.is_empty():
+				looter["rune_candidates"] = looter.get("rune_candidates", []) + [candidates]
+				looter["rune_picks_owed"] = int(looter.get("rune_picks_owed", 0)) + 1
+				spoils += "\nRUNE CACHE: the %s may choose one of three\non their card." % \
+					String(looter["key"]).capitalize()
+			# Gravelight Lantern: the spoils pile runs deeper.
+			for extra_i in int(Run.relic_add("loot_extra")):
+				spoils += "%s (Gravelight Lantern)" % _drop_item_line(Run.random_loot())
+		# §4: the mini-boss awards a GENERIC ABILITY UPGRADE chosen from three,
+		# not an ability. No consumable, no rune cache.
+		if node_type == "miniboss":
+			Run.tally_add("elites")
+			var mb_names := PackedStringArray()
+			for member in Run.party:
+				if Run.award_upgrade_pick(member):
+					mb_names.append(_hero_label(member))
+			# APPEND, never assign. A mini-boss carries no bargain today (§3
+			# offers precede fights and elites only), so `spoils` is empty
+			# here — but assigning would silently swallow the bargain line the
+			# moment that changes, and a reward that vanishes without a word
+			# is the exact failure the item cap's refusal message exists to
+			# avoid.
+			spoils += "\n\nTHE WAY IS OPEN"
+			if not mb_names.is_empty():
+				spoils += "\nABILITY UPGRADE: %s may choose one of three\non their card." % \
+					" and ".join(mb_names)
 		Run.save_run()
 		_sfx("victory", -4.0)
-		if Run.encounter.get("type", "") == "boss":
-			var relic := Relics.unlock_random()
-			# The final boss awards no points — the relic IS the reward.
-			var boss_text := ("+%d gold, %d talent points each." % [gold_gain, pts]) \
-				if pts > 0 else ("+%d gold — the final relic is claimed." % gold_gain)
-			if not relic.is_empty():
-				boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
-			# One ability pick per zone boss, for EVERY hero (Batch AH — the
-			# zone's mini-boss pays the other one).
-			var trophy_specs: Array = _award_ability_picks()
-			if not trophy_specs.is_empty():
-				boss_text += "\n\nNEW ABILITY: %s may choose one of three\non the Party screen." % \
-					" and ".join(trophy_specs)
-				Run.save_run()
-			# Persistent profile: boss kills and zone clears always count;
-			# the final boss also books a completed run for every spec.
-			Profile.note_boss(Run.boss_kind())
-			Profile.note_zone_cleared()
-			if Run.has_next_zone():
-				# The next zone opens another rune slot (Run.rune_slots is
-				# 2 + zone_idx, which has not advanced yet).
-				boss_text += "\n\nA NEW RUNE SLOT opens for every hero in %s (%d total)." % [
-					Run.next_zone_name(), Run.rune_slots() + 1]
-				_show_end("THE ZONE IS CLEANSED", boss_text,
-					[["Descend into %s" % Run.next_zone_name(), _next_zone]], true)
-			else:
-				Profile.note_completion(Run.party.map(func(m): return m.get("spec", "")))
-				# Batch Z: the summary needs the run state clear_save destroys
-				# — snapshot FIRST, never reorder the save logic (a reordering
-				# that leaves a dead run resumable is the worse bug).
-				var comp_snap := _run_snapshot("complete", boss_text)
-				Run.active = false
-				Run.clear_save()
-				_show_run_summary(comp_snap)
+		if node_type == "boss":
+			_resolve_boss(gold_gain, pts)
 		else:
-			# Regular fights pay no points at all now — say what WAS won
-			# rather than "+0 talent points".
-			var win_text := "+%d gold." % gold_gain
+			# Ordinary fights pay no points at all — say what WAS won rather
+			# than "+0 talent points".
+			var win_text := "+%d gold. The party recovers %d%%." % [
+				gold_gain, int(round(Run.victory_heal_pct() * 100))]
 			if pts > 0:
-				win_text += " Each hero gains %d talent point%s." % [
+				win_text += "\nEach hero gains %d talent point%s." % [
 					pts, "" if pts == 1 else "s"]
-			if flex_pts > 0:
-				win_text += " Each hero gains %d ELITE point%s — spend it on a\nsecond node in a row already picked." % [
-					flex_pts, "" if flex_pts == 1 else "s"]
-			_show_end("VICTORY", win_text + elite_text,
-				[["Continue", _to_map]], true)
+			# §5 and §7: what follows a cleared fight or elite. Both are rolled
+			# HERE, once, and queued on the run — rolling them from the map
+			# would re-roll on every redraw, and the merchant FLOOR would never
+			# mean anything.
+			var after: Array = []
+			if merchant_owed or Run.roll_merchant(node_type):
+				after.append("shop")
+			if Run.roll_event(node_type):
+				after.append("event")
+			var buttons: Array = [["Continue", _to_map]]
+			if not after.is_empty():
+				Run.pending_after = after
+				spoils += "\n\n%s" % ("A merchant waits on the road ahead."
+					if String(after[0]) == "shop"
+					else "Something waits on the road ahead.")
+				buttons = [["Continue", _to_after]]
+			Run.save_run()
+			_show_end("VICTORY", win_text + spoils, buttons, true)
 	else:
 		# Wipes count toward the profile only for real runs (sims never
 		# carry Run.active). Batch AC: nor does dying in a DEBUG-SUMMONED
@@ -9125,6 +9171,64 @@ func _check_end() -> void:
 		_show_run_summary(wipe_snap)
 
 
+# ---------- Batch AN §4: the boss slots ----------
+#
+# Zone 1 and zone 2 bosses award ONE ABILITY PICK for every hero, drawn from
+# that hero\'s SPEC POOL ONLY (§4 dropped the class draw AH added). The END
+# boss awards a relic unlock, big gold, and ends the run — deliberately NO
+# ability pick, because nothing follows it and the pick would be dead value.
+func _resolve_boss(gold_gain: int, pts: int) -> void:
+	var relic := Relics.unlock_random()
+	var boss_text := "+%d gold." % gold_gain
+	if pts > 0:
+		boss_text += " Each hero gains %d talent point%s." % [
+			pts, "" if pts == 1 else "s"]
+	if Run.has_next_zone():
+		if not relic.is_empty():
+			boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
+		var picked: Array = _award_ability_picks()
+		if not picked.is_empty():
+			boss_text += "\n\nNEW ABILITY: %s may choose one of three\non their card." % \
+				" and ".join(picked)
+			Run.save_run()
+		Profile.note_boss(Run.boss_kind())
+		Profile.note_zone_cleared()
+		_show_end("THE ZONE IS CLEANSED", boss_text,
+			[["Descend into %s" % Run.next_zone_name(), _next_zone]], true)
+		return
+	# The end boss. The run is over on its death.
+	boss_text += "\n\nThe road ends here."
+	if not relic.is_empty():
+		boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
+	Profile.note_boss(Run.boss_kind())
+	Profile.note_zone_cleared()
+	Profile.note_completion(Run.party.map(func(m): return m.get("spec", "")))
+	# Batch Z: the summary needs the run state clear_save destroys — snapshot
+	# FIRST, never reorder the save logic (a reordering that leaves a dead run
+	# resumable is the worse bug).
+	var comp_snap := _run_snapshot("complete", boss_text)
+	Run.active = false
+	Run.clear_save()
+	_show_run_summary(comp_snap)
+
+
+# One consumable into the pouch, honouring the §6 cap of six per type. A
+# refused drop SAYS SO — a reward that silently evaporates reads as a bug,
+# which is the whole reason add_item reports what landed.
+func _drop_item_line(id: String) -> String:
+	if Run.add_item(id) > 0:
+		return "\n+1 %s" % Run.ITEM_INFO[id][0]
+	return "\n%s — the party already carries %d, and cannot hold more." % [
+		Run.ITEM_INFO[id][0], Run.ITEM_CAP]
+
+
+func _hero_label(member: Dictionary) -> String:
+	var spec := String(member.get("spec", ""))
+	if Classes.SPEC_INFO.has(spec):
+		return String(Classes.SPEC_INFO[spec]["name"])
+	return String(member["key"]).capitalize()
+
+
 func _next_zone() -> void:
 	Run.advance_zone()
 	Run.save_run()
@@ -9132,9 +9236,20 @@ func _next_zone() -> void:
 
 
 func _to_map() -> void:
-	# Route through the party screen so talent points get spent before
-	# picking the next node.
-	get_tree().change_scene_to_file("res://scenes/party.tscn")
+	# Batch AN: straight back to the map. It carries the hero cards now, so
+	# there is no longer a Party screen to route through — points, runes and
+	# picks are all spendable on the map itself.
+	get_tree().change_scene_to_file("res://scenes/map.tscn")
+
+
+# §5 / §7: a merchant and/or an event queued by the fight that just ended.
+# Run.pending_after is a QUEUE the screens pop from, so a fight that rolled
+# both resolves the shop, then the event, then the map — and quitting
+# mid-queue simply drops what is left rather than stranding the player.
+func _to_after() -> void:
+	var next := Run.next_after_scene()
+	Run.save_run()
+	get_tree().change_scene_to_file(next)
 
 
 func _start_new_run() -> void:
@@ -9346,17 +9461,15 @@ func _show_end(title: String, subtitle: String, buttons: Array,
 # clear_save() destroys the run save and the draft resets the party, so
 # the snapshot is taken BEFORE either. Pure data — safe to hold across
 # the clear and to serialize into the copy-out text.
-# Batch AH: queue one ability pick on every hero and return the spec names
-# that got one, for the victory card. A hero whose two pools are exhausted
-# is silently skipped — the offer is rolled here, so "nothing left" is a
-# fact the roll knows and the card never has to guess at.
+# Queue one ability pick on every hero and return the names that got one,
+# for the victory card. A hero whose SPEC pool is exhausted is silently
+# skipped — the offer is rolled here, so "nothing left" is a fact the roll
+# knows and the card never has to guess at. (Batch AN: spec pool only.)
 func _award_ability_picks() -> Array:
 	var named: Array = []
 	for member in Run.party:
 		if Run.award_ability_pick(member):
-			named.append(Classes.SPEC_INFO[member["spec"]]["name"] \
-				if Classes.SPEC_INFO.has(member.get("spec", "")) \
-				else String(member["key"]).capitalize())
+			named.append(_hero_label(member))
 	return named
 
 
@@ -9373,7 +9486,7 @@ func _run_snapshot(outcome: String, closing_text: String) -> Dictionary:
 		"closing_text": closing_text,
 		"zone_num": Run.zone_idx + 1,
 		"zone_name": Run.zone_name,
-		"tier": clampi(Run.floor_idx + 1, 1, Run.FLOORS),
+		"tier": clampi(Run.slot_idx + 1, 1, Run.SLOTS_PER_ZONE),
 		"boss_name": Enemies.unit_name(Run.boss_kind()),
 		"encounter_type": String(Run.encounter.get("type", "fight")),
 		"encounter_theme": String(Run.encounter.get("theme", "Warband")),

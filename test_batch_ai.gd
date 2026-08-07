@@ -238,60 +238,75 @@ func _conditions() -> void:
 # ---------- 5. the economy ----------
 
 func _economy(run: Node) -> void:
+	# BATCH AN: a full run walked slot by slot, exactly as the line lays it
+	# out — 12 points from the board plus the awakening's own 1 = 13, against
+	# an 8-node tree. §8 states 12 and a surplus of 4; the awakening point is
+	# not a slot, so it survives and the real surplus is 5. Pinned at 13 on
+	# purpose: if the designer decides §8's arithmetic is exact and drops the
+	# awakening point, THIS is the check that says so out loud.
 	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
 	var total := 0
 	run.award_spec_point(0)
 	total += 1
-	for zone in 3:
-		for f in 5:
-			total += run.award_talent_points("fight")
-		total += run.award_talent_points("miniboss")
+	for zone in run.SLOT_COUNT:
 		run.zone_idx = zone
-		total += run.award_talent_points("boss")
-	ok(total == 8, "a 3-zone run guarantees %d normal points, want 8" % total)
-	ok(run.party[0]["talent_points"] == 8, "...banked on every hero (%d)" % \
+		for ty in run.ZONE_SHAPE:
+			total += run.award_talent_points(String(ty))
+	ok(total == 13, "a 3-zone run pays %d points (12 from slots + 1 awakening)" % total)
+	ok(run.party[0]["talent_points"] == 13, "...banked on every hero (%d)" % \
 		int(run.party[0]["talent_points"]))
+	# The 8-node tree, and what the surplus can and cannot do.
+	ok(total - 8 == 5, "the surplus is 5 nodes' worth of second picks")
 	run.zone_idx = 0
+	# BATCH AN §8 RE-CUT THIS SCHEDULE and the checks moved with it: one
+	# purse, 1 point apiece from elites, mini-bosses AND bosses (the end boss
+	# included — it used to pay nothing), and nothing from ordinary fights.
+	# award_talent_flex is GONE; the surplus buys second nodes because the
+	# rows run out, not because a second wallet says so.
 	ok(run.award_talent_points("fight") == 0, "regular fights pay nothing")
-	ok(run.award_talent_points("elite") == 0, "elites pay no NORMAL point")
-	ok(run.award_talent_flex("elite") == 1, "elites pay 1 point into the flex purse")
-	ok(run.award_talent_flex("miniboss") == 0, "nothing else pays flex")
-	ok(run.award_talent_flex("boss") == 0, "...not even a boss")
+	ok(run.award_talent_points("elite") == 1, "elites pay 1 point")
+	ok(run.award_talent_points("miniboss") == 1, "mini-bosses pay 1 point")
+	ok(run.award_talent_points("boss") == 1, "zone bosses pay 1 point")
 	run.zone_idx = 2
-	ok(run.award_talent_points("boss") == 0,
-		"the FINAL boss pays nothing — points with nothing after them")
+	ok(run.award_talent_points("boss") == 1,
+		"the END boss pays 1 too — §8 lists it as a point source")
+	# The whole-run arithmetic §8 states: 4 per zone, 12 per run.
+	var per_zone := 0
+	for ty in run.ZONE_SHAPE:
+		if String(ty) in ["elite", "miniboss", "boss"]:
+			per_zone += 1
+	ok(per_zone == 4, "a zone holds exactly 4 point-paying slots")
+	ok(per_zone * run.SLOT_COUNT == 12, "a run pays 12 against an 8-node tree")
 
 
 # ---------- 6. save migration (§7) ----------
 
 func _migration(run: Node) -> void:
-	# A hero mid-run under the OLD scheme: multi-rank purchases, a purchase
-	# order, points banked at the old prices. Zone 2 (so two zone bosses and
-	# two mini-bosses are behind them), standing past this zone's mini-boss.
+	# BATCH AN REPLACED THIS TEST'S SUBJECT. AI's migration wiped a pre-AI
+	# tree and re-issued its purse; AN changed the BOARD as well, and a party
+	# standing at tier 7 column 2 cannot be placed on a line with no columns.
+	# So a pre-v7 save is REFUSED and cleared rather than migrated, and what
+	# is left to pin is that _migrate_trees still swaps a saved tree snapshot
+	# for the live definition (so balance edits reach an in-flight run).
 	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
 	run.specs_chosen = true
 	run.zone_idx = 2
-	run.floor_idx = run.MINIBOSS_TIER + 1
+	run.slot_idx = 6
+	# A current save keeps its picks: migration must never eat live state.
 	for m in run.party:
 		m["spec"] = "berserker"
-		m["talents"] = {"bz_savagery": 3, "bz_bloodcraze": 2}
-		m["talent_order"] = ["bz_savagery", "bz_bloodcraze"]
-		m["talent_points"] = 4
-	run._migrate_trees(5)  # a v5 save: everything before Batch AI
-	for m in run.party:
-		ok(m["talents"].is_empty(), "a pre-AI tree is WIPED, not translated")
-		ok(not m.has("talent_order"), "...and the dead purchase order goes with it")
-		ok(int(m["talent_flex"]) == 0, "...flex starts empty")
-		# 1 spec + 2 zone bosses x2 + 2 mini-bosses behind + this zone's = 8.
-		ok(int(m["talent_points"]) == 8,
-			"...and the purse is re-issued on the new schedule: %d, want 8" % \
-				int(m["talent_points"]))
-		ok(not m["tree"].is_empty(), "...on a live tree")
-	# A same-version save keeps its picks: migration must not fire twice.
-	for m in run.party:
 		m["talents"] = {"bz_savagery": 1}
 		m["talent_points"] = 3
-	run._migrate_trees(6)
+	run._migrate_trees()
 	for m in run.party:
-		ok(m["talents"].has("bz_savagery"), "a v6 save keeps its picks")
+		ok(m["talents"].has("bz_savagery"), "a v7 save keeps its picks")
 		ok(int(m["talent_points"]) == 3, "...and its purse")
+		ok(not m["tree"].is_empty(), "...on a live tree")
+	# A node that vanished from the live tree refunds rather than vanishing.
+	for m in run.party:
+		m["talents"] = {"bz_savagery": 1, "no_such_node": 1}
+		m["talent_points"] = 0
+	run._migrate_trees()
+	for m in run.party:
+		ok(not m["talents"].has("no_such_node"), "a dead node is dropped")
+		ok(int(m["talent_points"]) == 1, "...and its point comes back")

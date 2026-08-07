@@ -1639,3 +1639,77 @@ justify why. What was genuinely missing was simpler: the default path had no
 distinctness assertion of its own. Only the guaranteed path checked, which
 is why this showed up as an intermittent failure on one spec instead of a
 flat statement that the roller was wrong.
+
+## Batch AN — the map scaffold (2026-08-07)
+
+**Placeholders on purpose, and it matters that they are labelled.** The six
+modifiers and the four ability upgrades in this batch exist so a 36-encounter
+run is playable end to end before 66 pieces of new content are authored
+against it. The alternative — author the content first, then find out the
+pacing was wrong — is how a design ends up with twenty modifiers nobody wants
+to take. Every placeholder is built out of a hook that already existed, which
+is also what kept the batch's blast radius small: six modifiers cost four new
+fields on `BattleUnit` and one stamp function.
+
+**Severity is flat, and that is a design position rather than a
+simplification.** A severity that read party composition would tax every
+build for being good at something: bring a Cryomancer and Tinderbox gets
+cheaper for you, so a composition-aware rating would pay you less for it. The
+batch's own phrasing settles it — a modifier that happens to be cheap for
+your build is a good deal you *earned by building that way*. Flat severity
+also makes authoring a modifier a one-number job, which is the property that
+makes twenty of them tractable.
+
+**The severity-1-or-2 floor is guaranteed by construction, not by rejection.**
+Rolling three and re-rolling until one is mild works until the table's shape
+changes and the retry budget quietly starts failing. Drawing the first option
+out of the low pool and the other two out of everything cannot fail on an
+unlucky table, and the test samples 2,000 offers rather than trusting the
+argument.
+
+**The reward pays on victory because the modifier is a price.** Paying up
+front would let a player bank a severity-4 rune and then lose the fight it
+was supposed to cost them, and "a merchant follows the fight" cannot resolve
+before the fight it follows. That one reward settled the whole question.
+
+**Two purses became one by arithmetic, not by decision.** Batch AI split
+elite points into a flex purse because 8 points against an 8-node tree left
+no slack: a normal point had to be *barred* from second nodes or the tree
+could be climbed faster than the schedule intended. At 12 points against 8
+rows the structure does the barring on its own — rows are mutually exclusive
+and there are only eight, so anything past the eighth has nowhere to go but a
+second node in a row already picked. The flex purse survives in the data
+because deleting it would strand old saves and close the door on a relic that
+wants to grant flexibility without granting climb, but nothing feeds it now.
+`Talents.purse_for` is the single place that answers "which wallet pays",
+which is what keeps the greying, the tooltip and the spend from disagreeing —
+the failure shape that hid Measured Rage for two batches was two read sites
+answering one question.
+
+**The awakening's talent point was kept, and the arithmetic is off by one
+because of it.** §8 says 12 per run and a surplus of 4; the real totals are
+13 and 5. The section enumerates *slot types* and the awakening is not a
+slot, so removing it would have been a design change the batch never asked
+for — and a real one: the first talent pick would slide from "the moment you
+choose a spec" out to encounter 3. Kept, flagged, and pinned by a test that
+asserts 13 explicitly, so if the designer decides §8's arithmetic is exact
+the check is the thing that says so.
+
+**Pre-v7 saves are refused rather than migrated.** A saved party standing at
+tier 7, column 2 has no honest position on a line with no columns, and the
+board it describes has rest nodes and a mini-boss row this build cannot
+render. Batch AI made the same call about ranked talent purchases: a wipe
+that says so beats a migration that invents state.
+
+**The route-agency figure is kept at a permanent 0%.** A line has no route
+decision, so the honest report of it is zero — but a *missing* figure reads
+as a broken instrument, and the next person to run the sim would spend an
+afternoon finding out it was deleted on purpose. Deleting a metric and
+reporting a metric as zero say different things; this is the second one.
+
+**Deleted, not left unreachable.** Nine constants and eight functions went
+out of `run_state.gd`, and a test pins each of them ABSENT. The reason is the
+edge-column adjacency bug this batch also deleted: it survived three batches
+because the code that produced it still resolved, still ran, and disagreed
+with its own comment. A constant that still compiles is a constant a later
+batch reads by accident.

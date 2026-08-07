@@ -106,6 +106,17 @@ var beast_committed := false # Lone Bond: a REAL summon has been spent (Call
                              # of the Wild writes kinds_summoned but never this)
 var free_summon := false     # No Beast Left: the next summon is free
 var no_heals := false        # Ancient Pact: this beast rejects all healing
+# ---- Batch AN §3: the battle modifier ----
+# A modifier binds BOTH parties for one battle, so it is stamped on every
+# unit at spawn rather than checked per-unit at a read site. Each field has
+# exactly ONE read site, named beside it — which is what lets a modifier be
+# authored as a stamp rather than as six conditionals scattered through the
+# damage pipeline. Defaults are the no-modifier values, so a battle with no
+# modifier runs the pre-AN code path byte for byte.
+var mod_ignore_armor := false  # Brittle    — read in effective_armor()
+var mod_speed_mult := 1.0      # Frenzied   — read in effective_speed()
+var mod_no_heals := false      # Bloodless  — read in heal_amount()
+var mod_cost_mult := 1.0       # Warded     — read in battle._eff_cost()
 var soul_partner: BattleUnit = null  # One Soul: damage is split with them
 var _soul_guard := false     # re-entry guard while splitting
 var damaged_since_turn := false  # Unbroken Watch bookkeeping
@@ -1194,7 +1205,11 @@ func start_cooldown(ab: Ability) -> void:
 
 
 func effective_speed() -> float:
-	var s := speed * (0.75 if has_status("slow") else 1.0)
+	# Frenzied (Batch AN): everyone acts faster. It multiplies the SPEED, not
+	# the cooldowns — cooldowns tick in the unit's own turns, so a faster
+	# unit reaches its next turn sooner but has not shortened anything, which
+	# is exactly what "cooldowns unchanged" asks for.
+	var s := speed * mod_speed_mult * (0.75 if has_status("slow") else 1.0)
 	# Chilled deepens with stacks: 1 = -25% speed, 2+ = -50% (Frigid Grip
 	# stamps its extra slow on the victim when the stack lands).
 	var chill := status_stacks("chilled") if has_status("chilled") else 0
@@ -1210,6 +1225,12 @@ func effective_speed() -> float:
 
 
 func effective_armor() -> float:
+	# Brittle (Batch AN): all attacks ignore armor, on both sides. Returned
+	# before every armor SOURCE rather than after them, so a build that
+	# stacks Dominant Presence and Endurance is levelled with everyone else
+	# instead of keeping a fraction of a bonus the modifier says is gone.
+	if mod_ignore_armor:
+		return 0.0
 	var a := armor
 	# Dominant Presence: armor value grows 5%/rank per debuff applied.
 	if dominant_ranks > 0 and debuffs_applied > 0:
@@ -1657,6 +1678,14 @@ func recover_from_break() -> void:
 # another unit or an item — the Warden's Endurance talent resets on them.
 # Returns the healing that actually landed (after multipliers).
 func heal_amount(amount: int, external := false) -> int:
+	# Bloodless (Batch AN): no healing for anyone. It sits at the top of the
+	# heal pipeline with the other absolute refusals — Bleed and every
+	# damage-over-time run through take_hit and are untouched by it, which is
+	# the whole shape of the modifier.
+	if mod_no_heals:
+		if amount > 0:
+			float_text("BLOODLESS", Color(0.7, 0.2, 0.25))
+		return 0
 	# Ancient Pact: the beast has forsaken all mending.
 	if no_heals:
 		if amount > 0:

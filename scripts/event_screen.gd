@@ -138,5 +138,10 @@ func _show_outcome(outcome: String, lines: PackedStringArray) -> void:
 	btn.text = "Continue"
 	btn.custom_minimum_size = Vector2(240, 44)
 	btn.pressed.connect(Music.click)
-	btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/map.tscn"))
+	# Batch AN: a fight can queue a merchant AND an event behind it, so
+	# leaving asks the run where to go rather than assuming the map.
+	btn.pressed.connect(func():
+		var next := Run.next_after_scene()
+		Run.save_run()
+		get_tree().change_scene_to_file(next))
 	vbox.add_child(btn)

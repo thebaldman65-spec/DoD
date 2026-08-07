@@ -75,7 +75,7 @@ func _gate_win_scaling() -> void:
 	# compounding off the spec stat block (the Batch T ordering trap).
 	var wins := 10
 	run.combat_wins = wins
-	run.floor_idx = 0
+	run.slot_idx = 0
 	run.encounter = {"type": "fight", "enemies": ["raider", "archer"],
 		"theme": "Warband"}
 	var battle: Node = (load("res://scenes/battle.tscn") as PackedScene).instantiate()
@@ -108,22 +108,22 @@ func _gate_talent_conservation() -> void:
 	# one complete tree — so this books the whole run's supply.
 	for i in run.party.size():
 		run.award_spec_point(i)
-	for zone in 3:
-		for f in 3:
-			run.award_talent_points("fight")   # pays nothing, on purpose
-		run.award_talent_points("miniboss")
+	# Batch AN: walk the LINE and let it pay what it pays — one purse, 1
+	# point per elite / mini-boss / boss, nothing from ordinary fights. The
+	# whole point of driving the real ZONE_SHAPE here rather than a hand
+	# count is that the schedule and the board can never drift apart.
+	for zone in run.SLOT_COUNT:
 		run.zone_idx = zone
-		run.award_talent_points("boss")
-	# Elites pay into the SEPARATE flex purse.
-	for e in 2:
-		run.award_talent_flex("elite")
+		for ty in run.ZONE_SHAPE:
+			run.award_talent_points(String(ty))
 	var before := 0
 	var before_flex := 0
 	for m in run.party:
 		before += int(m["talent_points"])
 		before_flex += int(m.get("talent_flex", 0))
-	_check("income booked (8 x 4 heroes)", before, 32)
-	_check("elite purse booked (2 x 4 heroes)", before_flex, 8)
+	# 12 from the line + 1 from the awakening, on each of four heroes.
+	_check("income booked (13 x 4 heroes)", before, 52)
+	_check("no flex purse is fed any more", before_flex, 0)
 	RunSim._run_spent = 0
 	RunSim._spend_talents(run)
 	var after := 0
@@ -146,9 +146,12 @@ func _gate_talent_conservation() -> void:
 			var node := Talents.node_in_tree(tree, String(id))
 			_check("node is in the tree (%s/%s)" % [m["spec"], id], node.is_empty(), false)
 		replay_total += Talents.points_spent(learned)
-		# 8 points buys 8 nodes: seven rows and a capstone. The two elite
-		# points widen two of those rows, so a fully-fed hero lands on 10.
-		_check("complete tree (%s)" % m["spec"], learned.size(), 10)
+		# Batch AN: 13 points buys 13 nodes — eight of them the tree proper
+		# (seven rows and a capstone) and the other five widening five of
+		# those rows to two picks each. The ceiling is 15 (the capstone row
+		# never takes a second), so a fully-fed hero is still short of it and
+		# the surplus is a real choice rather than a formality.
+		_check("complete tree (%s)" % m["spec"], learned.size(), 13)
 		_check("capstone taken (%s)" % m["spec"],
 			Talents.has_capstone(tree, learned), true)
 		_check("bank not negative (%s)" % m["spec"],
@@ -169,7 +172,7 @@ func _gate_enemy_scaling() -> void:
 	_setup_run(run)
 	# Zone slot 2 (x1.5), tier 4 — the old cliff tier, worth pinning exactly.
 	run.zone_idx = 1
-	run.floor_idx = 3
+	run.slot_idx = 3
 	var kinds := ["raider", "archer", "shaman"]
 	run.encounter = {"type": "fight", "enemies": kinds, "theme": "Warband"}
 	var battle: Node = (load("res://scenes/battle.tscn") as PackedScene).instantiate()
