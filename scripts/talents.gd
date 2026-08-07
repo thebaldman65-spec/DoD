@@ -1937,7 +1937,13 @@ static func desc_for(node: Dictionary, ranks: int) -> String:
 		var sc: Dictionary = node["scale"]
 		var val := float(sc.get("base", 0.0)) \
 			+ float(sc.get("step", 0.0)) * maxi(ranks, 1)
-		desc = desc.replace("{v}", String.num(val, 2))
+		# Two decimals, then the dead ones trimmed: a whole number reads "25"
+		# rather than "25.00" (every tooltip in all twelve trees said the
+		# latter until Batch AP) and a genuine 2.5 still reads "2.5".
+		var txt := String.num(val, 2)
+		if txt.contains("."):
+			txt = txt.rstrip("0").rstrip(".")
+		desc = desc.replace("{v}", txt)
 	return desc
 
 

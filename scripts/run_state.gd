@@ -1288,13 +1288,82 @@ func victory_heal_pct() -> float:
 # a run of "+50% damage" three times over is a number, not a decision.
 #
 # PLACEHOLDER POOL OF FOUR until the dozen are authored. Stored on the
-# member as `upgrades` = [{id, ability}], read at battle spawn.
+# member as `upgrades` = [{id, ability}], and READ AT BATTLE SPAWN by
+# `apply_upgrades` below (Batch AP — before that the pick was recorded and
+# nothing acted on it).
+#
+# TWO DESCRIPTIONS WERE CORRECTED IN BATCH AP, because they were authored
+# before anything read them and both named the wrong thing:
+#   Effortless zeroes `cost` ONLY and never `faith_cost` — Mercy is the Holy
+#   Cleric's identity resource and a free Resurrection is a different game.
+#   Swift was written as "+2 initiative speed", but delays across the whole
+#   roster run 1.5-4.0, so subtracting 2 would take most abilities to
+#   near-zero. It is a 25% cut floored at 1.0 instead — the one balance
+#   judgement in that batch, flagged rather than buried.
 const ABILITY_UPGRADES := {
 	"up_damage": {"name": "Honed", "desc": "+50% damage."},
 	"up_cooldown": {"name": "Quickened", "desc": "-2 turns cooldown (minimum 0)."},
-	"up_free": {"name": "Effortless", "desc": "Costs no resource."},
-	"up_speed": {"name": "Swift", "desc": "+2 initiative speed (arrives sooner)."},
+	"up_free": {"name": "Effortless",
+		"desc": "Costs no Rage / Mana / Focus (Mercy is unaffected)."},
+	"up_speed": {"name": "Swift", "desc": "Arrives 25% sooner."},
 }
+
+
+# Does this upgrade have anything to change on this ability? An upgrade
+# offered on an ability it cannot touch (Honed on Heal, Effortless on a
+# 0-cost basic) reads as a reward and does nothing, which is the whole bug
+# the wiring exists to close. Swift is the one that fits everything —
+# every ability has a delay.
+func upgrade_fits(id: String, ab: Ability) -> bool:
+	match id:
+		"up_damage":
+			return ab.damage > 0
+		"up_cooldown":
+			return ab.cooldown > 0
+		"up_free":
+			return ab.cost > 0
+	return true
+
+
+# Stamp every upgrade this hero has taken onto the matching ability in an
+# ASSEMBLED kit, and return {ability name: [upgrade names]} of what actually
+# landed — the battle tooltip names upgrades off that return, so it can only
+# ever advertise an upgrade that really applied.
+#
+# CALLED FROM EXACTLY TWO SITES, the two that assemble a kit: the hero spawn
+# in battle.gd and the sheet assembly in party_screen.gd. (RunSim reloads the
+# battle scene, so it inherits the battle.gd site and needs no third call.)
+#
+# ORDER IS LOAD-BEARING: this runs AFTER `Talents.apply_from_tree` and after
+# the equipped-rune pass, never before. Several talents SET an ability field
+# rather than add to it — the Resonant Hymn node sets Hymn of Hope's cost to
+# 25 — so an Effortless applied first would be silently overwritten by the
+# talent. Upgrades go last, so they always win.
+#
+# An entry naming an ability the hero no longer holds is skipped in silence:
+# it can happen across a spec reroll and is not an error.
+func apply_upgrades(member: Dictionary, abilities: Array) -> Dictionary:
+	var landed: Dictionary = {}
+	for up in member.get("upgrades", []):
+		var id := String(up.get("id", ""))
+		var target := String(up.get("ability", ""))
+		if target == "" or not ABILITY_UPGRADES.has(id):
+			continue
+		for ab in abilities:
+			if ab.display_name != target:
+				continue
+			match id:
+				"up_damage":
+					ab.damage = int(round(ab.damage * 1.5))
+				"up_cooldown":
+					ab.cooldown = maxi(ab.cooldown - 2, 0)
+				"up_free":
+					# `cost` alone. faith_cost (Mercy) is never touched.
+					ab.cost = 0
+				"up_speed":
+					ab.delay = maxf(ab.delay * 0.75, 1.0)
+			landed[target] = landed.get(target, []) + [upgrade_name(id)]
+	return landed
 
 
 func upgrade_name(id: String) -> String:
@@ -1314,19 +1383,39 @@ func has_upgrade(member: Dictionary, id: String) -> bool:
 
 
 # Three {id, ability} candidates: an upgrade the hero has not taken, paired
-# with an ability they can actually cast. Fewer than three when the hero has
-# taken most of the pool — the picker shows what exists rather than padding.
+# with an ability THAT UPGRADE CAN ACTUALLY CHANGE. Fewer than three when the
+# hero has taken most of the pool, or when an upgrade has nothing to land on —
+# the picker shows what exists rather than padding.
+#
+# BATCH AP added the pairing filter. Before it, the roll took a random owned
+# name, so Honed could be offered on Heal (damage 0), Effortless on Blood
+# Price (cost 0) and Quickened on a basic (cooldown 0).
 func roll_upgrade_offer(member: Dictionary) -> Array:
 	var abilities: Array = owned_ability_names(member).filter(
 		func(n): return String(n) != "Strike")
 	if abilities.is_empty():
 		return []
+	# Resolve each owned name ONCE through the existing resolver — there is no
+	# second one, deliberately. A name it cannot resolve (a class core attack,
+	# a kit override) is dropped: the filter has nothing to read on it, and an
+	# unfiltered pairing is exactly what this is here to stop.
+	var live: Dictionary = {}
+	for n in abilities:
+		var ab: Ability = Classes.pool_ability(String(n))
+		if ab != null:
+			live[String(n)] = ab
 	var ids: Array = ABILITY_UPGRADES.keys().filter(
 		func(id): return not has_upgrade(member, String(id)))
 	ids.shuffle()
 	var offer: Array = []
-	for id in ids.slice(0, 3):
-		offer.append({"id": String(id), "ability": String(abilities.pick_random())})
+	for id in ids:
+		var eligible: Array = live.keys().filter(
+			func(n): return upgrade_fits(String(id), live[n]))
+		if eligible.is_empty():
+			continue  # nothing this upgrade can touch — dropped, not paired with a dud
+		offer.append({"id": String(id), "ability": String(eligible.pick_random())})
+		if offer.size() == 3:
+			break
 	return offer
 
 

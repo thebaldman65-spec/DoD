@@ -24,6 +24,10 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 var frame_size := 100      # square frame edge of this unit's sprite strips
 var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
 var hero_key := ""         # class id ("warrior"...) — display name may be the spec
+# {ability display_name: [upgrade names]} — the mini-boss upgrades that landed
+# on this hero's kit at spawn. Read by the ability tooltip alone; the upgrades
+# themselves are already baked into the Ability objects.
+var ability_upgrades := {}
 var walks_to_target := false  # real locomotion: walk to melee range and back
 var counter_attacks := 0      # Counter Attack: answers a parry with a basic attack
 var unit_name := ""

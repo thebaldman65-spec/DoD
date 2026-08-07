@@ -533,6 +533,14 @@ func _spawn_units() -> void:
 					# grep-stable "Rune:" line at spawn means every equipped
 					# rune is still visible in a log a tester pastes back.
 					_rune_roll_call.append("%s: %s" % [cfg["unit_name"], rune["name"]])
+			# Mini-boss ability upgrades (Batch AP) — the FIRST thing that reads
+			# `upgrades`, which Batch AN recorded and nothing acted on. It runs
+			# LAST of everything that touches an ability, and that is the point:
+			# several talents (and a rune or two) SET a field rather than add to
+			# it — the Resonant Hymn node sets Hymn of Hope's cost to 25 — so an
+			# Effortless applied earlier would be silently overwritten. The
+			# return names what actually landed; the ability tooltip reads it.
+			cfg["ability_upgrades"] = Run.apply_upgrades(Run.party[i], cfg["abilities"])
 		# SECOND-RESOURCE CEILINGS — derived LAST, from whatever cfg holds by
 		# now. Batch AA moved this block down from above the class passives:
 		# it used to run before runes applied, so a rune writing
@@ -3313,6 +3321,13 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 	tip += "\nInitiative cost: %.1f" % ab.delay
 	if ab.perfect_text != "":
 		tip += "\nPerfect: %s" % ab.perfect_text
+	# Mini-boss upgrades on this ability (Batch AP §4): NAMES ONLY. Every
+	# number above already reflects them — the upgrade was baked into the
+	# Ability at spawn — so repeating the magnitudes here would be a second
+	# copy of a number that has already moved once.
+	var ups: Array = u.ability_upgrades.get(ab.display_name, [])
+	if not ups.is_empty():
+		tip += "\n%s" % " · ".join(PackedStringArray(ups))
 	return tip
 
 

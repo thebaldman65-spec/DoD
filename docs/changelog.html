@@ -5,6 +5,64 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-07 — Batch AP: the mini-boss reward becomes real</h2>
+<p><i>Ability upgrades were offered, picked, stored on the hero and saved — and nothing read
+them at battle spawn. Three mini-bosses a run handed out an inert prize. This batch wires
+the four placeholder upgrades and nothing else; the pool stays four, and no new upgrade is
+authored here.</i></p>
+<ul>
+<li><b>The four upgrades now do something.</b> <b>Honed</b> multiplies an ability's damage by
+1.5. <b>Quickened</b> takes two turns off its cooldown, floored at 0. <b>Effortless</b> sets
+its resource cost to 0. <b>Swift</b> cuts its initiative delay by 25%, floored at 1.0.</li>
+
+<li><b>Two of the four had their text corrected, because it was written before anything read
+it.</b> <b>Effortless</b> zeroes the ordinary resource cost <i>only</i> — never Mercy. Mercy
+is the Holy Cleric's identity resource and a free Resurrection is a different game, so the
+description now says "costs no Rage / Mana / Focus (Mercy is unaffected)". <b>Swift</b> said
+"+2 initiative speed", but delays across the whole roster run 1.5–4.0, so subtracting 2 would
+have taken most abilities to near-zero — the authored number was never checked against the
+field it names. It is a 25% cut floored at 1.0 instead, described as "Arrives 25% sooner".
+<b>That floor-and-percentage is the one balance judgement in this batch</b>, and it is stated
+here rather than buried. Honed and Quickened keep their text as written.</li>
+
+<li><b>Upgrades apply after talents, and the order is not interchangeable.</b> One helper on
+<code>Run</code>, called from exactly the two places that assemble a hero's kit: the battle
+spawn and the hero sheet. Both call it <i>after</i> the talent tree and the equipped runes,
+because several talents <i>set</i> an ability's field rather than add to it — the Swordmaster
+node that upgrades Lunge sets its cost to 15 — so an Effortless applied first would be
+silently overwritten. Upgrades go last and always win. An upgrade naming an ability the hero
+no longer holds is skipped in silence; that can happen across a spec reroll and is not an
+error. The run simulator reloads the battle scene, so it inherits the same code with no
+separate change. Stacking and never-twice already worked and are untouched, and
+<code>upgrades</code> already persisted, so <b>no save version moves</b>.</li>
+
+<li><b>The offer only pairs an upgrade with an ability it can change.</b> It used to pair a
+random un-taken upgrade with a random owned ability, which could offer Honed on Heal (no
+damage), Effortless on Blood Price (no cost) or Quickened on a basic attack (no cooldown) — a
+pick that reads as a reward and does nothing, which is the exact bug this batch exists to
+close. Each candidate upgrade now keeps only the abilities it has something to touch, and an
+upgrade with nothing to land on is dropped from the offer rather than paired with a dud. An
+offer showing fewer than three was already normal and needs no new handling.</li>
+
+<li><b>The player can see it.</b> An upgraded ability's button in battle carries a trailing
+line naming its upgrades — "Honed · Swift". Names only: the magnitudes are already in the
+numbers above them, which now reflect the upgrade. The hero sheet assembles the kit the same
+way, so an Effortless ability loses its cost tag there too. Nothing else in the UI changes;
+the pick itself already resolved on the map hero card.</li>
+
+<li><b>Talent tooltips stop reading "25.00%".</b> Every tooltip in all twelve trees rendered
+its number to two decimals; the dead zeros and a trailing decimal point are trimmed, so a
+whole 25 reads "25" and a genuine 2.5 still reads "2.5". This had been reported and not acted
+on since Batch AJ. The Master Document's talent tables were regenerated to match, but only
+where the dead decimal was the <i>only</i> difference from the live text.</li>
+
+<li><b>Housekeeping:</b> one test check formatted an Array into a bare <code>%s</code> and
+spewed a "String formatting error" to stderr on every run — one character. <b>The
+<code>treasure</code>/Loot node type needed no deleting: it was already gone</b>, taken with
+the whole node-map generator when Batch AN replaced it with the line. It had been listed as
+outstanding since Batch AC; the listing was stale, not the code.</li>
+</ul>
+
 <h2>2026-08-07 — Batch AO: map direction, offer gating, and a kill switch</h2>
 <p><i>Three changes from playing Batch AN. No new systems, and no balance work beyond the
 one gold number in the second item.</i></p>

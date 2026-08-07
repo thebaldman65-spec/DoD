@@ -1757,3 +1757,42 @@ the accepted cost is that on-death procs reading a killing blow (Seeding
 Embers and friends) will not fire. Everything *after* the kills is the real
 victory path on purpose: gold, points, the heal, the bargain's reward, the
 spoils, the summary. The switch exists to reach that path, not to replace it.
+
+## Batch AP — the mini-boss reward becomes real
+
+**The bug was not in the upgrade, it was in the gap between the pick and the
+fight.** Every visible part of the mini-boss reward worked: the offer rolled,
+the card rendered, the pick resolved, the choice saved. Nothing read it at
+spawn. That is the worst shape a bug can take, because the player has no way
+to tell — the prize looks exactly like a prize right up until it silently
+does nothing three times a run. It survived a whole batch because "placeholder
+pool" and "unwired" were recorded in the same sentence, and the first one made
+the second sound intentional.
+
+**Two of the four descriptions were wrong, and only wiring them proved it.**
+Text written for something nothing reads is text nobody has to check against a
+field. "Effortless: costs no resource" is fine until you ask which resource,
+and the Holy Cleric has two — one of them her entire identity. "Swift: +2
+initiative speed" names a stat that does not exist and implies an arithmetic
+the roster cannot survive: delays run 1.5–4.0, so subtracting 2 takes most
+abilities to nearly nothing. Both read as authored numbers. Neither had ever
+been arithmetic.
+
+**Upgrades apply last because talents overwrite, and overwriting is silent.**
+Several talents *set* an ability's field rather than adding to it — the node
+that upgrades Lunge sets its cost to 15 — so an upgrade applied before the
+tree does not conflict, it simply disappears. There is no error and no log
+line; the ability just costs what the talent says. Ordering is the whole fix,
+and it is the same ordering lesson Batch AH learned from the other side.
+
+**An offer that can pair a reward with nothing is worse than a smaller
+offer.** Honed on Heal, Effortless on a free ability, Quickened on something
+with no cooldown — each of those is a pick that reads as a choice and is not
+one. Dropping an upgrade with nothing to land on can leave two options instead
+of three, and two real choices beat three where one is a decoy.
+
+**The stale note is the same failure as the stale prize.** The `treasure`/Loot
+node type had been carried as outstanding for six batches. It had been deleted
+five batches ago, with the map generator it belonged to. A list of open
+problems that nobody re-reads against the code becomes a list of problems that
+are not open, and it costs exactly as much attention as a real one.

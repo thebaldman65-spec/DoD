@@ -145,6 +145,11 @@ func _draw_detail() -> void:
 		if rune.get("equipped", false):
 			Talents.apply_payload(cfg, rune["payload"], 1,
 				{"learned": member.get("talents", {}), "member": member})
+	# Mini-boss ability upgrades (Batch AP), LAST — same order as the battle
+	# spawn, and for the same reason: a talent that SETS a field would
+	# otherwise overwrite the upgrade. The sheet has to show the numbers the
+	# fight will use.
+	Run.apply_upgrades(member, cfg["abilities"])
 	cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
 	# Toughness (Warden talent): Constitution grows with bulk — same order as
 	# battle spawn (after every max-HP bonus has landed).

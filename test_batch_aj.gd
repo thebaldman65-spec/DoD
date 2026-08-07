@@ -251,10 +251,22 @@ func _magnitudes() -> void:
 			"%s renders %s (got %s)" % [id, SCALE_VALUES[id], rendered])
 		# desc_for is what the party screen actually shows: prove the
 		# placeholder is consumed and the number reaches the string.
+		#
+		# BATCH AP trimmed the dead decimals out of desc_for, so a whole 15
+		# renders "15" where it used to render "15.0". The expectation below
+		# is built from the DESIGN value in SCALE_VALUES rather than from
+		# desc_for's own output, so this stays a test and not a mirror:
+		# whole numbers print as integers, and bz_unstoppable's genuine 3.5
+		# still has to survive.
+		var design: float = float(SCALE_VALUES[id])
+		var want_txt: String = ("%d" % int(design)) \
+			if is_equal_approx(design, float(int(design))) else String.num(design, 1)
 		var shown := Talents.desc_for(n, 1)
 		ok(not shown.contains("{v}"), "%s's tooltip consumes its placeholder" % id)
-		ok(shown.contains(String.num(rendered, 2)),
-			"%s's tooltip shows %s" % [id, String.num(rendered, 2)])
+		ok(shown.contains(want_txt), "%s's tooltip shows %s (got \"%s\")"
+			% [id, want_txt, shown])
+		ok(not shown.contains(want_txt + ".0"),
+			"%s's tooltip carries no dead decimal: \"%s\"" % [id, shown])
 	# Reckless Fury carries two DIFFERENT numbers, so it has no scale and
 	# writes them out — assert both reach the tooltip.
 	var rk := _node("bz_reckless")

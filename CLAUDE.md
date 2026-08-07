@@ -179,6 +179,114 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   party.tscn is the HERO SHEET now, opened from a card.
 
 ## Current systems snapshot (2026-08-07)
+BATCH AP (08-07) — THE MINI-BOSS REWARD BECOMES REAL. `Run.ABILITY_UPGRADES`
+was offered, picked, stored on the member and saved, and NOTHING READ IT AT
+BATTLE SPAWN — three mini-bosses a run handed out an inert prize. Machinery
+only: the pool stays FOUR and no new upgrade is authored, so the authoring
+batch that replaces the four has somewhere to land.
+§1 THE FOUR EFFECTS. `up_damage` Honed `damage = int(round(damage * 1.5))`;
+`up_cooldown` Quickened `cooldown = maxi(cooldown - 2, 0)`; `up_free`
+Effortless `cost = 0`; `up_speed` Swift `delay = maxf(delay * 0.75, 1.0)`.
+TWO DESCRIPTIONS CORRECTED, because they were authored before anything read
+them: EFFORTLESS ZEROES `cost` AND NEVER `faith_cost` — Mercy is the Holy
+Cleric's identity resource and a free Resurrection is a different game, so it
+now reads "costs no Rage / Mana / Focus (Mercy is unaffected)". SWIFT said
+"+2 initiative speed" against a roster whose delays run 1.5-4.0, i.e. the
+authored number was never checked against the field it names; it is 25% off
+floored at 1.0, "Arrives 25% sooner". THAT FLOOR-AND-PERCENTAGE IS THE ONE
+BALANCE JUDGEMENT IN THE BATCH and it is flagged, not buried. Honed and
+Quickened keep their text.
+§2 ONE HELPER, TWO CALL SITES, AND THE ORDER IS LOAD-BEARING.
+`Run.apply_upgrades(member, abilities)` sits beside ABILITY_UPGRADES, stamps
+every `member["upgrades"]` entry onto the matching ability by display_name,
+and RETURNS {ability name: [upgrade names]} of what actually landed — the
+battle tooltip reads that return, so it can only ever advertise an upgrade
+that really applied. Called from THE TWO SITES THAT ASSEMBLE A KIT, the ones
+the Batch AH ordering fix already touched: the hero spawn in battle.gd and
+the sheet assembly in party_screen.gd. RunSim reloads the battle scene and
+inherits the battle.gd site — no third call.
+**IT RUNS AFTER `Talents.apply_from_tree` AND AFTER THE EQUIPPED-RUNE PASS,
+NEVER BEFORE.** Several talents (and two rune payloads) SET an ability field
+rather than add to it — `sm_lunge`'s upgrade path SETS Lunge's cost to 15 —
+so an Effortless applied first is silently overwritten. UPGRADES ARE LAST, SO
+THEY ALWAYS WIN. Placing it after runes rather than immediately after the
+tree is a deliberate deviation from the batch doc's letter in favour of its
+stated rule: runes can `set` an ability field AND can grant one, so an
+upgrade naming a rune-granted ability only resolves in this position.
+CORRECTION TO THE BATCH DOC: it cites "the Resonant Hymn node sets Hymn of
+Hope's cost to 25". NO SUCH NODE EXISTS — Hymn of Hope is cost 0 /
+faith_cost 1 and no Holy node touches its cost. The rule is right, the
+example is not; `sm_lunge` is the live one.
+An entry naming an ability the hero no longer holds is skipped SILENTLY (a
+spec reroll can do it, and it is not an error), as is an unknown upgrade id.
+Stacking and never-twice already held in has_upgrade/award_upgrade_pick and
+are untouched; `upgrades` already persisted, so NO SAVE VERSION MOVES (v7).
+§3 THE OFFER ONLY PAIRS AN UPGRADE WITH AN ABILITY IT CAN CHANGE.
+`roll_upgrade_offer` used to take a random un-taken upgrade and a random
+owned name, so it could offer Honed on Heal (damage 0), Effortless on Blood
+Price (cost 0) or Quickened on a basic (cooldown 0) — a pick that reads as a
+reward and does nothing, the exact bug the batch exists to close. Each owned
+name resolves ONCE through the existing `Classes.pool_ability` (no second
+resolver) and `Run.upgrade_fits(id, ab)` keeps damage>0 / cooldown>0 /
+cost>0; up_speed fits everything. An upgrade with no eligible ability is
+DROPPED rather than paired with a dud; the offer already filled short.
+CONSEQUENCE WORTH KNOWING, measured not assumed: `pool_ability` resolves
+spec kits, pool entries, vault and talent grants but NOT the class core
+attack or its kit overrides, so exactly ONE name per hero drops out of the
+candidate list — Frostbolt (cryo), Smite (holy), Quick Shot (sharpshooter);
+the Berserker loses none, "Strike" was already filtered. Offers still came
+out at three in 2000 rolls, so nothing shrank in practice.
+§4 VISIBILITY. `BattleUnit.ability_upgrades` (new field, {name: [labels]},
+fed from cfg at spawn) and one trailing line on the ability button's
+tooltip — `Honed · Swift`. NAMES ONLY: the magnitudes are already in the
+numbers above them, which now reflect the upgrade. The hero sheet assembles
+the kit the same way, so an Effortless ability loses its cost tag there too.
+Nothing else in the UI moved; the pick still resolves on the map hero card.
+§5 THE THREE ONE-LINERS. (a) `Talents.desc_for` trims dead decimals — a whole
+25 renders "25", a genuine 2.5 still "2.5". NOTE the standing note was
+slightly wrong about the symptom: `String.num(v, 2)` was rendering "25.0",
+not "25.00". Reported since AJ, closed here. (b) test_batch_ah.gd:202 `%
+[cross]`. (c) **THE `treasure`/LOOT NODE TYPE NEEDED NO DELETING — IT WAS
+ALREADY GONE**, taken with the whole node-map generator when AN replaced it
+with the line. Nothing in any .gd/.tscn/.json names it (one line of event
+flavour text uses the word "treasure" in prose). It had been listed as
+outstanding since AC; THE LISTING WAS STALE, NOT THE CODE — which is the
+same failure this batch's headline bug is.
+DOCS: master.html stamped Batch AP; §6a corrected (Effortless/Swift, the
+pairing filter, the after-talents ordering); its TALENT TABLES REGENERATED
+from the live trees but ONLY where a dead decimal was the sole difference —
+107 cells rewritten, 2 LEFT ALONE and reported instead (Overkill, because
+the name collides across the Berserker and Sharpshooter trees and a
+name-keyed rewrite would have swapped them; Rampage, whose doc text drifted
+in wording before this batch). master.html never listed a Loot node.
+VERIFIED: check_parse 0 failures, check_flow 0 failures (6 screens), 11
+scenes 0 SCRIPT ERROR. test_batch_an 5667/0, test_batch_ah 5416/0 (stamp
+gate bumped AO -> AP), ah_battle 65/0, ai 2036/0, aj 403/0, ak 524/0, al
+556/0, test_runes 2982/0, run-harness gates 1/2/3 PASS.
+ONE TEST WAS RE-POINTED, with the reason in the file: test_batch_aj pinned
+its tooltips with `shown.contains(String.num(rendered, 2))`, i.e. against
+the OLD rendering. It builds the expectation from the DESIGN value in
+SCALE_VALUES now (whole numbers as integers, bz_unstoppable's genuine 3.5
+kept) plus a companion check that no dead decimal survives — a test, not a
+mirror of desc_for. 389 -> 403 checks.
+SCRATCH (in the scratchpad, NOT committed — the batch forbade new
+scaffolding): check_ap.gd 30/0 (each effect on real Ability objects, the
+floors, Effortless proven to leave faith_cost alone on Resurrection,
+stacking, unheld/unknown ids skipped, 2000 offers with ZERO duds, Effortless
+never on a 0-cost ability over 400 rolls, desc_for's trim across all 263
+tree nodes, AND THE ORDERING RULE IN BOTH DIRECTIONS — sm_lunge sets 15,
+upgrades-last gives 0, upgrades-first gives 15). check_ap_live.gd 12/0
+drives a REAL battle: Lunge live at cost 0 and the Swift delay, both labels
+on the unit, the tooltip's last line reading "Effortless · Swift", Honed
+live on Ice Lance with the tooltip's damage line already carrying the
+upgraded number, an un-upgraded ability gaining no line, and the hero sheet
+chip showing the upgraded cost.
+KNOWN-BAD, NOT OURS: test_rune_battle 91/1 (the Inferno chip check), the
+standing defect since AK. test_runes prints a `start_rune_enabled` SCRIPT
+ERROR from a name AN retired — pre-existing, still 2982/0.
+NO SIM RUN AND NO DIFFICULTY CLAIM: this batch turns three inert picks a run
+into live ones, which is a real power delta, but ./sim.sh carries no
+difficulty signal (Batch R) and there is no control row for it here.
 BATCH AO (08-07) — DIRECTION, GATING, KILL SWITCH. Three changes from playing
 AN. No new systems and no balance work beyond ONE gold number.
 §1 THE ROAD READS LEFT TO RIGHT. `SLOT_X_START` 1196.0 -> 84.0 (the exact
@@ -250,12 +358,8 @@ control row: `./sim.sh --run 20` walked clean, 0 SCRIPT ERROR, and the two
 numbers that PROVE THE GATE MOVED are bargains taken 6.0/run (was one per
 fight and elite) and gold earned 2036/run. Read those as instrumentation, not
 as balance.
-REPORTED NOT ACTED ON: (a) test_batch_ah.gd:202 formats an Array into a bare
-`%s` (`... % cross`), so that one check spews "String formatting error" to
-stderr on every run — PRE-EXISTING on HEAD, harmless today, but it would
-swallow the message if the check ever failed. One char (`% [cross]`).
-(b) `Talents.desc_for` still renders `String.num(v, 2)` — "+25.00%" in every
-tooltip of all twelve trees, still a one-line fix.
+REPORTED NOT ACTED ON: nothing outstanding — both items (test_batch_ah.gd:202's
+bare `%s`, and desc_for's two-decimal rendering) WERE CLOSED IN BATCH AP.
 BATCH AN (08-07) — MAP SCAFFOLD. The branching node map is GONE; a run is a
 LINE of 3 zones x 12 slots = 36. Every zone is the IDENTICAL authored shape
 (Run.ZONE_SHAPE): fight fight ELITE fight fight MINI-BOSS fight fight ELITE
@@ -389,12 +493,13 @@ mention a waystone/merchant/camp in FLAVOUR only (waystone_cache,
 abandoned_wagon, old_trapper, mushroom_ring) and all still fire.
 REPORTED NOT ACTED ON: (a) the three point-granting events (Blood Altar,
 Training Grounds, Warden's Echo) now pay into an economy that is already 5
-points in surplus — they were sized against Batch AI's exact-8 purse. (b)
-ability UPGRADES are recorded on the member but nothing reads them at battle
-spawn: the pick is real and persists, the effect is not wired, which is
-correct for a placeholder pool but must not be mistaken for a working feature.
-(c) `Talents.desc_for` still renders String.num(v, 2) so tooltips read
-"+25.00%" — pre-dates this batch, affects all twelve trees, one-line fix.
+points in surplus — they were sized against Batch AI's exact-8 purse.
+(b) SUPERSEDED BY BATCH AP — as written it said ability UPGRADES are recorded
+on the member and nothing reads them at battle spawn. They are wired now:
+`Run.apply_upgrades` runs at the hero spawn and on the hero sheet, AFTER
+`Talents.apply_from_tree` and the rune pass. See the AP block for the
+ordering rule; do not re-record this as unwired.
+(c) CLOSED IN BATCH AP — desc_for's dead decimals are trimmed.
 BATCH AL (08-06) — WARDEN, ALL 24 NODES. The third of the four class batches
 AI promised. One spec only; the other nine trees and enemy tuning are
 UNTOUCHED.
@@ -503,9 +608,8 @@ party already sitting at 85% health — that is the instrument's ceiling, not
 the lane's. Kit-mechanics ratios ONLY.
 REPORTED NOT ACTED ON: (a) Unkillable's self-mend is not booked by
 `_stat_heal`, so the Warden's heal/battle column reads 0 on a Plate build —
-a pre-existing instrumentation gap, not a talent bug. (b) `Talents.desc_for`
-still renders `String.num(v, 2)`, so tooltips read "+25.00%" — pre-dates this
-batch, affects ALL TWELVE trees, one-line fix whenever the designer wants it.
+a pre-existing instrumentation gap, not a talent bug. (b) desc_for's
+two-decimal rendering — CLOSED IN BATCH AP.
 BATCH AJ (08-06) — BERSERKER, ALL 24 NODES. The second of the four class
 batches AI promised. One spec only; the other ten trees and enemy tuning
 are UNTOUCHED.
@@ -600,10 +704,8 @@ Measured cross-row, Relentless, Scar Tissue, Overkill, Rampage) and 24%
 on the GRANT/BLEEDOUT build (First Blood, Flurry, Battle Shout, Arterial,
 Second Wind, Unrelenting, Blood Tithe, Exsanguination). Kit-mechanics
 ratios ONLY — no difficulty signal.
-REPORTED NOT ACTED ON: `Talents.desc_for` renders `String.num(v, 2)`, so
-every tree's tooltips read "+15.00% damage" rather than "+15%". Pre-dates
-this batch and affects ALL TWELVE trees, which is why it was not touched
-here — it is a one-line fix in desc_for whenever the designer wants it.
+REPORTED NOT ACTED ON: desc_for's two-decimal rendering, which made every
+tree's tooltips read "+15.0% damage" rather than "+15%" — CLOSED IN BATCH AP.
 BATCH AK (08-06) — SWORDMASTER KIT CORRECTION + ALL 24 NODES. The first of
 the four class batches AI promised. One spec only; the other ten trees and
 enemy tuning are UNTOUCHED.
@@ -968,7 +1070,8 @@ nearly nothing to bind on and the guaranteed slot is always Rare-or-better
 where it used to be ~60% Common. "The opening gift stays modest" comes
 from the POOL'S COMPOSITION, not the rarity weighting; a smaller opening
 gift means authoring Common spec entries, not re-weighting the roll.
-(b) treasure/Loot STILL outstanding since AC — six batches.
+(b) treasure/Loot: NOT OUTSTANDING — Batch AN deleted the node type with the
+whole deck generator, and Batch AP confirmed nothing in the code names it.
 VERIFIED: test_start_rune.gd 131 -> 233 checks, 0 failures (EXTENDED, and
 it prints the AE/AF subtotals separately so "AE's 131 still pass" is a
 number you can read off the output). The 102 AF checks: the guarantee held
@@ -1095,7 +1198,7 @@ this is why spec-worn landed at 0.49 and not the 1.18 projected, and a
 spec-weighted opening roughly doubles it for one line. (b) six entries are
 magnitude-proof, incl. the Deep Sight nobody had noticed. (c) difficulty
 does NOT need its own batch on this evidence; Wanderer x0.7 untouched.
-(d) treasure/Loot STILL outstanding since AC — five batches. (e) the
+(d) treasure/Loot — see the AP block: already deleted by AN, listing was stale. (e) the
 magnitude pass is PREPARED AND RECORDED, not applied; if a second
 acquisition lever lands (rest-node rune offer, touched 2.3/run vs the shop's
 0.6, or a second elite cache) THE SWEEP MUST BE RE-RUN AT THAT ACQUISITION
@@ -1184,7 +1287,7 @@ of Exsanguination's scarred audit passes on a term that is actually its
 BENEFIT — its real cost (15% vs 20% bleedout) is a battle.gd constant no
 audit can see. (c) test_rune_battle's White Flame check is FLAKY
 (~1 run in 3 — the bot must land a fire hit); pre-existing, do not read
-it as a regression. (d) treasure/Loot still outstanding from AC.
+it as a regression. (d) treasure/Loot — deleted by AN, see the AP block.
 BATCH AC (08-04) — THE TESTER'S WORKBENCH: reach any node on demand.
 DEBUG/TESTING AFFORDANCES ONLY — no balance, no content, no difficulty
 (difficulty stays CLOSED pending human playtesters). Designer's ask
@@ -1295,8 +1398,9 @@ battle into ~1.5s / ~160 frames. (3) macOS has no `timeout` binary — a
 `timeout ... | grep -c "SCRIPT ERROR"` parse check silently reports 0
 errors for every scene because "command not found" contains no match.
 Use `--quit-after N` and no wrapper.
-REPORTED NOT ACTED ON (designer's call): (a) treasure/Loot is now the
-only node type a debug menu cannot reach — delete it or deal it again;
+REPORTED NOT ACTED ON (designer's call): (a) treasure/Loot was
+the only node type a debug menu could not reach — DELETED BY AN with the deck
+generator it belonged to (confirmed absent in AP);
 (b) a summoned fight still increments `Run.combat_wins` (real
 progression, left real deliberately), so a debug-touched summary's
 "Battles won: X of Y" can read X > Y — cosmetic, and sims cannot see it;
@@ -2546,3 +2650,8 @@ Space or left click; no announcer text (combat log only).
   The open lever remains authored rune POWER — a runes.json data edit,
   not machinery — and the dilution question (see the AB block).
 - Sim bot wins ~90%+ with 4 heroes; real difficulty tuning by user playtest.
+- ABILITY UPGRADES ARE WIRED BUT STILL A PLACEHOLDER POOL OF FOUR (Batch AP
+  built the machinery, deliberately authoring nothing). The authoring batch
+  has somewhere to land now: add ids to `Run.ABILITY_UPGRADES`, a branch in
+  `Run.apply_upgrades`, and an eligibility rule in `Run.upgrade_fits`.
+  A hero draws three a run, so a pool much past ~8 stops being felt.
