@@ -228,33 +228,41 @@ var dominant_ranks := 0       # Dominant Presence: armor per debuff applied
 var debuffs_applied := 0
 var unkillable_ranks := 0     # Unkillable: heal on block
 var elem_weak_ranks := 0      # Elemental Weakness: Crushing Blow resist shred
-var tank_spank_ranks := 0     # Tank and Spank: Mocking Blow empowers an ally
+var tank_spank_ranks := 0     # Tank and Spank: Mocking Blow always empowers an ally
 var ricochet_ranks := 0       # Richocet: chance to stun on block
-var endurance_ranks := 0      # Endurance: +1%/rank armor per unhealed turn
+var endurance_ranks := 0      # Endurance: +3%/rank armor per unhealed turn
 var endurance_stacks := 0
 var healed_externally := false
-var iron_will_ranks := 0      # Iron Will: -4%/rank damage taken per own debuff
+var iron_will_ranks := 0      # Iron Will: -12%/rank damage taken per own debuff
 var sundering_ranks := 0      # Sundering: Crushing Blow BD splash to Adjacent
-var tenacity := 0             # Tenacity: +5 max HP per Heavy Plating block
+var tenacity := 0             # Tenacity: +15 max HP per Heavy Plating block
 var tenacity_hp_gained := 0   # battle-long gains (excluded from the run save)
-var rally := 0                # Rally: party +15% healing for 2t per HP block
-var shield_mastery_ranks := 0 # Shield Mastery: Shieldwall's stance +1 turn/rank
+var rally := 0                # Rally: party +30% healing for 3t per HP block
+var shield_mastery_ranks := 0 # Shield Mastery: Shieldwall's stance +2 turns/rank
 var plating_bonus := 0.0      # Heavy Plating v2: +8% Block per unblocked hit
                               # (cap +40%; any Block resets it; fresh per battle
                               # like frenzy_floor — units are built each battle)
-# Warden lanes (Batch H). See talents.gd for the node text.
-var plate_discipline_ranks := 0  # Plate Discipline: the plating climbs +3%/rank faster
-var battered_ranks := 0       # Battered Not Broken: blocks shed 8/rank own Break
-var provoke_ranks := 0        # Provoke: Mocking Blow taunts +1 foe/rank
-var spite_ranks := 0          # Spite: attackers take 8%/rank of dealt damage back
-var bruising_ranks := 0       # Bruising Guard: blocks deal 10/rank BD to the attacker
-var grudge_ranks := 0         # Grudge: +6%/rank damage vs enemies he taunts
-var rallying_stomp_ranks := 0 # Rallying Stomp: War Stomp refuels +5%/rank more
-var bulwark_line_ranks := 0   # Bulwark Line: Interpose grants +1 charge/rank
-var shared_vigil_ranks := 0   # Shared Vigil: allies -3%/rank damage while he's >50% HP
-var steadfast_ranks := 0      # Steadfast: absorbs 15%/rank of a blow felling an ally
+# Warden lanes (Batch H; magnitudes re-authored in Batch AL, where a node
+# became a whole exclusive row instead of one of three ranks). See talents.gd
+# for the node text.
+var plate_discipline_ranks := 0  # Plate Discipline: the plating climbs +12%/rank faster
+var battered_ranks := 0       # Battered Not Broken: blocks shed 30/rank own Break
+var provoke_ranks := 0        # Provoke: Mocking Blow taunts +2 foes/rank
+var spite_ranks := 0          # Spite: attackers take 30%/rank of dealt damage back
+var bruising_ranks := 0       # Bruising Guard: blocks deal 30/rank BD to the attacker
+var spite_break := 0          # …and its cross-row half: Spite's reflect builds Break too
+var grudge_ranks := 0         # Grudge: +25%/rank damage vs enemies he taunts
+var rune_grudge_bonus := 0.0  # the Rune of Grudges' own, smaller share of the same term
+var rallying_cry := 0         # Rallying Cry: allies regain N% resource at his turn
+var rallying_stomp_ranks := 0 # …and its War Stomp rider: the stomp refuels +20%/rank more
+var bulwark_ally_block := 0   # Bulwark Line: Shieldwall grants allies +N% Block chance
+var bulwark_line_ranks := 0   # …and its Interpose rider: +1 charge/rank per ally
+var shared_vigil_ranks := 0   # Shared Vigil: allies -12%/rank damage while he's >50% HP
+var rune_vigil_bonus := 0.0   # the Rune of the Standard's own, smaller share of it
+var steadfast_ranks := 0      # Steadfast: absorbs 60%/rank of a blow felling an ally
 var immovable := 0            # Immovable (capstone): cannot be Broken
 var immovable_noted := false  # one proc log per battle, not one per hit
+var hold_line_upgraded := 0   # Hold the Line capstone landing on an earned copy
 var vengeful_guardian := 0    # Vengeful Guardian (capstone): first block each turn
 var vengeful_ready := true    # answers with Crushing Blow; re-arms at his turn
 var seasoned_def_bonus := 0.0 # Defensive Stance: deeper damage-taken cut
@@ -1206,13 +1214,15 @@ func effective_armor() -> float:
 	# Dominant Presence: armor value grows 5%/rank per debuff applied.
 	if dominant_ranks > 0 and debuffs_applied > 0:
 		a *= 1.0 + 0.15 * dominant_ranks * debuffs_applied
-	# Endurance: +1%/rank armor per turn without an external heal, CAPPED at
+	# Endurance: +3%/rank armor per turn without an external heal, CAPPED at
 	# +75% (Batch W, 08-02). The streak itself is uncapped, so a long fight
 	# used to report absurd bonuses (+97,521% was measured); the final
 	# minf(a, 0.85) below always clamped the real value, so the cap mostly
 	# stops the chip and the log from lying — but it also bounds the term
-	# for any future armor source that reads it before the clamp.
-	a += minf(0.01 * endurance_ranks * endurance_stacks, 0.75)
+	# for any future armor source that reads it before the clamp. Batch AL
+	# tripled the step, which is what makes the cap a real ceiling: it is
+	# reached on turn 25 rather than turn 75.
+	a += minf(0.03 * endurance_ranks * endurance_stacks, 0.75)
 	# Melt Armor: Burn ticks have eaten this much off for the battle.
 	a = maxf(a - melted, 0.0)
 	if has_status("fortify"):
@@ -1239,9 +1249,9 @@ func _refresh_chips() -> void:
 		for s in statuses:
 			if s.id == "iron_will":
 				var n := count_debuffs()
-				var pct := 4 * iron_will_ranks * n
+				var pct := 12 * iron_will_ranks * n
 				s.short = "-%d%%" % pct
-				s.desc = "Iron Will: takes 4%% less damage per rank\nfor every debuff on the Warden.\nCurrently -%d%% (%d debuff%s)." % [
+				s.desc = "Iron Will: takes 12%% less damage\nfor every debuff on the Warden.\nCurrently -%d%% (%d debuff%s)." % [
 					pct, n, "" if n == 1 else "s"]
 	for child in _chips_root.get_children():
 		child.queue_free()
@@ -1511,8 +1521,15 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	# Devoutness (talent, ex-Devotion Aura): power carries the % cut.
 	if has_status("devotion"):
 		pressure_add = int(pressure_add * (1.0 - status_power("devotion") / 100.0))
+	# Hold the Line: the status carries its own cut, so the UPGRADED cast
+	# (the capstone landing on an already-earned copy) is 80% rather than
+	# 50% without a second status or a second read site here. Power 0 on a
+	# pre-AL save's status falls back to the base 50.
 	if has_status("hold_bd"):
-		pressure_add = int(pressure_add * 0.5)
+		# Integer arithmetic on purpose: a float 1.0 - 80/100.0 lands at
+		# 0.19999999 and an 80% cut on 100 Break would read 19, not 20.
+		var hl_cut := maxi(status_power("hold_bd"), 50)
+		pressure_add = pressure_add * (100 - hl_cut) / 100
 	# Bulwark of Fortitude: NO Break damage while the stand holds.
 	if has_status("bulwark"):
 		pressure_add = 0
@@ -1652,7 +1669,7 @@ func heal_amount(amount: int, external := false) -> int:
 		return 0
 	var mult := healing_received_mult
 	if has_status("rally_heal"):
-		mult *= 1.15
+		mult *= 1.30
 	if has_status("frostbite"):
 		mult *= 0.5
 	# Last Hope (Holy talent, party-wide stamp): the nearly-dead heal deeper.

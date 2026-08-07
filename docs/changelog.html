@@ -5,6 +5,93 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-06 — Batch AL: the Warden's 24 nodes</h2>
+<ul>
+<li><b>All 24 tree nodes re-authored for row exclusivity.</b> The third of the four class
+batches Batch AI promised. Every id survives, so saved picks migrate and no save version
+moves (still v6). Since AI a node is not one of three ranks — it is the whole row, priced
+against the two doors it closes, which came out at roughly 3-4× the old rank-1 values:
+Unkillable 2% → 8% of the health he brought in, Richocet 5% → 35% stun chance, Toughness
+5% → 25% of max HP as Constitution, Provoke +1 → +2 taunted foes, Rally +15%/2 turns →
++30%/3 turns, Endurance 1% → 3% armor per unhealed turn, Iron Will 4% → 12% per debuff,
+Tenacity +5 → +15 max HP per block, Sundering 25% → 100% of the Break splash, Elemental
+Weakness 5% → 20% resist shred, Shield Mastery +1 → +2 turns of stance, Spite 8% → 30%
+reflected, Plate Discipline +3% → +12% on the plating climb, Bruising Guard 10 → 30 Break
+damage, Shared Vigil 3% → 12%, Battered Not Broken 8 → 30 Break shed, Grudge 6% → 25%,
+Steadfast 15% → 60% absorbed.</li>
+
+<li><b>The rows are themed, not merely exclusive.</b> 1 who your defence pays, 2 how much
+you hold, 3 attrition, 4 what compounds, 5 active defence, 6 the engine running, 7 the last
+stand, 8 the capstone. Row 1 is the model for the whole tree: one trigger, three
+beneficiaries — a block heals <i>him</i>, a block stuns <i>them</i>, a taunt empowers
+<i>the party</i>.</li>
+
+<li><b>Two nodes were re-specced in place — same id, new effect — and for the same
+reason.</b> Batch AH moved the ability each one modified into the earnable spec pool, so
+both were dead on a Warden who never drew it. <b>Rallying Stomp</b> ("War Stomp restores
++5% more resource") became <b>Rallying Cry</b>: at the start of each of the Warden's turns
+every ally regains 4% of their maximum resource, and War Stomp — if he owns it — restores
+20% more on top. <b>Bulwark Line</b> ("Interpose grants +1 charge") now keys to
+<b>Shieldwall</b>, which he has always had since Batch G promoted it into the base kit:
+the stance also grants every ally +10% Block chance for its duration, and Interpose — if
+he owns it — still hands each ally an extra charge. The refuel and the cover are Banner's
+real cargo; they happen on their own now, and the earnable abilities ride on top.</li>
+
+<li><b>Tank and Spank is CERTAIN.</b> It was a 15% chance to Empower an ally off Mocking
+Blow. Mocking Blow is free and on his rotation constantly, so a chance roll there read as
+noise rather than tension — nothing was ever planned around it. It always fires now.</li>
+
+<li><b>Spite and Bruising Guard stopped being an exclusive fork.</b> They sat in one tier
+as "reflect the damage you soak, or convert your blocks into Break". Split across rows 5
+and 6 both are reachable, so taking the second welds them into one continuous Break engine
+instead of two unrelated numbers: with Spite taken, its reflected damage also builds Break
+equal to 50% of its value.</li>
+
+<li><b>Hold the Line's capstone upgrades an earned copy.</b> The ability also sits in the
+Warden spec pool (Batch AH), so drawing it early used to make the capstone the worst pick
+in its row — a second copy of a button you already have. Taken on an ability he already
+owns it now UPGRADES instead: the Break reduction rises from 50% to 80%, and the no-death
+window lasts two turns rather than one. Same pattern as the Swordmaster's Lunge and Execute
+and the Berserker's Battle Shout and Rampage.</li>
+
+<li><b>Two Warden runes repaired in passing.</b> The <b>Rune of Grudges</b> and the <b>Rune
+of the Standard</b> each added a RANK to a talent counter whose per-rank value this batch
+multiplies by four. Left alone, a rune advertising "+6% damage against his taunted mark"
+would quietly have started paying 25% — a magnitude change nobody authored, and exactly the
+rune-magnitude pass the designer closed in Batch AF. Both now carry their own smaller term
+alongside the node's, so each pays its advertised number whether it is worn alone or beside
+the talent. Same repair as Batch AK made to the Rune of the Still Wrist, for the same
+reason.</li>
+
+<li><b>New status: Bulwark Line.</b> The ally Block grant rides the same Heavy Plating
+slice of the block roll that Shieldwall's own stance does, so what it buys is real Block
+rather than a separate ward — and a block it buys is logged as "(Bulwark Line)". It does
+NOT feed the Warden's Tenacity or Rally, which key on his own Heavy Plating blocks.</li>
+
+<li><b>Measured, flagged, not nerfed.</b> Kit smoke test, fixed lineup, 40 battles per row,
+force-learned 8-node builds (a standalone sim spends no points, so an unloaded run never
+touches these nodes at all). All rows 40/40 wins, 0 SCRIPT ERROR. The THREAT lane is the
+standout by a distance: his Break damage per battle 104 → 320 and the party's Breaks per
+battle 1.02 → 2.35, with his damage share 17% → 30% — that is Sundering at a full 100%
+splash plus the newly-reachable Spite/Bruising Guard pair. The BANNER build shows up in
+statuses applied per battle (1.3 → 5.7) rather than damage, and the PLATE build barely
+moves against a lineup the party already survives at 85% health. Kit-mechanics ratios only
+— the fixed smoke lineup carries NO difficulty signal (Batch R). No difficulty measurement
+was run, deliberately: a content re-author of one spec has no honest control row, because
+the sim's damage-share instrument reads a fixed four-hero party.</li>
+
+<li><b>Verified.</b> New <code>test_batch_al.gd</code>, 556 checks / 0 failures, stable
+3/3: tree shape, all 24 ids/rows/lanes/names, every magnitude in BOTH the payload and the
+tooltip that renders it, all three conditional halves firing / dark / inert on an empty
+ctx, the upgrade path in both acquisition orders, both repaired runes paying alone and
+stacked, and a live battle for the ally cover, the refuel, the taunt spread, the block
+payoffs and the upgraded capstone. Regression: test_batch_ai 2042/0, test_batch_ah 4284/0,
+test_batch_ah_battle 63/0, test_batch_aj 389/0, test_batch_ak 524/0, test_runes 3128/0,
+test_start_rune 239/0, test_start_rune_ui 31/0, run-harness gates 1/2/3 PASS. 10 scenes,
+0 SCRIPT ERROR. Known-bad and not ours: test_rune_battle 91/1, the Inferno chip check
+Batch AK recorded as a standing defect.</li>
+</ul>
+
 <h2>2026-08-06 — Batch AJ: the Berserker's 24 nodes</h2>
 <ul>
 <li><b>All 24 tree nodes re-authored for row exclusivity.</b> Every id survives, so saved

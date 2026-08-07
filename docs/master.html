@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-06 (Batch AJ)</b></p>
+<p align="right"><b>Last updated: 2026-08-06 (Batch AL)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -229,7 +229,7 @@ Shieldmaster also blocks at 5%). The Warden's Shieldwall adds a further +25% whi
 stance holds, on the Heavy Plating slice of the roll. Guaranteed blocks come from
 <b>Interpose charges</b> alone — one charge, one blocked attack. Broken units cannot Block.
 A block flashes <b>BLOCK</b> and the log names its source — "(Interpose)",
-"(Heavy Plating)", or "(base Block)" — which matters: the Warden's Tenacity and Rally
+"(Heavy Plating)", "(Bulwark Line)", or "(base Block)" — which matters: the Warden's Tenacity and Rally
 talents feed on Heavy Plating blocks specifically, and so, therefore, do the blocks
 Shieldwall buys.</li>
 <li><b>Armor Penetration (keyword):</b> every % of armor penetration negates a % of the
@@ -364,15 +364,15 @@ shows the % gained at the moment of the shout.</td></tr>
 Shieldwall). Counts as Heavy Plating for Tenacity and Rally; the chip reads
 "+25% Block" and his passive chip folds it into the live total.</td></tr>
 <tr><td>High Guard</td><td>Takes 40% less damage for 2 turns (Swordmaster talent, after a parry).</td></tr>
-<tr><td>Elemental Weakness</td><td>Elemental (non-physical) resistances reduced by 5% per
-talent rank (Warden's Crushing Blow talent); the chip shows the reduction ("−15%").</td></tr>
+<tr><td>Elemental Weakness</td><td>Elemental (non-physical) resistances reduced by 20%
+(Warden's Crushing Blow talent); the chip shows the reduction ("−20%").</td></tr>
 <tr><td>Enraged</td><td>+12% damage per stack for 5 turns, stacking &times;3 (Berserker
 talent, on dropping below half HP); the chip shows the live bonus.</td></tr>
 <tr><td>Unrelenting Assault</td><td>+40 Constitution for 3 turns (Berserker talent, on
 dropping below 25% HP; at most once every 5 turns).</td></tr>
-<tr><td>Endurance</td><td>+1% armor per turn without an external heal, capped at +75% (Warden talent);
+<tr><td>Endurance</td><td>+3% armor per turn without an external heal, capped at +75% (Warden talent);
 the chip tracks the streak and clears when healed.</td></tr>
-<tr><td>Iron Will</td><td>Takes 4% LESS damage per debuff on the Warden (talent); a
+<tr><td>Iron Will</td><td>Takes 12% LESS damage per debuff on the Warden (talent); a
 permanent chip whose value follows the live debuff count.</td></tr>
 <tr><td>Crushing Blows</td><td>+9% armor penetration per 20 total enemy-party
 bloodloss — per 15 if Savagery was taken too (Berserker talent); a permanent chip with the
@@ -381,7 +381,7 @@ live value, which names the step it is currently counting in.</td></tr>
 (Pyromancer talent ability, 2 turns).</td></tr>
 <tr><td>Seeding Embers</td><td>Bonus damage on the next turn, harvested from an enemy that
 died Burning (Pyromancer talent); the chip shows the live %.</td></tr>
-<tr><td>Rallied</td><td>+15% healing received (the Warden's Rally, 2 turns per Heavy
+<tr><td>Rallied</td><td>+30% healing received (the Warden's Rally, 3 turns per Heavy
 Plating block).</td></tr>
 <tr><td>Rime</td><td>Every stack of Chilled this enemy gains also chills one other random
 enemy (Cryomancer talent ability).</td></tr>
@@ -394,8 +394,12 @@ per-stack bonuses.</td></tr>
 the chip tracks the total % damage and max Mana gained (Arcanist talent).</td></tr>
 <tr><td>Melt Armor</td><td>Armor burned away for the battle by Burn ticks (Pyromancer
 talent); sits on the ENEMY with the live −% on the chip.</td></tr>
-<tr><td>Hold the Line</td><td>Takes 50% less Break damage (Warden capstone).</td></tr>
+<tr><td>Hold the Line</td><td>Takes 50% less Break damage — 80% when the capstone
+landed on an already-earned Hold the Line (Warden capstone).</td></tr>
 <tr><td>Undying</td><td>Cannot drop below 1 HP (Warden capstone).</td></tr>
+<tr><td>Bulwark Line</td><td>+10% Block chance for as long as the Warden's Shieldwall
+holds (Warden talent). Rides the Heavy Plating slice of the block roll, so it is real
+Block; a block it buys is logged as "(Bulwark Line)".</td></tr>
 <tr><td>Sunder</td><td>−35% armor.</td></tr>
 <tr><td>Ward</td><td>Takes 50% less BD.</td></tr>
 <tr><td>Fortify</td><td>+10% armor (Defense Potion).</td></tr>
@@ -686,15 +690,18 @@ enemies, 3.0 int, 3cd; allies regain 10% of their resource (Perfect: 20% instead
 Shieldwall — 25 Rage, 1.5, 2cd, self-cast with no target selection: +25% Block chance for
 2 turns (Perfect: 3). The blocks it buys count as <b>Heavy Plating</b> blocks, so they feed
 Tenacity and Rally — which Interpose's charges never do. The chip reads "+25% Block"; the
-Shield Mastery talent adds +1 turn to every cast.<br>
+Shield Mastery talent adds +2 turns to every cast, and the Bulwark Line talent throws
++10% Block over every ally for the same duration.<br>
 <i>Earnable (§6a):</i> Interpose — 25 Rage, 2.0 int, 4cd, self-cast with no
 target selection: every OTHER living
 ally gains 1 shield charge — the next attack against them is BLOCKED (Perfect: the
 Warden gains a charge too). Charges ADD to any the ally is already holding, and are the
 only guaranteed blocks in the game.<br>
-<i>Talent-granted:</i> Hold the Line — 30 Rage, 3.0, 6cd, the party takes 50% less Break
-damage for 2 turns and cannot die for a turn (Perfect: refunds 5 Rage); self-cast, no
-target selection.<br>
+<i>Earnable (§6a) and talent-granted:</i> Hold the Line — 30 Rage, 3.0, 6cd, the party
+takes 50% less Break damage for 2 turns and cannot die for a turn (Perfect: refunds 5
+Rage); self-cast, no target selection. A Hold the Line earned from an ability pick and
+THEN taken as the capstone is UPGRADED instead: 80% less Break damage, and the no-death
+window lasts 2 turns.<br>
 <b>Talent lanes:</b> see §7 — Plate / Threat / Banner.</li>
 <li><b>Swordmaster (Bruiser)</b> — <b>Stat block:</b> 165 HP / 22% armor / <b>12%
 parry</b> (the technician; the only parry-stat character — see §4.3).<br>
@@ -1071,14 +1078,14 @@ separately, and the map's Party button badges both.</p>
 <p><b>Warden</b> — <b>PLATE</b> (mitigation and the block payoffs — everything that answers being hit) · <b>THREAT</b> (he wants to be hit; this lane is what happens to whoever obliges) · <b>BANNER</b> (the half that protects other people)</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Plate</th><th>Threat</th><th>Banner</th></tr>
-<tr><td>1</td><td><b>Unkillable</b> — Every time you Block an attack, heal for 2.0% of maximum health.</td><td><b>Richocet</b> — Blocking an attack has a 5.0% chance to Stun the attacker.</td><td><b>Tank and Spank</b> — Mocking Blow has a 15.0% chance to Empower a random ally (2 turns).</td></tr>
-<tr><td>2</td><td><b>Toughness</b> — Constitution is increased by 5.0% of maximum HP.</td><td><b>Provoke</b> — Mocking Blow taunts 1.0 additional foe(s).</td><td><b>Rally</b> — Every attack Blocked by Heavy Plating grants the party +15% healing received for 2 turns.</td></tr>
-<tr><td>3</td><td><b>Endurance</b> — +1.0% armor for every turn the Warden is not healed by an external source (resets when healed).</td><td><b>Iron Will</b> — The Warden takes 4.0% less damage for every debuff currently on him.</td><td><b>Rallying Stomp</b> — War Stomp restores 5.0% more resource to allies.</td></tr>
-<tr><td>4</td><td><b>Tenacity</b> — Every attack Blocked by Heavy Plating increases maximum health by 5 for the rest of the battle.</td><td><b>Sundering</b> — Crushing Blow deals 25.0% of its Break damage to enemies Adjacent to the target (dead neighbors block the splash on their side).</td><td><b>Elemental Weakness</b> — Crushing Blow also reduces all elemental resistances of the target by 5.0% (3 turns).</td></tr>
-<tr><td>5</td><td><b>Shield Mastery</b> — Shieldwall&#x27;s stance holds 1.0 turn(s) longer (the perfect cast included).</td><td><b>Spite</b> — Attackers that damage the Warden take 8.0% of that damage back.</td><td><b>Bulwark Line</b> — Interpose grants each ally 1.0 additional shield charge(s).</td></tr>
-<tr><td>6</td><td><b>Plate Discipline</b> — Heavy Plating&#x27;s climbing Block bonus grows +3.0% faster per unblocked hit (8% becomes 11/14/17%).</td><td><b>Bruising Guard</b> — Blocking an attack deals 10.0 Break damage to the attacker.</td><td><b>Shared Vigil</b> — Allies take 3.0% less damage while the Warden is above 50% health.</td></tr>
-<tr><td>7</td><td><b>Battered Not Broken</b> — Blocking an attack removes 8.0 Break from the Warden&#x27;s own meter.</td><td><b>Grudge</b> — +6.0% damage against enemies currently taunted by the Warden.</td><td><b>Steadfast</b> — When damage would drop an ally below 20% health, the Warden absorbs 15.0% of it instead.</td></tr>
-<tr><td>CAP</td><td><b>Immovable</b> — The Warden cannot be Broken, and his Block chance is increased by 20%.</td><td><b>Vengeful Guardian</b> — The first attack the Warden Blocks each turn is answered with a free Crushing Blow.</td><td><b>Hold the Line</b> — New ability: Hold the Line — the party takes 50% less Break damage for 2 turns and cannot die for a turn (30 Rage, 3.0 int, 6cd).</td></tr>
+<tr><td>1</td><td><b>Unkillable</b> — Every time you Block an attack, heal for 8% of the health you brought into the battle.</td><td><b>Richocet</b> — Blocking an attack has a 35% chance to Stun the attacker.</td><td><b>Tank and Spank</b> — Mocking Blow ALWAYS Empowers a random ally (2 turns).</td></tr>
+<tr><td>2</td><td><b>Toughness</b> — Constitution is increased by 25% of maximum HP.</td><td><b>Provoke</b> — Mocking Blow taunts 2 additional foes.</td><td><b>Rally</b> — Every attack Blocked by Heavy Plating grants the party +30% healing received for 3 turns.</td></tr>
+<tr><td>3</td><td><b>Endurance</b> — +3% armor for every turn the Warden is not healed by an external source (resets when healed, capped at +75%).</td><td><b>Iron Will</b> — The Warden takes 12% less damage for every debuff currently on him.</td><td><b>Rallying Cry</b> — At the start of each of the Warden&#x27;s turns, every ally regains 4% of their maximum resource. If he owns War Stomp, it restores 20% more resource as well.</td></tr>
+<tr><td>4</td><td><b>Tenacity</b> — Every attack Blocked by Heavy Plating increases maximum health by 15 for the rest of the battle.</td><td><b>Sundering</b> — Crushing Blow deals 100% of its Break damage to enemies Adjacent to the target (dead neighbors block the splash on their side).</td><td><b>Elemental Weakness</b> — Crushing Blow also reduces all elemental resistances of the target by 20% (3 turns).</td></tr>
+<tr><td>5</td><td><b>Shield Mastery</b> — Shieldwall&#x27;s stance holds 2 turns longer — 4 turns, or 5 on a perfect cast.</td><td><b>Spite</b> — Attackers that damage the Warden take 30% of that damage back.</td><td><b>Bulwark Line</b> — Shieldwall also grants every ally +10% Block chance for its duration. If he owns Interpose, each ally gains 1 additional shield charge from it as well.</td></tr>
+<tr><td>6</td><td><b>Plate Discipline</b> — Heavy Plating&#x27;s climbing Block bonus grows +12% faster per unblocked hit (8% becomes 20%, so it caps in two hits rather than five).</td><td><b>Bruising Guard</b> — Blocking an attack deals 30 Break damage to the attacker. If Spite was taken, its reflected damage builds Break equal to 50% of its value as well.</td><td><b>Shared Vigil</b> — Allies take 12% less damage while the Warden is above 50% health.</td></tr>
+<tr><td>7</td><td><b>Battered Not Broken</b> — Blocking an attack removes 30 Break from the Warden&#x27;s own meter.</td><td><b>Grudge</b> — +25% damage against enemies currently taunted by the Warden.</td><td><b>Steadfast</b> — When damage would drop an ally below 20% health, the Warden absorbs 60% of it instead.</td></tr>
+<tr><td>CAP</td><td><b>Immovable</b> — The Warden cannot be Broken, and his Block chance is increased by 20%.</td><td><b>Vengeful Guardian</b> — The first attack the Warden Blocks each turn is answered with a free Crushing Blow.</td><td><b>Hold the Line</b> — New ability: Hold the Line — the party takes 50% less Break damage for 2 turns and cannot die for a turn (30 Rage, 3.0 int, 6cd). If Hold the Line was already earned, this UPGRADES it instead: 80% less Break damage, and the no-death window lasts 2 turns.</td></tr>
 </table>
 <p><b>Holy</b> — <b>RADIANCE</b> (throughput: bigger heals, cheaper heals, less waste) · <b>MERCY</b> (the resource economy: earning stacks, holding them, spending them, and
 Empower) · <b>SANCTUARY</b> (the safety net: keeping people from dying, rather than healing them
@@ -1210,10 +1217,11 @@ from which purse, and — for a node not yet taken — the names of the two sibl
 would close. A closed sibling says what closed it and that an elite point can force it.</p>
 <p><b>Talent visibility:</b> every talent proc is written to the combat log with a
 "Talent:" tag (Enraged, Unrelenting Assault, Endurance, Unkillable, Richocet, Tank and
-Spank, Dominant Presence, Sundering, Riposte...), and stateful talent buffs display as
+Spank, Rallying Cry, Bulwark Line, Dominant Presence, Sundering, Riposte...), and stateful
+talent buffs display as
 status chips with live counters — Enraged / Iron Will / Crushing Blows / Battle Shout show
 their current % bonus, Endurance its armor streak, Shieldwall its Block bonus and Interpose
-its remaining charges,
+its remaining charges, Bulwark Line the Block chance it lends each ally,
 Elemental Weakness the resist reduction, Unrelenting Assault its borrowed Constitution.</p>
 
 <h2>8. Economy</h2>

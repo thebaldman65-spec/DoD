@@ -164,13 +164,13 @@
 		"name": "Rune of Grudges", "rarity": "rare", "scope": "spec:warden",
 		"price": 100, "lane": "Threat",
 		"desc": "+6% damage against enemies held by his taunt (stacks with the Grudge talent).",
-		"payload": {"stat": {"grudge_ranks": 1}}
+		"payload": {"stat": {"rune_grudge_bonus": 0.06}}
 	},
 	"standard": {
 		"name": "Rune of the Standard", "rarity": "rare", "scope": "spec:warden",
 		"price": 100, "lane": "Banner",
 		"desc": "Allies take 3% less damage while he stands above half health (stacks with Shared Vigil).",
-		"payload": {"stat": {"shared_vigil_ranks": 1}}
+		"payload": {"stat": {"rune_vigil_bonus": 0.03}}
 	},
 	"sentinel": {
 		"name": "Rune of the Sentinel", "rarity": "rare", "scope": "spec:warden",

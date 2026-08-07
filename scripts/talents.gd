@@ -478,56 +478,80 @@ const LANE_TREES := {
 		# old tree was damage dials on a 75-Attack tank, so the offensive
 		# payloads convert into currencies he actually spends: mitigation,
 		# Break pressure, threat, and party protection.
+		#
+		# BATCH AL (08-06) re-authored all 24 for row exclusivity, the same
+		# pass AK and AJ ran on the Swordmaster and the Berserker. A node is
+		# a ROW now, not one of three ranks, so it is priced against the two
+		# doors it closes — roughly 3-4x the old rank-1 values.
+		#
+		# ROWS ARE THEMED, not merely exclusive: 1 who your defence pays /
+		# 2 how much you hold / 3 attrition / 4 what compounds / 5 active
+		# defence / 6 the engine running / 7 the last stand / 8 capstone.
+		# Row 1 is the model for the whole tree — one trigger (a Block, a
+		# taunt), three beneficiaries: him, them, the party.
+		#
+		# TWO RE-SPECS IN PLACE, both for the same reason: AH moved the
+		# ability they modified into the earnable spec pool, so each was
+		# dead on a Warden who never drew it. wd_stomp_drill (War Stomp's
+		# refuel) and wd_bannerman (Interpose's charges) now key to
+		# something he always has, and the old ability rides on top as an
+		# `owns_ability` rider.
+		#
+		# ONE CROSS-ROW CONDITION: Spite and Bruising Guard used to be an
+		# exclusive fork (reflect the damage, or convert the blocks into
+		# Break). Split across rows 5 and 6 both are reachable, so the
+		# second one welds the pair into one Break engine — `spite_break`.
 		# --- Lane A: Plate — mitigation and the block payoffs.
 		# Everything that answers being hit. ---
 		{"id": "wd_unkillable", "name": "Unkillable", "ranks": 1, "lane": "Plate", "row": 1,
-			"desc": "Every time you Block an attack, heal for {v}% of maximum health.",
-			"scale": {"step": 2},
+			"desc": "Every time you Block an attack, heal for {v}% of the health you brought into the battle.",
+			"scale": {"step": 8},
 			"payload": {"stat": {"unkillable_ranks": 1}}},
 		{"id": "wd_toughness", "name": "Toughness", "ranks": 1, "lane": "Plate", "row": 2,
 			"desc": "Constitution is increased by {v}% of maximum HP.",
-			"scale": {"step": 5},
+			"scale": {"step": 25},
 			"payload": {"stat": {"toughness_ranks": 1}}},
 		{"id": "wd_endurance", "name": "Endurance", "ranks": 1, "lane": "Plate", "row": 3,
-			"desc": "+{v}% armor for every turn the Warden is not healed by an external source (resets when healed).",
-			"scale": {"step": 1},
+			"desc": "+{v}% armor for every turn the Warden is not healed by an external source (resets when healed, capped at +75%).",
+			"scale": {"step": 3},
 			"payload": {"stat": {"endurance_ranks": 1}}},
 		{"id": "wd_tenacity", "name": "Tenacity", "ranks": 1, "lane": "Plate", "row": 4,
-			"desc": "Every attack Blocked by Heavy Plating increases maximum health by 5 for the rest of the battle.",
+			"desc": "Every attack Blocked by Heavy Plating increases maximum health by 15 for the rest of the battle.",
 			"payload": {"stat": {"tenacity": 1}}},
 		# Re-spec (Batch AB, same id so saved ranks migrate and nobody is
 		# refunded): Shieldwall stopped granting charges, so "+1 charge/rank"
 		# stopped meaning anything. The stance's length is the dial now.
 		{"id": "wd_shieldwall", "name": "Shield Mastery", "ranks": 1, "lane": "Plate", "row": 5,
-			"desc": "Shieldwall's stance holds {v} turn(s) longer (the perfect cast included).",
-			"scale": {"step": 1},
+			"desc": "Shieldwall's stance holds {v} turns longer — 4 turns, or 5 on a perfect cast.",
+			"scale": {"step": 2},
 			"payload": {"stat": {"shield_mastery_ranks": 1}}},
 		# Re-spec (was Layered Plating, a flat armor dial; same id, so saved
 		# ranks carry): the lane's signature — tightens the cadence of the
-		# Batch G pity ramp, so blocks arrive every second hit instead of
-		# every third and every on-Block talent fires more often.
+		# Batch G pity ramp, so the cap arrives in two unblocked hits instead
+		# of five and every on-Block talent fires far more often.
 		{"id": "wd_plating", "name": "Plate Discipline", "ranks": 1, "lane": "Plate", "row": 6,
-			"desc": "Heavy Plating's climbing Block bonus grows +{v}% faster per unblocked hit (8% becomes 11/14/17%).",
-			"scale": {"step": 3},
+			"desc": "Heavy Plating's climbing Block bonus grows +{v}% faster per unblocked hit (8% becomes 20%, so it caps in two hits rather than five).",
+			"scale": {"step": 12},
 			"payload": {"stat": {"plate_discipline_ranks": 1}}},
 		# Re-spec (was Immovable, a flat damage-taken dial — that NAME moved
 		# to the Plate capstone): a Broken unit cannot Block at all, so
 		# getting Broken switches his identity off. Blocking holds that off.
 		{"id": "wd_immovable", "name": "Battered Not Broken", "ranks": 1, "lane": "Plate", "row": 7,
 			"desc": "Blocking an attack removes {v} Break from the Warden's own meter.",
-			"scale": {"step": 8},
+			"scale": {"step": 30},
 			"payload": {"stat": {"battered_ranks": 1}}},
 		# --- Lane B: Threat — he wants to be hit. This lane is what
 		# happens to whoever obliges. ---
 		{"id": "wd_ricochet", "name": "Richocet", "ranks": 1, "lane": "Threat", "row": 1,
 			"desc": "Blocking an attack has a {v}% chance to Stun the attacker.",
-			"scale": {"step": 5},
+			"scale": {"step": 35},
 			"payload": {"stat": {"ricochet_ranks": 1}}},
 		# Re-spec (was Taunt Master, -1 Mocking cooldown; ranks 1 → 2): the
-		# taunt engine widens — more of the room swings at the wall.
+		# taunt engine widens — more of the room swings at the wall. The
+		# base ability already drags in one extra foe; this is on top.
 		{"id": "wd_taunt_master", "name": "Provoke", "ranks": 1, "lane": "Threat", "row": 2,
-			"desc": "Mocking Blow taunts {v} additional foe(s).",
-			"scale": {"step": 1},
+			"desc": "Mocking Blow taunts {v} additional foes.",
+			"scale": {"step": 2},
 			"payload": {"stat": {"provoke_ranks": 1}}},
 		# Re-spec IN MEANING (same id, same name, same idea — adversity
 		# makes him stronger — converted into the currency a tank banks):
@@ -535,69 +559,104 @@ const LANE_TREES := {
 		# 75-Attack character.
 		{"id": "wd_iron_will", "name": "Iron Will", "ranks": 1, "lane": "Threat", "row": 3,
 			"desc": "The Warden takes {v}% less damage for every debuff currently on him.",
-			"scale": {"step": 4},
+			"scale": {"step": 12},
 			"payload": {"stat": {"iron_will_ranks": 1}}},
 		{"id": "wd_sundering", "name": "Sundering", "ranks": 1, "lane": "Threat", "row": 4,
 			"desc": "Crushing Blow deals {v}% of its Break damage to enemies Adjacent to the target (dead neighbors block the splash on their side).",
-			"scale": {"step": 25},
+			"scale": {"step": 100},
 			"payload": {"stat": {"sundering_ranks": 1}}},
-		# Re-spec (was Spiked Bulwark, a Richocet deepener). Exclusive fork
-		# with Bruising Guard: the punishment you soak becomes damage, or
-		# becomes Break pressure.
+		# Re-spec (was Spiked Bulwark, a Richocet deepener). Used to be an
+		# EXCLUSIVE fork with Bruising Guard; Batch AL put them in different
+		# rows, so both are reachable and Bruising Guard's `also` half welds
+		# them together instead (see there).
 		{"id": "wd_spiked", "name": "Spite", "ranks": 1, "lane": "Threat", "row": 5,
 			"desc": "Attackers that damage the Warden take {v}% of that damage back.",
-			"scale": {"step": 8},
+			"scale": {"step": 30},
 			"payload": {"stat": {"spite_ranks": 1}}},
 		# Re-spec (was Shattering Blow, +5 Crushing damage): the more
-		# interesting half of the fork — on a character who blocks
+		# interesting half of the old fork — on a character who blocks
 		# constantly and is attacked more than anyone, this quietly makes
 		# him a Break engine for the whole party.
+		#
+		# The cross-row half needed its OWN field rather than a second point
+		# on the counter: `bruising_ranks` sets a flat Break number on the
+		# block, while the rider adds Break to a completely different event
+		# (Spite's reflect, at the damage site). Two events, two fields.
 		{"id": "wd_shatter_guard", "name": "Bruising Guard", "ranks": 1, "lane": "Threat", "row": 6,
-			"desc": "Blocking an attack deals {v} Break damage to the attacker.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"bruising_ranks": 1}}},
+			"desc": "Blocking an attack deals {v} Break damage to the attacker. If Spite was taken, its reflected damage builds Break equal to 50% of its value as well.",
+			"scale": {"step": 30},
+			"payload": {"stat": {"bruising_ranks": 1},
+				"also": [
+					{"condition": {"has_node": "wd_spiked"},
+						"stat": {"spite_break": 1}},
+				]}},
 		# Re-spec (same name, was a flat +3% damage dial): the damage he
 		# does keep is aimed at whoever he's holding.
 		{"id": "wd_grudge", "name": "Grudge", "ranks": 1, "lane": "Threat", "row": 7,
 			"desc": "+{v}% damage against enemies currently taunted by the Warden.",
-			"scale": {"step": 6},
+			"scale": {"step": 25},
 			"payload": {"stat": {"grudge_ranks": 1}}},
 		# --- Lane C: Banner — the half that protects other people. ---
+		# Batch AL made the Empower CERTAIN. Mocking Blow is free and sits on
+		# his rotation constantly, so a chance roll there is noise rather
+		# than tension — you cannot plan around it and you barely notice it
+		# fire. No {v}: the node has no number left to render.
 		{"id": "wd_tank_spank", "name": "Tank and Spank", "ranks": 1, "lane": "Banner", "row": 1,
-			"desc": "Mocking Blow has a {v}% chance to Empower a random ally (2 turns).",
-			"scale": {"step": 15},
+			"desc": "Mocking Blow ALWAYS Empowers a random ally (2 turns).",
 			"payload": {"stat": {"tank_spank_ranks": 1}}},
 		{"id": "wd_rally", "name": "Rally", "ranks": 1, "lane": "Banner", "row": 2,
-			"desc": "Every attack Blocked by Heavy Plating grants the party +15% healing received for 2 turns.",
+			"desc": "Every attack Blocked by Heavy Plating grants the party +30% healing received for 3 turns.",
 			"payload": {"stat": {"rally": 1}}},
-		# Re-spec (was Stomp Drill, -5 War Stomp cost): deepens the refuel —
-		# the real cargo on a 75-Attack tank's aoe.
-		{"id": "wd_stomp_drill", "name": "Rallying Stomp", "ranks": 1, "lane": "Banner", "row": 3,
-			"desc": "War Stomp restores {v}% more resource to allies.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"rallying_stomp_ranks": 1}}},
+		# RE-SPEC (Batch AL; was Rallying Stomp, "War Stomp restores +5% more
+		# resource" — and before that Stomp Drill, -5 cost). Same id, so
+		# saved picks migrate. Batch AH made War Stomp EARNABLE rather than
+		# part of the opening kit, which left this node dead on a Warden who
+		# never drew it. The party refuel is Banner's real cargo, so it now
+		# happens on its own, at his turn, and War Stomp deepens it if he
+		# has it. `owns_ability` is the honest instrument here because NO
+		# node grants War Stomp — the only question is whether the kit holds
+		# it (the AK correction).
+		{"id": "wd_stomp_drill", "name": "Rallying Cry", "ranks": 1, "lane": "Banner", "row": 3,
+			"desc": "At the start of each of the Warden's turns, every ally regains {v}% of their maximum resource. If he owns War Stomp, it restores 20% more resource as well.",
+			"scale": {"step": 4},
+			"payload": {"stat": {"rallying_cry": 4},
+				"also": [
+					{"condition": {"owns_ability": "War Stomp"},
+						"stat": {"rallying_stomp_ranks": 1}},
+				]}},
 		{"id": "wd_elem_weak", "name": "Elemental Weakness", "ranks": 1, "lane": "Banner", "row": 4,
 			"desc": "Crushing Blow also reduces all elemental resistances of the target by {v}% (3 turns).",
-			"scale": {"step": 5},
+			"scale": {"step": 20},
 			"payload": {"stat": {"elem_weak_ranks": 1}}},
-		# Re-spec (was Bannerman, a flat max-HP dial): the Batch G tank verb
-		# deepens — the cover he throws gets thicker.
+		# RE-SPEC (Batch AL; was "Interpose grants each ally +1 shield
+		# charge", and before that Bannerman, a flat max-HP dial). Same id,
+		# same fix as Rallying Cry above: AH made Interpose earnable, so the
+		# node keys to SHIELDWALL — which he has always had since Batch G
+		# promoted it into the base kit — and Interpose rides on top.
+		#
+		# The ally grant rides the same Heavy Plating slice of the block roll
+		# that Shieldwall's own stance does, so the cover is real Block, not
+		# a separate mitigation site.
 		{"id": "wd_bannerman", "name": "Bulwark Line", "ranks": 1, "lane": "Banner", "row": 5,
-			"desc": "Interpose grants each ally {v} additional shield charge(s).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"bulwark_line_ranks": 1}}},
+			"desc": "Shieldwall also grants every ally +{v}% Block chance for its duration. If he owns Interpose, each ally gains 1 additional shield charge from it as well.",
+			"scale": {"step": 10},
+			"payload": {"stat": {"bulwark_ally_block": 10},
+				"also": [
+					{"condition": {"owns_ability": "Interpose"},
+						"stat": {"bulwark_line_ranks": 1}},
+				]}},
 		# Re-spec (was Fortress, a flat max-HP dial): conditional on the
 		# Warden being healthy — the party's mitigation depends on keeping
 		# him standing, so healing him is protecting everyone.
 		{"id": "wd_fortress", "name": "Shared Vigil", "ranks": 1, "lane": "Banner", "row": 6,
 			"desc": "Allies take {v}% less damage while the Warden is above 50% health.",
-			"scale": {"step": 3},
+			"scale": {"step": 12},
 			"payload": {"stat": {"shared_vigil_ranks": 1}}},
 		# Re-spec (was Veteran's Will, an Iron Will deepener): the lane's
 		# thesis in one node — he eats what would have killed you.
 		{"id": "wd_veteran", "name": "Steadfast", "ranks": 1, "lane": "Banner", "row": 7,
 			"desc": "When damage would drop an ally below 20% health, the Warden absorbs {v}% of it instead.",
-			"scale": {"step": 15},
+			"scale": {"step": 60},
 			"payload": {"stat": {"steadfast_ranks": 1}}},
 		# --- Capstones (row 8): take ONE, no lane requirement ---
 		# Re-spec (was The Mountain, a stat pile; the name comes from the
@@ -615,14 +674,26 @@ const LANE_TREES := {
 			"capstone": true,
 			"desc": "The first attack the Warden Blocks each turn is answered with a free Crushing Blow.",
 			"payload": {"stat": {"vengeful_guardian": 1}}},
+		# Batch AL: Hold the Line also sits in the Warden spec pool (Batch
+		# AH), so the capstone GRANTS it when unowned and UPGRADES it when
+		# the hero already earned it from a pick — the AK pattern, exactly
+		# as Battle Shout and Rampage do in the Berserker tree. A capstone
+		# that hands you a second copy of an ability you already cast is the
+		# worst pick in the row; this makes drawing it early a reason to
+		# take the capstone rather than a reason to avoid it.
 		{"id": "wd_hold_line", "name": "Hold the Line", "ranks": 1, "lane": "Banner", "row": 8,
 			"capstone": true,
-			"desc": "New ability: Hold the Line — the party takes 50% less Break damage for 2 turns and cannot die for a turn (30 Rage, 3.0 int, 6cd).",
+			"desc": "New ability: Hold the Line — the party takes 50% less Break damage for 2 turns and cannot die for a turn (30 Rage, 3.0 int, 6cd). If Hold the Line was already earned, this UPGRADES it instead: 80% less Break damage, and the no-death window lasts 2 turns.",
 			"payload": {"new_ability": {"display_name": "Hold the Line", "cost": 30,
 				"special": "hold_the_line", "delay": 3.0, "anim": "attack03",
 				"cooldown": 6,
 				"perfect_id": "", "perfect_text": "Refunds 5 Rage",
-				"description": "Embolden the party: 50% less Break\ndamage for 2 turns, and no one can die\nfor a turn."}}},
+				"description": "Embolden the party: 50% less Break\ndamage for 2 turns, and no one can die\nfor a turn."},
+				"upgrade": [
+					{"stat": {"hold_line_upgraded": 1}},
+					{"ability": "Hold the Line", "set": {
+						"description": "Embolden the party: 80% less Break\ndamage for 2 turns, and no one can die\nfor two turns."}},
+				]}},
 	],
 	"pyromancer": [
 		# Purpose-designed lanes (Batch N, 07-31). Batch AI re-cut the tiers

@@ -188,6 +188,117 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-08-06)
+BATCH AL (08-06) — WARDEN, ALL 24 NODES. The third of the four class batches
+AI promised. One spec only; the other nine trees and enemy tuning are
+UNTOUCHED.
+ROWS ARE THEMED: 1 who your defence pays / 2 how much you hold / 3 attrition
+/ 4 what compounds / 5 active defence / 6 the engine running / 7 the last
+stand / 8 capstone. Row 1 is the model for the tree — one trigger, three
+beneficiaries (a block heals HIM, a block stuns THEM, a taunt empowers THE
+PARTY).
+MAGNITUDES, one decision applied 24 times (a node is a ROW, priced against
+the two doors it closes): Unkillable 2->8%, Richocet 5->35%, Toughness
+5->25%, Provoke +1->+2 foes, Rally 15%/2t -> 30%/3t, Endurance 1->3%/turn
+(cap +75% unchanged and now REACHABLE — turn 25 not turn 75), Iron Will
+4->12%/debuff, Tenacity +5->+15 max HP, Sundering 25->100% of the Break
+splash, Elemental Weakness 5->20%, Shield Mastery +1->+2 turns, Spite
+8->30%, Plate Discipline +3->+12% (climb 8->20%, caps in 2 hits not 5),
+Bruising Guard 10->30 BD, Shared Vigil 3->12%, Battered Not Broken 8->30
+Break shed, Grudge 6->25%, Steadfast 15->60%. EVERY ID SURVIVES, so saved
+picks migrate and NO SAVE VERSION MOVES (still v6).
+TWO RE-SPECS IN PLACE, BOTH FOR THE SAME REASON — AH moved the ability each
+one modified into the earnable spec pool, so both were DEAD on a Warden who
+never drew it. `wd_stomp_drill` (was Rallying Stomp, "War Stomp restores +5%
+more") -> RALLYING CRY: every ally regains 4% of max resource at the start of
+each of his turns, and War Stomp restores 20% more IF he owns it.
+`wd_bannerman` (was "Interpose grants +1 charge") -> BULWARK LINE: Shieldwall
+also grants every ally +10% Block chance for its duration, and Interpose
+hands each ally an extra charge IF he owns it. THE RULE THIS LEAVES: a talent
+may READ an earnable ability, it must not DEPEND on one.
+TANK AND SPANK IS CERTAIN (was a 15% roll). Mocking Blow is free and on his
+rotation constantly, so the roll fired several times a battle and changed no
+decision — that is noise, not variance. The node has no {v} left to render.
+ONE CROSS-ROW CONDITION: Spite + Bruising Guard used to be an EXCLUSIVE FORK
+(reflect, or convert blocks to Break) — same trigger, same question, so it
+was really "which number do you prefer". Split across rows 5/6 both are
+reachable and the second welds them: `spite_break` makes the reflect carry
+Break equal to 50% of its damage. It needed its OWN field, unlike AJ's
+index-counter trick, because the two halves fire on DIFFERENT EVENTS (a
+block vs the damage site).
+UPGRADE PATH (the AK pattern): Hold the Line sits in SPEC_POOLS["warden"] AND
+the tree. Node on an unowned ability = grant; on an owned one = upgrade —
+Break cut 50%->80% via `hold_line_upgraded`, no-death window 2 status turns
+-> 3 (the +1 is the hero-turn tick offset). The 50/80 rides the hold_bd
+STATUS POWER so unit.gd keeps ONE read site; that read is INTEGER arithmetic
+on purpose (1.0 - 80/100.0 lands at 0.19999999 and an 80% cut on 100 Break
+would read 19).
+NEW FIELDS, four not the doc's three (the doc's count did not allow for the
+upgrade path it also asks for — exactly as AJ and AK needed theirs):
+rallying_cry (the turn-start block in _run_battle, beside the Vengeful
+Guardian re-arm), bulwark_ally_block (the shield_block special),
+spite_break (the Spite reflect), hold_line_upgraded (the hold_the_line
+special). NEW STATUS `bulwark_line`: it rides the SAME Heavy Plating SLICE of
+the block roll Shieldwall's own stance does, so the cover is real Block — but
+it carries its own LABEL, so an ally's covered block is logged "(Bulwark
+Line)" and does NOT feed the Warden's Tenacity/Rally (both test
+block_source == "Heavy Plating"). The Warden is excluded from his own grant:
+his +25% stance is already up.
+TWO RUNES REPAIRED IN PASSING — A TALENT RE-TUNE CAN SILENTLY RE-TUNE A RUNE.
+The Rune of Grudges and the Rune of the Standard each added a RANK to
+grudge_ranks / shared_vigil_ranks, whose per-rank value this batch multiplies
+by four: untouched, a rune advertising "+6%" would have started paying 25%.
+That IS the rune-magnitude pass the designer closed in AF, arriving by
+accident. Both now carry their own term (`rune_grudge_bonus` 0.06,
+`rune_vigil_bonus` 0.03) ADDED to the node's, so each pays its advertised
+number alone AND stacked. Same shape as AK's Still Wrist repair. CONSEQUENCE
+WORTH KNOWING: Shared Vigil can no longer use `_living_hero_with` — that
+helper reads its field as an INT and a rune-only Warden (0.03) would be
+invisible to it, so the scan is inlined and looks for EITHER half.
+runes.json is NOT byte-unchanged; this is a dead-magnitude repair, NOT the
+magnitude pass.
+VERIFIED: NEW test_batch_al.gd 556 checks / 0 failures, stable 3/3 (tree
+shape, all 24 ids/rows/lanes/names, every magnitude in BOTH the payload and
+the tooltip it renders, all three conditional halves firing/dark/inert-on-
+empty-ctx, the upgrade path in BOTH acquisition orders, both repaired runes
+alone and stacked, and a live battle for the ally cover, the refuel, the
+taunt spread, the block payoffs and the upgraded capstone). Its live half
+spawns battles WITHOUT autoplay and forces determinism with block_chance/
+plating_bonus/parry_chance + `no_cover` (the Sharpshooter's miss BYPASS)
+rather than retrying — the AK discipline. GOTCHA THE FIRST RUN HIT: passing
+`is_counter = true` to `_resolve` SKIPS THE WHOLE BLOCK BRANCH, so a driven
+"prove the block fires" check silently proves nothing.
+ONE ASSERTION IS A FLOOR, DELIBERATELY: Rally's 3-turn status reads 2 on the
+Survivalist, because the Hunter class passive makes him ACT FIRST and his
+opening turn has already ticked one off. That is the timeline, not the
+talent.
+Regression: test_batch_ai 2042/0, test_batch_ah 4284/0 (its master.html stamp
+gate bumped to Batch AL), test_batch_ah_battle 63/0, test_batch_aj 389/0,
+test_batch_ak 524/0, test_runes 3128/0 (was 3130 — the two repaired runes
+now write FLOATS, so two STAT_INT_KEYS-family checks no longer apply),
+test_start_rune 239/0, test_start_rune_ui 31/0, run-harness gates 1/2/3 PASS.
+10 scenes, 0 SCRIPT ERROR.
+KNOWN-BAD, NOT OURS: test_rune_battle 91/1 (the Inferno chip check), the
+standing defect Batch AK recorded.
+NO DIFFICULTY MEASUREMENT WAS RUN, deliberately — same reasoning as AJ/AK: a
+content re-author of ONE spec has no honest control row, because the sim's
+damage-share instrument reads a fixed four-hero party. ./sim.sh is a kit
+smoke test only and carries no difficulty signal (Batch R).
+KIT SMOKE, fixed lineup, 40 battles/row, warden,cryomancer,inquisitor,
+beastmaster, DOD_SIM_TALENTS force-learning full 8-node builds (standalone
+sims spend no points, so an unloaded run never touches these nodes at all).
+All rows 40/40 wins, 0 SCRIPT ERROR. MEASURED AND FLAGGED, NOT NERFED — THE
+THREAT LANE IS THE STANDOUT BY A DISTANCE: BD/battle 104 -> 320 and the
+PARTY's Breaks/battle 1.02 -> 2.35, his damage share 17% -> 30% (Sundering at
+a full 100% splash + the newly-reachable Spite/Bruising Guard pair). BANNER
+shows up in statuses/battle 1.3 -> 5.7 rather than damage; PLATE barely moves
+(17% -> 17%, prevented 47 -> 50) because the smoke lineup never threatens a
+party already sitting at 85% health — that is the instrument's ceiling, not
+the lane's. Kit-mechanics ratios ONLY.
+REPORTED NOT ACTED ON: (a) Unkillable's self-mend is not booked by
+`_stat_heal`, so the Warden's heal/battle column reads 0 on a Plate build —
+a pre-existing instrumentation gap, not a talent bug. (b) `Talents.desc_for`
+still renders `String.num(v, 2)`, so tooltips read "+25.00%" — pre-dates this
+batch, affects ALL TWELVE trees, one-line fix whenever the designer wants it.
 BATCH AJ (08-06) — BERSERKER, ALL 24 NODES. The second of the four class
 batches AI promised. One spec only; the other ten trees and enemy tuning
 are UNTOUCHED.

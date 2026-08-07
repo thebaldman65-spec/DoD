@@ -83,7 +83,12 @@ const STATUS_INFO := {
 	"elem_weak": ["Elemental Weakness", "EW", Color(0.40, 0.80, 0.75), "Elemental resistances reduced."],
 	"hold_bd": ["Hold the Line", "HL", Color(0.95, 0.82, 0.45), "Takes 50% less Break damage."],
 	"undying": ["Undying", "UD", Color(1.0, 0.95, 0.75), "Cannot drop below 1 HP."],
-	"rally_heal": ["Rallied", "R+", Color(0.95, 0.75, 0.45), "+15% healing received\n(the Warden's Rally)."],
+	# Bulwark Line (Batch AL): the Warden's Shieldwall covers the line. The
+	# grant rides the same Heavy Plating slice of the block roll his own
+	# stance does, so what it buys is real Block, not a separate ward.
+	"bulwark_line": ["Bulwark Line", "BL", Color(0.72, 0.8, 0.95),
+		"+10% Block chance (the Warden's Shieldwall)."],
+	"rally_heal": ["Rallied", "R+", Color(0.95, 0.75, 0.45), "+30% healing received\n(the Warden's Rally)."],
 	"flame_shield": ["Flame Shield", "FS", Color(1.0, 0.55, 0.25), "Takes 50% less damage; attackers\nare set Burning (3 turns)."],
 	"seeding": ["Seeding Embers", "SE", Color(1.0, 0.65, 0.3), "Empowered by a burning death:\nbonus damage on the next turn."],
 	"rime": ["Rime", "Ri", Color(0.75, 0.9, 1.0), "Rimed: every stack of Chilled this\nenemy gains also chills one other\nrandom enemy."],
@@ -584,7 +589,7 @@ func _spawn_units() -> void:
 		# Toughness (Warden talent): Constitution grows with bulk.
 		if cfg.get("toughness_ranks", 0) > 0:
 			cfg["constitution"] = int(cfg.get("constitution", 100)
-				+ 0.05 * cfg["toughness_ranks"] * cfg["max_hp"])
+				+ 0.25 * cfg["toughness_ranks"] * cfg["max_hp"])
 		# Node scaling: +2% of BASE Attack and HP per combat node won this
 		# run (linear). Armor/resists/speed/constitution/crit/block/parry
 		# never scale (Toughness above reads the unscaled HP for the same
@@ -1776,6 +1781,26 @@ func _run_battle() -> void:
 		# his turns — one free Crushing Blow per turn, never per block.
 		if u.vengeful_guardian > 0:
 			u.vengeful_ready = true
+		# Rallying Cry (Batch AL): THE one read site for `rallying_cry`. The
+		# banner refuels the line on its own now, every one of his turns —
+		# it used to be a rider on War Stomp, which Batch AH made earnable,
+		# so on a Warden who never drew the stomp the node did nothing at
+		# all. War Stomp still deepens it, at its own cast site.
+		if u.rallying_cry > 0 and u.is_hero and not u.is_companion:
+			var rc_fed := 0
+			for rc_h in heroes:
+				if rc_h.dead or rc_h == u or rc_h.resource_name == "" \
+						or rc_h.max_resource <= 0:
+					continue
+				var rc_gain := maxi(int(rc_h.max_resource * 0.01 * u.rallying_cry), 1)
+				rc_h.resource = mini(rc_h.resource + rc_gain, rc_h.max_resource)
+				rc_h.float_text("+%d %s" % [rc_gain, rc_h.resource_name],
+					Color(0.5, 0.8, 1.0))
+				rc_h.refresh_bars()
+				rc_fed += 1
+			if rc_fed > 0:
+				_log("   → Talent: Rallying Cry — the banner refuels the line (+%d%%)" % \
+					u.rallying_cry, "#b0a8e0")
 		# Endurance (Warden talent): armor stacks while unhealed by others,
 		# shown as a buff chip that tracks the current bonus.
 		if u.endurance_ranks > 0:
@@ -1788,9 +1813,9 @@ func _run_battle() -> void:
 				u.endurance_stacks += 1
 				# Capped at +75% to match effective_armor() — the chip must
 				# never advertise a bonus the damage path cannot grant.
-				var e_pct := mini(1 * u.endurance_ranks * u.endurance_stacks, 75)
-				var e_desc := "Endurance: +%d%% armor for every turn\nwithout an external heal.\nCurrently +%d%% armor (%d-turn streak)." % [
-					u.endurance_ranks, e_pct, u.endurance_stacks]
+				var e_pct := mini(3 * u.endurance_ranks * u.endurance_stacks, 75)
+				var e_desc := "Endurance: +%d%% armor for every turn\nwithout an external heal (cap +75%%).\nCurrently +%d%% armor (%d-turn streak)." % [
+					3 * u.endurance_ranks, e_pct, u.endurance_stacks]
 				if not u.update_status("endurance", "+%d%%" % e_pct, e_desc):
 					u.add_status("endurance", "Endurance", "+%d%%" % e_pct,
 						Color(0.76, 0.68, 0.48), -1, e_desc)
@@ -3955,6 +3980,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# instead of whenever the dice feel like it.
 					var plating := (0.15 + strike_target.plating_bonus) \
 						if strike_target.passive_id == "heavy_plating" else 0.0
+					var plate_label := "Heavy Plating"
 					# Shieldwall (Batch AB) rides the SAME slice on purpose: the
 					# stance raises the Block roll instead of bypassing it, so
 					# the blocks it buys are Heavy Plating blocks and DO feed
@@ -3962,11 +3988,22 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					if strike_target.has_status("shieldwall"):
 						plating += 0.01 * maxi(
 							strike_target.status_power("shieldwall"), 0)
+					# Bulwark Line (Batch AL): the same stance, thrown over the
+					# rest of the party. Heavy Plating is the Warden's own
+					# passive, so on an ALLY this slice is the only thing in
+					# it — hence its own label, which also keeps Tenacity and
+					# Rally (they test for "Heavy Plating") from firing off a
+					# teammate's block.
+					if strike_target.has_status("bulwark_line"):
+						plating += 0.01 * maxi(
+							strike_target.status_power("bulwark_line"), 0)
+						if strike_target.passive_id != "heavy_plating":
+							plate_label = "Bulwark Line"
 					var block_roll := randf()
 					if block_roll < strike_target.block_chance:
 						block_source = "base Block"
 					elif block_roll < strike_target.block_chance + plating:
-						block_source = "Heavy Plating"
+						block_source = plate_label
 				if block_source != "":
 					_stat("attacks")
 					_stat("attack_block")
@@ -3996,7 +4033,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						strike_target.plating_bonus = 0.0
 						strike_target.refresh_bars()
 						_log("   → Heavy Plating: the climbing bonus resets", "#8c9cc8")
-					# Unkillable: blocking mends the Warden — 2%/rank of the
+					# Unkillable: blocking mends the Warden — 8%/rank of the
 					# pool he brought INTO the battle, not the one Tenacity
 					# grows during it. Both talents trigger on the same Heavy
 					# Plating block, so reading live max_hp made every block
@@ -4007,7 +4044,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					if strike_target.unkillable_ranks > 0:
 						var unkill_base: int = strike_target.max_hp \
 							- strike_target.tenacity_hp_gained
-						var mend := maxi(int(unkill_base * 0.02
+						var mend := maxi(int(unkill_base * 0.08
 							* strike_target.unkillable_ranks), 1)
 						strike_target.heal_amount(mend)
 						strike_target.float_text("+%d" % mend, Color(0.4, 0.9, 0.45))
@@ -4015,14 +4052,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							strike_target.unit_name, mend], "#b0a8e0")
 					# Richocet: the shield answer can ring the attacker's skull.
 					if strike_target.ricochet_ranks > 0 and not attacker.dead \
-							and randf() < 0.05 * strike_target.ricochet_ranks:
+							and randf() < 0.35 * strike_target.ricochet_ranks:
 						_log("   → Talent: Richocet — the block staggers %s" % \
 							attacker.unit_name, "#b0a8e0")
 						_apply_status(attacker, "stunned", 1)
 					# Battered Not Broken: a Broken unit cannot Block at all,
 					# so blocking works to hold that fate off.
 					if strike_target.battered_ranks > 0 and strike_target.pressure > 0:
-						var bnb := mini(8 * strike_target.battered_ranks,
+						var bnb := mini(30 * strike_target.battered_ranks,
 							strike_target.pressure)
 						strike_target.pressure -= bnb
 						strike_target.refresh_bars()
@@ -4032,7 +4069,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# the most-attacked hero, a quiet party-wide Break engine.
 					if strike_target.bruising_ranks > 0 and not attacker.dead \
 							and not attacker.is_hero:
-						var bg_bd := 10 * strike_target.bruising_ranks
+						var bg_bd := 30 * strike_target.bruising_ranks
 						attacker.take_hit(0, bg_bd)
 						_stat_bd(strike_target, bg_bd)
 						attacker.float_text("+%d BD" % bg_bd, Color(0.8, 0.5, 1.0))
@@ -4041,19 +4078,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# Tenacity / Rally feed on Heavy Plating blocks alone.
 					if block_source == "Heavy Plating":
 						if strike_target.tenacity > 0:
-							strike_target.max_hp += 5
-							strike_target.tenacity_hp_gained += 5
+							strike_target.max_hp += 15
+							strike_target.tenacity_hp_gained += 15
 							strike_target.refresh_bars()
-							strike_target.float_text("+5 Max HP", Color(0.55, 0.9, 0.6))
-							_log("   → Talent: Tenacity — %s toughens (+5 max HP)" % \
+							strike_target.float_text("+15 Max HP", Color(0.55, 0.9, 0.6))
+							_log("   → Talent: Tenacity — %s toughens (+15 max HP)" % \
 								strike_target.unit_name, "#b0a8e0")
 						if strike_target.rally > 0:
 							var rinfo: Array = STATUS_INFO["rally_heal"]
 							for h in heroes:
 								if not h.dead:
 									h.add_status("rally_heal", rinfo[0], rinfo[1],
-										rinfo[2], 2, rinfo[3])
-							_log("   → Talent: Rally — the party is Rallied (+15% healing, 2 turns)",
+										rinfo[2], 3, rinfo[3])
+							_log("   → Talent: Rally — the party is Rallied (+30% healing, 3 turns)",
 								"#b0a8e0")
 					await _wait(0.4)
 					# Vengeful Guardian (capstone): the FIRST block each turn
@@ -4081,10 +4118,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# unblocked attack (cap +40%). Bad-luck protection, not
 					# choice: the on-block talents are guaranteed to fire on a
 					# dependable cadence. The chip shows the live total.
-					# Plate Discipline steepens the climb (+3%/rank), pulling
-					# blocks to roughly every second hit instead of every third.
+					# Plate Discipline steepens the climb (+12%/rank), taking
+					# the ramp to its +40% cap in two unblocked hits rather
+					# than five.
 					var wd_climb := 0.08 \
-						+ 0.03 * strike_target.plate_discipline_ranks
+						+ 0.12 * strike_target.plate_discipline_ranks
 					strike_target.plating_bonus = minf(
 						strike_target.plating_bonus + wd_climb, 0.40)
 					strike_target.refresh_bars()
@@ -4428,12 +4466,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and attacker.hp < attacker.max_hp * 0.25:
 				raw *= 1.5
 			# Grudge: the damage the Warden does keep is aimed at whoever
-			# he is holding — +6%/rank against targets HIS taunt binds.
-			if attacker.grudge_ranks > 0 and strike_target.has_status("mocked") \
+			# he is holding — +25%/rank against targets HIS taunt binds.
+			# The Rune of Grudges keeps its own advertised +6% in a SEPARATE
+			# term (Batch AL): it used to add a rank to this counter, and
+			# re-pricing the node from 6% to 25% would have quadrupled the
+			# rune's number without anyone touching the rune.
+			var grudge_cut := 0.25 * attacker.grudge_ranks \
+				+ attacker.rune_grudge_bonus
+			if grudge_cut > 0.0 and strike_target.has_status("mocked") \
 					and strike_target.status_power("mocked") == heroes.find(attacker):
-				raw *= 1.0 + 0.06 * attacker.grudge_ranks
-				_log("   → Talent: Grudge — +%d%% against his taunted mark" % (
-					6 * attacker.grudge_ranks), "#b0a8e0")
+				raw *= 1.0 + grudge_cut
+				_log("   → Talent: Grudge — +%d%% against his taunted mark" % \
+					int(round(grudge_cut * 100.0)), "#b0a8e0")
 			# Rune of the Reaper (rune_execute_bonus, its only read site):
 			# wounded prey — targets below 35% health — takes extra.
 			if attacker.rune_execute_bonus > 0.0 \
@@ -4537,13 +4581,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var pv_was := raw
 				raw *= 1.0 - 0.03 * strike_target.faith_stacks
 				_prev(_living_devout(), pv_was - raw)
-			# Iron Will: adversity hardens the Warden — 4%/rank less damage
+			# Iron Will: adversity hardens the Warden — 12%/rank less damage
 			# taken per debuff on him (the chip tracks the live total; the
 			# floor is a sanity clamp for absurd debuff piles).
 			if strike_target.iron_will_ranks > 0:
 				var iw_n := strike_target.count_debuffs()
 				if iw_n > 0:
-					var iw_pct := 4 * strike_target.iron_will_ranks * iw_n
+					var iw_pct := 12 * strike_target.iron_will_ranks * iw_n
 					var pv_was := raw
 					raw *= maxf(1.0 - 0.01 * iw_pct, 0.1)
 					_prev(strike_target, pv_was - raw)
@@ -4551,16 +4595,29 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						iw_pct, iw_n], "#b0a8e0")
 			# Shared Vigil: the line holds while the Warden stands tall —
 			# allies take less while he is above half health.
+			# The Rune of the Standard carries its own advertised 3% in a
+			# SEPARATE term (Batch AL, same reason as Grudge above), so the
+			# search cannot use _living_hero_with — that helper reads its
+			# field as an int, and a rune-only Warden would be invisible to
+			# it. Scanned here so EITHER half finds him.
 			if strike_target.is_hero and not strike_target.is_companion:
-				var sv_w := _living_hero_with("shared_vigil_ranks")
+				var sv_w: BattleUnit = null
+				for sv_h in heroes:
+					if not sv_h.dead and not sv_h.is_companion \
+							and (sv_h.shared_vigil_ranks > 0
+							or sv_h.rune_vigil_bonus > 0.0):
+						sv_w = sv_h
+						break
 				if sv_w != null and sv_w != strike_target \
 						and sv_w.hp > sv_w.max_hp * 0.5:
+					var sv_cut := 0.12 * sv_w.shared_vigil_ranks \
+						+ sv_w.rune_vigil_bonus
 					var pv_was := raw
-					raw *= 1.0 - 0.03 * sv_w.shared_vigil_ranks
+					raw *= 1.0 - sv_cut
 					_prev(sv_w, pv_was - raw)
 					_log("   → Talent: Shared Vigil — %s is covered (-%d%%)" % [
 						strike_target.unit_name,
-						3 * sv_w.shared_vigil_ranks], "#b0a8e0")
+						int(round(sv_cut * 100.0))], "#b0a8e0")
 			# Blessed Vestments: Renewal wraps its bearer in cloth-of-light
 			# — the blessing rides the status, while the Cleric stands.
 			if strike_target.is_hero and not strike_target.is_companion \
@@ -4817,16 +4874,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							_log("† %s dies" % h.unit_name, "#e05050")
 					final = share
 			# Steadfast (Warden talent): what would fell an ally, he takes on
-			# himself — 15%/rank of a blow that would leave them below 20%
+			# himself — 60%/rank of a blow that would leave them below 20%
 			# health is absorbed instead (Pressure still lands on the struck
-			# hero alone, like Unity).
+			# hero alone, like Unity). The mini(..., final - 1) below is what
+			# keeps the struck hero taking at least 1: at 60% the absorb is
+			# now large enough that the clamp does real work.
 			if final > 1 and strike_target.is_hero \
 					and not strike_target.is_companion:
 				var sf_w := _living_hero_with("steadfast_ranks")
 				if sf_w != null and sf_w != strike_target \
 						and strike_target.hp - final < int(strike_target.max_hp * 0.20):
 					var sf_part := mini(maxi(int(round(
-						final * 0.15 * sf_w.steadfast_ranks)), 1), final - 1)
+						final * 0.60 * sf_w.steadfast_ranks)), 1), final - 1)
 					final -= sf_part
 					var sf_res: Dictionary = sf_w.take_hit(sf_part, 0)
 					sf_w.float_text("-%d Steadfast" % sf_part, Color(0.95, 0.85, 0.4))
@@ -5060,7 +5119,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Crushing Blow (Warden talents): resist shred + BD splash.
 			if ab.display_name == "Crushing Blow" and not strike_target.dead \
 					and attacker.elem_weak_ranks > 0:
-				var shred := 5 * attacker.elem_weak_ranks
+				var shred := 20 * attacker.elem_weak_ranks
 				_apply_status(strike_target, "elem_weak", 3, shred)
 				# The chip carries the talent-scaled number.
 				strike_target.update_status("elem_weak", "-%d%%" % shred,
@@ -5069,7 +5128,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_note_debuff_applied(attacker, "elem_weak")
 			if ab.display_name == "Crushing Blow" and attacker.sundering_ranks > 0 \
 					and attacker.is_hero:
-				var splash_bd := int(round(pr * 0.25 * attacker.sundering_ranks))
+				var splash_bd := int(round(pr * 1.00 * attacker.sundering_ranks))
 				if splash_bd > 0:
 					var neighbors := _adjacent_enemies(strike_target)
 					for foe in neighbors:
@@ -5097,20 +5156,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var taunt_turns := 5 if is_perfect else 4
 					_apply_status(strike_target, "mocked", taunt_turns, mocker_idx)
 					_note_debuff_applied(attacker, "mocked")
-					# Provoke widens the net: +1 taunted foe per rank on top
-					# of the base one.
+					# Provoke widens the net: +2 taunted foes per rank on top
+					# of the one the base ability already drags in.
 					var others := enemies.filter(
 						func(e): return not e.dead and e != strike_target)
 					others.shuffle()
-					var taunt_extra := mini(1 + attacker.provoke_ranks, others.size())
+					var taunt_extra := mini(1 + 2 * attacker.provoke_ranks,
+						others.size())
 					for oi in taunt_extra:
 						_apply_status(others[oi], "mocked", taunt_turns, mocker_idx)
 					if attacker.provoke_ranks > 0 and taunt_extra > 1:
 						_log("   → Talent: Provoke — the taunt drags in %d more foes" % \
 							taunt_extra, "#b0a8e0")
-				# Tank and Spank: the taunt can Empower a random ally.
-				if attacker.tank_spank_ranks > 0 \
-						and randf() < 0.15 * attacker.tank_spank_ranks:
+				# Tank and Spank: the taunt Empowers a random ally — ALWAYS
+				# since Batch AL. Mocking Blow is free and on his rotation
+				# constantly, so a chance roll here read as noise rather than
+				# tension; nothing was ever planned around it.
+				if attacker.tank_spank_ranks > 0:
 					var pals := heroes.filter(func(h): return not h.dead)
 					if not pals.is_empty():
 						var pal: BattleUnit = pals.pick_random()
@@ -5139,16 +5201,29 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					int(round((CRIT_CHANCE + strike_target.crit_bonus) * 100)),
 					_dot_tick("burn", strike_target))
 			# Spite (Warden talent): laying hands on him costs — attackers
-			# take 8%/rank of the damage they dealt straight back.
+			# take 30%/rank of the damage they dealt straight back.
+			# CROSS-ROW (Batch AL): Spite and Bruising Guard used to be an
+			# exclusive fork. In separate rows both are reachable, and taking
+			# the second welds them into ONE Break engine — the reflect
+			# carries Break equal to half its damage. `spite_break` is the
+			# rider's only read site.
 			if strike_target.spite_ranks > 0 and final > 0 \
 					and not attacker.is_hero and not attacker.dead \
 					and attacker != strike_target:
 				var spite_dmg := maxi(int(round(
-					final * 0.08 * strike_target.spite_ranks)), 1)
-				var spite_res: Dictionary = attacker.take_hit(spite_dmg, 0)
+					final * 0.30 * strike_target.spite_ranks)), 1)
+				var spite_bd := 0
+				if strike_target.spite_break > 0:
+					spite_bd = maxi(int(round(spite_dmg * 0.5)), 1)
+				var spite_res: Dictionary = attacker.take_hit(spite_dmg, spite_bd)
 				attacker.float_text("-%d Spite" % spite_dmg, Color(0.9, 0.55, 0.4))
 				_log("   → Talent: Spite — %s takes %d damage back" % [
 					attacker.unit_name, spite_dmg], "#b0a8e0")
+				if spite_bd > 0:
+					_stat_bd(strike_target, spite_bd)
+					attacker.float_text("+%d BD" % spite_bd, Color(0.8, 0.5, 1.0))
+					_log("   → Talent: Bruising Guard — the spite carries %d Break damage" % \
+						spite_bd, "#b0a8e0")
 				if spite_res.died:
 					_stat("enemy_deaths")
 					_sfx("death", -4.0)
@@ -5400,11 +5475,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# (20% on a perfect cast; the damage is a 75-Attack tank's, the
 		# party refuel is the real payload).
 		if ab.display_name == "War Stomp" and attacker.is_hero and not attacker.dead:
+			# Rallying Cry's ABILITY RIDER (Batch AL): the node's body fires
+			# at his turn now, and this is the extra it pays a Warden who
+			# also owns the stomp.
 			var stomp_pct := (0.20 if is_perfect else 0.10) \
-				+ 0.05 * attacker.rallying_stomp_ranks
+				+ 0.20 * attacker.rallying_stomp_ranks
 			if attacker.rallying_stomp_ranks > 0:
-				_log("   → Talent: Rallying Stomp — the refuel deepens (+%d%%)" % (
-					5 * attacker.rallying_stomp_ranks), "#b0a8e0")
+				_log("   → Talent: Rallying Cry — War Stomp's refuel deepens (+%d%%)" % (
+					20 * attacker.rallying_stomp_ranks), "#b0a8e0")
 			for h in heroes:
 				if h.dead or h == attacker or h.resource_name == "":
 					continue
@@ -7241,8 +7319,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# bonus rides the Heavy Plating slice of the roll, so the blocks
 			# it buys wake Tenacity and Rally — the trade the ability is for.
 			# Shield Mastery (the re-specced wd_shieldwall node) now buys
-			# DURATION, the perfect cast included.
-			var wall_turns := (3 if is_perfect else 2) + attacker.shield_mastery_ranks
+			# DURATION, the perfect cast included — 2 turns per rank.
+			var wall_turns := (3 if is_perfect else 2) \
+				+ 2 * attacker.shield_mastery_ranks
 			_sfx("parry", -6.0, 0.5)
 			_apply_status(attacker, "shieldwall", wall_turns, SHIELDWALL_BLOCK,
 				0, attacker)
@@ -7254,6 +7333,29 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s sets the wall!" % attacker.unit_name)
 			_log("%s: Shieldwall — +%d%% Block chance for %d turns" % [
 				attacker.unit_name, SHIELDWALL_BLOCK, wall_turns], "#8c9cc8")
+			# Bulwark Line (Batch AL): the stance covers the LINE as well.
+			# The grant rides the same Heavy Plating slice of the block roll
+			# the Warden's own stance does, and holds exactly as long — so
+			# Shield Mastery lengthens the party's cover for free. He is
+			# excluded: his own +25% is already up, and stacking a second
+			# slice on the caster would make the node a self-buff.
+			if attacker.bulwark_ally_block > 0:
+				var bl_pct: int = attacker.bulwark_ally_block
+				var bl_covered := 0
+				for h in heroes:
+					if h.dead or h.is_companion or h == attacker:
+						continue
+					_apply_status(h, "bulwark_line", wall_turns, bl_pct, 0, attacker)
+					h.update_status("bulwark_line", "+%d%% Block" % bl_pct,
+						"Bulwark Line: +%d%% Block chance for %d more turn(s)\n(the Warden's Shieldwall)." % [
+							bl_pct, wall_turns], bl_pct)
+					h.float_text("COVERED", Color(0.75, 0.8, 0.95))
+					h.refresh_bars()
+					bl_covered += 1
+				if bl_covered > 0:
+					_log("   → Talent: Bulwark Line — the wall covers %d all%s (+%d%% Block)" % [
+						bl_covered, "y" if bl_covered == 1 else "ies", bl_pct],
+						"#b0a8e0")
 		"interpose":
 			# The tank verb the kit was missing: cover the whole line. Rides
 			# the existing shield_charges status — it already counts down,
@@ -7261,7 +7363,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# the ally is holding. Since Batch AB this is the ONLY source of
 			# guaranteed charges, which is why the block log names it.
 			_sfx("parry", -6.0, 0.5)
-			# Bulwark Line thickens the cover: +1 charge per rank per ally.
+			# Bulwark Line's ABILITY RIDER thickens the cover: +1 charge per
+			# ally, and only when the hero actually owns Interpose (Batch AL
+			# — the node's main body moved to Shieldwall, which he always
+			# has; this half is the bonus for having drawn Interpose too).
 			var sw_grant := 1 + attacker.bulwark_line_ranks
 			for h in heroes:
 				if h.dead or h.is_companion:
@@ -7284,17 +7389,29 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name,
 				" [PERFECT: the Warden too]" if is_perfect else ""], "#8c9cc8")
 		"hold_the_line":
+			# UPGRADED (Batch AL — the wd_hold_line capstone landing on a
+			# Hold the Line he already earned from a pool pick): the Break
+			# cut rises 50% -> 80% and the no-death window doubles. The cut
+			# rides the status' power so unit.gd keeps ONE read site; the
+			# undying turns carry the usual hero-turn tick offset, so "one
+			# turn" is 2 and "two turns" is 3.
+			var hl_up := attacker.hold_line_upgraded > 0
+			var hl_cut := 80 if hl_up else 50
+			var hl_undying := 3 if hl_up else 2
 			_sfx("heal", -5.0, 0.6)
 			for h in heroes.filter(func(he): return not he.dead):
-				_apply_status(h, "hold_bd", 2)
-				_apply_status(h, "undying", 2)
+				_apply_status(h, "hold_bd", 2, hl_cut)
+				h.update_status("hold_bd", "HL",
+					"Takes %d%% less Break damage." % hl_cut, hl_cut)
+				_apply_status(h, "undying", hl_undying)
 			if is_perfect:
 				attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
 				attacker.float_text("+5 Rage", Color(1.0, 0.5, 0.4))
 				attacker.refresh_bars()
 			_message("%s HOLDS THE LINE!" % attacker.unit_name)
-			_log("%s: Hold the Line — party takes 50%% less BD and cannot die" % \
-				attacker.unit_name, "#70d878")
+			_log("%s: Hold the Line — party takes %d%% less BD and cannot die%s" % [
+				attacker.unit_name, hl_cut,
+				" for two turns [UPGRADED]" if hl_up else ""], "#70d878")
 		"resurrection":
 			if target != null and target.dead:
 				var rez_frac := 0.25 if is_perfect else 0.2

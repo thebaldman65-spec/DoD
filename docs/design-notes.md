@@ -4,6 +4,81 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A node that modifies an ability you may never draw (Batch AL) — 2026-08-06
+
+**Batch AH created a class of dead talent quietly, and the Warden had two
+of them.** When abilities became earnable rather than opening kit, every
+node whose whole content was "ability X does more" stopped being a node
+and became a lottery ticket on X. Rallying Stomp modified War Stomp;
+Bulwark Line modified Interpose; AH moved both abilities into the spec
+pool. Neither node broke, logged, or crashed — it simply bought nothing,
+which is the same failure shape as Measured Rage's inert payload in Batch
+AJ, arriving through a different door.
+
+The fix is not to un-trim the kit. It is to notice **what the node was
+actually for** and move that to a trigger he always has. Rallying Cry
+still refuels the party; it just does it at his turn instead of on a
+button he may not own. Bulwark Line still throws cover over the line; it
+just rides Shieldwall, which has been base kit since Batch G. The earned
+ability then becomes a *bonus* on a node that already works — which is
+strictly better content than a node that is either great or worthless
+depending on a draw.
+
+**The general rule this leaves behind:** a talent may READ an earnable
+ability, but it must not DEPEND on one. Anything else prices a node
+against a probability instead of against the two doors it closes.
+
+## Chance is only tension if you can plan around it (Batch AL) — 2026-08-06
+
+Tank and Spank was a 15% chance to Empower an ally whenever Mocking Blow
+landed. Mocking Blow is free and on the Warden's rotation constantly, so
+the roll happened several times a battle and its outcome never changed a
+decision — you could not hold the taunt for it, spend around it, or notice
+when it failed. That is not variance, it is noise: the node's real value
+was its average, and the player experienced the average as "something
+occasionally happens".
+
+Made certain, the same node becomes a plan: taunt, then the Empowered ally
+swings. Randomness earns its place on a rare, expensive, or optional
+trigger — where the roll is an event. On a free button pressed every other
+turn it just blurs the number.
+
+## Splitting an exclusive pair can be better than keeping it (Batch AL) — 2026-08-06
+
+Spite and Bruising Guard were an exclusive fork: turn the punishment you
+soak into damage, or into Break. It reads like a real choice, but both
+halves answered the same question ("what does being hit pay?") with the
+same trigger, so the decision was really "which number do you prefer" —
+and one of them was always better for the party you happened to have.
+
+Split across rows 5 and 6 both are reachable, and the cross-row rider
+turns the second pick into something neither half was alone: one
+continuous Break engine, where the reflect he was already taking now also
+feeds the meter his blocks are chipping. The lesson is that an exclusive
+pair is only interesting when the two options **ask different questions**.
+When they ask the same one, separating them and paying for the
+combination is the better content.
+
+## A talent re-tune can silently re-tune a rune (Batch AL) — 2026-08-06
+
+Two Warden runes added a RANK to a talent counter. That was fine while a
+rank meant 6% — the rune read "+6% damage against his taunted mark" and
+paid exactly that. Re-pricing the node to 25% would have made the same
+untouched rune pay 25%, four times its own description, with nothing in
+the diff to show for it.
+
+This is worth naming because it is invisible from both ends. Reading
+runes.json, nothing changed. Reading talents.gd, nothing mentions runes.
+The coupling only exists in a battle.gd read site that multiplies a
+counter by a constant, and it will happen again to any rune that shares a
+counter with a node.
+
+**The rule: a rune and a talent may share a read site, but not a
+magnitude.** Batch AK hit this from the other side with the Rune of the
+Still Wrist, where a `max()` would have left the rune inert when worn
+alone; the same shape, the same answer — give the rune its own term and
+add them.
+
 ## Rows should ask a question (Batch AJ) — 2026-08-06
 
 **A row is a question and a lane is an answer.** Batch AI cut the old
