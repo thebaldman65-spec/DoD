@@ -175,16 +175,94 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   bleed buildup meter, outline shader hover).
 - Screens: main_menu → draft (pick 4 + relics) → spec_choice (permanent) →
   map (THE hub: the road, four hero cards, potions, burger) → offer (before
-  every fight/elite) → battle → sometimes shop and/or event → back to map.
+  every elite/mini-boss) → battle → sometimes shop and/or event → back to map.
   party.tscn is the HERO SHEET now, opened from a card.
 
 ## Current systems snapshot (2026-08-07)
+BATCH AO (08-07) — DIRECTION, GATING, KILL SWITCH. Three changes from playing
+AN. No new systems and no balance work beyond ONE gold number.
+§1 THE ROAD READS LEFT TO RIGHT. `SLOT_X_START` 1196.0 -> 84.0 (the exact
+mirror across the 1280-wide screen, so the margins are the old ones reversed)
+and `_slot_pos()` ADDS the step; `SLOT_X_STEP` is unchanged at 98.0. Both
+Line2D draws read `_slot_pos()` so the road and the walked stretch followed
+with no edit. THE COMPASS LABEL IS DELETED — it existed only because the
+direction was unconventional, and a caption explaining which way to read a
+line is a cost the line should not need. The slot numbers 1-12 STAY (twelve
+near-identical dots want a ruler either way); their comment no longer claims
+the boss-on-the-left made counting hard. The `ON THE READING DIRECTION`
+paragraph is gone from the file header. In-game text corrected with the code:
+the Batch Z FRAMING CARD said "RIGHT TO LEFT" and it now says left to right.
+§2 THE OFFER MOVES TO ELITES AND MINI-BOSSES — 4 encounters a zone, not 10. A
+bargain before all eight plain fights was a toll booth; it is an event now.
+Gate is `if ty in ["elite", "miniboss"]` in BOTH map_screen._on_slot_pressed
+AND run_sim._walk (the harness must walk the road the player walks). Bosses
+still get NOTHING. `claim_reward()` is already on every victory path and
+returns empty when nothing is pending, so plain fights needed no special case.
+A MINI-BOSS NOW FIGHTS UNDER A MODIFIER, deliberately: every enemy in its
+warband already carries 1.5x max HP, so a severity-4 pick there is the
+sharpest gamble in the run, and the severity-1-or-2 floor is what makes it a
+choice rather than a trap. Its existing spoils (elite gold, 1 talent point,
+the ability-upgrade pick) are untouched and STACK with the bargain reward.
+offer_screen's subtitle is THREE-WAY now (elite / mini-boss "the WARDEN of
+this zone blocks the road" / plain fight KEPT as a defensive default though
+nothing routes there). Map dot tooltips moved with the gate: the mini-boss dot
+announces the bargain, the plain-fight dot no longer does.
+FIGHT GOLD 25-35 -> **45-60**, one number in one place (`Run.award_gold`).
+Elite/mini-boss 80-100 and boss 110-130 UNCHANGED. Deliberately BELOW the old
+bargain payout, because a plain fight no longer charges a modifier for it.
+§3 BATTLE `DEBUG ▾` -> KILL ALL ENEMIES (id 3 — 0/1/2 and 10+ were taken).
+`_debug_kill_enemies()`: returns on `battle_over`; for every living enemy sets
+`hp = 0`, calls `_die()`, `refresh_bars()`; logs one line in the debug colour;
+sets `action_panel.visible = false` (a turn parked on `await _ability_picked`
+would otherwise leave live buttons under the victory panel); calls
+`_check_end()` LAST so the NORMAL victory branch runs — gold, points, the 15%
+heal, claim_reward, elite spoils, the summary. **IT IS A SWITCH, NOT A HIT**:
+it does NOT route through `take_hit`, so no damage event, no on-hit/overkill
+proc, no floating number — and the accepted cost is that ON-DEATH TALENT PROCS
+READING A KILLING BLOW (Seeding Embers and friends) DO NOT FIRE. It inherits
+`_debug_allowed()` and the single `Run.debug_used` honesty write at the top of
+the dispatch — battle.gd still has EXACTLY ONE write site (asserted).
+VERIFIED: check_parse 0 failures, check_flow 0 failures (6 screens), 11 scenes
+0 SCRIPT ERROR. test_batch_an 5667/0, test_batch_ah 5416/0, ah_battle 65/0,
+ai 2036/0, aj 389/0, ak 524/0, al 556/0, test_runes 2982/0, run-harness gates
+1/2/3 PASS. test_batch_ah's master.html STAMP GATE was bumped AN -> AO (that
+is the one thing it exists to make you do); no test asserted the old routing
+or the old x-geometry, so nothing else moved. SCRATCH (moved to the
+scratchpad, NOT committed — the batch forbade new scaffolding): check_ao.gd
+24/0 reads the twelve slot-button x positions OFF THE LIVE SCREEN and asserts
+they ascend + the compass label is absent + both gates in source + all four
+gold bands over 400 rolls each; check_ao_live.gd 27/0 drives a REAL mini-boss
+battle (bargain accepted, modifier armed) and a real plain fight through the
+switch and reads the booking off Run — no damage in `_run_slice`, panel
+hidden, battle_over, gold paid, party healed, modifier cleared, the talent
+point paid on the mini-boss and NOT on the fight, four upgrade picks owed.
+PURITY: profile.json/relics.json/trees.json byte-identical, no run_save.bin
+left behind.
+KNOWN-BAD, NOT OURS: test_rune_battle 91/1 (the Inferno chip check), the
+standing defect since AK.
+SEEN ONCE, NOT REPRODUCED: test_batch_al read 556/1 on one invocation and
+556/0 on the eight after it; the failing check was not captured. Nothing this
+batch touches is on AL's path (Warden tree, live block/taunt battles). Watch
+it; do not treat 3/3 clean as proof it is gone.
+SIM SMOKE ONLY, NO DIFFICULTY SIGNAL — n=20 is far below the resolvable
+difference (completions band +/-17.5 pts at that n) and this batch has no
+control row: `./sim.sh --run 20` walked clean, 0 SCRIPT ERROR, and the two
+numbers that PROVE THE GATE MOVED are bargains taken 6.0/run (was one per
+fight and elite) and gold earned 2036/run. Read those as instrumentation, not
+as balance.
+REPORTED NOT ACTED ON: (a) test_batch_ah.gd:202 formats an Array into a bare
+`%s` (`... % cross`), so that one check spews "String formatting error" to
+stderr on every run — PRE-EXISTING on HEAD, harmless today, but it would
+swallow the message if the check ever failed. One char (`% [cross]`).
+(b) `Talents.desc_for` still renders `String.num(v, 2)` — "+25.00%" in every
+tooltip of all twelve trees, still a one-line fix.
 BATCH AN (08-07) — MAP SCAFFOLD. The branching node map is GONE; a run is a
 LINE of 3 zones x 12 slots = 36. Every zone is the IDENTICAL authored shape
 (Run.ZONE_SHAPE): fight fight ELITE fight fight MINI-BOSS fight fight ELITE
-fight fight BOSS. Zone 3's boss is the end boss. Renders RIGHT TO LEFT (slot 1
-right edge, boss left) — flagged as unconventional, shipped as specified; it
-is SLOT_X_START/SLOT_X_STEP in map_screen.gd if it flips.
+fight fight BOSS. Zone 3's boss is the end boss. Renders LEFT TO RIGHT (slot 1
+left edge, boss right) — AN shipped it right-to-left having flagged that as
+unconventional, and BATCH AO FLIPPED IT; it is SLOT_X_START/SLOT_X_STEP in
+map_screen.gd.
 REWARDS AND MODIFIERS IN THIS BATCH ARE PLACEHOLDERS, deliberately — the point
 was a playable 36-slot run to feel the pacing before 66 pieces of content get
 authored against it.
@@ -207,7 +285,8 @@ AND CLEARED on load — a party at tier 7 column 2 has no honest position on a
 line with no columns (the Batch AI call about ranked purchases, applied to the
 board). _migrate_trees() lost its save_version arg with the pre-AI branch.
 THE OFFER (§3, new scenes/offer.tscn + scripts/offer_screen.gd): 3 bargains
-before every FIGHT and ELITE, none before mini-bosses/bosses. One MODIFIER
+before every ELITE and MINI-BOSS (BATCH AO re-gated it; AN shipped it before
+every fight and elite), none before plain fights/bosses. One MODIFIER
 (binds BOTH parties) + one REWARD, both visible, no decline. Severity 1-4 is
 FLAT and authored per modifier; REWARDS is keyed on it. THE FLOOR — every
 offer holds a severity 1 or 2 — is guaranteed BY CONSTRUCTION (first draw out
@@ -2440,8 +2519,9 @@ arrow; hover/Tab lights plates; plain style until UI assets arrive); parties
 grouped tight; combat log hideable (– button). SPECCED HEROES DISPLAY THEIR
 SPEC NAME everywhere (unit_name = spec; logic keys on unit.hero_key — never
 match display names!). Battle DEBUG ▾ menu (bottom-right): Full Restore,
-Reset cooldowns, Enemy attacks OFF, per-hero turn LOCK (every HERO turn
-theirs — enemies still act; displaced heroes' clocks tick as if they acted).
+Kill All Enemies (Batch AO, id 3), Cooldowns OFF, Enemy attacks OFF, per-hero
+turn LOCK (every HERO turn theirs — enemies still act; displaced heroes'
+clocks tick as if they acted).
 Renewal is Holy-only (15 HP/turn). Cleric core has Resurrection (40 Faith,
 revive 20% hp/resource, targets the fallen); Devout has Divine Wrath
 ("wrath" status +15% dmg/speed); Occultist: Shadowrend basic (via

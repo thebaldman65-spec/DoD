@@ -1002,6 +1002,7 @@ func _build_debug_panel() -> void:
 	ui.add_child(menu)
 	_debug_popup = menu.get_popup()
 	_debug_popup.add_item("Full Restore", 0)
+	_debug_popup.add_item("Kill All Enemies", 3)
 	_debug_popup.add_check_item("Cooldowns OFF", 2)
 	_debug_popup.add_check_item("Enemy attacks OFF", 1)
 	_debug_popup.add_separator("Turn lock — all hero turns")
@@ -1027,6 +1028,9 @@ func _on_debug_menu(id: int) -> void:
 	Run.debug_used = true
 	if id == 0:
 		_debug_full_restore()
+		return
+	if id == 3:
+		_debug_kill_enemies()
 		return
 	if id == 2:
 		var cd_idx := _debug_popup.get_item_index(2)
@@ -1069,6 +1073,30 @@ func _debug_full_restore() -> void:
 			u.second_resource = u.second_max
 		u.refresh_bars()
 	_log("DEBUG: party fully restored", "#e0a050")
+
+
+# Batch AO §3: reach the victory screen on demand. It is a SWITCH, not a hit
+# — the enemies are set dead directly rather than routed through take_hit, so
+# there is no damage event, no on-hit or overkill proc, and no floating
+# number. The deliberate consequence: on-death talent procs that read a
+# killing blow (Seeding Embers and friends) do not fire on a nuked kill.
+# Everything AFTER the kills is the real victory path — _check_end books the
+# gold, the talent points, the 15% heal, claim_reward, elite spoils and the
+# summary, which is exactly what a tester needs to see.
+func _debug_kill_enemies() -> void:
+	if battle_over:
+		return
+	for e in enemies:
+		if e.dead:
+			continue
+		e.hp = 0
+		e._die()
+		e.refresh_bars()
+	_log("DEBUG: every enemy struck down", "#e0a050")
+	# A turn parked on `await _ability_picked` would otherwise leave live
+	# buttons sitting under the victory panel.
+	action_panel.visible = false
+	_check_end()
 
 
 func _debug_toggle_enemies(off: bool) -> void:

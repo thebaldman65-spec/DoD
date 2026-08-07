@@ -1,7 +1,8 @@
-# The offer screen (Batch AN §3): before every FIGHT and ELITE slot the
-# player is shown three bargains and takes one. A bargain is one MODIFIER
-# (a condition binding BOTH parties for that battle) plus one REWARD, both
-# visible before choosing.
+# The offer screen (Batch AN §3, re-gated in AO §2): before every ELITE and
+# MINI-BOSS slot the player is shown three bargains and takes one. A bargain
+# is one MODIFIER (a condition binding BOTH parties for that battle) plus one
+# REWARD, both visible before choosing. Plain fights and bosses walk straight
+# in — four bargains a zone is an event, ten was a toll booth.
 #
 # The reward scales with the modifier's SEVERITY automatically — severity is
 # authored per modifier, flat, and deliberately ignores party composition. A
@@ -60,10 +61,18 @@ func _draw_screen() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
-	var is_elite: bool = String(Run.encounter.get("type", "fight")) == "elite"
+	# Three-way, because the mini-boss reached this screen in Batch AO. The
+	# plain-fight line is kept as a defensive default: nothing routes here
+	# from a fight today, and a screen that says nothing is worse than a
+	# screen that says the ordinary thing.
+	var enc_type := String(Run.encounter.get("type", "fight"))
+	var opener := "A warband stands in the road."
+	if enc_type == "elite":
+		opener = "An ELITE warband stands in the road."
+	elif enc_type == "miniboss":
+		opener = "The WARDEN of this zone blocks the road."
 	var sub := Label.new()
-	sub.text = ("An ELITE warband stands in the road." if is_elite
-		else "A warband stands in the road.") \
+	sub.text = opener \
 		+ "  Choose the terms you will fight on —\n" \
 		+ "the condition binds BOTH sides, and the payment lands when they fall."
 	sub.add_theme_font_size_override("font_size", 15)

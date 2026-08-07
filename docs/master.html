@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-07 (Batch AN)</b></p>
+<p align="right"><b>Last updated: 2026-08-07 (Batch AO)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -18,7 +18,7 @@ timing skill check on every action — the player's execution matters as much as
 <h2>2. Run Flow</h2>
 <p><b>Main Menu</b> → <b>Draft</b> (pick 4 heroes + equip up to 3 relics) →
 <b>Spec Choice</b> (permanent; heroes begin with <b>no runes</b> and three empty slots) →
-<b>Map</b> (the road) → <b>Offer</b> (three bargains, before every fight and elite) →
+<b>Map</b> (the road) → <b>Offer</b> (three bargains, before every elite and mini-boss) →
 <b>Battle</b> → sometimes <b>Shop</b> and/or <b>???</b> → back to the map → …
 → <b>Mini-boss</b> → … → <b>Zone Boss</b> → next zone (party fully restored) →
 <b>end boss</b> → run complete. Talents, runes and picks are all handled on the map's hero
@@ -73,8 +73,8 @@ has the <b>identical</b> shape. Nothing is dealt and nothing is rolled — the s
 <p>Zone 3's boss is the <b>end boss</b>: the run ends on its death. There is no route to
 plan — the only forward move is the next encounter — so the run's decisions live on the
 <b>offer screen</b> (§3a) rather than in routing.</p>
-<p><b>The road reads RIGHT TO LEFT:</b> encounter 1 sits on the right edge and the boss on
-the left. Each encounter is a dot on the line; the current position is marked, cleared dots
+<p><b>The road reads LEFT TO RIGHT:</b> encounter 1 sits on the left edge and the boss on
+the right. Each encounter is a dot on the line; the current position is marked, cleared dots
 dim, and dots ahead show their type by colour. <b>Hovering a dot scouts it</b> — theme, full
 lineup, and the band's damage-type identity ("Resists: Nature x3 / Soft to: Fire x2"), from
 the moment the zone is generated. <b>Mini-boss and boss dots show their type but not their
@@ -82,15 +82,19 @@ identity:</b> the player learns which boss they drew only by fighting the mini-b
 <p><b>The mini-boss holds the middle of every zone.</b> Encounter 6 is an <b>elite warband
 carrying a boss-tier health pool</b> (every enemy at 1.5&times; its usual maximum, attack
 untouched — a longer fight, not a harder-hitting one). It pays <b>elite gold (80&ndash;100)
-and 1 talent point</b>, and its own spoil is a <b>generic ability upgrade</b> (§6a). No
-modifier and no offer precedes it: mini-bosses and bosses are fixed encounters.</p>
+and 1 talent point</b>, and its own spoil is a <b>generic ability upgrade</b> (§6a). <b>The
+offer precedes it</b> (§3a), so a mini-boss is fought under a modifier — with every enemy
+already at 1.5&times; health a severity-4 pick is a real gamble, and the guaranteed
+low-severity option is what makes it a choice rather than a trap. Its spoils stack with the
+bargain's reward. <b>Bosses</b> remain fixed encounters: no modifier, no offer.</p>
 <p><b>Elites are the snowball engine.</b> An elite kill pays <b>1 talent point</b>, drops a
 <b>rune cache</b> for a random hero (three candidates rolled at the kill, one chosen on that
 hero's card), plus a random consumable and a bigger gold purse (80&ndash;100).</p>
 
 <h3>3a. The offer &mdash; three bargains</h3>
-<p>Before every <b>fight and elite</b> encounter — not mini-bosses, not bosses — the player is
-shown <b>3 options</b> and picks one. Each option is one <b>modifier</b> plus one
+<p>Before every <b>elite and mini-boss</b> encounter — not plain fights, not bosses — the
+player is shown <b>3 options</b> and picks one. That is <b>four a zone</b>: the bargain is an
+event on the road, not a gate in front of every battle. Each option is one <b>modifier</b> plus one
 <b>reward</b>, both visible before choosing. There is no decline.</p>
 <p>A modifier is a condition that <b>binds both parties</b> for that battle. Each carries a
 <b>severity of 1&ndash;4</b>, and <b>the reward table reads that severity</b> — so authoring a
@@ -1274,7 +1278,7 @@ Elemental Weakness the resist reduction, Unrelenting Assault its borrowed Consti
 
 <h2>8. Economy</h2>
 <ul>
-<li><b>Gold:</b> start 60 (+80 with Gravewrought Coin). Fight 25–35, elite and mini-boss
+<li><b>Gold:</b> start 60 (+80 with Gravewrought Coin). Fight 45–60, elite and mini-boss
 80–100, boss 110–130.</li>
 <li><b>Talent points:</b> spec choice 1, then elite 1 / mini-boss 1 / boss 1 and fight 0 —
 4 a zone, 12 a run, 13 with the awakening, against a complete tree of 8 (§7).</li>
@@ -1575,7 +1579,7 @@ The draft screen stays clean — no passive text there.</li>
 <li><b>Shop (The Wandering Peddler):</b> consumables column + one rune offer per party member;
 reached when a cleared fight or elite schedules one (§3b). A consumable already at its cap of
 6 greys its own button rather than taking the gold.</li>
-<li><b>Offer screen:</b> three bargain cards before every fight and elite (§3a) — severity
+<li><b>Offer screen:</b> three bargain cards before every elite and mini-boss (§3a) — severity
 number, a four-pip severity bar, the modifier's name and effect, and what it pays on victory.
 The party's HP and the warband being faced are both on screen, because choosing a
 severity-4 bargain at 30% health should be an informed decision.</li>
@@ -1771,7 +1775,10 @@ point.</code>, in the panel and in the <b>Copy summary</b> clipboard text both, 
 summary is the alpha's feedback channel and a debug-touched run is not a data point.
 Simulated runs can never set it: they load neither the map nor the battle menus.</li>
 <li>In battle, a <b>DEBUG ▾ menu</b> (bottom-right)
-offers: Full Restore (HP/resources/secondary for the party), a <b>Cooldowns OFF</b>
+offers: Full Restore (HP/resources/secondary for the party), <b>Kill All Enemies</b> (every
+living enemy is switched off — no damage event, no on-hit or on-death proc — and the normal
+victory flow runs: gold, talent points, the heal, the bargain's reward, elite spoils and the
+summary), a <b>Cooldowns OFF</b>
 toggle (while checked, hero abilities never go on cooldown; existing cooldowns clear on
 enabling — enemies carry none), an
 <b>Enemy attacks OFF</b> toggle (enemies skip their turns while checked), and a <b>turn

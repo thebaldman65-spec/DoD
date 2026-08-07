@@ -5,6 +5,45 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-07 — Batch AO: map direction, offer gating, and a kill switch</h2>
+<p><i>Three changes from playing Batch AN. No new systems, and no balance work beyond the
+one gold number in the second item.</i></p>
+<ul>
+<li><b>The road now reads LEFT TO RIGHT.</b> Encounter 1 sits on the left edge and the boss
+on the right. Batch AN flagged right-to-left as unconventional and shipped it anyway; it
+read wrong in play, so it is flipped. It was two constants, as AN said it would be
+(<code>SLOT_X_START</code> moves to the exact mirror of its old value across the 1280-wide
+screen, and the step now adds instead of subtracting — the line keeps its old margins,
+reversed). <b>The compass label under the road is deleted:</b> it existed only because the
+direction was unconventional, and left-to-right is what a reader already assumes. The slot
+numbers 1–12 under the dots stay — twelve near-identical dots want a ruler whichever way the
+road runs.</li>
+
+<li><b>The offer moves to ELITES and MINI-BOSSES; plain fights pay gold instead.</b> A
+bargain screen before all eight plain fights in a zone made it a toll booth. It is an event
+now: <b>four encounters a zone instead of ten</b>. Bosses still get no offer. A <b>mini-boss
+is therefore fought under a modifier</b>, which is intended — every enemy in a mini-boss
+warband already carries 1.5× max HP, so a severity-4 pick there is a real gamble, and the
+guaranteed low-severity option is what makes it a choice rather than a trap. The mini-boss's
+existing spoils (elite gold, 1 talent point, the ability-upgrade pick) are untouched and now
+stack with the bargain's reward. <b>Plain-fight gold covers the hole: 25–35 → 45–60.</b>
+Elite/mini-boss (80–100) and boss (110–130) are unchanged. It is deliberately below the old
+bargain payout, because a plain fight no longer charges a modifier for it. The severity-1-or-2
+floor, the no-decline rule and reward-on-victory are all unchanged, and the run sim's harness
+walks the same gate so a simulated run walks the road the player walks.</li>
+
+<li><b>New: battle DEBUG ▾ → Kill All Enemies.</b> A tester can reach the victory screen on
+demand. It is a <b>switch, not a hit</b>: every living enemy is set to 0 HP and killed
+directly rather than through the damage path, so there is no damage event, no on-hit or
+overkill proc and no floating number. The deliberate consequence is that on-death talent
+procs which read a killing blow (Seeding Embers and friends) do not fire on a nuked kill —
+the accepted cost of a switch. Everything after the kills is the <b>real victory path</b>:
+gold, talent points, the 15% heal, the bargain's reward, elite spoils and the run summary,
+which is exactly what needs testing. It inherits the existing debug gate and the
+<code>debug_used</code> honesty flag from the menu's one dispatch, so a debug-touched run
+still declares itself in the summary.</li>
+</ul>
+
 <h2>2026-08-07 — Batch AN: the map scaffold</h2>
 <p><i>Rewards and modifiers in this batch are <b>PLACEHOLDERS</b> drawn from content that
 already exists. The point is to make a full 36-encounter run playable so the pacing can be

@@ -1713,3 +1713,47 @@ edge-column adjacency bug this batch also deleted: it survived three batches
 because the code that produced it still resolved, still ran, and disagreed
 with its own comment. A constant that still compiles is a constant a later
 batch reads by accident.
+
+## Batch AO — the direction, the toll booth, and the switch (2026-08-07)
+
+**Right-to-left was flagged, shipped, and read wrong.** AN said in its own
+comment that horizontal run-maps conventionally read left to right and that
+an English-reading player may parse the boss end as the start — then chose
+the unconventional direction and shipped it behind a compass label. Playing
+it settled the question the reasoning could not. Worth keeping is the shape
+of the fix: the label went out with the direction, because a caption
+explaining which way to read a line is a cost the line should not need. If a
+layout needs a legend, the legend is not the deliverable — the layout is
+wrong.
+
+**A choice offered ten times a zone is a toll booth, not a decision.** The
+offer was not weak, it was constant: eight plain fights plus two elites meant
+the bargain screen sat between the player and every battle, so the interesting
+question ("what will I accept for this?") flattened into a tax with three
+tickets. Cutting it to four a zone — the elites and the mini-boss — costs
+nothing about the mechanic and restores the thing that made it a decision,
+which is that it does not always happen.
+
+**The mini-boss gets a modifier deliberately, and the floor is what makes it
+fair.** Every enemy in a mini-boss warband already carries 1.5× max HP, so a
+severity-4 pick there is the sharpest gamble in the run. That is the point.
+It only works because the severity-1-or-2 floor is guaranteed by construction:
+without a survivable option the gamble would be a trap, and the floor is what
+converts "the game punished me" into "I chose that".
+
+**The gold moved because the price did.** Eight bargains a zone disappeared,
+and a bargain paid for itself. Plain-fight gold rose 25–35 → 45–60,
+deliberately below the old bargain payout — a fight that no longer charges a
+modifier should not pay what a fight that did paid. The number is one line in
+one place, which is the only reason it belongs in a batch that is otherwise
+not doing balance work.
+
+**Kill All Enemies is a switch, not a hit, and that costs something.** Routing
+it through `take_hit` would have been fewer lines and would have fired
+on-hit procs, overkill transfers and floating numbers on a kill nobody dealt
+— a debug tool that quietly runs game logic is a debug tool that lies about
+what it tested. Setting HP to zero and calling `_die()` skips all of it, and
+the accepted cost is that on-death procs reading a killing blow (Seeding
+Embers and friends) will not fire. Everything *after* the kills is the real
+victory path on purpose: gold, points, the heal, the bargain's reward, the
+spoils, the summary. The switch exists to reach that path, not to replace it.

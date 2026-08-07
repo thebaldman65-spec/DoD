@@ -995,7 +995,10 @@ func clear_save() -> void:
 
 
 func award_gold(node_type: String) -> int:
-	var amount := randi_range(25, 35)
+	# Batch AO §2: a plain fight no longer charges a modifier for its pay, so
+	# the eight bargains a zone lost are covered here — deliberately BELOW the
+	# old bargain payout, because the fight is now unconditional.
+	var amount := randi_range(45, 60)
 	match node_type:
 		"elite", "miniboss":
 			# Elites pay out hard — seeking them out is how skilled players snowball.

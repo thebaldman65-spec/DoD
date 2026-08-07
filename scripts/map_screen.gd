@@ -1,18 +1,13 @@
-# The run map (Batch AN): a FIXED LINE of 12 slots for the current zone,
-# rendered RIGHT TO LEFT — slot 1 on the right edge, the boss on the left.
-# There is no route to plan: the only forward move is the next dot, and the
-# run's decisions live on the offer screen that precedes every fight and
-# elite.
+# The run map (Batch AN, flipped in AO): a FIXED LINE of 12 slots for the
+# current zone, rendered LEFT TO RIGHT — slot 1 on the left edge, the boss on
+# the right. There is no route to plan: the only forward move is the next
+# dot, and the run's decisions live on the offer screen that precedes every
+# elite and mini-boss.
 #
 # THIS SCREEN IS ALSO THE PARTY SCREEN NOW. All four hero stat cards live
 # here rather than behind a Party button — HP, resource, three rune slots,
 # unspent points — and the potion inventory is INTERACTIVE (§6). Clicking a
 # card opens that hero's talent tree; clicking a rune slot opens the pouch.
-#
-# ON THE READING DIRECTION: horizontal run-maps conventionally read left to
-# right, so an English-reading player may parse the boss end as the start.
-# The batch flagged that, chose right-to-left anyway, and asked for it to
-# ship — it is one constant (SLOT_X_START / SLOT_X_STEP's sign) if it flips.
 extends Node2D
 
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
@@ -29,9 +24,9 @@ const NODE_COLORS := {
 }
 
 # The line's geometry. Slot 0 sits at SLOT_X_START and each later slot steps
-# LEFT by SLOT_X_STEP — the whole right-to-left decision is these two
+# RIGHT by SLOT_X_STEP — the whole left-to-right reading is these two
 # numbers, and flipping the map is negating the step and moving the start.
-const SLOT_X_START := 1196.0
+const SLOT_X_START := 84.0
 const SLOT_X_STEP := 98.0
 const SLOT_Y := 250.0
 const DOT_R := 15.0
@@ -87,11 +82,11 @@ func _maybe_show_framing() -> bool:
 	vbox.add_child(title)
 	var body := Label.new()
 	body.text = ("A run is a road of 36 encounters — three zones of twelve, and\n" +
-		"every zone has the same shape. The road reads RIGHT TO LEFT: you\n" +
-		"start at the right edge and the zone's boss waits on the left.\n\n" +
+		"every zone has the same shape. The road reads LEFT TO RIGHT: you\n" +
+		"start at the left edge and the zone's boss waits on the right.\n\n" +
 		"Two ELITES, one MINI-BOSS and the BOSS stand in every zone, and\n" +
 		"each of them pays a talent point. Ordinary fights pay none.\n\n" +
-		"Before every fight and elite you are offered THREE BARGAINS: a\n" +
+		"Before every elite and mini-boss you are offered THREE BARGAINS: a\n" +
 		"condition that binds both sides of the battle, and what clearing\n" +
 		"it under that condition pays. The harder the condition, the richer\n" +
 		"the payment — and one of the three is always survivable.\n\n" +
@@ -115,7 +110,7 @@ func _maybe_show_framing() -> bool:
 
 
 func _slot_pos(slot: int) -> Vector2:
-	return Vector2(SLOT_X_START - slot * SLOT_X_STEP, SLOT_Y)
+	return Vector2(SLOT_X_START + slot * SLOT_X_STEP, SLOT_Y)
 
 
 func _draw_screen() -> void:
@@ -276,8 +271,8 @@ func _draw_line() -> void:
 			btn.tooltip_text = "[DEBUG] " + btn.tooltip_text
 		add_child(btn)
 
-		# The slot number under each dot: 12 identical-looking fights want a
-		# ruler, and the boss end being on the left makes counting harder.
+		# The slot number under each dot: twelve near-identical dots want a
+		# ruler, whichever way the road runs.
 		var num := Label.new()
 		num.text = str(s + 1)
 		num.add_theme_font_size_override("font_size", 10)
@@ -287,16 +282,6 @@ func _draw_line() -> void:
 		num.size = Vector2(w, 12)
 		num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		add_child(num)
-
-	# A one-line compass so the reading direction is stated, not inferred.
-	var compass := Label.new()
-	compass.text = "◄ the boss lies this way              you started here ►"
-	compass.add_theme_font_size_override("font_size", 11)
-	compass.add_theme_color_override("font_color", Color(0.55, 0.52, 0.58))
-	compass.position = Vector2(0, SLOT_Y + 40)
-	compass.size = Vector2(1280, 14)
-	compass.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(compass)
 
 	if free_travel:
 		var marker := Label.new()
@@ -319,12 +304,14 @@ func _slot_tooltip(slot: Dictionary, s: int) -> String:
 	if ty in ["miniboss", "boss"]:
 		var what := "A mini-boss holds the middle of the zone." if ty == "miniboss" \
 			else "The zone's boss. Nothing goes around it."
-		return "%s\nYou will not know which until you meet it." % what
+		var tail := "\n\nA bargain is offered before it." if ty == "miniboss" else ""
+		return "%s\nYou will not know which until you meet it.%s" % [what, tail]
 	var head := "Encounter %d of %d" % [s + 1, Run.SLOTS_PER_ZONE]
+	var bargain := ""
 	if ty == "elite":
 		head += " — ELITE"
-	return "%s\n%s\n\nA bargain is offered before this fight." % [
-		head, _warband_tooltip(slot)]
+		bargain = "\n\nA bargain is offered before this fight."
+	return "%s\n%s%s" % [head, _warband_tooltip(slot), bargain]
 
 
 func _add_debug_outline(at: Vector2, size: Vector2) -> void:
@@ -969,9 +956,9 @@ func _on_slot_pressed(s: int) -> void:
 	Run.encounter = {"type": ty, "enemies": warband,
 		"theme": slot.get("theme", "Warband")}
 	Run.save_run()
-	# §3: fights and elites are preceded by the offer. Mini-bosses and bosses
-	# are fixed encounters — no modifier, no offer.
-	if ty in ["fight", "elite"]:
+	# Batch AO §2: the offer is an EVENT, not a toll booth — fights and bosses
+	# walk straight in, elites and mini-bosses are preceded by the bargain.
+	if ty in ["elite", "miniboss"]:
 		get_tree().change_scene_to_file("res://scenes/offer.tscn")
 	else:
 		get_tree().change_scene_to_file("res://scenes/battle.tscn")

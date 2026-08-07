@@ -243,11 +243,13 @@ static func walk_to_next_fight(run: Node) -> bool:
 		_seen_nodes[seen_key] = true
 		deck_seen[ty] = int(deck_seen.get(ty, 0)) + 1
 	run.advance(s)
-	# §3: the offer. The bot takes the SEVEREST bargain it is offered while
-	# the party is healthy and the MILDEST once it is hurt — the crudest
-	# policy that exercises both ends of the severity table, and the one a
-	# cautious human most resembles. It is a policy, not a recommendation.
-	if ty in ["fight", "elite"]:
+	# §3: the offer, gated to elites and mini-bosses by Batch AO §2 — the
+	# harness must walk the road the player walks. The bot takes the SEVEREST
+	# bargain it is offered while the party is healthy and the MILDEST once it
+	# is hurt — the crudest policy that exercises both ends of the severity
+	# table, and the one a cautious human most resembles. It is a policy, not
+	# a recommendation.
+	if ty in ["elite", "miniboss"]:
 		_take_offer(run)
 	var warband: Array = node.get("enemies", [])
 	if warband.is_empty():
