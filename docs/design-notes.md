@@ -4,6 +4,54 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Rows should ask a question (Batch AJ) — 2026-08-06
+
+**A row is a question and a lane is an answer.** Batch AI cut the old
+tiers into exclusive rows mechanically — by position, not by meaning — and
+the Berserker came out of it with rows that had nothing to decide in them.
+The clearest case: Deafening Cry (which shortened Battle Shout's cooldown)
+landed in the same row as Battle Shout itself. Two exclusive nodes where
+one exists only to modify the other is not a choice; it is one live option
+and one dead one, and the dead one is dead in a way the player only
+discovers after spending the point. Re-themeing the rows — the opening,
+the wound, what the wound pays, the edge, what compounds, refusal, the
+finish — is what made the re-pricing coherent, because you cannot ask "is
+this worth closing two doors for" until you know what the other two doors
+are for.
+
+**Cross-row conditions are how a tree rewards a plan without adding
+nodes.** Three of them here, and each one exists because the pair is more
+interesting than either half: Savagery makes Crushing Blows count faster,
+Unstoppable stops Scar Tissue's floor falling at all, and Measured Rage
+*cancels* Reckless Fury's risk rather than subtracting from it. That last
+one is the shape worth keeping — two nodes for consequence-free damage, or
+one node and eat the risk. It is a real decision at the point of purchase
+and it costs no new content.
+
+**Cancel, do not subtract.** Measured Rage and Reckless Fury both write
+the same damage-taken field, so the obvious implementation is arithmetic:
+-20% plus +15% lands on -5%. That is fragile in a way that is easy to
+miss — it silently depends on both magnitudes staying where they are, and
+a later re-tune of either one breaks a promise the tooltip is still
+making. A flag that zeroes the term outright says what the design means
+and survives any future number.
+
+**A capstone needs a ceiling before an upgrade path can buy anything.**
+Rampage's kill-recast chained for as long as the kills kept coming. The
+upgrade path in this batch — "may chain twice per turn" — is meaningless
+against an unbounded base, so the cap came first. Worth remembering when
+the remaining trees land: an upgrade is only a reward if the base has an
+edge to push out.
+
+**The inert-node lesson.** Measured Rage has been doing nothing since
+Batch AI, because the read site was guarded `> 0.0` and the node's whole
+payload is a negative number. Nothing crashed, nothing logged, and the
+tooltip kept promising 8% — the failure mode CLAUDE.md already warns about
+for typo'd stat fields, arriving through a different door. The batch's
+test spawns a live Berserker and reads the reduction off him rather than
+trusting the payload, which is the only version of that check that would
+have caught it.
+
 ## A node is a row now (Batch AK) — 2026-08-06
 
 **The re-author is not a tuning pass, it is a re-pricing after a structural

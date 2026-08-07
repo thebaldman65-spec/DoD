@@ -108,18 +108,28 @@ func _names(u: BattleUnit) -> Array:
 
 func _test_earned_kit() -> void:
 	# The Berserker earns Battle Shout (its OWN pool) and Crushing Blow (the
-	# Warden's kit, via the warrior class pool), and buys Deafening Cry —
-	# the talent that shortens Battle Shout's cooldown. If the pool copy
-	# went on AFTER the tree, the -1 would silently miss it.
-	var warcry_id := ""
+	# Warden's kit, via the warrior class pool), and buys the Battle Shout
+	# TALENT NODE. If the pool copy went on AFTER the tree, the node would
+	# not see it and would grant a second copy instead of upgrading.
+	#
+	# BATCH AJ re-pointed this probe IN PLACE. It used to buy Deafening Cry
+	# and check that the -1 cooldown found the pool-bought Shout; AJ
+	# re-specced that node into Overkill (it existed only to modify a node
+	# in its own exclusive row), so the probe now rides bz_battle_shout's
+	# own upgrade path. It is the SAME question — did the tree run against a
+	# kit that already held the earned copy — asked of the mechanism that is
+	# actually load-bearing today.
+	var shout_id := ""
 	var tree: Array = Talents.generate_tree("berserker", "warrior")
 	for node in tree:
-		if String(node.get("payload", {}).get("ability", "")) == "Battle Shout":
-			warcry_id = String(node["id"])
-	ok(warcry_id != "", "the Berserker tree still holds a Battle Shout modifier")
+		var np: Dictionary = node.get("payload", {})
+		if np.has("new_ability") \
+				and String(np["new_ability"]["display_name"]) == "Battle Shout":
+			shout_id = String(node["id"])
+	ok(shout_id != "", "the Berserker tree still holds the Battle Shout node")
 	var prep := func(run):
 		run.party[0]["bm_abilities"] = ["Battle Shout", "Crushing Blow"]
-		run.party[0]["talents"] = {warcry_id: 1}
+		run.party[0]["talents"] = {shout_id: 1}
 	var scene := await _spawn(["berserker", "cryomancer", "holy", "mystic"],
 		["raider", "archer", "raider"], "fight", prep)
 	var bz := _hero(scene, "bloodrage")
@@ -129,12 +139,17 @@ func _test_earned_kit() -> void:
 		ok(names.has("Battle Shout"), "an earned SPEC-pool ability is in the kit")
 		ok(names.has("Crushing Blow"), "an earned CLASS-pool ability is in the kit")
 		ok(names.count("Battle Shout") == 1, "and it is not double-granted")
-		var base := Talents.granted_ability("Battle Shout")
+		# THE ORDERING PROOF: the index reads 2 only if the node found the
+		# pool copy already in the kit. A 1 means the tree ran first and
+		# granted its own — the exact regression this ordering fix exists
+		# to prevent.
+		ok(int(bz.battle_shout_node) == 2,
+			"the Battle Shout node UPGRADED the POOL-bought copy (index %d, want 2)" % [
+				bz.battle_shout_node])
 		for a in bz.abilities:
 			if a.display_name == "Battle Shout":
-				ok(a.cooldown == base.cooldown - 1,
-					"Deafening Cry found the POOL-bought Battle Shout (cd %d, base %d)" % [
-						a.cooldown, base.cooldown])
+				ok(String(a.description).contains("18%"),
+					"...and the kit carries the upgraded description")
 		# The trimmed three are gone unless earned.
 		ok(not names.has("Blood Price"),
 			"a trimmed ability stays out of the kit until it is earned")

@@ -168,14 +168,31 @@ var bloodrage_step_bonus := 0.0  # Unstoppable: adds to Blood Frenzy's 2%/step
 var frenzy_floor := 0.0  # Blood Frenzy v2: half the peak bonus this battle
                          # (fraction; ratchets up, never resets mid-battle —
                          # units are built fresh each battle)
-var scar_tissue_ranks := 0    # Scar Tissue: floor keeps 60/70/75% of the peak
-var scent_ranks := 0          # Scent of Blood: +3%/rank damage per bleedout
-var blood_tithe_ranks := 0    # Blood Tithe: 15/rank Rage per enemy bleedout
-var arterial_ranks := 0       # Arterial Spray: 25%/rank buildup transfer
-var deathwish_ranks := 0      # Deathwish: +6%/rank damage below 35% health
-var bloodied_momentum_ranks := 0  # Bloodied Momentum: 15/rank Rage per kill
-var second_wind := 0          # Second Wind: first drop below 25% grants 40 Rage
+var scar_tissue_ranks := 0    # Scar Tissue: floor keeps 85% of the peak; 2 =
+                              # Unstoppable was taken too, so it keeps 100%
+var scent_ranks := 0          # Scent of Blood: +10% damage per bleedout
+var blood_tithe_ranks := 0    # Blood Tithe: 45 Rage per enemy bleedout
+var arterial_ranks := 0       # Arterial Spray: full buildup transfer
+var deathwish_ranks := 0      # Deathwish: +25% damage below 35% health
+var bloodied_momentum_ranks := 0  # Bloodied Momentum: 40 Rage per kill
+var second_wind := 0          # Second Wind: first drop below 25% grants 60 Rage
+                              # and clears every cooldown
 var second_wind_used := false
+# Batch AJ fields — each read at exactly ONE site, the discipline the rune
+# fields above follow (the changelog names the sites):
+var opening_rage := 0         # First Blood: Rage in the tank at battle start
+var overkill_reset := 0       # Overkill (Berserker): a kill clears Hack and
+                              # Slash and Wildstrikes cooldowns. NOT `overkill`
+                              # — the Sharpshooter's talent of the same name
+                              # has owned that field since Batch 32, and the
+                              # two do entirely different things
+var measured_cancels_reckless := 0  # Measured Rage + Reckless Fury: the
+                              # damage-taken term is cancelled outright
+var battle_shout_node := 0    # Battle Shout node: 1 = granted here, 2 =
+                              # upgraded onto an already-earned copy
+var rampage_upgraded := 0     # Rampage capstone onto an earned copy: the
+                              # kill-recast may chain twice a turn, not once
+var rampage_chains := 0       # runtime: chains used this turn (reset each turn)
 # Batch X authored-rune fields — each read at exactly ONE battle.gd site
 # (the relics hook-audit discipline; the changelog lists the sites):
 var blood_pact := 0           # Exsanguination rune: NEGATIVE threshold shift —
@@ -871,8 +888,9 @@ func refresh_bars() -> void:
 				var step := 2.0 + bloodrage_step_bonus
 				var live := frenzy_bonus() * 100.0
 				var floor_pct := frenzy_floor * 100.0
-				# Scar Tissue rewrites how much of the peak the floor keeps.
-				var keep_pct: int = [50, 60, 70, 75][clampi(scar_tissue_ranks, 0, 3)]
+				# Scar Tissue rewrites how much of the peak the floor keeps
+				# (2 = Unstoppable was taken as well — it keeps all of it).
+				var keep_pct: int = [50, 85, 100][clampi(scar_tissue_ranks, 0, 2)]
 				s.short = "+%d%% (floor %d%%)" % [int(round(live)),
 					int(round(floor_pct))]
 				s.desc = "Blood Frenzy: +%.1f%% damage per 5%% HP missing.\nCurrently +%.1f%%. The floor — %d%% of the highest\nbonus reached this battle — is +%.1f%%\nand never falls." % [
@@ -1303,8 +1321,11 @@ func return_to_idle() -> void:
 func frenzy_bonus() -> float:
 	var step := (2.0 + bloodrage_step_bonus) / 100.0
 	var current := int((1.0 - hp / float(max_hp)) * 100.0 / 5.0) * step
-	# Scar Tissue: the floor keeps 60/70/75% of the peak instead of half.
-	var keep: float = [0.5, 0.6, 0.7, 0.75][clampi(scar_tissue_ranks, 0, 3)]
+	# Scar Tissue: the floor keeps 85% of the peak instead of half — or ALL
+	# of it at 2, which is the node plus its cross-row partner Unstoppable
+	# (see the Batch AJ header in talents.gd). At 100% the floor tracks the
+	# peak exactly, so the bonus never falls at all.
+	var keep: float = [0.5, 0.85, 1.0][clampi(scar_tissue_ranks, 0, 2)]
 	if current * keep > frenzy_floor:
 		frenzy_floor = current * keep
 		if scar_tissue_ranks > 0:
@@ -1432,8 +1453,8 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	if enraged_ranks > 0 and was_above_half and hp <= max_hp * 0.5 and hp > 0:
 		enraged_stacks = mini(enraged_stacks + 1, 3)
 		enraged_timer = 5
-		var enr_pct := 3 * enraged_ranks * enraged_stacks
-		var enr_desc := "Enraged: +3%% damage per rank per stack,\ngained by dropping below half health\n(max 3 stacks). Currently +%d%% (x%d)." % [
+		var enr_pct := 12 * enraged_ranks * enraged_stacks
+		var enr_desc := "Enraged: +12%% damage per stack, gained\nby dropping below half health\n(max 3 stacks). Currently +%d%% (x%d)." % [
 			enr_pct, enraged_stacks]
 		if update_status("enraged", "+%d%%" % enr_pct, enr_desc, -1, 5):
 			float_text("ENRAGED x%d" % enraged_stacks, Color(0.9, 0.35, 0.3))
@@ -1446,7 +1467,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	# for 3 turns (at most once every 5 turns).
 	if unrelenting_ranks > 0 and was_above_quarter and hp <= max_hp * 0.25 \
 			and hp > 0 and unrelenting_cd == 0:
-		var con_gain := 10 * unrelenting_ranks
+		var con_gain := 40 * unrelenting_ranks
 		constitution += con_gain
 		unrelenting_cd = 5
 		add_status("unrelenting", "Unrelenting Assault", "+%d" % con_gain,
@@ -1461,15 +1482,21 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	if second_wind > 0 and not second_wind_used and was_above_quarter \
 			and hp <= max_hp * 0.25 and hp > 0:
 		second_wind_used = true
-		resource = mini(resource + 40, max_resource)
-		float_text("SECOND WIND +40 Rage", Color(1.0, 0.5, 0.4))
-		_proc_log("Talent: Second Wind — %s surges back (+40 Rage)" % unit_name)
+		resource = mini(resource + 60, max_resource)
+		# Batch AJ: the node buys a whole TURN back, so the cooldowns go with
+		# the Rage. Clearing the dict is the same thing the debug restore
+		# does — nothing else on the unit tracks a cooldown.
+		var sw_cleared := cooldowns.size()
+		cooldowns.clear()
+		float_text("SECOND WIND +60 Rage", Color(1.0, 0.5, 0.4))
+		_proc_log("Talent: Second Wind — %s surges back (+60 Rage, %d cooldown%s cleared)" % [
+			unit_name, sw_cleared, "" if sw_cleared == 1 else "s"])
 	# Deathwish (talent): crossing under 35% health, the edge sharpens.
 	if deathwish_ranks > 0 and not was_below_deathwish \
 			and hp < max_hp * 0.35 and hp > 0:
-		float_text("DEATHWISH +%d%%" % (6 * deathwish_ranks), Color(0.9, 0.3, 0.3))
+		float_text("DEATHWISH +%d%%" % (25 * deathwish_ranks), Color(0.9, 0.3, 0.3))
 		_proc_log("Talent: Deathwish — %s deals +%d%% damage below 35%% health" % [
-			unit_name, 6 * deathwish_ranks])
+			unit_name, 25 * deathwish_ranks])
 	# Mana Shield: half the pain flows back as Mana.
 	if has_status("mana_shield") and resource_name == "Mana" and amount > 0:
 		var converted := maxi(int(amount * 0.5), 1)

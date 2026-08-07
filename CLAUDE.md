@@ -188,6 +188,104 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   map (burger menu, shop/rest/loot nodes) → battle → party (talents/runes).
 
 ## Current systems snapshot (2026-08-06)
+BATCH AJ (08-06) — BERSERKER, ALL 24 NODES. The second of the four class
+batches AI promised. One spec only; the other ten trees and enemy tuning
+are UNTOUCHED.
+ROWS ARE THEMED, not just exclusive: 1 the opening / 2 the wound / 3 what
+the wound pays / 4 the edge / 5 what compounds / 6 refusal / 7 the finish
+/ 8 capstone. AI cut the old tiers into rows BY POSITION, which left rows
+with no question in them — the clearest being Deafening Cry (Battle
+Shout's cooldown) landing in Battle Shout's own row.
+MAGNITUDES, one decision applied 24 times (a node is a ROW, priced against
+the two doors it closes): Savagery +5->+15 Bleed, Unstoppable 2.5->3.5%
+step, Hemorrhage threshold 80->60, Reckless 5/5 -> 20% dealt / 15% taken,
+Flurry +1->+2 strikes, Crushing Blows 3->9%, Bloodied Momentum 15->40
+Rage, Arterial 25%->full transfer, Deathwish 6->25%, Relentless -5->-15
+Rage, Scent 3->10%, Scar Tissue floor 60->85%, Second Wind 40->60 Rage,
+Bloodcraze 3->12%, Measured Rage 8->20%, Unrelenting +10->+40 Con, Blood
+Tithe 15->45 Rage, Enraged 3->12%/stack. EVERY ID SURVIVES, so saved picks
+migrate and NO SAVE VERSION MOVES (still v6).
+TWO RE-SPECS IN PLACE: `bz_vitality` (was Vitality, +5% max HP) -> FIRST
+BLOOD, opens every battle with 40 Rage; `bz_warcry` (was Deafening Cry)
+-> OVERKILL, a kill clears Hack and Slash + Wildstrikes cooldowns.
+GOTCHA — THE BATCH DOC'S IDS ARE NOT THE LIVE IDS. It names bz_deafening/
+bz_scar/bz_flurry/bz_momentum/bz_second_wind; the live ids are bz_warcry/
+bz_frenzied_edge/bz_bloodlust_node/bz_thick_skin/bz_bloodied_hide. The
+doc's own rule ("every node keeps its existing id so saved trees migrate")
+is what settles it — the doc wrote the tidy version of names the nodes
+already carry. Same class of thing as bz_bloodlust_node holding "Flurry".
+THREE CROSS-ROW CONDITIONS (payload `condition` + has_node, Batch AI §5).
+TWO OF THEM NEEDED NO NEW FIELD — both counters were already read as an
+INDEX, so the conditional half adds a SECOND point and the read site knows
+2 means "and the partner": crushing_blows_ranks 1=step 20 / 2=step 15 (+
+Savagery); scar_tissue_ranks 1=85% floor / 2=100% and never falls (+
+Unstoppable). The third could not be written that way — Measured Rage and
+Reckless Fury BOTH write dmg_taken_bonus and the pair must land on exactly
+ZERO, not on their sum, so `measured_cancels_reckless` zeroes the term
+outright. CANCEL, DO NOT SUBTRACT: arithmetic there would silently depend
+on both magnitudes never moving again.
+TWO UPGRADE PATHS (the AK pattern; both sit in SPEC_POOLS["berserker"]):
+Battle Shout -> +18%/4 turns (from the node's own +12%/3; a pool copy
+never noded stays the pool's +8%/2) via `battle_shout_node` read as an
+INDEX 0/1/2 at the special. Rampage -> the kill-recast chains TWICE a turn
+via `rampage_upgraded`. RAMPAGE'S RECAST IS CAPPED FOR THE FIRST TIME (1/
+turn base, `rampage_chains` reset in _player_turn) — it used to chain
+unbounded, and an upgrade path has nothing to buy against no ceiling.
+NEW FIELDS, five not the doc's three (the doc's count did not allow for
+the two upgrade paths it also asks for, exactly as AK needed lunge_
+upgraded/execute_upgraded): opening_rage (hero spawn, beside Bottled
+Storm — a FLOOR not an addition), overkill_reset (_on_enemy_death),
+measured_cancels_reckless (the damage-taken site), battle_shout_node
+(the special), rampage_upgraded (the recast). NOT `overkill` — THE
+SHARPSHOOTER HAS OWNED THAT FIELD SINCE BATCH 32 (kill overflow carries to
+another enemy) and both are talents literally named Overkill. Name
+collision REPORTED, NOT RESOLVED: different trees, different ids, nothing
+breaks, but two nodes share a name in tooltips now.
+LIVE BUG FOUND AND FIXED — MEASURED RAGE HAS BEEN INERT SINCE BATCH AI.
+The damage-taken read site was guarded `> 0.0` and the node's whole
+payload is a NEGATIVE, so it ate it silently: nothing crashed, nothing
+logged, the tooltip kept promising 8%. Same failure shape as a typo'd stat
+field, through a different door. The guard reads any non-zero value now
+and credits mitigation via _prev like its neighbours.
+ALSO: Relentless buys Hack and Slash's bleed RELIABILITY permanently by
+`set`ting the ability's own bleed_chance to 1.0 — no new field, no second
+read site (the AG rule bought once instead of earned per cast). Second
+Wind clears every cooldown as well as its 60 Rage.
+VERIFIED: NEW test_batch_aj.gd 389 checks / 0 failures, stable 3/3 (tree
+shape, all 24 ids/rows/lanes/names, every magnitude in BOTH the payload
+and the tooltip it renders — most of this tree's numbers live in a
+battle.gd read site, so the tooltip is the only place the design number
+appears in the data — all three conditional halves firing/dark/inert-on-
+empty-ctx, both upgrade paths in BOTH acquisition orders, and a live
+battle for the opening Rage, the Overkill reset, Second Wind's cleared
+cooldowns, the Measured/Reckless cancellation and the Scar Tissue floor).
+test_batch_ah_battle's ORDERING PROBE WAS RE-POINTED IN PLACE with the
+reason in the file: it rode Deafening Cry, which no longer exists, so it
+now rides Battle Shout's own upgrade path — the same question ("did the
+tree run against a kit that already held the earned copy") asked of the
+mechanism that is load-bearing today. It is 63 checks now.
+Regression: test_batch_ai 2042/0, test_batch_ah 4284/0, test_batch_ak
+524/0, test_runes 3130/0, test_start_rune 239/0, test_start_rune_ui 31/0,
+run-harness gates 1/2/3 PASS. 10 scenes, 0 SCRIPT ERROR.
+KNOWN-BAD, NOT OURS: test_rune_battle 91/1 (the Inferno chip check), the
+standing defect Batch AK recorded.
+NO DIFFICULTY MEASUREMENT WAS RUN, deliberately — same reasoning as AK: a
+content re-author of ONE spec has no honest control row, because the sim's
+damage-share instrument reads a fixed four-hero party. ./sim.sh is a kit
+smoke test only and carries no difficulty signal (Batch R).
+KIT SMOKE, fixed lineup, DOD_SIM_TALENTS force-learning a full 8-node
+build (standalone sims spend no points, so an unloaded run never touches
+these nodes at all — load them or the smoke test proves nothing): 40/40
+wins both builds, 0 SCRIPT ERROR. His damage share 23% ungeared -> 32%
+on the AGGRESSIVE build (Savagery+Crushing Blows cross-row, Reckless+
+Measured cross-row, Relentless, Scar Tissue, Overkill, Rampage) and 24%
+on the GRANT/BLEEDOUT build (First Blood, Flurry, Battle Shout, Arterial,
+Second Wind, Unrelenting, Blood Tithe, Exsanguination). Kit-mechanics
+ratios ONLY — no difficulty signal.
+REPORTED NOT ACTED ON: `Talents.desc_for` renders `String.num(v, 2)`, so
+every tree's tooltips read "+15.00% damage" rather than "+15%". Pre-dates
+this batch and affects ALL TWELVE trees, which is why it was not touched
+here — it is a one-line fix in desc_for whenever the designer wants it.
 BATCH AK (08-06) — SWORDMASTER KIT CORRECTION + ALL 24 NODES. The first of
 the four class batches AI promised. One spec only; the other ten trees and
 enemy tuning are UNTOUCHED.

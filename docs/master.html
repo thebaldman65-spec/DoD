@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-06 (Batch AK)</b></p>
+<p align="right"><b>Last updated: 2026-08-06 (Batch AJ)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -352,9 +352,11 @@ strike (Occultist's Bewitch, 3 turns).</td></tr>
 Sundering them (Occultist capstone).</td></tr>
 <tr><td>Invigoration</td><td>Restores Mana at the start of each turn (Dark Pact
 talent).</td></tr>
-<tr><td>Battle Shout</td><td>+8% damage, plus 1% per 20 blood buildup on the enemy party,
-snapshotted at cast and given to the WHOLE party (Berserker talent). The chip shows the %
-gained at the moment of the shout.</td></tr>
+<tr><td>Battle Shout</td><td>+12% damage, plus 1% per 20 blood buildup on the enemy party,
+snapshotted at cast and given to the WHOLE party for 3 turns (Berserker talent). A Battle
+Shout earned from an ability pick and then taken as a talent is UPGRADED instead: +18% and
+4 turns. Earned but never taken as a talent, it is the pool's own +8% for 2 turns. The chip
+shows the % gained at the moment of the shout.</td></tr>
 <tr><td>Interpose (charges)</td><td>The next N attacks against this unit are BLOCKED
 (granted by the Warden's Interpose). The chip counts down the charges left
 ("IP3" → "IP1").</td></tr>
@@ -364,16 +366,17 @@ Shieldwall). Counts as Heavy Plating for Tenacity and Rally; the chip reads
 <tr><td>High Guard</td><td>Takes 40% less damage for 2 turns (Swordmaster talent, after a parry).</td></tr>
 <tr><td>Elemental Weakness</td><td>Elemental (non-physical) resistances reduced by 5% per
 talent rank (Warden's Crushing Blow talent); the chip shows the reduction ("−15%").</td></tr>
-<tr><td>Enraged</td><td>+3% damage per stack for 5 turns, stacking &times;3 (Berserker
+<tr><td>Enraged</td><td>+12% damage per stack for 5 turns, stacking &times;3 (Berserker
 talent, on dropping below half HP); the chip shows the live bonus.</td></tr>
-<tr><td>Unrelenting Assault</td><td>+10 Constitution × ranks invested, for 3 turns
-(Berserker talent, on dropping below 25% HP; at most once every 5 turns).</td></tr>
+<tr><td>Unrelenting Assault</td><td>+40 Constitution for 3 turns (Berserker talent, on
+dropping below 25% HP; at most once every 5 turns).</td></tr>
 <tr><td>Endurance</td><td>+1% armor per turn without an external heal, capped at +75% (Warden talent);
 the chip tracks the streak and clears when healed.</td></tr>
 <tr><td>Iron Will</td><td>Takes 4% LESS damage per debuff on the Warden (talent); a
 permanent chip whose value follows the live debuff count.</td></tr>
-<tr><td>Crushing Blows</td><td>+3% armor penetration per 20 total enemy-party
-bloodloss (Berserker talent); a permanent chip with the live value.</td></tr>
+<tr><td>Crushing Blows</td><td>+9% armor penetration per 20 total enemy-party
+bloodloss — per 15 if Savagery was taken too (Berserker talent); a permanent chip with the
+live value, which names the step it is currently counting in.</td></tr>
 <tr><td>Flame Shield</td><td>Takes 50% less damage; attackers are set Burning for 3 turns
 (Pyromancer talent ability, 2 turns).</td></tr>
 <tr><td>Seeding Embers</td><td>Bonus damage on the next turn, harvested from an enemy that
@@ -1044,14 +1047,14 @@ separately, and the map's Party button badges both.</p>
 <p><b>Berserker</b> — <b>BLOODLETTING</b> (wounds as an engine: keep bleed high, or burst it) · <b>FURY</b> (the risk dial) · <b>WARPATH</b> (momentum: keep swinging, or survive to keep swinging)</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Bloodletting</th><th>Fury</th><th>Warpath</th></tr>
-<tr><td>1</td><td><b>Savagery</b> — All bleed-building Berserker abilities build +5.0 more Bleed.</td><td><b>Unstoppable</b> — Blood Frenzy grants 2.5% damage for every 5% of health missing (up from the base 2%).</td><td><b>Vitality</b> — +5.0% max HP.</td></tr>
-<tr><td>2</td><td><b>Bloodcraze</b> — When an enemy bleeds out, the Berserker heals 3.0% of max HP.</td><td><b>Battle Shout</b> — New ability: Battle Shout — the whole party gains +8% damage, plus 1% for every 20 points of blood buildup on the enemy party, for 2 turns (15 Rage, 2cd).</td><td><b>Deafening Cry</b> — Battle Shout&#x27;s cooldown is reduced by 1 turn.</td></tr>
-<tr><td>3</td><td><b>Crushing Blows</b> — For every 20 points of bloodloss on the enemy team, gain 3.0% armor penetration.</td><td><b>Enraged</b> — Dropping below 50% health grants a +3.0% damage buff for 5 turns (stacks up to 3 times).</td><td><b>Unrelenting Assault</b> — Dropping below 25% health grants +10.0 Constitution for 3 turns (at most once every 5 turns).</td></tr>
-<tr><td>4</td><td><b>Hemorrhage</b> — Enemies at 80.0 or more bloodloss are Crippled.</td><td><b>Reckless Fury</b> — +5.0% damage dealt AND +5.0% damage taken.</td><td><b>Flurry</b> — Hack and Slash strikes an extra time.</td></tr>
-<tr><td>5</td><td><b>Scent of Blood</b> — +3.0% damage for each enemy that has bled out this battle.</td><td><b>Measured Rage</b> — Take 8% less damage. A steadier hand than Reckless Fury.</td><td><b>Bloodied Momentum</b> — When an enemy is slain, the Berserker gains 15.0 Rage.</td></tr>
-<tr><td>6</td><td><b>Arterial Spray</b> — When an enemy bleeds out, 25.0% of its blood buildup transfers to another living enemy.</td><td><b>Scar Tissue</b> — The Blood Frenzy floor holds 60/70/75% of your peak bonus (instead of 50%).</td><td><b>Relentless</b> — Hack and Slash costs 5.0 less Rage.</td></tr>
-<tr><td>7</td><td><b>Blood Tithe</b> — An enemy bleeding out grants the Berserker 15.0 Rage.</td><td><b>Deathwish</b> — +6.0% damage dealt while below 35% health.</td><td><b>Second Wind</b> — The first time you drop below 25% health each battle, immediately gain 40 Rage.</td></tr>
-<tr><td>CAP</td><td><b>Exsanguination</b> — Bleedout deals 35% of max HP (up from 20%), and the victim&#x27;s full blood buildup surges to another living enemy — chaining across the field.</td><td><b>Undying Rage</b> — While below 25% health the Berserker cannot die and deals +50% damage. The hit that would have killed him ends the rage at 1 HP (once per battle).</td><td><b>Rampage</b> — New ability: Rampage — strike 3 times for damage and bloodloss; if the target dies, immediately recast on another enemy (40 Rage, 4.0 int, 4cd).</td></tr>
+<tr><td>1<br><i>the opening</i></td><td><b>Savagery</b> — All bleed-building Berserker abilities build +15 more Bleed.</td><td><b>Unstoppable</b> — Blood Frenzy grants 3.5% damage for every 5% of health missing (up from the base 2%).</td><td><b>First Blood</b> — The Berserker begins every battle with 40 Rage.</td></tr>
+<tr><td>2<br><i>the wound</i></td><td><b>Hemorrhage</b> — Enemies at 60 or more bloodloss are Crippled.</td><td><b>Reckless Fury</b> — +20% damage dealt AND +15% damage taken.</td><td><b>Flurry</b> — Hack and Slash strikes 2 additional times (5 in total).</td></tr>
+<tr><td>3<br><i>what the wound pays</i></td><td><b>Crushing Blows</b> — For every 20 points of bloodloss on the enemy team, gain 9% armor penetration. With Savagery, every 15 points instead.</td><td><b>Battle Shout</b> — New ability: Battle Shout — the whole party gains +12% damage, plus 1% for every 20 points of blood buildup on the enemy party, for 3 turns (15 Rage, 2cd). If Battle Shout was already earned, this UPGRADES it instead: +18% base and 4 turns.</td><td><b>Bloodied Momentum</b> — When an enemy is slain, the Berserker gains 40 Rage.</td></tr>
+<tr><td>4<br><i>the edge</i></td><td><b>Arterial Spray</b> — When an enemy bleeds out, 100% of its blood buildup transfers to another living enemy.</td><td><b>Deathwish</b> — +25% damage dealt while below 35% health.</td><td><b>Relentless</b> — Hack and Slash costs 15 less Rage, and its bleed rolls ALWAYS land.</td></tr>
+<tr><td>5<br><i>what compounds</i></td><td><b>Scent of Blood</b> — +10% damage for each enemy that has bled out this battle.</td><td><b>Scar Tissue</b> — The Blood Frenzy floor holds 85% of your peak bonus (instead of 50%). With Unstoppable, it holds 100% and never falls at all.</td><td><b>Second Wind</b> — The first time you drop below 25% health each battle, immediately gain 60 Rage and clear every cooldown.</td></tr>
+<tr><td>6<br><i>refusal</i></td><td><b>Bloodcraze</b> — When an enemy bleeds out, the Berserker heals 12% of max HP.</td><td><b>Measured Rage</b> — Take 20% less damage. With Reckless Fury, it cancels that node&#x27;s +15% damage taken entirely instead — leaving the +20% dealt clean.</td><td><b>Unrelenting Assault</b> — Dropping below 25% health grants +40 Constitution for 3 turns (at most once every 5 turns).</td></tr>
+<tr><td>7<br><i>the finish</i></td><td><b>Blood Tithe</b> — An enemy bleeding out grants the Berserker 45 Rage.</td><td><b>Enraged</b> — Dropping below 50% health grants a +12% damage buff for 5 turns (stacks up to 3 times).</td><td><b>Overkill</b> — Killing an enemy clears the cooldowns of Hack and Slash and Wildstrikes.</td></tr>
+<tr><td>CAP</td><td><b>Exsanguination</b> — Bleedout deals 35% of max HP (up from 20%), and the victim&#x27;s full blood buildup surges to another living enemy — chaining across the field.</td><td><b>Undying Rage</b> — While below 25% health the Berserker cannot die and deals +50% damage. The hit that would have killed him ends the rage at 1 HP (once per battle).</td><td><b>Rampage</b> — New ability: Rampage — strike 3 times for damage and bloodloss; if the target dies, immediately recast on another enemy, once per turn (40 Rage, 4.0 int, 4cd). If Rampage was already earned, this UPGRADES it instead: the free recast may chain TWICE per turn.</td></tr>
 </table>
 <p><b>Swordmaster</b> — <b>BLADE</b> (damage, crit, and the Aggressive stance) · <b>POISE</b> (the defensive half, and ALL the parry) · <b>BREAKER</b> (fill their meter, then live in the window)</p>
 <table border="1" cellpadding="4">

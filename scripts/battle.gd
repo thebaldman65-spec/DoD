@@ -444,10 +444,11 @@ func _spawn_units() -> void:
 			base_hp = cfg["max_hp"]
 			if Run.active and i < Run.party.size():
 				# Earned abilities (mini-boss and boss picks) go on BEFORE the
-				# tree: several talents MODIFY an ability rather than grant it,
-				# and Deafening Cry has to find a pool-bought Battle Shout the
-				# same way it finds a talent-bought one. apply_from_tree already
-				# refuses to double-grant a name it can see.
+				# tree: several talents MODIFY an ability rather than grant
+				# it, and every `upgrade` path (Batch AK's Lunge and Execute,
+				# Batch AJ's Battle Shout and Rampage) asks whether the copy
+				# was ALREADY in the kit — a question only this ordering can
+				# answer. apply_from_tree refuses to double-grant either way.
 				for bm_name in Run.party[i].get("bm_abilities", []):
 					var bm_ab := Classes.spec_pool_ability(spec, bm_name)
 					if bm_ab != null and not cfg["abilities"].any(
@@ -577,7 +578,8 @@ func _spawn_units() -> void:
 				for dtype in relic_resists:
 					res[dtype] = float(res.get(dtype, 0.0)) + relic_resists[dtype]
 				cfg["resists"] = res
-		# Percentage HP talents (Vitality) apply after every flat bonus.
+		# Percentage HP talents (Inner Faith, Unwavering Faith) apply after
+		# every flat bonus.
 		cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
 		# Toughness (Warden talent): Constitution grows with bulk.
 		if cfg.get("toughness_ranks", 0) > 0:
@@ -632,6 +634,15 @@ func _spawn_units() -> void:
 		var res_floor := Run.relic_add("resource_floor_pct")
 		if res_floor > 0.0 and u.max_resource > 0:
 			u.resource = maxi(u.resource, int(res_floor * u.max_resource))
+			u.refresh_bars()
+		# First Blood (Batch AJ): THE ONE read site for `opening_rage`. It
+		# sits beside Bottled Storm because that is where the battle's
+		# opening resource is settled — after the member-mana sync, so a
+		# resumed run cannot overwrite it. A FLOOR, not an addition: the
+		# node promises he opens at 40, and stacking it on top of a relic
+		# floor would make two "you start with" effects multiply.
+		if u.opening_rage > 0 and u.max_resource > 0:
+			u.resource = maxi(u.resource, mini(u.opening_rage, u.max_resource))
 			u.refresh_bars()
 		heroes.append(u)
 
@@ -1868,10 +1879,11 @@ func _update_talent_chips() -> void:
 	for h in heroes:
 		if h.dead or h.crushing_blows_ranks == 0:
 			continue
-		var pen: int = 3 * h.crushing_blows_ranks * int(party_bleed / 20.0)
+		var cb_step := _crushing_step(h)
+		var pen: int = 9 * int(party_bleed / float(cb_step))
 		h.update_status("crushing_blows", "+%d%%" % pen,
-			"Crushing Blows: +3%% armor penetration per\nrank for every 20 bloodloss on the enemy\nteam. Currently +%d%% (%d total bloodloss)." % [
-				pen, party_bleed])
+			"Crushing Blows: +9%% armor penetration for\nevery %d bloodloss on the enemy team.\nCurrently +%d%% (%d total bloodloss)." % [
+				cb_step, pen, party_bleed])
 	# Inferno Master: the Pyromancer's passive chip tracks the enemy team's
 	# total Burn TURNS (Pyromaniac raises the per-turn step and the cap with
 	# it; Heat Haze raises the cap alone).
@@ -1930,9 +1942,9 @@ func _update_talent_chips() -> void:
 	for h in heroes:
 		if h.dead or h.scent_ranks == 0 or h.bleedouts_this_battle == 0:
 			continue
-		var sc_pct: int = 3 * h.scent_ranks * h.bleedouts_this_battle
+		var sc_pct: int = 10 * h.scent_ranks * h.bleedouts_this_battle
 		var sc_desc := "Scent of Blood: +%d%% damage per enemy\nbled out this battle. Currently +%d%%\n(%d bleedouts)." % [
-			3 * h.scent_ranks, sc_pct, h.bleedouts_this_battle]
+			10 * h.scent_ranks, sc_pct, h.bleedouts_this_battle]
 		if not h.update_status("scent", "+%d%%" % sc_pct, sc_desc, sc_pct):
 			var sc_info: Array = STATUS_INFO["scent"]
 			h.add_status("scent", sc_info[0], "+%d%%" % sc_pct, sc_info[2], -1,
@@ -1944,7 +1956,7 @@ func _update_talent_chips() -> void:
 			continue
 		if h.deathwish_ranks > 0:
 			if h.hp < h.max_hp * 0.35:
-				var dw_pct: int = 6 * h.deathwish_ranks
+				var dw_pct: int = 25 * h.deathwish_ranks
 				var dw_desc := "Deathwish: +%d%% damage while below\n35%% health." % dw_pct
 				if not h.update_status("deathwish", "+%d%%" % dw_pct, dw_desc, dw_pct):
 					var dw_info: Array = STATUS_INFO["deathwish"]
@@ -1992,6 +2004,7 @@ func _player_turn(u: BattleUnit) -> void:
 	current_hero = u
 	item_used = false
 	empower_armed = false  # Mercy Empowerment never carries between turns
+	u.rampage_chains = 0   # the capstone's kill-recast budget is per turn
 	if u.resource_name == "Mana":
 		# Evocation (Mage class passive) adds mana_regen_bonus.
 		u.resource = mini(u.resource + 12 + u.mana_regen_bonus, u.max_resource)
@@ -3605,6 +3618,15 @@ func _max_hero_rank(field: String) -> int:
 	return best
 
 
+# Crushing Blows' step: how much enemy-party bloodloss buys one 9% slice of
+# armor penetration. The counter is an INDEX, not a rank — Batch AJ's
+# cross-row condition adds a second point when Savagery was taken too, and
+# the wounds pay out a third faster. Shared by the damage calc and the chip
+# so the readout can never disagree with the number it describes.
+func _crushing_step(u: BattleUnit) -> int:
+	return 15 if u.crushing_blows_ranks >= 2 else 20
+
+
 # ADJACENT (keyword): the enemies DIRECTLY beside the target in formation
 # order. A dead neighbor NEGATES the adjacent bonus on that side — the
 # effect never jumps past a corpse to the next living enemy. Used by
@@ -4388,7 +4410,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 + attacker.frenzy_bonus()
 			# Enraged (talent): stacks from dropping below half HP.
 			if attacker.enraged_stacks > 0 and attacker.enraged_ranks > 0:
-				raw *= 1.0 + 0.03 * attacker.enraged_ranks * attacker.enraged_stacks
+				raw *= 1.0 + 0.12 * attacker.enraged_ranks * attacker.enraged_stacks
 			# Battle Shout: fury fed by the enemy party's open wounds (at cast).
 			if attacker.has_status("battle_shout"):
 				raw *= 1.0 + attacker.status_power("battle_shout") / 100.0
@@ -4397,10 +4419,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.25
 			# Scent of Blood: every bleedout this battle feeds the fury.
 			if attacker.scent_ranks > 0 and attacker.bleedouts_this_battle > 0:
-				raw *= 1.0 + 0.03 * attacker.scent_ranks * attacker.bleedouts_this_battle
+				raw *= 1.0 + 0.10 * attacker.scent_ranks * attacker.bleedouts_this_battle
 			# Deathwish: nothing left to lose below 35% health.
 			if attacker.deathwish_ranks > 0 and attacker.hp < attacker.max_hp * 0.35:
-				raw *= 1.0 + 0.06 * attacker.deathwish_ranks
+				raw *= 1.0 + 0.25 * attacker.deathwish_ranks
 			# Undying Rage: the refusal burns while he rides below a quarter.
 			if attacker.undying_rage > 0 and not attacker.undying_rage_used \
 					and attacker.hp < attacker.max_hp * 0.25:
@@ -4575,8 +4597,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 0.75
 				if strike_target.is_hero:
 					_prev(strike_target, pv_was - raw)
-			if strike_target.dmg_taken_bonus > 0.0:
-				raw *= 1.0 + strike_target.dmg_taken_bonus
+			# Reckless Fury raises this, Measured Rage lowers it. THE ONE read
+			# site for measured_cancels_reckless: taking both nodes has to
+			# land on exactly zero, not on the sum of one node's -20% and the
+			# other's +15%, so the flag zeroes the term outright rather than
+			# adding a third number to it.
+			# (The guard here used to be `> 0.0`, which silently ate every
+			# negative value — Measured Rage has been inert since Batch AI
+			# gave it a payload of its own. Fixed in the batch that
+			# re-authors the node.)
+			var dtb := strike_target.dmg_taken_bonus
+			if strike_target.measured_cancels_reckless > 0:
+				dtb = 0.0
+			if dtb != 0.0:
+				var dtb_was := raw
+				raw *= 1.0 + dtb
+				if raw < dtb_was and strike_target.is_hero:
+					_prev(strike_target, dtb_was - raw)
 			# Seasoned Fighter: the guard decides what gets through — Defensive
 			# turns blows aside (talent-deepened), Aggressive leaves openings.
 			if strike_target.passive_id == "seasoned":
@@ -4636,7 +4673,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				for foe in enemies:
 					if not foe.dead:
 						party_bleed += foe.bleed_buildup
-				pen += 0.03 * attacker.crushing_blows_ranks * int(party_bleed / 20.0)
+				pen += 0.09 * int(party_bleed / float(_crushing_step(attacker)))
 			var effective_armor := strike_target.effective_armor() \
 				* (1.0 - clampf(pen, 0.0, 1.0))
 			if is_perfect and ab.display_name == "Arcane Rift":
@@ -5613,9 +5650,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				res_gain += attacker.harmonics_ranks
 			_gain_resonance(attacker, res_gain)
 		# Rampage: a kill lets it surge onward — an immediate free recast on
-		# another enemy (and it chains while the kills keep coming).
+		# another enemy. Batch AJ put a CAP on it: once per turn, or twice if
+		# the capstone landed on an already-earned Rampage. It used to chain
+		# for as long as the kills kept coming, which is a capstone with no
+		# ceiling and nothing left for the upgrade path to buy.
 		if ab.display_name == "Rampage" and attacker.is_hero and not attacker.dead \
-				and target != null and target.dead and not battle_over:
+				and target != null and target.dead and not battle_over \
+				and attacker.rampage_chains < 1 + attacker.rampage_upgraded:
+			attacker.rampage_chains += 1
 			var rampage_foes := enemies.filter(func(e): return not e.dead)
 			if not rampage_foes.is_empty():
 				var next_target: BattleUnit = rampage_foes.pick_random()
@@ -7081,22 +7123,27 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, bp_cost,
 				" [PERFECT: cost halved]" if is_perfect else ""], "#e05050")
 		"battle_shout":
-			# Batch AG: a real warcry — a flat +8% for the WHOLE party, with
+			# Batch AG: a real warcry — a flat base for the WHOLE party, with
 			# the enemy party's bloodloss on top. Companions don't hear it.
+			# THE ONE read site for `battle_shout_node` (Batch AJ): 0 = he
+			# earned the shout from a pick and never took the node, 1 = the
+			# node granted it, 2 = the node upgraded an earned copy.
+			var shout_base: int = [8, 12, 18][clampi(attacker.battle_shout_node, 0, 2)]
+			var shout_turns: int = [2, 3, 4][clampi(attacker.battle_shout_node, 0, 2)]
 			var shout_bleed := 0
 			for e in enemies:
 				if not e.dead:
 					shout_bleed += e.bleed_buildup
-			var shout_pct := 8 + int(shout_bleed / 20.0)
+			var shout_pct := shout_base + int(shout_bleed / 20.0)
 			_sfx("crit", -8.0, 0.7)
 			# The chip shows the damage gained at the moment of the shout.
-			var shout_desc := "Battle Shout: +%d%% damage for 2 turns\n(+8%% base, plus 1%% per 20 of the %d\nblood buildup on the enemy party at\nthe time of the shout)." % [
-				shout_pct, shout_bleed]
+			var shout_desc := "Battle Shout: +%d%% damage for %d turns\n(+%d%% base, plus 1%% per 20 of the %d\nblood buildup on the enemy party at\nthe time of the shout)." % [
+				shout_pct, shout_turns, shout_base, shout_bleed]
 			var shout_n := 0
 			for h in heroes:
 				if h.dead:
 					continue
-				_apply_status(h, "battle_shout", 2, shout_pct)
+				_apply_status(h, "battle_shout", shout_turns, shout_pct)
 				h.update_status("battle_shout", "+%d%%" % shout_pct, shout_desc,
 					shout_pct)
 				shout_n += 1
@@ -7105,8 +7152,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.float_text("+5 Rage", Color(1.0, 0.5, 0.4))
 				attacker.refresh_bars()
 			_message("%s roars with bloodlust!" % attacker.unit_name)
-			_log("%s: Battle Shout — +%d%% damage for 2 turns to %d %s" % [
-				attacker.unit_name, shout_pct, shout_n,
+			_log("%s: Battle Shout — +%d%% damage for %d turns to %d %s" % [
+				attacker.unit_name, shout_pct, shout_turns, shout_n,
 				"hero" if shout_n == 1 else "heroes"], "#70d878")
 		"guard_change":
 			# The swap itself (Rage and cooldown already handled generically).
@@ -8202,10 +8249,24 @@ func _on_enemy_death(victim: BattleUnit) -> void:
 				and heroes[mk_idx].cooldowns.get("Mark of the Hunt", 0) > 0:
 			heroes[mk_idx].cooldowns.erase("Mark of the Hunt")
 			_log("   → The hunt is rewarded: Mark of the Hunt resets", "#b0a8e0")
+	# Overkill (Batch AJ): a kill resets the two abilities the archetype is
+	# built on. THE ONE read site for `overkill_reset` — the existing kill
+	# hook, which is also where Bloodied Momentum and Apex Predator live.
+	for ok_h in heroes:
+		if ok_h.dead or ok_h.overkill_reset == 0:
+			continue
+		var ok_cleared := PackedStringArray()
+		for ok_name in ["Hack and Slash", "Wildstrikes"]:
+			if ok_h.cooldowns.get(ok_name, 0) > 0:
+				ok_h.cooldowns.erase(ok_name)
+				ok_cleared.append(ok_name)
+		if not ok_cleared.is_empty():
+			_log("   → Overkill: %s is ready again (%s)" % [ok_h.unit_name,
+				" and ".join(ok_cleared)], "#b0a8e0")
 	# Bloodied Momentum: every kill feeds the Berserker's swing.
 	for mo_h in heroes:
 		if not mo_h.dead and mo_h.bloodied_momentum_ranks > 0:
-			var mo_rage := 15 * int(mo_h.bloodied_momentum_ranks)
+			var mo_rage := 40 * int(mo_h.bloodied_momentum_ranks)
 			mo_h.resource = mini(mo_h.resource + mo_rage, mo_h.max_resource)
 			mo_h.float_text("+%d Rage" % mo_rage, Color(1.0, 0.5, 0.4))
 			mo_h.refresh_bars()
@@ -8299,7 +8360,7 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 				tally_h.bleedouts_this_battle += 1
 			for feaster in heroes:
 				if not feaster.dead and feaster.bloodcraze > 0:
-					var craze := maxi(int(feaster.max_hp * 0.03 * feaster.bloodcraze), 1)
+					var craze := maxi(int(feaster.max_hp * 0.12 * feaster.bloodcraze), 1)
 					feaster.heal_amount(craze)
 					feaster.float_text("+%d Bloodcraze" % craze, Color(0.85, 0.3, 0.3))
 					_log("   → Bloodcraze: %s feasts (+%d HP)" % [feaster.unit_name,
@@ -8307,7 +8368,7 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 			# Blood Tithe: the bleedout pays its toll in Rage.
 			for bt_h in heroes:
 				if not bt_h.dead and bt_h.blood_tithe_ranks > 0:
-					var tithe := 15 * int(bt_h.blood_tithe_ranks)
+					var tithe := 45 * int(bt_h.blood_tithe_ranks)
 					bt_h.resource = mini(bt_h.resource + tithe, bt_h.max_resource)
 					bt_h.float_text("+%d Rage" % tithe, Color(1.0, 0.5, 0.4))
 					bt_h.refresh_bars()
@@ -8318,7 +8379,7 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 				if not sc_h.dead and sc_h.scent_ranks > 0:
 					_log("   → Scent of Blood: %s sharpens (+%d%% damage, %d bleedouts)" % [
 						sc_h.unit_name,
-						3 * sc_h.scent_ranks * sc_h.bleedouts_this_battle,
+						10 * sc_h.scent_ranks * sc_h.bleedouts_this_battle,
 						sc_h.bleedouts_this_battle], "#b0a8e0")
 		_sfx("crit", -5.0, 0.8)
 		_log("   → %s BLEEDS OUT for %d" % [victim.unit_name, bleed_dmg], "#e05050")
@@ -8335,7 +8396,10 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 		# Each chain visits an enemy at most once, so a full-buildup wave
 		# sweeps the field and stops.
 		if not victim.is_hero:
-			var t_pct := (1.0 if exsang else 0.25 * _max_hero_rank("arterial_ranks"))
+			# Batch AJ: Arterial Spray is a FULL transfer now — the node is a
+			# row, so it reads as all-or-nothing rather than a quarter a rank.
+			var t_pct := (1.0 if (exsang or _max_hero_rank("arterial_ranks") > 0) \
+				else 0.0)
 			if t_pct > 0.0:
 				chain_hops.append(victim)
 				var hosts: Array = enemies.filter(
@@ -8348,14 +8412,14 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 						surge, host.unit_name], "#e08850")
 					_add_bleed_with_burst(host, surge, chain_hops)
 	else:
-		# Hemorrhage (talent): enough open wounds leave the enemy Crippled
-		# (threshold 80/70/60 buildup by rank).
+		# Hemorrhage (talent): enough open wounds leave the enemy Crippled.
+		# Batch AJ made the threshold a flat 60 — one node, one number.
 		var hem := 0
 		for h in heroes:
 			if not h.dead:
 				hem = maxi(hem, h.hemorrhage_ranks)
 		if hem > 0 and not victim.is_hero and not victim.has_status("cripple") \
-				and victim.bleed_buildup >= 90 - 10 * hem:
+				and victim.bleed_buildup >= 60:
 			_apply_status(victim, "cripple", 2)
 			_log("   → Hemorrhage: %s is Crippled by blood loss" % victim.unit_name,
 				"#8cc843")

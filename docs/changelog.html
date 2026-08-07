@@ -5,6 +5,87 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-06 — Batch AJ: the Berserker's 24 nodes</h2>
+<ul>
+<li><b>All 24 tree nodes re-authored for row exclusivity.</b> Every id survives, so saved
+picks migrate and no save version moves. The rows have been mutually exclusive since Batch
+AI, which means a node is no longer one of three ranks — it is the whole row, priced
+against the two doors it closes. Concretely: Savagery +5 → +15 Bleed, Unstoppable 2.5% →
+3.5% per step, Hemorrhage's threshold 80 → 60 bloodloss, Reckless Fury 5%/5% → 20% dealt /
+15% taken, Flurry +1 → +2 strikes, Crushing Blows 3% → 9% per step, Bloodied Momentum 15 →
+40 Rage, Arterial Spray 25% → a full transfer, Deathwish 6% → 25%, Relentless −5 → −15
+Rage, Scent of Blood 3% → 10% per bleedout, Scar Tissue's floor 60% → 85%, Second Wind 40
+→ 60 Rage, Bloodcraze 3% → 12% max HP, Measured Rage 8% → 20%, Unrelenting Assault +10 →
++40 Constitution, Blood Tithe 15 → 45 Rage, Enraged 3% → 12% per stack.</li>
+
+<li><b>The rows are themed now.</b> Each row asks one question and each lane answers it its
+own way: 1 the opening, 2 the wound, 3 what the wound pays, 4 the edge, 5 what compounds,
+6 refusal, 7 the finish, 8 the capstone. Batch AI cut the old tiers into rows mechanically,
+which left several rows with no question in them at all.</li>
+
+<li><b>Two nodes were re-specced in place — same id, new effect.</b> <b>Vitality</b> (+5%
+max HP) became <b>First Blood</b>: the Berserker begins every battle with 40 Rage. A flat
+health dial is not an opening. <b>Deafening Cry</b> (Battle Shout's cooldown) became
+<b>Overkill</b>: killing an enemy clears the cooldowns of Hack and Slash and Wildstrikes.
+AI's mechanical row assignment had put Deafening Cry in the same row as Battle Shout
+itself, and two exclusive nodes where one exists only to modify the other is a row with a
+dead option in it.</li>
+
+<li><b>Three cross-row conditions.</b> <b>Crushing Blows</b> counts every 15 points of
+bloodloss instead of 20 if Savagery was taken. <b>Scar Tissue</b>'s Frenzy floor holds
+100% of the peak — never falling at all — if Unstoppable was taken. <b>Measured Rage</b>
+with Reckless Fury cancels that node's +15% damage taken outright rather than subtracting
+from it, so the pair buys consequence-free damage: two nodes for a clean +20%, or one node
+and eat the risk.</li>
+
+<li><b>Two upgrade paths.</b> Battle Shout and Rampage sit in the Berserker's spec pool as
+well as his tree. A node on an ability he does not own grants it; on one he earned from a
+pick it upgrades instead — Battle Shout to +18% for 4 turns (from +12% for 3), Rampage's
+kill-recast to twice a turn.</li>
+
+<li><b>Rampage's recast is capped for the first time.</b> It used to chain for as long as
+the kills kept coming, which is a capstone with no ceiling and nothing left for an upgrade
+path to buy. It is once per turn now, twice with the upgrade.</li>
+
+<li><b>Fixed: Measured Rage has been doing nothing since Batch AI.</b> The damage-taken
+read site was guarded <code>&gt; 0.0</code>, which silently ate every negative value — and
+Measured Rage's whole payload is a negative. The node has been inert for two batches. The
+guard now reads any non-zero value, and the batch's own test spawns a live Berserker to
+prove the reduction lands.</li>
+
+<li><b>Second Wind clears every cooldown</b> as well as granting its Rage, which is what
+makes the near-death moment a whole turn rather than a resource top-up.</li>
+
+<li><b>Relentless buys reliability permanently.</b> Hack and Slash's bleed roll always
+lands with it — the Batch AG rule that a perfect on a swingy ability pays in reliability
+rather than magnitude, bought once instead of earned per cast.</li>
+
+<li><b>Naming collision, reported not resolved:</b> the Sharpshooter's Precision lane
+already has a talent called <b>Overkill</b> (a kill's overflow damage carries to another
+enemy). Different trees and different ids, so nothing breaks — but two nodes now share a
+name in tooltips. The engine field was named <code>overkill_reset</code> to keep them
+apart.</li>
+
+<li><b>Verified:</b> new test_batch_aj.gd, 389 checks / 0 failures, stable 3/3 — the tree's
+shape, all 24 ids/rows/lanes/names, every magnitude in both the payload and the tooltip it
+renders, all three conditional halves firing/dark/inert-on-empty-ctx, both upgrade paths in
+both acquisition orders, and a live battle for First Blood's opening Rage, the Overkill
+reset, Second Wind's cleared cooldowns, the Measured/Reckless cancellation and the Scar
+Tissue floor. test_batch_ah_battle's ordering probe was re-pointed IN PLACE (it rode
+Deafening Cry, which no longer exists) onto Battle Shout's own upgrade path — the same
+question asked of the mechanism that is load-bearing today. Regression: test_batch_ai
+2042/0, test_batch_ah 4284/0, test_batch_ah_battle 63/0, test_batch_ak 524/0, test_runes
+3130/0, test_start_rune 239/0, test_start_rune_ui 31/0, run-harness gates 1/2/3 PASS.
+Known-bad and not ours: test_rune_battle 91/1, the standing Inferno-chip defect.</li>
+
+<li><b>No difficulty measurement was run, deliberately.</b> This is a content re-author of
+ONE spec, and the sim's damage-share instrument reads a fixed four-hero party, so a
+single-spec re-tune has no honest control row (the same reasoning Batch AK recorded).
+Several values are 2–3× their old rank-1 numbers by design: a hero now gets 8 nodes a run
+instead of a third of a 24-node tree, so per-node impact has to rise to match. Whether the
+whole curve needs enemy scaling is a question for after all twelve trees are authored.</li>
+</ul>
+
 <h2>2026-08-06 — Batch AK: the Swordmaster kit correction and his 24 nodes</h2>
 <ul>
 <li><b>Guard Change is back in the opening three; Shatterpoint is earnable in its
