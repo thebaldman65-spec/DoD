@@ -58,7 +58,9 @@ func _run_all() -> void:
 	_test_scheduling(RunState)
 	_test_attrition(RunState)
 	_test_runes(RunState)
+	_test_glossary_terms()
 	await _test_modifiers_live()
+	await _test_companion_modifier()
 
 
 # ---------- 1. the line (§1) ----------
@@ -153,10 +155,39 @@ func _test_offer(RunState) -> void:
 	print("\n§3 the offer")
 	var run = RunState.new()
 	run.new_run()
-	# The six placeholders and their authored severities.
+	# BATCH AQ authored the pool. The six AN placeholders are the first six
+	# entries here and are asserted UNCHANGED — ids, severities and text —
+	# because a save mid-run holds a pending modifier by id.
 	var want := {"overgrown": 1, "tinderbox": 2, "frenzied": 2,
-		"brittle": 3, "warded": 3, "bloodless": 4}
-	ok(run.MODIFIERS.size() == 6, "six placeholder modifiers")
+		"brittle": 3, "warded": 3, "bloodless": 4,
+		"parched": 1, "slick": 1, "dulledge": 1, "muffled": 1, "hoarfrost": 1,
+		"fleeting": 2, "feverish": 2, "deadened": 2, "miasma": 2,
+		"thinair": 3, "encumbered": 3,
+		"bloodletting": 4, "mirrorbound": 4}
+	ok(run.MODIFIERS.size() == 19, "nineteen authored modifiers (was six)")
+	ok(run.MODIFIERS.size() == want.size(), "...and the test knows all of them")
+	# The pool is WEIGHTED LOW on purpose: every offer's safe slot is served
+	# by the 1-2 pool alone, so that is the end that actually repeats.
+	var by_sev := {1: 0, 2: 0, 3: 0, 4: 0}
+	for mid in run.MODIFIERS:
+		by_sev[run.modifier_severity(String(mid))] += 1
+	ok(by_sev[1] == 6, "six severity-1 modifiers (got %d)" % by_sev[1])
+	ok(by_sev[2] == 6, "six severity-2 modifiers (got %d)" % by_sev[2])
+	ok(by_sev[3] == 4, "four severity-3 modifiers (got %d)" % by_sev[3])
+	ok(by_sev[4] == 3, "three severity-4 modifiers (got %d)" % by_sev[4])
+	ok(by_sev[1] + by_sev[2] > by_sev[3] + by_sev[4],
+		"the pool is weighted toward the low severities")
+	# `rot` was authored and DROPPED — the battle-end sync writes max_hp back
+	# onto the party member, so a halved max HP outlived the fight that
+	# charged for it. Pinned ABSENT so it cannot return without the seventh
+	# field it needs (see the changelog).
+	ok(not run.MODIFIERS.has("rot"), "rot is not in the pool")
+	# The AN six, exactly as AN shipped them.
+	ok(String(run.MODIFIERS["overgrown"]["desc"])
+		== "Both parties begin the fight at 70% health.",
+		"Overgrown's text is untouched")
+	ok(String(run.MODIFIERS["bloodless"]["name"]) == "Bloodless",
+		"Bloodless keeps its name")
 	for id in want:
 		ok(run.MODIFIERS.has(id), "%s exists" % id)
 		ok(run.modifier_severity(id) == int(want[id]),
@@ -179,9 +210,13 @@ func _test_offer(RunState) -> void:
 		sev4_kinds.append(String(r["kind"]))
 	ok("shop" in sev4_kinds, "severity 4 can summon a merchant on demand")
 	ok("rune" in sev4_kinds, "severity 4 can pay a rune")
-	# 2000 offers: three DISTINCT modifiers, rewards matched to severity, and
-	# THE FLOOR — always at least one option of severity 1 or 2.
+	# 2000 offers: three DISTINCT modifiers, rewards matched to severity, THE
+	# FLOOR (always at least one option of severity 1 or 2), and BATCH AQ §2 —
+	# the other two slots come from the 3-4 pool alone, so no offer ever holds
+	# two low options. Both are promises about an unbounded number of future
+	# rolls, so they are sampled hard rather than eyeballed.
 	var floor_misses := 0
+	var two_low := 0
 	var seen_mods := {}
 	for trial in 2000:
 		var offer: Array = run.roll_offer()
@@ -207,9 +242,16 @@ func _test_offer(RunState) -> void:
 			ok(false, "an offer repeated a modifier: %s" % offer)
 		if low < 1:
 			floor_misses += 1
+		if low > 1:
+			two_low += 1
 	ok(floor_misses == 0,
 		"EVERY offer holds a severity 1 or 2 (missed %d of 2000)" % floor_misses)
-	ok(seen_mods.size() == 6, "all six modifiers reach the offer screen over 2000 rolls")
+	ok(two_low == 0,
+		"§2: NO offer holds two low options — one safe, two gambles (%d of 2000)"
+		% two_low)
+	ok(seen_mods.size() == 19,
+		"all nineteen modifiers reach the offer screen over 2000 rolls (saw %d)"
+		% seen_mods.size())
 	# Accepting arms exactly one battle's worth of state.
 	var one: Array = run.roll_offer()
 	run.accept_offer(one[0])
@@ -238,6 +280,46 @@ func _test_modifiers_live() -> void:
 	print("\n§3 the modifiers, in a live battle")
 	var run: Node = root.get_node("/root/Run")
 	run.sim_run = false
+	# THE CONTROL, TAKEN FIRST. Every AQ modifier that edits a STAT rather
+	# than writing a field (Slick, Dull Edge, Feverish, Encumbered, Miasma,
+	# Parched) can only be checked as a DELTA, so the unmodified battle is
+	# measured before any of them and every later spawn is compared against
+	# it. The lineup and the warband are fixed, so index i is the same unit
+	# in every spawn.
+	var clean := await _spawn_battle(run, "")
+	var base: Array = []
+	if clean != null:
+		for u in clean.heroes + clean.enemies:
+			var delays := {}
+			var cds := {}
+			for ab in u.abilities:
+				delays[ab.display_name] = ab.delay
+				cds[ab.display_name] = ab.cooldown
+			base.append({"crit": u.crit_bonus, "attack": u.attack,
+				"hrm": u.healing_received_mult, "res": u.resource,
+				"maxres": u.max_resource, "second": u.second_resource,
+				"second_max": u.second_max, "second_name": u.second_resource_name,
+				"delays": delays, "cds": cds})
+		# NO modifier = the pre-AN path, byte for byte. This is the check that
+		# catches a stamp leaking out of the battle that armed it.
+		for u in clean.heroes + clean.enemies:
+			ok(not u.mod_ignore_armor, "no modifier: armor is untouched")
+			ok(is_equal_approx(u.mod_speed_mult, 1.0), "no modifier: speed is untouched")
+			ok(is_equal_approx(u.mod_cost_mult, 1.0), "no modifier: costs are untouched")
+			ok(not u.mod_no_heals, "no modifier: healing is untouched")
+			ok(u.mod_bd_mult == 100, "no modifier: Break damage is untouched")
+			ok(u.mod_status_turns == 0, "no modifier: status durations are untouched")
+			ok(not u.mod_no_break, "no modifier: the Break meter still works")
+			ok(not u.mod_no_regen, "no modifier: the resource drip still runs")
+			ok(u.mod_bleed_add == 0, "no modifier: no free Bleed")
+			ok(is_equal_approx(u.mod_recoil, 0.0), "no modifier: no recoil")
+			ok(is_equal_approx(float(u.type_dmg_bonus.get("fire", 0.0)), 0.0),
+				"no modifier: fire damage is untouched")
+			ok(u.hp == u.max_hp, "no modifier: everyone opens at full health")
+			ok(not u.has_status("chilled"), "no modifier: nobody opens Chilled")
+		clean.free()
+	else:
+		ok(false, "the control battle failed to spawn")
 	# Every modifier is checked on BOTH parties — "applies to both parties"
 	# is the load-bearing half of the design and the easiest thing to get
 	# half-right.
@@ -248,6 +330,19 @@ func _test_modifiers_live() -> void:
 		"brittle": "armor",
 		"warded": "cost",
 		"bloodless": "heal",
+		"parched": "resource",
+		"slick": "delay",
+		"dulledge": "crit",
+		"muffled": "bd",
+		"hoarfrost": "chilled",
+		"fleeting": "status_turns",
+		"feverish": "attack",
+		"deadened": "no_break",
+		"miasma": "half_heal",
+		"thinair": "no_regen",
+		"encumbered": "cooldown",
+		"bloodletting": "bleed",
+		"mirrorbound": "recoil",
 	}
 	for mod_id in expectations:
 		var battle := await _spawn_battle(run, mod_id)
@@ -303,26 +398,275 @@ func _test_modifiers_live() -> void:
 						"Bloodless: a 50-point heal on %s lands 0" % u.unit_name)
 					ok(u.hp == hurt, "...and the health bar does not move")
 					u.hp = was
+			# ---- Batch AQ's thirteen ----
+			"resource":
+				for i in everyone.size():
+					var u: BattleUnit = everyone[i]
+					var b: Dictionary = base[i]
+					ok(u.resource <= int(b["maxres"]) / 2,
+						"Parched: %s opens at or under half resource (%d of %d)" % [
+							u.unit_name, u.resource, u.max_resource])
+					if String(b["second_name"]) != "":
+						ok(u.second_resource <= int(b["second_max"]) / 2,
+							"Parched: %s's %s is halved too" % [u.unit_name,
+								b["second_name"]])
+					# Overgrown's lesson: it must never top a low tank UP.
+					u.resource = 1
+					battle._stamp_modifier(u, "parched")
+					ok(u.resource == 1,
+						"Parched never REFILLS %s — it only ever takes" % u.unit_name)
+			"delay":
+				for i in everyone.size():
+					var u: BattleUnit = everyone[i]
+					var was_delays: Dictionary = base[i]["delays"]
+					for ab in u.abilities:
+						if not was_delays.has(ab.display_name):
+							continue
+						ok(is_equal_approx(ab.delay,
+							float(was_delays[ab.display_name]) + 0.5),
+							"Slick Footing: %s's %s costs +0.5 initiative" % [
+								u.unit_name, ab.display_name])
+			"crit":
+				for i in everyone.size():
+					var u: BattleUnit = everyone[i]
+					ok(is_equal_approx(u.crit_bonus,
+						maxf(float(base[i]["crit"]) - 0.05, -0.10)),
+						"Dull Edge: %s loses 5 points of crit" % u.unit_name)
+					ok(0.10 + u.crit_bonus >= 0.0,
+						"Dull Edge: %s's total crit chance never goes negative"
+						% u.unit_name)
+			"bd":
+				for u in everyone:
+					ok(u.mod_bd_mult == 75, "Muffled: %s is stamped" % u.unit_name)
+					# Driven at the read site. Constitution is normalised first
+					# so the assertion reads the modifier and not the stat.
+					u.constitution = 100
+					u.pressure = 0
+					u.broken = false
+					u.take_hit(0, 40)
+					ok(u.pressure == 30,
+						"Muffled: 40 Break damage on %s lands 30 (got %d)" % [
+							u.unit_name, u.pressure])
+			"chilled":
+				for u in everyone:
+					ok(u.has_status("chilled"),
+						"Hoarfrost: %s begins the fight Chilled" % u.unit_name)
+					ok(u.status_stacks("chilled") == 1,
+						"...one stack, not a free Freeze")
+					ok(u.effective_speed() < u.speed,
+						"...and effective_speed reads it (%s)" % u.unit_name)
+					ok(not u.get_status("chilled").is_empty()
+						and int(u.get_status("chilled")["turns"]) == 3,
+						"...for three turns")
+			"status_turns":
+				for u in everyone:
+					ok(u.mod_status_turns == -1,
+						"Fleeting: %s is stamped" % u.unit_name)
+					u.remove_status("exposed")
+					battle._apply_status(u, "exposed", 3)
+					ok(int(u.get_status("exposed").get("turns", 0)) == 2,
+						"Fleeting: a 3-turn status on %s lands as 2" % u.unit_name)
+					u.remove_status("exposed")
+					battle._apply_status(u, "exposed", 1)
+					ok(int(u.get_status("exposed").get("turns", 0)) == 1,
+						"Fleeting: a 1-turn status never falls below 1")
+					u.remove_status("exposed")
+					# Battle-long statuses are a PERMANENCE FLAG, not a
+					# duration — shortening one would make it last a turn.
+					u.add_status("sunder", "Sundered", "S", Color.WHITE, -1)
+					ok(int(u.get_status("sunder").get("turns", 0)) == -1,
+						"Fleeting: a battle-long status on %s stays battle-long"
+						% u.unit_name)
+					u.remove_status("sunder")
+			"attack":
+				for i in everyone.size():
+					var u: BattleUnit = everyone[i]
+					ok(u.attack == int(round(float(base[i]["attack"]) * 1.25)),
+						"Feverish: %s hits 25%% harder (%d, was %d)" % [
+							u.unit_name, u.attack, int(base[i]["attack"])])
+			"no_break":
+				for u in everyone:
+					ok(u.mod_no_break, "Deadened: %s is stamped" % u.unit_name)
+					u.pressure = 0
+					u.broken = false
+					u.take_hit(0, 500)
+					ok(u.pressure == 0,
+						"Deadened: 500 Break damage moves %s's meter not at all"
+						% u.unit_name)
+					ok(not u.broken, "...and nobody Breaks")
+			"half_heal":
+				for i in everyone.size():
+					var u: BattleUnit = everyone[i]
+					ok(is_equal_approx(u.healing_received_mult,
+						float(base[i]["hrm"]) * 0.5),
+						"Miasma: %s's healing multiplier is halved" % u.unit_name)
+					u.hp = maxi(u.hp - 200, 1)
+					var landed: int = u.heal_amount(100)
+					ok(landed == int(round(100.0 * u.healing_received_mult)),
+						"Miasma: a 100-point heal on %s lands %d" % [
+							u.unit_name, landed])
+					ok(landed > 0 and landed < 100,
+						"...halved, not refused — Bloodless tops this ladder")
+			"no_regen":
+				for u in everyone:
+					ok(u.mod_no_regen, "Thin Air: %s is stamped" % u.unit_name)
+				# The read site is inline in _player_turn, which cannot be
+				# driven without a live hero turn — so the GUARD is asserted
+				# in the source instead. A refactor that moves the drip out
+				# from under it trips this.
+				_source_has("res://scripts/battle.gd", "if not u.mod_no_regen:",
+					"Thin Air: the turn-start drip sits under the guard")
+			"cooldown":
+				for i in everyone.size():
+					var u: BattleUnit = everyone[i]
+					var was_cds: Dictionary = base[i]["cds"]
+					for ab in u.abilities:
+						if not was_cds.has(ab.display_name):
+							continue
+						var before: int = int(was_cds[ab.display_name])
+						if before > 0:
+							ok(ab.cooldown == before + 2,
+								"Encumbered: %s's %s costs 2 more turns" % [
+									u.unit_name, ab.display_name])
+						else:
+							ok(ab.cooldown == 0,
+								"Encumbered: the cooldown-free %s gains none" %
+								ab.display_name)
+			"bleed":
+				for u in everyone:
+					ok(u.mod_bleed_add == 15,
+						"Bloodletting: %s is stamped" % u.unit_name)
+				_source_has("res://scripts/battle.gd",
+					"bleed_amount += attacker.mod_bleed_add",
+					"Bloodletting: the on-hit bleed site reads the field")
+				# Bleedout still triggers at 100 by the existing rule.
+				var bleeder: BattleUnit = everyone[0]
+				bleeder.bleed_buildup = 0
+				ok(not bleeder.add_bleed(99), "Bloodletting: 99 Bleed does not burst")
+				ok(bleeder.add_bleed(15), "...and crossing 100 does")
+			"recoil":
+				for u in everyone:
+					ok(is_equal_approx(u.mod_recoil, 0.25),
+						"Mirrorbound: %s is stamped" % u.unit_name)
+				_source_has("res://scripts/battle.gd",
+					"recoil_pct += attacker.mod_recoil",
+					"Mirrorbound: the recoil site reads the field")
+				# The backlash is paid through take_tick_damage, which is not a
+				# strike — so recoil can never itself recoil.
+				_source_has("res://scripts/battle.gd",
+					"var recoil_died := attacker.take_tick_damage(recoil,",
+					"Mirrorbound: recoil is paid as tick damage, so it cannot recoil")
 		battle.free()
-	# NO modifier = the pre-AN path, byte for byte. This is the check that
-	# catches a stamp leaking out of the battle that armed it.
-	var clean := await _spawn_battle(run, "")
-	if clean != null:
-		for u in clean.heroes + clean.enemies:
-			ok(not u.mod_ignore_armor, "no modifier: armor is untouched")
-			ok(is_equal_approx(u.mod_speed_mult, 1.0), "no modifier: speed is untouched")
-			ok(is_equal_approx(u.mod_cost_mult, 1.0), "no modifier: costs are untouched")
-			ok(not u.mod_no_heals, "no modifier: healing is untouched")
-			ok(is_equal_approx(float(u.type_dmg_bonus.get("fire", 0.0)), 0.0),
-				"no modifier: fire damage is untouched")
-			ok(u.hp == u.max_hp, "no modifier: everyone opens at full health")
-		clean.free()
 
 
-func _spawn_battle(run: Node, mod_id: String) -> Node:
+# ---------- Batch AQ §4: the companion the modifier used to miss ----------
+
+func _test_companion_modifier() -> void:
+	print("\n§4 a summoned beast is bound by the bargain")
+	var run: Node = root.get_node("/root/Run")
+	run.sim_run = false
+	# Hoarfrost is the sharpest probe: _apply_battle_modifier walks
+	# heroes + enemies, and a beast exists at neither moment, so before the
+	# summon-site fix it was the ONE unit on the field not Chilled.
+	var battle := await _spawn_battle(run, "hoarfrost",
+		["berserker", "pyromancer", "holy", "beastmaster"])
+	if battle == null:
+		ok(false, "companion probe: battle failed to spawn")
+		return
+	var hunter: BattleUnit = null
+	for h in battle.heroes:
+		if h.hero_key == "hunter":
+			hunter = h
+	if hunter == null:
+		ok(false, "companion probe: no Beastmaster on the field")
+		battle.free()
+		return
+	battle.sim = true  # skips the pacing timers; the summon itself is unchanged
+	await battle._do_summon(hunter, "ursus")
+	var beasts: Array = battle._beasts(hunter)
+	ok(beasts.size() == 1, "the Beastmaster fields one beast")
+	if beasts.size() == 1:
+		var beast: BattleUnit = beasts[0]
+		ok(beast.has_status("chilled"),
+			"§4: the summoned beast arrives Chilled like everyone else")
+		ok(beast.effective_speed() < beast.speed,
+			"...and the chill is real, not a chip")
+	battle.free()
+	# The two the summon site already inherited, stated so a future reader
+	# does not "fix" them into a double application: the beast copies the
+	# hunter's Attack and crit, and those already carry Feverish / Dull Edge.
+	var fev := await _spawn_battle(run, "feverish",
+		["berserker", "pyromancer", "holy", "beastmaster"])
+	if fev != null:
+		var fh: BattleUnit = null
+		for h in fev.heroes:
+			if h.hero_key == "hunter":
+				fh = h
+		if fh != null:
+			fev.sim = true
+			await fev._do_summon(fh, "canis")
+			var fb: Array = fev._beasts(fh)
+			if fb.size() == 1:
+				ok(fb[0].attack == fh.attack,
+					"§4: the beast inherits the hunter's Feverish Attack, once")
+				ok(is_equal_approx(fb[0].crit_bonus, fh.crit_bonus),
+					"...and his crit, once")
+		fev.free()
+
+
+# ---------- Batch AQ §5D: the four glossary terms ----------
+
+func _test_glossary_terms() -> void:
+	print("\n§5D the glossary learns the bargain")
+	var want := {
+		"ability_upgrades": "progression",
+		"bargain": "run",
+		"modifier": "run",
+		"severity": "run",
+	}
+	var ids := {}
+	for e in Glossary.entries():
+		ids[String(e["id"])] = true
+	for id in want:
+		var entry: Dictionary = Glossary.entry(String(id))
+		ok(not entry.is_empty(), "glossary has '%s'" % id)
+		if entry.is_empty():
+			continue
+		ok(String(entry["category"]) == String(want[id]),
+			"'%s' is filed under %s" % [id, want[id]])
+		ok(String(entry["short"]) != "" and String(entry["long"]) != "",
+			"'%s' says something" % id)
+		# Cross-linked to each other, and every link resolves.
+		ok(not (entry.get("see_also", []) as Array).is_empty(),
+			"'%s' cross-links" % id)
+		for link in entry.get("see_also", []):
+			ok(ids.has(String(link)),
+				"'%s' links to a real entry (%s)" % [id, link])
+	# The bargain trio names each other — a system with nineteen faces needs
+	# one place that explains the system.
+	ok("modifier" in Glossary.entry("bargain").get("see_also", []),
+		"the Bargain entry points at Modifier")
+	ok("severity" in Glossary.entry("bargain").get("see_also", []),
+		"...and at Severity")
+
+
+# Reads a source file and asserts a needle is in it. Used for the three AQ
+# fields whose read site is INLINE in a function that cannot be called
+# without a live hero turn or a full strike resolution — the field assert
+# alone would pass on code that never reads it.
+func _source_has(path: String, needle: String, msg: String) -> void:
+	var f := FileAccess.open(path, FileAccess.READ)
+	if f == null:
+		ok(false, "%s (cannot open %s)" % [msg, path])
+		return
+	ok(f.get_as_text().contains(needle), msg)
+
+
+func _spawn_battle(run: Node, mod_id: String,
+		specs := ["berserker", "pyromancer", "holy", "sharpshooter"]) -> Node:
 	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
 	for i in run.party.size():
-		run.party[i]["spec"] = ["berserker", "pyromancer", "holy", "sharpshooter"][i]
+		run.party[i]["spec"] = String(specs[i])
 		run.party[i]["tree"] = Talents.generate_tree(run.party[i]["spec"],
 			run.party[i]["key"])
 		run.sync_spec_hp(i)

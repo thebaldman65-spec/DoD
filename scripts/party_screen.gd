@@ -149,7 +149,10 @@ func _draw_detail() -> void:
 	# spawn, and for the same reason: a talent that SETS a field would
 	# otherwise overwrite the upgrade. The sheet has to show the numbers the
 	# fight will use.
-	Run.apply_upgrades(member, cfg["abilities"])
+	# Batch AQ §5A: the RETURN is captured now instead of discarded — it names
+	# what actually LANDED, so the sheet's ◆ carries the same guarantee the
+	# battle tooltip has and can never advertise an upgrade that did not apply.
+	var landed_upgrades: Dictionary = Run.apply_upgrades(member, cfg["abilities"])
 	cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
 	# Toughness (Warden talent): Constitution grows with bulk — same order as
 	# battle spawn (after every max-HP bonus has landed).
@@ -264,8 +267,15 @@ func _draw_detail() -> void:
 			cost_note = "  (%d)" % ab.cost
 		elif ab.faith_cost > 0:
 			cost_note = "  (%dF)" % ab.faith_cost
-		chip_label.text = "%s%s" % [ab.display_name, cost_note]
+		# Batch AQ §5A: the same ◆ mark and the same gold the battle action
+		# button wears, off the same source of truth (what apply_upgrades said
+		# landed). Twelve upgrades a run were invisible outside a fight.
+		var ups: Array = landed_upgrades.get(ab.display_name, [])
+		chip_label.text = "%s%s%s" % ["◆ " if not ups.is_empty() else "",
+			ab.display_name, cost_note]
 		chip_label.add_theme_font_size_override("font_size", 13)
+		if not ups.is_empty():
+			chip_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
 		chip_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		chip.add_child(chip_label)
 		var tip := ab.description
@@ -280,6 +290,11 @@ func _draw_detail() -> void:
 			tip += "\nHeals: %d" % ab.heal
 		if ab.perfect_text != "":
 			tip += "\nPerfect: %s" % ab.perfect_text
+		# Trailing line, names only — the same line and the same place the
+		# battle button's tooltip puts it. The magnitudes are already in the
+		# numbers above, which reflect the upgrade.
+		if not ups.is_empty():
+			tip += "\n%s" % " · ".join(PackedStringArray(ups))
 		chip.tooltip_text = tip
 		add_child(chip)
 

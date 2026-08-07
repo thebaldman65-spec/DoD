@@ -121,6 +121,16 @@ var mod_ignore_armor := false  # Brittle    — read in effective_armor()
 var mod_speed_mult := 1.0      # Frenzied   — read in effective_speed()
 var mod_no_heals := false      # Bloodless  — read in heal_amount()
 var mod_cost_mult := 1.0       # Warded     — read in battle._eff_cost()
+# Batch AQ's six, same rule: one field, one read site, default = no modifier.
+# mod_bd_mult is an INTEGER PERCENT (100 = unchanged) so the Break block can
+# stay integer arithmetic end to end — see the hold_bd cut it sits beside for
+# why that matters there.
+var mod_bd_mult := 100         # Muffled    — read in take_hit()'s Break block
+var mod_status_turns := 0      # Fleeting   — read in add_status()
+var mod_no_break := false      # Deadened   — read in take_hit()'s Break block
+var mod_no_regen := false      # Thin Air   — read in battle._player_turn()
+var mod_bleed_add := 0         # Bloodletting — read at battle's on-hit bleed
+var mod_recoil := 0.0          # Mirrorbound  — read at battle's recoil site
 var soul_partner: BattleUnit = null  # One Soul: damage is split with them
 var _soul_guard := false     # re-entry guard while splitting
 var damaged_since_turn := false  # Unbroken Watch bookkeeping
@@ -968,6 +978,14 @@ func refresh_bars() -> void:
 # `tick` = damage per turn for DoTs, snapshotted from the applier's Attack.
 func add_status(id: String, label: String, short: String, color: Color, turns: int,
 		desc := "", power := 0, tick := 0) -> void:
+	# Fleeting (Batch AQ): every status applied lasts one turn less, floored at
+	# one. THE ONE read site for mod_status_turns, and it sits here rather than
+	# in battle._apply_status because plenty of statuses (spec chips, Bracing,
+	# Elusive, the beast's own marks) are added directly. BATTLE-LONG STATUSES
+	# ARE EXEMPT: a negative turn count is a permanence flag, not a duration,
+	# and shortening it would turn a permanent status into a 1-turn one.
+	if turns > 0:
+		turns = maxi(turns + mod_status_turns, 1)
 	for s in statuses:
 		if s.id == id:
 			# Poison stacks additively (each stack ticks again) and every
@@ -1555,8 +1573,18 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		# 0.19999999 and an 80% cut on 100 Break would read 19, not 20.
 		var hl_cut := maxi(status_power("hold_bd"), 50)
 		pressure_add = pressure_add * (100 - hl_cut) / 100
+	# Muffled (Batch AQ): every meter fills slowly. Integer percent, for the
+	# same reason its neighbour above is — and unguarded, because x100/100 on
+	# an int is the identity, so the no-modifier path stays byte for byte.
+	pressure_add = pressure_add * mod_bd_mult / 100
 	# Bulwark of Fortitude: NO Break damage while the stand holds.
 	if has_status("bulwark"):
+		pressure_add = 0
+	# Deadened (Batch AQ): the Break meter does nothing this fight. It zeroes
+	# the same number `immovable` does, one line below, but through its OWN
+	# field — Immovable logs a Warden capstone proc, and a modifier claiming to
+	# be somebody's capstone is a lying log.
+	if mod_no_break:
 		pressure_add = 0
 	# Immovable (Warden capstone): he cannot be Broken, ever.
 	if immovable > 0 and pressure_add > 0:

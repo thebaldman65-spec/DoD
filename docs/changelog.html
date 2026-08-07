@@ -5,6 +5,82 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-07 — Batch AQ: the modifier pool, 6 → 19, and upgrades you can see</h2>
+<p><i>Two things. The bargain's modifier pool goes from six placeholders to nineteen authored
+ones, weighted toward the mild end. And the ability upgrades Batch AP wired become visible
+outside a fight.</i></p>
+<ul>
+<li><b>Thirteen new modifiers.</b> Severity 1: <b>Parched</b> (both parties open at half
+resource), <b>Slick Footing</b> (+0.5 initiative on every ability), <b>Dull Edge</b> (crit
+chance halved), <b>Muffled</b> (all Break damage −25%), <b>Hoarfrost</b> (everyone opens
+Chilled). Severity 2: <b>Fleeting</b> (every status lasts one turn less, never below one),
+<b>Feverish</b> (everyone deals 25% more), <b>Deadened</b> (nobody can be Broken),
+<b>Miasma</b> (healing received halved). Severity 3: <b>Thin Air</b> (no resource returns at
+turn start), <b>Encumbered</b> (+2 turns on every cooldown that already had one). Severity 4:
+<b>Bloodletting</b> (every attack adds 15 Bleed), <b>Mirrorbound</b> (a quarter of the damage
+you deal comes back on you). <b>The six existing modifiers are untouched</b> — ids,
+severities and text — so a save holding a pending modifier still resolves.</li>
+
+<li><b>The pool is weighted low on purpose.</b> Six severity-1, six severity-2, four
+severity-3, three severity-4. Every offer's first card is drawn from the 1–2 pool, so that is
+the end a run actually sees over and over; the harsh end already rotates. Authoring the pool
+evenly would have deepened the half nobody repeats.</li>
+
+<li><b>The other two cards now come from the severity 3–4 pool alone.</b> They used to draw
+from everything left, low and high together. At six modifiers that was fine; at nineteen —
+twelve of them low — <b>86% of sampled offers came out holding two cheap options</b>, three
+cheap rewards, and no real decision. Filling from the high pool makes every offer read the
+same way: <b>one safe option, two gambles</b>. The floor still guarantees the safe one, so a
+wounded party is never cornered. This is the only change in the batch that is not
+authoring.</li>
+
+<li><b>Rot was authored, implemented, and dropped — and that is the finding worth keeping.</b>
+It was to halve everyone's maximum health, and the risk flagged in advance was the percentage
+effects that read max HP. The real problem was somewhere else entirely: <b>the end-of-battle
+sync writes the battle unit's max HP straight back onto the party member</b>, so winning a Rot
+fight would have carried the halving out of the battle that charged for it — the map card
+would show the halved maximum, the party's health would be clamped under it, and a bargain
+sold as "one battle" would have taken half the party's HP for the rest of the run. Undoing
+that needs a seventh new field read at the save sync, which is past the field budget this
+batch set for itself, so it was dropped rather than patched around. Severity 4 ships with
+three modifiers instead of four; the pool is 19, not 20. Reinstating Rot is a small, separate
+decision, and it should be made deliberately.</li>
+
+<li><b>Companions were missing every modifier — a pre-existing bug six modifiers made nearly
+invisible.</b> The modifier is stamped on everyone at spawn, and a summoned beast exists at
+neither of those moments, so under Hoarfrost it would have been the only unit on the field not
+Chilled. Fixed at the summon site, beside the lines that already copy the hunter's armor,
+Stability and crit. <b>Correction to the batch brief:</b> it cited Feverish as an example of
+what the beast misses — it does not. The beast's Attack is copied from the hunter's, which is
+already modified, so Feverish (and Dull Edge) always reached it; stamping them again would
+have doubled them, and the fix skips exactly those two.</li>
+
+<li><b>Ability upgrades are visible outside a fight now.</b> A run awards three upgrades to
+every hero, twelve across the party, and until now every one of them was discoverable only by
+hovering ability buttons mid-battle. An upgraded ability wears a gold <b>◆</b> on its label —
+on the battle action button and on the hero sheet's chip — and each map hero card carries a
+<b>◆N</b> count beside its rune slots, whose hover lists them one per line ("Overpower —
+Honed"). The badge takes no click of its own; the whole card is already the button that opens
+the tree. The hover line itself is unchanged from Batch AP: names only, because the
+magnitudes are already in the numbers above them. The hero sheet was capturing nothing from
+the call that applies upgrades; it reads that call's return now, so it can only ever mark an
+upgrade that really applied.</li>
+
+<li><b>Four glossary entries:</b> Ability Upgrades (under Progression, next to boss trophies),
+and The Bargain, Modifier and Severity under The Run, cross-linked to each other. Nineteen
+modifiers is the point at which the system needs one place explaining the system rather than
+nineteen descriptions each explaining one face.</li>
+
+<li><b>Two shapes deliberately not authored,</b> recorded so the rules stay visible: anything
+that touches only heroes ("no items this fight", "the skill-check window shrinks") breaks the
+binds-both-parties rule and is a difficulty slider wearing a bargain's clothes; and
+miss-chance modifiers, which would land cleanly on the hook Dazed already uses and play as
+tedium rather than tension. Rejected on feel, not on machinery.</li>
+
+<li><b>Unchanged and stated as such:</b> the reward table, the bot's severity-extreme bargain
+policy, the offer screen's layout, and the save version — nothing new persists.</li>
+</ul>
+
 <h2>2026-08-07 — Batch AP: the mini-boss reward becomes real</h2>
 <p><i>Ability upgrades were offered, picked, stored on the hero and saved — and nothing read
 them at battle spawn. Three mini-bosses a run handed out an inert prize. This batch wires

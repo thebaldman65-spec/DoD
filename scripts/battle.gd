@@ -796,46 +796,109 @@ func _spawn_units() -> void:
 			u.next_time = -0.01
 
 
-# ---------- Batch AN §3: the battle modifier ----------
+# ---------- Batch AN §3 / Batch AQ §3: the battle modifier ----------
 #
 # The bargain the player accepted at the offer screen, stamped onto every
 # combatant on BOTH sides once they all exist. Each modifier is one field
 # write (or one stat nudge) and nothing else — no per-modifier branch in the
-# damage pipeline — because the four unit-side fields each have exactly one
-# read site and the two stat-side ones use hooks that already existed.
+# damage pipeline — because every unit-side field has exactly one read site
+# and the stat-side ones use hooks that already existed.
 #
 # Applied AFTER spawn and BEFORE the opening initiative roll: Frenzied has
 # to be on the board before `next_time` is seeded off speed, or the first
 # turn order would be the unmodified one.
 func _apply_battle_modifier() -> void:
-	if not Run.active or Run.pending_modifier == "":
+	var mod_id := _active_modifier()
+	if mod_id == "":
 		return
-	var mod_id := String(Run.pending_modifier)
-	if not Run.MODIFIERS.has(mod_id):
-		return
-	var cfg: Dictionary = Run.MODIFIERS[mod_id]
 	for u in heroes + enemies:
-		match mod_id:
-			"overgrown":
-				# BOTH parties begin at 70% health. Heroes are clamped to
-				# their CURRENT hp as well, so an already-wounded party is
-				# never healed up to 70% by a modifier that only ever takes.
-				u.hp = maxi(mini(u.hp, int(round(u.max_hp * 0.7))), 1)
-				u.refresh_bars()
-			"tinderbox":
-				# The existing typed-damage hook the Emberheart relic uses.
-				u.type_dmg_bonus["fire"] = \
-					float(u.type_dmg_bonus.get("fire", 0.0)) + 0.25
-			"frenzied":
-				u.mod_speed_mult = 1.3
-			"brittle":
-				u.mod_ignore_armor = true
-			"warded":
-				u.mod_cost_mult = 1.25
-			"bloodless":
-				u.mod_no_heals = true
+		_stamp_modifier(u, mod_id)
+	var cfg: Dictionary = Run.MODIFIERS[mod_id]
 	_log("[b]%s[/b] — %s" % [String(cfg["name"]).to_upper(), String(cfg["desc"])],
 		"#d0a0e0")
+
+
+# The modifier this battle is being fought under, or "" for none. One place
+# answers it, so the spawn pass and the summon site (§4) cannot disagree.
+func _active_modifier() -> String:
+	if not Run.active or Run.pending_modifier == "":
+		return ""
+	var mod_id := String(Run.pending_modifier)
+	return mod_id if Run.MODIFIERS.has(mod_id) else ""
+
+
+# ONE list of nineteen, one branch each. `inherited` is true for a companion
+# summoned mid-battle (§4): it arrives carrying its hunter's Attack and crit
+# ALREADY modified, so the two branches that write those must not fire again.
+# Everything else has to be stamped or the beast is the one unit on the field
+# the bargain does not bind.
+func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
+	match mod_id:
+		"overgrown":
+			# BOTH parties begin at 70% health. Heroes are clamped to
+			# their CURRENT hp as well, so an already-wounded party is
+			# never healed up to 70% by a modifier that only ever takes.
+			u.hp = maxi(mini(u.hp, int(round(u.max_hp * 0.7))), 1)
+			u.refresh_bars()
+		"tinderbox":
+			# The existing typed-damage hook the Emberheart relic uses.
+			u.type_dmg_bonus["fire"] = \
+				float(u.type_dmg_bonus.get("fire", 0.0)) + 0.25
+		"frenzied":
+			u.mod_speed_mult = 1.3
+		"brittle":
+			u.mod_ignore_armor = true
+		"warded":
+			u.mod_cost_mult = 1.25
+		"bloodless":
+			u.mod_no_heals = true
+		"parched":
+			# Overgrown's lesson, applied to the other tank: clamp to the
+			# CURRENT value too, so a mage who walks in on fumes is never
+			# topped UP by a modifier that only ever takes.
+			u.resource = mini(u.resource, u.max_resource / 2)
+			if u.second_resource_name != "":
+				u.second_resource = mini(u.second_resource, u.second_max / 2)
+			u.refresh_bars()
+		"slick":
+			for ab in u.abilities:
+				ab.delay += 0.5
+		"dulledge":
+			# Floored so a unit's TOTAL crit chance (CRIT_CHANCE + bonus)
+			# can never go under zero — several read sites add the two.
+			if not inherited:
+				u.crit_bonus = maxf(u.crit_bonus - 0.05, -CRIT_CHANCE)
+		"muffled":
+			u.mod_bd_mult = 75
+		"hoarfrost":
+			# Through the normal status door, so Frigid Grip and the rest of
+			# Chilled's riders behave exactly as they always do. The plate
+			# already exists at this point, so the chip renders.
+			_apply_status(u, "chilled", 3)
+		"fleeting":
+			u.mod_status_turns = -1
+		"feverish":
+			if not inherited:
+				u.attack = int(round(u.attack * 1.25))
+		"deadened":
+			u.mod_no_break = true
+		"miasma":
+			# The mild rung of the ladder Bloodless tops, on the hook Holy
+			# Conduit already uses.
+			u.healing_received_mult *= 0.5
+		"thinair":
+			u.mod_no_regen = true
+		"encumbered":
+			# NEVER ADD TO A ZERO — Warded's discipline on a different field,
+			# and it is what makes "basic attacks are unaffected" true rather
+			# than aspirational.
+			for ab in u.abilities:
+				if ab.cooldown > 0:
+					ab.cooldown += 2
+		"bloodletting":
+			u.mod_bleed_add = 15
+		"mirrorbound":
+			u.mod_recoil = 0.25
 
 
 func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
@@ -2109,16 +2172,21 @@ func _player_turn(u: BattleUnit) -> void:
 	item_used = false
 	empower_armed = false  # Mercy Empowerment never carries between turns
 	u.rampage_chains = 0   # the capstone's kill-recast budget is per turn
-	if u.resource_name == "Mana":
-		# Evocation (Mage class passive) adds mana_regen_bonus.
-		u.resource = mini(u.resource + 12 + u.mana_regen_bonus, u.max_resource)
-		u.refresh_bars()
-	elif u.resource_name == "Focus":
-		u.resource = mini(u.resource + 15, u.max_resource)
-		u.refresh_bars()
-	elif u.resource_name == "Rage":
-		u.resource = mini(u.resource + 5, u.max_resource)
-		u.refresh_bars()
+	# Thin Air (Batch AQ): THE one read site for mod_no_regen. It stops the
+	# DRIP and nothing else — attacks that BUILD resource are untouched, which
+	# is why a Rage hero survives it better than a Mage. That asymmetry is the
+	# modifier, not a hole in it.
+	if not u.mod_no_regen:
+		if u.resource_name == "Mana":
+			# Evocation (Mage class passive) adds mana_regen_bonus.
+			u.resource = mini(u.resource + 12 + u.mana_regen_bonus, u.max_resource)
+			u.refresh_bars()
+		elif u.resource_name == "Focus":
+			u.resource = mini(u.resource + 15, u.max_resource)
+			u.refresh_bars()
+		elif u.resource_name == "Rage":
+			u.resource = mini(u.resource + 5, u.max_resource)
+			u.refresh_bars()
 	# Companions have no turns of their own: their statuses tick (and Breaks
 	# recover) with their master. Standing at the hunter's side earns Loyalty.
 	for tick_b in _beasts(u):
@@ -2892,6 +2960,7 @@ func _show_actions(u: BattleUnit) -> void:
 	basic_btn.custom_minimum_size = Vector2(84, 32)
 	basic_btn.add_theme_font_size_override("font_size", 13)
 	basic_btn.tooltip_text = _ability_tooltip(u, basic)
+	_mark_upgraded(basic_btn, u, basic)
 	basic_btn.disabled = not _ability_usable(u, basic)
 	basic_btn.pressed.connect(_on_ability_button.bind(basic))
 	basic_btn.mouse_entered.connect(_preview_delay.bind(u, basic))
@@ -3090,6 +3159,7 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 		ab_btn.tooltip_text += "\n(Requires more than %d Resonance)" % (2 + u.still_mind_ranks)
 	if ab.special == "overcharge" and u.overcharged:
 		ab_btn.tooltip_text += "\n(Already Overcharged)"
+	_mark_upgraded(ab_btn, u, ab)
 	ab_btn.disabled = not _ability_usable(u, ab)
 	ab_btn.pressed.connect(_on_popup_ability.bind(popup, ab))
 	ab_btn.mouse_entered.connect(_preview_delay.bind(u, ab))
@@ -3166,6 +3236,7 @@ func _open_summon_picker(u: BattleUnit) -> void:
 		b.add_theme_font_size_override("font_size", 13)
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.tooltip_text = _ability_tooltip(u, ab)
+		_mark_upgraded(b, u, ab)
 		b.disabled = not _ability_usable(u, ab)
 		b.focus_mode = Control.FOCUS_NONE  # highlight is drawn, not focus-based
 		b.pressed.connect(_confirm_summon.bind(i))
@@ -3329,6 +3400,24 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 	if not ups.is_empty():
 		tip += "\n%s" % " · ".join(PackedStringArray(ups))
 	return tip
+
+
+# Batch AQ §5A. AP put the upgrade names on the tooltip and NOWHERE ELSE — a
+# full run awards three upgrades to every hero, twelve across the party, all
+# of them discoverable only by hovering forty buttons mid-fight. An upgraded
+# ability wears a ◆ now, in the gold the map card's unspent-pick badges use.
+# It reads `ability_upgrades`, which is fed from apply_upgrades' RETURN, so it
+# can only ever mark an upgrade that really applied.
+const UPGRADE_GOLD := Color(1.0, 0.9, 0.5)
+
+
+func _mark_upgraded(btn: Button, u: BattleUnit, ab: Ability) -> void:
+	if (u.ability_upgrades.get(ab.display_name, []) as Array).is_empty():
+		return
+	btn.text = "◆ " + btn.text
+	btn.add_theme_color_override("font_color", UPGRADE_GOLD)
+	btn.add_theme_color_override("font_hover_color", UPGRADE_GOLD)
+	btn.add_theme_color_override("font_pressed_color", UPGRADE_GOLD)
 
 
 # The Items button opens the same picker Alt does (one item per hero per turn).
@@ -5241,9 +5330,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			var bleed_roll := ab.bleed_chance
 			if is_perfect and ab.display_name in ["Wildstrikes", "Hack and Slash"]:
 				bleed_roll = 1.0
-			if ab.bleed_build > 0 and not strike_target.dead and randf() <= bleed_roll:
-				_add_bleed_with_burst(strike_target,
-					ab.bleed_build + attacker.bleed_bonus)
+			# The dead-target check STAYS OUTSIDE the roll. It guarded the
+			# `randf()` before Batch AQ split this block, and a draw taken one
+			# extra time shifts every later roll in the battle — the cheapest
+			# possible way to make an unrelated probabilistic test flap.
+			if not strike_target.dead:
+				var bleed_amount := 0
+				if ab.bleed_build > 0 and randf() <= bleed_roll:
+					bleed_amount = ab.bleed_build + attacker.bleed_bonus
+				# Bloodletting (Batch AQ): THE one read site for mod_bleed_add.
+				# Every hit opens a wound, so it does NOT ride the ability's
+				# own bleed roll — it is added alongside whatever that roll
+				# gave. Gated on `damage`, because a hit that lands none is not
+				# a wound. Bleedout still triggers at 100 by the existing rule,
+				# inside _add_bleed_with_burst.
+				if ab.damage > 0:
+					bleed_amount += attacker.mod_bleed_add
+				if bleed_amount > 0:
+					_add_bleed_with_burst(strike_target, bleed_amount)
 			if ab.display_name == "Mocking Blow" and not strike_target.dead:
 				var mocker_idx := heroes.find(attacker)
 				if mocker_idx >= 0:
@@ -5596,6 +5700,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# Magi's Wrath: spreading the storm dissipates its backlash.
 		if ab.display_name == "Magi's Wrath":
 			recoil_pct = maxf(recoil_pct - 0.03 * enemies_struck, 0.0)
+		# Mirrorbound (Batch AQ): THE one read site for mod_recoil. It is added
+		# AFTER Magi's Wrath's per-hit fade so the modifier's quarter is never
+		# dissipated by an ability's own rule — the bargain says a quarter comes
+		# back, and a quarter comes back. The backlash is paid through
+		# take_tick_damage below, which is not a strike, so RECOIL CANNOT ITSELF
+		# RECOIL; and a lethal one still passes through Ashes of Al'ar's guard
+		# inside take_tick_damage exactly as a native recoil does.
+		recoil_pct += attacker.mod_recoil
 		if recoil_pct > 0.0 and not attacker.dead:
 			var recoil := maxi(int(round(total_dealt * recoil_pct)), 1)
 			# Unity binds recoil too: the backlash splits across the party.
@@ -7988,6 +8100,17 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 	comp.pack_master = hunter
 	comp.crit_bonus = hunter.crit_bonus
 	comp.companion_power = hunter.companion_power
+	# Batch AQ §4: the beast joins a fight that is ALREADY under a bargain.
+	# _apply_battle_modifier walks heroes + enemies at spawn, and a companion
+	# exists at neither moment — so before this line a summoned beast was the
+	# only unit on the field the modifier did not bind. It sits beside the
+	# armor / Stability / crit copies above because those are the existing
+	# precedent for "inherit the state of the fight". `inherited` is true: the
+	# Attack and crit it just copied off the hunter already carry Feverish and
+	# Dull Edge, and stamping those twice would double them.
+	var comp_mod := _active_modifier()
+	if comp_mod != "":
+		_stamp_modifier(comp, comp_mod, true)
 	comp.next_time = INF  # never drawn a turn from the timeline
 	companions.append(comp)
 	hunter.beasts.append(comp)

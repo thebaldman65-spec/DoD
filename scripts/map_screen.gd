@@ -467,6 +467,31 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		slot_btn.pressed.connect(_open_rune_panel.bind(idx))
 		add_child(slot_btn)
 
+	# Batch AQ §5C: the ability-upgrade count, sitting alongside the rune slots
+	# — runes already get exactly this treatment here and upgrades got nothing,
+	# which is the asymmetry worth closing. A full run awards three to every
+	# hero and before this they were discoverable only by hovering an ability
+	# button mid-fight. IT DOES NOT TAKE A CLICK: it is a child of the card
+	# button with MOUSE_FILTER_PASS, so it carries its own tooltip while the
+	# press falls through to the card, which is already the button that opens
+	# the tree.
+	var ups: Array = member.get("upgrades", [])
+	if not ups.is_empty():
+		var up_lines := PackedStringArray()
+		for up in ups:
+			up_lines.append("%s — %s" % [String(up.get("ability", "")),
+				Run.upgrade_name(String(up.get("id", "")))])
+		var up_badge := Label.new()
+		up_badge.text = "◆%d" % ups.size()
+		up_badge.add_theme_font_size_override("font_size", 12)
+		up_badge.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
+		up_badge.tooltip_text = "Ability upgrades\n%s" % "\n".join(up_lines)
+		up_badge.position = Vector2(CARD_W - 78, 76)
+		up_badge.size = Vector2(66, 18)
+		up_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		up_badge.mouse_filter = Control.MOUSE_FILTER_PASS
+		open.add_child(up_badge)
+
 	# The badges: unspent points and any owed pick, stated on the card rather
 	# than behind a click.
 	var badges := PackedStringArray()

@@ -1086,9 +1086,23 @@ func item_full(id: String) -> bool:
 # building that way; a severity that read the party would quietly tax every
 # build for being good at something.
 #
-# PLACEHOLDERS. These six exist so a 36-slot run is playable end to end and
-# the pacing can be FELT before the authored 20 are written. Every one is
-# built out of a hook battle.gd already has.
+# BATCH AQ AUTHORED THE POOL — 6 placeholders became 19, and the six
+# originals are untouched (ids, severities and text all stand, so a save mid-
+# run with a pending modifier still resolves).
+#
+# THE POOL IS WEIGHTED LOW, DELIBERATELY. Every offer's first draw comes from
+# the severity 1-2 pool, so the safe slot on every card all run is served by
+# that pool alone; the harsh end already rotates and the low end is what
+# actually repeats. Counts: 6 / 6 / 4 / 3 across severities 1-4.
+#
+# SEVERITY 4 IS THREE, NOT THE FOUR THE BATCH ASKED FOR. `rot` (max HP halved
+# for everyone) was authored, implemented, and DROPPED — see the changelog.
+# The battle-end save sync writes `heroes[i].max_hp` straight back onto the
+# party member, so a HALVED max HP survived the fight that charged for it and
+# cost the party half its health for the rest of the run. Undoing that needs a
+# seventh new BattleUnit field read at the sync, which is over the batch's
+# stated field budget; the batch's own instruction for that case is to drop it
+# and say so.
 const MODIFIERS := {
 	"overgrown": {"name": "Overgrown", "severity": 1,
 		"desc": "Both parties begin the fight at 70% health."},
@@ -1102,6 +1116,36 @@ const MODIFIERS := {
 		"desc": "All abilities cost 25% more. Basic attacks are free."},
 	"bloodless": {"name": "Bloodless", "severity": 4,
 		"desc": "No healing for anyone. Bleed and damage-over-time still tick."},
+	# ---- severity 1 (Batch AQ) ----
+	"parched": {"name": "Parched", "severity": 1,
+		"desc": "Both parties begin the fight at half resource."},
+	"slick": {"name": "Slick Footing", "severity": 1,
+		"desc": "Every ability costs +0.5 initiative. Everyone is slower to come round again."},
+	"dulledge": {"name": "Dull Edge", "severity": 1,
+		"desc": "Critical chance is halved, for everyone."},
+	"muffled": {"name": "Muffled", "severity": 1,
+		"desc": "All Break damage is reduced 25%. Meters fill slowly."},
+	"hoarfrost": {"name": "Hoarfrost", "severity": 1,
+		"desc": "Everyone begins the fight Chilled."},
+	# ---- severity 2 (Batch AQ) ----
+	"fleeting": {"name": "Fleeting", "severity": 2,
+		"desc": "Every status applied lasts one turn less (never below one)."},
+	"feverish": {"name": "Feverish", "severity": 2,
+		"desc": "Everyone deals 25% more damage. Fights end quickly, one way or the other."},
+	"deadened": {"name": "Deadened", "severity": 2,
+		"desc": "Nobody can be Broken. The Break meter does nothing this fight."},
+	"miasma": {"name": "Miasma", "severity": 2,
+		"desc": "All healing received is halved."},
+	# ---- severity 3 (Batch AQ) ----
+	"thinair": {"name": "Thin Air", "severity": 3,
+		"desc": "No resource returns at the start of a turn. What you have is what you get."},
+	"encumbered": {"name": "Encumbered", "severity": 3,
+		"desc": "Every ability with a cooldown costs two more turns of it. Basic attacks are unaffected."},
+	# ---- severity 4 (Batch AQ) ----
+	"bloodletting": {"name": "Bloodletting", "severity": 4,
+		"desc": "Every hit opens a wound. All attacks add 15 Bleed, on both sides."},
+	"mirrorbound": {"name": "Mirrorbound", "severity": 4,
+		"desc": "A quarter of the damage you deal comes back on you."},
 }
 
 # The reward table reads severity and nothing else. Each entry is the list
@@ -1146,6 +1190,15 @@ func reward_text(reward: Dictionary) -> String:
 # 1 or 2, so a party down to its last few HP always has a survivable choice.
 # It is enforced by CONSTRUCTION (the first draw comes from the low pool)
 # rather than by rejecting rolls, so it cannot fail on an unlucky table.
+#
+# BATCH AQ §2: the other two slots come from the severity 3-4 pool ALONE.
+# They used to draw from low + high together, which was tolerable at six
+# modifiers and would not have been at nineteen — twelve of them low, so most
+# offers would have come out as three cheap options paying three cheap
+# rewards. The pool would have got deeper and the decision blander. Filling
+# from the high pool makes every offer read the same way: ONE SAFE OPTION,
+# TWO GAMBLES. The floor still guarantees the safe one, so a wounded party is
+# never cornered.
 func roll_offer() -> Array:
 	var low: Array = []
 	var rest: Array = []
@@ -1159,12 +1212,13 @@ func roll_offer() -> Array:
 	var picked: Array = []
 	if not low.is_empty():
 		picked.append(low.pop_front())
-	# Fill the other two from everything left, low and high together, so the
-	# guarantee raises the floor without capping the ceiling.
-	var pool: Array = low + rest
-	pool.shuffle()
-	while picked.size() < 3 and not pool.is_empty():
-		picked.append(pool.pop_front())
+	while picked.size() < 3 and not rest.is_empty():
+		picked.append(rest.pop_front())
+	# Only if the high pool cannot fill the card — it holds seven and needs to
+	# supply two, so this is a guard, not a path. An offer short of three
+	# options would be worse than a second low one.
+	while picked.size() < 3 and not low.is_empty():
+		picked.append(low.pop_front())
 	var offer: Array = []
 	for id in picked:
 		var sev := modifier_severity(String(id))

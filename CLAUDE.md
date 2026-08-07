@@ -179,6 +179,119 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   party.tscn is the HERO SHEET now, opened from a card.
 
 ## Current systems snapshot (2026-08-07)
+BATCH AQ (08-07) — THE MODIFIER POOL 6 -> 19, AND UPGRADES YOU CAN SEE.
+Authoring plus one design change; no new subsystem.
+§1/§3 THIRTEEN NEW MODIFIERS. Counts by severity 6/6/4/3 (was 1/2/2/1). THE
+SIX AN PLACEHOLDERS ARE BYTE-UNTOUCHED — ids, severities, desc — so a save
+holding `pending_modifier` still resolves; test_batch_an asserts each.
+SIX NEW `BattleUnit` FIELDS, ONE READ SITE EACH (the AN one-line-per-field
+form): `mod_bd_mult` (Muffled, INT PERCENT 100=unchanged -> the pressure_add
+block in take_hit, beside the hold_bd cut; unguarded because x100/100 on an
+int is the identity), `mod_status_turns` (Fleeting -> unit.add_status, and
+NEGATIVE turn counts are exempt — a battle-long status is a permanence FLAG,
+not a duration), `mod_no_break` (Deadened -> the same pressure_add zeroing,
+but NOT `immovable` itself: that logs a Warden capstone proc and a modifier
+claiming to be somebody's capstone is a lying log), `mod_no_regen` (Thin Air
+-> the turn-start drip in _player_turn; stops the DRIP only, attacks that
+BUILD resource are untouched, which is why Rage survives it and Mana does
+not — intended), `mod_bleed_add` (Bloodletting -> the on-hit bleed in
+_resolve; does NOT ride the ability's own bleed roll, gated on `ab.damage`),
+`mod_recoil` (Mirrorbound -> `recoil_pct`, added AFTER Magi's Wrath's per-hit
+fade; paid via take_tick_damage so recoil cannot itself recoil and Ashes of
+Al'ar still catches a lethal one). The other seven ride existing hooks or
+edit a stat at spawn: Parched (resource/second_resource clamp — clamps to
+the CURRENT value too, Overgrown's lesson), Slick (+0.5 `delay` per ability),
+Dull Edge (crit_bonus -0.05 floored at -CRIT_CHANCE so total crit can never
+go negative), Hoarfrost (`_apply_status` chilled 3 — the normal door, so
+Frigid Grip and every other rider behave), Feverish (attack x1.25), Miasma
+(healing_received_mult x0.5 — the Holy Conduit hook), Encumbered (+2
+`cooldown` ONLY where cooldown > 0).
+`_apply_battle_modifier` split into `_active_modifier()` + `_stamp_modifier(u,
+mod_id, inherited)` — ONE list of nineteen, two call sites.
+§2 THE ONE DESIGN CHANGE: after the guaranteed low first draw, the OTHER TWO
+SLOTS FILL FROM THE SEVERITY 3-4 POOL ALONE (was low+rest combined). MEASURED
+BEFORE/AFTER on 2000 sampled offers: the old fill put TWO LOW OPTIONS in 1717
+of 2000 (86%) once the pool was 19 — three cheap options paying three cheap
+rewards. Now every offer reads ONE SAFE, TWO GAMBLES; the floor still holds by
+construction. A guard falls back to the low pool if the high pool ever cannot
+fill (it holds 7 and needs 2) — a guard, not a path.
+**`rot` WAS AUTHORED, IMPLEMENTED AND DROPPED — READ THIS BEFORE RE-ADDING
+IT.** Halving `max_hp` at spawn is fine inside the fight (Unkillable reads
+max_hp - tenacity_hp_gained, Tenacity adds flat, the Mercy threshold is a
+ratio — all proportional). THE KILL IS THE SAVE SYNC: battle.gd's victory
+branch does `Run.party[i]["max_hp"] = heroes[i].max_hp - tenacity_hp_gained`,
+so a HALVED max HP outlives the battle that charged for it — hp clamped under
+it, the map card showing the halved maximum until the next victory re-syncs.
+A one-battle bargain would cost half the party's HP for the rest of the run.
+Undoing it needs a SEVENTH field read at the sync, over the batch's stated
+budget, and the batch's own instruction for that case is drop-and-report. So
+severity 4 ships THREE, not four, and the pool is 19, not 20. test_batch_an
+pins `rot` ABSENT.
+§4 COMPANIONS WERE MISSING EVERY MODIFIER — pre-existing, six modifiers made
+it nearly invisible. `_apply_battle_modifier` walks heroes+enemies at spawn
+and a beast exists at neither moment. Fixed at the `_do_summon` site beside
+the armor/Stability/crit copies, with `inherited = true`. CORRECTION TO THE
+BATCH DOC: it named Feverish as an example of what the beast misses. IT DOES
+NOT — the beast's cfg takes `hunter.attack`, already multiplied, and
+`comp.crit_bonus = hunter.crit_bonus` already carries Dull Edge. Those are
+the two branches `inherited` SKIPS; stamping them again would double them.
+Everything else (Hoarfrost's chill, Miasma, the six fields) genuinely was
+missed. Overgrown/Parched DO now clamp a mid-fight arrival — consistent with
+"binds both parties", and flagged rather than hidden.
+§5 THE UPGRADES ARE VISIBLE OUTSIDE A FIGHT. (A) `_mark_upgraded(btn, u, ab)`
+prefixes "◆ " and paints the label `UPGRADE_GOLD` = Color(1.0, 0.9, 0.5) (the
+map card's unspent-pick gold) on THREE battle surfaces — the basic-attack
+button, every `_ability_popup_button`, and the summon picker. The hero sheet's
+chips get the same mark; party_screen now CAPTURES `Run.apply_upgrades`'s
+return instead of discarding it, so the sheet's ◆ carries the battle
+tooltip's guarantee (it can only mark what actually landed) and its hover
+gains the same trailing `Honed · Swift` line. (C) map hero card: a `◆N` badge
+beside the rune slots, hidden at zero, hover lists `Overpower — Honed` one
+per line. IT TAKES NO CLICK — it is a Label CHILD OF THE CARD BUTTON with
+MOUSE_FILTER_PASS, so the tooltip is its own and the press falls through to
+the card. (D) four glossary entries: `ability_upgrades` (Progression),
+`bargain`/`modifier`/`severity` (The Run), cross-linked; glossary.json 66 ->
+70.
+NOT AUTHORED, deliberately, and stated so the rule stays visible: hero-only
+modifiers ("no items this fight", "the skill-check window shrinks") break
+binds-both-parties and are a difficulty slider wearing a bargain's clothes;
+miss-chance modifiers land cleanly on Dazed's hook and play as tedium.
+UNCHANGED: REWARDS, the bot's severity-extreme bargain policy, the offer
+screen layout, the six existing modifiers, SAVE v7 (nothing new persists).
+VERIFIED: check_parse 0 failures, check_flow 0 failures (6 screens), 11
+scenes 0 SCRIPT ERROR. test_batch_an 5667 -> 6044/0, test_batch_ah 5416/0
+(its master.html STAMP GATE bumped AP -> AQ), ah_battle 65/0, ai 2036/0, aj
+403/0, ak 524/0, test_runes 2982/0, run-harness gates 1/2/3 PASS.
+NEGATIVE CONTROLS RUN, because a test that cannot fail proves nothing:
+Muffled 75->80 and mod_bleed_add 15->14 both trip their checks, and restoring
+the old `low + rest` fill trips the §2 assertion at 1717/2000.
+SCRATCH (in the scratchpad, NOT committed — the batch forbade new
+scaffolding): check_aq.gd 18/0 drives the DRAWN half test_batch_an cannot
+see — the ◆2 badge on a real map card with its tooltip text, colour,
+MOUSE_FILTER_PASS and Button parent; exactly one marked chip on a real hero
+sheet with the trailing hover line; and exactly one ◆ button in a real battle
+(Overpower is not the class core attack, so it lives in the Abilities
+dropdown, not on the bar).
+GOTCHA THAT COST A BISECT: splitting the on-hit bleed block moved `randf()`
+out from behind its `not strike_target.dead` guard. A single extra draw
+shifts EVERY later roll in the battle — the cheapest possible way to make an
+unrelated probabilistic test flap. The guard is back outside the roll. When
+restructuring anything in `_resolve`, PRESERVE THE DRAW ORDER.
+KNOWN-BAD, NOT OURS: test_rune_battle 91/1 (the Inferno chip check), the
+standing defect since AK. **test_batch_al's flake IS NOW CAPTURED AND
+REPRODUCES ON UNMODIFIED HEAD** — the failing check AO could not name is
+`"Spite reflects damage at the attacker"` (§11 `_live_spite_break`), and an
+interleaved A/B of HEAD vs this batch's battle.gd read HEAD 2 failures of 4,
+AQ 0 of 4. It is a HARNESS RACE, not product code: `_spawn` waits a fixed 20
+`process_frame`s while the battle's own `_run_battle` loop is advancing on
+REAL SceneTreeTimers, then drives `_resolve` by hand on top of it. Do not
+chase it in product code, and do not read one clean AL run as proof.
+SIM SMOKE ONLY, NO DIFFICULTY CLAIM — n=20, no control row, and ./sim.sh
+carries no difficulty signal (Batch R): `./sim.sh --run 20` walked clean, 0
+SCRIPT ERROR, every one of the nineteen reachable, bargains 6.6/run at avg
+severity 3.52. Read that severity as INSTRUMENTATION for §2 (the bot's policy
+is severity-extreme, so it takes the harshest card and §2 guarantees that
+card is now a 3 or a 4) — never as a difficulty reading.
 BATCH AP (08-07) — THE MINI-BOSS REWARD BECOMES REAL. `Run.ABILITY_UPGRADES`
 was offered, picked, stored on the member and saved, and NOTHING READ IT AT
 BATTLE SPAWN — three mini-bosses a run handed out an inert prize. Machinery
@@ -2650,8 +2763,15 @@ Space or left click; no announcer text (combat log only).
   The open lever remains authored rune POWER — a runes.json data edit,
   not machinery — and the dilution question (see the AB block).
 - Sim bot wins ~90%+ with 4 heroes; real difficulty tuning by user playtest.
-- ABILITY UPGRADES ARE WIRED BUT STILL A PLACEHOLDER POOL OF FOUR (Batch AP
-  built the machinery, deliberately authoring nothing). The authoring batch
-  has somewhere to land now: add ids to `Run.ABILITY_UPGRADES`, a branch in
-  `Run.apply_upgrades`, and an eligibility rule in `Run.upgrade_fits`.
+- ABILITY UPGRADES ARE WIRED AND VISIBLE BUT STILL A PLACEHOLDER POOL OF FOUR
+  (AP built the machinery, AQ built the three surfaces, both deliberately
+  authoring nothing). The authoring batch has somewhere to land now: add ids
+  to `Run.ABILITY_UPGRADES`, a branch in `Run.apply_upgrades`, and an
+  eligibility rule in `Run.upgrade_fits` — the ◆ marker and the ◆N card badge
+  read what LANDED, so they need no change when the pool grows.
   A hero draws three a run, so a pool much past ~8 stops being felt.
+- SEVERITY 4 HOLDS THREE MODIFIERS, not the four AQ's table asked for: `rot`
+  was dropped over the max-HP save sync (see the AQ block). Reinstating it is
+  one field (`mod_max_hp_lost`, written at the stamp, added back at the
+  victory sync beside `tenacity_hp_gained`) plus its authoring — a deliberate
+  decision, not a leftover.

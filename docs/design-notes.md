@@ -1796,3 +1796,43 @@ node type had been carried as outstanding for six batches. It had been deleted
 five batches ago, with the map generator it belonged to. A list of open
 problems that nobody re-reads against the code becomes a list of problems that
 are not open, and it costs exactly as much attention as a real one.
+
+---
+
+## Batch AQ — the pool at nineteen, and the prize you could not see
+
+**A pool weighted evenly would have deepened the half nobody repeats.** Every
+offer's first card is drawn from the mild pool. That means the safe slot on
+every bargain, all run, is served by the low end alone — so the low end is
+what a player actually meets over and over, and the harsh end rotates on its
+own. Authoring six/six/four/three rather than five/five/five/five is not a
+softening; it is putting the depth where the repetition is.
+
+**Filling the other two slots from the harsh pool is what stops a bigger pool
+being a blander one.** With nineteen modifiers and twelve of them mild, the
+old "draw from everything left" fill put two cheap options on 86% of offers.
+Three cheap options paying three cheap rewards is not a decision, it is a
+formality with pips on it. One safe and two gambles is the same card every
+time and a different question every time.
+
+**Rot died at a line nobody would have looked at.** The risk that was flagged
+in advance was arithmetic: what happens to the effects that read maximum
+health as a percentage. Those were all fine, because they were all ratios. The
+kill was a bookkeeping line — the battle writes the unit's max HP back onto
+the party member on victory — so a modifier scoped to one fight would have
+followed the party out of it and taken half their health for the rest of the
+run. The lesson is not "check percentages"; it is that a modifier which edits
+a stat has to be checked against every line that *copies* that stat out of the
+battle, not just the lines that read it inside.
+
+**The companion bug was invisible because there were only six modifiers.**
+Four of the six wrote a field the beast never read, and the two that mattered
+happened to ride the hunter's own stats. Nineteen modifiers would have made it
+obvious within a run, which is the useful thing about scale: it does not
+create the bug, it stops the bug being deniable.
+
+**Twelve prizes a run, none of them visible while standing still.** A reward
+you can only see by hovering the thing it changed, during the fight, is a
+reward the player learns to stop looking for. The runes on the map card had
+had this treatment since the card existed; upgrades getting nothing beside
+them was not a design decision, it was an omission that read as one.

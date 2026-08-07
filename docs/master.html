@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-07 (Batch AP)</b></p>
+<p align="right"><b>Last updated: 2026-08-07 (Batch AQ)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -100,20 +100,48 @@ event on the road, not a gate in front of every battle. Each option is one <b>mo
 <b>severity of 1&ndash;4</b>, and <b>the reward table reads that severity</b> — so authoring a
 modifier means authoring one number, not a pairing. Severity is <b>flat</b>, authored per
 modifier, and <b>deliberately ignores party composition</b>: a modifier that happens to be
-cheap for your build is a good deal you earned by building that way. <b>Every offer holds at
-least one option of severity 1 or 2</b>, so a wounded party always has a survivable choice —
-guaranteed by construction, not by rejecting rolls.</p>
+cheap for your build is a good deal you earned by building that way. A modifier binds every
+combatant on the field, including a <b>companion summoned mid-battle</b>.</p>
+<p><b>How the three cards are dealt.</b> The first comes from the <b>severity 1&ndash;2</b>
+pool and the other two from the <b>severity 3&ndash;4</b> pool, so <b>every offer reads the
+same way: one safe option, two gambles</b>. The floor &mdash; at least one option of severity
+1 or 2 &mdash; is therefore guaranteed by construction rather than by rejecting rolls, and a
+wounded party is never cornered.</p>
 <p>The reward pays <b>on victory</b>: the modifier is the price, and the reward is what
 clearing the fight under it bought.</p>
+<p><b>The pool is 19, weighted low.</b> Because the safe slot on every card is served by the
+1&ndash;2 pool alone, that is the end a run actually sees repeatedly &mdash; so it is the end
+that is authored deepest.</p>
 <table border="1" cellpadding="4">
 <tr><th>Modifier</th><th>Severity</th><th>Effect (both parties)</th></tr>
 <tr><td>Overgrown</td><td>1</td><td>Both parties begin the fight at 70% health.</td></tr>
+<tr><td>Parched</td><td>1</td><td>Both parties begin the fight at half resource.</td></tr>
+<tr><td>Slick Footing</td><td>1</td><td>Every ability costs +0.5 initiative. Everyone is
+slower to come round again.</td></tr>
+<tr><td>Dull Edge</td><td>1</td><td>Critical chance is halved, for everyone.</td></tr>
+<tr><td>Muffled</td><td>1</td><td>All Break damage is reduced 25%. Meters fill slowly.</td></tr>
+<tr><td>Hoarfrost</td><td>1</td><td>Everyone begins the fight Chilled.</td></tr>
 <tr><td>Tinderbox</td><td>2</td><td>All fire damage +25%, whoever deals it.</td></tr>
 <tr><td>Frenzied</td><td>2</td><td>Everyone acts 30% faster. Cooldowns are unchanged.</td></tr>
+<tr><td>Fleeting</td><td>2</td><td>Every status applied lasts one turn less (never below
+one).</td></tr>
+<tr><td>Feverish</td><td>2</td><td>Everyone deals 25% more damage. Fights end quickly, one way
+or the other.</td></tr>
+<tr><td>Deadened</td><td>2</td><td>Nobody can be Broken. The Break meter does nothing this
+fight.</td></tr>
+<tr><td>Miasma</td><td>2</td><td>All healing received is halved.</td></tr>
 <tr><td>Brittle</td><td>3</td><td>All attacks ignore armor, on both sides.</td></tr>
 <tr><td>Warded</td><td>3</td><td>All abilities cost 25% more. Basic attacks are free.</td></tr>
+<tr><td>Thin Air</td><td>3</td><td>No resource returns at the start of a turn. What you have
+is what you get.</td></tr>
+<tr><td>Encumbered</td><td>3</td><td>Every ability with a cooldown costs two more turns of it.
+Basic attacks are unaffected.</td></tr>
 <tr><td>Bloodless</td><td>4</td><td>No healing for anyone. Bleed and damage-over-time still
 tick.</td></tr>
+<tr><td>Bloodletting</td><td>4</td><td>Every hit opens a wound. All attacks add 15 Bleed, on
+both sides.</td></tr>
+<tr><td>Mirrorbound</td><td>4</td><td>A quarter of the damage you deal comes back on
+you.</td></tr>
 </table>
 <table border="1" cellpadding="4">
 <tr><th>Severity</th><th>Reward (one of these, rolled)</th></tr>
@@ -175,7 +203,9 @@ design — is the FINAL boss: the run ends on its death.</li>
 <li><b>Map screen:</b> zone art background, the road with a <b>position readout</b>
 ("Zone 2 of 3 — encounter 7 of 12 (19 of 36) — the Ash Tyrant waits"), and <b>all four hero
 stat cards</b>. Each card carries portrait, spec name, HP bar with numbers, resource bar,
-<b>three rune slots</b> (filled or empty — click one to open that hero's pouch), and an
+<b>three rune slots</b> (filled or empty — click one to open that hero's pouch), an
+<b>&#9670;N ability-upgrade count</b> alongside them (hidden at zero; hovering it lists them
+as "Overpower — Honed", one per line — it takes no click of its own), and an
 unspent-talent badge; <b>clicking a card opens that hero's talent tree and full sheet</b>.
 Owed ability picks, ability upgrades and rune picks are resolved <b>on the card itself</b>.
 Also on screen: gold, the interactive potion inventory (§3c), and the burger menu (Restart
@@ -661,9 +691,15 @@ show fewer than three.</p>
 <p><b>Upgrades apply at battle spawn, after talents.</b> The order matters: several talents
 <i>set</i> an ability's field rather than add to it, so an upgrade applied first would be
 silently overwritten. Upgrades go last and always win. The hero sheet assembles the kit the
-same way, so the numbers on the sheet are the numbers in the fight, and an upgraded ability's
-button in battle carries a trailing line naming its upgrades (e.g. "Honed · Swift") — the
-magnitudes are already in the ability's own text.</p>
+same way, so the numbers on the sheet are the numbers in the fight.</p>
+<p><b>Where you can see them.</b> An ability carrying any upgrade wears a gold
+<b>&#9670;</b> on its label &mdash; on its battle action button <i>and</i> on its hero-sheet
+chip &mdash; and hovering either ends with a line naming the upgrades ("Honed · Swift"). Names
+only: the magnitudes are already in the numbers above, which reflect the upgrade. Outside a
+fight, each map hero card carries a <b>&#9670;N</b> count beside its rune slots whose hover
+lists them one per line. A run awards three upgrades to every hero, twelve across the party,
+and before these three surfaces existed all twelve were discoverable only by hovering ability
+buttons mid-fight.</p>
 <p><b>The SPEC pool</b> holds what only that spec can earn: the abilities trimmed out of its
 opening three, the abilities its talent tree grants, and its own vaulted ones. An ability a
 talent has already granted is never offered again.</p>
@@ -1579,7 +1615,8 @@ Stats mirror the battle
 spawn math: Constitution uses the spec's value plus Toughness, Attack/HP include node
 scaling, and the spec passive line bakes in talent ranks (Aggressive/Defensive Stance,
 Unstoppable) — the class passive + spec passive lines, ability chips (hover shows real
-numbers AND the "% of Attack" scaling), a <b>read-only</b> rune list (three flat slots;
+numbers AND the "% of Attack" scaling; a chip carrying an <b>ability upgrade</b> wears a gold
+<b>&#9670;</b> and names its upgrades on the last line of its hover), a <b>read-only</b> rune list (three flat slots;
 equipping happens on the map card, so one place writes it), and the spec's talent tree:
 three lane columns seven rows deep, a capstone shelf, and click-to-learn nodes (row number
 on the node, lock and closed reasons on the tooltips) for all twelve specs. The header shows
@@ -1620,11 +1657,15 @@ at 20%), <b>Statuses</b> (every debuff the battle code can apply, plus Quick Dra
 <b>Damage types</b> (all seven schools and how resists and vulnerabilities read),
 <b>Resources</b> (Rage and Mana, plus every spec resource: Resonance, Mercy, Empower, Faith,
 Focus, Loyalty, Ruin), <b>Progression</b> (the seven exclusive rows and the capstone row,
-the flat 1-point price, talent point income, boss trophies, node scaling),
+the flat 1-point price, talent point income, boss trophies, <b>ability upgrades</b>, node
+scaling),
 <b>Items &amp; gear</b> (runes, scarred runes, consumables, and <b>relics versus runes</b>
 as its own entry — permanent-across-runs versus run-scoped is the single most confusable
-distinction in the game), and <b>The Run</b> (zones and tiers, node types, elites, events,
-what a wipe costs, the difficulty choice).</p>
+distinction in the game), and <b>The Run</b> (zones and tiers, node types, elites, <b>the
+bargain, modifiers and severity</b>, events, what a wipe costs, the difficulty choice). The
+bargain trio was added when the modifier pool went from six to nineteen: a system with
+nineteen faces needs one place that explains the system rather than nineteen descriptions
+that each explain one face.</p>
 <p><b>Surfacing:</b> a panel from the map burger, the hero sheet, and the battle burger —
 a category tree on the left, the entry on the right with clickable cross-links. In battle it
 is inert: pure Control UI with no awaits or timers, and the battle scene suspends its own
