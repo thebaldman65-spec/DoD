@@ -565,29 +565,59 @@ var martyrdom_cb := Callable()
 var capacitor_ranks := 0      # Holy Capacitor: overheal banks for next Heal
 var stored_overheal := 0      # the banked amount (released by Heal)
 var beacon_ranks := 0         # Beacon: turn-start pulse on the nearly-dead
-# Devout Conviction + tree (07-23). See talents.gd for the node text.
+# Devout Conviction + tree (07-23; magnitudes and units re-authored in Batch
+# AW). EVERY COUNTER BELOW IS ADDITIVE — it holds its own magnitude in the
+# units its read site sums, so a node and a rune each pay what they advertise
+# alone AND stacked. FOUR of them hold the INCREASE on a base the kit already
+# pays without the node (stalwart_step on Divine Shield's 30%, righteous_step
+# on the ground's 10%, faithful_step on the release's 15%, fervor_step on the
+# ground's 1 Faith); those are named `_step` for that reason, AV's
+# `guardian_step` precedent. See talents.gd for the node text.
 var faith_stacks := 0         # Conviction: per-ALLY Faith (0-5)
-var communion_ranks := 0      # Communion: 5-stack procs can spread
-var faithful_ranks := 0       # Blessed are the Faithful: bigger 5-stack heal
-var devoutness_ranks := 0     # Devoutness: party-wide BD cut (ex-passive)
-var afterglow_ranks := 0      # Afterglow: heal when Divine Shield breaks
-var covenant_ranks := 0       # Sacred Covenant: lethal-save heal + Faith
-var aegis_ranks := 0          # Radient Aegis: Divine Shield can echo
-var blessed_barrier_ranks := 0 # Blessed Barrier: absorbs convert to healing
-var waters_ranks := 0         # Cleansing Waters: either banner can cleanse
-var pulse_ranks := 0          # Healing Pulse: either banner drips healing
+# Batch AW §1 — CONVICTION'S THIRD CLAUSE: every Faith release raises the
+# Devout's maximum by 3% of the maximum he brought to the fight. Linear on
+# base, never on current. `conviction_hp_gained` is the LEAK GUARD: the
+# victory sync subtracts it before writing max_hp back onto the party member,
+# beside tenacity_hp_gained.
+# CORRECTION TO THE BATCH BRIEF, recorded rather than glossed: it says the two
+# fields "do opposite things at the same site" because Tenacity's growth is
+# permanent. IT IS NOT — tenacity_hp_gained has been excluded from the save
+# sync since Batch W (the ~127,000 max-HP runaway), exactly like this one, and
+# the line above has said so all along. The instruction NOT TO MERGE THEM
+# stands anyway, for a better reason: tenacity_hp_gained has a SECOND consumer,
+# the Unkillable mend at battle.gd's block site, which reads "the pool he
+# brought into the battle" and must mean TENACITY'S growth alone. Folding
+# Conviction's growth into it would change what a Warden's Unkillable heals for
+# whenever a Devout stands beside him.
+var conviction_hp_gained := 0 # battle-long growth (excluded from the run save)
+var conviction_base_hp := 0   # the base the 3% reads, captured at first release
+var communion_ranks := 0      # Communion: (N x their own stacks)% to spread
+var faithful_step := 0        # Blessed are the Faithful: +N pts on the 15% heal
+var devoutness_ranks := 0     # Devoutness: party-wide BD cut, percentage POINTS
+var afterglow_ranks := 0      # Afterglow: heal N% of Devout max on shield break
+var covenant_heal := 0        # Sacred Covenant: lethal-save heal, % of max
+var covenant_faith := 0       # Sacred Covenant: Faith granted by that save
+var aegis_ranks := 0          # Radient Aegis: N% chance Divine Shield echoes
+var blessed_barrier_ranks := 0 # Blessed Barrier: N% of absorbs become healing
+var waters_ranks := 0         # Cleansing Waters: N% chance/turn to be cleansed
+var pulse_ranks := 0          # Healing Pulse: N% of Devout max healed per turn
 # Devout Batch K lanes (07-30): the purpose-designed tree's new hooks.
-var fervor_ranks := 0         # Fervor: Consecrated Ground drips Faith
-var oath_ranks := 0           # Binding Oath: releases keep stacks
-var warded_ranks := 0         # Warded Robes: armor rider on the shield
-var stalwart_ranks := 0       # Stalwart: Divine Shield absorbs more
-var unyielding_ranks := 0     # Unyielding Aegis: shield re-forms once
-var righteous_ranks := 0      # Righteous Fire: deeper Cons. Ground reflect
-var crusade_ranks := 0        # Crusader's Tempo: Zeal ticks more cooldown
-var purity_ranks := 0         # Purity: Zeal carries a Divine Shield
-var lifewell_ranks := 0       # Lifewell: reflected damage heals the party
+var fervor_step := 0          # Fervor: +N on the ground's base 1 Faith/turn
+var oath_ranks := 0           # Binding Oath: releases keep N stacks
+var warded_ranks := 0         # Warded Robes: +N% armor while the shield holds
+var stalwart_step := 0        # Stalwart: +N pts on Divine Shield's 30% absorb
+var unyielding_ranks := 0     # Unyielding Aegis: re-forms at N% of strength
+var righteous_step := 0       # Righteous Fire: +N pts on the ground's 10%
+var crusade_ranks := 0        # Crusader's Tempo: Zeal ticks N extra cooldown
+var purity_ranks := 0         # Purity: Zeal carries a shield of N% Devout max
+var lifewell_ranks := 0       # Lifewell: reflected damage heals N% of itself
 var apostle := 0              # capstone: releases keep all 5 stacks
-var judgement := 0            # capstone: Cons. Ground punishes attackers
+var judgement := 0            # capstone: Cons. Ground BD, % of damage dealt
+                              # (the gate AND the magnitude — one field)
+# Batch AW §5 — the two authored talent fallbacks (AU §1). Each is the extra
+# a node pays when the hero already earned the ability it would have granted.
+var resolve_extra_turns := 0  # Sacred Resolve owned: its split lasts +N turns
+var bulwark_extra_turns := 0  # Bulwark of Fortitude owned: +N turns of effect
 
 # Barrier-lethal hook (set by the battle scene): fires when a Divine
 # Shield absorbs a hit that would otherwise have killed this unit.

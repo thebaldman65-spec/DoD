@@ -1346,7 +1346,13 @@ const LANE_TREES := {
 		# RE-SPEC of hl_beacon (turn-start pulse on the nearly-dead) — the
 		# nearest surviving intent: something automatic that fires because a
 		# hero is at death's door, without a cast.
-		{"id": "hl_beacon", "name": "Shared Vigil", "ranks": 1, "lane": "Vigil", "row": 5,
+		# BATCH AW §9 — RENAMED "Hour of Need". Batch AV shipped it as SHARED
+		# VIGIL and FLAGGED the collision rather than hiding it: the Warden's
+		# Banner row-6 node has carried that name since Batch AL. His triggers
+		# on him standing strong, hers on a hero being near death, so HIS keeps
+		# the name that fits it. THIS IS A LABEL ONLY — the counter
+		# `holy_vigil_pct` and every read site are untouched.
+		{"id": "hl_beacon", "name": "Hour of Need", "ranks": 1, "lane": "Vigil", "row": 5,
 			"desc": "While any hero is below 30% health, the whole party takes 15% less damage.",
 			"payload": {"stat": {"holy_vigil_pct": 15}}},
 		# Re-spec: the ward stops riding Renewal and rides the HEALING, so
@@ -1392,148 +1398,159 @@ const LANE_TREES := {
 				"also": [{"stat": {"martyrdom": 1}}]}},
 	],
 	"inquisitor": [
-		# Devout (spec id is legacy) — purpose-designed lanes (Batch K,
-		# 07-30). Batch AI re-cut the tiers into 7 exclusive rows + a
-		# capstone row. The 12 original nodes keep their ids and payloads
-		# verbatim; the Batch 31 conversion fillers were re-specced IN
-		# PLACE (same ids, new effects).
-		# --- Lane A: Bulwark — the shield itself: bigger, harder, more
-		# often. Faith comes FROM absorbs, so this lane is the engine
-		# block of the whole Conviction system. ---
+		# THE DEVOUT (spec id is legacy) — purpose-designed lanes (Batch K,
+		# 07-30), re-cut into 7 exclusive rows + a capstone row by Batch AI, and
+		# RE-AUTHORED AT ROW PRICING BY BATCH AW. The spine: HE LENDS OUT HIS OWN
+		# BULK AND COLLECTS DIVIDENDS — Conviction's third clause (battle.gd
+		# `_conviction_growth`) raises his maximum on every Faith release, and his
+		# whole kit already reads that maximum, so one clause makes it all
+		# escalate off OTHER PEOPLE'S survival rather than his own casting.
+		# EVERY ID SURVIVES AND RE-SPECS IN PLACE; no save version moves.
+		# MAGNITUDES ARE 4-5x, not the Mage trees' 3x, for the same reason
+		# Holy's were: these were rank-1 values on a support whose numbers were
+		# the smallest in the game. EVERY COUNTER IS ADDITIVE — it writes its own
+		# magnitude in the units its read site sums. FOUR hold the INCREASE on a
+		# base the kit pays WITHOUT the node and are named `_step` for it
+		# (Stalwart on Divine Shield's 30%, Righteous Fire on the ground's
+		# 10%, Blessed are the Faithful on the release's 15%, Fervor on the
+		# ground's base 1 Faith) — AV's `guardian_step` precedent.
+		# --- Lane BULWARK — THE LOAN ITSELF: invest deeply in one ally. Faith
+		# comes FROM absorbs, so this lane is the engine block of the whole
+		# Conviction system. ---
 		{"id": "dv_barrier", "name": "Blessed Barrier", "ranks": 1, "lane": "Bulwark", "row": 1,
 			"desc": "Divine Shield converts {v}% of the damage it absorbs into healing for its holder.",
-			"scale": {"step": 4},
-			"payload": {"stat": {"blessed_barrier_ranks": 1}}},
+			"scale": {"step": 20},
+			"payload": {"stat": {"blessed_barrier_ranks": 20}}},
 		{"id": "dv_aegis", "name": "Radient Aegis", "ranks": 1, "lane": "Bulwark", "row": 2,
 			"desc": "Casting Divine Shield has a {v}% chance to cast it again on another ally.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"aegis_ranks": 1}}},
+			"scale": {"step": 60},
+			"payload": {"stat": {"aegis_ranks": 60}}},
 		{"id": "dv_afterglow", "name": "Afterglow", "ranks": 1, "lane": "Bulwark", "row": 3,
 			"desc": "When Divine Shield breaks, its holder is healed for {v}% of the Devout's max health.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"afterglow_ranks": 1}}},
-		# Re-spec (was a flat +3% armor dial): the armor now lives on the
-		# shield itself — Divine Shield is the lane's only subject.
+			"scale": {"step": 20},
+			"payload": {"stat": {"afterglow_ranks": 20}}},
 		{"id": "dv_warded", "name": "Warded Robes", "ranks": 1, "lane": "Bulwark", "row": 4,
 			"desc": "While Divine Shield holds, its holder has +{v}% armor.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"warded_ranks": 1}}},
-		# Re-spec (was -4% damage taken, exclusive with Righteous Fire
-		# CROSS-LANE — that pair is gone). The new fork is in-lane and is
-		# the shield lane's real question: a bigger shield, or a more
-		# frequent one? Bastion also attacks the one-Faith-source-on-a-2cd
-		# problem head on.
+			"scale": {"step": 25},
+			"payload": {"stat": {"warded_ranks": 25}}},
+		# The counter holds the INCREASE on the 30% the ability pays without it.
 		{"id": "dv_stalwart", "name": "Stalwart", "ranks": 1, "lane": "Bulwark", "row": 5,
 			"desc": "Divine Shield absorbs {v}% of the Devout's max health (up from the base 30%).",
-			"scale": {"base": 30, "step": 5},
-			"payload": {"stat": {"stalwart_ranks": 1}}},
-		# Re-spec (was a second Blessed Barrier step; ranks 2 -> 1 — the
-		# loader refunds any over-cap saved rank).
+			"scale": {"base": 30, "step": 20},
+			"payload": {"stat": {"stalwart_step": 20}}},
+		# BASTION GOING TO ZERO IS THE LANE'S STATEMENT and the direct answer to
+		# the other half of §2's problem: a shield every turn is a Faith engine.
+		# The strongest node in the tree.
 		{"id": "dv_bastion", "name": "Bastion", "ranks": 1, "lane": "Bulwark", "row": 6,
-			"desc": "Divine Shield's cooldown is reduced by 1 turn.",
-			"payload": {"ability": "Divine Shield", "add": {"cooldown": -1}}},
-		# Re-spec (was a second Radient Aegis step): the breaking shield
-		# gets a second life instead of a second copy.
+			"desc": "Divine Shield has no cooldown at all.",
+			"payload": {"ability": "Divine Shield", "set": {"cooldown": 0}}},
 		{"id": "dv_unyielding", "name": "Unyielding Aegis", "ranks": 1, "lane": "Bulwark", "row": 7,
 			"desc": "When Divine Shield breaks, it immediately re-forms at {v}% of its original strength (once per cast).",
-			"scale": {"step": 30},
-			"payload": {"stat": {"unyielding_ranks": 1}}},
-		# --- Lane B: Faith — the stack economy: earn it faster, keep it
-		# longer, spend it deeper. ---
+			"scale": {"step": 90},
+			"payload": {"stat": {"unyielding_ranks": 90}}},
+		# --- Lane FAITH — WHAT THE RETURNS PAY: invest in the dividend itself.
+		# Earn the stacks faster, keep them longer, spend them deeper. ---
 		{"id": "dv_communion", "name": "Communion", "ranks": 1, "lane": "Faith", "row": 1,
 			"desc": "When a party member reaches 5 Faith, every other member has a ({v} x their own Faith stacks)% chance to gain 1 stack.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"communion_ranks": 1}}},
+			"scale": {"step": 40},
+			"payload": {"stat": {"communion_ranks": 40}}},
+		# THE MOST INVESTMENT-SHAPED NODE IN THE GAME with Conviction's third
+		# clause: it raises the base that every payout in his kit — and every
+		# growth increment — scales from.
 		{"id": "dv_unwavering", "name": "Unwavering Faith", "ranks": 1, "lane": "Faith", "row": 2,
 			"desc": "Increases the Devout's maximum health by {v}%.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"max_hp_pct": 0.05}}},
+			"scale": {"step": 20},
+			"payload": {"stat": {"max_hp_pct": 0.20}}},
 		{"id": "dv_devoutness", "name": "Devoutness", "ranks": 1, "lane": "Faith", "row": 3,
 			"desc": "The entire party takes {v}% less Break damage.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"devoutness_ranks": 1}}},
+			"scale": {"step": 20},
+			"payload": {"stat": {"devoutness_ranks": 20}}},
+		# The counter holds the INCREASE on the release's base 15%.
 		{"id": "dv_faithful", "name": "Blessed are the Faithful", "ranks": 1, "lane": "Faith", "row": 4,
 			"desc": "The heal at 5 stacks of Faith restores {v}% max health (up from the base 15%).",
-			"scale": {"base": 15, "step": 5},
-			"payload": {"stat": {"faithful_ranks": 1}}},
+			"scale": {"base": 15, "step": 20},
+			"payload": {"stat": {"faithful_step": 20}}},
+		# Two magnitudes, two fields: the heal is a percentage, the Faith is a
+		# stack count, and one counter cannot honestly hold both.
 		{"id": "dv_covenant", "name": "Sacred Covenant", "ranks": 1, "lane": "Faith", "row": 5,
-			"desc": "Should Divine Shield prevent lethal damage, its holder is healed for {v}% max health and gains 1 Faith stack.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"covenant_ranks": 1}}},
-		# Re-spec (was a second Blessed-are-the-Faithful step). THE node of
-		# the batch: Faith's second source — party-wide, and riding a
-		# base-kit cast instead of a talent. Conviction finally behaves
-		# like the party-wide system its description promises.
+			"desc": "Should Divine Shield prevent lethal damage, its holder is healed for {v}% max health and gains 2 Faith stacks.",
+			"scale": {"step": 25},
+			"payload": {"stat": {"covenant_heal": 25, "covenant_faith": 2}}},
+		# RE-SPECCED RATHER THAN REPRICED: Batch AW §2 took Fervor's subject
+		# into the base kit (Consecrated Ground drips 1 Faith per ally per turn
+		# with no node at all), so the node keeps its id and its subject and goes
+		# ONE STEP DEEPER instead.
 		{"id": "dv_fervor", "name": "Fervor", "ranks": 1, "lane": "Faith", "row": 6,
-			"desc": "While Consecrated Ground holds, every ally gains {v} Faith at the start of their turn.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"fervor_ranks": 1}}},
-		# Re-spec (was a second Sacred Covenant step): shortens the re-ramp
-		# after a release — allies live in the useful 3-5 band.
+			"desc": "Consecrated Ground's Faith drip becomes {v} per ally per turn instead of 1.",
+			"scale": {"base": 1, "step": 1},
+			"payload": {"stat": {"fervor_step": 1}}},
 		{"id": "dv_oath", "name": "Binding Oath", "ranks": 1, "lane": "Faith", "row": 7,
 			"desc": "When an ally's Faith releases at 5 stacks, they keep {v} instead of resetting to zero.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"oath_ranks": 1}}},
-		# --- Lane C: Zeal — everything else he casts: the ground, the
-		# blessing, the resolve. ---
-		# Re-spec: keys off EITHER banner now (was Resolve only), so
-		# skipping Sacred Resolve no longer strands the node.
+			"scale": {"step": 3},
+			"payload": {"stat": {"oath_ranks": 3}}},
+		# --- Lane ZEAL — EVERYONE, SHALLOWLY: invest a little in the whole
+		# party. (Its old thesis was "everything else he casts", which is the
+		# fault Holy's Sanctuary had — a lane named after the leftovers.) ---
 		{"id": "dv_waters", "name": "Cleansing Waters", "ranks": 1, "lane": "Zeal", "row": 1,
 			"desc": "While Consecrated Ground or Sacred Resolve holds, each party member has a {v}% chance each turn to be cleansed of one harmful effect.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"waters_ranks": 1}}},
-		# Re-spec (was a flat +3% damage dial, exclusive with Stalwart
-		# cross-lane): now it deepens Consecrated Ground's bite.
+			"scale": {"step": 50},
+			"payload": {"stat": {"waters_ranks": 50}}},
+		# The counter holds the INCREASE on the ground's base 10% reflect.
 		{"id": "dv_righteous", "name": "Righteous Fire", "ranks": 1, "lane": "Zeal", "row": 2,
 			"desc": "Consecrated Ground reflects {v}% of damage taken (up from the base 10%).",
-			"scale": {"base": 10, "step": 5},
-			"payload": {"stat": {"righteous_ranks": 1}}},
+			"scale": {"base": 10, "step": 25},
+			"payload": {"stat": {"righteous_step": 25}}},
+		# §5: the authored fallback for a hero who already EARNED Sacred Resolve
+		# — the node pays a longer split instead of a grant it cannot make.
 		{"id": "dv_resolve", "name": "Sacred Resolve", "ranks": 1, "lane": "Zeal", "row": 3,
 			"desc": "New ability: Sacred Resolve — all damage received is split evenly among living heroes for 3 turns; Break damage still lands on the struck hero (25 Mana, 2.5 int, 5cd; Perfect: 4 turns).",
-			"payload": {"grant_ability": "Sacred Resolve"}},
-		# Re-spec: either banner keeps the pulse beating (was Resolve only).
+			"payload": {"grant_ability": "Sacred Resolve",
+				"upgrade": [{"stat": {"resolve_extra_turns": 2}}]}},
 		{"id": "dv_pulse", "name": "Healing Pulse", "ranks": 1, "lane": "Zeal", "row": 4,
 			"desc": "While Consecrated Ground or Sacred Resolve holds, the party heals {v}% of the Devout's max health each turn.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"pulse_ranks": 1}}},
-		# Re-spec (was Blessing of Zeal cooldown -1; ranks 1 -> 2): the
-		# blessing's own cast-time cooldown tick deepens instead.
+			"scale": {"step": 8},
+			"payload": {"stat": {"pulse_ranks": 8}}},
 		{"id": "dv_crusade", "name": "Crusader's Tempo", "ranks": 1, "lane": "Zeal", "row": 5,
 			"desc": "Blessing of Zeal ticks its target's cooldowns down {v} additional turn(s) on cast.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"crusade_ranks": 1}}},
-		# Re-spec (was a second Cleansing Waters step): Blessing of Zeal
-		# doubles Faith gain, so it now CARRIES a Faith source — the shield
-		# is a true Divine Shield (flagged divine) and feeds Conviction.
+			"scale": {"step": 3},
+			"payload": {"stat": {"crusade_ranks": 3}}},
+		# A THIRD FAITH SOURCE, AND THAT IS WHY IT EARNS A ROW: a shield inside
+		# the blessing feeds Conviction, and the blessing already doubles Faith
+		# gain — so the doubling finally travels WITH a source.
 		{"id": "dv_purity", "name": "Purity", "ranks": 1, "lane": "Zeal", "row": 6,
 			"desc": "Blessing of Zeal also grants its target a Divine Shield absorbing {v}% of the Devout's max health.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"purity_ranks": 1}}},
-		# Re-spec (was a second Healing Pulse step; ranks 2 -> 3): pairs
-		# with Righteous Fire — together the ground is a healing engine.
+			"scale": {"step": 35},
+			"payload": {"stat": {"purity_ranks": 35}}},
 		{"id": "dv_lifewell", "name": "Lifewell", "ranks": 1, "lane": "Zeal", "row": 7,
 			"desc": "Damage reflected by Consecrated Ground heals the party for {v}% of the amount reflected.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"lifewell_ranks": 1}}},
+			"scale": {"step": 80},
+			"payload": {"stat": {"lifewell_ranks": 80}}},
 		# --- Capstones (row 8): take ONE, no lane requirement ---
+		# §5: the batch calls this "the first capstone in the game that grants
+		# an ability". IT IS NOT — nine do (bz_rampage, sm_execute, wd_hold_line,
+		# py_firestorm, py_rebirth, cr_shatter, ar_wrath, oc_hysteria and this
+		# one), and eight predate Batch AW. The half that IS true is the reason
+		# the brief gives: Holy's three granted none, so this is the first
+		# CLERIC capstone to owe a fallback at all. Corrected toward the code.
 		{"id": "dv_bulwark", "name": "Bulwark of Fortitude", "ranks": 1, "lane": "Bulwark", "row": 8,
 			"capstone": true,
 			"desc": "New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.0 int, 3cd; Perfect: the party instantly heals 5%).",
-			"payload": {"grant_ability": "Bulwark of Fortitude"}},
-		# Re-spec (was two Faithful steps + a Covenant step): the Faith
-		# lane as a win condition — the party parks at max mitigation and
-		# damage, and every absorb becomes a heal.
+			"payload": {"grant_ability": "Bulwark of Fortitude",
+				"upgrade": [{"stat": {"bulwark_extra_turns": 1}}]}},
+		# UNCHANGED, and with Conviction's third clause it is THE INTERACTION TO
+		# MEASURE: releases stop consuming stacks, so every further Faith gain
+		# re-triggers one — and every release now grows him. The Communion
+		# chain-guard that already stops release cascades recursing stays exactly
+		# as it is.
 		{"id": "dv_apostle", "name": "Apostle", "ranks": 1, "lane": "Faith", "row": 8,
 			"capstone": true,
 			"desc": "Faith releases no longer consume stacks: an ally at 5 Faith stays at 5, and every further Faith gain triggers the release again.",
 			"payload": {"stat": {"apostle": 1}}},
-		# Re-spec (was +8% damage + a Pulse step): a party role that is
-		# neither healing nor damage — a Break-pressure engine that plays
-		# straight into the Swordmaster's Break loop.
+		# The counter is the gate AND the magnitude — one field, one read site.
 		{"id": "dv_judgement", "name": "Judgement", "ranks": 1, "lane": "Zeal", "row": 8,
 			"capstone": true,
-			"desc": "While Consecrated Ground holds, every enemy that damages a hero is Sundered for 2 turns and takes Break damage equal to 20% of the damage it dealt.",
-			"payload": {"stat": {"judgement": 1}}},
+			"desc": "While Consecrated Ground holds, every enemy that damages a hero is Sundered for 2 turns and takes Break damage equal to 40% of the damage it dealt.",
+			"payload": {"stat": {"judgement": 40}}},
 	],
 	"mystic": [
 		# Survivalist — 7 exclusive rows + a capstone row (Batch AI).

@@ -179,6 +179,163 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   party.tscn is the HERO SHEET now, opened from a card.
 
 ## Current systems snapshot (2026-08-08)
+BATCH AW (08-08) — THE DEVOUT: INVESTMENT. Second of the Cleric three. His tree
+was purpose-designed already (Batch K), so like AV this is NOT a restructure — it is
+a SPINE (**he lends out his own bulk and collects dividends**) plus the same 4-5x
+repricing Holy needed. One spec only; the other eleven trees and enemy tuning
+UNTOUCHED. Every one of his 24 ids survives and re-specs in place, NO SAVE VERSION
+MOVES (still v7). §9 carries one Holy fix.
+§0 **SAME INSTRUMENT RULE AS AV, AND IT BINDS HARDER HERE: the Devout is the LOWEST
+damage-share spec in the game (2-4%) and that number is meaningless.** Read
+prevented, healing landed and the normalised contribution share, at a stated sample
+size and on matched flags — Batch AA measured his heal/battle going 10->14
+fixed-party and 25->13 rotated, i.e. OPPOSITE SIGNS, which is what noise looks like.
+§1 **CONVICTION GAINS A THIRD CLAUSE: THE PRINCIPAL GROWS.** Every Faith release
+raises the Devout's maximum health by **3% of his BASE maximum** for the rest of the
+battle AND heals him for the same amount (the dividend arrives as usable health, not
+an empty bar). **"3% OF BASE" IS LOAD-BEARING AND IS NOT 3% OF CURRENT** — the base
+is captured ONCE, at the first release, so growth is LINEAR (3% x N), never 1.03^N.
+The loop still compounds THROUGH THE KIT (bigger maximum -> bigger shield -> more
+absorbs -> more Faith -> more releases), which IS the design; what must not compound
+is the clause against itself, because Apostle turns releases into a stream. NOTHING
+ELSE NEEDED BUILDING — his whole kit already reads his maximum.
+**ONE IMPLEMENTATION: `_conviction_growth(devout)`, one caller (the release branch of
+`_gain_faith`), plus `CONVICTION_GROWTH_PCT = 0.03` and two fields,
+`conviction_hp_gained` / `conviction_base_hp`.**
+**THE LANDMINE, AND IT IS WHY `rot` WAS DROPPED FROM AQ: max_hp LEAKS OUT OF THE
+BATTLE.** The battle-end save sync writes each unit's `max_hp` straight back onto the
+party member, so a one-fight change follows the party out of it — the Devout would be
+permanently enormous one battle at a time with NOTHING CRASHING to announce it.
+`conviction_hp_gained` accumulates every point granted and **BOTH victory syncs
+(battle.gd's victory branch AND run_sim.gd's) subtract it before writing max_hp back**,
+beside `tenacity_hp_gained`, with `hp` clamped under the restored maximum in the same
+step (the existing clampi does it). **THE FIELDS STAY SEPARATE** — but NOT for the
+reason the batch brief gives. **CORRECTION TO THE BRIEF: it calls Tenacity's growth
+PERMANENT. IT IS NOT** — `tenacity_hp_gained` has been subtracted at that same sync
+since Batch W (the ~127,000 max-HP runaway), and unit.gd's own comment has said
+"excluded from the run save" all along. The real reason not to merge them:
+`tenacity_hp_gained` has a SECOND consumer, **Unkillable's mend**, which reads
+`max_hp - tenacity_hp_gained` as "the pool he brought INTO the battle" and must mean
+TENACITY'S growth alone — folding Conviction's in would change what a Warden's
+Unkillable heals for whenever a Devout stands beside him.
+§2 **CONSECRATED GROUND IS A FAITH SOURCE IN THE BASE KIT.** Faith had ONE real
+source on a 2-turn cooldown — one shield, one target — so a passive promising a
+party-wide system delivered to one ally at a time. Fervor's effect MOVED into the
+ability: **every ally gains 1 Faith at the start of their turn while the ground
+holds, NO NODE REQUIRED**; the Fervor node re-specs to DEEPEN it (2/turn). It is its
+own function, **`_ground_faith_tick(u)`**, called from the turn-start block —
+extracted deliberately, because `_run_battle` cannot be driven headlessly (the AR
+trap) and a clause with a real gate has to be reachable by a test or its negative
+control can only ever be a grep.
+§3 ALL 24 NODES RE-AUTHORED AT ROW PRICING, **magnitudes 4-5x not the Mage trees' 3x**
+(same reason as Holy's: rank-1 values on the smallest-numbered support in the game).
+**THE LANE NAMES STAY; TWO THESES ARE RE-AIMED.** Zeal's was "everything else he
+casts" — the fault Sanctuary had, a lane named after the leftovers. The three lanes are
+now three shapes of one act: **BULWARK invests deeply in ONE ally · FAITH invests in
+what the returns pay · ZEAL invests shallowly in EVERYONE.** FULL OLD->NEW MAPPING IN
+THE CHANGELOG. **BASTION GOES TO NO COOLDOWN AT ALL** (a `set`, not the old -1 `add`)
+— a shield every turn is a Faith engine, and it is the strongest node in the tree.
+**UNWAVERING FAITH AT +20% MAX HEALTH is now the most investment-shaped node in the
+game**: with §1 it raises the base every payout AND every growth increment scales from.
+Purity is a THIRD Faith source (the blessing already doubles Faith gain, so the
+doubling finally travels WITH a source). Judgement repriced 20% -> 40%.
+§4 **THE STALWART <-> BASTION PAIR IS DISSOLVED and nobody had noticed.** Batch K
+authored them as an in-lane fork; **Batch AI's row exclusivity destroyed it** — rows 5
+and 6 of one lane, so a player holds both. Removed from CLAUDE.md's prose list (see
+the AA block; `test_runes._exclusives` has been a bare `pass` since AI, so the list
+survived only there — the same correction AS and AT each made). MEASURED, NOT
+PRE-EMPTIVELY RE-TUNED: 50% of his maximum absorbed, on no cooldown.
+§5 TWO AUTHORED FALLBACKS (AU §1) replacing his generics: Sacred Resolve already
+owned -> its split lasts **5 turns instead of 3** (`resolve_extra_turns` 2); Bulwark
+of Fortitude already owned -> **4 turns instead of 3** (`bulwark_extra_turns` 1).
+**CORRECTION TO THE BRIEF: Bulwark is NOT "the first capstone in the game that grants
+an ability" — NINE do** (bz_rampage, sm_execute, wd_hold_line, py_firestorm,
+py_rebirth, cr_shatter, ar_wrath, oc_hysteria and it), eight of them predating AW.
+The true half is the brief's own reason: Holy's three granted none, so it is the first
+CLERIC capstone to owe a fallback. **test_batch_au's generic-count floor moved 12 -> 11
+with the reason in the file** (it FALLS on purpose, one class batch at a time) plus a
+durable half: arcanist/holy/inquisitor now owe NO generics at all.
+§6 **EVERY DEVOUT COUNTER IS ADDITIVE** (the AR/AS/AT/AV form). **FOUR hold the
+INCREASE on a base the kit pays WITHOUT the node and are named `_step` for it** —
+`stalwart_step` on Divine Shield's 30%, `righteous_step` on the ground's 10%,
+`faithful_step` on the release's 15%, `fervor_step` on §2's new base drip of 1 (AV's
+`guardian_step` precedent). **THE BRIEF NAMED TWO OF THOSE FOUR**; the other two have
+the same shape and take the same treatment — reported, not silently generalised.
+`covenant_ranks` SPLIT into `covenant_heal` (25) + `covenant_faith` (2), because one
+counter cannot honestly hold a percentage and a stack count. **`judgement` is the GATE
+AND THE MAGNITUDE in one field** (40 = 40%).
+RUNE AUDIT. **RE-POINTED, and every one still pays EXACTLY what it advertises AND
+exactly what it paid before this batch — only the units moved:** Warded Robes
+(blessed_barrier_ranks 1->4, warded_ranks 1->10), Binding Oath (faithful_ranks 1 ->
+`faithful_step` 5), Burning Censer, the scarred one (righteous_ranks 2 ->
+`righteous_step` 10, lifewell_ranks 1->20), Standing Vow (blessed_barrier_ranks 1->4,
+devoutness_ranks 1->5, pulse_ranks 1->2). The four `_step` names were added to
+**`Runes.STAT_INT_KEYS`** or JSON's float slides into a typed int var and the hero
+fails to spawn (the AA trap). **THE THREE CLERIC CLASS-WIDE RUNES TOUCH NO DEVOUT
+COUNTER**, asserted. **NO DEVOUT RUNE WAS LEFT HOMELESS — this batch retires no node**,
+so there is no vault entry; the test asserts every rune-written counter still has a
+live read site so a later batch that DOES retire one has to say so.
+§7 THE BOT: **Consecrated Ground goes up WHENEVER IT IS OFF COOLDOWN and comes FIRST**
+(the old policy laid it only at 3+ foes as a mitigation button, so a sim measured a
+spec whose party-wide Faith source was mostly absent). Divine Shield onto
+**`_likeliest_target(allies)`** — and the ONLY honest signal on this board is a TAUNT,
+which is a certainty rather than a lean (`_enemy_turn` narrows a mocked enemy's whole
+target list); everything else an enemy does is a 40/60 roll between lowest health and
+`_threat_pick`, and lowest health is already the fallback, so guessing past the taunt
+would be inventing policy. Companion taunts (mocked power 100+) are skipped — the beast
+eats the hit and cannot hold Faith. Blessing of Zeal onto a shield-holder is the Batch K
+fix and STAYS.
+§9 **`hl_beacon` RENAMED "HOUR OF NEED"** — it shipped as SHARED VIGIL in AV, which
+collides with the Warden's Banner row-6 node of the same name (AV flagged it rather
+than shipping it silently). His triggers on standing strong and KEEPS the name; hers
+triggers on a hero being near death. **A LABEL ONLY** — `holy_vigil_pct`,
+`HOLY_VIGIL_AT` and every read site are byte-untouched. test_batch_av re-pointed IN
+PLACE with the reason in the file (315/0 still).
+NEW INSTRUMENT (§0's one new number): **`Devout max-health growth/battle`** in the
+standalone sim report — average HP lent, average % of base, and the MAXIMUM OBSERVED.
+Printed only when a Devout was in the party (a zero on a party without one reads as a
+broken instrument).
+VERIFIED: check_parse 0, check_flow 0 (6 screens), 11 scenes 0 SCRIPT ERROR,
+run-harness gates 1/2/3 PASS. NEW test_batch_aw.gd **337/0**.
+Regression: an 6047/0, ah 5410/0 (STAMP GATE bumped AV -> AW), ah_battle 65/0, ai 2036/0,
+aj 403/0, ak 523/0, al 556/0, ar 885/0, as 387/0, at 460/0, au **255/0 (was 249 — the
+generic-count floor re-pointed 12 -> 11 with the reason in the file, plus the durable
+per-class half)**, av **315/0 (the rename re-pointed IN PLACE)**, test_runes 2981/0,
+test_rune_battle 94/0 (its Devout checks re-pointed to the new units).
+NEGATIVE CONTROLS RUN, all three the batch named: the growth reading CURRENT instead of
+base trips 7 checks, the victory sync leaving the growth on the party member trips 3,
+and Fervor still gating the ground's drip trips 3.
+LIVE AUTOPLAY BATTLE clean (0 SCRIPT ERROR) and the loop reads correctly in a real fight:
+"Consecrated Ground kindles Pyromancer (+2 Faith) (Fervor)" every turn for every hero,
+then "Conviction: the principal grows — Devout's maximum health rises 6 (now 216) …
+rises 6 (now 222) … rises 6 (now 228)". **THE STEP STAYS CONSTANT WHILE THE MAXIMUM
+CLIMBS — that is 3%-of-base working, visible in the log.**
+KIT SMOKE, **CONTRIBUTION METRICS ONLY (§0)**, fixed lineup, 40 battles/row,
+berserker,pyromancer,inquisitor,beastmaster, DOD_SIM_TALENTS force-learning full 8-node
+lanes. All five rows 40/40 wins, 0 SCRIPT ERROR. Devout reads (heal/battle, prevented,
+contribution%, damage share, growth/battle): **ungeared 40 / 82 / 18% / 2% / +3.7% of
+base; BULWARK 48 / 94 / 20% / 2% / +4.4%; FAITH 1997 / 88 / 78% / 3% / +72.9%; ZEAL 134 /
+67 / 27% / 2% / +2.3%.** HIS DAMAGE SHARE NEVER LEAVES 2-3% WHILE HIS CONTRIBUTION GOES
+18% -> 78% — that is §0's whole point, and reading the wrong column would call this batch
+a nerf.
+**THE APOSTLE ROW, ISOLATED, WHICH IS THE NUMBER §1 ASKED FOR AND EXPLICITLY DID NOT ASK
+TO BE CAPPED.** Same FAITH rows 1-7 both sides, only row 8 varying (Apostle vs Bulwark of
+Fortitude): **Apostle +72.9% of base per battle, MAXIMUM OBSERVED 360 HP on a 175 base
+(+206%); without it +41.7%, maximum observed 180 HP (+103%).** So Apostle is worth ~1.75x
+the growth — and BOTH rows are far past the brief's own projection of "a dozen releases
+puts him at +36%", because §2's base-kit drip plus Fervor plus Communion feed many more
+releases than that estimate modelled. Healing follows it: 1997/battle with Apostle vs
+1086 without. **REPORTED AND NOT CAPPED, exactly as §1 instructed — this is a decision,
+not a bug.** Note the smoke fight is over by round 7-8, so a longer fight reads HIGHER.
+NO DIFFICULTY MEASUREMENT AND NO SIM ROW, deliberately — same as AJ/AK/AL/AR/AS/AT/AU/AV.
+A `./sim.sh --run 15` was walked ONLY to exercise RunSim's victory sync (this batch edits
+it) and to check purity: 0 SCRIPT ERROR, profile.json + relics.json BYTE-IDENTICAL, no
+run_save.bin created. **Its Matrix row is NOT reported as a difficulty reading** — n=15
+is far under the resolvable difference and there is no control row.
+DOC-DRIFT NOTE: §8 asked for "the x3 rank notation" to be removed from master.html's
+Devout lanes. **THERE IS NONE ANYWHERE IN THE FILE.** The tables were stale in a
+different way — AI's magnitudes and AP's dead decimals — and were REGENERATED from the
+live tree.
 BATCH AV (08-08) — HOLY: REVERSAL. First of the Cleric three. Her tree was
 purpose-designed already, so this is NOT a restructure — it is a SPINE (**nothing
 is final, no loss permanent**) plus the most overdue repricing in the game. One
@@ -2392,12 +2549,17 @@ Martyr/Wellspring runes break). test_runes.gd asserts the call-site order
 so it cannot move back — the Hunter batch would have hit this on Focus.
 AUTHORING RULES THAT ARE NOW TESTED, NOT JUST WRITTEN: no rune may write
 one half of an EXCLUSIVE talent pair (heat_haze/scorched,
-cascade/overflow, stalwart/bastion,
+cascade/overflow,
 pact_flesh/barter — cold_snap/bitter_cold DISSOLVED IN BATCH AS: both sit
 in Deep Freeze rows 6 and 2 now, a player can hold both, and a rune writing
 either counter is legal. arcane_ward/still_mind DISSOLVED IN BATCH AT: both
 designs are gone (their ids carry Event Horizon and Backlash), so the pair
-went with them. NOTE the rule itself is no longer a live TEST:
+went with them. **stalwart/bastion DISSOLVED IN BATCH AW**: Batch K authored
+them as an in-lane fork (a bigger shield, or a more frequent one) and BATCH
+AI'S ROW EXCLUSIVITY DESTROYED IT — they sit in Bulwark rows 5 and 6, so a
+player holds both, and the combination is now legal AND large (a shield
+absorbing 50% of his maximum, on no cooldown). NOTE the rule itself is no
+longer a live TEST:
 Batch AI retired test_runes._exclusives to a `pass` because at row
 granularity it would fire on nearly every spec rune in the game); every
 stat field must be a real BattleUnit property or
@@ -3483,13 +3645,15 @@ Space or left click; no announcer text (combat log only).
   The open lever remains authored rune POWER — a runes.json data edit,
   not machinery — and the dilution question (see the AB block).
 - Sim bot wins ~90%+ with 4 heroes; real difficulty tuning by user playtest.
-- SIX TALENT TREES STILL CARRY BATCH AI'S MAGNITUDES, AND THE MAGE CLASS IS
-  DONE. The four class batches AI promised landed (AK Swordmaster, AJ Berserker,
-  AL Warden, AR Pyromancer), then AS re-authored the Cryomancer and AT the
-  Arcanist — so all three Mage specs are purpose-authored. THE THREE CLERICS AND
-  THE THREE HUNTERS remain structurally correct and numerically weak: single-rank
-  nodes at the old rank-1 values, i.e. roughly a third of the power a row should
-  be priced at.
+- FOUR TALENT TREES STILL CARRY BATCH AI'S MAGNITUDES. The four class batches AI
+  promised landed (AK Swordmaster, AJ Berserker, AL Warden, AR Pyromancer), then
+  AS re-authored the Cryomancer and AT the Arcanist — THE MAGE CLASS IS DONE — and
+  AV the Holy Cleric, AW the Devout. **THE OCCULTIST IS THE LAST CLERIC**, and the
+  THREE HUNTERS are the last class. They remain structurally correct and
+  numerically weak: single-rank nodes at the old rank-1 values, i.e. roughly a
+  third of the power a row should be priced at. Both Cleric batches so far needed
+  4-5x rather than the Mage trees' 3x, because a support's numbers were the
+  smallest in the game to begin with.
 - DEATH RAY CARRIES NO BREAK DAMAGE (Batch AT, STILL OPEN AFTER AU). AT's brief
   specified Mana, initiative, cooldown, damage, target count and the gate
   precisely and said nothing about BD, so it ships at pressure 0 rather than
@@ -3518,11 +3682,14 @@ Space or left click; no announcer text (combat log only).
   every ability-granting talent node falls back on, so a new entry is felt in
   two places. A hero draws three a run, so a pool much past ~8 stops being
   felt as a REWARD; the fallback has no such ceiling.
-- NINE SPECS STILL TAKE THE GENERIC TALENT FALLBACK (Batch AU §1). Only the
-  Arcanist's two are authored. Each class's re-author batch should replace its
-  own generics with authored fallbacks the way AU did — a node payload's
-  `upgrade` list, or `no_fallback: true` where the node already pays through
-  another clause. The generic is a floor, not a finished design.
+- SEVEN SPECS STILL TAKE THE GENERIC TALENT FALLBACK (Batch AU §1), 11 nodes of
+  them. The Arcanist's two are authored (AU), Holy's two (AV) and the Devout's two
+  (AW). Each remaining class re-author batch should replace its own generics the
+  way those did — a node payload's `upgrade` list, or `no_fallback: true` where
+  the node already pays through another clause. The generic is a floor, not a
+  finished design. test_batch_au's floor is now `generic >= 11` and FALLS on
+  purpose one batch at a time, with a durable per-class half beside it (a spec
+  whose batch has landed must owe NO generics).
 - SEVERITY 4 HOLDS THREE MODIFIERS, not the four AQ's table asked for: `rot`
   was dropped over the max-HP save sync (see the AQ block). Reinstating it is
   one field (`mod_max_hp_lost`, written at the stamp, added back at the

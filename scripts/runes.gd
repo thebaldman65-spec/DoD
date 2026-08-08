@@ -74,7 +74,15 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# BattleUnit field whose name does not end "_ranks" must be listed here,
 	# or JSON's float slides straight into a typed int var and the hero fails
 	# to spawn. These three are what the four Holy runes write today.
-	"triage_heal", "divine_presence_pct", "last_hope_pct"]
+	"triage_heal", "divine_presence_pct", "last_hope_pct",
+	# Batch AW: the Devout's counters went additive too. Most kept their
+	# "_ranks" names (they are still int magnitudes, just in bigger units), but
+	# the four holding the INCREASE on a base the kit pays without the node are
+	# named "_step" — and two of them are written by runes today (the Burning
+	# Censer's righteous_step, the Binding Oath's faithful_step).
+	"stalwart_step", "righteous_step", "faithful_step", "fervor_step",
+	"covenant_heal", "covenant_faith",
+	"resolve_extra_turns", "bulwark_extra_turns"]
 
 static var _data := {}
 

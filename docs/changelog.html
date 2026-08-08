@@ -5,6 +5,153 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-08 — Batch AW: the Devout — investment</h2>
+<p><i>Second of the Cleric three. His tree was purpose-designed already (Batch K), so this is
+not a restructure either — it is a spine (<b>he lends out his own bulk and collects
+dividends</b>) plus the same 4–5&times; repricing Holy needed. Every one of his 24 ids
+survives and re-specs in place; no new ids, none deleted, <b>no save version move</b>
+(still v7).</i></p>
+<ul>
+
+<li><b>§0 THE INSTRUMENT, AGAIN.</b> The Devout is the lowest damage-share spec in the game
+(2–4%) and that number is meaningless. Every row below reads <b>healing landed, damage
+prevented and the normalised contribution share</b>, at a stated sample size and on matched
+flags — his numbers are small enough that sampling noise swamps them (Batch AA measured his
+heal/battle going 10&rarr;14 fixed-party and 25&rarr;13 rotated, i.e. opposite signs).</li>
+
+<li><b>§1 CONVICTION GAINS A THIRD CLAUSE: THE PRINCIPAL GROWS.</b> He collected a sip of
+Mana on every Faith release and never got richer — a lender running a charity. Now
+<b>every Faith release raises the Devout's maximum health by 3% of his BASE maximum for the
+rest of the battle, and heals him for the same amount</b>, so the dividend arrives as usable
+health rather than an empty bar. <b>"3% of base" is load-bearing and is not 3% of
+current</b>: the growth is linear (3% &times; N releases, never 1.03^N). The loop still
+compounds <i>through the kit</i> — bigger maximum &rarr; bigger shield &rarr; more absorbs
+&rarr; more Faith &rarr; more releases — which is the design; what must not compound is the
+clause against itself, because Apostle turns releases into a stream. <b>Nothing else needed
+building</b>: his entire kit already reads his maximum, so one clause makes the whole kit
+escalate, and it escalates off <i>other people's</i> survival rather than his own casting.</li>
+
+<li><b>THE LANDMINE, HANDLED: max_hp does not leave the battle.</b> This is exactly why
+<code>rot</code> was dropped from Batch AQ — the battle-end save sync writes each unit's
+<code>max_hp</code> straight back onto the party member, so a one-fight change follows the
+party out of it and the Devout would grow permanently enormous one battle at a time with
+nothing crashing to announce it. A single field, <code>conviction_hp_gained</code>,
+accumulates every point granted, and <b>both</b> victory syncs (battle.gd's and RunSim's)
+subtract it before writing <code>max_hp</code> back, with <code>hp</code> clamped under the
+restored maximum in the same step.</li>
+
+<li><b>§2 CONSECRATED GROUND IS A FAITH SOURCE IN THE BASE KIT.</b> Faith had one real
+source and it sat on a 2-turn cooldown — one shield, one target — so a passive whose
+description promised a party-wide system delivered to one ally at a time. <b>Fervor's effect
+moved into Consecrated Ground itself: while it holds, every ally gains 1 Faith at the start
+of their turn, with no node required.</b> Faith is party-wide from turn one, which is what
+Conviction always claimed, and the ground becomes an engine rather than a mitigation button.
+The Fervor node is re-specced rather than repriced — same id, same subject, one step deeper
+(2 per ally per turn).</li>
+
+<li><b>§3 ALL 24 NODES RE-AUTHORED AT ROW PRICING.</b> Magnitudes are 4–5&times; rather than
+the Mage trees' 3&times;, for the same reason Holy's were: these were rank-1 values on a
+support whose numbers were already the smallest in the game. <b>The lane names stay; two
+theses are re-aimed.</b> Zeal's thesis was "everything else he casts", which is the fault
+Holy's Sanctuary had — a lane named after the leftovers. The three lanes are now three
+shapes of the same act: <b>BULWARK invests deeply in one ally &middot; FAITH invests in what
+the returns pay &middot; ZEAL invests shallowly in everyone.</b> The full table is in
+&sect;7 of the Master Document. Highlights: <b>Bastion goes to NO COOLDOWN AT ALL</b> (a
+shield every turn is a Faith engine, and it is the strongest node in the tree),
+<b>Unwavering Faith at +20% max health is now the most investment-shaped node in the
+game</b> (with &sect;1 it raises the base every payout and every growth increment scales
+from), <b>Purity is a third Faith source</b> (the blessing already doubles Faith gain, so
+the doubling finally travels with a source), and <b>Judgement is repriced 20% &rarr; 40%</b>
+of the damage dealt.</li>
+
+<li><b>§4 THE STALWART &harr; BASTION PAIR IS DISSOLVED, and nobody had noticed.</b> Batch K
+authored them as an in-lane fork — a bigger shield, or a more frequent one — and
+<b>Batch AI's row exclusivity destroyed that fork</b>: they sit in rows 5 and 6, so a player
+holds both. Removed from CLAUDE.md's prose list (<code>test_runes._exclusives</code> has
+been a bare <code>pass</code> since AI, so the list survived only there — the same
+correction AS and AT each made for their own trees). The combination is now legal and it is
+large: <b>a shield absorbing 50% of his maximum, on no cooldown.</b> Measured, reported, not
+pre-emptively re-tuned.</li>
+
+<li><b>§5 TWO AUTHORED TALENT FALLBACKS</b> (Batch AU &sect;1), replacing his generics:
+Sacred Resolve already owned &rarr; its split lasts <b>5 turns instead of 3</b>; Bulwark of
+Fortitude already owned &rarr; its effect lasts <b>4 turns instead of 3</b>.</li>
+
+<li><b>§6 EVERY DEVOUT COUNTER IS ADDITIVE</b> (the AR/AS/AT/AV form) — each writes its own
+magnitude in the units its read site sums. <b>Four hold the INCREASE on a base the kit pays
+without the node</b> and are named <code>_step</code> for it: Stalwart on Divine Shield's
+30%, Righteous Fire on the ground's 10%, Blessed are the Faithful on the release's 15%, and
+Fervor on &sect;2's new base drip of 1. (The batch named two of those four; the other two
+have the same shape and take the same treatment — reported, not silently generalised.)
+Sacred Covenant's single counter became two, <code>covenant_heal</code> and
+<code>covenant_faith</code>, because one counter cannot honestly hold both a percentage and
+a stack count.</li>
+
+<li><b>RUNE AUDIT — every re-pointed rune still pays exactly what it advertises AND exactly
+what it paid before this batch. Only the units moved.</b> Rune of the Warded Robes
+(<code>blessed_barrier_ranks</code> 1&rarr;4, <code>warded_ranks</code> 1&rarr;10); Rune of
+the Binding Oath (<code>faithful_ranks</code> 1 &rarr; <code>faithful_step</code> 5);
+Rune of the Burning Censer, the scarred one (<code>righteous_ranks</code> 2 &rarr;
+<code>righteous_step</code> 10, <code>lifewell_ranks</code> 1&rarr;20); Rune of the Standing
+Vow (<code>blessed_barrier_ranks</code> 1&rarr;4, <code>devoutness_ranks</code> 1&rarr;5,
+<code>pulse_ranks</code> 1&rarr;2). The four new <code>_step</code> names were added to
+<code>Runes.STAT_INT_KEYS</code> or JSON's float would slide into a typed int var and the
+hero would fail to spawn (the AA trap). <b>The three Cleric class-wide runes touch no Devout
+counter</b>, asserted. No Devout rune was left homeless: this batch retires no node.</li>
+
+<li><b>§7 THE BOT.</b> Consecrated Ground is the Faith engine now, and the old policy
+treated it as a mitigation button it only laid at three or more foes — so a sim measured a
+spec whose party-wide source was mostly absent. It now goes up <b>whenever it is off
+cooldown</b>, and comes first. Divine Shield goes on <b>whoever is likeliest to be hit
+next</b> (the only honest signal on this board is a taunt, which is a certainty rather than
+a lean; lowest health is the fallback) rather than round-robin. Blessing of Zeal onto a
+shield-holder is the Batch K fix and stays.</li>
+
+<li><b>§9 ONE HOLY FIX, FOLDED IN: <code>hl_beacon</code> is renamed "Hour of Need".</b> It
+shipped as SHARED VIGIL in Batch AV, which collides with the Warden's Banner row-6 node of
+the same name (AV flagged it rather than shipping it silently). His triggers on him standing
+strong and keeps the name that fits it; hers triggers on a hero being near death. <b>A label
+only</b> — <code>holy_vigil_pct</code> and every read site are exactly as they were.</li>
+
+<li><b>MAPPING TABLE — every id survives and re-specs in place.</b> Bulwark:
+<code>dv_barrier</code> Blessed Barrier 4%&rarr;20% &middot; <code>dv_aegis</code> Radient
+Aegis 15%&rarr;60% &middot; <code>dv_afterglow</code> Afterglow 5%&rarr;20% &middot;
+<code>dv_warded</code> Warded Robes 10%&rarr;25% &middot; <code>dv_stalwart</code> Stalwart
+35%&rarr;50% &middot; <code>dv_bastion</code> Bastion &minus;1 cooldown &rarr; <b>no
+cooldown</b> &middot; <code>dv_unyielding</code> Unyielding Aegis 30%&rarr;90%.
+Faith: <code>dv_communion</code> Communion 20&rarr;40 &middot; <code>dv_unwavering</code>
+Unwavering Faith 5%&rarr;20% &middot; <code>dv_devoutness</code> Devoutness 5%&rarr;20%
+&middot; <code>dv_faithful</code> Blessed are the Faithful 20%&rarr;35% &middot;
+<code>dv_covenant</code> Sacred Covenant 5%+1 Faith &rarr; 25%+2 Faith &middot;
+<code>dv_fervor</code> Fervor "the ground drips 1" &rarr; <b>re-spec</b>, "the drip becomes
+2" (its old subject is base kit now) &middot; <code>dv_oath</code> Binding Oath keeps
+1&rarr;3. Zeal: <code>dv_waters</code> Cleansing Waters 15%&rarr;50% &middot;
+<code>dv_righteous</code> Righteous Fire 15%&rarr;35% &middot; <code>dv_resolve</code>
+Sacred Resolve unchanged, <b>+ an authored fallback</b> &middot; <code>dv_pulse</code>
+Healing Pulse 2%&rarr;8% &middot; <code>dv_crusade</code> Crusader's Tempo 1&rarr;3 turns
+&middot; <code>dv_purity</code> Purity 10%&rarr;35% &middot; <code>dv_lifewell</code>
+Lifewell 20%&rarr;80%. Capstones: <code>dv_bulwark</code> unchanged, <b>+ an authored
+fallback</b> &middot; <code>dv_apostle</code> unchanged &middot; <code>dv_judgement</code>
+20%&rarr;40%. <b>No forced assignment was needed</b> — every node's subject survived, and the
+one re-spec (Fervor) keeps its own subject one step deeper.</li>
+
+<li><b>TWO CLAIMS IN THE BATCH BRIEF WERE STALE and are recorded rather than quietly
+actioned.</b> (a) &sect;1 says Tenacity's growth at the victory sync is <b>permanent</b> and
+that the two fields "do opposite things at the same site". It is not permanent —
+<code>tenacity_hp_gained</code> has been subtracted at that sync since Batch W. The
+instruction not to merge them stands for a better reason: <code>tenacity_hp_gained</code>
+has a second consumer, Unkillable's mend, which reads "the pool he brought into the battle"
+and must mean Tenacity's growth alone. (b) &sect;5 calls Bulwark of Fortitude "the first
+capstone in the game that grants an ability". <b>Nine capstones grant one</b> and eight
+predate this batch; what is true is the reason the brief gives — Holy's three granted none,
+so it is the first <i>Cleric</i> capstone to owe a fallback. Also: &sect;8 asked for the
+"&times;3 rank notation" to be removed from the Master Document's Devout lanes; <b>there is
+none</b> anywhere in the file. The Devout tables were genuinely stale in a different way —
+they still carried Batch AI's magnitudes and dead decimals — and have been regenerated from
+the live tree.</li>
+
+</ul>
+
 <h2>2026-08-08 — Batch AV: Holy — reversal</h2>
 <p><i>First of the Cleric three. Her tree was purpose-designed already, so this is not a
 restructure — it is a spine (<b>nothing is final, no loss permanent</b>) plus the most

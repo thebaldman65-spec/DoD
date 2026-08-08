@@ -2046,3 +2046,52 @@ and a capstone quietly doing Empower's job for free is how a resource stops
 mattering. Writing it as an ability payload rather than a stat means no field in
 it *could* reach the return health; the prohibition is a property of the data
 rather than a note somebody has to keep obeying.
+
+## Batch AW — the Devout: investment
+
+**The kit was already investment-shaped; what was missing was the other half of
+investment.** Divine Shield, Afterglow, Healing Pulse, Purity's shield and the
+Faith release all pay out percentages of *his* maximum health — he was already
+lending out his own bulk. What he never did was collect: the returns went to
+everyone else and he took a sip of Mana. Adding one clause (every Faith release
+raises his maximum by 3% of base, and heals him for it) made the whole kit
+escalate without building anything, because every one of those payouts already
+reads the number that now grows.
+
+**Escalation off other people's survival is a different spec from escalation off
+your own casting.** The Arcanist's curve is self-driven — he presses buttons and
+gets bigger. The Devout's is not: it only moves when a shield he gave somebody
+else absorbs a blow, or when the party stands on his ground. That is the whole
+reason the same mechanical shape reads as a support rather than as a second
+Arcanist, and it is why the clause is worth more than the number in it.
+
+**Linear on base, compounding through the kit.** 3% of base rather than 3% of
+current is the load-bearing decision. The loop still compounds — a bigger
+maximum makes a bigger shield, which absorbs more, which builds more Faith — but
+it compounds through mechanisms a player can see and interact with. A clause
+compounding against *itself* would be an exponential nobody could read off the
+tooltip, and Apostle (which turns releases into a stream) would have made it
+unbounded rather than merely large.
+
+**A one-fight change that survives the fight is the failure mode to design
+against, and it does not crash.** The battle-end sync writes each unit's
+`max_hp` back onto the party member; anything that moves the maximum mid-battle
+walks out of the battle unless something subtracts it. That is what killed `rot`
+in Batch AQ, and it is invisible — no error, no log line, just a hero who is
+quietly larger every fight. The pattern that works is a named field that
+accumulates exactly what was lent and a subtraction at the sync. The test worth
+writing is not "does the growth happen" but "is it gone afterwards".
+
+**A lane named after the leftovers is a lane with no question in it.** Zeal's
+old thesis was "everything else he casts" — the same fault Holy's Sanctuary had.
+Re-aimed as "invest shallowly in everyone", it sits against Bulwark's "invest
+deeply in one ally" and Faith's "invest in what the returns pay", and the three
+become three answers to one question instead of two answers and a bin.
+
+**Moving an effect down into the base kit is often worth more than repricing it.**
+Fervor was a row-6 node fixing a problem the passive had from turn one: Faith had
+a single source on a 2-turn cooldown, so a party-wide system delivered to one
+ally at a time. No magnitude on that node could fix it, because the fix was
+needed by players who had not bought it. Putting the drip in Consecrated Ground
+and letting the node deepen it costs a node's worth of power and buys the passive
+its stated identity.

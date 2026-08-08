@@ -228,6 +228,7 @@ func _arcanist_authored() -> void:
 	# mechanism is game-wide, and a node left on nothing is what AU §1 fixes.
 	var granting := 0
 	var generic := 0
+	var generic_ids: Array = []
 	for spec in Talents.LANE_TREES:
 		for n in Talents.LANE_TREES[spec]:
 			var pay: Dictionary = n.get("payload", {})
@@ -239,13 +240,30 @@ func _arcanist_authored() -> void:
 				"%s's collision behaviour is one of the three" % n["id"])
 			if kind == "generic":
 				generic += 1
+				generic_ids.append(String(n["id"]))
 			elif kind == "none":
 				ok(String(n["id"]) == "ar_wrath",
 					"%s is the only node that opts out entirely" % n["id"])
 	ok(granting >= 20,
 		"the roster really does hold a pile of ability-granting nodes (%d)" % granting)
-	ok(generic >= 12,
+	# RE-POINTED IN PLACE BY BATCH AW, with the reason here: this floor FALLS
+	# on purpose, one class batch at a time. AU shipped it at 15 generics with
+	# only the Arcanist's two authored; AV authored Holy's two (13), AW the
+	# Devout's two (11). A bare ">= 12" would have read as a regression rather
+	# than as the mechanism working, so the floor moves WITH the reason and the
+	# survivors are NAMED below so it cannot be lowered again by attrition.
+	ok(generic >= 11,
 		"most of them fall back on the GENERIC, which is the point (%d)" % generic)
+	# THE DURABLE HALF: a class whose re-author batch has landed owes no
+	# generics at all. Both Cleric specs with granting nodes are authored now.
+	for done_spec in ["arcanist", "holy", "inquisitor"]:
+		for n2 in Talents.LANE_TREES.get(done_spec, []):
+			var pay2: Dictionary = n2.get("payload", {})
+			if Talents.granted_name(pay2) == "":
+				continue
+			ok(Talents.collision_kind(pay2) != "generic",
+				"%s (%s) has an AUTHORED fallback — its class batch landed" % [
+					n2["id"], done_spec])
 	_report.append("ability-granting nodes: %d, of which %d take the generic" % [
 		granting, generic])
 

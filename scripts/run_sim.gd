@@ -520,7 +520,9 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		var h = battle.heroes[i]
 		# Same clamp as the real branch: battle-long Tenacity gains stay in
 		# the battle, and the fallen return at 20% HP.
-		var save_max: int = h.max_hp - h.tenacity_hp_gained
+		# Conviction's growth (Batch AW) comes back off here too — it is a
+		# one-fight loan, not permanent bulk. See battle.gd's victory branch.
+		var save_max: int = h.max_hp - h.tenacity_hp_gained - h.conviction_hp_gained
 		run.party[i]["hp"] = clampi(maxi(h.hp, int(save_max * 0.2)), 1, save_max)
 		run.party[i]["max_hp"] = save_max
 		if h.resource_name == "Mana":

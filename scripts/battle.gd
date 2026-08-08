@@ -693,15 +693,15 @@ func _spawn_units() -> void:
 
 	# Devoutness (Devout talent, ex-Devotion Aura): the whole party takes
 	# less Break damage — a battle-long status whose power carries the %.
-	var dvn_ranks := 0
+	var dvn_pct := 0
 	for h in heroes:
-		dvn_ranks = maxi(dvn_ranks, h.devoutness_ranks)
-	if dvn_ranks > 0:
+		dvn_pct = maxi(dvn_pct, h.devoutness_ranks)
+	if dvn_pct > 0:
 		for h in heroes:
-			_apply_status(h, "devotion", -1, 5 * dvn_ranks)
+			_apply_status(h, "devotion", -1, dvn_pct)
 			h.update_status("devotion", "DA",
-				"Devoutness: takes %d%% less\nBreak damage." % (5 * dvn_ranks),
-				5 * dvn_ranks)
+				"Devoutness: takes %d%% less\nBreak damage." % dvn_pct,
+				dvn_pct)
 	# Conviction (Devout passive): Divine Shield absorbs build Faith, and
 	# lethal saves reward — both hook back into the battle scene.
 	if heroes.any(func(h): return h.passive_id == "conviction"):
@@ -1750,25 +1750,19 @@ func _run_battle() -> void:
 			if zl_dv != null:
 				if zl_dv.pulse_ranks > 0 and not u.is_companion:
 					var pulse_amt := maxi(int(round(
-						zl_dv.max_hp * 0.02 * zl_dv.pulse_ranks)), 1)
+						zl_dv.max_hp * 0.01 * zl_dv.pulse_ranks)), 1)
 					var pulse_got := u.heal_amount(pulse_amt, u != zl_dv)
 					u.float_text("+%d" % pulse_got, Color(0.4, 0.9, 0.45))
 					_log("   → Talent: Healing Pulse — %s mends %d" % [
 						u.unit_name, pulse_got], "#b0a8e0")
-				if zl_dv.waters_ranks > 0 and randf() < 0.15 * zl_dv.waters_ranks:
+				if zl_dv.waters_ranks > 0 and randf() < 0.01 * zl_dv.waters_ranks:
 					var washed := u.dispel_one_debuff()
 					if washed != "":
 						u.float_text("Cleansed: %s" % washed, Color(0.5, 0.95, 0.6))
 						_log("   → Talent: Cleansing Waters — the %s washes off %s" % [
 							washed, u.unit_name], "#b0a8e0")
-		# Fervor: the consecrated ground kindles the standing party's
-		# Faith — Conviction's second source, and its only party-wide one.
-		if u.is_hero and not u.is_companion and u.has_status("cons_ground"):
-			var fv_dv := _living_devout()
-			if fv_dv != null and fv_dv.fervor_ranks > 0:
-				_log("   → Talent: Fervor — the holy ground kindles %s (+%d Faith)" % [
-					u.unit_name, fv_dv.fervor_ranks], "#b0a8e0")
-				_gain_faith(u, fv_dv.fervor_ranks)
+		# Batch AW §2: the holy ground is a Faith engine in the BASE KIT now.
+		_ground_faith_tick(u)
 		if u.has_status("focus") and u.resource_name == "Mana":
 			u.resource = mini(u.resource + 10, u.max_resource)
 			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
@@ -1869,7 +1863,7 @@ func _run_battle() -> void:
 						u.unit_name, fm_washed, fm_ally.unit_name], "#70d878")
 		# Beacon: as the Cleric's turn begins, her light reaches everyone at
 		# death's door — no cast spent. RUNE-ONLY SINCE BATCH AV (the node
-		# became Shared Vigil): the Rune of the Sleepless Vigil is the last
+		# became Hour of Need): the Rune of the Sleepless Vigil is the last
 		# writer, so the read site is KEPT and gated, never silently deleted.
 		if u.is_hero and not u.dead and u.beacon_ranks > 0:
 			for bc_h in heroes.filter(
@@ -2957,18 +2951,28 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 					and u.ability_ready(resolve_ab) \
 					and weakest_ally.hp < weakest_ally.max_hp * 0.7:
 				return [resolve_ab, u]
-			# Divine Shield is the Faith engine: keep it rolling.
-			var shield_ab := _find_ability(u, "Divine Shield")
-			if shield_ab != null and u.resource >= shield_ab.cost \
-					and u.ability_ready(shield_ab) \
-					and weakest_ally.hp < weakest_ally.max_hp * 0.8 \
-					and not weakest_ally.has_status("barrier"):
-				return [shield_ab, weakest_ally]
+			# BATCH AW §7 — CONSECRATED GROUND IS THE FAITH ENGINE NOW, so it
+			# comes FIRST and goes up whenever it is off cooldown. The old
+			# policy treated it as a mitigation button and only laid it at
+			# three or more foes, which meant a sim measured a spec whose
+			# party-wide Faith source was mostly absent.
 			var ground_ab := _find_ability(u, "Consecrated Ground")
-			if ground_ab != null and u.resource >= ground_ab.cost \
-					and u.ability_ready(ground_ab) and foes.size() >= 3 \
+			if ground_ab != null and u.resource >= _eff_cost(u, ground_ab) \
+					and u.ability_ready(ground_ab) \
 					and not u.has_status("cons_ground"):
 				return [ground_ab, u]
+			# Divine Shield is the other Faith engine: keep it rolling, and
+			# put it on whoever is LIKELIEST TO BE HIT NEXT rather than
+			# round-robin — a shield that never gets struck builds no Faith.
+			# Lowest health is the fallback when nothing is drawing fire.
+			var shield_ab := _find_ability(u, "Divine Shield")
+			if shield_ab != null and u.resource >= _eff_cost(u, shield_ab) \
+					and u.ability_ready(shield_ab):
+				var shield_t := _likeliest_target(allies)
+				if shield_t == null or shield_t.has_status("barrier"):
+					shield_t = weakest_ally
+				if not shield_t.has_status("barrier"):
+					return [shield_ab, shield_t]
 			var zeal_ab := _find_ability(u, "Blessing of Zeal")
 			if zeal_ab != null and u.resource >= zeal_ab.cost and u.ability_ready(zeal_ab):
 				# Kindle whoever holds a Divine Shield — doubled Faith gain
@@ -4026,6 +4030,31 @@ func _lowest_hp(pool: Array) -> BattleUnit:
 	return best
 
 
+# BATCH AW §7 — WHICH ALLY IS LIKELIEST TO BE HIT NEXT, or null when nothing
+# in the board state says. Used by the Devout's bot to aim Divine Shield: a
+# shield that never gets struck builds no Faith, so "whoever is drawing fire"
+# beats "whoever is hurt" as an opening question.
+#
+# THE ONLY HONEST SIGNAL ON THIS BOARD IS A TAUNT, and it is a certainty rather
+# than a lean: `_enemy_turn` narrows a mocked enemy's whole target list to the
+# taunter. Everything else an enemy does is a 40/60 roll between lowest health
+# and `_threat_pick`, and lowest health is what the caller already falls back
+# to — so guessing past the taunt would be inventing policy, not reading it.
+# Companion taunts (mocked power 100+) are deliberately skipped: the beast
+# eats the hit, and it cannot hold Faith.
+func _likeliest_target(pool: Array) -> BattleUnit:
+	for e in enemies:
+		if e.dead or not e.has_status("mocked"):
+			continue
+		var m_idx: int = e.status_power("mocked")
+		if m_idx < 0 or m_idx >= heroes.size() or m_idx >= 100:
+			continue
+		var taunter: BattleUnit = heroes[m_idx]
+		if not taunter.dead and pool.has(taunter):
+			return taunter
+	return null
+
+
 # The living hero carrying a passive, or null (Batch W: attribution for
 # passive-driven mitigation like the Chilled swing malus).
 func _living_hero_passive(pid: String) -> BattleUnit:
@@ -4091,9 +4120,9 @@ const OVERCHARGE_BOT_STACKS := 8
 # BOT POLICY NUMBER: it sits just past the crossover (three turns held is worth
 # less than the Lance's 35% plus its stack bonus; five is worth more).
 const SHATTER_BOT_TURNS := 5
-# Shared Vigil (Holy, Batch AV): how low ANY hero has to be for the party to
-# close ranks. THE one place the line is decided — the damage block and the
-# node text read the same number.
+# Hour of Need (Holy, Batch AV; renamed by AW §9): how low ANY hero has to be
+# for the party to close ranks. THE one place the line is decided — the damage
+# block and the node text read the same number.
 const HOLY_VIGIL_AT := 0.30
 
 
@@ -5161,9 +5190,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_log("   → Talent: Shared Vigil — %s is covered (-%d%%)" % [
 						strike_target.unit_name,
 						int(round(sv_cut * 100.0))], "#b0a8e0")
-			# Shared Vigil (HOLY, Vigil row 5, Batch AV): the party closes
-			# ranks while ANYONE is at death's door — the mirror image of
-			# the Warden's above. Deliberately NOT gated on the Cleric's own
+			# HOUR OF NEED (HOLY, Vigil row 5, Batch AV; RENAMED FROM SHARED
+			# VIGIL BY BATCH AW §9 — the Warden above had the name first and
+			# his trigger fits it, so hers moved. Label only: the counter
+			# `holy_vigil_pct` and this read site are unchanged): the party
+			# closes ranks while ANYONE is at death's door — the mirror image
+			# of the Warden's above. Deliberately NOT gated on the Cleric's own
 			# health: she is the one keeping the party out of the window it
 			# reads. The struck hero counts as "any hero", so a lone
 			# survivor below the line still gets it.
@@ -5173,7 +5205,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var pv_was := raw
 					raw *= 1.0 - 0.01 * hv_c.holy_vigil_pct
 					_prev(hv_c, pv_was - raw)
-					_log("   → Talent: Shared Vigil — the party closes ranks around %s (-%d%%)" % [
+					_log("   → Talent: Hour of Need — the party closes ranks around %s (-%d%%)" % [
 						strike_target.unit_name, hv_c.holy_vigil_pct], "#b0a8e0")
 			# Ruin: the Old Gods' mark cracks the target open (+2%/stack;
 			# Deeper Hex widens every crack by 1%/rank).
@@ -5562,8 +5594,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and not attacker.dead and final > 0:
 				var cg_dv := _living_devout()
 				var cg_pct := 0.10
-				if cg_dv != null and cg_dv.righteous_ranks > 0:
-					cg_pct += 0.05 * cg_dv.righteous_ranks
+				if cg_dv != null and cg_dv.righteous_step > 0:
+					cg_pct += 0.01 * cg_dv.righteous_step
 				var reflect := maxi(int(round(final * cg_pct)), 1)
 				_log("   → Consecrated Ground reflects %d to %s%s" % [
 					reflect, attacker.unit_name,
@@ -5576,7 +5608,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_log("† %s dies" % attacker.unit_name, "#e05050")
 				# Lifewell: the reflected pain waters the party.
 				if cg_dv != null and cg_dv.lifewell_ranks > 0:
-					var well := maxi(int(round(reflect * 0.20 * cg_dv.lifewell_ranks)), 1)
+					var well := maxi(int(round(reflect * 0.01 * cg_dv.lifewell_ranks)), 1)
 					for wh in heroes:
 						if wh.dead or wh.is_companion:
 							continue
@@ -5588,7 +5620,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# Judgement: the ground passes sentence on the attacker.
 				if cg_dv != null and cg_dv.judgement > 0 and not attacker.dead:
 					_apply_status(attacker, "sunder", 2)
-					var jd_bd := maxi(int(round(final * 0.20)), 1)
+					var jd_bd := maxi(int(round(final * 0.01 * cg_dv.judgement)), 1)
 					var jd_result: Dictionary = attacker.take_hit(0, jd_bd)
 					_stat_bd(cg_dv, jd_bd)
 					_log("   → Talent: Judgement — %s is Sundered and takes %d Break damage" % [
@@ -7236,16 +7268,16 @@ func _grant_divine_shield(devout: BattleUnit, target: BattleUnit, power: int) ->
 		return
 	bstat["divine"] = true  # only Divine Shield absorbs build Faith
 	bstat["src"] = devout.unit_name  # Batch W: absorbs credit the caster
-	bstat["blessed_pct"] = 0.04 * devout.blessed_barrier_ranks
-	bstat["afterglow"] = int(round(devout.max_hp * 0.05 * devout.afterglow_ranks))
-	bstat["warded"] = 0.10 * devout.warded_ranks
+	bstat["blessed_pct"] = 0.01 * devout.blessed_barrier_ranks
+	bstat["afterglow"] = int(round(devout.max_hp * 0.01 * devout.afterglow_ranks))
+	bstat["warded"] = 0.01 * devout.warded_ranks
 	# Re-applying merges to the bigger power (add_status maxes), so the
 	# re-form baseline is the pool as it stands, not this cast's power.
 	bstat["original"] = int(bstat.get("power", power))
-	bstat["unyielding_pct"] = 0.30 * devout.unyielding_ranks
+	bstat["unyielding_pct"] = 0.01 * devout.unyielding_ranks
 	if devout.warded_ranks > 0:
 		_log("   → Talent: Warded Robes — the shield hardens %s (+%d%% armor while it holds)" % [
-			target.unit_name, 10 * devout.warded_ranks], "#b0a8e0")
+			target.unit_name, devout.warded_ranks], "#b0a8e0")
 
 
 # Conviction (Devout passive): the living Devout, or null. Faith stacks
@@ -7449,7 +7481,7 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 	if u.faith_stacks < 5:
 		var f_desc := "Conviction: Faith x%d — %d%% damage\nmitigation and +%d%% damage dealt.\nAt 5 stacks: healed for %d%% max\nhealth, and the Faith resets." % [
 			u.faith_stacks, 3 * u.faith_stacks, 2 * u.faith_stacks,
-			15 + 5 * devout.faithful_ranks]
+			15 + devout.faithful_step]
 		if not u.update_status("faith", "F%d" % u.faith_stacks, f_desc):
 			u.add_status("faith", "Faith", "F%d" % u.faith_stacks,
 				Color(0.98, 0.85, 0.45), -1, f_desc)
@@ -7464,13 +7496,13 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 	u.faith_stacks = keep
 	if keep > 0:
 		var k_desc := "Conviction: Faith x%d — %d%% damage\nmitigation and +%d%% damage dealt.\nAt 5 stacks: healed for %d%% max\nhealth." % [
-			keep, 3 * keep, 2 * keep, 15 + 5 * devout.faithful_ranks]
+			keep, 3 * keep, 2 * keep, 15 + devout.faithful_step]
 		if not u.update_status("faith", "F%d" % keep, k_desc):
 			u.add_status("faith", "Faith", "F%d" % keep,
 				Color(0.98, 0.85, 0.45), -1, k_desc)
 	else:
 		u.remove_status("faith")
-	var f_heal := maxi(int(round(u.max_hp * (0.15 + 0.05 * devout.faithful_ranks))), 1)
+	var f_heal := maxi(int(round(u.max_hp * (0.15 + 0.01 * devout.faithful_step))), 1)
 	var f_got: int = u.heal_amount(f_heal, u != devout)
 	u.float_text("FAITH +%d" % f_got, Color(0.98, 0.85, 0.45))
 	_stat_heal(devout, f_got)
@@ -7479,6 +7511,9 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 	devout.refresh_bars()
 	_log("   → Conviction: %s's Faith overflows — healed %d; %s recovers %d Mana" % [
 		u.unit_name, f_got, devout.unit_name, d_mana], "#e8c860")
+	# Batch AW §1 — THE THIRD CLAUSE: the returns increase the principal. He
+	# lends out his own bulk and collects a dividend on every release.
+	_conviction_growth(devout)
 	if devout.apostle > 0:
 		_log("   → Talent: Apostle — %s's Faith burns undimmed (stays at 5)" % \
 			u.unit_name, "#b0a8e0")
@@ -7491,11 +7526,80 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 		for h in heroes:
 			if h == u or h.dead or h.is_companion or h.faith_stacks <= 0:
 				continue
-			if randf() < 0.20 * devout.communion_ranks * h.faith_stacks:
+			if randf() < 0.01 * devout.communion_ranks * h.faith_stacks:
 				_log("   → Talent: Communion — %s's fervor spreads to %s" % [
 					u.unit_name, h.unit_name], "#b0a8e0")
 				_gain_faith(h, 1)
 		_communion_chain = false
+
+
+# BATCH AW §1 — CONVICTION'S THIRD CLAUSE, AND THE ONE PLACE THE DEVOUT'S
+# MAXIMUM GROWS. Every Faith release raises it by 3% of his BASE maximum and
+# heals him for the same amount, so the dividend arrives as usable health
+# rather than an empty bar.
+#
+# "3% OF BASE" IS LOAD-BEARING AND IS NOT 3% OF CURRENT. The base is captured
+# once, on the first release, and never re-read — so the growth is LINEAR
+# (3% x N releases), never `1.03^N`. The loop still compounds THROUGH THE KIT
+# (bigger maximum -> bigger shield -> more absorbs -> more Faith -> more
+# releases), which is the design; what must not compound is the clause against
+# itself, because Apostle turns releases into a stream.
+#
+# THE LANDMINE, AND IT IS EXACTLY WHY `rot` WAS DROPPED FROM BATCH AQ: the
+# battle-end save sync writes each unit's max_hp straight back onto the party
+# member, so a one-fight change would follow the party out of it and the Devout
+# would grow permanently enormous one battle at a time with nothing crashing to
+# announce it. `conviction_hp_gained` accumulates every point granted and BOTH
+# victory syncs (battle.gd's own and RunSim's) subtract it before writing
+# max_hp back, beside `tenacity_hp_gained`, with hp clamped under the restored
+# maximum in the same step. DO NOT MERGE THE TWO FIELDS — but not for the
+# reason the batch brief gives (it calls Tenacity's growth permanent; it has
+# been excluded from the save sync since Batch W, exactly like this one). The
+# real reason is that tenacity_hp_gained has a SECOND consumer: Unkillable's
+# mend reads `max_hp - tenacity_hp_gained` as "the pool he brought into the
+# battle", and that must mean TENACITY'S growth alone.
+const CONVICTION_GROWTH_PCT := 0.03
+
+
+func _conviction_growth(devout: BattleUnit) -> void:
+	if devout.conviction_base_hp <= 0:
+		devout.conviction_base_hp = devout.max_hp - devout.conviction_hp_gained
+	var step := maxi(int(round(devout.conviction_base_hp * CONVICTION_GROWTH_PCT)), 1)
+	devout.max_hp += step
+	devout.conviction_hp_gained += step
+	var grow_got: int = devout.heal_amount(step)
+	devout.float_text("+%d MAX" % step, Color(0.98, 0.85, 0.45))
+	devout.refresh_bars()
+	_stat_heal(devout, grow_got)
+	_log("   → Conviction: the principal grows — %s's maximum health rises %d (now %d)" % [
+		devout.unit_name, step, devout.max_hp], "#e8c860")
+
+
+# BATCH AW §2 — THE HOLY GROUND IS A FAITH SOURCE IN THE BASE KIT, and this is
+# the whole of it. Faith had ONE real source and it sat on a 2-turn cooldown:
+# one shield, one target, while Conviction's description promised a party-wide
+# system. Fervor's effect MOVED HERE — every ally gains 1 Faith at the start of
+# their turn while Consecrated Ground holds, WITH NO NODE REQUIRED — and the
+# Fervor node now DEEPENS it instead (fervor_step = +1, so 2 per ally per turn).
+#
+# It is its own function rather than an inline block because the turn-start
+# upkeep lives inside `_run_battle`, which cannot be driven headlessly (the AR
+# trap: awaiting a turn awaits an ability pick that never arrives). A clause
+# with a real gate in it has to be reachable by a test, or the negative control
+# "Fervor is still required" can only ever be a grep.
+func _ground_faith_tick(u: BattleUnit) -> void:
+	if not u.is_hero or u.is_companion or u.dead:
+		return
+	if not u.has_status("cons_ground"):
+		return
+	var devout := _living_devout()
+	if devout == null:
+		return
+	var gain := 1 + devout.fervor_step
+	_log("   → Consecrated Ground kindles %s (+%d Faith)%s" % [
+		u.unit_name, gain,
+		" (Fervor)" if devout.fervor_step > 0 else ""], "#c8b880")
+	_gain_faith(u, gain)
 
 
 # Conviction: a Divine Shield soaking a hit steels its holder.
@@ -7506,15 +7610,15 @@ func _on_shield_absorbed(holder: BattleUnit) -> void:
 # Sacred Covenant: a Divine Shield that saved a life rewards its holder.
 func _on_lethal_saved(saved: BattleUnit) -> void:
 	var devout := _living_devout()
-	if devout == null or devout.covenant_ranks <= 0:
+	if devout == null or devout.covenant_heal <= 0:
 		return
-	var cov_heal := maxi(int(round(saved.max_hp * 0.05 * devout.covenant_ranks)), 1)
+	var cov_heal := maxi(int(round(saved.max_hp * 0.01 * devout.covenant_heal)), 1)
 	var cov_got: int = saved.heal_amount(cov_heal, saved != devout)
 	saved.float_text("+%d" % cov_got, Color(0.95, 0.9, 0.6))
 	_stat_heal(devout, cov_got)
 	_log("   → Talent: Sacred Covenant — the shield held the line; %s heals %d and keeps the Faith" % [
 		saved.unit_name, cov_got], "#b0a8e0")
-	_gain_faith(saved, devout.covenant_ranks)
+	_gain_faith(saved, maxi(devout.covenant_faith, 1))
 
 
 # Mercy (Holy passive): an ally's brush with death steels the healer.
@@ -7672,7 +7776,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# Absorbs 30% (perfect 35%) of the DEVOUT's max health, carrying
 			# the tree's riders (Blessed Barrier / Afterglow; Covenant fires
 			# through the lethal-save hook). Stalwart deepens the absorb.
-			var ds_pct := (0.35 if is_perfect else 0.30) + 0.05 * attacker.stalwart_ranks
+			var ds_pct := (0.35 if is_perfect else 0.30) + 0.01 * attacker.stalwart_step
 			var shield := int(round(attacker.max_hp * ds_pct))
 			_sfx("parry", -6.0, 0.6)
 			_grant_divine_shield(attacker, target, shield)
@@ -7680,9 +7784,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Divine Shield on %s — absorbs %d (%d%% of the Devout's health%s)" % [
 				attacker.unit_name, target.unit_name, shield,
 				int(round(ds_pct * 100)),
-				", Stalwart" if attacker.stalwart_ranks > 0 else ""], "#70d878")
+				", Stalwart" if attacker.stalwart_step > 0 else ""], "#70d878")
 			# Radient Aegis: the shield can echo onto another ally.
-			if attacker.aegis_ranks > 0 and randf() < 0.15 * attacker.aegis_ranks:
+			if attacker.aegis_ranks > 0 and randf() < 0.01 * attacker.aegis_ranks:
 				var aegis_pool := heroes.filter(
 					func(h): return not h.dead and h != target and not h.is_companion)
 				if not aegis_pool.is_empty():
@@ -7779,11 +7883,15 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# Devout at the turn-start block, and key off EITHER banner
 			# (this or Consecrated Ground) since Batch K.
 			_sfx("heal", -5.0, 0.7)
+			# Batch AW §5: the authored fallback for a hero who already EARNED
+			# Sacred Resolve — its node pays a longer split instead of a
+			# grant it cannot make (resolve_extra_turns, +2).
+			var res_turns := (4 if is_perfect else 3) + attacker.resolve_extra_turns
 			for h in heroes.filter(func(he): return not he.dead):
-				_apply_status(h, "unity", 4 if is_perfect else 3)
+				_apply_status(h, "unity", res_turns)
 			_message("%s binds the party as one!" % attacker.unit_name)
 			_log("%s: Sacred Resolve — the party's souls are bound (%d turns)" % [
-				attacker.unit_name, 4 if is_perfect else 3], "#70d878")
+				attacker.unit_name, res_turns], "#70d878")
 		"cons_ground":
 			_sfx("heal", -5.0, 0.6)
 			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
@@ -7813,23 +7921,28 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# gain finally travels WITH a Faith source.
 			if attacker.purity_ranks > 0:
 				var purity_pow := maxi(int(round(
-					attacker.max_hp * 0.10 * attacker.purity_ranks)), 1)
+					attacker.max_hp * 0.01 * attacker.purity_ranks)), 1)
 				_grant_divine_shield(attacker, target, purity_pow)
 				target.float_text("Purity %d" % purity_pow, Color(0.95, 0.9, 0.6))
 				_log("   → Talent: Purity — the blessing carries a shield (%d)" % \
 					purity_pow, "#b0a8e0")
 		"bulwark":
 			_sfx("parry", -5.0, 0.5)
+			# Batch AW §5: the first CLERIC capstone that grants an ability and
+			# therefore owes a fallback (Holy's three granted none; eight other
+			# capstones across the roster already did — see talents.gd) —
+			# already owned, it pays +1 turn instead.
+			var bw_turns := 3 + attacker.bulwark_extra_turns
 			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
-				_apply_status(h, "bulwark", 3)
+				_apply_status(h, "bulwark", bw_turns)
 				if is_perfect:
 					var bw_heal := maxi(int(round(h.max_hp * 0.05)), 1)
 					var bw_got: int = h.heal_amount(bw_heal, h != attacker)
 					h.float_text("+%d" % bw_got, Color(0.4, 0.9, 0.45))
 					_stat_heal(attacker, bw_got)
 			_message("%s raises the BULWARK OF FORTITUDE!" % attacker.unit_name)
-			_log("%s: Bulwark of Fortitude — no Break damage, armor +50%%, 10%% healing per turn (3 turns)" % \
-				attacker.unit_name, "#8c9cc8")
+			_log("%s: Bulwark of Fortitude — no Break damage, armor +50%%, 10%% healing per turn (%d turns)" % [
+				attacker.unit_name, bw_turns], "#8c9cc8")
 		"bewitch":
 			_sfx("break", -8.0, 1.4)
 			_apply_status(target, "bewitch", 3)
@@ -10082,6 +10195,23 @@ func _check_end() -> void:
 	if sim:
 		sim_done += 1
 		_stat("battles")
+		# BATCH AW §0 — THE ONE NEW NUMBER, and it is the whole batch in one
+		# figure: how much maximum health Conviction lent the Devout over the
+		# course of this fight. Banked here rather than at the growth site so
+		# it is a PER-BATTLE total, and the maximum observed is tracked
+		# alongside because §1 ships 3% uncapped as a deliberate trial and the
+		# Apostle row is what decides whether it needs a ceiling.
+		for cg_h in heroes:
+			if cg_h.passive_id != "conviction":
+				continue
+			_stat("conviction_growth", float(cg_h.conviction_hp_gained))
+			_stat("conviction_battles")
+			if cg_h.conviction_base_hp > 0:
+				_stat("conviction_growth_pct", 100.0 * cg_h.conviction_hp_gained
+					/ float(cg_h.conviction_base_hp))
+			sim_stats["conviction_growth_max"] = maxf(
+				sim_stats.get("conviction_growth_max", 0.0),
+				float(cg_h.conviction_hp_gained))
 		# Fights that never reached round 3 record their end state (a win
 		# counts 0 standing — the field emptied before AoE could feed).
 		if not _r3_recorded:
@@ -10159,9 +10289,17 @@ func _check_end() -> void:
 		Run.combat_wins += 1
 		for i in heroes.size():
 			# Keep the saved max in sync with talents/runes/scaling so full
-			# heals reach the true maximum — but battle-long Tenacity gains
-			# stay in the battle.
-			var save_max: int = heroes[i].max_hp - heroes[i].tenacity_hp_gained
+			# heals reach the true maximum — but battle-long gains stay in the
+			# battle. TWO SEPARATE LOANS COME OFF HERE (Batch AW): Tenacity's,
+			# and now Conviction's growth — each is a ONE-FIGHT loan, and hp is
+			# clamped under the restored maximum in the same step (the clampi
+			# below). Without the second one the Devout leaves every battle
+			# permanently larger with nothing crashing to announce it — the
+			# exact failure that got `rot` dropped from Batch AQ. THE FIELDS
+			# STAY SEPARATE: Unkillable also reads tenacity_hp_gained, as "the
+			# pool he brought into the battle", and must not see this one.
+			var save_max: int = heroes[i].max_hp - heroes[i].tenacity_hp_gained \
+				- heroes[i].conviction_hp_gained
 			# The Untouched refuse to stay down: the fallen return at 20% HP.
 			Run.party[i]["hp"] = clampi(maxi(heroes[i].hp, int(save_max * 0.2)),
 				1, save_max)
@@ -10409,6 +10547,14 @@ func _print_sim_report() -> void:
 			int(sim_stats.get("stalemates", 0.0)), int(battles)])
 	print("Per-hero contribution (avg per battle present):")
 	print(_contrib_table(sim_stats))
+	# Batch AW §0: printed only when a Devout was in the party, because a zero
+	# on a party without one reads as a broken instrument rather than a line.
+	var cg_n: float = sim_stats.get("conviction_battles", 0.0)
+	if cg_n > 0.0:
+		print("Devout max-health growth/battle: %.1f HP (+%.1f%% of base), max observed %d HP" % [
+			sim_stats.get("conviction_growth", 0.0) / cg_n,
+			sim_stats.get("conviction_growth_pct", 0.0) / cg_n,
+			int(sim_stats.get("conviction_growth_max", 0.0))])
 	print("=============================================\n")
 
 

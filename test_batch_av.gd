@@ -24,7 +24,7 @@
 #   LIVE: Intercession fires once, costs a stack ON TRIGGER and not on cast,
 #      and does nothing when she holds none. Serenity's cost waiver, and that
 #      it does NOT alter the return health. Grace only at maximum Mercy.
-#      Martyrdom's automatic return. Shared Vigil and Blessed Vestments.
+#      Martyrdom's automatic return. Hour of Need and Blessed Vestments.
 #   NEGATIVE CONTROLS for the two that would fail silently: Guardian Angel
 #      back at 53%, and Serenity also setting the return health to full.
 extends SceneTree
@@ -279,8 +279,14 @@ func _tree_shape() -> void:
 				n.get("lane", ""), n.get("row", 0)])
 	# The renames, by name rather than by id — a re-spec that forgot its label
 	# would pass every structural check above.
+	# hl_beacon RE-POINTED IN PLACE BY BATCH AW §9, with the reason here: AV
+	# shipped it as "Shared Vigil" and FLAGGED the collision with the Warden's
+	# Banner row-6 node of the same name rather than shipping it silently. AW
+	# took the designer's call — his triggers on standing strong and keeps the
+	# name; hers is "Hour of Need". A LABEL ONLY: `holy_vigil_pct` and every
+	# read site are untouched, and the magnitude check below still reads 15.
 	for pair in [["hl_resurrection", "Grace"], ["hl_inner_faith", "Intercession"],
-			["hl_beacon", "Shared Vigil"], ["hl_capacitor", "Martyrdom"],
+			["hl_beacon", "Hour of Need"], ["hl_capacitor", "Martyrdom"],
 			["hl_sanctum", "Sanctum"], ["hl_serenity", "Serenity"],
 			["hl_vestments", "Blessed Vestments"]]:
 		ok(String(_node(String(pair[0])).get("name", "")) == String(pair[1]),
@@ -381,7 +387,7 @@ func _additive_units() -> void:
 			["0.01 * caster.cascade_pct", "Radiant Cascade"],
 			["0.01 * _overflow_share(caster)", "Overflow"],
 			["* u.divine_presence_pct * _healing_done_mult(u)", "Divine Presence"],
-			["0.01 * hv_c.holy_vigil_pct", "Shared Vigil"],
+			["0.01 * hv_c.holy_vigil_pct", "Hour of Need"],
 			["0.01 * caster.vestments_pct", "Blessed Vestments"],
 			["0.01 * cleric.grace_pct", "Grace"],
 			["0.01 * cleric.sanctified_pct", "Sanctified"],
@@ -752,14 +758,14 @@ func _live_martyrdom() -> void:
 	await _kill(scene)
 
 
-# ---------- live: Shared Vigil and Blessed Vestments ----------
+# ---------- live: Hour of Need and Blessed Vestments ----------
 
 func _live_vigil_and_vestments() -> void:
 	# SHARED VIGIL. The same blow, twice, differing only in whether ANYONE is
 	# under the line — so the 15% is measured rather than asserted.
 	var scene := await _spawn({"hl_beacon": 1})
 	var c := _hero(scene, 2)
-	ok(c.holy_vigil_pct == 15, "Shared Vigil is stamped at 15%")
+	ok(c.holy_vigil_pct == 15, "Hour of Need is stamped at 15%")
 	var foe = scene.get("enemies")[0]
 	var mark := _hero(scene, 0)
 	for h in scene.get("heroes"):
@@ -778,7 +784,7 @@ func _live_vigil_and_vestments() -> void:
 		var cut := 1.0 - float(covered_hit) / float(plain_hit)
 		ok(abs(cut - 0.15) < 0.015,
 			"...and the cut is 15%% (got %.1f%%)" % (cut * 100.0))
-		_report.append("Shared Vigil measured at %.1f%% damage taken" % (cut * 100.0))
+		_report.append("Hour of Need measured at %.1f%% damage taken" % (cut * 100.0))
 	await _kill(scene)
 	# BLESSED VESTMENTS: her healing leaves a barrier worth a quarter of it.
 	var vest := await _spawn({"hl_vestments": 1})

@@ -381,9 +381,15 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 		ok(has_flay, "occultist: the Flayed Mind rune granted no Mind Flay")
 	if by_spec.has("conviction"):
 		var dv: Node = by_spec["conviction"]
-		ok(dv.blessed_barrier_ranks >= 2,
+		# RE-POINTED IN PLACE BY BATCH AW, with the reason here: the Devout's
+		# counters went ADDITIVE, so the two runes feeding Blessed Barrier now
+		# write 4 apiece (4% of absorbs each) rather than a rank each, and
+		# Righteous Fire's counter is `righteous_step` — the INCREASE on the
+		# ground's base 10%, which is what the Burning Censer's advertised
+		# "reflects 10% more" means. Same question, current units.
+		ok(dv.blessed_barrier_ranks >= 8,
 			"devout: two runes feeding blessed_barrier_ranks did not sum")
-		ok(dv.righteous_ranks >= 2, "devout: righteous_ranks never applied")
+		ok(dv.righteous_step >= 10, "devout: righteous_step never applied")
 
 	# BATCH AH: the White Flame check below reads a LOG LINE, which made it a
 	# race against how long the fight lasts — and AH trimmed the Berserker's

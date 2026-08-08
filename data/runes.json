@@ -285,25 +285,25 @@
 		"name": "Rune of the Warded Robes", "rarity": "rare", "scope": "spec:inquisitor",
 		"price": 100, "lane": "Bulwark",
 		"desc": "Divine Shield turns 4% of what it absorbs into healing, and its holder wears +10% armor while it stands.",
-		"payload": {"stat": {"blessed_barrier_ranks": 1, "warded_ranks": 1}}
+		"payload": {"stat": {"blessed_barrier_ranks": 4, "warded_ranks": 10}}
 	},
 	"binding_oath": {
 		"name": "Rune of the Binding Oath", "rarity": "rare", "scope": "spec:inquisitor",
 		"price": 100, "lane": "Faith",
 		"desc": "A Faith release leaves 1 stack standing instead of nothing, and heals 5% more of the bearer's max health.",
-		"payload": {"stat": {"oath_ranks": 1, "faithful_ranks": 1}}
+		"payload": {"stat": {"oath_ranks": 1, "faithful_step": 5}}
 	},
 	"burning_censer": {
 		"name": "Rune of the Burning Censer", "rarity": "rare", "scope": "spec:inquisitor",
 		"price": 75, "scarred": true, "lane": "Zeal",
 		"desc": "Consecrated Ground reflects 10% more and the reflection mends the party for a fifth of it — but -12% max health.",
-		"payload": {"stat": {"righteous_ranks": 2, "lifewell_ranks": 1, "max_hp_pct": -0.12}}
+		"payload": {"stat": {"righteous_step": 10, "lifewell_ranks": 20, "max_hp_pct": -0.12}}
 	},
 	"standing_vow": {
 		"name": "Rune of the Standing Vow", "rarity": "rare", "scope": "spec:inquisitor",
 		"price": 100,
 		"desc": "A little of every vow: Divine Shield heals 4% of what it absorbs, -5% party Break damage, holy ground mends 2% each turn.",
-		"payload": {"stat": {"blessed_barrier_ranks": 1, "devoutness_ranks": 1, "pulse_ranks": 1}}
+		"payload": {"stat": {"blessed_barrier_ranks": 4, "devoutness_ranks": 5, "pulse_ranks": 2}}
 	},
 
 	"deepening_ruin": {
