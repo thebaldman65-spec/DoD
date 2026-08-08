@@ -369,31 +369,45 @@ var fuse_ranks := 0           # no node: Fuse
 var white_heat_ranks := 0     # no node: White Heat
 var avatar_flame := 0         # no node: Avatar of Flame
 var was_frozen := false       # has been Frozen this battle
-# Cryomancer tree (Batch O lanes). See talents.gd for the node text.
-var hungering_ranks := 0      # Hungering Cold: chilled enemies hit softer
-var frostbite_ranks := 0      # Brittle Ice: crits land easier on Frozen
-var piercing_ice_ranks := 0   # Piercing Ice: Ice Lance crit damage
-var hypothermia_ranks := 0    # Hypothermia: chilled enemies take more
-var frigid_ranks := 0         # Frigid Grip: deeper slow per stack
-var frigid_bonus := 0.0       # stamped on VICTIMS when Chilled lands
-var icy_veins_ranks := 0      # Icy Veins: Ice Lance kills empower the next
-var icy_veins_charge := 0.0   # the armed bonus for the next Ice Lance
-var splinter_ranks := 0       # Splintering Shards: Razor Ice 4th strike
-var whiteout_ranks := 0       # Whiteout: Blizzard can Daze
-var freezing_ranks := 0       # Freezing Advance: next hit on the frozen
-var freezing_adv_mark := false # stamped on the VICTIM when it Freezes
-var emp_frostbolt_ranks := 0  # Empowered Frostbolt: bigger basic bolt
-var cold_snap_ranks := 0      # Cold Snap: Frozen holds extra turns
-var bitter_cold_ranks := 0    # Bitter Cold: freezes chill the field
-var glacial_ranks := 0        # Glacial Economy: Mana back per freeze
-var crystal_edge_ranks := 0   # Crystal Edge: deeper Lance stack scaling
-var honed_shards_ranks := 0   # Honed Shards: Lance crits apply Chilled
-var frost_ward_ranks := 0     # Frost Ward: less damage from the Chilled
-var icy_resolve_ranks := 0    # Icy Resolve: Rime lasts longer
-var grasp_ranks := 0          # Winter's Grasp: chilled foes gain stacks
-var numbing_ranks := 0        # Numbing Veil: chilled enemies can miss
-var absolute_zero := 0        # capstone: freezes keep all 4 stacks
-var eternal_winter := 0       # capstone: the whole field chills each turn
+# Cryomancer tree (Batch AS lanes: Winter / Deep Freeze / Thaw).
+# EVERY COUNTER BELOW IS ADDITIVE, not ranked: the node writes its own
+# magnitude in the units the read site sums, so a rune writing the same field
+# pays its advertised number alone AND stacked. Under the old `1 x step` form
+# a rune's value silently inherited the node's multiplier.
+var hungering_ranks := 0      # Hungering Cold: -N% damage per Chilled stack
+var frostbite_ranks := 0      # Brittle Ice: +N% crit chance against a HELD enemy
+var piercing_ice_ranks := 0   # Piercing Ice: Ice Lance +N% critical damage
+var hypothermia_ranks := 0    # Hypothermia: +N% damage taken per Chilled stack
+var frigid_ranks := 0         # Frigid Grip: every Chilled stack slows N% harder
+var frigid_bonus := 0.0       # ...stamped on the VICTIM when Chilled lands
+var deep_chill_ranks := 0     # Deep Chill: Frostbolt applies +N stacks of Chilled
+var splinter_ranks := 0       # Splintering Shards: Razor Ice ALWAYS strikes a 4th time
+var whiteout_ranks := 0       # Whiteout: Blizzard applies N stacks to every enemy
+var killing_frost := 0        # Killing Frost: +N points on the held-enemy window
+var cold_snap_ranks := 0      # Cold Snap: a held enemy's Break fills N per turn
+var bitter_cold_ranks := 0    # Bitter Cold: a freeze chills every OTHER enemy N times
+var glacial_ranks := 0        # Glacial Economy: N% of max Mana back per freeze
+var crystal_edge_ranks := 0   # Crystal Edge: Ice Lance +N% of Attack per Chilled stack
+var honed_shards_ranks := 0   # Honed Shards: a release leaves N stacks of Chilled
+var icy_resolve_ranks := 0    # Icy Resolve: Rime lasts N additional turns
+var grasp_ranks := 0          # Winter's Grasp: N random Chilled enemies gain a stack
+var second_prison := 0        # Second Prison: he can hold TWO enemies at once
+var shattered_tempo := 0.0    # Shattered Tempo: a release pushes every OTHER enemy back
+var absolute_zero := 0        # capstone: NO limit on how many enemies he holds
+var eternal_winter := 0       # capstone: every enemy gains a stack each of his turns
+# RUNE-ONLY (Batch AS §5). Numbing Veil's node became Glacial Prison; the
+# read site is KEPT because the Rune of the Killing Cold still writes it.
+var numbing_ranks := 0        # Chilled enemies miss N% more often
+# UNREACHABLE BUT KEPT (the AR vault pattern — no node writes these and no
+# rune does either, so each is gated `> 0` and can never be non-zero. Listed
+# in the changelog so a later batch can re-node or delete them deliberately
+# rather than rediscovering them.)
+var icy_veins_ranks := 0      # no node: Icy Veins
+var icy_veins_charge := 0.0   # no node: Icy Veins' armed bonus
+var emp_frostbolt_ranks := 0  # no node: Empowered Frostbolt
+var freezing_ranks := 0       # no node: Freezing Advance
+var freezing_adv_mark := false # no node: Freezing Advance's victim mark
+var frost_ward_ranks := 0     # no node: Frost Ward
 # Arcanist rework + tree (07-20). See talents.gd for the node text.
 var overcharged := false      # Overcharge is active (max Resonance 8)
 var overcharge_mult := 1.5    # weight of stacks 6-8 (1.65 on a perfect cast)
@@ -1258,13 +1272,17 @@ func effective_speed() -> float:
 	# unit reaches its next turn sooner but has not shortened anything, which
 	# is exactly what "cooldowns unchanged" asks for.
 	var s := speed * mod_speed_mult * (0.75 if has_status("slow") else 1.0)
-	# Chilled deepens with stacks: 1 = -25% speed, 2+ = -50% (Frigid Grip
-	# stamps its extra slow on the victim when the stack lands).
+	# Chilled deepens with stacks: 1 = -25% speed, 2+ = -50%. Frigid Grip
+	# stamps its extra slow on the victim when the stack lands, and it is PER
+	# STACK (Batch AS): at 10 points a stack, one stack is -35%, two is -70%,
+	# three is -80%. That is the node §0 exists for — it is what makes the
+	# initiative bar visibly move — and the 0.1 floor is what stops a deep
+	# pile turning the divisor into zero.
 	var chill := status_stacks("chilled") if has_status("chilled") else 0
 	if chill == 1:
-		s *= 0.75 - frigid_bonus
+		s *= maxf(0.75 - frigid_bonus, 0.1)
 	elif chill >= 2:
-		s *= maxf(0.5 - frigid_bonus, 0.1)
+		s *= maxf(0.5 - frigid_bonus * chill, 0.1)
 	if has_status("quickdraw"):
 		s *= 1.5
 	if has_status("wrath"):

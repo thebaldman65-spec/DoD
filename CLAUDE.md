@@ -179,6 +179,135 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   party.tscn is the HERO SHEET now, opened from a card.
 
 ## Current systems snapshot (2026-08-07)
+BATCH AS (08-07) — THE CRYOMANCER, RE-AUTHORED AROUND GLACIAL HOLD. Second of
+the Mage three. One spec only; the other ten trees and enemy tuning UNTOUCHED.
+§0 THE INITIATIVE AUDIT, AND THE ANSWER IS MOSTLY GOOD NEWS: **THE RESCHEDULE
+HAS ALWAYS CALLED effective_speed()** — every line in battle.gd that advances a
+unit on the timeline (turn loop, stun/freeze branches, debug turn lock,
+enemy-skip toggle, post-cast reschedule, delay_push, the turn bar's own
+preview) divides by it. CHILLED HAS ALWAYS SLOWED; every doc claiming so was
+right. THE ONE HOLE WAS THE OPENING ROLL — `(100.0 / u.speed)` read the raw
+stat, so Frenzied (mod_speed_mult) and Hoarfrost (Chilled), both of which live
+in effective_speed(), did NOTHING to the first turn order and the comment above
+`_apply_battle_modifier()` asserting otherwise HAD BEEN WRONG SINCE AN. Now
+`(100.0 / maxf(u.effective_speed(), 0.1))`; the Hunter's -0.01 override
+untouched. test_batch_as pins BOTH halves against the source (a seed is one
+random draw; a single sample cannot tell two divisors apart).
+§1 PERMAFROST -> **GLACIAL HOLD**, one mechanic in three clauses. PERMAFROST
+his Chilled never expires (unchanged). THE HOLD a Frozen enemy stays Frozen
+INDEFINITELY, off the initiative bar, released ONLY by Ice Lance, Shatter, or a
+freeze past his limit (frees the OLDEST); a released enemy returns on 1 stack.
+THE WINDOW a held enemy takes +15% from ALL sources (+30% Killing Frost).
+**NOTHING ELSE THAWS IT — not ally damage, not his own Blizzard, not time.**
+He holds ONE (two w/ Second Prison, any number under Absolute Zero). NO COST
+CLAUSE, unlike Overburn, deliberately: his cost is TEMPO. Bosses resist until
+Broken AND a held boss releases after one turn (an indefinite boss hold is a
+softlock, not a fantasy).
+FIVE NAMED SITES, all together above `_apply_status`: `_holds` (the ORDERED
+ledger, oldest first — the ONE answer to "is this held", so the bar, the
+window, Brittle Ice, Cold Snap, Cryoclasm and the bot cannot disagree),
+`_hold_freeze` (THE ONE PLACE A HOLD BEGINS; two callers — the Chilled-4 branch
+and Glacial Prison), `_hold_release` (THE ONE PLACE ONE ENDS; every caller
+names its reason in the log, and Honed Shards + Shattered Tempo live here so
+Shatter and an evicted prison inherit them with no second copy), `_hold_sync`
+(top of every turn, before the bar reads it) and `_hold_window_mult`.
+THREE CONSEQUENCES THE BRIEF DID NOT ENUMERATE — DECISIONS, NOT SIDE EFFECTS:
+(a) **A CLEANSING RITE CANNOT REACH A HOLD** (`_cleansable_debuffs` skips it) —
+frozen is in DEBUFF_IDS and the rite takes the LONGEST-remaining debuff, and a
+battle-long freeze reads 999, so a mender warband would have stripped it every
+time and the indefinite prison would be worth LESS than the old one-turn
+freeze. That removes the enemy's only answer; the hold limit and the boss
+carve-out are the price. (b) A held enemy goes to **next_time = INF** rather
+than losing a turn a round — otherwise the log fills forever and its cooldowns
+tick while it sits helpless. (c) **IF THE CRYOMANCER DIES EVERY PRISON OPENS**
+(in `_hold_sync`) — the same softlock through a different door.
+§2 KIT: **ICE LANCE IS THE RELEASE** (damage/Break/always-crit-vs-Frozen all
+kept — the auto-crit finally means something). Frostbolt/Razor Ice/Blizzard/
+Rime mechanically unchanged; Blizzard's desc SAYS it does not thaw a hold.
+TWO NEW ABILITIES, tree-only (both read the hold, so both fail AH's curation
+rule): Glacial Prison (25/2.5/4cd, freeze outright) and Cryoclasm (20/2.0/3cd,
+MOVE the hold — deliberately NOT routed through `_hold_release`, because a move
+is not a release and no release payoff may fire).
+§3 **SHATTERPOINT RENAMED THAW** (it was four crit dials — a control spec whose
+payoff lane is burst is a damage spec wearing a coat). ALL 24 NODES RE-AUTHORED
+AT ROW PRICING, **EVERY ID SURVIVES**, TEN CHANGED LANE, NO SAVE VERSION MOVES
+(still v7). FULL OLD->NEW MAPPING IN THE CHANGELOG. TWO FORCED ASSIGNMENTS
+REPORTED NOT HIDDEN: cr_frost_ward -> Second Prison (no ancestor exists; a slot
+had to hold it) and cr_lance_focus -> Cryoclasm (the closest remaining Ice
+Lance node). Cold Snap and Absolute Zero are RE-SPECCED, not repriced — "Frozen
+lasts +1 turn" and "freezing no longer reduces stacks" are both meaningless
+under an indefinite hold, so they became a held enemy's Break filling 15/turn
+and NO LIMIT on holds.
+MAGNITUDES ARE **ADDITIVE, NOT RANKED**: every counter writes its own magnitude
+in the units its read site sums (frigid_ranks 10 = percentage POINTS, and
+**FRIGID GRIP IS PER STACK NOW** — 1 stack -35%, 2 -70%, 3 -80%, floored at a
+0.1 multiplier so a deep pile can never make a zero divisor).
+NEW FIELDS, one read site each: deep_chill_ranks, killing_frost, second_prison,
+shattered_tempo (the tree's only FLOAT counter — `_max_hero_rank` reads ints,
+so `_hero_shattered_tempo` is its own scanner).
+§4 **A HELD ENEMY LEAVES THE 14-SLOT TURN BAR ENTIRELY** and its nameplate chip
+reads HELD with a tooltip naming every door out. NOTE: an ordinary hold leaves
+the bar because next_time is INF, so **the bar's `_is_held` filter is
+load-bearing ONLY for the held BOSS**, which keeps its clock — a negative
+control stripping the filter PASSED against a raider, and the assertion that
+catches it now lives in the boss check.
+§5 RUNE AUDIT. **RE-POINTED:** Bitter Grip (frigid 1->3, frostbite 1->2), Long
+Winter (frigid 1->3, crystal_edge 1->5), Killing Cold (numbing 1->5), Honed
+Lance (**lane tag Shatterpoint -> Thaw** — a dead lane name would have left it
+homeless in the bot's build policy AND the per-lane coverage test).
+hungering_ranks and hypothermia_ranks did NOT move (their read sites were
+already additive). **THE THREE MAGE CLASS-WIDE RUNES TOUCH NO CRYOMANCER
+COUNTER**, asserted. **RUNE-ONLY, READ SITE KEPT:** `numbing_ranks` (Glacial
+Prison took its node's id). FLAGGED FOR RE-AUTHORING: the Killing Cold is
+tagged the WINTER rune but pays into Thaw's Hypothermia plus a node-less
+counter — a design call, and rune magnitude is CLOSED since AF.
+UNREACHABLE-BUT-KEPT (AR vault pattern, gated `> 0`, reported so a later batch
+can re-node or delete deliberately): icy_veins_ranks/icy_veins_charge,
+emp_frostbolt_ranks, freezing_ranks/freezing_adv_mark, frost_ward_ranks.
+§6 `cold_snap` <-> `bitter_cold` DISSOLVED (rows 6 and 2 of the SAME lane now).
+**THE BRIEF'S PREMISE WAS HALF STALE:** it called this an entry in AA's TESTED
+rule, but Batch AI retired `test_runes._exclusives` to a bare `pass` — the list
+survives only as prose in this file. Other five pairs untouched.
+§7 THE BOT: build on the highest-Attack enemy, freeze, LEAVE IT HELD, release
+with Ice Lance only when a second freeze is ready or it is the last enemy
+standing; Glacial Prison on cooldown vs the highest-Attack UNHELD enemy;
+Cryoclasm when a bigger threat than the one he holds appears.
+VERIFIED: check_parse 0, check_flow 0 (6 screens), 11 scenes 0 SCRIPT ERROR.
+NEW test_batch_as.gd 387/0, STABLE 3/3. Regression: an 6044/0, ah 5410/0 (STAMP
+GATE bumped AR -> AS), ah_battle 65/0, ai 2036/0, aj 403/0, ak 523/0, al 556/0,
+ar 885/0, test_runes 2982/0, test_rune_battle 94/0, run-harness gates 1/2/3
+PASS.
+NEGATIVE CONTROLS RUN: opening roll back on raw speed trips 3, Ice Lance not
+releasing trips 2, a Cleansing Rite reaching a hold trips 1, the hold getting a
+clock trips 2, Frigid Grip back at 3 trips 2. A SIXTH PASSED AND THE GAP WAS
+CLOSED, not noted — see §4.
+TEST GOTCHAS WORTH KEEPING: (1) `_rebuild_turn_bar` opens by `queue_free()`ing
+its old slots and **queue_free is DEFERRED**, so counting immediately after
+sees BOTH bars at once — that artefact read exactly like "the held enemy is
+still in the bar". Park a `process_frame` between every rebuild and its count.
+(2) A turn-bar assertion keyed on `unit_name` needs DISTINCT enemy kinds; three
+raiders are three identical tooltips and the check proves nothing. (3) A bare
+`BattleUnit.new()` has no nameplate, so `add_status` crashes in
+`_refresh_chips` — build the status list by hand for pure `effective_speed()`
+math.
+KIT SMOKE, fixed lineup, 40 battles/row, DOD_SIM_TALENTS force-learning full
+8-node builds: all four rows 40/40 wins, 0 SCRIPT ERROR, Glacial Prison at 1.0
+casts/battle. **THE THREE LANES SEPARATED CLEANLY** — ungeared 39% share/146
+BD/0.93 enemy Breaks/1.00 taken; WINTER 45%/130/0.68/**0.38**; DEEP FREEZE
+**39% (FLAT)**/**300 BD**/**2.67**/**0.03**; THAW **51%**/346 dmg. Deep
+Freeze's damage share does not move while the party's Break output nearly
+triples — "control is a team resource" as a number. MEASURED AND FLAGGED, NOT
+NERFED: Thaw's 51% is the tallest column and ships as written. Kit-mechanics
+ratios ONLY, no difficulty signal (Batch R).
+REPORTED NOT ACTED ON: **SHATTER NEVER FIRED IN THE SMOKE, and it is a design
+tension not a bot bug.** Shatter (Thaw) and Absolute Zero (Deep Freeze) are
+both capstones and only ONE can be taken, so a Shatter build holds at most TWO
+(Second Prison, which costs him Piercing Ice) — and at a limit of one, Shatter
+and Ice Lance do the same job for more Mana, so the bot correctly prefers the
+Lance. The intended pairing IS reachable (Shatter is in SPEC_POOLS, so he can
+EARN it and take Absolute Zero), but no sim row exercised it; test_batch_as
+drives the mass release directly instead.
+NO DIFFICULTY MEASUREMENT AND NO SIM ROW, deliberately — same as AJ/AK/AL/AR.
 BATCH AR (08-07) — THE PYROMANCER, RE-AUTHORED AROUND COMMITMENT. First of
 the Mage three, and the last of the four class batches AI promised. One spec
 only; the other eleven trees and enemy tuning are UNTOUCHED.
@@ -1816,9 +1945,14 @@ healing_received_mult/mana_regen_bonus, so runes must stay AFTER it or the
 Martyr/Wellspring runes break). test_runes.gd asserts the call-site order
 so it cannot move back — the Hunter batch would have hit this on Focus.
 AUTHORING RULES THAT ARE NOW TESTED, NOT JUST WRITTEN: no rune may write
-one half of an EXCLUSIVE talent pair (heat_haze/scorched, cold_snap/
-bitter_cold, arcane_ward/still_mind, cascade/overflow, stalwart/bastion,
-pact_flesh/barter); every stat field must be a real BattleUnit property or
+one half of an EXCLUSIVE talent pair (heat_haze/scorched,
+arcane_ward/still_mind, cascade/overflow, stalwart/bastion,
+pact_flesh/barter — cold_snap/bitter_cold DISSOLVED IN BATCH AS: both sit
+in Deep Freeze rows 6 and 2 now, a player can hold both, and a rune writing
+either counter is legal. NOTE the rule itself is no longer a live TEST:
+Batch AI retired test_runes._exclusives to a `pass` because at row
+granularity it would fire on nearly every spec rune in the game); every
+stat field must be a real BattleUnit property or
 a cfg field battle.gd consumes (set() SILENTLY DROPS unknown names — a typo
 is a dud, not a crash) AND something must actually read it; payload carries
 exactly ONE branch (apply_payload is an if/elif chain — a second branch is
@@ -2901,11 +3035,12 @@ Space or left click; no announcer text (combat log only).
   The open lever remains authored rune POWER — a runes.json data edit,
   not machinery — and the dilution question (see the AB block).
 - Sim bot wins ~90%+ with 4 heroes; real difficulty tuning by user playtest.
-- EIGHT TALENT TREES STILL CARRY BATCH AI'S MAGNITUDES. The four class batches
+- SEVEN TALENT TREES STILL CARRY BATCH AI'S MAGNITUDES. The four class batches
   AI promised are done (AK Swordmaster, AJ Berserker, AL Warden, AR
-  Pyromancer); Cryomancer, Arcanist, the three Clerics and the three Hunters
-  are structurally correct and numerically weak — single-rank nodes at the old
-  rank-1 values, i.e. roughly a third of the power a row should be priced at.
+  Pyromancer), and BATCH AS re-authored the Cryomancer on top of them; the
+  Arcanist, the three Clerics and the three Hunters are structurally correct
+  and numerically weak — single-rank nodes at the old rank-1 values, i.e.
+  roughly a third of the power a row should be priced at.
 - ASHES OF AL'AR HAS NOWHERE TO LIVE (Batch AR). The Pyromancer's self-revive
   was removed with every other defensive option, deliberately, and its id now
   carries an unrelated node. If the designer wants it back it belongs Mage-wide

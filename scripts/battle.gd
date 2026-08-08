@@ -25,8 +25,8 @@ const MINIBOSS_HP_MULT := 1.5
 # Visual identity of each status effect: [label, chip tag, color, tooltip]
 const STATUS_INFO := {
 	"slow": ["Slowed", "Sl", Color(0.55, 0.65, 0.9), "-25% speed; turns arrive later."],
-	"chilled": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "Stacking frost: 1 = -25% speed,\n2 = -50%, 3 = also -15% damage;\n4 stacks FREEZE the victim."],
-	"frozen": ["Frozen", "Fz", Color(0.65, 0.88, 1.0), "Frozen solid: skips their turns until\nthe ice thaws."],
+	"chilled": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "Stacking frost: 1 = -25% speed,\n2 = -50%, 3 = also -15% damage;\n4 stacks FREEZE the victim."],  # 4 = a HOLD when he applied them
+	"frozen": ["Frozen", "Fz", Color(0.65, 0.88, 1.0), "Frozen solid: skips their turns until\nthe ice thaws. A Cryomancer's freeze is a\nHOLD — it never thaws on its own."],
 	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Burning: takes damage at the start of each\nturn (6% of the applier's Attack).\nReapplying Burn extends the duration."],
 	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Bleed builds with wounding attacks;\nat 100 the target bleeds out for 20% max HP.\nBleed damage ignores armor."],
 	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-35% armor."],
@@ -187,6 +187,10 @@ var debug_locked_hero: BattleUnit = null  # debug: every turn goes to this hero
 var debug_cooldowns_off := false  # debug toggle: abilities never cool down
 var _rime_echoing := false  # guards Rime chill-echoes from chaining
 var _bitter_echoing := false  # guards Bitter Cold freezes from cascading forever
+# GLACIAL HOLD's ledger (Batch AS §1) — the enemies the Cryomancer is holding,
+# OLDEST FIRST. See the block above _apply_status for the three clauses.
+var _holds: Array[BattleUnit] = []
+var _clock := 0.0  # the acting unit's position on the timeline, this turn
 var empower_armed := false  # Mercy: the next heal cast spends +1 stack
 var _debug_popup: PopupMenu
 
@@ -797,8 +801,17 @@ func _spawn_units() -> void:
 			Vector2(ENEMY_PLATE_X, PLATE_TOP + i * PLATE_STEP)))
 
 	_apply_battle_modifier()
+	# Batch AS §0: the opening roll seeds off EFFECTIVE speed, not the raw
+	# stat. Every reschedule site in this file has always divided by
+	# effective_speed() — so Chilled, Slowed and Quick Draw have always bent
+	# the timeline — but this one line read `u.speed`, which meant the two
+	# modifiers stamped immediately above it (Frenzied's mod_speed_mult and
+	# Hoarfrost's three stacks of Chilled) did nothing to the FIRST turn
+	# order, exactly what the comment on _apply_battle_modifier promised they
+	# would. The divisor is floored because a modifier is allowed to stack
+	# with a deep chill and 100.0 / 0.0 is not a turn order.
 	for u in heroes + enemies:
-		u.next_time = (100.0 / u.speed) * randf_range(0.0, 1.0)
+		u.next_time = (100.0 / maxf(u.effective_speed(), 0.1)) * randf_range(0.0, 1.0)
 	# Tracker (Hunter class passive): always attacks first in every fight.
 	for u in heroes:
 		if u.hero_key == "hunter":
@@ -814,8 +827,11 @@ func _spawn_units() -> void:
 # and the stat-side ones use hooks that already existed.
 #
 # Applied AFTER spawn and BEFORE the opening initiative roll: Frenzied has
-# to be on the board before `next_time` is seeded off speed, or the first
-# turn order would be the unmodified one.
+# to be on the board before `next_time` is seeded off effective speed, or the
+# first turn order would be the unmodified one. That claim was FALSE from AN
+# until Batch AS — the roll read the raw `speed` stat, so neither Frenzied
+# (mod_speed_mult) nor Hoarfrost (Chilled) reached it. Both live in
+# effective_speed(), which the seed now calls.
 func _apply_battle_modifier() -> void:
 	var mod_id := _active_modifier()
 	if mod_id == "":
@@ -1425,7 +1441,12 @@ func _toggle_log() -> void:
 func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability = null) -> void:
 	for child in turn_bar.get_children():
 		child.queue_free()
-	var alive := (heroes + enemies).filter(func(u): return not u.dead)
+	# Batch AS §4: A HELD ENEMY IS REMOVED FROM THE BAR ENTIRELY, because it
+	# is not going to act. That single line of UI is the whole spec made
+	# visible — an enemy disappearing from the turn order is the control
+	# fantasy in a way no damage number can be.
+	var alive := (heroes + enemies).filter(
+		func(u): return not u.dead and not _is_held(u))
 	if alive.is_empty():
 		return
 	var sim: Array = alive.map(func(u): return {"unit": u, "t": u.next_time})
@@ -1527,11 +1548,15 @@ func _run_battle() -> void:
 		# being trapped by it.
 		_maybe_nudge_forfeit(_turns_taken)
 		_turns_taken += 1
+		# The hold ledger is read by the turn bar rebuilt on the very next
+		# line, so it is trued up FIRST.
+		_hold_sync()
 		_update_talent_chips()
 		_rebuild_turn_bar()
 		var u := _next_unit()
 		if u == null:
 			break
+		_clock = u.next_time  # where "now" is, for anything rejoining the timeline
 		# Field-size proxy: count the enemies still standing as round 3 opens
 		# (every unit at speed 100 acts once per 100 timeline ticks).
 		if sim and not _r3_recorded and u.next_time >= 200.0:
@@ -1766,7 +1791,8 @@ func _run_battle() -> void:
 						_apply_status(ew_e, "chilled", 3, 0, 0, u)
 		if u.is_hero and not u.dead and u.grasp_ranks > 0:
 			var wg_pool: Array = enemies.filter(
-				func(e): return not e.dead and e.has_status("chilled"))
+				func(e): return not e.dead and e.has_status("chilled") \
+					and not _is_held(e))
 			wg_pool.shuffle()
 			var wg_n := mini(u.grasp_ranks, wg_pool.size())
 			for wg_i in wg_n:
@@ -1775,6 +1801,18 @@ func _run_battle() -> void:
 					_log("   → Talent: Winter's Grasp — the cold sinks deeper into %s" % \
 						wg_e.unit_name, "#b0a8e0")
 					_apply_status(wg_e, "chilled", 3, 0, 0, u)
+		# Cold Snap: the hold is not idle time. Pressure accumulates on a
+		# helpless target, so denial converts into the PARTY's Break — the
+		# reason the node was re-specced rather than repriced (it used to
+		# extend Frozen's duration, which an indefinite hold makes meaningless).
+		if u.is_hero and not u.dead and u.cold_snap_ranks > 0:
+			for cs_e in _holds.duplicate():
+				if not cs_e.dead:
+					_log("   → Talent: Cold Snap — the ice presses on %s (+%d BD)" % [
+						cs_e.unit_name, u.cold_snap_ranks], "#b0a8e0")
+					cs_e.take_hit(0, u.cold_snap_ranks)
+					_stat_bd(u, u.cold_snap_ranks)
+					cs_e.refresh_bars()
 		# Survivalist upkeep: Plague Bearer spreads the rot, the Field
 		# Medic tends a random ally.
 		if u.is_hero and not u.dead and u.plague_bearer > 0:
@@ -1887,17 +1925,17 @@ func _run_battle() -> void:
 		if u.has_status("frozen"):
 			u.float_text("FROZEN", Color(0.65, 0.88, 1.0))
 			_log("%s is frozen solid and loses their turn" % u.unit_name, "#7cc8f0")
-			# A lost turn still counts: status timers and cooldowns tick — the
-			# freeze itself thaws one step here too (Cold Snap freezes hold
-			# for extra turns, so the ice may outlast this loss).
+			# A lost turn still counts: status timers and cooldowns tick, and
+			# the freeze thaws one step here.
+			#
+			# A CRYOMANCER'S HOLD NEVER REACHES THIS BRANCH — a held enemy is
+			# off the timeline entirely (next_time = INF), which is exactly
+			# what §4's missing slot in the turn bar is showing. What DOES
+			# reach here is the boss carve-out (one turn of ice, then it acts
+			# again — _hold_sync closes the hold on the next pass) and any
+			# freeze reached with no Cryomancer standing.
 			u.tick_statuses()
 			u.tick_cooldowns()
-			# Absolute Zero: a thaw at 4 held stacks refreezes on the spot.
-			if not u.has_status("frozen") and u.status_stacks("chilled") >= 4 \
-					and _living_hero_with("absolute_zero") != null:
-				_log("   → Capstone: Absolute Zero — %s cannot thaw" % u.unit_name,
-					"#7cc8f0")
-				_apply_status(u, "frozen", 1 + _max_hero_rank("cold_snap_ranks"))
 			await _wait(0.8)
 			u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
 			continue
@@ -2643,40 +2681,72 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			var barrage := _find_ability(u, "Arcane Barrage")
 			if barrage != null and u.resource >= barrage.cost and u.ability_ready(barrage) and foes.size() >= 2:
 				return [barrage, target_foe]
-			# Cryomancer (Batch O): CONCENTRATE — razor the chilled toward 4,
-			# lance the frozen, and let the default bolt keep feeding the
-			# deepest pile instead of spreading thin.
+			# CRYOMANCER (Batch AS §7): the policy has to know what a HOLD is,
+			# or a sim measures a spec that is not the one that shipped.
+			# BUILD stacks on the highest-Attack enemy, FREEZE it, LEAVE IT
+			# HELD, and release with Ice Lance only when a second freeze is
+			# ready or it is the last enemy standing. Instrument honesty, not
+			# tuning: NO DIFFICULTY MEASUREMENT BELONGS IN THIS BATCH — a
+			# single-spec re-author has no honest control row, which is what
+			# AJ, AK, AL and AR each recorded.
+			var unheld: Array = foes.filter(func(e): return not _is_held(e))
+			# The mark: the biggest threat he is not already holding.
+			var cryo_mark: BattleUnit = null
+			for e in unheld:
+				if cryo_mark == null or e.attack > cryo_mark.attack:
+					cryo_mark = e
 			var most_chilled: BattleUnit = null
-			for e in foes:
+			for e in unheld:
 				if e.has_status("chilled") and (most_chilled == null \
 						or e.status_stacks("chilled") > most_chilled.status_stacks("chilled")):
 					most_chilled = e
+			# Glacial Prison on cooldown, against the highest-Attack UNHELD
+			# enemy — it needs no build, so it never waits on one.
+			var prison := _find_ability(u, "Glacial Prison")
+			if prison != null and u.resource >= prison.cost \
+					and u.ability_ready(prison) and cryo_mark != null:
+				return [prison, cryo_mark]
+			var lance := _find_ability(u, "Ice Lance")
+			var lance_up: bool = lance != null and u.resource >= lance.cost \
+				and u.ability_ready(lance)
+			# THE RELEASE IS A DECISION, not a reflex. He spends a hold only
+			# when he can immediately replace it, or when the held enemy is
+			# the last thing standing and the fight cannot end otherwise.
+			if lance_up and not _holds.is_empty():
+				var replaceable: bool = (prison != null and u.ability_ready(prison) \
+					and u.resource >= prison.cost + lance.cost and cryo_mark != null) \
+					or (most_chilled != null and most_chilled.status_stacks("chilled") >= 3)
+				if unheld.is_empty() or replaceable:
+					return [lance, _holds[0]]
 			var razor := _find_ability(u, "Razor Ice")
 			if razor != null and u.resource >= razor.cost and u.ability_ready(razor) \
-					and most_chilled != null:
-				return [razor, most_chilled]
-			var lance := _find_ability(u, "Ice Lance")
-			if lance != null and u.resource >= lance.cost and u.ability_ready(lance):
-				var frozen_foes := foes.filter(func(e): return e.has_status("frozen"))
-				if not frozen_foes.is_empty():
-					return [lance, frozen_foes[0]]
-				if most_chilled != null and most_chilled.status_stacks("chilled") >= 3:
-					return [lance, most_chilled]
+					and cryo_mark != null:
+				return [razor, cryo_mark]
+			if lance_up and most_chilled != null \
+					and most_chilled.status_stacks("chilled") >= 3:
+				return [lance, most_chilled]
 			var bliz := _find_ability(u, "Blizzard")
 			if bliz != null and u.resource >= bliz.cost and u.ability_ready(bliz) \
-					and foes.filter(func(e): return e.status_stacks("chilled") < 2).size() >= 3:
+					and unheld.filter(func(e): return e.status_stacks("chilled") < 2).size() >= 3:
 				return [bliz, target_foe]
 			var rime_ab := _find_ability(u, "Rime")
 			if rime_ab != null and u.resource >= rime_ab.cost and u.ability_ready(rime_ab):
-				var rime_t: BattleUnit = most_chilled if most_chilled != null else target_foe
-				if not rime_t.has_status("rime"):
+				var rime_t: BattleUnit = most_chilled if most_chilled != null else cryo_mark
+				if rime_t != null and not rime_t.has_status("rime"):
 					return [rime_ab, rime_t]
+			# Cryoclasm moves the lockdown onto whatever became the bigger
+			# problem while he was holding the old one.
+			var clasp := _find_ability(u, "Cryoclasm")
+			if clasp != null and u.resource >= clasp.cost and u.ability_ready(clasp) \
+					and _ability_usable(u, clasp) and cryo_mark != null \
+					and not _holds.is_empty() and cryo_mark.attack > _holds[0].attack:
+				return [clasp, cryo_mark]
 			var shat := _find_ability(u, "Shatter")
 			if shat != null and u.resource >= shat.cost and u.ability_ready(shat) \
-					and foes.filter(func(e): return e.has_status("chilled")).size() >= 2:
-				return [shat, target_foe]
-			if u.passive_id == "permafrost" and most_chilled != null:
-				return [u.abilities[0], most_chilled]    # Frostbolt the deepest pile
+					and _ability_usable(u, shat) and _holds.size() >= 2:
+				return [shat, _holds[0]]
+			if u.passive_id == "permafrost" and cryo_mark != null:
+				return [u.abilities[0], cryo_mark]       # Frostbolt the mark
 			return [u.abilities[0], target_foe]          # basic bolt
 		"hunter":
 			# Fill every free beast slot (The Pack fields two: wolf, then
@@ -3161,9 +3231,14 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 			and not enemies.any(func(e): return not e.dead \
 			and (e.hp < e.max_hp * exec_thr or e.broken)):
 		return false
-	# Shatter: needs someone Chilled to detonate.
-	if ab.display_name == "Shatter" \
-			and not enemies.any(func(e): return not e.dead and e.has_status("chilled")):
+	# Shatter (Batch AS): it is the MASS RELEASE now, so it needs a hold to
+	# break, not merely someone chilled. Cryoclasm needs one for the same
+	# reason — it moves a prison, and there has to be a prison.
+	if ab.display_name == "Shatter" and _holds.filter(
+			func(e): return not e.dead).is_empty():
+		return false
+	if ab.special == "cryoclasm" and _holds.filter(
+			func(e): return not e.dead).is_empty():
 		return false
 	# Wildfire: there has to be fire to drag (same rule as Shatter). Wildfire
 	# Spread lights the unburnt on its way through, so with that node taken a
@@ -3829,6 +3904,16 @@ func _cancel_charge(u: BattleUnit, cause: String) -> void:
 func _cleansable_debuffs(u: BattleUnit) -> Array:
 	var out: Array = []
 	for s in u.statuses:
+		# A GLACIAL HOLD IS NOT CLEANSABLE (Batch AS). §1 says nothing else
+		# thaws it, and a Cleansing Rite is very much something else — worse,
+		# a battle-long freeze reads as 999 turns remaining, so the rite's
+		# longest-first pick would take the hold EVERY time and the indefinite
+		# prison would be worth strictly less than the old one-turn freeze
+		# against any mender warband. Reported, not hidden: this removes the
+		# enemy's only answer to a hold, which is what the hold limit and the
+		# boss carve-out are the price for.
+		if s.id == "frozen" and _is_held(u):
+			continue
 		if BattleUnit.DEBUFF_IDS.has(s.id) and not (s.id in ["broken", "bleed"]) \
 				and not s.get("sticky", false):
 			out.append(s)
@@ -3923,9 +4008,11 @@ func _miss_chance(attacker: BattleUnit, defender: BattleUnit = null) -> float:
 		return 0.0
 	var chance := MISS_CHANCE + (0.20 if attacker.has_status("dazed") else 0.0) \
 		+ (0.50 if attacker.has_status("blind") else 0.0)
-	# Numbing Veil (Cryomancer talent): chilled fingers fumble the blow.
+	# Numbing Veil: chilled fingers fumble the blow. THE NODE IS GONE (Batch AS
+	# gave its id to Glacial Prison) — this read site is KEPT because the Rune
+	# of the Killing Cold still writes the counter. ADDITIVE: percentage points.
 	if not attacker.is_hero and attacker.has_status("chilled"):
-		chance += 0.05 * _max_hero_rank("numbing_ranks")
+		chance += 0.01 * _max_hero_rank("numbing_ranks")
 	# Elusiveness: the wolf and the eagle are hard to pin down.
 	if defender != null and defender.has_status("elusive"):
 		chance += 0.25
@@ -4092,10 +4179,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if ab.aoe:
 			strike_targets = enemies.filter(func(t): return not t.dead) \
 				if attacker.is_hero else _hero_side()
-			# Shatter only detonates the Chilled.
+			# Shatter only detonates what he is HOLDING (Batch AS): the
+			# capstone is the mass release, so its victims are the prisons.
 			if ab.display_name == "Shatter":
-				strike_targets = strike_targets.filter(
-					func(t): return t.has_status("chilled"))
+				strike_targets = strike_targets.filter(func(t): return _is_held(t))
 		elif ab.choose_two or ab.choose_three:
 			var second: BattleUnit = second_target
 			if second == null or second.dead or second == target:
@@ -4121,9 +4208,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# bolt (Batch AH) — it aims the ones you already have.
 		if ab.display_name == "Firestorm":
 			total_hits = randi_range(6, 8)
-		# Splintering Shards: Razor Ice can find one more victim.
-		if ab.display_name == "Razor Ice" and attacker.splinter_ranks > 0 \
-				and randf() < 0.20 * attacker.splinter_ranks:
+		# Splintering Shards: Razor Ice ALWAYS finds a fourth victim, so one
+		# cast is four stacks and four stacks is a freeze. The roll is gone
+		# deliberately — a node that decides whether the spec's win condition
+		# happens this turn must not be a coin flip.
+		if ab.display_name == "Razor Ice" and attacker.splinter_ranks > 0:
 			total_hits += 1
 			_log("Talent: Splintering Shards — Razor Ice splinters again!", "#b0a8e0")
 		var total_dealt := 0
@@ -4429,9 +4518,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Super Nova: Detonation crits harder into the ash.
 			if attacker.supernova_ranks > 0 and ab.display_name == "Detonation":
 				crit_chance += 0.03 * attacker.supernova_ranks
-			# Brittle Ice (talent): Frozen targets are easier to strike true.
-			if strike_target.has_status("frozen"):
-				crit_chance += 0.02 * _max_hero_rank("frostbite_ranks")
+			# Brittle Ice (talent): a HELD target is easier to strike true, and
+			# it is party-wide. ADDITIVE — percentage points.
+			if _is_held(strike_target):
+				crit_chance += 0.01 * _max_hero_rank("frostbite_ranks")
 			# Sweeping Strikes perfect: the second swing cuts truer.
 			if is_perfect and ab.display_name == "Sweeping Strikes" and hit_i == 1:
 				crit_chance += 0.25
@@ -4481,9 +4571,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if attacker.passive_id == "lethal_aim":
 					crit_mult = 1.5 if attacker.consistent_aim > 0 \
 						else 2.0 + 0.1 * attacker.lethal_eye_ranks
-				# Piercing Ice: the lance drives deeper on a crit.
+				# Piercing Ice: the lance drives deeper on a crit. ADDITIVE —
+				# the counter is percentage POINTS of critical damage.
 				if ab.display_name == "Ice Lance":
-					crit_mult += 0.10 * attacker.piercing_ice_ranks
+					crit_mult += 0.01 * attacker.piercing_ice_ranks
 				raw *= crit_mult
 				# Critical Mass: every 3rd crit detonates harder and pays Mana.
 				if attacker.critical_mass_ranks > 0:
@@ -4544,26 +4635,29 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Master's Aim: the basic shot is the craft.
 			if ab.display_name == "Quick Shot" and attacker.masters_aim_ranks > 0:
 				raw += 0.06 * attacker.masters_aim_ranks * attacker.attack
-			# Empowered Frostbolt (talent): the basic bolt bites deeper.
+			# Empowered Frostbolt — NO NODE AND NO RUNE writes this (Batch AS):
+			# unreachable but kept, the AR vault pattern.
 			if ab.display_name == "Frostbolt" and attacker.emp_frostbolt_ranks > 0:
 				raw += 0.02 * attacker.emp_frostbolt_ranks * attacker.attack
-			# Shatter: 10% of Attack PER Chilled stack on each victim.
+			# Shatter: 10% of Attack PER Chilled stack the held enemy CARRIED.
+			# The release runs after the whole strike loop for exactly this
+			# reason — releasing first would drop every pile to 1 and the
+			# capstone would be paid on the ashes (the ordering trap AG fixed
+			# for Detonation, arriving through a different door).
 			if ab.display_name == "Shatter":
 				raw *= maxi(strike_target.status_stacks("chilled"), 1)
-			# Ice Lance (Batch O, halved Batch W): the stored cold detonates —
-			# +5% of Attack per Chilled stack on the target (Crystal Edge
-			# deepens the take). Batch O's +10%, stacked on permanent stacks
-			# and an auto-crit, made this clause the whole kit; +5% keeps the
-			# reason-to-exist without the excess.
+			# Ice Lance: the stored cold detonates — +5% of Attack per Chilled
+			# stack on the target, and Crystal Edge deepens the take. ADDITIVE:
+			# the counter is percentage POINTS on top of the base 5.
 			if ab.display_name == "Ice Lance" \
 					and strike_target.status_stacks("chilled") > 0:
-				raw += (0.05 + 0.05 * attacker.crystal_edge_ranks) \
+				raw += (0.05 + 0.01 * attacker.crystal_edge_ranks) \
 					* strike_target.status_stacks("chilled") * attacker.attack
-			# Icy Veins: a banked kill empowers this lance.
+			# Icy Veins — NO NODE AND NO RUNE writes this (Batch AS): kept, gated
+			# and reported rather than deleted, the AR vault pattern.
 			if ab.display_name == "Ice Lance" and attacker.icy_veins_charge > 0.0:
 				raw *= 1.0 + attacker.icy_veins_charge
-			# Freezing Advance: the first strike after the freeze bites deeper
-			# (the mark is spent by the strike loop's last hit).
+			# Freezing Advance — same: unreachable but kept.
 			if attacker.freezing_ranks > 0 and strike_target.freezing_adv_mark \
 					and ab.damage > 0:
 				raw *= 1.0 + 0.10 * attacker.freezing_ranks
@@ -4714,7 +4808,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 - 0.01 * _max_hero_rank("hungering_ranks") * atk_chill
 			if not attacker.is_hero and strike_target.is_hero and pv_chill > raw:
 				_prev(_living_hero_passive("permafrost"), pv_chill - raw)
-			# Frost Ward: the Cryomancer reads the chilled swing coming.
+			# Frost Ward — NO NODE AND NO RUNE writes this (Batch AS): kept and
+			# gated rather than deleted, the AR vault pattern.
 			if not attacker.is_hero and atk_chill > 0 \
 					and strike_target.frost_ward_ranks > 0:
 				var pv_was := raw
@@ -4963,11 +5058,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var pv_was := raw
 				raw *= 1.0 - 0.02 * strike_target.molten_ranks
 				_prev(strike_target, pv_was - raw)
-			# Permafrost: Frozen enemies take 15% more from ALL sources.
-			if strike_target.has_status("frozen") and heroes.any(
-					func(h): return not h.dead and h.passive_id == "permafrost"):
-				raw *= 1.15
-			# Hypothermia (talent): the cold opens wounds wider.
+			# GLACIAL HOLD, CLAUSE 3 — THE WINDOW. A held enemy takes +15%
+			# damage from ALL sources (+30% with Killing Frost). This is the
+			# clause that makes his denial a party resource: everyone wants to
+			# pile onto the target he is holding.
+			if _is_held(strike_target):
+				raw *= _hold_window_mult()
+			# Hypothermia (talent): the cold opens wounds wider. ADDITIVE — the
+			# counter is percentage POINTS per stack.
 			if not strike_target.is_hero and strike_target.has_status("chilled"):
 				raw *= 1.0 + 0.01 * _max_hero_rank("hypothermia_ranks") \
 					* strike_target.status_stacks("chilled")
@@ -5378,6 +5476,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_dot_tick(ab.applies_status["id"], attacker), attacker,
 						is_perfect and ab.display_name == "Pommel Strike")
 					_note_debuff_applied(attacker, ab.applies_status["id"])
+					# Deep Chill (Batch AS): Frostbolt lays TWO stacks, not one —
+					# the free pump doubles, so the build is two casts instead of
+					# four. The extra goes through the same door as the first, so
+					# Rime, Frigid Grip and the freeze cascade all behave.
+					if ab.display_name == "Frostbolt" and attacker.deep_chill_ranks > 0 \
+							and not strike_target.dead:
+						for _dc_i in attacker.deep_chill_ranks:
+							if not strike_target.dead:
+								_apply_status(strike_target, "chilled", 3, 0, 0, attacker)
 					# Wrath of the Old Gods: the Occultist's debuffs mark Ruin.
 					if attacker.passive_id == "old_gods" and not strike_target.is_hero \
 							and BattleUnit.DEBUFF_IDS.has(ab.applies_status["id"]):
@@ -5590,31 +5697,27 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Blizzard" and not strike_target.dead:
 				# The perfect buys RELIABILITY, not magnitude (Batch AH): the
 				# 1-2 roll is waived and every enemy takes the full 2.
-				for chill_i in (2 if is_perfect else randi_range(1, 2)):
-					_apply_status(strike_target, "chilled", 3, 0, 0, attacker)
+				# Whiteout (Batch AS) replaces the 1-2 roll outright: the storm
+				# lays a FLAT 3 on everything, which is three quarters of a freeze
+				# across the whole field in one cast.
+				var bliz_stacks: int = attacker.whiteout_ranks if attacker.whiteout_ranks > 0 \
+					else (2 if is_perfect else randi_range(1, 2))
+				for chill_i in bliz_stacks:
+					if not strike_target.dead:
+						_apply_status(strike_target, "chilled", 3, 0, 0, attacker)
 				_note_debuff_applied(attacker, "chilled")
-				# Whiteout: the storm blinds.
-				if attacker.whiteout_ranks > 0 and not strike_target.dead \
-						and randf() < 0.15 * attacker.whiteout_ranks:
-					_log("   → Talent: Whiteout — %s is blinded by the storm" % \
-						strike_target.unit_name, "#b0a8e0")
-					_apply_status(strike_target, "dazed", 2)
-					_note_debuff_applied(attacker, "dazed")
-			# Icy Veins: an Ice Lance kill banks power for the next lance.
+			# Icy Veins — NO NODE AND NO RUNE writes this (Batch AS): kept, gated
+			# and reported. The charge is still cleared on every Lance so a stale
+			# value could never linger if a later batch re-nodes it.
 			if ab.display_name == "Ice Lance" and attacker.is_hero:
 				attacker.icy_veins_charge = 0.0
 				if result.died and attacker.icy_veins_ranks > 0:
 					attacker.icy_veins_charge = 0.15 * attacker.icy_veins_ranks
 					_log("   → Talent: Icy Veins — the next Ice Lance hits +%d%%" % \
 						int(attacker.icy_veins_charge * 100), "#b0a8e0")
-			# Honed Shards: a critical lance splinters into fresh cold.
-			if is_crit and ab.display_name == "Ice Lance" and not strike_target.dead \
-					and attacker.honed_shards_ranks > 0:
-				_log("   → Talent: Honed Shards — the crit leaves its splinters", "#b0a8e0")
-				for _hs_i in attacker.honed_shards_ranks:
-					if not strike_target.dead:
-						_apply_status(strike_target, "chilled", 3, 0, 0, attacker)
-				_note_debuff_applied(attacker, "chilled")
+			# Honed Shards moved (Batch AS): it rides the RELEASE now, not the
+			# crit, and fires from _hold_release — one implementation, so Shatter
+			# and an evicted prison inherit it with no second copy.
 			# Explosive Force: a fire crit fans the flames longer.
 			if is_crit and ab.dmg_type == "fire" and attacker.explosive_ranks > 0 \
 					and not strike_target.dead and strike_target.has_status("burn"):
@@ -5760,6 +5863,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							break
 			if (ab.random_hits > 0 or ab.multi_hits > 0) and total_hits > 1:
 				await _wait(0.45)  # sequential strikes land distinctly
+		# ---- GLACIAL HOLD: the NAMED RELEASES (Batch AS §1/§2) ----
+		# Both sit AFTER the strike loop so every hit is paid on the pile the
+		# hold was carrying. Ice Lance keeps its damage, its Break and its
+		# always-crit against Frozen — which finally means something, because
+		# the release is now a deliberate act with a payoff attached rather
+		# than a spell that happens to like frozen targets.
+		if ab.display_name == "Ice Lance" and attacker.is_hero and _is_held(target):
+			_hold_release(target, "Ice Lance")
+		if ab.display_name == "Shatter" and attacker.is_hero:
+			for sh_t in _holds.duplicate():
+				_hold_release(sh_t, "Shatter")
 		# War Stomp: the tremor rallies the line — allies regain 10% resource
 		# (20% on a perfect cast; the damage is a 75-Attack tank's, the
 		# party refuel is the real payload).
@@ -6064,6 +6178,222 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		attacker.next_time += eff_delay * 100.0 / attacker.effective_speed()
 
 
+# ---------- GLACIAL HOLD (Batch AS §1) — the Cryomancer's spine ----------
+#
+# ONE mechanic in three clauses, each with exactly one place that decides it.
+#
+#   PERMAFROST — Chilled stacks HE applies never expire. That clause lives in
+#     _apply_status below (eff_turns = -1) and is unchanged since Batch O.
+#   THE HOLD   — a Frozen enemy stays Frozen INDEFINITELY. It is released only
+#     when he chooses to release it: Ice Lance, Shatter, or a freeze past his
+#     hold limit (which evicts the OLDEST). NOTHING ELSE THAWS IT — not ally
+#     damage, not his own Blizzard, not time. A released enemy comes back on 1
+#     stack of Chilled, so the engine stays warm.
+#   THE WINDOW — a held enemy takes +15% damage from ALL sources (+30% with
+#     Killing Frost). Clauses 2 and 3 together are the design: the hold is
+#     simultaneously denial and a party-wide damage window he opens and
+#     closes, so his control is a team resource rather than a solo trick.
+#
+# A NAMED RELEASE WITH NO ACCIDENTAL THAWS IS A DELIBERATE CHOICE over the
+# alternative (any single-target hit from him breaks it). The alternative is
+# more physical and much less legible, and it makes his own Blizzard a
+# liability. "The only way that enemy acts again is if the Cryomancer lets
+# it" is the sentence this section exists to make true.
+#
+# THE SPINE CARRIES NO COST CLAUSE, unlike Overburn, and that is deliberate.
+# His cost is tempo: every turn spent building stacks is a turn not spent
+# killing, and he can hold ONE enemy. Control should not be self-harm. If the
+# hold proves too cheap the lever is stack-build rate, not a tax bolted on.
+#
+# BOSSES KEEP THEIR CARVE-OUT AND GET ONE MORE: they resist Frozen until
+# Broken (the guard at the top of _apply_status), and a held boss releases on
+# its own after one turn — it keeps its place on the timeline and spends that
+# turn in the ice. A boss removed from the fight indefinitely is not a control
+# fantasy, it is a softlock.
+#
+# `_holds` is the ONE answer to "is this enemy held", so the initiative bar,
+# the damage window, Brittle Ice, Cold Snap, Cryoclasm and the bot all read
+# the same list and cannot disagree.
+const HOLD_WINDOW := 15         # +% damage a held enemy takes, from all sources
+const HOLD_RELEASE_STACKS := 1  # what a released enemy comes back on
+
+
+func _is_held(u: BattleUnit) -> bool:
+	return _holds.has(u)
+
+
+# What the HELD chip says. Written from the rules rather than restating them,
+# so a rule change that forgets this line shows up as a lie on screen.
+func _hold_tooltip(timed: bool) -> String:
+	var out := "HELD by Glacial Hold: off the turn order entirely,\n"
+	out += "and takes +%d%% damage from EVERY source.\n" % (
+		HOLD_WINDOW + _max_hero_rank("killing_frost"))
+	if timed:
+		out += "A boss shrugs the ice off after one turn."
+	else:
+		out += "It thaws only when the Cryomancer lets it:\n"
+		out += "Ice Lance, Shatter, or a new freeze past his limit.\n"
+		out += "Ally damage, his own Blizzard and time do NOTHING."
+	return out
+
+
+# ONE enemy, TWO with Second Prison, ANY number under Absolute Zero.
+func _hold_limit() -> int:
+	if _living_hero_with("absolute_zero") != null:
+		return 99
+	return 2 if _living_hero_with("second_prison") != null else 1
+
+
+# Clause 3, and the ONE place the window's size is decided.
+func _hold_window_mult() -> float:
+	return 1.0 + (HOLD_WINDOW + _max_hero_rank("killing_frost")) * 0.01
+
+
+# THE ONE PLACE A HOLD BEGINS. Two callers: the Chilled-4 branch of
+# _apply_status, and Glacial Prison (which skips straight to it).
+func _hold_freeze(target: BattleUnit, src: BattleUnit) -> void:
+	if target.dead or target.has_status("frozen"):
+		return
+	# No Cryomancer standing — or the victim is a HERO, which Hoarfrost plus
+	# an enemy chill can reach — means an ORDINARY freeze, not a hold. A held
+	# hero would be a softlock wearing the spec's clothes.
+	var cryo := _living_hero_passive("permafrost")
+	var holding := cryo != null and not target.is_hero
+	# The boss carve-out: one turn of ice, then it acts again on its own.
+	var timed := target.is_boss or not holding
+	_apply_status(target, "frozen", 1 if timed else -1)
+	if not target.has_status("frozen"):
+		return                      # boss immunity bounced it; the stacks sit
+	target.was_frozen = true
+	if not holding:
+		target.set_chilled_stacks(1)
+		_log("   → %s FREEZES SOLID (4 stacks of Chilled)" % target.unit_name,
+			"#7cc8f0")
+		return
+	_holds.append(target)
+	# The pile stays MAXED while he holds it — the ember belongs to the
+	# release, not to the freeze (Absolute Zero's old "keeps all 4" clause is
+	# redundant under an indefinite hold, which is why it was re-specced).
+	target.set_chilled_stacks(4)
+	if not timed:
+		# Off the timeline entirely: it is not going to act, and §4's empty
+		# slot in the turn bar is this line made visible.
+		target.next_time = INF
+	_log("   → %s is HELD in the ice — only the Cryomancer can release it" % \
+		target.unit_name, "#7cc8f0")
+	target.float_text("HELD", Color(0.65, 0.88, 1.0))
+	# §4's other half: the nameplate says HELD, not "Fz", and the tooltip
+	# names every door out. A player who cannot see why an enemy stopped
+	# taking turns is being shown a bug, not a mechanic.
+	var hold_st := target.get_status("frozen")
+	if not hold_st.is_empty():
+		hold_st["label"] = "HELD"
+	target.update_status("frozen", "HELD", _hold_tooltip(timed))
+	_hold_freeze_riders(target, cryo)
+	# Over the limit: the OLDEST prison gives out. This is a RELEASE, so it
+	# pays out through _hold_release like every other one — Shattered Tempo
+	# and Honed Shards fire on it too.
+	while _holds.size() > _hold_limit():
+		_hold_release(_holds[0], "the oldest prison gives out")
+
+
+# What rides a freeze: the Mana it pays back and the cold it rolls outward.
+func _hold_freeze_riders(target: BattleUnit, cryo: BattleUnit) -> void:
+	# Glacial Economy: every freeze pays its caster back in Mana.
+	var gl_h := _living_hero_with("glacial_ranks")
+	if gl_h != null and gl_h.resource_name == "Mana":
+		var gl_mana := maxi(int(round(gl_h.max_resource * 0.01 * gl_h.glacial_ranks)), 1)
+		gl_h.resource = mini(gl_h.resource + gl_mana, gl_h.max_resource)
+		gl_h.float_text("+%d Mana" % gl_mana, Color(0.5, 0.7, 1.0))
+		gl_h.refresh_bars()
+		_log("   → Talent: Glacial Economy — the freeze returns %d Mana" % gl_mana,
+			"#b0a8e0")
+	# Bitter Cold: the freeze rolls outward — every OTHER enemy catches
+	# stacks. One cascade at a time: a freeze the spread itself causes never
+	# re-spreads (that way lies the ice age).
+	var bc_h := _living_hero_with("bitter_cold_ranks")
+	if bc_h != null and not _bitter_echoing:
+		_bitter_echoing = true
+		var bc_pool := enemies.filter(func(e): return not e.dead and e != target)
+		if not bc_pool.is_empty():
+			_log("   → Talent: Bitter Cold — the freeze rolls across the field",
+				"#b0a8e0")
+			for bc_e in bc_pool:
+				for _bc_i in bc_h.bitter_cold_ranks:
+					if not bc_e.dead:
+						_apply_status(bc_e, "chilled", 3, 0, 0, bc_h)
+		_bitter_echoing = false
+
+
+# THE ONE PLACE A HOLD ENDS. Every caller names its reason in the log, because
+# "why is that enemy moving again" must always have an answer on screen.
+func _hold_release(target: BattleUnit, reason: String) -> void:
+	if not _holds.has(target):
+		return
+	_holds.erase(target)
+	target.remove_status("frozen")
+	_log("   → %s is released from the ice — %s" % [target.unit_name, reason],
+		"#7cc8f0")
+	if target.dead:
+		return
+	target.set_chilled_stacks(HOLD_RELEASE_STACKS)
+	if is_inf(target.next_time):
+		# Back onto the timeline a full basic action from NOW — never
+		# instantly, and never at the stale clock it was frozen on.
+		target.next_time = _clock + BASIC_DELAY * 100.0 \
+			/ maxf(target.effective_speed(), 0.1)
+	# Shattered Tempo: the release is paid out in TIME rather than damage —
+	# the purest thing in the tree. Same arithmetic as Ability.delay_push.
+	var st := _hero_shattered_tempo()
+	if st > 0.0:
+		_log("   → Talent: Shattered Tempo — the shockwave sets the field back",
+			"#b0a8e0")
+		for e in enemies:
+			if not e.dead and e != target and not _is_held(e):
+				e.next_time += st * 100.0 / maxf(e.effective_speed(), 0.1)
+	# Honed Shards LAST, because it can re-freeze the enemy it just thawed:
+	# the release leaves the thawed target already deep in the cold.
+	var hs := _max_hero_rank("honed_shards_ranks")
+	if hs > 0 and not target.dead:
+		var hs_h := _living_hero_with("honed_shards_ranks")
+		_log("   → Talent: Honed Shards — the thaw leaves %d fresh stacks" % hs,
+			"#b0a8e0")
+		for _hs_i in hs:
+			if not target.dead:
+				_apply_status(target, "chilled", 3, 0, 0, hs_h)
+
+
+# Shattered Tempo is the tree's only FLOAT counter, so it needs its own
+# scanner: _max_hero_rank reads ints.
+func _hero_shattered_tempo() -> float:
+	var best := 0.0
+	for h in heroes:
+		if not h.dead:
+			best = maxf(best, h.shattered_tempo)
+	return best
+
+
+# The ledger is authoritative, so it has to stay true. Called at the top of
+# every turn, before anything reads it.
+func _hold_sync() -> void:
+	# The grip is his: if no Cryomancer stands, every prison opens. Nothing in
+	# §1 says so, because §1 never contemplates him dying — but a dead hero
+	# holding an enemy out of the fight forever is the softlock the boss
+	# carve-out exists to refuse, arriving through a different door.
+	if _living_hero_passive("permafrost") == null:
+		for u in _holds.duplicate():
+			_hold_release(u, "the Cryomancer's grip is gone")
+		return
+	for u in _holds.duplicate():
+		if u.dead:
+			_holds.erase(u)
+		elif not u.has_status("frozen"):
+			# The boss carve-out landing, or an enemy Cleansing Rite (which
+			# cannot reach a hold — see _cleansable_debuffs — but a later
+			# batch might add a door this catches).
+			_hold_release(u, "the ice runs out")
+
+
 # `force` is the ONE way past the boss immunity, and it exists for exactly
 # two callers: the Pommel Strike and Snare Trap perfects, whose whole
 # payoff since Batch AH is that the Stun lands on an unbroken boss. It is
@@ -6107,7 +6437,9 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 			st_stamp["src_name"] = src.unit_name
 	if id == "chilled":
 		# Frigid Grip rides every stack: stamp the deeper slow on the victim.
-		target.frigid_bonus = 0.03 * _max_hero_rank("frigid_ranks")
+		# ADDITIVE units — the counter is percentage POINTS, so the node's 10
+		# and a rune's 3 each pay what they advertise, alone and stacked.
+		target.frigid_bonus = 0.01 * _max_hero_rank("frigid_ranks")
 		# Rime: the chill leaps to one other random enemy (never chains).
 		if target.has_status("rime") and not _rime_echoing:
 			var others := enemies.filter(func(e): return not e.dead and e != target)
@@ -6118,51 +6450,10 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 				_apply_status(echo_t, "chilled", 3, 0, 0, src)
 				_rime_echoing = false
 		# Four stacks flash-freeze the victim — unless the ice already holds
-		# them (a boss just keeps sitting on its stacks until Broken).
+		# them (a boss just keeps sitting on its stacks until Broken). What
+		# the freeze BECOMES is _hold_freeze's decision, not this branch's.
 		if target.status_stacks("chilled") >= 4 and not target.has_status("frozen"):
-			_apply_status(target, "frozen", 1 + _max_hero_rank("cold_snap_ranks"))
-			if target.has_status("frozen"):
-				target.was_frozen = true
-				# Batch O: the payoff keeps an ember — the freeze leaves 1
-				# stack instead of wiping the pile (Absolute Zero holds all 4).
-				# Batch W MEASURED the wipe (0 remains) and put the ember back:
-				# 200/budget sweeps read 47/42/40/38% vs the ember's
-				# 49/42/39/39% — noise. His share is structural (auto-crit +
-				# shard concentration + permanence), not this knob's to fix.
-				var kept := 4 if _living_hero_with("absolute_zero") != null else 1
-				target.set_chilled_stacks(kept)
-				_log("   → %s FREEZES SOLID (4 stacks of Chilled — x%d remains)" % [
-					target.unit_name, kept], "#7cc8f0")
-				# Freezing Advance: the Cryomancer's next strike on this
-				# victim bites deeper — arm the mark.
-				if _max_hero_rank("freezing_ranks") > 0:
-					target.freezing_adv_mark = true
-				# Glacial Economy: every freeze pays its caster back in Mana.
-				var gl_h := _living_hero_with("glacial_ranks")
-				if gl_h != null and gl_h.resource_name == "Mana":
-					var gl_mana := maxi(int(round(gl_h.max_resource * 0.05
-						* gl_h.glacial_ranks)), 1)
-					gl_h.resource = mini(gl_h.resource + gl_mana, gl_h.max_resource)
-					gl_h.float_text("+%d Mana" % gl_mana, Color(0.5, 0.7, 1.0))
-					gl_h.refresh_bars()
-					_log("   → Talent: Glacial Economy — the freeze returns %d Mana" % \
-						gl_mana, "#b0a8e0")
-				# Bitter Cold: the freeze rolls outward — every OTHER enemy
-				# catches stacks. One cascade at a time: a freeze the spread
-				# itself causes never re-spreads (that way lies the ice age).
-				var bc_h := _living_hero_with("bitter_cold_ranks")
-				if bc_h != null and not _bitter_echoing:
-					_bitter_echoing = true
-					var bc_pool := enemies.filter(
-						func(e): return not e.dead and e != target)
-					if not bc_pool.is_empty():
-						_log("   → Talent: Bitter Cold — the freeze rolls across the field",
-							"#b0a8e0")
-						for bc_e in bc_pool:
-							for _bc_i in bc_h.bitter_cold_ranks:
-								if not bc_e.dead:
-									_apply_status(bc_e, "chilled", 3, 0, 0, bc_h)
-					_bitter_echoing = false
+			_hold_freeze(target, src)
 			return
 		var pile := target.get_status("chilled")
 		if int(pile.get("turns", 3)) < 0:
@@ -8068,6 +8359,51 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s rimes %s!" % [attacker.unit_name, target.unit_name])
 			_log("%s: Rime on %s — its chills will spread (%d turns)" % [
 				attacker.unit_name, target.unit_name, rime_turns], "#7cc8f0")
+		"glacial_prison":
+			# Deep Freeze row 4: the hold WITHOUT the build. It skips the four
+			# stacks entirely, which is what makes the lane's opening move a
+			# choice rather than a countdown. Everything after the freeze —
+			# Glacial Economy, Bitter Cold, the limit eviction, the boss
+			# carve-out — comes free, because it goes through _hold_freeze like
+			# every other freeze in the game.
+			_sfx("break", -9.0, 0.8)
+			_message("%s seals %s in ice!" % [attacker.unit_name, target.unit_name])
+			_log("%s: Glacial Prison closes on %s" % [attacker.unit_name,
+				target.unit_name], "#7cc8f0")
+			if not target.has_status("chilled"):
+				_apply_status(target, "chilled", 3, 0, 0, attacker)
+				_note_debuff_applied(attacker, "chilled")
+			_hold_freeze(target, attacker)
+		"cryoclasm":
+			# Thaw row 4: CONTROL AS A VERB — the lockdown relocates without
+			# being spent. Deliberately NOT routed through _hold_release: a move
+			# is not a release, so Shattered Tempo and Honed Shards do not fire
+			# and the hold he is paying for is still the hold he has.
+			var cc_from: BattleUnit = null
+			for cc_h in _holds:
+				if not cc_h.dead:
+					cc_from = cc_h      # the OLDEST living prison moves
+					break
+			if cc_from == null or cc_from == target or target.dead:
+				_log("%s: Cryoclasm finds nothing to move" % attacker.unit_name, "#909090")
+			else:
+				var cc_stacks := cc_from.status_stacks("chilled")
+				_sfx("break", -9.0, 1.1)
+				_message("%s hurls the ice from %s onto %s!" % [attacker.unit_name,
+					cc_from.unit_name, target.unit_name])
+				_log("%s: Cryoclasm — the prison moves to %s (x%d Chilled travels)" % [
+					attacker.unit_name, target.unit_name, cc_stacks], "#7cc8f0")
+				_holds.erase(cc_from)
+				cc_from.remove_status("frozen")
+				cc_from.set_chilled_stacks(HOLD_RELEASE_STACKS)
+				if is_inf(cc_from.next_time):
+					cc_from.next_time = _clock + BASIC_DELAY * 100.0 \
+						/ maxf(cc_from.effective_speed(), 0.1)
+				if not target.has_status("chilled"):
+					_apply_status(target, "chilled", 3, 0, 0, attacker)
+					_note_debuff_applied(attacker, "chilled")
+				target.set_chilled_stacks(cc_stacks)
+				_hold_freeze(target, attacker)
 		"stabilize":
 			# Vents the Resonance stacks ABOVE the floor (2, raised by Still
 			# Mind): Mana back and a damage-reduction ward per stack consumed.

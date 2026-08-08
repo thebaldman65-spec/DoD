@@ -5,6 +5,212 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-07 — Batch AS: the Cryomancer — control</h2>
+<p><i>Second of the Mage three. His structure was sound and his middle lane was a damage
+lane, which made a control spec a damage spec wearing a coat. The spine is now: you decide
+WHEN the enemy acts. Not how hard — when.</i></p>
+<ul>
+<li><b>§0 FIRST, BECAUSE THE WHOLE BATCH RESTS ON IT — AND THE ANSWER IS MOSTLY GOOD NEWS.
+The scheduler HAS always called <code>effective_speed()</code>.</b> Every line in battle.gd
+that advances a unit's place on the timeline — the turn loop, the stun and freeze branches,
+the debug turn lock, the enemy-skip toggle, the post-cast reschedule, delay_push, the turn
+bar's own preview — divides by <code>effective_speed()</code>, and always has. <b>Chilled
+has been slowing enemies since it was written, and every doc claiming so was right.</b>
+<b>The one hole was exactly the one already confirmed: the OPENING ROLL.</b>
+<code>u.next_time = (100.0 / u.speed) * randf_range(0.0, 1.0)</code> read the raw stat, so
+the comment above <code>_apply_battle_modifier()</code> — which promises modifiers are
+stamped before the roll <i>specifically so Frenzied is on the board before next_time seeds
+off speed</i> — <b>has been wrong since Batch AN</b>. Frenzied (mod_speed_mult) and
+Hoarfrost (Chilled) both live in <code>effective_speed()</code>, which that line never
+called, so neither did anything to the first turn order. Fixed: the seed reads
+<code>effective_speed()</code>, floored at 0.1 because a modifier is allowed to stack with a
+deep chill and 100/0 is not a turn order. The Hunter's <code>next_time = -0.01</code>
+override is untouched.</li>
+
+<li><b>PERMAFROST → GLACIAL HOLD. One mechanic in three clauses.</b> <b>Permafrost:</b> his
+Chilled stacks never expire (unchanged, and the reason the accumulation feels like control).
+<b>The hold:</b> a Frozen enemy stays Frozen <b>indefinitely</b> — it leaves the initiative
+bar entirely and is released only when he chooses, by Ice Lance, by Shatter, or by freezing
+past his hold limit (which frees the oldest). <b>Nothing else thaws it: not ally damage, not
+his own Blizzard, not time.</b> He holds ONE enemy, two with Second Prison, any number under
+Absolute Zero; a released enemy comes back on 1 stack so the engine stays warm.
+<b>The window:</b> a held enemy takes +15% damage from all sources. Clauses 2 and 3 together
+are the design — the hold is simultaneously denial and a party-wide damage window he opens
+and closes, so his control is a team resource rather than a solo trick.</li>
+
+<li><b>A named release with no accidental thaws is a deliberate choice</b> over the
+alternative (any single-target hit from him breaks it). The alternative is more physical and
+much less legible, and it makes his own Blizzard a liability. Three things follow that the
+brief did not enumerate, and all three are decisions rather than side effects. <b>(a) A
+CLEANSING RITE CANNOT REACH A HOLD.</b> Frozen is in DEBUFF_IDS and the rite strips the
+longest-remaining debuff first — and a battle-long freeze reads as 999 turns, so a mender
+warband would have taken the hold every single time and the indefinite prison would be worth
+strictly LESS than the old one-turn freeze. That removes the enemy's only answer to a hold,
+which is what the hold limit and the boss carve-out are the price for. <b>(b) A held enemy
+is taken OFF THE TIMELINE</b> (next_time = INF) rather than losing a turn each round —
+otherwise the log would fill with "frozen solid and loses their turn" forever and its
+cooldowns would keep ticking while it sat helpless. <b>(c) IF THE CRYOMANCER DIES, EVERY
+PRISON OPENS.</b> A dead hero holding an enemy out of the fight forever is the softlock the
+boss carve-out exists to refuse, arriving through a different door.</li>
+
+<li><b>Bosses keep their carve-out and get one more.</b> They resist Frozen until Broken, as
+before — and a held boss keeps its place on the timeline and releases on its own after one
+turn. A boss removed from the fight indefinitely is not a control fantasy, it is a
+softlock.</li>
+
+<li><b>The spine has no cost clause, unlike Overburn, and that is intentional.</b> His cost
+is tempo: every turn spent building stacks is a turn not spent killing, and he can hold one
+enemy. Control should not be self-harm. If the hold proves too cheap the lever is stack-build
+rate, not a tax bolted on afterwards.</li>
+
+<li><b>KIT: Ice Lance becomes the release.</b> It keeps its damage, its Break and its
+always-crit against Frozen — which finally means something, because the release is now a
+deliberate act with a payoff attached rather than a spell that happens to like frozen
+targets. Frostbolt, Razor Ice, Blizzard and Rime are mechanically unchanged; Blizzard's
+description now says outright that it does not thaw a hold, because a player would otherwise
+assume it does and never cast it again. <b>Two new abilities arrive as tree tools:</b>
+Glacial Prison (25 Mana, 2.5, 4cd — freeze the target outright, whatever its stacks) and
+Cryoclasm (20 Mana, 2.0, 3cd — move the hold and its stacks onto a different enemy). Neither
+enters a pool: both read the hold, so both fail Batch AH's curation rule.</li>
+
+<li><b>SHATTERPOINT IS RENAMED THAW.</b> It was Piercing Ice, Empowered Frostbolt, Icy
+Veins, Crystal Edge — four crit dials in the payoff lane of a control spec. Deep Freeze and
+Winter keep their names; only the lane that was lying about its job changed. Each row asks
+one question: 1 the opening · 2 the spread · 3 what the slow is worth · 4 the tool · 5 the
+hold · 6 the price · 7 the release · 8 the capstone.</li>
+
+<li><b>ALL 24 NODES RE-AUTHORED AT ROW PRICING, EVERY ID SURVIVES, NO SAVE VERSION MOVES
+(still v7).</b> Ten ids changed lane — legal, and the reason test_batch_as repeats the shape
+audit test_batch_ai already does generically. THE FULL MAPPING, old node → new design:
+<br><b>Winter:</b> cr_hungering Hungering Cold → <i>Hungering Cold</i> (1% → 3% per stack) ·
+cr_emp_frostbolt Empowered Frostbolt → <b>Deep Chill</b> (both are Frostbolt riders; the
+free pump doubles instead of hitting harder) · cr_grasp Winter's Grasp → <i>Winter's
+Grasp</i> (1 → 2 enemies, row 6 → 3) · cr_rime Rime → <i>Rime</i>, unchanged (row 3 → 4) ·
+cr_icy_resolve Icy Resolve → <i>Icy Resolve</i> (+1 → +2 turns) · cr_whiteout Whiteout →
+<b>Whiteout re-specced</b> (a 15% Daze roll → a flat 3 stacks on every enemy; Deep Freeze
+row 3 → Winter row 6) · cr_splinter Splintering Shards → <i>always</i> strikes a fourth time
+(the roll is gone: a node that decides whether the spec's win condition happens this turn
+must not be a coin flip; Shatterpoint row 4 → Winter row 7).
+<br><b>Deep Freeze:</b> cr_frostbite Brittle Ice → <i>Brittle Ice</i> (2% → 6%, and it reads
+HELD rather than Frozen) · cr_bitter Bitter Cold → <i>Bitter Cold</i> (1 → 2 stacks, row 6 →
+2) · cr_frigid Frigid Grip → <i>Frigid Grip</i> (3% → 10%, and PER STACK) · cr_numbing
+Numbing Veil → <b>Glacial Prison</b> (denial by attrition → denial by decision) ·
+cr_frost_ward Frost Ward → <b>Second Prison — A FORCED ASSIGNMENT, REPORTED NOT HIDDEN</b>
+(Second Prison has no ancestor in this tree; Frost Ward's damage reduction against Chilled
+attackers was the closest thing to "fewer enemies get to swing at you", and a slot had to
+hold it) · cr_cold_snap Cold Snap → <b>Cold Snap re-specced, not repriced</b> (it extended
+Frozen's duration, which an indefinite hold makes meaningless; now a held enemy's Break
+meter fills 15 each of his turns, so denial converts into the party's Break) · cr_glacial
+Glacial Economy → <i>Glacial Economy</i> (5% → 15% Mana).
+<br><b>Thaw:</b> cr_hypothermia Hypothermia → <i>Hypothermia</i> (1% → 3%, Winter → Thaw) ·
+cr_freezing Freezing Advance → <b>Killing Frost</b> (both are "more damage against the enemy
+he just froze"; the same question asked of the hold instead of the moment) · cr_crystal
+Crystal Edge → <i>Crystal Edge</i> (5% → 15% per stack) · cr_lance_focus Lance Focus →
+<b>Cryoclasm — a FORCED-ISH ASSIGNMENT, also reported</b> (a Mana discount on Ice Lance was
+simply the closest remaining Ice Lance node) · cr_piercing Piercing Ice → <i>Piercing Ice</i>
+(10% → 30% crit damage) · cr_razor_hone Honed Shards → <b>re-specced onto the RELEASE</b>
+(it rode Ice Lance crits; it applies 3 stacks to the thawed enemy now, and because it lives
+in <code>_hold_release</code> the Shatter path and an evicted prison inherit it with no
+second implementation) · cr_icy_veins Icy Veins → <b>Shattered Tempo</b> (the Lance's payoff
+paying forward, which is what this does too — the release is paid out in TIME, through the
+existing delay_push arithmetic rather than a new one).
+<br><b>Capstones:</b> cr_eternal Eternal Winter unchanged · cr_absolute <b>Absolute Zero
+re-specced</b> ("freezing no longer reduces stacks" is redundant under an indefinite hold →
+NO LIMIT on how many enemies he holds) · cr_shatter <b>Shatter re-specced into the mass
+release</b> (it detonated the Chilled; it breaks every prison at once now, paid on the pile
+each held enemy was carrying).</li>
+
+<li><b>§4 — A HELD ENEMY LEAVES THE INITIATIVE BAR.</b> That single line of UI is the whole
+spec made visible: an enemy disappearing from the turn order is the control fantasy in a way
+no damage number can be. Its nameplate chip reads <b>HELD</b> rather than "Fz", and the
+tooltip names every door out — and what does not open one. Worth knowing: an ordinary hold
+leaves the bar because its next_time is INF, so <b>the bar's own filter is load-bearing only
+for the held BOSS</b>, which keeps its clock. A negative control that stripped the filter
+passed cleanly against a raider; the assertion that catches it now lives in the boss
+check.</li>
+
+<li><b>§5 — RANKED → ADDITIVE, AND THE RUNE AUDIT.</b> Every Cryomancer counter now writes
+its own magnitude in the units its read site sums. Under the old <code>1 × step</code> form
+a rune writing the same field silently inherited the node's multiplier. <b>FOUR RUNES
+RE-POINTED:</b> the Bitter Grip (frigid_ranks 1 → 3, frostbite_ranks 1 → 2), the Long Winter
+(frigid_ranks 1 → 3, crystal_edge_ranks 1 → 5; hungering_ranks stays 1 — its read site was
+already additive), the Killing Cold (numbing_ranks 1 → 5; hypothermia_ranks stays 2, same
+reason), and the Honed Lance, whose <b>lane tag moved Shatterpoint → Thaw</b> — a lane that
+stopped existing would have left it homeless in both the bot's build policy and the
+per-lane coverage test. <b>THE THREE MAGE CLASS-WIDE RUNES (Wellspring, Reckless Channeling,
+Comet) TOUCH NO CRYOMANCER COUNTER</b>, asserted so a future re-tune of one cannot silently
+re-tune the other. <b>FLAGGED FOR RE-AUTHORING, NOT DELETED:</b> <code>numbing_ranks</code>
+has no node any more (Glacial Prison took the id) — the read site is KEPT and live, the rune
+still pays its advertised 5%, and the test asserts both. Also flagged: the Killing Cold is
+tagged the <i>Winter</i> rune but now pays into Thaw's Hypothermia and a node-less counter.
+That is a re-authoring call, not a repair, and rune magnitude has been closed since Batch
+AF.</li>
+
+<li><b>UNREACHABLE BUT KEPT</b> (the AR vault pattern — no node writes these and no rune
+does either, each gated <code>&gt; 0</code>, listed so a later batch can re-node or delete
+them deliberately rather than rediscovering them): <code>icy_veins_ranks</code> /
+<code>icy_veins_charge</code>, <code>emp_frostbolt_ranks</code>,
+<code>freezing_ranks</code> / <code>freezing_adv_mark</code>,
+<code>frost_ward_ranks</code>.</li>
+
+<li><b>§6 — ONE NAMED EXCLUSIVE PAIR DISSOLVES, and the brief's premise was half stale.</b>
+<code>cold_snap</code> ↔ <code>bitter_cold</code> sat in rows 6 and 2 of the same lane after
+Batch AI replaced named pairs with row exclusivity, so a player can hold both and a rune
+writing either counter is legal. It is removed from the list in CLAUDE.md, with the reason
+in place. <b>But it was not, as the brief has it, an entry in a TESTED rule:</b> Batch AI
+retired <code>test_runes._exclusives</code> to a bare <code>pass</code> — at row granularity
+the alarm would fire on nearly every spec rune in the game — so the list survives only as
+prose. The other five pairs are untouched.</li>
+
+<li><b>§7 — THE BOT KNOWS WHAT A HOLD IS.</b> Build stacks on the highest-Attack enemy,
+freeze it, <b>leave it held</b>, and release with Ice Lance only when a second freeze is
+ready or it is the last enemy standing; Glacial Prison on cooldown against the highest-Attack
+unheld enemy; Cryoclasm when a bigger threat appears than the one he is holding. Instrument
+honesty, not tuning — no difficulty measurement belongs in this batch.</li>
+</ul>
+
+<p><b>VERIFIED:</b> check_parse 0 failures, check_flow 0 failures (6 screens), 11 scenes 0
+SCRIPT ERROR. NEW test_batch_as.gd <b>387 checks / 0 failures, stable 3/3</b>. Regression:
+test_batch_an 6044/0, test_batch_ah 5410/0 (its master.html STAMP GATE bumped AR → AS),
+ah_battle 65/0, ai 2036/0, aj 403/0, ak 523/0, al 556/0, ar 885/0, test_runes 2982/0,
+test_rune_battle 94/0, run-harness gates 1/2/3 PASS.</p>
+
+<p><b>NEGATIVE CONTROLS RUN, because a test that cannot fail proves nothing:</b> putting the
+opening roll back on raw speed trips 3 checks, stopping Ice Lance releasing trips 2, letting
+a Cleansing Rite reach a hold trips 1, giving the hold a clock trips 2, and Frigid Grip back
+at 3 trips 2. A sixth control — stripping the turn bar's <code>_is_held</code> filter —
+<b>passed, and that gap was closed rather than noted</b>: the held-boss assertion described
+above is what catches it now.</p>
+
+<p><b>KIT SMOKE, fixed lineup, 40 battles/row, berserker,cryomancer,inquisitor,beastmaster,
+DOD_SIM_TALENTS force-learning full 8-node builds</b> (standalone sims spend no points, so
+an unloaded run never touches these nodes at all). All four rows 40/40 wins, 0 SCRIPT ERROR,
+and Glacial Prison appears in the rotation at 1.0 casts/battle. <b>The three lanes separated
+cleanly, which is the result worth keeping:</b> ungeared he is 39% damage share / 146 BD /
+0.93 enemy Breaks / 1.00 Breaks taken. <b>WINTER</b> 45% / 130 BD / 0.68 / <b>0.38</b> —
+tempo, and the party stops getting Broken. <b>DEEP FREEZE</b> 39% (FLAT) / <b>300 BD</b> /
+<b>2.67</b> enemy Breaks / <b>0.03</b> taken — its damage share does not move while the
+party's Break output nearly triples and the enemies barely get to act. That is "control is a
+team resource" landing as a number. <b>THAW</b> <b>51%</b> / 346 damage/battle — the window
+lane is the damage standout. MEASURED AND FLAGGED, NOT NERFED (the AK/AL/AR discipline):
+Thaw at 51% is the tallest column, and these magnitudes are the batch's own, so it ships as
+written. Kit-mechanics ratios ONLY — the smoke lineup carries no difficulty signal (Batch
+R).</p>
+
+<p><b>REPORTED, NOT ACTED ON — SHATTER NEVER FIRED IN THE SMOKE, AND THE REASON IS A DESIGN
+TENSION, NOT A BOT BUG.</b> Shatter is the Thaw capstone and Absolute Zero is the Deep Freeze
+capstone, and only one capstone can be taken — so a player who takes Shatter holds at most
+TWO (Second Prison, Deep Freeze row 5, which costs him Piercing Ice). At a hold limit of one,
+Shatter and Ice Lance do the same job and the Lance is cheaper, so the bot correctly prefers
+it. The intended pairing is reachable — Shatter is also in SPEC_POOLS["cryomancer"], so a
+Cryomancer can EARN it and take Absolute Zero as the capstone — but no sim row exercised
+that. test_batch_as drives the mass release directly instead: three enemies held under
+Absolute Zero, one cast, all three released and all three struck.</p>
+
+<p><b>NO DIFFICULTY MEASUREMENT AND NO SIM ROW, deliberately</b> — same reasoning as AJ/AK/
+AL/AR: a single-spec re-author has no honest control row against a fixed four-hero party, and
+./sim.sh carries no difficulty signal (Batch R).</p>
+
 <h2>2026-08-07 — Batch AR: the Pyromancer — commitment</h2>
 <p><i>First of the Mage three. His lanes were purpose-designed and sound; what he needed was
 the repricing every node was missing, and a spine. Spend everything, and the payoff is

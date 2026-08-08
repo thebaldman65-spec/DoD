@@ -561,7 +561,7 @@ static func apply_kit_overrides(cfg: Dictionary, spec: String) -> void:
 			"delay": 2.0, "anim": "attack01",
 			"applies_status": {"id": "chilled", "turns": 3},
 			"perfect_id": "", "perfect_text": "Deals 25% of Attack instead",
-			"description": "A shard of biting cold: applies 1 stack\nof Chilled (4 stacks freeze the target\nsolid)."})
+			"description": "A shard of biting cold: applies 1 stack\nof Chilled. Four stacks put the enemy in\nGlacial Hold — off the turn order until\nthe Cryomancer releases it."})
 	elif spec == "arcanist":
 		cfg["abilities"][0] = Ability.make({"display_name": "Arcane Explosion",
 			"dmg_type": "arcane", "cost": 0, "damage": 10, "pressure": 10,
@@ -708,11 +708,14 @@ const SPEC_INFO := {
 		"resists": {"fire": 0.30, "frost": -0.20},
 		"passive_desc": "Overburn: +2% damage for every turn of Burn standing on\nthe enemy team, up to +40% — but at the start of each of\nhis turns he loses 1 Mana for every one of those turns,\nand THAT has no cap. Every turn of Burn he CONSUMES\nrefunds 1 Mana.",
 		"blurb": "Aggressive flame — spend everything, or the fire spends you."},
+	# The passive ID stays "permafrost" (Batch AS renamed the PASSIVE to
+	# GLACIAL HOLD; the id is a key battle.gd matches on, like the
+	# Survivalist's spec id "mystic", and renaming it buys nothing).
 	"cryomancer": {"name": "Cryomancer", "constitution": 85, "archetype": "Control", "passive": "permafrost",
 		"max_hp": 135, "armor": 0.08,
 		"resists": {"frost": 0.30, "fire": -0.20},
-		"passive_desc": "Permafrost: Chilled stacks applied by the Cryomancer\nnever expire. Frozen enemies take 15% increased damage\nfrom all sources.",
-		"blurb": "Battlefield control — chill, freeze, then shatter."},
+		"passive_desc": "Glacial Hold: Chilled stacks the Cryomancer applies never\nexpire, and a Frozen enemy stays Frozen INDEFINITELY — it\nleaves the turn order until he releases it with Ice Lance or\nShatter, or freezes past his limit (which frees the oldest).\nNothing else thaws it: not ally damage, not his own Blizzard,\nnot time. A held enemy takes +15% damage from all sources,\nand comes back on 1 stack of Chilled. He holds ONE enemy.\nBosses resist the freeze until Broken and shrug a hold after\none turn.",
+		"blurb": "Battlefield control — you decide when the enemy acts."},
 	# The Arcanist's health bar is a resource he spends (like the Devout's):
 	# Resonance bills him +5% damage taken per stack and Cannon recoils 15%,
 	# so he carries the class's biggest pool — and no armor to speak of,
@@ -872,15 +875,15 @@ static func spec_abilities(spec: String) -> Array:
 					"multi_hits": 3, "perfect_extra_hit": false,
 					"applies_status": {"id": "chilled", "turns": 3},
 					"perfect_id": "", "perfect_text": "Deals 25% of Attack instead",
-					"description": "Three razor shards driven into ONE\ntarget; every shard applies a stack\nof Chilled."}),
+					"description": "Three razor shards driven into ONE\ntarget; every shard applies a stack\nof Chilled — three quarters of a hold\nin a single cast."}),
 				Ability.make({"display_name": "Blizzard", "cooldown": 4, "dmg_type": "frost", "cost": 30,
 					"damage": 15, "pressure": 10, "delay": 3.5, "anim": "attack03", "aoe": true,
 					"perfect_id": "", "perfect_text": "Two stacks of Chilled on every enemy.",
-					"description": "Storm of ice rakes ALL enemies,\nlayering 1-2 stacks of Chilled\non each."}),
+					"description": "Storm of ice rakes ALL enemies,\nlayering 1-2 stacks of Chilled\non each. It does NOT thaw a hold —\nno damage does."}),
 				Ability.make({"display_name": "Ice Lance", "cooldown": 2, "dmg_type": "frost", "cost": 25,
 					"damage": 35, "pressure": 15, "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Deals 20 BD instead",
-					"description": "A frozen spear driven deep: +5% of\nAttack per Chilled stack on the target,\nand it ALWAYS crits against Frozen\ntargets."}),
+					"description": "A frozen spear driven deep: +5% of\nAttack per Chilled stack on the target,\nand it ALWAYS crits against Frozen\ntargets. Cast on a HELD enemy it is\nthe RELEASE — the ice breaks and the\nenemy returns on 1 stack of Chilled."}),
 			]
 		"arcanist":
 			# Resonance-engine kit (07-20 rework; core Magic Bolt becomes Arcane

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-07 (Batch AR)</b></p>
+<p align="right"><b>Last updated: 2026-08-07 (Batch AS)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -218,14 +218,18 @@ recedes grey.</li>
 <h2>4. Combat System</h2>
 <h3>4.1 Initiative timeline</h3>
 <p>Every unit sits on a shared timeline. After acting, a unit's next turn arrives after
-<b>delay × 100 / speed</b> time units (delay is the ability's initiative cost, listed in every
-tooltip; basic actions are 2.0, heavy abilities up to 6.0). Speed 100 is average. Slow status
-reduces effective speed to 75%; Quick Draw raises it by 50%. Some abilities shove the
-<i>target</i> down the timeline (delay_push). The initiative bar (top of screen, 14 slots,
-38×53 portraits) always shows the coming order; <b>hovering any individual ability re-sorts
-the bar with a gold "ghost" portrait</b> showing where that cast would land your next turn.
-The ghost locks in when the ability is chosen and persists through targeting and the skill
-check.</p>
+<b>delay × 100 / effective speed</b> time units (delay is the ability's initiative cost,
+listed in every tooltip; basic actions are 2.0, heavy abilities up to 6.0). Speed 100 is
+average. <b>Effective speed is what the timeline reads, everywhere</b> — the opening roll
+that seeds the first turn order as well as every reschedule after it — so every modifier to
+speed genuinely bends the clock. Slow reduces it to 75%; Chilled to 75% at one stack and 50%
+at two or more, deeper still under Frigid Grip; Quick Draw raises it by 50%. Some abilities
+shove the <i>target</i> down the timeline (delay_push). The initiative bar (top of screen,
+14 slots, 38×53 portraits) always shows the coming order — with one exception: <b>an enemy
+held in a Cryomancer's Glacial Hold is removed from the bar entirely</b>, because it is not
+going to act. <b>Hovering any individual ability re-sorts the bar with a gold "ghost"
+portrait</b> showing where that cast would land your next turn. The ghost locks in when the
+ability is chosen and persists through targeting and the skill check.</p>
 <h3>4.2 Skill checks</h3>
 <p>Every hero action runs a timing bar: a cursor sweeps 0→1→0 (0.72s per sweep); stop it with
 <b>Spacebar or Left Click</b>.</p>
@@ -387,14 +391,15 @@ Roots of Wrath (3 turns), and the Survivalist's Trapper passive (5 turns).</li>
 <h3>4.6 Status effects (current roster)</h3>
 <table border="1" cellpadding="4">
 <tr><th>Status</th><th>Effect</th></tr>
-<tr><td>Chilled</td><td>STACKING frost (Cryomancer-only, max 4): 1 stack −25% speed,
-2 stacks −50% speed, 3 stacks −50% speed AND −15% damage dealt; <b>4 stacks = FROZEN</b>
-— the freeze leaves <b>1 stack</b> in place. Stacks the Cryomancer applies <b>never
-expire</b> (Permafrost); Chilled from any other source lasts 3 turns, every reapplication
-resetting the clock. The chip counts stacks ("C2").</td></tr>
-<tr><td>Frozen</td><td>Frozen solid: skips their turns while the ice holds (1 turn,
-more under Cold Snap; a stun — bosses resist unless Broken). Reached at 4 stacks of
-Chilled.</td></tr>
+<tr><td>Chilled</td><td>STACKING frost (max 4): 1 stack −25% speed, 2 stacks −50% speed,
+3 stacks −50% speed AND −15% damage dealt; <b>4 stacks = FROZEN</b>. Stacks the Cryomancer
+applies <b>never expire</b>; Chilled from any other source lasts 3 turns, every
+reapplication resetting the clock. Under a Glacial Hold the pile stays at 4 and drops to
+<b>1</b> only on release. The chip counts stacks ("C2").</td></tr>
+<tr><td>Frozen</td><td>Frozen solid: skips their turns while the ice holds. From any source
+but the Cryomancer that is one turn, and bosses resist unless Broken. <b>A Cryomancer's
+freeze is a Glacial Hold</b> — indefinite, off the turn order, and released only by him.
+The nameplate chip reads HELD.</td></tr>
 <tr><td>Frostbite</td><td>Healing received reduced by 50% (2 turns). Inflicted by the
 Cryomancer's Rime on cast.</td></tr>
 <tr><td>Slowed</td><td>−25% speed (generic; e.g. Shrapnel Charge).</td></tr>
@@ -882,10 +887,18 @@ bolts spread evenly across the living instead of falling at random). Phoenix Reb
 resist, −20% fire (the Pyromancer's reflection — each mage is armoured in his own
 element and soft to his opposite, so a fire warband and a frost warband ask genuinely
 different questions of the same party).<br>
-Passive <i>Permafrost</i>: Chilled stacks applied by the
-Cryomancer <b>never expire</b>, and Frozen enemies take 15% increased damage from ALL
-sources. When an enemy Freezes, its stacks drop to <b>1</b> instead of 0 — the payoff
-keeps the engine warm. Its core Magic
+Passive <i>Glacial Hold</i>, one mechanic in three clauses. <b>Permafrost</b> — Chilled
+stacks applied by the Cryomancer never expire. <b>The hold</b> — a Frozen enemy stays Frozen
+<b>indefinitely</b>: it leaves the initiative bar entirely and is released only when the
+Cryomancer chooses, by Ice Lance, by Shatter, or by freezing past his hold limit (which
+releases the oldest). <b>Nothing else thaws it: not ally damage, not his own AoE, not
+time.</b> He holds <b>one</b> enemy (two with Second Prison, any number under Absolute
+Zero), and a released enemy comes back at 1 stack of Chilled so the engine stays warm.
+<b>The window</b> — a held enemy takes <b>+15% damage from all sources</b>, so the hold is
+simultaneously denial and a party-wide damage window he opens and closes. <b>Bosses</b>
+resist Frozen until Broken, and a held boss releases on its own after one turn. The spine
+carries no cost clause: his cost is tempo — every turn spent building stacks is a turn not
+spent killing, and he can hold one enemy. Its core Magic
 Bolt is reforged into <b>Frostbolt</b> — free, 20% Atk frost / 15 BD / 2.0, no cd, applies
 1 stack of Chilled (Perfect: hits at 25% of Attack).<br>
 Razor Ice — 25 Mana, 15% Atk frost / 10 BD / 2.5, 3cd; THREE shards driven into a SINGLE
@@ -894,13 +907,18 @@ Attack).<br>
 Blizzard — 30 Mana, 15% Atk frost to ALL / 10 BD / 3.5, 4cd; layers 1-2 stacks of Chilled
 on each victim (Perfect: 2 stacks on every enemy, no roll).<br>
 Ice Lance — 25 Mana, 35% Atk frost / 15 BD / 3.0, 2cd; +5% of Attack per Chilled stack
-on the target, and ALWAYS crits against Frozen targets (Perfect: 20 BD instead).<br>
+on the target, and ALWAYS crits against Frozen targets (Perfect: 20 BD instead).
+<b>Cast on a held enemy, Ice Lance is THE RELEASE</b> — the ice breaks and the enemy
+returns on 1 stack of Chilled.<br>
 <i>Talent-granted:</i> Rime — 25 Mana, 3.0, 3cd: inflicts Frostbite (−50% healing
 received, 2 turns), and for 3 turns every stack of Chilled the
-target gains also chills one other random enemy (Perfect: 4 turns). Shatter (capstone) —
-30 Mana, 4.0, 5cd: every Chilled enemy takes 10% of Attack PER STACK of Chilled on it;
-only castable while someone is Chilled (Perfect: cooldown becomes 4).<br>
-<b>Talent lanes:</b> see §7 — Deep Freeze / Shatterpoint / Winter.</li>
+target gains also chills one other random enemy (Perfect: 4 turns). Glacial Prison — 25
+Mana, 2.5, 4cd: Freeze the target outright, whatever its stacks. Cryoclasm — 20 Mana, 2.0,
+3cd: move the hold and its remaining stacks onto a different enemy, without spending it.
+Shatter (capstone) — 30 Mana, 4.0, 5cd: release EVERY hold at once, each held enemy taking
+10% of Attack per stack of Chilled it was carrying; only castable while he holds something
+(Perfect: cooldown becomes 4).<br>
+<b>Talent lanes:</b> see §7 — Winter / Deep Freeze / Thaw.</li>
 <li><b>Arcanist (Ramp)</b> — <b>Stat block:</b> 155 HP / 6% armor / +20% arcane &amp;
 +10% shadow resist, −15% physical (the most health and the least armour in the class:
 Resonance bills him +5% damage taken per stack and Arcane Cannon recoils 15% of its
@@ -1287,17 +1305,17 @@ siphons)</p>
 <tr><td>7</td><td><b>Chain Ignition</b> &mdash; An enemy that dies Burning splits its remaining Burn turns among the survivors.</td><td><b>Cauterise</b> &mdash; Drain that would take you below 0 Mana takes health instead, 1 HP per Mana — and your damage cap is removed while you are under 20 Mana.</td><td><b>Total Commitment</b> &mdash; Detonation consumes Burn from the target and the two enemies adjacent to it.</td></tr>
 <tr><td>CAP</td><td><b>Firestorm</b> &mdash; New ability: Firestorm — rain fire on 6-8 random enemies for 12% of Attack each, applying Burn (30 Mana, 3.5 int, 4cd).</td><td><b>Phoenix Rebirth</b> &mdash; New ability: Phoenix Rebirth — sacrifice 25% of current health and your Mana returns to full (2.0 int, 4cd).</td><td><b>Cataclysm</b> &mdash; Detonation consumes the Burn from EVERY burning enemy and adds all of it to the hit.</td></tr>
 </table>
-<p><b>Cryomancer</b> — <b>DEEP FREEZE</b> (reaching and holding Frozen) · <b>SHATTERPOINT</b> (the burst payoff) · <b>WINTER</b> (the field aura)</p>
+<p><b>Cryomancer</b> — <b>WINTER</b> (buy more time) · <b>DEEP FREEZE</b> (spend it on denial) · <b>THAW</b> (spend it on the window)</p>
 <table border="1" cellpadding="4">
-<tr><th>Row</th><th>Deep Freeze</th><th>Shatterpoint</th><th>Winter</th></tr>
-<tr><td>1</td><td><b>Brittle Ice</b> — Frozen enemies are 2% more likely to be struck by a critical hit (party-wide).</td><td><b>Piercing Ice</b> — Ice Lance gains 10% critical strike damage.</td><td><b>Hungering Cold</b> — Chilled enemies deal 1% less damage per stack of Chilled.</td></tr>
-<tr><td>2</td><td><b>Frigid Grip</b> — Every stack of Chilled slows 3% harder.</td><td><b>Empowered Frostbolt</b> — Frostbolt deals an extra 2% of Attack.</td><td><b>Hypothermia</b> — Enemies take 1% more damage per stack of Chilled.</td></tr>
-<tr><td>3</td><td><b>Whiteout</b> — Enemies hit by Blizzard have a 15% chance to become Dazed (2 turns).</td><td><b>Icy Veins</b> — Killing an enemy with Ice Lance empowers your next Ice Lance by 15%.</td><td><b>Rime</b> — New ability: Rime — inflicts Frostbite (-50% healing received, 2 turns); for 3 turns, every stack of Chilled the target gains also chills one other random enemy (25 Mana, 3.0 int, 3cd).</td></tr>
-<tr><td>4</td><td><b>Freezing Advance</b> — When an enemy Freezes, the Cryomancer&#x27;s next attack against it deals +10% damage.</td><td><b>Splintering Shards</b> — Razor Ice has a 20% chance to strike a fourth time.</td><td><b>Frost Ward</b> — The Cryomancer takes 4% less damage from Chilled enemies.</td></tr>
-<tr><td>5</td><td><b>Cold Snap</b> — Frozen lasts 1 additional turn(s).</td><td><b>Lance Focus</b> — Ice Lance costs 5 less Mana.</td><td><b>Icy Resolve</b> — Rime lasts 1 additional turn(s).</td></tr>
-<tr><td>6</td><td><b>Bitter Cold</b> — Freezing an enemy applies 1 stack(s) of Chilled to every other enemy.</td><td><b>Crystal Edge</b> — Ice Lance deals an extra 5% of Attack per Chilled stack (on top of the base 10%).</td><td><b>Winter&#x27;s Grasp</b> — At the start of each of the Cryomancer&#x27;s turns, 1 random Chilled enemy(ies) gain a stack.</td></tr>
-<tr><td>7</td><td><b>Glacial Economy</b> — Freezing an enemy restores 5% of the Cryomancer&#x27;s maximum Mana.</td><td><b>Honed Shards</b> — Critical hits with Ice Lance apply 1 stack(s) of Chilled.</td><td><b>Numbing Veil</b> — Chilled enemies have a 5% chance to miss.</td></tr>
-<tr><td>CAP</td><td><b>Absolute Zero</b> — Freezing an enemy no longer reduces its Chilled stacks — they hold at 4, and the target refreezes the moment its freeze ends.</td><td><b>Shatter</b> — New ability: Shatter — deal 10% of Attack × their Chilled stacks to EVERY Chilled enemy (30 Mana, 4.0 int, 5cd).</td><td><b>Eternal Winter</b> — EVERY enemy gains 1 stack of Chilled at the start of each of the Cryomancer&#x27;s turns.</td></tr>
+<tr><th>Row</th><th>Winter</th><th>Deep Freeze</th><th>Thaw</th></tr>
+<tr><td>1</td><td><b>Hungering Cold</b> &mdash; Chilled enemies deal 3% less damage per stack of Chilled.</td><td><b>Brittle Ice</b> &mdash; Held enemies are 6% likelier to be struck by a critical hit, party-wide.</td><td><b>Hypothermia</b> &mdash; Enemies take 3% more damage per stack of Chilled.</td></tr>
+<tr><td>2</td><td><b>Deep Chill</b> &mdash; Frostbolt applies 2 stacks of Chilled instead of 1.</td><td><b>Bitter Cold</b> &mdash; Freezing an enemy applies 2 stacks of Chilled to every other enemy.</td><td><b>Killing Frost</b> &mdash; The held-enemy damage bonus rises from +15% to +30%.</td></tr>
+<tr><td>3</td><td><b>Winter's Grasp</b> &mdash; At the start of each of his turns, 2 random Chilled enemies gain a stack.</td><td><b>Frigid Grip</b> &mdash; Every stack of Chilled slows 10% harder.</td><td><b>Crystal Edge</b> &mdash; Ice Lance deals an extra 15% of Attack per Chilled stack (on top of the base 5%).</td></tr>
+<tr><td>4</td><td><b>Rime</b> &mdash; New ability: Rime — inflicts Frostbite (-50% healing received, 2 turns); for 3 turns, every stack of Chilled the target gains also chills one other random enemy (25 Mana, 3.0 int, 3cd).</td><td><b>Glacial Prison</b> &mdash; New ability: Glacial Prison — Freeze the target outright, whatever its stacks (25 Mana, 2.5 int, 4cd).</td><td><b>Cryoclasm</b> &mdash; New ability: Cryoclasm — move the hold and its remaining stacks onto a different enemy (20 Mana, 2.0 int, 3cd).</td></tr>
+<tr><td>5</td><td><b>Icy Resolve</b> &mdash; Rime lasts 2 additional turns.</td><td><b>Second Prison</b> &mdash; He can hold TWO enemies at once instead of one.</td><td><b>Piercing Ice</b> &mdash; Ice Lance gains 30% critical strike damage.</td></tr>
+<tr><td>6</td><td><b>Whiteout</b> &mdash; Blizzard applies 3 stacks of Chilled to every enemy instead of 1-2.</td><td><b>Cold Snap</b> &mdash; A held enemy&#x27;s Break meter fills 15 at the start of each of his turns.</td><td><b>Honed Shards</b> &mdash; A release applies 3 stacks of Chilled to the thawed enemy.</td></tr>
+<tr><td>7</td><td><b>Splintering Shards</b> &mdash; Razor Ice ALWAYS strikes a fourth time — one cast is a freeze.</td><td><b>Glacial Economy</b> &mdash; Freezing an enemy restores 15% of his maximum Mana.</td><td><b>Shattered Tempo</b> &mdash; Releasing a hold pushes every OTHER enemy back 2 on the initiative timeline.</td></tr>
+<tr><td>CAP</td><td><b>Eternal Winter</b> &mdash; EVERY enemy gains 1 stack of Chilled at the start of each of his turns.</td><td><b>Absolute Zero</b> &mdash; No limit on how many enemies he can hold at once.</td><td><b>Shatter</b> &mdash; New ability: Shatter — release EVERY hold at once for 10% of Attack per Chilled stack the held enemy carried (30 Mana, 4.0 int, 5cd).</td></tr>
 </table>
 <p><b>Arcanist</b> — <b>RESONANCE</b> (the stack engine: ramp faster, cap higher, keep getting paid at the
 ceiling) · <b>OVERLOAD</b> (the risk half: crits, echoes, and the big spenders escalating with the

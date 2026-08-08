@@ -847,140 +847,165 @@ const LANE_TREES := {
 			"payload": {"stat": {"cataclysm": 1}}},
 	],
 	"cryomancer": [
-		# Purpose-designed lanes (Batch O, 07-31). Batch AI re-cut the tiers
-		# into 7 exclusive rows + a capstone row. Every id
-		# survives and re-specs in place, so saved ranks migrate. With
-		# Permafrost v2 the stacks stop expiring, and the lanes read clean:
-		# DEEP FREEZE reaches and holds Frozen, SHATTERPOINT is the burst
-		# payoff, WINTER is the field aura that profits from every stack.
-		# --- Lane A: Deep Freeze — reaching and holding Frozen. ---
-		{"id": "cr_frostbite", "name": "Brittle Ice", "ranks": 1, "lane": "Deep Freeze", "row": 1,
-			"desc": "Frozen enemies are {v}% more likely to be struck by a critical hit (party-wide).",
-			"scale": {"step": 2},
-			"payload": {"stat": {"frostbite_ranks": 1}}},
-		{"id": "cr_frigid", "name": "Frigid Grip", "ranks": 1, "lane": "Deep Freeze", "row": 2,
-			"desc": "Every stack of Chilled slows {v}% harder.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"frigid_ranks": 1}}},
-		{"id": "cr_whiteout", "name": "Whiteout", "ranks": 1, "lane": "Deep Freeze", "row": 3,
-			"desc": "Enemies hit by Blizzard have a {v}% chance to become Dazed (2 turns).",
-			"scale": {"step": 15},
-			"payload": {"stat": {"whiteout_ranks": 1}}},
-		# Re-spec (was a Rime rider, which sat in the wrong lane): the freeze
-		# opens a window, and his next strike takes it.
-		{"id": "cr_freezing", "name": "Freezing Advance", "ranks": 1, "lane": "Deep Freeze", "row": 4,
-			"desc": "When an enemy Freezes, the Cryomancer's next attack against it deals +{v}% damage.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"freezing_ranks": 1}}},
-		# Re-spec (was a flat Frostbolt damage dial). The exclusive pair:
-		# depth or breadth — hold ONE enemy under far longer, or turn every
-		# freeze into a field-wide chill that cascades toward the next one.
-		{"id": "cr_cold_snap", "name": "Cold Snap", "ranks": 1, "lane": "Deep Freeze", "row": 5,
-			"desc": "Frozen lasts {v} additional turn(s).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"cold_snap_ranks": 1}}},
-		# Re-spec (was a flat +damage dial, exclusive with Numbing Veil).
-		{"id": "cr_bitter", "name": "Bitter Cold", "ranks": 1, "lane": "Deep Freeze", "row": 6,
-			"desc": "Freezing an enemy applies {v} stack(s) of Chilled to every other enemy.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"bitter_cold_ranks": 1}}},
-		# Re-spec (was a Blizzard Mana discount): the engine pays for itself.
-		{"id": "cr_glacial", "name": "Glacial Economy", "ranks": 1, "lane": "Deep Freeze", "row": 7,
-			"desc": "Freezing an enemy restores {v}% of the Cryomancer's maximum Mana.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"glacial_ranks": 1}}},
-		# --- Lane B: Shatterpoint — the burst payoff. ---
-		{"id": "cr_piercing", "name": "Piercing Ice", "ranks": 1, "lane": "Shatterpoint", "row": 1,
-			"desc": "Ice Lance gains {v}% critical strike damage.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"piercing_ice_ranks": 1}}},
-		{"id": "cr_emp_frostbolt", "name": "Empowered Frostbolt", "ranks": 1, "lane": "Shatterpoint", "row": 2,
-			"desc": "Frostbolt deals an extra {v}% of Attack.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"emp_frostbolt_ranks": 1}}},
-		{"id": "cr_icy_veins", "name": "Icy Veins", "ranks": 1, "lane": "Shatterpoint", "row": 3,
-			"desc": "Killing an enemy with Ice Lance empowers your next Ice Lance by {v}%.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"icy_veins_ranks": 1}}},
-		# Re-spec (was an extra RANDOM target — a talent that fought the
-		# spec's own win condition): now the fourth-stack node, a 60% shot
-		# at rank 3 to Freeze straight out of a single Razor Ice.
-		{"id": "cr_splinter", "name": "Splintering Shards", "ranks": 1, "lane": "Shatterpoint", "row": 4,
-			"desc": "Razor Ice has a {v}% chance to strike a fourth time.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"splinter_ranks": 1}}},
-		{"id": "cr_lance_focus", "name": "Lance Focus", "ranks": 1, "lane": "Shatterpoint", "row": 5,
-			"desc": "Ice Lance costs {v} less Mana.",
-			"scale": {"step": 5},
-			"payload": {"ability": "Ice Lance", "add": {"cost": -5}}},
-		# Re-spec (was a flat crit dial): deepens the Lance's new per-stack
-		# scaling instead.
-		{"id": "cr_crystal", "name": "Crystal Edge", "ranks": 1, "lane": "Shatterpoint", "row": 6,
-			"desc": "Ice Lance deals an extra {v}% of Attack per Chilled stack (on top of the base 10%).",
-			"scale": {"step": 5},
-			"payload": {"stat": {"crystal_edge_ranks": 1}}},
-		# Re-spec (was a Razor Ice damage dial): the payoff hit feeds the
-		# next build.
-		{"id": "cr_razor_hone", "name": "Honed Shards", "ranks": 1, "lane": "Shatterpoint", "row": 7,
-			"desc": "Critical hits with Ice Lance apply {v} stack(s) of Chilled.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"honed_shards_ranks": 1}}},
-		# --- Lane C: Winter — the field aura. ---
+		# BATCH AS — re-authored around GLACIAL HOLD: control is deciding WHEN
+		# the enemy acts, not how hard it hits. SHATTERPOINT is renamed THAW,
+		# because a control spec whose payoff lane was burst (four crit dials)
+		# was a damage spec wearing a coat. Winter and Deep Freeze keep theirs.
+		#
+		# EVERY ONE OF THE 24 IDS SURVIVES AND RE-SPECS IN PLACE, so saved picks
+		# migrate and NO SAVE VERSION MOVES. Ten ids changed lane — legal, and
+		# the full old->new mapping table is in the changelog.
+		#
+		# EACH ROW ASKS ONE QUESTION: 1 the opening / 2 the spread / 3 what the
+		# slow is worth / 4 the tool / 5 the hold / 6 the price / 7 the release /
+		# 8 the capstone.
+		#
+		# MAGNITUDES ARE ADDITIVE, NOT RANKED (Batch AS §5): every counter below
+		# writes its own magnitude in the units its read site sums. Under the old
+		# `1 x step` form a rune writing the same field silently inherited the
+		# node's multiplier — four Cryomancer spec runes ride these counters.
+		# --- Lane WINTER — buy more time. ---
 		{"id": "cr_hungering", "name": "Hungering Cold", "ranks": 1, "lane": "Winter", "row": 1,
 			"desc": "Chilled enemies deal {v}% less damage per stack of Chilled.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"hungering_ranks": 1}}},
-		{"id": "cr_hypothermia", "name": "Hypothermia", "ranks": 1, "lane": "Winter", "row": 2,
-			"desc": "Enemies take {v}% more damage per stack of Chilled.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"hypothermia_ranks": 1}}},
-		{"id": "cr_rime", "name": "Rime", "ranks": 1, "lane": "Winter", "row": 3,
+			"scale": {"step": 3},
+			"payload": {"stat": {"hungering_ranks": 3}}},
+		# Re-spec (was Empowered Frostbolt, a flat damage add on the same
+		# ability): the free pump doubles instead of hitting harder.
+		{"id": "cr_emp_frostbolt", "name": "Deep Chill", "ranks": 1, "lane": "Winter", "row": 2,
+			"desc": "Frostbolt applies {v} stacks of Chilled instead of 1.",
+			"scale": {"base": 1, "step": 1},
+			"payload": {"stat": {"deep_chill_ranks": 1}}},
+		{"id": "cr_grasp", "name": "Winter's Grasp", "ranks": 1, "lane": "Winter", "row": 3,
+			"desc": "At the start of each of his turns, {v} random Chilled enemies gain a stack.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"grasp_ranks": 2}}},
+		{"id": "cr_rime", "name": "Rime", "ranks": 1, "lane": "Winter", "row": 4,
 			"desc": "New ability: Rime — inflicts Frostbite (-50% healing received, 2 turns); for 3 turns, every stack of Chilled the target gains also chills one other random enemy (25 Mana, 3.0 int, 3cd).",
 			"payload": {"new_ability": {"display_name": "Rime", "cost": 25,
 				"special": "rime", "delay": 3.0, "anim": "attack02", "cooldown": 3,
 				"perfect_id": "", "perfect_text": "Lasts 4 turns",
 				"description": "Hoarfrost takes root: Frostbites the\ntarget (-50% healing received, 2 turns);\nfor 3 turns, every stack of Chilled\nthis enemy gains also chills one\nother random enemy."}}},
-		# Re-spec (was a flat armor dial): the aura lane shields its caster.
-		{"id": "cr_frost_ward", "name": "Frost Ward", "ranks": 1, "lane": "Winter", "row": 4,
-			"desc": "The Cryomancer takes {v}% less damage from Chilled enemies.",
-			"scale": {"step": 4},
-			"payload": {"stat": {"frost_ward_ranks": 1}}},
-		# Re-spec (was a flat max-health dial): feeds the ability instead.
 		{"id": "cr_icy_resolve", "name": "Icy Resolve", "ranks": 1, "lane": "Winter", "row": 5,
-			"desc": "Rime lasts {v} additional turn(s).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"icy_resolve_ranks": 1}}},
-		# Re-spec (was a Frigid Grip dial): with permanent stacks the field
-		# drifts toward Frozen while he spends his turns elsewhere.
-		{"id": "cr_grasp", "name": "Winter's Grasp", "ranks": 1, "lane": "Winter", "row": 6,
-			"desc": "At the start of each of the Cryomancer's turns, {v} random Chilled enemy(ies) gain a stack.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"grasp_ranks": 1}}},
-		# Re-spec (was a flat damage-taken dial): the whole warband fumbles.
-		{"id": "cr_numbing", "name": "Numbing Veil", "ranks": 1, "lane": "Winter", "row": 7,
-			"desc": "Chilled enemies have a {v}% chance to miss.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"numbing_ranks": 1}}},
+			"desc": "Rime lasts {v} additional turns.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"icy_resolve_ranks": 2}}},
+		# Re-spec (was a Daze roll on Blizzard, in the wrong lane): the storm
+		# stops being a chance at a status and becomes three quarters of a hold
+		# across the WHOLE field.
+		{"id": "cr_whiteout", "name": "Whiteout", "ranks": 1, "lane": "Winter", "row": 6,
+			"desc": "Blizzard applies {v} stacks of Chilled to every enemy instead of 1-2.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"whiteout_ranks": 3}}},
+		# The roll is GONE, deliberately: a node that decides whether the spec's
+		# win condition happens this turn must not be a coin flip.
+		{"id": "cr_splinter", "name": "Splintering Shards", "ranks": 1, "lane": "Winter", "row": 7,
+			"desc": "Razor Ice ALWAYS strikes a fourth time — one cast is a freeze.",
+			"payload": {"stat": {"splinter_ranks": 1}}},
+		# --- Lane DEEP FREEZE — spend it on denial. ---
+		{"id": "cr_frostbite", "name": "Brittle Ice", "ranks": 1, "lane": "Deep Freeze", "row": 1,
+			"desc": "Held enemies are {v}% likelier to be struck by a critical hit, party-wide.",
+			"scale": {"step": 6},
+			"payload": {"stat": {"frostbite_ranks": 6}}},
+		{"id": "cr_bitter", "name": "Bitter Cold", "ranks": 1, "lane": "Deep Freeze", "row": 2,
+			"desc": "Freezing an enemy applies {v} stacks of Chilled to every other enemy.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"bitter_cold_ranks": 2}}},
+		# THE NODE §0 EXISTS FOR: at 10 points a stack this is what makes the
+		# initiative bar visibly move, and it only works because the reschedule
+		# reads effective_speed() (audited in Batch AS — it always has).
+		{"id": "cr_frigid", "name": "Frigid Grip", "ranks": 1, "lane": "Deep Freeze", "row": 3,
+			"desc": "Every stack of Chilled slows {v}% harder.",
+			"scale": {"step": 10},
+			"payload": {"stat": {"frigid_ranks": 10}}},
+		# Re-spec (was Numbing Veil, a miss chance on Chilled enemies — denial
+		# by attrition; this is denial by decision). The counter it used to
+		# write is RUNE-ONLY now and its read site is kept.
+		{"id": "cr_numbing", "name": "Glacial Prison", "ranks": 1, "lane": "Deep Freeze", "row": 4,
+			"desc": "New ability: Glacial Prison — Freeze the target outright, whatever its stacks (25 Mana, 2.5 int, 4cd).",
+			"payload": {"new_ability": {"display_name": "Glacial Prison", "cost": 25,
+				"special": "glacial_prison", "delay": 2.5, "anim": "attack03", "cooldown": 4,
+				"perfect_id": "", "perfect_text": "",
+				"description": "The air closes like a fist: the target\nis Frozen OUTRIGHT, whatever its\nChilled stacks, and joins the Glacial\nHold. Bosses still resist until Broken."}}},
+		# FORCED ASSIGNMENT, reported not hidden (Batch AS §9): Second Prison
+		# has no ancestor in this tree. cr_frost_ward held a damage reduction
+		# against Chilled attackers — the closest thing to "fewer enemies get to
+		# swing at you", and a slot had to hold it.
+		{"id": "cr_frost_ward", "name": "Second Prison", "ranks": 1, "lane": "Deep Freeze", "row": 5,
+			"desc": "He can hold TWO enemies at once instead of one.",
+			"payload": {"stat": {"second_prison": 1}}},
+		# Re-spec, NOT a reprice: it used to extend Frozen's duration, which an
+		# indefinite hold makes meaningless. Now the hold DOES something while
+		# it lasts — denial converts into the party's Break.
+		{"id": "cr_cold_snap", "name": "Cold Snap", "ranks": 1, "lane": "Deep Freeze", "row": 6,
+			"desc": "A held enemy's Break meter fills {v} at the start of each of his turns.",
+			"scale": {"step": 15},
+			"payload": {"stat": {"cold_snap_ranks": 15}}},
+		{"id": "cr_glacial", "name": "Glacial Economy", "ranks": 1, "lane": "Deep Freeze", "row": 7,
+			"desc": "Freezing an enemy restores {v}% of his maximum Mana.",
+			"scale": {"step": 15},
+			"payload": {"stat": {"glacial_ranks": 15}}},
+		# --- Lane THAW — spend it on the window. ---
+		{"id": "cr_hypothermia", "name": "Hypothermia", "ranks": 1, "lane": "Thaw", "row": 1,
+			"desc": "Enemies take {v}% more damage per stack of Chilled.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"hypothermia_ranks": 3}}},
+		# Re-spec (was Freezing Advance, "+damage on the enemy you just froze"):
+		# the same question asked of the hold instead of the moment.
+		{"id": "cr_freezing", "name": "Killing Frost", "ranks": 1, "lane": "Thaw", "row": 2,
+			"desc": "The held-enemy damage bonus rises from +15% to +{v}%.",
+			"scale": {"base": 15, "step": 15},
+			"payload": {"stat": {"killing_frost": 15}}},
+		{"id": "cr_crystal", "name": "Crystal Edge", "ranks": 1, "lane": "Thaw", "row": 3,
+			"desc": "Ice Lance deals an extra {v}% of Attack per Chilled stack (on top of the base 5%).",
+			"scale": {"step": 15},
+			"payload": {"stat": {"crystal_edge_ranks": 15}}},
+		# Re-spec (was Lance Focus, a Mana discount on Ice Lance — the closest
+		# remaining Ice Lance node, and a forced-ish assignment reported as one).
+		{"id": "cr_lance_focus", "name": "Cryoclasm", "ranks": 1, "lane": "Thaw", "row": 4,
+			"desc": "New ability: Cryoclasm — move the hold and its remaining stacks onto a different enemy (20 Mana, 2.0 int, 3cd).",
+			"payload": {"new_ability": {"display_name": "Cryoclasm", "cost": 20,
+				"special": "cryoclasm", "delay": 2.0, "anim": "attack02", "cooldown": 3,
+				"perfect_id": "", "perfect_text": "",
+				"description": "Control as a verb: the prison and the\ncold inside it are torn loose and\ndriven onto a DIFFERENT enemy. The\nlockdown relocates without being\nspent, so no release payoff fires."}}},
+		{"id": "cr_piercing", "name": "Piercing Ice", "ranks": 1, "lane": "Thaw", "row": 5,
+			"desc": "Ice Lance gains {v}% critical strike damage.",
+			"scale": {"step": 30},
+			"payload": {"stat": {"piercing_ice_ranks": 30}}},
+		# Re-spec in place: it rode Ice Lance CRITS, it rides Ice Lance's
+		# RELEASE now — and because it lives in _hold_release, Shatter and an
+		# evicted prison inherit it with no second implementation.
+		{"id": "cr_razor_hone", "name": "Honed Shards", "ranks": 1, "lane": "Thaw", "row": 6,
+			"desc": "A release applies {v} stacks of Chilled to the thawed enemy.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"honed_shards_ranks": 3}}},
+		# Re-spec (was Icy Veins, "an Ice Lance kill empowers the next lance" —
+		# the Lance's payoff paying forward, which is what this does too). The
+		# purest thing in the tree: the release is paid out in TIME.
+		{"id": "cr_icy_veins", "name": "Shattered Tempo", "ranks": 1, "lane": "Thaw", "row": 7,
+			"desc": "Releasing a hold pushes every OTHER enemy back {v} on the initiative timeline.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"shattered_tempo": 2.0}}},
 		# --- Capstones (row 8): take ONE, no lane requirement ---
-		{"id": "cr_shatter", "name": "Shatter", "ranks": 1, "lane": "Shatterpoint", "row": 8,
+		# Re-specced into the MASS RELEASE (Batch AS): it used to detonate the
+		# Chilled; it breaks every prison at once now, paid on the pile each
+		# held enemy was carrying.
+		{"id": "cr_shatter", "name": "Shatter", "ranks": 1, "lane": "Thaw", "row": 8,
 			"capstone": true,
-			"desc": "New ability: Shatter — deal 10% of Attack × their Chilled stacks to EVERY Chilled enemy (30 Mana, 4.0 int, 5cd).",
+			"desc": "New ability: Shatter — release EVERY hold at once for 10% of Attack per Chilled stack the held enemy carried (30 Mana, 4.0 int, 5cd).",
 			"payload": {"new_ability": {"display_name": "Shatter", "cost": 30,
 				"dmg_type": "frost", "damage": 10, "pressure": 10, "aoe": true,
 				"delay": 4.0, "anim": "attack03", "cooldown": 5,
 				"perfect_id": "", "perfect_text": "Cooldown becomes 4 instead",
-				"description": "The cold detonates: every Chilled\nenemy takes 10% of Attack PER STACK\nof Chilled on it."}}},
-		# Absolute Zero: total lockdown on a chosen target — and every
-		# per-stack aura stays permanently maxed against it.
+				"description": "Every prison breaks at once: each\nheld enemy takes 10% of Attack PER\nSTACK of Chilled it was carrying,\nand is released."}}},
+		# Re-specced (Batch AS): "freezing no longer reduces stacks" is
+		# redundant under an indefinite hold, so the capstone buys CAPACITY.
 		{"id": "cr_absolute", "name": "Absolute Zero", "ranks": 1, "lane": "Deep Freeze", "row": 8,
 			"capstone": true,
-			"desc": "Freezing an enemy no longer reduces its Chilled stacks — they hold at 4, and the target refreezes the moment its freeze ends.",
+			"desc": "No limit on how many enemies he can hold at once.",
 			"payload": {"stat": {"absolute_zero": 1}}},
-		# Eternal Winter: inevitability — with permanent stacks the entire
-		# field freezes whether he acts or not.
 		{"id": "cr_eternal", "name": "Eternal Winter", "ranks": 1, "lane": "Winter", "row": 8,
 			"capstone": true,
-			"desc": "EVERY enemy gains 1 stack of Chilled at the start of each of the Cryomancer's turns.",
+			"desc": "EVERY enemy gains 1 stack of Chilled at the start of each of his turns.",
 			"payload": {"stat": {"eternal_winter": 1}}},
 	],
 	"arcanist": [

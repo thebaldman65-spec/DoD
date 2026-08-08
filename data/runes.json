@@ -207,12 +207,12 @@
 	"bitter_grip": {
 		"name": "Rune of the Bitter Grip", "rarity": "rare", "scope": "spec:cryomancer",
 		"price": 100, "lane": "Deep Freeze",
-		"desc": "Every stack of Chilled slows 3% harder, and Frozen enemies are 2% likelier to be struck critically — by anyone.",
-		"payload": {"stat": {"frigid_ranks": 1, "frostbite_ranks": 1}}
+		"desc": "Every stack of Chilled slows 3% harder, and HELD enemies are 2% likelier to be struck critically — by anyone.",
+		"payload": {"stat": {"frigid_ranks": 3, "frostbite_ranks": 2}}
 	},
 	"honed_lance": {
 		"name": "Rune of the Honed Lance", "rarity": "rare", "scope": "spec:cryomancer",
-		"price": 100, "lane": "Shatterpoint",
+		"price": 100, "lane": "Thaw",
 		"requires_ability": "Ice Lance",
 		"desc": "Ice Lance costs 5 less Mana and drives 5% of Attack deeper.",
 		"payload": {"ability": "Ice Lance", "add": {"cost": -5, "damage": 5}}
@@ -221,13 +221,13 @@
 		"name": "Rune of the Killing Cold", "rarity": "rare", "scope": "spec:cryomancer",
 		"price": 75, "scarred": true, "lane": "Winter",
 		"desc": "Enemies take 2% more damage per Chilled stack and Chilled enemies miss 5% more — but heals he receives are 25% weaker.",
-		"payload": {"stat": {"hypothermia_ranks": 2, "numbing_ranks": 1, "healing_received_mult": -0.25}}
+		"payload": {"stat": {"hypothermia_ranks": 2, "numbing_ranks": 5, "healing_received_mult": -0.25}}
 	},
 	"long_winter": {
 		"name": "Rune of the Long Winter", "rarity": "rare", "scope": "spec:cryomancer",
 		"price": 100,
 		"desc": "A little of every cold: Chilled slows 3% harder, Ice Lance +5% of Attack per stack, Chilled enemies hit 1% softer per stack.",
-		"payload": {"stat": {"frigid_ranks": 1, "crystal_edge_ranks": 1, "hungering_ranks": 1}}
+		"payload": {"stat": {"frigid_ranks": 3, "crystal_edge_ranks": 5, "hungering_ranks": 1}}
 	},
 
 	"resonant_core": {

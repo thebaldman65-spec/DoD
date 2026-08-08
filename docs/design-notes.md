@@ -4,6 +4,47 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Denial you have to decide (Batch AS) — 2026-08-07
+
+The Cryomancer's problem was that his control kept happening TO him. Four
+stacks of setup bought a single skipped turn, the freeze fired whenever the
+fourth stack happened to land rather than when he wanted it, and the pile
+immediately dropped to one so the next one cost the same again. A spec whose
+archetype is Control was spending its whole turn economy on a mechanic it did
+not choose the timing of.
+
+So the hold became indefinite and the release became a named act. That is one
+change, not two: the moment nothing thaws a freeze by accident, "when does
+this enemy act again" stops being a timer and becomes a question the player
+answers. It is why the release had to be a specific spell rather than "any
+single-target hit from him" — the physical version reads better in a sentence
+but makes his own Blizzard a liability, and a player who cannot predict when
+their lockdown breaks does not have a lockdown.
+
+The +15% window is what stops the whole thing being a solo trick. Denial on
+its own is invisible to the other three heroes; a target that is both helpless
+and softer is something the party plays around. It also gives the release a
+real cost — you are closing a window as well as freeing an enemy — which is
+the only reason Ice Lance's always-crit clause has ever meant anything.
+
+The boss carve-out is not balance, it is a refusal. "This enemy never acts
+again" is a fantasy right up to the point where the enemy is the thing you
+have to kill to end the fight, and then it is a softlock. Same reasoning
+retired the enemy Cleansing Rite as an answer to a hold, in the other
+direction: a battle-long freeze reads as the longest-remaining debuff, so
+menders would have stripped it first every single time and the indefinite
+prison would have been worth less than the one-turn freeze it replaced. The
+hold LIMIT is the price instead — one enemy, and every extra costs a node.
+
+SHATTERPOINT had to go because a control spec whose payoff lane is burst is a
+damage spec wearing a coat. Four crit dials in a row is not a lane, it is a
+stat block with names on it. Thaw asks what you spend the window on, which is
+a different question from Deep Freeze's "how much do you deny" and Winter's
+"how much time do you buy" — and the kit smoke came back with the three lanes
+genuinely separated: Deep Freeze's damage share does not move at all while the
+party's Break output nearly triples. That is the shape the spec is supposed to
+have.
+
 ## A reward that caps and a cost that does not (Batch AR) — 2026-08-07
 
 The Pyromancer's loop was already build-and-spend, and two things quietly
