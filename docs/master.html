@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-07 (Batch AT)</b></p>
+<p align="right"><b>Last updated: 2026-08-08 (Batch AU)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -629,7 +629,12 @@ half your current stacks — all of them on a perfect cast).</li>
 <li><b>The curve compounds.</b> At N stacks the damage bonus is <b>1.5% ×
 N(N+1)/2</b> and the damage <i>taken</i> penalty is <b>0.75% × N(N+1)/2</b> — the same
 triangular curve at half the step. Both ends uncapped. Conduit raises the damage step to
-2% and the Singularity capstone doubles it to 3%; nothing modifies the taken step.</li>
+2% and the <b>Magi's Wrath</b> capstone doubles it to 3%; nothing modifies the taken
+step. <b>Singularity pays BUILD RATE instead</b> — critical hits build 2 additional
+Resonance and every enemy killed builds 3 — because damage is quadratic in the stack
+count and only linear in the step, so a build-rate capstone and a step capstone come out
+comparable rather than one dwarfing the other. Crit building is <b>additive</b>: base 2,
+Attunement sets it to 3, Singularity adds 2 on top for 5.</li>
 <li><b>+1% critical chance per stack, linear</b> — one stable term that does not compound,
 so the tooltip has something a player can hold in their head.</li>
 </ul>
@@ -959,10 +964,11 @@ would square it. Unity splits the recoil across the party like any other damage.
 Arcane Barrage — 20 Mana, 6 bolts × 8% Atk / 3 BD each, 2.5, 2cd; every bolt strikes one
 of the (up to) 3 living enemies with the LOWEST health — the volley typically rakes 2-3
 of them (Perfect: no two bolts strike the same enemy while an unstruck one stands).<br>
-Death Ray — 40 Mana, 150% Atk arcane to one enemy / 5.0, 3cd; <b>unusable below 5
+Death Ray — 55 Mana, 150% Atk arcane to one enemy / 5.0, 3cd; <b>unusable below 8
 Resonance</b>, and it <b>consumes no stacks</b> (it builds one, like every damaging cast).
-A button greyed out for the first four turns and then the only thing he wants to press —
-escalation expressed as an action rather than as a passive drift.<br>
+A genuinely late button — dark until the ramp is deep, and then the only thing he wants to
+press. At a Mage's 22 Mana regeneration, 55 is most of three turns' saving with Cannon and
+Barrage competing for the same pool. It carries <b>no Break damage</b>.<br>
 <i>Earnable (spec pool):</i> Stabilize — free, 1.5, 3cd; consumes the Resonance stacks
 ABOVE 2: +5 Mana and +10% damage reduction (2 turns) per stack consumed. The only thing in
 the game that removes Resonance, and the reason it is earned rather than given: it is the
@@ -970,10 +976,12 @@ escape hatch from the ramp, so taking it is a decision (Perfect: also heals 5% o
 health).<br>
 <i>Talent-granted:</i> Overcharge — 20 Mana, 1.5, 5cd, once per battle: immediately gain
 Resonance equal to HALF your current stacks (Perfect: your full current stacks). At ten
-stacks it grants five. Magi's Wrath (capstone) — 30 Mana, 15% Atk arcane to ALL enemies /
-4.0, 4cd; BD = 2.5 × stacks; recoil 15% of damage dealt, −3% per enemy hit, and no
-per-stack damage term for the same reason Cannon has none (Perfect: costs 3.5 initiative
-instead).<br>
+stacks it grants five. <b>Taking its node on an Overcharge already earned from the spec
+pool makes it usable twice per battle instead.</b> Magi's Wrath (capstone) — 30 Mana, 15%
+Atk arcane to ALL enemies / 4.0, 4cd; BD = 2.5 × stacks; recoil 15% of damage dealt, −3%
+per enemy hit, and no per-stack damage term for the same reason Cannon has none (Perfect:
+costs 3.5 initiative instead). <b>The node also doubles the damage curve's step, 1.5% →
+3%</b>, so it pays whether or not the ability was already earned.<br>
 <b>Talent lanes:</b> see §7 — Resonance / Overload / Entropy.</li>
 </ul>
 <h3>6.3 Cleric</h3>
@@ -1190,7 +1198,8 @@ is made, the tooltip also names the two doors it would shut.</p>
 no lane requirement anywhere — a build can zig-zag across all three lanes, or run straight
 down one.</p>
 <p><b>The capstone row (row 8)</b> opens when all seven rows are picked. Take one, from any
-lane; there is no lane-purity requirement.</p>
+lane; there is no lane-purity requirement. <b>It is one capstone per hero, ever</b> — the
+shelf says so, and taking one locks the other two with a tooltip naming what barred them.</p>
 <p><b>Every node costs exactly 1 point and holds a single rank</b> — no exceptions, no
 ranked investment, no escalating price curve. <b>A complete tree is 8 nodes.</b></p>
 <p><b>Economy:</b> <b>1 point for choosing a spec</b> (paid the moment the awakening is
@@ -1354,23 +1363,43 @@ constantly)</p>
 <tr><td>1</td><td><b>Harmonics</b> — Arcane Explosion builds 2 Resonance instead of 1.</td><td><b>Conduit</b> — The damage curve&#x27;s step rises from 1.5% to 2% per stack.</td><td><b>Conversion</b> — 30% of damage taken is paid as Mana instead of health.</td></tr>
 <tr><td>2</td><td><b>Attunement</b> — A critical hit builds 3 Resonance instead of 2.</td><td><b>Volatility</b> — Arcane Cannon deals +30% damage, and its recoil rises from 15% to 25%.</td><td><b>On the Edge</b> — Surviving an attack below 35% health builds 4 Resonance.</td></tr>
 <tr><td>3</td><td><b>Charged Bolts</b> — Every damaging cast restores 5% of maximum Mana per 4 stacks held.</td><td><b>Temporal Rift</b> — A critical hit echoes for 40% of its damage against a random enemy.</td><td><b>Feedback Loop</b> — 30% of recoil damage is paid as Mana instead of health.</td></tr>
-<tr><td>4</td><td><b>Overcharge</b> — New ability: Overcharge — once per battle, immediately gain Resonance equal to HALF your current stacks (20 Mana, 1.5 int, 5cd).</td><td><b>Suppressing Fire</b> — Each bolt of Arcane Barrage deals 2% of Attack more than the previous one.</td><td><b>Stable Alignment</b> — No single attack can take more than 25% of your maximum health.</td></tr>
+<tr><td>4</td><td><b>Overcharge</b> — New ability: Overcharge — once per battle, immediately gain Resonance equal to HALF your current stacks (20 Mana, 1.5 int, 5cd). If you already have it, it becomes usable TWICE per battle.</td><td><b>Suppressing Fire</b> — Each bolt of Arcane Barrage deals 2% of Attack more than the previous one.</td><td><b>Stable Alignment</b> — No single attack can take more than 25% of your maximum health.</td></tr>
 <tr><td>5</td><td><b>Resonant Core</b> — The first damaging cast of each of his turns builds 1 additional Resonance.</td><td><b>Cannoneer</b> — Arcane Cannon&#x27;s Break damage rises from 5 to 9 per Resonance stack.</td><td><b>Backlash</b> — Resonance also builds when he takes damage: 1 stack per hit received.</td></tr>
 <tr><td>6</td><td><b>Critical Mass</b> — Every third critical hit builds 4 Resonance.</td><td><b>Barrage Master</b> — Arcane Barrage fires 3 additional bolts.</td><td><b>Siphon</b> — 20% of all damage he deals is restored as Mana.</td></tr>
 <tr><td>7</td><td><b>Cascade</b> — At 10 or more stacks, every damaging cast builds 1 additional Resonance.</td><td><b>Terminal Velocity</b> — At 15 or more Resonance, Death Ray has no cooldown.</td><td><b>Event Horizon</b> — While at 15 or more Resonance, no single attack can reduce him below 1 health.</td></tr>
-<tr><td>CAP</td><td><b>Singularity</b> — The damage curve&#x27;s step DOUBLES: 1.5% to 3% per Resonance stack.</td><td><b>Magi&#x27;s Wrath</b> — New ability: Magi&#x27;s Wrath — 15% of Attack as arcane to ALL enemies; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd).</td><td><b>Perfect Conversion</b> — ALL recoil and ALL self-inflicted damage is paid as Mana instead of health.</td></tr>
+<tr><td>CAP</td><td><b>Singularity</b> — Critical hits build 2 ADDITIONAL Resonance, and every enemy killed builds 3.</td><td><b>Magi&#x27;s Wrath</b> — New ability: Magi&#x27;s Wrath — 15% of Attack as arcane to ALL enemies; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd). ALSO doubles the damage curve&#x27;s step: 1.5% to 3% per stack.</td><td><b>Perfect Conversion</b> — ALL recoil and ALL self-inflicted damage is paid as Mana instead of health.</td></tr>
 </table>
 <p><b>Review aid:</b> the map burger's "All Spec Abilities Unlocked" toggle (default OFF,
-session-only; DOD_SIM_GRANT_ALL=1 headless) pre-grants every talent-granted ability and
-both earnable pools at spawn, so reworked kits can be reviewed without spending points.</p>
+session-only; DOD_SIM_GRANT_ALL=1 headless) pre-grants each hero <b>their own spec's</b>
+talent-granted abilities, capstone abilities and spec pool at spawn, so a reworked kit can
+be reviewed without spending points. <b>The class pool is deliberately excluded</b> — a
+sibling spec's abilities are exactly what made the toggle unusable for reviewing one spec.
+A class-pool ability is still reachable through a real boss reward or the debug node
+summoner.</p>
 <p><b>Layout:</b> every tree renders as three lane columns — seven rows deep, with a
 capstone shelf underneath. Lane headers count the nodes taken in each lane (a read of the
 build, not a requirement). Each node is an emblem square labelled with its row number, and
 greys out the moment it is unreachable — a row not yet open, a door a sibling shut, or a
 capstone before 7/7. Art is placeholder.</p>
+<p><b>A row is drawn as one decision, not three picks.</b> Each of rows 1-7 sits inside a
+band labelled <b>CHOOSE ONE</b>; hovering any node <b>dims its two siblings</b>, so the
+choice is visible at the moment it is being made; and a row that has been decided shows
+its siblings <b>greyed with a lock glyph</b>. The capstone shelf carries the same treatment
+under its own stricter label.</p>
 <p><b>Tooltip display:</b> a node's tooltip shows its row, its one value, what it costs and
 from which purse, and — for a node not yet taken — the names of the two siblings taking it
-would close. A closed sibling says what closed it and that an elite point can force it.</p>
+would close (capstones included). A barred node names what barred it in words —
+<i>"Barred — you took [Name] in this row."</i> — and, where the surplus can still force it,
+says so underneath. Never a bare disabled node with no reason given.</p>
+<p><b>An earned ability no longer kills its own tree node.</b> Several abilities sit in a
+spec pool <i>and</i> in that spec's tree, so a boss can hand one over before its node is
+reached. When that happens the node <b>upgrades the ability instead of granting it</b>:
+either an authored effect (the Arcanist's Overcharge node buys a second use per battle) or
+the <b>generic fallback</b> — the highest-priority ability upgrade the ability does not
+already carry, in the order Honed → Quickened → Effortless → Swift, filtered by the same
+eligibility rules the mini-boss pick uses. It does <b>not</b> consume the once-per-run
+allowance on those upgrades. If every eligible upgrade is already on the ability the node
+grants nothing, and its tooltip says so.</p>
 <p><b>Talent visibility:</b> every talent proc is written to the combat log with a
 "Talent:" tag (Enraged, Unrelenting Assault, Endurance, Unkillable, Richocet, Tank and
 Spank, Rallying Cry, Bulwark Line, Dominant Presence, Sundering, Riposte...), and stateful
@@ -1597,7 +1626,7 @@ holds W, and the remaining abilities follow in kit order. <b>There is no cap on 
 abilities a hero holds</b>, so slot 10 onward binds to <b>Shift + the same key in the same
 order</b> (10 = Shift+Q, 11 = Shift+W, … 18 = Shift+G). Each button shows its key, e.g.
 "[W] Bloodlust" or "[⇧Q] Blood Price". A hotkey is ignored when the ability is unaffordable
-or gated (Death Ray below 5 Resonance, Kill Command without a living companion,
+or gated (Death Ray below 8 Resonance, Kill Command without a living companion,
 Resurrection with nobody fallen), and hotkeys only work while the action bar is open —
 never during targeting or a skill check.</li>
 <li><b>Tab:</b> while choosing an action, Tab opens/closes the <b>Abilities list</b> (browse

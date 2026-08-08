@@ -152,7 +152,10 @@ func _draw_detail() -> void:
 	# Batch AQ §5A: the RETURN is captured now instead of discarded — it names
 	# what actually LANDED, so the sheet's ◆ carries the same guarantee the
 	# battle tooltip has and can never advertise an upgrade that did not apply.
-	var landed_upgrades: Dictionary = Run.apply_upgrades(member, cfg["abilities"])
+	# Batch AU §1's talent fallbacks ride the same call, so the sheet shows the
+	# upgraded numbers a collided node actually bought.
+	var landed_upgrades: Dictionary = Run.apply_upgrades(member, cfg["abilities"],
+		cfg.get(Talents.FALLBACK_KEY, []))
 	# Kiln-Forged (Pyromancer, Batch AR): mirrors the battle spawn, because the
 	# Resistances row below reads cfg["resists"] and a sheet that omitted this
 	# would quietly disagree with the fight.
@@ -413,6 +416,30 @@ const LANE_COL_X := [620.0, 872.0, 1124.0]
 const LANE_ROW_Y := [150.0, 206.0, 262.0, 318.0, 374.0, 430.0, 486.0]
 const LANE_CAP_Y := 566.0
 
+# BATCH AU §2 — EXCLUSIVITY MADE LEGIBLE. A row of three siblings read as three
+# independent picks; it is ONE decision, and a player who does not know that
+# discovers it by closing two doors they wanted. Three changes, because they fix
+# different halves of the problem:
+#   (a) each row is drawn as a BAND with a CHOOSE ONE label — the structural
+#       fix, which stops the misread before it happens;
+#   (b) hovering a node DIMS ITS TWO SIBLINGS — the one that actually prevents
+#       the mistake, because it fires at the moment of deciding;
+#   (c) a taken row LOCKS its siblings visibly — greyed, a lock glyph, and a
+#       tooltip that names what barred them. Never a bare disabled node.
+# Row 8 gets its own treatment because its rule is stricter: ONE CAPSTONE PER
+# HERO, EVER, across all three lanes.
+const ROW_BAND_PAD := 34.0        # how far a band reaches past the outer columns
+const ROW_BAND_H := 50.0
+const ROW_BAND_COLOR := Color(1, 1, 1, 0.035)
+const ROW_BAND_DECIDED := Color(0.55, 0.45, 0.20, 0.10)
+const SIBLING_DIM := 0.26         # alpha a hovered node's siblings fall to
+const LOCK_GLYPH := "⊘"
+
+# id -> its Button, and id -> the other ids in its row. Rebuilt with the tree.
+var _tree_buttons: Dictionary = {}
+var _tree_siblings: Dictionary = {}
+var _tree_base_modulate: Dictionary = {}
+
 
 # Lane order comes from the tree itself (first appearance) — the columns
 # read left to right in the order the tree was authored.
@@ -431,11 +458,35 @@ func _draw_lane_tree(member: Dictionary) -> void:
 	var points: int = member.get("talent_points", 0)
 	var flex: int = member.get("talent_flex", 0)
 	var lane_order := _tree_lanes(tree)
+	_tree_buttons = {}
+	_tree_siblings = {}
+	_tree_base_modulate = {}
 	var back := ColorRect.new()
 	back.position = TREE_BACK_POS
 	back.size = TREE_BACK_SIZE
 	back.color = Color(0.05, 0.05, 0.06)
 	add_child(back)
+	# (a) THE ROW BANDS. Added before the spines and the nodes so they sit
+	# behind everything — a Control draws its children in order.
+	for row in range(1, Talents.ROWS + 1):
+		var band_y: float = LANE_ROW_Y[row - 1]
+		var decided := not Talents.row_picks(tree, learned, row).is_empty()
+		var band := ColorRect.new()
+		band.position = Vector2(LANE_COL_X[0] - ROW_BAND_PAD, band_y - ROW_BAND_H / 2.0)
+		band.size = Vector2(
+			LANE_COL_X[LANE_COL_X.size() - 1] + ROW_BAND_PAD - band.position.x,
+			ROW_BAND_H)
+		band.color = ROW_BAND_DECIDED if decided else ROW_BAND_COLOR
+		add_child(band)
+		var band_lbl := Label.new()
+		band_lbl.text = "CHOOSE ONE"
+		band_lbl.add_theme_font_size_override("font_size", 9)
+		band_lbl.add_theme_color_override("font_color",
+			Color(0.62, 0.55, 0.38) if decided else Color(0.45, 0.45, 0.50))
+		band_lbl.position = Vector2(TREE_BACK_POS.x + 4, band_y - 7)
+		band_lbl.size = Vector2(LANE_COL_X[0] - ROW_BAND_PAD - TREE_BACK_POS.x - 8, 14)
+		band_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		add_child(band_lbl)
 	# Lane spines + headers with the count of nodes taken in each lane. Lanes
 	# no longer gate anything (rows do), so this is a read of the build the
 	# player has assembled, not a requirement they are working toward.
@@ -462,7 +513,10 @@ func _draw_lane_tree(member: Dictionary) -> void:
 	# Row 8: the capstone shelf. Any lane — the seven rows above are the
 	# whole requirement.
 	var cap_lbl := Label.new()
-	cap_lbl.text = "— CAPSTONE · take ONE —"
+	# Batch AU §2: row 8's rule is stricter than a row's and the shelf has to
+	# say which — one capstone per hero, EVER, across all three lanes. A player
+	# who does not know that discovers it by losing two capstones.
+	cap_lbl.text = "— CAPSTONE · ONE PER HERO, EVER · any lane —"
 	cap_lbl.add_theme_font_size_override("font_size", 12)
 	cap_lbl.add_theme_color_override("font_color", Color(0.7, 0.6, 0.75))
 	# Clear of row 7's own label, which sits just under its node.
@@ -480,6 +534,13 @@ func _draw_lane_tree(member: Dictionary) -> void:
 		var y: float = LANE_CAP_Y if row >= Talents.CAPSTONE_ROW \
 			else LANE_ROW_Y[clampi(row - 1, 0, LANE_ROW_Y.size() - 1)]
 		var center := Vector2(LANE_COL_X[col], y)
+		# (b) the sibling map, built from the tree's own rows — row 8 included,
+		# because the capstone shelf is one decision too.
+		var sibs := PackedStringArray()
+		for sib in Talents.row_nodes(tree, row):
+			if String(sib["id"]) != String(talent["id"]):
+				sibs.append(String(sib["id"]))
+		_tree_siblings[String(talent["id"])] = sibs
 		_make_tree_node(talent, learned, points, center, 44.0, flex)
 	_build_tree_tip()
 
@@ -542,6 +603,14 @@ func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
 		or check["why"].begins_with("Closed") or check["why"].begins_with("Barred")
 		or check["why"].begins_with("Coming"))) \
 		or (check["ok"] and Talents.purse_for(Run.party[selected], check) == "")
+	# BATCH AU §2c — A TAKEN ROW LOCKS ITS SIBLINGS VISIBLY. `barred` is the
+	# row rule having shut this node, whether for good (the third node, or a
+	# capstone after one is taken) or subject to AN's surplus-point crack. It
+	# wears the lock glyph and its tooltip NAMES what barred it either way; the
+	# crack survives untouched, and the tooltip is where it is stated.
+	var barred: bool = ranks_have < 1 and not _row_open_for(talent, learned)
+	if barred:
+		locked = true
 
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(node_size, node_size)
@@ -558,8 +627,11 @@ func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
 	btn.add_theme_stylebox_override("normal", sb)
 	btn.add_theme_stylebox_override("hover", sb_hover)
 	btn.add_theme_stylebox_override("pressed", sb_hover)
-	# Placeholder emblem until node art lands (capstones wear a crown).
-	btn.text = "♛" if talent.get("capstone", false) else "⚔"
+	# Placeholder emblem until node art lands (capstones wear a crown); a
+	# barred node wears the lock instead, so the row reads as decided at a
+	# glance rather than only on hover.
+	btn.text = LOCK_GLYPH if barred \
+		else ("♛" if talent.get("capstone", false) else "⚔")
 	btn.add_theme_font_size_override("font_size", 24 if node_size >= 50.0 else 19)
 	btn.add_theme_color_override("font_color",
 		Color(0.30, 0.30, 0.34) if locked else Color(0.58, 0.58, 0.64))
@@ -571,6 +643,8 @@ func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
 		center, flex))
 	btn.mouse_exited.connect(_hide_tree_tip)
 	add_child(btn)
+	_tree_buttons[String(talent["id"])] = btn
+	_tree_base_modulate[String(talent["id"])] = btn.modulate
 
 	# Row number under the node: the whole gate, stated where the eye is.
 	var pts_label := Label.new()
@@ -589,15 +663,59 @@ func _make_tree_node(talent: Dictionary, learned: Dictionary, points: int,
 	add_child(pts_label)
 
 
+# Is this node's row still open to it — i.e. has NO sibling been taken? Rows
+# 1-7 ask row_picks; row 8 asks whether a capstone exists at all, because its
+# rule is one per hero across every lane. THE ONE PLACE the question is asked,
+# so the lock glyph, the greying and the tooltip cannot disagree.
+func _row_open_for(talent: Dictionary, learned: Dictionary) -> bool:
+	var tree: Array = Run.party[selected].get("tree", [])
+	var row := int(talent.get("row", 1))
+	if row >= Talents.CAPSTONE_ROW:
+		return not Talents.has_capstone(tree, learned)
+	return Talents.row_picks(tree, learned, row).is_empty()
+
+
+# WHAT BARRED IT, by name — Batch AU §2c. Never a bare disabled node.
+func _barred_line(talent: Dictionary, learned: Dictionary) -> String:
+	var tree: Array = Run.party[selected].get("tree", [])
+	var row := int(talent.get("row", 1))
+	var taken := PackedStringArray()
+	for pid in Talents.row_picks(tree, learned, row):
+		if String(pid) != String(talent["id"]):
+			taken.append(String(Talents.node_in_tree(tree, String(pid)).get("name", pid)))
+	if taken.is_empty():
+		return ""
+	if row >= Talents.CAPSTONE_ROW:
+		return "Barred — %s is your capstone, and a hero takes ONE ever." % \
+			" and ".join(taken)
+	return "Barred — you took %s in this row." % " and ".join(taken)
+
+
 func _show_tree_tip(talent: Dictionary, ranks_have: int, check: Dictionary,
 		points: int, center: Vector2, flex: int = 0) -> void:
+	_dim_siblings(String(talent["id"]))
 	_tree_tip_name.text = talent["name"]
 	_tree_tip_desc.text = Talents.desc_for(talent, ranks_have)
 	var row := int(talent.get("row", 1))
 	var state := "Capstone" if row >= Talents.CAPSTONE_ROW else "Row %d of %d" % [
 		row, Talents.ROWS]
+	var learned_now: Dictionary = Run.party[selected].get("talents", {})
+	var barred_line := "" if ranks_have > 0 else _barred_line(talent, learned_now)
 	if ranks_have > 0:
 		state += "  —  TAKEN"
+	elif barred_line != "":
+		# The named reason comes FIRST, because it is the answer to the only
+		# question a greyed node raises. The surplus-point crack, where it is
+		# still open, is stated under it rather than instead of it.
+		state += "\n%s" % barred_line
+		if check["ok"] and check["pool"] == "flex":
+			var fpurse := Talents.purse_for(Run.party[selected], check)
+			if fpurse == "talent_flex":
+				state += "\nA SURPLUS point can force it open (have %d)" % flex
+			elif fpurse == "talent_points":
+				state += "\nA surplus point can force it open — click to spend 1 point (have %d)" % points
+			else:
+				state += "\nA surplus point could force it open — you have none"
 	elif not check["ok"]:
 		state += "  —  %s" % check["why"]
 	elif check["pool"] == "flex":
@@ -614,14 +732,23 @@ func _show_tree_tip(talent: Dictionary, ranks_have: int, check: Dictionary,
 		state += "  —  costs 1 point (have 0)"
 	else:
 		state += "  —  click to spend 1 point"
-	if ranks_have < 1 and row < Talents.CAPSTONE_ROW and check["pool"] != "flex":
-		# Name the doors this pick would shut, before it shuts them.
+	if ranks_have < 1 and barred_line == "":
+		# Name the doors this pick would shut, before it shuts them. Batch AU
+		# extends this to row 8 as well: the shelf is one decision too, and
+		# losing two capstones to a rule nobody stated is the exact failure §2
+		# exists to stop.
 		var siblings := PackedStringArray()
 		for sib in Talents.row_nodes(Run.party[selected].get("tree", []), row):
 			if String(sib["id"]) != String(talent["id"]):
 				siblings.append(String(sib["name"]))
 		if not siblings.is_empty():
-			state += "\nTaking it closes %s" % " and ".join(siblings)
+			state += "\nTaking it closes %s%s" % [" and ".join(siblings),
+				" — one capstone per hero, EVER" if row >= Talents.CAPSTONE_ROW else ""]
+	# Batch AU §1: what this node does when its grant collides with an ability
+	# the hero already earned. Only appears when it actually would.
+	var collide := Run.fallback_line(Run.party[selected], talent.get("payload", {}))
+	if collide != "":
+		state += "\n%s" % collide
 	_tree_tip_state.text = state
 	_tree_tip.visible = true
 	# Sits to the left of the hovered node, like the reference image.
@@ -634,6 +761,30 @@ func _show_tree_tip(talent: Dictionary, ranks_have: int, check: Dictionary,
 func _hide_tree_tip() -> void:
 	if _tree_tip != null:
 		_tree_tip.visible = false
+	_undim_siblings()
+
+
+# (b) HOVERING A NODE DIMS ITS TWO SIBLINGS — the change that actually prevents
+# the mistake, because it fires at the moment the player is deciding. The dim
+# MULTIPLIES nothing: each button's base modulate (which already carries the
+# greying) is stored at build time and restored on exit, so a locked sibling
+# does not creep darker every time the mouse passes over the row.
+func _dim_siblings(hovered_id: String) -> void:
+	_undim_siblings()
+	for sid in _tree_siblings.get(hovered_id, []):
+		var key := String(sid)
+		var btn = _tree_buttons.get(key)
+		if btn == null or not is_instance_valid(btn):
+			continue
+		var base: Color = _tree_base_modulate.get(key, Color(1, 1, 1, 1))
+		btn.modulate = Color(base.r, base.g, base.b, SIBLING_DIM)
+
+
+func _undim_siblings() -> void:
+	for key in _tree_base_modulate:
+		var btn = _tree_buttons.get(key)
+		if btn != null and is_instance_valid(btn):
+			btn.modulate = _tree_base_modulate[key]
 
 
 func _on_tree_node_pressed(talent_id: String) -> void:

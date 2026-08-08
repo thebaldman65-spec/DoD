@@ -212,8 +212,8 @@
    "see_also": ["status_ruin"]},
 
   {"id": "talent_lanes", "term": "Talent Lanes", "category": "progression",
-   "short": "Three lanes per spec; going deep in one unlocks its heights.",
-   "long": "Each spec's tree is three themed lanes of eight nodes. Deeper tiers unlock by NODES OWNED in that lane - 2 nodes open the middle tier, 4 open the top, and 6 open the lane's capstone (the Beastmaster's older tree counts points instead: 3/6/8). Only ONE capstone can ever be taken per hero, and a few node pairs are exclusive - taking one bars the other. Depth or breadth is the build decision of the run.",
+   "short": "Three lanes crossed by seven rows: one node per row, one capstone per hero.",
+   "long": "Each spec's tree is three themed LANES crossed by seven ROWS, plus a capstone shelf underneath - 24 nodes in all, and every node costs exactly 1 point. A ROW HOLDS ONE NODE PER LANE AND YOU PICK EXACTLY ONE: the other two are barred, drawn greyed with a lock, and their tooltip names what barred them. Hovering a node dims the two it would close, and every row is drawn inside a CHOOSE ONE band, because the row is one decision rather than three picks. Row 1 is open from the start and each later row opens when the one above it has been picked, so a build can zig-zag across the lanes or run straight down one - there is no lane requirement anywhere. The capstone shelf opens once all seven rows are picked, and it is ONE CAPSTONE PER HERO, EVER, from any lane: taking one bars the other two for the rest of the run. A run pays more points than a tree has rows, and the surplus forces a SECOND node open in a row already picked; the third node in that row stays shut forever. If a node grants an ability you have already earned elsewhere, it upgrades that ability instead of granting it.",
    "see_also": ["talent_cost", "talent_points"]},
   {"id": "talent_cost", "term": "Talent Costs", "category": "progression",
    "short": "Nodes get pricier as you own more: 1,1,1,2,2,2,3...",

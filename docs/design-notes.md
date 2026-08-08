@@ -1958,3 +1958,56 @@ cannot reach, and it converts a binary the player has no opinion about into a
 decision they have to make every turn. The tension it creates — the party's
 damage window is also Shatter's fuse, and cashing the window kills the fuse — is
 the good kind, and resolving it would have thrown away the reason to fix it.
+
+## Batch AU — four things from the AT playtest
+
+**A rule that runs one direction is not a rule, it is half a rule.** Talents
+already refused to grant an ability a boss had handed over; nothing handled the
+reverse, so earning Magi's Wrath quietly deleted a third of a capstone shelf. The
+tempting fix — filter the boss pool — is the wrong one, and it is worth writing
+down why: the spec pools and the trees deliberately OVERLAP, so anything that
+filters tree abilities out of pools empties pools across the whole roster. The
+overlap is a feature (a player can earn a piece early or buy it late), which
+means the collision has to be handled where it happens rather than prevented.
+
+**The generic fallback is deliberate reuse, and reuse is the whole argument for
+it.** Four ability upgrades already exist, are already eligibility-filtered, and
+already show a ◆ on three surfaces. Pointing a new rule at machinery a player has
+already been taught costs one function and teaches nothing new; authoring a
+fifteenth bespoke "if you already own this" effect per node would cost twelve
+batches and a legibility problem. The general shape: when a new rule needs an
+effect, look first for an effect the player can already read.
+
+**Two steps, and the second one is not where it is for convenience.** The
+decision "this node collided" belongs at the grant site; the resolution belongs
+last, after every talent and rune that might `set` the same field. Batch AP
+learned that ordering the hard way and it holds here unchanged — an upgrade
+applied in the middle of the talent pass is an upgrade something later overwrites
+without an error.
+
+**Exclusivity was legible in the rules and invisible on the screen.** Three
+sibling nodes drawn as three squares read as three independent purchases no
+matter what the tooltip says, because the layout is the first thing the eye
+believes. The band fixes the reading, the hover dim fixes the moment of choosing,
+and the lock fixes the aftermath — and none of the three substitutes for the
+others. The row-8 case is the sharpest version: a rule a player only discovers by
+losing two capstones is a rule the interface never stated.
+
+**The capstones were crossed, and the arithmetic says which way round they go.**
+Doubling the damage step is what "each stack is worth more" means, so it belongs
+in the lane that sells that; build rate belongs in the lane that sells stacks.
+What makes the swap interesting rather than cosmetic is that the two are NOT
+equivalent: under a triangular curve the payout is quadratic in the count and
+linear in the step, so a build-rate capstone has to be deliberately restrained to
+stay in the same weight class as a step capstone. Singularity's +2 per crit looks
+timid beside "the step DOUBLES" and measures out at 1.74x against 2.00x. The
+lesson is the one AT already recorded, arriving through a design door instead of
+a measurement one: price build rate as the expensive thing.
+
+**A debug toggle that shows you too much is not a generous debug toggle.** The
+grant-all aid existed to review one spec's kit and was handing the reviewer three
+specs' kits, which makes the thing it exists for harder rather than easier. The
+class pool had to go, and the honest way to ship that is to name what it costs
+(a class-pool ability is no longer covered) rather than to add a second toggle
+that restores the confusion behind a checkbox.
+

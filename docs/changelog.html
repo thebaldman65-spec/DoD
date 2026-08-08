@@ -5,6 +5,161 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-08 — Batch AU: four things from the AT playtest</h2>
+<p><i>Two game-wide fixes and two pieces of Arcanist repair. No Cleric work. Every id
+survives and no save version moves (still v7).</i></p>
+<ul>
+
+<li><b>§1 AN EARNED ABILITY NO LONGER KILLS ITS OWN TREE NODE.</b> The rule ran one
+direction only: a talent that had already granted an ability stopped the boss offering it,
+but taking Magi's Wrath from a zone boss left its capstone node granting something the hero
+already owned — and that row silently dropped to two live options.
+<b>Filtering the boss pool is NOT the fix</b>: <code>SPEC_POOLS</code> entries are tree
+nodes across the roster, so filtering tree abilities out would empty pools.
+<b>THE NODE UPGRADES THE ABILITY INSTEAD OF GRANTING IT.</b>
+<ul>
+<li><b>The generic fallback reuses machinery that already exists</b>: apply the
+highest-priority eligible <code>ABILITY_UPGRADES</code> entry the ability does not already
+carry, in the order <b>Honed → Quickened → Effortless → Swift</b>, filtered by Batch AP §3's
+existing eligibility rules (Honed needs damage &gt; 0, Quickened cooldown &gt; 0, Effortless
+cost &gt; 0, Swift anything). Those upgrades are already wired (AP) and already visible with
+the ◆ marker and its hover line (AQ §5), so a fallback is legible the moment it fires with
+nothing new to build.</li>
+<li><b>It BYPASSES AP's once-per-run rule.</b> That rule governs the mini-boss pick pool; a
+talent-granted upgrade is not a mini-boss pick and must not consume one.</li>
+<li><b>It still respects "not already on this ability."</b> When every eligible upgrade is
+already on it the node grants nothing and <b>says so in its tooltip</b> — an honest dead end
+beats a silent one.</li>
+<li><b>The Arcanist's two are authored.</b> <b>Overcharge</b> already owned → the node makes
+it usable <b>twice per battle</b>. <b>Magi's Wrath</b> already owned → nothing extra, and
+that is a consequence of §4: once the capstone carries the step-doubling as a passive, owning
+the ability already does not make the node dead. §4 and §1 close each other's worst case.</li>
+<li><b>Scope:</b> the mechanism is game-wide and every ability-granting node gets the generic
+(22 such nodes, 15 of them on the generic), so nothing is left silently broken. Each class's
+re-author batch replaces its own generics with authored fallbacks.</li>
+</ul>
+<b>IMPLEMENTATION, AND WHY IT IS TWO STEPS.</b> The DECISION is made at the grant site
+(<code>Talents._collided</code>, reached from both the <code>new_ability</code> and
+<code>grant_ability</code> branches) and recorded on the cfg by ability name; the RESOLUTION
+happens in <code>Run.apply_upgrades</code>, which already runs LAST at both kit-assembly
+sites. That position is not convenience — it is Batch AP's load-bearing ordering rule:
+several talents and runes <code>set</code> an ability field, so an upgrade applied mid-tree
+would be silently overwritten. (It also has to be that way: <code>Run</code> is an autoload
+and an autoload identifier does not resolve inside a <code>class_name</code> script.)
+A node opts out with <code>no_fallback: true</code>; Magi's Wrath is the only one.</li>
+
+<li><b>§2 EXCLUSIVITY MADE LEGIBLE.</b> A row of three siblings read as three independent
+picks; it is one decision. Three changes, because they fix different halves:
+<ul>
+<li><b>(a) Each of rows 1-7 is drawn as a BAND with a CHOOSE ONE label</b> — the structural
+fix, which stops the misread before it happens. A decided row's band warms in colour.</li>
+<li><b>(b) Hovering a node DIMS ITS TWO SIBLINGS</b> — the one that actually prevents the
+mistake, because it fires at the moment the player is deciding. The capstone shelf dims the
+same way, since it is one decision too.</li>
+<li><b>(c) A taken row LOCKS its siblings visibly</b> — greyed, with a lock glyph, and a
+tooltip naming what barred them: <i>"Barred — you took [Name] in this row."</i> Never a bare
+disabled node with no reason given.</li>
+<li><b>Row 8 gets its own treatment</b>, because its rule is stricter: one capstone per hero,
+EVER, across all three lanes. The shelf label says so, taking one locks the other two with
+the same named tooltip, and an untaken capstone's tooltip now also names the two it would
+close (it previously only did that for rows 1-7).</li>
+</ul>
+<b>ONE VISIBLE CONSEQUENCE, FLAGGED NOT HIDDEN:</b> Batch AN's surplus-point crack is
+untouched in the rules, but a second node in a decided row now reads as BARRED (greyed, lock
+glyph) rather than as an ordinary open pick. The tooltip states the crack underneath the
+reason — "A surplus point can force it open" — so the affordance is legible rather than
+implied by the node's colour.</li>
+
+<li><b>§3 DEATH RAY.</b> Too strong: at twelve stacks it lands 325% of Attack in one hit.
+<b>Gate 5 → 8 Resonance</b> (<code>DEATH_RAY_STACKS = 8</code>) — more on-theme, not less: a
+genuinely late button rather than a turn-five one. <b>Cost 40 → 55 Mana</b>; he lost
+Stabilize in AT, so at a Mage's 22 regen that is most of three turns' saving with Cannon and
+Barrage competing for the same pool. Damage, initiative, cooldown and target count are
+unchanged, and it still consumes no stacks. Terminal Velocity's 15-stack threshold still
+sits clear of the new gate and is unchanged.
+<b>A miss chance was considered and rejected on precedent</b> — AQ turned down miss-chance
+modifiers on feel grounds, and a 325% nuke that whiffs is the strongest case for that
+objection rather than an exception to it.
+<b>CHECKED AND REPORTED rather than assumed:</b> a Mage's maximum Mana is 100, so 55 leaves
+45 of headroom (~2.5 turns of regeneration from empty) — the cost is payable. The greyed-out
+affordance reads "(Requires 8 Resonance — you have N)" off the constant, so it names the new
+threshold by construction, and a test reads it off a real popup button.
+<b>LEFT OPEN, DELIBERATELY: Death Ray still carries no Break damage.</b> A 55-Mana nuke that
+contributes nothing to the party's Break is a live design question, not an oversight.</li>
+
+<li><b>§4 THE TWO CAPSTONES WERE IN THE WRONG LANES. Uncrossed.</b> Singularity doubled the
+damage <i>step</i>, which is Overload's entire thesis, while Overload's own capstone was a
+plain AoE.
+<ul>
+<li><b>Magi's Wrath (Overload capstone)</b> grants the ability <b>and doubles the damage
+step, 1.5% → 3%</b>. It keeps <code>BD = 2.5 × stacks</code> and its recoil, and it does
+<b>not</b> get a per-stack damage term back — that is still the squaring trap AT exists
+around. The step-doubling now sits in the lane whose pitch is "each stack worth more".</li>
+<li><b>Singularity (Resonance capstone)</b> takes a build-rate effect: <b>critical hits build
+2 additional Resonance, and every enemy killed builds 3</b>.</li>
+<li><b>Why that is small, and why small is correct.</b> AT measured it: damage is
+step × N(N+1)/2, so it is quadratic in the stack count and only linear in the step. Doubling
+the build rate roughly quadruples the payout while doubling the step merely doubles it, so a
+capstone that doubled the build rate would be twice the capstone beside it on the same shelf.
+Singularity's effect is also deliberately self-scaling: the passive grants +1% crit per stack,
+so crits rise with the curve and escalation feeds its own build rate late without compounding
+from turn one.</li>
+<li><b>Measured, as §4 asked.</b> At twelve stacks Magi's Wrath is exactly ×2.00 on the
+damage bonus; four extra stacks (roughly where Singularity's +2 per crit lands him at ~22%
+crit) is ×1.74. The two come out comparable, so both ship as written.</li>
+<li><b>Crit-build stacking is ADDITIVE and one read site says so:</b> base 2, Attunement
+(Resonance row 2) sets it to 3, Singularity adds 2 on top for 5. Not the higher of the two,
+and never summed twice.</li>
+<li><b>The kill clause rides <code>_on_enemy_death</code></b>, the one place a death is
+booked, so it can only fire once per death.</li>
+<li><b>Perfect Conversion (Entropy capstone) is unchanged.</b></li>
+</ul>
+Field-wise: <code>singularity</code> is gone; <code>wrath_step_double</code> moves the step
+and <code>singularity_crit_build</code> / <code>singularity_kill_build</code> pay the build
+rate. <code>overcharged</code> (a bool) became <code>overcharge_uses</code> +
+<code>overcharge_extra</code>, decided in one place, <code>overcharge_ready()</code> — and
+the spent chip only appears when the allowance is actually exhausted, so it cannot lie about
+a second use still owed.</li>
+
+<li><b>§5 THE DEBUG GRANT, SCOPED TO THE HERO'S OWN SPEC.</b> <code>Run.debug_grant_all</code>
+pre-granted every talent-granted and boss-trophy ability the CLASS could reach, so testing the
+Arcanist put Pyromancer abilities in his hands. It now grants that spec's tree grants, that
+spec's capstone abilities and <code>SPEC_POOLS[spec]</code> — nothing from another spec.
+<b><code>CLASS_POOLS</code> is excluded, and that is the trade-off worth naming</b>: the
+sibling abilities showing up ARE the class pool's contents (Flamewave and Firestorm are in
+<code>CLASS_POOLS["mage"]</code>), so excluding it is what fixes the complaint. The cost is
+that a legitimately earnable class-pool ability is no longer covered by the toggle; the node
+summoner and a real boss reward still reach them. <b>No second toggle was built.</b>
+Default off, session-scoped, never saved; <code>debug_used</code> still trips. The map toast
+now says "each hero's OWN spec abilities", so the scope is stated where a tester meets it.</li>
+
+<li><b>Verified.</b> check_parse 0, check_flow 0 (6 screens). NEW <code>test_batch_au.gd</code>
+246 checks / 0 failures. Regression: an 6044/0, ah 5494/0 (stamp gate bumped AT → AU),
+ah_battle 65/0, ai 2036/0, aj 403/0, ak 524/0, al 557/0, ar 885/0, as 387/0, at 460/0
+(re-pointed in place — the Death Ray numbers and the capstone field that moved), test_runes
+2981/0, test_rune_battle 94/0, run-harness gates 1/2/3 PASS, 11 scenes 0 SCRIPT ERROR.
+<b>NEGATIVE CONTROLS RUN</b>, because a test that cannot fail proves nothing: putting the
+step-doubling back on Singularity trips 5 checks, and letting the fallback consume a
+mini-boss upgrade slot trips 5.</li>
+
+<li><b>Kit smoke</b> — fixed lineup, 40 battles a row, berserker/arcanist/inquisitor/
+beastmaster, talents force-learned. All rows 40/40 wins, 0 SCRIPT ERROR.
+<b>The capstone A/B §4 asked for, isolated</b> (same Resonance rows 1-7 both sides, only row
+8 varying): <b>Singularity 604 damage/battle (63% share) vs Magi's Wrath 678 (66%)</b> — about
+12% apart, with Magi's Wrath also bringing an entire extra AoE ability, which is the direction
+§4 predicted (×2.00 against ~×1.74). <b>The two come out comparable and both ship as
+written.</b> Full-lane rows for context: ungeared 46%/311, Resonance 59%/544 (AT read
+60%/526), Overload 52%/320 (AT read 56%/371). Caveat that applies to both: a smoke fight is
+over by round 3-4, so a compounding curve is measured near the bottom of itself.
+<b>§3's cost, measured:</b> <b>Death Ray fires 0.0 times per battle in the full Overload
+build</b> (0.5 ungeared, 0.8-0.9 in any Resonance build; AT read 0.7-1.1 everywhere). The
+Overload lane carries no build-rate nodes, so at gate 8 plus 55 Mana it never gets there
+inside a smoke fight — §3 taken to its conclusion rather than a bug, and the largest single
+reason that lane fell 371 → 320 despite gaining the doubled step. Reported, not retuned.
+Kit-mechanics ratios only — no difficulty signal (Batch R).</li>
+
+</ul>
+
 <h2>2026-08-07 — Batch AT: the Arcanist — escalation (and Shatter, re-specced)</h2>
 <p><i>Third of the Mage three, and the class is done. His tree was already purpose-designed —
 Resonance / Overload / Control, all 24 ids intact — so this batch is not a restructure. It is

@@ -1362,6 +1362,13 @@ const ABILITY_UPGRADES := {
 	"up_speed": {"name": "Swift", "desc": "Arrives 25% sooner."},
 }
 
+# THE ORDER THE GENERIC TALENT FALLBACK PICKS IN (Batch AU §1): Honed,
+# Quickened, Effortless, Swift — first one that FITS the ability and is not
+# already on it. A Dictionary's key order is stable in GDScript, but the
+# fallback's priority is a DESIGN decision rather than an authoring accident,
+# so it is written down separately and the test asserts both lists agree.
+const UPGRADE_PRIORITY := ["up_damage", "up_cooldown", "up_free", "up_speed"]
+
 
 # Does this upgrade have anything to change on this ability? An upgrade
 # offered on an ability it cannot touch (Honed on Heal, Effortless on a
@@ -1396,8 +1403,22 @@ func upgrade_fits(id: String, ab: Ability) -> bool:
 #
 # An entry naming an ability the hero no longer holds is skipped in silence:
 # it can happen across a spec reroll and is not an error.
-func apply_upgrades(member: Dictionary, abilities: Array) -> Dictionary:
+#
+# BATCH AU §1: `talent_fallbacks` is the list of ability names whose TREE NODE
+# collided with an already-owned copy (recorded by Talents at the grant site,
+# passed straight through from the cfg). Each one takes the highest-priority
+# eligible upgrade it does not already carry. THEY ARE RESOLVED HERE, LAST,
+# because AP's ordering rule is load-bearing — a talent or rune that SETS an
+# ability field would otherwise silently overwrite an upgrade applied earlier.
+# THEY BYPASS THE ONCE-PER-RUN RULE ON PURPOSE: that rule governs the mini-boss
+# PICK POOL, and a talent-granted upgrade is not a mini-boss pick, so it must
+# neither consult `has_upgrade` nor be written into `member["upgrades"]`.
+func apply_upgrades(member: Dictionary, abilities: Array,
+		talent_fallbacks: Array = []) -> Dictionary:
 	var landed: Dictionary = {}
+	# What each ability already carries, so the fallback can respect "not
+	# already on this ability" without a second read of the same data.
+	var carried: Dictionary = {}
 	for up in member.get("upgrades", []):
 		var id := String(up.get("id", ""))
 		var target := String(up.get("ability", ""))
@@ -1406,18 +1427,85 @@ func apply_upgrades(member: Dictionary, abilities: Array) -> Dictionary:
 		for ab in abilities:
 			if ab.display_name != target:
 				continue
-			match id:
-				"up_damage":
-					ab.damage = int(round(ab.damage * 1.5))
-				"up_cooldown":
-					ab.cooldown = maxi(ab.cooldown - 2, 0)
-				"up_free":
-					# `cost` alone. faith_cost (Mercy) is never touched.
-					ab.cost = 0
-				"up_speed":
-					ab.delay = maxf(ab.delay * 0.75, 1.0)
+			_stamp_upgrade(id, ab)
+			carried[target] = carried.get(target, []) + [id]
 			landed[target] = landed.get(target, []) + [upgrade_name(id)]
+	for name in talent_fallbacks:
+		var fb_name := String(name)
+		var fb_ab: Ability = null
+		for ab2 in abilities:
+			if ab2.display_name == fb_name:
+				fb_ab = ab2
+				break
+		if fb_ab == null:
+			continue  # the ability left the kit — nothing to upgrade, not an error
+		var pick := fallback_upgrade_id(fb_ab, carried.get(fb_name, []))
+		if pick == "":
+			continue  # an honest dead end; the node's tooltip says so
+		_stamp_upgrade(pick, fb_ab)
+		carried[fb_name] = carried.get(fb_name, []) + [pick]
+		landed[fb_name] = landed.get(fb_name, []) + [upgrade_name(pick)]
 	return landed
+
+
+# THE ONE PLACE AN UPGRADE'S EFFECT IS WRITTEN — both the mini-boss pick and
+# the talent fallback go through it, so the two can never pay different
+# amounts for the same named upgrade.
+func _stamp_upgrade(id: String, ab: Ability) -> void:
+	match id:
+		"up_damage":
+			ab.damage = int(round(ab.damage * 1.5))
+		"up_cooldown":
+			ab.cooldown = maxi(ab.cooldown - 2, 0)
+		"up_free":
+			# `cost` alone. faith_cost (Mercy) is never touched.
+			ab.cost = 0
+		"up_speed":
+			ab.delay = maxf(ab.delay * 0.75, 1.0)
+
+
+# The generic talent fallback's choice: the first upgrade in UPGRADE_PRIORITY
+# that FITS this ability (AP §3's eligibility rules, reused not re-written) and
+# is not in `already`. "" when every eligible upgrade is already on it — the
+# node grants nothing, and the hero screen says so rather than staying silent.
+func fallback_upgrade_id(ab: Ability, already: Array = []) -> String:
+	if ab == null:
+		return ""
+	for id in UPGRADE_PRIORITY:
+		var uid := String(id)
+		if already.has(uid):
+			continue
+		if upgrade_fits(uid, ab):
+			return uid
+	return ""
+
+
+# What a hero's tree node would actually hand them if its grant collided right
+# now, as a sentence — the hero screen's collision line. "" when the node has
+# nothing to say (it does not grant an ability, or the hero does not own it).
+# Reads `member["upgrades"]` for what the ability already carries, which is the
+# same data apply_upgrades reads, so the tooltip cannot promise a second Honed.
+func fallback_line(member: Dictionary, payload: Dictionary) -> String:
+	var name := Talents.granted_name(payload)
+	if name == "" or not Talents.owns_ability(member, name):
+		return ""
+	match Talents.collision_kind(payload):
+		"none":
+			return ""
+		"authored":
+			return "You already have %s — this node upgrades it instead." % name
+	var ab: Ability = Classes.pool_ability(name)
+	if ab == null:
+		return ""
+	var already: Array = []
+	for up in member.get("upgrades", []):
+		if String(up.get("ability", "")) == name:
+			already.append(String(up.get("id", "")))
+	var pick := fallback_upgrade_id(ab, already)
+	if pick == "":
+		return "You already have %s, and every upgrade it can take is already on it — this node grants NOTHING." % name
+	return "You already have %s — this node makes it %s instead (%s)" % [
+		name, upgrade_name(pick), upgrade_desc(pick)]
 
 
 func upgrade_name(id: String) -> String:

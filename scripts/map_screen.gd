@@ -1045,7 +1045,10 @@ func _on_burger(id: int) -> void:
 		16:
 			Run.debug_grant_all = not Run.debug_grant_all
 			_draw_screen()
-			_toast("DEBUG: all spec abilities %s" % (
+			# Batch AU §5: it grants each hero their OWN spec's kit only —
+			# the toast says so, or a tester waits for a sibling's ability
+			# that is deliberately never coming.
+			_toast("DEBUG: each hero's OWN spec abilities %s" % (
 				"UNLOCKED for every battle" if Run.debug_grant_all else "gated again"))
 		20:
 			Run.debug_free_travel = not Run.debug_free_travel

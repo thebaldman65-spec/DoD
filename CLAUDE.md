@@ -178,7 +178,149 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   every elite/mini-boss) → battle → sometimes shop and/or event → back to map.
   party.tscn is the HERO SHEET now, opened from a card.
 
-## Current systems snapshot (2026-08-07)
+## Current systems snapshot (2026-08-08)
+BATCH AU (08-08) — FOUR THINGS FROM THE AT PLAYTEST. Two game-wide fixes and two
+pieces of Arcanist repair; NO CLERIC WORK (Holy starts clean at AV). Every id
+survives, NO SAVE VERSION MOVES (still v7).
+§1 **AN EARNED ABILITY NO LONGER KILLS ITS OWN TREE NODE.** The rule ran ONE
+DIRECTION ONLY — a talent that had granted an ability stopped the boss offering
+it, but taking Magi's Wrath from a zone boss left its capstone node granting
+something already owned and that row silently dropped to TWO live options.
+**FILTERING THE BOSS POOL IS NOT THE FIX** and must never be tried: SPEC_POOLS
+entries ARE tree nodes across the roster, so filtering tree abilities out of
+spec pools would empty pools. **THE NODE UPGRADES THE ABILITY INSTEAD OF
+GRANTING IT.** The GENERIC fallback = the highest-priority eligible
+ABILITY_UPGRADES entry the ability does not already carry, order **Honed ->
+Quickened -> Effortless -> Swift** (`Run.UPGRADE_PRIORITY`), filtered by AP §3's
+existing eligibility (Honed damage>0, Quickened cooldown>0, Effortless cost>0,
+Swift anything). Deliberate REUSE: those upgrades are wired (AP), dud-filtered
+(AP §3) and already visible with the ◆ marker and hover line (AQ §5), so a
+fallback is legible the moment it fires with nothing new to build.
+**IT BYPASSES AP'S ONCE-PER-RUN RULE** — that rule governs the MINI-BOSS PICK
+POOL and a talent-granted upgrade is not a mini-boss pick. It still respects
+"not already on THIS ability", and when nothing eligible is left the node grants
+NOTHING and **says so in its tooltip** (`Run.fallback_line`).
+**IT IS TWO STEPS AND THAT IS LOAD-BEARING, NOT CONVENIENCE.** The DECISION is
+at the grant site — `Talents._collided`, reached from BOTH the `new_ability` and
+`grant_ability` branches — which records the ability NAME on
+`cfg[Talents.FALLBACK_KEY]`. The RESOLUTION is in `Run.apply_upgrades`, which
+already runs LAST at both kit-assembly sites: **AP's ordering rule means several
+talents and runes `set` an ability field, so an upgrade applied mid-tree is
+silently overwritten.** (It also could not live in talents.gd anyway — PROVEN,
+not assumed: `Run` does not resolve inside a class_name script, the compile
+error is "Identifier not found: Run".) `Run._stamp_upgrade` is now THE ONE PLACE
+an upgrade's effect is written, shared by the mini-boss pick and the fallback.
+A node opts out with **`no_fallback: true`** inside its payload; AUTHORED
+fallbacks use AK's existing `upgrade` list and win over the generic.
+**THE ARCANIST'S TWO ARE AUTHORED:** Overcharge already owned -> the node makes
+it usable TWICE per battle (`overcharge_extra`); Magi's Wrath already owned ->
+NOTHING, and that is a consequence of §4 — the capstone carries the
+step-doubling as a passive, so owning the ability already does not make it dead.
+**§4 AND §1 CLOSE EACH OTHER'S WORST CASE.** Scope: game-wide, 22 ability-granting
+nodes of which 15 take the generic; each class's re-author batch replaces its own
+generics with authored ones. DO NOT author the other nine specs' fallbacks.
+§2 **EXCLUSIVITY MADE LEGIBLE**, three changes because they fix different halves:
+(a) rows 1-7 are drawn as a BAND with a **CHOOSE ONE** label (the structural fix
+— it stops the misread before it happens; a decided row's band warms in colour);
+(b) **hovering a node DIMS ITS TWO SIBLINGS** (the one that actually prevents the
+mistake, because it fires while deciding — `_dim_siblings`/`_undim_siblings`
+restore from a stored base modulate, so a locked sibling never creeps darker);
+(c) a taken row LOCKS its siblings visibly — greyed, LOCK_GLYPH "⊘", and a
+tooltip naming what barred them, *"Barred — you took [Name] in this row."*
+ROW 8 HAS ITS OWN, STRICTER TREATMENT: the shelf reads "ONE PER HERO, EVER", the
+dim applies there too, taking one locks the other two with the same named
+tooltip, and an untaken capstone now also names the two it would close (it only
+did that for rows 1-7 before).
+**ONE VISIBLE CONSEQUENCE, FLAGGED NOT HIDDEN:** AN's surplus-point crack is
+untouched IN THE RULES, but a second node in a decided row now READS as barred
+(greyed + glyph) rather than as an ordinary open pick. The tooltip states the
+crack under the reason — "A surplus point can force it open" — so the affordance
+is legible rather than implied by colour. `Talents.can_learn`'s Locked/Closed/
+Barred/Maxed PREFIX VOCABULARY IS UNTOUCHED (test_batch_ai asserts it); the
+batch's player-facing sentence is built in party_screen, which is where UI text
+belongs.
+§3 **DEATH RAY: GATE 5 -> 8** (`DEATH_RAY_STACKS = 8`) **AND COST 40 -> 55 MANA.**
+At twelve stacks it lands 325% of Attack in one hit, so a genuinely late button
+is MORE on-theme, not less. Damage, initiative, cooldown and target count
+UNCHANGED and it still consumes nothing. Terminal Velocity's 15 still sits clear
+above the gate. **A MISS CHANCE WAS CONSIDERED AND REJECTED ON PRECEDENT** (AQ
+turned down miss-chance modifiers on feel grounds; a 325% nuke that whiffs is
+the strongest case FOR that objection). **BOTH CHECKS THE BATCH ASKED FOR, DONE
+AND REPORTED:** a Mage's max Mana is 100, so 55 leaves 45 headroom (~2.5 turns of
+regen from empty) — the cost is payable; and the greyed affordance reads
+"(Requires 8 Resonance — you have N)" off the constant, asserted off a REAL
+popup button rather than off the constant itself.
+§4 **THE TWO CAPSTONES WERE CROSSED AND ARE UNCROSSED.** Singularity doubled the
+damage STEP, which is OVERLOAD's entire thesis, while Overload's own capstone was
+a plain AoE. **MAGI'S WRATH (Overload capstone) now grants the ability AND
+doubles the step 1.5% -> 3%** (`wrath_step_double`, applied via `also` so it
+lands whether the ability is granted or was already earned). It keeps BD = 2.5 x
+stacks and its recoil and **still gets NO per-stack damage term back** — that is
+the squaring trap AT exists around. **SINGULARITY (Resonance capstone) takes
+BUILD RATE: crits build 2 additional Resonance, every enemy killed builds 3.**
+**WHY THAT IS SMALL AND WHY SMALL IS CORRECT:** damage is step x N(N+1)/2 —
+quadratic in the count, only linear in the step — so doubling the BUILD RATE
+roughly QUADRUPLES the payout while doubling the step merely doubles it. A
+capstone that doubled the build rate would be twice the capstone beside it on
+the same shelf. It is also deliberately SELF-SCALING (the passive grants +1%
+crit per stack, so crits rise with the curve and it feeds itself LATE without
+compounding from turn one). MEASURED, as §4 asked: at 12 stacks Wrath is exactly
+x2.00 and four more stacks is x1.74 — comparable, so BOTH SHIP AS WRITTEN.
+**CRIT BUILDING IS ADDITIVE WITH EXACTLY ONE READ SITE:** base 2, Attunement
+sets 3, Singularity adds 2 = 5. NOT the higher of the two, never summed twice.
+The kill clause rides `_on_enemy_death` — THE one place a death is booked — so
+it fires once per death. Perfect Conversion UNCHANGED.
+FIELDS: `singularity` is GONE; `wrath_step_double` moves the step,
+`singularity_crit_build` / `singularity_kill_build` pay the build rate.
+`overcharged` (bool) became `overcharge_uses` + `overcharge_extra` decided in
+ONE place, `overcharge_ready()` — and the spent CHIP only appears once the
+allowance is exhausted, or it would lie about a second use still owed.
+§5 **THE DEBUG GRANT IS SCOPED TO THE HERO'S OWN SPEC.** It pre-granted every
+talent-granted and boss-trophy ability the CLASS could reach, so testing the
+Arcanist put Pyromancer abilities in his hands. Now: that spec's tree grants,
+that spec's capstones and `SPEC_POOLS[spec]`. **`CLASS_POOLS` IS EXCLUDED AND
+THAT IS THE TRADE-OFF WORTH NAMING** — the sibling abilities showing up ARE the
+class pool's contents (Flamewave and Firestorm are in CLASS_POOLS["mage"]), so
+excluding it is what fixes the complaint. The cost: a legitimately earnable
+class-pool ability is no longer covered by the toggle; the node summoner and a
+real boss reward still reach them. **DO NOT BUILD A SECOND TOGGLE FOR IT.**
+Default off, session-scoped, never saved; `debug_used` still trips. The map
+toast says "each hero's OWN spec abilities" so the scope is stated where a tester
+meets it.
+VERIFIED: check_parse 0, check_flow 0 (6 screens), 11 scenes 0 SCRIPT ERROR.
+NEW test_batch_au.gd **246/0**. Regression: an 6044/0, ah 5494/0 (STAMP GATE
+bumped AT -> AU), ah_battle 65/0, ai 2036/0, aj 403/0, ak 524/0, al 557/0, ar
+885/0, as 387/0, at **460/0** (was 457 — RE-POINTED IN PLACE with the reason in
+the file: Death Ray's cost and gate, and `u.singularity` -> `u.wrath_step_double`
+for the curve probe), test_runes 2981/0, test_rune_battle 94/0, run-harness
+gates 1/2/3 PASS.
+NEGATIVE CONTROLS RUN: putting the step-doubling back on Singularity trips 5
+checks, letting the fallback consume a mini-boss upgrade slot trips 5.
+KIT SMOKE, fixed lineup, 40 battles/row, berserker,arcanist,inquisitor,
+beastmaster, DOD_SIM_TALENTS force-learning full builds. All rows 40/40 wins, 0
+SCRIPT ERROR. **THE CAPSTONE A/B §4 ASKED FOR, ISOLATED** — SAME Resonance rows
+1-7 both sides, only row 8 varying: **Singularity 604 dmg/battle (63% share) vs
+Magi's Wrath 678 (66%)**. ~12% apart, with Magi's Wrath also bringing a whole
+extra AoE ability, which is the direction §4 predicted (2.00x vs ~1.74x). **THE
+TWO COME OUT COMPARABLE AND BOTH SHIP AS WRITTEN.** Full-lane rows for context:
+ungeared 46%/311, RESONANCE 59%/544 (AT read 60%/526), OVERLOAD 52%/320 (AT read
+56%/371). CAVEAT THAT MATTERS FOR BOTH: a smoke fight is over by round 3-4, so a
+compounding curve is measured near the BOTTOM of itself — these rows under-read
+every late-game capstone by construction.
+**§3'S COST, MEASURED AND WORTH KNOWING: DEATH RAY FIRES 0.0 TIMES PER BATTLE IN
+THE FULL OVERLOAD BUILD** (0.5 ungeared, 0.8-0.9 in any Resonance build; AT read
+0.7-1.1 everywhere). The Overload lane carries no build-rate nodes, so at gate 8
+plus 55 Mana it never gets there inside a smoke fight. That is §3 taken to its
+conclusion rather than a bug — a genuinely late button is late — but it means the
+Overload lane no longer presses it at all in a short fight, which is the largest
+single reason that lane's damage fell 371 -> 320 despite gaining the doubled
+step. REPORTED, NOT RETUNED.
+NO DIFFICULTY MEASUREMENT AND NO SIM ROW, deliberately — same as AJ/AK/AL/AR/AS/
+AT: no honest control row for a single-spec change, and ./sim.sh carries no
+difficulty signal (Batch R).
+REPORTED NOT ACTED ON: **DEATH RAY STILL CARRIES NO BREAK DAMAGE.** §3 was
+offered a version trading raw damage for pressure and that option was NOT taken,
+so a 55-Mana nuke still contributes nothing to the party's Break. STILL OPEN.
 BATCH AT (08-07) — THE ARCANIST, RE-AUTHORED AROUND ESCALATION. Third of the
 Mage three, AND THE MAGE CLASS IS DONE. One spec only (plus §8's Cryomancer
 Shatter fix); the other nine trees and enemy tuning UNTOUCHED. His tree was
@@ -3208,11 +3350,13 @@ Space or left click; no announcer text (combat log only).
   THE THREE HUNTERS remain structurally correct and numerically weak: single-rank
   nodes at the old rank-1 values, i.e. roughly a third of the power a row should
   be priced at.
-- DEATH RAY CARRIES NO BREAK DAMAGE (Batch AT). Its brief specified Mana,
-  initiative, cooldown, damage, target count and its 5-stack gate precisely and
-  said nothing about BD, so it ships at pressure 0 rather than have a number
-  invented for it. A 40-Mana nuke that contributes nothing to the party's Break
-  is a real design question; one field in the Arcanist's kit either way.
+- DEATH RAY CARRIES NO BREAK DAMAGE (Batch AT, STILL OPEN AFTER AU). AT's brief
+  specified Mana, initiative, cooldown, damage, target count and the gate
+  precisely and said nothing about BD, so it ships at pressure 0 rather than
+  have a number invented for it. **AU §3 was offered a version that fixed it by
+  trading raw damage for pressure and that option was NOT taken**, so a 55-Mana
+  nuke still contributes nothing to the party's Break. One field in the
+  Arcanist's kit either way; it is the designer's call, not a batch's.
 - ASHES OF AL'AR HAS NOWHERE TO LIVE (Batch AR). The Pyromancer's self-revive
   was removed with every other defensive option, deliberately, and its id now
   carries an unrelated node. If the designer wants it back it belongs Mage-wide
@@ -3225,11 +3369,20 @@ Space or left click; no announcer text (combat log only).
   are live.
 - ABILITY UPGRADES ARE WIRED AND VISIBLE BUT STILL A PLACEHOLDER POOL OF FOUR
   (AP built the machinery, AQ built the three surfaces, both deliberately
-  authoring nothing). The authoring batch has somewhere to land now: add ids
-  to `Run.ABILITY_UPGRADES`, a branch in `Run.apply_upgrades`, and an
-  eligibility rule in `Run.upgrade_fits` — the ◆ marker and the ◆N card badge
-  read what LANDED, so they need no change when the pool grows.
-  A hero draws three a run, so a pool much past ~8 stops being felt.
+  authoring nothing). The authoring batch has somewhere to land: add ids to
+  `Run.ABILITY_UPGRADES`, a branch in `Run._stamp_upgrade`, an eligibility rule
+  in `Run.upgrade_fits` — and A PLACE IN `Run.UPGRADE_PRIORITY`, which AU's
+  talent fallback picks from in order. The ◆ marker and the ◆N card badge read
+  what LANDED, so they need no change when the pool grows. NOTE THE SECOND
+  CONSUMER NOW: the pool is no longer only a mini-boss reward, it is also what
+  every ability-granting talent node falls back on, so a new entry is felt in
+  two places. A hero draws three a run, so a pool much past ~8 stops being
+  felt as a REWARD; the fallback has no such ceiling.
+- NINE SPECS STILL TAKE THE GENERIC TALENT FALLBACK (Batch AU §1). Only the
+  Arcanist's two are authored. Each class's re-author batch should replace its
+  own generics with authored fallbacks the way AU did — a node payload's
+  `upgrade` list, or `no_fallback: true` where the node already pays through
+  another clause. The generic is a floor, not a finished design.
 - SEVERITY 4 HOLDS THREE MODIFIERS, not the four AQ's table asked for: `rot`
   was dropped over the max-HP save sync (see the AQ block). Reinstating it is
   one field (`mod_max_hp_lost`, written at the stamp, added back at the

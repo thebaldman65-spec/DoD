@@ -98,7 +98,12 @@ const PAYLOADS := {
 	"ar_still": ["backlash_stacks", 1],
 	"ar_attunement": ["siphon_ranks", 20],
 	"ar_ward": ["event_horizon", 15],
-	"ar_singularity": ["singularity", 1],
+	# RE-POINTED BY BATCH AU §4, in place with the reason here: the two
+	# capstones were crossed and are uncrossed now. The step-doubling moved to
+	# Magi's Wrath (Overload, whose thesis it always was) and Singularity took
+	# a BUILD-RATE effect instead. It writes two fields; the second is asserted
+	# below beside the kill clause.
+	"ar_singularity": ["singularity_crit_build", 2],
 	"ar_timelord": ["perfect_conversion", 1],
 }
 
@@ -247,7 +252,7 @@ func _magnitudes() -> void:
 		# ADDITIVE, NOT RANKED: a bare 1 standing in for a multiplier is the
 		# form this batch removed. The four legitimate 1s are counted stacks.
 		if not field in ["harmonics_ranks", "attunement_crit", "resonant_core_ranks",
-				"cascade_stacks", "backlash_stacks", "singularity",
+				"cascade_stacks", "backlash_stacks",
 				"perfect_conversion"]:
 			ok(float(stat.get(field, 0)) != 1.0,
 				"%s's %s is a real magnitude, not a rank-1 stand-in" % [id, field])
@@ -325,16 +330,18 @@ func _curve_maths() -> void:
 	u.second_resource = 20
 	ok(u.resonance_curve() > 3.0 * half,
 		"T(2N) grows faster than 2 x T(N) — the curve is not a slope in disguise")
-	# Conduit and Singularity move the DAMAGE step and nothing else.
+	# Conduit and the Magi's Wrath capstone move the DAMAGE step, nothing else.
 	u.second_resource = 12
 	var base_taken := u.resonance_taken_bonus()
 	u.conduit_step = 0.5
 	ok(int(u.resonance_dmg_bonus() * 100.0) == 156,
 		"Conduit at 12 stacks: +156%% (2%% x 78, got %d)" % int(u.resonance_dmg_bonus() * 100.0))
 	u.conduit_step = 0.0
-	u.singularity = 1
+	# BATCH AU §4: the step-doubling is MAGI'S WRATH'S now, not Singularity's.
+	# Same arithmetic, different capstone — the field is what moved.
+	u.wrath_step_double = 1
 	ok(int(u.resonance_dmg_bonus() * 100.0) == 234,
-		"Singularity at 12 stacks: +234%% (3%% x 78, got %d)" % int(u.resonance_dmg_bonus() * 100.0))
+		"Magi's Wrath at 12 stacks: +234%% (3%% x 78, got %d)" % int(u.resonance_dmg_bonus() * 100.0))
 	ok(abs(u.resonance_taken_bonus() - base_taken) < 0.0001,
 		"...and neither one touches the damage-TAKEN step")
 	u.free()
@@ -354,7 +361,8 @@ func _kit() -> void:
 	# Death Ray's own numbers, from §2 verbatim.
 	for ab in kit:
 		if ab.display_name == "Death Ray":
-			ok(ab.cost == 40, "Death Ray costs 40 Mana (got %d)" % ab.cost)
+			# BATCH AU §3 raised it 40 -> 55.
+			ok(ab.cost == 55, "Death Ray costs 55 Mana (got %d)" % ab.cost)
 			ok(abs(ab.delay - 5.0) < 0.001, "Death Ray is 5.0 initiative")
 			ok(ab.cooldown == 3, "Death Ray is 3cd (got %d)" % ab.cooldown)
 			ok(ab.damage == 150, "Death Ray is 150%% of Attack (got %d)" % ab.damage)
@@ -688,11 +696,12 @@ func _live_death_ray() -> void:
 		return
 	arc.max_resource = 9999
 	arc.resource = 9999
-	for n in [0, 1, 4]:
+	# BATCH AU §3 raised the gate 5 -> 8, so 5 and 7 are DARK where they lit.
+	for n in [0, 1, 4, 5, 7]:
 		arc.second_resource = n
 		ok(not scene.call("_ability_usable", arc, dray),
 			"Death Ray is DARK at %d Resonance" % n)
-	for n in [5, 6, 20]:
+	for n in [8, 9, 20]:
 		arc.second_resource = n
 		ok(scene.call("_ability_usable", arc, dray),
 			"Death Ray LIGHTS at %d Resonance" % n)

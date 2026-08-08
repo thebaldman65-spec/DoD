@@ -1047,12 +1047,18 @@ const LANE_TREES := {
 		# RE-SPECCED, NOT REPRICED. Raising a cap to 8 is meaningless once
 		# there is no cap; compounding the ramp is the escalation version of
 		# the same button. At ten stacks it grants five.
+		# AUTHORED FALLBACK (Batch AU §1): Overcharge is in SPEC_POOLS, so a zone
+		# boss can hand it over before this node is reached. Taking the node on
+		# an Overcharge he already owns buys a SECOND use per battle rather
+		# than doing nothing — the node still answers its own question ("how
+		# much more storm can I feed on?"), just in the other currency.
 		{"id": "ar_overcharge", "name": "Overcharge", "ranks": 1, "lane": "Resonance", "row": 4,
-			"desc": "New ability: Overcharge — once per battle, immediately gain Resonance equal to HALF your current stacks (20 Mana, 1.5 int, 5cd).",
+			"desc": "New ability: Overcharge — once per battle, immediately gain Resonance equal to HALF your current stacks (20 Mana, 1.5 int, 5cd). If you already have it, it becomes usable TWICE per battle.",
 			"payload": {"new_ability": {"display_name": "Overcharge", "cost": 20,
 				"special": "overcharge", "delay": 1.5, "anim": "attack02", "cooldown": 5,
 				"perfect_id": "", "perfect_text": "Gain your FULL current stacks instead",
-				"description": "Feed the storm on itself: gain\nResonance equal to half the stacks you\nalready hold. Once per battle — the\nhigher you are, the more it pays."}}},
+				"description": "Feed the storm on itself: gain\nResonance equal to half the stacks you\nalready hold. Once per battle — the\nhigher you are, the more it pays."},
+				"upgrade": [{"stat": {"overcharge_extra": 1}}]}},
 		# Re-spec (was +1 maximum Resonance — a ceiling that no longer exists).
 		# Straightforward runway, paid on the turn rather than the cast.
 		{"id": "ar_core", "name": "Resonant Core", "ranks": 1, "lane": "Resonance", "row": 5,
@@ -1168,24 +1174,49 @@ const LANE_TREES := {
 			"scale": {"step": 15},
 			"payload": {"stat": {"event_horizon": 15}}},
 		# --- Capstones (row 8): take ONE, no lane requirement ---
-		# RE-SPECCED, because uncapping is the default now: it used to remove
-		# the ceiling and cap the penalty at 5 stacks. It doubles the curve's
-		# step instead — at twelve stacks +234% rather than +117%.
+		# BATCH AU §4 — THE TWO CAPSTONES WERE IN THE WRONG LANES AND ARE
+		# UNCROSSED HERE. Doubling the damage STEP is the Overload lane's entire
+		# thesis, so it went to Magi's Wrath; this one takes BUILD RATE, which
+		# is the Resonance lane's.
+		# WHY THE NUMBERS LOOK SMALL, AND WHY SMALL IS CORRECT: damage is
+		# step x N(N+1)/2, so it is QUADRATIC in the stack count and only
+		# LINEAR in the step (AT measured it). Doubling the build rate roughly
+		# QUADRUPLES the payout while doubling the step merely doubles it — a
+		# capstone that doubled the build rate would be twice the capstone
+		# sitting beside it on the same shelf. It is also deliberately
+		# SELF-SCALING: the passive grants +1% crit per stack, so crits rise
+		# with the curve and the build rate feeds itself LATE without
+		# compounding from turn one.
+		# CRIT BUILDING IS ADDITIVE: Attunement (row 2) sets it to 3, this adds
+		# 2 on top for 5. Not the higher of the two, and summed at exactly one
+		# read site in battle.gd.
 		{"id": "ar_singularity", "name": "Singularity", "ranks": 1, "lane": "Resonance", "row": 8,
 			"capstone": true,
-			"desc": "The damage curve's step DOUBLES: 1.5% to 3% per Resonance stack.",
-			"payload": {"stat": {"singularity": 1}}},
-		# The existing granted ability, per §2's per-stack removal: its +4% per
-		# stack is GONE (the passive does that now, and leaving it on would
-		# square the compounding). BD = 2.5 x stacks and the recoil stay.
+			"desc": "Critical hits build 2 ADDITIONAL Resonance, and every enemy killed builds 3.",
+			"payload": {"stat": {"singularity_crit_build": 2, "singularity_kill_build": 3}}},
+		# The existing granted ability, per Batch AT §2's per-stack removal: its
+		# +4% per stack is GONE (the passive does that now, and leaving it on
+		# would square the compounding). BD = 2.5 x stacks and the recoil stay,
+		# and IT STILL GETS NO PER-STACK DAMAGE TERM BACK — that is the squaring
+		# trap AT exists around.
+		# BATCH AU §4: IT ALSO DOUBLES THE DAMAGE CURVE'S STEP, 1.5% -> 3%. That
+		# clause used to be Singularity's, in the Resonance lane, which is
+		# backwards — "each stack worth more" is what the Overload lane sells.
+		# The doubling rides `also`, so it lands whether the ability is granted
+		# here or was already earned.
+		# NO FALLBACK, DELIBERATELY (Batch AU §1): the passive half is why. A
+		# hero who already owns Magi's Wrath still gets the step-doubling out
+		# of this node, so it is not dead and owes nothing extra.
 		{"id": "ar_wrath", "name": "Magi's Wrath", "ranks": 1, "lane": "Overload", "row": 8,
 			"capstone": true,
-			"desc": "New ability: Magi's Wrath — 15% of Attack as arcane to ALL enemies; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd).",
+			"desc": "New ability: Magi's Wrath — 15% of Attack as arcane to ALL enemies; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd). ALSO doubles the damage curve's step: 1.5% to 3% per stack.",
 			"payload": {"new_ability": {"display_name": "Magi's Wrath", "cost": 30,
 				"dmg_type": "arcane", "damage": 15, "pressure": 0, "aoe": true,
 				"delay": 4.0, "anim": "attack03", "cooldown": 4, "recoil_base": 0.15,
 				"perfect_id": "", "perfect_text": "Costs 3.5 initiative instead",
-				"description": "The storm unchained: rakes the whole\nenemy team for 15% of Attack.\nBD = 2.5 x stacks. Recoil 15% of\ndamage dealt, -3% per enemy hit."}}},
+				"description": "The storm unchained: rakes the whole\nenemy team for 15% of Attack.\nBD = 2.5 x stacks. Recoil 15% of\ndamage dealt, -3% per enemy hit."},
+				"no_fallback": true,
+				"also": [{"stat": {"wrath_step_double": 1}}]}},
 		# RE-SPECCED FROM MASTER OF MOMENTS, whose free venting died with
 		# Stabilize — it was the most anti-escalation node in the game. The id
 		# is kept; the name had to change because it no longer described
@@ -2163,6 +2194,31 @@ static func apply_from_tree(cfg: Dictionary, tree_nodes: Array,
 #               only honest question is "was it already in the kit when the
 #               tree ran", and the abilities list is what knows that. Both
 #               call sites apply earned picks BEFORE the tree, deliberately.
+#
+# BATCH AU §1 — AN EARNED ABILITY NO LONGER KILLS ITS OWN TREE NODE. The rule
+# ran ONE DIRECTION ONLY: a talent that had already granted an ability stopped
+# the boss offering it, but taking Magi's Wrath from a zone boss left its
+# capstone node granting something the hero already owned, and that row
+# silently dropped to two live options. Filtering the boss pool is NOT the fix
+# — SPEC_POOLS entries ARE tree nodes across the roster, so filtering would
+# empty pools. THE NODE UPGRADES THE ABILITY INSTEAD OF GRANTING IT:
+#   * an authored `upgrade` list wins where a class batch has written one;
+#   * otherwise the node owes its GENERIC fallback — the highest-priority
+#     eligible ABILITY_UPGRADES entry the ability does not already carry.
+# The generic is RESOLVED IN `Run.apply_upgrades`, not here, for two reasons.
+# The table and its eligibility rules live on Run (an autoload identifier does
+# not resolve inside a class_name script), and more importantly AP's ordering
+# rule is load-bearing: several talents and runes SET an ability field, so an
+# upgrade applied mid-tree would be silently overwritten. Upgrades go LAST.
+# This records WHICH abilities owe one; apply_upgrades decides WHAT they get.
+#
+# `no_fallback: true` opts a node out — the authored answer is "nothing extra
+# is needed". Magi's Wrath is the only one today: its capstone carries the
+# step-doubling as a passive since Batch AU §4, so owning the ability already
+# does not make the node dead.
+const FALLBACK_KEY := "talent_upgrade_fallbacks"
+
+
 static func apply_payload(cfg: Dictionary, payload: Dictionary, ranks: int,
 		ctx: Dictionary = {}) -> void:
 	if not condition_met(payload.get("condition", {}), ctx):
@@ -2178,15 +2234,16 @@ static func apply_payload(cfg: Dictionary, payload: Dictionary, ranks: int,
 		if not cfg["abilities"].any(func(a): return a.display_name == nab.display_name):
 			cfg["abilities"] = cfg["abilities"] + [nab]
 		else:
-			for up in payload.get("upgrade", []):
-				apply_payload(cfg, up, ranks, ctx)
+			_collided(cfg, payload, nab.display_name, ranks, ctx)
 	elif payload.has("grant_ability"):
 		# The ability def lives in Classes (single source shared with the
 		# DOD_SIM_ABILITIES hook), not inline in the node.
 		var granted := Classes.pending_talent_ability(payload["grant_ability"])
-		if granted != null \
-				and not cfg["abilities"].any(func(a): return a.display_name == granted.display_name):
-			cfg["abilities"] = cfg["abilities"] + [granted]
+		if granted != null:
+			if not cfg["abilities"].any(func(a): return a.display_name == granted.display_name):
+				cfg["abilities"] = cfg["abilities"] + [granted]
+			else:
+				_collided(cfg, payload, granted.display_name, ranks, ctx)
 	elif payload.has("ability"):
 		for ab in cfg["abilities"]:
 			if ab.display_name == payload["ability"]:
@@ -2201,3 +2258,44 @@ static func apply_payload(cfg: Dictionary, payload: Dictionary, ranks: int,
 	# single site — no second gate anywhere.
 	for extra in payload.get("also", []):
 		apply_payload(cfg, extra, ranks, ctx)
+
+
+# THE COLLISION SITE (Batch AU §1) — reached when an ability-granting node
+# finds the hero already holding what it grants. Exactly one rule, so no
+# ability-granting node in the game can be silently dead:
+#   1. an AUTHORED fallback (`upgrade`) wins where a class batch wrote one;
+#   2. `no_fallback: true` means the authored answer is deliberately nothing;
+#   3. otherwise the node OWES ITS GENERIC — recorded on the cfg by ability
+#      name and resolved by `Run.apply_upgrades`, which runs last.
+static func _collided(cfg: Dictionary, payload: Dictionary, display_name: String,
+		ranks: int, ctx: Dictionary) -> void:
+	var authored: Array = payload.get("upgrade", [])
+	if not authored.is_empty():
+		for up in authored:
+			apply_payload(cfg, up, ranks, ctx)
+		return
+	if bool(payload.get("no_fallback", false)):
+		return
+	cfg[FALLBACK_KEY] = cfg.get(FALLBACK_KEY, []) + [display_name]
+
+
+# Does this node's payload grant an ability, and if so which? "" when it does
+# not. The hero screen asks it to decide whether a node's tooltip needs the
+# collision line at all — one answer, so the tooltip cannot claim a fallback
+# for a node that has nothing to fall back from.
+static func granted_name(payload: Dictionary) -> String:
+	if payload.has("new_ability"):
+		return String(payload["new_ability"].get("display_name", ""))
+	if payload.has("grant_ability"):
+		return String(payload["grant_ability"])
+	return ""
+
+
+# What a node does when its grant collides, for the tooltip: "authored" (a
+# class batch wrote one), "none" (deliberately nothing) or "generic".
+static func collision_kind(payload: Dictionary) -> String:
+	if not (payload.get("upgrade", []) as Array).is_empty():
+		return "authored"
+	if bool(payload.get("no_fallback", false)):
+		return "none"
+	return "generic"

@@ -94,7 +94,7 @@ const STATUS_INFO := {
 	"rime": ["Rime", "Ri", Color(0.75, 0.9, 1.0), "Rimed: every stack of Chilled this\nenemy gains also chills one other\nrandom enemy."],
 	"frostbite": ["Frostbite", "Fb", Color(0.45, 0.70, 0.95), "Frostbitten: healing received\nreduced by 50%."],
 	"stabilized": ["Stabilized", "St+", Color(0.55, 0.68, 0.95), "Grounded resonance: takes less\ndamage (10% per stack consumed)."],
-	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge has been spent this\nbattle — the storm has already been\nfed on itself once."],
+	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge is spent for this\nbattle — the storm has no feeding\nleft in it."],
 	"sanctified": ["Hallowed", "Hw", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
 	"capacitor": ["Holy Capacitor", "HC", Color(0.95, 0.9, 0.6), "Stored overhealing, released by\nthe next Heal."],
 	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith — 3% mitigation and +2%\ndamage per stack; at 5 the bearer\nis healed and the Faith resets."],
@@ -497,6 +497,18 @@ func _spawn_units() -> void:
 		# Review aid: pre-grant unlockable abilities when the map-burger
 		# DEBUG toggle is armed. Dedupe keys on display_name, so
 		# talent-learned copies never double up.
+		#
+		# BATCH AU §5 — SCOPED TO THE HERO'S OWN SPEC. It used to pre-grant
+		# every talent-granted and boss-trophy ability the CLASS could reach,
+		# which meant testing the Arcanist put Pyromancer abilities in his
+		# hands. Now: this spec's tree grants, this spec's capstones, and
+		# `SPEC_POOLS[spec]`. Nothing from another spec.
+		# `CLASS_POOLS` IS EXCLUDED, AND THAT IS THE TRADE-OFF: the sibling
+		# abilities showing up ARE the class pool's contents (Flamewave and
+		# Firestorm are in CLASS_POOLS["mage"]), so excluding it is what fixes
+		# the complaint. The cost is that a legitimately earnable class-pool
+		# ability is no longer covered by the toggle — the node summoner and a
+		# real boss reward still reach them. DO NOT BUILD A SECOND TOGGLE.
 		if Run.debug_grant_all and spec != "":
 			for tn in Talents.generate_tree(spec, hero_keys[i]):
 				var tn_pay: Dictionary = tn.get("payload", {})
@@ -508,8 +520,7 @@ func _spawn_units() -> void:
 				if tn_grant != null \
 						and not cfg["abilities"].any(func(a): return a.display_name == tn_grant.display_name):
 					cfg["abilities"] = cfg["abilities"] + [tn_grant]
-			for pool_name in Classes.spec_pool(spec) \
-					+ Classes.class_pool(Classes.class_of_spec(spec)):
+			for pool_name in Classes.spec_pool(spec):
 				var pool_ab := Classes.spec_pool_ability(spec, pool_name)
 				if pool_ab != null \
 						and not cfg["abilities"].any(func(a): return a.display_name == pool_ab.display_name):
@@ -543,7 +554,12 @@ func _spawn_units() -> void:
 			# it — the Resonant Hymn node sets Hymn of Hope's cost to 25 — so an
 			# Effortless applied earlier would be silently overwritten. The
 			# return names what actually landed; the ability tooltip reads it.
-			cfg["ability_upgrades"] = Run.apply_upgrades(Run.party[i], cfg["abilities"])
+			# Batch AU §1: the third argument is every ability whose TREE NODE
+			# collided with an already-owned copy. The node owes an upgrade,
+			# and this is the position that owes it — last, after everything
+			# that could overwrite it.
+			cfg["ability_upgrades"] = Run.apply_upgrades(Run.party[i], cfg["abilities"],
+				cfg.get(Talents.FALLBACK_KEY, []))
 		# SECOND-RESOURCE CEILINGS — derived LAST, from whatever cfg holds by
 		# now. Batch AA moved this block down from above the class passives:
 		# it used to run before runes applied, so a rune writing
@@ -2682,7 +2698,7 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			# that it is worth a turn, then spends it once.
 			var ocharge := _find_ability(u, "Overcharge")
 			if ocharge != null and u.resource >= ocharge.cost and u.ability_ready(ocharge) \
-					and not u.overcharged and u.second_resource >= OVERCHARGE_BOT_STACKS:
+					and u.overcharge_ready() and u.second_resource >= OVERCHARGE_BOT_STACKS:
 				return [ocharge, u]
 			var cannon := _find_ability(u, "Arcane Cannon")
 			if cannon != null and u.resource >= cannon.cost and u.ability_ready(cannon):
@@ -3282,13 +3298,14 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# Still Mind ranks).
 	if ab.special == "stabilize" and u.second_resource <= 2 + u.still_mind_ranks:
 		return false
-	# Overcharge: the storm only feeds on itself once per battle.
-	if ab.special == "overcharge" and u.overcharged:
+	# Overcharge: the storm only feeds on itself once per battle — twice once
+	# the tree node has landed on an already-earned copy (Batch AU §1).
+	if ab.special == "overcharge" and not u.overcharge_ready():
 		return false
-	# DEATH RAY (Batch AT): THE 5-STACK GATE. Greyed out for the first four
-	# turns and then the only thing he wants to press — escalation expressed as
-	# an action rather than as a passive drift. It consumes NOTHING, so the gate
-	# is the only thing that ever stands between him and the button.
+	# DEATH RAY: THE RESONANCE GATE (8 since Batch AU). Dark until the ramp is
+	# genuinely deep and then the only thing he wants to press — escalation
+	# expressed as an action rather than as a passive drift. It consumes
+	# NOTHING, so the gate is the only thing that stands between him and it.
 	if ab.display_name == "Death Ray" and u.second_resource < DEATH_RAY_STACKS:
 		return false
 	return true
@@ -3321,10 +3338,11 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 		ab_btn.tooltip_text += "\n(No fallen allies)"
 	if ab.special == "stabilize" and u.second_resource <= 2 + u.still_mind_ranks:
 		ab_btn.tooltip_text += "\n(Requires more than %d Resonance)" % (2 + u.still_mind_ranks)
-	if ab.special == "overcharge" and u.overcharged:
-		ab_btn.tooltip_text += "\n(Already Overcharged this battle)"
-	# Death Ray's gate has to SAY so, or a button dark for four turns reads as
-	# a bug rather than as the ramp it is measuring.
+	if ab.special == "overcharge" and not u.overcharge_ready():
+		ab_btn.tooltip_text += "\n(Already Overcharged %s this battle)" % (
+			"twice" if u.overcharge_extra > 0 else "once")
+	# Death Ray's gate has to SAY so, and say the LIVE number, or a button dark
+	# for most of a fight reads as a bug rather than as the ramp it measures.
 	if ab.display_name == "Death Ray" and u.second_resource < DEATH_RAY_STACKS:
 		ab_btn.tooltip_text += "\n(Requires %d Resonance — you have %d)" % [
 			DEATH_RAY_STACKS, u.second_resource]
@@ -4038,9 +4056,12 @@ const MISS_CHANCE := 0.05
 const PARRY_CHANCE := 0.05        # hero baseline
 const ENEMY_PARRY_CHANCE := 0.025 # enemy baseline (half the hero rate)
 const CRIT_CHANCE := 0.10
-# Death Ray's gate (Batch AT) — THE one place the 5-stack line is decided, read
-# by `_ability_usable`, its tooltip affordance and the bot's rotation.
-const DEATH_RAY_STACKS := 5
+# Death Ray's gate — THE one place the line is decided, read by
+# `_ability_usable`, its tooltip affordance and the bot's rotation.
+# BATCH AU RAISED IT 5 -> 8. At twelve stacks the ability lands 325% of Attack
+# in one hit, and a genuinely LATE button is more on-theme than a turn-five one.
+# Terminal Velocity's 15-stack threshold still sits clear above it.
+const DEATH_RAY_STACKS := 8
 # Where the bot decides Overcharge is finally worth a turn. A BOT POLICY NUMBER,
 # not a design one — Overcharge itself has no threshold.
 const OVERCHARGE_BOT_STACKS := 8
@@ -6269,7 +6290,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# figure, Harmonics the free basic, Resonant Core the first cast of
 			# each turn, Cascade every cast once he is 10 deep, and Critical
 			# Mass pays out its third-crit trips HERE rather than mid-loop.
-			var res_gain := (2 + attacker.attunement_crit) if any_crit else 1
+			#
+			# CRIT BUILDING IS ADDITIVE AND THIS IS ITS ONLY READ SITE (Batch
+			# AU §4): base 2, Attunement +1 = 3, Singularity +2 = 5 with both.
+			# NOT the higher of the two, and never summed at a second site.
+			var res_gain := (2 + attacker.attunement_crit
+				+ attacker.singularity_crit_build) if any_crit else 1
 			if ab.display_name == "Arcane Explosion" and attacker.harmonics_ranks > 0:
 				res_gain += attacker.harmonics_ranks
 			if attacker.resonant_core_ranks > 0 and not attacker.res_cast_this_turn:
@@ -8603,12 +8629,17 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# there is no cap, so it COMPOUNDS THE RAMP instead — gain Resonance
 			# equal to half the stacks he already holds (all of them on a
 			# perfect). At ten stacks that is five; at twenty it is ten. Once
-			# per battle, which is what `overcharged` now means.
-			attacker.overcharged = true
+			# per battle — TWICE once the tree node has landed on an Overcharge
+			# he already earned (Batch AU §1's authored fallback), which is why
+			# this counts uses rather than setting a spent flag.
+			attacker.overcharge_uses += 1
 			attacker.overcharge_mult = 1.0 if is_perfect else 0.5
 			var oc_gain := int(floor(attacker.second_resource * attacker.overcharge_mult))
 			_sfx("perfect", -6.0, 0.8)
-			_apply_status(attacker, "overcharged", -1)
+			# The chip means "no feeding left", not "has fed once" — with the
+			# node's second use still owed it would otherwise be a lying chip.
+			if not attacker.overcharge_ready():
+				_apply_status(attacker, "overcharged", -1)
 			if oc_gain > 0:
 				_gain_resonance(attacker, oc_gain)
 			attacker.refresh_bars()
@@ -9316,6 +9347,18 @@ func _on_enemy_death(victim: BattleUnit) -> void:
 		if not ok_cleared.is_empty():
 			_log("   → Overkill: %s is ready again (%s)" % [ok_h.unit_name,
 				" and ".join(ok_cleared)], "#b0a8e0")
+	# SINGULARITY (Batch AU): the Resonance capstone's second clause — every
+	# enemy killed builds Resonance. It rides THIS hook, the one place a death
+	# is booked, so it can only ever fire once per death (a negative control
+	# that also pays it from the strike loop trips the test).
+	for sg_h in heroes:
+		if sg_h.dead or sg_h.singularity_kill_build <= 0:
+			continue
+		if sg_h.second_resource_name != "Resonance":
+			continue
+		_gain_resonance(sg_h, sg_h.singularity_kill_build)
+		_log("   → Talent: Singularity — the collapse feeds on the kill (+%d Resonance)" % \
+			sg_h.singularity_kill_build, "#b0a8e0")
 	# Bloodied Momentum: every kill feeds the Berserker's swing.
 	for mo_h in heroes:
 		if not mo_h.dead and mo_h.bloodied_momentum_ranks > 0:

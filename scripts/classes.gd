@@ -925,10 +925,17 @@ static func spec_abilities(spec: String) -> Array:
 					"perfect_extra_hit": false,
 					"perfect_id": "", "perfect_text": "No two bolts strike the same enemy.",
 					"description": "Six bolts hound the weakest: each\nstrikes one of the 2-3 enemies with\nthe lowest health."}),
-				Ability.make({"display_name": "Death Ray", "cooldown": 3, "dmg_type": "arcane", "cost": 40,
+				# BATCH AU: gate 5 -> 8 Resonance, cost 40 -> 55 Mana. At twelve
+				# stacks it lands 325% of Attack in one hit, so it is a genuinely
+				# LATE button now rather than a turn-five one — and at a Mage's 22
+				# regen, 55 Mana is most of three turns' saving with Cannon and
+				# Barrage competing for the same pool. Damage, initiative, cooldown
+				# and target count are UNCHANGED and it still consumes nothing.
+				# STILL NO BREAK DAMAGE — reported, not acted on (see CLAUDE.md).
+				Ability.make({"display_name": "Death Ray", "cooldown": 3, "dmg_type": "arcane", "cost": 55,
 					"damage": 150, "pressure": 0, "delay": 5.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "",
-					"description": "The payoff: 150% of Attack as arcane\nto one enemy. Unusable below 5\nResonance — and it CONSUMES NO\nSTACKS. The ramp never comes down."}),
+					"description": "The payoff: 150% of Attack as arcane\nto one enemy. Unusable below 8\nResonance — and it CONSUMES NO\nSTACKS. The ramp never comes down."}),
 			]
 		"holy":
 			# Mercy kit (07-22 rework): heals scale off the CASTER's max

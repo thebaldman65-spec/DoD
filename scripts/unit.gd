@@ -412,7 +412,12 @@ var freezing_ranks := 0       # no node: Freezing Advance
 var freezing_adv_mark := false # no node: Freezing Advance's victim mark
 var frost_ward_ranks := 0     # no node: Frost Ward
 # Arcanist rework + tree (07-20). See talents.gd for the node text.
-var overcharged := false      # Overcharge is spent (once per battle)
+var overcharge_uses := 0      # Overcharge casts spent this battle
+# BATCH AU: Overcharge's AUTHORED FALLBACK. When the ar_overcharge node lands on
+# an Overcharge he already earned from the spec pool, the node buys a SECOND use
+# instead of doing nothing. The allowance is decided in exactly one place —
+# `overcharge_ready()` below — so the gate, the tooltip and the bot agree.
+var overcharge_extra := 0     # extra uses per battle (the node's fallback)
 var overcharge_mult := 0.5    # fraction of current stacks it grants (1.0 perfect)
 var crit_streak := 0          # crits since the last Critical Mass proc
 var res_cast_this_turn := false  # Resonant Core: has he cast yet this turn?
@@ -440,7 +445,13 @@ var stable_ranks := 0         # Stable Alignment: single-hit cap, % of max healt
 var backlash_stacks := 0      # Backlash: Resonance per hit received
 var siphon_ranks := 0         # Siphon: % of damage dealt restored as Mana
 var event_horizon := 0        # Event Horizon: stacks above which he cannot be killed
-var singularity := 0          # capstone: the damage curve's step doubles
+# THE TWO CAPSTONES SWAPPED LANES IN BATCH AU. The step-doubling was
+# Singularity's (Resonance) and the plain AoE was Magi's Wrath's (Overload) —
+# crossed, because doubling the STEP is the Overload lane's entire thesis.
+# Uncrossed now: Magi's Wrath carries the step, Singularity carries build rate.
+var wrath_step_double := 0    # Magi's Wrath capstone: the damage curve's step doubles
+var singularity_crit_build := 0 # Singularity capstone: extra Resonance per crit
+var singularity_kill_build := 0 # Singularity capstone: Resonance per enemy killed
 var perfect_conversion := 0   # capstone: ALL self-inflicted damage paid as Mana
 # UNREACHABLE BUT KEPT (the AR vault pattern — gated `> 0`, reported rather
 # than silently deleted, so a later batch can re-node or remove them
@@ -488,11 +499,22 @@ func resonance_curve() -> float:
 	return n * (n + 1.0) * 0.5
 
 
-# Conduit adds 0.5 points; Singularity adds another 1.5 (the additive reading of
+# THE ONE PLACE Overcharge's per-battle allowance is decided (Batch AU). One
+# cast, or two once the ar_overcharge node has landed on an already-earned copy.
+func overcharge_ready() -> bool:
+	return overcharge_uses < 1 + overcharge_extra
+
+
+# Conduit adds 0.5 points; MAGI'S WRATH adds another 1.5 (the additive reading of
 # "the step doubles, 1.5% -> 3%", which is the form this tree uses throughout).
+#
+# BATCH AU MOVED THE DOUBLING FROM SINGULARITY TO MAGI'S WRATH and nothing else
+# may write this term — Singularity pays build rate now, which is quadratic in
+# the payout where the step is only linear (AT's measured finding). A negative
+# control putting the doubling back on Singularity has to trip the test.
 func resonance_dmg_step() -> float:
 	var step := RESONANCE_DMG_STEP + conduit_step
-	if singularity > 0:
+	if wrath_step_double > 0:
 		step += RESONANCE_DMG_STEP
 	return step
 
