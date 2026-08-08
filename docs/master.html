@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-07 (Batch AS)</b></p>
+<p align="right"><b>Last updated: 2026-08-07 (Batch AT)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -325,19 +325,23 @@ all</b> — their kits are gated by resources and AI conditions instead.</li>
 <li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
 positive one. Talents that count debuffs (Dominant Presence, Iron Will) use this
 classification.</li>
-<li><b>Crit:</b> 10% base + 25% vs Broken targets + 3% per Mage Resonance stack + talent/spec
+<li><b>Crit:</b> 10% base + 25% vs Broken targets + 1% per Arcanist Resonance stack + talent/spec
 bonuses (+15% with Aguila summoned). Guaranteed: Ice Lance vs Frozen; a perfect Execute.
 Resonance builds
 only on the Mage's own casts — parry counters do not grant stacks.</li>
-<li><b>Attacker modifiers:</b> Resonance +15%/stack; Surge +20%; Empower +25%; Cripple −25%;
+<li><b>Attacker modifiers:</b> Resonance +1.5% × N(N+1)/2 at N stacks (a COMPOUNDING
+curve, not a per-stack slope — see §5.1); Surge +20%; Empower +25%; Cripple −25%;
 Blood Frenzy up to +40% as HP falls; Seasoned Fighter +15% above half HP; relic bonuses
 (global +10% dragonbone; fire/holy +20% emberheart); Powershot +2% per 1% of the target's
-EMPTY Break bar; Overpower +0.5 per point of target Break; Arcane Cannon
-+7.5%/Resonance stack; Magi's Wrath +4%/Resonance stack; Fireball perfects at 25% of
-Attack.</li>
+EMPTY Break bar; Overpower +0.5 per point of target Break; Volatility +30% on Arcane
+Cannon; Fireball perfects at 25% of Attack. <b>Neither Arcane Cannon nor Magi's Wrath
+carries a per-stack damage term</b> — the passive compounds, and an ability-side per-stack
+multiplier on top of it would square the escalation. Both keep their Break terms, which
+ride stacks on a different axis.</li>
 <li><b>Target modifiers:</b> Exposed +15%; Seasoned Fighter −15% at or
-below half HP; Mage Resonance +5% damage
-<i>taken</i> per stack (the glass-cannon risk); Stabilized −10% per stack
+below half HP; Arcanist Resonance +0.75% × N(N+1)/2 damage
+<i>taken</i> at N stacks — the same compounding curve at half the step, and uncapped
+(the glass-cannon risk, and the whole bargain); Stabilized −10% per stack
 consumed.</li>
 <li><b>Armor:</b> flat % damage reduction. Fortify +10%; Broken ×0.7; Sunder ×0.65; Armor
 Penetration ignores a fraction.</li>
@@ -464,11 +468,8 @@ Plating block).</td></tr>
 enemy (Cryomancer talent ability).</td></tr>
 <tr><td>Stabilized</td><td>Takes 10% less damage per Resonance stack consumed by
 Stabilize (2 turns; the chip shows the total).</td></tr>
-<tr><td>Overcharged</td><td>Battle-long: maximum Resonance is 8 (raised further by
-Resonant Core); stacks past 5 weigh 1.5× (1.65× from a perfect cast) toward the Resonance
-per-stack bonuses.</td></tr>
-<tr><td>Unlimited Power</td><td>Resonance overflow banked as permanent battle power —
-the chip tracks the total % damage and max Mana gained (Arcanist talent).</td></tr>
+<tr><td>Overcharged</td><td>Battle-long marker: Overcharge has already been spent this
+battle (it is once per battle).</td></tr>
 <tr><td>Hold the Line</td><td>Takes 50% less Break damage — 80% when the capstone
 landed on an already-earned Hold the Line (Warden capstone).</td></tr>
 <tr><td>Undying</td><td>Cannot drop below 1 HP (Warden capstone).</td></tr>
@@ -578,8 +579,8 @@ character art (see §12).</p>
 <table border="1" cellpadding="4">
 <tr><th>Class</th><th>HP</th><th>Armor</th><th>Speed</th><th>Constitution</th><th>Resource(s)</th></tr>
 <tr><td>Warrior</td><td>154</td><td>25%</td><td>95</td><td>110</td><td>Rage 0–100</td></tr>
-<tr><td>Mage</td><td>99</td><td>10%</td><td>110</td><td>85</td><td>Mana 100 (+ Resonance 0–5 as
-Arcanist; 0–8 while Overcharged)</td></tr>
+<tr><td>Mage</td><td>99</td><td>10%</td><td>110</td><td>85</td><td>Mana 100 (+ Resonance,
+UNCAPPED, as Arcanist)</td></tr>
 <tr><td>Cleric</td><td>121</td><td>15%</td><td>85</td><td>100</td><td>Mana 100 (+ Mercy 0–5 as
 Holy)</td></tr>
 <tr><td>Hunter</td><td>110</td><td>12%</td><td>105</td><td>95</td><td>Mana 100 (+ Focus
@@ -615,18 +616,40 @@ supporting cast for +1 extra stack and a bonus effect. <b>Empowered casts forgo 
 perfect bonus.</b> Talents move the economy: the ceiling (Martyr's Vigor, to 6/7), the
 opening stacks (Zealous Light), and the Empower surcharge itself (Ardor and Avatar of
 Mercy can waive it — see §7).</li>
-<li><b>Arcane Resonance (ARCANIST passive, 0–5 base):</b> only the Arcanist spec has the
-bar. +1 per damaging cast (+2 on crits; parry counters grant nothing; Harmonics deepens
-Arcane Explosion's gain). Each stack: +15% damage dealt (Conduit deepens it), +3% crit,
-but +5% damage <i>taken</i> (Arcane Ward softens it). <b>Backlash Ward:</b> EVERY gain
-that arrives at maximum stacks restores 15 Mana instead — the maxed engine keeps paying,
-in Mana rather than stacks (Unlimited Power's overflow conversion takes priority when
-learned). Stacks persist until Stabilize vents the ones above its floor of 2. Talents
-move the ceiling: Resonant Core (+1), the Overcharge talent ability (cap 8 plus
-Resonant Core for the battle — stacks past 5 weigh 1.5×, 1.65× on a perfect cast, toward
-the per-stack bonuses above), and Singularity (no cap at all; the damage-taken penalty
-stops rising past 5 stacks). The Resonance readout on the nameplate always shows the true
-damage bonus.</li>
+<li><b>Runaway Resonance (ARCANIST passive, NO MAXIMUM):</b> only the Arcanist spec has
+the bar, and it is the only resource in the game with no ceiling. Three clauses:
+<ul>
+<li><b>No ceiling.</b> +1 per damaging cast, +2 on a crit (parry counters grant nothing),
+and <b>nothing removes it</b> — it persists to the end of the battle. Talents move the
+build RATE, never a cap: Harmonics (Arcane Explosion builds 2), Attunement (a crit builds
+3), Resonant Core (+1 on the first cast of each of his turns), Critical Mass (4 on every
+third crit), Cascade (+1 per cast at 10 or more stacks), Backlash (+1 per hit received),
+On the Edge (4 for surviving below 35% health), and Overcharge (once per battle, gain
+half your current stacks — all of them on a perfect cast).</li>
+<li><b>The curve compounds.</b> At N stacks the damage bonus is <b>1.5% ×
+N(N+1)/2</b> and the damage <i>taken</i> penalty is <b>0.75% × N(N+1)/2</b> — the same
+triangular curve at half the step. Both ends uncapped. Conduit raises the damage step to
+2% and the Singularity capstone doubles it to 3%; nothing modifies the taken step.</li>
+<li><b>+1% critical chance per stack, linear</b> — one stable term that does not compound,
+so the tooltip has something a player can hold in their head.</li>
+</ul>
+Compounding rather than linear is the whole design: a linear per-stack term is a slope, a
+compounding one is a curve, and the difference is what makes him nothing early and
+everything late. At five stacks he is <b>weaker</b> than a flat +15%/stack Arcanist was;
+by twelve he has roughly doubled. The numbers, because a compounding figure nobody
+tabulates is a figure nobody can plan against:
+<table border="1" cellpadding="4">
+<tr><th>Stacks</th><th>Damage</th><th>Damage taken</th></tr>
+<tr><td>5</td><td>+22%</td><td>+11%</td></tr>
+<tr><td>8</td><td>+54%</td><td>+27%</td></tr>
+<tr><td>12</td><td>+117%</td><td>+59%</td></tr>
+<tr><td>16</td><td>+204%</td><td>+102%</td></tr>
+</table>
+The nameplate readout shows the raw stack count and both live percentages; because there
+is no maximum, its bar fills toward 15 stacks (the depth Terminal Velocity and Event
+Horizon switch on at) and pins there. The one thing that removes Resonance is an EARNED
+Stabilize, which vents everything above 2 — the escape hatch from the ramp, which is why
+it is a spec-pool pick rather than part of the opening three.</li>
 </ul>
 <h3>5.2 Core kits (before specialization)</h3>
 <ul>
@@ -711,7 +734,7 @@ talent has already granted is never offered again.</p>
 <tr><td><b>Swordmaster</b></td><td>Overpower, Pommel Strike, Guard Change</td><td>Sweeping Strikes, Shatterpoint, Lunge, Execute</td></tr>
 <tr><td><b>Pyromancer</b></td><td>Detonation, Wildfire, Flamewave</td><td>Immolate, Firestorm</td></tr>
 <tr><td><b>Cryomancer</b></td><td>Razor Ice, Blizzard, Ice Lance</td><td>Rime, Shatter</td></tr>
-<tr><td><b>Arcanist</b></td><td>Arcane Cannon, Arcane Barrage, Stabilize</td><td>Overcharge, Magi's Wrath</td></tr>
+<tr><td><b>Arcanist</b></td><td>Arcane Cannon, Arcane Barrage, Death Ray</td><td>Overcharge, Magi's Wrath, Stabilize</td></tr>
 <tr><td><b>Holy</b></td><td>Heal, Renewal, Hymn of Hope</td><td>Resurrection, Divine Plea</td></tr>
 <tr><td><b>Devout</b></td><td>Divine Shield, Consecrated Ground, Blessing of Zeal</td><td>Sacred Resolve, Bulwark of Fortitude</td></tr>
 <tr><td><b>Occultist</b></td><td>Hex of Ruin, Bewitch, Dark Pact</td><td>Mind Flay, Mass Hysteria, Umbral Sigil</td></tr>
@@ -921,32 +944,37 @@ Shatter (capstone) — 30 Mana, 4.0, 5cd: release EVERY hold at once, each held 
 <b>Talent lanes:</b> see §7 — Winter / Deep Freeze / Thaw.</li>
 <li><b>Arcanist (Ramp)</b> — <b>Stat block:</b> 155 HP / 6% armor / +20% arcane &amp;
 +10% shadow resist, −15% physical (the most health and the least armour in the class:
-Resonance bills him +5% damage taken per stack and Arcane Cannon recoils 15% of its
-damage, so his health bar is a resource he spends rather than a buffer — and he is raw
+Resonance bills him a COMPOUNDING damage-taken penalty and Arcane Cannon recoils 15% of
+its damage, so his health bar is a resource he spends rather than a buffer — and he is raw
 energy in robes, so anything that closes the distance hurts far more than a spell
 would).<br>
-Passive <i>Arcane Resonance</i> (the stack mechanic itself; see
+Passive <i>Runaway Resonance</i> (the stack mechanic itself; see
 §5.1). Its core Magic Bolt is reforged into <b>Arcane Explosion</b> — free, 10% Atk arcane
 / 10 BD / 2.0, no cd, hits TWO distinct random enemies simultaneously; builds 1 Resonance
 (2 on a crit) like every damaging cast.<br>
-Arcane Cannon — 25 Mana, 40% Atk arcane / 3.5, 2cd; +7.5% DAMAGE per Resonance stack and
-<b>BD = 5 × current stacks</b>; recoil is a flat 15% of damage dealt (Perfect: costs 3.0
-initiative instead). Unity splits the recoil across the party like any other damage.<br>
+Arcane Cannon — 25 Mana, 40% Atk arcane / 3.5, 2cd; <b>BD = 5 × current stacks</b>;
+recoil is a flat 15% of damage dealt (Perfect: costs 3.0 initiative instead). It carries no
+per-stack damage term of its own — the passive compounds, and an ability-side one on top
+would square it. Unity splits the recoil across the party like any other damage.<br>
 Arcane Barrage — 20 Mana, 6 bolts × 8% Atk / 3 BD each, 2.5, 2cd; every bolt strikes one
 of the (up to) 3 living enemies with the LOWEST health — the volley typically rakes 2-3
 of them (Perfect: no two bolts strike the same enemy while an unstruck one stands).<br>
-Stabilize — free, 1.5, 3cd; consumes the Resonance stacks ABOVE 2: +5 Mana and +10%
-damage reduction (2 turns) per stack consumed — a mid-fight vent that keeps the engine
-warm (+30% damage and the crit remain at the floor), not a reset. Unusable at 2 stacks
-or fewer (Perfect: also heals 5% of max health).<br>
-<i>Talent-granted:</i> Overcharge — 20 Mana, 1.5, 5cd, once per battle: maximum Resonance
-becomes 8 (raised further by Resonant Core) for the rest of the battle; stacks past 5
-weigh 1.5× toward the Resonance per-stack bonuses ONLY — Cannon's, Barrage's, and Magi's
-Wrath's own per-stack scalings count raw stacks (Perfect: 1.65× instead). Magi's Wrath
-(capstone) — 30 Mana, 15% Atk arcane to ALL enemies / 4.0, 4cd;
-+4% damage per Resonance stack and BD = 2.5 × stacks; recoil 15% of damage dealt, −3%
-per enemy hit (Perfect: costs 3.5 initiative instead).<br>
-<b>Talent lanes:</b> see §7 — Resonance / Overload / Control.</li>
+Death Ray — 40 Mana, 150% Atk arcane to one enemy / 5.0, 3cd; <b>unusable below 5
+Resonance</b>, and it <b>consumes no stacks</b> (it builds one, like every damaging cast).
+A button greyed out for the first four turns and then the only thing he wants to press —
+escalation expressed as an action rather than as a passive drift.<br>
+<i>Earnable (spec pool):</i> Stabilize — free, 1.5, 3cd; consumes the Resonance stacks
+ABOVE 2: +5 Mana and +10% damage reduction (2 turns) per stack consumed. The only thing in
+the game that removes Resonance, and the reason it is earned rather than given: it is the
+escape hatch from the ramp, so taking it is a decision (Perfect: also heals 5% of max
+health).<br>
+<i>Talent-granted:</i> Overcharge — 20 Mana, 1.5, 5cd, once per battle: immediately gain
+Resonance equal to HALF your current stacks (Perfect: your full current stacks). At ten
+stacks it grants five. Magi's Wrath (capstone) — 30 Mana, 15% Atk arcane to ALL enemies /
+4.0, 4cd; BD = 2.5 × stacks; recoil 15% of damage dealt, −3% per enemy hit, and no
+per-stack damage term for the same reason Cannon has none (Perfect: costs 3.5 initiative
+instead).<br>
+<b>Talent lanes:</b> see §7 — Resonance / Overload / Entropy.</li>
 </ul>
 <h3>6.3 Cleric</h3>
 <ul>
@@ -1322,15 +1350,15 @@ ceiling) · <b>OVERLOAD</b> (the risk half: crits, echoes, and the big spenders 
 bill attached) · <b>CONTROL</b> (surviving what you built — the fork: run hot forever, or vent
 constantly)</p>
 <table border="1" cellpadding="4">
-<tr><th>Row</th><th>Resonance</th><th>Overload</th><th>Control</th></tr>
-<tr><td>1</td><td><b>Arcane Mastery</b> — Each stack of Arcane Resonance grants 1% extra critical strike chance (on top of the base 3%).</td><td><b>Critical Mass</b> — Every 3rd critical strike deals 20% more damage and restores half as much of your maximum Mana.</td><td><b>Mindfulness</b> — Every 6 of your turns, ALL of your cooldowns tick down 1 extra turn.</td></tr>
-<tr><td>2</td><td><b>Mana Attunement</b> — Restore 2% of your maximum Mana every time you gain a stack of Resonance.</td><td><b>Temporal Rift</b> — Critical strikes have a 3% chance to echo for 25% of their damage against a random enemy.</td><td><b>Conversion</b> — 10% of damage taken is lost as Mana instead of health.</td></tr>
-<tr><td>3</td><td><b>Harmonics</b> — Arcane Explosion grants 1 additional Resonance.</td><td><b>Overcharge</b> — New ability: Overcharge — raise your maximum Resonance to 8; stacks beyond 5 give 1.5x their normal Resonance bonus (20 Mana, 1.5 int, 5cd).</td><td><b>On the Edge</b> — Surviving an attack below 25% health grants 1 stack of Resonance.</td></tr>
-<tr><td>4</td><td><b>Conduit</b> — Each Resonance stack grants +2% damage (on top of the base 15%).</td><td><b>Suppressing Fire</b> — Each bolt of Arcane Barrage deals 0.25% of Attack more than the previous one.</td><td><b>Stable Alignment</b> — You cannot lose more than 35% of your maximum health to a single attack.</td></tr>
-<tr><td>5</td><td><b>Resonant Core</b> — Maximum Resonance rises by 1 (Overcharge&#x27;s raised cap climbs the same amount).</td><td><b>Cannoneer</b> — Arcane Cannon deals +2.5% damage per Resonance stack (on top of the base 7.5%).</td><td><b>Arcane Ward</b> — The Resonance damage-taken penalty falls 1% per stack (from the base 5%).</td></tr>
-<tr><td>6</td><td><b>Unlimited Power</b> — Gaining Resonance while already at maximum stacks instead grants +2% damage and +2% maximum Mana (stacks all battle).</td><td><b>Barrage Master</b> — Arcane Barrage fires 1 additional bolt(s).</td><td><b>Still Mind</b> — Stabilize leaves 1 additional stacks standing (on top of its floor of 2).</td></tr>
-<tr><td>7</td><td><b>Charged Bolts</b> — While at maximum Resonance, damaging casts restore 5% of your maximum Mana.</td><td><b>Volatility</b> — Arcane Cannon and Magi&#x27;s Wrath deal +5% damage, and their recoil rises +5%.</td><td><b>Feedback Loop</b> — 10% of recoil damage is paid as Mana instead of health.</td></tr>
-<tr><td>CAP</td><td><b>Singularity</b> — Resonance has NO maximum. The damage-taken penalty stops rising past 5 stacks.</td><td><b>Magi&#x27;s Wrath</b> — New ability: Magi&#x27;s Wrath — 15% of Attack as arcane to ALL enemies, +4% per Resonance stack; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd).</td><td><b>Master of Moments</b> — Stabilize consumes no stacks at all — it grants its Mana and damage reduction from your current stacks and leaves them intact.</td></tr>
+<tr><th>Row</th><th>Resonance</th><th>Overload</th><th>Entropy</th></tr>
+<tr><td>1</td><td><b>Harmonics</b> — Arcane Explosion builds 2 Resonance instead of 1.</td><td><b>Conduit</b> — The damage curve&#x27;s step rises from 1.5% to 2% per stack.</td><td><b>Conversion</b> — 30% of damage taken is paid as Mana instead of health.</td></tr>
+<tr><td>2</td><td><b>Attunement</b> — A critical hit builds 3 Resonance instead of 2.</td><td><b>Volatility</b> — Arcane Cannon deals +30% damage, and its recoil rises from 15% to 25%.</td><td><b>On the Edge</b> — Surviving an attack below 35% health builds 4 Resonance.</td></tr>
+<tr><td>3</td><td><b>Charged Bolts</b> — Every damaging cast restores 5% of maximum Mana per 4 stacks held.</td><td><b>Temporal Rift</b> — A critical hit echoes for 40% of its damage against a random enemy.</td><td><b>Feedback Loop</b> — 30% of recoil damage is paid as Mana instead of health.</td></tr>
+<tr><td>4</td><td><b>Overcharge</b> — New ability: Overcharge — once per battle, immediately gain Resonance equal to HALF your current stacks (20 Mana, 1.5 int, 5cd).</td><td><b>Suppressing Fire</b> — Each bolt of Arcane Barrage deals 2% of Attack more than the previous one.</td><td><b>Stable Alignment</b> — No single attack can take more than 25% of your maximum health.</td></tr>
+<tr><td>5</td><td><b>Resonant Core</b> — The first damaging cast of each of his turns builds 1 additional Resonance.</td><td><b>Cannoneer</b> — Arcane Cannon&#x27;s Break damage rises from 5 to 9 per Resonance stack.</td><td><b>Backlash</b> — Resonance also builds when he takes damage: 1 stack per hit received.</td></tr>
+<tr><td>6</td><td><b>Critical Mass</b> — Every third critical hit builds 4 Resonance.</td><td><b>Barrage Master</b> — Arcane Barrage fires 3 additional bolts.</td><td><b>Siphon</b> — 20% of all damage he deals is restored as Mana.</td></tr>
+<tr><td>7</td><td><b>Cascade</b> — At 10 or more stacks, every damaging cast builds 1 additional Resonance.</td><td><b>Terminal Velocity</b> — At 15 or more Resonance, Death Ray has no cooldown.</td><td><b>Event Horizon</b> — While at 15 or more Resonance, no single attack can reduce him below 1 health.</td></tr>
+<tr><td>CAP</td><td><b>Singularity</b> — The damage curve&#x27;s step DOUBLES: 1.5% to 3% per Resonance stack.</td><td><b>Magi&#x27;s Wrath</b> — New ability: Magi&#x27;s Wrath — 15% of Attack as arcane to ALL enemies; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd).</td><td><b>Perfect Conversion</b> — ALL recoil and ALL self-inflicted damage is paid as Mana instead of health.</td></tr>
 </table>
 <p><b>Review aid:</b> the map burger's "All Spec Abilities Unlocked" toggle (default OFF,
 session-only; DOD_SIM_GRANT_ALL=1 headless) pre-grants every talent-granted ability and
@@ -1569,7 +1597,7 @@ holds W, and the remaining abilities follow in kit order. <b>There is no cap on 
 abilities a hero holds</b>, so slot 10 onward binds to <b>Shift + the same key in the same
 order</b> (10 = Shift+Q, 11 = Shift+W, … 18 = Shift+G). Each button shows its key, e.g.
 "[W] Bloodlust" or "[⇧Q] Blood Price". A hotkey is ignored when the ability is unaffordable
-or gated (Stabilize without a Resonance stack, Kill Command without a living companion,
+or gated (Death Ray below 5 Resonance, Kill Command without a living companion,
 Resurrection with nobody fallen), and hotkeys only work while the action bar is open —
 never during targeting or a skill check.</li>
 <li><b>Tab:</b> while choosing an action, Tab opens/closes the <b>Abilities list</b> (browse

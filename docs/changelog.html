@@ -5,6 +5,271 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-07 — Batch AT: the Arcanist — escalation (and Shatter, re-specced)</h2>
+<p><i>Third of the Mage three, and the class is done. His tree was already purpose-designed —
+Resonance / Overload / Control, all 24 ids intact — so this batch is not a restructure. It is
+a SPINE: nothing early, everything late. Three things stopped him escalating, and all three
+are gone.</i></p>
+<ul>
+
+<li><b>§1 ARCANE RESONANCE → RUNAWAY RESONANCE. Three clauses, and the middle one is the
+whole batch.</b>
+<ul>
+<li><b>No ceiling.</b> Resonance has no maximum, builds 1 per damaging cast and 2 on a crit,
+and <b>nothing removes it</b> — it persists to the end of the battle. <code>second_max</code>
+is a sentinel 99 nothing is meant to reach.</li>
+<li><b>The curve compounds.</b> The damage bonus is <b>1.5% × N(N+1)/2</b> and the
+damage-taken penalty is <b>0.75% × N(N+1)/2</b>, both uncapped. <b>Compounding rather than
+linear is the design</b>: a linear per-stack term is a slope, a triangular one is a curve, and
+that is the mathematical difference between a ramp and an escalation. The worked numbers, so
+this can be checked rather than trusted — 5 stacks +22%/+11%, 8 +54%/+27%, 12 +117%/+59%,
+16 +204%/+102%. <b>Note what that says: at five stacks he is WEAKER than he was
+(+25% taken for less damage), and by twelve he has roughly doubled.</b> That reshape is the
+point.</li>
+<li><b>+1% critical chance per stack, LINEAR</b> — one stable, readable term beside two that
+compound, so the tooltip has something a player can hold in their head. (It was +3%/stack
+with a talent deepening it; the talent's counter is rune-only now and still pays +1%/rank.)</li>
+</ul>
+<b>SHIPPED COMPOUNDING, NOT THE LINEAR FALLBACK.</b> §1 offered a stated fallback (keep the
+cap removed, make both terms linear at 2%/1%) if the kit smoke came out absurd. It did not —
+see the smoke numbers below — so the fantasy ships as authored.
+<b>THE CURVE HAS EXACTLY ONE IMPLEMENTATION</b>, <code>BattleUnit.resonance_curve()</code>,
+and battle.gd reads it through two named sites (<code>_resonance_dmg_mult</code> /
+<code>_resonance_taken_mult</code>). The nameplate reads the same method directly, so the
+plate, the ability tooltip and the damage path cannot disagree.</li>
+
+<li><b>THE READ SITES, one line each.</b> <code>_resonance_dmg_mult</code> → the attacker
+block in <code>_resolve</code> and the ability tooltip's <code>buff_mult</code>.
+<code>_resonance_taken_mult</code> → the target block in <code>_resolve</code>.
+Crit → the crit-chance block, off the RAW stack count (linear, so it does not go through the
+curve at all). The nameplate → <code>refresh_bars</code>, which prints the stack count and
+both live percentages.</li>
+
+<li><b>§2 THE PER-STACK TERMS COME OFF ARCANE CANNON AND MAGI'S WRATH, AND THIS IS THE TRAP
+THE BATCH EXISTS AROUND.</b> Cannon lost <code>+7.5% damage per stack</code> and Wrath lost
+<code>+4% per stack</code>. <b>Why: the passive compounds now, so an ability-side per-stack
+term multiplies a curve by a slope and SQUARES the escalation.</b> At 12 stacks a Cannon
+would have been 2.17 × 1.90 = 4.1× its base instead of 2.17×. <b>Both keep their Break
+terms</b> (5 × stacks and 2.5 × stacks) because Break is a different axis, and Cannon keeps
+its 15% recoil. test_batch_at asserts both removals in the source AND live, and a negative
+control restoring Cannon's term trips 2 checks.</li>
+
+<li><b>§2 STABILIZE LEAVES THE OPENING THREE; DEATH RAY COMES OUT OF THE VAULT.</b> Stabilize
+was the escape hatch — it vents the very stacks the spec exists to build, and Master of
+Moments made venting free, which made it the most anti-escalation node in the game. It joins
+<code>SPEC_POOLS["arcanist"]</code> so a player who wants the safety valve can <b>earn</b> it:
+a choice, not a default. Its def moved into <code>trimmed_kit_ability</code>, so exactly ONE
+copy exists (the AK resolver rule), and it stays spec-only because it reads Resonance (AH's
+curation rule). <b>Death Ray</b> takes its slot: 40 Mana, 5.0 initiative, 3cd, 150% of Attack
+as arcane, single target, <b>unusable below 5 Resonance</b>, and it <b>consumes no stacks</b>
+(it builds one, like every damaging cast — "consumes nothing" is not "is not a cast").
+A button dark for four turns and then the only thing he wants to press.
+<b>Losing Stabilize costs him his Mana valve as well as his defence, and that is intended</b> —
+his Mana comes from being hurt now: Conversion, Feedback Loop and Siphon in the Entropy lane.
+<b>ONE INTERPRETATION STATED RATHER THAN GLOSSED:</b> §1 says nothing removes Resonance and §2
+keeps Stabilize earnable, which vents it. Those describe different things — the passive has no
+decay, no cap and no reset, and an earned Stabilize is the deliberate exception a player buys.
+Both ship as written.</li>
+
+<li><b>§3 ALL 24 NODES RE-AUTHORED AT ROW PRICING. EVERY ID SURVIVES AND RE-SPECS IN PLACE,
+so saved picks migrate and NO SAVE VERSION MOVES (still v7).</b> <b>The Control lane is renamed
+ENTROPY</b> — after Batch AS "Control" is the Cryomancer's identity word, a sibling lane
+wearing it reads as a collision, and the lane was never about control anyway. Resonance and
+Overload keep their names. <b>THE FULL OLD → NEW MAPPING</b>, by closest surviving intent:
+<table border="1" cellpadding="4">
+<tr><th>id</th><th>was</th><th>is now</th><th>lane move</th><th>note</th></tr>
+<tr><td>ar_harmonics</td><td>Harmonics — Explosion grants +1</td><td><b>Harmonics</b> — Explosion builds 2</td><td>Resonance 3 → 1</td><td>same design, repriced</td></tr>
+<tr><td>ar_mastery</td><td>Arcane Mastery — +1%/rank crit per stack</td><td><b>Attunement</b> — a crit builds 3</td><td>Resonance 1 → 2</td><td>re-spec: the passive pays flat crit now, so the tree's crit-and-Resonance node builds instead</td></tr>
+<tr><td>ar_charged</td><td>Charged Bolts — Mana while AT max</td><td><b>Charged Bolts</b> — Mana per 4 stacks held</td><td>Resonance 7 → 3</td><td>re-spec: there is no max to sit at</td></tr>
+<tr><td>ar_overcharge</td><td>Overcharge — raise the cap to 8</td><td><b>Overcharge</b> — gain half your current stacks</td><td>Overload 3 → Resonance 4</td><td><b>RE-SPECCED, NOT REPRICED</b> — raising a cap is meaningless without one</td></tr>
+<tr><td>ar_core</td><td>Resonant Core — +1 maximum</td><td><b>Resonant Core</b> — +1 on the first cast of a turn</td><td>Resonance 5</td><td>re-spec: same reason</td></tr>
+<tr><td>ar_critical_mass</td><td>Critical Mass — every 3rd crit +20% dmg</td><td><b>Critical Mass</b> — every 3rd crit builds 4</td><td>Overload 1 → Resonance 6</td><td>re-spec; the OLD counter is rune-only and its read site is kept</td></tr>
+<tr><td>ar_unlimited</td><td>Unlimited Power — overflow AT the cap</td><td><b>Cascade</b> — +1 per cast at 10+ stacks</td><td>Resonance 6 → 7</td><td>re-spec: both are "the top of the ramp pays extra"; the lane's thesis</td></tr>
+<tr><td>ar_conduit</td><td>Conduit — +2%/stack on the linear term</td><td><b>Conduit</b> — the curve's step 1.5% → 2%</td><td>Resonance 4 → Overload 1</td><td>same intent, new units</td></tr>
+<tr><td>ar_volatility</td><td>Volatility — Cannon AND Wrath +5% dmg/recoil</td><td><b>Volatility</b> — Cannon +30%, recoil → 25%</td><td>Overload 7 → 2</td><td>Cannon only; the recoil is a SET, not an add</td></tr>
+<tr><td>ar_temporal</td><td>Temporal Rift — 3% CHANCE to echo 25%</td><td><b>Temporal Rift</b> — a crit echoes 40%, certainly</td><td>Overload 2 → 3</td><td>a coin flip on top of a crit is variance on variance</td></tr>
+<tr><td>ar_suppressing</td><td>Suppressing Fire — +0.25%/bolt</td><td><b>Suppressing Fire</b> — +2%/bolt</td><td>Overload 4</td><td>repriced only</td></tr>
+<tr><td>ar_cannoneer</td><td>Cannoneer — Cannon's per-stack DAMAGE</td><td><b>Cannoneer</b> — Cannon's BD 5 → 9 per stack</td><td>Overload 5</td><td>re-spec: §2 removed the axis it rode, so it moves to the one that survived</td></tr>
+<tr><td>ar_barrister</td><td>Barrage Master — +1 bolt</td><td><b>Barrage Master</b> — +3 bolts</td><td>Overload 6</td><td>repriced only</td></tr>
+<tr><td>ar_mindfulness</td><td>Mindfulness — all cooldowns tick faster</td><td><b>Terminal Velocity</b> — Death Ray free at 15+</td><td>Control 1 → Overload 7</td><td><b>FORCED-ISH, REPORTED</b> — cooldown acceleration is the closest surviving intent; mindfulness_ranks is rune-only, read site kept</td></tr>
+<tr><td>ar_conversion</td><td>Conversion — 10% of damage as Mana</td><td><b>Conversion</b> — 30%</td><td>Control 2 → Entropy 1</td><td>repriced only</td></tr>
+<tr><td>ar_on_edge</td><td>On the Edge — below 25%, +1 stack</td><td><b>On the Edge</b> — below 35%, +4 stacks</td><td>Control 3 → Entropy 2</td><td>threshold is fixed now, not rank-scaled</td></tr>
+<tr><td>ar_meltdown</td><td>Feedback Loop — 10% of recoil as Mana</td><td><b>Feedback Loop</b> — 30%</td><td>Control 7 → Entropy 3</td><td>repriced only</td></tr>
+<tr><td>ar_stable</td><td>Stable Alignment — cap 35% of max HP</td><td><b>Stable Alignment</b> — cap 25%</td><td>Control 4 → Entropy 4</td><td><b>KEPT DELIBERATELY</b> where Ward and Still Mind were not: a single-hit cap is what makes a compounding death curve interesting rather than random</td></tr>
+<tr><td>ar_still</td><td>Still Mind — Stabilize leaves +1 stack</td><td><b>Backlash</b> — +1 Resonance per hit received</td><td>Control 6 → Entropy 5</td><td><b>FORCED ASSIGNMENT, REPORTED NOT HIDDEN</b> — Backlash has no ancestor, and Still Mind's whole subject left the kit, so its design died most completely; a slot had to hold it</td></tr>
+<tr><td>ar_attunement</td><td>Mana Attunement — Mana per stack gained</td><td><b>Siphon</b> — 20% of damage dealt as Mana</td><td>Resonance 2 → Entropy 6</td><td>re-spec: the same passive Mana income, paid on damage instead of stacks, because he can no longer vent for Mana</td></tr>
+<tr><td>ar_ward</td><td>Arcane Ward — softens the per-stack penalty</td><td><b>Event Horizon</b> — no attack drops him below 1 HP at 15+</td><td>Control 5 → Entropy 7</td><td>re-spec: both soften what the ramp does to him. The lane's thesis — the reward for escalating is that escalating stops killing you</td></tr>
+<tr><td>ar_singularity</td><td>Singularity — no cap; penalty stops at 5</td><td><b>Singularity</b> — the curve's step DOUBLES 1.5% → 3%</td><td>capstone, Resonance</td><td><b>RE-SPECCED</b>, because uncapping is the default now. At 12 stacks +234% instead of +117%</td></tr>
+<tr><td>ar_wrath</td><td>Magi's Wrath — +4%/stack, BD 2.5×</td><td><b>Magi's Wrath</b> — BD 2.5× only</td><td>capstone, Overload</td><td>per §2's removal</td></tr>
+<tr><td>ar_timelord</td><td>Master of Moments — Stabilize consumes nothing</td><td><b>Perfect Conversion</b> — ALL self-inflicted damage paid as Mana</td><td>capstone, Control → Entropy</td><td><b>RE-SPECCED</b> — its free venting died with Stabilize. The id is kept; the NAME had to change because it no longer described anything</td></tr>
+</table>
+<b>ONE FORCED ASSIGNMENT AND ONE NEAR ONE, both reported rather than hidden</b> (AR did this
+for Ashes of Al'ar, AS for Second Prison, and both reports were worth more than a tidy
+table): <code>ar_still</code> → Backlash outright, and <code>ar_mindfulness</code> →
+Terminal Velocity on the thin thread of "both are about cooldowns". <b>Nothing needed a new
+subsystem</b>: every design above is a stat counter plus one conditional at an existing read
+site, and Death Ray's gate is one line in <code>_ability_usable</code> beside Stabilize's.</li>
+
+<li><b>ARCANE WARD AND STILL MIND ARE GONE AS DESIGNS</b> — two mitigation nodes in a lane
+about converting danger into fuel, and Still Mind modified an ability that is no longer in the
+kit. <b>MAGNITUDES ARE ADDITIVE, NOT RANKED</b>: every counter writes its own magnitude in the
+units its read site sums (conversion_ranks 30 = percentage POINTS, stable_ranks 25 IS the cap,
+cannoneer_ranks 4 is the INCREASE on Cannon's 5 BD/stack). <b>conduit_step is a FLOAT and is
+deliberately NOT named <code>_ranks</code></b> — Runes.STAT_INT_KEYS coerces anything ending
+that way, and 0.5 would have become 0: the node silently inert, nothing crashing. The test
+asserts the name as well as the type.</li>
+
+<li><b>DELETED WITH THEIR PREMISE, not left unreachable: UNLIMITED POWER and BACKLASH WARD.</b>
+Both existed only to answer "what happens when the ramp runs out of room", and the answer is
+now that it never does. The <code>unlimited</code> status went with them. <b>UNREACHABLE BUT
+KEPT</b> (the AR vault pattern, gated <code>&gt; 0</code>, reported so a later batch can
+re-node or delete deliberately): <code>mindfulness_ranks</code>,
+<code>arcane_mastery_ranks</code> and <code>critical_mass_ranks</code> are RUNE-ONLY and their
+read sites are kept on purpose; <code>mana_attune_ranks</code> and
+<code>still_mind_ranks</code> have no writer at all — the first because Siphon replaced it, the
+second because Stabilize is earnable and still reads its floor.</li>
+
+<li><b>§4 THE RUNE AUDIT. RE-POINTED:</b>
+<ul>
+<li><b>Rune of the Resonant Core</b> — <code>conduit_ranks</code> → <code>conduit_step: 0.5</code>,
+and its desc rewritten, because <b>BOTH its clauses lost their meaning</b>: there is no maximum
+to raise and no linear per-stack term to deepen. It pays the node's own 0.5 points of curve
+step now, and <code>resonant_core_ranks</code> still pays into the node's new meaning (+1 on
+the first cast of a turn). <b>THE ARITHMETIC, REPORTED NOT BURIED</b> — its old "+2% per stack"
+paid +10% at 5 stacks, +16% at 8, +24% at 12; 0.5 points of curve pays +7.5%, +18%, +39%. It
+crosses over around eight stacks: worse early, better late, which is this batch's whole shape.
+Rune magnitude has been closed since AF, so that is a <b>report</b>, not a retune.</li>
+<li><b>Rune of the Unquiet Mind</b> — <code>feedback_ranks</code> 2 → <b>20</b>, because the
+counter is percentage POINTS now and 2 would have silently gutted it from "a fifth of Cannon's
+recoil" to a fiftieth. Its <b>lane tag Control → Entropy</b>, the AS Honed Lance lesson: a dead
+lane name leaves a rune homeless in the bot's build policy and the per-lane coverage test.
+Its <code>mindfulness_ranks</code> clause is now the ONLY thing that writes that counter, and
+its read site is kept for exactly that reason.</li>
+<li><b>Rune of the Wide Current</b> — <code>on_edge_ranks</code> → its own
+<code>rune_on_edge_ranks</code> term (the AR Cinder Trail pattern, because the node took the
+counter for new units). It reproduces the OLD formula exactly — threshold 20 + 5/rank, one
+stack per rank — so it still pays its advertised "surviving a blow under 25% health grants a
+stack". <b>The threshold takes the MAX and the payout SUMS</b>, so each half pays its number
+alone AND stacked (the AK/AL repair rule); summing thresholds would have produced a 60% window
+neither half asked for. Its other two clauses are <b>untouched</b> and still pay their
+advertised amounts, because their read sites were deliberately kept.</li>
+<li><b>Rune of the Seventh Bolt</b> — unchanged. Arcane Barrage is unchanged and still in the
+kit.</li>
+</ul>
+<b>THE THREE MAGE CLASS-WIDE RUNES TOUCH NO ARCANIST COUNTER</b> (Wellspring, Reckless
+Channeling, Comet) — asserted in the test, not assumed. runes.json changed by three payload
+re-points and two descs; this is <b>not</b> the magnitude pass the designer closed in AF.</li>
+
+<li><b>§5 THE <code>ar_ward</code> ↔ <code>ar_still</code> EXCLUSIVE PAIR DISSOLVES</b> with
+the two designs, and the entry is removed from CLAUDE.md's prose with the reason recorded
+beside it rather than quietly vanishing. Note the correction AS already logged and this batch
+confirms: <code>test_runes._exclusives</code> was retired to a bare <code>pass</code> by Batch
+AI, so the pair list has only ever been prose since. The remaining four pairs are untouched.</li>
+
+<li><b>§6 THE BOT: NEVER COME DOWN.</b> The old mage rotation vented at 4+ stacks below 80%
+health — the exact opposite of the spec that shipped, and against an ability that is no longer
+in the opening three. Now: <b>Death Ray</b> the moment the gate opens (it consumes nothing, so
+there is no reason to save it) → <b>Magi's Wrath</b> at 3+ enemies → <b>Overcharge</b> once, at
+8+ stacks, because it pays half of what he holds and spending it early throws the button away →
+<b>Cannon</b> → <b>Barrage</b> → <b>Arcane Explosion</b> as the free filler that keeps building.
+<b>Stabilize is deliberately absent</b>, and the code says so: if a player earns it, it is
+theirs to press, but the bot measuring the spec must never vent.</li>
+
+<li><b>§8 SHATTER, RE-SPECCED — TIME HELD, NOT STACKS HELD (Cryomancer).</b> AS reported it
+never firing and correctly called that a design tension rather than a bot bug: Shatter (Thaw)
+and Absolute Zero (Deep Freeze) are both capstones and only one is takeable, so a Shatter build
+holds at most two — and at a limit of one, Shatter and Ice Lance did the same job and the Lance
+was cheaper. The bot preferred the Lance correctly. <b>Fixed by changing what it scales on.</b>
+Shatter — 30 Mana, 4.0, 5cd, releases every hold, and each released enemy takes <b>10% of
+Attack per turn it spent held, capped at 12</b> (Perfect: cooldown 4, as before). This resolves
+the tension <b>without touching either capstone</b>: at three turns held it is worth less than
+Ice Lance's 35% plus its stack bonus, the crossover sits around turn four or five, and past
+that the Lance can never match it. Multiple holds still multiply it, so Absolute Zero and
+Second Prison builds still want it — they are no longer <b>required</b> for it to be worth a
+capstone. <b>The hold stops being a binary state and becomes a CHARGE</b>, which is right for a
+spec whose currency is time, and it gives the player a real question every turn: release now
+for a modest hit, or hold longer while the enemy sits off the board doing nothing.</li>
+
+<li><b>§8 IMPLEMENTATION.</b> The counter is <code>BattleUnit.hold_turns</code>, written in
+<b>exactly one place</b> — <code>_hold_sync</code>, at the top of every turn, walking
+<code>_holds</code>. It is deliberately NOT a dictionary parked beside <code>_holds</code>:
+that would be a second answer to "is this held" and the two could disagree. Because only the
+ledger walk writes it, a counter can never advance on an enemy that is not in a prison, and it
+advances <b>once per turn, not once per unit per turn</b> — a negative control nesting the
+increment inside a second walk over <code>_holds</code> trips the test. It zeroes at
+<code>_hold_freeze</code>, so an enemy released and re-frozen does not resume its old charge.
+<b>The nameplate HELD chip shows the count</b> ("HELD 7") and its tooltip says what the number
+buys, because a charge the player cannot see is a decision they cannot make. <b>THE BOT:</b>
+hold longer, and prefer Shatter over Ice Lance once the oldest hold has charged five turns —
+the Shatter check moved ABOVE the Lance release, and the <code>_holds.size() &gt;= 2</code>
+gate that made it never fire is gone.</li>
+
+<li><b>§8 ONE CONSEQUENCE, INTENDED AND RECORDED:</b> the hold is simultaneously a damage
+window for the party and a charging Shatter, so the party spending the window kills the target
+and the charge with it. <b>That tension is the good kind</b> — it makes "leave it held one more
+turn" an actual argument rather than a free choice. It is deliberately NOT resolved by
+preserving the charge on death; there is nothing to shatter.</li>
+
+<li><b>ONE ITEM THE BRIEF DID NOT SPECIFY, FLAGGED RATHER THAN INVENTED: Death Ray carries no
+Break damage.</b> §2 gives its Mana, initiative, cooldown, damage, target count and gate
+precisely and says nothing about BD, so it ships at <code>pressure: 0</code> — the same shape
+Cannon and Wrath declare before their stack-based Break lands. A 40-Mana nuke contributing
+nothing to the party's Break is a real design question; it is the designer's, not this
+batch's.</li>
+
+</ul>
+<p><b>VERIFIED:</b> check_parse 0 failures, check_flow 0 failures (6 screens).
+<b>NEW test_batch_at.gd 457 checks / 0 failures, STABLE 4/4.</b> Regression: test_batch_an
+6044/0, test_batch_ah 5494/0 (its master.html STAMP GATE bumped AS → AT, and its verbatim
+Arcanist pool assertion updated with the batch), ah_battle 65/0, ai 2036/0, aj 403/0, ak
+<b>524/0 (was 523 — the Arcanist's spec pool gained Stabilize, and every entry still
+resolves)</b>, al <b>557/0 (was 556 — same reason: it audits every spec pool entry too)</b>, ar 885/0,
+as 387/0, test_runes <b>2981/0 (was 2982 — the Resonant Core rune's payload went int → float,
+so one STAT_INT_KEYS-family check no longer applies, exactly AL's precedent)</b>,
+test_rune_battle 94/0, run-harness gates 1/2/3 PASS, 11 scenes 0 SCRIPT ERROR.</p>
+<p><b>KNOWN-BAD, NOT OURS:</b> test_batch_al's standing flake reproduced <b>2 runs of 4</b>
+here, and it is the same check AQ named and diagnosed — <code>"Spite reflects damage at the
+attacker"</code>, a harness race in test_batch_al's own <code>_spawn</code> (it waits a fixed
+20 <code>process_frame</code>s while the battle's <code>_run_battle</code> loop is advancing on
+REAL timers, then drives <code>_resolve</code> by hand). Nothing in this batch touches the
+Warden tree or a block/taunt battle. Do not read a clean run as evidence it is gone.</p>
+<p><b>TWO TEST RE-POINTS, IN PLACE AND WITH THE REASON IN THE FILE</b> rather than deleted:
+test_runes' Batch AA call-site ordering alarm probed <code>resonant_core_ranks</code> as a
+CEILING field, and Runaway Resonance has no ceiling for it to raise — so the Resonance probe
+is inverted (it now asserts no Resonance ceiling is being derived at all, which is the thing a
+future batch could break) and the "runes actually write a ceiling" floor drops 4 → 3 with the
+three survivors NAMED so it cannot be lowered again by attrition. The RULE is untouched and
+still live for Mercy and Focus. test_batch_as's exclusive-pair prose assertion was already
+written to expect the AS dissolution note; the AT one is added the same way.</p>
+<p><b>NEGATIVE CONTROLS RUN, because a test that cannot fail proves nothing:</b> making the
+curve LINEAR instead of triangular trips <b>34</b> checks; restoring Arcane Cannon's per-stack
+damage term trips 2; putting Shatter back on Chilled stacks trips 1; capping the damage-taken
+curve at 5 stacks trips 1; and nesting <code>_hold_sync</code>'s increment inside a second walk
+over <code>_holds</code> (once per unit per unit) trips 1.</p>
+<p><b>KIT SMOKE — and §1's fallback decision rests on it.</b> Fixed lineup, 40 battles/row,
+berserker,arcanist,inquisitor,beastmaster, DOD_SIM_TALENTS force-learning full 8-node builds.
+<b>All four rows 40/40 wins, 0 SCRIPT ERROR</b>, and every new piece appears in the rotation
+(Death Ray 0.7–1.1 casts/battle in every row, Overcharge 0.8, Magi's Wrath 1.0). Damage share
+and Break: ungeared <b>47%</b>/72 BD; RESONANCE <b>60%</b>/79; OVERLOAD <b>56%</b>/54;
+ENTROPY <b>55%</b>/85.</p>
+<p><b>THE FINDING WORTH KEEPING, and it is a property of compounding itself: BUILD RATE BEATS
+PER-STACK VALUE, quadratically.</b> The Resonance lane is the standout (526 damage/battle
+against Overload's 371) even though Overload is the lane whose entire pitch is "each stack
+worth more". The reason is the curve: damage is step × N(N+1)/2, so it is QUADRATIC in the
+stack count and only LINEAR in the step. Doubling the build rate roughly quadruples the payout;
+raising the step from 1.5% to 2% multiplies it by 1.33. <b>Any future tuning of this spec should
+treat the Resonance lane's build-rate nodes as the expensive ones</b> — that is not obvious from
+reading the node text, and it is the opposite of how the two lanes are pitched.</p>
+<p><b>SHIPPED AS AUTHORED — COMPOUNDING, NOT THE LINEAR FALLBACK.</b> §1 asked for the smoke
+numbers and a decision. 60% at the tallest lane is in the same band as content already shipped
+and flagged rather than nerfed (AR's Kindling row read 66%, AS's Thaw 51%), the spec loses no
+battles, and nothing came out absurd — so the fallback was not taken. MEASURED AND FLAGGED, NOT
+NERFED, per the standing rule. <b>Kit-mechanics ratios ONLY: the smoke lineup carries NO
+difficulty signal (Batch R), and these magnitudes are this batch's own.</b></p>
+<p><b>NO DIFFICULTY MEASUREMENT AND NO SIM ROW, deliberately</b> — same reasoning as AJ, AK,
+AL, AR and AS: a single-spec re-author has no honest control row against a fixed four-hero
+party, and <code>./sim.sh</code> carries no difficulty signal (Batch R).</p>
+
 <h2>2026-08-07 — Batch AS: the Cryomancer — control</h2>
 <p><i>Second of the Mage three. His structure was sound and his middle lane was a damage
 lane, which made a control spec a damage spec wearing a coat. The spine is now: you decide

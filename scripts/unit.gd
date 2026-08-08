@@ -375,6 +375,9 @@ var was_frozen := false       # has been Frozen this battle
 # pays its advertised number alone AND stacked. Under the old `1 x step` form
 # a rune's value silently inherited the node's multiplier.
 var hungering_ranks := 0      # Hungering Cold: -N% damage per Chilled stack
+var hold_turns := 0           # Batch AT: turns this enemy has spent HELD. Written
+                              # ONLY by battle._hold_sync (walking `_holds`) and
+                              # zeroed at _hold_freeze; Shatter's damage reads it.
 var frostbite_ranks := 0      # Brittle Ice: +N% crit chance against a HELD enemy
 var piercing_ice_ranks := 0   # Piercing Ice: Ice Lance +N% critical damage
 var hypothermia_ranks := 0    # Hypothermia: +N% damage taken per Chilled stack
@@ -409,33 +412,97 @@ var freezing_ranks := 0       # no node: Freezing Advance
 var freezing_adv_mark := false # no node: Freezing Advance's victim mark
 var frost_ward_ranks := 0     # no node: Frost Ward
 # Arcanist rework + tree (07-20). See talents.gd for the node text.
-var overcharged := false      # Overcharge is active (max Resonance 8)
-var overcharge_mult := 1.5    # weight of stacks 6-8 (1.65 on a perfect cast)
-var mindfulness_ranks := 0    # Mindfulness: periodic extra cooldown tick
-var mindfulness_counter := 0
-var arcane_mastery_ranks := 0 # Arcane Mastery: +1%/rank crit per stack
-var mana_attune_ranks := 0    # Mana Attunement: mana per stack gained
-var on_edge_ranks := 0        # On the Edge: stacks from surviving low hits
-var conversion_ranks := 0     # Conversion: damage partly paid in Mana
-var critical_mass_ranks := 0  # Critical Mass: every 3rd crit hits harder
+var overcharged := false      # Overcharge is spent (once per battle)
+var overcharge_mult := 0.5    # fraction of current stacks it grants (1.0 perfect)
 var crit_streak := 0          # crits since the last Critical Mass proc
-var temporal_ranks := 0       # Temporal Rift: crits can echo
-var suppressing_ranks := 0    # Suppressing Fire: Barrage bolts ramp
-var stable_ranks := 0         # Stable Alignment: single-hit damage cap
-var unlimited_ranks := 0      # Unlimited Power: overflow → dmg + max Mana
-var unlimited_surges := 0     # overflow procs banked this battle
-# Arcanist lane tree (Batch P, 07-31). See talents.gd for the node text.
-var harmonics_ranks := 0      # Harmonics: Arcane Explosion grants extra stacks
-var conduit_ranks := 0        # Conduit: deeper per-stack damage bonus
-var resonant_core_ranks := 0  # Resonant Core: +1 max Resonance per rank
-var charged_bolts_ranks := 0  # Charged Bolts: Mana per damaging cast at max
-var cannoneer_ranks := 0      # Cannoneer: Cannon's per-stack damage deepens
-var volatility_ranks := 0     # Volatility: Cannon/Wrath damage AND recoil up
-var arcane_ward_ranks := 0    # Arcane Ward: Resonance dmg-taken penalty falls
-var still_mind_ranks := 0     # Still Mind: Stabilize leaves extra stacks
-var feedback_ranks := 0       # Feedback Loop: recoil partly paid as Mana
-var singularity := 0          # capstone: no Resonance cap, penalty stops at 5
-var master_moments := 0       # capstone: Stabilize consumes no stacks
+var res_cast_this_turn := false  # Resonant Core: has he cast yet this turn?
+# Arcanist tree, RE-AUTHORED IN BATCH AT around escalation. Every counter is
+# ADDITIVE — it writes its own magnitude in the units its read site sums.
+var harmonics_ranks := 0      # Harmonics: extra Resonance from Arcane Explosion
+var attunement_crit := 0      # Attunement: extra Resonance from a crit
+var charged_bolts_ranks := 0  # Charged Bolts: % max Mana per cast, per 4 stacks
+var resonant_core_ranks := 0  # Resonant Core: extra Resonance, first cast of a turn
+var critical_mass_stacks := 0 # Critical Mass: Resonance on every 3rd crit
+var cascade_stacks := 0       # Cascade: extra Resonance per cast at 10+ stacks
+var conduit_step := 0.0       # Conduit: POINTS on the damage curve's step (FLOAT —
+                              # never name this "_ranks" or Runes coerces 0.5 to 0)
+var volatility_ranks := 0     # Volatility: % damage on Arcane Cannon
+var volatility_recoil := 0    # Volatility: Cannon's recoil %, as a SET not an add
+var temporal_ranks := 0       # Temporal Rift: % of a crit echoed at a random enemy
+var suppressing_ranks := 0    # Suppressing Fire: % of Attack each Barrage bolt gains
+var cannoneer_ranks := 0      # Cannoneer: extra Break damage per stack on Cannon
+var terminal_velocity := 0    # Terminal Velocity: stacks above which Death Ray is free
+var conversion_ranks := 0     # Conversion: % of damage taken paid as Mana
+var on_edge_threshold := 0.0  # On the Edge: health % below which surviving pays
+var on_edge_stacks := 0       # On the Edge: Resonance it pays
+var feedback_ranks := 0       # Feedback Loop: % of recoil paid as Mana
+var stable_ranks := 0         # Stable Alignment: single-hit cap, % of max health
+var backlash_stacks := 0      # Backlash: Resonance per hit received
+var siphon_ranks := 0         # Siphon: % of damage dealt restored as Mana
+var event_horizon := 0        # Event Horizon: stacks above which he cannot be killed
+var singularity := 0          # capstone: the damage curve's step doubles
+var perfect_conversion := 0   # capstone: ALL self-inflicted damage paid as Mana
+# UNREACHABLE BUT KEPT (the AR vault pattern — gated `> 0`, reported rather
+# than silently deleted, so a later batch can re-node or remove them
+# deliberately). mindfulness_ranks, arcane_mastery_ranks and
+# critical_mass_ranks are RUNE-ONLY: the Runes of the Unquiet Mind and the
+# Wide Current still pay them and their read sites are kept on purpose.
+# mana_attune_ranks and still_mind_ranks have no writer at all — the first
+# because Siphon replaced it, the second because Still Mind's whole subject
+# (Stabilize's floor) left the opening three, though Stabilize itself is
+# earnable and still reads the floor.
+var mindfulness_ranks := 0    # RUNE-ONLY: periodic extra cooldown tick
+var mindfulness_counter := 0
+var arcane_mastery_ranks := 0 # RUNE-ONLY: +1%/rank crit per stack, on top of 1%
+var critical_mass_ranks := 0  # RUNE-ONLY: every 3rd crit hits harder + Mana
+var mana_attune_ranks := 0    # no writer: Mana per stack gained
+var still_mind_ranks := 0     # no writer: Stabilize leaves extra stacks
+# The Rune of the Wide Current's OWN On the Edge term (the AR Cinder Trail
+# pattern): the node took on_edge_* for new units, so the rune keeps its old
+# formula on its own field rather than being silently re-tuned by the node's.
+var rune_on_edge_ranks := 0
+
+
+# ---------- RUNAWAY RESONANCE (Batch AT) ----------
+#
+# THE ONE PLACE THE CURVE IS DECIDED. battle.gd reads it through
+# `_resonance_dmg_mult` / `_resonance_taken_mult` and the nameplate below reads
+# it directly, so a change here can never leave one of them behind.
+#
+# T(N) = N(N+1)/2 — the triangular number, and the whole design. A linear
+# per-stack term is a SLOPE; this is a CURVE, which is the difference between
+# a ramp and an escalation. Both ends are uncapped and nothing removes stacks.
+#   5 stacks  +22% dmg / +11% taken      8 stacks  +54% / +27%
+#  12 stacks +117% dmg / +59% taken     16 stacks +204% / +102%
+const RESONANCE_BAR_REF := 15.0     # what the second-resource bar fills toward:
+                                    # the depth Terminal Velocity and Event
+                                    # Horizon both switch on at
+const RESONANCE_DMG_STEP := 1.5     # % damage per point of curve
+const RESONANCE_TAKEN_STEP := 0.75  # % damage TAKEN per point — nothing modifies
+                                    # this, deliberately: Conduit and Singularity
+                                    # name the damage curve only
+
+
+func resonance_curve() -> float:
+	var n := float(second_resource)
+	return n * (n + 1.0) * 0.5
+
+
+# Conduit adds 0.5 points; Singularity adds another 1.5 (the additive reading of
+# "the step doubles, 1.5% -> 3%", which is the form this tree uses throughout).
+func resonance_dmg_step() -> float:
+	var step := RESONANCE_DMG_STEP + conduit_step
+	if singularity > 0:
+		step += RESONANCE_DMG_STEP
+	return step
+
+
+func resonance_dmg_bonus() -> float:
+	return 0.01 * resonance_dmg_step() * resonance_curve()
+
+
+func resonance_taken_bonus() -> float:
+	return 0.01 * RESONANCE_TAKEN_STEP * resonance_curve()
 # Holy tree (07-22). See talents.gd for the node text.
 var triage_ranks := 0         # Triage: instant heals can crit, +3%/rank healing
 var heavenly_ranks := 0       # Heavenly Aura: deeper Mercy stack bonus
@@ -937,22 +1004,17 @@ func refresh_bars() -> void:
 		_res_fill.size.x = PLATE_BAR_W * clampf(resource / float(max_resource), 0.0, 1.0)
 		_res_text.text = "%s %d/%d" % [resource_name, resource, max_resource]
 	if _res2_fill != null:
-		# Singularity has no cap — the bar reads against the old 5-stack line.
-		var res2_ref := 5.0 if singularity > 0 else float(second_max)
+		# Resonance has NO MAXIMUM (Batch AT), so the bar cannot read against
+		# one: it fills toward RESONANCE_BAR_REF and pins there. The number
+		# beside it is the honest readout — the raw stack count and what the
+		# compounding curve is currently paying, both ways.
+		var res2_ref := RESONANCE_BAR_REF if second_resource_name == "Resonance" \
+			else float(second_max)
 		_res2_fill.size.x = PLATE_BAR_W * clampf(second_resource / res2_ref, 0.0, 1.0)
 		if second_resource_name == "Resonance":
-			# Overcharge weights stacks past 5 harder — show the true bonus
-			# (Conduit deepens the per-stack term; Singularity has no cap).
-			var eff := float(second_resource)
-			if overcharged and second_resource > 5:
-				eff = 5.0 + (second_resource - 5.0) * overcharge_mult
-			var per_stack := 15.0 + 2.0 * conduit_ranks
-			if singularity > 0:
-				_res2_text.text = "%d (+%d%% dmg)" % [second_resource,
-					int(round(eff * per_stack))]
-			else:
-				_res2_text.text = "%d/%d (+%d%% dmg)" % [second_resource, second_max,
-					int(round(eff * per_stack))]
+			_res2_text.text = "%d (+%d%% dmg / +%d%% taken)" % [second_resource,
+				int(round(resonance_dmg_bonus() * 100.0)),
+				int(round(resonance_taken_bonus() * 100.0))]
 		else:
 			_res2_text.text = "%s %d/%d" % [second_resource_name, second_resource, second_max]
 	if passive_id == "bloodrage":
@@ -1496,8 +1558,9 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 						unit_name, glow_got])
 			break
 	# Conversion (Arcanist talent): part of the pain bleeds off as Mana.
+	# ADDITIVE — the counter is percentage POINTS of the hit (Batch AT).
 	if conversion_ranks > 0 and resource_name == "Mana" and amount > 0:
-		var converted := mini(int(round(amount * 0.10 * conversion_ranks)), resource)
+		var converted := mini(int(round(amount * 0.01 * conversion_ranks)), resource)
 		if converted > 0:
 			amount -= converted
 			resource -= converted
@@ -1505,13 +1568,24 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			_proc_log("Talent: Conversion — %s pays %d of the hit in Mana" % [
 				unit_name, converted])
 	# Stable Alignment (Arcanist talent): one attack can only cut so deep.
+	# ADDITIVE — the counter IS the cap as a % of max health (Batch AT).
 	if stable_ranks > 0 and amount > 0:
-		var stable_cap := maxi(int(round(max_hp * (0.40 - 0.05 * stable_ranks))), 1)
+		var stable_cap := maxi(int(round(max_hp * 0.01 * stable_ranks)), 1)
 		if amount > stable_cap:
 			float_text("ALIGNED -%d" % (amount - stable_cap), Color(0.75, 0.7, 0.95))
 			_proc_log("Talent: Stable Alignment — the hit is capped at %d (%d%% max HP)" % [
-				stable_cap, 40 - 5 * stable_ranks])
+				stable_cap, stable_ranks])
 			amount = stable_cap
+	# EVENT HORIZON (Arcanist capstone, Batch AT): the reward for escalating is
+	# that escalating stops killing you. Deep enough into Runaway Resonance, no
+	# SINGLE attack can put him down — it leaves him on 1. Deliberately sits
+	# AFTER Stable Alignment (a capped hit is what it is asked to survive) and
+	# before the subtraction, so nothing downstream sees a lethal number.
+	if event_horizon > 0 and second_resource >= event_horizon \
+			and amount > 0 and amount >= hp:
+		amount = maxi(hp - 1, 0)
+		float_text("EVENT HORIZON", Color(0.85, 0.55, 1.0))
+		_proc_log("Talent: Event Horizon — %s cannot be reduced below 1 health" % unit_name)
 	var was_above_half := hp > max_hp * 0.5
 	var was_above_quarter := hp > max_hp * 0.25
 	var was_below_deathwish := hp < max_hp * 0.35

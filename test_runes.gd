@@ -322,21 +322,40 @@ func _ordering(battle_src: String) -> void:
 	# Batch AA moved these derivations below the rune block. The Focus three
 	# were the reason ("the Hunter batch would have hit this on Focus") and
 	# Batch AB is the first time runes actually write them.
-	for probe in ["resonant_core_ranks", "mercy_cap_bonus", "zealous_mercy",
+	# RE-POINTED IN PLACE, BATCH AT, with the reason here rather than a silent
+	# deletion: `resonant_core_ranks` is no longer a CEILING field. Runaway
+	# Resonance has no maximum at all, so nothing derives a Resonance ceiling
+	# from cfg any more and the probe had nothing left to find. The RULE is
+	# untouched and still live for Mercy and Focus, which is what the remaining
+	# five probes watch — and the Resonance side is now covered by the opposite
+	# assertion below: that no derivation reads a Resonance ceiling out of cfg.
+	for probe in ["mercy_cap_bonus", "zealous_mercy",
 			"deep_focus", "spray", "opening_volley"]:
 		var derive_at := battle_src.find("cfg.get(\"%s\"" % probe)
 		ok(derive_at >= 0, "battle.gd: no derivation reads %s" % probe)
 		ok(derive_at > rune_at,
 			"battle.gd: %s is derived BEFORE runes apply — ceiling runes are duds" % probe)
+	# Batch AT: the Arcanist's ceiling is GONE, not moved. A batch that quietly
+	# re-derives one would put a cap back on a passive whose whole design is not
+	# having one, so the alarm now watches for its RETURN.
+	ok(battle_src.find("cfg.get(\"resonant_core_ranks\"") < 0,
+		"battle.gd: a Resonance CEILING is being derived again — Runaway Resonance has no maximum")
+	ok(battle_src.find("cfg[\"second_max\"] = 99") > rune_at,
+		"battle.gd: the Arcanist's sentinel second_max is gone or moved above the rune block")
 	# ...and the pool must actually hold a rune that writes a ceiling field,
 	# or the assertion above is guarding a road nothing drives on.
 	var ceiling_writers := 0
 	for id in Runes.ids():
 		for field in Runes.config(id).get("payload", {}).get("stat", {}):
 			if String(field) in ["deep_focus", "opening_volley", "spray",
-					"resonant_core_ranks", "mercy_cap_bonus", "zealous_mercy"]:
+					"mercy_cap_bonus", "zealous_mercy"]:
 				ceiling_writers += 1
-	ok(ceiling_writers >= 4,
+	# Batch AT lowered this floor 4 -> 3, and the arithmetic is the whole reason:
+	# the Rune of the Resonant Core was one of the four, and Runaway Resonance
+	# has no ceiling for it to raise. THE THREE THAT REMAIN ARE NAMED so a future
+	# batch cannot lower it again by attrition — Open Hand (zealous_mercy),
+	# Deep Sight (deep_focus), Long Draw (opening_volley).
+	ok(ceiling_writers >= 3,
 		"only %d runes write a second-resource ceiling — the ordering fix is untested in practice" % ceiling_writers)
 
 

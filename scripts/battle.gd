@@ -94,8 +94,7 @@ const STATUS_INFO := {
 	"rime": ["Rime", "Ri", Color(0.75, 0.9, 1.0), "Rimed: every stack of Chilled this\nenemy gains also chills one other\nrandom enemy."],
 	"frostbite": ["Frostbite", "Fb", Color(0.45, 0.70, 0.95), "Frostbitten: healing received\nreduced by 50%."],
 	"stabilized": ["Stabilized", "St+", Color(0.55, 0.68, 0.95), "Grounded resonance: takes less\ndamage (10% per stack consumed)."],
-	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Maximum Resonance raised to 8;\nstacks beyond 5 give extra Resonance\nbonus (damage, crit, damage taken)."],
-	"unlimited": ["Unlimited Power", "UP", Color(0.85, 0.55, 1.0), "Resonance overflow: bonus damage\nand maximum Mana, all battle."],
+	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge has been spent this\nbattle — the storm has already been\nfed on itself once."],
 	"sanctified": ["Hallowed", "Hw", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
 	"capacitor": ["Holy Capacitor", "HC", Color(0.95, 0.9, 0.6), "Stored overhealing, released by\nthe next Heal."],
 	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith — 3% mitigation and +2%\ndamage per stack; at 5 the bearer\nis healed and the Faith resets."],
@@ -552,12 +551,14 @@ func _spawn_units() -> void:
 		# Sharpshooter's Focus flags) was read too early and did NOTHING —
 		# exactly the silent dud the rune schema exists to prevent. Talent
 		# behaviour is unchanged: talents already applied further up.
-		# Singularity: no maximum (99 is "never reached in practice";
-		# Backlash Ward / Unlimited Power overflow simply never fires).
+		# RUNAWAY RESONANCE HAS NO CEILING AT ALL (Batch AT) — not a talent-
+		# raised one, not a capstone-removed one. 99 is "never reached in
+		# practice"; the nameplate bar reads against BattleUnit's
+		# RESONANCE_BAR_REF instead, because a bar with no maximum has nothing
+		# to fill. resonant_core_ranks no longer touches this: the node buys
+		# an extra stack on the first cast of each turn now.
 		if spec == "arcanist":
-			cfg["second_max"] = 5 + int(cfg.get("resonant_core_ranks", 0))
-			if int(cfg.get("singularity", 0)) > 0:
-				cfg["second_max"] = 99
+			cfg["second_max"] = 99
 		# Mercy: Martyr's Vigor moves the ceiling, Zealous Light the start.
 		if spec == "holy":
 			cfg["second_max"] = 5 + int(cfg.get("mercy_cap_bonus", 0))
@@ -2229,6 +2230,7 @@ func _player_turn(u: BattleUnit) -> void:
 	item_used = false
 	empower_armed = false  # Mercy Empowerment never carries between turns
 	u.rampage_chains = 0   # the capstone's kill-recast budget is per turn
+	u.res_cast_this_turn = false  # Resonant Core pays the FIRST cast of a turn
 	# Thin Air (Batch AQ): THE one read site for mod_no_regen. It stops the
 	# DRIP and nothing else — attacks that BUILD resource are untouched, which
 	# is why a Rage hero survives it better than a Mage. That asymmetry is the
@@ -2657,30 +2659,41 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			var fstorm := _find_ability(u, "Firestorm")
 			if fstorm != null and u.resource >= fstorm.cost and u.ability_ready(fstorm):
 				return [fstorm, target_foe]
-			# Arcanist: ride the Resonance engine — big spenders first.
+			# ARCANIST (Batch AT §6): the rotation is built on one rule —
+			# **NEVER COME DOWN.** The old policy vented at 4+ stacks below 80%
+			# health, which is the exact opposite of the spec that shipped (and
+			# Stabilize is not even in the opening three any more). Death Ray
+			# the moment the gate opens, because it consumes nothing and there
+			# is no reason on earth to save it; Overcharge as LATE as it can
+			# still be spent, because it compounds what he is already holding.
+			# Instrument honesty, not tuning: NO DIFFICULTY MEASUREMENT BELONGS
+			# IN THIS BATCH — a single-spec re-author has no honest control row,
+			# which AJ, AK, AL, AR and AS each recorded.
+			var dray := _find_ability(u, "Death Ray")
+			if dray != null and u.resource >= dray.cost and u.ability_ready(dray) \
+					and u.second_resource >= DEATH_RAY_STACKS:
+				return [dray, target_foe]
 			var wrath := _find_ability(u, "Magi's Wrath")
 			if wrath != null and u.resource >= wrath.cost and u.ability_ready(wrath) \
-					and foes.size() >= 3 and u.second_resource >= 3:
+					and foes.size() >= 3:
 				return [wrath, target_foe]
+			# Overcharge pays HALF of what he holds, so spending it early throws
+			# the button away. The bot holds it until the ramp is deep enough
+			# that it is worth a turn, then spends it once.
 			var ocharge := _find_ability(u, "Overcharge")
 			if ocharge != null and u.resource >= ocharge.cost and u.ability_ready(ocharge) \
-					and not u.overcharged and u.second_resource >= 4:
+					and not u.overcharged and u.second_resource >= OVERCHARGE_BOT_STACKS:
 				return [ocharge, u]
-			# Stabilize is a valve now, not a reset — vent early and often
-			# (Batch P; _ability_usable covers the Still Mind floor).
-			var stab := _find_ability(u, "Stabilize")
-			if stab != null and u.ability_ready(stab) \
-					and u.second_resource >= 4 \
-					and u.hp < u.max_hp * 0.8 \
-					and _ability_usable(u, stab):
-				return [stab, u]
 			var cannon := _find_ability(u, "Arcane Cannon")
-			if cannon != null and u.resource >= cannon.cost and u.ability_ready(cannon) \
-					and u.second_resource >= 2:
+			if cannon != null and u.resource >= cannon.cost and u.ability_ready(cannon):
 				return [cannon, target_foe]
 			var barrage := _find_ability(u, "Arcane Barrage")
 			if barrage != null and u.resource >= barrage.cost and u.ability_ready(barrage) and foes.size() >= 2:
 				return [barrage, target_foe]
+			# NOTE THE ABSENCE, and do not "fix" it: Stabilize is deliberately
+			# NOT in this rotation. If a player earns it out of the spec pool it
+			# is theirs to press; the bot measuring the spec must never vent,
+			# because venting is what the whole batch removed.
 			# CRYOMANCER (Batch AS §7): the policy has to know what a HOLD is,
 			# or a sim measures a spec that is not the one that shipped.
 			# BUILD stacks on the highest-Attack enemy, FREEZE it, LEAVE IT
@@ -2709,9 +2722,28 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			var lance := _find_ability(u, "Ice Lance")
 			var lance_up: bool = lance != null and u.resource >= lance.cost \
 				and u.ability_ready(lance)
-			# THE RELEASE IS A DECISION, not a reflex. He spends a hold only
-			# when he can immediately replace it, or when the held enemy is
-			# the last thing standing and the fight cannot end otherwise.
+			# SHATTER, AND IT COMES BEFORE THE LANCE (Batch AT §8). It used to sit
+			# below the Lance behind a `_holds.size() >= 2` gate, which is why
+			# AS's smoke never cast it once: a Shatter build cannot take Absolute
+			# Zero, so it rarely holds two. Now that it charges on TURNS, the
+			# honest question is whether the oldest prison has cooked long
+			# enough — below the crossover the Lance is still the better button,
+			# above it the Lance can never catch up.
+			var shat := _find_ability(u, "Shatter")
+			if shat != null and u.resource >= shat.cost and u.ability_ready(shat) \
+					and _ability_usable(u, shat) \
+					and _holds.any(func(e): return e.hold_turns >= SHATTER_BOT_TURNS):
+				return [shat, _holds[0]]
+			# THE RELEASE IS A DECISION, not a reflex — and HOLD LONGER is the
+			# new default: with Shatter owned he leaves a charging prison alone
+			# until it is worth breaking, because the Lance spends the charge for
+			# nothing. He spends a hold on the Lance only when he can immediately
+			# replace it, or when the held enemy is the last thing standing and
+			# the fight cannot end otherwise.
+			if lance_up and shat != null and not _holds.is_empty() \
+					and not unheld.is_empty() \
+					and _holds[0].hold_turns < SHATTER_BOT_TURNS:
+				lance_up = false
 			if lance_up and not _holds.is_empty():
 				var replaceable: bool = (prison != null and u.ability_ready(prison) \
 					and u.resource >= prison.cost + lance.cost and cryo_mark != null) \
@@ -2741,10 +2773,6 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 					and _ability_usable(u, clasp) and cryo_mark != null \
 					and not _holds.is_empty() and cryo_mark.attack > _holds[0].attack:
 				return [clasp, cryo_mark]
-			var shat := _find_ability(u, "Shatter")
-			if shat != null and u.resource >= shat.cost and u.ability_ready(shat) \
-					and _ability_usable(u, shat) and _holds.size() >= 2:
-				return [shat, _holds[0]]
 			if u.passive_id == "permafrost" and cryo_mark != null:
 				return [u.abilities[0], cryo_mark]       # Frostbolt the mark
 			return [u.abilities[0], target_foe]          # basic bolt
@@ -3254,8 +3282,14 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# Still Mind ranks).
 	if ab.special == "stabilize" and u.second_resource <= 2 + u.still_mind_ranks:
 		return false
-	# Overcharge: the limit only breaks once per battle.
+	# Overcharge: the storm only feeds on itself once per battle.
 	if ab.special == "overcharge" and u.overcharged:
+		return false
+	# DEATH RAY (Batch AT): THE 5-STACK GATE. Greyed out for the first four
+	# turns and then the only thing he wants to press — escalation expressed as
+	# an action rather than as a passive drift. It consumes NOTHING, so the gate
+	# is the only thing that ever stands between him and the button.
+	if ab.display_name == "Death Ray" and u.second_resource < DEATH_RAY_STACKS:
 		return false
 	return true
 
@@ -3288,7 +3322,12 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	if ab.special == "stabilize" and u.second_resource <= 2 + u.still_mind_ranks:
 		ab_btn.tooltip_text += "\n(Requires more than %d Resonance)" % (2 + u.still_mind_ranks)
 	if ab.special == "overcharge" and u.overcharged:
-		ab_btn.tooltip_text += "\n(Already Overcharged)"
+		ab_btn.tooltip_text += "\n(Already Overcharged this battle)"
+	# Death Ray's gate has to SAY so, or a button dark for four turns reads as
+	# a bug rather than as the ramp it is measuring.
+	if ab.display_name == "Death Ray" and u.second_resource < DEATH_RAY_STACKS:
+		ab_btn.tooltip_text += "\n(Requires %d Resonance — you have %d)" % [
+			DEATH_RAY_STACKS, u.second_resource]
 	_mark_upgraded(ab_btn, u, ab)
 	ab_btn.disabled = not _ability_usable(u, ab)
 	ab_btn.pressed.connect(_on_popup_ability.bind(popup, ab))
@@ -3505,7 +3544,7 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 	if ab.damage > 0:
 		var buff_mult := 1.0
 		if u.second_resource_name == "Resonance":
-			buff_mult *= 1.0 + (0.15 + 0.02 * u.conduit_ranks) * _resonance_power(u)
+			buff_mult *= _resonance_dmg_mult(u)
 		if u.has_status("surge"):
 			buff_mult *= 1.2
 		if u.has_status("empower"):
@@ -3999,6 +4038,16 @@ const MISS_CHANCE := 0.05
 const PARRY_CHANCE := 0.05        # hero baseline
 const ENEMY_PARRY_CHANCE := 0.025 # enemy baseline (half the hero rate)
 const CRIT_CHANCE := 0.10
+# Death Ray's gate (Batch AT) — THE one place the 5-stack line is decided, read
+# by `_ability_usable`, its tooltip affordance and the bot's rotation.
+const DEATH_RAY_STACKS := 5
+# Where the bot decides Overcharge is finally worth a turn. A BOT POLICY NUMBER,
+# not a design one — Overcharge itself has no threshold.
+const OVERCHARGE_BOT_STACKS := 8
+# Where the bot stops preferring Ice Lance and starts preferring Shatter. ALSO A
+# BOT POLICY NUMBER: it sits just past the crossover (three turns held is worth
+# less than the Lance's 35% plus its stack bonus; five is worth more).
+const SHATTER_BOT_TURNS := 5
 
 
 func _miss_chance(attacker: BattleUnit, defender: BattleUnit = null) -> float:
@@ -4087,6 +4136,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		elif ab.display_name == "Detonation" and attacker.fuse_ranks > 0 \
 				and randf() < 0.15 * attacker.fuse_ranks:
 			_log("   → Talent: Fuse — Detonation's cooldown resets", "#b0a8e0")
+		# TERMINAL VELOCITY (Batch AT): deep enough into Runaway Resonance, the
+		# payoff nuke stops having a cooldown at all. The Overload lane's answer
+		# to "what does the late game look like" — he just keeps pressing it.
+		elif ab.display_name == "Death Ray" and attacker.terminal_velocity > 0 \
+				and attacker.second_resource >= attacker.terminal_velocity:
+			_log("   → Talent: Terminal Velocity — Death Ray has no cooldown", "#b0a8e0")
 		else:
 			attacker.start_cooldown(ab)
 	var dmg_mult := {"perfect": 1.15, "good": 1.0, "fail": 0.6}[grade] as float
@@ -4223,6 +4278,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# second Barrage next turn starts from a clean board.
 		var _spread_struck := {}
 		var any_crit := false
+		# Critical Mass's third-crit trips, counted here and PAID AFTER the
+		# strike loop (Batch AT). It must not pay inside the loop: granting
+		# Resonance mid-cast would let the compounding curve read the new stack
+		# count on the very hit that earned it — the ordering trap AG fixed for
+		# Detonation and AR for Pressure Cooker, arriving through a third door.
+		var crit_mass_trips := 0
 		for hit_i in total_hits:
 			var strike_target: BattleUnit
 			if ab.random_hits > 0:
@@ -4493,11 +4554,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Pommel Strike carries its own keen 25% crit base.
 			var crit_chance := (0.25 if ab.display_name == "Pommel Strike" else CRIT_CHANCE) \
 				+ (0.25 if strike_target.broken else 0.0)
-			# Resonant Mind: +3% crit per Resonance stack (Arcane Mastery
-			# deepens it by +1%/rank; Overcharge weights stacks 6-8).
+			# RUNAWAY RESONANCE, CLAUSE 3: +1% crit per stack, LINEAR and
+			# deliberately so — one stable term a player can hold in their head
+			# beside two that compound. The Rune of the Wide Current is the only
+			# thing that deepens it now (arcane_mastery_ranks is rune-only).
 			if attacker.second_resource_name == "Resonance":
-				crit_chance += (0.03 + 0.01 * attacker.arcane_mastery_ranks) \
-					* _resonance_power(attacker)
+				crit_chance += (0.01 + 0.01 * attacker.arcane_mastery_ranks) \
+					* attacker.second_resource
 			crit_chance += attacker.crit_bonus
 			# Pack Bond (Aguila): the eagle's eyes serve the whole party
 			# (+10% crit, scaled by the bond tier — doubled/tripled/half).
@@ -4576,24 +4639,34 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if ab.display_name == "Ice Lance":
 					crit_mult += 0.01 * attacker.piercing_ice_ranks
 				raw *= crit_mult
-				# Critical Mass: every 3rd crit detonates harder and pays Mana.
-				if attacker.critical_mass_ranks > 0:
+				# CRITICAL MASS — TWO CLAUSES, ONE STREAK. The NODE builds
+				# Resonance on every third crit (critical_mass_stacks, Batch
+				# AT); the RUNE of the Wide Current still pays the OLD clause,
+				# +20% damage and Mana (critical_mass_ranks, rune-only now, read
+				# site deliberately kept per §4). Both ride the same counter, so
+				# a hero holding both gets ONE third-crit proc paying both
+				# halves rather than two counters drifting apart.
+				if attacker.critical_mass_ranks > 0 \
+						or attacker.critical_mass_stacks > 0:
 					attacker.crit_streak += 1
 					if attacker.crit_streak >= 3:
 						attacker.crit_streak = 0
-						raw *= 1.0 + 0.20 * attacker.critical_mass_ranks
-						var cm_mana := int(round(attacker.max_resource
-							* 0.10 * attacker.critical_mass_ranks))
-						attacker.resource = mini(attacker.resource + cm_mana,
-							attacker.max_resource)
-						attacker.float_text("+%d Mana" % cm_mana, Color(0.5, 0.7, 1.0))
-						attacker.refresh_bars()
-						_log("   → Talent: Critical Mass — +%d%% damage, +%d Mana" % [
-							20 * attacker.critical_mass_ranks, cm_mana], "#b0a8e0")
-			# Attacker-side modifiers (Conduit deepens the base 15%/stack).
+						crit_mass_trips += 1
+						if attacker.critical_mass_ranks > 0:
+							raw *= 1.0 + 0.20 * attacker.critical_mass_ranks
+							var cm_mana := int(round(attacker.max_resource
+								* 0.10 * attacker.critical_mass_ranks))
+							attacker.resource = mini(attacker.resource + cm_mana,
+								attacker.max_resource)
+							attacker.float_text("+%d Mana" % cm_mana, Color(0.5, 0.7, 1.0))
+							attacker.refresh_bars()
+							_log("   → Rune: Critical Mass — +%d%% damage, +%d Mana" % [
+								20 * attacker.critical_mass_ranks, cm_mana], "#b0a8e0")
+			# RUNAWAY RESONANCE, CLAUSE 2 (attacker side): the COMPOUNDING
+			# damage curve. Conduit and Singularity move its step; nothing caps
+			# it. See BattleUnit.resonance_curve for the arithmetic.
 			if attacker.second_resource_name == "Resonance":
-				raw *= 1.0 + (0.15 + 0.02 * attacker.conduit_ranks) \
-					* _resonance_power(attacker)
+				raw *= _resonance_dmg_mult(attacker)
 			if attacker.has_status("surge"):
 				raw *= 1.2
 			if attacker.has_status("wrath"):
@@ -4609,23 +4682,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Dark Infusion: the Occultist feeds on the enemy team's afflictions.
 			if attacker.infusion_ranks > 0:
 				raw *= 1.0 + 0.02 * attacker.infusion_ranks * _unique_enemy_debuffs()
-			# Arcane Cannon: the damage (not the recoil) grows with Resonance
-			# (Cannoneer deepens the base 7.5%/stack).
-			if ab.display_name == "Arcane Cannon":
-				raw *= 1.0 + (0.075 + 0.025 * attacker.cannoneer_ranks) \
-					* attacker.second_resource
-			# Magi's Wrath: the storm feeds on banked Resonance.
-			if ab.display_name == "Magi's Wrath":
-				raw *= 1.0 + 0.04 * attacker.second_resource
-			# Volatility: the big spenders escalate — recoil rises to match
-			# (the bill lands in the recoil block).
-			if attacker.volatility_ranks > 0 \
-					and ab.display_name in ["Arcane Cannon", "Magi's Wrath"]:
-				raw *= 1.0 + 0.05 * attacker.volatility_ranks
+			# THE PER-STACK TERMS ON ARCANE CANNON AND MAGI'S WRATH ARE GONE
+			# (Batch AT §2), AND THIS IS THE TRAP THE BATCH EXISTS AROUND: the
+			# passive compounds now, so an ability-side "+x% per stack" would
+			# multiply a curve by a slope and SQUARE the escalation. Cannon
+			# keeps BD = 5 x stacks (Break is a different axis, see the
+			# pressure block) and its 15% recoil; Wrath keeps 2.5 x stacks.
+			# DO NOT re-add a per-stack damage term to either one.
+			#
+			# Volatility: the Cannon alone now, and it is a bigger bill as well
+			# as a bigger blow — the recoil SET lands in the recoil block.
+			if attacker.volatility_ranks > 0 and ab.display_name == "Arcane Cannon":
+				raw *= 1.0 + 0.01 * attacker.volatility_ranks
 			# Suppressing Fire: every Barrage bolt bites harder than the last.
+			# ADDITIVE — the counter is percentage POINTS of Attack per bolt.
 			if ab.display_name == "Arcane Barrage" and attacker.suppressing_ranks > 0 \
 					and hit_i > 0:
-				raw += 0.0025 * attacker.suppressing_ranks * hit_i * attacker.attack
+				raw += 0.01 * attacker.suppressing_ranks * hit_i * attacker.attack
 			# Frostbolt / Razor Ice perfects: flat 25% of Attack instead.
 			if is_perfect and ab.display_name in ["Frostbolt", "Razor Ice"]:
 				raw = 0.25 * attacker.attack * randf_range(0.9, 1.1)
@@ -4639,13 +4712,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# unreachable but kept, the AR vault pattern.
 			if ab.display_name == "Frostbolt" and attacker.emp_frostbolt_ranks > 0:
 				raw += 0.02 * attacker.emp_frostbolt_ranks * attacker.attack
-			# Shatter: 10% of Attack PER Chilled stack the held enemy CARRIED.
-			# The release runs after the whole strike loop for exactly this
-			# reason — releasing first would drop every pile to 1 and the
-			# capstone would be paid on the ashes (the ordering trap AG fixed
-			# for Detonation, arriving through a different door).
+			# SHATTER: 10% of Attack PER TURN THE HELD ENEMY SPENT HELD, capped
+			# at 12 (Batch AT §8 — it used to read Chilled stacks, which under an
+			# indefinite hold are pinned at 4 for everyone and so made Shatter a
+			# more expensive Ice Lance). `ab.damage` is the 10, so this multiplies
+			# by the charge. The release still runs AFTER the whole strike loop
+			# for the same reason it always did: releasing first would zero the
+			# very counter the capstone is paid on (the ordering trap AG fixed for
+			# Detonation, arriving through a third door).
 			if ab.display_name == "Shatter":
-				raw *= maxi(strike_target.status_stacks("chilled"), 1)
+				raw *= float(clampi(strike_target.hold_turns, 1, SHATTER_TURN_CAP))
 			# Ice Lance: the stored cold detonates — +5% of Attack per Chilled
 			# stack on the target, and Crystal Edge deepens the take. ADDITIVE:
 			# the counter is percentage POINTS on top of the base 5.
@@ -4921,13 +4997,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						and strike_target.status_power("hunt_mark") == heroes.find(attacker):
 					raw *= 1.25
 			raw *= 1.0 + attacker.dmg_bonus + float(attacker.type_dmg_bonus.get(ab.dmg_type, 0.0))
-			# Target-side modifiers. Arcane Ward softens the Resonance penalty
-			# (5% → 2%/stack); Singularity stops it rising past 5 stacks.
+			# RUNAWAY RESONANCE, CLAUSE 2 (target side): the same compounding
+			# curve at half the step, and NOTHING SOFTENS IT — Arcane Ward is
+			# gone and Singularity no longer caps it. That is the whole bargain:
+			# at five stacks he is WEAKER than he used to be, and by twelve he
+			# has roughly doubled while taking +59%.
 			if strike_target.second_resource_name == "Resonance":
-				var res_pen := _resonance_power(strike_target)
-				if strike_target.singularity > 0:
-					res_pen = minf(res_pen, 5.0)
-				raw *= 1.0 + (0.05 - 0.01 * strike_target.arcane_ward_ranks) * res_pen
+				raw *= _resonance_taken_mult(strike_target)
 			# Savage Presence (Ursus): the bear stands between the hunter and
 			# harm — 10% less damage taken, scaled by the bond tier.
 			if strike_target.is_hero and strike_target.passive_id == "pack":
@@ -5122,9 +5198,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				and attacker.second_resource > 0
 			var pr := int(round(ab.pressure * pr_mult * (1.5 if is_crit else 1.0)))
 			# Arcane Cannon / Magi's Wrath: Break damage IS the banked Resonance
-			# (5 / 2.5 BD per stack, in place of a flat pressure value).
+			# (5 / 2.5 BD per stack, in place of a flat pressure value). THIS IS
+			# THE AXIS THE PER-STACK DAMAGE TERMS LEFT INTACT — Cannoneer moves
+			# Cannon's rate 5 -> 9 and is ADDITIVE (the counter is the increase).
 			if ab.display_name == "Arcane Cannon":
-				pr = int(round(5.0 * attacker.second_resource * pr_mult \
+				pr = int(round((5.0 + attacker.cannoneer_ranks) \
+					* attacker.second_resource * pr_mult \
 					* (1.5 if is_crit else 1.0)))
 			if ab.display_name == "Magi's Wrath":
 				pr = int(round(2.5 * attacker.second_resource * pr_mult \
@@ -5327,13 +5406,33 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							_log("† %s dies" % ok_t.unit_name, "#e05050")
 							_on_enemy_death(ok_t)
 			# On the Edge (talent): surviving a blow at the brink feeds the storm.
+			# BACKLASH (Batch AT): the Entropy lane's engine — being hit IS a
+			# build action. It fires before On the Edge so a hit that crosses
+			# the brink pays both, which is the lane working as designed.
 			if strike_target.is_hero and not result.died \
-					and strike_target.on_edge_ranks > 0 \
-					and strike_target.hp < strike_target.max_hp \
-					* (0.20 + 0.05 * strike_target.on_edge_ranks):
+					and strike_target.backlash_stacks > 0 \
+					and strike_target.second_resource_name == "Resonance":
+				_log("   → Talent: Backlash — %s turns the blow into Resonance" % \
+					strike_target.unit_name, "#b0a8e0")
+				_gain_resonance(strike_target, strike_target.backlash_stacks)
+			# ON THE EDGE, and the ONE place the node and the rune are reconciled.
+			# The node writes on_edge_threshold (a health PERCENTAGE, 35) and
+			# on_edge_stacks (the payout, 4). The Rune of the Wide Current keeps
+			# its own term `rune_on_edge_ranks` and reproduces the OLD formula
+			# exactly — threshold 20 + 5/rank, one stack per rank — because a
+			# threshold cannot be summed the way a magnitude can (35 + 25 = 60%
+			# is not "both effects", it is a third effect neither one asked for).
+			# THE THRESHOLD TAKES THE MAX; THE PAYOUT SUMS, so each half pays its
+			# advertised number alone AND stacked (the AK/AL repair rule).
+			var oe_rune_thr := (20.0 + 5.0 * strike_target.rune_on_edge_ranks) \
+				if strike_target.rune_on_edge_ranks > 0 else 0.0
+			var oe_thr := maxf(strike_target.on_edge_threshold, oe_rune_thr)
+			var oe_gain := strike_target.on_edge_stacks + strike_target.rune_on_edge_ranks
+			if strike_target.is_hero and not result.died and oe_gain > 0 \
+					and strike_target.hp < strike_target.max_hp * 0.01 * oe_thr:
 				_log("   → Talent: On the Edge — %s draws power from the brink" % \
 					strike_target.unit_name, "#b0a8e0")
-				_gain_resonance(strike_target, 1)
+				_gain_resonance(strike_target, oe_gain)
 			if is_crit:
 				_sfx("crit", -3.0)
 				strike_target.float_text("%d!" % final, Color(1.0, 0.45, 0.15), true)
@@ -5425,12 +5524,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if echoed:
 					_log("   → Umbral Sigil echoes %d to the warband" % echo, "#b070d0")
 			# Temporal Rift (talent): the crit tears a seam — an echo lashes out.
-			if is_crit and attacker.is_hero and attacker.temporal_ranks > 0 \
-					and randf() < 0.03 * attacker.temporal_ranks:
+			# BATCH AT MADE IT CERTAIN, not a roll: temporal_ranks is the echo's
+			# PERCENTAGE of the crit now, and the chance clause is gone. A coin
+			# flip on top of a crit is variance stacked on variance, and the one
+			# thing a compounding spec must not be is random.
+			if is_crit and attacker.is_hero and attacker.temporal_ranks > 0:
 				var rift_pool := enemies.filter(func(e): return not e.dead)
 				if not rift_pool.is_empty():
 					var rift_t: BattleUnit = rift_pool.pick_random()
-					var rift_dmg := maxi(int(round(final * 0.25)), 1)
+					var rift_dmg := maxi(int(round(final * 0.01
+						* attacker.temporal_ranks)), 1)
 					var rift_result: Dictionary = rift_t.take_hit(rift_dmg, 0)
 					rift_t.float_text("-%d Rift" % rift_dmg, Color(0.7, 0.5, 1.0))
 					_log("   → Talent: Temporal Rift — the crit echoes %d into %s" % [
@@ -5898,10 +6001,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				" [PERFECT]" if is_perfect else ""], "#70d878")
 		# Post-strike attacker effects (skipped if a counter felled the attacker).
 		var recoil_pct := ab.recoil_base
-		# Volatility: escalation's bill — Cannon and Wrath recoil harder.
-		if attacker.volatility_ranks > 0 \
-				and ab.display_name in ["Arcane Cannon", "Magi's Wrath"]:
-			recoil_pct += 0.05 * attacker.volatility_ranks
+		# Volatility: escalation's bill. It is a SET, not an add — the node says
+		# Cannon's recoil "rises to 25%", so volatility_recoil IS the new
+		# percentage and Cannon is the only ability it touches (Batch AT).
+		if attacker.volatility_recoil > 0 and ab.display_name == "Arcane Cannon":
+			recoil_pct = 0.01 * attacker.volatility_recoil
 		# Magi's Wrath: spreading the storm dissipates its backlash.
 		if ab.display_name == "Magi's Wrath":
 			recoil_pct = maxf(recoil_pct - 0.03 * enemies_struck, 0.0)
@@ -5930,15 +6034,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							_log("† %s dies" % h.unit_name, "#e05050")
 			# Feedback Loop (talent): part of the backlash is paid as Mana
 			# instead of health (pairs with Conversion — self-harm into fuel).
-			if attacker.feedback_ranks > 0 and attacker.resource_name == "Mana":
-				var fb_mana := mini(int(round(recoil * 0.10 * attacker.feedback_ranks)),
+			# ADDITIVE — the counter is percentage POINTS of the recoil.
+			# PERFECT CONVERSION (capstone) takes ALL of it: his self-harm stops
+			# being harm, which is the natural end of the Entropy lane. It is
+			# folded in here rather than given its own block so there is exactly
+			# ONE place the recoil-into-Mana rate is decided.
+			var fb_pct := 0.01 * attacker.feedback_ranks
+			if attacker.perfect_conversion > 0:
+				fb_pct = 1.0
+			if fb_pct > 0.0 and attacker.resource_name == "Mana":
+				var fb_mana := mini(int(round(recoil * fb_pct)),
 					mini(attacker.resource, recoil))
 				if fb_mana > 0:
 					attacker.resource -= fb_mana
 					recoil -= fb_mana
 					attacker.float_text("-%d Mana" % fb_mana, Color(0.5, 0.7, 1.0))
-					_log("   → Talent: Feedback Loop — %d of the recoil paid as Mana" % \
-						fb_mana, "#b0a8e0")
+					_log("   → Talent: %s — %d of the recoil paid as Mana" % [
+						"Perfect Conversion" if attacker.perfect_conversion > 0 \
+							else "Feedback Loop", fb_mana], "#b0a8e0")
 			var recoil_died := attacker.take_tick_damage(recoil, "-%d Recoil" % recoil,
 				Color(1.0, 0.4, 0.5))
 			_log("   → %s recoils for %d" % [attacker.unit_name, recoil], "#e08850")
@@ -5947,6 +6060,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_sfx("death", -4.0)
 				_message("%s is consumed by their own power!" % attacker.unit_name)
 				_log("† %s dies" % attacker.unit_name, "#e05050")
+		# SIPHON (Batch AT): the Entropy lane's Mana income, and the reason
+		# losing Stabilize does not starve him — he drinks Mana out of the
+		# damage he deals instead of out of stacks he vents. ADDITIVE, the
+		# counter is percentage POINTS of the damage dealt.
+		if attacker.siphon_ranks > 0 and total_dealt > 0 \
+				and attacker.resource_name == "Mana" and not attacker.dead:
+			var sip := maxi(int(round(total_dealt * 0.01 * attacker.siphon_ranks)), 1)
+			var sip_was := attacker.resource
+			attacker.resource = mini(attacker.resource + sip, attacker.max_resource)
+			var sip_got := attacker.resource - sip_was
+			if sip_got > 0:
+				attacker.float_text("+%d Mana" % sip_got, Color(0.5, 0.7, 1.0))
+				attacker.refresh_bars()
+				_log("   → Talent: Siphon — %s draws %d Mana from the wound" % [
+					attacker.unit_name, sip_got], "#b0a8e0")
 		if ab.lifesteal > 0.0 and total_dealt > 0 and not attacker.dead:
 			var leech := int(total_dealt * ab.lifesteal * (1.5 if is_perfect else 1.0))
 			attacker.heal_amount(leech)
@@ -6121,22 +6249,41 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# Resonance builds only on the Mage's own casts — parry counters don't
 		# count (they made the Mage "start" battles with a stack).
 		if not is_counter:
-			# Charged Bolts (talent): a damaging cast made AT the ceiling
-			# vents power as Mana (checked before the gain lands).
+			# Charged Bolts (talent): there is no ceiling to sit at any more, so
+			# it pays for the stacks he is HOLDING — 5% of max Mana per 4 stacks
+			# (Batch AT). Checked BEFORE this cast's gain lands, so the number is
+			# what he was carrying when he pressed the button.
 			if attacker.second_resource_name == "Resonance" \
 					and attacker.charged_bolts_ranks > 0 \
-					and attacker.second_resource >= attacker.second_max:
-				var cb_mana := maxi(int(round(attacker.max_resource * 0.05
-					* attacker.charged_bolts_ranks)), 1)
+					and attacker.second_resource >= 4:
+				var cb_mana := maxi(int(round(attacker.max_resource * 0.01
+					* attacker.charged_bolts_ranks
+					* float(attacker.second_resource / 4))), 1)
 				attacker.resource = mini(attacker.resource + cb_mana,
 					attacker.max_resource)
 				attacker.float_text("+%d Mana" % cb_mana, Color(0.5, 0.7, 1.0))
 				_log("   → Talent: Charged Bolts — %s recovers %d Mana" % [
 					attacker.unit_name, cb_mana], "#b0a8e0")
-			var res_gain := 2 if any_crit else 1
-			# Harmonics (talent): the free basic ramps the engine faster.
+			# THE BUILD RATE, and every Resonance-lane node that moves it. Base
+			# is 1 per damaging cast, 2 on a crit; Attunement raises the crit
+			# figure, Harmonics the free basic, Resonant Core the first cast of
+			# each turn, Cascade every cast once he is 10 deep, and Critical
+			# Mass pays out its third-crit trips HERE rather than mid-loop.
+			var res_gain := (2 + attacker.attunement_crit) if any_crit else 1
 			if ab.display_name == "Arcane Explosion" and attacker.harmonics_ranks > 0:
 				res_gain += attacker.harmonics_ranks
+			if attacker.resonant_core_ranks > 0 and not attacker.res_cast_this_turn:
+				res_gain += attacker.resonant_core_ranks
+			# CASCADE — the Resonance lane's thesis: the curve gets steeper the
+			# higher it already is.
+			if attacker.cascade_stacks > 0 and attacker.second_resource >= 10:
+				res_gain += attacker.cascade_stacks
+			if crit_mass_trips > 0 and attacker.critical_mass_stacks > 0:
+				res_gain += crit_mass_trips * attacker.critical_mass_stacks
+				_log("   → Talent: Critical Mass — the third crit detonates into Resonance",
+					"#b0a8e0")
+			if attacker.second_resource_name == "Resonance":
+				attacker.res_cast_this_turn = true
 			_gain_resonance(attacker, res_gain)
 		# Rampage: a kill lets it surge onward — an immediate free recast on
 		# another enemy. Batch AJ put a CAP on it: once per turn, or twice if
@@ -6216,6 +6363,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 # the same list and cannot disagree.
 const HOLD_WINDOW := 15         # +% damage a held enemy takes, from all sources
 const HOLD_RELEASE_STACKS := 1  # what a released enemy comes back on
+# SHATTER SCALES ON TIME HELD, NOT STACKS HELD (Batch AT §8). AS reported it
+# never firing and correctly called that a design tension rather than a bot bug:
+# Shatter (Thaw) and Absolute Zero (Deep Freeze) are both capstones and only one
+# is takeable, so at a hold limit of one Shatter and Ice Lance did the same job
+# and the Lance was cheaper. Charging on TURNS resolves it without touching
+# either capstone — at three turns held it is worth less than Ice Lance's 35%
+# plus its stack bonus, the crossover sits around turn four or five, and past
+# that the Lance can never match it. THE HOLD STOPS BEING A BINARY STATE AND
+# BECOMES A CHARGE, which is right for a spec whose currency is time.
+const SHATTER_PER_TURN := 10    # % of Attack per turn a released enemy spent held
+const SHATTER_TURN_CAP := 12    # and the ceiling on that count
+# THE COUNTER BELONGS TO THE HELD ENEMY (BattleUnit.hold_turns) AND IS ADVANCED
+# IN EXACTLY ONE PLACE — `_hold_sync`, walking `_holds`. It is deliberately NOT a
+# dictionary parked beside `_holds`: that would be a second answer to "is this
+# held" and the two could disagree. Because only `_hold_sync` writes it, and it
+# only ever walks the ledger, a counter can never advance on an enemy that is not
+# in a prison — and it advances ONCE PER TURN, not once per unit per turn.
 
 
 func _is_held(u: BattleUnit) -> bool:
@@ -6233,7 +6397,11 @@ func _hold_tooltip(timed: bool) -> String:
 	else:
 		out += "It thaws only when the Cryomancer lets it:\n"
 		out += "Ice Lance, Shatter, or a new freeze past his limit.\n"
-		out += "Ally damage, his own Blizzard and time do NOTHING."
+		out += "Ally damage, his own Blizzard and time do NOTHING.\n"
+		# Batch AT §8: the chip counts, so the tooltip has to say what the
+		# count BUYS — otherwise the number on the nameplate is decoration.
+		out += "The number is TURNS HELD: Shatter pays %d%% of\n" % SHATTER_PER_TURN
+		out += "Attack per turn on release (max %d)." % SHATTER_TURN_CAP
 	return out
 
 
@@ -6271,6 +6439,9 @@ func _hold_freeze(target: BattleUnit, src: BattleUnit) -> void:
 			"#7cc8f0")
 		return
 	_holds.append(target)
+	# A fresh prison starts on a fresh charge (Batch AT §8) — an enemy released
+	# and re-frozen has not been held for the sum of both stints.
+	target.hold_turns = 0
 	# The pile stays MAXED while he holds it — the ember belongs to the
 	# release, not to the freeze (Absolute Zero's old "keeps all 4" clause is
 	# redundant under an indefinite hold, which is why it was re-specced).
@@ -6392,6 +6563,14 @@ func _hold_sync() -> void:
 			# cannot reach a hold — see _cleansable_debuffs — but a later
 			# batch might add a door this catches).
 			_hold_release(u, "the ice runs out")
+		else:
+			# THE CHARGE (Batch AT §8). One increment per turn per prison, at
+			# the top of the turn, on the one pass that already walks the ledger.
+			# The chip is rewritten with it, because a charge the player cannot
+			# see is a decision they cannot make.
+			u.hold_turns = mini(u.hold_turns + 1, SHATTER_TURN_CAP)
+			u.update_status("frozen", "HELD %d" % u.hold_turns,
+				_hold_tooltip(u.is_boss))
 
 
 # `force` is the ONE way past the boss immunity, and it exists for exactly
@@ -6719,35 +6898,26 @@ func _party_crit_bonus() -> float:
 	return best
 
 
-# Arcane Resonance: builds on damaging casts (2 on crit via Arcane Instability);
-# every gain at max stacks triggers Backlash Ward (+15 Mana). Stacks persist
-# until Stabilize vents the ones above its floor. Overcharge raises the cap.
+# RUNAWAY RESONANCE (Batch AT), CLAUSE 1: NO CEILING, and nothing removes it.
+# It builds 1 per damaging cast and 2 on a crit, it persists to the end of the
+# battle, and `second_max` is a sentinel 99 nothing is meant to reach.
+#
+# DELETED WITH THEIR PREMISE, not left unreachable: UNLIMITED POWER (overflow AT
+# a cap) and BACKLASH WARD (+15 Mana on every gain at the cap). Both existed
+# only to answer "what happens when the ramp runs out of room", and the answer
+# now is that it never does. The one thing that still takes stacks away is an
+# EARNED Stabilize — a deliberate exception a player buys out of the spec pool.
 func _gain_resonance(caster: BattleUnit, stacks: int) -> void:
 	if caster.second_resource_name != "Resonance":
 		return
 	var before := caster.second_resource
-	# Unlimited Power: overflow at the cap converts into permanent power.
-	if before >= caster.second_max and caster.unlimited_ranks > 0:
-		caster.unlimited_surges += 1
-		caster.dmg_bonus += 0.02 * caster.unlimited_ranks
-		var up_mana := int(round(caster.max_resource * 0.02 * caster.unlimited_ranks))
-		caster.max_resource += up_mana
-		var up_pct := 2 * caster.unlimited_ranks * caster.unlimited_surges
-		var up_desc := "Unlimited Power: Resonance overflow —\ncurrently +%d%% damage and +%d%% maximum\nMana (all battle)." % [up_pct, up_pct]
-		if not caster.update_status("unlimited", "+%d%%" % up_pct, up_desc):
-			caster.add_status("unlimited", "Unlimited Power", "+%d%%" % up_pct,
-				Color(0.85, 0.55, 1.0), -1, up_desc)
-		caster.float_text("UNLIMITED POWER +%d%%" % (2 * caster.unlimited_ranks),
-			Color(0.85, 0.55, 1.0))
-		_log("   → Talent: Unlimited Power — %s overflows (+%d%% damage, +%d max Mana)" % [
-			caster.unit_name, 2 * caster.unlimited_ranks, up_mana], "#b0a8e0")
-		caster.refresh_bars()
-		return
 	caster.second_resource = mini(caster.second_resource + stacks, caster.second_max)
 	var gained := caster.second_resource - before
 	if gained > 0:
 		caster.float_text("+%d Resonance" % gained, Color(0.8, 0.5, 1.0))
-		# Mana Attunement: every stack gained drips Mana back.
+		# Mana Attunement — NO NODE AND NO RUNE writes this (Batch AT): Siphon
+		# took its lane slot. Kept, gated and reported rather than deleted, the
+		# AR vault pattern, so a later batch can re-node or remove it on purpose.
 		if caster.mana_attune_ranks > 0:
 			var att_mana := int(round(caster.max_resource * 0.02
 				* caster.mana_attune_ranks * gained))
@@ -6756,23 +6926,18 @@ func _gain_resonance(caster: BattleUnit, stacks: int) -> void:
 				caster.float_text("+%d Mana" % att_mana, Color(0.5, 0.7, 1.0))
 				_log("   → Talent: Mana Attunement — %s sips %d Mana" % [
 					caster.unit_name, att_mana], "#b0a8e0")
-	# Backlash Ward: EVERY gain at max stacks restores Mana (Batch P) — the
-	# ramp keeps paying in a different currency once it can't pay in stacks.
-	# Unlimited Power's overflow branch above still takes priority.
-	if caster.second_resource == caster.second_max:
-		caster.resource = mini(caster.resource + 15, caster.max_resource)
-		caster.float_text("Backlash Ward +15 Mana", Color(0.5, 0.7, 1.0))
-		_log("   → Backlash Ward: %s restores 15 Mana" % caster.unit_name, "#b0a8e0")
 	caster.refresh_bars()
 
 
-# Effective Resonance weight: Overcharge makes stacks 6-8 count for 1.5x
-# (1.65x on a perfect cast) toward the passive's per-stack bonuses.
-func _resonance_power(u: BattleUnit) -> float:
-	var stacks := float(u.second_resource)
-	if u.overcharged and stacks > 5.0:
-		return 5.0 + (stacks - 5.0) * u.overcharge_mult
-	return stacks
+# THE TWO READ SITES OF THE COMPOUNDING CURVE. Both delegate to BattleUnit so
+# the nameplate, the ability tooltip and the damage path can never disagree —
+# there is exactly one implementation of N(N+1)/2 in the codebase.
+func _resonance_dmg_mult(u: BattleUnit) -> float:
+	return 1.0 + u.resonance_dmg_bonus()
+
+
+func _resonance_taken_mult(u: BattleUnit) -> float:
+	return 1.0 + u.resonance_taken_bonus()
 
 
 # Mercy (Holy passive): +5% healing done per stack currently held (Heavenly
@@ -8408,13 +8573,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# Vents the Resonance stacks ABOVE the floor (2, raised by Still
 			# Mind): Mana back and a damage-reduction ward per stack consumed.
 			# A tactical valve, not a reset — the engine keeps running (Batch P).
+			# Batch AT: MASTER OF MOMENTS IS GONE — free venting was the most
+			# anti-escalation node in the game, and its id carries Perfect
+			# Conversion now. Stabilize ALWAYS consumes, which is what makes
+			# earning it a real decision rather than a free button.
 			var st_floor := 2 + attacker.still_mind_ranks
 			var st_stacks := attacker.second_resource - st_floor
-			if attacker.master_moments > 0:
-				# Master of Moments: full value from every stack, none consumed.
-				st_stacks = attacker.second_resource
-			else:
-				attacker.second_resource = st_floor
+			attacker.second_resource = st_floor
 			var st_mana := 5 * st_stacks
 			attacker.resource = mini(attacker.resource + st_mana, attacker.max_resource)
 			var st_dr := 10 * st_stacks
@@ -8430,27 +8595,27 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.float_text("+%d" % st_heal, Color(0.4, 0.9, 0.45))
 			attacker.refresh_bars()
 			_message("%s stabilizes!" % attacker.unit_name)
-			if attacker.master_moments > 0:
-				_log("%s: Stabilize (Master of Moments) — %d stacks channelled, none consumed: +%d Mana, -%d%% damage taken (2 turns)" % [
-					attacker.unit_name, st_stacks, st_mana, st_dr], "#b085e0")
-			else:
-				_log("%s: Stabilize — %d stacks vented (%d remain): +%d Mana, -%d%% damage taken (2 turns)" % [
-					attacker.unit_name, st_stacks, attacker.second_resource,
-					st_mana, st_dr], "#b085e0")
+			_log("%s: Stabilize — %d stacks vented (%d remain): +%d Mana, -%d%% damage taken (2 turns)" % [
+				attacker.unit_name, st_stacks, attacker.second_resource,
+				st_mana, st_dr], "#b085e0")
 		"overcharge":
+			# RE-SPECCED (Batch AT): raising a cap to 8 is meaningless once
+			# there is no cap, so it COMPOUNDS THE RAMP instead — gain Resonance
+			# equal to half the stacks he already holds (all of them on a
+			# perfect). At ten stacks that is five; at twenty it is ten. Once
+			# per battle, which is what `overcharged` now means.
 			attacker.overcharged = true
-			attacker.overcharge_mult = 1.65 if is_perfect else 1.5
-			# Resonant Core raises both ceilings; Singularity has none to raise.
-			if attacker.singularity == 0:
-				attacker.second_max = 8 + attacker.resonant_core_ranks
+			attacker.overcharge_mult = 1.0 if is_perfect else 0.5
+			var oc_gain := int(floor(attacker.second_resource * attacker.overcharge_mult))
 			_sfx("perfect", -6.0, 0.8)
 			_apply_status(attacker, "overcharged", -1)
+			if oc_gain > 0:
+				_gain_resonance(attacker, oc_gain)
 			attacker.refresh_bars()
 			_message("%s OVERCHARGES!" % attacker.unit_name)
-			_log("%s: Overcharge — max Resonance is now %s; stacks beyond 5 weigh %.2fx" % [
-				attacker.unit_name,
-				("unlimited" if attacker.singularity > 0 else str(attacker.second_max)),
-				attacker.overcharge_mult], "#b085e0")
+			_log("%s: Overcharge — the storm feeds on itself: +%d Resonance (now %d)%s" % [
+				attacker.unit_name, oc_gain, attacker.second_resource,
+				" [PERFECT]" if is_perfect else ""], "#b085e0")
 		"holy_heal":
 			# 40% of the CASTER's max health, Mercy-scaled; Triage can crit;
 			# Holy Capacitor releases its stored overheal here.

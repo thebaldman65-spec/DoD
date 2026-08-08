@@ -166,7 +166,11 @@ const SPEC_POOLS := {
 	# Overburn and so can only ever be a spec pick.
 	"pyromancer": ["Immolate", "Firestorm"],
 	"cryomancer": ["Rime", "Shatter"],
-	"arcanist": ["Overcharge", "Magi's Wrath"],
+	# Batch AT: STABILIZE joins the pool — it left the opening three because it
+	# is the escape hatch from the escalation, and earning it back is the right
+	# shape for a safety valve. Every entry here reads Resonance, so none of
+	# them can ever be class-pool-eligible (AH's curation rule).
+	"arcanist": ["Overcharge", "Magi's Wrath", "Stabilize"],
 	# Cleric. The three Mercy/Faith spenders can only ever be spec picks —
 	# a sibling has no stacks to pay them with.
 	"holy": ["Resurrection", "Divine Plea"],
@@ -387,6 +391,19 @@ static func trimmed_kit_ability(display_name: String) -> Ability:
 		# the stance — trimming it turned a quarter of his tree inert.
 		# Shatterpoint only accelerates a Break he reaches by other means,
 		# so it is the safe piece to make earnable.
+		# Batch AT: Stabilize came OUT of the Arcanist's opening three and into
+		# SPEC_POOLS["arcanist"]. It is the escape hatch from the ramp — it
+		# vents the very stacks Runaway Resonance exists to build — so it is a
+		# choice a player EARNS rather than a default they start holding. Its
+		# venting is the one thing that removes Resonance; the passive's "no
+		# ceiling, nothing removes it" describes the passive's own rules, and
+		# this is the exception the player buys deliberately.
+		"Stabilize":
+			return Ability.make({"display_name": "Stabilize", "cooldown": 3, "cost": 0,
+				"damage": 0, "pressure": 0, "special": "stabilize", "delay": 1.5,
+				"anim": "attack01",
+				"perfect_id": "", "perfect_text": "Also heals 5% of max health",
+				"description": "Vent the storm: consumes all\nResonance ABOVE 2 — +5 Mana and +10%\ndamage reduction (2 turns) per stack\nconsumed. Unusable at 2 or fewer."})
 		"Shatterpoint":
 			return Ability.make({"display_name": "Shatterpoint", "cost": 30,
 				"damage": 20, "pressure": 40, "delay": 3.0, "anim": "attack03",
@@ -717,14 +734,14 @@ const SPEC_INFO := {
 		"passive_desc": "Glacial Hold: Chilled stacks the Cryomancer applies never\nexpire, and a Frozen enemy stays Frozen INDEFINITELY — it\nleaves the turn order until he releases it with Ice Lance or\nShatter, or freezes past his limit (which frees the oldest).\nNothing else thaws it: not ally damage, not his own Blizzard,\nnot time. A held enemy takes +15% damage from all sources,\nand comes back on 1 stack of Chilled. He holds ONE enemy.\nBosses resist the freeze until Broken and shrug a hold after\none turn.",
 		"blurb": "Battlefield control — you decide when the enemy acts."},
 	# The Arcanist's health bar is a resource he spends (like the Devout's):
-	# Resonance bills him +5% damage taken per stack and Cannon recoils 15%,
-	# so he carries the class's biggest pool — and no armor to speak of,
+	# Resonance bills him a COMPOUNDING damage-taken penalty and Cannon recoils
+	# 15%, so he carries the class's biggest pool — and no armor to speak of,
 	# because raw energy in robes stops nothing that closes the distance.
 	"arcanist": {"name": "Arcanist", "constitution": 90, "archetype": "Ramp", "passive": "resonance",
 		"max_hp": 155, "armor": 0.06,
 		"resists": {"arcane": 0.20, "shadow": 0.10, "physical": -0.15},
-		"passive_desc": "Arcane Resonance: damaging casts build stacks (max 5) — each grants\n+15% damage and +3% crit but +5% damage taken. Max stacks trigger\nBacklash Ward (+15 Mana). Stacks persist until consumed.",
-		"blurb": "Unstable raw magic — stack the storm, then release it."},
+		"passive_desc": "Runaway Resonance: damaging casts build stacks (2 on a crit) with NO\nMAXIMUM, and nothing removes them. The bonuses COMPOUND: at N stacks\n+1.5% x N(N+1)/2 damage and +0.75% x N(N+1)/2 damage taken, plus a\nflat +1% crit per stack. 5 stacks = +22%/+11%; 12 = +117%/+59%.",
+		"blurb": "Unstable raw magic — nothing early, everything late."},
 	"holy": {"name": "Holy", "constitution": 100, "archetype": "Healer", "passive": "mercy",
 		"max_hp": 150, "armor": 0.10,
 		"resists": {"holy": 0.20, "shadow": -0.15},
@@ -887,22 +904,31 @@ static func spec_abilities(spec: String) -> Array:
 			]
 		"arcanist":
 			# Resonance-engine kit (07-20 rework; core Magic Bolt becomes Arcane
-			# Explosion via apply_kit_overrides). VAULTED — kept for future
-			# return: Death Ray (the 5-stack 150% payoff nuke).
+			# Explosion via apply_kit_overrides). BATCH AT: **DEATH RAY IS OUT
+			# OF THE VAULT AND STABILIZE IS IN THE SPEC POOL.** Stabilize was
+			# the escape hatch from the ramp — it vents the stacks the whole
+			# spec exists to build — so it becomes something a player EARNS if
+			# they want the safety valve back, and its def moved to
+			# `trimmed_kit_ability` (exactly ONE def, the AK resolver rule).
+			# Death Ray is what a ramp is FOR: a button greyed out for the
+			# first four turns and then the only thing he wants to press.
+			# Cannon KEEPS BD = 5 x stacks and its 15% recoil; its own
+			# +7.5%-per-stack damage term is GONE — the passive compounds now,
+			# and an ability-side per-stack term would square it.
 			return [
 				Ability.make({"display_name": "Arcane Cannon", "cooldown": 2, "dmg_type": "arcane", "cost": 25, "damage": 40,
 					"pressure": 0, "delay": 3.5, "anim": "attack02", "recoil_base": 0.15,
 					"perfect_id": "", "perfect_text": "Costs 3.0 initiative instead",
-					"description": "Channel raw Resonance into a blast:\n+7.5% DAMAGE per Resonance stack;\nBD = 5 x current stacks. Recoil: the\nMage takes 15% of the damage dealt."}),
+					"description": "Channel raw Resonance into a blast:\n40% of Attack, and BD = 5 x current\nstacks. Recoil: the Mage takes 15%\nof the damage dealt."}),
 				Ability.make({"display_name": "Arcane Barrage", "cooldown": 2, "dmg_type": "arcane", "cost": 20, "damage": 8,
 					"pressure": 3, "delay": 2.5, "anim": "attack03", "random_hits": 6,
 					"perfect_extra_hit": false,
 					"perfect_id": "", "perfect_text": "No two bolts strike the same enemy.",
 					"description": "Six bolts hound the weakest: each\nstrikes one of the 2-3 enemies with\nthe lowest health."}),
-				Ability.make({"display_name": "Stabilize", "cooldown": 3, "cost": 0, "damage": 0,
-					"pressure": 0, "special": "stabilize", "delay": 1.5, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "Also heals 5% of max health",
-					"description": "Vent the storm: consumes all\nResonance ABOVE 2 — +5 Mana and +10%\ndamage reduction (2 turns) per stack\nconsumed. Unusable at 2 or fewer."}),
+				Ability.make({"display_name": "Death Ray", "cooldown": 3, "dmg_type": "arcane", "cost": 40,
+					"damage": 150, "pressure": 0, "delay": 5.0, "anim": "attack03",
+					"perfect_id": "", "perfect_text": "",
+					"description": "The payoff: 150% of Attack as arcane\nto one enemy. Unusable below 5\nResonance — and it CONSUMES NO\nSTACKS. The ramp never comes down."}),
 			]
 		"holy":
 			# Mercy kit (07-22 rework): heals scale off the CASTER's max

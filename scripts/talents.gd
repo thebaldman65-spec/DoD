@@ -987,16 +987,20 @@ const LANE_TREES := {
 			"payload": {"stat": {"shattered_tempo": 2.0}}},
 		# --- Capstones (row 8): take ONE, no lane requirement ---
 		# Re-specced into the MASS RELEASE (Batch AS): it used to detonate the
-		# Chilled; it breaks every prison at once now, paid on the pile each
-		# held enemy was carrying.
+		# Chilled; it breaks every prison at once now. BATCH AT RE-SPECCED WHAT
+		# IT SCALES ON — TIME HELD, NOT STACKS HELD. Under an indefinite hold
+		# every prison sits pinned at 4 stacks, so the old reading made Shatter a
+		# dearer Ice Lance and AS's smoke never cast it once. Charging on turns
+		# resolves that without touching either capstone, and it turns the hold
+		# from a binary state into a CHARGE the player decides when to spend.
 		{"id": "cr_shatter", "name": "Shatter", "ranks": 1, "lane": "Thaw", "row": 8,
 			"capstone": true,
-			"desc": "New ability: Shatter — release EVERY hold at once for 10% of Attack per Chilled stack the held enemy carried (30 Mana, 4.0 int, 5cd).",
+			"desc": "New ability: Shatter — release EVERY hold at once for 10% of Attack per TURN it spent held, capped at 12 turns (30 Mana, 4.0 int, 5cd).",
 			"payload": {"new_ability": {"display_name": "Shatter", "cost": 30,
 				"dmg_type": "frost", "damage": 10, "pressure": 10, "aoe": true,
 				"delay": 4.0, "anim": "attack03", "cooldown": 5,
 				"perfect_id": "", "perfect_text": "Cooldown becomes 4 instead",
-				"description": "Every prison breaks at once: each\nheld enemy takes 10% of Attack PER\nSTACK of Chilled it was carrying,\nand is released."}}},
+				"description": "Every prison breaks at once: each held\nenemy takes 10% of Attack PER TURN it\nspent frozen (max 12), and is\nreleased. Release now for a modest\nhit, or hold longer and hit harder."}}},
 		# Re-specced (Batch AS): "freezing no longer reduces stacks" is
 		# redundant under an indefinite hold, so the capstone buys CAPACITY.
 		{"id": "cr_absolute", "name": "Absolute Zero", "ranks": 1, "lane": "Deep Freeze", "row": 8,
@@ -1009,149 +1013,187 @@ const LANE_TREES := {
 			"payload": {"stat": {"eternal_winter": 1}}},
 	],
 	"arcanist": [
-		# Purpose-designed lanes (Batch P, 07-31). Batch AI re-cut the tiers
-		# into 7 exclusive rows + a capstone row. Every id
-		# survives: the 12 originals keep their payloads verbatim
-		# (ar_suppressing and ar_temporal move Control → Overload, where a
-		# Barrage ramp and a crit echo belong) and the Batch 31 fillers
-		# re-spec IN PLACE (same ids, new effects), so saved ranks migrate
-		# and nobody gets a refund.
-		# --- Lane A: Resonance — the stack engine: ramp faster, cap
-		# higher, and keep getting paid at the ceiling. ---
-		{"id": "ar_mastery", "name": "Arcane Mastery", "ranks": 1, "lane": "Resonance", "row": 1,
-			"desc": "Each stack of Arcane Resonance grants {v}% extra critical strike chance (on top of the base 3%).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"arcane_mastery_ranks": 1}}},
-		{"id": "ar_attunement", "name": "Mana Attunement", "ranks": 1, "lane": "Resonance", "row": 2,
-			"desc": "Restore {v}% of your maximum Mana every time you gain a stack of Resonance.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"mana_attune_ranks": 1}}},
-		# Re-spec (was an Arcane Mastery duplicate; same id, so saved ranks
-		# carry). Ramps him off the FREE basic — the weak opening turns
-		# shorten without spending Mana.
-		{"id": "ar_harmonics", "name": "Harmonics", "ranks": 1, "lane": "Resonance", "row": 3,
-			"desc": "Arcane Explosion grants {v} additional Resonance.",
-			"scale": {"step": 1},
+		# Purpose-designed lanes (Batch P, 07-31); Batch AI cut them into 7
+		# exclusive rows + a capstone row; BATCH AT re-authored all 24 at row
+		# pricing around ESCALATION — nothing early, everything late. EVERY ID
+		# SURVIVES and re-specs in place, so saved picks migrate and no save
+		# version moves. The full old->new mapping is in the changelog.
+		# THE LANE FORMERLY CALLED CONTROL IS **ENTROPY**: after Batch AS,
+		# "Control" is the Cryomancer's identity word, and the lane was never
+		# about control anyway — it turns his own danger into fuel.
+		# MAGNITUDES ARE ADDITIVE, NOT RANKED: every counter writes its own
+		# magnitude in the units its read site sums (AR/AS's form).
+		# --- Lane RESONANCE — build higher, sooner. ---
+		# Re-spec in place: it already WAS Harmonics, and Arcane Explosion is
+		# the free build engine, so the lane opens on the button he presses
+		# when he has nothing better to do.
+		{"id": "ar_harmonics", "name": "Harmonics", "ranks": 1, "lane": "Resonance", "row": 1,
+			"desc": "Arcane Explosion builds {v} Resonance instead of 1.",
+			"scale": {"base": 1, "step": 1},
 			"payload": {"stat": {"harmonics_ranks": 1}}},
-		# Re-spec (was a Mana Attunement echo): the passive's core dial.
-		{"id": "ar_conduit", "name": "Conduit", "ranks": 1, "lane": "Resonance", "row": 4,
-			"desc": "Each Resonance stack grants +{v}% damage (on top of the base 15%).",
-			"scale": {"step": 2},
-			"payload": {"stat": {"conduit_ranks": 1}}},
-		# Re-spec (was +4% max health): straightforward runway — more
-		# ceiling to climb (Overcharge's raised cap climbs with it).
-		{"id": "ar_core", "name": "Resonant Core", "ranks": 1, "lane": "Resonance", "row": 5,
-			"desc": "Maximum Resonance rises by {v} (Overcharge's raised cap climbs the same amount).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"resonant_core_ranks": 1}}},
-		{"id": "ar_unlimited", "name": "Unlimited Power", "ranks": 1, "lane": "Resonance", "row": 6,
-			"desc": "Gaining Resonance while already at maximum stacks instead grants +{v}% damage and +{v}% maximum Mana (stacks all battle).",
-			"scale": {"step": 2},
-			"payload": {"stat": {"unlimited_ranks": 1}}},
-		# Re-spec (was flat Explosion damage): pay for staying hot.
-		{"id": "ar_charged", "name": "Charged Bolts", "ranks": 1, "lane": "Resonance", "row": 7,
-			"desc": "While at maximum Resonance, damaging casts restore {v}% of your maximum Mana.",
+		# Re-spec (was Arcane Mastery, +1%/rank crit per stack — which the
+		# passive now pays as a flat 1% per stack all by itself). The node that
+		# owned "crit x Resonance" owns it still: a crit BUILDS more now.
+		{"id": "ar_mastery", "name": "Attunement", "ranks": 1, "lane": "Resonance", "row": 2,
+			"desc": "A critical hit builds {v} Resonance instead of 2.",
+			"scale": {"base": 2, "step": 1},
+			"payload": {"stat": {"attunement_crit": 1}}},
+		# Re-spec in place: it paid Mana AT the ceiling, and there is no
+		# ceiling — so it pays for the stacks he is HOLDING instead.
+		{"id": "ar_charged", "name": "Charged Bolts", "ranks": 1, "lane": "Resonance", "row": 3,
+			"desc": "Every damaging cast restores {v}% of maximum Mana per 4 stacks held.",
 			"scale": {"step": 5},
-			"payload": {"stat": {"charged_bolts_ranks": 1}}},
-		# --- Lane B: Overload — the risk half: crits, echoes, and the
-		# big spenders escalating with the bill attached. ---
-		{"id": "ar_critical_mass", "name": "Critical Mass", "ranks": 1, "lane": "Overload", "row": 1,
-			"desc": "Every 3rd critical strike deals {v}% more damage and restores half as much of your maximum Mana.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"critical_mass_ranks": 1}}},
-		# Moved from Control: a crit echo is pure offence.
-		{"id": "ar_temporal", "name": "Temporal Rift", "ranks": 1, "lane": "Overload", "row": 2,
-			"desc": "Critical strikes have a {v}% chance to echo for 25% of their damage against a random enemy.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"temporal_ranks": 1}}},
-		{"id": "ar_overcharge", "name": "Overcharge", "ranks": 1, "lane": "Overload", "row": 3,
-			"desc": "New ability: Overcharge — raise your maximum Resonance to 8; stacks beyond 5 give 1.5x their normal Resonance bonus (20 Mana, 1.5 int, 5cd).",
+			"payload": {"stat": {"charged_bolts_ranks": 5}}},
+		# RE-SPECCED, NOT REPRICED. Raising a cap to 8 is meaningless once
+		# there is no cap; compounding the ramp is the escalation version of
+		# the same button. At ten stacks it grants five.
+		{"id": "ar_overcharge", "name": "Overcharge", "ranks": 1, "lane": "Resonance", "row": 4,
+			"desc": "New ability: Overcharge — once per battle, immediately gain Resonance equal to HALF your current stacks (20 Mana, 1.5 int, 5cd).",
 			"payload": {"new_ability": {"display_name": "Overcharge", "cost": 20,
 				"special": "overcharge", "delay": 1.5, "anim": "attack02", "cooldown": 5,
-				"perfect_id": "", "perfect_text": "Stacks beyond 5 give 1.65x instead",
-				"description": "Push past the limit: maximum\nResonance becomes 8; stacks beyond\n5 give 1.5x their normal Resonance\nbonus (damage, crit, damage taken)."}}},
-		# Moved from Control: an offensive Barrage ramp belongs here.
+				"perfect_id": "", "perfect_text": "Gain your FULL current stacks instead",
+				"description": "Feed the storm on itself: gain\nResonance equal to half the stacks you\nalready hold. Once per battle — the\nhigher you are, the more it pays."}}},
+		# Re-spec (was +1 maximum Resonance — a ceiling that no longer exists).
+		# Straightforward runway, paid on the turn rather than the cast.
+		{"id": "ar_core", "name": "Resonant Core", "ranks": 1, "lane": "Resonance", "row": 5,
+			"desc": "The first damaging cast of each of his turns builds {v} additional Resonance.",
+			"scale": {"step": 1},
+			"payload": {"stat": {"resonant_core_ranks": 1}}},
+		# Re-spec in place: every third crit used to hit harder, it BUILDS now.
+		# The old counter (critical_mass_ranks) is RUNE-ONLY and its read site
+		# is kept — the Rune of the Wide Current still pays the old clause.
+		{"id": "ar_critical_mass", "name": "Critical Mass", "ranks": 1, "lane": "Resonance", "row": 6,
+			"desc": "Every third critical hit builds {v} Resonance.",
+			"scale": {"step": 4},
+			"payload": {"stat": {"critical_mass_stacks": 4}}},
+		# THE LANE'S THESIS, and re-specced from Unlimited Power (whose whole
+		# premise was overflow AT a cap): the curve gets steeper the higher it
+		# already is.
+		{"id": "ar_unlimited", "name": "Cascade", "ranks": 1, "lane": "Resonance", "row": 7,
+			"desc": "At 10 or more stacks, every damaging cast builds {v} additional Resonance.",
+			"scale": {"step": 1},
+			"payload": {"stat": {"cascade_stacks": 1}}},
+		# --- Lane OVERLOAD — each stack worth more, for a bigger bill. ---
+		# Re-spec in place: it deepened a LINEAR per-stack term; it deepens the
+		# COMPOUNDING step now. NOTE the units — conduit_step is percentage
+		# POINTS on the curve's step, and it is a FLOAT, so it must never be
+		# named "_ranks" (Runes.STAT_INT_KEYS would coerce 0.5 to 0).
+		{"id": "ar_conduit", "name": "Conduit", "ranks": 1, "lane": "Overload", "row": 1,
+			"desc": "The damage curve's step rises from 1.5% to {v}% per stack.",
+			"scale": {"base": 1.5, "step": 0.5},
+			"payload": {"stat": {"conduit_step": 0.5}}},
+		# Re-spec in place (it was Cannon AND Wrath, +5%/rank each way): the
+		# Cannon alone now, and the bill is a SET not an add — 15% -> 25%.
+		{"id": "ar_volatility", "name": "Volatility", "ranks": 1, "lane": "Overload", "row": 2,
+			"desc": "Arcane Cannon deals +{v}% damage, and its recoil rises from 15% to 25%.",
+			"scale": {"step": 30},
+			"payload": {"stat": {"volatility_ranks": 30, "volatility_recoil": 25}}},
+		# Re-spec in place: it was a CHANCE to echo for 25%; it is a certain
+		# echo for 40% now. A coin flip on a crit is variance on variance.
+		{"id": "ar_temporal", "name": "Temporal Rift", "ranks": 1, "lane": "Overload", "row": 3,
+			"desc": "A critical hit echoes for {v}% of its damage against a random enemy.",
+			"scale": {"step": 40},
+			"payload": {"stat": {"temporal_ranks": 40}}},
 		{"id": "ar_suppressing", "name": "Suppressing Fire", "ranks": 1, "lane": "Overload", "row": 4,
 			"desc": "Each bolt of Arcane Barrage deals {v}% of Attack more than the previous one.",
-			"scale": {"step": 0.25},
-			"payload": {"stat": {"suppressing_ranks": 1}}},
-		# Re-spec (was flat Cannon damage): the per-stack term instead.
+			"scale": {"step": 2},
+			"payload": {"stat": {"suppressing_ranks": 2}}},
+		# Re-spec in place: it deepened Cannon's per-stack DAMAGE, which §2
+		# takes off the ability entirely (the passive does that now). Break is
+		# a different axis, so the node moves onto the axis that survives.
 		{"id": "ar_cannoneer", "name": "Cannoneer", "ranks": 1, "lane": "Overload", "row": 5,
-			"desc": "Arcane Cannon deals +{v}% damage per Resonance stack (on top of the base 7.5%).",
-			"scale": {"step": 2.5},
-			"payload": {"stat": {"cannoneer_ranks": 1}}},
-		# Re-spec (was a Barrage Mana discount): more bolts instead.
+			"desc": "Arcane Cannon's Break damage rises from 5 to {v} per Resonance stack.",
+			"scale": {"base": 5, "step": 4},
+			"payload": {"stat": {"cannoneer_ranks": 4}}},
 		{"id": "ar_barrister", "name": "Barrage Master", "ranks": 1, "lane": "Overload", "row": 6,
-			"desc": "Arcane Barrage fires {v} additional bolt(s).",
-			"scale": {"step": 1},
-			"payload": {"ability": "Arcane Barrage", "add": {"random_hits": 1}}},
-		# Re-spec (was flat crit; its old cross-lane exclusive is retired —
-		# the fork lives in Control now): the lane's thesis in one node —
-		# pure escalation with the bill attached.
-		{"id": "ar_volatility", "name": "Volatility", "ranks": 1, "lane": "Overload", "row": 7,
-			"desc": "Arcane Cannon and Magi's Wrath deal +{v}% damage, and their recoil rises +{v}%.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"volatility_ranks": 1}}},
-		# --- Lane C: Control — surviving what you built. The risk answer
-		# is a fork: run hot forever, or vent constantly. ---
-		{"id": "ar_mindfulness", "name": "Mindfulness", "ranks": 1, "lane": "Control", "row": 1,
-			"desc": "Every {v} of your turns, ALL of your cooldowns tick down 1 extra turn.",
-			"scale": {"base": 7, "step": -1},
-			"payload": {"stat": {"mindfulness_ranks": 1}}},
-		{"id": "ar_conversion", "name": "Conversion", "ranks": 1, "lane": "Control", "row": 2,
-			"desc": "{v}% of damage taken is lost as Mana instead of health.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"conversion_ranks": 1}}},
-		{"id": "ar_on_edge", "name": "On the Edge", "ranks": 1, "lane": "Control", "row": 3,
-			"desc": "Surviving an attack below {v}% health grants 1 stack of Resonance.",
-			"scale": {"base": 20, "step": 5},
-			"payload": {"stat": {"on_edge_ranks": 1}}},
-		{"id": "ar_stable", "name": "Stable Alignment", "ranks": 1, "lane": "Control", "row": 4,
-			"desc": "You cannot lose more than {v}% of your maximum health to a single attack.",
-			"scale": {"base": 40, "step": -5},
-			"payload": {"stat": {"stable_ranks": 1}}},
-		# Re-spec (was +3% armor). One side of the sharpest fork the spec
-		# can offer: run permanently hot — the penalty barely bites...
-		{"id": "ar_ward", "name": "Arcane Ward", "ranks": 1, "lane": "Control", "row": 5,
-			"desc": "The Resonance damage-taken penalty falls {v}% per stack (from the base 5%).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"arcane_ward_ranks": 1}}},
-		# Re-spec (was flat damage reduction). ...or vent often and
-		# cheaply, because venting no longer erases you.
-		{"id": "ar_still", "name": "Still Mind", "ranks": 1, "lane": "Control", "row": 6,
-			"desc": "Stabilize leaves {v} additional stacks standing (on top of its floor of 2).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"still_mind_ranks": 1}}},
-		# Re-spec (was Meltdown, a +dmg/+taken dial; same id, so saved
-		# ranks carry). Pairs with Conversion: a committed Control build
-		# turns nearly all self-inflicted damage into fuel.
-		{"id": "ar_meltdown", "name": "Feedback Loop", "ranks": 1, "lane": "Control", "row": 7,
+			"desc": "Arcane Barrage fires {v} additional bolts.",
+			"scale": {"step": 3},
+			"payload": {"ability": "Arcane Barrage", "add": {"random_hits": 3}}},
+		# FORCED-ISH ASSIGNMENT, reported not hidden (Batch AT §9): the node
+		# was Mindfulness ("all your cooldowns tick down 1 extra turn every N
+		# turns"), and cooldown acceleration is the closest surviving intent to
+		# "the payoff nuke stops having a cooldown". It crosses Control ->
+		# Overload, which is legal. mindfulness_ranks is RUNE-ONLY now and its
+		# read site is kept (the Rune of the Unquiet Mind still pays it).
+		{"id": "ar_mindfulness", "name": "Terminal Velocity", "ranks": 1, "lane": "Overload", "row": 7,
+			"desc": "At {v} or more Resonance, Death Ray has no cooldown.",
+			"scale": {"step": 15},
+			"payload": {"stat": {"terminal_velocity": 15}}},
+		# --- Lane ENTROPY — turn the danger into fuel. Losing Stabilize cost
+		# him his Mana valve as well as his defence, and that is intended: his
+		# Mana comes from being hurt now, so the more dangerous his own build
+		# gets, the more it feeds itself. ---
+		{"id": "ar_conversion", "name": "Conversion", "ranks": 1, "lane": "Entropy", "row": 1,
+			"desc": "{v}% of damage taken is paid as Mana instead of health.",
+			"scale": {"step": 30},
+			"payload": {"stat": {"conversion_ranks": 30}}},
+		# Re-spec in place: the threshold is fixed at 35% now (it used to RISE
+		# with ranks off a base of 20) and the payout is 4 stacks, not 1.
+		{"id": "ar_on_edge", "name": "On the Edge", "ranks": 1, "lane": "Entropy", "row": 2,
+			"desc": "Surviving an attack below {v}% health builds 4 Resonance.",
+			"scale": {"step": 35},
+			"payload": {"stat": {"on_edge_threshold": 35.0, "on_edge_stacks": 4}}},
+		{"id": "ar_meltdown", "name": "Feedback Loop", "ranks": 1, "lane": "Entropy", "row": 3,
 			"desc": "{v}% of recoil damage is paid as Mana instead of health.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"feedback_ranks": 1}}},
+			"scale": {"step": 30},
+			"payload": {"stat": {"feedback_ranks": 30}}},
+		# KEPT DELIBERATELY, where Arcane Ward and Still Mind were not: a cap
+		# on any single hit is what makes a COMPOUNDING death curve survivable
+		# enough to be interesting rather than random.
+		{"id": "ar_stable", "name": "Stable Alignment", "ranks": 1, "lane": "Entropy", "row": 4,
+			"desc": "No single attack can take more than {v}% of your maximum health.",
+			"scale": {"step": 25},
+			"payload": {"stat": {"stable_ranks": 25}}},
+		# FORCED ASSIGNMENT, reported not hidden (Batch AT §9): Backlash has no
+		# ancestor in this tree. ar_still held Still Mind, whose entire subject
+		# (Stabilize's floor) left the opening three — a slot had to hold it,
+		# and this is the one whose old design died most completely.
+		{"id": "ar_still", "name": "Backlash", "ranks": 1, "lane": "Entropy", "row": 5,
+			"desc": "Resonance also builds when he takes damage: {v} stack per hit received.",
+			"scale": {"step": 1},
+			"payload": {"stat": {"backlash_stacks": 1}}},
+		# Re-spec (was Mana Attunement, "Mana every time you gain a stack"):
+		# the same passive Mana income, paid on the damage he deals instead of
+		# the stacks he banks — because he can no longer vent for Mana.
+		{"id": "ar_attunement", "name": "Siphon", "ranks": 1, "lane": "Entropy", "row": 6,
+			"desc": "{v}% of all damage he deals is restored as Mana.",
+			"scale": {"step": 20},
+			"payload": {"stat": {"siphon_ranks": 20}}},
+		# THE LANE'S THESIS, re-specced from Arcane Ward (which softened the
+		# per-stack penalty): the reward for escalating is that escalating
+		# stops killing you — and it only switches on once he is deep enough
+		# to need it.
+		{"id": "ar_ward", "name": "Event Horizon", "ranks": 1, "lane": "Entropy", "row": 7,
+			"desc": "While at {v} or more Resonance, no single attack can reduce him below 1 health.",
+			"scale": {"step": 15},
+			"payload": {"stat": {"event_horizon": 15}}},
 		# --- Capstones (row 8): take ONE, no lane requirement ---
-		# Re-spec (was a stat pile): the natural end of a lane about the
-		# resource itself — unlimited scaling, risk capped where it
-		# already hurts. (Overflow payouts never fire: there is no max.)
+		# RE-SPECCED, because uncapping is the default now: it used to remove
+		# the ceiling and cap the penalty at 5 stacks. It doubles the curve's
+		# step instead — at twelve stacks +234% rather than +117%.
 		{"id": "ar_singularity", "name": "Singularity", "ranks": 1, "lane": "Resonance", "row": 8,
 			"capstone": true,
-			"desc": "Resonance has NO maximum. The damage-taken penalty stops rising past 5 stacks.",
+			"desc": "The damage curve's step DOUBLES: 1.5% to 3% per Resonance stack.",
 			"payload": {"stat": {"singularity": 1}}},
+		# The existing granted ability, per §2's per-stack removal: its +4% per
+		# stack is GONE (the passive does that now, and leaving it on would
+		# square the compounding). BD = 2.5 x stacks and the recoil stay.
 		{"id": "ar_wrath", "name": "Magi's Wrath", "ranks": 1, "lane": "Overload", "row": 8,
 			"capstone": true,
-			"desc": "New ability: Magi's Wrath — 15% of Attack as arcane to ALL enemies, +4% per Resonance stack; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd).",
+			"desc": "New ability: Magi's Wrath — 15% of Attack as arcane to ALL enemies; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd).",
 			"payload": {"new_ability": {"display_name": "Magi's Wrath", "cost": 30,
 				"dmg_type": "arcane", "damage": 15, "pressure": 0, "aoe": true,
 				"delay": 4.0, "anim": "attack03", "cooldown": 4, "recoil_base": 0.15,
 				"perfect_id": "", "perfect_text": "Costs 3.5 initiative instead",
-				"description": "The storm unchained: rakes the whole\nenemy team, +4% damage per Resonance\nstack; BD = 2.5 x stacks. Recoil 15%\nof damage dealt, -3% per enemy hit."}}},
-		# Re-spec (was a Temporal Rift / Mindfulness bundle): removes the
-		# Stabilize trade entirely — full defensive value, full offensive
-		# value, every three turns.
-		{"id": "ar_timelord", "name": "Master of Moments", "ranks": 1, "lane": "Control", "row": 8,
+				"description": "The storm unchained: rakes the whole\nenemy team for 15% of Attack.\nBD = 2.5 x stacks. Recoil 15% of\ndamage dealt, -3% per enemy hit."}}},
+		# RE-SPECCED FROM MASTER OF MOMENTS, whose free venting died with
+		# Stabilize — it was the most anti-escalation node in the game. The id
+		# is kept; the name had to change because it no longer described
+		# anything. The natural end of the lane: his self-harm stops being harm.
+		{"id": "ar_timelord", "name": "Perfect Conversion", "ranks": 1, "lane": "Entropy", "row": 8,
 			"capstone": true,
-			"desc": "Stabilize consumes no stacks at all — it grants its Mana and damage reduction from your current stacks and leaves them intact.",
-			"payload": {"stat": {"master_moments": 1}}},
+			"desc": "ALL recoil and ALL self-inflicted damage is paid as Mana instead of health.",
+			"payload": {"stat": {"perfect_conversion": 1}}},
 	],
 	"holy": [
 		# Purpose-designed lanes (Batch J, 07-30). Batch AI re-cut the tiers

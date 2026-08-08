@@ -233,8 +233,8 @@
 	"resonant_core": {
 		"name": "Rune of the Resonant Core", "rarity": "rare", "scope": "spec:arcanist",
 		"price": 100, "lane": "Resonance",
-		"desc": "Maximum Arcane Resonance rises by 1, and every stack grants +2% more damage.",
-		"payload": {"stat": {"resonant_core_ranks": 1, "conduit_ranks": 1}}
+		"desc": "The first cast of each of his turns builds 1 extra Resonance, and the damage curve's step rises 0.5%.",
+		"payload": {"stat": {"resonant_core_ranks": 1, "conduit_step": 0.5}}
 	},
 	"seventh_bolt": {
 		"name": "Rune of the Seventh Bolt", "rarity": "rare", "scope": "spec:arcanist",
@@ -245,15 +245,15 @@
 	},
 	"unquiet_mind": {
 		"name": "Rune of the Unquiet Mind", "rarity": "rare", "scope": "spec:arcanist",
-		"price": 75, "scarred": true, "lane": "Control",
+		"price": 75, "scarred": true, "lane": "Entropy",
 		"desc": "Cooldowns tick an extra turn every sixth turn, and a fifth of Cannon's recoil is paid in Mana, not blood — but 8 less Mana a turn.",
-		"payload": {"stat": {"mindfulness_ranks": 1, "feedback_ranks": 2, "mana_regen_bonus": -8}}
+		"payload": {"stat": {"mindfulness_ranks": 1, "feedback_ranks": 20, "mana_regen_bonus": -8}}
 	},
 	"wide_current": {
 		"name": "Rune of the Wide Current", "rarity": "rare", "scope": "spec:arcanist",
 		"price": 100,
 		"desc": "A little of every current: +1% crit per stack, every third crit hits 20% harder, surviving a blow under 25% health grants a stack.",
-		"payload": {"stat": {"arcane_mastery_ranks": 1, "critical_mass_ranks": 1, "on_edge_ranks": 1}}
+		"payload": {"stat": {"arcane_mastery_ranks": 1, "critical_mass_ranks": 1, "rune_on_edge_ranks": 1}}
 	},
 
 	"triage_ward": {

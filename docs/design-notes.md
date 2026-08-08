@@ -1911,3 +1911,50 @@ you can only see by hovering the thing it changed, during the fight, is a
 reward the player learns to stop looking for. The runes on the map card had
 had this treatment since the card existed; upgrades getting nothing beside
 them was not a design decision, it was an omission that read as one.
+
+## Batch AT — the Arcanist: escalation
+
+**A slope and a curve are different fantasies, and only one of them is a ramp.**
+The Arcanist had always been described as the ramp spec, and he had never been
+one: one stack per cast to a cap of five, +15% each, is not
+nothing-early-everything-late — it is slightly-weak-for-four-turns. The fix was
+not bigger numbers, it was a different *shape*. N(N+1)/2 means every stack is
+worth more than the last, so the same spec that is genuinely feeble at five
+stacks is frightening at twelve. That is why the batch tabulated the numbers
+rather than describing them: a compounding figure nobody has written down is a
+figure nobody can plan against, and a player who cannot plan against it
+experiences it as randomness.
+
+**Removing the escape hatch was the load-bearing change, not the passive.** A
+ramp with a free vent button is not a ramp — every turn asks "should I cash out",
+and the answer is usually yes, because the downside is immediate and the upside
+is speculative. Stabilize did not need nerfing; it needed to stop being a
+default. Making it earnable turns the same button from a tax on the fantasy into
+a deliberate confession that you do not want the fantasy today.
+
+**The trap this batch is really about: two multipliers that each look reasonable.**
++7.5% damage per stack on Arcane Cannon was fine against a linear passive and
+catastrophic against a compounding one, because it turns a curve into a curve
+squared. Nothing about the ability's own text changes when the passive changes,
+which is exactly why it survives a rewrite. The general rule worth keeping: when
+a passive's scaling shape changes, audit every ability that reads the same
+resource — not for whether the number is still balanced, but for whether it is
+still the same *kind* of number.
+
+**And the measured surprise, which the node text actively hides: under a
+compounding curve, build rate beats per-stack value quadratically.** The lane
+selling "each stack worth more" lost to the lane selling "more stacks", by a
+lot, because the payout is quadratic in the count and only linear in the step.
+Both lanes read as symmetrical trade-offs; the mathematics is not symmetrical at
+all. A tuning pass that priced these two lanes by how their text reads would get
+it backwards.
+
+**Shatter: the difference between a state and a charge.** It never fired because
+it and Ice Lance answered the same question — "spend the hold" — and one was
+cheaper. Scaling it on *stacks held* could never fix that, because an indefinite
+hold pins every prison at the same stack count, so the two abilities were reading
+a constant. Scaling on *turns held* gives the hold a second dimension the Lance
+cannot reach, and it converts a binary the player has no opinion about into a
+decision they have to make every turn. The tension it creates — the party's
+damage window is also Shatter's fuse, and cashing the window kills the fuse — is
+the good kind, and resolving it would have thrown away the reason to fix it.

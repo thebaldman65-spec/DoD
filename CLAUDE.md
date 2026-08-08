@@ -179,6 +179,168 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   party.tscn is the HERO SHEET now, opened from a card.
 
 ## Current systems snapshot (2026-08-07)
+BATCH AT (08-07) — THE ARCANIST, RE-AUTHORED AROUND ESCALATION. Third of the
+Mage three, AND THE MAGE CLASS IS DONE. One spec only (plus §8's Cryomancer
+Shatter fix); the other nine trees and enemy tuning UNTOUCHED. His tree was
+already purpose-designed, so this is not a restructure — it is a SPINE:
+**NOTHING EARLY, EVERYTHING LATE.**
+§1 ARCANE RESONANCE -> **RUNAWAY RESONANCE**, three clauses. NO CEILING (1 per
+damaging cast, 2 on a crit, and NOTHING REMOVES IT — it persists to the end of
+the battle; second_max is a sentinel 99). THE CURVE COMPOUNDS: damage
+**1.5% x N(N+1)/2**, damage taken **0.75% x N(N+1)/2**, both uncapped. +1% CRIT
+PER STACK, LINEAR (one stable term beside two that compound). Table: 5 stacks
++22%/+11%, 8 +54%/+27%, 12 +117%/+59%, 16 +204%/+102% — SO AT FIVE STACKS HE IS
+WEAKER THAN HE WAS and by twelve he has roughly doubled. **COMPOUNDING RATHER
+THAN LINEAR IS THE WHOLE DESIGN** (a linear per-stack term is a slope; a
+triangular one is a curve) and §1's stated linear fallback was NOT taken — the
+smoke came out fine, see below.
+**THE CURVE HAS EXACTLY ONE IMPLEMENTATION**: `BattleUnit.resonance_curve()`
+(+ resonance_dmg_step / resonance_dmg_bonus / resonance_taken_bonus), and
+battle.gd reads it through TWO named sites. READ SITES, one line each:
+`_resonance_dmg_mult` -> the attacker block in _resolve AND the ability
+tooltip's buff_mult; `_resonance_taken_mult` -> the target block in _resolve;
+crit -> the crit-chance block off the RAW stack count (linear, so it never
+touches the curve); the nameplate -> refresh_bars, which prints the stack count
+and BOTH live percentages and fills its bar toward RESONANCE_BAR_REF (15) since
+there is no maximum to fill toward.
+§2 **THE PER-STACK DAMAGE TERMS COME OFF ARCANE CANNON AND MAGI'S WRATH, AND
+THAT IS THE TRAP THE BATCH EXISTS AROUND** — the passive compounds now, so an
+ability-side per-stack term multiplies a curve by a slope and SQUARES the
+escalation (a 12-stack Cannon would be 4.1x base instead of 2.17x). DO NOT
+RE-ADD ONE. Both KEEP their Break terms (5 x stacks / 2.5 x stacks — Break is a
+different axis) and Cannon keeps its 15% recoil.
+**STABILIZE LEFT THE OPENING THREE FOR SPEC_POOLS["arcanist"]** (def moved to
+`trimmed_kit_ability`, so exactly ONE def exists — the AK resolver rule; still
+spec-only because it reads Resonance). It is the escape hatch from the ramp, so
+it is EARNED, not given. **DEATH RAY CAME OUT OF THE VAULT INTO THE KIT**: 40
+Mana, 5.0, 3cd, 150% of Attack arcane, single target, gated at
+DEATH_RAY_STACKS = 5, and IT CONSUMES NOTHING (it still BUILDS one — "consumes
+nothing" is not "is not a cast"). Losing Stabilize costs him his Mana valve as
+well as his defence, INTENDED: his Mana comes from being hurt now (Conversion,
+Feedback Loop, Siphon). ONE INTERPRETATION STATED, NOT GLOSSED: §1's "nothing
+removes it" describes the PASSIVE (no decay, no cap, no reset); an earned
+Stabilize is the deliberate exception a player buys.
+§3 ALL 24 NODES RE-AUTHORED AT ROW PRICING, **EVERY ID SURVIVES AND RE-SPECS IN
+PLACE**, NO SAVE VERSION MOVES (still v7). **THE CONTROL LANE IS RENAMED
+ENTROPY** (after AS, "Control" is the Cryomancer's identity word, and the lane
+was never about control — it turns his danger into fuel). FULL OLD->NEW MAPPING
+IN THE CHANGELOG. ONE FORCED ASSIGNMENT AND ONE NEAR ONE, REPORTED NOT HIDDEN:
+`ar_still` (Still Mind) -> BACKLASH, because Backlash has no ancestor and Still
+Mind's whole subject left the kit; `ar_mindfulness` (Mindfulness) -> TERMINAL
+VELOCITY on the thread of "both are about cooldowns". NOTHING NEEDED A NEW
+SUBSYSTEM. Arcane Ward and Still Mind are gone as DESIGNS; STABLE ALIGNMENT WAS
+KEPT DELIBERATELY — a single-hit cap is what makes a compounding death curve
+interesting rather than random.
+MAGNITUDES ARE **ADDITIVE, NOT RANKED** (conversion_ranks 30 = percentage
+POINTS, stable_ranks 25 IS the cap, cannoneer_ranks 4 is the INCREASE on the
+5 BD/stack). **`conduit_step` IS A FLOAT AND IS DELIBERATELY NOT NAMED
+"_ranks"** — Runes.STAT_INT_KEYS coerces anything ending that way and 0.5 would
+become 0, the node silently inert with nothing crashing. The test asserts the
+NAME as well as the type.
+**DELETED WITH THEIR PREMISE, not left unreachable: UNLIMITED POWER and BACKLASH
+WARD** (both answered "what happens when the ramp runs out of room", and it
+never does), plus the `unlimited` status. **UNREACHABLE BUT KEPT** (AR vault
+pattern, gated `> 0`): mindfulness_ranks, arcane_mastery_ranks and
+critical_mass_ranks are RUNE-ONLY with their read sites kept on purpose;
+mana_attune_ranks and still_mind_ranks have NO writer at all.
+NEW FIELDS, one read site each: attunement_crit, charged_bolts (re-meaning),
+critical_mass_stacks, cascade_stacks, conduit_step, volatility_recoil,
+terminal_velocity, on_edge_threshold + on_edge_stacks, backlash_stacks,
+siphon_ranks, event_horizon, perfect_conversion (renamed from master_moments),
+res_cast_this_turn (reset in _player_turn beside rampage_chains),
+rune_on_edge_ranks, and hold_turns for §8. CRITICAL MASS'S THIRD-CRIT TRIPS ARE
+COUNTED IN THE STRIKE LOOP AND PAID AFTER IT (`crit_mass_trips`): granting
+Resonance mid-cast would let the curve read the new stack count on the very hit
+that earned it — the ordering trap AG fixed for Detonation and AR for Pressure
+Cooker, arriving through a third door.
+§4 RUNE AUDIT. **RE-POINTED:** Resonant Core (conduit_ranks -> conduit_step 0.5
++ desc rewritten, because BOTH its clauses lost their meaning — no maximum to
+raise, no linear term to deepen; the arithmetic is in the changelog and it
+crosses over around 8 stacks), Unquiet Mind (feedback_ranks 2 -> **20**, and
+**lane tag Control -> Entropy** — the AS Honed Lance lesson), Wide Current
+(on_edge_ranks -> its own `rune_on_edge_ranks`, the AR Cinder Trail pattern; it
+reproduces the OLD formula so it still pays its advertised number, and the
+THRESHOLD TAKES THE MAX while the PAYOUT SUMS — summing thresholds would give a
+60% window neither half asked for). Seventh Bolt UNCHANGED. **THE THREE MAGE
+CLASS-WIDE RUNES TOUCH NO ARCANIST COUNTER**, asserted. Rune magnitude is CLOSED
+since AF, so a rune paying a different amount is a REPORT, not a retune.
+§5 `ar_ward` <-> `ar_still` DISSOLVED (both designs gone). Same correction AS
+recorded: Batch AI retired test_runes._exclusives to a bare `pass`, so the pair
+list is prose in this file only. Other four pairs untouched.
+§6 THE BOT: **NEVER COME DOWN.** Death Ray whenever it is up and stacks >= 5
+(it consumes nothing, so there is no reason to save it); Magi's Wrath at 3+
+enemies; Overcharge ONCE at OVERCHARGE_BOT_STACKS = 8 (it pays HALF of what he
+holds, so spending it early throws the button away); Cannon; Barrage; Arcane
+Explosion as the free filler. **STABILIZE IS DELIBERATELY ABSENT and the code
+says so** — do not "fix" it.
+§8 **SHATTER RE-SPECCED: TIME HELD, NOT STACKS HELD** (Cryomancer). AS reported
+it never firing and called it a design tension, correctly — Shatter (Thaw) and
+Absolute Zero (Deep Freeze) are both capstones, so at a hold limit of one
+Shatter and Ice Lance did the same job and the Lance was cheaper. NOW: 30 Mana,
+4.0, 5cd, releases every hold, each released enemy takes SHATTER_PER_TURN (10%)
+of Attack PER TURN HELD, capped at SHATTER_TURN_CAP (12). Resolves the tension
+WITHOUT touching either capstone: 3 turns held is worth less than Ice Lance's
+35% + stack bonus, the crossover is turn 4-5, past that the Lance can never
+match it. THE HOLD IS A CHARGE, NOT A BINARY STATE.
+IMPLEMENTATION: the counter is `BattleUnit.hold_turns`, written in EXACTLY ONE
+PLACE — `_hold_sync`, walking `_holds`. NOT a dictionary beside `_holds` (that
+would be a second answer to "is this held"). It advances ONCE PER TURN, NOT once
+per unit per turn — a negative control nesting the increment inside a second
+walk trips the test. Zeroed at `_hold_freeze`, so a re-freeze does not resume an
+old charge. **THE NAMEPLATE HELD CHIP SHOWS THE COUNT** ("HELD 7") and its
+tooltip says what the number buys. NOTE the chip's visible text is `short`, NOT
+`label` — `_refresh_chips` renders `short` into the tag Label and `label` is the
+tooltip heading; asserting the wrong one proves nothing. BOT: hold longer, and
+prefer Shatter over Ice Lance at SHATTER_BOT_TURNS = 5 — the check moved ABOVE
+the Lance release and the `_holds.size() >= 2` gate that made it never fire is
+GONE. ONE CONSEQUENCE, INTENDED: the party spending the damage window kills the
+target and the charge with it. That tension is the good kind; do NOT resolve it
+by preserving the charge on death.
+VERIFIED: check_parse 0, check_flow 0 (6 screens). NEW test_batch_at.gd 457/0,
+STABLE 4/4. Regression: an 6044/0, ah 5494/0 (STAMP GATE bumped AS -> AT, and
+its verbatim Arcanist pool assertion moved with the batch), ah_battle 65/0,
+ai 2036/0, aj 403/0, ak **524/0 (was 523 — the Arcanist's spec pool gained
+Stabilize and every entry still resolves)**, al **557/0 (was 556 — same reason)**, ar 885/0, as 387/0,
+test_runes **2981/0 (was 2982 — the Resonant Core rune's payload went int -> float, so one
+STAT_INT_KEYS-family check no longer applies; AL's precedent)**, test_rune_battle 94/0,
+run-harness gates 1/2/3 PASS, 11 scenes 0 SCRIPT ERROR. LIVE AUTOPLAY BATTLE clean: Cannon
+at 0 stacks logs +0 BD (BD = 5 x stacks, as it should), Charged Bolts drips, and DEATH RAY
+LANDS FOR 256.
+KNOWN-BAD, NOT OURS: test_batch_al's standing flake reproduced **2 runs of 4** here and it is
+the check AQ named — `"Spite reflects damage at the attacker"`, a harness race in its own
+`_spawn`. Nothing this batch touches is on AL's path.
+TWO TEST RE-POINTS, IN PLACE WITH THE REASON IN THE FILE: test_runes' Batch AA
+ordering alarm probed `resonant_core_ranks` as a CEILING field and Runaway
+Resonance has none — the Resonance probe is INVERTED now (it asserts no
+Resonance ceiling is derived at all, which is what a future batch could break)
+and the "runes actually write a ceiling" floor drops 4 -> 3 with the three
+survivors NAMED so it cannot be lowered again by attrition. The RULE is
+untouched and still live for Mercy and Focus.
+NEGATIVE CONTROLS RUN: making the curve LINEAR trips **34** checks, restoring
+Cannon's per-stack term trips 2, Shatter back on Chilled stacks trips 1, capping
+the taken curve at 5 stacks trips 1, and nesting _hold_sync's increment trips 1.
+KIT SMOKE, fixed lineup, 40 battles/row, berserker,arcanist,inquisitor,
+beastmaster, DOD_SIM_TALENTS force-learning full 8-node builds. All four rows
+40/40 wins, 0 SCRIPT ERROR, every new piece in the rotation (Death Ray 0.7-1.1
+casts/battle in EVERY row, Overcharge 0.8, Magi's Wrath 1.0). Share/BD:
+ungeared **47%**/72; RESONANCE **60%**/79; OVERLOAD **56%**/54; ENTROPY
+**55%**/85.
+**THE FINDING WORTH KEEPING, and it is a property of compounding itself: BUILD
+RATE BEATS PER-STACK VALUE, QUADRATICALLY.** Resonance is the standout (526
+damage/battle vs Overload's 371) even though Overload is the lane whose whole
+pitch is "each stack worth more" — because damage is step x N(N+1)/2, i.e.
+QUADRATIC in the stack count and only LINEAR in the step. Doubling the build
+rate roughly quadruples the payout; 1.5% -> 2% multiplies it by 1.33. **ANY
+FUTURE TUNING SHOULD TREAT THE RESONANCE LANE'S BUILD-RATE NODES AS THE
+EXPENSIVE ONES** — that is not obvious from the node text and it is the opposite
+of how the two lanes are pitched. MEASURED AND FLAGGED, NOT NERFED; 60% sits in
+the band AR (Kindling 66%) and AS (Thaw 51%) already shipped. Kit-mechanics
+ratios ONLY — NO difficulty signal (Batch R).
+NO DIFFICULTY MEASUREMENT AND NO SIM ROW, deliberately — same as AJ/AK/AL/AR/AS.
+REPORTED NOT ACTED ON: **DEATH RAY CARRIES NO BREAK DAMAGE.** §2 specifies its
+Mana, initiative, cooldown, damage, target count and gate precisely and says
+nothing about BD, so it ships at pressure 0. A 40-Mana nuke contributing nothing
+to the party's Break is a real design question — the designer's, not the batch's.
 BATCH AS (08-07) — THE CRYOMANCER, RE-AUTHORED AROUND GLACIAL HOLD. Second of
 the Mage three. One spec only; the other ten trees and enemy tuning UNTOUCHED.
 §0 THE INITIATIVE AUDIT, AND THE ANSWER IS MOSTLY GOOD NEWS: **THE RESCHEDULE
@@ -299,8 +461,10 @@ Freeze's damage share does not move while the party's Break output nearly
 triples — "control is a team resource" as a number. MEASURED AND FLAGGED, NOT
 NERFED: Thaw's 51% is the tallest column and ships as written. Kit-mechanics
 ratios ONLY, no difficulty signal (Batch R).
-REPORTED NOT ACTED ON: **SHATTER NEVER FIRED IN THE SMOKE, and it is a design
-tension not a bot bug.** Shatter (Thaw) and Absolute Zero (Deep Freeze) are
+REPORTED NOT ACTED ON — **CLOSED BY BATCH AT: Shatter scales on TURNS HELD now,
+so it no longer needs a second prison to beat Ice Lance and the bot casts it. Do
+not re-record this as outstanding.** As AS wrote it: **SHATTER NEVER FIRED IN THE
+SMOKE, and it is a design tension not a bot bug.** Shatter (Thaw) and Absolute Zero (Deep Freeze) are
 both capstones and only ONE can be taken, so a Shatter build holds at most TWO
 (Second Prison, which costs him Piercing Ice) — and at a limit of one, Shatter
 and Ice Lance do the same job for more Mana, so the bot correctly prefers the
@@ -1946,10 +2110,12 @@ Martyr/Wellspring runes break). test_runes.gd asserts the call-site order
 so it cannot move back — the Hunter batch would have hit this on Focus.
 AUTHORING RULES THAT ARE NOW TESTED, NOT JUST WRITTEN: no rune may write
 one half of an EXCLUSIVE talent pair (heat_haze/scorched,
-arcane_ward/still_mind, cascade/overflow, stalwart/bastion,
+cascade/overflow, stalwart/bastion,
 pact_flesh/barter — cold_snap/bitter_cold DISSOLVED IN BATCH AS: both sit
 in Deep Freeze rows 6 and 2 now, a player can hold both, and a rune writing
-either counter is legal. NOTE the rule itself is no longer a live TEST:
+either counter is legal. arcane_ward/still_mind DISSOLVED IN BATCH AT: both
+designs are gone (their ids carry Event Horizon and Backlash), so the pair
+went with them. NOTE the rule itself is no longer a live TEST:
 Batch AI retired test_runes._exclusives to a `pass` because at row
 granularity it would fire on nearly every spec rune in the game); every
 stat field must be a real BattleUnit property or
@@ -3035,12 +3201,18 @@ Space or left click; no announcer text (combat log only).
   The open lever remains authored rune POWER — a runes.json data edit,
   not machinery — and the dilution question (see the AB block).
 - Sim bot wins ~90%+ with 4 heroes; real difficulty tuning by user playtest.
-- SEVEN TALENT TREES STILL CARRY BATCH AI'S MAGNITUDES. The four class batches
-  AI promised are done (AK Swordmaster, AJ Berserker, AL Warden, AR
-  Pyromancer), and BATCH AS re-authored the Cryomancer on top of them; the
-  Arcanist, the three Clerics and the three Hunters are structurally correct
-  and numerically weak — single-rank nodes at the old rank-1 values, i.e.
-  roughly a third of the power a row should be priced at.
+- SIX TALENT TREES STILL CARRY BATCH AI'S MAGNITUDES, AND THE MAGE CLASS IS
+  DONE. The four class batches AI promised landed (AK Swordmaster, AJ Berserker,
+  AL Warden, AR Pyromancer), then AS re-authored the Cryomancer and AT the
+  Arcanist — so all three Mage specs are purpose-authored. THE THREE CLERICS AND
+  THE THREE HUNTERS remain structurally correct and numerically weak: single-rank
+  nodes at the old rank-1 values, i.e. roughly a third of the power a row should
+  be priced at.
+- DEATH RAY CARRIES NO BREAK DAMAGE (Batch AT). Its brief specified Mana,
+  initiative, cooldown, damage, target count and its 5-stack gate precisely and
+  said nothing about BD, so it ships at pressure 0 rather than have a number
+  invented for it. A 40-Mana nuke that contributes nothing to the party's Break
+  is a real design question; one field in the Arcanist's kit either way.
 - ASHES OF AL'AR HAS NOWHERE TO LIVE (Batch AR). The Pyromancer's self-revive
   was removed with every other defensive option, deliberately, and its id now
   carries an unrelated node. If the designer wants it back it belongs Mage-wide
