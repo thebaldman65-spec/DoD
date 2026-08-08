@@ -627,30 +627,41 @@ var lethal_saved_cb := Callable()
 var shield_absorbed_cb := Callable()
 var prevented_cb := Callable()  # Batch W sim ledger: barrier absorbs → (src_name, absorbed, holder)
 
-# Occultist tree (07-24; lanes re-specced Batch L 07-30). See talents.gd
-# for the node text.
-var emp_hex_ranks := 0        # Empowered Hex: Hex can apply Decay
-var soul_leech_ranks := 0     # Soul Leech: deeper Ruin lifesteal
-var pleasure_ranks := 0       # Pleasure from Pain: heals per unique debuff
+# Occultist tree (07-24; lanes re-specced Batch L 07-30; every counter went
+# ADDITIVE in Batch AX — the field holds the MAGNITUDE, not a rank, and the
+# read site applies no step of its own). See talents.gd for the node text.
+#
+# THREE HOLD THE INCREASE ON A BASE THE KIT ALREADY PAYS and are named `_step`
+# for it (AV's `guardian_step` precedent, AW's four): `deep_hex_step` on the
+# passive's 2%-per-stack, `soul_leech_step` on its 2%-per-stack lifesteal,
+# `whispers_step` on Psychosis's own 50%. A FOURTH has the same shape and takes
+# the same treatment — `barter_step` on Dark Pact's base 15% — reported in the
+# changelog rather than silently generalised.
+var emp_hex_ranks := 0        # Empowered Hex: % chance Hex applies Decay (100 = always)
+var soul_leech_step := 0      # Soul Leech: +% per Ruin stack on the base 2%
+var pleasure_pct := 0.0       # Pleasure from Pain: % max HP per unique debuff (FRACTIONAL
+                              # — must NOT end in "_ranks" or STAT_INT_KEYS coerces it)
 var channeling_ranks := 0     # Corrupted Channeling: crippled attackers feed
 var murderous_ranks := 0      # Murderous Intent: bewitched kills heal
 var invigoration_ranks := 0   # Invigoration: Dark Pact mana regen
-var spread_ranks := 0         # Spread of Madness: Psychosis is contagious
+var spread_ranks := 0         # Spread of Madness: % chance Psychosis leaps
+var spread_ruin := 0          # Spread of Madness: Ruin the newly maddened take
 var infusion_ranks := 0       # Dark Infusion: attack per unique debuff
-var mirror_ranks := 0         # Umbral Mirror: enemy debuffs can reflect
-var broken_will_ranks := 0    # Broken Will: more Break damage dealt
-var deep_hex_ranks := 0       # Deeper Hex: Ruin stacks bite harder
-var grim_ranks := 0           # Grim Focus: detonations hit harder
-var entropy_ranks := 0        # Entropy: any Ruin grinds Break each turn
-var unravel_ranks := 0        # Unraveling: detonations seed Ruin in others
-var whispers_ranks := 0       # Whispers: Psychosis seizes more often
-var delirium_ranks := 0       # Delirium: maddened strikes mark the victim
-var cackling_ranks := 0       # Cackling Mirror: fellow-strikes heal the party
-var torment_ranks := 0        # Lingering Torment: expired madness leaves Decay
-var gluttony_ranks := 0       # Gluttony: deeper Ruin lifesteal (own dial)
-var pact_flesh_ranks := 0     # Pact of Flesh: Dark Pact bleeds less
-var barter_ranks := 0         # Dark Barter: Dark Pact heals deeper
-var avatar_ruin := 0          # capstone: detonations keep their stacks
+var mirror_ranks := 0         # Umbral Mirror: % chance enemy debuffs reflect
+var broken_will_ranks := 0    # Broken Will: +% Break damage dealt
+var deep_hex_step := 0        # Deeper Hex: +% damage per Ruin stack on the base 2%
+var grim_ranks := 0           # Grim Focus: +% detonation damage
+var entropy_ranks := 0        # Entropy: Break damage any Ruin grinds each turn
+var unravel_ranks := 0        # Unraveling: Ruin a detonation seeds in others
+var whispers_step := 0        # Whispers: +% seize chance on Psychosis's base 50%
+var delirium_ranks := 0       # Delirium: Ruin a maddened strike marks
+var cackling_ranks := 0       # Cackling Mirror: % of a fellow-strike healed
+var torment_ranks := 0        # Lingering Torment: Decay turns expired madness leaves
+var gluttony_ranks := 0       # Gluttony: +% per Ruin stack (its own dial)
+var pact_flesh_ranks := 0     # Pact of Flesh: percentage POINTS off Dark Pact's 20%
+var barter_step := 0          # Dark Barter: +% on Dark Pact's base 15% party heal
+var avatar_ruin := 0          # capstone: the Ruin threshold it installs (5), gate AND
+                              # magnitude in one field (AW's `judgement` precedent)
 var soul_glut := 0            # capstone: the Ruin lifesteal feeds everyone
 
 # Active statuses: {id, label, short, color, turns}
@@ -1212,10 +1223,13 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 				s.desc = _chilled_desc(int(s.stacks), turns < 0)
 				float_text("Chilled x%d" % s.stacks, color)
 			elif id == "ruin":
-				# Ruin STACKS (max 5, battle-long): the Old Gods' mark deepens.
-				s.stacks = mini(int(s.get("stacks", 1)) + 1, 5)
+				# Ruin STACKS battle-long, and since Batch AX it has NO MAXIMUM
+				# and NEVER CLEARS: corruption that resets is not corruption. A
+				# detonation takes the PRIMER, never the mark. The chip's text is
+				# re-stamped by battle._gain_ruin, the only site that can see the
+				# Occultist's talents (per-stack bite AND threshold both move).
+				s.stacks = int(s.get("stacks", 1)) + 1
 				s.short = "R%d" % s.stacks
-				s.desc = "Marked by the Old Gods: takes %d%% more\ndamage; heroes striking this unit heal.\nAt 5 stacks Ruin detonates on this\nunit's next turn." % (2 * int(s.stacks))
 				float_text("Ruin x%d" % s.stacks, color)
 			elif id == "burn":
 				# Reapplied Burn burns LONGER: the fresh application's turns

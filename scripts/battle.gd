@@ -46,8 +46,8 @@ const STATUS_INFO := {
 	"bewitch": ["Bewitched", "Bw", Color(0.75, 0.35, 0.85), "Charmed: basic-attacks its own\nallies, Dazing them with every\nstrike."],
 	"psychosis": ["Psychosis", "Py", Color(0.82, 0.42, 0.92), "Madness: 50% each turn to turn on\nits own — attacking a fellow, or\ncasting its helpful magic on the\nenemy side."],
 	"decay": ["Decay", "Dc", Color(0.62, 0.52, 0.35), "Rotting: takes 10 Break damage at\nthe start of each turn."],
-	"ruin": ["Ruin", "R1", Color(0.72, 0.32, 0.82), "Marked by the Old Gods: takes 2%\nmore damage per stack; heroes\nstriking this unit heal. At 5\nstacks Ruin detonates."],
-	"ruin_primed": ["Ruin (primed)", "R!", Color(0.9, 0.3, 0.9), "The Old Gods reach through: Ruin\ndetonates when this unit next\nacts."],
+	"ruin": ["Ruin", "R1", Color(0.72, 0.32, 0.82), "Marked by the Old Gods: takes 2%\nmore damage per stack; heroes\nstriking this unit heal. No ceiling,\nnever clears; detonates every 10th\nstack."],
+	"ruin_primed": ["Ruin (primed)", "R!", Color(0.9, 0.3, 0.9), "The Old Gods reach through: Ruin\ndetonates when this unit next\nacts — and the stacks REMAIN."],
 	"hysteria": ["Mass Hysteria", "MH", Color(0.9, 0.5, 0.9), "Next turn: strikes a fellow with\nDOUBLE Break damage, Sundering\nthem."],
 	"invig": ["Invigoration", "Iv", Color(0.45, 0.6, 0.95), "Restores Mana at the start of\neach turn (Dark Pact talent)."],
 	"devotion": ["Devotion Aura", "DA", Color(0.95, 0.8, 0.45), "The Devout's presence: takes 15%\nless Break damage."],
@@ -1692,8 +1692,8 @@ func _run_battle() -> void:
 		if not u.is_hero and not u.broken and u.has_status("ruin"):
 			var ent_occ := _living_occultist()
 			if ent_occ != null and ent_occ.entropy_ranks > 0:
-				var ent_result: Dictionary = u.take_hit(0, 5 * ent_occ.entropy_ranks)
-				_stat_bd(ent_occ, 5 * ent_occ.entropy_ranks)
+				var ent_result: Dictionary = u.take_hit(0, ent_occ.entropy_ranks)
+				_stat_bd(ent_occ, ent_occ.entropy_ranks)
 				u.float_text("+%d BD" % ent_result.get("bd", 0), Color(0.62, 0.52, 0.35))
 				_log("   → Talent: Entropy — Ruin grinds %s (+%d Break damage)" % [
 					u.unit_name, ent_result.get("bd", 0)], "#b0a8e0")
@@ -2439,10 +2439,10 @@ func _player_turn(u: BattleUnit) -> void:
 	await _resolve(u, ab, target, grade)
 	# Pleasure from Pain (Occultist talent): every unique affliction on the
 	# enemy team feeds the party as the Occultist's turn ends.
-	if u.pleasure_ranks > 0 and not u.dead and not battle_over:
+	if u.pleasure_pct > 0.0 and not u.dead and not battle_over:
 		var pp_uniques := _unique_enemy_debuffs()
 		if pp_uniques > 0:
-			var pp_amt := maxi(int(round(u.max_hp * 0.005 * u.pleasure_ranks
+			var pp_amt := maxi(int(round(u.max_hp * 0.01 * u.pleasure_pct
 				* pp_uniques)), 1)
 			for pp_h in heroes.filter(func(h): return not h.dead and not h.is_companion):
 				var pp_got: int = pp_h.heal_amount(pp_amt, pp_h != u)
@@ -2991,7 +2991,19 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 							zeal_t = zh
 				if not zeal_t.has_status("zeal"):
 					return [zeal_ab, zeal_t]
-			# Occultist: the Old Gods' toolkit.
+			# Occultist: the Old Gods' toolkit. BATCH AX §6 — two rules, or a
+			# sim measures a spec nobody plays.
+			#
+			# (1) FOCUS RUIN RATHER THAN SPREADING IT. Ten-stack thresholds
+			# reward working ONE target; a bot that debuffs whatever is
+			# convenient never detonates at all. _ruin_focus overrides the
+			# generic lowest-HP pick for everything he aims.
+			# (2) AGAINST A BOSS, PRIORITISE BREAK — Shadowrend and Hex on the
+			# boss, and HOLD the madness casts until it is Broken, since they
+			# are refused outright before that (§2). Spending a turn on one is
+			# spending the turn on nothing.
+			var oc_t := _ruin_focus(foes, target_foe)
+			var oc_gated: bool = oc_t.is_boss and not oc_t.broken
 			var pact := _find_ability(u, "Dark Pact")
 			if pact != null and u.resource >= pact.cost and u.ability_ready(pact) \
 					and u.hp > u.max_hp * 0.5 \
@@ -2999,21 +3011,21 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				return [pact, u]
 			var hyst := _find_ability(u, "Mass Hysteria")
 			if hyst != null and u.resource >= hyst.cost and u.ability_ready(hyst) \
-					and foes.size() >= 3:
+					and foes.size() >= 3 and not oc_gated:
 				return [hyst, u]
 			var mflay := _find_ability(u, "Mind Flay")
 			if mflay != null and u.resource >= mflay.cost and u.ability_ready(mflay) \
-					and foes.size() >= 2:
-				return [mflay, target_foe]
+					and foes.size() >= 2 and not oc_gated:
+				return [mflay, oc_t]
 			var bwitch := _find_ability(u, "Bewitch")
 			if bwitch != null and u.resource >= bwitch.cost and u.ability_ready(bwitch) \
-					and foes.size() >= 2 and not target_foe.has_status("bewitch") \
-					and not target_foe.is_boss:
-				return [bwitch, target_foe]
+					and foes.size() >= 2 and not oc_t.has_status("bewitch") \
+					and not oc_gated:
+				return [bwitch, oc_t]
 			var hex := _find_ability(u, "Hex of Ruin")
 			if hex != null and u.resource >= hex.cost and u.ability_ready(hex):
-				return [hex, target_foe]
-			return [u.abilities[0], target_foe]          # Smite / Shadowrend
+				return [hex, oc_t]
+			return [u.abilities[0], oc_t]                # Smite / Shadowrend
 	return [u.abilities[0], target_foe]
 
 
@@ -3802,19 +3814,19 @@ func _enemy_turn(u: BattleUnit) -> void:
 	# the heroes; the rest maul their own. Spread of Madness is contagious.
 	if u.has_status("psychosis"):
 		var spread_r := _max_hero_rank("spread_ranks")
-		if spread_r > 0 and randf() < 0.15 * spread_r:
+		if spread_r > 0 and randf() < 0.01 * spread_r:
 			var sane := enemies.filter(func(e): return not e.dead and e != u and not e.has_status("psychosis") and (not e.is_boss or e.broken))
 			if not sane.is_empty():
 				var infected: BattleUnit = sane.pick_random()
 				_log("   → Talent: Spread of Madness — the psychosis leaps to %s" % \
 					infected.unit_name, "#b0a8e0")
 				_apply_status(infected, "psychosis", 3)
-				_gain_ruin(infected, 1)
+				_gain_ruin(infected, _max_hero_rank("spread_ruin"))
 		# Whispers (talent): the madness speaks louder — 50% base, +10%/rank.
 		var psy_occ := _living_occultist()
-		var psy_chance := 0.5 + ((0.10 * psy_occ.whispers_ranks) if psy_occ != null else 0.0)
+		var psy_chance := 0.5 + ((0.01 * psy_occ.whispers_step) if psy_occ != null else 0.0)
 		if randf() < psy_chance:
-			if psy_occ != null and psy_occ.whispers_ranks > 0:
+			if psy_occ != null and psy_occ.whispers_step > 0:
 				_log("   → Talent: Whispers — the madness needs no coaxing (%d%% seized)" % \
 					int(round(psy_chance * 100)), "#b0a8e0")
 			var psy_support := _psychotic_support(u)
@@ -5208,11 +5220,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_log("   → Talent: Hour of Need — the party closes ranks around %s (-%d%%)" % [
 						strike_target.unit_name, hv_c.holy_vigil_pct], "#b0a8e0")
 			# Ruin: the Old Gods' mark cracks the target open (+2%/stack;
-			# Deeper Hex widens every crack by 1%/rank).
+			# Deeper Hex widens every crack to 5%).
+			#
+			# LEFT UNCAPPED DELIBERATELY (Batch AX §1). Against stacks that no
+			# longer clear this is a multiplier on a number with no ceiling —
+			# at twenty stacks Deeper Hex is +100% damage taken — and that IS
+			# the intended payoff of a long boss fight. It is the first thing
+			# to check if a boss row comes back absurd.
 			if not strike_target.is_hero and strike_target.has_status("ruin"):
 				var ruin_occ := _living_occultist()
 				if ruin_occ != null:
-					raw *= 1.0 + (0.02 + 0.01 * ruin_occ.deep_hex_ranks) \
+					raw *= 1.0 + 0.01 * (2 + ruin_occ.deep_hex_step) \
 						* strike_target.status_stacks("ruin")
 			# Shielded: the Orc Shieldmaster's single-ally ward.
 			if strike_target.has_status("shielded"):
@@ -5370,7 +5388,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_log("   → Talent: Pressure Cooker — +25 BD", "#b0a8e0")
 			# Broken Will: the Occultist grinds stability down harder.
 			if attacker.broken_will_ranks > 0:
-				pr = int(round(pr * (1.0 + 0.05 * attacker.broken_will_ranks)))
+				pr = int(round(pr * (1.0 + 0.01 * attacker.broken_will_ranks)))
 			# Breaker runes (rune_bd_bonus, its only read site): every blow
 			# lands heavier on the meter.
 			if attacker.rune_bd_bonus > 0.0 and pr > 0:
@@ -5388,14 +5406,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			total_dealt += final
 			enemies_struck += 1
 			# Wrath of the Old Gods: heroes striking a Ruined target drink
-			# deep (10% of damage dealt; Soul Leech and Gluttony deepen the
-			# draught on separate dials).
+			# deep. BATCH AX §1 — THE DRAUGHT IS PER STACK (2% each, replacing
+			# the flat 10%-while-any-Ruin), so it finally rewards the depth the
+			# passive was ignoring. Soul Leech and Gluttony are its two dials.
+			#
+			# AND IT IS CAPPED AT 40% OF THE DAMAGE DEALT, whatever the stacks
+			# and whatever the talents. The amplification above is allowed to
+			# run away; this is not — per-stack lifesteal against stacks with
+			# no ceiling would let the party heal more than it deals.
 			if attacker.is_hero and not strike_target.is_hero and final > 0 \
 					and strike_target.has_status("ruin") and not attacker.dead:
 				var occ_leech := _living_occultist()
 				if occ_leech != null:
-					var leech_pct := 0.10 + 0.05 * occ_leech.soul_leech_ranks \
-						+ 0.03 * occ_leech.gluttony_ranks
+					var leech_pct: float = minf(0.01
+						* (2 + occ_leech.soul_leech_step + occ_leech.gluttony_ranks)
+						* strike_target.status_stacks("ruin"), RUIN_LEECH_CAP)
 					var rl_heal := maxi(int(round(final * leech_pct)), 1)
 					var rl_got: int = attacker.heal_amount(rl_heal)
 					attacker.float_text("+%d" % rl_got, Color(0.7, 0.4, 0.9))
@@ -5429,7 +5454,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_log("   → Talent: Delirium — the betrayal marks %s (+%d Ruin)" % [
 							strike_target.unit_name, mad_occ.delirium_ranks], "#b0a8e0")
 					if mad_occ.cackling_ranks > 0:
-						var ck_amt := maxi(int(round(final * 0.03 * mad_occ.cackling_ranks)), 1)
+						var ck_amt := maxi(int(round(final * 0.01 * mad_occ.cackling_ranks)), 1)
 						for ck_h in heroes.filter(func(he): return not he.dead and not he.is_companion):
 							var ck_got: int = ck_h.heal_amount(ck_amt, ck_h != mad_occ)
 							ck_h.float_text("+%d" % ck_got, Color(0.7, 0.4, 0.9))
@@ -5692,7 +5717,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var mirror_r := _max_hero_rank("mirror_ranks")
 				if not attacker.is_hero and strike_target.is_hero and mirror_r > 0 \
 						and BattleUnit.DEBUFF_IDS.has(ab.applies_status["id"]) \
-						and randf() < 0.10 * mirror_r:
+						and randf() < 0.01 * mirror_r:
 					_log("   → Talent: Umbral Mirror — the %s rebounds onto %s" % [
 						ab.applies_status["id"].capitalize(), attacker.unit_name],
 						"#b0a8e0")
@@ -5722,7 +5747,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# Empowered Hex: the curse can set the rot in.
 				if ab.display_name == "Hex of Ruin" and attacker.emp_hex_ranks > 0 \
 						and not strike_target.dead \
-						and randf() < 0.25 * attacker.emp_hex_ranks:
+						and randf() < 0.01 * attacker.emp_hex_ranks:
 					_apply_status(strike_target, "decay", 3)
 					_gain_ruin(strike_target, 1)
 					_log("   → Talent: Empowered Hex — Decay takes root in %s" % \
@@ -6367,7 +6392,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if not attacker.is_hero and attacker.has_status("cripple") and total_dealt > 0 \
 				and chan_r > 0:
 			var blessed: BattleUnit = heroes.filter(func(h): return not h.dead).pick_random()
-			var leech_heal := maxi(int(round(total_dealt * 0.25 * chan_r)), 1)
+			var leech_heal := maxi(int(round(total_dealt * 0.01 * chan_r)), 1)
 			var chan_got: int = blessed.heal_amount(leech_heal)
 			blessed.float_text("+%d" % chan_got, Color(0.7, 0.4, 0.9))
 			_stat_heal(_living_hero_with("channeling_ranks"), chan_got)
@@ -7321,7 +7346,7 @@ func _bewitched_strike(u: BattleUnit) -> bool:
 			var mi_pool := heroes.filter(func(h): return not h.dead and not h.is_companion)
 			if not mi_pool.is_empty():
 				var mi_t := _lowest_hp(mi_pool)
-				var mi_heal := maxi(int(round(occ.max_hp * 0.10 * mi_ranks)), 1)
+				var mi_heal := maxi(int(round(occ.max_hp * 0.01 * mi_ranks)), 1)
 				var mi_got: int = mi_t.heal_amount(mi_heal, mi_t != occ)
 				mi_t.float_text("+%d" % mi_got, Color(0.7, 0.4, 0.9))
 				_stat_heal(occ, mi_got)
@@ -7347,6 +7372,27 @@ func _psychotic_support(u: BattleUnit) -> Array:
 	return []
 
 
+# BATCH AX §6 — THE BOT WORKS ONE TARGET. Ruin detonates on multiples of ten
+# and the stacks live on the enemy, so spreading the mark across a warband is
+# how a build never sees its own payoff. The deepest mark wins; a field with no
+# mark on it yet falls back to the generic pick, and an UNBROKEN BOSS outranks
+# both, because Break is the gate on the other half of his kit.
+func _ruin_focus(foes: Array, fallback: BattleUnit) -> BattleUnit:
+	if foes.is_empty():
+		return fallback
+	for e in foes:
+		if e.is_boss and not e.broken:
+			return e
+	var best: BattleUnit = fallback
+	var best_r := 0
+	for e in foes:
+		var r: int = e.status_stacks("ruin")
+		if r > best_r:
+			best_r = r
+			best = e
+	return best
+
+
 # Wrath of the Old Gods (Occultist passive): the living Occultist, or null.
 func _living_occultist() -> BattleUnit:
 	for h in heroes:
@@ -7366,7 +7412,7 @@ func _on_status_expired(u: BattleUnit, id: String) -> void:
 	var occ := _living_occultist()
 	if occ == null or occ.torment_ranks == 0:
 		return
-	var torment_turns := 2 * occ.torment_ranks
+	var torment_turns := occ.torment_ranks
 	_apply_status(u, "decay", torment_turns)
 	_log("   → Talent: Lingering Torment — the madness curdles into Decay on %s (%d turns)" % [
 		u.unit_name, torment_turns], "#b0a8e0")
@@ -7385,40 +7431,109 @@ func _unique_enemy_debuffs() -> int:
 	return seen.size()
 
 
+# BATCH AX §1 — RUIN HAS NO MAXIMUM AND NEVER CLEARS, and it detonates on
+# EVERY TENTH STACK rather than at the fifth. The threshold is what Avatar of
+# Ruin moves (to 5), so it lives in one function both the arming site and the
+# chip text read.
+const RUIN_THRESHOLD := 10
+
+# §1's runaway guard. The per-stack lifesteal reads uncapped stacks, so without
+# this the party would out-heal its own damage on a long boss. Soul Leech,
+# Gluttony and Soul Glut all sit UNDER it.
+const RUIN_LEECH_CAP := 0.40
+
+
+func _ruin_threshold() -> int:
+	var occ := _living_occultist()
+	# `avatar_ruin` is the GATE AND THE MAGNITUDE in one field (AW's `judgement`
+	# precedent): it holds the threshold the capstone installs.
+	if occ != null and occ.avatar_ruin > 0:
+		return occ.avatar_ruin
+	return RUIN_THRESHOLD
+
+
 # Wrath of the Old Gods: every Occultist-applied debuff marks its victim.
-# At 5 stacks the mark is PRIMED — it detonates at the victim's next turn.
+#
+# THE ARMING TEST IS "DID A STACK LAND ON A MULTIPLE OF THE THRESHOLD", NOT
+# "== 5". Stacks survive their detonations now, so an equality would arm once
+# and never again — and a `>=` would arm on every stack after the first
+# threshold. The modulo is the whole rule: 10, 20, 30 arm; 11 does not. Stacks
+# are added ONE AT A TIME so a multi-stack gain can never step over a
+# threshold without touching it.
 func _gain_ruin(target: BattleUnit, n: int = 1) -> void:
 	var occ := _living_occultist()
 	if occ == null or target.is_hero or target.dead:
 		return
+	var step := _ruin_threshold()
 	for i in n:
-		if target.status_stacks("ruin") >= 5:
-			break
 		_apply_status(target, "ruin", -1, 0, 0, occ)
-	if target.status_stacks("ruin") >= 5 and not target.has_status("ruin_primed"):
-		_apply_status(target, "ruin_primed", 1)
-		_log("   → The Old Gods take notice — %s's Ruin is PRIMED" % \
-			target.unit_name, "#c060d0")
+		# `> 0` is load-bearing: _apply_status can REFUSE the mark (Hallowed
+		# bounces every debuff), and 0 % anything is 0 — a refused stack would
+		# otherwise arm the bomb.
+		var st := target.status_stacks("ruin")
+		if st > 0 and st % step == 0 and not target.has_status("ruin_primed"):
+			_apply_status(target, "ruin_primed", 1)
+			_log("   → The Old Gods take notice — %s's Ruin is PRIMED (%d stacks)" % [
+				target.unit_name, st], "#c060d0")
+	_stamp_ruin_chip(target)
+	# BATCH AX §0 — THE SECOND NEW NUMBER: how deep the mark actually gets now
+	# that it has no ceiling. Banked at the gain site rather than at battle end
+	# because a target that DIES holding twenty stacks still measured twenty.
+	if sim:
+		var mk := "ruin_max_boss" if _boss_fight() else "ruin_max_trash"
+		sim_stats[mk] = maxf(sim_stats.get(mk, 0.0),
+			float(target.status_stacks("ruin")))
+
+
+# Is this a boss fight? Read off the field rather than the encounter, so a
+# mini-boss lineup and a zone boss both count and a driven test can set it.
+func _boss_fight() -> bool:
+	for e in enemies:
+		if e.is_boss:
+			return true
+	return false
+
+
+# The Ruin chip's own text. It lives here rather than in unit.add_status
+# because every number in it moves with the Occultist's talents: Deeper Hex
+# widens the per-stack bite and Avatar of Ruin halves the threshold.
+func _stamp_ruin_chip(target: BattleUnit) -> void:
+	var occ := _living_occultist()
+	if occ == null or not target.has_status("ruin"):
+		return
+	var stacks := target.status_stacks("ruin")
+	var step := _ruin_threshold()
+	target.update_status("ruin", "R%d" % stacks,
+		"Marked by the Old Gods: takes %d%% more\ndamage (%d%% per stack, never clears);\nheroes striking this unit heal. Ruin\ndetonates at %d stacks." % [
+			(2 + occ.deep_hex_step) * stacks, 2 + occ.deep_hex_step,
+			(int(stacks / step) + 1) * step])
 
 
 # The primed Ruin detonates: shadow damage off the Occultist's Attack and
-# a wave of stolen vitality for the party. Grim Focus deepens the blast,
-# Unraveling seeds the mark in every other enemy, and the Avatar of Ruin
-# capstone keeps the stacks so a held target detonates again each turn.
+# a wave of stolen vitality for the party. Grim Focus deepens the blast and
+# Unraveling seeds the mark in every other enemy.
+#
+# BATCH AX §1 — THE STACKS SURVIVE. Only the primer is consumed; the mark
+# itself never washes off, so the +2%-per-stack amplification climbs for the
+# whole battle and the next detonation waits for the next multiple of the
+# threshold. It is bigger than it was (50% -> 90% of Attack, 15% -> 25% party
+# heal) because it costs twice as long to earn — not quite double, because the
+# persisting stacks are themselves new value.
 func _detonate_ruin(target: BattleUnit) -> void:
 	var occ := _living_occultist()
-	# Avatar of Ruin: the stacks are never consumed — only the primer is.
-	var det_avatar := occ != null and occ.avatar_ruin > 0
-	if not det_avatar:
-		target.remove_status("ruin")
 	target.remove_status("ruin_primed")
 	if occ == null or target.dead:
 		return
-	var det_raw := 0.50 * occ.attack * randf_range(0.9, 1.1)
-	# Grim Focus: the detonation strikes 25%/rank harder.
-	det_raw *= 1.0 + 0.25 * occ.grim_ranks
+	var det_raw := 0.90 * occ.attack * randf_range(0.9, 1.1)
+	# Grim Focus: the detonation strikes 80% harder.
+	det_raw *= 1.0 + 0.01 * occ.grim_ranks
 	var resist := float(target.resists.get("shadow", 0.0))
 	var det_dmg := maxi(int(round(det_raw * (1.0 - resist))), 1)
+	# BATCH AX §0 — THE FIRST OF TWO NEW NUMBERS, and §1 says to report it
+	# rather than assume it: moving the threshold from the 5th stack to the 10th
+	# largely takes his signature payoff OUT of ordinary fights, by construction.
+	# Split trash vs boss because that split IS the design.
+	_stat("ruin_detonations_boss" if _boss_fight() else "ruin_detonations_trash")
 	_message("RUIN consumes %s!" % target.unit_name)
 	var det_died := target.take_tick_damage(det_dmg, "-%d RUIN" % det_dmg,
 		Color(0.8, 0.3, 0.9))
@@ -7426,11 +7541,11 @@ func _detonate_ruin(target: BattleUnit) -> void:
 	_log("%s: Wrath of the Old Gods — Ruin detonates on %s for %d shadow" % [
 		occ.unit_name, target.unit_name, det_dmg], "#c060d0")
 	for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
-		var rw_heal := maxi(int(round(occ.max_hp * 0.15)), 1)
+		var rw_heal := maxi(int(round(occ.max_hp * 0.25)), 1)
 		var rw_got: int = h.heal_amount(rw_heal, h != occ)
 		h.float_text("+%d" % rw_got, Color(0.7, 0.4, 0.9))
 		_stat_heal(occ, rw_got)
-	_log("   → the party feasts on the ruin (15% of the Occultist's health each)",
+	_log("   → the party feasts on the ruin (25% of the Occultist's health each)",
 		"#b070d0")
 	# Unraveling: the blast seeds Ruin in every OTHER enemy. One propagation
 	# per detonation BY CONSTRUCTION: a seeded enemy only gets PRIMED here —
@@ -7445,13 +7560,12 @@ func _detonate_ruin(target: BattleUnit) -> void:
 		if unr_hit > 0:
 			_log("   → Talent: Unraveling — the ruin seeps outward (+%d Ruin to %d others)" % [
 				occ.unravel_ranks, unr_hit], "#b0a8e0")
-	# Avatar of Ruin: a target still held at 5 is primed anew — the bomb
-	# goes off again at its next turn.
-	if det_avatar and not target.dead and target.status_stacks("ruin") >= 5 \
-			and not target.has_status("ruin_primed"):
-		_apply_status(target, "ruin_primed", 1)
-		_log("   → Avatar of Ruin — the mark endures; %s will detonate again" % \
-			target.unit_name, "#c060d0")
+	# The mark endures. It is NOT re-primed here: the next blast waits for the
+	# next multiple of the threshold, which is what _gain_ruin's modulo decides.
+	if not target.dead:
+		_stamp_ruin_chip(target)
+		_log("   → the mark endures — %s still bears %d Ruin" % [target.unit_name,
+			target.status_stacks("ruin")], "#b070d0")
 	if det_died:
 		_stat("enemy_deaths")
 		_sfx("death", -4.0)
@@ -7957,7 +8071,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"dark_pact":
 			# Blood for blood: the Occultist bleeds so the party may live.
 			# Pact of Flesh thins the toll (20% base, -10%/rank — free at 2).
-			var pact_pct := maxf(0.20 - 0.10 * attacker.pact_flesh_ranks, 0.0)
+			var pact_pct := maxf(0.20 - 0.01 * attacker.pact_flesh_ranks, 0.0)
 			var pact_cost := 0
 			if pact_pct > 0.0:
 				pact_cost = maxi(int(round(attacker.max_hp * pact_pct)), 1)
@@ -7969,7 +8083,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("heal", -5.0, 0.6)
 			# The pact-maker bleeds; every OTHER party member drinks. Dark
 			# Barter deepens the draught (15% base, +10%/rank).
-			var pact_heal_pct := 0.15 + 0.10 * attacker.barter_ranks
+			var pact_heal_pct := 0.15 + 0.01 * attacker.barter_step
 			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
 				if h == attacker:
 					continue
@@ -7977,7 +8091,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var dp_hgot: int = h.heal_amount(dp_amt, true)
 				h.float_text("+%d" % dp_hgot, Color(0.7, 0.4, 0.9))
 				_stat_heal(attacker, dp_hgot)
-			if attacker.barter_ranks > 0:
+			if attacker.barter_step > 0:
 				_log("   → Talent: Dark Barter — the party drinks %d%% (up from 15%%)" % \
 					int(round(pact_heal_pct * 100)), "#b0a8e0")
 			# The Occultist knits back together over 3 turns (10%/turn).
@@ -7988,7 +8102,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# Invigoration (talent): the pact also drips Mana back.
 			if attacker.invigoration_ranks > 0:
 				var invig_tick := maxi(int(round(attacker.max_resource
-					* 0.02 * attacker.invigoration_ranks)), 1)
+					* 0.01 * attacker.invigoration_ranks)), 1)
 				_apply_status(attacker, "invig", 3, invig_tick)
 			if is_perfect:
 				attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
@@ -10195,6 +10309,11 @@ func _check_end() -> void:
 	if sim:
 		sim_done += 1
 		_stat("battles")
+		# Batch AX §0: the denominators for the two Ruin numbers. A run is mostly
+		# trash, so averaging detonations over ALL battles would bury the boss
+		# half — which is the half the design is aimed at.
+		if heroes.any(func(h): return h.passive_id == "old_gods"):
+			_stat("ruin_boss_battles" if _boss_fight() else "ruin_trash_battles")
 		# BATCH AW §0 — THE ONE NEW NUMBER, and it is the whole batch in one
 		# figure: how much maximum health Conviction lent the Devout over the
 		# course of this fight. Banked here rather than at the growth site so
@@ -10555,7 +10674,28 @@ func _print_sim_report() -> void:
 			sim_stats.get("conviction_growth", 0.0) / cg_n,
 			sim_stats.get("conviction_growth_pct", 0.0) / cg_n,
 			int(sim_stats.get("conviction_growth_max", 0.0))])
+	var rx := ruin_report_line(sim_stats)
+	if rx != "":
+		print(rx)
 	print("=============================================\n")
+
+
+# BATCH AX §0 — THE TWO NUMBERS THE BATCH IS ABOUT, split trash vs boss because
+# that split IS the design: moving the threshold to every tenth stack takes his
+# signature payoff largely out of ordinary fights and makes him the boss
+# specialist by construction. Shared by the standalone report and RunSim's,
+# since only a RUN ever meets a boss. Returns "" when no Occultist stood — a
+# zero on a party without one reads as a broken instrument rather than a line.
+static func ruin_report_line(stats: Dictionary) -> String:
+	var rt_n: float = stats.get("ruin_trash_battles", 0.0)
+	var rb_n: float = stats.get("ruin_boss_battles", 0.0)
+	if rt_n <= 0.0 and rb_n <= 0.0:
+		return ""
+	return "Ruin detonations/battle: trash %.2f (n=%d, deepest mark %d) | boss %.2f (n=%d, deepest mark %d)" % [
+		stats.get("ruin_detonations_trash", 0.0) / maxf(rt_n, 1.0), int(rt_n),
+		int(stats.get("ruin_max_trash", 0.0)),
+		stats.get("ruin_detonations_boss", 0.0) / maxf(rb_n, 1.0), int(rb_n),
+		int(stats.get("ruin_max_boss", 0.0))]
 
 
 # Sweep report (DOD_SIM_SWEEP=1): one row per budget stage. Rounds reuses

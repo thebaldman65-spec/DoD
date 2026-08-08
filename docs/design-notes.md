@@ -2095,3 +2095,59 @@ ally at a time. No magnitude on that node could fix it, because the fix was
 needed by players who had not bought it. Putting the drip in Consecrated Ground
 and letting the node deepen it costs a node's worth of power and buys the passive
 its stated identity.
+
+
+## Batch AX — the Occultist: corruption
+
+**A resource that resets is not a resource — it is a cooldown wearing a
+counter's clothes.** Ruin climbed to five and then cleared, so the number on the
+chip was never a record of anything; it was a timer. Removing the cap and the
+clear costs nothing structurally and changes what the spec is *about*: his power
+stops being something he does each turn and becomes something that has been done
+to the enemy. The one design fact worth carrying forward is that the fantasy was
+already in the fiction and only the mechanic disagreed with it.
+
+**Moving a threshold out is a bigger nerf than it looks, and the honest thing is
+to name the loss rather than hide it inside a buff.** Ten stacks at ~1.5 a turn
+is about seven turns, and a trash fight ends in seven or eight — so pushing the
+detonation from the 5th stack to the 10th very nearly removes his signature
+payoff from most of the fights he is in. Making him the boss specialist by
+construction is a real design position, but it is one that a bigger blast and a
+persisting mark can easily paper over in a changelog. The batch shipped an
+instrument for exactly that number, split trash vs boss, and named the fallback
+variant (*first detonation at 5, every 10 after*) without shipping it.
+
+**When you uncap one number, every effect that reads it needs deciding
+separately — and "cap them all" is as lazy as "cap none".** Two effects read
+Ruin per stack. The damage amplification is *supposed* to run away: that is the
+payoff of a long boss fight, and Deeper Hex at twenty stacks doubling incoming
+damage is the design working. The lifesteal is not, because per-stack lifesteal
+against an unbounded number lets the party heal more than it deals, which is not
+"strong" but "the fight cannot end". One got a ceiling and one deliberately did
+not, and the reason lives beside each.
+
+**A gate is not a hole when the player can see the key.** Every Madness effect
+is refused by a boss until it is Broken, which reads as "this lane does nothing
+in the fights that matter" — right up until you notice the same tree sells you
+two nodes whose whole job is grinding Break. The fix was never mechanical. It
+was that the plan existed and was invisible, so it got stated in the lane text,
+the glossary and the tooltips, and the mechanic was left exactly alone.
+
+**A unit change is not a magnitude change, and the difference matters most for
+things you are not allowed to retune.** Rune magnitude has been closed since
+Batch AF, so a rune re-pointed onto a re-priced counter must still pay what it
+paid. That works right up until the *unit* moves: the Hollow Chalice bought "5%
+more from a flat lifesteal", and after this batch there is no flat lifesteal for
+that sentence to mean anything against. There is no faithful number, only a
+faithful *relationship* — one node's worth of each dial, which is what it always
+was. Reporting that is the whole job; quietly picking a number and calling it
+unchanged is how a closed question gets reopened by accident.
+
+**A stale premise in a brief is worth more as a finding than as a change.**
+§7 asked for a Fervor cut whose stated end state — the ground paying 2 a turn
+with the node learned — was already what shipped in Batch AW. The two readings
+that *would* have been real changes each broke something the brief said to keep:
+one leaves a node doing nothing, the other reverts AW's decision to put the drip
+in the base kit. The measured overshoot it was aimed at is still there, and
+saying so plainly is more useful than shipping a guess that makes the number
+move for reasons nobody chose.

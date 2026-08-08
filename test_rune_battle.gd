@@ -370,8 +370,15 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 				barrage.random_hits if barrage != null else -1))
 	if by_spec.has("old_gods"):
 		var oc: Node = by_spec["old_gods"]
-		ok(oc.deep_hex_ranks >= 1, "occultist: deep_hex_ranks never applied")
-		ok(oc.entropy_ranks >= 1, "occultist: entropy_ranks never applied")
+		# RE-POINTED IN PLACE BY BATCH AX, with the reason here: the Occultist's
+		# counters went ADDITIVE, so the Deepening Ruin writes a magnitude rather
+		# than a rank — 1 percentage point per Ruin stack and 5 Break damage a
+		# turn, which is EXACTLY what the rune paid before the batch.
+		ok(oc.deep_hex_step == 1, "occultist: the Deepening Ruin pays %d%% per stack, expected 1" % oc.deep_hex_step)
+		ok(oc.entropy_ranks == 5, "occultist: the Deepening Ruin grinds %d Break damage, expected 5" % oc.entropy_ranks)
+		ok(oc.soul_leech_step == 3 and oc.gluttony_ranks == 3,
+			"occultist: the Hollow Chalice pays %d/%d per stack, expected 3/3" % [
+				oc.soul_leech_step, oc.gluttony_ranks])
 		ok(oc.healing_received_mult < 1.15,
 			"occultist: the Hollow Chalice healing cost never applied")
 		var has_flay := false

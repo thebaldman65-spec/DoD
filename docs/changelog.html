@@ -5,6 +5,177 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-08 — Batch AX: the Occultist — corruption</h2>
+<p><i>Third of the Cleric three, and <b>the class is done</b>. His tree needed the least
+structural work of the three — Ruin / Madness / Leech are genuinely distinct axes with real
+cross-lane plumbing, and no lane was lying about its job (Batch L did good work). What he
+needed was the same 4&ndash;5&times; repricing and a spine: <b>corruption &mdash; his power
+is not in him at all, it is in what he has done to them.</b> Every one of his 24 ids
+survives and re-specs in place; no new ids, none deleted, <b>no save version move</b>
+(still v7). &sect;7 carries a finding on the Devout's Fervor rather than a change.</i></p>
+<ul>
+
+<li><b>&sect;1 RUIN HAS NO MAXIMUM AND IT NEVER CLEARS.</b> <b>Corruption that resets is not
+corruption.</b> A detonation now consumes the <i>primer</i> and nothing else: the mark
+stays, so the +2%-per-stack amplification climbs for the whole battle. <b>The detonation
+moves from the 5th stack to every 10th</b> — thresholds at 10, 20, 30 and onward — and the
+implementation tracks <b>the next multiple crossed</b>, not an equality: with stacks that
+survive, <code>== 5</code> would arm once and never again, and <code>&gt;= 5</code> would
+arm on every stack forever. <b>The blast is bigger because it costs twice as long to
+earn</b>: 50% &rarr; <b>90% of the Occultist's Attack</b>, and the party heal 15% &rarr;
+<b>25% of his max health</b>. Not quite double, because the persisting stacks are themselves
+new value.</li>
+
+<li><b>THE CONSEQUENCE, STATED RATHER THAN BURIED: his signature payoff largely leaves
+ordinary fights.</b> On a focused target he builds roughly 1.5 Ruin a turn, so ten stacks is
+about seven turns and a trash fight ends in seven or eight. <b>That is the intent</b> — a
+trash enemy will not survive long enough for the stacks to run away and a boss will, which
+makes him the boss specialist by construction. It is also a real loss of moment-to-moment
+feel, so it is <b>measured and reported</b>, not assumed. <b>IT MEASURED ZERO.</b> Across
+519 trash battles of a 40-run line (Ruin-lane build) the trash rate is <b>0.00
+detonations/battle, deepest mark 10</b>; a 200-battle standalone smoke with the <i>entire</i>
+Ruin lane force-learned also reads <b>0.00, and its deepest mark is 7</b> — ten stacks is not
+merely rare in an ordinary fight, it is out of reach. The boss half is thin rather than
+healthy: <b>0.13 detonations/battle over 23 boss fights, deepest mark 12</b>. Per &sect;1's
+own instruction the variant that would fix it — <i>first detonation at 5, every 10 after</i>,
+which keeps the trash payoff and the boss escalation both — was <b>deliberately NOT shipped
+on this batch's own initiative</b>. The number is the report; the decision is the
+designer's.</li>
+
+<li><b>UNCAPPED STACKS MEAN EVERY PER-STACK EFFECT NEEDED A RUNAWAY CHECK. There are two,
+and they get opposite treatment.</b> <b>The damage amplification is left uncapped</b> —
++2% a stack, +5% with Deeper Hex, climbing all fight; on a boss that is the intended payoff
+of long corruption and it is the reason the spine works. <b>The lifesteal is capped.</b> It
+becomes <b>per stack (2% each, replacing the flat 10%-while-any-Ruin)</b> — the axis the
+passive had been wasting — and <b>the whole draught is capped at 40% of the damage
+dealt</b>, whatever the stacks and whatever the talents, because per-stack lifesteal against
+an uncapped number would let the party heal more than it deals. Soul Leech, Gluttony and
+Soul Glut all sit under it.</li>
+
+<li><b>&sect;2 THE MADNESS LANE'S BOSS PROBLEM IS MADE LEGIBLE, NOT PATCHED.</b> Psychosis,
+Bewitch, Hysteria and Mass Hysteria all resist a boss unless it is Broken, so a Madness build
+read as dead in the nine fights a run that decide the run. <b>It is not dead — it is gated
+behind a task, and the task is his other lane's job.</b> Broken Will and Entropy exist to
+grind Break and they got much bigger here, so breaking the boss and <i>then</i> maddening it
+is a genuine two-step plan. <b>No boss workaround was added.</b> What changed is that the
+rule is now stated where a player meets it: the Madness lane's node text, the Psychosis /
+Bewitched / Mass Hysteria glossary entries (all three now <b>name Break as the key</b>), and
+the Bewitch / Mind Flay / Mass Hysteria ability tooltips.</li>
+
+<li><b>&sect;3 ALL 24 NODES RE-PRICED AT ROW PRICING</b>, magnitudes 4&ndash;5&times; for the
+same reason Holy's and the Devout's were. <b>All three lane names and theses stand</b> —
+this is the one Cleric tree that did not need re-aiming. Full table in &sect;7 of the Master
+Document. <b>Deeper Hex is now the most dangerous node in the game</b> and wants watching:
+against uncapped stacks it is a multiplier on a number with no ceiling, and at twenty stacks
+it is +100% damage taken (measured at &times;1.96 in the batch test). That is the intended
+shape of a long boss fight, and it is the first thing to check if a boss row comes back
+absurd. <b>Avatar of Ruin is re-specced rather than repriced</b>: keeping the stacks is the
+default now, so the capstone moves the <i>threshold</i> instead — <b>every 5th stack instead
+of every 10th</b>, doubling his detonation rate. It is the answer for a player who wants the
+payoff back in ordinary fights.</li>
+
+<li><b>&sect;4 TWO AUTHORED FALLBACKS (AU &sect;1) replacing his generics:</b> Mind Flay
+already owned &rarr; it strikes <b>three</b> minions instead of two; Mass Hysteria already
+owned &rarr; its cooldown drops from 4 to <b>2</b>. <b>With that the Cleric class owes no
+generic fallbacks at all</b>, and test_batch_au's floor moves 11 &rarr; 9 with the reason in
+the file (it falls on purpose, one class batch at a time).</li>
+
+<li><b>&sect;5 EVERY OCCULTIST COUNTER IS ADDITIVE</b> (the AR/AS/AT/AV/AW form): the payload
+holds the magnitude and the read site applies no step of its own. <b>Four hold the INCREASE
+on a base the kit already pays and are named <code>_step</code> for it</b> —
+<code>deep_hex_step</code> on the passive's 2%, <code>soul_leech_step</code> on its 2%
+lifesteal, <code>whispers_step</code> on Psychosis's 50%, and <b>the batch named three; the
+fourth (<code>barter_step</code>, on Dark Pact's 15%) has the same shape and takes the same
+treatment</b> — reported, not silently generalised. <code>spread_ranks</code> SPLIT into
+<code>spread_ranks</code> (a chance) + <code>spread_ruin</code> (a stack count), because one
+counter cannot honestly hold both. <b><code>pleasure_ranks</code> was RENAMED
+<code>pleasure_pct</code></b>: its magnitude is 2.5 and <code>Runes.STAT_INT_KEYS</code>
+coerces anything ending in <code>_ranks</code> to an int, which would have silently rounded
+it down. <code>avatar_ruin</code> is the gate AND the magnitude in one field (it holds the
+threshold it installs).</li>
+
+<li><b>RUNE AUDIT — three re-pointed, and two of them still pay exactly what they paid before
+this batch (only the units moved):</b> the Deepening Ruin (<code>deep_hex_ranks</code> 1
+&rarr; <code>deep_hex_step</code> 1, <code>entropy_ranks</code> 1&rarr;5) and the Whispering
+Dark (<code>broken_will_ranks</code> 1&rarr;5, <code>spread_ranks</code> 1&rarr;15, +
+<code>spread_ruin</code> 1 — the old spread site marked the newly maddened with 1 Ruin
+unconditionally, so the rune paid it and now has to say so, <code>pleasure_ranks</code> 1
+&rarr; <code>pleasure_pct</code> 0.5). <b>THE HOLLOW CHALICE IS THE ONE THAT COULD NOT.</b>
+&sect;1 changed the lifesteal's <i>unit</i> from a flat rate to a per-stack one, so "5% more
+from Ruined targets" has no equivalent value at all. It keeps the relationship it has always
+had — exactly one node's worth of each dial (<code>soul_leech_step</code> 3,
+<code>gluttony_ranks</code> 3) — and its description was rewritten to the new units rather
+than left lying. Reported rather than filed as a magnitude change (rune magnitude has been
+closed since Batch AF). <b>The Hollow Chalice's healing clamp was CHECKED rather than
+trusted</b>, as &sect;5 asked: the worst reachable loadout sums to <b>&minus;0.60</b> against
+a floor of &minus;1.00, so Batch AA's guard comment still holds — and the batch test now
+computes it rather than believing it. The three Cleric class-wide runes touch no Occultist
+counter, asserted. <b>No Occultist exclusive pair survives</b> in the data or in CLAUDE.md's
+prose: Batch L already retired Pact of Flesh &harr; Grim Focus and no other was authored.</li>
+
+<li><b>&sect;6 THE BOT: it works ONE target, and it holds its madness against a boss.</b>
+Ten-stack thresholds reward focus, so a bot that debuffed whatever was convenient would never
+detonate and a sim would measure a spec nobody plays. <code>_ruin_focus</code> aims
+everything he casts at the deepest existing mark, and <b>an unbroken boss outranks even
+that</b> — Shadowrend and Hex go on it to grind Break, while Mass Hysteria, Mind Flay and
+Bewitch are <b>held</b> until it is Broken, since they are refused outright before that.</li>
+
+<li><b>NEW INSTRUMENT (&sect;0's two numbers):</b> <b>Ruin detonations per battle and the
+deepest mark observed, each SPLIT TRASH VS BOSS</b>, in both the standalone report and the
+run report — the run report because only a run ever meets a boss. Printed only when an
+Occultist stood, because a zero on a party without one reads as a broken instrument rather
+than a line.</li>
+
+<li><b>&sect;7 THE DEVOUT'S FERVOR: THE BATCH BRIEF'S PREMISE WAS STALE, AND THIS IS A
+FINDING RATHER THAN A CHANGE.</b> &sect;7 asked to drop Fervor "from 2 Faith per ally per
+turn to 1, so Consecrated Ground pays 2 a turn rather than 3 with the node learned". <b>The
+ground already paid 2 a turn with the node learned</b>: Batch AW put a base drip of 1 in the
+kit and priced Fervor as a +1 increase, so the end state &sect;7 specified was already
+shipped and the instruction is a no-op. Corrected toward the code (the house rule), and NOT
+generalised into a guess: the two readings that would have been real changes are
+<code>fervor_step</code> 1&rarr;0, which leaves a node doing nothing at all, and reverting
+AW &sect;2's base drip, which &sect;7 explicitly says stays. <b>The smoke was re-run anyway
+and it is comparable with AW's:</b> the FAITH row isolated on Apostle, n=200, measures
+<b>80% contribution, 2305 healing a battle, +83.7% of base growth per battle, peak 390 HP on
+a 175 base</b> against AW's 78% / 1997 / +72.9% / 360. <b>AW's overshoot is UNADDRESSED and
+is still open for a later batch to price.</b></li>
+
+<li><b>DOCS.</b> The Ruin glossary entry was rewritten wholesale (no ceiling, never clears,
+tenth-stack threshold, per-stack amplification, capped lifesteal); Psychosis, Bewitched and
+Mass Hysteria each gained the boss rule and name Break as the key; &sect;6.3's Occultist
+entry and &sect;7's three lane tables were rebuilt from the shipped tree. <b>One more stale
+claim recorded rather than actioned:</b> &sect;8 asks for "the &times;3 rank notation
+removed" from &sect;7's Occultist tables. There is no such notation in master.html and there
+has not been since Batch AI made every node single-rank — the same correction Batch AW
+made when its own brief claimed it.</li>
+
+<li><b>MAPPING TABLE — every id survives and re-specs in place.</b> Ruin:
+<code>oc_emp_hex</code> Empowered Hex 25% &rarr; <b>always</b> &middot;
+<code>oc_deep_hex</code> Deeper Hex 3%&rarr;5% per stack &middot;
+<code>oc_channeling</code> Corrupted Channeling 25%&rarr;60% &middot;
+<code>oc_broken_will</code> Broken Will 5%&rarr;25% &middot; <code>oc_grim</code> Grim Focus
+25%&rarr;80% &middot; <code>oc_entropy</code> Entropy 5&rarr;20 Break damage &middot;
+<code>oc_unravel</code> Unraveling 1&rarr;4 Ruin. Madness: <code>oc_spread</code> Spread of
+Madness 15%&rarr;60% and 1&rarr;2 Ruin &middot; <code>oc_whispers</code> Whispers
+60%&rarr;95% &middot; <code>oc_mind_flay</code> Mind Flay unchanged, <b>+ an authored
+fallback</b> &middot; <code>oc_mirror</code> Umbral Mirror 10%&rarr;45% &middot;
+<code>oc_delirium</code> Delirium 1&rarr;3 Ruin &middot; <code>oc_cackling</code> Cackling
+Mirror 3%&rarr;15% &middot; <code>oc_torment</code> Lingering Torment 2&rarr;5 turns.
+Leech: <code>oc_soul_leech</code> Soul Leech "15% flat" &rarr; <b>5% per stack</b> &middot;
+<code>oc_invigoration</code> Invigoration 2%&rarr;8% &middot; <code>oc_gluttony</code>
+Gluttony "3% flat" &rarr; <b>3% per stack</b> &middot; <code>oc_pleasure</code> Pleasure
+from Pain 0.5%&rarr;2.5% &middot; <code>oc_murderous</code> Murderous Intent 10%&rarr;35%
+&middot; <code>oc_pact_flesh</code> Pact of Flesh &minus;10%&rarr;&minus;15% (a cost of 5%)
+&middot; <code>oc_barter</code> Dark Barter 25%&rarr;35%. Capstones:
+<code>oc_avatar_ruin</code> Avatar of Ruin <b>re-spec</b>, "detonations keep their stacks"
+&rarr; "detonates every 5th stack" (its old subject is the passive now) &middot;
+<code>oc_hysteria</code> Mass Hysteria unchanged, <b>+ an authored fallback</b> &middot;
+<code>oc_soul_glut</code> Soul Glut unchanged in intent, now under the 40% cap. <b>No forced
+assignment was needed</b> — every node's subject survived, and the one re-spec (Avatar of
+Ruin) keeps its own subject one step further out.</li>
+
+</ul>
+
 <h2>2026-08-08 — Batch AW: the Devout — investment</h2>
 <p><i>Second of the Cleric three. His tree was purpose-designed already (Batch K), so this is
 not a restructure either — it is a spine (<b>he lends out his own bulk and collects

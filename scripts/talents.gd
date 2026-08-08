@@ -1807,153 +1807,165 @@ const LANE_TREES := {
 			"payload": {"stat": {"apex": 1}}},
 	],
 	"occultist": [
-		# Purpose-designed lanes (Batch L, 07-30). Batch AI re-cut the tiers
-		# into 7 exclusive rows + a capstone row. The 11 mapped
-		# original nodes keep their ids and payloads verbatim (Dark Infusion
-		# was already dropped by the Batch 31 conversion and stays out); the
-		# conversion fillers were re-specced IN PLACE (same ids, new
-		# effects), so saved ranks migrate. The deliberate bias: CROSS-LANE
-		# PLUMBING — the three lanes never fed one another, so Delirium
-		# makes Madness generate Ruin, and Cackling Mirror / Soul Glut make
-		# both generate healing. Three lanes running one loop.
-		# --- Lane A: Ruin — the detonation engine: stack the mark, blow
-		# it, chain it. Entropy is the Pressure archetype made literal. ---
+		# Purpose-designed lanes (Batch L, 07-30), re-priced by Batch AX
+		# (08-08). Batch AI re-cut the tiers into 7 exclusive rows + a capstone
+		# row; Batch L's cross-lane plumbing is intact and was the reason this
+		# tree needed the LEAST structural work of the Cleric three — Ruin /
+		# Madness / Leech are genuinely distinct axes and no lane is lying about
+		# its job. AX gave it the same 4-5x repricing Holy and the Devout took,
+		# and a spine: CORRUPTION — his power is not in him at all, it is in
+		# what he has done to them. EVERY ID SURVIVES AND RE-SPECS IN PLACE, so
+		# saved picks migrate and no save version moves.
+		#
+		# EVERY COUNTER IS ADDITIVE (the AR/AS/AT/AV/AW form): the payload holds
+		# the MAGNITUDE and the read site applies no step of its own.
+		# --- Lane RUIN — the mark: stack it, blow it, chain it. Batch AX
+		# repriced the lane around §1's new corruption: the stacks never wash
+		# off, so every per-stack node here is a dial on a number with no
+		# ceiling. Broken Will and Entropy are ALSO §2's two-step plan — the
+		# Break that unlocks the Madness lane against a boss — and they are
+		# priced with that job in mind, not just as damage dials. ---
+		# The chance IS the counter now (100 = always), so a rune adding to it
+		# cannot overflow into nonsense.
 		{"id": "oc_emp_hex", "name": "Empowered Hex", "ranks": 1, "lane": "Ruin", "row": 1,
-			"desc": "Hex of Ruin has a {v}% chance per target to also apply Decay (10 Break damage per turn, 3 turns).",
-			"scale": {"step": 25},
-			"payload": {"stat": {"emp_hex_ranks": 1}}},
-		# Re-spec (was a second Empowered Hex step; ranks 2 -> 3): each
-		# stack of the mark now cracks its bearer wider — the meter does
-		# damage work while it fills.
+			"desc": "Hex of Ruin ALWAYS applies Decay to each target it curses (10 Break damage per turn, 3 turns).",
+			"payload": {"stat": {"emp_hex_ranks": 100}}},
+		# THE MOST DANGEROUS NODE IN THE GAME and it wants watching: against
+		# uncapped stacks this is a multiplier on a number with no ceiling. At
+		# twenty stacks it is +100% damage taken. That is the intended shape of a
+		# long boss fight, and it is the first thing to check if a boss row comes
+		# back absurd. The counter holds the INCREASE on the passive's own 2%.
 		{"id": "oc_deep_hex", "name": "Deeper Hex", "ranks": 1, "lane": "Ruin", "row": 2,
 			"desc": "Each stack of Ruin makes its bearer take {v}% more damage (up from the base 2%).",
-			"scale": {"base": 2, "step": 1},
-			"payload": {"stat": {"deep_hex_ranks": 1}}},
+			"scale": {"base": 2, "step": 3},
+			"payload": {"stat": {"deep_hex_step": 3}}},
 		{"id": "oc_channeling", "name": "Corrupted Channeling", "ranks": 1, "lane": "Ruin", "row": 3,
 			"desc": "Whenever a Crippled enemy attacks, a random hero heals for {v}% of the damage it dealt.",
-			"scale": {"step": 25},
-			"payload": {"stat": {"channeling_ranks": 1}}},
+			"scale": {"step": 60},
+			"payload": {"stat": {"channeling_ranks": 60}}},
 		{"id": "oc_broken_will", "name": "Broken Will", "ranks": 1, "lane": "Ruin", "row": 4,
 			"desc": "The Occultist deals {v}% more Break damage.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"broken_will_ranks": 1}}},
-		# Re-spec (was a flat +3% damage dial, exclusive with Pact of Flesh
-		# CROSS-LANE — that pair is gone; ranks 3 -> 2): the detonation is
-		# the lane's payoff, so the damage dial lives on it now.
+			"scale": {"step": 25},
+			"payload": {"stat": {"broken_will_ranks": 25}}},
 		{"id": "oc_grim", "name": "Grim Focus", "ranks": 1, "lane": "Ruin", "row": 5,
 			"desc": "Ruin detonations deal {v}% more damage.",
-			"scale": {"step": 25},
-			"payload": {"stat": {"grim_ranks": 1}}},
-		# Re-spec (was a second Broken Will step; ranks 2 -> 3): any Ruin at
-		# all now grinds the Break meter on its own — and feeds the
-		# Swordmaster's Broken-window loop across the party.
+			"scale": {"step": 80},
+			"payload": {"stat": {"grim_ranks": 80}}},
 		{"id": "oc_entropy", "name": "Entropy", "ranks": 1, "lane": "Ruin", "row": 6,
 			"desc": "Enemies bearing any Ruin take {v} Break damage at the start of each of their turns.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"entropy_ranks": 1}}},
-		# Re-spec (was Hex of Ruin -5 Mana; ranks 2 -> 3): a detonation now
-		# seeds the mark in every other enemy — the next meter is already
-		# filling. One propagation per detonation (battle.gd enforces it).
+			"scale": {"step": 20},
+			"payload": {"stat": {"entropy_ranks": 20}}},
+		# One propagation per detonation (battle.gd enforces it): a seeded enemy
+		# is only ARMED here, and armed Ruin fires at its own turn start.
 		{"id": "oc_unravel", "name": "Unraveling", "ranks": 1, "lane": "Ruin", "row": 7,
 			"desc": "When Ruin detonates, every other enemy gains {v} Ruin.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"unravel_ranks": 1}}},
-		# --- Lane B: Madness — enemies turned on each other, and the
-		# betrayal now has somewhere to go: Delirium turns it into Ruin,
-		# Cackling Mirror turns it into healing. ---
+			"scale": {"step": 4},
+			"payload": {"stat": {"unravel_ranks": 4}}},
+		# --- Lane MADNESS — enemies turned on each other. §2: EVERY EFFECT IN
+		# THIS LANE IS REFUSED BY A BOSS UNTIL IT IS BROKEN. That is not a hole,
+		# it is a task, and the task is the Ruin lane's job (Broken Will,
+		# Entropy). The fix Batch AX shipped was LEGIBILITY, not a workaround:
+		# the rule is stated here, in the glossary and in the tooltips. ---
+		# Two magnitudes, two fields: a chance and a stack count, and one counter
+		# cannot honestly hold both (AW's `covenant` precedent).
 		{"id": "oc_spread", "name": "Spread of Madness", "ranks": 1, "lane": "Madness", "row": 1,
-			"desc": "Psychosis has a {v}% chance per turn to spread to a fellow minion — the newly maddened gain a stack of Ruin.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"spread_ranks": 1}}},
-		# Re-spec (was Bewitch -5 Mana; ranks 2 -> 3): at 50%, half of
-		# every Psychosis is a wasted turn and the lane feels unreliable.
-		# At 80% it's a plan.
+			"desc": "Psychosis has a {v}% chance each turn to leap to a fellow minion — the newly maddened gain 2 Ruin. Bosses resist until Broken.",
+			"scale": {"step": 60},
+			"payload": {"stat": {"spread_ranks": 60, "spread_ruin": 2}}},
+		# The counter holds the INCREASE on Psychosis's own 50%.
 		{"id": "oc_whispers", "name": "Whispers", "ranks": 1, "lane": "Madness", "row": 2,
-			"desc": "Psychosis takes the wheel {v}% of the time (up from the base 50%).",
-			"scale": {"base": 50, "step": 10},
-			"payload": {"stat": {"whispers_ranks": 1}}},
+			"desc": "Psychosis seizes its victim {v}% of the time (up from the base 50%). Bosses resist Psychosis until Broken.",
+			"scale": {"base": 50, "step": 45},
+			"payload": {"stat": {"whispers_step": 45}}},
+		# §4's authored fallback (AU §1): a hero who already EARNED Mind Flay
+		# gets a THIRD mind instead of a grant it cannot make.
 		{"id": "oc_mind_flay", "name": "Mind Flay", "ranks": 1, "lane": "Madness", "row": 3,
-			"desc": "New ability: Mind Flay — 30% of Attack in shadow to TWO chosen minions, inflicting Psychosis for 3 turns (25 Mana, 3.0 int, 2cd; Perfect: 4 turns).",
-			"payload": {"grant_ability": "Mind Flay"}},
+			"desc": "New ability: Mind Flay — 30% of Attack in shadow to TWO chosen minions, inflicting Psychosis for 3 turns (25 Mana, 3.0 int, 2cd; Perfect: 4 turns). Bosses resist until Broken.",
+			"payload": {"grant_ability": "Mind Flay",
+				"upgrade": [{"ability": "Mind Flay",
+					"set": {"choose_two": false, "choose_three": true,
+						"description": "Flay THREE chosen minds: 30% of\nAttack in shadow each and Psychosis\nfor 3 turns — madness that turns\nthem on their own."}}]}},
 		{"id": "oc_mirror", "name": "Umbral Mirror", "ranks": 1, "lane": "Madness", "row": 4,
-			"desc": "When an enemy would debuff a hero, there is a {v}% chance the debuff reflects back onto it instead (and counts toward Ruin).",
-			"scale": {"step": 10},
-			"payload": {"stat": {"mirror_ranks": 1}}},
-		# Re-spec (was a second Spread of Madness step): THE cross-lane
-		# node — every maddened strike now builds toward a detonation.
-		# Madness generates Ruin.
+			"desc": "When an enemy would debuff a hero, there is a {v}% chance the debuff rebounds onto the attacker instead (and counts toward Ruin).",
+			"scale": {"step": 45},
+			"payload": {"stat": {"mirror_ranks": 45}}},
+		# THE cross-lane node — every maddened strike builds toward a detonation.
 		{"id": "oc_delirium", "name": "Delirium", "ranks": 1, "lane": "Madness", "row": 5,
-			"desc": "When a Psychotic, Bewitched or Hysterical enemy strikes a fellow, the victim gains {v} Ruin.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"delirium_ranks": 1}}},
-		# Re-spec (was a second Umbral Mirror step): the other half of the
-		# plumbing — Madness generates healing, in his own siphoning voice.
+			"desc": "When a Psychotic, Bewitched or Hysterical enemy strikes a fellow, the victim is marked with {v} Ruin.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"delirium_ranks": 3}}},
 		{"id": "oc_cackling", "name": "Cackling Mirror", "ranks": 1, "lane": "Madness", "row": 6,
 			"desc": "When an enemy strikes a fellow, the party heals {v}% of the damage dealt.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"cackling_ranks": 1}}},
-		# Re-spec (was Bewitch cooldown -1; ranks 1 -> 2): madness never
-		# just ends any more — it curdles into the rot.
+			"scale": {"step": 15},
+			"payload": {"stat": {"cackling_ranks": 15}}},
 		{"id": "oc_torment", "name": "Lingering Torment", "ranks": 1, "lane": "Madness", "row": 7,
-			"desc": "When a madness effect expires, it leaves Decay behind for {v} turns (10 Break damage per turn).",
-			"scale": {"step": 2},
-			"payload": {"stat": {"torment_ranks": 1}}},
-		# --- Lane C: Leech — suffering into sustain. Holy restores, the
-		# Devout prevents, the Occultist siphons. ---
+			"desc": "An expiring madness effect leaves Decay behind for {v} turns (10 Break damage per turn).",
+			"scale": {"step": 5},
+			"payload": {"stat": {"torment_ranks": 5}}},
+		# --- Lane LEECH — suffering into sustain. Holy restores, the Devout
+		# prevents, the Occultist siphons. The passive's draught is PER STACK
+		# since Batch AX (2% each, replacing the flat 10%-while-any-Ruin), so
+		# these two dials finally reward the depth the passive was ignoring —
+		# and ALL OF IT sits under §1's 40%-of-damage-dealt cap. ---
+		# The counter holds the INCREASE on the passive's own 2% per stack.
 		{"id": "oc_soul_leech", "name": "Soul Leech", "ranks": 1, "lane": "Leech", "row": 1,
-			"desc": "Heroes striking a Ruined target heal {v}% of the damage dealt (up from the base 10%).",
-			"scale": {"base": 10, "step": 5},
-			"payload": {"stat": {"soul_leech_ranks": 1}}},
+			"desc": "The Ruin lifesteal rises to {v}% per stack (up from the base 2%). Capped at 40% of the damage dealt.",
+			"scale": {"base": 2, "step": 3},
+			"payload": {"stat": {"soul_leech_step": 3}}},
 		{"id": "oc_invigoration", "name": "Invigoration", "ranks": 1, "lane": "Leech", "row": 2,
-			"desc": "Dark Pact also restores {v}% of the Cleric's max Mana each turn for 3 turns.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"invigoration_ranks": 1}}},
-		# Re-spec (was a second Soul Leech step; ranks 2 -> 3): its own
-		# cheaper dial on the same draught.
+			"desc": "Dark Pact also restores {v}% of the Occultist's maximum Mana each turn for 3 turns.",
+			"scale": {"step": 8},
+			"payload": {"stat": {"invigoration_ranks": 8}}},
 		{"id": "oc_gluttony", "name": "Gluttony", "ranks": 1, "lane": "Leech", "row": 3,
-			"desc": "The Ruin lifesteal drinks another {v}% of the damage dealt.",
+			"desc": "The Ruin lifesteal drinks another {v}% per stack. Capped at 40% of the damage dealt.",
 			"scale": {"step": 3},
-			"payload": {"stat": {"gluttony_ranks": 1}}},
+			"payload": {"stat": {"gluttony_ranks": 3}}},
+		# A FRACTIONAL magnitude, so the field must NOT end in "_ranks" —
+		# Runes.STAT_INT_KEYS coerces anything with that suffix to an int.
 		{"id": "oc_pleasure", "name": "Pleasure from Pain", "ranks": 1, "lane": "Leech", "row": 4,
-			"desc": "At the end of the Occultist's turn, the party heals {v}% of the Occultist's max health for every UNIQUE debuff on the enemy team.",
-			"scale": {"step": 0.5},
-			"payload": {"stat": {"pleasure_ranks": 1}}},
+			"desc": "At the end of the Occultist's turn, the party heals {v}% of his maximum health for every UNIQUE debuff on the enemy team.",
+			"scale": {"step": 2.5},
+			"payload": {"stat": {"pleasure_pct": 2.5}}},
 		{"id": "oc_murderous", "name": "Murderous Intent", "ranks": 1, "lane": "Leech", "row": 5,
-			"desc": "When a Bewitched enemy kills one of its fellows, the lowest-health party member heals {v}% of the Occultist's max health.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"murderous_ranks": 1}}},
-		# Re-spec (was +4% max health, exclusive with Grim Focus CROSS-LANE
-		# — that pair is gone; ranks 3 -> 2). The new fork is in-lane and
-		# the cleanest possible: one ability, pay less or get more. Dark
-		# Pact is the one place he trades his own body for the party's.
+			"desc": "When a Bewitched enemy kills one of its fellows, the lowest-health party member heals {v}% of the Occultist's maximum health.",
+			"scale": {"step": 35},
+			"payload": {"stat": {"murderous_ranks": 35}}},
+		# The in-lane fork: one ability, pay less or get more. Dark Pact is the
+		# one place he trades his own body for the party's. The counter is
+		# percentage POINTS off the base cost of 20%.
 		{"id": "oc_pact_flesh", "name": "Pact of Flesh", "ranks": 1, "lane": "Leech", "row": 6,
-			"desc": "Dark Pact bleeds {v}% less of the Occultist's max health (from its base cost of 20%).",
-			"scale": {"step": 10},
-			"payload": {"stat": {"pact_flesh_ranks": 1}}},
-		# Re-spec (was Dark Pact cooldown -1; ranks 1 -> 2): the other jaw
-		# of the fork — the party drinks deeper from the same wound.
+			"desc": "Dark Pact bleeds {v}% less of the Occultist's maximum health — a cost of 5% rather than 20%.",
+			"scale": {"step": 15},
+			"payload": {"stat": {"pact_flesh_ranks": 15}}},
+		# The other jaw of the fork. A FOURTH counter holding the INCREASE on a
+		# base the kit already pays (Dark Pact's 15%), so it takes the `_step`
+		# name the other three do — §5 named three; this one has the same shape.
 		{"id": "oc_barter", "name": "Dark Barter", "ranks": 1, "lane": "Leech", "row": 7,
-			"desc": "Dark Pact heals the party for {v}% of each member's max health (up from the base 15%).",
-			"scale": {"base": 15, "step": 10},
-			"payload": {"stat": {"barter_ranks": 1}}},
+			"desc": "Dark Pact heals every other ally {v}% of their maximum health (up from the base 15%).",
+			"scale": {"base": 15, "step": 20},
+			"payload": {"stat": {"barter_step": 20}}},
 		# --- Capstones (row 8): take ONE, no lane requirement ---
-		# Re-spec (was an Emp Hex / Channeling stat bundle): the natural
-		# end state of a lane built on filling a meter — a maxed target is
-		# a recurring bomb.
+		# RE-SPECCED, because keeping the stacks is the DEFAULT now (Batch AX
+		# §1). Its old job — "detonations no longer consume their stacks" — is
+		# what the passive does without it, so the capstone moves the THRESHOLD
+		# instead: it doubles his detonation rate, and it is the answer for a
+		# player who wants the payoff back in ordinary fights. The counter is the
+		# GATE AND THE MAGNITUDE in one field (AW's `judgement` precedent): it
+		# holds the threshold it installs.
 		{"id": "oc_avatar_ruin", "name": "Avatar of Ruin", "ranks": 1, "lane": "Ruin", "row": 8,
 			"capstone": true,
-			"desc": "Ruin detonations no longer consume their stacks: a target held at 5 Ruin detonates again at the start of each of its turns.",
-			"payload": {"stat": {"avatar_ruin": 1}}},
+			"desc": "Ruin detonates every 5th stack instead of every 10th.",
+			"payload": {"stat": {"avatar_ruin": 5}}},
+		# §4's second authored fallback: a hero who already EARNED Mass Hysteria
+		# gets it back twice as often instead of a grant it cannot make.
 		{"id": "oc_hysteria", "name": "Mass Hysteria", "ranks": 1, "lane": "Madness", "row": 8,
 			"capstone": true,
-			"desc": "New ability: Mass Hysteria — next turn every minion strikes a fellow with DOUBLE Break damage, Sundering them for 3 turns (30 Mana, 4.0 int, 4cd; Perfect: 3cd).",
-			"payload": {"grant_ability": "Mass Hysteria"}},
-		# Re-spec (was a Soul Leech / max-health stat bundle): the "lesser
-		# healer" becomes a real one through his own mechanic — every
-		# hero's attack into a Ruined enemy is party-wide sustain.
+			"desc": "New ability: Mass Hysteria — next turn every minion strikes a fellow with DOUBLE Break damage, Sundering them for 3 turns (30 Mana, 4.0 int, 4cd; Perfect: 3cd). Bosses resist until Broken.",
+			"payload": {"grant_ability": "Mass Hysteria",
+				"upgrade": [{"ability": "Mass Hysteria", "set": {"cooldown": 2}}]}},
 		{"id": "oc_soul_glut", "name": "Soul Glut", "ranks": 1, "lane": "Leech", "row": 8,
 			"capstone": true,
-			"desc": "Whenever a hero heals by striking a Ruined target, the whole party heals for the same amount.",
+			"desc": "Whenever a hero heals by striking a Ruined target, the whole party heals for the same amount. Still under the 40% cap.",
 			"payload": {"stat": {"soul_glut": 1}}},
 	],
 }

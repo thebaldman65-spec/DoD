@@ -82,7 +82,18 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# Censer's righteous_step, the Binding Oath's faithful_step).
 	"stalwart_step", "righteous_step", "faithful_step", "fervor_step",
 	"covenant_heal", "covenant_faith",
-	"resolve_extra_turns", "bulwark_extra_turns"]
+	"resolve_extra_turns", "bulwark_extra_turns",
+	# Batch AX: the Occultist's counters went additive as well. Four hold the
+	# INCREASE on a base the kit already pays and are named `_step`; `spread_ruin`
+	# is the stack count Spread of Madness marks with (one counter cannot hold a
+	# chance AND a stack count). THREE OF THESE FIVE ARE WRITTEN BY RUNES TODAY —
+	# the Deepening Ruin's `deep_hex_step`, the Hollow Chalice's `soul_leech_step`
+	# and the Whispering Dark's `spread_ruin` — and the other two are listed for
+	# the same durability AW listed its unwritten ones with.
+	# NOT HERE ON PURPOSE: `pleasure_pct` is FRACTIONAL (2.5), so coercing it to
+	# an int would silently halve Pleasure from Pain.
+	"deep_hex_step", "soul_leech_step", "whispers_step", "barter_step",
+	"spread_ruin"]
 
 static var _data := {}
 

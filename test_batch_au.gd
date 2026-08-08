@@ -246,17 +246,18 @@ func _arcanist_authored() -> void:
 					"%s is the only node that opts out entirely" % n["id"])
 	ok(granting >= 20,
 		"the roster really does hold a pile of ability-granting nodes (%d)" % granting)
-	# RE-POINTED IN PLACE BY BATCH AW, with the reason here: this floor FALLS
+	# RE-POINTED IN PLACE BY BATCH AX, with the reason here: this floor FALLS
 	# on purpose, one class batch at a time. AU shipped it at 15 generics with
 	# only the Arcanist's two authored; AV authored Holy's two (13), AW the
-	# Devout's two (11). A bare ">= 12" would have read as a regression rather
+	# Devout's two (11), AX the Occultist's two (9) — and with that the CLERIC
+	# CLASS IS DONE. A bare ">= 11" would have read as a regression rather
 	# than as the mechanism working, so the floor moves WITH the reason and the
 	# survivors are NAMED below so it cannot be lowered again by attrition.
-	ok(generic >= 11,
+	ok(generic >= 9,
 		"most of them fall back on the GENERIC, which is the point (%d)" % generic)
 	# THE DURABLE HALF: a class whose re-author batch has landed owes no
-	# generics at all. Both Cleric specs with granting nodes are authored now.
-	for done_spec in ["arcanist", "holy", "inquisitor"]:
+	# generics at all. ALL THREE Cleric specs are authored now.
+	for done_spec in ["arcanist", "holy", "inquisitor", "occultist"]:
 		for n2 in Talents.LANE_TREES.get(done_spec, []):
 			var pay2: Dictionary = n2.get("payload", {})
 			if Talents.granted_name(pay2) == "":

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-08 (Batch AW)</b></p>
+<p align="right"><b>Last updated: 2026-08-08 (Batch AX)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -421,18 +421,19 @@ its Bestial Wrath strikes 2 turns).</td></tr>
 likely to miss them.</td></tr>
 <tr><td>Shielded</td><td>Takes 25% less damage — the Orc Shieldmaster's single-ally
 ward.</td></tr>
-<tr><td>Ruin</td><td>The Old Gods' mark (Occultist passive, max 5 stacks, battle-long):
-+2% damage taken per stack; heroes striking the bearer heal 10% of damage dealt. At 5
-stacks it is PRIMED and detonates on the bearer's next turn.</td></tr>
+<tr><td>Ruin</td><td>The Old Gods' mark (Occultist passive, NO maximum, never clears):
++2% damage taken per stack; heroes striking the bearer heal 2% of damage dealt per
+stack (capped at 40%). Every TENTH stack it is PRIMED and detonates on the bearer's
+next turn — and the stacks SURVIVE the blast.</td></tr>
 <tr><td>Psychosis</td><td>Madness: 50% each turn to turn on its own — attacking a fellow,
-or casting its helpful magic on the hero side instead. Bosses resist unless
-Broken.</td></tr>
+or casting its helpful magic on the hero side instead. A boss REFUSES it until Broken —
+the Break meter is the key.</td></tr>
 <tr><td>Decay</td><td>Rotting: takes 10 Break damage at the start of each turn (3
 turns).</td></tr>
 <tr><td>Bewitched</td><td>Charmed: basic-attacks its own allies, Dazing them with every
-strike (Occultist's Bewitch, 3 turns).</td></tr>
+strike (Occultist's Bewitch, 3 turns). A boss REFUSES it until Broken.</td></tr>
 <tr><td>Mass Hysteria</td><td>Strikes a fellow with DOUBLE Break damage on its next turn,
-Sundering them (Occultist capstone).</td></tr>
+Sundering them (Occultist capstone). A boss REFUSES it until Broken.</td></tr>
 <tr><td>Invigoration</td><td>Restores Mana at the start of each turn (Dark Pact
 talent).</td></tr>
 <tr><td>Battle Shout</td><td>+12% damage, plus 1% per 20 blood buildup on the enemy party,
@@ -1056,26 +1057,36 @@ turn (Perfect: the party instantly heals 5%).<br>
 real pool to spend from, because Dark Pact pays in his blood and his heals key off his
 maximum; deep shadow affinity, and cleansing flame finds the corrupt).<br>
 Passive <i>Wrath of the Old Gods</i>: every debuff the
-Occultist applies marks its victim with <b>Ruin</b> (max 5, battle-long, chip counts
-stacks). Each stack: the target takes +2% damage, and heroes striking it heal 10% of
-the damage dealt (a flat rate while ANY Ruin is on it; the Soul Leech and Gluttony
-talents deepen it). One turn after reaching 5 stacks, Ruin DETONATES: 50% of the Occultist's Attack
-as shadow damage, and every ally heals 15% of the Occultist's max health. The stacks
-only work while the Occultist stands. Basic attack: <b>Shadowrend</b> (corrupted
+Occultist applies marks its victim with <b>Ruin</b>. <b>Ruin has NO MAXIMUM and it
+NEVER CLEARS</b> — corruption that resets is not corruption — so the chip counts a
+number that only climbs, all fight. Each stack: the target takes +2% damage (5% with
+Deeper Hex, and that amplification is deliberately uncapped), and heroes striking it
+heal <b>2% of the damage dealt PER STACK</b> — Soul Leech and Gluttony are its two
+dials, and <b>the whole draught is capped at 40% of the damage dealt</b>, whatever the
+stacks and whatever the talents. <b>Every TENTH stack</b> the mark is primed and
+DETONATES when its bearer next acts: <b>90% of the Occultist's Attack</b> as shadow
+damage, and every ally heals <b>25% of the Occultist's max health</b>. <b>The stacks
+SURVIVE the blast</b>, so the next detonation waits for the next multiple of ten (the
+Avatar of Ruin capstone moves that to every fifth). This makes him the boss specialist
+by construction: a trash enemy will not live long enough for the stacks to run away
+and a boss will. The stacks only work while the Occultist stands. Basic attack: <b>Shadowrend</b> (corrupted
 Smite — 25% Atk shadow / 16 BD / 2.0, Cripples 2 turns).<br>
 Hex of Ruin — 20 Mana, 2.5, 2cd; curse THREE chosen enemies for 20% Atk shadow / 15 BD
 each, leaving them Exposed 3 turns (Perfect: no cooldown).<br>
 Bewitch — 25 Mana, 3.5, 4cd; the target basic-attacks its OWN allies for 3 turns,
 Dazing them with every strike — charms and Dazes feed Ruin (Perfect: the target attacks
-instantly). Bosses resist unless Broken.<br>
+instantly). <b>A boss REFUSES it until Broken — the Break meter is the key</b>, and
+Broken Will and Entropy exist to grind it.<br>
 Dark Pact — 20 Mana, 3.0, 3cd; the Occultist loses 20% max health, every OTHER ally
 heals 15% of their max health, and the Occultist regains 30% of max health over 3
 turns (Perfect: +5 Mana).<br>
 <i>Talent-granted:</i> Mind Flay — 25 Mana, 3.0, 2cd; 30% Atk shadow / 15 BD to TWO
 chosen minions, inflicting <b>Psychosis</b> for 3 turns (Perfect: 4 turns). Mass
 Hysteria (capstone) — 30 Mana, 4.0, 4cd; next turn every minion strikes a fellow with
-DOUBLE Break damage, Sundering them 3 turns (Perfect: 3cd). Bosses resist
-both.<br>
+DOUBLE Break damage, Sundering them 3 turns (Perfect: 3cd). <b>A boss REFUSES both
+until Broken</b>, as it does Bewitch — every effect in the MADNESS lane is gated behind
+Break. That is not a hole in the lane, it is a two-step plan: Break the boss with the
+RUIN lane, then madden it.<br>
 <b>Talent lanes:</b> see §7 — Ruin / Madness / Leech.</li>
 </ul>
 <h3>6.4 Hunter</h3>
@@ -1338,19 +1349,17 @@ returns pay: invest in the dividend) · <b>ZEAL</b> (invest shallowly in EVERYON
 <tr><td>7</td><td><b>Lone Bond</b> — You may summon only ONE beast per fight: it cannot be swapped, and cannot be re-summoned if it dies. Its Loyalty starts at 3 and caps at 8.</td><td><b>Wild Rotation</b> — Swap Companion has no cooldown and arrival effects always fire. Loyalty caps at 2.</td><td><b>Lone Hunter</b> — While you have no companion, your abilities cost 40% less Mana and you deal +25% damage.</td></tr>
 <tr><td>CAP</td><td><b>One Soul</b> — You and the active beast share a health pool — all damage to either is split evenly between you. Loyalty gain is doubled.</td><td><b>The Pack</b> — TWO beasts may be active at once: both strike when you attack, and each keeps its own Loyalty meter and grants its own Pack Bond boon. Summoning a third replaces whichever active beast has lower Loyalty.</td><td><b>Apex Predator</b> — Quick Shot triggers an ADDITIONAL free companion strike, and Kill Command&#x27;s cooldown resets whenever an enemy dies.</td></tr>
 </table>
-<p><b>Occultist</b> — <b>RUIN</b> (the detonation engine: stack the mark, blow it, chain it) · <b>MADNESS</b> (enemies turned on each other — and the betrayal now feeds the other two
-lanes) · <b>LEECH</b> (suffering into sustain: Holy restores, the Devout prevents, the Occultist
-siphons)</p>
+<p><b>Occultist</b> — <b>RUIN</b> (the mark: stack it, blow it, chain it) · <b>MADNESS</b> (enemies turned on each other — <b>every effect in the lane is REFUSED by a boss until it is Broken</b>, which is not a hole but a two-step plan: Broken Will and Entropy exist to grind the meter, then the madness lands) · <b>LEECH</b> (suffering into sustain: Holy restores, the Devout prevents, the Occultist siphons)</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Ruin</th><th>Madness</th><th>Leech</th></tr>
-<tr><td>1</td><td><b>Empowered Hex</b> — Hex of Ruin has a 25% chance per target to also apply Decay (10 Break damage per turn, 3 turns).</td><td><b>Spread of Madness</b> — Psychosis has a 15% chance per turn to spread to a fellow minion — the newly maddened gain a stack of Ruin.</td><td><b>Soul Leech</b> — Heroes striking a Ruined target heal 15% of the damage dealt (up from the base 10%).</td></tr>
-<tr><td>2</td><td><b>Deeper Hex</b> — Each stack of Ruin makes its bearer take 3% more damage (up from the base 2%).</td><td><b>Whispers</b> — Psychosis takes the wheel 60% of the time (up from the base 50%).</td><td><b>Invigoration</b> — Dark Pact also restores 2% of the Cleric&#x27;s max Mana each turn for 3 turns.</td></tr>
-<tr><td>3</td><td><b>Corrupted Channeling</b> — Whenever a Crippled enemy attacks, a random hero heals for 25% of the damage it dealt.</td><td><b>Mind Flay</b> — New ability: Mind Flay — 30% of Attack in shadow to TWO chosen minions, inflicting Psychosis for 3 turns (25 Mana, 3.0 int, 2cd; Perfect: 4 turns).</td><td><b>Gluttony</b> — The Ruin lifesteal drinks another 3% of the damage dealt.</td></tr>
-<tr><td>4</td><td><b>Broken Will</b> — The Occultist deals 5% more Break damage.</td><td><b>Umbral Mirror</b> — When an enemy would debuff a hero, there is a 10% chance the debuff reflects back onto it instead (and counts toward Ruin).</td><td><b>Pleasure from Pain</b> — At the end of the Occultist&#x27;s turn, the party heals 0.5% of the Occultist&#x27;s max health for every UNIQUE debuff on the enemy team.</td></tr>
-<tr><td>5</td><td><b>Grim Focus</b> — Ruin detonations deal 25% more damage.</td><td><b>Delirium</b> — When a Psychotic, Bewitched or Hysterical enemy strikes a fellow, the victim gains 1 Ruin.</td><td><b>Murderous Intent</b> — When a Bewitched enemy kills one of its fellows, the lowest-health party member heals 10% of the Occultist&#x27;s max health.</td></tr>
-<tr><td>6</td><td><b>Entropy</b> — Enemies bearing any Ruin take 5 Break damage at the start of each of their turns.</td><td><b>Cackling Mirror</b> — When an enemy strikes a fellow, the party heals 3% of the damage dealt.</td><td><b>Pact of Flesh</b> — Dark Pact bleeds 10% less of the Occultist&#x27;s max health (from its base cost of 20%).</td></tr>
-<tr><td>7</td><td><b>Unraveling</b> — When Ruin detonates, every other enemy gains 1 Ruin.</td><td><b>Lingering Torment</b> — When a madness effect expires, it leaves Decay behind for 2 turns (10 Break damage per turn).</td><td><b>Dark Barter</b> — Dark Pact heals the party for 25% of each member&#x27;s max health (up from the base 15%).</td></tr>
-<tr><td>CAP</td><td><b>Avatar of Ruin</b> — Ruin detonations no longer consume their stacks: a target held at 5 Ruin detonates again at the start of each of its turns.</td><td><b>Mass Hysteria</b> — New ability: Mass Hysteria — next turn every minion strikes a fellow with DOUBLE Break damage, Sundering them for 3 turns (30 Mana, 4.0 int, 4cd; Perfect: 3cd).</td><td><b>Soul Glut</b> — Whenever a hero heals by striking a Ruined target, the whole party heals for the same amount.</td></tr>
+<tr><td>1</td><td><b>Empowered Hex</b> — Hex of Ruin ALWAYS applies Decay to each target it curses (10 Break damage per turn, 3 turns).</td><td><b>Spread of Madness</b> — Psychosis has a 60% chance each turn to leap to a fellow minion — the newly maddened gain 2 Ruin. Bosses resist until Broken.</td><td><b>Soul Leech</b> — The Ruin lifesteal rises to 5% per stack (up from the base 2%). Capped at 40% of the damage dealt.</td></tr>
+<tr><td>2</td><td><b>Deeper Hex</b> — Each stack of Ruin makes its bearer take 5% more damage (up from the base 2%).</td><td><b>Whispers</b> — Psychosis seizes its victim 95% of the time (up from the base 50%). Bosses resist Psychosis until Broken.</td><td><b>Invigoration</b> — Dark Pact also restores 8% of the Occultist&#x27;s maximum Mana each turn for 3 turns.</td></tr>
+<tr><td>3</td><td><b>Corrupted Channeling</b> — Whenever a Crippled enemy attacks, a random hero heals for 60% of the damage it dealt.</td><td><b>Mind Flay</b> — New ability: Mind Flay — 30% of Attack in shadow to TWO chosen minions, inflicting Psychosis for 3 turns (25 Mana, 3.0 int, 2cd; Perfect: 4 turns). Bosses resist until Broken.</td><td><b>Gluttony</b> — The Ruin lifesteal drinks another 3% per stack. Capped at 40% of the damage dealt.</td></tr>
+<tr><td>4</td><td><b>Broken Will</b> — The Occultist deals 25% more Break damage.</td><td><b>Umbral Mirror</b> — When an enemy would debuff a hero, there is a 45% chance the debuff rebounds onto the attacker instead (and counts toward Ruin).</td><td><b>Pleasure from Pain</b> — At the end of the Occultist&#x27;s turn, the party heals 2.5% of his maximum health for every UNIQUE debuff on the enemy team.</td></tr>
+<tr><td>5</td><td><b>Grim Focus</b> — Ruin detonations deal 80% more damage.</td><td><b>Delirium</b> — When a Psychotic, Bewitched or Hysterical enemy strikes a fellow, the victim is marked with 3 Ruin.</td><td><b>Murderous Intent</b> — When a Bewitched enemy kills one of its fellows, the lowest-health party member heals 35% of the Occultist&#x27;s maximum health.</td></tr>
+<tr><td>6</td><td><b>Entropy</b> — Enemies bearing any Ruin take 20 Break damage at the start of each of their turns.</td><td><b>Cackling Mirror</b> — When an enemy strikes a fellow, the party heals 15% of the damage dealt.</td><td><b>Pact of Flesh</b> — Dark Pact bleeds 15% less of the Occultist&#x27;s maximum health — a cost of 5% rather than 20%.</td></tr>
+<tr><td>7</td><td><b>Unraveling</b> — When Ruin detonates, every other enemy gains 4 Ruin.</td><td><b>Lingering Torment</b> — An expiring madness effect leaves Decay behind for 5 turns (10 Break damage per turn).</td><td><b>Dark Barter</b> — Dark Pact heals every other ally 35% of their maximum health (up from the base 15%).</td></tr>
+<tr><td>CAP</td><td><b>Avatar of Ruin</b> — Ruin detonates every 5th stack instead of every 10th.</td><td><b>Mass Hysteria</b> — New ability: Mass Hysteria — next turn every minion strikes a fellow with DOUBLE Break damage, Sundering them for 3 turns (30 Mana, 4.0 int, 4cd; Perfect: 3cd). Bosses resist until Broken.</td><td><b>Soul Glut</b> — Whenever a hero heals by striking a Ruined target, the whole party heals for the same amount. Still under the 40% cap.</td></tr>
 </table>
 <p><b>Pyromancer</b> — <b>KINDLING</b> (how fast you light up) · <b>INFERNO</b> (how much heat you can stand) · <b>DETONATION</b> (how big the trigger is). Every lane pays for the same commitment: the fire you light bills you a Mana a turn per burn-turn, uncapped, and only consuming it pays any of that back.</p>
 <table border="1" cellpadding="4">

@@ -1000,6 +1000,11 @@ static func _print_report(battle) -> void:
 			% rs_stale + "neither side could finish; see CLAUDE.md Batch W)")
 	print("Per-spec contribution (avg per battle present):")
 	print(battle._contrib_table(battle.sim_stats))
+	# Batch AX §0: the only instrument that meets a boss, so the trash/boss
+	# split lives here as well as in the standalone report.
+	var rx_line: String = battle.ruin_report_line(battle.sim_stats)
+	if rx_line != "":
+		print(rx_line)
 	var earned := talent_spent + talent_left
 	print("Talent points per hero per run: earned %.1f   spent %.1f (banked %.1f)" % [
 		earned / runs / 4.0, talent_spent / runs / 4.0, talent_left / runs / 4.0])

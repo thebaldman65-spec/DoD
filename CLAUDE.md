@@ -179,6 +179,128 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   party.tscn is the HERO SHEET now, opened from a card.
 
 ## Current systems snapshot (2026-08-08)
+BATCH AX (08-08) — THE OCCULTIST: CORRUPTION. Third of the Cleric three and **THE
+CLERIC CLASS IS DONE**. His tree needed the LEAST structural work of the three —
+Ruin / Madness / Leech are genuinely distinct axes with real cross-lane plumbing and
+no lane was lying about its job (Batch L did good work) — so this is the 4-5x
+repricing plus a spine: **CORRUPTION — his power is not in him at all, it is in what
+he has done to them.** One spec only; the other eleven trees and enemy tuning
+UNTOUCHED. Every one of his 24 ids survives and re-specs in place, NO SAVE VERSION
+MOVES (still v7).
+§1 **RUIN HAS NO MAXIMUM AND NEVER CLEARS.** Corruption that resets is not corruption.
+`unit.add_status`'s ruin branch dropped its `mini(..., 5)`; a detonation consumes the
+PRIMER and nothing else. **THE THRESHOLD IS EVERY TENTH STACK (10, 20, 30, ...) AND
+THE ARMING TEST IS A MODULO, NOT AN EQUALITY** — `st > 0 and st % step == 0` in
+`_gain_ruin`. **BOTH HALVES OF THAT GUARD ARE LOAD-BEARING**: with stacks that survive,
+`== 5` arms once and never again and `>= 5` arms on every stack forever; and `> 0`
+exists because `_apply_status` CAN REFUSE the mark (Hallowed bounces every debuff) and
+`0 % anything == 0` would arm the bomb off a refused stack. Stacks are added ONE AT A
+TIME so a multi-stack gain can never step over a threshold without touching it.
+**`const RUIN_THRESHOLD := 10`, one `_ruin_threshold()`, one caller-visible override:
+`avatar_ruin` holds the threshold the capstone installs (5) — the GATE AND THE
+MAGNITUDE in one field (AW's `judgement` precedent).** The blast is bigger because it
+costs twice as long to earn: **50% -> 90% of Attack, party heal 15% -> 25% of his max
+health.** The chip text moved OUT of `unit.add_status` into **`_stamp_ruin_chip`**,
+because every number in it (the per-stack bite, the next threshold) moves with his
+talents and add_status cannot see them.
+**THE CONSEQUENCE IS STATED, NOT BURIED: his signature payoff largely leaves ordinary
+fights** (~1.5 Ruin a turn focused = ~7 turns to ten; a trash fight ends in 7-8). THAT
+IS THE INTENT — boss specialist by construction — but it is a real loss of feel, so §0
+MEASURES it. **IT MEASURED ZERO.** Run sim, 40 runs / 519 trash battles, Ruin-lane build:
+**trash 0.00 detonations/battle, deepest mark 10 | boss 0.13/battle over 23 boss fights,
+deepest mark 12**. Standalone smoke, 200 battles, ENTIRE Ruin lane force-learned: **trash
+0.00, deepest mark 7** — ten stacks is not rare in an ordinary fight, it is UNREACHABLE, and
+the boss half is thin rather than healthy. **§1's named variant — "first detonation at 5,
+every 10 after" — was DELIBERATELY NOT SHIPPED. Reporting the number was the instruction;
+the decision is the designer's.**
+**TWO PER-STACK EFFECTS, OPPOSITE TREATMENT.** The damage amplification is **LEFT
+UNCAPPED** (+2%/stack, +5% with **Deeper Hex — now the most dangerous node in the game**,
+a multiplier on a number with no ceiling; +100% at twenty stacks, measured x1.96). **The
+lifesteal is CAPPED**: it went PER STACK (2% each, replacing the flat
+10%-while-any-Ruin — the axis the passive was wasting) and **`const RUIN_LEECH_CAP :=
+0.40`** binds it whatever the stacks and whatever the talents, Soul Glut included.
+§2 **THE MADNESS LANE'S BOSS PROBLEM WAS MADE LEGIBLE, NOT PATCHED.** All four madness
+effects resist a boss until Broken, so the lane read as dead in the nine fights that
+decide a run. **It is gated behind a task, and the task is the RUIN lane's job** (Broken
+Will and Entropy, priced with that in mind). **NO BOSS WORKAROUND WAS ADDED** — the
+`_apply_status` guard and its two `force` callers are byte-untouched. What changed is
+where the rule is stated: the Madness node text, the Psychosis / Bewitched / Mass
+Hysteria glossary entries (**all three now NAME BREAK AS THE KEY**) and the Bewitch /
+Mind Flay / Mass Hysteria ability tooltips.
+§3 ALL 24 NODES RE-PRICED AT ROW PRICING, **4-5x** (Holy's and the Devout's reason).
+**ALL THREE LANE NAMES AND THESES STAND** — the one Cleric tree that did not need
+re-aiming. FULL OLD->NEW MAPPING IN THE CHANGELOG. **AVATAR OF RUIN IS RE-SPECCED, NOT
+REPRICED**: keeping the stacks is the DEFAULT now, so its old subject is the passive and
+the capstone moves the THRESHOLD instead (every 5th stack) — the answer for a player who
+wants the payoff back in ordinary fights.
+§4 TWO AUTHORED FALLBACKS (AU §1) replacing his generics: Mind Flay already owned ->
+**three minions instead of two** (`choose_two` off, `choose_three` on, description
+follows); Mass Hysteria already owned -> **cooldown 4 -> 2**. **THE CLERIC CLASS NOW OWES
+NO GENERICS AT ALL**; test_batch_au's floor moved 11 -> 9 with the reason in the file
+(it FALLS on purpose, one class batch at a time) and "occultist" joined its durable list.
+§5 **EVERY OCCULTIST COUNTER IS ADDITIVE** (the AR/AS/AT/AV/AW form). **FOUR hold the
+INCREASE on a base the kit pays WITHOUT the node and are named `_step`** —
+`deep_hex_step` on the passive's 2%, `soul_leech_step` on its 2% lifesteal,
+`whispers_step` on Psychosis's 50%, `barter_step` on Dark Pact's 15%. **THE BRIEF NAMED
+THREE OF THOSE FOUR**; the fourth has the same shape and takes the same treatment —
+reported, not silently generalised (the same call AW made). `spread_ranks` SPLIT into
+`spread_ranks` (a chance) + `spread_ruin` (a stack count). **`pleasure_ranks` RENAMED
+`pleasure_pct` BECAUSE ITS MAGNITUDE IS 2.5** — `Runes.STAT_INT_KEYS` coerces anything
+ending in `_ranks` and would have rounded it to 2 with nothing crashing; it is
+deliberately ABSENT from that list, while `deep_hex_step`, `soul_leech_step`,
+`whispers_step`, `barter_step` and `spread_ruin` were ADDED to it (the AA trap).
+RUNE AUDIT. **TWO RE-POINTED AND STILL PAYING EXACTLY WHAT THEY PAID — only the units
+moved:** the Deepening Ruin (`deep_hex_ranks` 1 -> `deep_hex_step` 1, `entropy_ranks`
+1->5) and the Whispering Dark (`broken_will_ranks` 1->5, `spread_ranks` 1->15,
+`pleasure_ranks` 1 -> `pleasure_pct` 0.5, **plus `spread_ruin` 1 — the old spread site
+marked the newly maddened with 1 Ruin unconditionally, so the rune WAS paying it and now
+has to say so**). **THE HOLLOW CHALICE IS THE ONE THAT COULD NOT PAY WHAT IT PAID**, and
+it is REPORTED not hidden: §1 changed the lifesteal's UNIT from flat to per-stack, so
+"5% more from Ruined targets" has no equivalent value. It keeps the relationship it has
+always had — exactly ONE NODE'S WORTH of each dial (`soul_leech_step` 3,
+`gluttony_ranks` 3) — and its desc was rewritten to the new units rather than left lying.
+**THE HOLLOW CHALICE CLAMP WAS CHECKED, NOT TRUSTED** (§5 named it): worst reachable
+`healing_received_mult` sum is **-0.60 against a floor of -1.00**, so AA's guard comment
+holds — and test_batch_ax COMPUTES it rather than believing it, beside test_runes'
+`_healing_floor`. **THE THREE CLERIC CLASS-WIDE RUNES TOUCH NO OCCULTIST COUNTER**,
+asserted. No rune was left homeless (this batch retires no node). **NO OCCULTIST
+EXCLUSIVE PAIR SURVIVES**, in the tree data OR in this file's prose: Batch L already
+retired Pact of Flesh <-> Grim Focus and no other was ever authored — so unlike AS, AT
+and AW there was nothing to dissolve.
+§6 THE BOT: **IT WORKS ONE TARGET.** `_ruin_focus(foes, target_foe)` aims everything he
+casts at the deepest existing mark (ten-stack thresholds reward focus; a bot that
+debuffed whatever was convenient would never detonate and a sim would measure a spec
+nobody plays). **AN UNBROKEN BOSS OUTRANKS EVEN THAT** — Shadowrend and Hex go on it to
+grind Break, while Mass Hysteria, Mind Flay and Bewitch are HELD behind `oc_gated` until
+it is Broken, because they are refused outright before that. Hex is never gated: it IS
+the plan.
+NEW INSTRUMENT (§0's two numbers): **`Ruin detonations/battle` and the DEEPEST MARK
+observed, each SPLIT TRASH VS BOSS** — one `ruin_report_line()` shared by the standalone
+report and RunSim's, **because only a RUN ever meets a boss**. Printed only when an
+Occultist stood.
+§7 **THE DEVOUT'S FERVOR: THE BRIEF'S PREMISE WAS STALE AND THIS SHIPPED AS A FINDING,
+NOT A CHANGE.** §7 asked to drop Fervor "from 2 Faith per ally per turn to 1, so
+Consecrated Ground pays 2 a turn rather than 3 with the node learned". **THE GROUND
+ALREADY PAID 2 WITH THE NODE LEARNED** — AW §2 put a base drip of 1 in the kit and priced
+Fervor as a +1 increase — so the end state §7 named was already shipped and the
+instruction is a NO-OP. Corrected toward the code, and NOT guessed into a real change:
+the two readings that would have been one are `fervor_step` 1->0 (a node that does
+nothing) and reverting AW §2's base drip (which §7 says stays). **THE SMOKE WAS RE-RUN
+ANYWAY AND IS COMPARABLE WITH AW'S**: FAITH row isolated on Apostle, n=200 —
+**80% contribution, 2305 healing/battle, +83.7% of base growth/battle, peak 390 HP on a
+175 base**, against AW's 78% / 1997 / +72.9% / 360. **AW'S OVERSHOOT IS UNADDRESSED AND
+STILL OPEN.**
+§8 ONE MORE STALE CLAIM RECORDED RATHER THAN ACTIONED: §8 asks for "the x3 rank notation
+removed" from §7's Occultist tables. **THERE IS NO SUCH NOTATION IN master.html** and has
+not been since Batch AI made every node single-rank — the identical correction AW made
+when its own brief claimed it.
+VERIFIED: check_parse 0, check_flow 0 (6 screens), run-harness gates 1/2/3 PASS.
+NEW test_batch_ax.gd **329/0**.
+Regression: ah 5410/0 (STAMP GATE bumped AW -> AX), ah_battle 65/0, ai 2036/0, an 6047/0,
+aj 403/0, ak 523/0, al 556/0, ar 885/0, as 387/0, at 460/0, au 257/0, av 315/0, aw 337/0,
+test_runes 2988/0, test_rune_battle 95/0 (its two Occultist rune checks re-pointed IN
+PLACE, with a third added for the Hollow Chalice).
+
 BATCH AW (08-08) — THE DEVOUT: INVESTMENT. Second of the Cleric three. His tree
 was purpose-designed already (Batch K), so like AV this is NOT a restructure — it is
 a SPINE (**he lends out his own bulk and collects dividends**) plus the same 4-5x
@@ -3337,16 +3459,18 @@ STUNNED/FROZEN lost turns tick statuses+cooldowns (fix 07-22). Arcanist
 tuning (07-22): Resonance dmg-taken +5%/stack (was 10); Overcharge
 recoil surcharges REMOVED (weighting = passive trio only).
 OCCULTIST OLD GODS REWORK + TREE (07-24, 9th tree): passive "corrupt"
-→ "old_gods". RUIN = enemy-side stacks (status "ruin", add_status
-branch caps 5, chip "R#", battle-long) gained whenever the Occultist
+→ "old_gods". RUIN = enemy-side stacks (status "ruin", chip "R#",
+battle-long, NO CAP since AX) gained whenever the Occultist
 applies a debuff (generic applies_status site checks passive_id ==
 "old_gods"; custom sites call _gain_ruin — Bewitch cast/Dazes, Hex
 Decay, Spread, Mirror). Effects gated on _living_occultist(): target
-+2%/stack in _resolve; hero strikes on Ruined targets lifesteal
-(10+5×soul_leech)% of final (post-damage block). At 5: "ruin_primed"
-1t → _detonate_ruin at the bearer's turn start (BEFORE tick_statuses;
-50% Occ Atk shadow w/ resist via take_tick_damage + party heal 15% Occ
-max HP). PSYCHOSIS status: 50%/turn in _enemy_turn — supports
++2%/stack in _resolve (AX: (2+deep_hex_step)%, UNCAPPED); hero
+strikes on Ruined targets lifesteal (2+soul_leech_step+gluttony)% PER
+STACK of final, minf'd at RUIN_LEECH_CAP 0.40. Every 10th stack (AX;
+_ruin_threshold, avatar_ruin installs 5): "ruin_primed" 1t →
+_detonate_ruin at the bearer's turn start (BEFORE tick_statuses; 90%
+Occ Atk shadow w/ resist via take_tick_damage + party heal 25% Occ
+max HP) — AND THE STACKS SURVIVE IT. PSYCHOSIS status: 50%/turn in _enemy_turn — supports
 (_psychotic_support matches healing_wave/enemy_shield/wild_growth)
 target HEROES, else 0-cost attack (_cheapest_attack) on a fellow;
 Spread of Madness rolls first (leap + _gain_ruin; bosses excluded).
@@ -3365,10 +3489,12 @@ applies_status w/ status_plus perfect) + Mass Hysteria capstone
 (perfect sets cd 4 = 3+tick). UMBRAL SIGIL + old Mind Flay VAULTED
 (sigil status machinery kept). Boss mind-magic immunity: stunned/
 frozen/psychosis/bewitch/hysteria all resist unless Broken
-(_apply_status guard). Talents: Corrupted Channeling now
-channeling_ranks (25%/rank of a Crippled attacker's damage), Pleasure
-from Pain end-of-_player_turn (0.5%/rank Occ max HP × unique enemy
-debuffs — _unique_enemy_debuffs helper), Dark Infusion attacker-side,
+(_apply_status guard). Talents (ALL ADDITIVE SINCE AX — the counter
+holds the magnitude): Corrupted Channeling channeling_ranks (60% of a
+Crippled attacker's damage), Pleasure from Pain end-of-_player_turn
+(pleasure_pct 2.5% Occ max HP × unique enemy debuffs —
+_unique_enemy_debuffs helper; the field is a FLOAT and must never be
+renamed back to "_ranks"), Dark Infusion attacker-side,
 Broken Will pr-side (replaced the old mindflay pr site), Umbral Mirror
 wraps the enemy→hero applies_status branch. GOTCHA RE-HIT: multiline
 lambda in filter() args = parse error (collapse to one line).

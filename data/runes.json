@@ -310,7 +310,7 @@
 		"name": "Rune of the Deepening Ruin", "rarity": "rare", "scope": "spec:occultist",
 		"price": 100, "lane": "Ruin",
 		"desc": "Every stack of Ruin makes its bearer take 1% more damage, and anything bearing Ruin takes 5 Break damage at the start of its turn.",
-		"payload": {"stat": {"deep_hex_ranks": 1, "entropy_ranks": 1}}
+		"payload": {"stat": {"deep_hex_step": 1, "entropy_ranks": 5}}
 	},
 	"flayed_mind": {
 		"name": "Rune of the Flayed Mind", "rarity": "epic", "scope": "spec:occultist",
@@ -321,14 +321,14 @@
 	"hollow_chalice": {
 		"name": "Rune of the Hollow Chalice", "rarity": "rare", "scope": "spec:occultist",
 		"price": 75, "scarred": true, "lane": "Leech",
-		"desc": "Heroes drink 5% more from Ruined targets and the Ruin lifesteal takes 3% more — but heals HE receives are 30% weaker.",
-		"payload": {"stat": {"soul_leech_ranks": 1, "gluttony_ranks": 1, "healing_received_mult": -0.3}}
+		"desc": "The Ruin lifesteal drinks 3% more per stack, and another 3% on top — but heals HE receives are 30% weaker (capped at 40% of the damage dealt).",
+		"payload": {"stat": {"soul_leech_step": 3, "gluttony_ranks": 3, "healing_received_mult": -0.3}}
 	},
 	"whispering_dark": {
 		"name": "Rune of the Whispering Dark", "rarity": "rare", "scope": "spec:occultist",
 		"price": 100,
 		"desc": "A little of every rite: +5% Break damage, Psychosis spreads 15% more readily, enemy afflictions mend the party each turn.",
-		"payload": {"stat": {"broken_will_ranks": 1, "spread_ranks": 1, "pleasure_ranks": 1}}
+		"payload": {"stat": {"broken_will_ranks": 5, "spread_ranks": 15, "spread_ruin": 1, "pleasure_pct": 0.5}}
 	},
 
 	"deep_bond": {

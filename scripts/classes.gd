@@ -559,12 +559,12 @@ static func pending_talent_ability(display_name: String) -> Ability:
 				"choose_two": true, "delay": 3.0, "anim": "attack03",
 				"applies_status": {"id": "psychosis", "turns": 3},
 				"perfect_id": "status_plus", "perfect_text": "Psychosis lasts 4 turns",
-				"description": "Flay TWO chosen minds: 30% of Attack\nin shadow each and Psychosis for\n3 turns — madness that turns them\non their own."})
+				"description": "Flay TWO chosen minds: 30% of Attack\nin shadow each and Psychosis for\n3 turns — madness that turns them\non their own. A BOSS RESISTS UNTIL\nBROKEN."})
 		"Mass Hysteria":
 			return Ability.make({"display_name": "Mass Hysteria", "cooldown": 4,
 				"cost": 30, "special": "hysteria", "delay": 4.0, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "Cooldown becomes 3 instead",
-				"description": "The warband turns on itself: next\nturn every minion strikes a fellow\nwith DOUBLE Break damage, Sundering\nthem for 3 turns."})
+				"description": "The warband turns on itself: next\nturn every minion strikes a fellow\nwith DOUBLE Break damage, Sundering\nthem for 3 turns. A BOSS RESISTS\nUNTIL BROKEN."})
 		"Bulwark of Fortitude":
 			return Ability.make({"display_name": "Bulwark of Fortitude", "cooldown": 3,
 				"cost": 30, "special": "bulwark", "delay": 3.0, "anim": "attack03",
@@ -1018,7 +1018,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Bewitch", "cooldown": 4, "cost": 25,
 					"special": "bewitch", "delay": 3.5, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "The target attacks instantly",
-					"description": "Charm a mind — for 3 turns the target\nbasic-attacks its OWN allies, Dazing\nthem with every strike."}),
+					"description": "Charm a mind — for 3 turns the target\nbasic-attacks its OWN allies, Dazing\nthem with every strike.\nA BOSS RESISTS UNTIL BROKEN."}),
 				Ability.make({"display_name": "Dark Pact", "cooldown": 3, "cost": 20,
 					"special": "dark_pact", "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Restores 5 Mana",
