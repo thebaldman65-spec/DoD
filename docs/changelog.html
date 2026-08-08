@@ -5,6 +5,165 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-08 — Batch AV: Holy — reversal</h2>
+<p><i>First of the Cleric three. Her tree was purpose-designed already, so this is not a
+restructure — it is a spine (<b>nothing is final, no loss permanent</b>) plus the most
+overdue repricing in the game. Every one of her 24 ids survives and re-specs in place; no
+new ids, none deleted, <b>no save version move</b> (still v7).</i></p>
+<ul>
+
+<li><b>§0 THE INSTRUMENT, AND IT IS NOT DAMAGE SHARE.</b> Batch W already measured her at
+8% damage share and 33% contribution off 431 healing a battle. Every measurement in this
+batch reads <b>healing landed, damage prevented and the normalised contribution share</b>;
+a moving damage share is noise. This is a <b>standing rule for the two Cleric batches still
+to come</b>.</li>
+
+<li><b>§1 RESURRECTION JOINS THE OPENING KIT</b>, unchanged (1 Mercy, 4.0, 3cd, 20% health
+and resource; Empower +1 Mercy returns them at full with 5 turns of Renewal; Perfect 25%).
+The thing that most means "nothing is final" was a row-5 node <i>and</i> an Epic rune's
+whole payload, so her identity was a pick most builds skipped. Consequences handled rather
+than discovered: it <b>left <code>SPEC_POOLS["holy"]</code></b> (a boss cannot offer what
+she starts with), <b>Mercy row 5 is now Grace</b>, and <b>her kit is FOUR abilities where
+every other spec has three</b>. That parity break is deliberate and is stated in the docs:
+she attacks at 50, so her abilities are not <i>part</i> of her contribution, they are all of
+it. Exactly one def of Resurrection exists — the kit calls
+<code>Classes.pending_talent_ability</code> rather than holding a copy (the AK resolver
+rule), because the Rune of the Last Rites still grants it by name.</li>
+
+<li><b>§2 SANCTUARY IS RENAMED VIGIL.</b> "Radiance is heal bigger, Sanctuary is stop people
+dying" was one axis with two names. VIGIL takes reversal — the fallen and the nearly-fallen
+— so she has three real questions instead of two: <b>how much you heal, how you pay for it,
+and what you can take back.</b></li>
+
+<li><b>§3 THE REPRICING.</b> Her magnitudes were the worst-priced of the twelve: a 5% dispel
+chance, 1% of maximum Mana, 1% of an ally's health, a threshold moved 50 → 53. Those were
+rank-1 values in a three-rank tree, and as whole ROWS costing two other options they were
+not decisions. Where the Mage trees needed 3×, hers needed <b>4–5×</b>. <b>Mercy itself is
+untouched by designer decision</b> — the generator, the +5% per stack, the spend costs, the
+Empower surcharge and the perfect-forgo all stand exactly as they were. The tree moves around
+it.
+<ul>
+<li><b>Guardian Angel 53% → 65% is the load-bearing reprice.</b> Mercy is untouched, so this
+node is the only lever on her economy — and 50→53 was never going to be one.</li>
+<li><b>Grace closes a real dead end:</b> at maximum stacks every further crossing paid her
+nothing, the one place her reactive economy wasted what it earned.</li>
+<li><b>Intercession is the reversal button</b> — death refused rather than healed away. It
+costs Mercy <i>on trigger</i>, not on cast, so a Cleric holding nothing gets nothing.</li>
+<li><b>Serenity is the row-7 statement:</b> reversal stops being a once-a-fight miracle. It
+deliberately does <b>not</b> touch the health the ally returns at — that is Empower's job,
+and stepping on it would make Empower pointless. It is written as an ability payload for
+exactly that reason: there is no field in it that <i>could</i> reach the return health.</li>
+</ul></li>
+
+<li><b>§8 THE FULL ID MAPPING.</b> Every design is mapped onto an existing id by closest
+surviving intent. <b>Three assignments are forced and are reported, not hidden.</b>
+<table border="1" cellpadding="4">
+<tr><th>id</th><th>Batch AI (was)</th><th>Batch AV (now)</th></tr>
+<tr><td>hl_triage</td><td>Triage — Radiance 1, crit + 3% healing</td><td>Triage — Radiance 1, crit + <b>15%</b></td></tr>
+<tr><td>hl_soothe</td><td>Soothing Touch — Radiance 2, Renewal −5 Mana</td><td>Soothing Touch — Radiance 2, <b>Heal AND Renewal −10 each</b></td></tr>
+<tr><td>hl_on_mend</td><td>On the Mend — Radiance 3, 5%</td><td>On the Mend — Radiance 3, <b>35%</b></td></tr>
+<tr><td>hl_divine_plea</td><td>Divine Plea — Radiance CAPSTONE</td><td>Divine Plea — <b>Radiance 4</b> (homed off the shelf)</td></tr>
+<tr><td>hl_swift</td><td>Swift Mending — Radiance 5, −1 cooldown</td><td>Swift Mending — Radiance 5, <b>no cooldown + Hymn −1</b></td></tr>
+<tr><td>hl_brilliance</td><td>Radiant Cascade — Radiance 6, 25%</td><td>Radiant Cascade — Radiance 6, <b>75%</b></td></tr>
+<tr><td>hl_overflow</td><td>Overflow — Radiance 7, 15%</td><td>Overflow — Radiance 7, <b>60%</b></td></tr>
+<tr><td>hl_sanctum</td><td>Living Sanctum — Sanctuary CAPSTONE</td><td><b>Sanctum</b> — Radiance CAPSTONE (+60% healing, ALL overheal spills)</td></tr>
+<tr><td>hl_heavenly</td><td>Heavenly Aura — Mercy 1, 10%/stack</td><td>Heavenly Aura — Mercy 1, <b>12%</b>/stack</td></tr>
+<tr><td>hl_holy_light</td><td>Holy Light — Mercy 2, 1% Mana</td><td>Holy Light — Mercy 2, <b>8%</b></td></tr>
+<tr><td>hl_zealous</td><td>Zealous Light — Mercy 3, 1 Mercy</td><td>Zealous Light — Mercy 3, <b>2 Mercy</b></td></tr>
+<tr><td>hl_sanctified</td><td>Sanctified — Mercy 4, 10%</td><td>Sanctified — Mercy 4, <b>35%</b></td></tr>
+<tr><td>hl_resurrection</td><td>Resurrection (grant) — Mercy 5</td><td><b>GRACE</b> — Mercy 5 (the slot Resurrection vacated; §8 named this one)</td></tr>
+<tr><td>hl_ardor</td><td>Ardor — Mercy 6, 4+ held</td><td>Ardor — Mercy 6, <b>3+</b> held</td></tr>
+<tr><td>hl_martyr</td><td>Martyr's Vigor — Mercy 7, cap 6</td><td>Martyr's Vigor — Mercy 7, <b>cap 8</b></td></tr>
+<tr><td>hl_avatar</td><td>Avatar of Mercy — Mercy CAPSTONE, +1/turn and free Empower</td><td>Avatar of Mercy — Mercy CAPSTONE, <b>free Empower that GRANTS a stack</b> (the per-turn drip is gone: it made the resource a clock rather than something the party earned her)</td></tr>
+<tr><td>hl_guardian</td><td>Guardian Angel — Sanctuary 1, 53%</td><td>Guardian Angel — Vigil 1, <b>65%</b></td></tr>
+<tr><td>hl_presence</td><td>Divine Presence — Sanctuary 2, 1%</td><td>Divine Presence — Vigil 2, <b>8%</b></td></tr>
+<tr><td>hl_last_hope</td><td>Last Hope — Sanctuary 3, 5%</td><td>Last Hope — Vigil 3, <b>40%</b></td></tr>
+<tr><td>hl_inner_faith</td><td>Inner Faith — Sanctuary 4, +5% max health</td><td><b>INTERCESSION</b> — Vigil 4. <b>FORCED ASSIGNMENT:</b> Intercession has no ancestor anywhere in the old tree; this id held the same row of the same lane.</td></tr>
+<tr><td>hl_beacon</td><td>Beacon — Sanctuary 6, turn-start pulse on the nearly-dead</td><td><b>SHARED VIGIL</b> — Vigil 5. <b>NEAR-FORCED:</b> the nearest surviving intent is "something automatic fires because a hero is at death's door, without a cast".</td></tr>
+<tr><td>hl_vestments</td><td>Blessed Vestments — Sanctuary 5, Renewal bearers take 5% less</td><td>Blessed Vestments — Vigil 6, <b>her healing leaves a 25%-value shield for 2 turns</b></td></tr>
+<tr><td>hl_serenity</td><td>Serenity — Sanctuary 7, one lethal save per battle</td><td>Serenity — Vigil 7, <b>Resurrection costs no Mercy and its cooldown drops to 1</b> (the lethal save became Intercession's job)</td></tr>
+<tr><td>hl_capacitor</td><td>Holy Capacitor — Radiance 4, overheal battery</td><td><b>MARTYRDOM</b> — Vigil CAPSTONE. <b>FULLY FORCED:</b> Martyrdom has no ancestor and Capacitor's battery had no successor. Nothing needed a new subsystem.</td></tr>
+</table>
+<b>Two designs are gone with their premise</b> rather than left unreachable as designs:
+Living Sanctum's party-echo and Inner Faith's flat health. <b>Holy Capacitor and Beacon lose
+their NODES but keep their read sites</b> — the Rune of the Triage Ward and the Rune of the
+Sleepless Vigil still write them, so they are rune-only, gated <code>&gt; 0</code>, and
+<b>flagged for re-authoring rather than silently deleted</b> (the AR vault pattern).</li>
+
+<li><b>§4 AU §1'S FALLBACKS, AUTHORED FOR HOLY.</b> <b>Divine Plea</b> already owned → the
+node makes it cost <b>1 Mercy instead of 2</b>. <b>Intercession</b> already owned → its
+window lasts <b>3 turns instead of 2</b>. Her three capstones grant no ability, so they need
+no fallback at all.
+<b>AND THE RULE ALREADY REACHED RUNE GRANTS — no new machinery was needed, which is the
+finding.</b> Runes share <code>Talents.apply_payload</code>, so a rune granting an ability
+the hero already holds hits the same <code>_collided</code> site, and
+<code>Run.apply_upgrades</code> already runs after the rune pass. The <b>Rune of the Last
+Rites</b> — whose entire Epic payload was granting Resurrection — therefore applies the
+generic instead: Resurrection has no damage, so Honed is skipped and <b>Quickened</b> lands
+(3cd → 1). Its description was rewritten to say so; it is no longer a knowingly dead
+Epic.</li>
+
+<li><b>§5 COUNTERS AND THE RUNE AUDIT. Every Holy counter is now ADDITIVE</b> (the form AR,
+AS and AT adopted): each writes its own magnitude in the units its read site sums. Two are
+the <i>increase</i> on a base the passive already pays — <code>heavenly_step</code> 7 on
+Mercy's 5%/stack and <code>guardian_step</code> 15 on the 50% window — which is AT's
+<code>cannoneer_ranks</code> precedent and the only honest additive form when the base exists
+without the node.
+<b>Re-pointed:</b> Rune of the Triage Ward (<code>triage_ranks</code> →
+<code>triage_heal</code> 3), Rune of the Open Hand (<code>triage_ranks</code> →
+<code>triage_heal</code> 3, <code>last_hope_ranks</code> → <code>last_hope_pct</code> 5),
+Rune of the Sleepless Vigil (<code>divine_presence_ranks</code> →
+<code>divine_presence_pct</code> 2, <b>and its by-name lane tag Sanctuary → Vigil</b> — a
+renamed lane is exactly the kind of reference that breaks quietly). Every one still pays its
+advertised number. <code>beacon_ranks</code> and <code>capacitor_ranks</code> did NOT move:
+they are rune-only now and their read sites were already in their own units.
+<b>The three cleric class-wide runes touch no Holy counter</b>, asserted. Rune magnitude has
+been closed since AF, so a rune paying a different amount would be a report, not a
+retune — none does.</li>
+
+<li><b>§6 THE BOT.</b> Raise a fallen hero FIRST whenever she can pay for it; Intercession
+while someone is under 30% and she holds a stack to pay the trigger; Divine Plea under 30%;
+Hymn at <b>two or more</b> allies below 70%; Heal otherwise. <b>Renewal is in the rotation
+and is not in §6's minimum</b> — reported rather than silently added, because On the Mend and
+the Renewal half of her throughput are unmeasurable without it. The Empower rule has one
+implementation: free when Avatar or Ardor's threshold says so, and <b>never</b> down past a
+Resurrection she could otherwise cast.</li>
+
+<li><b>ONE NAME COLLISION, FLAGGED NOT SILENT.</b> The Warden already has a Banner row-6 node
+called <b>Shared Vigil</b> (allies take 12% less while he is above half health). Holy's new
+Vigil row-5 node carries the same name with the opposite trigger. They are separate counters
+on separate specs and stack cleanly — only the label is shared. Renaming one is a designer
+call, so the batch shipped the name as specified and recorded the clash.</li>
+
+<li><b>VERIFIED.</b> check_parse 0, check_flow 0 (6 screens), 11 scenes 0 SCRIPT ERROR,
+run-harness gates 1/2/3 PASS. NEW test_batch_av.gd <b>315/0</b>. Regression: an 6047/0, ah 5410/0 (STAMP GATE bumped AU → AV; the "3 spec
+abilities" assertion RE-POINTED IN PLACE with the reason in the file), ah_battle 65/0,
+ai 2036/0, aj 403/0, ak <b>523/0</b> (was 524 — her spec pool lost Resurrection and every
+entry still resolves), al <b>556/0</b> (was 557 — same reason), ar 885/0, as 387/0, at 460/0,
+au <b>249/0</b> (was 246), test_runes 2981/0, test_rune_battle 94/0.
+<b>NEGATIVE CONTROLS RUN:</b> putting Guardian Angel back at 53% trips 2 checks; a Serenity
+that also returns the ally at full health trips 3.
+<b>KIT SMOKE, contribution metrics only (§0):</b> fixed lineup, 40 battles a row,
+berserker/pyromancer/holy/beastmaster, all four rows 40/40 wins and 0 SCRIPT ERROR —
+<b>ungeared 222 healing/battle and 29% contribution (3% damage share); RADIANCE 615 and 50%
+(1%); MERCY 346 and 37% (3%); VIGIL 302 healing + 31 prevented and 37% (4%)</b>. Her damage
+share FALLS as her contribution nearly doubles, which is §0's whole point.
+<b>Live autoplay battle clean</b> (0 SCRIPT ERROR), with <b>both reversals firing in sequence
+on the same hero</b> — the ordering rule working in a real fight: one Intercession window
+fades unused, the next refuses a lethal blow (survives at 1 HP, 1 Mercy spent), and when he
+falls again Martyrdom returns him at 30%. Shared Vigil logs −15% on every blow once someone
+crosses 30%. Blessed Vestments carries no proc line by design — it rides every heal and
+tick, so the barrier chip is its feedback and the test measures the ward directly.
+<b>NO DIFFICULTY MEASUREMENT AND NO SIM ROW</b>, deliberately — the same reason AJ, AK, AL,
+AR, AS, AT and AU each recorded.</li>
+
+<li><b>REPORTED, NOT ACTED ON.</b> <b>Resurrection fires 0.1–0.2 times a battle in the
+smoke</b> — a 40-battle fixed-lineup fight almost never kills a hero, so the kit's headline
+piece is measured by the test suite rather than by the sim. That is a property of the smoke,
+not of the spec, and it is the same "a smoke fight is over by round 3–4" caveat Batch AU
+recorded for late-game capstones.</li>
+</ul>
+
 <h2>2026-08-08 — Batch AU: four things from the AT playtest</h2>
 <p><i>Two game-wide fixes and two pieces of Arcanist repair. No Cleric work. Every id
 survives and no save version moves (still v7).</i></p>

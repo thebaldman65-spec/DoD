@@ -260,25 +260,25 @@
 		"name": "Rune of the Triage Ward", "rarity": "rare", "scope": "spec:holy",
 		"price": 100, "lane": "Radiance",
 		"desc": "Her instant heals can critically strike and mend 3% harder, and 5% of her overhealing is stored for the next Heal.",
-		"payload": {"stat": {"triage_ranks": 1, "capacitor_ranks": 1}}
+		"payload": {"stat": {"triage_heal": 3, "capacitor_ranks": 1}}
 	},
 	"last_rites": {
 		"name": "Rune of the Last Rites", "rarity": "epic", "scope": "spec:holy",
 		"price": 160, "lane": "Mercy",
-		"desc": "Grants RESURRECTION: spend 1 Mercy to return a fallen ally to life with 20% health and resource.",
+		"desc": "She already knows Resurrection, so this hones it instead: the rite comes back 2 turns sooner.",
 		"payload": {"grant_ability": "Resurrection"}
 	},
 	"sleepless_vigil": {
 		"name": "Rune of the Sleepless Vigil", "rarity": "rare", "scope": "spec:holy",
-		"price": 75, "scarred": true, "lane": "Sanctuary",
+		"price": 75, "scarred": true, "lane": "Vigil",
 		"desc": "The most wounded ally heals 2% as her turn ends; allies under a quarter heal 5% as it starts — but -10 Speed.",
-		"payload": {"stat": {"divine_presence_ranks": 2, "beacon_ranks": 1, "speed": -10.0}}
+		"payload": {"stat": {"divine_presence_pct": 2, "beacon_ranks": 1, "speed": -10.0}}
 	},
 	"open_hand": {
 		"name": "Rune of the Open Hand", "rarity": "rare", "scope": "spec:holy",
 		"price": 100,
 		"desc": "A little of every grace: +3% healing, she opens each battle holding 1 Mercy, and allies under a quarter heal 5% more.",
-		"payload": {"stat": {"triage_ranks": 1, "zealous_mercy": 1, "last_hope_ranks": 1}}
+		"payload": {"stat": {"triage_heal": 3, "zealous_mercy": 1, "last_hope_pct": 5}}
 	},
 
 	"warded_robes": {

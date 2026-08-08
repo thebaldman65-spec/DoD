@@ -171,9 +171,12 @@ const SPEC_POOLS := {
 	# shape for a safety valve. Every entry here reads Resonance, so none of
 	# them can ever be class-pool-eligible (AH's curation rule).
 	"arcanist": ["Overcharge", "Magi's Wrath", "Stabilize"],
-	# Cleric. The three Mercy/Faith spenders can only ever be spec picks —
-	# a sibling has no stacks to pay them with.
-	"holy": ["Resurrection", "Divine Plea"],
+	# Cleric. The Mercy/Faith spenders can only ever be spec picks — a sibling
+	# has no stacks to pay them with. BATCH AV: RESURRECTION LEFT THIS POOL
+	# because it joined her opening kit — a boss cannot offer what she starts
+	# with. Intercession is deliberately NOT here: it is the Vigil row-4 node's
+	# grant and reads Mercy on trigger, so a sibling could not pay it either.
+	"holy": ["Divine Plea"],
 	"inquisitor": ["Sacred Resolve", "Bulwark of Fortitude"],
 	"occultist": ["Mind Flay", "Mass Hysteria", "Umbral Sigil"],
 	# Hunter — the three pools that shipped in Batch 30/32, unchanged.
@@ -515,6 +518,12 @@ static func beastmaster_pool_ability(display_name: String) -> Ability:
 
 
 # DOD_SIM_ABILITIES test hook meanwhile. faith_cost = Mercy stacks.
+#
+# BATCH AV: "Resurrection" is no longer talent-gated — it is in the Holy
+# OPENING KIT (`spec_abilities`) and the Rune of the Last Rites still grants
+# it by name. Its def stays HERE and nowhere else, because those two callers
+# and `pool_ability` must all read the same numbers; the kit list calls this
+# function rather than holding a second copy (the AK resolver rule).
 static func pending_talent_ability(display_name: String) -> Ability:
 	match display_name:
 		"Resurrection":
@@ -528,7 +537,17 @@ static func pending_talent_ability(display_name: String) -> Ability:
 				"cost": 0, "faith_cost": 2, "special": "divine_plea",
 				"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "Restores 10 Mana",
-				"description": "Spend 2 Mercy: FULLY heal an ally.\nEmpower (+1 Mercy): also cleanse all\ndebuffs and ward them against new\nones for 3 turns."})
+				"description": "Spend 2 Mercy: FULLY heal an ally.\nEmpower (+1 Mercy): also cleanse all\ndebuffs and Hallow them against new\nones for 3 turns."})
+		# BATCH AV — THE REVERSAL BUTTON: death itself refused rather than
+		# healed away. NO faith_cost: it costs Mercy ON TRIGGER, not on cast,
+		# so a Cleric holding nothing arms nothing (battle._on_intercession_save
+		# is the one place that decides, and it refuses when she is empty).
+		"Intercession":
+			return Ability.make({"display_name": "Intercession", "cooldown": 4,
+				"cost": 25, "special": "intercession", "delay": 2.0,
+				"anim": "attack03",
+				"perfect_id": "", "perfect_text": "The window lasts a turn longer",
+				"description": "For 2 turns the next lethal blow\nagainst ANY hero is refused — they\nsurvive at 1 health and the Cleric\nloses 1 Mercy. She must be holding\none when it lands."})
 		"Sacred Resolve":
 			return Ability.make({"display_name": "Sacred Resolve", "cooldown": 5,
 				"cost": 25, "special": "unity", "delay": 2.5, "anim": "attack03",
@@ -941,6 +960,16 @@ static func spec_abilities(spec: String) -> Array:
 			# Mercy kit (07-22 rework): heals scale off the CASTER's max
 			# health; Mercy stacks fuel Hymn and Empowered casts. VAULTED —
 			# kept for future return: Dawnbreak (20 Mana flat 40, overflow).
+			#
+			# BATCH AV — FOUR ABILITIES, WHERE EVERY OTHER SPEC HAS THREE, AND
+			# THAT IS DELIBERATE. Resurrection is the thing that most means
+			# "nothing is final", and as a row-5 node it was a pick most builds
+			# skipped. She attacks at 50, so her abilities are not PART of her
+			# contribution — they are all of it, and the parity break buys the
+			# identity. Its def is NOT copied here: `pending_talent_ability`
+			# stays the single source (the AK resolver rule), because the Rune
+			# of the Last Rites still grants it by name and both must read the
+			# same numbers. It LEFT `SPEC_POOLS["holy"]` for the same reason.
 			return [
 				Ability.make({"display_name": "Heal", "cooldown": 1, "cost": 20, "special": "holy_heal",
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
@@ -954,6 +983,7 @@ static func spec_abilities(spec: String) -> Array:
 					"special": "hymn", "delay": 3.5, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Heals 25% instead",
 					"description": "Spend 1 Mercy: heal ALL allies for\n20% of their max health. Empower\n(+1 Mercy): 35% instead."}),
+				pending_talent_ability("Resurrection"),
 			]
 		"inquisitor":
 			# Conviction kit (07-23 rework). VAULTED — kept for future return:

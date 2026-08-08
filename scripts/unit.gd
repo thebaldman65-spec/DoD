@@ -525,32 +525,46 @@ func resonance_dmg_bonus() -> float:
 
 func resonance_taken_bonus() -> float:
 	return 0.01 * RESONANCE_TAKEN_STEP * resonance_curve()
-# Holy tree (07-22). See talents.gd for the node text.
-var triage_ranks := 0         # Triage: instant heals can crit, +3%/rank healing
-var heavenly_ranks := 0       # Heavenly Aura: deeper Mercy stack bonus
-var holy_light_ranks := 0     # Holy Light: mana back on perfect casts
-var guardian_ranks := 0       # Guardian Angel: wider Mercy window
+# Holy tree — RE-AUTHORED IN BATCH AV. Every counter is ADDITIVE: it holds
+# its own magnitude in the units its read site sums (percentage POINTS unless
+# said otherwise), never a rank the read site multiplies. See talents.gd.
+var triage_heal := 0          # Triage: +N% healing, and heals may CRIT at all
+var heavenly_step := 0        # Heavenly Aura: the INCREASE on Mercy's base 5%/stack
+var holy_light_pct := 0       # Holy Light: N% of max Mana back on a perfect cast
+var guardian_step := 0        # Guardian Angel: the INCREASE on the 50% Mercy window
 var mercy_threshold := 0.5    # party-wide stamp (Guardian Angel raises it)
-var divine_presence_ranks := 0 # Divine Presence: end-of-turn drip heal
-var last_hope_ranks := 0      # Last Hope: the nearly-dead heal deeper
+var divine_presence_pct := 0  # Divine Presence: end-of-turn drip heal, N% of max HP
+var last_hope_pct := 0        # Last Hope: the nearly-dead heal N% deeper
 var last_hope_bonus := 0      # party-wide stamp (receiver side of Last Hope)
+var last_overheal := 0        # overheal of the most recent heal_amount call
+var on_mend_pct := 0          # On the Mend: N% chance a Renewal tick dispels
+var sanctified_pct := 0       # Sanctified: N% chance a Mercy spend refunds
+var cascade_pct := 0          # Radiant Cascade: crit heals splash N% onward
+var overflow_pct := 0         # Overflow: N% of overhealing spills onward
+var zealous_mercy := 0        # Zealous Light: battle-opening Mercy (a COUNT)
+var grace_pct := 0            # Grace: a wasted stack heals the ally N% of her max HP
+var ardor_at := 0             # Ardor: hold this many Mercy and Empower is free
+var mercy_cap_bonus := 0      # Martyr's Vigor: the INCREASE on the base cap of 5
+var holy_vigil_pct := 0       # Shared Vigil: party takes N% less while anyone is low
+var vestments_pct := 0        # Blessed Vestments: her heals leave an N%-value shield
+var intercession_long := 0    # authored fallback: the refusal window lasts a turn more
+var martyrdom := 0            # capstone: the first hero to fall returns at 30%
+var sanctum := 0              # capstone: +60% healing, ALL overheal spills
+var avatar_of_mercy := 0      # capstone: Empower is free and GRANTS a stack
+# Party-wide stamps for the two reversal effects. `intercession` is a STATUS
+# (the one answer to "is the refusal live", so it expires by itself); the
+# callback returns FALSE when the Cleric cannot pay, and only then does the
+# hero die. Martyrdom is once per battle and free, so a plain latch is enough.
+var intercession_cb := Callable()
+var martyrdom_guard := false
+var martyrdom_cb := Callable()
+# RUNE-ONLY, READ SITES KEPT ON PURPOSE (the AR vault pattern): Batch AV
+# retired the Holy Capacitor and Beacon NODES, but the Rune of the Triage Ward
+# and the Rune of the Sleepless Vigil still write these. Flagged for
+# re-authoring — never silently deleted.
 var capacitor_ranks := 0      # Holy Capacitor: overheal banks for next Heal
 var stored_overheal := 0      # the banked amount (released by Heal)
-var last_overheal := 0        # overheal of the most recent heal_amount call
-var on_mend_ranks := 0        # On the Mend: Renewal ticks can dispel
-var sanctified_ranks := 0     # Sanctified: Mercy spends can refund
-# Holy tree v2 (Batch J, 07-30). See talents.gd for the node text.
-var cascade_ranks := 0        # Radiant Cascade: crit heals splash onward
-var overflow_ranks := 0       # Overflow: overhealing spills onward
-var zealous_mercy := 0        # Zealous Light: battle-opening Mercy
-var ardor_ranks := 0          # Ardor: held Mercy makes Empower free
-var mercy_cap_bonus := 0      # Martyr's Vigor: Mercy ceiling 5 -> 6 -> 7
-var vestments_ranks := 0      # Blessed Vestments: Renewal bearers take less
 var beacon_ranks := 0         # Beacon: turn-start pulse on the nearly-dead
-var serenity := 0             # Serenity: the Cleric's rank (spawn stamps it)
-var serenity_guard := false   # party-wide stamp: one lethal save is banked
-var avatar_of_mercy := 0      # capstone: Mercy per turn, Empower free
-var living_sanctum := 0       # capstone: single-ally heals echo party-wide
 # Devout Conviction + tree (07-23). See talents.gd for the node text.
 var faith_stacks := 0         # Conviction: per-ALLY Faith (0-5)
 var communion_ranks := 0      # Communion: 5-stack procs can spread
@@ -624,9 +638,9 @@ var status_expired_cb := Callable()
 # Mercy hook (set by the battle scene on heroes): fires when this unit
 # crosses below 50% health, from any damage source.
 var below_half_cb := Callable()
-# Serenity hook (set by the battle scene alongside serenity_guard): fires
-# when the guard saves this unit, so the battle can spend it party-wide.
-var serenity_cb := Callable()
+# The two Holy reversal hooks (Batch AV) are declared with the rest of her
+# state above: `intercession_cb` (asked whether the refusal can be PAID, so it
+# returns a bool) and `martyrdom_cb` (reports a spent latch).
 
 
 # The threshold is 50% by default; Guardian Angel stamps a higher one on
@@ -635,6 +649,40 @@ func _check_below_half(was_above: bool) -> void:
 	if is_hero and not is_companion and was_above \
 			and hp <= max_hp * mercy_threshold and below_half_cb.is_valid():
 		below_half_cb.call(self)
+
+
+# The health Martyrdom hands back — named so the test can read the number the
+# capstone text promises rather than a literal buried in a branch.
+const MARTYRDOM_RETURN := 0.30
+
+
+# THE ONE PLACE THE HOLY CLERIC'S TWO REVERSALS ANSWER A LETHAL BLOW (Batch
+# AV). Called from take_hit AND take_tick_damage, so a tick death is refused
+# exactly as an attack death is, and it sits AFTER a unit's own saves
+# (Undying, Undying Rage, Ashes of Al'ar) — her net is the party's last one.
+# THE ORDER IS DELIBERATE: Intercession is a cast with a two-turn window and
+# a price, so it goes first. Letting a paid, expiring refusal lapse while a
+# permanent capstone sat unused is the worse failure.
+func _holy_reversal() -> void:
+	if hp != 0:
+		return
+	# Intercession: the STATUS is the one answer to "is the refusal live", so
+	# the window expires by itself and nothing has to remember to clear a
+	# flag. The callback decides whether the Cleric can PAY the stack — it
+	# returns false when she holds none, and then the hero simply dies.
+	if has_status("intercession") and intercession_cb.is_valid() \
+			and bool(intercession_cb.call(self)):
+		hp = 1
+		float_text("INTERCESSION", Color(0.95, 0.9, 0.55), true)
+		return
+	# Martyrdom (capstone): the first hero to fall each battle is returned at
+	# 30%. A refusal-and-restore, not a death followed by a revive — the same
+	# machinery Undying Rage and Ashes of Al'ar use, so the hero never leaves
+	# the initiative order and no death is booked against the party.
+	if martyrdom_guard and martyrdom_cb.is_valid():
+		hp = maxi(int(max_hp * MARTYRDOM_RETURN), 1)
+		float_text("MARTYRDOM", Color(0.95, 0.9, 0.55), true)
+		martyrdom_cb.call(self)
 
 
 func _proc_log(text: String) -> void:
@@ -1632,13 +1680,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		hp = maxi(int(max_hp * 0.25), 1)
 		float_text("REBORN IN ASH", Color(1.0, 0.6, 0.2), true)
 		_proc_log("Talent: Ashes of Al'ar — %s rises from the ashes (25%% HP)" % unit_name)
-	# Serenity (Holy talent): the party's last net, after a unit's own
-	# saves — once per battle, the first lethal blow lands at 1 HP. The
-	# battle scene spends the guard party-wide via the callback.
-	if hp == 0 and serenity_guard and serenity_cb.is_valid():
-		hp = 1
-		float_text("SERENITY", Color(0.95, 0.9, 0.55), true)
-		serenity_cb.call(self)
+	_holy_reversal()
 	if resource_name == "Rage":
 		resource = mini(resource + 10, max_resource)
 	# Enraged (talent): dropping below half HP grants a stacking damage buff,
@@ -1775,11 +1817,7 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 		hp = maxi(int(max_hp * 0.25), 1)
 		float_text("REBORN IN ASH", Color(1.0, 0.6, 0.2), true)
 		_proc_log("Talent: Ashes of Al'ar — %s rises from the ashes (25%% HP)" % unit_name)
-	# Serenity (Holy talent): the net catches tick deaths too.
-	if hp == 0 and serenity_guard and serenity_cb.is_valid():
-		hp = 1
-		float_text("SERENITY", Color(0.95, 0.9, 0.55), true)
-		serenity_cb.call(self)
+	_holy_reversal()
 	# Blood Frenzy v2: tick-driven dives bank their floor too.
 	if passive_id == "bloodrage" and not dead:
 		frenzy_bonus()
@@ -1875,8 +1913,10 @@ func heal_amount(amount: int, external := false) -> int:
 	if has_status("frostbite"):
 		mult *= 0.5
 	# Last Hope (Holy talent, party-wide stamp): the nearly-dead heal deeper.
+	# ADDITIVE units (Batch AV) — the stamp is percentage POINTS, so the
+	# node's 40 and the Rune of the Open Hand's 5 each pay what they say.
 	if last_hope_bonus > 0 and hp < max_hp * 0.25:
-		mult *= 1.0 + 0.05 * last_hope_bonus
+		mult *= 1.0 + 0.01 * last_hope_bonus
 	# Batch AA guard: healing may be reduced to nothing, never INVERTED. The
 	# multiplier is a running sum of rune terms (Vampiric, Killing Cold, the
 	# Hollow Chalice…) and a negative one would quietly turn every heal into

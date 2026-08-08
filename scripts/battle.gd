@@ -83,6 +83,8 @@ const STATUS_INFO := {
 	"elem_weak": ["Elemental Weakness", "EW", Color(0.40, 0.80, 0.75), "Elemental resistances reduced."],
 	"hold_bd": ["Hold the Line", "HL", Color(0.95, 0.82, 0.45), "Takes 50% less Break damage."],
 	"undying": ["Undying", "UD", Color(1.0, 0.95, 0.75), "Cannot drop below 1 HP."],
+	"intercession": ["Intercession", "IC", Color(0.98, 0.92, 0.60),
+		"The next lethal blow against any hero\nis refused — they survive at 1 HP and\nthe Cleric loses 1 Mercy. She must be\nholding one when it lands."],
 	# Bulwark Line (Batch AL): the Warden's Shieldwall covers the line. The
 	# grant rides the same Heavy Plating slice of the block roll his own
 	# stance does, so what it buys is real Block, not a separate ward.
@@ -713,23 +715,30 @@ func _spawn_units() -> void:
 
 	# Guardian Angel raises the Mercy-earning threshold and Last Hope deepens
 	# healing on the nearly-dead — both are the Holy's talents, but the checks
-	# run on WHOEVER is hit/healed, so the ranks are stamped party-wide.
-	var ga_ranks := 0
-	var lh_ranks := 0
+	# run on WHOEVER is hit/healed, so the magnitudes are stamped party-wide.
+	# ADDITIVE units (Batch AV): both counters are percentage POINTS, and
+	# Guardian Angel's is the INCREASE on the passive's own 50% window.
+	var ga_step := 0
+	var lh_pct := 0
 	for h in heroes:
-		ga_ranks = maxi(ga_ranks, h.guardian_ranks)
-		lh_ranks = maxi(lh_ranks, h.last_hope_ranks)
-	if ga_ranks > 0 or lh_ranks > 0:
+		ga_step = maxi(ga_step, h.guardian_step)
+		lh_pct = maxi(lh_pct, h.last_hope_pct)
+	if ga_step > 0 or lh_pct > 0:
 		for h in heroes:
-			h.mercy_threshold = 0.5 + 0.03 * ga_ranks
-			h.last_hope_bonus = lh_ranks
+			h.mercy_threshold = 0.5 + 0.01 * ga_step
+			h.last_hope_bonus = lh_pct
 
-	# Serenity (Holy talent): the whole party carries one banked lethal
-	# save — stamped like the rest, spent for everyone via the callback.
-	if heroes.any(func(h): return h.serenity > 0):
+	# Intercession and Martyrdom (Batch AV): the party carries the Cleric's
+	# reversals, because the check runs on WHOEVER takes the lethal blow.
+	# Intercession's window is a STATUS the cast applies, so only the hook
+	# is stamped here; Martyrdom's latch is armed for the whole battle.
+	if heroes.any(func(h): return h.second_resource_name == "Mercy"):
 		for h in heroes:
-			h.serenity_guard = true
-			h.serenity_cb = _on_serenity_save
+			h.intercession_cb = _on_intercession_save
+	if heroes.any(func(h): return h.martyrdom > 0):
+		for h in heroes:
+			h.martyrdom_guard = true
+			h.martyrdom_cb = _on_martyrdom_return
 
 	var composition: Array = ["raider", "chief", "archer", "archer"]
 	# DOD_SIM_ENEMIES="boss,shieldmaster,shaman" forces the enemy lineup in
@@ -1711,19 +1720,20 @@ func _run_battle() -> void:
 			_stat_heal(String(ren_stat.get("src_name", "")), ren_got)
 			# On the Mend (talent, snapshotted on the status): the tick can
 			# wash one harmful effect away.
-			var mend_ranks := int(ren_stat.get("mend", 0))
-			if mend_ranks > 0 and randf() < 0.05 * mend_ranks:
+			var mend_pct := int(ren_stat.get("mend", 0))
+			if mend_pct > 0 and randf() < 0.01 * mend_pct:
 				var mended := u.dispel_one_debuff()
 				if mended != "":
 					u.float_text("Mended: %s" % mended, Color(0.5, 0.95, 0.6))
 					_log("   → Talent: On the Mend — Renewal washes the %s off %s" % [
 						mended, u.unit_name], "#b0a8e0")
-			# Living Sanctum (snapshotted on the status): the Cleric's
-			# Renewal ticks echo to the party while she stands.
-			if ren_stat.get("sanctum", false) and ren_got > 0:
-				var sn_c := _living_hero_with("living_sanctum")
-				if sn_c != null:
-					_sanctum_echo(sn_c, ren_got)
+			# Blessed Vestments (snapshotted on the status, Batch AV): the
+			# tick leaves cloth-of-light behind, exactly as her casts do.
+			var ward_pct := int(ren_stat.get("ward", 0))
+			if ward_pct > 0 and ren_got > 0:
+				var wd_c := _living_hero_with("vestments_pct")
+				if wd_c != null:
+					_vestments_ward(wd_c, u, ren_got)
 		# Bulwark of Fortitude: the stand knits flesh every turn.
 		if u.has_status("bulwark"):
 			var bw_amt := maxi(int(round(u.max_hp * 0.10)), 1)
@@ -1857,17 +1867,10 @@ func _run_battle() -> void:
 						Color(0.5, 0.95, 0.6))
 					_log("   → Field Medic: %s washes %s off %s" % [
 						u.unit_name, fm_washed, fm_ally.unit_name], "#70d878")
-		# Avatar of Mercy (Holy capstone): the well refills on its own.
-		if u.is_hero and not u.dead and u.avatar_of_mercy > 0 \
-				and u.second_resource_name == "Mercy" \
-				and u.second_resource < u.second_max:
-			u.second_resource += 1
-			u.float_text("+1 Mercy", Color(0.95, 0.8, 0.3))
-			u.refresh_bars()
-			_log("   → Capstone: Avatar of Mercy — the well rises (%d/%d)" % [
-				u.second_resource, u.second_max], "#e8c860")
-		# Beacon (Holy talent): as the Cleric's turn begins, her light
-		# reaches everyone at death's door — no cast spent.
+		# Beacon: as the Cleric's turn begins, her light reaches everyone at
+		# death's door — no cast spent. RUNE-ONLY SINCE BATCH AV (the node
+		# became Shared Vigil): the Rune of the Sleepless Vigil is the last
+		# writer, so the read site is KEPT and gated, never silently deleted.
 		if u.is_hero and not u.dead and u.beacon_ranks > 0:
 			for bc_h in heroes.filter(
 					func(h): return not h.dead and not h.is_companion and h.hp < h.max_hp * 0.25):
@@ -2342,7 +2345,7 @@ func _player_turn(u: BattleUnit) -> void:
 				"overcharge", "cons_ground", "bulwark", "dark_pact", "hysteria",
 				"instinct", "bestial", "spirit_bond", "hold_breath",
 				"venom_coat", "deadfall", "guard_change", "interpose",
-				"wildfire", "backdraft"]:
+				"wildfire", "backdraft", "intercession"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -2455,16 +2458,17 @@ func _player_turn(u: BattleUnit) -> void:
 				pp_uniques, "" if pp_uniques == 1 else "s", pp_amt], "#b0a8e0")
 	# Divine Presence (Holy talent): the light settles on the most wounded
 	# as the Cleric's turn ends.
-	if u.divine_presence_ranks > 0 and not u.dead and not battle_over:
+	if u.divine_presence_pct > 0 and not u.dead and not battle_over:
 		var dp_pool := heroes.filter(func(h): return not h.dead and not h.is_companion)
 		if not dp_pool.is_empty():
 			var dp_t := _lowest_hp(dp_pool)
 			if dp_t.hp < dp_t.max_hp:
 				var dp_amt := maxi(int(round(dp_t.max_hp * 0.01
-					* u.divine_presence_ranks * _healing_done_mult(u))), 1)
+					* u.divine_presence_pct * _healing_done_mult(u))), 1)
 				var dp_got: int = dp_t.heal_amount(dp_amt, dp_t != u)
 				dp_t.float_text("+%d" % dp_got, Color(0.4, 0.9, 0.45))
 				_stat_heal(u, dp_got)
+				_vestments_ward(u, dp_t, dp_got)
 				_log("   → Talent: Divine Presence — %s mends %d" % [
 					dp_t.unit_name, dp_got], "#b0a8e0")
 	_preview_locked = false
@@ -2894,38 +2898,54 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				return [dfall, u]
 			return [u.abilities[0], ss_t]          # Quick Shot works the target
 		"cleric":
-			# Holy triage first (Mercy spenders), then Devout/Occultist casts.
+			# BATCH AV — THE HOLY POLICY, rewritten so a sim measures the real
+			# spec rather than a spec missing its identity piece. Resurrection
+			# is in her OPENING KIT now, so it leads the rotation from turn one
+			# instead of being a talent she might not have drawn.
+			# RAISE THE FALLEN FIRST, ALWAYS, whenever she can pay for it.
 			var res_ab := _find_ability(u, "Resurrection")
 			if res_ab != null and u.second_resource >= res_ab.faith_cost \
-					and u.ability_ready(res_ab):
-				var fallen := heroes.filter(func(h): return h.dead)
+					and u.resource >= _eff_cost(u, res_ab) and u.ability_ready(res_ab):
+				var fallen := heroes.filter(func(h): return h.dead and not h.is_companion)
 				if not fallen.is_empty():
-					empower_armed = u.avatar_of_mercy > 0 \
-						or u.second_resource >= res_ab.faith_cost + 1
+					empower_armed = _holy_empower_ok(u, res_ab)
 					return [res_ab, fallen[0]]
+			# Intercession: arm the refusal while someone is genuinely close to
+			# dying AND she can pay the trigger — the price lands later, so a
+			# window opened on an empty hand is a wasted turn. Never doubled up
+			# on a window that is already open.
+			var icept := _find_ability(u, "Intercession")
+			if icept != null and u.resource >= _eff_cost(u, icept) \
+					and u.ability_ready(icept) and u.second_resource >= 1 \
+					and not u.has_status("intercession") \
+					and _any_hero_below(HOLY_VIGIL_AT):
+				return [icept, u]
 			var dplea := _find_ability(u, "Divine Plea")
 			if dplea != null and u.second_resource >= dplea.faith_cost \
 					and u.ability_ready(dplea) \
-					and weakest_ally.hp < weakest_ally.max_hp * 0.35:
-				empower_armed = (u.avatar_of_mercy > 0 \
-					or u.second_resource >= dplea.faith_cost + 1) \
+					and weakest_ally.hp < weakest_ally.max_hp * 0.30:
+				empower_armed = _holy_empower_ok(u, dplea) \
 					and weakest_ally.count_debuffs() > 0
 				return [dplea, weakest_ally]
+			# Hymn is the party button: it wants TWO wounded, not one.
 			var hymn := _find_ability(u, "Hymn of Hope")
 			if hymn != null and u.second_resource >= hymn.faith_cost and u.ability_ready(hymn) \
-					and weakest_ally.hp < weakest_ally.max_hp * 0.6:
-				empower_armed = u.avatar_of_mercy > 0 \
-					or u.second_resource >= hymn.faith_cost + 2
+					and _heroes_below(0.70) >= 2:
+				empower_armed = _holy_empower_ok(u, hymn)
 				return [hymn, u]
-			var hheal := _find_ability(u, "Heal")
-			if hheal != null and u.resource >= hheal.cost and u.ability_ready(hheal) \
-					and weakest_ally.hp < weakest_ally.max_hp * 0.55:
-				return [hheal, weakest_ally]
+			# Renewal is NOT in §6's minimum and is here deliberately: On the
+			# Mend and the Renewal half of her throughput are unmeasurable if
+			# the bot never casts it. Reported, not silently added.
 			var renew := _find_ability(u, "Renewal")
-			if renew != null and u.resource >= renew.cost and u.ability_ready(renew) \
+			if renew != null and u.resource >= _eff_cost(u, renew) and u.ability_ready(renew) \
 					and weakest_ally.hp < weakest_ally.max_hp * 0.8 \
 					and not weakest_ally.has_status("renewal"):
 				return [renew, weakest_ally]
+			# Heal otherwise — the fallback, so a hurt party is always mended.
+			var hheal := _find_ability(u, "Heal")
+			if hheal != null and u.resource >= _eff_cost(u, hheal) and u.ability_ready(hheal) \
+					and weakest_ally.hp < weakest_ally.max_hp:
+				return [hheal, weakest_ally]
 			# Devout: the Conviction toolkit.
 			var bulwark_ab := _find_ability(u, "Bulwark of Fortitude")
 			if bulwark_ab != null and u.resource >= bulwark_ab.cost \
@@ -3188,6 +3208,8 @@ func _show_actions(u: BattleUnit) -> void:
 		emp_btn.add_theme_font_size_override("font_size", 13)
 		emp_btn.disabled = u.second_resource < 1 and u.avatar_of_mercy <= 0
 		emp_btn.tooltip_text = "Spend +1 Mercy to Empower the next\nHeal / Renewal / Hymn / Resurrection /\nDivine Plea. Empowered casts forgo\ntheir perfect bonus. C toggles."
+		if u.avatar_of_mercy > 0:
+			emp_btn.tooltip_text += "\nAvatar of Mercy: it costs nothing and\nGRANTS a stack instead."
 		emp_btn.toggled.connect(func(on: bool): empower_armed = on)
 		action_box.add_child(emp_btn)
 	action_panel.visible = true
@@ -4069,6 +4091,53 @@ const OVERCHARGE_BOT_STACKS := 8
 # BOT POLICY NUMBER: it sits just past the crossover (three turns held is worth
 # less than the Lance's 35% plus its stack bonus; five is worth more).
 const SHATTER_BOT_TURNS := 5
+# Shared Vigil (Holy, Batch AV): how low ANY hero has to be for the party to
+# close ranks. THE one place the line is decided — the damage block and the
+# node text read the same number.
+const HOLY_VIGIL_AT := 0.30
+
+
+# Is any living hero (companions excluded) under this fraction of their
+# maximum health? A named method rather than an inline lambda: a multiline
+# lambda in a call argument is the GDScript trap CLAUDE.md records.
+func _any_hero_below(frac: float) -> bool:
+	return _heroes_below(frac) > 0
+
+
+# …and how many. Shared Vigil asks the first question, the bot's Hymn gate
+# asks the second, and both must count the same bodies.
+func _heroes_below(frac: float) -> int:
+	var n := 0
+	for h in heroes:
+		if not h.dead and not h.is_companion and h.hp < h.max_hp * frac:
+			n += 1
+	return n
+
+
+# THE EMPOWER RULE FOR THE BOT (Batch AV §6), asked the same way by every
+# Holy cast so the policy lives in one place:
+#   * Avatar of Mercy makes it unconditional — it now GRANTS a stack.
+#   * If ARDOR is learned, bank to its threshold first and Empower freely
+#     above it. Below the threshold the surcharge is a real spend, and the
+#     rhythm the node exists for is "bank, then spend".
+#   * NEVER Empower down past a Resurrection she could otherwise cast. Her
+#     identity is the raise; a prettier Hymn is not worth losing it.
+func _holy_empower_ok(u: BattleUnit, ab: Ability) -> bool:
+	if u.second_resource_name != "Mercy":
+		return false
+	if u.avatar_of_mercy > 0:
+		return true
+	if u.ardor_at > 0 and u.second_resource < u.ardor_at:
+		return false
+	var free_empower: bool = u.ardor_at > 0 and u.second_resource >= u.ardor_at
+	var surcharge := 0 if free_empower else 1
+	if u.second_resource < ab.faith_cost + surcharge:
+		return false
+	var res_ab := _find_ability(u, "Resurrection")
+	if res_ab != null \
+			and u.second_resource - ab.faith_cost - surcharge < res_ab.faith_cost:
+		return false
+	return true
 
 
 func _miss_chance(attacker: BattleUnit, defender: BattleUnit = null) -> float:
@@ -4207,18 +4276,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	# faith_cost = the secondary-resource price (Mercy for the Holy Cleric).
 	# Sanctified (talent): the spend can be refunded outright.
 	if ab.faith_cost > 0:
-		if attacker.sanctified_ranks > 0 \
-				and randf() < 0.10 * attacker.sanctified_ranks:
-			attacker.float_text("Mercy preserved", Color(0.95, 0.8, 0.3))
+		if _sanctified_refund(attacker):
 			_log("   → Talent: Sanctified — the Mercy is not consumed", "#b0a8e0")
 		else:
 			attacker.second_resource = maxi(attacker.second_resource - ab.faith_cost, 0)
 		attacker.refresh_bars()
 	# Holy Light (talent): every perfect cast drips Mana back.
-	if grade == "perfect" and attacker.holy_light_ranks > 0 \
+	if grade == "perfect" and attacker.holy_light_pct > 0 \
 			and attacker.resource_name == "Mana":
 		var hl_mana := maxi(int(round(attacker.max_resource
-			* 0.01 * attacker.holy_light_ranks)), 1)
+			* 0.01 * attacker.holy_light_pct)), 1)
 		attacker.resource = mini(attacker.resource + hl_mana, attacker.max_resource)
 		attacker.float_text("+%d Mana" % hl_mana, Color(0.5, 0.7, 1.0))
 		_log("   → Talent: Holy Light — %s restores %d Mana" % [
@@ -5064,8 +5131,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_prev(strike_target, pv_was - raw)
 					_log("   → Talent: Iron Will — -%d%% (%d debuffs)" % [
 						iw_pct, iw_n], "#b0a8e0")
-			# Shared Vigil: the line holds while the Warden stands tall —
-			# allies take less while he is above half health.
+			# Shared Vigil (WARDEN, Banner row 6): the line holds while he
+			# stands tall — allies take less while he is above half health.
+			# NAME COLLISION, FLAGGED NOT SILENT: Batch AV gave the Holy
+			# Cleric a Vigil row-5 node of the SAME NAME and the opposite
+			# trigger (below, holy_vigil_pct). They are separate counters on
+			# separate specs and stack cleanly; only the label is shared, and
+			# renaming one is the designer's call, not the batch's.
 			# The Rune of the Standard carries its own advertised 3% in a
 			# SEPARATE term (Batch AL, same reason as Grudge above), so the
 			# search cannot use _living_hero_with — that helper reads its
@@ -5089,18 +5161,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_log("   → Talent: Shared Vigil — %s is covered (-%d%%)" % [
 						strike_target.unit_name,
 						int(round(sv_cut * 100.0))], "#b0a8e0")
-			# Blessed Vestments: Renewal wraps its bearer in cloth-of-light
-			# — the blessing rides the status, while the Cleric stands.
-			if strike_target.is_hero and not strike_target.is_companion \
-					and strike_target.has_status("renewal"):
-				var bv_w := _living_hero_with("vestments_ranks")
-				if bv_w != null:
+			# Shared Vigil (HOLY, Vigil row 5, Batch AV): the party closes
+			# ranks while ANYONE is at death's door — the mirror image of
+			# the Warden's above. Deliberately NOT gated on the Cleric's own
+			# health: she is the one keeping the party out of the window it
+			# reads. The struck hero counts as "any hero", so a lone
+			# survivor below the line still gets it.
+			if strike_target.is_hero and not strike_target.is_companion:
+				var hv_c := _living_hero_with("holy_vigil_pct")
+				if hv_c != null and _any_hero_below(HOLY_VIGIL_AT):
 					var pv_was := raw
-					raw *= 1.0 - 0.05 * bv_w.vestments_ranks
-					_prev(bv_w, pv_was - raw)
-					_log("   → Talent: Blessed Vestments — Renewal shields %s (-%d%%)" % [
-						strike_target.unit_name,
-						5 * bv_w.vestments_ranks], "#b0a8e0")
+					raw *= 1.0 - 0.01 * hv_c.holy_vigil_pct
+					_prev(hv_c, pv_was - raw)
+					_log("   → Talent: Shared Vigil — the party closes ranks around %s (-%d%%)" % [
+						strike_target.unit_name, hv_c.holy_vigil_pct], "#b0a8e0")
 			# Ruin: the Old Gods' mark cracks the target open (+2%/stack;
 			# Deeper Hex widens every crack by 1%/rank).
 			if not strike_target.is_hero and strike_target.has_status("ruin"):
@@ -6966,26 +7040,44 @@ func _resonance_taken_mult(u: BattleUnit) -> float:
 	return 1.0 + u.resonance_taken_bonus()
 
 
-# Mercy (Holy passive): +5% healing done per stack currently held (Heavenly
-# Aura deepens it by +5%/rank; Triage adds a flat +3%/rank). Costs are paid
-# before the cast resolves, so a spender heals with what remains.
+# Mercy (Holy passive): +5% healing done per stack currently held. UNTOUCHED
+# BY BATCH AV BY DESIGNER DECISION — Heavenly Aura writes the INCREASE on that
+# 5 (7 makes it 12), Triage adds a flat percentage, and Sanctum a flat 60%.
+# Costs are paid before the cast resolves, so a spender heals with what
+# remains. ADDITIVE THROUGHOUT: every term below is percentage POINTS.
 func _healing_done_mult(caster: BattleUnit) -> float:
 	var m := 1.0
 	if caster.second_resource_name == "Mercy":
-		m += (0.05 + 0.05 * caster.heavenly_ranks) * caster.second_resource
-	m += 0.03 * caster.triage_ranks
+		m += 0.01 * (5 + caster.heavenly_step) * caster.second_resource
+	m += 0.01 * caster.triage_heal
+	if caster.sanctum > 0:
+		m += 0.60
 	return m
 
 
-# Triage: instant heals can CRIT (x1.5) off the Cleric's crit chance.
+# Triage: instant heals can CRIT (x1.5) off the Cleric's crit chance. A
+# non-zero Triage term is what unlocks the crit — one counter, one gate, so a
+# rune paying the healing half can never hand out crits the node did not.
 func _heal_crit_mult(caster: BattleUnit) -> float:
-	if caster.triage_ranks > 0 and randf() < CRIT_CHANCE + caster.crit_bonus:
+	if caster.triage_heal > 0 and randf() < CRIT_CHANCE + caster.crit_bonus:
 		return 1.5
 	return 1.0
 
 
-# Holy Capacitor: bank a share of the overheal the last heal spilled;
-# the next Heal releases the whole battery.
+# THE ONE PLACE THE OVERFLOW SHARE IS DECIDED. Sanctum spills ALL of it, so
+# the capstone and the Overflow node cannot disagree about the number and
+# taking both is not a double spill.
+func _overflow_share(caster: BattleUnit) -> int:
+	if caster.sanctum > 0:
+		return 100
+	return caster.overflow_pct
+
+
+# Holy Capacitor: bank a share of the overheal the last heal spilled; the
+# next Heal releases the whole battery. RUNE-ONLY SINCE BATCH AV — the node
+# became Martyrdom, and the Rune of the Triage Ward is the last writer. The
+# read site is KEPT and gated (the AR vault pattern), never silently deleted,
+# and it is FLAGGED FOR RE-AUTHORING.
 func _bank_overheal(caster: BattleUnit, target: BattleUnit) -> void:
 	if caster.capacitor_ranks <= 0 or target.last_overheal <= 0:
 		return
@@ -7004,7 +7096,7 @@ func _bank_overheal(caster: BattleUnit, target: BattleUnit) -> void:
 # Radiant Cascade: a critical heal splashes a share of its value onto the
 # lowest-health OTHER ally (needs Triage — nothing else crits a heal).
 func _radiant_cascade(caster: BattleUnit, healed: int, primary: BattleUnit) -> void:
-	if caster.cascade_ranks <= 0 or healed <= 0:
+	if caster.cascade_pct <= 0 or healed <= 0:
 		return
 	var cc_pool: Array = heroes.filter(
 		func(h): return not h.dead and not h.is_companion and h != primary)
@@ -7013,12 +7105,13 @@ func _radiant_cascade(caster: BattleUnit, healed: int, primary: BattleUnit) -> v
 	var cc_t: BattleUnit = _lowest_hp(cc_pool)
 	if cc_t.hp >= cc_t.max_hp:
 		return
-	var cc_amt := int(round(healed * 0.25 * caster.cascade_ranks))
+	var cc_amt := int(round(healed * 0.01 * caster.cascade_pct))
 	if cc_amt <= 0:
 		return
 	var cc_got: int = cc_t.heal_amount(cc_amt, cc_t != caster)
 	cc_t.float_text("+%d" % cc_got, Color(0.95, 0.9, 0.6))
 	_stat_heal(caster, cc_got)
+	_vestments_ward(caster, cc_t, cc_got)
 	_log("   → Talent: Radiant Cascade — the crit splashes %d onto %s" % [
 		cc_got, cc_t.unit_name], "#b0a8e0")
 
@@ -7027,7 +7120,7 @@ func _radiant_cascade(caster: BattleUnit, healed: int, primary: BattleUnit) -> v
 # ally at once. Reads the same overheal Holy Capacitor banks from, at the
 # same three sites (Heal, Hymn voices, Renewal's perfect burst).
 func _overflow_spill(caster: BattleUnit, target: BattleUnit) -> void:
-	if caster.overflow_ranks <= 0 or target.last_overheal <= 0:
+	if _overflow_share(caster) <= 0 or target.last_overheal <= 0:
 		return
 	var ov_pool: Array = heroes.filter(
 		func(h): return not h.dead and not h.is_companion and h != target)
@@ -7036,41 +7129,99 @@ func _overflow_spill(caster: BattleUnit, target: BattleUnit) -> void:
 	var ov_t: BattleUnit = _lowest_hp(ov_pool)
 	if ov_t.hp >= ov_t.max_hp:
 		return
-	var ov_amt := int(round(target.last_overheal * 0.15 * caster.overflow_ranks))
+	var ov_amt := int(round(target.last_overheal * 0.01 * _overflow_share(caster)))
 	if ov_amt <= 0:
 		return
 	var ov_got: int = ov_t.heal_amount(ov_amt, ov_t != caster)
 	ov_t.float_text("+%d" % ov_got, Color(0.95, 0.9, 0.6))
 	_stat_heal(caster, ov_got)
+	_vestments_ward(caster, ov_t, ov_got)
 	_log("   → Talent: Overflow — %d overhealing spills onto %s" % [
 		ov_got, ov_t.unit_name], "#b0a8e0")
 
 
-# Living Sanctum (capstone): every heal the Cleric grants a single ally
-# washes over the whole party at a quarter strength. Hymn is already the
-# whole party, and the echo never echoes itself.
-func _sanctum_echo(caster: BattleUnit, value: int) -> void:
-	if caster.living_sanctum <= 0 or value <= 0:
+# Blessed Vestments (Batch AV re-spec): her healing leaves cloth-of-light
+# behind — a 2-turn barrier worth a share of what landed. Called from every
+# site that credits HER with healing, so the ward follows the heal rather
+# than one named ability. `barrier` power takes the MAX on re-application
+# (unit.add_status), so a Renewal tick can never downgrade a Hymn's ward.
+func _vestments_ward(caster: BattleUnit, target: BattleUnit, healed: int) -> void:
+	if caster == null or target == null or caster.vestments_pct <= 0 or healed <= 0:
 		return
-	var ls_amt := int(round(value * 0.25))
-	if ls_amt <= 0:
+	var bv_power := int(round(healed * 0.01 * caster.vestments_pct))
+	if bv_power <= 0:
 		return
-	for ls_h in heroes.filter(func(he): return not he.dead and not he.is_companion):
-		var ls_got: int = ls_h.heal_amount(ls_amt, ls_h != caster)
-		if ls_got > 0:
-			ls_h.float_text("+%d" % ls_got, Color(0.95, 0.9, 0.6))
-			_stat_heal(caster, ls_got)
-	_log("   → Capstone: Living Sanctum — the light washes over the party (%d each)" % \
-		ls_amt, "#b0a8e0")
+	_apply_status(target, "barrier", 2, bv_power)
+	var bv_stat := target.get_status("barrier")
+	if not bv_stat.is_empty():
+		bv_stat["src"] = caster.unit_name  # Batch W: absorbs credit the caster
 
 
-# Serenity: the banked lethal save is spent for the WHOLE party the moment
-# it catches someone (the unit-side check floors the hit at 1 HP).
-func _on_serenity_save(saved: BattleUnit) -> void:
+# Grace (Batch AV): at maximum Mercy an ally's brush with death paid her
+# nothing — the one place her reactive economy wasted what it earned. Now
+# the stack she cannot hold becomes healing on the ally who earned it.
+func _grace_spill(cleric: BattleUnit, low_ally: BattleUnit) -> void:
+	if cleric.grace_pct <= 0 or low_ally == null or low_ally.dead:
+		return
+	var gr_amt := maxi(int(round(cleric.max_hp * 0.01 * cleric.grace_pct
+		* _healing_done_mult(cleric))), 1)
+	var gr_got: int = low_ally.heal_amount(gr_amt, low_ally != cleric)
+	low_ally.float_text("+%d" % gr_got, Color(0.95, 0.9, 0.6))
+	_stat_heal(cleric, gr_got)
+	_vestments_ward(cleric, low_ally, gr_got)
+	_log("   → Talent: Grace — the Mercy she cannot hold mends %s (+%d)" % [
+		low_ally.unit_name, gr_got], "#b0a8e0")
+
+
+# Intercession (Batch AV): THE ONE PLACE THE REFUSAL IS DECIDED. Asked by
+# BattleUnit._holy_reversal and answered with a bool, because the price is
+# paid ON TRIGGER, not on cast — a Cleric holding nothing gets nothing, and
+# that has to be decided at the moment the blow lands rather than when the
+# button was pressed. Spending it clears the window for the WHOLE party.
+func _on_intercession_save(saved: BattleUnit) -> bool:
+	var cleric := _mercy_holder()
+	if cleric == null or cleric.second_resource < 1:
+		_log("   → Intercession: the refusal goes unpaid — no Mercy in hand", "#909090")
+		return false
+	if not _sanctified_refund(cleric):
+		cleric.second_resource -= 1
+	cleric.refresh_bars()
 	for h in heroes:
-		h.serenity_guard = false
-	_log("   → Talent: Serenity — %s survives the killing blow at 1 HP" % \
-		saved.unit_name, "#b0a8e0")
+		h.remove_status("intercession")
+	_log("   → Talent: Intercession — death is refused; %s survives at 1 HP (%s spends 1 Mercy)" % [
+		saved.unit_name, cleric.unit_name], "#b0a8e0")
+	return true
+
+
+# Martyrdom (Batch AV capstone): the once-per-battle latch, spent for the
+# whole party the moment it catches someone. The unit side has already put
+# them back on their feet — this only reports and disarms.
+func _on_martyrdom_return(saved: BattleUnit) -> void:
+	for h in heroes:
+		h.martyrdom_guard = false
+	_log("   → Capstone: Martyrdom — %s is returned at %d%% health" % [
+		saved.unit_name, int(round(BattleUnit.MARTYRDOM_RETURN * 100))], "#b0a8e0")
+
+
+# The living hero whose second resource IS Mercy — the Holy Cleric. Her
+# reversals are stamped party-wide, so every one of them has to be able to
+# find her again from whoever the blow landed on.
+func _mercy_holder() -> BattleUnit:
+	for h in heroes:
+		if not h.dead and not h.is_companion and h.second_resource_name == "Mercy":
+			return h
+	return null
+
+
+# THE ONE PLACE THE SANCTIFIED ROLL HAPPENS. Three things spend Mercy — an
+# ability's faith_cost, the Empower surcharge and an Intercession trigger —
+# and before Batch AV the roll was written out twice with the third missing.
+# Returns true when the stack is preserved.
+func _sanctified_refund(cleric: BattleUnit) -> bool:
+	if cleric.sanctified_pct <= 0 or randf() >= 0.01 * cleric.sanctified_pct:
+		return false
+	cleric.float_text("Mercy preserved", Color(0.95, 0.8, 0.3))
+	return true
 
 
 # Divine Shield: applies the barrier and stamps the tree's riders on it
@@ -7367,7 +7518,10 @@ func _on_lethal_saved(saved: BattleUnit) -> void:
 
 
 # Mercy (Holy passive): an ally's brush with death steels the healer.
-# Fired by unit.below_half_cb whenever a party member crosses below 50%.
+# Fired by unit.below_half_cb whenever a party member crosses below 50%
+# (Guardian Angel widens the window to 65%). THE GENERATOR ITSELF IS
+# UNTOUCHED BY BATCH AV — only the dead end at the ceiling is closed: Grace
+# turns the stack she cannot hold into healing for the ally who earned it.
 func _on_hero_below_half(low_ally: BattleUnit) -> void:
 	for h in heroes:
 		if h.dead or h.second_resource_name != "Mercy":
@@ -7378,6 +7532,8 @@ func _on_hero_below_half(low_ally: BattleUnit) -> void:
 			h.refresh_bars()
 			_log("   → Mercy: %s steels themselves (%s falls below half health)" % [
 				h.unit_name, low_ally.unit_name], "#e8c860")
+		else:
+			_grace_spill(h, low_ally)
 
 
 # Mercy: arms and pays the Empower surcharge (+1 stack) for a supporting
@@ -7396,15 +7552,21 @@ func _consume_empower(attacker: BattleUnit, ab: Ability) -> bool:
 	# The no-cost checks are either/or — never a double refund: Avatar of
 	# Mercy (unconditional) supersedes Ardor (held-Mercy threshold), and
 	# Sanctified only rolls when a stack would actually be spent.
+	# BATCH AV: Avatar of Mercy now GRANTS a stack instead of merely waiving
+	# one, so an Empowered cast pays for itself and then some — the payoff for
+	# a whole lane spent on the resource. Ardor's threshold is the counter
+	# ITSELF now (3), not 5-minus-a-rank.
 	if attacker.avatar_of_mercy > 0:
-		_log("   → Capstone: Avatar of Mercy — the Empowerment costs nothing", "#b0a8e0")
-	elif attacker.ardor_ranks > 0 \
-			and attacker.second_resource >= 5 - attacker.ardor_ranks:
+		if attacker.second_resource < attacker.second_max:
+			attacker.second_resource += 1
+			attacker.float_text("+1 Mercy", Color(0.95, 0.8, 0.3))
+		_log("   → Capstone: Avatar of Mercy — the Empowerment costs nothing and GRANTS a stack (%d/%d)" % [
+			attacker.second_resource, attacker.second_max], "#b0a8e0")
+	elif attacker.ardor_at > 0 and attacker.second_resource >= attacker.ardor_at:
 		attacker.float_text("Mercy preserved", Color(0.95, 0.8, 0.3))
 		_log("   → Talent: Ardor — held Mercy carries the Empowerment; no stack is consumed", "#b0a8e0")
 	# Sanctified (talent): the surcharge can be refunded too.
-	elif attacker.sanctified_ranks > 0 and randf() < 0.10 * attacker.sanctified_ranks:
-		attacker.float_text("Mercy preserved", Color(0.95, 0.8, 0.3))
+	elif _sanctified_refund(attacker):
 		_log("   → Talent: Sanctified — the Empowerment costs nothing", "#b0a8e0")
 	else:
 		attacker.second_resource -= 1
@@ -7592,6 +7754,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_stat_heal(attacker, got)
 				_bank_overheal(attacker, h)
 				_overflow_spill(attacker, h)
+				_vestments_ward(attacker, h, got)
 				if h_crit > 1.0:
 					_radiant_cascade(attacker, got, h)
 			_message("%s sings the Hymn of Hope!" % attacker.unit_name)
@@ -8304,8 +8467,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						* _healing_done_mult(attacker))), 1)
 					_apply_status(target, "renewal", 5, 0, rez_tick, attacker)
 					if target.has_status("renewal"):
-						target.get_status("renewal")["mend"] = attacker.on_mend_ranks
-						target.get_status("renewal")["sanctum"] = attacker.living_sanctum > 0
+						target.get_status("renewal")["mend"] = attacker.on_mend_pct
+						target.get_status("renewal")["ward"] = attacker.vestments_pct
 				_sfx("heal", -4.0, 0.65)
 				target.float_text("RESURRECTED", Color(0.95, 0.9, 0.55))
 				target.next_time = attacker.next_time \
@@ -8668,7 +8831,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_overflow_spill(attacker, target)
 			if hh_crit > 1.0:
 				_radiant_cascade(attacker, hh_got, target)
-			_sanctum_echo(attacker, hh_got)
+			_vestments_ward(attacker, target, hh_got)
 			var hh_note := ""
 			if empowered:
 				var purged := target.purge_debuffs()
@@ -8683,13 +8846,28 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Heal — %s recovers %d%s (40%% of the Cleric's health)%s" % [
 				attacker.unit_name, target.unit_name, hh_got,
 				" CRIT" if hh_crit > 1.0 else "", hh_note], "#70d878")
+		"intercession":
+			# BATCH AV — THE REVERSAL BUTTON. It arms a window, it does not pay
+			# for one: the stack leaves her hand only when a blow actually
+			# lands (`_on_intercession_save`). The STATUS is the one answer to
+			# "is the refusal live", so it expires on its own clock and the
+			# guard cannot outlive its window. Applied to every living hero
+			# because the check runs on WHOEVER takes the blow.
+			var ic_turns := 2 + attacker.intercession_long + (1 if is_perfect else 0)
+			_sfx("heal", -6.0, 0.55)
+			for ic_h in heroes.filter(func(he): return not he.dead and not he.is_companion):
+				_apply_status(ic_h, "intercession", ic_turns)
+			_message("%s intercedes!" % attacker.unit_name)
+			_log("%s: Intercession — for %d turns the next lethal blow on any hero is refused (1 Mercy, on trigger)%s" % [
+				attacker.unit_name, ic_turns,
+				" [PERFECT]" if is_perfect else ""], "#70d878")
 		"divine_plea":
 			# Spend 2 Mercy: a full heal; Empowered also cleanses and wards.
 			_sfx("heal", -4.0, 0.7)
 			var dp_got: int = target.heal_amount(target.max_hp, target != attacker)
 			target.float_text("+%d" % dp_got, Color(0.4, 0.9, 0.45))
 			_stat_heal(attacker, dp_got)
-			_sanctum_echo(attacker, dp_got)
+			_vestments_ward(attacker, target, dp_got)
 			var dp_note := ""
 			if empowered:
 				var dp_purged := target.purge_debuffs()
@@ -8724,15 +8902,15 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# On the Mend and Living Sanctum ride the status (snapshotted):
 			# ticks can dispel, and can echo to the party.
 			if target.has_status("renewal"):
-				target.get_status("renewal")["mend"] = attacker.on_mend_ranks
-				target.get_status("renewal")["sanctum"] = attacker.living_sanctum > 0
+				target.get_status("renewal")["mend"] = attacker.on_mend_pct
+				target.get_status("renewal")["ward"] = attacker.vestments_pct
 			if empowered and target != attacker:
 				_apply_status(attacker, "renewal", 5, 0, ren_tick, attacker)
 				attacker.update_status("renewal", "R+",
 					"Renewal: restores %d HP at the start\nof each turn (15%% of the caster's\nmax health)." % ren_tick)
 				if attacker.has_status("renewal"):
-					attacker.get_status("renewal")["mend"] = attacker.on_mend_ranks
-					attacker.get_status("renewal")["sanctum"] = attacker.living_sanctum > 0
+					attacker.get_status("renewal")["mend"] = attacker.on_mend_pct
+					attacker.get_status("renewal")["ward"] = attacker.vestments_pct
 			if is_perfect:
 				# Triage: the burst can crit (captured so Radiant Cascade
 				# knows to splash).
@@ -8745,7 +8923,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_overflow_spill(attacker, target)
 				if rb_crit > 1.0:
 					_radiant_cascade(attacker, burst_got, target)
-				_sanctum_echo(attacker, burst_got)
+				_vestments_ward(attacker, target, burst_got)
 			_message("%s blesses %s with Renewal" % [attacker.unit_name, target.unit_name])
 			_log("%s: Renewal on %s — %d HP/turn for 5 turns%s" % [attacker.unit_name,
 				target.unit_name, ren_tick,

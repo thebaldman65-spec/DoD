@@ -51,7 +51,16 @@ func _test_kits() -> void:
 					slots += 1
 			if summons > 0:
 				slots += 1
-			ok(slots == 3, "%s opens with 3 spec abilities (got %d)" % [spec, slots])
+			# RE-POINTED IN PLACE BY BATCH AV, WITH THE REASON HERE RATHER THAN
+			# IN A CHANGELOG NOBODY READS AT 3AM: the Holy Cleric opens with
+			# FOUR, because Resurrection moved out of her tree and into her kit.
+			# That is a DELIBERATE parity break, not an oversight — she attacks
+			# at 50, so her abilities are not part of her contribution, they are
+			# all of it. Every other spec is still held to three, and the
+			# exception is NAMED so a second one cannot creep in beside it.
+			var want: int = 4 if spec == "holy" else 3
+			ok(slots == want, "%s opens with %d spec abilities (got %d)" % [
+				spec, want, slots])
 	# The core attack is still there and still separate from the three.
 	for class_key in ["warrior", "mage", "cleric", "hunter"]:
 		ok(Classes.kit(class_key).size() == 1,
@@ -400,7 +409,7 @@ func _test_doc_matches_code() -> void:
 	# The stamp moves with every batch that touches the doc; what this line
 	# is really guarding is that the doc was touched AT ALL when the code
 	# below it changed. Bump it, do not delete it.
-	ok(doc.contains("Last updated: 2026-08-08 (Batch AU)"),
+	ok(doc.contains("Last updated: 2026-08-08 (Batch AV)"),
 		"master.html carries the current batch's stamp")
 	for spec in Classes.SPEC_POOLS:
 		var listed: String = ", ".join(Classes.SPEC_POOLS[spec])

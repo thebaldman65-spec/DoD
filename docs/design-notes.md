@@ -2011,3 +2011,38 @@ class pool had to go, and the honest way to ship that is to name what it costs
 (a class-pool ability is no longer covered) rather than to add a second toggle
 that restores the confusion behind a checkbox.
 
+
+**Read the right instrument or the hero looks broken.** The Holy Cleric's damage
+share sits at 3-4% and moves in the wrong direction as she gets stronger: the
+full Radiance build reads 1%. Contribution reads 29% -> 50% over the same change.
+Any batch that tunes her against damage share will nerf the thing it meant to
+buy, and the reason is structural rather than incidental — she attacks at 50, so
+the number is measuring an activity she barely performs. Naming the instrument
+before the measurement is the cheap half of that; the expensive half is that a
+spec whose contribution lives in a different column needs its own reading habit,
+and the two Cleric batches after this one inherit it.
+
+**A magnitude priced as rank 1 of three is not a decision when it is a whole
+row.** Her tree was already purpose-designed, so nothing about its SHAPE was
+wrong — the numbers were simply left at the values they had when a node was one
+third of a purchase. A 5% dispel chance and a threshold moved from 50% to 53%
+are not weak choices, they are non-choices: nobody weighs them against the two
+options they close. The Mage trees needed roughly 3x; this one needed 4-5x, and
+the difference is worth remembering because "the tree is fine, it is just the
+numbers" was true here and the numbers were nearly an order of magnitude out.
+
+**The cost belongs where the effect lands, not where the button is pressed.**
+Intercession pays its Mercy when a blow is actually refused. Charging on cast
+would have made it an expensive gamble on the future; charging on trigger makes
+it a promise she has to be able to keep, and "she is holding nothing" becomes a
+real failure state rather than a greyed-out button. It also produced the nicest
+accident in the batch: a hero falling from full health crosses the Mercy window
+on the way down, so their own fall earns the stack their rescue spends.
+
+**Say what a capstone must NOT do, in the payload rather than the prose.**
+Serenity makes Resurrection free and near-instant, and the one thing it must not
+touch is the health the ally comes back at — that is Empower's entire payload,
+and a capstone quietly doing Empower's job for free is how a resource stops
+mattering. Writing it as an ability payload rather than a stat means no field in
+it *could* reach the return health; the prohibition is a property of the data
+rather than a note somebody has to keep obeying.

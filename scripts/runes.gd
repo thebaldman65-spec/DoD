@@ -68,7 +68,13 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# Batch AR: the Rune of the Cinder Trail was re-pointed onto its own term
 	# when the node took cinder_trail_ranks for a new meaning. Same trap, same
 	# list — it is a bare 1 that does not end in "_ranks".
-	"rune_cinder_ember"]
+	"rune_cinder_ember",
+	# Batch AV: the Holy tree's counters went ADDITIVE, so none of them end in
+	# "_ranks" any more. THE RULE FOR THE NEXT AUTHOR: a rune writing an int
+	# BattleUnit field whose name does not end "_ranks" must be listed here,
+	# or JSON's float slides straight into a typed int var and the hero fails
+	# to spawn. These three are what the four Holy runes write today.
+	"triage_heal", "divine_presence_pct", "last_hope_pct"]
 
 static var _data := {}
 
