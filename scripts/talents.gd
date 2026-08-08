@@ -696,109 +696,131 @@ const LANE_TREES := {
 				]}},
 	],
 	"pyromancer": [
-		# Purpose-designed lanes (Batch N, 07-31). Batch AI re-cut the tiers
-		# into 7 exclusive rows + a capstone row. Every id
-		# survives and re-specs in place, so saved ranks migrate. The old
-		# conversion named its lanes after kit pieces; these are named for
-		# the burn loop itself: KINDLING builds the fire, INFERNO profits
-		# while it burns, DETONATION cashes it in — on one target, hard.
-		# --- Lane A: Kindling — spreading the fire. ---
-		{"id": "py_accelerant", "name": "Accelerant", "ranks": 1, "lane": "Kindling", "row": 1,
-			"desc": "Your Burn ticks deal +{v}% of Attack (on top of the base 6%).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"accelerant_ranks": 1}}},
-		{"id": "py_explosive", "name": "Explosive Force", "ranks": 1, "lane": "Kindling", "row": 2,
-			"desc": "Critical hits with fire abilities extend the target's Burn by {v} turn(s).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"explosive_ranks": 1}}},
-		{"id": "py_invigorating", "name": "Invigorating Ashes", "ranks": 1, "lane": "Kindling", "row": 3,
-			"desc": "Every Burn tick has a {v}% chance to restore 2% of the Pyromancer's max Mana.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"invigorating_ranks": 1}}},
-		{"id": "py_flame_shield", "name": "Flame Shield", "ranks": 1, "lane": "Kindling", "row": 4,
-			"desc": "New ability: Flame Shield — take 50% less damage for 2 turns and attackers are set Burning for 3 turns (15 Mana, 1.5 int, 2cd).",
-			"payload": {"new_ability": {"display_name": "Flame Shield", "cost": 15,
-				"special": "flame_shield", "delay": 1.5, "anim": "attack03", "cooldown": 2,
-				"perfect_id": "", "perfect_text": "Also triggers a Burn tick on every burning enemy",
-				"description": "A barrier of living flame: take 50%\nless damage for 2 turns, and whoever\nstrikes the Pyromancer is set Burning\n(3 turns)."}}},
-		# Conflagration: the build button builds harder.
-		{"id": "py_arson", "name": "Conflagration", "ranks": 1, "lane": "Kindling", "row": 5,
-			"desc": "Flamewave applies +{v} turn(s) of Burn (fresh fires and extensions alike).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"conflagration_ranks": 1}}},
-		# Cinder Trail: the free basic becomes a spreader — it matters most
-		# in the opening turns before Flamewave is up.
-		{"id": "py_kindling", "name": "Cinder Trail", "ranks": 1, "lane": "Kindling", "row": 6,
-			"desc": "Fireball also applies {v} turn(s) of Burn to one random other enemy.",
+		# Purpose-designed lanes (Batch N, 07-31), re-cut into 7 exclusive rows
+		# plus a capstone row by Batch AI, and RE-AUTHORED AROUND OVERBURN by
+		# Batch AR. Every one of the 24 ids survives and re-specs in place, so
+		# saved picks migrate and NO SAVE VERSION MOVES; the changelog carries
+		# the full old-name -> new-name mapping table.
+		#
+		# The spine is COMMITMENT. Overburn pays +2% damage per turn of Burn
+		# standing on the enemy team and charges 1 Mana a turn for each of them
+		# — the reward caps at +40% and THE COST DOES NOT. Every lane answers
+		# the same question a different way: KINDLING lights more fires,
+		# INFERNO stands in them longer, DETONATION cashes them in. Each row
+		# asks one question — 1 the spark / 2 the spread / 3 what the heat
+		# gives / 4 the tool / 5 what compounds / 6 what you accept / 7 the
+		# trigger / 8 the capstone.
+		#
+		# MAGNITUDES ARE ADDITIVE, NOT RANKED. Several fields are fed by a rune
+		# as well as by a node (accelerant_ranks, conflagration_ranks), so each
+		# node writes its own magnitude in the units its read site adds up —
+		# the node pays its number, the rune pays its number, and stacked they
+		# pay the sum. That is the Batch AL repair rule applied up front.
+		# --- Lane A: KINDLING — how fast you light up. ---
+		{"id": "py_kindling", "name": "Cinder Trail", "ranks": 1, "lane": "Kindling", "row": 1,
+			"desc": "Fireball's Burn lasts {v} turn longer — 4 turns instead of 3.",
 			"scale": {"step": 1},
 			"payload": {"stat": {"cinder_trail_ranks": 1}}},
-		{"id": "py_spreading", "name": "Ember Wind", "ranks": 1, "lane": "Kindling", "row": 7,
-			"desc": "When an enemy dies Burning, its remaining Burn transfers to a random living enemy.",
-			"payload": {"stat": {"ember_wind": 1}}},
-		# --- Lane B: Inferno — profiting while it burns. ---
-		{"id": "py_pyromaniac", "name": "Pyromaniac", "ranks": 1, "lane": "Inferno", "row": 1,
-			"desc": "Inferno Master grants +0.2% damage per turn of Burn on the enemy team, and its cap rises to match.",
-			"payload": {"stat": {"pyromaniac_ranks": 1}}},
-		{"id": "py_molten", "name": "Molten Core", "ranks": 1, "lane": "Inferno", "row": 2,
-			"desc": "Take {v}% less damage from burning enemies.",
+		{"id": "py_accelerant", "name": "Accelerant", "ranks": 1, "lane": "Kindling", "row": 2,
+			"desc": "Your Burn ticks deal +{v}% of Attack, on top of the base 6%.",
+			"scale": {"step": 4},
+			"payload": {"stat": {"accelerant_ranks": 4}}},
+		{"id": "py_arson", "name": "Conflagration", "ranks": 1, "lane": "Kindling", "row": 3,
+			"desc": "Flamewave applies +{v} turns of Burn, fresh fires and extensions alike.",
 			"scale": {"step": 2},
-			"payload": {"stat": {"molten_ranks": 1}}},
-		{"id": "py_melt", "name": "Melt Armor", "ranks": 1, "lane": "Inferno", "row": 3,
-			"desc": "Every Burn tick melts the victim's armor by {v}% for the rest of the battle.",
+			"payload": {"stat": {"conflagration_ranks": 2}}},
+		# Backdraft lights NOTHING new — it only deepens what already burns,
+		# which is what makes it a commitment button rather than a spreader.
+		{"id": "py_melt", "name": "Backdraft", "ranks": 1, "lane": "Kindling", "row": 4,
+			"desc": "New ability: Backdraft — add 2 turns of Burn to every burning enemy (20 Mana, 2.0 int, 3cd).",
+			"payload": {"new_ability": {"display_name": "Backdraft", "cost": 20,
+				"special": "backdraft", "delay": 2.0, "anim": "attack03", "cooldown": 3,
+				"perfect_id": "", "perfect_text": "3 turns each instead",
+				"description": "Feed the fire air: every burning enemy\ngains 2 more turns of Burn. It starts\nno fires — it only deepens the ones\nalready lit, drain and all."}}},
+		{"id": "py_ashes", "name": "Wildfire Spread", "ranks": 1, "lane": "Kindling", "row": 5,
+			"desc": "Wildfire applies {v} turn of Burn to non-burning enemies before it consumes.",
 			"scale": {"step": 1},
-			"payload": {"stat": {"melt_ranks": 1}}},
-		# The exclusive pair: the same burning field read two ways — as a
-		# damage multiplier, or as a smother on the enemy's output.
-		{"id": "py_firebrand", "name": "Heat Haze", "ranks": 1, "lane": "Inferno", "row": 4,
-			"desc": "Inferno Master's cap rises by 10%.",
-			"payload": {"stat": {"heat_haze_ranks": 1}}},
-		{"id": "py_cauterize", "name": "Scorched Earth", "ranks": 1, "lane": "Inferno", "row": 5,
-			"desc": "Burning enemies deal {v}% less damage.",
-			"scale": {"step": 5},
-			"payload": {"stat": {"scorched_ranks": 1}}},
-		{"id": "py_ashes", "name": "Ashes of Al'ar", "ranks": 1, "lane": "Inferno", "row": 6,
-			"desc": "Upon death: {v}% chance to revive with 25% health (once per battle).",
-			"scale": {"step": 11},
-			"payload": {"stat": {"ashes_ranks": 1}}},
-		{"id": "py_undying_flame", "name": "Living Flame", "ranks": 1, "lane": "Inferno", "row": 7,
-			"desc": "While 3 or more enemies burn, regain {v}% of max Mana each turn.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"living_flame_ranks": 1}}},
-		# --- Lane C: Detonation — cashing it in. Every node is a different
-		# answer to "how do I get more out of one Detonation": chain it,
-		# repeat it, reset it, or guarantee the crit. ---
-		{"id": "py_supernova", "name": "Super Nova", "ranks": 1, "lane": "Detonation", "row": 1,
-			"desc": "Detonation gains +{v}% critical strike chance.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"supernova_ranks": 1}}},
-		{"id": "py_implosion", "name": "Implosion", "ranks": 1, "lane": "Detonation", "row": 2,
-			"desc": "Detonation has a {v}% chance to strike twice.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"implosion_ranks": 1}}},
-		{"id": "py_seeding", "name": "Seeding Embers", "ranks": 1, "lane": "Detonation", "row": 3,
-			"desc": "When an enemy dies while Burning, gain {v}% damage per Burn turn it had left, for your next turn.",
-			"scale": {"step": 1},
-			"payload": {"stat": {"seeding_ranks": 1}}},
-		# Chain Reaction: the lane's only field-wide effect, and it costs
-		# three ranks in a tier-1 slot to get there.
-		{"id": "py_warm_glow", "name": "Chain Reaction", "ranks": 1, "lane": "Detonation", "row": 4,
-			"desc": "Detonation splashes {v}% of its damage to every other burning enemy.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"chain_reaction_ranks": 1}}},
-		{"id": "py_rekindle", "name": "Fuse", "ranks": 1, "lane": "Detonation", "row": 5,
-			"desc": "Detonation has a {v}% chance to reset its own cooldown.",
-			"scale": {"step": 15},
-			"payload": {"stat": {"fuse_ranks": 1}}},
-		{"id": "py_shockwave", "name": "Blast Radius", "ranks": 1, "lane": "Detonation", "row": 6,
-			"desc": "Detonation consumes {v}% more of the target's remaining Burn damage.",
+			"payload": {"stat": {"wildfire_spread": 1}}},
+		{"id": "py_explosive", "name": "Explosive Force", "ranks": 1, "lane": "Kindling", "row": 6,
+			"desc": "Critical hits with fire abilities extend the target's Burn by {v} turns.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"explosive_ranks": 2}}},
+		{"id": "py_spreading", "name": "Chain Ignition", "ranks": 1, "lane": "Kindling", "row": 7,
+			"desc": "An enemy that dies Burning splits its remaining Burn turns among the survivors.",
+			"payload": {"stat": {"ember_wind": 1}}},
+		# --- Lane B: INFERNO — how much heat you can stand. ---
+		{"id": "py_pyromaniac", "name": "Fire Walker", "ranks": 1, "lane": "Inferno", "row": 1,
+			"desc": "Overburn's Mana drain is reduced by {v}%.",
 			"scale": {"step": 25},
-			"payload": {"stat": {"blast_radius_ranks": 1}}},
-		# White Heat: the guaranteed crit, gated behind setup — you must
-		# have GROWN the burn first. Stacks naturally with Super Nova,
-		# which covers the targets that haven't been stacked that high.
-		{"id": "py_focused", "name": "White Heat", "ranks": 1, "lane": "Detonation", "row": 7,
-			"desc": "Detonation always critically strikes a target with 5+ turns of Burn (4+ at rank 2).",
-			"payload": {"stat": {"white_heat_ranks": 1}}},
+			"payload": {"stat": {"fire_walker": 1}}},
+		{"id": "py_invigorating", "name": "Invigorating Ashes", "ranks": 1, "lane": "Inferno", "row": 2,
+			"desc": "Every Burn tick has a {v}% chance to restore 3% of max Mana.",
+			"scale": {"step": 20},
+			"payload": {"stat": {"invigorating_ranks": 20}}},
+		{"id": "py_firebrand", "name": "Heat Shimmer", "ranks": 1, "lane": "Inferno", "row": 3,
+			"desc": "Overburn's damage cap rises from +40% to +{v}%.",
+			"scale": {"base": 40, "step": 20},
+			"payload": {"stat": {"heat_haze_ranks": 20}}},
+		# The re-specced Flame Shield. Every clause pushes the SAME way —
+		# there is no defensive half left in it, and the retaliation burn
+		# feeds the engine that is now costing him more to run.
+		{"id": "py_flame_shield", "name": "Immolate", "ranks": 1, "lane": "Inferno", "row": 4,
+			"desc": "New ability: Immolate — for 2 turns Overburn's damage cap is lifted entirely, its drain doubles, and anyone who strikes you is set Burning 3 turns (15 Mana, 1.5 int, 2cd).",
+			"payload": {"new_ability": {"display_name": "Immolate", "cost": 15,
+				"special": "immolate", "delay": 1.5, "anim": "attack03", "cooldown": 2,
+				"perfect_id": "", "perfect_text": "Holds a 3rd turn",
+				"description": "Open the furnace: for 2 turns Overburn\nhas NO damage cap and its Mana drain\nDOUBLES, and whoever strikes you is\nset Burning (3 turns)."}}},
+		{"id": "py_molten", "name": "Kiln-Forged", "ranks": 1, "lane": "Inferno", "row": 5,
+			"desc": "+{v}% fire resistance, and Overburn's drain can never take you below 10 Mana.",
+			"scale": {"step": 20},
+			"payload": {"stat": {"kiln_forged": 1}}},
+		{"id": "py_undying_flame", "name": "Ash Lung", "ranks": 1, "lane": "Inferno", "row": 6,
+			"desc": "While Overburn's drain exceeds your Mana regeneration, you deal +{v}% damage.",
+			"scale": {"step": 15},
+			"payload": {"stat": {"ash_lung": 1}}},
+		# Cauterise is the health risk put back, ONCE, as an opt-in. The drain
+		# sits on Mana precisely so it is not a clock he carries; this node
+		# lets a player choose to carry it anyway, which is a decision rather
+		# than a tax — and the sharpest thing in the tree.
+		{"id": "py_cauterize", "name": "Cauterise", "ranks": 1, "lane": "Inferno", "row": 7,
+			"desc": "Drain that would take you below 0 Mana takes health instead, 1 HP per Mana — and your damage cap is removed while you are under 20 Mana.",
+			"payload": {"stat": {"cauterise": 1}}},
+		# --- Lane C: DETONATION — how big the trigger is. ---
+		{"id": "py_shockwave", "name": "Focused Flame", "ranks": 1, "lane": "Detonation", "row": 1,
+			"desc": "Detonation's Burn bonus rises from 250% to {v}%.",
+			"scale": {"base": 250, "step": 75},
+			"payload": {"stat": {"focused_flame": 1}}},
+		{"id": "py_supernova", "name": "Pressure Cooker", "ranks": 1, "lane": "Detonation", "row": 2,
+			"desc": "Detonation deals +{v} Break damage to a Burning target.",
+			"scale": {"step": 25},
+			"payload": {"stat": {"pressure_cooker": 1}}},
+		{"id": "py_implosion", "name": "Aftershock", "ranks": 1, "lane": "Detonation", "row": 3,
+			"desc": "Detonation re-applies {v} turns of Burn to the target after consuming.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"aftershock": 2}}},
+		# Out of the vault (Batch AR). No cooldown by design: 45 Mana under a
+		# drain, arriving 6.0 down the initiative bar, is the whole limiter.
+		{"id": "py_focused", "name": "Pyroblast", "ranks": 1, "lane": "Detonation", "row": 4,
+			"desc": "New ability: Pyroblast — a slow, enormous bolt for 55% of Attack, +50% against a Burning target (45 Mana, 6.0 int).",
+			"payload": {"new_ability": {"display_name": "Pyroblast", "cost": 45,
+				"dmg_type": "fire", "damage": 55, "pressure": 25, "delay": 6.0,
+				"anim": "attack03", "cooldown": 0,
+				"perfect_id": "", "perfect_text": "",
+				"description": "The long cast: 55% of Attack in fire,\nand HALF AGAIN against a target that\nis already Burning. It consumes\nnothing — it simply asks you to have\nlit the fire first."}}},
+		{"id": "py_seeding", "name": "Crucible", "ranks": 1, "lane": "Detonation", "row": 5,
+			"desc": "Consuming Burn refunds {v} Mana per turn instead of 1.",
+			"scale": {"base": 1, "step": 1},
+			"payload": {"stat": {"crucible": 1}}},
+		# No field and no read site: it SETS the ability's own cooldown, the
+		# way Relentless sets Hack and Slash's bleed_chance. Ability upgrades
+		# run after the tree, so a Quickened Detonation still gets its cut.
+		{"id": "py_rekindle", "name": "Twin Detonation", "ranks": 1, "lane": "Detonation", "row": 6,
+			"desc": "Detonation's cooldown drops to {v}.",
+			"scale": {"step": 1},
+			"payload": {"ability": "Detonation", "set": {"cooldown": 1}}},
+		{"id": "py_warm_glow", "name": "Total Commitment", "ranks": 1, "lane": "Detonation", "row": 7,
+			"desc": "Detonation consumes Burn from the target and the two enemies adjacent to it.",
+			"payload": {"stat": {"total_commitment": 1}}},
 		# --- Capstones (row 8): take ONE, no lane requirement ---
 		{"id": "py_firestorm", "name": "Firestorm", "ranks": 1, "lane": "Kindling", "row": 8,
 			"capstone": true,
@@ -808,17 +830,20 @@ const LANE_TREES := {
 				"perfect_extra_hit": false, "delay": 3.5, "anim": "attack03", "cooldown": 4,
 				"applies_status": {"id": "burn", "turns": 2},
 				"perfect_id": "", "perfect_text": "Every enemy takes an even share.",
-				"description": "The sky ignites: 6-8 bolts rake random\nenemies for 12% of Attack, each one\nsetting its victim Burning (2 turns\nper bolt — repeats stack)."}}},
-		{"id": "py_rebirth", "name": "Avatar of Flame", "ranks": 1, "lane": "Inferno", "row": 8,
+				"description": "The sky ignites: 6-8 bolts rake random\nenemies for 12% of Attack, each one\nsetting its victim Burning (2 turns\nper bolt — repeats stack). Twelve to\nsixteen turns of drain in one cast."}}},
+		# Out of the vault (Batch AR), minus its Empower clause — Empower is a
+		# named mechanic belonging to the Holy Cleric's Mercy system, and this
+		# ability never should have granted it.
+		{"id": "py_rebirth", "name": "Phoenix Rebirth", "ranks": 1, "lane": "Inferno", "row": 8,
 			"capstone": true,
-			"desc": "Inferno Master has no cap — every turn of Burn on the enemy team grants its full bonus — and the Pyromancer's fire damage ignores enemy fire resistance.",
-			"payload": {"stat": {"avatar_flame": 1}}},
-		# Cataclysm: the "detonate them all" fantasy as something earned —
-		# and it still rewards a good first target, since the chain walks
-		# down from there.
+			"desc": "New ability: Phoenix Rebirth — sacrifice 25% of current health and your Mana returns to full (2.0 int, 4cd).",
+			"payload": {"new_ability": {"display_name": "Phoenix Rebirth", "cost": 0,
+				"special": "phoenix", "delay": 2.0, "anim": "attack03", "cooldown": 4,
+				"perfect_id": "", "perfect_text": "Costs 15% of health instead",
+				"description": "Burn your own life for fuel: pay 25%\nof current health and your Mana\nreturns to FULL. Under Overburn a full\npool is exactly the relief the drain\ndenies you — and the price is a choice\nyou make, not a clock you carry."}}},
 		{"id": "py_hellfire", "name": "Cataclysm", "ranks": 1, "lane": "Detonation", "row": 8,
 			"capstone": true,
-			"desc": "After Detonation resolves, it fires again at the burning enemy with the most Burn remaining for 60% of its damage, chaining up to 3 additional times (each 60% of the one before).",
+			"desc": "Detonation consumes the Burn from EVERY burning enemy and adds all of it to the hit.",
 			"payload": {"stat": {"cataclysm": 1}}},
 	],
 	"cryomancer": [

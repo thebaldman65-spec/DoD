@@ -89,7 +89,7 @@ const STATUS_INFO := {
 	"bulwark_line": ["Bulwark Line", "BL", Color(0.72, 0.8, 0.95),
 		"+10% Block chance (the Warden's Shieldwall)."],
 	"rally_heal": ["Rallied", "R+", Color(0.95, 0.75, 0.45), "+30% healing received\n(the Warden's Rally)."],
-	"flame_shield": ["Flame Shield", "FS", Color(1.0, 0.55, 0.25), "Takes 50% less damage; attackers\nare set Burning (3 turns)."],
+	"immolate": ["Immolate", "IM", Color(1.0, 0.55, 0.25), "Overburn has NO damage cap and its\nMana drain is DOUBLED; attackers\nare set Burning (3 turns)."],
 	"seeding": ["Seeding Embers", "SE", Color(1.0, 0.65, 0.3), "Empowered by a burning death:\nbonus damage on the next turn."],
 	"rime": ["Rime", "Ri", Color(0.75, 0.9, 1.0), "Rimed: every stack of Chilled this\nenemy gains also chills one other\nrandom enemy."],
 	"frostbite": ["Frostbite", "Fb", Color(0.45, 0.70, 0.95), "Frostbitten: healing received\nreduced by 50%."],
@@ -591,6 +591,15 @@ func _spawn_units() -> void:
 				for dtype in relic_resists:
 					res[dtype] = float(res.get(dtype, 0.0)) + relic_resists[dtype]
 				cfg["resists"] = res
+		# Kiln-Forged (Pyromancer, Batch AR): its OTHER half is the drain
+		# floor in _player_turn; the resistance is a dict entry, and payloads
+		# only write scalars, so it lands here — the same site and the same
+		# shape as the relic resist block above, OUTSIDE the Run.active gate
+		# so a standalone sim sees it too.
+		if int(cfg.get("kiln_forged", 0)) > 0:
+			var kiln_res: Dictionary = cfg.get("resists", {})
+			kiln_res["fire"] = float(kiln_res.get("fire", 0.0)) + 0.20
+			cfg["resists"] = kiln_res
 		# Percentage HP talents (Inner Faith, Unwavering Faith) apply after
 		# every flat bonus.
 		cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
@@ -1595,8 +1604,8 @@ func _run_battle() -> void:
 						if h.dead:
 							continue
 						if h.invigorating_ranks > 0 and h.resource_name == "Mana" \
-								and randf() < 0.05 * h.invigorating_ranks:
-							var ash_mana := maxi(int(h.max_resource * 0.02), 1)
+								and randf() < 0.01 * h.invigorating_ranks:
+							var ash_mana := maxi(int(h.max_resource * 0.03), 1)
 							h.resource = mini(h.resource + ash_mana, h.max_resource)
 							h.refresh_bars()
 							h.float_text("+%d Mana" % ash_mana, Color(0.5, 0.7, 1.0))
@@ -2051,24 +2060,22 @@ func _update_talent_chips() -> void:
 		h.update_status("crushing_blows", "+%d%%" % pen,
 			"Crushing Blows: +9%% armor penetration for\nevery %d bloodloss on the enemy team.\nCurrently +%d%% (%d total bloodloss)." % [
 				cb_step, pen, party_bleed])
-	# Inferno Master: the Pyromancer's passive chip tracks the enemy team's
-	# total Burn TURNS (Pyromaniac raises the per-turn step and the cap with
-	# it; Heat Haze raises the cap alone).
+	# OVERBURN's live chip. It shows BOTH numbers, because the spec is a
+	# trade and half of it is invisible otherwise: the bonus it is paying him
+	# right now, and the Mana it will cost him at the start of his next turn.
+	# The chip is also where the asymmetry becomes legible — the bonus stops
+	# at the cap and the drain keeps climbing past it.
 	var burn_turns := _total_burn_turns()
 	for h in heroes:
-		if h.dead or h.passive_id != "inferno":
+		if h.dead or h.passive_id != "overburn":
 			continue
-		var inf_step: float = 1.0 + 0.2 * h.pyromaniac_ranks
-		var inf_cap: float = 25.0 * inf_step + 10.0 * h.heat_haze_ranks
-		var inf_pct: float = burn_turns * inf_step
-		if h.avatar_flame == 0:
-			inf_pct = minf(inf_pct, inf_cap)
-		var inf_cap_txt := ("no cap — Avatar of Flame" if h.avatar_flame > 0 \
-			else "up to +%d%%" % int(round(inf_cap)))
-		h.update_status("spec_passive", "+%d%%" % int(round(inf_pct)),
-			"Inferno Master: +%s%% damage for every turn\nof Burn on the enemy team (%s).\nCurrently +%d%% (%d Burn turns)." % [
-				String.num(inf_step, 1), inf_cap_txt, int(round(inf_pct)),
-				burn_turns])
+		var ob_pct := int(round((_overburn_mult(h, burn_turns) - 1.0) * 100.0))
+		var ob_bill := _overburn_drain(h, burn_turns)
+		var ob_cap_txt := ("no cap" if not _overburn_capped(h) \
+			else "up to +%d%%" % int(round(OVERBURN_CAP + h.heat_haze_ranks)))
+		h.update_status("spec_passive", "+%d%% / -%d" % [ob_pct, ob_bill],
+			"Overburn: +%d%% damage for every turn of Burn\non the enemy team (%s), and 1 Mana a turn\nfor each of them — WHICH HAS NO CAP.\nCurrently +%d%% and -%d Mana a turn (%d Burn turns).\nEvery turn of Burn you CONSUME refunds Mana." % [
+				int(OVERBURN_STEP), ob_cap_txt, ob_pct, ob_bill, burn_turns])
 	# Seeding Embers: harvest burning deaths (once per corpse).
 	for foe in enemies:
 		if not foe.dead or foe.seeding_consumed or foe.burn_at_death <= 0:
@@ -2089,8 +2096,11 @@ func _update_talent_chips() -> void:
 					2, seed_desc, seed_pct)
 			_log("   → Talent: Seeding Embers — %s gains +%d%% damage for a turn" % [
 				h.unit_name, seed_pct], "#b0a8e0")
-	# Ember Wind: a burning death releases its flame to a new host (the
-	# corpse-scan pattern Seeding proved — it catches DoT deaths too).
+	# Chain Ignition: a burning death does not waste its fuel — the turns
+	# it still held are SPLIT among the survivors (the corpse-scan pattern
+	# Seeding proved, so it catches DoT deaths too). Splitting rather than
+	# handing the whole stack to one enemy is what keeps it a SPREAD: it
+	# widens the field he is drained for without deepening any one fire.
 	for foe in enemies:
 		if not foe.dead or foe.ember_consumed or foe.burn_at_death <= 0:
 			continue
@@ -2100,11 +2110,20 @@ func _update_talent_chips() -> void:
 		var ew_pool: Array = enemies.filter(func(e): return not e.dead)
 		if ew_pool.is_empty():
 			continue
-		var ew_t: BattleUnit = ew_pool.pick_random()
-		_apply_status(ew_t, "burn", foe.burn_at_death, 0,
-			maxi(foe.burn_tick_at_death, 0))
-		_log("   → Talent: Ember Wind — %s's flame leaps to %s (%d turns)" % [
-			foe.unit_name, ew_t.unit_name, foe.burn_at_death], "#b0a8e0")
+		var ew_tick: int = maxi(foe.burn_tick_at_death, 0)
+		# Whole turns only, and none lost: 5 turns across 2 survivors is 3
+		# and 2, never 2.5 apiece and never a rounded-away turn.
+		var ew_each: int = foe.burn_at_death / ew_pool.size()
+		var ew_rem: int = foe.burn_at_death % ew_pool.size()
+		for ew_i in ew_pool.size():
+			var ew_share: int = ew_each + (1 if ew_i < ew_rem else 0)
+			if ew_share <= 0:
+				continue
+			var ew_t: BattleUnit = ew_pool[ew_i]
+			_apply_status(ew_t, "burn", ew_share, 0, ew_tick)
+			_log("   → Talent: Chain Ignition — %d turn%s of %s's flame passes to %s" % [
+				ew_share, "" if ew_share == 1 else "s", foe.unit_name,
+				ew_t.unit_name], "#b0a8e0")
 	# Scent of Blood: the ramp chip counts the battle's bleedouts.
 	for h in heroes:
 		if h.dead or h.scent_ranks == 0 or h.bleedouts_this_battle == 0:
@@ -2179,7 +2198,7 @@ func _player_turn(u: BattleUnit) -> void:
 	if not u.mod_no_regen:
 		if u.resource_name == "Mana":
 			# Evocation (Mage class passive) adds mana_regen_bonus.
-			u.resource = mini(u.resource + 12 + u.mana_regen_bonus, u.max_resource)
+			u.resource = mini(u.resource + _mana_regen(u), u.max_resource)
 			u.refresh_bars()
 		elif u.resource_name == "Focus":
 			u.resource = mini(u.resource + 15, u.max_resource)
@@ -2187,6 +2206,14 @@ func _player_turn(u: BattleUnit) -> void:
 		elif u.resource_name == "Rage":
 			u.resource = mini(u.resource + 5, u.max_resource)
 			u.refresh_bars()
+	# OVERBURN, CLAUSE 1 — the bill. It is charged AFTER the regen drip on
+	# purpose, and the ORDER IS THE DESIGN: a Mage regenerates 22 a turn, so a
+	# field holding 20 burn-turns leaves him treading water and unable to bank
+	# Detonation's 25, and a field holding 24 puts him underwater. That squeeze
+	# is the spec's characteristic failure and it must stay reachable in
+	# ordinary play. A lethal drain (Cauterise only) ends the turn here.
+	if _overburn_tick(u):
+		return
 	# Companions have no turns of their own: their statuses tick (and Breaks
 	# recover) with their master. Standing at the hunter's side earns Loyalty.
 	for tick_b in _beasts(u):
@@ -2255,11 +2282,11 @@ func _player_turn(u: BattleUnit) -> void:
 		if ab.special in ["rally", "focus", "surge", "quickdraw",
 				"phoenix", "hymn", "retaliate", "unity", "tripwire",
 				"mana_shield", "divine_wrath", "shield_block", "hold_the_line",
-				"battle_shout", "blood_price", "flame_shield", "stabilize",
+				"battle_shout", "blood_price", "immolate", "stabilize",
 				"overcharge", "cons_ground", "bulwark", "dark_pact", "hysteria",
 				"instinct", "bestial", "spirit_bond", "hold_breath",
 				"venom_coat", "deadfall", "guard_change", "interpose",
-				"wildfire"]:
+				"wildfire", "backdraft"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -2535,10 +2562,14 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				return [overpower, target_foe]
 			return [u.abilities[0], target_foe]          # Strike
 		"mage":
-			# Pyromancer (Batch N loop, Batch AG rework): Flamewave builds the
-			# fire, Wildfire harvests a WIDE field for free damage, and
-			# Detonation cashes in whoever holds the MOST — that targeting is
-			# the point of the loop.
+			# Pyromancer (Batch N loop, Batch AG rework, Batch AR's ONE RULE).
+			# The loop is still build-then-spend, but under Overburn a bot that
+			# never spends measures a spec no player would recognise: the fire it
+			# lit bills it 1 Mana a turn per burn-turn, forever, and only
+			# CONSUMING the fire refunds any of it. So the rule that comes first
+			# is CONSUME WHEN THE DRAIN EXCEEDS THE REGEN — Detonation onto the
+			# largest stack, Wildfire when Detonation is cooling. This is
+			# instrument honesty, not tuning.
 			var burning_foes := foes.filter(func(e): return e.has_status("burn"))
 			var unburnt: int = foes.size() - burning_foes.size()
 			var ripest: BattleUnit = null
@@ -2548,25 +2579,43 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				if bf_turns > ripest_turns:
 					ripest_turns = bf_turns
 					ripest = bf
-			var fshield := _find_ability(u, "Flame Shield")
-			if fshield != null and u.resource >= fshield.cost and u.ability_ready(fshield) \
-					and not u.has_status("flame_shield") and u.hp < u.max_hp * 0.7:
-				return [fshield, u]
+			var det := _find_ability(u, "Detonation")
+			var wfire := _find_ability(u, "Wildfire")
+			var underwater: bool = u.passive_id == "overburn" \
+				and _overburn_drain(u, _total_burn_turns()) > _mana_regen(u)
+			if underwater and det != null and ripest != null \
+					and u.resource >= det.cost and u.ability_ready(det):
+				return [det, ripest]
+			if underwater and wfire != null and not burning_foes.is_empty() \
+					and u.resource >= wfire.cost and u.ability_ready(wfire):
+				return [wfire, u]
+			var immolate := _find_ability(u, "Immolate")
+			if immolate != null and u.resource >= immolate.cost \
+					and u.ability_ready(immolate) and not u.has_status("immolate") \
+					and not underwater and burning_foes.size() >= 2:
+				return [immolate, u]
 			var fwave := _find_ability(u, "Flamewave")
 			if fwave != null and u.resource >= fwave.cost and u.ability_ready(fwave) \
 					and unburnt >= 2:
 				return [fwave, target_foe]
-			# Wildfire is the wide payoff now: it wants a line already alight,
-			# not one deep fire to copy. Held to 3+ so Detonation still gets
-			# its single-target cash-out.
-			var wfire := _find_ability(u, "Wildfire")
+			# Wildfire is the wide payoff: it wants a line already alight, not one
+			# deep fire to copy. Held to 3+ so Detonation still gets its
+			# single-target cash-out when he is not being squeezed.
 			if wfire != null and u.resource >= wfire.cost and u.ability_ready(wfire) \
 					and burning_foes.size() >= 3:
 				return [wfire, u]
-			var det := _find_ability(u, "Detonation")
 			if det != null and u.resource >= det.cost and u.ability_ready(det) \
 					and ripest_turns >= 3:
 				return [det, ripest]
+			var pblast := _find_ability(u, "Pyroblast")
+			if pblast != null and u.resource >= pblast.cost and u.ability_ready(pblast) \
+					and target_foe.has_status("burn"):
+				return [pblast, target_foe]
+			var backdraft := _find_ability(u, "Backdraft")
+			if backdraft != null and u.resource >= backdraft.cost \
+					and u.ability_ready(backdraft) and not underwater \
+					and burning_foes.size() >= 2:
+				return [backdraft, u]
 			var fstorm := _find_ability(u, "Firestorm")
 			if fstorm != null and u.resource >= fstorm.cost and u.ability_ready(fstorm):
 				return [fstorm, target_foe]
@@ -3116,8 +3165,14 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if ab.display_name == "Shatter" \
 			and not enemies.any(func(e): return not e.dead and e.has_status("chilled")):
 		return false
-	# Wildfire: there has to be fire to drag (same rule as Shatter).
-	if ab.special == "wildfire" \
+	# Wildfire: there has to be fire to drag (same rule as Shatter). Wildfire
+	# Spread lights the unburnt on its way through, so with that node taken a
+	# living enemy is enough. Backdraft only DEEPENS existing fires, so it
+	# keeps the strict rule with no exception.
+	if ab.special == "wildfire" and u.wildfire_spread == 0 \
+			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
+		return false
+	if ab.special == "backdraft" \
 			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
 		return false
 	# Stabilize: nothing to vent unless stacks sit above the floor (2, plus
@@ -4517,22 +4572,58 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Fireball perfect: the bolt hits at 25% of Attack instead of 20%.
 			if is_perfect and ab.display_name == "Fireball":
 				raw = 0.25 * attacker.attack * randf_range(0.9, 1.1)
-			# Inferno Master reads the field as it stands BEFORE this strike
-			# eats any of it — Detonation's own consumption must not shrink
-			# the bonus the consuming cast is paid (Batch AG).
+			# Pyroblast (out of the vault, Batch AR): half again into a target
+			# that is already alight. It consumes nothing — it just asks you
+			# to have lit the fire first.
+			if ab.display_name == "Pyroblast" and strike_target.has_status("burn"):
+				raw *= 1.5
+				_log("   → Pyroblast lands on burning flesh (+50%%)", "#e08850")
+			# Overburn reads the field as it stands BEFORE this strike eats any
+			# of it — Detonation's own consumption must not shrink the bonus
+			# the consuming cast is paid (Batch AG).
 			var inferno_turns := _total_burn_turns()
-			# Detonation: consumes the target's Burn — 150% of its remaining
-			# damage (tick × turns left × 1.5) joins this hit before
-			# mitigation. Blast Radius deepens the consumption +25%/rank.
+			# DETONATION, the win condition (Batch AR): it consumes Burn and
+			# adds 250% of its remaining damage (tick × turns left × 2.5) to
+			# this hit before mitigation. Focused Flame takes that to 325%;
+			# the Rune of the Blast Radius still carries its OWN +25% term, so
+			# node and rune each pay their advertised number alone and stacked.
+			# WHICH banks it empties widens with the tree: the target alone,
+			# plus its two neighbours under Total Commitment, or every burning
+			# enemy on the field under Cataclysm.
 			var detonated := 0
+			var det_turns := 0
+			# Whether the STRUCK target's own Burn went in — captured here
+			# because Pressure Cooker is read AFTER the consumption, and by
+			# then has_status("burn") is false on the very target it means.
+			# Same ordering trap Batch AG fixed for the passive.
+			var det_target_burned := false
 			if ab.display_name == "Detonation":
-				var det := strike_target.get_status("burn")
-				if not det.is_empty():
-					detonated = int(round(int(det.get("tick", 6)) \
-						* maxi(int(det.turns), 0) * 1.5 \
-						* (1.0 + 0.25 * attacker.blast_radius_ranks)))
-					raw += detonated
-					strike_target.remove_status("burn")
+				var det_pool: Array = [strike_target]
+				if attacker.cataclysm > 0:
+					det_pool = enemies.filter(func(e): return not e.dead)
+				elif attacker.total_commitment > 0:
+					det_pool = [strike_target] + _adjacent_enemies(strike_target)
+				var det_mult: float = (2.5 + 0.75 * attacker.focused_flame) \
+					* (1.0 + 0.25 * attacker.blast_radius_ranks)
+				for det_t in det_pool:
+					var det: Dictionary = det_t.get_status("burn")
+					if det.is_empty():
+						continue
+					var det_left: int = maxi(int(det.turns), 0)
+					if det_left <= 0:
+						continue
+					detonated += int(round(int(det.get("tick", 6)) \
+						* det_left * det_mult))
+					det_turns += det_left
+					if det_t == strike_target:
+						det_target_burned = true
+					det_t.remove_status("burn")
+				raw += detonated
+				if det_pool.size() > 1 and det_turns > 0:
+					_log("   → %s — the Burn of %d enemies goes into one hit" % [
+						"Capstone: Cataclysm" if attacker.cataclysm > 0 \
+							else "Talent: Total Commitment", det_pool.size()],
+						"#b0a8e0")
 			# Powershot (inverted, Batch 32): +2% damage per point of the
 			# target's Break bar already FULL — the team breaks them, the
 			# marksman ends them (+4% with Opportunist's Aim).
@@ -4593,11 +4684,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw += 0.5 * strike_target.pressure
 			if attacker.has_status("empower"):
 				raw *= 1.25
-			# Inferno Master: the Pyromancer feeds on every TURN of fire still
-			# standing on the enemy team (see _inferno_mult — Pyromaniac
-			# deepens the step and the cap, Heat Haze the cap alone, Avatar
-			# of Flame removes it).
-			raw *= _inferno_mult(attacker, inferno_turns)
+			# Overburn: the Pyromancer feeds on every TURN of fire still
+			# standing on the enemy team — capped, unlike the drain he pays
+			# for the same fire (see _overburn_mult).
+			raw *= _overburn_mult(attacker, inferno_turns)
+			# Ash Lung: he is only paid for standing in it while the fire is
+			# genuinely costing him more than the turn gives back.
+			if attacker.ash_lung > 0 \
+					and _overburn_drain(attacker, inferno_turns) \
+						> _mana_regen(attacker):
+				raw *= 1.15
 			# Seeding Embers: a burning death fuels the next swing.
 			if attacker.has_status("seeding"):
 				raw *= 1.0 + attacker.status_power("seeding") / 100.0
@@ -4875,12 +4971,6 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if not strike_target.is_hero and strike_target.has_status("chilled"):
 				raw *= 1.0 + 0.01 * _max_hero_rank("hypothermia_ranks") \
 					* strike_target.status_stacks("chilled")
-			# Flame Shield: the fire barrier halves what gets through.
-			if strike_target.has_status("flame_shield"):
-				var pv_was := raw
-				raw *= 0.5
-				if strike_target.is_hero:
-					_prev(strike_target, pv_was - raw)
 			if debug_prints and attacker.second_resource_name == "Resonance":
 				print("[DBG] %s attacks @%d stacks: base %d -> raw %.1f" % [
 					attacker.unit_name, attacker.second_resource, ab.damage, raw])
@@ -4968,6 +5058,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				pr += attacker.sunder_guard_bd
 				_log("   → Talent: Sunder Guard — +%d BD" % \
 					attacker.sunder_guard_bd, "#b0a8e0")
+			# Pressure Cooker: the trigger cracks the guard as well as the
+			# flesh. It reads the CAPTURED flag, not the status, because
+			# Detonation has already eaten the Burn by the time this runs.
+			if det_target_burned and attacker.pressure_cooker > 0:
+				pr += 25
+				_log("   → Talent: Pressure Cooker — +25 BD", "#b0a8e0")
 			# Broken Will: the Occultist grinds stability down harder.
 			if attacker.broken_will_ranks > 0:
 				pr = int(round(pr * (1.0 + 0.05 * attacker.broken_will_ranks)))
@@ -5254,6 +5350,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var turns: int = ab.applies_status["turns"]
 				if is_perfect and ab.perfect_id == "status_plus":
 					turns = 4
+				# Cinder Trail (Batch AR): the free bolt carries more fire —
+				# and more drain. It lengthens FIREBALL'S OWN Burn now; the
+				# old "embers onto a second enemy" reading survives on the
+				# Rune of the Cinder Trail, below.
+				if ab.display_name == "Fireball" and attacker.cinder_trail_ranks > 0:
+					turns += attacker.cinder_trail_ranks
 				var status_meta := 0
 				if ab.applies_status["id"] == "burn":
 					status_meta = int(round((CRIT_CHANCE + attacker.crit_bonus) * 100))
@@ -5392,8 +5494,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and not attacker.dead and randf() < 0.25:
 				_apply_status(attacker, "poison", 5, 0,
 					_dot_tick("poison", strike_target))
-			# Flame Shield: whoever strikes the shielded Pyromancer ignites.
-			if strike_target.has_status("flame_shield") and not attacker.is_hero \
+			# Immolate: whoever strikes the burning Pyromancer ignites — and
+			# that fresh Burn feeds his own engine, drain and all.
+			if strike_target.has_status("immolate") and not attacker.is_hero \
 					and not attacker.dead:
 				_apply_status(attacker, "burn", 3,
 					int(round((CRIT_CHANCE + strike_target.crit_bonus) * 100)),
@@ -5428,49 +5531,34 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_message("%s falls!" % attacker.unit_name)
 					_log("† %s dies" % attacker.unit_name, "#e05050")
 					_on_enemy_death(attacker)
-			# Pyromancer fire package (Batch N kit).
+			# Pyromancer fire package (Batch N kit, re-authored by AR).
 			if detonated > 0:
-				_log("   → Detonation consumes the Burn (+%d bonus damage)" % detonated,
+				_log("   → Detonation consumes %d turn%s of Burn (+%d bonus damage)" % [
+					det_turns, "" if det_turns == 1 else "s", detonated],
 					"#e08850")
+			# THE REFUND. It belongs to Overburn, not to Detonation — the same
+			# helper Wildfire calls — so anything the tree later teaches to eat
+			# Burn inherits it without a second implementation.
+			if det_turns > 0:
+				_overburn_refund(attacker, det_turns)
 			if is_perfect and ab.display_name == "Detonation" and not strike_target.dead:
 				_apply_status(strike_target, "burn", 2,
 					int(round((CRIT_CHANCE + attacker.crit_bonus) * 100)),
 					_dot_tick("burn", attacker))
-			# Chain Reaction: the blast front leaps to every OTHER burning
-			# enemy for 20%/rank of the damage dealt (fire; resists apply).
-			if ab.display_name == "Detonation" and attacker.is_hero \
-					and attacker.chain_reaction_ranks > 0 and final > 0:
-				var cr_struck := 0
-				for cr_t in enemies:
-					if cr_t.dead or cr_t == strike_target \
-							or not cr_t.has_status("burn"):
-						continue
-					var cr_dmg := maxi(int(round(
-						final * 0.20 * attacker.chain_reaction_ranks)), 1)
-					var cr_res := float(cr_t.resists.get("fire", 0.0))
-					if attacker.avatar_flame > 0 and cr_res > 0.0:
-						cr_res = 0.0
-					if cr_res != 0.0:
-						cr_dmg = maxi(int(round(cr_dmg * (1.0 - cr_res))), 0)
-					if cr_dmg <= 0:
-						continue
-					cr_struck += 1
-					_stat("dmg_hero_" + attacker.unit_name, cr_dmg)
-					if cr_t.take_tick_damage(cr_dmg, "-%d Chain" % cr_dmg,
-							Color(1.0, 0.55, 0.2)):
-						_stat("enemy_deaths")
-						_sfx("death", -4.0)
-						_message("%s falls!" % cr_t.unit_name)
-						_log("† %s dies" % cr_t.unit_name, "#e05050")
-						_on_enemy_death(cr_t)
-				if cr_struck > 0:
-					_log("   → Talent: Chain Reaction — the blast leaps to %d burning %s" % [
-						cr_struck, "enemy" if cr_struck == 1 else "enemies"],
-						"#b0a8e0")
+			# Aftershock: the trigger re-lights what it just emptied — and the
+			# refund is what pays for the fire it starts again.
+			if ab.display_name == "Detonation" and attacker.aftershock > 0 \
+					and not strike_target.dead:
+				_apply_status(strike_target, "burn", attacker.aftershock, 0,
+					_dot_tick("burn", attacker))
+				_log("   → Talent: Aftershock — the fire relights (%d turns)" % \
+					attacker.aftershock, "#b0a8e0")
 			if ab.display_name == "Flamewave" and not strike_target.dead:
 				# Batch N ignite clause: the wave STARTS fires now — 2 turns
 				# (3 perfect), and those already Burning gain the same as an
-				# extension. Conflagration feeds either path +1 turn/rank.
+				# extension. Conflagration adds its turns to either path, and
+				# the Rune of the Cinder Trail adds its own on top — the field
+				# is an ADDITIVE TURN COUNT, so each pays what it advertises.
 				var fw_turns := (3 if is_perfect else 2) + attacker.conflagration_ranks
 				if strike_target.has_status("burn"):
 					var fw := strike_target.get_status("burn")
@@ -5483,17 +5571,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				else:
 					_apply_status(strike_target, "burn", fw_turns, 0,
 						_dot_tick("burn", attacker))
-			# Cinder Trail: the free bolt scatters embers onto a second victim
-			# (1 turn of Burn per rank — the opening turns' spreader).
+			# RUNE-ONLY since Batch AR: the Rune of the Cinder Trail was
+			# RE-POINTED off cinder_trail_ranks (which the node took for a new
+			# meaning) onto its own term, so it still pays the effect it
+			# advertises — embers scattered onto a second victim — instead of
+			# silently doing something else.
 			if ab.display_name == "Fireball" and attacker.is_hero \
-					and attacker.cinder_trail_ranks > 0:
+					and attacker.rune_cinder_ember > 0:
 				var ct_pool: Array = enemies.filter(
 					func(e): return not e.dead and e != strike_target)
 				if not ct_pool.is_empty():
 					var ct_t: BattleUnit = ct_pool.pick_random()
-					_log("   → Talent: Cinder Trail — embers drift onto %s" % \
+					_log("   → Rune: the Cinder Trail — embers drift onto %s" % \
 						ct_t.unit_name, "#b0a8e0")
-					_apply_status(ct_t, "burn", attacker.cinder_trail_ranks, 0,
+					_apply_status(ct_t, "burn", attacker.rune_cinder_ember, 0,
 						_dot_tick("burn", attacker))
 			# Blizzard: 1-2 stacks of Chilled settle on each victim.
 			if ab.display_name == "Blizzard" and not strike_target.dead:
@@ -6111,9 +6202,9 @@ func _dot_tick(id: String, applier: BattleUnit) -> int:
 	return maxi(int(round(pct * 0.01 * applier.attack)), 1)
 
 
-# Inferno Master's fuel (Batch AG): the TOTAL turns of Burn standing on the
-# enemy team, not the number of enemies alight. One enemy burning for six
-# turns now feeds the passive exactly as hard as six burning for one.
+# Overburn's fuel (Batch AG, kept by AR): the TOTAL turns of Burn standing on
+# the enemy team, not the number of enemies alight. One enemy burning for six
+# turns feeds the passive exactly as hard as six burning for one.
 func _total_burn_turns() -> int:
 	var total := 0
 	for foe in enemies:
@@ -6125,21 +6216,116 @@ func _total_burn_turns() -> int:
 	return total
 
 
-# The Inferno Master multiplier for a measured field total. Pyromaniac deepens
-# the per-turn step AND lifts the cap with it; Heat Haze lifts the cap alone;
-# Avatar of Flame removes it. Ceilings: +25% base, +40% at Pyromaniac 3, +70%
-# with Heat Haze 3 on top.
-# Abilities that CONSUME Burn (Detonation, Wildfire) pass the total they
-# measured BEFORE their own consumption — the consuming cast gets full credit,
-# and only subsequent turns see the thinner field.
-func _inferno_mult(u: BattleUnit, burn_turns: int) -> float:
-	if u == null or u.passive_id != "inferno":
+# OVERBURN, CLAUSE 2 — the reward, and THE ONE PLACE ITS CAP IS DECIDED.
+# +2% damage per remaining Burn turn on the enemy team, capped at +40%.
+#
+# THE ASYMMETRY IS THE DESIGN: this caps and _overburn_drain() does not. Past
+# 20 burn-turns the cost keeps climbing and the bonus stops, so over-lighting
+# the field is how the Pyromancer loses. Nothing here may be made to scale
+# with the drain and nothing there may be given a ceiling.
+#
+# Heat Shimmer lifts the cap to +60%; Immolate and Cauterise (under 20 Mana)
+# LIFT IT ENTIRELY.
+# Abilities that CONSUME Burn (Detonation, Wildfire, Cataclysm) pass the total
+# they measured BEFORE their own consumption — the consuming cast is still
+# paid for the field it emptied, and only later turns see the ash.
+const OVERBURN_STEP := 2.0
+const OVERBURN_CAP := 40.0
+
+
+# The turn-start Mana drip, in ONE place — the drip itself reads it, and so
+# does Ash Lung, whose whole condition is "the drain outruns the regen".
+# Two sites asking the same question must not each carry their own 12.
+func _mana_regen(u: BattleUnit) -> int:
+	return 12 + u.mana_regen_bonus
+
+
+func _overburn_capped(u: BattleUnit) -> bool:
+	if u.has_status("immolate"):
+		return false
+	if u.cauterise > 0 and u.resource < 20:
+		return false
+	return true
+
+
+func _overburn_mult(u: BattleUnit, burn_turns: int) -> float:
+	if u == null or u.passive_id != "overburn":
 		return 1.0
-	var step := 1.0 + 0.2 * u.pyromaniac_ranks
-	var pct := burn_turns * step
-	if u.avatar_flame == 0:
-		pct = minf(pct, 25.0 * step + 10.0 * u.heat_haze_ranks)
+	var pct := burn_turns * OVERBURN_STEP
+	if _overburn_capped(u):
+		pct = minf(pct, OVERBURN_CAP + u.heat_haze_ranks)
 	return 1.0 + 0.01 * pct
+
+
+# OVERBURN, CLAUSE 1 — the cost, and THE ONE PLACE ITS SIZE IS DECIDED.
+# 1 Mana per remaining Burn turn on the field, UNCAPPED. Fire Walker takes a
+# quarter off it; Immolate doubles it.
+func _overburn_drain(u: BattleUnit, burn_turns: int) -> int:
+	if u == null or u.passive_id != "overburn":
+		return 0
+	var cost := float(maxi(burn_turns, 0))
+	if u.fire_walker > 0:
+		cost *= 0.75
+	if u.has_status("immolate"):
+		cost *= 2.0
+	return int(round(cost))
+
+
+# OVERBURN, CLAUSE 1 AT ITS READ SITE — the turn-start bill, called from
+# _player_turn immediately after the regen drip. Returns true if the drain was
+# LETHAL, which only Cauterise can make it. It lives here rather than inline so
+# the clause has one name, one home, and something a test can drive without
+# awaiting a player's ability pick.
+#
+# Kiln-Forged floors the bill at 10 Mana left and the rest simply evaporates;
+# Cauterise instead bills whatever the pool could not cover to HEALTH, 1 HP per
+# Mana. Taking BOTH is legal (same lane, different rows) and THE FLOOR WINS — a
+# Pyromancer who paid for "the drain can never take me below 10" does not then
+# get billed in blood for the same drain.
+func _overburn_tick(u: BattleUnit) -> bool:
+	if u == null or u.passive_id != "overburn":
+		return false
+	var turns := _total_burn_turns()
+	var cost := _overburn_drain(u, turns)
+	if cost <= 0:
+		return false
+	var floor_at: int = 10 if u.kiln_forged > 0 else 0
+	var paid: int = mini(cost, maxi(u.resource - floor_at, 0))
+	var unpaid: int = cost - paid
+	u.resource -= paid
+	u.refresh_bars()
+	u.float_text("-%d Mana" % paid, Color(0.55, 0.6, 0.85))
+	_log("%s: Overburn — %d turn%s of Burn drains %d Mana" % [
+		u.unit_name, turns, "" if turns == 1 else "s", paid], "#e08850")
+	# Cauterise: the health risk, put back ONCE as an opt-in. Only the part
+	# the Mana pool could not cover is billed, and it goes through
+	# take_tick_damage so a lethal drain is handled like any other tick.
+	if unpaid > 0 and u.cauterise > 0 and u.kiln_forged == 0:
+		_log("   → Talent: Cauterise — %d Mana of drain is paid in blood" % unpaid,
+			"#b0a8e0")
+		if u.take_tick_damage(unpaid, "-%d" % unpaid, Color(1.0, 0.4, 0.4)):
+			_message("%s burns away!" % u.unit_name)
+			_log("† %s falls to their own fire" % u.unit_name, "#e05050")
+			return true
+	return false
+
+
+# OVERBURN, CLAUSE 3 — the refund, and THE ONE PLACE IT IS PAID. It is a
+# property of the PASSIVE, not of any ability, so Detonation, Wildfire,
+# Cataclysm and anything the tree adds later inherit it from this single
+# implementation. Crucible doubles the rate.
+func _overburn_refund(u: BattleUnit, turns_consumed: int) -> void:
+	if u == null or u.passive_id != "overburn" or turns_consumed <= 0:
+		return
+	var rate := 2 if u.crucible > 0 else 1
+	var back: int = mini(turns_consumed * rate, u.max_resource - u.resource)
+	if back <= 0:
+		return
+	u.resource += back
+	u.refresh_bars()
+	u.float_text("+%d Mana" % back, Color(0.5, 0.7, 1.0))
+	_log("   → Overburn: %d turn%s of Burn consumed refunds %d Mana" % [
+		turns_consumed, "" if turns_consumed == 1 else "s", back], "#70a0e0")
 
 
 # Pack Bond strength for a hunter and a beast kind, all talents applied:
@@ -6878,7 +7064,12 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			attacker.refresh_bars()
 			attacker.float_text("-%d" % sacrifice, Color(1.0, 0.4, 0.5))
 			attacker.float_text("Mana restored!", Color(0.5, 0.7, 1.0))
-			_apply_status(attacker, "empower", 3)
+			# NO EMPOWER (Batch AR). The vaulted def granted it, but since the
+			# Holy Cleric's rework Empower is a SPECIFIC NAMED MECHANIC of her
+			# Mercy system — an ability from another class handing it out was
+			# a name collision, not a design. The clause is dropped, not
+			# renamed: under Overburn a full Mana pool is already the relief
+			# the drain denies him, and that is the whole ability.
 			_sfx("heal", -6.0, 0.6)
 			_message("%s burns with rebirth!" % attacker.unit_name)
 			_log("%s: Phoenix Rebirth — sacrificed %d HP for full Mana" % [
@@ -7759,16 +7950,31 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Dark Vigil — every ally regains 6%% of its own health (%d in all)" % [
 				attacker.unit_name, tp_total], "#70d878")
 		"wildfire":
-			# Batch AG: the wide payoff. Drag the fire down the whole line —
-			# every burning enemy loses a turn of Burn (two on a perfect) and
-			# eats 18% of Attack in fire for each turn taken. Enemies that
-			# aren't alight are untouched; one with a single turn left simply
-			# loses its Burn. The Inferno Master read is taken BEFORE any of
-			# it is spent, so the cast that empties the field is still paid
+			# Batch AG: the wide payoff, and Batch AR's WIDE RELEASE VALVE —
+			# Detonation empties one bank, this one skims them all. Every
+			# burning enemy loses a turn of Burn (two on a perfect) and eats
+			# 18% of Attack in fire for each turn taken; one with a single turn
+			# left simply loses its Burn. The Overburn read is taken BEFORE any
+			# of it is spent, so the cast that empties the field is still paid
 			# for the field it emptied — only later turns see the ash.
-			var wf_inferno := _inferno_mult(attacker, _total_burn_turns())
+			var wf_inferno := _overburn_mult(attacker, _total_burn_turns())
 			var wf_take := 2 if is_perfect else 1
 			var wf_binfo: Array = STATUS_INFO["burn"]
+			# Wildfire Spread: the unburnt catch BEFORE the drag begins, so
+			# their fresh turn is in the field on this same cast — it starts
+			# costing drain immediately and pays back only when something
+			# eats it. That is the node, not a rounding of it.
+			if attacker.wildfire_spread > 0:
+				var wf_lit := 0
+				for foe in enemies:
+					if foe.dead or foe.has_status("burn"):
+						continue
+					_apply_status(foe, "burn", attacker.wildfire_spread, 0,
+						_dot_tick("burn", attacker))
+					wf_lit += 1
+				if wf_lit > 0:
+					_log("   → Talent: Wildfire Spread — %d fresh %s catches" % [
+						wf_lit, "fire" if wf_lit == 1 else "fires"], "#b0a8e0")
 			var wf_struck := 0
 			var wf_total := 0
 			var wf_turns := 0
@@ -7818,29 +8024,41 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					attacker.unit_name, wf_turns, "" if wf_turns == 1 else "s",
 					wf_struck, "enemy" if wf_struck == 1 else "enemies",
 					wf_total, " [PERFECT]" if is_perfect else ""], "#e08850")
-		"flame_shield":
+			# Overburn's refund, from the SAME helper Detonation calls: the
+			# rule is a property of the PASSIVE, so neither ability carries
+			# its own copy of it.
+			_overburn_refund(attacker, wf_turns)
+		"immolate":
+			# The re-specced Flame Shield (Batch AR). Every clause pushes the
+			# SAME way — no cap on Overburn's reward, DOUBLE its drain, and a
+			# retaliation burn that feeds the very engine now costing more to
+			# run. There is deliberately no defensive half left in it.
 			_sfx("parry", -7.0, 1.1)
-			_apply_status(attacker, "flame_shield", 2)
-			_message("%s ignites the air!" % attacker.unit_name)
-			_log("%s: Flame Shield — 50%% less damage taken; attackers ignite (2 turns)" % \
-				attacker.unit_name, "#70d878")
-			if is_perfect:
-				# The ignition pulse: every burning enemy ticks RIGHT NOW.
-				for foe in enemies:
-					if foe.dead or not foe.has_status("burn"):
-						continue
-					var fs_tick := int(foe.get_status("burn").get("tick", 0))
-					if fs_tick <= 0:
-						fs_tick = DOT_STATUSES["burn"]
-					var fs_died: bool = foe.take_tick_damage(fs_tick,
-						"-%d Burn" % fs_tick, Color(1.0, 0.55, 0.2))
-					_log("   → the ignition pulse burns %s for %d" % [
-						foe.unit_name, fs_tick], "#e08850")
-					if fs_died:
-						_stat("enemy_deaths")
-						_sfx("death", -4.0)
-						_message("%s falls!" % foe.unit_name)
-						_log("† %s dies" % foe.unit_name, "#e05050")
+			_apply_status(attacker, "immolate", 3 if is_perfect else 2)
+			_message("%s opens the furnace!" % attacker.unit_name)
+			_log("%s: Immolate — Overburn uncapped, drain DOUBLED; attackers ignite (%d turns)" % [
+				attacker.unit_name, 3 if is_perfect else 2], "#e08850")
+		"backdraft":
+			# Lights nothing new: it only deepens what is already alight, which
+			# is what makes it a commitment rather than a spreader. The usable
+			# gate keeps it dark with an empty field.
+			var bd_turns := 3 if is_perfect else 2
+			var bd_binfo: Array = STATUS_INFO["burn"]
+			var bd_hit := 0
+			for foe in enemies:
+				if foe.dead or not foe.has_status("burn"):
+					continue
+				var bd_st: Dictionary = foe.get_status("burn")
+				foe.update_status("burn", bd_binfo[1], bd_binfo[3], -1,
+					maxi(int(bd_st.get("turns", 0)), 0) + bd_turns)
+				foe.float_text("Burn +%d turns" % bd_turns, bd_binfo[2])
+				bd_hit += 1
+			_sfx("bomb", -8.0, 0.9)
+			_message("%s feeds the fire air!" % attacker.unit_name)
+			_log("%s: Backdraft — +%d turns of Burn on %d burning %s%s" % [
+				attacker.unit_name, bd_turns, bd_hit,
+				"enemy" if bd_hit == 1 else "enemies",
+				" [PERFECT]" if is_perfect else ""], "#e08850")
 		"rime":
 			_sfx("break", -9.0, 1.4)
 			# Icy Resolve (talent): the hoarfrost roots deeper.

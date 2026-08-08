@@ -183,7 +183,7 @@
 		"name": "Rune of the Cinder Trail", "rarity": "rare", "scope": "spec:pyromancer",
 		"price": 100, "lane": "Kindling",
 		"desc": "Fireball also sets one other enemy Burning for 1 turn, and Flamewave burns 1 turn longer.",
-		"payload": {"stat": {"cinder_trail_ranks": 1, "conflagration_ranks": 1}}
+		"payload": {"stat": {"rune_cinder_ember": 1, "conflagration_ranks": 1}}
 	},
 	"white_flame": {
 		"name": "Rune of the White Flame", "rarity": "epic", "scope": "spec:pyromancer",

@@ -118,7 +118,7 @@
    "see_also": ["resists_vulns"]},
   {"id": "status_melted", "term": "Melted Armor", "category": "statuses",
    "short": "Armor permanently burned away.",
-   "long": "The Pyromancer's Melt Armor talent burns armor off with every Burn tick - a small permanent reduction that lasts the whole battle and keeps deepening while the target burns.",
+   "long": "Armor burned away for the rest of the battle - a small permanent reduction that keeps deepening while the target burns. NOTE: nothing in the game applies this today. Batch AR re-specced the Pyromancer talent that did, and the status is kept the way a vaulted ability is kept, so a later batch can point something at it again.",
    "see_also": ["status_burn", "status_sunder"]},
   {"id": "status_snared", "term": "Snared", "category": "statuses",
    "short": "A trap waits: next action springs a stun and poison.",

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-07 (Batch AQ)</b></p>
+<p align="right"><b>Last updated: 2026-08-07 (Batch AR)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -451,10 +451,8 @@ permanent chip whose value follows the live debuff count.</td></tr>
 <tr><td>Crushing Blows</td><td>+9% armor penetration per 20 total enemy-party
 bloodloss — per 15 if Savagery was taken too (Berserker talent); a permanent chip with the
 live value, which names the step it is currently counting in.</td></tr>
-<tr><td>Flame Shield</td><td>Takes 50% less damage; attackers are set Burning for 3 turns
-(Pyromancer talent ability, 2 turns).</td></tr>
-<tr><td>Seeding Embers</td><td>Bonus damage on the next turn, harvested from an enemy that
-died Burning (Pyromancer talent); the chip shows the live %.</td></tr>
+<tr><td>Immolate</td><td>Overburn has NO damage cap and its Mana drain is DOUBLED;
+attackers are set Burning for 3 turns (Pyromancer talent ability, 2 turns).</td></tr>
 <tr><td>Rallied</td><td>+30% healing received (the Warden's Rally, 3 turns per Heavy
 Plating block).</td></tr>
 <tr><td>Rime</td><td>Every stack of Chilled this enemy gains also chills one other random
@@ -466,8 +464,6 @@ Resonant Core); stacks past 5 weigh 1.5× (1.65× from a perfect cast) toward th
 per-stack bonuses.</td></tr>
 <tr><td>Unlimited Power</td><td>Resonance overflow banked as permanent battle power —
 the chip tracks the total % damage and max Mana gained (Arcanist talent).</td></tr>
-<tr><td>Melt Armor</td><td>Armor burned away for the battle by Burn ticks (Pyromancer
-talent); sits on the ENEMY with the live −% on the chip.</td></tr>
 <tr><td>Hold the Line</td><td>Takes 50% less Break damage — 80% when the capstone
 landed on an already-earned Hold the Line (Warden capstone).</td></tr>
 <tr><td>Undying</td><td>Cannot drop below 1 HP (Warden capstone).</td></tr>
@@ -708,7 +704,7 @@ talent has already granted is never offered again.</p>
 <tr><td><b>Berserker</b></td><td>Bloodlust, Wildstrikes, Hack and Slash</td><td>Blood Price, Battle Shout, Rampage</td></tr>
 <tr><td><b>Warden</b></td><td>Mocking Blow, Crushing Blow, Shieldwall</td><td>War Stomp, Interpose, Hold the Line, Retaliation</td></tr>
 <tr><td><b>Swordmaster</b></td><td>Overpower, Pommel Strike, Guard Change</td><td>Sweeping Strikes, Shatterpoint, Lunge, Execute</td></tr>
-<tr><td><b>Pyromancer</b></td><td>Detonation, Wildfire, Flamewave</td><td>Flame Shield, Firestorm</td></tr>
+<tr><td><b>Pyromancer</b></td><td>Detonation, Wildfire, Flamewave</td><td>Immolate, Firestorm</td></tr>
 <tr><td><b>Cryomancer</b></td><td>Razor Ice, Blizzard, Ice Lance</td><td>Rime, Shatter</td></tr>
 <tr><td><b>Arcanist</b></td><td>Arcane Cannon, Arcane Barrage, Stabilize</td><td>Overcharge, Magi's Wrath</td></tr>
 <tr><td><b>Holy</b></td><td>Heal, Renewal, Hymn of Hope</td><td>Resurrection, Divine Plea</td></tr>
@@ -727,7 +723,7 @@ Kill Command, Hex of Ruin) is spec-pool-only.</p>
 <table border="1" cellpadding="4">
 <tr><th>Class</th><th>Class pool (earnable by all three specs)</th></tr>
 <tr><td><b>Warrior</b></td><td>Bloodlust, Wildstrikes, Hack and Slash, Blood Price, Battle Shout, Rampage, Mocking Blow, Crushing Blow, War Stomp, Shieldwall, Interpose, Hold the Line, Overpower, Pommel Strike, Shatterpoint, Sweeping Strikes, Execute, Rallying Shout</td></tr>
-<tr><td><b>Mage</b></td><td>Flamewave, Flame Shield, Firestorm, Razor Ice, Blizzard, Ice Lance, Rime, Arcane Barrage, Mana Shield, Arcane Surge, Reality Fracture, Phoenix Rebirth</td></tr>
+<tr><td><b>Mage</b></td><td>Flamewave, Firestorm, Razor Ice, Blizzard, Ice Lance, Rime, Arcane Barrage, Mana Shield, Arcane Surge, Reality Fracture, Phoenix Rebirth</td></tr>
 <tr><td><b>Cleric</b></td><td>Heal, Renewal, Divine Shield, Consecrated Ground, Blessing of Zeal, Sacred Resolve, Bulwark of Fortitude, Bewitch, Dark Pact, Mind Flay, Mass Hysteria, Dawnbreak, Sanctuary, Divine Wrath</td></tr>
 <tr><td><b>Hunter</b></td><td>Hunter's Instinct, Mark of the Hunt, Aimed Shot, Powershot, Hold Breath, Quick Draw, Triple Shot, Pinning Shot, Called Shot, Tripwire, Shrapnel Charge, Snare Trap, Explosive Shot, Venom Coating, Hamstring, Deadfall, Harvest</td></tr>
 </table>
@@ -842,30 +838,45 @@ and it costs no Rage against a Broken target.</li>
 <h3>6.2 Mage</h3>
 <ul>
 <li><b>Pyromancer (Nuker)</b> — <b>Stat block:</b> 135 HP / 8% armor / +30% fire
-resist, −20% frost (the burning glass: armoured in his own element, soft to its
+resist, &minus;20% frost (the burning glass: armoured in his own element, soft to its
 opposite — the Cryomancer's deliberate mirror image).<br>
-Passive <i>Inferno Master</i>: +1% damage
-for every TURN of Burn standing on the enemy team, up to +25% (the spec chip shows the live
-bonus and the live turn count). Its core Magic
-Bolt is reforged into <b>Fireball</b> — free, 20% Atk fire / 15 BD / 2.0, no cd, applies
-3 turns of Burn (Perfect: hits at 25% of Attack).<br>
-Detonation — 25 Mana, 25% Atk fire / 20 BD / 3.0, 2cd; CONSUMES the target's Burn, adding
-150% of its remaining damage (tick × turns left × 1.5) to the hit before mitigation
-(Perfect: also applies 2 turns of Burn).<br>
-Wildfire — 20 Mana, 10 BD / 2.5, 3cd, no target selection; consumes ONE turn of Burn from
-EVERY burning enemy, each taking 18% of Attack in fire for it (an enemy down to its last
-turn simply loses its Burn; enemies that are not burning are untouched, and the ability
-cannot be cast with nothing alight). Inferno Master is measured BEFORE the consumption, so
-the cast that empties the field is still paid for it (Perfect: takes 2 turns from each
-instead, dealing the damage twice to anyone holding 2+).<br>
+Passive <i>Overburn</i>, three clauses and one mechanic. <b>Bonus:</b> +2% damage for every
+TURN of Burn standing on the enemy team, capped at +40%. <b>Drain:</b> at the start of each
+of his turns he loses 1 Mana for every one of those turns — and THAT HAS NO CAP.
+<b>Refund:</b> every turn of Burn he CONSUMES returns 1 Mana. The reward caps and the cost
+does not, so over-lighting the field is how he loses: one enemy at 3 turns is 3 Mana a turn
+for +6%, a full field at 20 burn-turns is 20 Mana a turn for +40% against a Mage's regen of
+22 (treading water, and unable to bank Detonation's 25), and at 24 he is going backwards.
+The spec chip shows both live numbers — the bonus he is being paid and the Mana his next
+turn will cost. He has NO defensive option anywhere in kit or tree; that is the spec.<br>
+His core Magic Bolt is reforged into <b>Fireball</b> — free, 20% Atk fire / 15 BD / 2.0,
+no cd, applies 3 turns of Burn (Perfect: hits at 25% of Attack). It stays free, so he can
+always light more — including when that is the wrong move.<br>
+Detonation — 25 Mana, 25% Atk fire / 20 BD / 3.0, 2cd; the NARROW release valve. CONSUMES
+one target's Burn, adding 250% of its remaining damage (tick × turns left × 2.5) to the hit
+before mitigation, and Overburn refunds a Mana for every turn eaten (Perfect: also applies
+2 turns of Burn).<br>
+Wildfire — 20 Mana, 10 BD / 2.5, 3cd, no target selection; the WIDE release valve. Consumes
+ONE turn of Burn from EVERY burning enemy, each taking 18% of Attack in fire for it (an
+enemy down to its last turn simply loses its Burn; enemies that are not burning are
+untouched, and the ability cannot be cast with nothing alight). Overburn is measured BEFORE
+the consumption, so the cast that empties the field is still paid for it, and its refund
+covers every turn taken (Perfect: takes 2 turns from each instead, dealing the damage twice
+to anyone holding 2+).<br>
 Flamewave — 25 Mana, 15% Atk fire to ALL / 5 BD / 3.0, 2cd; applies 2 turns of Burn to
 every enemy — those already Burning burn 2 turns longer instead (Perfect: 3 turns either
-way).<br>
-<i>Talent-granted:</i> Flame Shield — 15 Mana, 1.5, 2cd, self-cast: take 50% less damage
-for 2 turns and attackers are set Burning 3 turns (Perfect: also triggers an immediate Burn
-tick on every burning enemy). Firestorm — 30 Mana, 3.5, 4cd, capstone: 6-8 bolts at RANDOM
-enemies for 12% Atk each, each bolt applying 2 turns of Burn (Perfect: the bolts spread
-evenly across the living instead of falling at random).<br>
+way). It lights four fires and quadruples his drain, which is exactly the commitment it
+should be.<br>
+<i>Talent-granted:</i> Immolate — 15 Mana, 1.5, 2cd, self-cast: for 2 turns Overburn's
+damage cap is lifted ENTIRELY, its drain DOUBLES, and anyone who strikes him is set Burning
+3 turns (Perfect: holds a 3rd turn). Backdraft — 20 Mana, 2.0, 3cd: adds 2 turns of Burn to
+every burning enemy and starts no new fires (Perfect: 3 turns each). Pyroblast — 45 Mana,
+55% Atk fire / 25 BD / 6.0, no cd: half again against a target that is already Burning.
+Firestorm — 30 Mana, 3.5, 4cd, capstone: 6-8 bolts at RANDOM enemies for 12% Atk each, each
+bolt applying 2 turns of Burn — twelve to sixteen turns of drain in one cast (Perfect: the
+bolts spread evenly across the living instead of falling at random). Phoenix Rebirth — free,
+2.0, 4cd, capstone: sacrifice 25% of current health and Mana returns to FULL (Perfect: costs
+15% instead).<br>
 <b>Talent lanes:</b> see §7 — Kindling / Inferno / Detonation.</li>
 <li><b>Cryomancer (Control)</b> — <b>Stat block:</b> 135 HP / 8% armor / +30% frost
 resist, −20% fire (the Pyromancer's reflection — each mage is armoured in his own
@@ -1264,18 +1275,17 @@ siphons)</p>
 <tr><td>7</td><td><b>Unraveling</b> — When Ruin detonates, every other enemy gains 1 Ruin.</td><td><b>Lingering Torment</b> — When a madness effect expires, it leaves Decay behind for 2 turns (10 Break damage per turn).</td><td><b>Dark Barter</b> — Dark Pact heals the party for 25% of each member&#x27;s max health (up from the base 15%).</td></tr>
 <tr><td>CAP</td><td><b>Avatar of Ruin</b> — Ruin detonations no longer consume their stacks: a target held at 5 Ruin detonates again at the start of each of its turns.</td><td><b>Mass Hysteria</b> — New ability: Mass Hysteria — next turn every minion strikes a fellow with DOUBLE Break damage, Sundering them for 3 turns (30 Mana, 4.0 int, 4cd; Perfect: 3cd).</td><td><b>Soul Glut</b> — Whenever a hero heals by striking a Ruined target, the whole party heals for the same amount.</td></tr>
 </table>
-<p><b>Pyromancer</b> — <b>KINDLING</b> (building the fire) · <b>INFERNO</b> (profiting while it burns) · <b>DETONATION</b> (cashing it in: every node is a different answer to "how do I get more
-out of one Detonation")</p>
+<p><b>Pyromancer</b> — <b>KINDLING</b> (how fast you light up) · <b>INFERNO</b> (how much heat you can stand) · <b>DETONATION</b> (how big the trigger is). Every lane pays for the same commitment: the fire you light bills you a Mana a turn per burn-turn, uncapped, and only consuming it pays any of that back.</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Kindling</th><th>Inferno</th><th>Detonation</th></tr>
-<tr><td>1</td><td><b>Accelerant</b> — Your Burn ticks deal +1% of Attack (on top of the base 6%).</td><td><b>Pyromaniac</b> — Inferno Master grants +0.2% damage per turn of Burn on the enemy team, and its cap rises to match.</td><td><b>Super Nova</b> — Detonation gains +3% critical strike chance.</td></tr>
-<tr><td>2</td><td><b>Explosive Force</b> — Critical hits with fire abilities extend the target&#x27;s Burn by 1 turn(s).</td><td><b>Molten Core</b> — Take 2% less damage from burning enemies.</td><td><b>Implosion</b> — Detonation has a 3% chance to strike twice.</td></tr>
-<tr><td>3</td><td><b>Invigorating Ashes</b> — Every Burn tick has a 5% chance to restore 2% of the Pyromancer&#x27;s max Mana.</td><td><b>Melt Armor</b> — Every Burn tick melts the victim&#x27;s armor by 1% for the rest of the battle.</td><td><b>Seeding Embers</b> — When an enemy dies while Burning, gain 1% damage per Burn turn it had left, for your next turn.</td></tr>
-<tr><td>4</td><td><b>Flame Shield</b> — New ability: Flame Shield — take 50% less damage for 2 turns and attackers are set Burning for 3 turns (15 Mana, 1.5 int, 2cd).</td><td><b>Heat Haze</b> — Inferno Master&#x27;s cap rises by 10%.</td><td><b>Chain Reaction</b> — Detonation splashes 20% of its damage to every other burning enemy.</td></tr>
-<tr><td>5</td><td><b>Conflagration</b> — Flamewave applies +1 turn(s) of Burn (fresh fires and extensions alike).</td><td><b>Scorched Earth</b> — Burning enemies deal 5% less damage.</td><td><b>Fuse</b> — Detonation has a 15% chance to reset its own cooldown.</td></tr>
-<tr><td>6</td><td><b>Cinder Trail</b> — Fireball also applies 1 turn(s) of Burn to one random other enemy.</td><td><b>Ashes of Al&#x27;ar</b> — Upon death: 11% chance to revive with 25% health (once per battle).</td><td><b>Blast Radius</b> — Detonation consumes 25% more of the target&#x27;s remaining Burn damage.</td></tr>
-<tr><td>7</td><td><b>Ember Wind</b> — When an enemy dies Burning, its remaining Burn transfers to a random living enemy.</td><td><b>Living Flame</b> — While 3 or more enemies burn, regain 3% of max Mana each turn.</td><td><b>White Heat</b> — Detonation always critically strikes a target with 5+ turns of Burn (4+ at rank 2).</td></tr>
-<tr><td>CAP</td><td><b>Firestorm</b> — New ability: Firestorm — rain fire on 6-8 random enemies for 12% of Attack each, applying Burn (30 Mana, 3.5 int, 4cd).</td><td><b>Avatar of Flame</b> — Inferno Master has no cap — every turn of Burn on the enemy team grants its full bonus — and the Pyromancer&#x27;s fire damage ignores enemy fire resistance.</td><td><b>Cataclysm</b> — After Detonation resolves, it fires again at the burning enemy with the most Burn remaining for 60% of its damage, chaining up to 3 additional times (each 60% of the one before).</td></tr>
+<tr><td>1</td><td><b>Cinder Trail</b> &mdash; Fireball's Burn lasts 1 turn longer — 4 turns instead of 3.</td><td><b>Fire Walker</b> &mdash; Overburn's Mana drain is reduced by 25%.</td><td><b>Focused Flame</b> &mdash; Detonation's Burn bonus rises from 250% to 325%.</td></tr>
+<tr><td>2</td><td><b>Accelerant</b> &mdash; Your Burn ticks deal +4% of Attack, on top of the base 6%.</td><td><b>Invigorating Ashes</b> &mdash; Every Burn tick has a 20% chance to restore 3% of max Mana.</td><td><b>Pressure Cooker</b> &mdash; Detonation deals +25 Break damage to a Burning target.</td></tr>
+<tr><td>3</td><td><b>Conflagration</b> &mdash; Flamewave applies +2 turns of Burn, fresh fires and extensions alike.</td><td><b>Heat Shimmer</b> &mdash; Overburn's damage cap rises from +40% to +60%.</td><td><b>Aftershock</b> &mdash; Detonation re-applies 2 turns of Burn to the target after consuming.</td></tr>
+<tr><td>4</td><td><b>Backdraft</b> &mdash; New ability: Backdraft — add 2 turns of Burn to every burning enemy (20 Mana, 2.0 int, 3cd).</td><td><b>Immolate</b> &mdash; New ability: Immolate — for 2 turns Overburn's damage cap is lifted entirely, its drain doubles, and anyone who strikes you is set Burning 3 turns (15 Mana, 1.5 int, 2cd).</td><td><b>Pyroblast</b> &mdash; New ability: Pyroblast — a slow, enormous bolt for 55% of Attack, +50% against a Burning target (45 Mana, 6.0 int).</td></tr>
+<tr><td>5</td><td><b>Wildfire Spread</b> &mdash; Wildfire applies 1 turn of Burn to non-burning enemies before it consumes.</td><td><b>Kiln-Forged</b> &mdash; +20% fire resistance, and Overburn's drain can never take you below 10 Mana.</td><td><b>Crucible</b> &mdash; Consuming Burn refunds 2 Mana per turn instead of 1.</td></tr>
+<tr><td>6</td><td><b>Explosive Force</b> &mdash; Critical hits with fire abilities extend the target's Burn by 2 turns.</td><td><b>Ash Lung</b> &mdash; While Overburn's drain exceeds your Mana regeneration, you deal +15% damage.</td><td><b>Twin Detonation</b> &mdash; Detonation's cooldown drops to 1.</td></tr>
+<tr><td>7</td><td><b>Chain Ignition</b> &mdash; An enemy that dies Burning splits its remaining Burn turns among the survivors.</td><td><b>Cauterise</b> &mdash; Drain that would take you below 0 Mana takes health instead, 1 HP per Mana — and your damage cap is removed while you are under 20 Mana.</td><td><b>Total Commitment</b> &mdash; Detonation consumes Burn from the target and the two enemies adjacent to it.</td></tr>
+<tr><td>CAP</td><td><b>Firestorm</b> &mdash; New ability: Firestorm — rain fire on 6-8 random enemies for 12% of Attack each, applying Burn (30 Mana, 3.5 int, 4cd).</td><td><b>Phoenix Rebirth</b> &mdash; New ability: Phoenix Rebirth — sacrifice 25% of current health and your Mana returns to full (2.0 int, 4cd).</td><td><b>Cataclysm</b> &mdash; Detonation consumes the Burn from EVERY burning enemy and adds all of it to the hit.</td></tr>
 </table>
 <p><b>Cryomancer</b> — <b>DEEP FREEZE</b> (reaching and holding Frozen) · <b>SHATTERPOINT</b> (the burst payoff) · <b>WINTER</b> (the field aura)</p>
 <table border="1" cellpadding="4">

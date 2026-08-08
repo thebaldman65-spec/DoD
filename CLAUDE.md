@@ -179,6 +179,138 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   party.tscn is the HERO SHEET now, opened from a card.
 
 ## Current systems snapshot (2026-08-07)
+BATCH AR (08-07) — THE PYROMANCER, RE-AUTHORED AROUND COMMITMENT. First of
+the Mage three, and the last of the four class batches AI promised. One spec
+only; the other eleven trees and enemy tuning are UNTOUCHED.
+§1 INFERNO MASTER -> **OVERBURN**, one mechanic in three clauses. BONUS +2%
+damage per remaining Burn turn on the enemy team, CAPPED at +40%. DRAIN 1 Mana
+per burn-turn at the start of each of his turns, **UNCAPPED**. REFUND 1 Mana
+per turn of Burn he CONSUMES. **THE ASYMMETRY IS THE DESIGN AND MUST SURVIVE
+ANY LATER EDIT: the reward caps and the cost does not.** At 20 burn-turns he
+pays 20 against a Mage regen of 22 (treading water, cannot bank Detonation's
+25); at 24 he is going backwards. That squeeze is the spec's characteristic
+failure and it is meant to be reachable in ordinary play.
+FOUR NAMED READ SITES, one clause apiece, all in battle.gd and all next to
+each other: `_overburn_mult` (the bonus + THE ONE PLACE THE CAP IS DECIDED,
+via `_overburn_capped`), `_overburn_drain` (the cost — nothing may give it a
+ceiling), `_overburn_tick` (the turn-start bill; called from _player_turn
+AFTER the regen drip and NOWHERE ELSE — the order is what makes the squeeze
+happen, and a test asserts it positionally), `_overburn_refund` (the refund,
+TWO call sites: Detonation and Wildfire. It is a property of the PASSIVE, so
+anything the tree later teaches to eat Burn inherits it with no second
+implementation). `_mana_regen(u)` was extracted for the same reason — the drip
+and Ash Lung both ask "what is his regen" and must not each carry a 12.
+The 6% GLOBAL BURN TICK CONSTANT IS NOT TOUCHED — the proposal to weaken it
+was dropped deliberately (the drain already makes unspent fire cost something,
+and that constant is shared with enemies, runes and every other burn source).
+§2 KIT: Detonation's Burn bonus 150% -> 250% (cost/cd/BD unchanged) = the
+narrow release valve; Wildfire unchanged mechanically = the WIDE one, its desc
+now says so; Flamewave and Fireball unchanged (Fireball stays FREE on purpose
+— he can always light more, including when that is wrong). FLAME SHIELD IS
+RE-SPECCED INTO **IMMOLATE** and stops being defensive: 2 turns of no cap +
+DOUBLE drain + attackers set Burning 3. Its 50%-less-damage branch is DELETED,
+not left unreachable. PYROBLAST + PHOENIX REBIRTH out of the vault as tree
+nodes; Phoenix DROPS ITS EMPOWER CLAUSE (Empower is the Holy Cleric's named
+Mercy mechanic and this was a name collision, not a design), and its def MOVED
+out of `Classes.vault_ability` INTO the tree so exactly one copy exists —
+pool_ability finds it via Talents.granted_ability. Pyroblast needed no
+subsystem: a plain damage ability plus one conditional at the damage site.
+**THE PYROMANCER NOW HAS NO DEFENSIVE OPTION ANYWHERE IN KIT OR TREE. THAT IS
+DELIBERATE** — he is the commitment spec and an escape hatch is the one thing
+that would undo the batch. Molten Core, Scorched Earth and Ashes of Al'ar all
+went with it. test_batch_ar asserts the absence; do not "fix" it.
+POOLS: "Flame Shield" stopped existing, so it left SPEC_POOLS["pyromancer"]
+(-> "Immolate") AND CLASS_POOLS["mage"] (11 entries now, was 12). Immolate and
+Pyroblast are spec-only — both read Overburn, so both fail AH's curation rule.
+§3/§7 ALL 24 NODES RE-AUTHORED, **EVERY ID SURVIVES**, saved picks migrate,
+NO SAVE VERSION MOVES (still v7). FOUR IDS CHANGED LANE (py_invigorating and
+py_flame_shield Kindling->Inferno, py_melt and py_ashes Inferno->Kindling) —
+legal, and the reason test_batch_ar repeats the shape audit test_batch_ai
+already does generically. THE FULL OLD->NEW MAPPING TABLE IS IN THE CHANGELOG.
+ONE FORCED ASSIGNMENT, REPORTED NOT HIDDEN: Ashes of Al'ar (self-revive) has
+no successor because §2 removes every defence; py_ashes carries Wildfire
+Spread purely because a slot had to hold it. If the designer wants the revive
+back it belongs Mage-wide or on a relic, NOT in this tree.
+MAGNITUDES ARE **ADDITIVE, NOT RANKED**. accelerant_ranks is percentage POINTS
+(node 4, rune 1) and conflagration_ranks is a TURN COUNT (node 2, rune 1), so
+node and rune each pay their advertised number alone AND stacked. That is AL's
+repair rule applied up front rather than after the fact — the alternative
+(`4 * ranks`) would silently quadruple the rune.
+NEW FIELDS, one read site each: wildfire_spread, fire_walker, kiln_forged (its
++20% fire resist lands at the SPAWN site beside the relic resist block, and
+party_screen mirrors it or the sheet lies), ash_lung, cauterise, focused_flame,
+pressure_cooker, aftershock, crucible, total_commitment. Twin Detonation has
+NO field — it SETS Detonation's cooldown the way Relentless sets Hack and
+Slash's bleed_chance. PRESSURE COOKER READS A CAPTURED FLAG, not the status:
+Detonation eats the Burn in the raw-damage block, which runs BEFORE the Break
+calc, so `has_status("burn")` is already false on the very target it means
+(the same ordering trap AG fixed for the passive).
+§4 THE RUNE AUDIT. **RE-POINTED:** the Rune of the Cinder Trail -> its own
+`rune_cinder_ember` term (the node took cinder_trail_ranks for a new meaning);
+added to Runes.STAT_INT_KEYS because it is a bare 1 that does not end in
+"_ranks" — the AA/AB float-into-int trap. **STILL LIVE, RUNE-ONLY NOW** (nodes
+gone, read sites deliberately KEPT): supernova_ranks, molten_ranks,
+blast_radius_ranks. **INERT AND FLAGGED, NOT GUESSED:** `pyromaniac_ranks` —
+the White Flame's middle clause ("Inferno Master grants +1% per burning
+enemy") has no home, because Overburn has no per-turn step and inventing one
+is the guess §4 forbids. The rune is left exactly as authored; test_batch_ar
+ASSERTS THE CLAUSE IS INERT, so a re-authoring has to come and change that
+assertion. runes.json changed by ONE field name — a dead-counter re-point, NOT
+the magnitude pass the designer closed in AF.
+UNREACHABLE-BUT-KEPT (vault pattern, reported so a later batch can re-node or
+delete): seeding_ranks, melt_ranks/melted, ashes_ranks, scorched_ranks,
+living_flame_ranks, implosion_ranks, chain_reaction_ranks, fuse_ranks,
+white_heat_ranks, avatar_flame. Each is gated `> 0` and can never be non-zero.
+§5 THE BOT knows ONE new rule: **consume Burn when the drain exceeds Mana
+regeneration** — Detonation on the largest stack, Wildfire when Detonation is
+cooling. Immolate/Backdraft are held back while underwater. Instrument
+honesty, not tuning.
+VERIFIED: check_parse 0 failures, check_flow 0 failures (6 screens), 11 scenes
+0 SCRIPT ERROR. NEW test_batch_ar.gd 885 checks / 0 failures, STABLE 8/8.
+ITS FIRST DRAFT WAS FLAKY AND THE FLAKE WAS CAPTURED, NOT WAITED OUT: driving
+`_resolve` by hand leaves the 5% miss and 5% parry rolls live, and a skipped
+damage path reads exactly like "the node did nothing" — "Fireball lit the
+target" failed 1 run in 8, and a parried Detonation failed Total Commitment's
+three checks together. `_spawn` now arms `no_cover` (the Sharpshooter's miss
+BYPASS) and zeroes parry/block on both sides, the AK/AL discipline: FORCE
+determinism, never retry until it passes. ALSO NOTE `_player_turn` CANNOT BE
+DRIVEN HEADLESSLY — it awaits an ability pick that never comes, which is why
+the drain lives in `_overburn_tick` and the regen-then-bill ORDER is asserted
+positionally against the source instead. Regression:
+test_batch_an 6044/0, test_batch_ah 5410/0 (STAMP GATE bumped AQ -> AR),
+ah_battle 65/0, ai 2036/0, aj 403/0, ak 523/0 (was 524 — the mage class pool
+lost one entry, every remaining one still resolves), al 556/0, test_runes
+2982/0, run-harness gates 1/2/3 PASS.
+**THE STANDING test_rune_battle 91/1 DEFECT IS CLOSED — 94/0, stable 5/5.**
+Its Inferno chip assertion was RE-POINTED at Overburn rather than deleted (the
+question it was really asking — does the live chip read live state — is still
+worth asking). A SECOND, OLDER RACE IN THE SAME FILE WAS FOUND AND FIXED WHILE
+THERE: the White Flame check read the combat log 900 frames AFTER the forced
+hit, so it raced fight length and failed ~1 run in 3. AH's fix made the line
+get WRITTEN; it did not make it survive to be READ. The log is snapshotted at
+the forced hit now.
+NEGATIVE CONTROLS RUN, because a test that cannot fail proves nothing: capping
+the DRAIN at 40 trips 40 checks, Detonation back at 150% trips 1, renaming
+py_cauterize trips 6, and flattening Crucible's refund rate trips 1.
+KIT SMOKE, fixed lineup, 40 battles/row, berserker,pyromancer,inquisitor,
+beastmaster, DOD_SIM_TALENTS force-learning full 8-node builds (standalone sims
+spend no points, so an unloaded run never touches these nodes at all). All rows
+40/40 wins, 0 SCRIPT ERROR, and every new ability appears in the rotation
+(Backdraft, Immolate, Pyroblast, Firestorm). MEASURED AND FLAGGED, NOT NERFED —
+**KINDLING IS THE STANDOUT**: his damage share 46% ungeared -> 66% on the full
+Kindling build, vs 48% Inferno and 50% Detonation. Firestorm + Backdraft +
+Accelerant's 4%/tick + Conflagration's +2 turns compound, and the drain that is
+supposed to price that does not bite in a 7-round smoke fight. Kit-mechanics
+ratios ONLY — the smoke lineup carries NO difficulty signal (Batch R) and these
+magnitudes are the batch's own, so it ships as written.
+NO DIFFICULTY MEASUREMENT AND NO SIM ROW, deliberately — same reasoning as AJ/
+AK/AL: a single-spec re-author has no honest control row against a fixed
+four-hero party, and ./sim.sh carries no difficulty signal (Batch R).
+TWO CLAIMS IN THE BATCH BRIEF WERE STALE and are recorded rather than quietly
+actioned: (a) §6 asked for master.html's Wildfire text to be corrected from
+"spreads the target's Burn at half duration" — **IT ALREADY MATCHED THE CODE**,
+Batch AG updated it; (b) §4 predicted spec runes would break quietly and only
+ONE clause did. Same lesson as AP: a note in a brief is not evidence.
 BATCH AQ (08-07) — THE MODIFIER POOL 6 -> 19, AND UPGRADES YOU CAN SEE.
 Authoring plus one design change; no new subsystem.
 §1/§3 THIRTEEN NEW MODIFIERS. Counts by severity 6/6/4/3 (was 1/2/2/1). THE
@@ -969,7 +1101,9 @@ schedule (Run._migrate_trees / _batch_ai_point_schedule) — the old ranked,
 point-priced purchases have no honest translation.
 test_batch_ai.gd (2042 checks) pins all of it. test_runes' exclusive-pair
 alarm is RETIRED with its reasoning in the file: at row granularity every
-spec rune would trip it. EXPECTED: structurally correct, NUMERICALLY WEAK
+spec rune would trip it. ALL FOUR CLASS BATCHES HAVE NOW LANDED (AK Swordmaster, AJ
+Berserker, AL Warden, AR Pyromancer) — the remaining EIGHT trees still carry
+AI's structure at AI's magnitudes. EXPECTED: structurally correct, NUMERICALLY WEAK
 — rows lopsided, single-rank = old rank-1 values (~1/3 power). DO NOT
 TUNE; the four class batches re-author all 252 nodes. MEASURED (30 runs
 each side, same flags): depth 17.10+/-1.55 -> 13.40+/-0.86 (bands don't
@@ -2632,8 +2766,12 @@ via apply_kit_overrides (free, 20% Atk frost, 1 chilled stack, perfect
 flat 25%); Razor Ice v2 (3 random, +3%/chilled stack, perfect chills
 unchilled); Blizzard v2 (aoe, 1-2 stacks each, perfect_id "mana5");
 Ice Lance (auto-crit vs frozen, perfect pr=20). Old Frost Bolt VAULTED.
-PYROMANCER REWORK (07-16; the passive and Wildfire are SUPERSEDED BY
-BATCH AG above — read that block, not this one): passive "inferno" =
+PYROMANCER REWORK (07-16 — **HISTORY ONLY, SUPERSEDED TWICE OVER**: Batch AG
+reworked the passive and Wildfire, and BATCH AR replaced the passive outright
+with OVERBURN, re-specced Flame Shield into Immolate and re-authored all 24
+tree nodes. READ THE AR BLOCK, not this one; nothing below describes live
+code except the Fireball override and the Flamewave/Detonation shapes):
+passive "inferno" =
 Inferno Master (+5% dmg per burning enemy, cap 25%; live spec chip via _update_talent_chips; the
 old "ignite" on-hit passive is GONE). Core Magic Bolt → Fireball via
 apply_kit_overrides (free, 20% Atk fire, 15BD, burn 3t; perfect = flat
@@ -2763,6 +2901,21 @@ Space or left click; no announcer text (combat log only).
   The open lever remains authored rune POWER — a runes.json data edit,
   not machinery — and the dilution question (see the AB block).
 - Sim bot wins ~90%+ with 4 heroes; real difficulty tuning by user playtest.
+- EIGHT TALENT TREES STILL CARRY BATCH AI'S MAGNITUDES. The four class batches
+  AI promised are done (AK Swordmaster, AJ Berserker, AL Warden, AR
+  Pyromancer); Cryomancer, Arcanist, the three Clerics and the three Hunters
+  are structurally correct and numerically weak — single-rank nodes at the old
+  rank-1 values, i.e. roughly a third of the power a row should be priced at.
+- ASHES OF AL'AR HAS NOWHERE TO LIVE (Batch AR). The Pyromancer's self-revive
+  was removed with every other defensive option, deliberately, and its id now
+  carries an unrelated node. If the designer wants it back it belongs Mage-wide
+  or on a relic — putting it in a Pyromancer lane re-opens the escape hatch AR
+  closed.
+- THE RUNE OF THE WHITE FLAME HAS AN INERT CLAUSE (Batch AR). "Inferno Master
+  grants +1% per burning enemy" has no counterpart under Overburn; the rune is
+  left as authored and test_batch_ar pins the clause inert. Re-authoring it is
+  a design call, not a repair — and it is one clause of three, the other two
+  are live.
 - ABILITY UPGRADES ARE WIRED AND VISIBLE BUT STILL A PLACEHOLDER POOL OF FOUR
   (AP built the machinery, AQ built the three surfaces, both deliberately
   authoring nothing). The authoring batch has somewhere to land now: add ids

@@ -64,7 +64,11 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# Batch AB: the Hunter trees are full of these — flag talents whose
 	# payload is a bare 1. Same trap, same list.
 	"loyalty_cap_bonus", "deep_focus", "perfect_form", "opening_volley",
-	"coated_blades", "vulture"]
+	"coated_blades", "vulture",
+	# Batch AR: the Rune of the Cinder Trail was re-pointed onto its own term
+	# when the node took cinder_trail_ranks for a new meaning. Same trap, same
+	# list — it is a bare 1 that does not end in "_ranks".
+	"rune_cinder_ember"]
 
 static var _data := {}
 

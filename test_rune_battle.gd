@@ -13,6 +13,7 @@ extends SceneTree
 
 const REAL_SAVE := "user://run_save.bin"
 
+var _pierce_log := ""
 var checks := 0
 var fails: Array = []
 var _save_backup: PackedByteArray = PackedByteArray()
@@ -282,19 +283,53 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 		ok(equipped[spec].size() == 4, "%s: equipped %d spec runes, expected 4" % [
 			spec, equipped[spec].size()])
 
-	if by_spec.has("inferno"):
-		var py: Node = by_spec["inferno"]
-		# White Flame's new field, and its ONLY read site's input.
+	# RE-POINTED IN BATCH AR, and this is the standing 91/1 defect closing.
+	# The old block asserted the INFERNO MASTER chip against a string Batch AG
+	# had already changed ("+N% damage for each burning enemy" became a
+	# per-burn-TURN readout), so it failed on unmodified HEAD from AK onward.
+	# Batch AR replaced the passive outright, so the check is re-pointed at
+	# OVERBURN rather than deleted: the question it was really asking — does
+	# the live chip read live state, or a stale snapshot — is still worth
+	# asking, and is asked here of the new passive.
+	if by_spec.has("overburn"):
+		var py: Node = by_spec["overburn"]
+		# White Flame's own field, and its ONLY read site's input.
 		ok(py.rune_resist_pierce > 0.0, "pyromancer: rune_resist_pierce never applied")
-		# Counter stacking: two runes both feed Inferno Master's step.
-		ok(py.pyromaniac_ranks >= 1, "pyromancer: pyromaniac_ranks never applied")
-		ok(py.cinder_trail_ranks >= 1, "pyromancer: cinder_trail_ranks never applied")
-		# THE CHIP GOTCHA: the live passive readout must show the rune's
-		# contribution, not the talent-only number.
+		# The write still LANDS (an unknown field name would be dropped in
+		# silence) — but nothing reads it. Overburn has no per-turn step to
+		# raise, so the White Flame's middle clause is INERT and flagged for
+		# re-authoring; see Batch AR §4. This assertion is the flag.
+		ok(py.pyromaniac_ranks >= 1,
+			"pyromancer: pyromaniac_ranks never applied (the write must still land)")
+		# The Rune of the Cinder Trail was RE-POINTED when the node took
+		# cinder_trail_ranks for a new meaning; it rides its own term now.
+		ok(py.rune_cinder_ember >= 1,
+			"pyromancer: rune_cinder_ember never applied (the re-point)")
+		# THE CHIP GOTCHA, re-pointed: the live passive readout must show the
+		# field as it stands NOW — both halves of the trade, the bonus and the
+		# drain — not a value snapshotted at spawn.
+		# One enemy, then put the field back exactly as it was: the White
+		# Flame check further down forces a hit into this same live battle,
+		# and a probe that leaves the board changed is a probe that breaks
+		# the next assertion instead of the code.
+		var lit_foe: BattleUnit = null
+		for foe in scene.get("enemies"):
+			if not foe.dead and not foe.has_status("burn"):
+				lit_foe = foe
+				break
+		if lit_foe != null:
+			scene.call("_apply_status", lit_foe, "burn", 3, 0, 6)
+		var lit: int = scene.call("_total_burn_turns")
 		scene.call("_update_talent_chips")
 		var chip := String(py.get_status("spec_passive").get("desc", ""))
-		ok(chip.find("+%d%% damage for each burning" % (5 + py.pyromaniac_ranks)) >= 0,
-			"pyromancer: the Inferno chip does not read the rune-boosted step (%s)" % chip)
+		ok(chip.find("Overburn") >= 0,
+			"pyromancer: the passive chip does not name Overburn (%s)" % chip)
+		ok(lit > 0 and chip.find("+%d%%" % (lit * 2)) >= 0,
+			"pyromancer: the chip does not read the LIVE bonus (%s)" % chip)
+		ok(lit > 0 and chip.find("-%d Mana" % lit) >= 0,
+			"pyromancer: the chip does not read the LIVE drain (%s)" % chip)
+		if lit_foe != null:
+			lit_foe.remove_status("burn")
 	if by_spec.has("permafrost"):
 		var cr: Node = by_spec["permafrost"]
 		ok(cr.hypothermia_ranks >= 2, "cryomancer: hypothermia_ranks never applied")
@@ -357,11 +392,22 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 	# it 6/6 again). "The bot happened to get a turn" is not a thing a check
 	# should depend on, so the hit is forced instead of hoped for. Every
 	# enemy in this lineup resists fire, so any of them exercises the site.
-	if mage_spec == "pyromancer" and by_spec.has("inferno"):
-		var wf_py: BattleUnit = by_spec["inferno"]
-		var wf_foes: Array = scene.get("enemies")
+	if mage_spec == "pyromancer" and by_spec.has("overburn"):
+		var wf_py: BattleUnit = by_spec["overburn"]
+		# A LIVING target: by this point the autoplay battle has been running,
+		# and a hit onto a corpse exercises nothing.
+		var wf_foes: Array = scene.get("enemies").filter(func(e): return not e.dead)
+		ok(not wf_foes.is_empty(), "pyromancer: no living enemy left to force a hit onto")
 		if not wf_foes.is_empty():
 			await scene._resolve(wf_py, wf_py.abilities[0], wf_foes[0], "good")
+			# SNAPSHOT THE LOG HERE, not after the fight. Reading it 900 frames
+			# later made this a race against how long the battle runs, which is
+			# exactly the flake Batch AH thought it had closed by forcing the
+			# hit: forcing fixed WHETHER the line is written, not whether it
+			# survives to be read. The forced hit is the proof, so it is read
+			# the moment it happens.
+			for rt in scene.find_children("*", "RichTextLabel", true, false):
+				_pierce_log += rt.get_parsed_text()
 
 	# Let the fight actually run: a rune that crashes mid-battle is the
 	# failure a spawn-time check cannot see. The roll call is logged when
@@ -379,8 +425,11 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 	ok(log_text.find("Rune: ") >= 0, "%s: no Rune: tag anywhere in the log" % label)
 	if mage_spec == "pyromancer":
 		# The White Flame's ONLY read site, proven live against a fire-
-		# resistant warband rather than assumed from the source.
-		ok(log_text.find("Rune: the flame bites through resistance") >= 0,
+		# resistant warband rather than assumed from the source. Read off the
+		# snapshot taken at the forced hit (see above) OR the final log —
+		# either is proof, and the snapshot is the one that cannot race.
+		ok(_pierce_log.find("Rune: the flame bites through resistance") >= 0
+			or log_text.find("Rune: the flame bites through resistance") >= 0,
 			"pyromancer: rune_resist_pierce never fired against a resistant warband")
 	for spec in specs:
 		var missing: Array = []

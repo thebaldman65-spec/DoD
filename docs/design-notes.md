@@ -4,6 +4,40 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A reward that caps and a cost that does not (Batch AR) — 2026-08-07
+
+The Pyromancer's loop was already build-and-spend, and two things quietly
+defused it. His fire is free, so the bank filled itself. And the old
+passive paid him for *having* lit enemies, so his damage arrived whether
+or not he ever pulled the trigger — Detonation was a bonus rather than a
+decision. Both are one problem wearing two faces: **nothing in the spec
+ever charged him for the fire he was already being paid for.**
+
+Overburn charges him. The interesting part is not the drain, it is the
+shape of the pair: **the reward caps at +40% and the cost keeps climbing
+forever.** Under 20 burn-turns the two move together and the spec plays
+like it always did. Past 20 the bonus stops and the bill does not, so the
+field he built to be strong is the field that bankrupts him — and the only
+way out is to *spend* it, which is exactly the button the old design made
+optional. The refund is what turns that from a trap into an engine:
+consuming a six-turn Burn returns six Mana **and** drops the recurring
+drain by six a turn, so cashing in is the answer to every problem he has.
+
+Two things follow from that shape and were decided by it. The drain sits
+on **Mana, not health**, because a health cost is a clock you carry into
+the next fight and this has to be a decision you make inside one — which
+is why Cauterise, the one node that moves it back onto health, is an
+opt-in and reads as the sharpest thing in the tree. And the spec keeps
+**no defensive option anywhere**, in kit or tree, because an escape hatch
+is the single change that would undo the whole batch: the moment there is
+a button that says "survive the mistake", over-lighting the field stops
+being a mistake.
+
+The 6% global Burn tick was left alone on the same reasoning. A proposal
+came in to weaken tick damage so unspent fuel was wasted — but that is the
+same idea aimed at a shared constant. Overburn already makes unspent fire
+cost something, and it does it where only the Pyromancer feels it.
+
 ## A node that modifies an ability you may never draw (Batch AL) — 2026-08-06
 
 **Batch AH created a class of dead talent quietly, and the Warden had two

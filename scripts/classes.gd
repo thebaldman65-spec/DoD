@@ -162,8 +162,9 @@ const SPEC_POOLS := {
 	# Batch AK: Guard Change came OUT of this pool and back into the opening
 	# three; Shatterpoint went the other way.
 	"swordmaster": ["Sweeping Strikes", "Shatterpoint", "Lunge", "Execute"],
-	# Mage.
-	"pyromancer": ["Flame Shield", "Firestorm"],
+	# Mage. Batch AR re-specced Flame Shield into IMMOLATE, which reads
+	# Overburn and so can only ever be a spec pick.
+	"pyromancer": ["Immolate", "Firestorm"],
 	"cryomancer": ["Rime", "Shatter"],
 	"arcanist": ["Overcharge", "Magi's Wrath"],
 	# Cleric. The three Mercy/Faith spenders can only ever be spec picks —
@@ -193,7 +194,12 @@ const CLASS_POOLS := {
 		"Battle Shout", "Rampage", "Mocking Blow", "Crushing Blow", "War Stomp",
 		"Shieldwall", "Interpose", "Hold the Line", "Overpower", "Pommel Strike",
 		"Shatterpoint", "Sweeping Strikes", "Execute", "Rallying Shout"],
-	"mage": ["Flamewave", "Flame Shield", "Firestorm", "Razor Ice", "Blizzard",
+	# Batch AR: "Flame Shield" LEFT this pool because it stopped existing —
+	# the node that defined it is Immolate now, and Immolate reads Overburn,
+	# so it fails the curation rule that a class-pool entry must FUNCTION for
+	# a sibling. Pyroblast is a Pyromancer tree node and is deliberately NOT
+	# listed: its bonus reads a Burn the taker cannot apply.
+	"mage": ["Flamewave", "Firestorm", "Razor Ice", "Blizzard",
 		"Ice Lance", "Rime", "Arcane Barrage", "Mana Shield", "Arcane Surge",
 		"Reality Fracture", "Phoenix Rebirth"],
 	"cleric": ["Heal", "Renewal", "Divine Shield", "Consecrated Ground",
@@ -280,7 +286,9 @@ static func pool_ability(display_name: String) -> Ability:
 # picks without a line of new mechanics. FIVE could NOT come back, because
 # their machinery went with them: Pyroblast, Flame Surge, Frost Bolt, Death
 # Ray and Mend Wounds are prose in a comment, not code, and reviving them
-# would mean AUTHORING them. Three of the ten below (Mana Shield, Arcane
+# would mean AUTHORING them. BATCH AR AUTHORED PYROBLAST — it is a plain
+# damage ability plus one conditional in the existing damage block, which is
+# why it needed no subsystem; the other four are still prose. Three of the ten below (Mana Shield, Arcane
 # Surge, Reality Fracture) kept their full dicts in the vault comments and
 # come back verbatim; the other seven needed a cost/cooldown/initiative
 # wrapper around effects the handler already defines exactly, and THOSE
@@ -313,11 +321,11 @@ static func vault_ability(display_name: String) -> Ability:
 				"delay": 2.0, "anim": "attack03", "delay_push": 6.0, "cooldown": 3,
 				"perfect_id": "", "perfect_text": "An Arcanist also banks 1 Resonance",
 				"description": "Shove the target far down the\ninitiative order."})
-		"Phoenix Rebirth":
-			return Ability.make({"display_name": "Phoenix Rebirth", "cost": 0,
-				"special": "phoenix", "delay": 2.0, "anim": "attack03", "cooldown": 4,
-				"perfect_id": "", "perfect_text": "Costs 15% of health instead",
-				"description": "Burn your own life for power: pay 25%\nof current health for FULL resource\nand 3 turns of Empower (+25% damage)."})
+		# PHOENIX REBIRTH IS NOT HERE ANY MORE. Batch AR made it the
+		# Pyromancer's Inferno capstone, so the TREE owns the only copy and
+		# pool_ability finds it through Talents.granted_ability — the same
+		# single-source rule every other talent grant follows. It stays in
+		# CLASS_POOLS["mage"] and still resolves; only the def moved.
 		"Dawnbreak":
 			return Ability.make({"display_name": "Dawnbreak", "cost": 20,
 				"special": "dawnbreak", "target": Ability.Target.ALLY,
@@ -695,11 +703,11 @@ const SPEC_INFO := {
 	# The Pyromancer and Cryomancer are mirror-image glass cannons: armoured
 	# in their own element, soft to the opposite — a fire warband and a frost
 	# warband ask different questions of the same party.
-	"pyromancer": {"name": "Pyromancer", "constitution": 85, "archetype": "Nuker", "passive": "inferno",
+	"pyromancer": {"name": "Pyromancer", "constitution": 85, "archetype": "Nuker", "passive": "overburn",
 		"max_hp": 135, "armor": 0.08,
 		"resists": {"fire": 0.30, "frost": -0.20},
-		"passive_desc": "Inferno Master: +1% damage for every turn of Burn on the enemy team (up to +25%).",
-		"blurb": "Aggressive flame — burns that spread and stack."},
+		"passive_desc": "Overburn: +2% damage for every turn of Burn standing on\nthe enemy team, up to +40% — but at the start of each of\nhis turns he loses 1 Mana for every one of those turns,\nand THAT has no cap. Every turn of Burn he CONSUMES\nrefunds 1 Mana.",
+		"blurb": "Aggressive flame — spend everything, or the fire spends you."},
 	"cryomancer": {"name": "Cryomancer", "constitution": 85, "archetype": "Control", "passive": "permafrost",
 		"max_hp": 135, "armor": 0.08,
 		"resists": {"frost": 0.30, "fire": -0.20},
@@ -832,20 +840,22 @@ static func spec_abilities(spec: String) -> Array:
 			]
 		"pyromancer":
 			# Burn-centric kit (07-16 rework; the core Magic Bolt becomes
-			# Fireball via apply_kit_overrides). VAULTED — kept for future
-			# return: Pyroblast (45 Mana, 55%, 6.0, +50% vs Burning),
-			# Flame Surge (20 Mana, 15% AoE cone), Phoenix Rebirth
-			# (sacrifice 25% HP -> full Mana + Empower).
+			# Fireball via apply_kit_overrides). Batch AR made Detonation the
+			# win condition and re-specced Flame Shield into Immolate, so the
+			# spec has no defensive option anywhere in kit or tree — that is
+			# deliberate, and it is the whole point of the commitment spec.
+			# Pyroblast and Phoenix Rebirth came OUT of the vault as tree
+			# nodes. STILL VAULTED: Flame Surge (20 Mana, 15% AoE cone).
 			return [
 				Ability.make({"display_name": "Detonation", "cooldown": 2, "dmg_type": "fire", "cost": 25,
 					"damage": 25, "pressure": 20, "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Also applies 2 turns of Burn",
-					"description": "Ignite the wounds: consumes the target's\nBurn, adding 150% of its remaining\ndamage (tick × turns left × 1.5)\nto this hit."}),
+					"description": "The narrow release valve: consumes ONE\ntarget's Burn, adding 250% of its\nremaining damage (tick × turns left\n× 2.5) to this hit. Overburn refunds\n1 Mana for every turn consumed."}),
 				Ability.make({"display_name": "Wildfire", "cooldown": 3, "dmg_type": "fire", "cost": 20,
 					"damage": 0, "pressure": 10, "delay": 2.5, "anim": "attack02",
 					"special": "wildfire",
 					"perfect_id": "", "perfect_text": "Consumes 2 turns from each instead",
-					"description": "Drag the fire through them all: every\nburning enemy loses a turn of Burn and\ntakes 18% of Attack in fire."}),
+					"description": "The WIDE release valve: every burning\nenemy loses a turn of Burn and takes\n18% of Attack in fire. Detonation\nempties one bank; this one skims them\nall — and Overburn refunds every\nturn it takes."}),
 				Ability.make({"display_name": "Flamewave", "cooldown": 2, "dmg_type": "fire", "cost": 25,
 					"damage": 15, "pressure": 5, "delay": 3.0, "anim": "attack03", "aoe": true,
 					"perfect_id": "", "perfect_text": "3 turns of Burn instead",

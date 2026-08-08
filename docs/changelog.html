@@ -5,6 +5,181 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-07 — Batch AR: the Pyromancer — commitment</h2>
+<p><i>First of the Mage three. His lanes were purpose-designed and sound; what he needed was
+the repricing every node was missing, and a spine. Spend everything, and the payoff is
+behind the risk.</i></p>
+<ul>
+<li><b>Inferno Master is gone. OVERBURN replaces it, and it is one mechanic in three
+clauses.</b> <b>Bonus:</b> +2% damage per remaining turn of Burn on the enemy team, capped
+at +40%. <b>Drain:</b> at the start of each of his turns he loses 1 Mana for every one of
+those turns — <b>and that has no cap</b>. <b>Refund:</b> every turn of Burn he CONSUMES
+returns 1 Mana. Two things used to defuse his loop: his fire is free, so the bank filled
+itself, and the old passive paid him for HAVING lit enemies, so his damage arrived whether
+or not he ever pulled the trigger. Both are fixed by the same replacement.</li>
+
+<li><b>The asymmetry is the design: the reward caps and the cost does not.</b> One enemy at
+3 turns is 3 Mana a turn for +6% — trivial. A full field at 20 burn-turns is 20 Mana a turn
+for +40%, against a Mage's regen of 22: treading water, and unable to bank Detonation's 25.
+At 24 he is going backwards. That squeeze — <i>lit too much to afford the trigger</i> — is
+the spec's characteristic failure, and it is reachable in ordinary play, not a corner case.
+The refund is what makes the whole thing an engine rather than a trap: consuming a six-turn
+Burn returns 6 Mana <b>and</b> drops the drain by 6 a turn, so cashing in is the answer to
+every problem he has. Fireball stays free, so he can always light more — including when
+that is the wrong move.</li>
+
+<li><b>One rule, one implementation.</b> The refund is a property of the passive, not of any
+ability, so Detonation, Wildfire, Cataclysm and anything the tree later adds all inherit it
+from a single helper. Same for the drain and the cap.</li>
+
+<li><b>The spec chip shows both numbers live</b> — the bonus he is being paid and the Mana
+his next turn will cost — because half of a trade is not a readout.</li>
+
+<li><b>The 6% global Burn tick constant is NOT touched.</b> A proposal to weaken tick damage
+so unspent fuel was wasted was dropped deliberately: Overburn's drain already makes unspent
+fire cost something, and that constant is shared with enemies, runes and every other burn
+source in the game.</li>
+
+<li><b>Detonation becomes the win condition.</b> Its Burn bonus rises <b>150% → 250%</b> of
+the consumed Burn's remaining damage. Cost, cooldown and Break damage are unchanged. With
+the refund behind it, it is both his biggest hit and his release valve.</li>
+
+<li><b>Wildfire is the WIDE release valve where Detonation is the narrow one</b> —
+mechanically unchanged, and its description now says so.</li>
+
+<li><b>Flame Shield is re-specced into IMMOLATE and stops being defensive.</b> 15 Mana,
+1.5 initiative, 2cd, self-cast: for 2 turns Overburn's damage cap is lifted entirely, its
+drain doubles, and anyone who strikes him is set Burning 3 turns. Every clause pushes the
+same direction, and the retaliation burn feeds his own engine.</li>
+
+<li><b>This leaves the Pyromancer with no defensive option anywhere in his kit or tree. That
+is deliberate</b>, and it is flagged here rather than softened. He is the commitment spec;
+an escape hatch is the one thing that would undo the batch. Molten Core, Scorched Earth and
+Ashes of Al'ar all went with it.</li>
+
+<li><b>Pyroblast and Phoenix Rebirth come out of the vault</b> as tree nodes. Pyroblast:
+45 Mana, 55% of Attack, 6.0 initiative, +50% against a Burning target — no cooldown, because
+45 Mana under a drain arriving 6.0 down the bar is the whole limiter. Phoenix Rebirth ships
+with one correction: <b>the vaulted definition granted "Empower", which since the Holy
+Cleric's rework is a specific named mechanic belonging to her Mercy system. That clause is
+dropped.</b> It reads: sacrifice 25% of current HP, Mana returns to full. Under Overburn a
+full pool is precisely the relief he needs, and paying health for it is a choice he makes
+rather than a clock he carries — which is the whole reason the drain sits on Mana.</li>
+
+<li><b>All 24 nodes re-authored, and EVERY ID SURVIVES.</b> Saved picks migrate and
+<b>no save version moves</b> (still v7). Where a node changed what it does it was re-specced
+in place — the precedent is Batch AJ turning <code>bz_vitality</code> from Vitality into
+First Blood. No ids added, none deleted.</li>
+</ul>
+
+<p><b>THE FULL ID MAPPING</b> — so a later batch reading a saved pick can see where it went.
+Mapped by closest surviving intent; four ids changed lane, which is legal and expected.</p>
+<table border="1" cellpadding="4">
+<tr><th>id</th><th>was</th><th>is now</th><th>why this id</th></tr>
+<tr><td>py_kindling</td><td>Cinder Trail (K6) — Fireball embers a second enemy</td><td><b>Cinder Trail</b> (K1) — Fireball's Burn lasts 4 turns instead of 3</td><td>same name, same ability</td></tr>
+<tr><td>py_accelerant</td><td>Accelerant (K1) — Burn ticks +1%/rank</td><td><b>Accelerant</b> (K2) — Burn ticks +4% of Attack</td><td>identical; repriced</td></tr>
+<tr><td>py_arson</td><td>Conflagration (K5) — Flamewave +1 turn</td><td><b>Conflagration</b> (K3) — Flamewave +2 turns</td><td>identical; repriced</td></tr>
+<tr><td>py_melt</td><td>Melt Armor (I3) — Burn ticks shred armor</td><td><b>Backdraft</b> (K4) — new ability: +2 turns of Burn to every burning enemy</td><td>the field-wide "every burning enemy suffers more" node</td></tr>
+<tr><td>py_ashes</td><td>Ashes of Al'ar (I6) — self-revive</td><td><b>Wildfire Spread</b> (K5) — Wildfire lights the unburnt first</td><td><b>NO INTENT MATCH — the one forced assignment.</b> See the note below.</td></tr>
+<tr><td>py_explosive</td><td>Explosive Force (K2) — fire crits extend Burn 1</td><td><b>Explosive Force</b> (K6) — fire crits extend Burn 2</td><td>identical; repriced</td></tr>
+<tr><td>py_spreading</td><td>Ember Wind (K7) — a burning death passes its flame to one enemy</td><td><b>Chain Ignition</b> (K7) — a burning death SPLITS its turns among the survivors</td><td>same trigger, widened</td></tr>
+<tr><td>py_pyromaniac</td><td>Pyromaniac (I1) — raises the passive's step and cap</td><td><b>Fire Walker</b> (I1) — Overburn's drain is 25% lighter</td><td>the lane's row-1 "tune the passive" node; it tunes the cost now instead of the reward</td></tr>
+<tr><td>py_invigorating</td><td>Invigorating Ashes (K3) — 5%/rank chance of 2% Mana</td><td><b>Invigorating Ashes</b> (I2) — 20% chance of 3% max Mana</td><td>identical; repriced and moved to the lane it belongs in</td></tr>
+<tr><td>py_firebrand</td><td>Heat Haze (I4) — passive cap +10%</td><td><b>Heat Shimmer</b> (I3) — cap +40% → +60%</td><td>the passive-cap node, same job</td></tr>
+<tr><td>py_flame_shield</td><td>Flame Shield (K4) — new ability, defensive</td><td><b>Immolate</b> (I4) — new ability, the §2 re-spec</td><td>the re-spec the batch names outright</td></tr>
+<tr><td>py_molten</td><td>Molten Core (I2) — take less from burning enemies</td><td><b>Kiln-Forged</b> (I5) — +20% fire resistance, drain floors at 10 Mana</td><td>the tree's mitigation-flavoured node</td></tr>
+<tr><td>py_undying_flame</td><td>Living Flame (I7) — Mana while 3+ burn</td><td><b>Ash Lung</b> (I6) — +15% damage while the drain outruns regen</td><td>both are "while the field burns hard, you gain"</td></tr>
+<tr><td>py_cauterize</td><td>Scorched Earth (I5) — burning enemies hit softer</td><td><b>Cauterise</b> (I7) — the drain bills health; no cap under 20 Mana</td><td>the id was authored for a node called Cauterize; AR restores that name to it</td></tr>
+<tr><td>py_shockwave</td><td>Blast Radius (D6) — Detonation consumes 25% more</td><td><b>Focused Flame</b> (D1) — Detonation's Burn bonus 250% → 325%</td><td>the same mechanic: the magnitude of Detonation's Burn bonus</td></tr>
+<tr><td>py_supernova</td><td>Super Nova (D1) — Detonation crit chance</td><td><b>Pressure Cooker</b> (D2) — +25 Break damage on a Burning target</td><td>both are "Detonation's single strike is worth more"</td></tr>
+<tr><td>py_implosion</td><td>Implosion (D2) — Detonation can strike twice</td><td><b>Aftershock</b> (D3) — Detonation re-lights the target</td><td>both are "the Detonation does a second thing"</td></tr>
+<tr><td>py_focused</td><td>White Heat (D7) — guaranteed crit into a tall Burn</td><td><b>Pyroblast</b> (D4) — new ability, +50% vs a Burning target</td><td>both are "hit a burning target much harder"</td></tr>
+<tr><td>py_seeding</td><td>Seeding Embers (D3) — a burning death pays you</td><td><b>Crucible</b> (D5) — consumed Burn refunds 2 Mana a turn</td><td>both are "what the fire's end gives back"</td></tr>
+<tr><td>py_rekindle</td><td>Fuse (D5) — Detonation can reset its cooldown</td><td><b>Twin Detonation</b> (D6) — Detonation's cooldown drops to 1</td><td>identical question: Detonation's cooldown</td></tr>
+<tr><td>py_warm_glow</td><td>Chain Reaction (D4) — Detonation splashes other burning enemies</td><td><b>Total Commitment</b> (D7) — Detonation eats the two neighbours' Burn too</td><td>both widen Detonation past one target</td></tr>
+<tr><td>py_firestorm</td><td>Firestorm (CAP)</td><td><b>Firestorm</b> (CAP) — unchanged</td><td>—</td></tr>
+<tr><td>py_rebirth</td><td>Avatar of Flame (CAP) — no passive cap, fire pierces resist</td><td><b>Phoenix Rebirth</b> (CAP) — out of the vault</td><td>the Inferno-lane capstone</td></tr>
+<tr><td>py_hellfire</td><td>Cataclysm (CAP) — Detonation chains down the field</td><td><b>Cataclysm</b> (CAP) — Detonation eats EVERY burning enemy's Burn</td><td>same name, same fantasy, simpler</td></tr>
+</table>
+
+<ul>
+<li><b>One old node had no home, and it is reported rather than forced.</b>
+<b>Ashes of Al'ar</b> — the self-revive — has no successor anywhere in the new design,
+because §2 removes every defensive option deliberately. Its id carries Wildfire Spread now
+purely because a slot had to hold it; that is the batch's one assignment made on position
+rather than intent. <b>Where it should go, if the designer wants it back:</b> not into this
+tree. It is a Mage-wide or relic-shaped effect, and putting it back in a Pyromancer lane
+re-opens exactly the escape hatch the batch closed.</li>
+
+<li><b>Cauterise is the health risk put back, once, as an opt-in.</b> The drain sits on Mana
+so it would not be a clock he carries; one node that lets a player choose to carry it anyway
+is a decision rather than a tax, and it is the sharpest thing in the tree. Taking Kiln-Forged
+as well is legal, and the FLOOR WINS — a Pyromancer who paid for "the drain can never take
+me below 10" is not then billed in blood for the same drain.</li>
+
+<li><b>The magnitudes are ADDITIVE, not ranked.</b> Two fields are fed by a rune as well as
+by a node (Burn tick strength and Flamewave's turns), so each node writes its magnitude in
+the units its read site adds up. The node pays its number, the rune pays its number, and
+stacked they pay the sum. That is Batch AL's repair rule applied up front instead of after
+the fact.</li>
+</ul>
+
+<p><b>THE SPEC RUNE AUDIT (and it found what it was sent to find).</b> Most Pyromancer spec
+runes ride an existing talent counter rather than carrying their own machinery, and a rune
+pointing at a counter that no longer exists fails <i>silently</i> — no error, no log line.
+All four Pyromancer runes and all three Mage runes were checked against the new node set:</p>
+<ul>
+<li><b>RE-POINTED — Rune of the Cinder Trail.</b> The node took <code>cinder_trail_ranks</code>
+for a new meaning, so the rune was moved onto its own term and keeps paying exactly the
+effect it advertises (embers onto a second enemy). Its text is unchanged because its
+behaviour is.</li>
+<li><b>STILL LIVE, now rune-only content</b> — the Rune of the Blast Radius (Detonation
+consumes 25% more) and the Rune of the Long Burn (softer hits from burning enemies,
+Detonation crit). Their nodes are gone; their read sites were deliberately kept, because a
+rune whose node vanished wants re-authoring, not silent death.</li>
+<li><b>FLAGGED, NOT GUESSED — the Rune of the White Flame's middle clause is INERT.</b> It
+reads "Inferno Master grants +1% per burning enemy", and Overburn has no per-turn step to
+raise. Re-pointing it at the cap or the drain would be inventing a magnitude the design
+deliberately fixed, so the rune is left exactly as authored and this is the flag. Its other
+two clauses (resistance piercing, the health cost) are untouched and live. <b>A test asserts
+the clause is inert</b>, so a future re-authoring has to come and change that assertion
+rather than discover the problem.</li>
+<li>The three Mage class runes (Wellspring, Reckless Channeling, Comet) touch nothing this
+batch moved.</li>
+<li><code>runes.json</code> changed by exactly one field name. This is a dead-counter
+re-point, <b>not</b> the rune-magnitude pass the designer closed in Batch AF.</li>
+</ul>
+
+<p><b>THE BOT.</b> The autoplay mage policy ignored Mana pressure entirely, and under
+Overburn a bot that never detonates to relieve the drain would measure a spec no player
+would recognise. It now knows the one rule that matters: <b>consume Burn when the drain
+exceeds Mana regeneration</b> — Detonation onto the largest stack, Wildfire when Detonation
+is cooling. This is instrument honesty, not tuning.</p>
+
+<p><b>KIT SMOKE, AND ONE THING WORTH FLAGGING.</b> Forty battles per row against the fixed
+lineup, with a full 8-node build force-learned (a standalone sim spends no talent points, so
+an unloaded run never touches these nodes at all). Every row 40/40 wins, no script errors,
+and every new ability shows up in the rotation. <b>The Kindling lane is the standout by a
+distance</b> — his damage share goes 46% ungeared to <b>66%</b> on a full Kindling build,
+against 48% for Inferno and 50% for Detonation. Firestorm, Backdraft, Accelerant's tick and
+Conflagration's turns all compound, and the drain that is meant to price that does not bite
+inside a seven-round smoke fight. <b>Measured and flagged, not nerfed</b>: these are the
+batch's own magnitudes, so it ships as written. Kit-mechanics ratios only — the smoke lineup
+carries no difficulty signal.</p>
+
+<p><b>NO DIFFICULTY MEASUREMENT WAS RUN, deliberately</b> — the same reason Batches AJ, AK
+and AL recorded: a single-spec re-author has no honest control row against a fixed four-hero
+party, and <code>./sim.sh</code> carries no difficulty signal.</p>
+
+<p><b>TWO CLAIMS IN THE BATCH BRIEF WERE STALE, and are recorded rather than quietly
+actioned.</b> (1) §6 asked for the Master Document's Wildfire text to be corrected, saying it
+described Wildfire spreading the target's Burn at half duration. <b>It did not</b> — Batch AG
+updated that passage and the doc already matched the code. (2) §4 warned that spec runes
+would break "quietly"; only one clause did, and it is the one flagged above. Both are the
+same lesson Batch AP recorded: a note in a brief is not evidence, and has to be re-read
+against the code before it is acted on.</p>
+
+
 <h2>2026-08-07 — Batch AQ: the modifier pool, 6 → 19, and upgrades you can see</h2>
 <p><i>Two things. The bargain's modifier pool goes from six placeholders to nineteen authored
 ones, weighted toward the mild end. And the ability upgrades Batch AP wired become visible

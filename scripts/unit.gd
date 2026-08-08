@@ -312,36 +312,62 @@ var lunge_upgraded := 0       # Lunge node on an earned Lunge: both debuffs, any
 var execute_upgraded := 0     # Execute capstone on an earned Execute: 35%, free vs Broken
 var untouchable := 0          # Untouchable: Defensive parries negate + Pommel counter
 var guard_breaker := 0        # Guard Breaker: Broken recovery refills the meter to 50
-# Pyromancer tree (07-18). See talents.gd for the node text.
-var accelerant_ranks := 0     # Accelerant: +1%/rank Burn tick strength
-var pyromaniac_ranks := 0     # Pyromaniac: +0.2%/rank Inferno Master step (cap rides it)
-var supernova_ranks := 0      # Super Nova: +3%/rank Detonation crit
-var invigorating_ranks := 0   # Invigorating Ashes: mana back on Burn ticks
-var molten_ranks := 0         # Molten Core: less damage from burning enemies
-var explosive_ranks := 0      # Explosive Force: fire crits extend Burn
-var seeding_ranks := 0        # Seeding Embers: damage from burning deaths
-var melt_ranks := 0           # Melt Armor: Burn ticks shred armor
-var ashes_ranks := 0          # Ashes of Al'ar: chance to self-revive
-var ashes_used := false       # the phoenix rises once per battle
-var implosion_ranks := 0      # Implosion: Detonation can strike twice
+# Pyromancer tree (Batch AR — the Overburn re-author). All 24 ids survived
+# and re-specced in place; these are the fields the new nodes read. Several
+# are ADDITIVE MAGNITUDES rather than rank counts, so a node and a rune can
+# both feed one and each still pays exactly its advertised number: the node
+# writes 4 into accelerant_ranks and the Rune of the Long Burn writes 1, and
+# the read site adds percentage points. See talents.gd for the node text.
+var accelerant_ranks := 0     # Accelerant: Burn ticks +N points of Attack
+var cinder_trail_ranks := 0   # Cinder Trail: Fireball's Burn lasts +N turns
+var conflagration_ranks := 0  # Conflagration: Flamewave applies +N turns
+var explosive_ranks := 0      # Explosive Force: a fire crit extends Burn +N turns
+var wildfire_spread := 0      # Wildfire Spread: Wildfire lights the unburnt first
+var ember_wind := 0           # Chain Ignition: a burning death splits its Burn
+var ember_consumed := false   # Chain Ignition already released this corpse
+var burn_at_death := 0        # Burn turns left when this unit died
+var burn_tick_at_death := 0   # tick snapshot for the Chain Ignition transfer
+var fire_walker := 0          # Fire Walker: Overburn's drain is 25% lighter
+var invigorating_ranks := 0   # Invigorating Ashes: N% chance of Mana per Burn tick
+var heat_haze_ranks := 0      # Heat Shimmer: Overburn's damage cap +N points
+var kiln_forged := 0          # Kiln-Forged: +20% fire resist, drain floors at 10 Mana
+var ash_lung := 0             # Ash Lung: +15% damage while the drain outruns regen
+var cauterise := 0            # Cauterise: the drain bills health, and no cap under 20
+var focused_flame := 0        # Focused Flame: Detonation's Burn bonus 250% -> 325%
+var pressure_cooker := 0      # Pressure Cooker: +25 Break damage on a Burning target
+var aftershock := 0           # Aftershock: Detonation re-lights what it consumed
+var crucible := 0             # Crucible: consumed Burn refunds 2 Mana a turn, not 1
+var total_commitment := 0     # Total Commitment: the neighbours' Burn goes in too
+var cataclysm := 0            # capstone: Detonation eats the WHOLE field's Burn
+# --- Pyromancer machinery with NO NODE behind it since Batch AR. ---
+# The first four are RUNE-ONLY content now and keep their read sites, because
+# a rune whose node is gone wants re-authoring, not silent death (AR §4): the
+# Rune of the Blast Radius and the Rune of the Long Burn feed supernova_ranks,
+# the Long Burn also feeds molten_ranks, the Blast Radius feeds
+# blast_radius_ranks, and the Rune of the Cinder Trail was RE-POINTED onto
+# rune_cinder_ember when the node took cinder_trail_ranks for a new meaning.
+# pyromaniac_ranks is the one counter with no read site left — Inferno Master's
+# per-turn step does not exist under Overburn, and inventing one would be the
+# guess AR §4 forbids, so the White Flame's middle clause is FLAGGED as inert.
+# The rest is unreachable machinery, kept the way the vault keeps an ability.
+var supernova_ranks := 0      # RUNE-ONLY: Detonation crit chance
+var molten_ranks := 0         # RUNE-ONLY: burning enemies bite softer
+var blast_radius_ranks := 0   # RUNE-ONLY: Detonation consumes 25%/point more Burn
+var rune_cinder_ember := 0    # RUNE-ONLY: Fireball embers a second enemy
+var pyromaniac_ranks := 0     # INERT: the White Flame writes it, nothing reads it
+var seeding_ranks := 0        # no node: Seeding Embers
+var seeding_consumed := false
+var melt_ranks := 0           # no node: Melt Armor
 var melted := 0.0             # armor shredded off THIS unit by Melt Armor
-var burn_at_death := 0        # Burn turns left when this unit died (Seeding)
-var seeding_consumed := false # Seeding Embers already harvested this corpse
-# Pyromancer Batch N lanes (07-31). See talents.gd for the node text.
-var conflagration_ranks := 0  # Conflagration: Flamewave applies +1 turn/rank
-var cinder_trail_ranks := 0   # Cinder Trail: Fireball embers a second enemy
-var ember_wind := 0           # Ember Wind: burning deaths pass the flame on
-var ember_consumed := false   # Ember Wind already released this corpse
-var burn_tick_at_death := 0   # tick snapshot for the Ember Wind transfer
-var heat_haze_ranks := 0      # Heat Haze: Inferno Master cap +10%/rank
-var scorched_ranks := 0       # Scorched Earth: burning enemies swing softer
-var living_flame_ranks := 0   # Living Flame: mana while 3+ enemies burn
-var chain_reaction_ranks := 0 # Chain Reaction: Detonation splashes the burning
-var fuse_ranks := 0           # Fuse: Detonation can reset its own cooldown
-var blast_radius_ranks := 0   # Blast Radius: deeper Burn consumption
-var white_heat_ranks := 0     # White Heat: forced crit vs tall Burns
-var avatar_flame := 0         # capstone: no Inferno cap, fire pierces resist
-var cataclysm := 0            # capstone: Detonation chains down the field
+var ashes_ranks := 0          # no node: Ashes of Al'ar
+var ashes_used := false       # the phoenix rises once per battle
+var scorched_ranks := 0       # no node: Scorched Earth
+var living_flame_ranks := 0   # no node: Living Flame
+var implosion_ranks := 0      # no node: Implosion
+var chain_reaction_ranks := 0 # no node: Chain Reaction
+var fuse_ranks := 0           # no node: Fuse
+var white_heat_ranks := 0     # no node: White Heat
+var avatar_flame := 0         # no node: Avatar of Flame
 var was_frozen := false       # has been Frozen this battle
 # Cryomancer tree (Batch O lanes). See talents.gd for the node text.
 var hungering_ranks := 0      # Hungering Cold: chilled enemies hit softer
@@ -1659,8 +1685,9 @@ func _die() -> void:
 	var ua := get_status("unrelenting")
 	if not ua.is_empty():
 		constitution -= int(ua.get("power", 0))
-	# Seeding Embers reads the Burn this unit died with (harvested later);
-	# Ember Wind also needs the tick snapshot to pass the flame on whole.
+	# Chain Ignition reads the Burn this unit died with — turns AND tick — so
+	# it can split the flame among the survivors whole rather than re-rolling
+	# a fresh one. (Seeding Embers read the same snapshot; its node is gone.)
 	var burn_stat := get_status("burn")
 	if not burn_stat.is_empty():
 		burn_at_death = maxi(int(burn_stat.get("turns", 0)), 0)

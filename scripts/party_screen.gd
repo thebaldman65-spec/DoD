@@ -153,6 +153,13 @@ func _draw_detail() -> void:
 	# what actually LANDED, so the sheet's ◆ carries the same guarantee the
 	# battle tooltip has and can never advertise an upgrade that did not apply.
 	var landed_upgrades: Dictionary = Run.apply_upgrades(member, cfg["abilities"])
+	# Kiln-Forged (Pyromancer, Batch AR): mirrors the battle spawn, because the
+	# Resistances row below reads cfg["resists"] and a sheet that omitted this
+	# would quietly disagree with the fight.
+	if int(cfg.get("kiln_forged", 0)) > 0:
+		var kiln_res: Dictionary = cfg.get("resists", {})
+		kiln_res["fire"] = float(kiln_res.get("fire", 0.0)) + 0.20
+		cfg["resists"] = kiln_res
 	cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
 	# Toughness (Warden talent): Constitution grows with bulk — same order as
 	# battle spawn (after every max-HP bonus has landed).
