@@ -1553,87 +1553,158 @@ const LANE_TREES := {
 			"payload": {"stat": {"judgement": 40}}},
 	],
 	"mystic": [
-		# Survivalist — 7 exclusive rows + a capstone row (Batch AI).
-		# Lanes: Venom / Snares / Guerilla.
-		# --- Lane A: Venom — poison as a damage engine ---
+		# Survivalist — 7 exclusive rows + a capstone row (Batch AI). RE-AUTHORED
+		# BY BATCH BA (08-09), the LAST of the twelve, around a spine that was
+		# already half-written: ATTRITION — BREADTH OF AFFLICTION, NOT DEPTH OF
+		# ONE. EVERY ID SURVIVES AND RE-SPECS IN PLACE, so saved picks migrate and
+		# no save version moves.
+		#
+		# THE ONE TREE IN THE GAME WHOSE CEILING IS CORRECT AND STAYS: Trapper
+		# pays +8% per DIFFERENT status, and breadth is bounded by how many
+		# distinct debuffs exist — a design constant, not a dial. Overburn,
+		# Loyalty, Focus, Resonance and Ruin all lost their ceilings; this one
+		# keeps its.
+		#
+		# LANE NAMES AND THESES ALL STAND, re-aimed only in what VENOM's nodes DO:
+		# the affliction that ticks · the affliction that stops · the affliction
+		# that adds up. Each Venom node now hangs a DIFFERENT affliction off the
+		# poison, so the lane named for his signature damage stops fighting his
+		# own passive (a poison build earned +8% where a five-affliction build
+		# earned +40%).
+		#
+		# THE CONTAGION SPACE IS RESERVED FOR A FUTURE SPEC — see CLAUDE.md's
+		# standing design rule. Poison is his and stays his; anything that SPREADS
+		# ON ITS OWN (enemy to enemy, corpse to living, field-wide infection) is
+		# off-limits to this tree. Four nodes were re-specced off it.
+		#
+		# MAGNITUDES ARE ADDITIVE, NOT RANKED: every counter writes its own
+		# magnitude in the units its read site sums (AR/AS/AT/AV/AW/AX/AY/AZ).
+		# --- Lane A: Venom — the affliction that TICKS ---
+		# Deliberately FLAT damage rather than a percentage of Attack: converting
+		# it would change `_apply_poison`'s units and every rune riding
+		# `potent_ranks` with it, for a gain the reprice already delivers. 8x the
+		# value, same units, no read-site change — so the two runes that pay into
+		# it still pay exactly what their text advertises.
 		{"id": "sv_potent", "name": "Potent Toxins", "ranks": 1, "lane": "Venom", "row": 1,
-			"desc": "Your Poison deals +{v} damage per stack.", "scale": {"step": 1},
-			"payload": {"stat": {"potent_ranks": 1}}},
+			"desc": "Your Poison deals +{v} damage per stack.", "scale": {"step": 8},
+			"payload": {"stat": {"potent_ranks": 8}}},
 		{"id": "sv_coated", "name": "Coated Blades", "ranks": 1, "lane": "Venom", "row": 2,
-			"desc": "Your basic attack applies Poison for 2 turns.",
+			"desc": "Your basic attack applies Poison for 2 turns and Cripple for 2 turns.",
 			"payload": {"stat": {"coated_blades": 1}}},
-		{"id": "sv_virulence", "name": "Virulence", "ranks": 1, "lane": "Venom", "row": 3,
-			"desc": "Your Poison applications add +{v} extra stack(s).", "scale": {"step": 1},
-			"payload": {"stat": {"virulence_ranks": 1}}},
+		# RENAMED from Virulence — a pathogen term the reserved spec wants back.
+		# The id survives, the mechanic survives, only the name goes.
+		{"id": "sv_virulence", "name": "Distillate", "ranks": 1, "lane": "Venom", "row": 3,
+			"desc": "Your Poison applications add +{v} extra stacks and apply Exposed for 3 turns.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"virulence_ranks": 2}}},
 		{"id": "sv_slow_acting", "name": "Slow Acting", "ranks": 1, "lane": "Venom", "row": 4,
-			"desc": "Your Poison deals HALF damage but lasts TWICE as long and cannot be cleansed.",
+			"desc": "Your Poison deals HALF damage but lasts TWICE as long, cannot be cleansed, and applies Slowed for 3 turns.",
 			"payload": {"stat": {"slow_acting": 1}}},
+		# RE-SPECCED — the corpse transfer is gone (contagion). Keeping the wound
+		# open is craft: it reads the status-application path, not a death.
 		{"id": "sv_creeping", "name": "Creeping Death", "ranks": 1, "lane": "Venom", "row": 5,
-			"desc": "When a Poisoned enemy dies, its Poison stacks transfer to another enemy.",
+			"desc": "Applying any status to a Poisoned enemy refreshes its Poison to full duration.",
 			"payload": {"stat": {"creeping_death": 1}}},
+		# The only node in the lane that was already pointed at BREADTH rather
+		# than depth, and tissue death from venom is what venomous bites do — so
+		# it keeps its name as well as its job.
 		{"id": "sv_necrosis", "name": "Necrosis", "ranks": 1, "lane": "Venom", "row": 6,
-			"desc": "Poisoned enemies take +20% damage from ALL sources, not just yours.",
-			"payload": {"stat": {"necrosis": 1}}},
-		{"id": "sv_plague", "name": "Plague Bearer", "ranks": 1, "lane": "Venom", "row": 7,
-			"desc": "At the start of your turn, one Poisoned enemy spreads 3 Poison stacks to another.",
-			"payload": {"stat": {"plague_bearer": 1}}},
-		# --- Lane B: Snares — traps, retaliation, denial ---
+			"desc": "Poisoned enemies take +{v}% damage from ALL sources, not just yours.",
+			"scale": {"step": 35},
+			"payload": {"stat": {"necrosis": 35}}},
+		# REPLACES Plague Bearer (transmission). Party-wide craft with nothing
+		# self-propagating — he oils their blades. The closest thing to Plague
+		# Bearer's REACH that stays out of the reserved space.
+		{"id": "sv_plague", "name": "Quartermaster", "ranks": 1, "lane": "Venom", "row": 7,
+			"desc": "Your allies' basic attacks also apply your Poison.",
+			"payload": {"stat": {"quartermaster": 1}}},
+		# --- Lane B: Snares — the affliction that STOPS ---
 		{"id": "sv_wire", "name": "Reinforced Wire", "ranks": 1, "lane": "Snares", "row": 1,
-			"desc": "Tripwire's retaliation deals +{v}% of your Attack.", "scale": {"step": 10},
-			"payload": {"stat": {"wire_ranks": 1}}},
+			"desc": "Tripwire's retaliation deals +{v}% of your Attack.", "scale": {"step": 35},
+			"payload": {"stat": {"wire_ranks": 35}}},
 		{"id": "sv_rigging", "name": "Quick Rigging", "ranks": 1, "lane": "Snares", "row": 2,
-			"desc": "Snare Trap's cooldown is reduced by 1, and its spring also applies Cripple.",
-			"payload": {"stat": {"quick_rigging": 1}}},
+			"desc": "Snare Trap's cooldown is reduced by {v}, and its spring also applies Cripple.",
+			"scale": {"step": 2},
+			# TWO HALVES, TWO PAYLOADS. `apply_payload` is an if/elif chain, so a
+			# node carrying `stat` AND `ability` would silently drop the second —
+			# which is EXACTLY what had happened here: the cooldown clause has had
+			# no implementation at all since Batch 33 (unit.gd's own comment said
+			# "(payload)" and no payload existed). The `also` key is the one
+			# sanctioned way to hang a second half off a node (Batch AK).
+			"payload": {"stat": {"quick_rigging": 2},
+				"also": [{"ability": "Snare Trap", "add": {"cooldown": -2}}]}},
 		{"id": "sv_cruel", "name": "Cruel Devices", "ranks": 1, "lane": "Snares", "row": 3,
-			"desc": "Your traps deal +{v}% damage.", "scale": {"step": 15},
-			"payload": {"stat": {"cruel_ranks": 1}}},
+			"desc": "Your traps deal +{v}% damage.", "scale": {"step": 50},
+			"payload": {"stat": {"cruel_ranks": 50}}},
+		# A BYPASS, NOT A MAGNITUDE: nothing here to reprice — the same call AZ
+		# made for No Cover.
 		{"id": "sv_snap_shut", "name": "Snap Shut", "ranks": 1, "lane": "Snares", "row": 4,
 			"desc": "Tripwire also retaliates against RANGED attackers, not only melee.",
 			"payload": {"stat": {"snap_shut": 1}}},
 		{"id": "sv_caught", "name": "Caught Fast", "ranks": 1, "lane": "Snares", "row": 5,
-			"desc": "Enemies caught by your traps cannot be healed for 3 turns.",
-			"payload": {"stat": {"caught_fast": 1}}},
+			"desc": "Enemies caught by your traps cannot be healed for {v} turns.",
+			"scale": {"step": 5},
+			"payload": {"stat": {"caught_fast": 5}}},
 		{"id": "sv_bone", "name": "Bone Breaker", "ranks": 1, "lane": "Snares", "row": 6,
-			"desc": "Your traps apply 30 Break damage when they spring.",
-			"payload": {"stat": {"bone_breaker": 1}}},
+			"desc": "Your traps apply {v} Break damage when they spring.",
+			"scale": {"step": 90},
+			"payload": {"stat": {"bone_breaker": 90}}},
+		# THE COUNTER IS THE GATE AND THE MAGNITUDE IN ONE FIELD (AW's
+		# `judgement`): it holds the trap CAP it installs, so `_ability_usable`
+		# reads the number rather than carrying a hardcoded 2 beside it.
 		{"id": "sv_network", "name": "Deadfall Network", "ranks": 1, "lane": "Snares", "row": 7,
-			"desc": "You may have TWO traps active at once.",
-			"payload": {"stat": {"deadfall_network": 1}}},
-		# --- Lane C: Guerilla — survival, mobility, party utility ---
+			"desc": "You may have THREE traps active at once.",
+			"payload": {"stat": {"deadfall_network": 3}}},
+		# --- Lane C: Guerilla — the affliction that ADDS UP ---
 		{"id": "sv_woodcraft", "name": "Woodcraft", "ranks": 1, "lane": "Guerilla", "row": 1,
-			"desc": "+{v}% max Health.", "scale": {"step": 6},
-			"payload": {"stat": {"max_hp_pct": 0.06}}},
+			"desc": "+{v}% maximum Health.", "scale": {"step": 20},
+			"payload": {"stat": {"max_hp_pct": 0.20}}},
 		{"id": "sv_hitrun", "name": "Hit and Run", "ranks": 1, "lane": "Guerilla", "row": 2,
-			"desc": "Whenever you apply a status to an enemy, you gain Elusive for 1 turn.",
-			"payload": {"stat": {"hit_and_run": 1}}},
+			"desc": "Whenever you apply a status to an enemy, you gain Elusive for {v} turns.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"hit_and_run": 2}}},
 		{"id": "sv_scavenger", "name": "Scavenger", "ranks": 1, "lane": "Guerilla", "row": 3,
-			"desc": "Restore {v}% max Mana whenever an enemy dies.", "scale": {"step": 8},
-			"payload": {"stat": {"scavenger_ranks": 1}}},
+			"desc": "Restore {v}% maximum Mana whenever an enemy dies.", "scale": {"step": 25},
+			"payload": {"stat": {"scavenger_ranks": 25}}},
 		{"id": "sv_medic", "name": "Field Medic", "ranks": 1, "lane": "Guerilla", "row": 4,
-			"desc": "At the start of your turn, cleanse one debuff from a random ally.",
-			"payload": {"stat": {"field_medic": 1}}},
+			"desc": "At the start of your turn, cleanse {v} debuffs from random allies.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"field_medic": 2}}},
 		{"id": "sv_vulture", "name": "Vulture", "ranks": 1, "lane": "Guerilla", "row": 5,
-			"desc": "+30% damage against enemies afflicted by 3 or more different statuses.",
-			"payload": {"stat": {"vulture": 1}}},
+			"desc": "+{v}% damage against enemies afflicted by 3 or more different statuses.",
+			"scale": {"step": 60},
+			"payload": {"stat": {"vulture": 60}}},
 		{"id": "sv_ghillie", "name": "Ghillie Suit", "ranks": 1, "lane": "Guerilla", "row": 6,
-			"desc": "Enemies are 40% less likely to target you while another ally lives.",
-			"payload": {"stat": {"ghillie": 1}}},
+			"desc": "Enemies are {v}% less likely to target you while another ally lives.",
+			"scale": {"step": 65},
+			"payload": {"stat": {"ghillie": 65}}},
 		{"id": "sv_improvised", "name": "Improvised", "ranks": 1, "lane": "Guerilla", "row": 7,
-			"desc": "The first ability you use each fight does not start its cooldown.",
-			"payload": {"stat": {"improvised": 1}}},
+			"desc": "The first {v} abilities you use each fight do not start their cooldowns.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"improvised": 2}}},
 		# --- Capstones (row 8): take ONE, no lane requirement ---
-		{"id": "sv_epidemic", "name": "Epidemic", "ranks": 1, "lane": "Venom", "row": 8,
+		# REPLACES Epidemic (a pandemic — field-wide infection, reserved). It
+		# keeps the UNCLEANSABLE identity that made Epidemic a capstone and drops
+		# the contagion; the `sticky` flag it needs already exists in
+		# `unit.purge_debuffs` and the dispel path, so this is a re-point rather
+		# than new machinery. The counter is the gate AND the per-turn rise.
+		{"id": "sv_epidemic", "name": "Perfected Toxin", "ranks": 1, "lane": "Venom", "row": 8,
 			"capstone": true,
-			"desc": "Every enemy is PERMANENTLY Poisoned, and your Poison cannot be cleansed or expire.",
-			"payload": {"stat": {"epidemic": 1}}},
+			"desc": "Your Poison cannot be cleansed, never expires, and its tick rises by {v} each turn it persists.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"perfected_toxin": 2}}},
 		{"id": "sv_forest", "name": "The Whole Forest", "ranks": 1, "lane": "Snares", "row": 8,
 			"capstone": true,
 			"desc": "Tripwire never expires and bites on EVERY enemy action — melee, ranged, or spellwork.",
 			"payload": {"stat": {"whole_forest": 1}}},
+		# UNCHANGED IN DESIGN — already 2.5x the base and already the breadth
+		# capstone. The counter carries the percentage now (additive), so the
+		# read site reads a number rather than deriving one from a flag.
 		{"id": "sv_force", "name": "Force of Nature", "ranks": 1, "lane": "Guerilla", "row": 8,
 			"capstone": true,
-			"desc": "Trapper's bonus rises to +20% per different status — and applies to your ENTIRE party's damage.",
-			"payload": {"stat": {"force_of_nature": 1}}},
+			"desc": "Trapper's bonus rises to +{v}% per different status — and applies to your ENTIRE party's damage.",
+			"scale": {"step": 20},
+			"payload": {"stat": {"force_of_nature": 20}}},
 	],
 	"sharpshooter": [
 		# Batch AI re-cut this tree's tiers into 7 exclusive rows + a capstone

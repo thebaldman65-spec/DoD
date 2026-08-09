@@ -1550,14 +1550,12 @@ func _run_battle() -> void:
 		if zl_h.zealous_mercy > 0 and zl_h.second_resource > 0:
 			_log("Talent: Zealous Light — %s opens with %d Mercy" % [
 				zl_h.unit_name, zl_h.second_resource], "#b0a8e0")
-	# Epidemic (Survivalist capstone): the rot is already in every vein.
-	for ep_h in heroes:
-		if not ep_h.dead and ep_h.epidemic > 0:
-			for ep_e in enemies:
-				if not ep_e.dead:
-					_apply_poison(ep_h, ep_e, -1)
-			_log("Epidemic: every enemy is already rotting", "#70d878")
-			break
+	# BATCH BA: EPIDEMIC'S BATTLE-START HOOK IS GONE WITH THE DESIGN. It
+	# poisoned every enemy on the field the moment the fight opened — a
+	# pandemic, i.e. the reserved contagion spec's whole idea spent early. The
+	# STICKY half of what it did survives in Perfected Toxin, which is a
+	# property of HIS poison rather than an infection of the board and so needs
+	# no battle-start hook at all. Do not re-add one.
 	await _wait(0.8)
 	var _turns_taken := 0
 	while not battle_over:
@@ -1622,6 +1620,8 @@ func _run_battle() -> void:
 					if pstatus.get("fresh", false):
 						pstatus["fresh"] = false
 						continue
+					# Perfected Toxin: a poison that never leaves gets worse.
+					_perfected_toxin_tick(u)
 				# Tick strength was snapshotted from the applier's Attack.
 				var dot_dmg: int = int(u.get_status(dot_id).get("tick", 0))
 				if dot_dmg <= 0:
@@ -1847,26 +1847,22 @@ func _run_battle() -> void:
 					cs_e.take_hit(0, u.cold_snap_ranks)
 					_stat_bd(u, u.cold_snap_ranks)
 					cs_e.refresh_bars()
-		# Survivalist upkeep: Plague Bearer spreads the rot, the Field
-		# Medic tends a random ally.
-		if u.is_hero and not u.dead and u.plague_bearer > 0:
-			var pb_src: Array = enemies.filter(
-				func(e): return not e.dead and e.has_status("poison"))
-			if not pb_src.is_empty():
-				var pb_from: BattleUnit = pb_src.pick_random()
-				var pb_pool: Array = enemies.filter(
-					func(e): return not e.dead and e != pb_from)
-				if not pb_pool.is_empty():
-					var pb_to: BattleUnit = pb_pool.pick_random()
-					var pb_tick: int = int(pb_from.get_status("poison").get("tick", 3))
-					for _pb in 3:
-						_apply_status(pb_to, "poison", 5, 0, pb_tick)
-					_log("   → Plague Bearer: the rot leaps from %s to %s" % [
-						pb_from.unit_name, pb_to.unit_name], "#70d878")
+		# Survivalist upkeep: the Field Medic tends the party. PLAGUE BEARER'S
+		# BLOCK STOOD HERE AND IS DELETED WITH ITS CONCEPT (Batch BA) — rot that
+		# leaps from enemy to enemy is transmission, and transmission belongs to
+		# the reserved contagion spec. `sv_plague`'s id carries QUARTERMASTER
+		# now, which is craft (he oils his allies' blades) and lives on the
+		# strike path, not here. Quartermaster is NOT Plague Bearer with
+		# different numbers; nothing may be re-pointed from one to the other.
+		# ADDITIVE: the counter holds HOW MANY debuffs he washes off (2), and
+		# each roll picks its own ally — "two debuffs from random allies", not
+		# two off one unlucky hero.
 		if u.is_hero and not u.dead and u.field_medic > 0:
-			var fm_pool: Array = heroes.filter(
-				func(h): return not h.dead and _status_count(h) > 0)
-			if not fm_pool.is_empty():
+			for _fm in u.field_medic:
+				var fm_pool: Array = heroes.filter(
+					func(h): return not h.dead and _status_count(h) > 0)
+				if fm_pool.is_empty():
+					break
 				var fm_ally: BattleUnit = fm_pool.pick_random()
 				var fm_washed: String = fm_ally.dispel_one_debuff()
 				if fm_washed != "":
@@ -2935,22 +2931,38 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			var shrapnel := _find_ability(u, "Shrapnel Charge")
 			if shrapnel != null and u.resource >= shrapnel.cost and u.ability_ready(shrapnel) and foes.size() >= 2:
 				return [shrapnel, target_foe]
-			# Survivalist: rig, poison broadly, then reap the board.
+			# SURVIVALIST — BREADTH BEFORE DEPTH (Batch BA §8). His damage is the
+			# COUNT of distinct statuses on the target, not the size of any one
+			# of them, so the rotation prefers an ability that adds a status the
+			# target LACKS over one that deepens a status it already has. Snare
+			# and Hamstring lead; a further poison application onto an
+			# already-poisoned mark is worth nothing to the passive and waits.
 			var snare := _find_ability(u, "Snare Trap")
 			if snare != null and u.resource >= _eff_cost(u, snare) \
-					and _ability_usable(u, snare):
+					and _ability_usable(u, snare) and not target_foe.has_status("snared"):
 				return [snare, target_foe]
+			var ham := _find_ability(u, "Hamstring")
+			if ham != null and u.resource >= _eff_cost(u, ham) and u.ability_ready(ham) \
+					and not (target_foe.has_status("slow") and target_foe.has_status("exposed")):
+				return [ham, target_foe]
 			var vcoat := _find_ability(u, "Venom Coating")
 			if vcoat != null and u.resource >= _eff_cost(u, vcoat) \
 					and u.ability_ready(vcoat) and not u.has_status("venom_coat"):
 				return [vcoat, u]
-			var ham := _find_ability(u, "Hamstring")
-			if ham != null and u.resource >= _eff_cost(u, ham) and u.ability_ready(ham):
-				return [ham, target_foe]
+			# HARVEST'S THRESHOLD MOVED OFF 4 (§8), and it reads the same
+			# `_harvest_yield` the ability itself is paid on rather than a raw
+			# status count — §7 stopped Harvest charging for statuses it does not
+			# remove, so a bot counting sticky poison would press the button at a
+			# value it is no longer priced for (the AZ Coup precedent).
 			var harv := _find_ability(u, "Harvest")
 			if harv != null and u.resource >= _eff_cost(u, harv) \
-					and u.ability_ready(harv) and _status_count(target_foe) >= 4:
+					and u.ability_ready(harv) \
+					and _harvest_yield(target_foe) >= HARVEST_BOT_YIELD:
 				return [harv, target_foe]
+			# Depth last: another poison application only after the breadth
+			# options above have nothing left to add.
+			if ham != null and u.resource >= _eff_cost(u, ham) and u.ability_ready(ham):
+				return [ham, target_foe]
 			var dfall := _find_ability(u, "Deadfall")
 			if dfall != null and u.resource >= _eff_cost(u, dfall) \
 					and _ability_usable(u, dfall):
@@ -3348,7 +3360,11 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# Lone Bond: one beast per fight — no swaps, no second call.
 	if ab.special == "summon" and u.lone_bond > 0 and u.beast_committed:
 		return false
-	# Traps: one active at a time (two under Deadfall Network).
+	# Traps: one active at a time (THREE under Deadfall Network). The counter is
+	# the GATE AND THE MAGNITUDE in one field (Batch BA — AW's `judgement`
+	# precedent): it holds the cap it installs, so this site reads the number
+	# instead of carrying a hardcoded 2 that has to be found and changed beside
+	# the node text every time the design moves.
 	if ab.special in ["snare_trap", "deadfall"]:
 		var trap_count := u.deadfall_armed
 		var u_idx := heroes.find(u)
@@ -3356,7 +3372,7 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 			if not e.dead and e.has_status("snared") \
 					and e.status_power("snared") == u_idx:
 				trap_count += 1
-		if trap_count >= (2 if u.deadfall_network > 0 else 1):
+		if trap_count >= maxi(u.deadfall_network, 1):
 			return false
 	# Never a second beast of a kind already fielded (Loyalty keys on kind).
 	if ab.special == "summon" and _beasts(u).any(func(b): \
@@ -3980,9 +3996,10 @@ func _enemy_turn(u: BattleUnit) -> void:
 						sp_c.unit_name, u.unit_name], "#d8b880")
 				break
 		# Ghillie Suit: the Survivalist fades into the brush while any
-		# other ally still stands.
+		# other ally still stands. ADDITIVE — the counter is the percentage
+		# chance itself (Batch BA: 65).
 		if target != null and target.is_hero and not target.is_companion \
-				and target.ghillie > 0 and randf() < 0.40:
+				and target.ghillie > 0 and randf() < 0.01 * target.ghillie:
 			var gh_others: Array = living.filter(func(t): return t != target)
 			if not gh_others.is_empty():
 				target = gh_others.pick_random()
@@ -4062,7 +4079,7 @@ func _cancel_charge(u: BattleUnit, cause: String) -> void:
 
 # Everything a Cleansing Rite may strip: harmful, not a meter state
 # (Broken and the Bleed buildup stay), never sticky (Slow Acting /
-# Epidemic poison refuse every cleanse, this one included).
+# Perfected Toxin poison refuse every cleanse, this one included).
 func _cleansable_debuffs(u: BattleUnit) -> Array:
 	var out: Array = []
 	for s in u.statuses:
@@ -4323,11 +4340,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_log("   → Snap Shot: no cost, no cooldown (%d of %d)" % [
 			attacker.snap_used, attacker.snap_shot], "#b0a8e0")
 	elif not is_counter and not debug_cooldowns_off:
-		# Improvised (Survivalist): the first ability keeps its cooldown.
-		if attacker.improvised > 0 and not attacker.improvised_used \
+		# Improvised (Survivalist): the opening abilities keep their cooldowns.
+		# `improvised` holds HOW MANY and `improvised_used` is a COUNT rather
+		# than a bool — the AZ `snap_used` shape, and the reason the two numbers
+		# can never disagree about how many are still owed.
+		if attacker.improvised > 0 and attacker.improvised_used < attacker.improvised \
 				and ab.cooldown > 0:
-			attacker.improvised_used = true
-			_log("   → Improvised: no cooldown on the opener", "#b0a8e0")
+			attacker.improvised_used += 1
+			_log("   → Improvised: no cooldown on the opener (%d of %d)" % [
+				attacker.improvised_used, attacker.improvised], "#b0a8e0")
 		# Rapid Fire (capstone): a share of casts skip their cooldown. ADDITIVE —
 		# the counter is the percentage itself (Batch AZ: 50).
 		elif attacker.rapid_fire > 0 and ab.cooldown > 0 \
@@ -5060,23 +5081,43 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# gates the crit rider and carries this magnitude.
 			if attacker.exposed_nerve > 0 and strike_target.has_status("exposed"):
 				raw *= 1.0 + 0.01 * attacker.exposed_nerve
-			# Trapper (Survivalist): breadth of control IS the damage — +8%
-			# per different status on the target. Force of Nature raises it
-			# to +20% and lends it to the WHOLE party.
+			# TRAPPER (Survivalist): breadth of control IS the damage — +8% per
+			# DIFFERENT status on the target. Force of Nature raises the rate and
+			# lends it to the WHOLE party (ADDITIVE since Batch BA: the counter
+			# holds the percentage, 20).
+			#
+			# THIS IS THE ONE CEILING IN THE GAME THAT IS CORRECT AND STAYS.
+			# Overburn, Loyalty, Focus, Resonance and Ruin all had theirs removed;
+			# breadth is bounded by how many distinct debuffs EXIST, which is a
+			# design constant rather than a dial, so there is nothing to remove.
 			if attacker.is_hero and not attacker.is_companion:
 				var sv_n := _status_count(strike_target)
 				if sv_n > 0:
-					if _living_hero_with("force_of_nature") != null:
-						raw *= 1.0 + 0.20 * sv_n
+					var fn_h := _living_hero_with("force_of_nature")
+					if fn_h != null:
+						raw *= 1.0 + 0.01 * fn_h.force_of_nature * sv_n
 					elif attacker.passive_id == "trapper":
 						raw *= 1.0 + 0.08 * sv_n
-				# Vulture: three open wounds is a feast.
+				# THE INSTRUMENT BATCH BA IS ABOUT (§0): the average count of
+				# distinct statuses on a target when a Survivalist strikes it.
+				# That count IS his damage multiplier, so it is the only figure
+				# that says whether the Venom carriers actually landed. Banked at
+				# the site that READS it, and only for him.
+				if sim and attacker.passive_id == "trapper" \
+						and not strike_target.is_hero:
+					_stat("breadth_strikes")
+					_stat("breadth_sum", sv_n)
+					if sv_n > int(sim_stats.get("breadth_max", 0.0)):
+						sim_stats["breadth_max"] = float(sv_n)
+				# Vulture: three open wounds is a feast. ADDITIVE (60).
 				if attacker.vulture > 0 and sv_n >= 3:
-					raw *= 1.30
+					raw *= 1.0 + 0.01 * attacker.vulture
 			# Necrosis: the poisoned rot for everyone's blades (enemies only).
-			if not strike_target.is_hero and strike_target.has_status("poison") \
-					and _living_hero_with("necrosis") != null:
-				raw *= 1.20
+			# ADDITIVE — the counter is percentage POINTS (35).
+			if not strike_target.is_hero and strike_target.has_status("poison"):
+				var nec_h := _living_hero_with("necrosis")
+				if nec_h != null:
+					raw *= 1.0 + 0.01 * nec_h.necrosis
 			# Overpower: exploits instability — +0.5 damage per point of Break.
 			if ab.display_name == "Overpower":
 				raw += 0.5 * strike_target.pressure
@@ -6380,8 +6421,31 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_hit_and_run(attacker)
 				if attacker.coated_blades > 0 and ab.cost == 0:
 					_apply_poison(attacker, sv_t, 2)
+					# THE CARRIER (Batch BA): the blade is oiled, and what is on it
+					# does two things to the body it opens.
+					_apply_status(sv_t, "cripple", 2, 0, 0, attacker)
 				if attacker.has_status("venom_coat"):
 					_apply_poison(attacker, sv_t, 5)
+		# QUARTERMASTER (Batch BA §2, replacing Plague Bearer): his ALLIES' basic
+		# attacks also carry his poison — he oils their blades before the fight.
+		# It is party-wide CRAFT with nothing self-propagating, which is what
+		# keeps it out of the contagion space Plague Bearer occupied.
+		#
+		# THE POISON IS HIS, AND THAT IS THE LOAD-BEARING PART: it is applied
+		# with the SURVIVALIST as `src`, so the tick reads HIS Attack and HIS
+		# Potent Toxins, the carriers his Venom lane bought come with it, and the
+		# sim credits the tick to the Survivalist rather than to whoever swung.
+		if attacker.is_hero and not attacker.is_companion \
+				and attacker.passive_id != "trapper" \
+				and ab.damage > 0 and ab.cost == 0 and not is_counter:
+			var qm_h := _living_hero_with("quartermaster")
+			if qm_h != null:
+				for qm_t in [target, second_target, third_target]:
+					if qm_t == null or qm_t.dead or qm_t.is_hero:
+						continue
+					_apply_poison(qm_h, qm_t, 2)
+					_log("   → Quartermaster: %s's blade carries %s's poison" % [
+						attacker.unit_name, qm_h.unit_name], "#70d878")
 		# Sharpshooter: the Focus engine, the promised shot's spending, the
 		# pin, the called spot, and the spray's echo.
 		if attacker.is_hero and attacker.passive_id == "lethal_aim" \
@@ -6480,19 +6544,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if attacker.is_ranged and trapper.snap_shut == 0 \
 						and trapper.whole_forest == 0:
 					continue
+				# ADDITIVE (Batch BA): wire_ranks and cruel_ranks are both
+				# percentage POINTS, so node and rune each pay what they say.
 				var ret := maxi(int(total_dealt * 0.75), 1) \
-					+ int(0.10 * trapper.wire_ranks * trapper.attack)
-				ret = int(round(ret * (1.0 + 0.15 * trapper.cruel_ranks)))
+					+ int(0.01 * trapper.wire_ranks * trapper.attack)
+				ret = int(round(ret * (1.0 + 0.01 * trapper.cruel_ranks)))
 				var ret_result: Dictionary = attacker.take_hit(ret, 0)
 				_stat("dmg_hero_" + trapper.unit_name, ret)
 				attacker.float_text("%d Tripwire" % ret, Color(0.8, 0.65, 0.35))
 				_log("   → %s's tripwire rips %s for %d" % [trapper.unit_name,
 					attacker.unit_name, ret], "#50c8e0")
 				if trapper.bone_breaker > 0 and not attacker.dead:
-					attacker.take_hit(0, 30)
-					_stat_bd(trapper, 30)
+					attacker.take_hit(0, trapper.bone_breaker)
+					_stat_bd(trapper, trapper.bone_breaker)
 				if trapper.caught_fast > 0 and not attacker.dead:
-					_apply_status(attacker, "caught", 3)
+					_apply_status(attacker, "caught", trapper.caught_fast)
 				if ret_result.died:
 					_stat("enemy_deaths")
 					_sfx("death", -4.0)
@@ -6884,6 +6950,12 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		var st_stamp := target.get_status(id)
 		if not st_stamp.is_empty():
 			st_stamp["src_name"] = src.unit_name
+	# CREEPING DEATH sits HERE, above every per-status branch, because three of
+	# those branches (chilled, burn, poison) return early and a hook below them
+	# would silently miss the statuses a Cryomancer or a Pyromancer lands. It is
+	# reached the moment a status genuinely takes hold — the boss-immunity and
+	# Hallowed refusals above have already returned.
+	_creeping_refresh(target, id)
 	if id == "chilled":
 		# Frigid Grip rides every stack: stamp the deeper slow on the victim.
 		# ADDITIVE units — the counter is percentage POINTS, so the node's 10
@@ -6924,11 +6996,41 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		var per := int(pstat.get("tick", 0))
 		if per <= 0:
 			per = DOT_STATUSES["poison"]
-		_log("   → Poison on %s (x%d — %d nature dmg/turn, %d turns)" % [target.unit_name,
-			stacks, per * stacks, turns], "#8cc843")
+		# A permanent poison has no turn count to print. Every other status has
+		# said "battle" since long before this; the poison line said "-1 turns",
+		# which only Epidemic could reach and Perfected Toxin now reaches often.
+		var p_span := "battle-long" if turns < 0 else "%d turns" % turns
+		_log("   → Poison on %s (x%d — %d nature dmg/turn, %s)" % [target.unit_name,
+			stacks, per * stacks, p_span], "#8cc843")
 		return
 	var span := "battle" if turns < 0 else "%d turns" % turns
 	_log("   → %s on %s (%s)" % [info[0], target.unit_name, span], "#b0a8e0")
+
+
+# CREEPING DEATH, RE-SPECCED (Batch BA §2): laying ANY status on an enemy that
+# is already Poisoned opens the wound again — the Poison goes back to the full
+# duration it was applied with. He keeps the wound open; nothing crawls
+# anywhere, which is what keeps it out of the reserved contagion space.
+#
+# It reads the `full` stamp `_apply_poison` leaves rather than a constant of its
+# own, so a Slow Acting poison refreshes to its DOUBLED span and a Perfected
+# Toxin (permanent, `full` < 0) has nothing to refresh and is left alone. It
+# lives on the status-application path deliberately: the death path books
+# nothing for it any more.
+func _creeping_refresh(target: BattleUnit, applied_id: String) -> void:
+	if target == null or target.dead or target.is_hero or applied_id == "poison":
+		return
+	if not target.has_status("poison"):
+		return
+	if _living_hero_with("creeping_death") == null:
+		return
+	var cp: Dictionary = target.get_status("poison")
+	var full := int(cp.get("full", 0))
+	if full <= 0 or int(cp.get("turns", 0)) < 0:
+		return
+	cp["turns"] = full
+	_log("   → Creeping Death: the wound on %s is opened again (%d turns)" % [
+		target.unit_name, full], "#70d878")
 
 
 # DoT strength snapshots the APPLIER's Attack: Burn 6%, Poison 3% per stack.
@@ -8440,12 +8542,25 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, "#70d878")
 		"harvest":
 			if target != null and not target.dead:
-				var hv_n := _status_count(target)
+				# BATCH BA §7 — HARVEST PAYS FOR WHAT IT ACTUALLY REMOVED. It used
+				# to count BEFORE the purge, so a sticky poison (Slow Acting,
+				# Perfected Toxin) survived the cleanse and was billed for anyway.
+				# Recorded as a known quirk since Batch 33 and minor while his
+				# breadth was narrow — §2 and §3 widen it substantially, so the
+				# over-count would have grown with the batch that caused it.
+				# `_harvest_yield` is THE one answer to "what would this reap",
+				# shared with the bot so the two can never disagree.
+				var hv_n := _harvest_yield(target)
 				if hv_n <= 0:
 					_log("%s: Harvest — nothing on %s to reap" % [attacker.unit_name,
 						target.unit_name], "#909090")
 				else:
+					var hv_before := _status_count(target)
 					target.purge_debuffs()
+					# The real count, measured rather than predicted: what the
+					# purge TOOK. It cannot exceed the prediction, and it charges
+					# for nothing that is still standing on the body.
+					hv_n = maxi(hv_before - _status_count(target), 0)
 					var hv_raw := 0.12 * attacker.attack * hv_n * randf_range(0.9, 1.1)
 					hv_raw *= 1.0 - float(target.resists.get("nature", 0.0))
 					var hv_final := maxi(int(round(hv_raw \
@@ -9731,9 +9846,12 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	if pm != null and victim.has_status("hunt_mark") \
 			and victim.status_power("hunt_mark") == heroes.find(pm):
 		raw *= 1.25
-	# Necrosis: poisoned enemies take more from ALL sources.
-	if victim.has_status("poison") and _living_hero_with("necrosis") != null:
-		raw *= 1.20
+	# Necrosis: poisoned enemies take more from ALL sources — a beast's jaws
+	# included. ADDITIVE (Batch BA): the counter is percentage points.
+	if victim.has_status("poison"):
+		var nec_c := _living_hero_with("necrosis")
+		if nec_c != null:
+			raw *= 1.0 + 0.01 * nec_c.necrosis
 	raw *= 1.0 - float(victim.resists.get("physical", 0.0))
 	var comp_armor := victim.effective_armor() * (1.0 - clampf(pen, 0.0, 1.0))
 	var final := maxi(int(round(raw * (1.0 - comp_armor))), 1)
@@ -9806,6 +9924,32 @@ func _status_count(u: BattleUnit) -> int:
 	return n
 
 
+# WHAT HARVEST WOULD ACTUALLY REAP off this body (Batch BA §7) — the distinct
+# statuses a purge really takes, which is NOT `_status_count`: a STICKY poison
+# (Slow Acting, Perfected Toxin) refuses every cleanse and stays behind.
+# It mirrors `unit.purge_debuffs`'s own filter, and it is THE ONE ANSWER shared
+# by the ability and the bot's threshold, so the two can never disagree about
+# what the button is worth (the AZ Coup precedent).
+#
+# The bot's bar is THREE, down from the old raw count of four: it now measures
+# what the button is PAID for rather than what is standing on the body, and a
+# sticky poison — which every Slow Acting or Perfected Toxin build carries — no
+# longer counts toward it.
+const HARVEST_BOT_YIELD := 3
+
+
+func _harvest_yield(u: BattleUnit) -> int:
+	if u == null or u.dead:
+		return 0
+	var n := 0
+	for s in u.statuses:
+		if s.id == "broken" or bool(s.get("sticky", false)):
+			continue
+		if BattleUnit.DEBUFF_IDS.has(s.id):
+			n += 1
+	return n
+
+
 # The first living hero carrying a talent field (Necrosis, Force of
 # Nature — effects that outlive the attacker's identity).
 func _living_hero_with(field: String) -> BattleUnit:
@@ -9815,9 +9959,16 @@ func _living_hero_with(field: String) -> BattleUnit:
 	return null
 
 
-# Every Survivalist poison flows through here: Potent Toxins deepens the
-# tick, Virulence stacks it, Slow Acting halves-and-doubles (sticky),
-# Epidemic makes it permanent and uncleansable.
+# EVERY SURVIVALIST POISON FLOWS THROUGH HERE, and since Batch BA the Venom
+# lane's nodes hang a DIFFERENT AFFLICTION off it rather than more of the same:
+# Potent Toxins deepens the tick, Distillate stacks it AND Exposes, Slow Acting
+# halves-and-doubles (sticky) AND Slows, Perfected Toxin makes it permanent and
+# uncleansable. His passive pays for BREADTH, so the lane named for his
+# signature damage now feeds it instead of fighting it.
+#
+# `full` is stamped on the status so Creeping Death knows what "full duration"
+# means without a second constant; a permanent poison (turns < 0) has no
+# duration to refresh and simply ignores it.
 func _apply_poison(src: BattleUnit, victim: BattleUnit, turns: int) -> void:
 	if victim == null or victim.dead:
 		return
@@ -9829,23 +9980,60 @@ func _apply_poison(src: BattleUnit, victim: BattleUnit, turns: int) -> void:
 		if p_turns > 0:
 			p_turns *= 2
 		sticky = true
-	if src.epidemic > 0:
+	if src.perfected_toxin > 0:
 		p_turns = -1
 		sticky = true
 	for _i in 1 + src.virulence_ranks:
 		_apply_status(victim, "poison", p_turns, 0, tick)
-	if sticky:
-		var ps: Dictionary = victim.get_status("poison")
-		if not ps.is_empty():
+	var ps: Dictionary = victim.get_status("poison")
+	if not ps.is_empty():
+		if sticky:
 			ps["sticky"] = true
+		ps["full"] = p_turns
+	# THE CARRIER CLAUSES. Each is a SECOND affliction, which is the whole point
+	# — a poison build used to earn the passive's +8% where a five-affliction
+	# build earned +40%. Applied after the stacks so a single application lands
+	# each rider once, not once per stack.
+	if src.slow_acting > 0:
+		_apply_status(victim, "slow", 3, 0, 0, src)
+	if src.virulence_ranks > 0:
+		_apply_status(victim, "exposed", 3, 0, 0, src)
 	_hit_and_run(src)
 
 
+# PERFECTED TOXIN (Batch BA capstone, replacing Epidemic): a poison that cannot
+# be cleansed and never expires gets WORSE the longer it sits — its tick rises
+# by the counter's value each turn it survives to bite. Called once per victim
+# per turn, from the DoT block, immediately before the tick is read.
+#
+# IT IS ITS OWN FUNCTION DELIBERATELY: `_run_battle` cannot be driven headlessly
+# (the AR trap — it awaits an ability pick that never comes), so a clause buried
+# inside its loop can only ever be checked by a grep. This one a test can call.
+#
+# It raises only a poison that is genuinely PERMANENT (turns < 0), which is what
+# the capstone applies — a Slow Acting poison with a real clock is untouched.
+func _perfected_toxin_tick(victim: BattleUnit) -> void:
+	if victim == null or victim.dead or victim.is_hero:
+		return
+	var pt_h := _living_hero_with("perfected_toxin")
+	if pt_h == null:
+		return
+	var ps: Dictionary = victim.get_status("poison")
+	if ps.is_empty() or int(ps.get("turns", 0)) >= 0:
+		return
+	ps["tick"] = int(ps.get("tick", 0)) + pt_h.perfected_toxin
+	var pt_stacks := maxi(int(ps.get("stacks", 1)), 1)
+	victim.update_status("poison", "P%d" % pt_stacks,
+		"Perfected Toxin: %d nature damage at the start of\neach turn (%d per stack), and it worsens every turn." % [
+			int(ps["tick"]) * pt_stacks, int(ps["tick"])])
+
+
 # Hit and Run: laying a status on an enemy melts the Survivalist away.
+# ADDITIVE — the counter holds the DURATION it grants (Batch BA: 2).
 func _hit_and_run(src: BattleUnit) -> void:
 	if src != null and not src.dead and src.hit_and_run > 0 \
 			and not src.has_status("elusive"):
-		_apply_status(src, "elusive", 1)
+		_apply_status(src, "elusive", src.hit_and_run)
 
 
 # The Whole Forest: even spellwork trips the wire (attacks are covered
@@ -9855,8 +10043,9 @@ func _forest_bite(enemy: BattleUnit) -> void:
 		if trapper.dead or enemy.dead or trapper.whole_forest == 0 \
 				or not trapper.has_status("tripwire"):
 			continue
-		var fb := maxi(int(trapper.attack * (0.25 + 0.10 * trapper.wire_ranks) \
-			* (1.0 + 0.15 * trapper.cruel_ranks)), 1)
+		# ADDITIVE (Batch BA), same units as the retaliation block above.
+		var fb := maxi(int(trapper.attack * (0.25 + 0.01 * trapper.wire_ranks) \
+			* (1.0 + 0.01 * trapper.cruel_ranks)), 1)
 		var fb_res: Dictionary = enemy.take_hit(fb, 0)
 		_stat("dmg_hero_" + trapper.unit_name, fb)
 		enemy.float_text("%d Tripwire" % fb, Color(0.8, 0.65, 0.35))
@@ -9875,7 +10064,8 @@ func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float,
 	if victim == null or victim.dead:
 		return
 	if dmg > 0.0:
-		var tr_raw := dmg * (1.0 + 0.15 * placer.cruel_ranks) \
+		# ADDITIVE (Batch BA): cruel_ranks is percentage POINTS of trap damage.
+		var tr_raw := dmg * (1.0 + 0.01 * placer.cruel_ranks) \
 			* randf_range(0.9, 1.1)
 		tr_raw *= 1.0 - float(victim.resists.get("nature", 0.0))
 		var tr_final := maxi(int(round(tr_raw * (1.0 - victim.effective_armor()))), 1)
@@ -9894,12 +10084,14 @@ func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float,
 	_apply_status(victim, "stunned", 1, 0, 0, null, force_stun)
 	if placer.quick_rigging > 0:
 		_apply_status(victim, "cripple", 3)
+	# ADDITIVE (Batch BA): each counter IS the number its clause pays — Break
+	# damage (90) and the turns the teeth hold the wound open (5).
 	if placer.bone_breaker > 0:
-		victim.take_hit(0, 30)
-		_stat_bd(placer, 30)
-		victim.float_text("+30 BD", Color(0.8, 0.35, 1.0))
+		victim.take_hit(0, placer.bone_breaker)
+		_stat_bd(placer, placer.bone_breaker)
+		victim.float_text("+%d BD" % placer.bone_breaker, Color(0.8, 0.35, 1.0))
 	if placer.caught_fast > 0:
-		_apply_status(victim, "caught", 3)
+		_apply_status(victim, "caught", placer.caught_fast)
 	_hit_and_run(placer)
 
 
@@ -10097,25 +10289,20 @@ func _on_enemy_death(victim: BattleUnit) -> void:
 			mo_h.refresh_bars()
 			_log("   → Bloodied Momentum: %s drinks the kill (+%d Rage)" % [
 				mo_h.unit_name, mo_rage], "#b0a8e0")
-	# Scavenger: the Survivalist strips the corpse for supplies.
+	# Scavenger: the Survivalist strips the corpse for supplies. ADDITIVE — the
+	# counter is percentage POINTS of his maximum Mana (Batch BA: 25).
 	for sc_h in heroes:
 		if not sc_h.dead and sc_h.scavenger_ranks > 0:
-			var scv := int(sc_h.max_resource * 0.08 * sc_h.scavenger_ranks)
+			var scv := int(sc_h.max_resource * 0.01 * sc_h.scavenger_ranks)
 			sc_h.resource = mini(sc_h.resource + scv, sc_h.max_resource)
 			sc_h.float_text("+%d Mana" % scv, Color(0.45, 0.6, 0.95))
 			sc_h.refresh_bars()
-	# Creeping Death: the rot never dies with its host.
-	if victim.has_status("poison") and _living_hero_with("creeping_death") != null:
-		var cd_st: Dictionary = victim.get_status("poison")
-		var cd_pool: Array = enemies.filter(
-			func(e): return not e.dead and e != victim)
-		if not cd_pool.is_empty():
-			var cd_to: BattleUnit = cd_pool.pick_random()
-			for _cd in maxi(int(cd_st.get("stacks", 1)), 1):
-				_apply_status(cd_to, "poison", int(cd_st.get("turns", 5)), 0,
-					int(cd_st.get("tick", 3)))
-			_log("   → Creeping Death: the rot crawls to %s" % cd_to.unit_name,
-				"#70d878")
+	# CREEPING DEATH DOES NOT LIVE HERE ANY MORE (Batch BA). It used to pass a
+	# poisoned corpse's stacks to the living — transmission from a body, i.e.
+	# the reserved contagion spec's idea. It is a RE-SPEC, not a deletion: the
+	# node keeps its id and its name and now refreshes a Poison whenever he lays
+	# another status on the same enemy (`_creeping_refresh`, on the
+	# status-application path). A death books nothing for it.
 
 
 # Every talent that feeds a companion's blows, in one place: Loyalty
@@ -11007,6 +11194,9 @@ func _print_sim_report() -> void:
 	var fx := focus_report_line(sim_stats)
 	if fx != "":
 		print(fx)
+	var bx := breadth_report_line(sim_stats)
+	if bx != "":
+		print(bx)
 	print("=============================================\n")
 
 
@@ -11062,6 +11252,25 @@ static func focus_report_line(stats: Dictionary) -> String:
 		return ""
 	return "Focus: deepest reached %d (critical multiplier x%s at that depth)" % [
 		deepest, String.num(stats.get("focus_deepest_mult", 2.0), 2)]
+
+
+# BATCH BA §0 — THE SURVIVALIST'S ONE NEW NUMBER, and for this spec it is the
+# whole batch: the AVERAGE COUNT OF DISTINCT STATUSES ON A TARGET WHEN HE
+# STRIKES IT. That count IS his damage multiplier (Trapper pays +8% a status),
+# so it is the only figure that says whether §2's Venom carriers actually landed
+# — a damage share can move for a dozen reasons, breadth can only move for one.
+# Banked at the site that READS it, so what is recorded is the number the
+# multiplier was actually computed from. Shared by the standalone report and
+# RunSim's, the ruin_report_line pattern. Returns "" when no Survivalist stood:
+# a zero on a party without one reads as a broken instrument rather than a
+# finding.
+static func breadth_report_line(stats: Dictionary) -> String:
+	var strikes: float = stats.get("breadth_strikes", 0.0)
+	if strikes <= 0.0:
+		return ""
+	return "Trapper breadth: %.2f distinct statuses per strike (n=%d strikes, most seen %d)" % [
+		stats.get("breadth_sum", 0.0) / strikes, int(strikes),
+		int(stats.get("breadth_max", 0.0))]
 
 
 # Sweep report (DOD_SIM_SWEEP=1): one row per budget stage. Rounds reuses

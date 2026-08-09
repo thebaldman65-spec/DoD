@@ -398,12 +398,12 @@
 		"name": "Rune of the Carrion Wake", "rarity": "rare", "scope": "spec:mystic",
 		"price": 75, "scarred": true, "lane": "Guerilla",
 		"desc": "He strikes 30% harder at anything wearing three afflictions and drinks 16% max Mana from every death — but -12% max health.",
-		"payload": {"stat": {"vulture": 1, "scavenger_ranks": 2, "max_hp_pct": -0.12}}
+		"payload": {"stat": {"vulture": 30, "scavenger_ranks": 16, "max_hp_pct": -0.12}}
 	},
 	"long_hunt": {
 		"name": "Rune of the Long Hunt", "rarity": "rare", "scope": "spec:mystic",
 		"price": 100,
 		"desc": "A little of every trick: +1 Poison damage per stack, +15% trap damage, Tripwire answers with 10% more of his Attack.",
-		"payload": {"stat": {"potent_ranks": 1, "cruel_ranks": 1, "wire_ranks": 1}}
+		"payload": {"stat": {"potent_ranks": 1, "cruel_ranks": 15, "wire_ranks": 10}}
 	}
 }

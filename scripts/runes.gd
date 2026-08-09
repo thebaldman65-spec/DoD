@@ -80,7 +80,24 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# `opp_aim_step` is a FLOAT and is deliberately ABSENT, because the coercion
 	# would round 4.0 and nothing would crash.
 	"deep_focus", "perfect_form", "opening_volley",
+	# BATCH BA: `vulture` STAYS, and the reason changed under it too. It was a
+	# Survivalist flag whose payload was a bare 1; it is an int MAGNITUDE now
+	# (60 = percentage points of damage against a three-affliction target) and
+	# the Rune of the Carrion Wake pays 30 into it, so it needs this list
+	# exactly as much as it did as a flag. `coated_blades` stays a genuine FLAG
+	# — a rule, not an amount — and stays here for the original reason.
 	"coated_blades", "vulture",
+	# BATCH BA, the rest of the Survivalist's additive counters that do NOT end
+	# in "_ranks". None is written by a rune TODAY — the four spec:mystic runes
+	# ride `potent_ranks`, `cruel_ranks`, `wire_ranks`, `scavenger_ranks`,
+	# `coated_blades` and `vulture` — and they are listed for the durability
+	# AW/AX listed their unwritten ones with, so a later rune cannot land on one
+	# and fail to spawn a hero. NOT HERE ON PURPOSE: `max_hp_pct` is FRACTIONAL
+	# (Woodcraft's 0.20, the Carrion Wake's -0.12) and coercing it would flatten
+	# both to zero.
+	"necrosis", "quartermaster", "quick_rigging", "caught_fast", "bone_breaker",
+	"deadfall_network", "hit_and_run", "field_medic", "ghillie", "improvised",
+	"perfected_toxin", "force_of_nature",
 	# Batch AR: the Rune of the Cinder Trail was re-pointed onto its own term
 	# when the node took cinder_trail_ranks for a new meaning. Same trap, same
 	# list — it is a bare 1 that does not end in "_ranks".

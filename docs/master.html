@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-08 (Batch AZ)</b></p>
+<p align="right"><b>Last updated: 2026-08-09 (Batch BA)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1205,7 +1205,8 @@ Passive <i>Trapper</i>: enemies that strike the Hunter
 have a 25% chance to be Poisoned (5 turns), and the Survivalist's abilities deal <b>+8%
 damage per DIFFERENT status effect</b> afflicting the target (the curated debuff list only)
 — breadth of control IS the damage. Five different debuffs beat fifty stacks of one; his
-meter lives on the enemy.<br>
+meter lives on the enemy. It is the one payoff in the game with a real ceiling, and that is
+deliberate: breadth is bounded by how many distinct debuffs exist.<br>
 Tripwire — 20 Mana, 2.0, 4cd, for 5 turns the Hunter retaliates against EVERY attacking
 melee enemy — regardless of who they hit (Perfect: 6 turns).<br>
 Shrapnel Charge — 25 Mana, 3.0, 2cd, rips TWO chosen enemies for 20 NATURE / 25 BD each,
@@ -1214,7 +1215,7 @@ fragment rolls miss/parry separately.<br>
 Snare Trap — 20 Mana, 2.0, 3cd: rig a snare on one enemy — the next time it acts it is
 STUNNED for 1 turn and Poisoned for 4. Bosses shrug the stun unless Broken — unless the
 snare was rigged PERFECTLY (Perfect: the Stun lands on an unbroken boss).
-One trap at a time (two under Deadfall Network).<br>
+One trap at a time (three under Deadfall Network).<br>
 <b>Spec pool (earnable, §6a)</b> — five of the designed eight (Blight, Smoke Bomb and
 Field Dressing land later):<br>
 Explosive Shot — 35 Mana, 3.0, 3cd: 10 NATURE to ALL / 20 BD, Poisoning each (Perfect: 12
@@ -1227,8 +1228,10 @@ Deadfall — 20 Mana, 2.0, 3cd: an untargeted trap — the NEXT enemy to act tak
 nature damage and is Stunned 1 turn. You don't pick the victim (Perfect: you name them;
 an aimed trap waits for its mark, and releases if the mark dies first).<br>
 Harvest — 25 Mana, 3.0, 4cd: CONSUME every status on one enemy — 12% Atk per status
-consumed, healing yourself the same amount (Perfect: heals 150%). Cashing out strips your
-own Trapper bonus from the target.<br>
+REMOVED, healing yourself the same amount (Perfect: heals 150%). It is paid for what the
+cleanse actually took: a poison that cannot be cleansed (Slow Acting, Perfected Toxin)
+stays on the body and is not billed for. Cashing out strips your own Trapper bonus from
+the target.<br>
 <b>Talent lanes:</b> see §7 — Venom / Snares / Guerilla.</li>
 </ul>
 
@@ -1337,17 +1340,21 @@ returns pay: invest in the dividend) · <b>ZEAL</b> (invest shallowly in EVERYON
 <tr><td>7</td><td><b>Tunnel Vision</b> &mdash; +100% critical chance against the enemy you attacked last turn; -100% against every other enemy.</td><td><b>Overkill</b> &mdash; Excess damage from a killing blow carries to another enemy at full value — and the carry keeps your Focus in FULL rather than dropping it to the usual 50.</td><td><b>Spray of Arrows</b> &mdash; Your single-target attacks strike 2 additional random enemies for 50% damage — but Focus can never exceed 50.</td></tr>
 <tr><td>CAP</td><td><b>One Shot</b> &mdash; At 200 or more Focus, Aimed Shot EXECUTES any non-boss enemy below 35% health outright (elites included); otherwise it deals double damage. Either way, Focus resets to 0.</td><td><b>Through and Through</b> &mdash; Your attacks ignore ALL armor, and every critical hit refunds its Mana cost.</td><td><b>Rapid Fire</b> &mdash; Each ability you use has a 50% chance not to consume its cooldown.</td></tr>
 </table>
-<p><b>Survivalist</b> — <b>VENOM</b> (poison as a damage engine) · <b>SNARES</b> (traps, retaliation, denial) · <b>GUERILLA</b> (survival and party utility)</p>
+<p><b>Survivalist</b> — <b>VENOM</b> (the affliction that ticks) · <b>SNARES</b> (the affliction that stops) · <b>GUERILLA</b> (the affliction that adds up)</p>
+<p>Every Venom node hangs a <b>different</b> affliction off the poison rather than more of the
+same — his passive pays for BREADTH, so the lane named for his signature damage feeds it
+instead of competing with it. A single poison application from a Distillate + Slow Acting
+build lands three distinct statuses.</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Venom</th><th>Snares</th><th>Guerilla</th></tr>
-<tr><td>1</td><td><b>Potent Toxins</b> — Your Poison deals +1 damage per stack.</td><td><b>Reinforced Wire</b> — Tripwire&#x27;s retaliation deals +10% of your Attack.</td><td><b>Woodcraft</b> — +6% max Health.</td></tr>
-<tr><td>2</td><td><b>Coated Blades</b> — Your basic attack applies Poison for 2 turns.</td><td><b>Quick Rigging</b> — Snare Trap&#x27;s cooldown is reduced by 1, and its spring also applies Cripple.</td><td><b>Hit and Run</b> — Whenever you apply a status to an enemy, you gain Elusive for 1 turn.</td></tr>
-<tr><td>3</td><td><b>Virulence</b> — Your Poison applications add +1 extra stack(s).</td><td><b>Cruel Devices</b> — Your traps deal +15% damage.</td><td><b>Scavenger</b> — Restore 8% max Mana whenever an enemy dies.</td></tr>
-<tr><td>4</td><td><b>Slow Acting</b> — Your Poison deals HALF damage but lasts TWICE as long and cannot be cleansed.</td><td><b>Snap Shut</b> — Tripwire also retaliates against RANGED attackers, not only melee.</td><td><b>Field Medic</b> — At the start of your turn, cleanse one debuff from a random ally.</td></tr>
-<tr><td>5</td><td><b>Creeping Death</b> — When a Poisoned enemy dies, its Poison stacks transfer to another enemy.</td><td><b>Caught Fast</b> — Enemies caught by your traps cannot be healed for 3 turns.</td><td><b>Vulture</b> — +30% damage against enemies afflicted by 3 or more different statuses.</td></tr>
-<tr><td>6</td><td><b>Necrosis</b> — Poisoned enemies take +20% damage from ALL sources, not just yours.</td><td><b>Bone Breaker</b> — Your traps apply 30 Break damage when they spring.</td><td><b>Ghillie Suit</b> — Enemies are 40% less likely to target you while another ally lives.</td></tr>
-<tr><td>7</td><td><b>Plague Bearer</b> — At the start of your turn, one Poisoned enemy spreads 3 Poison stacks to another.</td><td><b>Deadfall Network</b> — You may have TWO traps active at once.</td><td><b>Improvised</b> — The first ability you use each fight does not start its cooldown.</td></tr>
-<tr><td>CAP</td><td><b>Epidemic</b> — Every enemy is PERMANENTLY Poisoned, and your Poison cannot be cleansed or expire.</td><td><b>The Whole Forest</b> — Tripwire never expires and bites on EVERY enemy action — melee, ranged, or spellwork.</td><td><b>Force of Nature</b> — Trapper&#x27;s bonus rises to +20% per different status — and applies to your ENTIRE party&#x27;s damage.</td></tr>
+<tr><td>1</td><td><b>Potent Toxins</b> — Your Poison deals +8 damage per stack.</td><td><b>Reinforced Wire</b> — Tripwire&#x27;s retaliation deals +35% of your Attack.</td><td><b>Woodcraft</b> — +20% maximum Health.</td></tr>
+<tr><td>2</td><td><b>Coated Blades</b> — Your basic attack applies Poison for 2 turns and Cripple for 2 turns.</td><td><b>Quick Rigging</b> — Snare Trap&#x27;s cooldown is reduced by 2, and its spring also applies Cripple.</td><td><b>Hit and Run</b> — Whenever you apply a status to an enemy, you gain Elusive for 2 turns.</td></tr>
+<tr><td>3</td><td><b>Distillate</b> — Your Poison applications add +2 extra stacks and apply Exposed for 3 turns.</td><td><b>Cruel Devices</b> — Your traps deal +50% damage.</td><td><b>Scavenger</b> — Restore 25% maximum Mana whenever an enemy dies.</td></tr>
+<tr><td>4</td><td><b>Slow Acting</b> — Your Poison deals HALF damage but lasts TWICE as long, cannot be cleansed, and applies Slowed for 3 turns.</td><td><b>Snap Shut</b> — Tripwire also retaliates against RANGED attackers, not only melee.</td><td><b>Field Medic</b> — At the start of your turn, cleanse 2 debuffs from random allies.</td></tr>
+<tr><td>5</td><td><b>Creeping Death</b> — Applying any status to a Poisoned enemy refreshes its Poison to full duration.</td><td><b>Caught Fast</b> — Enemies caught by your traps cannot be healed for 5 turns.</td><td><b>Vulture</b> — +60% damage against enemies afflicted by 3 or more different statuses.</td></tr>
+<tr><td>6</td><td><b>Necrosis</b> — Poisoned enemies take +35% damage from ALL sources, not just yours.</td><td><b>Bone Breaker</b> — Your traps apply 90 Break damage when they spring.</td><td><b>Ghillie Suit</b> — Enemies are 65% less likely to target you while another ally lives.</td></tr>
+<tr><td>7</td><td><b>Quartermaster</b> — Your allies&#x27; basic attacks also apply your Poison.</td><td><b>Deadfall Network</b> — You may have THREE traps active at once.</td><td><b>Improvised</b> — The first 2 abilities you use each fight do not start their cooldowns.</td></tr>
+<tr><td>CAP</td><td><b>Perfected Toxin</b> — Your Poison cannot be cleansed, never expires, and its tick rises by 2 each turn it persists.</td><td><b>The Whole Forest</b> — Tripwire never expires and bites on EVERY enemy action — melee, ranged, or spellwork.</td><td><b>Force of Nature</b> — Trapper&#x27;s bonus rises to +20% per different status — and applies to your ENTIRE party&#x27;s damage.</td></tr>
 </table>
 <p><b>Beastmaster</b> — <b>DEVOTION</b> (partnership in depth: one beast, further) · <b>THE PACK</b> (partnership in breadth: many beasts, rotated) · <b>HANDLER</b> (what he does when the partnership is not the answer)</p>
 <table border="1" cellpadding="4">

@@ -449,7 +449,7 @@ static func survivalist_pool_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Harvest", "cooldown": 4, "cost": 25,
 				"special": "harvest", "delay": 3.0, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "Heals 150% of the damage",
-				"description": "CONSUME every status on one enemy:\n12% of Attack per status consumed,\nand you heal the same amount.\nCashing out strips your own Trapper\nbonus from the target — spend the\nboard wisely."})
+				"description": "CONSUME every status on one enemy:\n12% of Attack per status REMOVED,\nand you heal the same amount.\nA poison that cannot be cleansed\nstays — and is not paid for.\nCashing out strips your own Trapper\nbonus from the target — spend the\nboard wisely."})
 	return null
 
 

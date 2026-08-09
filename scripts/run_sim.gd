@@ -1016,6 +1016,12 @@ static func _print_report(battle) -> void:
 	var fx_line: String = battle.focus_report_line(battle.sim_stats)
 	if fx_line != "":
 		print(fx_line)
+	# Batch BA §0: the average count of distinct statuses standing on a target
+	# when the Survivalist strikes it — his damage multiplier, read directly.
+	# Same rule, same place.
+	var bx_line: String = battle.breadth_report_line(battle.sim_stats)
+	if bx_line != "":
+		print(bx_line)
 	var earned := talent_spent + talent_left
 	print("Talent points per hero per run: earned %.1f   spent %.1f (banked %.1f)" % [
 		earned / runs / 4.0, talent_spent / runs / 4.0, talent_left / runs / 4.0])

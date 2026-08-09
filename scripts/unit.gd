@@ -188,31 +188,40 @@ var one_shot := 0            # capstone: the Focus THRESHOLD One Shot fires at �
                              # gate and magnitude in one field (AW's `judgement`)
 var through_and_through := 0 # FLAG: ignore ALL armor; crits refund Mana
 var rapid_fire := 0          # capstone: % chance an ability skips its cooldown
-# ---- Survivalist lane talents + trap state (Batch 33) ----
-var potent_ranks := 0        # Potent Toxins: poison +1/rank per stack
-var coated_blades := 0       # basic attacks apply Poison 2t
-var virulence_ranks := 0     # poison applications add +1 stack/rank
-var slow_acting := 0         # poison half tick, double turns, uncleansable
-var creeping_death := 0      # poisoned deaths pass their stacks onward
-var necrosis := 0            # poisoned enemies take +20% from ALL sources
-var plague_bearer := 0       # turn start: a poisoned enemy spreads 3 stacks
-var wire_ranks := 0          # Reinforced Wire: tripwire +10%/rank of Attack
-var quick_rigging := 0       # Snare Trap cd -1 (payload) + snares Cripple
-var cruel_ranks := 0         # traps deal +15%/rank damage
-var snap_shut := 0           # tripwire also bites ranged attackers
-var caught_fast := 0         # trap victims cannot be healed 3t
-var bone_breaker := 0        # traps apply 30 Break damage
-var deadfall_network := 0    # two traps may be active at once
-var hit_and_run := 0         # applying a status grants Elusive 1t
-var scavenger_ranks := 0     # +8%/rank max Mana on enemy death
-var field_medic := 0         # turn start: cleanse 1 debuff from a random ally
-var vulture := 0             # +30% vs enemies with 3+ different statuses
-var ghillie := 0             # 40% less likely to be targeted while allies live
-var improvised := 0          # first ability each fight starts no cooldown
-var improvised_used := false
-var epidemic := 0            # capstone: all enemies permanently Poisoned
+# ---- Survivalist lane talents + trap state (Batch 33, RE-AUTHORED BY BA) ----
+# EVERY COUNTER IS ADDITIVE: it writes its own magnitude in the units its read
+# site sums, so a node and a rune each pay what they advertise, alone and
+# stacked. FLAGS (a bare 1) are RULES, not amounts — they are named as such.
+var potent_ranks := 0        # Potent Toxins: FLAT poison damage per stack (8)
+var coated_blades := 0       # FLAG: basic attacks apply Poison 2t + Cripple 2t
+var virulence_ranks := 0     # Distillate: EXTRA poison stacks per application (2)
+var slow_acting := 0         # FLAG: half tick, double turns, sticky, +Slowed 3t
+var creeping_death := 0      # FLAG: any status on a Poisoned enemy refreshes it
+var necrosis := 0            # Poisoned enemies take +N% from ALL sources (35)
+var quartermaster := 0       # FLAG: allies' basic attacks apply HIS Poison
+                             # (the id sv_plague carries it; PLAGUE BEARER, and
+                             # the concept, are GONE — see the Batch BA block)
+var wire_ranks := 0          # Reinforced Wire: tripwire +N% of Attack (35)
+var quick_rigging := 0       # Snare Trap cooldown reduction (2) + snares Cripple
+var cruel_ranks := 0         # traps deal +N% damage (50)
+var snap_shut := 0           # FLAG: tripwire also bites ranged attackers
+var caught_fast := 0         # trap victims cannot be healed for N turns (5)
+var bone_breaker := 0        # traps apply N Break damage (90)
+var deadfall_network := 0    # the trap CAP it installs (3) — gate AND magnitude
+var hit_and_run := 0         # applying a status grants Elusive for N turns (2)
+var scavenger_ranks := 0     # +N% max Mana on enemy death (25)
+var field_medic := 0         # turn start: cleanse N debuffs from random allies (2)
+var vulture := 0             # +N% vs enemies with 3+ different statuses (60)
+var ghillie := 0             # N% less likely to be targeted while allies live (65)
+var improvised := 0          # how many opening abilities start no cooldown (2)
+var improvised_used := 0     # how many of them have been spent (AZ's `snap_used`)
+var perfected_toxin := 0     # capstone: his Poison is sticky, never expires, and
+                             # its tick RISES by N each turn it persists (2).
+                             # The id sv_epidemic carries it; EPIDEMIC's
+                             # field-wide infection is GONE (reserved space)
 var whole_forest := 0        # capstone: tripwire never expires, bites everything
-var force_of_nature := 0     # capstone: Trapper bonus 20%/status, party-wide
+var force_of_nature := 0     # capstone: Trapper's bonus as a percentage (20),
+                             # and it applies to the WHOLE party
 var deadfall_armed := 0      # armed untargeted traps waiting to spring
 var deadfall_aims: Array = [] # Batch AH: enemy indices a PERFECT rig named
 var companion_hp_bonus := 0   # talents: extra HP for summoned companions
@@ -1405,7 +1414,9 @@ func dispel_one_debuff() -> String:
 # Cleanse: strip every harmful status. Broken stays — it's a Break-meter
 # state, not a dispellable status. Returns how many were removed.
 func purge_debuffs() -> int:
-	# Sticky statuses (Slow Acting / Epidemic poison) refuse every cleanse.
+	# Sticky statuses (Slow Acting / Perfected Toxin poison) refuse every
+	# cleanse. Batch BA leans on this: Harvest is now paid for what the purge
+	# actually TOOK, so what survives here is what it is not billed for.
 	var before := statuses.size()
 	statuses = statuses.filter(
 		func(s): return s.id == "broken" or s.get("sticky", false) \

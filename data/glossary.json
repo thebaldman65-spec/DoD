@@ -62,7 +62,7 @@
    "see_also": ["dmg_fire", "status_poison"]},
   {"id": "status_poison", "term": "Poison", "category": "statuses",
    "short": "Stacking nature damage at each turn start.",
-   "long": "Each poison stack ticks for about 3% of the applier's Attack at the victim's turn start, and stacks have no cap - the pile grows, and each new stack refreshes the timer. Poison is nature-typed, so nature resists blunt it. Some poisons (Slow Acting, Epidemic) are sticky and cannot be cleansed.",
+   "long": "Each poison stack ticks for about 3% of the applier's Attack at the victim's turn start, plus a flat bonus per stack from Potent Toxins, and stacks have no cap - the pile grows, and each new stack refreshes the timer. Poison is nature-typed, so nature resists blunt it. The Survivalist's Venom lane makes each application CARRY a second affliction: Coated Blades adds Cripple, Distillate adds Exposed, Slow Acting adds Slowed. Some poisons (Slow Acting, Perfected Toxin) are sticky and cannot be cleansed - and a sticky poison survives a Harvest, so Harvest is not paid for it.",
    "see_also": ["dmg_nature", "status_burn"]},
   {"id": "status_bleed", "term": "Bleed", "category": "statuses",
    "short": "Buildup meter: at 100 the target bleeds out for 20% max HP.",

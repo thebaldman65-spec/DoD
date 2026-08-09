@@ -617,13 +617,23 @@ func _power_arm(data: Dictionary, unit_props: Dictionary, unit_src: String,
 # read site sums (points the conversion point drops, Focus a crit grants, Focus
 # he opens holding), so a rune CAN now move them and the pool does. The check
 # fired the moment the code changed, which is exactly the moment it was supposed
-# to. The two survivors are named so the list cannot empty by attrition:
-# `coated_blades` and `vulture`, both Survivalist flags — and HIS is the last
-# tree still carrying Batch AI's magnitudes, so expect this list to shrink again
-# when it is re-authored, DELIBERATELY and with the same reasoning.
+# to.
+#
+# BATCH BA TOOK A FOURTH, AND IT IS THE ONE AZ PREDICTED IN THIS COMMENT.
+# `vulture` was a Survivalist flag in front of a hard-coded 1.30; the re-author
+# gave it a real magnitude in the units its read site sums (60 = percentage
+# points), and the Rune of the Carrion Wake pays 30 into it now instead of a
+# bare 1 that did nothing. The prediction and the removal are recorded together
+# on purpose — the list shrinks when a tree is re-authored, never by attrition.
+#
+# ONE SURVIVOR, NAMED SO THE LIST CANNOT EMPTY QUIETLY: `coated_blades`. It is a
+# RULE, not an amount — his basic attack applies Poison and Cripple — so no
+# re-author can give it a magnitude, and the Rune of the Weeping Wound writing
+# it a bare 1 is correct rather than a leftover. WITH THE SURVIVALIST DONE,
+# EVERY TREE IN THE GAME HAS BEEN RE-AUTHORED: a future entry to this list would
+# be a NEW flag field, not another old one waiting its turn.
 const BOOLEAN_READ_FIELDS := {
 	"coated_blades": "coated_blades > 0",
-	"vulture": "vulture > 0",
 }
 
 

@@ -178,7 +178,199 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   every elite/mini-boss) → battle → sometimes shop and/or event → back to map.
   party.tscn is the HERO SHEET now, opened from a card.
 
-## Current systems snapshot (2026-08-08)
+## Current systems snapshot (2026-08-09)
+
+### STANDING DESIGN RULE — THE CONTAGION SPACE IS RESERVED (Batch BA §1)
+**A future spec is planned whose fantasy is DISEASE AND VIRALITY. Nothing self-propagating
+may be authored into the Survivalist's tree, or into any existing spec, until that spec is
+built.** Off-limits: transmission between enemies, transmission from a corpse, field-wide
+infection — anything that spreads WITHOUT the hero acting. **POISON ITSELF IS NOT RESERVED
+AND STAYS ENTIRELY THE SURVIVALIST'S**: poison is craft — curare, hemlock, a blade wiped on
+the right leaf. The distinction to hold is *a hunter who knows which plant does what* versus
+*a plague that no longer needs him.* This is recorded as a RULE rather than as four edits on
+purpose: without it a later batch re-adds "spreads to another enemy" innocently and spends
+the new spec's idea a second time. **BA re-specced four nodes off it** — Epidemic (capstone,
+every enemy permanently Poisoned), Plague Bearer (rot leaps enemy to enemy), Creeping Death
+(a corpse passes its stacks to the living) and the NAME Virulence (a pathogen term). SNARES
+and GUERILLA were never disease and are untouched by the rule.
+
+BATCH BA (08-09) — THE SURVIVALIST: ATTRITION THROUGH CRAFT. **LAST OF THE TWELVE — EVERY
+TALENT TREE IN THE GAME IS NOW PURPOSE-AUTHORED.** One spec only; the other eleven trees and
+enemy tuning UNTOUCHED. Every one of his 24 ids survives and re-specs in place, NO SAVE
+VERSION MOVES (still v7). His spec id is "mystic" and MUST NEVER BE RENAMED.
+SPINE: **ATTRITION — BREADTH OF AFFLICTION, NOT DEPTH OF ONE**, which was already half
+written: Trapper's +8% per DIFFERENT status is the cleanest statement of a spine in the game.
+**THIS IS THE ONE SPEC WHOSE CEILING IS CORRECT AND IS DELIBERATELY NOT REMOVED.** Overburn
+(AR), Loyalty (AY), Focus (AZ), Resonance (AT) and Ruin (AX) all lost theirs; breadth is
+bounded by how many distinct debuffs EXIST, which is a design constant rather than a dial, so
+there is nothing to take off. Master.html now says WHY, so a later batch does not read it as
+an oversight.
+§0 **ONE NEW NUMBER, AND FOR THIS SPEC IT IS THE WHOLE BATCH: the average count of distinct
+statuses on a target when he strikes it.** That count IS his damage multiplier, so it is the
+only figure that says whether §2's carrier re-specs actually worked — a damage share moves for
+a dozen reasons, breadth moves for one. `breadth_report_line()` shared by the standalone report
+and RunSim's (the `ruin_report_line` pattern), banked AT THE SITE THAT READS IT so what is
+recorded is the number the multiplier was computed from, and printed only when a Survivalist
+stood. Damage share is ALSO a valid read for him (Pressure archetype) — Batch W has him at
+25/25/25/26, the most stable spec in the game across every field size.
+§2/§3 **VENOM'S NODES EACH HANG A DIFFERENT AFFLICTION OFF THE POISON.** The lane named for his
+signature damage was fighting his own passive: a poison build earned +8% where a five-affliction
+build earned +40%. Now **Coated Blades carries Cripple, Distillate carries Exposed, Slow Acting
+carries Slowed** — and the pun Slow Acting had left unclaimed since Batch 33 is finally spent.
+MEASURED: one application from a Distillate + Slow Acting build lands **THREE distinct
+statuses**, i.e. +24% off a single cast. **NECROSIS STAYS EXACTLY AS WRITTEN, NAME INCLUDED** —
+tissue death from venom is what venomous bites do, it is craft rather than contagion, and it was
+already the only Venom node pointed at breadth.
+§3 ALL 24 NODES RE-PRICED AT ROW PRICING, **the Hunter's 3-4x** (AY and AZ's rate, not the
+Cleric three's 4-5x). **ALL THREE LANE NAMES AND THESES STAND**, re-aimed only in what Venom's
+nodes DO: *the affliction that ticks · the affliction that stops · the affliction that adds up.*
+FULL TABLE IN THE CHANGELOG. **FOUR NODES ARE RE-SPECCED RATHER THAN REPRICED, and each names
+what it replaced**: `sv_virulence` -> **DISTILLATE** (a rename only — the mechanic and the id
+survive); `sv_creeping` -> **CREEPING DEATH, KEEPING ITS NAME** (applying any status to a
+Poisoned enemy refreshes its Poison to full duration — he keeps the wound open, the corpse
+transfer is gone); `sv_plague` -> **QUARTERMASTER** (his allies' basic attacks also apply HIS
+poison — party-wide craft with nothing self-propagating, the closest thing to Plague Bearer's
+REACH that stays out of §1's space); `sv_epidemic` -> **PERFECTED TOXIN** (his Poison cannot be
+cleansed, never expires, and its tick RISES by 2 each turn it persists — it keeps the
+uncleansable identity that made Epidemic a capstone and drops the field-wide infection).
+**POTENT TOXINS STAYS FLAT DAMAGE RATHER THAN BECOMING A PERCENTAGE OF ATTACK, deliberately**:
+converting it would change `_apply_poison`'s units and every rune riding `potent_ranks` with it,
+for a gain the reprice already delivers. 8x the value, same units, no read-site change — **and
+that is why the two runes paying into it needed NO re-point and are reported as such.**
+**QUARTERMASTER'S POISON IS APPLIED WITH THE SURVIVALIST AS `src`, and that is load-bearing**:
+the tick reads HIS Attack and HIS Potent Toxins, the Venom carriers come with it, and the sim
+credits the tick to him rather than to whoever swung. Quartermaster is NOT Plague Bearer with
+different numbers and nothing may be re-pointed from one to the other.
+**PERFECTED TOXIN'S TICK-RISE IS ITS OWN FUNCTION, `_perfected_toxin_tick`** — `_run_battle`
+cannot be driven headlessly (the AR trap), so a clause buried in its loop could only ever be
+checked by a grep. **CREEPING DEATH SITS ABOVE `_apply_status`'s per-status branches**, because
+chilled, burn and poison all return early and a hook below them would silently miss every status
+a Cryomancer or Pyromancer lands. It reads the `full` stamp `_apply_poison` leaves rather than a
+constant of its own, so a Slow Acting poison refreshes to its DOUBLED span.
+§3 **LIVE BUG FOUND AND FIXED — QUICK RIGGING'S COOLDOWN CLAUSE HAS HAD NO IMPLEMENTATION SINCE
+BATCH 33.** unit.gd's own comment said "Snare Trap cd -1 (payload)" and no payload existed: the
+node's whole payload was `{"stat": {"quick_rigging": 1}}`, so only the Cripple half ever fired
+while the tooltip promised both. Same failure shape as AJ's Measured Rage, through a different
+door. It is TWO PAYLOADS now via the `also` key (AK) — `apply_payload` is an if/elif chain, so a
+node carrying `stat` AND `ability` would silently drop the second, which is exactly how this
+would have been "fixed" wrongly.
+§6 **EVERY SURVIVALIST COUNTER IS ADDITIVE** (the AR/AS/AT/AV/AW/AX/AY/AZ form). §6 of the brief
+named FIVE to convert — `potent_ranks` (8, and its units did not move), `wire_ranks` (35),
+`cruel_ranks` (50), `scavenger_ranks` (25), `virulence_ranks` (2) — and **EVERY OTHER NODE WHOSE
+MAGNITUDE IS A NUMBER TOOK THE SAME TREATMENT, reported rather than silently generalised** (the
+AW/AX/AZ call): `necrosis` 35, `caught_fast` 5, `bone_breaker` 90, `deadfall_network` **3 — the
+trap CAP it installs, gate AND magnitude in one field** (AW's `judgement`), `hit_and_run` 2,
+`field_medic` 2, `vulture` 60, `ghillie` 65, `improvised` 2 with **`improvised_used` now a COUNT
+not a bool** (AZ's `snap_used`), `perfected_toxin` 2, `force_of_nature` 20. **FIVE ARE STILL
+HONEST FLAGS** — Coated Blades, Slow Acting, Creeping Death, Snap Shut and Quartermaster (rules,
+not amounts). `max_hp_pct` already wrote a real magnitude (0.06 -> 0.20).
+**THE THREE COUNTERS THAT CHANGED MEANING RATHER THAN UNITS, which is the harder failure:**
+`plague_bearer` and `epidemic` **NO LONGER EXIST AS FIELDS** (deleted with their read sites, not
+renamed in place, so a later batch cannot write one), and `creeping_death` **left
+`_on_enemy_death` entirely** for the status-application path. **THE RUNE AUDIT CAME BACK CLEAN
+AND IS RECORDED RATHER THAN ASSUMED: no spec:mystic or class:hunter rune ever rode any of the
+three**, so nothing needed flagging for re-authoring. **THE FOUR SPEC RUNES ALL STILL PAY EXACTLY
+WHAT THEY PAID, only the units moved:** the Long Hunt (`cruel_ranks` 1 -> 15, `wire_ranks` 1 ->
+10, `potent_ranks` 1 UNTOUCHED because that counter kept its units), the Carrion Wake (`vulture`
+1 -> **30**, `scavenger_ranks` 2 -> 16, the scar untouched), the Weeping Wound (untouched —
+`coated_blades` is a flag and `potent_ranks` kept its units) and the Quick Spring (an ability
+payload, nothing to re-point). **THE THREE HUNTER CLASS-WIDE RUNES TOUCH NO SURVIVALIST
+COUNTER**, asserted. **THE FLOAT TRAP BOTH WAYS: `vulture` LEFT test_runes' `BOOLEAN_READ_FIELDS`
+and STAYED IN `Runes.STAT_INT_KEYS`** — it was a flag in front of a hardcoded 1.30 and is an int
+magnitude now, so it needs the int list exactly as much and the boolean alarm not at all. AZ's
+comment predicted this removal by name; prediction and removal are recorded together.
+**`coated_blades` IS THE LAST ENTRY IN `BOOLEAN_READ_FIELDS` and cannot leave** — it is a rule,
+not an amount. `max_hp_pct` stays OUT of STAT_INT_KEYS (fractional).
+§7 **HARVEST NOW PAYS FOR WHAT IT ACTUALLY REMOVED.** It counted BEFORE the purge, so a sticky
+poison survived the cleanse and was billed for anyway — a known quirk since Batch 33, minor while
+his breadth was narrow, and §2/§3 would have grown the over-count with the batch that caused it.
+The count is MEASURED as a delta across the purge rather than predicted. **`_harvest_yield()` is
+THE one answer to "what would this reap"**, shared with the bot. MEASURED: against 3 standing / 2
+reapable statuses it deals 19 where the old over-count paid ~30. That is a real reduction to
+Harvest under Slow Acting and Perfected Toxin builds and it is correct.
+§8 THE BOT, two changes. **BREADTH BEFORE DEPTH** — his damage is the COUNT of distinct statuses,
+so Snare and Hamstring are gated on the target LACKING what they would add, and another poison
+application onto an already-poisoned mark waits below them. **HARVEST'S THRESHOLD MOVED OFF 4**
+to `HARVEST_BOT_YIELD` = 3, read off `_harvest_yield` — the same function the ability is paid on,
+so the bot and the ability can never disagree about what the button is worth (the AZ Coup
+precedent). Instrument honesty, not tuning: NO DIFFICULTY MEASUREMENT IN THIS BATCH.
+§4 **BOTH NAMED EXCLUSIVE PAIRS GO, AND THE PROSE LIST IS NOW EMPTY.** Virulence <-> Slow Acting
+had already dissolved (Venom rows 3 and 4, so row exclusivity lets a player hold both — which
+under §3 means Exposed AND Slowed together, intended and stated); Plague Bearer <-> Deadfall
+Network went with Plague Bearer, and its replacement needs no pair because Quartermaster and
+three traps sit in the same row 7. **NOTHING REMAINS IN THE LIST** — every pair ever authored has
+either dissolved under Batch AI's row exclusivity or is a same-row pair row exclusivity already
+enforces, so a later batch is not chasing pairs that have been handled for eight batches.
+`test_runes._exclusives` has been a bare `pass` since AI.
+§5 **THE TROPHY-POOL COLLISION CANNOT ARISE, and it is recorded rather than left to a reader.**
+HIS TREE GRANTS NO ABILITIES AT ALL (Tripwire, Shrapnel Charge and Snare Trap are base kit;
+Explosive Shot, Venom Coating, Hamstring, Deadfall and Harvest are boss-trophy pool), so he owes
+no AU §1 fallback in either direction. **ASSERTED BOTH WAYS** — no node carries
+`grant_ability`/`new_ability`, and a fully-learned tree adds NOTHING to `Talents.ability_names`.
+**THAT COMPLETES THE TWELVE, so the fallback ledger closes here — and computing it found the
+standing thread was STALE.** It claimed "seven specs, 11 nodes"; the live trees say **TWO specs,
+NINE nodes — the Pyromancer (5) and the Cryomancer (4)**, and nobody else owes one. Counted off
+`Talents.granted_name` / `Talents.collision_kind` (the two functions the tooltip itself reads),
+not from memory, and the thread below is corrected toward the code. **THREE SPECS STRUCTURALLY
+CANNOT OWE ONE — their trees grant no abilities at all:** the Beastmaster (AY), the Sharpshooter
+(AZ) and the SURVIVALIST (BA). The Inquisitor, Holy, the Occultist, the Berserker, the
+Swordmaster, the Warden and the Arcanist all GRANT abilities and all have AUTHORED answers.
+VERIFIED: check_parse 0, check_flow 0 (6 screens), run-harness gates 1/2/3 PASS.
+NEW test_batch_ba.gd **647/0**.
+Regression: ah 5410/0 (STAMP GATE bumped AZ -> BA), ah_battle 65/0, ai 2036/0, an 6047/0,
+aj 403/0, ak 523/0, al 556/0, ar 885/0, as 387/0, at 460/0,
+au **334/0 (was 257 — the durable half EXTENDED, not re-pointed: the Warrior three joined the
+"its batch landed, so it owes no generics" list, and a NEW half pins the three specs whose
+trees grant no abilities at all, so a grant quietly added to one of them trips in the file a
+later batch actually reads about fallbacks)**, av 315/0, aw 338/0, ax 329/0, ay 455/0,
+az 489/0,
+test_runes **2973/0 (was 2976 — `vulture` LEFT `BOOLEAN_READ_FIELDS`, taking its three
+checks with it, which is the AE alarm doing its job rather than the list decaying: the field
+was a flag in front of a hardcoded 1.30 and carries a real magnitude now. THE LIST HAS ONE
+ENTRY LEFT, `coated_blades`, and it cannot leave — it is a rule, not an amount. With the
+twelfth tree authored, a future entry would be a NEW flag field, not another one waiting its
+turn.)**, test_rune_battle 96/0.
+NEGATIVE CONTROLS RUN, all four the batch named, each applied to the code and reverted:
+**Creeping Death still firing on death trips 2, Perfected Toxin poisoning the whole field at
+battle start trips 3, Harvest counting sticky poison it did not remove trips 2, and
+Quartermaster's poison being credited to the ally rather than to him trips 4.**
+**ONE OF THE FOUR CAUGHT A TEST THAT COULD NOT FAIL, which is the whole reason to run them:**
+the live half of negative control 2 read the enemy list 20 process_frames after spawn, but
+`_run_battle` OPENS WITH `await _wait(0.6)` ON A REAL SceneTreeTimer — so a reinstated
+field-wide infection sailed straight past it while only the two source greps fired. The check
+sets `Engine.time_scale = 50.0` for the wait now (the AC gotcha: it scales those timers and
+nothing else), and it trips.
+KIT SMOKE, fixed lineup, 40 battles/row, berserker,pyromancer,inquisitor,mystic,
+DOD_SIM_TALENTS force-learning full 8-node lanes. All rows 40/40 wins, 0 SCRIPT ERROR.
+Survivalist damage share / **Trapper breadth (§0's number)**: **ungeared 23% (149/battle),
+1.51 statuses per strike (most seen 5); VENOM 28% (187), 1.94 (most seen 7); SNARES 21%
+(137), 1.65; GUERILLA 29% (200), 1.53.** Kit-mechanics ratios ONLY; NO difficulty signal
+(Batch R).
+**§2 ANSWERED BY ITS OWN INSTRUMENT, WHICH IS WHY §0 EXISTS: the VENOM lane raises breadth
+per strike 1.51 -> 1.94 and the deepest count 5 -> 7, while its damage share moves five
+points.** The carriers are doing what they were written to do, and the damage column alone
+would have under-read it — GUERILLA reads a higher share (29%) off a LOWER breadth (1.53),
+because Vulture and Force of Nature multiply a count they do not create.
+A VENOM row with the trophy abilities granted reads **22% (151), breadth 1.57**, with the
+rotation exercised: Snare Trap 1.6 casts/battle, Hamstring 0.9, Harvest 0.3, Deadfall 0.1.
+LIVE AUTOPLAY BATTLES clean (0 SCRIPT ERROR), and **BOTH RE-SPECS READ CORRECTLY IN A REAL
+FIGHT**: the carriers land beside the stacks ("Poison on Orc Raider (x3 — 18 nature dmg/turn,
+battle-long)" then "Slowed on Orc Raider (3 turns)" then "Exposed on Orc Raider (3 turns)"),
+and Creeping Death logs "the wound on Orc Archer is opened again (8 turns)" three times in one
+fight while NOTHING crawls to a second body.
+ONE LOG-HONESTY FIX FOUND BY WATCHING IT: the poison line printed "-1 turns" on a permanent
+poison. Every other status has said "battle" for years; only Epidemic could reach that branch
+before and **Perfected Toxin reaches it constantly**, so it reads "battle-long" now.
+NO DIFFICULTY MEASUREMENT AND NO SIM ROW, deliberately — same as
+AJ/AK/AL/AR/AS/AT/AU/AV/AW/AX/AY/AZ.
+REPORTED NOT ACTED ON: **PERFECTED TOXIN SWITCHES CREEPING DEATH OFF.** The capstone makes his
+poison permanent, and a poison with no clock has no duration to refresh — so a player holding
+Venom row 5 AND the Venom capstone owns a node that can never fire. It is legible from both
+texts, it costs a row-5 pick rather than a capstone, and the two sit in the same lane so the
+build is a deliberate one; but it is a real dead combination and the designer's call, not a
+batch's. **QUARTERMASTER IS UNEXERCISED BY THE SMOKE**: the bot's allies almost never take a
+0-cost basic when they hold abilities, so its live coverage is the test suite's, not the sim's.
+
 BATCH AZ (08-08) — THE SHARPSHOOTER: PATIENCE. Second of the Hunter three. One spec only;
 the other eleven trees and enemy tuning UNTOUCHED. Every one of his 24 ids survives and
 re-specs in place, NO SAVE VERSION MOVES (still v7).
@@ -4171,17 +4363,18 @@ Space or left click; no announcer text (combat log only).
   The open lever remains authored rune POWER — a runes.json data edit,
   not machinery — and the dilution question (see the AB block).
 - Sim bot wins ~90%+ with 4 heroes; real difficulty tuning by user playtest.
-- ONE TALENT TREE STILL CARRIES BATCH AI'S MAGNITUDES — **the SURVIVALIST, and he is the
-  last one in the game.** The four class batches AI promised landed (AK Swordmaster, AJ
-  Berserker, AL Warden, AR Pyromancer), then AS re-authored the Cryomancer and AT the
-  Arcanist — THE MAGE CLASS IS DONE — then AV the Holy Cleric, AW the Devout and AX the
-  Occultist — THE CLERIC CLASS IS DONE — and **AY the Beastmaster and AZ the
-  Sharpshooter**. The survivor is structurally correct and numerically weak: single-rank
-  nodes at the old rank-1 values, i.e. roughly a third of the power a row should be
-  priced at. The Cleric three needed 4-5x rather than the Mage trees' 3x because a
-  support's numbers were the smallest in the game; **the Beastmaster and the Sharpshooter
-  both took 3-4x**, so the Hunter is not a special case that way. **His spec id is
+- **CLOSED IN BATCH BA — ALL TWELVE TALENT TREES ARE PURPOSE-AUTHORED. Do not re-record
+  this as outstanding.** The four class batches AI promised landed (AK Swordmaster, AJ
+  Berserker, AL Warden, AR Pyromancer), then AS the Cryomancer and AT the Arcanist (MAGE
+  DONE), AV Holy, AW the Devout and AX the Occultist (CLERIC DONE), and AY the Beastmaster,
+  AZ the Sharpshooter and **BA the Survivalist (HUNTER DONE, and with it the roster)**.
+  Rates for the record: the Mage three took 3x, the Cleric three 4-5x (a support's numbers
+  were the smallest in the game), the Hunter three 3-4x. **The Survivalist's spec id is
   "mystic" — NEVER rename it, saves and trees key on it.**
+  WHAT THIS CLOSES AND WHAT IT DOES NOT: every tree now carries authored magnitudes, so
+  "structurally correct, numerically weak" is no longer true of anything. The open work that
+  used to hide behind it is the per-spec AU §1 GENERIC FALLBACKS (below) and authored
+  content in the ability-upgrade pool — neither is a magnitude question.
 - DEATH RAY CARRIES NO BREAK DAMAGE (Batch AT, STILL OPEN AFTER AU). AT's brief
   specified Mana, initiative, cooldown, damage, target count and the gate
   precisely and said nothing about BD, so it ships at pressure 0 rather than
@@ -4210,14 +4403,24 @@ Space or left click; no announcer text (combat log only).
   every ability-granting talent node falls back on, so a new entry is felt in
   two places. A hero draws three a run, so a pool much past ~8 stops being
   felt as a REWARD; the fallback has no such ceiling.
-- SEVEN SPECS STILL TAKE THE GENERIC TALENT FALLBACK (Batch AU §1), 11 nodes of
-  them. The Arcanist's two are authored (AU), Holy's two (AV) and the Devout's two
-  (AW). Each remaining class re-author batch should replace its own generics the
-  way those did — a node payload's `upgrade` list, or `no_fallback: true` where
-  the node already pays through another clause. The generic is a floor, not a
-  finished design. test_batch_au's floor is now `generic >= 11` and FALLS on
-  purpose one batch at a time, with a durable per-class half beside it (a spec
-  whose batch has landed must owe NO generics).
+- **TWO SPECS STILL TAKE THE GENERIC TALENT FALLBACK (Batch AU §1), NINE nodes of them:
+  the PYROMANCER (5) and the CRYOMANCER (4). Nobody else owes one.** This entry read
+  "seven specs, 11 nodes" until Batch BA; **that was stale prose, corrected toward the
+  code** — the count was computed off the live trees through `Talents.granted_name` and
+  `Talents.collision_kind`, the same two functions the tooltip reads, rather than counted
+  from memory. **FULL OWNERSHIP LEDGER, and it is complete now that all twelve trees are
+  authored:**
+  · AUTHORED, owes nothing — Berserker (2), Swordmaster (2), Warden (1), Holy (2),
+    Inquisitor (2), Occultist (2), Arcanist (1 authored + 1 `no_fallback`).
+  · STRUCTURALLY CANNOT OWE ONE, their trees grant no abilities at all — **Beastmaster
+    (AY), Sharpshooter (AZ), SURVIVALIST (BA)**. Each is asserted both ways in its own
+    batch test, so a later batch adding a grant to one of them trips.
+  · STILL OWED — Pyromancer, Cryomancer.
+  Replace them the way AU/AV/AW/AX did: a node payload's `upgrade` list, or
+  `no_fallback: true` where the node already pays through another clause. The generic is
+  a floor, not a finished design. test_batch_au's floor is `generic >= 9` and FALLS on
+  purpose, with a durable per-class half beside it (a spec whose batch has landed must owe
+  NO generics).
 - SEVERITY 4 HOLDS THREE MODIFIERS, not the four AQ's table asked for: `rot`
   was dropped over the max-HP save sync (see the AQ block). Reinstating it is
   one field (`mod_max_hp_lost`, written at the stamp, added back at the

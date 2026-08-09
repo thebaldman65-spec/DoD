@@ -2241,3 +2241,45 @@ per-point damage term and a "you are at maximum" gate — and both would have
 broken silently in opposite directions: one scaling to absurdity, the other
 naming a maximum that no longer existed. Uncapping a resource is not one edit;
 it is an audit of everyone who was quietly relying on the ceiling.
+
+## Batch BA — the Survivalist: attrition through craft
+
+**A lane can be pointed at the opposite of the passive it feeds, and the numbers
+will look fine the whole time.** His passive pays for the *count* of different
+statuses on a target; his Venom lane built deeper poison. A poison build earned
++8% where a five-affliction build earned +40%, and no individual node was wrong —
+each one made poison better. The fault was only visible from the spine. Hanging a
+*different* affliction off each Venom node cost nothing in engine work and turned
+the lane from a competitor for his own passive into a feeder of it.
+
+**Reserving design space is a rule, not a set of edits.** Four nodes had drifted
+into a future spec's fantasy — spreading rot, corpse transmission, field-wide
+infection. Removing the four is the easy half; the half that lasts is writing down
+*what is reserved and why*, because the next batch that adds "it also spreads to
+another enemy" will do it innocently, and the idea will have been spent twice
+before anyone notices. The line drawn here is worth keeping: poison is craft — a
+hunter who knows which plant does what — and contagion is a plague that no longer
+needs him.
+
+**A ceiling is not automatically a fault.** Five specs in a row had theirs
+removed, and it would have been easy to make it six. But his ceiling is the number
+of distinct debuffs that exist, which is a design constant rather than a dial —
+there was nothing to take off, only something to *say*, so the reason now lives in
+the documentation where a later batch will read it before reaching for the same
+lever.
+
+**Instrument the thing the spine is about, not the thing that is easy to
+measure.** Damage share moves for a dozen reasons. The average count of statuses
+on a target when he strikes it moves for exactly one, and it is literally his
+damage multiplier. It immediately paid for itself: the Guerilla lane reads the
+higher damage share off the *lower* breadth, because its nodes multiply a count
+they do not create — which the damage column alone would have read as the better
+lane.
+
+**A test that cannot fail is worse than no test, and only a negative control
+finds one.** The check for "the capstone no longer infects the whole field at
+battle start" read the board twenty frames after spawn, and the battle's opening
+sits behind a real six-tenths-of-a-second timer. Reinstating the retired behaviour
+sailed straight past it. The two source greps beside it fired, which is exactly
+how a hole like this stays hidden — the control still trips, just not for the
+reason you think.

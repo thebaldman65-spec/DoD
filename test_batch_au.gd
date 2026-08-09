@@ -257,7 +257,8 @@ func _arcanist_authored() -> void:
 		"most of them fall back on the GENERIC, which is the point (%d)" % generic)
 	# THE DURABLE HALF: a class whose re-author batch has landed owes no
 	# generics at all. ALL THREE Cleric specs are authored now.
-	for done_spec in ["arcanist", "holy", "inquisitor", "occultist"]:
+	for done_spec in ["arcanist", "holy", "inquisitor", "occultist",
+			"berserker", "swordmaster", "warden"]:
 		for n2 in Talents.LANE_TREES.get(done_spec, []):
 			var pay2: Dictionary = n2.get("payload", {})
 			if Talents.granted_name(pay2) == "":
@@ -265,8 +266,22 @@ func _arcanist_authored() -> void:
 			ok(Talents.collision_kind(pay2) != "generic",
 				"%s (%s) has an AUTHORED fallback — its class batch landed" % [
 					n2["id"], done_spec])
+	# THE OTHER DURABLE HALF, ADDED BY BATCH BA now that all twelve trees are
+	# authored and the ledger is complete: THREE SPECS OWE NOTHING BECAUSE THEIR
+	# TREES GRANT NO ABILITIES AT ALL. That is a structural property, not an
+	# authoring choice, and it is worth pinning HERE as well as in each spec's
+	# own batch test — this is the file a later batch reads when it wonders
+	# whose fallbacks are outstanding, and a grant quietly added to one of these
+	# three would otherwise only move the count above.
+	for exempt in ["beastmaster", "sharpshooter", "mystic"]:
+		for n3 in Talents.LANE_TREES.get(exempt, []):
+			ok(Talents.granted_name(n3.get("payload", {})) == "",
+				"%s (%s) grants no ability — this spec owes no fallback in either direction" % [
+					n3["id"], exempt])
 	_report.append("ability-granting nodes: %d, of which %d take the generic" % [
 		granting, generic])
+	_report.append("the ledger is COMPLETE (Batch BA): Pyromancer and Cryomancer "
+		+ "are the only specs still owed authored fallbacks")
 
 
 # ---------- §3 Death Ray ----------
