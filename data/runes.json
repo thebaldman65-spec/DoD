@@ -359,26 +359,26 @@
 	"deep_sight": {
 		"name": "Rune of the Deep Sight", "rarity": "rare", "scope": "spec:sharpshooter",
 		"price": 100, "lane": "Precision",
-		"desc": "His Focus climbs to 150 instead of 100, and critical hits pour 20 more into it.",
-		"payload": {"stat": {"deep_focus": 1, "perfect_form": 1}}
+		"desc": "His patience turns into force 8 Focus sooner, and critical hits pour 20 more into it.",
+		"payload": {"stat": {"deep_focus": 8, "perfect_form": 20}}
 	},
 	"narrow_gap": {
 		"name": "Rune of the Narrow Gap", "rarity": "rare", "scope": "spec:sharpshooter",
 		"price": 100, "lane": "Penetration",
 		"desc": "His arrows ignore 8% more armor and bite 12% deeper into Broken enemies.",
-		"payload": {"stat": {"pierce_bonus": 0.08, "bonecracker_ranks": 1}}
+		"payload": {"stat": {"pierce_bonus": 0.08, "bonecracker_ranks": 12}}
 	},
 	"long_draw": {
 		"name": "Rune of the Long Draw", "rarity": "rare", "scope": "spec:sharpshooter",
 		"price": 75, "scarred": true, "lane": "Tempo",
-		"desc": "He opens every fight holding 60 Focus and gathers 10 more per attack — but the draw is slow: -10 Speed.",
-		"payload": {"stat": {"opening_volley": 1, "muscle_memory_ranks": 1, "speed": -10.0}}
+		"desc": "He opens every fight holding 60 more Focus and gathers 10 more per attack — but the draw is slow: -10 Speed.",
+		"payload": {"stat": {"opening_volley": 60, "muscle_memory_ranks": 10, "speed": -10.0}}
 	},
 	"level_aim": {
 		"name": "Rune of the Level Aim", "rarity": "rare", "scope": "spec:sharpshooter",
 		"price": 100,
 		"desc": "A little of every angle: 4% more armor ignored, +10 Focus per attack, +12% damage against Broken enemies.",
-		"payload": {"stat": {"pierce_bonus": 0.04, "muscle_memory_ranks": 1, "bonecracker_ranks": 1}}
+		"payload": {"stat": {"pierce_bonus": 0.04, "muscle_memory_ranks": 10, "bonecracker_ranks": 12}}
 	},
 
 	"weeping_wound": {

@@ -71,6 +71,14 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# Deep Bond pays 1.5), so they must stay OUT of this list or the coercion
 	# rounds them and the rune goes quietly under-strength (AT's
 	# `conduit_step` precedent).
+	# BATCH AZ: these three STAY, and the reason CHANGED under them. They used
+	# to be flag talents whose payload was a bare 1; they are int MAGNITUDES now
+	# (`deep_focus` = points the conversion point drops, `perfect_form` = Focus
+	# a crit grants, `opening_volley` = Focus he opens holding), and an int
+	# magnitude whose name does not end "_ranks" needs this list exactly as much
+	# as a flag did. THE CLASS OF CHANGE THAT FAILS SILENTLY IS THE OTHER ONE:
+	# `opp_aim_step` is a FLOAT and is deliberately ABSENT, because the coercion
+	# would round 4.0 and nothing would crash.
 	"deep_focus", "perfect_form", "opening_volley",
 	"coated_blades", "vulture",
 	# Batch AR: the Rune of the Cinder Trail was re-pointed onto its own term

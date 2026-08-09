@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-08 (Batch AY)</b></p>
+<p align="right"><b>Last updated: 2026-08-08 (Batch AZ)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -253,7 +253,7 @@ perfectly rigged Snare Trap land their Stun even on an unbroken boss, and a perf
 lets the player name the victim. Abilities with no roll to remove keep an ordinary bonus.</p>
 <h3>4.3 Attack resolution pipeline</h3>
 <p>Per strike, in order: <b>ability % × the attacker's current Attack</b> × random variance
-(0.9–1.1) × grade multiplier × crit (×1.5; Sharpshooter passive ×2) × attacker modifiers ×
+(0.9–1.1) × grade multiplier × crit (×1.5; the Sharpshooter's Lethal Aim ×2, rising with Focus) × attacker modifiers ×
 target modifiers × (1 − resist) × (1 − effective armor), minimum 1.</p>
 <ul>
 <li><b>Attack (stat) &amp; node scaling:</b> every unit has an Attack stat, and every
@@ -588,8 +588,8 @@ character art (see §12).</p>
 UNCAPPED, as Arcanist)</td></tr>
 <tr><td>Cleric</td><td>121</td><td>15%</td><td>85</td><td>100</td><td>Mana 100 (+ Mercy 0–5 as
 Holy)</td></tr>
-<tr><td>Hunter</td><td>110</td><td>12%</td><td>105</td><td>95</td><td>Mana 100 (+ Focus
-0–100 as Sharpshooter)</td></tr>
+<tr><td>Hunter</td><td>110</td><td>12%</td><td>105</td><td>95</td><td>Mana 100 (+ Focus,
+UNCAPPED, as Sharpshooter)</td></tr>
 </table>
 <h3>5.0 Class passives</h3>
 <p>Each CLASS carries one passive, active for every spec of that class (and before
@@ -608,10 +608,14 @@ is hit; every attack builds Rage (Strike 20, all spec/talent attacks 10); Perfec
 +10.</li>
 <li><b>Mana (Mage/Cleric/Hunter):</b> +12 at the start of their turns; the Hunter's Perfect
 basic adds +10; potions/Rally restore more.</li>
-<li><b>Focus (SHARPSHOOTER passive, 0–100, green second bar):</b> +20 per consecutive
-attack on the same enemy (Muscle Memory adds more), 0 on switching targets (halved under
-Unwavering), up to 50 retained on a kill; talents move the cap to 150 (Deep Focus) or 50
-(Spray of Arrows). Every point: +0.5% crit chance. Spent by Coup de Grâce and One Shot.</li>
+<li><b>Focus (SHARPSHOOTER passive, NO CEILING, green second bar):</b> +20 per
+consecutive attack on the same enemy (Muscle Memory and Unwavering add more), CLEARED on
+switching targets, up to 50 retained on a kill — all of it under Overkill. THE PAYOFF
+CONVERTS: the first 100 points each grant +0.5% critical chance, and every point past 100
+grants +0.5% of critical MULTIPLIER instead, so ×2 becomes ×2.5 at 200 Focus and ×3 at
+300. Deep Focus moves that conversion point down to 60; Spray of Arrows is the one talent
+that still imposes a ceiling, at 50. Spent by Coup de Grâce (which reads at most 200) and
+One Shot (which fires at 200).</li>
 <li><b>Mercy (HOLY passive, 0–5):</b> only the Holy spec has the bar. +1 stack whenever a
 party member falls below 50% health (any damage source; crossings count each time). Each
 stack held: <b>+5% healing done</b>. Stacks are SPENT on Hymn of Hope (1), Divine Plea (2),
@@ -1166,12 +1170,14 @@ max Mana. The cooldown resets if the marked enemy dies. Works with or without a 
 +10% nature resist, −10% physical (the lightest of the three: a marksman who wants to be at
 range and pays for being reached).<br>
 Passive <i>Lethal Aim</i>: critical hits deal ×2 damage
-instead of ×1.5, and the marksman runs on <b>FOCUS (0–100, green second bar)</b>: +20
-whenever they attack the enemy they attacked last turn (talents raise the gain and the
-cap), dropped to 0 on switching targets, and up to 50 retained on a kill. Every point of
-Focus grants <b>+0.5% critical chance</b> — five patient shots at one enemy is +50% crit.
-The decision the spec is built around: the enemy you've been working is rarely the enemy
-that most needs to die right now.<br>
+instead of ×1.5, and the marksman runs on <b>FOCUS (NO CEILING, green second bar)</b>: +20
+whenever they attack the enemy they attacked last turn (talents raise the gain), CLEARED on
+switching targets, and up to 50 retained on a kill. <b>THE PAYOFF CONVERTS AT 100.</b> The
+first 100 points of Focus each grant <b>+0.5% critical chance</b> — a hundred points of
+patience is +50% crit. Every point beyond 100 grants <b>+0.5% of critical MULTIPLIER</b>
+instead, so Lethal Aim's ×2 becomes ×2.5 at 200 Focus, ×3 at 300, and it never stops
+paying: patience buys certainty first, then force. The decision the spec is built around:
+the enemy you've been working is rarely the enemy that most needs to die right now.<br>
 Aimed Shot — 20 Mana, 45 dmg / 15 BD / 3.0, 1cd (Perfect: +20 Focus).<br>
 Powershot — 25 Mana, 20 dmg / 20 BD / 3.0, 2cd: +2% damage for every point of the target's
 Break bar already FULL — the team breaks them, the marksman ends them.<br>
@@ -1184,7 +1190,8 @@ turns).<br>
 Triple Shot — 30 Mana, 3.0, 3cd: three arrows at one target, 18% Atk each, every arrow
 rolling its critical separately (Perfect: one arrow is a guaranteed critical).<br>
 Coup de Grâce — 25 Mana, 3.5, 4cd: CONSUMES ALL FOCUS — 25% Atk plus 1% of the target's
-MISSING health per point of Focus spent.<br>
+MISSING health per point of Focus spent, reading at most 200 points however deep the meter
+has run.<br>
 Pinning Shot — 20 Mana, 2.5, 3cd, 20% Atk: the target is Slowed AND Dazed for 3 turns.<br>
 Called Shot — 25 Mana, 3.0, 3cd, 25% Atk: pick the spot before loosing — Sunder (−35%
 armor, 2 turns), +30 Break damage, or Exposed (3 turns). A picker opens on cast (the bot
@@ -1321,14 +1328,14 @@ returns pay: invest in the dividend) · <b>ZEAL</b> (invest shallowly in EVERYON
 <p><b>Sharpshooter</b> — <b>PRECISION</b> (Focus, crit chance, crit damage) · <b>PENETRATION</b> (armor, Break, finishing the party's work) · <b>TEMPO</b> (speed, cooldowns, Focus acceleration)</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Precision</th><th>Penetration</th><th>Tempo</th></tr>
-<tr><td>1</td><td><b>Steady Hands</b> — +4% critical chance.</td><td><b>Armor Piercer</b> — Your attacks ignore 8% of the target&#x27;s armor.</td><td><b>Fletcher&#x27;s Speed</b> — +5 Speed.</td></tr>
-<tr><td>2</td><td><b>Perfect Form</b> — Critical hits grant +20 Focus.</td><td><b>Sundering Shot</b> — Critical hits apply 15 Break damage.</td><td><b>Snap Shot</b> — The first ability you use each fight costs no Mana and does not start its cooldown.</td></tr>
-<tr><td>3</td><td><b>Deep Focus</b> — The Focus cap rises from 100 to 150.</td><td><b>Bonecracker</b> — +12% damage against Broken enemies.</td><td><b>Muscle Memory</b> — Focus gain per attack increases by 10.</td></tr>
-<tr><td>4</td><td><b>Executioner&#x27;s Eye</b> — Lethal Aim&#x27;s critical multiplier rises to x2.1.</td><td><b>Opportunist&#x27;s Aim</b> — Powershot&#x27;s Break scaling doubles: +4% damage per full point instead of +2%.</td><td><b>Opening Volley</b> — You begin every fight with 60 Focus.</td></tr>
-<tr><td>5</td><td><b>Consistent Aim</b> — Critical hits deal x1.5 again — but you gain +30% critical chance.</td><td><b>Exposed Nerve</b> — Critical hits apply Exposed for 3 turns.</td><td><b>Follow-Through</b> — Critical hits reduce ALL your cooldowns by 1.</td></tr>
-<tr><td>6</td><td><b>Unwavering</b> — Switching targets HALVES your Focus instead of clearing it.</td><td><b>No Cover</b> — Your attacks cannot be made to miss: Blind and Dazed do not affect you, and Elusive does not protect against you.</td><td><b>Second Nature</b> — Hold Breath&#x27;s guaranteed critical applies to your next TWO attacks.</td></tr>
-<tr><td>7</td><td><b>Tunnel Vision</b> — +50% critical chance against the enemy you attacked last turn; -50% against every other enemy.</td><td><b>Overkill</b> — Excess damage from a killing blow carries to another enemy at full value.</td><td><b>Spray of Arrows</b> — Your single-target attacks strike one additional random enemy for 50% damage — but Focus can never exceed 50.</td></tr>
-<tr><td>CAP</td><td><b>One Shot</b> — At maximum Focus, Aimed Shot EXECUTES any non-boss enemy below 35% health outright (elites included); otherwise it deals double damage. Either way, Focus resets to 0.</td><td><b>Through and Through</b> — Your attacks ignore ALL armor, and every critical hit refunds its Mana cost.</td><td><b>Rapid Fire</b> — Each ability you use has a 35% chance not to consume its cooldown.</td></tr>
+<tr><td>1</td><td><b>Steady Hands</b> &mdash; +15% critical chance.</td><td><b>Armor Piercer</b> &mdash; Your attacks ignore 30% of the target&#x27;s armor.</td><td><b>Fletcher&#x27;s Speed</b> &mdash; +18 Speed.</td></tr>
+<tr><td>2</td><td><b>Perfect Form</b> &mdash; Critical hits grant +40 Focus.</td><td><b>Sundering Shot</b> &mdash; Critical hits apply 45 Break damage.</td><td><b>Snap Shot</b> &mdash; The first 2 abilities you use each fight cost no Mana and do not start their cooldowns.</td></tr>
+<tr><td>3</td><td><b>Deep Focus</b> &mdash; Focus turns into force sooner: the conversion point falls from 100 Focus to 60.</td><td><b>Bonecracker</b> &mdash; +40% damage against Broken enemies.</td><td><b>Muscle Memory</b> &mdash; Focus gain per attack increases by 30.</td></tr>
+<tr><td>4</td><td><b>Executioner&#x27;s Eye</b> &mdash; Lethal Aim&#x27;s critical multiplier rises to x2.5.</td><td><b>Opportunist&#x27;s Aim</b> &mdash; Powershot&#x27;s Break scaling TRIPLES: +6% damage per full point instead of +2%.</td><td><b>Opening Volley</b> &mdash; You begin every fight with 150 Focus.</td></tr>
+<tr><td>5</td><td><b>Consistent Aim</b> &mdash; Your critical multiplier is reduced by 0.5 — but you gain +60% critical chance.</td><td><b>Exposed Nerve</b> &mdash; Critical hits apply Exposed for 3 turns, and you deal +15% damage to Exposed enemies.</td><td><b>Follow-Through</b> &mdash; Critical hits reduce ALL your cooldowns by 2.</td></tr>
+<tr><td>6</td><td><b>Unwavering</b> &mdash; Each consecutive turn attacking the same enemy grants +10 additional Focus, rising by 10 again each turn to a maximum of +50. Switching resets it.</td><td><b>No Cover</b> &mdash; Your attacks cannot be made to miss: Blind and Dazed do not affect you, and Elusive does not protect against you.</td><td><b>Second Nature</b> &mdash; Hold Breath&#x27;s guaranteed critical applies to your next 4 attacks.</td></tr>
+<tr><td>7</td><td><b>Tunnel Vision</b> &mdash; +100% critical chance against the enemy you attacked last turn; -100% against every other enemy.</td><td><b>Overkill</b> &mdash; Excess damage from a killing blow carries to another enemy at full value — and the carry keeps your Focus in FULL rather than dropping it to the usual 50.</td><td><b>Spray of Arrows</b> &mdash; Your single-target attacks strike 2 additional random enemies for 50% damage — but Focus can never exceed 50.</td></tr>
+<tr><td>CAP</td><td><b>One Shot</b> &mdash; At 200 or more Focus, Aimed Shot EXECUTES any non-boss enemy below 35% health outright (elites included); otherwise it deals double damage. Either way, Focus resets to 0.</td><td><b>Through and Through</b> &mdash; Your attacks ignore ALL armor, and every critical hit refunds its Mana cost.</td><td><b>Rapid Fire</b> &mdash; Each ability you use has a 50% chance not to consume its cooldown.</td></tr>
 </table>
 <p><b>Survivalist</b> — <b>VENOM</b> (poison as a damage engine) · <b>SNARES</b> (traps, retaliation, denial) · <b>GUERILLA</b> (survival and party utility)</p>
 <table border="1" cellpadding="4">

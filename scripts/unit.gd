@@ -154,30 +154,40 @@ var mod_recoil := 0.0          # Mirrorbound  — read at battle's recoil site
 var soul_bond: Array = []
 var _soul_guard := false     # re-entry guard while splitting
 var damaged_since_turn := false  # Unbroken Watch bookkeeping
-# ---- Sharpshooter Focus + lane talents (Batch 32) ----
+# ---- Sharpshooter Focus + lane talents (Batch 32, RE-AUTHORED BY BATCH AZ) ----
+# EVERY COUNTER BELOW HOLDS ITS OWN MAGNITUDE IN THE UNITS ITS READ SITE SUMS
+# (the AR/AS/AT/AV/AW/AX/AY form). §6 named three that had to be converted;
+# every other node whose §3 magnitude is a NUMBER took the same treatment, which
+# is reported rather than silently generalised (the AW/AX call). The four that
+# are still honest FLAGS are marked as such — they buy a rule, not an amount.
 var last_attack_target: BattleUnit = null  # Focus: the enemy worked last turn
-var lethal_eye_ranks := 0    # Executioner's Eye: crit mult 2.0 -> +0.1/rank
-var consistent_aim := 0      # crits x1.5 again, +30% crit chance
-var deep_focus := 0          # Focus cap 100 -> 150
-var unwavering := 0          # switching targets halves Focus instead of zeroing
-var perfect_form := 0        # crits grant +20 Focus
-var tunnel_vision := 0       # +50% crit vs the worked target, -50% vs others
-var bonecracker_ranks := 0   # +12%/rank damage vs Broken enemies
-var opp_aim := 0             # Powershot Break scaling doubles
-var sundering_shot := 0      # crits apply 15 Break damage
-var exposed_nerve := 0       # crits apply Exposed 3t
-var no_cover := 0            # attacks cannot be made to miss (bypass, not modifier)
-var overkill := 0            # kill overflow carries to another enemy
-var muscle_memory_ranks := 0 # Focus gain +10/rank
-var opening_volley := 0      # start fights at 60 Focus
-var follow_through := 0      # crits tick all cooldowns by 1
-var second_nature := 0       # Hold Breath covers the next TWO attacks
-var snap_shot := 0           # first ability each fight: free, no cooldown
-var snap_used := false
-var spray := 0               # single-target attacks echo to a random enemy at 50%
-var one_shot := 0            # capstone: max-Focus Aimed Shot executes below 40%
-var through_and_through := 0 # capstone: ignore ALL armor; crits refund Mana
-var rapid_fire := 0          # capstone: 35% chance abilities skip their cooldown
+var same_target_turns := 0   # Unwavering: consecutive turns on that same enemy
+var lethal_eye_ranks := 0    # Executioner's Eye: percentage POINTS of crit mult
+var consistent_aim := 0      # Consistent Aim: percentage POINTS SUBTRACTED from it
+var deep_focus := 0          # Deep Focus: points the CONVERSION POINT drops
+var unwavering := 0          # Unwavering: extra Focus per consecutive turn (ramp)
+var perfect_form := 0        # Perfect Form: Focus granted by a crit
+var tunnel_vision := 0       # Tunnel Vision: percentage POINTS of crit chance, ±
+var bonecracker_ranks := 0   # Bonecracker: percentage points of damage vs Broken
+var opp_aim_step := 0.0      # Opportunist's Aim: the INCREASE on Powershot's own
+                             # 2% per full Break point (a `_step`, and a FLOAT —
+                             # it must stay OUT of Runes.STAT_INT_KEYS)
+var sundering_shot := 0      # Sundering Shot: Break damage applied by a crit
+var exposed_nerve := 0       # Exposed Nerve: gate AND magnitude — crits apply
+                             # Exposed, and he deals +N% to Exposed enemies
+var no_cover := 0            # FLAG: attacks cannot be made to miss (a bypass)
+var overkill := 0            # FLAG: kill overflow carries, and keeps Focus whole
+var muscle_memory_ranks := 0 # Muscle Memory: Focus added to each attack's gain
+var opening_volley := 0      # Opening Volley: the Focus he opens a fight holding
+var follow_through := 0      # Follow-Through: cooldown turns a crit ticks off
+var second_nature := 0       # Second Nature: TOTAL held-breath shots (base 1)
+var snap_shot := 0           # Snap Shot: how many free abilities each fight
+var snap_used := 0           # how many of them have been spent
+var spray := 0               # Spray of Arrows: extra random enemies struck
+var one_shot := 0            # capstone: the Focus THRESHOLD One Shot fires at —
+                             # gate and magnitude in one field (AW's `judgement`)
+var through_and_through := 0 # FLAG: ignore ALL armor; crits refund Mana
+var rapid_fire := 0          # capstone: % chance an ability skips its cooldown
 # ---- Survivalist lane talents + trap state (Batch 33) ----
 var potent_ranks := 0        # Potent Toxins: poison +1/rank per stack
 var coated_blades := 0       # basic attacks apply Poison 2t
@@ -545,6 +555,67 @@ func resonance_dmg_bonus() -> float:
 
 func resonance_taken_bonus() -> float:
 	return 0.01 * RESONANCE_TAKEN_STEP * resonance_curve()
+
+
+# ---------- LETHAL AIM: FOCUS CONVERTS (Batch AZ) ----------
+#
+# THE ONE PLACE THE SPLIT IS DECIDED. battle.gd reads it through its crit-chance
+# block and its crit-multiplier block, the nameplate below reads it directly,
+# and the sim instrument reads it too — so a change here can never leave one of
+# them behind. (The AT Resonance discipline, arriving through the Hunter's door.)
+#
+# FOCUS HAS NO CEILING. The first FOCUS_CONVERT points each buy +0.5% CRITICAL
+# CHANCE; every point past it buys +0.5% of CRITICAL MULTIPLIER instead, and
+# that half never stops paying. Patience buys certainty first, then force.
+#
+# THE THRESHOLD IS A FIXED NUMBER, NOT "whenever chance reaches 100%". A built
+# marksman (Steady Hands + Consistent Aim + Tunnel Vision) passes 100% chance at
+# very low Focus, which would make the chance half of his own passive vestigial
+# and make the conversion depend on what else he had stacked. A fixed threshold
+# is legible in a tooltip — the first hundred is your aim, everything past it is
+# your force — and it keeps those three nodes meaningful, because they are what
+# buy reliable crits while Focus is still shallow.
+#   100 Focus  +50% chance / x2.0     200 Focus  +50% / x2.5
+#   300 Focus  +50% / x3.0            400 Focus  +50% / x3.5
+const FOCUS_CONVERT := 100      # where chance stops and multiplier starts
+const FOCUS_STEP := 0.005       # what one point of Focus buys, either side
+const FOCUS_BAR_REF := 200.0    # what the second-resource bar fills toward when
+                                # the meter is uncapped: One Shot's threshold and
+                                # Coup de Grâce's reading cap, which are the two
+                                # depths that mean anything
+
+
+# Deep Focus does not raise a ceiling any more (there is none) — it moves the
+# CONVERSION POINT DOWN, so his patience turns into force sooner. The counter
+# holds the DROP, which is what makes it additive: the node pays 40 and the Rune
+# of the Deep Sight pays 8 on top.
+func focus_convert() -> int:
+	return maxi(FOCUS_CONVERT - deep_focus, 1)
+
+
+func focus_crit_chance() -> float:
+	if second_resource_name != "Focus":
+		return 0.0
+	return mini(second_resource, focus_convert()) * FOCUS_STEP
+
+
+func focus_crit_mult() -> float:
+	if second_resource_name != "Focus":
+		return 0.0
+	return maxi(second_resource - focus_convert(), 0) * FOCUS_STEP
+
+
+# Lethal Aim's multiplier, whole: the base x2, Executioner's Eye's percentage
+# POINTS on top, Consistent Aim's points taken back off, and the converted half
+# of Focus. Written as +/- POINTS rather than as a `set` deliberately — Batch AZ
+# §4 dissolved the Executioner's Eye <-> Consistent Aim fork (they sit in rows 4
+# and 5 of ONE lane, so row exclusivity lets a player hold both), and the old
+# wording SET the multiplier to 1.5, which contradicts the other node outright.
+# Held together they resolve to x2.0, which is the whole point of the rewording.
+func lethal_crit_mult() -> float:
+	return 2.0 + 0.01 * (lethal_eye_ranks - consistent_aim) + focus_crit_mult()
+
+
 # Holy tree — RE-AUTHORED IN BATCH AV. Every counter is ADDITIVE: it holds
 # its own magnitude in the units its read site sums (percentage POINTS unless
 # said otherwise), never a rank the read site multiplies. See talents.gd.
@@ -1139,13 +1210,23 @@ func refresh_bars() -> void:
 		# one: it fills toward RESONANCE_BAR_REF and pins there. The number
 		# beside it is the honest readout — the raw stack count and what the
 		# compounding curve is currently paying, both ways.
+		# Focus has no ceiling either (Batch AZ) unless Spray of Arrows imposes
+		# one, and `second_max` carries -1 to say so. Same treatment as
+		# Resonance: fill toward a REFERENCE depth and pin there, and let the
+		# number beside the bar be the honest readout — how much chance the
+		# first half has bought, and what the converted half is paying.
+		var uncapped := second_max < 0
 		var res2_ref := RESONANCE_BAR_REF if second_resource_name == "Resonance" \
-			else float(second_max)
+			else (FOCUS_BAR_REF if uncapped else float(second_max))
 		_res2_fill.size.x = PLATE_BAR_W * clampf(second_resource / res2_ref, 0.0, 1.0)
 		if second_resource_name == "Resonance":
 			_res2_text.text = "%d (+%d%% dmg / +%d%% taken)" % [second_resource,
 				int(round(resonance_dmg_bonus() * 100.0)),
 				int(round(resonance_taken_bonus() * 100.0))]
+		elif second_resource_name == "Focus" and uncapped:
+			_res2_text.text = "Focus %d (+%d%% crit / x%s)" % [second_resource,
+				int(round(focus_crit_chance() * 100.0)),
+				String.num(lethal_crit_mult(), 2)]
 		else:
 			_res2_text.text = "%s %d/%d" % [second_resource_name, second_resource, second_max]
 	if passive_id == "bloodrage":

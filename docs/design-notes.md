@@ -2197,3 +2197,47 @@ the fix: it says the growth was never the load-bearing part of that row, and the
 next lever aimed at it should be expected to under-deliver too. A change that
 lands precisely and moves the headline number very little is evidence about the
 system, not a failure.
+
+## Batch AZ — the Sharpshooter: patience
+
+**A resource with no ceiling still needs somewhere for its payoff to go, and the
+honest answer is not always "more of the same".** Focus bought critical chance,
+and chance cannot pass 100% — so removing the cap on the meter would have
+produced a number that stopped mattering long before it stopped growing. The
+split at 100 exists because the meter and its payoff are different questions:
+the meter is patience, and patience can be unbounded, but *what it buys* has to
+change when the first thing it bought runs out of room.
+
+**A fixed threshold beat the clever one.** "Convert once crit chance actually
+reaches 100%" reads better in a sentence and is worse in every other way: a
+built marksman crosses 100% chance at very low Focus, which makes the chance
+half of his own passive vestigial and makes the conversion point depend on which
+*other* nodes he happened to take. Three talents exist to buy reliable crits
+while Focus is shallow; a self-adjusting threshold would have quietly deleted the
+job all three do. The fixed number is also the only version that fits in a
+tooltip — *the first hundred is your aim, everything past it is your force*.
+
+**A spec's own lane is the last place its central decision should be for sale.**
+Unwavering halved the Focus lost on a switch, in the lane named for the meter,
+in a spec whose entire subject is not looking away. That is the same shape as
+Flame Shield in the commitment spec and Stabilize in the escalation spec: an
+escape hatch sold from inside the thing it escapes. The fix is not to price the
+hatch higher — it is to point the node the other way, and to leave the real
+opt-out (Spray of Arrows) somewhere it costs something the spine actually wants.
+
+**Rewriting a node as an increment rather than an assignment is what lets two
+nodes coexist.** Consistent Aim *set* the critical multiplier to 1.5, which was
+coherent only while it was exclusive with the node that raised it — and the row
+restructure had quietly dissolved that exclusivity two batches earlier, leaving
+two live nodes contradicting each other. Written as −0.5 it composes with
+whatever else is on the field. A "set" is a claim about the whole system; an
+"add" is a claim only about itself, and only the second kind survives the system
+changing around it.
+
+**Reading Focus as a quantity is not the same as reading it as a fraction, and
+uncapping the meter separates the two.** Most of the tree reads a *share* of the
+meter and was untouched by the change. Two clauses read the raw count — a
+per-point damage term and a "you are at maximum" gate — and both would have
+broken silently in opposite directions: one scaling to absurdity, the other
+naming a maximum that no longer existed. Uncapping a resource is not one edit;
+it is an audit of everyone who was quietly relying on the ceiling.

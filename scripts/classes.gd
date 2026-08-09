@@ -467,12 +467,12 @@ static func sharpshooter_pool_ability(display_name: String) -> Ability:
 				"damage": 18, "multi_hits": 3, "pressure": 8, "delay": 3.0, "anim": "attack02",
 				"perfect_extra_hit": false,
 				"perfect_id": "", "perfect_text": "One arrow is a guaranteed critical.",
-				"description": "Three arrows at one target, 18% of\nAttack each — every arrow rolls its\ncritical separately. A crit lottery\nfor a full Focus bar."})
+				"description": "Three arrows at one target, 18% of\nAttack each — every arrow rolls its\ncritical separately. A crit lottery\nfor a deep Focus meter."})
 		"Coup de Grâce":
 			return Ability.make({"display_name": "Coup de Grâce", "cooldown": 4, "cost": 25,
 				"damage": 25, "pressure": 10, "delay": 3.5, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "",
-				"description": "CONSUMES ALL FOCUS: deals 25% of\nAttack plus 1% of the target's\nMISSING health per point of Focus\nspent. Cash out the patience."})
+				"description": "CONSUMES ALL FOCUS: deals 25% of\nAttack plus 1% of the target's\nMISSING health per point of Focus\nspent, reading at most 200.\nCash out the patience."})
 		"Pinning Shot":
 			return Ability.make({"display_name": "Pinning Shot", "cooldown": 3, "cost": 20,
 				"damage": 20, "pressure": 10, "delay": 2.5, "anim": "attack02",
@@ -789,7 +789,7 @@ const SPEC_INFO := {
 	"sharpshooter": {"name": "Sharpshooter", "constitution": 90, "archetype": "Nuker", "passive": "lethal_aim",
 		"max_hp": 140, "armor": 0.10,
 		"resists": {"nature": 0.10, "physical": -0.10},
-		"passive_desc": "Lethal Aim: critical hits deal x2 damage instead of\nx1.5. Each consecutive attack against the same enemy\ngrants +20 FOCUS (0-100; lost on switching targets,\n50 retained on a kill), and every point of Focus\ngrants +0.5% critical chance.",
+		"passive_desc": "Lethal Aim: critical hits deal x2 damage instead of\nx1.5. Each consecutive attack against the same enemy\ngrants +20 FOCUS (NO CEILING; cleared on switching\ntargets, 50 retained on a kill). The first 100 points\neach grant +0.5% critical chance; every point past 100\ngrants +0.5% CRITICAL MULTIPLIER instead — patience\nbuys certainty first, then force, and never stops.",
 		"blurb": "Every arrow an execution — patient, precise, final."},
 	# The toughest Hunter by design: his passive rewards being struck and
 	# Tripwire wants him in the fray. Deep nature affinity from a life

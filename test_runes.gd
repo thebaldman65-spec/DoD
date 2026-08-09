@@ -329,12 +329,27 @@ func _ordering(battle_src: String) -> void:
 	# untouched and still live for Mercy and Focus, which is what the remaining
 	# five probes watch — and the Resonance side is now covered by the opposite
 	# assertion below: that no derivation reads a Resonance ceiling out of cfg.
-	for probe in ["mercy_cap_bonus", "zealous_mercy",
-			"deep_focus", "spray", "opening_volley"]:
+	# RE-POINTED IN PLACE AGAIN, BATCH AZ, same shape and same reason as AT's:
+	# `deep_focus` IS NO LONGER A CEILING FIELD. Focus has no maximum at all
+	# now, and the node moves the CONVERSION POINT instead — which is decided on
+	# BattleUnit at read time, not derived from cfg at spawn. So the probe had
+	# nothing left to find, and the deep_focus side is covered by the opposite
+	# assertion below: that no derivation reads a Focus ceiling out of cfg.
+	# `spray` and `opening_volley` STILL derive from cfg and keep their probes —
+	# Spray of Arrows is the one node that still imposes a ceiling, and Opening
+	# Volley still sets what he walks in holding.
+	for probe in ["mercy_cap_bonus", "zealous_mercy", "spray", "opening_volley"]:
 		var derive_at := battle_src.find("cfg.get(\"%s\"" % probe)
 		ok(derive_at >= 0, "battle.gd: no derivation reads %s" % probe)
 		ok(derive_at > rune_at,
 			"battle.gd: %s is derived BEFORE runes apply — ceiling runes are duds" % probe)
+	# Batch AZ: the Sharpshooter's ceiling is GONE, not moved — the same alarm
+	# AT armed for Resonance. A batch that quietly re-derived one would put a cap
+	# back on a meter whose whole design is not having one.
+	ok(battle_src.find("cfg.get(\"deep_focus\"") < 0,
+		"battle.gd: a Focus CEILING is being derived from deep_focus again — Lethal Aim has no maximum")
+	ok(battle_src.find("const FOCUS_UNCAPPED := -1") >= 0,
+		"battle.gd: the Focus sentinel is gone — 'no cap' must not become a large number")
 	# Batch AT: the Arcanist's ceiling is GONE, not moved. A batch that quietly
 	# re-derives one would put a cap back on a passive whose whole design is not
 	# having one, so the alarm now watches for its RETURN.
@@ -347,15 +362,18 @@ func _ordering(battle_src: String) -> void:
 	var ceiling_writers := 0
 	for id in Runes.ids():
 		for field in Runes.config(id).get("payload", {}).get("stat", {}):
-			if String(field) in ["deep_focus", "opening_volley", "spray",
+			if String(field) in ["opening_volley", "spray",
 					"mercy_cap_bonus", "zealous_mercy"]:
 				ceiling_writers += 1
-	# Batch AT lowered this floor 4 -> 3, and the arithmetic is the whole reason:
-	# the Rune of the Resonant Core was one of the four, and Runaway Resonance
-	# has no ceiling for it to raise. THE THREE THAT REMAIN ARE NAMED so a future
-	# batch cannot lower it again by attrition — Open Hand (zealous_mercy),
-	# Deep Sight (deep_focus), Long Draw (opening_volley).
-	ok(ceiling_writers >= 3,
+	# Batch AT lowered this floor 4 -> 3 and BATCH AZ LOWERS IT 3 -> 2, both for
+	# the same arithmetic reason: the field a named writer wrote stopped being a
+	# ceiling. AT's was the Resonant Core (Runaway Resonance has no maximum);
+	# AZ's is the Deep Sight, because Lethal Aim has none either and the rune was
+	# re-pointed at the conversion point instead. THE TWO THAT REMAIN ARE NAMED
+	# so a future batch cannot lower it again by attrition — Open Hand
+	# (zealous_mercy) and Long Draw (opening_volley). IF IT WOULD FALL TO ONE,
+	# the honest move is to author a ceiling rune, not to drop the floor again.
+	ok(ceiling_writers >= 2,
 		"only %d runes write a second-resource ceiling — the ordering fix is untested in practice" % ceiling_writers)
 
 
@@ -591,11 +609,20 @@ func _power_arm(data: Dictionary, unit_props: Dictionary, unit_src: String,
 # The check is on the READ SITE, not on the rune: if someone later makes one
 # of these arithmetic, this fails and tells them the field can now carry a
 # magnitude — which is the moment the pool could start using it.
+#
+# BATCH AZ TOOK THREE OF THE FIVE OFF THIS LIST, AND THAT IS THE ALARM DOING ITS
+# JOB RATHER THAN THE LIST DECAYING. `deep_focus`, `perfect_form` and
+# `opening_volley` were flag talents whose payload was a bare 1; the
+# Sharpshooter re-author gave each of them a real magnitude in the units its
+# read site sums (points the conversion point drops, Focus a crit grants, Focus
+# he opens holding), so a rune CAN now move them and the pool does. The check
+# fired the moment the code changed, which is exactly the moment it was supposed
+# to. The two survivors are named so the list cannot empty by attrition:
+# `coated_blades` and `vulture`, both Survivalist flags — and HIS is the last
+# tree still carrying Batch AI's magnitudes, so expect this list to shrink again
+# when it is re-authored, DELIBERATELY and with the same reasoning.
 const BOOLEAN_READ_FIELDS := {
 	"coated_blades": "coated_blades > 0",
-	"deep_focus": "deep_focus\", 0) > 0",
-	"perfect_form": "perfect_form > 0",
-	"opening_volley": "opening_volley\", 0) > 0",
 	"vulture": "vulture > 0",
 }
 
@@ -622,16 +649,20 @@ func _boolean_fields(data: Dictionary, battle_src: String) -> void:
 			ok(int(v) == 1,
 				"%s writes %s = %s, but that field is a boolean gate — any value above 1 does nothing" % [
 					id, field, v])
-	# The Deep Sight carries NOTHING BUT boolean fields, so no magnitude pass
-	# can ever move it. Named so that a future pass reports it rather than
-	# quietly shipping an entry that got relatively weaker for free.
+	# INVERTED IN PLACE, BATCH AZ. It used to assert the Deep Sight carried
+	# NOTHING BUT boolean fields, so no magnitude pass could ever move it — one
+	# of AE's six magnitude-proof entries, named so a future pass would report it
+	# rather than quietly ship an entry that got relatively weaker for free. Both
+	# its fields carry real magnitudes now, so the honest question flipped: the
+	# alarm watches for it going BACK to being magnitude-proof, which would mean
+	# a batch had re-flagged a counter the tree spent this work making additive.
 	var ds: Dictionary = data["deep_sight"]["payload"]["stat"]
 	var ds_scalable := 0
 	for f in ds:
 		if not BOOLEAN_READ_FIELDS.has(f):
 			ds_scalable += 1
-	ok(ds_scalable == 0,
-		"deep_sight gained a scalable field — it is no longer magnitude-proof")
+	ok(ds_scalable == ds.size() and ds_scalable > 0,
+		"deep_sight has lost a scalable field — it was magnitude-proof until Batch AZ and must not go back")
 
 
 # ---------- Batch AE: what the opening pick can actually deal ----------

@@ -179,6 +179,196 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   party.tscn is the HERO SHEET now, opened from a card.
 
 ## Current systems snapshot (2026-08-08)
+BATCH AZ (08-08) — THE SHARPSHOOTER: PATIENCE. Second of the Hunter three. One spec only;
+the other eleven trees and enemy tuning UNTOUCHED. Every one of his 24 ids survives and
+re-specs in place, NO SAVE VERSION MOVES (still v7).
+SPINE: **PATIENCE — his power is in not looking away.** Focus already carried a real cost
+(earned by staying, lost by switching) and master.html already named the tension the spec
+exists for, so this is a spine that FITS plus the repricing every unauthored tree still needs.
+§0 **THE STANDING INSTRUCTION ON HIS DAMAGE SHARE IS CARRIED FORWARD AND MUST NOT BE
+REDISCOVERED AS A CONCERN: Batch W retired the old "Sharpshooter leads damage at 38%" flag as
+a stale number from a party that no longer exists, with the words NEVER TUNE AGAINST IT.** He
+is mid-pack (32-36%). Damage share IS a valid read for him (Nuker archetype) — unlike the
+Cleric three — so **if his rows come back high after this batch that is not automatically a
+problem: report it, do not act on it.**
+ONE NEW NUMBER, the AY pattern: **the DEEPEST FOCUS reached**, paired with **the critical
+multiplier it was paying at that depth** (§1 removes the ceiling, so "how deep does his
+patience actually get" stopped being answerable from the design). One `focus_report_line()`
+shared by the standalone report and RunSim's (the `ruin_report_line` pattern), banked AT THE
+GAIN SITE because a switch, a kill and One Shot all wipe the meter, and printed only when a
+Sharpshooter stood.
+§1 **FOCUS HAS NO CEILING, AND ITS PAYOFF CONVERTS AT 100.** One rule, one number, split in
+two: **the first 100 points each grant +0.5% CRITICAL CHANCE, and every point beyond 100
+grants +0.5% of CRITICAL MULTIPLIER instead.** Lethal Aim's x2 becomes x2.5 at 200 Focus, x3
+at 300, and it never stops paying — patience buys certainty first, then force. Focus is
+otherwise unchanged: +20 on attacking the enemy he attacked last turn, CLEARED on switching,
+up to 50 retained on a kill.
+**THE CONVERSION POINT IS A FIXED 100, DELIBERATELY, AND NOT "whenever crit chance reaches
+100%".** The alternative fails: with Steady Hands, Consistent Aim and Tunnel Vision a built
+marksman passes 100% chance at very low Focus, which would make the chance half of his own
+passive vestigial and make the conversion depend on what else he had stacked. A fixed
+threshold is legible in a tooltip — *the first hundred is your aim, everything past it is your
+force* — and it keeps those three nodes meaningful, because they are what buy reliable crits
+while Focus is still shallow. **THE 0.5%-PAST-100 RATE IS A BEST GUESS AT A NUMBER, SAID
+PLAINLY**; if the tail comes back far past x3-x3.5 the lever is THAT RATE, not the threshold.
+**EXACTLY ONE IMPLEMENTATION, ON BattleUnit** (the AT Resonance discipline through a Hunter
+door): `FOCUS_CONVERT` 100, `FOCUS_STEP` 0.005, `focus_convert()`, `focus_crit_chance()`,
+`focus_crit_mult()` and `lethal_crit_mult()`. battle.gd reads it through the crit-chance
+block and the crit-multiplier block, the NAMEPLATE reads it directly (it prints
+`Focus N (+X% crit / xY.YY)` and fills toward `FOCUS_BAR_REF` 200 since there is nothing to
+fill toward), and the sim instrument reads it too — so a change can never leave one behind.
+**`_focus_cap` RETURNS A SENTINEL, `FOCUS_UNCAPPED := -1`, NOT A LARGE NUMBER** — a large
+number is a ceiling a later batch reaches by accident (AY's `LOYALTY_UNCAPPED`). **EXACTLY ONE
+NODE STILL HANDS IT A NUMBER: Spray of Arrows (50), and that cap IS its cost.**
+**TWO CONSUMERS READ FOCUS AS A QUANTITY RATHER THAN A FRACTION AND BOTH WERE CHECKED AT THEIR
+SITES:** Coup de Grâce still CONSUMES ALL FOCUS but **READS at most `COUP_FOCUS_CAP` = 200**
+(at 400 Focus it would be 400% of missing health), and **One Shot's "at maximum Focus" became
+a NUMBER, 200** — `one_shot` is the gate AND the magnitude in one field (AW's `judgement`).
+**TWO OTHER `second_max` CONSUMERS NEEDED THE SENTINEL HANDLED, AND THEY ARE THE KIND OF THING
+THAT FAILS SILENTLY:** Parched halved `second_max / 2`, which on an uncapped meter would have
+zeroed the bar — it halves what he is HOLDING now; and the debug Full Restore set
+`second_resource = second_max`, i.e. to -1 — it restores to `FOCUS_BAR_REF`.
+§2 **UNWAVERING CHANGES SIDES.** It was the escape hatch (*switching halves your Focus instead
+of clearing it*) — a spec about not looking away selling a discount on looking away, from
+inside the spine's OWN lane, the same shape as Flame Shield and Stabilize. **RE-SPECCED to
+reward staying: each consecutive turn on one enemy grants +10 additional Focus, rising by 10
+each turn to a maximum of +50, resetting the moment he switches** (`same_target_turns` is the
+streak; `UNWAVERING_STEPS` = 5, so **the cap moves with the magnitude** rather than being a
+second number that can drift). **Spray of Arrows stays the honest way out** — it caps Focus at
+50 and costs him Tunnel Vision, a real opt-out priced against the spine rather than a
+softening of it.
+§3 ALL 24 NODES RE-PRICED AT ROW PRICING, **3-4x** (not the Cleric three's 4-5x — his numbers
+were never the smallest in the game). **ALL THREE LANE NAMES AND THESES STAND** — Precision,
+Penetration and Tempo were never lying about their jobs, so unlike AS's Shatterpoint or AT's
+Control nothing needed re-aiming. FULL TABLE IN THE CHANGELOG. **TWO NODES ARE RE-SPECCED
+RATHER THAN REPRICED:** Deep Focus (was "the cap rises 100 -> 150", which §1 left with no
+premise) now **moves the CONVERSION POINT from 100 to 60** — same name, same lane, a dial on
+the new mechanic instead of a dead ceiling raise; and Unwavering, per §2. **NO FORCED
+ASSIGNMENT: unlike AR's Ashes of Al'ar or AS's Frost Ward, every one of the 24 ids kept a real
+thread to what it used to do**, so nothing is carrying an unrelated design because a slot had
+to hold it.
+**THE TWO PREMISE CHECKS THE BRIEF ASKED FOR CAME BACK CLEAN, and both are recorded rather
+than assumed:** Coup de Grâce's formula at its site really is `raw += (max_hp - hp) * 0.01 *
+focus` (the changelog description of it was accurate), and the bot rotation really did already
+work `ss_t` — the description in this file was right about the Sharpshooter block. **THE REAL
+GAP WAS SOMEWHERE THE DESCRIPTION DID NOT LOOK**, and §7 has it.
+**CONSISTENT AIM'S WORDING CHANGE IS LOAD-BEARING, NOT COSMETIC.** It used to *set* the
+multiplier to 1.5, coherent only while it was exclusive with Executioner's Eye — and §4 shows
+that pair is dead. Written as **−0.5 (the counter holds 50 percentage POINTS)** it COMPOSES:
+x1.5 alone, x2.5 with Executioner's Eye alone, **x2.0 with both**, and the trade survives in
+every build. **OVERKILL GAINED A SECOND CLAUSE THAT TIES THE LANE TO THE SPINE:** a kill-chain
+is the one time switching targets is not disloyalty, so **the carry keeps his Focus in FULL**
+rather than dropping it to the usual 50.
+§4 **EXECUTIONER'S EYE <-> CONSISTENT AIM IS DISSOLVED.** Batch 32 authored it as a fork and
+they sit in Precision rows 4 and 5, so row exclusivity lets a player hold both; the pair list
+survives only as prose in this file (`test_runes._exclusives` has been a bare `pass` since AI)
+and **that prose is corrected** — the same correction AS, AT, AW and AY each made for their own
+trees. **TUNNEL VISION <-> SPRAY OF ARROWS SURVIVES UNTOUCHED**, because both sit in ROW 7 and
+row exclusivity enforces it correctly. Stated so a later batch does not "fix" it.
+§5 **THE TROPHY-POOL COLLISION CANNOT ARISE, and it is recorded rather than left to a reader.**
+HIS TREE GRANTS NO ABILITIES AT ALL (Aimed Shot, Powershot and Hold Breath are base kit; Quick
+Draw, Triple Shot, Coup de Grâce, Pinning Shot and Called Shot are boss-trophy pool), so he
+owes no AU §1 fallback in either direction. **ASSERTED BOTH WAYS** — no node carries
+`grant_ability`/`new_ability`, and a fully-learned tree adds NOTHING to `Talents.ability_names`.
+§6 **EVERY SHARPSHOOTER COUNTER IS ADDITIVE** (the AR/AS/AT/AV/AW/AX/AY form). §6 of the brief
+named THREE to convert — `lethal_eye_ranks` (50 = percentage points of crit multiplier),
+`bonecracker_ranks` (40) and `muscle_memory_ranks` (30) — and **EVERY OTHER NODE WHOSE
+MAGNITUDE IS A NUMBER TOOK THE SAME TREATMENT, reported rather than silently generalised** (the
+AW/AX call): `perfect_form` 40, `deep_focus` 40 (the DROP in the conversion point, which is
+what keeps it additive), `consistent_aim` 50, `unwavering` 10, `tunnel_vision` 100,
+`sundering_shot` 45, `exposed_nerve` 15 (gate AND magnitude), `snap_shot` 2 with `snap_used`
+now a COUNT not a bool, `opening_volley` 150, `follow_through` 2, `second_nature` 4 (a TOTAL,
+the `instinctive` precedent), `spray` 2, `one_shot` 200, `rapid_fire` 50. **FOUR ARE STILL
+HONEST FLAGS** — No Cover, Overkill, Through and Through (rules, not amounts).
+**`opp_aim` BECAME `opp_aim_step` (4.0) BECAUSE IT IS A FLOAT**: it holds the INCREASE on the
+2%-per-Break-point the kit pays WITHOUT the node (AV's `guardian_step` form), and it is
+**deliberately ABSENT from `Runes.STAT_INT_KEYS`** — the coercion would round it with nothing
+crashing (AT's `conduit_step`, AY's `wild_communion_step`). **THE OTHER HALF OF THE TRAP IS
+ASSERTED TOO: `deep_focus`, `perfect_form` and `opening_volley` STAY IN that list, and the
+reason under them CHANGED** — they used to be flags whose payload was a bare 1 and they are int
+MAGNITUDES now, which needs the list exactly as much.
+RUNE AUDIT, all four re-pointed. **THREE STILL PAY EXACTLY WHAT THEY PAID, only the units
+moved:** the Narrow Gap (`bonecracker_ranks` 1 -> 12, `pierce_bonus` untouched), the Long Draw
+(`opening_volley` 1 -> 60, `muscle_memory_ranks` 1 -> 10, the scarred -10 Speed untouched) and
+the Level Aim (`muscle_memory_ranks` 1 -> 10, `bonecracker_ranks` 1 -> 12). **THE RUNE OF THE
+DEEP SIGHT IS THE ONE THAT COULD NOT PAY WHAT IT PAID**, and it is REPORTED not hidden (the AY
+Deep Bond / AX Hollow Chalice precedent): "his Focus climbs to 150" has no equivalent value
+once there is no ceiling. **RE-POINTED, NOT DELETED** — it keeps the RELATIONSHIP, dropping the
+conversion point by 8, **one fifth of Deep Focus's 40, exactly AY's ratio**, and its desc was
+rewritten to the new units rather than left lying. Its second clause (crits granting +20 Focus)
+is untouched. **THE COLLISION §6 ASKED ABOUT, RESOLVED AND STATED: Long Draw's opening value
+and Opening Volley's 150 now SUM to 210** — the additive house rule, so each pays its
+advertised number alone and both stacked, and the rune's text says "60 MORE" so neither is
+lying. **THE THREE HUNTER CLASS-WIDE RUNES TOUCH NO SHARPSHOOTER COUNTER**, asserted.
+§7 THE BOT, two changes. **IT NEVER SWITCHES WHILE ITS MARK LIVES** — `_focus_mark(u,
+fallback)` is the ONE answer to "who is he shooting" (the AX `_ruin_focus` shape) and it is
+applied by REASSIGNING `target_foe` at the TOP of the hunter branch. **That position is
+load-bearing, and the brief's own instruction to check the code found why: the Sharpshooter
+rotation already worked `ss_t`, but the CLASS-POOL abilities he can earn — Shrapnel Charge,
+Snare Trap, Hamstring, Harvest, Deadfall — each aimed at `target_foe` and would have quietly
+broken the meter they were priced against.** **COUP'S THRESHOLD MOVED OFF 80** (most of a
+capped meter, a fraction of an uncapped one) **to `COUP_FOCUS_CAP`** — the same constant the
+damage site reads, so the bot and the ability can never disagree about what it is priced for.
+Instrument honesty, not tuning: NO DIFFICULTY MEASUREMENT IN THIS BATCH.
+KIT SMOKE, fixed lineup, 40 battles/row, berserker,pyromancer,inquisitor,sharpshooter,
+DOD_SIM_TALENTS force-learning full 8-node lanes. All rows 40/40 wins, 0 SCRIPT ERROR.
+Sharpshooter damage share / deepest Focus: **ungeared 36% (246/battle), deepest 130 (x2.15);
+PRECISION 37% (249), deepest 240 (x2.9); PENETRATION 36% (237), deepest 160 (x2.3), BD/battle
+138 against the other rows' 81-87; TEMPO 49% (317), deepest 50 — Spray of Arrows' cap, working.**
+A PRECISION row with the trophy abilities granted reads **39% (276), deepest 280 (x3.1)**.
+**§1'S OWN PREDICTION, ANSWERED TO THE NUMBER: it guessed "somewhere near x3 to x3.5 by the end
+of a long fight" and a full Precision build reaches x3.1.** So the 0.5%-past-100 rate SHIPS AS
+WRITTEN, and the lever named for the tail was not needed.
+**TEMPO IS THE STANDOUT AT 49%, AND IT IS REPORTED, NOT ACTED ON — that is §0's standing
+instruction working exactly as it was meant to.** The cause is legible: Snap Shot's two free
+casts plus Rapid Fire's 50% cooldown skip plus Follow-Through's -2 put Aimed Shot at 4.0
+casts/battle against the other rows' 2.4-3.3, and Spray of Arrows adds two extra bodies a shot.
+Note what it costs him: the Focus meter never leaves 50, so the whole converted half of his own
+passive is switched off in that build. **THE MOST DAMAGE AND THE LEAST PATIENCE ARE THE SAME
+ROW**, which is the trade the lane is supposed to sell.
+**PRECISION IS THE ROW WORTH A SECOND LOOK, AND IT IS A FINDING RATHER THAN A PROBLEM: it
+DOUBLES the depth (130 -> 240) and moves damage share by ONE POINT.** The build holds both
+halves of §4's dissolved pair, so Executioner's Eye's +0.5 and Consistent Aim's -0.5 cancel to
+x2.0 and Tunnel Vision's -100% switches off crits on everything except the mark. The lane pays
+in CERTAINTY, and the smoke's instrument reads damage. Kit-mechanics ratios ONLY; NO difficulty
+signal (Batch R).
+**COUP DE GRACE FIRES 0.1 TIMES A BATTLE at the new threshold** (trophy row; it is not in the
+opening kit, so the four lane rows never press it at all). That is §7 taken to its conclusion
+rather than a bug — 200 Focus is genuinely late in a fight that ends in 7 rounds — but it means
+**the smoke barely exercises the ability the reading cap was written for**, and a run is where
+that number will mean something. REPORTED, NOT RETUNED.
+ONE INSTRUMENT FIX THE FIRST SMOKE FOUND, and it is the class of thing that reads as a broken
+instrument rather than a finding: **the deepest-Focus line printed NOTHING on a Spray build.**
+The meter opens at Opening Volley's value clamped to the node's cap of 50, so no gain ever
+RAISES it and the banking sat inside a `> before` branch. The bank is outside that branch now —
+what is being recorded is how deep the meter GOT, not whether a given call moved it.
+VERIFIED: check_parse 0, check_flow 0 (6 screens), run-harness gates 1/2/3 PASS.
+NEW test_batch_az.gd **489/0**.
+Regression: ah 5410/0 (STAMP GATE bumped AY -> AZ), ah_battle 65/0, ai 2036/0, an 6047/0,
+aj 403/0, ak 523/0, al 556/0, ar 885/0, as 387/0, at 460/0, au 257/0, av 315/0, aw 338/0,
+ax 329/0, ay 455/0,
+test_runes **2976/0 (was 2985 — three RE-POINTS IN PLACE with the reason in the file: §1 took
+`deep_focus`, `perfect_form` and `opening_volley` out of `BOOLEAN_READ_FIELDS` because they
+carry real magnitudes now, which is the AE alarm doing its job rather than the list decaying;
+the AA ordering probe for `deep_focus` is INVERTED (it proves no Focus ceiling is derived at
+all, the AT Resonance treatment); and the ceiling-writer floor drops 3 -> 2 with the two
+survivors NAMED — Open Hand and Long Draw — so it cannot fall again by attrition)**,
+test_rune_battle **96/0 (was 95 — its Sharpshooter block RE-POINTED IN PLACE: the ceiling
+assertion is INVERTED, the counters read the new units, and a check was ADDED for the Deep
+Sight's re-pointed clause)**.
+NEGATIVE CONTROLS RUN, all four the batch named, each applied to the code and reverted:
+**Focus past the split still buying chance trips 2, Consistent Aim SETTING the multiplier trips
+2, Unwavering surviving a target switch trips 3, and Coup reading the whole meter trips 2.**
+LIVE AUTOPLAY BATTLE clean (0 SCRIPT ERROR), and **§2'S RAMP READS CORRECTLY IN A REAL FIGHT**:
+"Unwavering: +10 Focus for 1 turn on one mark" then "+20 Focus for 2 turns on one mark", then
+back to +10 after the mark died — the acceleration, and the reset, visible in the log.
+NO DIFFICULTY MEASUREMENT AND NO SIM ROW, deliberately — same as
+AJ/AK/AL/AR/AS/AT/AU/AV/AW/AX/AY.
+REPORTED NOT ACTED ON: **THE FOCUS METER IS UNCAPPED AND `_gain_focus` TAKES A SIGNED AMOUNT.**
+Nothing in the game currently spends Focus through it (Coup and One Shot both assign 0
+directly), so the floor at 0 is the only guard it needs today — but a later batch adding a
+per-point spender should decide at that site whether spending is allowed to run the meter
+backwards past what a single ability paid for.
 BATCH AY (08-08) — THE BEASTMASTER: PARTNERSHIP (AND THE PACK, BUILT). First of the
 Hunter three, and **he goes first rather than last** on Batch X's own precedent that the
 companion machinery "deserves a pass rather than being the tired third of three." One spec
@@ -3501,8 +3691,13 @@ spawn grants all read the spec pool now (member keys still bm_*).
 TREE = FIRST NODE-GATED LANES ("node_gated": true on the tree's first
 node; is_node_gated + lane_nodes_bought; NODE_TIER_REQ {0,2,4},
 NODE_CAPSTONE_REQ 6 — points-gated trees unchanged). Lanes Precision/
-Penetration/Tempo per the design doc; exclusives ss_exec_eye↔
-ss_consistent, ss_tunnel↔ss_spray. Bot: works ss_t (last target),
+Penetration/Tempo per the design doc; exclusives were authored as
+ss_exec_eye/ss_consistent and ss_tunnel/ss_spray — **THE FIRST PAIR IS
+DISSOLVED (Batch AZ §4)**: Batch AI's row exclusivity destroyed it, since
+both sit in Precision rows 4 and 5, so a player holds both and AZ reworded
+Consistent Aim to −0.5 so they compose (x2.0 together). **THE SECOND
+SURVIVES UNTOUCHED** because both sit in ROW 7 and row exclusivity enforces
+it correctly — do not "fix" it. Bot (PRE-AZ, see the AZ block):
 Hold Breath → Coup ≥80 focus & <60% hp → Triple ≥60 → Called → Aimed;
 9th kit entry renders unlabeled (popup guard existed). SIM NOTE
 SUPERSEDED (Batch W): the "sharpshooter leads damage 38%" flag was a
@@ -3976,16 +4171,17 @@ Space or left click; no announcer text (combat log only).
   The open lever remains authored rune POWER — a runes.json data edit,
   not machinery — and the dilution question (see the AB block).
 - Sim bot wins ~90%+ with 4 heroes; real difficulty tuning by user playtest.
-- TWO TALENT TREES STILL CARRY BATCH AI'S MAGNITUDES — **the SHARPSHOOTER and the
-  SURVIVALIST, and they are the last two in the game.** The four class batches AI
-  promised landed (AK Swordmaster, AJ Berserker, AL Warden, AR Pyromancer), then
-  AS re-authored the Cryomancer and AT the Arcanist — THE MAGE CLASS IS DONE — then
-  AV the Holy Cleric, AW the Devout and AX the Occultist — THE CLERIC CLASS IS DONE —
-  and **AY the Beastmaster**. The two survivors are structurally correct and
-  numerically weak: single-rank nodes at the old rank-1 values, i.e. roughly a third
-  of the power a row should be priced at. The Cleric three needed 4-5x rather than
-  the Mage trees' 3x because a support's numbers were the smallest in the game; **the
-  Beastmaster took 3-4x**, so the Hunter is not a special case that way.
+- ONE TALENT TREE STILL CARRIES BATCH AI'S MAGNITUDES — **the SURVIVALIST, and he is the
+  last one in the game.** The four class batches AI promised landed (AK Swordmaster, AJ
+  Berserker, AL Warden, AR Pyromancer), then AS re-authored the Cryomancer and AT the
+  Arcanist — THE MAGE CLASS IS DONE — then AV the Holy Cleric, AW the Devout and AX the
+  Occultist — THE CLERIC CLASS IS DONE — and **AY the Beastmaster and AZ the
+  Sharpshooter**. The survivor is structurally correct and numerically weak: single-rank
+  nodes at the old rank-1 values, i.e. roughly a third of the power a row should be
+  priced at. The Cleric three needed 4-5x rather than the Mage trees' 3x because a
+  support's numbers were the smallest in the game; **the Beastmaster and the Sharpshooter
+  both took 3-4x**, so the Hunter is not a special case that way. **His spec id is
+  "mystic" — NEVER rename it, saves and trees key on it.**
 - DEATH RAY CARRIES NO BREAK DAMAGE (Batch AT, STILL OPEN AFTER AU). AT's brief
   specified Mana, initiative, cooldown, damage, target count and the gate
   precisely and said nothing about BD, so it ships at pressure 0 rather than

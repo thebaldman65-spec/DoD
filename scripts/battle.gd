@@ -582,13 +582,19 @@ func _spawn_units() -> void:
 			cfg["second_max"] = 5 + int(cfg.get("mercy_cap_bonus", 0))
 			cfg["second_resource"] = mini(int(cfg.get("zealous_mercy", 0)),
 				int(cfg["second_max"]))
-		# Focus is the Sharpshooter's second resource (0-100; Deep Focus /
-		# Spray of Arrows move the ceiling, Opening Volley the start).
+		# Focus is the Sharpshooter's second resource, and BATCH AZ TOOK ITS
+		# CEILING AWAY. `second_max` carries the FOCUS_UNCAPPED sentinel for him
+		# now — Spray of Arrows is the ONE node that still hands the meter a
+		# number, and that cap IS its cost. Opening Volley says what he walks in
+		# holding, and it is ADDITIVE (the node 150, the Rune of the Long Draw
+		# another 60), so each pays its advertised number alone and both stacked.
 		if spec == "sharpshooter":
 			cfg["second_resource_name"] = "Focus"
-			cfg["second_max"] = (50 if cfg.get("spray", 0) > 0 \
-				else (150 if cfg.get("deep_focus", 0) > 0 else 100))
-			cfg["second_resource"] = 60 if cfg.get("opening_volley", 0) > 0 else 0
+			cfg["second_max"] = 50 if cfg.get("spray", 0) > 0 else FOCUS_UNCAPPED
+			var ss_open := int(cfg.get("opening_volley", 0))
+			if int(cfg["second_max"]) >= 0:
+				ss_open = mini(ss_open, int(cfg["second_max"]))
+			cfg["second_resource"] = ss_open
 		# Relic hooks (see the audit atop relics.gd): numeric boons
 		# aggregate across the run's relics. Outside the Run.active gate so
 		# DOD_SIM_RELICS loadouts drive the same code in standalone sims.
@@ -909,7 +915,11 @@ func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
 			# topped UP by a modifier that only ever takes.
 			u.resource = mini(u.resource, u.max_resource / 2)
 			if u.second_resource_name != "":
-				u.second_resource = mini(u.second_resource, u.second_max / 2)
+				# An UNCAPPED meter (Focus since AZ) has no maximum to take half
+				# of, so Parched halves what he is HOLDING instead. Same promise
+				# either way — the modifier only ever takes.
+				u.second_resource = (u.second_resource / 2) if u.second_max < 0 \
+					else mini(u.second_resource, u.second_max / 2)
 			u.refresh_bars()
 		"slick":
 			for ab in u.abilities:
@@ -1192,7 +1202,10 @@ func _debug_full_restore() -> void:
 		u.hp = u.max_hp
 		u.resource = u.max_resource
 		if u.second_resource_name != "":
-			u.second_resource = u.second_max
+			# "Full" on an uncapped meter (Focus since AZ) means the depth that
+			# means something — One Shot's threshold and Coup's reading cap.
+			u.second_resource = int(BattleUnit.FOCUS_BAR_REF) \
+				if u.second_max < 0 else u.second_max
 		u.refresh_bars()
 	_log("DEBUG: party fully restored", "#e0a050")
 
@@ -2800,6 +2813,15 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				return [u.abilities[0], cryo_mark]       # Frostbolt the mark
 			return [u.abilities[0], target_foe]          # basic bolt
 		"hunter":
+			# BATCH AZ §7 — THE MARKSMAN WORKS ONE TARGET, and this is the ONE
+			# place that decides it. Focus is the spec; a bot that retargets on
+			# convenience measures a spec nobody plays, so it switches only when
+			# its mark is DEAD. Reassigning `target_foe` here rather than at each
+			# pick is what makes the rule reach the CLASS-POOL abilities a
+			# Sharpshooter can earn — Shrapnel Charge, Snare Trap, Hamstring,
+			# Harvest and Deadfall all aimed at `target_foe` and would each have
+			# quietly broken the meter they were priced against.
+			target_foe = _focus_mark(u, target_foe)
 			# BATCH AY §7. IT MUST SUMMON EARLY AND KEEP SOMETHING STANDING:
 			# Loyalty only accrues while a beast lives, so a bot that summons
 			# late measures a spec nobody plays. This block is FIRST in the
@@ -2875,16 +2897,22 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 					and not u.has_status("instinct"):
 				return [hi, u]
 			# Sharpshooter: work one target — hold the breath, then spend it.
+			# `ss_t` IS `target_foe` now (the mark was decided at the top of the
+			# branch); it stays as a name because every pick below reads it.
 			var ss_t: BattleUnit = target_foe
-			if u.last_attack_target != null and not u.last_attack_target.dead:
-				ss_t = u.last_attack_target
 			var hbreath := _find_ability(u, "Hold Breath")
 			if hbreath != null and u.resource >= _eff_cost(u, hbreath) \
 					and u.ability_ready(hbreath) and not u.has_status("held_breath"):
 				return [hbreath, u]
+			# COUP'S THRESHOLD MOVED OFF 80 (Batch AZ §7): 80 was most of a
+			# capped meter and is a fraction of an uncapped one. It waits for
+			# COUP_FOCUS_CAP — the most the ability can READ — so the sim
+			# exercises it at the value it is priced for, and so the bot and the
+			# damage site can never disagree about what that value is.
 			var coup := _find_ability(u, "Coup de Grâce")
 			if coup != null and u.second_resource_name == "Focus" \
-					and u.second_resource >= 80 and u.resource >= _eff_cost(u, coup) \
+					and u.second_resource >= COUP_FOCUS_CAP \
+					and u.resource >= _eff_cost(u, coup) \
 					and u.ability_ready(coup) and ss_t.hp < ss_t.max_hp * 0.6:
 				return [coup, ss_t]
 			var triple := _find_ability(u, "Triple Shot")
@@ -3273,8 +3301,9 @@ func _show_actions(u: BattleUnit) -> void:
 func _eff_cost(u: BattleUnit, ab: Ability, target: BattleUnit = null) -> int:
 	if ab.special == "summon" and u.free_summons > 0:
 		return 0
-	# Snap Shot: the first ability of the fight costs nothing.
-	if u.snap_shot > 0 and not u.snap_used and ab.cost > 0:
+	# Snap Shot: the first abilities of the fight cost nothing. `snap_shot` is
+	# HOW MANY (Batch AZ, 2) and `snap_used` counts them off.
+	if u.snap_shot > u.snap_used and ab.cost > 0:
 		return 0
 	# Execute, upgraded by its own capstone landing on an earned Execute:
 	# free against a Broken target. With no target in hand — the button's
@@ -4283,23 +4312,26 @@ func _impact_sfx(attacker: BattleUnit, ab: Ability) -> String:
 
 func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: String,
 		is_counter := false) -> void:
-	var was_snap := attacker.snap_shot > 0 and not attacker.snap_used \
+	var was_snap := attacker.snap_shot > attacker.snap_used \
 		and ab.cost > 0 and not is_counter
 	attacker.resource = clampi(attacker.resource - _eff_cost(attacker, ab, target) \
 		+ ab.resource_gain, 0, attacker.max_resource)
 	attacker.refresh_bars()
 	if was_snap:
 		# Snap Shot: free, and the cooldown never starts.
-		attacker.snap_used = true
-		_log("   → Snap Shot: no cost, no cooldown", "#b0a8e0")
+		attacker.snap_used += 1
+		_log("   → Snap Shot: no cost, no cooldown (%d of %d)" % [
+			attacker.snap_used, attacker.snap_shot], "#b0a8e0")
 	elif not is_counter and not debug_cooldowns_off:
 		# Improvised (Survivalist): the first ability keeps its cooldown.
 		if attacker.improvised > 0 and not attacker.improvised_used \
 				and ab.cooldown > 0:
 			attacker.improvised_used = true
 			_log("   → Improvised: no cooldown on the opener", "#b0a8e0")
-		# Rapid Fire (capstone): 35% of casts skip their cooldown.
-		elif attacker.rapid_fire > 0 and ab.cooldown > 0 and randf() < 0.35:
+		# Rapid Fire (capstone): a share of casts skip their cooldown. ADDITIVE —
+		# the counter is the percentage itself (Batch AZ: 50).
+		elif attacker.rapid_fire > 0 and ab.cooldown > 0 \
+				and randf() < 0.01 * attacker.rapid_fire:
 			_log("   → Rapid Fire: the cooldown never starts", "#b0a8e0")
 		# Fuse (Pyromancer talent): Detonation can reset its own cooldown.
 		elif ab.display_name == "Detonation" and attacker.fuse_ranks > 0 \
@@ -4756,13 +4788,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if is_perfect and ab.display_name == "Sweeping Strikes" and hit_i == 1:
 				crit_chance += 0.25
 			# Lethal Aim (Sharpshooter): Focus steadies the hand — +0.5% crit
-			# per point; Tunnel Vision commits wholly to the worked target.
+			# per point, BUT ONLY AS FAR AS THE CONVERSION POINT (Batch AZ §1).
+			# Past it the same half-percent a point buys critical MULTIPLIER
+			# instead, in the crit block below: chance cannot pass 100%, force
+			# can go on forever. Tunnel Vision commits wholly to the worked mark.
 			if attacker.passive_id == "lethal_aim" \
 					and attacker.second_resource_name == "Focus":
-				crit_chance += attacker.second_resource * 0.005
+				crit_chance += attacker.focus_crit_chance()
 				if attacker.tunnel_vision > 0:
-					crit_chance += (0.50 if strike_target == attacker.last_attack_target \
-						else -0.50)
+					crit_chance += 0.01 * attacker.tunnel_vision \
+						* (1.0 if strike_target == attacker.last_attack_target else -1.0)
 			var is_crit := randf() < crit_chance
 			# Ice Lance: always crits against Frozen targets.
 			if ab.display_name == "Ice Lance" and strike_target.has_status("frozen"):
@@ -4795,12 +4830,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if strike_target.is_hero:
 					_prev(strike_target, pv_was - raw)
 			if is_crit:
-				# Lethal Aim x2 base; Executioner's Eye deepens it, Consistent
-				# Aim trades it back to x1.5 for +30% chance.
+				# LETHAL AIM: x2 base, Executioner's Eye deepens it, Consistent
+				# Aim takes half a multiplier back in exchange for chance — and
+				# EVERY POINT OF FOCUS PAST THE CONVERSION POINT ADDS 0.5% MORE
+				# (Batch AZ §1): x2.5 at 200 Focus, x3 at 300, and it never stops
+				# paying. ONE implementation, on BattleUnit, so this site, the
+				# nameplate and the sim instrument cannot read different numbers.
 				var crit_mult := 1.5
 				if attacker.passive_id == "lethal_aim":
-					crit_mult = 1.5 if attacker.consistent_aim > 0 \
-						else 2.0 + 0.1 * attacker.lethal_eye_ranks
+					crit_mult = attacker.lethal_crit_mult()
 				# Piercing Ice: the lance drives deeper on a crit. ADDITIVE —
 				# the counter is percentage POINTS of critical damage.
 				if ab.display_name == "Ice Lance":
@@ -4965,16 +5003,22 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# target's Break bar already FULL — the team breaks them, the
 			# marksman ends them (+4% with Opportunist's Aim).
 			if ab.display_name == "Powershot":
-				var ps_step := 4.0 if attacker.opp_aim > 0 else 2.0
+				# ADDITIVE: `opp_aim_step` is the INCREASE on the 2% the kit pays
+				# without the node, so Opportunist's Aim TRIPLES the scaling by
+				# writing 4 rather than by setting 6 (the `_step` house form).
+				var ps_step := 2.0 + attacker.opp_aim_step
 				raw *= 1.0 + ps_step * clampf(
 					strike_target.pressure / float(strike_target.stability), 0.0, 1.0)
-			# One Shot (capstone): at maximum Focus the perfect moment arrives —
-			# Aimed Shot executes below 35% health (never bosses; elites are
-			# fair game), doubles otherwise.
+			# One Shot (capstone): deep enough into the patience the perfect
+			# moment arrives — Aimed Shot executes below 35% health (never
+			# bosses; elites are fair game), doubles otherwise. THE THRESHOLD IS
+			# A NUMBER NOW (Batch AZ): it used to read "at maximum Focus", and §1
+			# left no maximum for it to name. `one_shot` is the GATE AND THE
+			# MAGNITUDE in one field (AW's `judgement` precedent).
 			var one_shot_exec := false
 			if ab.display_name == "Aimed Shot" and attacker.one_shot > 0 \
 					and attacker.second_resource_name == "Focus" \
-					and attacker.second_resource >= _focus_cap(attacker):
+					and attacker.second_resource >= attacker.one_shot:
 				if strike_target.hp < strike_target.max_hp * 0.35 \
 						and not strike_target.is_boss:
 					one_shot_exec = true
@@ -4987,18 +5031,35 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				attacker.second_resource = 0
 				attacker.refresh_bars()
 			# Coup de Grâce: cash out the patience — +1% of the target's
-			# MISSING health per point of Focus spent.
+			# MISSING health per point of Focus spent. IT STILL CONSUMES ALL
+			# FOCUS, but it READS at most COUP_FOCUS_CAP of it (Batch AZ §1):
+			# with no ceiling on the meter this term is one of only two that read
+			# Focus as a QUANTITY rather than a fraction, and at 400 Focus it
+			# would be 400% of what is missing.
 			if ab.display_name == "Coup de Grâce" \
 					and attacker.second_resource_name == "Focus" \
 					and attacker.second_resource > 0:
-				var cdg := attacker.second_resource
+				var cdg_held := attacker.second_resource
+				var cdg := mini(cdg_held, COUP_FOCUS_CAP)
 				attacker.second_resource = 0
 				attacker.refresh_bars()
 				raw += (strike_target.max_hp - strike_target.hp) * 0.01 * cdg
-				_log("   → Coup de Grâce: %d Focus spent" % cdg, "#e0a050")
-			# Bonecracker: the broken are already lost.
+				if cdg_held > cdg:
+					_log("   → Coup de Grâce: %d Focus spent, %d of it read" % [
+						cdg_held, cdg], "#e0a050")
+				else:
+					_log("   → Coup de Grâce: %d Focus spent" % cdg, "#e0a050")
+			# Bonecracker: the broken are already lost. ADDITIVE — the counter is
+			# percentage POINTS, so the node's 40 and the two runes' 12 apiece
+			# each pay their advertised number alone and stacked.
 			if strike_target.broken and attacker.bonecracker_ranks > 0:
-				raw *= 1.0 + 0.12 * attacker.bonecracker_ranks
+				raw *= 1.0 + 0.01 * attacker.bonecracker_ranks
+			# Exposed Nerve's SECOND clause: he finishes what he opened. The
+			# universal Exposed multiplier is target-side and applies to everyone;
+			# this is his alone, so it is attacker-side, and the one counter both
+			# gates the crit rider and carries this magnitude.
+			if attacker.exposed_nerve > 0 and strike_target.has_status("exposed"):
+				raw *= 1.0 + 0.01 * attacker.exposed_nerve
 			# Trapper (Survivalist): breadth of control IS the damage — +8%
 			# per different status on the target. Force of Nature raises it
 			# to +20% and lends it to the WHOLE party.
@@ -5563,19 +5624,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					strike_target.unit_name, "#c070e0")
 			# Sharpshooter on-crit riders: Perfect Form, Sundering Shot,
 			# Exposed Nerve, Follow-Through, Through and Through's refund.
+			# EVERY MAGNITUDE HERE LIVES IN ITS OWN COUNTER (Batch AZ), so a
+			# tooltip, a rune and this site cannot disagree about what a node
+			# pays: Perfect Form's Focus, Sundering Shot's Break, Follow-Through's
+			# cooldown turns.
 			if is_crit and attacker.is_hero and not is_counter:
 				if attacker.perfect_form > 0:
-					_gain_focus(attacker, 20)
+					_gain_focus(attacker, attacker.perfect_form)
 				if attacker.sundering_shot > 0 and not strike_target.dead:
-					strike_target.take_hit(0, 15)
-					_stat_bd(attacker, 15)
+					strike_target.take_hit(0, attacker.sundering_shot)
+					_stat_bd(attacker, attacker.sundering_shot)
 				if attacker.exposed_nerve > 0 and not strike_target.dead:
 					_apply_status(strike_target, "exposed", 3)
 				if attacker.follow_through > 0 and not attacker.cooldowns.is_empty():
 					for cd_key in attacker.cooldowns.keys():
 						attacker.cooldowns[cd_key] = maxi(
-							int(attacker.cooldowns[cd_key]) - 1, 0)
-					_log("   → Follow-Through: cooldowns tick", "#b0a8e0")
+							int(attacker.cooldowns[cd_key]) - attacker.follow_through, 0)
+					_log("   → Follow-Through: cooldowns tick %d" % \
+						attacker.follow_through, "#b0a8e0")
 				if attacker.through_and_through > 0 and ab.cost > 0:
 					attacker.resource = mini(attacker.resource + ab.cost,
 						attacker.max_resource)
@@ -6345,11 +6411,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var hb_info: Array = STATUS_INFO["held_breath"]
 					attacker.update_status("held_breath", "HB%d" % hb_left,
 						hb_info[3], hb_left)
+			# Spray of Arrows: `spray` is HOW MANY extra enemies the shot finds
+			# (Batch AZ, 2). It is also the one node that still hands Focus a
+			# ceiling, and that cap is what the breadth costs.
 			if attacker.spray > 0 and ab.multi_hits == 0 and ab.random_hits == 0:
 				var sp_pool := enemies.filter(
 					func(e): return not e.dead and e != target)
-				if not sp_pool.is_empty():
+				for _sp_i in attacker.spray:
+					if sp_pool.is_empty():
+						break
 					var sp_t: BattleUnit = sp_pool.pick_random()
+					sp_pool.erase(sp_t)
 					var sp_raw := ab.damage * 0.005 * attacker.attack \
 						* randf_range(0.9, 1.1)
 					sp_raw *= 1.0 - float(sp_t.resists.get("physical", 0.0))
@@ -8396,7 +8468,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						_on_enemy_death(target)
 		"hold_breath":
 			_gain_focus(attacker, 40)
-			var hb_shots := 2 if attacker.second_nature > 0 else 1
+			# Second Nature holds the TOTAL number of covered shots, not the
+			# increase (the `instinctive` precedent one branch below).
+			var hb_shots := attacker.second_nature if attacker.second_nature > 0 else 1
 			var hbi: Array = STATUS_INFO["held_breath"]
 			if not attacker.update_status("held_breath", "HB%d" % hb_shots,
 					hbi[3], hb_shots):
@@ -9831,46 +9905,113 @@ func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float,
 
 # ---------- Sharpshooter Focus ----------
 
-# The Focus ceiling: 100 base, 150 under Deep Focus, 50 under Spray of
-# Arrows (the spread costs the patience).
+# FOCUS HAS NO CEILING (Batch AZ §1). `_focus_cap` returns a SENTINEL rather
+# than a large number, for the same reason `_loyalty_cap` does (Batch AY): a
+# large number is a ceiling a later batch reaches by accident. EXACTLY ONE NODE
+# STILL HANDS IT A NUMBER — Spray of Arrows, and that cap IS its cost.
+const FOCUS_UNCAPPED := -1
+# What Coup de Grâce can READ, however deep the meter runs. It spends every
+# point (its own text says CONSUMES ALL FOCUS) but pays for at most this many:
+# at 1% of missing health a point, 400 Focus would be 400% of what is missing.
+# The bot holds the ability until the meter reaches it, off THIS constant, so
+# the two can never disagree about what the ability is priced for.
+const COUP_FOCUS_CAP := 200
+
+
 func _focus_cap(u: BattleUnit) -> int:
 	if u.spray > 0:
 		return 50
-	if u.deep_focus > 0:
-		return 150
-	return 100
+	return FOCUS_UNCAPPED
+
+
+# THE BOT'S MARK (Batch AZ §7), the AX `_ruin_focus` shape. A Sharpshooter
+# aims everything he casts at the enemy he is already working, and gives it up
+# only when it is dead — the ONE answer to "who is he shooting", so no pick in
+# the hunter branch can quietly break the meter the spec is made of. Any other
+# hunter keeps whatever the generic picker chose.
+func _focus_mark(u: BattleUnit, fallback: BattleUnit) -> BattleUnit:
+	if u.passive_id != "lethal_aim":
+		return fallback
+	if u.last_attack_target != null and not u.last_attack_target.dead:
+		return u.last_attack_target
+	return fallback
 
 
 func _gain_focus(u: BattleUnit, amount: int) -> void:
 	if u.second_resource_name != "Focus":
 		return
 	var before := u.second_resource
-	u.second_resource = clampi(u.second_resource + amount, 0, _focus_cap(u))
+	var cap := _focus_cap(u)
+	u.second_resource = maxi(u.second_resource + amount, 0)
+	if cap >= 0:
+		u.second_resource = mini(u.second_resource, cap)
 	if u.second_resource > before:
 		u.float_text("+%d Focus" % (u.second_resource - before),
 			Color(0.55, 0.85, 0.40))
+	# BATCH AZ §0 — the deepest Focus reached, banked AT THE GAIN SITE because a
+	# switch, a kill and One Shot all wipe the meter (the AY Loyalty precedent,
+	# unguarded for the same reason: a test that cannot read the instrument
+	# cannot prove it works). Paired with the multiplier it was paying, since
+	# §1's whole question is what the converted half is actually worth at the
+	# depth his patience really reaches.
+	#
+	# IT IS DELIBERATELY OUTSIDE THE `> before` BRANCH, and the first smoke is
+	# why: on a SPRAY build the meter opens at Opening Volley's value clamped to
+	# the node's cap of 50, so no gain ever raises it and the whole line printed
+	# NOTHING — a real depth reading as a broken instrument. What is being banked
+	# is how deep the meter GOT, not whether this call moved it.
+	if u.second_resource > int(sim_stats.get("focus_deepest", 0)):
+		sim_stats["focus_deepest"] = u.second_resource
+		sim_stats["focus_deepest_mult"] = u.lethal_crit_mult()
 	u.refresh_bars()
 
 
-# The Focus engine, run after each single-target attack: +20 on working
-# the same enemy as last turn (+10/rank Muscle Memory); switching clears
-# it (halves under Unwavering); a kill retains up to 50.
+# The Focus engine, run after each single-target attack: +20 on working the same
+# enemy as last turn (+ Muscle Memory, + Unwavering's ramp); switching CLEARS it;
+# a kill retains up to 50 — all of it under Overkill, whose carry is the one time
+# switching targets is not disloyalty.
+#
+# UNWAVERING CHANGED SIDES IN BATCH AZ. It used to HALVE the loss on a switch,
+# i.e. sell a discount on looking away from inside the spine's own lane — the
+# same shape as Flame Shield and Stabilize. It rewards staying instead: each
+# consecutive turn on one enemy grants an extra `unwavering` Focus, rising by
+# that much again each turn to a cap of UNWAVERING_STEPS times it, and resetting
+# the moment he switches. The cap moves with the magnitude rather than being a
+# second number that could drift from it.
+const UNWAVERING_STEPS := 5
+
+
 func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit) -> void:
 	if attacker.second_resource_name != "Focus" or victim == null:
 		return
 	if victim.dead:
-		attacker.second_resource = mini(attacker.second_resource, 50)
+		# The mark is gone, so the streak is too — but the meter is not. Overkill
+		# carries the blow onward at full value and keeps the Focus whole with it.
+		if attacker.overkill <= 0:
+			attacker.second_resource = mini(attacker.second_resource, 50)
+		elif attacker.second_resource > 50:
+			_log("   → Overkill: the chain keeps all %d Focus" % \
+				attacker.second_resource, "#e0a050")
 		attacker.last_attack_target = null
+		attacker.same_target_turns = 0
 		attacker.refresh_bars()
 		return
 	if attacker.last_attack_target == victim:
-		_gain_focus(attacker, 20 + 10 * attacker.muscle_memory_ranks)
+		attacker.same_target_turns += 1
+		var gain := 20 + attacker.muscle_memory_ranks
+		if attacker.unwavering > 0:
+			var ramp: int = attacker.unwavering \
+				* mini(attacker.same_target_turns, UNWAVERING_STEPS)
+			gain += ramp
+			_log("   → Unwavering: +%d Focus for %d %s on one mark" % [ramp,
+				attacker.same_target_turns,
+				"turn" if attacker.same_target_turns == 1 else "turns"], "#b0a8e0")
+		_gain_focus(attacker, gain)
 	elif attacker.last_attack_target != null:
-		var kept := (attacker.second_resource / 2) if attacker.unwavering > 0 else 0
-		if attacker.second_resource > kept:
-			attacker.float_text("Focus broken" if kept == 0 else "Focus halved",
-				Color(0.65, 0.65, 0.65))
-		attacker.second_resource = kept
+		if attacker.second_resource > 0:
+			attacker.float_text("Focus broken", Color(0.65, 0.65, 0.65))
+		attacker.second_resource = 0
+		attacker.same_target_turns = 0
 		attacker.refresh_bars()
 	attacker.last_attack_target = victim
 
@@ -10863,6 +11004,9 @@ func _print_sim_report() -> void:
 	var px := pack_report_line(sim_stats)
 	if px != "":
 		print(px)
+	var fx := focus_report_line(sim_stats)
+	if fx != "":
+		print(fx)
 	print("=============================================\n")
 
 
@@ -10901,6 +11045,23 @@ static func pack_report_line(stats: Dictionary) -> String:
 		line += " | The Pack: two beasts standing on %.0f%% of hunter turns (n=%d)" % [
 			100.0 * stats.get("pack_turns_two", 0.0) / pt, int(pt)]
 	return line
+
+
+# BATCH AZ §0 — THE SHARPSHOOTER'S ONE NEW NUMBER. §1 took the ceiling off
+# Focus, so "how deep does his patience actually get" stopped being answerable
+# from the design and has to be measured — and the answer is only interesting
+# beside what the converted half was PAYING at that depth, which is why the
+# multiplier is banked with it. Both are stamped at the GAIN site (a switch, a
+# kill and One Shot all wipe the meter — the AY Loyalty precedent). Shared by
+# the standalone report and RunSim's, the ruin_report_line pattern. Returns ""
+# when no Sharpshooter stood: a zero on a party without one reads as a broken
+# instrument rather than a finding.
+static func focus_report_line(stats: Dictionary) -> String:
+	var deepest: int = int(stats.get("focus_deepest", 0))
+	if deepest <= 0:
+		return ""
+	return "Focus: deepest reached %d (critical multiplier x%s at that depth)" % [
+		deepest, String.num(stats.get("focus_deepest_mult", 2.0), 2)]
 
 
 # Sweep report (DOD_SIM_SWEEP=1): one row per budget stage. Rounds reuses

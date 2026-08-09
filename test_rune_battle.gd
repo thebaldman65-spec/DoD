@@ -180,22 +180,39 @@ func _hunter_pass(spec: String) -> void:
 				"beastmaster: a Loyalty ceiling of %d was derived — Batch AY removed the ceiling" % \
 					scene.call("_loyalty_cap", hunter))
 		"sharpshooter":
-			# THE ORDERING FIX, live: both ceilings are derived from cfg at
-			# spawn. Before Batch AA they were read before runes applied.
-			ok(hunter.second_max == 150,
-				"sharpshooter: Focus cap read %d — Deep Sight was derived before it applied" % \
+			# THE ORDERING FIX, live: what a rune writes must be derived from
+			# cfg AFTER the rune pass. Before Batch AA it was read before.
+			# RE-POINTED BY BATCH AZ, with the reason in the file and the same
+			# treatment AY gave the Beastmaster block above: §1 gave Focus NO
+			# ceiling, so "the rune raised the cap to 150" asserts a design that
+			# no longer exists. THE QUESTION IS INVERTED — nothing may derive a
+			# ceiling for a marksman no node has given one to — and the ordering
+			# rule is still tested live by the OPENING VALUE, which the Rune of
+			# the Long Draw still writes into cfg.
+			ok(hunter.second_max == scene.get("FOCUS_UNCAPPED"),
+				"sharpshooter: a Focus ceiling of %d was derived — Batch AZ removed the ceiling" % \
 					hunter.second_max)
 			ok(hunter.second_resource == 60,
 				"sharpshooter: opened on %d Focus — the Long Draw was derived too early" % \
 					hunter.second_resource)
-			ok(hunter.perfect_form >= 1, "sharpshooter: perfect_form never applied")
+			# The counters went ADDITIVE in Batch AZ, so these read magnitudes
+			# rather than rank counts: the Deep Sight's +20 Focus a crit, and
+			# 12 apiece from the Narrow Gap and the Level Aim.
+			ok(hunter.perfect_form >= 20,
+				"sharpshooter: perfect_form read %d — the Deep Sight pays 20" % \
+					hunter.perfect_form)
 			ok(hunter.pierce_bonus > 0.11,
 				"sharpshooter: two runes feeding pierce_bonus did not sum (%.2f)" % \
 					hunter.pierce_bonus)
-			ok(hunter.bonecracker_ranks >= 2,
-				"sharpshooter: bonecracker_ranks read %d" % hunter.bonecracker_ranks)
-			ok(hunter.muscle_memory_ranks >= 2,
-				"sharpshooter: muscle_memory_ranks read %d" % hunter.muscle_memory_ranks)
+			ok(hunter.bonecracker_ranks >= 24,
+				"sharpshooter: bonecracker_ranks read %d — two runes pay 12 each" % \
+					hunter.bonecracker_ranks)
+			ok(hunter.muscle_memory_ranks >= 20,
+				"sharpshooter: muscle_memory_ranks read %d — two runes pay 10 each" % \
+					hunter.muscle_memory_ranks)
+			ok(hunter.deep_focus >= 8,
+				"sharpshooter: the Deep Sight's re-pointed clause never applied (%d)" % \
+					hunter.deep_focus)
 			ok(hunter.speed < 100.0,
 				"sharpshooter: the Long Draw speed cost never applied (%.1f)" % hunter.speed)
 		"mystic":

@@ -1010,6 +1010,12 @@ static func _print_report(battle) -> void:
 	var px_line: String = battle.pack_report_line(battle.sim_stats)
 	if px_line != "":
 		print(px_line)
+	# Batch AZ §0: the deepest Focus the marksman's patience actually reaches,
+	# and what the converted half was paying there. Same rule, same place — and
+	# a RUN is the only instrument whose fights are long enough to show it.
+	var fx_line: String = battle.focus_report_line(battle.sim_stats)
+	if fx_line != "":
+		print(fx_line)
 	var earned := talent_spent + talent_left
 	print("Talent points per hero per run: earned %.1f   spent %.1f (banked %.1f)" % [
 		earned / runs / 4.0, talent_spent / runs / 4.0, talent_left / runs / 4.0])

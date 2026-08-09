@@ -1636,88 +1636,137 @@ const LANE_TREES := {
 			"payload": {"stat": {"force_of_nature": 1}}},
 	],
 	"sharpshooter": [
-		# Batch AI re-cut this tree's tiers into 7 exclusive rows + a
-		# capstone row; every node costs 1 point and holds a single rank.
+		# Batch AI re-cut this tree's tiers into 7 exclusive rows + a capstone
+		# row; every node costs 1 point and holds a single rank. RE-AUTHORED BY
+		# BATCH AZ (08-08) around a spine: PATIENCE — his power is in not looking
+		# away. EVERY ID SURVIVES AND RE-SPECS IN PLACE, so saved picks migrate
+		# and no save version moves.
+		#
+		# THE LANE NAMES AND THESES ALL STAND — Precision, Penetration and Tempo
+		# were never lying about their jobs, so unlike the Cryomancer's
+		# Shatterpoint or the Arcanist's Control nothing needed re-aiming.
+		#
+		# MAGNITUDES ARE ADDITIVE, NOT RANKED: every counter writes its own
+		# magnitude in the units its read site sums (percentage POINTS unless
+		# said otherwise), so a node and a rune each pay their advertised number
+		# alone AND stacked. Repricing is 3-4x, not the Cleric three's 4-5x —
+		# his numbers were never the smallest in the game.
 		# --- Lane A: Precision — Focus, crit chance, crit damage ---
 		{"id": "ss_steady", "name": "Steady Hands", "ranks": 1, "lane": "Precision", "row": 1,
-			"desc": "+{v}% critical chance.", "scale": {"step": 4},
-			"payload": {"stat": {"crit_bonus": 0.04}}},
+			"desc": "+{v}% critical chance.", "scale": {"step": 15},
+			"payload": {"stat": {"crit_bonus": 0.15}}},
 		{"id": "ss_perfect_form", "name": "Perfect Form", "ranks": 1, "lane": "Precision", "row": 2,
-			"desc": "Critical hits grant +20 Focus.",
-			"payload": {"stat": {"perfect_form": 1}}},
+			"desc": "Critical hits grant +{v} Focus.", "scale": {"step": 40},
+			"payload": {"stat": {"perfect_form": 40}}},
+		# RE-SPECCED (was "the Focus cap rises from 100 to 150"): §1 took the
+		# ceiling away, so the old node had no premise left. It is the cleanest
+		# re-spec available — same name, same lane, and it becomes a DIAL on the
+		# new mechanic rather than a dead ceiling raise. The counter holds the
+		# DROP so it stays additive (the Rune of the Deep Sight adds 8 more).
 		{"id": "ss_deep_focus", "name": "Deep Focus", "ranks": 1, "lane": "Precision", "row": 3,
-			"desc": "The Focus cap rises from 100 to 150.",
-			"payload": {"stat": {"deep_focus": 1}}},
+			"desc": "Focus turns into force sooner: the conversion point falls from 100 Focus to {v}.",
+			"scale": {"base": 100, "step": -40},
+			"payload": {"stat": {"deep_focus": 40}}},
 		{"id": "ss_exec_eye", "name": "Executioner's Eye", "ranks": 1, "lane": "Precision", "row": 4,
 			"desc": "Lethal Aim's critical multiplier rises to x{v}.",
-			"scale": {"base": 2.0, "step": 0.1},
-			"payload": {"stat": {"lethal_eye_ranks": 1}}},
+			"scale": {"base": 2.0, "step": 0.5},
+			"payload": {"stat": {"lethal_eye_ranks": 50}}},
+		# The wording change is LOAD-BEARING, not cosmetic. It used to SET the
+		# multiplier to 1.5, which was coherent only while it was exclusive with
+		# Executioner's Eye — and §4 shows that pair is dead (rows 4 and 5 of one
+		# lane, so row exclusivity lets a player hold both). Written as -0.5 it
+		# COMPOSES: x1.5 alone, x2.0 with Executioner's Eye, and the trade
+		# survives in both builds.
 		{"id": "ss_consistent", "name": "Consistent Aim", "ranks": 1, "lane": "Precision", "row": 5,
-			"desc": "Critical hits deal x1.5 again — but you gain +30% critical chance.",
-			"payload": {"stat": {"consistent_aim": 1, "crit_bonus": 0.30}}},
+			"desc": "Your critical multiplier is reduced by 0.5 — but you gain +60% critical chance.",
+			"payload": {"stat": {"consistent_aim": 50, "crit_bonus": 0.60}}},
+		# RE-SPECCED (was "switching targets HALVES your Focus"): a spec about
+		# not looking away must not sell a discount on looking away, least of all
+		# in the spine's own lane — the same shape as Flame Shield and Stabilize.
+		# It rewards STAYING now. Spray of Arrows remains the honest way out.
 		{"id": "ss_unwavering", "name": "Unwavering", "ranks": 1, "lane": "Precision", "row": 6,
-			"desc": "Switching targets HALVES your Focus instead of clearing it.",
-			"payload": {"stat": {"unwavering": 1}}},
+			"desc": "Each consecutive turn attacking the same enemy grants +{v} additional Focus, rising by {v} again each turn to a maximum of +50. Switching resets it.",
+			"scale": {"step": 10},
+			"payload": {"stat": {"unwavering": 10}}},
 		{"id": "ss_tunnel", "name": "Tunnel Vision", "ranks": 1, "lane": "Precision", "row": 7,
-			"desc": "+50% critical chance against the enemy you attacked last turn; -50% against every other enemy.",
-			"payload": {"stat": {"tunnel_vision": 1}}},
+			"desc": "+{v}% critical chance against the enemy you attacked last turn; -{v}% against every other enemy.",
+			"scale": {"step": 100},
+			"payload": {"stat": {"tunnel_vision": 100}}},
 		# --- Lane B: Penetration — armor, Break, finishing the party's work ---
 		{"id": "ss_piercer", "name": "Armor Piercer", "ranks": 1, "lane": "Penetration", "row": 1,
-			"desc": "Your attacks ignore {v}% of the target's armor.", "scale": {"step": 8},
-			"payload": {"stat": {"pierce_bonus": 0.08}}},
+			"desc": "Your attacks ignore {v}% of the target's armor.", "scale": {"step": 30},
+			"payload": {"stat": {"pierce_bonus": 0.30}}},
 		{"id": "ss_sundering", "name": "Sundering Shot", "ranks": 1, "lane": "Penetration", "row": 2,
-			"desc": "Critical hits apply 15 Break damage.",
-			"payload": {"stat": {"sundering_shot": 1}}},
+			"desc": "Critical hits apply {v} Break damage.", "scale": {"step": 45},
+			"payload": {"stat": {"sundering_shot": 45}}},
 		{"id": "ss_bonecracker", "name": "Bonecracker", "ranks": 1, "lane": "Penetration", "row": 3,
-			"desc": "+{v}% damage against Broken enemies.", "scale": {"step": 12},
-			"payload": {"stat": {"bonecracker_ranks": 1}}},
+			"desc": "+{v}% damage against Broken enemies.", "scale": {"step": 40},
+			"payload": {"stat": {"bonecracker_ranks": 40}}},
+		# `opp_aim_step` is the INCREASE on the 2% the kit pays WITHOUT the node
+		# (AV's `guardian_step` form), so tripling the scaling is written as 4.
+		# It is a FLOAT and must stay OUT of Runes.STAT_INT_KEYS.
 		{"id": "ss_opp_aim", "name": "Opportunist's Aim", "ranks": 1, "lane": "Penetration", "row": 4,
-			"desc": "Powershot's Break scaling doubles: +4% damage per full point instead of +2%.",
-			"payload": {"stat": {"opp_aim": 1}}},
+			"desc": "Powershot's Break scaling TRIPLES: +6% damage per full point instead of +2%.",
+			"payload": {"stat": {"opp_aim_step": 4.0}}},
 		{"id": "ss_exposed_nerve", "name": "Exposed Nerve", "ranks": 1, "lane": "Penetration", "row": 5,
-			"desc": "Critical hits apply Exposed for 3 turns.",
-			"payload": {"stat": {"exposed_nerve": 1}}},
+			"desc": "Critical hits apply Exposed for 3 turns, and you deal +{v}% damage to Exposed enemies.",
+			"scale": {"step": 15},
+			"payload": {"stat": {"exposed_nerve": 15}}},
+		# A BYPASS, NOT A MAGNITUDE: there is nothing here to reprice, so it is
+		# the one node in the tree that is byte-unchanged.
 		{"id": "ss_no_cover", "name": "No Cover", "ranks": 1, "lane": "Penetration", "row": 6,
 			"desc": "Your attacks cannot be made to miss: Blind and Dazed do not affect you, and Elusive does not protect against you.",
 			"payload": {"stat": {"no_cover": 1}}},
+		# The second clause ties the lane to the spine: a kill-chain is the one
+		# time switching targets is not disloyalty, so it does not cost the bond.
 		{"id": "ss_overkill", "name": "Overkill", "ranks": 1, "lane": "Penetration", "row": 7,
-			"desc": "Excess damage from a killing blow carries to another enemy at full value.",
+			"desc": "Excess damage from a killing blow carries to another enemy at full value — and the carry keeps your Focus in FULL rather than dropping it to the usual 50.",
 			"payload": {"stat": {"overkill": 1}}},
 		# --- Lane C: Tempo — speed, cooldowns, Focus acceleration ---
 		{"id": "ss_fletcher", "name": "Fletcher's Speed", "ranks": 1, "lane": "Tempo", "row": 1,
-			"desc": "+{v} Speed.", "scale": {"step": 5},
-			"payload": {"stat": {"speed": 5.0}}},
+			"desc": "+{v} Speed.", "scale": {"step": 18},
+			"payload": {"stat": {"speed": 18.0}}},
 		{"id": "ss_snap", "name": "Snap Shot", "ranks": 1, "lane": "Tempo", "row": 2,
-			"desc": "The first ability you use each fight costs no Mana and does not start its cooldown.",
-			"payload": {"stat": {"snap_shot": 1}}},
+			"desc": "The first {v} abilities you use each fight cost no Mana and do not start their cooldowns.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"snap_shot": 2}}},
 		{"id": "ss_muscle", "name": "Muscle Memory", "ranks": 1, "lane": "Tempo", "row": 3,
-			"desc": "Focus gain per attack increases by {v}.", "scale": {"step": 10},
-			"payload": {"stat": {"muscle_memory_ranks": 1}}},
+			"desc": "Focus gain per attack increases by {v}.", "scale": {"step": 30},
+			"payload": {"stat": {"muscle_memory_ranks": 30}}},
+		# 150 OPENS HIM PAST THE CONVERSION POINT, which is the Tempo lane's whole
+		# argument in one node: he arrives already converting rather than earning
+		# his way there.
 		{"id": "ss_volley", "name": "Opening Volley", "ranks": 1, "lane": "Tempo", "row": 4,
-			"desc": "You begin every fight with 60 Focus.",
-			"payload": {"stat": {"opening_volley": 1}}},
+			"desc": "You begin every fight with {v} Focus.", "scale": {"step": 150},
+			"payload": {"stat": {"opening_volley": 150}}},
 		{"id": "ss_follow", "name": "Follow-Through", "ranks": 1, "lane": "Tempo", "row": 5,
-			"desc": "Critical hits reduce ALL your cooldowns by 1.",
-			"payload": {"stat": {"follow_through": 1}}},
+			"desc": "Critical hits reduce ALL your cooldowns by {v}.", "scale": {"step": 2},
+			"payload": {"stat": {"follow_through": 2}}},
 		{"id": "ss_second_nature", "name": "Second Nature", "ranks": 1, "lane": "Tempo", "row": 6,
-			"desc": "Hold Breath's guaranteed critical applies to your next TWO attacks.",
-			"payload": {"stat": {"second_nature": 1}}},
+			"desc": "Hold Breath's guaranteed critical applies to your next {v} attacks.",
+			"scale": {"step": 4},
+			"payload": {"stat": {"second_nature": 4}}},
 		{"id": "ss_spray", "name": "Spray of Arrows", "ranks": 1, "lane": "Tempo", "row": 7,
-			"desc": "Your single-target attacks strike one additional random enemy for 50% damage — but Focus can never exceed 50.",
-			"payload": {"stat": {"spray": 1}}},
+			"desc": "Your single-target attacks strike {v} additional random enemies for 50% damage — but Focus can never exceed 50.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"spray": 2}}},
 		# --- Capstones (row 8): take ONE, no lane requirement ---
+		# THE THRESHOLD REPLACES "at maximum Focus", which §1 made meaningless.
+		# The field is the gate AND the magnitude (AW's `judgement` precedent).
 		{"id": "ss_one_shot", "name": "One Shot", "ranks": 1, "lane": "Precision", "row": 8,
 			"capstone": true,
-			"desc": "At maximum Focus, Aimed Shot EXECUTES any non-boss enemy below 35% health outright (elites included); otherwise it deals double damage. Either way, Focus resets to 0.",
-			"payload": {"stat": {"one_shot": 1}}},
+			"desc": "At {v} or more Focus, Aimed Shot EXECUTES any non-boss enemy below 35% health outright (elites included); otherwise it deals double damage. Either way, Focus resets to 0.",
+			"scale": {"step": 200},
+			"payload": {"stat": {"one_shot": 200}}},
 		{"id": "ss_tnt", "name": "Through and Through", "ranks": 1, "lane": "Penetration", "row": 8,
 			"capstone": true,
 			"desc": "Your attacks ignore ALL armor, and every critical hit refunds its Mana cost.",
 			"payload": {"stat": {"through_and_through": 1}}},
 		{"id": "ss_rapid", "name": "Rapid Fire", "ranks": 1, "lane": "Tempo", "row": 8,
 			"capstone": true,
-			"desc": "Each ability you use has a 35% chance not to consume its cooldown.",
-			"payload": {"stat": {"rapid_fire": 1}}},
+			"desc": "Each ability you use has a {v}% chance not to consume its cooldown.",
+			"scale": {"step": 50},
+			"payload": {"stat": {"rapid_fire": 50}}},
 	],
 	"beastmaster": [
 		# Purpose-designed lanes (Batch 30, 07-25), re-cut into 7 exclusive rows
