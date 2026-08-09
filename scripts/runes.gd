@@ -62,8 +62,16 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# vars, and a float into an int var is a runtime error, not a rounding.
 	"zealous_mercy", "mercy_cap_bonus",
 	# Batch AB: the Hunter trees are full of these — flag talents whose
-	# payload is a bare 1. Same trap, same list.
-	"loyalty_cap_bonus", "deep_focus", "perfect_form", "opening_volley",
+	# payload is a bare 1. Same trap, same list. BATCH AY REMOVED
+	# `loyalty_cap_bonus`: §2 gave Loyalty no ceiling, so the field has no
+	# meaning, no writer and no reader left — the Rune of the Deep Bond that
+	# wrote it was re-pointed at the boon's step. NOTE THE OTHER HALF OF THE
+	# RULE, because AY's two new Beastmaster counters are the exception that
+	# proves it: `wild_communion_step` and `absolute_step` are FLOATS (the
+	# Deep Bond pays 1.5), so they must stay OUT of this list or the coercion
+	# rounds them and the rune goes quietly under-strength (AT's
+	# `conduit_step` precedent).
+	"deep_focus", "perfect_form", "opening_volley",
 	"coated_blades", "vulture",
 	# Batch AR: the Rune of the Cinder Trail was re-pointed onto its own term
 	# when the node took cinder_trail_ranks for a new meaning. Same trap, same

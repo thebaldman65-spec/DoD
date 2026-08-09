@@ -1005,6 +1005,11 @@ static func _print_report(battle) -> void:
 	var rx_line: String = battle.ruin_report_line(battle.sim_stats)
 	if rx_line != "":
 		print(rx_line)
+	# Batch AY §0: the Beastmaster's two — deepest Loyalty, and how often The
+	# Pack really fields two. Same rule, same place.
+	var px_line: String = battle.pack_report_line(battle.sim_stats)
+	if px_line != "":
+		print(px_line)
 	var earned := talent_spent + talent_left
 	print("Talent points per hero per run: earned %.1f   spent %.1f (banked %.1f)" % [
 		earned / runs / 4.0, talent_spent / runs / 4.0, talent_left / runs / 4.0])

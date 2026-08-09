@@ -609,10 +609,16 @@ func _holy_rename() -> void:
 func _negative_control_source() -> void:
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	var rsrc := FileAccess.get_file_as_string("res://scripts/run_sim.gd")
-	ok(bsrc.contains("devout.conviction_base_hp * CONVICTION_GROWTH_PCT"),
+	# RE-POINTED BY BATCH AY, with the reason in the file: §9 put the
+	# percentage in a local (`pct`) so a no-consume release can halve it, so
+	# the literal expression moved. THE QUESTION IS UNCHANGED — the growth
+	# must read the CAPTURED BASE and never the current maximum.
+	ok(bsrc.contains("devout.conviction_base_hp * pct"),
 		"NEGATIVE CONTROL: the growth reads the captured BASE, not max_hp")
 	ok(not bsrc.contains("devout.max_hp * CONVICTION_GROWTH_PCT"),
 		"NEGATIVE CONTROL: no path multiplies the CURRENT maximum")
+	ok(not bsrc.contains("devout.max_hp * pct"),
+		"NEGATIVE CONTROL: ...and the halved path does not either")
 	ok(bsrc.contains("- heroes[i].conviction_hp_gained"),
 		"NEGATIVE CONTROL: battle.gd's victory sync subtracts the growth")
 	ok(rsrc.contains("- h.conviction_hp_gained"),
@@ -721,10 +727,15 @@ func _live_apostle_stream() -> void:
 	for i in 12:
 		scene._gain_faith(ally, 1)
 	ok(ally.faith_stacks == 5, "...and every further gain re-triggers the release")
-	ok(dv.max_hp == 1000 + 13 * 30,
-		"13 releases under Apostle = +39%% of base (got +%d%%)" % (
+	# RE-POINTED BY BATCH AY §9, with the reason in the file: EVERY ONE of
+	# these 13 releases consumed no stacks (that is what Apostle does), so
+	# every one now pays HALF growth — 15 on a 1000 base, not 30. AW measured
+	# the stream and reported it; AY is the batch that acted on it, and this
+	# assertion is where the change is visible.
+	ok(dv.max_hp == 1000 + 13 * 15,
+		"13 releases under Apostle = +19%% of base at half growth (got +%d%%)" % (
 			(dv.max_hp - 1000) * 100 / 1000))
-	_report.append("APOSTLE ROW (§1's number to watch): 13 releases in one fight = max_hp 1000 -> %d, +%d%%" % [
+	_report.append("APOSTLE ROW (AW's number, AY's fix): 13 releases in one fight = max_hp 1000 -> %d, +%d%% (was +39%%)" % [
 		dv.max_hp, (dv.max_hp - 1000) * 100 / 1000])
 	await _kill(scene)
 

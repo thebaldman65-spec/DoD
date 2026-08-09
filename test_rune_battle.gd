@@ -130,20 +130,27 @@ func _hunter_pass(spec: String) -> void:
 
 	match spec:
 		"beastmaster":
-			ok(hunter.wild_communion_ranks >= 2,
-				"beastmaster: two runes feeding wild_communion_ranks did not sum (%d)" % \
-					hunter.wild_communion_ranks)
+			# BATCH AY RE-POINTED THESE IN PLACE — the counters went additive
+			# and `wild_communion_ranks` became the FLOAT `wild_communion_step`
+			# (the Deep Bond and the Shared Wild each pay 1.5, so they sum to
+			# 3.0). The question each check asks is unchanged.
+			ok(abs(float(hunter.wild_communion_step) - 3.0) < 0.001,
+				"beastmaster: two runes feeding wild_communion_step did not sum (%s)" % \
+					str(hunter.wild_communion_step))
 			# The Devout's field is `communion_ranks`; writing that one would be
 			# a silent dud that also buffs another class.
 			ok(hunter.get("communion_ranks") == 0,
 				"beastmaster: a rune wrote communion_ranks — that is the DEVOUT's field")
-			ok(hunter.momentum_ranks >= 2,
-				"beastmaster: momentum_ranks read %d" % hunter.momentum_ranks)
-			ok(hunter.loyalty_cap_bonus >= 1,
-				"beastmaster: loyalty_cap_bonus read %d — the ceiling rune is a dud" % \
-					hunter.loyalty_cap_bonus)
-			ok(hunter.masters_aim_ranks >= 2,
-				"beastmaster: masters_aim_ranks read %d" % hunter.masters_aim_ranks)
+			ok(hunter.momentum_ranks >= 16,
+				"beastmaster: momentum_ranks read %d, expected 8+8" % hunter.momentum_ranks)
+			# The Deep Bond's ceiling clause had no meaning left once Batch AY
+			# uncapped Loyalty, so it was RE-POINTED at the boon's own step
+			# rather than deleted. The rune must still pay something.
+			ok(abs(float(hunter.absolute_step) - 3.0) < 0.001,
+				"beastmaster: absolute_step read %s — the re-pointed Deep Bond is a dud" % \
+					str(hunter.absolute_step))
+			ok(hunter.masters_aim_ranks >= 12,
+				"beastmaster: masters_aim_ranks read %d, expected 12" % hunter.masters_aim_ranks)
 			# The scarred cost: it lands on HIM and, at summon, on every beast.
 			ok(hunter.armor < 0.10,
 				"beastmaster: the Loosened Straps armor cost never applied (%.2f)" % \
@@ -164,8 +171,13 @@ func _hunter_pass(spec: String) -> void:
 			ok(hunter.kinds_summoned.size() == 2,
 				"beastmaster: Feral Momentum sees %d distinct beasts, expected 2" % \
 					hunter.kinds_summoned.size())
-			ok(scene.call("_loyalty_cap", hunter) >= 6,
-				"beastmaster: the Loyalty ceiling read %d, expected 6+" % \
+			# RE-POINTED BY BATCH AY, with the reason in the file: §2 gave
+			# Loyalty NO ceiling, so the old "the rune raised it to 6" check
+			# is asserting a design that no longer exists. The question worth
+			# asking now is the inverse — that nothing derives a ceiling for a
+			# hunter no node has given one to.
+			ok(scene.call("_loyalty_cap", hunter) == scene.get("LOYALTY_UNCAPPED"),
+				"beastmaster: a Loyalty ceiling of %d was derived — Batch AY removed the ceiling" % \
 					scene.call("_loyalty_cap", hunter))
 		"sharpshooter":
 			# THE ORDERING FIX, live: both ceilings are derived from cfg at

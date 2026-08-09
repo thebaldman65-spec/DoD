@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-08 (Batch AX)</b></p>
+<p align="right"><b>Last updated: 2026-08-08 (Batch AY)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -522,16 +522,16 @@ Devout's tree).</td></tr>
 attack's damage.</td></tr>
 <tr><td>Guardian's Roar</td><td>The bear stands firm: Ursus takes 25% less damage
 (on summon/swap, 2 turns).</td></tr>
-<tr><td>Loyalty</td><td>Beastmaster companion chip (0–5 base, battle-long): +5% strike
-damage per stack plus the beast's gift; at 5 its Pack Bond boon is doubled. Reset when the
-beast dies (halved under Steadfast Bond).</td></tr>
+<tr><td>Loyalty</td><td>Beastmaster companion chip (UNCAPPED, battle-long): +5% strike
+damage per stack plus the beast's gift, and the Pack Bond boon grows 20% a stack with no
+ceiling. Lost when the beast dies (kept in full under Steadfast Bond).</td></tr>
 <tr><td>Marked</td><td>Mark of the Hunt: the Beastmaster and their beast deal +25% damage
 to this enemy and their strikes on it restore the hunter's Mana (5 turns; kill resets the
 mark's cooldown).</td></tr>
 <tr><td>Primal Surge</td><td>The Beastmaster spent the beast's Loyalty: +10% damage dealt
 (1 turn per stack spent).</td></tr>
 <tr><td>Vengeance</td><td>The Beastmaster's beast died: +30% damage and its Pack Bond boon
-lives on for 5 turns (Vengeance talent).</td></tr>
+lives on at FULL strength for the rest of the battle (Vengeance talent).</td></tr>
 <tr><td>Held Breath</td><td>The Sharpshooter's next attack is a GUARANTEED critical and
 ignores all armor (Hold Breath; two attacks with Second Nature — the HB# chip counts
 them).</td></tr>
@@ -1036,7 +1036,10 @@ damage mitigation and +2% damage dealt. At 5 stacks the ally is healed for 15% o
 health, their Faith resets, and the Devout recovers 3% max Mana — <b>and the Devout's own
 maximum health rises by 3% of his BASE maximum for the rest of the battle, healing him for
 the same amount</b>. That growth is linear on his base (3% per release, never 3% of the
-new total) and it lasts the battle only — it does not follow him out of the fight.<br>
+new total) and it lasts the battle only — it does not follow him out of the fight.
+<b>A release that consumed NO stacks — which is every release under Apostle — grants half
+that growth (1.5%), because a stream of free re-triggers would otherwise multiply the
+growth, the release heal and Communion's spread together.</b><br>
 Divine Shield — 15 Mana, 2.5, 2cd; an ally shield absorbing 30% of the Devout's max
 health, then it breaks (Perfect: 35%).<br>
 Consecrated Ground — 25 Mana, 3.0, 3cd; the party takes 15% less damage, reflects
@@ -1057,7 +1060,7 @@ turn (Perfect: the party instantly heals 5%).<br>
 real pool to spend from, because Dark Pact pays in his blood and his heals key off his
 maximum; deep shadow affinity, and cleansing flame finds the corrupt).<br>
 Passive <i>Wrath of the Old Gods</i>: every debuff the
-Occultist applies marks its victim with <b>Ruin</b>. <b>Ruin has NO MAXIMUM and it
+Occultist applies marks its victim with <b>2 Ruin</b>. <b>Ruin has NO MAXIMUM and it
 NEVER CLEARS</b> — corruption that resets is not corruption — so the chip counts a
 number that only climbs, all fight. Each stack: the target takes +2% damage (5% with
 Deeper Hex, and that amplification is deliberately uncapped), and heroes striking it
@@ -1098,14 +1101,16 @@ Passive <i>Pack Bond</i>: the active beast grants its boon —
 <b>Ursus, Savage Presence:</b> enemies are 15% more likely to attack the bear, and the hunter
 takes 10% less damage; <b>Canis:</b> the hunter deals +15% damage for EVERY enemy under 35%
 health; <b>Aguila:</b> the hunter and the whole party gain +10% crit chance.<br>
-<b>Loyalty (per beast, 0–5 base, chip on the companion):</b> a beast gains 1 Loyalty every
+<b>Loyalty (per beast, NO MAXIMUM, chip on the companion):</b> a beast gains 1 Loyalty every
 hunter turn that begins with it active, and 1 more each time it is summoned or swapped in.
 Each stack: +5% companion strike damage, plus that beast's gift — Ursus +3% max health, Canis
-+2 Bleed on its strikes, Aguila ignores 20% of the target's armor. At 5 stacks the beast's
-Pack Bond boon is DOUBLED. Each beast keeps its own meter for the whole battle; it resets
-only when that beast dies. (Talents move the ceiling — 7 with Absolute Devotion, 8 under
-Lone Bond, 2 under Wild Rotation — and Ancient Pact turns the doubling into a TRIPLING;
-the doubling threshold itself never moves from 5.)<br>
++2 Bleed on its strikes, Aguila ignores 20% of the target's armor. <b>The Pack Bond boon
+itself is a CURVE, not a threshold: ×(1 + 0.20 × Loyalty)</b> — ×2 at five stacks, ×3 at ten,
+×5 at twenty, and it never stops climbing. Each beast keeps its own meter for the whole
+battle; it dies with that beast. (Talents steepen the curve — Absolute Devotion raises the
+step to 35% a stack and Ancient Pact doubles whatever that came to; Lone Bond seats its one
+beast at 6 Loyalty and doubles every gain after. <b>Exactly one node still imposes a ceiling:
+Wild Rotation caps Loyalty at 3, and that cap is its cost.</b>)<br>
 <b>Summon-and-swap effects</b> fire whenever a beast is summoned OR swapped in — Ursus:
 <i>Guardian's Roar</i>, taunting the lowest-health enemy (preferring one not already taunted)
 while the bear takes 25% less damage for 2 turns; Canis: <i>Bloodhowl</i>, 15 Bleed to every
@@ -1115,7 +1120,7 @@ red/blue/green; never two of the same kind). Summoning goes
 through the <b>"Summon Companion" beast picker</b> at the top of the ability list on hotkey W
 (see §10); at beast capacity it becomes <b>"Swap Companion"</b> — 10 Mana, 1.0
 initiative, shared 2-turn cooldown, no skill check: the newcomer arrives with its swap effect
-and +1 Loyalty (under The Pack it replaces whichever active beast has lower Loyalty). Companions have HP, can be targeted by enemies and healed by allies, and
+and +1 Loyalty (under The Pack it replaces the OLDER of the two). Companions have HP, can be targeted by enemies and healed by allies, and
 inherit the hunter's armor, Constitution, and crit chance (talents can add companion HP and
 damage). They automatically attack (physical) whenever the hunter attacks; they take no
 timeline turns (statuses tick and Breaks recover on the hunter's turn).<br>
@@ -1137,7 +1142,7 @@ the pack turns on the next weakest. (Perfect: each beast that obeyed gains 1 Loy
 <b>Spec pool (earnable, §6a)</b> — the opening three are the Summon Companion picker,
 Hunter's Instinct and Kill Command:<br>
 Bestial Wrath — 25 Mana, 3.5, 3cd, requires a living companion (no skill check): unleashes
-the beast for 3 turns (+1 turn per 2 Loyalty with Devoted Fury) — <b>Ursus:</b> max health
+the beast for 3 turns (+1 turn PER Loyalty stack with Devoted Fury) — <b>Ursus:</b> max health
 DOUBLES, +50% armor, and it taunts 3 random enemies; <b>Canis:</b> +50% damage and +10 Bleed
 on its bleeding strikes; <b>Aguila:</b> +25% damage and every strike Blinds (2 turns). The
 borrowed bulk fades when the Wrath ends.<br>
@@ -1337,17 +1342,17 @@ returns pay: invest in the dividend) · <b>ZEAL</b> (invest shallowly in EVERYON
 <tr><td>7</td><td><b>Plague Bearer</b> — At the start of your turn, one Poisoned enemy spreads 3 Poison stacks to another.</td><td><b>Deadfall Network</b> — You may have TWO traps active at once.</td><td><b>Improvised</b> — The first ability you use each fight does not start its cooldown.</td></tr>
 <tr><td>CAP</td><td><b>Epidemic</b> — Every enemy is PERMANENTLY Poisoned, and your Poison cannot be cleansed or expire.</td><td><b>The Whole Forest</b> — Tripwire never expires and bites on EVERY enemy action — melee, ranged, or spellwork.</td><td><b>Force of Nature</b> — Trapper&#x27;s bonus rises to +20% per different status — and applies to your ENTIRE party&#x27;s damage.</td></tr>
 </table>
-<p><b>Beastmaster</b> — <b>DEVOTION</b> (stay with one beast) · <b>THE PACK</b> (rotate) · <b>HANDLER</b> (your own game)</p>
+<p><b>Beastmaster</b> — <b>DEVOTION</b> (partnership in depth: one beast, further) · <b>THE PACK</b> (partnership in breadth: many beasts, rotated) · <b>HANDLER</b> (what he does when the partnership is not the answer)</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Devotion</th><th>The Pack</th><th>Handler</th></tr>
-<tr><td>1</td><td><b>Wild Communion</b> — Companion strike damage per Loyalty stack rises to 6.5% (from the base 5%).</td><td><b>Quick Whistle</b> — Swap Companion&#x27;s cooldown is reduced by 1 turn(s).</td><td><b>Master&#x27;s Aim</b> — Quick Shot deals +6% of your Attack.</td></tr>
-<tr><td>2</td><td><b>Unbroken Watch</b> — The active beast gains +1 additional Loyalty on any turn it took no damage.</td><td><b>Feral Momentum</b> — +8% companion damage for each DIFFERENT beast summoned this fight.</td><td><b>Beast Within</b> — +10% companion max health.</td></tr>
-<tr><td>3</td><td><b>Absolute Devotion</b> — Loyalty ceiling rises from 5 to 7. The doubled Pack Bond still triggers at 5; stacks 6-7 add strike damage and the beast&#x27;s gift only.</td><td><b>Shared Devotion</b> — Summoning or swapping grants +1 Loyalty to EVERY beast, not only the arriving one.</td><td><b>Deep Reserves</b> — Spirit Bond restores +8% more max Mana.</td></tr>
-<tr><td>4</td><td><b>Devoted Fury</b> — Bestial Wrath lasts 1 turn longer per 2 Loyalty stacks on the active beast.</td><td><b>Herald</b> — Arrival effects strike an additional target: Guardian&#x27;s Roar taunts TWO enemies, Aguila&#x27;s dive hits TWO, and Bloodhowl doubles its Bleed on the bloodiest enemy.</td><td><b>Instinctive</b> — Hunter&#x27;s Instinct empowers 5 Quick Shots instead of 3.</td></tr>
-<tr><td>5</td><td><b>Steadfast Bond</b> — When a beast dies, its Loyalty returns at half rather than resetting to 0.</td><td><b>Menagerie</b> — The Pack Bond boon of every beast summoned this fight stays active at HALF strength while that beast is away.</td><td><b>Symbiosis</b> — Whenever your companion strikes, you restore 2% max Mana.</td></tr>
-<tr><td>6</td><td><b>Ancient Pact</b> — At 5 Loyalty the Pack Bond boon is TRIPLED instead of doubled — but the beast can no longer be healed by ANY source (Spirit Bond and Hunter&#x27;s Instinct included).</td><td><b>No Beast Left</b> — When a beast dies, your next summon this fight costs no Mana and ignores its cooldown.</td><td><b>Vengeance</b> — When your beast dies you inherit its Pack Bond boon and gain +30% damage, for 5 turns.</td></tr>
-<tr><td>7</td><td><b>Lone Bond</b> — You may summon only ONE beast per fight: it cannot be swapped, and cannot be re-summoned if it dies. Its Loyalty starts at 3 and caps at 8.</td><td><b>Wild Rotation</b> — Swap Companion has no cooldown and arrival effects always fire. Loyalty caps at 2.</td><td><b>Lone Hunter</b> — While you have no companion, your abilities cost 40% less Mana and you deal +25% damage.</td></tr>
-<tr><td>CAP</td><td><b>One Soul</b> — You and the active beast share a health pool — all damage to either is split evenly between you. Loyalty gain is doubled.</td><td><b>The Pack</b> — TWO beasts may be active at once: both strike when you attack, and each keeps its own Loyalty meter and grants its own Pack Bond boon. Summoning a third replaces whichever active beast has lower Loyalty.</td><td><b>Apex Predator</b> — Quick Shot triggers an ADDITIONAL free companion strike, and Kill Command&#x27;s cooldown resets whenever an enemy dies.</td></tr>
+<tr><td>1</td><td><b>Wild Communion</b> — Companion strike damage per Loyalty stack rises to 12% (from the base 5%).</td><td><b>Quick Whistle</b> — Swap Companion has NO cooldown (it shaves 3 turns off the shared 3).</td><td><b>Master&#x27;s Aim</b> — Quick Shot deals +25% of your Attack.</td></tr>
+<tr><td>2</td><td><b>Unbroken Watch</b> — The active beast gains +2 additional Loyalty on any turn it took no damage.</td><td><b>Feral Momentum</b> — +25% companion damage for each DIFFERENT beast summoned this fight.</td><td><b>Beast Within</b> — +40% companion maximum health.</td></tr>
+<tr><td>3</td><td><b>Absolute Devotion</b> — The Pack Bond boon grows 35% per Loyalty stack instead of the base 20%.</td><td><b>Shared Devotion</b> — Summoning or swapping grants +2 Loyalty to EVERY beast, not only the arriving one.</td><td><b>Deep Reserves</b> — Spirit Bond restores +30% more maximum Mana.</td></tr>
+<tr><td>4</td><td><b>Devoted Fury</b> — Bestial Wrath lasts 1 turn longer per Loyalty stack, rather than per two.</td><td><b>Herald</b> — Arrival effects strike 2 ADDITIONAL targets: Guardian&#x27;s Roar taunts three, Aguila dives three, and Bloodhowl doubles its Bleed on the two bloodiest enemies.</td><td><b>Instinctive</b> — Hunter&#x27;s Instinct empowers 8 Quick Shots instead of 3.</td></tr>
+<tr><td>5</td><td><b>Steadfast Bond</b> — A beast&#x27;s death returns 100% of its Loyalty rather than halving it — the meter survives it whole.</td><td><b>Menagerie</b> — Every beast summoned this fight keeps its Pack Bond boon at 50% strength while it is away.</td><td><b>Symbiosis</b> — Whenever your companion strikes, you restore 6% maximum Mana.</td></tr>
+<tr><td>6</td><td><b>Ancient Pact</b> — The Pack Bond boon&#x27;s growth per Loyalty stack DOUBLES — but the beast can no longer be healed by ANY source, Spirit Bond and Hunter&#x27;s Instinct included.</td><td><b>No Beast Left</b> — A beast&#x27;s death makes your next 2 summons cost no Mana and ignore their cooldown, and each arriving beast enters at 5 Loyalty.</td><td><b>Vengeance</b> — When a beast dies you take its Pack Bond boon at FULL strength for the rest of the battle, rather than for a few turns — and deal +30% damage while it holds.</td></tr>
+<tr><td>7</td><td><b>Lone Bond</b> — One beast per fight: it cannot be swapped and cannot be re-summoned if it dies — but it arrives at 6 Loyalty and gains DOUBLE thereafter. It also closes The Pack: you can never field two.</td><td><b>Wild Rotation</b> — Swap Companion has no cooldown and arrival effects ALWAYS fire. Loyalty caps at 3.</td><td><b>Lone Hunter</b> — While no beast stands, your abilities cost 50% less and you deal +30% damage.</td></tr>
+<tr><td>CAP</td><td><b>One Soul</b> — You and every beast you field share one health pool — all damage to any of you divides evenly between you. Loyalty gain is doubled.</td><td><b>The Pack</b> — TWO beasts may be active at once: both strike when you attack, each keeps its own Loyalty meter, and BOTH Pack Bond boons apply at FULL strength. Swapping replaces the OLDER of the two. Lone Bond closes this door.</td><td><b>Apex Predator</b> — Quick Shot triggers an ADDITIONAL free companion strike, and Kill Command&#x27;s cooldown resets whenever an enemy dies.</td></tr>
 </table>
 <p><b>Occultist</b> — <b>RUIN</b> (the mark: stack it, blow it, chain it) · <b>MADNESS</b> (enemies turned on each other — <b>every effect in the lane is REFUSED by a boss until it is Broken</b>, which is not a hole but a two-step plan: Broken Will and Entropy exist to grind the meter, then the madness lands) · <b>LEECH</b> (suffering into sustain: Holy restores, the Devout prevents, the Occultist siphons)</p>
 <table border="1" cellpadding="4">

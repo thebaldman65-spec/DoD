@@ -774,7 +774,7 @@ const SPEC_INFO := {
 	"occultist": {"name": "Occultist", "constitution": 95, "archetype": "Pressure", "passive": "old_gods",
 		"max_hp": 155, "armor": 0.08,
 		"resists": {"shadow": 0.25, "nature": 0.10, "fire": -0.20},
-		"passive_desc": "Wrath of the Old Gods: your debuffs mark the target with Ruin\n(max 5). Each stack: +2% damage taken; heroes striking a Ruined\ntarget heal 10% of the damage dealt. One turn after reaching 5\nstacks, Ruin detonates — 50% of Attack as shadow damage, and the\nparty heals 15% of the Occultist's max health.",
+		"passive_desc": "Wrath of the Old Gods: every debuff you apply marks the target\nwith 2 Ruin. The marks have NO MAXIMUM and never wash off. Each\nstack: +2% damage taken, and heroes striking a Ruined target heal\n2% of the damage dealt per stack (up to 40%). One turn after every\ntenth stack, Ruin detonates — 90% of Attack as shadow damage, the\nparty heals 25% of your max health, and THE STACKS SURVIVE IT.",
 		"blurb": "Forbidden rites — leech life and trade blood for power."},
 	# Hunter stat blocks (Batch Q). The Beastmaster's armor is a multiplier
 	# across up to three bodies — companions inherit it at summon — so it
@@ -782,7 +782,7 @@ const SPEC_INFO := {
 	"beastmaster": {"name": "Beastmaster", "constitution": 100, "archetype": "Ramp", "passive": "pack",
 		"max_hp": 160, "armor": 0.15,
 		"resists": {"nature": 0.20, "physical": 0.05},
-		"passive_desc": "Pack Bond — the active beast grants its boon: Ursus, Savage\nPresence: enemies are drawn to the bear and you take 10% less\ndamage; Canis: +15% damage per enemy under 35% health; Aguila: the\nwhole party gains +10% crit. LOYALTY (per beast, max 5): +1 each\nturn it stands with you and on summon/swap; +5% strike damage per\nstack plus a beast-specific gift; at 5 the boon is DOUBLED. Meters\nlast until that beast dies.",
+		"passive_desc": "Pack Bond — the active beast grants its boon: Ursus, Savage\nPresence: enemies are drawn to the bear and you take 10% less\ndamage; Canis: +15% damage per enemy under 35% health; Aguila: the\nwhole party gains +10% crit. LOYALTY (per beast, NO MAXIMUM): +1\neach turn it stands with you and on summon/swap; +5% strike damage\nper stack plus a beast-specific gift, and the boon itself grows 20%\na stack — x2 at five, and it keeps climbing. A meter dies with its\nbeast.",
 		"blurb": "The wilds hunt beside them — every kill is shared."},
 	# The lightest Hunter: a marksman who wants to be at range and pays for
 	# being reached.

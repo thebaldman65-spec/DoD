@@ -1720,86 +1720,148 @@ const LANE_TREES := {
 			"payload": {"stat": {"rapid_fire": 1}}},
 	],
 	"beastmaster": [
-		# --- Lane A: Devotion — stay with one beast, steepen the ramp ---
+		# Purpose-designed lanes (Batch 30, 07-25), re-cut into 7 exclusive rows
+		# + a capstone row by Batch AI, and RE-AUTHORED BY BATCH AY (08-08)
+		# around a spine: PARTNERSHIP — his power lives in another body, and it
+		# is the only resource in the game that can die. EVERY ID SURVIVES AND
+		# RE-SPECS IN PLACE, so saved picks migrate and no save version moves.
+		#
+		# THE LANE THESES SHARPENED WITHOUT RENAMING: DEVOTION is partnership in
+		# DEPTH (one beast, further); THE PACK is partnership in BREADTH (many
+		# beasts, rotated); HANDLER is what he does when the partnership is not
+		# the answer.
+		#
+		# EVERY COUNTER IS ADDITIVE (the AR/AS/AT/AV/AW/AX form): the payload
+		# holds the MAGNITUDE and the read site applies no step of its own. TWO
+		# hold the INCREASE on a base the kit already pays without the node and
+		# are named `_step` for it (AV's `guardian_step` precedent) —
+		# `wild_communion_step` on the passive's own 5%, `absolute_step` on the
+		# Pack Bond boon's own 20%. BOTH ARE IN `Runes.STAT_INT_KEYS`: neither
+		# ends in "_ranks" and both are written by runes, so without that entry
+		# JSON's float slides into a typed int var and the hero fails to spawn.
+		#
+		# WATCH THE ONE NAME TRAP: `wild_communion_step` IS NOT `communion_ranks`
+		# — that is the Devout's, and Batch 29 crossed the two once already.
+		# --- Lane DEVOTION: one beast, deeper ---
 		{"id": "bm_communion", "name": "Wild Communion", "ranks": 1, "lane": "devotion", "row": 1,
 			"desc": "Companion strike damage per Loyalty stack rises to {v}% (from the base 5%).",
-			"scale": {"base": 5.0, "step": 1.5},
-			"payload": {"stat": {"wild_communion_ranks": 1}}},
+			"scale": {"base": 5, "step": 7},
+			"payload": {"stat": {"wild_communion_step": 7}}},
 		{"id": "bm_unbroken", "name": "Unbroken Watch", "ranks": 1, "lane": "devotion", "row": 2,
-			"desc": "The active beast gains +1 additional Loyalty on any turn it took no damage.",
-			"payload": {"stat": {"unbroken_watch": 1}}},
+			"desc": "The active beast gains +{v} additional Loyalty on any turn it took no damage.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"unbroken_watch": 2}}},
+		# RE-SPECCED, NOT REPRICED: it used to raise a ceiling, and Batch AY §2
+		# removed the ceiling. It is the lane's thesis now — the dial on the
+		# curve itself, and Ancient Pact stacks on top of it (+70% a stack).
 		{"id": "bm_absolute", "name": "Absolute Devotion", "ranks": 1, "lane": "devotion", "row": 3,
-			"desc": "Loyalty ceiling rises from 5 to 7. The doubled Pack Bond still triggers at 5; stacks 6-7 add strike damage and the beast's gift only.",
-			"payload": {"stat": {"loyalty_cap_bonus": 2}}},
+			"desc": "The Pack Bond boon grows {v}% per Loyalty stack instead of the base 20%.",
+			"scale": {"base": 20, "step": 15},
+			"payload": {"stat": {"absolute_step": 15}}},
 		{"id": "bm_devoted_fury", "name": "Devoted Fury", "ranks": 1, "lane": "devotion", "row": 4,
-			"desc": "Bestial Wrath lasts 1 turn longer per 2 Loyalty stacks on the active beast.",
+			"desc": "Bestial Wrath lasts {v} turn(s) longer per Loyalty stack, rather than per two.",
+			"scale": {"step": 1},
 			"payload": {"stat": {"devoted_fury": 1}}},
 		{"id": "bm_steadfast", "name": "Steadfast Bond", "ranks": 1, "lane": "devotion", "row": 5,
-			"desc": "When a beast dies, its Loyalty returns at half rather than resetting to 0.",
-			"payload": {"stat": {"steadfast_bond": 1}}},
+			"desc": "A beast's death returns {v}% of its Loyalty rather than halving it — the meter survives it whole.",
+			"scale": {"step": 100},
+			"payload": {"stat": {"steadfast_bond": 100}}},
+		# RE-SPECCED, NOT REPRICED: tripling AT a threshold is meaningless once
+		# the threshold is a curve. It doubles the STEP now, whatever Absolute
+		# Devotion made it — the deep-partnership build, terrifying and fragile
+		# in equal measure.
 		{"id": "bm_ancient_pact", "name": "Ancient Pact", "ranks": 1, "lane": "devotion", "row": 6,
-			"desc": "At 5 Loyalty the Pack Bond boon is TRIPLED instead of doubled — but the beast can no longer be healed by ANY source (Spirit Bond and Hunter's Instinct included).",
+			"desc": "The Pack Bond boon's growth per Loyalty stack DOUBLES — but the beast can no longer be healed by ANY source, Spirit Bond and Hunter's Instinct included.",
 			"payload": {"stat": {"ancient_pact": 1}}},
+		# RE-SPECCED PAYOFF: a higher ceiling was its reward and there is no
+		# ceiling. It arrives deep and grows twice as fast instead. THE FIELD IS
+		# THE GATE AND THE MAGNITUDE IN ONE (AW's `judgement` precedent): 6 is
+		# the Loyalty it seats the beast at, and `> 0` is "Lone Bond is taken".
+		# IT ALSO HOLDS THE BEAST CAP AT ONE, which is what makes it and The
+		# Pack impossible to hold together — see battle._beast_cap.
 		{"id": "bm_lone_bond", "name": "Lone Bond", "ranks": 1, "lane": "devotion", "row": 7,
-			"desc": "You may summon only ONE beast per fight: it cannot be swapped, and cannot be re-summoned if it dies. Its Loyalty starts at 3 and caps at 8.",
-			"payload": {"stat": {"lone_bond": 1}}},
-		# --- Lane B: The Pack — rotate; swapping becomes the engine ---
+			"desc": "One beast per fight: it cannot be swapped and cannot be re-summoned if it dies — but it arrives at {v} Loyalty and gains DOUBLE thereafter. It also closes The Pack: you can never field two.",
+			"scale": {"step": 6},
+			"payload": {"stat": {"lone_bond": 6}}},
+		# --- Lane THE PACK: many beasts, rotated ---
 		{"id": "bm_whistle", "name": "Quick Whistle", "ranks": 1, "lane": "pack", "row": 1,
-			"desc": "Swap Companion's cooldown is reduced by {v} turn(s).",
-			"scale": {"step": 1},
-			"payload": {"stat": {"quick_whistle_ranks": 1}}},
+			"desc": "Swap Companion has NO cooldown (it shaves {v} turns off the shared 3).",
+			"scale": {"step": 3},
+			"payload": {"stat": {"quick_whistle_ranks": 3}}},
 		{"id": "bm_momentum", "name": "Feral Momentum", "ranks": 1, "lane": "pack", "row": 2,
 			"desc": "+{v}% companion damage for each DIFFERENT beast summoned this fight.",
-			"scale": {"step": 8},
-			"payload": {"stat": {"momentum_ranks": 1}}},
+			"scale": {"step": 25},
+			"payload": {"stat": {"momentum_ranks": 25}}},
 		{"id": "bm_shared", "name": "Shared Devotion", "ranks": 1, "lane": "pack", "row": 3,
-			"desc": "Summoning or swapping grants +1 Loyalty to EVERY beast, not only the arriving one.",
-			"payload": {"stat": {"shared_devotion": 1}}},
+			"desc": "Summoning or swapping grants +{v} Loyalty to EVERY beast, not only the arriving one.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"shared_devotion": 2}}},
 		{"id": "bm_herald", "name": "Herald", "ranks": 1, "lane": "pack", "row": 4,
-			"desc": "Arrival effects strike an additional target: Guardian's Roar taunts TWO enemies, Aguila's dive hits TWO, and Bloodhowl doubles its Bleed on the bloodiest enemy.",
-			"payload": {"stat": {"herald": 1}}},
+			"desc": "Arrival effects strike {v} ADDITIONAL targets: Guardian's Roar taunts three, Aguila dives three, and Bloodhowl doubles its Bleed on the two bloodiest enemies.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"herald": 2}}},
+		# MAGNITUDE DELIBERATELY UNCHANGED. Batch AY §1 gave it a new job rather
+		# than a bigger number: with The Pack it now carries a THIRD (absent)
+		# beast's boon rather than a first's, and it must stay meaningfully
+		# different from the two at full strength beside it.
 		{"id": "bm_menagerie", "name": "Menagerie", "ranks": 1, "lane": "pack", "row": 5,
-			"desc": "The Pack Bond boon of every beast summoned this fight stays active at HALF strength while that beast is away.",
-			"payload": {"stat": {"menagerie": 1}}},
+			"desc": "Every beast summoned this fight keeps its Pack Bond boon at {v}% strength while it is away.",
+			"scale": {"step": 50},
+			"payload": {"stat": {"menagerie": 50}}},
+		# Two magnitudes, two fields — one counter cannot honestly hold a call
+		# count and a Loyalty total (AW's `covenant` precedent).
 		{"id": "bm_no_beast_left", "name": "No Beast Left", "ranks": 1, "lane": "pack", "row": 6,
-			"desc": "When a beast dies, your next summon this fight costs no Mana and ignores its cooldown.",
-			"payload": {"stat": {"no_beast_left": 1}}},
+			"desc": "A beast's death makes your next {v} summons cost no Mana and ignore their cooldown, and each arriving beast enters at 5 Loyalty.",
+			"scale": {"step": 2},
+			"payload": {"stat": {"no_beast_left": 2, "no_beast_left_loyalty": 5}}},
+		# THE FIELD IS THE GATE AND THE MAGNITUDE IN ONE: 3 is the Loyalty cap
+		# it imposes, and that cap IS its cost — the one node in the game that
+		# still hands `_loyalty_cap` a number.
 		{"id": "bm_wild_rotation", "name": "Wild Rotation", "ranks": 1, "lane": "pack", "row": 7,
-			"desc": "Swap Companion has no cooldown and arrival effects always fire. Loyalty caps at 2.",
-			"payload": {"stat": {"wild_rotation": 1}}},
-		# --- Lane C: Handler — your own game: Quick Shot, Mana, loss ---
+			"desc": "Swap Companion has no cooldown and arrival effects ALWAYS fire. Loyalty caps at {v}.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"wild_rotation": 3}}},
+		# --- Lane HANDLER: when the partnership is not the answer ---
 		{"id": "bm_masters_aim", "name": "Master's Aim", "ranks": 1, "lane": "handler", "row": 1,
 			"desc": "Quick Shot deals +{v}% of your Attack.",
-			"scale": {"step": 6},
-			"payload": {"stat": {"masters_aim_ranks": 1}}},
+			"scale": {"step": 25},
+			"payload": {"stat": {"masters_aim_ranks": 25}}},
 		{"id": "bm_beast_within", "name": "Beast Within", "ranks": 1, "lane": "handler", "row": 2,
-			"desc": "+{v}% companion max health.",
-			"scale": {"step": 10},
-			"payload": {"stat": {"companion_hp_pct": 0.10}}},
+			"desc": "+{v}% companion maximum health.",
+			"scale": {"step": 40},
+			"payload": {"stat": {"companion_hp_pct": 0.40}}},
 		{"id": "bm_reserves", "name": "Deep Reserves", "ranks": 1, "lane": "handler", "row": 3,
-			"desc": "Spirit Bond restores +{v}% more max Mana.",
-			"scale": {"step": 8},
-			"payload": {"stat": {"deep_reserves_ranks": 1}}},
+			"desc": "Spirit Bond restores +{v}% more maximum Mana.",
+			"scale": {"step": 30},
+			"payload": {"stat": {"deep_reserves_ranks": 30}}},
 		{"id": "bm_instinctive", "name": "Instinctive", "ranks": 1, "lane": "handler", "row": 4,
-			"desc": "Hunter's Instinct empowers 5 Quick Shots instead of 3.",
-			"payload": {"stat": {"instinctive": 1}}},
+			"desc": "Hunter's Instinct empowers {v} Quick Shots instead of 3.",
+			"scale": {"step": 8},
+			"payload": {"stat": {"instinctive": 8}}},
 		{"id": "bm_symbiosis", "name": "Symbiosis", "ranks": 1, "lane": "handler", "row": 5,
-			"desc": "Whenever your companion strikes, you restore 2% max Mana.",
-			"payload": {"stat": {"symbiosis": 1}}},
+			"desc": "Whenever your companion strikes, you restore {v}% maximum Mana.",
+			"scale": {"step": 6},
+			"payload": {"stat": {"symbiosis": 6}}},
 		{"id": "bm_vengeance", "name": "Vengeance", "ranks": 1, "lane": "handler", "row": 6,
-			"desc": "When your beast dies you inherit its Pack Bond boon and gain +30% damage, for 5 turns.",
-			"payload": {"stat": {"vengeance": 1}}},
+			"desc": "When a beast dies you take its Pack Bond boon at FULL strength for the rest of the battle, rather than for a few turns — and deal +{v}% damage while it holds.",
+			"scale": {"step": 30},
+			"payload": {"stat": {"vengeance": 1, "vengeance_dmg": 30}}},
 		{"id": "bm_lone_hunter", "name": "Lone Hunter", "ranks": 1, "lane": "handler", "row": 7,
-			"desc": "While you have no companion, your abilities cost 40% less Mana and you deal +25% damage.",
-			"payload": {"stat": {"lone_hunter": 1}}},
+			"desc": "While no beast stands, your abilities cost {v}% less and you deal +30% damage.",
+			"scale": {"step": 50},
+			"payload": {"stat": {"lone_hunter": 50, "lone_hunter_dmg": 30}}},
 		# --- Capstones (row 8): take ONE, no lane requirement ---
 		{"id": "bm_one_soul", "name": "One Soul", "ranks": 1, "lane": "devotion", "row": 8,
 			"capstone": true,
-			"desc": "You and the active beast share a health pool — all damage to either is split evenly between you. Loyalty gain is doubled.",
+			"desc": "You and every beast you field share one health pool — all damage to any of you divides evenly between you. Loyalty gain is doubled.",
 			"payload": {"stat": {"one_soul": 1}}},
+		# BUILT BY BATCH AY §1. It had read "coming soon" in the shelf since
+		# Batch 30; most of the machinery was already here (`unit.beasts` is an
+		# Array, `unit.loyalty` is keyed by kind, `_bond_mult` is one site), so
+		# this was an unfinished switch rather than unbuilt machinery.
 		{"id": "bm_the_pack", "name": "The Pack", "ranks": 1, "lane": "pack", "row": 8,
 			"capstone": true,
-			"desc": "TWO beasts may be active at once: both strike when you attack, and each keeps its own Loyalty meter and grants its own Pack Bond boon. Summoning a third replaces whichever active beast has lower Loyalty.",
+			"desc": "TWO beasts may be active at once: both strike when you attack, each keeps its own Loyalty meter, and BOTH Pack Bond boons apply at FULL strength. Swapping replaces the OLDER of the two. Lone Bond closes this door.",
 			"payload": {"stat": {"the_pack": 1}}},
 		{"id": "bm_apex", "name": "Apex Predator", "ranks": 1, "lane": "handler", "row": 8,
 			"capstone": true,

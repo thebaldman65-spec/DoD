@@ -2151,3 +2151,49 @@ one leaves a node doing nothing, the other reverts AW's decision to put the drip
 in the base kit. The measured overshoot it was aimed at is still there, and
 saying so plainly is more useful than shipping a guess that makes the number
 move for reasons nobody chose.
+
+---
+
+## Batch AY — the Beastmaster
+
+**A resource with a ceiling is a node question; a resource without one is an
+identity.** Loyalty capped at 5 and doubled the boon there, so "how devoted is
+this beast" had exactly two answers and *raising the ceiling* was three separate
+nodes' job. Making the boon a continuous curve did not add power so much as move
+where the interesting decision lives: it is no longer "have I hit five yet", it
+is "is this partnership worth keeping alive". That is the same beast, the same
+numbers at five stacks, and a completely different question.
+
+**Uncapping a meter is not a local change — it is a licence for every read site
+to go somewhere it has never been.** Savage Presence reads `1 − 0.10 × boon` on
+damage taken, which was fine forever at a maximum boon of ×3 and starts *healing
+the hunter off enemy attacks* somewhere past ×10. The instinct is to cap the
+curve; the right move is to bound the *mitigation*, because the curve is the
+thing the batch is about and the multiplier crossing zero is an absurdity rather
+than a balance point. Whenever a ceiling comes off, the work is finding every
+place that quietly relied on it.
+
+**The rule that stops being enforceable is worse than the rule that was never
+written.** "One beast per fight" and "two beasts at once" were assumed to be
+mutually exclusive because they sit in a tree with exclusive rows — but a
+capstone shelf has no lane-purity requirement, so nothing barred the pair.
+Building a picker-level exclusion for it would have been a new subsystem for one
+case; resolving it where the number is actually read costs two lines and cannot
+be bypassed. The part that matters is that *both node descriptions say so*: an
+invisible resolution is just a different silent contradiction.
+
+**A default that is only ever right by coincidence will fail the moment
+something upstream moves.** The Pack replaced whichever beast held less Loyalty,
+which read as sensible for as long as Loyalty had a ceiling everyone reached.
+Uncapped, the newest arrival always holds the least — so the rule would have
+evicted the beast the player just called, every time, and made rotation
+impossible inside the capstone whose lane is named for rotation. Nothing about
+that rule changed; the world around it did.
+
+**Halving a multiplier tells you what fraction of a number the multiplier was
+responsible for.** Apostle's growth was cut in half and the growth halved
+exactly — but the FAITH row's contribution barely moved. That is worth more than
+the fix: it says the growth was never the load-bearing part of that row, and the
+next lever aimed at it should be expected to under-deliver too. A change that
+lands precisely and moves the headline number very little is evidence about the
+system, not a failure.

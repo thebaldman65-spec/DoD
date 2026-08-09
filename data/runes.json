@@ -334,26 +334,26 @@
 	"deep_bond": {
 		"name": "Rune of the Deep Bond", "rarity": "rare", "scope": "spec:beastmaster",
 		"price": 100, "lane": "devotion",
-		"desc": "Loyalty climbs one stack higher, and every stack drives the beast 1.5% harder.",
-		"payload": {"stat": {"loyalty_cap_bonus": 1, "wild_communion_ranks": 1}}
+		"desc": "Every Loyalty stack drives the beast 1.5% harder, and deepens the Pack Bond boon by a further 3%.",
+		"payload": {"stat": {"wild_communion_step": 1.5, "absolute_step": 3.0}}
 	},
 	"turning_pack": {
 		"name": "Rune of the Turning Pack", "rarity": "rare", "scope": "spec:beastmaster",
 		"price": 100, "lane": "pack",
 		"desc": "Swap Companion returns a turn sooner, and each different beast fielded this fight adds +8% companion damage.",
-		"payload": {"stat": {"quick_whistle_ranks": 1, "momentum_ranks": 1}}
+		"payload": {"stat": {"quick_whistle_ranks": 1, "momentum_ranks": 8}}
 	},
 	"loosened_straps": {
 		"name": "Rune of the Loosened Straps", "rarity": "rare", "scope": "spec:beastmaster",
 		"price": 75, "scarred": true, "lane": "handler",
 		"desc": "Quick Shot flies 12% of Attack harder — but he sheds 8% armor, and every beast he calls wears his plate.",
-		"payload": {"stat": {"masters_aim_ranks": 2, "armor": -0.08}}
+		"payload": {"stat": {"masters_aim_ranks": 12, "armor": -0.08}}
 	},
 	"shared_wild": {
 		"name": "Rune of the Shared Wild", "rarity": "rare", "scope": "spec:beastmaster",
 		"price": 100,
 		"desc": "A little of every bond: +1.5% companion damage per Loyalty stack, +8% per different beast fielded, +5% companion health.",
-		"payload": {"stat": {"wild_communion_ranks": 1, "momentum_ranks": 1, "companion_hp_pct": 0.05}}
+		"payload": {"stat": {"wild_communion_step": 1.5, "momentum_ranks": 8, "companion_hp_pct": 0.05}}
 	},
 
 	"deep_sight": {

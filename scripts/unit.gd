@@ -79,28 +79,43 @@ var loyalty := {}           # Beastmaster: per-beast Loyalty stacks (on the hunt
 var bestial_hp_bonus := 0    # Bestial Wrath (Ursus): doubled health, reverted on expiry
 var bestial_armor_bonus := 0.0
 var vigor_hp_bonus := 0      # Spirit Bond perfect: +10% max health, reverted on expiry
-# ---- Beastmaster lane-tree talents (Batch 30; set via cfg by setup()) ----
-var wild_communion_ranks := 0  # Wild Communion: Loyalty step 5% -> +1.5%/rank
-var unbroken_watch := 0      # +1 Loyalty on turns the beast took no damage
-var loyalty_cap_bonus := 0   # Absolute Devotion: ceiling 5 -> 7
-var devoted_fury := 0        # Bestial Wrath +1 turn per 2 Loyalty
-var steadfast_bond := 0      # death halves Loyalty instead of zeroing
-var ancient_pact := 0        # boon TRIPLED at 5; the beast is unhealable
-var lone_bond := 0           # one beast per fight; starts 3, caps 8
-var quick_whistle_ranks := 0 # swap cooldown -1/rank
-var momentum_ranks := 0      # +8%/rank companion dmg per distinct beast fielded
-var shared_devotion := 0     # summon/swap Loyalty goes to every beast
-var herald := 0              # arrival effects strike an extra target
-var menagerie := 0           # absent summoned beasts keep half their boon
-var no_beast_left := 0       # beast death -> next summon free, no cooldown
-var wild_rotation := 0       # swap has no cooldown; Loyalty caps at 2
-var masters_aim_ranks := 0   # Quick Shot +6%/rank of Attack
-var companion_hp_pct := 0.0  # Beast Within: +10%/rank companion max health
-var deep_reserves_ranks := 0 # Spirit Bond +8%/rank max Mana
-var instinctive := 0         # Hunter's Instinct empowers 5 shots
-var symbiosis := 0           # companion strikes restore 2% max Mana
-var vengeance := 0           # beast death -> inherit boon + 30% dmg, 5 turns
-var lone_hunter := 0         # no companion: costs -40%, damage +25%
+# ---- Beastmaster lane-tree talents (Batch 30; re-specced by BATCH AY) ----
+# EVERY COUNTER BELOW IS ADDITIVE (the AR/AS/AT/AV/AW/AX form): the payload
+# holds the MAGNITUDE in the units its read site sums, and the read site
+# applies no step of its own. The two named `_step` hold the INCREASE on a
+# base the kit already pays without the node (AV's `guardian_step` precedent).
+var wild_communion_step := 0.0  # +% on the passive's own 5% strike step per
+                             # stack. A FLOAT, and deliberately NOT in
+                             # Runes.STAT_INT_KEYS: the Rune of the Deep Bond
+                             # pays 1.5 and an int coercion would round it to 1
+                             # with nothing crashing (AT's `conduit_step`).
+var unbroken_watch := 0      # Loyalty gained on a turn the beast took no damage
+var absolute_step := 0.0     # +% on the Pack Bond boon's own 20% step per
+                             # stack. A FLOAT for the same reason.
+var devoted_fury := 0        # Bestial Wrath: +N turns per Loyalty stack
+var steadfast_bond := 0      # % of a dead beast's Loyalty that endures
+var ancient_pact := 0        # the boon step DOUBLES; the beast is unhealable
+var lone_bond := 0           # one beast per fight — AND the Loyalty it arrives
+                             # at (the gate and the magnitude in one field,
+                             # AW's `judgement` / AX's `avatar_ruin` precedent)
+var quick_whistle_ranks := 0 # turns shaved off the shared Swap cooldown
+var momentum_ranks := 0      # +% companion dmg per distinct beast fielded
+var shared_devotion := 0     # Loyalty every OTHER beast gains on summon/swap
+var herald := 0              # ADDITIONAL targets an arrival effect strikes
+var menagerie := 0           # % of the boon an absent summoned beast keeps
+var no_beast_left := 0       # free summons armed by a beast's death
+var no_beast_left_loyalty := 0  # Loyalty a free-summoned beast arrives at
+var wild_rotation := 0       # swap has no cooldown — AND the Loyalty cap it
+                             # imposes as its cost (gate and magnitude in one)
+var masters_aim_ranks := 0   # Quick Shot +% of Attack
+var companion_hp_pct := 0.0  # Beast Within: +% companion max health
+var deep_reserves_ranks := 0 # Spirit Bond +% max Mana
+var instinctive := 0         # Quick Shots Hunter's Instinct empowers (total)
+var symbiosis := 0           # % max Mana restored per companion strike
+var vengeance := 0           # beast death -> inherit its boon for the BATTLE
+var vengeance_dmg := 0       # ... and +% damage for as long as it holds
+var lone_hunter := 0         # no companion: % less cost (gate AND magnitude)
+var lone_hunter_dmg := 0     # ... and +% damage
 var one_soul := 0            # capstone: shared health pool, double Loyalty
 var apex := 0                # capstone: extra Quick Shot strike, KC resets
 var the_pack := 0            # capstone: two beasts active at once
@@ -108,7 +123,7 @@ var vengeance_kind := ""     # which boon Vengeance carries while it lasts
 var kinds_summoned := {}     # beasts fielded this fight (Feral Momentum et al)
 var beast_committed := false # Lone Bond: a REAL summon has been spent (Call
                              # of the Wild writes kinds_summoned but never this)
-var free_summon := false     # No Beast Left: the next summon is free
+var free_summons := 0        # No Beast Left: how many summons are still free
 var no_heals := false        # Ancient Pact: this beast rejects all healing
 # ---- Batch AN §3: the battle modifier ----
 # A modifier binds BOTH parties for one battle, so it is stamped on every
@@ -131,7 +146,12 @@ var mod_no_break := false      # Deadened   — read in take_hit()'s Break block
 var mod_no_regen := false      # Thin Air   — read in battle._player_turn()
 var mod_bleed_add := 0         # Bloodletting — read at battle's on-hit bleed
 var mod_recoil := 0.0          # Mirrorbound  — read at battle's recoil site
-var soul_partner: BattleUnit = null  # One Soul: damage is split with them
+# One Soul: EVERY member of the bond, self included — the hunter and each of
+# his living beasts. BATCH AY §1 made it an Array because The Pack fields two
+# beasts, so the bond spans THREE bodies and a single partner pointer could
+# only ever hold the newest (the older beast kept a stale link the hunter no
+# longer answered). Empty = no bond. battle._sync_soul_bond is the ONE writer.
+var soul_bond: Array = []
 var _soul_guard := false     # re-entry guard while splitting
 var damaged_since_turn := false  # Unbroken Watch bookkeeping
 # ---- Sharpshooter Focus + lane talents (Batch 32) ----
@@ -1610,19 +1630,27 @@ func frenzy_bonus() -> float:
 func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	if amount > 0:
 		damaged_since_turn = true  # Unbroken Watch bookkeeping
-	# One Soul (Beastmaster capstone): all damage to either half of the
-	# bond is split evenly between hunter and beast.
-	if amount > 1 and not _soul_guard and soul_partner != null \
-			and is_instance_valid(soul_partner) and not soul_partner.dead \
-			and not dead:
-		var shared: int = amount / 2
-		amount -= shared
-		soul_partner._soul_guard = true
-		soul_partner.take_hit(shared, 0)
-		soul_partner._soul_guard = false
-		float_text("Soul-split", Color(0.75, 0.6, 0.95))
-		_proc_log("One Soul: %s shares %d of the wound with %s" % [
-			unit_name, shared, soul_partner.unit_name])
+	# One Soul (Beastmaster capstone): a wound to ANY member of the bond
+	# divides across EVERY LIVING member of it. BATCH AY §1 decided this
+	# explicitly rather than letting The Pack decide it by accident — with two
+	# beasts the bond is three bodies and each takes a third, not a half. The
+	# guard is set on the RECEIVER before the recursive call, so a mate can
+	# never re-split the share it is being handed.
+	if amount > 1 and not _soul_guard and not dead and not soul_bond.is_empty():
+		var mates: Array = soul_bond.filter(func(m): return m != self \
+			and is_instance_valid(m) and not m.dead)
+		if not mates.is_empty():
+			var shared: int = amount / (mates.size() + 1)
+			if shared > 0:
+				amount -= shared * mates.size()
+				for mate in mates:
+					mate._soul_guard = true
+					mate.take_hit(shared, 0)
+					mate._soul_guard = false
+				float_text("Soul-split", Color(0.75, 0.6, 0.95))
+				_proc_log("One Soul: %s shares %d of the wound with %s" % [
+					unit_name, shared, ", ".join(
+						mates.map(func(m): return m.unit_name))])
 	# Barrier absorbs damage (not Pressure) before HP is touched. Divine
 	# Shield barriers carry talent riders: Blessed Barrier (absorbs heal),
 	# Sacred Covenant (lethal saves reward), Afterglow (heal on break).

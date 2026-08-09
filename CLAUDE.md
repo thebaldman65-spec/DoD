@@ -179,6 +179,211 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   party.tscn is the HERO SHEET now, opened from a card.
 
 ## Current systems snapshot (2026-08-08)
+BATCH AY (08-08) — THE BEASTMASTER: PARTNERSHIP (AND THE PACK, BUILT). First of the
+Hunter three, and **he goes first rather than last** on Batch X's own precedent that the
+companion machinery "deserves a pass rather than being the tired third of three." One spec
+only; the other eleven trees and enemy tuning UNTOUCHED. Every one of his 24 ids survives and
+re-specs in place, NO SAVE VERSION MOVES (still v7). §8 and §9 carry the two open fixes from AX.
+SPINE: **PARTNERSHIP — his power lives in another body, and it is the only resource in the
+game that can die.** The Hunter class's stated three-way contrast (*three meters in three
+places*) is the axis the Cleric now uses, so it is retired for **partnership / patience /
+attrition**. NOTE: that sentence appears ONLY in Batch AX's changelog entry — §10 asked for it
+to be replaced "wherever it appears" in master.html and IT WAS NEVER THERE.
+§0 **THE INSTRUMENT WAS CHECKED, NOT ASSUMED, AND THE ANSWER IS GOOD NEWS: COMPANION DAMAGE
+CREDITS THE HUNTER.** `_companion_hit` books `dmg_hero_<pack_master>` at ONE named site
+(`comp_credit`), so every Beastmaster number ever measured is READABLE and this batch's rows
+are comparable with Batch W's 17-28%. Damage share IS a valid read for him (Ramp damage
+archetype) — unlike the Cleric three. **`_ghost_hit` (Call of the Wild's bodiless blows) books
+NOTHING — a pre-existing instrumentation gap, reported not fixed**, and small: it fires only
+for absent kinds on a boss-trophy ability.
+TWO NEW NUMBERS, one `pack_report_line()` shared by the standalone report and RunSim's (the
+`ruin_report_line` pattern), printed only when a Beastmaster stood: **the DEEPEST LOYALTY
+reached** (banked at the GAIN site, because Primal Surge and a beast's death both wipe the
+meter) and **the share of hunter turns on which TWO beasts really stood** under The Pack.
+§1 **THE PACK IS BUILT — AND THE BRIEF'S PREMISE WAS STALE.** "COMING SOON, deferred" survives
+only in Batch 30's changelog entry; `_beast_cap`, `unit.beasts` and the per-kind `loyalty`
+dict were all already live and master.html already documented two beasts. What this batch
+actually built is the FIVE EDGE CASES that would otherwise have been decided by accident:
+- **BOTH BOONS AT FULL, never half.** Menagerie stays the half-strength node and now carries a
+  THIRD (absent) beast's boon rather than a first's — its magnitude is deliberately unchanged
+  because §1 gave it a new job instead.
+- **URSUS'S `100 + hunter_idx` TAUNT ENCODING SURVIVES TWO BEASTS** and still prefers the bear.
+  The decode already read `_beasts(heroes[idx])`, i.e. a list, so it needed no change — checked
+  live rather than assumed.
+- **ONE SOUL SPANS THREE BODIES, and that needed a field change.** `soul_partner` was a SINGLE
+  POINTER: a second summon silently overwrote it and the older beast kept a link the hunter no
+  longer answered. It is **`soul_bond`, an Array holding every living member**, and
+  **`battle._sync_soul_bond` is the ONE writer** (summon, free, death). A wound divides across
+  everyone: 30 damage is 10/10/10.
+- **THE SWAP REPLACES THE OLDER OF THE TWO, and that is a CORRECTION §2 FORCES, not a
+  preference.** The code replaced the LOWER-Loyalty beast; with an uncapped meter the beast you
+  just called ALWAYS holds the lower Loyalty, so the old rule would evict the newcomer
+  immediately and make rotation impossible under the very capstone whose lane is named for it.
+  `hunter.beasts` is append-ordered, so the oldest living beast is simply `_beasts(h)[0]`.
+- **CALL OF THE WILD** already handles a two-beast field (real bodies strike, the absent kind
+  ghosts) and still never sets `beast_committed` — Batch AG's fix survives. Checked, not assumed.
+**LONE BOND CLOSES THE PACK — AND ROW EXCLUSIVITY WAS NOT ALREADY HANDLING IT.** §1 asserts
+that it was; IT IS NOT. Lone Bond is Devotion row 7 and The Pack is a row-8 CAPSTONE with **no
+lane-purity requirement** (talents.gd's own rule), so a player can hold both — "one beast per
+fight" plus "two beasts at once", the one combination the brief says must be impossible.
+Resolved WHERE THE NUMBER IS READ (`_beast_cap` returns 1 under Lone Bond) rather than by
+building picker-level exclusion machinery, which §11 forbids, and **BOTH node descriptions say
+so** so the door is visible before the point is spent.
+§2 **LOYALTY HAS NO CEILING AND THE BOON IS A CURVE.** `_bond_mult` = **1 + 0.20 x Loyalty,
+continuous** — x2 at five stacks (EXACTLY today's doubling, so nothing a player learned became
+wrong), x3 at ten, x5 at twenty, and it never plateaus. `_bond_step(hunter)` is the ONE place
+the step is decided (Absolute Devotion adds to it, Ancient Pact doubles the result).
+**`_loyalty_cap` RETURNS A SENTINEL, `LOYALTY_UNCAPPED := -1`, NOT A LARGE NUMBER** — a large
+number is a ceiling a later batch reaches by accident. **EXACTLY ONE NODE STILL HANDS IT A
+NUMBER: Wild Rotation (3), and that cap IS its cost.** §2's own text says "three nodes still
+impose caps"; that is stale against its own §3, which re-specs Absolute Devotion and Lone Bond
+off caps entirely. Corrected toward §3, whose magnitudes are declared final.
+**THE ONE CLAMP THE CURVE FORCED, AND IT IS A GUARD NOT A MAGNITUDE: `BOND_MITIGATION_MAX
+:= 0.75`.** Ursus's Savage Presence is `1.0 - 0.10 * boon` on damage TAKEN, so an uncapped
+boon crosses zero and **enemy attacks would start HEALING him** (at the Absolute Devotion +
+Ancient Pact step, from Loyalty 13). The MITIGATION is bounded; the CURVE is not, because the
+curve is the identity. The Ursus attack-pull is clamped at 1.0 for the same reason.
+§3 ALL 24 NODES RE-PRICED AT ROW PRICING, **3-4x** (not the Cleric three's 4-5x — his numbers
+were never the smallest in the game). LANE THESES SHARPENED WITHOUT RENAMING: **DEVOTION =
+partnership in DEPTH · THE PACK = partnership in BREADTH · HANDLER = when the partnership is
+not the answer.** FULL TABLE IN THE CHANGELOG. **THREE NODES ARE RE-SPECCED RATHER THAN
+REPRICED, because §2 took their premise:** Absolute Devotion (was a ceiling dial) is now THE
+LANE'S THESIS — the boon's step 20% -> 35% a stack; Ancient Pact (was a threshold triple) now
+DOUBLES THE STEP AGAIN, so both taken it is +70% a stack against an unhealable beast; Lone Bond
+(was a higher ceiling) now ARRIVES AT 6 LOYALTY AND DOUBLES EVERY GAIN.
+**ONE JUDGEMENT CALL, FLAGGED NOT SILENT: VENGEANCE KEEPS ITS +30% DAMAGE.** §3's table
+describes only the boon and contrasts only the DURATION ("full strength for the rest of the
+battle, rather than for a status's duration"), so the duration is what changed — the damage
+clause is not dropped. It rides the same `vengeance` status, which is now applied with -1 turns
+(permanent). `vengeance_dmg` is its own field, per AW's two-magnitudes-two-fields rule.
+§4 **STEADFAST BOND <-> VENGEANCE: THERE WAS NOTHING LEFT TO DISSOLVE.** Batch 30 authored the
+fork and its record survives ONLY in that batch's changelog entry — not in the tree data, not
+in this file's prose list, not in master.html, and `test_runes._exclusives` has been a bare
+`pass` since AI. RECORDED, not actioned. **LONE BOND <-> WILD ROTATION SURVIVES UNTOUCHED**
+because both sit in ROW 7 and row exclusivity enforces it correctly — stated so a later batch
+does not "fix" a pair already being enforced.
+§5 **THE TROPHY-POOL COLLISION CANNOT ARISE, and it is recorded rather than left to a reader.**
+HIS TREE GRANTS NO ABILITIES AT ALL (the summons, Hunter's Instinct and Kill Command are base
+kit; Bestial Wrath, Spirit Bond, Primal Surge, Call of the Wild and Mark of the Hunt come from
+the boss-trophy pool), so he owes no AU §1 fallback in either direction and no trophy can land
+on a node's grant. **ASSERTED BOTH WAYS** — no node carries `grant_ability`/`new_ability`, and
+no `SPEC_POOLS["beastmaster"]` entry appears in `Talents.ability_names` for a fully-learned tree.
+§6 **EVERY BEASTMASTER COUNTER IS ADDITIVE** (the AR/AS/AT/AV/AW/AX form). **TWO hold the
+INCREASE on a base the kit pays WITHOUT the node and are named `_step`** — `wild_communion_step`
+on the passive's own 5%, `absolute_step` on the boon's own 20% (AV's `guardian_step` precedent).
+**BOTH ARE FLOATS AND ARE DELIBERATELY ABSENT FROM `Runes.STAT_INT_KEYS`** — the Rune of the
+Deep Bond pays **1.5**, and the int coercion would round it to 1 with nothing crashing (AT's
+`conduit_step` lesson, arriving through a Hunter door). `loyalty_cap_bonus` was **DELETED WITH
+ITS PREMISE** (field, STAT_INT_KEYS entry and rune clause), not left unreachable.
+**THE NAME TRAP IS ASSERTED IN BOTH DIRECTIONS**: `wild_communion_step` is NOT
+`communion_ranks` (the Devout's — Batch 29 crossed them once), and the test walks BOTH trees
+and proves the two specs share no counter at all.
+RUNE AUDIT. **ALL FOUR RE-POINTED; THREE STILL PAY EXACTLY WHAT THEY PAID, only the units
+moved:** the Turning Pack (`momentum_ranks` 1 -> 8), the Loosened Straps (`masters_aim_ranks`
+2 -> 12 — it rides Quick Shot, which Master's Aim reprices 6% -> 25%, and the rune's own flat
++12% of Attack is unchanged and composes additively at the same site), the Shared Wild
+(`wild_communion_ranks` 1 -> `wild_communion_step` 1.5, `momentum_ranks` 1 -> 8,
+`companion_hp_pct` untouched). **THE RUNE OF THE DEEP BOND IS THE ONE THAT COULD NOT PAY WHAT
+IT PAID**, and it is REPORTED not hidden (the AX Hollow Chalice precedent): "Loyalty climbs one
+stack higher" has NO equivalent value once there is no ceiling, because §2 delivers that for
+free. **RE-POINTED, NOT DELETED** — it keeps the RELATIONSHIP, paying into the boon's step
+(`absolute_step` 3 = one fifth of the node, the same ratio its other clause already had), and
+its desc was rewritten to the new units rather than left lying.
+**ONE CONSEQUENCE WORTH NAMING: QUICK WHISTLE NOW SHAVES THE WHOLE SWAP COOLDOWN, so the
+Turning Pack's "returns a turn sooner" is INERT for a player who takes that node.** It still
+pays in every other build. `SWAP_COOLDOWN := 3` and the floor is ZERO (it was 1, which would
+have made "no cooldown" unreachable). **THE THREE HUNTER CLASS-WIDE RUNES TOUCH NO BEASTMASTER
+COUNTER**, asserted.
+§7 THE BOT: **summon early and keep something standing** (the summon block is FIRST in the
+hunter branch, asserted positionally — Loyalty only accrues while a beast lives, so a bot that
+summons late measures a spec nobody plays); **under The Pack fill BOTH slots**, preferring a
+second beast over swapping the first; and **SWAP ONLY WHEN THE INCOMING BOON IS THE BETTER
+ONE.** `_bot_boon_worth(hunter, kind)` weighs each kind's own effect against the live field
+(Canis by wounded-enemy count, Ursus doubled while the hunter is under half, Aguila flat) AND
+MULTIPLIES BY THE LOYALTY CURVE, so an established beast is genuinely expensive to give up; a
+25% margin stops it churning. **IT ALSO RESPECTS THE SHARED SWAP COOLDOWN EXPLICITLY** — the
+bot calls "Summon X" rather than the picker's "Swap X" clone, and `_ability_usable`'s cooldown
+gate only matches the latter, so a swap rule without that check would have bypassed it.
+§8 **THE OCCULTIST: RUIN GENERATION DOUBLED (from AX's zero).** `const OLD_GODS_MARK := 2`,
+read at the **four sites that ARE the passive marking a debuff the Occultist applied**: the
+generic `applies_status` hook, Empowered Hex's Decay, Umbral Mirror's rebound (its own comment
+already says the reflection is his work) and Bewitch's special path. **NODE MAGNITUDES ARE NOT
+SWEPT UP IN IT** — Delirium, Unraveling and Spread of Madness keep their own. **ONE SITE
+DELIBERATELY LEFT AT 1 AND REPORTED: the daze a BEWITCHED ENEMY lays on a fellow** — that is
+madness-lane plumbing, not the Occultist applying a debuff. **THE THRESHOLD STAYS AT 10 AND
+AVATAR OF RUIN STAYS AT 5**; the *first at 5, every 10 after* variant AX named is STILL NOT
+SHIPPED.
+§9 **THE DEVOUT: A RELEASE THAT CONSUMED NO STACKS GRANTS HALF GROWTH** (1.5% of base, not 3%).
+`_conviction_growth(devout, consumed)` with ONE caller passing `keep < 5` — under Apostle `keep`
+is 5, so nothing was consumed. `CONVICTION_NO_CONSUME_SHARE := 0.5` is a SHARE of the base
+constant rather than a second magnitude, so the two cannot drift apart. It hits the multiplier
+precisely and leaves the base spec, the step and the fantasy alone.
+DOC DRIFT CORRECTED TOWARD THE CODE, found in passing: **the Occultist's in-game
+`passive_desc` still described the PRE-AX Ruin** — "max 5", a flat 10% lifesteal, a threshold of
+5, 50% of Attack and a 15% party heal. Every one of those numbers moved in Batch AX and that
+string was missed. Now matches the code, with AY's generation rate in it.
+VERIFIED: check_parse 0, check_flow 0 (6 screens), 11 scenes 0 SCRIPT ERROR, run-harness gates
+1/2/3 PASS. NEW test_batch_ay.gd **455/0**.
+Regression: ah 5410/0 (STAMP GATE bumped AX -> AY), ah_battle 65/0, ai 2036/0, an 6047/0,
+aj 403/0, ak 523/0, al 556/0, ar 885/0, as 387/0, at 460/0, au 257/0, av 315/0,
+aw **338/0 (was 337 — TWO checks RE-POINTED IN PLACE with the reason in the file: §9 moved the
+growth percentage into a local, and the 13-release Apostle stream now reads +19% not +39%; a
+THIRD check was ADDED so the halved path is covered by the same negative control)**,
+ax 329/0, test_runes **2985/0 (was 2988 — two rune payloads went int -> float, so three
+STAT_INT_KEYS-family checks no longer apply; the AL/AT precedent)**,
+test_rune_battle **95/0 (its Beastmaster block RE-POINTED IN PLACE: the ceiling assertion is
+INVERTED now — it proves no ceiling is derived — and the counters read the new units)**.
+NEGATIVE CONTROLS RUN, all four the batch named plus two of its own: the boon curve stepping at
+5 again trips **6**, Menagerie paying full trips **3**, Wild Communion writing the Devout's
+`communion_ranks` trips **4**, a full-consumption release also paying half trips **2**, the swap
+going back to lower-Loyalty trips **2**, and Lone Bond no longer closing The Pack trips **2**.
+KIT SMOKE, fixed lineup, 40 battles/row, berserker,pyromancer,inquisitor,beastmaster,
+DOD_SIM_TALENTS force-learning full 8-node lanes. All rows 40/40 wins, 0 SCRIPT ERROR.
+Beastmaster damage share / deepest Loyalty: **ungeared 26% (159/battle), deepest 11; DEVOTION
+42% (274), deepest 50; THE PACK 31% (198), deepest 3 (Wild Rotation's cap, working); HANDLER
+26% (161), deepest 9.** A PACK row with row 7 swapped off Wild Rotation reads **33% (212),
+deepest 13, two beasts standing on 53% of hunter turns**; the Wild Rotation row reads **63%**.
+**DEVOTION IS THE STANDOUT AND IT SHIPS AS WRITTEN** — Absolute Devotion + Ancient Pact is a
++70% step against an unhealable beast, and 50 Loyalty in a 7-round smoke fight is the curve
+doing exactly what §2 asked for. Kit-mechanics ratios ONLY; NO difficulty signal (Batch R).
+**§0'S SECOND NUMBER, ANSWERED HONESTLY: THE PACK FIELDS TWO ON 53-63% OF HUNTER TURNS.** The
+missing share is RAMP, not loss — turn 1 calls one beast and turn 2 calls the other, so in a
+7-round fight two of the hunter's turns are structurally single-beast. It is the capstone it
+claims to be.
+§8 MEASURED, BOTH HALVES, ON AX'S OWN FLAGS. **`ruin_report_line()` RE-RUN, 40-run line,
+Ruin build: trash 0.06 detonations/battle (n=774, DEEPEST MARK 20) | boss 0.35 (n=52, DEEPEST
+MARK 32)** — against AX's **trash 0.00 (n=519, deepest 10) | boss 0.13 (n=23, deepest 12)**.
+**THE WHOLE CURVE DOUBLED AND THEN SOME: the deepest trash mark EXACTLY doubled (10 -> 20) and
+the boss half nearly TRIPLED on both axes (0.13 -> 0.35, deepest 12 -> 32).** §8 predicted
+"deepest mark ~14 in trash and past 20 on a boss"; the run over-delivered on both because a run
+reaches deeper tiers and longer fights than the standalone smoke does.
+Standalone n=200 matched to AX's arm exactly (Ruin lane rows 1-7, threshold 10): **trash 0.05,
+deepest mark 14** against AX's **0.00, deepest 7** — the deepest mark doubled there too, and 14
+is §8's own prediction to the number. **TRASH IS OFF ZERO BUT ONLY BARELY, AND THAT IS
+REPORTED NOT ESCALATED: §8's own condition for reopening the threshold conversation was "if
+trash is still zero", and it is not.** With Avatar of Ruin's threshold of 5 the same standalone
+build reads **1.83 detonations/battle, deepest 19, 63% contribution** — the capstone is now a
+real answer for a player who wants the payoff back in ordinary fights, which is what AX designed
+it to be and which it could not previously deliver at all.
+**THE RUN ROW'S OTHER NUMBERS ARE NOT A DIFFICULTY READING** (n=40, no control row, and
+./sim.sh carries no difficulty signal since Batch R) — but one is worth keeping as
+instrumentation: **the deepest Loyalty reached over a full run is 90.** The curve genuinely has
+no ceiling in the only place long enough to show it.
+§9 MEASURED, AND THE FALLBACK IS REPORTED NOT TAKEN. FAITH row isolated on Apostle, n=200, same
+flags as AW's and AX's: **76% contribution, 1766 healing/battle, +36.6% of base growth/battle,
+peak 180 HP on a 175 base** — against AX's **80% / 2305 / +83.7% / 390**. **GROWTH AND PEAK BOTH
+HALVED, EXACTLY AS DESIGNED**; healing fell 23% with them. **CONTRIBUTION IS STILL 76%, WHICH IS
+PAST §9'S OWN ~60% TRIGGER — SO THE NEXT LEVER (the base step 3% -> 2%) IS REPORTED AND
+DELIBERATELY NOT TAKEN, on §9's explicit instruction.** Note what that number means: the growth
+was never the whole of the FAITH row, and halving it did not move contribution much, so a base-
+step cut may not either. THE DESIGNER'S CALL.
+NO DIFFICULTY MEASUREMENT AND NO SIM ROW, deliberately — same as AJ/AK/AL/AR/AS/AT/AU/AV/AW/AX.
+REPORTED NOT ACTED ON: **PRIMAL SURGE SCALES LINEARLY ON AN UNCAPPED METER.** It spends ALL
+Loyalty for `0.15 x stacks x Attack` per beast and buffs the hunter for that many TURNS; at the
+50 Loyalty the DEVOTION row reached, that is 7.5x Attack in one button and a 50-turn buff. It is
+a boss-trophy ability that RESETS the ramp, so the tension is the good kind — but §3 declared
+magnitudes final and did not mention it, so it ships untouched and is flagged. Also:
+**`_ghost_hit` books no damage stat** (see §0).
 BATCH AX (08-08) — THE OCCULTIST: CORRUPTION. Third of the Cleric three and **THE
 CLERIC CLASS IS DONE**. His tree needed the LEAST structural work of the three —
 Ruin / Madness / Leech are genuinely distinct axes with real cross-lane plumbing and
@@ -3771,15 +3976,16 @@ Space or left click; no announcer text (combat log only).
   The open lever remains authored rune POWER — a runes.json data edit,
   not machinery — and the dilution question (see the AB block).
 - Sim bot wins ~90%+ with 4 heroes; real difficulty tuning by user playtest.
-- FOUR TALENT TREES STILL CARRY BATCH AI'S MAGNITUDES. The four class batches AI
+- TWO TALENT TREES STILL CARRY BATCH AI'S MAGNITUDES — **the SHARPSHOOTER and the
+  SURVIVALIST, and they are the last two in the game.** The four class batches AI
   promised landed (AK Swordmaster, AJ Berserker, AL Warden, AR Pyromancer), then
-  AS re-authored the Cryomancer and AT the Arcanist — THE MAGE CLASS IS DONE — and
-  AV the Holy Cleric, AW the Devout. **THE OCCULTIST IS THE LAST CLERIC**, and the
-  THREE HUNTERS are the last class. They remain structurally correct and
-  numerically weak: single-rank nodes at the old rank-1 values, i.e. roughly a
-  third of the power a row should be priced at. Both Cleric batches so far needed
-  4-5x rather than the Mage trees' 3x, because a support's numbers were the
-  smallest in the game to begin with.
+  AS re-authored the Cryomancer and AT the Arcanist — THE MAGE CLASS IS DONE — then
+  AV the Holy Cleric, AW the Devout and AX the Occultist — THE CLERIC CLASS IS DONE —
+  and **AY the Beastmaster**. The two survivors are structurally correct and
+  numerically weak: single-rank nodes at the old rank-1 values, i.e. roughly a third
+  of the power a row should be priced at. The Cleric three needed 4-5x rather than
+  the Mage trees' 3x because a support's numbers were the smallest in the game; **the
+  Beastmaster took 3-4x**, so the Hunter is not a special case that way.
 - DEATH RAY CARRIES NO BREAK DAMAGE (Batch AT, STILL OPEN AFTER AU). AT's brief
   specified Mana, initiative, cooldown, damage, target count and the gate
   precisely and said nothing about BD, so it ships at pressure 0 rather than
