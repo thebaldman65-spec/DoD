@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-09 (Batch BE)</b></p>
+<p align="right"><b>Last updated: 2026-08-09 (Batch BD)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -256,9 +256,9 @@ chance roll.</b> On those the Perfect does not add damage or a hit — it remove
 Wildstrikes and Hack and Slash land their Bleed on every strike, Blizzard puts 2 stacks of
 Chilled on every enemy instead of 1–2, Firestorm spreads its bolts evenly across the living
 instead of scattering them, Arcane Barrage never strikes the same enemy twice while an
-unstruck one stands, Triple Shot pays out one guaranteed critical, Pommel Strike and a
-perfectly rigged Snare Trap land their Stun even on an unbroken boss, and a perfect Deadfall
-lets the player name the victim. Abilities with no roll to remove keep an ordinary bonus.</p>
+unstruck one stands, Triple Shot pays out one guaranteed critical, and Pommel Strike and a
+perfectly rigged Snare Trap land their Stun even on an unbroken boss. Abilities with no roll
+to remove keep an ordinary bonus &mdash; a perfect Deadfall gets a fourth spring.</p>
 <h3>4.3 Attack resolution pipeline</h3>
 <p>Per strike, in order: <b>ability % × the attacker's current Attack</b> × random variance
 (0.9–1.1) × grade multiplier × crit (×1.5; the Sharpshooter's Lethal Aim ×2, rising with Focus) × attacker modifiers ×
@@ -1231,7 +1231,9 @@ fragment rolls miss/parry separately.<br>
 Snare Trap — 20 Mana, 2.0, 3cd: rig a snare on one enemy — the next time it acts it is
 STUNNED for 1 turn and Poisoned for 4. Bosses shrug the stun unless Broken — unless the
 snare was rigged PERFECTLY (Perfect: the Stun lands on an unbroken boss).
-One trap at a time (three under Deadfall Network).<br>
+One trap at a time (three under Deadfall Network). A snare occupies its slot until the
+enemy it is set under acts; <b>a deadfall occupies one for as long as it has springs left</b>,
+so arming one locks out Snare Trap until it is spent.<br>
 <b>Spec pool (earnable, §6a)</b> — five of the designed eight (Blight, Smoke Bomb and
 Field Dressing land later):<br>
 Explosive Shot — 35 Mana, 3.0, 3cd: 10 NATURE to ALL / 20 BD, Poisoning each (Perfect: 12
@@ -1240,9 +1242,12 @@ Venom Coating — 20 Mana, 1.5, 5cd (no skill check): for 4 turns every attack a
 Poison and refreshes its timers.<br>
 Hamstring — 25 Mana, 2.5, 3cd, 20% Atk: Cripple, Slowed AND Exposed — three statuses in
 one cast (Perfect: 4 turns each).<br>
-Deadfall — 20 Mana, 2.0, 3cd: an untargeted trap — the NEXT enemy to act takes 35% Atk
-nature damage and is Stunned 1 turn. You don't pick the victim (Perfect: you name them;
-an aimed trap waits for its mark, and releases if the mark dies first).<br>
+Deadfall — 25 Mana, 2.0, 5cd: arm a deadfall in the path. The NEXT enemy to act takes 20%
+Atk nature damage and is Stunned 1 turn; the trap then lies dormant for 2 turns, re-arms
+itself and springs again — <b>three times in all</b> (Perfect: four). You never pick the
+victim: it takes whoever walks the trail. Bosses shrug the stun unless Broken. <b>It holds
+one trap slot until its last spring is spent</b>, which is the cost of a trap that stays on
+the board.<br>
 Harvest — 25 Mana, 3.0, 4cd: CONSUME every status on one enemy — 12% Atk per status
 REMOVED, healing yourself the same amount (Perfect: heals 150%). It is paid for what the
 cleanse actually took: a poison that cannot be cleansed (Slow Acting, Perfected Toxin)

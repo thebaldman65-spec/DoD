@@ -353,7 +353,13 @@ func _test_perfects() -> void:
 		"Firestorm": "Every enemy takes an even share.",
 		"Arcane Barrage": "No two bolts strike the same enemy.",
 		"Triple Shot": "One arrow is a guaranteed critical.",
-		"Deadfall": "Choose who the trap takes.",
+		# RE-POINTED BY BATCH BD, with the reason in the file: the perfect no
+		# longer names the victim. That clause was exactly what made Deadfall a
+		# copy of Snare Trap, so it is DELETED rather than reworded — but the
+		# ability still runs a check (asserted below) and its perfect still
+		# buys reliability rather than magnitude, which is what this battery is
+		# really about. test_batch_bd owns the re-spec itself.
+		"Deadfall": "A fourth spring.",
 	}
 	for name in expected:
 		var ab := _find_anywhere(name)
@@ -366,7 +372,8 @@ func _test_perfects() -> void:
 		ok(ab.perfect_id == "", "%s carries no magnitude perfect_id" % name)
 		if ab.multi_hits > 0 or ab.random_hits > 0:
 			ok(not ab.perfect_extra_hit, "%s gains no extra hit on a perfect" % name)
-	# Deadfall had to GAIN a skill check to have a perfect at all.
+	# Deadfall had to GAIN a skill check to have a perfect at all, and it
+	# KEEPS it after Batch BD — the perfect buys a fourth spring now.
 	var deadfall := _find_anywhere("Deadfall")
 	ok(deadfall != null and not deadfall.no_skill_check,
 		"Deadfall now runs a skill check")
@@ -409,7 +416,7 @@ func _test_doc_matches_code() -> void:
 	# The stamp moves with every batch that touches the doc; what this line
 	# is really guarding is that the doc was touched AT ALL when the code
 	# below it changed. Bump it, do not delete it.
-	ok(doc.contains("Last updated: 2026-08-09 (Batch BE)"),
+	ok(doc.contains("Last updated: 2026-08-09 (Batch BD)"),
 		"master.html carries the current batch's stamp")
 	for spec in Classes.SPEC_POOLS:
 		var listed: String = ", ".join(Classes.SPEC_POOLS[spec])

@@ -400,13 +400,21 @@ func _test_owed_badges() -> void:
 	map_scene.free()
 
 
-# ---------- 8. Deadfall's perfect: the one HUMAN-ONLY path ----------
+# ---------- 8. Deadfall's perfect ----------
 
+# RE-POINTED IN PLACE BY BATCH BD, and the RE-POINT IS THE POINT rather than a
+# tidy-up. AH gave Deadfall a skill check so it could have a perfect at all, and
+# the perfect it got was "name the victim" — which handed back the ONE thing
+# distinguishing it from Snare Trap, and is why the two abilities read as
+# identical for fourteen batches. BD deletes that clause with the
+# `deadfall_aims` array behind it, so the human-only target picker this check
+# was written to cover NO LONGER EXISTS.
+#
+# What survives is the question underneath: does a perfect rig actually pay
+# more than an ordinary one, driven through the real special. It does — a fourth
+# spring — and it is checked here as well as in test_batch_bd because THIS file
+# is the one that would otherwise still be asserting a deleted feature.
 func _test_deadfall_aim() -> void:
-	# The autoplay bot never casts Deadfall and is fenced out of the pick
-	# anyway (`not autoplay`), so this branch would otherwise ship with no
-	# runtime coverage at all. Drive it directly: resolve the special at
-	# "perfect" with autoplay off, and answer the target picker.
 	var prep := func(run):
 		run.party[3]["bm_abilities"] = ["Deadfall"]
 	var scene := await _spawn(["berserker", "cryomancer", "holy", "mystic"],
@@ -414,27 +422,26 @@ func _test_deadfall_aim() -> void:
 	var sv := _hero(scene, "trapper")
 	ok(sv != null, "the Survivalist spawned")
 	var foes: Array = scene.get("enemies")
-	ok(foes.size() >= 2, "at least two enemies to choose between")
+	ok(foes.size() >= 2, "at least two enemies on the board")
 	if sv == null or foes.size() < 2:
 		scene.free()
 		return
 	var ab: Ability = Classes.pool_ability("Deadfall")
-	ok(ab != null and not ab.no_skill_check, "Deadfall resolves and takes a check")
-	var mark: BattleUnit = foes[1]
+	ok(ab != null and not ab.no_skill_check, "Deadfall resolves and still takes a check")
 	scene.set("autoplay", false)
-	_answer_picker.call_deferred(scene, mark)
 	await scene._resolve_special(sv, ab, sv, "perfect", 1.0)
 	scene.set("autoplay", true)
-	ok(sv.deadfall_armed == 1, "the trap is armed")
-	ok(sv.deadfall_aims.size() == 1, "and it is AIMED (a perfect rig)")
-	if sv.deadfall_aims.size() == 1:
-		ok(int(sv.deadfall_aims[0]) == foes.find(mark),
-			"...at the enemy the player named")
-	# An ORDINARY rig arms nothing aimed.
+	ok(sv.deadfall_armed == 4, "a PERFECT rig arms FOUR springs (reads %d)" % \
+		sv.deadfall_armed)
+	# THE OLD BEHAVIOUR IS ASSERTED GONE, not merely unused: no picker opened
+	# (nothing answered one and the call returned), and the field it wrote to
+	# does not exist any more.
+	ok(not sv.get_property_list().any(
+			func(pr): return String(pr["name"]) == "deadfall_aims"),
+		"...and `deadfall_aims` is gone with the clause that wrote it")
+	# An ORDINARY rig arms three, and REPLACES rather than stacking.
 	await scene._resolve_special(sv, ab, sv, "good", 1.0)
-	ok(sv.deadfall_armed == 2, "a second trap is armed")
-	ok(sv.deadfall_aims.size() == 1, "an ordinary rig adds no aim")
-	# Let the picker's own coroutine unwind before the scene goes.
+	ok(sv.deadfall_armed == 3, "an ordinary rig arms three, replacing the four")
 	for _i in 6:
 		await process_frame
 	scene.free()

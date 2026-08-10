@@ -1031,6 +1031,12 @@ static func _print_report(battle) -> void:
 	var dx_line: String = battle.faith_report_line(battle.sim_stats)
 	if dx_line != "":
 		print(dx_line)
+	# Batch BD §1: the deadfall's springs and what the trap cap refused. A RUN is
+	# where a three-charge trap has room to spend itself, so this is the honest
+	# home for the number the slot rule is decided on.
+	var tx_line: String = battle.trap_report_line(battle.sim_stats)
+	if tx_line != "":
+		print(tx_line)
 	var earned := talent_spent + talent_left
 	print("Talent points per hero per run: earned %.1f   spent %.1f (banked %.1f)" % [
 		earned / runs / 4.0, talent_spent / runs / 4.0, talent_left / runs / 4.0])

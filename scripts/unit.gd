@@ -222,8 +222,16 @@ var perfected_toxin := 0     # capstone: his Poison is sticky, never expires, an
 var whole_forest := 0        # capstone: tripwire never expires, bites everything
 var force_of_nature := 0     # capstone: Trapper's bonus as a percentage (20),
                              # and it applies to the WHOLE party
-var deadfall_armed := 0      # armed untargeted traps waiting to spring
-var deadfall_aims: Array = [] # Batch AH: enemy indices a PERFECT rig named
+# BATCH BD — SAME FIELD, DIFFERENT UNIT, which is the class of change that
+# fails silently: this counted ARMED TRAPS and now counts CHARGES REMAINING on
+# the ONE deadfall a cast places (3, or 4 on a perfect rig). Every read site
+# moved with it — the spring decrements it, and the trap cap counts a deadfall
+# with charges left as exactly ONE occupant rather than as three traps.
+var deadfall_armed := 0      # charges left on the placed deadfall (0 = none out)
+var deadfall_dormant := 0    # turns it must rest before it can spring again (2)
+# `deadfall_aims` IS DELETED, not left unreachable (the BA precedent): the
+# perfect no longer names a victim, so the array could never be non-empty and a
+# later batch could otherwise write one.
 var companion_hp_bonus := 0   # talents: extra HP for summoned companions
 var companion_power := 0      # talents: extra damage on companion attacks
 # Fixed-tree talent stats (0/0.0 = not learned). See talents.gd for sources.

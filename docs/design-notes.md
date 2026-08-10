@@ -2445,3 +2445,45 @@ about Apostle was real and the re-measure confirms it, but a second change
 shipped on the same batch as the first makes both unmeasurable — and the last
 two attempts at this row were both shipped without a number in hand and both
 missed.
+
+## Batch BD — Deadfall becomes a placed hazard
+
+**Two abilities can be the same ability and nobody notices for fourteen batches,
+because nobody reads two tooltips side by side.** Deadfall and Snare Trap shared
+a cost, an initiative, a cooldown, a trap cap and a one-turn stun springing at
+the victim's turn start. The single distinction was that Deadfall does not let
+you pick your victim — and its Perfect handed that back. Each of those numbers
+was set in a different batch, by someone looking at that number, and every one
+of them was defensible on its own. Convergence is not a decision anybody makes;
+it is what happens when a spec pool grows without anything comparing its entries
+to the kit they sit beside.
+
+**The drawback was the design all along, and it was being apologised for.** The
+whole re-spec turns on refusing to give the player a say in who the trap takes.
+A snare catches one animal you chose; a deadfall sits in the trail and takes
+whoever walks it. Once that is the *point*, the perfect cannot be "you name the
+victim" — so the clause had to be deleted rather than reworded, because it is
+precisely the sort of thing that survives a rewrite intact.
+
+**Persistence is priced in slots, not in numbers.** Three springs at 20% is 60%
+where one spring was 35%, which is barely a change in damage; what it actually
+buys is three turns of denial spread across a fight, and what it actually costs
+is a trap slot held for as long as the trap has charges. That cost is the
+interesting part of the design, because it is the thing most likely to feel bad
+— so it ships instrumented, at the gate that says no, rather than argued about.
+A design decision with a counter attached to it is a decision the next batch can
+actually make.
+
+**A field that keeps its name and changes its unit is the most dangerous edit in
+the file.** `deadfall_armed` counted armed traps and now counts charges. Nothing
+crashes; the trap cap simply starts reading a three-charge trap as three traps
+and quietly eats the talent node whose whole job is to grant more slots. There
+is no compiler for this class of mistake, only the discipline of walking every
+read site and saying out loud what the number now means.
+
+**Three nodes tripled in value without being touched.** Bone Breaker pays 90
+Break per spring, so a full deadfall is 270 — likely the most Break any single
+cast in the game produces. Nothing about the node changed. Whenever an ability
+gains repetitions, everything hanging off it multiplies, and the honest move is
+to go and measure what those things now add up to rather than to notice it later
+in a balance pass.

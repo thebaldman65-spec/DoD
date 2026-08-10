@@ -1944,32 +1944,15 @@ func _run_battle() -> void:
 				# a flat 4 turns either way now.
 				_spring_trap(heroes[sn_idx], u, 0.0, sn_perfect)
 				_apply_poison(heroes[sn_idx], u, 4)
-		if not u.is_hero and not u.dead:
-			for df_h in heroes:
-				if not df_h.dead and df_h.deadfall_armed > 0:
-					# Batch AH: an AIMED deadfall (a perfect rig) waits for the
-					# one it was set for. An aim whose victim is already dead is
-					# released rather than wasted, so a perfect can never be
-					# worth LESS than an ordinary rig.
-					df_h.deadfall_aims = df_h.deadfall_aims.filter(
-						func(ix): return ix >= 0 and ix < enemies.size() \
-							and not enemies[ix].dead)
-					var df_here := enemies.find(u)
-					if df_h.deadfall_aims.has(df_here):
-						df_h.deadfall_aims.erase(df_here)
-					elif df_h.deadfall_aims.size() >= df_h.deadfall_armed:
-						continue  # every armed trap is spoken for, and not for you
-					df_h.deadfall_armed -= 1
-					if df_h.deadfall_armed <= 0:
-						df_h.remove_status("deadfall")
-					else:
-						df_h.update_status("deadfall", "DF%d" % df_h.deadfall_armed,
-							"Deadfall armed: the next enemy to act\nsprings it.", df_h.deadfall_armed)
-					_message("The deadfall springs on %s!" % u.unit_name)
-					_log("%s's deadfall springs on %s" % [df_h.unit_name,
-						u.unit_name], "#c8a860")
-					_spring_trap(df_h, u, 0.35 * df_h.attack)
-					break
+		# BATCH BD — the placed deadfall rests and springs at one site, and that
+		# site is ITS OWN FUNCTION rather than a clause buried in this loop:
+		# `_run_battle` cannot be driven headlessly (the AR trap), so a rule with a
+		# real gate has to be reachable by a test or its negative control can only
+		# ever be a grep (the AW `_ground_faith_tick` / BA `_perfected_toxin_tick`
+		# precedent). Its position is load-bearing and asserted: it sits ABOVE the
+		# stunned branch, so the stun a spring lands costs the victim the very turn
+		# it walked into the trap.
+		_deadfall_tick(u)
 		if u.dead:
 			continue
 		# Wind-up cancel (Batch V): a charger who loses this turn loses the
@@ -3003,6 +2986,18 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			if snare != null and u.resource >= _eff_cost(u, snare) \
 					and _ability_usable(u, snare) and not target_foe.has_status("snared"):
 				return [snare, target_foe]
+			# BATCH BD §3 — DEADFALL MOVED UP, from LAST to directly below Snare
+			# Trap. Sitting last was right for a one-shot mine and is wrong for a
+			# persistent investment: a trap with three charges wants arming EARLY,
+			# while there are turns left for it to spend them. Gated on there being
+			# no deadfall already out — the trap cap refuses a second one at a cap
+			# of 1 anyway, but under Deadfall Network it would not, and two
+			# deadfalls are not a thing.
+			var dfall := _find_ability(u, "Deadfall")
+			if dfall != null and u.deadfall_armed <= 0 \
+					and u.resource >= _eff_cost(u, dfall) \
+					and _ability_usable(u, dfall):
+				return [dfall, u]
 			var ham := _find_ability(u, "Hamstring")
 			if ham != null and u.resource >= _eff_cost(u, ham) and u.ability_ready(ham) \
 					and not (target_foe.has_status("slow") and target_foe.has_status("exposed")):
@@ -3025,10 +3020,6 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 			# options above have nothing left to add.
 			if ham != null and u.resource >= _eff_cost(u, ham) and u.ability_ready(ham):
 				return [ham, target_foe]
-			var dfall := _find_ability(u, "Deadfall")
-			if dfall != null and u.resource >= _eff_cost(u, dfall) \
-					and _ability_usable(u, dfall):
-				return [dfall, u]
 			return [u.abilities[0], ss_t]          # Quick Shot works the target
 		"cleric":
 			# BATCH AV — THE HOLY POLICY, rewritten so a sim measures the real
@@ -3428,13 +3419,31 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# instead of carrying a hardcoded 2 that has to be found and changed beside
 	# the node text every time the design moves.
 	if ab.special in ["snare_trap", "deadfall"]:
-		var trap_count := u.deadfall_armed
+		# BATCH BD — `deadfall_armed` COUNTS CHARGES NOW, NOT TRAPS. A placed
+		# deadfall is ONE occupant however many springs it has left, and it holds
+		# the slot until the last one is spent. That is the honest cost of
+		# persistence, and it is what makes Deadfall Network's three slots
+		# genuinely valuable to him rather than a stacking bonus.
+		var trap_count := 1 if u.deadfall_armed > 0 else 0
 		var u_idx := heroes.find(u)
 		for e in enemies:
 			if not e.dead and e.has_status("snared") \
 					and e.status_power("snared") == u_idx:
 				trap_count += 1
 		if trap_count >= maxi(u.deadfall_network, 1):
+			# BATCH BD §1 — THE NUMBER BEHIND THE SLOT RULE, banked at the refusal
+			# itself. Making a deadfall hold a slot is the clause most likely to
+			# make the ability feel bad, and the alternative (it costs no slot) is
+			# one condition right here — so the decision gets a measurement rather
+			# than a guess. Split by WHAT was refused and by whether a charged
+			# deadfall was the occupant, because only the second half is new.
+			_stat("trap_cap_refused")
+			if ab.special == "snare_trap":
+				_stat("trap_cap_refused_snare")
+				if u.deadfall_armed > 0:
+					_stat("trap_cap_refused_snare_by_deadfall")
+			else:
+				_stat("trap_cap_refused_deadfall")
 			return false
 	# Never a second beast of a kind already fielded (Loyalty keys on kind).
 	if ab.special == "summon" and _beasts(u).any(func(b): \
@@ -8624,34 +8633,23 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					target.unit_name], "#c8a860")
 				_hit_and_run(attacker)
 		"deadfall":
-			attacker.deadfall_armed += 1
-			# Batch AH: Deadfall gained a skill check, and its perfect buys
-			# the one thing the trap never gave you — a say in WHO it takes.
-			# The pick happens after the check, because "you got a perfect,
-			# now choose" is the whole point; cancelling just leaves the
-			# trap untargeted, which is its ordinary behaviour anyway.
-			if is_perfect and not autoplay:
-				var df_pool := enemies.filter(func(e): return not e.dead)
-				var df_aim: BattleUnit = null
-				if df_pool.size() == 1:
-					df_aim = df_pool[0]
-				elif df_pool.size() > 1:
-					_message("Name the one the deadfall takes")
-					df_aim = await _pick_target(df_pool)
-				if df_aim != null:
-					attacker.deadfall_aims.append(enemies.find(df_aim))
-					df_aim.float_text("MARKED", Color(0.75, 0.65, 0.30))
-					_log("   → the deadfall is rigged for %s alone" % \
-						df_aim.unit_name, "#c8a860")
-			if not attacker.update_status("deadfall", "DF%d" % attacker.deadfall_armed,
-					"Deadfall armed: the next enemy to act\nsprings it.", attacker.deadfall_armed):
-				attacker.add_status("deadfall", "Deadfall", "DF%d" % attacker.deadfall_armed,
-					Color(0.75, 0.65, 0.30), -1,
-					"Deadfall armed: the next enemy to act\nsprings it.", attacker.deadfall_armed)
+			# BATCH BD — ONE CAST PLACES ONE HAZARD WITH THREE CHARGES (four on a
+			# perfect rig). It SETS rather than adds: two deadfalls are not a
+			# thing, and the trap cap refuses a second cast while one holds
+			# charges. THE PERFECT NO LONGER NAMES A VICTIM — that clause is what
+			# made this ability a copy of Snare Trap, and it is deleted along with
+			# the `deadfall_aims` array it used to write to.
+			attacker.deadfall_armed = (DEADFALL_CHARGES + 1 if is_perfect \
+				else DEADFALL_CHARGES)
+			attacker.deadfall_dormant = 0
+			_stamp_deadfall_chip(attacker)
+			_stat("deadfall_casts")
 			_sfx("click", -8.0, 0.7)
-			_message("%s rigs a deadfall..." % attacker.unit_name)
-			_log("%s: Deadfall armed — the next enemy to act pays for it" % \
-				attacker.unit_name, "#c8a860")
+			_message("%s arms a deadfall in the path..." % attacker.unit_name)
+			_log("%s: Deadfall armed — %d springs, and it holds a trap slot until spent" % [
+				attacker.unit_name, attacker.deadfall_armed], "#c8a860")
+			if is_perfect:
+				_log("   → a perfect rig: a fourth spring", "#c8a860")
 		"venom_coat":
 			_apply_status(attacker, "venom_coat", 4)
 			_sfx("heal", -9.0, 0.7)
@@ -10223,6 +10221,72 @@ func _forest_bite(enemy: BattleUnit) -> void:
 
 
 # A sprung trap's payload: stun, poison, and every Snares-lane cruelty.
+# ---------- Batch BD: the deadfall as a placed hazard ----------
+
+# THREE NUMBERS, ONE PLACE. The charge count, the rest between springs and the
+# per-spring damage all move together in a re-tune, and the ability text, the
+# chip and the test all read them from here rather than each carrying a copy.
+const DEADFALL_CHARGES := 3        # a perfect rig gets one more
+const DEADFALL_DORMANCY := 2       # enemy turns it rests between springs
+const DEADFALL_SPRING_PCT := 0.20  # of Attack, per spring (was 0.35, once)
+
+
+# THE DEADFALL RESTS AND SPRINGS HERE, AND NOWHERE ELSE. Called from the
+# turn-start block of `_run_battle` for every unit about to act, so the
+# dormancy is counted in the same beats the trap is waiting through — a rest
+# ticked anywhere else would be a second answer to "may it fire".
+#
+# ORDER IS THE WHOLE RULE: a resting trap spends this turn resting and does NOT
+# spring, so `deadfall_dormant` is read before the charge is taken.
+func _deadfall_tick(u: BattleUnit) -> void:
+	if u == null or u.is_hero or u.dead:
+		return
+	for df_h in heroes:
+		if df_h.dead or df_h.deadfall_armed <= 0:
+			continue
+		# Resting: this turn buys one tick and nothing else. `continue` rather
+		# than `break`, because another hero's trap may still be live.
+		if df_h.deadfall_dormant > 0:
+			df_h.deadfall_dormant -= 1
+			_stamp_deadfall_chip(df_h)
+			continue
+		df_h.deadfall_armed -= 1
+		# ONLY A TRAP WITH A CHARGE LEFT RESTS. The last spring frees the slot
+		# outright — that is §1's cost of persistence ending, and the half that
+		# would fail quietly if it were forgotten.
+		df_h.deadfall_dormant = (DEADFALL_DORMANCY if df_h.deadfall_armed > 0 else 0)
+		_stamp_deadfall_chip(df_h)
+		_message("The deadfall springs on %s!" % u.unit_name)
+		_log("%s's deadfall springs on %s%s" % [df_h.unit_name, u.unit_name,
+			(" — %d spring(s) left, resting" % df_h.deadfall_armed) \
+				if df_h.deadfall_armed > 0 else " — its last"], "#c8a860")
+		_stat("deadfall_springs")
+		_spring_trap(df_h, u, DEADFALL_SPRING_PCT * df_h.attack)
+		break
+
+
+# THE CHIP HAS TO SAY MORE THAN IT DID. `DF#` showed how many traps were armed;
+# it now shows CHARGES REMAINING and WHETHER THE TRAP IS RESTING, because a
+# player who cannot see that the deadfall is dormant for two turns cannot plan
+# around it — and the whole value of the ability is that it is a thing sitting
+# on the board. ONE writer, three callers (the cast, the rest tick, the spring),
+# so the three can never disagree about what the trap is doing.
+# NOTE the chip's VISIBLE text is `short`, not `label` (the AT gotcha).
+func _stamp_deadfall_chip(h: BattleUnit) -> void:
+	if h.deadfall_armed <= 0:
+		h.remove_status("deadfall")
+		return
+	var short := "DF%d" % h.deadfall_armed
+	var desc := "A deadfall lies in the path: %d spring(s) left.\nThe next enemy to act takes %d%% of Attack\nas nature damage and is Stunned 1 turn.\nIt holds a trap slot until it is spent." % [
+		h.deadfall_armed, int(round(DEADFALL_SPRING_PCT * 100.0))]
+	if h.deadfall_dormant > 0:
+		short = "DF%d·%d" % [h.deadfall_armed, h.deadfall_dormant]
+		desc += "\nRESTING: it cannot spring for %d more turn(s)." % h.deadfall_dormant
+	if not h.update_status("deadfall", short, desc, h.deadfall_armed):
+		h.add_status("deadfall", "Deadfall", short, Color(0.75, 0.65, 0.30), -1,
+			desc, h.deadfall_armed)
+
+
 func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float,
 		force_stun := false) -> void:
 	if victim == null or victim.dead:
@@ -11378,6 +11442,9 @@ func _print_sim_report() -> void:
 	var dx := faith_report_line(sim_stats)
 	if dx != "":
 		print(dx)
+	var tx := trap_report_line(sim_stats)
+	if tx != "":
+		print(tx)
 	print("=============================================\n")
 
 
@@ -11452,6 +11519,34 @@ static func breadth_report_line(stats: Dictionary) -> String:
 	return "Trapper breadth: %.2f distinct statuses per strike (n=%d strikes, most seen %d)" % [
 		stats.get("breadth_sum", 0.0) / strikes, int(strikes),
 		int(stats.get("breadth_max", 0.0))]
+
+
+# BATCH BD §1 — THE SLOT RULE'S NUMBER. Making a placed deadfall hold a trap
+# slot for as long as it has charges is the clause most likely to make the
+# ability frustrating, and the alternative (it costs no slot at all) is ONE
+# CONDITION in `_ability_usable` — so the decision gets a measurement instead of
+# a guess: how often did the cap actually block a Snare Trap cast, and how often
+# was a charged deadfall the thing blocking it.
+#
+# Banked AT THE REFUSAL, so what is recorded is the gate actually saying no
+# rather than a count of casts inferred afterwards. Shared by the standalone
+# report and RunSim's, the `ruin_report_line` pattern. Returns "" when no
+# deadfall was ever armed — a zero on a party that never had the ability reads
+# as a broken instrument rather than a finding.
+static func trap_report_line(stats: Dictionary) -> String:
+	var casts: float = stats.get("deadfall_casts", 0.0)
+	if casts <= 0.0:
+		return ""
+	var n: float = maxf(stats.get("battles", 0.0), 1.0)
+	var springs: float = stats.get("deadfall_springs", 0.0)
+	var lines := PackedStringArray()
+	lines.append("Deadfall: %.2f casts/battle, %.2f springs/battle, %.2f springs per cast (n=%d battles)" % [
+		casts / n, springs / n, springs / casts, int(n)])
+	lines.append("  trap cap refused: Snare Trap %.2f/battle (%.2f of them with a charged deadfall holding the slot) | Deadfall %.2f/battle" % [
+		stats.get("trap_cap_refused_snare", 0.0) / n,
+		stats.get("trap_cap_refused_snare_by_deadfall", 0.0) / n,
+		stats.get("trap_cap_refused_deadfall", 0.0) / n])
+	return "\n".join(lines)
 
 
 # BATCH BC §1 — THE DEVOUT'S AGGREGATE, DECOMPOSED. Batch AW measured his

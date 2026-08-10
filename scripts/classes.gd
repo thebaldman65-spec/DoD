@@ -485,11 +485,20 @@ static func survivalist_pool_ability(display_name: String) -> Ability:
 				"applies_status": {"id": "cripple", "turns": 3},
 				"perfect_id": "status_plus", "perfect_text": "Everything lasts 4 turns",
 				"description": "A tearing shot through the leg:\nCripple, Slowed AND Exposed for\n3 turns — three statuses in one cast."})
+		# BATCH BD — RE-SPECCED FROM A ONE-SHOT MINE INTO A PLACED HAZARD.
+		# Read against the base kit, the old Deadfall WAS Snare Trap: same cost,
+		# same initiative, same cooldown, same 1-turn stun at the victim's turn
+		# start, both against the same trap cap — and the only distinction (you
+		# don't pick) was handed straight back by its perfect. UNTARGETED IS THE
+		# DESIGN NOW rather than the drawback, so the perfect can no longer name
+		# the victim: that clause is exactly what collapsed the two abilities.
+		# Per-spring damage is 35% -> 20% because there are THREE of them; the
+		# payoff is three turns of denial rather than the numbers.
 		"Deadfall":
-			return Ability.make({"display_name": "Deadfall", "cooldown": 3, "cost": 20,
+			return Ability.make({"display_name": "Deadfall", "cooldown": 5, "cost": 25,
 				"special": "deadfall", "delay": 2.0, "anim": "attack01",
-				"perfect_id": "", "perfect_text": "Choose who the trap takes.",
-				"description": "Rig an untargeted deadfall: the NEXT\nenemy to act takes 35 nature damage\nand is Stunned for 1 turn. You don't\npick the victim — whoever moves first\npays for it. A PERFECT rig lets you\nname them."})
+				"perfect_id": "", "perfect_text": "A fourth spring.",
+				"description": "Arm a deadfall in the path. The next\nenemy to act takes 20% Atk nature\ndamage and is Stunned 1 turn; the trap\nthen lies dormant 2 turns, re-arms and\nsprings again — THREE times in all.\nIt holds a trap slot until spent.\nA PERFECT rig gets a fourth."})
 		"Harvest":
 			return Ability.make({"display_name": "Harvest", "cooldown": 4, "cost": 25,
 				"special": "harvest", "delay": 3.0, "anim": "attack02",

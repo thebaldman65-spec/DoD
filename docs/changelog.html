@@ -5,6 +5,156 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-09 &mdash; Batch BD: Deadfall becomes a placed hazard</h2>
+<p><i>One ability. No tree is touched, no magnitude in the tree moves, no other spec is
+involved, no save version moves (still v7).</i></p>
+
+<p><b>THE FINDING FIRST, BECAUSE THE RE-SPEC IS ONLY ITS CONSEQUENCE. Read side by side,
+Deadfall and Snare Trap were the same ability</b> &mdash; and had been for fourteen batches:</p>
+<table border="1" cellpadding="4">
+<tr><th></th><th>Snare Trap (base kit)</th><th>Deadfall (trophy pool)</th></tr>
+<tr><td>Cost</td><td>20 Mana</td><td>20 Mana</td></tr>
+<tr><td>Initiative</td><td>2.0</td><td>2.0</td></tr>
+<tr><td>Cooldown</td><td>3</td><td>3</td></tr>
+<tr><td>Victim</td><td>one you choose</td><td>the next enemy to act</td></tr>
+<tr><td>Effect</td><td>Stun 1, Poison 4</td><td>35% Atk nature, Stun 1</td></tr>
+<tr><td>Perfect</td><td>the stun beats an unbroken boss</td><td><b>you name the victim</b></td></tr>
+</table>
+<p>Same cost, same speed, same cooldown, both traps, both against the same trap cap, both a
+1-turn stun springing at the victim's turn start. <b>The single distinction was that Deadfall
+does not let you pick &mdash; and its perfect handed that back.</b> A perfect Deadfall
+<i>was</i> a Snare Trap that traded poison for damage. And the trade ran against his own spine:
+Trapper pays +8% per <i>different</i> status on the target, Snare Trap lands two (three with
+Quick Rigging), Deadfall landed one. It cost a zone-boss pick for an ability that was harder to
+aim and fed his passive less.</p>
+
+<ul>
+<li><b>&sect;1 DEADFALL, RE-SPECCED. 25 Mana, 2.0 initiative, 5 turn cooldown, untargeted.</b>
+Arm a deadfall in the path: the next enemy to act takes <b>20% of Attack as nature damage and
+is Stunned for 1 turn</b>. The trap then <b>lies dormant for 2 turns, re-arms itself, and
+springs again &mdash; three times in all. Perfect: four.</b>
+<br><b>Untargeted is the design now rather than the drawback</b>, so the perfect no longer
+names the victim &mdash; that clause is precisely what collapsed the two abilities, and it
+would have survived any re-spec that did not delete it deliberately. A snare catches one animal
+you picked; a deadfall sits in the trail and takes whoever walks it.
+<br>Per-spring damage falls 35% &rarr; 20% <b>because there are three of them</b>: 60% total
+against a single ability's worth, with the real payoff in three turns of denial rather than in
+the numbers. Bosses shrug the stun unless Broken, by the ordinary rule &mdash; and note the
+synergy that falls out rather than being designed in: <b>three attempts across a fight means a
+Snares build grinding a boss's Break gets its stun the moment the Break lands</b>, without
+needing the perfect rig Snare Trap does.</li>
+
+<li><b>THE SLOT RULE, AND THE NUMBER BEHIND IT.</b> A deadfall occupies one trap slot for as
+long as it has springs left. That is the honest cost of persistence and it ties a trophy to a
+tree node: at the base cap of one, arming a deadfall locks out Snare Trap until it is spent,
+and <b>Deadfall Network's three slots become genuinely valuable to him</b> rather than a
+stacking bonus. It is also the clause most likely to make the ability feel bad, so <b>the gate
+is instrumented at the refusal itself</b> &mdash; <code>trap_report_line()</code> reports casts,
+springs, springs-per-cast and <b>how often the cap actually refused a Snare Trap, split by
+whether a charged deadfall was the thing holding the slot</b>.
+<br><b>AND THE ANSWER IS NOT SUBTLE. Kit smoke, n=200 battles, lineup
+berserker/pyromancer/inquisitor/mystic with Deadfall granted:</b></li>
+</ul>
+<table border="1" cellpadding="4">
+<tr><th>row</th><th>Deadfall casts/battle</th><th>springs/battle</th><th>springs per cast</th>
+<th>Snare Trap casts/battle</th><th>Snare Trap refused by the cap</th></tr>
+<tr><td><b>base cap of one</b> (no talents)</td><td>1.06</td><td>2.24</td><td><b>2.10</b></td>
+<td>1.4</td><td><b>3.03/battle &mdash; all 3.03 of them with a charged deadfall holding the slot</b></td></tr>
+<tr><td>full SNARES lane (Deadfall Network, cap 3)</td><td>1.03</td><td>2.42</td><td>2.35</td>
+<td><b>2.6</b></td><td><b>0.00</b></td></tr>
+</table>
+<ul>
+<li><b>READ THAT SECOND COLUMN AGAINST THE LAST ONE: at the base cap the deadfall blocks a
+Snare Trap cast ABOUT THREE TIMES A BATTLE, which is more often than Snare Trap is actually
+cast</b> (1.4), <b>and every single refusal is the deadfall's doing.</b> Deadfall Network takes
+it to zero and nearly doubles his Snare Trap casts, 1.4 &rarr; 2.6. <b>So the clause does
+exactly what it was expected to do, at a size worth knowing before deciding whether to keep
+it</b> &mdash; the alternative (a deadfall costs no slot at all) is one condition at that same
+gate. <b>Shipped holding a slot, as specified, with the number attached.</b>
+<br><b>A second figure worth having: springs per cast is 2.10, not 3.</b> A smoke fight is over
+in seven rounds and the third charge often never lands, which also means the 270-Break Bone
+Breaker figure below is a full-deadfall ceiling rather than a typical fight. A run is where
+that number will mean something.</li>
+
+<li><b>SURVIVALIST ROWS, for context and NOT as a difficulty reading</b> (kit-mechanics ratios
+only; ./sim.sh carries no difficulty signal since Batch R): base cap <b>27% damage share
+(170/battle), Trapper breadth 1.25</b>; full SNARES lane <b>28% (178), breadth 1.56</b>. Both
+40/40-equivalent clean, 0 SCRIPT ERROR.</li>
+
+<li><b>&sect;2 THE FIELD KEPT ITS NAME AND CHANGED ITS UNIT, which is the class of change that
+fails silently.</b> <code>deadfall_armed</code> counted <i>armed traps</i> and now counts
+<i>charges remaining</i> on the one deadfall a cast places. Every read site moved with it: the
+spring decrements it, the chip renders it, and <b>the trap cap counts a charged deadfall as
+exactly ONE occupant</b> &mdash; left alone, a three-charge trap would have filled Deadfall
+Network's cap by itself, spending the node it is meant to make valuable.
+<code>deadfall_dormant</code> is new. <b><code>deadfall_aims</code> is DELETED, not left
+unreachable</b> (the BA precedent): the perfect no longer names a target, so the array could
+never be non-empty, and the test asserts the field <i>does not exist</i> rather than that it is
+empty.
+<br><b>The rest-and-spring rule was extracted into <code>_deadfall_tick()</code></b>, because
+<code>_run_battle</code> cannot be driven headlessly (the AR trap) and a rule left inside it can
+only ever be checked by a grep &mdash; its negative controls could never fail. Its position is
+asserted too: it runs <i>above</i> the stunned branch, so the stun a spring lands costs the
+victim the very turn it walked into the trap.</li>
+
+<li><b>THREE TALENT NODES NOW PAY PER SPRING, AND THAT IS THREE TIMES WHAT THEY USED TO.
+MEASURED, not estimated:</b> <b>Bone Breaker pays 90 Break on each of three springs = 270
+across a full deadfall</b> &mdash; the largest number in the batch and quite possibly the most
+Break any single cast in the game produces; <b>Cruel Devices multiplies each spring by 1.5</b>
+(81 damage across three at 100 Attack, against 30 for one 35% spring); and <b>Caught Fast is
+re-applied on every spring</b>, so five turns of unhealable becomes a rolling lock. None of the
+three is changed here. The figures are reported so the next decision has them.</li>
+
+<li><b>THE CHIP HAS TO SAY MORE THAN IT DID.</b> <code>DF#</code> showed how many traps were
+armed; it shows <b>springs remaining and whether the trap is resting</b> &mdash; <code>DF3</code>
+armed and ready, <code>DF2&middot;2</code> for two springs left and two turns of rest, with the
+tooltip saying so in words. A player who cannot see that the deadfall is dormant cannot plan
+around it, and the whole value of the ability is that it is a thing sitting on the board.</li>
+
+<li><b>&sect;3 THE BOT ARMS IT EARLY NOW.</b> Deadfall sat <i>last</i> in the rotation, which
+was right for a one-shot mine and wrong for a persistent investment: a trap with three charges
+wants arming while there are turns left to spend them. It moved to <b>directly below Snare
+Trap</b>, gated on there being no deadfall already out (the cap refuses a second at a cap of
+one, but Deadfall Network would not, and two deadfalls are not a thing).
+<br><b>&sect;3's own instruction to verify the rotation at its site found the brief's premise
+half stale</b>: it describes the live order as
+<code>snare &rarr; venom coat &rarr; hamstring &rarr; harvest &rarr; deadfall</code>, and the
+code reads <code>snare &rarr; hamstring &rarr; venom coat &rarr; harvest &rarr; hamstring again
+&rarr; deadfall</code> &mdash; Batch BA put breadth before depth, so Hamstring appears twice and
+above Venom Coating. Corrected toward the code; the move itself is unaffected.</li>
+
+<li><b>&sect;4 AN OPEN THREAD, RECORDED AND NOT ACTED ON.</b> Batch AH's curation rule checks
+that a CLASS-pool entry works for a sibling spec. <b>Nothing has ever checked a SPEC pool for
+redundancy against its own base kit</b> &mdash; which is why this duplication survived fourteen
+batches and was caught by a player reading two tooltips. A pass across all twelve spec pools,
+comparing each entry against its own kit, is worth doing and is not this batch: twelve pools,
+five to eight entries apiece, and any redundancy found is a design decision rather than a
+fix.</li>
+
+<li><b>VERIFIED.</b> check_parse 0, check_flow 0 (6 screens), 11 scenes 0 SCRIPT ERROR,
+run-harness gates 1/2/3 PASS. New <code>test_batch_bd.gd</code> <b>69 checks / 0 failures</b>.
+<br><b>Four negative controls, each applied to the code and reverted</b> (the suite came back to
+69/0 after the last): a spring not decrementing the charges trips <b>10</b>; the dormancy not
+blocking a consecutive spring trips 5; the slot never freeing after the last charge trips 2;
+and <b>the cap counting CHARGES as occupants &mdash; the unit change simply un-made &mdash;
+trips 2</b>, which is the one worth having, because that is the failure the rename invites and
+nothing else in the game would have complained about it.
+<br><b>Three test re-points, each with the reason in the file:</b> test_batch_ah's perfect-text
+map reads "A fourth spring."; <b>test_batch_ah_battle's Deadfall check was written to cover the
+human-only target picker this batch DELETES</b>, so it now drives what survives underneath
+(does a perfect rig pay more?) and asserts the old field gone &mdash; 65 &rarr; 63 checks; and
+test_batch_ba's trap-cap check fills the cap with real occupants (a deadfall plus snares)
+because the unit of the field it drove has changed under it.
+<br><b>Regression, everything else at its Batch BE count with zero drift</b> &mdash; ah 5587,
+ai 2036, an 6052, aj 403, ak 527, al 559, ar 887, as 387, at 461, au 335, av 315, aw 338,
+ax 329, ay 455, az 489, ba 647, bb 172, bc 91, be 31, test_runes 2973, test_rune_battle 96,
+all 0 failures.
+<br><b>Live autoplay clean</b>, and it reads correctly in a real fight: "Deadfall armed &mdash;
+4 springs, and it holds a trap slot until spent" / "a perfect rig: a fourth spring", then
+"springs on Orc Archer &mdash; 3 spring(s) left, resting", the stun costing the Archer that
+turn, and the trap coming back twice more across the fight.</li>
+</ul>
+
 <h2>2026-08-09 &mdash; Batch BE: Communion, 40 &rarr; 15</h2>
 <p><i><b>One number changes.</b> Communion's chance falls from (40 &times; the recipient's Faith
 stacks)% to (15 &times; the recipient's stacks)%. Nothing else in the game moves &mdash; no other

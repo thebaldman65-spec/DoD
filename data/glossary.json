@@ -126,7 +126,7 @@
    "see_also": ["status_burn", "status_sunder"]},
   {"id": "status_snared", "term": "Snared", "category": "statuses",
    "short": "A trap waits: next action springs a stun and poison.",
-   "long": "A Survivalist trap waits underfoot: the next time this enemy acts, the trap springs - it is Stunned for a turn and Poisoned. Trap talents add crippling, bone-breaking Break damage, or wounds that refuse healing.",
+   "long": "A Survivalist trap waits underfoot: the next time this enemy acts, the trap springs - it is Stunned for a turn and Poisoned. Trap talents add crippling, bone-breaking Break damage, or wounds that refuse healing. A SNARE IS SET UNDER ONE ENEMY AND SPRINGS ONCE; a Deadfall is untargeted, takes whoever acts next, and springs three times over a fight with two turns of rest between.",
    "see_also": ["status_stunned", "status_caught"]},
   {"id": "status_caught", "term": "Caught Fast", "category": "statuses",
    "short": "Cannot be healed.",

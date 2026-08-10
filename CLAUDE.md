@@ -235,6 +235,99 @@ every enemy permanently Poisoned), Plague Bearer (rot leaps enemy to enemy), Cre
 (a corpse passes its stacks to the living) and the NAME Virulence (a pathogen term). SNARES
 and GUERILLA were never disease and are untouched by the rule.
 
+BATCH BD (08-09) — DEADFALL BECOMES A PLACED HAZARD. **ONE ABILITY.** No tree is touched, no
+magnitude in the tree moves, no other spec is involved, no save version moves (still v7).
+§0 **THE FINDING, WHICH IS WORTH MORE THAN THE RE-SPEC: DEADFALL AND SNARE TRAP WERE THE SAME
+ABILITY, AND HAD BEEN FOR FOURTEEN BATCHES.** Same 20 Mana, same 2.0 initiative, same 3
+cooldown, both traps, both against the same trap cap, both a 1-turn stun springing at the
+victim's turn start. **The single distinction was that Deadfall does not let you pick — and its
+PERFECT handed that back.** It also ran against his own spine: Trapper pays +8% per DIFFERENT
+status, Snare Trap lands two (three with Quick Rigging), Deadfall landed one.
+§1 **RE-SPECCED: 25 Mana, 2.0, 5cd, UNTARGETED. The next enemy to act takes 20% of Attack as
+nature damage and is Stunned 1 turn; the trap then lies DORMANT 2 TURNS, re-arms and springs
+again — THREE TIMES IN ALL. Perfect: FOUR.** Per-spring damage 35% -> 20% because there are
+three of them. **UNTARGETED IS THE DESIGN NOW RATHER THAN THE DRAWBACK, so the perfect can no
+longer name the victim — that clause is exactly what collapsed the two abilities and it would
+have survived any re-spec that did not delete it deliberately.** Bosses shrug the stun unless
+Broken, by the ordinary rule (the spring passes no `force_stun`); the synergy that falls out
+rather than being designed in is that **three attempts across a fight means a Snares build
+grinding a boss's Break gets its stun the moment the Break lands**, without the perfect rig
+Snare Trap needs.
+§2 **`deadfall_armed` IS THE SAME FIELD WITH A DIFFERENT UNIT — THE CLASS OF CHANGE THAT FAILS
+SILENTLY.** It counted ARMED TRAPS and counts **CHARGES REMAINING** on the one deadfall a cast
+places. Every read site moved with it, and **the trap-cap gate is the one that would have
+failed quietly: a charged deadfall is ONE occupant however many springs it has left.** Left
+alone, a three-charge trap would have filled Deadfall Network's cap of three by itself and
+spent the node the rule exists to make valuable. `deadfall_dormant` is new (and is deliberately
+NOT in `Runes.STAT_INT_KEYS` — no rune writes it). **`deadfall_aims` IS DELETED WITH ITS READ
+SITE** (the BA precedent — a field nothing can write goes, so a later batch cannot write one);
+the test asserts the field **DOES NOT EXIST** rather than that it is empty.
+**THE REST-AND-SPRING RULE IS ITS OWN FUNCTION, `_deadfall_tick(u)`** — `_run_battle` cannot be
+driven headlessly (the AR trap), so a rule left inside it can only ever be checked by a grep
+and its negative controls could never fail (the AW `_ground_faith_tick` / BA
+`_perfected_toxin_tick` precedent). **ITS POSITION IS LOAD-BEARING AND ASSERTED: it runs ABOVE
+the stunned branch**, so the stun a spring lands costs the victim the very turn it walked into
+the trap. Three constants in one place: `DEADFALL_CHARGES` 3, `DEADFALL_DORMANCY` 2,
+`DEADFALL_SPRING_PCT` 0.20. **THE CHIP IS WRITTEN BY ONE FUNCTION, `_stamp_deadfall_chip`,
+THREE CALLERS** (cast, rest, spring) — `DF3` armed and ready, **`DF2·2`** for two springs left
+and two turns of rest. NOTE the visible text is `short`, not `label` (the AT gotcha).
+**THREE TALENT NODES NOW PAY PER SPRING AND THAT IS THREE TIMES WHAT THEY USED TO. MEASURED,
+not estimated: BONE BREAKER PAYS 90 BREAK ON EACH OF THREE SPRINGS = 270 ACROSS A FULL
+DEADFALL** — the largest number in the batch and possibly the most Break any single cast in the
+game produces; **Cruel Devices multiplies each spring by 1.5** (81 damage across three at 100
+Attack, against 30 for one 35% spring); **Caught Fast is re-applied on every spring**, so five
+turns of unhealable becomes a rolling lock. None of the three is changed here.
+§1 **THE SLOT RULE SHIPPED WITH ITS NUMBER, WHICH IS THE POINT OF THE SECTION. A deadfall holds
+one trap slot for as long as it has springs left**, and the gate is instrumented AT THE REFUSAL
+(`trap_report_line()`, static, shared by the standalone report and RunSim's — the
+`ruin_report_line` pattern; "" when no deadfall was ever armed). **KIT SMOKE, n=200, lineup
+berserker,pyromancer,inquisitor,mystic with Deadfall granted:**
+· **BASE CAP OF ONE (no talents): 1.06 casts/battle, 2.24 springs/battle, 2.10 springs per
+cast; Snare Trap cast 1.4/battle and REFUSED BY THE CAP 3.03/battle — ALL 3.03 OF THEM WITH A
+CHARGED DEADFALL HOLDING THE SLOT.**
+· **FULL SNARES LANE (Deadfall Network, cap 3): 1.03 casts, 2.42 springs, 2.35 per cast;
+Snare Trap cast 2.6/battle, REFUSED 0.00.**
+**THE DEADFALL BLOCKS A SNARE TRAP CAST ABOUT THREE TIMES A BATTLE AT THE BASE CAP — MORE OFTEN
+THAN SNARE TRAP IS ACTUALLY CAST — AND DEADFALL NETWORK NEARLY DOUBLES HIS SNARE CASTS (1.4 ->
+2.6).** The clause does exactly what it was expected to do, at a size worth knowing. **SHIPPED
+HOLDING A SLOT AS SPECIFIED; the alternative is ONE CONDITION at that same gate and the
+decision now has a measurement instead of a guess.** **SECOND FIGURE WORTH HAVING: SPRINGS PER
+CAST IS 2.10, NOT 3** — a smoke fight ends in seven rounds and the third charge often never
+lands, **so the 270 Break above is a full-deadfall CEILING rather than a typical fight.** A run
+is where that number will mean something. Survivalist rows for context only, NO difficulty
+signal (Batch R): base cap 27% share (170/battle), breadth 1.25; SNARES 28% (178), 1.56.
+§3 **THE BOT ARMS IT EARLY. Deadfall moved from LAST in the rotation to directly below Snare
+Trap**, gated on `u.deadfall_armed <= 0` — the cap refuses a second at a cap of one, but
+Deadfall Network would not, and two deadfalls are not a thing. **§3'S OWN INSTRUCTION TO VERIFY
+THE ROTATION AT ITS SITE FOUND THE BRIEF HALF STALE**: it describes the order as `snare -> venom
+coat -> hamstring -> harvest -> deadfall`, and the code reads `snare -> hamstring -> venom coat
+-> harvest -> hamstring AGAIN -> deadfall` (BA put breadth before depth). Corrected toward the
+code; the move is unaffected. Instrument honesty, not tuning: NO DIFFICULTY MEASUREMENT.
+§4 **OPEN THREAD, RECORDED AND NOT ACTED ON — see the entry in "Known open threads" below.**
+Batch AH's curation rule checks a CLASS-pool entry against a sibling spec; **nothing has ever
+checked a SPEC pool for redundancy against its own base kit.**
+VERIFIED: check_parse 0, check_flow 0 (6 screens), 11 scenes 0 SCRIPT ERROR, run-harness gates
+1/2/3 PASS. NEW test_batch_bd.gd **69/0**.
+NEGATIVE CONTROLS RUN, the three §6 named plus one of its own, each applied and reverted (the
+suite came back to 69/0 after the last): **a spring not decrementing the charges trips 10**, the
+dormancy not blocking a consecutive spring trips 5, the slot never freeing after the last charge
+trips 2, and **the cap counting CHARGES as occupants — the unit change simply un-made — trips
+2.** That last is the one worth having: it is the failure the rename invites and nothing else in
+the game would have complained about it.
+**THREE TEST RE-POINTS, each with the reason in the file:** test_batch_ah's perfect-text map
+reads "A fourth spring."; **test_batch_ah_battle's Deadfall check was written to cover the
+human-only target picker this batch DELETES**, so it drives what survives underneath (does a
+perfect rig pay more) and asserts the old field gone — **65 -> 63 checks**; and test_batch_ba's
+trap-cap check fills the cap with REAL occupants (a deadfall plus snares), because the unit of
+the field it drove changed under it.
+Regression, everything else at its BE count with ZERO DRIFT — ah 5587, ai 2036, an 6052, aj 403,
+ak 527, al 559, ar 887, as 387, at 461, au 335, av 315, aw 338, ax 329, ay 455, az 489, ba 647,
+bb 172, bc 91, be 31, test_runes 2973, test_rune_battle 96, all 0 failures.
+LIVE AUTOPLAY clean (0 SCRIPT ERROR) and it reads correctly in a real fight: "Deadfall armed —
+4 springs, and it holds a trap slot until spent" / "a perfect rig: a fourth spring", then
+"springs on Orc Archer — 3 spring(s) left, resting", the stun costing the Archer that turn, and
+the trap returning twice more across the fight.
+
 BATCH BE (08-09) — COMMUNION, 40 -> 15. **ONE NUMBER.** Nothing else in the game moves — no
 other magnitude, no re-spec, no spec touched, no save version (still v7). Every id survives.
 §1 **`dv_communion` PAYS 15, NOT 40** — the chance is `(15 x the RECIPIENT's own Faith
@@ -4729,6 +4822,23 @@ Space or left click; no announcer text (combat log only).
     see the standing note "WHAT A CONTRIBUTION SHARE CANNOT SEE" at `DOD_SIM_TALENTS`.**
   · **READ THE LEVEL OFF THE ALL-FOUR ROWS, NOT THE ONE-HERO ONES** — see the same standing
     note. Both constructions agree about the cause and disagree about the level.
+- **NOTHING HAS EVER CHECKED A SPEC POOL FOR REDUNDANCY AGAINST ITS OWN BASE KIT (Batch BD §4).
+  RECORDED, NOT ACTED ON.** Batch AH's curation rule checks that a CLASS-pool entry still
+  FUNCTIONS for a sibling spec — a real rule, tested, and pointed at a different question.
+  **Deadfall duplicated Snare Trap for fourteen batches** (same cost, initiative, cooldown, trap
+  cap and 1-turn stun, with its perfect handing back the only distinction) **and was caught by a
+  player reading two tooltips, not by anything in the harness.** A pass across all twelve spec
+  pools comparing each entry against its own kit is worth doing and is NOT a repair batch:
+  twelve pools, five to eight entries apiece, and **any redundancy it finds is a design decision
+  rather than a fix** — the answer to two similar abilities is usually to make one of them
+  something else, which is authoring.
+- **A DEADFALL HOLDS A TRAP SLOT UNTIL SPENT, AND THAT COSTS A MEASURED 3.03 SNARE TRAP CASTS A
+  BATTLE AT THE BASE CAP (Batch BD §1).** Shipped as specified. **The alternative — a deadfall
+  costs no slot at all — is ONE CONDITION in `_ability_usable`**, and the number is now on the
+  table for the designer rather than a guess: at a cap of one the deadfall refuses more Snare
+  Trap casts than Snare Trap actually gets (1.4/battle), every refusal is the deadfall's, and
+  Deadfall Network takes refusals to zero while nearly doubling his snares (1.4 -> 2.6).
+  `trap_report_line()` prints it, so a re-decision does not need a new instrument.
 - Menu background image not yet in imported files (fallback: forest art).
 - Distinct Mage/Cleric/Hunter sprites awaited from user.
 - Boss tri-choice class modifiers deferred (design doc) until 3+ zones.

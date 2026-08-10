@@ -799,10 +799,23 @@ func _live_trap_cap() -> void:
 	scene = await _spawn({"sv_network": 1})
 	h = _hero(scene, 3)
 	ok(h.deadfall_network == 3, "Deadfall Network installs a cap of THREE")
-	h.deadfall_armed = 2
-	ok(scene.call("_ability_usable", h, snare),
-		"two traps out under Deadfall Network: a THIRD is allowed")
+	# RE-POINTED IN PLACE BY BATCH BD, with the reason in the file, because the
+	# UNIT of `deadfall_armed` changed underneath this check: it counted armed
+	# TRAPS and now counts CHARGES on the ONE deadfall a cast places, so a
+	# 3-charge trap is ONE occupant rather than three. Filling the cap therefore
+	# means real occupants — a deadfall plus snared enemies — which is what the
+	# question was always about. THE QUESTION IS UNCHANGED: the cap is the
+	# counter, not a hardcoded 2. test_batch_bd owns the charges-are-not-traps
+	# half directly.
+	var ba_idx: int = scene.get("heroes").find(h)
+	var ba_foes: Array = scene.get("enemies")
 	h.deadfall_armed = 3
+	ba_foes[0].add_status("snared", "Snared", "Sn", Color(0.75, 0.65, 0.30), -1,
+		"", ba_idx)
+	ok(scene.call("_ability_usable", h, snare),
+		"a deadfall plus ONE snare under Deadfall Network: a THIRD trap is allowed")
+	ba_foes[1].add_status("snared", "Snared", "Sn", Color(0.75, 0.65, 0.30), -1,
+		"", ba_idx)
 	ok(not scene.call("_ability_usable", h, snare),
 		"...and a fourth is refused — the cap is the counter, not a hardcoded 2")
 	await _kill(scene)
