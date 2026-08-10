@@ -716,9 +716,20 @@ func _live_growth_heals() -> void:
 # ---------- live: §1 the Apostle row, which is the one that matters ----------
 
 func _live_apostle_stream() -> void:
-	# Apostle stops releases consuming stacks, so every FURTHER Faith gain
-	# re-triggers one. The batch takes 3% uncapped deliberately, to see what a
-	# stream of releases does — MEASURED AND REPORTED, never capped here.
+	# RE-POINTED TWICE, AND THE SECOND TIME THE STREAM ITSELF WENT AWAY.
+	# AW wrote this against an Apostle that stopped releases consuming stacks,
+	# so every further Faith gain re-triggered one; AY §9 halved what those
+	# free re-triggers paid; BATCH BG §2 MOVED THE CAPSTONE OFF THE RELEASE
+	# AXIS ENTIRELY. Nothing parks an ally at five any more, so the stream is
+	# not a thing the game can produce and the row it fed cannot be re-measured.
+	#
+	# What survives is the QUESTION this check was really asking — how much
+	# maximum health a long fight's worth of releases lends the Devout — and
+	# it is now asked of the shape the game actually has: thirteen releases,
+	# each one rebuilt from zero, each one consuming its stacks and paying the
+	# full 3%. The old number (13 x 15 on a 1000 base) is what it read while
+	# Apostle multiplied frequency; the new one is 13 x 30, and BG's own suite
+	# holds the negative control that the park is gone.
 	var scene := await _spawn({"dv_apostle": 1})
 	var dv := _hero(scene, 2)
 	var ally := _hero(scene, 0)
@@ -729,20 +740,17 @@ func _live_apostle_stream() -> void:
 	dv.conviction_base_hp = 0
 	ally.faith_stacks = 0
 	scene._gain_faith(ally, 5)
-	ok(ally.faith_stacks == 5, "Apostle parks the ally at 5 Faith")
-	# Twelve further single gains, i.e. a long fight's worth of absorbs.
+	ok(ally.faith_stacks == 0,
+		"Batch BG: a release under Apostle consumes the stacks like any other")
+	# Twelve further releases, i.e. a long fight's worth of absorbs — but each
+	# one now costs five gains rather than one, which IS the repair.
 	for i in 12:
-		scene._gain_faith(ally, 1)
-	ok(ally.faith_stacks == 5, "...and every further gain re-triggers the release")
-	# RE-POINTED BY BATCH AY §9, with the reason in the file: EVERY ONE of
-	# these 13 releases consumed no stacks (that is what Apostle does), so
-	# every one now pays HALF growth — 15 on a 1000 base, not 30. AW measured
-	# the stream and reported it; AY is the batch that acted on it, and this
-	# assertion is where the change is visible.
-	ok(dv.max_hp == 1000 + 13 * 15,
-		"13 releases under Apostle = +19%% of base at half growth (got +%d%%)" % (
+		scene._gain_faith(ally, 5)
+	ok(ally.faith_stacks == 0, "...and each of them resets him again")
+	ok(dv.max_hp == 1000 + 13 * 30,
+		"13 releases = +39%% of base at the full step (got +%d%%)" % (
 			(dv.max_hp - 1000) * 100 / 1000))
-	_report.append("APOSTLE ROW (AW's number, AY's fix): 13 releases in one fight = max_hp 1000 -> %d, +%d%% (was +39%%)" % [
+	_report.append("APOSTLE ROW (AW's number, re-pointed by BG): 13 releases in one fight = max_hp 1000 -> %d, +%d%% — and under BG each one costs five Faith gains, not one" % [
 		dv.max_hp, (dv.max_hp - 1000) * 100 / 1000])
 	await _kill(scene)
 

@@ -99,7 +99,7 @@ const STATUS_INFO := {
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge is spent for this\nbattle — the storm has no feeding\nleft in it."],
 	"sanctified": ["Hallowed", "Hw", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
 	"capacitor": ["Holy Capacitor", "HC", Color(0.95, 0.9, 0.6), "Stored overhealing, released by\nthe next Heal."],
-	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith — 3% mitigation and +2%\ndamage per stack; at 5 the bearer\nis healed and the Faith resets."],
+	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith — 3% mitigation and +2%\ndamage per stack (doubled by Apostle);\nat 5 the bearer is healed and the\nFaith resets."],
 	"cons_ground": ["Consecrated Ground", "CG", Color(0.9, 0.82, 0.5), "Standing on holy ground: takes 15%\nless damage and reflects 10% of\ndamage taken."],
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
 	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],
@@ -4992,11 +4992,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Blessing of Zeal: kindled allies strike harder.
 			if attacker.has_status("zeal"):
 				raw *= 1.15
-			# Conviction: each Faith stack sharpens the blade (+2%) — while
-			# the Devout stands.
-			if attacker.is_hero and attacker.faith_stacks > 0 \
-					and _living_devout() != null:
-				raw *= 1.0 + 0.02 * attacker.faith_stacks
+			# Conviction: each Faith stack sharpens the blade — +2% a stack,
+			# DOUBLED to +4% under Apostle (Batch BG §2) — while the Devout
+			# stands. The multiplier reads the DEVOUT's capstone and the
+			# CARRIER's stacks: the bonus lands on whoever holds the Faith.
+			if attacker.is_hero and attacker.faith_stacks > 0:
+				var fd_dv := _living_devout()
+				if fd_dv != null:
+					raw *= 1.0 + 0.01 * FAITH_DAMAGE_PCT \
+						* _faith_stack_mult(fd_dv) * attacker.faith_stacks
 			# Dark Infusion: the Occultist feeds on the enemy team's afflictions.
 			if attacker.infusion_ranks > 0:
 				raw *= 1.0 + 0.02 * attacker.infusion_ranks * _unique_enemy_debuffs()
@@ -5388,13 +5392,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 0.85
 				if strike_target.is_hero:
 					_devout_prev(_living_devout(), pv_was - raw, "ground")
-			# Conviction: each Faith stack turns the blade (3%) — while the
-			# Devout stands.
-			if strike_target.is_hero and strike_target.faith_stacks > 0 \
-					and _living_devout() != null:
-				var pv_was := raw
-				raw *= 1.0 - 0.03 * strike_target.faith_stacks
-				_devout_prev(_living_devout(), pv_was - raw, "stacks")
+			# Conviction: each Faith stack turns the blade — 3% a stack,
+			# DOUBLED to 6% under Apostle (Batch BG §2) — while the Devout
+			# stands. It still books to HIM (`_devout_prev`), which is why
+			# the capstone can raise his prevented/battle without moving his
+			# `d+h+p%` share much: the damage half lands on his allies and
+			# raises the denominator instead.
+			if strike_target.is_hero and strike_target.faith_stacks > 0:
+				var fp_dv := _living_devout()
+				if fp_dv != null:
+					var pv_was := raw
+					raw *= 1.0 - 0.01 * FAITH_MITIGATION_PCT \
+						* _faith_stack_mult(fp_dv) * strike_target.faith_stacks
+					_devout_prev(fp_dv, pv_was - raw, "stacks")
 			# Iron Will: adversity hardens the Warden — 12%/rank less damage
 			# taken per debuff on him (the chip tracks the live total; the
 			# floor is a sanity clamp for absurd debuff piles).
@@ -7973,10 +7983,36 @@ func _detonate_ruin(target: BattleUnit) -> void:
 var _communion_chain := false
 
 
+# BATCH BG §2 — CONVICTION'S HELD HALF, AND THE ONE NODE THAT TOUCHES IT.
+# Faith has two halves: what a stack does WHILE HELD, and what happens when
+# five of them RELEASE. Every one of the eight Faith nodes acts on the release
+# half — Communion spreads it, Fervor and Sacred Covenant feed it, Blessed are
+# the Faithful deepens its heal, Binding Oath (and, until this batch, Apostle)
+# changes what it consumes. NOTHING IN THE LANE HAD EVER TOUCHED THE HELD HALF.
+# That is the whole reason it was the axis available for the re-spec: a lane
+# where seven nodes and a capstone all act on one term is one node with eight
+# prices, and Apostle multiplying RELEASE FREQUENCY is exactly what made it
+# cancel against Communion (BF measured the capstone at −8 one-hero / −2 all
+# four AFTER the Communion repair — taking it LOWERED the engine it sits on).
+#
+# Apostle now doubles both per-stack terms instead. ONE MULTIPLIER, ONE GATE,
+# THREE CALLERS — the two damage sites and the status chip — so the tooltip can
+# never describe a number the arithmetic does not use.
+const FAITH_MITIGATION_PCT := 3
+const FAITH_DAMAGE_PCT := 2
+
+
+# What a single Faith stack is worth right now, as a multiplier on the two
+# constants above. `devout` may be null; every caller has already established
+# that he stands, because the stacks do nothing at all when he does not.
+func _faith_stack_mult(devout: BattleUnit) -> int:
+	return 2 if devout != null and devout.apostle > 0 else 1
+
+
 # Conviction: a mitigated hit steels the struck ally. At 5 stacks the
 # ally is healed (Blessed are the Faithful deepens it), Faith resets —
-# unless Binding Oath keeps a remnant or Apostle keeps it all — the
-# Devout sips Mana, and Communion may spread the fervor.
+# unless Binding Oath keeps a remnant — the Devout sips Mana, and
+# Communion may spread the fervor.
 func _gain_faith(u: BattleUnit, n: int) -> void:
 	var devout := _living_devout()
 	if devout == null or u.dead or u.is_companion or not u.is_hero:
@@ -7985,25 +8021,27 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 	if u.has_status("zeal"):
 		n *= 2
 	u.faith_stacks = mini(u.faith_stacks + n, 5)
+	var f_mult := _faith_stack_mult(devout)
 	if u.faith_stacks < 5:
 		var f_desc := "Conviction: Faith x%d — %d%% damage\nmitigation and +%d%% damage dealt.\nAt 5 stacks: healed for %d%% max\nhealth, and the Faith resets." % [
-			u.faith_stacks, 3 * u.faith_stacks, 2 * u.faith_stacks,
+			u.faith_stacks, FAITH_MITIGATION_PCT * f_mult * u.faith_stacks,
+			FAITH_DAMAGE_PCT * f_mult * u.faith_stacks,
 			15 + devout.faithful_step]
 		if not u.update_status("faith", "F%d" % u.faith_stacks, f_desc):
 			u.add_status("faith", "Faith", "F%d" % u.faith_stacks,
 				Color(0.98, 0.85, 0.45), -1, f_desc)
 		return
-	# The fifth stack: release. Apostle keeps the ally parked at 5 (every
-	# further gain re-triggers this); Binding Oath keeps a remnant.
+	# The fifth stack: release. Binding Oath keeps a remnant; nothing else
+	# does. BATCH BG §2 REMOVED APOSTLE FROM THIS BRANCH — the capstone no
+	# longer changes what a release consumes, which is the whole re-spec.
 	var keep := 0
-	if devout.apostle > 0:
-		keep = 5
-	elif devout.oath_ranks > 0:
+	if devout.oath_ranks > 0:
 		keep = mini(devout.oath_ranks, 4)
 	u.faith_stacks = keep
 	if keep > 0:
 		var k_desc := "Conviction: Faith x%d — %d%% damage\nmitigation and +%d%% damage dealt.\nAt 5 stacks: healed for %d%% max\nhealth." % [
-			keep, 3 * keep, 2 * keep, 15 + devout.faithful_step]
+			keep, FAITH_MITIGATION_PCT * f_mult * keep,
+			FAITH_DAMAGE_PCT * f_mult * keep, 15 + devout.faithful_step]
 		if not u.update_status("faith", "F%d" % keep, k_desc):
 			u.add_status("faith", "Faith", "F%d" % keep,
 				Color(0.98, 0.85, 0.45), -1, k_desc)
@@ -8028,43 +8066,41 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 		u.unit_name, f_got, devout.unit_name, d_mana], "#e8c860")
 	# Batch AW §1 — THE THIRD CLAUSE: the returns increase the principal. He
 	# lends out his own bulk and collects a dividend on every release.
-	# BATCH AY §9: A RELEASE THAT CONSUMED NO STACKS PAYS HALF. Apostle parks
-	# the ally at 5, so every further gain re-triggers the release and
-	# multiplies growth, release heal and Communion spread together — AW
-	# measured 78% contribution and +72.9% growth a battle, AX re-measured
-	# 80% / +83.7% / peak 390 HP on a 175 base, and nothing had yet addressed
-	# it (AX's Fervor instruction turned out to be a no-op). This hits the
-	# multiplier precisely and leaves the base spec, the step and the fantasy
-	# alone. `keep` is the whole test: 5 kept out of 5 is nothing consumed.
+	# BATCH AY §9: A RELEASE THAT CONSUMED NO STACKS PAYS HALF. `keep` is the
+	# whole test: 5 kept out of 5 is nothing consumed.
+	#
+	# BATCH BG §2 — NOTHING IN THE GAME REACHES THE HALF BRANCH ANY MORE, and
+	# that is a consequence of the re-spec rather than a decision about AY's
+	# tax. Apostle was the only thing that ever parked an ally at 5; Binding
+	# Oath's remnant is `mini(oath_ranks, 4)`, so `keep` is now capped at 4 by
+	# construction and `keep < 5` is always true. THE ARGUMENT STAYS because
+	# it is the honest expression of the rule and one `mini()` from live
+	# again, but it is dead today and the docs no longer claim otherwise.
 	_conviction_growth(devout, keep < 5)
-	if devout.apostle > 0:
-		_log("   → Talent: Apostle — %s's Faith burns undimmed (stays at 5)" % \
-			u.unit_name, "#b0a8e0")
-	elif keep > 0:
+	if keep > 0:
 		_log("   → Talent: Binding Oath — %s keeps %d Faith" % [
 			u.unit_name, keep], "#b0a8e0")
 	# Communion: fervor spreads to allies who are STILL BUILDING it (the chance
 	# scales with their own Faith).
 	#
 	# BATCH BF §2 — AN ALLY AT FIVE IS NOT BUILDING, HE IS AT THE PAYOUT, AND
-	# COMMUNION NO LONGER ROLLS FOR HIM. This attacks the COUPLING rather than
-	# the output: the roll reads the recipient's CURRENT stacks while Apostle
-	# parks allies at 5, so parked allies rolled 75% (BE measured it) and every
-	# advance on one was itself a release. Under Apostle the node now fires at
-	# most once per ally, as they cross 4 -> 5, and it cannot manufacture a
-	# release out of one that already happened. It does not care WHICH node
-	# parks the ally, and it leaves Communion whole in the seven builds that
-	# never take Apostle.
+	# COMMUNION NO LONGER ROLLS FOR HIM. This attacked the COUPLING rather than
+	# the output: the roll reads the recipient's CURRENT stacks, and Apostle
+	# parked allies at 5, so parked allies rolled 75% (BE measured it) and every
+	# advance on one was itself a release. THE CONDITION IS NOT WRITTEN FOR
+	# APOSTLE and does not name it — it does not care WHICH node parks an ally,
+	# which is why it survives BG unchanged.
 	#
-	# `faith_stacks` is capped at 5 above and a hero at 5 releases on the spot
-	# unless Apostle keeps him there — so this branch bites on Apostle builds
-	# and effectively nowhere else, which is exactly where the coupling was.
+	# `faith_stacks` is capped at 5 above and a hero at 5 releases on the spot,
+	# so with Apostle off the release axis (Batch BG §2) NOTHING now parks an
+	# ally at five and the condition is dormant in every shipped build. THE
+	# GUARD STAYS: it is what makes the roll's meaning ("still building")
+	# structural rather than a fact about one capstone.
 	#
-	# TWO COSTS, CARRIED FORWARD RATHER THAN DROPPED. The cliff is real: 60% at
-	# four stacks, 0% at five, and the node tooltip has to say so or it reads as
-	# a bug. And two nodes in one lane that partly cancel each other is a smell
-	# — this makes Apostle and Communion less complementary again after BE
-	# accidentally made them more so. Recorded, not solved.
+	# THE CLIFF IS REAL AND STATED IN THE TOOLTIP: 60% at four stacks, 0% at
+	# five. BG'S RE-SPEC INVERTS THE SMELL BF RECORDED rather than reducing it
+	# — Communion wants allies below five and Apostle now wants them carrying
+	# stacks, so both nodes pull toward the same 1-4 band instead of cancelling.
 	if devout.communion_ranks > 0 and not _communion_chain:
 		_communion_chain = true
 		for h in heroes:

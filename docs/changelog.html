@@ -5,6 +5,206 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-09 &mdash; Batch BG: the run harness reads difficulty, and Apostle changes axis</h2>
+<p><i>Two things that cannot contaminate each other. <b>&sect;1 is a measurement and ships
+nothing</b> &mdash; it replaces BF's sweep as the difficulty reference, because the sweep's
+enemies are unscaled and a run's are not. <b>&sect;2 is one capstone re-specced</b>, and it ran
+first so &sect;1 measured the fixed spec. No save version moves (still v7).</i></p>
+
+<h3>&sect;1 &mdash; The run harness reads difficulty (leading, because this supersedes the sweep
+table as the reference anyone comes back for)</h3>
+<p><code>./sim.sh --run 100</code>, all three route policies, <b>two build levels</b>. Unlike the
+sweep, this carries tier stat scaling, the zone slot multiplier, HP and mana between fights,
+talent points earned <i>and</i> spent, elite runes and boss trophies. <b>Nothing was tuned. The
+proposal at the end is marked as a proposal.</b></p>
+
+<p><b>Three premises corrected toward the code before a single number is read.</b></p>
+<ul>
+<li><b>The three route policies are one walk, and have been since Batch AN.</b> The report's own
+line reads <b>&ldquo;Reachable nodes per step: 1.00 &mdash; steps offering a real choice: 0% (0 of
+2764)&rdquo;</b>, and every node type reads <i>taken == offered</i> (fight 18.6/18.6, elite
+4.6/4.6, boss 2.1/2.1). A line map has no route decision, so <b>the &ldquo;band across
+policies&rdquo; is three samples of ONE configuration</b>. That is not a loss &mdash; it is a free
+triplicate, and it is where the noise floor below comes from.</li>
+<li><b>Rests do not exist</b> (Batch AN). &ldquo;Rests taken versus offered&rdquo; reads
+<b>0.0/0.0</b> and always will. Recovery is the per-slot heal and the bot's potions.</li>
+<li><b>The build policy is a confound and it is smaller than it looks.</b>
+<code>DOD_SIM_BUILDS</code> defaults to each tree's FIRST lane &mdash; and for three of the four
+specs in the default party that first lane is <i>already</i> the lane its own batch measured as
+the standout (Berserker Bloodletting, Beastmaster devotion). The default band's real deficit is
+the <b>Devout on BULWARK, the lane BF measured at 14%</b>, plus the Cryomancer on Winter. So the
+two bands differ in <b>two heroes, not four</b>, and the gap between them must be read that
+way.</li>
+</ul>
+
+<p><b>DEFAULT BUILDS &mdash; first lane per tree. The floor: what an indifferent build achieves.
+n=100 per policy.</b></p>
+<table border="1" cellpadding="4">
+<tr><th>route</th><th>completions</th><th>95% band</th><th>depth of 36</th><th>wipe median slot</th><th>points/hero/run</th><th>gold unspent</th></tr>
+<tr><td>greedy</td><td>48%</td><td>&plusmn;9.6 pts</td><td>24.31 &plusmn; 1.30</td><td>z1 t9</td><td>9.2</td><td>1410</td></tr>
+<tr><td>default</td><td><b>60%</b></td><td>&plusmn;9.6 pts</td><td><b>27.64 &plusmn; 1.13</b></td><td>z2 t0.5</td><td>10.4</td><td>1572</td></tr>
+<tr><td>cautious</td><td>49%</td><td>&plusmn;9.6 pts</td><td>24.23 &plusmn; 1.25</td><td>z1 t10</td><td>9.2</td><td>1293</td></tr>
+</table>
+<p><b>The spread across the three IS the noise, since the three are the same walk</b> &mdash; at
+n=100 completions cannot resolve anything under 19 points, and the rows differ by 12. Read depth
+reached, not completions.</p>
+<p>Run economy (default route): gold earned 2496, spent 924, <b>1572 left unspent</b>; items used
+11.0/run against 8.9 carried unused; merchants 10.6/run, events 5.8/run, bargains 7.0/run at
+severity 3.67; runes acquired 3.51/hero/run with <b>94% of slots filled</b>; <b>8.0 talent nodes
+owned entering a boss</b>, with points spent to within 0.1 of points earned.</p>
+
+<p><b>NAMED BUILDS &mdash; each hero on the lane its own batch measured strongest. The ceiling:
+what a player who reads their tree achieves. n=100 per policy.</b></p>
+<table border="1" cellpadding="4">
+<tr><th>route</th><th>completions</th><th>depth of 36</th><th>wipe median slot</th><th>points/hero/run</th><th>gold unspent</th></tr>
+<tr><td>greedy</td><td>58%</td><td>27.00 &plusmn; 1.28</td><td>z1 t9</td><td>10.2</td><td>1589</td></tr>
+<tr><td>default</td><td>55%</td><td>25.81 &plusmn; 1.29</td><td>z1 t9</td><td>9.7</td><td>1485</td></tr>
+<tr><td>cautious</td><td>57%</td><td>27.67 &plusmn; 1.26</td><td>z1 t9</td><td>10.4</td><td>1687</td></tr>
+</table>
+<p><b>SUBSTITUTION, REPORTED RATHER THAN BURIED.</b> The strongest-lane control set BC and BE
+built puts the Cryomancer on <b>Thaw</b>, and Thaw row 6 (Honed Shards) reaches the
+<i>still-open</i> recursion between <code>_hold_release</code> and <code>_hold_freeze</code> that
+BF &sect;3 found &mdash; <b>measured here at 15 stack overflows in four runs and ~1.1 MB of
+backtrace, against zero on Deep Freeze at the same n</b>. A band measured through a stack
+overflow is not a band, so the Cryomancer runs Deep Freeze. <b>Until that crash is fixed, no run
+band can contain a Thaw Cryomancer</b>, which means one of twelve specs cannot have its best lane
+measured by the project's best instrument. (Standalone lane rows are unaffected: zero events
+across ten n=200 rows on the fixed lineup.)</p>
+
+<p><b>AND THE QUESTION NOBODY HAD ASKED: how much does building well actually matter in a full
+run?</b> Because the three route rows are provably the same configuration, they pool to n=300 a
+band:</p>
+<table border="1" cellpadding="4">
+<tr><th>band</th><th>completions (n=300)</th><th>95% band</th><th>depth of 36</th></tr>
+<tr><td>default builds</td><td>52.3%</td><td>&plusmn;5.7 pts</td><td>25.39 &plusmn; 0.71</td></tr>
+<tr><td>named builds</td><td>56.7%</td><td>&plusmn;5.6 pts</td><td>26.83 &plusmn; 0.73</td></tr>
+<tr><td><b>gap</b></td><td><b>+4.3 pts (1.07&sigma;)</b></td><td>&mdash;</td><td><b>+1.43 tiers (1.40&sigma;)</b></td></tr>
+</table>
+<p><b>Neither is significant.</b> Moving the Devout off his worst lane onto his best, and the
+Cryomancer off Winter onto Deep Freeze, buys about four points of completions and a tier and a
+half of depth &mdash; and at n=300 a band that cannot be told from zero. <b>Read it with the
+caveat that makes it honest: the two bands differ in TWO heroes, not four</b>, because the
+default first lane already <i>is</i> the standout lane for the Berserker and the Beastmaster. So
+this is not &ldquo;building well is worth nothing&rdquo;; it is &ldquo;these two lane swaps, on
+this bot, are worth about four points.&rdquo;</p>
+
+<p><b>Per-tier win rate is 91&ndash;100% at every tier of every zone</b> (default route, default
+builds: z1 t8 96%, z1 boss 91%, z2 boss 100%, z3 boss 100%; named builds z1 boss 97%, z2 boss
+95%, z3 boss 98%), at 0.3&ndash;1.1 deaths per fight and 70&ndash;89% party health entering.</p>
+
+<p><b>The Devout's FAITH lane, measured in a real run for the first time: 37% <code>d+h+p%</code>
+over 2581 battles</b>, against the 38% the standalone all-four lane row gives &mdash; the two
+instruments agree, which is the first time a lane row has been cross-checked against progression.
+Healing 456/battle at 125 per release over 3.13 releases. <i>Caveat on one field:</i> the
+&ldquo;max observed&rdquo; Conviction growth reads 1071&ndash;6130 across the named rows, which is
+a <b>stalemate artefact</b> &mdash; 2&ndash;3 stalemates per band run to a forced end and the
+growth clause accumulates for hundreds of rounds. Read the mean (26.9 HP/battle, +9.4% of base),
+never the max.</p>
+
+<p><b>THE RECONCILIATION WITH BF'S SWEEP, WHICH IS WHAT THE SECTION WAS COMMISSIONED FOR. The
+15-point gap is not an artefact of measuring without tier scaling. A real scaled fight is not
+measurably harder than its budget row</b> &mdash; 91&ndash;100% scaled here against 93&ndash;100%
+unscaled in BF's sweep. <b>What kills runs is compounding, not scaling:</b> roughly 24 fights a
+run at ~95% each is 0.95<sup>24</sup> &asymp; 29%, and the measured completion rate is
+48&ndash;60%. The per-fight number and the per-run number are both right and they answer
+different questions.</p>
+
+<p><b>The measured power ladder is D-shaped inside every zone and its floor drops zone by
+zone</b> (party-vs-warband ratio, default route): z1 <b>1.49 &rarr; 0.83</b> at its boss, z2
+<b>1.23 &rarr; 0.69</b>, z3 <b>1.04 &rarr; 0.53</b>. Wipes cluster where the ratio first crosses
+under 1 &mdash; z1 t8&ndash;boss (19 of 40) and z2 t4&ndash;7 (10 of 40).</p>
+
+<p><b>PROPOSAL &mdash; AND IT IS ONLY A PROPOSAL. Do not pull enemy health, attack or count.</b>
+Every one of those moves the per-fight number, and the per-fight number is already inside the
+band the sweep says is 8&ndash;15 points too easy; pulling them would fix the run by breaking the
+fight. <b>The lever the run data argues for is tier scaling's own slope, and the number that
+argues for it is the ratio floor: 0.83 / 0.69 / 0.53 at the three zone bosses.</b> A ladder whose
+top sits at 0.53 while the fights on it are still won 100% of the time is a ladder whose shape is
+doing nothing &mdash; the party is nominally outgunned two to one at the zone-3 boss and beats it
+every time. <b>Either the ratio model does not predict outcome, in which case stop steering by
+it, or the slope is real and something else is holding the win rate up.</b> That is the question
+the next difficulty batch should answer before it moves a number.</p>
+
+<h3>&sect;2 &mdash; Apostle moves off the frequency axis</h3>
+<p><b>The capstone no longer changes what a release consumes. Instead every stack of Faith an
+ally carries is worth double: 6% damage mitigation and +4% damage dealt per stack, up from 3% and
++2%.</b> Same id, same lane, same row, same payload field &mdash; no save migrates.</p>
+<p><b>Why the axis and not the price.</b> BF measured the old capstone at <b>&minus;8 one-hero and
+&minus;2 all four</b>: taking it <i>lowered</i> the engine it sat on, because parking allies at
+five made them invisible to Communion. A price cannot fix a sign. Apostle multiplied release
+<i>frequency</i> &mdash; the exact term BE and BF spent two batches taming &mdash; so a capstone
+whose whole effect is that term will keep inverting at any number you put on it.</p>
+<p><b>Conviction has two halves: what a stack does WHILE HELD, and what happens when five of them
+RELEASE. All eight Faith nodes touch the release half. Nothing had ever touched the held
+half.</b> That made it simultaneously the only untouched axis in the lane and an unmistakably
+capstone-sized one. <b>And it makes the two nodes complementary instead of cancelling</b> &mdash;
+Communion pays only for allies below five, Apostle now pays for allies carrying stacks, so both
+want the party sitting in the 1&ndash;4 band. The smell BF recorded is not reduced, it is
+inverted.</p>
+
+<p><b>One of BF's own rows does not reproduce, and that had to be established before anything
+could be compared to it.</b> Every row below is n=200 on BC/BE's lineup, taken in one session on
+one instrument, with the pre-BG rows <i>re-run on an unmodified-HEAD copy</i> rather than quoted.
+<b>BF's all-four &minus;Apostle cell (31%) reads 39% on unmodified HEAD today</b> &mdash; an
+8-point miss on the cell BF called a natural control and computed &ldquo;Apostle is worth
+&minus;2 all four&rdquo; from. Its other rows do reproduce: one-hero FAITH 54&rarr;55, one-hero
+&minus;Apostle 62&rarr;64, ZEAL 31&rarr;32, BULWARK 14&rarr;12, all inside n=200's
+&plusmn;1&ndash;2.</p>
+
+<p><code>d+h+p%</code> | healing/battle | releases/battle | healing per release | prev/b |
+Faith-stack prev/b:</p>
+<table border="1" cellpadding="4">
+<tr><th>row</th><th>HEAD (old Apostle)</th><th>BG (new Apostle)</th></tr>
+<tr><td>one-hero, FAITH all eight</td><td>55% | 639 | 9.96 | 61 | 70 | 14</td><td><b>61% | 857 | 11.98 | 64 | 79 | 25</b></td></tr>
+<tr><td>one-hero, &minus;Apostle <i>(control)</i></td><td>64% | 958 | 13.30 | 65 | 68 | 12</td><td><b>63% | 930 | 12.91 | 65 | 71 | 12</b></td></tr>
+<tr><td>all four built, FAITH all eight</td><td>36% / 35% | 271/264 | 4.18/4.12 | 47/41 | 8</td><td><b>38% / 38% | 313/314 | 4.51/4.49 | 50/51 | 14</b></td></tr>
+<tr><td>all four built, &minus;Apostle <i>(control)</i></td><td>39% | 334 | 4.79 | 43 | 6</td><td><b>40% / 38% | 348/313 | 4.96/4.47 | 43/43 | 7/6</b></td></tr>
+</table>
+<p>Two replicates apiece on the all-four rows: <b>the n=200 spread there is about 2 points</b>,
+which is the resolution every all-four number should be read at.</p>
+
+<p><b>The control that proves the change is inert where it should be: the &minus;Apostle rows do
+not move.</b> Seven of the eight Devout builds never take this capstone and not one of them feels
+it.</p>
+<p><b>The mechanism reads exactly as designed, in the term that IS the capstone.</b> Faith-stack
+damage prevented per battle is <b>2.0&ndash;2.3&times; the &minus;Apostle baseline in both
+constructions</b> &mdash; all four 7/6 &rarr; 14/14, one-hero 12 &rarr; 25. The old capstone moved
+the same term by 1.3&times;, and it did it by <i>parking</i> rather than by doubling.</p>
+
+<p><b>Apostle's worth, on one instrument: old &minus;9 one-hero and &minus;3.5 all four; new
+&minus;2 and &minus;1</b> &mdash; the latter inside the replicate spread, i.e. zero. <b>It is
+still not positive ON THE SHARE, and that is the intended outcome rather than a failure.</b> The
+mitigation books to <i>him</i>; the +4% damage lands on his <i>allies</i> and raises the
+denominator; and a tougher party absorbs fewer hits, so his own engine spins slower (releases
+12.91 &rarr; 11.98 one-hero). <b>Read the capstone in <code>prev/b</code> and the stack term, not
+in the share.</b> His prevented per battle goes 43 &rarr; 50 all four and 71 &rarr; 79 one-hero;
+party damage per battle 616 &rarr; 627 <i>(the old capstone took it 610 &rarr; 597 &mdash; the
+wrong sign)</i>; enemy damage landed per battle 168 &rarr; 162. <code>BDprev/b</code> is unmoved
+at 36 all four and 49 one-hero, which is Devoutness and is untouched.</p>
+
+<p><b>The bar, re-measured on the BG tree in the same session: FAITH 38% | ZEAL 32% | BULWARK
+12%</b> &mdash; 1.19&times;, six points clear of ZEAL, against BF's stated 1.06&times;. Note that
+HEAD's own FAITH/ZEAL was <i>already</i> 1.11&times; before this batch (35.5 vs 32), so BG added
+about 2.5 points to a gap that was about 3.5. <b>The brief said: if the row climbs past ZEAL by
+more than a couple of points, report and stop, and do not take a fourth lever on this lane. It
+did, and nothing further was taken.</b></p>
+
+<p><b>One rule went quietly unreachable and the docs now say so.</b> Batch AY's
+&ldquo;a release that consumed NO stacks pays half growth&rdquo; existed only to tax Apostle's
+stream. Apostle was the only thing that ever parked an ally at five, and Binding Oath's remnant is
+capped at four by construction &mdash; so no release can now reach it. The rule and its argument
+stay in the code, one line from being live again; master.html no longer claims it happens, and
+the test drives it at <code>_conviction_growth</code> instead of through a release.</p>
+
+<p><b>Tests:</b> new <code>test_batch_bg.gd</code> &mdash; 44 checks, including both rates
+measured end to end over 400 casts each (12% / 24% less damage taken at four stacks, +8% / +16%
+dealt) and the two negative controls the batch exists for: <i>a release under Apostle still
+consumes the stacks</i>, and <i>the doubled values follow the CARRIER, not the Devout</i> (an ally
+on four stacks is paid +16% with the Devout empty, and nothing at all when the four stacks are on
+the Devout instead). Communion still rolls 60% for a carrier at four, unchanged. Five assertions
+in <code>test_batch_aw</code> and <code>test_batch_ay</code> pinned the superseded capstone and
+were re-pointed rather than deleted.</p>
+
 <h2>2026-08-09 &mdash; Batch BF: the instrument learns to see Break, Communion's last lever,
 and the first honest difficulty read</h2>
 <p><i>Three things, in that order, because each one changes what the next measures. &sect;1 is a

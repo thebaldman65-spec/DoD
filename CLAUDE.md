@@ -41,12 +41,27 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   points earned AND spent, elite runes auto-equipped, trophies) → run
   report: wipe distribution, per-tier averages, measured party-vs-warband
   power table + run economy (gold earned/spent/unspent, items used/left,
-  rests taken vs offered) + a per-invocation "Matrix row" line for
-  cross-policy assembly. Policies env-set + printed: DOD_SIM_ROUTE
-  (greedy|default|cautious|elites — Batch U: greedy = the Batch S floor
-  byte-for-byte, never rests while combat is offered; default rests when
-  AVG party HP <65% and a rest is reachable; cautious <80%; run all three
-  for the band real play sits inside), DOD_SIM_SHOPS=off / DOD_SIM_ITEMS=off
+  merchants/events/bargains per run — **NOT rests: Batch AN deleted them and
+  the "taken vs offered" row reads 0.0/0.0 forever**) + a per-invocation
+  "Matrix row" line for cross-policy assembly. Policies env-set + printed:
+  DOD_SIM_ROUTE (greedy|default|cautious|elites — Batch U: greedy = the
+  Batch S floor byte-for-byte, never rests while combat is offered; default
+  rests when AVG party HP <65% and a rest is reachable; cautious <80%).
+  **BATCH BG §1 MEASURED WHAT THE THREE POLICIES ARE WORTH ON THE LINE MAP
+  AND THE ANSWER IS NOTHING: "Reachable nodes per step: 1.00 — steps
+  offering a real choice: 0% (0 of 2764)", every node type taken ==
+  offered. THE THREE ROUTE ROWS ARE THREE SAMPLES OF ONE CONFIGURATION, NOT
+  A BAND — useful as a free triplicate for estimating noise, useless as a
+  bracket on real play. Do not repeat "run all three for the band real play
+  sits inside"; it has been stale since AN.**
+  **BATCH BG §1 STANDING CAUTION ON EVERY RUN BAND: `DOD_SIM_BUILDS`
+  DEFAULTS TO EACH TREE'S FIRST LANE, AND THAT IS A CONFOUND WITH A KNOWN
+  SIGN.** For the default party the first lane is Berserker Bloodletting,
+  Cryomancer Winter, **Devout BULWARK — the lane BF measured at 14% against
+  FAITH's 33%** — and Beastmaster devotion. Two of those four ARE the lanes
+  their own batches measured as standouts, so a default-vs-named comparison
+  is a two-hero difference, not a four-hero one. **Always print the build
+  string beside a run number**, DOD_SIM_SHOPS=off / DOD_SIM_ITEMS=off
   (both default ON: shops heal-first — hero <50% buys a Health Potion each —
   then priciest affordable offer not carried, runes incl. but only onto a
   free slot + equipped at purchase, never dipping under the 40g reserve;
@@ -266,6 +281,149 @@ the new spec's idea a second time. **BA re-specced four nodes off it** — Epide
 every enemy permanently Poisoned), Plague Bearer (rot leaps enemy to enemy), Creeping Death
 (a corpse passes its stacks to the living) and the NAME Virulence (a pathogen term). SNARES
 and GUERILLA were never disease and are untouched by the rule.
+
+BATCH BG (08-09) — THE RUN HARNESS READS DIFFICULTY, AND APOSTLE CHANGES AXIS. Two things
+that cannot contaminate each other: **§1 is a measurement that ships nothing; §2 is one
+capstone re-specced.** §2 ran first so §1 measured the fixed spec. No save version moves
+(still v7).
+
+§2 **APOSTLE IS OFF THE FREQUENCY AXIS. It no longer changes what a release consumes; every
+stack of Faith an ally CARRIES is worth double — 6% mitigation and +4% damage dealt per
+stack, against the base 3% and +2%.** Same id, same lane, same row, same `apostle` payload
+field, so no save migrates.
+**WHY THIS AND NOT A REPRICE, AND THIS IS THE PART THAT MUST SURVIVE: BF MEASURED THE OLD
+CAPSTONE AT −8 ONE-HERO AND −2 ALL FOUR.** Taking it LOWERED the engine it sat on, because
+parking allies at five made them invisible to Communion. **Re-pricing cannot fix a sign.**
+Apostle multiplied release FREQUENCY — the exact term BE and BF spent two batches taming — so
+a capstone whose whole effect is that term will keep inverting at ANY price. **DO NOT
+RE-PRICE IT BACK ONTO THE RELEASE.**
+**THE STRUCTURAL FACT THAT MAKES THE LANE MAKE SENSE, STATED ONCE PROPERLY: Conviction has
+two halves — what a stack does WHILE HELD, and what happens when five of them RELEASE. All
+EIGHT Faith nodes touch the release half** (Communion spreads it, Fervor and Sacred Covenant
+feed it, Blessed are the Faithful deepens its heal, Binding Oath changes what it consumes,
+Unwavering Faith and Devoutness sit on the payout's scale). **NOTHING HAD EVER TOUCHED THE
+HELD HALF.** That is why it was both the only axis available and unmistakably capstone-sized.
+**ONE MULTIPLIER, ONE GATE, THREE CALLERS**: `battle._faith_stack_mult(devout)` returns 2
+under Apostle and 1 otherwise; `FAITH_MITIGATION_PCT`/`FAITH_DAMAGE_PCT` are the base rates;
+the two damage sites and the status chip are the only readers, so the tooltip can never
+describe a number the arithmetic does not use. `.apostle` is read in exactly ONE place and
+test_batch_bg asserts that count.
+**THE SMELL IS INVERTED, NOT REDUCED** — Communion pays only for allies BELOW five and
+Apostle now pays for allies CARRYING stacks, so both nodes want the party in the 1-4 band.
+**AY §9'S HALF-GROWTH RULE IS NOW UNREACHABLE AND THE CODE SAYS SO.** Apostle was the only
+thing that ever parked an ally at five; Binding Oath's remnant is `mini(oath_ranks, 4)`, so
+`keep` is capped at 4 by construction and `keep < 5` is always true. **The argument and the
+rule STAY** (one `mini()` from live again) but master.html no longer claims it happens, and
+test_batch_ay drives it at `_conviction_growth` instead of through a release.
+
+§2 MEASURED — **AND THE FIRST THING THE RE-MEASURE FOUND WAS THAT ONE OF BF'S OWN ROWS DOES
+NOT REPRODUCE.** Every row below is n=200, BC/BE's lineup, taken in ONE session on ONE
+instrument, with the pre-BG rows re-run on an unmodified-HEAD copy rather than quoted.
+**BF'S ALL-FOUR −APOSTLE CELL (31%) READS 39% ON UNMODIFIED HEAD TODAY** — an 8-point miss on
+the cell BF called a natural control and computed "Apostle is worth −2 all four" from. BF's
+other rows DO reproduce (one-hero FAITH 54→55, one-hero −Apostle 62→64, ZEAL 31→32, BULWARK
+14→12, all within n=200's ±1-2). **QUOTE BG'S ROWS, NOT BF'S, FOR ANYTHING ALL-FOUR.**
+`d+h+p%` | healing/battle | releases/battle | healing per release | prev/b | Faith-stack
+prev/b:
+**ONE-HERO** — FAITH+Apostle **HEAD 55% | 639 | 9.96 | 61 | 70 | 14** → **BG 61% | 857 |
+11.98 | 64 | 79 | 25**; −Apostle **HEAD 64% | 958 | 13.30 | 65 | 68 | 12** → **BG 63% | 930 |
+12.91 | 65 | 71 | 12**.
+**ALL FOUR BUILT** (two replicates apiece — **the n=200 spread on this row is ~2 points and
+that is the resolution to read every all-four number at**) — FAITH+Apostle **HEAD 36% / 35% |
+271/264 | 4.18/4.12 | 47/41 | 8** → **BG 38% / 38% | 313/314 | 4.51/4.49 | 50/51 | 14**;
+−Apostle **HEAD 39% | 334 | 4.79 | 43 | 6** → **BG 40% / 38% | 348/313 | 4.96/4.47 | 43/43 |
+7/6**.
+**THE CONTROL THAT PROVES THE CHANGE IS INERT WHERE IT SHOULD BE: the −Apostle rows do not
+move** (all four 39 → 40/38, one-hero 64 → 63, Faith-stack prevented 6 → 7/6 and 12 → 12).
+Seven of the eight Devout builds never take this capstone and none of them feels it.
+**THE MECHANISM READS EXACTLY AS DESIGNED, in the term that is actually the capstone**:
+Faith-stack prevented/battle is **2.0-2.3x the −Apostle baseline in both constructions** (all
+four 7/6 → 14/14, one-hero 12 → 25). The OLD capstone moved the same term by 1.3x, and it did
+it by parking rather than by doubling.
+**APOSTLE'S WORTH, ON ONE INSTRUMENT: old −9 one-hero / −3.5 all four; NEW −2 one-hero and
+−1 all four (inside the ±2 replicate spread, i.e. zero).** It is
+still slightly negative ON THE SHARE and **that is the intended outcome, not a failure** —
+the mitigation books to HIM and the +4% damage lands on his ALLIES and raises the
+denominator, and a tougher party absorbs fewer hits so his engine spins slower (releases
+12.91 → 11.98 one-hero). **READ IT IN prev/b AND THE STACK TERM, NEVER IN THE SHARE ALONE.**
+His prevented/battle 43 → 50 all four and 71 → 79 one-hero; party damage/battle 616 → 627
+(the old capstone took it 610 → 597, the wrong sign); enemy damage landed/battle 168 → 162.
+`BDprev/b` is unmoved at 36 (all four) / 49 (one-hero) — Devoutness, untouched.
+**THE BAR, RE-MEASURED ON THE BG TREE IN THE SAME SESSION: FAITH 38% | ZEAL 32% | BULWARK
+12%.** That is **1.19x**, six points clear of ZEAL, against BF's stated 1.06x — but note
+HEAD's own FAITH/ZEAL was ALREADY 1.11x before this batch (35.5 vs 32), so BG added ~2.5
+points to a gap that was ~3.5. **BG'S BRIEF SAID: IF THE ROW CLIMBS PAST ZEAL BY MORE THAN A
+COUPLE OF POINTS, REPORT AND STOP — DO NOT TAKE A FOURTH LEVER ON THIS LANE. IT DID, AND
+NOTHING FURTHER WAS TAKEN.**
+
+§1 **THE RUN HARNESS READS DIFFICULTY — A MEASUREMENT, NOTHING TUNED, AND THE PROPOSAL AT THE
+END IS MARKED AS A PROPOSAL.** `./sim.sh --run 100`, all three route policies, TWO BUILD
+LEVELS. This SUPERSEDES BF §3's sweep as the difficulty reference: the sweep's enemies are
+unscaled, this carries tier scaling, the zone multiplier, carried HP/mana, points earned AND
+spent, elite runes and trophies.
+**THREE STALE PREMISES, CORRECTED TOWARD THE CODE BEFORE ANY NUMBER IS READ:**
+· **THE THREE ROUTE POLICIES ARE ONE WALK AND HAVE BEEN SINCE BATCH AN.** The report's own
+line: **"Reachable nodes per step: 1.00 — steps offering a real choice: 0% (0 of 2764)"**,
+and **every node type reads taken == offered** (fight 18.6/18.6, elite 4.6/4.6, boss
+2.1/2.1). **The band across policies is three samples of ONE configuration, not a band.**
+· **RESTS DO NOT EXIST** (Batch AN). "rests taken vs offered" is **0.0/0.0** and always will
+be; the recovery line is the per-slot heal. Do not ask a run report for it again.
+· **A "route band" therefore cannot bracket real play.** What the three rows DO give is a
+free triplicate measurement of the same configuration, which is how the noise below is
+estimated.
+**DEFAULT BUILDS (each tree's FIRST lane), n=100 per policy — greedy | default | cautious:**
+completions **48% | 60% | 49%** (95% band **±9.6 points**, so the three are NOT
+distinguishable and the spread IS the noise floor); depth reached of 36 **24.31±1.30 |
+27.64±1.13 | 24.23±1.25**; wipe median slot **z1 t9 | z2 t0.5 | z1 t10**; talent points
+earned/hero/run **9.2 | 10.4 | 9.2**, spent to within 0.1; gold unspent **1410 | 1572 |
+1293** on 2221/2496/2132 earned; items used **10.2 | 11.0 | 10.5** per run against 8.3-8.9
+carried unused; merchants **10.6/run**, events **5.8/run**, bargains **7.0/run at severity
+3.67**; runes acquired **3.51/hero/run** with **94% of slots filled**; **8.0 talent nodes
+owned entering a boss.**
+**NAMED BUILDS (each hero on the lane his own batch measured strongest), n=100 per policy:**
+completions **58% | 55% | 57%**, depth **27.00±1.28 | 25.81±1.29 | 27.67±1.26**, wipe median
+**z1 t9** in all three, points earned/hero/run 10.2 | 9.7 | 10.4.
+**SUBSTITUTION, REPORTED NOT BURIED: the Cryomancer runs DEEP FREEZE, not BE/BC's Thaw**,
+because Thaw row 6 (Honed Shards) reaches the still-open `_hold_release`/`_hold_freeze`
+recursion — 15 stack overflows in FOUR runs against ZERO on Deep Freeze. See the crash entry
+under Known open threads.
+**THE QUESTION NOBODY HAD ASKED, ANSWERED. Because the three route rows are provably one
+configuration they POOL to n=300 a band:** default builds **52.3% ±5.7 (95%)**, depth
+**25.39±0.71**; named builds **56.7% ±5.6**, depth **26.83±0.73**. **GAP: +4.3 points
+(1.07σ) and +1.43 tiers (1.40σ) — NEITHER IS SIGNIFICANT.** Building well, on this bot, is
+worth about four points of completions and cannot be told from zero at n=300 a band. **READ
+IT WITH THE CAVEAT THAT MAKES IT HONEST: the two bands differ in TWO heroes, not four** (the
+default first lane already IS the standout for the Berserker and the Beastmaster), so this is
+"these two lane swaps are worth ~4 points", not "builds do not matter".
+**PER-TIER WIN RATE IS 91-100% AT EVERY TIER OF EVERY ZONE** (default builds/default route:
+z1 t8 96%, z1 boss 91%, z2 boss 100%, z3 boss 100%; named builds: z1 boss 97%, z2 boss 95%,
+z3 boss 98%), with **0.3-1.1 deaths per fight** and party HP entering at **70-89%**.
+**THE DEVOUT'S FAITH LANE IN A REAL RUN, THE FIRST TIME A LANE ROW HAS BEEN CROSS-CHECKED
+AGAINST PROGRESSION: 37% `d+h+p%` over 2581 battles against the standalone all-four row's
+38%.** The two instruments agree. Healing 456/battle, 125 per release, 3.13 releases/battle.
+**CAVEAT ON ONE FIELD: `conviction_growth_max` reads 1071-6130 in the named rows and that is
+a STALEMATE ARTEFACT** (2-3 per band run to a forced end and the growth clause accumulates
+for hundreds of rounds). Read the mean — 26.9 HP/battle, +9.4% of base — never the max.
+**THE RECONCILIATION WITH BF'S SWEEP, WHICH IS THE POINT OF THE SECTION: THE 15-POINT GAP IS
+NOT AN ARTEFACT OF MISSING TIER SCALING. A REAL SCALED FIGHT IS NOT MEASURABLY HARDER THAN
+ITS BUDGET ROW** — 91-100% scaled here against 93-100% unscaled in BF's sweep. **WHAT KILLS
+RUNS IS COMPOUNDING, NOT SCALING**: ~24 fights a run at ~95% each is 0.95^24 ≈ 29%, and the
+measured completion rate is 48-60%. **The per-fight number and the per-run number are both
+correct and they are different questions.**
+**THE MEASURED POWER LADDER IS D-SHAPED INSIDE EVERY ZONE AND THE FLOOR DROPS ZONE BY ZONE**
+(party-vs-warband ratio, default route): z1 **1.49 → 0.83** at its boss, z2 **1.23 → 0.69**,
+z3 **1.04 → 0.53**. **Wipes cluster where the ratio first crosses under 1: z1 t8-boss (19 of
+40) and z2 t4-7 (10 of 40).**
+**PROPOSAL, AND IT IS A PROPOSAL — NOTHING WAS TUNED. Do not pull enemy health, attack or
+count.** The per-fight win rate is already inside a band the sweep says is 8-15 points too
+easy, and every one of those levers moves the per-fight number the sweep already measures.
+**The lever the run data argues for is TIER SCALING'S OWN SLOPE, and the number that argues
+for it is the ratio floor: 0.83 / 0.69 / 0.53 at the three zone bosses.** A ladder whose top
+sits at 0.53 while the fights on it are still won 100% of the time is a ladder whose SHAPE is
+doing nothing — the party is nominally outgunned two to one at the z3 boss and beats it every
+time. **Either the ratio model is not predictive of outcome (in which case stop steering by
+it) or the slope is real and the win rate is being held up by something else.** That is the
+question the next difficulty batch should answer BEFORE it moves a number.
 
 BATCH BF (08-09) — THE INSTRUMENT LEARNS TO SEE BREAK, COMMUNION'S LAST LEVER, AND THE FIRST
 HONEST DIFFICULTY READ. Three things in that order, because each changes what the next
@@ -4947,9 +5105,24 @@ Space or left click; no announcer text (combat log only).
     deaths) matches this build's (100% / 7.6 / 0.21). **But the direction of the contamination
     favours the party** — a permanently-held enemy stops acting — so treat the built top-band
     row as an upper bound for that reason as well as the unscaled-enemy one.
-- **THE DEVOUT'S FAITH ROW: TWO REPAIRS SHIPPED (BE, then BF §2), AND THE SECOND ONE LANDED
-  THE ROW ON ITS BAR. THE THREAD IS NEARLY CLOSED AND WHAT REMAINS IS A TREE-SHAPE QUESTION,
-  NOT A MAGNITUDE.** Do not re-derive any of this; every figure below is measured, n=200,
+  · **BATCH BG §1 FOUND ITS REAL COST AND IT IS BIGGER THAN A SWEEP ROW: IT MAKES A THAW
+    CRYOMANCER UNMEASURABLE IN A FULL RUN.** BG's named band was specified on BE/BC's
+    strongest-lane control set, which puts the Cryomancer on Thaw — **measured at 15 stack
+    overflows in FOUR runs and ~1.1 MB of backtrace**, against **ZERO on Deep Freeze at the
+    same n**. A run fields more enemies for longer than a sweep battle does, so the ~6% of
+    budget-12 battles becomes several aborts per run. **BG substituted Deep Freeze and said
+    so; until this is fixed, NO RUN BAND CAN INCLUDE A THAW CRYOMANCER**, which also means one
+    of twelve specs cannot have its strongest lane measured by the project's best instrument.
+    Standalone lane rows are unaffected (the fixed 4-enemy lineup never triggered it — 0
+    events across ten n=200 rows).
+- **THE DEVOUT'S FAITH ROW: CLOSED BY BATCH BG. THREE REPAIRS SHIPPED (BE, BF §2, then BG §2's
+  RE-SPEC OF THE CAPSTONE), THE TREE-SHAPE QUESTION IS ANSWERED, AND THE BRIEF'S OWN STOP RULE
+  FIRED — DO NOT TAKE A FOURTH LEVER ON THIS LANE.** Read BG's block at the top of this file
+  for the shipped shape and the current numbers; **quote BG's rows, not BF's, for anything
+  ALL-FOUR — BF's all-four −Apostle cell (31%) reads 39% on unmodified HEAD and does not
+  reproduce.** Everything below is BE/BF's record, kept because the HISTORY of the row is what
+  makes the fourth lever look tempting and the history is the argument against it. Every figure
+  below is measured, n=200,
   BC's lineup, and BF's rows were taken with the SAME instrument as BE's (BF §1 did not move
   `d+h+p%` by a point, which is why the two batches' rows are comparable at all).
   · **WHAT SHIPPED: Communion 40 -> 15 (BE), then Communion no longer rolls for an ally
@@ -4976,6 +5149,9 @@ Space or left click; no announcer text (combat log only).
     four). **RECORDED, NOT SOLVED, exactly as BF specified.** If the tree wants restructuring
     later, this is the note to start from: the honest fix is probably to make one of the two
     nodes something else, not to re-price either.
+    **SOLVED BY BG §2, AND ALONG EXACTLY THAT LINE: the capstone became something else rather
+    than something cheaper.** BF's −8 is the number that justifies the re-spec and it must
+    travel with it — see the BG block. **DO NOT RE-PRICE APOSTLE BACK ONTO THE RELEASE.**
   · **THE CLIFF IS REAL AND IS STATED IN THE TOOLTIP: 60% at four stacks, 0% at five.**
     Measured in test_batch_bf over 1200 driven releases apiece — **58.8% at four, 0.0% at
     five** (it was 75% at five before BF). An ability whose chance climbs with stacks and then

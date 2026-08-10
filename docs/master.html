@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-09 (Batch BF)</b></p>
+<p align="right"><b>Last updated: 2026-08-09 (Batch BG)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -496,7 +496,8 @@ health, snapshotted (and Mercy-scaled) when cast.</td></tr>
 turns).</td></tr>
 <tr><td>Faith</td><td>Conviction (Devout passive): Divine Shield absorbs AND standing on
 Consecrated Ground build stacks (max 5) — 3% damage mitigation and +2% damage dealt per
-stack; at 5 the bearer heals 15% max health, Faith resets, the Devout recovers 3% max
+stack, doubled to 6% and +4% by the Apostle capstone;
+at 5 the bearer heals 15% max health, Faith resets, the Devout recovers 3% max
 Mana, and the Devout's own maximum health rises 3% of his base for the rest of the
 battle (he is healed for that amount too). The chip counts stacks ("F3").</td></tr>
 <tr><td>Consecrated Ground</td><td>Takes 15% less damage and reflects 10% of damage
@@ -1052,14 +1053,13 @@ Passive <i>Conviction</i>: allies build <b>Faith</b> whenever
 <b>Divine Shield absorbs damage for them</b> (1 per absorbed hit) and whenever they begin
 a turn standing on <b>Consecrated Ground</b> (1 per ally per turn) — max 5 stacks; doubled
 under Blessing of Zeal; the stacks only work while the Devout stands. Each stack: 3%
-damage mitigation and +2% damage dealt. At 5 stacks the ally is healed for 15% of max
+damage mitigation and +2% damage dealt — <b>doubled to 6% and +4% by the Apostle
+capstone, which is the only node in the game that touches what a HELD stack is worth</b>.
+At 5 stacks the ally is healed for 15% of max
 health, their Faith resets, and the Devout recovers 3% max Mana — <b>and the Devout's own
 maximum health rises by 3% of his BASE maximum for the rest of the battle, healing him for
 the same amount</b>. That growth is linear on his base (3% per release, never 3% of the
-new total) and it lasts the battle only — it does not follow him out of the fight.
-<b>A release that consumed NO stacks — which is every release under Apostle — grants half
-that growth (1.5%), because a stream of free re-triggers would otherwise multiply the
-growth, the release heal and Communion's spread together.</b><br>
+new total) and it lasts the battle only — it does not follow him out of the fight.<br>
 Divine Shield — 15 Mana, 2.5, 2cd; an ally shield absorbing 30% of the Devout's max
 health, then it breaks (Perfect: 35%).<br>
 Consecrated Ground — 25 Mana, 3.0, 3cd; the party takes 15% less damage, reflects
@@ -1347,7 +1347,7 @@ returns pay: invest in the dividend) · <b>ZEAL</b> (invest shallowly in EVERYON
 <tr><td>5</td><td><b>Stalwart</b> — Divine Shield absorbs 50% of the Devout&#x27;s max health (up from the base 30%).</td><td><b>Sacred Covenant</b> — Should Divine Shield prevent lethal damage, its holder is healed for 25% max health and gains 2 Faith stacks.</td><td><b>Crusader&#x27;s Tempo</b> — Blessing of Zeal ticks its target&#x27;s cooldowns down 3 additional turn(s) on cast.</td></tr>
 <tr><td>6</td><td><b>Bastion</b> — Divine Shield has no cooldown at all.</td><td><b>Fervor</b> — Consecrated Ground&#x27;s Faith drip becomes 2 per ally per turn instead of 1.</td><td><b>Purity</b> — Blessing of Zeal also grants its target a Divine Shield absorbing 35% of the Devout&#x27;s max health.</td></tr>
 <tr><td>7</td><td><b>Unyielding Aegis</b> — When Divine Shield breaks, it immediately re-forms at 90% of its original strength (once per cast).</td><td><b>Binding Oath</b> — When an ally&#x27;s Faith releases at 5 stacks, they keep 3 instead of resetting to zero.</td><td><b>Lifewell</b> — Damage reflected by Consecrated Ground heals the party for 80% of the amount reflected.</td></tr>
-<tr><td>CAP</td><td><b>Bulwark of Fortitude</b> — New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.0 int, 3cd; Perfect: the party instantly heals 5%).</td><td><b>Apostle</b> — Faith releases no longer consume stacks: an ally at 5 Faith stays at 5, and every further Faith gain triggers the release again.</td><td><b>Judgement</b> — While Consecrated Ground holds, every enemy that damages a hero is Sundered for 2 turns and takes Break damage equal to 40% of the damage it dealt.</td></tr>
+<tr><td>CAP</td><td><b>Bulwark of Fortitude</b> — New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.0 int, 3cd; Perfect: the party instantly heals 5%).</td><td><b>Apostle</b> — Every stack of Faith an ally carries is worth double: 6% damage mitigation and +4% damage dealt per stack, up from 3% and +2%. Releases still consume the stacks.</td><td><b>Judgement</b> — While Consecrated Ground holds, every enemy that damages a hero is Sundered for 2 turns and takes Break damage equal to 40% of the damage it dealt.</td></tr>
 </table>
 <p><b>Sharpshooter</b> — <b>PRECISION</b> (Focus, crit chance, crit damage) · <b>PENETRATION</b> (armor, Break, finishing the party's work) · <b>TEMPO</b> (speed, cooldowns, Focus acceleration)</p>
 <table border="1" cellpadding="4">

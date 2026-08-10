@@ -738,7 +738,9 @@ var righteous_step := 0       # Righteous Fire: +N pts on the ground's 10%
 var crusade_ranks := 0        # Crusader's Tempo: Zeal ticks N extra cooldown
 var purity_ranks := 0         # Purity: Zeal carries a shield of N% Devout max
 var lifewell_ranks := 0       # Lifewell: reflected damage heals N% of itself
-var apostle := 0              # capstone: releases keep all 5 stacks
+var apostle := 0              # capstone: each held Faith stack is worth
+                              # DOUBLE (Batch BG §2 — it no longer touches
+                              # what a release consumes; see _faith_stack_mult)
 var judgement := 0            # capstone: Cons. Ground BD, % of damage dealt
                               # (the gate AND the magnitude — one field)
 # Batch AW §5 — the two authored talent fallbacks (AU §1). Each is the extra

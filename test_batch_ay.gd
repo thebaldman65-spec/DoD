@@ -967,8 +967,24 @@ func _live_faith_half_growth() -> void:
 	dv.conviction_hp_gained = 0
 	dv.conviction_base_hp = 0
 	ally.faith_stacks = 0
+	# BATCH BG §2 — THE RULE IS STILL SHIPPED, BUT NOTHING REACHES IT THROUGH
+	# A RELEASE ANY MORE. Apostle was the only thing that ever parked an ally
+	# at five; Binding Oath's remnant is `mini(oath_ranks, 4)`, so `keep` is
+	# capped at 4 by construction and the half branch is dead from `_gain_faith`.
+	# The check therefore moves ONE LEVEL DOWN, to the function that owns the
+	# rule — which is the honest place for it, and the two assertions together
+	# say exactly what is true: the tax exists, and the release cannot trigger it.
 	scene.call("_gain_faith", ally, 5)
-	ok(ally.faith_stacks == 5, "Apostle parks the ally at 5")
+	ok(ally.faith_stacks == 0,
+		"Batch BG: no release parks an ally at five, so no release consumes nothing")
+	ok(dv.max_hp == 1030,
+		"...and the release therefore pays the FULL step (+30, got +%d)" % \
+			(dv.max_hp - 1000))
+	dv.max_hp = 1000
+	dv.hp = 1000
+	dv.conviction_hp_gained = 0
+	dv.conviction_base_hp = 0
+	scene.call("_conviction_growth", dv, false)
 	ok(dv.max_hp == 1015,
 		"a release that consumed NOTHING grants HALF growth: +15 on a 1000 base (got +%d)" % \
 			(dv.max_hp - 1000))
@@ -987,6 +1003,6 @@ func _live_faith_half_growth() -> void:
 	ok(dv2.max_hp == 1030,
 		"NEGATIVE CONTROL: a full-consumption release still grants FULL growth (+30, got +%d)" % \
 			(dv2.max_hp - 1000))
-	_report.append("§9: Apostle release +15 of 1000 (half); ordinary release +30 (full) — the multiplier is hit, the base spec untouched")
+	_report.append("§9: no-consume growth +15 of 1000 (half, driven at _conviction_growth since BG left no release that reaches it); ordinary release +30 (full)")
 	await _kill(scene)
 	await _kill(scene2)

@@ -196,7 +196,7 @@
    "see_also": ["res_mercy", "skill_check"]},
   {"id": "res_faith", "term": "Faith", "category": "resources",
    "short": "The Devout's gift: stacks that grow on shielded allies and on holy ground.",
-   "long": "Faith lives on the Devout's ALLIES, not the Devout. Two things build it: every hit a Divine Shield absorbs builds a stack on its bearer, and every ally standing on Consecrated Ground gains one at the start of their turn (cap 5). Each stack grants 3% damage reduction and +2% damage dealt. At 5 the Faith releases - a heal of 15%+ max HP - and the stacks reset to build again. Every release also makes the Devout himself a little bigger: his maximum health rises 3% for the rest of the battle and he is healed for the same amount, so the more his shields are tested, the more there is to shield with.",
+   "long": "Faith lives on the Devout's ALLIES, not the Devout. Two things build it: every hit a Divine Shield absorbs builds a stack on its bearer, and every ally standing on Consecrated Ground gains one at the start of their turn (cap 5). Each stack grants 3% damage reduction and +2% damage dealt - doubled to 6% and +4% if the Devout has taken Apostle, the one node that touches what a HELD stack is worth. At 5 the Faith releases - a heal of 15%+ max HP - and the stacks reset to build again. Every release also makes the Devout himself a little bigger: his maximum health rises 3% for the rest of the battle and he is healed for the same amount, so the more his shields are tested, the more there is to shield with.",
    "see_also": ["res_mercy"]},
   {"id": "res_focus", "term": "Focus", "category": "resources",
    "short": "The Sharpshooter's aim: builds on one target, lost on switching.",

@@ -1551,14 +1551,23 @@ const LANE_TREES := {
 			"desc": "New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.0 int, 3cd; Perfect: the party instantly heals 5%).",
 			"payload": {"grant_ability": "Bulwark of Fortitude",
 				"upgrade": [{"stat": {"bulwark_extra_turns": 1}}]}},
-		# UNCHANGED, and with Conviction's third clause it is THE INTERACTION TO
-		# MEASURE: releases stop consuming stacks, so every further Faith gain
-		# re-triggers one — and every release now grows him. The Communion
-		# chain-guard that already stops release cascades recursing stays exactly
-		# as it is.
+		# BATCH BG §2 — RE-SPECCED OFF THE FREQUENCY AXIS, and the id, the lane
+		# and the payload field all survive so no save migrates. It used to
+		# park allies at 5 so every further gain re-triggered a release; BF
+		# measured that at −8 one-hero and −2 all four AFTER the Communion
+		# repair, i.e. TAKING THE CAPSTONE LOWERED THE ENGINE IT SITS ON.
+		#
+		# RE-PRICING COULD NOT HAVE FIXED THAT AND NEITHER NODE WAS WRONG ON
+		# ITS OWN — THE AXIS WAS. Apostle multiplied release FREQUENCY, the
+		# exact term BE and BF spent two batches taming, so a capstone whose
+		# whole effect was that term would keep producing the same cancellation
+		# at any price. Conviction has two halves — what a stack does WHILE
+		# HELD and what happens when five RELEASE — and all eight Faith nodes
+		# touch the release half. The held half was the one untouched,
+		# capstone-sized axis in the lane. See battle.gd's `_faith_stack_mult`.
 		{"id": "dv_apostle", "name": "Apostle", "ranks": 1, "lane": "Faith", "row": 8,
 			"capstone": true,
-			"desc": "Faith releases no longer consume stacks: an ally at 5 Faith stays at 5, and every further Faith gain triggers the release again.",
+			"desc": "Every stack of Faith an ally carries is worth double: 6% damage mitigation and +4% damage dealt per stack, up from 3% and +2%. Releases still consume the stacks.",
 			"payload": {"stat": {"apostle": 1}}},
 		# The counter is the gate AND the magnitude — one field, one read site.
 		{"id": "dv_judgement", "name": "Judgement", "ranks": 1, "lane": "Zeal", "row": 8,

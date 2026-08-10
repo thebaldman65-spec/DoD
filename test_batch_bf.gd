@@ -551,8 +551,14 @@ func _live_rate_at_four_stacks() -> void:
 # THE BOTTOM OF IT, AND THE BATCH'S WHOLE CHANGE. Not "rarely" — never, over
 # 1200 driven releases, on the exact construction that measured 75% in BE. And
 # the second half, which is the point of the lever rather than a side effect:
-# an Apostle-parked party produces NO Communion-driven release at all, so the
-# node can no longer manufacture a release out of one that already happened.
+# a parked party produces NO Communion-driven release at all, so the node can
+# no longer manufacture a release out of one that already happened.
+#
+# BATCH BG §2 NOTE: nothing in the game parks an ally at five any more — the
+# capstone moved off the release axis. The state is CONSTRUCTED here by writing
+# `faith_stacks` directly, which is what these checks always did; the condition
+# itself is unchanged and is what is under test. Apostle stays learned only so
+# the row keeps naming the build the coupling was found in.
 func _live_never_rolls_at_five() -> void:
 	var scene := await _spawn({"dv_communion": 1, "dv_apostle": 1})
 	var dv := _devout(scene)

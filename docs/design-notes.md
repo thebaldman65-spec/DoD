@@ -4,6 +4,62 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A lane where every node acts on one term is one node with eight prices (Batch BG) — 2026-08-09
+
+Four batches went at the Devout's Faith row. It is worth writing down what
+each of them was actually doing, because read in order they are not four
+attempts at a number — they are a slow discovery that the number was never
+the fault.
+
+**AW and AY aimed at a term worth 4% of the row.** Both went for Conviction's
+growth clause, the one that raises the Devout's maximum health on every
+release. AY halved it with real precision and measured the growth halve
+exactly. The row did not move. It could not have: the growth is 4.3% of the
+lane's healing, and halving 4.3% of something buys you two points. Neither
+batch had any way to know that, because nothing printed the parts.
+
+**BC found the term worth 60% of it, by decomposing rather than guessing.**
+It shipped no gameplay change at all. It broke the aggregate into releases,
+healing per release, and healing by source, and the answer fell out
+immediately: the row was large because it *released a great many times*, not
+because each release paid much. A frequency problem. Two batches had been
+aiming at a magnitude.
+
+**BE and BF fixed the frequency and BF broke a capstone doing it.** Communion
+went 40 → 15, then stopped rolling for allies already at five. Both landed.
+And Apostle — which had been worth +7 points, then +10 — came out at **−8**.
+Taking the capstone now *lowered* the engine it sat on top of, because parking
+allies at five made them invisible to the node that spreads Faith.
+
+That is the fact worth keeping, and it is not about the Devout.
+
+**Apostle multiplied release frequency. So did Communion. So did Fervor,
+Sacred Covenant, Blessed are the Faithful and Binding Oath.** Every one of the
+eight nodes in that lane acted on the same term. A lane like that is not a
+lane — it is one node with eight prices. And when a repair batch finally taxes
+the shared term, every node in the lane moves at once, in the same direction,
+by an amount nobody chose. The capstone's sign did not flip because BF made a
+mistake. It flipped because a capstone that multiplies the thing you are
+taming is *guaranteed* to invert when you tame it, at any price you put on it.
+
+**Which is why this batch did not re-price it.** Re-pricing a node that is on
+the wrong axis moves it along the wrong axis. Conviction has two halves — what
+a stack does *while held*, and what happens when five of them *release* — and
+all eight nodes were on the release half. The held half had never been touched
+by anything, which made it simultaneously the one axis available and the one
+axis that could carry a capstone. Apostle now doubles what a held stack is
+worth. The test of whether that was the right change rather than a smaller
+version of the wrong one is not the magnitude: it is that the two nodes now
+*want the same thing*. Communion pays for allies below five; Apostle pays for
+allies carrying stacks. Both push toward the 1–4 band. The smell BF recorded
+is not reduced, it is inverted.
+
+**The fault was structural long before any number was wrong, and it was
+legible from the tree the day the tree was written.** Nobody needed a sim to
+see that eight nodes all read the same clause. What was needed was for someone
+to ask what each node acts *on* rather than what each node is *worth* — and
+four batches of number-tuning is what it cost not to ask.
+
 ## A zero is evidence about the instrument (Batch BF) — 2026-08-09
 
 A metric that pools three quantities and silently omits a fourth will be
