@@ -686,10 +686,23 @@ var beacon_ranks := 0         # Beacon: turn-start pulse on the nearly-dead
 # units its read site sums, so a node and a rune each pay what they advertise
 # alone AND stacked. FOUR of them hold the INCREASE on a base the kit already
 # pays without the node (stalwart_step on Divine Shield's 30%, righteous_step
-# on the ground's 10%, faithful_step on the release's 15%, fervor_step on the
-# ground's 1 Faith); those are named `_step` for that reason, AV's
-# `guardian_step` precedent. See talents.gd for the node text.
-var faith_stacks := 0         # Conviction: per-ALLY Faith (0-5)
+# on the ground's 10%, faithful_step on the release's 15%); those are named
+# `_step` for that reason, AV's `guardian_step` precedent. (A fourth,
+# `fervor_step`, went with Batch BH §2's re-spec.) See talents.gd for the
+# node text.
+# BATCH BH §2 — FAITH IS NO LONGER ONLY AN ALLY'S. The Devout carries stacks of
+# his own, and HIS NEVER RELEASE: they hold, paying him the same mitigation and
+# damage they pay everyone else. That is a change to what the resource IS rather
+# than to one node, which is why it is written here and in the passive text
+# rather than only in Binding Oath's tooltip. THE BRIEF'S PREMISE FOR IT WAS
+# STALE and is corrected toward the code: it says "Faith has only ever existed
+# on allies — the Devout has no meter of his own anywhere in his kit", but
+# `_gain_faith` has never excluded him (he is a hero), so Consecrated Ground has
+# been dripping Faith onto its own caster since Batch AW §2 and he has been
+# releasing at five like anybody else. THAT release was a frequency source
+# nobody had counted, and closing it is part of §2's job, not a side effect.
+var faith_stacks := 0         # Conviction: Faith (0-5). Allies release at 5;
+                              # THE DEVOUT'S OWN HOLD THERE (Batch BH §2).
 # Batch AW §1 — CONVICTION'S THIRD CLAUSE: every Faith release raises the
 # Devout's maximum by 3% of the maximum he brought to the fight. Linear on
 # base, never on current. `conviction_hp_gained` is the LEAK GUARD: the
@@ -729,8 +742,35 @@ var blessed_barrier_ranks := 0 # Blessed Barrier: N% of absorbs become healing
 var waters_ranks := 0         # Cleansing Waters: N% chance/turn to be cleansed
 var pulse_ranks := 0          # Healing Pulse: N% of Devout max healed per turn
 # Devout Batch K lanes (07-30): the purpose-designed tree's new hooks.
-var fervor_step := 0          # Fervor: +N on the ground's base 1 Faith/turn
-var oath_ranks := 0           # Binding Oath: releases keep N stacks
+# BATCH BH §2 — TWO FIELDS WERE DELETED HERE RATHER THAN RE-POINTED IN PLACE,
+# BECAUSE BOTH NODES CHANGED WHAT THEY MEAN AND NOT ONLY WHAT THEY PAY. That is
+# the harder failure (the BA precedent: `plague_bearer` and `epidemic` went with
+# their read sites so a later batch could not write one, and BD's `deadfall_armed`
+# is the counter-example — same field, new unit, silently). Gone:
+#   · `fervor_step`, the +N on Consecrated Ground's 1 Faith/turn drip. Fervor is
+#     not a drip node any more, so the field has no meaning, no writer and no
+#     reader. The BASE drip of 1 stays exactly as Batch AW §2 shipped it.
+#   · `oath_ranks`, the remnant a release left standing. THAT REMNANT WAS ONE OF
+#     THE THREE FREQUENCY MULTIPLIERS §2 EXISTS TO REMOVE — keeping 3 of 5 means
+#     the next release costs two stacks instead of five — so it is deleted, not
+#     re-priced. A release resets to zero again, as it did before Batch K.
+var fervor := 0               # Fervor: a GATE. While Consecrated Ground holds,
+                              # every ally's Faith stacks are worth double. It
+                              # multiplies the HELD half and adds no releases at
+                              # all; stacks with Apostle for quadruple. Shaped
+                              # like `apostle` deliberately — one multiplier, one
+                              # gate, one read site (`_faith_stack_mult`).
+var oath_faith := 0           # Binding Oath: the Devout gains N Faith of HIS OWN
+                              # whenever an ally's Faith releases.
+var oath_opening := 0         # Rune-only (the Rune of the Binding Oath): N Faith
+                              # the Devout opens the battle already holding. The
+                              # rune's old clause bought a release remnant, which
+                              # the re-spec deleted; this keeps the RELATIONSHIP
+                              # — Faith that persists — through the door that
+                              # still exists (the AZ Deep Sight / AY Deep Bond
+                              # precedent). It is in `Runes.STAT_INT_KEYS`
+                              # because a rune writes it and it does not end
+                              # "_ranks" (the AA float-into-int trap).
 var warded_ranks := 0         # Warded Robes: +N% armor while the shield holds
 var stalwart_step := 0        # Stalwart: +N pts on Divine Shield's 30% absorb
 var unyielding_ranks := 0     # Unyielding Aegis: re-forms at N% of strength

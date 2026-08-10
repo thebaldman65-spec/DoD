@@ -1490,18 +1490,44 @@ const LANE_TREES := {
 			"desc": "Should Divine Shield prevent lethal damage, its holder is healed for {v}% max health and gains 2 Faith stacks.",
 			"scale": {"step": 25},
 			"payload": {"stat": {"covenant_heal": 25, "covenant_faith": 2}}},
-		# RE-SPECCED RATHER THAN REPRICED: Batch AW §2 took Fervor's subject
-		# into the base kit (Consecrated Ground drips 1 Faith per ally per turn
-		# with no node at all), so the node keeps its id and its subject and goes
-		# ONE STEP DEEPER instead.
+		# BATCH BH §2 — RE-SPECCED ONTO CONVICTION'S HELD HALF, AND THE REASON IS
+		# STRUCTURAL RATHER THAN NUMERICAL. BC's decomposition proved this lane
+		# was one node with eight prices: THREE of the eight multiplied release
+		# FREQUENCY and one multiplied release MAGNITUDE, so buying down the lane
+		# compounded instead of choosing. Fervor was one of the three — a deeper
+		# drip is more releases — and its old subject (the drip itself) is base
+		# kit anyway since Batch AW §2. It now doubles what a HELD stack is worth
+		# while the ground is up, which is an axis the lane has never had, and it
+		# ADDS NO RELEASES AT ALL. Stacks with Apostle for QUADRUPLE, which is a
+		# real build rather than a coincidence: both nodes now want the party
+		# carrying stacks instead of cycling them.
+		# The base drip of 1 Faith per ally per turn is UNCHANGED and still needs
+		# no node (`battle._ground_faith_tick`).
+		# No `scale`: like Apostle, the payload is a GATE and the two magnitudes
+		# it doubles are battle.gd constants, so the tooltip states them outright
+		# rather than rendering one and hiding the other (`desc_for` renders a
+		# single {v}).
 		{"id": "dv_fervor", "name": "Fervor", "ranks": 1, "lane": "Faith", "row": 6,
-			"desc": "Consecrated Ground's Faith drip becomes {v} per ally per turn instead of 1.",
-			"scale": {"base": 1, "step": 1},
-			"payload": {"stat": {"fervor_step": 1}}},
+			"desc": "While Consecrated Ground holds, every ally standing on it counts each stack of Faith DOUBLE: 6% damage mitigation and +4% damage dealt per stack, up from 3% and +2%. It grants no extra Faith at all. With Apostle the stacks count quadruple.",
+			"payload": {"stat": {"fervor": 1}}},
+		# BATCH BH §2 — THE LARGEST UNTOUCHED AXIS IN THE LANE: THE DEVOUT'S OWN
+		# FAITH. Its old effect (a release leaves a remnant standing) was the
+		# lane's THIRD frequency multiplier — keeping 3 of 5 means the next
+		# release costs two stacks rather than five — so it is deleted rather
+		# than re-priced, and `oath_ranks` went with it.
+		# What replaces it fits the node's NAME exactly and costs the lane
+		# nothing in frequency: HIS stacks pay while held and never release
+		# (`battle._gain_faith`). It also makes the lane's last pick a different
+		# KIND of thing rather than a larger version of its first.
+		# CORRECTION TOWARD THE CODE, because the brief's premise for this node
+		# was stale: it says the Devout "has no meter of his own anywhere in his
+		# kit". He has had one since Batch AW §2 — Consecrated Ground drips onto
+		# its own caster and `_gain_faith` never excluded him — AND IT RELEASED,
+		# which was an uncounted frequency source. The re-spec closes that too.
 		{"id": "dv_oath", "name": "Binding Oath", "ranks": 1, "lane": "Faith", "row": 7,
-			"desc": "When an ally's Faith releases at 5 stacks, they keep {v} instead of resetting to zero.",
-			"scale": {"step": 3},
-			"payload": {"stat": {"oath_ranks": 3}}},
+			"desc": "Whenever an ally's Faith releases, the Devout gains {v} stack of Faith himself. His own Faith never releases — it holds, paying him the same mitigation and damage it pays them.",
+			"scale": {"step": 1},
+			"payload": {"stat": {"oath_faith": 1}}},
 		# --- Lane ZEAL — EVERYONE, SHALLOWLY: invest a little in the whole
 		# party. (Its old thesis was "everything else he casts", which is the
 		# fault Holy's Sanctuary had — a lane named after the leftovers.) ---

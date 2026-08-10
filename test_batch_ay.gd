@@ -563,8 +563,20 @@ func _negative_control_source() -> void:
 	ok(bsrc.contains("minf(0.10 * sp_ursus, BOND_MITIGATION_MAX)"),
 		"NEGATIVE CONTROL: Savage Presence cannot cross zero into healing")
 	# (5) §9: a release that DID consume stacks must still pay full growth.
-	ok(bsrc.contains("_conviction_growth(devout, keep < 5)"),
-		"NEGATIVE CONTROL: only a no-consume release is halved")
+	# RE-POINTED IN PLACE (Batch BH §2), and the question is now asked of a
+	# stronger fact. AY's grep pinned the call site's `keep < 5` argument; BG
+	# made the half branch unreachable (nothing parks an ally at five) and BH
+	# DELETED `keep` itself along with Binding Oath's remnant, the last thing
+	# that ever wrote a non-zero one. So the call site passes a literal, and
+	# what is worth pinning here is that it passes the FULL-consumption one —
+	# a release that resets to zero must never be billed as a no-consume
+	# release. THE RULE ITSELF IS UNTOUCHED inside `_conviction_growth`, where
+	# this suite already drives both branches directly.
+	ok(bsrc.contains("_conviction_growth(devout, true)")
+		and not bsrc.contains("_conviction_growth(devout, false)"),
+		"NEGATIVE CONTROL: a release that consumes all five pays FULL growth")
+	ok(bsrc.contains("pct *= CONVICTION_NO_CONSUME_SHARE"),
+		"NEGATIVE CONTROL: ...and the half-growth rule still exists to be halved by")
 	# (6) §8: the passive's mark is one constant, and the node magnitudes are
 	# not swept up in it.
 	ok(bsrc.contains("const OLD_GODS_MARK := 2"),

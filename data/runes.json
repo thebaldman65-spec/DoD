@@ -290,8 +290,8 @@
 	"binding_oath": {
 		"name": "Rune of the Binding Oath", "rarity": "rare", "scope": "spec:inquisitor",
 		"price": 100, "lane": "Faith",
-		"desc": "A Faith release leaves 1 stack standing instead of nothing, and heals 5% more of the bearer's max health.",
-		"payload": {"stat": {"oath_ranks": 1, "faithful_step": 5}}
+		"desc": "The oath is sworn before the fight: the Devout opens each battle holding 1 Faith of his own, and a Faith release heals 5% more of the bearer's max health.",
+		"payload": {"stat": {"oath_opening": 1, "faithful_step": 5}}
 	},
 	"burning_censer": {
 		"name": "Rune of the Burning Censer", "rarity": "rare", "scope": "spec:inquisitor",

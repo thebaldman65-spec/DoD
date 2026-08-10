@@ -255,15 +255,24 @@ func _the_capstone_describes_the_held_half() -> void:
 # have added a fourth frequency lever rather than moved off the axis.
 func _the_release_branch_no_longer_names_the_capstone() -> void:
 	var src := _src("res://scripts/battle.gd")
+	# BATCH BH §2 RE-POINTED THIS IN PLACE. BG's question was "does the release
+	# branch still read `apostle`", asked by slicing around the `keep` local.
+	# BH deleted `keep` itself along with Binding Oath's remnant — the last
+	# thing that ever wrote a non-zero one — so the slice has no anchor. The
+	# question survives and is asked of the whole branch, which is strictly
+	# stronger: NOTHING in the release reads the capstone, and nothing keeps a
+	# remnant at all any more.
 	var i := src.find("func _gain_faith(")
 	ok(i > 0, "§2: _gain_faith is findable")
 	var body := src.substr(i, src.find("func _conviction_growth(") - i)
-	var keep := body.find("var keep := 0")
-	var after := body.substr(keep, body.find("u.faith_stacks = keep") - keep)
-	ok(not after.contains("apostle"),
-		"§2: nothing between `var keep` and its use reads `apostle` — the park is gone")
-	ok(after.contains("oath_ranks"),
-		"§2: ...and Binding Oath is the only thing left that keeps a remnant")
+	var rel := body.find("# The fifth stack:")
+	var after := body.substr(rel, body.length() - rel)
+	ok(not after.contains(".apostle"),
+		"§2: nothing in the release branch reads `apostle` — the park is gone")
+	ok(not after.contains("oath_ranks") and not body.contains("var keep"),
+		"§2: ...and Batch BH deleted the remnant, so a release always resets to zero")
+	ok(body.contains("u.faith_stacks = 0"),
+		"§2: ...which the branch says outright")
 	# Belt and braces: `keep = 5` is what the old branch wrote.
 	ok(not body.contains("keep = 5"),
 		"§2: no branch of the release keeps all five stacks")
@@ -409,15 +418,20 @@ func _live_release_still_consumes() -> void:
 	ok(_stat_of(scene, "faith_releases") == 1.0,
 		"§2: five single gains from zero pay ONE release, not five (%.0f)" % \
 			_stat_of(scene, "faith_releases"))
-	# Binding Oath is untouched and is now the only remnant in the game.
+	# BATCH BH §2 RE-POINTED THIS IN PLACE AND INVERTED IT. BG's check was
+	# "Binding Oath still keeps its 3, capstone or no" — the remnant was the
+	# only one left in the game and BG was guarding it. BH deleted it as the
+	# lane's third frequency multiplier, so the question worth asking at this
+	# exact setup is the opposite one, and it is the control that would catch
+	# the remnant being restored.
 	await _kill(scene)
 	scene = await _spawn({"dv_apostle": 1, "dv_oath": 1})
 	ally = scene.get("heroes")[0]
 	ally.faith_stacks = 0
 	scene.call("_gain_faith", ally, 5)
-	ok(ally.faith_stacks == 3,
-		"§2: Binding Oath still keeps its 3, capstone or no (left at %d)" % ally.faith_stacks)
-	_report.append("release under Apostle leaves %d stacks (was 5); with Binding Oath, 3" % 0)
+	ok(ally.faith_stacks == 0,
+		"§2: a release resets to ZERO, Binding Oath or no (left at %d)" % ally.faith_stacks)
+	_report.append("release under Apostle leaves %d stacks (was 5); with Binding Oath, also 0" % 0)
 	await _kill(scene)
 	_live_ran += 1
 

@@ -4,6 +4,60 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The lane was one node with eight prices, and taking the prices off cost most of the lane (Batch BH) — 2026-08-10
+
+BG moved the capstone off the frequency axis and wrote down why: a lane where
+every node multiplies the same term is indistinguishable from a single
+expensive node. BH finished the job in the lane body — Fervor and Binding Oath
+went onto axes the lane had never had — and the result is worth recording
+because it is the part nobody predicted.
+
+**The row did not settle below its siblings. It fell to a third of them.**
+Four batches of tuning had moved it between 80% and 33%; taking the structure
+apart moved it to roughly where his weakest lane sits. That is not a mistake in
+the re-spec and it was not corrected, because it is the honest measurement of
+something the tuning had been hiding: **most of what the lane was worth was the
+compounding, not the nodes.** Three multipliers on one term do not add up, they
+multiply, and four batches of shaving one of them at a time could never have
+revealed how much of the total was the product rather than the parts. The only
+way to find out was to take all three off at once and look.
+
+**The thing to hold onto is what that says about the four tuning batches.** None
+of them was wrong about its own number. AW and AY halved a growth clause worth
+4% and measured a row that did not move. BE and BF took Communion from 40 to 15
+and then conditioned it, and both landed exactly where they aimed. Every one of
+those measurements was correct, and the sum of them still did not tell anybody
+what the lane was worth, because a lane whose nodes multiply cannot be
+understood one node at a time. **A leave-one-out grid on a compounding lane
+under-reports every node in it**, which is why BC's grid read Binding Oath at
+one point and BH's re-spec of that same node moved the row by eleven.
+
+**The rule this leaves, and it is worth having beyond the Devout:** if
+withholding any single node moves a lane's headline by more than about fifteen
+points, the lane is not a set of choices, it is one choice with several prices,
+and no amount of re-pricing will make it behave. That is a test you can run on a
+tree before anybody plays it.
+
+**It comes with a caveat that only shows up once you pass it.** The re-specced
+lane passes easily — nothing in it moves the headline by more than a point,
+against Communion's thirty-three before. But an ungeared Devout standing beside
+the same three built allies reads 11%, and the full eight-node lane reads 13. The
+whole lane is worth two points, and nothing inside a two-point lane could move a
+headline by fifteen however badly it were designed. **A lane that does nothing
+passes the shape test perfectly.** So the grid has to be read against the lane's
+own distance from the ungeared floor, and a lane can fail in two directions: one
+node worth everything, or eight nodes worth nothing.
+
+**And the smell did not go away, it moved.** BF found Apostle inverted — taking
+the capstone lowered the engine it sat on. BG fixed that, and BH's own
+leave-one-out promptly found the same inversion one row down, on the node it had
+just re-specced. Two different nodes, two batches apart, the same sign error, and
+in both cases the cause was that the node changed the state of a system that
+feeds itself. That is not a coincidence about the Devout; it is what happens
+whenever a node's payoff and its own supply are wired to the same meter. The
+next lane built on a self-feeding resource should be read for that before it is
+priced.
+
 ## A lane where every node acts on one term is one node with eight prices (Batch BG) — 2026-08-09
 
 Four batches went at the Devout's Faith row. It is worth writing down what

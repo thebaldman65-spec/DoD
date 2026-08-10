@@ -299,8 +299,15 @@ func _magnitudes() -> void:
 			["dv_faithful", "faithful_step", 20],       # 15 + 20 = 35%
 			["dv_covenant", "covenant_heal", 25],
 			["dv_covenant", "covenant_faith", 2],
-			["dv_fervor", "fervor_step", 1],            # 1 + 1 = 2/turn
-			["dv_oath", "oath_ranks", 3],
+			# BATCH BH §2 RE-POINTED BOTH OF THESE IN PLACE. Fervor and Binding
+			# Oath were re-specced off the release-frequency axis, so neither
+			# counter exists any more: `fervor_step` (the +1 on the ground's
+			# drip) and `oath_ranks` (the remnant a release left standing) were
+			# DELETED WITH THEIR READ SITES, not renamed. The question AW is
+			# asking here — "every node writes its own magnitude in the units
+			# its read site sums" — is asked of the replacements instead.
+			["dv_fervor", "fervor", 1],                 # a GATE, like apostle
+			["dv_oath", "oath_faith", 1],               # Faith HE gains per ally release
 			["dv_waters", "waters_ranks", 50],
 			["dv_righteous", "righteous_step", 25],     # 10 + 25 = 35%
 			["dv_pulse", "pulse_ranks", 8],
@@ -326,8 +333,12 @@ func _magnitudes() -> void:
 		"...and no longer merely subtracts a turn (%s)" % str(bas.get("add", {})))
 	# The tooltips render the DESIGN value, and for most of this tree that is
 	# the only place the number appears outside a battle.gd read site.
+	# BATCH BH §2: `dv_fervor` left this list because it no longer HAS a
+	# rendered total — like Apostle it is a gate whose two magnitudes are
+	# battle.gd constants, so its tooltip states them outright and
+	# test_batch_bh asserts them there.
 	for pair in [["dv_stalwart", "50"], ["dv_faithful", "35"],
-			["dv_righteous", "35"], ["dv_fervor", "2"]]:
+			["dv_righteous", "35"]]:
 		var n := _node(String(pair[0]))
 		var shown := Talents.desc_for(n, 1)
 		ok(shown.contains(String(pair[1])),
@@ -351,7 +362,10 @@ func _additive_units() -> void:
 			["0.01 * devout.communion_ranks", "Communion"],
 			["0.01 * devout.faithful_step", "Blessed are the Faithful"],
 			["0.01 * devout.covenant_heal", "Sacred Covenant"],
-			["1 + devout.fervor_step", "Fervor"],
+			# BATCH BH §2: Fervor is a gate on the multiplier now, not an
+			# addend on the drip. Its read site is `_faith_stack_mult`.
+			["devout.fervor > 0", "Fervor"],
+			["devout.oath_faith > 0", "Binding Oath"],
 			["0.01 * zl_dv.waters_ranks", "Cleansing Waters"],
 			["0.01 * cg_dv.righteous_step", "Righteous Fire"],
 			["0.01 * zl_dv.pulse_ranks", "Healing Pulse"],
@@ -364,11 +378,22 @@ func _additive_units() -> void:
 	# No old ranked counter may survive anywhere.
 	var usrc := FileAccess.get_file_as_string("res://scripts/unit.gd")
 	var rsrc := FileAccess.get_file_as_string("res://data/runes.json")
+	# BATCH BH §2 ADDED `fervor_step` AND `oath_ranks` to this sweep: both were
+	# live AW counters and both are deleted now, so the same rule that keeps an
+	# old ranked name from surviving keeps these from surviving either.
 	for dead in ["stalwart_ranks", "righteous_ranks", "faithful_ranks",
-			"fervor_ranks", "covenant_ranks"]:
-		ok(not bsrc.contains(dead) and not usrc.contains(dead)
-			and not rsrc.contains(dead),
-			"the ranked counter %s is gone from every read site" % dead)
+			"fervor_ranks", "covenant_ranks", "fervor_step", "oath_ranks"]:
+		# BATCH BH §2 SHARPENED THE PREDICATE, and it is a sharpening rather
+		# than a weakening: the question is "can anything READ OR WRITE this
+		# counter", and a bare `contains` also trips on a COMMENT naming the
+		# field — which is exactly how this project records that a field was
+		# deleted deliberately (the BA `plague_bearer` precedent asks a later
+		# batch not to re-add one, and it can only ask by naming it). So the
+		# three greps now look for a read (`.name`), a declaration (`var name`)
+		# and a rune key (`"name"`) rather than for the string anywhere.
+		ok(not bsrc.contains("." + dead) and not usrc.contains("var " + dead)
+			and not rsrc.contains('"%s"' % dead),
+			"the ranked counter %s has no read site, no declaration and no rune key" % dead)
 	# Nor may an old ranked MULTIPLIER survive on a counter that kept its name.
 	for dead_math in ["0.04 * devout.blessed_barrier_ranks",
 			"0.15 * attacker.aegis_ranks", "0.05 * devout.afterglow_ranks",
@@ -491,8 +516,13 @@ func _rune_audit() -> void:
 		and int(wr.get("warded_ranks", 0)) == 10,
 		"the Warded Robes pays its advertised 4%% absorb-heal and +10%% armor (got %s)" % str(wr))
 	var bo: Dictionary = Runes.build("binding_oath")["payload"]["stat"]
-	ok(int(bo.get("oath_ranks", 0)) == 1 and int(bo.get("faithful_step", 0)) == 5,
-		"the Binding Oath leaves 1 stack and heals 5%% more (got %s)" % str(bo))
+	# BATCH BH §2 RE-POINTED THE FIRST CLAUSE IN PLACE. The node stopped
+	# leaving a remnant, so "a release leaves 1 stack standing" had no
+	# equivalent value; the rune keeps the RELATIONSHIP (Faith that persists)
+	# through the Devout's own meter instead. Its SECOND clause is byte-
+	# untouched, which is what this check is really guarding.
+	ok(int(bo.get("oath_opening", 0)) == 1 and int(bo.get("faithful_step", 0)) == 5,
+		"the Binding Oath opens with 1 Faith of his own and heals 5%% more (got %s)" % str(bo))
 	var bc: Dictionary = Runes.build("burning_censer")["payload"]["stat"]
 	ok(int(bc.get("righteous_step", 0)) == 10
 		and int(bc.get("lifewell_ranks", 0)) == 20,
@@ -507,7 +537,9 @@ func _rune_audit() -> void:
 	# A rune writing an int field whose name does not end "_ranks" MUST be in
 	# STAT_INT_KEYS or JSON's float slides into a typed int var and the hero
 	# fails to spawn — the AA trap, through the AW door.
-	for f2 in ["faithful_step", "righteous_step", "stalwart_step", "fervor_step"]:
+	# BATCH BH §2: `fervor_step` left the list with the field; `oath_opening`
+	# joined it, being the bare int the re-pointed rune now writes.
+	for f2 in ["faithful_step", "righteous_step", "stalwart_step", "oath_opening"]:
 		ok(Runes.STAT_INT_KEYS.has(f2),
 			"%s is listed in Runes.STAT_INT_KEYS" % f2)
 	# Lane tags must name a live lane, or the rune is homeless in the bot's
@@ -540,7 +572,8 @@ func _rune_audit() -> void:
 	# silently deleted. AW retires no Devout node, so there is nothing to
 	# vault — asserted so a later batch that DOES retire one has to say so.
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
-	for still_live in ["blessed_barrier_ranks", "warded_ranks", "oath_ranks",
+	# BATCH BH §2: `oath_ranks` -> `oath_opening`, the field the rune writes now.
+	for still_live in ["blessed_barrier_ranks", "warded_ranks", "oath_opening",
 			"faithful_step", "righteous_step", "lifewell_ranks",
 			"devoutness_ranks", "pulse_ranks"]:
 		ok(bsrc.contains(still_live),
@@ -646,9 +679,12 @@ func _negative_control_source() -> void:
 		and bsrc.count("heroes[i].conviction_hp_gained") == 1,
 		"conviction_hp_gained has exactly one writer and one reader in battle.gd")
 	# The drip must not be gated on the node.
-	ok(not bsrc.contains("devout.fervor_step > 0:")
-		and not bsrc.contains("if devout.fervor_step <= 0"),
-		"NEGATIVE CONTROL: the ground's Faith drip is not gated on Fervor")
+	# BATCH BH §2 STRENGTHENED THIS RATHER THAN RE-POINTING IT. AW's question
+	# was "the drip is not GATED on Fervor"; the drip is not touched by Fervor
+	# at all now, so the check asserts the stronger thing — the flat 1.
+	ok(bsrc.contains("_gain_faith(u, 1)")
+		and not bsrc.contains("devout.fervor_step"),
+		"NEGATIVE CONTROL: the ground's Faith drip is a flat 1, un-gated and un-deepened")
 
 
 # ---------- live: §1 the growth is LINEAR ON BASE ----------
@@ -807,7 +843,7 @@ func _live_ground_drip() -> void:
 	var bare := await _spawn({})
 	var dv := _hero(bare, 2)
 	var ally := _hero(bare, 0)
-	ok(dv.fervor_step == 0, "Fervor is NOT learned")
+	ok(dv.fervor == 0, "Fervor is NOT learned")
 	ally.faith_stacks = 0
 	# NO GROUND, NO FAITH — the gate has to be real or the next check is
 	# measuring nothing.
@@ -826,19 +862,24 @@ func _live_ground_drip() -> void:
 	ok(bsrc.count("func _ground_faith_tick") == 1
 		and bsrc.count("_ground_faith_tick(u)") == 1,
 		"the drip has one implementation and one caller")
-	ok(bsrc.contains("var gain := 1 + devout.fervor_step"),
-		"...and its base is 1, with Fervor as the increase")
+	ok(bsrc.contains("_gain_faith(u, 1)"),
+		"...and it is a flat 1, which is the whole of AW §2's base kit")
 	await _kill(bare)
-	# THE NODE DEEPENS IT: 2 per ally per turn.
+	# BATCH BH §2 RE-POINTED THE SECOND HALF OF THIS CHECK, and INVERTED it
+	# rather than deleting it — which is the point. AW asked "does the node
+	# DEEPEN the drip"; a deeper drip is a release-frequency multiplier, and
+	# taking that off this lane is BH §2's whole subject. So the question the
+	# check asks now is the opposite one, and it is the negative control that
+	# would catch the node being put back: does Fervor leave the drip ALONE?
 	var deep := await _spawn({"dv_fervor": 1})
 	var dv2 := _hero(deep, 2)
 	var ally2 := _hero(deep, 0)
-	ok(dv2.fervor_step == 1, "Fervor is stamped as the +1 increase")
+	ok(dv2.fervor == 1, "Fervor is stamped as a gate on the HELD half")
 	ally2.faith_stacks = 0
 	deep._apply_status(ally2, "cons_ground", 3)
 	deep._ground_faith_tick(ally2)
-	ok(ally2.faith_stacks == 2,
-		"...and with the node the drip is 2 (got %d)" % ally2.faith_stacks)
+	ok(ally2.faith_stacks == 1,
+		"...and with the node the drip is STILL 1 (got %d)" % ally2.faith_stacks)
 	await _kill(deep)
 
 

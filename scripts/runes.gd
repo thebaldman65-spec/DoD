@@ -110,10 +110,19 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	"triage_heal", "divine_presence_pct", "last_hope_pct",
 	# Batch AW: the Devout's counters went additive too. Most kept their
 	# "_ranks" names (they are still int magnitudes, just in bigger units), but
-	# the four holding the INCREASE on a base the kit pays without the node are
+	# those holding the INCREASE on a base the kit pays without the node are
 	# named "_step" — and two of them are written by runes today (the Burning
 	# Censer's righteous_step, the Binding Oath's faithful_step).
-	"stalwart_step", "righteous_step", "faithful_step", "fervor_step",
+	# BATCH BH §2 REMOVED `fervor_step` FROM THIS LIST WITH THE FIELD ITSELF:
+	# Fervor no longer deepens Consecrated Ground's drip, so the counter has no
+	# meaning, no writer and no reader (the AY `loyalty_cap_bonus` precedent —
+	# a field deleted with its premise leaves this list too, or the list decays
+	# into a graveyard of names nothing can write).
+	# `oath_opening` JOINS IT for the ordinary reason: the Rune of the Binding
+	# Oath writes a bare 1 into it and the name does not end "_ranks", which is
+	# exactly the AA float-into-int trap. `oath_faith` is NOT here — no rune
+	# writes it, and node payloads are GDScript ints already.
+	"stalwart_step", "righteous_step", "faithful_step", "oath_opening",
 	"covenant_heal", "covenant_faith",
 	"resolve_extra_turns", "bulwark_extra_turns",
 	# Batch AX: the Occultist's counters went additive as well. Four hold the

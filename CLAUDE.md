@@ -268,6 +268,22 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 
 ## Current systems snapshot (2026-08-09)
 
+### STANDING RULE — FIFTEEN POINTS UNDER LEAVE-ONE-OUT IS WHAT MAKES A LANE A LANE (Batch BH §2)
+**If withholding any single node moves a lane's headline contribution by more than about fifteen
+points, that lane is not a set of choices — it is ONE choice with several prices, and no amount
+of re-pricing will make it behave.** BC's grid had Communion at THIRTY-THREE on the Devout's
+Faith lane, and four consecutive batches then tuned magnitudes on a lane whose fault was its
+shape. This is a test you can run on a tree before anybody plays it, and it is cheap:
+`DOD_SIM_TALENTS` with one id withheld is the whole harness.
+**TWO CAVEATS THAT MUST TRAVEL WITH IT, both learned by running it (BH §2):**
+· **A LANE THAT DOES LITTLE PASSES TRIVIALLY.** No node can move a headline by fifteen points
+when the whole lane is worth three above ungeared. Read the grid against the lane's own
+distance from the ungeared floor, never as an absolute.
+· **THE GRID UNDER-REPORTS EVERY NODE IN A COMPOUNDING LANE.** Where several nodes multiply the
+same term, withholding one leaves the others multiplying, so each reads small and the total is
+large. BC measured Binding Oath at one point on exactly this lane. **A small leave-one-out
+number is evidence of a node's marginal worth, NOT of its structural role.**
+
 ### STANDING DESIGN RULE — THE CONTAGION SPACE IS RESERVED (Batch BA §1)
 **A future spec is planned whose fantasy is DISEASE AND VIRALITY. Nothing self-propagating
 may be authored into the Survivalist's tree, or into any existing spec, until that spec is
@@ -281,6 +297,137 @@ the new spec's idea a second time. **BA re-specced four nodes off it** — Epide
 every enemy permanently Poisoned), Plague Bearer (rot leaps enemy to enemy), Creeping Death
 (a corpse passes its stacks to the living) and the NAME Virulence (a pathogen term). SNARES
 and GUERILLA were never disease and are untouched by the rule.
+
+BATCH BH (08-10) — FOUR MORE ABILITY UPGRADES, AND THE FAITH LANE GETS A SECOND AXIS. Two
+things that do not interact: **§1 is additive content, §2 is two re-specs.** No save version
+moves (still v7); every id survives.
+
+§1 **THE UPGRADE POOL GOES FROM FOUR TO EIGHT AND CLOSES THERE — see the entry under "Known
+open threads" below**, which is where it belongs and where it will be looked for. Short version:
+Weighted / Widened / Piercing / Certain, on Break, breadth, armor and status reliability; the
+new ids are APPENDED to `UPGRADE_PRIORITY` because that list is AU §1's fallback order and a
+compatibility surface; three of the brief's field names were corrected toward the code; and
+**`up_sure` was not written because the Perfect window is a script constant a grader with no
+arguments reads, and the bot never runs the bar at all.** Certain reaches 2 of 92 abilities and
+that is REPORTED, not forced.
+
+§2 **FERVOR AND BINDING OATH MOVE OFF THE RELEASE-FREQUENCY AXIS, FINISHING WHAT BG STARTED ON
+THE CAPSTONE.** BC's decomposition proved this lane was one node with eight prices — three of
+the eight multiplied release FREQUENCY and one multiplied release MAGNITUDE. BG moved Apostle;
+BH moves the other two, leaving **Communion as the lane's single frequency node** (15, untouched)
+and Sacred Covenant's +2 on a lethal save (one small frequency term is not the fault).
+**BC'S GRID FIGURES TRAVEL WITH THE TWO RE-SPECS SO NOBODY RE-PRICES THEM BACK ONTO FREQUENCY**
+(full lane 80% | 2255 healing | 32.21 releases): **−Fervor read 64% | 956 | 14.19 — the node
+HALVED release frequency, which is exactly why its old subject had to go**; −Binding Oath read
+79% | 2123 | 30.43, i.e. ONE point, and BH's own instrument later showed why that number was
+misleadingly small (see the leave-one-out caveat in the standing rule above). −Communion read
+47% | 444 | 7.08, THIRTY-THREE points, and Communion is the one that stays.
+· **FERVOR — THE HELD HALF.** Was: the ground's Faith drip becomes 2 per ally per turn. Now:
+**while Consecrated Ground holds, every ally standing on it counts each stack DOUBLE — 6%
+mitigation and +4% damage dealt — and it grants no extra Faith at all.** Stacks with Apostle for
+QUADRUPLE. The base drip of 1 is AW §2's and is untouched.
+· **BINDING OATH — THE DEVOUT'S OWN FAITH.** Was: a release leaves 3 stacks standing, which
+means the NEXT release costs two rather than five, i.e. the third frequency multiplier wearing a
+"you keep some" coat. Now: **an ally's release swears the Devout a stack of his own, and HIS
+never releases — it holds, paying him the same mitigation and damage it pays them.**
+**THE BRIEF'S PREMISE FOR THAT NODE WAS STALE AND CORRECTING IT MADE THE CHANGE BIGGER THAN THE
+BRIEF THOUGHT. It says the Devout "has no meter of his own anywhere in his kit". HE HAS HAD ONE
+SINCE BATCH AW §2** — Consecrated Ground drips onto its own caster and `_gain_faith` never
+excluded him — **AND IT RELEASED**, healing, growing his own maximum and rolling Communion. That
+was an uncounted frequency source; closing it is what §2's own named negative control asks for,
+and it is why this is a change to WHAT THE RESOURCE IS rather than to one node.
+**ONE MULTIPLIER, TWO GATES, ONE READ SITE**: `_faith_stack_mult(devout, holder)` takes the
+HOLDER too, because Fervor reads the CARRIER's ground — reading the Devout's would double
+everybody whenever he stood on his own. `.apostle` is still read in exactly one place.
+**TWO FIELDS DELETED WITH THEIR READ SITES, not re-pointed in place** (both nodes changed what
+they MEAN, the harder failure — the BA `plague_bearer` precedent): `fervor_step` and
+`oath_ranks`. Three replace them: `fervor` (a gate shaped like `apostle`), `oath_faith`,
+`oath_opening`. `fervor_step` LEFT `Runes.STAT_INT_KEYS` with the field; `oath_opening` joined it.
+**THE RUNE OF THE BINDING OATH COULD NOT PAY WHAT IT PAID — RE-POINTED, NOT DELETED, AND
+REPORTED** (the AZ Deep Sight / AY Deep Bond / AX Hollow Chalice precedent): its first clause
+bought the deleted remnant, so it keeps the RELATIONSHIP (Faith that persists) through
+`oath_opening` — the Devout opens each battle already holding one. Second clause
+(`faithful_step` 5) byte-untouched, desc rewritten. **A dead-clause repair, NOT the rune
+magnitude pass closed in AF.** `_swear_opening_oath()` is its own function called from the
+battle-start block (the `_run_battle`-cannot-be-driven-headlessly rule).
+**AY §9's HALF-GROWTH RULE IS UNREACHABLE TWICE OVER NOW** — Apostle was the only thing that
+parked an ally at five (BG) and the remnant was the last writer of a non-zero `keep` (BH), so a
+release always consumes all five. Rule and argument stay in `_conviction_growth`, where
+test_batch_ay drives them.
+
+§2 MEASURED, n=200 every row, BC/BE's lineup, **ONE session, ONE instrument, with the pre-BH
+rows RE-RUN on an unmodified-HEAD copy rather than quoted — and the HEAD rows REPRODUCE BG's
+exactly** (BG published FAITH 38 / ZEAL 32 / BULWARK 12; HEAD reads 39 / 32 / 12).
+`d+h+p%` | healing/battle | releases/battle | healing per release | growth/battle:
+**ALL FOUR BUILT** — FAITH+Apostle **HEAD 39% | 331 | 4.78 | 62 | 28.6 HP** → **BH 13%/14% |
+26/31 | 0.42/0.49 | 54 | 2.9 HP**; −Apostle **HEAD 38% | 312 | 4.51 | 62** → **BH 13% | 32 |
+0.51 | 54**; **ZEAL 32 → 31**; **BULWARK 12 → 12**.
+**ONE-HERO** — FAITH+Apostle **HEAD 63% | 918 | 12.80 | 65** → **BH 25% | 95 | 1.50 | 55**;
+−Apostle **BH 24% | 100 | 1.59 | 55**.
+**THE BAR: FAITH 13 | ZEAL 31 | BULWARK 12 — 0.44x, from BG's 1.19x. THE LANE WENT FROM TWICE
+ITS SIBLINGS TO LEVEL WITH THE WEAKEST OF THEM. REPORTED AND NOT CORRECTED, on §2's explicit
+instruction; Blessed are the Faithful is the node to raise if the designer wants it raised.**
+**ZEAL AND BULWARK ARE THE CONTROL AND THEY DO NOT MOVE** — worth measuring rather than
+assuming, because unlike BE's and BF's levers this batch changed a rule about the RESOURCE, so
+the two lanes taking no Faith node were no longer byte-identical by construction.
+**THE SHAPE TEST PASSES ON BOTH HALVES: releases/battle 4.78 → 0.42-0.49 all four and 12.80 →
+1.50 one-hero, while healing per release stays flat** (62 → 54, 65 → 55; the small fall is
+explained — HEAD's average included the Devout's OWN releases at his grown maximum, and only
+allies release now).
+**AND THE INSTRUMENT FINDING, WHICH MATTERS MORE THAN THE GRID — see the Faith entry under
+"Known open threads": THE ALL-FOUR ROW IS NO LONGER A ±2-POINT INSTRUMENT.** The first read of
+the −Binding Oath cell came back **24% / 2.06 releases** and does not reproduce (three later
+reads: 12/13/14%).
+**THE LEAVE-ONE-OUT GRID, EVERY CELL REPLICATED BECAUSE OF THAT** (all four built, n=200 a read,
+d+h+p% per read → median): **full 13/14/13/13 → 13; −Communion 14/14/13 → 14; −Fervor 13/13/13
+→ 13; −Binding Oath 24(runaway)/12/13/14 → 13.** Releases/battle 0.36-0.49 in every cell.
+**NOTHING MOVES THE HEADLINE BY MORE THAN ONE POINT, against BC's Communion at THIRTY-THREE —
+so on §2's stated test the lane is a lane. IT PASSES TRIVIALLY AND THAT MUST BE SAID: an
+UNGEARED Devout beside the same three built allies reads 11%, so the whole eight-node lane is
+worth about TWO POINTS over no lane at all**, and nothing inside a two-point lane can move a
+headline by fifteen. That caveat is attached to the standing rule above.
+**THE LANE'S ONE SURVIVING FREQUENCY NODE IS NEARLY DORMANT TOO, and so is the node re-specced
+to replace one: Communion only rolls ON a release** and at 0.4 releases/battle it barely rolls
+(hence its 1 point), **and Binding Oath's payer IS ally releases — the very term §2 damped.**
+Both reported, neither touched.
+
+LIVE AUTOPLAY clean (0 SCRIPT ERROR) and **FERVOR READS CORRECTLY IN A REAL FIGHT** —
+"Consecrated Ground kindles Berserker (+1 Faith) — and his Faith is worth double here (Fervor)",
+i.e. the flat drip and the doubling in one line. **BUT IN FIVE CONSECUTIVE AUTOPLAY BATTLES THE
+FAITH NEVER RELEASED ONCE.** That is exactly what 0.4 releases/battle means and it is not a bug,
+but it deserves the plainest statement available: **THE DEVOUT'S SIGNATURE PAYOFF HAS LARGELY
+LEFT ORDINARY FIGHTS** — the same shape as AX's Ruin-in-trash finding, and the same rule applies
+(reporting the number was the job; the decision is the designer's). Binding Oath's log line is
+consequently unexercised by the smoke; test_batch_bh drives it directly, where a rare branch
+belongs.
+VERIFIED: check_parse 0, check_flow 0 (6 screens), 11 scenes 0 SCRIPT ERROR, run-harness gates
+1/2/3 PASS. NEW test_batch_bh.gd **230/0**.
+NEGATIVE CONTROLS RUN, SEVEN, each applied and reverted (the suite came back to 230/0 after the
+last): **Fervor still dripping stacks trips 2, the Devout's own Faith reaching five and
+releasing trips 5, a new upgrade bypassing AP's eligibility filter trips 4, Fervor reading the
+DEVOUT's ground instead of the HOLDER's trips 4, Binding Oath's remnant restored trips 2, the
+four new upgrades inserted AHEAD of the old four trips 9, and Weighted landing on `damage`
+rather than `pressure` trips 2.**
+**SIX SUITES RE-POINTED IN PLACE with the reason in each file, and THREE OF THE RE-POINTS ARE
+INVERSIONS** — the honest treatment when a batch reverses a rule an older batch was guarding:
+test_batch_aw's "does Fervor deepen the drip" now asks whether it leaves the drip alone;
+test_batch_ax's §7 finding ("the ground already pays 2") became history and the site pins the
+flat 1; test_batch_bg's "Binding Oath still keeps its 3" became "a release resets to zero,
+Binding Oath or no". test_batch_an's pool-of-four literal and test_batch_au's four-entry
+priority list moved to the pool's real size and to the ORIGINAL FOUR still leading it.
+**ONE CHECK WAS SHARPENED RATHER THAN RE-POINTED, and the reason generalises:** test_batch_aw's
+dead-counter sweep used a bare `contains`, which trips on a COMMENT naming a deleted field — and
+naming them is exactly how this project asks a later batch not to re-add one — so it looks for a
+read, a declaration and a rune key instead.
+Regression, every suite at its BG count with ZERO DRIFT except the four this batch re-pointed —
+ah **5587/0 (STAMP GATE bumped BG -> BH, in BOTH files that hold it — test_batch_ah and
+test_batch_bb's duplicate)**, ah_battle 63, ai 2036, an **6053 (was 6052 — one check ADDED where
+the pool-of-four literal was re-pointed: the offer still shrinks, it just needs six taken out of
+eight rather than two out of four)**, aj 403, ak 527, al 559, ar 887, as 387, at 461,
+au **340 (was 335 — re-pointed, and the dead-end case needed a NON-damaging ability because a
+damaging one now legitimately continues into Piercing)**, av 315, aw **340 (was 338)**, ax 329,
+ay **457 (was 455)**, az 489, ba 647, bb 172, bc 91, bd 69, be 34, bf 78, bg 45,
+test_runes 2973, test_rune_battle 96 — all 0 failures.
 
 BATCH BG (08-09) — THE RUN HARNESS READS DIFFICULTY, AND APOSTLE CHANGES AXIS. Two things
 that cannot contaminate each other: **§1 is a measurement that ships nothing; §2 is one
@@ -5115,10 +5262,27 @@ Space or left click; no announcer text (combat log only).
     of twelve specs cannot have its strongest lane measured by the project's best instrument.
     Standalone lane rows are unaffected (the fixed 4-enemy lineup never triggered it — 0
     events across ten n=200 rows).
-- **THE DEVOUT'S FAITH ROW: CLOSED BY BATCH BG. THREE REPAIRS SHIPPED (BE, BF §2, then BG §2's
-  RE-SPEC OF THE CAPSTONE), THE TREE-SHAPE QUESTION IS ANSWERED, AND THE BRIEF'S OWN STOP RULE
-  FIRED — DO NOT TAKE A FOURTH LEVER ON THIS LANE.** Read BG's block at the top of this file
-  for the shipped shape and the current numbers; **quote BG's rows, not BF's, for anything
+- **THE DEVOUT'S FAITH ROW: FOUR REPAIRS SHIPPED (BE, BF §2, BG §2's capstone re-spec, then
+  BH §2's two lane-body re-specs) AND THE LANE IS NOW THE WEAKEST OF HIS THREE, NOT THE
+  STRONGEST. READ THE BH BLOCK AT THE TOP OF THIS FILE FOR THE CURRENT NUMBERS — everything
+  in this entry below the BH lines is HISTORY.** **THE BAR NOW READS FAITH 13% | ZEAL 31% |
+  BULWARK 12%, against BG's FAITH 38 | ZEAL 32 | BULWARK 12.** BH's brief predicted the fall,
+  instructed that it be reported and not chased, and **nothing was taken**. **THE NODE TO RAISE
+  IF THE DESIGNER WANTS IT RAISED IS BLESSED ARE THE FAITHFUL**, the lane's only magnitude node
+  — that is a decision, not a repair, and no batch should take it unasked.
+  **TWO THINGS FROM BH THAT MUST TRAVEL WITH ANY FUTURE WORK ON THIS LANE:**
+  **(1) THE ALL-FOUR FAITH ROW IS NO LONGER A ±2-POINT INSTRUMENT.** BH's first read of its
+  −Binding Oath cell came back 24% / 2.06 releases and **does not reproduce** — three later
+  reads of the same build give 12/13/13%. The cause is the loop AW documented as intended
+  (release → bigger Devout maximum → bigger Divine Shield → more absorbs → more Faith), which
+  is **positive feedback with an ignition threshold, and BH parks the lane just under it**, so
+  a few runaway battles in 200 drag the mean ten points. **REPLICATE ANY LOAD-BEARING FAITH
+  ROW; a single n=200 read is not enough on this lane any more.**
+  **(2) A LEAVE-ONE-OUT GRID ON A COMPOUNDING LANE UNDER-REPORTS EVERY NODE IN IT.** BC's grid
+  read Binding Oath at ONE point; BH's re-spec of that same node was part of a change that
+  moved the row twenty-six. Three multipliers on one term do not add, they multiply, and
+  shaving one at a time can never show how much of the total is the product.
+  Everything from here down is BE/BF's record; **quote BG's rows, not BF's, for anything
   ALL-FOUR — BF's all-four −Apostle cell (31%) reads 39% on unmodified HEAD and does not
   reproduce.** Everything below is BE/BF's record, kept because the HISTORY of the row is what
   makes the fourth lever look tempting and the history is the argument against it. Every figure
@@ -5221,17 +5385,40 @@ Space or left click; no announcer text (combat log only).
   left as authored and test_batch_ar pins the clause inert. Re-authoring it is
   a design call, not a repair — and it is one clause of three, the other two
   are live.
-- ABILITY UPGRADES ARE WIRED AND VISIBLE BUT STILL A PLACEHOLDER POOL OF FOUR
-  (AP built the machinery, AQ built the three surfaces, both deliberately
-  authoring nothing). The authoring batch has somewhere to land: add ids to
-  `Run.ABILITY_UPGRADES`, a branch in `Run._stamp_upgrade`, an eligibility rule
-  in `Run.upgrade_fits` — and A PLACE IN `Run.UPGRADE_PRIORITY`, which AU's
-  talent fallback picks from in order. The ◆ marker and the ◆N card badge read
-  what LANDED, so they need no change when the pool grows. NOTE THE SECOND
-  CONSUMER NOW: the pool is no longer only a mini-boss reward, it is also what
-  every ability-granting talent node falls back on, so a new entry is felt in
-  two places. A hero draws three a run, so a pool much past ~8 stops being
-  felt as a REWARD; the fallback has no such ceiling.
+- **THE ABILITY-UPGRADE POOL IS AUTHORED AND CLOSED AT EIGHT (Batch BH §1). Do not
+  re-record it as a placeholder of four, and do not add a ninth.** AP built the
+  machinery, AQ the three surfaces, BH authored the other four. **EIGHT IS THE
+  TARGET, NOT A STEP TOWARD TWELVE** — a hero draws three a run, so a bigger pool
+  stops being felt as a reward. Honed / Quickened / Effortless / Swift (AP) plus
+  **Weighted** (Break doubled, `pressure > 0`), **Widened** (one more target or
+  hit, `random_hits > 0 or multi_hits > 0`), **Piercing** (half the armor,
+  `damage > 0 and armor_pierce < 1.0`), **Certain** (the status roll becomes a
+  certainty, a partial `status_chance` WITH a status, or a partial `bleed_chance`).
+  **THE EXTENDED `UPGRADE_PRIORITY` ORDER IS A COMPATIBILITY SURFACE, NOT A
+  PREFERENCE — the four new ids are APPENDED** so a node that granted Honed
+  yesterday grants Honed today (AU §1's fallback walks this list; inserting
+  anywhere else silently re-points every live fallback in the game).
+  **THREE CORRECTIONS BH MADE TOWARD THE CODE, so nobody re-derives them:**
+  the brief's `bd` **IS `Ability.pressure`** (no `bd` field exists); **`aoe` is NOT
+  eligible for Widened** — an area attack already hits every living enemy, so
+  there is no target to add and offering it is precisely AP §3's dud; and **NO
+  HERO ABILITY IN THE GAME SETS `status_chance` BELOW 1.0** (only enemy kits in
+  enemies.json do, which no upgrade can reach), so **the reliability axis the
+  roster actually has is `bleed_chance`** and Certain covers both fields.
+  **`up_sure` (widen the Perfect window) WAS NOT WRITTEN, on the brief's own
+  condition, and the reason is durable: `PERFECT_HALF` is a bare script constant
+  read by `_grade_skill_check()`, WHICH TAKES NO ARGUMENTS AND CANNOT SEE THE
+  ABILITY**, plus a zone rectangle built once at UI setup — and **the bot never
+  runs the timing bar at all** (it rolls a grade off hardcoded probabilities), so
+  a widened window is invisible to every instrument this project owns. Piercing
+  took the slot. If a later batch parameterises the window, that is when to
+  revisit; test_batch_bh pins all four facts.
+  **MEASURED ELIGIBILITY REACH across the 92 abilities `Classes.pool_ability`
+  resolves: Swift 92, Quickened 88, Effortless 84, Honed 37, Piercing 37,
+  Weighted 35, Widened 8, CERTAIN 2** (Hack and Slash and Wildstrikes, both the
+  Berserker's — for eleven specs Certain is simply dropped from the offer rather
+  than paired with a dud). **REPORTED, NOT FORCED**: widening it means authoring
+  partial status chances onto hero abilities, which is design, not repair.
 - **TWO SPECS STILL TAKE THE GENERIC TALENT FALLBACK (Batch AU §1), NINE nodes of them:
   the PYROMANCER (5) and the CRYOMANCER (4). Nobody else owes one.** This entry read
   "seven specs, 11 nodes" until Batch BA; **that was stale prose, corrected toward the

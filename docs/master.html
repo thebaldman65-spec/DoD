@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-09 (Batch BG)</b></p>
+<p align="right"><b>Last updated: 2026-08-10 (Batch BH)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -496,10 +496,13 @@ health, snapshotted (and Mercy-scaled) when cast.</td></tr>
 turns).</td></tr>
 <tr><td>Faith</td><td>Conviction (Devout passive): Divine Shield absorbs AND standing on
 Consecrated Ground build stacks (max 5) — 3% damage mitigation and +2% damage dealt per
-stack, doubled to 6% and +4% by the Apostle capstone;
-at 5 the bearer heals 15% max health, Faith resets, the Devout recovers 3% max
-Mana, and the Devout's own maximum health rises 3% of his base for the rest of the
-battle (he is healed for that amount too). The chip counts stacks ("F3").</td></tr>
+stack, doubled to 6% and +4% by the Apostle capstone and doubled again on Consecrated
+Ground with Fervor (so quadrupled with both). At 5 the bearer heals 15% max health, Faith
+resets, the Devout recovers 3% max Mana, and the Devout's own maximum health rises 3% of
+his base for the rest of the battle (he is healed for that amount too).
+<b>The Devout carries Faith of his own, and his never releases</b> — it holds at 5, paying
+him the same mitigation and damage it pays everyone else. The chip counts stacks
+("F3").</td></tr>
 <tr><td>Consecrated Ground</td><td>Takes 15% less damage and reflects 10% of damage
 taken to the attacker (Devout ability, 2–3 turns).</td></tr>
 <tr><td>Blessing of Zeal</td><td>+15% damage dealt; Faith gain doubled (Devout ability,
@@ -729,16 +732,34 @@ offered two. The pick is resolved on that hero's map card, and the triple is rol
 moment the award drops — re-opening the card never rerolls it.</p>
 <p><b>The mini-boss award is different in kind:</b> a <b>generic ability upgrade</b>, chosen
 from three, attached to one ability the hero already owns. Upgrades <b>stack</b> on the same
-ability, but the <b>same upgrade cannot be taken twice in a run</b>. The placeholder pool of
-four, until the dozen are authored: <b>Honed</b> (+50% damage), <b>Quickened</b> (−2
-cooldown, minimum 0), <b>Effortless</b> (costs no Rage / Mana / Focus — <b>Mercy is
-unaffected</b>, so a free Resurrection is not on the table), <b>Swift</b> (arrives 25%
-sooner, never below 1.0 initiative delay). Three awards a run, one per mini-boss.</p>
-<p><b>An upgrade is only ever offered on an ability it can change</b> — Honed on something
-that deals damage, Quickened on something with a cooldown, Effortless on something that
-costs. Swift fits everything, because everything has an initiative delay. An upgrade with no
+ability, but the <b>same upgrade cannot be taken twice in a run</b>. Three awards a run, one
+per mini-boss. <b>The pool holds eight</b>, and they sit on eight different axes so that a
+second upgrade on the same ability is worth taking:</p>
+<table>
+<tr><th>Upgrade</th><th>What it does</th><th>Offered only when</th></tr>
+<tr><td><b>Honed</b></td><td>+50% damage.</td><td>the ability deals damage</td></tr>
+<tr><td><b>Quickened</b></td><td>−2 turns cooldown (minimum 0).</td>
+<td>it has a cooldown</td></tr>
+<tr><td><b>Effortless</b></td><td>Costs no Rage / Mana / Focus. <b>Mercy is unaffected</b>,
+so a free Resurrection is not on the table.</td><td>it has a resource cost</td></tr>
+<tr><td><b>Swift</b></td><td>Arrives 25% sooner, never below 1.0 initiative delay.</td>
+<td>always — everything has an initiative delay</td></tr>
+<tr><td><b>Weighted</b></td><td>Break damage doubled.</td><td>it deals Break damage</td></tr>
+<tr><td><b>Widened</b></td><td>Strikes one additional target, or lands one additional hit.</td>
+<td>it strikes several random enemies, or the same enemy several times. <b>Not</b> an area
+attack — that already hits every living enemy, so there is no target left to add</td></tr>
+<tr><td><b>Piercing</b></td><td>Ignores half the target's armor, on top of anything it already
+pierced (never more than all of it).</td><td>it deals damage and does not already pierce
+everything</td></tr>
+<tr><td><b>Certain</b></td><td>Its status application always lands.</td>
+<td>it applies a status or Bleed on a <i>chance</i> — never when that is already a
+certainty</td></tr>
+</table>
+<p><b>An upgrade is only ever offered on an ability it can change.</b> An upgrade with no
 eligible ability is dropped from the offer rather than paired with a dud, so an offer can
-show fewer than three.</p>
+show fewer than three. And because three are now drawn from eight rather than from four, any
+one of them appears about half as often: <b>a hero can finish a run having never been offered
+the upgrade their build wanted.</b> That is the variety working, not a fault.</p>
 <p><b>Upgrades apply at battle spawn, after talents.</b> The order matters: several talents
 <i>set</i> an ability's field rather than add to it, so an upgrade applied first would be
 silently overwritten. Upgrades go last and always win. The hero sheet assembles the kit the
@@ -1053,13 +1074,19 @@ Passive <i>Conviction</i>: allies build <b>Faith</b> whenever
 <b>Divine Shield absorbs damage for them</b> (1 per absorbed hit) and whenever they begin
 a turn standing on <b>Consecrated Ground</b> (1 per ally per turn) — max 5 stacks; doubled
 under Blessing of Zeal; the stacks only work while the Devout stands. Each stack: 3%
-damage mitigation and +2% damage dealt — <b>doubled to 6% and +4% by the Apostle
-capstone, which is the only node in the game that touches what a HELD stack is worth</b>.
+damage mitigation and +2% damage dealt — <b>doubled to 6% and +4% by the Apostle capstone,
+and doubled again while the carrier stands on Consecrated Ground with Fervor learned, so
+the two together make a stack worth 12% and +8%</b>.
 At 5 stacks the ally is healed for 15% of max
 health, their Faith resets, and the Devout recovers 3% max Mana — <b>and the Devout's own
 maximum health rises by 3% of his BASE maximum for the rest of the battle, healing him for
 the same amount</b>. That growth is linear on his base (3% per release, never 3% of the
 new total) and it lasts the battle only — it does not follow him out of the fight.<br>
+<b>THE DEVOUT HOLDS FAITH OF HIS OWN, AND IT NEVER RELEASES.</b> He builds stacks like
+anyone else — his own Consecrated Ground drips onto him, and Binding Oath swears him one
+every time an ally releases — but at 5 they simply hold, paying him the same mitigation and
+damage they pay the party. Only an ALLY'S Faith releases, and a release always resets that
+ally to zero.<br>
 Divine Shield — 15 Mana, 2.5, 2cd; an ally shield absorbing 30% of the Devout's max
 health, then it breaks (Perfect: 35%).<br>
 Consecrated Ground — 25 Mana, 3.0, 3cd; the party takes 15% less damage, reflects
@@ -1345,8 +1372,8 @@ returns pay: invest in the dividend) · <b>ZEAL</b> (invest shallowly in EVERYON
 <tr><td>3</td><td><b>Afterglow</b> — When Divine Shield breaks, its holder is healed for 20% of the Devout&#x27;s max health.</td><td><b>Devoutness</b> — The entire party takes 20% less Break damage.</td><td><b>Sacred Resolve</b> — New ability: Sacred Resolve — all damage received is split evenly among living heroes for 3 turns; Break damage still lands on the struck hero (25 Mana, 2.5 int, 5cd; Perfect: 4 turns).</td></tr>
 <tr><td>4</td><td><b>Warded Robes</b> — While Divine Shield holds, its holder has +25% armor.</td><td><b>Blessed are the Faithful</b> — The heal at 5 stacks of Faith restores 35% max health (up from the base 15%).</td><td><b>Healing Pulse</b> — While Consecrated Ground or Sacred Resolve holds, the party heals 8% of the Devout&#x27;s max health each turn.</td></tr>
 <tr><td>5</td><td><b>Stalwart</b> — Divine Shield absorbs 50% of the Devout&#x27;s max health (up from the base 30%).</td><td><b>Sacred Covenant</b> — Should Divine Shield prevent lethal damage, its holder is healed for 25% max health and gains 2 Faith stacks.</td><td><b>Crusader&#x27;s Tempo</b> — Blessing of Zeal ticks its target&#x27;s cooldowns down 3 additional turn(s) on cast.</td></tr>
-<tr><td>6</td><td><b>Bastion</b> — Divine Shield has no cooldown at all.</td><td><b>Fervor</b> — Consecrated Ground&#x27;s Faith drip becomes 2 per ally per turn instead of 1.</td><td><b>Purity</b> — Blessing of Zeal also grants its target a Divine Shield absorbing 35% of the Devout&#x27;s max health.</td></tr>
-<tr><td>7</td><td><b>Unyielding Aegis</b> — When Divine Shield breaks, it immediately re-forms at 90% of its original strength (once per cast).</td><td><b>Binding Oath</b> — When an ally&#x27;s Faith releases at 5 stacks, they keep 3 instead of resetting to zero.</td><td><b>Lifewell</b> — Damage reflected by Consecrated Ground heals the party for 80% of the amount reflected.</td></tr>
+<tr><td>6</td><td><b>Bastion</b> — Divine Shield has no cooldown at all.</td><td><b>Fervor</b> — While Consecrated Ground holds, every ally standing on it counts each stack of Faith DOUBLE: 6% damage mitigation and +4% damage dealt per stack, up from 3% and +2%. It grants no extra Faith at all. With Apostle the stacks count quadruple.</td><td><b>Purity</b> — Blessing of Zeal also grants its target a Divine Shield absorbing 35% of the Devout&#x27;s max health.</td></tr>
+<tr><td>7</td><td><b>Unyielding Aegis</b> — When Divine Shield breaks, it immediately re-forms at 90% of its original strength (once per cast).</td><td><b>Binding Oath</b> — Whenever an ally&#x27;s Faith releases, the Devout gains 1 stack of Faith himself. His own Faith never releases — it holds, paying him the same mitigation and damage it pays them.</td><td><b>Lifewell</b> — Damage reflected by Consecrated Ground heals the party for 80% of the amount reflected.</td></tr>
 <tr><td>CAP</td><td><b>Bulwark of Fortitude</b> — New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.0 int, 3cd; Perfect: the party instantly heals 5%).</td><td><b>Apostle</b> — Every stack of Faith an ally carries is worth double: 6% damage mitigation and +4% damage dealt per stack, up from 3% and +2%. Releases still consume the stacks.</td><td><b>Judgement</b> — While Consecrated Ground holds, every enemy that damages a hero is Sundered for 2 turns and takes Break damage equal to 40% of the damage it dealt.</td></tr>
 </table>
 <p><b>Sharpshooter</b> — <b>PRECISION</b> (Focus, crit chance, crit damage) · <b>PENETRATION</b> (armor, Break, finishing the party's work) · <b>TEMPO</b> (speed, cooldowns, Focus acceleration)</p>

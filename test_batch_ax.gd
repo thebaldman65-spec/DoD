@@ -574,17 +574,25 @@ func _fervor_unmoved() -> void:
 	# brief specified was already shipped and the change is a NO-OP. Corrected
 	# toward the code (the house rule), reported, and PINNED here so the
 	# finding cannot rot into a silent regression.
+	# BATCH BH §2 RE-POINTED THIS IN PLACE AND INVERTED IT, which is the honest
+	# thing to do with it rather than deleting it. AX's finding was "the ground
+	# already pays 2 with Fervor learned, so the brief's instruction is a
+	# no-op". BH §2 re-specced Fervor off the drip entirely — a deeper drip is
+	# a release-frequency multiplier and that is the whole subject of that
+	# batch — so the ground pays 1 with the node or without it. The finding
+	# AX pinned is now HISTORY; what is worth pinning at this site is that the
+	# drip is Batch AW §2's base and nothing deepens it.
 	var dv_tree := Talents.generate_tree("inquisitor", "cleric")
 	var fervor := Talents.node_in_tree(dv_tree, "dv_fervor")
-	ok(int((fervor.get("payload", {}).get("stat", {}) as Dictionary).get("fervor_step", 0)) == 1,
-		"Fervor is still the +1 increase on the base drip of 1")
-	ok(Talents.desc_for(fervor, 1).contains("becomes 2 per ally per turn"),
-		"...so the ground pays 2 a turn with the node learned")
+	ok(not (fervor.get("payload", {}).get("stat", {}) as Dictionary).has("fervor_step"),
+		"Fervor no longer writes an increase on the drip at all (Batch BH §2)")
+	ok(not Talents.desc_for(fervor, 1).contains("per ally per turn"),
+		"...and its text no longer promises a deeper drip")
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
-	ok(bsrc.contains("var gain := 1 + devout.fervor_step"),
-		"...and the base is still 1 with Fervor as the increase (AW §2 untouched)")
-	_report.append("§7 NO-OP: Fervor already paid +1 (ground = 2/turn with the node). "
-		+ "AW's 78%/1997 FAITH overshoot is UNADDRESSED by this batch — see the smoke row.")
+	ok(bsrc.contains("_gain_faith(u, 1)") and not bsrc.contains("devout.fervor_step"),
+		"...the ground pays a flat 1, AW §2's base kit, un-deepened")
+	_report.append("§7 was a NO-OP at AX (Fervor already paid +1). BATCH BH §2 then took "
+		+ "Fervor off the drip entirely; the ground pays 1 with the node or without it.")
 
 
 # ---------- the negative controls, in source ----------
@@ -893,10 +901,10 @@ func _live_fervor() -> void:
 		await process_frame
 	var dv := _hero(scene, 2)
 	var ally := _hero(scene, 0)
-	ok(dv != null and dv.fervor_step == 1, "Fervor is stamped as the +1 increase")
+	ok(dv != null and dv.fervor == 1, "Fervor is stamped as a gate on the HELD half")
 	ally.faith_stacks = 0
 	scene._apply_status(ally, "cons_ground", 3)
 	scene._ground_faith_tick(ally)
-	ok(ally.faith_stacks == 2,
-		"Consecrated Ground pays 2 a turn with the node learned (got %d)" % ally.faith_stacks)
+	ok(ally.faith_stacks == 1,
+		"Consecrated Ground pays 1 a turn WITH the node learned too (got %d)" % ally.faith_stacks)
 	await _kill(scene)

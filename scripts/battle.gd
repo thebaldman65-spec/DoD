@@ -1607,6 +1607,11 @@ func _run_battle() -> void:
 		if zl_h.zealous_mercy > 0 and zl_h.second_resource > 0:
 			_log("Talent: Zealous Light — %s opens with %d Mercy" % [
 				zl_h.unit_name, zl_h.second_resource], "#b0a8e0")
+	# BATCH BH §2 — the Rune of the Binding Oath's re-pointed clause: the Devout
+	# opens the battle with the oath already sworn. Its own function for the
+	# standing reason (`_run_battle` cannot be driven headlessly — the AR trap),
+	# so its negative control can be a real check rather than a grep.
+	_swear_opening_oath()
 	# BATCH BA: EPIDEMIC'S BATTLE-START HOOK IS GONE WITH THE DESIGN. It
 	# poisoned every enemy on the field the moment the fight opened — a
 	# pandemic, i.e. the reserved contagion spec's whole idea spent early. The
@@ -5000,7 +5005,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var fd_dv := _living_devout()
 				if fd_dv != null:
 					raw *= 1.0 + 0.01 * FAITH_DAMAGE_PCT \
-						* _faith_stack_mult(fd_dv) * attacker.faith_stacks
+						* _faith_stack_mult(fd_dv, attacker) * attacker.faith_stacks
 			# Dark Infusion: the Occultist feeds on the enemy team's afflictions.
 			if attacker.infusion_ranks > 0:
 				raw *= 1.0 + 0.02 * attacker.infusion_ranks * _unique_enemy_debuffs()
@@ -5403,7 +5408,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if fp_dv != null:
 					var pv_was := raw
 					raw *= 1.0 - 0.01 * FAITH_MITIGATION_PCT \
-						* _faith_stack_mult(fp_dv) * strike_target.faith_stacks
+						* _faith_stack_mult(fp_dv, strike_target) * strike_target.faith_stacks
 					_devout_prev(fp_dv, pv_was - raw, "stacks")
 			# Iron Will: adversity hardens the Warden — 12%/rank less damage
 			# taken per debuff on him (the chip tracks the live total; the
@@ -8005,8 +8010,22 @@ const FAITH_DAMAGE_PCT := 2
 # What a single Faith stack is worth right now, as a multiplier on the two
 # constants above. `devout` may be null; every caller has already established
 # that he stands, because the stacks do nothing at all when he does not.
-func _faith_stack_mult(devout: BattleUnit) -> int:
-	return 2 if devout != null and devout.apostle > 0 else 1
+#
+# BATCH BH §2 — FERVOR IS THE SECOND MULTIPLIER, AND IT READS THE HOLDER.
+# Apostle doubles every stack everywhere; Fervor doubles the stacks of anyone
+# standing on Consecrated Ground, so the two compose to QUADRUPLE while the
+# ground is up and the node adds no releases at all. `holder` is the unit whose
+# stacks are being valued — the carrier, never the Devout — which is the same
+# distinction BG's own negative control exists for: reading `devout.faith_stacks`
+# here would leave allies at their undoubled rates while every source-level
+# check still passed.
+func _faith_stack_mult(devout: BattleUnit, holder: BattleUnit = null) -> int:
+	if devout == null:
+		return 1
+	var m := 2 if devout.apostle > 0 else 1
+	if devout.fervor > 0 and holder != null and holder.has_status("cons_ground"):
+		m *= 2
+	return m
 
 
 # Conviction: a mitigated hit steels the struck ally. At 5 stacks the
@@ -8020,33 +8039,43 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 	# Blessing of Zeal: the kindled build Faith twice as fast.
 	if u.has_status("zeal"):
 		n *= 2
+	# BATCH BH §2 — THE DEVOUT'S OWN FAITH HOLDS AT FIVE AND NEVER RELEASES.
+	# His stacks pay him the mitigation and the damage exactly as they pay
+	# everyone else (both read sites test `is_hero`, and always have), but the
+	# release below is an ALLY'S. A RELEASING DEVOUT PUTS THE FREQUENCY LOOP
+	# STRAIGHT BACK — his release heals, grows the principal and rolls Communion,
+	# which feeds further releases — and he has been doing exactly that since
+	# Batch AW §2 put the Faith drip in the base kit, because nothing here ever
+	# excluded him. THE BRIEF SAID HE "HAS NO METER OF HIS OWN ANYWHERE IN HIS
+	# KIT"; he has had one for six batches, and it released. Closing that is part
+	# of §2's job rather than a side effect of Binding Oath.
+	#
+	# ONE BRANCH, so there is one answer to "can this unit release".
+	var own := u == devout
 	u.faith_stacks = mini(u.faith_stacks + n, 5)
-	var f_mult := _faith_stack_mult(devout)
-	if u.faith_stacks < 5:
-		var f_desc := "Conviction: Faith x%d — %d%% damage\nmitigation and +%d%% damage dealt.\nAt 5 stacks: healed for %d%% max\nhealth, and the Faith resets." % [
-			u.faith_stacks, FAITH_MITIGATION_PCT * f_mult * u.faith_stacks,
-			FAITH_DAMAGE_PCT * f_mult * u.faith_stacks,
+	var f_mult := _faith_stack_mult(devout, u)
+	if own or u.faith_stacks < 5:
+		var f_tail := "At 5 stacks: healed for %d%% max\nhealth, and the Faith resets." % [
 			15 + devout.faithful_step]
+		if own:
+			f_tail = "His own Faith HOLDS — it\nnever releases."
+		var f_desc := "Conviction: Faith x%d — %d%% damage\nmitigation and +%d%% damage dealt.\n%s" % [
+			u.faith_stacks, FAITH_MITIGATION_PCT * f_mult * u.faith_stacks,
+			FAITH_DAMAGE_PCT * f_mult * u.faith_stacks, f_tail]
 		if not u.update_status("faith", "F%d" % u.faith_stacks, f_desc):
 			u.add_status("faith", "Faith", "F%d" % u.faith_stacks,
 				Color(0.98, 0.85, 0.45), -1, f_desc)
 		return
-	# The fifth stack: release. Binding Oath keeps a remnant; nothing else
-	# does. BATCH BG §2 REMOVED APOSTLE FROM THIS BRANCH — the capstone no
-	# longer changes what a release consumes, which is the whole re-spec.
-	var keep := 0
-	if devout.oath_ranks > 0:
-		keep = mini(devout.oath_ranks, 4)
-	u.faith_stacks = keep
-	if keep > 0:
-		var k_desc := "Conviction: Faith x%d — %d%% damage\nmitigation and +%d%% damage dealt.\nAt 5 stacks: healed for %d%% max\nhealth." % [
-			keep, FAITH_MITIGATION_PCT * f_mult * keep,
-			FAITH_DAMAGE_PCT * f_mult * keep, 15 + devout.faithful_step]
-		if not u.update_status("faith", "F%d" % keep, k_desc):
-			u.add_status("faith", "Faith", "F%d" % keep,
-				Color(0.98, 0.85, 0.45), -1, k_desc)
-	else:
-		u.remove_status("faith")
+	# The fifth stack: an ALLY releases, always to zero.
+	#
+	# BATCH BG §2 took Apostle off this branch (the capstone no longer changes
+	# what a release consumes). BATCH BH §2 TOOK BINDING OATH'S REMNANT, WHICH
+	# WAS THE LAST THING LEFT ON IT AND WAS A FREQUENCY MULTIPLIER IN DISGUISE:
+	# keeping 3 of 5 meant the NEXT release cost two stacks rather than five, so
+	# "you keep some" bought releases per battle. §2's whole subject is that this
+	# lane had three such multipliers; Communion is the one that stays.
+	u.faith_stacks = 0
+	u.remove_status("faith")
 	var f_heal := maxi(int(round(u.max_hp * (0.15 + 0.01 * devout.faithful_step))), 1)
 	var f_got: int = u.heal_amount(f_heal, u != devout)
 	u.float_text("FAITH +%d" % f_got, Color(0.98, 0.85, 0.45))
@@ -8066,20 +8095,24 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 		u.unit_name, f_got, devout.unit_name, d_mana], "#e8c860")
 	# Batch AW §1 — THE THIRD CLAUSE: the returns increase the principal. He
 	# lends out his own bulk and collects a dividend on every release.
-	# BATCH AY §9: A RELEASE THAT CONSUMED NO STACKS PAYS HALF. `keep` is the
-	# whole test: 5 kept out of 5 is nothing consumed.
+	# BATCH AY §9: A RELEASE THAT CONSUMED NO STACKS PAYS HALF.
 	#
-	# BATCH BG §2 — NOTHING IN THE GAME REACHES THE HALF BRANCH ANY MORE, and
-	# that is a consequence of the re-spec rather than a decision about AY's
-	# tax. Apostle was the only thing that ever parked an ally at 5; Binding
-	# Oath's remnant is `mini(oath_ranks, 4)`, so `keep` is now capped at 4 by
-	# construction and `keep < 5` is always true. THE ARGUMENT STAYS because
-	# it is the honest expression of the rule and one `mini()` from live
-	# again, but it is dead today and the docs no longer claim otherwise.
-	_conviction_growth(devout, keep < 5)
-	if keep > 0:
-		_log("   → Talent: Binding Oath — %s keeps %d Faith" % [
-			u.unit_name, keep], "#b0a8e0")
+	# BATCH BG §2 made the half branch unreachable and BATCH BH §2 makes it
+	# unreachable TWICE OVER: Apostle was the only thing that ever parked an ally
+	# at five, and Binding Oath's remnant — the last writer of a non-zero `keep`
+	# — is deleted, so a release now always consumes all five. The argument and
+	# the rule STAY inside `_conviction_growth`, where test_batch_ay drives them
+	# directly; the docs do not claim it happens.
+	_conviction_growth(devout, true)
+	# BATCH BH §2 — BINDING OATH PAYS THE DEVOUT HIMSELF NOW. An ally's release
+	# swears him a stack of his own, which HOLDS (the branch at the top of this
+	# function) and pays him the same mitigation and damage it pays them. It costs
+	# the lane nothing in frequency: his stacks never release, so this adds a
+	# payer rather than another payout.
+	if devout.oath_faith > 0 and not own:
+		_log("   → Talent: Binding Oath — %s takes the oath upon himself (+%d Faith)" % [
+			devout.unit_name, devout.oath_faith], "#b0a8e0")
+		_gain_faith(devout, devout.oath_faith)
 	# Communion: fervor spreads to allies who are STILL BUILDING it (the chance
 	# scales with their own Faith).
 	#
@@ -8091,11 +8124,14 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 	# APOSTLE and does not name it — it does not care WHICH node parks an ally,
 	# which is why it survives BG unchanged.
 	#
-	# `faith_stacks` is capped at 5 above and a hero at 5 releases on the spot,
-	# so with Apostle off the release axis (Batch BG §2) NOTHING now parks an
-	# ally at five and the condition is dormant in every shipped build. THE
-	# GUARD STAYS: it is what makes the roll's meaning ("still building")
-	# structural rather than a fact about one capstone.
+	# `faith_stacks` is capped at 5 above and an ALLY at 5 releases on the spot,
+	# so with Apostle off the release axis (Batch BG §2) and Binding Oath's
+	# remnant deleted (Batch BH §2) nothing parks an ally at five and the
+	# condition is dormant for allies in every shipped build. THE GUARD STAYS,
+	# and BH gave it a second job: THE DEVOUT'S OWN FAITH HOLDS AT FIVE, so he
+	# is a hero this loop really does skip. That is correct — a roll spent on a
+	# meter that never releases buys nothing — and it is why the guard reads
+	# "still building" rather than naming any node.
 	#
 	# THE CLIFF IS REAL AND STATED IN THE TOOLTIP: 60% at four stacks, 0% at
 	# five. BG'S RE-SPEC INVERTS THE SMELL BF RECORDED rather than reducing it
@@ -8169,13 +8205,19 @@ func _conviction_growth(devout: BattleUnit, consumed := true) -> void:
 # one shield, one target, while Conviction's description promised a party-wide
 # system. Fervor's effect MOVED HERE — every ally gains 1 Faith at the start of
 # their turn while Consecrated Ground holds, WITH NO NODE REQUIRED — and the
-# Fervor node now DEEPENS it instead (fervor_step = +1, so 2 per ally per turn).
+# Fervor DEEPENED it (2 per ally per turn) from Batch AW until Batch BH §2.
+#
+# BATCH BH §2 — THE DRIP IS BACK TO A FLAT 1 AND FERVOR NO LONGER TOUCHES IT.
+# A bigger drip is a release-frequency multiplier, which is the term §2 exists
+# to take out of this lane; Fervor moved onto the HELD half instead (it doubles
+# what a stack standing on the ground is worth — see `_faith_stack_mult`). The
+# base drip is Batch AW §2's and is unchanged: every ally, 1 Faith, no node.
 #
 # It is its own function rather than an inline block because the turn-start
 # upkeep lives inside `_run_battle`, which cannot be driven headlessly (the AR
 # trap: awaiting a turn awaits an ability pick that never arrives). A clause
 # with a real gate in it has to be reachable by a test, or the negative control
-# "Fervor is still required" can only ever be a grep.
+# "the ground still drips" can only ever be a grep.
 func _ground_faith_tick(u: BattleUnit) -> void:
 	if not u.is_hero or u.is_companion or u.dead:
 		return
@@ -8184,11 +8226,30 @@ func _ground_faith_tick(u: BattleUnit) -> void:
 	var devout := _living_devout()
 	if devout == null:
 		return
-	var gain := 1 + devout.fervor_step
-	_log("   → Consecrated Ground kindles %s (+%d Faith)%s" % [
-		u.unit_name, gain,
-		" (Fervor)" if devout.fervor_step > 0 else ""], "#c8b880")
-	_gain_faith(u, gain)
+	_log("   → Consecrated Ground kindles %s (+1 Faith)%s" % [
+		u.unit_name,
+		" — and his Faith is worth double here (Fervor)" \
+			if devout.fervor > 0 else ""], "#c8b880")
+	_gain_faith(u, 1)
+
+
+# BATCH BH §2 — RUNE-ONLY, AND IT IS A RE-POINT RATHER THAN A NEW DESIGN. The
+# Rune of the Binding Oath used to buy a release remnant ("a Faith release
+# leaves 1 stack standing instead of nothing"); §2 deleted that remnant as one
+# of the lane's three frequency multipliers, so the clause had no equivalent
+# value left. IT KEEPS THE RELATIONSHIP IT HAS ALWAYS HAD — Faith that persists
+# — through the only door the re-spec leaves open: the Devout's own meter,
+# which holds rather than releasing. He opens the fight already carrying it.
+# (The AZ Deep Sight / AY Deep Bond / AX Hollow Chalice precedent: re-pointed,
+# not deleted, and REPORTED rather than hidden. Its second clause,
+# `faithful_step`, is untouched and still pays exactly what it advertises.)
+func _swear_opening_oath() -> void:
+	var devout := _living_devout()
+	if devout == null or devout.oath_opening <= 0:
+		return
+	_log("Rune: the Binding Oath is already sworn — %s opens with %d Faith" % [
+		devout.unit_name, devout.oath_opening], "#b0a8e0")
+	_gain_faith(devout, devout.oath_opening)
 
 
 # Conviction: a Divine Shield soaking a hit steels its holder.

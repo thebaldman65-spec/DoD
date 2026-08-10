@@ -105,8 +105,14 @@ func _fallback_table() -> void:
 	# The order is a DESIGN decision, so it is written down separately from the
 	# pool and both lists have to agree — an id in one and not the other is a
 	# fallback that can never be chosen, or one chosen for an id nothing pays.
-	ok(run.UPGRADE_PRIORITY == ["up_damage", "up_cooldown", "up_free", "up_speed"],
-		"the fallback order is Honed -> Quickened -> Effortless -> Swift")
+	# RE-POINTED IN PLACE (Batch BH §1): the pool went four -> eight and the new
+	# ids were APPENDED, which is a compatibility surface rather than a
+	# preference — a node that granted Honed yesterday must grant Honed today.
+	# So the check that matters is that the ORIGINAL FOUR still lead, in order,
+	# and that is what is asserted; the four new ones and their order are
+	# pinned in test_batch_bh.
+	ok(run.UPGRADE_PRIORITY.slice(0, 4) == ["up_damage", "up_cooldown", "up_free", "up_speed"],
+		"the fallback order still opens Honed -> Quickened -> Effortless -> Swift")
 	ok(run.UPGRADE_PRIORITY.size() == run.ABILITY_UPGRADES.size(),
 		"every upgrade in the pool has a place in the order")
 	for id in run.UPGRADE_PRIORITY:
@@ -135,9 +141,18 @@ func _fallback_resolver() -> void:
 	ok(run.fallback_upgrade_id(full,
 		["up_damage", "up_cooldown", "up_free"]) == "up_speed",
 		"...then Swift, which fits anything")
+	# RE-POINTED IN PLACE (Batch BH §1): `full` deals damage, so with a pool of
+	# eight it legitimately continues into Piercing rather than dead-ending.
+	# The dead end is still asserted — it just needs an ability that genuinely
+	# has nothing left for any of the eight, which is what `bare` is.
 	ok(run.fallback_upgrade_id(full,
-		["up_damage", "up_cooldown", "up_free", "up_speed"]) == "",
-		"...and NOTHING when all four are already on it — the honest dead end")
+		["up_damage", "up_cooldown", "up_free", "up_speed"]) == "up_pierce",
+		"...then Piercing, once the pool holds eight")
+	var bare: Ability = Ability.make({"display_name": "Bare", "heal": 10, "cooldown": 3,
+		"cost": 20, "delay": 3.0})
+	ok(run.fallback_upgrade_id(bare,
+		["up_cooldown", "up_free", "up_speed"]) == "",
+		"...and NOTHING when every eligible upgrade is on it — the honest dead end")
 	# INELIGIBLE ONES ARE SKIPPED, NOT PAIRED. A heal has no damage, a basic no
 	# cooldown, a free ability no cost — the exact three duds AP §3 closed.
 	var heal: Ability = Ability.make({"display_name": "Heal", "damage": 0, "cooldown": 3,

@@ -1347,10 +1347,16 @@ func victory_heal_pct() -> float:
 # Overpower is legal) but the SAME upgrade cannot be taken twice in a run —
 # a run of "+50% damage" three times over is a number, not a decision.
 #
-# PLACEHOLDER POOL OF FOUR until the dozen are authored. Stored on the
+# A POOL OF EIGHT since Batch BH (it opened at four). Stored on the
 # member as `upgrades` = [{id, ability}], and READ AT BATTLE SPAWN by
 # `apply_upgrades` below (Batch AP — before that the pick was recorded and
 # nothing acted on it).
+#
+# THE OFFER NOW DRAWS THREE FROM EIGHT RATHER THAN THREE FROM FOUR, so any
+# given upgrade appears about half as often. That is the point — variety
+# across runs — but it also means A HERO CAN FINISH A RUN HAVING BEEN OFFERED
+# A POOL THAT NEVER INCLUDED THE ONE THEIR BUILD WANTED. That is correct for a
+# roguelike, not a bug, and the changelog says so.
 #
 # TWO DESCRIPTIONS WERE CORRECTED IN BATCH AP, because they were authored
 # before anything read them and both named the wrong thing:
@@ -1360,12 +1366,65 @@ func victory_heal_pct() -> float:
 #   roster run 1.5-4.0, so subtracting 2 would take most abilities to
 #   near-zero. It is a 25% cut floored at 1.0 instead — the one balance
 #   judgement in that batch, flagged rather than buried.
+# BATCH BH §1 — THE POOL GOES FROM FOUR TO EIGHT. The recorded ceiling is
+# about eight and eight is the TARGET, not a step toward twelve: a hero draws
+# three upgrades a run, so a pool much past eight stops being felt as a reward.
+#
+# The four originals move damage, cooldown, cost and delay. The four new ones
+# were chosen for axes those do not touch — Break, breadth, armor and status
+# reliability — so a SECOND upgrade on the same ability is far more likely to
+# mean something. Every existing rule is unchanged: AP's eligibility filter,
+# the never-twice-per-run rule, the stack-on-one-ability rule, application
+# AFTER `Talents.apply_from_tree`, and AU §1's use of the pool as the generic
+# talent fallback.
+#
+# THREE CORRECTIONS TOWARD THE CODE, because the brief named fields the game
+# does not have or does not use. Each is reported rather than forced:
+#
+#   1. THE BRIEF'S `bd` IS `pressure`. Break damage on an Ability has always
+#      lived in `Ability.pressure`; there is no `bd` field. Weighted doubles
+#      `pressure` and its eligibility reads it.
+#
+#   2. WIDENED DOES NOT ACCEPT `aoe`, AND THAT IS AP §3's OWN RULE. An `aoe`
+#      ability already strikes EVERY living enemy, so there is no additional
+#      target to add — Widened on Blizzard would read as a reward and do
+#      nothing, which is exactly the dud the eligibility filter exists to
+#      prevent. It fits `random_hits`/`multi_hits` alone.
+#
+#   3. NO HERO ABILITY IN THE GAME SETS `status_chance` BELOW 1.0 — the only
+#      writers are enemy kits in data/enemies.json, which no upgrade can ever
+#      reach. On its authored eligibility Certain would have been a pool entry
+#      that could never be offered. THE RELIABILITY AXIS THE HERO ROSTER
+#      ACTUALLY HAS IS `bleed_chance` (Hack and Slash and Wildstrikes both roll
+#      0.5, and the Relentless talent exists to buy exactly this), so Certain
+#      covers both fields: the axis the brief asked for, through the door the
+#      game actually has.
+#
+# AND ONE REPLACEMENT, on the brief's own instruction. `up_sure` (Sure — "the
+# Perfect window on its skill check is doubled") WAS NOT WRITTEN. §1 required
+# the window to be verified as a readable value at its site first, and it is
+# not: `PERFECT_HALF` is a bare script constant in battle.gd read at exactly
+# two places — `_grade_skill_check()`, which takes no arguments and cannot see
+# which ability is being cast, and the perfect-zone ColorRect built once during
+# UI setup. It is a fixed fraction shared by every ability and every hero, not
+# a parameter. Worse, the bot never runs the bar at all (it rolls a grade off
+# hardcoded probabilities), so a widened window would be invisible to every
+# instrument the project owns and its worth could never be reported. PIERCING
+# takes the slot instead: armor is an axis nothing else in the pool touches,
+# and "the number lands against less" composes with Honed rather than
+# duplicating it.
 const ABILITY_UPGRADES := {
 	"up_damage": {"name": "Honed", "desc": "+50% damage."},
 	"up_cooldown": {"name": "Quickened", "desc": "-2 turns cooldown (minimum 0)."},
 	"up_free": {"name": "Effortless",
 		"desc": "Costs no Rage / Mana / Focus (Mercy is unaffected)."},
 	"up_speed": {"name": "Swift", "desc": "Arrives 25% sooner."},
+	"up_break": {"name": "Weighted", "desc": "Break damage doubled."},
+	"up_wide": {"name": "Widened",
+		"desc": "Strikes one additional target, or lands one additional hit."},
+	"up_pierce": {"name": "Piercing",
+		"desc": "Ignores half the target's armor (on top of any it already pierced)."},
+	"up_certain": {"name": "Certain", "desc": "Its status application always lands."},
 }
 
 # THE ORDER THE GENERIC TALENT FALLBACK PICKS IN (Batch AU §1): Honed,
@@ -1373,7 +1432,15 @@ const ABILITY_UPGRADES := {
 # already on it. A Dictionary's key order is stable in GDScript, but the
 # fallback's priority is a DESIGN decision rather than an authoring accident,
 # so it is written down separately and the test asserts both lists agree.
-const UPGRADE_PRIORITY := ["up_damage", "up_cooldown", "up_free", "up_speed"]
+#
+# BATCH BH §1 — THE FOUR NEW ONES GO AFTER THE FOUR OLD ONES, AND THAT IS A
+# COMPATIBILITY SURFACE RATHER THAN A PREFERENCE. This list is what every
+# ability-granting talent node falls back on when its grant collides with an
+# already-owned copy, so a node that granted Honed yesterday must grant Honed
+# today. Appending keeps every existing fallback byte-identical; inserting
+# anywhere else would silently re-point nine live nodes.
+const UPGRADE_PRIORITY := ["up_damage", "up_cooldown", "up_free", "up_speed",
+	"up_break", "up_wide", "up_pierce", "up_certain"]
 
 
 # Does this upgrade have anything to change on this ability? An upgrade
@@ -1389,6 +1456,22 @@ func upgrade_fits(id: String, ab: Ability) -> bool:
 			return ab.cooldown > 0
 		"up_free":
 			return ab.cost > 0
+		"up_break":
+			# `pressure` IS Break damage — there is no `bd` field.
+			return ab.pressure > 0
+		"up_wide":
+			# `aoe` is deliberately absent: it already hits every living enemy.
+			return ab.random_hits > 0 or ab.multi_hits > 0
+		"up_pierce":
+			# Armor only matters to a hit that deals damage, and an ability
+			# already piercing everything has nothing left to take.
+			return ab.damage > 0 and ab.armor_pierce < 1.0
+		"up_certain":
+			# Either reliability roll, and NEITHER when it is already a
+			# certainty — a guaranteed status offered "Certain" is the dud.
+			return (not ab.applies_status.is_empty() and ab.status_chance > 0.0 \
+					and ab.status_chance < 1.0) \
+				or (ab.bleed_build > 0 and ab.bleed_chance < 1.0)
 	return true
 
 
@@ -1468,6 +1551,25 @@ func _stamp_upgrade(id: String, ab: Ability) -> void:
 			ab.cost = 0
 		"up_speed":
 			ab.delay = maxf(ab.delay * 0.75, 1.0)
+		"up_break":
+			ab.pressure *= 2
+		"up_wide":
+			# ONE branch or the other, never both: `random_hits` and
+			# `multi_hits` are alternatives at the resolve site (it reads
+			# random first, then multi), so adding to both would spend the
+			# upgrade on a field the cast never looks at.
+			if ab.random_hits > 0:
+				ab.random_hits += 1
+			else:
+				ab.multi_hits += 1
+		"up_pierce":
+			ab.armor_pierce = minf(ab.armor_pierce + 0.5, 1.0)
+		"up_certain":
+			# Both rolls, because eligibility admits either one — an ability
+			# that only carries the bleed roll is unaffected by the first
+			# line and vice versa.
+			ab.status_chance = 1.0
+			ab.bleed_chance = 1.0
 
 
 # The generic talent fallback's choice: the first upgrade in UPGRADE_PRIORITY

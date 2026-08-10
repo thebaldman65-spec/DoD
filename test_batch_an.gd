@@ -714,7 +714,13 @@ func _test_rewards(RunState) -> void:
 	ok(per_zone * run.SLOT_COUNT == 12, "12 a run, against an 8-node tree")
 	run.zone_idx = 0
 	# THE MINI-BOSS: a generic ability upgrade, chosen from three.
-	ok(run.ABILITY_UPGRADES.size() == 4, "a placeholder pool of four upgrades")
+	# RE-POINTED IN PLACE (Batch BH §1): AN shipped a PLACEHOLDER pool of four
+	# and this line pinned the placeholder. BH authored the other four, so the
+	# question the check is really asking — "the mini-boss draws three from a
+	# real pool" — is asserted against the pool's own size rather than a
+	# literal, and the size itself is pinned in test_batch_bh where the eight
+	# are specified.
+	ok(run.ABILITY_UPGRADES.size() == 8, "a pool of eight upgrades (was four at AN)")
 	var hero: Dictionary = run.party[0]
 	var up_offer: Array = run.roll_upgrade_offer(hero)
 	ok(up_offer.size() == 3, "the mini-boss offers three upgrades")
@@ -740,8 +746,22 @@ func _test_rewards(RunState) -> void:
 		{"id": "up_free", "ability": "Overpower"}]
 	ok(not run.has_upgrade(hero, "up_speed"), "an untaken upgrade stays available")
 	var stacked: Array = run.roll_upgrade_offer(hero)
-	ok(stacked.size() == 2, "the offer shrinks as the pool empties (got %d)"
+	# RE-POINTED IN PLACE (Batch BH §1): two taken out of FOUR left two to
+	# offer; two out of EIGHT still leaves a full three. The question is the
+	# same — the offer never pads and never repeats — so it is asked by
+	# emptying the pool down to two rather than by a literal that only held
+	# while the pool was four.
+	ok(stacked.size() == 3, "two taken out of eight still fills a three-wide offer (got %d)"
 		% stacked.size())
+	var nearly: Array = []
+	for drain_id in run.UPGRADE_PRIORITY.slice(0, 6):
+		nearly.append({"id": String(drain_id), "ability": "Overpower"})
+	hero["upgrades"] = nearly
+	var short_offer: Array = run.roll_upgrade_offer(hero)
+	ok(short_offer.size() <= 2, "...and the offer DOES shrink once six are taken (got %d)"
+		% short_offer.size())
+	hero["upgrades"] = [{"id": "up_damage", "ability": "Overpower"},
+		{"id": "up_free", "ability": "Overpower"}]
 	# ZONE BOSSES: the ability pick is SPEC-POOL ONLY now.
 	var spec_pool: Array = Classes.spec_pool("berserker")
 	var class_pool: Array = Classes.class_pool("warrior")

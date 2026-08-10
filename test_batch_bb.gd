@@ -792,7 +792,7 @@ func _docs() -> void:
 	# is the canonical one and moves with every batch that touches the doc. What
 	# it is really guarding is that the doc was touched AT ALL. Bump it, do not
 	# delete it.
-	ok(doc.contains("Last updated: 2026-08-09 (Batch BG)"),
+	ok(doc.contains("Last updated: 2026-08-10 (Batch BH)"),
 		"§7: master.html carries the current batch's stamp")
 	ok(doc.contains("Rot"), "§7: §3a's modifier table has Rot back")
 	# The pool tables are verbatim — test_batch_ah asserts them too, so this is
