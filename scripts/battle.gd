@@ -237,6 +237,12 @@ const SHIELDWALL_BLOCK := 25
 # per-spec share pools at battle end (rotation needs "share of the battles
 # this spec was IN", which the stage totals can't give).
 var _b_slice := {}
+# BATCH BF §1: the same idea for Break DEALT, and a SEPARATE dict on purpose.
+# `_b_slice` is summed wholesale into the damage-healing-prevented pool, so a
+# Break key living in it would fold Break into the existing contribution share
+# by nothing more than a `for` loop — the exact change this batch refuses to
+# make. Two dicts, and the fold cannot happen by accident.
+var _b_bd_slice := {}
 # Batch Z: this battle's per-hero damage in REAL play, banked into the run
 # ledger (Run.tally) at battle end so the run summary can show a whole-run
 # damage share. Written only when `sim` is false — RunSim keeps its own
@@ -712,14 +718,24 @@ func _spawn_units() -> void:
 	# Devoutness (Devout talent, ex-Devotion Aura): the whole party takes
 	# less Break damage — a battle-long status whose power carries the %.
 	var dvn_pct := 0
+	var dvn_src := ""
 	for h in heroes:
-		dvn_pct = maxi(dvn_pct, h.devoutness_ranks)
+		if h.devoutness_ranks > dvn_pct:
+			dvn_pct = h.devoutness_ranks
+			dvn_src = h.unit_name
 	if dvn_pct > 0:
 		for h in heroes:
 			_apply_status(h, "devotion", -1, dvn_pct)
 			h.update_status("devotion", "DA",
 				"Devoutness: takes %d%% less\nBreak damage." % dvn_pct,
 				dvn_pct)
+			# BATCH BF §1: the aura's Break cut is now a per-hero column, so it
+			# needs a name to sit under. Stamped straight onto the status rather
+			# than passed as `_apply_status`'s `src`, which would also bump the
+			# `st/b` debuff counter and move a column this batch is holding still.
+			var dvn_st: Dictionary = h.get_status("devotion")
+			if not dvn_st.is_empty():
+				dvn_st["src_name"] = dvn_src
 	# Conviction (Devout passive): Divine Shield absorbs build Faith, and
 	# lethal saves reward — both hook back into the battle scene.
 	if heroes.any(func(h): return h.passive_id == "conviction"):
@@ -4509,6 +4525,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			target.unit_name, amount, grade_tag], "#70d878")
 		if is_perfect and ab.perfect_id == "ward":
 			_apply_status(target, "ward", 3)
+			# BATCH BF §1: the Break it refuses is the caster's work, so the
+			# caster rides the status (the `renewal["ward"]` pattern).
+			var wd_st := target.get_status("ward")
+			if not wd_st.is_empty():
+				wd_st["src_name"] = attacker.unit_name
 	elif not is_counter and not ab.aoe and ab.multi_hits == 0 and ab.random_hits == 0 \
 			and not ab.choose_two and randf() < _miss_chance(attacker, target):
 		_stat("attacks")
@@ -8022,11 +8043,33 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 	elif keep > 0:
 		_log("   → Talent: Binding Oath — %s keeps %d Faith" % [
 			u.unit_name, keep], "#b0a8e0")
-	# Communion: fervor is contagious (chance scales with the OTHERS' Faith).
+	# Communion: fervor spreads to allies who are STILL BUILDING it (the chance
+	# scales with their own Faith).
+	#
+	# BATCH BF §2 — AN ALLY AT FIVE IS NOT BUILDING, HE IS AT THE PAYOUT, AND
+	# COMMUNION NO LONGER ROLLS FOR HIM. This attacks the COUPLING rather than
+	# the output: the roll reads the recipient's CURRENT stacks while Apostle
+	# parks allies at 5, so parked allies rolled 75% (BE measured it) and every
+	# advance on one was itself a release. Under Apostle the node now fires at
+	# most once per ally, as they cross 4 -> 5, and it cannot manufacture a
+	# release out of one that already happened. It does not care WHICH node
+	# parks the ally, and it leaves Communion whole in the seven builds that
+	# never take Apostle.
+	#
+	# `faith_stacks` is capped at 5 above and a hero at 5 releases on the spot
+	# unless Apostle keeps him there — so this branch bites on Apostle builds
+	# and effectively nowhere else, which is exactly where the coupling was.
+	#
+	# TWO COSTS, CARRIED FORWARD RATHER THAN DROPPED. The cliff is real: 60% at
+	# four stacks, 0% at five, and the node tooltip has to say so or it reads as
+	# a bug. And two nodes in one lane that partly cancel each other is a smell
+	# — this makes Apostle and Communion less complementary again after BE
+	# accidentally made them more so. Recorded, not solved.
 	if devout.communion_ranks > 0 and not _communion_chain:
 		_communion_chain = true
 		for h in heroes:
-			if h == u or h.dead or h.is_companion or h.faith_stacks <= 0:
+			if h == u or h.dead or h.is_companion or h.faith_stacks <= 0 \
+					or h.faith_stacks >= 5:
 				continue
 			if randf() < 0.01 * devout.communion_ranks * h.faith_stacks:
 				_log("   → Talent: Communion — %s's fervor spreads to %s" % [
@@ -8461,6 +8504,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var bw_turns := 3 + attacker.bulwark_extra_turns
 			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
 				_apply_status(h, "bulwark", bw_turns)
+				# BATCH BF §1: three turns of NO Break damage, party-wide, and
+				# until this batch it was counted nowhere in the game. The
+				# caster's name rides the status so the refused points land in
+				# his column and not the unattributed bucket.
+				var bw_st: Dictionary = h.get_status("bulwark")
+				if not bw_st.is_empty():
+					bw_st["src_name"] = attacker.unit_name
 				if is_perfect:
 					var bw_heal := maxi(int(round(h.max_hp * 0.05)), 1)
 					var bw_got: int = h.heal_amount(bw_heal, h != attacker)
@@ -9088,6 +9138,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_apply_status(h, "hold_bd", 2, hl_cut)
 				h.update_status("hold_bd", "HL",
 					"Takes %d%% less Break damage." % hl_cut, hl_cut)
+				# BATCH BF §1: the Warden's THREAT lane is Break end to end and
+				# none of it reached a contribution number. The cut is his.
+				var hl_st: Dictionary = h.get_status("hold_bd")
+				if not hl_st.is_empty():
+					hl_st["src_name"] = attacker.unit_name
 				_apply_status(h, "undying", hl_undying)
 			if is_perfect:
 				attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
@@ -11091,12 +11146,19 @@ func _check_end() -> void:
 			b_all_total += _b_slice[k]
 			if String(k).begins_with("dmg_hero_"):
 				b_dmg_total += _b_slice[k]
+		# BATCH BF §1: the Break-dealt pool, from its own slice. Same rule as
+		# the two above — the party's Break output over the battles this spec
+		# stood in — so a rotated report and a fixed one read the same way.
+		var b_bd_total := 0.0
+		for k in _b_bd_slice:
+			b_bd_total += _b_bd_slice[k]
 		for h in heroes:
 			if h.is_companion:
 				continue
 			_stat("n_hero_" + h.unit_name)
 			_stat("pool_dmg_hero_" + h.unit_name, b_dmg_total)
 			_stat("pool_all_hero_" + h.unit_name, b_all_total)
+			_stat("pool_bd_hero_" + h.unit_name, b_bd_total)
 		if run_sim:
 			# RunSim replays the real victory/defeat flow (minus UI and
 			# persistence), walks the map to the next fight, and reloads
@@ -11419,6 +11481,10 @@ func _print_sim_report() -> void:
 			int(sim_stats.get("stalemates", 0.0)), int(battles)])
 	print("Per-hero contribution (avg per battle present):")
 	print(_contrib_table(sim_stats))
+	# BATCH BF §1: which effects refused the Break in the BDprev/b column.
+	var bp_line := break_prevented_line(sim_stats)
+	if bp_line != "":
+		print(bp_line)
 	# Batch AW §0: printed only when a Devout was in the party, because a zero
 	# on a party without one reads as a broken instrument rather than a line.
 	var cg_n: float = sim_stats.get("conviction_battles", 0.0)
@@ -11647,6 +11713,11 @@ func _print_sweep_report() -> void:
 	for i in sweep_stats.size():
 		print("  budget %d:" % SWEEP_BUDGETS[i])
 		print(_contrib_table(sweep_stats[i]))
+		# BATCH BF §1: §3's difficulty read has both shares AND the Break
+		# prevented audit from the start, rather than acquiring them later.
+		var sw_bp := break_prevented_line(sweep_stats[i])
+		if sw_bp != "":
+			print("  " + sw_bp)
 	print("Sim time: %.1fs" % elapsed)
 	print("=============================================\n")
 
@@ -11686,6 +11757,17 @@ func _share_line(s: Dictionary) -> String:
 # instrumented mitigation (blocks, barriers, stances, Faith...) — base
 # armor and resists are deliberately not a contribution. "st" counts
 # statuses landed on others where the applier is known.
+#
+# BATCH BF §1 — TWO NEW COLUMNS AND, DELIBERATELY, NOT ONE NEW SHARE. `BD%` is
+# each hero's Break DEALT over the party's, and `BDprev/b` is Break REFUSED.
+# Both are Break points and both stay OUT of `d+h+p%`: folding them in needs an
+# exchange rate between a Break point and a hit point — one? a tenth? — that
+# nobody can defend, and inventing it would bury a guess inside every
+# measurement taken afterwards.
+#
+# AND THE OLD COLUMN IS NOW LABELLED FOR WHAT IT IS. It was called `contrib%`
+# and at least one number in this project's history was read as "share of the
+# party's work". It is a damage-healing-prevented share. The header says so.
 func _contrib_table(s: Dictionary) -> String:
 	var names: Array = []
 	for key in s:
@@ -11693,24 +11775,69 @@ func _contrib_table(s: Dictionary) -> String:
 			names.append(key.trim_prefix("n_hero_"))
 	names.sort()
 	var lines := PackedStringArray()
-	lines.append("  hero               n   dmg/b  dmg%  heal/b  prev/b   BD/b  st/b  contrib%")
+	lines.append("  hero               n   dmg/b  dmg%  heal/b  prev/b   BD/b  BD%  BDprev/b  st/b  d+h+p%")
 	for hero in names:
 		var n: float = maxf(s.get("n_hero_" + hero, 0.0), 1.0)
 		var dmg: float = s.get("dmg_hero_" + hero, 0.0)
 		var heal: float = s.get("heal_hero_" + hero, 0.0)
 		var prev: float = s.get("prev_hero_" + hero, 0.0)
 		var bd: float = s.get("bd_hero_" + hero, 0.0)
+		var bdp: float = s.get("bdprev_hero_" + hero, 0.0)
 		var st: float = s.get("st_hero_" + hero, 0.0)
 		var dpool: float = maxf(s.get("pool_dmg_hero_" + hero, 0.0), 1.0)
 		var apool: float = maxf(s.get("pool_all_hero_" + hero, 0.0), 1.0)
-		lines.append("  %-16s %4d %7.0f %4.0f%% %7.0f %7.0f %6.0f %5.1f %7.0f%%" % [
+		var bpool: float = maxf(s.get("pool_bd_hero_" + hero, 0.0), 1.0)
+		lines.append("  %-16s %4d %7.0f %4.0f%% %7.0f %7.0f %6.0f %3.0f%% %9.0f %5.1f %7.0f%%" % [
 			hero, int(n), dmg / n, 100.0 * dmg / dpool, heal / n, prev / n,
-			bd / n, st / n, 100.0 * (dmg + heal + prev) / apool])
+			bd / n, 100.0 * bd / bpool, bdp / n, st / n,
+			100.0 * (dmg + heal + prev) / apool])
 	var un: float = s.get("prev_hero_(unattributed)", 0.0)
 	if un > 0.0:
 		lines.append("  prevented, unattributed: %.0f/battle" % \
 			(un / maxf(s.get("battles", 0.0), 1.0)))
+	var bun: float = s.get("bdprev_hero_(unattributed)", 0.0)
+	if bun > 0.0:
+		lines.append("  Break prevented, unattributed: %.0f/battle" % \
+			(bun / maxf(s.get("battles", 0.0), 1.0)))
+	lines.append("  d+h+p% = (damage + healing + damage prevented) / the party's total of the SAME THREE.")
+	lines.append("           It is NOT a share of the party's work: Break points, dealt or refused,")
+	lines.append("           are outside it by design and are the BD% and BDprev/b columns instead.")
 	return "\n".join(lines)
+
+
+# BATCH BF §1 — THE AUDIT, PRINTED. Six effects in the game reduce or refuse
+# incoming Break and until this batch exactly one of them was booked anywhere.
+# This line is where "banked wherever it happens" becomes checkable: the terms
+# are written by the same call as the per-hero totals in `BDprev/b`, so the
+# parts and the total cannot drift apart.
+#
+# TWO EFFECTS ARE DELIBERATELY ABSENT AND THE OMISSION IS THE POINT OF NAMING
+# THEM: Rallying Shout removes BANKED Break from the party's meters, and
+# Battered Not Broken shrugs 30/rank off a blocker's. Those are Break HEALING,
+# not Break refused — a different question from "how much never landed" — and
+# folding them in would make this column two things at once. If a later batch
+# wants them measured, it wants a new column.
+#
+# Returns "" when the party refused no Break at all — a row of zeroes on a
+# party with no Break defense reads as a broken instrument rather than a
+# finding, which is the `faith_report_line` rule and the whole lesson of this
+# batch besides.
+static func break_prevented_line(stats: Dictionary) -> String:
+	var n: float = maxf(stats.get("battles", 0.0), 1.0)
+	var terms := [
+		["devoutness", "Devoutness"], ["bulwark", "Bulwark of Fortitude"],
+		["hold_line", "Hold the Line"], ["ward", "Ward"],
+		["immovable", "Immovable"], ["bracing", "Bracing"]]
+	var parts := PackedStringArray()
+	var total := 0.0
+	for t in terms:
+		var v: float = stats.get("bdprev_" + String(t[0]), 0.0)
+		total += v
+		parts.append("%s %.0f" % [t[1], v / n])
+	if total <= 0.0:
+		return ""
+	return "Break prevented/battle by source: %s | total %.0f" % [
+		" | ".join(parts), total / n]
 
 
 var _end_action := Callable()  # victory screens: Space presses this
@@ -12053,6 +12180,10 @@ func _stat(key: String, amount := 1.0) -> void:
 		if key.begins_with("dmg_hero_") or key.begins_with("heal_hero_") \
 				or key.begins_with("prev_hero_"):
 			_b_slice[key] = _b_slice.get(key, 0.0) + amount
+		# BATCH BF §1: Break dealt gets its own slice and its own pool, so it
+		# can have a SHARE without joining the one above.
+		elif key.begins_with("bd_hero_"):
+			_b_bd_slice[key] = _b_bd_slice.get(key, 0.0) + amount
 	elif key.begins_with("dmg_hero_"):
 		# Batch Z: real play banks hero damage for the run summary.
 		_run_slice[key] = _run_slice.get(key, 0.0) + amount
@@ -12138,6 +12269,13 @@ func _on_barrier_prevented(src_name: String, absorbed: int, holder: BattleUnit,
 func _on_unit_credit(src_name: String, amount: int, term: String) -> void:
 	if term == "devoutness_break":
 		_stat("faith_break_cut", float(amount))
+		_prev_bd(src_name, float(amount), "devoutness")
+		return
+	# BATCH BF §1: a `bd_` term is BREAK PREVENTED and goes to the Break door.
+	# The prefix is the whole routing rule, so a new reducer in unit.gd names
+	# itself into the right ledger and cannot land in the healing total.
+	if term.begins_with("bd_"):
+		_prev_bd(src_name, float(amount), term.trim_prefix("bd_"))
 		return
 	_devout_heal(src_name, float(amount), term)
 
@@ -12162,6 +12300,27 @@ func _devout_prev(owner, cut: float, term: String) -> void:
 	_prev(owner, cut)
 	if sim and cut > 0.0:
 		_stat("faith_prev_" + term, cut)
+
+
+# BATCH BF §1 — THE ONE PLACE BREAK PREVENTED IS BOOKED, on `_devout_prev`'s
+# pattern: the per-hero total and the per-term breakdown are written by the SAME
+# call, so the parts can never disagree with the total. Before this batch only
+# Devoutness had a home and the other five reducers had none — the Warden's
+# whole THREAT lane and the Devout's own Bulwark capstone measured exactly
+# nothing, which is how a build can look dead when only the instrument is.
+#
+# ITS UNITS ARE BREAK POINTS AND THEY STAY THERE. `bdprev_hero_` deliberately
+# does NOT begin with `prev_hero_`, so `_stat` cannot rake it into `_b_slice`
+# and thence into the damage-healing-prevented pool: adding a Break point to a
+# hit point needs an exchange rate nobody can defend, and inventing one would
+# bury a guess inside every measurement taken afterwards.
+func _prev_bd(owner, cut: float, term: String) -> void:
+	if not sim or cut <= 0.0:
+		return
+	var nm := _contrib_name(owner)
+	if nm != "":
+		_stat("bdprev_hero_" + nm, cut)
+	_stat("bdprev_" + term, cut)
 
 
 var _sfx_players: Array = []

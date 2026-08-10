@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-09 (Batch BD)</b></p>
+<p align="right"><b>Last updated: 2026-08-09 (Batch BF)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1340,7 +1340,7 @@ dividends. <b>BULWARK</b> (the loan itself: invest deeply in ONE ally) · <b>FAI
 returns pay: invest in the dividend) · <b>ZEAL</b> (invest shallowly in EVERYONE)</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Bulwark</th><th>Faith</th><th>Zeal</th></tr>
-<tr><td>1</td><td><b>Blessed Barrier</b> — Divine Shield converts 20% of the damage it absorbs into healing for its holder.</td><td><b>Communion</b> — When a party member reaches 5 Faith, every other member has a (15 x their own Faith stacks)% chance to gain 1 stack.</td><td><b>Cleansing Waters</b> — While Consecrated Ground or Sacred Resolve holds, each party member has a 50% chance each turn to be cleansed of one harmful effect.</td></tr>
+<tr><td>1</td><td><b>Blessed Barrier</b> — Divine Shield converts 20% of the damage it absorbs into healing for its holder.</td><td><b>Communion</b> — When a party member reaches 5 Faith, every other member who is still <b>building</b> Faith has a (15 x their own Faith stacks)% chance to gain 1 stack. The chance therefore peaks at 60% on an ally holding 4 — an ally already at 5 is at the payout rather than building, and is not rolled for at all.</td><td><b>Cleansing Waters</b> — While Consecrated Ground or Sacred Resolve holds, each party member has a 50% chance each turn to be cleansed of one harmful effect.</td></tr>
 <tr><td>2</td><td><b>Radient Aegis</b> — Casting Divine Shield has a 60% chance to cast it again on another ally.</td><td><b>Unwavering Faith</b> — Increases the Devout&#x27;s maximum health by 20%.</td><td><b>Righteous Fire</b> — Consecrated Ground reflects 35% of damage taken (up from the base 10%).</td></tr>
 <tr><td>3</td><td><b>Afterglow</b> — When Divine Shield breaks, its holder is healed for 20% of the Devout&#x27;s max health.</td><td><b>Devoutness</b> — The entire party takes 20% less Break damage.</td><td><b>Sacred Resolve</b> — New ability: Sacred Resolve — all damage received is split evenly among living heroes for 3 turns; Break damage still lands on the struck hero (25 Mana, 2.5 int, 5cd; Perfect: 4 turns).</td></tr>
 <tr><td>4</td><td><b>Warded Robes</b> — While Divine Shield holds, its holder has +25% armor.</td><td><b>Blessed are the Faithful</b> — The heal at 5 stacks of Faith restores 35% max health (up from the base 15%).</td><td><b>Healing Pulse</b> — While Consecrated Ground or Sacred Resolve holds, the party heals 8% of the Devout&#x27;s max health each turn.</td></tr>
@@ -1892,6 +1892,26 @@ for now), DOD_ENEMIES_OFF=1 (arm the "Enemy attacks OFF" debug toggle from the
 environment). Autoplay debug runs echo every combat-log line to
 stdout as "[LOG] ..." so headless tests can grep them; status expiries print as
 "... fades from ..." lines.</li>
+<li><b>The contribution table</b> (printed by the standalone report, the sweep and the run
+harness alike, so all three read the same way). One row per hero:
+<code>dmg/b</code> and <code>dmg%</code> (damage per battle, and its share of the party's),
+<code>heal/b</code>, <code>prev/b</code> (instrumented mitigation — blocks, barriers,
+stances, Faith; base armor and resists are deliberately <i>not</i> a contribution),
+<code>BD/b</code> and <code>BD%</code> (Break damage dealt, and its share of the party's),
+<code>BDprev/b</code> (Break damage refused or reduced), <code>st/b</code> (statuses landed
+on others), and <code>d+h+p%</code>.
+<br><b><code>d+h+p%</code> is exactly what it says: (damage + healing + damage prevented)
+over the party's total of the same three. It is NOT a share of the party's work.</b> Break
+points and hit points are different units, and adding them needs an exchange rate nobody
+can defend — so Break stays out of that column entirely and gets the two columns of its own
+instead. A build that pays in Break (the Warden's Threat lane, the Occultist's grind, the
+Devout's Devoutness) reads low in <code>d+h+p%</code> by construction, and reading that as a
+weak build is the mistake the columns exist to prevent.
+<br>Beneath the table, <b>Break prevented per battle by source</b> — Devoutness, Bulwark of
+Fortitude, Hold the Line, Ward, Immovable, Bracing — booked through one door, so the parts
+always sum to the <code>BDprev/b</code> column. Base Constitution is not booked (a stat
+block is not a contribution) and neither are the run modifiers Muffled and Deadened (nobody
+in the party did that).</li>
 <li><b>Difficulty sweep:</b> <code>./sim.sh --sweep N</code> (DOD_SIM_SWEEP=1) runs N
 battles at EACH power budget 3/6/9/12 with a fresh warband rolled per battle from the
 fight-node themes, and prints — per budget — win rate, rounds, hero deaths, average
@@ -1905,7 +1925,13 @@ fight is harder than its budget row. Without --sweep, plain sims fight a fixed
 raider/chief/archer/archer lineup (power 7, unscaled) — fine for kit smoke tests,
 meaningless for difficulty. Win-rate targets attach to a budget, never to "the sim":
 the ≈85% target describes the top of the ladder (see the changelog's Batch R sweep
-table for the measured curve).</li>
+table for the measured curve).
+<br><b>Run it at TWO build levels, because they are two different questions and each maps
+onto a real part of the run.</b> <i>Ungeared</i> — no talents spent, the party as it enters
+zone 1: read the LOW budgets off this. <i>All four force-learned into full 8-node lanes</i>
+(<code>DOD_SIM_TALENTS</code> with four whole lanes) — the party at zone 3, where 8 points
+is exactly a full path: read the TOP budget off this. A single build level makes either the
+early game or the late game look wrong for a reason that is not real.</li>
 <li><b>Run harness:</b> <code>./sim.sh --run N</code> (DOD_SIM_RUN=N, default 50) plays
 N COMPLETE runs headlessly — the real 36-encounter road, real warbands at real budgets
 WITH enemy tier scaling and the zone slot multiplier, HP/mana/items carried between

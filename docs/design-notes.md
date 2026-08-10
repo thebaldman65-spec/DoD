@@ -4,6 +4,50 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A zero is evidence about the instrument (Batch BF) — 2026-08-09
+
+A metric that pools three quantities and silently omits a fourth will be
+trusted exactly as much as one that does not. That is the whole of it, and
+this project spent fourteen batches proving it.
+
+The contribution share has been damage plus healing plus damage-prevented,
+over the party's total of the same three, since Batch W. Nothing about that
+is wrong; it is a perfectly good measure of the thing it measures. What was
+wrong is that nobody printed the omission next to it, so the number got read
+as "how much of the party's work this hero did" — including, at least once,
+in this project's own notes. Break points were in neither the numerator nor
+the denominator, dealt or prevented, while `BD/b` sat printed in its own
+column right beside the share, which made the omission look deliberate and
+handled rather than deliberate and unhandled.
+
+The cost was not theoretical. The Warden's entire Threat lane pays in Break;
+Batch AL measured that lane taking his Break per battle from 104 to 320 and
+the party's Breaks per battle from 1.02 to 2.35, and not one point of it
+reached a contribution number. The Occultist's Broken Will and Entropy exist
+to grind a boss's meter. Batch BD gave a single deadfall 270 Break points.
+Every one of those builds was measured, repeatedly, by an instrument that
+could not see its output.
+
+**And here is the part worth keeping, because it is the only reason any of
+it was found: an effect measuring exactly nothing is evidence about the
+instrument at least as often as it is evidence about the effect.** Batch BC
+ran a leave-one-out grid over the Devout's Faith lane and read −Devoutness
+at 80% — the same as the full lane. A node that removes 20% of the party's
+incoming Break damage moved the headline by zero. Zero is a suspicious
+number. A node can be weak, and a weak node reads as 1% or 2%; a node that
+reads as *exactly* the control is usually not being measured at all. That
+one zero is what opened the whole question, and it opened it fourteen
+batches later than it should have because a small number and no number look
+identical in a report that prints neither.
+
+So the fix is not really the two new columns. The fix is that the table now
+says what it is — `d+h+p%`, and a line under it stating outright that it is
+not a share of the party's work — and that every effect which refuses Break
+books through one door with its name attached, so a seventh one added later
+either appears in the audit line or does not exist. The columns are what you
+do after you have admitted the omission. Printing the admission is the part
+that generalises.
+
 ## An aggregate is not a diagnosis (Batch BC) — 2026-08-09
 
 Three batches in a row looked at one number — the Devout's FAITH row at

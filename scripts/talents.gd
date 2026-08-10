@@ -1458,8 +1458,14 @@ const LANE_TREES := {
 		# three, 60% at four) and the chain decays instead of sustaining. The
 		# counter keeps its meaning and its units — AW's reprice took it 20 -> 40
 		# and this takes it below where it started.
+		# BATCH BF §2 — THE CONDITION, AND IT IS WRITTEN AS AN INCLUSION BECAUSE
+		# THE MECHANIC READS BETTER THAT WAY: fervor spreads to allies who are
+		# STILL BUILDING it. An ally sitting at five is not building — he is at
+		# the payout. The cliff (60% at four, 0% at five) is stated outright: an
+		# ability whose chance climbs with stacks and then vanishes at the top
+		# reads as a bug unless the tooltip says otherwise.
 		{"id": "dv_communion", "name": "Communion", "ranks": 1, "lane": "Faith", "row": 1,
-			"desc": "When a party member reaches 5 Faith, every other member has a ({v} x their own Faith stacks)% chance to gain 1 stack.",
+			"desc": "When a party member reaches 5 Faith, every other member who is still BUILDING Faith has a ({v} x their own Faith stacks)% chance to gain 1 stack. The chance therefore peaks at 60% on an ally holding 4 — an ally already at 5 is at the payout rather than building, and is not rolled for at all.",
 			"scale": {"step": 15},
 			"payload": {"stat": {"communion_ranks": 15}}},
 		# THE MOST INVESTMENT-SHAPED NODE IN THE GAME with Conviction's third

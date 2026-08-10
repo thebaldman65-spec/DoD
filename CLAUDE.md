@@ -164,25 +164,57 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   **BATCH BE BUILT THE ALL-FOUR LANE CONTROL SET FOR THE DEVOUT, which BC's grid
   lacked — use it rather than re-deriving it** (n=200, same lineup, other three
   on berserker Bloodletting + cryomancer Thaw + beastmaster devotion): **FAITH
-  45% | ZEAL 31% | BULWARK 14% | ungeared 11%**, against the one-hero 73/42/23/18.
-  **STANDING NOTE — WHAT A CONTRIBUTION SHARE CANNOT SEE (Batch BE §4). THE
-  METRIC HAS A MISSING TERM AND IT IS BREAK.** `_contrib_table` computes
-  `contrib% = (dmg + heal + prev) / pool`, and `pool` is built in `_stat` from
-  exactly three key prefixes — `dmg_hero_`, `heal_hero_`, `prev_hero_`. **SO
-  BREAK POINTS ARE OUTSIDE BOTH THE NUMERATOR AND THE DENOMINATOR, DEALT OR
-  PREVENTED**, even though `BD/b` is printed as its own column right beside the
-  share. Devoutness's Break reduction is banked to `faith_break_cut` (49 points a
-  battle in the FAITH row) and read only by `faith_report_line`;
-  `_on_unit_credit` branches it off and RETURNS before the healing door.
-  **CONSEQUENCE, AND IT REACHES WELL PAST THE DEVOUT: BC's grid read −Devoutness
-  at 80% — a zero — and that zero is the instrument, not the node.** The Warden's
-  whole THREAT lane is Break (AL measured his BD/battle 104 -> 320 and the
-  party's Breaks/battle 1.02 -> 2.35) and none of it reaches a contribution share
-  either. **EVERY BREAK-FOCUSED BUILD IN THE GAME IS MEASURED BY AN INSTRUMENT
-  THAT CANNOT SEE ITS OUTPUT. Reported, NOT changed — and this is the item that
-  gates a difficulty pass**, because a pass designed against this metric would
-  tune the game around damage and healing alone. test_batch_be pins the two
-  sites, so a later batch that DOES add a Break term has to come and say so.
+  33% | ZEAL 31% | BULWARK 14% | ungeared 11%**, against the one-hero 54/42/23/18.
+  **The FAITH cell is BF's re-measure (BE read 45 / 73 before its §2 condition);
+  ZEAL, BULWARK and ungeared are BE's and are byte-identical by construction —
+  a build without `dv_communion` makes no Communion draw at all.**
+  **STANDING NOTE — WHAT A CONTRIBUTION SHARE CAN AND CANNOT SEE. THE BLIND SPOT
+  BE §4 FOUND (Batch BE) IS CLOSED (Batch BF §1), AND WHAT CLOSED IT WAS TWO NEW
+  COLUMNS, NOT A NEW SHARE.**
+  **WHAT THE OLD COLUMN IS, AND IT IS NOW LABELLED AS SUCH: `d+h+p%` (it was
+  called `contrib%`, and at least one number in this project's history was read
+  the second way) = `(dmg + heal + prev) / pool`, pool built in `_stat` from
+  exactly three key prefixes — `dmg_hero_`, `heal_hero_`, `prev_hero_`. THAT
+  COLUMN DID NOT MOVE BY A POINT IN BF and must not: it is the control that makes
+  every pre-BF row comparable with every post-BF one.** The table prints a legend
+  under itself saying outright that it is not a share of the party's work.
+  **WHAT IS NEW: `BD%` (a hero's Break DEALT over the party's, off its own
+  `pool_bd_hero_` pool and its own `_b_bd_slice`) and `BDprev/b` (Break refused or
+  reduced), plus a `break_prevented_line` audit under the table naming which
+  effect refused what.**
+  **BREAK IS STILL NOT FOLDED INTO `d+h+p%` AND MUST NOT BE** — that needs an
+  exchange rate between a Break point and a hit point (one? a tenth?) that nobody
+  can defend, and inventing it buries a guess inside every measurement taken
+  afterwards. The two slices are SEPARATE DICTS for this reason: `_b_slice` is
+  summed wholesale into the d+h+p pool, so a Break key living in it would fold
+  Break in through nothing more than a `for` loop.
+  **BREAK PREVENTED NOW HAS ONE DOOR — `_prev_bd`, on BC's `_devout_prev` pattern
+  (per-hero total and named term written by the SAME call, so parts can never
+  disagree with the total). SIX REDUCERS BOOK THROUGH IT** via `unit.gd`'s
+  `_credit_bd` and the `bd_` term prefix that routes them: **Devoutness, Bulwark
+  of Fortitude, Hold the Line, Ward, Immovable, Bracing.** Before BF exactly ONE
+  of the six was booked anywhere. `faith_break_cut` survives as the Devoutness
+  term's alias so `faith_report_line` and BC's test read on.
+  **TWO DELIBERATE EXCLUSIONS, PINNED IN test_batch_bf SO THEY CANNOT BE QUIETLY
+  REVERSED: base Constitution** (a stat block is not a contribution — the same
+  rule that keeps base armor and resists out of `prev_hero_`; BRACING *is* booked,
+  because a stance a talent bought is exactly what the damage side counts) **and
+  the run modifiers `mod_bd_mult`/`mod_no_break`** (nobody in the party did that).
+  **TWO MORE ARE ADJACENT AND ARE NOT IN THE COLUMN: Rallying Shout removes 30-50
+  BANKED Break from each hero, and Battered Not Broken shrugs 30/rank off a
+  blocker's meter.** Those are Break *healing*, not Break refused — a different
+  question from "how much never landed" — so they are not booked; if a later batch
+  wants them it wants a new column, not this one. **Nothing else in the game
+  writes `pressure` downward except `revive` and `recover_from_break`, which are
+  structural.**
+  **WHY IT MATTERED, AND IT REACHED WELL PAST THE DEVOUT: BC's grid read
+  −Devoutness at 80% — a zero — and that zero was the instrument, not the node.**
+  The Warden's whole THREAT lane is Break (AL measured his BD/battle 104 -> 320
+  and the party's Breaks/battle 1.02 -> 2.35), the Occultist's Broken Will and
+  Entropy exist to grind a boss's meter, and BD gave a single deadfall 270 Break
+  points. **A BUILD THAT PAYS IN BREAK STILL READS LOW IN `d+h+p%` BY
+  CONSTRUCTION — read it in `BD%` and `BDprev/b`, and never call such a build weak
+  off the d+h+p column alone.**
   `DOD_SIM_ABILITIES="Resurrection,Divine Plea"` appends pending
   talent-gated abilities (Classes.pending_talent_ability; Holy only).
   `DOD_ENEMIES_OFF=1` arms the enemy-skip debug toggle headlessly.
@@ -234,6 +266,103 @@ the new spec's idea a second time. **BA re-specced four nodes off it** — Epide
 every enemy permanently Poisoned), Plague Bearer (rot leaps enemy to enemy), Creeping Death
 (a corpse passes its stacks to the living) and the NAME Virulence (a pathogen term). SNARES
 and GUERILLA were never disease and are untouched by the rule.
+
+BATCH BF (08-09) — THE INSTRUMENT LEARNS TO SEE BREAK, COMMUNION'S LAST LEVER, AND THE FIRST
+HONEST DIFFICULTY READ. Three things in that order, because each changes what the next
+measures. No save version moves (still v7). **§3 IS A MEASUREMENT AND NOTHING WAS TUNED.**
+§1 **THE CONTRIBUTION METRIC COULD NOT SEE BREAK AND EVERY BREAK BUILD WAS MEASURED BY IT —
+CLOSED. See the STANDING NOTE at `DOD_SIM_TALENTS` above for the shipped shape**, which is
+where it belongs and where it will be looked for. Short version: **two new columns and
+deliberately NOT one new share.** `BD%` (a hero's Break dealt over the party's, off its own
+pool and its own battle slice) and `BDprev/b` (Break refused), plus a `break_prevented_line`
+audit naming which effect refused what. **THE OLD SHARE DID NOT MOVE BY A POINT AND IS NOW
+LABELLED `d+h+p%`** with a legend under the table stating outright that it is not a share of
+the party's work. **BREAK IS NOT FOLDED IN AND MUST NOT BE** — that needs an exchange rate
+between a Break point and a hit point that nobody can defend.
+**THE AUDIT FOUND FIVE MORE HOLES BESIDE THE ONE THE BRIEF NAMED.** Six effects reduce or
+refuse incoming Break — **Devoutness, Bulwark of Fortitude, Hold the Line, Ward, Immovable,
+Bracing** — and exactly ONE (Devoutness) was booked anywhere before this batch. All six now
+go through **one door, `_prev_bd`**, on BC's `_devout_prev` pattern: per-hero total and named
+term written by the SAME call, so the parts can never disagree with the total. `unit.gd`'s
+`_credit_bd` and the `bd_` term prefix are the routing rule, so a seventh reducer added later
+names itself into the right ledger or does not book at all. Measured live: **Bulwark refuses
+182 of 200 raw Break points on one hit and books all 182 to its caster.**
+§2 **COMMUNION NO LONGER ROLLS FOR AN ALLY ALREADY AT FIVE FAITH.** One condition, on the
+existing gate, framed as an INCLUSION because the mechanic reads better that way and the
+tooltip has to say it: fervor spreads to allies **still building** it; an ally at five is at
+the payout, not building. **THE CLIFF IS STATED IN THE TOOLTIP — 60% at four, 0% at five** —
+because a chance that climbs with stacks and then vanishes reads as a bug otherwise. Measured
+over 1200 driven releases apiece: **58.8% at four, 0.0% at five (it was 75%).**
+**IT LANDED INSIDE THE BRACKET BE PRE-MEASURED FOR IT, WHICH IS WHY THIS LEVER WAS CHOSEN OVER
+THE ALTERNATIVE.** Bracket 48-73% one-hero / 25-45% all four; **measured 54% and 33%.**
+n=200 per row, BC's lineup, both constructions, all four rows — contribution | healing/battle
+| releases/battle | healing per release:
+**ONE-HERO**: FAITH all eight **73% | 1555 | 22.77 | 65 -> 54% | 618 | 9.64 | 61**;
+−Apostle **63% | 910 | 12.70 | 65 -> 62% | 913 | 12.70 | 65**.
+**ALL FOUR BUILT**: FAITH **45% | 429 | 6.55 | 62 -> 33% | 244 | 3.81 | 61**;
+−Apostle (new row) **31% | 318 | 4.58 | 62**.
+**THE −APOSTLE ROW IS A NATURAL CONTROL AND IT REPRODUCES TO THE HUNDREDTH** — releases
+12.70 -> 12.70, because without Apostle an ally never sits at 5 and the condition can never
+fire. **HEALING PER RELEASE DID NOT MOVE IN ANY ROW**, across BE and BF both: it was a
+frequency problem and both levers bought frequency.
+**THE BAR IS MET ON THE ROW THAT COUNTS: all four built, FAITH 33% against ZEAL 31% /
+BULWARK 14%** — 1.06x, from 1.8x before BE and 1.45x after it. ZEAL/BULWARK were NOT re-run
+and did not need to be (no `dv_communion`, no draw, byte-identical by construction).
+**AND THE SIGN ON APOSTLE FLIPPED, WHICH IS THE COST THE BRIEF PREDICTED, NOW WITH A NUMBER.**
+Apostle was worth +7 at Communion 40 and +10 at 15; it is now **−8 one-hero (54 vs 62) and −2
+all four (33 vs 31)**. Taking the capstone LOWERS the Faith engine, because parking allies at
+5 makes them invisible to Communion. **TWO NODES IN ONE LANE THAT PARTLY CANCEL EACH OTHER IS
+A SMELL. RECORDED, NOT SOLVED** — if the tree wants restructuring later, this is the note to
+start from, and the honest fix is probably to make one of the two something else rather than
+to re-price either.
+§3 **THE FIRST HONEST DIFFICULTY READ. A MEASUREMENT — NOTHING WAS TUNED, AND THE PROPOSAL AT
+THE END IS STATED AS A PROPOSAL SO THAT STAYS OBVIOUS.** `./sim.sh --sweep 400`, n=400 per
+budget (R used 200; at 400 the SE on a 93% row is 1.3 points), **two build levels**.
+**UNGEARED — no talents, the party entering zone 1. READ THE LOW BUDGETS OFF THIS.**
+budget | win% | rounds | deaths/b | foes | alive@r3:
+**3 100% 5.0 0.02 2.5 0.0 | 6 100% 7.6 0.22 4.2 0.0 | 9 97% 10.0 0.59 5.4 0.1 |
+12 93% 12.3 0.96 5.9 0.3**
+**ALL FOUR IN FULL 8-NODE LANES — the party at zone 3, 8 points = a full path. READ THE TOP
+BUDGET OFF THIS** (BE's four lanes, so it is comparable with §2's rows):
+**3 100% 3.9 0.01 2.5 0.0 | 6 100% 5.3 0.06 4.2 0.0 | 9 100% 6.6 0.14 5.4 0.0 |
+12 100% 7.6 0.21 5.9 0.0**
+Both shares at budget 12 (dmg% | BD% | d+h+p%) — **ungeared** Beastmaster 33|10|26,
+Berserker 27|44|22, Cryomancer 36|41|29, Devout 4|5|22; **built** Beastmaster 45|10|26,
+Berserker 23|43|14, Cryomancer 30|43|17, Devout 2|4|43 with 55 Break prevented/battle.
+**THE CONTROL, AND IT IS WHAT MAKES THE REST READABLE: THE UNGEARED ROW REPRODUCES BATCH R
+ALMOST EXACTLY** — R read 100/100/98/93.5 at n=200, this reads 100/100/97/93 at n=400.
+Nothing in the twelve spec batches since has moved the composition curve.
+**AGAINST BATCH V's ~85% TOP-BAND TARGET: 93% UNGEARED, 100% BUILT — 8 AND 15 POINTS HIGH,
+and the built party lost none of 400 top-band fights.** The 100% rows at budgets 3/6 are not
+a finding; a first-zone encounter is supposed to read that way.
+**THE CAVEAT IS LARGE AND MUST TRAVEL WITH THE TABLE: sweep enemies are UNSCALED and BOTH
+build levels ran against the ZONE-1 roster**, so the build axis is clean and the enemy axis is
+missing — a real tier-8+ zone-3 fight carries tier scaling and the zone multiplier on top.
+**These are an UPPER BOUND on the party's side, not a verdict on the game.** What the table
+honestly says is that COMPOSITION ALONE DOES NOT PRODUCE AN 85% TOP BAND.
+**PROPOSED, NOT TAKEN — ENEMY COUNT AT THE TOP OF THE LADDER. The number: budget 12 fields 5.9
+enemies against budget 9's 5.4 — 9% more bodies for 33% more budget**, so the top step buys
+per-enemy quality rather than a bigger fight. Beside it, **`alive@r3` is 0.0 at EVERY budget
+on the built row** (0.0-0.3 ungeared) — the field is empty entering round 3 everywhere, Batch
+S's finding, unmoved. Count is the only one of the four levers that moves both: it raises
+incoming actions per round (**attrition is the sensitive dial — deaths/battle swings 0.02 ->
+0.96 across the ungeared ladder, 48x, while win% moves 7 points**) and it puts a field on the
+board for the round the AoE specs are balanced around. Expect win% down at 9-12 and barely at
+3-6, deaths/battle up at the top, `alive@r3` off the floor, and shares to shift toward the AoE
+specs — which is diagnostic, not a side effect. **NOT enemy attack** (moves deaths but leaves
+`alive@r3` at 0.0 — harder in the least interesting way); **NOT enemy health** (fights already
+run 12.3 rounds ungeared at 12, and one stalemate already appeared); **NOT the budget curve**
+(that moves WHERE a budget sits on the road, a run-shape lever for a `--run` measurement).
+**THE 08-02 NOTE BELOW SAYS DIFFICULTY IS CLOSED AS A SIM QUESTION AND NOT TO PROPOSE CHANGES
+UNSOLICITED. BF's brief SOLICITED this read explicitly and argued the older reason had
+expired. Re-opened BY REQUEST, measured only, nothing changed** — the note stands for
+unsolicited difficulty work and this was not that.
+**AND THE BUILT ROW FOUND A CRASH — an infinite recursion between `_hold_release` and
+`_hold_freeze` that a Cryomancer with Honed Shards reaches in normal play. PRE-EXISTING (23
+events per 400 budget-12 battles, IDENTICAL COUNT on unmodified HEAD at matched n), NOT FIXED
+HERE, and it is now the FIRST open thread.** The same HEAD run also reproduces the built
+budget-12 row (100% / 7.8 rounds / 0.22 deaths against this build's 100% / 7.6 / 0.21), which
+is the independent evidence that §1 and §2 moved no difficulty.
 
 BATCH BD (08-09) — DEADFALL BECOMES A PLACED HAZARD. **ONE ABILITY.** No tree is touched, no
 magnitude in the tree moves, no other spec is involved, no save version moves (still v7).
@@ -4789,39 +4918,78 @@ Battle has burger menu (restart/settings overlay/exit); skill checks accept
 Space or left click; no announcer text (combat log only).
 
 ## Known open threads
-- **THE DEVOUT'S FAITH ROW: ONE REPAIR SHIPPED (Batch BE), AND IT UNDER-DELIVERED AGAINST ITS
-  OWN BAR. THE ROW IS STILL THE TALLEST IN HIS TREE.** Do not re-derive any of this; every
-  figure below is measured.
-  · **WHAT SHIPPED: Communion 40 -> 15** (`dv_communion`, the chance is `15 x the RECIPIENT's
-    own stacks`%). One-hero the row went **80% -> 73%** (healing 2255 -> 1555, releases 32.21
-    -> 22.77); all four built, **55% -> 45%** (695 -> 429, 10.54 -> 6.55). **Healing per
-    release did not move in any row** — the lever landed on the axis it was aimed at.
-  · **THE BAR IT MISSED:** FAITH should sit near his other two lanes rather than at twice them.
-    One-hero **73% vs ZEAL 42% / BULWARK 23%**; all four **45% vs ZEAL 31% / BULWARK 14%**.
-    The gap narrowed 1.9x -> 1.7x and 1.8x -> 1.45x. **A REAL REDUCTION, NOT THE WHOLE REPAIR.**
-  · **THE LIVE OPEN QUESTION, AND IT IS THE NEXT LEVER: COMMUNION READS THE RECIPIENT'S
-    *CURRENT* STACKS, SO APOSTLE'S PARKED ALLIES ROLL 75%, NOT 15%** — three of them is ~2.25
-    expected advances per release and the loop still sustains. **BE MEASURED THE INTERACTION
-    AND IT WENT THE OTHER WAY: APOSTLE WAS WORTH 7 POINTS AT 40 AND IS WORTH 10 AT 15**
-    (80->73 against 73->63), because at 40 Binding Oath's three parked stacks already rolled a
-    certainty and Apostle was buying redundancy. **The two nodes are no longer redundant
-    back-ups — a better tree, and the reason the row did not fall further.**
-  · **TWO CANDIDATE LEVERS, RECORDED AS NOT TAKEN. THE RECOMMENDATION IS THE FIRST:**
-    **Communion reads stacks only below 5** (one condition at the existing gate; a parked ally
-    becomes invisible to it) — **its landing zone is already bracketed by measured rows,
-    48-73% one-hero and 25-45% all four**, which nothing else on the table is; it attacks the
-    coupling rather than the output and leaves Communion whole in every non-Apostle build. Its
-    cost: a 60%-at-four / 0%-at-five cliff that must be stated in the tooltip. The other is
-    **Communion fires at most once per battle turn** — rejected because its bite scales with
-    fight length, i.e. hardest exactly where the row is most wanted.
+- **A CRASH. INFINITE RECURSION BETWEEN `_hold_release` AND `_hold_freeze`, REACHABLE IN NORMAL
+  PLAY BY A CRYOMANCER WHO HAS TAKEN HONED SHARDS. FOUND BY BF §3's BUILT SWEEP; PRE-EXISTING,
+  NOT BF's — REPRODUCED ON UNMODIFIED HEAD AT MATCHED n WITH THE IDENTICAL COUNT (23 events in
+  400 budget-12 battles, both builds). NOT FIXED: BF is a measure-don't-tune batch and this is
+  its own change with its own tests. THIS IS THE FIRST THING TO DO NEXT.**
+  · **THE MECHANISM IS DETERMINISTIC, NOT A RACE.** `_hold_release` erases the target from
+    `_holds`, calls `set_chilled_stacks(HOLD_RELEASE_STACKS)` — **which is 1** — and then
+    Honed Shards (`cr_razor_hone`, Thaw row 6) applies **3** more. 1 + 3 = **exactly the 4 that
+    flash-freezes** in `_apply_status`'s chilled branch, so **every release re-freezes its own
+    target.** Alone that is survivable; the loop needs the second half.
+  · **THE SECOND HALF IS THE HOLD LIMIT.** `_hold_limit()` is **1** for a Thaw-lane Cryomancer
+    (no Second Prison, no Absolute Zero — both are Deep Freeze). `_hold_freeze` appends, then
+    runs `while _holds.size() > _hold_limit(): _hold_release(_holds[0])`. So freezing a SECOND
+    enemy evicts the first, whose release re-freezes it, which evicts the second, whose release
+    re-freezes it — **the two ping-pong until GDScript's ~1024-frame stack limit.** The comment
+    at the Honed Shards site already says it "can re-freeze the enemy it just thawed"; what was
+    never noticed is that the eviction loop turns that into a cycle.
+  · **TRIGGER, IN ONE LINE: Honed Shards learned + hold limit 1 + two enemies held at once.**
+    ~6% of budget-12 battles with a full Thaw lane. Budgets 3/6/9 never hit it (the field is
+    rarely big enough for a second hold).
+  · **THE FIX I WOULD PROPOSE AND DID NOT TAKE: a re-entrancy latch on the release, exactly the
+    `_communion_chain` pattern this batch just re-tested** — a release may re-freeze, but a
+    re-freeze may not evict-and-release again. The alternatives are worse: capping Honed Shards
+    below 4 changes a shipped magnitude, and evicting BEFORE appending only reorders the cycle.
+  · **IT DOES NOT INVALIDATE §3's BUILT ROW.** All 23 affected battles were wins, and the row
+    reads 400/400 with them excluded too; HEAD's own budget-12 row (100% / 7.8 rounds / 0.22
+    deaths) matches this build's (100% / 7.6 / 0.21). **But the direction of the contamination
+    favours the party** — a permanently-held enemy stops acting — so treat the built top-band
+    row as an upper bound for that reason as well as the unscaled-enemy one.
+- **THE DEVOUT'S FAITH ROW: TWO REPAIRS SHIPPED (BE, then BF §2), AND THE SECOND ONE LANDED
+  THE ROW ON ITS BAR. THE THREAD IS NEARLY CLOSED AND WHAT REMAINS IS A TREE-SHAPE QUESTION,
+  NOT A MAGNITUDE.** Do not re-derive any of this; every figure below is measured, n=200,
+  BC's lineup, and BF's rows were taken with the SAME instrument as BE's (BF §1 did not move
+  `d+h+p%` by a point, which is why the two batches' rows are comparable at all).
+  · **WHAT SHIPPED: Communion 40 -> 15 (BE), then Communion no longer rolls for an ally
+    already at 5 (BF §2).** One-hero the row went **80% -> 73% -> 54%** (healing 2255 -> 1555
+    -> 618, releases 32.21 -> 22.77 -> 9.64); all four built, **55% -> 45% -> 33%** (695 ->
+    429 -> 244, 10.54 -> 6.55 -> 3.81). **Healing per release has not moved in ANY row across
+    either batch** (67/65/61 one-hero, 62/61 all four) — both levers landed on frequency,
+    which is the axis BC identified.
+  · **THE BAR IS MET ON THE ROW THAT COUNTS.** FAITH should sit near his other two lanes
+    rather than at twice them: **all four built, 33% against ZEAL 31% / BULWARK 14% — a 1.06x
+    gap, from 1.8x before BE and 1.45x after it.** One-hero it is **54% vs ZEAL 42% /
+    BULWARK 23%**, 1.29x from 1.9x. (ZEAL/BULWARK were NOT re-run and did not need to be: a
+    build without `dv_communion` makes no Communion draw at all, so those rows are
+    byte-identical by construction — BE's own argument about its controls.)
+  · **THE CONTROL THAT PROVES THE LEVER HIT WHAT IT AIMED AT: the −Apostle row is UNCHANGED.**
+    One-hero **63% -> 62%**, releases **12.70 -> 12.70** to the hundredth, healing 910 -> 913.
+    Without Apostle an ally never sits at 5, so the new condition can never fire — and it
+    doesn't.
+  · **THE SIGN ON APOSTLE FLIPPED, AND THIS IS THE OPEN ITEM. IT IS THE "TWO NODES IN ONE LANE
+    THAT PARTLY CANCEL" SMELL, NOW WITH A NUMBER.** At 40 Apostle was worth **+7**; at 15
+    **+10**; after BF §2 it is worth **−8 one-hero (54 vs 62) and −2 all four (33 vs 31)** —
+    taking the capstone now LOWERS the Faith engine's output, because parking allies at 5
+    makes them invisible to Communion (releases 9.64 vs 12.70 one-hero, 3.81 vs 4.58 all
+    four). **RECORDED, NOT SOLVED, exactly as BF specified.** If the tree wants restructuring
+    later, this is the note to start from: the honest fix is probably to make one of the two
+    nodes something else, not to re-price either.
+  · **THE CLIFF IS REAL AND IS STATED IN THE TOOLTIP: 60% at four stacks, 0% at five.**
+    Measured in test_batch_bf over 1200 driven releases apiece — **58.8% at four, 0.0% at
+    five** (it was 75% at five before BF). An ability whose chance climbs with stacks and then
+    vanishes at the top reads as a bug unless the text says so.
   · **THE GROWTH CLAUSE IS 4.3% OF THE ROW'S HEALING.** AY halved it and the row did not move,
     for that reason. **THE LEVER THE ROADMAP NAMES — the growth's base step 3% -> 2% — IS THE
     SAME TERM AND IS WORTH ~1.4%. DO NOT TAKE IT EXPECTING IT TO MOVE THE ROW.**
-  · **IT IS A FAITH-LANE PROBLEM, NOT A DEVOUT PROBLEM**, and **DEVOUTNESS MOVES THE HEADLINE
-    BY ZERO** because it pays only in Break points — **that 0 is the instrument, not the node;
-    see the standing note "WHAT A CONTRIBUTION SHARE CANNOT SEE" at `DOD_SIM_TALENTS`.**
+  · **DEVOUTNESS NO LONGER MOVES THE HEADLINE BY ZERO BECAUSE THE INSTRUMENT CAN SEE IT NOW**
+    (BF §1): it books **35-48 Break points a battle** into `BDprev/b`, which is where that
+    node's work has always been. It still contributes nothing to `d+h+p%` and never should —
+    see the standing note at `DOD_SIM_TALENTS`.
   · **READ THE LEVEL OFF THE ALL-FOUR ROWS, NOT THE ONE-HERO ONES** — see the same standing
-    note. Both constructions agree about the cause and disagree about the level.
+    note. Both constructions agree about the cause and disagree about the level, and BF is the
+    clearest case yet: Apostle reads −8 one-hero and −2 all four.
 - **NOTHING HAS EVER CHECKED A SPEC POOL FOR REDUNDANCY AGAINST ITS OWN BASE KIT (Batch BD §4).
   RECORDED, NOT ACTED ON.** Batch AH's curation rule checks that a CLASS-pool entry still
   FUNCTIONS for a sibling spec — a real rule, tested, and pointed at a different question.

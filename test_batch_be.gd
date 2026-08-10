@@ -259,12 +259,24 @@ func _the_guard_is_not_a_magnitude() -> void:
 #
 # NOTHING IS CHANGED BY THIS BATCH. The check exists so that a later batch
 # which DOES add a Break term to the share has to come here and say so.
+#
+# BATCH BF §1 CAME HERE AND SAID SO. It did NOT fold Break into the share — it
+# gave Break its own two columns beside it and left this one alone, so every
+# assertion below still holds and the one that reads the format string reads a
+# longer one. The invariant this function protects is unchanged and is the
+# control that makes BF's new columns readable: `d+h+p%` is still damage,
+# healing and damage-prevented over the same three, and nothing else.
 func _contribution_cannot_see_break() -> void:
 	var src := _src("res://scripts/battle.gd")
 	# The share itself: damage + healing + damage-prevented, over the same
 	# three summed across the party. Break points appear in neither.
-	ok(src.contains("bd / n, st / n, 100.0 * (dmg + heal + prev) / apool])"),
-		"§4: contrib% is (damage + healing + prevented) / the same three, pooled")
+	ok(src.contains("100.0 * (dmg + heal + prev) / apool])"),
+		"§4: the share is (damage + healing + prevented) / the same three, pooled")
+	# BF's columns sit BESIDE it, over their own pool, and never inside it.
+	ok(src.contains("100.0 * bd / bpool"),
+		"§4: Break DEALT is its own share over its own pool (Batch BF §1)")
+	ok(src.contains("var bpool: float = maxf(s.get(\"pool_bd_hero_\" + hero, 0.0), 1.0)"),
+		"§4: ...and that pool is built from Break keys alone")
 	# ... and the pool is built from exactly those three keys, so Break damage
 	# DEALT is outside the denominator too. `bd_hero_` is printed beside the
 	# share as its own column and never enters it.
@@ -346,21 +358,25 @@ func _live_rate_at_three_stacks() -> void:
 	_live_ran += 1
 
 
-# §2, PINNED AS A NUMBER RATHER THAN AS PROSE. Communion reads the recipient's
+# §2, PINNED AS A NUMBER RATHER THAN AS PROSE. Communion read the recipient's
 # CURRENT stacks and Apostle parks allies at 5 instead of resetting them, so in
-# an Apostle build the chance is not 15% — it is 75%, and every advance on a
-# parked ally is itself a release. THIS IS THE OPEN QUESTION THE BATCH SHIPS
-# WITH; the test states its cost so it cannot be forgotten.
+# an Apostle build the chance was not 15% — it was 75%, and every advance on a
+# parked ally was itself a release. THAT WAS THE OPEN QUESTION BE SHIPPED WITH;
+# the test stated its cost so it could not be forgotten.
+#
+# BATCH BF §2 TOOK THE LEVER BE RECOMMENDED, so the number this function pins
+# is now ZERO and the row is kept rather than deleted: it is the direct
+# before/after of the fix, at the exact construction that produced the 75%.
 func _live_rate_at_five_stacks_apostle() -> void:
 	var scene := await _spawn({"dv_communion": 1, "dv_apostle": 1})
 	var dv := _devout(scene)
 	ok(dv != null and dv.apostle > 0, "§2: Apostle is learned")
 	if dv != null:
 		var rate := _measure(scene, scene.get("heroes")[1], 5, true)
-		ok(absf(rate - 0.75) < 0.05,
-			"§2: an Apostle-parked ally at FIVE stacks rolls at 75%% (read %.1f%%)" % \
+		ok(rate == 0.0,
+			"§2 (BF): an Apostle-parked ally at FIVE stacks is NEVER rolled for — was 75%% (read %.1f%%)" % \
 				(100.0 * rate))
-		_report.append("Communion on an Apostle-parked ally (5 stacks): %.1f%% over %d trials (want 75%%)" % [
+		_report.append("Communion on an Apostle-parked ally (5 stacks): %.1f%% over %d trials (was 75%%, want 0%% since BF)" % [
 			100.0 * rate, TRIALS])
 	await _kill(scene)
 	_live_ran += 1
@@ -368,37 +384,57 @@ func _live_rate_at_five_stacks_apostle() -> void:
 
 # ---------- live: the guard ----------
 
-# THREE PARKED ALLIES AT 75% IS ~2.25 EXPECTED ADVANCES PER RELEASE, and every
-# advance on a parked ally releases again. Above one, the loop sustains — so
-# the guard is load-bearing at 15 exactly as it was at 40. One call must bank
-# at most one release per hero: the caster's own, plus one apiece for the three
-# others. Without the guard those inner releases roll Communion again.
+# THREE ALLIES ONE STACK SHORT OF THE PAYOUT IS ~1.8 EXPECTED ADVANCES PER
+# RELEASE at 60% apiece, and every advance takes an ally to 5, which releases
+# again. Above one, the loop sustains — so the guard is load-bearing at 15
+# exactly as it was at 40. One call must bank at most one release per hero: the
+# caster's own, plus one apiece for the three others. Without the guard those
+# inner releases roll Communion again.
+#
+# BATCH BF §2 MOVED WHERE THE CASCADE RISK LIVES, so this drives it from FOUR
+# stacks rather than five. At five the allies are now skipped outright and the
+# cascade is impossible by construction — a test that drove it from there would
+# pass while measuring nothing, which is the failure mode this project keeps
+# finding. Four stacks is where a chain can still form.
 func _live_chain_guard_bounds_the_cascade() -> void:
 	var scene := await _spawn({"dv_communion": 1, "dv_apostle": 1})
 	var dv := _devout(scene)
 	var heroes: Array = scene.get("heroes")
 	if dv != null:
 		var worst := 0.0
+		var any_spread := 0
 		for _i in 200:
 			for h in heroes:
-				h.faith_stacks = 5
+				h.faith_stacks = 4
 				h.hp = h.max_hp
 			scene.get("sim_stats").clear()
 			heroes[0].faith_stacks = 0
 			scene.call("_gain_faith", heroes[0], 5)
-			worst = maxf(worst, _stat_of(scene, "faith_releases"))
+			var rel := _stat_of(scene, "faith_releases")
+			worst = maxf(worst, rel)
+			if rel > 1.0:
+				any_spread += 1
 		ok(worst >= 1.0, "§6: the driven release actually happened")
+		ok(any_spread > 0,
+			"§6: the cascade is still REACHABLE from four stacks (%d of 200 spread)" % \
+				any_spread)
 		ok(worst <= float(heroes.size()),
 			"§6: one release banks at most one per hero (%d), worst seen %.0f" % [
 				heroes.size(), worst])
-		_report.append("chain guard: worst releases from ONE call with three parked allies: %.0f (cap %d)" % [
-			worst, heroes.size()])
+		_report.append("chain guard: worst releases from ONE call with three allies at four stacks: %.0f (cap %d, spread in %d/200)" % [
+			worst, heroes.size(), any_spread])
 	await _kill(scene)
 	_live_ran += 1
 
 
 # The other half, and the one a "fix" would break: the guard is a re-entrancy
 # latch, not a once-per-battle limiter. Two separate releases must BOTH roll.
+#
+# BATCH BF §2: driven from FOUR stacks for the same reason as the check above —
+# at five the ally is skipped by the new condition and this would read 0 while
+# claiming the latch had jammed. The ally is re-isolated between the two calls
+# so the second release faces the same draw as the first; the question is
+# whether the latch re-arms, not what the first roll happened to do.
 func _live_guard_resets_between_releases() -> void:
 	var scene := await _spawn({"dv_communion": 1, "dv_apostle": 1})
 	var dv := _devout(scene)
@@ -408,10 +444,11 @@ func _live_guard_resets_between_releases() -> void:
 			"§6: the latch starts down")
 		var fired_late := 0
 		for _i in 60:
-			_isolate(scene, heroes[1], 5)
+			_isolate(scene, heroes[1], 4)
 			heroes[0].faith_stacks = 0
 			scene.call("_gain_faith", heroes[0], 5)
 			ok_quiet(not bool(scene.get("_communion_chain")))
+			_isolate(scene, heroes[1], 4)
 			var before := _stat_of(scene, "faith_releases")
 			heroes[0].faith_stacks = 0
 			scene.call("_gain_faith", heroes[0], 5)

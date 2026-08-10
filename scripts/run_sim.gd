@@ -1003,6 +1003,10 @@ static func _print_report(battle) -> void:
 			% rs_stale + "neither side could finish; see CLAUDE.md Batch W)")
 	print("Per-spec contribution (avg per battle present):")
 	print(battle._contrib_table(battle.sim_stats))
+	# BATCH BF §1: the Break prevented audit, by source. Same rule, same place.
+	var bp_line: String = battle.break_prevented_line(battle.sim_stats)
+	if bp_line != "":
+		print(bp_line)
 	# Batch AX §0: the only instrument that meets a boss, so the trash/boss
 	# split lives here as well as in the standalone report.
 	var rx_line: String = battle.ruin_report_line(battle.sim_stats)

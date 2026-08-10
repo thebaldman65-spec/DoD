@@ -1772,6 +1772,20 @@ func frenzy_bonus() -> float:
 	return maxf(current, frenzy_floor)
 
 
+# BATCH BF §1 — ONE LINE PER BREAK REDUCER, and every one of them goes through
+# here. `src` is whoever's work it was: a caster's name stamped on the status
+# for party-wide effects, or the unit's own name for the ones a hero does to
+# himself (Bracing, Immovable). An empty `src` is NOT silently swallowed — it
+# reaches the ledger's "(unattributed)" bucket, because a known gap is useful
+# and a silent one isn't (the `_contrib_name` rule).
+#
+# HERO-SIDE ONLY. Break refused on an ENEMY is not the party's work, and
+# crediting it would put an enemy's Constitution in a hero's column.
+func _credit_bd(cut: int, term: String, src: String) -> void:
+	if cut > 0 and is_hero and credit_cb.is_valid():
+		credit_cb.call(src, cut, term)
+
+
 func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	if amount > 0:
 		damaged_since_turn = true  # Unbroken Watch bookkeeping
@@ -1964,10 +1978,31 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		float_text("+%d Mana" % converted, Color(0.5, 0.7, 1.0))
 	# Constitution: break resistance (100 = neutral; higher takes less Pressure).
 	# Bracing (Swordmaster talent): the raised guard is harder to Break.
+	#
+	# BATCH BF §1 — EVERY LINE FROM HERE DOWN THAT LOWERS `pressure_add` NOW SAYS
+	# SO, through `_credit_bd` and the single door it reaches in battle.gd. Until
+	# this batch exactly ONE of them did (Devoutness), so a Warden holding the
+	# line and a Devout raising the Bulwark both measured zero. THE ARITHMETIC IS
+	# UNTOUCHED: every credit reads a delta either side of a line that already
+	# existed. Two classes are deliberately NOT booked and the reasons differ —
+	#   base Constitution: a stat block is not a contribution, the same rule that
+	#     keeps base armor and resists out of `prev_hero_`. BRACING *is* booked,
+	#     because a stance a talent bought is exactly what the damage side counts.
+	#   `mod_bd_mult` / `mod_no_break`: run modifiers. Nobody in the party did
+	#     that, and a contribution ledger that credits the weather is worthless.
 	var eff_con := constitution + ((30 * bracing_ranks) if stance == "defensive" else 0)
+	var bd_raw := pressure_add
 	pressure_add = int(round(pressure_add * 100.0 / maxf(eff_con, 1.0)))
+	if bracing_ranks > 0 and stance == "defensive":
+		# What the same hit would have cost at his UNBRACED Constitution: the
+		# node's whole effect is the gap between the two divisors.
+		_credit_bd(int(round(bd_raw * 100.0 / maxf(constitution, 1.0))) - pressure_add,
+			"bd_bracing", unit_name)
 	if has_status("ward"):
+		var wd_was := pressure_add
 		pressure_add = int(pressure_add * 0.5)
+		_credit_bd(wd_was - pressure_add, "bd_ward",
+			String(get_status("ward").get("src_name", "")))
 	# Devoutness (talent, ex-Devotion Aura): power carries the % cut.
 	if has_status("devotion"):
 		# BATCH BC §1: the Break points this removes are NOT damage, so they
@@ -1975,8 +2010,8 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		# at all. They get their own term and their own units.
 		var dvn_was := pressure_add
 		pressure_add = int(pressure_add * (1.0 - status_power("devotion") / 100.0))
-		if dvn_was > pressure_add and is_hero and credit_cb.is_valid():
-			credit_cb.call("", dvn_was - pressure_add, "devoutness_break")
+		_credit_bd(dvn_was - pressure_add, "devoutness_break",
+			String(get_status("devotion").get("src_name", "")))
 	# Hold the Line: the status carries its own cut, so the UPGRADED cast
 	# (the capstone landing on an already-earned copy) is 80% rather than
 	# 50% without a second status or a second read site here. Power 0 on a
@@ -1985,13 +2020,18 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		# Integer arithmetic on purpose: a float 1.0 - 80/100.0 lands at
 		# 0.19999999 and an 80% cut on 100 Break would read 19, not 20.
 		var hl_cut := maxi(status_power("hold_bd"), 50)
+		var hl_was := pressure_add
 		pressure_add = pressure_add * (100 - hl_cut) / 100
+		_credit_bd(hl_was - pressure_add, "bd_hold_line",
+			String(get_status("hold_bd").get("src_name", "")))
 	# Muffled (Batch AQ): every meter fills slowly. Integer percent, for the
 	# same reason its neighbour above is — and unguarded, because x100/100 on
 	# an int is the identity, so the no-modifier path stays byte for byte.
 	pressure_add = pressure_add * mod_bd_mult / 100
 	# Bulwark of Fortitude: NO Break damage while the stand holds.
 	if has_status("bulwark"):
+		_credit_bd(pressure_add, "bd_bulwark",
+			String(get_status("bulwark").get("src_name", "")))
 		pressure_add = 0
 	# Deadened (Batch AQ): the Break meter does nothing this fight. It zeroes
 	# the same number `immovable` does, one line below, but through its OWN
@@ -2004,6 +2044,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		if not immovable_noted:
 			immovable_noted = true
 			_proc_log("Capstone: Immovable — %s cannot be Broken" % unit_name)
+		_credit_bd(pressure_add, "bd_immovable", unit_name)
 		pressure_add = 0
 	var just_broke := false
 	var applied_bd := 0
