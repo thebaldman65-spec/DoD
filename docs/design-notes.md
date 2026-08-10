@@ -4,6 +4,72 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## An aggregate is not a diagnosis (Batch BC) — 2026-08-09
+
+Three batches in a row looked at one number — the Devout's FAITH row at
+78%, then 80%, then 76% contribution — and two of them tried to move it.
+Neither did. This batch did not try to move it at all; it printed what the
+number is made of, and the answer took about four minutes of measurement
+once the instrument existed.
+
+The reason the two attempts missed is not that they were badly aimed. It is
+that there was nothing to aim *with*. A contribution share is
+damage + healing + prevented over the party's total, and every one of those
+is itself a sum of a dozen effects. AX aimed at Fervor and found the
+instruction was already shipped — a no-op, discovered only after the fact.
+AY aimed at Apostle's growth clause, halved it precisely, and watched the
+growth halve and the row not move. AY even wrote down why that might be
+("the growth was never the whole of the FAITH row") and reported the next
+lever without taking it. That was the right call, and it is also the moment
+the batch should have stopped guessing and started decomposing. It took one
+more batch to do it.
+
+The decomposition says the growth clause AY halved was worth about 4% of
+the row's healing. Halving 4% of something cannot move it, and no amount of
+care in the aiming would have changed that. **The next lever the roadmap
+names is another growth lever, and it is worth about 1.4%.** That is the
+kind of thing an aggregate hides and a decomposition cannot.
+
+What the row is actually made of is *frequency*. The lane's per-release
+payout roughly triples against an unbuilt Devout; the number of releases
+goes up twenty-four-fold. Three of the eight nodes multiply frequency and
+one multiplies magnitude, and the three frequency nodes own the row between
+them. That is not visible from the node text — every one of the eight reads
+like a reasonable support talent — and it is not visible from the total.
+It is only visible when you take the nodes away one at a time.
+
+Leave-one-out is a blunt instrument and that is the point. It does not
+explain anything; it just refuses to be fooled about which term is
+load-bearing, which is the exact thing two batches got wrong.
+
+**The second finding is the one worth remembering longer**, because it is
+not about the Devout at all. Every lane row this project has ever reported
+— the Warden's Threat at 30%, Holy's Radiance at 50%, the Devout's Faith at
+80% — was measured with one hero fully built and three unbuilt, because the
+force-learn flag takes node ids and node ids are spec-scoped. Nothing is
+broken; the harness always built whichever heroes were named, and only one
+was ever named. But a share is a ratio, and a ratio against three unbuilt
+heroes is not the same question as a ratio against three built ones. Those
+rows still mean something — they are honest A/B comparisons of one spec's
+lanes against each other, which is what they were mostly used for — but
+they are not "this is how much of a real party's work this hero does", and
+that is how at least one of them got read.
+
+The lesson generalises past this instrument: a measurement whose
+denominator you did not choose deliberately is a measurement you do not
+fully own. Writing the flag string was a mechanical step, and the
+mechanical step decided the denominator.
+
+Three heals were also found crediting nobody at all — Blessed Barrier's
+conversion, Afterglow's mend, Healing Pulse's drip — plus the Devout
+capstone's tick and Devoutness's entire effect. Two of those are the
+biggest single heal in their own lane. This is why the fix is *one* booking
+function rather than five call sites: the terms and the total now come from
+the same place, so a heal added later either says which term it is or
+doesn't compile into the ledger at all. The old shape let a site produce
+healing and simply forget to mention it, five separate times, over five
+separate batches, with nothing anywhere reading zero.
+
 ## Six things left for later, and later is now (Batch BB) — 2026-08-09
 
 Every item in this batch was found by an earlier batch, recorded, and put down

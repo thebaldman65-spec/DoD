@@ -744,7 +744,15 @@ var lethal_saved_cb := Callable()
 # Conviction hook: fires whenever a Divine Shield barrier absorbs damage
 # for this unit (the only source of Faith).
 var shield_absorbed_cb := Callable()
-var prevented_cb := Callable()  # Batch W sim ledger: barrier absorbs → (src_name, absorbed, holder)
+var prevented_cb := Callable()  # Batch W sim ledger: barrier absorbs → (src_name, absorbed, holder, divine)
+# BATCH BC §1 — the sim ledger's door out of unit.gd, for effects computed
+# HERE that the battle scene cannot see. Three ride it, and none of the three
+# had ever been credited to anybody: Blessed Barrier's conversion, Afterglow's
+# mend and Devoutness's Break reduction. Fires as (src_name, amount, term) —
+# THE TERM IS NAMED AT THE SITE THAT COMPUTES THE NUMBER, so the ledger prints
+# terms rather than a pool and a later effect added here has to say which term
+# it belongs to instead of silently vanishing the way these three did.
+var credit_cb := Callable()
 
 # Occultist tree (07-24; lanes re-specced Batch L 07-30; every counter went
 # ADDITIVE in Batch AX — the field holds the MAGNITUDE, not a rank, and the
@@ -1793,10 +1801,15 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			var bb_pct := float(s.get("blessed_pct", 0.0))
 			if bb_pct > 0.0 and absorbed > 0:
 				var bb_heal := maxi(int(round(absorbed * bb_pct)), 1)
-				heal_amount(bb_heal)
-				float_text("+%d" % bb_heal, Color(0.4, 0.9, 0.45))
+				# BATCH BC §1: the return was being DISCARDED, so a heal into a
+				# full bar read the same as one into an empty one — and neither
+				# reached the ledger at all. Both fixed here.
+				var bb_got := heal_amount(bb_heal)
+				float_text("+%d" % bb_got, Color(0.4, 0.9, 0.45))
+				if bb_got > 0 and credit_cb.is_valid():
+					credit_cb.call(String(s.get("src", "")), bb_got, "blessed")
 				_proc_log("Talent: Blessed Barrier — %s converts %d absorbed into healing" % [
-					unit_name, bb_heal])
+					unit_name, bb_got])
 			# Conviction: only Divine Shield absorbs build Faith.
 			if absorbed > 0 and s.get("divine", false) \
 					and shield_absorbed_cb.is_valid():
@@ -1804,8 +1817,14 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			# Batch W: the absorb is prevented damage — report it with the
 			# caster stamped on the barrier ("" lands in the unattributed
 			# bucket battle-side).
+			# BATCH BC §1 carries the `divine` flag through, because "prevented"
+			# pools every barrier in the game — Holy's Blessed Vestments ward
+			# included — and the decomposition needs DIVINE SHIELD'S absorbs
+			# alone. Read off the same flag the Faith trigger reads, one line up,
+			# so the two can never disagree about what a Divine Shield is.
 			if absorbed > 0 and prevented_cb.is_valid():
-				prevented_cb.call(String(s.get("src", "")), absorbed, self)
+				prevented_cb.call(String(s.get("src", "")), absorbed, self,
+					bool(s.get("divine", false)))
 			if would_have_died and amount < hp and lethal_saved_cb.is_valid():
 				lethal_saved_cb.call(self)
 			if s.power <= 0:
@@ -1825,6 +1844,9 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 				if glow > 0:
 					var glow_got := heal_amount(glow)
 					float_text("+%d" % glow_got, Color(0.95, 0.9, 0.6))
+					if glow_got > 0 and credit_cb.is_valid():
+						credit_cb.call(String(s.get("src", "")), glow_got,
+							"afterglow")
 					_proc_log("Talent: Afterglow — the breaking shield mends %s for %d" % [
 						unit_name, glow_got])
 			break
@@ -1940,7 +1962,13 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		pressure_add = int(pressure_add * 0.5)
 	# Devoutness (talent, ex-Devotion Aura): power carries the % cut.
 	if has_status("devotion"):
+		# BATCH BC §1: the Break points this removes are NOT damage, so they
+		# have never belonged in `prev_hero_` and were never counted anywhere
+		# at all. They get their own term and their own units.
+		var dvn_was := pressure_add
 		pressure_add = int(pressure_add * (1.0 - status_power("devotion") / 100.0))
+		if dvn_was > pressure_add and is_hero and credit_cb.is_valid():
+			credit_cb.call("", dvn_was - pressure_add, "devoutness_break")
 	# Hold the Line: the status carries its own cut, so the UPGRADED cast
 	# (the capstone landing on an already-earned copy) is 80% rather than
 	# 50% without a second status or a second read site here. Power 0 on a

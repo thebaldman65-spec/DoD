@@ -142,6 +142,25 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   specs (warrior,mage,cleric,hunter order). `DOD_SIM_ENEMIES="boss,shaman,..."`
   forces the enemy lineup in test battles. `DOD_SIM_TALENTS="bz_bloodcraze:3"`
   force-learns talents on bot heroes whose spec tree has the id.
+  **STANDING NOTE — HOW TO READ A LANE ROW (Batch BC §0). THE HARNESS IS
+  PER-HERO; THE FLAG STRING IS WHAT HAS ALWAYS BEEN ONE-SPEC.** It walks EVERY
+  hero and keeps whichever named ids appear in THAT hero's own tree — but all
+  **288 node ids across the twelve trees are disjoint** (asserted in
+  test_batch_bc), so a string naming one spec's lane builds exactly ONE hero.
+  **THERE IS NOTHING TO FIX HERE AND FIXING IT WOULD BE WRONG** — name four
+  lanes and four heroes build. What it means is that **EVERY LANE ROW EVER
+  REPORTED — the Warden's Threat at 30%, Holy's Radiance at 50%, the Devout's
+  Faith at 80% — IS A FULLY-BUILT HERO MEASURED AGAINST THREE UNBUILT ONES.**
+  Those rows are honest A/B comparisons of one spec's lanes AGAINST EACH OTHER,
+  which is mostly what they were used for; they are NOT "how much of a real
+  party's work this hero does". **A CONTRIBUTION SHARE INFLATES TWICE THAT WAY,
+  and the second half is the one nobody expects**: three unbuilt allies shrink
+  the DENOMINATOR, and they also feed the NUMERATOR for a support, because they
+  take more punishment and fights run longer. Measured on the Devout: enemy
+  damage/battle 207 -> 74 and rounds/battle 7.8 -> 5.4 once the other three are
+  built, and his releases fall 32.2 -> 11.1 with them. **THE LEVEL MOVES A LOT
+  AND THE LANE RANKING BARELY MOVES** (FAITH/ungeared is 4.4x one-hero and 5.0x
+  all-four), so a re-measure is only owed where a row was read as an absolute.
   `DOD_SIM_ABILITIES="Resurrection,Divine Plea"` appends pending
   talent-gated abilities (Classes.pending_talent_ability; Holy only).
   `DOD_ENEMIES_OFF=1` arms the enemy-skip debug toggle headlessly.
@@ -193,6 +212,100 @@ the new spec's idea a second time. **BA re-specced four nodes off it** — Epide
 every enemy permanently Poisoned), Plague Bearer (rot leaps enemy to enemy), Creeping Death
 (a corpse passes its stacks to the living) and the NAME Virulence (a pathogen term). SNARES
 and GUERILLA were never disease and are untouched by the rule.
+
+BATCH BC (08-09) — DECOMPOSING THE DEVOUT'S FAITH ROW. **NO GAMEPLAY CHANGE SHIPPED.** No
+magnitude moves, no node is re-specced, no spec is touched, no save version moves (still v7).
+Instrumentation only, and the measurement it made possible.
+§0 **THE INSTRUMENT, FIRST, BECAUSE IT REFRAMES EVERY LANE ROW IN THIS FILE — see the STANDING
+NOTE at `DOD_SIM_TALENTS` above, which is where it belongs and where it will be looked for.**
+Short version: the harness is PER-HERO, all 288 node ids are disjoint, so a one-spec flag
+string builds one hero, **and nothing is broken.** Re-run with all four heroes force-learned
+into their own full 8-node lanes, the FAITH row reads **55% (their standout lanes) / 58%
+(their weakest) against 80% one-hero — a TIGHT BRACKET, so the answer does not depend on which
+lanes the other three were given.** Roughly a quarter of the 80% was methodology. **THE LANE
+COMPARISON SURVIVES INTACT** — ungeared 18% -> 11% and FAITH 80% -> 55%, i.e. 4.4x becomes
+5.0x — so **only a row that was read as an ABSOLUTE owes a re-measure.**
+§1/§2 **THE ANSWER IS FREQUENCY, DECISIVELY. THE ROW IS LARGE BECAUSE IT RELEASES A GREAT MANY
+TIMES, NOT BECAUSE IT PAYS A LOT PER RELEASE.** Across the whole lane the payout per release
+roughly triples (24 -> 67 HP) while releases go up **TWENTY-FOUR-FOLD (1.33 -> 32.2 a
+battle)**. Three of the eight nodes multiply frequency, ONE multiplies magnitude.
+**THE LEAVE-ONE-OUT GRID IS IN THE CHANGELOG AND IS THE DELIVERABLE — a later batch should
+design against it, the way difficulty designs against Batch V's sweep table.** Fixed lineup
+berserker,cryomancer,inquisitor,beastmaster, **n=200 EVERY ROW**, one node withheld at a time
+(contribution | healing/battle | releases/battle | healing per release):
+**full lane 80% | 2255 | 32.21 | 67**; −Communion **47% | 444 | 7.08 | 60**; −Blessed are the
+Faithful 64% | 973 | 30.86 | **29**; −Fervor 64% | 956 | **14.19** | 64; −Apostle 73% | 1510 |
+20.27 | 67; −Unwavering Faith 78% | 2040 | 30.66 | 64; −Sacred Covenant 79% | 2158 | 30.84 |
+67; −Binding Oath 79% | 2123 | 30.43 | 67; −Devoutness **80%** | 2291 | 32.70 | 67.
+Controls, same n: **BULWARK 23% | 88, ZEAL 42% | 363, ungeared 18% | 41** — so the gap to
+attribute is 18% -> 80% and the other two lanes sit at 23% and 42%. **IT IS A FAITH-LANE
+PROBLEM, NOT A DEVOUT PROBLEM**, and those want different repairs.
+**COMMUNION IS THE ROW AND IT IS NOT CLOSE**: one row-1 node takes the headline 80% -> 47% and
+the healing 2255 -> 444. The mechanism is legible once the number points at it — Communion
+rolls *40% x each other member's own Faith stacks*, and **APOSTLE PARKS EVERY ALLY AT 5, SO
+THE ROLL IS 200%, i.e. CERTAIN, FOR ALL THREE OF THEM. One release becomes four.** They are
+not two terms, they are one engine, and Communion is the half that multiplies.
+**DEVOUTNESS MOVES THE HEADLINE BY ZERO** — it pays only in Break points, which a contribution
+share cannot see. Real value, invisible instrument; do not read its 0 as a dead node.
+§1 **WHY THE LAST TWO FIXES UNDER-DELIVERED, WITH A NUMBER ON IT AT LAST. Conviction's growth
+— the term AY halved precisely — is 97 of the row's 2255 healing a battle, 4.3%.** Halving
+4.3% of something cannot move it. **THE NEXT LEVER THE ROADMAP NAMES (the growth's base step,
+3% -> 2%) IS THE SAME TERM AGAIN AND IS WORTH ~1.4% OF THE ROW. EXPECT IT TO UNDER-DELIVER FOR
+THE SAME REASON.** Reported, NOT acted on — the repair is its own batch.
+§1 **FIVE EFFECTS WERE CREDITING NOBODY AT ALL**, two of them the largest single heal in their
+own lane. Blessed Barrier's conversion and Afterglow's mend fire inside `unit.gd`, which
+cannot reach the sim ledger, and simply vanished; **Healing Pulse** and the **Bulwark of
+Fortitude** tick fire in battle.gd and were never booked; and **Devoutness's Break reduction
+was counted nowhere in the game.** All five are instrumented now. **CONSEQUENCE, STATED SO THE
+ROWS CAN BE RECONCILED RATHER THAN TRUSTED: BATCH AW'S BULWARK AND ZEAL ROWS ARE SUPERSEDED ON
+THE HEALING AND CONTRIBUTION COLUMNS — ZEAL reads 42% against AW's 27% because Healing Pulse
+alone is 219 of its 363 healing. Take the newly-counted terms back out and ZEAL reads 144
+against AW's 134, BULWARK 50 against AW's 48, ungeared 41 against AW's 40. THE FAITH ROW IS
+UNTOUCHED BY ALL OF IT** — a FAITH build learns none of the five nodes involved, which is
+exactly why §2's grid is comparable with every historical FAITH row.
+FIELDS/MACHINERY, all instrumentation: **`faith_report_line()`**, static, shared by the
+standalone report and RunSim's on the `ruin_report_line` pattern, `""` when no Devout stood;
+**`_devout_heal(owner, amount, term)` and `_devout_prev(owner, cut, term)` are ONE booking door
+each**, so the parts can never disagree with the total; **`BattleUnit.credit_cb`** is one new
+callback carrying the three effects unit.gd computes that battle.gd cannot see, with the TERM
+NAMED AT THE SITE that computes the number; `prevented_cb` gained a 4th arg, the `divine` flag,
+because "prevented" pools every barrier in the game and the split needs Divine Shield's alone.
+**THE DENOMINATOR IS `conviction_battles`, THE COUNT AW ALREADY BANKED** — one denominator, one
+answer. **§2 NEEDED NO NEW HARNESS FLAG**: withholding a node is seven ids where there were
+eight, which `DOD_SIM_TALENTS` already does.
+**ONE LOG-HONESTY FIX FOUND BY INSTRUMENTING IT:** Blessed Barrier discarded `heal_amount`'s
+return, so its log line and float reported the heal it ASKED for rather than the one that
+LANDED — a heal into a full bar read exactly like one into an empty bar. It reports what
+landed now. (The BA "-1 turns" precedent: watching an instrument finds these.)
+VERIFIED: check_parse 0, check_flow 0 (6 screens).
+11 scenes 0 SCRIPT ERROR. NEW test_batch_bc.gd **91/0** (its 8 live checks each bump a counter
+asserted at the end — **a live check that THROWS mid-way aborts its own function while the
+suite still prints "0 failures", and this batch hit exactly that**: `_resolve` is
+`(attacker, ability, target, grade)` and a wrong argument order threw silently).
+Regression, EVERY suite at its BB count with ZERO drift (this batch adds no gameplay and no
+pool entry, so a moved count would itself be the finding): ah 5587/0, ah_battle 65/0,
+ai 2036/0, an 6052/0, aj 403/0, ak 527/0, al 559/0, ar 887/0, as 387/0, at 461/0, au 335/0,
+av 315/0, aw 338/0, ax 329/0, ay 455/0, az 489/0, ba 647/0, bb 172/0, test_runes 2973/0
+(with its ONE pre-existing `start_rune_enabled` SCRIPT ERROR from a name AN retired — still
+0 failures), test_rune_battle 96/0. Run-harness gates 1/2/3 PASS.
+NEGATIVE CONTROLS RUN, five, each applied to the code and reverted (the suite was re-run
+after the last revert and came back to 91/0 byte-for-byte): **every barrier counting as a
+Divine Shield trips 2, folding Devoutness's Break points into damage-prevented trips 2,
+Blessed Barrier banking the heal it ASKED for rather than the one that LANDED trips 1,
+un-crediting Healing Pulse again trips 2, and not banking the release COUNT at the release
+trips 2.**
+**KNOWN-BAD, NOT OURS, AND THE DIAGNOSIS IS NEW — AR'S "the standing test_rune_battle defect
+is CLOSED, stable 5/5" IS ONLY HALF TRUE.** `"pyromancer: rune_resist_pierce never fired
+against a resistant warband"` failed 1 run in 8 here (and passed 4/4 on a STASHED,
+unmodified HEAD, so it is not this batch). **THE RESIDUAL CAUSE IS NAMED SO IT DOES NOT GET
+RE-DIAGNOSED: the check drives `_resolve` by hand and `test_rune_battle.gd ARMS `no_cover`
+NOWHERE IN THE FILE`** — grep it — **so the forced hit still rolls the 5% miss, and a missed
+hit writes no resist line at all.** AR fixed whether the line SURVIVES TO BE READ (the log
+snapshot); it did not fix whether the line gets WRITTEN. The fix is one line at the forced
+hit, the AK/AL/AR discipline this file already states — **REPORTED, NOT TAKEN, because this
+batch changes nothing.**
+**master.html IS UNTOUCHED — nothing about the game changed**, so test_batch_ah's STAMP GATE
+stays pinned at BB deliberately. Do not bump it for a batch that ships no design change.
 
 BATCH BB (08-09) — CLEARING THE DECK. Six repairs carried over from the twelve spec batches.
 NO spec re-authored, NO magnitude retuned, NO tree touched; every id survives, NO SAVE VERSION
@@ -4454,6 +4567,25 @@ Battle has burger menu (restart/settings overlay/exit); skill checks accept
 Space or left click; no announcer text (combat log only).
 
 ## Known open threads
+- **THE DEVOUT'S FAITH ROW IS DECOMPOSED (Batch BC) AND THE REPAIR IS STILL OWED — BUT IT IS
+  NO LONGER A GUESS, SO STATE THE FINDING RATHER THAN RE-DERIVING IT.** Three things are now
+  measured rather than assumed, and a repair batch should quote them:
+  · **THE ROW IS A FREQUENCY ROW.** Releases go 1.33 -> 32.2 a battle across the lane while
+    the payout per release only goes 24 -> 67. **AIM AT FREQUENCY OR EXPECT TO MISS.**
+  · **COMMUNION CARRIES IT: withholding that one row-1 node reads 47% against the lane's 80%,
+    healing 444 against 2255.** It multiplies because **Apostle parks every ally at 5, which
+    makes Communion's `40% x their stacks` roll a certainty for all three of them** — one
+    release becomes four. Communion and Apostle are ONE ENGINE; a lever on either alone is
+    priced against the other.
+  · **THE GROWTH CLAUSE IS 4.3% OF THE ROW'S HEALING.** AY halved it and the row did not move,
+    for that reason. **THE NEXT LEVER THE ROADMAP NAMES — the growth's base step 3% -> 2% — IS
+    THE SAME TERM AND IS WORTH ~1.4%. DO NOT TAKE IT EXPECTING IT TO MOVE THE ROW.**
+  Also settled by the same grid: it is a **FAITH-LANE** problem, not a Devout problem (BULWARK
+  23%, ZEAL 42%, ungeared 18%), and **DEVOUTNESS MOVES THE HEADLINE BY ZERO** because it pays
+  only in Break points, which a contribution share cannot see — that 0 is the instrument's
+  blind spot, not a dead node.
+  **AND THE LEVEL ITSELF IS LOWER THAN EVERY PRIOR ROW SAID: 55-58%, not 80%** — see the
+  standing note on reading a lane row at `DOD_SIM_TALENTS`. The ranking above is unaffected.
 - Menu background image not yet in imported files (fallback: forest art).
 - Distinct Mage/Cleric/Hunter sprites awaited from user.
 - Boss tri-choice class modifiers deferred (design doc) until 3+ zones.

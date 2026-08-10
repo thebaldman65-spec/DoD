@@ -5,6 +5,165 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-09 &mdash; Batch BC: decomposing the Devout's FAITH row</h2>
+<p><i><b>This batch ships no gameplay change.</b> No magnitude moves, no node is re-specced, no
+spec is touched, no save version moves (still v7). It exists to answer one question that two
+previous batches guessed at and missed &mdash; and the answer arrived in two parts, the second
+of which is worth more than the Devout repair it was commissioned for.</i></p>
+<ul>
+
+<li><b>&sect;0 THE INSTRUMENT FIRST, BECAUSE IT REFRAMES THE NUMBER. Every lane row this
+project has ever reported was measured with ONE hero fully built and three unbuilt.</b>
+<code>DOD_SIM_TALENTS</code> is <i>not</i> a one-hero harness &mdash; it walks every hero in
+the party and force-learns whichever named ids appear in <i>that</i> hero's own spec tree.
+<b>But all 288 node ids across the twelve trees are disjoint</b> (verified, zero collisions),
+so a flag string naming one spec's lane builds exactly one hero. <b>Nothing is broken and
+there is nothing to fix: the harness always built whoever was named, and only one spec was
+ever named.</b> The repair is a flag string, not a code change.
+<br><b>What that costs, measured rather than argued.</b> The FAITH row re-run with all four
+heroes force-learned into their own full 8-node lanes:
+<b>80% contribution &rarr; 55&ndash;58%</b> (55% with the other three on the lanes their own
+batches measured as standouts, 58% on the lanes they measured lowest &mdash; a tight bracket,
+so the result does not depend on which lanes were picked). <b>Roughly a quarter of the 80% was
+methodology.</b>
+<br><b>And it inflates TWICE, which is the part worth keeping.</b> A contribution share is a
+ratio, so three unbuilt allies shrink the denominator &mdash; that much was expected. They
+also <i>feed the numerator</i>: three weak allies take far more punishment, and the Devout's
+Faith comes from Divine Shield absorbing hits, so his engine spins faster beside heroes who
+are losing. Enemy damage/battle falls 207 &rarr; 74 when the party is built, and his releases
+fall with it, 32.2 &rarr; 11.1. <b>A support measured beside unbuilt allies is measured in the
+conditions that suit him best.</b>
+<br><b>How to read the historical rows, then:</b> they are honest A/B comparisons of one
+spec's lanes <i>against each other</i>, which is mostly what they were used for. They are not
+"this is how much of a real party's work this hero does". At least one of them was read that
+way.</li>
+
+<li><b>&sect;1/&sect;2 THE ANSWER, AND IT IS THE FREQUENCY HALF. The FAITH row is large
+because it releases a great many times, not because it pays a lot per release.</b> Across the
+whole lane the payout per release roughly triples (24 &rarr; 67 HP) while the number of
+releases goes up <b>twenty-four-fold</b> (1.33 &rarr; 32.2 a battle). Three of the eight nodes
+multiply frequency, one multiplies magnitude, and the three frequency nodes own the row.
+<br><b>THE LEAVE-ONE-OUT GRID IS THE DELIVERABLE.</b> Fixed lineup
+(berserker, cryomancer, inquisitor, beastmaster), <b>n=200 battles for every row</b>, one node
+withheld at a time, everything else identical:</li>
+</ul>
+
+<table border="1" cellpadding="4">
+<tr><th>row</th><th>contribution</th><th>healing/battle</th><th>releases/battle</th>
+<th>healing per release</th><th>vs the full lane</th></tr>
+<tr><td><b>FAITH, all eight</b></td><td><b>80%</b></td><td><b>2255</b></td><td><b>32.21</b></td><td><b>67</b></td><td>&mdash;</td></tr>
+<tr><td>&minus; Communion</td><td><b>47%</b></td><td><b>444</b></td><td><b>7.08</b></td><td>60</td><td><b>&minus;33 pts, healing &minus;80%, releases &minus;78%</b></td></tr>
+<tr><td>&minus; Blessed are the Faithful</td><td>64%</td><td>973</td><td>30.86</td><td><b>29</b></td><td>&minus;16 pts &mdash; <b>the only magnitude term</b>; frequency untouched</td></tr>
+<tr><td>&minus; Fervor</td><td>64%</td><td>956</td><td><b>14.19</b></td><td>64</td><td>&minus;16 pts, releases &minus;56%</td></tr>
+<tr><td>&minus; Apostle</td><td>73%</td><td>1510</td><td>20.27</td><td>67</td><td>&minus;7 pts, releases &minus;37%</td></tr>
+<tr><td>&minus; Unwavering Faith</td><td>78%</td><td>2040</td><td>30.66</td><td>64</td><td>&minus;2 pts</td></tr>
+<tr><td>&minus; Sacred Covenant</td><td>79%</td><td>2158</td><td>30.84</td><td>67</td><td>&minus;1 pt</td></tr>
+<tr><td>&minus; Binding Oath</td><td>79%</td><td>2123</td><td>30.43</td><td>67</td><td>&minus;1 pt</td></tr>
+<tr><td>&minus; Devoutness</td><td>80%</td><td>2291</td><td>32.70</td><td>67</td><td><b>0 pts</b> &mdash; it pays only in Break, which the share cannot see</td></tr>
+<tr><td colspan="6"><i>Controls, same n, same lineup:</i></td></tr>
+<tr><td>BULWARK lane</td><td>23%</td><td>88</td><td>1.59</td><td>25</td><td rowspan="3">the gap to attribute is <b>18% &rarr; 80%</b>, and the other two lanes sit at 23% and 42% &mdash; <b>a FAITH-lane problem, not a Devout problem</b></td></tr>
+<tr><td>ZEAL lane</td><td>42%</td><td>363</td><td>1.21</td><td>25</td></tr>
+<tr><td>ungeared</td><td>18%</td><td>41</td><td>1.33</td><td>24</td></tr>
+</table>
+
+<ul>
+<li><b>COMMUNION IS THE ROW, and it is not close.</b> Withholding one row-1 node takes the
+headline from 80% to 47% and the healing from 2255 to 444.
+<br><b>THE MECHANISM IS LEGIBLE ONCE THE NUMBER POINTS AT IT, and it is worth more to a repair
+batch than the ranking is. Communion's chance is <i>40% &times; the other member's own Faith
+stacks</i> &mdash; which reaches 100% AT THREE STACKS AND SATURATES THERE.</b> It is written
+as a chance and is, in every build that matters, a certainty. <b>TWO SEPARATE NODES PARK
+ALLIES ABOVE THE SATURATION POINT:</b> Apostle keeps them at 5 (roll 200%) and <b>Binding Oath
+keeps them at 3 (roll 120%)</b>. That is why the grid reads the way it does &mdash; withholding
+Apostle costs only 7 points, and withholding Binding Oath only 1, <b>because each is a
+redundant back-up for the other's guarantee.</b>
+<br><b>PROVED RATHER THAN INFERRED, with a ninth row: withholding Communion AND Apostle
+together reads 48% | 465 healing | 6.93 releases, which is the Communion-only row (47% | 444 |
+7.08) to within the noise band.</b> <b>Apostle contributes nothing measurable once Communion
+is gone</b> &mdash; it is not an independent frequency multiplier, it is Communion's
+amplifier. They are one engine, and Communion is the half that multiplies.</li>
+
+<li><b>THE RANKING SURVIVES &sect;0'S CORRECTION, checked rather than assumed.</b> Re-run under
+the all-four construction, withholding Communion reads <b>24% against the corrected lane's
+55%</b> &mdash; healing 695 &rarr; 137 and releases 10.54 &rarr; 2.21, i.e. <b>&minus;80% and
+&minus;79%, against &minus;80% and &minus;78% one-hero.</b> The two constructions disagree
+about the LEVEL and agree exactly about the CAUSE.</li>
+
+<li><b>WHY THE LAST TWO FIXES UNDER-DELIVERED, with a number on it at last.</b> Conviction's
+growth clause &mdash; the term Batch AY halved with precision &mdash; is <b>97 of the row's
+2255 healing a battle, 4.3%</b>. Halving 4.3% of something cannot move it, and no amount of
+care in the aiming would have changed that. <b>The next lever the roadmap names (the growth's
+base step, 3% &rarr; 2%) is the same term again and is worth about 1.4% of the row. It should
+be expected to under-deliver for the same reason.</b> Reported, not acted on: this batch
+changes nothing, and the repair is its own batch.</li>
+
+<li><b>&sect;1 THE DECOMPOSITION FOUND FIVE EFFECTS CREDITING NOBODY AT ALL</b>, three of them
+healing and two of them the largest single heal in their own lane. Blessed Barrier's
+conversion and Afterglow's mend fire inside <code>unit.gd</code>, which cannot reach the sim
+ledger, and simply vanished; <b>Healing Pulse</b> and the <b>Bulwark of Fortitude</b> tick
+fire in battle.gd and were never booked; and <b>Devoutness's Break reduction was counted
+nowhere in the game.</b> All five are instrumented now, and the correction is visible in the
+control rows: <b>the ZEAL lane reads 42% where Batch AW read 27%</b>, because Healing Pulse
+alone is 219 of its 363 healing a battle, and <b>BULWARK reads 23% against AW's 20%</b>.
+<br><b>The arithmetic is stated so the rows can be reconciled rather than trusted:</b> take
+the newly-counted terms back out and ZEAL reads 144 healing against AW's 134 and BULWARK 50
+against AW's 48, while <b>the ungeared row reads 41 against AW's 40 and the FAITH row is
+untouched</b> &mdash; a FAITH build learns none of the five nodes involved, which is why
+&sect;2's grid is directly comparable with every historical FAITH row. <b>BATCH AW'S DEVOUT
+BULWARK AND ZEAL ROWS ARE SUPERSEDED ON THE HEALING AND CONTRIBUTION COLUMNS; his FAITH and
+ungeared rows are not.</b> Holy's and the Occultist's rows are untouched &mdash; none of the
+five effects is theirs.</li>
+
+<li><b>ONE LOG-HONESTY FIX, FOUND BY INSTRUMENTING IT.</b> Blessed Barrier discarded
+<code>heal_amount</code>'s return, so its combat-log line and its floating number reported the
+heal it <i>asked</i> for rather than the one that <i>landed</i> &mdash; a heal into a full
+health bar read exactly like a heal into an empty one. It reports what landed now.</li>
+
+<li><b>WHAT WAS ADDED IS INSTRUMENTATION AND NOTHING ELSE.</b> One report line,
+<code>faith_report_line()</code>, shared by the standalone report and RunSim's exactly as
+<code>ruin_report_line</code> and its four siblings are, returning "" when no Devout stood.
+One booking function each for healing and for prevention, so the parts can never disagree with
+the total. One callback out of <code>unit.gd</code> for the three effects the battle scene
+cannot see. <b>&sect;2's leave-one-out needed no new harness flag at all</b> &mdash;
+withholding a node is seven ids where there were eight, which
+<code>DOD_SIM_TALENTS</code> already does.</li>
+
+<li><b>VERIFIED.</b> check_parse 0, check_flow 0 (6 screens), 11 scenes 0 SCRIPT ERROR,
+run-harness gates 1/2/3 PASS, live autoplay clean. New <code>test_batch_bc.gd</code>
+<b>91 checks / 0 failures</b>. <b>Regression: every suite at its Batch BB count with zero
+drift</b>, which is itself the check that matters for a batch that adds no gameplay and no
+pool entry &mdash; ah 5587, ah_battle 65, ai 2036, an 6052, aj 403, ak 527, al 559, ar 887,
+as 387, at 461, au 335, av 315, aw 338, ax 329, ay 455, az 489, ba 647, bb 172,
+test_runes 2973, test_rune_battle 96, all 0 failures.
+<br><b>Five negative controls, each applied to the code and reverted</b> (the suite came back
+to 91/0 after the last one): every barrier counting as a Divine Shield trips 2, folding
+Devoutness's Break points into damage-prevented trips 2, Blessed Barrier banking the heal it
+<i>asked</i> for trips 1, un-crediting Healing Pulse trips 2, and not banking the release count
+at the release trips 2.
+<br><b>ONE CORRECTION TO AN EARLIER BATCH'S CLAIM, found in passing.</b> Batch AR recorded
+<code>test_rune_battle</code>'s standing defect as closed and stable; the check
+<i>"pyromancer: rune_resist_pierce never fired"</i> failed 1 run in 8 here and passed 4/4 on a
+stashed, unmodified HEAD, so it is not this batch. <b>The residual cause is named so nobody
+re-diagnoses it: the check drives <code>_resolve</code> by hand and the file arms
+<code>no_cover</code> nowhere, so the forced hit still rolls the 5% miss &mdash; and a missed
+hit writes no resist line at all.</b> AR fixed whether the line survives to be <i>read</i>; it
+did not fix whether the line is <i>written</i>. One line at the forced hit closes it.
+<b>Reported, not taken</b> &mdash; this batch changes nothing.</li>
+
+<li><b>NOISE, STATED RATHER THAN ASSUMED</b>, because this spec's numbers were flagged as
+sampling-noise-prone as far back as Batch W (heal/battle moving 10&rarr;14 and 25&rarr;13 in
+one measurement, opposite signs). The baseline row was run twice at n=200, nothing changed
+between them: <b>80% / 2255 healing / 32.21 releases against 79% / 2165 / 30.96</b> &mdash;
+about a point of contribution and 4% of the healing.
+<b>SO THE BOTTOM THREE ROWS OF THE GRID ARE INSIDE THE BAND AND MUST NOT BE READ AS EFFECTS:
+Unwavering Faith, Sacred Covenant and Binding Oath move the headline by 1&ndash;2 points, which
+is what zero looks like at this sample size.</b> Everything above them &mdash; Communion at
+&minus;33, Blessed are the Faithful and Fervor at &minus;16, Apostle at &minus;7 &mdash; is
+far outside it. Binding Oath's 1 point is explained rather than dismissed: see the saturation
+note above.</li>
+
+</ul>
+
 <h2>2026-08-09 &mdash; Batch BB: clearing the deck</h2>
 <p><i>Six repairs carried over from the twelve spec batches &mdash; every one a thing that was
 found, recorded and deliberately left for later. <b>No spec is re-authored, no magnitude is

@@ -730,6 +730,11 @@ func _spawn_units() -> void:
 	# banks only in sim mode, so real play pays nothing for the wire).
 	for h in heroes:
 		h.prevented_cb = _on_barrier_prevented
+		# BATCH BC §1: the three effects unit.gd computes that battle.gd cannot
+		# see — Blessed Barrier's conversion, Afterglow's mend and Devoutness's
+		# Break reduction. None had ever been credited to anyone, so every
+		# Devout row ever measured under-read two of his three lanes.
+		h.credit_cb = _on_unit_credit
 
 	# Guardian Angel raises the Mercy-earning threshold and Last Hope deepens
 	# healing on the nearly-dead — both are the Holy's talents, but the checks
@@ -1787,6 +1792,9 @@ func _run_battle() -> void:
 			var bw_amt := maxi(int(round(u.max_hp * 0.10)), 1)
 			var bw_tick := u.heal_amount(bw_amt, true)
 			u.float_text("+%d" % bw_tick, Color(0.55, 0.75, 0.95))
+			# BATCH BC §1: same gap as Healing Pulse — the Devout capstone's
+			# tick was healing the party and crediting nobody.
+			_devout_heal(_living_devout(), bw_tick, "bulwark")
 			_log("%s stands fortified — regains %d HP (Bulwark)" % [
 				u.unit_name, bw_tick], "#8c9cc8")
 		# Zeal-lane riders (Batch K): Healing Pulse drips and Cleansing
@@ -1801,6 +1809,9 @@ func _run_battle() -> void:
 						zl_dv.max_hp * 0.01 * zl_dv.pulse_ranks)), 1)
 					var pulse_got := u.heal_amount(pulse_amt, u != zl_dv)
 					u.float_text("+%d" % pulse_got, Color(0.4, 0.9, 0.45))
+					# BATCH BC §1: never credited to anybody until now, so the
+					# ZEAL control row under-read its own biggest heal.
+					_devout_heal(zl_dv, pulse_got, "pulse")
 					_log("   → Talent: Healing Pulse — %s mends %d" % [
 						u.unit_name, pulse_got], "#b0a8e0")
 				if zl_dv.waters_ranks > 0 and randf() < 0.01 * zl_dv.waters_ranks:
@@ -5346,14 +5357,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var pv_was := raw
 				raw *= 0.85
 				if strike_target.is_hero:
-					_prev(_living_devout(), pv_was - raw)
+					_devout_prev(_living_devout(), pv_was - raw, "ground")
 			# Conviction: each Faith stack turns the blade (3%) — while the
 			# Devout stands.
 			if strike_target.is_hero and strike_target.faith_stacks > 0 \
 					and _living_devout() != null:
 				var pv_was := raw
 				raw *= 1.0 - 0.03 * strike_target.faith_stacks
-				_prev(_living_devout(), pv_was - raw)
+				_devout_prev(_living_devout(), pv_was - raw, "stacks")
 			# Iron Will: adversity hardens the Warden — 12%/rank less damage
 			# taken per debuff on him (the chip tracks the live total; the
 			# floor is a sanity clamp for absurd debuff piles).
@@ -5838,7 +5849,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							continue
 						var well_got: int = wh.heal_amount(well, wh != cg_dv)
 						wh.float_text("+%d" % well_got, Color(0.4, 0.9, 0.45))
-						_stat_heal(cg_dv, well_got)
+						_devout_heal(cg_dv, well_got, "lifewell")
 					_log("   → Talent: Lifewell — the reflected pain mends the party for %d" % \
 						well, "#b0a8e0")
 				# Judgement: the ground passes sentence on the attacker.
@@ -7968,7 +7979,15 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 	var f_heal := maxi(int(round(u.max_hp * (0.15 + 0.01 * devout.faithful_step))), 1)
 	var f_got: int = u.heal_amount(f_heal, u != devout)
 	u.float_text("FAITH +%d" % f_got, Color(0.98, 0.85, 0.45))
-	_stat_heal(devout, f_got)
+	# BATCH BC §1 — THE TWO NUMBERS THE WHOLE DECOMPOSITION TURNS ON, banked
+	# here because this IS the release: how OFTEN Faith pays out, and how much
+	# THE PAYOUT ITSELF is worth, separated from every other heal he does. The
+	# shape of the answer matters more than either figure — a row that is large
+	# because it pays a lot per release and a row that is large because it
+	# releases a great many times want opposite repairs, and two batches have
+	# now guessed without being able to tell them apart.
+	_stat("faith_releases")
+	_devout_heal(devout, f_got, "release")
 	var d_mana := maxi(int(round(devout.max_resource * 0.03)), 1)
 	devout.resource = mini(devout.resource + d_mana, devout.max_resource)
 	devout.refresh_bars()
@@ -8048,7 +8067,7 @@ func _conviction_growth(devout: BattleUnit, consumed := true) -> void:
 	var grow_got: int = devout.heal_amount(step)
 	devout.float_text("+%d MAX" % step, Color(0.98, 0.85, 0.45))
 	devout.refresh_bars()
-	_stat_heal(devout, grow_got)
+	_devout_heal(devout, grow_got, "growth")
 	_log("   → Conviction: the principal grows — %s's maximum health rises %d (now %d)%s" % [
 		devout.unit_name, step, devout.max_hp,
 		"" if consumed else " (half — the Faith was never spent)"], "#e8c860")
@@ -8094,7 +8113,7 @@ func _on_lethal_saved(saved: BattleUnit) -> void:
 	var cov_heal := maxi(int(round(saved.max_hp * 0.01 * devout.covenant_heal)), 1)
 	var cov_got: int = saved.heal_amount(cov_heal, saved != devout)
 	saved.float_text("+%d" % cov_got, Color(0.95, 0.9, 0.6))
-	_stat_heal(devout, cov_got)
+	_devout_heal(devout, cov_got, "covenant")
 	_log("   → Talent: Sacred Covenant — the shield held the line; %s heals %d and keeps the Faith" % [
 		saved.unit_name, cov_got], "#b0a8e0")
 	_gain_faith(saved, maxi(devout.covenant_faith, 1))
@@ -11353,6 +11372,9 @@ func _print_sim_report() -> void:
 	var bx := breadth_report_line(sim_stats)
 	if bx != "":
 		print(bx)
+	var dx := faith_report_line(sim_stats)
+	if dx != "":
+		print(dx)
 	print("=============================================\n")
 
 
@@ -11427,6 +11449,63 @@ static func breadth_report_line(stats: Dictionary) -> String:
 	return "Trapper breadth: %.2f distinct statuses per strike (n=%d strikes, most seen %d)" % [
 		stats.get("breadth_sum", 0.0) / strikes, int(strikes),
 		int(stats.get("breadth_max", 0.0))]
+
+
+# BATCH BC §1 — THE DEVOUT'S AGGREGATE, DECOMPOSED. Batch AW measured his
+# FAITH row at 78% contribution, AX at 80%, and AY halved Apostle's growth
+# contribution and watched the growth halve exactly while the row barely moved.
+# Two fixes have now been aimed at a term inside an aggregate that nobody could
+# see the parts of. This prints the parts.
+#
+# THE SHAPE OF THE ANSWER MATTERS MORE THAN ANY SINGLE FIGURE: is the row large
+# because it pays a lot PER RELEASE, or because it releases A GREAT MANY TIMES?
+# Those want opposite repairs.
+#
+# The denominator is `conviction_battles` — the count already banked at
+# `_check_end` for every battle a Devout stood in. One denominator, one answer:
+# a second count of the same thing is a second thing to drift.
+#
+# Shared by the standalone report and RunSim's, the `ruin_report_line` pattern.
+# Returns "" when no Devout stood — a zero on a party without one reads as a
+# broken instrument rather than a finding (and AZ's `focus_deepest` is the
+# precedent for the opposite failure: a line banked in the wrong place printed
+# NOTHING on a legal build, and a broken instrument reads as a finding).
+static func faith_report_line(stats: Dictionary) -> String:
+	var n: float = stats.get("conviction_battles", 0.0)
+	if n <= 0.0:
+		return ""
+	var rel: float = stats.get("faith_releases", 0.0)
+	var rel_heal: float = stats.get("faith_heal_release", 0.0)
+	var heal_terms := [
+		["release", "release"], ["growth", "growth"],
+		["blessed", "Blessed Barrier"], ["afterglow", "Afterglow"],
+		["pulse", "Healing Pulse"], ["covenant", "Sacred Covenant"],
+		["lifewell", "Lifewell"], ["bulwark", "Bulwark of Fortitude"]]
+	var heal_parts := PackedStringArray()
+	var heal_sum := 0.0
+	for t in heal_terms:
+		var v: float = stats.get("faith_heal_" + String(t[0]), 0.0)
+		heal_sum += v
+		heal_parts.append("%s %.0f" % [t[1], v / n])
+	var prev_terms := [
+		["shield", "Divine Shield absorbs"], ["ground", "Consecrated Ground"],
+		["stacks", "Faith stacks"]]
+	var prev_parts := PackedStringArray()
+	for t in prev_terms:
+		prev_parts.append("%s %.0f" % [
+			t[1], stats.get("faith_prev_" + String(t[0]), 0.0) / n])
+	var lines := PackedStringArray()
+	lines.append("Devout FAITH decomposition (n=%d battles with a Devout):" % int(n))
+	lines.append("  releases/battle %.2f | healing per release %.0f | total healing/battle %.0f" % [
+		rel / n, rel_heal / maxf(rel, 1.0), heal_sum / n])
+	lines.append("  healing/battle by source: %s" % " | ".join(heal_parts))
+	lines.append("  prevented/battle: %s" % " | ".join(prev_parts))
+	lines.append("  growth/battle %.1f HP (+%.1f%% of base, max observed %d) | Break points removed by Devoutness %.0f/battle" % [
+		stats.get("conviction_growth", 0.0) / n,
+		stats.get("conviction_growth_pct", 0.0) / n,
+		int(stats.get("conviction_growth_max", 0.0)),
+		stats.get("faith_break_cut", 0.0) / n])
+	return "\n".join(lines)
 
 
 # Sweep report (DOD_SIM_SWEEP=1): one row per budget stage. Rounds reuses
@@ -11940,9 +12019,51 @@ func _stat_bd(owner, amount: float) -> void:
 # Barrier absorbs report through the unit callback (unit.gd can't reach
 # the stats directly): credit the caster stamped on the barrier, else the
 # unattributed bucket. Only hero-side barriers are the party's ledger.
-func _on_barrier_prevented(src_name: String, absorbed: int, holder: BattleUnit) -> void:
-	if holder.is_hero:
-		_prev(src_name, float(absorbed))
+# BATCH BC §1 takes the `divine` flag as well, because the pooled figure
+# cannot tell a Divine Shield from Holy's Blessed Vestments ward.
+func _on_barrier_prevented(src_name: String, absorbed: int, holder: BattleUnit,
+		divine := false) -> void:
+	if not holder.is_hero:
+		return
+	_prev(src_name, float(absorbed))
+	if divine:
+		_stat("faith_prev_shield", float(absorbed))
+
+
+# BATCH BC §1 — what unit.gd computes and battle.gd cannot see, credited and
+# NAMED. `term` is decided at the site that computes the number, so a later
+# effect added inside unit.gd has to say which term it belongs to rather than
+# dropping into a pool — or, as all three of these did until now, vanishing.
+# ONE TERM IS NOT A HEAL and is routed here rather than at its call site: the
+# Break points Devoutness removes are a different unit and must not be summed
+# with healing.
+func _on_unit_credit(src_name: String, amount: int, term: String) -> void:
+	if term == "devoutness_break":
+		_stat("faith_break_cut", float(amount))
+		return
+	_devout_heal(src_name, float(amount), term)
+
+
+# BATCH BC §1 — THE ONE PLACE A DEVOUT HEAL IS BOOKED. His contribution has
+# been an aggregate since Batch W and two batches have now aimed a fix at a
+# term inside it without knowing which term was load-bearing. Every heal his
+# kit produces goes through here with its term named, so the report can print
+# the parts rather than the sum — and so the parts can never disagree with the
+# total, which they would the moment a site banked one and forgot the other.
+func _devout_heal(owner, amount: float, term: String) -> void:
+	_stat_heal(owner, amount)
+	if sim and amount > 0.0:
+		_stat("faith_heal_" + term, amount)
+
+
+# The prevented half of the same rule. Damage only — Devoutness cuts BREAK
+# points, which are different units and are banked by `_devout_break_cut`
+# rather than folded in here (a Break point added to a damage total would
+# quietly inflate the contribution share, which sums damage + heal + prevented).
+func _devout_prev(owner, cut: float, term: String) -> void:
+	_prev(owner, cut)
+	if sim and cut > 0.0:
+		_stat("faith_prev_" + term, cut)
 
 
 var _sfx_players: Array = []

@@ -1025,6 +1025,12 @@ static func _print_report(battle) -> void:
 	var bx_line: String = battle.breadth_report_line(battle.sim_stats)
 	if bx_line != "":
 		print(bx_line)
+	# Batch BC §1: the Devout's aggregate, decomposed into the terms it is built
+	# from. Same rule, same place — and a run is where the release count has
+	# room to run, since a smoke fight ends in 7 rounds.
+	var dx_line: String = battle.faith_report_line(battle.sim_stats)
+	if dx_line != "":
+		print(dx_line)
 	var earned := talent_spent + talent_left
 	print("Talent points per hero per run: earned %.1f   spent %.1f (banked %.1f)" % [
 		earned / runs / 4.0, talent_spent / runs / 4.0, talent_left / runs / 4.0])
