@@ -163,8 +163,11 @@ func _test_offer(RunState) -> void:
 		"parched": 1, "slick": 1, "dulledge": 1, "muffled": 1, "hoarfrost": 1,
 		"fleeting": 2, "feverish": 2, "deadened": 2, "miasma": 2,
 		"thinair": 3, "encumbered": 3,
-		"bloodletting": 4, "mirrorbound": 4}
-	ok(run.MODIFIERS.size() == 19, "nineteen authored modifiers (was six)")
+		"bloodletting": 4, "mirrorbound": 4,
+		# BATCH BB §5 re-pointed this block IN PLACE: `rot` is AQ's authored
+		# fourth severity-4 bargain and it SHIPS now, so the pool is twenty.
+		"rot": 4}
+	ok(run.MODIFIERS.size() == 20, "twenty authored modifiers (was six, then AQ's nineteen)")
 	ok(run.MODIFIERS.size() == want.size(), "...and the test knows all of them")
 	# The pool is WEIGHTED LOW on purpose: every offer's safe slot is served
 	# by the 1-2 pool alone, so that is the end that actually repeats.
@@ -174,14 +177,17 @@ func _test_offer(RunState) -> void:
 	ok(by_sev[1] == 6, "six severity-1 modifiers (got %d)" % by_sev[1])
 	ok(by_sev[2] == 6, "six severity-2 modifiers (got %d)" % by_sev[2])
 	ok(by_sev[3] == 4, "four severity-3 modifiers (got %d)" % by_sev[3])
-	ok(by_sev[4] == 3, "three severity-4 modifiers (got %d)" % by_sev[4])
+	ok(by_sev[4] == 4, "four severity-4 modifiers (got %d)" % by_sev[4])
 	ok(by_sev[1] + by_sev[2] > by_sev[3] + by_sev[4],
 		"the pool is weighted toward the low severities")
-	# `rot` was authored and DROPPED — the battle-end sync writes max_hp back
-	# onto the party member, so a halved max HP outlived the fight that
-	# charged for it. Pinned ABSENT so it cannot return without the seventh
-	# field it needs (see the changelog).
-	ok(not run.MODIFIERS.has("rot"), "rot is not in the pool")
+	# `rot` was authored by AQ and DROPPED there, because the battle-end sync
+	# wrote max_hp back onto the party member and a halved maximum outlived the
+	# fight that charged for it. BATCH BB §5 BUILT THE FIELD AQ NAMED, so the
+	# assertion INVERTS rather than disappearing: what a later batch could break
+	# is not "rot came back" but "rot came back without its guard", and
+	# test_batch_bb owns that half.
+	ok(run.MODIFIERS.has("rot"), "rot is in the pool (Batch BB reinstated it)")
+	ok(run.modifier_severity("rot") == 4, "rot is severity 4")
 	# The AN six, exactly as AN shipped them.
 	ok(String(run.MODIFIERS["overgrown"]["desc"])
 		== "Both parties begin the fight at 70% health.",
@@ -249,9 +255,9 @@ func _test_offer(RunState) -> void:
 	ok(two_low == 0,
 		"§2: NO offer holds two low options — one safe, two gambles (%d of 2000)"
 		% two_low)
-	ok(seen_mods.size() == 19,
-		"all nineteen modifiers reach the offer screen over 2000 rolls (saw %d)"
-		% seen_mods.size())
+	ok(seen_mods.size() == run.MODIFIERS.size(),
+		"all %d modifiers reach the offer screen over 2000 rolls (saw %d)"
+		% [run.MODIFIERS.size(), seen_mods.size()])
 	# Accepting arms exactly one battle's worth of state.
 	var one: Array = run.roll_offer()
 	run.accept_offer(one[0])

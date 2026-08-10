@@ -5,6 +5,99 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-09 &mdash; Batch BB: clearing the deck</h2>
+<p><i>Six repairs carried over from the twelve spec batches &mdash; every one a thing that was
+found, recorded and deliberately left for later. <b>No spec is re-authored, no magnitude is
+retuned, no tree is touched.</b> Every id survives; <b>no save version move</b> (still v7).</i></p>
+<ul>
+
+<li><b>&sect;3 THE OCCULTIST'S DETONATION NUMBER, FINALLY PRINTED &mdash; and it leads because
+it is why the batch exists.</b> <code>ruin_report_line()</code>, 40-run line, Ruin lane rows
+1&ndash;7 at the standing threshold of 10:
+<b>trash 0.07 detonations/battle (n=566, deepest mark 31) | boss 0.60 (n=25, deepest mark 18)</b>.
+Against <b>AX's trash 0.00 (n=519, deepest 10) | boss 0.13 (n=23, deepest 12)</b> and
+<b>AY's trash 0.06 (n=774, deepest 20) | boss 0.35 (n=52, deepest 32)</b>.
+<b>TRASH IS NOT ZERO, SO THE THREAD CLOSES.</b> The condition for escalating to the
+<i>first detonation at 5, every 10 after</i> variant was "if trash is still zero"; it is not,
+and that variant stays unshipped. <b>Nothing shipped off this measurement.</b> Read the boss
+half as the real movement &mdash; 0.13 &rarr; 0.35 &rarr; 0.60 across three batches &mdash;
+and the trash half as flat but alive. Two caveats stated rather than buried: AY <i>did</i>
+measure both halves, but only into the project guide, so <b>this is the first time the number
+has appeared in a changelog</b>, which is what was actually being asked for; and this row was
+walked with <b>Rot in the bargain pool</b> (the bot took it 0.60/run), which AX's and AY's
+rows could not have been.</li>
+
+<li><b>&sect;1 THE PACK'S SWAP RULE IS BATCH Q'S AGAIN: the beast holding LESS LOYALTY is the
+one that goes</b>, with a tie falling to the older so the rule is total rather than
+order-dependent. Batch AY shipped "replaces the older of the two", and that was a regression
+in the worst possible batch to make it in &mdash; AY is the batch that removed Loyalty's
+ceiling, and its own smoke measured a bond <b>fifty stacks deep</b>. The shipped rule could
+destroy a 50-stack partnership in favour of a fresh arrival, inside the spec whose whole spine
+is partnership <i>depth</i>. AY's stated reason does not survive the site: the newcomer is not
+on the field yet when the victim is chosen, so it can never be the one evicted. What the age
+rule really bought was the ability to rotate a deep bond OUT, and refusing that is the point.
+One implementation (<code>_swap_victim</code>) read by the summon AND the bot, so the beast
+the bot prices is the beast the summon frees; Batch Q's <b>never two of the same kind</b>
+clause is untouched, and it covers the swap clones as well as the summons. The capstone's own
+text and both swap tooltips now say what the code does.</li>
+
+<li><b>&sect;2 CREEPING DEATH WORKS UNDER PERFECTED TOXIN NOW.</b> The capstone makes his
+poison permanent; the node refreshed a poison's duration; <b>a poison with no clock has no
+duration to refresh</b> &mdash; so Venom row 5 plus the Venom capstone owned a node that could
+never fire. <b>You cannot extend forever, so you deepen instead: on a permanent poison the
+node ADDS A STACK, and on a clocked one it refreshes exactly as before.</b> One clause, both
+nodes stay live, and it reads correctly from either text. Both halves read the <code>full</code>
+stamp the poison already carries rather than a constant of their own.
+<br><b>The governor the refresh version never needed:</b> the node fires on applying
+<i>any</i> status to a poisoned enemy, and since Batch BA a single Distillate cast lands
+poison, Exposed and Slowed together. Refreshing three times is refreshing once &mdash; but
+adding three stacks is not adding one. <b>The stack clause is limited to once per enemy per
+turn; the refresh clause is deliberately left firing freely</b>, because each half is bounded
+by what it does.</li>
+
+<li><b>&sect;4 CALL OF THE WILD'S BODILESS BLOWS ARE MEASURED.</b> Batch AY confirmed that a
+beast's damage credits its hunter at one named site, which is what makes every Beastmaster
+number readable &mdash; and found that <code>_ghost_hit</code>, the spirit strike an absent
+kind makes, booked <b>no damage at all</b>. It is credited the same way now, through the same
+resolution, so the two sites cannot drift. <b>There is no Break half to mirror</b>: checked at
+the site rather than assumed, the ghost blow deals a hardcoded zero pressure. It is a trophy
+ability, so this changes no balance &mdash; it changes whether a Beastmaster who earned Call
+of the Wild is measured honestly.</li>
+
+<li><b>&sect;5 ROT IS BACK, AT SEVERITY 4: everyone's maximum health is halved, on both
+sides, for the fight and no longer.</b> Batch AQ authored it, implemented it and dropped it
+during that batch, because the battle-end save sync writes each unit's maximum straight back
+onto the party member &mdash; so a one-fight bargain would have cost the party half its health
+for the rest of the run, with nothing crashing to announce it. AQ recorded the fix it needed;
+<b>Batch AW then built exactly that pattern for the opposite sign.</b> The severity-4 pool is
+four, which was AQ's stated target, and the pool is twenty.
+<br><b>Three fields now meet at one line and their signs differ</b>, so both syncs state the
+ordering: Tenacity's growth and Conviction's growth are <b>subtracted</b> (one-fight gains),
+Rot's reduction is <b>added back</b> (a one-fight loss), and all three stay separate &mdash;
+Tenacity's has a second reader in Unkillable's mend, which means "the pool he brought into the
+battle" and nothing else.
+<br><b>Rot is NOT excluded from anything that reads maximum health</b>, and that is the design
+rather than an oversight: Unkillable's mend, the below-half Mercy window, Conviction's growth
+and the Devout's whole kit are ratios, so they scale with the smaller pool exactly as every
+other both-parties modifier does. It is why Rot is severity 4. <b>One correction, from
+checking rather than trusting: they are not <i>all</i> ratios.</b> Tenacity adds a flat +15
+maximum health per block, so under Rot it claws back a slightly larger share of a smaller
+pool. Nothing absurd, nowhere near the runaway that was feared &mdash; reported, not
+changed.</li>
+
+<li><b>&sect;6 ASHES OF AL'AR HAS A HOME: every Mage can EARN it.</b> Batch AR removed the
+Pyromancer's self-revive along with every other defensive option in that spec, which was right
+for a spine built on having no escape hatch, and left the ability homeless. It is now
+<b>30 Mana, 2.5 initiative, no cooldown, self-cast: the next blow that would kill you this
+battle returns you at 25% of maximum health instead (Perfect: 40%), once per battle</b> &mdash;
+in the Mage class pool, restoring it to twelve entries, and in all three Mage spec pools,
+which is where a zone boss actually draws from. <b>AR's rule is untouched: the Pyromancer
+still has no defensive option anywhere in his kit or his tree.</b> He can buy the escape hatch
+back only by spending a boss pick on it and a turn to arm it &mdash; a real choice against his
+own spine rather than a hole in it.</li>
+
+</ul>
+
 <h2>2026-08-09 &mdash; Batch BA: the Survivalist &mdash; attrition through craft</h2>
 <p><i>Last of the twelve. <b>Every talent tree in the game is now purpose-authored.</b> The
 spine was already half-written: <b>attrition &mdash; breadth of affliction, not depth of

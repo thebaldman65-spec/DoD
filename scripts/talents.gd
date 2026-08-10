@@ -1602,8 +1602,10 @@ const LANE_TREES := {
 			"payload": {"stat": {"slow_acting": 1}}},
 		# RE-SPECCED — the corpse transfer is gone (contagion). Keeping the wound
 		# open is craft: it reads the status-application path, not a death.
+		# BATCH BB §2 gave it its second clause: Perfected Toxin leaves no clock
+		# to refresh, so against a permanent poison the node deepens instead.
 		{"id": "sv_creeping", "name": "Creeping Death", "ranks": 1, "lane": "Venom", "row": 5,
-			"desc": "Applying any status to a Poisoned enemy refreshes its Poison to full duration.",
+			"desc": "Applying any status to a Poisoned enemy refreshes its Poison to full duration — or, if that Poison is permanent, adds a stack instead (once per enemy per turn).",
 			"payload": {"stat": {"creeping_death": 1}}},
 		# The only node in the lane that was already pointed at BREADTH rather
 		# than depth, and tissue death from venom is what venomous bites do — so
@@ -1981,7 +1983,7 @@ const LANE_TREES := {
 		# this was an unfinished switch rather than unbuilt machinery.
 		{"id": "bm_the_pack", "name": "The Pack", "ranks": 1, "lane": "pack", "row": 8,
 			"capstone": true,
-			"desc": "TWO beasts may be active at once: both strike when you attack, each keeps its own Loyalty meter, and BOTH Pack Bond boons apply at FULL strength. Swapping replaces the OLDER of the two. Lone Bond closes this door.",
+			"desc": "TWO beasts may be active at once: both strike when you attack, each keeps its own Loyalty meter, and BOTH Pack Bond boons apply at FULL strength. Swapping replaces whichever of the two holds LESS Loyalty — the deeper bond always keeps its place. Lone Bond closes this door.",
 			"payload": {"stat": {"the_pack": 1}}},
 		{"id": "bm_apex", "name": "Apex Predator", "ranks": 1, "lane": "handler", "row": 8,
 			"capstone": true,

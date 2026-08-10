@@ -10,7 +10,8 @@
 #      against a LIVE strike, because if it went the other way every
 #      Beastmaster number ever measured would be wrong.
 #   §1 THE PACK, BUILT: two beasts standing, BOTH boons at FULL strength,
-#      separate Loyalty meters, a swap replacing the OLDER of the two; One Soul
+#      separate Loyalty meters, a swap replacing the SHALLOWER bond (BATCH BB §1
+#      REVERTED AY's "older of the two" — see `_live_swap_replaces_shallower`); One Soul
 #      splitting across THREE bodies; Ursus's 100+idx taunt encoding decoding
 #      to the right body with two beasts; Call of the Wild against a two-beast
 #      field; AND that Lone Bond makes The Pack unreachable.
@@ -76,7 +77,7 @@ func _run() -> void:
 	await _live_uncapped()
 	await _live_wild_rotation_cap()
 	await _live_two_beasts()
-	await _live_swap_replaces_older()
+	await _live_swap_replaces_shallower()
 	await _live_lone_bond_closes_the_pack()
 	await _live_one_soul_three_bodies()
 	await _live_taunt_encoding()
@@ -500,8 +501,15 @@ func _bot_policy_source() -> void:
 		"BOT: swapping is decided by BOON WORTH, not by cooldown availability")
 	ok(src.contains("best_worth > out_worth * 1.25"),
 		"BOT: ...and only when the incoming boon clears a real margin")
-	ok(src.contains("var out_b: BattleUnit = bot_beasts[0]"),
-		"BOT: the beast it would replace is the OLDER one, matching _do_summon")
+	# RE-POINTED IN PLACE BY BATCH BB §1, with the reason in the file. The
+	# question this check has always asked is "does the bot price the SAME beast
+	# `_do_summon` will actually free" — a bot valuing one beast while the summon
+	# frees another would refuse every swap forever. That question is unchanged;
+	# only the answer moved, because AY's oldest-beast rule was a regression and
+	# BB restored Batch Q's. It rides `_swap_victim`, the one implementation both
+	# sites now read, so the two can no longer disagree at all.
+	ok(src.contains("var out_b: BattleUnit = _swap_victim(u)"),
+		"BOT: the beast it would replace is the one `_do_summon` frees (`_swap_victim`)")
 	# The summon block must come FIRST in the hunter branch, or Loyalty never
 	# accrues and the sim measures a spec nobody plays.
 	var hunter_at := src.find("\t\t\"hunter\":")
@@ -676,24 +684,33 @@ func _live_two_beasts() -> void:
 	await _kill(scene)
 
 
-func _live_swap_replaces_older() -> void:
+# RE-POINTED IN PLACE BY BATCH BB §1 — INVERTED, NOT DELETED, with the reason
+# in the file. AY shipped "the swap replaces the OLDER of the two" and this check
+# pinned it; **that was a regression, and AY was the worst possible batch to make
+# it in** — AY is the batch that removed Loyalty's ceiling and whose own smoke
+# measured a bond fifty stacks deep, so an age rule can break a 50-stack
+# partnership for a fresh arrival inside the spec whose spine is partnership
+# DEPTH. AY's stated reason ("the newest arrival always holds the lower Loyalty,
+# so the old rule would evict the beast you just called") does not survive the
+# site: the newcomer is not on the field yet when the victim is chosen.
+#
+# The SETUP is byte-identical, because it is still the one setup that tells the
+# two rules apart — the deep beast is also the older one. Only the expectation
+# moved. Batch BB restored Batch Q's rule and test_batch_bb owns the tie-break
+# and the bot half.
+func _live_swap_replaces_shallower() -> void:
 	var scene := await _spawn({"bm_the_pack": 1})
 	var h := _hero(scene, 3)
 	await _summon(scene, h, "ursus")
 	await _summon(scene, h, "canis")
-	# Give the OLDER beast the HIGHER Loyalty. Under the pre-AY rule ("replace
-	# the lower") the wolf would go; under §1's rule the BEAR goes, because it
-	# arrived first. This is the check that tells the two rules apart, and it
-	# matters because with an uncapped meter the newest arrival ALWAYS holds
-	# the lower Loyalty — the old rule made rotation impossible.
 	h.loyalty["ursus"] = 20
 	h.loyalty["canis"] = 1
 	await _summon(scene, h, "aguila")
 	var kinds: Array = scene.call("_beasts", h).map(func(b): return b.companion_kind)
-	ok(not kinds.has("ursus"),
-		"the swap replaced the OLDER beast (the bear), not the lower-Loyalty one")
-	ok(kinds.has("canis") and kinds.has("aguila"),
-		"...leaving the wolf and the eagle standing (got %s)" % str(kinds))
+	ok(kinds.has("ursus"),
+		"the swap SPARED the deeper bond (the bear), though it was also the older")
+	ok(not kinds.has("canis") and kinds.has("aguila"),
+		"...and took the shallower one instead (got %s)" % str(kinds))
 	await _kill(scene)
 
 

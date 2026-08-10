@@ -4,6 +4,57 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Six things left for later, and later is now (Batch BB) — 2026-08-09
+
+Every item in this batch was found by an earlier batch, recorded, and put down
+on purpose. That is a good habit and it accumulates a debt; six is about where
+the debt starts costing more than the discipline saves.
+
+Two of them were the same kind of mistake, which is worth naming. The Pack's
+swap rule and Creeping Death's refresh both read correctly at the moment they
+were written and stopped being true when something *else* changed. AY removed
+Loyalty's ceiling and changed the swap to take the older beast in the same
+batch, and the second change quietly undid the first: a meter that can reach
+fifty is a meter worth protecting, and "replaces the older" throws away the
+deepest thing the spec can build. BA wrote Creeping Death as a refresh and
+Perfected Toxin as permanence, in the same tree, in the same batch — and a
+poison with no clock has nothing to refresh. Neither was careless. Both are
+what happens when a mechanic is checked against the design it was written for
+rather than against the design it now sits inside.
+
+So the repairs are shaped to survive the next such change. The swap rule is one
+function that the summon and the bot both read, rather than the same
+`beasts[0]` written twice. Creeping Death's two halves read the stamp the
+poison already carries instead of a constant of their own, so whichever way a
+future batch moves durations, the node follows.
+
+The governor on the stack clause is the interesting part. Refreshing three
+times is refreshing once, so the original never needed to care how many
+statuses a single cast landed — and BA later made a single cast land three.
+Adding a stack does not have that property. The fix is not to govern the node;
+it is to govern the half that needs it and to say in the code why the other
+half must not get one, because the tidy-looking change is to apply the same
+limit to both and that would be a silent nerf to the clause BA shipped.
+
+Rot came back because AW had already built its pattern for the opposite sign.
+That is the whole story: AQ dropped it needing "one field added back at the
+victory sync", AW needed one field *subtracted* at the same sync for
+Conviction's growth, and once that existed Rot was an afternoon. What the batch
+had to do carefully was the third field. Three numbers meeting at one line with
+different signs is exactly the shape that produces a five-figure runaway, and
+two of them cancel arithmetically in a fight that carries both — so the test
+that matters uses deliberately different magnitudes, and the ordering is stated
+at both syncs rather than inferred from the arithmetic.
+
+Ashes of Al'ar is the one design call, and it cost more than it looked like it
+would. The brief called it one array entry; the ability had never existed as an
+ability, only as a passive guard behind a talent, and the class pool it was
+told to join has not been read by anything since AN retired the class draw. So
+the honest version is a wrapper with new numbers and an entry in each Mage spec
+pool. The Pyromancer keeps his hole — no defence in kit or tree, which is what
+AR built the spec around — and buying the escape hatch back now costs a boss
+pick and a turn. That is a worse deal than having it, which is the point.
+
 ## Denial you have to decide (Batch AS) — 2026-08-07
 
 The Cryomancer's problem was that his control kept happening TO him. Four

@@ -192,6 +192,13 @@ var _bitter_echoing := false  # guards Bitter Cold freezes from cascading foreve
 # OLDEST FIRST. See the block above _apply_status for the three clauses.
 var _holds: Array[BattleUnit] = []
 var _clock := 0.0  # the acting unit's position on the timeline, this turn
+# HOW MANY UNIT TURNS THIS BATTLE HAS SPENT. It drives the stalemate guard and
+# the forfeit nudge, and since Batch BB it is also the clock a once-per-turn
+# governor reads (Creeping Death's stack clause). PROMOTED FROM A LOCAL for
+# that: `_run_battle` cannot be driven headlessly (the AR trap), so a governor
+# keyed on a local inside it could never be tested — a test advances this field
+# by hand and asserts the second application is refused.
+var _turns_taken := 0
 var empower_armed := false  # Mercy: the next heal cast spends +1 stack
 var _debug_popup: PopupMenu
 
@@ -217,6 +224,11 @@ var _r3_recorded := false
 # x 60 rounds is far past anything legitimate.
 const STALEMATE_TURNS := 600
 var stalemate := false
+# ASHES OF AL'AR (Batch BB §6): the share of maximum health the phoenix hands
+# back. Named constants rather than literals in the branch because the ability
+# TEXT promises both numbers and a test reads them off here.
+const ASHES_RETURN := 25
+const ASHES_RETURN_PERFECT := 40
 # Shieldwall (Batch AB): the Block chance the Warden's stance adds, in
 # percent. It rides the Heavy Plating slice of the block roll on purpose —
 # see the "shield_block" special and the roll itself.
@@ -884,7 +896,8 @@ func _active_modifier() -> String:
 	return mod_id if Run.MODIFIERS.has(mod_id) else ""
 
 
-# ONE list of nineteen, one branch each. `inherited` is true for a companion
+# ONE list of twenty, one branch each (AQ's nineteen plus Rot, reinstated by
+# BB §5). `inherited` is true for a companion
 # summoned mid-battle (§4): it arrives carrying its hunter's Attack and crit
 # ALREADY modified, so the two branches that write those must not fire again.
 # Everything else has to be stamped or the beast is the one unit on the field
@@ -960,6 +973,29 @@ func _stamp_modifier(u: BattleUnit, mod_id: String, inherited := false) -> void:
 			u.mod_bleed_add = 15
 		"mirrorbound":
 			u.mod_recoil = 0.25
+		"rot":
+			# BATCH BB §5 — AQ's fourth severity-4 bargain, reinstated. The
+			# halving is stamped here, AFTER spawn, so every max-HP source the
+			# hero actually brought (relics, Unwavering Faith, the spec block)
+			# is already in the number being halved.
+			#
+			# `rot_hp_lost` is the WHOLE of the fix AQ named: it banks what was
+			# taken so the victory sync can put it back. Accumulating rather
+			# than assigning is deliberate — a companion arriving mid-fight is
+			# stamped through this same branch, and a field that assigns cannot
+			# survive being reached twice.
+			#
+			# THE HALVING IS NOT EXCLUDED FROM ANYTHING THAT READS max_hp, and
+			# that is the design rather than an oversight: Unkillable's mend,
+			# the below-half Mercy window and the Devout's whole kit are RATIOS
+			# of the maximum, so they scale with the smaller pool exactly as
+			# every other modifier binding both parties does. It is why Rot is
+			# severity 4.
+			var rot_lost: int = u.max_hp - maxi(u.max_hp / 2, 1)
+			u.max_hp -= rot_lost
+			u.rot_hp_lost += rot_lost
+			u.hp = clampi(u.hp, 1, u.max_hp)
+			u.refresh_bars()
 
 
 func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
@@ -1557,7 +1593,6 @@ func _run_battle() -> void:
 	# property of HIS poison rather than an infection of the board and so needs
 	# no battle-start hook at all. Do not re-add one.
 	await _wait(0.8)
-	var _turns_taken := 0
 	while not battle_over:
 		# STALEMATE GUARD (Batch W, SIMS ONLY — real play is untouched).
 		# Some kits carry unbounded battle-long accumulators (the Warden's
@@ -2355,7 +2390,7 @@ func _player_turn(u: BattleUnit) -> void:
 				"mana_shield", "divine_wrath", "shield_block", "hold_the_line",
 				"battle_shout", "blood_price", "immolate", "stabilize",
 				"overcharge", "cons_ground", "bulwark", "dark_pact", "hysteria",
-				"instinct", "bestial", "spirit_bond", "hold_breath",
+				"instinct", "bestial", "spirit_bond", "hold_breath", "ashes",
 				"venom_coat", "deadfall", "guard_change", "interpose",
 				"wildfire", "backdraft", "intercession"]:
 			target = u  # self/party effects need no target choice
@@ -2634,6 +2669,19 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				return [overpower, target_foe]
 			return [u.abilities[0], target_foe]          # Strike
 		"mage":
+			# ASHES OF AL'AR (Batch BB §6), FIRST IN THE MAGE BRANCH AND ONLY
+			# WHEN HE IS ALREADY IN TROUBLE. It is an earned class-pool pick, so
+			# most rows never hold it; without a rule the sim could never
+			# exercise it at all and the ability would be invisible to every
+			# measurement. Held to under 40% health because arming it early
+			# wastes the turn a Mage does not have — instrument honesty, not
+			# tuning. `ashes_return` IS the "already armed" answer, so no second
+			# flag can disagree with the guard.
+			var ashes := _find_ability(u, "Ashes of Al'ar")
+			if ashes != null and u.ashes_return <= 0 and not u.ashes_used \
+					and u.hp < u.max_hp * 0.4 \
+					and u.resource >= ashes.cost and u.ability_ready(ashes):
+				return [ashes, u]
 			# Pyromancer (Batch N loop, Batch AG rework, Batch AR's ONE RULE).
 			# The loop is still build-then-spend, but under Overburn a bot that
 			# never spends measures a spec no player would recognise: the fire it
@@ -2840,7 +2888,10 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 				# `_bot_boon_worth`, which reads the Loyalty CURVE: a fresh
 				# beast starts near x1 while the one it would replace may be
 				# at x4, so under §2 a swap has to clear a real bar.
-				var out_b: BattleUnit = bot_beasts[0]  # the older, per §1
+				# BB §1: the shallower bond is what a swap actually costs him,
+				# so the bot prices THAT beast — `_swap_victim` is the same
+				# answer `_do_summon` acts on, and the two cannot disagree.
+				var out_b: BattleUnit = _swap_victim(u)
 				var out_worth := _bot_boon_worth(u, out_b.companion_kind)
 				var best_in := ""
 				var best_worth := 0.0
@@ -3272,7 +3323,7 @@ func _show_actions(u: BattleUnit) -> void:
 			if swapping:
 				group_btn.tooltip_text = "Swap the active beast (10 %s, 1.0 int,\nshared 2-turn cooldown). The newcomer\narrives with its swap effect and\n+1 Loyalty." % u.resource_name
 				if u.the_pack > 0:
-					group_btn.tooltip_text += "\nThe newcomer replaces the OLDER\nof the two beasts."
+					group_btn.tooltip_text += "\nThe newcomer replaces whichever beast\nholds LESS Loyalty (ties: the older)."
 				if u.cooldowns.get("Swap Companion", 0) > 0:
 					group_btn.tooltip_text += "\n(Swap recovering: %d turn(s))" % \
 						u.cooldowns["Swap Companion"]
@@ -3508,7 +3559,7 @@ func _open_summon_picker(u: BattleUnit) -> void:
 			var beast: String = a.display_name.get_slice(" ", 1)
 			var swap_desc := "Swap the pack: %s arrives with its\nswap effect and +1 Loyalty.\nShared cooldown: 2 turns." % beast
 			if u.the_pack > 0:
-				swap_desc += "\nReplaces the OLDER of the two beasts."
+				swap_desc += "\nReplaces whichever beast holds LESS\nLoyalty (ties: the older)."
 			_summon_opts.append(Ability.make({"display_name": "Swap " + beast,
 				"cooldown": 0, "cost": 10, "special": "summon", "delay": 1.0,
 				"anim": "attack01", "no_skill_check": true,
@@ -7012,10 +7063,24 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 # duration it was applied with. He keeps the wound open; nothing crawls
 # anywhere, which is what keeps it out of the reserved contagion space.
 #
-# It reads the `full` stamp `_apply_poison` leaves rather than a constant of its
-# own, so a Slow Acting poison refreshes to its DOUBLED span and a Perfected
-# Toxin (permanent, `full` < 0) has nothing to refresh and is left alone. It
-# lives on the status-application path deliberately: the death path books
+# IT HAS TWO CLAUSES SINCE BATCH BB §2, AND THE SPLIT IS WHAT KEEPS IT ALIVE.
+# Perfected Toxin makes his poison PERMANENT, and a poison with no clock has no
+# duration to refresh — so Venom row 5 plus the Venom capstone owned a node that
+# could never fire. YOU CANNOT EXTEND FOREVER, SO YOU DEEPEN INSTEAD: on a
+# permanent poison the node ADDS A STACK; on a clocked one it refreshes, exactly
+# as BA wrote it. Both halves read the same `full` stamp `_apply_poison` leaves
+# rather than a constant of their own, so a Slow Acting poison refreshes to its
+# DOUBLED span and the capstone's `full` of -1 routes to the other clause.
+#
+# THE GOVERNOR IS ON THE STACK CLAUSE ALONE, AND ONLY IT NEEDS ONE. The node
+# fires on applying ANY status to a poisoned enemy, and since BA a single
+# Distillate cast lands poison, Exposed and Slowed together — refreshing three
+# times is refreshing once, so the original never had to care, but ADDING THREE
+# STACKS IS NOT ADDING ONE. The stack half is limited to once per enemy per
+# turn; the refresh half is deliberately left firing freely, because each half
+# is bounded by what it does.
+#
+# It lives on the status-application path deliberately: the death path books
 # nothing for it any more.
 func _creeping_refresh(target: BattleUnit, applied_id: String) -> void:
 	if target == null or target.dead or target.is_hero or applied_id == "poison":
@@ -7026,7 +7091,22 @@ func _creeping_refresh(target: BattleUnit, applied_id: String) -> void:
 		return
 	var cp: Dictionary = target.get_status("poison")
 	var full := int(cp.get("full", 0))
-	if full <= 0 or int(cp.get("turns", 0)) < 0:
+	if full < 0:
+		# THE STACK CLAUSE — permanent poison, once per enemy per turn. The
+		# marker rides the STATUS rather than a dict beside it, so it dies with
+		# the poison it governs and no bookkeeping can outlive its subject.
+		if int(cp.get("creep_turn", -1)) == _turns_taken:
+			return
+		cp["creep_turn"] = _turns_taken
+		var stacks: int = maxi(int(cp.get("stacks", 1)), 1) + 1
+		cp["stacks"] = stacks
+		_perfected_chip(target, cp)
+		target.float_text("Poison x%d" % stacks, STATUS_INFO["poison"][2])
+		_log("   → Creeping Death: the venom in %s bites deeper (x%d)" % [
+			target.unit_name, stacks], "#70d878")
+		return
+	# THE REFRESH CLAUSE — a poison with a clock, ungoverned.
+	if full == 0:
 		return
 	cp["turns"] = full
 	_log("   → Creeping Death: the wound on %s is opened again (%d turns)" % [
@@ -8165,6 +8245,22 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			attacker.refresh_bars()
 			_message("%s focuses..." % attacker.unit_name)
 			_log("%s: Focus — regenerating Mana" % attacker.unit_name, "#70d878")
+		"ashes":
+			# BATCH BB §6 — the phoenix, armed rather than owned. The guard
+			# itself is unit.gd's and is byte-untouched in what it DOES; this
+			# cast is the only thing that switches it on, and `ashes_used`
+			# (already in that guard) is what keeps it to once a battle.
+			#
+			# It writes the RETURN SHARE, not a chance: a boss pick plus a turn
+			# plus 30 Mana buying a 33% roll is the shape AP spent a whole
+			# section removing from the upgrade pool.
+			attacker.ashes_return = ASHES_RETURN_PERFECT if is_perfect \
+				else ASHES_RETURN
+			_sfx("heal", -6.0, 1.2)
+			attacker.float_text("ASHES", Color(1.0, 0.6, 0.2), true)
+			_message("%s wreathes themself in embers!" % attacker.unit_name)
+			_log("%s: Ashes of Al'ar — the next lethal blow returns them at %d%% health" % [
+				attacker.unit_name, attacker.ashes_return], "#e08850")
 		"surge":
 			# Lasts through one status tick so it covers exactly the next turn's attack.
 			_apply_status(attacker, "surge", 2)
@@ -9550,8 +9646,38 @@ func _sync_soul_bond(hunter: BattleUnit) -> void:
 		b.soul_bond = bond
 
 
+# WHICH BEAST A SUMMON AT CAPACITY REPLACES — BATCH Q'S RULE, RESTORED.
+#
+# THE ONE HOLDING LESS LOYALTY GOES. Batch AY changed this to "the older of the
+# two" and that was a regression, not a design: AY is the batch that removed
+# Loyalty's ceiling, and its own smoke measured a bond fifty stacks deep, so an
+# age-based rule can destroy a 50-stack partnership in favour of a fresh one —
+# inside the spec whose whole spine is partnership DEPTH. DO NOT "FIX" IT BACK.
+#
+# AY's stated reason for the change does not survive contact with this site: the
+# newcomer is not on the field yet when the victim is chosen, so it can never be
+# the one evicted. What the age rule actually bought was the ability to rotate a
+# deep bond OUT, and that is precisely what the spec should refuse.
+#
+# TIES FALL TO THE OLDER, which is what makes the rule TOTAL rather than
+# order-dependent: `hunter.beasts` is append-ordered, so a STRICT `<` leaves the
+# earlier of two equal beasts holding the slot no matter how the list was built.
+func _swap_victim(hunter: BattleUnit) -> BattleUnit:
+	var live: Array = _beasts(hunter)
+	if live.is_empty():
+		return null
+	var worst: BattleUnit = live[0]
+	var worst_l: int = int(hunter.loyalty.get(worst.companion_kind, 0))
+	for cand in live:
+		var cand_l: int = int(hunter.loyalty.get(cand.companion_kind, 0))
+		if cand_l < worst_l:
+			worst = cand
+			worst_l = cand_l
+	return worst
+
+
 # Summons the hunter's next beast (The Pack fields two). At capacity the
-# call REPLACES the OLDER living beast. The newcomer inherits
+# call REPLACES the beast holding LESS Loyalty. The newcomer inherits
 # the hunter's armor, stability, and crit chance; it has no resource and
 # takes no turns. A swap (replacing a LIVING beast) starts the shared Swap
 # cooldown; the arriving beast keeps its Loyalty, gains +1, and fires its
@@ -9564,14 +9690,10 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 			_free_beast(hunter, old)
 	var was_swap := false
 	if _beasts(hunter).size() >= _beast_cap(hunter):
-		# BATCH AY §1: THE SWAP REPLACES THE OLDER OF THE TWO, not the one
-		# holding lower Loyalty. Under §2's uncapped meter the newest arrival
-		# ALWAYS holds the lower Loyalty, so the old rule would have evicted
-		# the beast the player just called and made rotation impossible under
-		# the very capstone whose lane is named for it. `hunter.beasts` is
-		# append-ordered, so the oldest living beast is simply the first.
+		# BATCH BB §1: the shallower bond is the one that breaks — one rule,
+		# one implementation, and `_swap_victim` carries the reason.
 		was_swap = true
-		_free_beast(hunter, _beasts(hunter)[0])
+		_free_beast(hunter, _swap_victim(hunter))
 	if was_swap and hunter.wild_rotation == 0:
 		# Quick Whistle shaves the shared swap cooldown; the node shaves all
 		# of it (the floor is zero — "no cooldown" has to be reachable).
@@ -9777,6 +9899,17 @@ func _ghost_hit(hunter: BattleUnit, kind: String, victim: BattleUnit,
 	var gh_armor := victim.effective_armor() * (1.0 - pen)
 	var final := maxi(int(round(raw * (1.0 - gh_armor))), 1)
 	var result: Dictionary = victim.take_hit(final, 0)
+	# BATCH BB §4 — A BODILESS BLOW IS STILL THE HUNTER'S BLOW. AY §0 found this
+	# site booking NOTHING and correctly reported rather than fixed it, which
+	# left a Beastmaster who earned Call of the Wild measured dishonestly. It
+	# resolves the credit exactly the way `_companion_hit` does (`comp_credit`),
+	# so the two sites cannot drift; here the spirit has no body, so the hunter
+	# IS the credit. NO BREAK DAMAGE IS BOOKED because none is dealt — the
+	# `take_hit` above passes a hardcoded pressure of 0, checked at the site
+	# rather than assumed, so there is no `_stat_bd` half to mirror.
+	if not victim.is_hero:
+		var ghost_credit: BattleUnit = hunter
+		_stat("dmg_hero_" + ghost_credit.unit_name, final)
 	_sfx("crit" if is_crit else "hit", -6.0, 1.2)
 	victim.float_text("%d%s" % [final, "!" if is_crit else ""],
 		Color(0.7, 0.85, 1.0), is_crit)
@@ -10022,10 +10155,19 @@ func _perfected_toxin_tick(victim: BattleUnit) -> void:
 	if ps.is_empty() or int(ps.get("turns", 0)) >= 0:
 		return
 	ps["tick"] = int(ps.get("tick", 0)) + pt_h.perfected_toxin
-	var pt_stacks := maxi(int(ps.get("stacks", 1)), 1)
-	victim.update_status("poison", "P%d" % pt_stacks,
+	_perfected_chip(victim, ps)
+
+
+# The chip a PERMANENT poison wears. TWO sites move its numbers — this tick
+# raises the per-stack bite, and Batch BB's Creeping Death stack clause adds a
+# stack — so they share one writer rather than each carrying a copy of the
+# sentence (the drift AX moved the Ruin chip out of `add_status` to avoid).
+func _perfected_chip(victim: BattleUnit, ps: Dictionary) -> void:
+	var per := maxi(int(ps.get("tick", 0)), 1)
+	var stacks := maxi(int(ps.get("stacks", 1)), 1)
+	victim.update_status("poison", "P%d" % stacks,
 		"Perfected Toxin: %d nature damage at the start of\neach turn (%d per stack), and it worsens every turn." % [
-			int(ps["tick"]) * pt_stacks, int(ps["tick"])])
+			per * stacks, per])
 
 
 # Hit and Run: laying a status on an enemy melts the Survivalist away.
@@ -10919,17 +11061,31 @@ func _check_end() -> void:
 		Run.combat_wins += 1
 		for i in heroes.size():
 			# Keep the saved max in sync with talents/runes/scaling so full
-			# heals reach the true maximum — but battle-long gains stay in the
-			# battle. TWO SEPARATE LOANS COME OFF HERE (Batch AW): Tenacity's,
-			# and now Conviction's growth — each is a ONE-FIGHT loan, and hp is
-			# clamped under the restored maximum in the same step (the clampi
-			# below). Without the second one the Devout leaves every battle
-			# permanently larger with nothing crashing to announce it — the
-			# exact failure that got `rot` dropped from Batch AQ. THE FIELDS
-			# STAY SEPARATE: Unkillable also reads tenacity_hp_gained, as "the
-			# pool he brought into the battle", and must not see this one.
+			# heals reach the true maximum — but nothing a single battle did to
+			# max_hp may leave it. `hp` is clamped under the restored maximum in
+			# the same step (the clampi below).
+			#
+			# THREE FIELDS MEET HERE AND THEIR SIGNS DIFFER. STATE THE ORDER
+			# BEFORE TOUCHING THIS LINE — it is the site with a ~127,000 max-HP
+			# runaway in its history (Batch W) and the site that got `rot`
+			# dropped from Batch AQ:
+			#
+			#   tenacity_hp_gained   SUBTRACTED. A one-fight gain, off since W.
+			#                        IT HAS A SECOND CONSUMER — Unkillable's
+			#                        mend reads `max_hp - tenacity_hp_gained` as
+			#                        "the pool he brought into the battle" — so
+			#                        nothing may be folded INTO it.
+			#   conviction_hp_gained SUBTRACTED. A one-fight gain (Batch AW).
+			#   rot_hp_lost          ADDED BACK. A one-fight LOSS (Batch BB §5).
+			#                        The only one of the three with this sign,
+			#                        which is exactly why it is its own field.
+			#
+			# ALL THREE STAY SEPARATE. Two of them happen to cancel arithmetically
+			# in a fight that carries both, and that is a coincidence of the
+			# numbers, not a licence to merge them: they answer different
+			# questions and one of them is read somewhere else.
 			var save_max: int = heroes[i].max_hp - heroes[i].tenacity_hp_gained \
-				- heroes[i].conviction_hp_gained
+				- heroes[i].conviction_hp_gained + heroes[i].rot_hp_lost
 			# The Untouched refuse to stay down: the fallen return at 20% HP.
 			Run.party[i]["hp"] = clampi(maxi(heroes[i].hp, int(save_max * 0.2)),
 				1, save_max)

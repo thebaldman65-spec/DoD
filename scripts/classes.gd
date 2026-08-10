@@ -164,13 +164,27 @@ const SPEC_POOLS := {
 	"swordmaster": ["Sweeping Strikes", "Shatterpoint", "Lunge", "Execute"],
 	# Mage. Batch AR re-specced Flame Shield into IMMOLATE, which reads
 	# Overburn and so can only ever be a spec pick.
-	"pyromancer": ["Immolate", "Firestorm"],
-	"cryomancer": ["Rime", "Shatter"],
+	#
+	# ASHES OF AL'AR IS IN ALL THREE MAGE POOLS (Batch BB §6), AND THAT IS A
+	# CORRECTION TO THE BRIEF RATHER THAN A LIBERTY. §6 says the ability "joins
+	# CLASS_POOLS["mage"]" and calls that one array entry; it IS one array entry
+	# and it is made below — but **BATCH AN §4 RETIRED THE CLASS DRAW**, and
+	# `award_ability_pick` has read `roll_spec_ability_offer` (SPEC POOLS ONLY)
+	# ever since. `CLASS_POOLS` still resolves and nothing reads it, so the
+	# class-pool entry ALONE would have given the ability a home no boss can
+	# reach — an unearnable answer to a homelessness thread, which is not what
+	# §6 asked for. The entry the LIVE draw needs is a spec-pool one per Mage
+	# spec; the class-pool entry is made as instructed and stands ready for the
+	# day the class draw reopens. "Any Mage may earn it" is the design either
+	# way, and re-opening the class draw is a live change to how every one of
+	# the twelve specs is offered abilities — far past this section's scope.
+	"pyromancer": ["Immolate", "Firestorm", "Ashes of Al'ar"],
+	"cryomancer": ["Rime", "Shatter", "Ashes of Al'ar"],
 	# Batch AT: STABILIZE joins the pool — it left the opening three because it
 	# is the escape hatch from the escalation, and earning it back is the right
 	# shape for a safety valve. Every entry here reads Resonance, so none of
 	# them can ever be class-pool-eligible (AH's curation rule).
-	"arcanist": ["Overcharge", "Magi's Wrath", "Stabilize"],
+	"arcanist": ["Overcharge", "Magi's Wrath", "Stabilize", "Ashes of Al'ar"],
 	# Cleric. The Mercy/Faith spenders can only ever be spec picks — a sibling
 	# has no stacks to pay them with. BATCH AV: RESURRECTION LEFT THIS POOL
 	# because it joined her opening kit — a boss cannot offer what she starts
@@ -206,9 +220,16 @@ const CLASS_POOLS := {
 	# so it fails the curation rule that a class-pool entry must FUNCTION for
 	# a sibling. Pyroblast is a Pyromancer tree node and is deliberately NOT
 	# listed: its bonus reads a Burn the taker cannot apply.
+	# BATCH BB §6: ASHES OF AL'AR TAKES THE SLOT FLAME SHIELD LEFT, putting the
+	# pool back at twelve. It passes AH's curation rule cleanly — a self-revive
+	# reads nothing but the taker's own health, so it FUNCTIONS for any Mage —
+	# and it is the designer's answer to the homeless-ability thread AR opened.
+	# It is EARNABLE, never default: the Pyromancer can have his escape hatch
+	# back only by spending a boss pick on it, which is a choice against his own
+	# spine rather than the hole AR deliberately left.
 	"mage": ["Flamewave", "Firestorm", "Razor Ice", "Blizzard",
 		"Ice Lance", "Rime", "Arcane Barrage", "Mana Shield", "Arcane Surge",
-		"Reality Fracture", "Phoenix Rebirth"],
+		"Reality Fracture", "Phoenix Rebirth", "Ashes of Al'ar"],
 	"cleric": ["Heal", "Renewal", "Divine Shield", "Consecrated Ground",
 		"Blessing of Zeal", "Sacred Resolve", "Bulwark of Fortitude", "Bewitch",
 		"Dark Pact", "Mind Flay", "Mass Hysteria", "Dawnbreak", "Sanctuary",
@@ -317,6 +338,30 @@ static func vault_ability(display_name: String) -> Ability:
 				"cost": 15, "special": "mana_shield", "delay": 2.0, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "Initiative cost 1.5 instead of 2",
 				"description": "50% of damage taken converts into\nMana (3 turns)."})
+		# BATCH BB §6 — ASHES OF AL'AR GETS A HOME, AND IT NEEDED A WRAPPER.
+		# The batch brief calls this "one array entry"; IT IS NOT, and the
+		# difference is worth stating rather than quietly absorbing. Ashes of
+		# Al'ar has never been an Ability — it was a Pyromancer TALENT, a passive
+		# guard in `unit.take_hit` / `unit.take_tick_damage`, and AR removed the
+		# node with every other defensive option in that spec. A CLASS_POOLS
+		# entry has to resolve through `pool_ability` to an Ability, so putting
+		# the self-revive Mage-wide means authoring the cast that arms it.
+		#
+		# THAT IS EXACTLY THE VAULT'S OWN PRECEDENT (Batch AH): seven of the ten
+		# entries below "needed a cost/cooldown/initiative wrapper around effects
+		# the handler already defines exactly, and THOSE NUMBERS ARE NEW". The
+		# guard is live and untouched in unit.gd; the cost, the initiative and
+		# the return share are this batch's one balance judgement, flagged here
+		# rather than buried.
+		#
+		# ARMING IT COSTS A TURN, and for the Pyromancer that is the point: the
+		# spec whose spine is having no escape hatch can buy one back only by
+		# spending a boss pick AND a turn he would rather spend burning.
+		"Ashes of Al'ar":
+			return Ability.make({"display_name": "Ashes of Al'ar", "cost": 30,
+				"special": "ashes", "delay": 2.5, "anim": "attack03", "cooldown": 0,
+				"perfect_id": "", "perfect_text": "Returns at 40% health instead of 25%",
+				"description": "Wreathe yourself in embers: the next\nblow that would kill you this battle\nreturns you at 25% health instead.\nOnce per battle."})
 		"Arcane Surge":
 			return Ability.make({"display_name": "Arcane Surge", "cost": 15,
 				"special": "surge", "delay": 3.0, "anim": "attack03", "cooldown": 3,

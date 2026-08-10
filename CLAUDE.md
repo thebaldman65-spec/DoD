@@ -194,6 +194,104 @@ every enemy permanently Poisoned), Plague Bearer (rot leaps enemy to enemy), Cre
 (a corpse passes its stacks to the living) and the NAME Virulence (a pathogen term). SNARES
 and GUERILLA were never disease and are untouched by the rule.
 
+BATCH BB (08-09) — CLEARING THE DECK. Six repairs carried over from the twelve spec batches.
+NO spec re-authored, NO magnitude retuned, NO tree touched; every id survives, NO SAVE VERSION
+MOVES (still v7).
+§3 **THE NUMBER, FIRST, BECAUSE IT IS WHY THE BATCH EXISTS. `ruin_report_line()`, 40-run line,
+Ruin lane rows 1-7, threshold 10: `trash 0.07 (n=566, deepest mark 31) | boss 0.60 (n=25,
+deepest mark 18)`.** Against AX's **trash 0.00 (n=519, deepest 10) | boss 0.13 (n=23, deepest
+12)** and AY's **trash 0.06 (n=774, deepest 20) | boss 0.35 (n=52, deepest 32)**. **TRASH IS
+NOT ZERO AND THE THREAD CLOSES: §3's own condition for escalating to the *first detonation at
+5, every 10 after* variant was "if trash is still zero", and it is not.** THAT VARIANT REMAINS
+UNSHIPPED AND IS STILL NOT TO BE TAKEN ON A BATCH'S OWN INITIATIVE. **NO CHANGE SHIPPED OFF
+THIS MEASUREMENT.** Read the boss half as the real movement (0.13 → 0.35 → 0.60) and the trash
+half as flat-but-alive. **TWO HONEST CAVEATS: §3's premise was HALF STALE** — AY §8 did print
+both halves, but only into CLAUDE.md's AY block; **the CHANGELOG never carried the number,
+which is what §3 was really asking for and what this batch's entry fixes** — and **this row
+was measured with Rot in the bargain pool** (the bot took it 0.60/run), which AX's and AY's
+rows could not have, so it is a 20-modifier row against two 19-modifier ones.
+§1 **THE PACK'S SWAP RULE REVERTED TO BATCH Q'S** — see the standing rule below; AY's
+"replaces the older" was a regression and is named as one so it cannot be "fixed" back.
+§2 **CREEPING DEATH GAINED ITS SECOND CLAUSE** (stack a permanent poison, refresh a clocked
+one; the stack half governed once per enemy per turn) — see the standing rule below.
+§4 **`_ghost_hit` BOOKS ITS DAMAGE NOW.** AY §0 reported Call of the Wild's bodiless blows
+crediting nothing and correctly left it; BB credits them through the SAME resolution
+`_companion_hit` uses (`comp_credit` / `ghost_credit`, both behind `if not victim.is_hero`),
+so the two sites cannot drift. **NO BREAK HALF EXISTS TO MIRROR — VERIFIED AT THE SITE rather
+than assumed: `_ghost_hit` calls `take_hit(final, 0)`, a hardcoded pressure of zero.** It is a
+trophy ability, so this changes NO balance; it changes whether a Beastmaster who earned Call
+of the Wild is measured honestly.
+§5 **ROT, REINSTATED AT SEVERITY 4** — see the victory-sync standing rule below. AQ's stated
+target of four severity-4 modifiers is met (pool 20, counts 6/6/4/4).
+**ONE READ VERIFIED RATHER THAN TRUSTED, AND THE BRIEF WAS SLIGHTLY WRONG: §5 says the
+percentage effects reading `max_hp` "are all ratios, so they scale correctly". THREE OF THE
+FOUR ARE** — Unkillable's mend is `(max_hp - tenacity_hp_gained) * 8%/rank`, Conviction's
+growth is 3% of a base captured from the halved maximum, the Mercy window is a ratio.
+**TENACITY IS NOT: it adds a FLAT +15 max HP per Heavy Plating block**, so under Rot it claws
+back a slightly LARGER share of a smaller pool. Nothing absurd and nothing near AQ's feared
+runaway, so it ships untouched — but the paragraph should not be repeated as written.
+§6 **ASHES OF AL'AR GOT ITS HOME, AND THE BRIEF'S "one array entry" WAS NOT ONE.** It has
+never been an Ability — it was a Pyromancer TALENT, a passive guard in `unit.take_hit` /
+`take_tick_damage` — and a pool entry must resolve through `Classes.pool_ability` to an
+Ability. So the batch authored **the wrapper, exactly on AH's vault precedent** (seven of the
+ten vault entries "needed a cost/cooldown/initiative wrapper around effects the handler
+already defines exactly, and THOSE NUMBERS ARE NEW"): **30 Mana, 2.5 initiative, no cooldown,
+self-cast, `special: "ashes"`; the next lethal blow this battle returns him at 25% health
+(perfect 40%), once per battle.** THE COST OF A TURN IS THE POINT for the spec built on having
+no escape hatch. **AND THE SECOND CORRECTION IS THE LOAD-BEARING ONE: `CLASS_POOLS` HAS BEEN
+DEAD SINCE BATCH AN §4** — `award_ability_pick` reads `roll_spec_ability_offer`, i.e. SPEC
+pools only — so the class-pool entry alone would have been an unearnable answer to a
+homelessness thread. **It is in `CLASS_POOLS["mage"]` as instructed (back to twelve) AND in
+all three Mage SPEC_POOLS, which is what the live boss draw reads.** Re-opening the class draw
+was NOT done: that is a live change to how all twelve specs are offered abilities.
+FIELD CHANGES: `rot_hp_lost` (new), `ashes_ranks` → **`ashes_return`** (a real magnitude, the
+% returned, replacing a `randf() < 0.11 * ranks` roll that had NO WRITER AT ALL since AR), and
+`battle._turns_taken` promoted from a local to a field. **`unit._ashes_guard()` is ONE
+implementation with TWO callers** — the clause was written out twice before, which is what let
+the copies be re-pointed independently. **REMOVING THE OLD `randf()` SHIFTS NO RNG SEQUENCE**:
+that draw sat behind `ashes_ranks > 0`, which nothing could make true (the AQ draw-order
+gotcha, checked rather than assumed).
+VERIFIED: check_parse 0, check_flow 0 (6 screens), run-harness gates 1/2/3 PASS.
+11 scenes 0 SCRIPT ERROR. NEW test_batch_bb.gd **172/0**.
+Regression: ah **5587/0 (was 5410 — STAMP GATE bumped BA -> BB, and the count ROSE because
+its offer battery walks every pool entry: the Pyromancer's and the Cryomancer's spec pools
+went 2 -> 3, so their offers went from two entries to three, 40 trials apiece)**,
+ah_battle 65/0, ai 2036/0,
+an **6052/0 (was 6047 — the `rot is not in the pool` assertion INVERTS rather than
+disappearing: what a later batch could break is not "rot came back" but "rot came back without
+its guard", and test_batch_bb owns that half; the modifier count reads off `MODIFIERS.size()`
+now so it cannot drift again)**, aj 403/0, ak **527/0 (was 523 — pool entries)**,
+al **559/0 (was 556 — same)**, ar **887/0 (was 885 — same)**, as 387/0,
+at **461/0 (was 460 — same)**, au **335/0 (was 334 — same)**, av 315/0, aw 338/0, ax 329/0,
+ay **455/0, TWO CHECKS RE-POINTED IN PLACE with the reason in the file** (see the swap rule
+above — the bot check now reads `_swap_victim`, and `_live_swap_replaces_older` is
+`_live_swap_replaces_shallower`: INVERTED, not deleted, with its SETUP byte-identical because
+that setup is still the one that tells the two rules apart), az 489/0, ba 647/0,
+test_runes 2973/0, test_rune_battle 96/0.
+NEGATIVE CONTROLS RUN, the three §8 named plus one of its own, each applied to the code and
+reverted: **the swap taking the deeper bond trips 5, Rot's reduction persisting onto the party
+member trips 7, Creeping Death stacking once per STATUS rather than once per turn trips 5, and
+dropping `_ghost_hit`'s credit trips 4.**
+KIT SMOKE, fixed lineup, 40 battles/row, 0 SCRIPT ERROR both rows: a Beastmaster row with The
+Pack forced reads **27% damage share (170/battle), deepest Loyalty 8, two beasts standing on
+61% of hunter turns**; a Survivalist VENOM row with Creeping Death AND Perfected Toxin reads
+**30% (209/battle), breadth 1.94, most seen 7**. Kit-mechanics ratios ONLY; NO difficulty
+signal (Batch R).
+LIVE AUTOPLAY clean (0 SCRIPT ERROR) and **§2 READS CORRECTLY IN A REAL FIGHT**: "Poison on
+Orc Raider (x1 — 2 nature dmg/turn, battle-long)" climbing to x3, then "Creeping Death: the
+venom in Orc Raider bites deeper (x4)" ... "(x5)" ... "(x6)" — once a turn, on two different
+enemies independently. **A BOT SWAP DID NOT OCCUR IN ANY SMOKE, and that is the §7 margin
+rule working rather than a gap**: it needs both slots full, both beasts alive, and the
+incoming boon worth 1.25x the outgoing one. The rule is driven directly in test_batch_bb
+instead (three live checks plus the bot's pricing), which is where a rare branch belongs.
+NO DIFFICULTY MEASUREMENT AND NO SIM ROW beyond §3's instrument row — same as
+AJ/AK/AL/AR/AS/AT/AU/AV/AW/AX/AY/AZ/BA.
+REPORTED NOT ACTED ON: **TENACITY'S FLAT +15 UNDER ROT** (see §5 above), and **ASHES OF AL'AR
+IS A CAST, NOT A PASSIVE** — §6 describes a self-revive the Pyromancer "can have back", and
+the pool machinery can only carry an ability, so arming it costs a turn. If the designer wants
+the passive shape instead, the honest home is a RELIC (§6's own named alternative), and
+reversing this section is four array entries plus one vault case.
+
 BATCH BA (08-09) — THE SURVIVALIST: ATTRITION THROUGH CRAFT. **LAST OF THE TWELVE — EVERY
 TALENT TREE IN THE GAME IS NOW PURPOSE-AUTHORED.** One spec only; the other eleven trees and
 enemy tuning UNTOUCHED. Every one of his 24 ids survives and re-specs in place, NO SAVE
@@ -4375,18 +4473,20 @@ Space or left click; no announcer text (combat log only).
   "structurally correct, numerically weak" is no longer true of anything. The open work that
   used to hide behind it is the per-spec AU §1 GENERIC FALLBACKS (below) and authored
   content in the ability-upgrade pool — neither is a magnitude question.
-- DEATH RAY CARRIES NO BREAK DAMAGE (Batch AT, STILL OPEN AFTER AU). AT's brief
-  specified Mana, initiative, cooldown, damage, target count and the gate
-  precisely and said nothing about BD, so it ships at pressure 0 rather than
-  have a number invented for it. **AU §3 was offered a version that fixed it by
-  trading raw damage for pressure and that option was NOT taken**, so a 55-Mana
-  nuke still contributes nothing to the party's Break. One field in the
-  Arcanist's kit either way; it is the designer's call, not a batch's.
-- ASHES OF AL'AR HAS NOWHERE TO LIVE (Batch AR). The Pyromancer's self-revive
-  was removed with every other defensive option, deliberately, and its id now
-  carries an unrelated node. If the designer wants it back it belongs Mage-wide
-  or on a relic — putting it in a Pyromancer lane re-opens the escape hatch AR
-  closed.
+- **DEATH RAY'S ABSENT BREAK DAMAGE IS CLOSED (Batch BB §7) — THE DESIGNER CLOSED IT
+  DELIBERATELY AND IT MUST STOP RESURFACING AS AN OPEN QUESTION.** It carries no BD, at
+  55 Mana, on purpose. AT specified everything but BD, AU was offered a version trading
+  raw damage for pressure and declined it, and BB struck the thread. **Do not re-record
+  it as outstanding and do not propose the fix unsolicited.**
+- **ASHES OF AL'AR HAS A HOME (CLOSED BY BATCH BB §6, the designer's own call).** It is
+  Mage-wide and EARNABLE: `CLASS_POOLS["mage"]` (back to twelve entries) **and all three
+  Mage SPEC_POOLS, which is where the live boss draw actually reads** — Batch AN §4
+  retired the class draw, so a class-pool entry alone would have been unreachable. AR's
+  rule survives untouched: **the Pyromancer still has no defensive option anywhere in his
+  KIT OR TREE**, and test_batch_ar's `_no_defence` asserts exactly those two places. He
+  can buy the escape hatch back only by spending a boss pick and a turn on it. The field
+  is `ashes_return` (a REAL magnitude — the % of max health handed back — not the old
+  `randf() < 0.11 * ranks` roll), one guard `BattleUnit._ashes_guard()`, two callers.
 - THE RUNE OF THE WHITE FLAME HAS AN INERT CLAUSE (Batch AR). "Inferno Master
   grants +1% per burning enemy" has no counterpart under Overburn; the rune is
   left as authored and test_batch_ar pins the clause inert. Re-authoring it is
@@ -4421,8 +4521,46 @@ Space or left click; no announcer text (combat log only).
   a floor, not a finished design. test_batch_au's floor is `generic >= 9` and FALLS on
   purpose, with a durable per-class half beside it (a spec whose batch has landed must owe
   NO generics).
-- SEVERITY 4 HOLDS THREE MODIFIERS, not the four AQ's table asked for: `rot`
-  was dropped over the max-HP save sync (see the AQ block). Reinstating it is
-  one field (`mod_max_hp_lost`, written at the stamp, added back at the
-  victory sync beside `tenacity_hp_gained`) plus its authoring — a deliberate
-  decision, not a leftover.
+- **SEVERITY 4 HOLDS FOUR MODIFIERS AGAIN — `rot` SHIPPED IN BATCH BB §5.** The pool is
+  twenty (6/6/4/4). Do not re-record it as dropped.
+- **THE VICTORY SYNC NOW HAS THREE FIELDS MEETING AT ONE LINE AND THEIR SIGNS DIFFER.
+  READ THIS BEFORE TOUCHING IT — IT IS THE SITE WITH A ~127,000 MAX-HP RUNAWAY IN ITS
+  HISTORY (Batch W) AND THE SITE THAT GOT `rot` DROPPED FROM AQ.** Both syncs
+  (battle.gd's victory branch AND run_sim.gd's `on_battle_end`) compute:
+  `max_hp - tenacity_hp_gained - conviction_hp_gained + rot_hp_lost`.
+  · **`tenacity_hp_gained` — SUBTRACTED.** A one-fight gain, off since W. **IT HAS A
+    SECOND CONSUMER**: Unkillable's mend reads `max_hp - tenacity_hp_gained` as "the pool
+    he brought into the battle", so NOTHING may be folded into it.
+  · **`conviction_hp_gained` — SUBTRACTED.** A one-fight gain (AW).
+  · **`rot_hp_lost` — ADDED BACK.** A one-fight LOSS (BB §5). The only one with this
+    sign, which is exactly why it is its own field.
+  **ALL THREE STAY SEPARATE.** Two of them cancel arithmetically in a battle carrying
+  both; that is a coincidence of the numbers, not a licence to merge. test_batch_bb's
+  three-fields-one-sync check drives a Devout growing, a Warden's Tenacity growing and
+  Rot active in ONE battle with DELIBERATELY DIFFERENT magnitudes, so a sign error cannot
+  hide inside a cancellation.
+- **THE PACK'S SWAP RULE IS BATCH Q'S AND MUST NOT BE "FIXED" BACK (Batch BB §1).** A
+  summon at capacity replaces the beast holding **LESS Loyalty**, tie-breaking to the
+  older; one implementation, `battle._swap_victim`, read by `_do_summon` AND the bot.
+  **AY's "replaces the older of the two" was a REGRESSION, not a design** — AY is the
+  batch that removed Loyalty's ceiling and measured a bond 50 stacks deep, so an age rule
+  can break a 50-stack partnership for a fresh arrival inside the spec whose spine is
+  partnership DEPTH. AY's stated reason ("the newcomer always holds the lowest Loyalty")
+  does not survive the site: **the newcomer is not on the field yet when the victim is
+  chosen.** What the age rule really bought was the ability to rotate a deep bond OUT,
+  and refusing that is the point. Batch Q's **never-two-of-the-same-kind** clause is
+  untouched and covers the swap clones too (`_ability_usable` slices the kind off the
+  display name, so "Swap Ursus" and "Summon Ursus" hit the same gate).
+- **CREEPING DEATH HAS TWO CLAUSES AND ONLY ONE OF THEM IS GOVERNED (Batch BB §2).**
+  Perfected Toxin makes his poison permanent and a poison with no clock has no duration
+  to refresh, so Venom row 5 + the Venom capstone owned a node that could never fire.
+  **On a permanent poison the node ADDS A STACK; on a clocked one it refreshes.** Both
+  halves read the `full` stamp `_apply_poison` leaves (`full < 0` = permanent), not a
+  constant of their own. **THE STACK CLAUSE IS LIMITED TO ONCE PER ENEMY PER TURN AND THE
+  REFRESH CLAUSE MUST NEVER GAIN THAT LIMIT**: the node fires on ANY status landing on a
+  poisoned enemy, and since BA one Distillate cast lands poison + Exposed + Slowed
+  together — refreshing three times is refreshing once, but adding three stacks is not
+  adding one. The governor's marker rides the STATUS (`creep_turn`), so it dies with the
+  poison and is per-enemy for free. **`battle._turns_taken` was PROMOTED FROM A LOCAL to
+  a field for it**, because `_run_battle` cannot be driven headlessly and a governor
+  keyed on a local inside it could never be tested.

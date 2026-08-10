@@ -398,7 +398,15 @@ var seeding_ranks := 0        # no node: Seeding Embers
 var seeding_consumed := false
 var melt_ranks := 0           # no node: Melt Armor
 var melted := 0.0             # armor shredded off THIS unit by Melt Armor
-var ashes_ranks := 0          # no node: Ashes of Al'ar
+# ASHES OF AL'AR (Batch BB §6). It was a Pyromancer talent until AR removed
+# every defensive option from that spec, and its field sat here with NO WRITER
+# AT ALL — kept, gated `> 0`, waiting for a home. It has one now: the ability of
+# the same name in `CLASS_POOLS["mage"]`, earnable by any Mage from a boss.
+# `ashes_return` HOLDS A REAL MAGNITUDE (the percentage of maximum health handed
+# back) rather than the old rank count behind a `randf() < 0.11 * ranks` roll —
+# the additive form every batch since AR has used, and the roll had no business
+# sitting behind a cast that costs a turn and a boss pick.
+var ashes_return := 0         # Ashes of Al'ar: % of max HP the phoenix returns at
 var ashes_used := false       # the phoenix rises once per battle
 var scorched_ranks := 0       # no node: Scorched Earth
 var living_flame_ranks := 0   # no node: Living Flame
@@ -691,6 +699,17 @@ var faith_stacks := 0         # Conviction: per-ALLY Faith (0-5)
 # whenever a Devout stands beside him.
 var conviction_hp_gained := 0 # battle-long growth (excluded from the run save)
 var conviction_base_hp := 0   # the base the 3% reads, captured at first release
+# BATCH BB §5 — ROT'S LEAK GUARD, AND THE SIGN IS THE OPPOSITE OF THE TWO ABOVE.
+# The severity-4 bargain HALVES maximum health for both parties; without a guard
+# the victory sync would write the halved maximum onto the party member and a
+# one-fight bargain would cost half the party's HP for the rest of the run —
+# exactly why Batch AQ authored `rot`, implemented it, and dropped it.
+#
+# THREE FIELDS NOW MEET AT THAT ONE SITE AND THEIR SIGNS DIFFER. The sync ADDS
+# this one back and SUBTRACTS the other two; `tenacity_hp_gained` is subtracted
+# and additionally has the second consumer named above. Do not fold any of the
+# three into another — see the block at battle.gd's victory branch.
+var rot_hp_lost := 0          # Rot: max HP taken for one fight (added back at the sync)
 var communion_ranks := 0      # Communion: (N x their own stacks)% to spread
 var faithful_step := 0        # Blessed are the Faithful: +N pts on the 15% heal
 var devoutness_ranks := 0     # Devoutness: party-wide BD cut, percentage POINTS
@@ -824,6 +843,24 @@ func _holy_reversal() -> void:
 		hp = maxi(int(max_hp * MARTYRDOM_RETURN), 1)
 		float_text("MARTYRDOM", Color(0.95, 0.9, 0.55), true)
 		martyrdom_cb.call(self)
+
+
+# ASHES OF AL'AR — the phoenix refuses the grave, once per battle. ONE
+# IMPLEMENTATION, TWO CALLERS (take_hit and take_tick_damage), so a tick death
+# is refused exactly as an attack death is. It was written out twice before
+# Batch BB gave the ability a home; the duplication is what let the two copies
+# be re-pointed independently, so they share a function now.
+#
+# IT SITS ABOVE `_holy_reversal` AT BOTH CALLERS AND THAT ORDER IS AV'S: a
+# unit's OWN saves answer first, and the Holy Cleric's net is the party's last.
+func _ashes_guard() -> void:
+	if hp != 0 or ashes_return <= 0 or ashes_used:
+		return
+	ashes_used = true
+	hp = maxi(int(max_hp * 0.01 * ashes_return), 1)
+	float_text("REBORN IN ASH", Color(1.0, 0.6, 0.2), true)
+	_proc_log("Ashes of Al'ar — %s rises from the ashes (%d%% HP)" % [
+		unit_name, ashes_return])
 
 
 func _proc_log(text: String) -> void:
@@ -1837,13 +1874,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		hp = 1
 		float_text("UNDYING RAGE", Color(0.95, 0.25, 0.2), true)
 		_proc_log("Capstone: Undying Rage — %s refuses to die (1 HP; the rage ends)" % unit_name)
-	# Ashes of Al'ar: the phoenix may refuse the grave (once per battle).
-	if hp == 0 and ashes_ranks > 0 and not ashes_used \
-			and randf() < 0.11 * ashes_ranks:
-		ashes_used = true
-		hp = maxi(int(max_hp * 0.25), 1)
-		float_text("REBORN IN ASH", Color(1.0, 0.6, 0.2), true)
-		_proc_log("Talent: Ashes of Al'ar — %s rises from the ashes (25%% HP)" % unit_name)
+	_ashes_guard()
 	_holy_reversal()
 	if resource_name == "Rage":
 		resource = mini(resource + 10, max_resource)
@@ -1975,12 +2006,7 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 		hp = 1
 		float_text("UNDYING RAGE", Color(0.95, 0.25, 0.2), true)
 		_proc_log("Capstone: Undying Rage — %s refuses to die (1 HP; the rage ends)" % unit_name)
-	if hp == 0 and ashes_ranks > 0 and not ashes_used \
-			and randf() < 0.11 * ashes_ranks:
-		ashes_used = true
-		hp = maxi(int(max_hp * 0.25), 1)
-		float_text("REBORN IN ASH", Color(1.0, 0.6, 0.2), true)
-		_proc_log("Talent: Ashes of Al'ar — %s rises from the ashes (25%% HP)" % unit_name)
+	_ashes_guard()
 	_holy_reversal()
 	# Blood Frenzy v2: tick-driven dives bank their floor too.
 	if passive_id == "bloodrage" and not dead:

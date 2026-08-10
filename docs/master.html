@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-09 (Batch BA)</b></p>
+<p align="right"><b>Last updated: 2026-08-09 (Batch BB)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -109,7 +109,7 @@ same way: one safe option, two gambles</b>. The floor &mdash; at least one optio
 wounded party is never cornered.</p>
 <p>The reward pays <b>on victory</b>: the modifier is the price, and the reward is what
 clearing the fight under it bought.</p>
-<p><b>The pool is 19, weighted low.</b> Because the safe slot on every card is served by the
+<p><b>The pool is 20, weighted low.</b> Because the safe slot on every card is served by the
 1&ndash;2 pool alone, that is the end a run actually sees repeatedly &mdash; so it is the end
 that is authored deepest.</p>
 <table border="1" cellpadding="4">
@@ -142,7 +142,15 @@ tick.</td></tr>
 both sides.</td></tr>
 <tr><td>Mirrorbound</td><td>4</td><td>A quarter of the damage you deal comes back on
 you.</td></tr>
+<tr><td>Rot</td><td>4</td><td>Everyone's maximum health is halved, on both sides. It lasts the
+fight and no longer.</td></tr>
 </table>
+<p><b>Rot is not excluded from anything that reads maximum health.</b> Unkillable's mend, the
+below-half Mercy window, Conviction's growth and the Devout's whole kit are ratios of the
+maximum, so they all scale with the smaller pool &mdash; consistent with every other modifier
+that binds both parties, and the reason Rot sits at severity 4. The halving lasts the fight
+and is undone when it ends: nothing a bargain does to maximum health may follow the party out
+of the battle that charged for it.</p>
 <table border="1" cellpadding="4">
 <tr><th>Severity</th><th>Reward (one of these, rolled)</th></tr>
 <tr><td>1</td><td>40 gold</td></tr>
@@ -750,9 +758,9 @@ talent has already granted is never offered again.</p>
 <tr><td><b>Berserker</b></td><td>Bloodlust, Wildstrikes, Hack and Slash</td><td>Blood Price, Battle Shout, Rampage</td></tr>
 <tr><td><b>Warden</b></td><td>Mocking Blow, Crushing Blow, Shieldwall</td><td>War Stomp, Interpose, Hold the Line, Retaliation</td></tr>
 <tr><td><b>Swordmaster</b></td><td>Overpower, Pommel Strike, Guard Change</td><td>Sweeping Strikes, Shatterpoint, Lunge, Execute</td></tr>
-<tr><td><b>Pyromancer</b></td><td>Detonation, Wildfire, Flamewave</td><td>Immolate, Firestorm</td></tr>
-<tr><td><b>Cryomancer</b></td><td>Razor Ice, Blizzard, Ice Lance</td><td>Rime, Shatter</td></tr>
-<tr><td><b>Arcanist</b></td><td>Arcane Cannon, Arcane Barrage, Death Ray</td><td>Overcharge, Magi's Wrath, Stabilize</td></tr>
+<tr><td><b>Pyromancer</b></td><td>Detonation, Wildfire, Flamewave</td><td>Immolate, Firestorm, Ashes of Al'ar</td></tr>
+<tr><td><b>Cryomancer</b></td><td>Razor Ice, Blizzard, Ice Lance</td><td>Rime, Shatter, Ashes of Al'ar</td></tr>
+<tr><td><b>Arcanist</b></td><td>Arcane Cannon, Arcane Barrage, Death Ray</td><td>Overcharge, Magi's Wrath, Stabilize, Ashes of Al'ar</td></tr>
 <tr><td><b>Holy</b></td><td>Heal, Renewal, Hymn of Hope, Resurrection (four — see §6.3)</td><td>Divine Plea</td></tr>
 <tr><td><b>Devout</b></td><td>Divine Shield, Consecrated Ground, Blessing of Zeal</td><td>Sacred Resolve, Bulwark of Fortitude</td></tr>
 <tr><td><b>Occultist</b></td><td>Hex of Ruin, Bewitch, Dark Pact</td><td>Mind Flay, Mass Hysteria, Umbral Sigil</td></tr>
@@ -765,14 +773,20 @@ abilities plus the class's vaulted ones. <b>Curation rule — an entry has to FU
 sibling.</b> Anything that costs a spec-exclusive secondary resource (Mercy, Faith), reads a
 passive the taker will not have (Burn to consume, Resonance to spend, Loyalty or a living
 beast, the Swordmaster's stance), or is a spec's signature identity piece (the three summons,
-Kill Command, Hex of Ruin) is spec-pool-only.</p>
+Kill Command, Hex of Ruin) is spec-pool-only. <b>The zone-boss draw reads the SPEC pool
+alone</b>; the class pool is the standing statement of what an ability could legally be
+offered to, and it is what a re-opened class draw would read.</p>
 <table border="1" cellpadding="4">
 <tr><th>Class</th><th>Class pool (earnable by all three specs)</th></tr>
 <tr><td><b>Warrior</b></td><td>Bloodlust, Wildstrikes, Hack and Slash, Blood Price, Battle Shout, Rampage, Mocking Blow, Crushing Blow, War Stomp, Shieldwall, Interpose, Hold the Line, Overpower, Pommel Strike, Shatterpoint, Sweeping Strikes, Execute, Rallying Shout</td></tr>
-<tr><td><b>Mage</b></td><td>Flamewave, Firestorm, Razor Ice, Blizzard, Ice Lance, Rime, Arcane Barrage, Mana Shield, Arcane Surge, Reality Fracture, Phoenix Rebirth</td></tr>
+<tr><td><b>Mage</b></td><td>Flamewave, Firestorm, Razor Ice, Blizzard, Ice Lance, Rime, Arcane Barrage, Mana Shield, Arcane Surge, Reality Fracture, Phoenix Rebirth, Ashes of Al'ar</td></tr>
 <tr><td><b>Cleric</b></td><td>Heal, Renewal, Divine Shield, Consecrated Ground, Blessing of Zeal, Sacred Resolve, Bulwark of Fortitude, Bewitch, Dark Pact, Mind Flay, Mass Hysteria, Dawnbreak, Sanctuary, Divine Wrath</td></tr>
 <tr><td><b>Hunter</b></td><td>Hunter's Instinct, Mark of the Hunt, Aimed Shot, Powershot, Hold Breath, Quick Draw, Triple Shot, Pinning Shot, Called Shot, Tripwire, Shrapnel Charge, Snare Trap, Explosive Shot, Venom Coating, Hamstring, Deadfall, Harvest</td></tr>
 </table>
+<p><b>Ashes of Al'ar</b> &mdash; 30 Mana, 2.5 initiative, no cooldown, self-cast: wreathe
+yourself in embers and the next blow that would kill you this battle returns you at 25% of
+maximum health instead (Perfect: 40%). Once per battle. It is the Mage class's only refusal of
+death, and it is earned rather than given.</p>
 <p><b>The action bar past nine.</b> Abilities 1–9 keep Q/W/E/R/A/S/D/F/G; ability 10 onward
 binds to <b>Shift + the same key in the same order</b> (10 = Shift+Q, 11 = Shift+W, …), and
 the button carries the modifier in its label ("[⇧Q] Blood Price"). Shift hotkeys obey every
@@ -894,7 +908,9 @@ does not, so over-lighting the field is how he loses: one enemy at 3 turns is 3 
 for +6%, a full field at 20 burn-turns is 20 Mana a turn for +40% against a Mage's regen of
 22 (treading water, and unable to bank Detonation's 25), and at 24 he is going backwards.
 The spec chip shows both live numbers — the bonus he is being paid and the Mana his next
-turn will cost. He has NO defensive option anywhere in kit or tree; that is the spec.<br>
+turn will cost. He has NO defensive option anywhere in kit or tree; that is the spec &mdash;
+the one door back is <b>Ashes of Al'ar</b>, which every Mage can EARN from a zone boss, so
+buying his escape hatch back costs him a pick he could have spent on fire.<br>
 His core Magic Bolt is reforged into <b>Fireball</b> — free, 20% Atk fire / 15 BD / 2.0,
 no cd, applies 3 turns of Burn (Perfect: hits at 25% of Attack). It stays free, so he can
 always light more — including when that is the wrong move.<br>
@@ -1351,7 +1367,7 @@ build lands three distinct statuses.</p>
 <tr><td>2</td><td><b>Coated Blades</b> — Your basic attack applies Poison for 2 turns and Cripple for 2 turns.</td><td><b>Quick Rigging</b> — Snare Trap&#x27;s cooldown is reduced by 2, and its spring also applies Cripple.</td><td><b>Hit and Run</b> — Whenever you apply a status to an enemy, you gain Elusive for 2 turns.</td></tr>
 <tr><td>3</td><td><b>Distillate</b> — Your Poison applications add +2 extra stacks and apply Exposed for 3 turns.</td><td><b>Cruel Devices</b> — Your traps deal +50% damage.</td><td><b>Scavenger</b> — Restore 25% maximum Mana whenever an enemy dies.</td></tr>
 <tr><td>4</td><td><b>Slow Acting</b> — Your Poison deals HALF damage but lasts TWICE as long, cannot be cleansed, and applies Slowed for 3 turns.</td><td><b>Snap Shut</b> — Tripwire also retaliates against RANGED attackers, not only melee.</td><td><b>Field Medic</b> — At the start of your turn, cleanse 2 debuffs from random allies.</td></tr>
-<tr><td>5</td><td><b>Creeping Death</b> — Applying any status to a Poisoned enemy refreshes its Poison to full duration.</td><td><b>Caught Fast</b> — Enemies caught by your traps cannot be healed for 5 turns.</td><td><b>Vulture</b> — +60% damage against enemies afflicted by 3 or more different statuses.</td></tr>
+<tr><td>5</td><td><b>Creeping Death</b> — Applying any status to a Poisoned enemy refreshes its Poison to full duration &mdash; or, if that Poison is permanent, adds a stack instead (once per enemy per turn).</td><td><b>Caught Fast</b> — Enemies caught by your traps cannot be healed for 5 turns.</td><td><b>Vulture</b> — +60% damage against enemies afflicted by 3 or more different statuses.</td></tr>
 <tr><td>6</td><td><b>Necrosis</b> — Poisoned enemies take +35% damage from ALL sources, not just yours.</td><td><b>Bone Breaker</b> — Your traps apply 90 Break damage when they spring.</td><td><b>Ghillie Suit</b> — Enemies are 65% less likely to target you while another ally lives.</td></tr>
 <tr><td>7</td><td><b>Quartermaster</b> — Your allies&#x27; basic attacks also apply your Poison.</td><td><b>Deadfall Network</b> — You may have THREE traps active at once.</td><td><b>Improvised</b> — The first 2 abilities you use each fight do not start their cooldowns.</td></tr>
 <tr><td>CAP</td><td><b>Perfected Toxin</b> — Your Poison cannot be cleansed, never expires, and its tick rises by 2 each turn it persists.</td><td><b>The Whole Forest</b> — Tripwire never expires and bites on EVERY enemy action — melee, ranged, or spellwork.</td><td><b>Force of Nature</b> — Trapper&#x27;s bonus rises to +20% per different status — and applies to your ENTIRE party&#x27;s damage.</td></tr>
@@ -1366,7 +1382,7 @@ build lands three distinct statuses.</p>
 <tr><td>5</td><td><b>Steadfast Bond</b> — A beast&#x27;s death returns 100% of its Loyalty rather than halving it — the meter survives it whole.</td><td><b>Menagerie</b> — Every beast summoned this fight keeps its Pack Bond boon at 50% strength while it is away.</td><td><b>Symbiosis</b> — Whenever your companion strikes, you restore 6% maximum Mana.</td></tr>
 <tr><td>6</td><td><b>Ancient Pact</b> — The Pack Bond boon&#x27;s growth per Loyalty stack DOUBLES — but the beast can no longer be healed by ANY source, Spirit Bond and Hunter&#x27;s Instinct included.</td><td><b>No Beast Left</b> — A beast&#x27;s death makes your next 2 summons cost no Mana and ignore their cooldown, and each arriving beast enters at 5 Loyalty.</td><td><b>Vengeance</b> — When a beast dies you take its Pack Bond boon at FULL strength for the rest of the battle, rather than for a few turns — and deal +30% damage while it holds.</td></tr>
 <tr><td>7</td><td><b>Lone Bond</b> — One beast per fight: it cannot be swapped and cannot be re-summoned if it dies — but it arrives at 6 Loyalty and gains DOUBLE thereafter. It also closes The Pack: you can never field two.</td><td><b>Wild Rotation</b> — Swap Companion has no cooldown and arrival effects ALWAYS fire. Loyalty caps at 3.</td><td><b>Lone Hunter</b> — While no beast stands, your abilities cost 50% less and you deal +30% damage.</td></tr>
-<tr><td>CAP</td><td><b>One Soul</b> — You and every beast you field share one health pool — all damage to any of you divides evenly between you. Loyalty gain is doubled.</td><td><b>The Pack</b> — TWO beasts may be active at once: both strike when you attack, each keeps its own Loyalty meter, and BOTH Pack Bond boons apply at FULL strength. Swapping replaces the OLDER of the two. Lone Bond closes this door.</td><td><b>Apex Predator</b> — Quick Shot triggers an ADDITIONAL free companion strike, and Kill Command&#x27;s cooldown resets whenever an enemy dies.</td></tr>
+<tr><td>CAP</td><td><b>One Soul</b> — You and every beast you field share one health pool — all damage to any of you divides evenly between you. Loyalty gain is doubled.</td><td><b>The Pack</b> — TWO beasts may be active at once: both strike when you attack, each keeps its own Loyalty meter, and BOTH Pack Bond boons apply at FULL strength. Swapping replaces whichever of the two holds LESS Loyalty &mdash; the deeper bond always keeps its place. Lone Bond closes this door.</td><td><b>Apex Predator</b> — Quick Shot triggers an ADDITIONAL free companion strike, and Kill Command&#x27;s cooldown resets whenever an enemy dies.</td></tr>
 </table>
 <p><b>Occultist</b> — <b>RUIN</b> (the mark: stack it, blow it, chain it) · <b>MADNESS</b> (enemies turned on each other — <b>every effect in the lane is REFUSED by a boss until it is Broken</b>, which is not a hole but a two-step plan: Broken Will and Entropy exist to grind the meter, then the madness lands) · <b>LEECH</b> (suffering into sustain: Holy restores, the Devout prevents, the Occultist siphons)</p>
 <table border="1" cellpadding="4">

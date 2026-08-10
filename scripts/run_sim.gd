@@ -518,11 +518,14 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 	run.combat_wins += 1
 	for i in battle.heroes.size():
 		var h = battle.heroes[i]
-		# Same clamp as the real branch: battle-long Tenacity gains stay in
-		# the battle, and the fallen return at 20% HP.
-		# Conviction's growth (Batch AW) comes back off here too — it is a
-		# one-fight loan, not permanent bulk. See battle.gd's victory branch.
-		var save_max: int = h.max_hp - h.tenacity_hp_gained - h.conviction_hp_gained
+		# Same clamp as the real branch, and the SAME THREE FIELDS WITH THE
+		# SAME SIGNS: Tenacity's and Conviction's battle-long GAINS come off
+		# (both one-fight loans), and Rot's battle-long LOSS goes back on
+		# (Batch BB §5 — the opposite sign, which is why it is its own field).
+		# The ordering and the reason for keeping all three apart are stated in
+		# full at battle.gd's victory branch; this site must never drift from it.
+		var save_max: int = h.max_hp - h.tenacity_hp_gained - h.conviction_hp_gained \
+			+ h.rot_hp_lost
 		run.party[i]["hp"] = clampi(maxi(h.hp, int(save_max * 0.2)), 1, save_max)
 		run.party[i]["max_hp"] = save_max
 		if h.resource_name == "Mana":

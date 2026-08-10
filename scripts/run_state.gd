@@ -1093,16 +1093,19 @@ func item_full(id: String) -> bool:
 # THE POOL IS WEIGHTED LOW, DELIBERATELY. Every offer's first draw comes from
 # the severity 1-2 pool, so the safe slot on every card all run is served by
 # that pool alone; the harsh end already rotates and the low end is what
-# actually repeats. Counts: 6 / 6 / 4 / 3 across severities 1-4.
+# actually repeats. Counts: 6 / 6 / 4 / 4 across severities 1-4.
 #
-# SEVERITY 4 IS THREE, NOT THE FOUR THE BATCH ASKED FOR. `rot` (max HP halved
-# for everyone) was authored, implemented, and DROPPED — see the changelog.
-# The battle-end save sync writes `heroes[i].max_hp` straight back onto the
-# party member, so a HALVED max HP survived the fight that charged for it and
-# cost the party half its health for the rest of the run. Undoing that needs a
-# seventh new BattleUnit field read at the sync, which is over the batch's
-# stated field budget; the batch's own instruction for that case is to drop it
-# and say so.
+# SEVERITY 4 IS FOUR AGAIN (Batch BB §5). `rot` — maximum health halved for
+# everyone — was authored by AQ, implemented, and DROPPED there: the battle-end
+# save sync writes `heroes[i].max_hp` straight back onto the party member, so a
+# HALVED maximum survived the fight that charged for it and would have cost the
+# party half its health for the rest of the run. AQ recorded the fix it needed
+# (one field, added back at the victory sync) and Batch AW then BUILT EXACTLY
+# THAT PATTERN FOR THE OPPOSITE SIGN — `conviction_hp_gained` accumulates growth
+# and the sync subtracts it. `rot_hp_lost` accumulates the reduction and the
+# sync ADDS it back. Both victory syncs carry all three fields now, and the
+# ordering is stated at each of them because this is the site with a five-figure
+# max-HP runaway in its history (Batch W).
 const MODIFIERS := {
 	"overgrown": {"name": "Overgrown", "severity": 1,
 		"desc": "Both parties begin the fight at 70% health."},
@@ -1146,6 +1149,9 @@ const MODIFIERS := {
 		"desc": "Every hit opens a wound. All attacks add 15 Bleed, on both sides."},
 	"mirrorbound": {"name": "Mirrorbound", "severity": 4,
 		"desc": "A quarter of the damage you deal comes back on you."},
+	# ---- severity 4 (Batch BB §5, AQ's authored fourth) ----
+	"rot": {"name": "Rot", "severity": 4,
+		"desc": "Everyone's maximum health is halved, on both sides. It lasts the fight and no longer."},
 }
 
 # The reward table reads severity and nothing else. Each entry is the list
