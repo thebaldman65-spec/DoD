@@ -31,8 +31,15 @@ extends SceneTree
 const REAL_SAVE := "user://run_save.bin"
 
 # §2's design numbers, in one place.
-const BASE_MITIGATION := 3      # % per stack
-const BASE_DAMAGE := 2          # % per stack
+# BATCH BI §1 RE-POINTED THE TWO MAGNITUDES AND EVERY CHECK BELOW THAT READS
+# THEM. They fell 3 -> 2 and 2 -> +1.5 because the held value now reads the
+# battle's PEAK Faith rather than the current count, and a peak that ratchets to
+# five and stays there pays roughly double what a low average count paid. The
+# QUESTIONS this suite asks are unchanged — the capstone doubles the held half,
+# the doubling follows the carrier, the release still consumes — so the suite is
+# re-pointed in place rather than replaced. Floats, because +1.5% is not an int.
+const BASE_MITIGATION := 2.0    # % per stack (Batch BI §1: was 3)
+const BASE_DAMAGE := 1.5        # % per stack (Batch BI §1: was 2)
 const APOSTLE_MULT := 2
 const STACKS := 4               # the deepest an ally can CARRY — five releases
 # Casts per measured rate. Damage rolls uniform ±10% (SD 5.8% of the mean), so
@@ -194,6 +201,10 @@ func _neutral(scene: Node) -> void:
 		u.hp = u.max_hp
 		u.second_resource = 0
 		u.faith_stacks = 0
+		# BATCH BI §1: the PEAK is what the two damage sites read now, and it
+		# never falls on its own — so a measurement arm that did not clear it
+		# would carry the previous arm's stacks into this one's control.
+		u.faith_peak = 0
 		u.remove_status("faith")
 		u.purge_debuffs()
 
@@ -208,6 +219,7 @@ func _damage_dealt(scene: Node, carrier: BattleUnit, stacks: int) -> float:
 		_neutral(scene)
 		foe.hp = foe.max_hp
 		carrier.faith_stacks = stacks
+		carrier.faith_peak = stacks   # Batch BI §1: the read site reads the peak
 		await scene.call("_resolve", carrier, carrier.abilities[0], foe, "good")
 	return _stat_of(scene, key)
 
@@ -224,6 +236,7 @@ func _damage_taken(scene: Node, carrier: BattleUnit, stacks: int) -> float:
 		_neutral(scene)
 		carrier.hp = carrier.max_hp
 		carrier.faith_stacks = stacks
+		carrier.faith_peak = stacks   # Batch BI §1: the read site reads the peak
 		await scene.call("_resolve", foe, ab, carrier, "good")
 		total += float(carrier.max_hp - carrier.hp)
 	return total
@@ -238,9 +251,9 @@ func _the_capstone_describes_the_held_half() -> void:
 	ok(not n.is_empty(), "§2: dv_apostle is still in the Faith lane at row 8")
 	var d: String = String(n.get("desc", ""))
 	ok(d.contains("%d%%" % (BASE_MITIGATION * APOSTLE_MULT)),
-		"§2: the capstone states 6% mitigation per stack")
+		"§2: the capstone states its doubled mitigation per stack (now 4%)")
 	ok(d.contains("+%d%%" % (BASE_DAMAGE * APOSTLE_MULT)),
-		"§2: ...and +4% damage dealt per stack")
+		"§2: ...and its doubled damage dealt per stack (now +3%)")
 	ok(not d.to_lower().contains("no longer consume"),
 		"§2: ...and it no longer promises releases that consume nothing")
 	# The id, the lane and the payload field all survive, so no save migrates.
@@ -292,8 +305,10 @@ func _one_multiplier_one_gate() -> void:
 		"§2: one definition and three callers — two damage sites and the chip (found %d)" % \
 			src.count("_faith_stack_mult("))
 	# The base rates are constants, not literals scattered across the sites.
-	ok(src.contains("const FAITH_MITIGATION_PCT := %d" % BASE_MITIGATION)
-			and src.contains("const FAITH_DAMAGE_PCT := %d" % BASE_DAMAGE),
+	# BATCH BI §1: both are FLOATS now (+1.5% is not an integer, and "%d" would
+	# have shipped it as 1), so the literal is matched rather than "%d"-rendered.
+	ok(src.contains("const FAITH_MITIGATION_PCT := 2.0")
+			and src.contains("const FAITH_DAMAGE_PCT := 1.5"),
 		"§2: the two base rates are named constants")
 	ok(not src.contains("0.03 * strike_target.faith_stacks")
 			and not src.contains("0.02 * attacker.faith_stacks"),
@@ -308,14 +323,25 @@ func _the_chip_and_the_passive_name_the_doubling() -> void:
 	var bsrc := _src("res://scripts/battle.gd")
 	var i := bsrc.find("\"faith\": [\"Faith\"")
 	ok(i > 0, "§2: the Faith status default is findable")
-	var chip := bsrc.substr(i, 260)
-	ok(chip.contains("Apostle"),
-		"§2: the Faith status default names Apostle as the doubler")
+	# BATCH BI §1 RE-POINTED BOTH HALVES. BG asked whether these two texts name
+	# APOSTLE as the doubler; BI made the bigger statement about the resource
+	# the one a player meets first — the value is paid on the PEAK, so a release
+	# no longer takes it away — and the status default has 260 characters, not
+	# room for both. The question BG was really asking is "does the player read
+	# the same rule the arithmetic uses", so it is asked of the rule that
+	# CHANGED. The capstone's own doubling is still named in the passive block
+	# below, and is checked on `dv_apostle`'s own text further up.
+	var chip := bsrc.substr(i, 400)
+	ok(chip.contains("HIGHEST count held this battle") \
+			and chip.contains("the peak keeps paying"),
+		"§2/BI: the Faith status default states the peak rule")
 	var csrc := _src("res://scripts/classes.gd")
 	var j := csrc.find("\"passive_desc\": \"Conviction:")
 	ok(j > 0, "§2: the Devout's passive block is findable")
-	ok(csrc.substr(j, 400).contains("doubled by Apostle"),
-		"§2: ...and the passive block names it too")
+	ok(csrc.substr(j, 600).contains("Apostle adds another 1x"),
+		"§2: ...and the passive block names Apostle's share of the multiplier")
+	ok(csrc.substr(j, 600).contains("HIGHEST COUNT HELD THIS BATTLE"),
+		"§2/BI: ...and the peak rule as well")
 
 
 # ---------- live: the two rates, measured end to end ----------
@@ -350,7 +376,7 @@ func _live_mitigation_doubles() -> void:
 	ok(absf(got_ap - want_ap) < BAND,
 		"§2: four stacks WITH Apostle take %.0f%% less (read %.1f%%)" % [
 			100.0 * (1.0 - want_ap), 100.0 * (1.0 - got_ap)])
-	_report.append("mitigation at 4 stacks over %d hits: plain %.1f%% less | Apostle %.1f%% less (want 12 / 24)" % [
+	_report.append("mitigation at 4 stacks over %d hits: plain %.1f%% less | Apostle %.1f%% less (want 8 / 16 at BI rates)" % [
 		HITS, 100.0 * (1.0 - got_plain), 100.0 * (1.0 - got_ap)])
 	_live_ran += 1
 
@@ -382,7 +408,7 @@ func _live_damage_dealt_doubles() -> void:
 	ok(absf(got_ap - want_ap) < BAND,
 		"§2: four stacks WITH Apostle deal +%.0f%% (read +%.1f%%)" % [
 			100.0 * (want_ap - 1.0), 100.0 * (got_ap - 1.0)])
-	_report.append("damage dealt at 4 stacks over %d casts: plain +%.1f%% | Apostle +%.1f%% (want 8 / 16)" % [
+	_report.append("damage dealt at 4 stacks over %d casts: plain +%.1f%% | Apostle +%.1f%% (want 6 / 12 at BI rates)" % [
 		HITS, 100.0 * (got_plain - 1.0), 100.0 * (got_ap - 1.0)])
 	_live_ran += 1
 
@@ -401,20 +427,29 @@ func _live_release_still_consumes() -> void:
 	ally.faith_stacks = 0
 	ally.hp = maxi(ally.max_hp / 2, 1)
 	scene.get("sim_stats").clear()
-	scene.call("_gain_faith", ally, 5)
+	scene.call("_gain_faith", ally, 5, "absorb")
 	ok(ally.faith_stacks == 0,
 		"§2: a release under Apostle RESETS the ally (left at %d)" % ally.faith_stacks)
 	ok(ally.faith_stacks != 5,
 		"§2: NEGATIVE CONTROL — the ally is not parked at five")
-	ok(not ally.has_status("faith"),
-		"§2: ...and the chip is gone with the stacks")
+	# BATCH BI §1 INVERTED THIS CHECK RATHER THAN DELETING IT, which is the
+	# honest treatment when a batch reverses a rule an older one guarded. BG
+	# asked whether the chip goes with the stacks; the PEAK keeps paying after a
+	# release now, so a chip that vanished would hide a live benefit — the
+	# player would see nothing on the bar and still be taking 10% less damage.
+	# The chip therefore STAYS, at zero stacks, stating the peak.
+	ok(ally.has_status("faith"),
+		"§2/BI: ...and the chip STAYS, because the peak keeps paying")
+	ok(String(ally.get_status("faith").get("short", "")) == "F0",
+		"§2/BI: ...showing a count of zero (got \"%s\")" % \
+			String(ally.get_status("faith").get("short", "")))
 	ok(_stat_of(scene, "faith_releases") == 1.0,
 		"§2: one release banked, not a stream (%.0f)" % _stat_of(scene, "faith_releases"))
 	# And the stream itself: under the old node, five further gains meant five
 	# further releases. Now they rebuild from zero and pay once.
 	scene.get("sim_stats").clear()
 	for _i in 5:
-		scene.call("_gain_faith", ally, 1)
+		scene.call("_gain_faith", ally, 1, "absorb")
 	ok(_stat_of(scene, "faith_releases") == 1.0,
 		"§2: five single gains from zero pay ONE release, not five (%.0f)" % \
 			_stat_of(scene, "faith_releases"))
@@ -428,7 +463,7 @@ func _live_release_still_consumes() -> void:
 	scene = await _spawn({"dv_apostle": 1, "dv_oath": 1})
 	ally = scene.get("heroes")[0]
 	ally.faith_stacks = 0
-	scene.call("_gain_faith", ally, 5)
+	scene.call("_gain_faith", ally, 5, "absorb")
 	ok(ally.faith_stacks == 0,
 		"§2: a release resets to ZERO, Binding Oath or no (left at %d)" % ally.faith_stacks)
 	_report.append("release under Apostle leaves %d stacks (was 5); with Binding Oath, also 0" % 0)
@@ -443,13 +478,16 @@ func _live_the_chip_states_the_doubled_numbers() -> void:
 	var scene := await _spawn({"dv_apostle": 1})
 	var ally: BattleUnit = scene.get("heroes")[0]
 	ally.faith_stacks = 0
-	scene.call("_gain_faith", ally, STACKS)
+	# BATCH BI §1: the chip prints what the PEAK pays, so the peak has to be
+	# cleared with the count or a previous test's five would be rendered here.
+	ally.faith_peak = 0
+	scene.call("_gain_faith", ally, STACKS, "absorb")
 	var s: Dictionary = ally.get_status("faith")
 	var desc := String(s.get("desc", ""))
-	ok(desc.contains("%d%% damage" % (BASE_MITIGATION * APOSTLE_MULT * STACKS)),
-		"§2: the chip at four stacks reads 24%% mitigation (got \"%s\")" % desc)
-	ok(desc.contains("+%d%% damage dealt" % (BASE_DAMAGE * APOSTLE_MULT * STACKS)),
-		"§2: ...and +16%% damage dealt")
+	ok(desc.contains("%d%% damage mitigation" % (BASE_MITIGATION * APOSTLE_MULT * STACKS)),
+		"§2: the chip at four stacks reads its doubled mitigation (got \"%s\")" % desc)
+	ok(desc.contains("+%d%%" % (BASE_DAMAGE * APOSTLE_MULT * STACKS)),
+		"§2: ...and its doubled damage dealt")
 	ok(String(s.get("short", "")) == "F%d" % STACKS,
 		"§2: ...and the visible text is still the stack count")
 	await _kill(scene)
@@ -457,10 +495,11 @@ func _live_the_chip_states_the_doubled_numbers() -> void:
 	scene = await _spawn()
 	ally = scene.get("heroes")[0]
 	ally.faith_stacks = 0
-	scene.call("_gain_faith", ally, STACKS)
+	ally.faith_peak = 0
+	scene.call("_gain_faith", ally, STACKS, "absorb")
 	desc = String(ally.get_status("faith").get("desc", ""))
-	ok(desc.contains("%d%% damage" % (BASE_MITIGATION * STACKS)),
-		"§2: without Apostle the same chip reads 12%% (got \"%s\")" % desc)
+	ok(desc.contains("%d%% damage mitigation" % (BASE_MITIGATION * STACKS)),
+		"§2: without Apostle the same chip reads the undoubled rate (got \"%s\")" % desc)
 	await _kill(scene)
 	_live_ran += 1
 
@@ -482,7 +521,7 @@ func _live_communion_still_rolls_for_the_carrier() -> void:
 	# comes out eligible. Under the old capstone he would sit at five and
 	# Communion would skip him forever after.
 	ally.faith_stacks = 0
-	scene.call("_gain_faith", ally, 5)
+	scene.call("_gain_faith", ally, 5, "absorb")
 	ok(ally.faith_stacks < 5,
 		"§2: an ally who has released is below five again (at %d)" % ally.faith_stacks)
 	var fired := 0
@@ -494,7 +533,7 @@ func _live_communion_still_rolls_for_the_carrier() -> void:
 		ally.faith_stacks = STACKS
 		var before := _stat_of(scene, "faith_releases")
 		war.faith_stacks = 0
-		scene.call("_gain_faith", war, 5)
+		scene.call("_gain_faith", war, 5, "absorb")
 		# The advance takes the ally to five, which RELEASES — so the release
 		# counter is the only honest witness at four stacks (BF's rule).
 		if _stat_of(scene, "faith_releases") - before >= 2.0:
@@ -529,7 +568,9 @@ func _live_the_doubling_follows_the_carrier_not_the_devout() -> void:
 		_neutral(scene)
 		foe.hp = foe.max_hp
 		ally.faith_stacks = STACKS
+		ally.faith_peak = STACKS
 		dv.faith_stacks = 0
+		dv.faith_peak = 0
 		await scene.call("_resolve", ally, ally.abilities[0], foe, "good")
 	var carried := _stat_of(scene, "dmg_hero_" + ally.unit_name)
 	# Arm 2 — the stacks are all on the Devout and the ally holds none.
@@ -538,18 +579,20 @@ func _live_the_doubling_follows_the_carrier_not_the_devout() -> void:
 		_neutral(scene)
 		foe.hp = foe.max_hp
 		ally.faith_stacks = 0
+		ally.faith_peak = 0
 		dv.faith_stacks = STACKS
+		dv.faith_peak = STACKS
 		await scene.call("_resolve", ally, ally.abilities[0], foe, "good")
 	var lent := _stat_of(scene, "dmg_hero_" + ally.unit_name)
 
 	var want := 1.0 + 0.01 * BASE_DAMAGE * APOSTLE_MULT * STACKS
 	ok(absf(carried / maxf(bare, 1.0) - want) < BAND,
-		"§2: the ally is paid on HIS OWN stacks with the Devout empty (+%.1f%%, want +16%%)" % \
+		"§2: the ally is paid on HIS OWN stacks with the Devout empty (+%.1f%%, want +12%%)" % \
 			(100.0 * (carried / maxf(bare, 1.0) - 1.0)))
 	ok(absf(lent / maxf(bare, 1.0) - 1.0) < BAND,
 		"§2: NEGATIVE CONTROL — stacks on the DEVOUT pay the ally nothing (%.1f%%)" % \
 			(100.0 * (lent / maxf(bare, 1.0) - 1.0)))
-	_report.append("carrier-keyed check: ally +%.1f%% on his own four | +%.1f%% on the Devout's four (want 16 / 0)" % [
+	_report.append("carrier-keyed check: ally +%.1f%% on his own four | +%.1f%% on the Devout's four (want 12 / 0)" % [
 		100.0 * (carried / maxf(bare, 1.0) - 1.0),
 		100.0 * (lent / maxf(bare, 1.0) - 1.0)])
 	await _kill(scene)

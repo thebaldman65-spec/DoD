@@ -682,7 +682,7 @@ func _negative_control_source() -> void:
 	# BATCH BH §2 STRENGTHENED THIS RATHER THAN RE-POINTING IT. AW's question
 	# was "the drip is not GATED on Fervor"; the drip is not touched by Fervor
 	# at all now, so the check asserts the stronger thing — the flat 1.
-	ok(bsrc.contains("_gain_faith(u, 1)")
+	ok(bsrc.contains("_gain_faith(u, 1, \"ground\")")
 		and not bsrc.contains("devout.fervor_step"),
 		"NEGATIVE CONTROL: the ground's Faith drip is a flat 1, un-gated and un-deepened")
 
@@ -703,7 +703,7 @@ func _live_growth() -> void:
 	dv.conviction_base_hp = 0
 	for i in 10:
 		ally.faith_stacks = 0
-		scene._gain_faith(ally, 5)
+		scene._gain_faith(ally, 5, "absorb")
 	ok(dv.conviction_base_hp == 1000,
 		"the base is captured once, at the first release (got %d)" % dv.conviction_base_hp)
 	ok(dv.max_hp == 1300,
@@ -733,7 +733,7 @@ func _live_growth_heals() -> void:
 	# because of the growth clause — the point being that the dividend arrives
 	# as USABLE health rather than as an empty bar.
 	ally.faith_stacks = 0
-	scene._gain_faith(ally, 5)
+	scene._gain_faith(ally, 5, "absorb")
 	ok(dv.max_hp == 1030, "one release: maximum 1000 -> %d" % dv.max_hp)
 	ok(dv.hp == dv.max_hp,
 		"...and he is healed for the amount granted, so the new bar is FULL (%d/%d)" % [dv.hp, dv.max_hp])
@@ -741,7 +741,7 @@ func _live_growth_heals() -> void:
 	# moving — an empty 30 HP would read as a working clause on a full bar.
 	dv.hp = 500
 	ally.faith_stacks = 0
-	scene._gain_faith(ally, 5)
+	scene._gain_faith(ally, 5, "absorb")
 	ok(dv.max_hp == 1060, "a second release: maximum -> %d" % dv.max_hp)
 	ok(dv.hp >= 530,
 		"...and a wounded Devout genuinely gains the health (500 -> %d)" % dv.hp)
@@ -775,13 +775,13 @@ func _live_apostle_stream() -> void:
 	dv.conviction_hp_gained = 0
 	dv.conviction_base_hp = 0
 	ally.faith_stacks = 0
-	scene._gain_faith(ally, 5)
+	scene._gain_faith(ally, 5, "absorb")
 	ok(ally.faith_stacks == 0,
 		"Batch BG: a release under Apostle consumes the stacks like any other")
 	# Twelve further releases, i.e. a long fight's worth of absorbs — but each
 	# one now costs five gains rather than one, which IS the repair.
 	for i in 12:
-		scene._gain_faith(ally, 5)
+		scene._gain_faith(ally, 5, "absorb")
 	ok(ally.faith_stacks == 0, "...and each of them resets him again")
 	ok(dv.max_hp == 1000 + 13 * 30,
 		"13 releases = +39%% of base at the full step (got +%d%%)" % (
@@ -806,7 +806,7 @@ func _live_victory_sync() -> void:
 	# the two loans are handled at one site and a merge would show up here.
 	for i in 6:
 		warrior.faith_stacks = 0
-		scene._gain_faith(warrior, 5)
+		scene._gain_faith(warrior, 5, "absorb")
 	warrior.max_hp += 45
 	warrior.tenacity_hp_gained += 45
 	var grown: int = dv.max_hp
@@ -862,7 +862,7 @@ func _live_ground_drip() -> void:
 	ok(bsrc.count("func _ground_faith_tick") == 1
 		and bsrc.count("_ground_faith_tick(u)") == 1,
 		"the drip has one implementation and one caller")
-	ok(bsrc.contains("_gain_faith(u, 1)"),
+	ok(bsrc.contains("_gain_faith(u, 1, \"ground\")"),
 		"...and it is a flat 1, which is the whole of AW §2's base kit")
 	await _kill(bare)
 	# BATCH BH §2 RE-POINTED THE SECOND HALF OF THIS CHECK, and INVERTED it

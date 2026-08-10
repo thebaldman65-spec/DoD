@@ -703,6 +703,24 @@ var beacon_ranks := 0         # Beacon: turn-start pulse on the nearly-dead
 # nobody had counted, and closing it is part of §2's job, not a side effect.
 var faith_stacks := 0         # Conviction: Faith (0-5). Allies release at 5;
                               # THE DEVOUT'S OWN HOLD THERE (Batch BH §2).
+# BATCH BI §1 — THE HELD HALF READS THE PEAK, AND THIS FIELD IS WHY THE LANE'S
+# TWO AXES STOP FIGHTING. Fed by ONE meter, releases want it EMPTY and held
+# value wants it FULL, so the second axis BG and BH added to break the
+# compounding was not independent of the release engine — it was antagonistic
+# to it. That is a design fault rather than a magnitude, and it is why BH's
+# leave-one-out grid came back flat with Communion and Binding Oath both
+# dormant.
+# The peak is the highest Faith this unit has held THIS BATTLE. It rises with
+# `faith_stacks` and NEVER falls — a release resets the stacks and leaves the
+# peak standing, so the release stops erasing the held benefit and becomes pure
+# upside. Frequency and depth can both be real at the same time.
+# TWO READ SITES, both in battle.gd's damage pipeline (the mitigation term at
+# the strike-target block and the damage-dealt term at the attacker block), and
+# ONE RESET, `battle._reset_faith_meters()` at battle start, which zeroes it
+# ALONGSIDE the stacks so the two can never drift. Everything else about the
+# meter is unchanged: releases still fire at five, still reset the stacks to
+# zero, still heal.
+var faith_peak := 0           # highest Faith held this battle (never falls)
 # Batch AW §1 — CONVICTION'S THIRD CLAUSE: every Faith release raises the
 # Devout's maximum by 3% of the maximum he brought to the fight. Linear on
 # base, never on current. `conviction_hp_gained` is the LEAK GUARD: the

@@ -516,7 +516,7 @@ func _measure(scene: Node, ally: BattleUnit, stacks: int, by_release: bool) -> f
 		_isolate(scene, ally, stacks)
 		var before := _stat_of(scene, "faith_releases")
 		war.faith_stacks = 0
-		scene.call("_gain_faith", war, 5)
+		scene.call("_gain_faith", war, 5, "absorb")
 		if by_release:
 			if _stat_of(scene, "faith_releases") - before >= 2.0:
 				fired += 1
@@ -577,7 +577,7 @@ func _live_never_rolls_at_five() -> void:
 				h.hp = h.max_hp
 			scene.get("sim_stats").clear()
 			heroes[0].faith_stacks = 0
-			scene.call("_gain_faith", heroes[0], 5)
+			scene.call("_gain_faith", heroes[0], 5, "absorb")
 			worst = maxf(worst, _stat_of(scene, "faith_releases"))
 		ok(worst == 1.0,
 			"§2: a fully parked party banks the driven release and nothing else (worst %.0f)" % worst)
@@ -606,7 +606,7 @@ func _live_guard_is_still_a_reentrancy_lock() -> void:
 				h.hp = h.max_hp
 			scene.get("sim_stats").clear()
 			heroes[0].faith_stacks = 0
-			scene.call("_gain_faith", heroes[0], 5)
+			scene.call("_gain_faith", heroes[0], 5, "absorb")
 			var rel := _stat_of(scene, "faith_releases")
 			worst = maxf(worst, rel)
 			if rel > 1.0:
@@ -623,11 +623,11 @@ func _live_guard_is_still_a_reentrancy_lock() -> void:
 		for _i in 60:
 			_isolate(scene, heroes[1], 4)
 			heroes[0].faith_stacks = 0
-			scene.call("_gain_faith", heroes[0], 5)
+			scene.call("_gain_faith", heroes[0], 5, "absorb")
 			_isolate(scene, heroes[1], 4)
 			var before := _stat_of(scene, "faith_releases")
 			heroes[0].faith_stacks = 0
-			scene.call("_gain_faith", heroes[0], 5)
+			scene.call("_gain_faith", heroes[0], 5, "absorb")
 			if _stat_of(scene, "faith_releases") - before >= 2.0:
 				fired_late += 1
 		ok(fired_late > 0,

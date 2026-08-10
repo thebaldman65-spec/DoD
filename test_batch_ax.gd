@@ -589,7 +589,7 @@ func _fervor_unmoved() -> void:
 	ok(not Talents.desc_for(fervor, 1).contains("per ally per turn"),
 		"...and its text no longer promises a deeper drip")
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
-	ok(bsrc.contains("_gain_faith(u, 1)") and not bsrc.contains("devout.fervor_step"),
+	ok(bsrc.contains("_gain_faith(u, 1, \"ground\")") and not bsrc.contains("devout.fervor_step"),
 		"...the ground pays a flat 1, AW §2's base kit, un-deepened")
 	_report.append("§7 was a NO-OP at AX (Fervor already paid +1). BATCH BH §2 then took "
 		+ "Fervor off the drip entirely; the ground pays 1 with the node or without it.")

@@ -1507,8 +1507,15 @@ const LANE_TREES := {
 		# it doubles are battle.gd constants, so the tooltip states them outright
 		# rather than rendering one and hiding the other (`desc_for` renders a
 		# single {v}).
+		# BATCH BI §1 — THE MAGNITUDES CHANGED UNDER IT AND SO DID THE WAY IT
+		# COMPOSES WITH APOSTLE. Both nodes double the held value; MULTIPLIED
+		# they reach x4, which is the compounding fault this whole arc exists to
+		# remove rebuilt on the new axis. They are ADDITIVE — base 1x, Fervor
+		# +1x, Apostle +1x, so both together are x3 — and the tooltip says
+		# "triple" rather than "quadruple" for that reason. See
+		# `battle._faith_stack_mult`, which is written as a sum on purpose.
 		{"id": "dv_fervor", "name": "Fervor", "ranks": 1, "lane": "Faith", "row": 6,
-			"desc": "While Consecrated Ground holds, every ally standing on it counts each stack of Faith DOUBLE: 6% damage mitigation and +4% damage dealt per stack, up from 3% and +2%. It grants no extra Faith at all. With Apostle the stacks count quadruple.",
+			"desc": "While Consecrated Ground holds, every ally standing on it counts each stack of Faith DOUBLE: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. It grants no extra Faith at all. With Apostle the stacks count TRIPLE: the two nodes ADD to the base rather than multiplying each other.",
 			"payload": {"stat": {"fervor": 1}}},
 		# BATCH BH §2 — THE LARGEST UNTOUCHED AXIS IN THE LANE: THE DEVOUT'S OWN
 		# FAITH. Its old effect (a release leaves a remnant standing) was the
@@ -1591,9 +1598,16 @@ const LANE_TREES := {
 		# HELD and what happens when five RELEASE — and all eight Faith nodes
 		# touch the release half. The held half was the one untouched,
 		# capstone-sized axis in the lane. See battle.gd's `_faith_stack_mult`.
+		# BATCH BI §1 — same two corrections as Fervor: the per-stack figures came
+		# down because the held value now reads the battle's PEAK rather than the
+		# current count (a peak ratchets to five and stays there, so the old
+		# numbers paid roughly double in practice), and the two doublers ADD
+		# rather than multiply. At x3 on a peak of five this is 30% mitigation
+		# and +22.5% damage on every ally while the ground holds — a capstone
+		# plus a row-6 node, and it is meant to be strong.
 		{"id": "dv_apostle", "name": "Apostle", "ranks": 1, "lane": "Faith", "row": 8,
 			"capstone": true,
-			"desc": "Every stack of Faith an ally carries is worth double: 6% damage mitigation and +4% damage dealt per stack, up from 3% and +2%. Releases still consume the stacks.",
+			"desc": "Every stack of Faith an ally carries is worth double: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. Releases still reset the count — and the value is paid on the highest count held this battle, so a release never takes it away.",
 			"payload": {"stat": {"apostle": 1}}},
 		# The counter is the gate AND the magnitude — one field, one read site.
 		{"id": "dv_judgement", "name": "Judgement", "ranks": 1, "lane": "Zeal", "row": 8,

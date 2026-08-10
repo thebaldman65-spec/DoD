@@ -32,10 +32,21 @@ extends SceneTree
 const REAL_SAVE := "user://run_save.bin"
 
 # §2's design numbers, in one place.
-const BASE_MITIGATION := 3      # % per stack, per battle.gd's constant
-const BASE_DAMAGE := 2          # % per stack
-const APOSTLE_MULT := 2
-const FERVOR_MULT := 2
+# BATCH BI §1 RE-POINTED ALL FOUR, AND TWO OF THEM ARE AN INVERSION rather than
+# a re-price. The magnitudes fell (3 -> 2, 2 -> +1.5) because the held value now
+# reads the battle's PEAK Faith rather than the current count, and a peak that
+# ratchets to five pays roughly double what a low average count paid. THE TWO
+# MULTIPLIERS NOW ADD INSTEAD OF MULTIPLYING: BH composed them as a product,
+# reaching x4, and x4 on one term is the compounding fault this arc exists to
+# remove rebuilt on the new axis. Base 1x + Fervor 1x + Apostle 1x = x3.
+# `FERVOR_MULT`/`APOSTLE_MULT` therefore hold what each node ADDS, and the pair
+# is `BOTH_MULT`. The suite's questions are unchanged and it is re-pointed in
+# place; `_live_fervor_and_apostle_quadruple` is renamed for the same reason.
+const BASE_MITIGATION := 2.0    # % per stack, per battle.gd's constant (BI: was 3)
+const BASE_DAMAGE := 1.5        # % per stack (BI: was 2)
+const APOSTLE_MULT := 2         # base 1x + Apostle's 1x
+const FERVOR_MULT := 2          # base 1x + Fervor's 1x
+const BOTH_MULT := 3            # Batch BI §1: ADDITIVE — never 4
 const STACKS := 4
 # Casts per measured rate. See the BG note: a 400-cast sum has an SE of ~0.3%,
 # so the ±2-point bands below are ~5 sigma and cannot flap.
@@ -89,7 +100,7 @@ func _run() -> void:
 	_the_rune_is_repointed()
 
 	await _live_fervor_doubles_the_held_half()
-	await _live_fervor_and_apostle_quadruple()
+	await _live_fervor_and_apostle_are_additive_not_multiplied()
 	await _live_fervor_adds_no_release()
 	await _live_the_ground_drips_a_flat_one()
 	await _live_the_devout_accrues_his_own_faith()
@@ -191,6 +202,9 @@ func _neutral(scene: Node) -> void:
 		u.hp = u.max_hp
 		u.second_resource = 0
 		u.faith_stacks = 0
+		# BATCH BI §1: the damage sites read the PEAK, which never falls on its
+		# own — an arm that left it set would carry into the next arm's control.
+		u.faith_peak = 0
 		u.remove_status("faith")
 		u.remove_status("cons_ground")
 		u.purge_debuffs()
@@ -216,6 +230,7 @@ func _damage_dealt(scene: Node, carrier: BattleUnit, stacks: int,
 			_ground(carrier)
 		foe.hp = foe.max_hp
 		carrier.faith_stacks = stacks
+		carrier.faith_peak = stacks   # Batch BI §1: the read site reads the peak
 		await scene.call("_resolve", carrier, carrier.abilities[0], foe, "good")
 	return _stat_of(scene, key)
 
@@ -233,6 +248,7 @@ func _damage_taken(scene: Node, carrier: BattleUnit, stacks: int,
 			_ground(carrier)
 		carrier.hp = carrier.max_hp
 		carrier.faith_stacks = stacks
+		carrier.faith_peak = stacks   # Batch BI §1: the read site reads the peak
 		await scene.call("_resolve", foe, ab, carrier, "good")
 		total += float(carrier.max_hp - carrier.hp)
 	return total
@@ -544,8 +560,12 @@ func _the_two_nodes_describe_their_new_axes() -> void:
 		"§2: ...and states both doubled magnitudes (6%% and +4%%)")
 	ok(fd.to_lower().contains("no extra faith"),
 		"§2: ...and says outright that it grants no Faith — the frequency claim")
-	ok(fd.to_lower().contains("quadruple"),
-		"§2: ...and names the Apostle stack")
+	# BATCH BI §1 INVERTED THIS. BH asked whether Fervor's text names the
+	# QUADRUPLE it made with Apostle; the two add rather than multiply now, so
+	# the text must say TRIPLE — and must not say quadruple, because a tooltip
+	# promising x4 is exactly the compounding the re-spec removed.
+	ok(fd.to_lower().contains("triple") and not fd.to_lower().contains("quadruple"),
+		"§2/BI: ...and names the Apostle stack as TRIPLE, not quadruple")
 	ok(int((fv.get("payload", {}).get("stat", {}) as Dictionary).get("fervor", 0)) == 1,
 		"§2: Fervor's payload is the `fervor` gate")
 	ok(not (fv.get("payload", {}).get("stat", {}) as Dictionary).has("fervor_step"),
@@ -595,7 +615,7 @@ func _the_deleted_fields_are_gone() -> void:
 		"§2: battle.gd reads neither deleted field")
 	ok(not bsrc.contains("1 + devout.fervor_step"),
 		"§2: the ground's drip no longer adds Fervor to it")
-	ok(bsrc.contains("_gain_faith(u, 1)"),
+	ok(bsrc.contains("_gain_faith(u, 1, \"ground\")"),
 		"§2: ...it is a flat 1 per ally per turn, Batch AW §2's base, unchanged")
 	var tsrc := _src("res://scripts/talents.gd")
 	ok(not tsrc.contains("\"fervor_step\":") and not tsrc.contains("\"oath_ranks\":"),
@@ -624,9 +644,12 @@ func _one_multiplier_two_gates() -> void:
 	# damage site is the mis-write BG's own control exists for, and Fervor adds a
 	# second way to make it: reading the DEVOUT's cons_ground instead of the
 	# holder's would double everybody whenever he stood on his own ground.
-	ok(bsrc.contains("_faith_stack_mult(fd_dv, attacker) * attacker.faith_stacks"),
-		"§2: the damage site values the ATTACKER's stacks under the ATTACKER's ground")
-	ok(bsrc.contains("_faith_stack_mult(fp_dv, strike_target) * strike_target.faith_stacks"),
+	# BATCH BI §1: both sites read `faith_peak` now — the highest count held this
+	# battle — but the CARRIER-KEYED question BH asked is untouched and is what
+	# these two still check.
+	ok(bsrc.contains("_faith_stack_mult(fd_dv, attacker) * attacker.faith_peak"),
+		"§2: the damage site values the ATTACKER's Faith under the ATTACKER's ground")
+	ok(bsrc.contains("_faith_stack_mult(fp_dv, strike_target) * strike_target.faith_peak"),
 		"§2: the mitigation site values the TARGET's")
 	ok(bsrc.contains("holder.has_status(\"cons_ground\")"),
 		"§2: Fervor's gate reads the HOLDER's ground, never the Devout's")
@@ -695,9 +718,14 @@ func _live_fervor_doubles_the_held_half() -> void:
 	_live_ran += 1
 
 
-# FERVOR AND APOSTLE COMPOSE TO QUADRUPLE. The two gates multiply; they must not
-# take the larger, and they must not sum.
-func _live_fervor_and_apostle_quadruple() -> void:
+# BATCH BI §1 — FERVOR AND APOSTLE COMPOSE TO TRIPLE, AND THIS IS THE NEGATIVE
+# CONTROL THE BATCH MOST NEEDS: a PRODUCT would pass every other check in this
+# file. BH had them multiply to x4; x4 on one term is the compounding fault the
+# whole arc exists to remove, rebuilt on the held axis. They add — base 1x,
+# Fervor +1x, Apostle +1x — so they must not take the larger (x2) and must not
+# multiply (x4). The two arms are 8 mitigation points apart at four stacks, so
+# the ±2.5 band cannot confuse them.
+func _live_fervor_and_apostle_are_additive_not_multiplied() -> void:
 	var scene := await _spawn({"dv_fervor": 1, "dv_apostle": 1})
 	var ally: BattleUnit = scene.get("heroes")[0]
 	var base_off := await _damage_taken(scene, ally, 0, false)
@@ -707,15 +735,21 @@ func _live_fervor_and_apostle_quadruple() -> void:
 	var cut_off := 100.0 * (1.0 - off / base_off)
 	var cut_on := 100.0 * (1.0 - on / base_on)
 	var want_off := float(BASE_MITIGATION * APOSTLE_MULT * STACKS)
-	var want_on := float(BASE_MITIGATION * APOSTLE_MULT * FERVOR_MULT * STACKS)
-	_report.append("§2 Fervor + Apostle at %d stacks: off the ground %.1f%% (want %.0f), on it %.1f%% (want %.0f)"
+	var want_on := float(BASE_MITIGATION * BOTH_MULT * STACKS)
+	_report.append("§2 Fervor + Apostle at %d stacks: off the ground %.1f%% (want %.0f), on it %.1f%% (want %.0f — x3, NOT x4)"
 		% [STACKS, cut_off, want_off, cut_on, want_on])
 	ok(absf(cut_off - want_off) < 2.0,
 		"§2: Apostle alone still doubles to %d%% (measured %.1f%%)"
 			% [BASE_MITIGATION * APOSTLE_MULT, cut_off])
 	ok(absf(cut_on - want_on) < 2.5,
-		"§2: the two QUADRUPLE on the ground — %d%% a stack (measured %.1f%%)"
-			% [BASE_MITIGATION * APOSTLE_MULT * FERVOR_MULT, cut_on])
+		"§2/BI: the two TRIPLE on the ground — %.1f%% a stack, not %.1f%% (measured %.1f%%)"
+			% [BASE_MITIGATION * BOTH_MULT, BASE_MITIGATION * 4, cut_on])
+	ok(absf(cut_on - float(BASE_MITIGATION * 4 * STACKS)) > 2.5,
+		"§2/BI: NEGATIVE CONTROL — they do NOT multiply to x4 (measured %.1f%%, x4 would be %.1f%%)"
+			% [cut_on, BASE_MITIGATION * 4 * STACKS])
+	ok(absf(cut_on - float(BASE_MITIGATION * 2 * STACKS)) > 2.5,
+		"§2/BI: ...and they do not take the larger either (x2 would be %.1f%%)"
+			% (BASE_MITIGATION * 2 * STACKS))
 	# The damage half moves with it, on the same gates.
 	var dmg_off := await _damage_dealt(scene, ally, STACKS, false)
 	var dmg_on := await _damage_dealt(scene, ally, STACKS, true)
@@ -723,11 +757,11 @@ func _live_fervor_and_apostle_quadruple() -> void:
 	var d_base_on := await _damage_dealt(scene, ally, 0, true)
 	var up_off := 100.0 * (dmg_off / d_base_off - 1.0)
 	var up_on := 100.0 * (dmg_on / d_base_on - 1.0)
-	_report.append("§2 Fervor + Apostle damage dealt at %d stacks: off %.1f%% (want %d), on %.1f%% (want %d)"
+	_report.append("§2 Fervor + Apostle damage dealt at %d stacks: off %.1f%% (want %.1f), on %.1f%% (want %.1f — x3)"
 		% [STACKS, up_off, BASE_DAMAGE * APOSTLE_MULT * STACKS,
-			up_on, BASE_DAMAGE * APOSTLE_MULT * FERVOR_MULT * STACKS])
-	ok(absf(up_on - float(BASE_DAMAGE * APOSTLE_MULT * FERVOR_MULT * STACKS)) < 2.5,
-		"§2: ...and quadruples the damage half too (measured +%.1f%%)" % up_on)
+			up_on, BASE_DAMAGE * BOTH_MULT * STACKS])
+	ok(absf(up_on - float(BASE_DAMAGE * BOTH_MULT * STACKS)) < 2.5,
+		"§2/BI: ...and TRIPLES the damage half too (measured +%.1f%%)" % up_on)
 	await _kill(scene)
 	_live_ran += 1
 
@@ -788,7 +822,7 @@ func _live_the_devout_accrues_his_own_faith() -> void:
 	_neutral(scene)
 	for i in 3:
 		ally.faith_stacks = 4
-		scene.call("_gain_faith", ally, 1)   # the fifth stack: a release
+		scene.call("_gain_faith", ally, 1, "absorb")   # the fifth stack: a release
 		ok(dv.faith_stacks == i + 1,
 			"§2: ally release %d leaves the Devout holding %d Faith (holds %d)"
 				% [i + 1, i + 1, dv.faith_stacks])
@@ -800,7 +834,7 @@ func _live_the_devout_accrues_his_own_faith() -> void:
 	_neutral(bare)
 	for _i in 3:
 		b_ally.faith_stacks = 4
-		bare.call("_gain_faith", b_ally, 1)
+		bare.call("_gain_faith", b_ally, 1, "absorb")
 	ok(b_dv.faith_stacks == 0,
 		"§2: WITHOUT the node an ally's release swears him nothing (holds %d)"
 			% b_dv.faith_stacks)
@@ -852,7 +886,7 @@ func _live_his_own_faith_never_releases() -> void:
 	# Twenty stacks' worth, one at a time. An ALLY would have released four
 	# times over.
 	for _i in 20:
-		scene.call("_gain_faith", dv, 1)
+		scene.call("_gain_faith", dv, 1, "absorb")
 	ok(dv.faith_stacks == 5,
 		"§2: the Devout's own Faith HOLDS at five (holds %d)" % dv.faith_stacks)
 	ok(_stat_of(scene, "faith_releases") == 0.0,
@@ -875,7 +909,7 @@ func _live_his_own_faith_never_releases() -> void:
 	_neutral(scene)
 	scene.get("sim_stats").clear()
 	for _i2 in 20:
-		scene.call("_gain_faith", ally, 1)
+		scene.call("_gain_faith", ally, 1, "absorb")
 	ok(_stat_of(scene, "faith_releases") == 4.0,
 		"§2: ...while an ALLY's twenty gains release four times (%d)"
 			% int(_stat_of(scene, "faith_releases")))
@@ -890,12 +924,17 @@ func _live_an_ally_release_resets_to_zero() -> void:
 	var ally: BattleUnit = scene.get("heroes")[0]
 	_neutral(scene)
 	ally.faith_stacks = 4
-	scene.call("_gain_faith", ally, 1)
+	scene.call("_gain_faith", ally, 1, "absorb")
 	ok(ally.faith_stacks == 0,
 		"§2: a release resets the ally to ZERO even with Binding Oath (left %d)"
 			% ally.faith_stacks)
-	ok(not ally.has_status("faith"),
-		"§2: ...and the chip goes with it")
+	# BATCH BI §1 INVERTED THIS, as it did BG's identical check. The COUNT goes
+	# to zero; the PEAK does not, and it keeps paying — so a chip that vanished
+	# would hide a live benefit rather than report an empty meter.
+	ok(ally.has_status("faith"),
+		"§2/BI: ...and the chip STAYS, at zero stacks, because the peak pays on")
+	ok(ally.faith_peak == 5,
+		"§2/BI: ...with the peak standing at five (reads %d)" % ally.faith_peak)
 	var bsrc := _src("res://scripts/battle.gd")
 	ok(bsrc.contains("_conviction_growth(devout, true)"),
 		"§2: ...so the growth is always a full step — nothing consumes nothing now")

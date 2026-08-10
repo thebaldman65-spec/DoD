@@ -99,7 +99,7 @@ const STATUS_INFO := {
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge is spent for this\nbattle — the storm has no feeding\nleft in it."],
 	"sanctified": ["Hallowed", "Hw", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
 	"capacitor": ["Holy Capacitor", "HC", Color(0.95, 0.9, 0.6), "Stored overhealing, released by\nthe next Heal."],
-	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith — 3% mitigation and +2%\ndamage per stack (doubled by Apostle);\nat 5 the bearer is healed and the\nFaith resets."],
+	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith, 2 a hit — 2% mitigation\nand +1.5% damage per stack, paid on\nthe HIGHEST count held this battle.\nAt 5 the bearer is healed and the\ncount resets; the peak keeps paying."],
 	"cons_ground": ["Consecrated Ground", "CG", Color(0.9, 0.82, 0.5), "Standing on holy ground: takes 15%\nless damage and reflects 10% of\ndamage taken."],
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
 	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],
@@ -1607,6 +1607,10 @@ func _run_battle() -> void:
 		if zl_h.zealous_mercy > 0 and zl_h.second_resource > 0:
 			_log("Talent: Zealous Light — %s opens with %d Mercy" % [
 				zl_h.unit_name, zl_h.second_resource], "#b0a8e0")
+	# BATCH BI §1 — the Faith meters open at zero, COUNT AND PEAK TOGETHER. It
+	# runs before the opening oath below, which grants Faith. Its own function
+	# for the same standing reason.
+	_reset_faith_meters()
 	# BATCH BH §2 — the Rune of the Binding Oath's re-pointed clause: the Devout
 	# opens the battle with the oath already sworn. Its own function for the
 	# standing reason (`_run_battle` cannot be driven headlessly — the AR trap),
@@ -4997,15 +5001,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Blessing of Zeal: kindled allies strike harder.
 			if attacker.has_status("zeal"):
 				raw *= 1.15
-			# Conviction: each Faith stack sharpens the blade — +2% a stack,
-			# DOUBLED to +4% under Apostle (Batch BG §2) — while the Devout
-			# stands. The multiplier reads the DEVOUT's capstone and the
-			# CARRIER's stacks: the bonus lands on whoever holds the Faith.
-			if attacker.is_hero and attacker.faith_stacks > 0:
+			# Conviction: each Faith stack sharpens the blade — +1.5% a stack,
+			# raised to +3% by Apostle and +4.5% by both it and Fervor (the
+			# multiplier is a SUM, Batch BI §1) — while the Devout stands. It
+			# reads the DEVOUT's capstone and the CARRIER's Faith: the bonus
+			# lands on whoever holds it.
+			# BATCH BI §1 — ONE OF THE TWO SITES THAT READ THE PEAK RATHER THAN
+			# THE CURRENT COUNT. `faith_peak` is the highest Faith this attacker
+			# has held THIS BATTLE, so a release stops erasing the held benefit
+			# it just spent. See `_faith_stack_mult` and unit.gd's field.
+			if attacker.is_hero and attacker.faith_peak > 0:
 				var fd_dv := _living_devout()
 				if fd_dv != null:
 					raw *= 1.0 + 0.01 * FAITH_DAMAGE_PCT \
-						* _faith_stack_mult(fd_dv, attacker) * attacker.faith_stacks
+						* _faith_stack_mult(fd_dv, attacker) * attacker.faith_peak
 			# Dark Infusion: the Occultist feeds on the enemy team's afflictions.
 			if attacker.infusion_ranks > 0:
 				raw *= 1.0 + 0.02 * attacker.infusion_ranks * _unique_enemy_debuffs()
@@ -5397,18 +5406,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 0.85
 				if strike_target.is_hero:
 					_devout_prev(_living_devout(), pv_was - raw, "ground")
-			# Conviction: each Faith stack turns the blade — 3% a stack,
-			# DOUBLED to 6% under Apostle (Batch BG §2) — while the Devout
-			# stands. It still books to HIM (`_devout_prev`), which is why
-			# the capstone can raise his prevented/battle without moving his
-			# `d+h+p%` share much: the damage half lands on his allies and
-			# raises the denominator instead.
-			if strike_target.is_hero and strike_target.faith_stacks > 0:
+			# Conviction: each Faith stack turns the blade — 2% a stack, raised
+			# to 4% by Apostle and 6% by both it and Fervor (the multiplier is
+			# a SUM, Batch BI §1) — while the Devout stands. It still books to
+			# HIM (`_devout_prev`), which is why the capstone can raise his
+			# prevented/battle without moving his `d+h+p%` share much: the
+			# damage half lands on his allies and raises the denominator instead.
+			# BATCH BI §1 — THE SECOND SITE THAT READS THE PEAK. Same rule as the
+			# damage term above: `faith_peak` never falls inside a battle, so the
+			# mitigation a release paid for survives the release.
+			if strike_target.is_hero and strike_target.faith_peak > 0:
 				var fp_dv := _living_devout()
 				if fp_dv != null:
 					var pv_was := raw
 					raw *= 1.0 - 0.01 * FAITH_MITIGATION_PCT \
-						* _faith_stack_mult(fp_dv, strike_target) * strike_target.faith_stacks
+						* _faith_stack_mult(fp_dv, strike_target) * strike_target.faith_peak
 					_devout_prev(fp_dv, pv_was - raw, "stacks")
 			# Iron Will: adversity hardens the Warden — 12%/rank less damage
 			# taken per debuff on him (the chip tracks the live total; the
@@ -8003,8 +8015,18 @@ var _communion_chain := false
 # Apostle now doubles both per-stack terms instead. ONE MULTIPLIER, ONE GATE,
 # THREE CALLERS — the two damage sites and the status chip — so the tooltip can
 # never describe a number the arithmetic does not use.
-const FAITH_MITIGATION_PCT := 3
-const FAITH_DAMAGE_PCT := 2
+#
+# BATCH BI §1 — THE MAGNITUDES COME DOWN BECAUSE PEAK-READING MULTIPLIES THEIR
+# EFFECTIVE VALUE. 3% and +2% were priced against a CURRENT count that averages
+# low; read against a peak that ratchets to five and stays there (`faith_peak`),
+# the same numbers pay roughly double in practice for the rest of every fight.
+# 2% and +1.5% at a peak of five is 10% mitigation and +7.5% damage on each ally
+# PERMANENTLY — comparable to what the current-reading version paid at its best
+# moments, now paid reliably.
+# Both are floats because 1.5 is not an integer and rounding it at the constant
+# would silently ship 1% or 2%; the two read sites multiply into a float anyway.
+const FAITH_MITIGATION_PCT := 2.0
+const FAITH_DAMAGE_PCT := 1.5
 
 
 # What a single Faith stack is worth right now, as a multiplier on the two
@@ -8013,26 +8035,115 @@ const FAITH_DAMAGE_PCT := 2
 #
 # BATCH BH §2 — FERVOR IS THE SECOND MULTIPLIER, AND IT READS THE HOLDER.
 # Apostle doubles every stack everywhere; Fervor doubles the stacks of anyone
-# standing on Consecrated Ground, so the two compose to QUADRUPLE while the
-# ground is up and the node adds no releases at all. `holder` is the unit whose
-# stacks are being valued — the carrier, never the Devout — which is the same
-# distinction BG's own negative control exists for: reading `devout.faith_stacks`
-# here would leave allies at their undoubled rates while every source-level
-# check still passed.
+# standing on Consecrated Ground. `holder` is the unit whose stacks are being
+# valued — the carrier, never the Devout — which is the same distinction BG's
+# own negative control exists for: reading `devout.faith_stacks` here would
+# leave allies at their undoubled rates while every source-level check still
+# passed.
+#
+# BATCH BI §1 — THE TWO ARE ADDITIVE WITH EACH OTHER AND MUST NOT BE MULTIPLIED.
+# BH composed them as a product, which reaches ×4 — and ×4 on one term IS the
+# compounding fault this whole arc exists to remove, rebuilt on a new axis. It
+# is written below as a SUM OF BONUSES on a base of 1 rather than a product of
+# multipliers, deliberately and in this shape, BECAUSE A PRODUCT IS WHAT A LATER
+# BATCH WILL WRITE BY ACCIDENT: `m *= 2` reads like the obvious edit and passes
+# every source-level check in the file. Base 1×, Fervor +1×, Apostle +1× — so
+# both together are ×3, never ×4. test_batch_bi's negative control exists for
+# exactly this line.
 func _faith_stack_mult(devout: BattleUnit, holder: BattleUnit = null) -> int:
 	if devout == null:
 		return 1
-	var m := 2 if devout.apostle > 0 else 1
+	var m := 1
+	if devout.apostle > 0:
+		m += 1
 	if devout.fervor > 0 and holder != null and holder.has_status("cons_ground"):
-		m *= 2
+		m += 1
 	return m
 
 
+# The two constants above, rendered for a tooltip. +1.5% a stack is a real
+# magnitude and "%d" would print it as 1 — the same trap AA's float-into-int
+# note records from the other direction — so a fractional value keeps its
+# decimal and a whole one drops it, rather than every chip reading "10.0%".
+static func _faith_pct_text(v: float) -> String:
+	return ("%.1f" % v) if absf(v - roundf(v)) > 0.01 else ("%d" % int(round(v)))
+
+
+# BATCH BI §1 — THE ONE PLACE THE FAITH CHIP IS RENDERED, and it exists because
+# the peak made a release stop being the end of the status. Before this batch a
+# release removed the chip and that was honest: the stacks were gone and so was
+# everything they paid. NOW THE PEAK KEEPS PAYING, so a removed chip would hide
+# a live benefit — the player would see nothing on the bar and still be taking
+# 10% less damage. The chip therefore survives at zero stacks and prints BOTH
+# numbers, the count and the peak, with the value keyed to the peak.
+func _refresh_faith_chip(u: BattleUnit, devout: BattleUnit) -> void:
+	var mult := _faith_stack_mult(devout, u)
+	var f_tail := "At 5 stacks: healed for %d%% max\nhealth and the count resets —\nthe PEAK keeps paying." % [
+		15 + devout.faithful_step]
+	if u == devout:
+		f_tail = "His own Faith HOLDS — the\ncount never releases."
+	var f_desc := "Conviction: Faith x%d (peak %d) —\n%s%% damage mitigation and +%s%%\ndamage dealt, paid on the PEAK.\n%s" % [
+		u.faith_stacks, u.faith_peak,
+		_faith_pct_text(FAITH_MITIGATION_PCT * mult * u.faith_peak),
+		_faith_pct_text(FAITH_DAMAGE_PCT * mult * u.faith_peak), f_tail]
+	if not u.update_status("faith", "F%d" % u.faith_stacks, f_desc):
+		u.add_status("faith", "Faith", "F%d" % u.faith_stacks,
+			Color(0.98, 0.85, 0.45), -1, f_desc)
+
+
+# BATCH BI §2 — THE ONE DOOR FAITH IS BOOKED THROUGH, on `_devout_heal`'s
+# pattern: the TOTAL and the NAMED TERM are written by the same call, so the
+# parts of the table can never disagree with its sum. The whole point of §2 is
+# that releases sat at 0.4 a battle and nobody could say WHICH source was dry —
+# Conviction's absorbs, the ground's drip, Communion or Sacred Covenant — and
+# BC's lesson is that guessing at a term is how four batches missed.
+# `n` is what the meter ACTUALLY took, computed by the caller as the difference
+# across the assignment, so Zeal's doubling and the cap at five are already in it.
+func _faith_gained(u: BattleUnit, n: int, source: String) -> void:
+	if not sim or n <= 0:
+		return
+	_stat("faith_gained_total", float(n))
+	_stat("faith_gained_" + source, float(n))
+	# Whose meter it landed on, split the one way that matters: the Devout's own
+	# Faith HOLDS and never releases (Batch BH §2), so Faith paid onto him buys
+	# held value only and can never appear as a release. A table that mixed the
+	# two would read as a healthy rate feeding a dry payout.
+	if u == _living_devout():
+		_stat("faith_gained_devout", float(n))
+
+
+# BATCH BI §1 — THE PEAK'S ONE RESET, at battle start and ALONGSIDE THE STACKS.
+# `faith_peak` never falls inside a battle, so the only thing that can lower it
+# is a battle boundary; a peak that survived one would follow a hero out of the
+# fight that raised it and pay for the rest of the run, which is the `rot` /
+# `conviction_hp_gained` leak in a new field. Fresh units make both fields zero
+# by construction today, so this loop is BELT AND BRACES — and it is written as
+# its own function called from the battle-start block for the standing reason
+# (`_run_battle` cannot be driven headlessly, the AR trap), so the negative
+# control "the peak does not survive a battle boundary" can be a real check
+# rather than a grep. It runs BEFORE `_swear_opening_oath`, which grants Faith.
+func _reset_faith_meters() -> void:
+	for h in heroes:
+		h.faith_stacks = 0
+		h.faith_peak = 0
+		h.remove_status("faith")
+
+
 # Conviction: a mitigated hit steels the struck ally. At 5 stacks the
-# ally is healed (Blessed are the Faithful deepens it), Faith resets —
-# unless Binding Oath keeps a remnant — the Devout sips Mana, and
-# Communion may spread the fervor.
-func _gain_faith(u: BattleUnit, n: int) -> void:
+# ally is healed (Blessed are the Faithful deepens it), the COUNT resets — the
+# peak does not (Batch BI §1) — the Devout sips Mana, and Communion may spread
+# the fervor.
+#
+# BATCH BI §2 — EVERY CALLER NAMES ITS SOURCE, and the parameter has no default
+# on purpose: the decomposition is the batch's deliverable and a source that
+# defaults is a source that silently lands in the wrong bucket the next time
+# somebody adds a Faith generator. Four sources were named in the brief
+# (absorbs, the ground's drip, Communion, Sacred Covenant) and TWO MORE EXIST IN
+# THE CODE and are printed beside them rather than folded away: Binding Oath's
+# stack to the Devout and the Rune of the Binding Oath's opening grant. Printing
+# four while six are counted would break the one property that makes the table
+# trustworthy — the parts summing to the total.
+func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	var devout := _living_devout()
 	if devout == null or u.dead or u.is_companion or not u.is_hero:
 		return
@@ -8052,19 +8163,21 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 	#
 	# ONE BRANCH, so there is one answer to "can this unit release".
 	var own := u == devout
+	var f_was := u.faith_stacks
 	u.faith_stacks = mini(u.faith_stacks + n, 5)
-	var f_mult := _faith_stack_mult(devout, u)
+	# BATCH BI §1 — THE PEAK RATCHETS HERE AND NOWHERE ELSE. It is raised from
+	# the count immediately after the count moves, so there is exactly one line
+	# in the file where the two can disagree and it is this one.
+	u.faith_peak = maxi(u.faith_peak, u.faith_stacks)
+	# BATCH BI §2 — THE SOURCE TABLE, banked as WHAT WAS ACTUALLY GAINED rather
+	# than what was asked for: Zeal doubles `n` above and the cap at five throws
+	# the remainder away, so crediting `n` would print a table that adds up to
+	# more Faith than the meter ever held. Total and term are written by the SAME
+	# call, the `_devout_heal` pattern, so the parts can never disagree with the
+	# sum — which is the property §5 asserts.
+	_faith_gained(u, u.faith_stacks - f_was, source)
 	if own or u.faith_stacks < 5:
-		var f_tail := "At 5 stacks: healed for %d%% max\nhealth, and the Faith resets." % [
-			15 + devout.faithful_step]
-		if own:
-			f_tail = "His own Faith HOLDS — it\nnever releases."
-		var f_desc := "Conviction: Faith x%d — %d%% damage\nmitigation and +%d%% damage dealt.\n%s" % [
-			u.faith_stacks, FAITH_MITIGATION_PCT * f_mult * u.faith_stacks,
-			FAITH_DAMAGE_PCT * f_mult * u.faith_stacks, f_tail]
-		if not u.update_status("faith", "F%d" % u.faith_stacks, f_desc):
-			u.add_status("faith", "Faith", "F%d" % u.faith_stacks,
-				Color(0.98, 0.85, 0.45), -1, f_desc)
+		_refresh_faith_chip(u, devout)
 		return
 	# The fifth stack: an ALLY releases, always to zero.
 	#
@@ -8074,8 +8187,15 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 	# keeping 3 of 5 meant the NEXT release cost two stacks rather than five, so
 	# "you keep some" bought releases per battle. §2's whole subject is that this
 	# lane had three such multipliers; Communion is the one that stays.
+	#
+	# BATCH BI §1 — THE COUNT RESETS, THE PEAK DOES NOT, AND THE CHIP STAYS UP.
+	# This line is the whole point of the batch: the release no longer erases the
+	# held benefit it just spent, so the lane's two axes stop being one meter
+	# pulled in opposite directions. The chip is REFRESHED rather than removed
+	# (it used to be removed here) because a live benefit with no chip is a lie
+	# on the bar — see `_refresh_faith_chip`.
 	u.faith_stacks = 0
-	u.remove_status("faith")
+	_refresh_faith_chip(u, devout)
 	var f_heal := maxi(int(round(u.max_hp * (0.15 + 0.01 * devout.faithful_step))), 1)
 	var f_got: int = u.heal_amount(f_heal, u != devout)
 	u.float_text("FAITH +%d" % f_got, Color(0.98, 0.85, 0.45))
@@ -8112,7 +8232,7 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 	if devout.oath_faith > 0 and not own:
 		_log("   → Talent: Binding Oath — %s takes the oath upon himself (+%d Faith)" % [
 			devout.unit_name, devout.oath_faith], "#b0a8e0")
-		_gain_faith(devout, devout.oath_faith)
+		_gain_faith(devout, devout.oath_faith, "oath")
 	# Communion: fervor spreads to allies who are STILL BUILDING it (the chance
 	# scales with their own Faith).
 	#
@@ -8146,7 +8266,7 @@ func _gain_faith(u: BattleUnit, n: int) -> void:
 			if randf() < 0.01 * devout.communion_ranks * h.faith_stacks:
 				_log("   → Talent: Communion — %s's fervor spreads to %s" % [
 					u.unit_name, h.unit_name], "#b0a8e0")
-				_gain_faith(h, 1)
+				_gain_faith(h, 1, "communion")
 		_communion_chain = false
 
 
@@ -8221,16 +8341,28 @@ func _conviction_growth(devout: BattleUnit, consumed := true) -> void:
 func _ground_faith_tick(u: BattleUnit) -> void:
 	if not u.is_hero or u.is_companion or u.dead:
 		return
-	if not u.has_status("cons_ground"):
-		return
+	# The ground gate MOVED BELOW the Devout lookup in Batch BI §2 so the
+	# denominator could be banked between the two. Same outcomes either way —
+	# both are pure reads — but the order is now load-bearing for the report.
 	var devout := _living_devout()
 	if devout == null:
 		return
+	# BATCH BI §2 — THE GROUND'S DENOMINATOR, banked at the only site that knows
+	# it. `faith_ground_turns` counts hero turn-starts on the ground and
+	# `faith_hero_turns` counts hero turn-starts full stop, so the report can say
+	# what share of the fight the ground was actually up — the number behind the
+	# batch's own guess that a 3-turn cooldown against a 2-turn duration puts it
+	# at two thirds at best. Both are banked BEFORE the ground gate below, or the
+	# denominator would be the numerator.
+	_stat("faith_hero_turns")
+	if not u.has_status("cons_ground"):
+		return
+	_stat("faith_ground_turns")
 	_log("   → Consecrated Ground kindles %s (+1 Faith)%s" % [
 		u.unit_name,
 		" — and his Faith is worth double here (Fervor)" \
 			if devout.fervor > 0 else ""], "#c8b880")
-	_gain_faith(u, 1)
+	_gain_faith(u, 1, "ground")
 
 
 # BATCH BH §2 — RUNE-ONLY, AND IT IS A RE-POINT RATHER THAN A NEW DESIGN. The
@@ -8249,12 +8381,30 @@ func _swear_opening_oath() -> void:
 		return
 	_log("Rune: the Binding Oath is already sworn — %s opens with %d Faith" % [
 		devout.unit_name, devout.oath_opening], "#b0a8e0")
-	_gain_faith(devout, devout.oath_opening)
+	_gain_faith(devout, devout.oath_opening, "opening")
 
 
 # Conviction: a Divine Shield soaking a hit steels its holder.
+#
+# BATCH BI §2 — TWO FAITH PER ABSORBED HIT, UP FROM ONE, AND THE BRIEF SAYS
+# OUTRIGHT IT EXPECTS THIS TO BE INSUFFICIENT. Five stacks at 2 a hit is three
+# absorbs rather than five, a rate increase of about 1.7x, which takes BH's 0.4
+# releases a battle to roughly 0.7 against a target of two to four. The rest has
+# to come from somewhere else and the DECOMPOSITION — not another guess — is
+# what says where; this row has had six batches and four briefs with something
+# wrong in them, and it does not get a fifth guess.
+# The magnitude lives here rather than in a constant because it is one number at
+# one site; if a later batch wants to tune it, this is the line.
+const FAITH_PER_ABSORB := 2
+
+
 func _on_shield_absorbed(holder: BattleUnit) -> void:
-	_gain_faith(holder, 1)
+	# The absorb denominator: how many hits the shields actually soaked. Faith
+	# from absorbs divided by this is the effective rate, and without it the
+	# per-source table cannot say whether a small number means a weak source or
+	# a rare one.
+	_stat("faith_absorb_hits")
+	_gain_faith(holder, FAITH_PER_ABSORB, "absorb")
 
 
 # Sacred Covenant: a Divine Shield that saved a life rewards its holder.
@@ -8268,7 +8418,7 @@ func _on_lethal_saved(saved: BattleUnit) -> void:
 	_devout_heal(devout, cov_got, "covenant")
 	_log("   → Talent: Sacred Covenant — the shield held the line; %s heals %d and keeps the Faith" % [
 		saved.unit_name, cov_got], "#b0a8e0")
-	_gain_faith(saved, maxi(devout.covenant_faith, 1))
+	_gain_faith(saved, maxi(devout.covenant_faith, 1), "covenant")
 
 
 # Mercy (Holy passive): an ally's brush with death steels the healer.
@@ -11731,6 +11881,13 @@ static func trap_report_line(stats: Dictionary) -> String:
 # broken instrument rather than a finding (and AZ's `focus_deepest` is the
 # precedent for the opposite failure: a line banked in the wrong place printed
 # NOTHING on a legal build, and a broken instrument reads as a finding).
+#
+# BATCH BI §2 — IT GAINED A SOURCE TABLE, AND THAT TABLE IS THE BATCH'S
+# DELIVERABLE. BH left releases at 0.4 a battle and nothing in the project could
+# say WHICH of Faith's sources was dry, so §2 decomposed BEFORE changing a
+# number rather than after. Six gain terms, two denominators (absorbed hits, and
+# the share of hero turns the ground was actually up), and the total is written
+# by the same call as every part.
 static func faith_report_line(stats: Dictionary) -> String:
 	var n: float = stats.get("conviction_battles", 0.0)
 	if n <= 0.0:
@@ -11755,8 +11912,37 @@ static func faith_report_line(stats: Dictionary) -> String:
 	for t in prev_terms:
 		prev_parts.append("%s %.0f" % [
 			t[1], stats.get("faith_prev_" + String(t[0]), 0.0) / n])
+	# BATCH BI §2 — WHERE THE FAITH ITSELF COMES FROM, WHICH IS THIS BATCH'S
+	# DELIVERABLE the way BC's grid was. Releases sat at 0.4 a battle and no
+	# instrument in the project could say which of the four sources was dry, so
+	# the rate change shipped beside the decomposition rather than after it.
+	# SIX TERMS, NOT THE BRIEF'S FOUR: Binding Oath and the rune's opening grant
+	# are Faith too, and printing four while counting six would break the one
+	# property that makes the table worth reading — the parts summing to the
+	# total, which test_batch_bi asserts.
+	var gain_terms := [
+		["absorb", "absorbs"], ["ground", "ground drip"],
+		["communion", "Communion"], ["covenant", "Covenant"],
+		["oath", "Binding Oath"], ["opening", "opening rune"]]
+	var gain_parts := PackedStringArray()
+	for t in gain_terms:
+		gain_parts.append("%s %.2f" % [
+			t[1], stats.get("faith_gained_" + String(t[0]), 0.0) / n])
+	var g_total: float = stats.get("faith_gained_total", 0.0)
+	var g_devout: float = stats.get("faith_gained_devout", 0.0)
+	# The two denominators that make the six terms above readable: a small
+	# number from absorbs can mean a weak rate or a rare absorb, and the ground's
+	# drip is only paid while the ground is up.
+	var abs_hits: float = stats.get("faith_absorb_hits", 0.0)
+	var g_turns: float = stats.get("faith_ground_turns", 0.0)
+	var h_turns: float = stats.get("faith_hero_turns", 0.0)
 	var lines := PackedStringArray()
 	lines.append("Devout FAITH decomposition (n=%d battles with a Devout):" % int(n))
+	lines.append("  Faith gained/battle by source: %s   (total %.2f, of which %.2f onto the Devout's own held meter)" % [
+		" | ".join(gain_parts), g_total / n, g_devout / n])
+	lines.append("  denominators: absorbed hits/battle %.2f (Faith/absorb %.2f) | ground up on %.0f%% of hero turns (%.1f of %.1f a battle)" % [
+		abs_hits / n, stats.get("faith_gained_absorb", 0.0) / maxf(abs_hits, 1.0),
+		100.0 * g_turns / maxf(h_turns, 1.0), g_turns / n, h_turns / n])
 	lines.append("  releases/battle %.2f | healing per release %.0f | total healing/battle %.0f" % [
 		rel / n, rel_heal / maxf(rel, 1.0), heal_sum / n])
 	lines.append("  healing/battle by source: %s" % " | ".join(heal_parts))

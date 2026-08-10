@@ -986,7 +986,7 @@ func _live_faith_half_growth() -> void:
 	# The check therefore moves ONE LEVEL DOWN, to the function that owns the
 	# rule — which is the honest place for it, and the two assertions together
 	# say exactly what is true: the tax exists, and the release cannot trigger it.
-	scene.call("_gain_faith", ally, 5)
+	scene.call("_gain_faith", ally, 5, "absorb")
 	ok(ally.faith_stacks == 0,
 		"Batch BG: no release parks an ally at five, so no release consumes nothing")
 	ok(dv.max_hp == 1030,
@@ -1010,7 +1010,7 @@ func _live_faith_half_growth() -> void:
 	dv2.conviction_hp_gained = 0
 	dv2.conviction_base_hp = 0
 	ally2.faith_stacks = 0
-	scene2.call("_gain_faith", ally2, 5)
+	scene2.call("_gain_faith", ally2, 5, "absorb")
 	ok(ally2.faith_stacks == 0, "without Apostle the release CONSUMES the stacks")
 	ok(dv2.max_hp == 1030,
 		"NEGATIVE CONTROL: a full-consumption release still grants FULL growth (+30, got +%d)" % \

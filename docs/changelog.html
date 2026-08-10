@@ -5,6 +5,127 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-10 &mdash; Batch BI: the two Faith axes stop fighting each other</h2>
+<p><i>No save version moves (still v7); every id survives. <b>&sect;1 is a change to what the
+resource IS</b> &mdash; the held half of Conviction reads the highest Faith you have held this
+battle rather than what you hold right now. <b>&sect;2 is a decomposition</b> of where Faith
+actually comes from, with one rate change shipped beside it.</i></p>
+
+<h3>&sect;2 &mdash; Where the Faith comes from, leading, because it is the deliverable</h3>
+<p>BH left releases at <b>0.4 a battle</b> and nothing in the project could say <i>which</i>
+source was dry. Every Devout sim row now prints the whole table. Full eight-node lane, all four
+built, n=200, BC/BE's lineup &mdash; <b>Faith gained per battle by source:</b></p>
+<table>
+<tr><th>source</th><th>Faith/battle</th><th>share</th><th>its denominator</th></tr>
+<tr><td><b>Consecrated Ground drip</b></td><td><b>9.1</b></td><td><b>66%</b></td>
+<td>ground up on <b>54&ndash;56%</b> of hero turn-starts (9.1 of 16.6)</td></tr>
+<tr><td><b>Divine Shield absorbs</b></td><td><b>3.2</b></td><td>23%</td>
+<td><b>1.5 absorbed hits a battle</b>, at 2.05 Faith each</td></tr>
+<tr><td>Binding Oath</td><td>0.70</td><td>5%</td><td>ally releases (0.73/battle)</td></tr>
+<tr><td>Communion</td><td>0.68</td><td>5%</td><td>ally releases</td></tr>
+<tr><td>Sacred Covenant</td><td>0.03</td><td>&mdash;</td><td>lethal saves</td></tr>
+<tr><td>opening rune</td><td>0.00</td><td>&mdash;</td><td>not in this build</td></tr>
+<tr><td><b>total</b></td><td><b>13.8</b></td><td></td>
+<td>of which <b>3.4 lands on the Devout's own non-releasing meter</b></td></tr>
+</table>
+<p><b>THE BRIEF GUESSED THE GROUND, AND THE GUESS IS RIGHT ABOUT WHICH SOURCE MATTERS AND WRONG
+ABOUT WHY.</b> It expected the ground to be the dry one &mdash; a 3-turn cooldown against a
+2-turn duration. The ground is up 55% of the time, close to that guess, but it is <b>66% of all
+Faith and the only thing keeping the lane alive</b>. The genuinely dry source is <b>absorbs, at
+1.5 absorbed hits a battle</b>.</p>
+<p><b>AND THE REAL BOTTLENECK IS NEITHER RATE.</b> About <b>10.4 Faith a battle reaches allies,
+split across THREE of them &mdash; 3.5 each &mdash; against a release threshold of 5</b>, in a
+fight that gives an ally roughly four turns. <b>The average ally cannot fill the meter in an
+average fight.</b> 0.73 releases &times; 5 = 3.65 Faith actually reaching a payout: <b>35% of
+what lands, the rest stranded as partial stacks when the battle ends.</b></p>
+
+<h3>&sect;2 &mdash; The rate change, and the next lever named with its number</h3>
+<p><b>Conviction pays 2 Faith per absorbed hit, up from 1.</b> &sect;2 said outright it expected
+this to be insufficient, and <b>it is</b>: releases went <b>0.42&ndash;0.49 &rarr;
+0.68&ndash;0.76</b>, a factor of ~1.6 against the 1.7 predicted, on a stated target of <b>two to
+four releases a battle</b>.</p>
+<p><b>THE NEXT LEVER, WITH THE ARITHMETIC, AND NOTHING FURTHER WAS TAKEN: the ground's base drip
+1 &rarr; 2.</b> It adds ~9.1 Faith a battle, ~6.8 of it to allies, taking an ally from 3.5 to
+~5.7 &mdash; across the threshold &mdash; for an estimated <b>2.0&ndash;2.5 releases a
+battle</b>. <b>The alternative, recorded with its number so the choice is visible: the release
+threshold 5 &rarr; 3</b>, which costs no new Faith at all (~2.6&ndash;3.0 releases) but changes
+the cap and the threshold, today the same number. <b>Both are design decisions. Neither was
+taken</b> &mdash; and the drip is the term BH deliberately removed a node from, so raising the
+base is a decision that has to be made knowingly rather than as a repair.</p>
+
+<h3>&sect;1 &mdash; What changed, and why it was a design fault rather than a magnitude</h3>
+<p><b>The lane's two axes were fed by one meter and they wanted opposite things: releases want
+the meter EMPTY, held-stack value wants it FULL.</b> So the second axis BG and BH added to break
+the lane's compounding was not independent of the release engine &mdash; it was <i>antagonistic</i>
+to it. That is why BH's leave-one-out grid came back flat, and why Communion (which only rolls
+<i>on</i> a release) and Binding Oath (which is <i>paid by</i> releases) both read dormant.</p>
+<p><b>A stack's held value now reads the PEAK &mdash; the highest Faith that carrier has held
+this battle &mdash; rather than the current count.</b> A release resets the count and leaves the
+peak standing, so it is pure upside instead of a cost paid against the lane's other half. The
+peak is per-battle and is zeroed when the next fight opens.</p>
+<p><b>The magnitudes came down, because peak-reading multiplies their effective value.</b> 3%
+and +2% were priced against a current count that averages low; read against a peak that ratchets
+to five and stays there, the same numbers pay roughly double for the rest of every fight.
+<b>Now 2% mitigation and +1.5% damage per peak stack.</b></p>
+<p><b>Fervor and Apostle are ADDITIVE with each other, not multiplicative.</b> Both double the
+held value; multiplied they reach &times;4, which is the compounding fault this whole arc exists
+to remove, rebuilt on a new axis. <b>Base 1&times;, Fervor +1&times;, Apostle +1&times; &mdash;
+so both together are &times;3 and never &times;4</b>, and both tooltips now say TRIPLE. At
+&times;3 on a peak of five that is <b>30% mitigation and +22.5% damage on every ally</b> while
+the ground holds &mdash; a capstone plus a row-6 node, and it is meant to be strong.</p>
+<p><b>The Faith chip now survives a release</b>, sitting at F0 and stating the peak beside the
+count. A live benefit with no chip on the bar is a lie, and the peak is still paying.</p>
+
+<h3>&sect;3 &mdash; Measured, every row replicated</h3>
+<p>BH recorded that this row is no longer a &plusmn;2-point instrument, so every cell is a
+median of repeated n=200 reads. All four built, BC/BE's lineup. <b>Read the lane against its
+distance from the ungeared floor, never as an absolute.</b></p>
+<table>
+<tr><th>all four built</th><th>d+h+p% per read</th><th>median</th><th>releases/battle</th>
+<th>healing/battle</th></tr>
+<tr><td>FAITH + Apostle</td><td>15 / 14 / 15 / 15</td><td><b>15%</b></td><td>0.68&ndash;0.76</td>
+<td>42&ndash;48</td></tr>
+<tr><td>&minus; Apostle</td><td>15 / 15 / 15</td><td><b>15%</b></td><td>0.71&ndash;0.75</td>
+<td>46&ndash;48</td></tr>
+<tr><td>&minus; Communion</td><td>15 / 15 / 14</td><td><b>15%</b></td>
+<td>0.65&ndash;0.72</td><td>40&ndash;45</td></tr>
+<tr><td>&minus; Binding Oath</td><td>15 / 13 / 13</td><td><b>13%</b></td>
+<td>0.57&ndash;0.76</td><td>36&ndash;47</td></tr>
+<tr><td><b>ungeared</b> (the floor)</td><td>12 / 11 / 11</td><td><b>11%</b></td>
+<td>0.60&ndash;0.75</td><td>18&ndash;22</td></tr>
+</table>
+<p><b>THE LANE IS WORTH FOUR POINTS OVER THE FLOOR, AGAINST BH'S TWO.</b> Its healing more than
+doubles (19 &rarr; 46) over the same floor.</p>
+<p><b>NO IGNITION.</b> BH warned that &sect;2 raises the very term that feeds the growth loop
+(release &rarr; bigger maximum &rarr; bigger shield &rarr; more absorbs &rarr; more Faith), which
+is positive feedback with a threshold. Across four full-lane reads the spread is <b>14&ndash;15</b>
+and across three ungeared reads <b>11&ndash;12</b>; <b>nothing came back ten points above its
+neighbours</b>. 200/200 wins every row, 0 SCRIPT ERROR.</p>
+<p><b>Communion and Binding Oath were reported and NOT touched, on &sect;3's instruction
+&mdash; and only one of the two is still dormant.</b> <b>Communion is</b>, exactly as &sect;3
+predicted: withholding it moves the headline by nothing, and the source table says why outright
+&mdash; it is worth <b>0.68 Faith a battle</b> against the ground's 9.1, because it only rolls
+<i>on</i> a release and there are 0.7 of those. <b>Binding Oath is the one cell this instrument
+cannot resolve, and it is reported as unresolved rather than claimed either way</b>: its reads
+are <b>15 / 13 / 13 against the full row's 14 / 15 / 15 / 15 &mdash; the ranges overlap</b>, and
+BH's standing warning is that this row is no longer a &plusmn;2-point instrument. What the cell
+actually tracks is releases (its single read at 0.76 releases scored 15, the same as a full row
+at the same rate).</p>
+<p><b>The mechanism that would explain a real effect, offered as a hypothesis with its evidence
+rather than as a finding:</b> &sect;1 gave the node somewhere to go. The Devout's own Faith
+ratchets a peak now, so the ~0.70 stacks a battle it swears him pay him mitigation for the rest
+of the fight instead of sitting on a meter that never releases &mdash; and the numbers move the
+right way (Faith onto his own meter <b>3.4 with the node, 2.6 without</b>; absorbed hits
+<b>3.1&ndash;3.4 against 2.6&ndash;3.3</b>, which is the documented loop of less damage taken
+&rarr; more shields cast &rarr; more absorbs). <b>It would take more replicates than this batch
+ran to say so, and no lever should be aimed at this node on the strength of three reads.</b></p>
+<p><b>Apostle reads zero on the headline</b> (15% with, 15% without) &mdash; the capstone's
+value is held mitigation and damage that lands on ALLIES and raises the denominator, which is
+the shape BG already recorded; read it in the ally rows, not in his contribution share.</p>
+<p><b>LIVE AUTOPLAY: the signature payoff is back in ordinary fights.</b> Three releases in one
+battle, with Binding Oath and Communion both firing &mdash; against BH's <b>five consecutive
+autoplay battles with no release at all</b>. 0 SCRIPT ERROR.</p>
+
 <h2>2026-08-10 &mdash; Batch BH: four more ability upgrades, and the Faith lane gets a second axis</h2>
 <p><i>Two things that do not interact. <b>&sect;1 is additive content</b> &mdash; the generic
 ability-upgrade pool goes from four to eight. <b>&sect;2 is two re-specs</b> that finish the job

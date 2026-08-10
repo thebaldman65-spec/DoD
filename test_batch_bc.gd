@@ -442,7 +442,7 @@ func _live_release_banks_count_and_heal() -> void:
 	if dv != null:
 		mage.hp = 1  # or the release heals into a full bar and reads 0
 		var want := maxi(int(round(mage.max_hp * 0.15)), 1)
-		scene.call("_gain_faith", mage, 5)
+		scene.call("_gain_faith", mage, 5, "absorb")
 		ok(_stat_of(scene, "faith_releases") == 1.0,
 			"§1: one release banks one release")
 		ok(_stat_of(scene, "faith_heal_release") == float(want),
@@ -553,6 +553,10 @@ func _live_faith_stack_mitigation_is_split_out() -> void:
 	var foe: BattleUnit = scene.get("enemies")[0]
 	if dv != null:
 		war.faith_stacks = 3
+		# BATCH BI §1: the mitigation site reads `faith_peak` — the highest count
+		# held this battle — so a bare stack count no longer arms the term this
+		# check is about. Set with the count, exactly as `_gain_faith` does.
+		war.faith_peak = 3
 		# _resolve(attacker, ability, target, grade) — argument ORDER matters
 		# and a wrong one throws mid-run while the suite still reports 0
 		# failures, which is the CLAUDE.md "fakes a clean pass" trap.
@@ -580,7 +584,7 @@ func _live_the_terms_sum_to_the_total() -> void:
 		mage.hp = 1
 		war.hp = maxi(war.max_hp / 2, 1)
 		dv.hp = maxi(dv.max_hp / 2, 1)
-		scene.call("_gain_faith", mage, 5)          # release + growth
+		scene.call("_gain_faith", mage, 5, "absorb")          # release + growth
 		scene.call("_grant_divine_shield", dv, war, 200)
 		war.take_hit(60, 0)                          # Blessed Barrier
 		war.hp = 5

@@ -823,7 +823,7 @@ const SPEC_INFO := {
 	"inquisitor": {"name": "Devout", "constitution": 110, "archetype": "Warder", "passive": "conviction",
 		"max_hp": 175, "armor": 0.18,
 		"resists": {"holy": 0.15, "fire": 0.10, "shadow": -0.10},
-		"passive_desc": "Conviction: allies build Faith whenever Divine Shield absorbs damage\nfor them (max 5 stacks; doubled under Blessing of Zeal). Each stack:\n3% damage mitigation and +2% damage dealt — doubled by Apostle, and\ndoubled again on Consecrated Ground with Fervor. At 5 stacks the ally\nis healed for 15% of max health, their Faith resets, and the Devout\nrecovers 3% max Mana. THE DEVOUT CARRIES FAITH OF HIS OWN, and his\nnever releases: it holds, paying him the same mitigation and damage.",
+		"passive_desc": "Conviction: allies build Faith whenever Divine Shield absorbs damage\nfor them — 2 a hit, max 5 stacks, doubled under Blessing of Zeal.\nEach stack: 2% damage mitigation and +1.5% damage dealt, PAID ON THE\nHIGHEST COUNT HELD THIS BATTLE — Apostle adds another 1x and Fervor\nanother on Consecrated Ground, so both together are triple, not\nquadruple. At 5 the ally is healed for 15% of max health, the COUNT\nresets — the peak does not, so a release never takes the benefit away\n— and the Devout recovers 3% max Mana. THE DEVOUT CARRIES FAITH OF\nHIS OWN, and his count never releases at all.",
 		"blurb": "A living shrine — faith made armor for the whole party."},
 	"occultist": {"name": "Occultist", "constitution": 95, "archetype": "Pressure", "passive": "old_gods",
 		"max_hp": 155, "armor": 0.08,

@@ -4,6 +4,50 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Adding an axis is not the same as adding a choice (Batch BI) — 2026-08-10
+
+This one is about me rather than about the Devout.
+
+BG and BH diagnosed a compounding lane correctly and fixed it by giving the
+lane a second axis: Apostle, then Fervor, then Binding Oath all moved off
+release FREQUENCY and onto what a HELD stack is worth. The diagnosis was right
+and the direction was right. **The second axis was still wrong, because both
+axes read one meter, and they wanted opposite things from it.** A release wants
+the meter empty. Held value wants it full. Every release therefore paid for
+itself by destroying the other half's subject, and the lane's "two choices"
+were one choice with two prices facing in opposite directions.
+
+**That is the same fault BC diagnosed, arrived at from the opposite side.** BC
+found nodes that all pushed one number the same way and called it one node with
+eight prices. This was nodes pushing one number *against each other*, and the
+symptom was different — not compounding but cancellation, a leave-one-out grid
+that came back flat because every node's contribution was being eaten by its
+neighbour's. **Direction is not the test. Sharing the number is the test.** Two
+effects that read the same term are one effect with two prices, whichever way
+they push it.
+
+**The number that made it visible:** BH's grid moved by at most one point in
+any cell, and an ungeared Devout beside the same three built allies read 11%
+against the full eight-node lane's 13%. Both readings look like "the lane is
+fine, just small". Neither is a magnitude problem, and four batches of
+re-pricing would not have found it, because re-pricing an antagonistic pair
+moves the balance between two halves that still cancel.
+
+**The repair was to stop sharing the number**, not to raise either half: the
+held value reads a *second* quantity derived from the meter — the highest count
+held this battle — which rises when the count rises and does not fall when a
+release empties it. The release engine and the held engine now read two numbers
+that never fight, and both can be tuned without paying the other.
+
+**The general rule: before adding a second axis to a lane, check what the new
+axis READS. If it reads the same state the first axis mutates, it is not a
+second axis — it is a second price on the first one, and whether it compounds
+or cancels is just a matter of sign.**
+
+**And a smaller one, worth keeping:** the flat grid was the evidence, and it was
+nearly discarded as "the lane is just small". A leave-one-out grid that comes
+back flat on a lane that *does* something is a finding, not a null result.
+
 ## The lane was one node with eight prices, and taking the prices off cost most of the lane (Batch BH) — 2026-08-10
 
 BG moved the capstone off the frequency axis and wrote down why: a lane where

@@ -283,6 +283,30 @@ distance from the ungeared floor, never as an absolute.
 same term, withholding one leaves the others multiplying, so each reads small and the total is
 large. BC measured Binding Oath at one point on exactly this lane. **A small leave-one-out
 number is evidence of a node's marginal worth, NOT of its structural role.**
+· **A THIRD CAVEAT, ADDED BY BATCH BI §1, AND IT IS THE ONE THAT NEARLY GOT MISSED: A FLAT GRID
+ON A LANE THAT DOES SOMETHING IS A FINDING, NOT A NULL RESULT.** BH's grid moved by at most one
+point in any cell and read as "the lane is fine, just small". It was the signature of the
+antagonism in the standing rule directly below — every node's contribution was being eaten by
+its neighbour's — and no amount of re-pricing would have found it.
+
+### STANDING RULE — HELD VALUE AND SPEND FREQUENCY ARE ANTAGONISTIC ON A SINGLE METER (Batch BI §1)
+**A resource that both (a) pays something while HELD and (b) is CONSUMED at a threshold has two
+effects reading one number and wanting opposite things from it: the spend wants it empty, the
+held value wants it full.** Whatever you do to one, you pay for on the other. **DO NOT ADD A
+"SECOND AXIS" TO SUCH A LANE BY GIVING A NODE THE HELD HALF: that is not a second axis, it is a
+second price on the first one.**
+**THIS IS THE SAME FAULT BC DIAGNOSED, ARRIVED AT FROM THE OPPOSITE SIDE.** BC found nodes all
+pushing one number the SAME way and called it one node with eight prices; this is nodes pushing
+one number AGAINST each other. **DIRECTION IS NOT THE TEST. SHARING THE NUMBER IS THE TEST** —
+two effects that read the same term are one effect with two prices, whichever way they push it.
+**THE TEST, BEFORE ADDING ANY SECOND AXIS: ask what the new axis READS.** If it reads state the
+first axis mutates, it will compound or cancel and which one is only a matter of sign.
+**THE REPAIR SHAPE, FOR WHEN THIS RECURS: give the second effect its own DERIVED quantity rather
+than the meter.** BI's `faith_peak` is the Devout's — a high-water mark that rises with the count
+and does not fall when a spend empties it, so frequency and depth can both be real. **DO NOT
+RE-COUPLE THEM.** Faith's held half must never read `faith_stacks` again; that is
+test_batch_bi's first negative control, and the mis-write reads as a smaller number rather than
+as a bug.
 
 ### STANDING DESIGN RULE — THE CONTAGION SPACE IS RESERVED (Batch BA §1)
 **A future spec is planned whose fantasy is DISEASE AND VIRALITY. Nothing self-propagating
@@ -297,6 +321,139 @@ the new spec's idea a second time. **BA re-specced four nodes off it** — Epide
 every enemy permanently Poisoned), Plague Bearer (rot leaps enemy to enemy), Creeping Death
 (a corpse passes its stacks to the living) and the NAME Virulence (a pathogen term). SNARES
 and GUERILLA were never disease and are untouched by the rule.
+
+BATCH BI (08-10) — THE TWO FAITH AXES STOP FIGHTING EACH OTHER. No save version moves (still
+v7); every id survives. **§1 is a change to what the resource IS, §2 is a decomposition with one
+rate change shipped beside it.**
+
+§1 **THE HELD VALUE READS THE PEAK, NOT THE CURRENT COUNT — AND THIS IS THE STRUCTURAL NOTE THE
+WHOLE BATCH EXISTS FOR. HELD VALUE AND RELEASE FREQUENCY ARE ANTAGONISTIC ON A SINGLE METER:
+releases want it EMPTY, held value wants it FULL.** So the second axis BG and BH added to break
+the compounding was not independent of the release engine, it was *against* it — which is why
+BH's leave-one-out grid came back flat and why Communion (rolls only ON a release) and Binding
+Oath (paid BY releases) both read dormant. **A LATER BATCH WOULD OTHERWISE REDISCOVER THIS BY
+RE-COUPLING THEM.**
+· **`faith_peak` (unit.gd)** — the highest Faith a unit has held THIS BATTLE. **ONE RATCHET**
+(`u.faith_peak = maxi(...)` in `_gain_faith`, immediately after the count moves — one line where
+the two can disagree), **TWO READ SITES** (the damage-dealt term at the attacker block and the
+mitigation term at the strike-target block, both gated on `faith_peak > 0` too), **ONE RESET**
+(`_reset_faith_meters()`, battle start, zeroing count and peak TOGETHER and running BEFORE
+`_swear_opening_oath`, which grants Faith). Its own function for the standing reason —
+`_run_battle` cannot be driven headlessly, so the reset's negative control is a real check.
+A release resets the COUNT and leaves the peak standing, so the release is pure upside instead
+of a cost paid against the lane's other half.
+· **THE MAGNITUDES CAME DOWN BECAUSE PEAK-READING MULTIPLIES THEIR EFFECTIVE VALUE**: 3% → **2%**
+mitigation, +2% → **+1.5%** damage, per PEAK stack. Both are FLOATS now (`"%d"` would ship +1.5
+as 1 — the AA float-into-int trap from the other side); `_faith_pct_text` renders them.
+· **FERVOR AND APOSTLE ARE ADDITIVE, AND THE READ SITE IS WRITTEN AS A SUM ON PURPOSE.** Base
+1×, Fervor +1×, Apostle +1× → **×3, never ×4**. **THE REASON, ATTACHED: a product is the
+compounding fault this arc exists to remove, rebuilt on the new axis** — and `m *= 2` is what a
+later batch writes by accident, because it reads like the obvious edit and passes every
+source-level check in the file. At ×3 on a peak of five that is 30% mitigation and +22.5% damage
+on every ally while the ground holds.
+· **THE CHIP NOW SURVIVES A RELEASE** (`_refresh_faith_chip`, the one place Faith is rendered),
+at F0, stating both the count and the peak. A live benefit with no chip is a lie on the bar.
+
+§2 **THE PER-SOURCE TABLE IS THE DELIVERABLE, THE WAY BC'S GRID WAS.** Releases sat at 0.4 a
+battle and nothing in the project could say WHICH source was dry. `_faith_gained` is the one
+door (total and named term written by the SAME call, `_devout_heal`'s pattern), and
+**`_gain_faith` takes a `source` with NO DEFAULT** — a default is how the next Faith generator
+lands silently in the wrong bucket. **SIX TERMS, NOT THE BRIEF'S FOUR**: absorbs, ground drip,
+Communion, Covenant, **Binding Oath and the opening rune**, because printing four while counting
+six would break the parts-sum-to-the-total property the table is worth reading for.
+**TWO DENOMINATORS**: absorbed hits/battle, and the share of hero turn-starts the ground was up
+(`faith_ground_turns` / `faith_hero_turns`, both banked in `_ground_faith_tick` — the ground gate
+MOVED BELOW the Devout lookup so the denominator is not the numerator).
+**THE RATE CHANGE: Conviction pays `FAITH_PER_ABSORB` = 2 per absorbed hit, up from 1.**
+
+§2 MEASURED, n=200 a read, BC/BE's all-four lineup, **every row replicated because BH recorded
+that this row is no longer a ±2-point instrument.** `d+h+p%` per read → median:
+**FAITH + Apostle 15/14/15/15 → 15%; −Apostle 15/15/15 → 15%; ungeared 12/11/11 → 11%.**
+**THE LANE IS WORTH FOUR POINTS OVER THE UNGEARED FLOOR, AGAINST BH'S TWO** — read against the
+floor, never as an absolute (BH's caveat, and it is what makes this legible). Releases/battle
+**0.68-0.76 against BH's 0.42-0.49**, i.e. **~1.6×, almost exactly the 1.7× §2 predicted** —
+and §2 said in advance it expected that to be insufficient. **IT IS: the target was two to four
+releases a battle and the lane reads 0.7.**
+**NO IGNITION. The spread is 14-15 across four full-lane reads and 11-12 across three ungeared
+ones; nothing came back ten points above its neighbours**, which is the runaway BH warned §2
+would feed. 200/200 wins every row, 0 SCRIPT ERROR.
+**THE DECOMPOSITION, full lane, per battle: ground drip 9.1 | absorbs 3.2 | Binding Oath 0.70 |
+Communion 0.68 | Covenant 0.03 | opening rune 0.00 — total 13.8, of which 3.4 lands on the
+Devout's own non-releasing meter.** Denominators: **absorbed hits 1.5 a battle** (2.05 Faith
+each — the rate change landed exactly), **ground up on 54-56% of hero turn-starts** (9.1 of 16.6).
+**THE BRIEF GUESSED THE GROUND AND THE GUESS IS RIGHT ABOUT WHICH SOURCE MATTERS AND WRONG ABOUT
+WHY. The ground is not dry — it is 66% of all Faith and the only thing keeping the lane alive.
+THE DRY SOURCE IS ABSORBS: 1.5 absorbed hits a battle.** And the real bottleneck is neither
+rate: **~10.4 Faith a battle reaches allies, split across THREE of them, so an ally averages 3.5
+against a release threshold of 5. The average ally cannot fill the meter in an average fight** —
+0.73 releases × 5 = 3.65 Faith actually reaching a payout, **35% of what lands. The rest is
+stranded as partial stacks when the battle ends** (~16.6 hero turn-starts ≈ 4 turns an ally).
+**THE NEXT LEVER, WITH THE NUMBER BEHIND IT, AND NOTHING FURTHER WAS TAKEN: the ground's base
+drip 1 → 2.** It adds ~9.1 Faith/battle, ~6.8 of it to allies, taking an ally from 3.5 to ~5.7 —
+across the threshold — for an estimated **2.0-2.5 releases a battle, the bottom of the band.**
+**THE ALTERNATIVE, RECORDED WITH ITS NUMBER SO THE CHOICE IS VISIBLE: the release threshold
+5 → 3**, which costs no new Faith at all (3.5 per ally over a threshold of 3 ≈ 2.6-3.0 releases)
+but changes the cap and the threshold, today the same number. **BOTH ARE DESIGN DECISIONS AND
+NEITHER WAS TAKEN. THE DRIP IS THE TERM BH DELIBERATELY REMOVED A NODE FROM** (a deeper drip is
+a frequency multiplier) — raising the BASE is a different decision from re-adding a node
+multiplier, but it must be made knowingly.
+**COMMUNION AND BINDING OATH WERE REPORTED AND NOT TOUCHED, on §3's instruction — AND ONLY ONE
+OF THE TWO IS STILL DORMANT.** Leave-one-out, all four built, every cell replicated
+(d+h+p% per read → median): **full 15/14/15/15 → 15; −Communion 15/15/14 → 15 (NO MOVE);
+−Binding Oath 15/13/13 → 13.**
+· **COMMUNION IS DORMANT, AS §3 PREDICTED**, and its own gain term says why outright: **0.68
+Faith a battle** against the ground's 9.1. It only rolls ON a release and there are 0.7 of those.
+· **BINDING OATH MAY NOT BE, AND THE HONEST ANSWER IS THAT THIS INSTRUMENT CANNOT RESOLVE IT.
+REPORTED AS UNRESOLVED RATHER THAN CLAIMED EITHER WAY.** Its reads are **15/13/13 against the
+full row's 14/15/15/15 — the ranges OVERLAP**, and BH's standing warning is that this row is no
+longer a ±2-point instrument. What the cell tracks is releases and healing (nooath 0.76/0.57/0.64
+releases, and its ONE read at 0.76 releases scored 15, the same as a full row at the same rate),
+not a clean node effect.
+  **THE MECHANISM THAT WOULD EXPLAIN A REAL EFFECT, AS A HYPOTHESIS WITH ITS EVIDENCE, NOT AS A
+  FINDING: §1 gave the node somewhere to go.** The Devout's own Faith ratchets a PEAK now, so the
+  ~0.70 stacks a battle it swears him pay him mitigation for the rest of the fight instead of
+  sitting on a meter that never releases — and the numbers move the right way (Faith onto his own
+  meter **3.4 with the node, 2.6 without**; absorbed hits **3.1-3.4 vs 2.6-3.3**, which is the
+  documented loop: less damage taken → more Divine Shields cast → more absorbs). **IT WOULD TAKE
+  MORE REPLICATES THAN THIS BATCH RAN TO SAY SO, and no lever should be aimed at this node on the
+  strength of three reads.**
+· **APOSTLE READS ZERO ON THE HEADLINE** (15% with, 15% without) — the capstone's whole value
+is now held mitigation and damage that lands on ALLIES and raises the denominator, which is the
+same shape BG recorded; read it in the ally rows, not in his `d+h+p%`.
+**LIVE AUTOPLAY: 0 SCRIPT ERROR, and THE SIGNATURE PAYOFF IS BACK IN ORDINARY FIGHTS — three
+releases in one battle, against BH's FIVE CONSECUTIVE AUTOPLAY BATTLES WITH NO RELEASE AT ALL.**
+Binding Oath and Communion both fired in that same fight.
+
+VERIFIED: check_parse 0, check_flow 0 (6 screens), 11 scenes 0 SCRIPT ERROR, run-harness gates
+1/2/3 PASS. **EVERY SUITE IN THE PROJECT RUN AND GREEN** (ah 5587, an 6053, runes 2973, ay 457,
+at 461, az 489, ba 647, ar 887, al 559, aw 340, au 340, ax 329, as 387, av 315, ai 2036, aj 403,
+ak 527, bb 172, bh 233, rune_battle 96, bc 91, bi 88, bf 78, bd 69, ah_battle 63, bg 47, be 34).
+**test_batch_ah's and test_batch_bb's master.html stamp gates bumped BH → BI** — they are the
+same gate twice and both must move.
+**ONE PRE-EXISTING FLAKE OBSERVED AND DIAGNOSED, NOT CHASED: test_batch_al's "Spite reflects
+damage at the attacker" fails about 1 run in 10.** It is a rounding edge — Spite reflects 30% of
+a hit that carries a ±10% roll, and a low roll under armor reflects zero — and it is
+**UNREACHABLE FROM THIS BATCH: AL's party is warden/cryomancer/holy/mystic, so no Devout stands,
+`_living_devout()` returns null and every Faith read site is inert.** Eight runs on an
+unmodified-HEAD copy came back clean, which does not by itself distinguish 1-in-10 from zero —
+the party composition is the argument, not the count.
+NEGATIVE CONTROLS RUN, SEVEN, each applied to battle.gd and reverted (the file was restored and
+the suite re-run green afterwards): **the held value reading the CURRENT count again trips 9;
+the peak surviving a battle boundary trips 2; Fervor and Apostle multiplying to ×4 trips 4
+(including the measured arm — 32.4% read against the 24% the sum pays); a peak on the DEVOUT
+paying his allies trips 5; Conviction paying 1 per absorb again trips 3; the release removing the
+chip again trips 1; and a source landing in the wrong bucket (the ground booking as an absorb)
+trips 2.**
+NEW test_batch_bi.gd **88/0**. **SEVEN SUITES RE-POINTED IN PLACE with the reason in
+each file, and FOUR OF THE RE-POINTS ARE INVERSIONS** — test_batch_bg's and test_batch_bh's "the
+chip is gone with the stacks" became "the chip STAYS, because the peak keeps paying";
+test_batch_bh's "the two QUADRUPLE" became the additivity negative control (`x4` now FAILS it);
+test_batch_bg's "the status default names Apostle as the doubler" became "it states the peak
+rule", because BI made the bigger statement the one a player meets first. The mechanical
+re-points: every driven `_gain_faith` call gained its source argument, the `_gain_faith(u, 1)`
+source-greps in aw/ax/bh became `_gain_faith(u, 1, "ground")`, and every `_damage_dealt` /
+`_damage_taken` helper in bc/bg/bh sets `faith_peak` beside `faith_stacks` — **that last one is
+the trap: a helper that set only the count would measure zero and read as a magnitude bug.**
 
 BATCH BH (08-10) — FOUR MORE ABILITY UPGRADES, AND THE FAITH LANE GETS A SECOND AXIS. Two
 things that do not interact: **§1 is additive content, §2 is two re-specs.** No save version
@@ -5262,10 +5419,29 @@ Space or left click; no announcer text (combat log only).
     of twelve specs cannot have its strongest lane measured by the project's best instrument.
     Standalone lane rows are unaffected (the fixed 4-enemy lineup never triggered it — 0
     events across ten n=200 rows).
-- **THE DEVOUT'S FAITH ROW: FOUR REPAIRS SHIPPED (BE, BF §2, BG §2's capstone re-spec, then
-  BH §2's two lane-body re-specs) AND THE LANE IS NOW THE WEAKEST OF HIS THREE, NOT THE
-  STRONGEST. READ THE BH BLOCK AT THE TOP OF THIS FILE FOR THE CURRENT NUMBERS — everything
-  in this entry below the BH lines is HISTORY.** **THE BAR NOW READS FAITH 13% | ZEAL 31% |
+- **THE DEVOUT'S FAITH ROW — THE ROW IS NOT A MAGNITUDE PROBLEM AND NEVER WAS. READ THE BI
+  BLOCK AT THE TOP OF THIS FILE FOR THE CURRENT NUMBERS; everything in this entry below the BI
+  lines is HISTORY.** Six batches: BE, BF §2, BG §2's capstone re-spec, BH §2's two lane-body
+  re-specs, then **BI §1's decoupling — the one that named the actual fault.**
+  **THE FAULT WAS THAT HELD VALUE AND RELEASE FREQUENCY READ ONE METER AND WANTED OPPOSITE
+  THINGS FROM IT.** BG and BH broke a compounding lane by adding a second axis, and the second
+  axis was ANTAGONISTIC to the first, so the grid went flat and two nodes went dormant. BI §1
+  gave the held half its own quantity (`faith_peak`, the battle's high-water mark), and the lane
+  went from **two points over the ungeared floor to four** with releases up ~1.6×.
+  **WHAT IS STILL OPEN, WITH THE NUMBER: RELEASES ARE 0.7 A BATTLE AGAINST A STATED TARGET OF
+  TWO TO FOUR, AND THE CAUSE IS NOW MEASURED RATHER THAN GUESSED.** ~10.4 Faith a battle reaches
+  three allies — 3.5 each — against a release threshold of 5, in a fight that gives an ally about
+  four turns. **The average ally cannot fill the meter in an average fight; 35% of the Faith that
+  lands is stranded as partial stacks at battle end.** BI named ONE lever with its arithmetic
+  (**the ground's base drip 1 → 2**, worth ~+9.1 Faith/battle and an estimated 2.0-2.5 releases)
+  and recorded ONE alternative (**the release threshold 5 → 3**, ~2.6-3.0 releases at no extra
+  Faith). **NEITHER WAS TAKEN — both are design decisions, and the drip is the term BH
+  deliberately took a node off.** Do not take a third lever without re-reading the per-source
+  table, which the sim prints on every Devout row.
+  **THE FAITH ROW HAS TAKEN FOUR LEVERS ALREADY (Communion twice, the capstone, the lane body).
+  DO NOT RE-PRICE ANY OF THEM BACK, and do not fold held value and release frequency onto one
+  number again — that is the fault BI removed.**
+  **HISTORY FROM HERE DOWN.** **THE BAR AT BH READ FAITH 13% | ZEAL 31% |
   BULWARK 12%, against BG's FAITH 38 | ZEAL 32 | BULWARK 12.** BH's brief predicted the fall,
   instructed that it be reported and not chased, and **nothing was taken**. **THE NODE TO RAISE
   IF THE DESIGNER WANTS IT RAISED IS BLESSED ARE THE FAITHFUL**, the lane's only magnitude node

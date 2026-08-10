@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-10 (Batch BH)</b></p>
+<p align="right"><b>Last updated: 2026-08-10 (Batch BI)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -494,15 +494,21 @@ Block; a block it buys is logged as "(Bulwark Line)".</td></tr>
 health, snapshotted (and Mercy-scaled) when cast.</td></tr>
 <tr><td>Hallowed</td><td>Immune to new debuffs (Empowered Divine Plea, 3
 turns).</td></tr>
-<tr><td>Faith</td><td>Conviction (Devout passive): Divine Shield absorbs AND standing on
-Consecrated Ground build stacks (max 5) — 3% damage mitigation and +2% damage dealt per
-stack, doubled to 6% and +4% by the Apostle capstone and doubled again on Consecrated
-Ground with Fervor (so quadrupled with both). At 5 the bearer heals 15% max health, Faith
-resets, the Devout recovers 3% max Mana, and the Devout's own maximum health rises 3% of
-his base for the rest of the battle (he is healed for that amount too).
-<b>The Devout carries Faith of his own, and his never releases</b> — it holds at 5, paying
-him the same mitigation and damage it pays everyone else. The chip counts stacks
-("F3").</td></tr>
+<tr><td>Faith</td><td>Conviction (Devout passive): Divine Shield absorbs (2 a hit) AND
+standing on Consecrated Ground (1 an ally a turn) build stacks, max 5.
+<b>WHAT A STACK PAYS IS READ OFF THE HIGHEST COUNT THE CARRIER HAS HELD THIS BATTLE, NOT
+THE COUNT HELD RIGHT NOW</b> — 2% damage mitigation and +1.5% damage dealt per PEAK stack.
+The Apostle capstone adds another 1× and Fervor another again while the carrier stands on
+Consecrated Ground, so <b>the two together are TRIPLE and never quadruple: they add to the
+base rather than multiplying each other</b>. At 5 the bearer heals 15% max health, the
+COUNT resets — <b>the peak does not, so a release never takes the held benefit away</b> —
+the Devout recovers 3% max Mana, and the Devout's own maximum health rises 3% of his base
+for the rest of the battle (he is healed for that amount too).
+<b>The Devout carries Faith of his own, and his count never releases</b> — it holds at 5,
+paying him the same mitigation and damage it pays everyone else. The chip counts current
+stacks ("F3") and states the peak beside them; it stays up at F0 after a release, because
+the peak is still paying. The peak is per-battle and is zeroed when the next fight
+opens.</td></tr>
 <tr><td>Consecrated Ground</td><td>Takes 15% less damage and reflects 10% of damage
 taken to the attacker (Devout ability, 2–3 turns).</td></tr>
 <tr><td>Blessing of Zeal</td><td>+15% damage dealt; Faith gain doubled (Devout ability,
@@ -1071,14 +1077,22 @@ TRIGGER, not on cast, so a Cleric holding none arms nothing.<br>
 three BY DESIGN — Divine Shield, Afterglow, Healing Pulse and the Faith release all pay
 out percentages of HIS maximum: his own bulk is what he lends out).<br>
 Passive <i>Conviction</i>: allies build <b>Faith</b> whenever
-<b>Divine Shield absorbs damage for them</b> (1 per absorbed hit) and whenever they begin
+<b>Divine Shield absorbs damage for them</b> (2 per absorbed hit) and whenever they begin
 a turn standing on <b>Consecrated Ground</b> (1 per ally per turn) — max 5 stacks; doubled
-under Blessing of Zeal; the stacks only work while the Devout stands. Each stack: 3%
-damage mitigation and +2% damage dealt — <b>doubled to 6% and +4% by the Apostle capstone,
-and doubled again while the carrier stands on Consecrated Ground with Fervor learned, so
-the two together make a stack worth 12% and +8%</b>.
+under Blessing of Zeal; the stacks only work while the Devout stands.
+<b>THE HELD VALUE IS PAID ON THE PEAK — the highest Faith the carrier has held this
+battle — RATHER THAN ON THE CURRENT COUNT.</b> That is what stops Conviction's two halves
+fighting each other: releases want the meter empty, held value wants it full, and one
+meter cannot do both. A release resets the count and leaves the peak standing, so it is
+pure upside instead of a cost paid against the other half.
+Each PEAK stack: 2%
+damage mitigation and +1.5% damage dealt — <b>the Apostle capstone adds another 1× and
+Fervor another again while the carrier stands on Consecrated Ground, and THE TWO ADD
+RATHER THAN MULTIPLY: both together are ×3, so a stack is worth 6% and +4.5%, never the ×4
+a product would give</b>. At a peak of five with both, that is 30% mitigation and +22.5%
+damage on every ally while the ground holds.
 At 5 stacks the ally is healed for 15% of max
-health, their Faith resets, and the Devout recovers 3% max Mana — <b>and the Devout's own
+health, their Faith COUNT resets, and the Devout recovers 3% max Mana — <b>and the Devout's own
 maximum health rises by 3% of his BASE maximum for the rest of the battle, healing him for
 the same amount</b>. That growth is linear on his base (3% per release, never 3% of the
 new total) and it lasts the battle only — it does not follow him out of the fight.<br>
@@ -1086,7 +1100,8 @@ new total) and it lasts the battle only — it does not follow him out of the fi
 anyone else — his own Consecrated Ground drips onto him, and Binding Oath swears him one
 every time an ally releases — but at 5 they simply hold, paying him the same mitigation and
 damage they pay the party. Only an ALLY'S Faith releases, and a release always resets that
-ally to zero.<br>
+ally's COUNT to zero — his peak, and so everything the peak pays, stands for the rest of
+the fight.<br>
 Divine Shield — 15 Mana, 2.5, 2cd; an ally shield absorbing 30% of the Devout's max
 health, then it breaks (Perfect: 35%).<br>
 Consecrated Ground — 25 Mana, 3.0, 3cd; the party takes 15% less damage, reflects
@@ -1372,9 +1387,9 @@ returns pay: invest in the dividend) · <b>ZEAL</b> (invest shallowly in EVERYON
 <tr><td>3</td><td><b>Afterglow</b> — When Divine Shield breaks, its holder is healed for 20% of the Devout&#x27;s max health.</td><td><b>Devoutness</b> — The entire party takes 20% less Break damage.</td><td><b>Sacred Resolve</b> — New ability: Sacred Resolve — all damage received is split evenly among living heroes for 3 turns; Break damage still lands on the struck hero (25 Mana, 2.5 int, 5cd; Perfect: 4 turns).</td></tr>
 <tr><td>4</td><td><b>Warded Robes</b> — While Divine Shield holds, its holder has +25% armor.</td><td><b>Blessed are the Faithful</b> — The heal at 5 stacks of Faith restores 35% max health (up from the base 15%).</td><td><b>Healing Pulse</b> — While Consecrated Ground or Sacred Resolve holds, the party heals 8% of the Devout&#x27;s max health each turn.</td></tr>
 <tr><td>5</td><td><b>Stalwart</b> — Divine Shield absorbs 50% of the Devout&#x27;s max health (up from the base 30%).</td><td><b>Sacred Covenant</b> — Should Divine Shield prevent lethal damage, its holder is healed for 25% max health and gains 2 Faith stacks.</td><td><b>Crusader&#x27;s Tempo</b> — Blessing of Zeal ticks its target&#x27;s cooldowns down 3 additional turn(s) on cast.</td></tr>
-<tr><td>6</td><td><b>Bastion</b> — Divine Shield has no cooldown at all.</td><td><b>Fervor</b> — While Consecrated Ground holds, every ally standing on it counts each stack of Faith DOUBLE: 6% damage mitigation and +4% damage dealt per stack, up from 3% and +2%. It grants no extra Faith at all. With Apostle the stacks count quadruple.</td><td><b>Purity</b> — Blessing of Zeal also grants its target a Divine Shield absorbing 35% of the Devout&#x27;s max health.</td></tr>
+<tr><td>6</td><td><b>Bastion</b> — Divine Shield has no cooldown at all.</td><td><b>Fervor</b> — While Consecrated Ground holds, every ally standing on it counts each stack of Faith DOUBLE: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. It grants no extra Faith at all. With Apostle the stacks count TRIPLE: the two nodes ADD to the base rather than multiplying each other.</td><td><b>Purity</b> — Blessing of Zeal also grants its target a Divine Shield absorbing 35% of the Devout&#x27;s max health.</td></tr>
 <tr><td>7</td><td><b>Unyielding Aegis</b> — When Divine Shield breaks, it immediately re-forms at 90% of its original strength (once per cast).</td><td><b>Binding Oath</b> — Whenever an ally&#x27;s Faith releases, the Devout gains 1 stack of Faith himself. His own Faith never releases — it holds, paying him the same mitigation and damage it pays them.</td><td><b>Lifewell</b> — Damage reflected by Consecrated Ground heals the party for 80% of the amount reflected.</td></tr>
-<tr><td>CAP</td><td><b>Bulwark of Fortitude</b> — New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.0 int, 3cd; Perfect: the party instantly heals 5%).</td><td><b>Apostle</b> — Every stack of Faith an ally carries is worth double: 6% damage mitigation and +4% damage dealt per stack, up from 3% and +2%. Releases still consume the stacks.</td><td><b>Judgement</b> — While Consecrated Ground holds, every enemy that damages a hero is Sundered for 2 turns and takes Break damage equal to 40% of the damage it dealt.</td></tr>
+<tr><td>CAP</td><td><b>Bulwark of Fortitude</b> — New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.0 int, 3cd; Perfect: the party instantly heals 5%).</td><td><b>Apostle</b> — Every stack of Faith an ally carries is worth double: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. Releases still reset the count — and the value is paid on the highest count held this battle, so a release never takes it away.</td><td><b>Judgement</b> — While Consecrated Ground holds, every enemy that damages a hero is Sundered for 2 turns and takes Break damage equal to 40% of the damage it dealt.</td></tr>
 </table>
 <p><b>Sharpshooter</b> — <b>PRECISION</b> (Focus, crit chance, crit damage) · <b>PENETRATION</b> (armor, Break, finishing the party's work) · <b>TEMPO</b> (speed, cooldowns, Focus acceleration)</p>
 <table border="1" cellpadding="4">

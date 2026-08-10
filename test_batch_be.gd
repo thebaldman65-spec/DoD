@@ -311,7 +311,7 @@ func _measure(scene: Node, ally: BattleUnit, stacks: int, parked: bool) -> float
 		_isolate(scene, ally, stacks)
 		var before := _stat_of(scene, "faith_releases")
 		war.faith_stacks = 0
-		scene.call("_gain_faith", war, 5)
+		scene.call("_gain_faith", war, 5, "absorb")
 		if parked:
 			# The warrior's own release is always one of them.
 			if _stat_of(scene, "faith_releases") - before >= 2.0:
@@ -409,7 +409,7 @@ func _live_chain_guard_bounds_the_cascade() -> void:
 				h.hp = h.max_hp
 			scene.get("sim_stats").clear()
 			heroes[0].faith_stacks = 0
-			scene.call("_gain_faith", heroes[0], 5)
+			scene.call("_gain_faith", heroes[0], 5, "absorb")
 			var rel := _stat_of(scene, "faith_releases")
 			worst = maxf(worst, rel)
 			if rel > 1.0:
@@ -446,12 +446,12 @@ func _live_guard_resets_between_releases() -> void:
 		for _i in 60:
 			_isolate(scene, heroes[1], 4)
 			heroes[0].faith_stacks = 0
-			scene.call("_gain_faith", heroes[0], 5)
+			scene.call("_gain_faith", heroes[0], 5, "absorb")
 			ok_quiet(not bool(scene.get("_communion_chain")))
 			_isolate(scene, heroes[1], 4)
 			var before := _stat_of(scene, "faith_releases")
 			heroes[0].faith_stacks = 0
-			scene.call("_gain_faith", heroes[0], 5)
+			scene.call("_gain_faith", heroes[0], 5, "absorb")
 			if _stat_of(scene, "faith_releases") - before >= 2.0:
 				fired_late += 1
 		ok(not bool(scene.get("_communion_chain")),
