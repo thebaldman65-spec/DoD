@@ -7936,7 +7936,10 @@ func _detonate_ruin(target: BattleUnit) -> void:
 # Guards Communion against release chains: a communion-granted stack may
 # trigger a release (and its heal), but never rolls Communion again.
 # Without this, Apostle pins allies at 5 and two of them re-trigger each
-# other forever — a guaranteed infinite recursion.
+# other — at BE's 15 that is a decaying random walk rather than AW's
+# certainty, but "unbounded with probability approaching 1" is not a
+# recursion depth to leave to the numbers. THE GUARD IS NOT A MAGNITUDE
+# AND MUST SURVIVE ANY REPRICE OF `communion_ranks`.
 var _communion_chain := false
 
 

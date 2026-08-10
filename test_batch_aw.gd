@@ -287,7 +287,14 @@ func _magnitudes() -> void:
 			["dv_warded", "warded_ranks", 25],
 			["dv_stalwart", "stalwart_step", 20],       # 30 + 20 = 50%
 			["dv_unyielding", "unyielding_ranks", 90],
-			["dv_communion", "communion_ranks", 40],
+			# RE-POINTED IN PLACE BY BATCH BE, with the reason in the file: AW
+			# priced this at 40 and BC's leave-one-out grid then measured the
+			# node carrying the whole FAITH row (80% contribution against 47%
+			# withheld). At 40 an ally at three or more stacks advanced with
+			# CERTAINTY; 15 is the first value at which nothing is guaranteed.
+			# The counter's meaning and units are untouched — see test_batch_be
+			# for the three measured rates the number buys.
+			["dv_communion", "communion_ranks", 15],
 			["dv_devoutness", "devoutness_ranks", 20],
 			["dv_faithful", "faithful_step", 20],       # 15 + 20 = 35%
 			["dv_covenant", "covenant_heal", 25],

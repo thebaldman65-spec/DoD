@@ -2400,3 +2400,48 @@ sits behind a real six-tenths-of-a-second timer. Reinstating the retired behavio
 sailed straight past it. The two source greps beside it fired, which is exactly
 how a hole like this stays hidden — the control still trips, just not for the
 reason you think.
+
+## Batch BE — Communion, and the loop nobody had traced
+
+**Two reasonable nodes can be one engine, and neither of them looks like the
+problem on its own.** Communion's chance reads *the recipient's current Faith
+stacks*, which is a perfectly sensible way to write "fervour spreads fastest
+among the fervent" — the more of the gift someone already holds, the more
+readily it takes. Apostle parks allies at 5 instead of resetting them, which is
+a perfectly sensible capstone: the faithful stay faithful. Put them in the same
+lane and the second one pins the first one's input at maximum forever, so a
+chance written as a chance is a certainty in the only build that takes both.
+Neither node was ever unreasonable. The *interaction* had simply never been
+looked at, and looking at it required tracing what reads what rather than
+reading either node's text.
+
+**That is the third mechanism in this one row that only became visible when
+somebody traced the reads.** The first was five effects crediting nobody at all;
+the second was Communion's saturation point sitting at three stacks with two
+separate nodes parking allies above it. All three were legible from the code and
+invisible from the design. A row that has produced three of these is telling you
+something about the method, not about the Devout: *a support's numbers are
+composed of other numbers, and the composition is where the surprises live.*
+
+**A frequency problem does not respond to a magnitude fix, and the reverse.**
+Two prior batches aimed at the payout — one halved the growth clause with real
+precision — and the row did not move, because the growth is 4% of it. The lever
+that moved it is the one that changes how *often* the loop fires. Worth stating
+plainly because the next repair will be tempted by whichever number is easiest
+to reach.
+
+**Reprice the input, not the output, when the output is a loop.** Dropping the
+chance from 40% to 15% is a small edit with a non-linear effect: at 40 an ally
+holding three stacks advanced with certainty, so a release *deterministically*
+produced further releases and the chain sustained itself. At 15 nothing is ever
+guaranteed, so the same chain decays. The interesting part is that the fix is
+not "40 is too big" — it is "any value at which three stacks reaches 100% turns
+a probability into a rule", and the design question is where that threshold sits
+rather than how large the number is.
+
+**Ship the number that was asked for; measure the interaction you are worried
+about; take neither of the levers you thought of while worrying.** The concern
+about Apostle was real and the re-measure confirms it, but a second change
+shipped on the same batch as the first makes both unmeasurable — and the last
+two attempts at this row were both shipped without a number in hand and both
+missed.

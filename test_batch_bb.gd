@@ -787,8 +787,12 @@ func _live_ashes_returns_the_mage() -> void:
 func _docs() -> void:
 	var doc := _src("res://docs/master.html")
 	ok(doc != "", "§7: master.html is readable")
-	ok(doc.contains("Last updated: 2026-08-09 (Batch BB)"),
-		"§7: master.html carries this batch's stamp")
+	# RE-POINTED BY BATCH BE (BB -> BE), with the reason in the file: this
+	# duplicates test_batch_ah's stamp gate, which is the canonical one and
+	# moves with every batch that touches the doc. What it is really guarding
+	# is that the doc was touched AT ALL. Bump it, do not delete it.
+	ok(doc.contains("Last updated: 2026-08-09 (Batch BE)"),
+		"§7: master.html carries the current batch's stamp")
 	ok(doc.contains("Rot"), "§7: §3a's modifier table has Rot back")
 	# The pool tables are verbatim — test_batch_ah asserts them too, so this is
 	# the early warning rather than the only guard.
@@ -826,7 +830,16 @@ func _docs() -> void:
 	# sample counts and deepest marks the way AX printed them, so the three
 	# rows are comparable. The number is what §3 was actually asking for, and
 	# it had never reached a changelog before.
-	var bb: String = log.split("Batch BB")[1].split("Batch BA")[0]
+	# ANCHOR REPAIRED BY BATCH BE, and it was READING THE WRONG ENTRY. It used
+	# to slice on the bare phrase "Batch BB", which BC's own changelog entry
+	# then reproduced in its regression line ("every suite at its Batch BB
+	# count") — so from BC onward the slice was the TAIL OF BC'S ENTRY and all
+	# four checks below failed for a reason that had nothing to do with BB.
+	# REPRODUCED ON UNMODIFIED HEAD before it was touched. It anchors on the
+	# HEADING now and ends at the next one, which no later entry's prose can
+	# imitate. The four assertions themselves are byte-unchanged: the question
+	# was always right, only the text it was asked of was wrong.
+	var bb: String = log.split("<h2>2026-08-09 &mdash; Batch BB")[1].split("<h2>")[0]
 	ok(bb.contains("trash 0.07") and bb.contains("n=566") and bb.contains("deepest mark 31"),
 		"§7: the entry carries the trash half in full")
 	ok(bb.contains("boss 0.60") and bb.contains("n=25") and bb.contains("deepest mark 18"),

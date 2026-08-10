@@ -1450,10 +1450,18 @@ const LANE_TREES := {
 			"payload": {"stat": {"unyielding_ranks": 90}}},
 		# --- Lane FAITH — WHAT THE RETURNS PAY: invest in the dividend itself.
 		# Earn the stacks faster, keep them longer, spend them deeper. ---
+		# BATCH BE §1 — 40 -> 15, AND THE NUMBER BEHIND IT: BC's leave-one-out grid
+		# read this one row-1 node at 80% contribution against 47% withheld
+		# (healing 2255 against 444). At 40 an ally holding three or more stacks
+		# advanced with CERTAINTY, so a release deterministically produced further
+		# releases; at 15 nothing is ever guaranteed (15% at one stack, 45% at
+		# three, 60% at four) and the chain decays instead of sustaining. The
+		# counter keeps its meaning and its units — AW's reprice took it 20 -> 40
+		# and this takes it below where it started.
 		{"id": "dv_communion", "name": "Communion", "ranks": 1, "lane": "Faith", "row": 1,
 			"desc": "When a party member reaches 5 Faith, every other member has a ({v} x their own Faith stacks)% chance to gain 1 stack.",
-			"scale": {"step": 40},
-			"payload": {"stat": {"communion_ranks": 40}}},
+			"scale": {"step": 15},
+			"payload": {"stat": {"communion_ranks": 15}}},
 		# THE MOST INVESTMENT-SHAPED NODE IN THE GAME with Conviction's third
 		# clause: it raises the base that every payout in his kit — and every
 		# growth increment — scales from.
