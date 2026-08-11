@@ -659,25 +659,33 @@ func _negative_control_source() -> void:
 		"NEGATIVE CONTROL: no path multiplies the CURRENT maximum")
 	ok(not bsrc.contains("devout.max_hp * pct"),
 		"NEGATIVE CONTROL: ...and the halved path does not either")
-	ok(bsrc.contains("- heroes[i].conviction_hp_gained"),
-		"NEGATIVE CONTROL: battle.gd's victory sync subtracts the growth")
-	ok(rsrc.contains("- h.conviction_hp_gained"),
-		"NEGATIVE CONTROL: RunSim's victory sync subtracts it too")
-	# Both syncs must keep subtracting Tenacity's own battle-long gain as well.
+	# RE-POINTED BY BATCH BJ §1, with the reason here: the two victory-sync
+	# copies (battle.gd's and RunSim's) were deduplicated into ONE
+	# implementation, BattleUnit.sync_victory_state. THE QUESTION IS
+	# UNCHANGED — the growth must come off the saved maximum — but there is
+	# only one site to ask it of now, plus the requirement that BOTH old
+	# callers still route through it.
+	var usrc := FileAccess.get_file_as_string("res://scripts/unit.gd")
+	ok(usrc.contains("- conviction_hp_gained"),
+		"NEGATIVE CONTROL: the shared victory sync subtracts the growth")
+	ok(bsrc.contains("heroes[i].sync_victory_state(Run.party[i])"),
+		"NEGATIVE CONTROL: battle.gd's victory branch calls the shared sync")
+	ok(rsrc.contains("battle.heroes[i].sync_victory_state(run.party[i])"),
+		"NEGATIVE CONTROL: RunSim's victory path calls the same shared sync")
+	# The sync must keep subtracting Tenacity's own battle-long gain as well.
 	# CORRECTION TO THE BATCH BRIEF, recorded not glossed: it describes
 	# Tenacity's growth as PERMANENT. It is not — tenacity_hp_gained has been
 	# excluded from the save sync since Batch W, exactly like this one. The two
 	# fields still must not be merged, for a better reason: Unkillable's mend
 	# reads `max_hp - tenacity_hp_gained` as "the pool he brought into the
 	# battle" and must mean TENACITY'S growth alone.
-	ok(bsrc.contains("heroes[i].max_hp - heroes[i].tenacity_hp_gained")
-		and rsrc.contains("h.max_hp - h.tenacity_hp_gained"),
-		"Tenacity's battle-long gain is still subtracted at both syncs")
+	ok(usrc.contains("max_hp - tenacity_hp_gained"),
+		"Tenacity's battle-long gain is still subtracted at the shared sync")
 	ok(bsrc.contains("- strike_target.tenacity_hp_gained"),
 		"...and Unkillable still reads tenacity_hp_gained alone (why they stay separate)")
 	ok(bsrc.count("devout.conviction_hp_gained += step") == 1
-		and bsrc.count("heroes[i].conviction_hp_gained") == 1,
-		"conviction_hp_gained has exactly one writer and one reader in battle.gd")
+		and not bsrc.contains("heroes[i].conviction_hp_gained"),
+		"conviction_hp_gained has exactly one writer in battle.gd; the read moved to the shared sync")
 	# The drip must not be gated on the node.
 	# BATCH BH §2 STRENGTHENED THIS RATHER THAN RE-POINTING IT. AW's question
 	# was "the drip is not GATED on Fervor"; the drip is not touched by Fervor

@@ -31,7 +31,10 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - New `class_name` files need `--headless --import` before they resolve.
 - Balance: `./sim.sh N` = N battles of the FIXED raider/chief/archer/archer
   lineup (power 7, unscaled) — kit smoke tests only; its win% carries NO
-  difficulty signal (Batch R). `./sim.sh --sweep N` (DOD_SIM_SWEEP=1) = N
+  difficulty signal (Batch R). **sim.sh passes `--fixed-fps 240` since Batch
+  BJ §1 — 5.3x faster (headless frame-sync sleep removed), nothing the sim
+  computes changes; a --run 100 is ~8 minutes. Every report ends with the
+  BJ §3a signature-payoff table (per-spec signature moments, trash | boss).** `./sim.sh --sweep N` (DOD_SIM_SWEEP=1) = N
   battles at EACH budget 3/6/9/12, fresh fight-theme warband per battle,
   enemies unscaled (`DOD_SIM_ZONE` picks the roster); per budget it also
   prints avg enemy count, avg enemies alive entering round 3, and per-hero
@@ -321,6 +324,180 @@ the new spec's idea a second time. **BA re-specced four nodes off it** — Epide
 every enemy permanently Poisoned), Plague Bearer (rot leaps enemy to enemy), Creeping Death
 (a corpse passes its stacks to the living) and the NAME Virulence (a pathogen term). SNARES
 and GUERILLA were never disease and are untouched by the rule.
+
+### STANDING REFERENCE — THE DEBUG SURFACES, ALL OF THEM IN ONE TABLE (Batch BJ §1)
+Half of these were documented only in changelog entries; this is the record. Not for deletion.
+**Gate for every UI surface: `Run.debug_enabled()`** = dev build OR `DOD_DEBUG=1` (exported),
+and `DOD_DEBUG=0` FORCES it shut; every use trips `Run.debug_used` → the run summary's "not a
+clean data point" line. Sims can never reach the UI surfaces (`_debug_allowed()` excludes
+sim/autoplay/sim_run).
+· MAP BURGER debug items (map_screen, ids 10-16/20-26): +200 Gold | +200 Talent Points (all) |
+  Full Heal Party | Jump to Boss Slot | Advance to Next Zone | Reroll Specs | "All Spec
+  Abilities Unlocked" check = `Run.debug_grant_all`, the PRE-GRANT toggle (spec-scoped, AU §5;
+  also armable headlessly via `DOD_SIM_GRANT_ALL=1`) | Free Travel check =
+  `Run.debug_free_travel` | Test-a-Node submenu: Shop / ??? Event / Fight / Elite / Mini-boss
+  (in place, `Run.debug_summon` books nothing).
+· BATTLE `DEBUG ▾` menu (battle.gd, dev builds, not sim/autoplay): Full Restore | Kill All
+  Enemies (a switch, not a hit — on-death procs reading a killing blow do not fire) |
+  Cooldowns OFF (check) | Enemy attacks OFF (check; armable headlessly via
+  `DOD_ENEMIES_OFF=1`) | per-hero Turn Lock (radio).
+· ENV FLAGS, sim family (defaults in parens): `DOD_SIM` (battle count, standalone),
+  `DOD_SIM_SWEEP` (budgets 3/6/9/12), `DOD_SIM_RUN` (full runs), `DOD_SIM_SPECS` (party,
+  warrior/mage/cleric/hunter order), `DOD_SIM_ENEMIES` (forced lineup), `DOD_SIM_ZONE` (roster)
+  / `DOD_SIM_THEME` (one theme) / `DOD_SIM_BUDGET` (def 6, standalone), `DOD_SIM_TALENTS`
+  (force-learn ids), `DOD_SIM_ABILITIES` (append pending/pool abilities by name),
+  `DOD_SIM_GRANT_ALL`, `DOD_SIM_ROTATE` (all twelve specs), `DOD_SIM_ROUTE`
+  (greedy|default|cautious|elites — one walk since AN), `DOD_SIM_SHOPS`/`DOD_SIM_ITEMS`
+  (economy policies, def on), `DOD_SIM_BUILDS` (def each tree's FIRST lane — the BG confound),
+  `DOD_SIM_TROPHIES`, `DOD_SIM_RELICS`, `DOD_SIM_RUNES` (full|stats|off, def full),
+  `DOD_SIM_RUNE_ECON=rich` / `DOD_SIM_RUNE_POWER=<mult>` (AD experiment arms, double-gated on
+  Run.sim_run), `DOD_SIM_DIFFICULTY` (standard|wanderer x0.7 — never on a baseline row),
+  `DOD_SIM_DEBUG` (echo the combat log in sim mode — the hang discriminator).
+· ENV FLAGS, non-sim: `DOD_AUTOPLAY` (1 debug battle, echoes "[LOG]"; never exits on its own —
+  timeout/kill it), `DOD_DEBUG` (above), `DOD_ENEMIES_OFF` (above), `DOD_ZONE_ROTATION`
+  (randomize zone draws within slot pools).
+· RETIRED, still printed as retired in the report header: `DOD_SIM_MAP`, `DOD_SIM_MINIBOSS`,
+  `DOD_SIM_START_RUNE`, `DOD_SIM_SPEC_OPENING` (Batch AN, with their features).
+
+### STANDING REFERENCE — THE UNCAPPED-METER GOVERNOR TABLE (Batch BJ §3b)
+Six ratcheting accumulators exist; every governor was VERIFIED AT ITS SITE this batch. No
+meter is ungoverned. meter | what governs it | where the governor lives:
+· **Overburn's field total** (burn turns, uncapped) | the BONUS caps at +40 (+20 under Heat
+  Shimmer; lifted entirely by Immolate / Cauterise under 20 Mana) while the DRAIN never caps —
+  the asymmetry IS the governor: over-lighting is how he loses | `_overburn_mult` /
+  `_overburn_capped` (cap), `_overburn_drain` (uncapped cost), OVERBURN_STEP/CAP consts,
+  battle.gd ~7210-7260.
+· **Loyalty** (per beast, no ceiling) | the beast's DEATH breaks the meter (Steadfast Bond
+  keeps a share); plus BOND_MITIGATION_MAX 0.75 clamps Savage Presence so an uncapped boon can
+  never heal the hunter off enemy hits | `_on_beast_death` battle.gd ~10790; the clamp const
+  beside BOND_STEP ~7370-7385; `_loyalty_cap` returns the LOYALTY_UNCAPPED sentinel (only Wild
+  Rotation hands it a number — the cap IS that node's cost).
+· **Focus** (uncapped; Spray caps 50) | the FIXED-100 CONVERSION: the first 100 points buy
+  crit CHANCE (saturates at +50%), everything past buys MULTIPLIER only; Deep Focus moves the
+  split point down, floor 1 | FOCUS_CONVERT/FOCUS_STEP + focus_convert()/focus_crit_chance()/
+  focus_crit_mult()/lethal_crit_mult(), unit.gd ~605-645 (THE ONE PLACE THE SPLIT IS DECIDED).
+· **Resonance** (uncapped both ends, nothing removes stacks) | the uncapped DAMAGE-TAKEN cost:
+  RESONANCE_TAKEN_STEP 0.75%/curve-point on the same triangular curve T(N)=N(N+1)/2, and
+  NOTHING may modify that step (deliberate — Conduit and Magi's Wrath name the damage curve
+  only) | unit.gd ~543-582 (THE ONE PLACE THE CURVE IS DECIDED), read at battle.gd's
+  strike-target block.
+· **Ruin** (uncapped, never clears, detonates every 10th stack — Avatar installs 5) | the
+  LIFESTEAL caps at RUIN_LEECH_CAP = 0.40 of the damage dealt, whatever the stacks and
+  whatever the talents (Soul Glut included); the amplification is ALLOWED to run |
+  battle.gd ~7846 (const), applied at the strike-loop leech block ~5680.
+· **faith_peak** (never falls in battle) | the BATTLE RESET: `_reset_faith_meters()` zeroes
+  count and peak together at battle start, before the opening oath; one ratchet site in
+  `_gain_faith` | battle.gd ~8125-8171.
+
+BATCH BJ (08-11) — THE FULL AUDIT: dead code, tooltip truth, and the coherence tables. No save
+version moves (still v7); no magnitude moves, no node re-specced, no system redesigned. What
+shipped: deletions of unambiguous dead code, ONE dedup, ONE sim-harness speedup, and text
+corrected toward the code everywhere the two disagreed.
+
+§1 DEAD CODE — DELETED (each pinned ABSENT in test_batch_bj, the BA pattern): unit fields
+`below_half_last` (no writer, no reader), `was_frozen` (unread since AS replaced the
+"shattering" passive; its one write went too), `companion_hp_bonus` (writer died in the AY
+re-author; its +0 term went too), `infusion_ranks` (Dark Infusion died in the AX re-author, no
+vault marker — field AND dead branch), `chain_reaction_ranks` (the one AR-vault family member
+whose kept read site was ALREADY gone — no writer AND no reader, so the keep had no premise);
+run_state functions `relic_active` / `slot_type` / `owed_rune_picks` / `modifier_name` /
+`owed_upgrade_picks` and `Runes.generate_spec` (all zero callers; generate_spec was stranded
+when AN retired the spec-opening); `STATUS_INFO["bleed"]` (never applied by any path, never
+displayed — the bleed chip is synthesized from `bleed_buildup` in unit.gd); and the last REST
+SURVIVORS in code — the tally template's `"rests"` key (no writer existed), the run summary's
+"Rests taken: 0" line, and the report loop's `"rest"` row.
+§1 DELIBERATE KEEPS, one line each, all asserted PRESENT in test_batch_bj so a later cleanup
+must read the decision first: **CONVICTION_NO_CONSUME_SHARE** stays (test_batch_ay drives the
+branch directly and it is a designed rule — revived by any future writer of a partial-consume
+release, i.e. an effect that parks an ally at five or lets a release keep stacks);
+**CLASS_POOLS** stays (ready for the day the class draw reopens — AN §4's call, unchanged);
+**THE VAULT** stays whole — Retaliation, Ashes of Al'ar and Umbral Sigil are LIVE (in
+SPEC_POOLS, the draw the game actually reads), the other seven (Rallying Shout, Mana Shield,
+Arcane Surge, Reality Fracture, Dawnbreak, Sanctuary, Divine Wrath) are name-resolvable design
+inventory no live draw can offer, and four more are prose-only (Flame Surge, Frost Bolt, Death
+Ray v1, Mend Wounds — reviving any means AUTHORING); the AR/AS/AT rune-only and vault-pattern
+counter families stay (documented; `icy_veins_charge` is transitively unreachable but rides its
+family's comment); **the two dead `rest_heal_add` relic hooks stay** (Cairnmoss Poultice,
+Martyr's Knucklebone — re-speccing a relic is design, AN's note stands).
+§1 THE VICTORY SYNC IS ONE IMPLEMENTATION NOW: `BattleUnit.sync_victory_state(member)` — the
+three-field arithmetic (two gains OFF, Rot's loss BACK ON), the 20% return floor, the clamp and
+the Mana write — called by battle.gd's victory branch AND RunSim.on_battle_end. The two copies
+begging each other not to drift are gone; the sign-order block lives above the function.
+test_batch_aw and test_batch_bb RE-POINTED IN PLACE at the one site (reasons in the files).
+§1 THE SIM IS 5.3x FASTER AND NOTHING IT COMPUTES CHANGED: headless Godot ticks
+`process_frame` at a throttled ~146/s whatever Engine.max_fps says, so ~81% of every sim's
+wall clock was the engine SLEEPING between frames (100 battles: 28.8s CPU inside 88.5s wall).
+`sim.sh` passes **--fixed-fps 240** now — the flag disables real-time frame sync, the same
+frames run back-to-back (100 battles 16.7s at 98% CPU, wins/rounds/deaths statistically
+identical). The remaining cost is battle logic itself; sim code never reads delta. A run-100
+measurement is ~8 minutes now, which changes what is affordable to measure.
+§2 THE TOOLTIP AUDIT, SYSTEMATIC AND COMPLETE — 144+144 talent nodes, 84 ability dicts, 65
+runes + 6 templates, 72 glossary entries, 20 enemy kinds, every desc against its payload and
+read site. **THE COUNT: 38 discrepancies** (13 talent, 7 ability, 6 rune, 11 glossary, 1
+enemy-data) against the four found by accident in twenty batches. ALL TEXT FIXED TOWARD THE
+CODE except the two that are MISSING MECHANICS, reported not silently implemented (§2's rule):
+· **Unbroken Watch's tooltip lied outright** — promised +2 Loyalty, the read site reads the
+  field as a GATE and pays a fixed +1; the magnitude was never read. Desc/scale/payload all say
+  1 now (behavior unchanged); paying more is a design decision needing the read site to pass
+  the field as the amount. test_batch_bj pins the gate-only shape.
+· **Reality Fracture's perfect ("An Arcanist also banks 1 Resonance") has NO implementation**
+  — no perfect_id, no handler, nothing. Unreachable in live play (vault entry, dead class
+  draw), so nobody has ever seen the lie. PINNED INERT in test_batch_bj (the White Flame
+  pattern); implementing it is one branch in the perfect dispatch, made knowingly.
+The rest, in one line each: Cauterise now states Kiln-Forged's precedence; Siphon says
+"strikes" (Temporal Rift's echo was never siphoned); Ricochet is spelled Ricochet; three
+Beastmaster descs dropped FALSE BASELINES (no code ever halved Loyalty on death, extended
+Wrath per-two-stacks, or paid a dead boon "for a few turns"); Wild Rotation stopped claiming
+base arrival behavior; Sacred Covenant says "a shield" (the lethal-save hook has NO divine
+gate — ANY barrier pays it, Blessed Vestments included); the four authored fallbacks
+(Sacred Resolve, Bulwark, Mind Flay, Mass Hysteria) state their already-owned upgrades;
+Consecrated Ground's tooltip finally states its Faith drip (66% of all Faith — its principal
+function was absent from its own text); Call of the Wild no longer claims 15% for LIVING
+beasts (they make their real strikes; ghosts strike at 15%); Spirit Bond and Primal Surge
+state their Pack behavior; Explosive Shot's perfect and Shrapnel Charge state "% of Attack"
+(they read as flat); the Weeping Wound states its Cripple carrier, the Wide Current its +10%
+max-Mana trip, the Whispering Dark its 1-Ruin mark (AX said it must), the Open Hand its
+heal-crit gate, the Hollow Chalice its true 6%-per-stack, the Warpath its 50% roll; eleven
+glossary entries rewritten off dead systems (ceil(N/3) pricing, 1/2/3 points, rests, growing
+rune slots, 10-tier maps, three-spec trophies, four-a-zone bargains, '???' nodes); the boss
+comment in battle.gd corrected (EVERY boss unlocks a relic — code and glossary already
+agreed); enemy ability `description`s are authored text NO UI displays (reported, kept).
+The White Flame's inert clause was found again independently and is NOT counted — recorded
+since AR, pinned by test_batch_ar, stands.
+§3a THE SIGNATURE-PAYOFF TABLE (the sim prints it now on every report — `_b_sig` slice, one
+`_sig()` door, banked trash-vs-boss in _check_end beside the Ruin denominators, rendered by
+`signature_report_block`, "" when nothing banked). ROTATED RUN n=100, default first-lane
+builds (BG's standing confound applies: Holy's first lane never learns Intercession, so that
+row's zero is the BUILD, not the bot). Per battle, trash | boss:
+  Berserker bleedouts 1.40 | 2.42 · Warden blocks 6.31 | 9.16 · Swordmaster Guard Changes
+  1.33 | 3.12 · Pyromancer Detonations 0.82 | 1.27 · Cryomancer freezes 7.85 | 7.33 (holds
+  ≥3: 2.17 | 2.65) · Arcanist Death Rays 0.44 | 0.57 · Holy Resurrections 0.20 | 0.15
+  (Intercessions 0 | 0, build-gated) · Devout releases 1.30 | 2.31 · Occultist detonations
+  0.16 | 0.86 · Beastmaster swaps 0.05 | 0.13 (beast deaths 0.18 | 0.27) · Sharpshooter
+  Focus conversions 1.46 | 2.05 · Survivalist 3+-status strikes 2.55 | 4.62.
+**THE ANSWER TO §3a's QUESTION: boss-only payoffs are TWO SPECS, not a pattern.** Ten of
+twelve signatures fire at least ~0.8/trash battle; the Occultist (5.4x boss/trash, 0.16
+trash) is boss-tilted BY DESIGN (AX), and the Beastmaster's swap is nearly absent everywhere
+(0.05/0.06 in both constructions) — the capstone lane's verb is not happening on this bot
+(the AY §7 swap margin rule needs both slots full + a 1.25x better boon; report, don't tune).
+Devout releases read 0.90-1.30 trash in RUN contexts against BI's 0.7 standalone all-four —
+different instrument, both true; the run carries items, runes and deeper fights.
+§3b THE GOVERNOR TABLE is under "Current systems snapshot" below (all six verified at their
+sites this batch — no meter is ungoverned; finding of the first order: none).
+§3c THE RUN ECONOMY, MEASURED (n=100 default party — completions 53%, inside BG's 48-60%
+band — and n=100 rotated at 27%; rotation is harder, as W found): **gold earned 2386 /
+spent 881 / DEAD 1505 per run (63% of income is never spent).** Shop buys 5.4 heals + 2.2
+restocks + 9.0 runes; items used 10.7/run against 8.6 carried unused at the end; merchants
+met 9.80/run (the rests-equivalent; taken == offered by construction — they are scheduled,
+never declined); events 5.19/run; bargains 6.6/run at severity 3.67. **AO's question
+answered: income is not the constraint and neither are prices — the binding refusals are
+SLOTS (13.6 shop-rune refusals/run for no free slot, vs 6.8 for the 40g reserve).** The
+economy generates ~2.7x what the bot can find worth buying, WITH the standing caveat that
+sim acquisition is a floor on the bot's policy, not a human's. "Per route" is one row by
+construction — the three policies are one walk since AN (BG §1), not re-run as a band.
+§5 test_batch_bj.gd 67/0. RE-POINTED IN PLACE: test_batch_aw (victory-sync checks → the one
+shared implementation + both callers), test_batch_bb (same). The signature block carries the
+""-when-absent coverage in test_batch_bj.
 
 BATCH BI (08-10) — THE TWO FAITH AXES STOP FIGHTING EACH OTHER. No save version moves (still
 v7); every id survives. **§1 is a change to what the resource IS, §2 is a decomposition with one
@@ -4684,7 +4861,8 @@ max_hp→max_hp_pct stacks with Vitality, armor/speed/crit/con/resists,
 resource_floor AFTER member-mana sync), victory block (heal/mana/
 gold), award_gold (gold_find_mult), map rest (rest_heal_add), shop
 _price() (discount, min 1g), elite spoils (loot_extra). WAYSTONE
-REBALANCED +1→+3 pts. relic_active() legacy-kept but no site uses it.
+REBALANCED +1→+3 pts. relic_active() was legacy-kept with no callers until
+Batch BJ §1 DELETED it (relic_add/relic_dict are the live doors).
 events relic_grant takes {"tier": "..."} (collectors_grave digs a
 guaranteed rare). Draft shelf + relics gallery are SCROLLING grids now
 (fixed grids overflowed past ~9 relics); rares wear ◆. DECLARED OUT
@@ -5617,8 +5795,10 @@ Space or left click; no announcer text (combat log only).
   twenty (6/6/4/4). Do not re-record it as dropped.
 - **THE VICTORY SYNC NOW HAS THREE FIELDS MEETING AT ONE LINE AND THEIR SIGNS DIFFER.
   READ THIS BEFORE TOUCHING IT — IT IS THE SITE WITH A ~127,000 MAX-HP RUNAWAY IN ITS
-  HISTORY (Batch W) AND THE SITE THAT GOT `rot` DROPPED FROM AQ.** Both syncs
-  (battle.gd's victory branch AND run_sim.gd's `on_battle_end`) compute:
+  HISTORY (Batch W) AND THE SITE THAT GOT `rot` DROPPED FROM AQ.** Since Batch BJ §1 it is
+  ONE IMPLEMENTATION — `BattleUnit.sync_victory_state(member)`, called by battle.gd's
+  victory branch AND run_sim.gd's `on_battle_end` (the two copies could drift; now they
+  cannot). It computes:
   `max_hp - tenacity_hp_gained - conviction_hp_gained + rot_hp_lost`.
   · **`tenacity_hp_gained` — SUBTRACTED.** A one-fight gain, off since W. **IT HAS A
     SECOND CONSUMER**: Unkillable's mend reads `max_hp - tenacity_hp_gained` as "the pool

@@ -41,7 +41,9 @@ var _had_save := false
 # here and say so.
 const NODES := {
 	"wd_unkillable": [1, "Plate", "Unkillable", "unkillable_ranks", 1],
-	"wd_ricochet": [1, "Threat", "Richocet", "ricochet_ranks", 1],
+	# RE-POINTED BY BATCH BJ §2: AL's table enshrined the misspelling
+	# "Richocet"; the node is spelled Ricochet now (a text fix, nothing else).
+	"wd_ricochet": [1, "Threat", "Ricochet", "ricochet_ranks", 1],
 	"wd_tank_spank": [1, "Banner", "Tank and Spank", "tank_spank_ranks", 1],
 	"wd_toughness": [2, "Plate", "Toughness", "toughness_ranks", 1],
 	"wd_taunt_master": [2, "Threat", "Provoke", "provoke_ranks", 1],

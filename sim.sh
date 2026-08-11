@@ -48,15 +48,22 @@ elif [[ "$1" == "--run" ]]; then
     runs=50
   fi
 fi
+# --fixed-fps disables Godot's real-time frame sync (Batch BJ §1). The sim's
+# only pacing is `await process_frame`, and headless Godot ticks those at a
+# throttled ~146/s no matter what Engine.max_fps says — two thirds of every
+# sim's wall clock was the engine sleeping between frames. With the flag the
+# same frames run back-to-back: measured 5.3x (100 battles 88.5s -> 16.7s)
+# with wins/rounds/deaths statistically identical. Sim logic never reads
+# delta, so the fixed timestep changes nothing it computes.
 if [[ -n "$runs" ]]; then
   DOD_SIM_RUN="$runs" \
   DOD_SIM_SPECS="${1:-berserker,cryomancer,inquisitor,beastmaster}" \
-    /Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
+    /Applications/Godot.app/Contents/MacOS/Godot --headless --fixed-fps 240 --path . \
     res://scenes/battle.tscn
 else
   DOD_SIM="${1:-200}" \
   DOD_SIM_SWEEP="$sweep" \
   DOD_SIM_SPECS="${2:-berserker,cryomancer,inquisitor,beastmaster}" \
-    /Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
+    /Applications/Godot.app/Contents/MacOS/Godot --headless --fixed-fps 240 --path . \
     res://scenes/battle.tscn
 fi

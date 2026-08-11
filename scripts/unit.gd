@@ -232,7 +232,6 @@ var deadfall_dormant := 0    # turns it must rest before it can spring again (2)
 # `deadfall_aims` IS DELETED, not left unreachable (the BA precedent): the
 # perfect no longer names a victim, so the array could never be non-empty and a
 # later batch could otherwise write one.
-var companion_hp_bonus := 0   # talents: extra HP for summoned companions
 var companion_power := 0      # talents: extra damage on companion attacks
 # Fixed-tree talent stats (0/0.0 = not learned). See talents.gd for sources.
 var bleed_bonus := 0          # Savagery: extra Bleed on bleed-building abilities
@@ -285,7 +284,6 @@ var dmg_taken_bonus := 0.0    # Reckless Fury: takes more damage
 var enraged_ranks := 0        # Enraged: stacks when dropping below 50% HP
 var enraged_stacks := 0       # current Enraged stacks (max 3)
 var enraged_timer := 0        # turns left on the Enraged buff
-var below_half_last := false  # edge detection for Enraged triggers
 var bloodcraze := 0           # Bloodcraze ranks: heal % max HP on enemy bleedout
 var unrelenting_ranks := 0    # Unrelenting Assault: +con when dropping below 25%
 var unrelenting_cd := 0
@@ -419,11 +417,9 @@ var ashes_used := false       # the phoenix rises once per battle
 var scorched_ranks := 0       # no node: Scorched Earth
 var living_flame_ranks := 0   # no node: Living Flame
 var implosion_ranks := 0      # no node: Implosion
-var chain_reaction_ranks := 0 # no node: Chain Reaction
 var fuse_ranks := 0           # no node: Fuse
 var white_heat_ranks := 0     # no node: White Heat
 var avatar_flame := 0         # no node: Avatar of Flame
-var was_frozen := false       # has been Frozen this battle
 # Cryomancer tree (Batch AS lanes: Winter / Deep Freeze / Thaw).
 # EVERY COUNTER BELOW IS ADDITIVE, not ranked: the node writes its own
 # magnitude in the units the read site sums, so a rune writing the same field
@@ -747,8 +743,43 @@ var conviction_base_hp := 0   # the base the 3% reads, captured at first release
 # THREE FIELDS NOW MEET AT THAT ONE SITE AND THEIR SIGNS DIFFER. The sync ADDS
 # this one back and SUBTRACTS the other two; `tenacity_hp_gained` is subtracted
 # and additionally has the second consumer named above. Do not fold any of the
-# three into another — see the block at battle.gd's victory branch.
+# three into another — the one site is sync_victory_state, directly below.
 var rot_hp_lost := 0          # Rot: max HP taken for one fight (added back at the sync)
+
+
+# THE VICTORY SYNC — what a won battle writes back onto the saved party member.
+# ONE implementation, TWO callers (battle.gd's victory branch and
+# RunSim.on_battle_end), extracted in Batch BJ §1: they were two copies whose
+# comments begged each other not to drift, which is exactly how drift happens.
+#
+# THREE FIELDS MEET HERE AND THEIR SIGNS DIFFER. STATE THE ORDER BEFORE
+# TOUCHING THIS LINE — it is the arithmetic with a ~127,000 max-HP runaway in
+# its history (Batch W) and the reason `rot` was dropped from Batch AQ:
+#
+#   tenacity_hp_gained   SUBTRACTED. A one-fight gain, off since W. IT HAS A
+#                        SECOND CONSUMER — Unkillable's mend reads
+#                        `max_hp - tenacity_hp_gained` as "the pool he brought
+#                        into the battle" — so nothing may be folded INTO it.
+#   conviction_hp_gained SUBTRACTED. A one-fight gain (Batch AW).
+#   rot_hp_lost          ADDED BACK. A one-fight LOSS (Batch BB §5). The only
+#                        one of the three with this sign, which is exactly why
+#                        it is its own field.
+#
+# ALL THREE STAY SEPARATE. Two of them happen to cancel arithmetically in a
+# fight that carries both, and that is a coincidence of the numbers, not a
+# licence to merge them: they answer different questions and one of them is
+# read somewhere else.
+func sync_victory_state(member: Dictionary) -> void:
+	var save_max: int = max_hp - tenacity_hp_gained - conviction_hp_gained \
+		+ rot_hp_lost
+	# The fallen refuse to stay down: heroes return from a won fight at 20%,
+	# and hp is clamped under the restored maximum in the same step.
+	member["hp"] = clampi(maxi(hp, int(save_max * 0.2)), 1, save_max)
+	member["max_hp"] = save_max
+	if resource_name == "Mana":
+		member["mana"] = resource
+
+
 var communion_ranks := 0      # Communion: (N x their own stacks)% to spread
 var faithful_step := 0        # Blessed are the Faithful: +N pts on the 15% heal
 var devoutness_ranks := 0     # Devoutness: party-wide BD cut, percentage POINTS
@@ -841,7 +872,6 @@ var murderous_ranks := 0      # Murderous Intent: bewitched kills heal
 var invigoration_ranks := 0   # Invigoration: Dark Pact mana regen
 var spread_ranks := 0         # Spread of Madness: % chance Psychosis leaps
 var spread_ruin := 0          # Spread of Madness: Ruin the newly maddened take
-var infusion_ranks := 0       # Dark Infusion: attack per unique debuff
 var mirror_ranks := 0         # Umbral Mirror: % chance enemy debuffs reflect
 var broken_will_ranks := 0    # Broken Will: +% Break damage dealt
 var deep_hex_step := 0        # Deeper Hex: +% damage per Ruin stack on the base 2%

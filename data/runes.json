@@ -119,7 +119,7 @@
 		"name": "Rune of the Warpath", "rarity": "rare", "scope": "spec:berserker",
 		"price": 100, "lane": "Warpath",
 		"requires_ability": "Hack and Slash",
-		"desc": "Hack and Slash costs 5 less Rage and builds +5 Bleed per cut.",
+		"desc": "Hack and Slash costs 5 less Rage and builds +5 Bleed on every cut that draws blood (its own 50% roll).",
 		"payload": {"ability": "Hack and Slash", "add": {"cost": -5, "bleed_build": 5}}
 	},
 	"broad_path": {
@@ -252,7 +252,7 @@
 	"wide_current": {
 		"name": "Rune of the Wide Current", "rarity": "rare", "scope": "spec:arcanist",
 		"price": 100,
-		"desc": "A little of every current: +1% crit per stack, every third crit hits 20% harder, surviving a blow under 25% health grants a stack.",
+		"desc": "A little of every current: +1% crit per stack; every third crit hits 20% harder and swells his maximum Mana 10%; surviving a blow under 25% health grants a stack.",
 		"payload": {"stat": {"arcane_mastery_ranks": 1, "critical_mass_ranks": 1, "rune_on_edge_ranks": 1}}
 	},
 
@@ -277,7 +277,7 @@
 	"open_hand": {
 		"name": "Rune of the Open Hand", "rarity": "rare", "scope": "spec:holy",
 		"price": 100,
-		"desc": "A little of every grace: +3% healing, she opens each battle holding 1 Mercy, and allies under a quarter heal 5% more.",
+		"desc": "A little of every grace: +3% healing and her instant heals can CRIT, she opens each battle holding 1 Mercy, and allies under a quarter heal 5% more.",
 		"payload": {"stat": {"triage_heal": 3, "zealous_mercy": 1, "last_hope_pct": 5}}
 	},
 
@@ -321,13 +321,13 @@
 	"hollow_chalice": {
 		"name": "Rune of the Hollow Chalice", "rarity": "rare", "scope": "spec:occultist",
 		"price": 75, "scarred": true, "lane": "Leech",
-		"desc": "The Ruin lifesteal drinks 3% more per stack, and another 3% on top — but heals HE receives are 30% weaker (capped at 40% of the damage dealt).",
+		"desc": "The Ruin lifesteal drinks 6% more per stack — but heals HE receives are 30% weaker (capped at 40% of the damage dealt).",
 		"payload": {"stat": {"soul_leech_step": 3, "gluttony_ranks": 3, "healing_received_mult": -0.3}}
 	},
 	"whispering_dark": {
 		"name": "Rune of the Whispering Dark", "rarity": "rare", "scope": "spec:occultist",
 		"price": 100,
-		"desc": "A little of every rite: +5% Break damage, Psychosis spreads 15% more readily, enemy afflictions mend the party each turn.",
+		"desc": "A little of every rite: +5% Break damage, Psychosis spreads 15% more readily and marks the newly maddened with 1 Ruin, enemy afflictions mend the party each turn.",
 		"payload": {"stat": {"broken_will_ranks": 5, "spread_ranks": 15, "spread_ruin": 1, "pleasure_pct": 0.5}}
 	},
 
@@ -384,7 +384,7 @@
 	"weeping_wound": {
 		"name": "Rune of the Weeping Wound", "rarity": "rare", "scope": "spec:mystic",
 		"price": 100, "lane": "Venom",
-		"desc": "His basic attack leaves Poison behind for 2 turns, and every stack bites 2 harder.",
+		"desc": "His basic attack leaves Poison AND Cripple behind for 2 turns, and every stack bites 2 harder.",
 		"payload": {"stat": {"coated_blades": 1, "potent_ranks": 2}}
 	},
 	"quick_spring": {

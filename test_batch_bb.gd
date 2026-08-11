@@ -530,12 +530,16 @@ func _rot_pool() -> void:
 func _rot_sync_source() -> void:
 	var bsrc := _src("res://scripts/battle.gd")
 	var rsrc := _src("res://scripts/run_sim.gd")
-	# THE ORDERING, ASSERTED AT BOTH SYNCS. This is the site with a ~127,000
-	# max-HP runaway in its history and the site that got `rot` dropped from AQ.
-	ok(bsrc.contains("heroes[i].max_hp - heroes[i].tenacity_hp_gained \\\n\t\t\t\t- heroes[i].conviction_hp_gained + heroes[i].rot_hp_lost"),
-		"§5: battle.gd's sync subtracts two gains and ADDS the loss")
-	ok(rsrc.contains("h.max_hp - h.tenacity_hp_gained - h.conviction_hp_gained \\\n\t\t\t+ h.rot_hp_lost"),
-		"§5: run_sim.gd's sync carries the same three fields with the same signs")
+	# RE-POINTED BY BATCH BJ §1, with the reason here: the two sync copies were
+	# deduplicated into ONE implementation, BattleUnit.sync_victory_state, so
+	# the three-field expression exists in exactly one place now. THE QUESTION
+	# IS UNCHANGED — two gains off, the loss back on — asked of the one site,
+	# plus the requirement that BOTH old callers route through it.
+	ok(_src("res://scripts/unit.gd").contains("max_hp - tenacity_hp_gained - conviction_hp_gained \\\n\t\t+ rot_hp_lost"),
+		"§5: the shared sync subtracts two gains and ADDS the loss")
+	ok(bsrc.contains("heroes[i].sync_victory_state(Run.party[i])")
+		and rsrc.contains("battle.heroes[i].sync_victory_state(run.party[i])"),
+		"§5: both victory paths route through the ONE shared sync")
 	# ALL THREE STAY SEPARATE. Folding either of the others into
 	# tenacity_hp_gained would change what Unkillable's mend heals for.
 	ok(bsrc.contains("var unkill_base: int = strike_target.max_hp \\\n\t\t\t\t\t\t\t- strike_target.tenacity_hp_gained"),
@@ -792,7 +796,7 @@ func _docs() -> void:
 	# is the canonical one and moves with every batch that touches the doc. What
 	# it is really guarding is that the doc was touched AT ALL. Bump it, do not
 	# delete it.
-	ok(doc.contains("Last updated: 2026-08-10 (Batch BI)"),
+	ok(doc.contains("Last updated: 2026-08-11 (Batch BJ)"),
 		"§7: master.html carries the current batch's stamp")
 	ok(doc.contains("Rot"), "§7: §3a's modifier table has Rot back")
 	# The pool tables are verbatim — test_batch_ah asserts them too, so this is

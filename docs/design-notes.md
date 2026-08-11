@@ -4,6 +4,32 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## What was under the four accidents (Batch BJ) — 2026-08-11
+
+Four lying tooltips were found by accident in twenty batches — Measured Rage,
+Wildfire, Quick Rigging, Swift — every one discovered because a batch happened
+to reprice the node next door. The systematic pass found thirty-eight more.
+
+The number matters less than its shape. Only two were the Quick Rigging class —
+a promise with no implementation anywhere (Reality Fracture's perfect, and
+Unbroken Watch's +2 that was really a +1). The other thirty-six were all the
+same species of rot: text written against a game that later batches replaced,
+in places no batch had a reason to reread. Three Beastmaster tooltips still
+described the baselines their own re-author deleted ("rather than halving it" —
+nothing halves). Eleven glossary entries taught systems that were gone —
+talent-price curves, rests, growing rune slots, maps you route through. The
+worst offenders were not the newest text but the most *settled*: Consecrated
+Ground's tooltip never mentioned the Faith drip that is two thirds of what the
+lane generates, because the drip was added to the ability two batches after the
+tooltip was written and nothing forced the two together.
+
+The lesson is the same one the victory sync taught this batch from the code
+side: two copies of one truth drift, and the copy nobody rereads is the one
+that lies. Where a number lives in a payload and a desc renders it, the pair
+stays honest; where prose restates a mechanic, the prose quietly expires. The
+audit is the correction, not the cure — the cure is fewer places where truth
+is restated rather than rendered.
+
 ## Adding an axis is not the same as adding a choice (Batch BI) — 2026-08-10
 
 This one is about me rather than about the Devout.

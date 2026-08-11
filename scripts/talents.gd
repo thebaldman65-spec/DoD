@@ -542,7 +542,7 @@ const LANE_TREES := {
 			"payload": {"stat": {"battered_ranks": 1}}},
 		# --- Lane B: Threat — he wants to be hit. This lane is what
 		# happens to whoever obliges. ---
-		{"id": "wd_ricochet", "name": "Richocet", "ranks": 1, "lane": "Threat", "row": 1,
+		{"id": "wd_ricochet", "name": "Ricochet", "ranks": 1, "lane": "Threat", "row": 1,
 			"desc": "Blocking an attack has a {v}% chance to Stun the attacker.",
 			"scale": {"step": 35},
 			"payload": {"stat": {"ricochet_ranks": 1}}},
@@ -782,8 +782,11 @@ const LANE_TREES := {
 		# sits on Mana precisely so it is not a clock he carries; this node
 		# lets a player choose to carry it anyway, which is a decision rather
 		# than a tax — and the sharpest thing in the tree.
+		# BJ §2: the desc now states the Kiln-Forged precedence the read site
+		# has always enforced (battle.gd's _overburn_tick: the floor wins and
+		# the drain the floor refuses is never billed in blood).
 		{"id": "py_cauterize", "name": "Cauterise", "ranks": 1, "lane": "Inferno", "row": 7,
-			"desc": "Drain that would take you below 0 Mana takes health instead, 1 HP per Mana — and your damage cap is removed while you are under 20 Mana.",
+			"desc": "Drain that would take you below 0 Mana takes health instead, 1 HP per Mana — and your damage cap is removed while you are under 20 Mana. (Kiln-Forged's floor takes precedence: drain it refuses is never paid in blood.)",
 			"payload": {"stat": {"cauterise": 1}}},
 		# --- Lane C: DETONATION — how big the trigger is. ---
 		{"id": "py_shockwave", "name": "Focused Flame", "ranks": 1, "lane": "Detonation", "row": 1,
@@ -1161,8 +1164,11 @@ const LANE_TREES := {
 		# Re-spec (was Mana Attunement, "Mana every time you gain a stack"):
 		# the same passive Mana income, paid on the damage he deals instead of
 		# the stacks he banks — because he can no longer vent for Mana.
+		# BJ §2: "all damage" overstated — the pool is strike damage (what
+		# `total_dealt` accumulates); Temporal Rift's echo lands outside it
+		# and is never siphoned. Desc corrected toward the code.
 		{"id": "ar_attunement", "name": "Siphon", "ranks": 1, "lane": "Entropy", "row": 6,
-			"desc": "{v}% of all damage he deals is restored as Mana.",
+			"desc": "{v}% of the damage his strikes deal is restored as Mana.",
 			"scale": {"step": 20},
 			"payload": {"stat": {"siphon_ranks": 20}}},
 		# THE LANE'S THESIS, re-specced from Arcane Ward (which softened the
@@ -1487,7 +1493,7 @@ const LANE_TREES := {
 		# Two magnitudes, two fields: the heal is a percentage, the Faith is a
 		# stack count, and one counter cannot honestly hold both.
 		{"id": "dv_covenant", "name": "Sacred Covenant", "ranks": 1, "lane": "Faith", "row": 5,
-			"desc": "Should Divine Shield prevent lethal damage, its holder is healed for {v}% max health and gains 2 Faith stacks.",
+			"desc": "Should a shield prevent lethal damage, its holder is healed for {v}% max health and gains 2 Faith stacks.",
 			"scale": {"step": 25},
 			"payload": {"stat": {"covenant_heal": 25, "covenant_faith": 2}}},
 		# BATCH BH §2 — RE-SPECCED ONTO CONVICTION'S HELD HALF, AND THE REASON IS
@@ -1550,7 +1556,7 @@ const LANE_TREES := {
 		# §5: the authored fallback for a hero who already EARNED Sacred Resolve
 		# — the node pays a longer split instead of a grant it cannot make.
 		{"id": "dv_resolve", "name": "Sacred Resolve", "ranks": 1, "lane": "Zeal", "row": 3,
-			"desc": "New ability: Sacred Resolve — all damage received is split evenly among living heroes for 3 turns; Break damage still lands on the struck hero (25 Mana, 2.5 int, 5cd; Perfect: 4 turns).",
+			"desc": "New ability: Sacred Resolve — all damage received is split evenly among living heroes for 3 turns; Break damage still lands on the struck hero (25 Mana, 2.5 int, 5cd; Perfect: 4 turns). Already owned: the split lasts 5 turns instead.",
 			"payload": {"grant_ability": "Sacred Resolve",
 				"upgrade": [{"stat": {"resolve_extra_turns": 2}}]}},
 		{"id": "dv_pulse", "name": "Healing Pulse", "ranks": 1, "lane": "Zeal", "row": 4,
@@ -1581,7 +1587,7 @@ const LANE_TREES := {
 		# CLERIC capstone to owe a fallback at all. Corrected toward the code.
 		{"id": "dv_bulwark", "name": "Bulwark of Fortitude", "ranks": 1, "lane": "Bulwark", "row": 8,
 			"capstone": true,
-			"desc": "New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.0 int, 3cd; Perfect: the party instantly heals 5%).",
+			"desc": "New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.0 int, 3cd; Perfect: the party instantly heals 5%). Already owned: it lasts 4 turns instead.",
 			"payload": {"grant_ability": "Bulwark of Fortitude",
 				"upgrade": [{"stat": {"bulwark_extra_turns": 1}}]}},
 		# BATCH BG §2 — RE-SPECCED OFF THE FREQUENCY AXIS, and the id, the lane
@@ -1932,10 +1938,17 @@ const LANE_TREES := {
 			"desc": "Companion strike damage per Loyalty stack rises to {v}% (from the base 5%).",
 			"scale": {"base": 5, "step": 7},
 			"payload": {"stat": {"wild_communion_step": 7}}},
+		# BJ §2: THE TOOLTIP LIED — it promised +2 while the read site
+		# (battle.gd's companion-tick block) reads the field as a GATE and
+		# pays a fixed +1; the magnitude was never read anywhere. Corrected
+		# toward the code: desc, scale and payload all say 1 now, so the
+		# field stays gate-and-magnitude-in-one if a later batch decides the
+		# node should pay more (that is a design decision, and the read site
+		# would need to pass the field as the amount).
 		{"id": "bm_unbroken", "name": "Unbroken Watch", "ranks": 1, "lane": "devotion", "row": 2,
 			"desc": "The active beast gains +{v} additional Loyalty on any turn it took no damage.",
-			"scale": {"step": 2},
-			"payload": {"stat": {"unbroken_watch": 2}}},
+			"scale": {"step": 1},
+			"payload": {"stat": {"unbroken_watch": 1}}},
 		# RE-SPECCED, NOT REPRICED: it used to raise a ceiling, and Batch AY §2
 		# removed the ceiling. It is the lane's thesis now — the dial on the
 		# curve itself, and Ancient Pact stacks on top of it (+70% a stack).
@@ -1944,11 +1957,11 @@ const LANE_TREES := {
 			"scale": {"base": 20, "step": 15},
 			"payload": {"stat": {"absolute_step": 15}}},
 		{"id": "bm_devoted_fury", "name": "Devoted Fury", "ranks": 1, "lane": "devotion", "row": 4,
-			"desc": "Bestial Wrath lasts {v} turn(s) longer per Loyalty stack, rather than per two.",
+			"desc": "Bestial Wrath lasts {v} turn(s) longer per Loyalty stack on the beast.",
 			"scale": {"step": 1},
 			"payload": {"stat": {"devoted_fury": 1}}},
 		{"id": "bm_steadfast", "name": "Steadfast Bond", "ranks": 1, "lane": "devotion", "row": 5,
-			"desc": "A beast's death returns {v}% of its Loyalty rather than halving it — the meter survives it whole.",
+			"desc": "A beast's death returns {v}% of its Loyalty rather than breaking it — the meter survives it whole.",
 			"scale": {"step": 100},
 			"payload": {"stat": {"steadfast_bond": 100}}},
 		# RE-SPECCED, NOT REPRICED: tripling AT a threshold is meaningless once
@@ -2003,7 +2016,7 @@ const LANE_TREES := {
 		# it imposes, and that cap IS its cost — the one node in the game that
 		# still hands `_loyalty_cap` a number.
 		{"id": "bm_wild_rotation", "name": "Wild Rotation", "ranks": 1, "lane": "pack", "row": 7,
-			"desc": "Swap Companion has no cooldown and arrival effects ALWAYS fire. Loyalty caps at {v}.",
+			"desc": "Swap Companion has no cooldown — rotate every turn, each arrival effect firing as it comes. Loyalty caps at {v}.",
 			"scale": {"step": 3},
 			"payload": {"stat": {"wild_rotation": 3}}},
 		# --- Lane HANDLER: when the partnership is not the answer ---
@@ -2028,7 +2041,7 @@ const LANE_TREES := {
 			"scale": {"step": 6},
 			"payload": {"stat": {"symbiosis": 6}}},
 		{"id": "bm_vengeance", "name": "Vengeance", "ranks": 1, "lane": "handler", "row": 6,
-			"desc": "When a beast dies you take its Pack Bond boon at FULL strength for the rest of the battle, rather than for a few turns — and deal +{v}% damage while it holds.",
+			"desc": "When a beast dies you take its Pack Bond boon at FULL strength for the rest of the battle — where it would otherwise die with the beast — and deal +{v}% damage while it holds.",
 			"scale": {"step": 30},
 			"payload": {"stat": {"vengeance": 1, "vengeance_dmg": 30}}},
 		{"id": "bm_lone_hunter", "name": "Lone Hunter", "ranks": 1, "lane": "handler", "row": 7,
@@ -2127,7 +2140,7 @@ const LANE_TREES := {
 		# §4's authored fallback (AU §1): a hero who already EARNED Mind Flay
 		# gets a THIRD mind instead of a grant it cannot make.
 		{"id": "oc_mind_flay", "name": "Mind Flay", "ranks": 1, "lane": "Madness", "row": 3,
-			"desc": "New ability: Mind Flay — 30% of Attack in shadow to TWO chosen minions, inflicting Psychosis for 3 turns (25 Mana, 3.0 int, 2cd; Perfect: 4 turns). Bosses resist until Broken.",
+			"desc": "New ability: Mind Flay — 30% of Attack in shadow to TWO chosen minions, inflicting Psychosis for 3 turns (25 Mana, 3.0 int, 2cd; Perfect: 4 turns). Bosses resist until Broken. Already owned: it flays THREE minds instead.",
 			"payload": {"grant_ability": "Mind Flay",
 				"upgrade": [{"ability": "Mind Flay",
 					"set": {"choose_two": false, "choose_three": true,
@@ -2207,7 +2220,7 @@ const LANE_TREES := {
 		# gets it back twice as often instead of a grant it cannot make.
 		{"id": "oc_hysteria", "name": "Mass Hysteria", "ranks": 1, "lane": "Madness", "row": 8,
 			"capstone": true,
-			"desc": "New ability: Mass Hysteria — next turn every minion strikes a fellow with DOUBLE Break damage, Sundering them for 3 turns (30 Mana, 4.0 int, 4cd; Perfect: 3cd). Bosses resist until Broken.",
+			"desc": "New ability: Mass Hysteria — next turn every minion strikes a fellow with DOUBLE Break damage, Sundering them for 3 turns (30 Mana, 4.0 int, 4cd; Perfect: 3cd). Bosses resist until Broken. Already owned: its cooldown falls to 2.",
 			"payload": {"grant_ability": "Mass Hysteria",
 				"upgrade": [{"ability": "Mass Hysteria", "set": {"cooldown": 2}}]}},
 		{"id": "oc_soul_glut", "name": "Soul Glut", "ranks": 1, "lane": "Leech", "row": 8,

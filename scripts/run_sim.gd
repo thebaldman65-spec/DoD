@@ -517,19 +517,10 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 	t["wins"] += 1.0
 	run.combat_wins += 1
 	for i in battle.heroes.size():
-		var h = battle.heroes[i]
-		# Same clamp as the real branch, and the SAME THREE FIELDS WITH THE
-		# SAME SIGNS: Tenacity's and Conviction's battle-long GAINS come off
-		# (both one-fight loans), and Rot's battle-long LOSS goes back on
-		# (Batch BB §5 — the opposite sign, which is why it is its own field).
-		# The ordering and the reason for keeping all three apart are stated in
-		# full at battle.gd's victory branch; this site must never drift from it.
-		var save_max: int = h.max_hp - h.tenacity_hp_gained - h.conviction_hp_gained \
-			+ h.rot_hp_lost
-		run.party[i]["hp"] = clampi(maxi(h.hp, int(save_max * 0.2)), 1, save_max)
-		run.party[i]["max_hp"] = save_max
-		if h.resource_name == "Mana":
-			run.party[i]["mana"] = h.resource
+		# The three-field sync (two gains off, Rot's loss back on) is ONE
+		# implementation on BattleUnit now, shared with battle.gd's victory
+		# branch (Batch BJ §1) — it can no longer drift from the real one.
+		battle.heroes[i].sync_victory_state(run.party[i])
 	var node_type := String(run.encounter.get("type", "fight"))
 	run.award_talent_points(node_type)
 	run.award_gold(node_type)
@@ -1041,6 +1032,11 @@ static func _print_report(battle) -> void:
 	var tx_line: String = battle.trap_report_line(battle.sim_stats)
 	if tx_line != "":
 		print(tx_line)
+	# BJ §3a: the signature-payoff table — the run harness is the standard
+	# source for it (only a run ever meets a boss).
+	var sx_block: String = battle.signature_report_block(battle.sim_stats)
+	if sx_block != "":
+		print(sx_block)
 	var earned := talent_spent + talent_left
 	print("Talent points per hero per run: earned %.1f   spent %.1f (banked %.1f)" % [
 		earned / runs / 4.0, talent_spent / runs / 4.0, talent_left / runs / 4.0])
@@ -1133,7 +1129,7 @@ static func _print_report(battle) -> void:
 		walk_steps])
 	var off_parts := PackedStringArray()
 	var deck_parts := PackedStringArray()
-	for ty in ["fight", "elite", "miniboss", "rest", "shop", "event", "boss"]:
+	for ty in ["fight", "elite", "miniboss", "shop", "event", "boss"]:
 		off_parts.append("%s %.1f/%.1f" % [ty,
 			float(type_taken.get(ty, 0)) / runs,
 			float(type_offered.get(ty, 0)) / runs])

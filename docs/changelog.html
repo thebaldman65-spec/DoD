@@ -5,6 +5,89 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-11 &mdash; Batch BJ: the full audit</h2>
+<p><i>No save version moves (still v7). No magnitude moves, no node re-specced, no system
+redesigned. What shipped: deletions of unambiguous dead code, one deduplication, one
+sim-harness speedup, and every tooltip, rune text, and glossary entry corrected toward the
+code where the two disagreed.</i></p>
+
+<h3>&sect;2 &mdash; The tooltip audit, leading, because the count is the headline</h3>
+<p><b>Thirty-eight discrepancies</b>, against the four found by accident in twenty batches:
+13 talent tooltips, 7 ability descriptions, 6 rune texts, 11 glossary entries, and one block
+of authored enemy text no screen displays. All text is fixed toward the code. <b>Two were not
+text problems but MISSING MECHANICS, reported rather than silently implemented:</b></p>
+<p><b>Unbroken Watch's tooltip lied outright</b> &mdash; it promised +2 Loyalty on a
+no-damage turn while the code reads the field as a gate and pays a fixed +1; the magnitude
+was never read anywhere. The tooltip says +1 now (behavior unchanged); paying more is a
+design decision. <b>Reality Fracture's perfect</b> ("An Arcanist also banks 1 Resonance")
+has no implementation at all &mdash; and never could have been seen: the ability is vault
+inventory only reachable through the retired class draw. Pinned inert, the White Flame
+pattern.</p>
+<p>The rest in brief: three Beastmaster tooltips described baselines that never existed
+("rather than halving it" &mdash; nothing halves; "rather than per two" &mdash; no per-two
+exists; "rather than for a few turns" &mdash; a dead boon simply ends); Sacred Covenant
+triggers on ANY shield saving a life, not only Divine Shield, and now says so; Consecrated
+Ground's tooltip finally states the Faith drip that is two thirds of all Faith the lane
+generates; Call of the Wild claimed 15% strikes for beasts that actually make their own full
+strikes; two Hunter texts read as flat damage where the number is a percent of Attack; four
+"new ability" nodes now state what they grant when the ability is already owned; five rune
+texts understated their own payloads; eleven glossary entries still taught systems deleted
+batches ago (ceil(N/3) talent pricing, 1/2/3 points per fight, rests, rune slots that grow
+by zone, 10-tier maps with routing, three-spec trophies). One spelling: Ricochet.</p>
+
+<h3>&sect;3a &mdash; The signature-payoff table: how often the fantasy actually happens</h3>
+<p>Every sim report now ends with this table. Rotated full runs, n=100, default first-lane
+builds, per battle:</p>
+<table>
+<tr><th>spec</th><th>signature moment</th><th>trash</th><th>boss</th></tr>
+<tr><td>Berserker</td><td>bleedouts</td><td>1.40</td><td>2.42</td></tr>
+<tr><td>Warden</td><td>blocks</td><td>6.31</td><td>9.16</td></tr>
+<tr><td>Swordmaster</td><td>Guard Changes</td><td>1.33</td><td>3.12</td></tr>
+<tr><td>Pyromancer</td><td>Detonations</td><td>0.82</td><td>1.27</td></tr>
+<tr><td>Cryomancer</td><td>freezes &middot; holds &ge;3 turns</td><td>7.85 &middot; 2.17</td><td>7.33 &middot; 2.65</td></tr>
+<tr><td>Arcanist</td><td>Death Rays</td><td>0.44</td><td>0.57</td></tr>
+<tr><td>Holy</td><td>Resurrections &middot; Intercessions</td><td>0.20 &middot; 0*</td><td>0.15 &middot; 0*</td></tr>
+<tr><td>Devout</td><td>Faith releases</td><td>1.30</td><td>2.31</td></tr>
+<tr><td><b>Occultist</b></td><td><b>Ruin detonations</b></td><td><b>0.16</b></td><td><b>0.86</b></td></tr>
+<tr><td><b>Beastmaster</b></td><td><b>swaps</b> &middot; beast deaths</td><td><b>0.05</b> &middot; 0.18</td><td><b>0.13</b> &middot; 0.27</td></tr>
+<tr><td>Sharpshooter</td><td>Focus conversions</td><td>1.46</td><td>2.05</td></tr>
+<tr><td>Survivalist</td><td>3+-status strikes</td><td>2.55</td><td>4.62</td></tr>
+</table>
+<p><i>*Intercession is a Vigil-lane grant the default build never learns &mdash; that zero
+is the build, not the spec.</i></p>
+<p><b>The question this table was built to answer: boss-only payoffs are TWO SPECS, not a
+pattern.</b> Ten of twelve signatures fire in ordinary fights. The Occultist is boss-tilted
+by explicit design (5.4x). <b>The Beastmaster's swap &mdash; the verb his capstone lane is
+named for &mdash; is nearly absent everywhere</b> (0.05/battle): the bot's swap rule needs
+both slots full and a 1.25x better boon. Reported for the design review, not tuned.</p>
+
+<h3>&sect;3c &mdash; The run economy, finally visible</h3>
+<p>Default party, n=100, completions 53% (inside BG's band): <b>gold earned 2386 / spent
+881 / dead 1505 per run &mdash; 63% of income is never spent.</b> Items used 10.7/run
+against 8.6 carried unused at the end; merchants met 9.8/run; bargains 6.6/run at severity
+3.67. <b>The answer to AO's open question: income is not the constraint and neither are
+prices.</b> The binding refusals are SLOTS &mdash; 13.6 shop runes refused per run for "no
+free slot" against 6.8 for the 40g reserve. The economy generates roughly 2.7x what the bot
+can find worth buying (with the standing caveat that sim acquisition floors a bot's policy,
+not a human's).</p>
+
+<h3>&sect;1 &mdash; Dead code deleted, the sync deduplicated, the sim 5.3x faster</h3>
+<p>Deleted, each pinned absent by test: five unit fields whose writer or reader died in old
+re-authors (below_half_last, was_frozen, companion_hp_bonus, infusion_ranks,
+chain_reaction_ranks), six functions with zero callers (relic_active, slot_type,
+owed_rune_picks, modifier_name, owed_upgrade_picks, Runes.generate_spec), the never-applied
+"bleed" status registry row, and the last rest-machinery survivors in code (a tally key with
+no writer, a summary line that could only print 0, a report row for a slot type the line
+cannot deal). Kept deliberately, each now asserted present: the AY half-growth rule,
+CLASS_POOLS, the whole ability vault, the rune-only counter families, and the two dead
+rest_heal_add relic hooks (re-speccing a relic is design).</p>
+<p><b>The victory sync is one implementation now</b> &mdash; BattleUnit.sync_victory_state,
+called by both the real victory branch and the harness; the two copies whose comments begged
+each other not to drift are gone. <b>The sim harness is 5.3x faster</b>: headless Godot was
+sleeping two thirds of every sim's wall clock between frames; sim.sh passes --fixed-fps now
+and nothing the sim computes changed (100 battles: 88.5s &rarr; 16.7s, identical stats). A
+100-run measurement is ~8 minutes.</p>
+
 <h2>2026-08-10 &mdash; Batch BI: the two Faith axes stop fighting each other</h2>
 <p><i>No save version moves (still v7); every id survives. <b>&sect;1 is a change to what the
 resource IS</b> &mdash; the held half of Conviction reads the highest Faith you have held this

@@ -28,7 +28,9 @@ const STATUS_INFO := {
 	"chilled": ["Chilled", "Ch", Color(0.5, 0.75, 1.0), "Stacking frost: 1 = -25% speed,\n2 = -50%, 3 = also -15% damage;\n4 stacks FREEZE the victim."],  # 4 = a HOLD when he applied them
 	"frozen": ["Frozen", "Fz", Color(0.65, 0.88, 1.0), "Frozen solid: skips their turns until\nthe ice thaws. A Cryomancer's freeze is a\nHOLD — it never thaws on its own."],
 	"burn": ["Burn", "F", Color(1.0, 0.55, 0.2), "Burning: takes damage at the start of each\nturn (6% of the applier's Attack).\nReapplying Burn extends the duration."],
-	"bleed": ["Bleed", "Bl", Color(0.85, 0.25, 0.25), "Bleed builds with wounding attacks;\nat 100 the target bleeds out for 20% max HP.\nBleed damage ignores armor."],
+	# ("bleed" had a registry row here until Batch BJ §1 — never applied by any
+	# path and never displayed: the bleed chip is synthesized from bleed_buildup
+	# in unit.gd with its own label and colour. Deleted, not left unreachable.)
 	"sunder": ["Sunder", "D", Color(0.7, 0.7, 0.7), "-35% armor."],
 	"ward": ["Ward", "W", Color(1.0, 0.85, 0.4), "Takes 50% less Break damage."],
 	"fortify": ["Fortify", "+D", Color(0.55, 0.8, 0.9), "+10% armor."],
@@ -243,6 +245,14 @@ var _b_slice := {}
 # by nothing more than a `for` loop — the exact change this batch refuses to
 # make. Two dicts, and the fold cannot happen by accident.
 var _b_bd_slice := {}
+# BATCH BJ §3a — the signature-payoff slice: spec passive id -> how many of
+# that spec's SIGNATURE MOMENTS happened THIS battle (a "_b"-suffixed key is
+# the spec's second moment where it has one — Cryomancer holds, Holy
+# Intercessions, Beastmaster beast deaths). Banked trash-vs-boss in _check_end
+# beside the Ruin denominators (the AX pattern, widened to all twelve specs)
+# and reset with the scene like every other battle-local slice. Instrumentation
+# only: nothing reads it back into gameplay.
+var _b_sig := {}
 # Batch Z: this battle's per-hero damage in REAL play, banked into the run
 # ledger (Run.tally) at battle end so the run summary can show a whole-run
 # damage share. Written only when `sim` is false — RunSim keeps its own
@@ -4500,6 +4510,22 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	if attacker.is_hero:
 		_stat("hero_actions")
 		_stat("use_" + ab.display_name)
+		# BATCH BJ §3a — the cast-shaped signature moments, at the one site
+		# that already counts every hero cast. Passive-gated so a sibling spec
+		# earning the ability from a pool never books another spec's row.
+		match ab.display_name:
+			"Detonation":
+				if attacker.passive_id == "overburn":
+					_sig("overburn")
+			"Death Ray":
+				if attacker.passive_id == "resonance":
+					_sig("resonance")
+			"Resurrection":
+				if attacker.passive_id == "mercy":
+					_sig("mercy")
+			"Guard Change":
+				if attacker.passive_id == "seasoned":
+					_sig("seasoned")
 
 	# faith_cost = the secondary-resource price (Mercy for the Holy Cleric).
 	# Sanctified (talent): the spend can be refunded outright.
@@ -4716,6 +4742,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if block_source != "":
 					_stat("attacks")
 					_stat("attack_block")
+					# BJ §3a: a landed BLOCK is the Warden's signature moment —
+					# the identity Tenacity and Rally feed on. His own blocks
+					# only; an Interpose-covered ally's block is his work too
+					# and is credited to him below, so it books here as well.
+					if strike_target.passive_id == "heavy_plating" \
+							or (block_source == "Interpose"
+							and String(charges.get("src_name", "")) != ""):
+						_sig("heavy_plating")
 					# Batch W: what the blocked swing would have carried — the
 					# nominal hit through the blocker's armor (variance, crits
 					# and riders can't be known for a hit never rolled).
@@ -5015,9 +5049,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if fd_dv != null:
 					raw *= 1.0 + 0.01 * FAITH_DAMAGE_PCT \
 						* _faith_stack_mult(fd_dv, attacker) * attacker.faith_peak
-			# Dark Infusion: the Occultist feeds on the enemy team's afflictions.
-			if attacker.infusion_ranks > 0:
-				raw *= 1.0 + 0.02 * attacker.infusion_ranks * _unique_enemy_debuffs()
+			# (Dark Infusion's branch stood here until Batch BJ §1: the AX
+			# re-author retired the node, `infusion_ranks` kept no writer and
+			# carried no vault marker, so field and branch are deleted — the
+			# BA rule, not the AR vault pattern.)
 			# THE PER-STACK TERMS ON ARCANE CANNON AND MAGI'S WRATH ARE GONE
 			# (Batch AT §2), AND THIS IS THE TRAP THE BATCH EXISTS AROUND: the
 			# passive compounds now, so an ability-side "+x% per stack" would
@@ -5219,6 +5254,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_stat("breadth_sum", sv_n)
 					if sv_n > int(sim_stats.get("breadth_max", 0.0)):
 						sim_stats["breadth_max"] = float(sv_n)
+					# BJ §3a: a strike into three-plus open wounds — the
+					# window Vulture pays in — is the Survivalist's
+					# signature moment, node learned or not.
+					if sv_n >= 3:
+						_sig("trapper")
 				# Vulture: three open wounds is a feast. ADDITIVE (60).
 				if attacker.vulture > 0 and sv_n >= 3:
 					raw *= 1.0 + 0.01 * attacker.vulture
@@ -6887,7 +6927,13 @@ func _hold_freeze(target: BattleUnit, src: BattleUnit) -> void:
 	_apply_status(target, "frozen", 1 if timed else -1)
 	if not target.has_status("frozen"):
 		return                      # boss immunity bounced it; the stacks sit
-	target.was_frozen = true
+	# (`was_frozen` was stamped here until Batch BJ §1 — the old "shattering"
+	# passive's counter, unread since AS replaced that passive. Deleted.)
+	# BJ §3a: a freeze that LANDED while his grip stands is the Cryomancer's
+	# signature moment (a boss's one-turn ice included; a hero-side or
+	# cryomancer-less flash-freeze is not his).
+	if holding:
+		_sig("permafrost")
 	if not holding:
 		target.set_chilled_stacks(1)
 		_log("   → %s FREEZES SOLID (4 stacks of Chilled)" % target.unit_name,
@@ -7024,6 +7070,11 @@ func _hold_sync() -> void:
 			# The chip is rewritten with it, because a charge the player cannot
 			# see is a decision they cannot make.
 			u.hold_turns = mini(u.hold_turns + 1, SHATTER_TURN_CAP)
+			# BJ §3a: the charge crossing three IS "a hold held ≥3 turns" — it
+			# rises once per turn and resets on a re-freeze, so == fires once
+			# per hold.
+			if u.hold_turns == 3:
+				_sig("permafrost_b")
 			u.update_status("frozen", "HELD %d" % u.hold_turns,
 				_hold_tooltip(u.is_boss))
 
@@ -7650,6 +7701,7 @@ func _on_intercession_save(saved: BattleUnit) -> bool:
 		h.remove_status("intercession")
 	_log("   → Talent: Intercession — death is refused; %s survives at 1 HP (%s spends 1 Mercy)" % [
 		saved.unit_name, cleric.unit_name], "#b0a8e0")
+	_sig("mercy_b")  # BJ §3a: a PAID refusal is Holy's second signature moment
 	return true
 
 
@@ -7951,6 +8003,7 @@ func _detonate_ruin(target: BattleUnit) -> void:
 	# largely takes his signature payoff OUT of ordinary fights, by construction.
 	# Split trash vs boss because that split IS the design.
 	_stat("ruin_detonations_boss" if _boss_fight() else "ruin_detonations_trash")
+	_sig("old_gods")  # BJ §3a: the detonation is the Occultist's signature moment
 	_message("RUIN consumes %s!" % target.unit_name)
 	var det_died := target.take_tick_damage(det_dmg, "-%d RUIN" % det_dmg,
 		Color(0.8, 0.3, 0.9))
@@ -8207,6 +8260,7 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	# releases a great many times want opposite repairs, and two batches have
 	# now guessed without being able to tell them apart.
 	_stat("faith_releases")
+	_sig("conviction")  # BJ §3a: a release IS the Devout's signature moment
 	_devout_heal(devout, f_got, "release")
 	var d_mana := maxi(int(round(devout.max_resource * 0.03)), 1)
 	devout.resource = mini(devout.resource + d_mana, devout.max_resource)
@@ -8286,10 +8340,11 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 # battle-end save sync writes each unit's max_hp straight back onto the party
 # member, so a one-fight change would follow the party out of it and the Devout
 # would grow permanently enormous one battle at a time with nothing crashing to
-# announce it. `conviction_hp_gained` accumulates every point granted and BOTH
-# victory syncs (battle.gd's own and RunSim's) subtract it before writing
-# max_hp back, beside `tenacity_hp_gained`, with hp clamped under the restored
-# maximum in the same step. DO NOT MERGE THE TWO FIELDS — but not for the
+# announce it. `conviction_hp_gained` accumulates every point granted and the
+# victory sync — BattleUnit.sync_victory_state, ONE implementation since Batch
+# BJ §1, called by battle.gd's victory branch and RunSim's — subtracts it before
+# writing max_hp back, beside `tenacity_hp_gained`, with hp clamped under the
+# restored maximum in the same step. DO NOT MERGE THE TWO FIELDS — but not for the
 # reason the batch brief gives (it calls Tenacity's growth permanent; it has
 # been excluded from the save sync since Batch W, exactly like this one). The
 # real reason is that tenacity_hp_gained has a SECOND consumer: Unkillable's
@@ -10037,9 +10092,10 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 		hunter.loyalty[kind] = hunter.lone_bond
 	# Returning beasts keep their Loyalty; Ursus carries its HP gift too.
 	var prior_l: int = int(hunter.loyalty.get(kind, 0))
-	# Beast Within grows the base; flat talent HP rides on top.
-	var base_hp: int = int(round(stats[0] * (1.0 + hunter.companion_hp_pct))) \
-		+ hunter.companion_hp_bonus
+	# Beast Within grows the base. (The flat `companion_hp_bonus` that used to
+	# ride on top lost its last writer in the AY re-author and was deleted in
+	# Batch BJ §1 — a field nothing can write goes, the BA rule.)
+	var base_hp: int = int(round(stats[0] * (1.0 + hunter.companion_hp_pct)))
 	if kind == "ursus":
 		base_hp += int(round(stats[0] * 0.03)) * prior_l
 	var cfg := {"unit_name": kind.capitalize(), "is_hero": true, "sheet_dir": "sphere",
@@ -10080,6 +10136,10 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 	_message("%s answers the call!" % comp.unit_name)
 	_log("%s %s %s" % [hunter.unit_name,
 		"swaps in" if was_swap else "summons", comp.unit_name], "#70d878")
+	# BJ §3a: the SWAP is the Beastmaster's signature moment — the rotation
+	# his capstone lane is named for — not the plain summon.
+	if was_swap:
+		_sig("pack")
 	# The wolf and the eagle are permanently Elusive (enemies miss them more).
 	if kind in ["canis", "aguila"]:
 		var el_info: Array = STATUS_INFO["elusive"]
@@ -10667,6 +10727,12 @@ func _gain_focus(u: BattleUnit, amount: int) -> void:
 	u.second_resource = maxi(u.second_resource + amount, 0)
 	if cap >= 0:
 		u.second_resource = mini(u.second_resource, cap)
+	# BJ §3a: crossing the conversion point — patience becoming FORCE — is the
+	# Sharpshooter's signature moment. The point is his live focus_convert()
+	# (Deep Focus moves it), and a meter that resets and climbs back over
+	# counts again, honestly: he earned the depth twice.
+	if before <= u.focus_convert() and u.second_resource > u.focus_convert():
+		_sig("lethal_aim")
 	if u.second_resource > before:
 		u.float_text("+%d Focus" % (u.second_resource - before),
 			Color(0.55, 0.85, 0.40))
@@ -10746,6 +10812,7 @@ func _on_beast_death(comp: BattleUnit) -> void:
 		return
 	var kind: String = comp.companion_kind
 	var had: int = int(pm.loyalty.get(kind, 0))
+	_sig("pack_b")  # BJ §3a: a beast's death is the Beastmaster's second moment
 	if pm.steadfast_bond > 0 and had > 0:
 		# Steadfast Bond holds a SHARE of the meter (100 = all of it). It
 		# runs before Vengeance deliberately: the boon Vengeance inherits
@@ -10900,6 +10967,9 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 			# (Scent of Blood reads it attacker-side).
 			for tally_h in heroes:
 				tally_h.bleedouts_this_battle += 1
+			# BJ §3a: an enemy BLEEDING OUT is the Berserker's signature
+			# moment (banked only when one stands — the _sig slice rule).
+			_sig("bloodrage")
 			for feaster in heroes:
 				if not feaster.dead and feaster.bloodcraze > 0:
 					var craze := maxi(int(feaster.max_hp * 0.12 * feaster.bloodcraze), 1)
@@ -11355,6 +11425,22 @@ func _check_end() -> void:
 		# half — which is the half the design is aimed at.
 		if heroes.any(func(h): return h.passive_id == "old_gods"):
 			_stat("ruin_boss_battles" if _boss_fight() else "ruin_trash_battles")
+		# BATCH BJ §3a — the signature table's numerators and denominators:
+		# for every spec STANDING in this battle, one denominator tick and this
+		# battle's moment counts, split trash/boss exactly as Ruin's are. The
+		# "_b" pair is the spec's second moment (holds ≥3 / Intercessions /
+		# beast deaths); specs without one simply never book it.
+		var sig_kind := "boss" if _boss_fight() else "trash"
+		for sg_h in heroes:
+			if sg_h.is_companion or sg_h.passive_id == "":
+				continue
+			_stat("sigb_%s_%s" % [sg_h.passive_id, sig_kind])
+			var sg_n: float = _b_sig.get(sg_h.passive_id, 0.0)
+			if sg_n > 0.0:
+				_stat("sig_%s_%s" % [sg_h.passive_id, sig_kind], sg_n)
+			var sg_n2: float = _b_sig.get(sg_h.passive_id + "_b", 0.0)
+			if sg_n2 > 0.0:
+				_stat("sig2_%s_%s" % [sg_h.passive_id, sig_kind], sg_n2)
 		# BATCH AW §0 — THE ONE NEW NUMBER, and it is the whole batch in one
 		# figure: how much maximum health Conviction lent the Devout over the
 		# course of this fight. Banked here rather than at the growth site so
@@ -11457,36 +11543,11 @@ func _check_end() -> void:
 		for i in heroes.size():
 			# Keep the saved max in sync with talents/runes/scaling so full
 			# heals reach the true maximum — but nothing a single battle did to
-			# max_hp may leave it. `hp` is clamped under the restored maximum in
-			# the same step (the clampi below).
-			#
-			# THREE FIELDS MEET HERE AND THEIR SIGNS DIFFER. STATE THE ORDER
-			# BEFORE TOUCHING THIS LINE — it is the site with a ~127,000 max-HP
-			# runaway in its history (Batch W) and the site that got `rot`
-			# dropped from Batch AQ:
-			#
-			#   tenacity_hp_gained   SUBTRACTED. A one-fight gain, off since W.
-			#                        IT HAS A SECOND CONSUMER — Unkillable's
-			#                        mend reads `max_hp - tenacity_hp_gained` as
-			#                        "the pool he brought into the battle" — so
-			#                        nothing may be folded INTO it.
-			#   conviction_hp_gained SUBTRACTED. A one-fight gain (Batch AW).
-			#   rot_hp_lost          ADDED BACK. A one-fight LOSS (Batch BB §5).
-			#                        The only one of the three with this sign,
-			#                        which is exactly why it is its own field.
-			#
-			# ALL THREE STAY SEPARATE. Two of them happen to cancel arithmetically
-			# in a fight that carries both, and that is a coincidence of the
-			# numbers, not a licence to merge them: they answer different
-			# questions and one of them is read somewhere else.
-			var save_max: int = heroes[i].max_hp - heroes[i].tenacity_hp_gained \
-				- heroes[i].conviction_hp_gained + heroes[i].rot_hp_lost
-			# The Untouched refuse to stay down: the fallen return at 20% HP.
-			Run.party[i]["hp"] = clampi(maxi(heroes[i].hp, int(save_max * 0.2)),
-				1, save_max)
-			Run.party[i]["max_hp"] = save_max
-			if heroes[i].resource_name == "Mana":
-				Run.party[i]["mana"] = heroes[i].resource
+			# max_hp may leave it. The three-field arithmetic (two gains off,
+			# Rot's loss back on) lives in ONE place now —
+			# BattleUnit.sync_victory_state, shared with RunSim.on_battle_end
+			# (Batch BJ §1) — read the sign-order block there before touching it.
+			heroes[i].sync_victory_state(Run.party[i])
 		var node_type := String(Run.encounter.get("type", "fight"))
 		# Batch AN §8: 1 point for an elite, a mini-boss or a boss — including
 		# the END boss, which used to pay nothing. Ordinary fights pay none. One
@@ -11599,8 +11660,10 @@ func _check_end() -> void:
 # ---------- Batch AN §4: the boss slots ----------
 #
 # Zone 1 and zone 2 bosses award ONE ABILITY PICK for every hero, drawn from
-# that hero\'s SPEC POOL ONLY (§4 dropped the class draw AH added). The END
-# boss awards a relic unlock, big gold, and ends the run — deliberately NO
+# that hero\'s SPEC POOL ONLY (§4 dropped the class draw AH added). EVERY boss
+# awards a relic unlock (the unlock_random call below runs for all of them —
+# BJ §2 corrected this comment toward the code; the glossary was already
+# right). The END boss adds big gold and ends the run — deliberately NO
 # ability pick, because nothing follows it and the pick would be dead value.
 func _resolve_boss(gold_gain: int, pts: int) -> void:
 	var relic := Relics.unlock_random()
@@ -11758,7 +11821,55 @@ func _print_sim_report() -> void:
 	var tx := trap_report_line(sim_stats)
 	if tx != "":
 		print(tx)
+	var sx := signature_report_block(sim_stats)
+	if sx != "":
+		print(sx)
 	print("=============================================\n")
+
+
+# BATCH BJ §3a — THE SIGNATURE-PAYOFF TABLE: how often each spec's signature
+# moment actually happens, per trash battle and per boss battle. One row per
+# spec that ever STOOD in a battle; the second moment (after the ·) is only
+# printed for the three specs that have one. Shared by the standalone report
+# and RunSim's (the ruin_report_line pattern); "" when nothing was banked.
+# A standalone smoke never meets a boss, so its boss halves read n=0 rather
+# than pretending a 0.00 rate was measured.
+const SIG_LABELS := {
+	"bloodrage": ["Berserker", "bleedouts", ""],
+	"heavy_plating": ["Warden", "blocks", ""],
+	"seasoned": ["Swordmaster", "Guard Changes", ""],
+	"overburn": ["Pyromancer", "Detonations", ""],
+	"permafrost": ["Cryomancer", "freezes", "holds >=3 turns"],
+	"resonance": ["Arcanist", "Death Rays", ""],
+	"mercy": ["Holy", "Resurrections", "Intercessions"],
+	"conviction": ["Devout", "releases", ""],
+	"old_gods": ["Occultist", "Ruin detonations", ""],
+	"pack": ["Beastmaster", "swaps", "beast deaths"],
+	"lethal_aim": ["Sharpshooter", "Focus conversions", ""],
+	"trapper": ["Survivalist", "3+-status strikes", ""],
+}
+
+
+static func signature_report_block(stats: Dictionary) -> String:
+	var rows: Array = []
+	for pid in SIG_LABELS:
+		var lbl: Array = SIG_LABELS[pid]
+		var tn: float = stats.get("sigb_%s_trash" % pid, 0.0)
+		var bn: float = stats.get("sigb_%s_boss" % pid, 0.0)
+		if tn <= 0.0 and bn <= 0.0:
+			continue
+		var row := "  %s %s/battle: trash %.2f (n=%d) | boss %.2f (n=%d)" % [
+			lbl[0], lbl[1],
+			stats.get("sig_%s_trash" % pid, 0.0) / maxf(tn, 1.0), int(tn),
+			stats.get("sig_%s_boss" % pid, 0.0) / maxf(bn, 1.0), int(bn)]
+		if String(lbl[2]) != "":
+			row += " · %s: trash %.2f | boss %.2f" % [String(lbl[2]),
+				stats.get("sig2_%s_trash" % pid, 0.0) / maxf(tn, 1.0),
+				stats.get("sig2_%s_boss" % pid, 0.0) / maxf(bn, 1.0)]
+		rows.append(row)
+	if rows.is_empty():
+		return ""
+	return "Signature payoffs (Batch BJ §3a):\n" + "\n".join(rows)
 
 
 # BATCH AX §0 — THE TWO NUMBERS THE BATCH IS ABOUT, split trash vs boss because
@@ -12293,8 +12404,9 @@ func _summary_lines(snap: Dictionary) -> Array:
 		snap["combat_wins"], int(tally.get("battles", 0)), int(tally.get("elites", 0))]])
 	lines.append(["p", "Gold: %d earned in combat, %d spent at shops, %d unspent" % [
 		int(tally.get("gold_earned", 0)), int(tally.get("gold_spent", 0)), snap["gold"]]])
-	lines.append(["p", "Rests taken: %d   Events seen: %d" % [
-		int(tally.get("rests", 0)), snap["events_seen"]]])
+	# (The "Rests taken" half of this line died with the rest nodes in AN; the
+	# tally key had no writer and the line could only ever print 0 — BJ §1.)
+	lines.append(["p", "Events seen: %d" % snap["events_seen"]])
 	if not (snap["relics"] as Array).is_empty():
 		var relic_names := PackedStringArray()
 		for id in snap["relics"]:
@@ -12452,6 +12564,16 @@ func _wait(seconds: float) -> void:
 		await get_tree().process_frame
 	else:
 		await get_tree().create_timer(seconds * PACE).timeout
+
+
+# BATCH BJ §3a — one signature moment for the spec whose passive id this is.
+# The slice is banked (and split trash/boss) at _check_end; a moment booked
+# for a spec that is not in the party lands in the slice and is never banked,
+# which is what lets call sites stay unconditional where the guard would just
+# restate the passive gate around them.
+func _sig(passive: String, n := 1) -> void:
+	if sim:
+		_b_sig[passive] = _b_sig.get(passive, 0.0) + n
 
 
 # One stat counter, accumulated across all simulated battles.

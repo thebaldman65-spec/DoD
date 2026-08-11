@@ -472,7 +472,7 @@ static func survivalist_pool_ability(display_name: String) -> Ability:
 				"dmg_type": "nature", "cost": 35, "damage": 10, "pressure": 20,
 				"delay": 3.0, "anim": "attack03", "aoe": true,
 				"applies_status": {"id": "poison", "turns": 5},
-				"perfect_id": "", "perfect_text": "Deals 12 damage",
+				"perfect_id": "", "perfect_text": "Deals 12% of Attack",
 				"description": "A bursting powder charge rakes ALL\nenemies with nature damage and heavy\nBreak pressure, Poisoning each."})
 		"Venom Coating":
 			return Ability.make({"display_name": "Venom Coating", "cooldown": 5, "cost": 20,
@@ -552,17 +552,17 @@ static func beastmaster_pool_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Spirit Bond", "cooldown": 3, "cost": 20,
 				"special": "spirit_bond", "delay": 1.5, "anim": "attack01",
 				"perfect_id": "", "perfect_text": "Both gain +10% max health for 5 turns",
-				"description": "You and your companion each heal 25%\nof your max health now and 10% more\nnext turn. You restore 15% max Mana\nnow and 5% on each of your next\n2 turns. Requires a living companion."})
+				"description": "You and every living beast each heal\n25% of your max health now and 10%\nmore next turn. You restore 15% max\nMana now and 5% on each of your next\n2 turns. Requires a living companion."})
 		"Primal Surge":
 			return Ability.make({"display_name": "Primal Surge", "cooldown": 2, "cost": 20,
 				"special": "primal_surge", "delay": 3.0, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "The Loyalty is spent but NOT lost",
-				"description": "Spend ALL Loyalty on the active beast:\nit strikes for 15% of your Attack per\nstack spent, and you gain +10% damage\nfor that many turns. Loyalty resets\nto 0. Requires a beast with Loyalty."})
+				"description": "Spend ALL Loyalty: each living beast\nstrikes for 15% of your Attack per\nstack it spends, and you gain +10%\ndamage for the total turns. Loyalty\nresets to 0. Requires a beast with\nLoyalty."})
 		"Call of the Wild":
 			return Ability.make({"display_name": "Call of the Wild", "cooldown": 4, "cost": 30,
 				"special": "call_wild", "delay": 4.0, "anim": "attack01", "no_skill_check": true,
 				"perfect_id": "", "perfect_text": "",
-				"description": "The whole pack answers: all three\nbeasts appear, each striking your\ntarget for 15% of your Attack and\nfiring its arrival effect, then the\nabsent ones depart."})
+				"description": "The whole pack answers: your living\nbeasts make their own strikes, the\nabsent ones appear to strike for 15%\nof your Attack, every arrival effect\nfires, and the absent depart."})
 		"Mark of the Hunt":
 			return Ability.make({"display_name": "Mark of the Hunt", "cooldown": 3, "cost": 15,
 				"special": "mark_hunt", "delay": 2.0, "anim": "attack02",
@@ -1052,7 +1052,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Consecrated Ground", "cooldown": 3, "cost": 25, "special": "cons_ground",
 					"delay": 3.0, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Lasts 3 turns",
-					"description": "Holy ground blooms underfoot: the\nparty takes 15% less damage and\nreflects 10% of damage taken,\nfor 2 turns."}),
+					"description": "Holy ground blooms underfoot: the\nparty takes 15% less damage and\nreflects 10% of damage taken,\nfor 2 turns — and every ally is\nkindled 1 Faith at the start of\ntheir turn while it holds."}),
 				Ability.make({"display_name": "Blessing of Zeal", "cooldown": 2, "cost": 20, "special": "zeal",
 					"target": Ability.Target.ALLY, "delay": 2.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Lasts 4 turns",
@@ -1127,7 +1127,7 @@ static func spec_abilities(spec: String) -> Array:
 					"pressure": 25, "delay": 3.0, "anim": "attack03", "choose_two": true,
 					"applies_status": {"id": "cripple", "turns": 3},
 					"perfect_id": "status_plus", "perfect_text": "Adds Slowed; everything lasts 4 turns",
-					"description": "A scattering charge rips TWO chosen\nenemies for 20 nature damage each,\nleaving them Poisoned AND Crippled\n(3 turns). Two statuses on two targets\n— the engine of the hunt."}),
+					"description": "A scattering charge rips TWO chosen\nenemies for 20% of Attack as nature\ndamage each,\nleaving them Poisoned AND Crippled\n(3 turns). Two statuses on two targets\n— the engine of the hunt."}),
 				Ability.make({"display_name": "Snare Trap", "cooldown": 3, "cost": 20, "special": "snare_trap",
 					"delay": 2.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "The Stun lands even on a boss.",

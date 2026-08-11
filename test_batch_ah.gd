@@ -416,7 +416,7 @@ func _test_doc_matches_code() -> void:
 	# The stamp moves with every batch that touches the doc; what this line
 	# is really guarding is that the doc was touched AT ALL when the code
 	# below it changed. Bump it, do not delete it.
-	ok(doc.contains("Last updated: 2026-08-10 (Batch BI)"),
+	ok(doc.contains("Last updated: 2026-08-11 (Batch BJ)"),
 		"master.html carries the current batch's stamp")
 	for spec in Classes.SPEC_POOLS:
 		var listed: String = ", ".join(Classes.SPEC_POOLS[spec])

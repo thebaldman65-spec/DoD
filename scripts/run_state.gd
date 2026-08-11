@@ -154,7 +154,7 @@ var tally := {}
 
 func reset_tally() -> void:
 	tally = {"damage": {}, "gold_earned": 0, "gold_spent": 0,
-		"elites": 0, "rests": 0, "battles": 0}
+		"elites": 0, "battles": 0}
 
 
 func tally_add(key: String, amount := 1) -> void:
@@ -199,10 +199,6 @@ func debug_enabled() -> bool:
 	if env == "0":
 		return false
 	return OS.is_debug_build() or env == "1"
-
-
-func relic_active(id: String) -> bool:
-	return active_relics.has(id)
 
 
 # Aggregated relic hooks (see the vocabulary audit atop relics.gd):
@@ -287,12 +283,6 @@ func reachable() -> Array:
 func advance(slot: int) -> void:
 	slot_idx = slot
 	map[slot]["visited"] = true
-
-
-func slot_type(slot: int) -> String:
-	if slot < 0 or slot >= map.size():
-		return ""
-	return String(map[slot]["type"])
 
 
 # Where the party stands in the WHOLE run, 1-36 — the readout the zone
@@ -758,16 +748,6 @@ func roll_rune_candidates(member: Dictionary) -> Array:
 	return out
 
 
-# Owed rune picks across the whole party. The hero cards badge on this —
-# a pick sitting silently behind a click is the failure the badge exists to
-# prevent.
-func owed_rune_picks() -> int:
-	var n := 0
-	for member in party:
-		n += int(member.get("rune_picks_owed", 0))
-	return n
-
-
 # Ability picks (zone bosses) waiting to be chosen, across the party.
 func owed_ability_picks() -> int:
 	var n := 0
@@ -1167,10 +1147,6 @@ const REWARDS := {
 	3: [{"kind": "gold", "amount": 140}, {"kind": "rune"}],
 	4: [{"kind": "gold", "amount": 220}, {"kind": "rune"}, {"kind": "shop"}],
 }
-
-
-func modifier_name(id: String) -> String:
-	return String(MODIFIERS.get(id, {}).get("name", ""))
 
 
 func modifier_severity(id: String) -> int:
@@ -1676,13 +1652,6 @@ func award_upgrade_pick(member: Dictionary) -> bool:
 	member["up_candidates"] = member.get("up_candidates", []) + [offer]
 	member["up_picks_owed"] = int(member.get("up_picks_owed", 0)) + 1
 	return true
-
-
-func owed_upgrade_picks() -> int:
-	var n := 0
-	for member in party:
-		n += int(member.get("up_picks_owed", 0))
-	return n
 
 
 # Batch AN §4: zone bosses draw from the hero's SPEC POOL ONLY — the class

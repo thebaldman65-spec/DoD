@@ -253,8 +253,14 @@ func _magnitudes() -> void:
 	# DEVOTION
 	ok(_stat_of("bm_communion", "wild_communion_step") == 7.0,
 		"Wild Communion: the strike step rises to 12%% (base 5 + 7)")
-	ok(_stat_of("bm_unbroken", "unbroken_watch") == 2,
-		"Unbroken Watch: +2 Loyalty on an unbloodied turn")
+	# RE-POINTED BY BATCH BJ §2, with the reason here: AY's payload said 2 but
+	# the read site has ALWAYS read the field as a gate and paid a fixed +1 —
+	# the magnitude was never read anywhere, so the tooltip lied. BJ corrected
+	# desc, scale and payload toward the code (behavior unchanged); paying 2
+	# is a design decision that would also need the read site to pass the
+	# field as the _gain_loyalty amount. test_batch_bj pins the gate shape.
+	ok(_stat_of("bm_unbroken", "unbroken_watch") == 1,
+		"Unbroken Watch: +1 additional Loyalty on an unbloodied turn (the +2 was a lie — BJ §2)")
 	ok(_stat_of("bm_absolute", "absolute_step") == 15.0,
 		"Absolute Devotion: the boon step rises to 35%% (base 20 + 15)")
 	ok(_stat_of("bm_devoted_fury", "devoted_fury") == 1,
