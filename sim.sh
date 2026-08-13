@@ -12,19 +12,22 @@
 #                               sides (tier scaling, zone multipliers, talents
 #                               earned AND spent, trophies, HP carried) —
 #                               prints the run report. Policies via
-#                               DOD_SIM_ROUTE (retained, but a line offers no
-#                               route choice) /
+#                               DOD_SIM_ROUTE=greedy|balanced|cautious /
 #                               DOD_SIM_SHOPS=off / DOD_SIM_ITEMS=off (both
 #                               on by default: heal-first shopping with a
 #                               40g reserve, drink a Health Potion under
 #                               35% HP) / DOD_SIM_BUILDS / DOD_SIM_TROPHIES /
 #                               DOD_SIM_RELICS.
-# Batch AN: a run is a LINE (3 zones x 12 fixed slots), so DOD_SIM_ROUTE has
-#   nothing left to choose and the report's "choice" figure reads 0% by
-#   design. DOD_SIM_MAP, DOD_SIM_MINIBOSS, DOD_SIM_START_RUNE and
-#   DOD_SIM_SPEC_OPENING are RETIRED with the features they controlled; a
-#   Matrix row now reads map=line and reports depth out of 36 SLOTS, so no
-#   pre-AN row is comparable with a post-AN one.
+# Batch BK: a run is a GENERATED BRANCHING MAP again (3 zones x 16 slots,
+#   3 rows wide, 48 encounters), so DOD_SIM_ROUTE is a real axis for the
+#   first time since Batch AN — greedy takes every elite it can reach,
+#   cautious takes one only when nothing else is offered, balanced sits
+#   between. "default" still resolves (it aliases balanced) and so does
+#   "elites" (greedy), because every old sim script and Matrix row names
+#   them. A Matrix row now reads map=branch and reports depth out of 48
+#   SLOTS: no pre-BK row is comparable with a post-BK one, and no pre-AN
+#   row was comparable with either. DOD_SIM_MAP, DOD_SIM_MINIBOSS,
+#   DOD_SIM_START_RUNE and DOD_SIM_SPEC_OPENING stay RETIRED.
 # DOD_SIM_DIFFICULTY=wanderer ./sim.sh --run ... = the alpha testing
 #   difficulty (enemies x0.7 via the zone ladder). Default standard —
 #   never set for baseline rows.

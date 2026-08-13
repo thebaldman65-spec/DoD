@@ -28,6 +28,19 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 
 ## Verify before shipping
 - Parse: run each scene headless with `--quit-after 90`, grep "SCRIPT ERROR".
+  **TWELVE scenes since Batch BK** (blacksmith is new). `check_parse.gd`
+  force-loads every script and scene in one pass and is the faster gate.
+- **`check_map.gd` (Batch BK) is the MAP GENERATION instrument**: N generated
+  zones → node count, column widths, out-degree, foreclosure depth, the entry
+  guarantee, reach contiguity, and the walked distribution under an unsteered
+  route plus the three policies. ~0.2s a zone (26 warbands pre-rolled for
+  hover-scouting), so 1500 zones is ~5 minutes.
+- **`check_map_screen.tscn` (Batch BK) is the only thing that EXECUTES the
+  lattice draw.** The scene-parse gate loads map.tscn with no active run, so
+  it bounces to the main menu and never draws a node. This builds the screen
+  against a real in-flight run at three positions and opens both overlays.
+  It is a SCENE run, not `--script`: **autoloads (`Run`) do not resolve in a
+  `--script` SceneTree.**
 - New `class_name` files need `--headless --import` before they resolve.
 - Balance: `./sim.sh N` = N battles of the FIXED raider/chief/archer/archer
   lineup (power 7, unscaled) — kit smoke tests only; its win% carries NO
@@ -44,19 +57,20 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   points earned AND spent, elite runes auto-equipped, trophies) → run
   report: wipe distribution, per-tier averages, measured party-vs-warband
   power table + run economy (gold earned/spent/unspent, items used/left,
-  merchants/events/bargains per run — **NOT rests: Batch AN deleted them and
-  the "taken vs offered" row reads 0.0/0.0 forever**) + a per-invocation
-  "Matrix row" line for cross-policy assembly. Policies env-set + printed:
-  DOD_SIM_ROUTE (greedy|default|cautious|elites — Batch U: greedy = the
-  Batch S floor byte-for-byte, never rests while combat is offered; default
-  rests when AVG party HP <65% and a rest is reachable; cautious <80%).
-  **BATCH BG §1 MEASURED WHAT THE THREE POLICIES ARE WORTH ON THE LINE MAP
-  AND THE ANSWER IS NOTHING: "Reachable nodes per step: 1.00 — steps
-  offering a real choice: 0% (0 of 2764)", every node type taken ==
-  offered. THE THREE ROUTE ROWS ARE THREE SAMPLES OF ONE CONFIGURATION, NOT
-  A BAND — useful as a free triplicate for estimating noise, useless as a
-  bracket on real play. Do not repeat "run all three for the band real play
-  sits inside"; it has been stale since AN.**
+  merchants/events/**blacksmiths**/bargains per run — **NOT rests: Batch AN
+  deleted them and the "taken vs offered" row reads 0.0/0.0 forever**) + a
+  per-invocation "Matrix row" line for cross-policy assembly. Policies
+  env-set + printed: DOD_SIM_ROUTE (**greedy|balanced|cautious** since Batch
+  BK, one axis — how much ELITE the bot accepts; `default` ALIASES balanced
+  and `elites` ALIASES greedy so old scripts and Matrix rows still resolve).
+  **BATCH BG §1 MEASURED WHAT THE THREE POLICIES WERE WORTH ON THE LINE AND
+  THE ANSWER WAS NOTHING** ("Reachable nodes per step: 1.00 — steps offering
+  a real choice: 0% (0 of 2764)", every node type taken == offered): from AN
+  to BJ the three route rows were THREE SAMPLES OF ONE CONFIGURATION.
+  **BATCH BK MADE THEM A REAL BAND AGAIN** — 1.61 reachable per step, 41% of
+  steps a real choice, and the three policies walk 6.5 / 6.0 / 2.2 elites a
+  run. A pre-BK three-policy row is still a triplicate, not a bracket; a
+  post-BK one is a bracket.
   **BATCH BG §1 STANDING CAUTION ON EVERY RUN BAND: `DOD_SIM_BUILDS`
   DEFAULTS TO EACH TREE'S FIRST LANE, AND THAT IS A CONFOUND WITH A KNOWN
   SIGN.** For the default party the first lane is Berserker Bloodletting,
@@ -82,13 +96,13 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   spec-eligible authored rune granted at each zone half-mark; power = a
   multiplier on authored payload UPSIDE only, costs held, tpl_* stat
   sticks untouched).
-  RETIRED IN BATCH AN, along with the features they controlled:
-  DOD_SIM_MAP (there is no branching generator to reproduce),
-  DOD_SIM_MINIBOSS (the mini-boss is structural now — slot 6 of a fixed
-  line), DOD_SIM_START_RUNE and DOD_SIM_SPEC_OPENING (heroes begin with
-  no runes). Matrix rows read `map=line`, carry no start=/specopen=/mb=
-  field, and report depth out of 36 SLOTS rather than 33 tiers — so NO
-  PRE-AN ROW IS COMPARABLE WITH A POST-AN ONE, on any field.
+  RETIRED IN BATCH AN, along with the features they controlled, and NOT
+  revived by BK: DOD_SIM_MAP, DOD_SIM_MINIBOSS (the mini-boss is structural
+  — slot 8 of every zone), DOD_SIM_START_RUNE and DOD_SIM_SPEC_OPENING
+  (heroes begin with no runes). Matrix rows read **`map=branch`** since
+  Batch BK (`map=line` = an AN-to-BJ row), carry no start=/specopen=/mb=
+  field, and report depth out of **48 SLOTS** — so NO PRE-BK ROW IS
+  COMPARABLE WITH A POST-BK ONE, and no pre-AN row with either.
   RunSim
   (scripts/run_sim.gd statics, Run injected Events-style) owns setup/map
   walk/report; battle.gd hooks: _ready begin+note_battle_start, _check_end
@@ -388,6 +402,194 @@ meter is ungoverned. meter | what governs it | where the governor lives:
 · **faith_peak** (never falls in battle) | the BATTLE RESET: `_reset_faith_meters()` zeroes
   count and peak together at battle start, before the opening oath; one ratchet site in
   `_gain_faith` | battle.gd ~8125-8171.
+
+BATCH BK (08-12) — THE BRANCHING MAP. **SAVE v8, AND A PRE-v8 SAVE IS REFUSED AND
+CLEARED** — the second save-breaking change in the project's history, not the first (AN
+refused pre-v7 for the same class of reason, and the brief's claim that this would be the
+first is wrong). A run is a GENERATED LATTICE again: 3 zones x 16 slots = **48 encounters**
+(the brief says 49; 3 x 16 is 48, and its own "was 36" was 3 x 12 by the same construction).
+
+**READ THIS BEFORE TOUCHING THE GENERATOR — WHAT BATCH AN ACTUALLY SAID.** AN did NOT delete
+the old branching map for being decorative, and the 0%-choice figure was never a measurement
+of it. AN was a SCAFFOLD batch: it wanted a playable end-to-end run to feel the pacing before
+66 pieces of content were authored. The thing it named as needing deletion rather than repair
+was **the edge-column adjacency rule, documented 70% / actual 53%** — a disagreement that
+survived three batches because the code still resolved. The old map ALSO carried
+`_ensure_key_route` / `_route_satisfied` / `_guarantee_inbound`: **it GUARANTEED that every
+route reached the node types it was supposed to reach**, which is the exact opposite of this
+batch's rule. BG's "0% of 2,764 steps" is AN's LINE, and AN kept that metric reporting a
+permanent zero on purpose ("a missing figure reads as a broken instrument"). Never write that
+AN's forks reconverged too fast; nobody ever measured them.
+
+THE SHAPE (§1). Slots 1-7 branch 3 wide, slot 8 is the MINI-BOSS (every path converges), 9-15
+branch again, 16 is the BOSS. 14 branching columns x 3 rows = 42 positions; pruning removes 2-3,
+so a real zone holds ~39.7 nodes and columns are 2 or 3 wide (**84% are 3; NONE are 1** —
+MIN_COLUMN forbids it). Entry: any of column 1's three nodes; the mini-boss opens all of
+column 9 the same way, so each half starts with a free pick. **`map[slot]` IS AN ARRAY OF
+NODES**, `{type, visited, row, next, enemies, theme}`, and `next` holds INDICES INTO
+`map[slot+1]` (not row numbers — rows get pruned, indices do not shift). Position is the PAIR
+`(slot_idx, node_idx)`. `advance(node)` still takes ONE arg and it is the NODE index;
+`reachable()` returns node indices into the NEXT slot. `reachable_from(slot, node)` is new.
+
+GENERATION RULES, one line each (`Run._generate_map`, edges first then types):
+· every node has 1-3 edges in and 1-3 out (measured out-degree 59/37/4% for 1/2/3);
+· an edge lands on the same row or an adjacent one;
+· **paths never cross** — everything row i+1 reaches is at or below everything row i reaches;
+· nodes with no way in or no way out are REMOVED to a fixpoint, but never below MIN_COLUMN=2;
+· no elite in column 1; no two elites in ADJACENT COLUMNS (columns run 1-14 straight through
+  the mini-boss, so elite -> MINI-BOSS -> elite is barred too); at most one of each non-fight
+  type per column; every entry node reaches an elite and a trade node.
+**NOTHING IS ROLLED AND RE-ROLLED.** Every legal edge assignment is enumerated and drawn
+WEIGHTED (`FULL_COVER_WEIGHT` 3.0 favours a step that strands no row, `BRANCH_WEIGHT` 1.5
+favours more edges — those two numbers ARE the feel of the map); elite columns come from the
+standard non-adjacent-subset bijection, so an illegal spread cannot be NAMED. AN's severity
+floor made the same call: a retry budget quietly starts failing when the table's shape changes.
+
+MEASURED OVER 1500 GENERATED ZONES (`check_map.gd`, and test_batch_bk asserts the invariants
+over 1000): nodes/zone 39.75 · widths 2:16% 3:84% · **foreclosure 2.23 columns** a node can no
+longer reach · entry guarantee 0 failures of 4500 · reach-contiguity 0 failures · copies exact
+at 6 elite / 6 blacksmith / 5 merchant / 5 event, fights the remainder (17.75).
+**WALKED PER ZONE BY AN UNSTEERED ROUTE — this is §1's table, confirmed:** fight 6.25, elite
+2.24, blacksmith 2.04, merchant 1.73, event 1.74, and every one of them ranges 0 to its full
+copy count. **A ZERO-BLACKSMITH ROUTE HAPPENS 7.7% OF ZONES AND A ZERO-ELITE ROUTE 6.1%** —
+that is §1's "no node type is guaranteed", measured, and it is the design.
+
+DELETED, NOT LEFT UNREACHABLE (test_batch_bk and test_batch_an both pin absence):
+`ZONE_SHAPE`, `roll_merchant`, `roll_event`, `MERCHANT_CHANCE`, `MERCHANT_FLOOR`,
+`EVENT_CHANCE`, `slots_since_merchant`, `pending_after`, map_screen's `SLOT_X_START` /
+`SLOT_X_STEP` / `_on_slot_pressed` / the three inline pick-row drawers. **THE MERCHANT AND THE
+EVENT ARE MAP NODES NOW** — nothing rolls behind a cleared fight. THE ONE SURVIVOR is the
+severity-4 bargain's "a merchant follows the fight", kept because it is BOUGHT rather than
+rolled: one boolean `pending_shop`, not a queue.
+
+§3 THE BLACKSMITH — THE GOLD SINK. `Run.roll_blacksmith_offer` / `buy_blacksmith` /
+`blacksmith_price`, screen at scenes/blacksmith.tscn. 3 pairings, ONE HERO EACH, drawn through
+AP §3's eligibility filter; **gold only**; **BLACKSMITH_PRICES = [150, 225, 300]** by zone;
+buying ENDS the visit. **AP'S ONCE-PER-RUN RULE DOES NOT APPLY AND THE MECHANISM IS ONE FLAG:**
+a bought entry is written into the same `member["upgrades"]` list (that is what makes it land,
+wear its ◆ and hover like an awarded one) but carries `"bought": true`, and **`has_upgrade`
+SKIPS bought entries**. `has_upgrade` has exactly one consumer — `roll_upgrade_offer`, i.e. the
+MINI-BOSS PICK POOL — so without the flag, buying Honed in zone 1 would silently delete Honed
+from that hero's mini-boss offers for the rest of the run. **THE FLAG IS READ IN THAT ONE
+FUNCTION AND NOWHERE ELSE**; `apply_upgrades` stamps both kinds identically and
+`roll_blacksmith_offer`'s never-twice-on-ONE-ABILITY check counts both, because that rule is
+about the ability rather than about either pool.
+PRICES CAME FROM BJ'S NUMBERS, NOT A GUESS: 2386 earned / 881 spent at 36 encounters = 1505
+dead; x48/36 = ~2050; six visits at these prices = 1350.
+
+§4 EVENTS ARE CONVERSIONS. Every entry in data/events.json carries `kind`; **the KIND is drawn
+first at 60/25/15** (`Events.KIND_WEIGHTS`) and the weight inside it picks the entry, so
+authoring a ninth boon does not make boons commoner. **20 events: 8 tradeoff, 8 boon, 4 bane.**
+Every tradeoff has >=2 conversions AND a decline. **THE THREE KINDS SHARE ONE ICON AND ONE
+COLOUR (???) and the map screen cannot see `kind` at all** — a node that announced itself as a
+bane would never be walked onto. **NO BANE CAN TAKE A HERO BELOW 1 HP**, and that is a property
+of the verbs (`damage_pct` floors at 1, `max_hp_pct` floors max at 10 and re-clamps), driven at
+1 HP as the negative control. ONE NEW VERB: **`rune_grant`** (§4's own "health for a rune"),
+routed through `Run.grant_rune`, equipped when a slot is free. **NOT WRITTEN and the reason
+stands: "a held rune for two of lower rarity" needs a rune SURRENDERED, and nothing in the
+project has ever removed a rune** — `equipped` has one writer and the pouch only grows.
+
+§5 TIER SCALING — TWO DECISIONS, DIFFERENT ANSWERS, BOTH ON PURPOSE. **`Run.battle_budget` IS
+RESCALED across 16 and BOTH ENDS ARE HELD** (`lo = 3 + floor((t-1) * 5/14)`): slot 1 still
+opens 3-5, slot 15 still tops at 8-10, boss band untouched at 10-12. Keeping the old 0.5/slot
+SLOPE would have run slot 15 to 10-12 and collided with the boss's own band — a structural
+break, not a preference. Per-slot bands now: **3-5 3-5 3-5 4-6 4-6 4-6 5-7 5-7 5-7 6-8 6-8 6-8
+7-9 7-9 8-10 10-12** (elite/mini-boss floor of 6 still applies in `compose`).
+**THE ENEMY STAT LADDER IS NOT RESCALED**: battle.gd's `+2% attack / +2.5% HP per tier` is a
+RATE, not a curve with endpoints, and it now runs to tier 16 — slot 16 reads **x1.40 HP /
+x1.32 attack** against the old slot-12 top of x1.30 / x1.24. The party's own +2%-a-win ladder
+gained the same four steps. `zone_base_mult` is UNTOUCHED (it reads the ZONE slot 1-3, never
+the encounter slot).
+
+§5 THE MAP SCREEN. 3-row lattice with DRAWN EDGES inside a `clip_contents` Control plus an
+HScrollBar (`VIEW_X/Y/W/H`, `LAT_X0/X_STEP/Y0/Y_STEP`), left to right, **hero cards stacked
+down the LEFT EDGE** at 300x152 (`CARD_X/CARD_Y/CARD_STEP`). `_map_scroll` is a member and
+**starts NEGATIVE = "not placed yet"**: the first draw of a scene centres on the party's
+column, every redraw after it holds where the player left it. **A NODE THIS ROUTE CAN NO
+LONGER REACH IS DRAWN NEARLY OUT** (`Run.reachable_from`) — that is the only way a player sees
+what a step cost, and it is the whole visual argument of the batch. The card lost 74px in the
+move, so an owed pick is a **CHOOSE button opening a three-choice overlay**
+(`_open_pick_overlay`, one implementation for ability/upgrade/rune) instead of three inline
+rows. Card click still opens the hero SHEET (party.tscn) — §5 asks for "current talents (not
+changeable mid-run)", but **TALENTS ARE STILL SPENT IN-RUN** (the meta layer that locks them
+does not exist yet) and making them read-only would have deleted the entire in-run talent
+economy. Reported, not taken. FREE TRAVEL is narrowed: every node of the NEXT slot is
+clickable, ignoring edges — `advance()` is the only mover on a lattice, and "Jump to Boss
+Slot" now WALKS the board rather than setting `slot_idx`.
+
+§7 THE NEW BASELINES — **EVERY NUMBER HERE IS A NEW BASELINE AND NOTHING WAS TUNED AGAINST
+IT.** 48 encounters is a third more than 36, so **BG's 52.3% completions IS NOT COMPARABLE**
+and a figure below it is not a regression. Three policies, default first-lane builds,
+**n=150 pooled per policy** (a 50 and a 100, weighted):
+
+| route | completions | depth (of 48) | elites | tp/hero | gold earned | unspent | smith gold | decisions |
+|---|---|---|---|---|---|---|---|---|
+| greedy | 39.3% ±7.8 | 30.70 ±1.37 | 6.47 | 10.9 | 1963 | 27.8% | 931 (47%) | 12.9 |
+| balanced | 43.3% ±7.9 | 32.11 ±1.35 | 6.00 | 10.8 | 1930 | 25.8% | 904 (47%) | 13.1 |
+| cautious | 21.3% ±6.6 | 26.24 ±1.22 | 2.03 | 6.0 | 1226 | 24.6% | 508 (41%) | 10.8 |
+
+**DOES THE GREEDY ROUTE WIN? NO — AND IT DOES NOT LOSE EITHER.** greedy vs balanced is
+**0.70σ** on completions and 0.73σ on depth: indistinguishable. Both beat cautious hard —
+**+18.0 pts at 3.46σ** and **+22.0 pts at 4.19σ**, +4.5 / +5.9 slots. **THE ELITES ARE NOT
+UNDERPAID**: ducking every one is unambiguously the worst play, which is what §1 said a
+zero-elite route should be. **WHAT IS STILL OPEN: whether HUNTING them pays.** The two
+elite-tolerant policies are only 8% apart in exposure (6.47 walked vs 6.00), so the axis is
+flat where they sit; resolving its top wants a bigger n or a policy pair further apart.
+**READ THE TABLE WITH DEPTH IN MIND** — gold, points and bargains all scale with how far the
+run got, so cautious earning less of everything is a SURVIVAL result, not an economy one. Per
+SLOT WALKED the three read **0.36 / 0.34 / 0.23** talent points and **0.21 / 0.19 / 0.08**
+elites, and there the elite economy is plainly doing its job.
+**AND A CAUTION THE INSTRUMENT EARNED THIS BATCH:** at n=50 these same three configs read
+**30% / 50% / 18%** and would have been written up as "balanced wins by 20 points". At n=150
+they are 39 / 43 / 21. The n=50 spread WAS the noise, exactly as the stage-0b resolution block
+says before every report. **Never publish a three-policy completions verdict off n=50.**
+ECONOMY, RE-MEASURED with the merchant's new frequency and the blacksmith both live: unspent
+gold at run end **63% (BJ) -> 25-28%**; the blacksmith converts **41-47% of ALL income**,
+walking 6.5-7.9 a run and buying 2.4-4.1 — **the rest refused for want of gold, which is a
+sink doing what a sink is for** ("nothing eligible" is 0.00/run, so the POOL never binds, only
+the purse). Bargains/run 8.4 | 8.1 | 3.8 (they gate on elites, so they moved with them).
+
+VERIFIED: check_parse 0 · check_flow 0 (**9 screens** incl. the new blacksmith) · 12 scenes
+0 SCRIPT ERROR · check_map_screen OK (three positions, both overlays) · run-harness gates
+1/2/3 PASS · **NEW test_batch_bk ~130/0** (the count drifts +/-1: two report loops iterate
+columns whose width the generator decides — never pin it) · full battery green (an, ah,
+ah_battle, ai, aj, ak, al, ar, as, at, au, av, aw, ax, ay, az, ba, bb, bc, bd, be, bf, bg, bh,
+bi, bj, runes, rune_battle). **test_batch_ah is 5624 now** (was 5587 at BJ — its map section
+was rewritten).
+**SEVEN NEGATIVE CONTROLS, each applied to product code and reverted** (the suite returned to
+0 after the last): crossing edges permitted **trips 2**, an AN-style key-route guarantee
+**trips 3**, a restored post-fight merchant roll **trips 4**, a purchase consuming a mini-boss
+pick **trips 1**, `has_upgrade` counting bought entries **trips 2**, a bane allowed below 1 HP
+**trips 1**, the map screen leaking an event's kind **trips 1**.
+**ONE OF THEM FAILED INTERESTINGLY AND THE RESULT IS LOAD-BEARING: A GUARANTEED ROUTE CANNOT
+BE BUILT AT A SINGLE COLUMN.** Both rigs were caught by the GRAPH/COPY invariants rather than
+by the route check written for them, because MIN_COLUMN>=2 + one-of-each-type-per-column +
+no-orphans makes a single-column guarantee unconstructible. A guarantee has to be a whole-route
+repair pass — which is precisely what AN's `_ensure_key_route` was. So the zero-blacksmith check
+is a MEASUREMENT, not a trip-wire, and it ships PAIRED with its companion (`_forced_smith_routes`
+> 0: a route that tries to duck every blacksmith is sometimes forced onto one anyway). **A check
+that can only ever pass is a gap; the pair is what makes it mean something.**
+SIX SUITES RE-POINTED IN PLACE with the reason in each file: test_batch_an's line section and
+its whole scheduling section (both now pin ABSENCE), test_batch_ah's mini-boss unavoidability
+(a reachability WALK again rather than a fact about an authored array) and its dead
+`_every_route_crosses` forward-DP (deleted — it read `FLOORS` and `links`, neither of which has
+existed since AN), test_batch_ah_battle's owed-pick affordance (counts the CHOOSE button AND
+opens the overlay — counting only the button would be the test giving up on the half that
+matters), test_batch_ai's and test_run_harness's talent arithmetic (RANGES now, with a new
+`_check_range` that states both ends).
+REPORTED NOT ACTED ON: **test_runes.gd's pre-existing stale call** (`_start_rune_pool` ->
+`run.start_rune_enabled`, retired in AN) still prints a SCRIPT ERROR and still reports 0
+failures. Untouched — it predates this batch and is not BK's to close.
+
+§5 RUNSIM. **DOD_SIM_ROUTE IS A REAL AXIS AGAIN** after eleven batches of being three names for
+one walk. `ROUTE_ORDER` = greedy (elite first) / balanced / cautious (elite last); `default`
+ALIASES balanced and `elites` ALIASES greedy, because every old script and Matrix row names
+them. All three rank the blacksmith top of the non-elite order ON PURPOSE — §3 asks what a
+BLACKSMITH-HEAVY route converts, and a policy that walks past the sink cannot answer it; the
+unsteered distribution is measured in check_map.gd instead. The walker RESOLVES non-combat
+nodes in place and keeps stepping (`while true` until it finds a fight). `deck_seen` counts
+everything ever REACHABLE, not what was taken. Matrix rows read **`map=branch`** and
+**depth out of 48**; `map=line` is an AN-to-BJ row. NO PRE-BK ROW IS COMPARABLE.
 
 BATCH BJ (08-11) — THE FULL AUDIT: dead code, tooltip truth, and the coherence tables. No save
 version moves (still v7); no magnitude moves, no node re-specced, no system redesigned. What
@@ -847,6 +1049,10 @@ spent, elite runes and trophies.
 line: **"Reachable nodes per step: 1.00 — steps offering a real choice: 0% (0 of 2764)"**,
 and **every node type reads taken == offered** (fight 18.6/18.6, elite 4.6/4.6, boss
 2.1/2.1). **The band across policies is three samples of ONE configuration, not a band.**
+**CLOSED BY BATCH BK — this paragraph is history, not current behaviour.** The branching map
+reads 1.61 reachable per step and 41% of steps a real choice, and the three policies walk
+different numbers of elites. **Everything below in this BG block describes the LINE and is
+not comparable with a post-BK row on any field**, depth units included (36 vs 48).
 · **RESTS DO NOT EXIST** (Batch AN). "rests taken vs offered" is **0.0/0.0** and always will
 be; the recovery line is the per-slot heal. Do not ask a run report for it again.
 · **A "route band" therefore cannot bracket real play.** What the three rows DO give is a

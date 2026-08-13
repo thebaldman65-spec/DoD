@@ -37,17 +37,38 @@ func _go() -> void:
 		worn["equipped"] = true
 		run.party[3]["runes"] = [worn]
 
-	await _check("res://scenes/map.tscn", "map (slot -1)")
-	run.advance(0)
-	run.encounter = {"type": "fight", "enemies": run.map[0]["enemies"],
-		"theme": run.map[0].get("theme", "Warband")}
-	await _check("res://scenes/map.tscn", "map (mid-zone)")
+	await _check("res://scenes/map.tscn", "map (nothing entered)")
+	# Batch BK: advance() takes a NODE index within the next slot, and a
+	# node's warband lives on the node rather than on the slot.
+	run.advance(int(run.reachable()[0]))
+	var here: Dictionary = run.current_node()
+	run.encounter = {"type": String(here["type"]),
+		"enemies": here.get("enemies", []),
+		"theme": here.get("theme", "Warband")}
+	await _check("res://scenes/map.tscn", "map (column 1)")
+	# Halfway: far enough in that foreclosure is drawn and the lattice has
+	# scrolled, which is the state the old line could not produce.
+	for _s in 7:
+		var reach: Array = run.reachable()
+		if reach.is_empty():
+			break
+		run.advance(int(reach[reach.size() - 1]))
+	await _check("res://scenes/map.tscn", "map (past the mini-boss)")
 	await _check("res://scenes/offer.tscn", "offer")
 	await _check("res://scenes/party.tscn", "hero sheet")
 	await _check("res://scenes/shop.tscn", "shop")
+	# The blacksmith needs something on its counter, which means kits: the
+	# specs above are already awakened, so the offer rolls.
+	await _check("res://scenes/blacksmith.tscn", "blacksmith")
+	run.pending_event = Events.pick(run)
+	await _check("res://scenes/event.tscn", "event")
 	# The boss slot's card, and the end-boss zone.
 	run.zone_idx = 2
-	run.advance(run.BOSS_SLOT)
+	while run.slot_idx < run.BOSS_SLOT:
+		var reach2: Array = run.reachable()
+		if reach2.is_empty():
+			break
+		run.advance(int(reach2[0]))
 	await _check("res://scenes/map.tscn", "map (zone 3, boss cleared)")
 	print("check_flow: %d failures" % bad)
 	quit(1 if bad > 0 else 0)

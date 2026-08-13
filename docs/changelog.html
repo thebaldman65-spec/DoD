@@ -5,6 +5,219 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-12 &mdash; Batch BK: the branching map</h2>
+<p><i>The largest structural change since Batch AN. A run is a generated map again &mdash;
+3 zones &times; 16 slots, three rows wide &mdash; with two new node types, re-specced events,
+and the first save-breaking change since AN. <b>No difficulty tuning:</b> every number below is
+a new baseline, and tuning against a baseline in the batch that creates it is how the last four
+Devout batches went wrong.</i></p>
+
+<h3>The headline &mdash; 12.9 real decisions a run, against Batch BG's 0</h3>
+<p>Batch BG measured route agency on Batch AN's line and reported <b>0% of 2,764 steps offering
+a real choice</b>. On the same definition &mdash; two or more nodes reachable <i>and</i> not all
+of them the same type &mdash; the generated map reads <b>41% of steps, 10.8&ndash;13.1 a
+run</b> (n=150 per policy), out of the 42 branching steps a full clear walks. Reachable nodes per step goes from
+<b>1.00 to 1.61</b>.</p>
+<p>The mechanism is not a rule. Edges reach the same row or an adjacent one, they never cross,
+and 59% of nodes have a single exit &mdash; so <b>a step down a row leaves the corridor above
+unreachable for a measured 2.23 columns</b>. Nothing is sealed and nothing is announced. On the
+map screen a node this route can no longer reach is drawn nearly out, which is the only way a
+player sees what the last step cost.</p>
+
+<h3>&sect;1 &mdash; What a zone is now</h3>
+<p><b>3 zones &times; 16 slots = 48 encounters</b> (was 36). Slots 1&ndash;7 branch three wide,
+slot 8 is the <b>mini-boss</b> and every path converges on it, slots 9&ndash;15 branch again,
+slot 16 is the <b>boss</b>. <b>Any of column 1's three nodes may be entered</b>, and the
+mini-boss opens the whole of column 9 the same way, so each half of a zone begins with a free
+pick and then narrows. 14 branching columns &times; 3 rows = 42 positions; pruning removes two
+or three, so a real zone holds <b>~39.7 nodes</b> and its columns are 2 or 3 wide (84% are 3;
+none is ever 1).</p>
+<p><b>Copies per zone: 6 elites, 6 blacksmiths, 5 merchants, 5 events</b>, fights filling the
+rest (~17.8). An unsteered route walks <b>6.25 fights, 2.24 elites, 2.04 blacksmiths, 1.73
+merchants and 1.74 events</b> &mdash; measured over 1,500 generated zones, and dead on the
+arithmetic the design was specified from.</p>
+<p><b>NO NODE TYPE IS GUARANTEED ON A ROUTE.</b> Route past every blacksmith and you get no
+blacksmith that zone: it happens in <b>7.7% of zones</b> under an unsteered walk, and a
+zero-elite route happens in 6.1%. That is the design &mdash; it is what makes the trade route a
+choice rather than a milestone, and it is what makes skipping every elite an underpower
+strategy rather than a safe one.</p>
+<p><i>The brief says 49 encounters. It is 48: 3 &times; 16, by the same construction that made
+the old number 36 (3 &times; 12), since the third zone's boss is the end boss.</i></p>
+
+<h3>&sect;2 &mdash; Generation, and why there is no retry loop in it</h3>
+<p>The edge graph is generated first; types are assigned to the positions that survive. Every
+node has 1&ndash;3 edges in and out (measured out-degree 59/37/4% for one/two/three), every edge
+lands on the same row or an adjacent one, no two edges cross, and nodes with no way in or out
+are removed to a fixpoint &mdash; but never below two per column, because a one-node column is a
+step with no decision on it.</p>
+<p><b>Nothing is rolled and thrown back.</b> Every legal edge assignment for a column is
+enumerated and one is drawn <i>weighted</i>; assignments that would strand a column are never in
+the bag. Elite columns come from the standard non-adjacent-subset bijection, so an illegal
+spread cannot be named, let alone rejected. This is Batch AN's own severity-floor argument
+reused: a retry budget works until the table's shape changes, and then it fails invisibly.</p>
+<p>Type constraints: <b>no elite in column 1</b>; <b>no two elites in adjacent columns</b> (the
+columns run 1&ndash;14 straight through the mini-boss, so elite &rarr; mini-boss &rarr; elite is
+barred too); at most one of each non-fight type per column; and every entry node reaches at
+least one elite and at least one trade node &mdash; 0 failures in 4,500 entry nodes.</p>
+
+<h3>&sect;3 &mdash; The Blacksmith: the gold sink the economy has been missing since AO</h3>
+<p>Batch BJ measured <b>63% of every run's gold going unspent</b>, with 13.6 shop-rune refusals
+a run for <i>no free slot</i> against 6.8 for the gold reserve: <b>slots were the binding
+constraint, not prices</b>, so no amount of extra shop stock could ever have fixed it.
+<b>A blacksmith consumes no slot.</b></p>
+<p>It sells the ability upgrade Batch AP already built &mdash; three pairings on the counter,
+one hero each, drawn through AP's own eligibility filter so Honed is never offered on a heal.
+<b>Gold only</b>, no HP cost and no second currency, because the economy needed a <i>pure</i>
+sink. <b>One purchase ends the visit</b>: it is not a shop you clear. <b>Price scales with the
+zone: 150 / 225 / 300</b>, set from BJ's measured numbers rather than by guess (1,505 dead gold
+a run at 36 encounters scales to ~2,050 at 48; six visits at these prices is 1,350).</p>
+<p><b>AP's once-per-run rule does not apply here</b> &mdash; that rule governs the mini-boss
+pick pool, and a blacksmith is not that pool. A player may buy the same upgrade type more than
+once in a run on different abilities; the never-twice-on-one-ability rule still holds. The
+subtle half of that, which would have shipped unnoticed: a bought upgrade goes into the same
+list the mini-boss award writes (that is what makes it land, wear its &#9670; and hover
+identically), and <i>that</i> list is what the once-per-run rule reads &mdash; so without a
+flag, buying Honed in zone 1 would silently have deleted Honed from that hero's mini-boss offers
+for the rest of the run. The flag has exactly one reader.</p>
+
+<h3>&sect;3 &mdash; The Merchant becomes a node you can see coming</h3>
+<p>The Peddler used to appear after a won fight, 40% of the time with a four-fight drought
+floor. <b>It is a map node now</b> &mdash; five a zone &mdash; so a shop is something a player
+routes toward with gold in hand rather than something that happens to them. Same stock. The
+40% roll, the 25% event roll, the drought counter and the post-fight queue are all
+<b>deleted</b>, not left unreachable. <b>The one survivor is the severity-4 bargain's "a
+merchant follows the fight"</b>, kept because it is <i>bought</i> rather than rolled.</p>
+
+<h3>&sect;4 &mdash; Events become a trading floor</h3>
+<p>Events were gifts, and a gift node has nothing to think about. They are <b>resource
+conversions</b> now, in three kinds that <b>share one icon and one colour</b>. The player knows
+an event is there; they do not know which kind, because a visibly-bad node is a wall with extra
+steps rather than a gamble &mdash; the map screen cannot read an event's kind at all.</p>
+<ul>
+<li><b>Tradeoff, 60%</b> &mdash; two or three conversions of one resource into another, at a
+rate taken or declined. Health for a rune, gold for maximum health, health for talent points,
+gold for a relic. <b>Declining is always one of the buttons.</b> Eight authored: every existing
+tradeoff gained a second, deeper conversion beside its first.</li>
+<li><b>Boon, 25%</b> &mdash; a straight benefit, no cost. Eight authored.</li>
+<li><b>Bane, 15%</b> &mdash; a straight detriment, one button. Four new: <b>Ashfall</b> (12% of
+maximum health), <b>the Cutpurse</b> (a quarter of the purse), <b>Spoiled Stores</b> (two
+potions), <b>Wormrot</b> (&minus;5% maximum health for the run). <b>No bane can kill a hero or
+take anyone below 1 HP</b> &mdash; a bane you could not have avoided is only fair if it costs a
+resource, never a run.</li>
+</ul>
+<p>The <b>kind is drawn first</b>, at 60/25/15, and the weight inside that kind picks the entry,
+so authoring a ninth boon will not make boons commoner. <b>20 events ship</b>, against ~5 met
+per run. One new effect verb, <b>rune_grant</b>, for &sect;4's own worked example.</p>
+<p><b>Reported, not built:</b> &sect;4 also suggests trading a held rune for two of lower
+rarity. That needs a rune to be <i>surrendered</i>, and nothing in this project has ever removed
+a rune from a hero &mdash; the equipped flag has one writer and the pouch only grows. Building a
+removal path for one event would put a second, untested writer beside the one careful one.</p>
+
+<h3>&sect;5 &mdash; The map screen, rebuilt</h3>
+<p>A three-row lattice with <b>drawn edges</b>, reading left to right inside a clipped viewport
+with a horizontal scrollbar, so <b>the whole zone can be read before the first step</b>. The
+four hero cards moved to the <b>left edge, stacked</b>, and the right two thirds of the screen
+belongs to the map. Four node states, and the fourth is the new one: cleared is dim green with
+its edges lit gold, a node the party may step onto wears its full type colour and is larger, the
+road ahead recedes grey, and <b>a node this route can no longer reach is drawn nearly out</b>.
+The scroll position is held across redraws and centres on the party's own column when the screen
+opens.</p>
+<p>The card lost 74 pixels of height in the move, so an owed ability, upgrade or rune pick is now
+a <b>CHOOSE button opening a three-choice overlay</b> &mdash; one implementation for all three,
+where there were three near-identical inline rows, and each choice shows its full description
+under it rather than behind a hover.</p>
+<p><b>The tier ramp was rescaled and the enemy stat ladder was not</b>, and the two decisions are
+different on purpose. The budget ramp now spans 16 slots with <b>both ends held exactly where
+Batch AN left them</b> (slot 1 opens 3&ndash;5, slot 15 tops at 8&ndash;10, boss band untouched
+at 10&ndash;12); keeping the old slope would have run slot 15 into the boss's own band, which is
+a structural break rather than a preference. The enemy ladder's +2% attack / +2.5% HP is a
+<i>rate</i>, not a curve with endpoints, so it simply runs four more steps &mdash; slot 16 reads
+&times;1.40 HP / &times;1.32 attack against the old slot-12 top of &times;1.30 / &times;1.24, and
+the party's own +2%-a-win ladder gained the same four steps.</p>
+<p><b>Bargains per run became variable</b>, as intended: they gate on elites and mini-bosses, and
+elites are routed to rather than placed. Measured <b>8.4 a run greedy, 8.1 balanced, 3.8 cautious</b> (n=150).</p>
+<p><b>Reported, not taken:</b> &sect;5 asks for the hero sheet to show "current talents (not
+changeable mid-run)". Talents are still spent in-run &mdash; the meta layer that locks them
+before a run does not exist yet &mdash; and making the sheet read-only would have deleted the
+entire in-run talent economy, which is not a change this batch was asked for.</p>
+
+<h3>&sect;6 &mdash; Save v8, and pre-v8 saves are refused</h3>
+<p>A v7 save holds a flat 12-slot line and a single slot index. There is no honest place for
+that on a lattice: the migration would have to invent a row the party never stood in and a set of
+edges they never had, on a map generated after the fact. <b>Refused and cleared</b>, which is the
+call Batch AN made about pre-v7 saves and Batch AI made about ranked talent purchases. <i>The
+brief calls this the first save-breaking change in the project's history; it is the second.</i></p>
+
+<h3>&sect;7 &mdash; The new baselines, and the question the map exists to ask</h3>
+<p><b>Every figure here is a new baseline.</b> 48 encounters is a third more than 36, so Batch
+BG's 52.3% completion figure is not comparable and is not a regression when a number below it
+appears. Three route policies, default first-lane builds, n=150 pooled per policy:</p>
+<table border="1" cellpadding="4">
+<tr><th>Route</th><th>Completions</th><th>Depth (of 48)</th><th>Elites walked</th>
+<th>Talent points / hero</th><th>Gold earned</th><th>Blacksmith gold</th></tr>
+<tr><td><b>greedy</b> (elite first)</td><td><b>39.3%</b> &plusmn;7.8</td><td>30.70 &plusmn;1.37</td><td>6.47</td>
+<td>10.9</td><td>1963</td><td>931 (47%)</td></tr>
+<tr><td><b>balanced</b></td><td><b>43.3%</b> &plusmn;7.9</td><td>32.11 &plusmn;1.35</td><td>6.00</td>
+<td>10.8</td><td>1930</td><td>904 (47%)</td></tr>
+<tr><td><b>cautious</b> (elite last)</td><td><b>21.3%</b> &plusmn;6.6</td><td>26.24 &plusmn;1.22</td><td>2.03</td>
+<td>6.0</td><td>1226</td><td>508 (41%)</td></tr>
+</table>
+<p><b>Does the greedy route win? No &mdash; and it does not lose either.</b> Greedy and
+balanced are <b>indistinguishable at 0.70&sigma;</b> on completions and 0.73&sigma; on depth.
+Both beat cautious decisively: <b>+18.0 points at 3.46&sigma;</b> and <b>+22.0 points at
+4.19&sigma;</b> respectively, and +4.5 / +5.9 slots of depth. So <b>the elites are not
+underpaid</b> &mdash; ducking every one of them is unambiguously the worst way to play, which
+is exactly what &sect;1 said a zero-elite route should be. What the batch cannot yet say is
+whether <i>hunting</i> them pays, because the two policies that tolerate elites turned out to
+be only 8% apart in elite exposure (6.47 walked against 6.00): the axis is flat where they
+sit, and resolving its top end wants either a much larger n or a policy pair further apart
+than these two. That is named as a next step rather than closed.
+<br>One caution on reading the table: gold, talent points and bargains all scale with
+<b>depth</b>, so cautious earning less of everything is mostly a survival consequence rather
+than an economy finding. Per slot actually walked, the three read <b>0.36 / 0.34 / 0.23</b>
+talent points and <b>0.21 / 0.19 / 0.08</b> elites &mdash; there the elite economy is doing
+plainly what it was built to do.
+<br>And one on the instrument itself, because it caught us: at n=50 these same three policies
+read 30% / 50% / 18%, which would have been written up as "balanced wins by 20 points". At
+n=150 it is 39% / 43% / 21%. The n=50 spread was noise, and the report's own resolution block
+said so before the number was believed.</p>
+<p><b>The economy, re-measured with the merchant's new frequency and the blacksmith both
+live.</b> Unspent gold at run end falls from Batch BJ's <b>63%</b> to <b><b>25&ndash;28%</b></b>. The
+blacksmith alone converts <b><b>41&ndash;47%</b> of all income</b>; the route walks 6.5&ndash;7.9 of them a
+run and buys 2.4&ndash;4.1, the rest refused for want of gold &mdash; which is a sink doing
+exactly what a sink is for.</p>
+
+<h3>Tests</h3>
+<p><b>test_batch_bk: ~130 checks</b> (the count drifts by one or two run to run, because two
+of its loops iterate over columns whose width the generator decides) &mdash; 1,000 generated
+maps asserting every degree, adjacency, crossing, orphan, pruning-floor, copy-count,
+elite-placement and entry-reachability invariant; reachability contiguity; the blacksmith's
+offer, price, purchase and pool independence; the three event kinds, their weights and their
+declinability. Plus a suite-level check that all eight sections reached their last line,
+because a GDScript error mid-function aborts that function and the suite still prints
+"0 failures".</p>
+<p><b>Seven negative controls, each applied to the product code and reverted</b> (the suite came
+back to 0 failures after the last): crossing edges permitted trips 2, an AN-style key-route
+guarantee trips 3, a restored post-fight merchant roll trips 4, a purchase consuming a
+mini-boss pick trips 1, <code>has_upgrade</code> counting bought entries trips 2, a bane
+allowed below 1 HP trips 1, and the map screen leaking an event's kind trips 1.</p>
+<p><b>One of those seven is worth reporting on its own, because the attempt failed
+interestingly.</b> Rigging a route <i>guaranteed</i> to hit a blacksmith was tried twice and
+caught both times &mdash; but by the graph and copy-count invariants rather than by the
+route check written for it. The reason is structural: with a floor of two nodes per column, one
+of each non-fight type per column, and no orphans, <b>no node type can be made unavoidable at a
+single column at all</b>. A guarantee has to be a whole-route repair pass, which is exactly what
+Batch AN's <code>_ensure_key_route</code> was and exactly what this generator does not have. The
+route check is therefore a measurement rather than a trip-wire, so it ships paired with its own
+companion: a route that <i>tries</i> to duck every blacksmith is sometimes forced onto one
+anyway, which is what proves the avoid-walk is doing real work rather than always returning
+zero.</p>
+<p>Re-pointed rather than deleted: test_batch_an's line section and its scheduling section (both
+now pin the <i>absence</i> of what AN built), test_batch_ah's mini-boss unavoidability (a
+reachability walk again rather than a fact about an authored array), test_batch_ai's and
+test_run_harness's talent arithmetic (a range now, because the purse is a function of the route).
+Full battery green.</p>
+
 <h2>2026-08-11 &mdash; Batch BJ: the full audit</h2>
 <p><i>No save version moves (still v7). No magnitude moves, no node re-specced, no system
 redesigned. What shipped: deletions of unambiguous dead code, one deduplication, one

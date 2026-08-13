@@ -244,19 +244,33 @@ func _economy(run: Node) -> void:
 	# not a slot, so it survives and the real surplus is 5. Pinned at 13 on
 	# purpose: if the designer decides §8's arithmetic is exact and drops the
 	# awakening point, THIS is the check that says so out loud.
+	# BATCH BK: THE PER-RUN TOTAL IS NO LONGER A CONSTANT — elites are routed
+	# TOWARD on a branching map, so the run pays a FLOOR plus whatever the
+	# route reaches. The old 13 is asserted as the FLOOR-PLUS-CEILING pair it
+	# has become; the fixed number went with AN's line. Walked with the real
+	# reachability rather than a hand count, so the schedule and the board can
+	# still never drift apart.
 	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
 	var total := 0
 	run.award_spec_point(0)
 	total += 1
 	for zone in run.SLOT_COUNT:
 		run.zone_idx = zone
-		for ty in run.ZONE_SHAPE:
-			total += run.award_talent_points(String(ty))
-	ok(total == 13, "a 3-zone run pays %d points (12 from slots + 1 awakening)" % total)
-	ok(run.party[0]["talent_points"] == 13, "...banked on every hero (%d)" % \
+		run.slot_idx = -1
+		run.node_idx = 0
+		if zone > 0:
+			run._generate_map()
+		while true:
+			var reach: Array = run.reachable()
+			if reach.is_empty():
+				break
+			run.advance(int(reach[0]))
+			total += run.award_talent_points(String(run.current_node()["type"]))
+	ok(total >= 7, "a 3-zone run pays at least 7 (mini-boss + boss each zone, + the awakening) — got %d" % total)
+	ok(total <= 1 + run.SLOT_COUNT * (2 + int(run.NODE_COPIES["elite"])),
+		"...and never more than the elites on the board could pay (%d)" % total)
+	ok(run.party[0]["talent_points"] == total, "...banked on every hero (%d)" % \
 		int(run.party[0]["talent_points"]))
-	# The 8-node tree, and what the surplus can and cannot do.
-	ok(total - 8 == 5, "the surplus is 5 nodes' worth of second picks")
 	run.zone_idx = 0
 	# BATCH AN §8 RE-CUT THIS SCHEDULE and the checks moved with it: one
 	# purse, 1 point apiece from elites, mini-bosses AND bosses (the end boss
@@ -270,13 +284,18 @@ func _economy(run: Node) -> void:
 	run.zone_idx = 2
 	ok(run.award_talent_points("boss") == 1,
 		"the END boss pays 1 too — §8 lists it as a point source")
-	# The whole-run arithmetic §8 states: 4 per zone, 12 per run.
-	var per_zone := 0
-	for ty in run.ZONE_SHAPE:
-		if String(ty) in ["elite", "miniboss", "boss"]:
-			per_zone += 1
-	ok(per_zone == 4, "a zone holds exactly 4 point-paying slots")
-	ok(per_zone * run.SLOT_COUNT == 12, "a run pays 12 against an 8-node tree")
+	# BATCH BK: the whole-run arithmetic is a RANGE now. A zone holds 2
+	# unavoidable point-payers and 6 elites it may or may not route to.
+	run.new_run()
+	var payers := 2  # the mini-boss and the boss
+	var elite_nodes := 0
+	for s2 in run.map.size():
+		for node in run.map[s2]:
+			if String(node["type"]) == "elite":
+				elite_nodes += 1
+	ok(payers == 2, "a zone holds exactly 2 UNAVOIDABLE point-paying slots")
+	ok(elite_nodes == int(run.NODE_COPIES["elite"]),
+		"...and %d elites the route may reach" % elite_nodes)
 
 
 # ---------- 6. save migration (§7) ----------

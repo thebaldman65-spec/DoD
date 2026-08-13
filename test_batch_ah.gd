@@ -228,12 +228,16 @@ func _unique(arr: Array) -> Array:
 func _test_map(RunState) -> void:
 	print("\n§4 the mini-boss")
 	var run = RunState.new()
-	# BATCH AN REPLACED THE BOARD THIS SECTION USED TO PIN. There is no deck,
-	# no row and no route: a zone is a fixed line of 12 slots, so "no route
-	# goes around the mini-boss" is true by construction rather than by a
-	# forward DP. What survives is the question that still has meaning —
-	# every zone puts exactly one mini-boss in it, always in the same place,
-	# and the player cannot reach the boss without passing it.
+	# BATCH AN REPLACED THE BOARD THIS SECTION PINNED, AND BATCH BK REPLACED
+	# AN'S. A zone is a generated 16-slot lattice again, so "a zone is 12
+	# slots" and "it is the authored ZONE_SHAPE" are false by design and the
+	# checks that asserted them are DELETED rather than re-pointed at whatever
+	# the code now does. test_batch_bk owns the generation invariants.
+	# WHAT SURVIVES IS THE QUESTION THAT STILL HAS MEANING, and it is the one
+	# this section was written to ask: every zone puts exactly ONE mini-boss in
+	# it, and the player cannot reach the boss without passing it. On a
+	# lattice that is a REACHABILITY claim again rather than a fact about an
+	# authored array, so it is walked rather than counted.
 	for trial in 60:
 		run.new_run()
 		ok(run.map.size() == run.SLOTS_PER_ZONE,
@@ -241,40 +245,52 @@ func _test_map(RunState) -> void:
 		var counts := {}
 		var mb_at := -1
 		for s in run.map.size():
-			var ty := String(run.map[s]["type"])
-			counts[ty] = int(counts.get(ty, 0)) + 1
-			if ty == "miniboss":
-				mb_at = s
+			for node in run.map[s]:
+				var ty := String(node["type"])
+				counts[ty] = int(counts.get(ty, 0)) + 1
+				if ty == "miniboss":
+					mb_at = s
 		ok(int(counts.get("miniboss", 0)) == 1, "exactly one mini-boss per zone")
-		ok(mb_at == 5, "the mini-boss sits at slot 6 (index 5), always")
+		ok(mb_at == run.MINI_SLOT, "the mini-boss sits at slot 8 (index 7), always")
 		ok(int(counts.get("boss", 0)) == 1, "one boss, and it is the last slot")
-		ok(String(run.map[run.BOSS_SLOT]["type"]) == "boss",
+		ok(String(run.map[run.BOSS_SLOT][0]["type"]) == "boss",
 			"the boss is the last slot")
-		ok(int(counts.get("elite", 0)) == 2, "two elites per zone")
-		ok(int(counts.get("fight", 0)) == 8, "eight ordinary fights per zone")
 		ok(int(counts.get("rest", 0)) == 0, "no rest slots exist any more")
-		ok(int(counts.get("shop", 0)) == 0, "the shop is scheduled, never dealt")
-		ok(int(counts.get("event", 0)) == 0, "events are scheduled, never dealt")
-		# Unavoidable by construction: the only way past slot 6 is through it.
-		ok(mb_at < run.BOSS_SLOT, "the mini-boss stands before the boss")
-	# Every zone is the SAME line — that is the batch's whole premise.
+		# UNAVOIDABLE, WALKED. Every route from every entry node passes through
+		# slot 7 — on a lattice this is the mini-boss converge, and it is worth
+		# asserting rather than assuming because the whole entry guarantee in
+		# test_batch_bk rests on it.
+		for j in run.map[0].size():
+			var reach: Dictionary = run.reachable_from(0, j)
+			ok(reach.has("%d,0" % run.MINI_SLOT),
+				"entry node %d cannot reach the boss without the mini-boss" % j)
+			ok(reach.has("%d,0" % run.BOSS_SLOT),
+				"...and it does reach the boss")
+	# Every zone is a DIFFERENT map now, which is the batch's whole premise —
+	# the old check asserted the opposite and had to go with the line.
 	run.new_run()
 	var first: Array = []
 	for s in run.map.size():
-		first.append(String(run.map[s]["type"]))
+		for node2 in run.map[s]:
+			first.append(String(node2["type"]))
 	run.advance_zone()
 	var second: Array = []
 	for s in run.map.size():
-		second.append(String(run.map[s]["type"]))
-	ok(first == second, "every zone has the identical shape")
-	ok(first == run.ZONE_SHAPE, "...and it is the authored ZONE_SHAPE")
-	# Only one slot is ever reachable, and it is the next one.
+		for node3 in run.map[s]:
+			second.append(String(node3["type"]))
+	ok(first.size() > 0 and second.size() > 0, "both zones generated something")
+	# A walk always terminates on the boss and never before it.
 	run.new_run()
-	for s in run.SLOTS_PER_ZONE:
-		var reach: Array = run.reachable()
-		ok(reach.size() == 1, "exactly one slot forward at slot %d" % s)
-		ok(int(reach[0]) == s, "...and it is the next one")
-		run.advance(int(reach[0]))
+	var steps := 0
+	while true:
+		var reach2: Array = run.reachable()
+		if reach2.is_empty():
+			break
+		run.advance(int(reach2[0]))
+		steps += 1
+	ok(steps == run.SLOTS_PER_ZONE, "a walk is exactly %d steps (%d)" % [
+		run.SLOTS_PER_ZONE, steps])
+	ok(run.slot_idx == run.BOSS_SLOT, "...and it ends on the boss")
 	ok(run.reachable().is_empty(), "nothing follows the boss")
 	# Rewards: elite-tier points and gold, and its own ability pick.
 	run.new_run()
@@ -290,7 +306,7 @@ func _test_map(RunState) -> void:
 	ok(run.gold > gold_before, "...into the purse")
 	# It composes as an elite: an elite theme, at the elite budget floor.
 	for trial3 in 60:
-		var band: Array = run.compose("miniboss", 6)
+		var band: Array = run.compose("miniboss", 8)
 		ok(not band.is_empty(), "the mini-boss composes a warband")
 		ok(THEME_IS_ELITE(run.last_theme), "...from an elite theme (%s)" % run.last_theme)
 	run.free()
@@ -302,24 +318,11 @@ func THEME_IS_ELITE(theme_name: String) -> bool:
 	return themes.has(theme_name) and (themes[theme_name]["nodes"] as Array).has("elite")
 
 
-# Forward reachability: is there ANY route from tier 0 to the boss that
-# skips the given row? (There must not be.)
-func _every_route_crosses(run, row: int) -> bool:
-	var frontier := {}
-	for i in run.map[0].size():
-		if row == 0 and String(run.map[0][i]["type"]) != "miniboss":
-			frontier[i] = true
-		elif row != 0:
-			frontier[i] = true
-	for f in run.FLOORS - 1:
-		var next := {}
-		for i in frontier:
-			for j in run.map[f][int(i)]["links"]:
-				if f + 1 == row and String(run.map[f + 1][j]["type"]) == "miniboss":
-					continue  # this route was stopped BY the mini-boss
-				next[j] = true
-		frontier = next
-	return frontier.is_empty()
+# _every_route_crosses() is DELETED. It walked `run.map[f][i]["links"]` over
+# `run.FLOORS` — a board Batch AN removed and Batch BK did not bring back (the
+# lattice's edges are `next`, indices rather than links, and there is no
+# FLOORS). The question it asked is answered above by reachable_from, at the
+# site, against the map the game actually generates.
 
 
 # ---------- §5: hotkeys ----------
@@ -416,7 +419,7 @@ func _test_doc_matches_code() -> void:
 	# The stamp moves with every batch that touches the doc; what this line
 	# is really guarding is that the doc was touched AT ALL when the code
 	# below it changed. Bump it, do not delete it.
-	ok(doc.contains("Last updated: 2026-08-11 (Batch BJ)"),
+	ok(doc.contains("Last updated: 2026-08-12 (Batch BK)"),
 		"master.html carries the current batch's stamp")
 	for spec in Classes.SPEC_POOLS:
 		var listed: String = ", ".join(Classes.SPEC_POOLS[spec])

@@ -138,8 +138,9 @@ func _show_outcome(outcome: String, lines: PackedStringArray) -> void:
 	btn.text = "Continue"
 	btn.custom_minimum_size = Vector2(240, 44)
 	btn.pressed.connect(Music.click)
-	# Batch AN: a fight can queue a merchant AND an event behind it, so
-	# leaving asks the run where to go rather than assuming the map.
+	# Batch BK: the event is a map node now, so leaving is nearly always the
+	# map — but the bargain's bought merchant can still be pending, so the run
+	# is still asked rather than assumed.
 	btn.pressed.connect(func():
 		var next := Run.next_after_scene()
 		Run.save_run()

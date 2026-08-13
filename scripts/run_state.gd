@@ -1,26 +1,56 @@
 # Run-level state (autoload "Run"): the party, shared inventory, and the
-# run's fixed line of slots. Persists across scene switches within one run.
+# run's generated zone map. Persists across scene switches within one run.
 extends Node
 
-# Batch AN: A RUN IS A LINE, not a branching map. 3 zones x 12 slots = 36,
-# and every zone has the IDENTICAL shape — so the player always knows what
-# is coming and the run's decisions live in the offer screen (§3) rather
-# than in route planning. Nothing is dealt, nothing is rolled: the shape
-# below IS the zone.
+# BATCH BK: A RUN IS A BRANCHING MAP AGAIN — 3 zones x 16 slots = 48
+# encounters, the third zone's boss being the end boss. (§1 says 49; 3 x 16
+# is 48, and the brief's own "was 36" was 3 x 12 by the same construction, so
+# the slip is in the brief and the figure everywhere here is 48.)
+# Batch AN deleted the OLD
+# branching generator and put a LINE in its place; this is not that generator
+# coming back. What AN deleted guaranteed routes (`_ensure_key_route` /
+# `_route_satisfied` / `_guarantee_inbound`) and carried an edge-column
+# adjacency rule whose comment said 70% and whose code did 53% — it needed
+# deleting, not fixing. The mechanism here is the opposite one: NOTHING is
+# guaranteed on a route, and commitment comes from SPARSE NON-CROSSING
+# GEOMETRY rather than from a rule. A step down a row forecloses the corridor
+# above it for two to four columns because no edge climbs back fast enough.
 #
-# RETIRED WITH THE BRANCHING MAP (Batch Y/AH machinery, all deleted rather
-# than left unreachable): FLOORS, NODES_PER_TIER, the deck composition
-# constants FIGHT_NODES/REST_NODES/SHOP_NODES/EVENT_NODES, both
-# DECK_FALLBACK tables, MINIBOSS_TIER, the rejection-sampling deal and its
-# swap repair, the link graph, the edge-column adjacency rule (and with it
-# the documented-70%/actual-53% bug — it needed no fix, it needed deleting),
-# the inbound guarantee, and the forward-DP key-route check. ALL REST NODES
-# go too; attrition is answered by the per-slot victory heal in §6 instead.
-const SLOTS_PER_ZONE := 12
-const ZONE_SHAPE := ["fight", "fight", "elite", "fight", "fight", "miniboss",
-	"fight", "fight", "elite", "fight", "fight", "boss"]
-# The boss of the LAST zone is the end boss: the run ends on its death.
+# THE SHAPE (§1): slots 1-7 branch three wide, slot 8 is the mini-boss and
+# every path converges on it, slots 9-15 branch again, slot 16 is the zone
+# boss. 14 branching columns x 3 rows = 42 node positions; pruning takes a
+# few of them out, so a column is 2 or 3 wide and the real mean is ~39.7.
+const SLOTS_PER_ZONE := 16
+const ROWS := 3
+const MINI_SLOT := 7        # 0-based: the mini-boss, where the first half converges
 const BOSS_SLOT := SLOTS_PER_ZONE - 1
+const BRANCH_COLUMNS := 14  # 1-based columns 1..14; the mini-boss sits between 7 and 8
+
+# HOW MANY OF EACH TYPE A ZONE HOLDS (§1). Fights are not listed because
+# they are the FILLER: every position no other type claimed is a fight, so
+# the four counts below plus the surviving-position count fix the map. A
+# route walks 14 of them, which is where §1's expected-walked column comes
+# from — 6 elites over 14 columns, one per column, at a mean column width of
+# ~2.8, is 6/2.8 = 2.1 elites on a route that does not steer.
+const NODE_COPIES := {"elite": 6, "blacksmith": 6, "merchant": 5, "event": 5}
+
+# THE TWO GENERATION WEIGHTS, and they are the whole feel of the map.
+# Every legal edge-set for a column is enumerated (see _edge_candidates) and
+# drawn WEIGHTED — never rejected and re-rolled, because a retry budget is a
+# thing that quietly starts failing when the table's shape changes (Batch AN's
+# severity floor made the same call). FULL_COVER_WEIGHT favours a step that
+# strands no row, so most columns stay 3 wide; BRANCH_WEIGHT favours a step
+# with more edges, which is what puts a second option under the player's
+# cursor. Raising either one flattens foreclosure — measured at 2.25 columns
+# with these, against §2's "two to four".
+const FULL_COVER_WEIGHT := 3.0
+const BRANCH_WEIGHT := 1.5
+# No draw may leave the next column below this. A one-node column is a step
+# with no decision on it, and the headline this batch exists to move is
+# decisions per run. Guaranteed BY CONSTRUCTION: candidates that would strand
+# a column at one node are never in the bag, rather than being rolled and
+# thrown back.
+const MIN_COLUMN := 2
 
 # All item metadata lives here; battle and map both read it.
 const ITEM_IDS := ["health", "mana", "bomb", "revive", "defense"]
@@ -78,19 +108,16 @@ var zone_name := "Forest of Old"
 var zone_draw: Array = []  # this run's drawn zone ids, one per slot
 var party: Array = []      # [{key, hp, max_hp}] snapshots between battles
 var items := {}            # item id -> count (shared inventory)
-# Batch AN: the line. map[slot] = {type, visited, enemies, theme} for the
-# 12 slots of the CURRENT zone — one dict per slot, no columns and no
-# links, because there is only ever one way forward.
+# Batch BK: the lattice. map[slot] is an ARRAY of node dicts — 2 or 3 of them
+# on a branching slot, exactly one on the mini-boss and the boss. A node is
+# {type, visited, row, next, enemies, theme}, where `next` holds INDICES INTO
+# map[slot + 1] (not row numbers: rows get pruned, indices do not shift under
+# you). The party's position is the pair (slot_idx, node_idx).
 var map: Array = []
-var slot_idx := -1         # -1 = zone not entered; 0..11 = standing on that slot
+var slot_idx := -1         # -1 = zone not entered; 0..15 = standing on that slot
+var node_idx := 0          # which node of map[slot_idx] the party stands on
 var encounter := {}        # {"type": ..., "enemies": ["raider", ...]} for the next battle
 var seen_events: Array = []  # event ids drawn this run (non-repeating pool)
-# Batch AN §5: the merchant is scheduled, not always available. 40% after
-# any cleared fight or elite slot, with a FLOOR — four cleared slots
-# without a merchant and the next one is guaranteed. The counter is what
-# makes the floor a property of the run rather than of a lucky streak, so
-# it is saved.
-var slots_since_merchant := 0
 # The modifier the player accepted at the offer screen, live for exactly
 # one battle (§3). Cleared when that battle resolves. Not saved: quitting
 # between the offer and the fight forfeits the offer, and the slot is
@@ -101,12 +128,6 @@ var pending_reward := {}   # the reward the accepted option pays on victory
 # list, so the sheet is always entered for a specific hero). Session-scoped
 # — a resumed run opens the map, never a sheet.
 var hero_screen_idx := 0
-# §5/§7: what a cleared fight queued behind it — "shop" and/or "event", in
-# the order they resolve. Rolled ONCE on the victory screen and popped by
-# the screens, so a redraw can never re-roll the merchant and the four-slot
-# drought floor stays meaningful. Saved: the queue is earned state, and a
-# player who quits on the victory screen should still meet the merchant.
-var pending_after: Array = []
 # Debug (map burger): pre-grant every talent/trophy ability at battle
 # spawn. Session-scoped, never saved; DOD_SIM_GRANT_ALL=1 arms it for
 # headless full-kit runs. Default OFF so tests measure gated kits.
@@ -237,13 +258,13 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	draw_zones()
 	_enter_zone()
 	slot_idx = -1
-	slots_since_merchant = 0
+	node_idx = 0
 	encounter = {}
 	seen_events = []
 	pending_event = ""
 	pending_modifier = ""
 	pending_reward = {}
-	pending_after = []
+	pending_shop = false
 	# A fresh run starts clean, and starts un-summoned and un-travelled.
 	debug_used = false
 	debug_summon = false
@@ -252,40 +273,295 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	_generate_map()
 
 
-# ---------- the line (Batch AN) ----------
+# ---------- the branching map (Batch BK) ----------
 
-# One zone = the authored shape, in order. There is no deal, no shuffle, no
-# rejection sampling and no fallback table, because there is nothing left to
-# fail: every zone is the same twelve slots, and a slot's only variable is
-# the warband standing on it.
+# The branching slots, in walking order. 7 and 15 are missing on purpose:
+# those are the mini-boss and the boss, one node each, and every path
+# converges on them.
+const BRANCH_SLOTS := [0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14]
+# The pairs an edge draw runs between. 6 -> 7 and 14 -> 15 are absent because
+# they converge, and 7 -> 8 is absent because the mini-boss fans out to
+# everything: the second half is a fresh entry, which is what makes 8 the
+# other column whose whole width is choosable.
+const EDGE_PAIRS := [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6],
+	[8, 9], [9, 10], [10, 11], [11, 12], [12, 13], [13, 14]]
+
+
+# The slot a 1-based column number lives on. Columns run 1..14 straight
+# through the mini-boss, which is why an elite in column 7 forbids one in
+# column 8: elite -> MINI-BOSS -> elite is three hard fights back to back,
+# and the adjacency rule exists to stop exactly that.
+func column_slot(column: int) -> int:
+	return column - 1 if column <= 7 else column
+
+
+# THE GENERATOR. Edges first, types onto whatever positions survive — never
+# the other way round, because a type placed before pruning can be pruned.
 func _generate_map() -> void:
+	var alive := {}    # slot -> Array of surviving row numbers
+	var out_rows := {} # slot -> {row: Array of target rows in the next branch slot}
+	for s in BRANCH_SLOTS:
+		alive[s] = [0, 1, 2]
+		out_rows[s] = {}
+	for pair in EDGE_PAIRS:
+		_draw_edges(int(pair[0]), int(pair[1]), alive, out_rows)
+	_prune(alive, out_rows)
+	_build_lattice(alive, out_rows)
+	_assign_node_types()
+	_compose_warbands()
+
+
+# One column's edges. Every legal assignment is enumerated and ONE is drawn
+# weighted — see FULL_COVER_WEIGHT / BRANCH_WEIGHT. Rows that nothing points
+# at are dropped from the next column right here; the prune below only has
+# the knock-on effects left to chase.
+func _draw_edges(from_slot: int, to_slot: int, alive: Dictionary,
+		out_rows: Dictionary) -> void:
+	var rows: Array = alive[from_slot]
+	var cands := _edge_candidates(rows)
+	var total := 0.0
+	for c in cands:
+		total += float(c["w"])
+	var roll := randf() * total
+	var picked: Array = cands[cands.size() - 1]["iv"]
+	for c in cands:
+		roll -= float(c["w"])
+		if roll <= 0.0:
+			picked = c["iv"]
+			break
+	var covered := {}
+	for k in rows.size():
+		var iv: Array = picked[k]
+		var targets: Array = []
+		for r in range(int(iv[0]), int(iv[1]) + 1):
+			targets.append(r)
+			covered[r] = true
+		out_rows[from_slot][int(rows[k])] = targets
+	var kept: Array = []
+	for r in alive[to_slot]:
+		if covered.has(int(r)):
+			kept.append(int(r))
+	alive[to_slot] = kept
+
+
+# EVERY legal edge assignment for one column, as {iv, w}. `iv[k]` is the
+# INTERVAL [lo, hi] of target rows the k-th surviving source row reaches.
+#
+# THE THREE RULES, all enforced here rather than checked afterwards:
+#   adjacency   an interval lives inside [row - 1, row + 1]
+#   no crossing lo of one row is at or above hi of the row above it — that
+#               IS §2's "if row i reaches row j and row i+1 reaches row k
+#               then k >= j", written as the constraint that generates it
+#   min width   an assignment covering fewer than MIN_COLUMN target rows is
+#               never in the bag
+# Out-degree is hi - lo + 1, so 1..3 falls out of the interval shape; in-degree
+# is how many intervals contain a row, which is at most one per source row.
+func _edge_candidates(rows: Array) -> Array:
+	var out: Array = []
+	_extend_candidates(rows, 0, [], out)
+	return out
+
+
+func _extend_candidates(rows: Array, k: int, chosen: Array, out: Array) -> void:
+	if k >= rows.size():
+		var covered := {}
+		var extra := 0
+		for iv in chosen:
+			for r in range(int(iv[0]), int(iv[1]) + 1):
+				covered[r] = true
+			extra += int(iv[1]) - int(iv[0])
+		if covered.size() < MIN_COLUMN:
+			return
+		var w: float = pow(BRANCH_WEIGHT, extra)
+		if covered.size() == ROWS:
+			w *= FULL_COVER_WEIGHT
+		out.append({"iv": chosen.duplicate(true), "w": w})
+		return
+	var row := int(rows[k])
+	var lo_min := maxi(0, row - 1)
+	var hi_max := mini(ROWS - 1, row + 1)
+	if k > 0:
+		lo_min = maxi(lo_min, int(chosen[k - 1][1]))  # no crossing
+	for lo in range(lo_min, hi_max + 1):
+		for hi in range(lo, hi_max + 1):
+			chosen.append([lo, hi])
+			_extend_candidates(rows, k + 1, chosen, out)
+			chosen.pop_back()
+
+
+# Nodes with no way in or no way out are REMOVED, to a fixpoint — killing one
+# can strand its neighbours in either direction. Slots 0 and 8 are exempt from
+# the way-in rule (0 is the zone entry, 8 is fed by the mini-boss) and slots 6
+# and 14 from the way-out rule (they converge on the mini-boss and the boss).
+func _prune(alive: Dictionary, out_rows: Dictionary) -> void:
+	var changed := true
+	while changed:
+		changed = false
+		for i in range(EDGE_PAIRS.size() - 1, -1, -1):
+			var from_slot := int(EDGE_PAIRS[i][0])
+			var to_slot := int(EDGE_PAIRS[i][1])
+			var kept: Array = []
+			for r in alive[from_slot]:
+				var live: Array = []
+				for t in out_rows[from_slot].get(int(r), []):
+					if alive[to_slot].has(int(t)):
+						live.append(int(t))
+				if live.is_empty():
+					out_rows[from_slot].erase(int(r))
+					changed = true
+				else:
+					out_rows[from_slot][int(r)] = live
+					kept.append(int(r))
+			alive[from_slot] = kept
+		for pair in EDGE_PAIRS:
+			var from_slot := int(pair[0])
+			var to_slot := int(pair[1])
+			var inbound := {}
+			for r in alive[from_slot]:
+				for t in out_rows[from_slot].get(int(r), []):
+					inbound[int(t)] = true
+			var kept2: Array = []
+			for r in alive[to_slot]:
+				if inbound.has(int(r)):
+					kept2.append(int(r))
+				else:
+					out_rows[to_slot].erase(int(r))
+					changed = true
+			alive[to_slot] = kept2
+
+
+# Turn surviving rows + row-edges into the saved shape: an Array per slot,
+# each node carrying its row (for drawing) and `next` as INDICES into the
+# following slot's array.
+func _build_lattice(alive: Dictionary, out_rows: Dictionary) -> void:
 	map = []
 	for s in SLOTS_PER_ZONE:
-		var slot := {"type": String(ZONE_SHAPE[s]), "visited": false}
-		# Warbands are pre-rolled at map birth, exactly as the branching map
-		# did it: every slot carries its enemies + theme, so hovering a dot can
-		# show what resists what BEFORE the player commits. Scouting resists is
-		# counterplay, not a spoiler.
-		slot["enemies"] = compose(String(slot["type"]), s + 1)
-		slot["theme"] = last_theme
-		map.append(slot)
+		map.append([])
+	for s in BRANCH_SLOTS:
+		for r in alive[s]:
+			map[s].append({"type": "fight", "visited": false, "row": int(r),
+				"next": []})
+	map[MINI_SLOT].append({"type": "miniboss", "visited": false, "row": 1,
+		"next": []})
+	map[BOSS_SLOT].append({"type": "boss", "visited": false, "row": 1,
+		"next": []})
+	for pair in EDGE_PAIRS:
+		var from_slot := int(pair[0])
+		var to_slot := int(pair[1])
+		for node in map[from_slot]:
+			var links: Array = []
+			for t in out_rows[from_slot].get(int(node["row"]), []):
+				for j in map[to_slot].size():
+					if int(map[to_slot][j]["row"]) == int(t):
+						links.append(j)
+			node["next"] = links
+	# The three converging edges. Column 7 and column 14 have one way on;
+	# the mini-boss opens the whole of column 8.
+	for node in map[MINI_SLOT - 1]:
+		node["next"] = [0]
+	for node in map[BOSS_SLOT - 1]:
+		node["next"] = [0]
+	var after_mini: Array = []
+	for j in map[MINI_SLOT + 1].size():
+		after_mini.append(j)
+	map[MINI_SLOT][0]["next"] = after_mini
 
 
-# The slot the player may enter next: always exactly one, and none once the
-# boss is behind them. Still an Array, because that is the shape the map
-# screen and the sim already iterate — a line is a graph with one edge.
+# Types onto the surviving positions. CONSTRUCTIVE, not sampled-and-checked:
+# every constraint below is a restriction on what the draw may pick from.
+#
+#   elites      6 columns out of 2..14 with no two adjacent. Drawn through
+#               the standard bijection — pick 6 distinct from {2..9}, sort,
+#               add the index — so an illegal spread is not merely rejected,
+#               it cannot be named. That is also what caps a greedy route: 6
+#               elites in 6 non-adjacent columns, one node each, is 3.4
+#               walked at the greediest policy rather than 6.
+#   the rest    one blacksmith / merchant / event per column at most, into
+#               columns that still have a free position, roomiest first.
+#   fights      everything left. Never counted, always the remainder.
+func _assign_node_types() -> void:
+	var free := {}       # column -> Array of free node indices
+	var used := {}       # column -> Dictionary of types already placed there
+	for c in range(1, BRANCH_COLUMNS + 1):
+		var s := column_slot(c)
+		var idxs: Array = []
+		for j in map[s].size():
+			idxs.append(j)
+		free[c] = idxs
+		used[c] = {}
+	var base: Array = [2, 3, 4, 5, 6, 7, 8, 9]
+	base.shuffle()
+	base = base.slice(0, int(NODE_COPIES["elite"]))
+	base.sort()
+	for k in base.size():
+		_place_type(int(base[k]) + k, "elite", free, used)
+	for ty in ["blacksmith", "merchant", "event"]:
+		var cols: Array = []
+		for c in range(1, BRANCH_COLUMNS + 1):
+			if not used[c].has(ty) and not free[c].is_empty():
+				cols.append(c)
+		# Roomiest column first, so the deal can never paint itself into a
+		# corner: 22 non-fight nodes against a floor of 28 positions.
+		cols.sort_custom(func(a, b): return free[a].size() > free[b].size())
+		var want := int(NODE_COPIES[ty])
+		for i in mini(want, cols.size()):
+			_place_type(int(cols[i]), ty, free, used)
+
+
+func _place_type(column: int, ty: String, free: Dictionary,
+		used: Dictionary) -> void:
+	var idxs: Array = free[column]
+	if idxs.is_empty():
+		return
+	var pick := int(idxs[randi() % idxs.size()])
+	map[column_slot(column)][pick]["type"] = ty
+	idxs.erase(pick)
+	used[column][ty] = true
+
+
+# Warbands are pre-rolled at map birth, exactly as Batch AN's line did it:
+# every combat node carries its enemies + theme, so hovering a node can show
+# what resists what BEFORE the player commits. Scouting resists is
+# counterplay, not a spoiler. Non-combat nodes carry no warband at all.
+func _compose_warbands() -> void:
+	for s in SLOTS_PER_ZONE:
+		for node in map[s]:
+			if not String(node["type"]) in ["fight", "elite", "miniboss", "boss"]:
+				continue
+			node["enemies"] = compose(String(node["type"]), s + 1)
+			node["theme"] = last_theme
+
+
+# The nodes the player may enter next, as INDICES into map[slot_idx + 1].
+# Before the first step that is the whole of column 1; on the mini-boss it is
+# the whole of column 8; everywhere else it is the current node's own edges.
+# Empty once the boss is behind them.
 func reachable() -> Array:
-	if slot_idx + 1 >= SLOTS_PER_ZONE:
+	if slot_idx < 0:
+		var entry: Array = []
+		for j in map[0].size():
+			entry.append(j)
+		return entry
+	if slot_idx >= BOSS_SLOT:
 		return []
-	return [slot_idx + 1]
+	return Array(current_node().get("next", []))
 
 
-func advance(slot: int) -> void:
-	slot_idx = slot
-	map[slot]["visited"] = true
+# ONE argument still, and it is the NODE index within the next slot — the
+# slot is never a choice, only which of its nodes.
+func advance(node: int) -> void:
+	slot_idx += 1
+	node_idx = clampi(node, 0, maxi(map[slot_idx].size() - 1, 0))
+	map[slot_idx][node_idx]["visited"] = true
 
 
-# Where the party stands in the WHOLE run, 1-36 — the readout the zone
+func current_node() -> Dictionary:
+	if slot_idx < 0 or slot_idx >= map.size() or map[slot_idx].is_empty():
+		return {}
+	return map[slot_idx][clampi(node_idx, 0, map[slot_idx].size() - 1)]
+
+
+# Where the party stands in the WHOLE run, 1-48 — the readout the zone
 # header and the run summary both want. 0 before the first slot is entered.
 func run_slot_number() -> int:
 	if slot_idx < 0:
@@ -297,6 +573,25 @@ func run_slot_number() -> int:
 # opens the next zone.
 func is_end_boss_slot(slot: int) -> bool:
 	return slot == BOSS_SLOT and not has_next_zone()
+
+
+# Every node reachable from (slot, node), as a Dictionary of "slot,index"
+# keys. The map screen greys what a step has closed off, the sim measures
+# foreclosure with it, and the test asserts the entry guarantee against it.
+func reachable_from(slot: int, node: int) -> Dictionary:
+	var seen := {}
+	var frontier: Array = [[slot, node]]
+	while not frontier.is_empty():
+		var cur: Array = frontier.pop_back()
+		var s := int(cur[0])
+		var j := int(cur[1])
+		var key := "%d,%d" % [s, j]
+		if seen.has(key) or s < 0 or s >= map.size() or j >= map[s].size():
+			continue
+		seen[key] = true
+		for t in map[s][j].get("next", []):
+			frontier.append([s + 1, int(t)])
+	return seen
 
 
 # ---------- themed encounter generation (the budget system) ----------
@@ -390,7 +685,7 @@ func compose_budget(budget: int, roster := 1) -> Array:
 # simulated wipes landed on it. Later zones restart the ladder with a
 # tougher roster carrying higher base stats.
 # Enemy stat scaling is zone-local (Batch 36): every zone replays the
-# 1..11 tier ladder and its position in the run applies a flat base
+# 1..16 tier ladder and its position in the run applies a flat base
 # multiplier. Keyed by SLOT, not zone identity — the Forest of Old is
 # x1.0 as the opener and x2.2 when revisited as the finale — and slots
 # past the authored list continue the ~x1.5 step, so adding a 4th zone
@@ -421,10 +716,15 @@ func zone_base_mult(slot: int) -> float:
 		* pow(1.5, slot - ZONE_BASE_MULTS.size()) * difficulty_mult()
 
 
-# The tier is the SLOT NUMBER now (1-12), not a dealt row. The continuous
-# ramp Batch T fitted is kept byte-for-byte — it was fitted against slot
-# DEPTH, and a line is nothing but depth — so slot 12's boss band and the
-# t1:3-5 opening are exactly what they were.
+# The tier is the SLOT NUMBER (1-16). Batch T's ramp was fitted against slot
+# DEPTH and Batch AN kept it byte-for-byte on a 12-slot line; BATCH BK §5
+# RESCALES IT ACROSS 16 AND CHANGES NOTHING ELSE. Both ENDS are held exactly
+# where AN left them — slot 1 still opens at 3-5 and the last slot before the
+# boss still tops out at 8-10 — so the slope falls from 0.5 a slot to 5/14,
+# and the boss band is untouched. Keeping the old SLOPE instead would have run
+# the pre-boss slot to 10-12 and collided with the boss's own band, which is
+# difficulty tuning wearing a rescale's clothes; §7 forbids it.
+#   t1:3-5  t4:4-6  t8:5-7 (mini-boss)  t12:6-8  t15:8-10  t16:10-12 (boss)
 func battle_budget(tier := -1) -> int:
 	if tier <= 0:
 		tier = slot_idx + 1
@@ -433,8 +733,8 @@ func battle_budget(tier := -1) -> int:
 		# The boss slot keeps its band: the Escort composition (boss 7 +
 		# power 3-5 of company) is authored content, not the fight ladder.
 		return randi_range(10, 12)
-	var lo := 3 + int(floor((tier - 1) * 0.5))  # t1:3  t4:4  t7:6  t11:8
-	return randi_range(lo, lo + 2)              # t1:3-5  t4:4-6  t11:8-10
+	var lo := 3 + int(floor((tier - 1) * 5.0 / 14.0))
+	return randi_range(lo, lo + 2)
 
 
 func compose(node_type: String, tier := -1) -> Array:
@@ -836,10 +1136,11 @@ func advance_zone() -> void:
 	zone_idx += 1
 	_enter_zone()
 	slot_idx = -1
+	node_idx = 0
 	encounter = {}
 	pending_modifier = ""
 	pending_reward = {}
-	pending_after = []
+	pending_shop = false
 	for member in party:
 		member["hp"] = member["max_hp"]
 		member["mana"] = member["max_mana"]
@@ -859,22 +1160,20 @@ func save_run() -> void:
 	# and its points re-issued on load (_migrate_trees). Loading stays
 	# tolerant of older saves via .get defaults — never drop player state
 	# silently.
-	# v7 (Batch AN): the LINE. `map` is a flat 12-slot array and the party's
-	# position is one `slot_idx` — a pre-v7 save holds a [tier][column] board
-	# with links, rest nodes and a mini-boss row, and there is no honest way
-	# to place a party standing at tier 7 column 2 onto a line that no longer
-	# has columns. Those saves are REFUSED and cleared on load (see
-	# load_run), which is the same call Batch AI made about ranked talent
-	# purchases: a wipe that says so beats a migration that invents state.
+	# v7 (Batch AN): the LINE. v8 (BATCH BK): THE LATTICE. `map[slot]` is an
+	# ARRAY of nodes and the position is the PAIR (slot_idx, node_idx), so a
+	# v7 save's flat 12-slot line indexes into a structure that is not there.
+	# Refused and cleared on load, for the same reason AN refused pre-v7 and
+	# AI refused ranked purchases: the migration would have to INVENT a row
+	# the party never stood in and a set of edges they never had, on a map
+	# generated after the fact. A wipe that says so beats that.
 	file.store_var({
-		"version": 7, "party": party, "items": items, "gold": gold,
+		"version": 8, "party": party, "items": items, "gold": gold,
 		"tally": tally, "debug_used": debug_used,
 		"difficulty": difficulty,
 		"zone_idx": zone_idx, "zone_name": zone_name, "zone_draw": zone_draw,
-		"slot_idx": slot_idx, "seen_events": seen_events,
-		"slots_since_merchant": slots_since_merchant,
-		"pending_after": pending_after,
-		"specs_chosen": specs_chosen,
+		"slot_idx": slot_idx, "node_idx": node_idx, "seen_events": seen_events,
+		"pending_shop": pending_shop, "specs_chosen": specs_chosen,
 		"active_relics": active_relics, "map": map,
 		"combat_wins": combat_wins,
 	}, true)
@@ -892,10 +1191,10 @@ func load_run() -> bool:
 	if not (data is Dictionary):
 		return false
 	var save_version := int(data.get("version", 0))
-	# Batch AN: a pre-v7 save describes a board this build cannot render or
+	# Batch BK: a pre-v8 save describes a board this build cannot render or
 	# walk. Refuse it and delete it, rather than half-loading a run whose
 	# every "next node" call would index a dictionary that is not there.
-	if save_version < 7:
+	if save_version < 8:
 		clear_save()
 		return false
 	party = data["party"]
@@ -909,8 +1208,8 @@ func load_run() -> bool:
 		for slot in SLOT_COUNT:
 			zone_draw.append(SLOT_POOLS[slot][0])
 	slot_idx = int(data["slot_idx"])
-	slots_since_merchant = int(data.get("slots_since_merchant", 0))
-	pending_after = data.get("pending_after", [])
+	node_idx = int(data.get("node_idx", 0))
+	pending_shop = bool(data.get("pending_shop", false))
 	specs_chosen = data["specs_chosen"]
 	active_relics = data["active_relics"]
 	map = data["map"]
@@ -1251,56 +1550,48 @@ func claim_reward() -> Dictionary:
 			return {"text": "RUNE (the bargain): the %s may choose one of three."
 				% String(looter["key"]).capitalize(), "shop": false}
 		"shop":
-			# Guaranteed on demand — and it resets the §5 drought counter,
-			# because the party HAS just seen a merchant.
-			slots_since_merchant = 0
+			pending_shop = true
 			return {"text": "A merchant follows the fight.", "shop": true}
 	return {"text": "", "shop": false}
 
 
-# ---------- Batch AN §5 and §7: what follows a cleared slot ----------
+# ---------- Batch BK §3/§5: what follows a cleared slot ----------
 
-const MERCHANT_CHANCE := 0.40
-const MERCHANT_FLOOR := 4    # cleared slots without one before it is forced
-const EVENT_CHANCE := 0.25
-
-
-# Rolls the merchant for a just-cleared FIGHT or ELITE slot. The floor is
-# checked BEFORE the roll, so four dry slots guarantee the fifth rather than
-# merely improving its odds.
-func roll_merchant(node_type: String) -> bool:
-	if not node_type in ["fight", "elite"]:
-		return false
-	if slots_since_merchant >= MERCHANT_FLOOR or randf() < MERCHANT_CHANCE:
-		slots_since_merchant = 0
-		return true
-	slots_since_merchant += 1
-	return false
+# NOTHING ROLLS BEHIND A FIGHT ANY MORE. `roll_merchant` (40% with a
+# four-slot drought floor), `roll_event` (25%), `slots_since_merchant`,
+# `MERCHANT_CHANCE`/`MERCHANT_FLOOR`/`EVENT_CHANCE` and the `pending_after`
+# queue are all DELETED, not left unreachable — the merchant and the event
+# are map nodes now, and a node you can see coming is the whole point of
+# putting them on the board. A rolled merchant and a routed merchant are two
+# economies; keeping the roll would have run both.
+#
+# THE ONE SURVIVOR is the bargain's "a merchant follows the fight" reward,
+# and it survives because it is BOUGHT rather than rolled: the player took a
+# severity-4 modifier to get it. One boolean, not a queue.
+var pending_shop := false
 
 
-func roll_event(node_type: String) -> bool:
-	return node_type in ["fight", "elite"] and randf() < EVENT_CHANCE
-
-
-# THE one place that answers "where does the party go when this screen is
-# done". Pops the next queued interstitial and returns its scene, or the map
-# when the queue is empty. Shop and event both call it on leave, so a fight
-# that rolled both resolves shop -> event -> map without either screen
-# knowing the other exists.
+# Where a screen goes when it is done. The bought merchant is the only thing
+# that can sit between a victory and the map.
 func next_after_scene() -> String:
-	while not pending_after.is_empty():
-		var next := String(pending_after[0])
-		pending_after = pending_after.slice(1)
-		if next == "shop":
-			return "res://scenes/shop.tscn"
-		if next == "event":
-			pending_event = Events.pick(self)
-			if pending_event == "":
-				continue  # nothing eligible right now — try the next entry
-			seen_events.append(pending_event)
-			Profile.note_event(pending_event)
-			return "res://scenes/event.tscn"
+	if pending_shop:
+		pending_shop = false
+		return "res://scenes/shop.tscn"
 	return "res://scenes/map.tscn"
+
+
+# Arm the event a MERCHANT/EVENT node draws when the party steps onto it.
+# Returns false when nothing is eligible (the pool is spent for this run and
+# every requirement filtered) — the caller walks on rather than showing an
+# empty screen.
+func begin_event_node() -> bool:
+	pending_event = Events.pick(self)
+	if pending_event == "":
+		return false
+	seen_events.append(pending_event)
+	if not sim_run:
+		Profile.note_event(pending_event)
+	return true
 
 
 # ---------- Batch AN §6: attrition ----------
@@ -1600,10 +1891,24 @@ func upgrade_desc(id: String) -> String:
 	return String(ABILITY_UPGRADES.get(id, {}).get("desc", ""))
 
 
-# Has this hero already taken this upgrade, on any ability?
+# Has this hero already taken this upgrade, on any ability? THIS IS AP'S
+# ONCE-PER-RUN RULE and it has exactly one consumer, `roll_upgrade_offer` —
+# i.e. the MINI-BOSS PICK POOL.
+#
+# BATCH BK: A BOUGHT UPGRADE IS SKIPPED HERE. The blacksmith writes into the
+# same `member["upgrades"]` list on purpose (one list is what makes a bought
+# upgrade land, wear its ◆ and hover exactly like an awarded one), and if this
+# function counted those entries then buying Honed in zone 1 would quietly
+# delete Honed from that hero's mini-boss offers for the rest of the run —
+# a purchase eating out of the award economy, which is the subtler half of
+# §9's "a blacksmith purchase must not consume a mini-boss slot". The flag is
+# read HERE and nowhere else: `apply_upgrades` stamps bought and awarded
+# entries identically, and the never-twice-on-one-ability check in
+# `roll_blacksmith_offer` counts both, because that one is about the ABILITY
+# rather than about either pool.
 func has_upgrade(member: Dictionary, id: String) -> bool:
 	for up in member.get("upgrades", []):
-		if String(up.get("id", "")) == id:
+		if String(up.get("id", "")) == id and not bool(up.get("bought", false)):
 			return true
 	return false
 
@@ -1651,6 +1956,104 @@ func award_upgrade_pick(member: Dictionary) -> bool:
 		return false
 	member["up_candidates"] = member.get("up_candidates", []) + [offer]
 	member["up_picks_owed"] = int(member.get("up_picks_owed", 0)) + 1
+	return true
+
+
+# ---------- Batch BK §3: the blacksmith ----------
+
+# THE GOLD SINK. Batch BJ measured 63% of every run's gold going UNSPENT, with
+# 13.6 shop-rune refusals a run for no free slot against 6.8 for the reserve —
+# slots are what binds, not prices, so more shop stock could never have fixed
+# it. A BLACKSMITH CONSUMES NO SLOT. It sells the ability upgrade Batch AP
+# already wired, filtered by AP §3's eligibility rules, marked with the same ◆
+# on the same chip. This is that system with a price tag on it and no new
+# machinery underneath.
+#
+# PRICE IS SET FROM BJ'S NUMBERS, NOT FROM A GUESS, and the arithmetic is
+# written down so the next batch can argue with it rather than re-derive it:
+# 2386 gold earned and 881 spent a run at 36 encounters is 1505 dead. At 48
+# encounters that scales to ~2050 before the merchant's frequency change makes
+# it worse. A route walks ~2 blacksmiths a zone, so 6 visits at these prices
+# is 150+150+225+225+300+300 = 1350 — about two thirds of the dead gold, which
+# leaves the potion economy something to breathe with. Zone-scaled so late
+# gold still has somewhere to go.
+const BLACKSMITH_PRICES := [150, 225, 300]
+
+
+func blacksmith_price() -> int:
+	var base: int = int(BLACKSMITH_PRICES[clampi(zone_idx, 0,
+		BLACKSMITH_PRICES.size() - 1)])
+	return maxi(int(round(base * (1.0 - relic_add("shop_discount")))), 1)
+
+
+# Three {member_idx, id, ability} pairings, drawn across the WHOLE party.
+#
+# TWO RULES, AND THE DIFFERENCE BETWEEN THEM IS THE WHOLE POINT:
+#   AP's once-per-run rule (`has_upgrade`) IS NOT CONSULTED. That rule governs
+#   the MINI-BOSS PICK POOL — it exists so three mini-bosses cannot hand out
+#   three Honeds — and a blacksmith is not that pool. A player may buy Honed in
+#   zone 1 and again in zone 3 on a different ability, which is what makes gold
+#   a real second axis into the same system.
+#   Never twice on ONE ability still holds, and it is enforced here: a pairing
+#   whose (ability, upgrade) the hero already carries is never offered. Buying
+#   the same upgrade twice on the same ability is the dud AP §3 exists to stop.
+#
+# Fewer than three when the party has bought most of what fits — the counter
+# shows what exists rather than padding.
+func roll_blacksmith_offer() -> Array:
+	var pool: Array = []
+	for i in party.size():
+		var member: Dictionary = party[i]
+		var carried := {}
+		for up in member.get("upgrades", []):
+			carried["%s|%s" % [String(up.get("ability", "")),
+				String(up.get("id", ""))]] = true
+		for n in owned_ability_names(member):
+			var name := String(n)
+			if name == "Strike":
+				continue
+			var ab: Ability = Classes.pool_ability(name)
+			if ab == null:
+				continue  # unresolvable (a class core attack) — AP drops these too
+			for id in ABILITY_UPGRADES:
+				var uid := String(id)
+				if carried.has("%s|%s" % [name, uid]):
+					continue
+				if not upgrade_fits(uid, ab):
+					continue
+				pool.append({"member_idx": i, "id": uid, "ability": name})
+	pool.shuffle()
+	# One pairing per hero at most, so a counter never reads as three offers
+	# for the Berserker and nothing for anyone else.
+	var offer: Array = []
+	var seen_members := {}
+	for entry in pool:
+		if seen_members.has(int(entry["member_idx"])):
+			continue
+		seen_members[int(entry["member_idx"])] = true
+		offer.append(entry)
+		if offer.size() == 3:
+			break
+	return offer
+
+
+# Take the gold and stamp the purchase onto the member's own `upgrades` list —
+# the SAME list the mini-boss pick writes and the same one `apply_upgrades`
+# reads, so a bought upgrade lands, shows its ◆ and hovers exactly like an
+# awarded one. False when the party cannot pay.
+func buy_blacksmith(pairing: Dictionary) -> bool:
+	var price := blacksmith_price()
+	if gold < price:
+		return false
+	var member: Dictionary = party[int(pairing["member_idx"])]
+	gold -= price
+	tally_add("gold_spent", price)
+	# `bought` is read by has_upgrade ALONE — see the note there. Everything
+	# else in the project treats a bought upgrade and an awarded one as the
+	# same thing, which is the whole point of reusing the list.
+	member["upgrades"] = member.get("upgrades", []) + [
+		{"id": String(pairing["id"]), "ability": String(pairing["ability"]),
+			"bought": true}]
 	return true
 
 

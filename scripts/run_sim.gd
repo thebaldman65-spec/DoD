@@ -1,25 +1,26 @@
 # Full-run simulation harness (Batch S): ./sim.sh --run N plays N complete
-# runs — the real 30-node map deck, real warbands at real budgets WITH tier
-# stat scaling and the zone slot multiplier, state carried between battles
-# exactly as a real run carries it, talent points earned AND spent — and
-# reports where the runs end. The sweep isolates the composition axis;
+# runs — the real generated 16-slot branching map, real warbands at real
+# budgets WITH tier stat scaling and the zone slot multiplier, state carried
+# between battles exactly as a real run carries it, talent points earned AND
+# spent — and reports where the runs end. The sweep isolates the composition axis;
 # this instrument measures the whole difficulty curve, progression included.
 #
 # THE BOT IS DUMB ON PURPOSE. Every decision is a fixed, legible policy
 # printed in the report header — a clever bot would make the numbers
 # unattributable. We measure what the SYSTEMS do, not what a good player does.
-#   Route (DOD_SIM_ROUTE)    three policies, one axis: how much recovery
-#                            the bot allows itself (Batch U). "greedy" =
-#                            the Batch S floor byte for byte: fight >
-#                            elite always; rest only when no combat is
-#                            offered AND a hero sits under 60%. "default"
-#                            rests when AVERAGE party HP < 65% and a rest
-#                            is on offer, else fight > elite > shop >
-#                            event. "cautious" = the same at 80%. The
-#                            spread between the three IS the deliverable:
-#                            one number is a point, three are a band that
-#                            real play sits inside. "elites" kept as-is
-#                            (greedy ladder, elite > fight).
+#   Route (DOD_SIM_ROUTE)    three policies, ONE axis: how much ELITE the
+#                            bot accepts (Batch BK). "greedy" takes the
+#                            elite whenever one is reachable; "balanced"
+#                            (the default, and what "default" now aliases
+#                            to) puts trade nodes first and the elite
+#                            ahead of the filler; "cautious" takes the
+#                            elite only when nothing else is offered.
+#                            "elites" aliases greedy. The spread between
+#                            the three IS the deliverable — and it is a
+#                            real spread again: Batch AN's line left one
+#                            node reachable per step, so from AN to BJ the
+#                            three policies were three samples of ONE walk
+#                            (BG §1).
 #   Shops (DOD_SIM_SHOPS)    on by default (Batch U): heal-first (any
 #                            hero < 50% buys one Health Potion each),
 #                            then the priciest affordable offer not
@@ -47,6 +48,8 @@
 #                            default = first unowned in the spec's pool.
 #   Events                   take the first valid choice; the report
 #                            counts which events fired.
+#   Blacksmith               buy the first offered pairing when the gold
+#                            clears the 40g reserve (Batch BK §3).
 #   Relics (DOD_SIM_RELICS)  armed at the draft; none by default.
 #   Elite rune spoils        pick-of-3 resolved instantly: build-lane
 #                            match first, then spec-scoped, else the
@@ -73,7 +76,7 @@ static var talent_spent := 0.0    # points PAID across all runs, all heroes
 static var talent_left := 0.0     # unspent points at run end, all runs
 static var boss_nodes_sum := 0.0  # avg distinct nodes owned entering a boss
 static var boss_entries := 0
-static var route := "default"
+static var route := "balanced"
 static var builds := {}           # spec -> target lane name
 static var shops_on := true       # Batch U shop policy (DOD_SIM_SHOPS=off -> v1 floor)
 static var items_on := true       # Batch U drink policy (DOD_SIM_ITEMS=off -> v1 floor)
@@ -88,6 +91,15 @@ static var upgrade_taken := 0     # mini-boss ability upgrades resolved
 # now, not dealt onto the board.
 static var merchants_seen := 0
 static var events_seen := 0
+# Batch BK §3: the gold sink, split by how it FAILS — no gold is a pricing
+# problem, nothing eligible is a pool problem, and the two want different
+# fixes. `blacksmiths_seen` counts nodes WALKED, not nodes dealt.
+static var merchants_bought := 0  # the bargain's reward, NOT a map node
+static var blacksmiths_seen := 0
+static var smith_bought := 0
+static var smith_gold := 0.0
+static var smith_refused_gold := 0
+static var smith_refused_nothing := 0
 static var items_used := 0        # potions drunk in battle (battle.gd increments)
 static var items_left := 0.0      # consumables still carried when a run ends
 static var gold_earned := 0.0     # everything a run ever held (start + income)
@@ -147,7 +159,7 @@ static var worn_kind := {}          # spec|class|universal|stick -> runes worn
 # an instrument that could not have seen anything smaller than a large
 # effect. These are the continuous metrics that replace it as primary —
 # stored per RUN so the report can print a spread, not just a point.
-static var depth_reached: Array = []  # absolute tier at run end, 1..33
+static var depth_reached: Array = []  # absolute slot at run end, 1..48
 static var r8_samples: Array = []     # one ratio@z1t8 per run that fought it
 static var _run_r8 := -1.0
 
@@ -157,11 +169,18 @@ static func begin(run: Node, n: int) -> void:
 	runs_target = maxi(n, 1)
 	run.sim_run = true  # in-memory runs only — never touch the player's save
 	route = OS.get_environment("DOD_SIM_ROUTE")
-	if route == "":
-		route = "default"
-	elif not route in ["greedy", "default", "cautious", "elites"]:
-		push_warning("DOD_SIM_ROUTE '%s' unknown — using default" % route)
-		route = "default"
+	# Batch BK: the three policies are greedy / balanced / cautious. "default"
+	# and "elites" are kept as ALIASES rather than deleted — every sim script
+	# and every Matrix row in the changelog names them, and a flag that
+	# silently means something else is worse than one that still means what
+	# it meant.
+	if route in ["", "default"]:
+		route = "balanced"
+	elif route == "elites":
+		route = "greedy"
+	elif not route in ["greedy", "balanced", "cautious"]:
+		push_warning("DOD_SIM_ROUTE '%s' unknown — using balanced" % route)
+		route = "balanced"
 	shops_on = not OS.get_environment("DOD_SIM_SHOPS") in ["off", "0"]
 	items_on = not OS.get_environment("DOD_SIM_ITEMS") in ["off", "0"]
 	for pair in OS.get_environment("DOD_SIM_BUILDS").split(",", false):
@@ -219,45 +238,116 @@ static func start_run(run: Node) -> void:
 # things that FOLLOW a cleared slot rather than things standing on the board;
 # they are resolved by on_battle_end, not here.
 #
-# ROUTE AGENCY IS STRUCTURALLY ZERO NOW and the counters say so rather than
-# being deleted: walk_steps still climbs, reach_sum tracks it exactly, and
-# choice_steps stays 0 for every run. A report line that reads "choice 0%"
-# is the honest description of a line; a missing line would just look like
-# the instrument broke.
+# BATCH BK: THE WALKER CHOOSES AGAIN. Batch AN's line left exactly one node
+# reachable per step, so choice_steps was pinned at 0 for eleven batches and
+# the three route policies were one walk (BG §1 had to correct that premise
+# before it could read a number). The counters are unchanged — walk_steps,
+# reach_sum, choice_steps, type_offered/type_taken all mean what they always
+# meant — and they now have something to count.
+#
+# A step "offers a real choice" on BG's definition, kept byte for byte so the
+# 0% it measured and the figure this batch prints are the same measurement:
+# >= 2 nodes reachable AND not all of them the same type.
+#
+# NON-COMBAT NODES ARE RESOLVED HERE AND THE WALK CONTINUES. A blacksmith,
+# merchant or event is a slot the party stands on; nothing reloads the battle
+# scene for it, so the walker keeps stepping until it finds a fight.
 static func walk_to_next_fight(run: Node) -> bool:
-	_rich_top_up(run)
-	var reach: Array = run.reachable()
-	if reach.is_empty():
-		return false
-	if run.slot_idx < 0:
-		_tally_map(run)  # fresh zone: book its (fixed) composition
-	var s := int(reach[0])
-	walk_steps += 1
-	reach_sum += reach.size()
-	var node: Dictionary = run.map[s]
-	var ty := String(node["type"])
-	type_offered[ty] = int(type_offered.get(ty, 0)) + 1
-	type_taken[ty] = int(type_taken.get(ty, 0)) + 1
-	var seen_key := str(s)
-	if not _seen_nodes.has(seen_key):
-		_seen_nodes[seen_key] = true
-		deck_seen[ty] = int(deck_seen.get(ty, 0)) + 1
-	run.advance(s)
-	# §3: the offer, gated to elites and mini-bosses by Batch AO §2 — the
-	# harness must walk the road the player walks. The bot takes the SEVEREST
-	# bargain it is offered while the party is healthy and the MILDEST once it
-	# is hurt — the crudest policy that exercises both ends of the severity
-	# table, and the one a cautious human most resembles. It is a policy, not
-	# a recommendation.
-	if ty in ["elite", "miniboss"]:
-		_take_offer(run)
-	var warband: Array = node.get("enemies", [])
-	if warband.is_empty():
-		warband = run.compose(ty, s + 1)
-		node["theme"] = run.last_theme
-	run.encounter = {"type": ty, "enemies": warband,
-		"theme": node.get("theme", "Warband")}
-	return true
+	while true:  # non-combat nodes resolve in place and the walk carries on
+		_rich_top_up(run)
+		var reach: Array = run.reachable()
+		if reach.is_empty():
+			return false
+		if run.slot_idx < 0:
+			_tally_map(run)  # fresh zone: book what the generator dealt
+		var next_slot: int = run.slot_idx + 1
+		walk_steps += 1
+		reach_sum += reach.size()
+		var kinds := {}
+		for j in reach:
+			kinds[String(run.map[next_slot][int(j)]["type"])] = true
+		if reach.size() >= 2 and kinds.size() > 1:
+			choice_steps += 1
+		for k in kinds:
+			type_offered[k] = int(type_offered.get(k, 0)) + 1
+		# deck_seen means "ever REACHABLE on the taken path", not "taken" —
+		# every option at this step counts, once. Against deck_present it is
+		# the "the zone holds 6 blacksmiths, this route could reach 3" line,
+		# and on Batch AN's line the two collapsed into each other.
+		for j2 in reach:
+			var key := "%d,%d" % [next_slot, int(j2)]
+			if not _seen_nodes.has(key):
+				_seen_nodes[key] = true
+				var k := String(run.map[next_slot][int(j2)]["type"])
+				deck_seen[k] = int(deck_seen.get(k, 0)) + 1
+		var pick := _route_pick(run, next_slot, reach)
+		var node: Dictionary = run.map[next_slot][pick]
+		var ty := String(node["type"])
+		type_taken[ty] = int(type_taken.get(ty, 0)) + 1
+		run.advance(pick)
+		if ty == "blacksmith":
+			_blacksmith_visit(run)
+			continue
+		if ty == "merchant":
+			merchants_seen += 1
+			if shops_on:
+				_shop_visit(run)
+			continue
+		if ty == "event":
+			events_seen += 1
+			_resolve_event(run)
+			continue
+		# §3: the offer, gated to elites and mini-bosses by Batch AO §2 — the
+		# harness must walk the road the player walks. The bot takes the SEVEREST
+		# bargain it is offered while the party is healthy and the MILDEST once it
+		# is hurt — the crudest policy that exercises both ends of the severity
+		# table, and the one a cautious human most resembles. It is a policy, not
+		# a recommendation.
+		if ty in ["elite", "miniboss"]:
+			_take_offer(run)
+		var warband: Array = node.get("enemies", [])
+		if warband.is_empty():
+			warband = run.compose(ty, next_slot + 1)
+			node["theme"] = run.last_theme
+		run.encounter = {"type": ty, "enemies": warband,
+			"theme": node.get("theme", "Warband")}
+		return true
+	return false  # unreachable: the loop only leaves through a return
+
+
+# THE ROUTE POLICY, and it is one axis on purpose: HOW MUCH ELITE the bot
+# accepts. Three orderings, printed in the report header, dumb and fixed —
+# a clever router would make every other number unattributable.
+#   greedy    elite first. Three elites is three modifiers, three rune
+#             caches and three talent points against arriving at the
+#             mini-boss wounded, and whether that trade pays is the one
+#             question the whole map exists to ask.
+#   balanced  trade nodes first, elite ahead of the filler.
+#   cautious  elite LAST — taken only when nothing else is on offer.
+# Every policy ranks the blacksmith at the top of the non-elite order, which
+# is deliberate: §3 asks what fraction of income a BLACKSMITH-HEAVY route
+# converts, and a policy that walks past the sink cannot answer it. The
+# neutral (unsteered) walked distribution is measured over generated maps in
+# test_batch_bk, not here.
+const ROUTE_ORDER := {
+	"greedy": ["elite", "blacksmith", "merchant", "event", "fight"],
+	"balanced": ["blacksmith", "merchant", "elite", "event", "fight"],
+	"cautious": ["blacksmith", "merchant", "event", "fight", "elite"],
+}
+
+
+static func _route_pick(run: Node, slot: int, reach: Array) -> int:
+	var order: Array = ROUTE_ORDER.get(route, ROUTE_ORDER["balanced"])
+	var best := int(reach[0])
+	var best_rank := 99
+	for j in reach:
+		var rank: int = order.find(String(run.map[slot][int(j)]["type"]))
+		if rank < 0:
+			rank = order.size()  # miniboss / boss: never a choice, always alone
+		if rank < best_rank:
+			best_rank = rank
+			best = int(j)
+	return best
 
 
 # The bot's bargain policy. Healthy (>=60% average party HP) it takes the
@@ -324,9 +414,10 @@ static func _rich_top_up(run: Node) -> void:
 # source), and reset the per-map seen-guard for the ever-reachable count.
 static func _tally_map(run: Node) -> void:
 	_seen_nodes = {}
-	for node in run.map:
-		var ty := String(node["type"])
-		deck_present[ty] = int(deck_present.get(ty, 0)) + 1
+	for slot in run.map:
+		for node in slot:
+			var ty := String(node["type"])
+			deck_present[ty] = int(deck_present.get(ty, 0)) + 1
 
 
 static func _avg_hp(run: Node) -> float:
@@ -403,6 +494,30 @@ static func _shop_visit(run: Node) -> void:
 	# delivered (Batch AD). Anything still on the counter outlived the gold:
 	# the buy loop only stops when nothing clears the 40g reserve.
 	rune_refused_gold += offers.size()
+
+
+# THE BLACKSMITH POLICY (Batch BK §3), and it is the dumbest one that still
+# exercises the sink: buy the FIRST offered pairing whenever the gold clears
+# the same 40g reserve every other purchase respects. No preference between
+# upgrades, no saving up for a later zone — a bot that shopped cleverly would
+# make "what fraction of income does the sink convert" unattributable, and
+# that fraction is the number §3 asks for.
+static func _blacksmith_visit(run: Node) -> void:
+	blacksmiths_seen += 1
+	if not shops_on:
+		return
+	var offer: Array = run.roll_blacksmith_offer()
+	if offer.is_empty():
+		smith_refused_nothing += 1
+		return
+	var price: int = run.blacksmith_price()
+	if run.gold - price < GOLD_RESERVE:
+		smith_refused_gold += 1
+		return
+	if run.buy_blacksmith(offer[0]):
+		smith_bought += 1
+		smith_gold += price
+		_run_gold_spent += price
 
 
 # One rune per party member, dupes re-rolled (shop_screen._roll_offers),
@@ -571,15 +686,13 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 			run.advance_zone()
 		else:
 			run_over = true
-	# §5 and §7: what follows a cleared fight or elite, resolved by the same
-	# rolls the victory screen makes.
-	if merchant_owed or run.roll_merchant(node_type):
-		merchants_seen += 1
+	# Batch BK §3: the merchant and the event are MAP NODES now — walked to,
+	# or walked past — and walk_to_next_fight resolves them. The one thing a
+	# fight can still queue is the bargain's bought merchant.
+	if merchant_owed:
+		merchants_bought += 1
 		if shops_on:
 			_shop_visit(run)
-	if run.roll_event(node_type):
-		events_seen += 1
-		_resolve_event(run)
 	_spend_talents(run)  # the post-battle party screen, boiled to policy
 	if run_over:
 		_finish_run(run, battle, true)
@@ -898,7 +1011,7 @@ static func _print_report(battle) -> void:
 	var p_adj := clampf(p, 0.5 / runs, 1.0 - 0.5 / runs)
 	var p_sd := sqrt(p_adj * (1.0 - p_adj))
 	print("\nINSTRUMENT RESOLUTION (Batch AD stage 0b) — read this before the numbers:")
-	print("  PRIMARY   depth reached      mean %.2f  SD %.2f  SE %.2f   (absolute tier, 1-33; a full clear is 33)" % [
+	print("  PRIMARY   depth reached      mean %.2f  SD %.2f  SE %.2f   (absolute slot, 1-48; a full clear is 48)" % [
 		d_mean, d_sd, d_sd / sqrt(maxf(float(n_runs), 1.0))])
 	print(_resolution_line(d_sd, n_runs, "%.2f tiers"))
 	print("  PRIMARY   ratio@z1t8        mean %.3f  SD %.3f  SE %.3f   (%d of %d runs reached t8)" % [
@@ -1058,11 +1171,20 @@ static func _print_report(battle) -> void:
 			heals_bought / runs, restock_bought / runs, runes_bought / runs])
 	print("Items: used %.1f/run   carried unused at end %.1f" % [
 		items_used / runs, items_left / runs])
-	# Batch AN: rests are gone, so the recovery line is the per-slot heal and
-	# what the bot bought instead. The bargain line replaces the route line
-	# as the batch\'s most diagnostic: it is the only agency a run has left.
-	print("Merchants met: %.2f/run   Events: %.2f/run" % [
-		merchants_seen / runs, events_seen / runs])
+	# Batch BK: merchants and events are WALKED to now, not rolled — read these
+	# against the map's own copies (5 merchants and 5 events a zone, 15 each a
+	# run) rather than against a per-fight chance.
+	print("Merchants met: %.2f/run walked + %.2f/run bought with a bargain   Events: %.2f/run" % [
+		merchants_seen / runs, merchants_bought / runs, events_seen / runs])
+	# §3: the gold sink, and the number this batch was written for. Split by
+	# how a visit failed — no gold and nothing eligible want different fixes.
+	var smith_conv := 0.0
+	if gold_earned > 0.0:
+		smith_conv = 100.0 * smith_gold / gold_earned
+	print("Blacksmiths walked: %.2f/run   bought %.2f   %.0f gold/run (%.0f%% of all income)" % [
+		blacksmiths_seen / runs, smith_bought / runs, smith_gold / runs, smith_conv])
+	print("   refused: no gold %.2f/run   nothing eligible %.2f/run" % [
+		smith_refused_gold / runs, smith_refused_nothing / runs])
 	if offer_count > 0:
 		var sev_avg := offer_severity_sum / float(offer_count)
 		var mods := PackedStringArray()
@@ -1120,16 +1242,23 @@ static func _print_report(battle) -> void:
 	print("  Worn per hero at run end, by kind: %s" % "   ".join(kind_parts))
 	print("    (spec = one of the FOUR authored for that spec; stick = the generated Common family)")
 
-	# Route agency (Batch Y): the batch's headline pair is choice rate
-	# before vs after the link/deal rework — completions are a consequence.
+	# ROUTE AGENCY — Batch BK's headline, and it is the SAME measurement Batch
+	# BG printed as 0% of 2,764 steps. 42 steps a run (an entry plus 13
+	# transitions in each of three zones); a step is a real choice only when
+	# >= 2 nodes are reachable AND they are not all the same type.
 	var steps := maxf(float(walk_steps), 1.0)
 	print("\nRoute agency:")
-	print("  Reachable nodes per step: %.2f    steps offering a real choice: %.0f%% (%d of %d)" % [
-		reach_sum / steps, 100.0 * choice_steps / steps, choice_steps,
+	print("  Walk steps per run: %.1f   reachable nodes per step %.2f" % [
+		walk_steps / runs, reach_sum / steps])
+	print("    (48 on a full clear: 42 branching columns plus the 6 forced steps onto the mini-bosses and bosses)")
+	print("  DECISIONS — steps offering a real choice: %.1f per run, %.0f%% of steps (%d of %d)" % [
+		choice_steps / runs, 100.0 * choice_steps / steps, choice_steps,
 		walk_steps])
+	print("    (Batch BG measured this as 0%% of 2,764 steps: a line has no route decision)")
 	var off_parts := PackedStringArray()
 	var deck_parts := PackedStringArray()
-	for ty in ["fight", "elite", "miniboss", "shop", "event", "boss"]:
+	for ty in ["fight", "elite", "miniboss", "blacksmith", "merchant",
+			"event", "boss"]:
 		off_parts.append("%s %.1f/%.1f" % [ty,
 			float(type_taken.get(ty, 0)) / runs,
 			float(type_offered.get(ty, 0)) / runs])
@@ -1146,13 +1275,13 @@ static func _print_report(battle) -> void:
 	if not wipes.is_empty():
 		var abs_tiers: Array = []
 		for w in wipes:
-			abs_tiers.append((int(w["zone"]) - 1) * 11 + int(w["tier"]))
+			abs_tiers.append((int(w["zone"]) - 1) * 16 + int(w["tier"]))
 		abs_tiers.sort()
 		var n := abs_tiers.size()
 		var med: float = float(abs_tiers[n / 2]) if n % 2 == 1 \
 			else (abs_tiers[n / 2 - 1] + abs_tiers[n / 2]) / 2.0
-		var mz := int(ceil(med / 11.0))
-		var mt := med - (mz - 1) * 11.0
+		var mz := int(ceil(med / 16.0))
+		var mt := med - (mz - 1) * 16.0
 		med_desc = "%.1f (z%d t%.1f)" % [med, mz, mt]
 	var r8_desc := "n/a"
 	if tier_stats.has("1,8"):
@@ -1160,15 +1289,12 @@ static func _print_report(battle) -> void:
 		var f8: float = maxf(t8["fights"], 1.0)
 		r8_desc = "%.2f" % sqrt((t8["p_atk"] / f8) * (t8["p_ehp"] / f8) \
 			/ maxf((t8["e_atk"] / f8) * (t8["e_ehp"] / f8), 1.0))
-	# BATCH AN ROWS ARE NOT COMPARABLE WITH ANY EARLIER ROW, and the field
-	# list says so rather than leaving it to be noticed: map= now reads
-	# `line` and start=/specopen=/mb= are GONE, because the flags behind them
-	# went with the branching map. depth= is out of 36 slots now, not 33
-	# tiers, so even the primary metric changed units. A row carrying
-	# `map=line` is an AN-or-later row; anything else predates the line.
-	# choice= is retained and will read 0% forever — a line has no route
-	# decision, and a missing field would look like a broken instrument.
-	print("Matrix row: route=%s  map=line  diff=%s  econ=%s  power=x%.2f  bargain_sev=%.2f  depth=%.2f+/-%.2f (of 36)  ratio@z1t8=%s  completions=%.0f%%  wipe median slot=%s  choice=%.0f%%" % [
+	# NO BATCH AN-TO-BJ ROW IS COMPARABLE WITH A BK ROW EITHER, and the field
+	# list says so rather than leaving it to be noticed: map= reads `branch`,
+	# depth= is out of 48 SLOTS not 36, and route= is a real axis again rather
+	# than three names for one walk. A row carrying `map=line` is an AN-to-BJ
+	# row; `map=branch` is BK or later; anything else predates both.
+	print("Matrix row: route=%s  map=branch  diff=%s  econ=%s  power=x%.2f  bargain_sev=%.2f  depth=%.2f+/-%.2f (of 48)  ratio@z1t8=%s  completions=%.0f%%  wipe median slot=%s  choice=%.0f%%" % [
 		route, diff,
 		("rich" if OS.get_environment("DOD_SIM_RUNE_ECON") == "rich" else "normal"),
 		power_mult,

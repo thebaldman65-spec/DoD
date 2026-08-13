@@ -5,6 +5,25 @@
 # passed in explicitly (never read as an autoload) so headless tests can
 # drive events against a bare run_state instance.
 #
+# BATCH BK §4 — EVENTS ARE RESOURCE CONVERSIONS NOW, in three kinds, and
+# every entry carries its `kind`:
+#   tradeoff (60%)  two or three conversions plus a DECLINE that is always
+#                   available. Health for a rune, gold for maximum health,
+#                   health for talent points — a rate offered, taken or not.
+#   boon     (25%)  a straight benefit, no cost.
+#   bane     (15%)  a straight detriment, and ONE choice: a bane the player
+#                   could not have avoided is only fair if it costs a
+#                   RESOURCE, never a run.
+# THE THREE SHARE ONE ICON ON THE MAP AND ONE COLOUR. A node that announced
+# itself as a bane would simply never be walked onto — it would be a wall
+# with extra steps rather than a gamble. `kind` is read HERE, by the draw,
+# and nowhere the player can see.
+#
+# NO BANE MAY REDUCE A HERO BELOW 1 HP, and that is a property of the verbs
+# rather than of the authoring: `damage_pct` floors at 1 and `max_hp_pct`
+# floors max HP at 10 and re-clamps HP into [1, max]. test_batch_bk drives
+# every bane against a 1-HP party as the negative control.
+#
 # THE EFFECT VOCABULARY (the load-bearing part — 15 events is nothing,
 # the schema is everything):
 #   gold          {amount}                 +/- flat gold (floors at 0)
@@ -38,7 +57,21 @@ const DATA_PATH := "res://data/events.json"
 
 const VERBS := ["gold", "gold_pct", "heal_pct", "damage_pct", "mana_pct",
 	"max_hp_pct", "attack_pct", "talent_points", "item", "random_item",
-	"revive_pct", "relic_grant"]
+	"revive_pct", "relic_grant", "rune_grant"]
+
+# §4's own worked example — "health for a rune" — needs a rune the event can
+# hand over, and nothing in the vocabulary could hand one over. ONE new verb,
+# routed through Run.grant_rune (the same door the elite cache and the rich
+# arm already use), so an event rune is generated, priced and scoped exactly
+# like every other rune. Equipped on arrival when a slot is free, pouched
+# when it is not: an event must not be the one source that can overfill.
+#
+# NOT WRITTEN, and the reason is worth keeping: §4 also suggests "a held rune
+# for two of lower rarity". That needs a rune to be SURRENDERED, and nothing
+# in the project has ever removed a rune from a hero — `equipped` is written
+# in one place and the pouch only ever grows. Building the removal path for
+# one event would put a second, untested writer next to the one careful one.
+const KIND_WEIGHTS := {"tradeoff": 60, "boon": 25, "bane": 15}
 
 static var _data := {}
 
@@ -60,7 +93,14 @@ static func config(id: String) -> Dictionary:
 
 # Weighted, requirement-filtered, non-repeating draw. Every event seen
 # this run is excluded until nothing is left, then the seen filter is
-# dropped (40-event pools will make that rare).
+# dropped (a 20-entry pool against ~5 events a run makes that rare).
+#
+# BATCH BK §4: the KIND is drawn first, at 60/25/15, and the weight inside
+# `kind` decides which entry of that kind. Drawing the kind first is what
+# makes the ratio a property of the design rather than of how many events
+# happen to be authored — adding a ninth boon must not make boons commoner.
+# A kind with nothing eligible left falls through to the whole pool rather
+# than returning nothing: a spent bane pool should not close the node.
 static func pick(run: Node) -> String:
 	var seen: Array = run.get("seen_events")
 	var fresh := _eligible(run, seen)
@@ -68,15 +108,40 @@ static func pick(run: Node) -> String:
 		fresh = _eligible(run, [])
 	if fresh.is_empty():
 		return ""
+	var want := _draw_kind()
+	var of_kind: Array = fresh.filter(
+		func(id): return String(config(String(id)).get("kind", "boon")) == want)
+	return _weighted(of_kind if not of_kind.is_empty() else fresh)
+
+
+static func _draw_kind() -> String:
 	var total := 0
-	for id in fresh:
-		total += int(config(id).get("weight", 10))
+	for k in KIND_WEIGHTS:
+		total += int(KIND_WEIGHTS[k])
 	var roll := randi_range(1, total)
-	for id in fresh:
-		roll -= int(config(id).get("weight", 10))
+	for k in KIND_WEIGHTS:
+		roll -= int(KIND_WEIGHTS[k])
 		if roll <= 0:
-			return id
-	return fresh.back()
+			return String(k)
+	return "tradeoff"
+
+
+static func _weighted(ids: Array) -> String:
+	if ids.is_empty():
+		return ""
+	var total := 0
+	for id in ids:
+		total += int(config(String(id)).get("weight", 10))
+	var roll := randi_range(1, total)
+	for id in ids:
+		roll -= int(config(String(id)).get("weight", 10))
+		if roll <= 0:
+			return String(id)
+	return String(ids.back())
+
+
+static func kind(id: String) -> String:
+	return String(config(id).get("kind", "boon"))
 
 
 static func _eligible(run: Node, seen: Array) -> Array:
@@ -222,6 +287,34 @@ static func apply(run: Node, fx: Dictionary) -> String:
 				return ""
 			return "%s return%s at %d%% health" % [", ".join(raised),
 				"s" if raised.size() == 1 else "", int(round(amount * 100))]
+		"rune_grant":
+			# Onto a hero with a free slot first — a rune that arrives worn is
+			# a rune that does something. Everyone full: it goes in the pouch,
+			# where the map screen's slot buttons can still reach it.
+			var granted := PackedStringArray()
+			for i in int(fx.get("amount", 1)):
+				var open_slot: Array = []
+				for m in run.get("party"):
+					var worn := 0
+					for r in m.get("runes", []):
+						if r.get("equipped", false):
+							worn += 1
+					if worn < run.rune_slots():
+						open_slot.append(m)
+				var pool: Array = open_slot if not open_slot.is_empty() \
+					else run.get("party")
+				if pool.is_empty():
+					break
+				var taker: Dictionary = pool.pick_random()
+				var rune: Dictionary = run.grant_rune(taker)
+				if rune.is_empty():
+					break  # runes off — say nothing rather than lie
+				rune["equipped"] = not open_slot.is_empty()
+				taker["runes"] = taker.get("runes", []) + [rune]
+				granted.append("%s (%s)" % [String(rune["name"]), _who(taker)])
+			if granted.is_empty():
+				return ""
+			return "RUNE: %s" % ", ".join(granted)
 		"relic_grant":
 			# Optional {"tier": "common"|"rare"} narrows the pool (Batch 39
 			# tiering exists exactly so events can promise rarity).

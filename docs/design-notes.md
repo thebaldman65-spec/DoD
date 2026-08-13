@@ -2711,3 +2711,94 @@ cast in the game produces. Nothing about the node changed. Whenever an ability
 gains repetitions, everything hanging off it multiplies, and the honest move is
 to go and measure what those things now add up to rather than to notice it later
 in a balance pass.
+
+## Batch BK — the branching map, and what AN actually deleted
+
+**Read the deletion note before rebuilding the thing it deleted, and then say
+what it says rather than what it is convenient for it to have said.** This
+batch's own brief asserted that Batch AN removed the old branching map for being
+decorative, and that AN's forks "reconverged immediately, which is why it
+measured 0% choice". Neither claim survives AN's entry. AN deleted the generator
+as part of a *scaffold* batch — it wanted a playable end-to-end run to feel the
+pacing before 66 pieces of content were authored against it — and the specific
+thing it called out as needing deletion rather than repair was the edge-column
+adjacency rule, whose comment said 70% and whose code did 53%, a disagreement
+that survived three batches because the code still resolved. The 0%-choice
+figure is not a measurement of the old map at all: it is AN's *line*, and AN
+deliberately kept the metric reporting a permanent zero rather than deleting it,
+on the grounds that a missing figure reads as a broken instrument. The old map
+was never measured on this axis. Building on a premise that the previous author
+never held is how a rebuild gets the same result twice, so the premise has to be
+checked at the source and not in the brief.
+
+**What the old map really guaranteed is the thing worth not rebuilding.** AN's
+deletion list names `_ensure_key_route`, `_route_satisfied` and
+`_guarantee_inbound` — a forward-DP check that every route reached the node
+types it was supposed to reach. That is the opposite of this batch's rule, which
+is that **nothing is guaranteed on a route**: route past every blacksmith and you
+get no blacksmith. A guaranteed route makes every fork a detour, because whatever
+you skip is waiting on the other branch. It is not that the old forks reconverged
+too quickly; it is that a guarantee makes reconvergence *irrelevant*.
+
+**A fork is only a decision if it changes what is reachable.** That sentence is
+the whole batch. The mechanism that delivers it is not a rule but a shape: edges
+reach the same row or an adjacent one, they never cross, and most nodes have one
+exit. Nothing is sealed and nothing is announced — but a step down a row leaves
+the corridor above unreachable for a measured 2.23 columns, because no edge
+climbs back fast enough. The three rules that produce that number are each one
+line long, and none of them mentions commitment.
+
+**Constrain the draw; do not roll and re-roll.** Every legal edge assignment for
+a column is enumerated and one is drawn weighted, and assignments that would
+strand a column at a single node are simply never in the bag. Every elite spread
+is generated through the standard non-adjacent-subset bijection, so an illegal
+one cannot be *named*, let alone rejected. This is Batch AN's own severity-floor
+argument reused: rejection sampling works until the table's shape changes and the
+retry budget quietly starts failing, and the failure is invisible because the
+rejected rolls leave no trace. The generator has no retry loop anywhere in it.
+
+**Two weights are the entire feel of the map, and they should be two numbers
+rather than a paragraph of special cases.** `FULL_COVER_WEIGHT` favours a step
+that strands no row; `BRANCH_WEIGHT` favours a step with more edges. Everything a
+designer would want to tune — how often a column is narrow, how many forks a run
+offers, how deep foreclosure runs — moves with those two, and each was set by
+generating a few thousand maps and reading the distribution rather than by
+argument. Raising either one flattens foreclosure; that trade is the design
+surface, and it is legible because it is two constants.
+
+**A sink that shares a list with an award needs a flag, and the flag needs
+exactly one reader.** The blacksmith writes bought upgrades into the same
+`member["upgrades"]` list the mini-boss award writes, deliberately — one list is
+what makes a bought upgrade land, wear its ◆ and hover exactly like an awarded
+one. But `has_upgrade` reads that list to enforce AP's once-per-run rule on the
+*mini-boss pick pool*, so without a `bought` flag, buying Honed in zone 1 would
+silently delete Honed from that hero's mini-boss offers for the rest of the run.
+That is a purchase eating out of the award economy, and it is precisely the kind
+of coupling that ships unnoticed because nothing breaks. The flag is read in one
+function and nowhere else; everything else in the project treats the two kinds of
+entry as identical, which is the point of reusing the list.
+
+**Untelegraphed is a design position, not laziness about icons.** The three event
+kinds share one icon and one colour. A node visibly marked as a bane is not a
+gamble, it is a wall with extra steps: the player routes around it and the node
+has cost them nothing but a pixel. The cost of the position is that a bane must
+be genuinely mild — it may take a resource and never a run — which is why the
+negative control that matters is driving every bane against a party at 1 HP
+rather than reading the JSON and agreeing with it.
+
+**A structural change makes every derived constant a variable, and the honest
+move is to say which.** AN's line held exactly two elites a zone, so talent
+points per run were arithmetic: 12, 13 with the awakening, against a tree of 8.
+On a branching map elites are routed *toward*, so the total is a function of the
+route — a floor of 7 and a measured spread of two and a half points between the
+greedy and cautious policies. Several documents stated the old number as a fact
+about the game rather than as a consequence of the board. Every one of them had
+to be found and re-derived, and a cautious route can now finish a run without a
+complete tree, which is the elite economy working rather than a bug.
+
+**The brief's arithmetic was wrong and the code should not repeat it.** §1 says
+16 slots × 3 zones = 49 encounters. It is 48, by the same construction that made
+the old number 36 (3 × 12) — the third zone's boss is the end boss, not a
+fourteenth thing after it. Off-by-one in a headline figure propagates into every
+document that quotes it, so it is corrected at the constant and the correction is
+written down where the next reader will hit it.

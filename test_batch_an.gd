@@ -63,62 +63,43 @@ func _run_all() -> void:
 	await _test_companion_modifier()
 
 
-# ---------- 1. the line (§1) ----------
+# ---------- 1. the map (§1, SUPERSEDED BY BATCH BK) ----------
 
+# BATCH BK REPLACED AN'S LINE WITH A GENERATED 3-ROW LATTICE, so everything
+# this function used to assert about the twelve authored slots is now false by
+# design: SLOTS_PER_ZONE is 16, ZONE_SHAPE is DELETED, `map[slot]` is an ARRAY
+# of nodes rather than one dict, and `reachable()` returns 2-3 node indices at
+# a branching column instead of exactly one slot. test_batch_bk owns those
+# assertions now.
+#
+# WHAT IS KEPT HERE IS WHAT AN ACTUALLY DECIDED AND BK DID NOT REVISIT: three
+# zones, the boss on the last slot, the end boss being the LAST zone's boss
+# alone, and the budget ramp still reading the slot number with the boss band
+# untouched. The rest is deleted rather than rewritten to pass — a test kept
+# alive by re-pointing it at whatever the code now does has stopped asking its
+# question.
 func _test_line(RunState) -> void:
-	print("\n§1 the line")
+	print("\n§1 the map (AN's line, superseded by BK's lattice)")
 	var run = RunState.new()
-	ok(run.SLOTS_PER_ZONE == 12, "a zone is 12 slots")
 	ok(run.SLOT_COUNT == 3, "a run is 3 zones")
-	ok(run.SLOTS_PER_ZONE * run.SLOT_COUNT == 36, "a run is 36 slots")
-	ok(run.ZONE_SHAPE == ["fight", "fight", "elite", "fight", "fight",
-		"miniboss", "fight", "fight", "elite", "fight", "fight", "boss"],
-		"the authored shape is fight fight ELITE fight fight MINI-BOSS "
-		+ "fight fight ELITE fight fight BOSS")
-	ok(run.BOSS_SLOT == 11, "the boss is the last slot")
+	ok(run.BOSS_SLOT == run.SLOTS_PER_ZONE - 1, "the boss is the last slot")
+	ok(not ("ZONE_SHAPE" in run),
+		"ZONE_SHAPE is DELETED with the line (BK) — not left unreachable")
 	run.new_run()
-	ok(run.map.size() == 12, "a generated zone is 12 slots")
 	ok(run.slot_idx == -1, "a fresh zone is not entered yet")
-	# Every slot is a flat dict — no columns, no links.
-	for s in run.map.size():
-		var slot: Dictionary = run.map[s]
-		ok(slot is Dictionary, "slot %d is one dict, not a row" % s)
-		ok(not slot.has("links"), "slot %d carries no links" % s)
-		ok(String(slot["type"]) == String(run.ZONE_SHAPE[s]),
-			"slot %d is its authored type" % s)
-		ok(slot.has("enemies") and not (slot["enemies"] as Array).is_empty(),
-			"slot %d pre-rolled its warband at map birth" % s)
-		ok(slot.has("theme"), "slot %d carries its theme for the hover card" % s)
-	# One way forward, always, and nothing after the boss.
-	for s in run.SLOTS_PER_ZONE:
-		var reach: Array = run.reachable()
-		ok(reach.size() == 1, "exactly one slot forward from %d" % (s - 1))
-		ok(int(reach[0]) == s, "...and it is slot %d" % s)
-		run.advance(int(reach[0]))
-		ok(bool(run.map[s]["visited"]), "slot %d is marked cleared" % s)
-	ok(run.reachable().is_empty(), "nothing follows the boss")
-	ok(run.run_slot_number() == 12, "run position reads 12 of 36 at zone 1's boss")
-	# Zone 2 replays the identical shape, from the top.
-	run.advance_zone()
-	ok(run.zone_idx == 1, "advance_zone steps the zone")
-	ok(run.slot_idx == -1, "...and resets the position")
-	var second: Array = []
-	for s in run.map.size():
-		second.append(String(run.map[s]["type"]))
-	ok(second == run.ZONE_SHAPE, "zone 2 is the same twelve slots")
-	run.advance(0)
-	ok(run.run_slot_number() == 13, "run position reads 13 of 36 in zone 2")
-	# The budget ramp reads the SLOT number and the boss keeps its band.
-	for s in range(1, 12):
+	# The budget ramp still reads the SLOT number and the boss keeps its band.
+	# BK rescaled the slope across 16 slots and moved neither end.
+	for s in range(1, run.SLOTS_PER_ZONE):
 		var b: int = run.battle_budget(s)
 		ok(b >= 3 and b <= 10, "slot %d budgets inside the ramp (%d)" % [s, b])
 	for trial in 40:
-		var bb: int = run.battle_budget(12)
+		var bb: int = run.battle_budget(run.SLOTS_PER_ZONE)
 		ok(bb >= 10 and bb <= 12, "the boss slot keeps its 10-12 band (%d)" % bb)
-	ok(run.is_end_boss_slot(11) == false, "zone 2's boss is not the end boss")
+	run.zone_idx = 1
+	ok(run.is_end_boss_slot(run.BOSS_SLOT) == false, "zone 2's boss is not the end boss")
 	run.zone_idx = 2
-	ok(run.is_end_boss_slot(11), "zone 3's boss IS the end boss")
-	ok(not run.is_end_boss_slot(10), "...and nothing else is")
+	ok(run.is_end_boss_slot(run.BOSS_SLOT), "zone 3's boss IS the end boss")
+	ok(not run.is_end_boss_slot(run.BOSS_SLOT - 1), "...and nothing else is")
 	run.free()
 
 
@@ -142,8 +123,9 @@ func _test_deletions(RunState) -> void:
 	run.new_run()
 	for zone in 3:
 		for s in run.map.size():
-			ok(String(run.map[s]["type"]) != "rest",
-				"zone %d slot %d is not a rest" % [zone + 1, s])
+			for node in run.map[s]:
+				ok(String(node["type"]) != "rest",
+					"zone %d slot %d is not a rest" % [zone + 1, s])
 		if zone < 2:
 			run.advance_zone()
 	run.free()
@@ -271,12 +253,14 @@ func _test_offer(RunState) -> void:
 	ok(String(paid["text"]) != "", "...and says so")
 	ok(run.pending_modifier == "", "claiming clears the modifier")
 	ok(run.pending_reward.is_empty(), "...and the reward")
-	# The merchant reward resets the drought counter — the party HAS met one.
-	run.slots_since_merchant = 3
+	# The merchant reward. Batch BK deleted the drought counter it used to
+	# reset (there is no post-fight roll left to have a drought), so what is
+	# asserted now is the flag the victory screen actually routes on.
+	run.pending_shop = false
 	run.pending_reward = {"kind": "shop"}
 	var shopped: Dictionary = run.claim_reward()
 	ok(bool(shopped["shop"]), "the severity-4 merchant reward reports a merchant")
-	ok(run.slots_since_merchant == 0, "...and resets the drought counter")
+	ok(run.pending_shop, "...and arms the one merchant a fight can still queue")
 	run.free()
 
 
@@ -706,12 +690,21 @@ func _test_rewards(RunState) -> void:
 	ok(run.award_talent_points("boss") == 1, "a zone boss pays 1")
 	run.zone_idx = 2
 	ok(run.award_talent_points("boss") == 1, "the END boss pays 1 as well")
-	var per_zone := 0
-	for ty in run.ZONE_SHAPE:
-		if String(ty) in ["elite", "miniboss", "boss"]:
-			per_zone += 1
-	ok(per_zone == 4, "4 point-paying slots a zone")
-	ok(per_zone * run.SLOT_COUNT == 12, "12 a run, against an 8-node tree")
+	# BATCH BK: THE PER-RUN TOTAL IS NO LONGER A CONSTANT. AN's authored line
+	# held exactly two elites a zone, so points-per-run was arithmetic: 4 a
+	# zone, 12 a run. On a branching map the elites are 0-3 a WALKED zone, so
+	# the total is a function of the route — which is the design (elites pay,
+	# and routing to them is how you get paid). What is still fixed is the
+	# floor and the ceiling, so those are what this asserts.
+	var elite_columns := 0
+	for c in range(1, run.BRANCH_COLUMNS + 1):
+		for node in run.map[run.column_slot(c)]:
+			if String(node["type"]) == "elite":
+				elite_columns += 1
+	ok(elite_columns == int(run.NODE_COPIES["elite"]),
+		"a zone holds %d elites to route toward" % int(run.NODE_COPIES["elite"]))
+	ok(run.award_talent_points("miniboss") + run.award_talent_points("boss") == 2,
+		"the guaranteed floor is 2 points a zone — the mini-boss and the boss")
 	run.zone_idx = 0
 	# THE MINI-BOSS: a generic ability upgrade, chosen from three.
 	# RE-POINTED IN PLACE (Batch BH §1): AN shipped a PLACEHOLDER pool of four
@@ -775,60 +768,34 @@ func _test_rewards(RunState) -> void:
 	run.free()
 
 
-# ---------- 5. scheduling (§5, §7) ----------
+# ---------- 5. scheduling (§5, §7, DELETED BY BATCH BK) ----------
 
+# NOTHING ROLLS BEHIND A CLEARED FIGHT ANY MORE. Batch BK made the merchant
+# and the event MAP NODES — walked to, or walked past — and deleted
+# `roll_merchant`, `roll_event`, `MERCHANT_CHANCE`, `MERCHANT_FLOOR`,
+# `EVENT_CHANCE`, `slots_since_merchant` and the `pending_after` queue. What
+# this section used to prove (a 40% roll with a four-slot drought floor) is
+# not a weaker version of the new rule, it is a different economy, so the
+# checks are DELETED rather than re-pointed — and the absence is pinned, on
+# the AN pattern this very file established.
 func _test_scheduling(RunState) -> void:
-	print("\n§5/§7 scheduling")
+	print("\n§5/§7 scheduling (deleted by BK — the merchant is a map node)")
 	var run = RunState.new()
 	run.new_run()
-	ok(is_equal_approx(run.MERCHANT_CHANCE, 0.40), "the merchant rolls at 40%")
-	ok(run.MERCHANT_FLOOR == 4, "the floor is four dry slots")
-	ok(is_equal_approx(run.EVENT_CHANCE, 0.25), "events roll at 25%")
-	# Mini-bosses and bosses schedule nothing — §5 and §7 say "fight or
-	# elite", and a merchant after a zone boss would land after the zone.
-	for ty in ["miniboss", "boss"]:
-		var any := false
-		for trial in 400:
-			run.slots_since_merchant = 0
-			if run.roll_merchant(ty) or run.roll_event(ty):
-				any = true
-		ok(not any, "a %s slot schedules nothing" % ty)
-	# THE FLOOR IS A FLOOR: four cleared slots without a merchant and the
-	# fifth is guaranteed. Driven rather than sampled — the guarantee is
-	# about the worst case, and sampling only ever sees the average.
-	run.slots_since_merchant = 0
-	var forced := 0
-	for trial2 in 2000:
-		run.slots_since_merchant = run.MERCHANT_FLOOR
-		if run.roll_merchant("fight"):
-			forced += 1
-	ok(forced == 2000, "at the floor the merchant is GUARANTEED (%d of 2000)" % forced)
-	# ...and a merchant resets the counter, so the drought restarts.
-	run.slots_since_merchant = run.MERCHANT_FLOOR
-	run.roll_merchant("fight")
-	ok(run.slots_since_merchant == 0, "meeting a merchant resets the drought")
-	# The gap between merchants can never exceed the floor.
-	run.slots_since_merchant = 0
-	var gap := 0
-	var worst := 0
-	for trial3 in 4000:
-		if run.roll_merchant("fight"):
-			worst = maxi(worst, gap)
-			gap = 0
-		else:
-			gap += 1
-	ok(worst <= run.MERCHANT_FLOOR,
-		"no drought ever runs past %d slots (worst was %d)" % [run.MERCHANT_FLOOR, worst])
-	# The rate itself sits near 40% once the floor is excluded — a sanity
-	# band, not a tight assertion, because the floor lifts the mean.
-	run.slots_since_merchant = 0
-	var hits := 0
-	for trial4 in 4000:
-		if run.roll_merchant("fight"):
-			hits += 1
-	var rate := hits / 4000.0
-	ok(rate > 0.35 and rate < 0.60,
-		"the merchant rate lands in band with the floor lifting it (%.2f)" % rate)
+	for gone in ["MERCHANT_CHANCE", "MERCHANT_FLOOR", "EVENT_CHANCE",
+			"slots_since_merchant", "pending_after"]:
+		ok(not (gone in run), "%s is deleted with the post-fight roll (BK)" % gone)
+	for gone_fn in ["roll_merchant", "roll_event"]:
+		ok(not run.has_method(gone_fn), "%s() is deleted (BK)" % gone_fn)
+	# The one survivor, and it is BOUGHT rather than rolled: the severity-4
+	# bargain reward still puts a merchant behind the fight it priced.
+	ok("pending_shop" in run,
+		"the bargain's bought merchant survives — one boolean, not a queue")
+	run.pending_shop = true
+	ok(run.next_after_scene() == "res://scenes/shop.tscn",
+		"...and next_after_scene routes to it exactly once")
+	ok(run.next_after_scene() == "res://scenes/map.tscn",
+		"...then back to the map")
 	run.free()
 
 

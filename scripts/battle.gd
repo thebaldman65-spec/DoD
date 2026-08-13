@@ -839,8 +839,15 @@ func _spawn_units() -> void:
 		composition = Run.encounter["enemies"]
 	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 6)]
 	# Scaling rebase (Batch 36, rates halved in Batch T): each zone runs its
-	# OWN 1..11 tier ladder (+2% Attack / +2.5% HP of base per tier), and
-	# the zone's SLOT in the run applies a flat base multiplier on top (1st
+	# OWN tier ladder (+2% Attack / +2.5% HP of base per tier) — 1..16 since
+	# BATCH BK lengthened the zone, and the RATE is deliberately unchanged.
+	# The rate is what was authored; holding the old top (x1.30 HP / x1.24
+	# attack at slot 12) would have meant re-deriving a number nobody set,
+	# and the party's own +2%-a-win ladder gained the same four steps. The
+	# budget ramp WAS rescaled instead (Run.battle_budget) and for a
+	# different, structural reason: at the old slope slot 15 would have
+	# reached the boss's own 10-12 band. Slot 16 now reads x1.40 / x1.32.
+	# The zone's SLOT in the run applies a flat base multiplier on top (1st
 	# zone x1.0, 2nd x1.5, 3rd x2.2 — Run.zone_base_mult, position not
 	# identity). The slot multiplier carries between-zone escalation; the
 	# tier rate compounds on the budget ramp WITHIN a zone, and at +4%/+5%
@@ -11623,21 +11630,14 @@ func _check_end() -> void:
 			if pts > 0:
 				win_text += "\nEach hero gains %d talent point%s." % [
 					pts, "" if pts == 1 else "s"]
-			# §5 and §7: what follows a cleared fight or elite. Both are rolled
-			# HERE, once, and queued on the run — rolling them from the map
-			# would re-roll on every redraw, and the merchant FLOOR would never
-			# mean anything.
-			var after: Array = []
-			if merchant_owed or Run.roll_merchant(node_type):
-				after.append("shop")
-			if Run.roll_event(node_type):
-				after.append("event")
+			# BATCH BK §3/§5: NOTHING is rolled behind a cleared fight any more.
+			# The merchant and the event are MAP NODES the player routed to, or
+			# past. The only thing that can still stand between a victory and the
+			# map is the bargain's own "a merchant follows the fight" reward — and
+			# that one was BOUGHT, with a severity-4 modifier.
 			var buttons: Array = [["Continue", _to_map]]
-			if not after.is_empty():
-				Run.pending_after = after
-				spoils += "\n\n%s" % ("A merchant waits on the road ahead."
-					if String(after[0]) == "shop"
-					else "Something waits on the road ahead.")
+			if merchant_owed:
+				spoils += "\n\nA merchant waits on the road ahead."
 				buttons = [["Continue", _to_after]]
 			Run.save_run()
 			_show_end("VICTORY", win_text + spoils, buttons, true)
@@ -11730,10 +11730,10 @@ func _to_map() -> void:
 	get_tree().change_scene_to_file("res://scenes/map.tscn")
 
 
-# §5 / §7: a merchant and/or an event queued by the fight that just ended.
-# Run.pending_after is a QUEUE the screens pop from, so a fight that rolled
-# both resolves the shop, then the event, then the map — and quitting
-# mid-queue simply drops what is left rather than stranding the player.
+# Batch BK §3: the ONE interstitial a fight can still queue — the merchant the
+# bargain's severity-4 reward bought. Run.next_after_scene consumes the flag,
+# so quitting on the victory screen simply drops it rather than stranding the
+# player on a screen that never comes.
 func _to_after() -> void:
 	var next := Run.next_after_scene()
 	Run.save_run()

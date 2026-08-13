@@ -133,8 +133,9 @@ func _draw_screen() -> void:
 	leave.custom_minimum_size = Vector2(220, 48)
 	leave.position = Vector2(530, 640)
 	leave.pressed.connect(func():
-		# Batch AN: a fight can queue a merchant AND an event behind it, so
-		# leaving asks the run where to go rather than assuming the map.
+		# Batch BK: the merchant is a map node now, so leaving is nearly always
+		# the map — but the bargain's bought merchant can still be pending, so
+		# the run is still asked rather than assumed.
 		var next := Run.next_after_scene()
 		Run.save_run()
 		get_tree().change_scene_to_file(next))

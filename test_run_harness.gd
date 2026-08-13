@@ -43,6 +43,17 @@ func _check(label: String, got, want) -> void:
 		print("  FAIL %s: got %s, want %s" % [label, str(got), str(want)])
 
 
+# Batch BK: a branching map turns several of this file's constants into
+# ranges. A range check states BOTH ends so it still fails on a real drift —
+# a bare "is it plausible" would be the check quietly giving up.
+func _check_range(label: String, got: float, lo: float, hi: float) -> void:
+	if got >= lo and got <= hi:
+		print("  ok   %s (%s in [%s, %s])" % [label, str(got), str(lo), str(hi)])
+	else:
+		fails += 1
+		print("  FAIL %s: got %s, want [%s, %s]" % [label, str(got), str(lo), str(hi)])
+
+
 func _setup_run(run: Node) -> void:
 	run.sim_run = true  # save/clear are no-ops — never touch the real save
 	run.new_run()
@@ -103,26 +114,38 @@ func _gate_talent_conservation() -> void:
 		run.party[i]["spec"] = SPECS[i]
 		run.party[i]["tree"] = Talents.generate_tree(SPECS[i], run.party[i]["key"])
 		run.sync_spec_hp(i)
-	# Batch AI income: the awakening pays 1, mini-bosses 1, zone bosses 2,
-	# fights nothing. A full 3-zone run is 1 + 3 + 4 = 8 per hero — exactly
-	# one complete tree — so this books the whole run's supply.
+	# Income: the awakening pays 1, then 1 apiece from every elite, mini-boss
+	# and boss. Since Batch BK the elites are ROUTED TO, so the run's supply
+	# is a floor of 7 plus whatever this walk reached — books it either way.
 	for i in run.party.size():
 		run.award_spec_point(i)
-	# Batch AN: walk the LINE and let it pay what it pays — one purse, 1
-	# point per elite / mini-boss / boss, nothing from ordinary fights. The
-	# whole point of driving the real ZONE_SHAPE here rather than a hand
-	# count is that the schedule and the board can never drift apart.
+	# BATCH BK: walk the generated MAP and let it pay what it pays — one purse,
+	# 1 point per elite / mini-boss / boss, nothing from ordinary fights. The
+	# whole point of driving the real board rather than a hand count is that
+	# the schedule and the map can never drift apart; on a lattice that means
+	# an actual walk, and the total is a RANGE rather than a constant.
 	for zone in run.SLOT_COUNT:
 		run.zone_idx = zone
-		for ty in run.ZONE_SHAPE:
-			run.award_talent_points(String(ty))
+		run.slot_idx = -1
+		run.node_idx = 0
+		if zone > 0:
+			run._generate_map()
+		while true:
+			var reach: Array = run.reachable()
+			if reach.is_empty():
+				break
+			run.advance(int(reach[0]))
+			run.award_talent_points(String(run.current_node()["type"]))
 	var before := 0
 	var before_flex := 0
 	for m in run.party:
 		before += int(m["talent_points"])
 		before_flex += int(m.get("talent_flex", 0))
-	# 12 from the line + 1 from the awakening, on each of four heroes.
-	_check("income booked (13 x 4 heroes)", before, 52)
+	# The floor is 6 from the map + 1 from the awakening on each of four heroes
+	# = 28; every elite the walk reached adds 4 more. A RANGE, not a constant,
+	# since Batch BK made the elites routable.
+	_check_range("income booked (>=7 x 4 heroes, <=8 payers x 3 zones + 1)",
+		before, 28, 4 * (1 + run.SLOT_COUNT * (2 + int(run.NODE_COPIES["elite"]))))
 	_check("no flex purse is fed any more", before_flex, 0)
 	RunSim._run_spent = 0
 	RunSim._spend_talents(run)
@@ -146,14 +169,21 @@ func _gate_talent_conservation() -> void:
 			var node := Talents.node_in_tree(tree, String(id))
 			_check("node is in the tree (%s/%s)" % [m["spec"], id], node.is_empty(), false)
 		replay_total += Talents.points_spent(learned)
-		# Batch AN: 13 points buys 13 nodes — eight of them the tree proper
-		# (seven rows and a capstone) and the other five widening five of
-		# those rows to two picks each. The ceiling is 15 (the capstone row
-		# never takes a second), so a fully-fed hero is still short of it and
-		# the surplus is a real choice rather than a formality.
-		_check("complete tree (%s)" % m["spec"], learned.size(), 13)
-		_check("capstone taken (%s)" % m["spec"],
-			Talents.has_capstone(tree, learned), true)
+		# BATCH BK: the purse is a RANGE, so the tree size is one too. The
+		# floor is 7 (the awakening plus a mini-boss and a boss in each of
+		# three zones, on a route that ducked every elite); the ceiling is
+		# still 15, because seven rows take a second pick each and the
+		# capstone row never takes a second. A hero at the floor cannot even
+		# complete the eight-node tree, which is the elite economy working:
+		# a route that skips the paydays arrives with fewer nodes.
+		_check_range("tree size (%s)" % m["spec"], learned.size(), 7, 15)
+		_check("every point bought a node (%s)" % m["spec"],
+			learned.size(), Talents.points_spent(learned))
+		# The capstone opens only once all seven rows are picked, so it is
+		# asserted where it is reachable rather than unconditionally.
+		if learned.size() >= 8:
+			_check("capstone taken (%s)" % m["spec"],
+				Talents.has_capstone(tree, learned), true)
 		_check("bank not negative (%s)" % m["spec"],
 			int(m["talent_points"]) >= 0, true)
 		_check("elite purse not negative (%s)" % m["spec"],

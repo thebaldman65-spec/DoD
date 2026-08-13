@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-11 (Batch BJ)</b></p>
+<p align="right"><b>Last updated: 2026-08-12 (Batch BK)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -11,15 +11,16 @@ changes lives in the changelog. Engine: Godot 4.7, all UI built in code.</i></p>
 <p>A turn-based party roguelike. The world is being consumed by <b>the Decay</b>; the player
 commands <b>the Untouched</b> — four heroes immune to it — through zone after zone of corrupted
 enemies. Runs are short, buildcrafted, and repeatable: draft a party, awaken permanent
-specializations, walk a road of fixed encounters, defeat the zone boss, descend deeper. Death ends the run but
+specializations, route a branching map of encounters, defeat the zone boss, descend deeper. Death ends the run but
 feeds a permanent relic collection (meta-progression). Combat is timeline-initiative with a
 timing skill check on every action — the player's execution matters as much as their build.</p>
 
 <h2>2. Run Flow</h2>
 <p><b>Main Menu</b> → <b>Draft</b> (pick 4 heroes + equip up to 3 relics) →
 <b>Spec Choice</b> (permanent; heroes begin with <b>no runes</b> and three empty slots) →
-<b>Map</b> (the road) → <b>Offer</b> (three bargains, before every elite and mini-boss) →
-<b>Battle</b> → sometimes <b>Shop</b> and/or <b>???</b> → back to the map → …
+<b>Map</b> (a generated 16-slot lattice) → the node you route to: <b>Battle</b>, or
+<b>Smith</b>, or <b>Trade</b>, or <b>???</b> — with <b>Offer</b> (three bargains) in front of
+every elite and mini-boss → back to the map → …
 → <b>Mini-boss</b> → … → <b>Zone Boss</b> → next zone (party fully restored) →
 <b>end boss</b> → run complete. Talents, runes and picks are all handled on the map's hero
 cards; there is no separate Party screen.</p>
@@ -44,57 +45,115 @@ blurb, passive, and full ability details. The choice is permanent for the run.</
 party 15% of max HP</b> — there is no resting, so this is the whole recovery curve (the
 Chalice of Dawn relic stacks its 10% on top for 25%). Talent points come from the beats
 that matter — <b>1 for confirming a spec, then 1 apiece from every elite, mini-boss and
-boss</b>, the final boss included (§7). Regular fights award none. The <b>mini-boss</b>
+boss</b>, the final boss included (§7). Regular fights award none. <b>Since Batch BK the
+per-run total is a function of the route</b>, not a constant: the mini-boss and boss floor is
+6 a run, and every elite the route reaches adds one. The <b>mini-boss</b>
 hands every hero a <b>generic ability upgrade, three offered</b>; <b>zone bosses 1 and 2</b>
 hand every hero an <b>ability pick, three offered, drawn from that hero's spec pool only</b>
 (§6a). The <b>final boss</b> awards a relic unlock and big gold and <i>ends the run</i> — no
 ability pick, because nothing follows it to use one on. Fallen heroes return after a won
 battle at 20% max HP ("the Untouched refuse to stay down").</li>
 <li><b>Defeat:</b> the run ends, the save is cleared, back to a new draft.</li>
-<li><b>Saving:</b> auto-save to user://run_save.bin (format v7) after every completed
-encounter AND after spec confirmation (including debug rerolls); Continue resumes at the
-map. Loading swaps each member's saved tree snapshot for the live definition, so balance
+<li><b>Saving:</b> auto-save to user://run_save.bin (format <b>v8</b>) after every
+completed encounter AND after spec confirmation (including debug rerolls); Continue resumes at
+the map. Loading swaps each member's saved tree snapshot for the live definition, so balance
 edits reach a run in flight, and refunds points sunk into nodes that no longer exist. A
-save older than v7 describes a branching board this build cannot walk, so it is <b>refused
-and cleared</b> rather than half-loaded. Run end (win or wipe) clears the save.</li>
+save older than v8 holds a <b>flat 12-slot line and a single slot index</b>, which has no
+honest place on a lattice — the migration would have to invent a row the party never stood in
+and a set of edges they never had — so it is <b>refused and cleared</b> rather than
+half-loaded. (Batch AN made the same call about pre-v7 saves, and Batch AI about ranked talent
+purchases: a wipe that says so beats a migration that invents state.) Run end (win or wipe)
+clears the save.</li>
 </ul>
 
-<h2>3. Zones &amp; the Road</h2>
-<p><b>Structure rules:</b> a run is <b>3 zones &times; 12 encounters = 36</b>, and every zone
-has the <b>identical</b> shape. Nothing is dealt and nothing is rolled — the shape below
-<i>is</i> the zone:</p>
+<h2>3. Zones &amp; the Map</h2>
+<p><b>Structure rules:</b> a run is <b>3 zones &times; 16 encounters = 48</b>, and every zone
+is <b>generated</b>: a lattice three rows wide and sixteen slots deep.</p>
 <table border="1" cellpadding="4">
-<tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th>
-<th>9</th><th>10</th><th>11</th><th>12</th></tr>
-<tr><td>Fight</td><td>Fight</td><td><b>ELITE</b></td><td>Fight</td><td>Fight</td>
-<td><b>MINI-BOSS</b></td><td>Fight</td><td>Fight</td><td><b>ELITE</b></td><td>Fight</td>
-<td>Fight</td><td><b>BOSS</b></td></tr>
+<tr><th>Slot</th><th>Contents</th></tr>
+<tr><td>1&ndash;7</td><td>branching, 3 nodes per column</td></tr>
+<tr><td>8</td><td><b>MINI-BOSS</b> &mdash; every path converges</td></tr>
+<tr><td>9&ndash;15</td><td>branching, 3 nodes per column</td></tr>
+<tr><td>16</td><td><b>BOSS</b> &mdash; every path converges</td></tr>
 </table>
-<p>Zone 3's boss is the <b>end boss</b>: the run ends on its death. There is no route to
-plan — the only forward move is the next encounter — so the run's decisions live on the
-<b>offer screen</b> (§3a) rather than in routing.</p>
-<p><b>The road reads LEFT TO RIGHT:</b> encounter 1 sits on the left edge and the boss on
-the right. Each encounter is a dot on the line; the current position is marked, cleared dots
-dim, and dots ahead show their type by colour. <b>Hovering a dot scouts it</b> — theme, full
+<p><b>14 branching columns &times; 3 rows = 42 node positions</b>, of which pruning (below)
+removes two or three &mdash; a real zone holds <b>~39.7 nodes</b> and its columns are 2 or 3
+wide (84% are 3). The player walks <b>one node per column</b>: 14 free encounters plus the
+mini-boss and the boss. Zone 3's boss is the <b>end boss</b>: the run ends on its death.</p>
+<p><b>Entry: any of column 1's three nodes may be chosen</b>, and the mini-boss opens the
+whole of column 9 the same way &mdash; so each half of a zone begins with a free pick and
+then narrows.</p>
+
+<h3>Node copies per zone, and what a route actually meets</h3>
+<table border="1" cellpadding="4">
+<tr><th>Type</th><th>Copies in the zone</th><th>Walked by an unsteered route</th>
+<th>Range over 1500 zones</th></tr>
+<tr><td>Fight</td><td>the remainder (~17.8)</td><td>6.25</td><td>0&ndash;13</td></tr>
+<tr><td>Elite</td><td>6</td><td>2.24</td><td>0&ndash;6</td></tr>
+<tr><td>Blacksmith</td><td>6</td><td>2.04</td><td>0&ndash;6</td></tr>
+<tr><td>Merchant</td><td>5</td><td>1.73</td><td>0&ndash;5</td></tr>
+<tr><td>Event</td><td>5</td><td>1.74</td><td>0&ndash;5</td></tr>
+</table>
+<p><b>NO NODE TYPE IS GUARANTEED ON A ROUTE.</b> A player who routes past every blacksmith
+gets no blacksmith that zone &mdash; measured at <b>7.7% of zones under an unsteered walk</b>.
+That is the design: it is what makes the trade route a choice rather than a milestone. It
+also means a <b>zero-elite route is possible</b> (6.1% unsteered, 25% under a route that
+actively ducks them) and it is meant to be weak &mdash; skipping every elite is an underpower
+strategy, not a safe one.</p>
+
+<h3>Generation &mdash; the edges are the mechanism, not decoration</h3>
+<p>The edge graph is generated first; node types are assigned to the positions that survive.
+The rules:</p>
+<ul>
+<li>Every node has <b>1&ndash;3 edges in and 1&ndash;3 out</b>. Measured out-degree: 59% one,
+37% two, 4% three.</li>
+<li>Edges connect to the <b>same row or an adjacent row only</b>.</li>
+<li><b>Paths never cross.</b> If a node in row <i>i</i> reaches row <i>j</i> and the node in
+row <i>i+1</i> reaches row <i>k</i>, then <i>k</i> &ge; <i>j</i>.</li>
+<li>Nodes left with no way in or no way out are <b>removed</b>, to a fixpoint, so a column
+may end up narrower than 3. No column is ever pruned below <b>2</b> &mdash; a one-node column
+is a step with no decision on it, and that is guaranteed by construction (candidates that
+would strand a column are never in the bag) rather than by re-rolling.</li>
+<li>Type constraints: <b>no elite in column 1</b>; <b>no two elites in adjacent columns</b>
+(and the columns run 1&ndash;14 straight through the mini-boss, so elite &rarr; mini-boss
+&rarr; elite is barred too); <b>at most one of each non-fight type per column</b>; and
+<b>every entry node reaches at least one elite and at least one trade node</b>.</li>
+</ul>
+<p><b>Why this produces commitment without a rule:</b> stepping down a row makes the corridor
+above unreachable for the rest of the half, because no edge climbs back fast enough.
+<b>Measured foreclosure: 2.23 columns</b> a node can no longer reach, on average. Nothing is
+sealed and nothing is announced &mdash; the geometry does it.</p>
+<p><b>Decisions per run: 19.0 real choices</b> out of 42 branching steps, where a step counts
+only if two or more nodes are reachable <i>and</i> they are not all the same type. Batch AN's
+line measured <b>0 of 2,764</b> on the identical definition.</p>
+
+<h3>The five node types</h3>
+<p><b>Fight</b> nodes are battles. <b>Hovering any node scouts it</b> &mdash; theme, full
 lineup, and the band's damage-type identity ("Resists: Nature x3 / Soft to: Fire x2"), from
-the moment the zone is generated. <b>Mini-boss and boss dots show their type but not their
-identity:</b> the player learns which boss they drew only by fighting the mini-boss.</p>
-<p><b>The mini-boss holds the middle of every zone.</b> Encounter 6 is an <b>elite warband
-carrying a boss-tier health pool</b> (every enemy at 1.5&times; its usual maximum, attack
-untouched — a longer fight, not a harder-hitting one). It pays <b>elite gold (80&ndash;100)
-and 1 talent point</b>, and its own spoil is a <b>generic ability upgrade</b> (§6a). <b>The
-offer precedes it</b> (§3a), so a mini-boss is fought under a modifier — with every enemy
-already at 1.5&times; health a severity-4 pick is a real gamble, and the guaranteed
-low-severity option is what makes it a choice rather than a trap. Its spoils stack with the
-bargain's reward. <b>Bosses</b> remain fixed encounters: no modifier, no offer.</p>
+the moment the zone is generated &mdash; and a node the party can no longer reach is drawn
+nearly out, so the cost of the last step is visible on the board.
+<b>Mini-boss and boss nodes show their type but not their identity:</b> the player learns
+which boss they drew only by fighting the mini-boss.</p>
+<p><b>The mini-boss holds the middle of every zone.</b> Slot 8 is an <b>elite warband carrying
+a boss-tier health pool</b> (every enemy at 1.5&times; its usual maximum, attack untouched — a
+longer fight, not a harder-hitting one). It pays <b>elite gold (80&ndash;100) and 1 talent
+point</b>, and its own spoil is a <b>generic ability upgrade</b> (§6a). <b>The offer precedes
+it</b> (§3a). <b>Bosses</b> remain fixed encounters: no modifier, no offer.</p>
 <p><b>Elites are the snowball engine.</b> An elite kill pays <b>1 talent point</b>, drops a
 <b>rune cache</b> for a random hero (three candidates rolled at the kill, one chosen on that
-hero's card), plus a random consumable and a bigger gold purse (80&ndash;100).</p>
+hero's card), plus a random consumable and a bigger gold purse (80&ndash;100). Six stand in a
+zone and a route meets two to four of them, so <b>talent points per run are now a function of
+the route</b> rather than a constant: the guaranteed floor is 2 a zone (mini-boss and boss)
+plus 1 for the awakening.</p>
+<p><b>Blacksmith</b> and <b>Merchant</b> are §8's trade nodes. <b>Event (???)</b> is §3b.</p>
 
 <h3>3a. The offer &mdash; three bargains</h3>
 <p>Before every <b>elite and mini-boss</b> encounter — not plain fights, not bosses — the
-player is shown <b>3 options</b> and picks one. That is <b>four a zone</b>: the bargain is an
-event on the road, not a gate in front of every battle. Each option is one <b>modifier</b> plus one
+player is shown <b>3 options</b> and picks one. Since Batch BK that is <b>1&ndash;4 a zone</b>
+rather than a fixed four, because elites are routed to rather than placed: measured
+<b>8.4 a run greedy, 8.1 balanced, 3.8 cautious</b> (n=150 each; the count tracks how many
+elites the route reached, and how far the run got). The bargain is an event on the
+road, not a gate in front of every battle. Each option is one <b>modifier</b> plus one
 <b>reward</b>, both visible before choosing. There is no decline.</p>
 <p>A modifier is a condition that <b>binds both parties</b> for that battle. Each carries a
 <b>severity of 1&ndash;4</b>, and <b>the reward table reads that severity</b> — so authoring a
@@ -160,29 +219,43 @@ of the battle that charged for it.</p>
 fight</td></tr>
 </table>
 
-<h3>3b. What follows an encounter</h3>
-<p>Shops and events are <b>scheduled</b> now, not placed on a board. Both roll once, on the
-victory screen, after any cleared <b>fight or elite</b>:</p>
+<h3>3b. Events &mdash; resource conversions in three kinds</h3>
+<p><b>Nothing rolls behind a cleared fight any more.</b> The 40%-with-a-floor merchant roll
+and the 25% event roll are <b>deleted</b>: both are map nodes now, so the player can see one
+coming and plan to arrive with gold. The one exception is the severity-4 bargain reward
+"a merchant follows the fight", which is <i>bought</i> rather than rolled.</p>
+<p>An event node draws one of <b>three kinds, all sharing ONE icon (???)</b> and one colour.
+The player knows an event is there; they do not know which kind. A visibly-bad node is a wall
+with extra steps, not a gamble.</p>
 <ul>
-<li><b>Merchant &mdash; 40%</b>, with a <b>floor</b>: if 4 encounters pass with no merchant,
-the next cleared one guarantees a merchant. The severity-4 reward option guarantees one on
-demand. Shop contents are unchanged — consumables at existing prices, one rune offer per hero
-per visit, duplicates avoided.</li>
-<li><b>Event &mdash; 25%</b>, drawn from the existing pool with its requirement gating
-intact.</li>
+<li><b>Tradeoff &mdash; 60%.</b> Two or three options, each <b>converting one resource into
+another</b> at a rate the player accepts or declines. Health for a rune, gold for maximum
+health, health for talent points, gold for a relic. <b>Declining is always one of the
+buttons.</b> 8 authored.</li>
+<li><b>Boon &mdash; 25%.</b> A straight benefit, no cost. 8 authored.</li>
+<li><b>Bane &mdash; 15%.</b> A straight detriment, one button, no decline. <b>Banes are
+mild, and no bane may kill a hero or reduce anyone below 1 HP</b> &mdash; a bane the player
+could not have avoided is only fair if it costs a resource, never a run. 4 authored: Ashfall
+(12% of max HP), the Cutpurse (a quarter of the purse), Spoiled Stores (two potions), Wormrot
+(&minus;5% maximum health for the run).</li>
 </ul>
-<p>When both roll, the merchant resolves first, then the event, then the map.</p>
-<p><b>Events:</b> an event presents flavor text and 2+ choices; choices whose requirements
-fail are greyed with the reason. Effects speak a fixed <b>verb vocabulary</b> — gold /
-gold_pct / heal_pct / damage_pct (never kills: floors at 1 HP) / mana_pct / max_hp_pct /
-attack_pct (permanent for the run, applied at battle spawn) / talent_points / item /
-random_item / revive_pct (the fallen return) / relic_grant (random inactive relic; +40 gold
-when slots are full) — aimed by <b>target selectors</b> (party, random, lowest_hp,
-class:&lt;key&gt;) and gated by <b>requirement conditions</b> (min_gold, max_gold, zone_slot,
-has_item, spec_in_party, fallen_hero). Adding an event is a JSON edit; adding a verb is one
-handler. 16 events ship now (three zone-gated, two spec-gated, one needing a fallen hero);
-the schema is built for 40+. Seen events persist in the save and never repeat within a run
-until the pool exhausts.</p>
+<p>The <b>kind is drawn first</b>, at 60/25/15, and the weight inside that kind picks the
+entry &mdash; so authoring a ninth boon does not make boons commoner.</p>
+<p>Effects speak a fixed <b>verb vocabulary</b> — gold / gold_pct / heal_pct / damage_pct
+(never kills: floors at 1 HP) / mana_pct / max_hp_pct / attack_pct (permanent for the run,
+applied at battle spawn) / talent_points / item / random_item / revive_pct (the fallen
+return) / relic_grant (random inactive relic; +40 gold when slots are full) / <b>rune_grant</b>
+(new: a rune through the same door the elite cache uses, equipped when a slot is free) —
+aimed by <b>target selectors</b> (party, random, lowest_hp, class:&lt;key&gt;) and gated by
+<b>requirement conditions</b> (min_gold, max_gold, zone_slot, has_item, spec_in_party,
+fallen_hero). Adding an event is a JSON edit; adding a verb is one handler. <b>20 events</b>
+ship now. Seen events persist in the save and never repeat within a run until the pool
+exhausts.</p>
+<p><b>Not built, and the reason is worth keeping:</b> the "a held rune for two of lower
+rarity" conversion needs a rune to be <i>surrendered</i>, and nothing in the project has ever
+removed a rune from a hero — <code>equipped</code> has exactly one writer and the pouch only
+grows. Building a removal path for one event would put a second, untested writer beside the
+one careful one.</p>
 
 <h3>3c. Attrition and potions</h3>
 <p><b>There is no resting.</b> Clearing any encounter heals the party <b>15% of max HP</b>
@@ -201,26 +274,33 @@ one zone from its own authored candidate pool — zones are designed FOR a posit
 slot it can host. The current pools run fixed: 1. Forest of Old (roster 1) → 2. The
 Scarlands (roster 2) → 3. Forest of Old as the finale (tougher roster 3 — behemoths walk
 the old woods). Random slot draws sit behind the DOD_ZONE_ROTATION=1 flag until each
-pool holds ~2 candidates; every zone keeps the same 12-encounter shape so the talent
-economy never shifts. Deeper-slot enemies are tinted redder, and the slot sets
+pool holds ~2 candidates; every zone keeps the same 16-slot generated shape. Deeper-slot enemies are tinted redder, and the slot sets
 the stat multiplier (§4.3). The finale's boss — the <b>Withered Warden</b> again, by
 design — is the FINAL boss: the run ends on its death.</li>
 <li><b>Zone completion:</b> killing zone 1's or zone 2's boss awards a relic unlock, gold,
 1 talent point, an <b>ability pick for every hero</b> (§6a), and fully restores the party
 (HP and Mana) before the descent.</li>
-<li><b>Map screen:</b> zone art background, the road with a <b>position readout</b>
-("Zone 2 of 3 — encounter 7 of 12 (19 of 36) — the Ash Tyrant waits"), and <b>all four hero
-stat cards</b>. Each card carries portrait, spec name, HP bar with numbers, resource bar,
-<b>three rune slots</b> (filled or empty — click one to open that hero's pouch), an
-<b>&#9670;N ability-upgrade count</b> alongside them (hidden at zero; hovering it lists them
-as "Overpower — Honed", one per line — it takes no click of its own), and an
-unspent-talent badge; <b>clicking a card opens that hero's talent tree and full sheet</b>.
-Owed ability picks, ability upgrades and rune picks are resolved <b>on the card itself</b>.
-Also on screen: gold, the interactive potion inventory (§3c), and the burger menu (Restart
-Run / Glossary / Quit to Main Menu / Quit to Desktop). There is no Party button and no
-separate Party screen. The cleared stretch of road is lit gold, cleared dots are dim green,
-the next dot wears its full type colour and is the only one clickable, everything ahead
-recedes grey.</li>
+<li><b>Map screen:</b> zone art background, a <b>position readout</b>
+("Zone 2 of 3 — encounter 7 of 16 (23 of 48) — the Ash Tyrant waits"), the <b>lattice</b>,
+and <b>all four hero stat cards</b>.
+<br><b>The cards sit on the LEFT EDGE, stacked</b> (Batch BK), so the right two thirds belong
+to the map. Each carries portrait, spec name, HP bar with numbers, resource bar, <b>three rune
+slots</b> (filled or empty — click one to open that hero's pouch), an <b>&#9670;N
+ability-upgrade count</b> (hidden at zero; hovering it lists them as "Overpower — Honed", one
+per line — it takes no click of its own), and an unspent-talent badge; <b>clicking a card
+opens that hero's talent tree and full sheet</b>. An owed ability pick, ability upgrade or
+rune pick puts a <b>CHOOSE</b> button on the card which opens a <b>three-choice overlay</b>
+— the card lost 74 pixels of height in the move to the left edge and three choice buttons no
+longer fit inside it, and the overlay is the pattern the rune pouch already set. Each choice
+shows its full description under it rather than behind a hover.
+<br><b>The lattice</b> reads LEFT TO RIGHT inside a clipped viewport with a horizontal
+scrollbar, so <b>the whole zone can be read before the first step</b>. Edges are drawn.
+Cleared nodes are dim green and their edges gold; the nodes the party may step onto wear their
+full type colour, are larger, and are the only ones clickable; the road ahead recedes grey;
+and <b>a node this route can no longer reach is drawn nearly out</b>, which is the only way a
+player sees what the last step cost. Also on screen: gold, the interactive potion inventory
+(§3c), and the burger menu (Restart Run / Glossary / Quit to Main Menu / Quit to Desktop).
+There is no Party button and no separate Party screen.</li>
 </ul>
 
 <h2>4. Combat System</h2>
@@ -1316,13 +1396,18 @@ shelf says so, and taking one locks the other two with a tooltip naming what bar
 ranked investment, no escalating price curve. <b>A complete tree is 8 nodes.</b></p>
 <p><b>Economy:</b> <b>1 point for choosing a spec</b> (paid the moment the awakening is
 confirmed), then <b>1 apiece from every elite, mini-boss and boss</b> — the end boss
-included. Regular fights award none. A zone holds 4 point-paying encounters (2 elites, a
-mini-boss, a boss), so a three-zone run pays <b>12 from the road plus the awakening's 1 =
-13</b>, against a complete tree of 8. <b>The surplus buys row flexibility</b>, and it does so
-by arithmetic rather than by a second wallet: rows are mutually exclusive and there are only
-eight of them, so a purse can open at most 8 rows and anything beyond that has nowhere to go
-<i>but</i> second nodes in rows already picked. (The Waystone Shard relic's +3 at run start
-and the point-granting events are earliness, not extra nodes.)</p>
+included. Regular fights award none. <b>Batch BK made this a function of the route.</b> A zone
+holds a mini-boss and a boss the player cannot avoid and <b>six elites they route toward or
+past</b>, so a three-zone run pays a <b>floor of 6 plus the awakening's 1 = 7</b>, and a
+measured <b>10.9 (greedy) / 10.8 (balanced) / 6.0 (cautious)</b> per hero per run against a
+complete tree of 8 (n=150 each). AN's flat 12-from-the-road (13 with the awakening) was the fixed
+two-elites-a-zone line and is <b>superseded</b>. <b>The surplus buys row flexibility</b>, and
+it does so by arithmetic rather than by a second wallet: rows are mutually exclusive and there
+are only eight of them, so a purse can open at most 8 rows and anything beyond that has
+nowhere to go <i>but</i> second nodes in rows already picked. Under a cautious route the purse
+can now fall <i>short</i> of a complete tree, which is the elite economy working: a route that
+skips the paydays arrives with fewer nodes. (The Waystone Shard relic's +3 at run start and the
+point-granting events are earliness, not extra nodes.)</p>
 <p><b>THE SURPLUS buys second nodes.</b> With 13 points against 8 rows, five points cannot
 open anything — so they buy a <b>second node in a row already picked</b>, forcing that one
 row's door back open. <b>The third node in that row stays shut forever.</b> A separate
@@ -1527,14 +1612,42 @@ Elemental Weakness the resist reduction, Unrelenting Assault its borrowed Consti
 <ul>
 <li><b>Gold:</b> start 60 (+80 with Gravewrought Coin). Fight 45–60, elite and mini-boss
 80–100, boss 110–130.</li>
-<li><b>Talent points:</b> spec choice 1, then elite 1 / mini-boss 1 / boss 1 and fight 0 —
-4 a zone, 12 a run, 13 with the awakening, against a complete tree of 8 (§7).</li>
+<li><b>Talent points:</b> spec choice 1, then elite 1 / mini-boss 1 / boss 1 and fight 0.
+<b>Since Batch BK this is a function of the route</b>, not a constant: the guaranteed floor is
+2 a zone (mini-boss + boss) = 6 a run, 7 with the awakening, and every elite the route reaches
+adds one. Measured earned per hero per run (n=150 each): <b>10.9 greedy, 10.8 balanced, 6.0
+cautious</b>, against a complete tree of 8 (§7). The old figure of 12 (13 with the awakening)
+was AN's fixed two-elites-a-zone line and is <b>superseded</b>. Note these are per RUN, and a
+run that dies early earns less of everything: per slot actually walked the three read
+<b>0.36 / 0.34 / 0.23</b>.</li>
 <li><b>Abilities:</b> <b>two picks per run</b>, from zone 1's and zone 2's bosses, three
 offered each time and drawn from that hero's <b>spec pool only</b>. The end boss awards none.
 Each <b>mini-boss</b> instead awards a <b>generic ability upgrade</b>, three offered — three a
 run (see §6a).</li>
 <li><b>Consumable prices:</b> Health 30, Mana 30, Bomb 45, Revive 80, Defense 40. Starting
 inventory: 2 Health, 1 Mana, 1 Bomb, 1 Revive, 1 Defense.</li>
+<li><b>The blacksmith &mdash; the gold sink</b> (Batch BK). Batch BJ measured <b>63% of every
+run's gold going unspent</b>, with 13.6 shop-rune refusals a run for <i>no free slot</i>
+against 6.8 for the gold reserve: <b>slots were the binding constraint, not prices</b>, so no
+amount of extra shop stock could have fixed it. <b>A blacksmith consumes no slot.</b> It sells
+the ability upgrade Batch AP already wired, three pairings on the counter, one hero each, and
+<b>one purchase ends the visit</b> &mdash; it is not a shop you clear.
+<br><b>Gold only</b>: no HP cost and no second currency, because the economy needed a
+<i>pure</i> sink. <b>Price scales with the zone: 150 / 225 / 300.</b> The arithmetic behind
+those numbers, so a later batch can argue with it rather than re-derive it: 2386 earned and
+881 spent a run at 36 encounters is 1505 dead gold; at 48 encounters that scales to ~2050
+before the merchant's frequency change makes it worse; six visits at these prices is 1350.
+<br><b>AP's once-per-run rule does not apply here.</b> That rule governs the mini-boss pick
+pool; a blacksmith is not that pool. A player may buy the same upgrade type more than once in
+a run <i>on different abilities</i>, and a purchase neither consumes a mini-boss pick nor
+removes that upgrade from a later mini-boss offer. The never-twice-on-one-ability rule still
+holds.
+<br><b>Measured</b> (n=150 per policy, all three of which rank the blacksmith at the top of
+their non-elite order so the question has an answer): the route walks <b>6.5&ndash;7.9
+blacksmiths a run</b> and buys <b>2.4&ndash;4.1</b> of them &mdash; the rest are refused for
+want of gold, which is a sink doing exactly what a sink is for. It converts <b>41&ndash;47% of
+all income</b> (931 gold greedy, 904 balanced, 508 cautious). <b>Unspent gold at run end falls
+from Batch BJ's 63% to 25&ndash;28%.</b></li>
 <li><b>Runes</b> (run-scoped gear, bought at the Peddler or chosen from elite caches — the
 in-run power source that scales with depth): an <b>authored pool</b> (data/runes.json).
 <b>Rarity means kind, not magnitude:</b> Common = flat stat adds (the six generated
@@ -1976,20 +2089,23 @@ zone 1: read the LOW budgets off this. <i>All four force-learned into full 8-nod
 is exactly a full path: read the TOP budget off this. A single build level makes either the
 early game or the late game look wrong for a reason that is not real.</li>
 <li><b>Run harness:</b> <code>./sim.sh --run N</code> (DOD_SIM_RUN=N, default 50) plays
-N COMPLETE runs headlessly — the real 36-encounter road, real warbands at real budgets
+N COMPLETE runs headlessly — the real generated 48-encounter map, real warbands at real budgets
 WITH enemy tier scaling and the zone slot multiplier, HP/mana/items carried between
 battles, talent points earned and spent, elite runes and boss picks collected, all three
 zone slots — and prints the run report: completion/wipe rates, wipe distribution,
 per-slot win/death/HP averages, and the measured party-vs-warband power table (the
 progression counterweight, measured instead of modelled), plus the run economy: gold
 earned/spent/unspent, items used and carried unused, merchants met and events fired, and
-<b>which bargains the bot accepted with their average severity</b> — the one agency a run
-has left, and so the most diagnostic line in the report. The bot is dumb on purpose; every
+<b>which bargains the bot accepted with their average severity</b>. The bot is dumb on purpose; every
 policy is printed in the report header. Its bargain policy is severity-extreme: it takes
 the harshest option offered while the party is above 60% average HP and the mildest once
 it is below, which exercises both ends of the table without pretending to model a payoff.
-DOD_SIM_ROUTE is retained but has nothing left to choose — a line has no route decision,
-and the report's "choice" figure reads 0% forever by design rather than being deleted.
+<b>DOD_SIM_ROUTE is a real axis again</b> (Batch BK) after eleven batches in which the
+three policies were three samples of one walk: <code>greedy</code> takes every elite it can
+reach, <code>cautious</code> takes one only when nothing else is offered, <code>balanced</code>
+sits between, and all three rank the blacksmith at the top of the non-elite order so the
+gold-sink question has an answer. <code>default</code> aliases balanced and <code>elites</code>
+aliases greedy, because every old sim script names them.
 Shops are played by policy (heal-first:
 any hero under 50% HP buys a Health Potion; then the priciest affordable offer not
 already carried, runes included but only onto a member with a free slot, equipped at
@@ -2002,10 +2118,11 @@ lane each spec buys down (default: the tree's first lane, cheapest node first, c
 the moment its gate opens), DOD_SIM_TROPHIES lists preferred ability picks (default:
 the first offer entry), and DOD_SIM_RELICS arms relics at the draft. <b>DOD_SIM_MAP,
 DOD_SIM_MINIBOSS, DOD_SIM_START_RUNE and DOD_SIM_SPEC_OPENING are retired</b> — the
-branching map, the dealt mini-boss row and the opening rune pick they controlled no longer
-exist, so a Matrix row now reads <code>map=line</code> and carries no such fields. <b>Rows
-from before the road are not comparable with rows after it:</b> even <code>depth</code>
-changed units (36 encounters, not 33 tiers). Still excluded,
+dealt mini-boss row and the opening rune pick they controlled no longer exist, so a Matrix
+row reads <code>map=branch</code> (Batch BK; <code>map=line</code> is an AN-to-BJ row) and
+carries no such fields. <b>Rows from before Batch BK are not comparable with rows after it:</b>
+<code>depth</code> is out of 48 slots rather than 36, and <code>choice=</code> went from a
+structural 0% to a measured one. Still excluded,
 stated in the output: bomb/revive/defense/mana items are never used in battle, no
 pre-emptive or offensive item use, routing sees one tier ahead only, and shop rune
 picks ignore build synergy. Simulated runs live entirely in memory (Run.sim_run): they
@@ -2013,7 +2130,7 @@ never touch the player's save, relic unlocks, or profile.</li>
 <li><b>Testing shortcuts:</b> debug tools are ALWAYS available in dev (unexported) builds;
 exported builds require DOD_DEBUG=1 (and DOD_DEBUG=0 forces the gate shut in a dev build,
 which is how the headless tests stand where an exported build stands). The map burger menu
-gains a DEBUG section — +200 gold, +200 talent points for everyone, full heal, jump to the boss tier,
+gains a DEBUG section — +200 gold, +200 talent points for everyone, full heal, walk to the boss slot,
 advance to the next zone, <b>Reroll Specs</b> (refunds spent talent points, clears all
 specs, and reopens the awakening screen), and an <b>All Spec Abilities Unlocked</b> toggle
 (while checked, battles spawn with every talent-gated and trophy ability pre-granted —
@@ -2104,6 +2221,21 @@ three without them.</li>
 <li>Difficulty tuning is pending an honest baseline: the old "~100% win rate" figure
 measured a single fixed unscaled lineup and carried no information. The sweep
 (<code>./sim.sh --sweep</code>) now reads win rate per budget; tuning decisions design
-against that curve plus playtests.</li>
+against that curve plus playtests. <b>Batch BK reset every run-level baseline</b> — 48
+encounters rather than 36, a route that can be walked well or badly, and elite payouts that
+are now earned rather than issued — so the whole run curve wants re-reading before anything is
+tuned against it.</li>
+<li><b>Is the elite paid correctly?</b> The whole map exists to express the trade: three
+elites is three modifiers, three rune caches and three talent points against arriving at the
+mini-boss wounded. Measured at n=150 a route, greedy and balanced are indistinguishable
+(0.70&sigma; on completions) and both beat cautious decisively (3.5&sigma; and 4.2&sigma;)
+&mdash; so ducking every elite is already the losing play, but whether <i>hunting</i> them is
+the winning one is below this instrument's resolution. It wants either a larger n or a policy
+pair further apart on the elite axis than greedy and balanced turned out to be (6.47 elites a
+run against 6.00).</li>
+<li><b>A rune has never been removed from a hero.</b> The equipped flag has one writer and
+the pouch only grows, which is why Batch BK's event vocabulary can grant a rune but not take
+one &mdash; and why the "trade a held rune for two of lower rarity" conversion is unwritten.
+Whenever a design wants that, the removal path is the piece to build carefully and once.</li>
 </ul>
 </body></html>

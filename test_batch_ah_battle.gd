@@ -366,27 +366,49 @@ func _test_owed_badges() -> void:
 	run.award_ability_pick(run.party[0])
 	run.award_ability_pick(run.party[2])
 	ok(run.owed_ability_picks() == 2, "two owed after two awards")
-	# BATCH AN MOVED THE AFFORDANCE, so the check follows it. The Party
-	# button and its hero list are gone: all four cards live on the map, and
-	# an owed pick is resolved ON the card. Both halves of the old chain are
-	# still here — the map says who is owed something, and the buttons that
-	# resolve it are on the same screen — they are just one screen now.
+	# BATCH AN MOVED THE AFFORDANCE ONTO THE MAP CARD AND BATCH BK MOVED THE
+	# RESOLUTION ONE STEP FURTHER, so the check follows it again. The card lost
+	# 74 pixels of height when the cards went to the left edge, so three choice
+	# buttons no longer fit inside one: an owed pick is a CHOOSE button on the
+	# card that opens a three-choice overlay. BOTH HALVES OF THE CHAIN ARE
+	# STILL WHAT IS BEING ASSERTED — the map says who is owed something, and
+	# the thing that resolves it is one click away on the same screen — so the
+	# check counts the CHOOSE buttons and then opens one and counts the offers
+	# inside it. Counting only the button would be the test quietly giving up
+	# on the half that matters.
 	var map_scene: Node = load("res://scenes/map.tscn").instantiate()
 	root.add_child(map_scene)
 	for _i in 6:
 		await process_frame
-	var headings := 0
-	var offer_buttons := 0
+	var choose_buttons := 0
 	var walk: Array = [map_scene]
 	while not walk.is_empty():
 		var n: Node = walk.pop_back()
 		for c in n.get_children():
 			walk.append(c)
-		if n is Label and String(n.get("text")).contains("NEW ABILITY"):
-			headings += 1
-		if n is Button and String(n.get("text")).contains("1 ability"):
+		if n is Button and String(n.get("text")).contains("CHOOSE — ability"):
+			choose_buttons += 1
+	ok(choose_buttons == 2,
+		"both owed heroes show a CHOOSE button ON their card (got %d)" % choose_buttons)
+	# ...and the overlay it opens really does hold that hero's three offers.
+	map_scene._open_pick_overlay(0)
+	await process_frame
+	var heading_found := false
+	var offer_buttons := 0
+	var offered: Array = (run.party[0].get("bm_candidates", []) as Array)
+	var names: Array = offered[0] if not offered.is_empty() else []
+	walk = [map_scene]
+	while not walk.is_empty():
+		var n2: Node = walk.pop_back()
+		for c2 in n2.get_children():
+			walk.append(c2)
+		if n2 is Label and String(n2.get("text")).contains("NEW ABILITY"):
+			heading_found = true
+		if n2 is Button and names.has(String(n2.get("text"))):
 			offer_buttons += 1
-	ok(headings == 2, "both owed heroes show the pick ON their card (got %d)" % headings)
+	ok(heading_found, "the overlay names the pick")
+	ok(offer_buttons == names.size(),
+		"...and offers all %d candidates (got %d)" % [names.size(), offer_buttons])
 	# The badge line names the count on each owed card.
 	var badges := 0
 	walk = [map_scene]

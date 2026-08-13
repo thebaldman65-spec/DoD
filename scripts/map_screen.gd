@@ -1,19 +1,32 @@
-# The run map (Batch AN, flipped in AO): a FIXED LINE of 12 slots for the
-# current zone, rendered LEFT TO RIGHT — slot 1 on the left edge, the boss on
-# the right. There is no route to plan: the only forward move is the next
-# dot, and the run's decisions live on the offer screen that precedes every
-# elite and mini-boss.
+# The run map (Batch BK): a GENERATED 3-ROW LATTICE of 16 slots for the
+# current zone, rendered LEFT TO RIGHT — column 1 on the left edge, the boss
+# on the right, with the drawn edges between them. Batch AN's fixed line is
+# gone and so is AO's two-constant flip; the direction is still left to right,
+# and it is now a property of the lattice loop rather than of a sign.
 #
-# THIS SCREEN IS ALSO THE PARTY SCREEN NOW. All four hero stat cards live
-# here rather than behind a Party button — HP, resource, three rune slots,
-# unspent points — and the potion inventory is INTERACTIVE (§6). Clicking a
-# card opens that hero's talent tree; clicking a rune slot opens the pouch.
+# WHAT THE SCREEN HAS TO SHOW, and every layout decision below follows from
+# it: the WHOLE zone, before the first step. A route is only planned if it can
+# be read, so the lattice scrolls horizontally inside a clipped viewport and
+# nothing about a node is hidden — type, warband, and (the part that makes
+# foreclosure legible at all) WHETHER IT IS STILL REACHABLE FROM WHERE THE
+# PARTY STANDS. A node a step has closed off is drawn nearly out, which is the
+# only way a player sees the cost of the step they just took.
+#
+# THIS SCREEN IS ALSO THE PARTY SCREEN. All four hero stat cards live here
+# rather than behind a Party button — HP, resource, three rune slots, unspent
+# points — and the potion inventory is INTERACTIVE. §5 moves the cards to the
+# LEFT EDGE, stacked, so the whole right two thirds belongs to the map.
+# Clicking a card opens that hero's sheet (talents, abilities, runes); clicking
+# a rune slot opens the pouch; an owed pick opens its own overlay, because a
+# compact card has no room for three choice buttons and an overlay is the
+# pattern the pouch already set.
 extends Node2D
 
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
 const NODE_LABELS := {
 	"fight": "Fight", "elite": "ELITE", "boss": "BOSS", "miniboss": "WARDEN",
+	"blacksmith": "Smith", "merchant": "Trade", "event": "???",
 }
 const NODE_COLORS := {
 	"fight": Color(0.75, 0.72, 0.65), "elite": Color(0.95, 0.55, 0.3),
@@ -21,15 +34,42 @@ const NODE_COLORS := {
 	# Between the elite's orange and the boss's red, because that is exactly
 	# where the slot sits.
 	"miniboss": Color(0.95, 0.42, 0.32),
+	"blacksmith": Color(0.85, 0.68, 0.35),
+	"merchant": Color(0.45, 0.82, 0.55),
+	# §4: ONE icon and ONE colour for all three event kinds. A tradeoff, a
+	# boon and a bane are indistinguishable on the board on purpose — a
+	# visibly-bad node is a wall with extra steps, not a gamble.
+	"event": Color(0.72, 0.55, 0.95),
 }
 
-# The line's geometry. Slot 0 sits at SLOT_X_START and each later slot steps
-# RIGHT by SLOT_X_STEP — the whole left-to-right reading is these two
-# numbers, and flipping the map is negating the step and moving the start.
-const SLOT_X_START := 84.0
-const SLOT_X_STEP := 98.0
-const SLOT_Y := 250.0
-const DOT_R := 15.0
+# The lattice geometry. Column c sits at LAT_X0 + c * LAT_X_STEP inside the
+# scrolled content; row r at LAT_Y0 + r * LAT_Y_STEP. The content is wider
+# than the viewport by design — see _draw_lattice.
+const LAT_X0 := 44.0
+const LAT_X_STEP := 78.0
+const LAT_Y0 := 46.0
+const LAT_Y_STEP := 128.0
+const NODE_W := 68.0
+const NODE_H := 30.0
+# The viewport the lattice is clipped to: the right two thirds, above the
+# potion footer.
+const VIEW_X := 316.0
+const VIEW_Y := 84.0
+const VIEW_W := 956.0
+const VIEW_H := 452.0
+
+# How far the lattice is scrolled, kept across the redraws a pick or a potion
+# triggers — a screen that jumped back to column 1 every time a point was
+# spent would be unusable. NEGATIVE means "not placed yet": the first draw of
+# a scene centres on the party's own column, and every redraw after it holds
+# where the player left it.
+var _map_scroll := -1.0
+# Every lattice control, with the content x-range it occupies. `clip_contents`
+# clips DRAWING and nothing else: a button scrolled out of the viewport is
+# invisible but still takes clicks and still shows its tooltip, in a strip
+# beside the hero cards where nothing appears to be. Input is clipped by hand
+# in _clip_lattice_input, called on every scroll.
+var _lattice_controls: Array = []
 
 # Debug-only-reachable slots (Batch AC) wear this outline — a colour no
 # slot type and no slot state uses.
@@ -81,19 +121,22 @@ func _maybe_show_framing() -> bool:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(title)
 	var body := Label.new()
-	body.text = ("A run is a road of 36 encounters — three zones of twelve, and\n" +
-		"every zone has the same shape. The road reads LEFT TO RIGHT: you\n" +
-		"start at the left edge and the zone's boss waits on the right.\n\n" +
-		"Two ELITES, one MINI-BOSS and the BOSS stand in every zone, and\n" +
-		"each of them pays a talent point. Ordinary fights pay none.\n\n" +
+	body.text = ("A run is 48 encounters — three zones of sixteen. A zone is a\n" +
+		"MAP, not a road: three ways forward at a time, reading LEFT TO\n" +
+		"RIGHT, converging on the MINI-BOSS in the middle and the BOSS at\n" +
+		"the end. Scroll it and read the whole zone before you step.\n\n" +
+		"Nothing is guaranteed on a route. Step down a row and the corridor\n" +
+		"above you is closed for the next few columns — that IS the choice.\n\n" +
+		"ELITES pay a talent point and a rune, and cost you health. The\n" +
+		"SMITH sells ability upgrades for gold. TRADE is the Peddler. ??? is\n" +
+		"something standing on the road, and you will not know what until\n" +
+		"you stand on it.\n\n" +
 		"Before every elite and mini-boss you are offered THREE BARGAINS: a\n" +
-		"condition that binds both sides of the battle, and what clearing\n" +
-		"it under that condition pays. The harder the condition, the richer\n" +
-		"the payment — and one of the three is always survivable.\n\n" +
-		"Clearing any encounter heals the party 15%. There is no resting.\n\n" +
-		"Death ends the run and takes everything — gold, talents, runes.\n" +
-		"But every boss you fell leaves a RELIC behind, unlocked forever.\n\n" +
-		"Hover any dot to scout it. Click a hero to open their talents.")
+		"condition that binds both sides of the battle, and what clearing it\n" +
+		"under that condition pays — one of the three is always survivable.\n\n" +
+		"Clearing any encounter heals the party 15%. There is no resting.\n" +
+		"Death ends the run and takes everything, but every boss you fell\n" +
+		"leaves a RELIC behind, unlocked forever.")
 	body.add_theme_font_size_override("font_size", 15)
 	body.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
 	vbox.add_child(body)
@@ -109,8 +152,13 @@ func _maybe_show_framing() -> bool:
 	return true
 
 
-func _slot_pos(slot: int) -> Vector2:
-	return Vector2(SLOT_X_START + slot * SLOT_X_STEP, SLOT_Y)
+# Where a node sits INSIDE the scrolled content. The mini-boss and the boss
+# hold one node each and are drawn on the middle row; a branching slot's node
+# uses its stored `row`, so a pruned column keeps the gaps that make the
+# lattice read as authored rather than as a grid.
+func _node_pos(slot: int, node: Dictionary) -> Vector2:
+	return Vector2(LAT_X0 + slot * LAT_X_STEP,
+		LAT_Y0 + int(node.get("row", 1)) * LAT_Y_STEP)
 
 
 func _draw_screen() -> void:
@@ -142,7 +190,7 @@ func _draw_screen() -> void:
 	add_child(dim)
 
 	_draw_header()
-	_draw_line()
+	_draw_lattice()
 	_draw_hero_cards()
 	_draw_footer()
 
@@ -164,10 +212,10 @@ func _draw_header() -> void:
 	var subtitle := Label.new()
 	var here := Run.slot_idx + 1
 	if here < 1:
-		subtitle.text = "Zone %d of %d — 12 encounters to the %s" % [
+		subtitle.text = "Zone %d of %d — 16 encounters to the %s" % [
 			Run.zone_idx + 1, Run.SLOT_COUNT, boss_name]
 	else:
-		subtitle.text = "Zone %d of %d — encounter %d of %d (%d of 36) — the %s waits" % [
+		subtitle.text = "Zone %d of %d — encounter %d of %d (%d of 48) — the %s waits" % [
 			Run.zone_idx + 1, Run.SLOT_COUNT, here, Run.SLOTS_PER_ZONE,
 			Run.run_slot_number(), boss_name]
 	subtitle.add_theme_font_size_override("font_size", 15)
@@ -216,72 +264,89 @@ func _draw_header() -> void:
 	add_child(burger)
 
 
-# ---------- the line ----------
+# ---------- the lattice ----------
 
-func _draw_line() -> void:
-	# The road itself, drawn behind the dots. One straight run — the cleared
-	# stretch is lit, the road ahead is dark.
-	var road := Line2D.new()
-	road.add_point(_slot_pos(0))
-	road.add_point(_slot_pos(Run.SLOTS_PER_ZONE - 1))
-	road.width = 3.0
-	road.default_color = Color(0.32, 0.28, 0.38, 0.55)
-	add_child(road)
-	if Run.slot_idx >= 0:
-		var walked := Line2D.new()
-		walked.add_point(_slot_pos(0))
-		walked.add_point(_slot_pos(Run.slot_idx))
-		walked.width = 5.0
-		walked.default_color = Color(0.85, 0.72, 0.35, 0.8)
-		add_child(walked)
+# The whole zone, drawn once, inside a clipped viewport that scrolls. Order
+# matters: edges first so nodes sit on top of them, then the nodes, then the
+# scrollbar outside the clip.
+func _draw_lattice() -> void:
+	_lattice_controls = []
+	var view := Control.new()
+	view.position = Vector2(VIEW_X, VIEW_Y)
+	view.size = Vector2(VIEW_W, VIEW_H)
+	# The one line that makes horizontal scrolling possible without the
+	# lattice drawing over the hero cards.
+	view.clip_contents = true
+	view.mouse_filter = Control.MOUSE_FILTER_PASS
+	add_child(view)
+	var inner := Node2D.new()
+	view.add_child(inner)
 
+	var content_w: float = LAT_X0 * 2.0 + (Run.SLOTS_PER_ZONE - 1) * LAT_X_STEP \
+		+ NODE_W
+	var max_scroll: float = maxf(content_w - VIEW_W, 0.0)
+	# Centre the party's own column on entry, then hold wherever the player
+	# left it. A fresh zone opens at the left edge, which is where column 1 is.
+	if _map_scroll < 0.0:
+		_map_scroll = clampf(LAT_X0 + maxi(Run.slot_idx, 0) * LAT_X_STEP
+			- VIEW_W * 0.5, 0.0, max_scroll)
+	_map_scroll = clampf(_map_scroll, 0.0, max_scroll)
+	inner.position = Vector2(-_map_scroll, 0.0)
+
+	# WHAT IS STILL REACHABLE from where the party stands. Before the first
+	# step every entry node is; after it, this is the set a step has left —
+	# and everything outside it is what the step cost.
+	var live := {}
+	if Run.slot_idx < 0:
+		for j in Run.map[0].size():
+			live["0,%d" % j] = true
+			_merge_reach(live, Run.reachable_from(0, j))
+	else:
+		live = Run.reachable_from(Run.slot_idx, Run.node_idx)
 	var next_slot: int = Run.slot_idx + 1
 	var free_travel: bool = Run.debug_enabled() and Run.debug_free_travel
+	var reach: Array = Run.reachable()
+
 	for s in Run.SLOTS_PER_ZONE:
-		var slot: Dictionary = Run.map[s]
-		var ty := String(slot["type"])
-		var center := _slot_pos(s)
-		var is_next: bool = s == next_slot
-		var debug_only: bool = free_travel and not is_next and not slot["visited"]
+		for j in Run.map[s].size():
+			var node: Dictionary = Run.map[s][j]
+			var from_pos := _node_pos(s, node) + Vector2(NODE_W * 0.5, NODE_H * 0.5)
+			for t in node.get("next", []):
+				var target: Dictionary = Run.map[s + 1][int(t)]
+				var edge := Line2D.new()
+				edge.add_point(from_pos)
+				edge.add_point(_node_pos(s + 1, target)
+					+ Vector2(NODE_W * 0.5, NODE_H * 0.5))
+				var walked: bool = bool(node["visited"]) and bool(target["visited"])
+				var open_edge: bool = live.has("%d,%d" % [s, j])
+				edge.width = 4.0 if walked else 2.0
+				if walked:
+					edge.default_color = Color(0.85, 0.72, 0.35, 0.85)
+				elif open_edge:
+					edge.default_color = Color(0.42, 0.38, 0.5, 0.75)
+				else:
+					edge.default_color = Color(0.2, 0.19, 0.24, 0.5)
+				inner.add_child(edge)
 
-		var btn := Button.new()
-		btn.text = NODE_LABELS.get(ty, ty)
-		var w: float = 86.0 if is_next else 74.0
-		btn.custom_minimum_size = Vector2(w, 32.0)
-		btn.position = center - Vector2(w / 2.0, 16.0)
-		btn.disabled = not (is_next or debug_only)
-		btn.add_theme_font_size_override("font_size", 14 if is_next else 11)
-		if debug_only:
-			_add_debug_outline(btn.position, Vector2(w, 32.0))
-		# Three states, three clearly separate reads: cleared is history (dim
-		# green), the next slot is THE option (full colour, bigger), the road
-		# ahead recedes into the dark.
-		if slot["visited"]:
-			btn.modulate = Color(0.48, 0.66, 0.48)
-		elif is_next:
-			btn.modulate = NODE_COLORS.get(ty, Color.WHITE)
-		elif debug_only:
-			btn.modulate = _debug_tint(NODE_COLORS.get(ty, Color.WHITE))
-		else:
-			btn.modulate = Color(0.42, 0.40, 0.47)
-		btn.pressed.connect(Music.click)
-		btn.pressed.connect(_on_slot_pressed.bind(s))
-		btn.tooltip_text = _slot_tooltip(slot, s)
-		if debug_only:
-			btn.tooltip_text = "[DEBUG] " + btn.tooltip_text
-		add_child(btn)
+	for s in Run.SLOTS_PER_ZONE:
+		for j in Run.map[s].size():
+			_draw_node(inner, s, j, s == next_slot, reach, live, free_travel)
 
-		# The slot number under each dot: twelve near-identical dots want a
-		# ruler, whichever way the road runs.
-		var num := Label.new()
-		num.text = str(s + 1)
-		num.add_theme_font_size_override("font_size", 10)
-		num.add_theme_color_override("font_color",
-			Color(0.7, 0.66, 0.6) if is_next else Color(0.45, 0.43, 0.5))
-		num.position = center + Vector2(-w / 2.0, 18.0)
-		num.size = Vector2(w, 12)
-		num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		add_child(num)
+	if max_scroll > 0.0:
+		var bar := HScrollBar.new()
+		bar.position = Vector2(VIEW_X, VIEW_Y + VIEW_H + 2.0)
+		bar.custom_minimum_size = Vector2(VIEW_W, 14)
+		bar.size = Vector2(VIEW_W, 14)
+		bar.min_value = 0.0
+		bar.max_value = content_w
+		bar.page = VIEW_W
+		bar.value = _map_scroll
+		bar.value_changed.connect(func(v: float):
+			_map_scroll = v
+			inner.position = Vector2(-v, 0.0)
+			_clip_lattice_input())
+		add_child(bar)
+	_clip_lattice_input()
 
 	if free_travel:
 		var marker := Label.new()
@@ -290,31 +355,120 @@ func _draw_line() -> void:
 		marker.add_theme_color_override("font_color", DEBUG_OUTLINE)
 		marker.add_theme_constant_override("outline_size", 3)
 		marker.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
-		marker.position = Vector2(20, 60)
+		marker.position = Vector2(VIEW_X, 62)
 		marker.z_index = 40
 		add_child(marker)
 
 
-# What a dot says on hover. Combat slots reveal their warband and what it
+func _merge_reach(into: Dictionary, from: Dictionary) -> void:
+	for k in from:
+		into[k] = true
+
+
+# A control scrolled entirely out of the viewport stops taking input. Partly
+# visible keeps it: the half a player can see is the half they can click, and
+# refusing input to a node they can plainly see would be the worse bug.
+func _clip_lattice_input() -> void:
+	for entry in _lattice_controls:
+		var ctrl: Control = entry["ctrl"]
+		if not is_instance_valid(ctrl):
+			continue
+		var left: float = float(entry["x0"]) - _map_scroll
+		var right: float = float(entry["x1"]) - _map_scroll
+		ctrl.mouse_filter = Control.MOUSE_FILTER_IGNORE \
+			if right <= 0.0 or left >= VIEW_W else Control.MOUSE_FILTER_STOP
+
+
+# FOUR STATES, four clearly separate reads, and the fourth is the new one:
+# cleared is history (dim green), a node the party may step onto is THE option
+# (full colour, bigger), the road ahead recedes into the dark, and a node this
+# route can no longer reach is nearly gone.
+func _draw_node(inner: Node2D, s: int, j: int, is_next: bool, reach: Array,
+		live: Dictionary, free_travel: bool) -> void:
+	var node: Dictionary = Run.map[s][j]
+	var ty := String(node["type"])
+	var at := _node_pos(s, node)
+	var open_now: bool = is_next and (reach.has(j) or free_travel)
+	var debug_only: bool = free_travel and is_next and not reach.has(j)
+	var reachable_still: bool = live.has("%d,%d" % [s, j])
+
+	var btn := Button.new()
+	btn.text = String(NODE_LABELS.get(ty, ty))
+	var w: float = NODE_W + 8.0 if open_now else NODE_W
+	btn.position = at - Vector2((w - NODE_W) * 0.5, 0.0)
+	btn.custom_minimum_size = Vector2(w, NODE_H)
+	btn.size = Vector2(w, NODE_H)
+	btn.disabled = not open_now
+	btn.add_theme_font_size_override("font_size", 13 if open_now else 11)
+	if node["visited"]:
+		btn.modulate = Color(0.48, 0.66, 0.48)
+	elif debug_only:
+		btn.modulate = _debug_tint(NODE_COLORS.get(ty, Color.WHITE))
+	elif open_now:
+		btn.modulate = NODE_COLORS.get(ty, Color.WHITE)
+	elif reachable_still:
+		btn.modulate = Color(0.52, 0.50, 0.58)
+	else:
+		btn.modulate = Color(0.26, 0.25, 0.30)
+	btn.pressed.connect(Music.click)
+	btn.pressed.connect(_on_node_pressed.bind(j))
+	btn.tooltip_text = _node_tooltip(node, s, reachable_still)
+	if debug_only:
+		btn.tooltip_text = "[DEBUG] " + btn.tooltip_text
+	inner.add_child(btn)
+	_lattice_controls.append({"ctrl": btn, "x0": btn.position.x,
+		"x1": btn.position.x + w})
+	if debug_only:
+		_add_debug_outline_at(inner, btn.position, Vector2(w, NODE_H))
+
+	# The column number under each node: sixteen slots and three rows want a
+	# ruler, and "which encounter is this" is the first thing a player asks.
+	var num := Label.new()
+	num.text = str(s + 1)
+	num.add_theme_font_size_override("font_size", 10)
+	num.add_theme_color_override("font_color",
+		Color(0.7, 0.66, 0.6) if open_now else Color(0.42, 0.40, 0.47))
+	num.position = at + Vector2(0, NODE_H + 2.0)
+	num.size = Vector2(NODE_W, 12)
+	num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	num.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	inner.add_child(num)
+
+
+# What a node says on hover. Combat nodes reveal their warband and what it
 # resists / crumples to — mini-bosses and the boss show their TYPE but not
 # their identity, because learning which pair you drew by fighting the
-# mini-boss is the point (§1).
-func _slot_tooltip(slot: Dictionary, s: int) -> String:
-	var ty := String(slot["type"])
+# mini-boss is the point. The three EVENT kinds share one line: an event that
+# announced itself as a bane would never be walked onto.
+func _node_tooltip(node: Dictionary, s: int, reachable_still: bool) -> String:
+	var ty := String(node["type"])
+	var closed := "" if reachable_still or bool(node["visited"]) \
+		else "\n\nNo longer reachable from where the party stands."
 	if ty in ["miniboss", "boss"]:
 		var what := "A mini-boss holds the middle of the zone." if ty == "miniboss" \
 			else "The zone's boss. Nothing goes around it."
 		var tail := "\n\nA bargain is offered before it." if ty == "miniboss" else ""
 		return "%s\nYou will not know which until you meet it.%s" % [what, tail]
 	var head := "Encounter %d of %d" % [s + 1, Run.SLOTS_PER_ZONE]
+	match ty:
+		"blacksmith":
+			return ("%s — THE BLACKSMITH\nThree ability upgrades on the counter, " +
+				"gold only.\nOne purchase and the visit is over. %d gold here.%s") % [
+					head, Run.blacksmith_price(), closed]
+		"merchant":
+			return ("%s — THE PEDDLER\nPotions, and one rune offered to each hero " +
+				"who has\na free slot.%s") % [head, closed]
+		"event":
+			return ("%s — ???\nSomething stands on the road. It may want to trade, " +
+				"it\nmay be a gift, and it may simply cost you.%s") % [head, closed]
 	var bargain := ""
 	if ty == "elite":
 		head += " — ELITE"
 		bargain = "\n\nA bargain is offered before this fight."
-	return "%s\n%s%s" % [head, _warband_tooltip(slot), bargain]
+	return "%s\n%s%s%s" % [head, _warband_tooltip(node), bargain, closed]
 
 
-func _add_debug_outline(at: Vector2, size: Vector2) -> void:
+func _add_debug_outline_at(parent: Node, at: Vector2, size: Vector2) -> void:
 	var frame := Panel.new()
 	frame.position = at - Vector2(3, 3)
 	frame.size = size + Vector2(6, 6)
@@ -325,7 +479,7 @@ func _add_debug_outline(at: Vector2, size: Vector2) -> void:
 	sb.border_color = DEBUG_OUTLINE
 	sb.set_corner_radius_all(4)
 	frame.add_theme_stylebox_override("panel", sb)
-	add_child(frame)
+	parent.add_child(frame)
 
 
 # The slot's own colour, pulled toward grey and dimmed: readable as "this is
@@ -336,16 +490,23 @@ func _debug_tint(c: Color) -> Color:
 		lerpf(c.b, grey, 0.65) * 0.82)
 
 
-# ---------- the hero cards (§2) ----------
+# ---------- the hero cards ----------
 
-const CARD_W := 296.0
-const CARD_H := 226.0
-const CARD_Y := 360.0
+# Batch BK §5: STACKED DOWN THE LEFT EDGE, not spread along the bottom. The
+# card lost 74 pixels of height in the move and gave them to the map; what it
+# gave up is the inline pick row, which is an overlay now (see
+# _open_pick_overlay) — three choice buttons never fit a 152-tall card and a
+# card that scrolled would be worse than a click.
+const CARD_W := 300.0
+const CARD_H := 152.0
+const CARD_X := 8.0
+const CARD_Y := 84.0
+const CARD_STEP := 158.0
 
 
 func _draw_hero_cards() -> void:
 	for i in Run.party.size():
-		_draw_hero_card(i, Vector2(14.0 + i * (CARD_W + 6.0), CARD_Y))
+		_draw_hero_card(i, Vector2(CARD_X, CARD_Y + i * CARD_STEP))
 
 
 func _draw_hero_card(idx: int, at: Vector2) -> void:
@@ -391,9 +552,9 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 
 	var portrait := TextureRect.new()
 	portrait.texture = Classes.class_icon(key, spec)
-	portrait.position = at + Vector2(10, 10)
-	portrait.custom_minimum_size = Vector2(56, 56)
-	portrait.size = Vector2(56, 56)
+	portrait.position = at + Vector2(8, 8)
+	portrait.custom_minimum_size = Vector2(44, 44)
+	portrait.size = Vector2(44, 44)
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -404,24 +565,24 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 	var name_lbl := Label.new()
 	name_lbl.text = Classes.SPEC_INFO[spec]["name"] if spec != "" \
 		else "%s — Unawakened" % key.capitalize()
-	name_lbl.add_theme_font_size_override("font_size", 16)
+	name_lbl.add_theme_font_size_override("font_size", 14)
 	name_lbl.add_theme_color_override("font_color", Color(0.9, 0.86, 0.76))
-	name_lbl.position = at + Vector2(74, 12)
-	name_lbl.size = Vector2(CARD_W - 84, 20)
+	name_lbl.position = at + Vector2(58, 7)
+	name_lbl.size = Vector2(CARD_W - 108, 18)
 	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(name_lbl)
 
 	# HP bar with numbers, then the resource bar under it.
 	var hp: int = int(member["hp"])
 	var max_hp: int = maxi(int(member["max_hp"]), 1)
-	_bar(at + Vector2(74, 36), CARD_W - 84, 16,
+	_bar(at + Vector2(58, 27), CARD_W - 66, 15,
 		float(hp) / float(max_hp),
 		Color(0.75, 0.25, 0.28) if hp > 0 else Color(0.35, 0.2, 0.22),
 		"%d / %d" % [hp, max_hp])
 	var cfg := Classes.hero_config(key)
 	var res_name := String(cfg.get("resource_name", "Mana"))
 	if res_name == "Mana":
-		_bar(at + Vector2(74, 56), CARD_W - 84, 12,
+		_bar(at + Vector2(58, 45), CARD_W - 66, 11,
 			float(member["mana"]) / float(maxi(int(member["max_mana"]), 1)),
 			Color(0.3, 0.45, 0.85), "%s %d" % [res_name, int(member["mana"])])
 	else:
@@ -429,28 +590,21 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		# an empty bar every time would be a lie about the resource.
 		var res_lbl := Label.new()
 		res_lbl.text = "%s — builds in combat" % res_name
-		res_lbl.add_theme_font_size_override("font_size", 11)
+		res_lbl.add_theme_font_size_override("font_size", 10)
 		res_lbl.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
-		res_lbl.position = at + Vector2(74, 56)
+		res_lbl.position = at + Vector2(58, 44)
 		res_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(res_lbl)
 
-	# Three rune slots, filled or empty (§9 — flat 3 from run start). Each is
-	# its own button: clicking one opens this hero's pouch.
+	# Three rune slots, filled or empty (flat 3 from run start). Each is its
+	# own button: clicking one opens this hero's pouch.
 	var runes: Array = member.get("runes", [])
 	var worn: Array = runes.filter(func(r): return r.get("equipped", false))
-	var slots_lbl := Label.new()
-	slots_lbl.text = "RUNES"
-	slots_lbl.add_theme_font_size_override("font_size", 11)
-	slots_lbl.add_theme_color_override("font_color", Color(0.65, 0.6, 0.7))
-	slots_lbl.position = at + Vector2(12, 78)
-	slots_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(slots_lbl)
-	for s in Run.rune_slots():
-		var rune: Dictionary = worn[s] if s < worn.size() else {}
+	for sl in Run.rune_slots():
+		var rune: Dictionary = worn[sl] if sl < worn.size() else {}
 		var slot_btn := Button.new()
-		slot_btn.position = at + Vector2(12 + s * 92, 96)
-		slot_btn.custom_minimum_size = Vector2(86, 30)
+		slot_btn.position = at + Vector2(8 + sl * 96, 62)
+		slot_btn.custom_minimum_size = Vector2(92, 26)
 		slot_btn.add_theme_font_size_override("font_size", 10)
 		if rune.is_empty():
 			slot_btn.text = "— empty —"
@@ -470,11 +624,10 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 	# Batch AQ §5C: the ability-upgrade count, sitting alongside the rune slots
 	# — runes already get exactly this treatment here and upgrades got nothing,
 	# which is the asymmetry worth closing. A full run awards three to every
-	# hero and before this they were discoverable only by hovering an ability
-	# button mid-fight. IT DOES NOT TAKE A CLICK: it is a child of the card
-	# button with MOUSE_FILTER_PASS, so it carries its own tooltip while the
-	# press falls through to the card, which is already the button that opens
-	# the tree.
+	# hero (and BK's blacksmith sells more) and before AQ they were discoverable
+	# only by hovering an ability button mid-fight. IT DOES NOT TAKE A CLICK: it
+	# is a child of the card button with MOUSE_FILTER_PASS, so it carries its
+	# own tooltip while the press falls through to the card.
 	var ups: Array = member.get("upgrades", [])
 	if not ups.is_empty():
 		var up_lines := PackedStringArray()
@@ -486,8 +639,8 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		up_badge.add_theme_font_size_override("font_size", 12)
 		up_badge.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
 		up_badge.tooltip_text = "Ability upgrades\n%s" % "\n".join(up_lines)
-		up_badge.position = Vector2(CARD_W - 78, 76)
-		up_badge.size = Vector2(66, 18)
+		up_badge.position = Vector2(CARD_W - 48, 6)
+		up_badge.size = Vector2(40, 18)
 		up_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		up_badge.mouse_filter = Control.MOUSE_FILTER_PASS
 		open.add_child(up_badge)
@@ -508,27 +661,32 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		badge.text = "  ".join(badges)
 		badge.add_theme_font_size_override("font_size", 12)
 		badge.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
-		badge.position = at + Vector2(12, 134)
-		badge.size = Vector2(CARD_W - 24, 16)
+		badge.position = at + Vector2(8, 92)
+		badge.size = Vector2(CARD_W - 16, 16)
 		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(badge)
 
-	# Owed picks resolve HERE, on the card, rather than on a screen the
-	# player has to know to visit (§2 moved both flows onto the card).
-	if owed_abs > 0:
-		_draw_pick_row(idx, at + Vector2(12, 154), "NEW ABILITY",
-			member.get("bm_candidates", []), Color(0.95, 0.85, 0.4))
-	elif owed_ups > 0:
-		_draw_upgrade_row(idx, at + Vector2(12, 154))
-	elif owed_runes > 0:
-		_draw_rune_pick_row(idx, at + Vector2(12, 154))
+	# An owed pick opens its own overlay. It stays ON THE CARD in the sense
+	# that matters — the player never has to know which screen to visit — but
+	# the three choices need room to say what they are.
+	if owed_abs > 0 or owed_ups > 0 or owed_runes > 0:
+		var pick_btn := Button.new()
+		pick_btn.text = "CHOOSE — %s" % ("ability" if owed_abs > 0
+			else ("upgrade" if owed_ups > 0 else "rune"))
+		pick_btn.position = at + Vector2(8, 114)
+		pick_btn.custom_minimum_size = Vector2(CARD_W - 16, 30)
+		pick_btn.add_theme_font_size_override("font_size", 12)
+		pick_btn.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
+		pick_btn.pressed.connect(Music.click)
+		pick_btn.pressed.connect(_open_pick_overlay.bind(idx))
+		add_child(pick_btn)
 	else:
 		var hint := Label.new()
-		hint.text = "click the card for talents"
+		hint.text = "click the card for talents and sheet"
 		hint.add_theme_font_size_override("font_size", 11)
 		hint.add_theme_color_override("font_color", Color(0.5, 0.48, 0.52))
-		hint.position = at + Vector2(12, 196)
-		hint.size = Vector2(CARD_W - 24, 14)
+		hint.position = at + Vector2(8, 124)
+		hint.size = Vector2(CARD_W - 16, 14)
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(hint)
@@ -562,90 +720,117 @@ func _bar(at: Vector2, w: float, h: float, frac: float, fill: Color,
 	add_child(lbl)
 
 
-# ---------- picks that resolve on the card ----------
+# ---------- the owed-pick overlay ----------
 
-func _draw_pick_row(idx: int, at: Vector2, heading: String, queue: Array,
-		tint: Color) -> void:
-	var head := Label.new()
-	head.text = "%s — choose one" % heading
-	head.add_theme_font_size_override("font_size", 11)
-	head.add_theme_color_override("font_color", tint)
-	head.position = at
-	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(head)
-	if queue.is_empty():
-		return
-	var offer: Array = queue[0]
-	var spec := String(Run.party[idx].get("spec", ""))
-	for i in offer.size():
-		var pool_name := String(offer[i])
-		var ab: Ability = Classes.spec_pool_ability(spec, pool_name)
-		var b := Button.new()
-		b.text = pool_name
-		b.position = at + Vector2(0, 18 + i * 18)
-		b.custom_minimum_size = Vector2(CARD_W - 24, 17)
-		b.add_theme_font_size_override("font_size", 11)
-		if ab != null:
-			b.tooltip_text = "%s\n\n%s" % [pool_name, ab.description]
-		b.pressed.connect(Music.click)
-		b.pressed.connect(_pick_ability.bind(idx, pool_name))
-		add_child(b)
-
-
-func _draw_upgrade_row(idx: int, at: Vector2) -> void:
+# ONE overlay for all three owed picks — an ability, an upgrade or a rune —
+# because all three are "choose one of three, with a description each" and
+# three near-identical inline rows were three places for the same bug. The
+# card's CHOOSE button opens it; picking closes it and redraws.
+#
+# PRECEDENCE matches the card badge: ability, then upgrade, then rune. A hero
+# owed two picks resolves them one overlay at a time.
+func _open_pick_overlay(idx: int) -> void:
 	var member: Dictionary = Run.party[idx]
-	var queue: Array = member.get("up_candidates", [])
-	var head := Label.new()
-	head.text = "ABILITY UPGRADE — choose one"
-	head.add_theme_font_size_override("font_size", 11)
-	head.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
-	head.position = at
-	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(head)
-	if queue.is_empty():
+	var kind := ""
+	if int(member.get("bm_picks_owed", 0)) > 0:
+		kind = "ability"
+	elif int(member.get("up_picks_owed", 0)) > 0:
+		kind = "upgrade"
+	elif int(member.get("rune_picks_owed", 0)) > 0:
+		kind = "rune"
+	if kind == "":
 		return
-	var offer: Array = queue[0]
-	for i in offer.size():
-		var up: Dictionary = offer[i]
-		var b := Button.new()
-		b.text = "%s: %s" % [String(up["ability"]),
-			Run.upgrade_name(String(up["id"]))]
-		b.position = at + Vector2(0, 18 + i * 18)
-		b.custom_minimum_size = Vector2(CARD_W - 24, 17)
-		b.add_theme_font_size_override("font_size", 11)
-		b.tooltip_text = "%s — %s\n%s" % [Run.upgrade_name(String(up["id"])),
-			String(up["ability"]), Run.upgrade_desc(String(up["id"]))]
-		b.pressed.connect(Music.click)
-		b.pressed.connect(_pick_upgrade.bind(idx, i))
-		add_child(b)
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = 60
+	add_child(overlay)
+	var dim := ColorRect.new()
+	dim.size = Vector2(1280, 720)
+	dim.color = Color(0, 0, 0, 0.78)
+	overlay.add_child(dim)
+	var panel := PanelContainer.new()
+	panel.position = Vector2(320, 180)
+	panel.custom_minimum_size = Vector2(640, 300)
+	overlay.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	panel.add_child(box)
+
+	var heading: String = {"ability": "NEW ABILITY", "upgrade": "ABILITY UPGRADE",
+		"rune": "RUNE"}[kind]
+	var tint: Color = {"ability": Color(0.95, 0.85, 0.4),
+		"upgrade": Color(0.95, 0.85, 0.4),
+		"rune": Color(0.85, 0.6, 1.0)}[kind]
+	var title := Label.new()
+	title.text = "%s — %s, choose one" % [
+		Classes.SPEC_INFO.get(String(member.get("spec", "")), {}).get(
+			"name", String(member["key"]).capitalize()), heading]
+	title.add_theme_font_override("font", NAME_FONT)
+	title.add_theme_font_size_override("font_size", 26)
+	title.add_theme_color_override("font_color", tint)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+
+	match kind:
+		"ability":
+			var queue: Array = member.get("bm_candidates", [])
+			var spec := String(member.get("spec", ""))
+			for pool_name in (queue[0] if not queue.is_empty() else []):
+				var ab: Ability = Classes.spec_pool_ability(spec, String(pool_name))
+				_pick_button(box, String(pool_name),
+					ab.description if ab != null else "",
+					Color(0.85, 0.82, 0.75),
+					_pick_ability.bind(idx, String(pool_name)), overlay)
+		"upgrade":
+			var queue2: Array = member.get("up_candidates", [])
+			var offer: Array = queue2[0] if not queue2.is_empty() else []
+			for i in offer.size():
+				var up: Dictionary = offer[i]
+				_pick_button(box, "%s: %s" % [String(up["ability"]),
+					Run.upgrade_name(String(up["id"]))],
+					Run.upgrade_desc(String(up["id"])),
+					Color(1.0, 0.9, 0.5), _pick_upgrade.bind(idx, i), overlay)
+		"rune":
+			var queue3: Array = member.get("rune_candidates", [])
+			var triple: Array = queue3[0] if not queue3.is_empty() else []
+			for i in triple.size():
+				var rune: Dictionary = triple[i]
+				_pick_button(box, "%s  [%s]" % [rune["name"], rune["rarity"]],
+					String(rune["desc"]),
+					rune.get("rarity_color", Color(0.8, 0.8, 0.8)),
+					_pick_rune.bind(idx, i), overlay)
+
+	var close := Button.new()
+	close.text = "Not yet"
+	close.custom_minimum_size = Vector2(200, 34)
+	close.pressed.connect(Music.click)
+	close.pressed.connect(func(): overlay.queue_free())
+	box.add_child(close)
 
 
-func _draw_rune_pick_row(idx: int, at: Vector2) -> void:
-	var member: Dictionary = Run.party[idx]
-	var queue: Array = member.get("rune_candidates", [])
-	var head := Label.new()
-	head.text = "RUNE — choose one"
-	head.add_theme_font_size_override("font_size", 11)
-	head.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
-	head.position = at
-	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(head)
-	if queue.is_empty():
+# One choice: its name on the button, its full text under it, so a player
+# never picks an upgrade whose effect they had to hover to read.
+func _pick_button(box: VBoxContainer, label: String, desc: String,
+		tint: Color, action: Callable, overlay: Control) -> void:
+	var b := Button.new()
+	b.text = label
+	b.custom_minimum_size = Vector2(600, 32)
+	b.add_theme_font_size_override("font_size", 14)
+	b.add_theme_color_override("font_color", tint)
+	b.pressed.connect(Music.click)
+	b.pressed.connect(func():
+		overlay.queue_free()
+		action.call())
+	box.add_child(b)
+	if desc == "":
 		return
-	var triple: Array = queue[0]
-	for i in triple.size():
-		var rune: Dictionary = triple[i]
-		var b := Button.new()
-		b.text = String(rune["name"])
-		b.position = at + Vector2(0, 18 + i * 18)
-		b.custom_minimum_size = Vector2(CARD_W - 24, 17)
-		b.add_theme_font_size_override("font_size", 11)
-		b.add_theme_color_override("font_color",
-			rune.get("rarity_color", Color(0.8, 0.8, 0.8)))
-		b.tooltip_text = "%s  [%s]\n%s" % [rune["name"], rune["rarity"], rune["desc"]]
-		b.pressed.connect(Music.click)
-		b.pressed.connect(_pick_rune.bind(idx, i))
-		add_child(b)
+	var text := Label.new()
+	text.text = desc
+	text.add_theme_font_size_override("font_size", 12)
+	text.add_theme_color_override("font_color", Color(0.68, 0.65, 0.62))
+	text.custom_minimum_size = Vector2(600, 0)
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(text)
 
 
 func _pick_ability(idx: int, pool_name: String) -> void:
@@ -813,7 +998,7 @@ func _draw_footer() -> void:
 	gold_lbl.text = "Gold: %d" % Run.gold
 	gold_lbl.add_theme_font_size_override("font_size", 18)
 	gold_lbl.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
-	gold_lbl.position = Vector2(20, 604)
+	gold_lbl.position = Vector2(VIEW_X + 4, 556)
 	add_child(gold_lbl)
 
 	# §6: potions are usable HERE, not only in battle. Each item is a button;
@@ -822,15 +1007,15 @@ func _draw_footer() -> void:
 	hint.text = "Potions (usable here — max %d of each)" % Run.ITEM_CAP
 	hint.add_theme_font_size_override("font_size", 11)
 	hint.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
-	hint.position = Vector2(180, 606)
+	hint.position = Vector2(VIEW_X + 120, 560)
 	add_child(hint)
 	for i in Run.ITEM_IDS.size():
 		var id: String = Run.ITEM_IDS[i]
 		var have := int(Run.items.get(id, 0))
 		var btn := Button.new()
 		btn.text = "%s  x%d" % [Run.ITEM_INFO[id][0].replace(" Potion", ""), have]
-		btn.custom_minimum_size = Vector2(196, 34)
-		btn.position = Vector2(180 + i * 202, 626)
+		btn.custom_minimum_size = Vector2(182, 32)
+		btn.position = Vector2(VIEW_X + 4 + i * 190, 584)
 		btn.add_theme_font_size_override("font_size", 12)
 		btn.tooltip_text = _map_item_tooltip(id)
 		btn.disabled = have < 1 or not _usable_on_map(id)
@@ -966,20 +1151,45 @@ func _open_hero(idx: int) -> void:
 	get_tree().change_scene_to_file("res://scenes/party.tscn")
 
 
-func _on_slot_pressed(s: int) -> void:
+# Stepping onto a node. `j` indexes the NEXT slot's node array — the slot is
+# never a choice, only which of its nodes.
+func _on_node_pressed(j: int) -> void:
 	# Nothing a harness drives may travel the board (Batch AC). RunSim walks
 	# Run directly and never loads this scene.
 	if Run.sim_run:
 		return
-	var slot: Dictionary = Run.map[s]
-	Run.advance(s)
-	var ty := String(slot["type"])
-	var warband: Array = slot.get("enemies", [])
+	Run.advance(j)
+	var node: Dictionary = Run.current_node()
+	var ty := String(node["type"])
+	# Batch BK §3/§4: three node types resolve WITHOUT a battle. They still
+	# take the step — the node is spent, and the party has walked past whatever
+	# stood in the columns it can no longer reach.
+	match ty:
+		"blacksmith":
+			Run.save_run()
+			get_tree().change_scene_to_file("res://scenes/blacksmith.tscn")
+			return
+		"merchant":
+			Run.save_run()
+			get_tree().change_scene_to_file("res://scenes/shop.tscn")
+			return
+		"event":
+			if not Run.begin_event_node():
+				# The pool is spent AND every survivor is gated out. Walking on
+				# beats an empty screen; the node stays marked visited.
+				Run.save_run()
+				_draw_screen()
+				_toast("The road is quiet here.")
+				return
+			Run.save_run()
+			get_tree().change_scene_to_file("res://scenes/event.tscn")
+			return
+	var warband: Array = node.get("enemies", [])
 	if warband.is_empty():
-		warband = Run.compose(ty, s + 1)
-		slot["theme"] = Run.last_theme
+		warband = Run.compose(ty, Run.slot_idx + 1)
+		node["theme"] = Run.last_theme
 	Run.encounter = {"type": ty, "enemies": warband,
-		"theme": slot.get("theme", "Warband")}
+		"theme": node.get("theme", "Warband")}
 	Run.save_run()
 	# Batch AO §2: the offer is an EVENT, not a toll booth — fights and bosses
 	# walk straight in, elites and mini-bosses are preceded by the bargain.
@@ -1033,8 +1243,16 @@ func _on_burger(id: int) -> void:
 			Run.restore_mana(1.0)
 			_draw_screen()
 		13:
-			# Land on the last pre-boss slot so the boss is the next pick.
-			Run.advance(Run.BOSS_SLOT - 1)
+			# Walk the board forward, taking the first reachable node each
+			# column, until the boss is the next pick. On a lattice there is no
+			# "set slot_idx" — advance() is the only mover, and a debug entry
+			# that bypassed it would place the party on a node nothing links to.
+			while Run.slot_idx < Run.BOSS_SLOT - 1:
+				var step: Array = Run.reachable()
+				if step.is_empty():
+					break
+				Run.advance(int(step[0]))
+			_map_scroll = -1.0
 			_draw_screen()
 		14:
 			Run.advance_zone()
