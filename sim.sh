@@ -28,9 +28,13 @@
 #   SLOTS: no pre-BK row is comparable with a post-BK one, and no pre-AN
 #   row was comparable with either. DOD_SIM_MAP, DOD_SIM_MINIBOSS,
 #   DOD_SIM_START_RUNE and DOD_SIM_SPEC_OPENING stay RETIRED.
-# DOD_SIM_DIFFICULTY=wanderer ./sim.sh --run ... = the alpha testing
-#   difficulty (enemies x0.7 via the zone ladder). Default standard —
-#   never set for baseline rows.
+# DOD_SIM_DIFFICULTY names a RUNG of the ladder: wanderer (rung 1, enemies
+#   x0.50 via the zone ladder — Batch BN chose that float by sweeping
+#   untalented completion) | warden (rung 2, x1.00, the balance every
+#   pre-BM row was measured at) | ruin (rung 3, x1.30). Batch Y's
+#   "standard" still resolves and maps to warden. THE DEFAULT IS RUNG 1,
+#   so a row meant to compare against a pre-BM baseline must set
+#   DOD_SIM_DIFFICULTY=warden explicitly.
 # DOD_SIM_GRANT_ALL=1 ./sim.sh ... for full-kit runs.
 # DOD_SIM_ROTATE=1 ./sim.sh ... cycles the spec in each class slot across
 #   successive battles (sweep/standalone) or runs (--run), so all TWELVE

@@ -4,6 +4,46 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The comment was right. Nobody had read it next to the constraint (Batch BN) — 2026-08-13
+
+The Cryomancer's release has carried this comment since Batch AS:
+
+> Honed Shards LAST, because it can re-freeze the enemy it just thawed.
+
+That sentence is accurate. It was written by someone who had understood the
+behaviour completely, and it describes the near half of a crash that then sat
+in the game for six batches. The stacks a release leaves are one, Honed Shards
+adds three, and four is the number that flash-freezes — so every release
+re-freezes its own target, and the comment says so.
+
+What nobody traced is the sentence one function away. A Thaw-lane Cryomancer
+holds **one** enemy, and freezing a second evicts the first — which is a
+release. Put the two together and a self-re-trigger becomes a two-body cycle:
+freeze B, evict A, A's release re-freezes A, which evicts B, whose release
+re-freezes B, until the engine's stack limit. Neither site is wrong. Neither
+site can be *read* wrong. The bug lives in the sentence nobody wrote, which is
+the one that names them both.
+
+**A known local behaviour plus a known local constraint can be a bug that
+neither of them is.** That is the transferable part, and it is uncomfortable
+because the usual defences do not apply. This was not undocumented — the
+comment is *the* documentation. It was not unreviewed. It was not a magnitude
+anybody had to guess at. Every one of this project's habits for catching
+mistakes — read the site, state the rule beside the code, name the field once —
+operates *within* a site, and this fault had no site.
+
+What found it was a sweep: four hundred battles at a budget high enough to put
+two enemies in a prison at once, run for a different reason entirely (Batch BF
+was measuring difficulty). It cost twenty-three stack overflows and a megabyte
+of backtrace to notice. That is the second half of the lesson, and it is the
+cheerful half — **instruments find the faults that reading cannot**, because an
+instrument does not have to know which two sites to hold in mind at once. The
+project already believed this about balance. It is just as true about control
+flow, and the same argument says the fix should be a re-entrancy guard rather
+than a smaller number: the cycle is a control-flow fault, and cutting Honed
+Shards to three-minus-one to dodge a threshold would have nerfed a node to
+work around a `while` loop.
+
 ## Twelve spines were authored around denial, and none of them could be seen working (Batch BL) — 2026-08-12
 
 Enemy intent is not a new mechanic. It adds no ability, no status, no number.

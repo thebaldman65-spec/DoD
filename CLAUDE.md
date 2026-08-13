@@ -49,6 +49,14 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   computes reads delta. Any future suite that has to run a REAL-PLAY battle to completion wants
   the same trick.
 - New `class_name` files need `--headless --import` before they resolve.
+- **RUNNING THE FULL SUITE BATTERY DESTROYS THE PLAYER'S IN-PROGRESS RUN (Batch BN, learned the
+  expensive way).** Twenty-five suites spawn a live battle, which means `Run.new_run` and
+  `clear_save`, and **`user://run_save.bin` is simply gone afterwards** — several suites back it
+  up and restore it, but a LATER suite in the battery then wipes it again, so the individual
+  backups buy nothing when the whole battery runs. `profile.json` survives with a few counters
+  incremented (runs_started, occasionally a forfeit) and `relics.json` is byte-identical, so the
+  META layer is safe; it is the run in flight that is lost. **Copy `run_save.bin` aside before a
+  battery run if the designer has a run going**, and say so afterwards either way.
 - Balance: `./sim.sh N` = N battles of the FIXED raider/chief/archer/archer
   lineup (power 7, unscaled) — kit smoke tests only; its win% carries NO
   difficulty signal (Batch R). **sim.sh passes `--fixed-fps 240` since Batch
@@ -94,9 +102,14 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   DOD_SIM_BUILDS="spec:Lane,...", DOD_SIM_TROPHIES, DOD_SIM_RELICS (draft),
   DOD_SIM_ROTATE=1 (Batch W: rotate all twelve specs; see the Batch W
   block below — shares then carry sample counts),
-  DOD_SIM_DIFFICULTY=wanderer (Batch Y alpha affordance, enemies x0.7
-  through zone_base_mult; default standard — NEVER set on a baseline
-  row), DOD_SIM_RUNE_ECON=rich / DOD_SIM_RUNE_POWER=<mult> (Batch AD
+  DOD_SIM_DIFFICULTY=wanderer|warden|ruin — a RUNG of BM's ladder
+  (x0.50 / x1.00 / x1.30 through zone_base_mult; "standard" still
+  resolves and maps to warden). **THE DEFAULT IS RUNG 1 SINCE BATCH BM
+  AND THAT IS THE TRAP: an unset flag is NOT the old baseline.** A row
+  meant to compare against a pre-BM number must set warden explicitly,
+  and BATCH BN MOVED RUNG 1 FROM x0.70 TO x0.50, so an unset-flag row
+  taken before BN is not comparable with one taken after it either),
+  DOD_SIM_RUNE_ECON=rich / DOD_SIM_RUNE_POWER=<mult> (Batch AD
   EXPERIMENT ARMS — measurement only, never shipped; UNLIKE every other
   flag here they are gated on Run.sim_run as well as the env, so a stale
   export cannot put a real run in an arm. rich = all slots from t1 + a
@@ -357,8 +370,16 @@ draft and armable from `DOD_SIM_DIFFICULTY`, already folded into ONE multiplier 
 still resolve: **"standard" maps to rung 2**, the rung it was tuned at, so every old script and
 Matrix row reads. **EVERY SCALING NUMBER IS PROVISIONAL** — balance is deferred by designer
 decision and the STRUCTURE is what shipped.
-· **rung 1 Wanderer x0.70** — DELIBERATELY BELOW the present balance, because this is the rung
-  played with ZERO talents. Reuses Y's existing 0.7 rather than inventing a number.
+· **rung 1 Wanderer x0.50 (BATCH BN §2 — WAS x0.70, AND THE NEW NUMBER IS THE ONLY THING ON
+  THIS LADDER CHOSEN BY MEASUREMENT).** DELIBERATELY BELOW the present balance, because this is
+  the rung played with ZERO talents and it is the gate the whole meta layer sits behind. BM
+  reused Batch Y's 0.70 — a float picked for the Wanderer affordance, not for this job — and an
+  untalented party completed **12-13%** at it, i.e. eight attempts before the first unlock with
+  nothing banked in between. **SWEPT AT n=100 A ROW, untalented (`DOD_SIM_ROWS=0`), balanced:
+  x0.70 13% | x0.60 28% | x0.50 83% | x0.40 95%.** 70% (a first run won in one or two attempts)
+  is the target; 0.50 is the closest of the four. **THE CURVE IS A CLIFF between 0.60 and 0.50
+  — 55 points across one step — so 70% sits in an unsampled gap and 0.50 is "the nearest
+  sampled value", not a number to defend to three figures.**
 · **rung 2 Warden x1.00** — the present balance BYTE FOR BYTE, so every BK row still describes
   it. Twist: **the severity floor rises** (`roll_offer` reads `difficulty_def().severity_floor`
   instead of a constant 2), so the guaranteed mild bargain option may be severity 3.
@@ -577,7 +598,8 @@ sim/autoplay/sim_run).
   (economy policies, def on), `DOD_SIM_BUILDS` (def each tree's FIRST lane — the BG confound),
   `DOD_SIM_TROPHIES`, `DOD_SIM_RELICS`, `DOD_SIM_RUNES` (full|stats|off, def full),
   `DOD_SIM_RUNE_ECON=rich` / `DOD_SIM_RUNE_POWER=<mult>` (AD experiment arms, double-gated on
-  Run.sim_run), `DOD_SIM_DIFFICULTY` (standard|wanderer x0.7 — never on a baseline row),
+  Run.sim_run), `DOD_SIM_DIFFICULTY` (wanderer|warden|ruin = rungs 1-3 at x0.50 / x1.00 /
+  x1.30, "standard" aliases warden; **DEFAULTS TO RUNG 1** — set warden for a baseline row),
   `DOD_SIM_DEBUG` (echo the combat log in sim mode — the hang discriminator).
 · ENV FLAGS, non-sim: `DOD_AUTOPLAY` (1 debug battle, echoes "[LOG]"; never exits on its own —
   timeout/kill it), `DOD_DEBUG` (above), `DOD_ENEMIES_OFF` (above), `DOD_ZONE_ROTATION`
@@ -614,6 +636,85 @@ meter is ungoverned. meter | what governs it | where the governor lives:
 · **faith_peak** (never falls in battle) | the BATTLE RESET: `_reset_faith_meters()` zeroes
   count and peak together at battle start, before the opening oath; one ratchet site in
   `_gain_faith` | battle.gd ~8125-8171.
+
+BATCH BN (08-13) — THE CRASH, AND THE GATE. Two items, both blockers, neither large. **§1 is
+a bug fix. §2 is one float, chosen by measurement rather than by guess.** No save version moves
+(still v10); no node, no magnitude and no ability changed.
+
+§1 **THE `_hold_release` / `_hold_freeze` RECURSION IS CLOSED — see the entry under "Known open
+threads", where the MECHANISM IS KEPT after the fix on purpose.** The guard is the only thing
+preventing it and a later batch would delete it for looking redundant. Short version: a release
+comes back on `HOLD_RELEASE_STACKS` (1) and Honed Shards applies 3 — exactly the 4 that
+flash-freezes — while a freeze past `_hold_limit()` evicts the oldest prison, which is itself a
+release. At a Thaw-lane limit of 1 the two are a **two-body cycle** that runs to GDScript's
+stack limit.
+· **THE FIX IS A RE-ENTRANCY GUARD, NOT A MAGNITUDE CHANGE: `var _releasing`, set at the top of
+  `_hold_release` and cleared at its end, and `_hold_freeze` early-returns while it is set.**
+  Cutting Honed Shards' 3 or the release's 1 to dodge the threshold would nerf a node to work
+  around a control-flow bug; every authored magnitude is untouched and asserted so.
+· **THE FLAG IS BRACKETED BY A WRAPPER AND THAT IS LOAD-BEARING**: `_hold_release` sets it,
+  calls the new `_hold_release_body`, clears it. GDScript has no `finally`, the body already
+  carries an early return (a dead target), and **a flag left standing refuses every freeze for
+  the rest of the battle** — a softer failure than the crash and just as fatal. ONE setter, ONE
+  clearer, both asserted by count.
+· **IT ALSO CLOSES THE MILDER VERSION THAT WAS NEVER A CRASH: Ice Lance releasing a hold and
+  instantly re-taking it**, which made the release read as a no-op. That is the behaviour the
+  code comment beside Honed Shards has always described, and it was accurate.
+· **NO RE-ARM IS NEEDED, AND THIS WAS READ RATHER THAN ASSUMED (§1's own instruction).** The
+  flash-freeze threshold is **`status_stacks("chilled") >= 4`** — it reads BEING at four, not
+  REACHING four — and chilled stacks clamp at 4 in `add_status`, so **an enemy parked at the cap
+  with its freeze refused is frozen by the very next chill.** An `== 4`-style reach check there
+  would leave enemies permanently unfreezable, which would be worse than the crash and silent;
+  test_batch_bn drives the re-arm live and a negative control builds the reach-based version.
+· **CRYOCLASM IS UNAFFECTED, ASSERTED BOTH WAYS.** It MOVES a hold and is deliberately not
+  routed through `_hold_release` (so no release payoff fires), so the guard is never up when its
+  freeze runs. The check asserts the moved hold LANDS, not merely that it was un-refused — "the
+  guard does not block it" is trivially true of an ability that does nothing.
+· **WHAT IT UNBLOCKS, MEASURED: A THAW CRYOMANCER RUN BAND EXISTS AGAIN.** BG had to substitute
+  Deep Freeze to get a band at all. `DOD_SIM_BUILDS="cryomancer:Thaw"`, rung 2, balanced:
+  **25/25 runs, ZERO stack-overflow events**, completions 16%, depth 39.40 ±1.99 of 49.
+  **THE MATCHED CONTROL ON UNMODIFIED HEAD REPRODUCES THE CRASH AND CANNOT FINISH: 305 overflow
+  events and 20 MB of backtrace by run 6**, in the wall clock the fixed build spent completing
+  all 25. (BG read 15 events and ~1.1 MB in four runs; a deeper run reaches more of it.)
+
+§2 **RUNG 1'S MULTIPLIER IS x0.50, WAS x0.70 — SWEPT, NOT GUESSED. The table is the
+deliverable; see the difficulty-ladder standing reference above for it and for the cliff
+caveat.** Untalented completion, balanced route, n=100 a row: **x0.70 13% | x0.60 28% |
+x0.50 83% | x0.40 95%.** Bands at n=100 are ±6.6 to ±8.8 points, tighter than every difference
+that matters. **x0.70's 13% REPRODUCES BM's 12% at n=50**, which is the control that makes the
+rest readable.
+· **RUNGS 2 AND 3 WERE NOT TOUCHED. NEITHER MULTIPLIER MOVED, NEITHER TWIST MOVED**, and this is
+  said explicitly because a batch that moved rung 1 is exactly where a later reader would assume
+  all three moved. Rung 2 is still x1.00 — the present balance byte for byte, which is what
+  keeps every BK-and-earlier row readable — and rung 3 still x1.30. test_batch_bn asserts both,
+  plus both severity floors and the fixed-modifier flag.
+· **RUNG 1 WITH ROWS 1-3 FILLED IS NOW TRIVIAL AND THAT IS CORRECT, NOT A PROBLEM** — rung 1 is
+  meant to stop being a wall the moment a player has anything, because that is the signal to
+  climb. BM measured that build at 52% under x0.70; at x0.50 it reads **96% (n=100, balanced; depth 47.74 of 49)**.
+  Recorded so it is on the record, not tuned.
+· **THE 0% AT RUNG 2 IS NOT ADDRESSED HERE AND MUST NOT BE PAPERED OVER BY MOVING A RUNG.** BM's
+  diagnosis stands: the ladder's power ratio is a clean monotone 1.26 / 0.91 / 0.67, so the
+  LADDER is fine and the TREE is uneven — a capstone is worth more than the eight lane nodes
+  beneath it put together (8 picks 8%, 9 picks 68%). That is a distribution problem and it is
+  the next batch's, together with the leave-one-out grid owed on Harmonic Convergence.
+· **THE CONSEQUENCE NOBODY ASKED FOR, REPORTED RATHER THAN DISCOVERED: `DOD_SIM_DIFFICULTY`
+  DEFAULTS TO RUNG 1**, so **every run band taken without the flag since BM is a rung-1 band**,
+  and BN moved rung 1. A row meant to compare against a pre-BM baseline must set
+  `DOD_SIM_DIFFICULTY=warden` explicitly. sim.sh's header and both flag tables say so now.
+
+VERIFIED: check_parse 0 · check_flow 0 (11 screens) · run-harness gates 1/2/3 PASS ·
+**NEW test_batch_bn.gd 77/0**. **ONE SUITE RE-POINTED IN PLACE AND IT IS AN INVERSION**:
+test_batch_as's "...which is four again, so the release re-holds it on the spot" is now "...and
+BN's guard stops those four re-freezing it on the spot", with the reason in the file — the
+question is still worth asking, only the correct answer moved. **test_batch_as reads 396/0 both
+before and after, i.e. ZERO DRIFT** (and CLAUDE.md's older "as 387" figure was already stale;
+396 is what unmodified HEAD reads).
+**FOUR NEGATIVE CONTROLS RUN, each applied to product code and reverted** (battle.gd came back
+byte-identical, verified by hash): **clearing the guard before Honed Shards applies RESTORES THE
+CRASH — 11 checks trip and the suite spews stack overflows**; **the guard also blocking
+Cryoclasm trips 4**; **a REACH-based threshold (freeze only on crossing into 4) leaves a parked
+enemy permanently unfreezable and trips 4**; and **the wrapper's clear deleted, i.e. the flag
+leaking, trips 10**.
 
 BATCH BK (08-12) — THE BRANCHING MAP. **SAVE v8, AND A PRE-v8 SAVE IS REFUSED AND
 CLEARED** — the second save-breaking change in the project's history, not the first (AN
@@ -5976,45 +6077,40 @@ Battle has burger menu (restart/settings overlay/exit); skill checks accept
 Space or left click; no announcer text (combat log only).
 
 ## Known open threads
-- **A CRASH. INFINITE RECURSION BETWEEN `_hold_release` AND `_hold_freeze`, REACHABLE IN NORMAL
-  PLAY BY A CRYOMANCER WHO HAS TAKEN HONED SHARDS. FOUND BY BF §3's BUILT SWEEP; PRE-EXISTING,
-  NOT BF's — REPRODUCED ON UNMODIFIED HEAD AT MATCHED n WITH THE IDENTICAL COUNT (23 events in
-  400 budget-12 battles, both builds). NOT FIXED: BF is a measure-don't-tune batch and this is
-  its own change with its own tests. THIS IS THE FIRST THING TO DO NEXT.**
-  · **THE MECHANISM IS DETERMINISTIC, NOT A RACE.** `_hold_release` erases the target from
-    `_holds`, calls `set_chilled_stacks(HOLD_RELEASE_STACKS)` — **which is 1** — and then
-    Honed Shards (`cr_razor_hone`, Thaw row 6) applies **3** more. 1 + 3 = **exactly the 4 that
-    flash-freezes** in `_apply_status`'s chilled branch, so **every release re-freezes its own
-    target.** Alone that is survivable; the loop needs the second half.
-  · **THE SECOND HALF IS THE HOLD LIMIT.** `_hold_limit()` is **1** for a Thaw-lane Cryomancer
-    (no Second Prison, no Absolute Zero — both are Deep Freeze). `_hold_freeze` appends, then
-    runs `while _holds.size() > _hold_limit(): _hold_release(_holds[0])`. So freezing a SECOND
-    enemy evicts the first, whose release re-freezes it, which evicts the second, whose release
-    re-freezes it — **the two ping-pong until GDScript's ~1024-frame stack limit.** The comment
-    at the Honed Shards site already says it "can re-freeze the enemy it just thawed"; what was
-    never noticed is that the eviction loop turns that into a cycle.
-  · **TRIGGER, IN ONE LINE: Honed Shards learned + hold limit 1 + two enemies held at once.**
-    ~6% of budget-12 battles with a full Thaw lane. Budgets 3/6/9 never hit it (the field is
-    rarely big enough for a second hold).
-  · **THE FIX I WOULD PROPOSE AND DID NOT TAKE: a re-entrancy latch on the release, exactly the
-    `_communion_chain` pattern this batch just re-tested** — a release may re-freeze, but a
-    re-freeze may not evict-and-release again. The alternatives are worse: capping Honed Shards
-    below 4 changes a shipped magnitude, and evicting BEFORE appending only reorders the cycle.
-  · **IT DOES NOT INVALIDATE §3's BUILT ROW.** All 23 affected battles were wins, and the row
-    reads 400/400 with them excluded too; HEAD's own budget-12 row (100% / 7.8 rounds / 0.22
-    deaths) matches this build's (100% / 7.6 / 0.21). **But the direction of the contamination
-    favours the party** — a permanently-held enemy stops acting — so treat the built top-band
-    row as an upper bound for that reason as well as the unscaled-enemy one.
-  · **BATCH BG §1 FOUND ITS REAL COST AND IT IS BIGGER THAN A SWEEP ROW: IT MAKES A THAW
-    CRYOMANCER UNMEASURABLE IN A FULL RUN.** BG's named band was specified on BE/BC's
-    strongest-lane control set, which puts the Cryomancer on Thaw — **measured at 15 stack
-    overflows in FOUR runs and ~1.1 MB of backtrace**, against **ZERO on Deep Freeze at the
-    same n**. A run fields more enemies for longer than a sweep battle does, so the ~6% of
-    budget-12 battles becomes several aborts per run. **BG substituted Deep Freeze and said
-    so; until this is fixed, NO RUN BAND CAN INCLUDE A THAW CRYOMANCER**, which also means one
-    of twelve specs cannot have its strongest lane measured by the project's best instrument.
-    Standalone lane rows are unaffected (the fixed 4-enemy lineup never triggered it — 0
-    events across ten n=200 rows).
+- **CLOSED IN BATCH BN §1 — THE `_hold_release` / `_hold_freeze` RECURSION. THE MECHANISM IS KEPT
+  HERE ON PURPOSE, BECAUSE ONE FLAG IS THE ONLY THING PREVENTING IT AND A LATER BATCH COULD
+  DELETE THAT FLAG FOR LOOKING REDUNDANT.** It stood as the first open thread from BF §3 to BN,
+  six batches. Do not re-record it as outstanding.
+  · **THE CYCLE WAS DETERMINISTIC, NOT A RACE, AND NEITHER HALF WAS A BUG ON ITS OWN.**
+    `_hold_release` erases its target from `_holds` and calls
+    `set_chilled_stacks(HOLD_RELEASE_STACKS)` — **which is 1** — and then Honed Shards
+    (`cr_razor_hone`, Thaw row 6) applies **3** more. 1 + 3 is **exactly the 4 that
+    flash-freezes**, so every release re-froze its own target. Meanwhile `_hold_freeze` appends
+    and then runs `while _holds.size() > _hold_limit(): _hold_release(_holds[0])` — and the
+    limit is **1** for a Thaw-lane Cryomancer. So freezing a SECOND enemy evicted the first,
+    whose release re-froze it, which evicted the second, whose release re-froze IT, until
+    GDScript's stack limit. **The comment beside Honed Shards had always warned it "can
+    re-freeze the enemy it just thawed" and that warning was ACCURATE; what nobody traced was
+    that a hold LIMIT turns a self-re-trigger into a two-body cycle.**
+  · **THE FIX: `var _releasing`.** `_hold_release` sets it, calls `_hold_release_body`, clears
+    it; `_hold_freeze` early-returns while it is set, as its FIRST gate. **THE WRAPPER IS THE
+    POINT** — GDScript has no `finally`, the body carries an early return, and a leaked flag
+    refuses every freeze for the rest of the battle. **NO MAGNITUDE MOVED**: cutting Honed
+    Shards' 3 or the release's 1 would have nerfed a node to work around control flow.
+  · **NO RE-ARM IS NEEDED** and it was read, not assumed: the threshold is
+    `status_stacks("chilled") >= 4` (BEING at four, not REACHING it) and stacks clamp at 4, so a
+    parked enemy is frozen by the very next chill. A reach-based check there would leave enemies
+    permanently unfreezable — worse than the crash, and silent. Driven live in test_batch_bn and
+    built as a negative control.
+  · **HISTORICAL NUMBERS, kept because they are what an instrument looks like when it finds a
+    fault reading cannot:** 23 events per 400 budget-12 battles (BF §3, identical on unmodified
+    HEAD at matched n, so it was pre-existing); 15 overflows in four runs and ~1.1 MB of
+    backtrace with a Thaw Cryomancer (BG §1); and BN's own matched control — **305 events and
+    20 MB by run 6 on unmodified HEAD, against 25/25 runs and ZERO on the fixed build.**
+  · **WHAT IT COST WHILE IT STOOD, so the price of the next one is on the record: one of twelve
+    specs could not have its best lane measured by the project's best instrument.** BG
+    substituted Deep Freeze for Thaw to get a run band at all. That substitution is no longer
+    needed — a Thaw band now reads 16% completions, depth 39.40 ±1.99, zero events.
 - **THE DEVOUT'S FAITH ROW — THE ROW IS NOT A MAGNITUDE PROBLEM AND NEVER WAS. READ THE BI
   BLOCK AT THE TOP OF THIS FILE FOR THE CURRENT NUMBERS; everything in this entry below the BI
   lines is HISTORY.** Six batches: BE, BF §2, BG §2's capstone re-spec, BH §2's two lane-body

@@ -828,11 +828,27 @@ const ZONE_BASE_MULTS := [1.0, 1.5, 2.2]
 #
 # EVERY SCALING NUMBER HERE IS PROVISIONAL AND SAID SO. Balance is deferred
 # by designer decision; the STRUCTURE is what ships.
-#   rung 1 "Wanderer"  x0.70  — DELIBERATELY BELOW the present balance, and
-#                               it reuses Y's existing 0.7 rather than
-#                               inventing a number. This is the rung played
-#                               with ZERO talents, so it is the gate the
-#                               whole meta layer sits behind.
+#   rung 1 "Wanderer"  x0.50  — DELIBERATELY BELOW the present balance,
+#                               because this is the rung played with ZERO
+#                               talents and it is the gate the whole meta
+#                               layer sits behind. BATCH BN CHOSE THIS FLOAT
+#                               BY MEASUREMENT RATHER THAN BY GUESS: BM
+#                               inherited Batch Y's 0.70 from the Wanderer
+#                               affordance, which is a number picked for a
+#                               different job, and an untalented party
+#                               completed 12-13% at it — eight attempts
+#                               before the first unlock, with nothing banked
+#                               in between. Untalented completion, balanced
+#                               route, n=100 a row:
+#                                   x0.70  13%   x0.60  28%
+#                                   x0.50  83%   x0.40  95%
+#                               70% (a first run won in one or two attempts)
+#                               is the target and 0.50 is the closest of the
+#                               four. THE CURVE IS A CLIFF between 0.60 and
+#                               0.50 and 70% sits inside that unsampled gap,
+#                               so the honest reading is "the nearest
+#                               sampled value", not "the right number to
+#                               three figures" — a later playtest may move it.
 #   rung 2 "Warden"    x1.00  — the present balance, byte-for-byte. BK's
 #                               39.3/43.3/21.3% completions were measured
 #                               here, so nothing about that row moves.
@@ -846,7 +862,7 @@ const ZONE_BASE_MULTS := [1.0, 1.5, 2.2]
 #   fixed_modifier  — the mini-boss, the zone bosses and the end boss carry
 #                     a modifier, which today they never do.
 const DIFFICULTIES := {
-	"wanderer": {"rung": 1, "name": "Wanderer", "mult": 0.70,
+	"wanderer": {"rung": 1, "name": "Wanderer", "mult": 0.50,
 		"blurb": "The Decay is thin here. No twist.",
 		"severity_floor": 2, "fixed_modifier": false},
 	"warden": {"rung": 2, "name": "Warden", "mult": 1.00,

@@ -5,6 +5,83 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-13 &mdash; Batch BN: the crash, and the gate</h2>
+<p><i>Two items, both blockers, neither large. <b>&sect;1 is a bug. &sect;2 is one float, chosen
+by measurement rather than by guess.</b> Nothing else ships: no node, no ability, no magnitude
+and no save version moved. The capstone repricing that BM's numbers argue for is the next
+batch's &mdash; it wants the leave-one-out grid owed on Harmonic Convergence, and it must not be
+tuned in the same pass that moves rung 1.</i></p>
+
+<h3>&sect;1 &mdash; The infinite recursion between a release and a freeze</h3>
+<p><b>A Cryomancer who had taken Honed Shards could crash the game in normal play, and had been
+able to for six batches.</b> Batch BF's built sweep found it (23 stack overflows per 400
+budget-12 battles, identical on unmodified code, so it was nobody's recent work); Batch BG then
+measured 15 overflows in four runs and about a megabyte of backtrace with a Thaw Cryomancer in
+the party, and had to substitute a different lane to get a run measurement at all.</p>
+<p><b>The mechanism is deterministic, and neither half of it was a bug on its own.</b> A
+released enemy comes back on 1 stack of Chilled and <b>Honed Shards then applies 3</b> &mdash;
+which is exactly the 4 that flash-freezes &mdash; so every release re-froze its own target. The
+code comment beside that node had always said so, and it was right. The half nobody had read
+next to it is that a Thaw Cryomancer <b>holds one enemy</b>, so freezing a second evicts the
+first, and an eviction is a release. Together: freeze B, evict A, A's release re-freezes A,
+which evicts B, whose release re-freezes B &mdash; until the engine's stack limit.</p>
+<ul>
+<li><b>The fix is a re-entrancy guard, not a magnitude change.</b> No freeze may begin while a
+release is resolving. <b>Every authored number is left exactly as it was</b> &mdash; the node's
+intent is that a released enemy goes back into the pile deep, the engine stays warm, and that
+intent is good. Cutting Honed Shards' 3 or the release's 1 to dodge a threshold would have
+nerfed a node to work around control flow.</li>
+<li><b>It also closes the milder version that was never a crash:</b> Ice Lance releasing a hold
+and instantly re-taking it, which made the release read as doing nothing.</li>
+<li><b>A parked enemy is still freezable</b>, which was verified rather than assumed &mdash; the
+freeze threshold reads <i>being</i> at four stacks rather than <i>reaching</i> four, so the very
+next chill freezes it again. A guard that left enemies permanently unfreezable would have been a
+worse bug than the crash, and a silent one.</li>
+<li><b>Cryoclasm is unaffected.</b> It moves a hold rather than spending one and is deliberately
+not routed through the release, so no release payoff fires and the guard never sees it.</li>
+</ul>
+<p><b>What it unblocks, measured:</b> a Thaw Cryomancer can be measured by the run harness
+again &mdash; 25 runs, <b>zero stack-overflow events</b>, 16% completions at rung 2. The matched
+control on unmodified code could not finish: 305 overflow events and 20 MB of backtrace by its
+sixth run, in the time the fixed build completed all twenty-five.</p>
+
+<h3>&sect;2 &mdash; Rung 1's multiplier: &times;0.70 &rarr; &times;0.50</h3>
+<p><b>Difficulty 1 is the gate the entire meta layer sits behind</b> &mdash; rows, points,
+capstones and every subsequent rung are all behind one end-boss kill at rung 1, played with no
+talents at all. It was completing <b>12&ndash;13%</b>, which is roughly eight attempts before
+the first unlock with nothing banked in between. Rung 1 is the tutorial rung and it has to
+behave like one.</p>
+<p><b>The number was swept, not guessed.</b> Untalented party, balanced route, n=100 a row:</p>
+<table border="1" cellpadding="4">
+<tr><th>Rung-1 multiplier</th><th>Completions</th><th>Depth (of 49)</th><th>Power ratio @ z1 t8</th><th>Median wipe</th></tr>
+<tr><td>&times;0.70 (was)</td><td>13%</td><td>33.33 &plusmn;1.19</td><td>1.25</td><td>slot 30 (z2 t14)</td></tr>
+<tr><td>&times;0.60</td><td>28%</td><td>39.68 &plusmn;0.95</td><td>1.45</td><td>slot 41 (z3 t9)</td></tr>
+<tr><td><b>&times;0.50 (ships)</b></td><td><b>83%</b></td><td>46.62 &plusmn;0.43</td><td>1.74</td><td>slot 42 (z3 t10)</td></tr>
+<tr><td>&times;0.40</td><td>95%</td><td>47.76 &plusmn;0.17</td><td>2.15</td><td>slot 45 (z3 t13)</td></tr>
+</table>
+<p>The aim is a first run won in one or two attempts &mdash; 70% is 1.4 attempts, and 83% is
+1.2. <b>&times;0.50 is the closest of the four and it ships, but the table is what matters:</b>
+the curve is a cliff between &times;0.60 and &times;0.50 (55 points across one step), so 70%
+sits inside an unsampled gap and this is the nearest sampled value rather than a number defended
+to three figures. A later playtest may move it. The &times;0.70 row reproduces Batch BM's 12% at
+half the sample size, which is the control that makes the rest readable.</p>
+<h4>Three consequences, reported rather than discovered</h4>
+<ul>
+<li><b>Rung 1 with talent rows 1&ndash;3 filled is now close to a formality</b> &mdash; that
+build read 52% under &times;0.70 and <b>96%</b> now (n=100, balanced). <b>This is correct and not a problem.</b>
+Rung 1 is meant to become trivial once a player has anything, because that is the signal to
+climb.</li>
+<li><b>Rungs 2 and 3 did not move.</b> Neither multiplier, neither twist. Rung 2 is the present
+balance byte for byte, which is what keeps every earlier measurement readable. This is stated
+because a batch that moved rung 1 is exactly where someone would later assume all three
+moved.</li>
+<li><b>The 0% at rung 2 is not addressed here and must not be papered over by moving a rung.</b>
+Batch BM measured rung-matched builds at 52% / 0% / 18% and diagnosed it correctly: the ladder's
+power ratio is a clean, monotone 1.26 / 0.91 / 0.67, so <b>the ladder is fine and the tree is
+uneven</b> &mdash; a capstone is worth more than the eight lane nodes beneath it put together.
+That is a distribution problem and it belongs to its own batch.</li>
+</ul>
+
 <h2>2026-08-12 &mdash; Batch BM: talents become meta progression</h2>
 <p><i>The largest design change in the project's history. Talents stop being an in-run reward
 and become a <b>permanent, vertical meta layer</b>: points are earned per spec per completed

@@ -368,7 +368,14 @@ func _end_boss_and_ladder() -> void:
 	# THE LADDER: three rungs, rung 1 BELOW the present balance, rung 2 AT it.
 	_check(rs.contains('const DIFFICULTY_ORDER := ["wanderer", "warden", "ruin"]'),
 		"three rungs in order")
-	_check(rs.contains('"mult": 0.70'), "rung 1 is below the present balance")
+	# RE-POINTED IN PLACE (Batch BN §2): this pinned the literal 0.70, which BM
+	# inherited from Batch Y's Wanderer affordance — a float picked for a
+	# different job. BN swept untalented completion at 0.70 / 0.60 / 0.50 / 0.40
+	# (13% / 28% / 83% / 95%) and shipped 0.50. THE QUESTION IS UNCHANGED AND SO
+	# IS THE LABEL — rung 1 must sit BELOW the present balance — only the number
+	# moved, so the check is re-pointed rather than deleted, and rungs 2 and 3
+	# below it are asserted UNMOVED in the same breath.
+	_check(rs.contains('"mult": 0.50'), "rung 1 is below the present balance")
 	_check(rs.contains('"mult": 1.00'), "rung 2 IS the present balance")
 	_check(rs.contains('"mult": 1.30'), "rung 3 is above it")
 	_check(rs.contains('const LEGACY_DIFFICULTY := {"standard": "warden"}'),

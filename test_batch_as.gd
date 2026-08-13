@@ -861,8 +861,18 @@ func _live_releases() -> void:
 		hs.call("_hold_release", foe2, "the test")
 		ok(foe2.status_stacks("chilled") == 4,
 			"Honed Shards: 1 + 3 fresh stacks (got %d)" % foe2.status_stacks("chilled"))
-		ok(hs.call("_is_held", foe2),
-			"...which is four again, so the release re-holds it on the spot")
+		# RE-POINTED IN PLACE, AND IT IS AN INVERSION (Batch BN §1). This line
+		# asserted "...which is four again, so the release re-holds it on the
+		# spot" — the behaviour AS shipped and the near half of a crash. The
+		# release re-freezing its own target, plus a freeze past the limit
+		# evicting and releasing another, is a deterministic two-body cycle that
+		# ran to the stack limit (23 events per 400 budget-12 battles, BF §3).
+		# BN's `_releasing` guard refuses a freeze while a release resolves, so
+		# THE STACKS STILL LAND AND THE FREEZE DOES NOT. The check is kept
+		# rather than deleted because "does the release re-hold" is still the
+		# question worth asking; only the correct answer moved.
+		ok(not hs.call("_is_held", foe2),
+			"...and BN's guard stops those four re-freezing it on the spot")
 	hs.queue_free()
 	await process_frame
 	# Shattered Tempo pays the release out in TIME rather than damage.

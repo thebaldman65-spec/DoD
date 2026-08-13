@@ -193,6 +193,11 @@ var _bitter_echoing := false  # guards Bitter Cold freezes from cascading foreve
 # GLACIAL HOLD's ledger (Batch AS §1) — the enemies the Cryomancer is holding,
 # OLDEST FIRST. See the block above _apply_status for the three clauses.
 var _holds: Array[BattleUnit] = []
+# BATCH BN §1 — NO FREEZE MAY BEGIN WHILE A RELEASE IS RESOLVING. This one flag
+# is the whole fix for a deterministic infinite recursion between _hold_release
+# and _hold_freeze, and REMOVING IT RESTORES A CRASH — see the block above
+# _hold_release for the two-body cycle it breaks.
+var _releasing := false
 var _clock := 0.0  # the acting unit's position on the timeline, this turn
 # HOW MANY UNIT TURNS THIS BATTLE HAS SPENT. It drives the stalemate guard and
 # the forfeit nudge, and since Batch BB it is also the clock a once-per-turn
@@ -7641,6 +7646,15 @@ func _hold_window_mult() -> float:
 # THE ONE PLACE A HOLD BEGINS. Two callers: the Chilled-4 branch of
 # _apply_status, and Glacial Prison (which skips straight to it).
 func _hold_freeze(target: BattleUnit, src: BattleUnit) -> void:
+	# BATCH BN §1 — THE RE-ENTRANCY GUARD, AND IT IS THE FIRST LINE ON PURPOSE.
+	# A release can chill its own target back to four stacks (Honed Shards), and
+	# a freeze past the limit evicts and releases another. Either alone is fine;
+	# together they are a cycle that runs to the stack limit. Refusing the freeze
+	# WHILE a release resolves breaks it without touching either magnitude.
+	# The target keeps its stacks and is freezable again by the next chill — the
+	# threshold check is `>= 4`, i.e. it reads BEING at four, not REACHING it.
+	if _releasing:
+		return
 	if target.dead or target.has_status("frozen"):
 		return
 	# No Cryomancer standing — or the victim is a HERO, which Hoarfrost plus
@@ -7725,9 +7739,35 @@ func _hold_freeze_riders(target: BattleUnit, cryo: BattleUnit) -> void:
 
 # THE ONE PLACE A HOLD ENDS. Every caller names its reason in the log, because
 # "why is that enemy moving again" must always have an answer on screen.
+#
+# BATCH BN §1 — THE CYCLE `_releasing` BREAKS, WRITTEN OUT IN FULL BECAUSE THE
+# GUARD IS THE ONLY THING PREVENTING IT AND A LATER BATCH WOULD DELETE IT FOR
+# LOOKING REDUNDANT. Neither half is a bug on its own:
+#   · a release comes back on HOLD_RELEASE_STACKS (1) and Honed Shards then
+#     applies 3 — exactly the 4 that flash-freezes — so EVERY release re-freezes
+#     its own target. The comment at the Honed Shards site below has always said
+#     so, and it was accurate;
+#   · a freeze past `_hold_limit()` evicts the oldest prison, which is a release.
+# Put together at a limit of 1 they are a TWO-BODY CYCLE: freezing a second
+# enemy evicts the first, whose release re-freezes it, which evicts the second,
+# whose release re-freezes IT — until GDScript's stack limit. Measured at 23
+# stack-overflow events per 400 budget-12 battles (Batch BF §3) and 15 in four
+# runs with a Thaw Cryomancer (BG §1), and it is DETERMINISTIC, not a race.
+# The guard refuses a freeze while a release resolves; every authored magnitude
+# is left alone.
 func _hold_release(target: BattleUnit, reason: String) -> void:
 	if not _holds.has(target):
 		return
+	# The body is its own function for one reason: GDScript has no `finally`,
+	# the body already carries an early return, and a flag left standing would
+	# refuse every freeze for the rest of the battle. Set in one place, cleared
+	# in one place, whatever the body does.
+	_releasing = true
+	_hold_release_body(target, reason)
+	_releasing = false
+
+
+func _hold_release_body(target: BattleUnit, reason: String) -> void:
 	_holds.erase(target)
 	target.remove_status("frozen")
 	_log("   → %s is released from the ice — %s" % [target.unit_name, reason],
@@ -7769,8 +7809,12 @@ func _hold_release(target: BattleUnit, reason: String) -> void:
 		for e in enemies:
 			if not e.dead and e != target and not _is_held(e):
 				e.next_time += st * 100.0 / maxf(e.effective_speed(), 0.1)
-	# Honed Shards LAST, because it can re-freeze the enemy it just thawed:
-	# the release leaves the thawed target already deep in the cold.
+	# Honed Shards LAST: the release leaves the thawed target already deep in the
+	# cold. Since BATCH BN §1 it can no longer re-freeze the enemy it just thawed
+	# — `_releasing` refuses that — which closes the MILD version of the same
+	# fault as well as the crash: an Ice Lance release that instantly re-took its
+	# own hold, so the release read as a no-op. The stacks still land, so the
+	# next chill on that target freezes it again (`>= 4`, not `== 4`).
 	var hs := _max_hero_rank("honed_shards_ranks")
 	if hs > 0 and not target.dead:
 		var hs_h := _living_hero_with("honed_shards_ranks")

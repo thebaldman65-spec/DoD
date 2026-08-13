@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-12 (Batch BM)</b></p>
+<p align="right"><b>Last updated: 2026-08-13 (Batch BN)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -45,7 +45,7 @@ twist</b> as well as scaling, because stat inflation alone is a wall and a named
 ladder. <b>Every scaling number below is provisional and is the designer's to set.</b>
 <table border="1" cellpadding="4">
 <tr><th>Rung</th><th>Enemies</th><th>Twist</th><th>Opens</th></tr>
-<tr><td><b>1 — Wanderer</b></td><td>×0.70</td><td>none</td><td>talent rows 1–3</td></tr>
+<tr><td><b>1 — Wanderer</b></td><td>×0.50</td><td>none</td><td>talent rows 1–3</td></tr>
 <tr><td><b>2 — Warden</b></td><td>×1.00</td><td>the severity floor rises: the guaranteed
 mild bargain option may be severity 3</td><td>talent rows 4–6</td></tr>
 <tr><td><b>3 — Ruin</b></td><td>×1.30</td><td>the floor rises again (severity 4), and
@@ -53,7 +53,12 @@ mild bargain option may be severity 3</td><td>talent rows 4–6</td></tr>
 which today never do</td><td>talent rows 7–9</td></tr>
 </table>
 <b>Rung 1 is deliberately tuned BELOW the balance every prior measurement was taken at</b>,
-because it is the rung played with zero talents. Rung 2 IS that balance, byte for byte.</li>
+because it is the rung played with zero talents. Rung 2 IS that balance, byte for byte.
+<b>Rung 1's ×0.50 was chosen by measurement:</b> an untalented party on a balanced route
+completes <b>83%</b> of runs at it (n=100), against 13% / 28% / 95% at ×0.70 / ×0.60 / ×0.40.
+The aim is a first run won in one or two attempts; 70% would be 1.4 attempts and 83% is 1.2.
+The curve is a cliff between ×0.60 and ×0.50, so 70% sits in an unsampled gap and this is the
+nearest sampled value rather than a number defended to three figures.</li>
 <li><b>Spec choice:</b> offered per hero after the first victory. Three cards per class, each
 showing the spec name, its <b>archetype</b> in bold (mouseover for the archetype explanation),
 blurb, passive, and full ability details. The choice is permanent for the run.</li>
@@ -2313,15 +2318,18 @@ at the template when convenient. Battle backgrounds: authored at ≈1280×720 (u
 
 <h2>13. Known Gaps / Next Steps</h2>
 <ul>
-<li><b>Difficulty 1 with an untalented party completes 12%</b> (n=50, balanced). That is the
-gate the whole meta layer sits behind and it is <b>reported, not tuned</b>. The lever is rung
-1's multiplier &mdash; one float in one place.</li>
-<li><b>The ladder does not yet absorb the tree, and the shape of the miss is legible.</b>
-Rung-matched builds read 52% / 0% / 18% across the three rungs while the power ratio reads a
-clean, monotone 1.26 / 0.91 / 0.67 &mdash; so the ladder IS steeper at every rung and it is the
-tree that is uneven. <b>Rows 7&ndash;9 are where the tree's power lives, and rung 2 asks for a
-build that stops one row short of them.</b> Three plausible fixes (the rung's multiplier, the
-tier boundary, the capstone's price) and no measurement yet distinguishing them.</li>
+<li><b>Rung 1's landing zone is a cliff, and 70% sits inside it.</b> Untalented completion reads
+28% at &times;0.60 and 83% at &times;0.50, so one step of the multiplier is worth 55 points and
+the value that would land on the stated target was never sampled. The shipped &times;0.50 is the
+nearest sampled value, not a tuned one; the finer sweep (&times;0.58 to &times;0.52) is cheap
+and has not been run.</li>
+<li><b>The ladder does not yet absorb the tree at rungs 2 and 3, and the shape of the miss is
+legible.</b> Rung-matched builds read 0% at rung 2 and 18% at rung 3 while the power ratio reads
+a clean, monotone 1.26 / 0.91 / 0.67 &mdash; so the ladder IS steeper at every rung and it is
+the tree that is uneven. <b>Rows 7&ndash;9 are where the tree's power lives, and rung 2 asks for
+a build that stops one row short of them.</b> Two plausible fixes remain (the tier boundary, the
+capstone's price) and no measurement yet distinguishing them. <b>Moving a rung is not one of
+them</b> &mdash; the ratios say the ladder is not what is wrong.</li>
 <li><b>A capstone is worth more than the eight lane nodes beneath it put together</b> &mdash;
 eight picks and nine picks at the same rung read 8% and 68%. Measured, reported, untouched.</li>
 <li><b>BH's leave-one-out grid is owed on Harmonic Convergence</b> (Arcanist, Resonance row 8),
