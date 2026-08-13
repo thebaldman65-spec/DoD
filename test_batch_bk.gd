@@ -563,7 +563,18 @@ func _section_removals(rsrc: String, ssrc: String, bsrc: String, msrc: String) -
 
 func _section_save() -> void:
 	var src := FileAccess.get_file_as_string("res://scripts/run_state.gd")
-	ok(src.contains("\"version\": 8"), "§6: SAVE v8")
+	# BATCH BL re-pointed this line IN PLACE rather than deleting it. It used to
+	# pin the literal `"version": 8`, which broke the moment BL's recap ledgers
+	# raised it to 9 — and that is the wrong thing for a sibling batch's suite to
+	# own: BK's invariant is the REFUSAL THRESHOLD (a save describing a board
+	# this build cannot walk is cleared, not half-loaded), not whatever number
+	# the newest batch happens to be writing. Asserted as "8 or later" so the
+	# next bump does not fail a map test either.
+	var ver := -1
+	var vpos := src.find("\"version\": ")
+	if vpos >= 0:
+		ver = int(src.substr(vpos + 11, 3).strip_edges().split(",")[0])
+	ok(ver >= 8, "§6: SAVE version is 8 or later (found %d)" % ver)
 	ok(src.contains("if save_version < 8:"), "§6: a pre-v8 save is REFUSED and cleared")
 	ok(src.contains("\"node_idx\": node_idx"),
 		"§6: the position is the PAIR (slot_idx, node_idx) — which is exactly why a v7 line save has no honest place on a lattice")

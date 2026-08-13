@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-12 (Batch BK)</b></p>
+<p align="right"><b>Last updated: 2026-08-12 (Batch BL)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -659,7 +659,47 @@ first); the Orc Shieldmaster ALWAYS casts Shielding when no ally carries its war
 (lowest-HP ally first, itself included); the Withered Warden has a 60% chance to cast Wild
 Growth on the most wounded of its warband (itself included) when someone is below 70% HP.
 The Chief and the Ash-Wrought Tyrant build and spend Rage like a Warrior.</p>
-<h3>4.9 There is no announcer</h3>
+<h3>4.9 Enemy intent</h3>
+<p><b>Every enemy shows what it is about to do.</b> A fight is a planning puzzle rather than a
+guessing game: the twelve spines that were authored around denial, patience and control —
+the Cryomancer's hold, the Sharpshooter's patience, the Warden's threat — are all about
+refusing a <i>named</i> action, and the player can now see the name.</p>
+<p><b>Declare on schedule, resolve on turn.</b> An enemy selects its next action the moment its
+turn ends, and every enemy selects once before the first turn of the battle. That stored
+choice is what is displayed, and it is what resolves when the enemy's turn arrives. The
+<b>selection rules are unchanged</b> (§4.8 above) — only <i>when</i> they run has moved.</p>
+<p>The intent appears in two places: an <b>icon under each enemy's portrait in the turn bar</b>
+(on its next turn's slot only), and an <b>icon plus a line on the enemy's nameplate</b>, so a
+player watching the battlefield never has to read the bar. The seven categories:</p>
+<table>
+<tr><th>Intent</th><th>Icon</th><th>Meaning</th></tr>
+<tr><td>Strike</td><td>→</td><td>Single-target damage. Shows the ability's name.</td></tr>
+<tr><td>Sweep</td><td>⇉</td><td>An attack that hits the whole party, or several of it.</td></tr>
+<tr><td>Crush</td><td>▼</td><td>A high-pressure attack — more Break damage than health damage.</td></tr>
+<tr><td>Afflict</td><td>●</td><td>Applies a status. Shows the status's name.</td></tr>
+<tr><td>Bolster</td><td>▲</td><td>Buffs, wards or cleanses itself or a fellow.</td></tr>
+<tr><td>Mend</td><td>+</td><td>Heals.</td></tr>
+<tr><td>Wind-up</td><td>!!</td><td>A charged blow that lands on a later turn. Shows the turns remaining.</td></tr>
+</table>
+<p><b>No damage number is shown.</b> The only honest number would be one produced by the same
+code the real hit runs, and that code cannot be run twice for the same answer — it rolls
+variance and a critical on the way through, and it moves the attacker's state as it goes. A
+number computed a second way would be a tooltip that drifts from its ability, so the
+category and the ability's own name are shown instead.</p>
+<p><b>A declared action can be denied, and the board moves in between.</b> Three things can
+happen at resolution:</p>
+<ul>
+<li><b>The target is gone</b> → the enemy re-targets <i>within the same ability</i>. The intent
+the player planned against holds; only the victim changes.</li>
+<li><b>The ability cannot be used</b> (its cost is no longer payable) → it falls back to the
+basic attack, <b>and the combat log says so</b>.</li>
+<li><b>The enemy cannot act at all</b> (Stunned, Frozen, Broken, or held by a Cryomancer) →
+<b>the declared action is discarded, not banked.</b> Denying an enemy its turn denies the
+action it announced, exactly as cancelling a wind-up always has.</li>
+</ul>
+<p>The madness statuses are a fourth case and behave the same way: Hysteria, Bewitch and
+Psychosis take the turn, so the announced action does not happen.</p>
+<h3>4.10 There is no announcer</h3>
 <p>All battle information lives in the scrolling combat log (top right) and floating combat
 text. No banner text appears at the top of the battle.</p>
 
@@ -2011,7 +2051,8 @@ wipe, and forfeit. It reports the outcome and depth reached (<b>"Forfeited — Z
 reads distinctly from "Wiped", in its own colour, and carries the <b>reason</b> the player
 picked), the final battle (type, theme, and lineup) and which heroes fell,
 the party as it stood (per hero: spec, talent count with its <b>lane spread</b>, runes
-equipped, abilities earned), <b>damage share per hero across the whole run</b>, the run economy
+equipped, abilities earned), <b>damage share per hero across the whole run</b>, the three
+breakdowns below, the run economy
 (battles won, elites taken, gold earned / spent / unspent, rests, events seen, relics
 carried), and a chronicle line — cycles survived, cycles lost, and cycles abandoned once
 there are any — so a session of runs accumulates into something visible. A <b>Copy summary</b> button puts a plain-text version on
@@ -2019,13 +2060,33 @@ the clipboard: a wipe becomes a report the player can paste back to the designer
 feedback data with no telemetry to build. If any debug tool was used at any point in the
 run, the summary opens with <code>DEBUG TOOLS WERE USED IN THIS RUN — not a clean data
 point.</code> — in the panel and in the clipboard text both (see §12, Testing shortcuts).</p>
+<p><b>What killed you.</b> The summary answers three further questions, each reported for the
+<b>whole run</b> and again for the <b>final battle alone</b> — the run totals say what the build
+was doing, and only the final-battle block says what happened in that last fight:</p>
+<ul>
+<li><b>Damage dealt, by ability</b> — per hero, their top five abilities by damage across the
+run, with totals. The per-ability split always sums to the flat per-hero total beside it.</li>
+<li><b>Damage taken, by source</b> — per hero, the total and their top five sources, each named
+as <i>enemy kind / ability</i> (three Shieldmasters aggregate into one row, not three).
+<b>Indirect damage is included and attributed to whoever caused it:</b> status ticks go to the
+unit that applied them, and self-inflicted costs — Blood Price, Dark Pact, Cauterise, the
+Overburn drain, recoil — are marked as the hero's own.</li>
+<li><b>The killing blow</b> — for each hero who fell: what struck last, from whom, for how much,
+and <b>what their health was before it landed</b>. "I died" becomes "I was at 40 and it hit for
+52", which is the difference between a run that felt unfair and one that taught something.</li>
+</ul>
+<p>None of this is defeat-only: a completed run wants to know which ability carried it as much
+as a wipe wants to know what ended it.</p>
 <p><b>Two structural rules behind it:</b> (1) the summary <b>snapshots run state before the
 save is cleared</b>, never by reordering the save logic — a run that stays resumable after
 death is a worse bug than a missing summary. (2) The per-run ledger (damage per hero, gold,
 elites, rests, battles) lives on the <b>Run</b> autoload, not the battle scene, because the
 battle scene reloads between fights; it is banked once per battle from a battle-local slice,
 written only in real play so the simulation harness's own statistics path can never
-double-count it.</p>
+double-count it. The three breakdowns above follow both rules, and each per-hero map is
+<b>bounded</b> — at most 24 rows, with anything past that folded into a single "(other)" row
+— so no future ability draft can quietly grow the save file. The per-hero totals stay exact
+whatever the bound does to the rows.</p>
 
 <h2>12. Technical Reference</h2>
 <ul>

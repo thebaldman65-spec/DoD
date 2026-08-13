@@ -41,6 +41,13 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   against a real in-flight run at three positions and opens both overlays.
   It is a SCENE run, not `--script`: **autoloads (`Run`) do not resolve in a
   `--script` SceneTree.**
+- **`test_batch_bl.gd` NEEDS `--fixed-fps 12` AND IT IS NOT THE sim.sh FLAG.** sim.sh passes
+  240 to make frames run back-to-back in WALL time; this suite passes 12 to make each frame a
+  big TIME step, because a real-play battle paces itself with `create_timer` waits and §2's
+  ledger can only be read after a fight ENDS. At the default step a three-orc fight does not
+  finish inside any sane frame budget; at 12 it finishes in ~700 frames and nothing the battle
+  computes reads delta. Any future suite that has to run a REAL-PLAY battle to completion wants
+  the same trick.
 - New `class_name` files need `--headless --import` before they resolve.
 - Balance: `./sim.sh N` = N battles of the FIXED raider/chief/archer/archer
   lineup (power 7, unscaled) — kit smoke tests only; its win% carries NO
@@ -284,6 +291,128 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   party.tscn is the HERO SHEET now, opened from a card.
 
 ## Current systems snapshot (2026-08-09)
+
+### STANDING REFERENCE — ENEMY INTENT: ONE DECLARED-ACTION STORE, THREE RE-VALIDATION BRANCHES (Batch BL §1)
+**DECLARE ON SCHEDULE, RESOLVE ON TURN.** `_choose_enemy_action` is the SELECTION half lifted
+out of `_enemy_turn` **byte-for-byte** — §1 forbade an AI rewrite and that function is where the
+promise is kept, so a diff touching the rules inside it broke the promise. Only *when* it runs
+moved. Sites:
+· **Declaration**: `_declare_intent(u)` (writes `BattleUnit.intent` + the plate).
+  Called from **`_declare_all_intents()`** at battle start (in `_run_battle`, after the opening
+  oath/Faith hooks — they move state the policy reads) and from **the turn loop right after
+  `await _enemy_turn(u)`**, NOT from the bottom of `_enemy_turn`: that function has eight
+  returns and a declaration owed on all of them is a declaration owed by the caller. Also on
+  each lost-turn branch (stun/freeze/broken, after the discard) and in `_hold_release`.
+· **Re-validation** at resolution, `_revalidate_intent(u)`, in this fixed order — (1) **target
+  gone → re-target within the SAME ability** (`_istat("intent_retarget")`); (2) **ability
+  unusable → fall back to `_cheapest_attack` AND LOG IT** (`intent_fallback`; a silent
+  substitution is the intent system lying); (3) **cannot act → `_discard_intent`, DISCARDED NOT
+  BANKED** (`intent_discarded` + `intent_discard_<cause>`; stunned/frozen/broken/held).
+  **READ THE TARGET UNTYPED FIRST** — a declared beast can be `queue_free`d between declaration
+  and resolution, and a typed assignment of a freed instance errors BEFORE `is_instance_valid`
+  can run. Found in a live 50-run measurement; pinned in test_batch_bl.
+· **A FOURTH counter, deliberately not one of the three**: `intent_hijacked` — Hysteria,
+  Bewitch and Psychosis take the turn, so the unit ACTS but not as declared. Counted at the
+  moment each branch COMMITS (Psychosis is a coin-flip; clearing on the status alone would
+  throw away declarations on the half of turns the madness does not take).
+· **THE `charging` STATUS IS THE SAME MECHANISM, NOT A SECOND ONE.** The wind-up stores its
+  blow in `intent` like everything else; the status survives only as the chip and the cancel
+  hook. **Nothing reads an ability name off the status any more** (asserted). `_declare_intent`
+  returns early on `has_status("charging")` — that ONE line is why a charging enemy declares
+  once, not twice. `_cancel_charge` routes through `_discard_intent`, so a cancelled wind-up
+  counts as exactly one discard. **A later batch wanting a multi-turn declaration sets
+  `intent.turns` and adds a chip. IT DOES NOT ADD A SECOND STORE.**
+· **Counters go through `_istat`, NOT `_stat`** — unconditional, not sim-gated, because the
+  re-validation rates are a property of the MECHANISM and must be observable in real play or
+  "a stun really discards" is only checkable by trusting the code that does it. In sim they
+  land in the same `sim_stats` dict, so there is still exactly one counter.
+  `intent_report_line(stats)` is a static and prints in BOTH reports.
+· **Categories are DATA-DRIVEN** (`_intent_category`): windup → mend → ally-target → aoe →
+  `pressure > damage` → applies_status-and-not-this-unit's-hardest-hit → strike. Order IS the
+  classification. An enemy added to enemies.json classifies itself; there is no name table.
+**NO PREDICTED NUMBER SHIPPED, AND THIS IS THE FINDING RATHER THAN AN OMISSION.** §1 required
+the number come from the same call the real hit makes, run dry, and named the escape hatch. The
+strike block is `battle.gd` ~4990-5670 (~680 lines) and fails on two counts, either fatal
+alone: (a) it mutates on the way through — `crit_streak`, resource restores, `float_text`, and
+writes to THREE ledgers (`_prev`, `_devout_prev`, `_stat`); (b) its FIRST line is
+`randf_range(0.9, 1.1)` and a crit rolls inside it, so **the same call with identical inputs
+returns a different number**, and §4's "predicted equals dealt" could not hold even after a
+perfect extraction. Icon + the ABILITY'S OWN NAME is shown instead — read off the declaration,
+so it cannot drift. **The negative control changed shape to match**: test_batch_bl greps the
+intent block for `attacker.attack` / `effective_armor` / `randf_range` / `resists.get` and
+fails if a later batch adds a preview by reimplementing the maths.
+**TWO THINGS §1 DELIBERATELY DID NOT BUILD — NOT BUILT, NOT MISSED:**
+· **HIDDEN INTENT** (an enemy whose intent is concealed, making information a resource the
+  player fights for). A good mechanic and a DIFFERENT one; author it once the baseline is
+  legible. Flagged, not built.
+**MEASURED AT BL (150 runs, 50 per policy, 50,799 declarations) — the baseline a later batch
+compares against.** Re-targeted **3.2 / 3.5 / 5.9%** (greedy/balanced/cautious); **fell back to
+basic 0.0% in all three** (the number §1 said to watch — the declaration is NOT happening too
+early); discarded **16.1 / 15.1 / 11.2%**, and it is **almost all the Cryomancer's hold** (3014
+/ 2598 / 1365) with Break the remainder (103 / 94 / 162) and **zero plain stun or freeze** —
+in this party his freeze always becomes a hold. **ONE IN SIX DECLARED ENEMY ACTIONS NEVER
+HAPPENS.** `intent_hijacked` reads **0.0% and that is a MEASUREMENT HOLE, NOT A RESULT**: the
+standard test party carries no Occultist, so no madness status was ever applied — the counter
+is asserted in the suite but has never run at scale. **Completions 52 / 46 / 20% against BK's
+39.3 / 43.3 / 21.3.** All three inside their 95% bands, **but greedy is +12.7 pts and near the
+edge of its own, so it is a signal rather than noise.** The bot cannot benefit from SEEING an
+intent, so if it is real the mechanism must be the one behavioural shift below — an enemy that
+declared before a Break window opened does not take it. **NOTHING WAS TUNED**; BK's baselines
+are two batches old and correcting inside the batch that moves them is the Devout mistake.
+· **AN AI REWRITE.** Selection logic is untouched. **What DID change is that state-sensitive
+  policies now read the board ONE TURN EARLIER** — reported, corrected nowhere: the whole of
+  `_enemy_support_action` (Healing Wave <40%, Regenerate <50%, Cleansing Rite, Shielding, Wild
+  Growth <70%, Dark Vigil), the **Broken-hero exploit** (the most sensitive of all — a Break
+  window is short and a declaration made before it opens will not take it), `_lowest_hp` /
+  `_threat_pick`, the taunt narrowing, and the Savage Presence / Ghillie Suit rolls.
+
+### STANDING REFERENCE — THE RECAP LEDGERS AND THEIR BOUND (Batch BL §2)
+**DAMAGE TAKEN WAS TRACKED NOWHERE BEFORE BL** — `_stat` knew `dmg_hero_` / `heal_hero_` /
+`prev_hero_` / `bd_hero_` / `st_hero_` and nothing taken. It now hangs off ONE door:
+**`BattleUnit.damage_taken_cb`**, fired by `_report_taken` from the only two places health
+leaves a unit (`take_hit`, `take_tick_damage`). It reports the **DELTA, not the argument** (a
+52 into a hero on 40 is 40 taken, or the column would disagree with the health bar) and sits
+**BELOW ALL FOUR DEATH-REFUSALS** — Hold the Line, Undying Rage, Ashes of Al'ar,
+Intercession/Martyrdom. Above them it would count health handed straight back AND file a
+refused death as a killing blow. A future damage source cannot forget to report: it cannot
+remove health without one of those two functions.
+· **ATTRIBUTION IS A FRAME**, `_dmg_frame(src, label, src_name)`, set at **`_resolve`'s entry**
+  — one site covering the strike, its splash, echoes, the reflect/retaliation it draws and the
+  recoil/Blood Price it costs — **re-established after each of the TEN nested `await _resolve`
+  calls** (a counter leaves the frame pointing at itself) and set explicitly at the two damage
+  sites outside `_resolve`: the **DoT tick loop** (from the status's `src_name`, which
+  `_apply_status` already stamps — the applier may be dead) and the **Overburn/Cauterise
+  drain**. **SELF-INFLICTED IS DECIDED BY IDENTITY** (`victim == _dmg_src`), which covers Blood
+  Price, Dark Pact, Cauterise, the Overburn drain and recoil in one rule and cannot go stale
+  the way a name list would.
+· **BY KIND, NEVER BY INSTANCE** — `_taken_source` reads the new `BattleUnit.enemy_kind`
+  (stamped in `_enemy_config` AFTER the "boss" alias resolves, so a boss books as what it is).
+  `unit_name` happens to agree today; keying on that agreement would make the aggregation an
+  accident the first uniquely-named enemy breaks. Negative control renames two same-kind
+  instances and asserts one row.
+· **New tally keys** (`Run.tally`): `dealt` hero→ability→amount, `taken`
+  hero→"`<kind> / <ability>`"→amount, `taken_total` hero→amount (**exact, never folded**),
+  `kills` (list), `final` (a whole copy of the other four, **overwritten every battle — so at
+  run end it IS the final battle** and nothing has to know which fight that was).
+  Writers `tally_dealt` / `tally_taken` / `tally_kill` / `tally_bank_final`, all through the
+  ONE bounded writer `_tally_book`.
+· **THE BOUND: `TALLY_KEYS_PER_HERO = 24` rows per hero per map, INCLUDING the `(other)` row**
+  (so "at most 24", not "24 plus one"); `TALLY_KILLS_MAX = 12`, oldest kept. Overflow FOLDS
+  into `(other)` rather than being dropped — the total stays exact and only the breakdown gets
+  coarser, which is the right way round when the panel reports a top 5.
+· **Banked by `_bank_run_ledgers()`**, called from `_check_end`'s run branch AND from
+  `_do_forfeit` (a forfeit never reaches `_check_end`, and the abandoned fight is exactly what
+  the tester wants explained). **Idempotent** — it clears the slices as it banks.
+· **SAVE VERSION 8 → 9, TOLERANT** (unlike BK's v8 refusal): these are counters, not structure,
+  so a v8 save loads and seeds the new keys at zero mid-run. A recap that starts counting
+  halfway beats a wiped run.
+· **BL DROPPED A `sim and` GUARD IN THE DoT TICK LOOP and it was a real hole, not a tidy-up**:
+  in REAL PLAY a Pyromancer's Burn and a Survivalist's Poison reached neither the run summary's
+  damage share nor anything else. **Sim totals are untouched** — that path already counted the
+  ticks — so **no baseline moves**.
+· Renderer `_append_breakdown(...)` is written ONCE and called TWICE (whole run, final battle);
+  everything goes into the SAME line list `_summary_plain_text` walks, so the Copy button stays
+  complete. **Not a defeat-only screen** — wipes, forfeits and completions all get it.
 
 ### STANDING RULE — FIFTEEN POINTS UNDER LEAVE-ONE-OUT IS WHAT MAKES A LANE A LANE (Batch BH §2)
 **If withholding any single node moves a lane's headline contribution by more than about fifteen

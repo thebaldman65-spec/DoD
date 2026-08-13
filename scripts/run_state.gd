@@ -173,9 +173,29 @@ var sim_run := false
 var tally := {}
 
 
+# BATCH BL §2 — THE BOUND, and it is a real one rather than a comment. An
+# unbounded (hero x ability) map is fine today — a hero owns a handful of
+# abilities and meets a handful of enemy kinds — but it is a map keyed on
+# AUTHORED CONTENT that goes into the save file, and a later ability draft with
+# 150 entries would grow every save quietly and forever. Past the bound, further
+# distinct keys fold into one "(other)" row rather than being dropped: the
+# per-hero TOTAL stays exact and only the breakdown gets coarser, which is the
+# right way round when the panel reports a top 5.
+const TALLY_KEYS_PER_HERO := 24
+const TALLY_KILLS_MAX := 12
+const TALLY_OTHER := "(other)"
+
+
 func reset_tally() -> void:
+	# `dealt`/`taken` are hero -> key -> amount; `taken_total` is the exact
+	# per-hero sum (never folded, so the "(other)" row can never make the
+	# breakdown disagree with the total); `kills` is the killing-blow list; and
+	# `final` holds the LAST battle's own copy of all four. Overwriting `final`
+	# every battle is what makes it the FINAL battle when the run ends.
 	tally = {"damage": {}, "gold_earned": 0, "gold_spent": 0,
-		"elites": 0, "battles": 0}
+		"elites": 0, "battles": 0,
+		"dealt": {}, "taken": {}, "taken_total": {}, "kills": [],
+		"final": {"dealt": {}, "taken": {}, "taken_total": {}, "kills": []}}
 
 
 func tally_add(key: String, amount := 1) -> void:
@@ -201,6 +221,75 @@ func tally_damage(hero_name: String, amount: float) -> void:
 	var dmg: Dictionary = tally.get("damage", {})
 	dmg[hero_name] = float(dmg.get(hero_name, 0.0)) + amount
 	tally["damage"] = dmg
+
+
+# BATCH BL §2 — THE ONE BOUNDED WRITER, shared by the dealt map and the taken
+# map so the cap cannot be honoured by one and forgotten by the other. `book` is
+# hero -> key -> amount; a key already present always lands on its own row, so
+# the bound bites only on the (N+1)th DISTINCT key a hero ever sees.
+func _tally_book(book: Dictionary, hero_name: String, key: String,
+		amount: float) -> void:
+	var rows: Dictionary = book.get(hero_name, {})
+	# The bound counts the "(other)" row itself, so a hero's map NEVER holds
+	# more than TALLY_KEYS_PER_HERO entries — "at most 24 rows" rather than
+	# "24 rows plus one more".
+	if not rows.has(key) and rows.size() >= TALLY_KEYS_PER_HERO - 1:
+		key = TALLY_OTHER
+	rows[key] = float(rows.get(key, 0.0)) + amount
+	book[hero_name] = rows
+
+
+# Damage a hero DEALT, split by the ability that dealt it (Batch BL §2). The
+# whole-run `damage` total above is written separately and stays authoritative:
+# these rows answer "with what", never "how much".
+func tally_dealt(hero_name: String, ability: String, amount: float) -> void:
+	if debug_summon or amount <= 0.0:
+		return
+	if tally.is_empty():
+		reset_tally()
+	_tally_book(tally.get("dealt", {}), hero_name, ability, amount)
+
+
+# Damage a hero TOOK, keyed by "<source> / <ability>" — the source being an
+# enemy KIND (three Shieldmasters aggregate into one row) or the hero themself
+# for a self-inflicted cost. `taken_total` is kept beside it and is never folded
+# into "(other)", so the total is exact whatever the bound does to the rows.
+func tally_taken(hero_name: String, source_key: String, amount: float) -> void:
+	if debug_summon or amount <= 0.0:
+		return
+	if tally.is_empty():
+		reset_tally()
+	_tally_book(tally.get("taken", {}), hero_name, source_key, amount)
+	var totals: Dictionary = tally.get("taken_total", {})
+	totals[hero_name] = float(totals.get(hero_name, 0.0)) + amount
+	tally["taken_total"] = totals
+
+
+# One killing blow: who fell, to what, from whom, for how much, and the health
+# it landed against. Bounded like everything else here — a run cannot record
+# more than TALLY_KILLS_MAX of them, and the oldest is the one kept because the
+# first death in a run is the one that explains the rest.
+func tally_kill(record: Dictionary) -> void:
+	if debug_summon:
+		return
+	if tally.is_empty():
+		reset_tally()
+	var kills: Array = tally.get("kills", [])
+	if kills.size() < TALLY_KILLS_MAX:
+		kills.append(record)
+	tally["kills"] = kills
+
+
+# The battle that just ended, banked whole so the recap can report it on its
+# own. Overwritten each time: when the run ends, this holds the final battle.
+func tally_bank_final(dealt: Dictionary, taken: Dictionary,
+		taken_total: Dictionary, kills: Array) -> void:
+	if debug_summon:
+		return
+	if tally.is_empty():
+		reset_tally()
+	tally["final"] = {"dealt": dealt.duplicate(true), "taken": taken.duplicate(true),
+		"taken_total": taken_total.duplicate(true), "kills": kills.duplicate(true)}
 
 
 const HERO_BASE := {
@@ -1167,8 +1256,14 @@ func save_run() -> void:
 	# AI refused ranked purchases: the migration would have to INVENT a row
 	# the party never stood in and a set of edges they never had, on a map
 	# generated after the fact. A wipe that says so beats that.
+	# v9 (BATCH BL §2): the recap's new ledgers — dealt-by-ability, taken-by-
+	# source, taken totals, killing blows, and the final-battle copy of all
+	# four. TOLERANT, unlike the v8 refusal above: these are counters, not
+	# structure, so a v8 save loads and simply starts them mid-run at zero. A
+	# recap that begins counting halfway through a resumed run is a smaller lie
+	# than a wiped run, which is the test v8 failed and this one passes.
 	file.store_var({
-		"version": 8, "party": party, "items": items, "gold": gold,
+		"version": 9, "party": party, "items": items, "gold": gold,
 		"tally": tally, "debug_used": debug_used,
 		"difficulty": difficulty,
 		"zone_idx": zone_idx, "zone_name": zone_name, "zone_draw": zone_draw,
@@ -1223,6 +1318,17 @@ func load_run() -> bool:
 	tally = data.get("tally", {})
 	if tally.is_empty():
 		reset_tally()
+	# BATCH BL §2: a v8 save carries a tally with none of the recap's new keys.
+	# Seed the missing ones rather than refusing the save — every writer above
+	# assumes they exist, and a resumed run should lose the recap's history, not
+	# the run.
+	for k in ["dealt", "taken", "taken_total"]:
+		if not (tally.get(k) is Dictionary):
+			tally[k] = {}
+	if not (tally.get("kills") is Array):
+		tally["kills"] = []
+	if not (tally.get("final") is Dictionary):
+		tally["final"] = {"dealt": {}, "taken": {}, "taken_total": {}, "kills": []}
 	_migrate_trees()
 	# A pre-AC (v4) save loads with the honesty flag false — it predates
 	# every tool that could have set it. The session-scoped toggles are

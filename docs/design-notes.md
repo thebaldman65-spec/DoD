@@ -4,6 +4,54 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Twelve spines were authored around denial, and none of them could be seen working (Batch BL) — 2026-08-12
+
+Enemy intent is not a new mechanic. It adds no ability, no status, no number.
+It moves *when* an existing function runs and then draws the result. That is
+why it was worth more than a new mechanic would have been.
+
+Count what this game already spent on denial. The Cryomancer's whole spec is
+taking an enemy off the timeline. The Warden's Threat lane is a bid to be
+attacked instead of someone else. The Sharpshooter waits. Break exists so that
+a party can spend three turns buying one turn where an enemy does nothing.
+Stun, Freeze, Hysteria, Bewitch, Psychosis — five separate systems whose payoff
+is that an enemy's turn does not happen. Twelve spines, and the payoff of every
+one of them was **an event with no visible content**: something that was going
+to occur did not, and the player was never told what it was.
+
+A player who cannot see what they prevented cannot tell prevention from luck.
+That is the whole argument. Freezing an Ash Hurler mid-charge always read as a
+win, because Batch V made the wind-up *say its name* — the chip, the log line,
+the CHARGE LOST float. Freezing an Orc Brute a turn before its Overhead Crush
+read as nothing at all, and it was worth about the same. One of those two was
+legible and the other was not, and the difference was a label rather than a
+rule.
+
+The re-validation rules follow from the same idea rather than from
+engineering. A dead target re-targets *within the same ability* because the
+player planned against the ability, not the victim — the plan should survive
+the kill. An unusable ability falls back to the basic attack **and says so**,
+because a silent substitution is the intent system lying, which is worse than
+not having one. And a denied turn discards the declaration rather than banking
+it: banking would mean that stunning an enemy delayed its blow instead of
+deleting it, which would take the payoff back out of the twelve spines this was
+built to pay.
+
+The number was dropped, and that is a design decision rather than a
+compromise. A damage preview computed a second way is a tooltip with a shorter
+fuse — Batch BJ's audit found thirty-eight tooltips that had drifted from their
+code, and a number rendered every turn beside the thing it describes would
+drift faster and more visibly than any of them. The damage path here cannot be
+asked twice for the same answer; it rolls variance and a critical on the way
+through. So the intent says *what*, not *how much*. "The Brute is about to
+Crush" is most of the planning value of "the Brute is about to Crush you for
+41", and it is the half that cannot become a lie.
+
+The recap is the same instinct pointed at the other end of a run. A wipe
+already reported *that* you died and *who* fell. What it could not say was what
+hit last and what you were standing on when it did. "I was at 40 and it hit for
+52" is a sentence a player can act on; "the party has fallen" is not.
+
 ## What was under the four accidents (Batch BJ) — 2026-08-11
 
 Four lying tooltips were found by accident in twenty batches — Measured Rage,

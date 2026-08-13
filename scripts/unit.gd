@@ -70,6 +70,19 @@ var next_time := 0.0        # position on the initiative timeline
 var is_ranged := false      # ranged units can't be parried; Tripwire skips them
 var is_boss := false        # bosses cannot be Stunned unless Broken
 var enemy_role := ""        # "tank"/"support"/"damage" — heal-AI priorities
+# BATCH BL §2 — the enemy's KIND ("shieldmaster"), set from the roster config so
+# the recap can aggregate three Shieldmasters into one row. `unit_name` happens
+# to be shared by instances of a kind today, but that is a name collision rather
+# than an attribution: this field is the one the ledger keys on.
+var enemy_kind := ""
+# BATCH BL §1 — THE DECLARED ACTION. ONE store for both flavours of declaration:
+# an ordinary intent lands on this unit's next turn, and a WIND-UP is simply a
+# declaration with `turns` 2. The `charging` status survives as the visible chip
+# and the cancel hook the turn loop already checks, but it no longer carries a
+# stored ability name of its own — that would be a second declared-action
+# mechanism sitting beside the first, which is exactly what §1 forbids.
+# Keys: ability (Ability), target (BattleUnit), category, detail, turns, logs.
+var intent := {}
 var is_companion := false   # Beastmaster summon: no turns, fights alongside
 var companion_kind := ""    # "ursus" / "canis" / "aguila"
 var beasts: Array = []      # the Beastmaster's active summons (on the hunter;
@@ -852,6 +865,15 @@ var prevented_cb := Callable()  # Batch W sim ledger: barrier absorbs → (src_n
 # terms rather than a pool and a later effect added here has to say which term
 # it belongs to instead of silently vanishing the way these three did.
 var credit_cb := Callable()
+# BATCH BL §2 — THE DAMAGE-TAKEN DOOR, and there is exactly one because there
+# are exactly two places health leaves a unit: `take_hit` (every strike) and
+# `take_tick_damage` (every DoT, recoil and self-inflicted cost). Fires as
+# (victim, hp_lost, hp_before) with the HP ACTUALLY REMOVED — after barriers,
+# Conversion, Stable Alignment and Event Horizon have each had their say — so
+# the ledger books what the player felt rather than what was aimed at them.
+# `hp_before` rides along because the killing-blow line needs the number the
+# hit landed against, and only this scope still has it.
+var damage_taken_cb := Callable()
 
 # Occultist tree (07-24; lanes re-specced Batch L 07-30; every counter went
 # ADDITIVE in Batch AX — the field holds the MAGNITUDE, not a rank, and the
@@ -985,6 +1007,7 @@ var sprite: AnimatedSprite2D
 var _plate_root: Node2D    # nameplate container owned by the battle scene
 var _plate_panel: Panel
 var _plate_style: StyleBoxFlat
+var _intent_label: Label   # BATCH BL §1: the declared action, on the plate
 var _plate_active := false # gold border: it's this unit's turn
 var _plate_hover := false  # light border: hovered / targeted
 var _hp_fill: ColorRect
@@ -1206,12 +1229,46 @@ func build_plate(root: Node2D) -> void:
 	_plate_panel.add_child(_pressure_text)
 	y += 11.0
 
+	# BATCH BL §1 — THE INTENT LINE, above the chips and below the bars. It sits
+	# on the plate rather than only in the turn bar for the reason §1 gives: a
+	# player watching the battlefield should not have to read the bar to know
+	# what is coming.
+	#
+	# ENEMIES ONLY, and that is a layout constraint rather than a preference. A
+	# hero's next action is the player's own choice, so the row would always be
+	# blank on one — and reserving its 12px on a hero carrying two resource bars
+	# takes the plate from 79px to 91px against a PLATE_STEP of 82, which stacks
+	# the party's plates into each other. An enemy plate has spare room in the
+	# same place because it carries no resource bars.
+	if not is_hero:
+		_intent_label = Label.new()
+		_intent_label.position = Vector2(4, y)
+		_intent_label.size = Vector2(PLATE_W - 8, 12)
+		_intent_label.add_theme_font_size_override("font_size", 9)
+		_intent_label.add_theme_constant_override("outline_size", 2)
+		_intent_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+		_intent_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_intent_label.visible = false
+		_plate_panel.add_child(_intent_label)
+		y += 12.0
+
 	# Chips run full width under the portrait + bars.
 	var chips_y := maxf(y, 52.0)
 	_chips_root = Node2D.new()
 	_chips_root.position = Vector2(5, chips_y + 2.0)
 	_plate_panel.add_child(_chips_root)
 	_plate_panel.size = Vector2(PLATE_W, chips_y + 17.0)
+
+
+# BATCH BL §1 — the intent line's ONE writer. Blank text hides the row outright
+# rather than leaving an empty strip, so a Held or dead enemy (which declares
+# nothing) reads as declaring nothing.
+func set_intent_plate(text: String, color: Color) -> void:
+	if _intent_label == null or not is_instance_valid(_intent_label):
+		return
+	_intent_label.text = text
+	_intent_label.add_theme_color_override("font_color", color)
+	_intent_label.visible = text != ""
 
 
 # Border states: gold = this unit's turn; light = hovered/targeted.
@@ -1995,6 +2052,10 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	var was_above_quarter := hp > max_hp * 0.25
 	var was_below_deathwish := hp < max_hp * 0.35
 	var was_above_mercy := hp > max_hp * mercy_threshold
+	# BATCH BL §2: the health this hit landed against, captured before the
+	# subtraction — the killing-blow line's whole point ("I was at 40 and it hit
+	# for 52") and the one number no later scope can recover.
+	var hp_before := hp
 	hp = maxi(hp - amount, 0)
 	_check_below_half(was_above_mercy)
 	# Hold the Line: the party cannot die while the blessing holds.
@@ -2010,6 +2071,12 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		_proc_log("Capstone: Undying Rage — %s refuses to die (1 HP; the rage ends)" % unit_name)
 	_ashes_guard()
 	_holy_reversal()
+	# BATCH BL §2 — BOOKED BELOW ALL FOUR DEATH-REFUSALS (Hold the Line, Undying
+	# Rage, Ashes of Al'ar, Intercession/Martyrdom), never above them. Above,
+	# the delta would count health the hero got straight back, and a refused
+	# death would be filed as a killing blow — the recap would name a hit that
+	# killed nobody as the thing that killed you.
+	_report_taken(amount, hp_before)
 	if resource_name == "Rage":
 		resource = mini(resource + 10, max_resource)
 	# Enraged (talent): dropping below half HP grants a stacking damage buff,
@@ -2161,8 +2228,23 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 
 
 # Damage from DoT effects (Burn). No Pressure, no hurt animation. Returns true on death.
+# BATCH BL §2 — the one report, called from BOTH subtraction sites with the
+# health actually removed. It reports the DELTA rather than the argument: a hit
+# for 52 into a hero on 40 is 40 points of damage taken, and booking 52 would
+# make the taken column disagree with the health bar. `hp_before` is passed
+# through unchanged because the killing-blow line wants what the hit landed
+# against, not what survived it.
+func _report_taken(amount: int, hp_before: int) -> void:
+	if amount <= 0 or not damage_taken_cb.is_valid():
+		return
+	var lost := hp_before - hp
+	if lost > 0:
+		damage_taken_cb.call(self, lost, hp_before)
+
+
 func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 	var tick_was_above := hp > max_hp * mercy_threshold
+	var tick_hp_before := hp
 	hp = maxi(hp - amount, 0)
 	_check_below_half(tick_was_above)
 	if hp == 0 and has_status("undying"):
@@ -2175,6 +2257,8 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 		_proc_log("Capstone: Undying Rage — %s refuses to die (1 HP; the rage ends)" % unit_name)
 	_ashes_guard()
 	_holy_reversal()
+	# BATCH BL §2 — same rule as take_hit: below every death-refusal.
+	_report_taken(amount, tick_hp_before)
 	# Blood Frenzy v2: tick-driven dives bank their floor too.
 	if passive_id == "bloodrage" and not dead:
 		frenzy_bonus()

@@ -258,6 +258,27 @@ var _b_sig := {}
 # damage share. Written only when `sim` is false — RunSim keeps its own
 # stats path and must never double-count.
 var _run_slice := {}
+# BATCH BL §2 — the recap's three battle-local slices, banked into Run.tally at
+# _check_end beside `_run_slice` and under the SAME rule: real play only. Their
+# shapes are the tally's own (hero -> key -> amount, and a list of records), so
+# banking is a copy rather than a translation.
+var _run_dealt := {}        # hero -> ability -> damage dealt
+var _run_taken := {}        # hero -> "<source> / <ability>" -> damage taken
+var _run_taken_total := {}  # hero -> damage taken (exact; never folded)
+var _run_kills: Array = []  # the killing blows this battle
+# BATCH BL §2 — THE ATTRIBUTION FRAME: who is dealing damage right now, and with
+# what. Set at `_resolve`'s entry (which covers every strike, its splash, its
+# echoes, its recoil and its self-costs in one place) and re-established after
+# each NESTED resolve, plus explicitly at the handful of damage sites that live
+# outside `_resolve` — the status ticks and the Overburn drain.
+#
+# `_dmg_src` is the unit so self-inflicted damage can be recognised by identity
+# (victim == source) rather than by a list of ability names that would go stale;
+# `_dmg_src_name` carries a source that is no longer a live unit, which is what
+# a status tick from a dead applier is.
+var _dmg_src: BattleUnit = null
+var _dmg_src_name := ""
+var _dmg_label := ""
 
 var history: RichTextLabel
 var history_panel: PanelContainer
@@ -406,7 +427,12 @@ func _enemy_config(kind: String) -> Dictionary:
 	if kind == "boss":
 		# The zone def owns its boss (rotation-safe — never keyed on slot).
 		kind = Run.boss_kind() if Run.active else "withered_warden"
-	return Enemies.config(kind)
+	var cfg := Enemies.config(kind)
+	# BATCH BL §2: the kind travels onto the unit so the recap can aggregate by
+	# it. Stamped after the "boss" alias resolves, so a boss books under the
+	# kind it actually is rather than under the word "boss".
+	cfg["enemy_kind"] = kind
+	return cfg
 
 
 func _spawn_units() -> void:
@@ -1044,6 +1070,7 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
 	u.setup(config)
 	u.log_proc = _log  # unit-side talent procs reach the combat log
 	u.status_expired_cb = _on_status_expired  # Lingering Torment listens
+	u.damage_taken_cb = _on_damage_taken  # BATCH BL §2: the recap's taken ledger
 	# The nameplate is a sibling (not a child) so lunges/knockback never move it.
 	var plate := Node2D.new()
 	plate.position = plate_pos
@@ -1443,6 +1470,11 @@ func _do_forfeit(reason_id: String, reason_label: String) -> void:
 	_close_forfeit_confirm()
 	battle_over = true
 	Profile.note_forfeit(Run.party.map(func(m): return m.get("spec", "")))
+	# BATCH BL §2: a forfeit never reaches `_check_end`, so the fight being
+	# walked away from would be missing from the recap entirely — and §2 says
+	# that fight is exactly what the tester wants explained. Banked here, before
+	# the snapshot, so the abandoned battle IS the final battle.
+	_bank_run_ledgers()
 	# Snapshot BEFORE the clear — the Batch Z rule, unchanged.
 	var snap := _run_snapshot("forfeit", "")
 	snap["forfeit_reason"] = reason_label
@@ -1562,6 +1594,7 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 		func(u): return not u.dead and not _is_held(u))
 	if alive.is_empty():
 		return
+	var intent_shown := {}   # BATCH BL §1: one icon per enemy, first slot only
 	var sim: Array = alive.map(func(u): return {"unit": u, "t": u.next_time})
 	if preview_unit != null and preview_ability != null:
 		for entry in sim:
@@ -1598,6 +1631,27 @@ func _rebuild_turn_bar(preview_unit: BattleUnit = null, preview_ability: Ability
 		if is_ghost:
 			stripe.color = Color(1.0, 0.85, 0.3)
 		slot.add_child(stripe)
+		# BATCH BL §1 — THE INTENT ICON, on the FIRST appearance of each enemy
+		# only. The bar shows fourteen slots and a fast enemy fills several of
+		# them; a declaration covers exactly one turn, so stamping it on every
+		# slot would promise the same blow three times.
+		if not u.is_hero and not u.intent.is_empty() \
+				and not intent_shown.has(u):
+			intent_shown[u] = true
+			var cat := String(u.intent.get("category", "strike"))
+			var icon_info: Array = INTENT_ICONS.get(cat, INTENT_ICONS["strike"])
+			var icon := Label.new()
+			icon.text = String(icon_info[0])
+			icon.custom_minimum_size = Vector2(38, 12)
+			icon.add_theme_font_size_override("font_size", 10)
+			icon.add_theme_color_override("font_color", icon_info[1])
+			icon.add_theme_constant_override("outline_size", 2)
+			icon.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+			icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			icon.mouse_filter = Control.MOUSE_FILTER_STOP
+			icon.tooltip_text = "%s: %s %s" % [u.unit_name, cat.capitalize(),
+				_intent_detail(u, u.intent["ability"], cat)]
+			slot.add_child(icon)
 		turn_bar.add_child(slot)
 		best.t += BASIC_DELAY * 100.0 / u.effective_speed()
 
@@ -1633,6 +1687,12 @@ func _run_battle() -> void:
 	# standing reason (`_run_battle` cannot be driven headlessly — the AR trap),
 	# so its negative control can be a real check rather than a grep.
 	_swear_opening_oath()
+	# BATCH BL §1 — EVERY ENEMY DECLARES BEFORE THE FIRST TURN, so the opening
+	# board is already legible: the player's first decision is made against
+	# named actions rather than against an unknown one. It runs after the
+	# opening-oath and Faith hooks above because those move hero state the
+	# selection policy reads.
+	_declare_all_intents()
 	# BATCH BA: EPIDEMIC'S BATTLE-START HOOK IS GONE WITH THE DESIGN. It
 	# poisoned every enemy on the field the moment the fight opened — a
 	# pandemic, i.e. the reserved contagion spec's whole idea spent early. The
@@ -1670,6 +1730,14 @@ func _run_battle() -> void:
 		# The hold ledger is read by the turn bar rebuilt on the very next
 		# line, so it is trued up FIRST.
 		_hold_sync()
+		# BATCH BL §1: the dead declare nothing. Swept here rather than hooked
+		# into every one of the file's death sites, for the same reason
+		# `_hold_sync` sweeps — one pass a turn, immediately above the rebuild
+		# that reads it.
+		for e in enemies:
+			if e.dead and not e.intent.is_empty():
+				e.intent = {}
+				_refresh_intent_plate(e)
 		_update_talent_chips()
 		_rebuild_turn_bar()
 		var u := _next_unit()
@@ -1729,16 +1797,31 @@ func _run_battle() -> void:
 					if fire_resist != 0.0:
 						dot_dmg = maxi(int(round(dot_dmg * (1.0 - fire_resist))), 0)
 						stack_tag += " (resisted)" if fire_resist > 0.0 else " (WEAK!)"
-				# Sim bookkeeping: tick damage credits the spec that owns the
+				# Bookkeeping: tick damage credits the spec that owns the
 				# lane (heroes never poison/burn each other, so the status
 				# names its owner: poison = Survivalist, burn = Pyromancer).
-				if sim and not u.is_hero and dot_dmg > 0:
+				#
+				# BATCH BL §2 DROPPED THE `sim and` GUARD THAT USED TO OPEN THIS
+				# BRANCH, and it was a real hole rather than a tidy-up: in REAL
+				# PLAY a Pyromancer's Burn and a Survivalist's Poison reached
+				# neither the run summary's damage share nor anything else, so
+				# two specs whose whole lane is damage-over-time read as doing
+				# less than they did. Sim totals are untouched — that path
+				# already counted these ticks — so no baseline moves.
+				if not u.is_hero and dot_dmg > 0:
 					var dot_owner := "Survivalist" if dot_id == "poison" else "Pyromancer"
 					for dh in heroes:
 						if dh.unit_name == dot_owner:
+							_dmg_frame(dh, String(STATUS_INFO[dot_id][0]))
 							_stat("dmg_hero_" + dot_owner, dot_dmg)
 							break
 				var info: Array = STATUS_INFO[dot_id]
+				# BATCH BL §2 — a status tick is attributed to WHOEVER APPLIED
+				# IT, which `_apply_status` already stamps on the status as
+				# `src_name`. The applier may be dead by now (a Burn outlives
+				# its Ashblade), so the name is carried rather than the unit.
+				_dmg_frame(null, String(info[0]),
+					String(u.get_status(dot_id).get("src_name", "")))
 				_sfx("hit", -14.0, 0.8)
 				var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
 				_log("%s takes %d %s damage%s" % [u.unit_name, dot_dmg, info[0],
@@ -2010,6 +2093,11 @@ func _run_battle() -> void:
 			u.remove_status("stunned")
 			u.float_text("STUNNED", Color(0.95, 0.9, 0.4))
 			_log("%s is stunned and loses their turn" % u.unit_name, "#e0d060")
+			# BATCH BL §1, case 3: the declared action is DISCARDED, not banked.
+			# The unit re-declares for its next turn straight afterwards, so the
+			# player is never left reading a blank plate.
+			_discard_intent(u, "stunned")
+			_declare_intent(u)
 			# A lost turn still counts: other status timers and cooldowns tick.
 			u.tick_statuses()
 			u.tick_cooldowns()
@@ -2028,6 +2116,8 @@ func _run_battle() -> void:
 			# reach here is the boss carve-out (one turn of ice, then it acts
 			# again — _hold_sync closes the hold on the next pass) and any
 			# freeze reached with no Cryomancer standing.
+			_discard_intent(u, "frozen")
+			_declare_intent(u)
 			u.tick_statuses()
 			u.tick_cooldowns()
 			await _wait(0.8)
@@ -2109,6 +2199,8 @@ func _run_battle() -> void:
 			u.broken_pending = false
 			_message("%s is Broken and loses their turn!" % u.unit_name)
 			_log("%s loses their turn (Broken)" % u.unit_name, "#c070e0")
+			_discard_intent(u, "broken")
+			_declare_intent(u)
 			await _wait(1.0)
 			if u.broken_extra_turns > 0:
 				# Overpower held the wound open — the window runs on.
@@ -2131,6 +2223,13 @@ func _run_battle() -> void:
 			await _player_turn(u)
 		else:
 			await _enemy_turn(u)
+			# BATCH BL §1 — DECLARE ON SCHEDULE. The turn is over, so the next
+			# action is chosen NOW and shown. It sits here rather than at the
+			# bottom of `_enemy_turn` because that function has eight returns
+			# (debug skip, wind-up landing, three madness branches, two empty-
+			# board guards) and a declaration owed on every one of them is a
+			# declaration owed by the CALLER.
+			_declare_intent(u)
 		_check_end()
 	if active_unit != null and is_instance_valid(active_unit):
 		active_unit.set_plate_active(false)
@@ -3952,6 +4051,233 @@ func _pick_target(pool: Array) -> BattleUnit:
 	return chosen
 
 
+# ---------- BATCH BL §1: enemy intent ----------
+#
+# DECLARE ON SCHEDULE, RESOLVE ON TURN. Every enemy selects its next action the
+# moment its turn ends (and every enemy selects once at battle start), stores
+# that choice on `BattleUnit.intent`, and shows it. What the player sees is what
+# resolves — modulo the three re-validation branches below, which exist because
+# the board moves between the declaration and the resolution.
+#
+# THE CHARGING STATUS IS THE SAME MECHANISM, NOT A SECOND ONE. Batch V's wind-up
+# was already a declared action that lands on a later turn; it now stores that
+# action in `intent` like everything else, and the status survives only as the
+# chip and as the cancel hook the turn loop checks. Anything that wants a
+# two-turn declaration should set `intent.turns = 2` and add the chip — never
+# build a parallel store.
+#
+# The seven categories, deliberately few. The ORDER is the classification: an
+# AoE that also poisons reads as a Sweep because the sweep is the headline, and
+# a status-applier reads as an Afflict only when it is NOT this unit's hardest
+# hit (otherwise the damage is the headline and the status is a rider).
+const INTENT_ICONS := {
+	"strike": ["→", Color(0.90, 0.42, 0.38)],
+	"sweep": ["⇉", Color(0.95, 0.52, 0.30)],
+	"crush": ["▼", Color(0.80, 0.44, 1.00)],
+	"afflict": ["●", Color(0.62, 0.82, 0.42)],
+	"bolster": ["▲", Color(0.48, 0.72, 0.95)],
+	"mend": ["+", Color(0.40, 0.88, 0.48)],
+	"windup": ["!!", Color(1.00, 0.62, 0.30)],
+}
+
+
+# What kind of thing the declared ability is. Pure classification off the
+# ability's own data — no table of names, so an enemy added to enemies.json
+# classifies itself.
+func _intent_category(u: BattleUnit, ab: Ability) -> String:
+	if ab.special == "windup" or u.has_status("charging"):
+		return "windup"
+	if ab.heal > 0 or ab.special in ["healing_wave", "wild_growth", "totem_pulse"]:
+		return "mend"
+	if ab.target == Ability.Target.ALLY or ab.special == "cleanse_allies":
+		return "bolster"
+	if ab.aoe or ab.random_hits > 0:
+		return "sweep"
+	if ab.pressure > ab.damage:
+		return "crush"
+	if not ab.applies_status.is_empty():
+		# Only when the status is the point. An ability that both afflicts and
+		# hits harder than anything else this unit owns is read as the hit —
+		# calling the boss's biggest blow "Afflict" would teach the player to
+		# under-prepare for it.
+		var hardest := 0
+		for a in u.abilities:
+			hardest = maxi(hardest, a.damage)
+		if ab.damage < hardest:
+			return "afflict"
+	return "strike"
+
+
+# The text beside the icon. §1 asks for a predicted number on three of the
+# seven rows and THIS BATCH DOES NOT SHIP ONE — see `_intent_detail_note` and
+# the batch report. The ability's own name goes there instead: it is read off
+# the declaration rather than computed, so it cannot drift from the code.
+func _intent_detail(u: BattleUnit, ab: Ability, category: String) -> String:
+	match category:
+		"windup":
+			return "%d turn%s" % [maxi(int(u.intent.get("turns", 1)), 1),
+				"" if int(u.intent.get("turns", 1)) == 1 else "s"]
+		"afflict":
+			var sid := String(ab.applies_status.get("id", ""))
+			if STATUS_INFO.has(sid):
+				return String(STATUS_INFO[sid][0])
+			return ab.display_name
+		"mend", "bolster":
+			return ab.display_name
+		_:
+			return ab.display_name
+
+
+# One declaration. Called at battle start for every enemy and at the END of
+# every enemy turn — including turns that were lost, so a stunned enemy still
+# tells the player what it means to do next.
+func _declare_intent(u: BattleUnit) -> void:
+	if u == null or not is_instance_valid(u) or u.dead or u.is_hero:
+		return
+	# A CHARGING ENEMY HAS ALREADY DECLARED. This is the line that makes a
+	# wind-up produce ONE declaration rather than two: the cast turn ends with
+	# the stone already hoisted, and re-declaring here would overwrite the very
+	# thing the chip is advertising.
+	if u.has_status("charging"):
+		_refresh_intent_plate(u)
+		return
+	if _is_held(u) or battle_over:
+		u.intent = {}
+		_refresh_intent_plate(u)
+		return
+	var chosen := _choose_enemy_action(u)
+	if chosen.is_empty():
+		u.intent = {}
+		_refresh_intent_plate(u)
+		return
+	var ab: Ability = chosen["ability"]
+	u.intent = {
+		"ability": ab, "target": chosen["target"], "turns": 1,
+		"support": bool(chosen.get("support", false)),
+		"message": String(chosen.get("message", "")),
+		"logs": chosen.get("logs", []),
+		"category": _intent_category(u, ab),
+	}
+	_istat("intent_declared")
+	_refresh_intent_plate(u)
+
+
+func _declare_all_intents() -> void:
+	for e in enemies:
+		_declare_intent(e)
+
+
+# BATCH BL §1 — A HIJACKED TURN. Hysteria, Bewitch and Psychosis make the unit
+# act against its own side, so the declared action does not happen — but the
+# unit DID act, which is not §1's third case ("cannot act at all"). It gets its
+# own counter so the discard rate keeps meaning what §1 says it means, and it is
+# called at the moment each branch COMMITS rather than at the top of the turn:
+# Psychosis is a coin-flip, and clearing on the status alone would throw away
+# declarations on the half of the turns where the madness does not take.
+func _intent_hijacked(u: BattleUnit) -> void:
+	if u.intent.is_empty():
+		return
+	u.intent = {}
+	_refresh_intent_plate(u)
+	_istat("intent_hijacked")
+
+
+# A declaration that never got to resolve. DISCARDED, NOT BANKED — the turn
+# loop already drops a wind-up in exactly these cases, and an intent that
+# survived a stun would be the system quietly promising a hit the player had
+# already paid to prevent. Counted; a call with nothing declared is free.
+func _discard_intent(u: BattleUnit, cause: String) -> void:
+	if u == null or not is_instance_valid(u) or u.intent.is_empty():
+		return
+	u.intent = {}
+	_istat("intent_discarded")
+	_istat("intent_discard_" + cause)
+	_refresh_intent_plate(u)
+
+
+# The three re-validation branches, in the order §1 fixes:
+#   1. target gone     -> re-target within the SAME ability (the intent the
+#                         player planned against holds; only the victim moves)
+#   2. ability unusable -> fall back to the basic attack, AND SAY SO. A silent
+#                         substitution is the intent system lying.
+#   3. cannot act       -> handled by the turn loop via _discard_intent.
+# Returns the declaration to resolve, or {} when there is nothing left to do.
+func _revalidate_intent(u: BattleUnit) -> Dictionary:
+	var decl: Dictionary = u.intent.duplicate()
+	u.intent = {}
+	_refresh_intent_plate(u)
+	if decl.is_empty():
+		# Nothing was declared (battle-start edge, or the selection found no
+		# affordable attack a turn ago). Choose now rather than skip the turn.
+		decl = _choose_enemy_action(u)
+		if decl.is_empty():
+			return {}
+	var ab: Ability = decl.get("ability")
+	if ab == null:
+		return {}
+	# --- 2: is the ability still usable? ---
+	if not _intent_ability_usable(u, ab):
+		var basic := _cheapest_attack(u)
+		if basic == null:
+			return {}
+		_istat("intent_fallback")
+		_log("%s cannot bring %s to bear — it falls back to %s" % [
+			u.unit_name, ab.display_name, basic.display_name], "#c8b880")
+		ab = basic
+		decl["ability"] = basic
+		decl["support"] = false
+		decl["message"] = ""
+	# --- 1: is the target still there? ---
+	# READ UNTYPED FIRST. A declared target can be FREED between declaration and
+	# resolution — a Beastmaster's beast is queue_free'd when it is swapped, and
+	# an enemy that declared against it holds the last reference — and assigning
+	# a freed instance to a `BattleUnit` variable is a runtime error in its own
+	# right, before any `is_instance_valid` check gets to run. This is the whole
+	# reason case 1 exists, so it must not crash on the case it is for.
+	var target_raw = decl.get("target")
+	var target: BattleUnit = null
+	if target_raw != null and is_instance_valid(target_raw):
+		target = target_raw
+	var want_ally: bool = bool(decl.get("support", false)) \
+		or ab.target == Ability.Target.ALLY
+	if target == null or target.dead \
+			or (not want_ally and _is_held(target)):
+		var pool: Array = enemies.filter(func(e): return not e.dead) if want_ally \
+			else _hero_side()
+		if pool.is_empty():
+			return {}
+		_istat("intent_retarget")
+		target = _lowest_hp(pool) if want_ally else pool.pick_random()
+		decl["target"] = target
+	return decl
+
+
+# An enemy's ability is unusable when it can no longer be paid for, when a
+# cooldown is running (enemies do not start cooldowns today — checked anyway so
+# an enemy that gains one cannot silently break the promise), or when the kit
+# it belongs to no longer holds it.
+func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
+	if not u.abilities.has(ab):
+		return false
+	if ab.cost > u.resource:
+		return false
+	if int(u.cooldowns.get(ab.display_name, 0)) > 0:
+		return false
+	return true
+
+
+func _refresh_intent_plate(u: BattleUnit) -> void:
+	if sim or u == null or not is_instance_valid(u):
+		return
+	if u.intent.is_empty():
+		u.set_intent_plate("", Color(1, 1, 1))
+		return
+	var cat := String(u.intent.get("category", "strike"))
+	var info: Array = INTENT_ICONS.get(cat, INTENT_ICONS["strike"])
+	var detail := _intent_detail(u, u.intent["ability"], cat)
+	u.set_intent_plate("%s %s" % [info[0], detail], info[1])
+
+
 func _enemy_turn(u: BattleUnit) -> void:
 	if debug_enemies_off:
 		u.next_time += BASIC_DELAY * 100.0 / u.effective_speed()
@@ -3964,9 +4290,12 @@ func _enemy_turn(u: BattleUnit) -> void:
 	# turn's whole action. Cancels never reach here: the turn loop drops the
 	# charge before a Broken, Frozen, or Stunned charger gets a turn.
 	if u.has_status("charging"):
-		var ch_name := str(u.get_status("charging").get("ability", ""))
+		# BATCH BL §1: the stored blow comes out of `intent`, the ONE declared-
+		# action store — the status no longer carries an ability name of its own.
+		var ch_stored: Ability = u.intent.get("ability")
 		u.remove_status("charging")
-		var ch_stored := _find_ability(u, ch_name)
+		u.intent = {}
+		_refresh_intent_plate(u)
 		var ch_pool := _hero_side()
 		if ch_stored != null and not ch_pool.is_empty():
 			var ch_copy: Ability = Ability.make({"display_name": ch_stored.display_name,
@@ -3997,6 +4326,7 @@ func _enemy_turn(u: BattleUnit) -> void:
 			_message("%s lashes out in hysteria!" % u.unit_name)
 			_log("%s is hysterical — turns on %s!" % [u.unit_name,
 				hys_target.unit_name], "#c070e0")
+			_intent_hijacked(u)
 			await _wait(0.4)
 			await _resolve(u, hys_copy, hys_target, "good")
 			return
@@ -4004,6 +4334,7 @@ func _enemy_turn(u: BattleUnit) -> void:
 	# the Occultist's work — it feeds Ruin).
 	if u.has_status("bewitch"):
 		if await _bewitched_strike(u):
+			_intent_hijacked(u)
 			return
 	# Psychosis: 50% each turn the madness takes the wheel — supports aid
 	# the heroes; the rest maul their own. Spread of Madness is contagious.
@@ -4029,6 +4360,7 @@ func _enemy_turn(u: BattleUnit) -> void:
 				_message("%s aids the enemy in its madness!" % u.unit_name)
 				_log("%s is psychotic — its magic serves the heroes!" % u.unit_name,
 					"#c070e0")
+				_intent_hijacked(u)
 				await _wait(0.4)
 				await _resolve(u, psy_support[0], psy_support[1], "good")
 				return
@@ -4039,12 +4371,43 @@ func _enemy_turn(u: BattleUnit) -> void:
 				_message("%s turns on its allies!" % u.unit_name)
 				_log("%s is psychotic — attacks %s!" % [u.unit_name,
 					psy_target.unit_name], "#c070e0")
+				_intent_hijacked(u)
 				await _wait(0.4)
 				await _resolve(u, psy_basic, psy_target, "good")
 				return
+	# BATCH BL §1 — RESOLUTION. The choice was made at the end of this unit's
+	# last turn (or at battle start); everything below re-validates it and
+	# resolves it. The three re-validation branches are `_revalidate_intent`.
+	var decl := _revalidate_intent(u)
+	if decl.is_empty():
+		return
+	var d_ab: Ability = decl["ability"]
+	var d_target: BattleUnit = decl["target"]
+	# Flavour captured at SELECTION and emitted HERE, so the log reads in the
+	# order the player watches it: the Break exploit and the bear's pull are
+	# about the blow landing now, not about the choice made a turn ago.
+	for line in decl.get("logs", []):
+		_log(String(line[0]), String(line[1]))
+	if String(decl.get("message", "")) != "":
+		_message(String(decl["message"]))
+		await _wait(0.4)
+	await _resolve(u, d_ab, d_target, "good")
+	if bool(decl.get("support", false)):
+		_forest_bite(u)
+
+
+# BATCH BL §1 — THE SELECTION HALF, lifted out of `_enemy_turn` unchanged. This
+# is the whole of the refactor: the policy below is byte-for-byte the policy
+# that shipped in BK, and only WHEN it runs has moved. §1 forbids an AI rewrite
+# and this function is where that promise is kept — a diff that touches the
+# rules inside it is a diff that broke the promise.
+#
+# Returns {} when there is nothing to declare (no living heroes, no affordable
+# attack); resolution treats that as "fall back to the basic attack".
+func _choose_enemy_action(u: BattleUnit) -> Dictionary:
 	var living := _hero_side()
 	if living.is_empty():
-		return
+		return {}
 	var is_mocked := false
 	if u.has_status("mocked"):
 		var mocker_idx := u.status_power("mocked")
@@ -4071,15 +4434,23 @@ func _enemy_turn(u: BattleUnit) -> void:
 	if not is_mocked:
 		var support := _enemy_support_action(u)
 		if not support.is_empty():
-			await _resolve(u, support[0], support[1], "good")
-			_forest_bite(u)
-			return
+			return {"ability": support[0], "target": support[1], "support": true,
+				"message": "", "logs": []}
 	var target: BattleUnit
 	var ab: Ability
+	var logs: Array = []
+	var message := ""
 	# Only damaging, off-cooldown abilities count as attacks; support casts
 	# are chosen above.
 	var affordable: Array = u.abilities.filter(
 		func(a): return a.cost <= u.resource and a.damage > 0)
+	# BATCH BL §1: the ONE genuinely new line in this function. Selection used
+	# to run at the instant of acting, where every enemy in the roster has at
+	# least one free attack and the list could not be empty; a declaration made
+	# a turn early can outlive the resource that paid for it, so an empty list
+	# is now reachable and says "nothing to declare" rather than indexing [0].
+	if affordable.is_empty():
+		return {}
 	var broken_heroes := living.filter(func(h): return h.broken)
 	if not broken_heroes.is_empty():
 		# Exploit a Broken hero with the hardest-hitting attack they can afford.
@@ -4088,8 +4459,7 @@ func _enemy_turn(u: BattleUnit) -> void:
 		for a in affordable:
 			if a.damage > ab.damage:
 				ab = a
-		_message("%s exploits the Break!" % u.unit_name)
-		await _wait(0.4)
+		message = "%s exploits the Break!" % u.unit_name
 	else:
 		# Prefer finishing off wounded heroes; sometimes spread damage.
 		# Threatening Presence: Warriors draw 20% more of the random picks.
@@ -4105,8 +4475,8 @@ func _enemy_turn(u: BattleUnit) -> void:
 				var sp_pull := minf(0.15 * _bond_mult(sp_c.pack_master, "ursus"), 1.0)
 				if randf() < sp_pull:
 					target = sp_c
-					_log("   → Savage Presence: %s draws %s's attack" % [
-						sp_c.unit_name, u.unit_name], "#d8b880")
+					logs.append(["   → Savage Presence: %s draws %s's attack" % [
+						sp_c.unit_name, u.unit_name], "#d8b880"])
 				break
 		# Ghillie Suit: the Survivalist fades into the brush while any
 		# other ally still stands. ADDITIVE — the counter is the percentage
@@ -4116,7 +4486,8 @@ func _enemy_turn(u: BattleUnit) -> void:
 			var gh_others: Array = living.filter(func(t): return t != target)
 			if not gh_others.is_empty():
 				target = gh_others.pick_random()
-	await _resolve(u, ab, target, "good")
+	return {"ability": ab, "target": target, "support": false,
+		"message": message, "logs": logs}
 
 
 # Weighted random target: Warriors weigh 1.2, everyone else 1.0.
@@ -4182,7 +4553,13 @@ func _enemy_support_action(u: BattleUnit) -> Array:
 # on purpose — cancelling the charge is the counterplay the Ash Hurler
 # exists to teach (Batch V).
 func _cancel_charge(u: BattleUnit, cause: String) -> void:
-	var pending := str(u.get_status("charging").get("ability", "the blow"))
+	# BATCH BL §1: the pending blow's name comes from `intent` now. Discarded
+	# through the same door every other denied declaration uses, so a cancelled
+	# wind-up counts once, as a discard, and not twice — the stun/freeze/broken
+	# branch that follows finds nothing left to drop.
+	var pend_ab: Ability = u.intent.get("ability")
+	var pending := pend_ab.display_name if pend_ab != null else "the blow"
+	_discard_intent(u, cause.to_lower())
 	u.remove_status("charging")
 	u.float_text("CHARGE LOST", Color(1.0, 0.62, 0.3))
 	_message("%s's %s is cancelled!" % [u.unit_name, pending])
@@ -4442,6 +4819,13 @@ func _impact_sfx(attacker: BattleUnit, ab: Ability) -> String:
 
 func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: String,
 		is_counter := false) -> void:
+	# BATCH BL §2 — THE ATTRIBUTION FRAME, set once at the top and covering
+	# everything this cast does to anyone's health: the strike itself, its
+	# splash and echoes, the reflect and retaliation it draws, and the recoil
+	# and blood-price it costs the caster. One site rather than forty, and a
+	# damage effect added inside `_resolve` later is attributed correctly
+	# without knowing this ledger exists.
+	_dmg_frame(attacker, ab.display_name)
 	var was_snap := attacker.snap_shot > attacker.snap_used \
 		and ab.cost > 0 and not is_counter
 	attacker.resource = clampi(attacker.resource - _eff_cost(attacker, ab, target) \
@@ -4583,6 +4967,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			target.unit_name], "#909090")
 		await _wait(0.35)
 		await _try_opportunist(target, attacker)
+		_dmg_frame(attacker, ab.display_name)
 	else:
 		var strike_targets: Array = [target]
 		if ab.aoe:
@@ -4694,6 +5079,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						strike_target.unit_name], "#909090")
 					await _wait(0.45)
 					await _try_opportunist(strike_target, attacker)
+					_dmg_frame(attacker, ab.display_name)
 					if attacker.dead:
 						break
 					continue
@@ -4859,6 +5245,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							await _wait(0.4)
 							await _resolve(strike_target, _free_copy(vg_cb),
 								attacker, "good", true)
+							_dmg_frame(attacker, ab.display_name)
 							if attacker.dead:
 								break
 					continue
@@ -6305,6 +6692,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_log("%s retaliates!" % strike_target.unit_name, "#50c8e0")
 				await _wait(0.4)
 				await _resolve(strike_target, strike_target.abilities[0], attacker, "good", true)
+				_dmg_frame(attacker, ab.display_name)
 			if result.broke:
 				_stat("breaks_on_heroes" if strike_target.is_hero else "breaks_on_enemies")
 				_sfx("break", -3.0)
@@ -6348,6 +6736,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					await _wait(0.4)
 					await _resolve(attacker, _free_copy(sp_over), strike_target,
 						"good", true)
+					_dmg_frame(attacker, ab.display_name)
 			# Mark of the Hunt: every strike on the marked prey feeds the
 			# hunter's Mana (3% max per hit).
 			if attacker.is_hero and attacker.passive_id == "pack" \
@@ -6365,6 +6754,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_log("Talent: Implosion — the Detonation strikes twice!", "#b0a8e0")
 				await _wait(0.35)
 				await _resolve(attacker, _free_copy(ab), strike_target, "good", true)
+				_dmg_frame(attacker, ab.display_name)
 			# Cataclysm (capstone): the Detonation chains down the burning
 			# field — each link fires at the enemy with the most Burn left
 			# for 60% of the link before (damage AND BD), up to 3 extra
@@ -6397,6 +6787,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						cat_t.unit_name, int(round(cat_mult * 100))], "#e8c860")
 					await _wait(0.35)
 					await _resolve(attacker, cat_ab, cat_t, "good", true)
+					_dmg_frame(attacker, ab.display_name)
 					cat_mult *= 0.6
 			# Counter Attack: a parry answers back. Untouchable (Defensive
 			# stance only) answers with a free Pommel Strike — every parry
@@ -6417,6 +6808,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					await _wait(0.4)
 					await _resolve(strike_target, _free_copy(ut_pommel), attacker,
 						"good", true)
+					_dmg_frame(attacker, ab.display_name)
 					if attacker.dead:
 						break
 				elif strike_target.counter_attacks or strike_target.opportunist > 0:
@@ -6428,6 +6820,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						await _wait(0.4)
 						await _resolve(strike_target, _free_copy(rp_over), attacker,
 							"good", true)
+						_dmg_frame(attacker, ab.display_name)
 						if attacker.dead:
 							break
 			if (ab.random_hits > 0 or ab.multi_hits > 0) and total_hits > 1:
@@ -6804,6 +7197,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					next_target.unit_name], "#e05050")
 				await _wait(0.5)
 				await _resolve(attacker, _free_copy(ab), next_target, "good", true)
+				_dmg_frame(attacker, ab.display_name)
 	if not sim and attacker.position != lunge_origin:
 		if walked and not attacker.dead:
 			await _walk_to(attacker, lunge_origin)
@@ -7015,6 +7409,9 @@ func _hold_release(target: BattleUnit, reason: String) -> void:
 		"#7cc8f0")
 	if target.dead:
 		return
+	# BATCH BL §1: back on the timeline means back to declaring — the player
+	# should see what the thawed enemy means to do before it does it.
+	_declare_intent(target)
 	target.set_chilled_stacks(HOLD_RELEASE_STACKS)
 	if is_inf(target.next_time):
 		# Back onto the timeline a full basic action from NOW — never
@@ -7064,6 +7461,10 @@ func _hold_sync() -> void:
 			_hold_release(u, "the Cryomancer's grip is gone")
 		return
 	for u in _holds.duplicate():
+		# BATCH BL §1: a held enemy is off the timeline entirely — it is not
+		# going to act, so it declares nothing. Same rule §4's missing turn-bar
+		# slot already states, applied to the plate.
+		_discard_intent(u, "held")
 		if u.dead:
 			_holds.erase(u)
 		elif not u.has_status("frozen"):
@@ -7351,6 +7752,12 @@ func _overburn_tick(u: BattleUnit) -> bool:
 	if unpaid > 0 and u.cauterise > 0 and u.kiln_forged == 0:
 		_log("   → Talent: Cauterise — %d Mana of drain is paid in blood" % unpaid,
 			"#b0a8e0")
+		# BATCH BL §2 — §2 names this case outright: a hero killed by his own
+		# Overburn drain must read as killed by his own Overburn drain. The
+		# drain runs outside `_resolve` (it is a property of the passive, not of
+		# any cast), so it sets its own frame; `u` on both sides is what marks
+		# it self-inflicted.
+		_dmg_frame(u, "Overburn drain (Cauterise)")
 		if u.take_tick_damage(unpaid, "-%d" % unpaid, Color(1.0, 0.4, 0.4)):
 			_message("%s burns away!" % u.unit_name)
 			_log("† %s falls to their own fire" % u.unit_name, "#e05050")
@@ -9562,9 +9969,18 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("break", -10.0, 0.5)
 			attacker.add_status("charging", "Charging", "!!", Color(1.0, 0.62, 0.3), -1,
 				"%s lands at this unit's next turn:\nheavy damage to the whole party.\nBreak, Freeze, or Stun the charger\nto cancel the blow." % ab.display_name)
-			var wu := attacker.get_status("charging")
-			if not wu.is_empty():
-				wu["ability"] = ab.display_name
+			# BATCH BL §1 — THE WIND-UP IS A DECLARATION, stored in the same one
+			# place every other declaration is stored. The status used to carry
+			# an "ability" name of its own; it does not any more, because two
+			# stores for one concept is the parallel mechanism §1 forbids. This
+			# is also the line that makes a charging enemy declare ONCE: the
+			# end-of-turn declaration sees the chip and leaves this alone.
+			attacker.intent = {
+				"ability": ab, "target": null, "turns": 1, "support": false,
+				"message": "", "logs": [], "category": "windup",
+			}
+			_istat("intent_declared")
+			_refresh_intent_plate(attacker)
 			_message("%s hoists a massive blow!" % attacker.unit_name)
 			_log("%s is charging %s — it lands next turn! (Break, Freeze, or Stun cancels it)" % [
 				attacker.unit_name, ab.display_name], "#e08850")
@@ -11543,6 +11959,7 @@ func _check_end() -> void:
 	Run.tally_add("battles")
 	for key in _run_slice:
 		Run.tally_damage(String(key).trim_prefix("dmg_hero_"), _run_slice[key])
+	_bank_run_ledgers()
 	if victory:
 		# Node scaling: every combat victory grows the party (+2% of base
 		# Attack and HP at the next spawn).
@@ -11745,6 +12162,43 @@ func _start_new_run() -> void:
 	get_tree().change_scene_to_file("res://scenes/draft.tscn")
 
 
+# BATCH BL §1 — THE THREE RE-VALIDATION RATES, as a share of declarations made.
+# A static so RunSim can print the same line from the run report without
+# re-deriving it, and so a test can call it on a hand-built stats dict.
+#
+# HOW TO READ IT (§1's own instruction): re-targeting being common is fine — the
+# intent the player planned against held and only the victim moved. FALLBACK
+# being common is the signal that matters: it means the declaration is happening
+# too early, and the answer is to declare later, NOT to widen the fallback.
+# `hijacked` is not one of the three — it is the madness statuses taking a turn
+# the enemy would otherwise have spent on its declared action, counted
+# separately so it cannot inflate the discard rate.
+# BATCH BL §1 — the intent counters go into `sim_stats` UNCONDITIONALLY, unlike
+# every other counter in this file. `_stat` is sim-gated because the ledgers it
+# feeds are a sim instrument; the re-validation rates are a property of the
+# MECHANISM and have to be observable in real play too, or the only way to check
+# that a stun really discards is to trust the code that does it. In sim they
+# land in the same dict the report reads, so there is still exactly one counter.
+func _istat(key: String) -> void:
+	sim_stats[key] = sim_stats.get(key, 0.0) + 1.0
+
+
+static func intent_report_line(s: Dictionary) -> String:
+	var declared: float = maxf(s.get("intent_declared", 0.0), 1.0)
+	return ("Intent (Batch BL §1): declared %d | re-targeted %.1f%% | "
+		+ "fell back to basic %.1f%% | discarded %.1f%% (stun %d / freeze %d / "
+		+ "broken %d / held %d) | hijacked by madness %.1f%%") % [
+		int(s.get("intent_declared", 0.0)),
+		100.0 * s.get("intent_retarget", 0.0) / declared,
+		100.0 * s.get("intent_fallback", 0.0) / declared,
+		100.0 * s.get("intent_discarded", 0.0) / declared,
+		int(s.get("intent_discard_stunned", 0.0)),
+		int(s.get("intent_discard_frozen", 0.0)),
+		int(s.get("intent_discard_broken", 0.0)),
+		int(s.get("intent_discard_held", 0.0)),
+		100.0 * s.get("intent_hijacked", 0.0) / declared]
+
+
 func _print_sim_report() -> void:
 	var battles := maxf(sim_stats.get("battles", 0.0), 1.0)
 	var attacks := maxf(sim_stats.get("attacks", 0.0), 1.0)
@@ -11781,6 +12235,7 @@ func _print_sim_report() -> void:
 		100.0 * sim_stats.get("attack_miss", 0.0) / attacks,
 		100.0 * sim_stats.get("attack_parry", 0.0) / attacks,
 		100.0 * sim_stats.get("attack_crit", 0.0) / landed])
+	print(intent_report_line(sim_stats))
 	var usage_parts := PackedStringArray()
 	for key in sim_stats:
 		if key.begins_with("use_"):
@@ -12398,6 +12853,18 @@ func _summary_lines(snap: Dictionary) -> Array:
 			parts.append("%s %d%%" % [hero_name,
 				int(round(100.0 * float(dmg[hero_name]) / total))])
 		lines.append(["p", "  |  ".join(parts)])
+	# --- BATCH BL §2: what your build was DOING, what was doing it to you, and
+	# what ended it. Appended to the SAME line list, so the Copy button's text
+	# stays complete — a recap that is on screen but not in the paste is half a
+	# feature.
+	_append_breakdown(lines, tally.get("dealt", {}), tally.get("taken", {}),
+		tally.get("taken_total", {}), tally.get("kills", []), "whole run")
+	# The final battle on its own. The whole-run totals answer "what was my
+	# build doing"; they do not answer "what happened in that last fight".
+	var final: Dictionary = tally.get("final", {})
+	if final is Dictionary and not final.is_empty():
+		_append_breakdown(lines, final.get("dealt", {}), final.get("taken", {}),
+			final.get("taken_total", {}), final.get("kills", []), "final battle")
 	# --- the run economy ---
 	lines.append(["s", "The run in numbers"])
 	lines.append(["p", "Battles won: %d of %d   Elites taken: %d" % [
@@ -12422,6 +12889,81 @@ func _summary_lines(snap: Dictionary) -> Array:
 		chronicle += "   Cycles abandoned: %d" % int(snap["cycles_abandoned"])
 	lines.append(["p", chronicle])
 	return lines
+
+
+# BATCH BL §2 — the three new breakdowns, written ONCE and called twice: for
+# the whole run, and for the final battle alone. Sharing the renderer is what
+# guarantees the two read the same way, which is the whole point of reporting
+# them side by side. `scope` is the only thing that differs.
+#
+# NOT A DEFEAT-ONLY SCREEN: the caller runs this for wipes, forfeits and
+# completions alike. A completed run wants to know which ability carried it as
+# much as a wipe wants to know what ended it.
+const RECAP_TOP_N := 5
+
+
+func _append_breakdown(lines: Array, dealt: Dictionary, taken: Dictionary,
+		taken_total: Dictionary, kills: Array, scope: String) -> void:
+	# --- damage dealt, split by ability ---
+	if not dealt.is_empty():
+		lines.append(["s", "Damage dealt — by ability (%s)" % scope])
+		var d_names: Array = dealt.keys()
+		d_names.sort_custom(func(a, b): return _rows_total(dealt[a]) > _rows_total(dealt[b]))
+		for hero_name in d_names:
+			lines.append(["p", "%s — %d total\n    %s" % [hero_name,
+				int(round(_rows_total(dealt[hero_name]))),
+				_top_rows(dealt[hero_name])]])
+	# --- damage taken, split by source ---
+	if not taken.is_empty():
+		lines.append(["s", "Damage taken — by source (%s)" % scope])
+		var t_names: Array = taken.keys()
+		t_names.sort_custom(func(a, b): return float(taken_total.get(a, 0.0)) \
+			> float(taken_total.get(b, 0.0)))
+		for hero_name in t_names:
+			lines.append(["p", "%s — %d total\n    %s" % [hero_name,
+				int(round(float(taken_total.get(hero_name,
+					_rows_total(taken[hero_name]))))),
+				_top_rows(taken[hero_name])]])
+	# --- the killing blows ---
+	# THE SINGLE MOST VALUABLE LINE IN THE BATCH, and it is the "was at" that
+	# makes it so: "I died" becomes "I was at 40 and it hit for 52", which is
+	# the difference between a run that felt unfair and a run that taught the
+	# player something.
+	if not kills.is_empty():
+		lines.append(["s", "The killing blow (%s)" % scope])
+		for kill in kills:
+			var who := String(kill.get("source", "?"))
+			var by := "their own %s" % String(kill.get("ability", "?")) \
+				if bool(kill.get("self", false)) \
+				else "%s's %s" % [who, String(kill.get("ability", "?"))]
+			lines.append(["p", "%s fell to %s — %d damage, at %d health." % [
+				String(kill.get("hero", "?")), by, int(kill.get("amount", 0)),
+				int(kill.get("hp_before", 0))]])
+
+
+func _rows_total(rows: Dictionary) -> float:
+	var total := 0.0
+	for k in rows:
+		total += float(rows[k])
+	return total
+
+
+# The top RECAP_TOP_N rows of one hero's map, biggest first, as one line. A
+# tail that did not make the cut is SAID rather than dropped — a breakdown that
+# silently stops at five reads as a complete list.
+func _top_rows(rows: Dictionary) -> String:
+	var keys: Array = rows.keys()
+	keys.sort_custom(func(a, b): return float(rows[a]) > float(rows[b]))
+	var parts := PackedStringArray()
+	for i in mini(keys.size(), RECAP_TOP_N):
+		parts.append("%s %d" % [keys[i], int(round(float(rows[keys[i]])))])
+	var text := "  |  ".join(parts)
+	if keys.size() > RECAP_TOP_N:
+		var rest := 0.0
+		for i in range(RECAP_TOP_N, keys.size()):
+			rest += float(rows[keys[i]])
+		text += "  |  %d more: %d" % [keys.size() - RECAP_TOP_N, int(round(rest))]
+	return text
 
 
 # One party member, one line: class/spec, talent lane spread, runes, trophies.
@@ -12592,6 +13134,16 @@ func _stat(key: String, amount := 1.0) -> void:
 	elif key.begins_with("dmg_hero_"):
 		# Batch Z: real play banks hero damage for the run summary.
 		_run_slice[key] = _run_slice.get(key, 0.0) + amount
+		# BATCH BL §2 — THE "HOW", booked at the same single site as the "how
+		# much" so the two can never disagree about a hit. The ability name is
+		# the live attribution frame's, which is why the frame is set at
+		# `_resolve`'s entry rather than at each of the nine `dmg_hero_` call
+		# sites: a new damage site added later inherits the split for free.
+		var d_hero := key.trim_prefix("dmg_hero_")
+		var d_ab := _dmg_label if _dmg_label != "" else "(unattributed)"
+		var d_rows: Dictionary = _run_dealt.get(d_hero, {})
+		d_rows[d_ab] = float(d_rows.get(d_ab, 0.0)) + amount
+		_run_dealt[d_hero] = d_rows
 
 
 # ---------- Batch W: the contribution ledger ----------
@@ -12638,6 +13190,101 @@ func _stat_heal(owner, amount: float) -> void:
 	var name := _contrib_name(owner)
 	if name != "":
 		_stat("heal_hero_" + name, amount)
+
+
+# ---------- BATCH BL §2: the damage-taken ledger ----------
+#
+# Nothing tracked this before BL, which is why it is the real work in §2. It
+# hangs off `BattleUnit.damage_taken_cb` — the two subtraction sites in unit.gd
+# — so every door into a hero's health uses it: strikes, splash, echoes, status
+# ticks, recoil, self-inflicted costs and bane events alike. A future damage
+# source cannot forget to report, because it cannot remove health without going
+# through one of those two functions.
+
+# Set the frame. Called at `_resolve`'s entry and at the out-of-resolve damage
+# sites; `src_name` is for sources that are not a live unit any more.
+func _dmg_frame(src: BattleUnit, label: String, src_name := "") -> void:
+	_dmg_src = src
+	_dmg_label = label
+	_dmg_src_name = src_name
+
+
+# WHO A SOURCE IS, FOR THE RECAP — AND FOR AN ENEMY THAT IS ITS KIND, NEVER ITS
+# INSTANCE. Three Shieldmasters must aggregate into one readable row rather than
+# three, which is the difference between a recap and a transcript. `enemy_kind`
+# is read rather than `unit_name` deliberately: the two happen to agree today
+# because instances of a kind share a name, and keying on that agreement would
+# make the aggregation an accident that the first uniquely-named enemy breaks.
+func _taken_source(u: BattleUnit) -> String:
+	if u == null or not is_instance_valid(u):
+		return _dmg_src_name if _dmg_src_name != "" else "(unattributed)"
+	if u.is_hero:
+		if u.is_companion and u.pack_master != null and is_instance_valid(u.pack_master):
+			return u.pack_master.unit_name
+		return u.unit_name
+	if u.enemy_kind != "":
+		return Enemies.unit_name(u.enemy_kind)
+	return u.unit_name
+
+
+# BATCH BL §2 — the recap's three ledgers into the run tally, under the same
+# rule as Batch Z's slice: the scene reloads between fights, so anything not
+# banked here dies with it. Called from `_check_end`'s run branch and from the
+# forfeit, and IDEMPOTENT — the slices are cleared as they are banked, so the
+# two callers can never double-count the same battle.
+#
+# `tally_bank_final` runs LAST and takes this battle whole. It is overwritten
+# every fight, so when the run ends it holds the final battle and nothing has to
+# know which fight that was.
+func _bank_run_ledgers() -> void:
+	if sim:
+		return
+	for hero_name in _run_dealt:
+		for ability in _run_dealt[hero_name]:
+			Run.tally_dealt(hero_name, ability, _run_dealt[hero_name][ability])
+	for hero_name in _run_taken:
+		for source in _run_taken[hero_name]:
+			Run.tally_taken(hero_name, source, _run_taken[hero_name][source])
+	for kill in _run_kills:
+		Run.tally_kill(kill)
+	Run.tally_bank_final(_run_dealt, _run_taken, _run_taken_total, _run_kills)
+	_run_dealt = {}
+	_run_taken = {}
+	_run_taken_total = {}
+	_run_kills = []
+
+
+func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
+	# Real play only, and heroes only. RunSim keeps its own statistics path and
+	# must never double-count (the rule that keeps the harness honest); a beast
+	# eating a hit is not the hunter's health, so companions stay out too.
+	if sim or lost <= 0 or victim == null or not victim.is_hero \
+			or victim.is_companion:
+		return
+	# SELF-INFLICTED IS DECIDED BY IDENTITY: the victim is the unit currently
+	# acting. That covers Blood Price, Dark Pact, Cauterise, the Overburn drain
+	# and recoil in one rule, and it cannot go stale the way a list of ability
+	# names would. §2 asks that a hero killed by his own Overburn drain reads as
+	# killed by his own Overburn drain, and this is the line that delivers it.
+	var self_hit: bool = _dmg_src != null and _dmg_src == victim
+	var source := "themself" if self_hit else _taken_source(_dmg_src)
+	var label := _dmg_label if _dmg_label != "" else "unknown"
+	var key := "%s / %s" % [source, label]
+	var t_rows: Dictionary = _run_taken.get(victim.unit_name, {})
+	t_rows[key] = float(t_rows.get(key, 0.0)) + lost
+	_run_taken[victim.unit_name] = t_rows
+	_run_taken_total[victim.unit_name] = \
+		float(_run_taken_total.get(victim.unit_name, 0.0)) + lost
+	# THE KILLING BLOW. `hp <= 0` rather than `dead`: unit.gd reports below all
+	# four death-refusals, so health at zero here means the hit actually landed
+	# fatally and nothing bought it back.
+	if victim.hp <= 0:
+		_run_kills.append({
+			"hero": victim.unit_name, "source": source, "ability": label,
+			"amount": lost, "hp_before": hp_before, "self": self_hit,
+			"zone": Run.zone_idx + 1 if Run.active else 0,
+			"tier": clampi(Run.slot_idx + 1, 1, Run.SLOTS_PER_ZONE) if Run.active else 0,
+		})
 
 
 # Break damage a hero sent at the meter — the pre-Constitution BD value,

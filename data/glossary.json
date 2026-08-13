@@ -549,6 +549,17 @@
     ]
   },
   {
+    "id": "enemy_intent",
+    "term": "Enemy Intent",
+    "category": "combat",
+    "short": "Every enemy shows what it is about to do, and it can be denied.",
+    "long": "Each enemy picks its next action the moment its turn ends - and every enemy picks once before the first turn of a fight - then shows that choice until it acts. The icon appears twice: under the enemy's portrait in the turn bar (on its next turn's slot only) and on its nameplate, where it is written out. Seven categories: Strike (single-target damage), Sweep (an attack that hits the whole party or several of it), Crush (more Break damage than health damage), Afflict (applies a status, and the status is named), Bolster (buffs, wards or cleanses its own side), Mend (heals) and Wind-up (a charged blow landing on a later turn, with the turns remaining).\n\nNO DAMAGE NUMBER IS SHOWN, deliberately. The only honest preview would be one produced by the same code the real hit runs, and that code cannot be run twice for the same answer - it rolls damage variance and a critical on the way through. A number worked out a second way would drift from the ability it claims to describe, so the category and the ability's own name are shown instead.\n\nA DECLARED ACTION CAN BE DENIED, and that is the point. Stun, Freeze, Break or hold the enemy and the announced action is DISCARDED - not saved for later, exactly as cancelling a wind-up has always worked. Hysteria, Bewitch and Psychosis take the turn the same way. Two softer cases: kill the target it named and it re-targets WITH THE SAME ABILITY (the plan holds, only the victim changes); leave it unable to pay for the ability and it falls back to its basic attack, and the combat log says so rather than substituting in silence.",
+    "see_also": [
+      "pressure_break",
+      "initiative"
+    ]
+  },
+  {
     "id": "res_loyalty",
     "term": "Loyalty",
     "category": "resources",

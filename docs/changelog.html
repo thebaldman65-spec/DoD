@@ -5,6 +5,132 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-12 &mdash; Batch BL: enemy intent, and a recap that says what killed you</h2>
+<p><i>Two features, both extensions of machinery that already existed rather than new systems.
+<b>No difficulty tuning in either:</b> BK set new baselines two batches ago, §1 was expected to
+move them, and this batch measures and reports rather than correcting.</i></p>
+
+<h3>The headline &mdash; "I was at 40 and it hit for 52"</h3>
+<p>When a hero falls, the run summary now names <b>what struck last, from whom, for how much,
+and what their health was before it landed</b> &mdash; for every hero who fell, for the whole run
+and again for the final battle alone. "I died" becomes a sentence a player can act on. That
+last number is the difference between a run that felt unfair and a run that taught the player
+something.</p>
+
+<h3>&sect;1 &mdash; Enemy intent</h3>
+<p><b>Every enemy shows what it is about to do.</b> An enemy picks its next action the moment its
+turn ends &mdash; every enemy picks once before the first turn &mdash; and that stored choice is
+displayed until it resolves. Two surfaces: an icon under the enemy's portrait in the turn bar
+(on its next turn's slot only) and an icon plus a written line on its nameplate, so a player
+watching the battlefield never has to read the bar.</p>
+<p>Seven categories, and they are <b>data-driven</b> rather than a table of names &mdash; an enemy
+added to <code>enemies.json</code> classifies itself. <b>Strike</b> (single-target damage),
+<b>Sweep</b> (hits the party or several of it), <b>Crush</b> (more Break damage than health
+damage), <b>Afflict</b> (applies a status, and names it), <b>Bolster</b> (buffs, wards or
+cleanses its own side), <b>Mend</b> (heals), <b>Wind-up</b> (a charged blow with its turns
+remaining).</p>
+<p><b>This retroactively upgrades twelve spines.</b> The Cryomancer's hold, the Sharpshooter's
+patience, the Warden's threat, Break itself, Stun, Freeze and the three madness statuses all
+exist to deny an enemy its turn &mdash; and the payoff of every one of them used to be an event
+with no visible content. Freezing an Ash Hurler mid-charge always read as a win because Batch V
+made the wind-up say its name; freezing an Orc Brute a turn before its Overhead Crush read as
+nothing, and was worth about the same. The difference was a label.</p>
+<p><b>A declared action can be denied, and that is the point.</b> Three re-validation cases, in a
+fixed order: the <b>target is gone</b> &rarr; the enemy re-targets <i>within the same ability</i>
+(the plan holds, only the victim changes); the <b>ability cannot be paid for</b> &rarr; it falls
+back to the basic attack <b>and the log says so</b>, because a silent substitution is the intent
+system lying; the enemy <b>cannot act at all</b> (Stunned, Frozen, Broken, held) &rarr; the
+declaration is <b>discarded, not banked</b>. Banking it would mean a stun delayed the blow
+instead of deleting it, which would take the payoff back out of the twelve spines. Hysteria,
+Bewitch and Psychosis take the turn the same way.</p>
+<p><b>Nothing about enemy behaviour changed &mdash; only when the choice is made.</b> The selection
+logic was lifted out of the turn handler unaltered. What did move is that state-sensitive
+policies now read the board a turn earlier: the whole enemy support suite (Healing Wave under
+40%, Regenerate, Cleansing Rite, Shielding, Wild Growth, Dark Vigil), the wounded-hero and
+taunt picks, the Savage Presence and Ghillie Suit rolls, and &mdash; most sensitively &mdash; the
+Broken-hero exploit, since a Break window is short and a declaration made before one opens will
+not take it. Reported, changed nowhere.</p>
+<p><b>The wind-up is now the same mechanism rather than a second one.</b> Batch V's charge was
+already a declared action landing on a later turn; it stores its blow in the same single place
+every other declaration does, and the <code>charging</code> status survives only as the chip and
+the cancel hook. A charging enemy declares once, not twice, and a cancelled charge counts as
+exactly one denial.</p>
+<p><b>NO PREDICTED DAMAGE NUMBER IS SHOWN, and that is the batch's main finding rather than an
+omission.</b> The brief required any number to come from the same code the real hit runs, dry.
+That code cannot be: the strike path is ~680 lines that mutate state as they go and write to
+three separate ledgers, and its very first line rolls damage variance &mdash; with a critical
+rolled inside it &mdash; so <b>the same call with identical inputs returns a different
+number</b>. A preview worked out a second way is a tooltip with a shorter fuse than the
+thirty-eight Batch BJ found drifted. The category and the ability's own name are shown instead,
+read straight off the declaration.</p>
+
+<h3>&sect;2 &mdash; The recap</h3>
+<p>Batch Z's run summary reported damage share per hero. It could not say <b>how</b>, and it said
+nothing at all about damage taken. Three new breakdowns, each reported for the <b>whole run</b>
+and again for the <b>final battle alone</b> &mdash; the run totals say what the build was doing,
+and only the final-battle block says what happened in that last fight:</p>
+<ul>
+<li><b>Damage dealt, by ability</b> &mdash; per hero, their top five with totals. The split always
+sums to the flat per-hero total beside it.</li>
+<li><b>Damage taken, by source</b> &mdash; per hero, the total and their top five sources, named as
+<i>enemy kind / ability</i>. Attribution is by <b>kind</b>, so three Shieldmasters aggregate into
+one row rather than three. <b>Indirect damage is included and attributed to whoever caused
+it</b>: status ticks to the unit that applied them; Blood Price, Dark Pact, Cauterise, the
+Overburn drain and recoil marked as the hero's own. A hero killed by his own Overburn drain
+reads as killed by his own Overburn drain.</li>
+<li><b>The killing blow</b> &mdash; the headline above.</li>
+</ul>
+<p>All of it goes into the same line list the <b>Copy summary</b> button serialises, so the
+clipboard version stays complete &mdash; a recap on screen but not in the paste is half a
+feature. And <b>none of it is defeat-only</b>: a completed run wants to know which ability
+carried it as much as a wipe wants to know what ended it.</p>
+<p><b>The save version rises to 9, tolerantly</b> &mdash; unlike BK's refusal, an older save loads
+and simply starts the new counters mid-run at zero, because these are counters rather than
+structure. Each per-hero map is <b>bounded at 24 rows</b>, with anything past that folded into a
+single "(other)" row, so no future ability draft can quietly grow the save file; the per-hero
+totals stay exact whatever the bound does to the rows.</p>
+<p><b>A real hole closed on the way past.</b> Hero damage-over-time ticks &mdash; a Pyromancer's
+Burn, a Survivalist's Poison &mdash; were credited only in the simulation harness, so in real
+play two specs whose whole lane is damage-over-time were missing from the summary's damage
+share entirely. Simulation totals are untouched (that path already counted them), so no
+baseline moves.</p>
+
+<h3>What was measured</h3>
+<p><b>The three re-validation rates</b>, over 150 complete runs (50 per route policy,
+<b>50,799 declarations</b>):</p>
+<ul>
+<li><b>Re-targeted: 3.2 / 3.5 / 5.9%</b> (greedy / balanced / cautious). Fine, and expected
+&mdash; the intent the player planned against held; only the victim changed.</li>
+<li><b>Fell back to the basic attack: 0.0%</b> in all three. This is the number that matters:
+§1's rule is that a common fallback means the declaration is happening too early, and the answer
+would be to declare later rather than to widen the fallback. It is not happening.</li>
+<li><b>Discarded: 16.1 / 15.1 / 11.2%</b> &mdash; <b>almost entirely the Cryomancer's holds</b>
+(3,014 / 2,598 / 1,365) with Break the small remainder (103 / 94 / 162), and zero plain stuns or
+freezes, because in this party the Cryomancer's freeze always becomes a hold. <b>One in six
+declared enemy actions never happens</b>, and that is the twelve spines being paid.</li>
+<li><b>Hijacked by madness: 0.0%</b>, and this is a hole in the measurement rather than a
+result: the standard test party carries no Occultist, so Hysteria, Bewitch and Psychosis were
+never applied. The counter exists and is asserted in the suite; it has not been exercised at
+scale.</li>
+</ul>
+<p><b>Completions across the three route policies</b>, against BK's 39.3 / 43.3 / 21.3 for
+greedy / balanced / cautious: <b>greedy 52%</b>, <b>balanced 46%</b> (&plusmn;13.8 pts at n=50)
+and <b>cautious 20%</b> (&plusmn;11.1). <b>All three inside their bands &mdash; but greedy is
++12.7 points and sits near the edge of its own, so it is reported as a signal rather than as
+noise.</b> The bot does not plan, so it cannot benefit from seeing an intent; if this is real,
+the mechanism has to be the one behavioural shift §1 knowingly introduced &mdash; <b>enemies now
+choose a turn earlier, and the most state-sensitive choice they make is the Broken-hero
+exploit</b>. An enemy that declared before a Break window opened will not take it, which is a
+small unearned favour to the party. Named as the hypothesis, measured, and <b>corrected
+nowhere</b>: BK's baselines are two batches old, and tuning against a number in the batch that
+moves it is how four consecutive Devout batches went wrong.</p>
+
+<h3>Two things deliberately not built</h3>
+<p><b>Hidden intent</b> &mdash; an enemy whose intent is concealed, making information itself a
+resource the player fights for. A good mechanic and a different one; it belongs after the
+baseline is legible. <b>An AI rewrite</b> &mdash; the selection rules are untouched by
+construction. Both recorded as not built rather than missed.</p>
+
 <h2>2026-08-12 &mdash; Batch BK: the branching map</h2>
 <p><i>The largest structural change since Batch AN. A run is a generated map again &mdash;
 3 zones &times; 16 slots, three rows wide &mdash; with two new node types, re-specced events,
