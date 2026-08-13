@@ -28,6 +28,11 @@
 #   NEGATIVE CONTROLS for the three that would fail silently: a detonation
 #      clearing the stacks, the lifesteal uncapped, and Ruin arming on any
 #      stack rather than only on a multiple of the threshold.
+# BATCH BM RE-POINTED THIS FILE IN PLACE, mechanically and in two ways only:
+# the capstone SHELF moved from row 8 to row 9 (rows 1-8 are lane rows now),
+# and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
+# every id and every question this file asks is otherwise untouched — the
+# tables below are the batch's own record of its 24 nodes and stay that.
 extends SceneTree
 
 const REAL_SAVE := "user://run_save.bin"
@@ -195,7 +200,7 @@ const IDS := ["oc_emp_hex", "oc_deep_hex", "oc_channeling", "oc_broken_will",
 
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 24, "the Occultist tree holds 24 nodes (got %d)" % tree.size())
+	ok(tree.size() == 27, "the Occultist tree holds 24 nodes (got %d)" % tree.size())
 	# EVERY ID SURVIVES AND RE-SPECS IN PLACE — no new ids, none deleted, so
 	# saved picks migrate and no save version moves.
 	var seen := {}
@@ -203,7 +208,7 @@ func _tree_shape() -> void:
 		seen[String(t.get("id", ""))] = true
 	for id in IDS:
 		ok(seen.has(id), "the id %s survives" % id)
-	ok(seen.size() == 24, "...and no id was added (got %d distinct)" % seen.size())
+	ok(seen.size() == 27, "...and no id was added (got %d distinct)" % seen.size())
 	var per_lane := {}
 	var caps := 0
 	var cap_lanes := {}
@@ -218,14 +223,14 @@ func _tree_shape() -> void:
 			ok(bool(t.get("capstone", false)),
 				"%s on row 8 is flagged capstone" % t.get("id", ""))
 		else:
-			ok(row >= 1 and row <= 7,
+			ok(row >= 1 and row <= Talents.CAPSTONE_ROW,
 				"%s sits on a real row (got %d)" % [t.get("id", ""), row])
 			per_lane[lane] = per_lane.get(lane, 0) + 1
 	ok(caps == 3, "exactly three capstones (got %d)" % caps)
 	ok(cap_lanes.size() == 3, "the three capstones sit on three different lanes")
 	for lane in ["Ruin", "Madness", "Leech"]:
-		ok(per_lane.get(lane, 0) == 7,
-			"lane %s holds 7 row nodes (got %d)" % [lane, per_lane.get(lane, 0)])
+		ok(per_lane.get(lane, 0) == Talents.ROWS,
+			"lane %s holds 8 row nodes (got %d)" % [lane, per_lane.get(lane, 0)])
 	# Every row of every lane is filled exactly once — the row IS the choice.
 	var slots := {}
 	for t in tree:
@@ -251,8 +256,9 @@ func _tree_shape() -> void:
 			["oc_gluttony", "Leech", 3], ["oc_pleasure", "Leech", 4],
 			["oc_murderous", "Leech", 5], ["oc_pact_flesh", "Leech", 6],
 			["oc_barter", "Leech", 7],
-			["oc_avatar_ruin", "Ruin", 8], ["oc_hysteria", "Madness", 8],
-			["oc_soul_glut", "Leech", 8]]:
+			# BATCH BM moved the capstone shelf to row 9.
+			["oc_avatar_ruin", "Ruin", 9], ["oc_hysteria", "Madness", 9],
+			["oc_soul_glut", "Leech", 9]]:
 		var n := _node(String(pair[0]))
 		ok(String(n.get("lane", "")) == String(pair[1])
 			and int(n.get("row", 0)) == int(pair[2]),

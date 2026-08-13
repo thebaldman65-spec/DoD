@@ -28,6 +28,11 @@
 #   NEGATIVE CONTROLS for the three that would fail silently: the growth
 #      reading current instead of base, the victory sync leaving the growth on
 #      the party member, and Fervor still being required for the drip.
+# BATCH BM RE-POINTED THIS FILE IN PLACE, mechanically and in two ways only:
+# the capstone SHELF moved from row 8 to row 9 (rows 1-8 are lane rows now),
+# and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
+# every id and every question this file asks is otherwise untouched — the
+# tables below are the batch's own record of its 24 nodes and stay that.
 extends SceneTree
 
 const REAL_SAVE := "user://run_save.bin"
@@ -196,7 +201,7 @@ const IDS := ["dv_barrier", "dv_aegis", "dv_afterglow", "dv_warded",
 
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 24, "the Devout tree holds 24 nodes (got %d)" % tree.size())
+	ok(tree.size() == 27, "the Devout tree holds 24 nodes (got %d)" % tree.size())
 	# EVERY ID SURVIVES AND RE-SPECS IN PLACE — no new ids, none deleted, so
 	# saved picks migrate and no save version moves.
 	var seen := {}
@@ -204,7 +209,7 @@ func _tree_shape() -> void:
 		seen[String(t.get("id", ""))] = true
 	for id in IDS:
 		ok(seen.has(id), "the id %s survives" % id)
-	ok(seen.size() == 24, "...and no id was added (got %d distinct)" % seen.size())
+	ok(seen.size() == 27, "...and no id was added (got %d distinct)" % seen.size())
 	var per_lane := {}
 	var caps := 0
 	var cap_lanes := {}
@@ -219,14 +224,14 @@ func _tree_shape() -> void:
 			ok(bool(t.get("capstone", false)),
 				"%s on row 8 is flagged capstone" % t.get("id", ""))
 		else:
-			ok(row >= 1 and row <= 7,
+			ok(row >= 1 and row <= Talents.CAPSTONE_ROW,
 				"%s sits on a real row (got %d)" % [t.get("id", ""), row])
 			per_lane[lane] = per_lane.get(lane, 0) + 1
 	ok(caps == 3, "exactly three capstones (got %d)" % caps)
 	ok(cap_lanes.size() == 3, "the three capstones sit on three different lanes")
 	for lane in ["Bulwark", "Faith", "Zeal"]:
-		ok(per_lane.get(lane, 0) == 7,
-			"lane %s holds 7 row nodes (got %d)" % [lane, per_lane.get(lane, 0)])
+		ok(per_lane.get(lane, 0) == Talents.ROWS,
+			"lane %s holds 8 row nodes (got %d)" % [lane, per_lane.get(lane, 0)])
 	# Every row of every lane is filled exactly once — the row IS the choice.
 	var slots := {}
 	for t in tree:

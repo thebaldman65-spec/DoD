@@ -2850,3 +2850,42 @@ the old number 36 (3 × 12) — the third zone's boss is the end boss, not a
 fourteenth thing after it. Off-by-one in a headline figure propagates into every
 document that quotes it, so it is corrected at the constant and the correction is
 written down where the next reader will hit it.
+
+---
+
+## Batch BM — talents become meta progression (2026-08-12)
+
+**Vertical meta progression is the thing this genre's audience is most hostile to, and it
+works anyway when a difficulty ladder absorbs it.** Hades is the proof: nobody argues the
+Mirror of Night ruined it, because the Heat system rose to meet it. A meta layer without a
+ladder is not progression, it is the game slowly becoming easier until it stops asking
+anything — which is precisely what §5 exists to prevent, and why the ladder shipped in the
+same batch rather than in the next one. Shipping the tree alone would have been the version
+that earns the hostility.
+
+**The load-bearing decision is that unlocking a cell buys an OPTION, not a NODE.** Every
+obvious way to build this collapses into a tree you fill in: buy the node, own the node, and
+by the endgame every hero wears all twenty-seven. That version throws away twenty batches of
+work — AJ through BA priced every row against the two doors it closes, and a tree with no
+closed doors has no prices in it. Keeping the equip step separate means the row stays a
+three-way argument forever. What the meta layer buys is not power, it is **which arguments
+you are allowed to have**: a row where you own one cell has no decision in it, and a row where
+you own three is the decision the spec batches designed. That is why filling a tree makes your
+choices better rather than making them for you, and it is the one rule in the design a later
+batch could delete without anything breaking, which is why it is stated three times in the
+code and pinned by a negative control.
+
+**The end boss is the load-bearing piece nobody would have asked for.** The tree needed a
+gate that was not "play more" — a completion counter would have made rows arrive on a
+schedule rather than on a demonstration. Tying rows to *beating a fixed boss at a stated
+difficulty* means the player has proved they can use what they already have before being given
+more, and it makes the difficulty choice at the draft the most consequential decision in the
+run instead of a testing affordance. It also gives the ladder somewhere to put its teeth: one
+encounter that is FIXED, so it can be learned, and that gains mechanics rather than only
+numbers as the rungs climb.
+
+**On reporting a gate number rather than fixing it.** Difficulty 1 with an untalented party
+measures 12% completions. It would have been easy — and wrong — to move rung 1's multiplier
+until that read like a number a first run should have. This batch created that baseline, and
+the batch that creates a baseline must not correct against it; four consecutive Devout batches
+went wrong exactly that way. The number is the deliverable. The lever is one float.

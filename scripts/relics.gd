@@ -7,7 +7,6 @@
 # THE HOOK VOCABULARY (Batch 39 audit — what a relic can attach to
 # without new plumbing; every entry below is read at exactly one site):
 #   start_gold            new_run             flat gold at run start
-#   start_talent_points   new_run             points per hero at start
 #   start_items {id: n}   new_run             consumables at run start
 #   hero_attack_mult      battle spawn        party damage dealt (+frac,
 #                                             via the dmg_bonus field)
@@ -38,9 +37,12 @@ const SAVE_PATH := "user://relics.json"
 
 const POOL := {
 	# ---------- common ----------
+	# BATCH BM re-specced this in place: talent points became a META currency
+	# banked on Profile, so a per-run grant of them had nothing to buy. Same
+	# id, same tier, same "you start ahead" role — a different opening purse.
 	"waystone": {"name": "Waystone Shard", "tier": "common",
-		"desc": "Every hero begins each run with +3 talent points.",
-		"hooks": {"start_talent_points": 3}},
+		"desc": "Begin each run with +1 Health Potion,\n+1 Mana Potion and +1 Bomb.",
+		"hooks": {"start_items": {"health": 1, "mana": 1, "bomb": 1}}},
 	"coin": {"name": "Gravewrought Coin", "tier": "common",
 		"desc": "Begin each run with +80 gold.",
 		"hooks": {"start_gold": 80}},
@@ -106,9 +108,11 @@ const POOL := {
 	"kingsledger": {"name": "The King's Ledger", "tier": "rare",
 		"desc": "+40 gold at run start; all node gold +40%.",
 		"hooks": {"start_gold": 40, "gold_find_mult": 0.40}},
+	# BATCH BM: same re-spec, same reason. Its damage clause is untouched and
+	# the vacated half became more of it.
 	"warhorn": {"name": "Horn of the First War", "tier": "rare",
-		"desc": "Every hero starts with +2 talent points\nand deals +5% damage.",
-		"hooks": {"start_talent_points": 2, "hero_attack_mult": 0.05}},
+		"desc": "Every hero deals +12% damage.",
+		"hooks": {"hero_attack_mult": 0.12}},
 	"martyrbone": {"name": "Martyr's Knucklebone", "tier": "rare",
 		"desc": "The party heals 15% after every victory;\nrest nodes restore 10% more.",
 		"hooks": {"victory_heal_pct": 0.15, "rest_heal_add": 0.10}},

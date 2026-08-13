@@ -26,6 +26,14 @@ const MINI_SLOT := 7        # 0-based: the mini-boss, where the first half conve
 const BOSS_SLOT := SLOTS_PER_ZONE - 1
 const BRANCH_COLUMNS := 14  # 1-based columns 1..14; the mini-boss sits between 7 and 8
 
+# BATCH BM §6 — THE FOURTH BOSS. Three ZONE bosses pay a meta talent point
+# each; the END BOSS pays a relic and gates the meta tree's row tiers. It is
+# ONE EXTRA SLOT appended to the FINAL zone only, index SLOTS_PER_ZONE, so
+# the run is 3 x 16 + 1 = 49 encounters (BK settled on 48).
+# It is FIXED, not drawn from a pool, so it can be learned.
+const END_BOSS_SLOT := SLOTS_PER_ZONE
+const END_BOSS_KIND := "hollow_crown"
+
 # HOW MANY OF EACH TYPE A ZONE HOLDS (§1). Fights are not listed because
 # they are the FILLER: every position no other type claimed is a fight, so
 # the four counts below plus the surviving-position count fix the map. A
@@ -322,19 +330,21 @@ func relic_dict(hook: String) -> Dictionary:
 
 
 func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = [],
-		diff := "standard") -> void:
+		diff := "wanderer") -> void:
 	active = true
 	specs_chosen = false
-	difficulty = diff if DIFFICULTY_MULTS.has(diff) else "standard"
+	difficulty = difficulty_id(diff)
 	active_relics = relics.slice(0, 3)
 	clear_save()
 	party = []
 	for key in keys:
 		var base: Dictionary = HERO_BASE[key]
+		# BATCH BM: no in-run talent purse. `talents` is the EQUIPPED loadout,
+		# copied off Profile the moment a spec is confirmed and locked for the
+		# rest of the run (equip_spec_talents).
 		party.append({"key": key, "hp": base["hp"], "max_hp": base["hp"],
 			"mana": base["mana"], "max_mana": 100, "spec": "",
-			"talent_points": int(relic_add("start_talent_points")),
-			"talent_flex": 0, "talents": {}, "runes": []})
+			"talents": {}, "runes": []})
 	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
 	for id in relic_dict("start_items"):
 		items[id] = int(items.get(id, 0)) + int(relic_dict("start_items")[id])
@@ -554,6 +564,13 @@ func _build_lattice(alive: Dictionary, out_rows: Dictionary) -> void:
 	for j in map[MINI_SLOT + 1].size():
 		after_mini.append(j)
 	map[MINI_SLOT][0]["next"] = after_mini
+	# BATCH BM §6: the final zone carries ONE MORE SLOT after its boss — the
+	# end boss. Appended LAST, after every edge above is wired, because the
+	# converging-edge block writes `next` on the boss slot's neighbours and a
+	# link set before it would be overwritten.
+	if not has_next_zone():
+		map.append([{"type": "endboss", "visited": false, "row": 1, "next": []}])
+		map[BOSS_SLOT][0]["next"] = [0]
 
 
 # Types onto the surviving positions. CONSTRUCTIVE, not sampled-and-checked:
@@ -613,11 +630,19 @@ func _place_type(column: int, ty: String, free: Dictionary,
 # what resists what BEFORE the player commits. Scouting resists is
 # counterplay, not a spoiler. Non-combat nodes carry no warband at all.
 func _compose_warbands() -> void:
-	for s in SLOTS_PER_ZONE:
+	for s in map.size():
 		for node in map[s]:
-			if not String(node["type"]) in ["fight", "elite", "miniboss", "boss"]:
+			var ty := String(node["type"])
+			if not ty in ["fight", "elite", "miniboss", "boss", "endboss"]:
 				continue
-			node["enemies"] = compose(String(node["type"]), s + 1)
+			# BATCH BM §6: the end boss is FIXED, not composed — a single
+			# authored encounter, so it can be learned. It is the one node on
+			# the board whose lineup does not come out of the budget system.
+			if ty == "endboss":
+				node["enemies"] = [END_BOSS_KIND]
+				node["theme"] = "The Hollow Crown"
+				continue
+			node["enemies"] = compose(ty, s + 1)
 			node["theme"] = last_theme
 
 
@@ -631,7 +656,10 @@ func reachable() -> Array:
 		for j in map[0].size():
 			entry.append(j)
 		return entry
-	if slot_idx >= BOSS_SLOT:
+	# BATCH BM §6: the boss slot leads on to the END BOSS in the final zone,
+	# and nowhere at all in every other. Reading `next` covers both, because
+	# only the final zone's boss has a link out.
+	if slot_idx >= map.size() - 1:
 		return []
 	return Array(current_node().get("next", []))
 
@@ -650,18 +678,24 @@ func current_node() -> Dictionary:
 	return map[slot_idx][clampi(node_idx, 0, map[slot_idx].size() - 1)]
 
 
-# Where the party stands in the WHOLE run, 1-48 — the readout the zone
+# Where the party stands in the WHOLE run, 1-49 — the readout the zone
 # header and the run summary both want. 0 before the first slot is entered.
+# BATCH BM: 49, not 48. The final zone carries a seventeenth slot.
 func run_slot_number() -> int:
 	if slot_idx < 0:
 		return zone_idx * SLOTS_PER_ZONE
 	return zone_idx * SLOTS_PER_ZONE + slot_idx + 1
 
 
-# The end boss is the last zone's boss and nothing else. Every other boss
-# opens the next zone.
+func total_slots() -> int:
+	return SLOT_COUNT * SLOTS_PER_ZONE + 1
+
+
+# BATCH BM §6: the end boss is its OWN slot after the final zone's boss, not
+# the final zone's boss itself. A zone boss — including the third — opens
+# what follows it; only this one ends the run.
 func is_end_boss_slot(slot: int) -> bool:
-	return slot == BOSS_SLOT and not has_next_zone()
+	return slot == END_BOSS_SLOT and not has_next_zone()
 
 
 # Every node reachable from (slot, node), as a Dictionary of "slot,index"
@@ -781,21 +815,73 @@ func compose_budget(budget: int, roster := 1) -> Array:
 # is data work, never formula work.
 const ZONE_BASE_MULTS := [1.0, 1.5, 2.2]
 
-# Alpha difficulty affordance (Batch Y): a TESTING lever, not a balance
-# decision — Batch T still owns the numbers and nothing else in the game
-# bends to accommodate this. "wanderer" exists so a competent tester can
-# see all three zones and the finale; at standard numbers most alpha
-# feedback would describe one third of the content. ONE multiplier folded
-# into zone_base_mult — the single site battle spawn reads — so it is
-# trivially removable when difficulty is actually decided. Chosen at the
-# draft, saved with the run; sims arm it via DOD_SIM_DIFFICULTY (default
-# standard) so it can never contaminate a baseline row.
-const DIFFICULTY_MULTS := {"standard": 1.0, "wanderer": 0.7}
-var difficulty := "standard"
+# BATCH BM §5 — THE DIFFICULTY LADDER. Three rungs, and the ladder is what
+# rows 4-9 of the meta tree are FOR: vertical progression with nothing
+# absorbing it means the game only ever gets easier.
+#
+# `difficulty` was Batch Y's alpha testing lever — a String var, saved with
+# the run, armable from the draft and from DOD_SIM_DIFFICULTY, folded into
+# ONE multiplier at zone_base_mult. THE FIELD IS REUSED, NOT SHADOWED: every
+# one of those properties is what the ladder needs, so the change is to the
+# TABLE it keys into, not to the plumbing. Y's two ids still resolve
+# (LEGACY_DIFFICULTY below) so a saved run and every old sim script load.
+#
+# EVERY SCALING NUMBER HERE IS PROVISIONAL AND SAID SO. Balance is deferred
+# by designer decision; the STRUCTURE is what ships.
+#   rung 1 "Wanderer"  x0.70  — DELIBERATELY BELOW the present balance, and
+#                               it reuses Y's existing 0.7 rather than
+#                               inventing a number. This is the rung played
+#                               with ZERO talents, so it is the gate the
+#                               whole meta layer sits behind.
+#   rung 2 "Warden"    x1.00  — the present balance, byte-for-byte. BK's
+#                               39.3/43.3/21.3% completions were measured
+#                               here, so nothing about that row moves.
+#   rung 3 "Ruin"      x1.30  — provisional.
+#
+# EACH RUNG ABOVE 1 ADDS A NAMED TWIST as well as scaling, on the
+# ascension-ladder principle: stat inflation alone is a wall, a named twist
+# is a ladder. Both twists REUSE existing machinery rather than building new.
+#   severity_floor  — the guaranteed mild bargain option gets less mild:
+#                     roll_offer draws its safe slot from severity <= N.
+#   fixed_modifier  — the mini-boss, the zone bosses and the end boss carry
+#                     a modifier, which today they never do.
+const DIFFICULTIES := {
+	"wanderer": {"rung": 1, "name": "Wanderer", "mult": 0.70,
+		"blurb": "The Decay is thin here. No twist.",
+		"severity_floor": 2, "fixed_modifier": false},
+	"warden": {"rung": 2, "name": "Warden", "mult": 1.00,
+		"blurb": "The guaranteed mild bargain gets less mild.",
+		"severity_floor": 3, "fixed_modifier": false},
+	"ruin": {"rung": 3, "name": "Ruin", "mult": 1.30,
+		"blurb": "Harsher bargains, and fixed encounters carry a modifier.",
+		"severity_floor": 4, "fixed_modifier": true},
+}
+const DIFFICULTY_ORDER := ["wanderer", "warden", "ruin"]
+# Batch Y's two ids, kept resolvable so a saved run and every DOD_SIM_
+# DIFFICULTY script still loads. "standard" WAS the present balance and maps
+# to rung 2; "wanderer" kept its own id and its own multiplier.
+const LEGACY_DIFFICULTY := {"standard": "warden"}
+var difficulty := "wanderer"
+
+
+func difficulty_id(raw: String) -> String:
+	if DIFFICULTIES.has(raw):
+		return raw
+	return String(LEGACY_DIFFICULTY.get(raw, "wanderer"))
+
+
+func difficulty_def() -> Dictionary:
+	return DIFFICULTIES[difficulty_id(difficulty)]
+
+
+# The rung number 1-3 — what the end boss unlocks on Profile, and the only
+# thing outside this block that should read the ladder as a number.
+func difficulty_rung() -> int:
+	return int(difficulty_def()["rung"])
 
 
 func difficulty_mult() -> float:
-	return float(DIFFICULTY_MULTS.get(difficulty, 1.0))
+	return float(difficulty_def()["mult"])
 
 
 func zone_base_mult(slot: int) -> float:
@@ -1262,8 +1348,17 @@ func save_run() -> void:
 	# structure, so a v8 save loads and simply starts them mid-run at zero. A
 	# recap that begins counting halfway through a resumed run is a smaller lie
 	# than a wiped run, which is the test v8 failed and this one passes.
+	# v10 (BATCH BM): talents are META now. `party[i]["talents"]` is the
+	# EQUIPPED loadout copied off Profile at the awakening and locked for the
+	# run — the same {id: 1} shape, but nothing in a run writes it any more,
+	# and `talent_points` / `talent_flex` are gone from the member entirely.
+	# The map gained a SEVENTEENTH slot in the final zone (the end boss), so a
+	# v9 save's final-zone map has no position to walk onto after its boss.
+	# REFUSED AND CLEARED on load, for the same reason BK refused pre-v8: the
+	# migration would have to invent a slot the party never stood in, and a
+	# wipe that says so beats that.
 	file.store_var({
-		"version": 9, "party": party, "items": items, "gold": gold,
+		"version": 10, "party": party, "items": items, "gold": gold,
 		"tally": tally, "debug_used": debug_used,
 		"difficulty": difficulty,
 		"zone_idx": zone_idx, "zone_name": zone_name, "zone_draw": zone_draw,
@@ -1289,7 +1384,7 @@ func load_run() -> bool:
 	# Batch BK: a pre-v8 save describes a board this build cannot render or
 	# walk. Refuse it and delete it, rather than half-loading a run whose
 	# every "next node" call would index a dictionary that is not there.
-	if save_version < 8:
+	if save_version < 10:
 		clear_save()
 		return false
 	party = data["party"]
@@ -1309,9 +1404,7 @@ func load_run() -> bool:
 	active_relics = data["active_relics"]
 	map = data["map"]
 	combat_wins = int(data.get("combat_wins", 0))
-	difficulty = String(data.get("difficulty", "standard"))
-	if not DIFFICULTY_MULTS.has(difficulty):
-		difficulty = "standard"
+	difficulty = difficulty_id(String(data.get("difficulty", "wanderer")))
 	seen_events = data.get("seen_events", [])
 	# Pre-Z saves carry no ledger: start one mid-run rather than crash the
 	# summary — its counts just begin at the load point.
@@ -1358,18 +1451,15 @@ func _migrate_trees() -> void:
 			continue
 		var live_tree := Talents.generate_tree(spec, member["key"])
 		member["tree"] = live_tree
+		# BATCH BM: there is no in-run purse to refund into any more. An id
+		# the live tree no longer holds is simply DROPPED — the meta ledger
+		# already refunded its cell when the tree changed under it, and a
+		# member carrying a node that does not exist is the only real hazard.
 		var learned: Dictionary = member.get("talents", {})
-		var refund := 0
 		for id in learned.keys():
-			var node := Talents.node_in_tree(live_tree, id)
-			if node.is_empty():
-				refund += int(learned[id])
+			if Talents.node_in_tree(live_tree, id).is_empty():
 				learned.erase(id)
-			elif int(learned[id]) > int(node["ranks"]):
-				refund += int(learned[id]) - int(node["ranks"])
-				learned[id] = int(node["ranks"])
 		member["talents"] = learned
-		member["talent_points"] = member.get("talent_points", 0) + refund
 
 
 func clear_save() -> void:
@@ -1391,54 +1481,59 @@ func award_gold(node_type: String) -> int:
 			amount = randi_range(80, 100)
 		"boss":
 			amount = randi_range(110, 130)
+		"endboss":
+			# Nothing follows it, so the gold is a flourish rather than a
+			# budget — the relic is the reward (Batch BM §6).
+			amount = randi_range(150, 180)
 	amount = int(round(amount * (1.0 + relic_add("gold_find_mult"))))
 	gold += amount
 	tally_add("gold_earned", amount)
 	return amount
 
 
-# Combat rewards, Batch AN §8: points come from ELITES, MINI-BOSSES and
-# BOSSES only, one apiece. Regular fights award none.
-#   elite       1   x2 per zone
-#   mini-boss   1   x1 per zone
-#   zone boss   1   x1 per zone   (the END boss pays one too — see below)
-#   fight       0
-# = 4 per zone, 12 per run, against an 8-node tree.
+# BATCH BM §6 — THERE IS NO IN-RUN TALENT POINT. `award_talent_points` and
+# `award_spec_point` ARE DELETED, not zeroed, per the standing rule that dead
+# things are deleted; so are `member["talent_points"]` and `talent_flex`.
+# Fights, elites and mini-bosses award what they always did MINUS the point;
+# a ZONE BOSS banks a META point to Profile instead — same trigger, different
+# destination — and the END BOSS awards a relic and no points at all.
 #
-# ONE PURSE, and that is the change from Batch AI. AI split elite points
-# into a separate `talent_flex` because 8 points against an 8-node tree left
-# no room for a second node in a row — a normal point had to be barred from
-# buying one or the tree could be climbed faster. At 12 against 8 the SHAPE
-# does the barring instead: rows are mutually exclusive and there are only
-# eight of them, so a purse of 12 can open at most 8 rows and the surplus
-# has nowhere to go BUT second nodes. That is §8's "the 4 surplus buy row
-# flexibility exactly as Batch AI §6 already allows", arrived at by
-# arithmetic rather than by a second wallet. `talent_flex` survives as a
-# purse that is spent FIRST when it holds anything (old saves, and any
-# future relic that wants to grant flexibility without granting climb).
-#
-# NOTE FOR THE DESIGNER: the awakening's own point (award_spec_point, Batch
-# AI) is UNCHANGED and still paid, so the real total is 13 and the surplus
-# is 5, not 4. §8 enumerates SLOT types and the awakening is not a slot, so
-# it was left standing rather than silently deleted — removing it would push
-# the first talent pick from "the moment you choose a spec" out to slot 3,
-# which is a live design decision this batch does not ask for.
-func award_talent_points(node_type: String) -> int:
-	var pts := 1 if node_type in ["elite", "miniboss", "boss"] else 0
-	if pts > 0:
-		for member in party:
-			member["talent_points"] = member.get("talent_points", 0) + pts
-	return pts
+# EVERY HISTORICAL FIGURE THOSE SITES PRODUCED IS SUPERSEDED, including BK's
+# 10.9 / 10.8 / 6.0 talent points per hero per run and every "nodes owned
+# entering a boss" reading. Those measured a per-run purse that no longer
+# exists; do not compare any post-BM number against them.
+
+# 1 point per spec per zone boss, to Profile, for the specs that were in the
+# party. Called from BOTH victory paths (battle.gd and RunSim), and NEVER by
+# a sim — a simulated run must not touch the player's ledger, so the caller
+# checks `sim_run` exactly as it does for save_run.
+func bank_zone_boss_points() -> void:
+	if sim_run:
+		return
+	Profile.award_zone_boss_points(party.map(func(m): return m.get("spec", "")))
 
 
-# The point the awakening pays, granted the moment a spec is confirmed —
-# from BOTH paths (the spec screen and RunSim.start_run), the sync_spec_hp
-# pattern. Row 1 is open from the start, so this is the point that lets the
-# player act on the choice they just made.
-func award_spec_point(idx: int) -> void:
+# THE HANDOFF FROM THE META LAYER INTO THE RUN, called the moment a spec is
+# confirmed — from BOTH paths (the spec screen and RunSim.start_run), the
+# sync_spec_hp pattern. It copies the loadout the player configured BETWEEN
+# runs onto the member, and from here it is locked: nothing in a run writes
+# `member["talents"]` again.
+func equip_spec_talents(idx: int) -> void:
 	if idx < 0 or idx >= party.size():
 		return
-	party[idx]["talent_points"] = int(party[idx].get("talent_points", 0)) + 1
+	var spec := String(party[idx].get("spec", ""))
+	party[idx]["talents"] = Profile.equipped_talents(spec) if not sim_run \
+		else sim_equipped_talents(spec)
+
+
+# The sim's own loadout source. A sim must never read Profile (it would make
+# every baseline depend on whoever ran it), so RunSim installs the build it
+# was asked for here and this returns it.
+var sim_talents := {}   # spec -> {id: 1}
+
+
+func sim_equipped_talents(spec: String) -> Dictionary:
+	return (sim_talents.get(spec, {}) as Dictionary).duplicate()
 
 
 # ---------- Batch AN §6: the item cap ----------
@@ -1586,11 +1681,17 @@ func reward_text(reward: Dictionary) -> String:
 # from the high pool makes every offer read the same way: ONE SAFE OPTION,
 # TWO GAMBLES. The floor still guarantees the safe one, so a wounded party is
 # never cornered.
+# BATCH BM §5, TWIST ONE: THE SEVERITY FLOOR RISES WITH THE RUNG. The
+# guaranteed mild option is still guaranteed — the floor is still enforced by
+# construction rather than by rejecting rolls — but "mild" means severity <=
+# 2 at rung 1, <= 3 at rung 2 and <= 4 at rung 3, so by the top rung the safe
+# slot is only nominally safe. Every offer still reads ONE SAFE, TWO GAMBLES.
 func roll_offer() -> Array:
+	var floor_sev := int(difficulty_def()["severity_floor"])
 	var low: Array = []
 	var rest: Array = []
 	for id in MODIFIERS:
-		if modifier_severity(String(id)) <= 2:
+		if modifier_severity(String(id)) <= floor_sev:
 			low.append(String(id))
 		else:
 			rest.append(String(id))
@@ -1614,6 +1715,31 @@ func roll_offer() -> Array:
 			"reward": (choices.pick_random() as Dictionary).duplicate()})
 	offer.shuffle()
 	return offer
+
+
+# BATCH BM §5, TWIST TWO: FIXED ENCOUNTERS CARRY A MODIFIER, which today
+# they never do. The mini-boss, the three zone bosses and the end boss are
+# the only nodes a route cannot duck, so a modifier on them is a real
+# escalation the player has to build against rather than route around.
+# It is NOT a bargain: there is no offer, no choice and NO REWARD — the
+# modifier is the rung's, not something the player bought. Rung 3 only.
+const FIXED_MODIFIER_NODES := ["miniboss", "boss", "endboss"]
+
+
+func arm_fixed_modifier(node_type: String) -> void:
+	if not bool(difficulty_def()["fixed_modifier"]):
+		return
+	if not node_type in FIXED_MODIFIER_NODES:
+		return
+	if pending_modifier != "":
+		return  # a bargain already armed one; never stack two
+	var pool: Array = []
+	for id in MODIFIERS:
+		if modifier_severity(String(id)) >= 3:
+			pool.append(String(id))
+	if pool.is_empty():
+		return
+	pending_modifier = String(pool.pick_random())
 
 
 # The accepted option, armed for the battle about to start.

@@ -286,15 +286,22 @@ func _the_field_exists_and_has_one_ratchet() -> void:
 # reads as a smaller number rather than as a fault.
 func _both_read_sites_read_the_peak() -> void:
 	var src := _src("res://scripts/battle.gd")
-	ok(src.contains("_faith_stack_mult(fd_dv, attacker) * attacker.faith_peak"),
-		"§1: the damage site is paid from the ATTACKER's peak")
-	ok(src.contains("_faith_stack_mult(fp_dv, strike_target) * strike_target.faith_peak"),
-		"§1: the mitigation site is paid from the TARGET's peak")
+	# BATCH BM RE-POINTED THESE THREE IN PLACE. BI's rule is UNCHANGED and is
+	# what the check still asks: the held half reads a PEAK, never the current
+	# count. What moved is that CREED (Devout, Faith row 8) made "whose peak"
+	# a question with two answers — his own, or the party's highest — so both
+	# sites go through `_faith_paid_peak`, ONE function, exactly so the damage
+	# half and the mitigation half cannot disagree. The negative control below
+	# is untouched and is the half that matters.
+	ok(src.contains("_faith_stack_mult(fd_dv, attacker) * _faith_paid_peak(attacker)"),
+		"§1: the damage site is paid from a PEAK, through the one function")
+	ok(src.contains("_faith_stack_mult(fp_dv, strike_target) * _faith_paid_peak(strike_target)"),
+		"§1: the mitigation site is paid from a PEAK, through the same one")
 	ok(not src.contains("* attacker.faith_stacks")
 			and not src.contains("* strike_target.faith_stacks"),
 		"§1: NEGATIVE CONTROL — neither site multiplies by the CURRENT count")
-	ok(src.contains("if attacker.is_hero and attacker.faith_peak > 0:")
-			and src.contains("if strike_target.is_hero and strike_target.faith_peak > 0:"),
+	ok(src.contains("if attacker.is_hero and _faith_paid_peak(attacker) > 0:")
+			and src.contains("if strike_target.is_hero and _faith_paid_peak(strike_target) > 0:"),
 		"§1: ...and both gates are the peak too, so a released ally still pays")
 
 

@@ -257,8 +257,11 @@ func _the_capstone_describes_the_held_half() -> void:
 	ok(not d.to_lower().contains("no longer consume"),
 		"§2: ...and it no longer promises releases that consume nothing")
 	# The id, the lane and the payload field all survive, so no save migrates.
-	ok(String(n.get("lane", "")) == "Faith" and int(n.get("row", 0)) == 8,
-		"§2: id, lane and row are unchanged — no save version moves")
+	# BATCH BM moved the capstone SHELF from row 8 to row 9 (rows 1-8 are lanes
+	# now). The id, the lane and the payload field are what a save keys on and
+	# all three are untouched; the row is the shelf's, not the node's.
+	ok(String(n.get("lane", "")) == "Faith" and int(n.get("row", 0)) == Talents.CAPSTONE_ROW,
+		"§2: id, lane and the capstone shelf are unchanged")
 	ok(n.get("payload", {}).get("stat", {}).has("apostle"),
 		"§2: ...and the payload still writes the same `apostle` field")
 

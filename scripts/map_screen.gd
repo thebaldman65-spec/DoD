@@ -121,7 +121,7 @@ func _maybe_show_framing() -> bool:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(title)
 	var body := Label.new()
-	body.text = ("A run is 48 encounters — three zones of sixteen. A zone is a\n" +
+	body.text = ("A run is 49 encounters — three zones of sixteen, and then\nthe end boss. A zone is a\n" +
 		"MAP, not a road: three ways forward at a time, reading LEFT TO\n" +
 		"RIGHT, converging on the MINI-BOSS in the middle and the BOSS at\n" +
 		"the end. Scroll it and read the whole zone before you step.\n\n" +
@@ -215,9 +215,9 @@ func _draw_header() -> void:
 		subtitle.text = "Zone %d of %d — 16 encounters to the %s" % [
 			Run.zone_idx + 1, Run.SLOT_COUNT, boss_name]
 	else:
-		subtitle.text = "Zone %d of %d — encounter %d of %d (%d of 48) — the %s waits" % [
-			Run.zone_idx + 1, Run.SLOT_COUNT, here, Run.SLOTS_PER_ZONE,
-			Run.run_slot_number(), boss_name]
+		subtitle.text = "Zone %d of %d — encounter %d of %d (%d of %d) — the %s waits" % [
+			Run.zone_idx + 1, Run.SLOT_COUNT, here, Run.map.size(),
+			Run.run_slot_number(), Run.total_slots(), boss_name]
 	subtitle.add_theme_font_size_override("font_size", 15)
 	subtitle.add_theme_color_override("font_color", Color(0.72, 0.64, 0.52))
 	subtitle.position = Vector2(0, 56)
@@ -516,7 +516,6 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 	var owed_runes := int(member.get("rune_picks_owed", 0))
 	var owed_abs := int(member.get("bm_picks_owed", 0))
 	var owed_ups := int(member.get("up_picks_owed", 0))
-	var pts := int(member.get("talent_points", 0)) + int(member.get("talent_flex", 0))
 
 	var panel := Panel.new()
 	panel.position = at
@@ -525,15 +524,14 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 	sb.bg_color = Color(0.06, 0.05, 0.08, 0.92)
 	sb.set_corner_radius_all(6)
 	sb.set_border_width_all(2)
-	# The border carries the loudest unspent thing, same precedence the old
-	# Party badge used: rune purple > pick gold > talent gold > nothing.
+	# The border carries the loudest unspent thing: rune purple > pick gold >
+	# nothing. BATCH BM dropped the talent-gold rung — there is nothing to
+	# spend in a run any more, so a card can no longer owe a talent pick.
 	sb.border_color = Color(0.24, 0.22, 0.28)
 	if owed_runes > 0:
 		sb.border_color = Color(0.75, 0.45, 1.0)
 	elif owed_abs > 0 or owed_ups > 0:
 		sb.border_color = Color(0.95, 0.85, 0.4)
-	elif pts > 0:
-		sb.border_color = Color(0.85, 0.72, 0.35)
 	panel.add_theme_stylebox_override("panel", sb)
 	add_child(panel)
 
@@ -645,11 +643,9 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 		up_badge.mouse_filter = Control.MOUSE_FILTER_PASS
 		open.add_child(up_badge)
 
-	# The badges: unspent points and any owed pick, stated on the card rather
-	# than behind a click.
+	# The badges: any owed pick, stated on the card rather than behind a
+	# click. BATCH BM removed the unspent-points badge with the purse.
 	var badges := PackedStringArray()
-	if pts > 0:
-		badges.append("● %d point%s" % [pts, "" if pts == 1 else "s"])
 	if owed_abs > 0:
 		badges.append("◆ %d ability" % owed_abs)
 	if owed_ups > 0:
@@ -1190,6 +1186,7 @@ func _on_node_pressed(j: int) -> void:
 		node["theme"] = Run.last_theme
 	Run.encounter = {"type": ty, "enemies": warband,
 		"theme": node.get("theme", "Warband")}
+	Run.arm_fixed_modifier(ty)  # BATCH BM §5: rung 3's second twist
 	Run.save_run()
 	# Batch AO §2: the offer is an EVENT, not a toll booth — fights and bosses
 	# walk straight in, elites and mini-bosses are preceded by the bargain.
@@ -1235,9 +1232,12 @@ func _on_burger(id: int) -> void:
 			Run.gold += 200
 			_draw_screen()
 		11:
-			for member in Run.party:
-				member["talent_points"] = member.get("talent_points", 0) + 200
+			# BATCH BM: there is no in-run purse to fill. The tester's
+			# equivalent is a META grant — 60 points to every spec, which is
+			# past the 54 a full tree costs — plus every row tier open.
+			Profile.debug_grant_meta()
 			_draw_screen()
+			_toast("DEBUG: 60 talent points to every spec, all rows open")
 		12:
 			Run.heal_party(1.0)
 			Run.restore_mana(1.0)
@@ -1291,31 +1291,11 @@ func _on_burger(id: int) -> void:
 					_summon_event(String(ids[pick]))
 
 
-# Debug spec swap: refund spent points, clear specs, re-awaken. Nodes cost 1
-# apiece. The spec-choice point comes back OFF, because re-awakening will
-# pay it again — otherwise every swap mints one.
+# Debug spec swap: clear the specs and re-awaken. BATCH BM removed the refund
+# arithmetic with the purse it refunded into — a spec's talents are its META
+# loadout now, so re-awakening simply re-equips whatever the profile holds.
 func _debug_reroll_specs() -> void:
 	for member in Run.party:
-		if String(member.get("spec", "")) == "":
-			continue  # never awakened: nothing to refund, nothing paid
-		var learned: Dictionary = member.get("talents", {})
-		var tree: Array = member.get("tree", [])
-		var normal := 0
-		var flex := 0
-		for talent_id in learned:
-			if int(learned[talent_id]) < 1:
-				continue
-			var node := Talents.node_in_tree(tree, String(talent_id))
-			var row := int(node.get("row", 1))
-			# A row holding two picks bought the second out of the surplus;
-			# the first (definition order) was the ordinary pick.
-			var picks: Array = Talents.row_picks(tree, learned, row)
-			if picks.size() > 1 and String(picks[0]) != String(talent_id):
-				flex += 1
-			else:
-				normal += 1
-		member["talent_points"] = maxi(
-			member.get("talent_points", 0) + normal + flex - 1, 0)
 		member["spec"] = ""
 		member["talents"] = {}
 		member["tree"] = []

@@ -911,6 +911,58 @@ var avatar_ruin := 0          # capstone: the Ruin threshold it installs (5), ga
                               # magnitude in one field (AW's `judgement` precedent)
 var soul_glut := 0            # capstone: the Ruin lifesteal feeds everyone
 
+# ---- BATCH BM §2: the thirty-six ROW-8 fields, one read site each ----
+# Every one of these is an ADDITIVE magnitude in the units its read site
+# sums, the house form since AR. The read site is named on each line.
+# --- Warrior ---
+var slaughterhouse := 0       # Slaughterhouse: the buildup a bleedout leaves
+                              # behind instead of zero — the bleedout site
+var last_rites := 0           # Last Rites: Rage paid per point of damage under
+                              # 25% health — take_hit, above every other cut
+var bloodwake := 0            # Bloodwake: Rage per +1% damage — the attacker block
+var whetstone := 0            # Whetstone: Attack a crit adds, permanently — the crit site
+var waiting_guard := 0        # Waiting Guard: parries he may BANK — turn start
+var banked_guards := 0        # ...and how many he is holding right now
+var overpressure := 0         # Overpressure: % of wasted Break dealt as damage —
+                              # the pressure_add block in take_hit
+var iron_debt := 0            # Debt of Iron: % of the bank Crushing Blow spends
+var iron_bank := 0            # ...the bank itself, filled at the mitigation site
+var whole_room := 0           # The Whole Room: his taunts never expire — tick_statuses
+var standard_bearer := 0      # Standard Bearer: % of his armor every ally wears
+# --- Mage ---
+var sea_of_flame := 0         # Sea of Flame: +% fire damage per BURNING enemy
+var forge_body := 0           # Forge Body: % of the Overburn drain thrown as damage
+var powder_keg := 0           # Powder Keg: % of a Detonation banked into the next
+var keg_bank := 0             # ...the bank itself
+var winters_depth := 0        # Winter's Depth: -% Constitution per Chilled stack
+var cold_storage := 0         # Cold Storage: % max resource per HELD enemy, to allies
+var frostbound_hours := 0     # Frostbound Hours: turns held per cooldown turn refunded
+var convergence := 0          # Harmonic Convergence: stacks per +1 Resonance gained
+var blowback := 0             # Blowback: % of recoil dealt outward instead
+var entropy_toll := 0         # Entropy's Toll: Resonance banked at the end of his turn
+# --- Cleric ---
+var font_of_light := 0        # Font of Light: Mana per 2 points of overheal
+var mercy_aegis := 0          # Communion of Mercy: party -% damage per Mercy held
+var watchtower := 0           # Watchtower: the health % that pulls her turn forward
+var watchtower_used := false  # ...at most once a turn
+var layered_faith := 0        # Layered Faith: a shield ADDS rather than replaces
+var creed := 0                # Creed: Faith is paid on the party's highest peak
+var eternal_ground := 0       # Eternal Ground: Consecrated Ground never expires
+var weight_of_ruin := 0       # Weight of Ruin: the Ruin depth that halves and seals
+var permanent_delusion := 0   # Permanent Delusion: his madness never expires
+var blood_communion := 0      # Blood Communion: % of his Break dealt, healed
+# --- Hunter ---
+var cocktail := 0             # Cocktail: other statuses per extra Poison stack
+var set_and_forget := 0       # Set and Forget: a sprung trap re-arms next turn
+var trap_rearm := 0           # ...the trap owed a re-arm (0 = none)
+var practised_hands := 0      # Practised Hands: cooldown turns every cast refunds
+var continuous_aim := 0       # Continuous Aim: +0.1% damage per Focus, per point
+var sunder_shot := 0          # Sunder Shot: % of his armor pen applied to Constitution
+var metronome := 0            # Metronome: % of Focus that survives a payout
+var kindred := 0              # Kindred: the Loyalty depth that re-fires the arrival
+var free_swap := 0            # Instinctive Rotation: a swap costs no turn
+var ghost_pack := 0           # Ghost Pack: % power of a beastless companion strike
+
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []
 
@@ -1668,20 +1720,32 @@ func add_bleed(amount: int) -> bool:
 		bleed_buildup = 0
 		remove_status("bleed")
 	else:
-		var found := false
-		for s in statuses:
-			if s.id == "bleed":
-				s.short = "Bl%d" % bleed_buildup
-				s.desc = "Bleed buildup: %d/100.\nAt 100 the target bleeds out for\n20%% of max HP (ignores armor)." % bleed_buildup
-				found = true
-		if not found:
-			statuses.append({"id": "bleed", "label": "Bleed", "short": "Bl%d" % bleed_buildup,
+		log_bleed_chip()
+	_refresh_chips()
+	return bled
+
+
+# The bleed chip, rebuilt from the live meter. Its own function since BATCH
+# BM: Slaughterhouse re-seeds the meter AFTER add_bleed has zeroed it (it is
+# a party-side read, so it happens in battle.gd), and the chip has to follow.
+func log_bleed_chip() -> void:
+	if bleed_buildup <= 0:
+		remove_status("bleed")
+		_refresh_chips()
+		return
+	var found := false
+	for s in statuses:
+		if s.id == "bleed":
+			s.short = "Bl%d" % bleed_buildup
+			s.desc = "Bleed buildup: %d/100.\nAt 100 the target bleeds out for\n20%% of max HP (ignores armor)." % bleed_buildup
+			found = true
+	if not found:
+		statuses.append({"id": "bleed", "label": "Bleed", "short": "Bl%d" % bleed_buildup,
 				"color": Color(0.85, 0.25, 0.25), "turns": -1,
 				"desc": "Bleed buildup: %d/100.\nAt 100 the target bleeds out for\n20%% of max HP (ignores armor)." % bleed_buildup,
 				"power": 0, "stacks": 1})
 		float_text("Bleed %d" % bleed_buildup, Color(0.85, 0.3, 0.3))
 	_refresh_chips()
-	return bled
 
 
 func status_power(id: String) -> int:
@@ -1810,6 +1874,14 @@ func effective_armor() -> float:
 	# Bulwark of Fortitude: the unbreakable stand (+50% of current armor).
 	if has_status("bulwark"):
 		a *= 1.5
+	# BATCH BM §2 — STANDARD BEARER (Warden, Banner row 8). The deepest number
+	# in his tree stops being his alone: every ally wears a share of it. The
+	# share is STAMPED on the ally as a "standard" status by the turn-start
+	# block in battle.gd (which is the only place that can see the party), so
+	# this remains a pure unit-side read and the ally's chip says where the
+	# armor came from.
+	if has_status("standard"):
+		a += float(get_status("standard").get("armor", 0.0))
 	if broken:
 		a *= 0.7
 	if has_status("sunder"):
@@ -2019,6 +2091,21 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 					_proc_log("Talent: Afterglow — the breaking shield mends %s for %d" % [
 						unit_name, glow_got])
 			break
+	# BATCH BM §2 — LAST RITES (Berserker, Fury row 8). Below a quarter health
+	# the Rage the lane spends seven rows filling starts paying for the damage
+	# the lane spends seven rows inviting: 1 Rage a point, and health is only
+	# billed once the tank is dry. It sits ABOVE Conversion because the two
+	# are the same shape through different resources and the Berserker holds
+	# neither the other's field nor the other's resource_name.
+	if last_rites > 0 and resource_name == "Rage" and amount > 0 \
+			and hp <= max_hp * 0.25:
+		var paid := mini(int(round(amount * last_rites)), resource)
+		if paid > 0:
+			amount -= paid / maxi(last_rites, 1)
+			resource -= paid
+			float_text("-%d Rage" % paid, Color(0.9, 0.35, 0.3))
+			_proc_log("Talent: Last Rites — %s pays %d of the wound in Rage" % [
+				unit_name, paid])
 	# Conversion (Arcanist talent): part of the pain bleeds off as Mana.
 	# ADDITIVE — the counter is percentage POINTS of the hit (Batch AT).
 	if conversion_ranks > 0 and resource_name == "Mana" and amount > 0:
@@ -2148,6 +2235,16 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	#   `mod_bd_mult` / `mod_no_break`: run modifiers. Nobody in the party did
 	#     that, and a contribution ledger that credits the weather is worthless.
 	var eff_con := constitution + ((30 * bracing_ranks) if stance == "defensive" else 0)
+	# BATCH BM §2 — WINTER'S DEPTH (Cryomancer, Winter row 8) and SUNDER SHOT
+	# (Sharpshooter, Penetration row 8). BOTH thin the DIVISOR rather than
+	# adding to the numerator, because Break resistance is what each node
+	# converts its lane's currency into: Chilled stacks for one, armor
+	# penetration for the other. `winters_depth` / `sunder_shot` are STAMPED
+	# ON THIS UNIT at the strike site (they belong to the attacker, and only
+	# battle.gd can see who that is), so this stays a pure unit-side read.
+	if winters_depth > 0 or sunder_shot > 0:
+		var thin := 0.01 * float(winters_depth + sunder_shot)
+		eff_con = maxf(eff_con * (1.0 - minf(thin, 0.75)), 10.0)
 	var bd_raw := pressure_add
 	pressure_add = int(round(pressure_add * 100.0 / maxf(eff_con, 1.0)))
 	if bracing_ranks > 0 and stance == "defensive":
@@ -2203,6 +2300,16 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			_proc_log("Capstone: Immovable — %s cannot be Broken" % unit_name)
 		_credit_bd(pressure_add, "bd_immovable", unit_name)
 		pressure_add = 0
+	# BATCH BM §2 — OVERPRESSURE (Swordmaster, Breaker row 8). Break dealt
+	# into a full meter, or into an already-Broken enemy, is pure waste today.
+	# The overflow lands as damage instead. Read BEFORE the meter is written,
+	# because after it the excess is gone.
+	if overpressure > 0 and pressure_add > 0 and not is_hero:
+		var wasted := pressure_add if broken \
+			else maxi(pressure + pressure_add - stability, 0)
+		if wasted > 0:
+			amount += int(round(wasted * overpressure / 100.0))
+			float_text("OVERPRESSURE", Color(0.85, 0.7, 0.35))
 	var just_broke := false
 	var applied_bd := 0
 	if not broken:
@@ -2348,6 +2455,13 @@ func heal_amount(amount: int, external := false) -> int:
 		if amount > 0:
 			float_text("CAUGHT", Color(0.75, 0.6, 0.3))
 		return 0
+	# BATCH BM §2 — WEIGHT OF RUIN's second half (Occultist, Ruin row 8). It
+	# sits with the other ABSOLUTE refusals rather than in the multiplier
+	# block, because "cannot be healed" is a rule and not an amount.
+	if weight_of_ruin > 0 and status_stacks("ruin") >= weight_of_ruin:
+		if amount > 0:
+			float_text("RUINED", Color(0.6, 0.3, 0.6))
+		return 0
 	var mult := healing_received_mult
 	if has_status("rally_heal"):
 		mult *= 1.30
@@ -2366,6 +2480,11 @@ func heal_amount(amount: int, external := false) -> int:
 	mult = maxf(mult, 0.0)
 	var final := int(round(amount * mult))
 	last_overheal = maxi(final - (max_hp - hp), 0)
+	# BATCH BM §2 — FONT OF LIGHT (Holy, Radiance row 8). Overhealing is the
+	# lane's waste product and seven rows make more of it; here it becomes the
+	# resource that pays for casting. The field is on the CASTER, so battle.gd
+	# stamps `font_of_light` onto the healer and calls `drink_overheal` — this
+	# line only makes the number available.
 	hp = mini(hp + final, max_hp)
 	if external and final > 0:
 		healed_externally = true

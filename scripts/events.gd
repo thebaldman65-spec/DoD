@@ -37,7 +37,6 @@
 #   attack_pct    {amount, target}         permanent-for-run Attack shift
 #                                          (member event_attack_pct, read
 #                                          at battle spawn)
-#   talent_points {amount, target}         grant talent points
 #   item          {id, count}              grant/remove a consumable
 #   random_item   {count}                  LOOT_POOL rolls
 #   revive_pct    {amount}                 all fallen return at % max HP
@@ -56,7 +55,7 @@ class_name Events
 const DATA_PATH := "res://data/events.json"
 
 const VERBS := ["gold", "gold_pct", "heal_pct", "damage_pct", "mana_pct",
-	"max_hp_pct", "attack_pct", "talent_points", "item", "random_item",
+	"max_hp_pct", "attack_pct", "item", "random_item",
 	"revive_pct", "relic_grant", "rune_grant"]
 
 # §4's own worked example — "health for a rune" — needs a rune the event can
@@ -256,13 +255,6 @@ static func apply(run: Node, fx: Dictionary) -> String:
 				blessed.append(_who(m))
 			return "%s: %+d%% Attack for the run" % [", ".join(blessed),
 				int(round(amount * 100))]
-		"talent_points":
-			var taught := PackedStringArray()
-			for m in _targets(run, fx):
-				m["talent_points"] = int(m.get("talent_points", 0)) + int(amount)
-				taught.append(_who(m))
-			return "%s: +%d talent point%s" % [", ".join(taught), int(amount),
-				"" if int(amount) == 1 else "s"]
 		"item":
 			var items: Dictionary = run.get("items")
 			var id := String(fx.get("id", "health"))

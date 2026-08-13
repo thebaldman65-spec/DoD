@@ -14,6 +14,9 @@ const AB_INT_KEYS := ["damage", "pressure", "cost", "cooldown", "resource_gain",
 	"multi_hits", "random_hits", "faith_cost"]
 const CFG_INT_KEYS := ["max_hp", "attack", "stability", "constitution",
 	"resource", "max_resource", "power"]
+# The default rung `config` reads at: every caller that is not a live run
+# (the sweep, standalone battles, the map's hover-scout) sees the whole kit.
+const MAX_RUNG := 3
 
 static var _data := {}
 
@@ -61,7 +64,13 @@ static func kinds_for_roster(roster: int) -> Array:
 
 # A battle-ready config: ints restored, tint array -> Color, ability
 # dicts -> Ability objects ("target": "ally" -> the enum).
-static func config(kind: String) -> Dictionary:
+#
+# BATCH BM §6: `rung` is the DIFFICULTY RUNG the caller is playing at, and an
+# authored ability tagged `"rung": N` is dropped below it. THE END BOSS IS
+# THE ONLY USER — that is where "it gains mechanics with difficulty" lives,
+# and it is a filter over authored content rather than a second kit. The tag
+# is stripped before Ability.make, because Ability has no such property.
+static func config(kind: String, rung := MAX_RUNG) -> Dictionary:
 	var src: Dictionary = _load().get(kind, _load()["raider"])
 	var cfg: Dictionary = src.duplicate(true)
 	cfg["is_hero"] = false
@@ -77,6 +86,9 @@ static func config(kind: String) -> Dictionary:
 	var abs_out: Array = []
 	for ad in cfg.get("abilities", []):
 		var d: Dictionary = ad.duplicate(true)
+		if int(d.get("rung", 1)) > rung:
+			continue
+		d.erase("rung")
 		for key in AB_INT_KEYS:
 			if d.has(key):
 				d[key] = int(d[key])

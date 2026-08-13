@@ -12,7 +12,7 @@
 # What it pins:
 #   §0 THE HARNESS IS PER-HERO AND THE FLAG STRING IS WHAT WAS ONE-SPEC.
 #      `DOD_SIM_TALENTS` walks every hero and keeps the ids present in that
-#      hero's OWN tree; all 288 node ids across the twelve trees are disjoint,
+#      hero's OWN tree; all 324 node ids across the twelve trees are disjoint,
 #      so a one-spec flag string builds exactly one hero. Both halves are
 #      asserted, because the FINDING is the pair: nothing is wrong with the
 #      harness, and every historical lane row is still a fully-built hero
@@ -201,7 +201,10 @@ func _ids_are_disjoint() -> void:
 			if owner_of.has(id):
 				collisions.append(id)
 			owner_of[id] = spec
-	ok(total == 288, "§0: twelve trees of 24 nodes = 288 ids (read %d)" % total)
+	# BATCH BM: 27 nodes a tree, so 324. The PROPERTY the check exists for —
+	# that every id is disjoint, which is what makes a one-spec DOD_SIM_TALENTS
+	# string build exactly one hero — is unchanged.
+	ok(total == 324, "§0: twelve trees of 27 nodes = 324 ids (read %d)" % total)
 	ok(collisions.is_empty(),
 		"§0: no node id appears in two trees (%s)" % ", ".join(collisions))
 	_report.append("§0: %d node ids across twelve trees, %d collisions" % [
@@ -232,10 +235,22 @@ func _faith_lane_shape() -> void:
 	for n in tree:
 		if String(n.get("lane", "")) == "Faith":
 			lane.append(String(n["id"]))
-	ok(lane == FAITH_LANE,
-		"§2: the FAITH lane is the eight nodes the table names, in row order")
+	# BATCH BM RE-POINTED THIS IN PLACE: the grid is keyed on the EIGHT nodes
+	# that existed when it was measured, and BM added a ninth (Creed, row 8).
+	# The check asserts the eight are still there IN ORDER — which is what
+	# makes every historical cell comparable — rather than that the lane holds
+	# nothing else.
+	var kept: Array = []
+	for id in lane:
+		if FAITH_LANE.has(id):
+			kept.append(id)
+	ok(kept == FAITH_LANE,
+		"§2: the FAITH lane still holds the eight nodes the table names, in order")
 	# The table is a leave-ONE-out grid: eight rows, eight nodes.
-	ok(lane.size() == 8, "§2: eight FAITH nodes = eight rows")
+	# BATCH BM added a row-8 node to every lane, so FAITH is NINE now (the
+	# eight the grid was keyed on, plus Creed). The leave-one-out table below
+	# is keyed on the ORIGINAL EIGHT and stays comparable for that reason.
+	ok(lane.size() == 9, "§2: nine FAITH nodes = eight rows plus the shelf")
 
 
 # ---------- §1: the report line ----------

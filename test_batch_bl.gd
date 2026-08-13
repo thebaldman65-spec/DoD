@@ -505,7 +505,7 @@ func _section_save(rsrc: String) -> void:
 	var run: Node = load("res://scripts/run_state.gd").new()
 	run.sim_run = true
 	run.new_run()
-	ok(rsrc.contains("\"version\": 9"), "§2: the save version rose to 9")
+	ok(rsrc.contains("\"version\": 10"), "§2: the save version is 10 (BATCH BM)")
 	# TOLERANT LOAD: a v8 tally with none of the new keys must load and simply
 	# start the counters mid-run, not crash the first writer that touches them.
 	run.tally = {"damage": {}, "gold_earned": 0, "gold_spent": 0,

@@ -746,6 +746,17 @@ const SPEC_IDS := {
 }
 
 
+# All twelve spec ids as a flat list, in class order — what the build screen
+# and the sim's loadout installer walk. ONE derivation, so a thirteenth spec
+# joins both by joining SPEC_IDS.
+static func all_specs() -> Array:
+	var out: Array = []
+	for class_key in SPEC_IDS:
+		for spec in SPEC_IDS[class_key]:
+			out.append(String(spec))
+	return out
+
+
 # Batch W (DOD_SIM_ROTATE=1): the sim rotation schedule, shared by the
 # sweep (n = battle index) and the run harness (n = run index). The base
 # n term makes any 3 consecutive counters sample each class's three specs

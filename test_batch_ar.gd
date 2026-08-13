@@ -31,6 +31,11 @@
 #      both pools, and NO DEFENSIVE OPTION anywhere in kit or tree.
 #   7. LIVE — a spawned battle, because the drain, the refund, the chip and
 #      Immolate's uncapping only exist at battle time.
+# BATCH BM RE-POINTED THIS FILE IN PLACE, mechanically and in two ways only:
+# the capstone SHELF moved from row 8 to row 9 (rows 1-8 are lane rows now),
+# and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
+# every id and every question this file asks is otherwise untouched — the
+# tables below are the batch's own record of its 24 nodes and stay that.
 extends SceneTree
 
 const REAL_SAVE := "user://run_save.bin"
@@ -65,9 +70,9 @@ const NODES := {
 	"py_spreading": [7, "Kindling", "Chain Ignition"],
 	"py_cauterize": [7, "Inferno", "Cauterise"],
 	"py_warm_glow": [7, "Detonation", "Total Commitment"],
-	"py_firestorm": [8, "Kindling", "Firestorm"],
-	"py_rebirth": [8, "Inferno", "Phoenix Rebirth"],
-	"py_hellfire": [8, "Detonation", "Cataclysm"],
+	"py_firestorm": [9, "Kindling", "Firestorm"],
+	"py_rebirth": [9, "Inferno", "Phoenix Rebirth"],
+	"py_hellfire": [9, "Detonation", "Cataclysm"],
 }
 
 # id -> [stat field, the value the PAYLOAD writes]. Only the stat nodes; the
@@ -193,7 +198,7 @@ func _node(id: String) -> Dictionary:
 
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 24, "the Pyromancer tree holds 24 nodes (got %d)" % tree.size())
+	ok(tree.size() == 27, "the Pyromancer tree holds 24 nodes (got %d)" % tree.size())
 	var seen: Dictionary = {}
 	var grid: Dictionary = {}
 	for n in tree:
@@ -239,6 +244,14 @@ func _node_table() -> void:
 			"%s is named %s (got %s)" % [id, want[2], n["name"]])
 	# ...and nothing NEW appeared: no id was added to carry a re-spec.
 	for n in _tree():
+		# BATCH BM: this batch's table is THIS BATCH'S RECORD OF ITS OWN 24
+		# NODES, and BM added a ROW-8 node to every lane. The walk skips row 8
+		# rather than being taught the three new ids: what the check exists to
+		# prove is that the twenty-four survive UNCHANGED, and asserting that
+		# nothing else exists would make every later addition a failure here
+		# instead of in the batch that made it.
+		if int(n["row"]) == 8:
+			continue
 		ok(NODES.has(String(n["id"])),
 			"%s is one of the 24 surviving ids, not a new one" % String(n["id"]))
 	# The names that must be GONE, because their nodes were re-specced away.

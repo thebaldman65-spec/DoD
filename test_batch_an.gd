@@ -98,7 +98,13 @@ func _test_line(RunState) -> void:
 	run.zone_idx = 1
 	ok(run.is_end_boss_slot(run.BOSS_SLOT) == false, "zone 2's boss is not the end boss")
 	run.zone_idx = 2
-	ok(run.is_end_boss_slot(run.BOSS_SLOT), "zone 3's boss IS the end boss")
+	# BATCH BM INVERTED THIS DELIBERATELY: zone 3's boss is a ZONE boss like
+	# the other two — it pays a meta talent point and opens what follows it —
+	# and the END BOSS is its own slot after it. Both halves asserted, because
+	# what a later batch could break is the pair, not either one alone.
+	ok(not run.is_end_boss_slot(run.BOSS_SLOT),
+		"zone 3's boss is a ZONE boss now, not the end boss")
+	ok(run.is_end_boss_slot(run.END_BOSS_SLOT), "the END BOSS is the slot after it")
 	ok(not run.is_end_boss_slot(run.BOSS_SLOT - 1), "...and nothing else is")
 	run.free()
 

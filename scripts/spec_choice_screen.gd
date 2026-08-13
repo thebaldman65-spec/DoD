@@ -141,14 +141,14 @@ func _draw_screen() -> void:
 
 func _choose(idx: int, spec_id: String) -> void:
 	Music.click()
-	# The awakening pays the first talent point (Batch AI) — but only the
-	# first time, so the debug spec-swap cannot mint one per re-pick.
-	var first_time: bool = String(Run.party[idx].get("spec", "")) == ""
 	Run.party[idx]["spec"] = spec_id
 	Run.party[idx]["tree"] = Talents.generate_tree(spec_id, Run.party[idx]["key"])
 	Run.sync_spec_hp(idx)
-	if first_time:
-		Run.award_spec_point(idx)
+	# BATCH BM: the awakening no longer PAYS a point — it EQUIPS the loadout
+	# the player configured for this spec between runs, and from here it is
+	# locked for the run. Re-picking a spec (the debug swap) re-equips rather
+	# than minting anything, so the swap needs no special case any more.
+	Run.equip_spec_talents(idx)
 	_draw_screen()
 
 

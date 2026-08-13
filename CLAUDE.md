@@ -292,6 +292,89 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 
 ## Current systems snapshot (2026-08-09)
 
+### STANDING RULES — TALENTS ARE META PROGRESSION (Batch BM)
+**BUYING A CELL UNLOCKS AN OPTION. IT DOES NOT EQUIP IT.** This is the load-bearing rule of the
+whole talent system and it is the one a later batch would most easily collapse. A CELL is a
+(spec, node) pair bought ONCE, permanently, out of that spec's banked points on `Profile`.
+EQUIPPING is a separate act and it is what a run reads: **you still pick ONE node per row, and
+it locks for the run.** Owning all three cells in a row makes that row a real three-way
+argument; owning one leaves no argument in it. **THAT IS WHY TWENTY BATCHES OF ROW PRICING
+DESCRIBE THE ENDGAME RATHER THAN NEEDING A THIRD PASS** — a row is still priced against two
+closed doors. Collapsing the two into one click turns every tree into a checklist and throws
+AJ-through-BA away. `Talents.can_buy` and `Talents.can_equip` are separate questions on purpose;
+test_batch_bm's negative control 1 builds the collapse and proves it is rejected.
+· **EARNING** — 1 point per spec per ZONE BOSS defeated (3 a completed run; a zone-2 wipe still
+  banks 1 or 2, and that partial credit is the mechanism, not a rule). Only specs that PLAYED
+  earn. Points are PER SPEC and never transfer; banking is uncapped. **NOTHING IN A RUN AWARDS
+  ONE** and the END BOSS awards none either — it awards a relic and opens rows.
+· **SPENDING** — cells cost by TIER: rows 1-3 cost 1, rows 4-6 cost 2, rows 7-9 cost 3.
+  **27 cells = 54 points a spec = 18 completions.** `Talents.tier_of_row` / `cell_cost` /
+  `rows_unlocked` are the ONE place any of it is decided.
+· **RESPEC** — free, any time OUTSIDE a run, NEVER during one. The build screen's `_locked()`
+  is the gate and every mutator re-checks it.
+· **ROW GATING IS GLOBAL** — rows 1-3 at difficulty 1, 4-6 at 2, 7-9 at 3, for EVERY SPEC AT
+  ONCE. Points are per spec; rows are not. A tier arrives FULLY unlocked, which is what an
+  uncapped bank is for. A fresh save has NO rows, NO points and no talents at all.
+· **VERSIONS** — `Profile` is **v2** (tolerant load: a v1 profile arrives at tier 0 with zero
+  points, the correct state). The run save is **v10** and **a pre-v10 save is REFUSED and
+  cleared** (the final zone gained a 17th slot; a v9 map has no position after its boss).
+· **DELETED, NOT ZEROED** (each pinned ABSENT in test_batch_bm): `Run.award_talent_points`,
+  `Run.award_spec_point`, `member["talent_points"]`, `member["talent_flex"]`,
+  `Talents.can_learn`, `Talents.purse_for`, `Talents.points_spent`, `MAX_PER_ROW`, the events
+  verb `talent_points` and both relics' `start_talent_points` hook. **`Run.tally` never had a
+  talent counter** — checked, not assumed; the brief expected one.
+· **SUPERSEDED FIGURES, NAMED AS SUPERSEDED: BK's 10.9 / 10.8 / 6.0 talent points per hero per
+  run, and every "nodes owned entering a boss" reading before BM.** They measured a per-run
+  purse that does not exist. Never compare a post-BM number against them.
+· **THE HANDOFF** is `Run.equip_spec_talents(idx)`, called from BOTH paths (the spec screen and
+  RunSim.start_run — the sync_spec_hp pattern). A real run reads `Profile.equipped_talents`; a
+  SIM reads `Run.sim_talents`, installed by `RunSim.install_builds`. **RunSim CALLS Profile
+  nowhere at all** — a sim that read the player's ledger would make every baseline depend on
+  whoever ran it.
+
+### STANDING RULE — WHAT MAKES A ROW-8 NODE (Batch BM §2), AND BH'S FIFTEEN POINTS
+**ROW 8 IS THE NODE THAT ONLY MATTERS ONCE THE REST OF THE LANE IS BOUGHT — a payoff that reads
+the build itself rather than adding to it.** Every future node authored into row 8, and any node
+authored anywhere, must do ONE of these: **READ an accumulated quantity** the lane has spent
+rows building and pay off its DEPTH rather than its existence; **REMOVE a constraint** the lane
+has been working around all game; or **CONVERT** the lane's currency into something it could not
+previously buy. **IT MUST NOT BE A LARGER MAGNITUDE OF ANY NODE ABOVE IT.** A lane whose every
+node multiplies the same term is one node with several prices (BC diagnosed it, BH proved it).
+**THE TEST IS MECHANICAL AND IT SHIPS: test_batch_bm fails any row-8 payload that writes a stat
+field an earlier node in the SAME LANE writes.** A shared field is the signature of a re-skin.
+**AND BH'S FIFTEEN-POINT RULE IS A STANDING TEST FOR ANY NEW NODE:** under leave-one-out, no
+single node should move its lane's headline by more than about fifteen points. Read it with BH's
+three caveats (a lane that does little passes trivially; a compounding lane under-reports every
+node in it; a FLAT grid on a lane that does something is a finding, not a null result).
+**THE LANE THIS IS OWED ON AND WAS NOT RUN: Harmonic Convergence (Arcanist, Resonance row 8).**
+It reads the build rate, and AT §3 measured that build rate beats per-stack value QUADRATICALLY
+on a triangular curve. One `DOD_SIM_TALENTS` string with the id withheld is the whole harness.
+
+### STANDING REFERENCE — THE DIFFICULTY LADDER AND THE END BOSS (Batch BM §5/§6)
+**`Run.difficulty` WAS REUSED, NOT SHADOWED** — it was already a saved String var chosen at the
+draft and armable from `DOD_SIM_DIFFICULTY`, already folded into ONE multiplier at
+`zone_base_mult`. What changed is the TABLE it keys into (`Run.DIFFICULTIES`). Batch Y's ids
+still resolve: **"standard" maps to rung 2**, the rung it was tuned at, so every old script and
+Matrix row reads. **EVERY SCALING NUMBER IS PROVISIONAL** — balance is deferred by designer
+decision and the STRUCTURE is what shipped.
+· **rung 1 Wanderer x0.70** — DELIBERATELY BELOW the present balance, because this is the rung
+  played with ZERO talents. Reuses Y's existing 0.7 rather than inventing a number.
+· **rung 2 Warden x1.00** — the present balance BYTE FOR BYTE, so every BK row still describes
+  it. Twist: **the severity floor rises** (`roll_offer` reads `difficulty_def().severity_floor`
+  instead of a constant 2), so the guaranteed mild bargain option may be severity 3.
+· **rung 3 Ruin x1.30** — floor rises again, plus **FIXED ENCOUNTERS CARRY A MODIFIER**
+  (`Run.arm_fixed_modifier`, armed at BOTH walk sites): the mini-boss and every boss, the nodes
+  a route cannot duck. It is NOT a bargain — no offer, no choice, NO REWARD.
+**THE END BOSS is a 17th slot on the FINAL ZONE'S BOARD, so a run is 49 encounters** (BK settled
+on 48). `END_BOSS_SLOT` / `END_BOSS_KIND` / `total_slots()`. It is **FIXED, not composed** (the
+one node whose lineup does not come out of the budget system), so it can be learned, and it
+**gains stats AND MECHANICS with difficulty** — `Enemies.config(kind, rung)` drops any ability
+tagged `"rung": N` below that rung, and **the end boss is the only user**; every other kind reads
+identically at every rung. It awards a relic ALWAYS, no ability pick, no talent points, and
+**`Profile.note_end_boss(rung)` is what opens the meta tree's row tiers.** ZONE BOSSES — the
+third included, which used to BE the end boss — now pay a point, a relic and an ability pick and
+open what follows them.
+
 ### STANDING REFERENCE — ENEMY INTENT: ONE DECLARED-ACTION STORE, THREE RE-VALIDATION BRANCHES (Batch BL §1)
 **DECLARE ON SCHEDULE, RESOLVE ON TURN.** `_choose_enemy_action` is the SELECTION half lifted
 out of `_enemy_turn` **byte-for-byte** — §1 forbade an AI rewrite and that function is where the

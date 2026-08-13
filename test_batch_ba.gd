@@ -32,6 +32,11 @@
 #      still firing on death, Perfected Toxin poisoning the whole field at
 #      battle start, Harvest counting sticky poison it did not remove, and
 #      Quartermaster's poison being credited to the ally rather than to him.
+# BATCH BM RE-POINTED THIS FILE IN PLACE, mechanically and in two ways only:
+# the capstone SHELF moved from row 8 to row 9 (rows 1-8 are lane rows now),
+# and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
+# every id and every question this file asks is otherwise untouched — the
+# tables below are the batch's own record of its 24 nodes and stay that.
 extends SceneTree
 
 const REAL_SAVE := "user://run_save.bin"
@@ -189,7 +194,7 @@ const IDS := ["sv_potent", "sv_coated", "sv_virulence", "sv_slow_acting",
 
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 24, "the Survivalist tree holds 24 nodes (got %d)" % tree.size())
+	ok(tree.size() == 27, "the Survivalist tree holds 24 nodes (got %d)" % tree.size())
 	var by_lane := {"Venom": 0, "Snares": 0, "Guerilla": 0}
 	var caps := 0
 	var seen := {}
@@ -199,23 +204,28 @@ func _tree_shape() -> void:
 		seen[id] = true
 		ok(int(t.get("ranks", 0)) == 1, "%s holds a single rank" % id)
 		var row := int(t.get("row", 0))
-		ok(row >= 1 and row <= 8, "%s sits in a real row (got %d)" % [id, row])
+		ok(row >= 1 and row <= Talents.CAPSTONE_ROW, "%s sits in a real row 1-9 (got %d)" % [id, row])
 		if bool(t.get("capstone", false)):
 			caps += 1
-			ok(row == 8, "capstone %s is in row 8" % id)
+			ok(row == Talents.CAPSTONE_ROW, "capstone %s is on the capstone shelf" % id)
 		else:
 			by_lane[String(t["lane"])] = by_lane[String(t["lane"])] + 1
 		ok(not t.has("exclusive_with"),
 			"%s carries no stale exclusive_with — rows do the barring" % id)
 	ok(caps == 3, "three capstones (got %d)" % caps)
 	for lane in by_lane:
-		ok(by_lane[lane] == 7, "%s holds 7 rows (got %d)" % [lane, by_lane[lane]])
+		ok(by_lane[lane] == Talents.ROWS, "%s holds 8 rows (got %d)" % [lane, by_lane[lane]])
 	# §10: EVERY ONE OF THE 24 IDS SURVIVES AND RE-SPECS IN PLACE. This is what
 	# lets a saved tree migrate without a save version move.
 	for id in IDS:
 		ok(seen.has(id), "id %s survives the re-author" % id)
-	ok(seen.size() == IDS.size(),
-		"no id was added or dropped (got %d, expected %d)" % [seen.size(), IDS.size()])
+	# BATCH BM RE-POINTED THIS IN PLACE. `IDS` is THIS BATCH'S RECORD OF ITS OWN
+	# 24 NODES and stays that; BM added a row-8 node to every lane, so the live
+	# tree is 27. What the check exists to prove — that every one of the 24
+	# SURVIVES, which is what lets a saved tree migrate — is the loop above and
+	# is untouched. The count below allows exactly the three BM added.
+	ok(seen.size() == IDS.size() + 3,
+		"the 24 survive and BM added exactly 3 (got %d, table holds %d)" % [seen.size(), IDS.size()])
 	# The three lane names STAND — only what Venom's nodes DO was re-aimed.
 	for lane in ["Venom", "Snares", "Guerilla"]:
 		ok(by_lane.has(lane), "the lane %s still exists" % lane)

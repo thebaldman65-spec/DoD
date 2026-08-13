@@ -36,6 +36,11 @@
 #      three Mage runes ride is written by a node or still has a live read
 #      site, the re-points pay their advertised numbers ALONE AND STACKED, and
 #      the dissolved exclusive pair is gone from CLAUDE.md's prose.
+# BATCH BM RE-POINTED THIS FILE IN PLACE, mechanically and in two ways only:
+# the capstone SHELF moved from row 8 to row 9 (rows 1-8 are lane rows now),
+# and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
+# every id and every question this file asks is otherwise untouched — the
+# tables below are the batch's own record of its 24 nodes and stay that.
 extends SceneTree
 
 const REAL_SAVE := "user://run_save.bin"
@@ -70,9 +75,9 @@ const NODES := {
 	"ar_still": [5, "Entropy", "Backlash"],
 	"ar_attunement": [6, "Entropy", "Siphon"],
 	"ar_ward": [7, "Entropy", "Event Horizon"],
-	"ar_singularity": [8, "Resonance", "Singularity"],
-	"ar_wrath": [8, "Overload", "Magi's Wrath"],
-	"ar_timelord": [8, "Entropy", "Perfect Conversion"],
+	"ar_singularity": [9, "Resonance", "Singularity"],
+	"ar_wrath": [9, "Overload", "Magi's Wrath"],
+	"ar_timelord": [9, "Entropy", "Perfect Conversion"],
 }
 
 # id -> [stat field, the value the PAYLOAD writes]. ADDITIVE units: each is the
@@ -182,7 +187,7 @@ func _run() -> void:
 
 func _tree_shape() -> void:
 	var tree: Array = Talents.LANE_TREES["arcanist"]
-	ok(tree.size() == 24, "the tree holds 24 nodes (got %d)" % tree.size())
+	ok(tree.size() == 27, "the tree holds 24 nodes (got %d)" % tree.size())
 	var per_lane := {}
 	var caps := 0
 	var seen := {}
@@ -192,7 +197,7 @@ func _tree_shape() -> void:
 		per_lane[lane] = per_lane.get(lane, []) + [row]
 		if n.get("capstone", false):
 			caps += 1
-			ok(row == 8, "%s is a capstone and sits on row 8" % n["id"])
+			ok(row == Talents.CAPSTONE_ROW, "%s is a capstone and sits on the shelf" % n["id"])
 		ok(int(n["ranks"]) == 1, "%s is a single-rank node" % n["id"])
 		ok(not seen.has(n["id"]), "%s appears exactly once" % n["id"])
 		seen[n["id"]] = true
@@ -207,8 +212,8 @@ func _tree_shape() -> void:
 	for lane in ["Resonance", "Overload", "Entropy"]:
 		var rows: Array = per_lane.get(lane, [])
 		rows.sort()
-		ok(rows == [1, 2, 3, 4, 5, 6, 7, 8],
-			"lane %s holds rows 1-7 plus its capstone (got %s)" % [lane, rows])
+		ok(rows == [1, 2, 3, 4, 5, 6, 7, 8, 9],
+			"lane %s holds rows 1-8 plus its capstone (got %s)" % [lane, rows])
 	# §3: the lane formerly called Control is ENTROPY, because after AS
 	# "Control" is the Cryomancer's identity word.
 	ok(not per_lane.has("Control"),
@@ -233,6 +238,11 @@ func _node_table() -> void:
 	# NO NEW IDS EITHER — the promise runs both ways, and a 25th id would mean
 	# a save version move nobody asked for.
 	for id in by_id:
+		# BATCH BM: skip row 8 — this batch's table is ITS OWN record of ITS OWN
+		# 24 nodes, and BM added a row-8 node to every lane. The check exists to
+		# prove the twenty-four survive unchanged, not that nothing else exists.
+		if int(by_id[id]["row"]) == 8:
+			continue
 		ok(NODES.has(id), "%s is one of the 24 authored ids" % id)
 
 

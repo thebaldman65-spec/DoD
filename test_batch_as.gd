@@ -32,6 +32,11 @@
 #      in a changelog nobody re-reads.
 #   7. §4 — a held enemy is off the turn bar, off the timeline, and wears a
 #      HELD marker that names what releases it.
+# BATCH BM RE-POINTED THIS FILE IN PLACE, mechanically and in two ways only:
+# the capstone SHELF moved from row 8 to row 9 (rows 1-8 are lane rows now),
+# and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
+# every id and every question this file asks is otherwise untouched — the
+# tables below are the batch's own record of its 24 nodes and stay that.
 extends SceneTree
 
 const REAL_SAVE := "user://run_save.bin"
@@ -66,9 +71,9 @@ const NODES := {
 	"cr_piercing": [5, "Thaw", "Piercing Ice"],
 	"cr_razor_hone": [6, "Thaw", "Honed Shards"],
 	"cr_icy_veins": [7, "Thaw", "Shattered Tempo"],
-	"cr_eternal": [8, "Winter", "Eternal Winter"],
-	"cr_absolute": [8, "Deep Freeze", "Absolute Zero"],
-	"cr_shatter": [8, "Thaw", "Shatter"],
+	"cr_eternal": [9, "Winter", "Eternal Winter"],
+	"cr_absolute": [9, "Deep Freeze", "Absolute Zero"],
+	"cr_shatter": [9, "Thaw", "Shatter"],
 }
 
 # id -> [stat field, the value the PAYLOAD writes]. ADDITIVE units: each is
@@ -175,7 +180,7 @@ func _run() -> void:
 
 func _tree_shape() -> void:
 	var tree: Array = Talents.LANE_TREES["cryomancer"]
-	ok(tree.size() == 24, "the tree holds 24 nodes (got %d)" % tree.size())
+	ok(tree.size() == 27, "the tree holds 24 nodes (got %d)" % tree.size())
 	var per_lane := {}
 	var rows := {}
 	var capstones := 0
@@ -192,8 +197,8 @@ func _tree_shape() -> void:
 	ok(capstones == 3, "exactly 3 capstones (got %d)" % capstones)
 	ok(per_lane.size() == 3, "exactly 3 lanes (got %d)" % per_lane.size())
 	for lane in ["Winter", "Deep Freeze", "Thaw"]:
-		ok(int(per_lane.get(lane, 0)) == 8,
-			"lane %s holds 7 rows + a capstone (got %d)" % [lane, per_lane.get(lane, 0)])
+		ok(int(per_lane.get(lane, 0)) == Talents.CAPSTONE_ROW,
+			"lane %s holds 8 rows + a capstone (got %d)" % [lane, per_lane.get(lane, 0)])
 	for key in rows:
 		ok(int(rows[key]) == 1, "one node in %s" % key)
 	# SHATTERPOINT is the only lane name that changed, and it must be gone —
@@ -222,6 +227,11 @@ func _node_table() -> void:
 		ok(String(n["name"]) == want[2],
 			"%s is named %s (got %s)" % [id, want[2], n["name"]])
 	for id in by_id:
+		# BATCH BM: skip row 8 — this batch's table is ITS OWN record of ITS OWN
+		# 24 nodes, and BM added a row-8 node to every lane. The check exists to
+		# prove the twenty-four survive unchanged, not that nothing else exists.
+		if int(by_id[id]["row"]) == 8:
+			continue
 		ok(NODES.has(id), "no node was ADDED: %s is not in the table" % id)
 
 

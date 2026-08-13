@@ -1038,5 +1038,98 @@
     "description": "Every ally regains 6% of their\nmaximum health."
    }
   ]
+ },
+ "hollow_crown": {
+  "unit_name": "The Hollow Crown",
+  "power": 9,
+  "roles": [
+   "boss"
+  ],
+  "zones": [
+   1,
+   2,
+   3
+  ],
+  "enemy_role": "damage",
+  "max_hp": 620,
+  "attack": 115,
+  "armor": 0.3,
+  "speed": 90.0,
+  "stability": 100,
+  "constitution": 170,
+  "is_boss": true,
+  "tint": [
+   0.72,
+   0.68,
+   0.95
+  ],
+  "sprite_scale": 4.6,
+  "resists": {
+   "shadow": 0.5,
+   "arcane": 0.25,
+   "physical": 0.1,
+   "holy": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Crown of Thorns",
+    "damage": 46,
+    "pressure": 30,
+    "delay": 2.5,
+    "anim": "attack01",
+    "dmg_type": "shadow"
+   },
+   {
+    "display_name": "Hollow Wail",
+    "damage": 20,
+    "pressure": 22,
+    "delay": 3.5,
+    "anim": "attack02",
+    "dmg_type": "shadow",
+    "aoe": true,
+    "applies_status": {
+     "id": "dazed",
+     "turns": 2
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Regalia",
+    "special": "enemy_shield",
+    "delay": 3.0,
+    "anim": "attack03",
+    "target": "ally",
+    "description": "Wards an ally against the next blow."
+   },
+   {
+    "display_name": "Sundering Decree",
+    "rung": 2,
+    "damage": 34,
+    "pressure": 48,
+    "delay": 3.5,
+    "anim": "attack02",
+    "dmg_type": "physical",
+    "applies_status": {
+     "id": "sunder",
+     "turns": 3
+    },
+    "status_chance": 0.8
+   },
+   {
+    "display_name": "The Long Dark",
+    "rung": 3,
+    "damage": 30,
+    "pressure": 26,
+    "delay": 4.0,
+    "anim": "attack02",
+    "dmg_type": "shadow",
+    "aoe": true,
+    "applies_status": {
+     "id": "poison",
+     "turns": 4
+    },
+    "status_chance": 0.9
+   }
+  ]
  }
 }

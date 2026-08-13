@@ -427,7 +427,10 @@ func _enemy_config(kind: String) -> Dictionary:
 	if kind == "boss":
 		# The zone def owns its boss (rotation-safe — never keyed on slot).
 		kind = Run.boss_kind() if Run.active else "withered_warden"
-	var cfg := Enemies.config(kind)
+	# BATCH BM §6: the RUNG filters authored abilities — the end boss gains a
+	# mechanic at difficulty 2 and another at 3. Every other kind carries no
+	# tagged ability and reads identically at every rung.
+	var cfg := Enemies.config(kind, Run.difficulty_rung() if Run.active else Enemies.MAX_RUNG)
 	# BATCH BL §2: the kind travels onto the unit so the recap can aggregate by
 	# it. Stamped after the "boss" alias resolves, so a boss books under the
 	# kind it actually is rather than under the word "boss".
@@ -1739,6 +1742,15 @@ func _run_battle() -> void:
 				e.intent = {}
 				_refresh_intent_plate(e)
 		_update_talent_chips()
+		# BATCH BM §2 — WATCHTOWER (Holy, Vigil row 8). THE REVERSAL BECOMES
+		# SOMETHING THE PARTY CAN RELY ON RATHER THAN HOPE FOR: the lane is
+		# full of answers that arrive on HER turn, and her turn is the one
+		# thing she cannot schedule. Placed HERE — one line above the actor is
+		# chosen, after every damage source has resolved — so it catches a
+		# hero dropped by a DoT, a recoil or a strike alike, which no single
+		# damage site could. Once per turn, so it pulls her forward rather
+		# than handing her the whole fight.
+		_watchtower_check()
 		_rebuild_turn_bar()
 		var u := _next_unit()
 		if u == null:
@@ -1772,6 +1784,11 @@ func _run_battle() -> void:
 						continue
 					# Perfected Toxin: a poison that never leaves gets worse.
 					_perfected_toxin_tick(u)
+					# BATCH BM §2 — COCKTAIL (Survivalist, Venom row 8).
+					# BREADTH BECOMES SELF-PROPAGATING WITHIN ONE ENEMY, and
+					# the BA contagion reservation holds absolutely: nothing
+					# here spreads between enemies or from a corpse.
+					_cocktail_tick(u)
 				# Tick strength was snapshotted from the applier's Attack.
 				var dot_dmg: int = int(u.get_status(dot_id).get("tick", 0))
 				if dot_dmg <= 0:
@@ -2235,6 +2252,34 @@ func _run_battle() -> void:
 		active_unit.set_plate_active(false)
 
 
+# WATCHTOWER's own function (the `_run_battle`-cannot-be-driven-headlessly
+# rule): it pulls the Cleric to the front of the timeline when a hero crosses
+# the line. `watchtower_used` is cleared at the top of each of HER turns, so
+# it fires at most once between her turns however many heroes fall.
+func _watchtower_check() -> void:
+	var cleric := _living_hero_with("watchtower")
+	if cleric == null or cleric.watchtower_used:
+		return
+	var in_need := false
+	for h in heroes:
+		if not h.dead and not h.is_companion \
+				and h.hp <= h.max_hp * 0.01 * cleric.watchtower:
+			in_need = true
+			break
+	if not in_need:
+		return
+	var soonest := INF
+	for u in heroes + enemies:
+		if not u.dead and not u.is_companion and u.next_time < soonest:
+			soonest = u.next_time
+	if cleric.next_time <= soonest:
+		return  # she is already next; nothing to pull
+	cleric.watchtower_used = true
+	cleric.next_time = maxf(soonest - 0.01, _clock)
+	_log("   → Talent: Watchtower — %s answers at once" % cleric.unit_name,
+		"#b0a8e0")
+
+
 func _next_unit() -> BattleUnit:
 	var alive := (heroes + enemies).filter(func(u): return not u.dead)
 	if alive.is_empty():
@@ -2415,6 +2460,76 @@ func _update_talent_chips() -> void:
 				h.remove_status("bracing")
 
 
+# BATCH BM §2 — THE FIVE ROW-8 NODES THAT FIRE AT A HERO'S TURN START, in
+# one function rather than five clauses inside `_player_turn`. Its own
+# function for the standing reason: `_player_turn` awaits an ability pick
+# that never comes headlessly, so anything buried in it can only ever be
+# checked by a grep and its negative controls could never fail.
+func _row8_turn_start(u: BattleUnit) -> void:
+	# WAITING GUARD (Swordmaster, Poise row 8): a turn he was not struck
+	# banks a parry. `damaged_since_turn` is the existing bookkeeping — it is
+	# cleared for beasts in the companion tick, and set by take_hit for
+	# everyone — so this needs no second flag.
+	if u.waiting_guard > 0:
+		if not u.damaged_since_turn and u.banked_guards < u.waiting_guard:
+			u.banked_guards += 1
+			var wg_desc := "Banked Guards: %d — each parries one attack outright." % u.banked_guards
+			if not u.update_status("waiting_guard", "%d" % u.banked_guards, wg_desc):
+				u.add_status("waiting_guard", "Waiting Guard", "%d" % u.banked_guards,
+					Color(0.5, 0.8, 0.95), -1, wg_desc)
+			_log("   → Talent: Waiting Guard — %s banks a parry (%d held)" % [
+				u.unit_name, u.banked_guards], "#b0a8e0")
+		u.damaged_since_turn = false
+	# STANDARD BEARER (Warden, Banner row 8): every ally wears a share of his
+	# armor. Re-stamped every turn rather than once, because his armor MOVES
+	# (Endurance climbs, Dominant Presence reads debuffs applied) and a share
+	# stamped at spawn would be a share of a number that no longer exists.
+	if u.standard_bearer > 0:
+		var share := u.effective_armor() * 0.01 * u.standard_bearer
+		for ally in heroes:
+			if ally.dead or ally == u or ally.is_companion:
+				continue
+			var sd_desc := "Standard Bearer: +%d%% armor, lent by %s." % [
+				int(round(share * 100.0)), u.unit_name]
+			if not ally.update_status("standard", "+%d%%" % int(round(share * 100.0)),
+					sd_desc):
+				ally.add_status("standard", "Standard Bearer",
+					"+%d%%" % int(round(share * 100.0)),
+					Color(0.75, 0.7, 0.5), -1, sd_desc)
+			ally.get_status("standard")["armor"] = share
+	# COLD STORAGE (Cryomancer, Deep Freeze row 8): the hold pays the PARTY a
+	# second currency for as long as it lasts, and it reads DEPTH — how many
+	# he is holding, which Second Prison and Absolute Zero exist to raise.
+	if u.cold_storage > 0 and not _holds.is_empty():
+		var held := _holds.size()
+		for ally in heroes:
+			if ally.dead or ally.is_companion or ally.max_resource <= 0:
+				continue
+			var back := maxi(int(round(ally.max_resource * 0.01
+				* u.cold_storage * held)), 1)
+			ally.resource = mini(ally.resource + back, ally.max_resource)
+			ally.refresh_bars()
+		_log("   → Talent: Cold Storage — the prison feeds the party (%d held)" % \
+			held, "#b0a8e0")
+	# KINDRED (Beastmaster, devotion row 8): Loyalty buys a KIND rather than a
+	# quantity — past a depth the arrival effect stops being something the
+	# beast DID and becomes something it DOES.
+	if u.kindred > 0:
+		for beast in _beasts(u):
+			if int(u.loyalty.get(beast.companion_kind, 0)) >= u.kindred:
+				_log("   → Talent: Kindred — %s's bond calls the arrival again" % \
+					beast.unit_name, "#b0a8e0")
+				_arrival_for_kind(u, beast.companion_kind, beast, null)
+	# TRAP RE-ARM (Survivalist, Snares row 8 — Set and Forget). The spring
+	# marks the trap owed; his next turn puts it back out.
+	if u.set_and_forget > 0 and u.trap_rearm > 0:
+		u.trap_rearm = 0
+		u.deadfall_armed = maxi(u.deadfall_armed, 1)
+		u.deadfall_dormant = 0
+		_stamp_deadfall_chip(u)
+		_log("   → Talent: Set and Forget — the trap re-arms itself", "#b0a8e0")
+
+
 func _player_turn(u: BattleUnit) -> void:
 	if enemies.all(func(e): return e.dead):
 		return  # a companion or DoT already ended it; the loop will notice
@@ -2423,6 +2538,8 @@ func _player_turn(u: BattleUnit) -> void:
 	empower_armed = false  # Mercy Empowerment never carries between turns
 	u.rampage_chains = 0   # the capstone's kill-recast budget is per turn
 	u.res_cast_this_turn = false  # Resonant Core pays the FIRST cast of a turn
+	u.watchtower_used = false     # Watchtower pulls her turn forward once a turn
+	_row8_turn_start(u)           # BATCH BM §2's five turn-start row-8 nodes
 	# Thin Air (Batch AQ): THE one read site for mod_no_regen. It stops the
 	# DRIP and nothing else — attacks that BUILD resource are untouched, which
 	# is why a Rage hero survives it better than a Mage. That asymmetry is the
@@ -2625,6 +2742,35 @@ func _player_turn(u: BattleUnit) -> void:
 		_rebuild_turn_bar(u, ab)
 		action_panel.visible = false
 	await _resolve(u, ab, target, grade)
+	# ---- BATCH BM §2: the two row-8 nodes that fire when a hero's turn ENDS ----
+	# PRACTISED HANDS (Survivalist, Guerilla row 8): the COUNT of actions
+	# becomes the weapon. Improvised pays for his first two; this pays for
+	# every one after them, and it deliberately skips the ability just cast
+	# (a self-refunding cooldown is not a cooldown).
+	if u.practised_hands > 0 and not u.dead and not battle_over:
+		var ph_cast := String(ab.display_name) if ab != null else ""
+		var ph_cut := 0
+		for cd_name in u.cooldowns.keys():
+			if String(cd_name) == ph_cast:
+				continue
+			if int(u.cooldowns[cd_name]) > 0:
+				u.cooldowns[cd_name] = maxi(int(u.cooldowns[cd_name]) - u.practised_hands, 0)
+				ph_cut += 1
+		if ph_cut > 0:
+			_log("   → Talent: Practised Hands — %d cooldown%s tick early" % [
+				ph_cut, "" if ph_cut == 1 else "s"], "#b0a8e0")
+	# ENTROPY'S TOLL (Arcanist, Entropy row 8): the lane's frame from the
+	# other side of Perfect Conversion's ground — self-harm SPENT on purpose
+	# rather than refused. It pays health for Resonance, and under Perfect
+	# Conversion that health is itself paid in Mana, which is the build.
+	if u.entropy_toll > 0 and not u.dead and not battle_over \
+			and u.second_resource_name == "Resonance":
+		var toll := maxi(int(round(u.hp * 0.05)), 1)
+		if u.hp > toll:
+			u.take_tick_damage(toll, "TOLL", Color(0.8, 0.55, 1.0))
+			_gain_resonance(u, u.entropy_toll)
+			_log("   → Talent: Entropy's Toll — %s spends %d health for %d Resonance" % [
+				u.unit_name, toll, u.entropy_toll], "#b0a8e0")
 	# Pleasure from Pain (Occultist talent): every unique affliction on the
 	# enemy team feeds the party as the Occultist's turn ends.
 	if u.pleasure_pct > 0.0 and not u.dead and not battle_over:
@@ -4781,6 +4927,17 @@ func _miss_chance(attacker: BattleUnit, defender: BattleUnit = null) -> float:
 # moved that node's magnitude INTO the granted power, so the chip's live
 # number and the roll can never disagree).
 func _roll_parry(defender: BattleUnit) -> String:
+	# BATCH BM §2 — WAITING GUARD (Swordmaster, Poise row 8). Seven rows
+	# deepen a dice roll he can never plan around; this banks CERTAINTY
+	# instead of a bigger number. Spent BEFORE the roll, so a banked Guard is
+	# never wasted covering a parry he would have made anyway.
+	if defender.banked_guards > 0:
+		defender.banked_guards -= 1
+		defender.update_status("waiting_guard", "%d" % defender.banked_guards,
+			"Banked Guards: %d — each parries one attack outright." % defender.banked_guards)
+		if defender.banked_guards <= 0:
+			defender.remove_status("waiting_guard")
+		return "Waiting Guard"
 	var base := defender.parry_chance if defender.parry_chance >= 0.0 \
 		else (PARRY_CHANCE if defender.is_hero else ENEMY_PARRY_CHANCE)
 	var talent := defender.parry_bonus
@@ -5362,6 +5519,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Execute perfect: the killing stroke cannot glance.
 			if is_perfect and ab.display_name == "Execute":
 				is_crit = true
+			# BATCH BM §2 — WHETSTONE (Swordmaster, Blade row 8). Five crit
+			# nodes in the lane and every one pays per HIT; this reads the
+			# VOLUME of crits a whole fight produces and pays its depth.
+			# Applied here, after every source of `is_crit` has spoken, so
+			# every crit the lane manufactures counts.
+			if is_crit and attacker.whetstone > 0:
+				attacker.attack += attacker.whetstone
+				attacker.float_text("+%d Atk" % attacker.whetstone,
+					Color(0.9, 0.8, 0.4))
 			# Triple Shot perfect (Batch AH): the crit lottery still rolls,
 			# but one arrow is paid up front — the LAST one, so a crit the
 			# volley already rolled is never spent covering the guarantee.
@@ -5438,11 +5604,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# THE CURRENT COUNT. `faith_peak` is the highest Faith this attacker
 			# has held THIS BATTLE, so a release stops erasing the held benefit
 			# it just spent. See `_faith_stack_mult` and unit.gd's field.
-			if attacker.is_hero and attacker.faith_peak > 0:
+			if attacker.is_hero and _faith_paid_peak(attacker) > 0:
 				var fd_dv := _living_devout()
 				if fd_dv != null:
 					raw *= 1.0 + 0.01 * FAITH_DAMAGE_PCT \
-						* _faith_stack_mult(fd_dv, attacker) * attacker.faith_peak
+						* _faith_stack_mult(fd_dv, attacker) * _faith_paid_peak(attacker)
 			# (Dark Infusion's branch stood here until Batch BJ §1: the AX
 			# re-author retired the node, `infusion_ranks` kept no writer and
 			# carried no vault marker, so field and branch are deleted — the
@@ -5588,7 +5754,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					raw *= 2.0
 					_log("%s: One Shot — double damage at full Focus" % \
 						attacker.unit_name, "#e8c860")
-				attacker.second_resource = 0
+				attacker.second_resource = _metronome_left(attacker)
 				attacker.refresh_bars()
 			# Coup de Grâce: cash out the patience — +1% of the target's
 			# MISSING health per point of Focus spent. IT STILL CONSUMES ALL
@@ -5601,7 +5767,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and attacker.second_resource > 0:
 				var cdg_held := attacker.second_resource
 				var cdg := mini(cdg_held, COUP_FOCUS_CAP)
-				attacker.second_resource = 0
+				attacker.second_resource = _metronome_left(attacker)
 				attacker.refresh_bars()
 				raw += (strike_target.max_hp - strike_target.hp) * 0.01 * cdg
 				if cdg_held > cdg:
@@ -5709,6 +5875,39 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# the unit-side helper ratchets and returns in one motion.
 			if attacker.passive_id == "bloodrage":
 				raw *= 1.0 + attacker.frenzy_bonus()
+			# BATCH BM §2 — DEBT OF IRON, the SPEND half. Crushing Blow is
+			# the one button he swings, so the bank pays out through it and
+			# empties. Read before the multipliers below so the bank is a
+			# flat addition to the swing rather than something they scale.
+			if attacker.iron_debt > 0 and attacker.iron_bank > 0 \
+					and ab.display_name == "Crushing Blow":
+				var spent := int(round(attacker.iron_bank * attacker.iron_debt / 100.0))
+				if spent > 0:
+					raw += spent
+					_log("   → Talent: Debt of Iron — %d banked points come due" % \
+						spent, "#b0a8e0")
+				attacker.iron_bank = 0
+			# ---- BATCH BM §2: three row-8 damage reads, one line each ----
+			# BLOODWAKE (Berserker, Warpath row 8): the lane fills the tank for
+			# seven rows and nothing has ever paid for HOLDING it. Now it does,
+			# which is the lane's first real argument against spending.
+			if attacker.bloodwake > 0 and attacker.resource > 0:
+				raw *= 1.0 + 0.01 * floor(
+					attacker.resource / float(attacker.bloodwake))
+			# SEA OF FLAME (Pyromancer, Kindling row 8): pays for HOW MUCH of
+			# the field is lit rather than for lighting it.
+			if attacker.sea_of_flame > 0 and ab.dmg_type == "fire":
+				var lit := 0
+				for e in enemies:
+					if not e.dead and e.has_status("burn"):
+						lit += 1
+				raw *= 1.0 + 0.01 * attacker.sea_of_flame * lit
+			# CONTINUOUS AIM (Sharpshooter, Precision row 8): the conversion
+			# point stops being a threshold — every point of Focus pays,
+			# whether it is above or below the split.
+			if attacker.continuous_aim > 0 and attacker.second_resource > 0:
+				raw *= 1.0 + 0.001 * attacker.continuous_aim \
+					* attacker.second_resource
 			# Enraged (talent): stacks from dropping below half HP.
 			if attacker.enraged_stacks > 0 and attacker.enraged_ranks > 0:
 				raw *= 1.0 + 0.12 * attacker.enraged_ranks * attacker.enraged_stacks
@@ -5849,12 +6048,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# BATCH BI §1 — THE SECOND SITE THAT READS THE PEAK. Same rule as the
 			# damage term above: `faith_peak` never falls inside a battle, so the
 			# mitigation a release paid for survives the release.
-			if strike_target.is_hero and strike_target.faith_peak > 0:
+			if strike_target.is_hero and _faith_paid_peak(strike_target) > 0:
 				var fp_dv := _living_devout()
 				if fp_dv != null:
 					var pv_was := raw
 					raw *= 1.0 - 0.01 * FAITH_MITIGATION_PCT \
-						* _faith_stack_mult(fp_dv, strike_target) * strike_target.faith_peak
+						* _faith_stack_mult(fp_dv, strike_target) * _faith_paid_peak(strike_target)
 					_devout_prev(fp_dv, pv_was - raw, "stacks")
 			# Iron Will: adversity hardens the Warden — 12%/rank less damage
 			# taken per debuff on him (the chip tracks the live total; the
@@ -5915,6 +6114,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_prev(hv_c, pv_was - raw)
 					_log("   → Talent: Hour of Need — the party closes ranks around %s (-%d%%)" % [
 						strike_target.unit_name, hv_c.holy_vigil_pct], "#b0a8e0")
+			# BATCH BM §2 — COMMUNION OF MERCY (Holy, Mercy row 8). Mercy
+			# HELD has only ever paid HER (Heavenly Aura's healing-done
+			# term); this converts it into party mitigation, which the meter
+			# could never buy. It reads the CURRENT stack count on purpose:
+			# unlike Faith, Mercy has no antagonism to worry about — nothing
+			# in the lane pays for spending it down.
+			if strike_target.is_hero and not strike_target.is_companion:
+				var ma_c := _living_hero_with("mercy_aegis")
+				if ma_c != null and ma_c.second_resource > 0:
+					var ma_was := raw
+					raw *= maxf(1.0 - 0.01 * ma_c.mercy_aegis
+						* ma_c.second_resource, 0.25)
+					_prev(ma_c, ma_was - raw)
 			# Ruin: the Old Gods' mark cracks the target open (+2%/stack;
 			# Deeper Hex widens every crack to 5%).
 			#
@@ -6035,6 +6247,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				final = maxi(strike_target.hp, final)
 			# Armor's share, kept consistent with the displayed final number.
 			var armor_cut := maxi(int(round(raw)) - final, 0)
+			# BATCH BM §2 — DEBT OF IRON (Warden, Plate row 8), the BANK half.
+			# Seven rows prevent damage and prevention buys nothing; this
+			# CONVERTS it into the one currency Plate cannot otherwise reach.
+			# Banked from the ARMOR CUT specifically — the lane's own number —
+			# so a Warden being ignored banks nothing and a Warden being
+			# hammered banks a great deal, which is the trade the lane sells.
+			if strike_target.is_hero and strike_target.iron_debt > 0 \
+					and armor_cut > 0:
+				strike_target.iron_bank += armor_cut
+			
 			var resonance_boosted: bool = attacker.second_resource_name == "Resonance" \
 				and attacker.second_resource > 0
 			var pr := int(round(ab.pressure * pr_mult * (1.5 if is_crit else 1.0)))
@@ -6202,9 +6424,45 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_log("† %s dies" % sf_w.unit_name, "#e05050")
 			var hp_before := strike_target.hp
 			var was_broken := strike_target.broken
+			# BATCH BM §2 — two row-8 nodes are STAMPED ON THE VICTIM here,
+			# immediately before the hit, because both convert an ATTACKER's
+			# quantity into Break resistance and only this site knows who is
+			# swinging. `take_hit` reads them off the unit it is called on.
+			#   WINTER'S DEPTH (Cryomancer, Winter row 8) — per Chilled stack
+			#   SUNDER SHOT (Sharpshooter, Penetration row 8) — per point of
+			#     his armor penetration, which is the "armor and Break stop
+			#     being separate problems" the direction asked for.
+			strike_target.winters_depth = 0
+			strike_target.sunder_shot = 0
+			if attacker.is_hero and not strike_target.is_hero:
+				var wd_cryo := _living_hero_with("winters_depth")
+				if wd_cryo != null and strike_target.has_status("chilled"):
+					strike_target.winters_depth = wd_cryo.winters_depth \
+						* strike_target.status_stacks("chilled")
+				if attacker.sunder_shot > 0:
+					strike_target.sunder_shot = int(round(
+						attacker.sunder_shot * attacker.pierce_bonus))
 			var result: Dictionary = strike_target.take_hit(final, pr)
 			if attacker.is_hero and not strike_target.is_hero and pr > 0:
 				_stat_bd(attacker, pr)
+				# BLOOD COMMUNION (Occultist, Leech row 8): THE PARTY DRINKS
+				# FROM SOMETHING OTHER THAN HIS MARKS. Break is the currency
+				# Broken Will and Entropy spend the Ruin lane building, and it
+				# has never fed anybody. Keyed on the OCCULTIST rather than on
+				# the attacker, because the node is his and the Break is the
+				# party's — but only his own Break pays, which is what makes
+				# it a Leech-lane node rather than a party aura.
+				if attacker.blood_communion > 0:
+					var bc_pool := heroes.filter(
+						func(h): return not h.dead and not h.is_companion)
+					if not bc_pool.is_empty():
+						var bc_t := _lowest_hp(bc_pool)
+						var bc_amt := maxi(int(round(
+							result.get("bd", pr) * attacker.blood_communion / 100.0)), 1)
+						var bc_got: int = bc_t.heal_amount(bc_amt, bc_t != attacker)
+						if bc_got > 0:
+							bc_t.float_text("+%d" % bc_got, Color(0.7, 0.4, 0.9))
+							_stat_heal(attacker, bc_got)
 			if not sim and not result.died:
 				strike_target.hit_react((strike_target.position - attacker.position).normalized())
 			# Overpower: a blow into an already-Broken guard holds the wound
@@ -6517,7 +6775,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var mocker_idx := heroes.find(attacker)
 				if mocker_idx >= 0:
 					var taunt_turns := 5 if is_perfect else 4
-					_apply_status(strike_target, "mocked", taunt_turns, mocker_idx)
+					_apply_status(strike_target, "mocked", taunt_turns, mocker_idx,
+						0, attacker)
 					_note_debuff_applied(attacker, "mocked")
 					# Provoke widens the net: +2 taunted foes per rank on top
 					# of the one the base ability already drags in.
@@ -6527,7 +6786,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var taunt_extra := mini(1 + 2 * attacker.provoke_ranks,
 						others.size())
 					for oi in taunt_extra:
-						_apply_status(others[oi], "mocked", taunt_turns, mocker_idx)
+						_apply_status(others[oi], "mocked", taunt_turns, mocker_idx,
+							0, attacker)
 					if attacker.provoke_ranks > 0 and taunt_extra > 1:
 						_log("   → Talent: Provoke — the taunt drags in %d more foes" % \
 							taunt_extra, "#b0a8e0")
@@ -6599,6 +6859,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_log("   → Detonation consumes %d turn%s of Burn (+%d bonus damage)" % [
 					det_turns, "" if det_turns == 1 else "s", detonated],
 					"#e08850")
+			# BATCH BM §2 — POWDER KEG (Pyromancer, Detonation row 8). It
+			# reads an accumulated quantity ACROSS CASTS, which is an axis
+			# the lane has never had: a share of each blast is banked and
+			# rides the next one. (Cataclysm eats the field in ONE blast;
+			# this eats time, so the shelf and the row argue rather than
+			# repeat.) The bank is SPENT here and refilled below, in that
+			# order, so a single Detonation can never pay itself.
+			if attacker.powder_keg > 0 and ab.display_name == "Detonation":
+				if attacker.keg_bank > 0:
+					raw += attacker.keg_bank
+					_log("   → Talent: Powder Keg — %d banked damage goes in too" % \
+						attacker.keg_bank, "#b0a8e0")
+				attacker.keg_bank = int(round(
+					(detonated + attacker.keg_bank) * attacker.powder_keg / 100.0))
 			# THE REFUND. It belongs to Overburn, not to Detonation — the same
 			# helper Wildfire calls — so anything the tree later teaches to eat
 			# Burn inherits it without a second implementation.
@@ -6878,6 +7152,29 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		recoil_pct += attacker.mod_recoil
 		if recoil_pct > 0.0 and not attacker.dead:
 			var recoil := maxi(int(round(total_dealt * recoil_pct)), 1)
+			# BATCH BM §2 — BLOWBACK (Arcanist, Overload row 8): THE BILL
+			# BECOMES AN ASSET. Recoil is the lane's whole cost — Volatility
+			# raises it, Feedback Loop pays it in Mana — and this REDIRECTS it
+			# outward instead. It sits ABOVE Unity and Feedback Loop because a
+			# recoil sent at the enemy team is not a recoil the party can
+			# split or pay for; whatever it takes, they never see.
+			if attacker.blowback > 0:
+				var out: int = mini(int(round(recoil * attacker.blowback / 100.0)), recoil)
+				var bl_targets := enemies.filter(func(e): return not e.dead)
+				if out > 0 and not bl_targets.is_empty():
+					recoil -= out
+					var each := maxi(int(round(out / float(bl_targets.size()))), 1)
+					for bl_e in bl_targets:
+						_dmg_frame(attacker, "Blowback", attacker.unit_name)
+						bl_e.take_tick_damage(each, "-%d" % each, Color(0.8, 0.5, 1.0))
+						_stat("dmg_hero_%s" % attacker.unit_name, each)
+						if bl_e.dead:
+							_on_enemy_death(bl_e)
+					_dmg_frame(attacker, ab.display_name)
+					_log("   → Talent: Blowback — the recoil goes outward (%d each)" % \
+						each, "#b0a8e0")
+				if recoil <= 0:
+					recoil = 0
 			# Unity binds recoil too: the backlash splits across the party.
 			if attacker.has_status("unity"):
 				var bound := heroes.filter(func(h): return not h.dead)
@@ -7082,7 +7379,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if attacker.is_hero and attacker.passive_id == "pack" and ab.damage > 0 \
 				and not is_counter:
 			var comp_target: BattleUnit = target
-			for cs_b in _beasts(attacker):
+			var pack_now := _beasts(attacker)
+			# BATCH BM §2 — GHOST PACK (Beastmaster, handler row 8). THE
+			# BEAST'S ABSENCE BECOMES AN ASSET. Vengeance already inherits a
+			# dead beast's BOON; this inherits its STRIKE, so an empty field
+			# still fights as a pair. It rides `_ghost_hit`, the bodiless-blow
+			# path Call of the Wild already uses, rather than a second
+			# implementation — and it only fires when NOTHING stands, which is
+			# what keeps it a Handler node instead of a Pack one.
+			if pack_now.is_empty() and attacker.ghost_pack > 0 \
+					and comp_target != null and not comp_target.dead:
+				_log("   → Talent: Ghost Pack — a shape that is not there strikes",
+					"#b0a8e0")
+				var gp_kind: String = attacker.vengeance_kind \
+					if attacker.vengeance_kind != "" else "canis"
+				_ghost_hit(attacker, gp_kind, comp_target,
+					0.20 * attacker.attack * attacker.ghost_pack / 100.0)
+			for cs_b in pack_now:
 				if comp_target == null or comp_target.is_hero or comp_target.dead:
 					var foes := enemies.filter(func(e): return not e.dead)
 					comp_target = null if foes.is_empty() else _lowest_hp(foes)
@@ -7218,6 +7531,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			eff_delay = 3.0
 		if grade == "perfect" and ab.display_name == "Magi's Wrath":
 			eff_delay = 3.5
+		# BATCH BM §2 — INSTINCTIVE ROTATION (Beastmaster, pack row 8). BJ §3a
+		# measured the lane's central verb at 0.05 SWAPS A TRASH BATTLE: Wild
+		# Rotation already made the swap free of cooldown, and the swap still
+		# was not happening, because THE COST WAS NEVER THE COOLDOWN — it was
+		# the TURN. This removes that cost and nothing else. `_swapped_free`
+		# is set in `_do_summon`, the only place a swap is decided, and
+		# consumed here so it can never carry into another cast.
+		if attacker.free_swap > 0 and _swapped_free:
+			eff_delay = 0.0
+			_log("   → Talent: Instinctive Rotation — the swap costs no turn",
+				"#b0a8e0")
+		_swapped_free = false
 		attacker.next_time += eff_delay * 100.0 / attacker.effective_speed()
 
 
@@ -7418,6 +7743,23 @@ func _hold_release(target: BattleUnit, reason: String) -> void:
 		# instantly, and never at the stale clock it was frozen on.
 		target.next_time = _clock + BASIC_DELAY * 100.0 \
 			/ maxf(target.effective_speed(), 0.1)
+	# BATCH BM §2 — FROSTBOUND HOURS (Cryomancer, Thaw row 8). It reads the
+	# DEPTH of the charge (`hold_turns`, the same counter Shatter is paid on)
+	# and converts it into the party's cooldowns — a currency the lane has
+	# never been able to buy. Read BEFORE Honed Shards can re-freeze the
+	# target and zero the counter.
+	var fb := _max_hero_rank("frostbound_hours")
+	if fb > 0 and target.hold_turns > 0:
+		var refund: int = int(target.hold_turns / fb)
+		if refund > 0:
+			for h in heroes:
+				if h.dead or h.is_companion:
+					continue
+				for cd_name in h.cooldowns.keys():
+					if int(h.cooldowns[cd_name]) > 0:
+						h.cooldowns[cd_name] = maxi(int(h.cooldowns[cd_name]) - refund, 0)
+			_log("   → Talent: Frostbound Hours — %d turn%s off every cooldown" % [
+				refund, "" if refund == 1 else "s"], "#b0a8e0")
 	# Shattered Tempo: the release is paid out in TIME rather than damage —
 	# the purest thing in the tree. Same arithmetic as Ability.delay_push.
 	var st := _hero_shattered_tempo()
@@ -7515,6 +7857,23 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 	if id == "chilled" and src != null and src.is_hero \
 			and src.passive_id == "permafrost":
 		eff_turns = -1
+	# BATCH BM §2 — THE THREE "IT STOPS EXPIRING" ROW-8 NODES, at ONE site,
+	# because they are one rule pointed at three status families and three
+	# copies of it would drift. -1 is the project's existing battle-long
+	# marker (the same one Permafrost sets one line above), so nothing
+	# downstream needed teaching.
+	#   THE WHOLE ROOM   (Warden, Threat row 8)   — his taunts never lapse
+	#   ETERNAL GROUND   (Devout, Zeal row 8)     — the banner never expires
+	#   PERMANENT DELUSION (Occultist, Madness 8) — his madness never lifts
+	# Scoped to the SRC in every case, exactly as Permafrost is: an enemy's
+	# taunt or an enemy's madness keeps its clock.
+	if src != null and src.is_hero:
+		if id == "mocked" and src.whole_room > 0:
+			eff_turns = -1
+		elif id == "cons_ground" and src.eternal_ground > 0:
+			eff_turns = -1
+		elif id in ["psychosis", "bewitch", "hysteria"] and src.permanent_delusion > 0:
+			eff_turns = -1
 	target.add_status(id, info[0], info[1], info[2], eff_turns, info[3], power, tick)
 	# Batch W: the debuffer's ledger — statuses a hero lands on OTHERS
 	# (only sites that pass src are counted; the changelog owns the list).
@@ -7746,6 +8105,22 @@ func _overburn_tick(u: BattleUnit) -> bool:
 	u.float_text("-%d Mana" % paid, Color(0.55, 0.6, 0.85))
 	_log("%s: Overburn — %d turn%s of Burn drains %d Mana" % [
 		u.unit_name, turns, "" if turns == 1 else "s", paid], "#e08850")
+	# BATCH BM §2 — FORGE BODY (Pyromancer, Inferno row 8). The heat stops
+	# being survivable and becomes productive: the whole bill — the Mana that
+	# was paid AND the part the pool could not cover — is thrown at a random
+	# enemy as fire. THE COST IS UNCHANGED; only its exhaust is new.
+	if u.forge_body > 0 and not battle_over:
+		var living := enemies.filter(func(e): return not e.dead)
+		if not living.is_empty():
+			var thrown := maxi(int(round(cost * u.forge_body / 100.0)), 1)
+			var mark: BattleUnit = living.pick_random()
+			_dmg_frame(u, "Forge Body", u.unit_name)
+			mark.take_tick_damage(thrown, "-%d" % thrown, Color(1.0, 0.55, 0.25))
+			_stat("dmg_hero_%s" % u.unit_name, thrown)
+			_log("   → Talent: Forge Body — the drain is thrown at %s for %d" % [
+				mark.unit_name, thrown], "#b0a8e0")
+			if mark.dead:
+				_on_enemy_death(mark)
 	# Cauterise: the health risk, put back ONCE as an opt-in. Only the part
 	# the Mana pool could not cover is billed, and it goes through
 	# take_tick_damage so a lethal drain is handled like any other tick.
@@ -7935,6 +8310,14 @@ func _party_crit_bonus() -> float:
 func _gain_resonance(caster: BattleUnit, stacks: int) -> void:
 	if caster.second_resource_name != "Resonance":
 		return
+	# BATCH BM §2 — HARMONIC CONVERGENCE (Arcanist, Resonance row 8): THE
+	# BUILD RATE READS THE BUILD. AT §3 measured that build rate beats
+	# per-stack value QUADRATICALLY on a triangular curve, so this is the
+	# most dangerous shape in the batch and §7 names it as the lane to run
+	# BH's leave-one-out grid on. It is authored at +1 per N HELD stacks
+	# rather than as a multiplier for exactly that reason.
+	if caster.convergence > 0 and stacks > 0:
+		stacks += int(caster.second_resource / caster.convergence)
 	var before := caster.second_resource
 	caster.second_resource = mini(caster.second_resource + stacks, caster.second_max)
 	var gained := caster.second_resource - before
@@ -8004,6 +8387,20 @@ func _overflow_share(caster: BattleUnit) -> int:
 # read site is KEPT and gated (the AR vault pattern), never silently deleted,
 # and it is FLAGGED FOR RE-AUTHORING.
 func _bank_overheal(caster: BattleUnit, target: BattleUnit) -> void:
+	# BATCH BM §2 — FONT OF LIGHT (Holy, Radiance row 8) rides the same three
+	# call sites, because they are exactly the sites that know BOTH who healed
+	# and how much spilled. It CONVERTS: the lane's waste becomes the resource
+	# that pays for the next cast, which the meter could never buy.
+	if caster.font_of_light > 0 and target.last_overheal > 0 \
+			and caster.resource_name == "Mana":
+		var drawn := mini(int(target.last_overheal * caster.font_of_light / 2),
+			caster.max_resource - caster.resource)
+		if drawn > 0:
+			caster.resource += drawn
+			caster.refresh_bars()
+			caster.float_text("+%d Mana" % drawn, Color(0.5, 0.7, 1.0))
+			_log("   → Talent: Font of Light draws %d Mana back out of the spill" % \
+				drawn, "#b0a8e0")
 	if caster.capacitor_ranks <= 0 or target.last_overheal <= 0:
 		return
 	var banked := int(round(target.last_overheal * 0.05 * caster.capacitor_ranks))
@@ -8155,7 +8552,37 @@ func _sanctified_refund(cleric: BattleUnit) -> bool:
 # armor; Unyielding Aegis re-form). EVERY Divine Shield goes through
 # here — Purity's blessing-carried shield included — so the "divine"
 # flag (the Faith trigger) can never be missed.
+# BATCH BM §2 — CREED (Devout, Faith row 8). BI §1 made the held half read a
+# DERIVED quantity (`faith_peak`) rather than the meter, precisely so a second
+# axis could exist without fighting the release. This is that second axis and
+# it obeys the same rule: it touches NO frequency term (the lane holds three
+# already) and reads DEPTH ACROSS THE PARTY instead — every hero is paid at
+# the highest peak anyone reached. ONE function, and both faith read sites
+# call it, so the damage half and the mitigation half can never disagree.
+func _faith_paid_peak(holder: BattleUnit) -> int:
+	var mine := holder.faith_peak
+	var dv := _living_devout()
+	if dv == null or dv.creed <= 0:
+		return mine
+	var best := mine
+	for h in heroes:
+		if not h.dead and not h.is_companion:
+			best = maxi(best, h.faith_peak)
+	return best
+
+
 func _grant_divine_shield(devout: BattleUnit, target: BattleUnit, power: int) -> void:
+	# BATCH BM §2 — LAYERED FAITH (Devout, Bulwark row 8). `add_status` MAXES
+	# a re-applied barrier's power, so seven rows of investment have always
+	# been capped at one cast's worth. This ADDS instead: the shield
+	# compounds across casts with no limit, which is the lane's whole thesis
+	# finally allowed to compound. Written by pre-adding the standing pool to
+	# the power, so the max() below lands on the sum and nothing else in the
+	# barrier pipeline needed touching.
+	if devout.layered_faith > 0:
+		var held := target.get_status("barrier")
+		if not held.is_empty() and bool(held.get("divine", false)):
+			power += int(held.get("power", 0))
 	_apply_status(target, "barrier", -1, power)
 	var bstat := target.get_status("barrier")
 	if bstat.is_empty():
@@ -8348,6 +8775,11 @@ func _gain_ruin(target: BattleUnit, n: int = 1) -> void:
 	if occ == null or target.is_hero or target.dead:
 		return
 	var step := _ruin_threshold()
+	# BATCH BM §2 — WEIGHT OF RUIN (Occultist, Ruin row 8): the mark's DEPTH
+	# buys something other than damage. Stamped on the BEARER here (only this
+	# site knows an Occultist stands), and read unit-side by effective_speed
+	# and heal_amount, so the two halves of the node are one number.
+	target.weight_of_ruin = occ.weight_of_ruin
 	for i in n:
 		_apply_status(target, "ruin", -1, 0, 0, occ)
 		# `> 0` is load-bearing: _apply_status can REFUSE the mark (Hallowed
@@ -9180,7 +9612,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"cons_ground":
 			_sfx("heal", -5.0, 0.6)
 			for h in heroes.filter(func(he): return not he.dead and not he.is_companion):
-				_apply_status(h, "cons_ground", 3 if is_perfect else 2)
+				_apply_status(h, "cons_ground", 3 if is_perfect else 2, 0, 0, attacker)
 			_message("%s consecrates the ground!" % attacker.unit_name)
 			_log("%s: Consecrated Ground — the party takes 15%% less damage and reflects 10%% (%d turns)" % [
 				attacker.unit_name, 3 if is_perfect else 2], "#c8b880")
@@ -10482,6 +10914,12 @@ func _swap_victim(hunter: BattleUnit) -> BattleUnit:
 # takes no turns. A swap (replacing a LIVING beast) starts the shared Swap
 # cooldown; the arriving beast keeps its Loyalty, gains +1, and fires its
 # arrival effect.
+# BATCH BM §2 — Instinctive Rotation's one flag. Set by `_do_summon` (the
+# ONE place a swap is decided) and read once by the post-cast reschedule, so
+# a swap and the cast that carried it cannot disagree about what it cost.
+var _swapped_free := false
+
+
 func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> void:
 	# Fallen beasts leave the field on the next call, exactly as the
 	# single-beast flow always did.
@@ -10489,10 +10927,12 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 		if not is_instance_valid(old) or old.dead:
 			_free_beast(hunter, old)
 	var was_swap := false
+	_swapped_free = false
 	if _beasts(hunter).size() >= _beast_cap(hunter):
 		# BATCH BB §1: the shallower bond is the one that breaks — one rule,
 		# one implementation, and `_swap_victim` carries the reason.
 		was_swap = true
+		_swapped_free = hunter.free_swap > 0
 		_free_beast(hunter, _swap_victim(hunter))
 	if was_swap and hunter.wild_rotation == 0:
 		# Quick Whistle shaves the shared swap cooldown; the node shaves all
@@ -10950,6 +11390,30 @@ func _apply_poison(src: BattleUnit, victim: BattleUnit, turns: int) -> void:
 #
 # It raises only a poison that is genuinely PERMANENT (turns < 0), which is what
 # the capstone applies — a Slow Acting poison with a real clock is untouched.
+# BATCH BM §2 — COCKTAIL's own function, on the `_perfected_toxin_tick`
+# precedent: the DoT loop lives inside `_run_battle`, which cannot be driven
+# headlessly, so a clause buried in it could only ever be checked by a grep.
+# It reads the lane's own accumulated quantity — how many DIFFERENT statuses
+# the breadth spine has put on one mark — and turns it back into depth.
+func _cocktail_tick(victim: BattleUnit) -> void:
+	var mixer := _living_hero_with("cocktail")
+	if mixer == null or victim.is_hero or victim.dead:
+		return
+	var others := maxi(_status_count(victim) - 1, 0)  # the Poison itself does not count
+	var extra: int = int(others / mixer.cocktail)
+	if extra <= 0:
+		return
+	var ps := victim.get_status("poison")
+	if ps.is_empty():
+		return
+	ps["stacks"] = int(ps.get("stacks", 1)) + extra
+	victim.update_status("poison", "P%d" % int(ps["stacks"]),
+		"Poison x%d — the dose deepens with every affliction it shares a body with." % \
+			int(ps["stacks"]))
+	_log("   → Talent: Cocktail — the mixture bites deeper on %s (x%d)" % [
+		victim.unit_name, int(ps["stacks"])], "#b0a8e0")
+
+
 func _perfected_toxin_tick(victim: BattleUnit) -> void:
 	if victim == null or victim.dead or victim.is_hero:
 		return
@@ -11047,6 +11511,13 @@ func _deadfall_tick(u: BattleUnit) -> void:
 				if df_h.deadfall_armed > 0 else " — its last"], "#c8a860")
 		_stat("deadfall_springs")
 		_spring_trap(df_h, u, DEADFALL_SPRING_PCT * df_h.attack)
+		# BATCH BM §2 — SET AND FORGET (Survivalist, Snares row 8). A trap is
+		# spent the moment it works, so the lane pays a turn for every spring
+		# it wants. Marked owed HERE and put back out at his own turn start
+		# (`_row8_turn_start`), so the re-arm is visible as a beat rather than
+		# happening inside the spring that consumed it.
+		if df_h.set_and_forget > 0 and df_h.deadfall_armed <= 0:
+			df_h.trap_rearm = 1
 		break
 
 
@@ -11140,6 +11611,19 @@ func _focus_mark(u: BattleUnit, fallback: BattleUnit) -> BattleUnit:
 	if u.last_attack_target != null and not u.last_attack_target.dead:
 		return u.last_attack_target
 	return fallback
+
+
+# BATCH BM §2 — METRONOME (Sharpshooter, Tempo row 8). THE METER SURVIVES
+# WHAT CURRENTLY CLEARS IT. Overkill already covers the kill; this covers the
+# PAYOUT — One Shot and Coup de Grâce both zero the meter that paid for them,
+# and the lane whose whole subject is keeping the rhythm going should not have
+# to start from nothing after its own best turn. It deliberately does NOT
+# cover a target switch: that is disloyalty, and the spine says it costs.
+# ONE function, both payout sites, so they cannot disagree.
+func _metronome_left(u: BattleUnit) -> int:
+	if u.metronome <= 0:
+		return 0
+	return int(u.second_resource * u.metronome / 100.0)
 
 
 func _gain_focus(u: BattleUnit, amount: int) -> void:
@@ -11365,6 +11849,20 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 		_log("   → Rune: Exsanguination opens the vein early (bleedout at %d)" % (
 			100 + pact), "#b0a8e0")
 	if victim.add_bleed((100 - victim.bleed_buildup) if forced else amount):
+		# BATCH BM §2 — SLAUGHTERHOUSE (Berserker, Bloodletting row 8). The
+		# meter no longer resets to zero on a bleedout: it falls to the node's
+		# value, so the SAME enemy can bleed out repeatedly and every payoff
+		# hanging off a bleedout event (Scent of Blood, Bloodcraze, Blood
+		# Tithe, Arterial Spray) fires again. Written HERE, immediately after
+		# add_bleed has zeroed it, because add_bleed is unit-side and cannot
+		# see the party.
+		if not victim.is_hero:
+			var butcher := _living_hero_with("slaughterhouse")
+			if butcher != null:
+				victim.bleed_buildup = mini(butcher.slaughterhouse, 99)
+				victim.log_bleed_chip()
+				_log("   → Talent: Slaughterhouse — the wound stays open (%d)" % \
+					victim.bleed_buildup, "#e07070")
 		# Exsanguination (capstone): enemy bleedouts hit for 35% instead.
 		var exsang := not victim.is_hero \
 			and _living_hero_with("exsanguination") != null
@@ -11973,11 +12471,10 @@ func _check_end() -> void:
 			# (Batch BJ §1) — read the sign-order block there before touching it.
 			heroes[i].sync_victory_state(Run.party[i])
 		var node_type := String(Run.encounter.get("type", "fight"))
-		# Batch AN §8: 1 point for an elite, a mini-boss or a boss — including
-		# the END boss, which used to pay nothing. Ordinary fights pay none. One
-		# purse now; the flex purse is no longer fed (see award_talent_points
-		# for why the arithmetic closes without it).
-		var pts := Run.award_talent_points(node_type)
+		# BATCH BM §6: NOTHING here awards a talent point any more. Fights,
+		# elites and mini-bosses pay gold and their own spoils; a ZONE BOSS
+		# banks a meta point to Profile in _resolve_boss; the END BOSS pays a
+		# relic and no points at all.
 		var gold_gain := Run.award_gold(node_type)
 		# §6: clearing ANY slot heals the party. This is the whole of the
 		# rest-node replacement, and it rides the SAME relic hook the Chalice of
@@ -12037,16 +12534,11 @@ func _check_end() -> void:
 					" and ".join(mb_names)
 		Run.save_run()
 		_sfx("victory", -4.0)
-		if node_type == "boss":
-			_resolve_boss(gold_gain, pts)
+		if node_type in ["boss", "endboss"]:
+			_resolve_boss(gold_gain, node_type == "endboss")
 		else:
-			# Ordinary fights pay no points at all — say what WAS won rather
-			# than "+0 talent points".
 			var win_text := "+%d gold. The party recovers %d%%." % [
 				gold_gain, int(round(Run.victory_heal_pct() * 100))]
-			if pts > 0:
-				win_text += "\nEach hero gains %d talent point%s." % [
-					pts, "" if pts == 1 else "s"]
 			# BATCH BK §3/§5: NOTHING is rolled behind a cleared fight any more.
 			# The merchant and the event are MAP NODES the player routed to, or
 			# past. The only thing that can still stand between a victory and the
@@ -12074,21 +12566,20 @@ func _check_end() -> void:
 		_show_run_summary(wipe_snap)
 
 
-# ---------- Batch AN §4: the boss slots ----------
+# ---------- the boss slots (Batch AN §4, rewired by BATCH BM §6) ----------
 #
-# Zone 1 and zone 2 bosses award ONE ABILITY PICK for every hero, drawn from
-# that hero\'s SPEC POOL ONLY (§4 dropped the class draw AH added). EVERY boss
-# awards a relic unlock (the unlock_random call below runs for all of them —
-# BJ §2 corrected this comment toward the code; the glossary was already
-# right). The END boss adds big gold and ends the run — deliberately NO
-# ability pick, because nothing follows it and the pick would be dead value.
-func _resolve_boss(gold_gain: int, pts: int) -> void:
+# THREE ZONE BOSSES, THEN A FOURTH BOSS AFTER ZONE 3. A zone boss — INCLUDING
+# THE THIRD, which used to be the end boss — awards an ability pick for every
+# hero from that hero's SPEC POOL, a relic unlock, and BANKS ONE META TALENT
+# POINT PER SPEC to Profile. The END BOSS is its own slot: it awards a relic,
+# always; NO ability pick (nothing follows it); NO talent points; and it is
+# what OPENS THE META TREE'S ROW TIERS at the difficulty it was beaten on.
+func _resolve_boss(gold_gain: int, is_end: bool) -> void:
 	var relic := Relics.unlock_random()
 	var boss_text := "+%d gold." % gold_gain
-	if pts > 0:
-		boss_text += " Each hero gains %d talent point%s." % [
-			pts, "" if pts == 1 else "s"]
-	if Run.has_next_zone():
+	if not is_end:
+		Run.bank_zone_boss_points()
+		boss_text += "\n\nEach spec that walked this road banks 1 talent point."
 		if not relic.is_empty():
 			boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
 		var picked: Array = _award_ability_picks()
@@ -12098,15 +12589,23 @@ func _resolve_boss(gold_gain: int, pts: int) -> void:
 			Run.save_run()
 		Profile.note_boss(Run.boss_kind())
 		Profile.note_zone_cleared()
-		_show_end("THE ZONE IS CLEANSED", boss_text,
-			[["Descend into %s" % Run.next_zone_name(), _next_zone]], true)
+		var onward: String = "Descend into %s" % Run.next_zone_name() \
+			if Run.has_next_zone() else "Walk on"
+		_show_end("THE ZONE IS CLEANSED", boss_text, [[onward, _next_zone]], true)
 		return
 	# The end boss. The run is over on its death.
 	boss_text += "\n\nThe road ends here."
 	if not relic.is_empty():
 		boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
-	Profile.note_boss(Run.boss_kind())
-	Profile.note_zone_cleared()
+	# BATCH BM §4: beating it opens a tier of the meta tree for EVERY spec at
+	# once. Points are per spec; rows are not.
+	var tier_before := Profile.talent_tier()
+	Profile.note_end_boss(Run.difficulty_rung())
+	if Profile.talent_tier() > tier_before:
+		boss_text += "\n\nTALENT ROWS %d-%d ARE OPEN — for every spec." % [
+			Talents.rows_unlocked(tier_before) + 1,
+			Talents.rows_unlocked(Profile.talent_tier())]
+	Profile.note_boss(Run.END_BOSS_KIND)
 	Profile.note_completion(Run.party.map(func(m): return m.get("spec", "")))
 	# Batch Z: the summary needs the run state clear_save destroys — snapshot
 	# FIRST, never reorder the save logic (a reordering that leaves a dead run
@@ -12135,7 +12634,11 @@ func _hero_label(member: Dictionary) -> String:
 
 
 func _next_zone() -> void:
-	Run.advance_zone()
+	# BATCH BM §6: the THIRD zone's boss no longer ends the run — the end boss
+	# is the slot after it, on the same board — so there is no zone to advance
+	# into. Everything else about the button is unchanged.
+	if Run.has_next_zone():
+		Run.advance_zone()
 	Run.save_run()
 	_to_map()
 

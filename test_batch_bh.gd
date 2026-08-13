@@ -647,9 +647,13 @@ func _one_multiplier_two_gates() -> void:
 	# BATCH BI §1: both sites read `faith_peak` now — the highest count held this
 	# battle — but the CARRIER-KEYED question BH asked is untouched and is what
 	# these two still check.
-	ok(bsrc.contains("_faith_stack_mult(fd_dv, attacker) * attacker.faith_peak"),
+	# BATCH BM: the peak both sites read now goes through `_faith_paid_peak`
+	# (Creed can pay it on the party's highest instead of the holder's own).
+	# The CARRIER-KEYED question BH asked is what these two check and it is
+	# untouched — the multiplier is still keyed on who is CARRYING the stack.
+	ok(bsrc.contains("_faith_stack_mult(fd_dv, attacker) * _faith_paid_peak(attacker)"),
 		"§2: the damage site values the ATTACKER's Faith under the ATTACKER's ground")
-	ok(bsrc.contains("_faith_stack_mult(fp_dv, strike_target) * strike_target.faith_peak"),
+	ok(bsrc.contains("_faith_stack_mult(fp_dv, strike_target) * _faith_paid_peak(strike_target)"),
 		"§2: the mitigation site values the TARGET's")
 	ok(bsrc.contains("holder.has_status(\"cons_ground\")"),
 		"§2: Fervor's gate reads the HOLDER's ground, never the Devout's")

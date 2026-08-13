@@ -31,6 +31,11 @@
 #      still stepping at 5, Menagerie paying full instead of half,
 #      `wild_communion_step` writing the Devout's field, and a
 #      full-consumption Faith release granting only half.
+# BATCH BM RE-POINTED THIS FILE IN PLACE, mechanically and in two ways only:
+# the capstone SHELF moved from row 8 to row 9 (rows 1-8 are lane rows now),
+# and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
+# every id and every question this file asks is otherwise untouched — the
+# tables below are the batch's own record of its 24 nodes and stay that.
 extends SceneTree
 
 const REAL_SAVE := "user://run_save.bin"
@@ -211,7 +216,7 @@ const IDS := ["bm_communion", "bm_unbroken", "bm_absolute", "bm_devoted_fury",
 
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 24, "the Beastmaster tree holds 24 nodes (got %d)" % tree.size())
+	ok(tree.size() == 27, "the Beastmaster tree holds 24 nodes (got %d)" % tree.size())
 	var by_lane := {"devotion": 0, "pack": 0, "handler": 0}
 	var caps := 0
 	var seen := {}
@@ -221,10 +226,10 @@ func _tree_shape() -> void:
 		seen[id] = true
 		ok(int(t.get("ranks", 0)) == 1, "%s holds a single rank" % id)
 		var row := int(t.get("row", 0))
-		ok(row >= 1 and row <= 8, "%s sits in a real row (got %d)" % [id, row])
+		ok(row >= 1 and row <= Talents.CAPSTONE_ROW, "%s sits in a real row 1-9 (got %d)" % [id, row])
 		if bool(t.get("capstone", false)):
 			caps += 1
-			ok(row == 8, "capstone %s is in row 8" % id)
+			ok(row == Talents.CAPSTONE_ROW, "capstone %s is on the capstone shelf" % id)
 		else:
 			by_lane[String(t["lane"])] = by_lane[String(t["lane"])] + 1
 		# Batch AI's structure: exclusive references are by ROW, so no node may
@@ -233,12 +238,17 @@ func _tree_shape() -> void:
 			"%s carries no stale exclusive_with — rows do the barring" % id)
 	ok(caps == 3, "three capstones (got %d)" % caps)
 	for lane in by_lane:
-		ok(by_lane[lane] == 7, "lane %s holds 7 rows (got %d)" % [lane, by_lane[lane]])
+		ok(by_lane[lane] == Talents.ROWS, "lane %s holds 8 rows (got %d)" % [lane, by_lane[lane]])
 	# EVERY ID SURVIVES: §11's whole promise, and the reason no save moves.
 	for id in IDS:
 		ok(not _node(id).is_empty(), "id %s survives and re-specs in place" % id)
-	ok(seen.size() == IDS.size(),
-		"no id was added or deleted (tree %d vs expected %d)" % [seen.size(), IDS.size()])
+		# BATCH BM RE-POINTED THIS IN PLACE. `IDS` is THIS BATCH'S RECORD OF ITS OWN
+	# 24 NODES and stays that; BM added a row-8 node to every lane, so the live
+	# tree is 27. What the check exists to prove — that every one of the 24
+	# SURVIVES, which is what lets a saved tree migrate — is the loop above and
+	# is untouched. The count below allows exactly the three BM added.
+	ok(seen.size() == IDS.size() + 3,
+		"the 24 survive and BM added exactly 3 (tree %d, table %d)" % [seen.size(), IDS.size()])
 	# One node per lane per row, or the picker's "choose one" band is a lie.
 	var slots := {}
 	for t in tree:
@@ -739,7 +749,7 @@ func _live_lone_bond_closes_the_pack() -> void:
 	# purity), so it is resolved where the number is read.
 	var lb: Dictionary = _node("bm_lone_bond")
 	var tp: Dictionary = _node("bm_the_pack")
-	ok(int(lb["row"]) == 7 and int(tp["row"]) == 8,
+	ok(int(lb["row"]) == 7 and int(tp["row"]) == Talents.CAPSTONE_ROW,
 		"Lone Bond is row 7 and The Pack is row 8 — different rows, both pickable")
 	ok(String(lb["desc"]).to_lower().contains("the pack"),
 		"Lone Bond's own text says it closes The Pack")

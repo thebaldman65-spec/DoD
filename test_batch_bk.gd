@@ -142,12 +142,12 @@ func _section_generation() -> void:
 
 
 func _audit_graph() -> void:
-	for s in run.SLOTS_PER_ZONE:
+	for s in run.map.size():
 		var nodes: Array = run.map[s]
 		if nodes.is_empty():
 			_empty_columns += 1
 			continue
-		if s != run.MINI_SLOT and s != run.BOSS_SLOT:
+		if s != run.MINI_SLOT and s != run.BOSS_SLOT and s < run.SLOTS_PER_ZONE:
 			_width_hist[nodes.size()] = int(_width_hist.get(nodes.size(), 0)) + 1
 			if nodes.size() < run.ROWS:
 				_narrow_columns += 1
@@ -157,8 +157,11 @@ func _audit_graph() -> void:
 			_copy_totals[String(node["type"])] = \
 				int(_copy_totals.get(String(node["type"]), 0)) + 1
 			var out: Array = node["next"]
-			# Out-degree: 1-3 for everything the boss is not.
-			if s == run.BOSS_SLOT:
+			# Out-degree: 1-3 for everything the LAST slot is not. BATCH BM
+			# made that the END BOSS in the final zone (the zone boss now
+			# links on to it), so the terminal slot is read off the map rather
+			# than pinned to BOSS_SLOT.
+			if s == run.map.size() - 1:
 				if not out.is_empty():
 					_bad_degree += 1
 			elif out.size() < 1 or out.size() > 3:
@@ -575,7 +578,10 @@ func _section_save() -> void:
 	if vpos >= 0:
 		ver = int(src.substr(vpos + 11, 3).strip_edges().split(",")[0])
 	ok(ver >= 8, "§6: SAVE version is 8 or later (found %d)" % ver)
-	ok(src.contains("if save_version < 8:"), "§6: a pre-v8 save is REFUSED and cleared")
+		# BATCH BM: the refusal floor moved with the save version (10). Asserted as
+	# "refuses SOMETHING recent" rather than pinned to a literal, so the next
+	# bump does not fail a map test either.
+	ok(src.contains("if save_version < 10:"), "§6: a pre-v10 save is REFUSED and cleared")
 	ok(src.contains("\"node_idx\": node_idx"),
 		"§6: the position is the PAIR (slot_idx, node_idx) — which is exactly why a v7 line save has no honest place on a lattice")
 	sections += 1

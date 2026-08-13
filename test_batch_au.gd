@@ -77,7 +77,16 @@ func _run() -> void:
 	await _live_capstones()
 	await _live_death_ray_gate()
 	await _live_debug_grant()
-	await _live_tree_legibility()
+	# BATCH BM DELETED THIS SECTION WITH ITS SUBJECT. AU §2 built exclusivity
+	# legibility on the HERO SHEET — click-to-spend, sibling dimming while you
+	# decide, and the named reason a node is barred — and BM made that page
+	# READ-ONLY: talents are meta progression, chosen between runs on the
+	# build screen, and the sheet's job is now to say what is worn and that it
+	# cannot be changed. The questions the section asked are about a DECISION
+	# SURFACE that moved, not about a rule that was dropped; test_batch_bm's
+	# negative control 5 asserts the sheet has no spend path at all, and the
+	# build screen's own lock is asserted beside it. Deleted rather than
+	# half-repaired, on the same reasoning as test_batch_ai's three sections.
 
 	if FileAccess.file_exists("user://profile_batch_au_test.json"):
 		DirAccess.remove_absolute(
@@ -348,10 +357,10 @@ func _capstone_payloads() -> void:
 	ok(not wr.get("stat", {}).has("singularity_crit_build"),
 		"...and Magi's Wrath does not take a build-rate clause in exchange")
 	ok(String(by_id["ar_singularity"]["lane"]) == "Resonance"
-		and int(by_id["ar_singularity"]["row"]) == 8,
+		and int(by_id["ar_singularity"]["row"]) == Talents.CAPSTONE_ROW,
 		"Singularity stays the RESONANCE capstone — it is the effect that moved")
 	ok(String(by_id["ar_wrath"]["lane"]) == "Overload"
-		and int(by_id["ar_wrath"]["row"]) == 8,
+		and int(by_id["ar_wrath"]["row"]) == Talents.CAPSTONE_ROW,
 		"Magi's Wrath stays the OVERLOAD capstone")
 	ok(String(by_id["ar_timelord"]["name"]) == "Perfect Conversion",
 		"Perfect Conversion (Entropy) is unchanged")
@@ -415,12 +424,22 @@ func _source_audit() -> void:
 		"...reached from BOTH grant branches, new_ability and grant_ability")
 	ok(tsrc.contains("const FALLBACK_KEY :="),
 		"...and the cfg key it records under is named once")
-	# §2: the three legibility changes, in the source that draws them.
-	ok(psrc.contains("CHOOSE ONE"), "rows are drawn as bands with a CHOOSE ONE label")
-	ok(psrc.contains("func _dim_siblings("), "hovering a node dims its siblings")
-	ok(psrc.contains("const LOCK_GLYPH"), "a barred node wears a lock glyph")
-	ok(psrc.contains("Barred — you took %s in this row."),
-		"...and its tooltip names what barred it, verbatim")
+	# §2: BATCH BM MOVED THE DECISION SURFACE AND THESE FOUR MOVED WITH IT.
+	# AU §2's legibility was for a page where a player DECIDED; the hero sheet
+	# is read-only now (talents are meta, chosen between runs), so the three
+	# affordances that fired at the moment of deciding — the CHOOSE ONE bands,
+	# the sibling dim, the click-to-spend — live on the build screen. WHAT AU
+	# §2 WAS REALLY GUARDING SURVIVES AND IS ASSERTED HERE: a node the player
+	# is not wearing must never be a bare greyed square — it wears a glyph and
+	# its tooltip NAMES what stands in its row.
+	var build_src := FileAccess.get_file_as_string("res://scripts/talents_screen.gd")
+	ok(psrc.contains("const LOCK_GLYPH"), "an unequipped node wears a lock glyph")
+	ok(psrc.contains("%s holds this row"),
+		"...and its tooltip NAMES what holds the row instead")
+	ok(build_src.contains("unlocking is not equipping"),
+		"the build screen states the unlock-is-not-equip rule in words")
+	ok(build_src.contains("it will replace"),
+		"...and a node's tooltip says what equipping it would close")
 	ok(psrc.contains("ONE PER HERO, EVER"),
 		"the capstone shelf states its stricter rule")
 
@@ -817,85 +836,3 @@ func _live_debug_grant() -> void:
 
 
 # §2: driven on a REAL hero sheet, because the whole deliverable is drawn.
-func _live_tree_legibility() -> void:
-	var run := root.get_node("/root/Run")
-	run.sim_run = false
-	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
-	for i in run.party.size():
-		run.party[i]["spec"] = ["berserker", "arcanist", "holy", "beastmaster"][i]
-		run.party[i]["tree"] = Talents.generate_tree(
-			run.party[i]["spec"], run.party[i]["key"])
-		run.party[i]["talents"] = {}
-		run.party[i]["talent_points"] = 8
-		run.sync_spec_hp(i)
-	run.party[1]["talents"] = {"ar_harmonics": 1}
-	run.specs_chosen = true
-	run.active = true
-	run.hero_screen_idx = 1
-	var sheet: Node = load("res://scenes/party.tscn").instantiate()
-	root.add_child(sheet)
-	await process_frame
-	await process_frame
-	var labels: Array = []
-	var buttons: Array = []
-	for c in sheet.get_children():
-		if c is Label:
-			labels.append(String(c.text))
-		elif c is Button:
-			buttons.append(c)
-	# (a) one band label per row, and the shelf naming its stricter rule.
-	var bands := labels.filter(func(t): return t == "CHOOSE ONE")
-	ok(bands.size() == Talents.ROWS,
-		"one CHOOSE ONE band per row 1-7 (got %d)" % bands.size())
-	ok(labels.any(func(t): return t.contains("ONE PER HERO, EVER")),
-		"the capstone shelf states one capstone per hero, ever")
-	# (c) row 1 is decided, so its two siblings wear the lock glyph.
-	var locks := buttons.filter(func(b): return String(b.text) == sheet.get("LOCK_GLYPH"))
-	ok(locks.size() == 2,
-		"a decided row locks its TWO siblings with a glyph (got %d)" % locks.size())
-	for lb in locks:
-		ok(lb.modulate.r < 0.99, "...and greys them")
-	# ...and the reason, by name, off the real tooltip renderer.
-	var tree: Array = run.party[1].get("tree", [])
-	var sibling := {}
-	for n in tree:
-		if int(n["row"]) == 1 and String(n["id"]) != "ar_harmonics":
-			sibling = n
-			break
-	var check := Talents.can_learn(tree, String(sibling["id"]), run.party[1]["talents"])
-	sheet.call("_show_tree_tip", sibling, 0, check, 8, Vector2(600, 200), 0)
-	var state := String(sheet.get("_tree_tip_state").text)
-	ok(state.contains("Barred — you took Harmonics in this row."),
-		"a barred node NAMES what barred it: '%s'" % state)
-	# (b) hovering dims the two siblings and nothing else, and restores.
-	var by_id := {}
-	for n in tree:
-		by_id[String(n["id"])] = n
-	var buttons_by_id: Dictionary = sheet.get("_tree_buttons")
-	var base_mod: Dictionary = sheet.get("_tree_base_modulate")
-	sheet.call("_dim_siblings", "ar_conduit")
-	var dimmed := 0
-	for id in buttons_by_id:
-		var b: Button = buttons_by_id[id]
-		if b.modulate.a < 0.99:
-			dimmed += 1
-			ok(int(by_id[id]["row"]) == 1 and String(id) != "ar_conduit",
-				"only row 1's OTHER nodes dim (%s dimmed)" % id)
-	ok(dimmed == 2, "hovering dims exactly two siblings (got %d)" % dimmed)
-	sheet.call("_undim_siblings")
-	var still := 0
-	for id2 in buttons_by_id:
-		if abs((buttons_by_id[id2] as Button).modulate.a - (base_mod[id2] as Color).a) > 0.001:
-			still += 1
-	ok(still == 0, "...and leaving restores every base modulate (%d left dim)" % still)
-	# Capstones are one decision too, so the shelf dims as a row.
-	sheet.call("_dim_siblings", "ar_singularity")
-	var cap_dim := 0
-	for id3 in buttons_by_id:
-		if (buttons_by_id[id3] as Button).modulate.a < 0.99:
-			cap_dim += 1
-			ok(int(by_id[id3]["row"]) == Talents.CAPSTONE_ROW,
-				"the shelf dims as one decision (%s)" % id3)
-	ok(cap_dim == 2, "hovering a capstone dims the other two (got %d)" % cap_dim)
-	sheet.queue_free()
-	await process_frame

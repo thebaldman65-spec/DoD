@@ -212,12 +212,16 @@ func _initialize() -> void:
 		"§2: the Open Hand states the heal-crit gate it unlocks")
 	# The glossary corrected toward the code.
 	var glossary := FileAccess.get_file_as_string("res://data/glossary.json")
-	ok(glossary.contains("Every talent node costs 1 point"),
-		"§2: talent_cost describes the flat pricing")
+	# BATCH BM RE-POINTED THESE TWO. BJ's question — does the glossary describe
+	# the LIVE economy rather than a dead one — is exactly the right question
+	# and is unchanged; BM replaced the economy underneath it, so the strings
+	# move with it. A cell costs by TIER now, and nothing in a run pays a point.
+	ok(glossary.contains("rows 1-3 cost 1 point"),
+		"§2: talent_cost describes the TIER pricing")
 	ok(not glossary.contains("ceil(N/3)"),
 		"§2: ...and the AI-era curve is gone from it")
-	ok(glossary.contains("the END boss included; plain fights pay none"),
-		"§2: talent_points describes the AN schedule")
+	ok(glossary.contains("NOTHING IN A RUN AWARDS ONE"),
+		"§2: talent_points describes the META schedule")
 	ok(glossary.contains("three slots per hero"),
 		"§2: the runes entry describes the flat 3 slots")
 	ok(not glossary.contains("restored by rests"),

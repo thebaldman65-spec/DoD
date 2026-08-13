@@ -27,6 +27,11 @@
 #      stacked (a rune that is only live beside its node is a dead rune).
 #   6. LIVE — a spawned battle, because the ally cover, the refuel, the
 #      Break rider and the upgraded capstone only exist at cast time.
+# BATCH BM RE-POINTED THIS FILE IN PLACE, mechanically and in two ways only:
+# the capstone SHELF moved from row 8 to row 9 (rows 1-8 are lane rows now),
+# and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
+# every id and every question this file asks is otherwise untouched — the
+# tables below are the batch's own record of its 24 nodes and stay that.
 extends SceneTree
 
 const REAL_SAVE := "user://run_save.bin"
@@ -63,9 +68,9 @@ const NODES := {
 	"wd_immovable": [7, "Plate", "Battered Not Broken", "battered_ranks", 1],
 	"wd_grudge": [7, "Threat", "Grudge", "grudge_ranks", 1],
 	"wd_veteran": [7, "Banner", "Steadfast", "steadfast_ranks", 1],
-	"wd_mountain": [8, "Plate", "Immovable", "immovable", 1],
-	"wd_avenger": [8, "Threat", "Vengeful Guardian", "vengeful_guardian", 1],
-	"wd_hold_line": [8, "Banner", "Hold the Line", "", 0],
+	"wd_mountain": [9, "Plate", "Immovable", "immovable", 1],
+	"wd_avenger": [9, "Threat", "Vengeful Guardian", "vengeful_guardian", 1],
+	"wd_hold_line": [9, "Banner", "Hold the Line", "", 0],
 }
 
 # The number the tooltip must render for every node whose content is a
@@ -156,9 +161,17 @@ func _ability_names(list: Array) -> Array:
 
 func _tree_shape() -> void:
 	var tree: Array = Talents.generate_tree("warden", "warrior")
-	ok(tree.size() == 24, "the tree is 24 nodes (has %d)" % tree.size())
+	ok(tree.size() == 27, "the tree is 27 cells (has %d)" % tree.size())
 	var seen := {}
 	for node in tree:
+		# BATCH BM: this batch's table is THIS BATCH'S RECORD OF ITS OWN 24
+		# NODES, and BM added a ROW-8 node to every lane. The walk skips row 8
+		# rather than being taught the three new ids: what the check exists to
+		# prove is that the twenty-four survive UNCHANGED, and asserting that
+		# nothing else exists would make every later addition a failure here
+		# instead of in the batch that made it.
+		if int(node["row"]) == 8:
+			continue
 		var id := String(node["id"])
 		ok(NODES.has(id), "'%s' is a node the layout table names" % id)
 		ok(not seen.has(id), "'%s' appears once" % id)
@@ -174,8 +187,8 @@ func _tree_shape() -> void:
 			"'%s' sits in lane %s, want %s" % [id, node["lane"], want[1]])
 		ok(String(node["name"]) == String(want[2]),
 			"'%s' is named '%s', want '%s'" % [id, node["name"], want[2]])
-		ok(node.get("capstone", false) == (int(want[0]) == 8),
-			"'%s' is flagged capstone iff it sits in row 8" % id)
+		ok(node.get("capstone", false) == (int(want[0]) == Talents.CAPSTONE_ROW),
+			"'%s' is flagged capstone iff it sits on the shelf" % id)
 	# EVERY id survives, which is what lets saved trees migrate and is why
 	# no save version moves in this batch.
 	for id in NODES:

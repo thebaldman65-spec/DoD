@@ -56,7 +56,11 @@ func _check_range(label: String, got: float, lo: float, hi: float) -> void:
 
 func _setup_run(run: Node) -> void:
 	run.sim_run = true  # save/clear are no-ops — never touch the real save
-	run.new_run()
+	# BATCH BM: `new_run`'s default rung is 1 (x0.70) now, and gate 3 pins the
+	# ZONE SLOT multiplier at the values the enemy ladder was fitted against.
+	# Arm rung 2 explicitly — it IS the pre-BM balance, byte for byte — so the
+	# gate keeps measuring the same ladder rather than the new default.
+	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "warden")
 	for i in run.party.size():
 		run.party[i]["spec"] = SPECS[i]
 		run.party[i]["tree"] = []  # no talents: the scaling asserts stay pure
@@ -137,29 +141,17 @@ func _gate_talent_conservation() -> void:
 			run.advance(int(reach[0]))
 			run.award_talent_points(String(run.current_node()["type"]))
 	var before := 0
-	var before_flex := 0
+	# BATCH BM: the income half of this gate measured a purse that no longer
+	# exists. What replaces it is the half that IS still load-bearing — the
+	# loadout was INSTALLED before the run and every hero wears exactly what
+	# was asked for.
+	_check("the sim installed a loadout", run.sim_talents.is_empty(), false)
 	for m in run.party:
-		before += int(m["talent_points"])
-		before_flex += int(m.get("talent_flex", 0))
-	# The floor is 6 from the map + 1 from the awakening on each of four heroes
-	# = 28; every elite the walk reached adds 4 more. A RANGE, not a constant,
-	# since Batch BK made the elites routable.
-	_check_range("income booked (>=7 x 4 heroes, <=8 payers x 3 zones + 1)",
-		before, 28, 4 * (1 + run.SLOT_COUNT * (2 + int(run.NODE_COPIES["elite"]))))
-	_check("no flex purse is fed any more", before_flex, 0)
-	RunSim._run_spent = 0
-	RunSim._spend_talents(run)
-	var after := 0
-	var after_flex := 0
-	for m in run.party:
-		after += int(m["talent_points"])
-		after_flex += int(m.get("talent_flex", 0))
-	_check("ledger: earned - banked == spent",
-		(before - after) + (before_flex - after_flex), RunSim._run_spent)
-	_check("something was bought", RunSim._run_spent > 0, true)
-	# Replay every purchase at the flat price: 1 point a node, no exceptions.
-	# The count of learned nodes IS the points paid.
-	var replay_total := 0
+		_check("no in-run purse on the member (%s)" % m["spec"],
+			m.has("talent_points") or m.has("talent_flex"), false)
+		_check("the member wears the installed loadout (%s)" % m["spec"],
+			(m.get("talents", {}) as Dictionary).size(), RunSim.rows_built)
+	var replay_total := 0  # BATCH BM: always 0 — a run spends nothing
 	for m in run.party:
 		var tree: Array = m["tree"]
 		var learned: Dictionary = m.get("talents", {})
@@ -168,31 +160,27 @@ func _gate_talent_conservation() -> void:
 			_check("single rank (%s/%s)" % [m["spec"], id], int(learned[id]), 1)
 			var node := Talents.node_in_tree(tree, String(id))
 			_check("node is in the tree (%s/%s)" % [m["spec"], id], node.is_empty(), false)
-		replay_total += Talents.points_spent(learned)
-		# BATCH BK: the purse is a RANGE, so the tree size is one too. The
-		# floor is 7 (the awakening plus a mini-boss and a boss in each of
-		# three zones, on a route that ducked every elite); the ceiling is
-		# still 15, because seven rows take a second pick each and the
-		# capstone row never takes a second. A hero at the floor cannot even
-		# complete the eight-node tree, which is the elite economy working:
-		# a route that skips the paydays arrives with fewer nodes.
-		_check_range("tree size (%s)" % m["spec"], learned.size(), 7, 15)
-		_check("every point bought a node (%s)" % m["spec"],
-			learned.size(), Talents.points_spent(learned))
-		# The capstone opens only once all seven rows are picked, so it is
-		# asserted where it is reachable rather than unconditionally.
-		if learned.size() >= 8:
-			_check("capstone taken (%s)" % m["spec"],
-				Talents.has_capstone(tree, learned), true)
-		_check("bank not negative (%s)" % m["spec"],
-			int(m["talent_points"]) >= 0, true)
-		_check("elite purse not negative (%s)" % m["spec"],
-			int(m.get("talent_flex", 0)) >= 0, true)
-		# No row ever holds three.
-		for row in range(1, Talents.CAPSTONE_ROW + 1):
-			_check("row %d <= 2 picks (%s)" % [row, m["spec"]],
-				Talents.row_picks(tree, learned, row).size() <= Talents.MAX_PER_ROW, true)
-	_check("price replay == points paid", replay_total, RunSim._run_spent)
+		# BATCH BM RE-POINTED GATE 2 IN PLACE. Its subject was the IN-RUN
+		# PURSE — points earned against points paid, the surplus buying second
+		# nodes, and no row holding three — and BM deleted all of it: talents
+		# are META now, bought per spec on Profile and EQUIPPED before a run
+		# starts. There is nothing to conserve inside a run any more. What is
+		# still worth gating, and is what the loop asserts now, is that THE
+		# LOADOUT A RUN WEARS IS LEGAL: exactly one node per row, every id
+		# real, every rank 1, and nothing bought along the way.
+		var by_row := {}
+		for id in learned:
+			var n2 := Talents.node_in_tree(tree, String(id))
+			var r := int(n2.get("row", 0))
+			_check("row %d holds ONE equipped node (%s)" % [r, m["spec"]],
+				by_row.has(r), false)
+			by_row[r] = id
+		_check("no in-run purse survives (%s)" % m["spec"],
+			m.has("talent_points") or m.has("talent_flex"), false)
+		# The harness equips the same depth for every hero, so the count is
+		# exactly what DOD_SIM_ROWS asked for.
+		_check("loadout depth (%s)" % m["spec"], learned.size(), RunSim.rows_built)
+	_check("no points were spent in a run at all", replay_total, 0)
 
 
 # ---------- gate 3: enemy tier x slot scaling ----------

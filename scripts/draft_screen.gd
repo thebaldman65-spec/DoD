@@ -11,7 +11,7 @@ const CLASS_TINTS := {
 
 var picks: Array = []         # selection order = battle position
 var relic_picks: Array = []   # up to 3 relic ids
-var difficulty := "standard"  # alpha affordance (Batch Y) — see run_state
+var difficulty := "wanderer"  # BATCH BM §5: the ladder's first rung
 
 
 func _ready() -> void:
@@ -125,34 +125,47 @@ func _draw_screen() -> void:
 		rbtn.pressed.connect(_toggle_relic.bind(id))
 		grid.add_child(rbtn)
 
-	# The road chosen at the draft (Batch Y, alpha testing affordance):
-	# Wanderer softens the zone multipliers so a tester can see the whole
-	# game — it is not a balance statement and touches no other number.
+	# BATCH BM §5 — THE DIFFICULTY LADDER, chosen here and recorded with the
+	# run. Beating the END BOSS on a rung opens that tier of the meta talent
+	# tree for every spec, so this is the run's most consequential choice and
+	# it says what each rung's twist is rather than only how hard it is.
 	var diff_label := Label.new()
 	diff_label.text = "THE ROAD"
 	diff_label.add_theme_font_size_override("font_size", 13)
 	diff_label.add_theme_color_override("font_color", Color(0.6, 0.55, 0.5))
-	diff_label.position = Vector2(60, 626)
+	diff_label.position = Vector2(60, 620)
 	diff_label.size = Vector2(320, 18)
 	add_child(diff_label)
-	var diff_info := {
-		"standard": ["Standard", "The Decay at full strength — the game as designed."],
-		"wanderer": ["Wanderer", "A gentler road: enemies at 70% strength, so you can " +
-			"see every zone. A testing aid while difficulty is tuned."],
-	}
 	var dx := 60
-	for key in ["standard", "wanderer"]:
+	for key in Run.DIFFICULTY_ORDER:
+		var def: Dictionary = Run.DIFFICULTIES[key]
 		var dbtn := Button.new()
-		dbtn.text = ("[*] " if difficulty == key else "") + diff_info[key][0]
-		dbtn.tooltip_text = diff_info[key][1]
-		dbtn.custom_minimum_size = Vector2(150, 44)
-		dbtn.position = Vector2(dx, 646)
+		dbtn.text = "%s%d — %s" % ["[*] " if difficulty == key else "",
+			int(def["rung"]), def["name"]]
+		dbtn.tooltip_text = "%s\nEnemies at %d%% strength.\nBeating the end boss here opens talent rows %d-%d." % [
+			def["blurb"], int(round(float(def["mult"]) * 100)),
+			Talents.rows_unlocked(int(def["rung"]) - 1) + 1,
+			Talents.rows_unlocked(int(def["rung"]))]
+		dbtn.custom_minimum_size = Vector2(140, 40)
+		dbtn.position = Vector2(dx, 640)
+		dbtn.add_theme_font_size_override("font_size", 13)
 		if difficulty == key:
 			dbtn.modulate = Color(1.0, 0.9, 0.5)
 		dbtn.pressed.connect(Music.click)
 		dbtn.pressed.connect(_set_difficulty.bind(key))
 		add_child(dbtn)
-		dx += 160
+		dx += 148
+
+	# BATCH BM §4: the build screen is reachable from here as well as from the
+	# main menu — talents are chosen between runs, and the draft IS between
+	# runs. It reads what the profile holds, so it needs no run.
+	var tal := Button.new()
+	tal.text = "Talents"
+	tal.custom_minimum_size = Vector2(150, 42)
+	tal.position = Vector2(140, 16)
+	tal.pressed.connect(Music.click)
+	tal.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/talents.tscn"))
+	add_child(tal)
 
 	var start := Button.new()
 	start.text = "Begin the Run"

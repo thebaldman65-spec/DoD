@@ -243,8 +243,11 @@ func _one_writer_for_the_chip() -> void:
 	var src := _src("res://scripts/battle.gd")
 	ok(src.contains("func _stamp_deadfall_chip(h: BattleUnit) -> void:"),
 		"§2: one writer for the chip")
-	ok(src.count("_stamp_deadfall_chip(") == 4,
-		"§2: ...and three callers besides the definition (reads %d)" % \
+	# BATCH BM: Set and Forget (Survivalist, Snares row 8) puts the trap back
+	# out at his turn start, so there is a FOURTH caller. The property the
+	# check exists for — ONE writer, everybody else calls it — is unchanged.
+	ok(src.count("_stamp_deadfall_chip(") == 5,
+		"§2: ...and four callers besides the definition (reads %d)" % \
 			src.count("_stamp_deadfall_chip("))
 	ok(not src.contains('"DF%d" % attacker.deadfall_armed'),
 		"§2: the cast no longer writes the chip by hand")

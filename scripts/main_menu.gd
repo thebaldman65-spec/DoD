@@ -50,6 +50,10 @@ func _draw_screen() -> void:
 	var entries: Array = [
 		["New Game", _on_new_game, true],
 		["Continue", _on_continue, Run.has_save()],
+		# BATCH BM §4: talents are chosen BETWEEN runs, so the tree needs a
+		# home outside one. Always available — a fresh save opens it to a
+		# board with no rows, which is the honest first thing to show.
+		["Talents", _on_talents, true],
 		["Relics", _on_relics, true],
 		["Settings", _on_settings, true],
 		["Exit", _on_exit, true],
@@ -58,7 +62,7 @@ func _draw_screen() -> void:
 		var btn := Button.new()
 		btn.text = entries[i][0]
 		btn.custom_minimum_size = Vector2(300, 54)
-		btn.position = Vector2(490, 250 + i * 74)
+		btn.position = Vector2(490, 240 + i * 66)
 		btn.add_theme_font_size_override("font_size", 22)
 		btn.disabled = not entries[i][2]
 		btn.pressed.connect(Music.click)
@@ -74,6 +78,10 @@ func _on_new_game() -> void:
 func _on_continue() -> void:
 	if Run.load_run():
 		get_tree().change_scene_to_file("res://scenes/map.tscn")
+
+
+func _on_talents() -> void:
+	get_tree().change_scene_to_file("res://scenes/talents.tscn")
 
 
 func _on_relics() -> void:

@@ -72,10 +72,16 @@ static var wipes: Array = []      # [{zone: 1-3, tier: 1-11}]
 # "zone,tier" -> accumulators; every count is per FIGHT at that tier.
 static var tier_stats := {}
 static var event_counts := {}     # event id -> times fired across all runs
-static var talent_spent := 0.0    # points PAID across all runs, all heroes
-static var talent_left := 0.0     # unspent points at run end, all runs
-static var boss_nodes_sum := 0.0  # avg distinct nodes owned entering a boss
+# BATCH BM DELETED talent_spent / talent_left / boss_nodes_sum WITH THE
+# IN-RUN PURSE THEY MEASURED. Every figure they ever produced is superseded,
+# BK's 10.9 / 10.8 / 6.0 points per hero per run included: a run does not
+# earn or spend talent points any more. `boss_entries` survives because the
+# stage-0b resolution block counts boss reaches, which is still a real thing.
 static var boss_entries := 0
+static var boss_nodes_sum := 0.0  # avg nodes EQUIPPED entering a boss
+static var rows_built := Talents.CAPSTONE_ROW  # DOD_SIM_ROWS: rows the loadout fills
+static var diff_id := "wanderer"   # the rung this invocation walked, cached at
+static var diff_rung := 1          # start_run — RunSim may never name `Run`
 static var route := "balanced"
 static var builds := {}           # spec -> target lane name
 static var shops_on := true       # Batch U shop policy (DOD_SIM_SHOPS=off -> v1 floor)
@@ -108,7 +114,6 @@ static var gold_unspent := 0.0    # balance at wipe or completion
 static var heals_bought := 0      # rule 1: potions for the wounded
 static var restock_bought := 0    # rule 2: consumables bought back at count 0
 static var runes_bought := 0      # rule 2: runes bought (equipped at purchase)
-static var _run_spent := 0        # points paid this run
 static var _run_gold_spent := 0   # gold paid this run (shop policy only)
 static var _cur_tier := ""        # tier key of the battle in flight
 static var _deaths_before := 0.0  # sim_stats hero_deaths before this battle
@@ -187,6 +192,13 @@ static func begin(run: Node, n: int) -> void:
 		var bits: PackedStringArray = pair.split(":")
 		if bits.size() == 2:
 			builds[bits[0].strip_edges()] = bits[1].strip_edges()
+	# BATCH BM: DOD_SIM_ROWS is how many of the nine rows the equipped
+	# loadout fills — 0 for an untalented party, 3 / 6 / 9 for the builds §7
+	# pairs with each rung. Default 9 (a full tree); 0 is a real value, so
+	# the check is "was it set", not "is it non-zero".
+	var rows_env := OS.get_environment("DOD_SIM_ROWS")
+	rows_built = clampi(int(rows_env), 0, Talents.CAPSTONE_ROW) if rows_env != "" \
+		else Talents.CAPSTONE_ROW
 	start_run(run)
 
 
@@ -196,12 +208,16 @@ static func start_run(run: Node) -> void:
 	var relics: Array = []
 	if OS.get_environment("DOD_SIM_RELICS") != "":
 		relics = Array(OS.get_environment("DOD_SIM_RELICS").split(","))
-	# Alpha difficulty affordance (Batch Y): default standard, so no
-	# baseline row can be contaminated by a forgotten env var.
-	var diff := OS.get_environment("DOD_SIM_DIFFICULTY")
-	if not diff in ["standard", "wanderer"]:
-		diff = "standard"
+	# BATCH BM §5: DOD_SIM_DIFFICULTY names a RUNG — wanderer | warden | ruin.
+	# Batch Y's "standard" still resolves (Run.difficulty_id maps it to
+	# warden, the rung tuned at the present balance) so every old script and
+	# Matrix row reads. Default is rung 1, which is the rung an untalented
+	# party is meant to meet.
+	var diff: String = run.difficulty_id(OS.get_environment("DOD_SIM_DIFFICULTY"))
 	run.new_run(["warrior", "mage", "cleric", "hunter"], relics, diff)
+	diff_id = diff
+	diff_rung = run.difficulty_rung()
+	install_builds(run)
 	var default_specs := ["berserker", "cryomancer", "inquisitor", "beastmaster"]
 	var specs := default_specs
 	var env := OS.get_environment("DOD_SIM_SPECS")
@@ -218,14 +234,13 @@ static func start_run(run: Node) -> void:
 		run.party[i]["spec"] = spec
 		run.party[i]["tree"] = Talents.generate_tree(spec, run.party[i]["key"])
 		run.sync_spec_hp(i)  # awakening HP sync — same call as the spec screen
-		run.award_spec_point(i)  # Batch AI: the awakening's own talent point
+		run.equip_spec_talents(i)  # BATCH BM: the meta loadout, locked here
 		var run_sn := String(Classes.SPEC_INFO[spec]["name"])
 		spec_runs[run_sn] = int(spec_runs.get(run_sn, 0)) + 1
 	# Batch AE: the sim gets the opening pick too, resolved through the same
 	# _pick_rune_candidate policy the elite cache uses — otherwise the
 	# harness measures a different game than the one shipping.
 	run.specs_chosen = true
-	_run_spent = 0
 	_run_gold_spent = 0
 	_run_r8 = -1.0
 	if not walk_to_next_fight(run):
@@ -311,6 +326,7 @@ static func walk_to_next_fight(run: Node) -> bool:
 			node["theme"] = run.last_theme
 		run.encounter = {"type": ty, "enemies": warband,
 			"theme": node.get("theme", "Warband")}
+		run.arm_fixed_modifier(ty)  # BATCH BM §5: rung 3's second twist
 		return true
 	return false  # unreachable: the loop only leaves through a return
 
@@ -605,14 +621,14 @@ static func note_battle_start(run: Node, heroes: Array, enemies: Array,
 	if _cur_tier == "1,8":
 		_run_r8 = sqrt((p_atk * p_ehp) / maxf(e_atk * e_ehp, 1.0))
 	# Correctness check 2 (the batch doc): heroes must enter the boss with
-	# a real build, not base kits.
-	if String(run.encounter.get("type", "")) == "boss":
+	# a real build, not base kits. BATCH BM: the build is the EQUIPPED
+	# loadout, fixed before the run, so this counts what was equipped rather
+	# than what was bought along the way.
+	if String(run.encounter.get("type", "")) in ["boss", "endboss"]:
 		boss_entries += 1
 		var nodes := 0.0
 		for m in run.party:
-			for tid in m.get("talents", {}):
-				if int(m["talents"][tid]) > 0:
-					nodes += 1.0
+			nodes += float((m.get("talents", {}) as Dictionary).size())
 		boss_nodes_sum += nodes / maxf(run.party.size(), 1.0)
 
 
@@ -637,7 +653,6 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		# branch (Batch BJ §1) — it can no longer drift from the real one.
 		battle.heroes[i].sync_victory_state(run.party[i])
 	var node_type := String(run.encounter.get("type", "fight"))
-	run.award_talent_points(node_type)
 	run.award_gold(node_type)
 	if node_type == "elite":
 		var looter: Dictionary = run.party.pick_random()
@@ -693,7 +708,6 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		merchants_bought += 1
 		if shops_on:
 			_shop_visit(run)
-	_spend_talents(run)  # the post-battle party screen, boiled to policy
 	if run_over:
 		_finish_run(run, battle, true)
 		return
@@ -708,9 +722,6 @@ static func _finish_run(run: Node, battle, done: bool) -> void:
 	runs_done += 1
 	if done:
 		completed += 1
-	talent_spent += _run_spent
-	for m in run.party:
-		talent_left += int(m.get("talent_points", 0)) + int(m.get("talent_flex", 0))
 	# Gold ledger (Batch U): earned = everything the run ever held (start
 	# gold + income, net of event losses), so earned = spent + unspent.
 	gold_spent += _run_gold_spent
@@ -800,33 +811,40 @@ static func _award_trophies(run: Node) -> void:
 		ability_taken += 1
 
 
-# Spend every point the policy can: same bookkeeping as the party screen's
-# _learn_talent (1 point a node, the purse can_learn names), driven by
-# _next_buy.
-static func _spend_talents(run: Node) -> void:
-	for m in run.party:
-		var tree: Array = m.get("tree", [])
+# BATCH BM — THE BOT NO LONGER SPENDS POINTS, IT EQUIPS A LOADOUT. Talents
+# are meta progression now: there is no in-run purse, and what a run wears is
+# decided before it starts. DOD_SIM_BUILDS still names a lane per spec and
+# still means "that lane's node in every row"; DOD_SIM_ROWS says how many of
+# the nine rows the build is allowed to fill, which is what makes §7's
+# "rows 1-3 at rung 1, 1-6 at rung 2, 1-9 at rung 3" measurable.
+#
+# IT NEVER READS Profile. A sim that read the player's ledger would make
+# every baseline depend on whoever ran it; the loadout is installed on
+# `Run.sim_talents` and `Run.equip_spec_talents` reads that under sim_run.
+static func install_builds(run: Node) -> void:
+	var loadout := {}
+	for spec in Classes.all_specs():
+		var tree: Array = Talents.generate_tree(String(spec), "")
 		if tree.is_empty():
 			continue
-		var target := _target_lane(String(m.get("spec", "")), tree)
-		for guard in 200:  # one buy per loop; 200 = runaway insurance
-			var buy := _next_buy(m, tree, target)
-			if buy == "":
-				break
-			var learned: Dictionary = m.get("talents", {})
-			# Batch AN: `Talents.purse_for` decides, exactly as the hero
-			# sheet does — flex first while it holds anything, ordinary
-			# points after. Reading `pool` raw here would strand the surplus
-			# in the bank, and the sim would report a tree three nodes
-			# shallower than a player's.
-			var purse := Talents.purse_for(m,
-				Talents.can_learn(tree, buy, learned))
-			if purse == "":
-				break
-			learned[buy] = 1
-			m["talents"] = learned
-			m[purse] = int(m.get(purse, 0)) - 1
-			_run_spent += 1
+		var target := _target_lane(String(spec), tree)
+		var learned := {}
+		for row in range(1, mini(rows_built, Talents.CAPSTONE_ROW) + 1):
+			var picked := ""
+			for t in Talents.row_nodes(tree, row):
+				if String(t.get("lane", "")) == target:
+					picked = String(t["id"])
+					break
+			# The capstone shelf has no lane purity, so a lane whose shelf
+			# entry sits elsewhere still takes one — the first on the shelf.
+			if picked == "" and row == Talents.CAPSTONE_ROW:
+				var shelf := Talents.row_nodes(tree, row)
+				if not shelf.is_empty():
+					picked = String(shelf[0]["id"])
+			if picked != "":
+				learned[picked] = 1
+		loadout[String(spec)] = learned
+	run.sim_talents = loadout
 
 
 static func _target_lane(spec: String, tree: Array) -> String:
@@ -848,44 +866,6 @@ static func _pick_rune_candidate(member: Dictionary, candidates: Array) -> Dicti
 		if String(c.get("scope", "")) == "spec:%s" % spec:
 			return c
 	return candidates[0]
-
-
-# The next node the policy buys (Batch AI: rows, not lanes).
-#   Normal points: the target lane's node in the lowest open row, and the
-#   target lane's capstone once the shelf opens. A lane holds exactly one
-#   node per row, so a pure-lane build is always available — no spillover
-#   rule is needed to keep the bot spending.
-#   Surplus: a SECOND node in the lowest row that has one pick, taken from
-#   the next lane in tree order. Deliberately dumb and deterministic.
-# "" = nothing learnable with anything the hero is carrying — bank it.
-#
-# BATCH AN: the ROW picks still come first and the SECOND-node picks second,
-# which is the ordering that matters — climbing before widening. What
-# changed is that ordinary points can now pay for the widening once the
-# eight rows are spent, so the second pass runs on `talent_points` too
-# rather than only on a flex purse nothing feeds any more.
-static func _next_buy(m: Dictionary, tree: Array, target: String) -> String:
-	var learned: Dictionary = m.get("talents", {})
-	var lanes: Array = [target]
-	for t in tree:
-		var lane := String(t.get("lane", ""))
-		if not lane in lanes:
-			lanes.append(lane)
-	if int(m.get("talent_points", 0)) < 1 and int(m.get("talent_flex", 0)) < 1:
-		return ""
-	# Row picks before second-node picks: climbing beats widening while a
-	# row is still unopened.
-	for want_pool in ["points", "flex"]:
-		for row in range(1, Talents.CAPSTONE_ROW + 1):
-			for lane in lanes:
-				for t in Talents.row_nodes(tree, row):
-					if String(t.get("lane", "")) != lane:
-						continue
-					var check := Talents.can_learn(tree, String(t["id"]), learned)
-					if check["ok"] and check["pool"] == want_pool \
-							and Talents.purse_for(m, check) != "":
-						return String(t["id"])
-	return ""
 
 
 static func _tier(key: String) -> Dictionary:
@@ -958,10 +938,19 @@ static func _print_report(battle) -> void:
 	var runes_env := OS.get_environment("DOD_SIM_RUNES")
 	var runes_mode := runes_env if runes_env in ["off", "stats"] else "full"
 	print("          runes_pool=%s (DOD_SIM_RUNES: full=authored pool, stats=Common family, off=none)" % runes_mode)
-	var diff := OS.get_environment("DOD_SIM_DIFFICULTY")
-	if not diff in ["standard", "wanderer"]:
-		diff = "standard"
-	print("          map=line (Batch AN: 3 zones x 12 fixed slots; DOD_SIM_MAP/MINIBOSS/START_RUNE/SPEC_OPENING are RETIRED with the branching map)  difficulty=%s (DOD_SIM_DIFFICULTY; alpha testing affordance, NOT balance)" % diff)
+	# BATCH BM: the RUNG this row was walked at, read off the live run rather
+	# than off the env — Batch Y's "standard" still resolves and maps to rung
+	# 2, so an old script's row would otherwise print a name the ladder does
+	# not have. `rows=` is the equipped loadout's depth, which is the OTHER
+	# axis §7 pairs with the rung.
+	# THE INJECTION DISCIPLINE (the Events pattern): a class_name script cannot
+	# name an autoload — `Run` does not resolve here, and a --script test proves
+	# it by failing to compile. Both are cached at start_run, where the run
+	# object is in hand.
+	var diff := diff_id
+	var rung := diff_rung
+	print("          map=branch (BATCH BM: 3 zones x 16 slots + the END BOSS = 49 encounters)  difficulty=%s rung %d of 3 (DOD_SIM_DIFFICULTY)  rows=%d of %d equipped (DOD_SIM_ROWS)" % [
+		diff, rung, rows_built, Talents.CAPSTONE_ROW])
 	var specs_desc := OS.get_environment("DOD_SIM_SPECS")
 	if OS.get_environment("DOD_SIM_ROTATE") == "1":
 		specs_desc = "rotating all twelve (DOD_SIM_ROTATE=1)"
@@ -1155,12 +1144,13 @@ static func _print_report(battle) -> void:
 	var sx_block: String = battle.signature_report_block(battle.sim_stats)
 	if sx_block != "":
 		print(sx_block)
-	var earned := talent_spent + talent_left
-	print("Talent points per hero per run: earned %.1f   spent %.1f (banked %.1f)" % [
-		earned / runs / 4.0, talent_spent / runs / 4.0, talent_left / runs / 4.0])
-	if boss_entries > 0:
-		print("Avg talent nodes owned entering a boss: %.1f (%d boss fights)" % [
-			boss_nodes_sum / boss_entries, boss_entries])
+	# BATCH BM: no earned/spent/banked line — a run neither earns nor spends
+	# talent points. What it wears was decided before it started, and THAT is
+	# what the harness now reports. Meta points banked per run are a Profile
+	# number and deliberately not measured here (a sim never touches Profile).
+	print("Talent rows equipped: %d of %d   (nodes/hero %.1f over %d boss fights)" % [
+		rows_built, Talents.CAPSTONE_ROW,
+		boss_nodes_sum / maxf(boss_entries, 1.0), boss_entries])
 	var ev_parts := PackedStringArray()
 	var ev_ids: Array = event_counts.keys()
 	ev_ids.sort()
@@ -1296,11 +1286,11 @@ static func _print_report(battle) -> void:
 			/ maxf((t8["e_atk"] / f8) * (t8["e_ehp"] / f8), 1.0))
 	# NO BATCH AN-TO-BJ ROW IS COMPARABLE WITH A BK ROW EITHER, and the field
 	# list says so rather than leaving it to be noticed: map= reads `branch`,
-	# depth= is out of 48 SLOTS not 36, and route= is a real axis again rather
+	# depth= is out of 49 SLOTS (BATCH BM added the end boss) not 48, and route= is a real axis again rather
 	# than three names for one walk. A row carrying `map=line` is an AN-to-BJ
 	# row; `map=branch` is BK or later; anything else predates both.
-	print("Matrix row: route=%s  map=branch  diff=%s  econ=%s  power=x%.2f  bargain_sev=%.2f  depth=%.2f+/-%.2f (of 48)  ratio@z1t8=%s  completions=%.0f%%  wipe median slot=%s  choice=%.0f%%" % [
-		route, diff,
+	print("Matrix row: route=%s  map=branch  diff=%s(r%d) rows=%d  econ=%s  power=x%.2f  bargain_sev=%.2f  depth=%.2f+/-%.2f (of 49)  ratio@z1t8=%s  completions=%.0f%%  wipe median slot=%s  choice=%.0f%%" % [
+		route, diff, rung, rows_built,
 		("rich" if OS.get_environment("DOD_SIM_RUNE_ECON") == "rich" else "normal"),
 		power_mult,
 		(offer_severity_sum / float(maxi(offer_count, 1))),

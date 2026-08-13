@@ -21,7 +21,7 @@ func _go() -> void:
 		run.party[i]["tree"] = Talents.generate_tree(run.party[i]["spec"],
 			run.party[i]["key"])
 		run.sync_spec_hp(i)
-		run.award_spec_point(i)
+		run.equip_spec_talents(i)  # BATCH BM: the awakening equips, it does not pay
 	run.specs_chosen = true
 	run.active = true
 	# Give the cards something to render in every state: an owed rune pick,
@@ -70,11 +70,18 @@ func _go() -> void:
 			break
 		run.advance(int(reach2[0]))
 	await _check("res://scenes/map.tscn", "map (zone 3, boss cleared)")
+	# BATCH BM: the build screen, in BOTH its states — a run in flight (it
+	# must draw and lock) and no run (it must draw and be spendable).
+	await _check("res://scenes/talents.tscn", "talents (run in flight, locked)")
+	run.active = false
+	await _check("res://scenes/talents.tscn", "talents (between runs)")
+	run.active = true
 	print("check_flow: %d failures" % bad)
 	quit(1 if bad > 0 else 0)
 
 
 func _check(path: String, label: String) -> void:
+	print("  ... ", label)
 	var scene: Node = (load(path) as PackedScene).instantiate()
 	root.add_child(scene)
 	for _i in 5:

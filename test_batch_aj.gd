@@ -62,9 +62,10 @@ const NODES := {
 	"bz_feast": [7, "Bloodletting", "Blood Tithe"],
 	"bz_enraged": [7, "Fury", "Enraged"],
 	"bz_warcry": [7, "Warpath", "Overkill"],
-	"bz_exsanguinate": [8, "Bloodletting", "Exsanguination"],
-	"bz_undying": [8, "Fury", "Undying Rage"],
-	"bz_rampage": [8, "Warpath", "Rampage"],
+	# BATCH BM moved the capstone shelf to row 9 (rows 1-8 are lanes now).
+	"bz_exsanguinate": [9, "Bloodletting", "Exsanguination"],
+	"bz_undying": [9, "Fury", "Undying Rage"],
+	"bz_rampage": [9, "Warpath", "Rampage"],
 }
 
 # id -> [stat field, value the PAYLOAD writes]. Only the nodes whose
@@ -176,7 +177,7 @@ func _node(id: String) -> Dictionary:
 
 func _tree_shape() -> void:
 	var tree := _tree()
-	ok(tree.size() == 24, "the Berserker tree holds 24 nodes (got %d)" % tree.size())
+	ok(tree.size() == 27, "the Berserker tree holds 27 nodes (got %d)" % tree.size())
 	var seen: Dictionary = {}
 	var grid: Dictionary = {}
 	for n in tree:
@@ -187,16 +188,16 @@ func _tree_shape() -> void:
 		var key := "%d/%s" % [int(n["row"]), String(n["lane"])]
 		ok(not grid.has(key), "row %s holds one node (%s)" % [key, id])
 		grid[key] = id
-	# Rows 1-7 are full 3-wide; row 8 is the capstone shelf, also 3-wide but
-	# flagged, and NOT lane-gated.
-	for row in range(1, 9):
+	# BATCH BM: rows 1-8 are lane rows, all 3-wide; row 9 is the capstone
+	# shelf, also 3-wide but flagged, and NOT lane-gated.
+	for row in range(1, Talents.CAPSTONE_ROW + 1):
 		for lane in ["Bloodletting", "Fury", "Warpath"]:
 			ok(grid.has("%d/%s" % [row, lane]),
 				"row %d has a %s node" % [row, lane])
 	for n in tree:
 		var is_cap: bool = int(n["row"]) == Talents.CAPSTONE_ROW
 		ok(bool(n.get("capstone", false)) == is_cap,
-			"%s carries the capstone flag iff it is on row 8" % String(n["id"]))
+			"%s carries the capstone flag iff it is on the shelf" % String(n["id"]))
 
 
 # ---------- 2. every id, row, lane and name ----------

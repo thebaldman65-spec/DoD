@@ -23,6 +23,11 @@
 #      double-granted either way.
 #   6. LIVE — a spawned battle, because the BD spread, the parry spike, the
 #      parry counter and Execute's pricing only exist at cast time.
+# BATCH BM RE-POINTED THIS FILE IN PLACE, mechanically and in two ways only:
+# the capstone SHELF moved from row 8 to row 9 (rows 1-8 are lane rows now),
+# and the tree gained a ROW-8 NODE PER LANE, so 24 became 27. Every magnitude,
+# every id and every question this file asks is otherwise untouched — the
+# tables below are the batch's own record of its 24 nodes and stay that.
 extends SceneTree
 
 const REAL_SAVE := "user://run_save.bin"
@@ -57,9 +62,9 @@ const NODES := {
 	"sm_deep_thrust": [7, "Blade", "Tempo", "tempo_ranks", 1],
 	"sm_composure": [7, "Poise", "Deflection", "deflection", 1],
 	"sm_guarded": [7, "Breaker", "Off Balance", "off_balance_ranks", 1],
-	"sm_execute": [8, "Blade", "Execute", "", 0],
-	"sm_untouchable": [8, "Poise", "Untouchable", "untouchable", 1],
-	"sm_en_garde": [8, "Breaker", "Guard Breaker", "guard_breaker", 1],
+	"sm_execute": [9, "Blade", "Execute", "", 0],
+	"sm_untouchable": [9, "Poise", "Untouchable", "untouchable", 1],
+	"sm_en_garde": [9, "Breaker", "Guard Breaker", "guard_breaker", 1],
 }
 
 # The number the tooltip must render for the nodes whose whole content is a
@@ -198,9 +203,17 @@ func _pools_resolve() -> void:
 
 func _tree_shape() -> void:
 	var tree: Array = Talents.generate_tree("swordmaster", "warrior")
-	ok(tree.size() == 24, "the tree is 24 nodes (has %d)" % tree.size())
+	ok(tree.size() == 27, "the tree is 27 cells (has %d)" % tree.size())
 	var seen := {}
 	for node in tree:
+		# BATCH BM: this batch's table is THIS BATCH'S RECORD OF ITS OWN 24
+		# NODES, and BM added a ROW-8 node to every lane. The walk skips row 8
+		# rather than being taught the three new ids: what the check exists to
+		# prove is that the twenty-four survive UNCHANGED, and asserting that
+		# nothing else exists would make every later addition a failure here
+		# instead of in the batch that made it.
+		if int(node["row"]) == 8:
+			continue
 		var id := String(node["id"])
 		ok(NODES.has(id), "'%s' is a node the layout table names" % id)
 		ok(not seen.has(id), "'%s' appears once" % id)
@@ -216,8 +229,8 @@ func _tree_shape() -> void:
 			"'%s' sits in lane %s, want %s" % [id, node["lane"], want[1]])
 		ok(String(node["name"]) == String(want[2]),
 			"'%s' is named '%s', want '%s'" % [id, node["name"], want[2]])
-		ok(node.get("capstone", false) == (int(want[0]) == 8),
-			"'%s' is flagged capstone iff it sits in row 8" % id)
+		ok(node.get("capstone", false) == (int(want[0]) == Talents.CAPSTONE_ROW),
+			"'%s' is flagged capstone iff it sits on the shelf" % id)
 	for id in NODES:
 		ok(seen.has(id), "'%s' kept its id through the re-author" % id)
 	# One node per lane per row, the Batch AI rule the class batch must not

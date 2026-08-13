@@ -5,6 +5,235 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-12 &mdash; Batch BM: talents become meta progression</h2>
+<p><i>The largest design change in the project's history. Talents stop being an in-run reward
+and become a <b>permanent, vertical meta layer</b>: points are earned per spec per completed
+zone, banked forever, and spent between runs. Rows unlock by beating the end boss at
+escalating difficulty. A fresh save has no rows and no points.
+<b>NO BALANCE WAS TUNED IN THIS BATCH.</b> Every figure in &sect;7 below is a NEW BASELINE,
+and the batch that creates a baseline must not correct against it &mdash; that is how four
+consecutive Devout batches went wrong. Difficulty and magnitude tuning are the designer's,
+recorded here so they are not rediscovered as an omission.</i></p>
+
+<h3>&sect;4 &mdash; The structure, first, because everything else is downstream of it</h3>
+<p><b>BUYING A CELL UNLOCKS AN OPTION. IT DOES NOT EQUIP IT.</b> This is the load-bearing
+distinction in the whole design and it is the thing a later batch would most easily collapse.
+A cell is bought once, permanently, out of that spec's banked points. Equipping is a separate
+act: <b>you still pick ONE node per row, and it locks for the run.</b> Owning all three cells
+in a row means that row is a real three-way argument; owning one means it has no argument in
+it. <b>That is why twenty batches of row pricing describe the endgame rather than needing a
+third pass</b> &mdash; a row is still priced against two closed doors.</p>
+<ul>
+<li><b>Earning:</b> 1 point per spec per <b>zone boss</b> defeated. Three zone bosses, so
+<b>3 per spec per completed run</b>, and a run that dies in zone 2 still banks 1 or 2 &mdash;
+that partial credit is the mechanism, not a separate rule. Only specs that were in the party
+earn. Points are per spec and never transfer. Banking is uncapped.</li>
+<li><b>Spending:</b> cells cost by tier &mdash; rows 1&ndash;3 cost 1, rows 4&ndash;6 cost 2,
+rows 7&ndash;9 cost 3. <b>27 cells = 54 points to fill one spec</b>, which at 3 a run is
+eighteen completions.</li>
+<li><b>Respec:</b> free, any time <b>outside</b> a run, never during one. Nothing is spent
+per run; the 54 points are a permanent unlock ledger, not a per-run budget.</li>
+<li><b>Row gating is GLOBAL</b> &mdash; rows 1&ndash;3 at difficulty 1, 4&ndash;6 at 2,
+7&ndash;9 at 3, for every spec at once. Points are per spec; rows are not. <b>A tier arrives
+fully unlocked</b>, which is what an uncapped bank is for.</li>
+<li><b>The ledger lives on <code>Profile</code></b>, which already survived outside the run
+save. <b>Profile is v2, with the tolerant load it always had</b>: an existing profile arrives
+with zero points and zero rows, the correct state for a save that has never completed a run
+under this system. <b>The run save is v10 and a pre-v10 save is REFUSED and cleared</b>
+&mdash; the final zone gained a seventeenth slot, so a v9 map has no position to walk onto
+after its boss, and inventing one is worse than a wipe that says so.</li>
+<li><b>The build screen</b> (<code>scenes/talents.tscn</code>) is reachable from the main
+menu and from the draft. Per spec: points available, the row grid with locked / owned /
+equipped states, tier costs, and a free respec. <b>In-run the tree is read-only</b> and the
+hero sheet says so in its header.</li>
+</ul>
+<p><b>A discrepancy in the brief, flagged rather than resolved silently:</b> the designer said
+a first completion grants <b>5</b> points per spec; the mechanism pays <b>3</b>. Three ships,
+because it is what the mechanism produces and because rows 1&ndash;3 at tier-1 prices cost
+exactly 3 &mdash; the first completion buys a complete minimal build, one node per row. <b>If
+a first-completion bonus was intended, it is one number and it is not in this batch.</b></p>
+
+<h3>&sect;2 &mdash; Thirty-six new row-8 nodes, with the rationale for each</h3>
+<p>Every tree is <b>9 rows</b> now: 1&ndash;8 are lane rows, 9 is the capstone shelf. Row 8 is
+not "row 7 but bigger" &mdash; it is <b>the node that only matters once the rest of the lane
+is bought</b>. Each one reads an accumulated quantity the lane has spent seven rows building,
+removes a constraint the lane has worked around, or converts the lane's currency into
+something it could not previously buy. <b>None is a larger magnitude of a node above it</b>,
+and that is asserted structurally rather than promised: test_batch_bm walks every lane and
+fails any row-8 payload that writes a stat field an earlier node in the same lane writes.</p>
+<table border="1" cellpadding="4">
+<tr><th>Spec / lane</th><th>Node</th><th>Why it is a row 8</th></tr>
+<tr><td><b>Berserker</b><br><i>Bloodletting</i></td><td><b>Slaughterhouse</b> — Blood buildup no longer resets when an enemy bleeds out — it falls to 50 instead, so the same enemy can bleed out again and again.</td><td>CONVERTS — bleedout stops being terminal for the meter, so the four nodes downstream of a bleedout event can fire on one enemy again and again.</td></tr>
+<tr><td><b>Berserker</b><br><i>Fury</i></td><td><b>Last Rites</b> — While below 25% health, damage is taken out of Rage first — 1 Rage per point of damage — and only bites health once the tank is empty.</td><td>REMOVES A CONSTRAINT — the lane sells living low and low is what kills him; the Rage two lanes pile up becomes health.</td></tr>
+<tr><td><b>Berserker</b><br><i>Warpath</i></td><td><b>Bloodwake</b> — +1% damage for every 4 Rage the Berserker is currently holding.</td><td>READS AN ACCUMULATION — seven rows fill the tank and nothing has ever paid for HOLDING it, so the lane gains its first argument against spending.</td></tr>
+<tr><td><b>Swordmaster</b><br><i>Blade</i></td><td><b>Whetstone</b> — Every critical strike permanently raises the Swordmaster&#x27;s Attack by 3 for the rest of the battle.</td><td>READS AN ACCUMULATION — five crit nodes all pay per HIT; this pays for the VOLUME of crits a whole fight produces.</td></tr>
+<tr><td><b>Swordmaster</b><br><i>Poise</i></td><td><b>Waiting Guard</b> — Every turn the Swordmaster is not struck, he banks a Guard — the next attack against him is parried automatically. He may bank 3.</td><td>REMOVES A CONSTRAINT — parry is a dice roll the lane can deepen but never plan around; waiting banks certainty instead of a bigger number.</td></tr>
+<tr><td><b>Swordmaster</b><br><i>Breaker</i></td><td><b>Overpressure</b> — Break damage the Swordmaster deals past a full meter is not wasted — it lands as damage instead, 100% of a point apiece.</td><td>CONVERTS — Break dealt past a full meter is pure waste today; it becomes damage, the one thing Break cannot buy.</td></tr>
+<tr><td><b>Warden</b><br><i>Plate</i></td><td><b>Debt of Iron</b> — Every point of damage his armor and Blocks refuse is banked. Crushing Blow spends the bank, dealing 10% of it as bonus damage.</td><td>CONVERTS — seven rows prevent damage and prevention buys nothing; the bank pays out through the one button he swings.</td></tr>
+<tr><td><b>Warden</b><br><i>Threat</i></td><td><b>The Whole Room</b> — Taunts the Warden applies never expire.</td><td>REMOVES A CONSTRAINT — Provoke widens the taunt and the clock still runs it out. The room stays angry.</td></tr>
+<tr><td><b>Warden</b><br><i>Banner</i></td><td><b>Standard Bearer</b> — Every ally is protected by 50% of the Warden&#x27;s own armor value, on top of their own.</td><td>CONVERTS — his armor is the deepest number in the tree and has always been his alone; Banner&#x27;s thesis is that it should not be.</td></tr>
+<tr><td><b>Pyromancer</b><br><i>Kindling</i></td><td><b>Sea of Flame</b> — +7% fire damage for every enemy currently Burning.</td><td>READS AN ACCUMULATION — pays for HOW MUCH of the field is lit rather than for lighting it.</td></tr>
+<tr><td><b>Pyromancer</b><br><i>Inferno</i></td><td><b>Forge Body</b> — Every point of Mana Overburn drains is thrown at a random enemy as 100% of a point of fire damage.</td><td>CONVERTS — Overburn&#x27;s drain is the lane&#x27;s whole cost, and it becomes the lane&#x27;s output. The cost itself is unchanged.</td></tr>
+<tr><td><b>Pyromancer</b><br><i>Detonation</i></td><td><b>Powder Keg</b> — 30% of the damage each Detonation deals is banked and added to the next one.</td><td>READS AN ACCUMULATION ACROSS CASTS — an axis the lane has never had. Cataclysm eats the field in one blast; this eats time.</td></tr>
+<tr><td><b>Cryomancer</b><br><i>Winter</i></td><td><b>Winter&#x27;s Depth</b> — Every stack of Chilled lowers its bearer&#x27;s Constitution by 8% — the colder they are, the easier they Break.</td><td>CONVERTS — stacks buy damage, slow and freezes; they have never bought Break. (The direction asked for self-sustaining accumulation and Eternal Winter already IS that — see the deviation note below.)</td></tr>
+<tr><td><b>Cryomancer</b><br><i>Deep Freeze</i></td><td><b>Cold Storage</b> — At the start of each of his turns every ally regains 5% of their maximum resource for each enemy he is holding.</td><td>READS AN ACCUMULATION — how many he is holding — and pays the PARTY a second currency for as long as the hold lasts.</td></tr>
+<tr><td><b>Cryomancer</b><br><i>Thaw</i></td><td><b>Frostbound Hours</b> — Releasing a hold takes one turn off every hero&#x27;s cooldowns for every 3 turns the enemy spent held.</td><td>READS AN ACCUMULATION — turns held, the same charge Shatter is paid on — and buys the party TIME with it.</td></tr>
+<tr><td><b>Arcanist</b><br><i>Resonance</i></td><td><b>Harmonic Convergence</b> — Every 10 stacks of Resonance he holds, all Resonance gains are increased by 1.</td><td>READS AN ACCUMULATION — the build rate reads the build, exactly as the direction asked. THIS IS THE LANE TO WATCH: AT §3 measured that build rate beats per-stack value quadratically.</td></tr>
+<tr><td><b>Arcanist</b><br><i>Overload</i></td><td><b>Blowback</b> — 100% of all recoil is dealt to the enemy team instead of to him, split evenly between them.</td><td>CONVERTS — the bill becomes an asset: recoil is redirected outward instead of paid.</td></tr>
+<tr><td><b>Arcanist</b><br><i>Entropy</i></td><td><b>Entropy&#x27;s Toll</b> — At the end of each of his turns the Arcanist pays 5% of his current health and banks 3 Resonance.</td><td>CONVERTS, from the other side of Perfect Conversion&#x27;s ground — that capstone REFUSES self-harm; this one SPENDS it deliberately.</td></tr>
+<tr><td><b>Holy</b><br><i>Radiance</i></td><td><b>Font of Light</b> — Overhealing is drawn back as Mana — 1 Mana for every 2 points wasted.</td><td>CONVERTS — overhealing is the lane&#x27;s waste product and seven rows make more of it; here it becomes the resource that pays for casting.</td></tr>
+<tr><td><b>Holy</b><br><i>Mercy</i></td><td><b>Communion of Mercy</b> — Every stack of Mercy the Cleric holds grants the whole party 2% damage reduction.</td><td>READS AN ACCUMULATION — Mercy HELD has only ever paid her; it becomes party mitigation, a currency the meter could not buy.</td></tr>
+<tr><td><b>Holy</b><br><i>Vigil</i></td><td><b>Watchtower</b> — When any hero drops below 25% health the Cleric&#x27;s turn comes immediately (at most once a turn).</td><td>REMOVES A CONSTRAINT — every answer in the lane arrives on her turn, and her turn is the one thing she cannot schedule.</td></tr>
+<tr><td><b>Devout</b><br><i>Bulwark</i></td><td><b>Layered Faith</b> — A Divine Shield cast on an ally who already holds one ADDS to it instead of replacing it, with no limit.</td><td>REMOVES A CONSTRAINT — a second shield REPLACED the first, so the lane&#x27;s whole investment thesis was capped at one cast&#x27;s worth. It compounds across casts now.</td></tr>
+<tr><td><b>Devout</b><br><i>Faith</i></td><td><b>Creed</b> — Faith is held in common: every hero is paid for the HIGHEST peak any hero has reached this battle, not their own.</td><td>READS AN ACCUMULATION ACROSS THE PARTY, and touches NO frequency term — the lane holds three already (BI&#x27;s antagonism rule).</td></tr>
+<tr><td><b>Devout</b><br><i>Zeal</i></td><td><b>Eternal Ground</b> — Consecrated Ground never expires.</td><td>REMOVES A CONSTRAINT — the banners are the lane and the clock is what the lane spends its tempo fighting.</td></tr>
+<tr><td><b>Occultist</b><br><i>Ruin</i></td><td><b>Weight of Ruin</b> — An enemy bearing 8 or more Ruin moves at half speed and cannot be healed.</td><td>THE MARK&#x27;S DEPTH BUYS SOMETHING OTHER THAN DAMAGE — past a depth, Ruin is control.</td></tr>
+<tr><td><b>Occultist</b><br><i>Madness</i></td><td><b>Permanent Delusion</b> — Psychosis, Bewitchment and Hysteria the Occultist applies never expire.</td><td>REMOVES A CONSTRAINT — the maddened stop needing to be maddened again.</td></tr>
+<tr><td><b>Occultist</b><br><i>Leech</i></td><td><b>Blood Communion</b> — Every point of Break damage the Occultist deals heals the lowest-health hero for 20% of its value.</td><td>THE PARTY DRINKS FROM SOMETHING OTHER THAN HIS MARKS — his Break, which the Ruin lane spends rows building and which has never fed anybody.</td></tr>
+<tr><td><b>Beastmaster</b><br><i>devotion</i></td><td><b>Kindred</b> — At 8 or more Loyalty the beast&#x27;s arrival effect fires again at the start of each of the Beastmaster&#x27;s turns.</td><td>LOYALTY BUYS A KIND RATHER THAN A QUANTITY — past a depth the arrival effect stops being something the beast DID and becomes something it DOES.</td></tr>
+<tr><td><b>Beastmaster</b><br><i>pack</i></td><td><b>Instinctive Rotation</b> — Swapping a companion no longer costs the Beastmaster his turn — he acts again immediately.</td><td>ROTATION STOPS COSTING WHAT IT COSTS. BJ measured 0.05 swaps a trash battle; Wild Rotation had already removed the cooldown, so THE COST WAS NEVER THE COOLDOWN — it was the turn.</td></tr>
+<tr><td><b>Beastmaster</b><br><i>handler</i></td><td><b>Ghost Pack</b> — While no beast stands, the Beastmaster&#x27;s attacks still draw a companion strike at 60% power.</td><td>THE BEAST&#x27;S ABSENCE BECOMES AN ASSET — Vengeance inherits a dead beast&#x27;s boon; this inherits its STRIKE.</td></tr>
+<tr><td><b>Sharpshooter</b><br><i>Precision</i></td><td><b>Continuous Aim</b> — Focus pays without a threshold: every point grants +0.6% damage, on top of everything the conversion already buys.</td><td>THE CONVERSION POINT STOPS BEING A THRESHOLD — every point of Focus pays, above the split or below it.</td></tr>
+<tr><td><b>Sharpshooter</b><br><i>Penetration</i></td><td><b>Sunder Shot</b> — The armor the Sharpshooter ignores is also Constitution he ignores: a target resists his Break damage 100% less for each point of his armor penetration.</td><td>ARMOR AND BREAK STOP BEING SEPARATE PROBLEMS — the armor he ignores is Constitution he ignores.</td></tr>
+<tr><td><b>Sharpshooter</b><br><i>Tempo</i></td><td><b>Metronome</b> — When Focus is spent it falls to 50% of what it was rather than to zero.</td><td>THE METER SURVIVES WHAT CLEARS IT — Overkill covers the kill; this covers the PAYOUT.</td></tr>
+<tr><td><b>Survivalist</b><br><i>Venom</i></td><td><b>Cocktail</b> — At the start of a Poisoned enemy&#x27;s turn its Poison gains a stack for every 2 OTHER statuses it carries.</td><td>BREADTH BECOMES SELF-PROPAGATING WITHIN ONE ENEMY. BA&#x27;s contagion reservation holds absolutely: nothing spreads between enemies or from a corpse.</td></tr>
+<tr><td><b>Survivalist</b><br><i>Snares</i></td><td><b>Set and Forget</b> — A sprung trap re-arms itself at the start of the Survivalist&#x27;s next turn.</td><td>REMOVES A CONSTRAINT — a trap is spent the moment it works, so the lane pays a turn for every spring it wants.</td></tr>
+<tr><td><b>Survivalist</b><br><i>Guerilla</i></td><td><b>Practised Hands</b> — Every ability the Survivalist uses takes 1 turn off all his OTHER cooldowns.</td><td>THE COUNT ITSELF BECOMES THE WEAPON — Improvised pays for his first two actions; this pays for every one after them.</td></tr>
+</table>
+<p><b>THE THREE WARRIOR LANE TRIPLES, read and reported for the next batch:</b>
+<b>Berserker</b> &mdash; Bloodletting / Fury / Warpath. <b>Swordmaster</b> &mdash; Blade /
+Poise / Breaker. <b>Warden</b> &mdash; Plate / Threat / Banner.</p>
+<p><b>ONE DEVIATION FROM A STATED DIRECTION, reported rather than glossed.</b> The Cryomancer's
+Winter direction asked for accumulation that becomes self-sustaining without his casts.
+<b>Eternal Winter, the Winter capstone, already occupies exactly that ground</b> (every enemy
+gains a stack each of his turns) &mdash; the same collision the brief itself carved out for
+the Arcanist's Entropy against Perfect Conversion. A second consideration made it a decision
+rather than a preference: <b>the open <code>_hold_release</code>/<code>_hold_freeze</code>
+recursion is reached by freezing more often</b>, and a Winter node that raised freeze
+frequency would have widened a live crash. Winter's Depth converts Chilled into Break
+resistance instead &mdash; a currency the lane has never been able to buy.</p>
+
+<h3>&sect;3 &mdash; The capstone shelf moves to row 9</h3>
+<p>Row 9 holds the three existing capstones per spec, <b>unchanged in effect, every id in
+place, no re-specs and no magnitude changes</b>. It sits <b>behind difficulty 2</b>, so a new
+player cannot take a capstone and reaching one is the meta arc's landmark. This also retires a
+long-standing measurement artefact: <b>capstones stop being something the harness force-learns
+in row 8 as a matter of course.</b></p>
+
+<h3>&sect;5 &mdash; The difficulty ladder</h3>
+<p>Vertical progression with nothing absorbing it means the game only gets easier. Three
+rungs, and the ladder is what rows 4&ndash;9 are for. <b>Every scaling number is provisional
+and is the designer's.</b></p>
+<table border="1" cellpadding="4">
+<tr><th>Rung</th><th>Enemies</th><th>Named twist</th><th>Opens</th></tr>
+<tr><td><b>1 &mdash; Wanderer</b></td><td>&times;0.70</td><td>none</td><td>talent rows 1&ndash;3</td></tr>
+<tr><td><b>2 &mdash; Warden</b></td><td>&times;1.00</td><td><b>the severity floor rises</b>: the guaranteed mild bargain option may be severity 3</td><td>talent rows 4&ndash;6</td></tr>
+<tr><td><b>3 &mdash; Ruin</b></td><td>&times;1.30</td><td>the floor rises again (severity 4) and <b>fixed encounters carry a modifier</b> &mdash; the mini-boss and every boss, which today never do</td><td>talent rows 7&ndash;9</td></tr>
+</table>
+<p><b>RUNG 1 IS TUNED BELOW THE PRESENT BALANCE, DELIBERATELY, AND THAT IS THE THING MOST
+LIKELY TO BE GOT WRONG.</b> BK measured 39.3 / 43.3 / 21.3% completion with a full 8-node
+build; difficulty 1 is played with <b>zero talents</b>. So rung 1 is a new, easier tuning
+&mdash; it reuses Batch Y's existing &times;0.70 rather than inventing a number &mdash; and
+<b>rung 2 IS the present balance, byte for byte</b>, so every BK row still describes it.</p>
+<p><b><code>Run.difficulty</code> was REUSED, not shadowed</b>, and the check is recorded
+rather than assumed: it was already a String var, already saved with the run, already chosen
+at the draft and already armable from <code>DOD_SIM_DIFFICULTY</code>, and it already folded
+into exactly one multiplier at <code>zone_base_mult</code>. Every one of those is what the
+ladder needs, so what changed is the TABLE it keys into. <b>Batch Y's two ids still resolve</b>
+&mdash; "standard" maps to rung 2, the rung it was tuned at &mdash; so every old script and
+Matrix row still reads.</p>
+
+<h3>&sect;6 &mdash; The fourth boss, and the reward table rewired</h3>
+<p><b>A run is 49 encounters now</b>: 3 zones &times; 16, and then <b>THE END BOSS</b> as a
+seventeenth slot on the final zone's board. BK settled on 48. It ships as a <b>placeholder</b>
+&mdash; The Hollow Crown, statted as a hard boss, no bespoke mechanics. It is <b>FIXED, not
+drawn from a pool</b>, so it can be learned, and it <b>gains stats AND mechanics with
+difficulty</b>: a fourth ability at rung 2, a fifth at rung 3. That is a filter over authored
+content (<code>Enemies.config(kind, rung)</code>), not a second kit, and every other enemy in
+the roster reads identically at every rung. <b>It awards a relic, always, and no talent
+points.</b> Beating it is what opens the meta tree's row tiers.</p>
+<p><b>IN-RUN TALENT POINTS ARE DELETED, NOT ZEROED</b>, per the standing rule. Gone with them:
+<code>Run.award_talent_points</code>, <code>Run.award_spec_point</code>,
+<code>member["talent_points"]</code>, <code>member["talent_flex"]</code>,
+<code>Talents.can_learn</code>, <code>Talents.purse_for</code>,
+<code>Talents.points_spent</code>, <code>MAX_PER_ROW</code>, the hero sheet's spend path, the
+map card's points badge and the sim's earned/spent/banked report line. <b>Run.tally never had
+a talent counter</b> &mdash; checked rather than assumed; the brief expected one.</p>
+<p><b>EVERY HISTORICAL FIGURE THOSE SITES PRODUCED IS SUPERSEDED, BK's 10.9 / 10.8 / 6.0
+talent points per hero per run included.</b> They measured a per-run purse that no longer
+exists. Do not compare any post-BM number against them.</p>
+<p><b>Three consequences the brief did not enumerate, each re-specced rather than left with a
+dead hook.</b> The two relics granting <code>start_talent_points</code> &mdash; Waystone Shard
+and Horn of the First War &mdash; bought a purse that no longer exists; both keep their id,
+tier and "you start ahead" role with a different opening currency. The events verb
+<code>talent_points</code> went with its handler, and the <b>five</b> effect instances across
+Blood Altar, Ancient Training Grounds and Echo of the Warden are re-pointed at
+<code>attack_pct</code>, the closest live effect in kind on the same target selectors.
+<b>Magnitudes there are provisional.</b></p>
+
+<h3>&sect;7 &mdash; What it measures, and NOTHING WAS TUNED AGAINST ANY OF IT</h3>
+<p>n=50 a row, balanced route, default first-lane builds (BG's standing confound applies).
+<code>DOD_SIM_ROWS</code> is new and says how many of the nine rows the equipped loadout
+fills, which is what makes "the build that rung expects" measurable at all.</p>
+<table border="1" cellpadding="4">
+<tr><th>Row</th><th>rung</th><th>rows equipped</th><th>completions</th><th>depth (of 49)</th><th>ratio@z1t8</th></tr>
+<tr><td><b>THE GATE NUMBER</b> &mdash; a fresh save</td><td>1</td><td><b>0</b></td><td><b>12%</b></td><td>32.46 &plusmn;1.36</td><td>1.28</td></tr>
+<tr><td>a second-run player</td><td>1</td><td>3</td><td>52%</td><td>43.44 &plusmn;1.07</td><td>1.26</td></tr>
+<tr><td>the build rung 2 expects</td><td>2</td><td>6</td><td>0%</td><td>31.82 &plusmn;1.56</td><td>0.91</td></tr>
+<tr><td>the build rung 3 expects</td><td>3</td><td>9</td><td>18%</td><td>34.38 &plusmn;1.89</td><td>0.67</td></tr>
+<tr><td>EIGHT picks, matched rung</td><td>2</td><td>8</td><td>8%</td><td>34.78 &plusmn;1.50</td><td>0.88</td></tr>
+<tr><td><b>NINE picks, matched rung</b></td><td>2</td><td>9</td><td><b>68%</b></td><td>45.18 &plusmn;0.93</td><td>0.90</td></tr>
+</table>
+<p><b>THE GATE NUMBER IS 12%.</b> That is difficulty 1 with a party carrying no talents at all
+&mdash; the state a fresh save is in, and the gate the entire meta layer sits behind. It is
+reported and <b>not corrected</b>; whether 12% is the right number for a first run is a
+designer's call, and the lever is rung 1's multiplier, which is one float in one place.
+The second row is what a player faces once their first completion has bought them rows
+1&ndash;3: <b>12% &rarr; 52%</b> for three points. The meta layer is doing something.</p>
+<p><b>THE NINE-PICK ROW IS THE FINDING OF THE BATCH, AND IT IS BIGGER THAN &sect;7 EXPECTED.</b>
+Eight picks and nine picks at the SAME rung read <b>8% and 68%</b>, depth 34.78 and 45.18. The
+ninth pick is the CAPSTONE (row 9 is the shelf), so what this measures is that
+<b>a capstone is worth more than the eight lane nodes beneath it put together</b> &mdash; and
+depth, the low-variance metric, says the same thing at a tenth of the noise. That is the
+number &sect;7 asked for ("nine picks is stronger than anything the AJ&ndash;BA pricing ever
+assumed, and it is now reachable"), answered, and <b>it was not tuned against.</b> Two honest
+caveats travel with it: the harness's build is a PURE LANE, so its capstone is the one its
+seven rows were authored to feed &mdash; a real player's mixed build will read lower; and this
+is one measurement of one construction, not a re-pricing brief.</p>
+<p><b>DOES THE LADDER ABSORB THE TREE? NOT YET, AND THE SHAPE OF THE MISS IS LEGIBLE.</b> The
+three rung-matched rows read <b>52% / 0% / 18%</b>, which is not monotone in either direction.
+Read against the ratio column &mdash; 1.26 / 0.91 / 0.67, clean and monotone &mdash; the
+ladder is unambiguously steeper at every rung, so the non-monotone completions are the TREE
+moving, not the ladder failing to. Specifically: <b>rung 2 with rows 1&ndash;6 is the floor of
+the whole table at 0%</b>, and rung 3 with the full nine beats it at 18% <i>on a harder
+rung</i>. <b>Rows 7&ndash;9 are where the tree's power lives, and rung 2 asks for a build that
+stops one row short of them.</b> Whether the fix is the rung's multiplier, the tier boundary,
+or the capstone's price is a design decision with three plausible answers and no measurement
+yet distinguishing them. <b>NOTHING WAS CHANGED.</b> At n=50 the resolvable difference on
+completions is roughly &plusmn;14 points, which is BK's own standing caution &mdash; never
+publish a three-row completions verdict off n=50 &mdash; and it is why the sentences above
+lean on depth and ratio rather than on the percentages.</p>
+<p><b>BH's fifteen-point leave-one-out grid on a compounding row 8 was NOT run, and that is a
+gap rather than a finding.</b> The lane it is owed on is named in the code: <b>Harmonic
+Convergence (Arcanist, Resonance row 8)</b>, because AT &sect;3 measured that build rate beats
+per-stack value QUADRATICALLY on a triangular curve, and a node whose whole subject is the
+build rate is the most dangerous shape in the batch. The harness is one
+<code>DOD_SIM_TALENTS</code> string with the id withheld.</p>
+
+<h3>&sect;9 &mdash; Tests</h3>
+<p><b>NEW test_batch_bm.gd, 1890 checks / 0 failures.</b> Structure (every tree 9&times;3 plus
+3 capstones, every id present and disjoint across the roster, valid condition references, and
+<b>no row-8 node duplicating a stat field above it in its own lane</b>); earning; spending;
+gating; persistence; and <b>the six negative controls the brief names</b>, each built as
+broken state and proven to be rejected &mdash; a purchased cell auto-equipping, points
+transferring between specs, a per-spec row tier, an in-run talent award, equipped talents
+changing mid-run, and a row-8 node that is a row-4 node with a bigger number.</p>
+<p>Regression: <b>SIX SUITES RE-POINTED IN PLACE with the reason in each file</b>
+(test_batch_ai &mdash; whose gating, elite-crack and economy sections described the purse BM
+deleted and are REPLACED by test_batch_bm's rather than half-repaired &mdash; plus aj, bc, bg,
+bh and bi). VERIFIED: check_parse 0 &middot; 13 scenes 0 SCRIPT ERROR &middot; a full
+<code>--run</code> walks clean and reaches the new end boss.</p>
+
 <h2>2026-08-12 &mdash; Batch BL: enemy intent, and a recap that says what killed you</h2>
 <p><i>Two features, both extensions of machinery that already existed rather than new systems.
 <b>No difficulty tuning in either:</b> BK set new baselines two batches ago, §1 was expected to
