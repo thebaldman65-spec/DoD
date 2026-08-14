@@ -20,6 +20,14 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	"bleed", "sunder", "mocked", "stunned", "exposed", "cripple", "dazed",
 	"bewitch", "psychosis", "decay", "ruin", "hysteria",
 	"umbral_sigil", "elem_weak", "melted", "blind", "snared", "caught", "broken",
+	"slow_burn",
+	# BATCH BT — `slow_burn` IS a genuine debuff and is listed as one, which
+	# makes it CLEANSABLE by a mender's Cleansing Rite. That is the counterplay
+	# rather than an oversight (Blight the Well's precedent): a card that makes
+	# an enemy's own fire last longer should be answerable by that warband
+	# spending a turn not healing. `arcane_echo` is deliberately NOT here — it
+	# is a MARK, and it joins `covenant`/`quarry`/`snare_line`/`feinted` below
+	# for the same reason.
 	# BATCH BO §5 — Blight the Well is a genuine DEBUFF and is listed as one,
 	# which makes it CLEANSABLE by a mender's Cleansing Rite. That is the
 	# counterplay, not an oversight: an ability written to punish a healing
@@ -1917,7 +1925,18 @@ func status_stacks(id: String) -> int:
 # Called at the start of this unit's turn. Broken is managed separately;
 # negative turn counts mean "lasts the whole battle".
 func tick_statuses() -> void:
+	# BATCH BT — SLOW BURN (Pyromancer draft). THE FIRE STILL BURNS; IT JUST
+	# DOES NOT GET SHORTER. The DAMAGE tick is a separate pass entirely (the DoT
+	# loop at the top of this unit's turn, which reads the status and never
+	# touches its clock), so holding the countdown here leaves every tick of
+	# damage intact — which is the whole card. Read ONCE, above the loop, so
+	# the marker's own clock and the Burn it is holding cannot disagree about
+	# this turn: `slow_burn` decrements normally on the same pass, which is
+	# what makes three turns of marker exactly three turns of held fire.
+	var burn_held := has_status("slow_burn")
 	for s in statuses:
+		if s.id == "burn" and burn_held:
+			continue
 		if s.id != "broken" and s.turns > 0:
 			s.turns -= 1
 	# Unrelenting Assault: the borrowed Constitution fades with the buff.

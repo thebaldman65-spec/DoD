@@ -628,11 +628,20 @@ meter is ungoverned. meter | what governs it | where the governor lives:
   crit CHANCE (saturates at +50%), everything past buys MULTIPLIER only; Deep Focus moves the
   split point down, floor 1 | FOCUS_CONVERT/FOCUS_STEP + focus_convert()/focus_crit_chance()/
   focus_crit_mult()/lethal_crit_mult(), unit.gd ~605-645 (THE ONE PLACE THE SPLIT IS DECIDED).
-· **Resonance** (uncapped both ends, nothing removes stacks) | the uncapped DAMAGE-TAKEN cost:
+· **Resonance** (uncapped both ends; **TWO EARNED CARDS REMOVE STACKS — see below, and the old
+  "nothing removes stacks" is CORRECTED rather than amended**) | the uncapped DAMAGE-TAKEN cost:
   RESONANCE_TAKEN_STEP 0.75%/curve-point on the same triangular curve T(N)=N(N+1)/2, and
   NOTHING may modify that step (deliberate — Conduit and Magi's Wrath name the damage curve
   only) | unit.gd ~543-582 (THE ONE PLACE THE CURVE IS DECIDED), read at battle.gd's
-  strike-target block.
+  strike-target block. **THE TWO SPENDERS, AND NEITHER IS IN HIS OPENING KIT — BOTH MUST BE
+  EARNED: STABILIZE** (boss pool, since AT) vents everything above a floor of 2 for Mana and a
+  ward, and **ARCANE BOLT** (draft pool, Batch BT) pays 15% of Attack a stack and then HALVES what
+  he holds. **THE SHAPES ARE DELIBERATELY DIFFERENT AND MUST STAY SO**: a vent-to-floor is a way
+  OUT of the escalation, a halving is a change of SLOPE — the curve keeps compounding from where it
+  lands. Two spenders with one shape would be one card with two prices (BI's rule, other door).
+  **NEITHER IS A CONTRADICTION TO BE "FIXED"**: AT's "nothing removes it" described the PASSIVE
+  (no decay, no cap, no reset), and an earned spender is the exception a player buys. No test ever
+  asserted the absolute — checked across every suite at BT, not assumed.
 · **Ruin** (uncapped, never clears, detonates every 10th stack — Avatar installs 5) | the
   LIFESTEAL caps at RUIN_LEECH_CAP = 0.40 of the damage dealt, whatever the stacks and
   whatever the talents (Soul Glut included); the amplification is ALLOWED to run |
@@ -699,11 +708,13 @@ draft.** **THE CLASS-WIDE TRANCHE IS PAID IN FULL (Batch BQ then BR) — DO NOT 
 AS OWED.** BQ shipped six MAGE and six CLERIC; **BR shipped six HUNTER and six WARRIOR**, so
 `CLASS_DRAFT_POOLS` is 24 of a target 24 and **THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR
 EVERY HERO IN THE GAME** — no class rolls an empty pool and no offer loses its class card. The
-draft holds **48 of a target ~96**. **WHAT IS STILL OWED IS TRANCHES 2 AND 3 OF THE SPEC POOLS**:
-those are two deep apiece, so a hero worn down by the no-return ledger still fills SHORT. That is
-the visible shape of the REMAINING debt, not a bug — test_batch_br asserts the two-deep spec pools
-AND drives the fill-short rule on a worn-down pool, so it stays visible in code rather than only
-in prose.
+draft holds **57 of a target ~96 (Batch BT)**. **THE SPEC POOLS ARE UNEVEN NOW, AND THAT IS THE
+SHAPE OF THE DEBT RATHER THAN A BUG: the three MAGE specs draft from FIVE apiece; the other nine
+are still at TWO.** BT paid the first third of tranche 2; the Cleric, Hunter and Warrior thirds
+are owed next, and tranche 3 after them. So a Cryomancer's offer comes up FULL where a Warden's
+still fills SHORT — test_batch_bt asserts both halves (five for the Mage three, two for everybody
+else) and test_batch_br still drives the fill-short rule on a worn-down pool, so the debt stays
+visible in code rather than only in prose.
 **CLASS-WIDE AUTHORING RULES, recorded with the arrays so they travel with the content:**
 deliberately UNTIED AND GENERAL (Magic Barrier, not Frostbolt — the test is whether it would
 read as off-theme for ANY spec of that class), and **WEAKER THAN SPEC ABILITIES AND
@@ -769,6 +780,28 @@ does one an absolute parry zeroed: a charge rides a blow that landed.
   AND change whether a missed or blocked strike still applies it, a second unasked change riding
   along. Both are pinned in test_batch_br so a later batch reads the reasoning first.
 
+### STANDING RULE — EVERY ABILITY NAMES WHAT IT BUILDS WITH (Batch BT §1)
+**FROM TRANCHE 2 ONWARD, AN ABILITY THAT CANNOT NAME ITS COMBO HAS NOT BEEN DESIGNED YET.**
+Tranche 1 asked what GAP a card filled, which was the right question against a pool of two — with
+the pool that thin, anything coherent was an improvement. **At five per spec that question stops
+discriminating**: five cards each filling a different gap are still five cards nobody plans a run
+around. So every ability authored from here on NAMES what it is meant to be played beside — which
+TALENT NODE, which OTHER CARD, which CAPSTONE — and the line ships in three places: the comment
+above the definition in `classes.gd`, the `Builds with:` line in master.html's draft table (which
+is what a player actually reads), and the changelog entry. **A CARD THAT APPEARS IN NOBODY'S BUILD
+PLAN IS A CARD THAT FILLS A SLOT.**
+· **IT IS AN ACCEPTANCE TEST, NOT DOCUMENTATION, and test_batch_bt makes it mechanical**: each of
+  the nine must carry both an `AXIS:` and a `SYNERGY:` line in the comment above it. A tranche that
+  skips the line trips.
+· **IT COMPOSES WITH THE OLDER RULES RATHER THAN REPLACING THEM.** The axis line (BO §5) still
+  says what the card is FOR; BD §4's "no ability may be a strictly better version of another in
+  the same pool" still binds; BR §1's name sweep still runs first. The synergy line is what
+  catches the card that passes all three and is still inert.
+· **WHAT IT CAUGHT IMMEDIATELY, and it is why the rule earns its keep: FLASH FREEZE IS STRICTLY
+  DOMINATED BY GLACIAL PRISON on cost, initiative and cooldown.** Writing the synergy line is what
+  forced the comparison. See the BT block for the resolution (the acquisition channel is the
+  distinction, and the perfect is what stops it being dominated outright).
+
 ### STANDING RULE — SWEEP A NAME AGAINST THE WHOLE ROSTER BEFORE AUTHORING IT (Batch BR §1)
 **Every ability, talent node, status and rune.** An ABILITY-vs-ABILITY duplicate is a real break —
 `Classes.pool_ability` is keyed on `display_name`, so two abilities sharing one make the resolver
@@ -786,6 +819,241 @@ call and one string).
   Worse than BP's Precision Strike (same spec, but a node against a SPEC card). Nothing breaks, and
   **the ability's status is `ironclad` with its own chip** precisely so a Warden holding both never
   sees two chips reading the same word.
+
+BATCH BT (08-14) — TRANCHE 2, THE MAGE NINE. **Nine spec draft abilities, three per Mage spec;
+the Mage pools go 2 -> 5 and nobody else moves.** The draft goes 48 -> **57 of a target ~96**.
+Nothing else ships — no talent node, no magnitude, no existing ability changed, no save version
+moves (still v10), and **ZERO new unit-side fields for nine abilities** (BQ's standard: everything
+with a duration is a STATUS, which expires by itself and cannot leak past a battle). **THE
+STANDING RULE THIS BATCH SETS IS THE BLOCK ABOVE — every ability from tranche 2 onward names what
+it BUILDS WITH.** This block is the content, the decisions and the verification.
+**THE NINE, WITH THEIR AXES AND THEIR COMBOS.** Defs live in `Classes.draft_ability` beside BO's,
+BP's, BQ's and BR's, resolved at the top of `pool_ability` as before.
+· **PYROMANCER — hold the bank, multiply it, cash it for something else.** His spine after BS is
+  DEFERRED DAMAGE, and with the drain deleted holding fire no longer costs Mana; what it costs is
+  TURNS. **Slow Burn** (15 Mana, 1.5, 4cd, no target — for 3 turns the Burn on EVERY enemy stops
+  counting down while burning its full damage; *builds with* Powder Keg, Sea of Flame, Cataclysm,
+  and Firestorm's 12-16 burn-turns) · **Stoke** (20, 2.0, 3cd, 8 BD — 25% of Attack, and a Burning
+  target's remaining turns DOUBLED; *builds with* Detonation, Slow Burn, Total Commitment) ·
+  **Funeral Pyre** (25, 2.5, 4cd — consumes ALL Burn on one enemy for a shield worth 150% of the
+  damage it would still have dealt, and Overburn refunds every turn; *builds with* the whole
+  Inferno lane, every node of which is a percentage where this is the flat term).
+· **CRYOMANCER — get a hold, pay before the hold, survive without one.** His two existing cards
+  both ASSUME a hold, so against a boss both were dead for most of the fight. **Flash Freeze** (30,
+  3.0, 5cd — freezes outright whatever the stacks) · **Killing Frost** (20, 2.0, 3cd, aoe, 6 BD —
+  every CHILLED enemy takes 20% of Attack and gains 2 stacks; *builds with* Hypothermia, Frigid
+  Grip, Winter's Depth, Bitter Cold, and Blizzard/Eternal Winter's wide thin spread) · **Hoarfrost
+  Armor** (20, 2.0, 4cd, self — 3 turns of -25% damage taken, and anything that strikes him gains
+  2 stacks of Chilled; *builds with* Frigid Grip, Winter's Depth, Splintering Shards).
+· **ARCANIST — the first thing in the DRAFT that spends.** **Arcane Bolt** (30, 2.5, 4cd, 8 BD —
+  15% of Attack PER Resonance stack, then his stacks are HALVED) · **Inner Arcane** (15, 1.0, 3cd,
+  self — Resonance equal to the enemies still ALIVE, doubled below half health; *builds with* On
+  the Edge and Backlash, so an Entropy build is paid three ways for being nearly dead) · **Arcane
+  Echo** (25, 2.0, 4cd, 6 BD — 20% of Attack, and for 3 turns every damaging HIT he lands anywhere
+  repeats at 30% against this target).
+**THE BRIEF'S ARCANIST PREMISE WAS STALE AND IS CORRECTED TOWARD THE CODE** (the AR §6 / AX §7 /
+BD §3 / AY §1 / BS precedent). §4 says his kit has NO consumer and that Arcane Bolt is the ONE
+exception to "nothing removes Resonance". **STABILIZE HAS BEEN A CONSUMER SINCE BATCH AT** and is
+recorded there as exactly that exception. What is true is the smaller claim — his DRAFT POOL had
+no spender — and it is the more useful one, because it forces the question of how two spenders
+differ. **THEY ARE DELIBERATELY DIFFERENT SHAPES: Stabilize VENTS to a floor of 2 (a way OUT of
+the escalation, boss pool); Arcane Bolt HALVES (a change of SLOPE, draft pool)**, so the curve
+keeps compounding from where it lands rather than restarting. Two spenders with one shape would be
+one card with two prices. **AND NO TEST ANYWHERE ASSERTED "NOTHING REMOVES RESONANCE"** — swept
+across every suite rather than assumed, so §1's "re-point it in place" had nothing to re-point.
+The governor table's row is corrected instead.
+**ARCANE BOLT HALVES *AFTER* THE BLOW, AND THE +1 THAT FOLLOWS IS THE PASSIVE'S, NOT A BUG.** The
+raw block multiplies by the meter he WALKED IN WITH; halving first would quietly pay him for half
+of what the card promises. Every damaging cast then builds 1 Resonance because that is clause 1 of
+the passive, so 4 halves to 2 and the cast's own build takes him to 3 — **carving Arcane Bolt out
+of the passive would be a far bigger change than the card asks for**, and test_batch_bt asserts the
+relationship rather than a bare number so the reason travels with it.
+**THE ECHO COUNTS HITS, NOT CASTS (BR §1), AND ITS HOOK SITS BESIDE ARCANE ARROWS' FOR THAT EXACT
+REASON.** A three-bolt Barrage echoes THREE times, the card says so outright because a player will
+assume otherwise, and it reads `final` — the damage the hit actually dealt — so **the echo carries
+his full multiplier** (the compounding Resonance curve, a crit, a resist and an armor read are all
+already in that number). ONE MARK AT A TIME (Hunter's Mark's rule), the mark carries `src_name` so
+a second Arcanist cannot spend the first one's, and `_echoing` is a re-entrancy lock on the
+`_rime_echoing`/`_bitter_echoing` pattern — an echo that could reach itself is a stack overflow
+rather than a balance question (BN's two-body cycle is what that costs).
+· **A ONE-TAB INDENTATION ERROR MADE IT FIRE ONLY FOR PLAYERS HOLDING ARCANE ARROWS, and it is the
+  most reusable thing in the batch.** The hook landed INSIDE the Arcane Arrows `if` instead of
+  beside it, so it worked perfectly for anyone carrying five arrow charges and did nothing for
+  everyone else. **Nothing crashed and the log simply never printed.** It was caught because the
+  suite drives the echo directly rather than asserting that the cast returned.
+**SLOW BURN STOPS THE TICK-DOWN, NOT THE TICK.** The damage pass and the clock are separate — the
+DoT loop runs at the top of the victim's turn and never touches `turns`, `tick_statuses` decrements
+and never deals damage — so the whole card is ONE guard at the top of `tick_statuses`, read ONCE
+above the loop so the marker's own clock and the Burn it holds cannot disagree about this turn.
+**THE MARKER RIDES THE ENEMY, NOT HIM**, and it rides enemies NOT YET ALIGHT, which is why it is
+**the one card here with NO usable-gate** — casting it before the fire is the setup half of its own
+strongest sequence, and gating on "something is burning" would refuse it. Stated as a decision.
+**STOKE IS A MULTIPLIER RATHER THAN AN ADDITION, DELIBERATELY**: Backdraft already ADDS a flat +2
+turns to every burning enemy, so an additive Stoke would have been Backdraft aimed at one body —
+the Deadfall/Snare Trap duplication BD found, avoided up front rather than discovered later.
+Overburn reads the field BEFORE the doubling (`inferno_turns` is captured at the top of each
+strike), so THIS cast is not paid for the turns it just created and every later one is — Detonation's
+ordering rule since AG, pointed the other way.
+**FUNERAL PYRE USES THE EXISTING SHIELD DOOR, AS §2 INSTRUCTED — the `barrier` status Magic
+Barrier and Divine Shield already share**, so the absorb, the Warded Robes rider and the prevented
+ledger come free and there is no third implementation to disagree with the other two. **DELIBERATELY
+NOT `divine`**, for Magic Barrier's own reason: Faith is the Devout's engine and a Mage's ward
+feeding Conviction would be a spec mechanic leaking out through a Mage card. It is the **FIFTH
+consumer of the ONE refund door** — AR's rule still working, and test_batch_ar's and
+test_batch_bs's pinned call-site counts go **4 -> 5**, which is BO's reason for pinning a count
+rather than the count decaying.
+**THE BOSS CARVE-OUT WAS VERIFIED BEFORE FLASH FREEZE'S TEXT WAS WRITTEN, and the text says what
+the code does.** `_hold_freeze` computes `timed := target.is_boss or not holding`, so a boss
+resists until Broken and a HELD boss shrugs the ice after ONE turn. **The card therefore buys a
+turn against a boss, not a lockdown, and its description says so** — §3's own instruction, and the
+failure it names is a card promising more than it delivers.
+· **`_hold_freeze` GAINED AN OPTIONAL `force`, DEFAULTED OFF**, so its two older callers are
+  byte-identical in behaviour and the carve-out sits exactly where it was. **EXACTLY ONE CALLER
+  ARMS IT — a PERFECT Flash Freeze** — through the same call-site-visible exception Pommel Strike's
+  and Snare Trap's perfects already buy. **A forced boss is still `timed`**, so the perfect buys the
+  turn EARLIER, never a longer one, and the suite asserts the one-turn span in all three states.
+**BREAK DAMAGE ASSIGNED DELIBERATELY (the BO/BP/BQ/BR rule, applied up front).** The brief names no
+figure, so all nine are this batch's. **Stoke 8** and **Arcane Bolt 8**, level with Cinderfall and
+BELOW Fireball's 15 — a card that supplements the free basic must not out-Break it. **Killing Frost
+6** and **Arcane Echo 6**, level with Kindled Mind; Killing Frost below Cinderfall's 8 because it
+only reaches CHILLED enemies. **The other five carry NONE** — they land no blow. **ARCANE BOLT'S
+BREAK IS FLAT RATHER THAN PER-STACK, DELIBERATELY**: a per-stack Break term is Arcane Cannon's and
+Magi's Wrath's axis, and duplicating it here would be the squaring trap AT exists around arriving
+through the Break door.
+**TWO FINDINGS, REPORTED AND NOT RE-TUNED:**
+· **FLASH FREEZE IS DOMINATED BY GLACIAL PRISON ON EVERY NUMBER** — the node is 25 Mana, 2.5, 4cd
+  for the same outright freeze, against 30 / 3.0 / 5cd. **THE DISTINCTION IS THE ACQUISITION
+  CHANNEL AND IT IS REAL**: the node is a bought cell in ONE lane of the tree, so a Winter or Thaw
+  Cryomancer can never have it, while this is drafted by any of them. **Its PERFECT is what stops
+  it being dominated outright** — no node buys the unbroken boss. **Closest two since BR found
+  Cleave nearly War Stomp; recorded rather than discovered later, and the fix a later batch would
+  reach for (make the card cheaper) would make the NODE pointless instead.**
+· **KILLING FROST COLLIDES WITH A LIVE CRYOMANCER TALENT NODE** (`cr_freezing`, Thaw row 2).
+  **SAME SPEC, so a Cryomancer holding the node can draft the card** — the Iron Will shape rather
+  than BP's Precision Strike. **LABEL COLLISION ONLY**: a node's name is not an ability name,
+  nothing resolves it, the node's counter is the stat field `killing_frost` and the card's half is
+  a `special`, and the two share nothing. **Shipped as specified and flagged** (BR §1); renaming
+  either is the designer's call and one string. **Worth knowing that the brief renamed this card
+  FROM Cold Snap to dodge a node collision and landed on that node's lane-mate.** **HOARFROST
+  ARMOR is an ADJACENCY rather than a collision**: `hoarfrost` is a severity-1 battle modifier, so
+  the card's STATUS is `rimeguard` precisely so two chips never read the same word. **The other
+  six names are clean against the whole roster** — swept over every ability, talent node, status
+  and rune, and the sweep ships as a test.
+**THE BOT GOT NO ROTATION, ON PURPOSE.** All nine ride BO §5's wrapper (a drafted ability is
+substituted only when the real rotation came back with the free basic), so **NO existing rotation
+is re-weighted and no measurement taken before this batch stops being comparable** — BP, BQ and BR
+each did the same. What DID change is three **TARGETING** refinements inside that wrapper, each
+closing a case where the default mark makes a card read as inert: **Stoke and Funeral Pyre aim at
+the DEEPEST burning stack** rather than at the lowest-health enemy (very often the one carrying no
+fire), and **Arcane Echo aims at the HIGHEST-health enemy**, because a three-turn mark laid on the
+enemy about to die spends its window on a corpse — Rally's problem through a different door.
+**THREE LOG-HONESTY FIXES, ALL FOUND BY WATCHING A SMOKE RUN AND NONE OF THEM A MECHANICAL FAULT.**
+Flash Freeze's perfect announced "the ice takes an UNBROKEN boss" against a raider; **Inner Arcane
+printed the Resonance it ASKED for rather than what LANDED**, so a hero who cannot hold the meter
+read "+2 Resonance (now 0)" (BC's Blessed Barrier precedent — `_gain_resonance` refuses a unit
+without the meter, and `DOD_SIM_ABILITIES` hands the card to every hero); and Stoke printed "1
+turns". **No test would have been written for any of the three, and all three teach a player the
+wrong rule.**
+**GLOSSARY CORRECTED TOWARD THE CODE, NOT EXTENDED** (86 entries, unchanged count): the **Resonance**
+entry said "the only thing that removes Resonance is Stabilize" and now names both spenders with
+the difference between them, and the **Burn** entry gained the sentence Slow Burn makes necessary.
+No new entry was needed — Funeral Pyre's ward is the existing `barrier` a player already meets
+through Magic Barrier and Divine Shield.
+**VERIFIED — AND PER THE STANDING INSTRUCTION, THAT MEANS THE CODE LANDED AND WORKS. NO SWEEPS,
+NO BANDS, NO BALANCE MEASUREMENT WAS RUN, and none should be quoted from this batch.**
+check_parse 0 · check_flow 0 · check_map_screen OK · run-harness gates 1/2/3 PASS ·
+**NEW test_batch_bt.gd 454/0**.
+**ALL SEVEN CLAUSES §6 NAMED AS ABLE TO SILENTLY DO NOTHING ARE DRIVEN LIVE, and seven are built
+so a broken implementation still fails**: Slow Burn's turn count AND the victim's health are read
+across the same ticks (a frozen status passes one and fails the other, a no-op fails the first);
+Stoke is measured at 3 turns AND at 7, where doubling and any flat addition diverge by
+construction, plus the empty case where an adder would still fire; Funeral Pyre's shield is sized
+against a burn whose turns (5) and tick (8) are DELIBERATELY DIFFERENT numbers, so a turns-only
+read gives 7 and a tick-only read 12 against the true 60; Flash Freeze is driven at an unbroken
+boss, a Broken one and an unbroken one on a perfect with the ONE-TURN span asserted each time;
+Killing Frost is cast on a field holding a chilled half and an unchilled half AT ONCE, and then
+driven from 2 stacks to 4 to prove the flash-freeze branch is not skipped; Arcane Bolt is driven at
+two stack counts AND at ONE, where a halve-first implementation floors to nothing; and Arcane
+Echo's echo is compared as an IDENTITY between a single-strike probe and a three-hit volley, which
+is what tells three per VOLLEY from three per CAST (BR's Aimed Volley construction).
+· **TWO HARNESS FAULTS IN THE SUITE'S OWN FIRST DRAFT, BOTH WORTH RECORDING.** (a) A slice anchored
+  on the bare string `"funeral_pyre":` started HUNDREDS OF LINES EARLY, because the bot's targeting
+  refinement reads `ab.special == "funeral_pyre":` — so the "it is not a divine shield" check was
+  sweeping every Divine Shield in the file. Anchored on the match case AT ITS OWN INDENT now, with
+  a length assertion beside it: **a slice that quietly covers the wrong region is a check that has
+  stopped asking its question** (BE's changelog-anchor lesson through a source-code door).
+  (b) `Talents.LANE_TREES[spec]` is a **FLAT ARRAY** of node dicts, not a dict of lanes; indexing it
+  by lane THREW and **aborted the whole function while the suite still printed "0 failures"** — the
+  BC trap, caught by reading the COUNT rather than only the failures.
+· **COMMENTS ARE STRIPPED BEFORE THE SOURCE-LEVEL CHECKS**, BS's rule: this batch's own comment in
+  the Funeral Pyre case says "DELIBERATELY NOT `divine`" on purpose, and a bare `contains` would
+  fail against working code and invite a later author to "fix" it by deleting the line that
+  explains the decision.
+**FIFTEEN NEGATIVE CONTROLS, each applied to product code and reverted** (classes.gd, battle.gd
+and unit.gd all came back byte-identical by hash): Slow Burn freezing the WHOLE status rather than
+its clock **trips 2**; Slow Burn inert **trips 2**; Stoke ADDING rather than multiplying **trips
+3**; Funeral Pyre reading TURNS and ignoring the tick **trips 4**; the Pyre skipping the refund
+**trips 1**; Flash Freeze forcing on EVERY cast rather than on a perfect **trips 2**; Killing Frost
+hitting every enemy rather than only the Chilled **trips 5**; Killing Frost writing the pile
+directly instead of one stack at a time **trips 1**; Hoarfrost Armor chilling the wrong body
+**trips 1**; Arcane Bolt halving BEFORE the blow **trips 3**; the echo firing once per CAST **trips
+1**; the echo ignoring whose mark it is **trips 1**; Inner Arcane counting the dead **trips 3**;
+Inner Arcane with no health clause **trips 2**; and a spec card leaking into a class pool **trips
+2**. **NONE PASSED**, which is the first battery of controls in several batches where that is true
+— BS had three pass and each found a check with no teeth.
+**SUITES RE-POINTED IN PLACE WITH THE REASON IN EACH FILE, AND FOUR OF THE RE-POINTS ARE
+INVERSIONS** — the honest treatment when a batch pays a debt an older suite was recording.
+**test_batch_br's three "this spec's pool is still TWO deep — tranches 2 and 3 are owed"** became
+"five for the Mage three, two for the other nine, and the Cleric/Hunter/Warrior thirds are owed",
+with the setup byte-identical because it is still what tells the two answers apart; **test_batch_bo,
+bp, bq and br's spec-pool TOTALS go 24 -> 33** and bo's tranche-1 pool literals became a PREFIX
+assertion (a later tranche APPENDS, it does not rewrite, and BO's eighteen stay pinned as literals
+because a swap of two names would keep every count and change what the draft offers);
+**test_batch_ar's and test_batch_bs's `_overburn_refund` call-site counts 4 -> 5**;
+**test_batch_ax's `force := false` count 1 -> 2**, with a companion check that `_hold_freeze`
+THREADS the argument rather than deciding by name — the question that check asks (is the boss
+exception visible at its call site, or hidden in a name test?) is unchanged; and **test_batch_bn's
+`_hold_freeze` source anchor**, which is the re-entrancy guard's position and is unaffected by a
+new parameter.
+**THE MASTER.HTML STAMP GATE IS DUPLICATED EIGHT TIMES NOW** — test_batch_ah, bb, bn, bo, bp, bq,
+br AND bs — **and all eight moved together to Batch BT**. test_batch_bt deliberately does NOT add a
+ninth; the honest fix, if anyone wants one, is still for the newest suite to be the only one that
+checks it.
+**FULL BATTERY GREEN, ZERO FAILURES ANYWHERE**: ah 5500, ah_battle 65, ai 2217, aj 418, ak 528,
+al 560, **ar 735**, as 396, at 470, au 336, av 324, aw 350, **ax 339**, ay 484, az 519, ba 690,
+bb 172, bc 91, bd 69, be 34, bf 78, bg 47, bh 233, bi 88, bj 67, bl 88, bm 1891, **bn 77**,
+**bo 570**, **bp 268**, **bq 738**, **br 1441**, bs 262, **bt 454**, runes 2973, rune_battle 97 —
+all 0 failures. **an reads 3615 and bk 129, both inside their DOCUMENTED run-to-run drift** —
+neither is pinned and neither should be.
+· **FOUR COUNTS MOVED AND EVERY ONE IS EXPLAINED**: **bo 504 -> 570, bp 268 (unmoved), bq 738
+  (unmoved) and br 1441 (unmoved)** — bo's jump is its pool loops walking nine more entries plus
+  the three new depth checks; bn 76 -> **77** and ax 338 -> **339** are one check ADDED by each
+  re-point. **Nothing else moved by one.**
+**LIVE AUTOPLAY CLEAN, 0 SCRIPT ERROR, ALL NINE FIRING IN ORDINARY FIGHTS** — "Slow Burn — Burn
+stops counting down on 3 enemies for 3 turns (it still burns)", "Stoke: Orc Raider's Burn goes 2
+turns to 4" **followed by "4 turns to 8" on the next cast** (the doubling compounding, which is the
+combo visible in the log), "Funeral Pyre — 2 turns of Burn consumed from Orc Chief (worth 12), a
+shield of 24 [PERFECT]" **immediately followed by "Overburn: 2 turns of Burn consumed refunds 2
+Mana"**, "Killing Frost — 63 damage across 3 Chilled enemies, +2 stacks each", and "Arcane Echo:
+Orc Chief answers Quick Shot for 11". **NOTE the smoke's own artefact**: `DOD_SIM_ABILITIES`
+applies its list to EVERY hero, so a Devout casts Flash Freeze in the log — the real draft only
+ever offers spec-matching cards, which is what makes Inner Arcane's "+0 Resonance" line worth
+having.
+**A `--run 6` WAS WALKED ONLY TO EXERCISE RunSim's DRAFT PATH** (`DOD_SIM_DIFFICULTY=warden`):
+**8.17 offers/run, 24.50 cards shown, taken 8.17** — exactly three cards an offer, never short,
+which is the deepened Mage pools measured end to end. **Its Matrix row is NOT a difficulty reading
+and none is quoted.** **THE DESIGNER HAD NO RUN IN FLIGHT and none was created** — no
+`run_save.bin` exists, and **profile.json AND relics.json are byte-identical by hash** across the
+whole battery and the walk.
+**KNOWN-BAD, NOT OURS, AND UNCHANGED: test_batch_ah and test_batch_an both still call
+`Run.award_talent_points`, which BM deleted** — each throws a SCRIPT ERROR that aborts its own
+section while the suite prints 0 failures, so both have been silently under-testing since BM.
+test_runes still prints its pre-existing `start_rune_enabled` SCRIPT ERROR and still reads 2973/0.
+**TWO HARNESS FAULTS OF THE BATTERY SCRIPT'S OWN, worth recording because both read as suite
+failures**: a `grep -E "checks,"` missed every suite that prints "N checks / M failures" with no
+comma, so ten green suites reported as blank; and `test_run_harness` takes `DOD_GATE` and prints
+"FAIL unknown DOD_GATE ''" without it. **zsh's array rule still holds** — `FLAGS=(--fixed-fps 12)`
+and `"${FLAGS[@]}"` for test_batch_bl, never a string (BQ's two lost battery passes).
 
 BATCH BS (08-14) — OVERBURN LOSES THE DRAIN, AND INFERNO BECOMES A LANE. **THE DIAGNOSIS IS
 WORTH MORE THAN THE FIX AND IT IS THE REUSABLE HALF: AN ENTIRE COLUMN EXISTED TO MITIGATE AN

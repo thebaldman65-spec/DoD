@@ -96,6 +96,23 @@ const STATUS_INFO := {
 	"immolate": ["Immolate", "IM", Color(1.0, 0.55, 0.25), "Wrapped in his own fire: he takes 20%\nless damage, and anything that strikes\nhim is set Burning (3 turns)."],
 	"seeding": ["Seeding Embers", "SE", Color(1.0, 0.65, 0.3), "Empowered by a burning death:\nbonus damage on the next turn."],
 	"rime": ["Rime", "Ri", Color(0.75, 0.9, 1.0), "Rimed: every stack of Chilled this\nenemy gains also chills one other\nrandom enemy."],
+	# ---------- BATCH BT: THE MAGE NINE ----------
+	# SLOW BURN's marker rides the ENEMY, not the Pyromancer, because the thing
+	# being held is that enemy's own Burn clock — and it holds an enemy not yet
+	# alight just as well, so fire laid inside the window is held too.
+	"slow_burn": ["Slow Burn", "SB", Color(1.0, 0.72, 0.35),
+		"Banked fire: this enemy's Burn stops\ncounting down. It still burns for its\nfull damage every turn — it just never\ngets shorter."],
+	# HOARFROST ARMOR's status is `rimeguard` and NOT `hoarfrost`: that id is
+	# already a severity-1 battle modifier in Run.MODIFIERS, and two things
+	# wearing one word is how a chip starts lying about which one is up.
+	"rimeguard": ["Hoarfrost Armor", "HA", Color(0.62, 0.85, 1.0),
+		"Sheathed in ice: takes 25% less\ndamage, and anything that strikes him\ngains 2 stacks of Chilled."],
+	# ARCANE ECHO is a MARK, so it is deliberately absent from DEBUFF_IDS —
+	# the `quarry`/`snare_line`/`feinted` rule. It carries the caster's name in
+	# `src_name`, because the echo is HIS and a second Arcanist must not spend
+	# the first one's mark.
+	"arcane_echo": ["Arcane Echo", "AE", Color(0.72, 0.55, 1.0),
+		"Resonating: every damaging HIT its\nmarker lands anywhere repeats at 30%\nagainst this enemy. A three-bolt\nBarrage echoes three times."],
 	"frostbite": ["Frostbite", "Fb", Color(0.45, 0.70, 0.95), "Frostbitten: healing received\nreduced by 50%."],
 	"stabilized": ["Stabilized", "St+", Color(0.55, 0.68, 0.95), "Grounded resonance: takes less\ndamage (10% per stack consumed)."],
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge is spent for this\nbattle — the storm has no feeding\nleft in it."],
@@ -241,6 +258,10 @@ var debug_locked_hero: BattleUnit = null  # debug: every turn goes to this hero
 var debug_cooldowns_off := false  # debug toggle: abilities never cool down
 var _rime_echoing := false  # guards Rime chill-echoes from chaining
 var _bitter_echoing := false  # guards Bitter Cold freezes from cascading forever
+# BATCH BT — Arcane Echo's re-entrancy lock, on the two flags above's pattern.
+# See `_arcane_echo_repeat` for why an echo that could reach itself is a stack
+# overflow rather than a balance question.
+var _echoing := false
 # GLACIAL HOLD's ledger (Batch AS §1) — the enemies the Cryomancer is holding,
 # OLDEST FIRST. See the block above _apply_status for the three clauses.
 var _holds: Array[BattleUnit] = []
@@ -2864,7 +2885,15 @@ func _player_turn(u: BattleUnit) -> void:
 				# branch below, where its pool excludes him for the reason
 				# Covering Guard's does.
 				"field_dressing", "camouflage", "arcane_arrows",
-				"battle_trance", "iron_will", "warcry"]:
+				"battle_trance", "iron_will", "warcry",
+				# BATCH BT. `slow_burn` takes the WHOLE enemy team and the other
+				# two are self, so none of the three has anything to click.
+				# `killing_frost` is NOT here: it carries `aoe`, so it falls
+				# through to the aoe branch below and auto-targets exactly as
+				# Cinderfall and Blizzard already do. `funeral_pyre`,
+				# `flash_freeze`, Stoke, Arcane Bolt and Arcane Echo all name
+				# ONE enemy and fall through to the ordinary target picker.
+				"slow_burn", "hoarfrost_armor", "inner_arcane"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -3139,6 +3168,39 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 			if free_foes.is_empty():
 				continue
 			return [ab, _lowest_hp(free_foes)]
+		# BATCH BT — THREE TARGETING REFINEMENTS, each closing a case where the
+		# DEFAULT mark would make the card read as inert in a smoke test. This is
+		# targeting honesty, not a rotation: NONE of the nine is added to
+		# `_autoplay_pick_kit`, so no existing rotation is re-weighted and no
+		# measurement taken before this batch stops being comparable (BO §5's
+		# rule, kept unchanged by BP, BQ and BR).
+		#
+		# STOKE and FUNERAL PYRE both read ONE enemy's Burn — one doubles it, one
+		# eats it — so both want the DEEPEST stack on the field. `mark` is the
+		# lowest-health enemy, which is very often the one carrying no fire at all.
+		if ab.display_name == "Stoke" or ab.special == "funeral_pyre":
+			var bt_ripest: BattleUnit = null
+			var bt_turns := 0
+			for bt_e in foes:
+				var bt_left := int(bt_e.get_status("burn").get("turns", 0))
+				if bt_left > bt_turns:
+					bt_turns = bt_left
+					bt_ripest = bt_e
+			if bt_ripest != null:
+				return [ab, bt_ripest]
+			# Stoke still lands its 25% on anything, so it falls through to the
+			# ordinary mark; the Pyre never reaches here at all, because its gate
+			# refuses an unlit field outright.
+		# ARCANE ECHO marks an enemy for THREE TURNS, so it wants one that will
+		# still be standing to answer them. Aimed at `mark` — the lowest-health
+		# enemy, i.e. the one about to die — it would spend its whole window on a
+		# corpse, which is Rally's problem arriving through a different door.
+		if ab.display_name == "Arcane Echo":
+			var ae_pick: BattleUnit = foes[0]
+			for ae_e in foes:
+				if ae_e.hp > ae_pick.hp:
+					ae_pick = ae_e
+			return [ab, ae_pick]
 		return [ab, mark]
 	return []
 
@@ -4173,6 +4235,28 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if ab.special == "backdraft" \
 			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
 		return false
+	# ---- BATCH BT: the Mage nine's gates ----
+	# Funeral Pyre CONSUMES a bank; with nothing alight there is no bank, so
+	# there is no shield and no refund — Backdraft's rule exactly.
+	if ab.special == "funeral_pyre" \
+			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
+		return false
+	# Killing Frost only touches CHILLED enemies, so an unchilled field is a
+	# cast that hits nothing at all.
+	if ab.special == "killing_frost" \
+			and not enemies.any(func(e): return not e.dead and e.has_status("chilled")):
+		return false
+	# Arcane Bolt pays per stack: at zero it is a 30-Mana cast for nothing.
+	# ONE stack is a real (small) blow, so the gate is at one and not higher —
+	# choosing when to cash a shallow meter is the decision the card exists for.
+	if ab.display_name == "Arcane Bolt" and u.second_resource < 1:
+		return false
+	# SLOW BURN IS DELIBERATELY UNGATED and that is a decision rather than an
+	# omission. Its marker rides enemies not yet alight, so casting it into an
+	# unlit field and THEN casting Firestorm is a real line of play — gating on
+	# "something is burning" would refuse the setup half of the card's own
+	# strongest sequence. Stoke and Flash Freeze are ungated for the ordinary
+	# reason: both deal or do something to any legal target.
 	# Stabilize: nothing to vent unless stacks sit above the floor (2, plus
 	# Still Mind ranks).
 	if ab.special == "stabilize" and u.second_resource <= 2 + u.still_mind_ranks:
@@ -4225,6 +4309,17 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	if ab.display_name == "Death Ray" and u.second_resource < DEATH_RAY_STACKS:
 		ab_btn.tooltip_text += "\n(Requires %d Resonance — you have %d)" % [
 			DEATH_RAY_STACKS, u.second_resource]
+	# BATCH BT — every gate above SAYS so on the button it darkens, Death Ray's
+	# rule: a button dark for most of a fight reads as a bug rather than as the
+	# condition it is measuring.
+	if ab.special == "funeral_pyre" \
+			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
+		ab_btn.tooltip_text += "\n(Nothing is Burning)"
+	if ab.special == "killing_frost" \
+			and not enemies.any(func(e): return not e.dead and e.has_status("chilled")):
+		ab_btn.tooltip_text += "\n(No Chilled enemy)"
+	if ab.display_name == "Arcane Bolt" and u.second_resource < 1:
+		ab_btn.tooltip_text += "\n(Requires at least 1 Resonance)"
 	_mark_upgraded(ab_btn, u, ab)
 	ab_btn.disabled = not _ability_usable(u, ab)
 	ab_btn.pressed.connect(_on_popup_ability.bind(popup, ab))
@@ -6278,6 +6373,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if ab.display_name == "Pyroblast" and strike_target.has_status("burn"):
 				raw *= 1.5
 				_log("   → Pyroblast lands on burning flesh (+50%%)", "#e08850")
+			# BATCH BT — ARCANE BOLT: 15% of Attack PER RESONANCE STACK, and the
+			# perfect moves the per-stack rate rather than adding a flat lump.
+			# THE STACKS ARE READ HERE AND HALVED AFTER THE STRIKE LOOP (§6's
+			# "halving stacks AFTER, not before"), so the blow is paid on the
+			# meter he actually walked in with. It rides the ordinary raw block
+			# rather than a special precisely so the compounding Resonance
+			# multiplier a dozen lines below still lands on it — spending the
+			# meter and being paid by it in the same cast is the card.
+			if ab.display_name == "Arcane Bolt" \
+					and attacker.second_resource_name == "Resonance":
+				if is_perfect:
+					raw = 0.20 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
+				raw *= float(maxi(attacker.second_resource, 0))
 			# Overburn reads the field as it stands BEFORE this strike eats any
 			# of it — Detonation's own consumption must not shrink the bonus
 			# the consuming cast is paid (Batch AG).
@@ -6756,6 +6864,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 - IRON_WILL_CUT_PCT / 100.0
 				if strike_target.is_hero:
 					_prev(strike_target, iw_was - raw)
+			# BATCH BT — HOARFROST ARMOR's mitigation half. Its RETALIATION half
+			# — whoever strikes him gains 2 stacks of Chilled — is in the
+			# post-strike block beside Immolate's ignite, and the two point the
+			# same way: the blow is softened AND the attacker walks away colder.
+			# Booked to the prevented ledger and credited to HIM, like every
+			# other instrumented mitigation, because it is his own card on
+			# himself.
+			if strike_target.has_status("rimeguard"):
+				var hf_was := raw
+				raw *= 1.0 - HOARFROST_CUT
+				if strike_target.is_hero:
+					_prev(strike_target, hf_was - raw)
 			# Stabilized: grounded resonance blunts incoming blows.
 			if strike_target.has_status("stabilized"):
 				var pv_was := raw
@@ -7574,6 +7694,26 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_apply_status(attacker, "burn", 3,
 					int(round((CRIT_CHANCE + strike_target.crit_bonus) * 100)),
 					_dot_tick("burn", strike_target))
+			# BATCH BT — HOARFROST ARMOR's retaliation half, beside Immolate's
+			# for the reason it belongs there: same shape, other element, and
+			# the pair is why the two cards are siblings rather than duplicates
+			# (Immolate's fire feeds the Pyromancer's engine, this cold feeds
+			# the Cryomancer's, and no Mage holds both spec pools).
+			#
+			# THE STACKS LAND ON THE ATTACKER, WHICH IS THE WHOLE CARD — a
+			# version that chilled the target of HIS OWN casts would read as
+			# working while being an entirely different ability. `src` is the
+			# armoured hero, so four stacks reached this way become a real HOLD
+			# under his Permafrost rather than a plain freeze; and one
+			# `_apply_status` call per stack, because that is the branch where
+			# four stacks flash-freeze.
+			if strike_target.has_status("rimeguard") and not attacker.is_hero \
+					and not attacker.dead:
+				for _hf_i in HOARFROST_STACKS:
+					if attacker.dead:
+						break
+					_apply_status(attacker, "chilled", 3, 0, 0, strike_target)
+				_note_debuff_applied(strike_target, "chilled")
 			# Spite (Warden talent): laying hands on him costs — attackers
 			# take 30%/rank of the damage they dealt straight back.
 			# CROSS-ROW (Batch AL): Spite and Bruising Guard used to be an
@@ -7863,6 +8003,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and attacker.status_power("arrows") > 0 and final > 0 \
 					and not attacker.dead:
 				await _arcane_arrow_splash(attacker, strike_target, final)
+			# BATCH BT — ARCANE ECHO REPEATS HERE, INSIDE THE HIT LOOP, FOR THE
+			# SAME REASON ARCANE ARROWS SPLASHES HERE: BR §1's standing rule is
+			# that on-hit effects count HITS, not casts, so a three-bolt Barrage
+			# echoes THREE times. A player will assume once per cast, which is
+			# why the card says otherwise outright.
+			# Placed AFTER the strike resolves, so a MISSED, BLOCKED or
+			# absolutely-parried hit echoes nothing (`final > 0`) — an echo of a
+			# blow that never landed is an echo of nothing. And reading `final`
+			# is what makes the echo carry his FULL multiplier: the compounding
+			# Resonance curve, a crit, a resist and an armor read are all already
+			# in that number, where re-deriving from `ab.damage` would drift from
+			# it the moment any of the four differed.
+			if final > 0 and not is_counter and not attacker.dead:
+				await _arcane_echo_repeat(attacker, ab, final)
 			if (ab.random_hits > 0 or ab.multi_hits > 0) and total_hits > 1:
 				await _wait(0.45)  # sequential strikes land distinctly
 		# ---- GLACIAL HOLD: the NAMED RELEASES (Batch AS §1/§2) ----
@@ -7876,6 +8030,67 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if ab.display_name == "Shatter" and attacker.is_hero:
 			for sh_t in _holds.duplicate():
 				_hold_release(sh_t, "Shatter")
+		# ---- BATCH BT: THE THREE MAGE CARDS THAT ARE ORDINARY ATTACKS ----
+		# All three sit AFTER the strike loop, on Ice Lance's own model: the blow
+		# is paid on the board as it stood, and only then does the card's clause
+		# move that board.
+		#
+		# STOKE doubles the target's REMAINING Burn turns — the clock, not the
+		# tick — and does nothing at all to an enemy that is not alight, which is
+		# what keeps it a multiplier on a bank he built rather than a second
+		# Backdraft (which ADDS a flat +2 to every burning enemy). Overburn read
+		# the field BEFORE this line (`inferno_turns` is captured at the top of
+		# each strike), so THIS cast is not paid for the turns it just created and
+		# every later one is — the ordering rule Detonation has followed since
+		# Batch AG, pointed the other way.
+		if ab.display_name == "Stoke" and attacker.is_hero \
+				and target != null and not target.dead:
+			var sk_st: Dictionary = target.get_status("burn")
+			var sk_left: int = maxi(int(sk_st.get("turns", 0)), 0)
+			if sk_left > 0:
+				var sk_mult := STOKE_MULT_PERFECT if is_perfect else STOKE_MULT
+				var sk_binfo: Array = STATUS_INFO["burn"]
+				target.update_status("burn", sk_binfo[1], sk_binfo[3], -1,
+					sk_left * sk_mult)
+				target.float_text("Burn x%d" % sk_mult, sk_binfo[2])
+				_log("   → Stoke: %s's Burn goes %d turn%s to %d%s" % [
+					target.unit_name, sk_left, "" if sk_left == 1 else "s",
+					sk_left * sk_mult,
+					" [PERFECT]" if is_perfect else ""], "#e08850")
+			else:
+				_log("   → Stoke finds no fire on %s to feed" % target.unit_name,
+					"#909090")
+		# ARCANE BOLT HALVES HIS STACKS *AFTER* THE BLOW, never before: the raw
+		# block above multiplied by the meter he walked in with, and halving first
+		# would quietly pay him for half of what the card promises. Integer
+		# division floors, so 15 leaves 7 — the spend is never generous to itself.
+		if ab.display_name == "Arcane Bolt" and attacker.is_hero \
+				and attacker.second_resource_name == "Resonance":
+			var bo_before := attacker.second_resource
+			attacker.second_resource = int(floor(bo_before * ARCANE_BOLT_KEEP))
+			attacker.refresh_bars()
+			attacker.float_text("Resonance %d" % attacker.second_resource,
+				Color(0.8, 0.5, 1.0))
+			_log("   → Arcane Bolt spends the storm: %d Resonance to %d" % [
+				bo_before, attacker.second_resource], "#b085e0")
+		# ARCANE ECHO lays its mark. ONE MARK AT A TIME (Hunter's Mark's rule):
+		# marking a second enemy clears the first, so "this target" is never
+		# ambiguous and the card cannot be stacked into a field-wide echo. The
+		# mark carries `src_name` because the echo is HIS — `_arcane_echo_repeat`
+		# refuses to spend another caster's mark.
+		if ab.display_name == "Arcane Echo" and attacker.is_hero \
+				and target != null and not target.dead:
+			for ae_e in enemies:
+				if ae_e != target and ae_e.has_status("arcane_echo"):
+					ae_e.remove_status("arcane_echo")
+			var ae_turns := ARCANE_ECHO_TURNS + (1 if is_perfect else 0)
+			_apply_status(target, "arcane_echo", ae_turns, 0, 0, attacker)
+			var ae_st := target.get_status("arcane_echo")
+			if not ae_st.is_empty():
+				ae_st["src_name"] = attacker.unit_name
+			_log("   → Arcane Echo marks %s: every HIT repeats at %d%% here for %d turns%s" % [
+				target.unit_name, int(ARCANE_ECHO_SHARE * 100), ae_turns,
+				" [PERFECT]" if is_perfect else ""], "#b085e0")
 		# War Stomp: the tremor rallies the line — allies regain 10% resource
 		# (20% on a perfect cast; the damage is a 75-Attack tank's, the
 		# party refuel is the real payload).
@@ -8411,9 +8626,19 @@ func _hold_window_mult() -> float:
 	return 1.0 + (HOLD_WINDOW + _max_hero_rank("killing_frost")) * 0.01
 
 
-# THE ONE PLACE A HOLD BEGINS. Two callers: the Chilled-4 branch of
-# _apply_status, and Glacial Prison (which skips straight to it).
-func _hold_freeze(target: BattleUnit, src: BattleUnit) -> void:
+# THE ONE PLACE A HOLD BEGINS. THREE callers: the Chilled-4 branch of
+# _apply_status, Glacial Prison, and Batch BT's Flash Freeze (both of the
+# latter skip straight to it).
+#
+# BATCH BT — `force` IS AN OPTIONAL ARGUMENT DEFAULTED OFF, so the two older
+# callers are byte-identical in behaviour and the boss carve-out is exactly
+# where it was. It threads to the ONE `_apply_status` call below, which is the
+# call-site-visible boss exception Pommel Strike's and Snare Trap's perfects
+# already buy: EXACTLY ONE caller arms it, a PERFECT Flash Freeze. What it buys
+# is the freeze landing on an UNBROKEN boss — never a longer one, because
+# `timed` below is true for any boss however it got here, so a forced boss
+# still shrugs the ice off after a single turn.
+func _hold_freeze(target: BattleUnit, src: BattleUnit, force := false) -> void:
 	# BATCH BN §1 — THE RE-ENTRANCY GUARD, AND IT IS THE FIRST LINE ON PURPOSE.
 	# A release can chill its own target back to four stacks (Honed Shards), and
 	# a freeze past the limit evicts and releases another. Either alone is fine;
@@ -8432,7 +8657,7 @@ func _hold_freeze(target: BattleUnit, src: BattleUnit) -> void:
 	var holding := cryo != null and not target.is_hero
 	# The boss carve-out: one turn of ice, then it acts again on its own.
 	var timed := target.is_boss or not holding
-	_apply_status(target, "frozen", 1 if timed else -1)
+	_apply_status(target, "frozen", 1 if timed else -1, 0, 0, null, force)
 	if not target.has_status("frozen"):
 		return                      # boss immunity bounced it; the stacks sit
 	# (`was_frozen` was stamped here until Batch BJ §1 — the old "shattering"
@@ -8918,6 +9143,49 @@ const FORGE_BODY_CAP := 0.50
 # than another turn of waiting. It is a BOT constant, not a game magnitude.
 const DETONATE_AT := 4
 
+# ---------- BATCH BT §2/§3/§4 — THE MAGE NINE'S CONSTANTS, IN ONE PLACE ------
+# The same rule as the block above: every magnitude a card's text STATES but
+# does not scale off a node counter lives here, so a reprice is one block.
+# Numbers a card holds in its own payload (cost, initiative, cooldown, damage,
+# Break) stay in `Classes.draft_ability` and are not repeated here.
+#
+# SLOW BURN's window, and STOKE's multiplier. STOKE IS AUTHORED AS A MULTIPLIER
+# RATHER THAN AN ADDITION on purpose — Backdraft already ADDS a flat +2 turns to
+# every burning enemy, so an additive Stoke would have been Backdraft aimed at
+# one body, and BD §4's Deadfall/Snare Trap finding is what that rule exists to
+# prevent. Doubling is worth exactly as much as the stack he built and nothing
+# at all on an empty one, which is the deferred-damage spine stated as a card.
+const SLOW_BURN_TURNS := 3
+const STOKE_MULT := 2
+const STOKE_MULT_PERFECT := 3
+# FUNERAL PYRE: the share of the Burn's REMAINING damage that becomes a shield,
+# and how long that shield stands. 3 turns matches Magic Barrier, the other
+# Mage-side ward, so the two wards read the same way on the bar.
+const PYRE_SHARE := 1.50
+const PYRE_SHARE_PERFECT := 2.00
+const PYRE_SHIELD_TURNS := 3
+# KILLING FROST's stacks; its damage is the ability's own `damage` field.
+const KILLING_FROST_STACKS := 2
+const KILLING_FROST_STACKS_PERFECT := 3
+# HOARFROST ARMOR: the mitigation (read at the strike-target block), the stacks
+# the striker takes (the post-strike block, beside Immolate's ignite), and the
+# window. THE TWO HALVES POINT THE SAME WAY — the blow is softened AND the
+# attacker walks away colder — which is Immolate's own shape through a frost
+# door, and the reason the two cards are siblings rather than duplicates:
+# Immolate's retaliation feeds the Pyromancer's engine, this one feeds the
+# Cryomancer's, and no Mage can hold both spec pools.
+const HOARFROST_CUT := 0.25
+const HOARFROST_STACKS := 2
+const HOARFROST_TURNS := 3
+# ARCANE BOLT: the share of his Resonance he KEEPS. It is a HALVING rather than
+# a vent to a floor, which is the whole distinction from Stabilize (the boss
+# pool's spender, which drops him to 2): the curve keeps compounding from where
+# it lands, so spending is a change of slope rather than a reset.
+const ARCANE_BOLT_KEEP := 0.5
+# ARCANE ECHO: the share of each hit that repeats, and the window.
+const ARCANE_ECHO_SHARE := 0.30
+const ARCANE_ECHO_TURNS := 3
+
 
 # The turn-start Mana drip, in ONE place — the drip itself reads it, and so
 # does Ash Lung, whose whole condition is "the drain outruns the regen".
@@ -9088,6 +9356,62 @@ func _arcane_arrow_splash(attacker: BattleUnit, struck: BattleUnit,
 		_log("† %s dies" % victim.unit_name, "#e05050")
 		_on_enemy_death(victim)
 	await _wait(0.2)
+
+
+# BATCH BT — ARCANE ECHO. THE ARCANE-ARROWS DOOR, ARRIVING AGAIN: it is called
+# from INSIDE `_resolve`'s hit loop, so it fires PER HIT and a three-bolt Barrage
+# echoes three times (BR §1's standing rule). One function both finds the mark
+# and deals the blow, and it reads `final` — the damage THIS hit actually dealt —
+# so the echo carries the caster's full multiplier without re-deriving anything.
+#
+# THREE GUARDS, EACH LOAD-BEARING:
+# · `_echoing` is a RE-ENTRANCY LOCK on the `_rime_echoing` / `_bitter_echoing`
+#   pattern. The echo's own `take_hit` cannot reach this function today, but it
+#   is one line from doing so the moment anything echo-shaped is added beside
+#   it, and an unbounded echo is a stack overflow rather than a balance problem
+#   (Batch BN's two-body cycle is what that costs).
+# · THE MARK IS THE CASTER'S. It carries `src_name`, so a second Arcanist
+#   cannot spend the first one's mark and a Pyromancer standing beside him
+#   cannot spend it at all — "every damaging cast HE makes" is what the card
+#   says, and a mark on the board is not a party-wide amplifier.
+# · THE VICTIM MUST STILL BE ALIVE. An echo into a corpse is not a smaller
+#   echo, it is nothing.
+#
+# IT ECHOES ONTO THE MARKED TARGET EVEN WHEN THE MARKED TARGET IS THE ONE
+# STRUCK, deliberately: the card reads "every damaging HIT you land anywhere",
+# and carving out the obvious case would make focusing the mark worse than
+# hitting anything else — the exact opposite of the only reason he has to focus.
+func _arcane_echo_repeat(attacker: BattleUnit, ab: Ability, final: int) -> void:
+	if _echoing or not attacker.is_hero or attacker.is_companion or final <= 0:
+		return
+	var mark: BattleUnit = null
+	for e in enemies:
+		if e.dead or not e.has_status("arcane_echo"):
+			continue
+		if String(e.get_status("arcane_echo").get("src_name", "")) \
+				!= attacker.unit_name:
+			continue
+		mark = e
+		break
+	if mark == null:
+		return
+	_echoing = true
+	var echo := maxi(int(round(final * ARCANE_ECHO_SHARE)), 1)
+	echo = maxi(int(round(echo
+		* (1.0 - float(mark.resists.get("arcane", 0.0))))), 1)
+	var res: Dictionary = mark.take_hit(echo, 0)
+	mark.float_text("%d Echo" % echo, Color(0.72, 0.55, 1.0))
+	_stat("dmg_hero_" + _contrib_name(attacker), echo)
+	_log("   → Arcane Echo: %s answers %s for %d" % [mark.unit_name,
+		ab.display_name, echo], "#a090e0")
+	if res.died:
+		_stat("enemy_deaths")
+		_sfx("death", -4.0)
+		_message("%s falls!" % mark.unit_name)
+		_log("† %s dies" % mark.unit_name, "#e05050")
+		_on_enemy_death(mark)
+	_echoing = false
+	await _wait(0.15)
 
 
 # BATCH BR — HUNTER'S MARK's multiplier, and it is ONE function because the
@@ -12226,6 +12550,213 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Iron Will — %d turns of no Stun, Freeze, Daze or Break, and %d%% less damage%s" % [
 				attacker.unit_name, iw_turns, IRON_WILL_CUT_PCT,
 				" [PERFECT]" if is_perfect else ""], "#70d878")
+		# ============ BATCH BT: THE MAGE NINE ============
+		# SIX OF THE NINE RESOLVE HERE. Stoke, Arcane Bolt and Arcane Echo are
+		# ORDINARY ATTACKS and deliberately carry no `special` at all: a special
+		# is resolved INSTEAD of the strike loop, so an ability written as one
+		# would have to re-implement crit, variance, resists, armor, Overburn
+		# and the Resonance curve — and would then drift from every other
+		# attack in the game. Their clauses are name-keyed blocks inside
+		# `_resolve` instead (the Ice Lance / Pyroblast / Overpower pattern).
+		"slow_burn":
+			# AXIS: time, bought. THE MARKER RIDES THE ENEMY, NOT HIM — what is
+			# being held is that enemy's own Burn clock, and `tick_statuses`
+			# reads the marker on the unit whose statuses it is ticking.
+			# It is applied to EVERY living enemy including those not yet
+			# alight, which is not sloppiness: fire laid inside the window is
+			# held too, so Slow Burn into Firestorm is a real line of play and
+			# not merely Firestorm into Slow Burn.
+			var sb_turns := SLOW_BURN_TURNS + (1 if is_perfect else 0)
+			var sb_n := 0
+			for foe in enemies:
+				if foe.dead:
+					continue
+				_apply_status(foe, "slow_burn", sb_turns)
+				sb_n += 1
+			_sfx("bomb", -10.0, 0.7)
+			attacker.float_text("SLOW BURN", Color(1.0, 0.72, 0.35))
+			_message("%s banks the fire" % attacker.unit_name)
+			_log("%s: Slow Burn — Burn stops counting down on %d %s for %d turns (it still burns)%s" % [
+				attacker.unit_name, sb_n, "enemy" if sb_n == 1 else "enemies",
+				sb_turns, " [PERFECT]" if is_perfect else ""], "#e08850")
+		"funeral_pyre":
+			# AXIS: fire converted into survival. IT USES THE EXISTING BARRIER
+			# DOOR — the one Magic Barrier and Divine Shield share — rather than
+			# a third absorb: the absorb arithmetic, the Warded Robes rider and
+			# the prevented ledger all already hang off that status.
+			# DELIBERATELY NOT `divine`, for Magic Barrier's own reason: Faith
+			# is the Devout's engine and a Mage's ward feeding Conviction would
+			# be a spec mechanic leaking out through a Mage card.
+			if target != null and not target.dead:
+				var fp_st: Dictionary = target.get_status("burn")
+				var fp_turns: int = maxi(int(fp_st.get("turns", 0)), 0)
+				var fp_tick: int = int(fp_st.get("tick", 0))
+				if fp_tick <= 0:
+					fp_tick = DOT_STATUSES["burn"]
+				# The damage that Burn WOULD have dealt: what is left on the
+				# clock times what each tick is worth. Read before the consume,
+				# because the consume is what makes it stop being true.
+				var fp_would := fp_turns * fp_tick
+				var fp_share := PYRE_SHARE_PERFECT if is_perfect else PYRE_SHARE
+				var fp_power := int(round(fp_would * fp_share))
+				target.remove_status("burn")
+				if fp_power > 0:
+					# `add_status` already MAXES power and turns on
+					# re-application, so a fresh pyre can never be worth less
+					# than the ward it replaces and this site needs no
+					# arithmetic of its own (Magic Barrier's note).
+					_apply_status(attacker, "barrier", PYRE_SHIELD_TURNS, fp_power)
+					var fp_bst := attacker.get_status("barrier")
+					if not fp_bst.is_empty():
+						fp_bst["src"] = attacker.unit_name
+					attacker.float_text("BARRIER %d" % fp_power,
+						Color(0.40, 0.85, 0.95))
+				_sfx("parry", -8.0, 0.8)
+				if fp_turns <= 0:
+					# A LEGAL CAST THAT FINDS NOTHING: the gate only asks that
+					# SOMETHING on the field is alight, so a player can aim this
+					# at the wrong body. Say so rather than printing "a shield of
+					# 0" as though that were the effect (the Stoke line's rule).
+					_message("%s finds no fire to smother" % attacker.unit_name)
+					_log("%s: Funeral Pyre finds no Burn on %s" % [
+						attacker.unit_name, target.unit_name], "#909090")
+				else:
+					_message("%s smothers the fire and wears it" % attacker.unit_name)
+					_log("%s: Funeral Pyre — %d turn%s of Burn consumed from %s (worth %d), a shield of %d%s" % [
+						attacker.unit_name, fp_turns,
+						"" if fp_turns == 1 else "s", target.unit_name, fp_would,
+						fp_power, " [PERFECT]" if is_perfect else ""], "#70d878")
+				# The refund is the PASSIVE's, through the ONE door every other
+				# Burn consumer already shares (AR's rule; Crucible doubles it).
+				# A FIFTH consumer arriving and inheriting it is that rule
+				# working — test_batch_ar's pinned call-site count goes 4 -> 5.
+				_overburn_refund(attacker, fp_turns)
+		"flash_freeze":
+			# AXIS: the hold WITHOUT the build, on a drafted card rather than a
+			# bought cell. It goes through `_hold_freeze` like every other
+			# freeze in the game, so the limit eviction, Glacial Economy, Bitter
+			# Cold AND THE BOSS CARVE-OUT all come free.
+			#
+			# THE PERFECT IS THE ONE THING HERE THAT TOUCHES A STRUCTURAL RULE
+			# AND IT IS FLAGGED RATHER THAN BURIED: it passes `force`, the
+			# call-site-visible boss exception that Pommel Strike's and Snare
+			# Trap's perfects already buy. It is what keeps this card from being
+			# a strictly worse Glacial Prison (25 Mana, 2.5, 4cd for the same
+			# freeze), which no node can do. IT IS STILL ONLY ONE TURN — a held
+			# boss is `timed` whether it was Broken or forced, so the perfect
+			# buys the turn EARLIER, never a longer one.
+			if target != null and not target.dead:
+				if not target.has_status("chilled"):
+					_apply_status(target, "chilled", 3, 0, 0, attacker)
+					_note_debuff_applied(attacker, "chilled")
+				_sfx("break", -9.0, 0.7)
+				_message("%s seals %s in ice!" % [attacker.unit_name,
+					target.unit_name])
+				# LOG HONESTY, found by watching a smoke: the perfect's clause is
+				# about a BOSS, so claiming it against a raider announces a bigger
+				# effect than the one that fired. Say it only when it is the thing
+				# that actually happened.
+				var ff_forced := is_perfect and target.is_boss and not target.broken
+				_log("%s: Flash Freeze closes on %s%s%s" % [attacker.unit_name,
+					target.unit_name,
+					" — and the ice takes an UNBROKEN boss" if ff_forced else "",
+					" [PERFECT]" if is_perfect else ""], "#7cc8f0")
+				_hold_freeze(target, attacker, is_perfect)
+		"killing_frost":
+			# AXIS: the accumulation pays on its own. His stacks have only ever
+			# counted toward a freeze, so a fight where the freeze never lands
+			# is a fight where his build did nothing.
+			#
+			# THE STACKS ARE APPLIED ONE `_apply_status` CALL AT A TIME rather
+			# than by writing the pile directly, and that is load-bearing:
+			# `add_status` clamps chilled at 4 and the branch in `_apply_status`
+			# is where four stacks FLASH-FREEZE. Setting the number would skip
+			# both, so an enemy driven to four by this card would sit there
+			# un-frozen — the card's last line made false.
+			#
+			# NOTE the special's id matches a talent COUNTER's name
+			# (`u.killing_frost`, the +15 on the held-enemy window). Different
+			# namespaces and nothing reads across them; it is the label
+			# collision reported in `Classes.draft_ability`, not a shared field.
+			var kf_stacks := KILLING_FROST_STACKS_PERFECT if is_perfect \
+				else KILLING_FROST_STACKS
+			var kf_total := 0
+			var kf_n := 0
+			for foe in enemies:
+				if foe.dead or not foe.has_status("chilled"):
+					continue
+				var kf_raw := 0.01 * ab.damage * attacker.attack * mult \
+					* randf_range(0.9, 1.1)
+				var kf_res := float(foe.resists.get("frost", 0.0))
+				kf_raw *= 1.0 - kf_res
+				var kf_final := maxi(int(round(kf_raw
+					* (1.0 - foe.effective_armor()))), 1)
+				var kf_hit: Dictionary = foe.take_hit(kf_final, ab.pressure)
+				_stat("dmg_hero_" + attacker.unit_name, kf_final)
+				_stat_bd(attacker, ab.pressure)
+				kf_total += kf_final
+				kf_n += 1
+				foe.float_text("%d Killing Frost" % kf_final,
+					Color(0.62, 0.85, 1.0))
+				if kf_hit.died:
+					_stat("enemy_deaths")
+					_sfx("death", -4.0)
+					_message("%s falls!" % foe.unit_name)
+					_log("† %s dies" % foe.unit_name, "#e05050")
+					_on_enemy_death(foe)
+					continue
+				for _i in kf_stacks:
+					_apply_status(foe, "chilled", 3, 0, 0, attacker)
+				_note_debuff_applied(attacker, "chilled")
+			_sfx("break", -9.0, 1.2)
+			_message("%s drives the cold home!" % attacker.unit_name)
+			_log("%s: Killing Frost — %d damage across %d Chilled %s, +%d stacks each%s" % [
+				attacker.unit_name, kf_total, kf_n,
+				"enemy" if kf_n == 1 else "enemies", kf_stacks,
+				" [PERFECT]" if is_perfect else ""], "#7cc8f0")
+		"hoarfrost_armor":
+			# AXIS: stacks built without spending a turn applying them, and the
+			# only defence in his kit a boss cannot shrug (the other one is a
+			# hold). Both halves live elsewhere and each says where the other
+			# is: the 25% at the strike-target block, the retaliation in the
+			# post-strike block beside Immolate's ignite.
+			var hf_turns := HOARFROST_TURNS + (1 if is_perfect else 0)
+			_apply_status(attacker, "rimeguard", hf_turns)
+			_sfx("parry", -7.0, 1.3)
+			attacker.float_text("HOARFROST", Color(0.62, 0.85, 1.0))
+			_message("%s sheathes himself in ice" % attacker.unit_name)
+			_log("%s: Hoarfrost Armor — -%d%% damage taken, and strikers gain %d Chilled (%d turns)%s" % [
+				attacker.unit_name, int(HOARFROST_CUT * 100), HOARFROST_STACKS,
+				hf_turns, " [PERFECT]" if is_perfect else ""], "#70d878")
+		"inner_arcane":
+			# AXIS: the ramp's opening move and its panic button in one card.
+			# IT COUNTS THE LIVING, so it is widest on turn one and shrinks as
+			# the fight is won — the opposite shape to everything else he owns.
+			# IT GOES THROUGH `_gain_resonance`, THE ONE DOOR, so Harmonic
+			# Convergence's build-reads-the-build clause pays on it exactly as
+			# it pays on every other gain rather than being carved out here.
+			var ia_alive := enemies.filter(func(e): return not e.dead).size()
+			var ia_low := attacker.hp * 2 <= attacker.max_hp
+			var ia_gain := ia_alive * (2 if ia_low else 1) + (1 if is_perfect else 0)
+			_sfx("perfect", -8.0, 1.2)
+			# LOG HONESTY, found by watching a smoke (Batch BC's Blessed Barrier
+			# precedent): `_gain_resonance` REFUSES a unit that does not hold the
+			# meter, so the line below reports the DELTA rather than the amount
+			# asked for. Unreachable in a real draft — only an Arcanist is ever
+			# offered this — but `DOD_SIM_ABILITIES` hands it to every hero, and a
+			# Devout reading "+2 Resonance (now 0)" is a lie on the page whichever
+			# way it got there.
+			var ia_before := attacker.second_resource
+			if ia_gain > 0:
+				_gain_resonance(attacker, ia_gain)
+			var ia_got := attacker.second_resource - ia_before
+			_message("%s gathers the storm inward" % attacker.unit_name)
+			_log("%s: Inner Arcane — %d %s standing%s: +%d Resonance (now %d)%s" % [
+				attacker.unit_name, ia_alive,
+				"enemy" if ia_alive == 1 else "enemies",
+				", and he is below half health" if ia_low else "", ia_got,
+				attacker.second_resource,
+				" [PERFECT]" if is_perfect else ""], "#b085e0")
 		"venom_coat":
 			_apply_status(attacker, "venom_coat", 4)
 			_sfx("heal", -9.0, 0.7)

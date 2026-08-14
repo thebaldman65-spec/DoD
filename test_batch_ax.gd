@@ -439,8 +439,17 @@ func _boss_legibility() -> void:
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	ok(bsrc.contains('if not force and id in ["stunned", "frozen", "psychosis", "bewitch", "hysteria"] \\'),
 		"the boss guard still refuses all three madness statuses")
-	ok(bsrc.count("force := false") == 1 and bsrc.count(", true)\n") >= 0,
-		"...and `force` is still a single explicit argument, not a name check")
+	# RE-POINTED 1 -> 2 (Batch BT), AND THE QUESTION IS UNCHANGED. What this
+	# check exists to refuse is a boss EXCEPTION decided by a name test inside
+	# `_apply_status`; what it counts is the explicit `force` argument that keeps
+	# every exception visible at its CALL SITE. Batch BT gave `_hold_freeze` the
+	# same argument, defaulted off, and THREADS it to `_apply_status` — so there
+	# are two declarations of one mechanism rather than a second mechanism, and
+	# the next line is what says so.
+	ok(bsrc.count("force := false") == 2,
+		"...and `force` is still an explicit argument (2 declarations: _apply_status, _hold_freeze)")
+	ok(bsrc.contains('_apply_status(target, "frozen", 1 if timed else -1, 0, 0, null, force)'),
+		"...and _hold_freeze THREADS it rather than deciding by name")
 	# THE LANE TEXT says it, where a player picking talents reads it.
 	for id in ["oc_spread", "oc_whispers", "oc_mind_flay", "oc_hysteria"]:
 		var txt := Talents.desc_for(_node(id), 1)

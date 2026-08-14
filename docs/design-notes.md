@@ -3153,3 +3153,54 @@ exactly what the "weaker than spec" rule exists to prevent. What keeps the ceili
 Shout's bleed scaling — a term Warcry has no version of — so in the build the spec card belongs to
 it runs well past the class card. The lesson is BQ's own, arriving from the other side: compare
 against what the ability actually does in its own build, not against the number on its card.
+
+## Batch BT — tranche 2, the Mage nine
+
+**The question a pool asks changes when it stops being empty.** At two cards a spec, the only
+useful question was what *gap* an ability filled — the pool was so thin that anything coherent was
+an improvement. At five, that question stops discriminating: five cards that each fill a different
+gap are still five cards nobody plans a run around. So the rule from this tranche on is that every
+ability names what it *builds with* — a talent node, another card, a capstone — and the line ships
+beside the definition and in the table a player reads. It is not documentation of the design; it
+is the design's own acceptance test. A card that cannot name what it is played beside has not been
+designed yet.
+
+**Slow Burn and Stoke are a deliberate two-card combo, and shipping a known-strong pairing on
+purpose is different from shipping one by accident.** The Pyromancer's spine is deferred damage:
+he is weak until he cashes in, and every payoff he owns reads a bank that shrinks under him while
+he does nothing about it. Stalling the field and then doubling one stack is exactly the play that
+spine should be able to reach — and it costs two cards, two casts and two turns, which is a real
+price. The reason to say so out loud is that the next reader will find it and assume it was
+missed. It was not.
+
+**A card can be strictly worse than a talent node on every number and still be worth shipping, as
+long as the reason is the acquisition channel and not an oversight.** Flash Freeze loses to Glacial
+Prison on cost, initiative and cooldown. What it has is that a Winter or a Thaw Cryomancer can
+actually get it: the node lives in one lane of one tree and has to be bought, and two thirds of his
+builds will never see it. That is a real distinction — but it is only real if it is stated, because
+the failure mode is a later batch reading the two side by side and "fixing" the card by making it
+cheaper, which would make the node pointless instead. The perfect is what keeps the card from being
+dominated outright, and it buys the one thing no node can: the boss exception.
+
+**Correcting a brief's premise toward the code is worth more than implementing it as written.** The
+brief said the Arcanist has no Resonance consumer at all and that Arcane Bolt would be the sole
+exception to "nothing removes Resonance". Stabilize has been that exception since Batch AT, and it
+is recorded as one. What was actually true — that his *draft pool* had no spender — is a smaller
+claim, and it turned out to be the more useful one, because it forced the question of how the two
+spenders differ. Stabilize vents to a floor and is a way out; Arcane Bolt halves and is a change of
+slope. Two spenders with the same shape would have been one card with two prices.
+
+**A one-tab indentation error made an effect fire only for players holding an unrelated ability.**
+Arcane Echo's per-hit hook landed inside the Arcane Arrows block instead of beside it, so it
+worked exactly as designed for anyone carrying five arrow charges and did nothing for everyone
+else. Nothing crashed; the log simply never printed. It was caught because the suite drove the echo
+directly rather than asserting that the cast returned — which is the whole argument for building a
+check that a broken implementation still fails, restated in a new place.
+
+**Watching a smoke run is a different instrument from running a suite, and it found three lies the
+suite could not.** A perfect Flash Freeze announced that it had taken an unbroken boss when the
+target was a raider; Inner Arcane reported the Resonance it asked for rather than what landed, so a
+hero who cannot hold the meter read "+2 (now 0)"; Stoke printed "1 turns". None of the three is a
+mechanical fault and no test would have been written for any of them. They are all cases of the
+log describing a bigger or different event than the one that happened, which is the class of defect
+that teaches a player the wrong rule.

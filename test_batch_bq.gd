@@ -208,7 +208,14 @@ func _pools() -> void:
 	var spec_total := 0
 	for sp in Classes.SPEC_DRAFT_POOLS:
 		spec_total += Classes.SPEC_DRAFT_POOLS[sp].size()
-	ok(spec_total == 24, "§1: ...at BP's twenty-four, untouched (%d)" % spec_total)
+	# RE-POINTED 24 -> 33 (Batch BT). BQ pinned this to prove its own twelve
+	# CLASS cards had not leaked into the SPEC pools, and that question is
+	# unchanged and still answered by the loop above; the total is the second
+	# half of it, so it moves when the spec pools legitimately grow. BT added
+	# nine Mage SPEC cards and no class card at all — `CLASS_DRAFT_POOLS` is
+	# asserted at 24 two lines up, which is the half that must NOT move.
+	ok(spec_total == 33,
+		"§1: ...at BP's 24 plus BT's Mage nine, with no class card among them (%d)" % spec_total)
 
 
 func _class_pools_untouched() -> void:
@@ -960,7 +967,7 @@ func _docs() -> void:
 	var master := _src("res://docs/master.html")
 	# THE STAMP GATE, SEVENTH COPY (see test_batch_bp's note). It reads the
 	# CURRENT batch, not BQ's, and all seven move together.
-	ok(master.contains("Batch BS"), "§5: master.html is stamped for the current batch")
+	ok(master.contains("Batch BT"), "§5: master.html is stamped for the current batch")
 	for cls in TRANCHE_3:
 		for nm in TRANCHE_3[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)

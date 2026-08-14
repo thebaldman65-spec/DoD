@@ -770,8 +770,13 @@ func _live_refund() -> void:
 	# possible because the refund belongs to the PASSIVE rather than to any
 	# ability, exactly as AR's comment above claims. The question is unchanged:
 	# does every payer share the one implementation?
-	ok(src.count("_overburn_refund(attacker,") == 4,
-		"...and exactly four call sites: Detonation, Wildfire, Cinderfall, Ember Debt")
+	# RE-POINTED 4 -> 5 (Batch BT): FUNERAL PYRE is the FIFTH consumer of the one
+	# refund door. The question — does every Burn consumer share the single
+	# implementation — is unchanged; only the answer's size moved, which is what
+	# pinning a count is for: a new consumer has to COME AND SAY SO rather than
+	# writing its own refund.
+	ok(src.count("_overburn_refund(attacker,") == 5,
+		"...and exactly FIVE call sites: Detonation, Wildfire, Cinderfall, Ember Debt, Funeral Pyre")
 	var scene := await _spawn({}, ["raider", "raider"])
 	var py := _py(scene)
 	if py == null:

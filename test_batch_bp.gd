@@ -107,12 +107,17 @@ func _run() -> void:
 # ---------- §1/§5 THE THREE POOLS ----------
 
 func _pools() -> void:
-	# TWENTY-FOUR NOW, NOT EIGHTEEN — counted off the live dict rather than from
-	# the constant above, so the two have to agree.
+	# THIRTY-THREE NOW — counted off the live dict rather than from the constant
+	# above, so the two have to agree. RE-POINTED 24 -> 33 (Batch BT paid the
+	# first third of tranche 2, nine Mage cards), on BP's own argument for
+	# pinning it in the first place: what a later batch could break is not "the
+	# pools are thin", it is "a pool quietly emptied", and a total read off the
+	# LIVE dict catches that in either direction. BP's own six are asserted as
+	# LITERALS below and did not move.
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.SPEC_DRAFT_POOLS[spec].size()
-	ok(total == 24, "§5: BO's eighteen plus BP's six (got %d)" % total)
+	ok(total == 33, "§5+BT: BO's eighteen, BP's six, BT's Mage nine (got %d)" % total)
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12,
 		"§5: all twelve specs are named")
 	for spec2 in Classes.SPEC_DRAFT_POOLS:
@@ -892,7 +897,7 @@ func _docs() -> void:
 	# test_batch_bn, test_batch_bo, HERE, test_batch_bq and test_batch_br. ALL
 	# SEVEN MUST MOVE TOGETHER or a batch that bumps the timestamp trips suites
 	# it never touched.
-	ok(master.contains("Batch BS"),
+	ok(master.contains("Batch BT"),
 		"§6: master.html's stamp is bumped to the current batch")
 	ok(changelog.contains("Batch BP"),
 		"§6: the changelog carries a Batch BP entry")

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-14 (Batch BS)</b></p>
+<p align="right"><b>Last updated: 2026-08-14 (Batch BT)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1039,9 +1039,9 @@ SPEC_POOLS, the draft reads these.</p>
 <tr><td><b>Berserker</b></td><td>Blood Offering, Gut Rip</td></tr>
 <tr><td><b>Warden</b></td><td>Covering Guard, Eye of the Storm</td></tr>
 <tr><td><b>Swordmaster</b></td><td>Precision Strike, Feint</td></tr>
-<tr><td><b>Pyromancer</b></td><td>Cinderfall, Ember Debt</td></tr>
-<tr><td><b>Cryomancer</b></td><td>Winter's Toll, Rimebinding</td></tr>
-<tr><td><b>Arcanist</b></td><td>Null Field, Kindled Mind</td></tr>
+<tr><td><b>Pyromancer</b></td><td>Cinderfall, Ember Debt, Slow Burn, Stoke, Funeral Pyre</td></tr>
+<tr><td><b>Cryomancer</b></td><td>Winter's Toll, Rimebinding, Flash Freeze, Killing Frost, Hoarfrost Armor</td></tr>
+<tr><td><b>Arcanist</b></td><td>Null Field, Kindled Mind, Arcane Bolt, Inner Arcane, Arcane Echo</td></tr>
 <tr><td><b>Holy</b></td><td>Second Wind, Rite of Return</td></tr>
 <tr><td><b>Devout</b></td><td>Vow of Suffering, Aegis Reversal</td></tr>
 <tr><td><b>Occultist</b></td><td>Blight the Well, Covenant of Ash</td></tr>
@@ -1056,9 +1056,14 @@ SPEC_POOLS, the draft reads these.</p>
 </table>
 <p><b>The class seam is FULL, and pools are still thin.</b> All four class pools hold six, so
 <b>one card in four is class-wide</b> and that seam draws a real entry for <b>every hero in the
-game</b> — no class rolls an empty pool and no offer loses its class card. Forty-eight abilities
+game</b> — no class rolls an empty pool and no offer loses its class card. Fifty-seven abilities
 exist against a target of about ninety-six, so a hero who has refused his way down can still be
 offered two cards or one: that is the pool filling, not the draft misbehaving.</p>
+
+<p><b>The spec pools are UNEVEN, and that is the shape of the debt rather than a bug.</b>
+The three <b>Mage</b> specs draft from <b>five</b> apiece; the other nine still draft from two.
+A Cryomancer's offer therefore comes up full where a Warden's still fills short. The Cleric,
+Hunter and Warrior thirds of this tranche are owed next, and a third tranche after them.</p>
 
 <p><b>What a class-wide ability is, and is not.</b> Deliberately <b>untied and general</b> —
 Magic Barrier, not Frostbolt: the test is whether it would read as off-theme for <i>any</i>
@@ -1067,8 +1072,14 @@ passive (a Barrier does nothing for Overburn, a heal nothing for Ruin), so at eq
 would be a safe default that dilutes every build. Slightly weaker but always-on makes them the
 pick you take when your spec's engine is not online yet, which is a different role.</p>
 
-<p><b>The thirty-six drafted abilities.</b> Each names the axis it serves. The
-twenty-four spec cards come first; the twelve class-wide ones close the table.</p>
+<p><b>The forty-five drafted abilities.</b> Each names the axis it serves, and — from
+the Mage nine onward — <b>what it builds with</b>. The thirty-three spec cards come first;
+the twelve class-wide ones close the table.</p>
+<p><b>Every ability authored from here on names a combo.</b> While a pool held two cards the
+question was what <i>gap</i> an ability filled. At five the question is whether a <b>build</b>
+can be assembled, so each card names the talent node, the other card or the capstone it is
+meant to be played beside. A card that appears in nobody's build plan is a card that fills a
+slot.</p>
 <table border="1" cellpadding="4">
 <tr><th>Ability</th><th>Cost / init / cd</th><th>What it does</th><th>Axis</th></tr>
 <tr><td colspan="4"><b>Berserker</b> — <i>how do you get low, and what do you do with the blood</i></td></tr>
@@ -1083,12 +1094,21 @@ twenty-four spec cards come first; the twelve class-wide ones close the table.</
 <tr><td colspan="4"><b>Pyromancer</b> — <i>different answers to how do you commit</i></td></tr>
 <tr><td><b>Cinderfall</b></td><td>30 Mana, 3.0, 3cd, all enemies</td><td>20% of Attack across the field, then tears 2 turns of Burn from each burning enemy to deal that much again to it (Perfect: 3 turns). Overburn refunds every turn taken.</td><td>Spending wide instead of deep — Detonation empties one bank, this skims them all.</td></tr>
 <tr><td><b>Ember Debt</b></td><td>20 Mana, 2.0, 4cd, one enemy</td><td>No damage. 8 turns of Burn (Perfect: 12), and <b>Overburn refunds every one of those turns immediately</b>, as though he had already consumed them. The fire still burns its full term.</td><td>Paid before it burns — every other Burn payout empties the bank; this one does not.</td></tr>
+<tr><td><b>Slow Burn</b></td><td>15 Mana, 1.5, 4cd, no target</td><td>For 3 turns (Perfect: 4), the Burn on <b>every enemy stops counting down</b>. It still burns for its full damage each turn — it just never gets shorter. The mark rides enemies not yet alight, so fire laid inside the window is held too.</td><td>Time, bought. Every payoff he owns reads a bank that is shrinking under him, and nothing in his kit could slow it.<br><b>Builds with:</b> Powder Keg (Detonation row 8), Sea of Flame (Kindling row 8) and Cataclysm all want the field lit longer. Strongest straight after <b>Firestorm</b>, which lays 12–16 burn-turns in one cast.</td></tr>
+<tr><td><b>Stoke</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td>25% of Attack, and if the target is Burning its <b>remaining Burn turns are DOUBLED</b> (Perfect: tripled). Nothing extra against an enemy that is not alight. Overburn reads the field <i>before</i> the doubling, so later casts are what collect on it.</td><td>The bank multiplies instead of growing — worth exactly as much as the stack he built, and nothing on an empty one.<br><b>Builds with:</b> <b>Detonation</b> (250% of the bank, 325% under Focused Flame), so doubling a deep stack is his largest single swing; <b>Slow Burn</b> — stall, double, detonate; Cinder Trail's 4-turn Fireball; and Total Commitment, which consumes from the target <i>and</i> its two neighbours, so a doubled centre pays three ways.</td></tr>
+<tr><td><b>Funeral Pyre</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>Consumes <b>all</b> Burn on the target and grants a shield worth <b>150% of the damage that Burn would still have dealt</b> (Perfect: 200%), for 3 turns. Overburn refunds every turn consumed. Unusable with nothing alight.</td><td>The only card in his kit that converts fire into survival — the Inferno build's cash-in where Detonation is the Detonation build's.<br><b>Builds with:</b> the whole <b>Inferno lane</b> (Ember Shroud, Ashen Skin, Heat Haze, Immolate, Kiln-Forged, Ash Lung, Forge Body), every one of which is a percentage — a shield is the flat term that lane never gets. Overburn's refund pays 1 Mana a turn (2 with <b>Crucible</b>), so a deep stack cashed here is a shield <i>and</i> a pool.</td></tr>
 <tr><td colspan="4"><b>Cryomancer</b> — <i>what do you do with the time you bought</i></td></tr>
 <tr><td><b>Winter's Toll</b></td><td>25 Mana, 2.5, 4cd</td><td>The held enemy takes 8% of Attack per turn it has been held (Perfect: 12%). <b>The hold continues.</b> Unusable while he holds nothing.</td><td>Cashing in without releasing.</td></tr>
 <tr><td><b>Rimebinding</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td>Applies Chilled equal to the stacks on the held enemy (Perfect: one more).</td><td>The hold as a template — one deep prison becomes the next one.</td></tr>
+<tr><td><b>Flash Freeze</b></td><td>30 Mana, 3.0, 5cd, one enemy</td><td>Freezes the target <b>outright whatever its Chilled stacks</b>, and it joins the Glacial Hold. <b>A boss still resists until Broken, and a held boss shrugs the ice off after one turn</b> — that turn is what this buys against one, and it is not a lockdown. Perfect: it takes hold of an <b>unbroken</b> boss too, still for one turn.</td><td>The hold without the build. His other two draft cards both assume he already holds something, so against a boss both are dead cards for most of the fight.<br><b>Builds with:</b> <b>Cold Snap</b> (Deep Freeze row 6) fills a held enemy's Break meter 15 a turn, so a boss frozen once tends to stay freezable; <b>Second Prison</b> (row 5) makes a second hold worth having. Expensive and slow on purpose — the emergency, not the opener.</td></tr>
+<tr><td><b>Killing Frost</b></td><td>20 Mana, 2.0, 3cd, all enemies</td><td>Every <b>Chilled</b> enemy takes 20% of Attack and gains <b>2 more stacks</b> of Chilled (Perfect: 3). Enemies that are not Chilled are untouched — and four stacks still put one in the ice.</td><td>The accumulation pays on its own. His stacks have only ever counted toward a freeze, so a fight where the freeze never lands is a fight where his build did nothing.<br><b>Builds with:</b> <b>Hypothermia</b> (+3% damage taken a stack), <b>Frigid Grip</b> (10% harder slow a stack), <b>Winter's Depth</b> (−8% Constitution a stack, so they Break sooner) and <b>Bitter Cold</b>. Best after <b>Blizzard</b> or <b>Eternal Winter</b>, which spread thin stacks wide.</td></tr>
+<tr><td><b>Hoarfrost Armor</b></td><td>20 Mana, 2.0, 4cd, self</td><td>For 3 turns (Perfect: 4) he takes <b>25% less damage</b>, and <b>anything that strikes him gains 2 stacks of Chilled</b>.</td><td>The only thing in his kit that builds stacks without spending a turn applying them — and the only defence he has that a boss cannot shrug, since the other one is a hold.<br><b>Builds with:</b> <b>Frigid Grip</b> and <b>Winter's Depth</b>, where every stack is both a slow and a step toward Broken, so the retaliation is an engine rather than a deterrent; and <b>Splintering Shards</b>, which makes Razor Ice always land its fourth hit against the pile this builds.</td></tr>
 <tr><td colspan="4"><b>Arcanist</b> — <i>what carries you through the early game</i></td></tr>
 <tr><td><b>Null Field</b></td><td>25 Mana, 2.0, 4cd, self</td><td>For 3 turns (Perfect: 4), damage taken falls 5% per Resonance stack, <b>read live</b>.</td><td>The ramp defends itself — worthless at 2 stacks, enormous at 12, so surviving <i>to</i> the late game becomes the reward for ramping.</td></tr>
 <tr><td><b>Kindled Mind</b></td><td>15 Mana, 1.5, 2cd, one enemy</td><td>15% of Attack, and it banks 3 Resonance instead of 1 (Perfect: 4).</td><td>Buying the ramp with tempo — his fastest early climb, and a card he would rather not cast late.</td></tr>
+<tr><td><b>Arcane Bolt</b></td><td>30 Mana, 2.5, 4cd, one enemy</td><td><b>15% of Attack for every Resonance stack he holds</b> (Perfect: 20%), and then his stacks are <b>halved</b>. At 6 stacks that is 90% of Attack; at 16 it is 240% and he lands on 8. Dark at zero stacks.</td><td>Cash the curve, or keep climbing — the question his kit has never asked him. It <b>halves</b> rather than venting to a floor, which is the distinction from Stabilize: the curve keeps compounding from where it lands, so spending is a change of slope rather than a reset.<br><b>Builds with:</b> <b>Cascade</b> (+1 build a cast at 10+ stacks), <b>Harmonics</b> and <b>Critical Mass</b>, all of which make the climb back cheaper. The <b>Entropy</b> lane cares twice — halving the stacks also halves the compounding <i>damage-taken</i> penalty, so it is an escape hatch that costs him his damage rather than a free one.</td></tr>
+<tr><td><b>Inner Arcane</b></td><td>15 Mana, 1.0, 3cd, self</td><td>Banks Resonance equal to the number of enemies <b>still alive</b>, <b>doubled while he is below half health</b> (Perfect: one more).</td><td>The ramp's opening move and its panic button in one card — widest on turn one, and worth most when he is nearly dead.<br><b>Builds with:</b> <b>On the Edge</b> (Entropy row 2: surviving below 35% builds 4) and <b>Backlash</b> (Resonance builds when he takes damage), so an Entropy build gets paid three ways for being nearly dead — exactly when the compounding damage-taken penalty is killing him.</td></tr>
+<tr><td><b>Arcane Echo</b></td><td>25 Mana, 2.0, 4cd, one enemy</td><td>20% of Attack, and for 3 turns (Perfect: 4) <b>every damaging HIT he lands anywhere repeats at 30% against this target</b>. <b>It counts hits, not casts</b> — a three-bolt Barrage echoes three times. One mark at a time.</td><td>The only reason he has to focus one target. Worthless early (30% of a small number) and enormous once the passive is paying +117%, <b>because the echo carries his full multiplier</b>.<br><b>Builds with:</b> <b>Barrage Master</b> (+3 bolts) and <b>Suppressing Fire</b> (each Barrage bolt harder than the last), because the echo counts hits; and it sits beside <b>Temporal Rift</b>, whose crit echo goes at a <i>random</i> enemy.</td></tr>
 <tr><td colspan="4"><b>Holy</b> — <i>what does reversal cost you</i></td></tr>
 <tr><td><b>Second Wind</b></td><td>30 Mana, 2.5, 4cd, one ally</td><td>Heals for the damage that ally has taken in the last two turns, up to 40% of their maximum (Perfect: 55%).</td><td>Undoing recent history rather than topping up — enormous on someone just spiked, worthless on someone healthy.</td></tr>
 <tr><td><b>Rite of Return</b></td><td>35 Mana, 3.0, 5cd, one ally</td><td>For 3 turns (Perfect: 4), the next blow that would fell that ally restores them to 50% health instead — and Holy loses 30% of hers.</td><td>Reversal bought in advance rather than reacted to. Resurrection undoes a death and costs Mercy; this prevents one and costs her health.</td></tr>

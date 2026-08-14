@@ -187,7 +187,7 @@
   "term": "Burn",
   "category": "statuses",
   "short": "Fire damage at each turn start; reapplying extends it.",
-  "long": "A burning unit takes fire damage at the start of each of its turns - about 6% of the applier's Attack, locked in when the burn lands. Burn is fire-typed: fire resists shrink the ticks and fire vulnerability feeds them. Reapplying Burn ADDS duration rather than resetting it, so a fire build can keep a target lit indefinitely.",
+  "long": "A burning unit takes fire damage at the start of each of its turns - about 6% of the applier's Attack, locked in when the burn lands. Burn is fire-typed: fire resists shrink the ticks and fire vulnerability feeds them. Reapplying Burn ADDS duration rather than resetting it, so a fire build can keep a target lit indefinitely. The duration otherwise counts down one turn at a time; the Pyromancer's SLOW BURN stops that countdown for three turns without stopping the damage, so the fire burns exactly as hard and simply does not get shorter, and his STOKE doubles what is left on one target.",
   "see_also": [
    "dmg_fire",
    "status_poison"
@@ -514,7 +514,7 @@
   "term": "Resonance",
   "category": "resources",
   "short": "The Arcanist's stacks: UNCAPPED, permanent, and compounding both ways.",
-  "long": "Damaging casts build Resonance - 1 per cast, 2 on a crit - and it has NO MAXIMUM. Nothing removes it either: no decay, no cap, no reset, and it persists to the end of the battle. The bonuses COMPOUND rather than scaling per stack: at N stacks the damage bonus is 1.5% x N(N+1)/2 and the damage TAKEN penalty is 0.75% x N(N+1)/2, both uncapped, plus a flat +1% crit chance per stack. So 5 stacks is +22% damage and +11% taken; 8 is +54%/+27%; 12 is +117%/+59%; 16 is +204%/+102%. That curve IS the Arcanist - nothing early, everything late: at five stacks he is weaker than a flat per-stack ramp would make him, and by twelve he has roughly doubled while taking half again as much. The only thing that removes Resonance is Stabilize, which he does not start with and has to earn - it vents everything above 2 for Mana and a short damage shield, and it is the escape hatch from the escalation.",
+  "long": "Damaging casts build Resonance - 1 per cast, 2 on a crit - and it has NO MAXIMUM. Nothing removes it either: no decay, no cap, no reset, and it persists to the end of the battle. The bonuses COMPOUND rather than scaling per stack: at N stacks the damage bonus is 1.5% x N(N+1)/2 and the damage TAKEN penalty is 0.75% x N(N+1)/2, both uncapped, plus a flat +1% crit chance per stack. So 5 stacks is +22% damage and +11% taken; 8 is +54%/+27%; 12 is +117%/+59%; 16 is +204%/+102%. That curve IS the Arcanist - nothing early, everything late: at five stacks he is weaker than a flat per-stack ramp would make him, and by twelve he has roughly doubled while taking half again as much. TWO things remove Resonance and both must be EARNED - he starts with neither, and they are deliberately different shapes. STABILIZE (a boss-pool pick) VENTS everything above 2 for Mana and a short damage shield: the escape hatch from the escalation. ARCANE BOLT (a draft card) spends it as damage - 15% of Attack per stack, and then HALVES what he holds, so the curve keeps compounding from where it lands instead of restarting. One is a way out; the other is a change of slope.",
   "see_also": [
    "dmg_arcane",
    "crit"

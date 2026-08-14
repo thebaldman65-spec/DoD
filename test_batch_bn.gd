@@ -111,8 +111,16 @@ func _source_guard() -> void:
 	# The early return is the FIRST thing _hold_freeze does. Below the dead /
 	# already-frozen checks it would still be correct today, but it is above
 	# them so no clause added later can slip in ahead of it.
-	var fz := src.find("func _hold_freeze(target: BattleUnit, src: BattleUnit) -> void:")
-	ok(fz > 0, "§1: _hold_freeze is where it was")
+	# RE-POINTED IN PLACE (Batch BT), AND THE QUESTION IS UNCHANGED: this check
+	# exists to prove the re-entrancy guard is the FIRST thing `_hold_freeze`
+	# does, so no clause added later can slip in ahead of it. BT gave the
+	# function an optional `force` argument (defaulted off, threaded to
+	# `_apply_status`) — a new PARAMETER, not a new clause — so the anchor moved
+	# and the property it guards did not. The `force := false` in the signature
+	# is asserted here rather than only in test_batch_ax, because a later batch
+	# deleting the default would break every existing caller silently.
+	var fz := src.find("func _hold_freeze(target: BattleUnit, src: BattleUnit, force := false) -> void:")
+	ok(fz > 0, "§1: _hold_freeze is where it was (now carrying BT's defaulted `force`)")
 	if fz > 0:
 		var body := src.substr(fz, 700)
 		var guard := body.find("if _releasing:")
@@ -472,7 +480,7 @@ func _docs() -> void:
 	# test_batch_bb carry — three copies of one assertion, and all three must
 	# move together or the batch that bumps master.html trips two suites it did
 	# not touch.
-	ok(doc.contains("Last updated: 2026-08-14 (Batch BS)"),
+	ok(doc.contains("Last updated: 2026-08-14 (Batch BT)"),
 		"master.html carries the current batch's stamp")
 	# The number AND the reason it was chosen travel together, or the next
 	# reader sees a float with no argument behind it.

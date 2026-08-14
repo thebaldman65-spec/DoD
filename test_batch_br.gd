@@ -175,11 +175,26 @@ func _pools() -> void:
 	var spec_total := 0
 	for sp in Classes.SPEC_DRAFT_POOLS:
 		spec_total += Classes.SPEC_DRAFT_POOLS[sp].size()
-	ok(spec_total == 24, "§4: SPEC_DRAFT_POOLS is untouched at BP's twenty-four (%d)" % spec_total)
-	ok(spec_total + total == 48, "§0: the draft holds 48 of a target ~96 (%d)" % (spec_total + total))
+	# RE-POINTED IN PLACE (Batch BT), AND ALL THREE ARE INVERSIONS — the honest
+	# treatment when a batch pays a debt an older suite was recording. BR pinned
+	# these to stop a later reader taking "the class seam is closed" for "the
+	# draft is finished"; BT paid the FIRST THIRD of tranche 2 (nine Mage
+	# cards), so what has to be recorded now is that the debt is PARTLY paid and
+	# UNEVEN. The setups are byte-identical, because they are still what tells
+	# the two answers apart.
+	ok(spec_total == 33,
+		"§4+BT: SPEC_DRAFT_POOLS is BP's 24 plus BT's Mage nine (%d)" % spec_total)
+	ok(spec_total + total == 57,
+		"§0+BT: the draft holds 57 of a target ~96 (%d)" % (spec_total + total))
+	# THE POOLS ARE UNEVEN NOW, AND BOTH HALVES ARE ASSERTED. The Mage three are
+	# five deep and NINE SPECS ARE STILL TWO — so a Cryomancer's offer comes up
+	# full where a Warden's still fills SHORT, and the fill-short rule driven
+	# further down this file still bites where it was written to bite.
 	for sp2 in Classes.SPEC_DRAFT_POOLS:
-		ok(Classes.spec_draft_pool(sp2).size() == 2,
-			"§0: %s's SPEC pool is still two deep — tranches 2 and 3 are owed" % sp2)
+		var want := 5 if sp2 in ["pyromancer", "cryomancer", "arcanist"] else 2
+		ok(Classes.spec_draft_pool(sp2).size() == want,
+			"§0+BT: %s's SPEC pool is %d deep%s" % [sp2, want,
+				"" if want == 5 else " — the Cleric, Hunter and Warrior thirds are owed"])
 	# EVERY ENTRY RESOLVES THROUGH THE ONE RESOLVER, which is what makes the
 	# battle spawn, the hero sheet, the rune filter and the blacksmith pairing
 	# all pick them up with no new plumbing.
@@ -1166,7 +1181,7 @@ func _live_hits_not_casts() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	ok(master.contains("Batch BS"), "§5: master.html is stamped Batch BS")
+	ok(master.contains("Batch BT"), "§5: master.html is stamped Batch BT")
 	for cls in TRANCHE_4:
 		for nm in TRANCHE_4[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)

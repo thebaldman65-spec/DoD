@@ -128,11 +128,30 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.SPEC_DRAFT_POOLS[spec].size()
-	ok(total == 24, "§5+BP: twenty-four abilities ship — BO's eighteen plus BP's Warrior six (got %d)" % total)
+	# RE-POINTED AGAIN BY BATCH BT, ON EXACTLY THE SAME ARGUMENT BP USED: BT
+	# paid the first third of tranche 2, so the live total is 33 (BO's 18 + BP's
+	# Warrior 6 + BT's Mage 9). What a later batch could break is not "the pools
+	# are still thin", it is "a pool quietly emptied", and the total counted off
+	# the LIVE dict is what catches that either way.
+	ok(total == 33,
+		"§5+BP+BT: thirty-three ship — BO's 18, BP's Warrior 6, BT's Mage 9 (got %d)" % total)
+	# TRANCHE 1'S ENTRIES MUST STILL LEAD THEIR POOLS, which is the half of this
+	# check that survives BT untouched: a later tranche APPENDS, it does not
+	# rewrite what is already there. Asserted as a PREFIX rather than as
+	# equality, so BO's eighteen are still pinned as literals — a swap of two
+	# names would keep every count and change what the draft offers.
 	for spec in TRANCHE_1:
 		var live: Array = Classes.spec_draft_pool(spec)
-		ok(live == TRANCHE_1[spec],
-			"§5: %s's draft pool is %s (got %s)" % [spec, TRANCHE_1[spec], live])
+		var head: Array = live.slice(0, TRANCHE_1[spec].size())
+		ok(head == TRANCHE_1[spec],
+			"§5: %s's pool still OPENS with tranche 1's %s (got %s)" % [
+				spec, TRANCHE_1[spec], head])
+	# AND THE MAGE THREE ARE THE ONLY ONES THAT GREW (Batch BT). The other nine
+	# are still two deep, so the fill-short rule below still bites where it was
+	# written to bite.
+	for spec in ["pyromancer", "cryomancer", "arcanist"]:
+		ok(Classes.spec_draft_pool(spec).size() == 5,
+			"§5+BT: %s drafts FIVE" % spec)
 	# THE WARRIOR POOLS ARE NAMED **AND FILLED** SINCE BATCH BP (was: named and
 	# empty). One of four heroes in every party had no draft at all until it.
 	for w in ["berserker", "warden", "swordmaster"]:
@@ -1104,7 +1123,7 @@ func _docs() -> void:
 	# TOGETHER or a batch that bumps the timestamp trips suites it never
 	# touched. (BO had its own copy phrased as "this batch"; it is the same
 	# gate.)
-	ok(master.contains("Batch BS"),
+	ok(master.contains("Batch BT"),
 		"§6: master.html is stamped for the current batch")
 	ok(master.contains("THE ABILITY DRAFT") or master.contains("The Ability Draft"),
 		"§6: ...and carries the draft's own section")

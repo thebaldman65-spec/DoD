@@ -162,13 +162,17 @@ func _deletions() -> void:
 	ok(src.count("func _total_burn_turns") == 1,
 		"_total_burn_turns is the SINGLE denominator again")
 	# The surviving clauses, and their count. The refund is a property of the
-	# PASSIVE, so it must still have exactly one implementation — and FOUR call
-	# sites now (Detonation, Wildfire, Cinderfall, and BS's re-authored Ember
-	# Debt, which is the first payer that consumes nothing at all).
+	# PASSIVE, so it must still have exactly one implementation — and FIVE call
+	# sites now (Detonation, Wildfire, Cinderfall, BS's re-authored Ember Debt,
+	# which is the first payer that consumes nothing at all, and BATCH BT's
+	# FUNERAL PYRE). RE-POINTED 4 -> 5 rather than deleted, for the reason BO
+	# pinned the count in the first place: a new consumer has to COME AND SAY SO
+	# instead of quietly writing its own refund, and the count decaying to
+	# "whatever it is today" is what that would look like.
 	ok(src.count("func _overburn_refund") == 1,
 		"the refund still has exactly ONE implementation")
-	ok(src.count("_overburn_refund(attacker,") == 4,
-		"...and four call sites (got %d)" % src.count("_overburn_refund(attacker,"))
+	ok(src.count("_overburn_refund(attacker,") == 5,
+		"...and FIVE call sites (got %d)" % src.count("_overburn_refund(attacker,"))
 	ok(src.count("func _overburn_mult") == 1, "the bonus still has one home")
 	# GAP FOUND BY A NEGATIVE CONTROL, WHICH IS THE WHOLE REASON TO RUN THEM:
 	# THE FUNCTION-ABSENCE GREPS ABOVE DO NOT CATCH A BILL WRITTEN STRAIGHT INTO
@@ -341,7 +345,7 @@ func _rune_audit() -> void:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch BS"), "§5: master.html is stamped Batch BS")
+	ok(master.contains("Batch BT"), "§5: master.html is stamped Batch BT")
 	ok(master.contains("TWO clauses"),
 		"§5: master.html's Overburn entry states two clauses")
 	ok(master.contains("Holding fire\ncosts him nothing.</b>")

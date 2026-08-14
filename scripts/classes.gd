@@ -270,10 +270,17 @@ const SPEC_DRAFT_POOLS := {
 	"berserker": ["Blood Offering", "Gut Rip"],
 	"warden": ["Covering Guard", "Eye of the Storm"],
 	"swordmaster": ["Precision Strike", "Feint"],
-	# MAGE.
-	"pyromancer": ["Cinderfall", "Ember Debt"],
-	"cryomancer": ["Winter's Toll", "Rimebinding"],
-	"arcanist": ["Null Field", "Kindled Mind"],
+	# MAGE — FIVE APIECE SINCE BATCH BT (tranche 2's first third). The Cleric,
+	# Hunter and Warrior halves of tranche 2 are still owed at two, and tranche
+	# 3 after them, so a Cleric/Hunter/Warrior offer still fills SHORT while a
+	# Mage one does not. That asymmetry is the visible shape of the remaining
+	# debt rather than a bug, and test_batch_bt drives both sides of it.
+	"pyromancer": ["Cinderfall", "Ember Debt", "Slow Burn", "Stoke",
+		"Funeral Pyre"],
+	"cryomancer": ["Winter's Toll", "Rimebinding", "Flash Freeze",
+		"Killing Frost", "Hoarfrost Armor"],
+	"arcanist": ["Null Field", "Kindled Mind", "Arcane Bolt", "Inner Arcane",
+		"Arcane Echo"],
 	# CLERIC.
 	"holy": ["Second Wind", "Rite of Return"],
 	"inquisitor": ["Vow of Suffering", "Aegis Reversal"],
@@ -1193,6 +1200,184 @@ static func draft_ability(display_name: String) -> Ability:
 				"anim": "attack01", "special": "iron_will",
 				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
 				"description": "Set your teeth: for 3 turns you cannot\nbe Stunned, Frozen, Dazed or Broken,\nand take 15% less damage. The Break\nstill piles up to 99 — it just cannot\ncross until this ends."})
+		# ========== BATCH BT: TRANCHE 2, THE MAGE NINE ==========
+		#
+		# THE SYNERGY RULE STARTS HERE AND IS STANDING FROM THIS TRANCHE ON.
+		# Tranche 1 asked what GAP an ability filled, which was the right
+		# question against an empty pool. With five per spec the question
+		# becomes whether a BUILD can be assembled, so every entry below names
+		# what it combos with — which talent node, which other card, which
+		# capstone. A CARD THAT APPEARS IN NOBODY'S BUILD PLAN IS A CARD THAT
+		# FILLS A SLOT, and the named combo is what a later batch checks a new
+		# ability against.
+		#
+		# ----- PYROMANCER: hold the bank, multiply it, cash it for something
+		# else. THE SPINE AFTER BATCH BS IS DEFERRED DAMAGE — he is weak until
+		# he cashes in, and with the drain deleted holding fire no longer costs
+		# Mana. What it costs is TURNS. These three are the three things a bank
+		# can do: keep it, deepen it, or spend it on something other than
+		# damage.
+		#
+		# AXIS: time, bought. Every payoff he owns reads a bank that is
+		# shrinking under him and nothing in his kit could ever slow it.
+		# SYNERGY: Powder Keg (Detonation row 8) banks 30% of each Detonation
+		# into the next, Sea of Flame (Kindling row 8) pays +7% fire damage per
+		# burning enemy, and Cataclysm eats the whole field — all three want the
+		# field lit LONGER. Strongest immediately after Firestorm, which lays
+		# 12-16 burn-turns in one cast.
+		"Slow Burn":
+			return Ability.make({"display_name": "Slow Burn", "dmg_type": "fire",
+				"cost": 15, "damage": 0, "pressure": 0, "delay": 1.5,
+				"cooldown": 4, "anim": "attack03", "special": "slow_burn",
+				"perfect_id": "", "perfect_text": "Holds a 4th turn",
+				"description": "Bank the fire: for 3 turns the Burn on\nEVERY enemy stops counting down. It\nstill burns for its full damage — it\njust never gets shorter.\nThe mark rides enemies not yet alight,\nso fire laid inside the window holds too."})
+		# AXIS: the bank multiplies instead of growing. Backdraft ADDS turns and
+		# Ember Debt LAYS them; this one doubles what is already there, so it is
+		# worth exactly as much as the stack he built and nothing on an empty one.
+		# SYNERGY: Detonation pays 250% of the bank's remaining damage (325%
+		# with Focused Flame), so doubling a deep stack is the largest single
+		# swing available to him. Pairs directly with SLOW BURN — stall, double,
+		# detonate — and with Cinder Trail's 4-turn Fireball. Total Commitment
+		# consumes from the target AND its two neighbours, so a doubled centre
+		# pays three ways.
+		"Stoke":
+			return Ability.make({"display_name": "Stoke", "dmg_type": "fire",
+				"cost": 20, "damage": 25, "pressure": 8, "delay": 2.0,
+				"cooldown": 3, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "Burn turns TRIPLED instead of doubled",
+				"description": "Feed the coals: 25% of Attack, and if\nthe target is Burning its remaining\nBurn turns are DOUBLED. Nothing extra\nagainst an enemy that is not alight.\nOverburn reads the field BEFORE the\ndoubling — later casts collect on it."})
+		# AXIS: fire converted into survival rather than into damage — the only
+		# card in his kit that does it, and the Inferno build's cash-in where
+		# Detonation is the Detonation build's.
+		# SYNERGY: BATCH BS turned the whole Inferno lane into mitigation (Ember
+		# Shroud, Ashen Skin, Heat Haze, Immolate, Kiln-Forged, Ash Lung, Forge
+		# Body), and every one of those is a PERCENTAGE — a shield is the flat
+		# term that lane never gets. Overburn's refund pays 1 Mana per turn
+		# consumed (2 with Crucible), so a deep stack cashed here is a shield
+		# AND a pool.
+		"Funeral Pyre":
+			return Ability.make({"display_name": "Funeral Pyre", "dmg_type": "fire",
+				"cost": 25, "damage": 0, "pressure": 0, "delay": 2.5,
+				"cooldown": 4, "anim": "attack02", "special": "funeral_pyre",
+				"perfect_id": "", "perfect_text": "A shield worth 200% instead of 150%",
+				"description": "Put the fire out and wear it: consume\nALL Burn on one enemy and gain a\nshield worth 150% of the damage that\nBurn would still have dealt (3 turns).\nOverburn refunds every turn consumed."})
+		# ----- CRYOMANCER: get a hold, pay before the hold, survive without
+		# one. HIS POOL'S TWO EXISTING CARDS BOTH ASSUME HE ALREADY HOLDS
+		# SOMETHING — Winter's Toll collects interest on a hold, Rimebinding
+		# copies one — so against a boss, which resists Frozen until Broken,
+		# both are dead cards for most of the fight.
+		#
+		# AXIS: the hold WITHOUT the build, on a card rather than a bought cell.
+		# SYNERGY: Cold Snap (Deep Freeze row 6) fills a held enemy's Break
+		# meter 15 a turn, so a boss frozen once tends to stay freezable, and
+		# Second Prison (row 5) makes a second hold worth having. Expensive and
+		# slow on purpose — THE EMERGENCY, NOT THE OPENER.
+		#
+		# REPORTED, NOT RE-TUNED: on every number this is a strictly worse
+		# GLACIAL PRISON (Deep Freeze row 4 — 25 Mana, 2.5, 4cd for the same
+		# outright freeze). The distinction is the ACQUISITION CHANNEL, which is
+		# real: the node is a bought cell in ONE lane of ONE tree, so a Winter or
+		# Thaw Cryomancer can never have it, while this is drafted by any of
+		# them. Its PERFECT is what keeps it from being dominated outright — see
+		# `_hold_freeze`'s `force` argument, which no node buys.
+		"Flash Freeze":
+			return Ability.make({"display_name": "Flash Freeze", "dmg_type": "frost",
+				"cost": 30, "damage": 0, "pressure": 0, "delay": 3.0,
+				"cooldown": 5, "anim": "attack03", "special": "flash_freeze",
+				"perfect_id": "", "perfect_text": "It takes hold of an UNBROKEN boss too",
+				"description": "Seal it now: the target is Frozen\noutright whatever its Chilled stacks,\nand joins the Glacial Hold.\nA BOSS still resists until Broken —\nand a held boss shrugs the ice off\nafter ONE turn. That turn is what this\nbuys against one; it is not a lockdown."})
+		# AXIS: the accumulation pays on its own. His stacks currently do
+		# nothing but count toward a freeze, so a fight where the freeze never
+		# lands is a fight where his build did nothing.
+		# SYNERGY: it feeds Hypothermia (+3% damage taken per stack), Frigid
+		# Grip (10% harder slow per stack), Winter's Depth (-8% Constitution per
+		# stack, so they Break sooner) and Bitter Cold. Best after Blizzard or
+		# Eternal Winter, which spread thin stacks wide — this is what turns
+		# that spread into damage and depth.
+		#
+		# NAME COLLISION, REPORTED NOT RESOLVED (the BR §1 rule): KILLING FROST
+		# is also a Cryomancer talent node (`cr_freezing`, Thaw row 2, "+15
+		# points on the held-enemy window"). SAME SPEC, so a Cryomancer holding
+		# the node can draft the card — the Iron Will shape. It is a LABEL
+		# collision only: a node's name is not an ability name and nothing
+		# resolves it, the node's counter is `killing_frost` and the card's
+		# handler is a `special`, and the two touch no shared field.
+		"Killing Frost":
+			return Ability.make({"display_name": "Killing Frost", "dmg_type": "frost",
+				"cost": 20, "damage": 20, "pressure": 6, "delay": 2.0,
+				"cooldown": 3, "aoe": true, "anim": "attack03",
+				"special": "killing_frost",
+				"perfect_id": "", "perfect_text": "3 stacks of Chilled each instead of 2",
+				"description": "Drive the cold home: every CHILLED\nenemy takes 20% of Attack and gains 2\nmore stacks of Chilled. Enemies that\nare not Chilled are untouched — and\nfour stacks still put one in the ice."})
+		# AXIS: stacks built without spending a turn applying them, and the only
+		# defence in his kit that a boss cannot shrug (his other one is a hold).
+		# SYNERGY: Frigid Grip and Winter's Depth make every stack both a slow
+		# and a step toward Broken, so the retaliation is an engine rather than
+		# a deterrent; Splintering Shards makes Razor Ice always land its fourth
+		# hit against the pile this builds.
+		#
+		# ADJACENCY, REPORTED: `hoarfrost` is also a severity-1 BATTLE MODIFIER
+		# (Run.MODIFIERS — "everyone starts Chilled") and part of the Rune of
+		# Hoarfrost Points, a class:hunter rune. Neither is an ability and
+		# neither shares a name with this one; the status this card applies is
+		# `rimeguard` precisely so the two chips can never read the same word.
+		"Hoarfrost Armor":
+			return Ability.make({"display_name": "Hoarfrost Armor", "dmg_type": "frost",
+				"cost": 20, "damage": 0, "pressure": 0, "delay": 2.0,
+				"cooldown": 4, "anim": "attack01", "special": "hoarfrost_armor",
+				"perfect_id": "", "perfect_text": "Holds a 4th turn",
+				"description": "Wear the winter: for 3 turns you take\n25% less damage, and anything that\nstrikes you gains 2 stacks of Chilled.\nThey build the pile by hitting you."})
+		# ----- ARCANIST: the first thing in the DRAFT that spends. Every node
+		# and every drafted card he owns READS Resonance; the only spender he
+		# has ever had is STABILIZE, which is a boss-pool pick and vents the
+		# meter to a floor of 2 for Mana and a ward. So his decision has been
+		# "cast whatever builds fastest", which is not a decision.
+		#
+		# AXIS: cash the curve, or keep climbing. At 6 stacks it is 90% of
+		# Attack for a cost he barely notices; at 16 it is 240% and he falls
+		# to 8. IT HALVES RATHER THAN VENTING TO A FLOOR, which is the whole
+		# distinction from Stabilize: the curve keeps compounding from where it
+		# lands instead of restarting, so spending is a decision about slope
+		# rather than an abandonment of the ramp.
+		# SYNERGY: Cascade (+1 build per cast at 10+ stacks), Harmonics and
+		# Critical Mass all make the climb back cheaper, so a Resonance-lane
+		# build can spend and re-ramp. The ENTROPY lane cares twice — halving
+		# the stacks also halves the compounding DAMAGE-TAKEN penalty, so it is
+		# an escape hatch that costs him his damage rather than a free one.
+		"Arcane Bolt":
+			return Ability.make({"display_name": "Arcane Bolt", "dmg_type": "arcane",
+				"cost": 30, "damage": 15, "pressure": 8, "delay": 2.5,
+				"cooldown": 4, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "20% of Attack per stack instead of 15%",
+				"description": "Spend the storm: 15% of Attack for\nEVERY Resonance stack you hold, then\nyour stacks are HALVED.\nThe curve keeps compounding from where\nit lands — this is a change of slope,\nnot a reset."})
+		# AXIS: the ramp's opening move, and its panic button, in one card.
+		# SYNERGY: the opening cast in a four-enemy fight, and the panic button
+		# late — below half health it pays double exactly when the compounding
+		# damage-TAKEN penalty is killing him. On the Edge (Entropy row 2:
+		# surviving below 35% builds 4) and Backlash (Resonance builds when he
+		# takes damage) mean an ENTROPY build gets paid three ways for being
+		# nearly dead.
+		"Inner Arcane":
+			return Ability.make({"display_name": "Inner Arcane", "dmg_type": "arcane",
+				"cost": 15, "damage": 0, "pressure": 0, "delay": 1.0,
+				"cooldown": 3, "anim": "attack01", "special": "inner_arcane",
+				"perfect_id": "", "perfect_text": "One additional stack",
+				"description": "Gather it in: bank Resonance equal to\nthe number of enemies still ALIVE —\nDOUBLED while you are below half\nhealth. Widest on turn one, and worth\nmost when you are nearly dead."})
+		# AXIS: the only reason he has to focus one target. Worthless early (30%
+		# of a small number) and enormous once the passive is paying +117%,
+		# BECAUSE THE ECHO CARRIES HIS FULL MULTIPLIER — it reads the damage the
+		# hit actually dealt rather than re-deriving from a nominal number.
+		# SYNERGY: sits beside Temporal Rift (a crit echoes 40% at a RANDOM
+		# enemy), Barrage Master (+3 bolts) and Suppressing Fire (each Barrage
+		# bolt harder than the last). Per BR §1 THE ECHO COUNTS HITS: a
+		# three-bolt Barrage echoes three times, which is what makes the
+		# multi-hit nodes the ones to build with it.
+		"Arcane Echo":
+			return Ability.make({"display_name": "Arcane Echo", "dmg_type": "arcane",
+				"cost": 25, "damage": 20, "pressure": 6, "delay": 2.0,
+				"cooldown": 4, "anim": "attack03",
+				"perfect_id": "", "perfect_text": "The echo holds a 4th turn",
+				"description": "Set a resonance in one enemy: 20% of\nAttack, and for 3 turns every damaging\nHIT you land anywhere repeats at 30%\nagainst this target.\nA three-bolt Barrage echoes THREE\ntimes. One mark at a time."})
 	return null
 
 
