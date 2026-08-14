@@ -1068,10 +1068,13 @@ static func draft_ability(display_name: String) -> Ability:
 		# assumed before these were priced: `resource_name` is decided ONCE in
 		# `CONFIGS["warrior"]` and no spec override touches it.
 		#
-		# NONE OF THE SIX CARRIES `resource_gain`, and that is the cleanest
+		# FIVE OF THE SIX CARRY NO `resource_gain`, and that was the cleanest
 		# statement of §4's "weaker than spec work" a Rage class can be given:
-		# every Warrior spec ability builds 10-15 Rage while it spends, and
-		# these spend without building.
+		# every Warrior spec ability builds 10-15 Rage while it spends, and these
+		# spend without building. **CHARGE IS THE EXCEPTION, by the designer's
+		# reprice immediately after BR shipped — it builds 30, more than any
+		# Warrior spec ability and more than the free basic's 20.** Read its own
+		# comment below before touching either number.
 		#
 		# AXIS: recovery that scales with the beating. IT READS DAMAGE TAKEN,
 		# NOT MISSING HEALTH, and that distinction IS the ability — a Warrior
@@ -1106,17 +1109,32 @@ static func draft_ability(display_name: String) -> Ability:
 				"perfect_id": "", "perfect_text": "They also regain 15% of their resource",
 				"description": "Shout one ally forward: they act NEXT,\njumping straight to the front of the\norder. You gave them the turn — it\ncost you yours."})
 		# AXIS: reaching something NOW. The very fast initiative is the point —
-		# it is a Warrior's only answer to a caster winding up, and it is why
-		# the card is worth 20 Rage despite the free basic hitting nearly as
-		# hard. 10 BD sits DELIBERATELY BELOW the free Strike's 18: what he buys
-		# is the arrival and the Daze, and it must not also win on Break.
+		# it is a Warrior's only answer to a caster winding up.
+		#
+		# REPRICED BY THE DESIGNER IMMEDIATELY AFTER BATCH BR SHIPPED, AND THE
+		# ARGUMENT IT REPLACES IS RECORDED HERE RATHER THAN DELETED. The batch
+		# assigned 10 BD *deliberately below the free Strike's 18* and gave the
+		# card no `resource_gain` at all, on the reasoning that what a class card
+		# buys is the arrival and the Daze and it must not also win on Break —
+		# BQ's rule (the floor for a class ability is the FREE BASIC) applied the
+		# other way round. **THE DESIGNER'S CALL OVERRULES BOTH HALVES: 20 BD and
+		# 30 Rage generated.**
+		#
+		# WHAT THAT MAKES IT, SAID PLAINLY BECAUSE IT IS THE ONE THING A LATER
+		# READER WILL WANT: Charge now beats the free Strike on damage (25% vs
+		# 23%), on Break (20 vs 18), on initiative (1.0 vs 2.0) and carries a
+		# Daze, while still NET-GENERATING 10 Rage (30 gained against its own 20
+		# spent). Strike wins only on net Rage (+20) and on having no cooldown.
+		# **It is the first class-wide card in the game that generates its
+		# resource**, and the only one of the twenty-four that is not weaker than
+		# the free basic on every axis. Flagged, not silently absorbed.
 		"Charge":
 			return Ability.make({"display_name": "Charge", "cost": 20,
-				"damage": 25, "pressure": 10, "delay": 1.0, "cooldown": 3,
-				"anim": "attack02",
+				"damage": 25, "pressure": 20, "delay": 1.0, "cooldown": 3,
+				"anim": "attack02", "resource_gain": 30,
 				"applies_status": {"id": "dazed", "turns": 1},
 				"perfect_id": "", "perfect_text": "Dazed for 2 turns instead of 1",
-				"description": "Close the distance before it finishes\nthe cast: 25% of Attack and the target\nis DAZED for a turn. Nothing else in\nthe kit arrives this fast."})
+				"description": "Close the distance before it finishes\nthe cast: 25% of Attack and 20 Break\ndamage, and the target is DAZED for a\nturn. Builds 30 Rage. Nothing else in\nthe kit arrives this fast."})
 		# AXIS: breadth from a narrow class. THREE CHOSEN enemies rather than
 		# three random ones, which is the whole distinction from War Stomp (a
 		# Warden spec-pool entry with the same 15% and the same 15 BD, for LESS

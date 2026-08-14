@@ -240,7 +240,7 @@ func _break_damage() -> void:
 	var want := {
 		"Cleave": 15,          # the brief's figure, and it says "each"
 		"Aimed Volley": 8,     # §4's 25 read as a TOTAL, split three ways
-		"Charge": 10,          # this batch's, decided against the free Strike
+		"Charge": 20,          # THE DESIGNER'S REPRICE, over the batch's 10
 		"Field Dressing": 0, "Camouflage": 0, "Bola": 0, "Hunter's Mark": 0,
 		"Arcane Arrows": 0, "Battle Trance": 0, "Rally": 0, "Warcry": 0,
 		"Iron Will": 0,
@@ -258,9 +258,15 @@ func _break_damage() -> void:
 		and volley.pressure * volley.multi_hits <= triple.pressure * triple.multi_hits,
 		"§4: Aimed Volley's %d across three is at or under Triple Shot's %d" % [
 			volley.pressure * volley.multi_hits, triple.pressure * triple.multi_hits])
-	# CHARGE'S 10 IS DELIBERATELY BELOW THE FREE BASIC'S 18. What he buys is the
-	# arrival and the Daze, and it must not also win on Break — BQ's rule (the
-	# floor for a class card is the free core attack) applied the other way.
+	# CHARGE AGAINST THE FREE BASIC — BQ's rule (the floor for a class card is the
+	# free core attack), and this is the ONE card in the twenty-four that clears
+	# it rather than sitting under it.
+	#
+	# INVERTED BY THE DESIGNER'S REPRICE, IMMEDIATELY AFTER BR SHIPPED. The batch
+	# assigned 10 BD deliberately UNDER Strike's 18 and no `resource_gain` at all,
+	# so that what the card bought was the arrival and the Daze. The reprice makes
+	# it 20 BD and 30 Rage. The comparison is still exactly the one worth pinning
+	# — a class card measured against the free basic — so only the answer moves.
 	var charge: Ability = Classes.pool_ability("Charge")
 	var strike: Ability = null
 	for ab2 in Classes.kit("warrior"):
@@ -268,12 +274,22 @@ func _break_damage() -> void:
 			strike = ab2
 	ok(strike != null, "§4: the Warrior's free core attack is Strike")
 	if strike != null and charge != null:
-		ok(charge.pressure < strike.pressure,
-			"§4: Charge's %d BD is UNDER the free Strike's %d" % [
+		ok(charge.pressure > strike.pressure,
+			"REPRICE: Charge's %d BD is now OVER the free Strike's %d" % [
 				charge.pressure, strike.pressure])
+		ok(charge.damage > strike.damage,
+			"REPRICE: ...and over it on damage too (%d%% against %d%%)" % [
+				charge.damage, strike.damage])
 		ok(charge.delay < strike.delay,
-			"§4: ...and what it buys instead is the arrival (%.1f against %.1f)" % [
+			"§4: ...on top of the arrival it always bought (%.1f against %.1f)" % [
 				charge.delay, strike.delay])
+		# THE TWO THINGS STRIKE STILL WINS ON, pinned so "Charge is strictly
+		# better than the free basic" cannot become true by accident.
+		ok(charge.resource_gain - charge.cost < strike.resource_gain,
+			"REPRICE: Strike still wins on NET Rage (+%d against Charge's +%d)" % [
+				strike.resource_gain, charge.resource_gain - charge.cost])
+		ok(charge.cooldown > 0 and strike.cooldown == 0,
+			"REPRICE: ...and on having no cooldown (Charge sits on %d)" % charge.cooldown)
 
 
 # ---------- §4 THE "WEAKER" HALF, VERIFIED RATHER THAN TRUSTED ----------
@@ -336,15 +352,35 @@ func _weaker_half() -> void:
 				cleave.cost, stomp.cost])
 		ok(cleave.choose_three and stomp.random_hits == 3,
 			"§4: ...and the distinction is CHOSEN three against RANDOM three")
-	# NONE OF THE SIX WARRIOR CARDS BUILDS RAGE, which is the cleanest statement
-	# of "weaker than spec work" a Rage class can be given: every Warrior spec
-	# ability builds 10-15 while it spends, and these spend without building.
+	# FIVE OF THE SIX WARRIOR CARDS BUILD NO RAGE, which was the cleanest
+	# statement of "weaker than spec work" a Rage class can be given: every
+	# Warrior spec ability builds 10-15 while it spends, and these spend without
+	# building. **CHARGE IS THE EXCEPTION AND IT IS THE DESIGNER'S REPRICE**, not
+	# an oversight — asserted BY NAME so a later batch cannot quietly add a
+	# second one, and so the exception stays a decision.
 	for nm in TRANCHE_4["warrior"]:
 		var ab: Ability = Classes.pool_ability(nm)
+		if nm == "Charge":
+			ok(ab != null and ab.resource_gain == 30,
+				"REPRICE: Charge builds 30 Rage — the ONE class card that generates")
+			continue
 		ok(ab != null and ab.resource_gain == 0,
 			"§4: %s builds no Rage — the class cards spend without building" % nm)
+	# AND IT IS THE ONLY ONE IN ALL TWENTY-FOUR. The Mage, Cleric and Hunter
+	# pools have no resource generator at all, so this stays a Warrior-only
+	# exception rather than a rule that quietly spread.
+	for cls in Classes.CLASS_DRAFT_POOLS:
+		for nm2 in Classes.CLASS_DRAFT_POOLS[cls]:
+			if nm2 == "Charge":
+				continue
+			var ab3: Ability = Classes.pool_ability(nm2)
+			ok(ab3 != null and ab3.resource_gain == 0,
+				"REPRICE: %s (%s) still generates nothing" % [nm2, cls])
 	ok(strike_gain() > 0,
 		"§4: ...while the free Strike builds %d" % strike_gain())
+	ok(Classes.pool_ability("Charge").resource_gain > strike_gain(),
+		"REPRICE: and Charge builds MORE than the free basic (30 against %d)" % \
+			strike_gain())
 	# THE ONE CARD THAT FAILS §4 IN THE OTHER DIRECTION, PINNED AS A FINDING.
 	# WARCRY OUT-SIZES BATTLE SHOUT, a Berserker SPEC-pool ability, on its
 	# headline number. It ships as specified (§4 says confirm and REPORT, not
@@ -1005,12 +1041,24 @@ func _live_iron_will() -> void:
 	wd.block_chance = 0.0
 	wd.plating_bonus = -0.15
 	wd.parry_chance = 0.0
+	# AND THE CRIT ROLL COMES OFF TOO — the same fault this batch closed in
+	# test_batch_bq's Unburden and Exhortation checks, found here by the Charge
+	# reprice re-running the suite. This compares ONE blow against ONE blow, and
+	# a 15% cut cannot survive the WARDED swing landing a x1.5 crit. Forced, not
+	# retried (the AK/AL/AR discipline).
+	foe.crit_bonus = -1.0
 	var strike: Ability = foe.abilities[0]
 	var hp_a := wd.hp
 	await scene.call("_resolve", foe, strike, wd, "good")
 	var with_iw := hp_a - wd.hp
 	wd.remove_status("ironclad")
 	wd.hp = wd.max_hp
+	# AND THE PLATING RAMP IS RE-ZEROED BETWEEN THE TWO BLOWS. Heavy Plating
+	# climbs +8% Block per UNBLOCKED hit, so the first swing leaves the second
+	# with a real block chance — and a blocked swing is a FULL negation, which
+	# reads as 0 damage and inverts the comparison about one run in twelve. The
+	# cancel has to be re-applied, not applied once.
+	wd.plating_bonus = -0.15
 	var hp_b := wd.hp
 	await scene.call("_resolve", foe, strike, wd, "good")
 	var without_iw := hp_b - wd.hp

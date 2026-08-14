@@ -809,7 +809,8 @@ and BQ's, resolved at the top of `pool_ability` as before.
   make something happen on turn one: **Battle Trance** (15 Rage, 1.5, 4cd, self — 3 turns of 3% of
   maximum health PLUS HALF the damage taken since his last turn) · **Rally** (15, 1.5, 4cd, one ally
   — that ally acts NEXT; the only ability in the game that hands an ally a turn) · **Charge** (20,
-  **1.0**, 3cd — 25% of Attack, 10 BD, Dazed 1 turn; the fastest arrival in the kit) · **Cleave**
+  **1.0**, 3cd — 25% of Attack, **20 BD**, Dazed 1 turn, **builds 30 Rage**; the fastest arrival in
+  the kit, and the designer's reprice — see below) · **Cleave**
   (25, 2.5, 3cd, three CHOSEN enemies — 15% of Attack and 15 BD each) · **Warcry** (20, 2.0, 5cd —
   the whole party deals 20% more damage for 3 turns) · **Iron Will** (20, 1.5, 4cd, self — 3 turns
   of no Stun, Freeze, Daze or Break, and 15% less damage).
@@ -886,13 +887,25 @@ brief's) · **Aimed Volley 8 A SHOT = 24 across the volley**, and that is §4's 
 rather than per shot: the brief writes "(15 each)" for Cleave and "(25)" for the volley, 25 does
 not divide by three, and 8 lands level with Triple Shot's 8 a shot and 24 across three. Reading it
 per shot would have given a class card 75 Break against a Sharpshooter spec card's 24. **The
-one-point deviation is stated rather than rounded away silently.** · **Charge 10, DELIBERATELY
+one-point deviation is stated rather than rounded away silently.** · **Charge shipped at 10, DELIBERATELY
 BELOW the free Strike's 18** — BQ's rule (the floor for a class card is the FREE BASIC) applied the
-other way: he pays 20 Rage for 25% against Strike's free 23%, so what he buys is the **1.0
-initiative** and the Daze, and it must not also win on Break. · **The other nine carry NONE** —
-they are not attacks. · **NONE OF THE SIX WARRIOR CARDS CARRIES `resource_gain`**, which is the
-cleanest statement of "weaker than spec work" a Rage class can be given: every Warrior spec ability
-builds 10-15 Rage while it spends, and these spend without building.
+other way — **AND THE DESIGNER REPRICED IT TO 20 BD AND 30 RAGE IMMEDIATELY AFTER THE BATCH
+SHIPPED. See the reprice note below; the original argument is kept because a later reader would
+otherwise re-derive it.** · **The other nine carry NONE** — they are not attacks. · **FIVE OF THE
+SIX WARRIOR CARDS CARRY NO `resource_gain`**, which is the cleanest statement of "weaker than spec
+work" a Rage class can be given: every Warrior spec ability builds 10-15 Rage while it spends, and
+those five spend without building. **Charge is the exception, by the same reprice.**
+**THE CHARGE REPRICE, AND WHAT IT MAKES THE CARD — the one thing a later reader will want.** At 20
+BD and 30 Rage, **Charge beats the free Strike on damage (25% vs 23%), on Break (20 vs 18) and on
+initiative (1.0 vs 2.0), carries a Daze, and still NET-GENERATES 10 Rage** (30 gained against its
+own 20 spent). **Strike wins only on net Rage (+20) and on having no cooldown.** So it is the
+**first and only class-wide card in all twenty-four that generates its resource**, and the only one
+that is not weaker than the free basic on every axis — **a deliberate exception to BQ's rule rather
+than a drift past it**. It also clears **Overpower** (a Warrior boss-pool card) on cost, damage,
+initiative and Rage economy, losing only on cooldown (3 vs 1) and on Overpower's Break-scaling
+bonus. test_batch_br pins the exception BY NAME, asserts the two axes Strike still wins, and asserts
+that the other twenty-three class cards generate NOTHING — so a later batch cannot quietly add a
+second generator.
 **ONE CORRECTION TOWARD THE CODE: WARCRY IS +20% DAMAGE DEALT, NOT +20% ATTACK.** §3 says "gains
 20% Attack"; `attack` is a raw stat read at dozens of sites (DoT snapshots, companion strikes,
 poison ticks) and a temporary mutation of it needs a revert path — the exact shape that produced
@@ -908,7 +921,7 @@ mistake. Statuses expire by themselves and cannot leak past a battle.
 **VERIFIED — AND PER THE STANDING INSTRUCTION, THAT MEANS THE CODE LANDED AND WORKS. NO SWEEPS, NO
 BANDS, NO BALANCE MEASUREMENT WAS RUN, and none should be quoted from this batch.**
 check_parse 0 · check_flow 0 · check_map_screen OK · run-harness gates 1/2/3 PASS ·
-**NEW test_batch_br.gd 1400/0**. All six clauses §6 named as able to silently do nothing are driven
+**NEW test_batch_br.gd 1441/0** (1414 at ship; the Charge reprice added 27 checks). All six clauses §6 named as able to silently do nothing are driven
 live and asserted against the state they change; **six are built so a broken implementation still
 fails** (the volley's spend is an EXACT identity 5->2 with a single-strike ability asserted to
 spend exactly one in the same check — which is what tells "three per volley" from "three per cast";
@@ -927,7 +940,8 @@ left)" … "(3 charges left)", with a MISSED shot spending none. **NOTE the smok
 `DOD_SIM_ABILITIES` applies its list to EVERY hero, so a Cryomancer casts Charge in the log — the
 real draft only ever offers class-matching cards.**
 **ELEVEN NEGATIVE CONTROLS, each applied to product code and reverted** (battle.gd, unit.gd and
-classes.gd each came back byte-identical by hash, and the suite to 1414/0 after the last): Iron Will
+classes.gd each came back byte-identical by hash, and the suite to 1414/0 after the last — that
+figure predates the Charge reprice, which took the suite to 1441): Iron Will
 as "the meter cannot fill" **trips 5**; Iron Will as "Broken is refused" **trips 3**; Arcane Arrows
 spending one charge per CAST **trips 3**; Arcane Arrows put on a clock **trips 5**; Battle Trance
 reading MISSING HEALTH **trips 2**; Battle Trance's accumulator never cleared **trips 2**;
@@ -937,7 +951,7 @@ Camouflage OVERWRITING Ghillie Suit **trips 2**; Hunter's Mark paying only the h
 **FULL BATTERY GREEN**: ah 5500, ah_battle 65, ai 2217, aj 418, ak 528, al 560, ar 914, as 396,
 at 470, au 336, av 324, aw 350, ax 338, ay 484, az 519, **ba 690**, bb 172, bc 91, bd 69, be 34,
 bf 78, bg 47, bh 233, bi 88, bj 67, bl 88, bm 1890, bn 77, **bo 505**, **bp 268**, **bq 738**,
-**br 1414**, runes 2973, rune_battle 96 — all 0 failures. **an reads 3624 and bk 130, both inside
+**br 1441**, runes 2973, rune_battle 96 — all 0 failures. **an reads 3624 and bk 130, both inside
 their DOCUMENTED run-to-run drift** — neither is pinned and neither should be.
 · **THE THREE RAISED COUNTS ARE POOL LOOPS WALKING MORE ENTRIES, not new assertions** (bo 502 ->
   505, bp 260 -> 268, bq 592 -> 738): each suite iterates the LIVE pools, and twelve arrived. bq's

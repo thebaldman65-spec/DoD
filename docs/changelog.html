@@ -105,8 +105,9 @@ turns he heals 3% of maximum health plus <b>half of all damage taken since his l
 <li><b>Rally</b> (15 Rage, 1.5, 4cd, one ally) &mdash; that ally acts NEXT, jumping to the front of
 the initiative order. <i>Giving away tempo</i> &mdash; the only ability in the game that hands an
 ally a turn.</li>
-<li><b>Charge</b> (20 Rage, <b>1.0</b>, 3cd, one enemy) &mdash; 25% of Attack, 10 Break damage, and
-the target is Dazed for 1 turn. <i>Reaching something now.</i></li>
+<li><b>Charge</b> (20 Rage, <b>1.0</b>, 3cd, one enemy) &mdash; 25% of Attack, <b>20 Break
+damage</b>, and the target is Dazed for 1 turn; <b>builds 30 Rage</b>. <i>Reaching something
+now.</i> <b>REPRICED BY THE DESIGNER IMMEDIATELY AFTER THE BATCH SHIPPED</b> &mdash; see below.</li>
 <li><b>Cleave</b> (25 Rage, 2.5, 3cd, three chosen enemies) &mdash; 15% of Attack and 15 Break
 damage each. <i>Breadth from a narrow class.</i></li>
 <li><b>Warcry</b> (20 Rage, 2.0, 5cd, party) &mdash; the whole party deals 20% more damage for 3
@@ -172,14 +173,27 @@ also lands level with Triple Shot's 8 a shot and 24 across three, which is the s
 comparison was made against. Reading it as 25 per shot would have given a class card 75 Break
 against a Sharpshooter spec card's 24. <b>The one-point deviation is stated rather than rounded
 away silently.</b></p>
-<p><b>CHARGE CARRIES 10 BREAK DAMAGE, DELIBERATELY BELOW THE FREE STRIKE'S 18.</b> BQ's general
-rule &mdash; the floor for a class ability is the FREE BASIC, not the spec kit &mdash; applied the
-other way round: Charge costs 20 Rage for 25% of Attack against Strike's free 23%, so what it buys
-is the <b>1.0 initiative</b> (the fastest arrival in the kit, and a Warrior's only answer to a
-caster winding up) and the Daze. It must not also win on Break. <b>None of the six Warrior cards
-carries <code>resource_gain</code></b> either, which is the cleanest statement of "weaker than spec
-work" a Rage class can be given: every Warrior spec ability builds 10-15 Rage while it spends, and
-these spend without building.</p>
+<p><b>CHARGE WAS ASSIGNED 10 BREAK DAMAGE AND NO RAGE GENERATION, AND THE DESIGNER REPRICED IT TO
+20 AND 30 IMMEDIATELY AFTER THE BATCH SHIPPED. BOTH THE ORIGINAL ARGUMENT AND WHAT THE REPRICE
+CHANGES ARE RECORDED</b>, because the argument is what a later reader would otherwise re-derive.
+The batch's own assignment was BQ's general rule &mdash; the floor for a class ability is the FREE
+BASIC, not the spec kit &mdash; applied the other way round: Charge costs 20 Rage for 25% of Attack
+against Strike's free 23%, so what it bought was the <b>1.0 initiative</b> (the fastest arrival in
+the kit, and a Warrior's only answer to a caster winding up) and the Daze, and it must not also win
+on Break. The other five Warrior cards carry no <code>resource_gain</code>, which is the cleanest
+statement of "weaker than spec work" a Rage class can be given: every Warrior spec ability builds
+10-15 Rage while it spends, and those five spend without building.</p>
+<p><b>WHAT THE REPRICE MAKES IT, said plainly because it is the one thing a later reader will want:
+Charge now beats the free Strike on damage (25% against 23%), on Break (20 against 18) and on
+initiative (1.0 against 2.0), carries a Daze, and still NET-GENERATES 10 Rage</b> (30 gained against
+its own 20 spent). <b>Strike wins only on net Rage (+20) and on having no cooldown.</b> It is
+therefore the <b>first and only class-wide card in all twenty-four that generates its resource</b>,
+and the only one that is not weaker than the free basic on every axis &mdash; a deliberate exception
+to BQ's rule rather than a drift past it. It also clears <b>Overpower</b>, a Warrior boss-pool card,
+on cost, damage, initiative and Rage economy, losing only on cooldown (3 against 1) and on
+Overpower's Break-scaling bonus. test_batch_br pins the exception BY NAME, asserts the two axes
+Strike still wins, and asserts that the other twenty-three class cards generate nothing, so a later
+batch cannot quietly add a second one.</p>
 <p><b>WARCRY IS IMPLEMENTED AS +20% DAMAGE DEALT RATHER THAN +20% ATTACK, corrected toward the code
 and reported.</b> §3 says "gains 20% Attack". <code>attack</code> is a raw stat read at dozens of
 sites &mdash; DoT snapshots, companion strikes, poison ticks &mdash; and a temporary mutation of it
@@ -241,7 +255,9 @@ Mirror Image precedent, and Bola rides the EXISTING <code>slow</code> and <code>
 <p><b>Per the designer's standing instruction, that means the code landed and works. NO SWEEPS, NO
 BANDS, NO BALANCE MEASUREMENT WAS RUN, and none should be quoted from this batch.</b></p>
 <p>check_parse 0 &middot; check_flow 0 &middot; check_map_screen OK &middot; run-harness gates
-1/2/3 PASS &middot; <b>NEW test_batch_br.gd 1400/0</b>.</p>
+1/2/3 PASS &middot; <b>NEW test_batch_br.gd 1441/0</b> (1414 at ship; the Charge reprice added 27
+checks &mdash; the exception by name, the two axes Strike still wins, and a sweep proving the other
+twenty-three class cards still generate nothing).</p>
 <p><b>All six clauses §6 named as able to silently do nothing or do the wrong thing are driven live
 and asserted against the state they change, never against a cast returning &mdash; and six are
 built so a broken implementation still FAILS:</b> the volley's charge spend is an EXACT identity
@@ -265,7 +281,7 @@ the caster <b>trips 1</b>.</p>
 <p><b>FULL BATTERY GREEN</b>: ah 5500, ah_battle 65, ai 2217, aj 418, ak 528, al 560, ar 914, as 396,
 at 470, au 336, av 324, aw 350, ax 338, ay 484, az 519, <b>ba 690</b>, bb 172, bc 91, bd 69, be 34,
 bf 78, bg 47, bh 233, bi 88, bj 67, bl 88, bm 1890, bn 77, <b>bo 505</b>, <b>bp 268</b>,
-<b>bq 738</b>, <b>br 1414</b>, runes 2973, rune_battle 96 &mdash; all 0 failures. <b>an reads 3624
+<b>bq 738</b>, <b>br 1441</b>, runes 2973, rune_battle 96 &mdash; all 0 failures. <b>an reads 3624
 and bk 130, both inside their DOCUMENTED run-to-run drift.</b> The three raised counts are POOL
 LOOPS WALKING MORE ENTRIES rather than new assertions (each suite iterates the live pools, and
 twelve arrived; bq's jump is the largest because its "no class card is also in a spec pool" check
