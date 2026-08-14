@@ -2973,3 +2973,53 @@ survives the correction — rotation *is* taxed, just by a cooldown rather than 
 Focus surviving a volley *is* worth a card even when it is a guarantee rather than a
 distinction. What changes is that the reason in the file is now the true one. A design note
 built on a premise nobody re-read is how a system acquires numbers nobody can defend.
+
+---
+
+## Batch BP — the Warrior draft pools
+
+**On paying a named debt rather than a discovered one.** BO shipped eighteen abilities and wrote
+three empty arrays into the pool table with a comment saying why. That is a small thing that did
+a lot of work: the gap was visible in the data, not just in a changelog, so it could not quietly
+become permanent. A batch that had padded the Warrior pools with hurried content to avoid an
+awkward empty array would have spent the good version of these six.
+
+**The arriving-stance principle is the only genuinely new idea in the batch, and it came out of
+a mechanical problem.** An ability that switches your stance is, on its face, a tax: you cast it,
+you get a thing, and then you are somewhere you did not ask to be. The fix is not to make the
+switch optional — that deletes the interesting part — it is to make the switch *the point*, by
+having each branch pay out in the currency of the stance it leaves you in. The Aggressive branch
+buying defence reads backwards for about two seconds and then reads obviously right. Which is
+exactly why it is written down as a rule: the intuitive authoring produces the inverted card, and
+the inverted card still looks fine on the tooltip.
+
+**On bypassing armor instead of penetrating it.** Armor penetration in this game is a fraction
+*of* the target's armor, so a clause promising "+50% armor penetration" does nothing at all
+against an unarmoured enemy — and most enemies are lightly armoured. The upgrade pool already had
+a rule against exactly this shape (an upgrade must be able to change the ability it is paired
+with), and the same reasoning applies to a card's own text. A bypass is a smaller-sounding
+promise that is always true, which is worth more than a bigger-sounding one that is sometimes a
+no-op.
+
+**Covering Guard is the batch's best card because it takes a stat somewhere it has never been.**
+The Warden's Block is the only effect in the game that stops a blow *entirely* — no reduction,
+no redirect, nothing on the other side of it — and until now it only ever protected the body it
+belonged to. Lending the roll rather than the body keeps that property intact: nothing moves to
+him, so it is not Interpose with extra steps and it is not a taunt. Reading it live rather than
+snapshotting it is what makes it a build rather than a button: a Shieldwall raised after the ward
+deepens the ward.
+
+**Eye of the Storm ships flagged, and the flag is the honest part.** Two turns in which the party
+takes nothing is a large effect and nobody should pretend otherwise. What makes it worth shipping
+untuned is that its own scaling is the tension: it is best exactly when the situation is worst,
+and worst against the small heavy-hitting fields where a Warden is already comfortable. That
+shape is more likely to be right than any number we could pick for it in advance, so the number
+waits for play.
+
+**A negative control found a fault in this batch's own code, which is the entire reason to run
+them.** Eye of the Storm's mitigation was written three times in six lines — the apply, the chip
+text and the chip's power — and the last write silently won. A wrong figure in the first two
+would have been unobservable. The repair is a local, and the general rule is the one this project
+keeps re-learning in new places: a number written twice is a number that will eventually
+disagree with itself, and the test that catches it is the one that deliberately breaks the first
+copy.

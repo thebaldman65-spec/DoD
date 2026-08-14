@@ -69,6 +69,17 @@
   ]
  },
  {
+  "id": "stance",
+  "term": "Stance (Seasoned Fighter)",
+  "category": "combat",
+  "short": "The Swordmaster fights Aggressive or Defensive; three abilities switch him.",
+  "long": "Only the Swordmaster has stances, and he is always in one of two. AGGRESSIVE: +15% damage dealt and +10% damage taken. DEFENSIVE: 15% less damage taken and -10% damage dealt. He starts every battle Aggressive, and the stance resets with each new battle - it is never carried between fights. Several of his talents read it (Killing Edge sharpens the Aggressive guard, Bracing hardens the Defensive one, Untouchable makes a Defensive parry absolute), and THREE abilities change it: Guard Change, which does nothing but pivot and press the opening; and the two drafted cards, Precision Strike and Feint, which BRANCH on the stance they are cast from and then switch it. Both branch the same way round, and it is worth knowing: each branch buys what the stance he is ARRIVING in wants. Cast from Aggressive he lands in Defensive, so he is handed defence - a parry buff, or charges that answer blows. Cast from Defensive he lands in Aggressive, so he is handed offence - an armor bypass, or a strike and a misdirected enemy. He is never stranded mid-pivot.",
+  "see_also": [
+   "parry",
+   "crit"
+  ]
+ },
+ {
   "id": "fallen",
   "term": "Fallen Heroes",
   "category": "combat",

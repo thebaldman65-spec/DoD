@@ -671,7 +671,10 @@ failure it prevents is SILENT: a spine that stops working because its enabler be
 `slots` | spec | what the passive cannot function without:
 · 3 **Berserker** — nothing (Blood Frenzy reads his own health bar).
 · 3 **Warden** — nothing (Heavy Plating is a Block rule, it reads no ability).
-· 3 **Swordmaster** — **Guard Change** (the only stance swap in the game, AK's own finding).
+· 3 **Swordmaster** — **Guard Change**. AK called it "the only stance swap in the game" and
+  **BATCH BP MADE THAT FALSE** (Precision Strike and Feint both switch). It is still the
+  enabler for a sharper reason: it is his only UNCONDITIONAL swap — the other two are
+  drafted, cost Rage and carry cooldowns.
 · 3 **Pyromancer** — **Fireball, Detonation** (Overburn needs an applier AND a spender).
 · 3 **Cryomancer** — **Frostbolt, Ice Lance** (a Chilled applier, and a release).
 · 3 **Arcanist** — **Arcane Explosion** (the free cast that guarantees a build every turn).
@@ -684,15 +687,207 @@ failure it prevents is SILENT: a spine that stops working because its enabler be
   picks for a bookkeeping reason.
 · 3 **Sharpshooter** — **Quick Shot** (Lethal Aim counts consecutive single-target attacks).
 · 3 **Survivalist** — nothing (Trapper's breadth term counts statuses from ANY source).
-**THE WARRIOR POOLS ARE OWED.** All three draft pools are NAMED and EMPTY: the lane names only
-arrived in BM and their pools want the same discussion the other nine had. So is the whole
-CLASS-WIDE tranche — 6 per class, 24 in all, **none shipped in BO**. A Warrior's draft offer
-fills short (empty) today and that is the visible shape of the debt, not a bug.
+**THE WARRIOR POOLS WERE OWED AND ARE PAID (Batch BP) — do not re-record them as empty.** All
+three were NAMED and EMPTY at BO because the lane names only arrived in BM; BP filled them with
+two apiece (Berserker Blood Offering / Gut Rip, Warden Covering Guard / Eye of the Storm,
+Swordmaster Precision Strike / Feint), so **`SPEC_DRAFT_POOLS` is 24 entries and every spec has a
+draft.** **WHAT IS STILL OWED IS THE WHOLE CLASS-WIDE TRANCHE — 6 per class, 24 in all, none
+shipped in BO OR BP.** `CLASS_DRAFT_POOLS` is still four named empty arrays, so every card an
+offer holds today is spec-side and offers still fill SHORT at two. That is the visible shape of
+the REMAINING debt, not a bug.
 **CLASS-WIDE AUTHORING RULES, recorded with the empty arrays so they travel with the content:**
 deliberately UNTIED AND GENERAL (Magic Barrier, not Frostbolt — the test is whether it would
 read as off-theme for ANY spec of that class), and **WEAKER THAN SPEC ABILITIES AND
 UNCONDITIONAL** — they feed no passive, so at equal power they would be a safe default that
 dilutes every build.
+
+### STANDING DESIGN RULE — THE ARRIVING-STANCE PRINCIPLE (Batch BP §3)
+**EVERY STANCE ABILITY MUST BUY WHAT THE STANCE IT LEAVES HIM IN WANTS.** The Swordmaster's
+stances were a binary toggle with passive numbers on each side and NOTHING in his kit ever
+behaved differently depending on which one he was in; BP's two draft cards (Precision Strike,
+Feint) both READ the stance and then SWITCH it, and both are authored against this rule. Cast
+from Aggressive he lands in Defensive, so the ability hands him **defence**; cast from Defensive
+he lands in Aggressive, so it hands him **offence**. **He is never stranded — he always arrives
+holding something, and that is what makes the switch a feature rather than a tax.**
+**IT IS RECORDED AS A RULE BECAUSE IT IS THE THING A LATER STANCE ABILITY WOULD MOST EASILY GET
+BACKWARDS** — the intuitive authoring ("the Aggressive branch is the offensive one") produces
+exactly the inverted card, and it would still read fine on the tooltip.
+· **THE PIVOT IS ONE IMPLEMENTATION, THREE CALLERS — `_swordmaster_switch(u)`** (Guard Change,
+  Precision Strike, Feint). Batch AK's Guard Change could afford to own the pivot inline while it
+  was the only swap in the game; three copies of "flip it, restamp the chip, pay Tempo" drift.
+· **TEMPO IS PART OF THE PIVOT AND NOT PART OF GUARD CHANGE**, and that is a decision: the node's
+  text reads "Switching stance grants +30% damage for 1 turn" and NAMES NO ABILITY, so a swap
+  that skipped it would make a shipped tooltip false. Everything Guard Change pays BEYOND the
+  pivot — its Break damage, Sunder Guard, No Quarter, the parry perfect — stays on Guard Change.
+· **stance-GATED ABILITIES — ones that REQUIRE a stance to cast rather than branching on it —
+  ARE A NOTED FUTURE DIRECTION AND WERE DELIBERATELY NOT BUILT.** They are a different mechanic
+  (they constrain when you may act rather than what the act buys) and they want their own pass.
+· **"GUARD CHANGE IS THE ONLY STANCE SWAP IN THE GAME" IS NO LONGER TRUE** and `PROTECTED_CORES`
+  says so. It is still the Swordmaster's enabler for a sharper reason: it is the only
+  UNCONDITIONAL swap — the other two are DRAFTED (he may never be offered either), cost Rage, and
+  sit on 3- and 4-turn cooldowns.
+
+BATCH BP (08-13) — THE WARRIOR DRAFT POOLS. **Six abilities, two per Warrior spec, closing the
+debt BO left open: all three Warrior draft pools were NAMED AND EMPTY, so one of four heroes in
+every party had no draft at all.** Nothing else ships — no talent node, no magnitude, no existing
+ability changed, no save version moves (still v10). **THE 24 CLASS-WIDE ABILITIES ARE STILL OWED**
+and `CLASS_DRAFT_POOLS` is still empty and still says so. The arriving-stance principle is the
+standing rule directly above; this block is the content, the decisions and the verification.
+**THE SIX, WITH THEIR AXES.** `SPEC_DRAFT_POOLS` is 24 entries now (was 18); the defs are in
+`Classes.draft_ability` beside BO's, resolved at the top of `pool_ability` as before.
+· **Berserker — BLOOD OFFERING** (0 Rage, 1.5, 3cd, self): loses **20% of CURRENT health**, gains
+  40 Rage (perfect 60). *Axis: buying the frenzy band on purpose.* **PERCENT OF CURRENT, NOT
+  MAXIMUM, IS THE WHOLE SAFETY ARGUMENT** — it can never reach 0 and its absolute cost SHRINKS as
+  he drops, which is correct for a spec that wants to live low rather than die low. **The health
+  is removed DIRECTLY rather than through `take_hit`**: this is a price he pays, not a wound
+  anyone dealt, and the damage path would have fed Blood Price, the recap's damage-taken ledger
+  and every on-damage rider with an event that had no attacker.
+· **Berserker — GUT RIP** (30 Rage, 2.5, 4cd, one enemy, 20 BD): **bleeds the target out at once**
+  whatever its buildup, plus 6% of Attack per 10 points consumed (perfect 9%). *Axis: the bleedout
+  stops being the enemy's clock* — Bloodcraze, Scent of Blood, Arterial Spray and Blood Tithe were
+  four nodes waiting on a trigger he could not pull. **IT FIRES THE REAL BLEEDOUT PATH AND THAT IS
+  THE LOAD-BEARING LINE**: the meter is topped up to 100 through `_add_bleed_with_burst`, not
+  copied into the ability, so every talent that reads a bleedout sees this one — **SLAUGHTERHOUSE
+  INCLUDED, which leaves the meter at 50 rather than 0**, so a second Gut Rip four turns later has
+  half a wound waiting. A private burst is the one thing that would have made the ability do
+  nothing for the lane it exists to serve.
+· **Swordmaster — PRECISION STRIKE** (20 Rage, 2.0, 3cd, one enemy, **then switches stance**):
+  from Aggressive, TWO strikes at 20% of Attack (6 BD each) plus **+25% parry for 3 turns**; from
+  Defensive, ONE strike at 15% with **15 BD** plus **his attacks bypass ALL armor for 3 turns**
+  (status `open_guard`). *Axis: the same blade, two intentions.* **ARMOR IS BYPASSED OUTRIGHT
+  RATHER THAN PENETRATED BY A PERCENTAGE** — `pen` is a fraction OF the target's armor, so a
+  percentage clause would be "+50% of zero" against every unarmoured enemy in the game, i.e. the
+  exact dud AP §3's eligibility rule exists to prevent. It reuses the EXISTING bypass hook that
+  Held Breath and Through and Through already ride.
+· **Swordmaster — FEINT** (25 Rage, 2.0, 4cd, one enemy, **then switches stance**): from
+  Aggressive, a 35% strike (12 BD) and **that enemy's next attack lands on one of its own allies**
+  (status `feinted`); from Defensive, **no strike at all** and **2 charges** (perfect 3), each
+  parrying a blow outright and dealing its damage to the attacker (`feint_guards`). *Axis: their
+  swing lands somewhere they did not intend.* **CHARGES, NOT TURNS** — both halves wait until
+  SPENT, so a Feint cast into a lull is not wasted and cannot be dodged by an enemy simply not
+  swinging that turn.
+· **Warden — COVERING GUARD** (25 Rage, 2.5, 4cd, one ALLY): for 3 turns **HIS Block chance is
+  rolled against attacks aimed at that ally and a success NEGATES the attack entirely.** *Axis:
+  his stat protecting someone else.* **THIS IS NOT REDIRECTION — NOTHING MOVES TO HIM**; the blow
+  stops, which is what Block does and what nothing else in the game does. **IT READS HIS LIVE
+  BLOCK CHANCE** (`_live_block_chance` / `_plating_slice`, extracted from the block roll so the
+  two can never read different numbers), so Shieldwall, Heavy Plating's climb and Bulwark Line all
+  feed a ward laid turns earlier — **a snapshot at cast time would have read exactly like the
+  ability working while being quietly worse than the card.** Its own SLICE and its own LABEL in
+  the roll, for Bulwark Line's reason: Tenacity and Rally test for "Heavy Plating" and must not
+  fire off a covered ally's block. **A DEAD WARDEN COVERS NOBODY** (`_covering_warden` re-resolves
+  the stamped `src_name` live — his body is the ward).
+· **Warden — EYE OF THE STORM** (20 Rage, 2.0, 4cd, self): **taunts EVERY enemy for 2 turns** and
+  he takes **8% less damage per enemy taunted**. *Axis: being outnumbered becomes the point.*
+  Self-balancing by construction. The mitigation reads the number ACTUALLY TAUNTED rather than the
+  number alive, and **its governor is MAX_FIELD (six bodies) rather than a cap of its own**.
+  **FLAGGED AS POSSIBLY TOO STRONG AND SHIPPED UNTUNED, on the brief's explicit instruction:
+  watch it in play, do not pre-tune it.**
+**BREAK DAMAGE WAS ASSIGNED DELIBERATELY RATHER THAN BY OMISSION** (BO's own correction, applied
+up front — the brief named only Precision Strike's Defensive 15). Constants live together beside
+`SHIELDWALL_BLOCK`. **Precision Strike Aggressive 6 A STRIKE = 12 across two, DELIBERATELY BELOW
+the Defensive branch's 15** — the Defensive branch is the one whose card names Break as its own
+clause, so the Aggressive branch pays in damage and parry instead and must not also win on Break.
+**Feint 12**, below both and well below Overpower's 20 / Pommel's 30. **Gut Rip 20**, in line with
+Bloodlust's 18 and Crushing Blow's 20. **Blood Offering / Covering Guard / Eye of the Storm carry
+NONE** — they are not attacks, and Break from an ability that never strikes is Break from nowhere.
+**TWO ADJACENCIES FLAGGED BY THE BRIEF, AND A THIRD THE BATCH FOUND:**
+· **THE REDIRECT vs THE OCCULTIST'S MADNESS LANE — distinguished STRUCTURALLY, not by
+  assertion.** Feint takes ONE named attack and nothing else: no status on the victim, no Daze, no
+  Ruin, no persistence, and the enemy still CHOSE its own action and still spends its own turn.
+  Bewitch/Psychosis/Hysteria take the TURN and are counted as `_intent_hijacked` for that reason;
+  the redirect HONOURS the declaration, so it is deliberately NOT counted as one. **The brief's
+  fallback (a straight miss instead of a redirect) was not needed and was not taken.** Its site is
+  BELOW `_revalidate_intent` in `_enemy_turn`, so what is redirected is the blow actually about to
+  land; it redirects ATTACKS only (a mender's heal is not a swing to misdirect), and with no living
+  fellow the mark **HOLDS rather than being spent** and says so in the log.
+· **THE DEFENSIVE CHARGES vs RIPOSTE** — they resolve cleanly: a Feint charge IS a parry, so
+  Riposte answers it once and the reflect fires once. Nothing double-counts.
+· **THE CLOSER NEIGHBOUR IS WAITING GUARD** (Poise row 8, up to 3 banked guaranteed parries), and
+  the batch found it rather than the brief naming it. Distinguished by the REFLECT, which only
+  Feint's charges carry, and by the ORDER: **the RENEWABLE bank spends first.** Waiting Guard
+  re-banks every turn he goes undamaged while a Feint charge costs 25 Rage and a turn, so spending
+  the free one first preserves the paid one — the same argument that already put Waiting Guard
+  BEFORE the parry roll, extended one step.
+**FEINT'S REFLECT READS THE NOMINAL HIT, AND THE REASON IS STRUCTURAL RATHER THAN A SHORTCUT.**
+The charge is an ABSOLUTE parry (it joins `wall_parry`), because "its damage is dealt to the
+attacker INSTEAD" only reads as a redirect if none of it also lands on him — so the number cannot
+come from `final`, which the parry is about to zero. It is the nominal hit through his armor,
+which is **Batch W's own idiom for exactly this question** ("what the blocked swing would have
+carried"; variance, crits and riders cannot be known for a hit that was never rolled).
+**`feinted` IS DELIBERATELY NOT IN `DEBUFF_IDS`**, joining `covenant`/`quarry`/`snare_line` for
+the same reason and one more: it is a MARK, and it waits until spent, i.e. battle-long, which
+`_cleansable_debuffs` reads as 999 turns remaining — **a mender's longest-first pick would have
+taken it EVERY time**, the exact fault AS carved the Glacial Hold out for.
+**NEW UNIT-SIDE STATE: ONE FIELD.** `feint_guards` (a count plus a chip, exactly like
+`banked_guards` beside it, and deliberately NOT folded into it — only one of the two reflects).
+The other five abilities are carried entirely by STATUSES (`open_guard`, `feinted`, `feint_guard`,
+`covering_guard`, `eye_storm`), which is the cheaper answer wherever an effect has a duration and
+a chip: they expire by themselves and cannot leak past a battle.
+**COVERING GUARD IS FOR SOMEONE ELSE, AND THAT IS STRUCTURAL RATHER THAN A TOOLTIP WARNING** —
+THREE SITES, ONE RULE: the player's ally picker filters him out (Execute's precedent), the bot's
+pool filters him out, and `_ability_usable` refuses the cast outright when he is the last one
+standing. He already rolls his own Block; warding himself would stack a second copy of it.
+**REPORTED NOT ACTED ON — A NAME COLLISION, AND IT IS WORSE THAN BO'S.** **PRECISION STRIKE** sits
+one letter from **PRECISION STRIKES**, a Swordmaster talent node (Blade row 4), and unlike Second
+Wind (a Berserker node against a Holy ability) **THESE TWO ARE IN THE SAME SPEC**, so a player
+building a Swordmaster meets both. It is a LABEL collision only — a node's name is not an ability
+name, nothing resolves it, the fields are separate (`precision_ranks` vs the `precision_strike`
+special) — so nothing breaks. Shipped as specified and flagged on the Second Wind / Shared Vigil /
+Overkill precedent: renaming either is the designer's call and one string.
+**VERIFIED — AND PER THE STANDING INSTRUCTION, THAT MEANS THE CODE LANDED AND WORKS. NO SWEEPS,
+NO BANDS, NO BALANCE MEASUREMENT WAS RUN, and none should be quoted from this batch.**
+check_parse 0 · check_flow 0 (11 screens) · check_map_screen OK · run-harness gates 1/2/3 PASS ·
+**NEW test_batch_bp.gd 260/0**. All five clauses §7 named as able to silently do nothing are
+driven live and asserted against the state they change, never against a cast returning; **three
+are built so a broken implementation still fails** (Blood Offering's cost as an exact identity at
+two health levels — the floor of 1 keeps him alive under a MAX-health reading too, so only the
+COST discriminates; Covering Guard's ward laid while his Block is ZERO and Shieldwall raised
+AFTERWARD, the Null Field construction; and Feint's charges asserted SPENT by a real blow, since
+"they persist" is trivially true if nothing ever attacks him).
+**TEN NEGATIVE CONTROLS, each applied to product code and reverted** (battle.gd came back
+byte-identical by hash): Blood Offering on MAXIMUM health **trips 3**; Gut Rip writing a private
+burst **trips 3**; the arriving-stance principle inverted **trips 4**; Covering Guard snapshotting
+the Block chance **trips 1**; Feint's charges on a clock **trips 4**; Eye of the Storm flat rather
+than per-enemy **trips 1**; a Feint charge no longer absolute **trips 1**; the redirect never
+firing **trips 3**; the ally pool no longer excluding the Warden **trips 1**; a self-ward becoming
+a second slice of his own roll **trips 1**.
+**ONE OF THEM FOUND A FAULT IN THIS BATCH'S OWN CODE AND IT IS THE WHOLE REASON TO RUN THEM:
+EYE OF THE STORM'S MITIGATION WAS WRITTEN THREE TIMES IN SIX LINES** — the apply, the chip text
+and the chip's power — **and the chip's power silently WON**, so a wrong figure in the apply was
+unobservable and the negative control that broke it PASSED. Repaired with a local (`es_cut`): one
+place decides. **The general rule this project keeps re-learning in new places: a number written
+twice is a number that will eventually disagree with itself.**
+**LIVE AUTOPLAY CLEAN ACROSS FIVE REAL BATTLES, 0 SCRIPT ERROR, ALL SIX FIRING IN ORDINARY
+FIGHTS** — "Blood Offering — spends 35 health for 40 Rage (now 140 HP)"; "Gut Rip — Orc Archer
+bleeds out on 50 buildup" followed by the REAL bleedout and Slaughterhouse re-seeding to 50;
+"Precision Strike from the Aggressive guard — two cuts at 20% and +25% parry for 4 turns" then
+"the guard changes — he comes up Defensive"; and **"Orc Archer swings at the opening and finds
+Orc Chief instead (Feint)"**. **A log line naming the ARRIVING guard was added to both stance
+cards during the smoke** — without it the switch was visible only as a float, and the switch is
+the feature.
+**THE MASTER.HTML STAMP GATE IS DUPLICATED FOUR TIMES, NOT THREE** — test_batch_ah, test_batch_bb,
+test_batch_bn **and a fourth copy inside test_batch_bo** — and all four must move together or a
+batch that bumps the timestamp trips suites it never touched. Correct BO's own note, which says
+three.
+**FOUR SUITES RE-POINTED IN PLACE with the reason in each file, and THREE OF THE RE-POINTS ARE
+INVERSIONS** (the honest treatment when a batch pays a debt an older suite was recording):
+test_batch_bo's "eighteen ship" → twenty-four, its "a Warrior's pool is EMPTY" → "a Warrior drafts
+two of its own", and its "a Warrior's offer is empty and awarding one returns false" → "a Warrior
+gets a REAL offer and a REAL owed pick". **The setups are byte-identical, because they are still
+what tells the two answers apart.** **test_batch_bo reads 492/0** (was 449 — the count rose
+because its pool loops walk every entry and six arrived).
+**ZERO DRIFT EVERYWHERE ELSE**: ah 5500, ah_battle 65, ai 2217, aj 418, ak 528, al 560, ar 914,
+as 396, at 470, au 336, av 324, aw 350, ax 338, ay 484, az 519, ba 689, bb 172, bc 91, bd 69,
+be 34, bf 78, bg 47, bh 233, bi 88, bj 67, bm 1890, bn 77, bo 492, bp 260, runes 2973,
+rune_battle 96 — all 0 failures. **an reads 3618 and bk 129, both inside their DOCUMENTED
+run-to-run drift** (an 3614-3624; bk ±1 by construction) — neither is pinned and neither should
+be. **TWO KNOWN FLAKES each reproduced ONCE in the battery and passed on a clean re-run**:
+test_batch_at's Arcane Cannon check (recorded since AV) and test_rune_battle's
+`rune_resist_pierce` check (diagnosed in BC — the forced hit still rolls the 5% miss). **Neither
+is on this batch's path.**
+**THE DESIGNER HAD NO RUN IN FLIGHT and none was created**; profile.json, relics.json and
+trees.json are byte-identical after the battery.
 
 BATCH BO (08-13) — THE ABILITY DRAFT, AND TRANCHE 1. **§1-§4 build the draft machinery, §5
 authors the first tranche of content into it** — machinery first, because the schema decides

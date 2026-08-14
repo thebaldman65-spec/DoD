@@ -27,6 +27,12 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	# `covenant`, `quarry` and `snare_line` are deliberately NOT here — a MARK
 	# is not a debuff (the Beastmaster's `hunt_mark` has never been one) and a
 	# trap line is on the ground rather than on the enemy.
+	# BATCH BP: `feinted` joins that list of deliberate absences for the same
+	# reason and for one more. It is a mark — a misdirection the Swordmaster
+	# committed, not an affliction on the body — AND it waits until spent, i.e.
+	# battle-long, which `_cleansable_debuffs` reads as 999 turns remaining. A
+	# mender's longest-first pick would therefore take it EVERY time, which is
+	# the exact fault Batch AS carved the Glacial Hold out for.
 	"blight"]
 
 var frame_size := 100      # square frame edge of this unit's sprite strips
@@ -923,6 +929,22 @@ var blight_cb := Callable()
 # Returns true when it was, exactly like `intercession_cb`: "the caster is
 # gone" and "the rite is spent" are then the same line of code.
 var rite_cb := Callable()
+
+# ---------- BATCH BP — the Warrior draft's unit-side state ----------
+#
+# ONE FIELD. The other five abilities are carried entirely by STATUSES, which
+# is the cheaper answer wherever an effect has a duration and a chip: `feinted`
+# and `open_guard` and `covering_guard` and `eye_storm` all expire by
+# themselves and cannot leak past a battle.
+#
+# FEINT, DEFENSIVE BRANCH (Swordmaster) — parries banked, each of which returns
+# its attack's damage to the attacker. A COUNT plus a chip, exactly like
+# Waiting Guard's `banked_guards` beside it, and for the same reason: charges
+# WAIT UNTIL SPENT rather than expiring, so a Feint cast into a lull is not
+# wasted and it cannot be dodged by an enemy simply not attacking that turn.
+# It is deliberately NOT folded into `banked_guards`: only this one reflects,
+# and one counter holding two rules is how the reflect would go missing.
+var feint_guards := 0
 
 # Occultist tree (07-24; lanes re-specced Batch L 07-30; every counter went
 # ADDITIVE in Batch AX — the field holds the MAGNITUDE, not a rank, and the

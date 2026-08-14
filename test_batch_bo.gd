@@ -119,21 +119,27 @@ func _run() -> void:
 func _pools() -> void:
 	# EIGHTEEN SHIP, NOT TWENTY-FOUR. Counted off the live dict rather than
 	# from the constant above, so the two have to agree.
+	# RE-POINTED IN PLACE BY BATCH BP, WITH THE REASON HERE: BO shipped
+	# eighteen and NAMED the six Warrior entries as owed. BP paid that debt, so
+	# the live total is 24 — and the check that used to prove the debt was
+	# VISIBLE now proves it is PAID. Both halves are inversions rather than
+	# deletions: what a later batch could break is not "the Warrior pools are
+	# still empty", it is "the Warrior pools quietly emptied again".
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.SPEC_DRAFT_POOLS[spec].size()
-	ok(total == 18, "§5: eighteen abilities ship (got %d)" % total)
+	ok(total == 24, "§5+BP: twenty-four abilities ship — BO's eighteen plus BP's Warrior six (got %d)" % total)
 	for spec in TRANCHE_1:
 		var live: Array = Classes.spec_draft_pool(spec)
 		ok(live == TRANCHE_1[spec],
 			"§5: %s's draft pool is %s (got %s)" % [spec, TRANCHE_1[spec], live])
-	# THE WARRIOR POOLS ARE OWED AND EMPTY — named, so the machinery has the
-	# shape, and empty so nobody records the debt as paid.
+	# THE WARRIOR POOLS ARE NAMED **AND FILLED** SINCE BATCH BP (was: named and
+	# empty). One of four heroes in every party had no draft at all until it.
 	for w in ["berserker", "warden", "swordmaster"]:
 		ok(Classes.SPEC_DRAFT_POOLS.has(w),
-			"§5: %s's draft pool is NAMED (the debt is visible)" % w)
-		ok(Classes.spec_draft_pool(w).is_empty(),
-			"§5: ...and EMPTY — the Warrior tranche is owed, not shipped" % [])
+			"§5: %s's draft pool is NAMED" % w)
+		ok(Classes.spec_draft_pool(w).size() == 2,
+			"BP: ...and FILLED — %s drafts two of its own" % w)
 	# CLASS-WIDE: four keys, all empty, none shipping this batch.
 	ok(Classes.CLASS_DRAFT_POOLS.size() == 4,
 		"§4: all four class-wide pools are named")
@@ -204,8 +210,11 @@ func _cores() -> void:
 		"§2: Overburn needs a Burn applier AND a spender — the Pyromancer's core is larger")
 	ok(Classes.core_enablers("berserker").is_empty(),
 		"§2: ...than the Berserker's, whose passive reads nothing but his own health")
+	# Corrected toward the code by BP: Precision Strike and Feint switch the
+	# stance too, so Guard Change is his only UNCONDITIONAL swap rather than
+	# the only one in the game. The ENABLER is unchanged and still protected.
 	ok(Classes.core_enablers("swordmaster") == ["Guard Change"],
-		"§2: the Swordmaster's stances need the only stance swap in the game")
+		"§2: the Swordmaster's stances need his one unconditional stance swap")
 	ok(Classes.core_enablers("beastmaster").size() == 3,
 		"§2: Pack Bond needs a beast — all three summons are protected")
 	ok(Classes.core_slots("beastmaster") == 3,
@@ -266,15 +275,20 @@ func _offer_and_ratio() -> void:
 	for c in offer:
 		ok(not seen.has(c), "§3: no offer repeats a card inside itself (%s)" % c)
 		seen[c] = true
-	# A WARRIOR HAS NOTHING TO BE OFFERED YET, and the roller says so rather
-	# than inventing something.
+	# INVERTED BY BATCH BP, WITH THE REASON HERE. This asked "is a Warrior's
+	# offer empty" — it was BO's honest record of the debt. BP paid it, so the
+	# question worth asking is the opposite one, and it is the one a later
+	# batch could break: does a WARRIOR now get a real offer and a real owed
+	# pick, like the other nine. The SETUP is byte-identical because it is
+	# still what tells the two answers apart.
 	var w := {"key": "warrior", "spec": "berserker", "bm_abilities": []}
-	ok(run.roll_draft_offer(w).is_empty(),
-		"§3: a Warrior's draft offer is empty until its tranche lands")
-	ok(not run.award_draft_pick(w),
-		"§3: ...and awarding one returns false rather than owing a dead pick")
-	ok(int(w.get("draft_picks_owed", 0)) == 0,
-		"§3: ...leaving nothing owed")
+	var w_offer: Array = run.roll_draft_offer(w)
+	ok(w_offer.size() == 2,
+		"BP: a Warrior's draft offer is REAL now — two cards from a pool of two (got %d)" % w_offer.size())
+	ok(run.award_draft_pick(w),
+		"BP: ...and awarding one succeeds rather than refusing an empty pool")
+	ok(int(w.get("draft_picks_owed", 0)) == 1,
+		"BP: ...leaving a real pick owed")
 	# AN OWNED ABILITY IS NEVER OFFERED AGAIN. Owned covers EVERY source —
 	# kit, talent grant, boss pick, earlier draft — because the roller reads
 	# `owned_ability_names`, which is `Talents.ability_names`.
@@ -1020,8 +1034,13 @@ func _live_survivalist() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	ok(master.contains("Batch BO"),
-		"§6: master.html is stamped for this batch")
+	# RE-POINTED BY BATCH BP: this is the master.html STAMP GATE, duplicated in
+	# test_batch_ah, test_batch_bb and test_batch_bn — ALL FOUR MUST MOVE
+	# TOGETHER or a batch that bumps the timestamp trips suites it never
+	# touched. (BO had its own copy phrased as "this batch"; it is the same
+	# gate.)
+	ok(master.contains("Batch BP"),
+		"§6: master.html is stamped for the current batch")
 	ok(master.contains("THE ABILITY DRAFT") or master.contains("The Ability Draft"),
 		"§6: ...and carries the draft's own section")
 	for spec in TRANCHE_1:
@@ -1035,9 +1054,14 @@ func _docs() -> void:
 	ok(claude.contains("ABILITY_SLOT_CAP") or claude.contains("cap at 7")
 			or claude.contains("SEVEN"),
 		"§6: CLAUDE.md carries the cap")
-	ok(claude.contains("Warrior pools are owed")
-			or claude.contains("WARRIOR POOLS ARE OWED"),
-		"§6: ...and the note that the Warrior pools are owed")
+	# INVERTED BY BATCH BP. This proved the Warrior debt was RECORDED; the
+	# debt is paid, so what a later batch could break is the record that it
+	# was paid — and, more usefully, the note that the CLASS-WIDE tranche is
+	# still owed, which is the debt that remains.
+	ok(claude.contains("WARRIOR POOLS WERE OWED AND ARE PAID"),
+		"§6: ...and CLAUDE.md records that the Warrior pools are PAID (Batch BP)")
+	ok(claude.contains("CLASS-WIDE TRANCHE"),
+		"§6: ...while the class-wide tranche is still recorded as owed")
 	var chlog := _src("res://docs/changelog.html")
 	ok(chlog.contains("BATCH BO") or chlog.contains("Batch BO"),
 		"§6: the changelog has a Batch BO entry")

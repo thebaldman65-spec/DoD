@@ -262,11 +262,14 @@ const CLASS_POOLS := {
 # often come up two or one. It fills SHORT rather than padding with repeats,
 # which is AP §3's existing rule for upgrade offers applied unchanged.
 const SPEC_DRAFT_POOLS := {
-	# WARRIOR — OWED, NOT FORGOTTEN. The three Warrior lane names only arrived
-	# in Batch BM and their pools want the same discussion the other nine had,
-	# so they are named here empty rather than filled in a hurry. A draft offer
-	# to a Warrior fills short today; that is the visible shape of the debt.
-	"berserker": [], "warden": [], "swordmaster": [],
+	# WARRIOR — THE DEBT BO LEFT OPEN, CLOSED IN BATCH BP. All three pools were
+	# NAMED AND EMPTY, so one of four heroes in every party had no draft at all.
+	# Two apiece now; three entries each is still thin and a Warrior offer will
+	# fill short until tranche 2, which is the visible shape of the REMAINING
+	# debt rather than a bug.
+	"berserker": ["Blood Offering", "Gut Rip"],
+	"warden": ["Covering Guard", "Eye of the Storm"],
+	"swordmaster": ["Precision Strike", "Feint"],
 	# MAGE.
 	"pyromancer": ["Cinderfall", "Ember Debt"],
 	"cryomancer": ["Winter's Toll", "Rimebinding"],
@@ -338,8 +341,15 @@ const PROTECTED_CORES := {
 		"why": "Blood Frenzy reads his own health bar and nothing else."},
 	"warden": {"slots": 3, "enablers": [],
 		"why": "Heavy Plating is a Block-chance rule; it reads no ability."},
+	# BATCH BP corrected this `why` toward the code rather than leaving it to
+	# rot: Guard Change is no longer the ONLY stance swap in the game — Precision
+	# Strike and Feint both switch. It is still the enabler, and for a sharper
+	# reason than before: it is the only UNCONDITIONAL one. The other two are
+	# DRAFTED (a Swordmaster may never be offered either), cost Rage, and sit on
+	# 3- and 4-turn cooldowns, so a passive that is half inert without a swap
+	# still cannot be left depending on them.
 	"swordmaster": {"slots": 3, "enablers": ["Guard Change"],
-		"why": "Seasoned Fighter is two stances, and Guard Change is the only stance swap in the game (Batch AK)."},
+		"why": "Seasoned Fighter is two stances, and Guard Change is his only UNCONDITIONAL stance swap — the two drafted ones are neither guaranteed nor free (Batch AK, corrected BP)."},
 	"pyromancer": {"slots": 3, "enablers": ["Fireball", "Detonation"],
 		"why": "Overburn needs a Burn applier to build the field and a spender to empty it."},
 	"cryomancer": {"slots": 3, "enablers": ["Frostbolt", "Ice Lance"],
@@ -472,12 +482,13 @@ static func pool_ability(display_name: String) -> Ability:
 	return Talents.granted_ability(display_name)
 
 
-# ---------- TRANCHE 1: the eighteen drafted abilities (Batch BO §5) ----------
+# ------- TRANCHE 1 + 2: the twenty-four drafted abilities (BO §5, BP) -------
 #
-# EIGHTEEN SHIP, NOT TWENTY-FOUR, AND THAT IS SAID PLAINLY RATHER THAN LEFT AS
-# A GAP: six MAGE, six CLERIC, six HUNTER. The six WARRIOR abilities are NOT
-# authored here — the Warrior lane names only arrived in Batch BM and their
-# pools want the same discussion the other nine lanes had.
+# BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
+# six WARRIOR entries as owed rather than pretending the pools were full.
+# BATCH BP CLOSES THAT DEBT: six more, two per Warrior spec, so all twelve
+# specs have a draft. THE 24 CLASS-WIDE ABILITIES ARE STILL OWED and are not
+# here; `CLASS_DRAFT_POOLS` is still empty and still says so.
 #
 # EVERY ABILITY NAMES THE AXIS IT SERVES, in its comment. That rule is here
 # because the twelve tree batches spent themselves removing nodes that existed
@@ -494,6 +505,91 @@ static func pool_ability(display_name: String) -> Ability:
 # are not attacks and carry none.
 static func draft_ability(display_name: String) -> Ability:
 	match display_name:
+		# ----- BERSERKER (Batch BP): how do you get low, and what do you do
+		# with the blood. His damage scales with missing health and four
+		# Bloodletting nodes fire off a bleedout event — AND HE CONTROLS
+		# NEITHER. Enemy damage decides when he reaches his power band; a
+		# 100-point buildup decides when four of his own nodes fire.
+		#
+		# AXIS: buying the frenzy band on purpose. Every other hero avoids
+		# damage; he needs it, and today he waits for someone to give it to him.
+		# PERCENT OF CURRENT HEALTH, NOT MAXIMUM — so it can never kill him and
+		# its absolute cost shrinks as he drops, which is correct for a spec
+		# that wants to live low rather than die low.
+		"Blood Offering":
+			return Ability.make({"display_name": "Blood Offering", "cost": 0,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 3,
+				"anim": "attack02", "special": "blood_offering",
+				"perfect_id": "", "perfect_text": "60 Rage instead of 40",
+				"description": "Open a vein on purpose: lose 20% of\nyour CURRENT health and gain 40 Rage.\nIt can never take you below 1 — and\nthe lower you are, the less it costs."})
+		# AXIS: the bleedout stops being the enemy's clock. Bloodcraze, Scent of
+		# Blood, Arterial Spray and Blood Tithe are four nodes waiting on a
+		# trigger he cannot pull. IT FIRES THE REAL BLEEDOUT PATH, not a copy,
+		# so every talent that reads a bleedout sees this one — Slaughterhouse
+		# included, which leaves the meter at 50 rather than 0.
+		"Gut Rip":
+			return Ability.make({"display_name": "Gut Rip", "cost": 30,
+				"damage": 6, "pressure": 20, "delay": 2.5, "cooldown": 4,
+				"anim": "attack03", "special": "gut_rip",
+				"perfect_id": "", "perfect_text": "9% of Attack per 10 buildup instead of 6%",
+				"description": "Tear the wound wide: the target BLEEDS\nOUT at once whatever its buildup, and\ntakes 6% of Attack for every 10 points\nconsumed. Everything that answers a\nbleedout answers this one."})
+		# ----- SWORDMASTER (Batch BP): what is a stance worth. Stances were a
+		# binary toggle with passive numbers on each side and NOTHING in his kit
+		# ever behaved differently depending on which one he was in. Both entries
+		# read the stance and then SWITCH it.
+		#
+		# THE GOVERNING PRINCIPLE, AND IT IS WHAT MAKES THE SWITCH A FEATURE
+		# RATHER THAN A TAX: EACH BRANCH BUYS WHAT THE STANCE HE IS ARRIVING IN
+		# WANTS. Cast from Aggressive he lands in Defensive, so the ability hands
+		# him defence; cast from Defensive he lands in Aggressive, so it hands
+		# him offence. He is never stranded — he always arrives holding
+		# something. A LATER STANCE ABILITY MUST BE AUTHORED THE SAME WAY ROUND;
+		# it is the thing that would most easily be got backwards.
+		#
+		# AXIS: the same blade, two intentions. ARMOR IS BYPASSED OUTRIGHT rather
+		# than penetrated by a percentage — a multiplier on a base of zero would
+		# have been a clause that silently does nothing, which is the exact dud
+		# AP §3's eligibility rule exists to prevent.
+		"Precision Strike":
+			return Ability.make({"display_name": "Precision Strike", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 3,
+				"anim": "attack01", "special": "precision_strike",
+				"perfect_id": "", "perfect_text": "The stance it grants holds 4 turns instead of 3",
+				"description": "Read the guard, then change it.\nFROM AGGRESSIVE: strike TWICE for 20%\nof Attack each, and gain +25% parry\nfor 3 turns.\nFROM DEFENSIVE: strike ONCE for 15%\nof Attack with 15 BD, and your attacks\nignore ALL armor for 3 turns.\nEither way the stance then SWITCHES."})
+		# AXIS: their swing lands somewhere they did not intend. From the front
+		# foot he tricks them into a friend; from the back foot into themselves.
+		# CHARGES, NOT TURNS — they wait until spent, so a Feint cast into a lull
+		# is not wasted and it cannot be dodged by an enemy simply not attacking.
+		"Feint":
+			return Ability.make({"display_name": "Feint", "cost": 25,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 4,
+				"anim": "attack02", "special": "feint",
+				"perfect_id": "", "perfect_text": "Defensive banks a third charge; Aggressive strikes for 45%",
+				"description": "Sell an opening.\nFROM AGGRESSIVE: strike for 35% of\nAttack, and that enemy's next attack\nlands on one of its OWN allies.\nFROM DEFENSIVE: no strike — bank 2\ncharges, each parrying an attack\noutright and returning its damage to\nthe attacker.\nEither way the stance then SWITCHES."})
+		# ----- WARDEN (Batch BP): what does protection look like when it is not
+		# his own. Block is his signature stat and it has only ever protected
+		# him; Taunt brings damage to him one enemy at a time.
+		#
+		# AXIS: his stat protecting someone else. THIS IS NOT REDIRECTION —
+		# nothing moves to him. The attack simply stops, which is what Block does
+		# and what nothing else in the game does. It reads his LIVE Block chance,
+		# so Shieldwall, Heavy Plating's climb and Bulwark Line all feed it.
+		"Covering Guard":
+			return Ability.make({"display_name": "Covering Guard", "cost": 25,
+				"damage": 0, "pressure": 0, "delay": 2.5, "cooldown": 4,
+				"anim": "attack01", "special": "covering_guard",
+				"target": Ability.Target.ALLY,
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Stand over another: for 3 turns YOUR\nBlock chance is rolled against every\nattack aimed at one ally, and a\nsuccess negates it entirely. Nothing\nmoves to you — the blow just stops.\nIt reads your Block LIVE."})
+		# AXIS: being outnumbered becomes the point. A party-wide defensive
+		# cooldown that costs him everything, and it is self-balancing — a bigger
+		# field means more mitigation as well as more incoming.
+		"Eye of the Storm":
+			return Ability.make({"display_name": "Eye of the Storm", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 4,
+				"anim": "attack03", "special": "eye_of_storm",
+				"perfect_id": "", "perfect_text": "Holds 3 turns instead of 2",
+				"description": "Take the whole field: EVERY enemy is\ntaunted onto you for 2 turns, and you\ntake 8% less damage for each one\ntaunted. The more of them there are,\nthe better you weather it."})
 		# ----- PYROMANCER: different answers to how do you commit -----
 		# AXIS: spending wide instead of deep. Detonation empties one bank;
 		# this skims every bank, and relieves Overburn's drain across the field.

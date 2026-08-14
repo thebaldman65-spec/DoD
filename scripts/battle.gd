@@ -133,6 +133,14 @@ const STATUS_INFO := {
 	"covenant": ["Covenant of Ash", "CA", Color(0.60, 0.45, 0.50), "Bound to the ash: every stack of Ruin\napplied to ANY enemy also lands here."],
 	"quarry": ["Quarry", "Qy", Color(0.60, 0.85, 0.45), "Named the quarry: Focus gained from\nattacking this enemy is DOUBLED.\nSwitching away still clears him."],
 	"snare_line": ["Snare Line", "SL", Color(0.75, 0.65, 0.30), "A line runs across the ground: the\nnext time this enemy acts it springs\na trap where it stands."],
+	# ---- BATCH BP: the Warrior draft's statuses ----
+	# Five of the six carry one; Gut Rip is an instant. Feint carries TWO,
+	# because its branches land on opposite sides of the board.
+	"open_guard": ["Open Guard", "OG", Color(0.75, 0.85, 0.95), "The seam is found: this unit's attacks\nignore armor ENTIRELY."],
+	"feinted": ["Feinted", "Fn", Color(0.55, 0.80, 0.95), "Sold an opening: this unit's NEXT\nattack lands on one of its own allies\ninstead. It waits until spent."],
+	"feint_guard": ["Feint", "Fg", Color(0.45, 0.85, 1.0), "Charges banked: each parries one\nattack outright and returns its damage\nto the attacker. They wait until spent."],
+	"covering_guard": ["Covering Guard", "CG", Color(0.70, 0.78, 0.95), "Covered by the Warden: HIS Block\nchance is rolled against attacks aimed\nhere, and a success stops the blow\ndead. Nothing moves to him."],
+	"eye_storm": ["Eye of the Storm", "ES", Color(0.85, 0.80, 0.95), "The whole field is his: damage taken\nis reduced by 8% for every enemy he\ntaunted."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -251,6 +259,29 @@ const ASHES_RETURN_PERFECT := 40
 # percent. It rides the Heavy Plating slice of the block roll on purpose —
 # see the "shield_block" special and the roll itself.
 const SHIELDWALL_BLOCK := 25
+# ---- BATCH BP: the Warrior draft's magnitudes, in ONE place ----
+# Two of the six branch on stance, so their numbers cannot live on the Ability
+# the way Winter's Toll's per-turn step does — an Ability field holds one value
+# and each of these holds two. Named here instead, beside SHIELDWALL_BLOCK, so
+# the branch reads as a choice between two constants rather than as literals.
+#
+# BREAK DAMAGE WAS ASSIGNED DELIBERATELY RATHER THAN BY OMISSION (BO's own
+# correction, applied up front). §3 of the brief names ONE figure — Precision
+# Strike's Defensive 15 — and the other three are decided here against their
+# siblings and reported: the DEFENSIVE branch is the one whose card names Break
+# as its own clause, so the Aggressive branch is deliberately WORSE at it
+# (6 x 2 = 12 against 15) and pays in damage and parry instead. Feint's strike
+# is a trick rather than a hammer and sits below both at 12, against Overpower's
+# 20 and Pommel Strike's 30 on the same hero.
+const PRECISION_AGGRO_PCT := 20   # x2 strikes, from Aggressive
+const PRECISION_AGGRO_BD := 6     # ...per strike
+const PRECISION_DEF_PCT := 15     # x1 strike, from Defensive
+const PRECISION_DEF_BD := 15      # ...the one figure the brief names
+const PRECISION_PARRY_PCT := 25   # what the Aggressive branch grants
+const FEINT_STRIKE_PCT := 35
+const FEINT_BD := 12
+const FEINT_GUARDS := 2           # charges the Defensive branch banks
+const EYE_STORM_CUT_PCT := 8      # damage cut per enemy ACTUALLY taunted
 # Batch W: this battle's dmg/heal/prevented per hero — banked into the
 # per-spec share pools at battle end (rotation needs "share of the battles
 # this spec was IN", which the stage totals can't give).
@@ -2716,7 +2747,12 @@ func _player_turn(u: BattleUnit) -> void:
 				# branch below and auto-target exactly as Flamewave and Blizzard
 				# already do. `winters_toll` reads the ledger of held enemies
 				# rather than a click, which is why it is a self-cast.
-				"winters_toll", "null_field", "call_wilds", "snare_line"]:
+				"winters_toll", "null_field", "call_wilds", "snare_line",
+				# BATCH BP. `blood_offering` costs him his own health and
+				# `eye_of_storm` takes the WHOLE field, so neither has a target
+				# to click; `covering_guard` is ally-facing and falls through to
+				# the ALLY branch below, where its pool excludes him.
+				"blood_offering", "eye_of_storm"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -2743,6 +2779,14 @@ func _player_turn(u: BattleUnit) -> void:
 			var pool: Array
 			if ab.target == Ability.Target.ALLY:
 				pool = _hero_side()
+				# BATCH BP — COVERING GUARD IS FOR SOMEONE ELSE, AND THE POOL IS
+				# WHERE THAT IS MADE STRUCTURAL rather than left as a trap the
+				# tooltip warns about. He already rolls his own Block; warding
+				# himself would stack a second copy of it for no reason and read
+				# as a wasted cast. Narrowed here, on Execute's precedent, so the
+				# UI cannot offer the mistake and the bot cannot make it.
+				if ab.special == "covering_guard":
+					pool = pool.filter(func(a): return a != u)
 			else:
 				pool = enemies.filter(func(e): return not e.dead)
 				# Upgraded Execute he cannot actually pay for: the button is
@@ -2914,6 +2958,15 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 		if not _ability_usable(u, ab):
 			continue
 		if ab.target == Ability.Target.ALLY:
+			# BATCH BP: Covering Guard is for SOMEONE ELSE, so the bot's pool is
+			# narrowed exactly as `_player_turn`'s picker is. Two sites, one
+			# rule — and `_ability_usable` refuses the cast outright when he is
+			# the last one standing, so all three agree.
+			if ab.special == "covering_guard":
+				var cg_pool := allies.filter(func(h): return h != u)
+				if cg_pool.is_empty():
+					continue
+				return [ab, _lowest_hp(cg_pool)]
 			if ab.special == "aegis_reversal":
 				for h in allies:
 					var st: Dictionary = h.get_status("barrier")
@@ -3862,6 +3915,13 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 			cw_out[cw_b2.companion_kind] = true
 		if cw_out.size() >= 3:
 			return false
+	# ---- BATCH BP: the Warrior draft's gates ----
+	# Covering Guard lends his Block to ANOTHER body; standing alone there is
+	# nobody to lend it to (the ally pool in `_player_turn` is narrowed the
+	# same way, so the button and the picker can never disagree).
+	if ab.special == "covering_guard":
+		if not _hero_side().any(func(a): return a != u and not a.dead):
+			return false
 	# Primal Surge needs a beast with Loyalty to spend.
 	if ab.special == "primal_surge":
 		if not _beasts(u).any(func(b): \
@@ -4707,6 +4767,38 @@ func _enemy_turn(u: BattleUnit) -> void:
 	if String(decl.get("message", "")) != "":
 		_message(String(decl["message"]))
 		await _wait(0.4)
+	# BATCH BP — FEINT'S REDIRECT, and its POSITION is the decision. It sits
+	# BELOW `_revalidate_intent`, so the enemy has already re-targeted, fallen
+	# back or been discarded and what is redirected is the blow that is actually
+	# about to land — not the one it was thinking about a turn ago.
+	#
+	# IT IS ADJACENT TO THE OCCULTIST'S MADNESS LANE AND IS DISTINGUISHED
+	# STRUCTURALLY RATHER THAN BY ASSERTION: this takes ONE named attack and
+	# nothing else. No status on the victim, no Daze, no Ruin, no persistence,
+	# the enemy still chose its own action and still spends its own turn — where
+	# Bewitch, Psychosis and Hysteria take the TURN and are counted as
+	# `_intent_hijacked` for that reason. The declaration is honoured here, so
+	# this is deliberately NOT a hijack and is not counted as one.
+	#
+	# IT REDIRECTS ATTACKS ONLY. A mender's Healing Wave aimed at a fellow is
+	# not a swing to misdirect, and consuming the charge on one would be the
+	# ability failing silently — so the mark waits.
+	if u.has_status("feinted") and d_ab.damage > 0 and d_target != null \
+			and d_target.is_hero:
+		var ft_fellows := enemies.filter(func(e): return not e.dead and e != u)
+		if ft_fellows.is_empty():
+			# Nothing to trick it into — the mark HOLDS rather than being spent on
+			# a redirect that cannot happen. Said out loud: a charge that silently
+			# evaporated would read exactly like the ability not working.
+			_log("   → Feint: %s stands alone — the opening keeps" % u.unit_name,
+				"#909090")
+		else:
+			u.remove_status("feinted")
+			d_target = ft_fellows.pick_random()
+			_message("%s takes the feint!" % u.unit_name)
+			_log("%s swings at the opening and finds %s instead (Feint)" % [
+				u.unit_name, d_target.unit_name], "#7cc8f0")
+			await _wait(0.4)
 	await _resolve(u, d_ab, d_target, "good")
 	if bool(decl.get("support", false)):
 		_forest_bite(u)
@@ -5108,6 +5200,17 @@ func _roll_parry(defender: BattleUnit) -> String:
 		if defender.banked_guards <= 0:
 			defender.remove_status("waiting_guard")
 		return "Waiting Guard"
+	# BATCH BP — FEINT'S CHARGES, SPENT BELOW WAITING GUARD'S AND THAT ORDER IS
+	# A DECISION. Both are guaranteed parries spent before the roll for the same
+	# reason (never waste one covering a parry he would have made anyway), so
+	# the only question is which goes first — and Waiting Guard RE-BANKS itself
+	# every turn he goes undamaged while a Feint charge costs 25 Rage and a
+	# turn. Spending the renewable one first preserves the paid one, and the
+	# paid one is the only one that reflects.
+	if defender.feint_guards > 0:
+		defender.feint_guards -= 1
+		_stamp_feint_chip(defender)
+		return "Feint"
 	var base := defender.parry_chance if defender.parry_chance >= 0.0 \
 		else (PARRY_CHANCE if defender.is_hero else ENEMY_PARRY_CHANCE)
 	var talent := defender.parry_bonus
@@ -5426,6 +5529,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if not is_counter and not strike_target.broken and not strike_target.dead \
 					and not strike_target.is_companion:
 				var block_source := ""
+				# BATCH BP: resolved OUTSIDE the roll because the credit block
+				# below needs it too — a Covering Guard block is the Warden's
+				# work and has to book to him, exactly as an Interpose-covered
+				# ally's block already does.
+				var cg_warden := _covering_warden(strike_target)
 				var charges := strike_target.get_status("shield_charges")
 				if not charges.is_empty() and int(charges.get("power", 0)) > 0:
 					block_source = "Interpose"
@@ -5442,33 +5550,41 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# One roll, attributed to whichever slice it landed in.
 					# Heavy Plating v2: the passive's 15% plus the pity ramp —
 					# +8% per unblocked hit, so blocks arrive on a cadence
-					# instead of whenever the dice feel like it.
-					var plating := (0.15 + strike_target.plating_bonus) \
-						if strike_target.passive_id == "heavy_plating" else 0.0
+					# instead of whenever the dice feel like it. Shieldwall
+					# (Batch AB) and Bulwark Line (Batch AL) ride the SAME slice
+					# on purpose: they raise the Block roll instead of bypassing
+					# it, so the blocks they buy are real Block. Batch BP moved
+					# the arithmetic into `_plating_slice` so Covering Guard
+					# below cannot read a different number from this roll.
+					var plating := _plating_slice(strike_target)
 					var plate_label := "Heavy Plating"
-					# Shieldwall (Batch AB) rides the SAME slice on purpose: the
-					# stance raises the Block roll instead of bypassing it, so
-					# the blocks it buys are Heavy Plating blocks and DO feed
-					# Tenacity and Rally. That trade is the whole ability.
-					if strike_target.has_status("shieldwall"):
-						plating += 0.01 * maxi(
-							strike_target.status_power("shieldwall"), 0)
-					# Bulwark Line (Batch AL): the same stance, thrown over the
-					# rest of the party. Heavy Plating is the Warden's own
-					# passive, so on an ALLY this slice is the only thing in
-					# it — hence its own label, which also keeps Tenacity and
-					# Rally (they test for "Heavy Plating") from firing off a
+					# Heavy Plating is the Warden's own passive, so on an ALLY
+					# the Bulwark Line share is the only thing in the slice —
+					# hence its own label, which also keeps Tenacity and Rally
+					# (they test for "Heavy Plating") from firing off a
 					# teammate's block.
-					if strike_target.has_status("bulwark_line"):
-						plating += 0.01 * maxi(
-							strike_target.status_power("bulwark_line"), 0)
-						if strike_target.passive_id != "heavy_plating":
-							plate_label = "Bulwark Line"
+					if strike_target.has_status("bulwark_line") \
+							and strike_target.passive_id != "heavy_plating":
+						plate_label = "Bulwark Line"
+					# BATCH BP — COVERING GUARD. A THIRD SLICE, WITH THE WARDEN'S
+					# LIVE BLOCK CHANCE IN IT. This is not redirection: nothing
+					# moves to him, the blow simply stops — which is what Block
+					# does and what nothing else in the game does. Read live
+					# (`_live_block_chance`), so Shieldwall, Heavy Plating's
+					# climb and Bulwark Line all feed a ward laid turns ago.
+					# ITS OWN LABEL for the same reason Bulwark Line has one:
+					# Tenacity and Rally must not fire off a covered ally's
+					# block, and the log has to name what actually stopped it.
+					var cover := 0.0
+					if cg_warden != null:
+						cover = _live_block_chance(cg_warden)
 					var block_roll := randf()
 					if block_roll < strike_target.block_chance:
 						block_source = "base Block"
 					elif block_roll < strike_target.block_chance + plating:
 						block_source = plate_label
+					elif block_roll < strike_target.block_chance + plating + cover:
+						block_source = "Covering Guard"
 				if block_source != "":
 					_stat("attacks")
 					_stat("attack_block")
@@ -5476,9 +5592,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					# the identity Tenacity and Rally feed on. His own blocks
 					# only; an Interpose-covered ally's block is his work too
 					# and is credited to him below, so it books here as well.
+					# BATCH BP: a Covering Guard block is his Block chance doing
+					# his job on another body, so it books here for the same
+					# reason an Interpose-covered ally's block does.
 					if strike_target.passive_id == "heavy_plating" \
 							or (block_source == "Interpose"
-							and String(charges.get("src_name", "")) != ""):
+							and String(charges.get("src_name", "")) != "") \
+							or block_source == "Covering Guard":
 						_sig("heavy_plating")
 					# Batch W: what the blocked swing would have carried — the
 					# nominal hit through the blocker's armor (variance, crits
@@ -5492,6 +5612,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						var pv_owner := ""
 						if block_source == "Interpose":
 							pv_owner = String(charges.get("src_name", ""))
+						elif block_source == "Covering Guard" and cg_warden != null:
+							pv_owner = cg_warden.unit_name
 						if pv_owner == "":
 							pv_owner = strike_target.unit_name
 						_prev(pv_owner, ab.damage * 0.01 * attacker.attack
@@ -5623,13 +5745,44 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			var parried := parry_source != ""
 			# Untouchable: in the Defensive stance the parry is absolute —
 			# the hit lands NOTHING (damage, floor-of-1, and BD all zeroed).
-			var wall_parry: bool = parried and strike_target.untouchable > 0 \
-				and strike_target.stance == "defensive"
+			# BATCH BP: a FEINT charge is absolute too, and for a reason of its
+			# own — "its damage is dealt to the attacker INSTEAD" only reads as
+			# a redirect if none of it also lands on him.
+			var wall_parry: bool = parried \
+				and ((strike_target.untouchable > 0
+					and strike_target.stance == "defensive")
+				or parry_source == "Feint")
 			if parried:
 				_stat("attack_parry")
 				_sfx("parry", -4.0)
-				strike_target.float_text("UNTOUCHABLE" if wall_parry else "PARRY",
+				strike_target.float_text("FEINT" if parry_source == "Feint" \
+					else ("UNTOUCHABLE" if wall_parry else "PARRY"),
 					Color(0.4, 0.9, 1.0))
+				# BATCH BP — FEINT'S REFLECT. The charge is an ABSOLUTE parry
+				# above, so the number cannot come from `final`, which is about
+				# to be zeroed. It comes from the NOMINAL hit through his armor,
+				# which is Batch W's own idiom for exactly this question ("what
+				# the blocked swing would have carried" — variance, crits and
+				# riders cannot be known for a hit that was never rolled). ONE
+				# place, so it can never drift into reading a damage figure that
+				# the parry itself deleted.
+				if parry_source == "Feint" and ab.damage > 0 and not attacker.dead:
+					var fr_dmg := maxi(int(round(ab.damage * 0.01 * attacker.attack
+						* (1.0 - strike_target.effective_armor()))), 1)
+					if strike_target.is_hero:
+						_prev(strike_target, float(fr_dmg))
+						_stat("dmg_hero_" + _contrib_name(strike_target), fr_dmg)
+					var fr_res: Dictionary = attacker.take_hit(fr_dmg, 0)
+					attacker.float_text("-%d Feint" % fr_dmg, Color(0.45, 0.85, 1.0))
+					_log("   → Feint: %s's own blow comes back on it for %d" % [
+						attacker.unit_name, fr_dmg], "#7cc8f0")
+					if fr_res.died:
+						_stat("hero_deaths" if attacker.is_hero else "enemy_deaths")
+						_sfx("death", -4.0)
+						_message("%s falls!" % attacker.unit_name)
+						_log("† %s dies" % attacker.unit_name, "#e05050")
+						if not attacker.is_hero:
+							_on_enemy_death(attacker)
 				# Deflection: only that talent lets a ranged attack be parried.
 				if attacker.is_ranged:
 					_log("   → Talent: Deflection — %s turns the shot aside" % \
@@ -6221,6 +6374,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var pv_was := raw
 					raw *= 1.0 - minf(0.10 * sp_ursus, BOND_MITIGATION_MAX)
 					_prev(strike_target, pv_was - raw)
+			# BATCH BP — EYE OF THE STORM. He took the whole field onto himself,
+			# and the more of it he took the better he weathers it: 8% off per
+			# enemy ACTUALLY taunted, stamped as the status's power at cast. It
+			# reads the number TAUNTED rather than the number alive, so an enemy
+			# that shrugged the taunt never pays him for cover it did not give —
+			# and it is bounded by MAX_FIELD (six bodies) rather than by a cap of
+			# its own, which is why nothing here can go stale when the field does.
+			if strike_target.has_status("eye_storm"):
+				var es_was := raw
+				raw *= 1.0 - minf(
+					strike_target.status_power("eye_storm") / 100.0, 0.95)
+				if strike_target.is_hero:
+					_prev(strike_target, es_was - raw)
 			# Stabilized: grounded resonance blunts incoming blows.
 			if strike_target.has_status("stabilized"):
 				var pv_was := raw
@@ -6431,8 +6597,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				effective_armor = 0.0
 			# Held Breath's promised shot and Through and Through ignore armor
 			# entirely; a One Shot execution punches through everything.
+			# BATCH BP — PRECISION STRIKE'S DEFENSIVE BRANCH joins them, and it
+			# BYPASSES rather than PENETRATES on purpose: `pen` above is a
+			# fraction OF the target's armor, so a percentage clause would be
+			# "+50% of zero" against every unarmoured enemy in the game — a
+			# clause that silently does nothing, which is the exact dud AP §3's
+			# eligibility rule exists to prevent.
 			if attacker.through_and_through > 0 \
-					or attacker.has_status("held_breath") or one_shot_exec:
+					or attacker.has_status("held_breath") or one_shot_exec \
+					or attacker.has_status("open_guard"):
 				effective_armor = 0.0
 			# The universal floor of 1 yields to Untouchable's absolute parry.
 			var final := 0 if wall_parry \
@@ -8968,6 +9141,96 @@ func _living_devout() -> BattleUnit:
 	return null
 
 
+# ---------- BATCH BP — the three shared answers ----------
+#
+# THE STANCE PIVOT, ONE IMPLEMENTATION, THREE CALLERS (Guard Change, Precision
+# Strike, Feint). Batch AK's Guard Change was the only stance swap in the game
+# and could afford to own the pivot inline; two draft cards now switch it too,
+# and three copies of "flip it, restamp the chip, pay Tempo" would drift.
+#
+# TEMPO IS PART OF THE PIVOT AND NOT PART OF GUARD CHANGE, and that is a
+# decision rather than a convenience: the node's own text reads "Switching
+# stance grants +{v}% damage for 1 turn" and names no ability, so a swap that
+# skipped it would make a shipped tooltip false. Everything Guard Change pays
+# BEYOND the pivot — its Break damage, Sunder Guard, No Quarter, the parry
+# perfect — stays on Guard Change, because those are on its card and on no
+# other.
+func _swordmaster_switch(u: BattleUnit) -> void:
+	u.stance = "defensive" if u.stance == "aggressive" else "aggressive"
+	var sw_label := "Aggressive" if u.stance == "aggressive" else "Defensive"
+	_sfx("parry", -6.0, 0.8)
+	u.float_text("%s Stance" % sw_label, Color(0.4, 0.9, 1.0))
+	u.refresh_bars()  # restamps the stance chip
+	# Tempo: the pivot itself becomes an attack — momentum for a turn.
+	if u.tempo_ranks > 0:
+		var tp_pct := 30 * u.tempo_ranks
+		_apply_status(u, "tempo", 2, tp_pct)
+		u.update_status("tempo", "+%d%%" % tp_pct,
+			"Tempo: +%d%% damage for one turn\n(granted by switching stance)." % tp_pct,
+			tp_pct)
+		_log("   → Talent: Tempo — +%d%% damage for a turn" % tp_pct, "#b0a8e0")
+
+
+# Feint's banked charges, rendered. Its own function on Deadfall's
+# `_stamp_deadfall_chip` precedent — the cast writes it and `_roll_parry`
+# rewrites it as charges are spent, and a chip written in two places is a chip
+# that eventually disagrees with the counter behind it.
+func _stamp_feint_chip(u: BattleUnit) -> void:
+	if u.feint_guards <= 0:
+		u.remove_status("feint_guard")
+		return
+	var fg_desc := "Feint: %d charge(s). Each parries one\nattack outright and returns its damage\nto the attacker. They wait until spent." % \
+		u.feint_guards
+	if not u.update_status("feint_guard", "Fg%d" % u.feint_guards, fg_desc,
+			u.feint_guards):
+		var fi: Array = STATUS_INFO["feint_guard"]
+		u.add_status("feint_guard", fi[0], "Fg%d" % u.feint_guards, fi[2], -1,
+			fg_desc, u.feint_guards)
+
+
+# THE ONE ANSWER TO "what is this unit's Block chance right now", and the whole
+# reason Covering Guard reads correctly. The three slices below are the same
+# three the block roll itself adds together — base stat, Heavy Plating (passive
+# 15% plus the pity climb), Shieldwall and Bulwark Line — so a ward laid in
+# round 1 keeps pace with a Shieldwall raised in round 4 and with every point
+# Heavy Plating's ramp has climbed since. A number stamped at cast time would
+# have read exactly like the ability working while being quietly worse than the
+# card, which is the failure §7 named.
+func _live_block_chance(u: BattleUnit) -> float:
+	var bc := u.block_chance + _plating_slice(u)
+	return clampf(bc, 0.0, 1.0)
+
+
+# Heavy Plating's slice of the block roll: the passive's 15% plus its climb,
+# plus whichever stances are standing. Extracted from the roll itself so
+# Covering Guard cannot read a different number from the one the roll uses.
+func _plating_slice(u: BattleUnit) -> float:
+	var slice := (0.15 + u.plating_bonus) if u.passive_id == "heavy_plating" \
+		else 0.0
+	if u.has_status("shieldwall"):
+		slice += 0.01 * maxi(u.status_power("shieldwall"), 0)
+	if u.has_status("bulwark_line"):
+		slice += 0.01 * maxi(u.status_power("bulwark_line"), 0)
+	return slice
+
+
+# The Warden covering this unit, or null. Read off the status's stamped
+# `src_name` — the same stamp Interpose charges use to credit their caster —
+# and re-resolved LIVE, so a dead Warden stops covering (his body is the ward)
+# and cannot keep answering blows from the floor.
+func _covering_warden(u: BattleUnit) -> BattleUnit:
+	var cg := u.get_status("covering_guard")
+	if cg.is_empty():
+		return null
+	var cg_name := String(cg.get("src_name", ""))
+	if cg_name == "":
+		return null
+	for h in heroes:
+		if not h.dead and h.unit_name == cg_name and h != u:
+			return h
+	return null
+
+
 # The unit's guaranteed 0-cost attack (every enemy kit carries one).
 func _cheapest_attack(u: BattleUnit) -> Ability:
 	for a in u.abilities:
@@ -10615,6 +10878,271 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Snare Line — %d %s will spring a trap on acting%s" % [
 				attacker.unit_name, sl_hit, "enemy" if sl_hit == 1 else "enemies",
 				" [PERFECT: it holds two turns]" if is_perfect else ""], "#c8a860")
+		# ================= BATCH BP — THE WARRIOR DRAFT =================
+		"blood_offering":
+			# AXIS: buying the frenzy band on purpose. Blood Frenzy pays for
+			# missing health and four Bloodletting nodes fire off a bleedout —
+			# and he controls NEITHER. This is the one lever that lets him
+			# choose when he arrives in his own power band.
+			#
+			# PERCENT OF **CURRENT** HEALTH, NOT MAXIMUM, AND THAT IS THE WHOLE
+			# SAFETY ARGUMENT: 20% of what is left can never reach zero, and the
+			# absolute cost SHRINKS as he drops, which is correct for a spec
+			# that wants to live low rather than die low. The floor of 1 is
+			# belt-and-braces on top of it (Dark Pact's idiom, one line), and it
+			# is asserted rather than reasoned about.
+			#
+			# The health is removed DIRECTLY rather than through `take_hit`,
+			# deliberately: this is a price he pays, not a wound anyone dealt.
+			# Routing it through the damage path would feed Blood Price, the
+			# recap's damage-taken ledger and every on-damage rider with an
+			# event that had no attacker.
+			var bo_cost: int = maxi(int(round(attacker.hp * 0.20)), 1)
+			attacker.hp = maxi(attacker.hp - bo_cost, 1)
+			var bo_rage := 60 if is_perfect else 40
+			attacker.resource = mini(attacker.resource + bo_rage,
+				attacker.max_resource)
+			attacker.refresh_bars()
+			_sfx("crit", -8.0, 0.7)
+			attacker.float_text("-%d" % bo_cost, Color(0.9, 0.2, 0.25))
+			attacker.float_text("+%d Rage" % bo_rage, Color(1.0, 0.5, 0.4))
+			_message("%s opens a vein!" % attacker.unit_name)
+			_log("%s: Blood Offering — spends %d health for %d Rage (now %d HP)%s" % [
+				attacker.unit_name, bo_cost, bo_rage, attacker.hp,
+				" [PERFECT]" if is_perfect else ""], "#e05050")
+		"gut_rip":
+			# AXIS: the bleedout stops being the enemy's clock. Bloodcraze, Scent
+			# of Blood, Arterial Spray and Blood Tithe all hang off a bleedout
+			# EVENT, and until now only the enemy's own accumulated buildup could
+			# pull that trigger.
+			#
+			# IT FIRES THE **REAL** BLEEDOUT PATH AND THAT IS THE LOAD-BEARING
+			# LINE OF THE ABILITY: `_add_bleed_with_burst` is topped up to 100
+			# rather than a copy of the burst being written here, so every talent
+			# that reads a bleedout sees this one, the Exsanguination capstone
+			# and the Rune of Exsanguination still apply, Arterial Spray still
+			# chains — and SLAUGHTERHOUSE still leaves the meter at 50 instead of
+			# 0, which means a second Gut Rip four turns later has half a meter
+			# waiting for it. A private burst here would have been the one thing
+			# that made the ability do nothing for the lane it exists to serve.
+			if target != null and not target.dead:
+				# Read the meter BEFORE the burst empties it — the damage is paid
+				# on what was CONSUMED, so it has to be captured first.
+				var gr_had: int = target.bleed_buildup
+				var gr_step := 9 if is_perfect else ab.damage
+				_message("%s tears the wound wide!" % attacker.unit_name)
+				_log("%s: Gut Rip — %s bleeds out on %d buildup%s" % [
+					attacker.unit_name, target.unit_name, gr_had,
+					" [PERFECT]" if is_perfect else ""], "#e05050")
+				_add_bleed_with_burst(target, 100 - gr_had)
+				if not target.dead:
+					var gr_raw := 0.01 * gr_step * (gr_had / 10.0) \
+						* attacker.attack * mult * randf_range(0.9, 1.1)
+					var gr_final := maxi(int(round(gr_raw
+						* (1.0 - target.effective_armor()))), 1) if gr_had > 0 else 0
+					var gr_res: Dictionary = target.take_hit(gr_final, ab.pressure)
+					if gr_final > 0:
+						_stat("dmg_hero_" + attacker.unit_name, gr_final)
+						target.float_text("%d Gut Rip" % gr_final,
+							Color(0.9, 0.25, 0.3))
+					_stat_bd(attacker, ab.pressure)
+					_log("   → Gut Rip: %d buildup consumed, %d damage and %d BD" % [
+						gr_had, gr_final, int(gr_res["bd"])], "#e07070")
+					if gr_res["broke"]:
+						_stat("breaks_on_enemies")
+						_sfx("break", -3.0)
+						_message("%s BREAKS!" % target.unit_name)
+						_log("!! %s BREAKS" % target.unit_name, "#c070e0")
+						await _break_impact()
+					if gr_res.died:
+						_stat("enemy_deaths")
+						_sfx("death", -4.0)
+						_message("%s falls!" % target.unit_name)
+						_log("† %s dies" % target.unit_name, "#e05050")
+						_on_enemy_death(target)
+		"precision_strike":
+			# AXIS: the same blade, two intentions — and THE BRANCH BUYS WHAT THE
+			# STANCE HE IS ARRIVING IN WANTS. Cast from Aggressive he lands in
+			# Defensive, so it hands him defence (parry); cast from Defensive he
+			# lands in Aggressive, so it hands him offence (armor bypass). That
+			# is what makes the switch a feature rather than a tax: he is never
+			# stranded, he always arrives holding something. THE STANCE IS READ
+			# FIRST AND SWITCHED LAST, below, so the branch and the arrival can
+			# never disagree.
+			if target != null and not target.dead:
+				var ps_aggressive := attacker.stance == "aggressive"
+				var ps_turns := 4 if is_perfect else 3
+				var ps_hits := 2 if ps_aggressive else 1
+				var ps_pct := PRECISION_AGGRO_PCT if ps_aggressive \
+					else PRECISION_DEF_PCT
+				var ps_bd := PRECISION_AGGRO_BD if ps_aggressive \
+					else PRECISION_DEF_BD
+				# The GRANT lands before the strikes, so his own blow is the
+				# first thing the new guard pays for — a bypass he cannot use on
+				# the swing that found the seam would read as a bug.
+				if ps_aggressive:
+					_apply_status(attacker, "parry_up", ps_turns + 1,
+						PRECISION_PARRY_PCT)
+				else:
+					_apply_status(attacker, "open_guard", ps_turns + 1)
+				_message("%s finds the seam!" % attacker.unit_name)
+				_log("%s: Precision Strike from the %s guard — %s%s" % [
+					attacker.unit_name,
+					"Aggressive" if ps_aggressive else "Defensive",
+					("two cuts at %d%% and +%d%% parry for %d turns" % [
+						ps_pct, PRECISION_PARRY_PCT, ps_turns]) if ps_aggressive \
+					else ("one cut at %d%% and his attacks ignore ALL armor for %d turns" % [
+						ps_pct, ps_turns]),
+					" [PERFECT]" if is_perfect else ""], "#7cc8f0")
+				for ps_i in ps_hits:
+					if target.dead:
+						break
+					var ps_raw := 0.01 * ps_pct * attacker.attack * mult \
+						* randf_range(0.9, 1.1)
+					# The bypass reads the status the same way every other attack
+					# does, so the Defensive branch's own cut proves the clause.
+					var ps_armor := 0.0 if attacker.has_status("open_guard") \
+						else target.effective_armor()
+					var ps_final := maxi(int(round(ps_raw * (1.0 - ps_armor))), 1)
+					var ps_res: Dictionary = target.take_hit(ps_final, ps_bd)
+					_stat("dmg_hero_" + attacker.unit_name, ps_final)
+					_stat_bd(attacker, ps_bd)
+					target.float_text("%d" % ps_final, Color(0.65, 0.88, 1.0))
+					if ps_res["broke"]:
+						_stat("breaks_on_enemies")
+						_sfx("break", -3.0)
+						_message("%s BREAKS!" % target.unit_name)
+						_log("!! %s BREAKS" % target.unit_name, "#c070e0")
+						await _break_impact()
+					if ps_res.died:
+						_stat("enemy_deaths")
+						_sfx("death", -4.0)
+						_message("%s falls!" % target.unit_name)
+						_log("† %s dies" % target.unit_name, "#e05050")
+						_on_enemy_death(target)
+						break
+				_swordmaster_switch(attacker)
+				_log("   → Precision Strike: the guard changes — he comes up %s" % (
+					"Aggressive" if attacker.stance == "aggressive" else "Defensive"),
+					"#7cc8f0")
+		"feint":
+			# AXIS: their swing lands somewhere they did not intend. From the
+			# front foot he tricks them into a friend; from the back foot into
+			# themselves. Same arriving-stance principle as Precision Strike:
+			# Aggressive (leaving for Defensive) buys the redirect he will want
+			# while turtling; Defensive (leaving for Aggressive) buys charges
+			# that answer the blows he is about to invite.
+			var ft_aggressive := attacker.stance == "aggressive"
+			if ft_aggressive:
+				if target != null and not target.dead:
+					var ft_pct := 45 if is_perfect else FEINT_STRIKE_PCT
+					var ft_raw := 0.01 * ft_pct * attacker.attack * mult \
+						* randf_range(0.9, 1.1)
+					var ft_final := maxi(int(round(ft_raw
+						* (1.0 - target.effective_armor()))), 1)
+					var ft_res: Dictionary = target.take_hit(ft_final, FEINT_BD)
+					_stat("dmg_hero_" + attacker.unit_name, ft_final)
+					_stat_bd(attacker, FEINT_BD)
+					target.float_text("%d" % ft_final, Color(0.65, 0.88, 1.0))
+					_message("%s sells an opening!" % attacker.unit_name)
+					if ft_res["broke"]:
+						_stat("breaks_on_enemies")
+						_sfx("break", -3.0)
+						_message("%s BREAKS!" % target.unit_name)
+						_log("!! %s BREAKS" % target.unit_name, "#c070e0")
+						await _break_impact()
+					if ft_res.died:
+						_stat("enemy_deaths")
+						_sfx("death", -4.0)
+						_message("%s falls!" % target.unit_name)
+						_log("† %s dies" % target.unit_name, "#e05050")
+						_on_enemy_death(target)
+					else:
+						# BATTLE-LONG UNTIL SPENT, not a clock: "the next attack"
+						# is a charge, so a Feint thrown into a lull is not
+						# wasted and cannot be dodged by an enemy that simply
+						# does not swing this turn. Deliberately NOT in
+						# DEBUFF_IDS (see unit.gd) — it is a mark, and a
+						# battle-long entry there would be cleansed first every
+						# single time a mender stood.
+						_apply_status(target, "feinted", -1, 0, 0, attacker)
+						_log("%s: Feint — %s's next attack will land on one of its own%s" % [
+							attacker.unit_name, target.unit_name,
+							" [PERFECT]" if is_perfect else ""], "#7cc8f0")
+			else:
+				attacker.feint_guards += FEINT_GUARDS + (1 if is_perfect else 0)
+				_stamp_feint_chip(attacker)
+				_sfx("parry", -7.0, 0.9)
+				attacker.float_text("FEINT", Color(0.45, 0.85, 1.0))
+				_message("%s waits behind the blade" % attacker.unit_name)
+				_log("%s: Feint — %d charges banked; each parries a blow outright and returns its damage%s" % [
+					attacker.unit_name, attacker.feint_guards,
+					" [PERFECT]" if is_perfect else ""], "#7cc8f0")
+			_swordmaster_switch(attacker)
+			_log("   → Feint: the guard changes — he comes up %s" % (
+				"Aggressive" if attacker.stance == "aggressive" else "Defensive"),
+				"#7cc8f0")
+		"covering_guard":
+			# AXIS: his stat protecting someone else. THIS IS NOT REDIRECTION —
+			# nothing moves to him, the attack simply STOPS, which is what Block
+			# does and what nothing else in the game does.
+			#
+			# The status carries only the WARDER'S NAME; the number is looked up
+			# LIVE at the block roll (`_live_block_chance`), so Shieldwall,
+			# Heavy Plating's climb and Bulwark Line all feed it. A power stamped
+			# here would have been a snapshot at cast time, which reads exactly
+			# like the ability working while quietly being worse than the card.
+			if target != null and not target.dead and target != attacker:
+				var cg_turns := 4 if is_perfect else 3
+				_apply_status(target, "covering_guard", cg_turns, 0, 0, attacker)
+				_sfx("parry", -8.0, 0.7)
+				target.float_text("COVERED", Color(0.70, 0.78, 0.95))
+				_message("%s stands over %s" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Covering Guard — his Block (%d%% right now) answers attacks on %s for %d turns%s" % [
+					attacker.unit_name,
+					int(round(_live_block_chance(attacker) * 100.0)),
+					target.unit_name, cg_turns,
+					" [PERFECT]" if is_perfect else ""], "#8c9cc8")
+		"eye_of_storm":
+			# AXIS: being outnumbered becomes the point. A party-wide defensive
+			# cooldown that costs him everything, and it is self-balancing — a
+			# bigger field is more mitigation as well as more incoming.
+			#
+			# THE MITIGATION READS THE NUMBER ACTUALLY TAUNTED, not the number
+			# alive: an enemy that shrugged the taunt (nothing does today, but
+			# `_apply_status` can refuse) must not pay him for cover it never
+			# gave. It is bounded by MAX_FIELD rather than by a cap of its own —
+			# six bodies is the most the board can hold.
+			var es_idx := heroes.find(attacker)
+			var es_turns := 3 if is_perfect else 2
+			var es_n := 0
+			if es_idx >= 0:
+				for es_e in enemies:
+					if es_e.dead:
+						continue
+					_apply_status(es_e, "mocked", es_turns, es_idx, 0, attacker)
+					if es_e.has_status("mocked") \
+							and es_e.status_power("mocked") == es_idx:
+						es_n += 1
+				_note_debuff_applied(attacker, "mocked")
+			if es_n > 0:
+				# ONE PLACE DECIDES THE CUT. It was written three times here — the
+				# apply, the chip and the chip's power — and the chip's power silently
+				# WON, so a wrong figure in the apply could not be observed at all.
+				# Found by this batch's own negative control; a local is the fix.
+				var es_cut := es_n * EYE_STORM_CUT_PCT
+				_apply_status(attacker, "eye_storm", es_turns + 1, es_cut)
+				attacker.update_status("eye_storm", "-%d%%" % es_cut,
+					"Eye of the Storm: %d enemies taunted,\nso he takes %d%% less damage while\nthe storm holds." % [
+						es_n, es_cut], es_cut)
+			_sfx("break", -7.0, 0.7)
+			attacker.float_text("EYE OF THE STORM", Color(0.85, 0.80, 0.95), true)
+			_message("%s takes the whole field!" % attacker.unit_name)
+			_log("%s: Eye of the Storm — %d %s taunted for %d turns, and he takes %d%% less damage%s" % [
+				attacker.unit_name, es_n, "enemy" if es_n == 1 else "enemies",
+				es_turns, es_n * EYE_STORM_CUT_PCT,
+				" [PERFECT]" if is_perfect else ""], "#c8a0e0")
 		"venom_coat":
 			_apply_status(attacker, "venom_coat", 4)
 			_sfx("heal", -9.0, 0.7)
@@ -10885,22 +11413,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				"hero" if shout_n == 1 else "heroes"], "#70d878")
 		"guard_change":
 			# The swap itself (Rage and cooldown already handled generically).
-			attacker.stance = "defensive" if attacker.stance == "aggressive" \
-				else "aggressive"
-			var gc_label := "Aggressive" if attacker.stance == "aggressive" \
-				else "Defensive"
-			_sfx("parry", -6.0, 0.8)
-			attacker.float_text("%s Stance" % gc_label, Color(0.4, 0.9, 1.0))
-			attacker.refresh_bars()  # restamps the stance chip
-			# Tempo: the pivot itself becomes an attack — momentum for a turn.
-			if attacker.tempo_ranks > 0:
-				var tp_pct := 30 * attacker.tempo_ranks
-				_apply_status(attacker, "tempo", 2, tp_pct)
-				attacker.update_status("tempo", "+%d%%" % tp_pct,
-					"Tempo: +%d%% damage for one turn\n(granted by switching stance)." % tp_pct,
-					tp_pct)
-				_log("   → Talent: Tempo — +%d%% damage for a turn" % tp_pct,
-					"#b0a8e0")
+			# BATCH BP: the swap AND Tempo moved into `_swordmaster_switch`,
+			# because Precision Strike and Feint switch the stance too and three
+			# copies of the pivot would drift. Everything BELOW this line is
+			# Guard Change's OWN payload and stays here — the pressure it lands,
+			# Sunder Guard, No Quarter and the parry perfect are on its card and
+			# on no other.
+			_swordmaster_switch(attacker)
 			# The pivot presses the opening he already made: 15 BD to the
 			# un-Broken enemy nearest to Breaking (auto-picked — the ability
 			# takes no target, keeping autoplay await-free). SUNDER GUARD
@@ -10957,6 +11476,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_apply_status(attacker, "parry_up", 2, gc_parry)
 				attacker.update_status("parry_up", "+%d%%" % gc_parry,
 					"+%d%% parry chance." % gc_parry, gc_parry)
+			# Read AFTER `_swordmaster_switch` above, so the line names the guard
+			# he ARRIVED in rather than the one he left.
+			var gc_label := "Aggressive" if attacker.stance == "aggressive" \
+				else "Defensive"
 			_message("%s shifts his guard — %s!" % [attacker.unit_name, gc_label])
 			_log("%s: Guard Change — %s stance%s%s" % [attacker.unit_name,
 				gc_label, gc_bd_txt,

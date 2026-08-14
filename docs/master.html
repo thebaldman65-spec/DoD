@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-13 (Batch BO)</b></p>
+<p align="right"><b>Last updated: 2026-08-13 (Batch BP)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1035,9 +1035,9 @@ the pick you take when your spec's engine is not online yet.</p>
 SPEC_POOLS, the draft reads these.</p>
 <table border="1" cellpadding="4">
 <tr><th>Spec</th><th>Draft pool</th></tr>
-<tr><td><b>Berserker</b></td><td><i>owed</i></td></tr>
-<tr><td><b>Warden</b></td><td><i>owed</i></td></tr>
-<tr><td><b>Swordmaster</b></td><td><i>owed</i></td></tr>
+<tr><td><b>Berserker</b></td><td>Blood Offering, Gut Rip</td></tr>
+<tr><td><b>Warden</b></td><td>Covering Guard, Eye of the Storm</td></tr>
+<tr><td><b>Swordmaster</b></td><td>Precision Strike, Feint</td></tr>
 <tr><td><b>Pyromancer</b></td><td>Cinderfall, Ember Debt</td></tr>
 <tr><td><b>Cryomancer</b></td><td>Winter's Toll, Rimebinding</td></tr>
 <tr><td><b>Arcanist</b></td><td>Null Field, Kindled Mind</td></tr>
@@ -1049,13 +1049,23 @@ SPEC_POOLS, the draft reads these.</p>
 <tr><td><b>Survivalist</b></td><td>Choking Smoke, Snare Line</td></tr>
 <tr><td colspan="2"><b>Class-wide (all four classes)</b> — <i>owed</i></td></tr>
 </table>
-<p><b>Pools are thin.</b> Eighteen abilities exist against a target of about ninety-six, so
-offers come up two cards or one, and a Warrior has no draft pool at all yet. That is the pool
-filling, not the draft misbehaving.</p>
+<p><b>Pools are thin.</b> Twenty-four abilities exist against a target of about ninety-six, so
+offers come up two cards or one. That is the pool filling, not the draft misbehaving. Every
+spec has a draft now; the twenty-four <b>class-wide</b> abilities are still to be written, so
+every card an offer holds today is spec.</p>
 
-<p><b>The eighteen drafted abilities.</b> Each names the axis it serves.</p>
+<p><b>The twenty-four drafted abilities.</b> Each names the axis it serves.</p>
 <table border="1" cellpadding="4">
 <tr><th>Ability</th><th>Cost / init / cd</th><th>What it does</th><th>Axis</th></tr>
+<tr><td colspan="4"><b>Berserker</b> — <i>how do you get low, and what do you do with the blood</i></td></tr>
+<tr><td><b>Blood Offering</b></td><td>0 Rage, 1.5, 3cd, self</td><td>He loses <b>20% of his CURRENT health</b> and gains 40 Rage (Perfect: 60). Because it is a share of what is left rather than of his maximum, it can never take him below 1 — and it costs less the lower he is.</td><td>Buying the frenzy band on purpose. Blood Frenzy pays for missing health and he has never controlled when he gets there.</td></tr>
+<tr><td><b>Gut Rip</b></td><td>30 Rage, 2.5, 4cd, one enemy</td><td><b>Bleeds the target out at once</b> whatever its buildup, plus 6% of Attack for every 10 points consumed (Perfect: 9%). It fires the real bleedout, so Bloodcraze, Scent of Blood, Arterial Spray, Blood Tithe and Slaughterhouse all answer it.</td><td>The bleedout stops being the enemy's clock — four of his own nodes were waiting on a trigger he could not pull.</td></tr>
+<tr><td colspan="4"><b>Swordmaster</b> — <i>what is a stance worth</i>. Both cards read the stance and then <b>switch it</b>, and each branch buys what the stance he is <b>arriving</b> in wants — so he is never stranded.</td></tr>
+<tr><td><b>Precision Strike</b></td><td>20 Rage, 2.0, 3cd, one enemy</td><td><b>From Aggressive:</b> strikes <b>twice</b> for 20% of Attack each (6 BD a strike), and grants <b>+25% parry chance for 3 turns</b> — the defence the Defensive guard he lands in wants.<br><b>From Defensive:</b> strikes <b>once</b> for 15% of Attack with 15 BD, and <b>his attacks ignore ALL armor for 3 turns</b> — the offence the Aggressive guard he lands in wants.<br>Either way the stance then switches. Perfect: the stance it grants holds 4 turns.</td><td>The same blade, two intentions. Armor is bypassed outright rather than penetrated by a percentage, which against an unarmoured enemy would have been a clause that does nothing.</td></tr>
+<tr><td><b>Feint</b></td><td>25 Rage, 2.0, 4cd, one enemy</td><td><b>From Aggressive:</b> strikes for 35% of Attack (12 BD), and <b>that enemy's next attack lands on one of its own allies</b> (Perfect: 45%).<br><b>From Defensive:</b> no strike at all — he banks <b>2 charges</b> (Perfect: 3), each of which parries an attack against him outright and deals its damage to the attacker instead.<br>Either way the stance then switches.<br><b>Charges, not turns:</b> both halves wait until spent, so a Feint cast into a lull is not wasted and cannot be dodged by an enemy simply not swinging.</td><td>Their swing lands somewhere they did not intend. From the front foot he tricks them into a friend; from the back foot into themselves.</td></tr>
+<tr><td colspan="4"><b>Warden</b> — <i>what does protection look like when it is not his own</i></td></tr>
+<tr><td><b>Covering Guard</b></td><td>25 Rage, 2.5, 4cd, one ally</td><td>For 3 turns (Perfect: 4), <b>his</b> Block chance is rolled against every attack aimed at that ally, and a success <b>negates the attack entirely</b>. It reads his Block <b>live</b>, so Shieldwall, Heavy Plating's climb and Bulwark Line all feed it. Cast on another ally only.</td><td>His stat protecting someone else. This is <b>not</b> redirection — nothing moves to him; the attack simply stops, which is what Block does and what nothing else in the game does.</td></tr>
+<tr><td><b>Eye of the Storm</b></td><td>20 Rage, 2.0, 4cd, self</td><td><b>Taunts every enemy</b> for 2 turns (Perfect: 3), and he takes <b>8% less damage per enemy taunted</b> while it holds.</td><td>Being outnumbered becomes the point — a party-wide defensive cooldown that costs him everything, and it is self-balancing: a bigger field is more mitigation as well as more incoming.</td></tr>
 <tr><td colspan="4"><b>Pyromancer</b> — <i>different answers to how do you commit</i></td></tr>
 <tr><td><b>Cinderfall</b></td><td>30 Mana, 3.0, 3cd, all enemies</td><td>20% of Attack across the field, then tears 2 turns of Burn from each burning enemy to deal that much again to it (Perfect: 3 turns). Overburn refunds every turn taken.</td><td>Spending wide instead of deep — Detonation empties one bank, this skims them all.</td></tr>
 <tr><td><b>Ember Debt</b></td><td>20 Mana, 2.0, 4cd, one enemy</td><td>No damage. 8 turns of Burn (Perfect: 12), and <b>Overburn's Mana drain ignores that enemy entirely</b>. Its turns still feed the damage bonus.</td><td>Commitment without the bill — one enemy is free to light.</td></tr>
