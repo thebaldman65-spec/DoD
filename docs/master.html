@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-13 (Batch BP)</b></p>
+<p align="right"><b>Last updated: 2026-08-13 (Batch BQ)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1047,14 +1047,27 @@ SPEC_POOLS, the draft reads these.</p>
 <tr><td><b>Beastmaster</b></td><td>Twin Hunt, Call the Wilds</td></tr>
 <tr><td><b>Sharpshooter</b></td><td>Called Volley, Quarry's Mark</td></tr>
 <tr><td><b>Survivalist</b></td><td>Choking Smoke, Snare Line</td></tr>
-<tr><td colspan="2"><b>Class-wide (all four classes)</b> — <i>owed</i></td></tr>
+<tr><td colspan="2"><b>Class-wide pools</b> — drawn by every spec of the class, at roughly one card in four</td></tr>
+<tr><td><b>Mage</b> (all three specs)</td><td>Magic Barrier, Mirror Image, Magic Missiles, Mana Well, Dispel, Blink</td></tr>
+<tr><td><b>Cleric</b> (all three specs)</td><td>Ministration, Consecration, Chastise, Unburden, Exhortation, Undying Vigil</td></tr>
+<tr><td><b>Warrior</b></td><td><i>owed</i></td></tr>
+<tr><td><b>Hunter</b></td><td><i>owed</i></td></tr>
 </table>
-<p><b>Pools are thin.</b> Twenty-four abilities exist against a target of about ninety-six, so
-offers come up two cards or one. That is the pool filling, not the draft misbehaving. Every
-spec has a draft now; the twenty-four <b>class-wide</b> abilities are still to be written, so
-every card an offer holds today is spec.</p>
+<p><b>Pools are thin, and the class seam is HALF-FILLED.</b> Thirty-six abilities exist
+against a target of about ninety-six, so offers still come up two cards or one. That is the
+pool filling, not the draft misbehaving. Every spec has a draft, and <b>one card in four is
+class-wide</b> — that seam now draws real entries for a <b>Mage</b> or a <b>Cleric</b> hero,
+and still finds nothing for a <b>Warrior</b> or a <b>Hunter</b>, whose class pools are owed.</p>
 
-<p><b>The twenty-four drafted abilities.</b> Each names the axis it serves.</p>
+<p><b>What a class-wide ability is, and is not.</b> Deliberately <b>untied and general</b> —
+Magic Barrier, not Frostbolt: the test is whether it would read as off-theme for <i>any</i>
+spec of that class. And <b>weaker than spec abilities, and unconditional</b> — they feed no
+passive (a Barrier does nothing for Overburn, a heal nothing for Ruin), so at equal power they
+would be a safe default that dilutes every build. Slightly weaker but always-on makes them the
+pick you take when your spec's engine is not online yet, which is a different role.</p>
+
+<p><b>The thirty-six drafted abilities.</b> Each names the axis it serves. The
+twenty-four spec cards come first; the twelve class-wide ones close the table.</p>
 <table border="1" cellpadding="4">
 <tr><th>Ability</th><th>Cost / init / cd</th><th>What it does</th><th>Axis</th></tr>
 <tr><td colspan="4"><b>Berserker</b> — <i>how do you get low, and what do you do with the blood</i></td></tr>
@@ -1093,6 +1106,20 @@ every card an offer holds today is spec.</p>
 <tr><td colspan="4"><b>Survivalist</b> — <i>what else can be worn down</i></td></tr>
 <tr><td><b>Choking Smoke</b></td><td>25 Mana, 2.5, 4cd, all enemies</td><td>Blinds every enemy for 2 turns (Perfect: 3) — the existing Blind, +50% miss.</td><td>An affliction his kit does not otherwise have. Area attacks never miss, so it blanks single-target blows only.</td></tr>
 <tr><td><b>Snare Line</b></td><td>25 Mana, 2.5, 4cd</td><td>Every enemy that acts next turn (Perfect: for two turns) springs one of your traps where it stands — teeth, Break and all. It fills no trap slot and spends no placed trap.</td><td>The traps stop waiting.</td></tr>
+<tr><td colspan="4"><b>Class-wide — MAGE</b> (all three specs) — <i>the tools every spine wants and no spine provides, because a spine that provided them would stop being a spine</i></td></tr>
+<tr><td><b>Magic Barrier</b></td><td>25 Mana, 2.0, 4cd, self</td><td>Absorbs damage equal to <b>15% of his maximum health</b> for 3 turns (Perfect: 20%). It is an ordinary barrier, so it eats a share of <i>everything</i> — area attacks included.</td><td>The floor beneath all three Mage spines. Absorption, where Mirror Image is evasion.</td></tr>
+<tr><td><b>Mirror Image</b></td><td>20 Mana, 2.0, 4cd, self</td><td>The next <b>three single-target attacks</b> against him miss outright (Perfect: four). Area attacks roll no miss at all, so they spend no image. The images <b>wait until spent</b>.</td><td>Evasion rather than absorption. Better than the Barrier against three big hits, worse against a swarm — neither is a strict upgrade of the other.</td></tr>
+<tr><td><b>Magic Missiles</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td>Three bolts at <b>12% of Attack</b> each, 3 BD a bolt (Perfect: a fourth bolt).</td><td>The reliable filler. Multi-hit, so it plays with anything reading hits rather than casts, and cheap enough to cast while saving for something bigger.</td></tr>
+<tr><td><b>Mana Well</b></td><td>20 Mana, 1.5, 5cd, self</td><td>For 3 turns (Perfect: 4) his <b>Mana regeneration is doubled</b> — the live figure, so Evocation and any rune are doubled with it.</td><td>Costs Mana to make Mana: net-positive only if the fight lasts, so it is a read on the fight rather than a free button.</td></tr>
+<tr><td><b>Dispel</b></td><td>15 Mana, 1.5, 3cd, either side</td><td>Removes <b>two harmful effects from an ally, or two beneficial effects from an enemy</b> (Perfect: three). The only ability in the game that may target either side.</td><td>Utility nobody has. <b>Note:</b> the enemy half is thin — a ward from a Shieldmaster or a Hollow Crown is the only beneficial effect an enemy can carry.</td></tr>
+<tr><td><b>Blink</b></td><td>10 Mana, 1.0, 3cd, self</td><td>Clears <b>one turn from every one of his cooldowns</b> (Perfect: two). Its own is exempt.</td><td>Tempo, not damage. Worth most to whoever has the most on cooldown, so it scales with kit size rather than with any spec.</td></tr>
+<tr><td colspan="4"><b>Class-wide — CLERIC</b> (all three specs) — <i>three support-shaped spines with enormous conditional power and no baseline: none of the three can simply heal someone on turn one</i></td></tr>
+<tr><td><b>Ministration</b></td><td>20 Mana, 2.0, 2cd, one ally</td><td>Heals <b>20% of that ally's maximum health</b> (Perfect: 26%).</td><td>The plain heal none of them has. Holy's healing is gated behind Mercy, the Devout's behind shields absorbing hits, the Occultist's behind marks on enemies.</td></tr>
+<tr><td><b>Consecration</b></td><td>25 Mana, 2.5, 5cd, party</td><td>For 3 turns (Perfect: 4) the <b>whole party regains 5% of maximum health</b> at the start of each of their turns.</td><td>Sustained rather than burst — the opposite read to Ministration.</td></tr>
+<tr><td><b>Chastise</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td><b>25% of Attack</b> as holy damage and <b>20 Break damage</b> (Perfect: 30 BD).</td><td>Something to do with a turn. All three Clerics have turns where nobody needs healing and their engine is not ready.</td></tr>
+<tr><td><b>Unburden</b></td><td>20 Mana, 1.5, 4cd, one ally</td><td>Removes <b>every</b> harmful effect from that ally, and they take <b>20% less damage for 2 turns</b> (Perfect: 3).</td><td>Cleanse with a tail. A pure cleanse is dead against a warband that applies nothing; the mitigation means it is never a wasted card.</td></tr>
+<tr><td><b>Exhortation</b></td><td>25 Mana, 2.5, 4cd, party</td><td>The whole party's <b>next attack deals 25% more damage</b> (Perfect: 35%). <b>Banked, not timed</b> — it waits for each hero's next swing rather than expiring on a turn count.</td><td>The only offensive party buff a Cleric has.</td></tr>
+<tr><td><b>Undying Vigil</b></td><td>25 Mana, 2.0, 4cd, one ally</td><td>For 3 turns (Perfect: 4), whenever that ally is healed <b>by any source</b>, a second ally on lower health is healed for half as much.</td><td>Making one heal into two. It is the one class ability that gets <i>better</i> the more spec-specific the build is — a deliberate inversion of the unconditional-floor role the other five play.</td></tr>
 </table>
 
 <h3>6.1 Warrior</h3>

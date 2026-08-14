@@ -946,6 +946,29 @@ var rite_cb := Callable()
 # and one counter holding two rules is how the reflect would go missing.
 var feint_guards := 0
 
+# ------- BATCH BQ — the class-wide draft's unit-side state -------
+#
+# ONE CALLBACK AND NO NEW FIELDS AT ALL, for twelve abilities. Everything with
+# a duration is a STATUS (`barrier`, `mana_well`, `consecration`, `unburdened`,
+# `vigil`), which is the cheaper answer wherever an effect has a chip: they
+# expire by themselves and cannot leak past a battle.
+#
+# AND THE TWO THAT ARE *BANKED* RATHER THAN TIMED — Mirror Image's images and
+# Exhortation's share — LIVE IN THEIR STATUS'S `power`, BATTLE-LONG, on the
+# INTERPOSE precedent (`shield_charges` has held its charges that way since
+# Batch AB). A field plus a chip would be the same number written twice, and
+# Batch BP's Eye of the Storm is what that costs: the chip silently won and a
+# wrong figure in the apply was unobservable. One place decides; the chip IS
+# the place. Battle-long (-1 turns) is what makes "banked, not timed" true —
+# they wait until SPENT, whatever the fight does in between.
+#
+# UNDYING VIGIL (Cleric) — fired from heal_amount with (healed, amount) AFTER
+# the heal has landed, so it sees healing FROM ANY SOURCE (a cast, a Renewal
+# tick, an item, a lifesteal) rather than from one named ability. battle.gd
+# picks the second ally and does the forking, because unit.gd cannot see the
+# board — the `blight_cb` rule, through a friendlier door.
+var vigil_cb := Callable()
+
 # Occultist tree (07-24; lanes re-specced Batch L 07-30; every counter went
 # ADDITIVE in Batch AX — the field holds the MAGNITUDE, not a rank, and the
 # read site applies no step of its own). See talents.gd for the node text.
@@ -2639,6 +2662,16 @@ func heal_amount(amount: int, external := false) -> int:
 	if external and final > 0:
 		healed_externally = true
 	refresh_bars()
+	# BATCH BQ — UNDYING VIGIL. It fires HERE, at the bottom of the one function
+	# every heal in the game passes through, and that position is what makes
+	# "healed BY ANY SOURCE" true rather than "healed by the abilities we
+	# remembered to list" — a cast, a Renewal tick, an item, a lifesteal and a
+	# Blessed Barrier conversion all arrive at this line. BELOW the multipliers
+	# and the clamp on purpose: what forks is what LANDED, so a heal into a full
+	# bar forks nothing, exactly as it books nothing. The fork itself is
+	# battle.gd's (unit.gd cannot see the board) — this hands over the number.
+	if final > 0 and has_status("vigil") and vigil_cb.is_valid():
+		vigil_cb.call(self, final)
 	return final
 
 

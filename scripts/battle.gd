@@ -141,6 +141,21 @@ const STATUS_INFO := {
 	"feint_guard": ["Feint", "Fg", Color(0.45, 0.85, 1.0), "Charges banked: each parries one\nattack outright and returns its damage\nto the attacker. They wait until spent."],
 	"covering_guard": ["Covering Guard", "CG", Color(0.70, 0.78, 0.95), "Covered by the Warden: HIS Block\nchance is rolled against attacks aimed\nhere, and a success stops the blow\ndead. Nothing moves to him."],
 	"eye_storm": ["Eye of the Storm", "ES", Color(0.85, 0.80, 0.95), "The whole field is his: damage taken\nis reduced by 8% for every enemy he\ntaunted."],
+	# ---- BATCH BQ: the class-wide draft's statuses ----
+	# Four of the twelve carry one of their own. Magic Barrier rides the
+	# EXISTING `barrier` (the same absorb pipeline Divine Shield and the vaulted
+	# Arcane Barrier use — a second barrier implementation is the last thing
+	# this file needs), Mirror Image carries a COUNT and a chip of its own
+	# (`mirror_images`, the `feint_guards` shape) because its charges must not
+	# tick away on a turn count, Exhortation is banked in a field for the same
+	# reason, and Magic Missiles / Chastise / Dispel / Blink / Ministration
+	# resolve and are done.
+	"mana_well": ["Mana Well", "MW", Color(0.45, 0.65, 0.95), "The well is open: Mana regeneration\nis DOUBLED while it holds."],
+	"mirror": ["Mirror Image", "MI", Color(0.70, 0.75, 0.95), "Images stand in his place: the next\nsingle-target attacks against him miss\noutright. Area attacks never miss, so\nthey spend none. They wait until spent."],
+	"exhorted": ["Exhortation", "Ex", Color(0.98, 0.88, 0.55), "Called on: their NEXT attack deals\nbonus damage. It is BANKED — it waits\nfor the swing, however long they take."],
+	"consecration": ["Consecration", "Cs", Color(0.95, 0.88, 0.60), "Blessed ground: regains 5% of maximum\nhealth at the start of each turn."],
+	"unburdened": ["Unburdened", "Ub", Color(0.85, 0.92, 0.70), "The weight is lifted: takes 20% less\ndamage."],
+	"vigil": ["Undying Vigil", "UV", Color(0.95, 0.90, 0.70), "Watched over: every heal this ally\nreceives, from ANY source, also heals\na second ally on lower health for half\nas much."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -217,6 +232,13 @@ var _holds: Array[BattleUnit] = []
 # and _hold_freeze, and REMOVING IT RESTORES A CRASH — see the block above
 # _hold_release for the two-body cycle it breaks.
 var _releasing := false
+# BATCH BQ — NO FORK MAY BEGIN WHILE A FORK IS RESOLVING. Undying Vigil hangs
+# off `heal_amount`, so the heal it sends to the second ally re-enters that
+# function — and a second ally who is ALSO warded would fork again. It is not
+# the two-body cycle BN's guard breaks (the fork halves each time and would
+# terminate), but it is an unbounded chain from one cast, and one flag is
+# cheaper than reasoning about how long it runs.
+var _vigil_forking := false
 var _clock := 0.0  # the acting unit's position on the timeline, this turn
 # HOW MANY UNIT TURNS THIS BATTLE HAS SPENT. It drives the stalemate guard and
 # the forfeit nudge, and since Batch BB it is also the clock a once-per-turn
@@ -282,6 +304,13 @@ const FEINT_STRIKE_PCT := 35
 const FEINT_BD := 12
 const FEINT_GUARDS := 2           # charges the Defensive branch banks
 const EYE_STORM_CUT_PCT := 8      # damage cut per enemy ACTUALLY taunted
+# ---- BATCH BQ: the two class-wide magnitudes that are not on an Ability ----
+# Everything else in the twelve is a percentage inside its own `special` and
+# reads once; these two are read at a site the ability itself never touches — a
+# turn-start tick and a callback — so they are named here rather than left as
+# literals two functions apart.
+const CONSECRATION_PCT := 0.05    # of the holder's OWN max health, each turn
+const VIGIL_SHARE := 0.5          # of the heal that forked, to the second ally
 # Batch W: this battle's dmg/heal/prevented per hero — banked into the
 # per-spec share pools at battle end (rotation needs "share of the battles
 # this spec was IN", which the stage totals can't give).
@@ -844,6 +873,12 @@ func _spawn_units() -> void:
 		# Break reduction. None had ever been credited to anyone, so every
 		# Devout row ever measured under-read two of his three lanes.
 		h.credit_cb = _on_unit_credit
+		# BATCH BQ — UNDYING VIGIL's fork. Wired on EVERY hero unconditionally,
+		# beside the other three, rather than behind "is a Cleric standing":
+		# the ward is a DRAFTED card that any Cleric spec may hand to any ally,
+		# and the gate that decides whether it fires is the `vigil` STATUS on
+		# the healed unit — one gate, on the unit the effect is about.
+		h.vigil_cb = _on_vigil_heal
 
 	# Guardian Angel raises the Mercy-earning threshold and Last Hope deepens
 	# healing on the nearly-dead — both are the Holy's talents, but the checks
@@ -2043,6 +2078,10 @@ func _run_battle() -> void:
 							washed, u.unit_name], "#b0a8e0")
 		# Batch AW §2: the holy ground is a Faith engine in the BASE KIT now.
 		_ground_faith_tick(u)
+		# BATCH BQ — Consecration's drip, in its own function for the standing
+		# reason: a rule left inside this loop can only ever be checked by a
+		# grep, because `_run_battle` cannot be driven headlessly.
+		_consecration_tick(u)
 		if u.has_status("focus") and u.resource_name == "Mana":
 			u.resource = mini(u.resource + 10, u.max_resource)
 			u.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
@@ -2752,7 +2791,14 @@ func _player_turn(u: BattleUnit) -> void:
 				# `eye_of_storm` takes the WHOLE field, so neither has a target
 				# to click; `covering_guard` is ally-facing and falls through to
 				# the ALLY branch below, where its pool excludes him.
-				"blood_offering", "eye_of_storm"]:
+				"blood_offering", "eye_of_storm",
+				# BATCH BQ. Four of the twelve are self-casts and two are
+				# party-wide, which is the same thing to this list. `dispel`,
+				# `ministration`, `unburden` and `undying_vigil` are NOT here:
+				# the first picks either side (see below) and the other three
+				# are ally-facing and fall through to the ALLY branch.
+				"magic_barrier", "mirror_image", "mana_well", "blink",
+				"consecration", "exhortation"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -2777,7 +2823,18 @@ func _player_turn(u: BattleUnit) -> void:
 			target = auto_target
 		else:
 			var pool: Array
-			if ab.target == Ability.Target.ALLY:
+			# BATCH BQ — DISPEL IS THE ONLY ABILITY IN THE GAME WHOSE TARGET MAY
+			# BE EITHER SIDE, and this is where that is bought: ONE widened pool
+			# rather than a third `Ability.Target` value. An enum entry would
+			# have to be understood by the enemy AI's re-validation, the intent
+			# classifier, the bot's own targeting and `_ability_usable` — four
+			# places that would each need a rule for a case only one card uses.
+			# `_resolve_special` reads `target.is_hero` and knows which half it
+			# is, which is the whole cost of the feature.
+			if ab.special == "dispel":
+				pool = _hero_side()
+				pool.append_array(enemies.filter(func(e): return not e.dead))
+			elif ab.target == Ability.Target.ALLY:
 				pool = _hero_side()
 				# BATCH BP — COVERING GUARD IS FOR SOMEONE ELSE, AND THE POOL IS
 				# WHERE THAT IS MADE STRUCTURAL rather than left as a trap the
@@ -2865,13 +2922,10 @@ func _player_turn(u: BattleUnit) -> void:
 	# (a self-refunding cooldown is not a cooldown).
 	if u.practised_hands > 0 and not u.dead and not battle_over:
 		var ph_cast := String(ab.display_name) if ab != null else ""
-		var ph_cut := 0
-		for cd_name in u.cooldowns.keys():
-			if String(cd_name) == ph_cast:
-				continue
-			if int(u.cooldowns[cd_name]) > 0:
-				u.cooldowns[cd_name] = maxi(int(u.cooldowns[cd_name]) - u.practised_hands, 0)
-				ph_cut += 1
+		# BATCH BQ re-pointed this at `_tick_cooldowns` — same walk, same skip,
+		# same count, one implementation. The skip is still the ability just
+		# cast: a self-refunding cooldown is not a cooldown.
+		var ph_cut := _tick_cooldowns(u, u.practised_hands, ph_cast)
 		if ph_cut > 0:
 			_log("   → Talent: Practised Hands — %d cooldown%s tick early" % [
 				ph_cut, "" if ph_cut == 1 else "s"], "#b0a8e0")
@@ -2975,6 +3029,22 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 						return [ab, h]
 				continue
 			return [ab, _lowest_hp(allies)]
+		# BATCH BQ — DISPEL PICKS ITS OWN SIDE, which is the one card here whose
+		# target is not decided by `ab.target`. Ally first (an affliction the
+		# party is wearing is the common case and the half that always has
+		# something to do), enemy second, and it is SKIPPED ENTIRELY when
+		# neither side is wearing anything — a Dispel into an empty board is a
+		# wasted turn, and unlike the player the bot cannot look and decline.
+		if ab.special == "dispel":
+			var dp_ally := allies.filter(
+				func(h): return not _cleansable_debuffs(h).is_empty())
+			if not dp_ally.is_empty():
+				return [ab, _lowest_hp(dp_ally)]
+			var dp_foe := foes.filter(
+				func(e): return not _dispellable_buffs(e).is_empty())
+			if not dp_foe.is_empty():
+				return [ab, dp_foe[0]]
+			continue
 		# Rimebinding wants a target that is not already the prison it copies.
 		if ab.special == "rimebinding":
 			var free_foes := foes.filter(func(e): return not _is_held(e))
@@ -4997,6 +5067,36 @@ func _cleansable_debuffs(u: BattleUnit) -> Array:
 	return out
 
 
+# BATCH BQ — WHAT DISPEL MAY STRIP FROM AN ENEMY. It is DERIVED rather than a
+# list of names, on `_intent_category`'s rule: anything that is not a DEBUFF is
+# a candidate, so a beneficial status a later batch authors onto an enemy is
+# dispellable the day it lands without anybody remembering to come back here.
+#
+# THE EXCLUSION LIST IS THE PART WORTH READING, AND EVERY ENTRY IS A TRAP THE
+# DERIVED RULE WOULD OTHERWISE WALK INTO. `DEBUFF_IDS` deliberately does NOT
+# hold the five MARKS the party applies — covenant, quarry, snare_line,
+# feinted, hunt_mark — each absent for its own good reason (a mark is not an
+# affliction; see the comment on DEBUFF_IDS itself). Left to the derived rule
+# they read as "beneficial effects on an enemy", and DISPEL WOULD STRIP THE
+# PARTY'S OWN WORK — the exact opposite of the ability. `ruin_primed` is the
+# same trap through another door: it is the primer rather than the mark, so it
+# is not in DEBUFF_IDS either, and dispelling it would defuse the Occultist's
+# bomb for him. `charging` is a declared blow, not a boon — CANCELLING A
+# WIND-UP IS WHAT A BREAK IS FOR (Batch V), and handing that to a 15-Mana
+# utility card would quietly delete the Ash Hurler's whole lesson.
+const DISPEL_NEVER := ["covenant", "quarry", "snare_line", "feinted",
+	"hunt_mark", "ruin_primed", "charging", "spec_passive"]
+
+
+func _dispellable_buffs(u: BattleUnit) -> Array:
+	var out: Array = []
+	for s in u.statuses:
+		if BattleUnit.DEBUFF_IDS.has(s.id) or DISPEL_NEVER.has(s.id):
+			continue
+		out.append(s)
+	return out
+
+
 # Remaining turns for "longest-remaining" comparisons: battle-long
 # statuses (turns < 0 — Permafrost chill, Ruin) outlast everything.
 func _turns_left(s: Dictionary) -> int:
@@ -5396,8 +5496,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			var wd_st := target.get_status("ward")
 			if not wd_st.is_empty():
 				wd_st["src_name"] = attacker.unit_name
+	# BATCH BQ — MIRROR IMAGE spends a charge HERE, inside the miss branch's own
+	# conditions rather than in a rule of its own. Those conditions are what the
+	# game means by "a single-target attack", so an area attack, a multi-hit and
+	# a random-hit scatter never reach this line and never spend an image —
+	# which is the clause that keeps Mirror Image from being a strict upgrade of
+	# Magic Barrier. The short-circuit order matters: an image is spent BEFORE
+	# the dice are rolled, so a charge is never burnt on a blow that would have
+	# missed anyway.
 	elif not is_counter and not ab.aoe and ab.multi_hits == 0 and ab.random_hits == 0 \
-			and not ab.choose_two and randf() < _miss_chance(attacker, target):
+			and not ab.choose_two \
+			and (_mirror_dodge(attacker, target) \
+				or randf() < _miss_chance(attacker, target)):
 		_stat("attacks")
 		_stat("attack_miss")
 		_sfx("miss")
@@ -5463,6 +5573,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# count on the very hit that earned it — the ordering trap AG fixed for
 		# Detonation and AR for Pressure Cooker, arriving through a third door.
 		var crit_mass_trips := 0
+		# BATCH BQ — EXHORTATION IS SPENT ONCE PER CAST, NOT ONCE PER STRIKE,
+		# and it is read HERE, above the loop, for exactly that reason: "their
+		# NEXT ATTACK deals 25% more damage" means the cast, so Magic Missiles'
+		# three bolts are one attack. The share is the status's power, so the
+		# chip and the arithmetic read one number, and the status is spent the
+		# moment the cast commits — a COUNTER never spends it, because a free
+		# swing is not the swing they were called on to take.
+		var exhort_mult := 1.0
+		if attacker.status_power("exhorted") > 0 and ab.damage > 0 \
+				and not is_counter:
+			exhort_mult = 1.0 + 0.01 * attacker.status_power("exhorted")
+			_log("   → Exhortation: %s's attack lands %d%% harder (spent)" % [
+				attacker.unit_name, attacker.status_power("exhorted")], "#e8c860")
+			_stamp_exhort_chip(attacker, 0)
 		for hit_i in total_hits:
 			var strike_target: BattleUnit
 			if ab.random_hits > 0:
@@ -6166,6 +6290,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw += 0.5 * strike_target.pressure
 			if attacker.has_status("empower"):
 				raw *= 1.25
+			# BATCH BQ — EXHORTATION. The multiplier was read and SPENT once,
+			# above the strike loop, so a multi-hit ability is ONE attack rather
+			# than three — which is what the card says and what a per-strike
+			# consumption would quietly make false.
+			raw *= exhort_mult
 			# Overburn: the Pyromancer feeds on every TURN of fire still
 			# standing on the enemy team — capped, unlike the drain he pays
 			# for the same fire (see _overburn_mult).
@@ -6387,6 +6516,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					strike_target.status_power("eye_storm") / 100.0, 0.95)
 				if strike_target.is_hero:
 					_prev(strike_target, es_was - raw)
+			# BATCH BQ — UNBURDEN's tail. A flat 20% while it holds, booked to
+			# the prevented ledger like every other instrumented mitigation and
+			# CREDITED TO THE CLERIC WHO CAST IT rather than to the ally wearing
+			# it — Batch W's rule (a barrier's absorbs credit its caster, an
+			# Interpose charge credits the granting Warden). `_apply_status`
+			# stamps `src_name` at the cast, so the credit survives the caster
+			# dying and needs no second bookkeeping.
+			if strike_target.has_status("unburdened"):
+				var ub_was := raw
+				raw *= 0.80
+				if strike_target.is_hero:
+					_prev(String(strike_target.get_status("unburdened").get(
+						"src_name", "")), ub_was - raw)
 			# Stabilized: grounded resonance blunts incoming blows.
 			if strike_target.has_status("stabilized"):
 				var pv_was := raw
@@ -6868,9 +7010,11 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if attacker.exposed_nerve > 0 and not strike_target.dead:
 					_apply_status(strike_target, "exposed", 3)
 				if attacker.follow_through > 0 and not attacker.cooldowns.is_empty():
-					for cd_key in attacker.cooldowns.keys():
-						attacker.cooldowns[cd_key] = maxi(
-							int(attacker.cooldowns[cd_key]) - attacker.follow_through, 0)
+					# BATCH BQ: one implementation (`_tick_cooldowns`). It used
+					# to walk every entry including the ones already at zero,
+					# which was a no-op then and is skipped now — no behaviour
+					# moved, and the log line is unchanged.
+					_tick_cooldowns(attacker, attacker.follow_through)
 					_log("   → Follow-Through: cooldowns tick %d" % \
 						attacker.follow_through, "#b0a8e0")
 				if attacker.through_and_through > 0 and ab.cost > 0:
@@ -8176,9 +8320,8 @@ func _hold_release_body(target: BattleUnit, reason: String) -> void:
 			for h in heroes:
 				if h.dead or h.is_companion:
 					continue
-				for cd_name in h.cooldowns.keys():
-					if int(h.cooldowns[cd_name]) > 0:
-						h.cooldowns[cd_name] = maxi(int(h.cooldowns[cd_name]) - refund, 0)
+				# BATCH BQ: one implementation (`_tick_cooldowns`), per hero.
+				_tick_cooldowns(h, refund)
 			_log("   → Talent: Frostbound Hours — %d turn%s off every cooldown" % [
 				refund, "" if refund == 1 else "s"], "#b0a8e0")
 	# Shattered Tempo: the release is paid out in TIME rather than damage —
@@ -8487,8 +8630,97 @@ const OVERBURN_CAP := 40.0
 # The turn-start Mana drip, in ONE place — the drip itself reads it, and so
 # does Ash Lung, whose whole condition is "the drain outruns the regen".
 # Two sites asking the same question must not each carry their own 12.
+#
+# BATCH BQ — MANA WELL DOUBLES THE FIGURE THIS FUNCTION RETURNS, WHICH IS WHY
+# IT IS DOUBLED HERE AND NOWHERE ELSE. §6 names "doubling a base it no longer
+# uses" as one of the five clauses that could silently do nothing, and this is
+# the shape of the answer: what gets doubled is the number the drip ACTUALLY
+# spends — 12 plus Evocation's 10 plus whatever a rune adds — rather than a
+# constant copied out of this function years ago. The log line and the sim
+# instrument both read the same call.
 func _mana_regen(u: BattleUnit) -> int:
-	return 12 + u.mana_regen_bonus
+	var regen := 12 + u.mana_regen_bonus
+	if u.has_status("mana_well"):
+		regen *= 2
+	return regen
+
+
+# BATCH BQ — TAKE `turns` OFF THIS UNIT'S COOLDOWNS. Returns how many actually
+# moved, and `skip` names one ability that is exempt.
+#
+# THIS IS AN EXTRACTION, NOT A NEW HOOK, and §3 asked for exactly that ("the
+# cooldown-reduction hook already exists — reuse it"). What existed was FOUR
+# hand-written copies of the same six lines — Follow-Through, Practised Hands,
+# Frostbound Hours and Crusader's Tempo — and this project keeps re-learning
+# what that costs (Batch BP's Eye of the Storm: a number written three times,
+# and the wrong copy silently won). All four call this now and BEHAVE
+# IDENTICALLY: cutting an entry already at zero was always a no-op, so folding
+# the `> 0` guard in changes nothing any of them did.
+func _tick_cooldowns(u: BattleUnit, turns: int, skip := "") -> int:
+	var moved := 0
+	for cd_name in u.cooldowns.keys():
+		if skip != "" and String(cd_name) == skip:
+			continue
+		if int(u.cooldowns[cd_name]) > 0:
+			u.cooldowns[cd_name] = maxi(int(u.cooldowns[cd_name]) - turns, 0)
+			moved += 1
+	return moved
+
+
+# BATCH BQ — MIRROR IMAGE. The images are the `mirror` status's POWER and the
+# chip is where that number lives; ONE function writes it, and the spend site
+# below calls the same one (the Interpose precedent, and BP's lesson about a
+# number written twice).
+func _stamp_mirror_chip(u: BattleUnit, n: int) -> void:
+	if n <= 0:
+		u.remove_status("mirror")
+		return
+	u.update_status("mirror", "MI%d" % n,
+		"Mirror Image: %d image%s standing.\nThe next %d single-target attack%s\nagainst him MISS. Area attacks never\nmiss, so they spend none — and the\nimages wait until they are spent." % [
+			n, "" if n == 1 else "s", n, "" if n == 1 else "s"], n)
+
+
+# BATCH BQ — EXHORTATION's banked share, same rule: the status's power is the
+# number, and this is the one place it is rendered.
+func _stamp_exhort_chip(u: BattleUnit, pct: int) -> void:
+	if pct <= 0:
+		u.remove_status("exhorted")
+		return
+	u.update_status("exhorted", "+%d%%" % pct,
+		"Exhortation: their NEXT attack deals\n%d%% more damage. BANKED, not timed —\nit waits for the swing however long\nthey take to take it." % pct, pct)
+
+
+# BATCH BQ — MIRROR IMAGE's spend, and it is a SINGLE-TARGET rule. True when an
+# image ate the blow (and one was spent), false when the attack goes on to roll
+# for itself as usual.
+#
+# IT LIVES INSIDE THE SAME BRANCH AS THE MISS ROLL rather than beside it, and
+# that is what makes "counts three SINGLE-TARGET attacks" true rather than
+# nearly true: the branch's own conditions — not an area attack, no multi- or
+# random-hits, not a chosen pair, not a counter — ARE the game's definition of
+# a single-target attack that can miss, and reproducing that definition here in
+# a second form is how the two would drift apart. An AoE spends no image.
+#
+# NO COVER BYPASSES IT AND DOES NOT SPEND A CHARGE. That field is documented at
+# `_miss_chance` as an absolute — "these attacks cannot be made to miss by any
+# current or future source" — and Mirror Image is a future source. It is
+# unreachable in play (only the Sharpshooter carries it, and heroes do not
+# attack the Mage), but the rule is honoured rather than quietly excepted.
+# NOTE FOR A LATER SUITE: a harness that arms `no_cover` on every unit for
+# determinism (test_batch_bp does) will see this return false every time.
+func _mirror_dodge(attacker: BattleUnit, defender: BattleUnit) -> bool:
+	if defender == null or attacker == null:
+		return false
+	if attacker.no_cover > 0:
+		return false
+	var left := defender.status_power("mirror")
+	if left < 1:
+		return false
+	left -= 1
+	_stamp_mirror_chip(defender, left)
+	_log("   → Mirror Image: %s strikes an image of %s (%d left)" % [
+		attacker.unit_name, defender.unit_name, left], "#8c9cc8")
+	return true
 
 
 func _overburn_capped(u: BattleUnit) -> bool:
@@ -9904,6 +10136,23 @@ func _ground_faith_tick(u: BattleUnit) -> void:
 	_gain_faith(u, 1, "ground")
 
 
+# BATCH BQ — CONSECRATION's drip: 5% of a hero's OWN maximum at the start of
+# each of their turns while the blessing holds. ITS OWN FUNCTION for the AR
+# reason (`_run_battle` cannot be driven headlessly, so a clause inside its loop
+# has no reachable negative control), and it books the heal to the CLERIC who
+# cast it off the status's `src_name` — the same rule Renewal's tick follows.
+func _consecration_tick(u: BattleUnit) -> void:
+	if u.dead or not u.has_status("consecration"):
+		return
+	var cn_amt := maxi(int(round(u.max_hp * CONSECRATION_PCT)), 1)
+	var cn_got := u.heal_amount(cn_amt, true)
+	if cn_got <= 0:
+		return
+	u.float_text("+%d" % cn_got, Color(0.95, 0.88, 0.60))
+	_stat_heal(String(u.get_status("consecration").get("src_name", "")), cn_got)
+	_log("%s regains %d on consecrated ground" % [u.unit_name, cn_got], "#c8b880")
+
+
 # BATCH BH §2 — RUNE-ONLY, AND IT IS A RE-POINT RATHER THAN A NEW DESIGN. The
 # Rune of the Binding Oath used to buy a release remnant ("a Faith release
 # leaves 1 stack standing instead of nothing"); §2 deleted that remnant as one
@@ -10259,12 +10508,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_apply_status(target, "zeal", 4 if is_perfect else 3)
 			# Crusader's Tempo: the cast-time cooldown tick digs deeper.
 			var zeal_ticks := 1 + attacker.crusade_ranks
-			var zeal_ticked := false
-			for zeal_cd in target.cooldowns.keys():
-				if int(target.cooldowns[zeal_cd]) > 0:
-					target.cooldowns[zeal_cd] = maxi(
-						int(target.cooldowns[zeal_cd]) - zeal_ticks, 0)
-					zeal_ticked = true
+			# BATCH BQ: one implementation (`_tick_cooldowns`). Its return is
+			# the count that moved, which is exactly what `zeal_ticked` asked.
+			var zeal_ticked := _tick_cooldowns(target, zeal_ticks) > 0
 			_message("%s kindles %s!" % [attacker.unit_name, target.unit_name])
 			_log("%s: Blessing of Zeal on %s — +15%% damage, Faith gain doubled (%d turns)%s" % [
 				attacker.unit_name, target.unit_name, 4 if is_perfect else 3,
@@ -11143,6 +11389,259 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, es_n, "enemy" if es_n == 1 else "enemies",
 				es_turns, es_n * EYE_STORM_CUT_PCT,
 				" [PERFECT]" if is_perfect else ""], "#c8a0e0")
+		# ============ BATCH BQ: THE CLASS-WIDE TWELVE ============
+		# TEN OF THE TWELVE RESOLVE HERE. Magic Missiles and Chastise are
+		# ordinary attacks and need no case at all — which is the point of a
+		# class pool: half of it is tools, and the tools are what needs code.
+		"magic_barrier":
+			# AXIS: the floor beneath all three Mage spines. IT REUSES THE
+			# EXISTING `barrier` PIPELINE rather than authoring a second one —
+			# the absorb, the Warded Robes rider and the prevented ledger all
+			# already hang off that status, and a parallel barrier is how two
+			# implementations start disagreeing about what a barrier does.
+			# DELIBERATELY NOT `divine`: Faith is the Devout's engine, and a
+			# Mage's ward feeding Conviction would be a spec mechanic leaking
+			# out through a class card.
+			var mb_pct := 0.20 if is_perfect else 0.15
+			var mb_power := maxi(int(round(attacker.max_hp * mb_pct)), 1)
+			# `add_status` already takes the MAX of power and turns on
+			# re-application, so a fresh ward can never be worth less than the
+			# one it replaces and this site needs no arithmetic of its own.
+			_apply_status(attacker, "barrier", 3, mb_power)
+			var mb_st := attacker.get_status("barrier")
+			if not mb_st.is_empty():
+				mb_st["src"] = attacker.unit_name
+			_sfx("parry", -8.0, 0.9)
+			attacker.float_text("BARRIER %d" % mb_power, Color(0.40, 0.85, 0.95))
+			_message("%s raises a ward of raw magic" % attacker.unit_name)
+			_log("%s: Magic Barrier — absorbs %d (%d%% of maximum health) for 3 turns%s" % [
+				attacker.unit_name, mb_power, int(round(mb_pct * 100)),
+				" [PERFECT]" if is_perfect else ""], "#70d878")
+		"mirror_image":
+			# AXIS: evasion rather than absorption. THE CHARGES LIVE IN THE
+			# STATUS'S POWER (the Interpose precedent) and the status is
+			# BATTLE-LONG, which is what makes them wait until spent instead of
+			# ticking away — a Mirror Image cast into a lull is not wasted.
+			#
+			# RE-CASTING TAKES THE HIGHER COUNT RATHER THAN ADDING: three images
+			# is what the card promises, and stacking two casts to six would
+			# make the answer to "how do I survive this" a second copy of the
+			# same button. `_stamp_mirror_chip` is the ONE place the number is
+			# written, and the spend site calls the same function.
+			var mi_n: int = maxi(4 if is_perfect else 3,
+				attacker.status_power("mirror"))
+			_apply_status(attacker, "mirror", -1, mi_n)
+			_stamp_mirror_chip(attacker, mi_n)
+			_sfx("parry", -8.0, 1.1)
+			attacker.float_text("MIRROR IMAGE", Color(0.70, 0.75, 0.95))
+			_message("%s steps behind his own reflections" % attacker.unit_name)
+			_log("%s: Mirror Image — the next %d single-target attacks against him MISS%s" % [
+				attacker.unit_name, mi_n,
+				" [PERFECT]" if is_perfect else ""], "#70d878")
+		"mana_well":
+			# AXIS: a read on the fight rather than a free button. The doubling
+			# itself lives in `_mana_regen` — THE one place the drip's size is
+			# decided, so what is doubled is the figure the drip ACTUALLY uses
+			# (12 plus Evocation's 10 plus any rune), never a base it stopped
+			# reading. Doubling a stale constant here would be the classic
+			# silent no-op, and §6 names it as one of the five to check.
+			var mw_turns := 4 if is_perfect else 3
+			_apply_status(attacker, "mana_well", mw_turns)
+			_sfx("heal", -9.0, 1.1)
+			attacker.float_text("MANA WELL", Color(0.45, 0.65, 0.95))
+			_message("%s opens the well" % attacker.unit_name)
+			_log("%s: Mana Well — regeneration doubled to %d a turn for %d turns%s" % [
+				attacker.unit_name, _mana_regen(attacker), mw_turns,
+				" [PERFECT]" if is_perfect else ""], "#70d878")
+		"dispel":
+			# AXIS: utility nobody has. TWO HALVES, AIMED AT WHICHEVER SIDE IS
+			# WEARING SOMETHING IT SHOULD NOT BE — the only ability in the game
+			# whose target may be an ally OR an enemy, which is why the picker's
+			# pool is widened for it rather than a third Target enum being added.
+			#
+			# THE ENEMY HALF IS THIN AND IT WAS MEASURED, NOT ASSUMED (§3 asked):
+			# `shielded` is the ONLY beneficial status an enemy can carry in this
+			# game, applied by two of nineteen kinds (Orc Shieldmaster's
+			# Shielding, the Hollow Crown's Regalia). So that half strips at most
+			# ONE thing, usually nothing. Reported rather than dropped — the ally
+			# half is a real answer on its own, and authoring enemy buffs is a
+			# content decision that belongs to whoever wants one.
+			var dp_n := 3 if is_perfect else 2
+			if target != null and not target.dead:
+				var dp_taken: Array = []
+				if target.is_hero:
+					for _dp_i in dp_n:
+						var dp_name := target.dispel_one_debuff()
+						if dp_name == "":
+							break
+						dp_taken.append(dp_name)
+				else:
+					for _dp_j in dp_n:
+						var dp_buffs := _dispellable_buffs(target)
+						if dp_buffs.is_empty():
+							break
+						var dp_s: Dictionary = dp_buffs[0]
+						dp_taken.append(String(dp_s.get("label", dp_s.id)))
+						target.remove_status(String(dp_s.id))
+				if dp_taken.is_empty():
+					_log("%s: Dispel — nothing on %s to unpick" % [
+						attacker.unit_name, target.unit_name], "#909090")
+				else:
+					_sfx("parry", -9.0, 1.2)
+					target.float_text("DISPELLED", Color(0.65, 0.80, 0.95))
+					_message("%s unpicks the weave on %s" % [attacker.unit_name,
+						target.unit_name])
+					_log("%s: Dispel — %s loses %s%s" % [attacker.unit_name,
+						target.unit_name, ", ".join(dp_taken),
+						" [PERFECT]" if is_perfect else ""], "#70d878")
+		"blink":
+			# AXIS: tempo, not damage. It goes through `_tick_cooldowns`, THE one
+			# implementation of "take N turns off this unit's cooldowns" — the
+			# same door Follow-Through, Practised Hands, Frostbound Hours and
+			# Crusader's Tempo use since this batch extracted it. That is what
+			# makes "every cooldown, including abilities gained this run" true
+			# for free: the walk is over `u.cooldowns`, which is written by
+			# casting, so a drafted ability is in it the moment it is cast.
+			#
+			# IT SKIPS ITS OWN, and that is Practised Hands' rule rather than a
+			# special case: the cooldown is started BEFORE `_resolve_special`
+			# runs, so without the skip Blink would refund a third of itself
+			# every cast — and a self-refunding cooldown is not a cooldown.
+			var bl_turns := 2 if is_perfect else 1
+			var bl_n := _tick_cooldowns(attacker, bl_turns, ab.display_name)
+			_sfx("click", -8.0, 1.4)
+			if bl_n <= 0:
+				_log("%s: Blink — nothing of his is cooling down" % \
+					attacker.unit_name, "#909090")
+			else:
+				attacker.float_text("BLINK", Color(0.75, 0.55, 0.95))
+				_message("%s steps out of the moment" % attacker.unit_name)
+				_log("%s: Blink — %d cooldown%s tick %d turn%s early%s" % [
+					attacker.unit_name, bl_n, "" if bl_n == 1 else "s", bl_turns,
+					"" if bl_turns == 1 else "s",
+					" [PERFECT]" if is_perfect else ""], "#70d878")
+		"ministration":
+			# AXIS: the plain heal none of the three Clerics has. It reads the
+			# TARGET's maximum rather than the caster's, which is what keeps it
+			# the LESSER of it and Holy's Heal: 20% of the Warden's 200 is 40
+			# against Heal's 40% of her own 150, i.e. 60, and the same Mercy
+			# multiplier is applied to both so the gap survives every build.
+			if target != null and not target.dead:
+				var mn_pct := 0.26 if is_perfect else 0.20
+				var mn_amount := maxi(int(round(target.max_hp * mn_pct
+					* _healing_done_mult(attacker))), 1)
+				_sfx("heal", -8.0)
+				# Book what LANDED, not what was asked for (the BC log-honesty
+				# rule): a heal into a full bar must not read like a heal into
+				# an empty one.
+				var mn_got := target.heal_amount(mn_amount, target != attacker)
+				_stat_heal(attacker, mn_got)
+				target.float_text("+%d" % mn_got, Color(0.4, 0.9, 0.45))
+				_message("%s ministers to %s" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Ministration — %s regains %d (%d%% of their maximum)%s" % [
+					attacker.unit_name, target.unit_name, mn_got,
+					int(round(mn_pct * 100)),
+					" [PERFECT]" if is_perfect else ""], "#70d878")
+		"consecration":
+			# AXIS: sustained rather than burst, the opposite read to
+			# Ministration. THE TICK IS ITS OWN FUNCTION (`_consecration_tick`)
+			# for the standing reason: `_run_battle` cannot be driven headlessly
+			# (the AR trap), so a rule left inside its loop can only ever be
+			# checked by a grep and its negative control could never fail — the
+			# AW `_ground_faith_tick` / BA `_perfected_toxin_tick` precedent.
+			#
+			# COMPANIONS ARE EXCLUDED, exactly as Healing Pulse excludes them:
+			# "the whole party" is the four heroes, and a beast that regenerates
+			# 5% of its own maximum every turn is a different ability.
+			var cn_turns := 4 if is_perfect else 3
+			var cn_n := 0
+			for cn_h in heroes:
+				if cn_h.dead or cn_h.is_companion:
+					continue
+				_apply_status(cn_h, "consecration", cn_turns)
+				# THE CASTER IS STAMPED STRAIGHT ONTO THE STATUS rather than
+				# passed as `_apply_status`'s `src`, and the reason is the same
+				# one the Devoutness block gives: `src` also bumps the `st/b`
+				# DEBUFF counter, and a blessing laid on an ally is not a debuff
+				# landed on an enemy. The three ally-facing cards below do the
+				# same. What the stamp buys is that the drip's healing books to
+				# the Cleric who paid for it.
+				var cn_st: Dictionary = cn_h.get_status("consecration")
+				if not cn_st.is_empty():
+					cn_st["src_name"] = attacker.unit_name
+				cn_n += 1
+			_sfx("heal", -8.0, 0.7)
+			_message("%s consecrates the ground" % attacker.unit_name)
+			_log("%s: Consecration — %d %s 5%% of maximum health each turn for %d turns%s" % [
+				attacker.unit_name, cn_n,
+				"ally regains" if cn_n == 1 else "allies regain", cn_turns,
+				" [PERFECT]" if is_perfect else ""], "#70d878")
+		"unburden":
+			# AXIS: cleanse with a tail. THE TAIL IS THE POINT — a pure cleanse
+			# is a dead card against a warband that applies nothing, and the
+			# mitigation is what makes this one unconditional. `purge_debuffs`
+			# is the existing cleanse and its rules are unchanged: Broken is a
+			# METER STATE and stays, sticky poison refuses every cleanse.
+			if target != null and not target.dead:
+				var ub_turns := 3 if is_perfect else 2
+				var ub_removed := target.purge_debuffs()
+				_apply_status(target, "unburdened", ub_turns)
+				var ub_st := target.get_status("unburdened")
+				if not ub_st.is_empty():
+					ub_st["src_name"] = attacker.unit_name
+				_sfx("heal", -9.0, 0.9)
+				target.float_text("UNBURDENED", Color(0.85, 0.92, 0.70))
+				_message("%s lifts the weight from %s" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Unburden — %d harmful effect%s lifted from %s, and they take 20%% less damage for %d turns%s" % [
+					attacker.unit_name, ub_removed,
+					"" if ub_removed == 1 else "s", target.unit_name, ub_turns,
+					" [PERFECT]" if is_perfect else ""], "#70d878")
+		"exhortation":
+			# AXIS: the only offensive party buff a Cleric has. BANKED, NOT
+			# TIMED, and the STATUS IS BATTLE-LONG (-1) precisely so that is
+			# true: it waits for each hero's next swing however many turns they
+			# take to take it, so a slow hero is not cheated of it. The share
+			# lives in the status's power — one number, in one place, and the
+			# chip reads the same field the damage site does.
+			var ex_pct := 35 if is_perfect else 25
+			var ex_n := 0
+			for ex_h in heroes:
+				if ex_h.dead or ex_h.is_companion:
+					continue
+				# A held Exhortation is never downgraded by a second cast.
+				var ex_have: int = ex_h.status_power("exhorted")
+				var ex_val: int = maxi(ex_pct, ex_have)
+				_apply_status(ex_h, "exhorted", -1, ex_val)
+				_stamp_exhort_chip(ex_h, ex_val)
+				ex_h.float_text("+%d%% next hit" % ex_val, Color(0.98, 0.88, 0.55))
+				ex_n += 1
+			_sfx("heal", -8.0, 1.3)
+			_message("%s calls the party on!" % attacker.unit_name)
+			_log("%s: Exhortation — %d %s called on: each one's NEXT attack deals %d%% more damage (banked, not timed)%s" % [
+				attacker.unit_name, ex_n, "ally is" if ex_n == 1 else "allies are",
+				ex_pct, " [PERFECT]" if is_perfect else ""], "#70d878")
+		"undying_vigil":
+			# AXIS: making one heal into two, and THE ONE CLASS ABILITY THAT
+			# GETS BETTER THE MORE SPEC-SPECIFIC THE BUILD IS — a deliberate
+			# inversion of the unconditional-floor role the other five play.
+			# The fork itself hangs off `heal_amount` (see `_on_vigil_heal`), so
+			# it answers healing from ANY source rather than from a list of
+			# abilities somebody has to keep up to date.
+			if target != null and not target.dead:
+				var uv_turns := 4 if is_perfect else 3
+				_apply_status(target, "vigil", uv_turns)
+				var uv_st := target.get_status("vigil")
+				if not uv_st.is_empty():
+					uv_st["src_name"] = attacker.unit_name
+				_sfx("heal", -9.0, 0.6)
+				target.float_text("VIGIL", Color(0.95, 0.90, 0.70))
+				_message("%s keeps vigil over %s" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Undying Vigil — every heal on %s also mends a second ally for half, %d turns%s" % [
+					attacker.unit_name, target.unit_name, uv_turns,
+					" [PERFECT]" if is_perfect else ""], "#70d878")
 		"venom_coat":
 			_apply_status(attacker, "venom_coat", 4)
 			_sfx("heal", -9.0, 0.7)
@@ -15171,6 +15670,38 @@ func _on_unit_credit(src_name: String, amount: int, term: String) -> void:
 		_prev_bd(src_name, float(amount), term.trim_prefix("bd_"))
 		return
 	_devout_heal(src_name, float(amount), term)
+
+
+# BATCH BQ — UNDYING VIGIL's fork. Fired from `heal_amount` for the WARDED ally
+# with the healing that actually LANDED, and it does two things unit.gd cannot:
+# it looks at the board, and it heals somebody else.
+#
+# THE SECOND ALLY IS CHOSEN, NOT SUPPLIED, AND THE CHOICE IS THE ABILITY. It is
+# the living hero on the LOWEST health fraction among those strictly below the
+# warded ally — so the ward genuinely spreads DOWNWARD and can never re-heal
+# the ally who was just healed. With nobody below them the fork simply does not
+# happen, which is correct and is why the card says "a second ally at lower
+# health" rather than "another ally".
+func _on_vigil_heal(healed: BattleUnit, amount: int) -> void:
+	if _vigil_forking or healed == null or amount <= 0:
+		return
+	var share := maxi(int(round(amount * VIGIL_SHARE)), 1)
+	var ratio := healed.hp / float(maxi(healed.max_hp, 1))
+	var pool: Array = heroes.filter(func(h):
+		return not h.dead and not h.is_companion and h != healed \
+			and h.hp / float(maxi(h.max_hp, 1)) < ratio)
+	if pool.is_empty():
+		return
+	var second: BattleUnit = _lowest_hp(pool)
+	_vigil_forking = true
+	var got := second.heal_amount(share, true)
+	_vigil_forking = false
+	if got <= 0:
+		return
+	second.float_text("+%d" % got, Color(0.95, 0.90, 0.70))
+	_stat_heal(String(healed.get_status("vigil").get("src_name", "")), got)
+	_log("   → Undying Vigil: the mending reaches %s as well (+%d)" % [
+		second.unit_name, got], "#e8d890")
 
 
 # BATCH BC §1 — THE ONE PLACE A DEVOUT HEAL IS BOOKED. His contribution has

@@ -325,7 +325,14 @@ func _additive_units() -> void:
 		"20 + attacker.muscle_memory_ranks": "Muscle Memory",
 		"_gain_focus(attacker, attacker.perfect_form)": "Perfect Form",
 		"take_hit(0, attacker.sundering_shot)": "Sundering Shot",
-		"- attacker.follow_through, 0)": "Follow-Through",
+		# RE-POINTED IN PLACE BY BATCH BQ, and the question is unchanged: does
+		# Follow-Through's counter reach the read site as the MAGNITUDE, with
+		# no step applied on the way? BQ extracted the four hand-written
+		# cooldown walks into one `_tick_cooldowns(u, turns, skip)`, so the
+		# counter is now the `turns` ARGUMENT rather than a subtraction spelled
+		# out inline. A step would have to appear in this call to break it,
+		# which is exactly what this fragment still refuses.
+		"_tick_cooldowns(attacker, attacker.follow_through)": "Follow-Through",
 		"u.snap_shot > u.snap_used": "Snap Shot",
 		"for _sp_i in attacker.spray:": "Spray of Arrows",
 		"attacker.second_resource >= attacker.one_shot": "One Shot",

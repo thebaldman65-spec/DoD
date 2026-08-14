@@ -122,14 +122,20 @@ func _pools() -> void:
 		var live: Array = Classes.spec_draft_pool(w)
 		ok(live == TRANCHE_2[w],
 			"§5: %s's pool is %s (got %s)" % [w, TRANCHE_2[w], live])
-	# THE REMAINING DEBT IS STILL VISIBLE AND STILL EMPTY. Three entries a pool
-	# is thin and a Warrior offer will fill SHORT until tranche 2 of the
-	# class-wide side — that is the shape of the debt, not a bug.
+	# THE REMAINING DEBT IS STILL VISIBLE — AND IT IS HALF WHAT IT WAS.
+	# RE-POINTED IN PLACE BY BATCH BQ, AND IT IS AN INVERSION: BP asserted all
+	# four class pools were empty because none had been written; BQ wrote the
+	# Mage and Cleric six. The question is still worth asking (does a Warrior
+	# offer still fill short, and is that recorded), only the correct answer
+	# for two of the four moved. Setup byte-identical.
 	ok(Classes.CLASS_DRAFT_POOLS.size() == 4,
 		"§5: the four class-wide pools are still named")
-	for ck in ["warrior", "mage", "cleric", "hunter"]:
-		ok(Classes.class_draft_pool(ck).is_empty(),
-			"§5: ...and STILL EMPTY — the 24 class-wide abilities are owed (%s)" % ck)
+	for ck in ["mage", "cleric"]:
+		ok(Classes.class_draft_pool(ck).size() == 6,
+			"§5: ...the %s one is FILLED at six (Batch BQ)" % ck)
+	for ck2 in ["warrior", "hunter"]:
+		ok(Classes.class_draft_pool(ck2).is_empty(),
+			"§5: ...and the %s one is STILL EMPTY and still owed" % ck2)
 	# EVERY NEW ENTRY RESOLVES, to itself, with the fields a card needs. A pool
 	# name that does not resolve is an offer that hands out nothing.
 	for spec3 in TRANCHE_2:
@@ -854,8 +860,13 @@ func _docs() -> void:
 	var changelog := _src("res://docs/changelog.html")
 	var claude := _src("res://CLAUDE.md")
 	var glossary := _src("res://data/glossary.json")
-	ok(master.contains("Batch BP"),
-		"§6: master.html's stamp is bumped to this batch")
+	# THE MASTER.HTML STAMP GATE IS DUPLICATED **SIX** TIMES, NOT FOUR — BP's
+	# own note said four and then added this fifth copy without counting it;
+	# test_batch_bq is the sixth. test_batch_ah, test_batch_bb, test_batch_bn,
+	# test_batch_bo, HERE and test_batch_bq. ALL SIX MUST MOVE TOGETHER or a
+	# batch that bumps the timestamp trips suites it never touched.
+	ok(master.contains("Batch BQ"),
+		"§6: master.html's stamp is bumped to the current batch")
 	ok(changelog.contains("Batch BP"),
 		"§6: the changelog carries a Batch BP entry")
 	for spec in TRANCHE_2:

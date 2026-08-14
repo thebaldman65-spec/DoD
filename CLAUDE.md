@@ -691,15 +691,21 @@ failure it prevents is SILENT: a spine that stops working because its enabler be
 three were NAMED and EMPTY at BO because the lane names only arrived in BM; BP filled them with
 two apiece (Berserker Blood Offering / Gut Rip, Warden Covering Guard / Eye of the Storm,
 Swordmaster Precision Strike / Feint), so **`SPEC_DRAFT_POOLS` is 24 entries and every spec has a
-draft.** **WHAT IS STILL OWED IS THE WHOLE CLASS-WIDE TRANCHE — 6 per class, 24 in all, none
-shipped in BO OR BP.** `CLASS_DRAFT_POOLS` is still four named empty arrays, so every card an
-offer holds today is spec-side and offers still fill SHORT at two. That is the visible shape of
-the REMAINING debt, not a bug.
-**CLASS-WIDE AUTHORING RULES, recorded with the empty arrays so they travel with the content:**
+draft.** **THE CLASS-WIDE TRANCHE IS HALF PAID (Batch BQ) — DO NOT RE-RECORD IT AS WHOLLY
+OWED.** Six MAGE and six CLERIC shipped, so `CLASS_DRAFT_POOLS` holds twelve of a target
+twenty-four and the draft holds **36 of a target 48**. **WHAT IS STILL OWED IS THE HUNTER AND
+WARRIOR SIX APIECE**: those two arrays are still named and empty, so a Hunter's or a Warrior's
+offer still loses its class card and fills SHORT at two. That is the visible shape of the
+REMAINING debt, not a bug — and test_batch_bq asserts the emptiness, so it stays visible in code
+rather than only in prose.
+**CLASS-WIDE AUTHORING RULES, recorded with the arrays so they travel with the content:**
 deliberately UNTIED AND GENERAL (Magic Barrier, not Frostbolt — the test is whether it would
 read as off-theme for ANY spec of that class), and **WEAKER THAN SPEC ABILITIES AND
 UNCONDITIONAL** — they feed no passive, so at equal power they would be a safe default that
-dilutes every build.
+dilutes every build. **BQ ADDS A THIRD RULE, LEARNED BY BREAKING IT: verify the "weaker" half
+against the LIVE spec kits rather than trusting the brief, AND CHECK IT AGAINST THE FREE CORE
+ATTACK TOO** — Chastise is dominated by Smite, and no comparison against spec ABILITIES alone
+would ever have caught it.
 
 ### STANDING DESIGN RULE — THE ARRIVING-STANCE PRINCIPLE (Batch BP §3)
 **EVERY STANCE ABILITY MUST BUY WHAT THE STANCE IT LEAVES HIM IN WANTS.** The Swordmaster's
@@ -726,6 +732,156 @@ exactly the inverted card, and it would still read fine on the tooltip.
   says so. It is still the Swordmaster's enabler for a sharper reason: it is the only
   UNCONDITIONAL swap — the other two are DRAFTED (he may never be offered either), cost Rage, and
   sit on 3- and 4-turn cooldowns.
+
+BATCH BQ (08-13) — THE MAGE AND CLERIC CLASS POOLS. **Twelve class-wide abilities, six per
+class, filling HALF the seam BO opened: one draft card in four is class-wide, and until now
+that seam rolled into an empty pool for every hero in the game — a quarter of every offer was
+dead.** Nothing else ships — no talent node, no magnitude, no existing ability changed, no save
+version moves (still v10).
+**THE HUNTER AND WARRIOR CLASS POOLS ARE STILL OWED — twelve of a target twenty-four ship here,
+and a Hunter's or a Warrior's offer STILL LOSES ITS CLASS CARD.** `CLASS_DRAFT_POOLS["hunter"]`
+and `["warrior"]` are still empty arrays and test_batch_bq asserts they are, so the debt stays
+visible in code rather than only in prose. `SPEC_DRAFT_POOLS` is untouched at BP's 24, so the
+draft holds **36 of a target 48**.
+**`CLASS_DRAFT_POOLS` IS A SEPARATE STRUCTURE FROM `CLASS_POOLS` AND THAT IS THE ONE THING A
+LATER BATCH WOULD MOST EASILY UNDO BY "TIDYING TWO POOLS INTO ONE".** BO's own argument, applied
+to the other pool: **`CLASS_POOLS` feeds the BOSS pick**, so dropping six abilities into it
+would silently re-weight every boss offer in the game as a side effect of a draft change.
+**`CLASS_POOLS` is BYTE-UNTOUCHED and test_batch_bq asserts all four of its arrays AS LITERALS
+rather than by size** — a swap of two names would keep the count and change every draw. That is
+the negative control that matters here.
+**THE TWELVE, WITH THEIR ONE-LINE ROLES.** Defs live in `Classes.draft_ability` beside BO's and
+BP's, resolved at the top of `pool_ability` as before; a drafted class ability lands in
+`bm_abilities` exactly as a spec one does, so battle spawn, the hero sheet, the rune filter and
+upgrade pairing pick it up with no new plumbing.
+· **MAGE** — the tools every spine wants and no spine provides, *because a spine that provided
+  them would stop being a spine*: **Magic Barrier** (25 Mana, 2.0, 4cd, self — absorbs 15% of
+  max health, 3 turns; the floor beneath all three) · **Mirror Image** (20, 2.0, 4cd, self —
+  the next 3 SINGLE-TARGET attacks miss; evasion rather than absorption) · **Magic Missiles**
+  (15, 2.0, 2cd — 3 bolts at 12% of Attack; the reliable filler) · **Mana Well** (20, 1.5, 5cd,
+  self — regeneration DOUBLED 3 turns; costs mana to make mana) · **Dispel** (15, 1.5, 3cd —
+  two harmful effects off an ally OR two beneficial off an enemy; utility nobody has) ·
+  **Blink** (10, 1.0, 3cd, self — one turn off every cooldown, its own exempt; tempo).
+· **CLERIC** — three support spines with enormous CONDITIONAL power and no baseline (**none of
+  the three can simply heal someone on turn one**), and **the names are chosen for register**:
+  priestly and old, rites and offices, so every one sits on an Occultist tongue as easily as on
+  Holy's. **Ministration** (20, 2.0, 2cd, ally — heals 20% of THEIR max; the plain heal none of
+  them has) · **Consecration** (25, 2.5, 5cd — party regains 5% of max a turn for 3; sustained
+  rather than burst) · **Chastise** (15, 2.0, 2cd — 25% of Attack, 20 BD; see the finding) ·
+  **Unburden** (20, 1.5, 4cd, ally — every harmful effect removed, then 20% less damage 2 turns;
+  cleanse with a tail) · **Exhortation** (25, 2.5, 4cd — the party's NEXT attack +25%, BANKED
+  not timed) · **Undying Vigil** (25, 2.0, 4cd, ally — every heal on them also mends a second
+  ally on lower health for half; **the one class ability that gets BETTER the more spec-specific
+  the build is**).
+**THE FINDING, REPORTED AND NOT RE-TUNED — CHASTISE FAILS THE "WEAKER" RULE IN THE OTHER
+DIRECTION.** The brief names both its numbers, and against them the FREE core attack wins on
+damage for all three Cleric specs: Smite is 44% of Attack with 16 BD at no cost and no cooldown,
+Shadowrend 25% with 16 BD plus a Cripple. Chastise pays 15 Mana and a 2-turn cooldown for 25%
+and 4 more Break, so it is **DOMINATED — there is no board state on which casting it beats
+simply attacking.** Shipped as specified; test_batch_bq pins the comparison so a reprice has to
+read the reasoning first. **The lever is one of its two numbers and it is the designer's.**
+The three comparisons that DO pass were computed, not assumed: Ministration's 20% of the
+target's maximum tops out at 40 on the Warden's 200 against Heal's 40% of Holy's own 150 (60),
+and one Mercy term scales both; Magic Missiles' 3x12% = 36% sits under Razor Ice's 45% and
+Arcane Barrage's 48%; Magic Barrier's 15% sits under Divine Shield's 30% for more Mana and
+double the cooldown.
+**BREAK DAMAGE ASSIGNED DELIBERATELY (BO's correction, applied up front).** Chastise 20 (the
+brief's); **Magic Missiles 3 PER BOLT** — 9 across three, below Razor Ice's 10 a shard and level
+with Arcane Barrage's 3 while throwing half as many; **the other ten carry NONE** — they are not
+attacks.
+**DISPEL'S ENEMY HALF IS THIN AND IT WAS MEASURED BECAUSE §3 ASKED: `shielded` IS THE ONLY
+BENEFICIAL STATUS AN ENEMY CAN CARRY IN THE WHOLE GAME**, applied by two of nineteen kinds (Orc
+Shieldmaster's Shielding, the Hollow Crown's Regalia). That half strips at most ONE thing and
+usually nothing. Reported rather than dropped — the ally half stands on its own, and authoring
+enemy buffs is a content decision.
+· **THE EXCLUSION LIST IS THE LOAD-BEARING HALF.** What may be stripped is DERIVED (anything not
+  in `DEBUFF_IDS`), so a future enemy buff is dispellable the day it lands — but `DEBUFF_IDS`
+  deliberately does NOT hold the five MARKS the party applies (`covenant`, `quarry`,
+  `snare_line`, `feinted`, `hunt_mark`), and left to the derived rule **Dispel would have
+  stripped the party's own work.** `ruin_primed` is the same trap through another door (the
+  primer is not the mark, so it is not a debuff either, and dispelling it defuses the
+  Occultist's bomb for him) and `charging` is a declared blow rather than a boon — **cancelling
+  a wind-up is what a BREAK is for (Batch V)**. All eight are named in `DISPEL_NEVER`.
+**THREE DECISIONS AND ONE EXTRACTION THE BRIEF DID NOT MAKE:**
+· **DISPEL TARGETS EITHER SIDE THROUGH A WIDENED PICKER POOL, NOT A THIRD `Ability.Target`.** An
+  enum entry would have to be understood by the enemy AI's re-validation, the intent classifier,
+  the bot's targeting and `_ability_usable` — four places needing a rule for a case one card
+  uses. `_resolve_special` reads `target.is_hero`; that is the whole cost of the feature.
+· **THE COOLDOWN HOOK §3 SAID TO REUSE DID NOT EXIST AS A HOOK — IT EXISTED AS FOUR COPIES.**
+  Follow-Through, Practised Hands, Frostbound Hours and Crusader's Tempo each carried their own
+  hand-written six lines. All four call **`_tick_cooldowns(u, turns, skip)`** now and behave
+  IDENTICALLY (cutting an entry already at zero was always a no-op), with Blink the fifth
+  caller. The BP Eye-of-the-Storm lesson: a number written twice eventually disagrees with
+  itself.
+· **NO NEW UNIT FIELDS AT ALL FOR TWELVE ABILITIES.** Everything with a duration is a status
+  (`barrier`, `mana_well`, `consecration`, `unburdened`, `vigil`); the two that are BANKED
+  rather than timed — Mirror Image's images and Exhortation's share — **live in their status's
+  `power`, BATTLE-LONG, on the INTERPOSE precedent.** Battle-long is what makes "banked, not
+  timed" true. **GOTCHA: `status_power` RETURNS -1 FOR AN ABSENT STATUS, NOT 0** — every read
+  site guards on `< 1` or `> 0`, but a test written the obvious way reads -1 and fails against
+  working code.
+· **NO COVER BYPASSES MIRROR IMAGE AND SPENDS NO IMAGE**, honouring `_miss_chance`'s documented
+  absolute ("cannot be made to miss by any current or future source"). Unreachable in play (only
+  the Sharpshooter carries it and heroes do not attack the Mage). **A SUITE THAT ARMS `no_cover`
+  ON EVERY UNIT FOR DETERMINISM — test_batch_bp does — WILL SEE EVERY IMAGE LOOK BROKEN.**
+  test_batch_bq arms it on the HEROES only and says why in its harness.
+· **ONE MORE ONE-LINE RULE, worth having: `_on_vigil_heal` is guarded by `_vigil_forking`**, and
+  the chain it prevents is REACHABLE rather than theoretical — the fork RAISES its recipient, so
+  a second warded ally can end up above somebody who was above them a moment earlier.
+**UNDYING VIGIL FIRES FROM `heal_amount`'s BOTTOM LINE** (`vigil_cb`, the `blight_cb` door), so
+"healed BY ANY SOURCE" is true rather than "healed by the abilities we remembered to list" — a
+cast, a Renewal tick, an item and a lifesteal all arrive there. It picks the living hero on the
+LOWEST health fraction among those STRICTLY BELOW the warded ally, so the ward spreads downward
+and can never re-heal the ally just healed.
+**THE MASTER.HTML STAMP GATE IS DUPLICATED SIX TIMES, NOT FOUR** — test_batch_ah, test_batch_bb,
+test_batch_bn, test_batch_bo, **test_batch_bp (which BP's own note forgot to count while adding
+it)** and test_batch_bq. **All six must move together** or a batch that bumps the timestamp trips
+suites it never touched. Correct BP's own note, which says four. The count grows by one every
+time a new suite checks the stamp; the honest fix, if anyone wants one, is for the newest suite
+to be the only one that checks it.
+**VERIFIED — AND PER THE STANDING INSTRUCTION, THAT MEANS THE CODE LANDED AND WORKS. NO SWEEPS,
+NO BANDS, NO BALANCE MEASUREMENT WAS RUN, and none should be quoted from this batch.**
+check_parse 0 · check_flow 0 · check_map_screen OK · run-harness gates 1/2/3 PASS ·
+**NEW test_batch_bq.gd 592/0**.
+**NINE NEGATIVE CONTROLS, each applied to product code and reverted** (battle.gd and classes.gd
+came back byte-identical by hash, and the suite to 592/0 after the last): an image spent by an
+AREA attack **trips 3**; Mana Well doubling a hardcoded 12 **trips 1**; Dispel's exclusion list
+removed **trips 3**; Blink refunding its own cooldown **trips 1**; the vigil fork's re-entrancy
+guard deleted **trips 1**; Exhortation put on a clock **trips 3**; a class-wide ability leaking
+into `CLASS_POOLS` **trips 2**; Ministration reading the caster's maximum **trips 1**; the
+Exhortation spend site removed **trips 2**.
+**LIVE AUTOPLAY CLEAN across three real battles, 0 SCRIPT ERROR, ALL TWELVE FIRING IN ORDINARY
+FIGHTS** — "Magic Barrier — absorbs 27 (20% of maximum health)", **"Mana Well — regeneration
+doubled to 44 a turn"** (12 plus Evocation's 10, doubled: the number that tells a live read apart
+from a doubled constant), "Orc Raider strikes an image of Pyromancer (2 left)", and Exhortation
+banking across turns before spending on a swing. **NOTE the smoke's own artefact:
+`DOD_SIM_ABILITIES` applies its list to EVERY hero, so a Berserker casts Magic Barrier in the
+log — the real draft only ever offers class-matching cards.**
+**FULL BATTERY GREEN**: ah 5500, ah_battle 65, ai 2217, aj 418, ak 528, al 560, ar 914, as 396,
+at 470, au 336, av 324, aw 350, ax 338, ay 484, az 519, ba 689, bb 172, bc 91, bd 69, be 34,
+bf 78, bg 47, bh 233, bi 88, bj 67, bl 88, bm 1890, bn 77, bo 502, bp 260, bq 592, runes 2973,
+rune_battle 96 — all 0 failures. **an reads 3617-3620 and bk 129-130, both inside their
+DOCUMENTED run-to-run drift** — neither is pinned and neither should be. **test_batch_at's
+Arcane Cannon flake (recorded since AV) reproduced ONCE in two battery passes** and read 470/0
+on a clean re-run; nothing here is on the Arcanist's path.
+· **SEVEN SUITES RE-POINTED IN PLACE with the reason in each file, and FOUR OF THE RE-POINTS ARE
+  INVERSIONS**: test_batch_bo's and test_batch_bp's "every class pool is EMPTY" became "the Mage
+  and Cleric ones are FILLED at six, the other two still owed"; test_batch_bo's "a thin pool
+  fills SHORT" now measures a Mage at three AND a Hunter at two, because the fill-short rule has
+  to be measured where it still bites; and its "the next offer is empty" became "the next offer
+  cannot re-present a DECLINED card", which is what that check was always asking (it read
+  `.is_empty()` only because a Holy hero's whole draft used to be the two cards she declined).
+· **test_batch_az's Follow-Through check was RE-POINTED AND IT WAS A REAL CATCH.** It greps
+  battle.gd for the literal `- attacker.follow_through, 0)` to prove the counter is read
+  ADDITIVELY, and extracting the four cooldown walks deleted that exact text. The question is
+  unchanged; the fragment is `_tick_cooldowns(attacker, attacker.follow_through)` now. 519/0.
+**GOTCHA THAT COST TWO BATTERY PASSES, AND IT IS THE HARNESS RATHER THAN THE SUITE: ZSH DOES NOT
+WORD-SPLIT AN UNQUOTED PARAMETER.** A battery script holding `FLAGS="--fixed-fps 12"` and passing
+`$FLAGS` hands Godot ONE argument, which it ignores — so test_batch_bl ran at the default frame
+step, its real-play battle never finished, and **four ledger checks failed in a way that reads
+exactly like a suite fault** (88/4 in both passes, 88/0 on five standalone runs including one
+replaying the whole battery order before it). Use an ARRAY (`FLAGS=(--fixed-fps 12)` /
+`"${FLAGS[@]}"`). Confirmed by reproducing the 88/4 on demand with the broken quoting.
 
 BATCH BP (08-13) — THE WARRIOR DRAFT POOLS. **Six abilities, two per Warrior spec, closing the
 debt BO left open: all three Warrior draft pools were NAMED AND EMPTY, so one of four heroes in

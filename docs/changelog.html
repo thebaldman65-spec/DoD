@@ -5,6 +5,205 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-13 &mdash; Batch BQ: the Mage and Cleric class pools</h2>
+<p><i>Twelve class-wide abilities, six per class, filling <b>half</b> the seam Batch BO opened.
+One draft card in four is class-wide, and until now that seam rolled into an empty pool for
+every hero in the game &mdash; a quarter of every offer was dead. <b>The Hunter and Warrior
+class pools are NOT in this batch and are still owed:</b> twelve of a target twenty-four ship
+here, and a Hunter's or a Warrior's offer still loses its class card. Nothing else ships &mdash;
+no talent node, no magnitude, no existing ability changed, and no save version moves (still
+v10).</i></p>
+
+<h3>A separate pool, for Batch BO's own reason</h3>
+<p><b><code>CLASS_POOLS</code> is byte-untouched, and that is the negative control that
+matters.</b> BO built <code>SPEC_DRAFT_POOLS</code> as a new structure rather than adding to
+<code>SPEC_POOLS</code>, because sharing one pool would have silently re-weighted every boss
+offer in the game the moment new entries landed. The identical argument applies here:
+<code>CLASS_POOLS</code> feeds boss picks today, so dropping six abilities into it would
+re-weight those offers as a side effect of a draft change. So the twelve live in
+<b><code>CLASS_DRAFT_POOLS</code></b>, keyed by class, and test_batch_bq asserts all four of
+<code>CLASS_POOLS</code>' arrays as literals rather than by size &mdash; a swap of two names
+would keep the count and change every draw. <b>The tidy-looking edit a later batch would make
+&mdash; folding two class pools into one &mdash; is the thing that comment exists to
+refuse.</b></p>
+<p>Drafted class abilities land in <code>bm_abilities</code> exactly as spec draft abilities
+do, so battle spawn, the hero sheet, the rune filter and upgrade pairing all pick them up with
+no new plumbing.</p>
+
+<h3>The Mage six &mdash; the tools every spine wants and no spine provides</h3>
+<p>Three spines &mdash; commitment, control, escalation &mdash; that are all fragile early and
+all mana-hungry, <b>because a spine that provided its own answer would stop being a spine.</b>
+The Pyromancer has no defence at all by design (Batch AR removed every option deliberately),
+the Arcanist's went to the vault with Stabilize (AT), and the Cryomancer's is a hold a boss
+shrugs.</p>
+<ul>
+<li><b>Magic Barrier</b> &mdash; 25 Mana, 2.0 init, 4cd, self. Absorbs <b>15% of maximum
+health</b> for 3 turns (Perfect: 20%). <i>The floor beneath all three.</i> It reuses the
+existing barrier pipeline rather than authoring a second one, and it is deliberately <b>not</b>
+a Divine Shield: Faith is the Devout's engine, and a Mage's ward feeding Conviction would be a
+spec mechanic leaking out through a class card.</li>
+<li><b>Mirror Image</b> &mdash; 20 Mana, 2.0, 4cd, self. <b>The next three single-target attacks
+against him miss</b> (Perfect: four). <i>Evasion rather than absorption.</i> Better than the
+Barrier against three big hits, worse against a swarm or an AoE &mdash; <b>the two are not a
+strict upgrade of each other in either direction</b>, which is the class-pool rule applied
+inside one pool.</li>
+<li><b>Magic Missiles</b> &mdash; 15 Mana, 2.0, 2cd, one enemy. <b>Three bolts at 12% of
+Attack</b> each (Perfect: a fourth). <i>The reliable filler.</i> Multi-hit, so it plays with
+anything reading hits rather than casts.</li>
+<li><b>Mana Well</b> &mdash; 20 Mana, 1.5, 5cd, self. For 3 turns (Perfect: 4) <b>Mana
+regeneration is doubled</b>. <i>Costs mana to make mana</i> &mdash; net-positive only if the
+fight lasts.</li>
+<li><b>Dispel</b> &mdash; 15 Mana, 1.5, 3cd. <b>Two harmful effects off an ally, or two
+beneficial effects off an enemy</b> (Perfect: three). <i>Utility nobody has</i>, and the only
+ability in the game whose target may be either side.</li>
+<li><b>Blink</b> &mdash; 10 Mana, 1.0, 3cd, self. <b>Clears one turn from every one of his
+cooldowns</b> (Perfect: two); its own is exempt. <i>Tempo, not damage</i> &mdash; it scales
+with kit size rather than with any spec, which is the cleanest statement of "class-wide" in
+the pool.</li>
+</ul>
+
+<h3>The Cleric six &mdash; three spines with enormous conditional power and no baseline</h3>
+<p><b>None of the three can simply heal someone on turn one:</b> Holy's healing is gated behind
+Mercy, the Devout's behind shields absorbing hits, the Occultist's behind marks on enemies.
+<b>The names are chosen for register</b> &mdash; the Occultist is a Cleric, and "Sanctified
+Ground" on him reads as a joke. These are priestly and old: rites, offices, practices &mdash;
+words about what a cleric <i>does</i> rather than which side he is on.</p>
+<ul>
+<li><b>Ministration</b> &mdash; 20 Mana, 2.0, 2cd, one ally. Heals <b>20% of their maximum
+health</b> (Perfect: 26%). <i>The plain heal none of them has.</i></li>
+<li><b>Consecration</b> &mdash; 25 Mana, 2.5, 5cd. For 3 turns (Perfect: 4) <b>the whole party
+regenerates 5% of maximum health each turn</b>. <i>Sustained rather than burst</i> &mdash; the
+opposite read to Ministration.</li>
+<li><b>Chastise</b> &mdash; 15 Mana, 2.0, 2cd, one enemy. <b>25% of Attack and 20 Break
+damage</b> (Perfect: 30 BD). <i>Something to do with a turn.</i> <b>See the finding below.</b></li>
+<li><b>Unburden</b> &mdash; 20 Mana, 1.5, 4cd, one ally. <b>Removes every harmful effect</b>,
+and they take <b>20% less damage for 2 turns</b> (Perfect: 3). <i>Cleanse with a tail</i>
+&mdash; a pure cleanse is dead against warbands that apply nothing, and the mitigation half is
+what makes it never a wasted card.</li>
+<li><b>Exhortation</b> &mdash; 25 Mana, 2.5, 4cd. <b>The whole party's next attack deals 25%
+more damage</b> (Perfect: 35%). <i>The only offensive party buff a Cleric has.</i> <b>Banked,
+not timed</b> &mdash; it waits for each hero's next swing rather than expiring on a turn count,
+so a slow hero is not cheated of it.</li>
+<li><b>Undying Vigil</b> &mdash; 25 Mana, 2.0, 4cd, one ally. For 3 turns (Perfect: 4),
+<b>whenever that ally is healed, a second ally on lower health is healed for half as much</b>.
+<i>Making one heal into two.</i> It fits all three spines without duplicating any: Holy's big
+heals fork, the Devout's shield-conversion trickles outward, the Occultist's lifesteal spreads.
+<b>It is the one class ability that gets better the more spec-specific the build is</b>, a
+deliberate inversion of the unconditional-floor role the other five play.</li>
+</ul>
+<p><b>No death-save clause, deliberately.</b> Holy already has three (Resurrection,
+Intercession, Rite of Return) and a fourth in the class pool would make her the only spec whose
+class card duplicates her own identity. <b>Name note:</b> <i>Undying Vigil</i> sits near the
+Berserker's <b>Undying Rage</b> (Fury capstone) and near Holy's <b>VIGIL</b> lane &mdash;
+different objects, no mechanical collision, but three uses of two words, recorded so it is a
+known overlap rather than a discovered one.</p>
+
+<h3>The "weaker" half, verified rather than trusted &mdash; and the one card that fails it</h3>
+<p>Every comparison was checked against the live spec kits, with the arithmetic:</p>
+<ul>
+<li><b>Ministration against Holy's Heal.</b> Heal is 40% of the <i>Cleric's</i> maximum (150
+&rarr; 60); Ministration is 20% of the <i>target's</i>, which tops out at 40 on the Warden's
+200. The same Mercy multiplier scales both, so the gap survives every build. <b>Lesser.</b></li>
+<li><b>Magic Missiles against the Mage fillers.</b> 3 &times; 12% = 36% against Razor Ice's
+3 &times; 15% = 45% and Arcane Barrage's 6 &times; 8% = 48%, and 3 Break a bolt against Razor
+Ice's 10. <b>Lesser.</b></li>
+<li><b>Magic Barrier against Divine Shield.</b> 15% of maximum against 30%, for more Mana and
+double the cooldown. <b>Lesser.</b></li>
+</ul>
+<p><b>THE FINDING, REPORTED AND NOT RE-TUNED: CHASTISE FAILS THE RULE IN THE OTHER DIRECTION
+&mdash; it is too weak to pick rather than too strong.</b> The brief names both its numbers,
+and against them the <i>free core attack</i> wins on damage for all three Cleric specs: Smite
+is 44% of Attack with 16 BD at no cost and no cooldown; Shadowrend is 25% with 16 BD and a
+Cripple. Chastise pays 15 Mana and a 2-turn cooldown for 25% of Attack and 4 more Break, so it
+is <b>dominated</b> &mdash; there is no board state on which casting it beats simply attacking.
+It ships as specified, and test_batch_bq pins the comparison so a later reprice has to read the
+reasoning first. The lever is one of its two numbers and it is the designer's, not a
+batch's.</p>
+
+<h3>Break damage was assigned deliberately rather than by omission</h3>
+<p>Batch BO's own correction, applied up front. The brief names only Chastise's 20.
+<b>Chastise 20</b> (named); <b>Magic Missiles 3 per bolt</b> &mdash; 9 across three, decided
+against its siblings: below Razor Ice's 10 a shard and level with Arcane Barrage's 3 while
+throwing half as many. <b>The other ten carry none</b>, because they are not attacks and Break
+from an ability that never strikes is Break from nowhere.</p>
+
+<h3>What was measured rather than assumed</h3>
+<ul>
+<li><b>Dispel's enemy half is thin, and §3 asked.</b> <code>shielded</code> is the <b>only</b>
+beneficial status an enemy can carry in the whole game, applied by <b>two of nineteen enemy
+kinds</b> (the Orc Shieldmaster's Shielding and the Hollow Crown's Regalia). So that half
+strips at most <i>one</i> thing and usually nothing. <b>Reported rather than dropped:</b> the
+ally half is a real answer on its own, and authoring enemy buffs is a content decision that
+belongs to whoever wants one.</li>
+<li><b>The exclusion list is the load-bearing half of Dispel.</b> What may be stripped is
+<i>derived</i> (anything that is not a debuff), so an enemy buff a later batch authors is
+dispellable the day it lands. But <code>DEBUFF_IDS</code> deliberately does not hold the five
+<b>marks</b> the party applies &mdash; covenant, quarry, snare_line, feinted, hunt_mark &mdash;
+and left to the derived rule they read as "beneficial effects on an enemy", so <b>Dispel would
+have stripped the party's own work.</b> <code>ruin_primed</code> is the same trap through
+another door (it is the primer, not the mark, so it is not a debuff either, and dispelling it
+would defuse the Occultist's bomb for him), and <code>charging</code> is a declared blow rather
+than a boon &mdash; <b>cancelling a wind-up is what a Break is for</b>, and handing that to a
+15-Mana utility card would quietly delete the Ash Hurler's whole lesson.</li>
+<li><b>Mana Well doubles the live figure.</b> Measured in a real fight at <b>44 a turn</b> for
+a Mage &mdash; 12 base plus Evocation's 10, doubled &mdash; rather than a doubled hardcoded 12.
+The doubling lives in <code>_mana_regen</code>, the one place the drip's size is decided.</li>
+</ul>
+
+<h3>Two decisions and one extraction the brief did not name</h3>
+<ul>
+<li><b>Dispel targets either side through a widened picker pool, not a third
+<code>Ability.Target</code> value.</b> An enum entry would have to be understood by the enemy
+AI's re-validation, the intent classifier, the bot's targeting and <code>_ability_usable</code>
+&mdash; four places needing a rule for a case one card uses. <code>_resolve_special</code>
+reads <code>target.is_hero</code> and knows which half it is; that is the whole cost.</li>
+<li><b>The cooldown hook §3 said to reuse did not exist as a hook &mdash; it existed as four
+copies.</b> Follow-Through, Practised Hands, Frostbound Hours and Crusader's Tempo each carried
+their own hand-written six lines. They all call <b><code>_tick_cooldowns</code></b> now, and
+they behave identically: cutting an entry already at zero was always a no-op, so folding the
+guard in changes nothing any of them did. Blink is the fifth caller. <b>This project keeps
+re-learning what a number written twice costs</b> (Batch BP's Eye of the Storm, where the chip
+silently won).</li>
+<li><b>Mirror Image's images and Exhortation's share live in their status's <code>power</code>,
+battle-long</b>, on the Interpose precedent &mdash; no new unit fields at all for twelve
+abilities. Battle-long is what makes <i>banked, not timed</i> true, and one place holding the
+number is what stops the chip and the arithmetic disagreeing.</li>
+<li><b>No Cover bypasses Mirror Image and spends no image.</b> That field is documented at
+<code>_miss_chance</code> as an absolute &mdash; "these attacks cannot be made to miss by any
+current or future source" &mdash; and Mirror Image is a future source. It is unreachable in
+play (only the Sharpshooter carries it and heroes do not attack the Mage), but the rule is
+honoured rather than quietly excepted. <b>A later suite that arms <code>no_cover</code> on
+every unit for determinism, as test_batch_bp does, will see every image look broken;</b>
+test_batch_bq arms it on the heroes only, and says why.</li>
+</ul>
+
+<h3>Verified</h3>
+<p><b>Per the standing instruction, that means the code landed and works. No sweeps, no bands,
+no balance measurement was run, and none should be quoted from this batch.</b></p>
+<p>check_parse 0 &middot; check_flow 0 &middot; run-harness gates 1/2/3 PASS &middot;
+<b>new test_batch_bq.gd</b>. All five clauses §6 named as able to silently do nothing are driven
+live and asserted against the state they change, never against a cast returning &mdash; and
+<b>five are built so a broken implementation still fails</b>: an area attack sits in the
+<i>middle</i> of Mirror Image's count so "an AoE spends none" cannot pass on charges that never
+move; Mana Well is measured on a Mage carrying Evocation's +10, where the honest answer (44)
+and the stale-constant answer (24) differ; a party mark is put on the same enemy Dispel is
+pointed at; Blink's cast asserts a drafted ability's cooldown and its own in opposite
+directions; and Undying Vigil's board carries an ally <i>above</i> the warded one and an ally
+<i>between</i>, so "heals whoever is lowest" and "re-heals the warded one" both fail.</p>
+<p><b>Nine negative controls</b>, each applied to product code and reverted (both touched files
+came back byte-identical by hash): an image spent by an area attack trips 3; Mana Well doubling a
+hardcoded 12 trips 1; Dispel's exclusion list removed trips 3; Blink refunding its own cooldown
+trips 1; the vigil fork's re-entrancy guard deleted trips 1; Exhortation put on a clock trips 3;
+a class-wide ability leaking into <code>CLASS_POOLS</code> trips 2; Ministration reading the
+caster's maximum trips 1; the Exhortation spend site removed trips 2.</p>
+<p><b>Live autoplay clean across three real battles, 0 SCRIPT ERROR, with all twelve firing in
+ordinary fights</b> &mdash; including "Mana Well &mdash; regeneration doubled to <b>44</b> a
+turn", which is the number that tells a live read apart from a doubled constant. Full battery
+green; <code>test_batch_az</code>'s Follow-Through source-grep was re-pointed at
+<code>_tick_cooldowns</code> (the extraction deleted the literal it looked for, and the question
+it asks is unchanged), and six other suites were re-pointed in place with the reason in each
+file, four of them inversions of assertions that recorded the debt this batch paid.</p>
+
 <h2>2026-08-13 &mdash; Batch BP: the Warrior draft pools</h2>
 <p><i>Six abilities, two per Warrior spec, closing the debt Batch BO left open. All three
 Warrior draft pools were <b>named and empty</b>, so a Warrior's draft offer filled short in

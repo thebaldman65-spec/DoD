@@ -3023,3 +3023,52 @@ would have been unobservable. The repair is a local, and the general rule is the
 keeps re-learning in new places: a number written twice is a number that will eventually
 disagree with itself, and the test that catches it is the one that deliberately breaks the first
 copy.
+
+## Batch BQ — the Mage and Cleric class pools
+
+**The seam was the thing worth fixing, not the pools.** BO built a draft that draws roughly one
+card in four from a class-wide pool, and then shipped with every class-wide pool empty. That is
+not a missing feature, it is a quarter of every offer being dead — a hero was shown three cards
+and only ever really offered two-and-a-bit. Filling half the seam is worth more than it sounds
+because the half that was empty was *structurally* empty rather than thin: no amount of good luck
+would have found a class card.
+
+**The rule that makes class abilities interesting is that they are worse.** It reads backwards
+and it is the whole design. A class card feeds no passive: a barrier does nothing for Overburn, a
+heal does nothing for Ruin. If it were as strong as a spec card it would be the safe pick in
+every build and every Mage would end up holding the same six. Slightly weaker but always-on makes
+it the card you take when your spec's engine is not online yet — which is a real role and one no
+spec card can fill, *because a spine that provided its own answer would stop being a spine*. The
+Pyromancer having no defence is not an oversight AR left behind; it is what he is.
+
+**And that rule cuts the other way too, which is what Chastise found.** Checking that a class
+card is weaker than the *spec abilities* is not enough — it also has to beat doing nothing, and
+"doing nothing" in this game means casting the free core attack. Chastise loses to Smite on
+damage, costs Mana and a cooldown Smite does not, and wins only 4 Break. There is no board state
+on which pressing it beats simply attacking. It ships as written because the numbers are the
+brief's, but the lesson generalises past this card: **the floor for a class ability is the free
+basic, not the spec kit.**
+
+**Undying Vigil is the deliberate exception and the pool needs one.** Five of the six Cleric
+cards are unconditional floors; one of them gets *better* the more spec-specific the build is —
+Holy's big heals fork, the Devout's shield-conversion trickles outward, the Occultist's lifesteal
+spreads. A pool where every card is a floor teaches the player that class cards are filler. One
+card that rewards a real build is what stops that.
+
+**Mirror Image and Magic Barrier exist to not dominate each other.** Two defensive cards in one
+six-card pool is one too many unless each answers something the other cannot, so the images are
+spent only by single-target attacks and the barrier eats a share of everything. The AoE clause is
+not a balance patch bolted on afterwards; it is the reason there are two cards.
+
+**Dispel's enemy half is nearly decorative and saying so is the deliverable.** Exactly one
+beneficial status exists on the enemy side of this game, from two of nineteen kinds. The card
+ships whole because the ally half stands on its own and because authoring enemy buffs is a
+content decision rather than a repair — but a card whose text promises a symmetry the game does
+not have is worth flagging before somebody balances around it.
+
+**The exclusion list turned out to be the hard part of Dispel, and it is the interesting kind of
+bug.** "Strip beneficial effects from an enemy" derived as "anything that is not a debuff" is
+correct, obvious, and would have stripped the party's own marks — Covenant of Ash, Quarry's Mark,
+the snare line, a Feint — because a *mark is deliberately not a debuff*. The rule that reads
+cleanly at one site is wrong because of a decision made at a completely different one, and the
+only defence is writing the exclusions down with their reasons attached.

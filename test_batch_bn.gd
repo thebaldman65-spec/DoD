@@ -472,7 +472,7 @@ func _docs() -> void:
 	# test_batch_bb carry — three copies of one assertion, and all three must
 	# move together or the batch that bumps master.html trips two suites it did
 	# not touch.
-	ok(doc.contains("Last updated: 2026-08-13 (Batch BP)"),
+	ok(doc.contains("Last updated: 2026-08-13 (Batch BQ)"),
 		"master.html carries the current batch's stamp")
 	# The number AND the reason it was chosen travel together, or the next
 	# reader sees a float with no argument behind it.

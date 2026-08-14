@@ -895,6 +895,19 @@
   ]
  },
  {
+  "id": "class_draft",
+  "term": "Class-Wide Abilities",
+  "category": "progression",
+  "short": "Roughly one draft card in four is drawn from a pool the whole CLASS shares.",
+  "long": "Every draft offer mixes two pools. Most cards come from your SPEC's own pool; roughly ONE IN FOUR comes from a CLASS-WIDE pool that every spec of that class draws from - so a Pyromancer, a Cryomancer and an Arcanist can all be offered Magic Barrier. They are deliberately UNTIED AND GENERAL: a class card would not read as off-theme for any spec of the class, which is why it is Magic Barrier and not Frostbolt. AND THEY ARE WEAKER THAN SPEC ABILITIES, ON PURPOSE - but unconditional. A class card feeds no passive: a barrier does nothing for Overburn, a heal does nothing for Ruin. If they were as strong as spec cards they would be the safe default in every build, and every hero would end up holding the same six. Slightly weaker but always-on makes them the pick you take when your spec's engine is not online yet, which is a real and different role. MAGE and CLERIC pools are written; the WARRIOR and HUNTER pools are not yet, so those heroes' offers currently draw spec cards only.",
+  "see_also": [
+   "ability_draft",
+   "ability_slots",
+   "protected_core",
+   "boss_trophies"
+  ]
+ },
+ {
   "id": "ability_slots",
   "term": "Ability Slots",
   "category": "progression",

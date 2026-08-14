@@ -284,23 +284,36 @@ const SPEC_DRAFT_POOLS := {
 	"mystic": ["Choking Smoke", "Snare Line"],
 }
 
-# CLASS-WIDE DRAFT ABILITIES — NAMED HERE, EMPTY UNTIL THEIR OWN TRANCHE.
-# Six per class, twenty-four in all, and NONE of them ship in Batch BO. The
-# keys exist now because the machinery has to know the shape it is drawing
-# from: `Run.roll_draft_offer` already mixes the two pools at CLASS_DRAFT_SHARE
-# and simply finds nothing on this side of it today.
+# CLASS-WIDE DRAFT ABILITIES — HALF FILLED (Batch BQ). Six per class,
+# twenty-four in all; the MAGE and CLERIC twelve ship here and the HUNTER and
+# WARRIOR twelve ARE STILL OWED. A Hunter's or a Warrior's offer still loses
+# its class card, which is the visible shape of the remaining debt rather than
+# a bug — said plainly rather than left as a gap.
 #
-# THE AUTHORING RULES, RECORDED WITH THE EMPTY ARRAYS SO THEY ARRIVE WITH THE
-# CONTENT: a class-wide ability is DELIBERATELY UNTIED AND GENERAL — Magic
-# Barrier, not Frostbolt. The test is whether it would read as off-theme for
-# ANY spec of that class; if a Pyromancer drawing it would feel like he wandered
-# into the wrong tree, it is a spec ability. And they are WEAKER THAN SPEC
-# ABILITIES AND UNCONDITIONAL: they feed no passive (a Barrier does nothing for
-# Overburn), so at equal power they would be a safe default that dilutes every
+# THIS IS A SEPARATE STRUCTURE FROM `CLASS_POOLS` ABOVE AND IT MUST STAY ONE.
+# The reason is BO's own, applied to the other pool: `CLASS_POOLS` feeds the
+# BOSS pick today, so dropping six abilities into it would silently re-weight
+# every boss offer in the game as a side effect of a draft change. THE
+# TIDY-LOOKING EDIT A LATER BATCH WOULD MAKE — folding two class pools into one
+# — IS EXACTLY THE ONE THIS COMMENT EXISTS TO REFUSE. `CLASS_POOLS` is
+# byte-untouched by Batch BQ and test_batch_bq asserts it directly.
+#
+# THE AUTHORING RULES, RECORDED WITH THE CONTENT THEY GOVERN: a class-wide
+# ability is DELIBERATELY UNTIED AND GENERAL — Magic Barrier, not Frostbolt.
+# The test is whether it would read as off-theme for ANY spec of that class; if
+# a Pyromancer drawing it would feel like he wandered into the wrong tree, it is
+# a spec ability. And they are WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL:
+# they feed no passive (a Barrier does nothing for Overburn, a heal nothing for
+# Ruin), so at equal power they would be a safe default that dilutes every
 # build. Slightly weaker but always-on makes them the pick you take when your
-# spec's engine is not online yet, which is a real role.
+# spec's engine is not online yet, which is a real role and a different one.
 const CLASS_DRAFT_POOLS := {
-	"warrior": [], "mage": [], "cleric": [], "hunter": [],
+	"warrior": [],
+	"mage": ["Magic Barrier", "Mirror Image", "Magic Missiles", "Mana Well",
+		"Dispel", "Blink"],
+	"cleric": ["Ministration", "Consecration", "Chastise", "Unburden",
+		"Exhortation", "Undying Vigil"],
+	"hunter": [],
 }
 
 # Roughly one card in four is class-wide; the rest are spec. Read by
@@ -482,13 +495,16 @@ static func pool_ability(display_name: String) -> Ability:
 	return Talents.granted_ability(display_name)
 
 
-# ------- TRANCHE 1 + 2: the twenty-four drafted abilities (BO §5, BP) -------
+# --- THE DRAFTED ABILITIES — THIRTY-SIX OF A TARGET 48 (BO §5, BP, BQ) ---
 #
 # BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
 # six WARRIOR entries as owed rather than pretending the pools were full.
-# BATCH BP CLOSES THAT DEBT: six more, two per Warrior spec, so all twelve
-# specs have a draft. THE 24 CLASS-WIDE ABILITIES ARE STILL OWED and are not
-# here; `CLASS_DRAFT_POOLS` is still empty and still says so.
+# BATCH BP CLOSED THAT DEBT: six more, two per Warrior spec, so all twelve
+# specs have a draft and `SPEC_DRAFT_POOLS` is 24 entries.
+# BATCH BQ ADDS THE FIRST TWELVE CLASS-WIDE ONES — six MAGE, six CLERIC — so
+# `CLASS_DRAFT_POOLS` is half filled. THE HUNTER AND WARRIOR CLASS POOLS ARE
+# STILL OWED, twelve entries between them, and they are still empty arrays
+# that say so.
 #
 # EVERY ABILITY NAMES THE AXIS IT SERVES, in its comment. That rule is here
 # because the twelve tree batches spent themselves removing nodes that existed
@@ -750,6 +766,190 @@ static func draft_ability(display_name: String) -> Ability:
 				"special": "snare_line",
 				"perfect_id": "", "perfect_text": "The line holds a second turn",
 				"description": "Run a line across the whole field: the\nnext turn EVERY enemy that acts springs\none of your traps where it stands —\nteeth, Break and all. It fills no trap\nslot and spends no placed trap."})
+		# ================= BATCH BQ: THE CLASS-WIDE TWELVE =================
+		#
+		# SIX MAGE AND SIX CLERIC, filling half the seam BO opened: one card in
+		# four is class-wide, and until now that seam rolled into an empty pool
+		# for every hero in the game. THE HUNTER AND WARRIOR TWELVE ARE STILL
+		# OWED — see the comment above `CLASS_DRAFT_POOLS`.
+		#
+		# THEY ARE WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL, and the
+		# "weaker" half was VERIFIED against the live spec kits rather than
+		# assumed — every comparison is in the changelog with its arithmetic.
+		# ONE OF THE TWELVE FAILS IT IN THE OTHER DIRECTION AND IS REPORTED
+		# RATHER THAN RE-TUNED: see Chastise below.
+		#
+		# BREAK DAMAGE WAS ASSIGNED DELIBERATELY RATHER THAN BY OMISSION (the
+		# correction BO made to its own predecessor, applied up front). The
+		# brief names only Chastise's 20. TWO of the twelve are attacks and
+		# carry BD; the other ten are not attacks, and Break from an ability
+		# that never strikes is Break from nowhere.
+		#
+		# ----- MAGE: the tools every spine wants and no spine provides,
+		# BECAUSE A SPINE THAT PROVIDED THEM WOULD STOP BEING A SPINE. The
+		# Pyromancer has no defence at all by design (AR removed every option
+		# deliberately), the Arcanist's went to the vault with Stabilize (AT),
+		# and the Cryomancer's is a hold that a boss shrugs.
+		#
+		# AXIS: the floor beneath all three. ABSORPTION — it eats a share of
+		# everything, area attacks included.
+		"Magic Barrier":
+			return Ability.make({"display_name": "Magic Barrier",
+				"dmg_type": "arcane", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 4, "anim": "attack03",
+				"special": "magic_barrier",
+				"perfect_id": "", "perfect_text": "Absorbs 20% of maximum health instead",
+				"description": "Raise a ward of raw magic: absorbs\ndamage equal to 15% of your maximum\nhealth for 3 turns. It eats a share of\nEVERYTHING, area attacks included."})
+		# AXIS: evasion rather than absorption, and THE TWO MUST NOT BE A
+		# STRICT UPGRADE OF EACH OTHER IN EITHER DIRECTION — §2's rule applied
+		# inside one pool. Better than the Barrier against three big single
+		# hits, worse against a swarm or an area attack: those roll no miss at
+		# all, so they spend no image and the ward does nothing about them.
+		"Mirror Image":
+			return Ability.make({"display_name": "Mirror Image",
+				"dmg_type": "arcane", "cost": 20, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 4, "anim": "attack03",
+				"special": "mirror_image",
+				"perfect_id": "", "perfect_text": "Four images instead of three",
+				"description": "Step behind three copies of yourself:\nthe next THREE single-target attacks\nagainst you MISS outright. Area attacks\nnever miss, so they never spend one.\nThe images wait until spent."})
+		# AXIS: the reliable filler. Multi-hit, so it plays with anything
+		# reading HITS rather than casts, and cheap enough to cast while saving
+		# for something bigger. DELIBERATELY THE LESSER of the Mage's multi-hit
+		# fillers: 3 x 12% against Razor Ice's 3 x 15% and Arcane Barrage's
+		# 6 x 8%, and 3 BD a bolt against their 10 and 3.
+		"Magic Missiles":
+			return Ability.make({"display_name": "Magic Missiles",
+				"dmg_type": "arcane", "cost": 15, "damage": 12, "pressure": 3,
+				"delay": 2.0, "cooldown": 2, "anim": "attack01",
+				"multi_hits": 3,
+				"perfect_id": "", "perfect_text": "A fourth bolt",
+				"description": "Three bolts of raw force into one\nenemy, 12% of Attack each. Cheap,\ncertain, and it never needs anything\nto be true first."})
+		# AXIS: a read on the fight rather than a free button. It costs Mana to
+		# make Mana, so it is net-positive only if the fight lasts — and the
+		# pool's own ceiling is what keeps it honest when he casts it full.
+		"Mana Well":
+			return Ability.make({"display_name": "Mana Well",
+				"dmg_type": "arcane", "cost": 20, "damage": 0, "pressure": 0,
+				"delay": 1.5, "cooldown": 5, "anim": "attack03",
+				"special": "mana_well",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Open the well: for 3 turns your Mana\nregeneration is DOUBLED. It costs Mana\nto make Mana — a long fight pays for\nit and a short one does not."})
+		# AXIS: utility nobody has. TWO HALVES, AND THE ENEMY HALF IS THIN —
+		# `shielded` is the ONLY beneficial status an enemy can carry in the
+		# whole game (two of nineteen kinds apply it), so that half removes at
+		# most ONE thing and usually nothing. MEASURED AND REPORTED rather than
+		# quietly dropped: authoring enemy buffs is a content decision and not
+		# this batch's, and the ally half is a real answer on its own.
+		"Dispel":
+			return Ability.make({"display_name": "Dispel",
+				"dmg_type": "arcane", "cost": 15, "damage": 0, "pressure": 0,
+				"delay": 1.5, "cooldown": 3, "anim": "attack02",
+				"special": "dispel",
+				"perfect_id": "", "perfect_text": "Removes a third effect",
+				"description": "Unpick what is woven: strip TWO harmful\neffects from an ALLY, or TWO beneficial\nones from an ENEMY. Point it at\nwhichever side is wearing something it\nshould not be."})
+		# AXIS: tempo, not damage. Worth most to whoever has the most on
+		# cooldown, so it scales with KIT SIZE rather than with any spec —
+		# which is the cleanest statement of "class-wide" in the pool.
+		"Blink":
+			return Ability.make({"display_name": "Blink",
+				"dmg_type": "arcane", "cost": 10, "damage": 0, "pressure": 0,
+				"delay": 1.0, "cooldown": 3, "anim": "attack03",
+				"special": "blink",
+				"perfect_id": "", "perfect_text": "Two turns off every cooldown instead",
+				"description": "Step out of the moment and back into\nit: every one of your cooldowns loses\na turn. Blink's own does not — a\nself-refunding cooldown is no cooldown\nat all."})
+		# ----- CLERIC: three support-shaped spines with enormous CONDITIONAL
+		# power and no baseline. NONE OF THE THREE CAN SIMPLY HEAL SOMEONE ON
+		# TURN ONE: Holy's healing is gated behind Mercy, the Devout's behind
+		# shields absorbing hits, the Occultist's behind marks on enemies.
+		#
+		# THE NAMES ARE CHOSEN FOR REGISTER. The Occultist is a Cleric, and
+		# "Sanctified Ground" on him reads as a joke. These are priestly and
+		# old — rites, offices, practices — words about what a cleric DOES
+		# rather than which side he is on, and every one has to sit on an
+		# Occultist tongue as easily as on Holy's.
+		#
+		# AXIS: the plain heal none of them has. DELIBERATELY THE LESSER of it
+		# and Holy's Heal — 20% of the TARGET's maximum tops out at 40 on the
+		# Warden's 200, against Heal's 40% of her own 150, i.e. 60, and both
+		# are multiplied by the same Mercy term.
+		"Ministration":
+			return Ability.make({"display_name": "Ministration",
+				"dmg_type": "holy", "cost": 20, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 2, "anim": "attack02",
+				"special": "ministration", "target": Ability.Target.ALLY,
+				"perfect_id": "", "perfect_text": "Heals 26% of their maximum instead",
+				"description": "The plain office: heal one ally for 20%\nof THEIR maximum health. No stacks, no\nshields, no marks — it simply works."})
+		# AXIS: sustained rather than burst, the opposite read to Ministration.
+		# Per target it is small on purpose; what it buys is that it is small
+		# for EVERYONE, every turn, while it holds.
+		"Consecration":
+			return Ability.make({"display_name": "Consecration",
+				"dmg_type": "holy", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.5, "cooldown": 5, "anim": "attack03",
+				"special": "consecration",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Bless the ground you all stand on: for\n3 turns the WHOLE PARTY regains 5% of\nmaximum health at the start of each of\ntheir turns."})
+		# AXIS: something to do with a turn. All three Clerics have turns where
+		# nobody needs healing and their engine is not ready, and the Break
+		# means that turn still contributes.
+		#
+		# REPORTED, NOT RE-TUNED — THE ONE CARD OF THE TWELVE THAT FAILS §2 IN
+		# THE OTHER DIRECTION, i.e. it is too weak to pick rather than too
+		# strong. The brief names both numbers, and against them the FREE core
+		# attack wins on damage for all three Cleric specs: Smite is 44% of
+		# Attack with 16 BD at no cost and no cooldown, Shadowrend 25% with
+		# 16 BD plus a Cripple. Chastise pays 15 Mana and a 2-turn cooldown for
+		# 25% of Attack and 4 more Break, so it is DOMINATED. The lever is one
+		# of its two numbers and it is the designer's, not a batch's.
+		"Chastise":
+			return Ability.make({"display_name": "Chastise",
+				"dmg_type": "holy", "cost": 15, "damage": 25, "pressure": 20,
+				"delay": 2.0, "cooldown": 2, "anim": "attack01",
+				"perfect_id": "", "perfect_text": "Deals 30 Break damage instead",
+				"description": "Rebuke one enemy: 25% of Attack as holy\ndamage and 20 Break damage. For the\nturns when nobody needs mending and the\nengine is not ready."})
+		# AXIS: cleanse with a tail. A PURE cleanse is dead against a warband
+		# that applies nothing, and the mitigation half is what makes it never
+		# a wasted card — the unconditional rule stated as a mechanic rather
+		# than as an intention.
+		"Unburden":
+			return Ability.make({"display_name": "Unburden",
+				"dmg_type": "holy", "cost": 20, "damage": 0, "pressure": 0,
+				"delay": 1.5, "cooldown": 4, "anim": "attack02",
+				"special": "unburden", "target": Ability.Target.ALLY,
+				"perfect_id": "", "perfect_text": "The mitigation holds 3 turns instead of 2",
+				"description": "Lift the weight: remove EVERY harmful\neffect from one ally, and they take 20%\nless damage for 2 turns. With nothing\nto remove it is still the mitigation."})
+		# AXIS: the only offensive party buff a Cleric has. BANKED, NOT TIMED —
+		# it waits for each hero's next swing rather than expiring on a turn
+		# count, so a slow hero is not cheated of it.
+		"Exhortation":
+			return Ability.make({"display_name": "Exhortation",
+				"dmg_type": "holy", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.5, "cooldown": 4, "anim": "attack03",
+				"special": "exhortation",
+				"perfect_id": "", "perfect_text": "35% more damage instead of 25%",
+				"description": "Call them on: the WHOLE PARTY's next\nattack deals 25% more damage. It is\nBANKED, not timed — it waits for each\nhero's next swing however long they\ntake to take it."})
+		# AXIS: making one heal into two. IT IS THE ONE CLASS ABILITY THAT GETS
+		# BETTER THE MORE SPEC-SPECIFIC THE BUILD IS, a deliberate inversion of
+		# the unconditional-floor role the other five play: Holy's big heals
+		# fork, the Devout's shield-conversion trickles outward, the
+		# Occultist's lifesteal spreads.
+		#
+		# NAME NOTE, RECORDED SO IT IS A KNOWN OVERLAP RATHER THAN A DISCOVERED
+		# ONE: it sits near the Berserker's UNDYING RAGE (Fury capstone) and
+		# near Holy's VIGIL lane. Different objects, no mechanical collision —
+		# three uses of two words.
+		#
+		# NO DEATH-SAVE CLAUSE, deliberately: Holy already has three
+		# (Resurrection, Intercession, Rite of Return) and a fourth in the
+		# class pool would make her the only spec whose class card duplicates
+		# her own identity.
+		"Undying Vigil":
+			return Ability.make({"display_name": "Undying Vigil",
+				"dmg_type": "holy", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 4, "anim": "attack02",
+				"special": "undying_vigil", "target": Ability.Target.ALLY,
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Keep watch over one ally: for 3 turns,\nwhenever they are healed BY ANY SOURCE,\na second ally on lower health is healed\nfor half as much."})
 	return null
 
 
