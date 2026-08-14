@@ -309,7 +309,16 @@ func _additive_units() -> void:
 		"0.01 * trapper.cruel_ranks": "Cruel Devices reads percentage points (tripwire)",
 		"0.01 * placer.cruel_ranks": "Cruel Devices reads percentage points (traps)",
 		"0.01 * sc_h.scavenger_ranks": "Scavenger reads percentage points",
-		"0.01 * target.ghillie": "Ghillie Suit reads its own chance",
+		# RE-POINTED IN PLACE BY BATCH BR, AND IT WAS A REAL CATCH — the AZ
+		# Follow-Through precedent exactly. The question is unchanged (does
+		# Ghillie read its own counter as the percentage CHANCE, additively,
+		# rather than through a hardcoded rate) and it is still worth asking;
+		# only the fragment moved. BR extracted the roll into `_evade_chance`
+		# so Camouflage could STACK with it as an independent chance rather
+		# than overwrite it, and that extraction deleted this exact text.
+		"0.01 * u.ghillie": "Ghillie Suit reads its own chance",
+		"func _evade_chance(u: BattleUnit) -> float:":
+			"...and it is one function, shared with Camouflage (Batch BR)",
 		"maxi(u.deadfall_network, 1)": "the trap gate reads the counter, not a hardcoded 2",
 		"placer.bone_breaker)": "Bone Breaker's Break damage comes off the counter",
 		"placer.caught_fast)": "Caught Fast's duration comes off the counter",

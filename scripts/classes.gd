@@ -284,11 +284,16 @@ const SPEC_DRAFT_POOLS := {
 	"mystic": ["Choking Smoke", "Snare Line"],
 }
 
-# CLASS-WIDE DRAFT ABILITIES — HALF FILLED (Batch BQ). Six per class,
-# twenty-four in all; the MAGE and CLERIC twelve ship here and the HUNTER and
-# WARRIOR twelve ARE STILL OWED. A Hunter's or a Warrior's offer still loses
-# its class card, which is the visible shape of the remaining debt rather than
-# a bug — said plainly rather than left as a gap.
+# CLASS-WIDE DRAFT ABILITIES — COMPLETE (Batch BR). Six per class,
+# twenty-four in all. BQ shipped the MAGE and CLERIC twelve and named the
+# HUNTER and WARRIOR twelve as owed; BR pays that debt, so THE ONE-IN-FOUR
+# CLASS SEAM NOW DRAWS A REAL ENTRY FOR EVERY HERO IN THE GAME. No class rolls
+# an empty pool any more, and no offer loses its class card.
+#
+# THE DRAFT IS 48 OF A TARGET ~96 (24 spec + 24 class-wide). TRANCHES 2 AND 3
+# ARE STILL OWED — spec pools remain thin at two apiece and an offer of three
+# will still come up short, which is the visible shape of the REMAINING debt
+# rather than a bug.
 #
 # THIS IS A SEPARATE STRUCTURE FROM `CLASS_POOLS` ABOVE AND IT MUST STAY ONE.
 # The reason is BO's own, applied to the other pool: `CLASS_POOLS` feeds the
@@ -296,7 +301,9 @@ const SPEC_DRAFT_POOLS := {
 # every boss offer in the game as a side effect of a draft change. THE
 # TIDY-LOOKING EDIT A LATER BATCH WOULD MAKE — folding two class pools into one
 # — IS EXACTLY THE ONE THIS COMMENT EXISTS TO REFUSE. `CLASS_POOLS` is
-# byte-untouched by Batch BQ and test_batch_bq asserts it directly.
+# byte-untouched by Batch BQ AND by Batch BR; test_batch_bq and test_batch_br
+# both assert it AS LITERALS rather than by size, because a swap of two names
+# would keep the count and change every boss draw in the game.
 #
 # THE AUTHORING RULES, RECORDED WITH THE CONTENT THEY GOVERN: a class-wide
 # ability is DELIBERATELY UNTIED AND GENERAL — Magic Barrier, not Frostbolt.
@@ -308,12 +315,14 @@ const SPEC_DRAFT_POOLS := {
 # build. Slightly weaker but always-on makes them the pick you take when your
 # spec's engine is not online yet, which is a real role and a different one.
 const CLASS_DRAFT_POOLS := {
-	"warrior": [],
+	"warrior": ["Battle Trance", "Rally", "Charge", "Cleave", "Warcry",
+		"Iron Will"],
 	"mage": ["Magic Barrier", "Mirror Image", "Magic Missiles", "Mana Well",
 		"Dispel", "Blink"],
 	"cleric": ["Ministration", "Consecration", "Chastise", "Unburden",
 		"Exhortation", "Undying Vigil"],
-	"hunter": [],
+	"hunter": ["Field Dressing", "Camouflage", "Aimed Volley", "Bola",
+		"Hunter's Mark", "Arcane Arrows"],
 }
 
 # Roughly one card in four is class-wide; the rest are spec. Read by
@@ -495,16 +504,17 @@ static func pool_ability(display_name: String) -> Ability:
 	return Talents.granted_ability(display_name)
 
 
-# --- THE DRAFTED ABILITIES — THIRTY-SIX OF A TARGET 48 (BO §5, BP, BQ) ---
+# --- THE DRAFTED ABILITIES — FORTY-EIGHT OF A TARGET ~96 (BO §5, BP, BQ, BR) -
 #
 # BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
 # six WARRIOR entries as owed rather than pretending the pools were full.
 # BATCH BP CLOSED THAT DEBT: six more, two per Warrior spec, so all twelve
 # specs have a draft and `SPEC_DRAFT_POOLS` is 24 entries.
-# BATCH BQ ADDS THE FIRST TWELVE CLASS-WIDE ONES — six MAGE, six CLERIC — so
-# `CLASS_DRAFT_POOLS` is half filled. THE HUNTER AND WARRIOR CLASS POOLS ARE
-# STILL OWED, twelve entries between them, and they are still empty arrays
-# that say so.
+# BATCH BQ ADDED THE FIRST TWELVE CLASS-WIDE ONES — six MAGE, six CLERIC.
+# BATCH BR ADDS THE OTHER TWELVE — six HUNTER, six WARRIOR — so
+# `CLASS_DRAFT_POOLS` IS FULL AT 24 AND THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL
+# ENTRY FOR EVERY HERO IN THE GAME. Tranches 2 and 3 are still owed: spec pools
+# remain thin at two apiece and an offer of three will still fill short.
 #
 # EVERY ABILITY NAMES THE AXIS IT SERVES, in its comment. That rule is here
 # because the twelve tree batches spent themselves removing nodes that existed
@@ -769,9 +779,9 @@ static func draft_ability(display_name: String) -> Ability:
 		# ================= BATCH BQ: THE CLASS-WIDE TWELVE =================
 		#
 		# SIX MAGE AND SIX CLERIC, filling half the seam BO opened: one card in
-		# four is class-wide, and until now that seam rolled into an empty pool
-		# for every hero in the game. THE HUNTER AND WARRIOR TWELVE ARE STILL
-		# OWED — see the comment above `CLASS_DRAFT_POOLS`.
+		# four is class-wide, and until BQ that seam rolled into an empty pool
+		# for every hero in the game. THE HUNTER AND WARRIOR TWELVE FOLLOW
+		# BELOW (Batch BR) and the seam is closed — see `CLASS_DRAFT_POOLS`.
 		#
 		# THEY ARE WEAKER THAN SPEC ABILITIES AND UNCONDITIONAL, and the
 		# "weaker" half was VERIFIED against the live spec kits rather than
@@ -950,6 +960,216 @@ static func draft_ability(display_name: String) -> Ability:
 				"special": "undying_vigil", "target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
 				"description": "Keep watch over one ally: for 3 turns,\nwhenever they are healed BY ANY SOURCE,\na second ally on lower health is healed\nfor half as much."})
+		# ============ BATCH BR: THE HUNTER AND WARRIOR CLASS-WIDE TWELVE ======
+		#
+		# THE SEAM CLOSES HERE. BQ filled Mage and Cleric; these twelve fill the
+		# other two, so every hero's one-in-four class card draws a real entry
+		# and no class rolls an empty pool.
+		#
+		# THE TWO STANDING RULES §1 SET, both recorded beside the content they
+		# were set for and both applying game-wide from here on:
+		#   1. CHARGES AND THE EFFECTS THAT RIDE THEM COUNT HITS, NOT CASTS.
+		#      A three-shot ability spends three of Arcane Arrows' five and
+		#      splashes three times. It is a real power increase for multi-hit
+		#      kits and it is deliberate.
+		#   2. A NAME IS SWEPT AGAINST THE WHOLE ROSTER BEFORE IT IS AUTHORED —
+		#      every ability, talent node, status and rune. The Warrior recovery
+		#      card was authored as SECOND WIND, which Holy already holds
+		#      (tranche 1, BO), and is BATTLE TRANCE for that reason.
+		#
+		# BREAK DAMAGE ASSIGNED DELIBERATELY, as BO's own correction requires.
+		# §4 names two figures (Aimed Volley 25, Cleave 15 each) and leaves the
+		# rest to this batch. THREE of the twelve are attacks and carry BD;
+		# the other nine never strike, and Break from an ability that never
+		# strikes is Break from nowhere.
+		#
+		# ----- HUNTER: three spines that are all CONDITIONAL, and a class with
+		# NO HEALING WHATSOEVER and the thinnest defensive kit in the game. The
+		# Beastmaster needs a beast standing, the Sharpshooter needs to not have
+		# switched, the Survivalist needs statuses already on the board — so all
+		# three have opening turns where the engine is not running.
+		#
+		# AXIS: the only self-heal a Hunter can get. THE ONE UNCONDITIONAL
+		# ANSWER TO A CLASS-WIDE HOLE — every other class can mend itself
+		# somewhere; this one cannot, at all, in any of its three trees.
+		"Field Dressing":
+			return Ability.make({"display_name": "Field Dressing", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 3,
+				"anim": "attack02", "special": "field_dressing",
+				"perfect_id": "", "perfect_text": "Heals 24% of maximum health instead",
+				"description": "Bind the wound where you stand: heal\n18% of your maximum health and shake\noff one harmful effect. The only\nself-heal a Hunter can get."})
+		# AXIS: buying TIME rather than absorbing damage — the defensive shape
+		# the class does not have, stated as evasion so it never overlaps the
+		# Mage's Barrier or the Warden's Block.
+		#
+		# FLAGGED, NOT SILENTLY SHIPPED: it sits close to the Survivalist's
+		# GHILLIE SUIT (Guerilla row 6, 65% and permanent). The two STACK — one
+		# combined roll, computed as independent chances rather than either
+		# overwriting the other — and for a Survivalist already holding the node
+		# this is close to a dead draw. See `_evade_chance` in battle.gd.
+		"Camouflage":
+			return Ability.make({"display_name": "Camouflage", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
+				"anim": "attack01", "special": "camouflage",
+				"perfect_id": "", "perfect_text": "Holds 3 turns instead of 2",
+				"description": "Go to ground: for 2 turns enemies are\n70% less likely to aim at you. It buys\nTIME rather than soaking damage —\nnothing about the blow changes, only\nwho it lands on."})
+		# AXIS: the reliable strike. Every Hunter kit is built on a conditional
+		# and this works when nothing is set up yet — and being MULTI-HIT is
+		# what makes it play with a charge bank (§1) rather than beside one.
+		#
+		# DELIBERATELY THE LESSER of the class's multi-hit shots: 3 x 12% = 36%
+		# against Triple Shot's 3 x 18% = 54%, for 10 less Mana. Its 8 BD a shot
+		# is §4's 25 read as a TOTAL and split three ways — 24 across the volley,
+		# level with Triple Shot's 8-a-shot rather than above it.
+		"Aimed Volley":
+			return Ability.make({"display_name": "Aimed Volley", "cost": 20,
+				"damage": 12, "pressure": 8, "delay": 2.5, "cooldown": 3,
+				"anim": "attack02", "multi_hits": 3,
+				"perfect_id": "", "perfect_text": "A fourth shot",
+				"description": "Three shots into one enemy, 12% of\nAttack each with 8 Break damage a\nshot. No mark, no bond, no stance —\nit works on turn one."})
+		# AXIS: two statuses on one card, and nothing else at all. THE PRICE OF
+		# THE BREADTH IS THAT IT IS ALL IT DOES — no damage, no Break, no third
+		# status — which is what keeps it under the Survivalist's own appliers.
+		"Bola":
+			return Ability.make({"display_name": "Bola", "cost": 15,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 3,
+				"anim": "attack01", "special": "bola",
+				"perfect_id": "", "perfect_text": "Both hold 4 turns instead of 3",
+				"description": "Whip the cord round its legs: the\ntarget is SLOWED and CRIPPLED for 3\nturns. Two afflictions, one card, and\nnot one point of damage."})
+		# AXIS: focus fire made explicit — the ONLY party-wide amplifier the
+		# class has. It is the enemy that is marked, so every hero and every
+		# beast on the field reads it, which is what separates it from the
+		# Beastmaster's MARK OF THE HUNT (that one pays HIM and his beast 25%,
+		# and restores his Mana; this one pays EVERYONE 15% and nothing else).
+		"Hunter's Mark":
+			return Ability.make({"display_name": "Hunter's Mark", "cost": 15,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
+				"anim": "attack01", "special": "hunters_mark",
+				"perfect_id": "", "perfect_text": "The mark holds 6 turns instead of 4",
+				"description": "Call the target out: for 4 turns the\nWHOLE PARTY deals 15% more damage to\nit. One mark at a time — the point is\nthat everyone shoots the same thing."})
+		# AXIS: a charge BANK, which the class has never had. BANKED, NOT TIMED
+		# — the charges wait until spent, on the Interpose/`shield_charges`
+		# precedent BQ used for Mirror Image, so a cast into a lull is not
+		# wasted. PER §1 A THREE-SHOT ABILITY SPENDS THREE.
+		"Arcane Arrows":
+			return Ability.make({"display_name": "Arcane Arrows",
+				"dmg_type": "arcane", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 5, "anim": "attack03",
+				"special": "arcane_arrows",
+				"perfect_id": "", "perfect_text": "Six charges instead of five",
+				"description": "Quench five arrows in raw magic: each\nof your next five ATTACKS also strikes\nan additional random enemy for half\ndamage. They wait until spent — and a\nthree-shot volley spends three."})
+		# ----- WARRIOR: three spines that are all melee, all Rage-driven and
+		# all REACTIVE. The Berserker needs to be hurt, the Swordmaster needs a
+		# stance and a Break window, the Warden needs to be attacked. NONE CAN
+		# MAKE SOMETHING HAPPEN ON TURN ONE, and the class has no ranged option
+		# and no way to reach a back line.
+		#
+		# ALL THREE WARRIOR SPECS USE RAGE — verified at the site rather than
+		# assumed before these were priced: `resource_name` is decided ONCE in
+		# `CONFIGS["warrior"]` and no spec override touches it.
+		#
+		# NONE OF THE SIX CARRIES `resource_gain`, and that is the cleanest
+		# statement of §4's "weaker than spec work" a Rage class can be given:
+		# every Warrior spec ability builds 10-15 Rage while it spends, and
+		# these spend without building.
+		#
+		# AXIS: recovery that scales with the beating. IT READS DAMAGE TAKEN,
+		# NOT MISSING HEALTH, and that distinction IS the ability — a Warrior
+		# who enters full and is hammered heals hard; one who enters low and is
+		# then ignored heals the 3% floor. THE RECOVERY IS DELAYED AND THAT IS
+		# WHAT KEEPS IT HONEST: he has to survive the damage before he gets any
+		# of it back, so it is not mitigation and cannot save him from a
+		# killing blow.
+		#
+		# NAME: authored as SECOND WIND, which Holy already holds (BO). Renamed
+		# here rather than shipped as a duplicate — see §1's rule above.
+		"Battle Trance":
+			return Ability.make({"display_name": "Battle Trance", "cost": 15,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
+				"anim": "attack01", "special": "battle_trance",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Go somewhere the pain cannot follow:\nfor 3 turns, at the start of each of\nyour turns heal 3% of maximum health\nPLUS HALF of all damage taken since\nyour last turn."})
+		# AXIS: giving away tempo. THE ONLY ABILITY IN THE GAME THAT HANDS AN
+		# ALLY A TURN, and the only tempo tool a class with none can have. It
+		# reuses the EXISTING initiative machinery (the Cryomancer's Shattered
+		# Tempo pushes units along the timeline; this is that hook aimed the
+		# other way) — there is no second turn-order manipulator.
+		#
+		# IT CANNOT TARGET HIM, which is what bounds it: handing away a turn
+		# costs him one, so no hero can be given consecutive turns off a single
+		# Warrior, and the 4-turn cooldown bounds it again.
+		"Rally":
+			return Ability.make({"display_name": "Rally", "cost": 15,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
+				"anim": "attack01", "special": "rally_ally",
+				"target": Ability.Target.ALLY,
+				"perfect_id": "", "perfect_text": "They also regain 15% of their resource",
+				"description": "Shout one ally forward: they act NEXT,\njumping straight to the front of the\norder. You gave them the turn — it\ncost you yours."})
+		# AXIS: reaching something NOW. The very fast initiative is the point —
+		# it is a Warrior's only answer to a caster winding up, and it is why
+		# the card is worth 20 Rage despite the free basic hitting nearly as
+		# hard. 10 BD sits DELIBERATELY BELOW the free Strike's 18: what he buys
+		# is the arrival and the Daze, and it must not also win on Break.
+		"Charge":
+			return Ability.make({"display_name": "Charge", "cost": 20,
+				"damage": 25, "pressure": 10, "delay": 1.0, "cooldown": 3,
+				"anim": "attack02",
+				"applies_status": {"id": "dazed", "turns": 1},
+				"perfect_id": "", "perfect_text": "Dazed for 2 turns instead of 1",
+				"description": "Close the distance before it finishes\nthe cast: 25% of Attack and the target\nis DAZED for a turn. Nothing else in\nthe kit arrives this fast."})
+		# AXIS: breadth from a narrow class. THREE CHOSEN enemies rather than
+		# three random ones, which is the whole distinction from War Stomp (a
+		# Warden spec-pool entry with the same 15% and the same 15 BD, for LESS
+		# Rage and with an ally refuel on top). Cleave is unambiguously the
+		# lesser of the two; what it buys is that the three are picked.
+		"Cleave":
+			return Ability.make({"display_name": "Cleave", "cost": 25,
+				"damage": 15, "pressure": 15, "delay": 2.5, "cooldown": 3,
+				"anim": "attack03", "choose_three": true,
+				"perfect_extra_hit": false,
+				"perfect_id": "", "perfect_text": "22% of Attack instead of 15%",
+				"description": "One wide swing across three chosen\nenemies: 15% of Attack and 15 Break\ndamage each. The narrow class finally\nhits more than one thing."})
+		# AXIS: the party buff the class lacks. NOTHING A WARRIOR DOES CURRENTLY
+		# IMPROVES ANYONE ELSE'S NUMBERS.
+		#
+		# CORRECTED TOWARD THE CODE AND REPORTED: §3 says "gains 20% Attack".
+		# It is implemented as +20% DAMAGE DEALT, on Battle Shout's own read
+		# site — `attack` is a raw stat read at dozens of sites (DoT snapshots,
+		# companion strikes, poison ticks) and a temporary mutation of it needs
+		# a revert path, which is the shape that produced this project's
+		# ~127,000 max-HP runaway. The number is identical where it is felt.
+		"Warcry":
+			return Ability.make({"display_name": "Warcry", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
+				"anim": "attack03", "special": "warcry",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Put the whole line on the front foot:\nevery hero deals 20% more damage for\n3 turns. The one thing a Warrior can\ndo for somebody else's numbers."})
+		# AXIS: refusing to be stopped. EVERY WARRIOR SPINE DIES TO LOSING A
+		# TURN — a stunned Berserker is not bleeding anyone, a Broken Warden is
+		# not blocking.
+		#
+		# THE BREAK HALF IS A CAP, NOT AN IMMUNITY, AND IT IS DECIDED RATHER
+		# THAN LEFT OPEN: while it holds, his meter fills to 99 and no further.
+		# Pressure still accumulates and simply cannot cross, so the moment the
+		# trance ends he is sitting one hit from Broken. That makes it a DELAY
+		# rather than a negation — the enemy's three turns of Break work are
+		# deferred onto the turn he stops being immune, not erased. It is NOT
+		# "the meter cannot fill" and NOT "Broken is refused": both read the
+		# same in a short test and neither leaves him at 99 afterwards.
+		#
+		# NAME COLLISION, REPORTED NOT RESOLVED: the Warden's Threat row 3 node
+		# is also called IRON WILL, and so is the live status that node's chip
+		# rides. Same class, same spec reachable — worse than BP's Precision
+		# Strike. Nothing breaks (a node's name is not an ability name and
+		# nothing resolves it) and this ability's status is `ironclad` with its
+		# own chip, so neither overwrites the other; renaming either is the
+		# designer's call and one string.
+		"Iron Will":
+			return Ability.make({"display_name": "Iron Will", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
+				"anim": "attack01", "special": "iron_will",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Set your teeth: for 3 turns you cannot\nbe Stunned, Frozen, Dazed or Broken,\nand take 15% less damage. The Break\nstill piles up to 99 — it just cannot\ncross until this ends."})
 	return null
 
 

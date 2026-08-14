@@ -151,11 +151,28 @@ const STATUS_INFO := {
 	# reason, and Magic Missiles / Chastise / Dispel / Blink / Ministration
 	# resolve and are done.
 	"mana_well": ["Mana Well", "MW", Color(0.45, 0.65, 0.95), "The well is open: Mana regeneration\nis DOUBLED while it holds."],
-	"mirror": ["Mirror Image", "MI", Color(0.70, 0.75, 0.95), "Images stand in his place: the next\nsingle-target attacks against him miss\noutright. Area attacks never miss, so\nthey spend none. They wait until spent."],
+	"mirror": ["Mirror Image", "MI", Color(0.70, 0.75, 0.95), "Images stand in his place: the next\nsingle-target attacks against him miss\noutright — ONE PER HIT, so a multi-hit\nblow spends one an arrow. Area attacks\nnever miss and spend none. They wait\nuntil spent."],
 	"exhorted": ["Exhortation", "Ex", Color(0.98, 0.88, 0.55), "Called on: their NEXT attack deals\nbonus damage. It is BANKED — it waits\nfor the swing, however long they take."],
 	"consecration": ["Consecration", "Cs", Color(0.95, 0.88, 0.60), "Blessed ground: regains 5% of maximum\nhealth at the start of each turn."],
 	"unburdened": ["Unburdened", "Ub", Color(0.85, 0.92, 0.70), "The weight is lifted: takes 20% less\ndamage."],
 	"vigil": ["Undying Vigil", "UV", Color(0.95, 0.90, 0.70), "Watched over: every heal this ally\nreceives, from ANY source, also heals\na second ally on lower health for half\nas much."],
+	# ---- BATCH BR: the Hunter and Warrior class-wide draft's statuses ----
+	# Six of the twelve carry one. Field Dressing, Aimed Volley, Charge and
+	# Cleave resolve and are done; Bola rides the EXISTING `slow` and `cripple`
+	# (two afflictions the game already has — authoring a third would be the
+	# Choking Smoke mistake), and Rally hands over a turn and is gone.
+	#
+	# `arrows` AND `camouflage` ARE BOTH BANKED-OR-TIMED IN THEIR POWER, on the
+	# Mirror Image precedent BQ set: the charge count and the evasion percentage
+	# live in the status, so the chip and the arithmetic read ONE number. Arcane
+	# Arrows is battle-long (-1 turns) because it waits until SPENT; Camouflage
+	# carries a clock because it is time it buys.
+	"arrows": ["Arcane Arrows", "AA", Color(0.72, 0.62, 0.95), "Quenched in raw magic: each attack\nalso strikes an additional random\nenemy for half damage. ONE CHARGE PER\nHIT — a three-shot volley spends\nthree. They wait until spent."],
+	"camouflage": ["Camouflage", "Cm", Color(0.55, 0.72, 0.50), "Gone to ground: enemies are far less\nlikely to aim here. It stacks with\nGhillie Suit rather than replacing it."],
+	"party_mark": ["Hunter's Mark", "HM", Color(0.85, 0.60, 0.30), "Called out: the WHOLE PARTY deals 15%\nmore damage to this enemy — every\nhero and every beast, not just the one\nwho marked it."],
+	"battle_trance": ["Battle Trance", "BT", Color(0.90, 0.55, 0.40), "Somewhere the pain cannot follow: at\nthe start of each turn, heals 3% of\nmaximum health PLUS HALF the damage\ntaken since the last one. It arrives\nAFTER the beating, never before."],
+	"warcry": ["Warcry", "Wc", Color(0.95, 0.60, 0.35), "The line is on the front foot:\n+20% damage dealt."],
+	"ironclad": ["Iron Will", "IW", Color(0.80, 0.80, 0.88), "Teeth set: cannot be Stunned, Frozen,\nDazed or Broken, and takes 15% less\ndamage. The Break meter still fills —\nto 99, and no further."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -311,6 +328,21 @@ const EYE_STORM_CUT_PCT := 8      # damage cut per enemy ACTUALLY taunted
 # literals two functions apart.
 const CONSECRATION_PCT := 0.05    # of the holder's OWN max health, each turn
 const VIGIL_SHARE := 0.5          # of the heal that forked, to the second ally
+# ---- BATCH BR: the Hunter and Warrior class-wide magnitudes, in ONE place ----
+# Each of these is read at a site the ability's own `special` never touches — an
+# enemy's target pick, the raw-damage block, a turn-start tick, the strike loop —
+# so a literal at the read site and a literal in the log would be two numbers
+# that eventually disagree. BP's Eye of the Storm lesson, applied up front: that
+# ability's mitigation was written three times in six lines and the chip's copy
+# silently won.
+const CAMOUFLAGE_PCT := 70        # less likely to be TARGETED, while it holds
+const PARTY_MARK_PCT := 15        # more damage from the WHOLE party, per hit
+const ARCANE_ARROW_CHARGES := 5   # banked, spent ONE PER HIT (§1)
+const ARCANE_ARROW_SPLASH := 0.5  # of the hit's damage, to a random other enemy
+const BATTLE_TRANCE_FLOOR := 0.03 # of maximum health, the tick's floor
+const BATTLE_TRANCE_SHARE := 0.5  # of the damage taken since his last turn
+const WARCRY_PCT := 20            # more damage dealt, party-wide
+const IRON_WILL_CUT_PCT := 15     # less damage taken while it holds
 # Batch W: this battle's dmg/heal/prevented per hero — banked into the
 # per-spec share pools at battle end (rotation needs "share of the battles
 # this spec was IN", which the stage totals can't give).
@@ -2327,6 +2359,13 @@ func _run_battle() -> void:
 			if rc_fed > 0:
 				_log("   → Talent: Rallying Cry — the banner refuels the line (+%d%%)" % \
 					u.rallying_cry, "#b0a8e0")
+		# BATCH BR — BATTLE TRANCE's tick. Its own function for the standing
+		# reason (`_run_battle` cannot be driven headlessly, so a rule buried in
+		# this loop could only ever be checked by a grep and its negative
+		# control could never fail) and called from HERE, at the start of his
+		# turn, because the whole ability is that the recovery is DELAYED — he
+		# has to survive the damage before he gets any of it back.
+		_battle_trance_tick(u)
 		# Endurance (Warden talent): armor stacks while unhealed by others,
 		# shown as a buff chip that tracks the current bonus.
 		if u.endurance_ranks > 0:
@@ -2798,7 +2837,16 @@ func _player_turn(u: BattleUnit) -> void:
 				# the first picks either side (see below) and the other three
 				# are ally-facing and fall through to the ALLY branch.
 				"magic_barrier", "mirror_image", "mana_well", "blink",
-				"consecration", "exhortation"]:
+				"consecration", "exhortation",
+				# BATCH BR. Five of the twelve have nothing to click:
+				# `field_dressing`, `camouflage`, `arcane_arrows`,
+				# `battle_trance` and `iron_will` are self, `warcry` is
+				# party-wide, which is the same thing to this list. `rally_ally`
+				# is NOT here — it is ally-facing and falls through to the ALLY
+				# branch below, where its pool excludes him for the reason
+				# Covering Guard's does.
+				"field_dressing", "camouflage", "arcane_arrows",
+				"battle_trance", "iron_will", "warcry"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -2844,6 +2892,14 @@ func _player_turn(u: BattleUnit) -> void:
 				# UI cannot offer the mistake and the bot cannot make it.
 				if ab.special == "covering_guard":
 					pool = pool.filter(func(a): return a != u)
+				# BATCH BR — RALLY IS FOR SOMEONE ELSE, AND THAT IS WHAT BOUNDS
+				# IT. Handing away a turn costs him his own, so a Warrior can
+				# never chain turns onto himself; excluding him here (and in the
+				# bot's pool, and in `_ability_usable`) is what makes "no hero
+				# gets unbounded consecutive turns" structural rather than a
+				# hope. Covering Guard's precedent, three sites, one rule.
+				if ab.special == "rally_ally":
+					pool = pool.filter(func(a): return a != u and not a.is_companion)
 			else:
 				pool = enemies.filter(func(e): return not e.dead)
 				# Upgraded Execute he cannot actually pay for: the button is
@@ -3021,6 +3077,20 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 				if cg_pool.is_empty():
 					continue
 				return [ab, _lowest_hp(cg_pool)]
+			# BATCH BR — RALLY IS FOR SOMEONE ELSE, the third of the three
+			# sites that say so. Hand it to whoever is FURTHEST from acting:
+			# a turn given to the hero who was about to act anyway buys
+			# nothing, which is the one way the bot could make this card look
+			# inert in a smoke test.
+			if ab.special == "rally_ally":
+				var rl_pool := allies.filter(func(h): return h != u)
+				if rl_pool.is_empty():
+					continue
+				var rl_pick: BattleUnit = rl_pool[0]
+				for rl_h in rl_pool:
+					if rl_h.next_time > rl_pick.next_time:
+						rl_pick = rl_h
+				return [ab, rl_pick]
 			if ab.special == "aegis_reversal":
 				for h in allies:
 					var st: Dictionary = h.get_status("barrier")
@@ -3992,6 +4062,15 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if ab.special == "covering_guard":
 		if not _hero_side().any(func(a): return a != u and not a.dead):
 			return false
+	# ---- BATCH BR: the Hunter and Warrior class-wide draft's one gate ----
+	# Rally HANDS A TURN TO SOMEBODY ELSE; standing alone there is nobody to
+	# hand it to, and a Rally on himself is the one shape that could chain
+	# turns. Refused at the button, narrowed in the player's picker and
+	# narrowed again in the bot's pool — three sites, one rule, so the
+	# affordance and the cast can never disagree.
+	if ab.special == "rally_ally":
+		if not heroes.any(func(a): return a != u and not a.dead):
+			return false
 	# Primal Surge needs a beast with Loyalty to spend.
 	if ab.special == "primal_surge":
 		if not _beasts(u).any(func(b): \
@@ -4959,11 +5038,21 @@ func _choose_enemy_action(u: BattleUnit) -> Dictionary:
 		# Ghillie Suit: the Survivalist fades into the brush while any
 		# other ally still stands. ADDITIVE — the counter is the percentage
 		# chance itself (Batch BA: 65).
-		if target != null and target.is_hero and not target.is_companion \
-				and target.ghillie > 0 and randf() < 0.01 * target.ghillie:
+		#
+		# BATCH BR — CAMOUFLAGE JOINS IT AT THIS ONE SITE rather than adding a
+		# second re-pick of its own. `_evade_chance` combines the two as
+		# INDEPENDENT chances, so a Survivalist holding both is harder to find
+		# than either alone and neither silently overwrites the other. ONE
+		# combined roll rather than one each: two sequential re-picks would let
+		# the second undo the first's choice.
+		var ev_chance := _evade_chance(target)
+		if target != null and ev_chance > 0.0 and randf() < ev_chance:
 			var gh_others: Array = living.filter(func(t): return t != target)
 			if not gh_others.is_empty():
+				var gh_was: BattleUnit = target
 				target = gh_others.pick_random()
+				logs.append(["   → %s is not where the blow was aimed (%s)" % [
+					gh_was.unit_name, _evade_source(gh_was)], "#8ab070"])
 	return {"ability": ab, "target": target, "support": false,
 		"message": message, "logs": logs}
 
@@ -5632,9 +5721,27 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					continue
 			# Multi-hit attacks roll miss/parry per strike: a blocked or missed
 			# hit never stops the follow-up strikes.
+			#
+			# BATCH BR §1 — MIRROR IMAGE SPENDS ONE IMAGE PER HIT HERE, AND THE
+			# GATE IS `multi_hits` ALONE. That is §1's rule (charges count HITS,
+			# not casts) applied retroactively to BQ's card, and the narrow gate
+			# is what keeps the card's own promise true: a multi-hit ability is
+			# repeated strikes on ONE target, i.e. single-target, while an area
+			# attack, a random scatter and a chosen pair are not and still spend
+			# nothing. Short-circuit order matches the single-target branch —
+			# the image is spent BEFORE the dice, so none is burnt on a blow
+			# that would have missed anyway.
+			#
+			# REPORTED: this changes NOTHING IN PLAY TODAY. No enemy in
+			# enemies.json carries a `multi_hits` or `random_hits` ability (they
+			# have `aoe` and single strikes only) and heroes do not attack the
+			# Mage, so the branch is unreachable — it is the rule made TRUE
+			# rather than a behaviour change, and the day an enemy gains a
+			# multi-hit blow it is already right.
 			if not is_counter and (ab.multi_hits > 0 or ab.random_hits > 0
 					or ab.choose_two or ab.choose_three):
-				if randf() < _miss_chance(attacker, strike_target):
+				if (ab.multi_hits > 0 and _mirror_dodge(attacker, strike_target)) \
+						or randf() < _miss_chance(attacker, strike_target):
 					_stat("attacks")
 					_stat("attack_miss")
 					_sfx("miss")
@@ -6376,6 +6483,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Battle Shout: fury fed by the enemy party's open wounds (at cast).
 			if attacker.has_status("battle_shout"):
 				raw *= 1.0 + attacker.status_power("battle_shout") / 100.0
+			# BATCH BR — WARCRY RIDES THE SAME READ, one line below the ability it
+			# is priced against. ONE implementation of "this unit deals N% more
+			# damage", read off the status's power, so the chip and the
+			# arithmetic cannot disagree — and so the class card and the spec
+			# card compose additively rather than one silently winning.
+			if attacker.has_status("warcry"):
+				raw *= 1.0 + attacker.status_power("warcry") / 100.0
 			# Blood Price: strength bought with his own blood.
 			if attacker.has_status("blood_price"):
 				raw *= 1.25
@@ -6470,6 +6584,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if strike_target.has_status("hunt_mark") \
 						and strike_target.status_power("hunt_mark") == heroes.find(attacker):
 					raw *= 1.25
+			# BATCH BR — HUNTER'S MARK. THE PARTY-WIDE ONE, and it sits OUTSIDE
+			# the `passive_id == "pack"` block above on purpose: the Beastmaster's
+			# `hunt_mark` stamps the marking hunter's index and pays HIM and his
+			# beast alone, and this mark carries no owner at all — EVERY hero and
+			# EVERY beast reads it, which is the entire distinction between the
+			# two cards.
+			#
+			# IT IS `_party_mark_mult` RATHER THAN A LITERAL BECAUSE A BEAST DOES
+			# NOT COME THROUGH HERE. `_companion_hit` is its own damage path and
+			# calls the same function — checked at the site rather than assumed
+			# from `comp.is_hero`, which is true of a companion and would have
+			# made "every beast reads it" look covered while it was not.
+			if attacker.is_hero:
+				raw *= _party_mark_mult(strike_target)
 			raw *= 1.0 + attacker.dmg_bonus + float(attacker.type_dmg_bonus.get(ab.dmg_type, 0.0))
 			# RUNAWAY RESONANCE, CLAUSE 2 (target side): the same compounding
 			# curve at half the step, and NOTHING SOFTENS IT — Arcane Ward is
@@ -6529,6 +6657,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if strike_target.is_hero:
 					_prev(String(strike_target.get_status("unburdened").get(
 						"src_name", "")), ub_was - raw)
+			# BATCH BR — IRON WILL's damage half. A flat 15% while it holds,
+			# booked to the prevented ledger like every other instrumented
+			# mitigation and credited to HIM, because it is his own card on
+			# himself. The status-refusal half lives in `_apply_status` and the
+			# Break half in `unit.take_hit`; three sites, one status, and each
+			# says where the other two are.
+			if strike_target.has_status("ironclad"):
+				var iw_was := raw
+				raw *= 1.0 - IRON_WILL_CUT_PCT / 100.0
+				if strike_target.is_hero:
+					_prev(strike_target, iw_was - raw)
 			# Stabilized: grounded resonance blunts incoming blows.
 			if strike_target.has_status("stabilized"):
 				var pv_was := raw
@@ -7620,6 +7759,22 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_dmg_frame(attacker, ab.display_name)
 						if attacker.dead:
 							break
+			# BATCH BR §1 — ARCANE ARROWS SPLASHES HERE, INSIDE THE HIT LOOP,
+			# AND THAT POSITION IS THE WHOLE RULE. Charges and the effects that
+			# ride them count HITS, not casts: a three-shot Aimed Volley spends
+			# three of five and splashes three times. Placed after the strike
+			# has resolved so a MISSED or BLOCKED hit spends no charge — an
+			# arrow that never landed cannot carry anything to a second body,
+			# and neither can one an absolute parry zeroed (`final > 0`).
+			#
+			# IT READS `final`, the damage THIS hit actually dealt, so the half
+			# is a real half of a real blow rather than a re-derivation of the
+			# ability's nominal damage — the two would drift apart the moment a
+			# crit, a resist or an armor read differed between them.
+			if attacker.is_hero and not is_counter and ab.damage > 0 \
+					and attacker.status_power("arrows") > 0 and final > 0 \
+					and not attacker.dead:
+				await _arcane_arrow_splash(attacker, strike_target, final)
 			if (ab.random_hits > 0 or ab.multi_hits > 0) and total_hits > 1:
 				await _wait(0.45)  # sequential strikes land distinctly
 		# ---- GLACIAL HOLD: the NAMED RELEASES (Batch AS §1/§2) ----
@@ -8411,6 +8566,26 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		_log("   → %s resists the %s (boss — Break them first)" % [target.unit_name,
 			String(STATUS_INFO[id][0])], "#909090")
 		return
+	# BATCH BR — IRON WILL refuses the three statuses that COST HIM A TURN,
+	# and nothing else. It sits beside the boss immunity because it is the
+	# same kind of rule (this unit does not take that status) and above
+	# Hallowed because it is narrower — three named ids, not every debuff.
+	#
+	# THE FOURTH THING IT REFUSES, BROKEN, IS NOT HERE AND MUST NOT BE ADDED:
+	# Broken is a Break-METER state written inside `unit.take_hit`, not a
+	# status anyone applies, and it is refused there BY A CAP AT 99 rather
+	# than by a refusal. Adding "broken" to this list would look like the
+	# same rule and would quietly replace a delay with a negation.
+	#
+	# `force` DOES NOT BYPASS IT. That argument is the boss carve-out bought
+	# by two perfects (Pommel Strike, Snare Trap) and it means "a boss is not
+	# immune here"; a hero who spent 20 Rage on three turns of not losing a
+	# turn is a different promise.
+	if target.has_status("ironclad") and id in ["stunned", "frozen", "dazed"]:
+		target.float_text("IRON WILL", Color(0.80, 0.80, 0.88))
+		_log("   → %s refuses the %s (Iron Will)" % [target.unit_name,
+			String(STATUS_INFO[id][0])], "#c0c0d0")
+		return
 	# Hallowed (Empowered Divine Plea): shrugs off every new debuff.
 	if target.has_status("sanctified") and BattleUnit.DEBUFF_IDS.has(id):
 		target.float_text("HALLOWED", Color(0.98, 0.88, 0.55))
@@ -8676,7 +8851,7 @@ func _stamp_mirror_chip(u: BattleUnit, n: int) -> void:
 		u.remove_status("mirror")
 		return
 	u.update_status("mirror", "MI%d" % n,
-		"Mirror Image: %d image%s standing.\nThe next %d single-target attack%s\nagainst him MISS. Area attacks never\nmiss, so they spend none — and the\nimages wait until they are spent." % [
+		"Mirror Image: %d image%s standing.\nThe next %d single-target HIT%s against\nhim MISS — a multi-hit blow spends one\nper strike. Area attacks never miss, so\nthey spend none, and the images wait\nuntil they are spent." % [
 			n, "" if n == 1 else "s", n, "" if n == 1 else "s"], n)
 
 
@@ -8688,6 +8863,133 @@ func _stamp_exhort_chip(u: BattleUnit, pct: int) -> void:
 		return
 	u.update_status("exhorted", "+%d%%" % pct,
 		"Exhortation: their NEXT attack deals\n%d%% more damage. BANKED, not timed —\nit waits for the swing however long\nthey take to take it." % pct, pct)
+
+
+# BATCH BR — ARCANE ARROWS' bank, on the same rule for the same reason: the
+# status's power IS the charge count, and this is the ONE place it is rendered.
+# §1's rule is stated in the chip, because a player meets the ability before
+# anyone explains that a three-shot volley spends three.
+func _stamp_arrows_chip(u: BattleUnit, n: int) -> void:
+	if n <= 0:
+		u.remove_status("arrows")
+		return
+	u.update_status("arrows", "AA%d" % n,
+		"Arcane Arrows: %d charge%s left.\nEach HIT — not each cast — also\nstrikes an additional random enemy\nfor half damage, so a three-shot\nvolley spends three. They wait until\nthey are spent." % [
+			n, "" if n == 1 else "s"], n)
+
+
+# BATCH BR — RALLY. THE ONE PLACE THE TURN IS HANDED OVER, and it is the
+# existing initiative machinery aimed the other way: `Ability.delay_push` and
+# Shattered Tempo both do `next_time += delay * 100 / effective_speed()` to push
+# a unit BACK, so pulling one FORWARD is the same write with the ally landing
+# ahead of everything on the clock. There is no second turn-order manipulator.
+#
+# IT PULLS TO JUST AHEAD OF THE EARLIEST UNIT ON THE FIELD rather than to the
+# caster's own `next_time`: the Warrior has already paid his delay by the time
+# this runs, so reading his clock would sometimes leave the ally BEHIND an enemy
+# that was already sooner — "acts next" has to mean next, not merely sooner.
+#
+# WHY IT CANNOT PRODUCE UNBOUNDED CONSECUTIVE TURNS: the ally spends the turn it
+# is given and re-enters the order normally, the Warrior spent HIS to give it,
+# the ability holds a 4-turn cooldown, and the target pool excludes the caster
+# at all three sites (the player's picker, the bot's pool, `_ability_usable`).
+# One turn moves; nothing repeats.
+func _rally_forward(caster: BattleUnit, ally: BattleUnit) -> void:
+	var soonest := ally.next_time
+	for u in heroes + enemies + companions:
+		if u.dead or u == ally:
+			continue
+		soonest = minf(soonest, u.next_time)
+	ally.next_time = soonest - 0.01
+	ally.float_text("RALLIED", Color(0.95, 0.60, 0.35))
+	_sfx("crit", -8.0, 1.2)
+	_message("%s shouts %s forward!" % [caster.unit_name, ally.unit_name])
+	_log("%s: Rally — %s acts NEXT, straight to the front of the order" % [
+		caster.unit_name, ally.unit_name], "#e8c860")
+
+
+# BATCH BR — HOW LIKELY AN ENEMY IS TO LOOK SOMEWHERE ELSE, AND IT IS ONE
+# ANSWER RATHER THAN TWO ROLLS. Camouflage (a 2-turn button, 70%) and Ghillie
+# Suit (a permanent Survivalist node, 65%) are the same kind of effect from two
+# sources, and §2 asked which way they would resolve: they STACK, combined as
+# INDEPENDENT chances — 1 - (1-0.65)(1-0.70) = 89.5% for a Survivalist holding
+# both — so neither silently overwrites the other and neither sums past 100%.
+#
+# ONE COMBINED ROLL, not one roll each, so the re-pick site keeps its shape: two
+# sequential re-picks would let the second undo the first's choice.
+func _evade_chance(u: BattleUnit) -> float:
+	if u == null or not u.is_hero or u.is_companion:
+		return 0.0
+	var miss_me := 1.0
+	if u.ghillie > 0:
+		miss_me *= 1.0 - 0.01 * u.ghillie
+	var camo := u.status_power("camouflage")
+	if camo > 0:
+		miss_me *= 1.0 - 0.01 * camo
+	return 1.0 - miss_me
+
+
+# BATCH BR §1 — ARCANE ARROWS' SPLASH, AND THE CHARGE IS SPENT HERE. ONE PLACE
+# decrements the bank and one place deals the extra blow, so "one charge per
+# hit" cannot become "one per cast" by an edit at either end.
+#
+# HALF OF WHAT THIS HIT ACTUALLY DEALT, passed in as `final` rather than
+# recomputed: the splash is a share of a blow that already resolved through
+# variance, the crit, the resists and the armor, so re-deriving it here would be
+# a second damage formula that drifts from the first.
+#
+# IT PICKS AN ADDITIONAL enemy — never the one just struck — and does nothing at
+# all when that enemy is the last one standing. The charge is NOT spent in that
+# case: a bank that drains itself against a single target would make the ability
+# worst exactly where a Hunter fights most.
+#
+# The victim takes it through `take_hit` with NO Break damage, so the arrow
+# cannot open a meter the shot itself never touched, and a kill routes through
+# `_on_enemy_death` like every other one.
+func _arcane_arrow_splash(attacker: BattleUnit, struck: BattleUnit,
+		final: int) -> void:
+	var left := attacker.status_power("arrows")
+	if left < 1 or final <= 0:
+		return
+	var pool: Array = enemies.filter(func(e): return not e.dead and e != struck)
+	if pool.is_empty():
+		return
+	var victim: BattleUnit = pool.pick_random()
+	left -= 1
+	_stamp_arrows_chip(attacker, left)
+	var splash := maxi(int(round(final * ARCANE_ARROW_SPLASH)), 1)
+	splash = maxi(int(round(splash * (1.0 - float(victim.resists.get("arcane", 0.0))))), 1)
+	var res: Dictionary = victim.take_hit(splash, 0)
+	victim.float_text("%d" % splash, Color(0.72, 0.62, 0.95))
+	_stat("dmg_hero_" + _contrib_name(attacker), splash)
+	_log("   → Arcane Arrows: the shot forks into %s for %d (%d charge%s left)" % [
+		victim.unit_name, splash, left, "" if left == 1 else "s"], "#a090e0")
+	if res.died:
+		_stat("enemy_deaths")
+		_sfx("death", -4.0)
+		_message("%s falls!" % victim.unit_name)
+		_log("† %s dies" % victim.unit_name, "#e05050")
+		_on_enemy_death(victim)
+	await _wait(0.2)
+
+
+# BATCH BR — HUNTER'S MARK's multiplier, and it is ONE function because the
+# hero strike loop and `_companion_hit` are two damage paths and the card
+# says "the WHOLE party". Returns 1.0 when nothing is marked, so both call
+# sites are unconditional and neither can forget the gate.
+func _party_mark_mult(victim: BattleUnit) -> float:
+	if victim == null or not victim.has_status("party_mark"):
+		return 1.0
+	return 1.0 + 0.01 * victim.status_power("party_mark")
+
+
+# Which of the two paid for that re-pick — for the log alone, so a player can
+# tell a drafted card from a talent they already owned.
+func _evade_source(u: BattleUnit) -> String:
+	var has_camo := u.status_power("camouflage") > 0
+	if has_camo and u.ghillie > 0:
+		return "Camouflage + Ghillie Suit"
+	return "Camouflage" if has_camo else "Ghillie Suit"
 
 
 # BATCH BQ — MIRROR IMAGE's spend, and it is a SINGLE-TARGET rule. True when an
@@ -11642,6 +11944,184 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Undying Vigil — every heal on %s also mends a second ally for half, %d turns%s" % [
 					attacker.unit_name, target.unit_name, uv_turns,
 					" [PERFECT]" if is_perfect else ""], "#70d878")
+		# ====== BATCH BR: THE HUNTER AND WARRIOR CLASS-WIDE TWELVE ======
+		# EIGHT OF THE TWELVE RESOLVE HERE. Aimed Volley, Charge and Cleave are
+		# ordinary attacks and need no case at all — which is again the shape of
+		# a class pool: half of it is tools, and the tools are what needs code.
+		"field_dressing":
+			# AXIS: the ONLY self-heal a Hunter can get. The cleanse rides
+			# `dispel_one_debuff` — the existing On the Mend door — rather than a
+			# second walk of the status list, so "one harmful effect" means
+			# exactly what it already means everywhere else in the game (Broken
+			# excluded; it is a meter state, not a dispellable status).
+			var fd_pct := 0.24 if is_perfect else 0.18
+			var fd_healed := attacker.heal_amount(
+				maxi(int(round(attacker.max_hp * fd_pct)), 1))
+			var fd_shed := attacker.dispel_one_debuff()
+			attacker.refresh_bars()
+			_stat_heal(attacker, fd_healed)
+			_sfx("heal", -9.0, 1.0)
+			attacker.float_text("+%d" % fd_healed, Color(0.4, 0.9, 0.45))
+			_message("%s binds the wound" % attacker.unit_name)
+			_log("%s: Field Dressing — heals %d (%d%% of maximum)%s%s" % [
+				attacker.unit_name, fd_healed, int(round(fd_pct * 100)),
+				(" and shakes off %s" % fd_shed) if fd_shed != "" \
+					else " (nothing to shake off)",
+				" [PERFECT]" if is_perfect else ""], "#70d878")
+		"camouflage":
+			# AXIS: buying TIME rather than soaking damage. The percentage lives
+			# in the status's POWER so the chip and `_evade_chance` read ONE
+			# number, and the clock is the point — this is the temporary half of
+			# a permanent talent, not a copy of it.
+			var cm_turns := 3 if is_perfect else 2
+			_apply_status(attacker, "camouflage", cm_turns, CAMOUFLAGE_PCT)
+			attacker.update_status("camouflage", "-%d%%" % CAMOUFLAGE_PCT,
+				String(STATUS_INFO["camouflage"][3]), CAMOUFLAGE_PCT)
+			_sfx("parry", -9.0, 0.8)
+			attacker.float_text("CAMOUFLAGE", Color(0.55, 0.72, 0.50))
+			_message("%s goes to ground" % attacker.unit_name)
+			_log("%s: Camouflage — enemies are %d%% less likely to aim at him for %d turns%s" % [
+				attacker.unit_name, CAMOUFLAGE_PCT, cm_turns,
+				" [PERFECT]" if is_perfect else ""], "#70d878")
+		"bola":
+			# AXIS: two afflictions on one card and NOTHING ELSE — no damage, no
+			# Break, no third status. Both ride the EXISTING appliers, so
+			# Trapper's breadth term, every cleanse and every chip already
+			# understand them.
+			if target != null and not target.dead:
+				var bl_turns := 4 if is_perfect else 3
+				_apply_status(target, "slow", bl_turns, 0, 0, attacker)
+				_apply_status(target, "cripple", bl_turns, 0, 0, attacker)
+				_sfx("hit", -6.0, 0.8)
+				target.float_text("BOLA", Color(0.75, 0.65, 0.30))
+				_message("%s tangles %s!" % [attacker.unit_name, target.unit_name])
+				_log("%s: Bola — %s is Slowed AND Crippled (%d turns)%s" % [
+					attacker.unit_name, target.unit_name, bl_turns,
+					" [PERFECT]" if is_perfect else ""], "#d8b880")
+		"hunters_mark":
+			# AXIS: focus fire made explicit — the only party-wide amplifier the
+			# class has. ONE MARK AT A TIME, cleared off the field first, so the
+			# card never becomes "mark everything".
+			#
+			# THE MARK IS ON THE ENEMY AND CARRIES NO OWNER, and that is the
+			# whole distinction from the Beastmaster's `hunt_mark` — that one
+			# stamps the hunter's index and pays HIM and his beast 25% plus
+			# Mana; this one pays EVERYONE 15% and nothing else. Anything on the
+			# hero side that strikes this enemy reads it.
+			if target != null and not target.dead:
+				for hm_e in enemies:
+					if hm_e != target and hm_e.has_status("party_mark"):
+						hm_e.remove_status("party_mark")
+				var hm_turns := 6 if is_perfect else 4
+				_apply_status(target, "party_mark", hm_turns, PARTY_MARK_PCT,
+					0, attacker)
+				_sfx("crit", -8.0, 1.15)
+				target.float_text("MARKED", Color(0.85, 0.60, 0.30))
+				_message("%s calls %s out!" % [attacker.unit_name, target.unit_name])
+				_log("%s: Hunter's Mark — the whole party deals %d%% more damage to %s (%d turns)%s" % [
+					attacker.unit_name, PARTY_MARK_PCT, target.unit_name,
+					hm_turns, " [PERFECT]" if is_perfect else ""], "#e0a050")
+		"arcane_arrows":
+			# AXIS: a charge BANK, which the class has never had. BATTLE-LONG
+			# (-1 turns) is what makes "banked, not timed" TRUE — the Mirror
+			# Image precedent, and the reason the count lives in the status's
+			# power rather than in a field of its own.
+			#
+			# RE-CASTING TAKES THE HIGHER COUNT rather than adding, exactly as
+			# Mirror Image does: five is what the card promises, and stacking
+			# two casts to ten would make the answer to "how do I hit harder" a
+			# second copy of the same button.
+			var aa_n: int = maxi(6 if is_perfect else ARCANE_ARROW_CHARGES,
+				attacker.status_power("arrows"))
+			_apply_status(attacker, "arrows", -1, aa_n)
+			_stamp_arrows_chip(attacker, aa_n)
+			_sfx("crit", -9.0, 1.25)
+			attacker.float_text("ARCANE ARROWS", Color(0.72, 0.62, 0.95))
+			_message("%s quenches his arrows in raw magic" % attacker.unit_name)
+			_log("%s: Arcane Arrows — %d charges banked; each HIT also strikes a second enemy for half damage%s" % [
+				attacker.unit_name, aa_n,
+				" [PERFECT]" if is_perfect else ""], "#70d878")
+		"battle_trance":
+			# AXIS: recovery that scales with the beating. THE ACCUMULATOR IS
+			# ZEROED AT THE CAST as well as at every tick, so the first tick pays
+			# for the damage taken since the trance began rather than for a wound
+			# he was already carrying — "since his last turn", read strictly.
+			var bt_turns := 4 if is_perfect else 3
+			attacker.trance_taken = 0
+			_apply_status(attacker, "battle_trance", bt_turns)
+			_sfx("heal", -9.0, 0.7)
+			attacker.float_text("BATTLE TRANCE", Color(0.90, 0.55, 0.40))
+			_message("%s goes somewhere the pain cannot follow" % attacker.unit_name)
+			_log("%s: Battle Trance — %d turns of 3%% of maximum health plus HALF the damage taken since his last turn%s" % [
+				attacker.unit_name, bt_turns,
+				" [PERFECT]" if is_perfect else ""], "#70d878")
+		"rally_ally":
+			# AXIS: giving away tempo — the ONLY ability in the game that hands
+			# an ally a turn, and the only tempo tool a class with none can have.
+			#
+			# IT REUSES THE EXISTING INITIATIVE MACHINERY. Shattered Tempo and
+			# `Ability.delay_push` both write `next_time` to move a unit along
+			# the timeline; this is that same hook aimed the other way, and
+			# `_rally_forward` is the ONE place the arithmetic lives. There is no
+			# second turn-order manipulator.
+			if target != null and not target.dead and target != attacker:
+				_rally_forward(attacker, target)
+				if is_perfect and target.resource_name != "":
+					var rl_gain := maxi(int(target.max_resource * 0.15), 1)
+					target.resource = mini(target.resource + rl_gain,
+						target.max_resource)
+					target.float_text("+%d %s" % [rl_gain, target.resource_name],
+						Color(0.95, 0.80, 0.35))
+					target.refresh_bars()
+					_log("   → a perfect shout: %s regains %d %s" % [
+						target.unit_name, rl_gain, target.resource_name],
+						"#e8c860")
+		"warcry":
+			# AXIS: the party buff the class lacks — nothing a Warrior does
+			# currently improves anyone else's numbers.
+			#
+			# IT RIDES BATTLE SHOUT'S OWN READ SITE (the raw-damage block reads
+			# `status_power`), so there is ONE implementation of "this unit deals
+			# N% more damage" and the two cannot drift.
+			#
+			# CORRECTED TOWARD THE CODE AND REPORTED: §3 says "20% Attack".
+			# `attack` is a raw stat read at dozens of sites — DoT snapshots,
+			# companion strikes, poison ticks — and a temporary mutation of it
+			# needs a revert path, which is the shape that produced this
+			# project's ~127,000 max-HP runaway (Batch W). +20% damage dealt is
+			# the same number where it is felt and it cannot leak past a battle.
+			var wc_turns := 4 if is_perfect else 3
+			var wc_n := 0
+			for wc_h in heroes:
+				if wc_h.dead:
+					continue
+				wc_n += 1
+				_apply_status(wc_h, "warcry", wc_turns, WARCRY_PCT)
+				wc_h.update_status("warcry", "+%d%%" % WARCRY_PCT,
+					String(STATUS_INFO["warcry"][3]), WARCRY_PCT)
+			_sfx("crit", -7.0, 0.8)
+			attacker.float_text("WARCRY", Color(0.95, 0.60, 0.35), true)
+			_message("%s puts the line on the front foot!" % attacker.unit_name)
+			_log("%s: Warcry — %d %s deal %d%% more damage for %d turns%s" % [
+				attacker.unit_name, wc_n, "hero" if wc_n == 1 else "heroes",
+				WARCRY_PCT, wc_turns,
+				" [PERFECT]" if is_perfect else ""], "#e8c860")
+		"iron_will":
+			# AXIS: refusing to be stopped. Every Warrior spine dies to losing a
+			# turn — a stunned Berserker is not bleeding anyone, a Broken Warden
+			# is not blocking.
+			#
+			# THE BREAK HALF IS A CAP, NOT AN IMMUNITY, and the clamp lives in
+			# `unit.take_hit` BELOW the meter write and ABOVE the threshold, so
+			# it leaves him at 99. Read that block before touching this one.
+			var iw_turns := 4 if is_perfect else 3
+			_apply_status(attacker, "ironclad", iw_turns)
+			_sfx("parry", -7.0, 0.7)
+			attacker.float_text("IRON WILL", Color(0.80, 0.80, 0.88))
+			_message("%s sets his teeth" % attacker.unit_name)
+			_log("%s: Iron Will — %d turns of no Stun, Freeze, Daze or Break, and %d%% less damage%s" % [
+				attacker.unit_name, iw_turns, IRON_WILL_CUT_PCT,
+				" [PERFECT]" if is_perfect else ""], "#70d878")
 		"venom_coat":
 			_apply_status(attacker, "venom_coat", 4)
 			_sfx("heal", -9.0, 0.7)
@@ -13013,6 +13493,10 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	if pm != null and victim.has_status("hunt_mark") \
 			and victim.status_power("hunt_mark") == heroes.find(pm):
 		raw *= 1.25
+	# BATCH BR — HUNTER'S MARK reaches the beast too, through the SAME
+	# function the strike loop calls. A second literal here is how the two
+	# paths would eventually disagree about what a mark is worth.
+	raw *= _party_mark_mult(victim)
 	# Necrosis: poisoned enemies take more from ALL sources — a beast's jaws
 	# included. ADDITIVE (Batch BA): the counter is percentage points.
 	if victim.has_status("poison"):
@@ -13276,6 +13760,44 @@ const DEADFALL_SPRING_PCT := 0.20  # of Attack, per spring (was 0.35, once)
 #
 # ORDER IS THE WHOLE RULE: a resting trap spends this turn resting and does NOT
 # spring, so `deadfall_dormant` is read before the charge is taken.
+# BATCH BR — BATTLE TRANCE TICKS HERE, AND NOWHERE ELSE. Called from the
+# turn-start block of `_run_battle` for the unit about to act — its own function
+# for the standing reason (`_run_battle` cannot be driven headlessly, so a rule
+# left inside its loop can only ever be checked by a grep and its negative
+# control could never fail: the `_ground_faith_tick` / `_perfected_toxin_tick` /
+# `_deadfall_tick` precedent).
+#
+# IT READS DAMAGE TAKEN, NOT MISSING HEALTH, AND THAT DISTINCTION IS THE
+# ABILITY. A Warrior who enters the fight full and gets hammered heals hard; one
+# who enters already low and is then ignored heals the 3% floor. A share of
+# CURRENT MISSING HEALTH is the alternative reading and it is a plain low-health
+# heal — a different and worse ability, and the one a later batch would write by
+# accident because it needs no accumulator.
+#
+# THE ACCUMULATOR IS CLEARED AT EVERY TICK, which is what makes "since his last
+# turn" true rather than "since the trance began": without the clear, turn three
+# would pay for turn one's damage a third time.
+#
+# THE 3% FLOOR PAYS EVEN WHEN HE TOOK NOTHING. That is not a rounding artefact —
+# it is what stops the card being dead in the fight where nobody hits him.
+func _battle_trance_tick(u: BattleUnit) -> void:
+	if u == null or u.dead or not u.has_status("battle_trance"):
+		return
+	var taken := u.trance_taken
+	u.trance_taken = 0
+	var floor_hp := maxi(int(round(u.max_hp * BATTLE_TRANCE_FLOOR)), 1)
+	var share := int(round(taken * BATTLE_TRANCE_SHARE))
+	var healed := u.heal_amount(floor_hp + share)
+	if healed <= 0:
+		return
+	u.refresh_bars()
+	_stat_heal(u, healed)
+	u.float_text("+%d" % healed, Color(0.90, 0.55, 0.40))
+	_log("   → Battle Trance: %s comes back %d — %d%% of maximum plus half of the %d he took since his last turn" % [
+		u.unit_name, healed, int(round(BATTLE_TRANCE_FLOOR * 100)), taken],
+		"#e09070")
+
+
 func _deadfall_tick(u: BattleUnit) -> void:
 	if u == null or u.is_hero or u.dead:
 		return

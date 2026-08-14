@@ -5,6 +5,310 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-14 &mdash; Batch BR: the Hunter and Warrior class pools</h2>
+<p><i>Twelve class-wide abilities, six per class, <b>closing the seam Batch BO opened and Batch
+BQ half-filled</b>. All four <code>CLASS_DRAFT_POOLS</code> are populated now, so every hero's
+one-in-four class card draws a real entry and no class rolls an empty pool. The draft goes from
+36 to 48 against a target of about 96 &mdash; <b>tranches 2 and 3 are still owed</b>, spec pools
+remain two deep, and an offer worn down by the no-return ledger will still fill short. Nothing
+else ships: no talent node, no magnitude, no existing ability changed, and no save version moves
+(still v10).</i></p>
+
+<h3>Two standing rules, set once</h3>
+<p><b>1. Charges and the effects that ride them count HITS, not casts.</b> A multi-hit ability
+spends one charge per hit and fires its on-hit effects per hit. Aimed Volley is three shots; under
+Arcane Arrows it spends <b>three</b> of five charges and forks <b>three</b> times. Magic Missiles
+and Called Volley behave the same way. This is a real power increase for multi-hit abilities and
+it is deliberate &mdash; it is what makes a multi-hit kit and a charge bank a <i>build</i> rather
+than a coincidence.</p>
+<p><b>Applied retroactively, and here is what actually changed.</b> The rule was audited across
+every charge bank in the game:</p>
+<ul>
+<li><b>Mirror Image</b> (Batch BQ) now spends one image <b>per hit</b> of a multi-hit attack.
+The gate is <code>multi_hits</code> alone, which is what keeps the card's own promise true: a
+multi-hit ability is repeated strikes on ONE target, i.e. single-target, while an area attack, a
+random scatter and a chosen pair are not and still spend nothing. <b>REPORTED: this changes
+nothing in play today.</b> No enemy in <code>enemies.json</code> carries a <code>multi_hits</code>
+or <code>random_hits</code> ability, and heroes do not attack the Mage &mdash; so it is the rule
+made TRUE ahead of its use rather than a behaviour change, and the day an enemy gains a multi-hit
+blow it is already right. Asserted, not assumed: test_batch_br greps the roster for both fields.</li>
+<li><b>Interpose's <code>shield_charges</code>, Waiting Guard's <code>banked_guards</code> and
+Feint's <code>feint_guards</code> ALREADY counted hits</b> &mdash; verified at their sites rather
+than assumed. The block branch and the parry roll both sit inside the strike loop, so a three-hit
+blow already spent three. No change; the suite pins the positions.</li>
+<li><b>ONE PLACE THE RULE WAS DELIBERATELY NOT APPLIED, and it is reported rather than buried:
+SPRAY OF ARROWS.</b> Batch AZ gates it <code>ab.multi_hits == 0 and ab.random_hits == 0</code> by
+design &mdash; <code>spray</code> is how many extra ENEMIES a single shot finds, and a multi-hit
+ability already finds its target three times. Firing it per hit would triple a shipped talent's
+magnitude, which is a balance change this batch's standing testing scope forbids measuring. The
+gate is pinned as a finding so a later batch has to read the reasoning first. The same shape
+applies to the Survivalist's post-loop on-hit package (Coated Blades, Venom Coating): it fires
+once per cast, and moving it inside the loop would both triple its output and change whether a
+MISSED or BLOCKED strike still applies it &mdash; a second, unasked change riding along.</li>
+</ul>
+<p><b>2. A name is swept against the whole roster &mdash; every ability, talent node, status and
+rune &mdash; before it is authored.</b> The Warrior recovery card was authored as <b>Second
+Wind</b>, which Holy already holds (tranche 1, Batch BO), and is <b>Battle Trance</b> here. That
+one was a true duplicate and had to be renamed: the resolver is keyed on <code>display_name</code>,
+so two abilities sharing one would make <code>pool_ability</code> answer the wrong question.</p>
+<p><b>TWO MORE COLLISIONS FOUND, BOTH REPORTED AND BOTH SHIPPED AS SPECIFIED</b> (the Batch BO
+Second Wind / Batch BP Precision Strike / Batch AV Shared Vigil precedent &mdash; a node's name is
+not an ability name, nothing resolves it, and renaming either is the designer's call and one
+string):</p>
+<ul>
+<li><b>RALLY</b> is also a Warden talent node (Banner row 2, +30% healing received for 2 turns),
+and there is a live <code>rally</code> status carrying that label. The ability needs no status of
+its own &mdash; it hands over a turn and is gone &mdash; so nothing can overwrite anything.</li>
+<li><b>IRON WILL</b> is also a Warden talent node (Threat row 3, &minus;4%/rank damage taken per
+debuff) AND a live status with that exact label. <b>This is the worst collision the project has
+had</b>: same class, same spec reachable, so a Warden holding the node can draft the card. Nothing
+breaks, and the ability's own status is <b><code>ironclad</code></b> with its own chip precisely so
+a Warden holding both never sees two chips reading the same word.</li>
+</ul>
+
+<h3>The twelve, with their axes</h3>
+<p><code>CLASS_DRAFT_POOLS</code> is 24 entries now (was 12); the defs live in
+<code>Classes.draft_ability</code> beside BO's, BP's and BQ's, resolved at the top of
+<code>pool_ability</code> as before. A drafted class ability lands in <code>bm_abilities</code>
+exactly as a spec one does, so battle spawn, the hero sheet, the rune filter and upgrade pairing
+pick it up with no new plumbing.</p>
+<p><b>HUNTER</b> &mdash; three spines that are all <i>conditional</i> (the Beastmaster needs a beast
+standing, the Sharpshooter needs to not have switched, the Survivalist needs statuses already on
+the board), in a class with <b>no healing whatsoever</b> and the thinnest defensive kit in the
+game:</p>
+<ul>
+<li><b>Field Dressing</b> (20 Mana, 2.0, 3cd, self) &mdash; heals 18% of maximum health and removes
+one harmful effect. <i>The only self-heal a Hunter can get.</i> The cleanse rides
+<code>dispel_one_debuff</code>, the existing On the Mend door, so "one harmful effect" means what
+it already means everywhere else.</li>
+<li><b>Camouflage</b> (20 Mana, 1.5, 4cd, self) &mdash; for 2 turns enemies are 70% less likely to
+target him. <i>Buying time rather than absorbing damage.</i></li>
+<li><b>Aimed Volley</b> (20 Mana, 2.5, 3cd, one enemy) &mdash; three shots at 12% of Attack each,
+8 Break damage a shot. <i>The reliable strike</i>, and being multi-hit is what makes it play with
+a charge bank.</li>
+<li><b>Bola</b> (15 Mana, 1.5, 3cd, one enemy) &mdash; Slowed and Crippled for 3 turns.
+<i>Two statuses on one card</i>, and nothing else at all.</li>
+<li><b>Hunter's Mark</b> (15 Mana, 1.5, 4cd, one enemy) &mdash; for 4 turns the whole party deals
+15% more damage to it. <i>Focus fire made explicit</i> &mdash; the only party-wide amplifier the
+class has.</li>
+<li><b>Arcane Arrows</b> (25 Mana, 2.0, 5cd, self) &mdash; 5 charges: each of his next five HITS
+also strikes an additional random enemy for half that hit's damage. <b>Banked, not timed</b>, on
+the Interpose / Mirror Image precedent.</li>
+</ul>
+<p><b>WARRIOR</b> &mdash; three spines that are all melee, all Rage-driven and all <i>reactive</i>
+(the Berserker needs to be hurt, the Swordmaster needs a stance and a Break window, the Warden
+needs to be attacked), none of which can make something happen on turn one:</p>
+<ul>
+<li><b>Battle Trance</b> (15 Rage, 1.5, 4cd, self) &mdash; for 3 turns, at the start of each of his
+turns he heals 3% of maximum health plus <b>half of all damage taken since his last turn</b>.
+<i>Recovery that scales with the beating.</i></li>
+<li><b>Rally</b> (15 Rage, 1.5, 4cd, one ally) &mdash; that ally acts NEXT, jumping to the front of
+the initiative order. <i>Giving away tempo</i> &mdash; the only ability in the game that hands an
+ally a turn.</li>
+<li><b>Charge</b> (20 Rage, <b>1.0</b>, 3cd, one enemy) &mdash; 25% of Attack, 10 Break damage, and
+the target is Dazed for 1 turn. <i>Reaching something now.</i></li>
+<li><b>Cleave</b> (25 Rage, 2.5, 3cd, three chosen enemies) &mdash; 15% of Attack and 15 Break
+damage each. <i>Breadth from a narrow class.</i></li>
+<li><b>Warcry</b> (20 Rage, 2.0, 5cd, party) &mdash; the whole party deals 20% more damage for 3
+turns. <i>The party buff the class lacks.</i></li>
+<li><b>Iron Will</b> (20 Rage, 1.5, 4cd, self) &mdash; for 3 turns he cannot be Stunned, Frozen,
+Dazed or Broken, and takes 15% less damage. <i>Refusing to be stopped.</i></li>
+</ul>
+
+<h3>Iron Will's Break half is a CAP, not an immunity &mdash; decided, not left open</h3>
+<p><b>While it holds, his Break meter fills to 99 and no further.</b> Pressure still accumulates
+and simply cannot cross, so the moment the trance ends he is sitting one hit from Broken. That
+makes it a <b>delay</b> rather than a negation, which is the better object: the enemy's three turns
+of Break work are not erased, they are deferred onto the turn he stops being immune.</p>
+<p><b>The clamp is in <code>unit.take_hit</code>, BELOW the meter write and ABOVE the threshold,
+and that position is the whole decision.</b> It is NOT implemented as "the meter cannot fill"
+(zeroing <code>pressure_add</code> up in the reducer block with Bulwark and Immovable) and NOT as
+"Broken is refused" (a guard on the <code>broken = true</code> line). Both read identically in a
+short test and <b>neither leaves him at 99 afterwards</b> &mdash; the first throws the pressure
+away, the second lets the meter sit at 100 and break on the very next point. test_batch_br
+asserts the <b>99</b>, not the absence of Broken.</p>
+<p><b>BROKEN IS DELIBERATELY NOT IN THE STATUS-REFUSAL LIST</b> in <code>_apply_status</code>,
+which names exactly three ids (<code>stunned</code>, <code>frozen</code>, <code>dazed</code>).
+Broken is a Break-METER state written inside <code>take_hit</code>, not a status anyone applies;
+adding it to that list would look like the same rule and would quietly replace the delay with a
+negation. And <code>force</code> does not bypass the refusal: that argument is the boss carve-out
+bought by two perfects, and a hero who spent 20 Rage on three turns of not losing a turn is a
+different promise.</p>
+
+<h3>Three findings, reported and not re-tuned</h3>
+<p><b>CAMOUFLAGE AND GHILLIE SUIT STACK, AND THE CARD IS CLOSE TO A DEAD DRAW FOR A SURVIVALIST
+WHO ALREADY HOLDS THE NODE.</b> §2 flagged the adjacency and asked which way it would resolve.
+They are combined as <b>independent chances</b> in one function, <code>_evade_chance</code> &mdash;
+1 &minus; (0.35 &times; 0.30) = <b>89.5%</b> for a hero holding both, against 65% for the node
+alone. Neither silently overwrites the other and neither is summed past 100%. <b>ONE combined roll
+rather than one each</b>, because two sequential re-picks would let the second undo the first's
+choice. Measured: the card adds <b>24.5 points</b> to a Ghillie build, against 70 to anyone else.
+Shipped as specified.</p>
+<p><b>WARCRY OUT-SIZES BATTLE SHOUT ON ITS HEADLINE NUMBER, which fails §4's "class abilities are
+weaker than spec abilities" in the direction that matters.</b> Warcry is +20% damage party-wide for
+3 turns; Battle Shout &mdash; a Berserker SPEC-pool ability &mdash; is 8% base for 2 turns, 12%/3 or
+18%/4 with its node. <b>The term that keeps the spec card's ceiling above the class card's is the
+one Warcry has no answer to</b>: Battle Shout adds 1% per 20 points of Bleed on the enemy party at
+cast time, so in the build it belongs to (a Bloodletting Berserker) it runs well past 20%. Shipped
+as specified per §4's instruction to confirm and REPORT; test_batch_br pins both numbers so a
+reprice has to read the reasoning first. The lever is one of Warcry's two numbers and it is the
+designer's.</p>
+<p><b>CLEAVE IS NEARLY WAR STOMP, AND IT IS THE LESSER OF THE TWO &mdash; which is the direction
+§4 requires, but the adjacency is worth naming.</b> Same 15% of Attack, same 15 Break damage, three
+targets each. War Stomp (a Warden spec-pool entry, also in <code>CLASS_POOLS["warrior"]</code>)
+costs 20 Rage against Cleave's 25 and refuels every ally on top. <b>The distinction is CHOSEN three
+against RANDOM three</b> &mdash; Cleave is <code>choose_three</code>, the stomp is
+<code>random_hits: 3</code> and can land twice on one body. That is a real difference and the
+acquisition channels differ too (the stomp is a boss/spec pick, Cleave is drafted at elites,
+merchants and events), but this is the closest two cards in the draft have come since Batch BD
+found Deadfall duplicating Snare Trap, and it is recorded rather than discovered later.</p>
+
+<h3>Two decisions the brief did not make, and one correction toward the code</h3>
+<p><b>AIMED VOLLEY'S 25 BREAK DAMAGE IS A TOTAL, AND IT SHIPS AS 8 A SHOT &mdash; 24 across the
+volley.</b> §4 names "Aimed Volley (25)" without the word "each" while naming "Cleave (15 each)"
+with it, so 25 is the card's figure rather than the shot's. <code>pressure</code> is applied PER
+HIT by the engine and 25 does not divide by three, so 8 a shot is the nearest integer split; it
+also lands level with Triple Shot's 8 a shot and 24 across three, which is the sibling the
+comparison was made against. Reading it as 25 per shot would have given a class card 75 Break
+against a Sharpshooter spec card's 24. <b>The one-point deviation is stated rather than rounded
+away silently.</b></p>
+<p><b>CHARGE CARRIES 10 BREAK DAMAGE, DELIBERATELY BELOW THE FREE STRIKE'S 18.</b> BQ's general
+rule &mdash; the floor for a class ability is the FREE BASIC, not the spec kit &mdash; applied the
+other way round: Charge costs 20 Rage for 25% of Attack against Strike's free 23%, so what it buys
+is the <b>1.0 initiative</b> (the fastest arrival in the kit, and a Warrior's only answer to a
+caster winding up) and the Daze. It must not also win on Break. <b>None of the six Warrior cards
+carries <code>resource_gain</code></b> either, which is the cleanest statement of "weaker than spec
+work" a Rage class can be given: every Warrior spec ability builds 10-15 Rage while it spends, and
+these spend without building.</p>
+<p><b>WARCRY IS IMPLEMENTED AS +20% DAMAGE DEALT RATHER THAN +20% ATTACK, corrected toward the code
+and reported.</b> §3 says "gains 20% Attack". <code>attack</code> is a raw stat read at dozens of
+sites &mdash; DoT snapshots, companion strikes, poison ticks &mdash; and a temporary mutation of it
+needs a revert path, which is the exact shape that produced this project's ~127,000 max-HP runaway
+(Batch W) and the reason the victory sync carries three separate fields. It rides <b>Battle Shout's
+own read site</b>, so there is one implementation of "this unit deals N% more damage", the two
+compose additively rather than one winning, and the number is identical where it is felt.</p>
+
+<h3>Machinery: what was reused, and the two new fields</h3>
+<ul>
+<li><b>RALLY REUSES THE EXISTING INITIATIVE HOOK.</b> <code>Ability.delay_push</code> and the
+Cryomancer's Shattered Tempo both write <code>next_time</code> to push a unit along the timeline;
+<code>_rally_forward</code> is that same write aimed the other way, pulling the ally to just ahead
+of the earliest unit on the field. <b>There is no second turn-order manipulator.</b> It pulls to the
+FIELD minimum rather than to the caster's own clock, because the Warrior has already paid his delay
+by then and reading his clock would sometimes leave the ally behind an enemy that was already
+sooner &mdash; "acts next" has to mean next.</li>
+<li><b>IT CANNOT PRODUCE UNBOUNDED CONSECUTIVE TURNS, and that is structural rather than hoped
+for.</b> The ally spends the turn it is given and re-enters the order normally, the Warrior spent
+HIS to give it, the ability holds a 4-turn cooldown, and <b>the caster is excluded from the target
+pool at three sites</b> &mdash; the player's picker, the bot's pool, and <code>_ability_usable</code>
+(which refuses the cast outright when he is the last one standing). The special's own guard reads
+<code>target != attacker</code> as the belt to those braces.</li>
+<li><b>BATTLE TRANCE READS DAMAGE TAKEN, NOT MISSING HEALTH</b>, and that distinction IS the
+ability. <code>BattleUnit.trance_taken</code> is a dedicated accumulator written by
+<code>_report_taken</code> &mdash; the ONE door Batch BL built, so it books health actually removed,
+below every death refusal, and a future damage source cannot forget to report to it. It is
+<b>cleared at every tick</b> (and at the cast), which is what makes "since his last turn" true
+rather than "since the trance began". It is deliberately NOT a read of BL's
+<code>dmg_by_turn</code>: that is a fixed two-turn window keyed on the GLOBAL turn index, and this
+is the span between one hero's turns, which is however long the timeline makes it.
+<code>_battle_trance_tick</code> is its own function for the standing reason &mdash;
+<code>_run_battle</code> cannot be driven headlessly, so a rule left in its loop can only be checked
+by a grep and its negative control can never fail.</li>
+<li><b>HUNTER'S MARK IS ONE MULTIPLIER WITH TWO CALLERS.</b> <code>_party_mark_mult</code> is read
+by the strike loop AND by <code>_companion_hit</code>, because a beast is a separate damage path
+and the card says "the WHOLE party". <b>Checked at the site rather than assumed from
+<code>comp.is_hero</code></b>, which is true of a companion and would have made "every beast reads
+it" look covered while it was not. The mark carries <b>no owner index</b>, which is the entire
+distinction from the Beastmaster's <code>hunt_mark</code> (that one stamps the hunter's index and
+pays him and his beast 25% plus Mana).</li>
+<li><b>ARCANE ARROWS SPENDS ITS CHARGE AND DEALS ITS BLOW IN ONE FUNCTION</b>,
+<code>_arcane_arrow_splash</code>, called from INSIDE the hit loop after the strike has resolved
+&mdash; so a MISSED or BLOCKED hit spends nothing, and an absolute parry that zeroed the damage
+spends nothing either. It reads <code>final</code>, the damage THIS hit actually dealt, rather than
+re-deriving it from the ability's nominal damage: the two would drift the moment a crit, a resist
+or an armor read differed. <b>It does nothing and spends nothing when the struck enemy is the last
+one standing</b> &mdash; a bank that drained itself against a single target would make the ability
+worst exactly where a Hunter fights most.</li>
+<li><b>NO NEW UNIT FIELDS FOR TEN OF THE TWELVE.</b> Everything with a duration is a status
+(<code>camouflage</code>, <code>party_mark</code>, <code>battle_trance</code>, <code>warcry</code>,
+<code>ironclad</code>), Arcane Arrows' charges live in their status's power BATTLE-LONG on the
+Mirror Image precedent, and Bola rides the EXISTING <code>slow</code> and <code>cripple</code>
+(authoring a third affliction would be the Choking Smoke mistake). <b>ONE new field:</b>
+<code>trance_taken</code>.</li>
+</ul>
+
+<h3>Verified</h3>
+<p><b>Per the designer's standing instruction, that means the code landed and works. NO SWEEPS, NO
+BANDS, NO BALANCE MEASUREMENT WAS RUN, and none should be quoted from this batch.</b></p>
+<p>check_parse 0 &middot; check_flow 0 &middot; check_map_screen OK &middot; run-harness gates
+1/2/3 PASS &middot; <b>NEW test_batch_br.gd 1400/0</b>.</p>
+<p><b>All six clauses §6 named as able to silently do nothing or do the wrong thing are driven live
+and asserted against the state they change, never against a cast returning &mdash; and six are
+built so a broken implementation still FAILS:</b> the volley's charge spend is an EXACT identity
+(5 &rarr; 2) with a single-strike ability asserted to spend exactly one in the same check, which is
+what tells "three per volley" from "three per cast"; the charges are TICKED six times by hand
+before the count is re-read; Battle Trance is measured where the two readings differ by
+construction (140 missing health against 20 taken, so the right answer is 16 and the missing-health
+reading would be 76); Rally is asserted to make the ally the unit <code>_next_unit</code> actually
+returns rather than merely to have written a smaller number; Camouflage's combined chance is
+asserted HIGHER than either alone and LOWER than their sum, which only independent combination
+gives; and Iron Will's meter is asserted at EXACTLY 99, which both wrong implementations fail.</p>
+<p><b>ELEVEN NEGATIVE CONTROLS, each applied to product code and reverted</b> (battle.gd, unit.gd
+and classes.gd each came back byte-identical by hash, and the suite to 1414/0 after the last): Iron
+Will as "the meter cannot fill" <b>trips 5</b>; Iron Will as "Broken is refused" <b>trips 3</b>;
+Arcane Arrows spending one charge per CAST <b>trips 3</b>; Arcane Arrows put on a clock <b>trips
+5</b>; Battle Trance reading MISSING HEALTH <b>trips 2</b>; Battle Trance's accumulator never cleared
+<b>trips 2</b>; Camouflage OVERWRITING Ghillie Suit <b>trips 2</b>; Hunter's Mark paying only the
+hero who marked <b>trips 2</b>; Mirror Image back to one image per CAST <b>trips 2</b>; a class
+ability leaking into <code>CLASS_POOLS</code> <b>trips 2</b>; Rally's ally pool no longer excluding
+the caster <b>trips 1</b>.</p>
+<p><b>FULL BATTERY GREEN</b>: ah 5500, ah_battle 65, ai 2217, aj 418, ak 528, al 560, ar 914, as 396,
+at 470, au 336, av 324, aw 350, ax 338, ay 484, az 519, <b>ba 690</b>, bb 172, bc 91, bd 69, be 34,
+bf 78, bg 47, bh 233, bi 88, bj 67, bl 88, bm 1890, bn 77, <b>bo 505</b>, <b>bp 268</b>,
+<b>bq 738</b>, <b>br 1414</b>, runes 2973, rune_battle 96 &mdash; all 0 failures. <b>an reads 3624
+and bk 130, both inside their DOCUMENTED run-to-run drift.</b> The three raised counts are POOL
+LOOPS WALKING MORE ENTRIES rather than new assertions (each suite iterates the live pools, and
+twelve arrived; bq's jump is the largest because its "no class card is also in a spec pool" check
+is 12 names &times; 12 specs).</p>
+<p><b>FIVE SUITES RE-POINTED IN PLACE with the reason in each file, and FOUR OF THE RE-POINTS ARE
+INVERSIONS</b> &mdash; the honest treatment when a batch pays a debt an older suite was recording.
+test_batch_bo's, test_batch_bp's and test_batch_bq's "the Hunter and Warrior class pools are still
+EMPTY and still owed" became "all four are FILLED at six"; bo's and bq's "a Hunter's offer fills
+SHORT at two" became "it fills THREE", <b>with the fill-short rule kept by wearing a pool down with
+the no-return ledger instead</b> &mdash; that rule was never about which pool is thin, it is about
+an offer never padding with repeats. The setups are byte-identical, because they are still what
+tells the two answers apart. <b>test_batch_ba's Ghillie Suit grep was re-pointed and it was a REAL
+CATCH</b> (the Batch AZ Follow-Through precedent exactly): it looks for the literal
+<code>0.01 * target.ghillie</code> to prove the node reads its own counter as the chance, and
+extracting the roll into <code>_evade_chance</code> deleted that exact text. The question is
+unchanged; the fragment is <code>0.01 * u.ghillie</code> now.</p>
+<p><b>TWO PRE-EXISTING FLAKES IN test_batch_bq FOUND AND CLOSED BY FORCED DETERMINISM, not
+retried</b> (the AK/AL/AR discipline): its Unburden mitigation check and its Exhortation damage check
+each compare ONE blow against ONE blow with the crit roll live, and a 20% cut or a 25% buff cannot
+survive the other side landing a &times;1.5 crit &mdash; each failed about one run in five against
+working code. Variance alone could never flip either (the ratio would have to exceed 1.25 and
+<code>randf_range</code> tops out at 1.1/0.9), which is what identifies the crit as the cause.
+<b>KNOWN-BAD AND UNCHANGED</b>: test_batch_ah and test_batch_an still call
+<code>Run.award_talent_points</code>, which Batch BM deleted, and both still print 0 failures while
+aborting their own sections; test_runes still prints its stale <code>start_rune_enabled</code>
+error; and test_batch_al's standing Spite flake reproduced once and passed on a clean re-run.</p>
+<p><b>THE DESIGNER HAD NO RUN IN FLIGHT and none was created</b> &mdash; no
+<code>run_save.bin</code> exists; relics.json and trees.json are byte-identical by hash after the
+battery and after a <code>--run 6</code> walked ONLY to exercise RunSim's draft path
+(<b>9.00 offers/run, 27.00 cards shown, taken 9.00</b> &mdash; three cards an offer, never short,
+which is the seam closing measured end to end). <b>Its Matrix row is NOT a difficulty reading and
+none is quoted.</b></p>
+<p><b>Live autoplay clean across real battles, 0 SCRIPT ERROR, ALL TWELVE FIRING IN ORDINARY
+FIGHTS</b> &mdash; "Battle Trance: Berserker comes back 16 &mdash; 3% of maximum plus half of the
+22 he took since his last turn" (the number that tells a live read apart from a low-health heal),
+"Berserker: Rally &mdash; Devout acts NEXT, straight to the front of the order", "Warcry &mdash; 4
+heroes deal 20% more damage for 3 turns", "Field Dressing &mdash; heals 32 (24% of maximum) and
+shakes off Poison", and the §1 rule visible in three consecutive lines: "Aimed Volley &hellip; the
+shot forks into Orc Chief (5 charges left)" &hellip; "(4 charges left)" &hellip; "(3 charges
+left)", with a MISSED shot spending none. <b>NOTE the smoke's own artefact:
+<code>DOD_SIM_ABILITIES</code> applies its list to EVERY hero, so a Cryomancer casts Charge in the
+log &mdash; the real draft only ever offers class-matching cards.</b></p>
+
 <h2>2026-08-13 &mdash; Batch BQ: the Mage and Cleric class pools</h2>
 <p><i>Twelve class-wide abilities, six per class, filling <b>half</b> the seam Batch BO opened.
 One draft card in four is class-wide, and until now that seam rolled into an empty pool for

@@ -150,21 +150,28 @@ func _pools() -> void:
 	var total := 0
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		total += Classes.CLASS_DRAFT_POOLS[cls].size()
-	ok(total == 12,
-		"§3/§4: twelve class-wide abilities ship (read off the live dict: %d)" % total)
+	# RE-POINTED IN PLACE BY BATCH BR, AND IT IS AN INVERSION: BQ shipped twelve
+	# of a target twenty-four and this counted them. BR shipped the other twelve
+	# — the HUNTER and WARRIOR six apiece — so the pool is FULL, and what a
+	# later batch could break is no longer "did the remaining twelve arrive" but
+	# "did any of the twenty-four quietly leave". BQ's own twelve are still
+	# asserted by name below, so this batch's content is not measured by BR's.
+	ok(total == 24,
+		"§3/§4+BR: twenty-four class-wide abilities ship (read off the live dict: %d)" % total)
 	for cls in TRANCHE_3:
 		var live: Array = Classes.class_draft_pool(cls)
 		ok(live.size() == 6, "§3/§4: the %s class pool holds six (%d)" % [cls, live.size()])
 		for nm in TRANCHE_3[cls]:
 			ok(live.has(nm), "§3/§4: %s is in the %s class pool" % [nm, cls])
-	# THE DEBT, STATED AS AN ASSERTION rather than as prose. It must stay
-	# visible until it is paid: a Hunter or Warrior offer still loses its class
-	# card, and a later batch reading "twelve shipped" should not have to guess
-	# which twelve.
-	ok(Classes.class_draft_pool("hunter").is_empty(),
-		"§0: the HUNTER class pool is still owed and still says so")
-	ok(Classes.class_draft_pool("warrior").is_empty(),
-		"§0: the WARRIOR class pool is still owed and still says so")
+	# THE DEBT WAS STATED AS AN ASSERTION rather than as prose, so that it stayed
+	# visible until it was paid. BATCH BR PAID IT, and the check INVERTS rather
+	# than being deleted — "the Hunter and Warrior pools emptied again" is the
+	# thing a later batch could actually break, and BQ's twelve are still pinned
+	# by name above, so nothing this suite was written to protect is lost.
+	ok(Classes.class_draft_pool("hunter").size() == 6,
+		"§0+BR: the HUNTER class pool is PAID at six")
+	ok(Classes.class_draft_pool("warrior").size() == 6,
+		"§0+BR: the WARRIOR class pool is PAID at six")
 	# EVERY ENTRY RESOLVES THROUGH THE ONE RESOLVER, which is what makes the
 	# battle spawn, the hero sheet, the rune filter and the blacksmith pairing
 	# all pick them up with no new plumbing.
@@ -337,8 +344,11 @@ func _draft_flow() -> void:
 	ok(cleric_left["class"].size() == 6,
 		"§1: an Occultist's class side holds six (%d)" % cleric_left["class"].size())
 	var hunter_left: Dictionary = run.draft_pool_left(hunter)
-	ok(hunter_left["class"].is_empty(),
-		"§0: a Sharpshooter's class side is still EMPTY — the debt, visible in the roll")
+	# INVERTED BY BATCH BR, same reason as the pool check above: this recorded
+	# the debt in the ROLL rather than in the array, and the debt is paid.
+	ok(hunter_left["class"].size() == 6,
+		"§0+BR: a Sharpshooter's class side holds six now — the debt, paid (%d)" % \
+			hunter_left["class"].size())
 	# The no-return ledger covers a class card exactly as it covers a spec one.
 	mage["draft_refused"] = ["Magic Barrier"]
 	var refused_left: Dictionary = run.draft_pool_left(mage)
@@ -359,13 +369,23 @@ func _draft_flow() -> void:
 				saw_spec = true
 	ok(saw_class, "§1: ...and real class cards appear in it")
 	ok(saw_spec, "§1: ...beside real spec cards")
-	# A HUNTER STILL FILLS SHORT, and that is the shape of the remaining debt.
+	# A HUNTER FILLED SHORT AT BQ, and that was the shape of the remaining debt.
+	# INVERTED BY BATCH BR — his offer fills three now, from both sides — and
+	# the FILL-SHORT rule itself is kept by wearing his pool down with the
+	# no-return ledger instead, because that rule was never about which pool is
+	# thin: it is about an offer never padding with repeats.
 	var hunter_offer: Array = run.roll_draft_offer(hunter)
-	ok(hunter_offer.size() == 2,
-		"§0: a Sharpshooter's offer still fills SHORT at two (%d)" % hunter_offer.size())
+	ok(hunter_offer.size() == 3,
+		"§0+BR: a Sharpshooter's offer fills THREE now (%d)" % hunter_offer.size())
 	for nm2 in hunter_offer:
-		ok(Classes.spec_draft_pool("sharpshooter").has(nm2),
-			"§0: ...and every card in it is spec-side")
+		ok(Classes.spec_draft_pool("sharpshooter").has(nm2)
+			or Classes.class_draft_pool("hunter").has(nm2),
+			"§0+BR: ...from his own spec or his class (%s)" % nm2)
+	hunter["draft_refused"] = Classes.class_draft_pool("hunter").duplicate()
+	var worn: Array = run.roll_draft_offer(hunter)
+	ok(worn.size() == 2,
+		"§1: a pool worn down to two still fills SHORT rather than padding (%d)" % worn.size())
+	hunter["draft_refused"] = []
 
 
 func _seam() -> void:
@@ -761,6 +781,15 @@ func _live_chastise_and_unburden() -> void:
 	ally.max_hp = 100000
 	ally.hp = 100000
 	foe.no_cover = 1
+	# FLAKE CLOSED BY BATCH BR — FORCED DETERMINISM, NOT A RETRY (the AK/AL/AR
+	# discipline). This compares ONE blow against ONE blow, and the crit roll was
+	# left live: a 20% cut cannot survive the other side landing a x1.5 crit, so
+	# the check failed about one run in five against working code. Variance alone
+	# never could flip it (the ratio would have to exceed 1.25 and randf_range
+	# tops out at 1.1/0.9), which is what identifies the crit as the cause.
+	# Reproduced on this batch's HEAD before it was touched; nothing in BR is on
+	# Unburden's path.
+	foe.crit_bonus = -1.0
 	var strike: Ability = foe.abilities[0]
 	await scene.call("_resolve", foe, strike, ally, "good")
 	var bare := 100000 - ally.hp
@@ -821,6 +850,11 @@ func _live_exhortation() -> void:
 	foe.parry_chance = 0.0
 	foe.block_chance = 0.0
 	slow.no_cover = 1
+	# FLAKE CLOSED BY BATCH BR — the same fault as the Unburden check above and
+	# the same fix. This compares ONE blow against ONE blow with the crit roll
+	# live, and a 25% buff cannot survive the PLAIN blow landing a x1.5 crit, so
+	# it failed about one run in five against working code. FORCED, not retried.
+	slow.crit_bonus = -1.0
 	slow.resource = slow.max_resource
 	var basic: Ability = slow.abilities[0]
 	await scene.call("_resolve", slow, basic, foe, "good")
@@ -924,13 +958,19 @@ func _live_undying_vigil() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	ok(master.contains("Batch BQ"), "§5: master.html is stamped Batch BQ")
+	# THE STAMP GATE, SEVENTH COPY (see test_batch_bp's note). It reads the
+	# CURRENT batch, not BQ's, and all seven move together.
+	ok(master.contains("Batch BR"), "§5: master.html is stamped for the current batch")
 	for cls in TRANCHE_3:
 		for nm in TRANCHE_3[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)
-	ok(master.to_lower().contains("half-filled") \
-			or master.to_lower().contains("half filled"),
-		"§5: master.html says the class seam is HALF filled")
+	# INVERTED BY BATCH BR: BQ's own doc line recorded the seam as HALF filled,
+	# which was true and had to be visible. BR filled the other half, so what a
+	# later batch could break is no longer "did the doc admit the gap" but "did
+	# the doc keep claiming a gap that is closed".
+	ok(not master.to_lower().contains("half-filled") \
+			and not master.to_lower().contains("half filled"),
+		"§5+BR: master.html no longer records the class seam as HALF filled")
 	var changelog := _src("res://docs/changelog.html")
 	ok(changelog.find("Batch BQ") >= 0, "§5: the changelog has a Batch BQ entry")
 	# SLICE ON THE HEADING, NOT ON THE PHRASE — the BE lesson, and it is a real

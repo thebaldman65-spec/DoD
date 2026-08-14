@@ -3072,3 +3072,47 @@ correct, obvious, and would have stripped the party's own marks — Covenant of 
 the snare line, a Feint — because a *mark is deliberately not a debuff*. The rule that reads
 cleanly at one site is wrong because of a decision made at a completely different one, and the
 only defence is writing the exclusions down with their reasons attached.
+
+## Batch BR — the Hunter and Warrior class pools
+
+**The seam is closed, and the debt that remains is a different debt.** Batch BO opened a
+one-in-four class card that rolled into an empty pool for every hero in the game; BQ filled half
+of it; this fills the rest. What is left owed is not the seam but the *depth* — spec pools are
+still two deep — and that distinction is worth keeping visible, because "the draft is finished"
+and "the draft works for everybody" are different sentences and only the second one is now true.
+
+**Iron Will's Break half had three plausible implementations and only one of them is the
+ability.** "The meter cannot fill", "Broken is refused" and "the meter caps at 99" all read
+identically in a short test: he does not break. They are three different cards. The first throws
+the pressure away, so the enemy's work is erased; the second lets the meter sit full, so he breaks
+on the very next point and the trance bought a turn rather than a window; only the third leaves
+him at 99 — pressure counted, refused, and *deferred onto the turn he stops being immune*. That is
+what makes it a delay rather than a negation, and it is the more interesting object: the cost
+arrives, it just arrives later, and the player can see it coming.
+
+**A card that reads damage taken is a different card from one that reads missing health, and the
+second one is what you write by accident.** Battle Trance needs an accumulator; a share of current
+missing health needs nothing at all. The lazy version is a plain low-health heal that pays most to
+whoever is already losing; the real one pays most to whoever is being hammered *right now*, which
+is a Warrior who committed rather than a Warrior who is dying. The accumulator is the whole design
+and it costs one field.
+
+**Hits, not casts, is a rule about what makes a build.** A charge bank that spends one per cast is
+a flat bonus. A charge bank that spends one per hit means a multi-hit kit and a charge bank are
+worth seeking out *together*, and that is the difference between a card and a combination. It is
+also the kind of rule that has to be set once and applied everywhere, because the answer would
+otherwise be decided by whichever loop each effect happened to be written inside.
+
+**Two of the twelve collide with talent node names and both ship anyway.** A node's name is not an
+ability name and nothing resolves it, so the collision is a label problem rather than a break —
+but Iron Will collides with a live status label as well, in the same class, on a spec that can hold
+both. The answer was to give the ability its own status id so nothing can overwrite anything, and
+then to say so loudly rather than quietly picking a different word. Renaming is one string and it
+is the designer's call; discovering the collision a year later is not.
+
+**Warcry is bigger than the spec card it sits beside, and the term that saves it is the one nobody
+would think to check.** On its headline number a class card beats a Berserker spec card, which is
+exactly what the "weaker than spec" rule exists to prevent. What keeps the ceiling right is Battle
+Shout's bleed scaling — a term Warcry has no version of — so in the build the spec card belongs to
+it runs well past the class card. The lesson is BQ's own, arriving from the other side: compare
+against what the ability actually does in its own build, not against the number on its card.

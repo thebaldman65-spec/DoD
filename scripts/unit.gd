@@ -916,6 +916,15 @@ var free_ability := 0
 # 90-round stalemate cannot grow it.
 var dmg_by_turn := {}
 var battle_turn := 0        # stamped by battle.gd each turn; the key above
+# BATCH BR — BATTLE TRANCE (Warrior). Damage taken SINCE HIS LAST TURN, and it
+# is its own accumulator rather than a read of `dmg_by_turn` above because the
+# two ask different questions: that one is a fixed two-turn window keyed on the
+# GLOBAL turn index, this one is the span between one hero's turns, which is
+# however long the timeline makes it. Written by `_report_taken` (the one door,
+# so it books what was ACTUALLY removed, below every death refusal) and CLEARED
+# BY BATTLE.GD AT EACH TICK OF THE TRANCE — a share of MISSING HEALTH is the
+# alternative reading and it is a different, worse ability.
+var trance_taken := 0
 # VOW OF SUFFERING (Devout) — fired from take_hit with (victim, share) when
 # the vow redirects half a wound. battle.gd bills the Devout and kindles the
 # ally's Faith; unit.gd only decides the split.
@@ -2449,6 +2458,23 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	if not broken:
 		applied_bd = pressure_add
 		pressure += pressure_add
+		# BATCH BR — IRON WILL IS A CAP, NOT AN IMMUNITY, AND THIS LINE IS THE
+		# WHOLE DECISION. The meter fills to `stability - 1` — 99 — and stops.
+		# Pressure still ACCUMULATES; it simply cannot cross, so the moment the
+		# status lapses he is sitting one hit from Broken and the enemy's three
+		# turns of Break work are DEFERRED rather than erased.
+		#
+		# DO NOT REWRITE IT AS "the meter cannot fill" (zeroing `pressure_add`
+		# up in the reducer block with Bulwark and Immovable) OR AS "Broken is
+		# refused" (a guard on the `broken = true` line). Both read identically
+		# in a short test and NEITHER leaves him at 99 afterwards — the first
+		# throws the pressure away, the second lets the meter sit at 100 and
+		# break on the very next point. The clamp is placed here, BELOW the
+		# meter write and ABOVE the threshold, because that is the only
+		# position where the pressure is both counted and refused.
+		if has_status("ironclad") and pressure >= stability:
+			applied_bd = maxi(applied_bd - (pressure - (stability - 1)), 0)
+			pressure = stability - 1
 		if pressure >= stability:
 			broken = true
 			broken_pending = true
@@ -2491,6 +2517,11 @@ func _report_taken(amount: int, hp_before: int) -> void:
 	for stale in dmg_by_turn.keys():
 		if int(stale) < battle_turn - 1:
 			dmg_by_turn.erase(stale)
+	# BATCH BR — BATTLE TRANCE's accumulator rides the SAME one door, for the
+	# same reason: a future damage source cannot forget to report to it, and it
+	# books health actually removed rather than damage aimed. It is unbounded
+	# only between two of his turns; battle.gd zeroes it at every tick.
+	trance_taken += lost
 	if damage_taken_cb.is_valid():
 		damage_taken_cb.call(self, lost, hp_before)
 

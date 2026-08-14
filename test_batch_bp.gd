@@ -122,20 +122,17 @@ func _pools() -> void:
 		var live: Array = Classes.spec_draft_pool(w)
 		ok(live == TRANCHE_2[w],
 			"§5: %s's pool is %s (got %s)" % [w, TRANCHE_2[w], live])
-	# THE REMAINING DEBT IS STILL VISIBLE — AND IT IS HALF WHAT IT WAS.
-	# RE-POINTED IN PLACE BY BATCH BQ, AND IT IS AN INVERSION: BP asserted all
-	# four class pools were empty because none had been written; BQ wrote the
-	# Mage and Cleric six. The question is still worth asking (does a Warrior
-	# offer still fill short, and is that recorded), only the correct answer
-	# for two of the four moved. Setup byte-identical.
+	# THE REMAINING DEBT IS PAID. RE-POINTED IN PLACE TWICE AND BOTH RE-POINTS
+	# ARE INVERSIONS: BP asserted all four class pools were empty because none
+	# had been written; BQ wrote the Mage and Cleric six; BATCH BR wrote the
+	# HUNTER AND WARRIOR six, which is the pool THIS suite's own spec is drawn
+	# from. The question is still worth asking — only the correct answer moved,
+	# twice — so the setup stays byte-identical.
 	ok(Classes.CLASS_DRAFT_POOLS.size() == 4,
 		"§5: the four class-wide pools are still named")
-	for ck in ["mage", "cleric"]:
+	for ck in ["mage", "cleric", "warrior", "hunter"]:
 		ok(Classes.class_draft_pool(ck).size() == 6,
-			"§5: ...the %s one is FILLED at six (Batch BQ)" % ck)
-	for ck2 in ["warrior", "hunter"]:
-		ok(Classes.class_draft_pool(ck2).is_empty(),
-			"§5: ...and the %s one is STILL EMPTY and still owed" % ck2)
+			"§5: ...the %s one is FILLED at six (BQ, then BR)" % ck)
 	# EVERY NEW ENTRY RESOLVES, to itself, with the fields a card needs. A pool
 	# name that does not resolve is an offer that hands out nothing.
 	for spec3 in TRANCHE_2:
@@ -248,24 +245,40 @@ func _warrior_draft_flow() -> void:
 	# A WARRIOR GETS A REAL OFFER FOR THE FIRST TIME. Until BP this was empty
 	# and `award_draft_pick` returned false — one of four heroes in every party
 	# had no draft at all.
+	#
+	# RE-POINTED IN PLACE BY BATCH BR, AND IT IS AN INVERSION. BP measured his
+	# offer at TWO — the honest record of a spec pool two deep beside an EMPTY
+	# class pool. BR filled the Warrior class six, so it fills THREE like
+	# everyone else's, and the cards may come from either side. The question is
+	# unchanged (does a Warrior get a real offer he can take a card off) and the
+	# setup is byte-identical; what moved is the count and where a card may come
+	# from.
+	#
+	# THE ONE MECHANICAL CHANGE: the take is driven off the candidates
+	# `award_draft_pick` actually STORED rather than off a separately-rolled
+	# offer. With a pool of two the two rolls were always the same two cards;
+	# with eight they are not, and a test that assumed they matched would fail
+	# against working code.
 	var m := {"key": "warrior", "spec": "swordmaster", "bm_abilities": []}
 	var offer: Array = run.roll_draft_offer(m)
-	ok(offer.size() == 2,
-		"§5: a Warrior's offer FILLS SHORT at two — the pool is two deep (got %d)" % offer.size())
+	ok(offer.size() == 3,
+		"§5: a Warrior's offer FILLS THREE now — two spec plus six class (got %d)" % offer.size())
 	for c in offer:
-		ok(TRANCHE_2["swordmaster"].has(String(c)),
-			"§5: ...and every card is his own spec's (%s)" % c)
+		ok(TRANCHE_2["swordmaster"].has(String(c))
+			or Classes.class_draft_pool("warrior").has(String(c)),
+			"§5: ...and every card is his own spec's or his CLASS's (%s)" % c)
 	ok(run.award_draft_pick(m), "§7: a Warrior can be owed a pick")
 	ok(int(m.get("draft_picks_owed", 0)) == 1, "§7: ...exactly one")
-	ok(run.take_draft_ability(m, offer[0]) == "",
+	var cands: Array = m["draft_candidates"][0]
+	ok(run.take_draft_ability(m, cands[0]) == "",
 		"§7: ...and can take a card off it")
-	ok(run.earned_ability_names(m).has(offer[0]),
+	ok(run.earned_ability_names(m).has(cands[0]),
 		"§7: ...which lands in `bm_abilities`, the list a boss pick already writes")
 	# THE SEVEN-SLOT CAP, DRIVEN WITH A WARRIOR. His core is 3, so 4 earned
 	# abilities fill him and the fifth needs a drop.
 	ok(run.ability_slots_used(m) == 4,
 		"§7: 3 core + 1 earned = 4 of 7 (got %d)" % run.ability_slots_used(m))
-	m["bm_abilities"] = [offer[0], "Lunge", "Execute", "Sweeping Strikes"]
+	m["bm_abilities"] = [cands[0], "Lunge", "Execute", "Sweeping Strikes"]
 	ok(run.ability_slots_used(m) == CAP,
 		"§7: four earned fills the cap at 7 (got %d)" % run.ability_slots_used(m))
 	ok(run.ability_slots_full(m), "§7: ...and the kit reads FULL")
@@ -273,18 +286,18 @@ func _warrior_draft_flow() -> void:
 	# ONE NAMED. Guard Change is his enabler; it is not in `bm_abilities`, so
 	# the refusal is the ABSENCE of the name rather than a branch.
 	m["draft_picks_owed"] = 1
-	m["draft_candidates"] = [[offer[1]]]
-	ok(run.take_draft_ability(m, offer[1]) != "",
+	m["draft_candidates"] = [[cands[1]]]
+	ok(run.take_draft_ability(m, cands[1]) != "",
 		"§7: at the cap, taking without dropping is refused")
 	ok(not run.drop_earned_ability(m, "Guard Change"),
 		"§7: his protected enabler can never be dropped")
 	ok(not run.drop_earned_ability(m, "Overpower"),
 		"§7: ...nor any other opening ability")
-	ok(run.take_draft_ability(m, offer[1], "Execute") == "",
+	ok(run.take_draft_ability(m, cands[1], "Execute") == "",
 		"§7: naming an EARNED ability to drop works")
 	ok(not run.earned_ability_names(m).has("Execute"),
 		"§7: ...and the dropped one is gone")
-	ok(run.earned_ability_names(m).has(offer[1]),
+	ok(run.earned_ability_names(m).has(cands[1]),
 		"§7: ...replaced by the card taken")
 	ok(run.draft_refused(m).has("Execute"),
 		"§7: ...and a DROP writes the no-return ledger too")
@@ -298,14 +311,27 @@ func _warrior_draft_flow() -> void:
 	for c2 in m2_offer:
 		ok(run.draft_refused(m2).has(String(c2)),
 			"§7: ...which refuses the WHOLE offer, not one card (%s)" % c2)
-	ok(run.roll_draft_offer(m2).is_empty(),
-		"§7: ...so a two-card pool declined once has nothing left to offer")
-	# A WARDEN'S POOL IS HIS OWN. Nothing cross-pollinates between the three
-	# Warrior specs — that is what makes them SPEC pools.
+	# RE-POINTED BY BATCH BR: with the class six behind him a Berserker's pool
+	# is eight, so one decline no longer empties it. The question the check was
+	# always asking is the one kept — a declined card never returns — and it is
+	# now asserted directly rather than through a pool that happened to be two
+	# deep.
+	var m2_left: Array = run.roll_draft_offer(m2)
+	for c2b in m2_offer:
+		ok(not m2_left.has(String(c2b)),
+			"§7: ...so a declined card is never offered again this run (%s)" % c2b)
+	# A WARDEN IS NEVER OFFERED ANOTHER WARDEN SPEC'S CARD. Nothing
+	# cross-pollinates between the three Warrior specs — that is what makes them
+	# SPEC pools. RE-POINTED BY BATCH BR: his CLASS six are legitimately his
+	# now, so the check names what must never appear rather than what may.
 	var m3 := {"key": "warrior", "spec": "warden", "bm_abilities": []}
 	for c3 in run.roll_draft_offer(m3):
-		ok(TRANCHE_2["warden"].has(String(c3)),
-			"§5: a Warden is only ever offered a Warden card (%s)" % c3)
+		ok(not TRANCHE_2["berserker"].has(String(c3))
+			and not TRANCHE_2["swordmaster"].has(String(c3)),
+			"§5: a Warden is never offered another Warrior spec's card (%s)" % c3)
+		ok(TRANCHE_2["warden"].has(String(c3))
+			or Classes.class_draft_pool("warrior").has(String(c3)),
+			"§5: ...only his own spec's or his class's (%s)" % c3)
 
 
 # ---------- §2 THE BERSERKER, LIVE ----------
@@ -860,12 +886,13 @@ func _docs() -> void:
 	var changelog := _src("res://docs/changelog.html")
 	var claude := _src("res://CLAUDE.md")
 	var glossary := _src("res://data/glossary.json")
-	# THE MASTER.HTML STAMP GATE IS DUPLICATED **SIX** TIMES, NOT FOUR — BP's
-	# own note said four and then added this fifth copy without counting it;
-	# test_batch_bq is the sixth. test_batch_ah, test_batch_bb, test_batch_bn,
-	# test_batch_bo, HERE and test_batch_bq. ALL SIX MUST MOVE TOGETHER or a
-	# batch that bumps the timestamp trips suites it never touched.
-	ok(master.contains("Batch BQ"),
+	# THE MASTER.HTML STAMP GATE IS DUPLICATED **SEVEN** TIMES — BP's own note
+	# said four and then added this fifth copy without counting it; BQ was the
+	# sixth and test_batch_br is the seventh. test_batch_ah, test_batch_bb,
+	# test_batch_bn, test_batch_bo, HERE, test_batch_bq and test_batch_br. ALL
+	# SEVEN MUST MOVE TOGETHER or a batch that bumps the timestamp trips suites
+	# it never touched.
+	ok(master.contains("Batch BR"),
 		"§6: master.html's stamp is bumped to the current batch")
 	ok(changelog.contains("Batch BP"),
 		"§6: the changelog carries a Batch BP entry")

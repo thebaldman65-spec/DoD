@@ -140,22 +140,20 @@ func _pools() -> void:
 			"§5: %s's draft pool is NAMED" % w)
 		ok(Classes.spec_draft_pool(w).size() == 2,
 			"BP: ...and FILLED — %s drafts two of its own" % w)
-	# CLASS-WIDE: four keys, HALF OF THEM FILLED NOW.
-	# RE-POINTED IN PLACE BY BATCH BQ, AND IT IS AN INVERSION — the honest
+	# CLASS-WIDE: four keys, ALL FOUR FILLED.
+	# RE-POINTED IN PLACE TWICE, AND BOTH RE-POINTS ARE INVERSIONS — the honest
 	# treatment when a later batch pays a debt an older suite was recording.
 	# BO asserted all four pools were EMPTY, because none shipped here. BQ
-	# filled the Mage and Cleric six, so what a later batch could break is no
-	# longer "did a class ability sneak in early" but "did the remaining debt
-	# stay visible". The setup is byte-identical, because it is still what
-	# tells the two answers apart.
+	# filled the Mage and Cleric six and this became "two filled, two owed".
+	# BATCH BR FILLED THE OTHER TWO, so the debt is gone and what a later batch
+	# could break is no longer "did the remaining debt stay visible" but "did a
+	# class pool quietly empty again". The setup is byte-identical, because it
+	# is still what tells the answers apart.
 	ok(Classes.CLASS_DRAFT_POOLS.size() == 4,
 		"§4: all four class-wide pools are named")
-	for ck in ["mage", "cleric"]:
+	for ck in ["mage", "cleric", "warrior", "hunter"]:
 		ok(Classes.class_draft_pool(ck).size() == 6,
-			"§4: the %s class pool is FILLED at six (Batch BQ)" % ck)
-	for ck2 in ["warrior", "hunter"]:
-		ok(Classes.class_draft_pool(ck2).is_empty(),
-			"§4: ...and the %s one is still EMPTY and still owed" % ck2)
+			"§4: the %s class pool is FILLED at six (BQ, then BR)" % ck)
 	ok(is_equal_approx(Classes.CLASS_DRAFT_SHARE, CLASS_SHARE),
 		"§4: roughly one card in four is class-wide")
 	# EVERY ENTRY RESOLVES. A pool name that does not resolve is an offer that
@@ -275,19 +273,29 @@ func _offer_and_ratio() -> void:
 	var run := root.get_node("/root/Run")
 	var m := {"key": "mage", "spec": "cryomancer", "bm_abilities": []}
 	var offer: Array = run.roll_draft_offer(m)
-	# RE-POINTED IN PLACE BY BATCH BQ, AND IT IS THE SAME INVERSION THE POOL
-	# CHECK ABOVE TAKES. BO measured a Cryomancer's offer at TWO cards, because
-	# his side of the draft held two and the class side held nothing — the
-	# honest record of a thin pool. BQ filled the Mage class pool, so his offer
-	# fills THREE now, and the fill-short rule has to be measured where it still
-	# BITES: a Hunter, whose class pool is the debt that remains. Both halves
-	# are asserted, because "fills short" and "fills three" are the two answers
-	# the same rule gives to two different pools.
+	# RE-POINTED IN PLACE TWICE, AND IT IS THE SAME INVERSION THE POOL CHECK
+	# ABOVE TAKES. BO measured a Cryomancer's offer at TWO cards, because his
+	# side of the draft held two and the class side held nothing — the honest
+	# record of a thin pool. BQ filled the Mage class pool, so his offer fills
+	# THREE, and BQ moved the fill-short half onto a Hunter, whose class pool
+	# was the debt that remained.
+	#
+	# BATCH BR PAID THAT DEBT, SO THE FILL-SHORT RULE HAS TO BE MEASURED
+	# SOMEWHERE IT STILL BITES — and with every class pool full, the only place
+	# left is a hero who has REFUSED his way down to fewer than three cards.
+	# That is the honest construction rather than a weaker check: the rule was
+	# never about which pool is thin, it is about an offer never padding with
+	# repeats, and the no-return ledger is what still makes a pool thin.
 	ok(offer.size() == 3,
 		"§3: a Mage's offer fills THREE now — spec plus class (Batch BQ)")
-	var thin := {"key": "hunter", "spec": "sharpshooter", "bm_abilities": []}
-	ok(run.roll_draft_offer(thin).size() == 2,
-		"§3: a THIN pool still fills SHORT (2 cards, not 3) — never padding")
+	var thin := {"key": "hunter", "spec": "sharpshooter", "bm_abilities": [],
+		"draft_refused": Classes.class_draft_pool("hunter").duplicate()}
+	var thin_offer: Array = run.roll_draft_offer(thin)
+	ok(thin_offer.size() == 2,
+		"§3: a pool worn down to two still fills SHORT (2 cards, not 3) — never padding (got %d)" % thin_offer.size())
+	for tc in thin_offer:
+		ok(Classes.spec_draft_pool("sharpshooter").has(String(tc)),
+			"§3: ...and what is left is his own spec's (%s)" % tc)
 	ok(offer.size() == offer.duplicate().size(),
 		"§3: ...and never pads")
 	var seen := {}
@@ -300,10 +308,15 @@ func _offer_and_ratio() -> void:
 	# batch could break: does a WARRIOR now get a real offer and a real owed
 	# pick, like the other nine. The SETUP is byte-identical because it is
 	# still what tells the two answers apart.
+	#
+	# RE-POINTED AGAIN BY BATCH BR, AND ONLY THE NUMBER MOVED: BP gave him two
+	# spec cards, BR gave his class six, so the offer fills THREE like everyone
+	# else's. The question — does a Warrior get a real offer and a real owed
+	# pick — is unchanged, which is why the setup is byte-identical.
 	var w := {"key": "warrior", "spec": "berserker", "bm_abilities": []}
 	var w_offer: Array = run.roll_draft_offer(w)
-	ok(w_offer.size() == 2,
-		"BP: a Warrior's draft offer is REAL now — two cards from a pool of two (got %d)" % w_offer.size())
+	ok(w_offer.size() == 3,
+		"BR: a Warrior's draft offer FILLS THREE now — two spec plus six class (got %d)" % w_offer.size())
 	ok(run.award_draft_pick(w),
 		"BP: ...and awarding one succeeds rather than refusing an empty pool")
 	ok(int(w.get("draft_picks_owed", 0)) == 1,
@@ -1072,12 +1085,13 @@ func _live_survivalist() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	# RE-POINTED BY BATCH BP: this is the master.html STAMP GATE, duplicated in
-	# test_batch_ah, test_batch_bb and test_batch_bn — ALL FOUR MUST MOVE
+	# RE-POINTED BY BATCH BP, THEN BQ, THEN BR: this is the master.html STAMP
+	# GATE, duplicated in test_batch_ah, test_batch_bb, test_batch_bn,
+	# test_batch_bp, test_batch_bq and test_batch_br — ALL SEVEN MUST MOVE
 	# TOGETHER or a batch that bumps the timestamp trips suites it never
 	# touched. (BO had its own copy phrased as "this batch"; it is the same
 	# gate.)
-	ok(master.contains("Batch BQ"),
+	ok(master.contains("Batch BR"),
 		"§6: master.html is stamped for the current batch")
 	ok(master.contains("THE ABILITY DRAFT") or master.contains("The Ability Draft"),
 		"§6: ...and carries the draft's own section")
@@ -1098,12 +1112,17 @@ func _docs() -> void:
 	# still owed, which is the debt that remains.
 	ok(claude.contains("WARRIOR POOLS WERE OWED AND ARE PAID"),
 		"§6: ...and CLAUDE.md records that the Warrior pools are PAID (Batch BP)")
-	# RE-POINTED BY BATCH BQ, same shape as the pool check above: the tranche is
-	# HALF paid now, so the record worth protecting is the HALF THAT REMAINS.
+	# RE-POINTED BY BATCH BQ AND AGAIN BY BR, same shape as the pool check
+	# above. BQ half-paid the tranche and the record worth protecting was the
+	# half that remained; BR paid the rest, so it is the RECORD OF PAYMENT that
+	# a later batch could break — together with the debt that is genuinely still
+	# outstanding, which is now tranche DEPTH rather than the class seam.
 	ok(claude.contains("CLASS-WIDE TRANCHE"),
 		"§6: ...while the class-wide tranche is still recorded")
-	ok(claude.contains("WARRIOR SIX APIECE"),
-		"§6: ...and names the Hunter and Warrior six as the debt that remains")
+	ok(claude.contains("PAID IN FULL"),
+		"§6: ...as PAID IN FULL (BQ then BR)")
+	ok(claude.contains("TRANCHES 2 AND 3"),
+		"§6: ...and the spec pools' depth named as the debt that remains")
 	var chlog := _src("res://docs/changelog.html")
 	ok(chlog.contains("BATCH BO") or chlog.contains("Batch BO"),
 		"§6: the changelog has a Batch BO entry")

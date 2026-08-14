@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-13 (Batch BQ)</b></p>
+<p align="right"><b>Last updated: 2026-08-14 (Batch BR)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -1050,14 +1050,14 @@ SPEC_POOLS, the draft reads these.</p>
 <tr><td colspan="2"><b>Class-wide pools</b> — drawn by every spec of the class, at roughly one card in four</td></tr>
 <tr><td><b>Mage</b> (all three specs)</td><td>Magic Barrier, Mirror Image, Magic Missiles, Mana Well, Dispel, Blink</td></tr>
 <tr><td><b>Cleric</b> (all three specs)</td><td>Ministration, Consecration, Chastise, Unburden, Exhortation, Undying Vigil</td></tr>
-<tr><td><b>Warrior</b></td><td><i>owed</i></td></tr>
-<tr><td><b>Hunter</b></td><td><i>owed</i></td></tr>
+<tr><td><b>Hunter</b> (all three specs)</td><td>Field Dressing, Camouflage, Aimed Volley, Bola, Hunter's Mark, Arcane Arrows</td></tr>
+<tr><td><b>Warrior</b> (all three specs)</td><td>Battle Trance, Rally, Charge, Cleave, Warcry, Iron Will</td></tr>
 </table>
-<p><b>Pools are thin, and the class seam is HALF-FILLED.</b> Thirty-six abilities exist
-against a target of about ninety-six, so offers still come up two cards or one. That is the
-pool filling, not the draft misbehaving. Every spec has a draft, and <b>one card in four is
-class-wide</b> — that seam now draws real entries for a <b>Mage</b> or a <b>Cleric</b> hero,
-and still finds nothing for a <b>Warrior</b> or a <b>Hunter</b>, whose class pools are owed.</p>
+<p><b>The class seam is FULL, and pools are still thin.</b> All four class pools hold six, so
+<b>one card in four is class-wide</b> and that seam draws a real entry for <b>every hero in the
+game</b> — no class rolls an empty pool and no offer loses its class card. Forty-eight abilities
+exist against a target of about ninety-six, so a hero who has refused his way down can still be
+offered two cards or one: that is the pool filling, not the draft misbehaving.</p>
 
 <p><b>What a class-wide ability is, and is not.</b> Deliberately <b>untied and general</b> —
 Magic Barrier, not Frostbolt: the test is whether it would read as off-theme for <i>any</i>
@@ -1120,6 +1120,20 @@ twenty-four spec cards come first; the twelve class-wide ones close the table.</
 <tr><td><b>Unburden</b></td><td>20 Mana, 1.5, 4cd, one ally</td><td>Removes <b>every</b> harmful effect from that ally, and they take <b>20% less damage for 2 turns</b> (Perfect: 3).</td><td>Cleanse with a tail. A pure cleanse is dead against a warband that applies nothing; the mitigation means it is never a wasted card.</td></tr>
 <tr><td><b>Exhortation</b></td><td>25 Mana, 2.5, 4cd, party</td><td>The whole party's <b>next attack deals 25% more damage</b> (Perfect: 35%). <b>Banked, not timed</b> — it waits for each hero's next swing rather than expiring on a turn count.</td><td>The only offensive party buff a Cleric has.</td></tr>
 <tr><td><b>Undying Vigil</b></td><td>25 Mana, 2.0, 4cd, one ally</td><td>For 3 turns (Perfect: 4), whenever that ally is healed <b>by any source</b>, a second ally on lower health is healed for half as much.</td><td>Making one heal into two. It is the one class ability that gets <i>better</i> the more spec-specific the build is — a deliberate inversion of the unconditional-floor role the other five play.</td></tr>
+<tr><td colspan="4"><b>Class-wide &mdash; HUNTER</b> (all three specs) &mdash; <i>three spines that are all conditional, in a class with no healing whatsoever and the thinnest defensive kit in the game</i></td></tr>
+<tr><td><b>Field Dressing</b></td><td>20 Mana, 2.0, 3cd, self</td><td>Heals <b>18% of maximum health</b> (Perfect: 24%) and removes <b>one</b> harmful effect.</td><td>The only self-heal a Hunter can get. Every other class can mend itself somewhere; this one cannot, in any of its three trees.</td></tr>
+<tr><td><b>Camouflage</b></td><td>20 Mana, 1.5, 4cd, self</td><td>For 2 turns (Perfect: 3) enemies are <b>70% less likely to aim at him</b>. It stacks with the Survivalist's Ghillie Suit as independent chances rather than replacing it.</td><td>Buying time rather than absorbing damage — the defensive shape the class does not have.</td></tr>
+<tr><td><b>Aimed Volley</b></td><td>20 Mana, 2.5, 3cd, one enemy</td><td><b>Three shots at 12% of Attack</b> each with <b>8 Break damage a shot</b> — 24 across the volley (Perfect: a fourth shot).</td><td>The reliable strike. Every Hunter kit is built on a conditional; this works when nothing is set up yet, and being multi-hit is what makes it play with a charge bank.</td></tr>
+<tr><td><b>Bola</b></td><td>15 Mana, 1.5, 3cd, one enemy</td><td>Applies <b>Slowed and Crippled for 3 turns</b> (Perfect: 4). No damage and no Break.</td><td>Two afflictions on one card and nothing else — the price of the breadth is that it is all it does.</td></tr>
+<tr><td><b>Hunter's Mark</b></td><td>15 Mana, 1.5, 4cd, one enemy</td><td>For 4 turns (Perfect: 6) the <b>whole party deals 15% more damage</b> to that enemy. One mark at a time.</td><td>Focus fire made explicit — the only party-wide amplifier the class has. Unlike the Beastmaster's Mark of the Hunt, the mark carries no owner: every hero and every beast reads it.</td></tr>
+<tr><td><b>Arcane Arrows</b></td><td>25 Mana, 2.0, 5cd, self</td><td><b>5 charges</b> (Perfect: 6): each of his next five <b>hits</b> also strikes an additional random enemy for half that hit's damage. <b>Banked, not timed</b> — they wait until spent, and a three-shot volley spends three.</td><td>A charge bank, which the class has never had.</td></tr>
+<tr><td colspan="4"><b>Class-wide &mdash; WARRIOR</b> (all three specs) &mdash; <i>three spines that are all melee, all Rage-driven and all reactive: none can make something happen on turn one</i></td></tr>
+<tr><td><b>Battle Trance</b></td><td>15 Rage, 1.5, 4cd, self</td><td>For 3 turns (Perfect: 4), at the start of each of his turns he heals <b>3% of maximum health plus half of all damage taken since his last turn</b>.</td><td>Recovery that scales with the beating. It reads damage <i>taken</i>, not missing health — and it is delayed, so it is not mitigation and cannot save him from a killing blow.</td></tr>
+<tr><td><b>Rally</b></td><td>15 Rage, 1.5, 4cd, one ally</td><td>That ally <b>acts next</b>, jumping straight to the front of the initiative order (Perfect: they also regain 15% of their resource). It cannot target the caster.</td><td>Giving away tempo — the only ability in the game that hands an ally a turn, and the only tempo tool a class with none can have.</td></tr>
+<tr><td><b>Charge</b></td><td>20 Rage, <b>1.0</b>, 3cd, one enemy</td><td><b>25% of Attack</b> and <b>10 Break damage</b>; the target is <b>Dazed for 1 turn</b> (Perfect: 2).</td><td>Reaching something now. The very fast initiative is the point — it is a Warrior's only answer to a caster winding up.</td></tr>
+<tr><td><b>Cleave</b></td><td>25 Rage, 2.5, 3cd, three chosen enemies</td><td><b>15% of Attack</b> (Perfect: 22%) and <b>15 Break damage</b> to each of three chosen enemies.</td><td>Breadth from a narrow class. Three <i>chosen</i> enemies rather than three random ones is what separates it from War Stomp.</td></tr>
+<tr><td><b>Warcry</b></td><td>20 Rage, 2.0, 5cd, party</td><td>The whole party deals <b>20% more damage for 3 turns</b> (Perfect: 4).</td><td>The party buff the class lacks — nothing else a Warrior does improves anyone else's numbers.</td></tr>
+<tr><td><b>Iron Will</b></td><td>20 Rage, 1.5, 4cd, self</td><td>For 3 turns (Perfect: 4) he <b>cannot be Stunned, Frozen, Dazed or Broken</b>, and takes <b>15% less damage</b>. The Break half is a <b>cap, not an immunity</b>: his meter fills to <b>99</b> and no further, so pressure still accumulates and simply cannot cross.</td><td>Refusing to be stopped. Every Warrior spine dies to losing a turn — and the cap makes it a delay rather than a negation: the moment it ends he is one hit from Broken.</td></tr>
 </table>
 
 <h3>6.1 Warrior</h3>
