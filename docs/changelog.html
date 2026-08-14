@@ -5,6 +5,219 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-14 &mdash; Batch BS: Overburn loses the drain, and Inferno becomes a lane</h2>
+<p><i><b>THE DIAGNOSIS FIRST, because it is the reusable half and the fix is only its
+consequence: an entire column of the Pyromancer's tree existed to mitigate an unfair
+passive.</b> Seven of the eight INFERNO nodes read Overburn's Mana drain &mdash; Fire Walker
+reduced it, Invigorating Ashes offset it, Immolate doubled it, Kiln-Forged floored it, Ash Lung
+paid him for outrunning it, Cauterise billed it to health, and Forge Body threw the paid bill at
+an enemy. Only Heat Shimmer did not, and it read the drain's own counterpart, the bonus cap.
+<b>A lane whose every node acts on one term is one node with eight prices</b> &mdash; the shape
+Batch BC diagnosed and Batch BH proved &mdash; <b>and it is worse when the term is a punishment,
+because then the lane is not a build, it is a payment plan.</b> The drain is deleted and the lane
+is re-authored around a new thesis. This is a design change, not a tuning pass: no magnitude
+anywhere else in the game moves, and no save version moves (still v10).</i></p>
+
+<h3>&sect;2 &mdash; Overburn, without the bill</h3>
+<p><b>Two clauses now, not three.</b> <b>BONUS</b> &mdash; +2% damage per remaining Burn turn on
+the enemy team, capped at +40%, unchanged. <b>REFUND</b> &mdash; 1 Mana per turn of Burn he
+consumes, unchanged, and it keeps its property-of-the-passive status so anything later taught to
+eat Burn inherits it. <b>DRAIN &mdash; deleted.</b></p>
+<p><b>DELETED, NOT ZEROED, and that is the rule that stops a later batch reviving a mechanic by
+flipping a constant.</b> <code>_overburn_drain</code>, <code>_overburn_tick</code> and the call
+from <code>_player_turn</code> are gone from the source; test_batch_bs asserts their
+NON-EXISTENCE rather than that they return zero. <code>_drain_burn_turns</code> went with them
+and <code>_total_burn_turns</code> is the single denominator again &mdash; the second one existed
+only because Ember Debt exempted an enemy from a bill that no longer exists.
+<code>BattleUnit.ember_debt</code> went with the exemption it served.</p>
+<p><b>THE SPINE SURVIVES THE REMOVAL, and this is recorded rather than assumed lost.</b> His
+damage is still <b>DEFERRED</b>: Burn ticks are small, Detonation pays 250% of the bank it
+empties, and turns spent lighting fires are turns not spent killing. <b>The commitment is that he
+is weak until he cashes in</b> &mdash; that was always the interesting half, and the drain was a
+punishment bolted onto it. Batch AR's "the reward caps and the cost does not" asymmetry dies with
+the cost; CLAUDE.md's Overburn block asserted it as load-bearing and was rewritten rather than
+amended, because a half-edited block is worse than either version.</p>
+<p><b>ONE CLAUSE IS DROPPED RATHER THAN REHOMED, AND IT IS SAID PLAINLY: the damage cap can no
+longer be raised by anything.</b> <code>_overburn_capped</code> is deleted too. Heat Shimmer
+(+20 cap points), Immolate and Cauterise-under-20-Mana were its only three lifters and all three
+were INFERNO clauses this batch re-authored. Raising the payoff's ceiling is <b>Detonation's</b>
+subject, not Inferno's, and every Detonation node is already authored &mdash; so rehoming it
+would have meant re-speccing a node outside this batch's scope. A later batch wanting a cap-raise
+authors one deliberately, which is the whole point of deleting the function instead of leaving it
+always-true. <b>The 6% global Burn tick constant is still not touched</b>, for Batch AR's reason:
+it is shared with enemies, runes and every other burn source in the game.</p>
+
+<h3>&sect;3 &mdash; INFERNO: the fire that shields you</h3>
+<p><i>"How much heat you can stand" is meaningless with no heat. The new thesis is the one thing
+the Pyromancer most lacks and the one his theme most obviously supports: <b>armoured in his own
+element</b> &mdash; 135 HP, 85 Constitution, and until now nothing at all.</i></p>
+<p><b>ALL EIGHT IDS SURVIVE AND RE-SPEC IN PLACE, EACH AT ITS OWN ROW.</b> No new ids, none
+deleted, no save version move &mdash; a player holding a row-5 pick still holds a row-5 pick.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Row</th><th>Node</th><th>Effect</th></tr>
+<tr><td>1</td><td><b>Ember Shroud</b></td><td>While <b>any</b> enemy is Burning, he takes
+<b>8% less damage</b>. Flat, on from turn one &mdash; the lane's opening statement, and the only
+one of the eight that does not scale with anything.</td></tr>
+<tr><td>2</td><td><b>Ashen Skin</b></td><td><b>+25% fire resistance</b>, and Burn ticks
+<b>he applied</b> heal him for <b>10% of the tick</b>.</td></tr>
+<tr><td>3</td><td><b>Heat Haze</b></td><td>Enemies attacking him <b>while Burning</b> have a
+<b>20% chance to miss</b>.</td></tr>
+<tr><td>4</td><td><b>Immolate</b></td><td><i>Re-specced.</i> 15 Mana, 1.5 int, 2cd, self: for
+<b>3 turns</b> anything that strikes him is set Burning 3 turns <b>and he takes 20% less
+damage</b> (Perfect: a 4th turn).</td></tr>
+<tr><td>5</td><td><b>Backblast</b></td><td>Once per battle, on dropping below <b>40% health</b>:
+every enemy is set Burning <b>4 turns</b> and he heals <b>15% of maximum</b>.</td></tr>
+<tr><td>6</td><td><b>Kiln-Forged</b></td><td>He cannot be reduced below 1 health by any single
+hit <b>while three or more enemies are Burning</b>.</td></tr>
+<tr><td>7</td><td><b>Ash Lung</b></td><td>Per burning enemy he takes <b>4% less damage and deals
+4% more</b>. Uncapped.</td></tr>
+<tr><td>8</td><td><b>Forge Body</b></td><td>Damage taken is reduced <b>1% per remaining Burn turn
+on the field, capped at 50%</b> &mdash; and <b>the damage prevented is dealt to a random burning
+enemy as fire</b>.</td></tr>
+</table>
+<p><b>THE LANE'S SHAPE, PER BATCH BM'S RULE.</b> Rows 1&ndash;7 are seven different KINDS of
+protection &mdash; flat mitigation, resistance and sustain, evasion, retaliation, an emergency, a
+death-refusal, and a scaling that pays both ways. <b>Row 8 reads the accumulated quantity the
+lane built and converts it into offence</b>, which is exactly the row-8 shape BM specified.
+<b>No node is a larger magnitude of another</b>, which is what the old lane failed.</p>
+<p><b>Three notes that are decisions, not flavour.</b></p>
+<ul>
+<li><b>Heat Shimmer's cap-raise left the lane and was DROPPED</b> &mdash; see &sect;2. The id
+(<code>py_firebrand</code>) stays at its row and becomes Heat Haze.</li>
+<li><b>Immolate keeps its id and its ability slot and loses the drain clause entirely.</b> Its
+"no damage cap" half goes too, since the cap is no longer this lane's business. What remains is
+<b>retaliation plus mitigation, both pointing the same way</b> &mdash; Batch AR's own standard
+for that node, read against a lane that now defends.</li>
+<li><b>Forge Body reads burn TURNS, not burning enemies, and the difference is the node.</b> Four
+enemies at four turns each is 16, and Firestorm alone puts 12&ndash;16 on the field in one cast.
+<b>The 50% cap needs about fifty burn-turns and will rarely be reached.</b> The designer has
+weighed the stack and it ships as written: at a realistic 20 burn-turns across four enemies,
+Ember Shroud, Ash Lung and Forge Body multiply to roughly <b>38% reduction on a 135 HP hero</b>.
+Recorded so the arithmetic is on the page rather than in a conversation.</li>
+</ul>
+<p><b>Batch AR's "no defensive option anywhere in kit or tree" assertion is RE-POINTED IN PLACE
+WITH ITS REASON, not deleted</b> &mdash; an inversion, on the AV/BR precedent for a suite
+recording a decision a later batch reverses. It was correct while commitment meant no escape
+hatch and a punishing drain priced every fire; with the tax gone the absence stopped being the
+spec and started being a hole in the sheet. What the check asks now is that his defence is EARNED
+in the tree (his opening kit is still all fire) and that every mitigating node is in INFERNO
+rather than scattered.</p>
+
+<h3>&sect;4 &mdash; Ember Debt, and the rest of the fallout</h3>
+<p><b>EMBER DEBT WAS RE-AUTHORED, NOT REPLACED.</b> It was entirely a drain exemption &mdash; 8
+turns of Burn on an enemy the bill ignored &mdash; and with no bill it was free Burn with no
+clause at all, which is not an ability. <b>Its new axis is PAID BEFORE IT BURNS:</b> 20 Mana,
+2.0 int, 4cd, one enemy, 8 turns of Burn (Perfect: 12), and <b>Overburn refunds every one of
+those turns immediately, as though he had already consumed them</b>. The fire still burns its
+full term. Every other Burn payout in the kit EMPTIES the bank (Detonation eats one stack,
+Wildfire and Cinderfall skim the field); this is the deepest single-target Burn he can lay and
+the only card the passive pays for without consuming anything. <b>It goes through
+<code>_overburn_refund</code>, the ONE door</b>, which is Batch AR's own rule working: a fourth
+consumer arrived and inherited the refund &mdash; Crucible doubles it too &mdash; with no second
+implementation. test_batch_ar's call-site count is re-pointed 3 &rarr; 4, which is BO's pinned
+count doing its job rather than decaying.</p>
+<p><b>THE RUNE AUDIT CAME BACK CLEAN, and it is recorded as a fact rather than a note</b>,
+because a rune riding a counter that changed meaning fails <b>silently</b> &mdash; no error, no
+log line. <b>No Pyromancer or Mage rune wrote any of the seven deleted fields</b>, so nothing
+needed re-pointing and nothing was flagged for re-authoring. The four spec runes ride
+<code>accelerant_ranks</code>, <code>conflagration_ranks</code>, <code>molten_ranks</code>,
+<code>supernova_ranks</code>, <code>blast_radius_ranks</code>, <code>rune_cinder_ember</code>,
+<code>rune_resist_pierce</code> and the inert <code>pyromaniac_ranks</code>; every one of those
+counters was verified to still have a live read site.</p>
+<ul>
+<li><b>The Rune of the White Flame's middle clause is still asserted INERT</b> (Batch AR
+&sect;4). This batch gave it no home &mdash; Overburn still has no per-burning-enemy step, and
+inventing one is the guess AR forbade &mdash; so the assertion is left <b>unchanged</b> rather
+than quietly re-pointed.</li>
+<li><b>The Rune of the Blast Radius and the Rune of the Long Burn still read live fields</b>
+&mdash; confirmed rather than assumed. They are rune-only content whose nodes are already gone,
+and their read sites survive.</li>
+</ul>
+<p><b>THE AUTOPLAY MAGE POLICY KNEW A RULE THAT NOW REFERENCES NOTHING</b> &mdash; "consume Burn
+when the drain exceeds Mana regeneration" (Batch AR &sect;5). <b>Replaced rather than merely
+dropped</b>, or the bot would hold fire forever and never cash it: <b>detonate the largest stack
+when it is worth more than waiting</b> (four burn-turns on the ripest stack), <b>and Wildfire
+when Detonation is cooling</b>. Immolate is a defensive card now, so the bot arms it when there
+is something to retaliate against rather than when the field is already alight. Instrument
+honesty, not tuning.</p>
+
+<h3>Verified</h3>
+<p><i>Per the standing instruction, that means <b>the code landed and works. No sweeps, no bands,
+no balance measurement was run, and none should be quoted from this batch.</b></i></p>
+<p>check_parse 0 &middot; check_flow 0 &middot; run-harness gates 1/2/3 PASS &middot;
+<b>new test_batch_bs.gd 262/0, stable 3/3</b>.</p>
+<p><b>THIRTEEN NEGATIVE CONTROLS, each applied to product code and reverted</b> (battle.gd,
+unit.gd and talents.gd all came back byte-identical by hash, and the suite to 261/0 after the
+last): the drain RESTORED as a turn-start bill <b>trips 2</b>; Forge Body reading burning BODIES
+instead of burn TURNS <b>trips 1</b>; Kiln-Forged with no board gate <b>trips 1</b>; Backblast
+without its once-per-battle flag <b>trips 2</b>; Ashen Skin healing on any burn tick rather than
+the one he applied <b>trips 1</b>; Heat Haze reading the defender's fire instead of the
+attacker's <b>trips 2</b>; Ash Lung paying only the dealt half <b>trips 1</b>; Ember Debt not
+paying the refund up front <b>trips 3</b>; Immolate lifting the damage cap again <b>trips 1</b>;
+Forge Body's throw not restoring the damage frame <b>trips 1</b>.</p>
+<p><b>THREE OF THEM PASSED ON THE FIRST RUN, AND THAT IS THE WHOLE REASON TO RUN THEM.</b> Each
+found a check that could not fail, and each was repaired rather than worked around:</p>
+<ul>
+<li><b>Restoring the drain tripped NOTHING.</b> The function-absence greps cannot see a bill
+written straight into <code>_player_turn</code>, which is precisely what a later batch reviving
+the mechanic would write. Three source-level assertions were added (the turn body still drips the
+regen, nothing in it takes resource away, and no CODE in it reads the passive) &mdash; with
+comments stripped first, because this batch's own tombstone in that function names the deleted
+bill on purpose and a bare grep would have failed against working code.</li>
+<li><b>Deleting Backblast's once-per-battle flag tripped NOTHING</b>, because the first fire
+leaves him at 45% health &mdash; ABOVE the 40% line &mdash; so the THRESHOLD was refusing the
+second call and the flag was never the thing under test. He is dropped back under the line first
+now, and the flag is the only thing that can refuse it.</li>
+<li><b>Disabling Ash Lung's TAKEN half tripped NOTHING, and the diagnosis is worth keeping.</b>
+The check compared one blow against one blow with a bare "<code>&lt;</code>" &mdash; and with the
+term disabled the second blow still read SMALLER (34 against 32), because the &plusmn;10%
+variance roll drifts once the board differs and the two blows stop consuming the RNG identically.
+<b>It was passing by luck, which is worse than failing.</b> The term is now amplified for the
+measurement (20 points rather than the shipped 4, with the shipped value asserted separately off
+the payload) and the assertion is a RATIO with open ground between signal (~0.38) and noise
+(~0.94).</li>
+</ul>
+<p><b>FULL BATTERY GREEN</b>, every suite at 0 failures. <b>Four counts moved and every one is
+explained</b>: test_batch_ar 914 &rarr; <b>735</b> (its asymmetry loop shed its cost half &mdash;
+sixty-one iterations asserting a climbing drain), test_batch_bm 1890 &rarr; <b>1891</b> (its row-8
+field loop walks one more field, because Ashen Skin honestly writes two), test_batch_bo 505
+&rarr; <b>504</b> and test_rune_battle 96 &rarr; <b>97</b>. Nothing else moved by one; an and bk
+sit inside their documented run-to-run drift. <b>The designer had no run in flight and none was
+created</b> &mdash; profile.json, relics.json and trees.json are all byte-identical by hash after
+the battery, and no <code>--run</code> was walked, because this batch measures nothing.</p>
+<p><b>SEEN ONCE, NOT REPRODUCED:</b> test_batch_br read 1441/1 on one battery pass and 1441/0 on
+four runs since; the failing check was not captured. Recorded rather than claimed fixed or
+diagnosed &mdash; nothing here is on the Warrior or Hunter class-card path.</p>
+<p><b>FOUR SUITES RE-POINTED IN PLACE with the reason in each file, and five of the re-points are
+INVERSIONS</b> &mdash; the honest treatment when a batch reverses a decision an older suite was
+guarding. test_batch_ar carries most of it (the asymmetry loop, the drain section, the chip, the
+Immolate check, <code>_no_defence</code> and the passive-desc check all invert; the refund
+call-site count goes 3 &rarr; 4) and reads <b>735/0, was 914</b> &mdash; the drop is the asymmetry
+loop shedding its cost half, sixty-one iterations that asserted a climbing drain beside a flat
+bonus. test_batch_bj's Cauterise line re-points onto Kiln-Forged's board gate; test_rune_battle's
+"the chip reads the LIVE drain" inverts to "the chip must not advertise a term that no longer
+exists" (<b>97/0, was 96</b>).</p>
+<p><b>AND ONE WAS FOUND BY A COUNT RATHER THAN BY A FAILURE.</b> test_batch_bo read <b>495/0</b>
+where Batch BR recorded 505: its Ember Debt section touches <code>foes[0].ember_debt</code>, which
+this batch deleted, so the section threw a SCRIPT ERROR, <b>aborted its own function, and the
+suite still printed "0 failures"</b> &mdash; the trap Batch BC documented. Nothing failed; ten
+checks simply stopped existing. Re-pointed onto the re-authored card and back to <b>504/0</b>, one
+short of 505 because the two-denominator pair honestly collapses into one check.
+<b>Read the counts, not only the failures.</b></p>
+<p><b>LIVE AUTOPLAY CLEAN, 0 SCRIPT ERROR</b>, with the re-specs reading correctly in ordinary
+fights: <i>"Pyromancer: Immolate &mdash; -20% damage taken and attackers ignite (3 turns)"</i>,
+<i>"Ember Debt &mdash; Orc Raider burns 8 turns, and Overburn pays the debt up front"</i>
+immediately followed by <i>"Overburn: 8 turns of Burn consumed refunds 8 Mana"</i>, and
+<i>"Talent: Backblast &mdash; Pyromancer sets 5 enemies alight (4 turns) and takes back 20"</i>.
+<b>Forge Body is visible reading burn TURNS rather than bodies</b>, its throw climbing 1 &rarr; 2
+&rarr; 4 &rarr; 5 across one fight as the field filled. <b>No Overburn drain line appears
+anywhere</b> &mdash; there is none to print. <b>Kiln-Forged did not fire in any smoke and that is
+the branch being rare rather than a gap</b>: it needs an actually lethal blow while three or more
+enemies burn. The suite drives it directly, which is where a rare branch belongs.
+<b>NOTE the smoke's own artefact</b>: <code>DOD_SIM_ABILITIES</code> applies its list to EVERY
+hero, so the Devout and the Beastmaster cast Ember Debt in the log &mdash; and only the
+Pyromancer's cast pays the refund, which is the passive's own guard working in plain sight.</p>
+
 <h2>2026-08-14 &mdash; Batch BR: the Hunter and Warrior class pools</h2>
 <p><i>Twelve class-wide abilities, six per class, <b>closing the seam Batch BO opened and Batch
 BQ half-filled</b>. All four <code>CLASS_DRAFT_POOLS</code> are populated now, so every hero's

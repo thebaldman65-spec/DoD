@@ -4,6 +4,43 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A punishing passive grows its own lane of antidotes (Batch BS) — 2026-08-14
+
+The Pyromancer's INFERNO lane had eight nodes and one subject. Fire Walker
+reduced Overburn's Mana drain, Invigorating Ashes offset it, Immolate doubled
+it, Kiln-Forged floored it, Ash Lung paid him for outrunning it, Cauterise
+billed it to health, Forge Body threw the paid bill at an enemy. Seven of
+eight. The eighth, Heat Shimmer, raised the cap on the bonus the drain was the
+price of — so it was not an exception, it was the same term seen from the
+other side.
+
+Batch BH found this shape in the Devout's Faith lane, where every node
+multiplied one number. **This is its mirror: every node divided one.** And the
+mirror is the worse of the two, because the term here was a *punishment*. A
+lane of multipliers is at least a lane about your power. A lane of antidotes
+is a payment plan, and the reason it never reads as one is that it looks
+extraordinarily full. Eight distinct effects. Eight distinct-sounding
+tooltips. Eight rows of real decisions, every one of them answering the same
+question: *how are you paying the bill?*
+
+**The test is not whether a lane's nodes differ in EFFECT but whether they
+differ in SUBJECT.** That distinction is the whole finding, and it is cheap to
+apply — you can run it on a tree before anybody plays it, without a sim, by
+listing what each node reads. Eight nodes that reduce, offset, floor, double
+and redirect one number are eight verbs and one noun. The verbs are what make
+it look like a lane; the noun is what makes it one node with eight prices.
+
+There is a second-order trap in it worth naming, because it is what kept this
+lane alive for so long. A punishing passive doesn't just *attract* mitigation
+nodes — it **justifies** them. Every one of those eight was defensible on its
+own terms, and each one made the spec more playable than it was without it. The
+lane was doing real work. That is exactly why nobody looked at the column and
+asked what it was made of: it passed the only test anyone thought to run, which
+is "does this node help?"
+
+The repair was not to re-price anything. It was to delete the term, and then
+ask what the column should have been about all along.
+
 ## The comment was right. Nobody had read it next to the constraint (Batch BN) — 2026-08-13
 
 The Cryomancer's release has carried this comment since Batch AS:

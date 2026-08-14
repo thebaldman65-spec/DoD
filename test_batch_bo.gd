@@ -563,33 +563,46 @@ func _live_pyromancer() -> void:
 	for f in foes:
 		f.max_hp = 9999
 		f.hp = 9999
-	# EMBER DEBT — THE EXEMPTION IS ONE OF THE EIGHT CLAUSES THAT COULD DO
-	# NOTHING. Measured as a DIFFERENCE between the two denominators, not as
-	# "the flag is set": the flag being true proves nothing about the bill.
+	# EMBER DEBT — RE-POINTED IN PLACE BY BATCH BS §4, AND IT IS AN INVERSION.
+	# BO measured the card as a DIFFERENCE BETWEEN TWO DENOMINATORS: its enemy
+	# was exempt from Overburn's Mana drain while still feeding the damage
+	# bonus, and that gap WAS the ability. BS DELETED THE DRAIN, so there was
+	# nothing left to be exempt from — `_drain_burn_turns`, `_overburn_drain`
+	# and `BattleUnit.ember_debt` are all gone, and this section was silently
+	# ABORTING on the first of them (the BC trap: a live check that throws kills
+	# its own function while the suite still prints "0 failures", which is
+	# exactly how it was found — the count fell 505 -> 495 and nothing failed).
+	# THE CARD WAS RE-AUTHORED RATHER THAN REPLACED and the question re-points
+	# with it: it is PAID UP FRONT now — Overburn refunds every turn it applies,
+	# as though he had already consumed them, while the fire burns its full
+	# term. Still measured as a state CHANGE rather than as "the cast returned".
 	var ed: Ability = scene.call("_find_ability", pyro, "Ember Debt")
+	pyro.resource = 40
+	var mana_was: int = pyro.resource
 	await scene.call("_resolve", pyro, ed, foes[0], "good")
-	ok(bool(foes[0].ember_debt), "§5: Ember Debt marks its enemy")
 	ok(foes[0].status_stacks("burn") > 0 or not foes[0].get_status("burn").is_empty(),
-		"§5: ...and lights it")
+		"§5: Ember Debt lights its enemy")
 	ok(int(foes[0].get_status("burn").get("turns", 0)) == 8,
 		"§5: ...for the 8 turns the card promises")
+	ok(pyro.resource == mana_was - ed.cost + 8,
+		"§5: ...and Overburn PAYS THE DEBT UP FRONT — %d - %d + 8 = %d (got %d)" % [
+			mana_was, ed.cost, mana_was - ed.cost + 8, pyro.resource])
 	var total := int(scene.call("_total_burn_turns"))
-	var billed := int(scene.call("_drain_burn_turns"))
 	ok(total >= 8, "§5: the field carries the fire (%d turns)" % total)
-	ok(billed == 0,
-		"§5: EMBER DEBT'S DRAIN EXEMPTION LANDS — the bill reads %d of %d turns" % [
-			billed, total])
-	# THE BONUS STILL COUNTS IT. That gap is the whole ability, and reading
-	# only the drain would let a later batch collapse the two functions.
 	ok(scene.call("_overburn_mult", pyro, total) > 1.0,
-		"§5: ...while the damage BONUS still reads the same fire")
-	ok(scene.call("_overburn_drain", pyro, billed) == 0,
-		"§5: ...so an exempt field costs no Mana at all")
-	# A SECOND, UNMARKED FIRE STILL COSTS.
+		"§5: ...and the damage BONUS reads it, which is the surviving clause")
+	# THE FIRE IS NOT CONSUMED — the distinction from every other payer, and
+	# "it burns" is trivially true unless the turns are re-read afterwards.
+	ok(int(foes[0].get_status("burn").get("turns", 0)) == 8,
+		"§5: ...while the fire still stands its full term, unconsumed")
+	# A SECOND FIRE COSTS HIM NOTHING TO HOLD EITHER — the inversion of BO's
+	# "everything else still bills as before", and the reason that line had to
+	# invert rather than be deleted.
 	var fb: Ability = scene.call("_find_ability", pyro, "Fireball")
+	pyro.resource = 40
 	await scene.call("_resolve", pyro, fb, foes[1], "good")
-	ok(int(scene.call("_drain_burn_turns")) > 0,
-		"§5: ...and everything else still bills as before")
+	ok(pyro.resource >= 40 - fb.cost,
+		"§5: ...and a second, unmarked fire bills him nothing to hold")
 	# CINDERFALL — wide, and it skims every bank.
 	var before_burn := int(scene.call("_total_burn_turns"))
 	var hp_before: Array = [foes[0].hp, foes[1].hp, foes[2].hp]
@@ -1091,7 +1104,7 @@ func _docs() -> void:
 	# TOGETHER or a batch that bumps the timestamp trips suites it never
 	# touched. (BO had its own copy phrased as "this batch"; it is the same
 	# gate.)
-	ok(master.contains("Batch BR"),
+	ok(master.contains("Batch BS"),
 		"§6: master.html is stamped for the current batch")
 	ok(master.contains("THE ABILITY DRAFT") or master.contains("The Ability Draft"),
 		"§6: ...and carries the draft's own section")

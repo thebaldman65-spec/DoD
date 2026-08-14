@@ -152,13 +152,15 @@ func _draw_detail() -> void:
 	# upgraded numbers a collided node actually bought.
 	var landed_upgrades: Dictionary = Run.apply_upgrades(member, cfg["abilities"],
 		cfg.get(Talents.FALLBACK_KEY, []))
-	# Kiln-Forged (Pyromancer, Batch AR): mirrors the battle spawn, because the
-	# Resistances row below reads cfg["resists"] and a sheet that omitted this
-	# would quietly disagree with the fight.
-	if int(cfg.get("kiln_forged", 0)) > 0:
-		var kiln_res: Dictionary = cfg.get("resists", {})
-		kiln_res["fire"] = float(kiln_res.get("fire", 0.0)) + 0.20
-		cfg["resists"] = kiln_res
+	# Ashen Skin (Pyromancer, BATCH BS §3 — the clause moved down the lane from
+	# Kiln-Forged, which refuses death now): mirrors the battle spawn, because
+	# the Resistances row below reads cfg["resists"] and a sheet that omitted
+	# this would quietly disagree with the fight.
+	if int(cfg.get("ashen_skin", 0)) > 0:
+		var ash_res: Dictionary = cfg.get("resists", {})
+		ash_res["fire"] = float(ash_res.get("fire", 0.0)) \
+			+ 0.01 * int(cfg["ashen_skin"])
+		cfg["resists"] = ash_res
 	cfg["max_hp"] = int(round(cfg["max_hp"] * (1.0 + cfg.get("max_hp_pct", 0.0))))
 	# Toughness (Warden talent): Constitution grows with bulk — same order as
 	# battle spawn (after every max-HP bonus has landed).

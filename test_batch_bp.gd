@@ -892,7 +892,7 @@ func _docs() -> void:
 	# test_batch_bn, test_batch_bo, HERE, test_batch_bq and test_batch_br. ALL
 	# SEVEN MUST MOVE TOGETHER or a batch that bumps the timestamp trips suites
 	# it never touched.
-	ok(master.contains("Batch BR"),
+	ok(master.contains("Batch BS"),
 		"§6: master.html's stamp is bumped to the current batch")
 	ok(changelog.contains("Batch BP"),
 		"§6: the changelog carries a Batch BP entry")

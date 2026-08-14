@@ -135,7 +135,20 @@ const STAT_INT_KEYS := ["max_hp", "attack", "constitution", "max_resource",
 	# NOT HERE ON PURPOSE: `pleasure_pct` is FRACTIONAL (2.5), so coercing it to
 	# an int would silently halve Pleasure from Pain.
 	"deep_hex_step", "soul_leech_step", "whispers_step", "barter_step",
-	"spread_ruin"]
+	"spread_ruin",
+	# BATCH BS §3: the re-authored Inferno lane's counters. NONE IS WRITTEN BY A
+	# RUNE TODAY — the audit in §4 came back clean, and the four spec:pyromancer
+	# runes ride `accelerant_ranks`, `conflagration_ranks`, `molten_ranks`,
+	# `supernova_ranks`, `blast_radius_ranks`, `rune_cinder_ember`,
+	# `rune_resist_pierce` and the inert `pyromaniac_ranks` — so these are
+	# listed for the durability AW and AX listed their unwritten ones with: a
+	# later rune landing on one must not fail to spawn a hero. They are int
+	# MAGNITUDES whose names do not end "_ranks", which is exactly the AA trap.
+	# THE SIX FIELDS THE LANE DELETED LEAVE NO ENTRIES BEHIND because they never
+	# had any (`fire_walker`, `invigorating_ranks`, `heat_haze_ranks`,
+	# `kiln_forged`, `ash_lung`, `cauterise`, and the old `forge_body`).
+	"ember_shroud", "ashen_skin", "ashen_skin_heal", "heat_haze", "backblast",
+	"kiln_forged_at", "ash_lung_pct", "forge_body_pct"]
 
 static var _data := {}
 

@@ -177,11 +177,20 @@ func _initialize() -> void:
 			rico_name = String(n["name"])
 	ok(rico_name == "Ricochet",
 		"§2: the Warden row-1 node is spelled Ricochet (was Richocet)")
+	# RE-POINTED IN PLACE BY BATCH BS §3. BJ's tooltip audit found that Cauterise
+	# promised something its read site qualified — Kiln-Forged's floor took
+	# precedence and the desc did not say so — and pinned the correction here.
+	# BOTH NODES CHANGED WHAT THEY DO: `py_cauterize` is Ash Lung now and
+	# `py_undying_flame` is Kiln-Forged, and neither reads a drain, so the
+	# precedence has nothing left to state. THE QUESTION BJ WAS REALLY ASKING —
+	# does the tooltip state the qualification its read site enforces? — is kept
+	# and pointed at the surviving one: Kiln-Forged's guard is GATED ON THE
+	# BOARD, and a card that did not say so would be the same failure.
 	var py_tree: Array = Talents.LANE_TREES["pyromancer"]
 	for n in py_tree:
-		if n["id"] == "py_cauterize":
-			ok(String(n["desc"]).contains("Kiln-Forged"),
-				"§2: Cauterise states the Kiln-Forged precedence its read site enforces")
+		if n["id"] == "py_undying_flame":
+			ok(String(n["desc"]).contains("or more enemies are Burning"),
+				"§2: Kiln-Forged states the board gate its read site enforces")
 	# Reality Fracture's perfect is INERT and pinned as such (the White Flame
 	# pattern): implementing it is a design decision a later batch must make
 	# against this check, not a drive-by.

@@ -573,6 +573,18 @@
   ]
  },
  {
+  "id": "overburn",
+  "term": "Overburn (Pyromancer)",
+  "category": "combat",
+  "short": "The Pyromancer is paid for every turn of Burn standing on the enemy team.",
+  "long": "The Pyromancer has no bar of his own - his power is the FIRE ALREADY ON THE BOARD. Two clauses. BONUS: he deals +2% more damage for every remaining turn of Burn standing across the whole enemy team, up to +40%. One enemy burning for six turns feeds him exactly as hard as six burning for one. REFUND: every turn of Burn he CONSUMES hands him back 1 Mana - Detonation, Wildfire, Cinderfall and Ember Debt all pay it, because the refund belongs to the passive rather than to any one ability. HOLDING FIRE COSTS HIM NOTHING. What makes him a commitment spec is that his damage is DEFERRED: Burn ticks are small, Detonation pays 250% of the bank it empties, and turns spent lighting fires are turns not spent killing - he is weak until he cashes in.",
+  "see_also": [
+   "status_burn",
+   "dmg_fire",
+   "res_mana"
+  ]
+ },
+ {
   "id": "enemy_intent",
   "term": "Enemy Intent",
   "category": "combat",

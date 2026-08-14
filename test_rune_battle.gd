@@ -355,8 +355,16 @@ func _pass(mage_spec: String, cleric_spec: String) -> void:
 			"pyromancer: the passive chip does not name Overburn (%s)" % chip)
 		ok(lit > 0 and chip.find("+%d%%" % (lit * 2)) >= 0,
 			"pyromancer: the chip does not read the LIVE bonus (%s)" % chip)
-		ok(lit > 0 and chip.find("-%d Mana" % lit) >= 0,
-			"pyromancer: the chip does not read the LIVE drain (%s)" % chip)
+		# RE-POINTED IN PLACE BY BATCH BS §2, AND IT IS AN INVERSION. Batch AR
+		# re-pointed this check FROM the old Inferno chip AT Overburn's drain,
+		# because the question it was really asking is whether the chip reads
+		# LIVE state rather than a number stamped once. THERE IS NO DRAIN — it
+		# is deleted, not zeroed — so the same question is asked of what the
+		# chip must NOT say: a term that no longer exists.
+		ok(chip.find("Mana a turn") < 0 and chip.find("-%d Mana" % lit) < 0,
+			"pyromancer: the chip still advertises a drain that no longer exists (%s)" % chip)
+		ok(chip.find("refunds Mana") >= 0,
+			"pyromancer: the chip does not state the surviving refund clause (%s)" % chip)
 		if lit_foe != null:
 			lit_foe.remove_status("burn")
 	if by_spec.has("permafrost"):

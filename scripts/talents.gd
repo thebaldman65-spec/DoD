@@ -830,46 +830,55 @@ const LANE_TREES := {
 		{"id": "py_spreading", "name": "Chain Ignition", "ranks": 1, "lane": "Kindling", "row": 7,
 			"desc": "An enemy that dies Burning splits its remaining Burn turns among the survivors.",
 			"payload": {"stat": {"ember_wind": 1}}},
-		# --- Lane B: INFERNO — how much heat you can stand. ---
-		{"id": "py_pyromaniac", "name": "Fire Walker", "ranks": 1, "lane": "Inferno", "row": 1,
-			"desc": "Overburn's Mana drain is reduced by {v}%.",
+		# --- Lane B: INFERNO — the fire that shields you. ---
+		# BATCH BS §3. It was "how much heat you can stand", and SEVEN OF ITS
+		# EIGHT NODES READ OVERBURN'S MANA DRAIN — an entire column existed to
+		# mitigate one punishing passive, which is one node with eight prices
+		# (BC's diagnosis, BH's proof) wearing the costume of a lane. The drain
+		# is deleted (battle.gd's `_overburn_mult` carries the argument) and the
+		# column is re-authored around the one thing the Pyromancer most lacks
+		# and his theme most obviously supports: ARMOURED IN HIS OWN ELEMENT.
+		# ALL EIGHT IDS SURVIVE AT THEIR OWN ROWS, so a saved pick migrates.
+		# ROWS 1-7 ARE SEVEN DIFFERENT KINDS OF PROTECTION — flat mitigation,
+		# resistance and sustain, evasion, retaliation, an emergency, a
+		# death-refusal, and a scaling that pays both ways. NO NODE IS A LARGER
+		# MAGNITUDE OF ANOTHER, which is exactly what the old lane failed.
+		{"id": "py_pyromaniac", "name": "Ember Shroud", "ranks": 1, "lane": "Inferno", "row": 1,
+			"desc": "While ANY enemy is Burning, you take {v}% less damage.",
+			"scale": {"step": 8},
+			"payload": {"stat": {"ember_shroud": 8}}},
+		{"id": "py_invigorating", "name": "Ashen Skin", "ranks": 1, "lane": "Inferno", "row": 2,
+			"desc": "+{v}% fire resistance, and every Burn tick YOU applied heals you for 10% of it.",
 			"scale": {"step": 25},
-			"payload": {"stat": {"fire_walker": 1}}},
-		{"id": "py_invigorating", "name": "Invigorating Ashes", "ranks": 1, "lane": "Inferno", "row": 2,
-			"desc": "Every Burn tick has a {v}% chance to restore 3% of max Mana.",
+			"payload": {"stat": {"ashen_skin": 25, "ashen_skin_heal": 10}}},
+		{"id": "py_firebrand", "name": "Heat Haze", "ranks": 1, "lane": "Inferno", "row": 3,
+			"desc": "Enemies that are Burning have a {v}% chance to miss you.",
 			"scale": {"step": 20},
-			"payload": {"stat": {"invigorating_ranks": 20}}},
-		{"id": "py_firebrand", "name": "Heat Shimmer", "ranks": 1, "lane": "Inferno", "row": 3,
-			"desc": "Overburn's damage cap rises from +40% to +{v}%.",
-			"scale": {"base": 40, "step": 20},
-			"payload": {"stat": {"heat_haze_ranks": 20}}},
-		# The re-specced Flame Shield. Every clause pushes the SAME way —
-		# there is no defensive half left in it, and the retaliation burn
-		# feeds the engine that is now costing him more to run.
+			"payload": {"stat": {"heat_haze": 20}}},
+		# Immolate keeps its id AND its ability slot and loses both Overburn
+		# clauses — the drain-doubling with the drain, and the "no damage cap"
+		# half because the cap is Detonation's subject rather than this lane's.
+		# What is left is retaliation plus mitigation, both pointing the same
+		# way, which is the AR standard for this node read against a lane that
+		# now defends instead of paying.
 		{"id": "py_flame_shield", "name": "Immolate", "ranks": 1, "lane": "Inferno", "row": 4,
-			"desc": "New ability: Immolate — for 2 turns Overburn's damage cap is lifted entirely, its drain doubles, and anyone who strikes you is set Burning 3 turns (15 Mana, 1.5 int, 2cd).",
+			"desc": "New ability: Immolate — for 3 turns you take 20% less damage and anything that strikes you is set Burning 3 turns (15 Mana, 1.5 int, 2cd).",
 			"payload": {"new_ability": {"display_name": "Immolate", "cost": 15,
 				"special": "immolate", "delay": 1.5, "anim": "attack03", "cooldown": 2,
-				"perfect_id": "", "perfect_text": "Holds a 3rd turn",
-				"description": "Open the furnace: for 2 turns Overburn\nhas NO damage cap and its Mana drain\nDOUBLES, and whoever strikes you is\nset Burning (3 turns)."}}},
-		{"id": "py_molten", "name": "Kiln-Forged", "ranks": 1, "lane": "Inferno", "row": 5,
-			"desc": "+{v}% fire resistance, and Overburn's drain can never take you below 10 Mana.",
-			"scale": {"step": 20},
-			"payload": {"stat": {"kiln_forged": 1}}},
-		{"id": "py_undying_flame", "name": "Ash Lung", "ranks": 1, "lane": "Inferno", "row": 6,
-			"desc": "While Overburn's drain exceeds your Mana regeneration, you deal +{v}% damage.",
+				"perfect_id": "", "perfect_text": "Holds a 4th turn",
+				"description": "Wrap yourself in it: for 3 turns you\ntake 20% LESS damage, and whatever\nstrikes you is set Burning (3 turns)."}}},
+		{"id": "py_molten", "name": "Backblast", "ranks": 1, "lane": "Inferno", "row": 5,
+			"desc": "Once per battle, the first time you drop below 40% health: every enemy is set Burning 4 turns and you heal {v}% of maximum.",
 			"scale": {"step": 15},
-			"payload": {"stat": {"ash_lung": 1}}},
-		# Cauterise is the health risk put back, ONCE, as an opt-in. The drain
-		# sits on Mana precisely so it is not a clock he carries; this node
-		# lets a player choose to carry it anyway, which is a decision rather
-		# than a tax — and the sharpest thing in the tree.
-		# BJ §2: the desc now states the Kiln-Forged precedence the read site
-		# has always enforced (battle.gd's _overburn_tick: the floor wins and
-		# the drain the floor refuses is never billed in blood).
-		{"id": "py_cauterize", "name": "Cauterise", "ranks": 1, "lane": "Inferno", "row": 7,
-			"desc": "Drain that would take you below 0 Mana takes health instead, 1 HP per Mana — and your damage cap is removed while you are under 20 Mana. (Kiln-Forged's floor takes precedence: drain it refuses is never paid in blood.)",
-			"payload": {"stat": {"cauterise": 1}}},
+			"payload": {"stat": {"backblast": 15}}},
+		{"id": "py_undying_flame", "name": "Kiln-Forged", "ranks": 1, "lane": "Inferno", "row": 6,
+			"desc": "You cannot be reduced below 1 health by any single hit while {v} or more enemies are Burning.",
+			"scale": {"step": 3},
+			"payload": {"stat": {"kiln_forged_at": 3}}},
+		{"id": "py_cauterize", "name": "Ash Lung", "ranks": 1, "lane": "Inferno", "row": 7,
+			"desc": "For every Burning enemy you take {v}% less damage and deal {v}% more. Uncapped.",
+			"scale": {"step": 4},
+			"payload": {"stat": {"ash_lung_pct": 4}}},
 		# --- Lane C: DETONATION — how big the trigger is. ---
 		{"id": "py_shockwave", "name": "Focused Flame", "ranks": 1, "lane": "Detonation", "row": 1,
 			"desc": "Detonation's Burn bonus rises from 250% to {v}%.",
@@ -917,11 +926,17 @@ const LANE_TREES := {
 			"desc": "+{v}% fire damage for every enemy currently Burning.",
 			"scale": {"step": 7},
 			"payload": {"stat": {"sea_of_flame": 7}}},
-		# CONVERTS: Overburn's drain is the lane's whole cost. It becomes output.
+		# READS AN ACCUMULATED QUANTITY, THEN CONVERTS IT (BATCH BS §3). Rows 1-7
+		# spend the whole lane turning fire into survival; this reads HOW MUCH
+		# fire is standing — burn TURNS, not burning bodies — and turns the
+		# survival back into damage. The two quantities diverge hard on purpose:
+		# four enemies at four turns each is 16, and Firestorm alone puts 12-16
+		# on the board in one cast, so the 50% cap needs about fifty burn-turns
+		# and will rarely be reached.
 		{"id": "py_forge_body", "name": "Forge Body", "ranks": 1, "lane": "Inferno", "row": 8,
-			"desc": "Every point of Mana Overburn drains is thrown at a random enemy as {v}% of a point of fire damage.",
-			"scale": {"step": 100},
-			"payload": {"stat": {"forge_body": 100}}},
+			"desc": "Damage taken is reduced {v}% per remaining Burn turn on the field, up to 50% — and the damage prevented is dealt to a random Burning enemy as fire.",
+			"scale": {"step": 1},
+			"payload": {"stat": {"forge_body_pct": 1}}},
 		# READS AN ACCUMULATED QUANTITY, ACROSS CASTS — the one axis the lane has
 		# never had. Cataclysm eats the field in one blast; this eats time.
 		{"id": "py_powder_keg", "name": "Powder Keg", "ranks": 1, "lane": "Detonation", "row": 8,

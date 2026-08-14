@@ -50,25 +50,25 @@ var _had_save := false
 # is the machine-checkable half of it.
 const NODES := {
 	"py_kindling": [1, "Kindling", "Cinder Trail"],
-	"py_pyromaniac": [1, "Inferno", "Fire Walker"],
+	"py_pyromaniac": [1, "Inferno", "Ember Shroud"],
 	"py_shockwave": [1, "Detonation", "Focused Flame"],
 	"py_accelerant": [2, "Kindling", "Accelerant"],
-	"py_invigorating": [2, "Inferno", "Invigorating Ashes"],
+	"py_invigorating": [2, "Inferno", "Ashen Skin"],
 	"py_supernova": [2, "Detonation", "Pressure Cooker"],
 	"py_arson": [3, "Kindling", "Conflagration"],
-	"py_firebrand": [3, "Inferno", "Heat Shimmer"],
+	"py_firebrand": [3, "Inferno", "Heat Haze"],
 	"py_implosion": [3, "Detonation", "Aftershock"],
 	"py_melt": [4, "Kindling", "Backdraft"],
 	"py_flame_shield": [4, "Inferno", "Immolate"],
 	"py_focused": [4, "Detonation", "Pyroblast"],
 	"py_ashes": [5, "Kindling", "Wildfire Spread"],
-	"py_molten": [5, "Inferno", "Kiln-Forged"],
+	"py_molten": [5, "Inferno", "Backblast"],
 	"py_seeding": [5, "Detonation", "Crucible"],
 	"py_explosive": [6, "Kindling", "Explosive Force"],
-	"py_undying_flame": [6, "Inferno", "Ash Lung"],
+	"py_undying_flame": [6, "Inferno", "Kiln-Forged"],
 	"py_rekindle": [6, "Detonation", "Twin Detonation"],
 	"py_spreading": [7, "Kindling", "Chain Ignition"],
-	"py_cauterize": [7, "Inferno", "Cauterise"],
+	"py_cauterize": [7, "Inferno", "Ash Lung"],
 	"py_warm_glow": [7, "Detonation", "Total Commitment"],
 	"py_firestorm": [9, "Kindling", "Firestorm"],
 	"py_rebirth": [9, "Inferno", "Phoenix Rebirth"],
@@ -84,18 +84,27 @@ const PAYLOADS := {
 	"py_ashes": ["wildfire_spread", 1],
 	"py_explosive": ["explosive_ranks", 2],
 	"py_spreading": ["ember_wind", 1],
-	"py_pyromaniac": ["fire_walker", 1],
-	"py_invigorating": ["invigorating_ranks", 20],
-	"py_firebrand": ["heat_haze_ranks", 20],
-	"py_molten": ["kiln_forged", 1],
-	"py_undying_flame": ["ash_lung", 1],
-	"py_cauterize": ["cauterise", 1],
+	"py_pyromaniac": ["ember_shroud", 8],
+	"py_invigorating": ["ashen_skin", 25],
+	"py_firebrand": ["heat_haze", 20],
+	"py_molten": ["backblast", 15],
+	"py_undying_flame": ["kiln_forged_at", 3],
+	"py_cauterize": ["ash_lung_pct", 4],
 	"py_shockwave": ["focused_flame", 1],
 	"py_supernova": ["pressure_cooker", 1],
 	"py_implosion": ["aftershock", 2],
 	"py_seeding": ["crucible", 1],
 	"py_warm_glow": ["total_commitment", 1],
 	"py_hellfire": ["cataclysm", 1],
+}
+
+# BATCH BS §3 — THE ONE NODE THAT WRITES A SECOND STAT FIELD, named here so
+# the "exactly one field" rule above stays a real check instead of being
+# relaxed for everybody. Ashen Skin's two clauses are two quantities (a
+# resistance and a share of a tick), and AW's rule is that one counter must not
+# hold both.
+const EXTRA_PAYLOAD_FIELDS := {
+	"py_invigorating": {"ashen_skin_heal": 10},
 }
 
 # id -> the value scale.base + scale.step must render. THE DESIGN NUMBER as
@@ -107,11 +116,12 @@ const SCALE_VALUES := {
 	"py_arson": 2.0,
 	"py_ashes": 1.0,
 	"py_explosive": 2.0,
-	"py_pyromaniac": 25.0,
-	"py_invigorating": 20.0,
-	"py_firebrand": 60.0,
-	"py_molten": 20.0,
-	"py_undying_flame": 15.0,
+	"py_pyromaniac": 8.0,
+	"py_invigorating": 25.0,
+	"py_firebrand": 20.0,
+	"py_molten": 15.0,
+	"py_undying_flame": 3.0,
+	"py_cauterize": 4.0,
 	"py_shockwave": 325.0,
 	"py_supernova": 25.0,
 	"py_implosion": 2.0,
@@ -161,7 +171,7 @@ func _run() -> void:
 	_no_defence()
 	_rune_audit()
 	await _live_passive_math()
-	await _live_drain()
+	await _live_no_bill()
 	await _live_refund()
 	await _live_asymmetry()
 	await _live_chip()
@@ -259,7 +269,13 @@ func _node_table() -> void:
 	var live_names: Array = []
 	for n in _tree():
 		live_names.append(String(n["name"]))
-	for dead in ["Pyromaniac", "Molten Core", "Melt Armor", "Heat Haze",
+	# BATCH BS §3 TOOK "Heat Haze" OFF THIS LIST AND IT IS A REVIVAL, NOT AN
+	# OVERSIGHT: AR retired the NAME (its old node became Heat Shimmer), and BS
+	# gave it back to the SAME id — py_firebrand, same lane, same row — for a
+	# node that now spoils a burning attacker's aim. The name is live again, so
+	# asserting it absent would fail against working code.
+	for dead in ["Pyromaniac", "Molten Core", "Melt Armor", "Heat Shimmer",
+			"Fire Walker", "Invigorating Ashes", "Cauterise",
 			"Scorched Earth", "Ashes of Al'ar", "Living Flame", "Super Nova",
 			"Implosion", "Seeding Embers", "Chain Reaction", "Fuse",
 			"Blast Radius", "White Heat", "Ember Wind", "Flame Shield",
@@ -283,7 +299,21 @@ func _magnitudes() -> void:
 			ok(pay[want[0]] == want[1],
 				"%s writes %s = %s (got %s)" % [id, want[0], str(want[1]),
 					str(pay[want[0]])])
-		ok(pay.size() == 1, "%s writes exactly one field" % id)
+		# RE-POINTED IN PLACE BY BATCH BS §3. AR could say "exactly one field"
+		# because every Pyromancer node held one magnitude. ASHEN SKIN HOLDS
+		# TWO — a fire resistance and a share of its own Burn tick — and the
+		# house rule is AW's: one counter cannot honestly hold two different
+		# quantities, so it gets two. The question the check is really asking is
+		# unchanged and is now asked properly: does the node write ONLY what
+		# this table says it writes? A third field trips it.
+		var allowed: Dictionary = EXTRA_PAYLOAD_FIELDS.get(id, {})
+		ok(pay.size() == 1 + allowed.size(),
+			"%s writes exactly %d field(s) (got %s)" % [id, 1 + allowed.size(),
+				str(pay.keys())])
+		for extra in allowed:
+			ok(pay.get(extra, null) == allowed[extra],
+				"%s also writes %s = %s (got %s)" % [id, extra,
+					str(allowed[extra]), str(pay.get(extra, null))])
 	for id in SCALE_VALUES:
 		var n2 := _node(String(id))
 		if n2.is_empty():
@@ -394,7 +424,16 @@ func _kit() -> void:
 	ok(pdesc.contains("Overburn"), "the passive is named Overburn")
 	ok(pdesc.contains("+2%"), "...its reward is stated")
 	ok(pdesc.contains("+40%"), "...its cap is stated")
-	ok(pdesc.contains("no cap"), "...and so is the fact that the COST has none")
+	# RE-POINTED IN PLACE BY BATCH BS §2. AR asked the in-game passive text to
+	# state that the COST had no cap, because that asymmetry was the spec. There
+	# is no cost. The question — does the passive's own text state its live
+	# terms rather than a version of them somebody remembers? — is unchanged and
+	# is asked of what it says NOW: the refund, and that holding fire is free.
+	ok(pdesc.contains("refunds 1 Mana"), "...its refund clause is stated")
+	ok(pdesc.contains("costs him\nnothing"),
+		"...and so is the fact that holding fire costs nothing (%s)" % pdesc)
+	ok(not pdesc.to_lower().contains("drain"),
+		"...and no drain survives in it")
 	ok(pdesc.contains("refunds"), "...and the refund")
 
 
@@ -422,30 +461,48 @@ func _pools() -> void:
 
 
 func _no_defence() -> void:
-	# §2: "This leaves the Pyromancer with no defensive option anywhere in his
-	# kit or tree. That is deliberate." Asserted, because the cheapest way to
-	# undo this batch is for a later one to quietly add an escape hatch.
-	var defensive := ["Flame Shield", "Mana Shield", "Molten Core",
+	# RE-POINTED IN PLACE BY BATCH BS §3, AND IT IS AN INVERSION RATHER THAN A
+	# DELETION (the AV/BR precedent for a suite recording a decision a later
+	# batch reverses). AR §2 asserted "no defensive option anywhere in his kit
+	# or tree", and that was CORRECT while commitment meant no escape hatch and
+	# a punishing Mana drain priced every fire he lit. BS §2 deleted the drain,
+	# and with the punishment gone the absence stopped being the spec and
+	# started being a hole in a 135 HP / 85 Constitution sheet. THE WHOLE
+	# INFERNO LANE IS HIS DEFENCE NOW.
+	# THE QUESTION IS STILL WORTH ASKING; ONLY THE CORRECT ANSWER MOVED, so the
+	# check is kept pointed at the two things that must stay true: the defence
+	# is EARNED IN THE TREE (his opening kit is still all fire), and it is the
+	# INFERNO LANE that carries it rather than being scattered.
+	var kit_defensive := ["Flame Shield", "Mana Shield", "Molten Core",
 		"Ashes of Al'ar", "Scorched Earth"]
-	for n in _tree():
-		ok(not defensive.has(String(n["name"])),
-			"no defensive node in the tree (%s)" % String(n["name"]))
-		var d := String(n.get("desc", "")).to_lower()
-		ok(not d.contains("less damage"),
-			"%s does not mitigate damage" % String(n["id"]))
-		ok(not d.contains("revive"), "%s is not a self-revive" % String(n["id"]))
 	for ab in Classes.spec_abilities("pyromancer"):
-		ok(not defensive.has(ab.display_name),
-			"no defensive ability in the kit (%s)" % ab.display_name)
-	# Immolate is the ex-Flame Shield and must have kept NOTHING defensive.
+		ok(not kit_defensive.has(ab.display_name),
+			"no defensive ability in the OPENING KIT (%s)" % ab.display_name)
+	# Every mitigating node is in INFERNO and nowhere else — a Kindling or
+	# Detomation node that started reducing damage would be the lane's thesis
+	# leaking, which is exactly the shape BS was written to remove.
+	var mitigating := 0
+	for n in _tree():
+		var d := String(n.get("desc", "")).to_lower()
+		if d.contains("less damage") or d.contains("cannot be reduced") \
+				or d.contains("chance to miss you") or d.contains("resistance"):
+			mitigating += 1
+			ok(String(n.get("lane", "")) == "Inferno",
+				"%s mitigates, so it is in INFERNO" % String(n["id"]))
+	ok(mitigating >= 5,
+		"the Inferno lane really does defend him (%d mitigating nodes)" % mitigating)
+	# Immolate keeps its id and its slot and is a DEFENSIVE ability now: the
+	# Overburn clauses went with the drain and the cap.
 	var imm: Ability = Talents.granted_ability("Immolate")
 	ok(imm != null, "Immolate exists")
 	if imm != null:
-		ok(not imm.description.contains("less damage"),
-			"Immolate kept no damage reduction (%s)" % imm.description)
+		ok(imm.description.contains("LESS damage"),
+			"Immolate mitigates now (%s)" % imm.description)
+		ok(not imm.description.to_lower().contains("drain"),
+			"...and names no drain (%s)" % imm.description)
 	var src := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	ok(not src.contains("Flame Shield: the fire barrier"),
-		"the 50%-less-damage branch is deleted, not left unreachable")
+		"the 50%-less-damage branch is still deleted, not left unreachable")
 
 
 # ---------- §4: the rune audit, as a fact rather than a note ----------
@@ -577,154 +634,124 @@ func _live_passive_math() -> void:
 	if py == null:
 		scene.queue_free()
 		return
-	# Clause 2: +2% a turn, capped at +40%.
+	# CLAUSE 1: +2% a turn, capped at +40%. Unchanged by BATCH BS §2 and
+	# asserted unchanged, because a batch that deletes half a passive is
+	# exactly where the surviving half gets moved by accident.
 	ok(is_equal_approx(scene.call("_overburn_mult", py, 0), 1.0),
 		"an unlit field pays nothing")
+	ok(is_equal_approx(scene.call("_overburn_mult", py, 3), 1.06),
+		"one enemy at 3 turns pays +6%")
 	ok(is_equal_approx(scene.call("_overburn_mult", py, 5), 1.10),
 		"5 burn-turns pay +10%")
 	ok(is_equal_approx(scene.call("_overburn_mult", py, 20), 1.40),
 		"20 burn-turns pay +40% — the cap, exactly")
 	ok(is_equal_approx(scene.call("_overburn_mult", py, 40), 1.40),
 		"40 burn-turns still pay +40% — the reward CAPS")
-	# The worked curve from §1, so the spec's own arithmetic is checkable.
-	ok(scene.call("_overburn_drain", py, 3) == 3,
-		"one enemy at 3 turns costs 3 Mana a turn")
-	ok(is_equal_approx(scene.call("_overburn_mult", py, 3), 1.06),
-		"...for +6%")
-	ok(scene.call("_overburn_drain", py, 20) == 20,
-		"a full field at 20 burn-turns costs 20 Mana a turn")
-	ok(scene.call("_mana_regen", py) == 22,
-		"...against a Mage's regen of 22, so he is treading water")
-	ok(scene.call("_mana_regen", py) - scene.call("_overburn_drain", py, 20) < 25,
-		"...and cannot bank Detonation's 25 out of a turn while he holds it")
-	ok(scene.call("_overburn_drain", py, 24) > scene.call("_mana_regen", py),
-		"at 24 burn-turns he is going backwards")
+	# BATCH BS §2 — THE CAP IS FLAT AND NOTHING LIFTS IT ANY MORE. Heat
+	# Shimmer, Immolate and Cauterise were the only three lifters and all three
+	# were Inferno clauses the batch re-authored; the cap-raise was DROPPED
+	# rather than rehomed (raising the payoff's ceiling is Detonation's subject
+	# and every Detonation node is already authored). Driven from a build that
+	# owns the whole re-authored lane, so "nothing lifts it" is measured rather
+	# than argued.
 	scene.queue_free()
+	await process_frame
+	var lane := await _spawn({
+		"py_pyromaniac": 1, "py_invigorating": 1, "py_firebrand": 1,
+		"py_flame_shield": 1, "py_molten": 1, "py_undying_flame": 1,
+		"py_cauterize": 1, "py_forge_body": 1}, ["raider", "raider"])
+	var py_l := _py(lane)
+	if py_l != null:
+		lane.call("_apply_status", py_l, "immolate", 3)
+		py_l.resource = 0
+		ok(is_equal_approx(lane.call("_overburn_mult", py_l, 40), 1.40),
+			"the whole Inferno lane, Immolate up and 0 Mana, still caps at +40%")
+	lane.queue_free()
 	await process_frame
 
 
 func _live_asymmetry() -> void:
-	# THE ASYMMETRY IS THE DESIGN AND MUST SURVIVE IMPLEMENTATION. Asserted
-	# as a pair over the same range: past the cap the reward is flat and the
-	# cost is still climbing, monotonically, with no ceiling anywhere.
+	# RE-POINTED IN PLACE BY BATCH BS §2, AND IT IS THE BATCH'S CENTRAL
+	# INVERSION. AR asserted a PAIR over the same range — past the cap the
+	# reward is flat while the cost keeps climbing, "and the asymmetry IS the
+	# design". THERE IS NO COST. `_overburn_drain` is deleted, so the second
+	# half of every one of those assertions has nothing to call.
+	# WHAT SURVIVES IS THE HALF THAT IS STILL TRUE (the reward is flat past the
+	# cap, monotone below it) AND §6'S NEGATIVE CONTROL, WHICH IS THE ONE THAT
+	# MATTERS: NO MANA LEAVES HIM AT TURN START UNDER ANY BURN LOAD. It is
+	# driven at 20+ burn-turns, where the old bill was largest.
 	var scene := await _spawn({}, ["raider", "raider"])
 	var py := _py(scene)
 	if py == null:
 		scene.queue_free()
 		return
 	var prev_bonus := 0.0
-	var prev_cost := -1
 	for turns in range(0, 61):
 		var bonus: float = scene.call("_overburn_mult", py, turns)
-		var cost: int = scene.call("_overburn_drain", py, turns)
-		ok(cost == turns, "the drain at %d burn-turns is %d, uncapped" % [turns, cost])
-		ok(cost > prev_cost, "the cost is still climbing at %d turns" % turns)
 		if turns > 20:
 			ok(is_equal_approx(bonus, 1.40),
 				"the bonus is STILL +40%% at %d turns — it caps" % turns)
 			ok(is_equal_approx(bonus, prev_bonus),
 				"...and stopped moving entirely past 20")
+		else:
+			ok(bonus >= prev_bonus, "the bonus climbs to the cap at %d turns" % turns)
 		prev_bonus = bonus
-		prev_cost = cost
-	# ...and the two nodes that lift the cap lift it ENTIRELY, while nothing
-	# anywhere puts a ceiling on the drain.
-	var shimmer := await _spawn({"py_firebrand": 1}, ["raider"])
-	var py2 := _py(shimmer)
-	if py2 != null:
-		ok(py2.heat_haze_ranks == 20, "Heat Shimmer loads +20 cap points")
-		ok(is_equal_approx(shimmer.call("_overburn_mult", py2, 40), 1.60),
-			"Heat Shimmer raises the cap to +60% and NOT past it")
-		ok(shimmer.call("_overburn_drain", py2, 40) == 40,
-			"...and does not touch the drain")
-	shimmer.queue_free()
-	await process_frame
 	scene.queue_free()
 	await process_frame
 
 
-func _live_drain() -> void:
-	# Clause 1, at its read site. _player_turn cannot be driven headlessly (it
-	# awaits an ability pick that never comes), so the clause lives in its own
-	# _overburn_tick and the ORDER is asserted against the source instead:
-	# the bill must be charged AFTER the regen drip, or the squeeze §1
-	# describes never happens.
+func _live_no_bill() -> void:
+	# §6'S NEGATIVE CONTROL, AND IT IS ASSERTED AS NON-EXISTENCE RATHER THAN AS
+	# RETURNING ZERO. A drain that returns 0 is a drain a later batch revives by
+	# flipping a constant; a drain that does not exist has to be re-authored,
+	# which is a decision somebody makes on purpose.
 	var src := FileAccess.get_file_as_string("res://scripts/battle.gd")
-	var turn_body := src.substr(src.find("func _player_turn(u: BattleUnit)"))
-	turn_body = turn_body.substr(0, turn_body.find("Companions have no turns"))
-	ok(turn_body.find("_mana_regen(u)") >= 0, "_player_turn drips the regen")
-	ok(turn_body.find("_overburn_tick(u)") >= 0, "...and then charges the drain")
-	ok(turn_body.find("_mana_regen(u)") < turn_body.find("_overburn_tick(u)"),
-		"REGEN FIRST, THEN THE BILL — the order the worked curve depends on")
-	ok(src.count("_overburn_tick(u)") == 1, "the drain has ONE call site")
-
-	var scene := await _spawn({}, ["raider", "raider", "raider"])
+	for gone in ["func _overburn_drain", "func _overburn_tick",
+			"func _drain_burn_turns", "func _overburn_capped"]:
+		ok(not src.contains(gone), "%s is DELETED, not zeroed" % gone)
+	ok(src.count("_overburn_tick(u)") == 0, "...and _player_turn no longer calls it")
+	ok(not src.contains("var turns := _drain_burn_turns()"),
+		"the second denominator is gone with it")
+	var unit_src := FileAccess.get_file_as_string("res://scripts/unit.gd")
+	ok(not unit_src.contains("var ember_debt := false"),
+		"BattleUnit.ember_debt went with the exemption it served")
+	# THE LIVE HALF: a real Pyromancer, a real turn start, a heavy field.
+	# `_player_turn` cannot be driven headlessly (it awaits an ability pick), so
+	# the two things it does before that await are driven directly — the regen
+	# drip, and then whatever the passive does. The assertion is that only the
+	# FIRST of those moves his pool.
+	var scene := await _spawn({}, ["raider", "raider", "raider", "raider"])
 	var py := _py(scene)
 	if py == null:
 		scene.queue_free()
 		return
-	var lit := _light(scene, 4)          # 12 burn-turns on the field
-	ok(scene.call("_total_burn_turns") == lit,
-		"the field reads %d burn-turns" % lit)
+	var lit := _light(scene, 6)          # 24 burn-turns — past where he drowned
+	ok(lit >= 20, "the field holds %d burn-turns, where the old bill was largest" % lit)
+	ok(scene.call("_total_burn_turns") == lit, "...and the ONE denominator reads it")
 	py.resource = 50
-	ok(not scene.call("_overburn_tick", py), "an ordinary drain is not lethal")
-	ok(py.resource == 50 - lit,
-		"the turn-start bill takes %d Mana (got %d)" % [lit, 50 - py.resource])
-	# An unlit field costs nothing at all.
-	for foe in scene.get("enemies"):
-		foe.remove_status("burn")
-	py.resource = 50
-	scene.call("_overburn_tick", py)
-	ok(py.resource == 50, "an unlit field bills nothing")
+	var regen: int = scene.call("_mana_regen", py)
+	py.resource = mini(py.resource + regen, py.max_resource)
+	ok(py.resource == 50 + regen,
+		"the turn-start drip is all that moves his Mana (%d -> %d)" % [50, py.resource])
+	# ...and nothing anywhere else in the file bills him for holding it: the
+	# whole re-authored lane learned, and the pool untouched across a full turn.
 	scene.queue_free()
 	await process_frame
-	# Fire Walker takes a quarter off it.
-	var walker := await _spawn({"py_pyromaniac": 1}, ["raider", "raider", "raider"])
-	var py2 := _py(walker)
+	var lane := await _spawn({
+		"py_pyromaniac": 1, "py_invigorating": 1, "py_firebrand": 1,
+		"py_flame_shield": 1, "py_molten": 1, "py_undying_flame": 1,
+		"py_cauterize": 1, "py_forge_body": 1},
+		["raider", "raider", "raider", "raider"])
+	var py2 := _py(lane)
 	if py2 != null:
-		ok(py2.fire_walker == 1, "Fire Walker loads its flag")
-		ok(walker.call("_overburn_drain", py2, 20) == 15,
-			"Fire Walker cuts a 20-Mana drain to 15")
-	walker.queue_free()
-	await process_frame
-	# Kiln-Forged floors it at 10 Mana and grants the fire resistance.
-	var kiln := await _spawn({"py_molten": 1}, ["raider", "raider", "raider"])
-	var py3 := _py(kiln)
-	if py3 != null:
-		ok(py3.kiln_forged == 1, "Kiln-Forged loads its flag")
-		ok(is_equal_approx(float(py3.resists.get("fire", 0.0)), 0.50),
-			"...+20% fire resistance on top of the spec block's 30% (got %s)" % \
-				str(py3.resists.get("fire", 0.0)))
-		_light(kiln, 8)
-		py3.resource = 12
-		kiln.call("_overburn_tick", py3)
-		ok(py3.resource == 10,
-			"the drain never takes him below 10 Mana (got %d)" % py3.resource)
-	kiln.queue_free()
-	await process_frame
-	# Cauterise bills the shortfall to HEALTH, 1 HP per Mana.
-	var caut := await _spawn({"py_cauterize": 1}, ["raider", "raider", "raider"])
-	var py4 := _py(caut)
-	if py4 != null:
-		ok(py4.cauterise == 1, "Cauterise loads its flag")
-		var burn_turns := _light(caut, 6)     # 18 on the field
-		py4.resource = 4
-		py4.hp = py4.max_hp
-		var hp_before := py4.hp
-		caut.call("_overburn_tick", py4)
-		ok(py4.resource == 0, "Cauterise empties the pool first")
-		ok(py4.hp == hp_before - (burn_turns - 4),
-			"...then bills %d HP for the Mana it could not cover (took %d)" % [
-				burn_turns - 4, hp_before - py4.hp])
-		# ...and the cap comes off under 20 Mana, which is the OTHER half.
-		py4.resource = 5
-		ok(not caut.call("_overburn_capped", py4),
-			"Cauterise removes the damage cap under 20 Mana")
-		ok(is_equal_approx(caut.call("_overburn_mult", py4, 40), 1.80),
-			"...so 40 burn-turns pay the full +80%")
-		py4.resource = 40
-		ok(caut.call("_overburn_capped", py4),
-			"...and the cap returns above 20 Mana")
-	caut.queue_free()
+		_light(lane, 8)                  # 32 burn-turns
+		py2.resource = 40
+		var hp_was: int = py2.hp
+		await process_frame
+		ok(py2.resource == 40,
+			"32 burn-turns and the whole Inferno lane bill him NOTHING (got %d)" % py2.resource)
+		ok(py2.hp == hp_was, "...and take no health either — Cauterise is gone")
+	lane.queue_free()
 	await process_frame
 
 
@@ -735,16 +762,16 @@ func _live_refund() -> void:
 	var src := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	ok(src.count("func _overburn_refund") == 1,
 		"the refund has exactly one implementation")
-	# BATCH BO RE-POINTED THIS IN PLACE, 2 -> 3. The question it is really
-	# asking is unchanged and still worth asking — does every Burn consumer
-	# share the ONE implementation, rather than each carrying its own copy —
-	# and AR's own comment above says exactly why: the refund is a property of
-	# the PASSIVE, so "anything the tree later teaches to eat Burn inherits it
-	# with no second implementation". CINDERFALL is the third consumer and it
-	# inherits it, which is the rule working. A fourth has to come here and say
-	# so, which is the point of pinning a count at all.
-	ok(src.count("_overburn_refund(attacker,") == 3,
-		"...and exactly three call sites: Detonation, Wildfire and Cinderfall")
+	# RE-POINTED IN PLACE A SECOND TIME BY BATCH BS §4, 3 -> 4, AND THAT IS THE
+	# COUNT DOING ITS JOB RATHER THAN DECAYING. BO took it 2 -> 3 for Cinderfall
+	# and wrote "a fourth has to come here and say so"; EMBER DEBT IS THE
+	# FOURTH. It is also the first consumer that CONSUMES NOTHING — it pays the
+	# refund up front for fire that then burns its full term — which is only
+	# possible because the refund belongs to the PASSIVE rather than to any
+	# ability, exactly as AR's comment above claims. The question is unchanged:
+	# does every payer share the one implementation?
+	ok(src.count("_overburn_refund(attacker,") == 4,
+		"...and exactly four call sites: Detonation, Wildfire, Cinderfall, Ember Debt")
 	var scene := await _spawn({}, ["raider", "raider"])
 	var py := _py(scene)
 	if py == null:
@@ -774,8 +801,11 @@ func _live_refund() -> void:
 
 
 func _live_chip() -> void:
-	# THE SPEC CHIP MUST SHOW BOTH NUMBERS LIVE (§1) — the bonus AND the drain.
-	# Half of a trade is not a readout.
+	# RE-POINTED IN PLACE BY BATCH BS §2. AR asked for BOTH numbers because the
+	# spec was a trade and half a trade is not a readout. THERE IS ONE NUMBER
+	# NOW — the drain is deleted — so the chip is checked for the bonus being
+	# LIVE, and for the drain being ABSENT from it rather than merely reading
+	# zero, which is the same non-existence rule the functions are held to.
 	var scene := await _spawn({}, ["raider", "raider", "raider"])
 	var py := _py(scene)
 	if py == null:
@@ -789,9 +819,14 @@ func _live_chip() -> void:
 	ok(desc.contains("Overburn"), "the chip names Overburn (%s)" % desc)
 	ok(desc.contains("+%d%%" % (lit * 2)),
 		"the chip shows the live BONUS of +%d%% (%s)" % [lit * 2, desc])
-	ok(desc.contains("-%d Mana" % lit),
-		"the chip shows the live DRAIN of %d Mana (%s)" % [lit, desc])
-	ok(desc.contains("NO CAP"), "the chip says which of the two has no cap")
+	ok(not desc.contains("-%d Mana" % lit),
+		"the chip shows NO drain — there is none (%s)" % desc)
+	ok(not desc.contains("NO CAP"),
+		"...and no longer claims a term without a cap (%s)" % desc)
+	ok(desc.contains("refunds Mana"),
+		"the chip still states the surviving second clause (%s)" % desc)
+	ok(String(chip.get("short", "")).find("/") < 0,
+		"the chip's TAG is one number now, not two (%s)" % String(chip.get("short", "")))
 	ok(not desc.contains("Inferno Master"), "no trace of the old passive")
 	scene.queue_free()
 	await process_frame
@@ -808,15 +843,17 @@ func _live_immolate() -> void:
 		if ab.display_name == "Immolate":
 			has_immolate = true
 	ok(has_immolate, "the node granted Immolate")
-	ok(scene.call("_overburn_capped", py), "capped before the cast")
-	ok(scene.call("_overburn_drain", py, 20) == 20, "and paying the plain drain")
-	py.add_status("immolate", "Immolate", "IM", Color(1, 1, 1), 2, "")
-	ok(not scene.call("_overburn_capped", py),
-		"Immolate lifts the damage cap ENTIRELY")
-	ok(is_equal_approx(scene.call("_overburn_mult", py, 40), 1.80),
-		"...so 40 burn-turns pay +80%")
-	ok(scene.call("_overburn_drain", py, 20) == 40,
-		"...and DOUBLES the drain (got %d)" % scene.call("_overburn_drain", py, 20))
+	# RE-POINTED IN PLACE BY BATCH BS §3, AND IT IS AN INVERSION. Immolate kept
+	# its id and its ability slot and lost BOTH Overburn clauses: the
+	# drain-doubling went with the drain, and the cap-lift went because the cap
+	# is Detonation's subject rather than Inferno's. What it does now is
+	# MITIGATE — and the retaliation burn below, which is byte-unchanged, is
+	# what makes the two clauses point the same way.
+	ok(is_equal_approx(scene.call("_overburn_mult", py, 40), 1.40),
+		"capped at +40% before the cast")
+	py.add_status("immolate", "Immolate", "IM", Color(1, 1, 1), 3, "")
+	ok(is_equal_approx(scene.call("_overburn_mult", py, 40), 1.40),
+		"Immolate does NOT lift the damage cap any more")
 	# The retaliation burn moved with it and reads the NEW status id — driven,
 	# not hoped for. `no_cover` is the Sharpshooter's existing miss BYPASS: it
 	# makes the strike land rather than retrying until it does (the AK/AL

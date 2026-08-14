@@ -399,12 +399,24 @@ var ember_wind := 0           # Chain Ignition: a burning death splits its Burn
 var ember_consumed := false   # Chain Ignition already released this corpse
 var burn_at_death := 0        # Burn turns left when this unit died
 var burn_tick_at_death := 0   # tick snapshot for the Chain Ignition transfer
-var fire_walker := 0          # Fire Walker: Overburn's drain is 25% lighter
-var invigorating_ranks := 0   # Invigorating Ashes: N% chance of Mana per Burn tick
-var heat_haze_ranks := 0      # Heat Shimmer: Overburn's damage cap +N points
-var kiln_forged := 0          # Kiln-Forged: +20% fire resist, drain floors at 10 Mana
-var ash_lung := 0             # Ash Lung: +15% damage while the drain outruns regen
-var cauterise := 0            # Cauterise: the drain bills health, and no cap under 20
+# BATCH BS §3 — THE INFERNO LANE, RE-AUTHORED AS DEFENCE. The eight node ids
+# survived; SIX FIELDS DID NOT, and they were DELETED WITH THEIR READ SITES
+# rather than re-pointed in place, because every one of them changed what it
+# MEANS and that is the failure mode nothing complains about (the BH
+# `fervor_step` / BA `plague_bearer` precedent). Gone with Overburn's drain:
+# `fire_walker`, `invigorating_ranks`, `heat_haze_ranks`, `kiln_forged`,
+# `ash_lung`, `cauterise` — and the old `forge_body`, which measured a bill
+# that no longer exists. NO RUNE WROTE ANY OF THE SEVEN (audited, BS §4), so
+# nothing needed re-pointing; a later rune landing on one of the names below
+# would be writing a field with a new meaning, which is why the names moved.
+var ember_shroud := 0         # Ember Shroud: -N% damage taken while ANY enemy Burns
+var ashen_skin := 0           # Ashen Skin: +N points of fire resistance (lands at spawn)
+var ashen_skin_heal := 0      # Ashen Skin: a Burn tick HE applied heals him N% of it
+var heat_haze := 0            # Heat Haze: a BURNING attacker has an N% chance to miss him
+var backblast := 0            # Backblast: heals N% of maximum, once, under 40% health
+var backblast_used := false   # once per battle, and the flag is what makes that true
+var kiln_forged_at := 0       # Kiln-Forged: no single hit kills while N+ enemies Burn
+var ash_lung_pct := 0         # Ash Lung: N points both ways, per burning enemy, uncapped
 var focused_flame := 0        # Focused Flame: Detonation's Burn bonus 250% -> 325%
 var pressure_cooker := 0      # Pressure Cooker: +25 Break damage on a Burning target
 var aftershock := 0           # Aftershock: Detonation re-lights what it consumed
@@ -889,19 +901,29 @@ var credit_cb := Callable()
 # hit landed against, and only this scope still has it.
 var damage_taken_cb := Callable()
 
+# BATCH BS §3 — KILN-FORGED asks the BOARD a question, which is the one thing
+# this file cannot answer for itself, so it asks back the way every other
+# cross-unit effect here does. Returns how many living enemies are Burning;
+# stamped on every spawned unit at `battle._make_unit`, so the count is read
+# fresh at the moment a hit lands rather than sampled at the top of a turn.
+# It is a METHOD reference rather than a lambda deliberately — a nested lambda
+# inside a call argument is this project's oldest parse trap.
+var burning_foes_cb := Callable()
+
 # ---------- BATCH BO §5 — the drafted abilities' unit-side state ----------
 #
-# FIVE FIELDS AND THREE CALLBACKS, one read site each. The callbacks exist for
+# FOUR FIELDS AND THREE CALLBACKS, one read site each (it was FIVE until BATCH
+# BS §4 deleted Ember Debt's — see directly below). The callbacks exist for
 # the same reason every other one on this file does: unit.gd cannot see the
 # board, so an effect that has to reach ANOTHER unit hands the number back to
 # battle.gd rather than reaching across.
 #
-# EMBER DEBT (Pyromancer) — stamped on the ENEMY, read by `_drain_burn_turns`
-# alone. It exempts that enemy's Burn from Overburn's Mana DRAIN and from
-# nothing else: its turns still feed the damage BONUS, which is the whole
-# trade ("one enemy is free to light"). Read the asymmetry in battle.gd's
-# Overburn block before touching either half.
-var ember_debt := false
+# EMBER DEBT (Pyromancer) — BATCH BS §4 DELETED ITS FIELD WITH THE DRAIN.
+# `ember_debt` was a bool on the ENEMY read by `_drain_burn_turns` alone, and
+# it exempted that enemy from a bill that no longer exists. The ability was
+# RE-AUTHORED rather than replaced (see `Classes.draft_ability`): it now pays
+# Overburn's REFUND up front, through the same one door Detonation, Wildfire
+# and Cinderfall share, so it needs no state on either side.
 # AEGIS REVERSAL (Devout) — the consumed shield's remaining power, waiting on
 # the ALLY. Spent by their next damaging strike and zeroed there.
 var aegis_bonus := 0
@@ -1034,7 +1056,10 @@ var whole_room := 0           # The Whole Room: his taunts never expire — tick
 var standard_bearer := 0      # Standard Bearer: % of his armor every ally wears
 # --- Mage ---
 var sea_of_flame := 0         # Sea of Flame: +% fire damage per BURNING enemy
-var forge_body := 0           # Forge Body: % of the Overburn drain thrown as damage
+var forge_body_pct := 0       # Forge Body: -N% damage taken per remaining Burn TURN
+                              # on the field (capped), the prevented damage thrown
+                              # at a burning enemy. It REPLACES `forge_body`, which
+                              # measured the drain BS §2 deleted.
 var powder_keg := 0           # Powder Keg: % of a Detonation banked into the next
 var keg_bank := 0             # ...the bank itself
 var winters_depth := 0        # Winter's Depth: -% Constitution per Chilled stack
@@ -2278,6 +2303,20 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		amount = maxi(hp - 1, 0)
 		float_text("EVENT HORIZON", Color(0.85, 0.55, 1.0))
 		_proc_log("Talent: Event Horizon — %s cannot be reduced below 1 health" % unit_name)
+	# KILN-FORGED (Pyromancer, Inferno row 6 — BATCH BS §3). Deliberately built
+	# on Event Horizon's shape rather than on the four DEATH-REFUSALS below the
+	# subtraction: the promise is that no SINGLE HIT reduces him below 1, so it
+	# belongs above the subtraction where nothing downstream ever sees a lethal
+	# number. That also makes it honest about what it is NOT — a Burn tick is
+	# not a hit, and `take_tick_damage` deliberately carries no copy of this.
+	# THE GATE IS THE BOARD, not a stat: it holds only while THREE OR MORE
+	# enemies are Burning, so the lane's own work is what keeps him standing.
+	if kiln_forged_at > 0 and amount > 0 and amount >= hp \
+			and burning_foes_cb.is_valid() \
+			and int(burning_foes_cb.call()) >= kiln_forged_at:
+		amount = maxi(hp - 1, 0)
+		float_text("KILN-FORGED", Color(1.0, 0.6, 0.3))
+		_proc_log("Talent: Kiln-Forged — %s is fired hard and cannot fall (1 HP)" % unit_name)
 	var was_above_half := hp > max_hp * 0.5
 	var was_above_quarter := hp > max_hp * 0.25
 	var was_below_deathwish := hp < max_hp * 0.35

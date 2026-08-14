@@ -618,7 +618,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"description": "Take the whole field: EVERY enemy is\ntaunted onto you for 2 turns, and you\ntake 8% less damage for each one\ntaunted. The more of them there are,\nthe better you weather it."})
 		# ----- PYROMANCER: different answers to how do you commit -----
 		# AXIS: spending wide instead of deep. Detonation empties one bank;
-		# this skims every bank, and relieves Overburn's drain across the field.
+		# this skims every bank, and Overburn refunds every turn it takes.
 		"Cinderfall":
 			return Ability.make({"display_name": "Cinderfall", "dmg_type": "fire",
 				"cost": 30, "damage": 20, "pressure": 8, "delay": 3.0,
@@ -626,14 +626,19 @@ static func draft_ability(display_name: String) -> Ability:
 				"special": "cinderfall",
 				"perfect_id": "", "perfect_text": "Takes 3 turns of Burn from each instead of 2",
 				"description": "Rake the whole field for 20% of Attack,\nthen tear 2 turns of Burn from EACH\nburning enemy to deal that much again\nto it. Overburn refunds every turn taken."})
-		# AXIS: commitment without the bill. One enemy is free to light;
-		# everything else still costs, so the choice is which enemy is exempt.
+		# AXIS: PAID BEFORE IT BURNS (BATCH BS §4, re-authored). Its old axis was
+		# "commitment without the bill" — an exemption from Overburn's Mana
+		# drain — and BS deleted the drain, so the card's whole second sentence
+		# had nothing left to say. Every other Burn payout in the kit EMPTIES
+		# the bank (Detonation eats a stack, Wildfire and Cinderfall skim the
+		# field); this is the deepest single-target Burn he can lay AND the only
+		# card Overburn pays for without consuming anything.
 		"Ember Debt":
 			return Ability.make({"display_name": "Ember Debt", "dmg_type": "fire",
 				"cost": 20, "damage": 0, "pressure": 0, "delay": 2.0,
 				"cooldown": 4, "anim": "attack02", "special": "ember_debt",
 				"perfect_id": "", "perfect_text": "12 turns of Burn instead of 8",
-				"description": "Set a debt alight: 8 turns of Burn on\none enemy, and Overburn's Mana drain\nIGNORES that enemy entirely for the\nrest of the battle. Its turns still\nfeed the damage bonus."})
+				"description": "Set a debt alight: 8 turns of Burn on\none enemy — and Overburn pays you for\nevery one of them NOW, as though you\nhad already consumed them. The fire\nstill burns its full term."})
 		# ----- CRYOMANCER: what do you do with the time you bought -----
 		# AXIS: cashing in without releasing. Shatter and Ice Lance both end the
 		# hold to be paid; this collects interest and leaves the prison standing.
@@ -1691,7 +1696,7 @@ const SPEC_INFO := {
 	"pyromancer": {"name": "Pyromancer", "constitution": 85, "archetype": "Nuker", "passive": "overburn",
 		"max_hp": 135, "armor": 0.08,
 		"resists": {"fire": 0.30, "frost": -0.20},
-		"passive_desc": "Overburn: +2% damage for every turn of Burn standing on\nthe enemy team, up to +40% — but at the start of each of\nhis turns he loses 1 Mana for every one of those turns,\nand THAT has no cap. Every turn of Burn he CONSUMES\nrefunds 1 Mana.",
+		"passive_desc": "Overburn: +2% damage for every turn of Burn standing on\nthe enemy team, up to +40%. Every turn of Burn he\nCONSUMES refunds 1 Mana. Holding fire costs him\nnothing — his commitment is that the damage is\nDEFERRED until he cashes it in.",
 		"blurb": "Aggressive flame — spend everything, or the fire spends you."},
 	# The passive ID stays "permafrost" (Batch AS renamed the PASSIVE to
 	# GLACIAL HOLD; the id is a key battle.gd matches on, like the
