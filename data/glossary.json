@@ -869,5 +869,41 @@
    "difficulty_ladder",
    "relics_vs_runes"
   ]
+ },
+ {
+  "id": "ability_draft",
+  "term": "The Ability Draft",
+  "category": "progression",
+  "short": "New abilities offered three at a time by elites, merchants and events.",
+  "long": "Beside the zone-boss pick sits a second, larger source of abilities. EVERY ELITE OFFERS ONE ON VICTORY, to one hero; a MERCHANT sells one for gold (120 / 180 / 240 by zone); and some EVENTS trade for one. Every offer is three cards the hero does not already own, drawn from that spec's draft pool with roughly one card in four coming from a wider class-wide pool. If the pool cannot fill three it FILLS SHORT rather than repeating itself. Elites run 0-3 per zone, so how much you draft is a property of the road you walked: a greedy route drafts far more than a cautious one. DECLINING IS ALWAYS ALLOWED, and a declined or dropped ability does not come back to that run's pool.",
+  "see_also": [
+   "ability_slots",
+   "protected_core",
+   "boss_trophies",
+   "ability_upgrades"
+  ]
+ },
+ {
+  "id": "ability_slots",
+  "term": "Ability Slots",
+  "category": "progression",
+  "short": "A kit holds seven abilities. Past that, taking one means dropping one.",
+  "long": "A hero's kit has room for SEVEN abilities, and the protected core counts against it - so most specs open with 3 filled and 4 to fill. AT THE CAP AN OFFER BECOMES TAKE-ONE-AND-DROP-ONE: you pick the incoming ability and then name which of your EARNED abilities it replaces. Only earned abilities can be named; the protected core never can. A dropped ability does not return to that run's pool, so the choice is real. The cap binds every source alike - a zone-boss pick at seven slots asks for a drop exactly as a drafted card does.",
+  "see_also": [
+   "ability_draft",
+   "protected_core",
+   "boss_trophies"
+  ]
+ },
+ {
+  "id": "protected_core",
+  "term": "Protected Abilities",
+  "category": "progression",
+  "short": "The passive, the basic attack, and whatever the passive needs to work.",
+  "long": "Every spec keeps a PROTECTED CORE: its passive, its basic attack, and the minimum abilities its passive cannot function without. Protected abilities CAN NEVER BE DROPPED, which is what stops the seven-slot cap from breaking a spec - a Pyromancer can never trade away the Detonation that Overburn exists to spend, and a Beastmaster can never trade away the summons Pack Bond reads. The minimum varies by spec rather than following a rule: Overburn needs a Burn applier AND a spender, while the Berserker's Blood Frenzy reads nothing but his own health bar and needs no ability at all.",
+  "see_also": [
+   "ability_slots",
+   "ability_draft"
+  ]
  }
 ]

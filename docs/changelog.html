@@ -5,6 +5,282 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-13 &mdash; Batch BO: the ability draft, and tranche 1</h2>
+<p><i>Two things, and the order mattered: <b>&sect;1&ndash;&sect;4 build the draft machinery,
+&sect;5 authors the first tranche of content into it.</b> Machinery first, because the schema
+decides what an ability has to carry &mdash; a draftable flag, a class-wide tag &mdash; and
+authoring ninety-six abilities before those exist means authoring them twice. No save version
+moves (still v10); no talent node, no magnitude and no existing ability changed.</i></p>
+
+<h3>The rules of the draft</h3>
+<p>Beside the zone-boss pick there is now a second, larger source of abilities. Where a boss
+pick is rare and drawn from a small spec pool, <b>the draft is frequent, drawn from its own
+pool, and comes with a cost</b>.</p>
+<ul>
+<li><b>A kit holds seven abilities.</b> Every spec keeps a <b>protected core</b> &mdash; its
+passive, its basic attack, and the minimum abilities its passive needs to function &mdash; and
+that core counts against the seven, so most specs carry <b>3 protected and 4 draftable</b>
+(Holy carries 4 and 3).</li>
+<li><b>Protected abilities can never be dropped</b>, so every drop decision is among <i>earned</i>
+abilities. That is what makes the cap unable to break a passive: a Pyromancer can never trade
+away the Detonation Overburn exists to spend, and a Beastmaster can never trade away the summons
+Pack Bond reads.</li>
+<li><b>At the cap, an offer becomes take-one-and-drop-one.</b> Pick the incoming ability, then
+name which of your earned abilities it replaces.</li>
+<li><b>Declining is always allowed</b>, at any point, full or not. A settled kit is a legitimate
+end state, and being forced to churn would make a good build worse as the run goes on.</li>
+<li><b>A declined or dropped ability does not return to that run's pool</b>, so an offer can
+never re-present what was just refused.</li>
+<li><b>Every offer is 3 cards</b>, and a pool that cannot fill three <b>fills short rather than
+padding with repeats</b> &mdash; the same rule ability upgrades already follow.</li>
+</ul>
+<p><b>Where picks come from.</b> An <b>elite always offers one on victory</b>, to one hero
+&mdash; the designer's decision, and the reason is that the player should always feel their
+build is improving. Elites run 0&ndash;3 per zone, so <b>drafts are route-dependent</b>: a
+greedy route drafts far more than a cautious one, which is the map's risk axis paying out in a
+new currency. A <b>merchant</b> sells one for gold (<b>120 / 180 / 240 by zone</b>). Some
+<b>events</b> trade for one &mdash; the Ancient Training Grounds sells a new form for 200 gold,
+and the Echo of the Warden teaches one for a hero's health. <b>Zone bosses keep the existing
+pick, unchanged</b>: same timing, same pool, same overlay.</p>
+<p><b>Roughly one card in four is class-wide</b>; the rest are spec. Class-wide abilities are
+deliberately untied and general &mdash; Magic Barrier, not Frostbolt &mdash; and are
+<b>weaker than spec abilities but unconditional</b>: they feed no passive, so at equal power
+they would be a safe default that dilutes every build. Slightly weaker and always-on makes them
+the pick you take when your spec's engine is not online yet. <b>Six per class, twenty-four in
+all, and none of them ship in this batch</b>; the pools are named so the machinery has the shape
+it needs.</p>
+<p><b>Pools are thin, and that is expected.</b> Eighteen abilities exist against a target of
+about ninety-six, so offers will come up two cards or one for the next two batches, and a
+Warrior has no draft pool at all yet. That is the pool filling, not the draft misbehaving.</p>
+
+<h3>The twelve protected cores</h3>
+<p>The "needs" column is the minimum each passive cannot function without, and it is decided per
+spec rather than by a rule &mdash; Overburn is meaningless without a Burn applier and without
+Detonation to spend it, so the Pyromancer's core is larger than the Berserker's, whose Blood
+Frenzy reads nothing but his own health bar. <b>An empty cell is a real answer</b>: those specs'
+opening abilities are protected because they shipped in the kit, not because the passive needs
+them. The table is written down and tested because the failure it prevents is silent &mdash; a
+spine that stops working because its enabler became draftable logs nothing and simply reads as
+a weak spec.</p>
+<table border="1" cellpadding="4">
+<tr><th>Spec</th><th>Slots</th><th>Its passive needs</th><th>Why</th></tr>
+<tr><td>Berserker</td><td>3</td><td>&mdash;</td><td>Blood Frenzy reads his own health bar and nothing else.</td></tr>
+<tr><td>Warden</td><td>3</td><td>&mdash;</td><td>Heavy Plating is a Block-chance rule; it reads no ability.</td></tr>
+<tr><td>Swordmaster</td><td>3</td><td>Guard Change</td><td>Seasoned Fighter is two stances, and Guard Change is the only stance swap in the game.</td></tr>
+<tr><td>Pyromancer</td><td>3</td><td>Fireball, Detonation</td><td>Overburn needs an applier to build the field and a spender to empty it.</td></tr>
+<tr><td>Cryomancer</td><td>3</td><td>Frostbolt, Ice Lance</td><td>Glacial Hold needs a Chilled applier to reach four stacks and a release to end the hold.</td></tr>
+<tr><td>Arcanist</td><td>3</td><td>Arcane Explosion</td><td>Runaway Resonance builds on damaging casts; the free core attack guarantees one every turn.</td></tr>
+<tr><td>Holy</td><td>4</td><td>Heal, Hymn of Hope</td><td>Mercy must be spendable &mdash; Hymn pays stacks outright, and Empower needs a heal to empower.</td></tr>
+<tr><td>Devout</td><td>3</td><td>Divine Shield, Consecrated Ground</td><td>Conviction builds only on Divine Shield absorbs, and Batch BI measured the ground's drip at 66% of all Faith.</td></tr>
+<tr><td>Occultist</td><td>3</td><td>Shadowrend, Hex of Ruin</td><td>Wrath of the Old Gods marks on debuffs he applies; these two are the debuffs he always holds.</td></tr>
+<tr><td>Beastmaster</td><td>3</td><td>All three summons</td><td>Pack Bond reads a living beast. His five opening abilities cost <b>three</b> slots &mdash; the summon picker has been one bar entry since Batch AH, and counting three would cost him two draftable picks for a bookkeeping reason.</td></tr>
+<tr><td>Sharpshooter</td><td>3</td><td>Quick Shot</td><td>Lethal Aim counts consecutive single-target attacks; the free shot lets him stay on a mark every turn.</td></tr>
+<tr><td>Survivalist</td><td>3</td><td>&mdash;</td><td>Trapper's poison rides being struck, and its breadth term counts statuses from any source &mdash; including his allies'.</td></tr>
+</table>
+
+<h3>Tranche 1 &mdash; eighteen abilities</h3>
+<p><b>Eighteen ship, not twenty-four, and that is said plainly rather than left as a gap</b>:
+six MAGE, six CLERIC, six HUNTER. <b>The six WARRIOR abilities are not authored here</b> &mdash;
+the Warrior lane names only arrived in Batch BM and their pools want the same discussion the
+other nine had. Every ability names the axis it serves, because the twelve tree batches spent
+themselves removing nodes that existed to fill a grid, and ninety-six abilities has the same
+risk in a larger form.</p>
+
+<p><b>Pyromancer &mdash; different answers to how do you commit.</b></p>
+<ul>
+<li><b>Cinderfall</b> &mdash; 30 Mana, 3.0 initiative, 3cd, all enemies. 20% of Attack across the
+field, then <b>consumes 2 turns of Burn from each enemy</b> to deal that much again to it
+(Perfect: 3 turns). Overburn refunds every turn taken. <i>Axis: spending wide instead of deep</i>
+&mdash; Detonation empties one bank, this skims every bank, and relieves Overburn's drain across
+the field.</li>
+<li><b>Ember Debt</b> &mdash; 20 Mana, 2.0, 4cd, one enemy. No damage. Applies 8 turns of Burn
+(Perfect: 12), and <b>Overburn's Mana drain ignores that enemy entirely</b> while its turns still
+feed the damage bonus. <i>Axis: commitment without the bill</i> &mdash; one enemy is free to
+light; everything else still costs, so the choice is which enemy earns the exemption.</li>
+</ul>
+<p><b>Cryomancer &mdash; what do you do with the time you bought.</b></p>
+<ul>
+<li><b>Winter's Toll</b> &mdash; 25 Mana, 2.5, 4cd. The held enemy takes 8% of Attack per turn it
+has been held (Perfect: 12%). <b>The hold continues.</b> <i>Axis: cashing in without releasing</i>
+&mdash; Shatter and Ice Lance both end the hold to be paid; this collects interest and leaves the
+prison standing.</li>
+<li><b>Rimebinding</b> &mdash; 20 Mana, 2.0, 3cd, one enemy. Applies Chilled equal to the stacks
+on the held enemy (Perfect: one more). <i>Axis: the hold as a template</i> &mdash; one deep prison
+becomes the next one.</li>
+</ul>
+<p><b>Arcanist &mdash; what carries you through the early game.</b></p>
+<ul>
+<li><b>Null Field</b> &mdash; 25 Mana, 2.0, 4cd, self. For 3 turns (Perfect: 4), damage taken
+falls <b>5% per Resonance stack, read live</b>. <i>Axis: the ramp defends itself</i> &mdash;
+worthless at 2 stacks, enormous at 12, so it does not rescue his early game, it makes surviving
+<i>to</i> the late game the reward for ramping. It is deliberately the opposite of Stabilize,
+which Batch AT vaulted for being an escape hatch.</li>
+<li><b>Kindled Mind</b> &mdash; 15 Mana, 1.5, 2cd, one enemy. 15% of Attack, and it <b>banks 3
+Resonance instead of 1</b> (Perfect: 4). <i>Axis: buying the ramp with tempo</i> &mdash; his
+fastest early climb and a card he would rather not cast late, which is the correct shape for
+escalation.</li>
+</ul>
+<p><b>Holy &mdash; what does reversal cost you.</b></p>
+<ul>
+<li><b>Second Wind</b> &mdash; 30 Mana, 2.5, 4cd, one ally. Heals for the damage that ally has
+taken <b>in the last two turns</b>, up to 40% of their maximum (Perfect: 55%). <i>Axis: undoing
+recent history rather than topping up</i> &mdash; enormous on someone just spiked, worthless on
+someone healthy.</li>
+<li><b>Rite of Return</b> &mdash; 35 Mana, 3.0, 5cd, one ally. For 3 turns (Perfect: 4), the next
+blow that would fell that ally <b>restores them to 50% health instead, and Holy loses 30% of
+hers</b>. <i>Axis: reversal bought in advance rather than reacted to</i> &mdash; Resurrection
+undoes a death and costs Mercy; this prevents one and costs her health. <b>It sits alongside
+Intercession</b>, which also refuses a lethal blow: the two are distinguished by target (one named
+ally vs the next hero to fall), timing (pre-bought vs a window) and currency (her health vs a
+Mercy stack). <b>If they read as duplicates in play, this is the one to cut.</b></li>
+</ul>
+<p><b>Devout &mdash; what else can he lend.</b></p>
+<ul>
+<li><b>Vow of Suffering</b> &mdash; 20 Mana, 2.0, 3cd, one ally. For 3 turns (Perfect: 4), <b>half
+the damage that ally takes is redirected to the Devout</b>. <i>Axis: mitigation by relocation</i>
+&mdash; Divine Shield absorbs a capped amount; this has no cap, and every hit he eats builds that
+ally's Faith.</li>
+<li><b>Aegis Reversal</b> &mdash; 30 Mana, 2.5, 4cd, one ally. <b>Consumes that ally's Divine
+Shield; their next attack deals bonus damage equal to what the shield had left</b> (Perfect: half
+again). <i>Axis: unspent protection becomes offence</i> &mdash; his shields expire unspent
+constantly; this makes over-shielding a resource, and it is the Devout dealing damage without
+attacking.</li>
+</ul>
+<p><b>Occultist &mdash; what else can be corrupted.</b></p>
+<ul>
+<li><b>Blight the Well</b> &mdash; 25 Mana, 2.5, 4cd, one enemy. For 4 turns (Perfect: 6),
+<b>healing that enemy receives damages it instead</b>. <i>Axis: corrupting recovery.</i>
+<b>Deliberately situational</b> &mdash; near-dead against a warband with no healer, decisive
+against one with. A pool needs a few cards that are excellent when the board calls for them, or
+every pick is a safe generic. It is a real debuff, so a mender can spend a turn cleansing it, and
+that is the counterplay rather than an oversight.</li>
+<li><b>Covenant of Ash</b> &mdash; 20 Mana, 2.0, 4cd, one enemy. Marks it; <b>while the mark holds,
+every Ruin stack applied to any enemy also lands here</b>. One covenant at a time. <i>Axis:
+corruption that compounds onto a chosen target</i> &mdash; spread pressure becomes focused pressure
+without giving up the spread.</li>
+</ul>
+<p><b>Beastmaster &mdash; what does the partnership give you.</b></p>
+<ul>
+<li><b>Twin Hunt</b> &mdash; 25 Mana, 2.5, 3cd, one enemy. <b>The Beastmaster and his beast strike
+together</b>, each for 40% of Attack (Perfect: the beast lands 55%). <b>If the beast's blow kills
+it, his next ability costs nothing.</b> <i>Axis: the two bodies acting deliberately</i>, where the
+rest of his kit has the beast on its own clock.</li>
+<li><b>Call the Wilds</b> &mdash; 20 Mana, 2.0, 5cd. Calls in the absent beast he is most bonded
+with, <b>keeping its Loyalty and paying no shared Swap cooldown</b>, and it strikes immediately
+(Perfect: twice). <i>Axis: rotation without the tax.</i> Batch BJ measured swaps at <b>0.05 per
+trash battle</b> &mdash; the central verb of an entire lane barely happens.
+<b>A CORRECTION TRAVELS WITH THIS ONE.</b> The batch brief says the Loyalty loss is why, and
+<b>a swap has never cost Loyalty</b>: it lives on the hunter's own record and is written in four
+places, none of them a swap &mdash; only a beast's death breaks the meter, and only Primal Surge
+spends it. What a swap actually costs is a turn and a three-turn shared cooldown, so that is what
+this ability refuses. The Loyalty half is kept as an explicit, tested guarantee rather than dropped,
+because it is what the card promises.</li>
+</ul>
+<p><b>Sharpshooter &mdash; what breaks the patience, and what pays for it.</b></p>
+<ul>
+<li><b>Called Volley</b> &mdash; 30 Mana, 3.0, 4cd, all enemies. 20% of Attack (Perfect: 26%), and
+<b>his Focus and his mark survive it</b>. <i>Axis: hitting the field without breaking the bond.</i>
+<b>A finding travels with this one.</b> The clause is true but it is <i>not</i> a distinction: the
+Focus engine has been gated to skip area attacks since Batch AZ, so no area attack has ever cleared
+Focus, and "every other multi-target option costs him his meter" does not survive reading the code
+either. Shipped as specified; what the batch buys is that the guarantee is now a named, tested rule
+rather than a side effect of one condition in an unrelated branch.</li>
+<li><b>Quarry's Mark</b> &mdash; 15 Mana, 1.5, 3cd, one enemy. Marks it for the battle: <b>Focus
+gained from attacking the marked enemy is doubled</b>. One mark at a time. <i>Axis: patience that
+accelerates.</i> It deliberately does <b>not</b> protect Focus on the marked enemy's death &mdash;
+Overkill already does that, and an ability duplicating a row-7 talent is the Deadfall fault Batch
+BD found. Switching still clears him; the mark makes committing pay faster.
+<b>Flag: doubled may be too much</b> on a build stacking Muscle Memory and Unwavering. <b>+50% is
+the stated fallback if it reads hot in play.</b></li>
+</ul>
+<p><b>Survivalist &mdash; what else can be worn down.</b></p>
+<ul>
+<li><b>Choking Smoke</b> &mdash; 25 Mana, 2.5, 4cd, all enemies. <b>Blinds every enemy for 2
+turns</b> (Perfect: 3). <i>Axis: an affliction his kit does not otherwise have.</i> It uses the
+<b>existing</b> Blind at its existing +50% miss rather than authoring a new status; the stacking
+was read rather than assumed, and it is <b>flat percentage points</b> on top of the base 5%, never
+a multiplier. Priced against the fact that <b>area attacks never miss</b>, so a field-wide 50%
+blanks single-target blows only.</li>
+<li><b>Snare Line</b> &mdash; 25 Mana, 2.5, 4cd. <b>Every enemy that acts next turn springs one of
+your traps</b>, wherever it stands (Perfect: the line holds two turns). <i>Axis: the traps stop
+waiting.</i> It fills no trap slot and spends no placed trap, and the spring goes through the same
+door a snare does &mdash; so Bone Breaker's Break, Cruel Devices' multiplier, Quick Rigging's
+Cripple and Caught Fast all pay per spring.</li>
+</ul>
+
+<h3>Reported, not buried</h3>
+<ul>
+<li><b>Break damage is this batch's number, not the brief's.</b> The batch specifies cost,
+initiative, cooldown, target and effect for all eighteen and says nothing about Break damage
+&mdash; exactly as Batch AT's brief said nothing about Death Ray's, and that omission became a
+thread three batches long. The four that are ordinary attacks carry Break damage in line with
+their siblings (Cinderfall 8, Called Volley 8, Kindled Mind 6, Twin Hunt 12); the rest are not
+attacks and carry none.</li>
+<li><b>A name collision this batch created.</b> <b>Second Wind</b> is also the Berserker's
+Warpath row-5 talent node. It is a <i>label</i> collision only &mdash; a node's name is not an
+ability name, nothing resolves it, and the two write different fields &mdash; so nothing breaks.
+Shipped as specified and flagged, on the Shared Vigil and Overkill precedents: renaming either is
+the designer's call and one string.</li>
+<li><b>Two decisions the brief did not make.</b> An elite's draft goes to <b>one hero, drawn at
+random</b> and independently of the rune looter: the brief says "always, on victory" and not to
+whom, and offering every hero a card at every elite would hand out about twenty-six picks a run
+against four draftable slots, which is not a draft. And the merchant's price (120/180/240) sits
+deliberately below the blacksmith's, because the smith buys a permanent upgrade to something you
+already hold while an ability is the cheaper, more frequent question.</li>
+<li><b>The cap binds the zone-boss pick too.</b> The offer is unchanged &mdash; same source, same
+timing, same pool &mdash; but a seven-slot cap one pool can walk past is not a cap, and a
+Beastmaster's five spec-pool entries alone reach eight. A boss pick at the cap opens the same
+drop step a drafted card does.</li>
+<li><b>The bot gets one hook, not nine rotations.</b> Every spec's rotation is hand-authored and
+names its own kit, so a drafted ability would never be cast and no sim or live autoplay could
+verify it. The bot now substitutes a usable drafted ability <i>only</i> when its real rotation came
+back with the free basic attack &mdash; so it re-weights nothing, and no measurement taken before
+this batch stops being comparable. It is not a policy for playing these abilities well.</li>
+</ul>
+
+<h3>Verification</h3>
+<p><b>Per the designer's standing instruction from this batch onward, verification means the code
+landed and works. No sweeps, no bands, no balance measurement was run, and none should be quoted
+from this batch.</b> Where a number above needs watching, it is watched in play.</p>
+<p>Parse and flow gates clean, thirteen scenes with no script errors, the map-screen draw gate
+green, the run-harness gates all passing, and <b>a new test_batch_bo.gd at 449 checks, 0
+failures, stable over four runs</b>. <b>Eight negative controls</b> were each applied to real
+code and reverted (every touched file came back byte-identical by hash): a protected ability
+made droppable trips seven checks; Ember Debt's two denominators collapsed into one trips one;
+Null Field frozen at cast time trips one; a decline that does not write the no-return ledger
+trips three; an offer padding with repeats trips three; Winter's Toll releasing the hold trips
+two; an enabler moved into its own draft pool trips two; and Rite of Return billing its toll
+before restoring the health trips two. All eight of
+the clauses that could have silently done nothing &mdash; Ember Debt's drain exemption, Winter's
+Toll leaving the hold standing, Null Field reading current stacks, Aegis Reversal consuming the
+shield, Covenant of Ash mirroring Ruin, Call the Wilds preserving Loyalty, Called Volley preserving
+Focus, and Choking Smoke applying the existing Blind &mdash; are driven live and asserted against
+the state they change, never against the fact that the cast returned. <b>Three of them are built so
+that a broken implementation still fails:</b> Winter's Toll's "the hold continues" is trivially true
+of an ability that does nothing, so the damage is asserted beside it; Null Field's "reads current
+stacks" is trivially true of a value stamped at cast time, so the same field is measured at two
+different stack counts; and Call the Wilds' "keeps Loyalty" is trivially true if no swap happened,
+so the beast on the field is asserted to have changed.</p>
+<p><b>One edge was found by reading rather than by a test, and it is worth recording: Holy can
+swear the Rite of Return on herself.</b> Her own 30% toll then re-enters the very reversal she
+is standing in — so the promise has to be spent before the bill (or it answers its own toll
+forever) and the health restored before it (or she is billed against zero and marked dead one
+line before the restore would have run). That ordering is why this reversal's handler performs
+the restore while Intercession's and Martyrdom's do not, and the self-save case is now driven
+directly.</p>
+<p><b>Live autoplay is clean across three real battles</b>, with six of the eighteen firing in
+ordinary fights. A six-run simulation was walked <i>only</i> to exercise the elite path — eight
+offers a run, seven and a half cards shown, four and two thirds taken, and the short-offer and
+nothing-left-to-offer counters both large, which is exactly the shape of a thin pool. <b>Its
+difficulty figures are not a reading and none is quoted.</b></p>
+<p><b>The full suite battery is green with zero drift, and the zero was measured rather than
+assumed</b> — seven suites were re-run on stashed, unmodified code and read the same counts to
+the check. <b>Two pre-existing faults are recorded rather than fixed:</b> test_batch_ah and
+test_batch_an both still call a function Batch BM deleted, and each throws an error that aborts
+its own section while the suite goes on printing "0 failures" — so both have been quietly
+under-testing their reward sections for two batches. And test_batch_al's long-standing Spite
+flake appeared once in four runs, as it has since Batch BI. Neither is on this batch's path.</p>
+
 <h2>2026-08-13 &mdash; Batch BN: the crash, and the gate</h2>
 <p><i>Two items, both blockers, neither large. <b>&sect;1 is a bug. &sect;2 is one float, chosen
 by measurement rather than by guess.</b> Nothing else ships: no node, no ability, no magnitude

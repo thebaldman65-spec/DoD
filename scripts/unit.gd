@@ -19,7 +19,15 @@ const WEAKNESS_EXTRA := 0.25
 const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	"bleed", "sunder", "mocked", "stunned", "exposed", "cripple", "dazed",
 	"bewitch", "psychosis", "decay", "ruin", "hysteria",
-	"umbral_sigil", "elem_weak", "melted", "blind", "snared", "caught", "broken"]
+	"umbral_sigil", "elem_weak", "melted", "blind", "snared", "caught", "broken",
+	# BATCH BO §5 — Blight the Well is a genuine DEBUFF and is listed as one,
+	# which makes it CLEANSABLE by a mender's Cleansing Rite. That is the
+	# counterplay, not an oversight: an ability written to punish a healing
+	# warband should be answerable by that warband spending a turn not healing.
+	# `covenant`, `quarry` and `snare_line` are deliberately NOT here — a MARK
+	# is not a debuff (the Beastmaster's `hunt_mark` has never been one) and a
+	# trap line is on the ground rather than on the enemy.
+	"blight"]
 
 var frame_size := 100      # square frame edge of this unit's sprite strips
 var portrait_path := ""    # dedicated portrait art (falls back to a sheet crop)
@@ -875,6 +883,47 @@ var credit_cb := Callable()
 # hit landed against, and only this scope still has it.
 var damage_taken_cb := Callable()
 
+# ---------- BATCH BO §5 — the drafted abilities' unit-side state ----------
+#
+# FIVE FIELDS AND THREE CALLBACKS, one read site each. The callbacks exist for
+# the same reason every other one on this file does: unit.gd cannot see the
+# board, so an effect that has to reach ANOTHER unit hands the number back to
+# battle.gd rather than reaching across.
+#
+# EMBER DEBT (Pyromancer) — stamped on the ENEMY, read by `_drain_burn_turns`
+# alone. It exempts that enemy's Burn from Overburn's Mana DRAIN and from
+# nothing else: its turns still feed the damage BONUS, which is the whole
+# trade ("one enemy is free to light"). Read the asymmetry in battle.gd's
+# Overburn block before touching either half.
+var ember_debt := false
+# AEGIS REVERSAL (Devout) — the consumed shield's remaining power, waiting on
+# the ALLY. Spent by their next damaging strike and zeroed there.
+var aegis_bonus := 0
+# TWIN HUNT (Beastmaster) — free casts owed because the BEAST landed the kill.
+# A count rather than a bool, on the `free_summons` precedent: two kills in a
+# row owe two free casts and a bool would silently swallow the second.
+var free_ability := 0
+# SECOND WIND (Holy) — damage taken, by battle turn index. Written by
+# `_report_taken` (so it books what was ACTUALLY removed, below every death
+# refusal, exactly like the recap ledgers) and read by the ability across the
+# last two indices. Bounded: only the two most recent turns are kept, so a
+# 90-round stalemate cannot grow it.
+var dmg_by_turn := {}
+var battle_turn := 0        # stamped by battle.gd each turn; the key above
+# VOW OF SUFFERING (Devout) — fired from take_hit with (victim, share) when
+# the vow redirects half a wound. battle.gd bills the Devout and kindles the
+# ally's Faith; unit.gd only decides the split.
+var vow_cb := Callable()
+# BLIGHT THE WELL (Occultist) — fired from heal_amount with (victim, amount)
+# when healing has to become damage instead. The heal returns 0 here and the
+# DAMAGE is dealt battle-side, so the death it can cause routes through
+# `_on_enemy_death` like every other one.
+var blight_cb := Callable()
+# RITE OF RETURN (Holy) — asked whether the promised reversal can be paid.
+# Returns true when it was, exactly like `intercession_cb`: "the caster is
+# gone" and "the rite is spent" are then the same line of code.
+var rite_cb := Callable()
+
 # Occultist tree (07-24; lanes re-specced Batch L 07-30; every counter went
 # ADDITIVE in Batch AX — the field holds the MAGNITUDE, not a rank, and the
 # read site applies no step of its own). See talents.gd for the node text.
@@ -1005,6 +1054,30 @@ const MARTYRDOM_RETURN := 0.30
 # permanent capstone sat unused is the worse failure.
 func _holy_reversal() -> void:
 	if hp != 0:
+		return
+	# BATCH BO §5 — RITE OF RETURN GOES FIRST, and the reason is AV's own
+	# ordering argument taken one step further: the more SPECIFICALLY BOUGHT
+	# and the shorter-lived a refusal is, the sooner it should spend. The Rite
+	# was cast on THIS ally by name, holds 3 turns and costs Holy 30% of her
+	# health; Intercession blankets the whole party for a window; Martyrdom is
+	# a permanent capstone. Letting the named, expiring, already-paid-for
+	# promise lapse while a blanket window covered the same death is the
+	# failure this order refuses.
+	#
+	# `rite_cb` decides whether it can be PAID — it returns false when the
+	# Cleric who swore it is gone — so "the rite is spent" and "there is nobody
+	# left to spend it" are the same line of code (the intercession pattern).
+	#
+	# UNLIKE INTERCESSION AND MARTYRDOM, THE HANDLER PERFORMS THE RESTORE AS
+	# WELL AS THE PRICE, AND THE REASON IS A SPECIFIC RE-ENTRANCY: Holy may
+	# swear this on HERSELF. The toll is 30% of her health paid through
+	# `take_tick_damage`, which re-enters this very function — so the rite has
+	# to be SPENT and the health RESTORED before the bill lands, or she answers
+	# her own toll forever, and a bill collected while she still sat at zero
+	# would mark her dead a line before the restore ran. Order is everything
+	# here; the handler is the only scope that can hold all of it.
+	if has_status("rite_return") and rite_cb.is_valid() \
+			and bool(rite_cb.call(self)):
 		return
 	# Intercession: the STATUS is the one answer to "is the refusal live", so
 	# the window expires by itself and nothing has to remember to clear a
@@ -2091,6 +2164,22 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 					_proc_log("Talent: Afterglow — the breaking shield mends %s for %d" % [
 						unit_name, glow_got])
 			break
+	# BATCH BO §5 — VOW OF SUFFERING (Devout). HALF the damage this ally takes
+	# is redirected to the Devout for 3 turns. It sits DIRECTLY BELOW THE
+	# BARRIER BLOCK and that position is load-bearing: a Divine Shield is the
+	# Devout's own work and must eat first, so the vow relocates half of what
+	# GETS THROUGH rather than half of what was aimed. Above the barrier it
+	# would bill him for damage the shield was about to absorb — he would pay
+	# twice for the same hit.
+	#
+	# `vow_cb` returns the share it managed to bill (0 when the Devout is gone
+	# or already dead), and only THAT is subtracted here — a relocation that
+	# never landed must not also vanish from the ally.
+	if amount > 1 and has_status("vow") and vow_cb.is_valid():
+		var share: int = int(vow_cb.call(self, amount / 2))
+		if share > 0:
+			amount -= share
+			float_text("Vow -%d" % share, Color(0.98, 0.85, 0.45))
 	# BATCH BM §2 — LAST RITES (Berserker, Fury row 8). Below a quarter health
 	# the Rage the lane spends seven rows filling starts paying for the damage
 	# the lane spends seven rows inviting: 1 Rage a point, and health is only
@@ -2342,11 +2431,34 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 # through unchanged because the killing-blow line wants what the hit landed
 # against, not what survived it.
 func _report_taken(amount: int, hp_before: int) -> void:
-	if amount <= 0 or not damage_taken_cb.is_valid():
+	if amount <= 0:
 		return
 	var lost := hp_before - hp
-	if lost > 0:
+	if lost <= 0:
+		return
+	# BATCH BO §5 — SECOND WIND's ledger rides the ONE door BL already built,
+	# so it books the health actually removed, below every death refusal, and a
+	# future damage source cannot forget to report to it. BOUNDED TO TWO KEYS:
+	# the ability reads two turns and nothing else reads it at all, so anything
+	# older is deleted rather than accumulated (a 90-round stalemate must not
+	# grow a dictionary nobody reads).
+	dmg_by_turn[battle_turn] = int(dmg_by_turn.get(battle_turn, 0)) + lost
+	for stale in dmg_by_turn.keys():
+		if int(stale) < battle_turn - 1:
+			dmg_by_turn.erase(stale)
+	if damage_taken_cb.is_valid():
 		damage_taken_cb.call(self, lost, hp_before)
+
+
+# The damage this unit has taken across the CURRENT turn and the one before
+# it — Second Wind's whole subject, and its own function so a test can read it
+# without driving a heal.
+func damage_taken_recent() -> int:
+	var total := 0
+	for key in dmg_by_turn:
+		if int(key) >= battle_turn - 1:
+			total += int(dmg_by_turn[key])
+	return total
 
 
 func take_tick_damage(amount: int, label: String, color: Color) -> bool:
@@ -2461,6 +2573,22 @@ func heal_amount(amount: int, external := false) -> int:
 	if weight_of_ruin > 0 and status_stacks("ruin") >= weight_of_ruin:
 		if amount > 0:
 			float_text("RUINED", Color(0.6, 0.3, 0.6))
+		return 0
+	# BATCH BO §5 — BLIGHT THE WELL (Occultist). Healing this enemy receives
+	# DAMAGES it instead. It joins the absolute refusals for the same reason
+	# Weight of Ruin does — "healing does not heal here" is a rule, not a
+	# multiplier — and it is deliberately ABOVE them in intent but BELOW them
+	# in order: a target that already cannot be healed at all has nothing to
+	# invert, and billing it damage as well would pay the Occultist twice for
+	# two different nodes refusing the same heal.
+	#
+	# THE DAMAGE IS DEALT BATTLE-SIDE, through `blight_cb`. Calling
+	# take_tick_damage from inside heal_amount would kill a unit at a site that
+	# cannot reach `_on_enemy_death`, so the kill's payoffs (Ruin, Scavenger,
+	# Overkill, the loot) would silently not fire.
+	if has_status("blight") and amount > 0 and blight_cb.is_valid():
+		float_text("BLIGHTED", Color(0.55, 0.25, 0.45))
+		blight_cb.call(self, amount)
 		return 0
 	var mult := healing_received_mult
 	if has_status("rally_heal"):

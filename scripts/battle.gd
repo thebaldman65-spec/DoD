@@ -122,6 +122,17 @@ const STATUS_INFO := {
 	"snared": ["Snared", "Sn", Color(0.75, 0.65, 0.30), "A trap waits underfoot: the next\ntime this enemy acts it is STUNNED\nfor 1 turn and Poisoned."],
 	"caught": ["Caught Fast", "Cf", Color(0.75, 0.55, 0.25), "The trap's teeth hold the wound\nopen: cannot be healed."],
 	"venom_coat": ["Venom Coating", "VC", Color(0.45, 0.80, 0.30), "Coated arrows: every attack applies\nPoison and refreshes its timer."],
+	# ---- BATCH BO §5: the drafted abilities' statuses ----
+	# Six of the eighteen carry one. The other twelve either damage outright,
+	# write a field, or ride a status that already existed (Choking Smoke uses
+	# the EXISTING Blind — §5 says to use it, not to author a new one).
+	"null_field": ["Null Field", "NF", Color(0.75, 0.55, 0.95), "The storm folds inward: damage taken\nis reduced by 5% per RESONANCE STACK,\nread live — it deepens as he casts."],
+	"vow": ["Vow of Suffering", "Vw", Color(0.98, 0.85, 0.45), "The Devout carries half of it: half\nthe damage this ally takes is\nredirected to him — and every share\nhe eats kindles this ally 1 Faith."],
+	"rite_return": ["Rite of Return", "RR", Color(0.95, 0.90, 0.55), "Promised the road back: the next blow\nthat would fell this ally restores\nthem to 50% health instead, and costs\nHoly 30% of her own."],
+	"blight": ["Blighted", "Bl", Color(0.55, 0.25, 0.45), "The well is poisoned: any healing this\nenemy receives DAMAGES it for the\nsame amount instead."],
+	"covenant": ["Covenant of Ash", "CA", Color(0.60, 0.45, 0.50), "Bound to the ash: every stack of Ruin\napplied to ANY enemy also lands here."],
+	"quarry": ["Quarry", "Qy", Color(0.60, 0.85, 0.45), "Named the quarry: Focus gained from\nattacking this enemy is DOUBLED.\nSwitching away still clears him."],
+	"snare_line": ["Snare Line", "SL", Color(0.75, 0.65, 0.30), "A line runs across the ground: the\nnext time this enemy acts it springs\na trap where it stands."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -584,7 +595,14 @@ func _spawn_units() -> void:
 				if tn_grant != null \
 						and not cfg["abilities"].any(func(a): return a.display_name == tn_grant.display_name):
 					cfg["abilities"] = cfg["abilities"] + [tn_grant]
-			for pool_name in Classes.spec_pool(spec):
+			# BATCH BO: the DRAFT pool joins the toggle, for the reason the
+			# toggle exists at all — "All Spec Abilities Unlocked" that skipped
+			# eighteen of them would be a testing aid that lies. Scope is
+			# unchanged (this spec only); the class-wide draft pool is excluded
+			# for exactly AU §5's reason, and is empty today besides.
+			var granted_pool: Array = Classes.spec_pool(spec) \
+				+ Classes.spec_draft_pool(spec)
+			for pool_name in granted_pool:
 				var pool_ab := Classes.spec_pool_ability(spec, pool_name)
 				if pool_ab != null \
 						and not cfg["abilities"].any(func(a): return a.display_name == pool_ab.display_name):
@@ -822,6 +840,19 @@ func _spawn_units() -> void:
 		for h in heroes:
 			h.martyrdom_guard = true
 			h.martyrdom_cb = _on_martyrdom_return
+
+	# BATCH BO §5 — the drafted abilities' two hero-side hooks. Stamped on the
+	# WHOLE party rather than on the caster, for the reason every hook above is:
+	# the check runs on whoever is hit, not on whoever cast. Both are gated on
+	# the ability actually being held, so a party with neither pays nothing —
+	# and `_find_ability` reads the assembled kit, so a DRAFTED copy arms them
+	# exactly as a starting one would.
+	if heroes.any(func(h): return _find_ability(h, "Vow of Suffering") != null):
+		for h in heroes:
+			h.vow_cb = _on_vow_share
+	if heroes.any(func(h): return _find_ability(h, "Rite of Return") != null):
+		for h in heroes:
+			h.rite_cb = _on_rite_return
 
 	var composition: Array = ["raider", "chief", "archer", "archer"]
 	# DOD_SIM_ENEMIES="boss,shieldmaster,shaman" forces the enemy lineup in
@@ -1079,6 +1110,11 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
 	u.log_proc = _log  # unit-side talent procs reach the combat log
 	u.status_expired_cb = _on_status_expired  # Lingering Torment listens
 	u.damage_taken_cb = _on_damage_taken  # BATCH BL §2: the recap's taken ledger
+	# BATCH BO §5 — Blight the Well. Stamped on EVERY spawned unit rather than
+	# on enemies alone: the status is only ever applied to an enemy, but the
+	# stamp site is the one place every unit passes through, and a hook that is
+	# only attached to half the field is a hook a later batch has to remember.
+	u.blight_cb = _on_blight_heal
 	# The nameplate is a sibling (not a child) so lunges/knockback never move it.
 	var plate := Node2D.new()
 	plate.position = plate_pos
@@ -1735,6 +1771,13 @@ func _run_battle() -> void:
 		# being trapped by it.
 		_maybe_nudge_forfeit(_turns_taken)
 		_turns_taken += 1
+		# BATCH BO §5 — SECOND WIND's window. One stamp a turn, on the one loop
+		# that already counts turns, so "the last two turns" means the same
+		# thing to every unit on the field. It rides `_turns_taken` rather than
+		# a second counter for the reason BB promoted that variable in the first
+		# place: two counters for one clock is two answers to one question.
+		for tu in heroes + enemies:
+			tu.battle_turn = _turns_taken
 		# The hold ledger is read by the turn bar rebuilt on the very next
 		# line, so it is trued up FIRST.
 		_hold_sync()
@@ -2091,6 +2134,24 @@ func _run_battle() -> void:
 				# a flat 4 turns either way now.
 				_spring_trap(heroes[sn_idx], u, 0.0, sn_perfect)
 				_apply_poison(heroes[sn_idx], u, 4)
+		# BATCH BO §5 — SNARE LINE. The traps stop waiting: every enemy that
+		# ACTS while the line holds springs one where it stands. It sits beside
+		# the snare rather than in its own hook because it asks the identical
+		# question at the identical moment, and it goes through the same
+		# `_spring_trap`, so Bone Breaker's Break, Cruel Devices' multiplier,
+		# Quick Rigging's Cripple and Caught Fast all pay per spring exactly as
+		# they do on a placed trap. It spends NO placed trap and fills no trap
+		# slot — checked at the cast, stated on the card.
+		if not u.is_hero and not u.dead and u.has_status("snare_line"):
+			var sl_idx2 := u.status_power("snare_line")
+			u.remove_status("snare_line")
+			if sl_idx2 >= 0 and sl_idx2 < heroes.size() and not heroes[sl_idx2].dead:
+				_message("The line springs under %s!" % u.unit_name)
+				_log("%s's snare line springs on %s" % [heroes[sl_idx2].unit_name,
+					u.unit_name], "#c8a860")
+				_stat("snare_line_springs")
+				_spring_trap(heroes[sl_idx2], u,
+					DEADFALL_SPRING_PCT * heroes[sl_idx2].attack)
 		# BATCH BD — the placed deadfall rests and springs at one site, and that
 		# site is ITS OWN FUNCTION rather than a clause buried in this loop:
 		# `_run_battle` cannot be driven headlessly (the AR trap), so a rule with a
@@ -2649,7 +2710,13 @@ func _player_turn(u: BattleUnit) -> void:
 				"overcharge", "cons_ground", "bulwark", "dark_pact", "hysteria",
 				"instinct", "bestial", "spirit_bond", "hold_breath", "ashes",
 				"venom_coat", "deadfall", "guard_change", "interpose",
-				"wildfire", "backdraft", "intercession"]:
+				"wildfire", "backdraft", "intercession",
+				# BATCH BO §5. `cinderfall` and `choking_smoke` are deliberately
+				# NOT here: both carry `aoe`, so they fall through to the aoe
+				# branch below and auto-target exactly as Flamewave and Blizzard
+				# already do. `winters_toll` reads the ledger of held enemies
+				# rather than a click, which is why it is a self-cast.
+				"winters_toll", "null_field", "call_wilds", "snare_line"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -2810,7 +2877,62 @@ func _player_turn(u: BattleUnit) -> void:
 
 # Simple hero policy for automated battles: heal when hurt, spend when able,
 # focus the weakest (preferring Broken) enemy.
+# BATCH BO §5 — THE BOT AND THE DRAFTED ABILITIES, IN ONE PLACE RATHER THAN
+# NINE. Every spec's rotation below is hand-authored and names its own kit, so
+# a drafted ability would never be cast at all — and a spec whose new cards
+# never fire is a spec the sim and live autoplay cannot verify.
+#
+# THE HOOK IS DELIBERATELY THE LOWEST PRIORITY THERE IS: the real rotation runs
+# FIRST and is substituted only when it came back with the free basic attack,
+# i.e. when the bot had nothing it wanted to do anyway. That gives live
+# coverage without re-weighting a single existing rotation, so no measurement
+# taken before this batch stops being comparable. It is NOT a policy for
+# playing these abilities well; authoring that is each ability's own tuning
+# pass, in play, per the batch's testing scope.
 func _autoplay_pick(u: BattleUnit) -> Array:
+	var pick := _autoplay_pick_kit(u)
+	if pick.is_empty() or pick[0] != u.abilities[0]:
+		return pick
+	var drafted := _bot_drafted_pick(u)
+	return drafted if not drafted.is_empty() else pick
+
+
+# A usable drafted ability and a sane target for it, or [] when there is none.
+# Targeting mirrors what `_player_turn` would do with the same ability: an
+# ally-facing card goes to whoever needs it, everything else to the mark the
+# rotation had already chosen. Self-casts and area attacks resolve their own
+# targets, so what is returned for those is never read.
+func _bot_drafted_pick(u: BattleUnit) -> Array:
+	var foes := enemies.filter(func(e): return not e.dead)
+	if foes.is_empty():
+		return []
+	var allies := heroes.filter(func(h): return not h.dead and not h.is_companion)
+	var mark: BattleUnit = _lowest_hp(foes)
+	for ab in u.abilities:
+		if Classes.draft_ability(ab.display_name) == null:
+			continue
+		if not _ability_usable(u, ab):
+			continue
+		if ab.target == Ability.Target.ALLY:
+			if ab.special == "aegis_reversal":
+				for h in allies:
+					var st: Dictionary = h.get_status("barrier")
+					if not st.is_empty() and bool(st.get("divine", false)) \
+							and int(st.get("power", 0)) > 0:
+						return [ab, h]
+				continue
+			return [ab, _lowest_hp(allies)]
+		# Rimebinding wants a target that is not already the prison it copies.
+		if ab.special == "rimebinding":
+			var free_foes := foes.filter(func(e): return not _is_held(e))
+			if free_foes.is_empty():
+				continue
+			return [ab, _lowest_hp(free_foes)]
+		return [ab, mark]
+	return []
+
+
+func _autoplay_pick_kit(u: BattleUnit) -> Array:
 	var foes := enemies.filter(func(e): return not e.dead)
 	if foes.is_empty():
 		return [u.abilities[0], u]  # battle is over; the loop ends it
@@ -3662,6 +3784,17 @@ func _eff_cost(u: BattleUnit, ab: Ability, target: BattleUnit = null) -> int:
 	# HOW MANY (Batch AZ, 2) and `snap_used` counts them off.
 	if u.snap_shot > u.snap_used and ab.cost > 0:
 		return 0
+	# BATCH BO §5 — TWIN HUNT's payoff: the BEAST landed the kill, so his next
+	# ability costs nothing. A COUNT, not a flag (the `free_summons` shape), so
+	# two kills in a row owe two free casts instead of silently owing one.
+	#
+	# IT SITS BELOW SNAP SHOT AND THAT ORDER IS MIRRORED EXACTLY IN `_resolve`
+	# (`was_free_ability` requires `not was_snap`). No unit can hold both today
+	# — one is the Sharpshooter's, the other the Beastmaster's — but two waivers
+	# that disagree about which one paid would spend a charge the price never
+	# came off, and nothing would crash to say so.
+	if u.free_ability > 0 and ab.cost > 0:
+		return 0
 	# Execute, upgraded by its own capstone landing on an earned Execute:
 	# free against a Broken target. With no target in hand — the button's
 	# own affordability question — a living Broken enemy is enough to light
@@ -3697,6 +3830,38 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if ab.special in ["kill_command", "bestial", "spirit_bond"] \
 			and _beasts(u).is_empty():
 		return false
+	# ---- BATCH BO §5: the drafted abilities' gates ----
+	# Each one refuses a cast that could only ever do nothing — the same rule
+	# Shatter, Stabilize and Kill Command already follow, so a greyed button
+	# says "not yet" instead of a cast saying "nothing happened".
+	# Twin Hunt is the partnership acting together; with no beast it is a
+	# worse basic attack.
+	if ab.special == "twin_hunt" and _beasts(u).is_empty():
+		return false
+	# Winter's Toll and Rimebinding both READ a hold — one to bill it, one to
+	# copy it — so neither can be cast while he holds nothing.
+	if ab.special in ["winters_toll", "rimebinding"] and _holds.is_empty():
+		return false
+	# Aegis Reversal spends a DIVINE shield: any barrier will not do, because
+	# the clause is about the Devout's own unspent protection.
+	if ab.special == "aegis_reversal":
+		var ar_found := false
+		for ar_h in _hero_side():
+			if ar_h.dead:
+				continue
+			var ar_st: Dictionary = ar_h.get_status("barrier")
+			if not ar_st.is_empty() and int(ar_st.get("power", 0)) > 0 \
+					and bool(ar_st.get("divine", false)):
+				ar_found = true
+		if not ar_found:
+			return false
+	# Call the Wilds needs an absent beast to call in.
+	if ab.special == "call_wilds":
+		var cw_out := {}
+		for cw_b2 in _beasts(u):
+			cw_out[cw_b2.companion_kind] = true
+		if cw_out.size() >= 3:
+			return false
 	# Primal Surge needs a beast with Loyalty to spend.
 	if ab.special == "primal_surge":
 		if not _beasts(u).any(func(b): \
@@ -4990,9 +5155,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	_dmg_frame(attacker, ab.display_name)
 	var was_snap := attacker.snap_shot > attacker.snap_used \
 		and ab.cost > 0 and not is_counter
+	# BATCH BO §5 — TWIN HUNT's free cast is COUNTED OFF HERE, beside Snap
+	# Shot's, and it is read BEFORE `_eff_cost` waives the price so the two
+	# cannot disagree about whether this cast was the free one. It waives the
+	# COST only: the cooldown still runs, unlike Snap Shot's.
+	var was_free_ability := attacker.free_ability > 0 and ab.cost > 0 \
+		and not is_counter and not was_snap
 	attacker.resource = clampi(attacker.resource - _eff_cost(attacker, ab, target) \
 		+ ab.resource_gain, 0, attacker.max_resource)
 	attacker.refresh_bars()
+	if was_free_ability:
+		attacker.free_ability -= 1
+		_log("   → Twin Hunt: the beast's kill pays for this one (%d left)" % \
+			attacker.free_ability, "#e0a050")
 	if was_snap:
 		# Snap Shot: free, and the cooldown never starts.
 		attacker.snap_used += 1
@@ -6021,6 +6196,20 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# has roughly doubled while taking +59%.
 			if strike_target.second_resource_name == "Resonance":
 				raw *= _resonance_taken_mult(strike_target)
+				# BATCH BO §5 — NULL FIELD, and it reads the CURRENT stack
+				# count at the moment of the hit rather than a number stamped
+				# at cast time. That is the ability's whole axis: worthless at
+				# 2 stacks, enormous at 12, and it deepens for as long as he
+				# keeps casting while it holds. The floor at 5% of the incoming
+				# hit is a guard, not a magnitude — twenty stacks would
+				# otherwise cross zero and start healing him, which is exactly
+				# the trap BOND_MITIGATION_MAX exists for on the other side of
+				# the file.
+				if strike_target.has_status("null_field"):
+					var nf_cut := minf(0.05 * strike_target.second_resource, 0.95)
+					var nf_saved := raw * nf_cut
+					raw -= nf_saved
+					_prev(strike_target, nf_saved)
 			# Savage Presence (Ursus): the bear stands between the hunter and
 			# harm — 10% less damage taken, scaled by the bond curve. THE
 			# CLAMP IS LOAD-BEARING under Batch AY's uncapped Loyalty: without
@@ -6250,6 +6439,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				else maxi(int(round(raw * (1.0 - effective_armor))), 1)
 			if one_shot_exec:
 				final = maxi(strike_target.hp, final)
+			# BATCH BO §5 — AEGIS REVERSAL's payoff, spent here rather than in
+			# the raw block, and the position is the whole point: a Divine
+			# Shield absorbs POST-MITIGATION damage one for one, so the offence
+			# it becomes has to land the same way or "equal to whatever the
+			# shield had left" would quietly be "equal to it, minus armor".
+			# CONSUMED ON THE FIRST STRIKE — `raw` is recomputed per hit, so
+			# without the zeroing a multi-hit ability would pay it three times.
+			if attacker.aegis_bonus > 0 and ab.damage > 0 and not wall_parry:
+				final += attacker.aegis_bonus
+				_log("   → Aegis Reversal: the unspent shield lands as %d bonus damage" % \
+					attacker.aegis_bonus, "#e0c060")
+				attacker.aegis_bonus = 0
 			# Armor's share, kept consistent with the displayed final number.
 			var armor_cut := maxi(int(round(raw)) - final, 0)
 			# BATCH BM §2 — DEBT OF IRON (Warden, Plate row 8), the BANK half.
@@ -7310,7 +7511,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# Sharpshooter: the Focus engine, the promised shot's spending, the
 		# pin, the called spot, and the spray's echo.
 		if attacker.is_hero and attacker.passive_id == "lethal_aim" \
-				and ab.damage > 0 and not is_counter and not ab.aoe \
+				and ab.damage > 0 and not is_counter and not _focus_safe(ab) \
 				and target != null and not target.is_hero:
 			_sharpshooter_focus(attacker, target)
 			if ab.display_name == "Pinning Shot" and not target.dead:
@@ -7495,6 +7696,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				res_gain += crit_mass_trips * attacker.critical_mass_stacks
 				_log("   → Talent: Critical Mass — the third crit detonates into Resonance",
 					"#b0a8e0")
+			# BATCH BO §5 — KINDLED MIND banks 3 instead of 1. ADDITIVE, like
+			# every other term in this block: +2 on the base of 1, so an
+			# ordinary cast reads exactly the 3 the card promises and a CRIT
+			# still reads more, which is the general rule of the meter rather
+			# than an exception this ability would have to carve out.
+			if ab.display_name == "Kindled Mind":
+				res_gain += 3 if is_perfect else 2
 			if attacker.second_resource_name == "Resonance":
 				attacker.res_cast_this_turn = true
 			_gain_resonance(attacker, res_gain)
@@ -8068,6 +8276,24 @@ func _total_burn_turns() -> int:
 	return total
 
 
+# BATCH BO §5 — EMBER DEBT'S EXEMPTION, AND IT IS A SECOND DENOMINATOR RATHER
+# THAN A DISCOUNT ON THE FIRST. The same total as above, minus the burn turns
+# standing on enemies marked by Ember Debt — and it feeds the DRAIN ONLY.
+# `_overburn_mult` keeps reading `_total_burn_turns`, so a marked enemy's fire
+# still pays the damage bonus while costing nothing to hold: "one enemy is free
+# to light; everything else still costs" is exactly the gap between these two
+# functions, and collapsing them into one would delete the ability.
+func _drain_burn_turns() -> int:
+	var total := 0
+	for foe in enemies:
+		if foe.dead or foe.ember_debt:
+			continue
+		var b: Dictionary = foe.get_status("burn")
+		if not b.is_empty():
+			total += maxi(int(b.get("turns", 0)), 0)
+	return total
+
+
 # OVERBURN, CLAUSE 2 — the reward, and THE ONE PLACE ITS CAP IS DECIDED.
 # +2% damage per remaining Burn turn on the enemy team, capped at +40%.
 #
@@ -8137,7 +8363,10 @@ func _overburn_drain(u: BattleUnit, burn_turns: int) -> int:
 func _overburn_tick(u: BattleUnit) -> bool:
 	if u == null or u.passive_id != "overburn":
 		return false
-	var turns := _total_burn_turns()
+	# BATCH BO §5: the BILL reads `_drain_burn_turns` (Ember Debt's exemption);
+	# the BONUS still reads `_total_burn_turns` at `_overburn_mult`. Two
+	# denominators on purpose — see `_drain_burn_turns`.
+	var turns := _drain_burn_turns()
 	var cost := _overburn_drain(u, turns)
 	if cost <= 0:
 		return false
@@ -8570,6 +8799,91 @@ func _on_martyrdom_return(saved: BattleUnit) -> void:
 		saved.unit_name, int(round(BattleUnit.MARTYRDOM_RETURN * 100))], "#b0a8e0")
 
 
+# ---------- BATCH BO §5 — the three cross-unit hooks ----------
+
+# RITE OF RETURN (Holy). The unit side has already refused the death and put
+# the ally back at half health; this bills the caster and reports. Returns
+# FALSE when there is nobody left to pay, and then the hero simply dies —
+# `intercession_cb`'s own contract, for the same reason: "the promise is spent"
+# and "the promiser is gone" must be one line of code, not two states that can
+# disagree.
+func _on_rite_return(saved: BattleUnit) -> bool:
+	var cleric := _mercy_holder()
+	if cleric == null or cleric.dead:
+		_log("   → Rite of Return: the rite goes unanswered — its caster has fallen",
+			"#909090")
+		return false
+	# THE ORDER OF THESE THREE LINES IS THE WHOLE FUNCTION, and it is written
+	# for the case where Holy swore the rite ON HERSELF: the toll below runs
+	# `take_tick_damage`, which re-enters `_holy_reversal`. SPEND the promise
+	# first (or it answers its own toll, forever), RESTORE the health second
+	# (or the toll is billed against zero and marks her dead a line before the
+	# restore would have run), and only then bill.
+	saved.remove_status("rite_return")
+	saved.hp = maxi(int(saved.max_hp * 0.5), 1)
+	saved.float_text("RITE OF RETURN", Color(0.95, 0.9, 0.55), true)
+	# HER 30% IS A REAL COST AND IT GOES THROUGH take_tick_damage, so a rite
+	# that kills her is handled like any other lethal tick — including by the
+	# party's other refusals, which is the correct and slightly grim reading of
+	# a resurrection cult's arithmetic.
+	var toll := maxi(int(round(cleric.max_hp * 0.30)), 1)
+	_dmg_frame(cleric, "Rite of Return")
+	cleric.take_tick_damage(toll, "-%d" % toll, Color(0.95, 0.9, 0.55))
+	saved.refresh_bars()
+	_log("   → Rite of Return — %s is restored to 50%% health; %s pays %d of her own" % [
+		saved.unit_name, cleric.unit_name, toll], "#e0d070")
+	if cleric.dead:
+		_log("† %s falls paying the rite" % cleric.unit_name, "#e05050")
+	return true
+
+
+# VOW OF SUFFERING (Devout). The unit side has decided the SPLIT; this bills
+# the Devout and kindles the ally. Returns the share actually relocated, so a
+# vow with nobody left to carry it costs the ally nothing rather than deleting
+# half a wound.
+func _on_vow_share(ally: BattleUnit, share: int) -> int:
+	if share <= 0:
+		return 0
+	var devout := _living_devout()
+	if devout == null or devout == ally:
+		return 0
+	_dmg_frame(devout, "Vow of Suffering")
+	devout.take_tick_damage(share, "-%d" % share, Color(0.98, 0.85, 0.45))
+	_log("   → Vow of Suffering: %s carries %d of %s's wound" % [
+		devout.unit_name, share, ally.unit_name], "#e0c060")
+	# "Every hit he eats builds that ally's Faith" — the ALLY's meter, because
+	# Conviction's release is theirs. Its own source term, so BI §2's per-source
+	# table keeps summing to its total (a default would land it in the wrong
+	# bucket, which is why `_gain_faith` refuses to have one).
+	_gain_faith(ally, 1, "vow")
+	if devout.dead:
+		_log("† %s falls under the weight of the vow" % devout.unit_name, "#e05050")
+	return share
+
+
+# BLIGHT THE WELL (Occultist). Healing became damage; unit.gd returned 0 and
+# handed the number here so the DEATH it can cause routes through
+# `_on_enemy_death` like every other one — the whole reason this is a callback
+# rather than a `take_tick_damage` inside `heal_amount`.
+func _on_blight_heal(victim: BattleUnit, amount: int) -> void:
+	if amount <= 0 or victim.dead:
+		return
+	var occ := _living_occultist()
+	_dmg_frame(occ if occ != null else victim, "Blight the Well",
+		occ.unit_name if occ != null else "")
+	_log("   → Blight the Well: the mending turns on %s for %d" % [
+		victim.unit_name, amount], "#a050b0")
+	if occ != null:
+		_stat("dmg_hero_" + occ.unit_name, amount)
+	if victim.take_tick_damage(amount, "-%d" % amount, Color(0.7, 0.3, 0.6)):
+		if not victim.is_hero:
+			_stat("enemy_deaths")
+			_sfx("death", -4.0)
+			_message("%s falls!" % victim.unit_name)
+			_log("† %s dies" % victim.unit_name, "#e05050")
+			_on_enemy_death(victim)
+
+
 # The living hero whose second resource IS Mercy — the Holy Cleric. Her
 # reversals are stamped party-wide, so every one of them has to be able to
 # find her again from whoever the blow landed on.
@@ -8835,6 +9149,23 @@ func _gain_ruin(target: BattleUnit, n: int = 1) -> void:
 			_log("   → The Old Gods take notice — %s's Ruin is PRIMED (%d stacks)" % [
 				target.unit_name, st], "#c060d0")
 	_stamp_ruin_chip(target)
+	# BATCH BO §5 — COVENANT OF ASH. Every stack landing on ANY enemy also
+	# lands on the covenant's bearer. IT IS THE LAST THING THIS FUNCTION DOES
+	# and the recursion is broken by identity, not by a flag: the mirrored
+	# stacks go on the BEARER, and a stack landing on the bearer finds
+	# `mirror == target` and stops. One covenant exists at a time (the cast
+	# clears the field first), so there is no chain to guard against.
+	#
+	# The mirrored stacks go through this same function, so they arm the
+	# detonation threshold, deepen the chip and book the AX depth reading
+	# exactly as a directly-applied stack does — which is the point of
+	# "spread pressure becomes focused pressure without giving up the spread".
+	for mirror in enemies:
+		if mirror == target or mirror.dead or not mirror.has_status("covenant"):
+			continue
+		_log("   → Covenant of Ash: the ash claims %d stack%s on %s too" % [
+			n, "" if n == 1 else "s", mirror.unit_name], "#a050b0")
+		_gain_ruin(mirror, n)
 	# BATCH AX §0 — THE SECOND NEW NUMBER: how deep the mark actually gets now
 	# that it has no ceiling. Banked at the gain site rather than at battle end
 	# because a target that DIES holding twenty stacks still measured twenty.
@@ -9892,6 +10223,398 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, attacker.deadfall_armed], "#c8a860")
 			if is_perfect:
 				_log("   → a perfect rig: a fourth spring", "#c8a860")
+		# ---------- BATCH BO §5 — THE DRAFTED ABILITIES ----------
+		"cinderfall":
+			# AXIS: spending wide instead of deep. It is written on Wildfire's
+			# model deliberately — same skim across every bank, same
+			# Overburn-read-before-consumption rule, same refund door — so the
+			# two abilities cannot drift about what "consuming Burn" means.
+			# What differs is that this one HITS FIRST and only then skims,
+			# which is why it carries base damage where Wildfire carries none.
+			var cf_inferno := _overburn_mult(attacker, _total_burn_turns())
+			var cf_take := 3 if is_perfect else 2
+			var cf_binfo: Array = STATUS_INFO["burn"]
+			var cf_total := 0
+			var cf_turns := 0
+			for foe in enemies:
+				if foe.dead:
+					continue
+				# The wide hit: 20% of Attack on everything standing.
+				var cf_raw := 0.01 * ab.damage * attacker.attack * mult \
+					* cf_inferno * randf_range(0.9, 1.1)
+				var cf_res := float(foe.resists.get("fire", 0.0))
+				if attacker.avatar_flame > 0:
+					cf_res = 0.0
+				cf_raw *= 1.0 - cf_res
+				var cf_final := maxi(int(round(cf_raw
+					* (1.0 - foe.effective_armor()))), 1)
+				# The skim: 2 turns of Burn torn out for that much AGAIN.
+				var cf_st: Dictionary = foe.get_status("burn")
+				var cf_left: int = maxi(int(cf_st.get("turns", 0)), 0)
+				var cf_spent: int = mini(cf_take, cf_left)
+				if cf_spent > 0:
+					if cf_left - cf_spent <= 0:
+						foe.remove_status("burn")
+					else:
+						foe.update_status("burn", cf_binfo[1], cf_binfo[3], -1,
+							cf_left - cf_spent)
+					cf_final *= 2
+					cf_turns += cf_spent
+				var cf_hit: Dictionary = foe.take_hit(cf_final, ab.pressure)
+				_stat("dmg_hero_" + attacker.unit_name, cf_final)
+				_stat_bd(attacker, ab.pressure)
+				cf_total += cf_final
+				foe.float_text("%d Cinderfall" % cf_final, Color(1.0, 0.5, 0.25))
+				if cf_hit.died:
+					_stat("enemy_deaths")
+					_sfx("death", -4.0)
+					_message("%s falls!" % foe.unit_name)
+					_log("† %s dies" % foe.unit_name, "#e05050")
+					_on_enemy_death(foe)
+			_sfx("bomb", -8.0, 0.9)
+			_message("%s rains cinders across the field!" % attacker.unit_name)
+			_log("%s: Cinderfall — %d damage across the field, %d turn%s of Burn skimmed%s" % [
+				attacker.unit_name, cf_total, cf_turns,
+				"" if cf_turns == 1 else "s", " [PERFECT]" if is_perfect else ""],
+				"#e08850")
+			# The refund is the PASSIVE's, through the one door Detonation and
+			# Wildfire already share — this ability carries no copy of it.
+			_overburn_refund(attacker, cf_turns)
+		"ember_debt":
+			# AXIS: commitment without the bill. The exemption is a FIELD on
+			# the enemy read by `_drain_burn_turns` alone — the damage BONUS
+			# still counts this fire, and that gap is the whole ability.
+			if target != null and not target.dead:
+				var ed_turns := 12 if is_perfect else 8
+				_apply_status(target, "burn", ed_turns, 0, _dot_tick("burn", attacker))
+				target.ember_debt = true
+				_sfx("bomb", -9.0, 0.8)
+				_message("%s writes a debt in fire on %s" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Ember Debt — %s burns %d turns, and Overburn's drain ignores it entirely%s" % [
+					attacker.unit_name, target.unit_name, ed_turns,
+					" [PERFECT]" if is_perfect else ""], "#e08850")
+		"winters_toll":
+			# AXIS: cashing in without releasing. It reads `hold_turns`, the
+			# SAME charge Shatter is paid on — and that counter is already
+			# governed at SHATTER_TURN_CAP by `_hold_sync`, so this adds no new
+			# ungoverned accumulator. The hold is deliberately NOT touched: it
+			# is not routed through `_hold_release`, so no release payoff fires
+			# and the prison stands (the Cryoclasm precedent).
+			var wt_hit := 0
+			for held in _holds.duplicate():
+				if held.dead:
+					continue
+				var wt_step := 12 if is_perfect else ab.damage
+				var wt_raw := 0.01 * wt_step * maxi(held.hold_turns, 1) \
+					* attacker.attack * mult * randf_range(0.9, 1.1)
+				wt_raw *= 1.0 - float(held.resists.get("frost", 0.0))
+				var wt_final := maxi(int(round(wt_raw
+					* (1.0 - held.effective_armor()))), 1)
+				var wt_res: Dictionary = held.take_hit(wt_final, ab.pressure)
+				_stat("dmg_hero_" + attacker.unit_name, wt_final)
+				held.float_text("%d Winter's Toll" % wt_final, Color(0.65, 0.88, 1.0))
+				_log("%s: Winter's Toll — %s has been held %d turn%s and pays %d; the ice holds" % [
+					attacker.unit_name, held.unit_name, held.hold_turns,
+					"" if held.hold_turns == 1 else "s", wt_final], "#7cc8f0")
+				wt_hit += 1
+				if wt_res.died:
+					_stat("enemy_deaths")
+					_sfx("death", -4.0)
+					_message("%s falls!" % held.unit_name)
+					_log("† %s dies" % held.unit_name, "#e05050")
+					_on_enemy_death(held)
+			if wt_hit == 0:
+				_log("%s: Winter's Toll — he holds nothing" % attacker.unit_name,
+					"#909090")
+			else:
+				_sfx("crit", -9.0, 0.8)
+				_message("%s collects the interest" % attacker.unit_name)
+		"rimebinding":
+			# AXIS: the hold as a template. One deep prison becomes the next.
+			# Four stacks land it in the ice too — and BN's re-entrancy guard is
+			# what makes that safe to write.
+			if target != null and not target.dead:
+				var rb_deepest := 0
+				for held2 in _holds:
+					rb_deepest = maxi(rb_deepest, held2.status_stacks("chilled"))
+				if rb_deepest < 1:
+					_log("%s: Rimebinding — he holds nothing to copy" % \
+						attacker.unit_name, "#909090")
+				else:
+					var rb_n: int = rb_deepest + (1 if is_perfect else 0)
+					_message("%s copies the prison onto %s" % [attacker.unit_name,
+						target.unit_name])
+					_log("%s: Rimebinding — %d stack%s of Chilled onto %s%s" % [
+						attacker.unit_name, rb_n, "" if rb_n == 1 else "s",
+						target.unit_name, " [PERFECT]" if is_perfect else ""],
+						"#7cc8f0")
+					for _rb_i in rb_n:
+						if not target.dead:
+							_apply_status(target, "chilled", 3, 0, 0, attacker)
+		"null_field":
+			# AXIS: the ramp defends itself. THE STATUS CARRIES NO NUMBER — the
+			# mitigation is computed at the strike-target block off the CURRENT
+			# stack count, so a field cast at 2 stacks really is worth nothing
+			# and really does deepen as he keeps casting. Stamping the value
+			# here would freeze it at cast time and quietly delete the ability's
+			# whole axis.
+			_apply_status(attacker, "null_field", 4 if is_perfect else 3)
+			_sfx("parry", -8.0, 0.9)
+			_message("%s folds the storm inward" % attacker.unit_name)
+			_log("%s: Null Field — damage taken falls 5%% per Resonance stack (%d now: -%d%%)%s" % [
+				attacker.unit_name, attacker.second_resource,
+				mini(5 * attacker.second_resource, 95),
+				" [PERFECT]" if is_perfect else ""], "#b070e0")
+		"second_wind_holy":
+			# AXIS: undoing recent history rather than topping up. It reads the
+			# BL damage-taken door, which books what was actually removed below
+			# every death refusal — so a hero saved by Intercession is not
+			# healed for the blow that never landed.
+			if target != null and not target.dead:
+				var sw_taken := target.damage_taken_recent()
+				var sw_cap_pct := 0.55 if is_perfect else 0.40
+				var sw_amount: int = mini(sw_taken,
+					int(round(target.max_hp * sw_cap_pct)))
+				sw_amount = int(round(sw_amount * _healing_done_mult(attacker)))
+				if sw_amount <= 0:
+					_log("%s: Second Wind — %s has taken nothing to take back" % [
+						attacker.unit_name, target.unit_name], "#909090")
+				else:
+					_stat_heal(attacker, sw_amount)
+					_sfx("heal", -8.0)
+					var sw_got := target.heal_amount(sw_amount, target != attacker)
+					target.float_text("+%d" % sw_got, Color(0.4, 0.9, 0.45))
+					_message("%s takes back the last two turns" % attacker.unit_name)
+					_log("%s: Second Wind — %s regains %d, the damage of the last two turns%s" % [
+						attacker.unit_name, target.unit_name, sw_got,
+						" [PERFECT]" if is_perfect else ""], "#70d878")
+		"rite_of_return":
+			# AXIS: reversal bought in advance rather than reacted to. The
+			# STATUS is the one answer to "is the promise live", so it expires
+			# by itself and no flag can outlive it (Intercession's rule).
+			if target != null and not target.dead:
+				_apply_status(target, "rite_return", 4 if is_perfect else 3)
+				_sfx("heal", -9.0, 0.6)
+				_message("%s promises %s the road back" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Rite of Return — the next blow that would fell %s returns them at 50%% instead (%d turns)%s" % [
+					attacker.unit_name, target.unit_name, 4 if is_perfect else 3,
+					" [PERFECT]" if is_perfect else ""], "#e0d070")
+		"vow_suffering":
+			# AXIS: mitigation by relocation. Divine Shield absorbs a CAPPED
+			# amount; this has no cap at all — what bounds it is the Devout's
+			# own health, which is the trade.
+			if target != null and not target.dead:
+				_apply_status(target, "vow", 4 if is_perfect else 3)
+				var vw_st := target.get_status("vow")
+				if not vw_st.is_empty():
+					vw_st["src_name"] = attacker.unit_name
+				_sfx("parry", -8.0, 0.8)
+				_message("%s takes %s's wounds as his own" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Vow of Suffering — half of %s's wounds come to him for %d turns%s" % [
+					attacker.unit_name, target.unit_name, 4 if is_perfect else 3,
+					" [PERFECT]" if is_perfect else ""], "#e0c060")
+		"aegis_reversal":
+			# AXIS: unspent protection becomes offence. His shields expire
+			# unspent constantly; this makes over-shielding a resource, and it
+			# is the Devout dealing damage without attacking.
+			if target != null and not target.dead:
+				var ag_st := target.get_status("barrier")
+				var ag_left: int = int(ag_st.get("power", 0)) if not ag_st.is_empty() \
+					else 0
+				if ag_left <= 0 or not bool(ag_st.get("divine", false)):
+					_log("%s: Aegis Reversal — %s carries no Divine Shield to spend" % [
+						attacker.unit_name, target.unit_name], "#909090")
+				else:
+					target.remove_status("barrier")
+					var ag_bonus: int = int(round(ag_left * (1.5 if is_perfect else 1.0)))
+					target.aegis_bonus += ag_bonus
+					target.float_text("+%d next hit" % ag_bonus,
+						Color(0.95, 0.85, 0.45))
+					_sfx("crit", -9.0, 0.9)
+					_message("%s turns the shield outward" % attacker.unit_name)
+					_log("%s: Aegis Reversal — %s's shield is spent as %d bonus damage on their next attack%s" % [
+						attacker.unit_name, target.unit_name, ag_bonus,
+						" [PERFECT]" if is_perfect else ""], "#e0c060")
+		"blight_well":
+			# AXIS: corrupting recovery. DELIBERATELY SITUATIONAL — near-dead
+			# against a warband with no healer, decisive against one with.
+			if target != null and not target.dead:
+				_apply_status(target, "blight", 6 if is_perfect else 4, 0, 0, attacker)
+				# It IS a debuff the Occultist applied, so the passive marks it
+				# — through the same call the generic hook makes, at the same
+				# magnitude, rather than a second rule of its own.
+				if attacker.passive_id == "old_gods":
+					_gain_ruin(target, OLD_GODS_MARK)
+				_sfx("bomb", -9.0, 0.7)
+				_message("%s poisons the well beneath %s" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Blight the Well — healing on %s will damage it for %d turns%s" % [
+					attacker.unit_name, target.unit_name, 6 if is_perfect else 4,
+					" [PERFECT]" if is_perfect else ""], "#a050b0")
+		"covenant_ash":
+			# AXIS: corruption that compounds onto a chosen target. ONE
+			# COVENANT AT A TIME — cleared off every other enemy first, so the
+			# mark cannot be quietly stacked across the field.
+			if target != null and not target.dead:
+				for foe2 in enemies:
+					foe2.remove_status("covenant")
+				_apply_status(target, "covenant", -1, 0, 0, attacker)
+				if is_perfect:
+					_gain_ruin(target, 2)
+				_sfx("bomb", -9.0, 0.6)
+				_message("%s binds %s to the ash" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Covenant of Ash — every stack of Ruin landing anywhere also lands on %s%s" % [
+					attacker.unit_name, target.unit_name,
+					" [PERFECT: 2 Ruin now]" if is_perfect else ""], "#a050b0")
+		"twin_hunt":
+			# AXIS: the two bodies acting deliberately, where the rest of his
+			# kit has the beast on its own clock.
+			if target != null and not target.dead:
+				var th_beasts: Array = _beasts(attacker)
+				_message("%s and the pack strike as one!" % attacker.unit_name)
+				_log("%s: Twin Hunt — hunter and beast strike together" % \
+					attacker.unit_name, "#e0a050")
+				var th_raw := 0.01 * ab.damage * attacker.attack * mult \
+					* randf_range(0.9, 1.1)
+				var th_final := maxi(int(round(th_raw
+					* (1.0 - target.effective_armor()))), 1)
+				var th_hit: Dictionary = target.take_hit(th_final, ab.pressure)
+				_stat("dmg_hero_" + attacker.unit_name, th_final)
+				_stat_bd(attacker, ab.pressure)
+				target.float_text("%d" % th_final, Color(0.95, 0.85, 0.5))
+				if th_hit.died:
+					_stat("enemy_deaths")
+					_sfx("death", -4.0)
+					_message("%s falls!" % target.unit_name)
+					_log("† %s dies" % target.unit_name, "#e05050")
+					_on_enemy_death(target)
+				elif not th_beasts.is_empty():
+					# The BEAST's blow is the one that can pay: the free cast is
+					# owed only when IT lands the kill, which is what makes the
+					# ability about the partnership rather than about a bigger
+					# number. It goes through `_companion_hit`, so Loyalty, the
+					# boon curve and every companion rider apply as usual.
+					var th_b: BattleUnit = th_beasts[0]
+					var th_pct := 0.55 if is_perfect else 0.40
+					await _companion_hit(th_b, target,
+						th_pct * attacker.attack * _bestial_dmg_mult(th_b), 0)
+					if target.dead:
+						attacker.free_ability += 1
+						_log("   → Twin Hunt: %s made the kill — the hunter's next ability is free" % \
+							th_b.unit_name, "#e0a050")
+						_on_enemy_death(target)
+		"call_wilds":
+			# AXIS: rotation without the tax.
+			#
+			# THE BRIEF'S PREMISE WAS STALE AND THIS IS THE CORRECTED ABILITY,
+			# reported rather than quietly reinterpreted. §5 says a swap loses
+			# Loyalty and that the loss is why BJ measured swaps at 0.05 per
+			# trash battle. IT DOES NOT: Loyalty lives on the HUNTER's own dict
+			# (`hunter.loyalty[kind]`) and is written in exactly four places,
+			# none of which is a swap — only a beast's DEATH breaks the meter
+			# (`_on_beast_death`) and only Primal Surge spends it. What a swap
+			# actually costs is a TURN and the shared 3-turn Swap cooldown, so
+			# that is what this ability refuses. The Loyalty half is kept as an
+			# explicit guarantee rather than dropped, because it is what the
+			# card promises and a later batch could make it false.
+			var cw_here := {}
+			for cw_b in _beasts(attacker):
+				cw_here[cw_b.companion_kind] = true
+			var cw_pick := ""
+			var cw_best := -1
+			for cw_kind in ["ursus", "canis", "aguila"]:
+				if cw_here.has(cw_kind):
+					continue
+				var cw_l: int = int(attacker.loyalty.get(cw_kind, 0))
+				if cw_l > cw_best:
+					cw_best = cw_l
+					cw_pick = cw_kind
+			if cw_pick == "":
+				_log("%s: Call the Wilds — the whole pack already stands" % \
+					attacker.unit_name, "#909090")
+			else:
+				var cw_before: int = int(attacker.loyalty.get(cw_pick, 0))
+				_message("%s whistles the pack round" % attacker.unit_name)
+				await _do_summon(attacker, cw_pick)
+				# NO SWAP TAX: the shared cooldown `_do_summon` just started is
+				# erased, and the arriving beast's Loyalty is asserted whole.
+				attacker.cooldowns.erase("Swap Companion")
+				attacker.loyalty[cw_pick] = maxi(
+					int(attacker.loyalty.get(cw_pick, 0)), cw_before)
+				_log("%s: Call the Wilds — %s answers at %d Loyalty, and the swap costs no cooldown" % [
+					attacker.unit_name, cw_pick.capitalize(),
+					int(attacker.loyalty.get(cw_pick, 0))], "#e0a050")
+				var cw_new: Array = _beasts(attacker).filter(
+					func(b): return b.companion_kind == cw_pick)
+				var cw_foes := enemies.filter(func(e): return not e.dead)
+				if not cw_new.is_empty() and not cw_foes.is_empty():
+					var cw_mark: BattleUnit = _lowest_hp(cw_foes)
+					await _companion_strike(cw_new[0], cw_mark, 1.0, false)
+					if is_perfect and not cw_mark.dead:
+						_log("   → Perfect: it strikes again on arrival", "#70d878")
+						await _companion_strike(cw_new[0], cw_mark, 1.0, false)
+		"quarrys_mark":
+			# AXIS: patience that accelerates. ONE MARK AT A TIME, cleared off
+			# the field first. It deliberately does NOT protect Focus on the
+			# marked enemy's death — Overkill already does that, and an ability
+			# duplicating a row-7 talent is the Deadfall fault (Batch BD).
+			if target != null and not target.dead:
+				for foe3 in enemies:
+					foe3.remove_status("quarry")
+				_apply_status(target, "quarry", -1, 0, 0, attacker)
+				if is_perfect:
+					_gain_focus(attacker, 20)
+				_sfx("click", -8.0, 1.2)
+				_message("%s names %s the quarry" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Quarry's Mark — Focus gained from %s is DOUBLED%s" % [
+					attacker.unit_name, target.unit_name,
+					" [PERFECT: +20 Focus now]" if is_perfect else ""], "#a0d060")
+		"choking_smoke":
+			# AXIS: an affliction his kit does not otherwise have. BLIND IS AN
+			# EXISTING STATUS at +50% miss — §5 says to use it, not to author a
+			# new one, and `_miss_chance` adds that 50 as flat percentage POINTS
+			# on top of the base 5 (and Dazed's 20), never as a multiplier.
+			# Priced honestly: AoE attacks roll no miss at all, so this blanks
+			# single-target blows only.
+			var cs_turns := 3 if is_perfect else 2
+			var cs_hit := 0
+			for foe4 in enemies:
+				if foe4.dead:
+					continue
+				_apply_status(foe4, "blind", cs_turns, 0, 0, attacker)
+				if foe4.has_status("blind"):
+					cs_hit += 1
+			_sfx("bomb", -9.0, 0.7)
+			_message("%s fouls the air" % attacker.unit_name)
+			_log("%s: Choking Smoke — %d %s Blinded for %d turns%s" % [
+				attacker.unit_name, cs_hit,
+				"enemy" if cs_hit == 1 else "enemies", cs_turns,
+				" [PERFECT]" if is_perfect else ""], "#8fa070")
+		"snare_line":
+			# AXIS: the traps stop waiting. It fills NO trap slot and spends no
+			# placed trap — it is its own line, and that is stated on the card
+			# so a player never wonders where their deadfall went. The spring
+			# itself goes through `_spring_trap`, so Bone Breaker, Cruel
+			# Devices, Quick Rigging and Caught Fast all pay per spring exactly
+			# as they do on a snare.
+			var sl_turns := 2 if is_perfect else 1
+			var sl_idx := heroes.find(attacker)
+			var sl_hit := 0
+			for foe5 in enemies:
+				if foe5.dead:
+					continue
+				_apply_status(foe5, "snare_line", sl_turns, sl_idx, 0, attacker)
+				sl_hit += 1
+			_sfx("click", -8.0, 0.6)
+			_message("%s runs a line across the field" % attacker.unit_name)
+			_log("%s: Snare Line — %d %s will spring a trap on acting%s" % [
+				attacker.unit_name, sl_hit, "enemy" if sl_hit == 1 else "enemies",
+				" [PERFECT: it holds two turns]" if is_perfect else ""], "#c8a860")
 		"venom_coat":
 			_apply_status(attacker, "venom_coat", 4)
 			_sfx("heal", -9.0, 0.7)
@@ -11720,6 +12443,25 @@ func _gain_focus(u: BattleUnit, amount: int) -> void:
 const UNWAVERING_STEPS := 5
 
 
+# BATCH BO §5 — CALLED VOLLEY: "Focus is not cleared by the switching this
+# causes", AND THE VERIFICATION §7 ASKED FOR TURNED THE CLAUSE INTO A FINDING.
+# THE CLAUSE IS TRUE BUT IT IS NOT A DISTINCTION: the Focus engine has been
+# gated on `not ab.aoe` since Batch AZ, so NO AREA ATTACK HAS EVER CLEARED
+# FOCUS. §5's supporting line — "every other multi-target option costs him his
+# meter" — does not survive reading the code either: `choose_two` and
+# `multi_hits` abilities call the engine against their PRIMARY target, so they
+# cost him nothing when that target is already his mark. What actually breaks
+# the bond is attacking a DIFFERENT single enemy, which no AoE does.
+#
+# SHIPPED AS SPECIFIED AND REPORTED RATHER THAN QUIETLY REINTERPRETED. What
+# this function buys is that the guarantee is now NAMED and TESTED instead of
+# being a side effect of one `not ab.aoe` in an unrelated condition — a later
+# batch that makes area attacks feed the meter has to come here and decide
+# about Called Volley on purpose.
+func _focus_safe(ab: Ability) -> bool:
+	return ab.aoe or ab.display_name == "Called Volley"
+
+
 func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit) -> void:
 	if attacker.second_resource_name != "Focus" or victim == null:
 		return
@@ -11738,6 +12480,15 @@ func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit) -> void:
 	if attacker.last_attack_target == victim:
 		attacker.same_target_turns += 1
 		var gain := 20 + attacker.muscle_memory_ranks
+		# BATCH BO §5 — QUARRY'S MARK doubles the Focus gained from the marked
+		# enemy. It multiplies the WHOLE gain including Unwavering's ramp
+		# below, because the card says "Focus gained from attacking the marked
+		# enemy is doubled" and paying only the base would be the tooltip
+		# lying. The doubling is applied after the ramp for exactly that
+		# reason. FLAGGED IN THE CHANGELOG: doubled may be too much on a build
+		# stacking Muscle Memory and Unwavering, and +50% is the stated
+		# fallback if it reads hot in play.
+		var qm_mark := victim.has_status("quarry")
 		if attacker.unwavering > 0:
 			var ramp: int = attacker.unwavering \
 				* mini(attacker.same_target_turns, UNWAVERING_STEPS)
@@ -11745,6 +12496,10 @@ func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit) -> void:
 			_log("   → Unwavering: +%d Focus for %d %s on one mark" % [ramp,
 				attacker.same_target_turns,
 				"turn" if attacker.same_target_turns == 1 else "turns"], "#b0a8e0")
+		if qm_mark:
+			gain *= 2
+			_log("   → Quarry's Mark: the named quarry pays double (+%d Focus)" % \
+				gain, "#a0d060")
 		_gain_focus(attacker, gain)
 	elif attacker.last_attack_target != null:
 		if attacker.second_resource > 0:
@@ -12546,6 +13301,22 @@ func _check_end() -> void:
 			var looter: Dictionary = Run.party.pick_random()
 			spoils += "\n\nELITE SPOILS"
 			spoils += _drop_item_line(Run.random_loot())
+			# BATCH BO §3 — AN ELITE ALWAYS OFFERS A DRAFT, on victory, and the
+			# designer's reason is stated rather than inferred: the player
+			# should always feel their build is improving. Elites run 0-3 per
+			# zone since BK, so picks are ROUTE-DEPENDENT — a greedy route
+			# drafts far more than a cautious one, which is the map's risk axis
+			# paying out in a new currency.
+			#
+			# ONE HERO PER ELITE, DRAWN INDEPENDENTLY OF THE RUNE LOOTER, and
+			# that is this batch's decision rather than the brief's: §3 says
+			# "always, on victory" and does not say to whom. Offering every
+			# hero a card at every elite would hand out ~26 picks a run against
+			# four draftable slots, which is not a draft.
+			var d_taker: Dictionary = Run.party.pick_random()
+			if Run.award_draft_pick(d_taker):
+				spoils += "\nTHE DRAFT: the %s may choose a new ability\non their card." % \
+					String(d_taker["key"]).capitalize()
 			# Rune pick-of-3 (Batch X): candidates rolled NOW and stored on the
 			# member (never rerolled), chosen on the hero card. Empty = runes
 			# off — the spoils keep the item.

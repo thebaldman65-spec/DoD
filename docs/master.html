@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-13 (Batch BN)</b></p>
+<p align="right"><b>Last updated: 2026-08-13 (Batch BO)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -968,6 +968,122 @@ binds to <b>Shift + the same key in the same order</b> (10 = Shift+Q, 11 = Shift
 the button carries the modifier in its label ("[⇧Q] Blood Price"). Shift hotkeys obey every
 existing rule: ignored while the ability is unaffordable or gated, and inactive during
 targeting or a skill check.</p>
+
+<h3>6b. THE ABILITY DRAFT</h3>
+<p>Beside the zone-boss pick sits a second, larger source of abilities: <b>the draft</b>.
+Where a boss pick is rare and drawn from a small spec pool, the draft is frequent, drawn from
+its own pool, and comes with a cost — <b>a kit has room for only seven abilities</b>, so past
+that point every new one replaces an old one.</p>
+
+<p><b>Where picks come from.</b></p>
+<table border="1" cellpadding="4">
+<tr><th>Source</th><th>Offer</th></tr>
+<tr><td><b>Elite</b></td><td><b>Always</b>, on victory — one hero, drawn at random. Elites run
+0–3 per zone, so drafts are <b>route-dependent</b>: a greedy route drafts far more than a
+cautious one.</td></tr>
+<tr><td><b>Merchant</b></td><td>Purchasable with gold, one hero at a time: <b>120 / 180 / 240
+by zone</b>. The three cards are drawn at purchase and wait on that hero's card.</td></tr>
+<tr><td><b>Event</b></td><td>Some events trade for one — the Ancient Training Grounds sells a
+new form for 200 gold, and the Echo of the Warden teaches one for a hero's health.</td></tr>
+<tr><td><b>Zone bosses</b></td><td>The existing §6a pick, unchanged: same timing, same SPEC
+pool, same overlay.</td></tr>
+</table>
+<p><b>Every offer is 3 cards</b>, and if the pool cannot fill three it <b>fills short rather
+than padding with repeats</b> — the same rule ability upgrades already follow.</p>
+
+<p><b>The seven-slot cap, and the protected core.</b> Every spec keeps a <b>protected core</b>:
+its passive, its basic attack, and the minimum abilities its passive needs to function.
+Protected abilities <b>can never be dropped</b>, so every drop decision is among <i>earned</i>
+abilities — which keeps the choice clean and makes the cap unable to break a passive. The core
+counts against the cap, so most specs carry <b>3 protected and 4 draftable</b>.</p>
+<p><b>At the cap, an offer becomes take-one-and-drop-one:</b> pick the incoming ability, then
+name which of your earned abilities it replaces. <b>Declining is always allowed</b>, at any
+point, full or not — a settled kit is a legitimate end state, and being forced to churn would
+make a good build worse as the run goes on. <b>A declined or dropped ability does not return
+to that run's pool</b>, so an offer can never re-present what was just refused.</p>
+
+<p><b>The twelve protected cores.</b> The "needs" column is the minimum the passive cannot
+function without, and it varies per spec rather than following a rule: Overburn is meaningless
+without a Burn applier and without Detonation to spend it, so the Pyromancer's core is larger
+than the Berserker's, whose Blood Frenzy reads nothing but his own health bar. An empty cell is
+a real answer — those specs' opening abilities are protected because they shipped in the kit,
+not because the passive needs them.</p>
+<table border="1" cellpadding="4">
+<tr><th>Spec</th><th>Slots</th><th>Its passive needs</th><th>Why</th></tr>
+<tr><td><b>Berserker</b></td><td>3</td><td>—</td><td>Blood Frenzy reads his own health bar and nothing else.</td></tr>
+<tr><td><b>Warden</b></td><td>3</td><td>—</td><td>Heavy Plating is a Block-chance rule; it reads no ability.</td></tr>
+<tr><td><b>Swordmaster</b></td><td>3</td><td>Guard Change</td><td>Seasoned Fighter is two stances, and Guard Change is the only stance swap in the game.</td></tr>
+<tr><td><b>Pyromancer</b></td><td>3</td><td>Fireball, Detonation</td><td>Overburn needs a Burn applier to build the field and a spender to empty it.</td></tr>
+<tr><td><b>Cryomancer</b></td><td>3</td><td>Frostbolt, Ice Lance</td><td>Glacial Hold needs a Chilled applier to reach four stacks and a release to end the hold.</td></tr>
+<tr><td><b>Arcanist</b></td><td>3</td><td>Arcane Explosion</td><td>Runaway Resonance builds on damaging casts; the free core attack guarantees one every turn.</td></tr>
+<tr><td><b>Holy</b></td><td>4</td><td>Heal, Hymn of Hope</td><td>Mercy is earned passively and must be spendable — Hymn pays stacks outright, and Empower needs a heal to empower.</td></tr>
+<tr><td><b>Devout</b></td><td>3</td><td>Divine Shield, Consecrated Ground</td><td>Conviction builds only on Divine Shield absorbs, and the ground's drip is two thirds of all Faith.</td></tr>
+<tr><td><b>Occultist</b></td><td>3</td><td>Shadowrend, Hex of Ruin</td><td>Wrath of the Old Gods marks on debuffs he applies; these two are the debuffs he always holds.</td></tr>
+<tr><td><b>Beastmaster</b></td><td>3</td><td>All three summons</td><td>Pack Bond reads a living beast. With no summon there is no boon, no Loyalty and no passive at all. His five opening abilities cost three slots — the summons share one bar entry.</td></tr>
+<tr><td><b>Sharpshooter</b></td><td>3</td><td>Quick Shot</td><td>Lethal Aim counts consecutive single-target attacks; the free shot lets him stay on a mark every turn.</td></tr>
+<tr><td><b>Survivalist</b></td><td>3</td><td>—</td><td>Trapper's poison rides being struck, and its breadth term counts statuses from any source — including his allies'.</td></tr>
+</table>
+
+<p><b>What the pool draws from.</b> Roughly <b>one card in four is class-wide</b>; the rest are
+spec. Class-wide abilities are deliberately untied and general — Magic Barrier, not Frostbolt —
+and the test is whether an ability would read as off-theme for any spec of that class. They are
+<b>weaker than spec abilities, and unconditional</b>: they feed no passive, so at equal power
+they would be a safe default that dilutes every build. Slightly weaker but always-on makes them
+the pick you take when your spec's engine is not online yet.</p>
+
+<p><b>The draft pools.</b> Separate from the §6a boss pools above: the boss pick still reads
+SPEC_POOLS, the draft reads these.</p>
+<table border="1" cellpadding="4">
+<tr><th>Spec</th><th>Draft pool</th></tr>
+<tr><td><b>Berserker</b></td><td><i>owed</i></td></tr>
+<tr><td><b>Warden</b></td><td><i>owed</i></td></tr>
+<tr><td><b>Swordmaster</b></td><td><i>owed</i></td></tr>
+<tr><td><b>Pyromancer</b></td><td>Cinderfall, Ember Debt</td></tr>
+<tr><td><b>Cryomancer</b></td><td>Winter's Toll, Rimebinding</td></tr>
+<tr><td><b>Arcanist</b></td><td>Null Field, Kindled Mind</td></tr>
+<tr><td><b>Holy</b></td><td>Second Wind, Rite of Return</td></tr>
+<tr><td><b>Devout</b></td><td>Vow of Suffering, Aegis Reversal</td></tr>
+<tr><td><b>Occultist</b></td><td>Blight the Well, Covenant of Ash</td></tr>
+<tr><td><b>Beastmaster</b></td><td>Twin Hunt, Call the Wilds</td></tr>
+<tr><td><b>Sharpshooter</b></td><td>Called Volley, Quarry's Mark</td></tr>
+<tr><td><b>Survivalist</b></td><td>Choking Smoke, Snare Line</td></tr>
+<tr><td colspan="2"><b>Class-wide (all four classes)</b> — <i>owed</i></td></tr>
+</table>
+<p><b>Pools are thin.</b> Eighteen abilities exist against a target of about ninety-six, so
+offers come up two cards or one, and a Warrior has no draft pool at all yet. That is the pool
+filling, not the draft misbehaving.</p>
+
+<p><b>The eighteen drafted abilities.</b> Each names the axis it serves.</p>
+<table border="1" cellpadding="4">
+<tr><th>Ability</th><th>Cost / init / cd</th><th>What it does</th><th>Axis</th></tr>
+<tr><td colspan="4"><b>Pyromancer</b> — <i>different answers to how do you commit</i></td></tr>
+<tr><td><b>Cinderfall</b></td><td>30 Mana, 3.0, 3cd, all enemies</td><td>20% of Attack across the field, then tears 2 turns of Burn from each burning enemy to deal that much again to it (Perfect: 3 turns). Overburn refunds every turn taken.</td><td>Spending wide instead of deep — Detonation empties one bank, this skims them all.</td></tr>
+<tr><td><b>Ember Debt</b></td><td>20 Mana, 2.0, 4cd, one enemy</td><td>No damage. 8 turns of Burn (Perfect: 12), and <b>Overburn's Mana drain ignores that enemy entirely</b>. Its turns still feed the damage bonus.</td><td>Commitment without the bill — one enemy is free to light.</td></tr>
+<tr><td colspan="4"><b>Cryomancer</b> — <i>what do you do with the time you bought</i></td></tr>
+<tr><td><b>Winter's Toll</b></td><td>25 Mana, 2.5, 4cd</td><td>The held enemy takes 8% of Attack per turn it has been held (Perfect: 12%). <b>The hold continues.</b> Unusable while he holds nothing.</td><td>Cashing in without releasing.</td></tr>
+<tr><td><b>Rimebinding</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td>Applies Chilled equal to the stacks on the held enemy (Perfect: one more).</td><td>The hold as a template — one deep prison becomes the next one.</td></tr>
+<tr><td colspan="4"><b>Arcanist</b> — <i>what carries you through the early game</i></td></tr>
+<tr><td><b>Null Field</b></td><td>25 Mana, 2.0, 4cd, self</td><td>For 3 turns (Perfect: 4), damage taken falls 5% per Resonance stack, <b>read live</b>.</td><td>The ramp defends itself — worthless at 2 stacks, enormous at 12, so surviving <i>to</i> the late game becomes the reward for ramping.</td></tr>
+<tr><td><b>Kindled Mind</b></td><td>15 Mana, 1.5, 2cd, one enemy</td><td>15% of Attack, and it banks 3 Resonance instead of 1 (Perfect: 4).</td><td>Buying the ramp with tempo — his fastest early climb, and a card he would rather not cast late.</td></tr>
+<tr><td colspan="4"><b>Holy</b> — <i>what does reversal cost you</i></td></tr>
+<tr><td><b>Second Wind</b></td><td>30 Mana, 2.5, 4cd, one ally</td><td>Heals for the damage that ally has taken in the last two turns, up to 40% of their maximum (Perfect: 55%).</td><td>Undoing recent history rather than topping up — enormous on someone just spiked, worthless on someone healthy.</td></tr>
+<tr><td><b>Rite of Return</b></td><td>35 Mana, 3.0, 5cd, one ally</td><td>For 3 turns (Perfect: 4), the next blow that would fell that ally restores them to 50% health instead — and Holy loses 30% of hers.</td><td>Reversal bought in advance rather than reacted to. Resurrection undoes a death and costs Mercy; this prevents one and costs her health.</td></tr>
+<tr><td colspan="4"><b>Devout</b> — <i>what else can he lend</i></td></tr>
+<tr><td><b>Vow of Suffering</b></td><td>20 Mana, 2.0, 3cd, one ally</td><td>For 3 turns (Perfect: 4), half the damage that ally takes is redirected to the Devout — and every share he eats kindles that ally 1 Faith.</td><td>Mitigation by relocation. Divine Shield absorbs a capped amount; this has no cap.</td></tr>
+<tr><td><b>Aegis Reversal</b></td><td>30 Mana, 2.5, 4cd, one ally</td><td>Consumes that ally's Divine Shield; their next attack deals bonus damage equal to whatever the shield had left (Perfect: half again).</td><td>Unspent protection becomes offence — and it is the Devout dealing damage without attacking.</td></tr>
+<tr><td colspan="4"><b>Occultist</b> — <i>what else can be corrupted</i></td></tr>
+<tr><td><b>Blight the Well</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>For 4 turns (Perfect: 6), healing that enemy receives damages it instead.</td><td>Corrupting recovery. <b>Deliberately situational</b> — near-dead against a warband with no healer, decisive against one with.</td></tr>
+<tr><td><b>Covenant of Ash</b></td><td>20 Mana, 2.0, 4cd, one enemy</td><td>Marks it; while the mark holds, every Ruin stack applied to any enemy also lands here. One covenant at a time.</td><td>Corruption that compounds onto a chosen target — spread pressure becomes focused pressure without giving up the spread.</td></tr>
+<tr><td colspan="4"><b>Beastmaster</b> — <i>what does the partnership give you</i></td></tr>
+<tr><td><b>Twin Hunt</b></td><td>25 Mana, 2.5, 3cd, one enemy</td><td>The Beastmaster and his beast strike together, each for 40% of Attack (Perfect: the beast lands 55%). If the beast's blow kills it, his next ability costs nothing.</td><td>The two bodies acting deliberately, where the rest of his kit has the beast on its own clock.</td></tr>
+<tr><td><b>Call the Wilds</b></td><td>20 Mana, 2.0, 5cd</td><td>Calls in the absent beast he is most bonded with, <b>keeping its Loyalty and paying no shared Swap cooldown</b>, and it strikes immediately (Perfect: twice).</td><td>Rotation without the tax — the central verb of an entire lane happens 0.05 times a trash battle.</td></tr>
+<tr><td colspan="4"><b>Sharpshooter</b> — <i>what breaks the patience, and what pays for it</i></td></tr>
+<tr><td><b>Called Volley</b></td><td>30 Mana, 3.0, 4cd, all enemies</td><td>20% of Attack across the line (Perfect: 26%), and his Focus and his mark survive it untouched.</td><td>Hitting the field without breaking the bond.</td></tr>
+<tr><td><b>Quarry's Mark</b></td><td>15 Mana, 1.5, 3cd, one enemy</td><td>Marks it for the battle: Focus gained from attacking it is doubled. One mark at a time.</td><td>Patience that accelerates. It deliberately does <b>not</b> protect Focus on the marked enemy's death — Overkill already does that.</td></tr>
+<tr><td colspan="4"><b>Survivalist</b> — <i>what else can be worn down</i></td></tr>
+<tr><td><b>Choking Smoke</b></td><td>25 Mana, 2.5, 4cd, all enemies</td><td>Blinds every enemy for 2 turns (Perfect: 3) — the existing Blind, +50% miss.</td><td>An affliction his kit does not otherwise have. Area attacks never miss, so it blanks single-target blows only.</td></tr>
+<tr><td><b>Snare Line</b></td><td>25 Mana, 2.5, 4cd</td><td>Every enemy that acts next turn (Perfect: for two turns) springs one of your traps where it stands — teeth, Break and all. It fills no trap slot and spends no placed trap.</td><td>The traps stop waiting.</td></tr>
+</table>
 
 <h3>6.1 Warrior</h3>
 <ul>

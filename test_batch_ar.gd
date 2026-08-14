@@ -735,8 +735,16 @@ func _live_refund() -> void:
 	var src := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	ok(src.count("func _overburn_refund") == 1,
 		"the refund has exactly one implementation")
-	ok(src.count("_overburn_refund(attacker,") == 2,
-		"...and exactly two call sites: Detonation and Wildfire")
+	# BATCH BO RE-POINTED THIS IN PLACE, 2 -> 3. The question it is really
+	# asking is unchanged and still worth asking — does every Burn consumer
+	# share the ONE implementation, rather than each carrying its own copy —
+	# and AR's own comment above says exactly why: the refund is a property of
+	# the PASSIVE, so "anything the tree later teaches to eat Burn inherits it
+	# with no second implementation". CINDERFALL is the third consumer and it
+	# inherits it, which is the rule working. A fourth has to come here and say
+	# so, which is the point of pinning a count at all.
+	ok(src.count("_overburn_refund(attacker,") == 3,
+		"...and exactly three call sites: Detonation, Wildfire and Cinderfall")
 	var scene := await _spawn({}, ["raider", "raider"])
 	var py := _py(scene)
 	if py == null:

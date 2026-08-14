@@ -241,6 +241,164 @@ const CLASS_POOLS := {
 }
 
 
+# ---------- THE ABILITY DRAFT (Batch BO) ----------
+#
+# A SECOND POOL, DELIBERATELY SEPARATE FROM `SPEC_POOLS` ABOVE. The zone-boss
+# pick is unchanged and still reads SPEC_POOLS; the DRAFT is what elites,
+# merchants and events offer, and it reads the two dicts below. Keeping the two
+# apart is the only thing that makes "the existing pick, unchanged" true rather
+# than nearly true — a shared pool would have re-weighted every boss offer in
+# the game the moment eighteen entries landed.
+#
+# WHAT A DRAFTED ABILITY IS, MECHANICALLY: exactly what an earned one already
+# was. It lands in `member["bm_abilities"]`, the same list the boss pick writes,
+# so the battle spawn, the hero sheet, `Talents.ability_names`, the rune
+# eligibility filter and the upgrade pairing all pick it up with no new
+# plumbing and NO SAVE VERSION MOVES (still v10). What the draft adds beside it
+# is `member["draft_refused"]` — the names this run may never offer again.
+#
+# POOLS ARE THIN UNTIL TRANCHE 3 AND THAT IS EXPECTED, NOT A BUG: eighteen
+# abilities against a target of about ninety-six, so an offer of three will
+# often come up two or one. It fills SHORT rather than padding with repeats,
+# which is AP §3's existing rule for upgrade offers applied unchanged.
+const SPEC_DRAFT_POOLS := {
+	# WARRIOR — OWED, NOT FORGOTTEN. The three Warrior lane names only arrived
+	# in Batch BM and their pools want the same discussion the other nine had,
+	# so they are named here empty rather than filled in a hurry. A draft offer
+	# to a Warrior fills short today; that is the visible shape of the debt.
+	"berserker": [], "warden": [], "swordmaster": [],
+	# MAGE.
+	"pyromancer": ["Cinderfall", "Ember Debt"],
+	"cryomancer": ["Winter's Toll", "Rimebinding"],
+	"arcanist": ["Null Field", "Kindled Mind"],
+	# CLERIC.
+	"holy": ["Second Wind", "Rite of Return"],
+	"inquisitor": ["Vow of Suffering", "Aegis Reversal"],
+	"occultist": ["Blight the Well", "Covenant of Ash"],
+	# HUNTER.
+	"beastmaster": ["Twin Hunt", "Call the Wilds"],
+	"sharpshooter": ["Called Volley", "Quarry's Mark"],
+	"mystic": ["Choking Smoke", "Snare Line"],
+}
+
+# CLASS-WIDE DRAFT ABILITIES — NAMED HERE, EMPTY UNTIL THEIR OWN TRANCHE.
+# Six per class, twenty-four in all, and NONE of them ship in Batch BO. The
+# keys exist now because the machinery has to know the shape it is drawing
+# from: `Run.roll_draft_offer` already mixes the two pools at CLASS_DRAFT_SHARE
+# and simply finds nothing on this side of it today.
+#
+# THE AUTHORING RULES, RECORDED WITH THE EMPTY ARRAYS SO THEY ARRIVE WITH THE
+# CONTENT: a class-wide ability is DELIBERATELY UNTIED AND GENERAL — Magic
+# Barrier, not Frostbolt. The test is whether it would read as off-theme for
+# ANY spec of that class; if a Pyromancer drawing it would feel like he wandered
+# into the wrong tree, it is a spec ability. And they are WEAKER THAN SPEC
+# ABILITIES AND UNCONDITIONAL: they feed no passive (a Barrier does nothing for
+# Overburn), so at equal power they would be a safe default that dilutes every
+# build. Slightly weaker but always-on makes them the pick you take when your
+# spec's engine is not online yet, which is a real role.
+const CLASS_DRAFT_POOLS := {
+	"warrior": [], "mage": [], "cleric": [], "hunter": [],
+}
+
+# Roughly one card in four is class-wide; the rest are spec. Read by
+# `Run.roll_draft_offer` per CARD, so a three-card offer averages 0.75
+# class-wide entries rather than being forced to hold exactly one.
+const CLASS_DRAFT_SHARE := 0.25
+
+
+# ---------- THE PROTECTED CORE (Batch BO §2) ----------
+#
+# EVERY SPEC KEEPS A PROTECTED CORE: its passive, its basic attack, and the
+# minimum abilities its passive needs to function. Protected abilities can
+# NEVER be dropped, so every drop decision is among EARNED abilities — which
+# keeps the choice clean and makes the slot cap unable to break a passive.
+#
+# THE FAILURE MODE THIS TABLE EXISTS TO PREVENT IS SILENT: a spine that stops
+# working because its enabler became draftable. Nothing crashes, nothing logs,
+# the spec simply reads as weak. `enablers` is therefore AUTHORED rather than
+# derived, and test_batch_bo asserts every named enabler is still in that
+# spec's opening kit and in NO draft or spec pool.
+#
+# TWO COLUMNS, AND THE DISTINCTION IS THE WHOLE POINT:
+# · `slots` — how many of the cap's seven the opening kit occupies. Ten specs
+#   sit at 3 (leaving 4 draftable). HOLY IS 4, because Batch AV gave her a
+#   fourth opening ability on purpose. THE BEASTMASTER HOLDS FIVE ABILITIES IN
+#   THREE SLOTS: his three summons share one action-bar entry, which has been
+#   Batch AH's rule since the pools were built, and counting them as three
+#   would take a spec down to two draftable picks for a bookkeeping reason.
+# · `enablers` — the MINIMUM the passive cannot function without. IT VARIES,
+#   and it is decided per spec rather than by a rule: Overburn is meaningless
+#   without a Burn applier and without Detonation to spend it, so the
+#   Pyromancer's core is larger than the Berserker's, whose Blood Frenzy reads
+#   nothing but his own health bar. An EMPTY list is a real answer, not an
+#   omission — those specs' opening abilities are protected because they
+#   shipped in the kit, not because the passive needs them.
+const PROTECTED_CORES := {
+	"berserker": {"slots": 3, "enablers": [],
+		"why": "Blood Frenzy reads his own health bar and nothing else."},
+	"warden": {"slots": 3, "enablers": [],
+		"why": "Heavy Plating is a Block-chance rule; it reads no ability."},
+	"swordmaster": {"slots": 3, "enablers": ["Guard Change"],
+		"why": "Seasoned Fighter is two stances, and Guard Change is the only stance swap in the game (Batch AK)."},
+	"pyromancer": {"slots": 3, "enablers": ["Fireball", "Detonation"],
+		"why": "Overburn needs a Burn applier to build the field and a spender to empty it."},
+	"cryomancer": {"slots": 3, "enablers": ["Frostbolt", "Ice Lance"],
+		"why": "Glacial Hold needs a Chilled applier to reach four stacks and a release to end the hold."},
+	"arcanist": {"slots": 3, "enablers": ["Arcane Explosion"],
+		"why": "Runaway Resonance builds on damaging casts; the free core attack is what guarantees one every turn."},
+	"holy": {"slots": 4, "enablers": ["Heal", "Hymn of Hope"],
+		"why": "Mercy is earned passively and must be SPENDABLE — Hymn pays stacks outright, and Empower needs a heal to empower."},
+	"inquisitor": {"slots": 3, "enablers": ["Divine Shield", "Consecrated Ground"],
+		"why": "Conviction builds ONLY on Divine Shield absorbs, and Batch BI measured the ground's drip at 66% of all Faith."},
+	"occultist": {"slots": 3, "enablers": ["Shadowrend", "Hex of Ruin"],
+		"why": "Wrath of the Old Gods marks on debuffs HE applies; these two are the debuffs he always holds."},
+	"beastmaster": {"slots": 3,
+		"enablers": ["Summon Ursus", "Summon Canis", "Summon Aguila"],
+		"why": "Pack Bond reads a living beast. With no summon there is no boon, no Loyalty and no passive at all."},
+	"sharpshooter": {"slots": 3, "enablers": ["Quick Shot"],
+		"why": "Lethal Aim counts consecutive single-target attacks; the free shot is what lets him stay on a mark every turn."},
+	"mystic": {"slots": 3, "enablers": [],
+		"why": "Trapper's poison rides being struck, and its breadth term counts statuses from ANY source — including his allies'."},
+}
+
+
+static func spec_draft_pool(spec: String) -> Array:
+	return SPEC_DRAFT_POOLS.get(spec, [])
+
+
+static func class_draft_pool(class_name_key: String) -> Array:
+	return CLASS_DRAFT_POOLS.get(class_name_key, [])
+
+
+# How many of the cap's seven slots this spec's protected core occupies.
+static func core_slots(spec: String) -> int:
+	return int(PROTECTED_CORES.get(spec, {}).get("slots", 3))
+
+
+# The minimum the passive cannot function without. Authored, not derived —
+# see the block above for why.
+static func core_enablers(spec: String) -> Array:
+	return PROTECTED_CORES.get(spec, {}).get("enablers", [])
+
+
+# Every display name the spec's protected core covers, READ OFF THE LIVE KIT
+# so it can never drift from what the hero actually opens holding: the class
+# core attack (after `apply_kit_overrides` renames it) plus every opening spec
+# ability. This is the list the drop step refuses.
+static func protected_names(spec: String) -> Array:
+	var out: Array = []
+	var class_key := class_of_spec(spec)
+	if class_key != "":
+		var cfg := {"abilities": kit(class_key)}
+		apply_kit_overrides(cfg, spec)
+		for ab in cfg["abilities"]:
+			out.append(ab.display_name)
+	for ab2 in spec_abilities(spec):
+		if ab2 != null and not out.has(ab2.display_name):
+			out.append(ab2.display_name)
+	return out
+
+
 static func spec_pool(spec: String) -> Array:
 	return SPEC_POOLS.get(spec, [])
 
@@ -279,6 +437,13 @@ static func spec_pool_ability(spec: String, display_name: String) -> Ability:
 # talent-granted ones out of the living trees, so a pool copy can never
 # drift from the copy the kit or the talent hands out.
 static func pool_ability(display_name: String) -> Ability:
+	# BATCH BO: the draft's own defs come first — they are a plain match and
+	# nothing else in the game holds a copy of them, so a drafted ability
+	# resolves everywhere an earned one already did (battle spawn, hero sheet,
+	# blacksmith pairing, upgrade eligibility) with no second resolver.
+	var drafted := draft_ability(display_name)
+	if drafted != null:
+		return drafted
 	var beast := beastmaster_pool_ability(display_name)
 	if beast != null:
 		return beast
@@ -305,6 +470,191 @@ static func pool_ability(display_name: String) -> Ability:
 					return ab
 	# A talent node grants it (new_ability payloads live in the trees).
 	return Talents.granted_ability(display_name)
+
+
+# ---------- TRANCHE 1: the eighteen drafted abilities (Batch BO §5) ----------
+#
+# EIGHTEEN SHIP, NOT TWENTY-FOUR, AND THAT IS SAID PLAINLY RATHER THAN LEFT AS
+# A GAP: six MAGE, six CLERIC, six HUNTER. The six WARRIOR abilities are NOT
+# authored here — the Warrior lane names only arrived in Batch BM and their
+# pools want the same discussion the other nine lanes had.
+#
+# EVERY ABILITY NAMES THE AXIS IT SERVES, in its comment. That rule is here
+# because the twelve tree batches spent themselves removing nodes that existed
+# to fill a grid, and ninety-six abilities has the same risk in a larger form.
+# NO ABILITY MAY BE A STRICTLY BETTER VERSION OF ANOTHER IN THE SAME POOL —
+# Batch BD found Deadfall had duplicated Snare Trap for fourteen batches.
+#
+# ONE NUMBER PER ABILITY IS THIS BATCH'S RATHER THAN THE BRIEF'S, AND IT IS
+# FLAGGED HERE RATHER THAN BURIED: **Break damage**. §5 specifies cost,
+# initiative, cooldown, target and effect for all eighteen and says nothing
+# about `pressure`, exactly as Batch AT's brief said nothing about Death Ray's
+# — and that omission became a thread that took three batches to close. The
+# two that are ordinary attacks carry BD in line with their siblings; the rest
+# are not attacks and carry none.
+static func draft_ability(display_name: String) -> Ability:
+	match display_name:
+		# ----- PYROMANCER: different answers to how do you commit -----
+		# AXIS: spending wide instead of deep. Detonation empties one bank;
+		# this skims every bank, and relieves Overburn's drain across the field.
+		"Cinderfall":
+			return Ability.make({"display_name": "Cinderfall", "dmg_type": "fire",
+				"cost": 30, "damage": 20, "pressure": 8, "delay": 3.0,
+				"cooldown": 3, "aoe": true, "anim": "attack03",
+				"special": "cinderfall",
+				"perfect_id": "", "perfect_text": "Takes 3 turns of Burn from each instead of 2",
+				"description": "Rake the whole field for 20% of Attack,\nthen tear 2 turns of Burn from EACH\nburning enemy to deal that much again\nto it. Overburn refunds every turn taken."})
+		# AXIS: commitment without the bill. One enemy is free to light;
+		# everything else still costs, so the choice is which enemy is exempt.
+		"Ember Debt":
+			return Ability.make({"display_name": "Ember Debt", "dmg_type": "fire",
+				"cost": 20, "damage": 0, "pressure": 0, "delay": 2.0,
+				"cooldown": 4, "anim": "attack02", "special": "ember_debt",
+				"perfect_id": "", "perfect_text": "12 turns of Burn instead of 8",
+				"description": "Set a debt alight: 8 turns of Burn on\none enemy, and Overburn's Mana drain\nIGNORES that enemy entirely for the\nrest of the battle. Its turns still\nfeed the damage bonus."})
+		# ----- CRYOMANCER: what do you do with the time you bought -----
+		# AXIS: cashing in without releasing. Shatter and Ice Lance both end the
+		# hold to be paid; this collects interest and leaves the prison standing.
+		"Winter's Toll":
+			return Ability.make({"display_name": "Winter's Toll", "dmg_type": "frost",
+				"cost": 25, "damage": 8, "pressure": 0, "delay": 2.5,
+				"cooldown": 4, "anim": "attack02", "special": "winters_toll",
+				"perfect_id": "", "perfect_text": "12% of Attack per turn held instead of 8%",
+				"description": "Collect the interest: the HELD enemy\ntakes 8% of Attack for every turn it\nhas spent in the ice — AND THE HOLD\nCONTINUES. Unusable while he holds\nnothing."})
+		# AXIS: the hold as a template. One deep prison becomes the next one.
+		"Rimebinding":
+			return Ability.make({"display_name": "Rimebinding", "dmg_type": "frost",
+				"cost": 20, "damage": 0, "pressure": 0, "delay": 2.0,
+				"cooldown": 3, "anim": "attack02", "special": "rimebinding",
+				"perfect_id": "", "perfect_text": "One extra stack of Chilled",
+				"description": "Copy the prison: apply Chilled to one\nenemy equal to the stacks standing on\nthe enemy you already hold. Four\nstacks put it in the ice too."})
+		# ----- ARCANIST: what carries you through the early game -----
+		# AXIS: the ramp defends itself. Worthless at 2 stacks, enormous at 12 —
+		# so it does not rescue his early game, it makes surviving TO the late
+		# game the reward for ramping. Deliberately the opposite of Stabilize.
+		"Null Field":
+			return Ability.make({"display_name": "Null Field", "dmg_type": "arcane",
+				"cost": 25, "damage": 0, "pressure": 0, "delay": 2.0,
+				"cooldown": 4, "anim": "attack03", "special": "null_field",
+				"perfect_id": "", "perfect_text": "Holds a 4th turn",
+				"description": "Fold the storm inward: for 3 turns you\ntake 5% less damage PER RESONANCE\nSTACK — read live, so it deepens as\nyou keep casting. Nothing at 2 stacks;\nhalf again at 10."})
+		# AXIS: buying the ramp with tempo. His fastest early climb and a card
+		# he would rather not cast late — the correct shape for escalation.
+		"Kindled Mind":
+			return Ability.make({"display_name": "Kindled Mind", "dmg_type": "arcane",
+				"cost": 15, "damage": 15, "pressure": 6, "delay": 1.5,
+				"cooldown": 2, "anim": "attack01",
+				"perfect_id": "", "perfect_text": "Builds 4 Resonance instead of 3",
+				"description": "A small deliberate spark: 15% of\nAttack, and it banks 3 Resonance\ninstead of 1."})
+		# ----- HOLY: what does reversal cost you -----
+		# AXIS: undoing recent history rather than topping up. Enormous on
+		# someone just spiked, worthless on someone healthy.
+		"Second Wind":
+			return Ability.make({"display_name": "Second Wind", "cost": 30,
+				"special": "second_wind_holy", "target": Ability.Target.ALLY,
+				"delay": 2.5, "cooldown": 4, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "Up to 55% of their maximum instead of 40%",
+				"description": "Take back the last two turns: heal an\nally for ALL the damage they have\ntaken in that window, up to 40% of\ntheir maximum. Nothing on someone\nwho has not been hit."})
+		# AXIS: reversal bought in advance rather than reacted to. Resurrection
+		# undoes a death and costs Mercy; this prevents one and costs her health.
+		"Rite of Return":
+			return Ability.make({"display_name": "Rite of Return", "cost": 35,
+				"special": "rite_of_return", "target": Ability.Target.ALLY,
+				"delay": 3.0, "cooldown": 5, "anim": "attack03",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Promise one ally the road back: for 3\nturns, the next blow that would fell\nthem restores them to 50% health\ninstead — and Holy loses 30% of hers\nwhen it pays."})
+		# ----- DEVOUT: what else can he lend -----
+		# AXIS: mitigation by relocation. Divine Shield absorbs a capped amount;
+		# this has no cap, and every hit he eats builds that ally's Faith.
+		"Vow of Suffering":
+			return Ability.make({"display_name": "Vow of Suffering", "cost": 20,
+				"special": "vow_suffering", "target": Ability.Target.ALLY,
+				"delay": 2.0, "cooldown": 3, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Take their wounds as your own: for 3\nturns HALF the damage that ally takes\nis redirected to the Devout — and\nevery share he eats kindles that ally\n1 Faith."})
+		# AXIS: unspent protection becomes offence. His shields expire unspent
+		# constantly; this makes over-shielding a resource.
+		"Aegis Reversal":
+			return Ability.make({"display_name": "Aegis Reversal", "cost": 30,
+				"special": "aegis_reversal", "target": Ability.Target.ALLY,
+				"delay": 2.5, "cooldown": 4, "anim": "attack03",
+				"perfect_id": "", "perfect_text": "The bonus is worth half again",
+				"description": "Spend the shield that was never spent:\nconsumes an ally's Divine Shield, and\ntheir next attack deals bonus damage\nequal to whatever the shield had left."})
+		# ----- OCCULTIST: what else can be corrupted -----
+		# AXIS: corrupting recovery. DELIBERATELY SITUATIONAL — near-dead
+		# against a warband with no healer, decisive against one with. A pool
+		# needs a few cards that are excellent when the board calls for them,
+		# or every pick is a safe generic.
+		"Blight the Well":
+			return Ability.make({"display_name": "Blight the Well",
+				"dmg_type": "shadow", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.5, "cooldown": 4, "anim": "attack03",
+				"special": "blight_well",
+				"perfect_id": "", "perfect_text": "Holds 6 turns instead of 4",
+				"description": "Poison the source: for 4 turns, any\nhealing that enemy receives DAMAGES\nit for the same amount instead."})
+		# AXIS: corruption that compounds onto a chosen target. Spread pressure
+		# becomes focused pressure without giving up the spread.
+		"Covenant of Ash":
+			return Ability.make({"display_name": "Covenant of Ash",
+				"dmg_type": "shadow", "cost": 20, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 4, "anim": "attack02",
+				"special": "covenant_ash",
+				"perfect_id": "", "perfect_text": "The mark also lands 2 Ruin outright",
+				"description": "Bind one enemy to the ash: while the\nmark holds, EVERY stack of Ruin\napplied to ANY enemy also lands here.\nOne covenant at a time."})
+		# ----- BEASTMASTER: what does the partnership give you -----
+		# AXIS: the two bodies acting deliberately, where the rest of his kit
+		# has the beast on its own clock.
+		"Twin Hunt":
+			return Ability.make({"display_name": "Twin Hunt", "cost": 25,
+				"damage": 40, "pressure": 12, "delay": 2.5, "cooldown": 3,
+				"anim": "attack02", "special": "twin_hunt",
+				"perfect_id": "", "perfect_text": "The beast's blow lands at 55% of Attack",
+				"description": "Strike as one: the Beastmaster and his\nbeast each hit for 40% of Attack. If\nthe BEAST'S blow is the killing one,\nhis next ability costs nothing."})
+		# AXIS: rotation without the tax. BJ measured swaps at 0.05 per trash
+		# battle — the central verb of an entire lane barely happens.
+		"Call the Wilds":
+			return Ability.make({"display_name": "Call the Wilds", "cost": 20,
+				"special": "call_wilds", "delay": 2.0, "cooldown": 5,
+				"anim": "attack01",
+				"perfect_id": "", "perfect_text": "The arriving beast strikes twice",
+				"description": "Whistle the pack round: call in the\nabsent beast you are most bonded with,\nkeeping its Loyalty AND paying no Swap\ncooldown — and it strikes the moment\nit arrives."})
+		# ----- SHARPSHOOTER: what breaks the patience, and what pays for it -----
+		# AXIS: hitting the field without breaking the bond.
+		"Called Volley":
+			return Ability.make({"display_name": "Called Volley", "cost": 30,
+				"damage": 20, "pressure": 8, "delay": 3.0, "cooldown": 4,
+				"aoe": true, "anim": "attack03",
+				"perfect_id": "", "perfect_text": "Deals 26% of Attack instead",
+				"description": "Loose on the whole line for 20% of\nAttack — and his Focus and his mark\nsurvive it untouched."})
+		# AXIS: patience that accelerates. It deliberately does NOT protect
+		# Focus on the marked enemy's death — Overkill already does that, and an
+		# ability duplicating a row-7 talent is the Deadfall fault.
+		"Quarry's Mark":
+			return Ability.make({"display_name": "Quarry's Mark", "cost": 15,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 3,
+				"anim": "attack01", "special": "quarrys_mark",
+				"perfect_id": "", "perfect_text": "The mark also grants 20 Focus now",
+				"description": "Name the quarry for the rest of the\nbattle: Focus gained from attacking it\nis DOUBLED. One mark at a time.\nSwitching away still clears him — the\nmark makes committing pay faster."})
+		# ----- SURVIVALIST: what else can be worn down -----
+		# AXIS: an affliction his kit does not otherwise have. Blind is an
+		# EXISTING status at +50% miss — used, not re-authored. Priced against
+		# that: AoE attacks never miss, so it blanks single-target attacks only.
+		"Choking Smoke":
+			return Ability.make({"display_name": "Choking Smoke",
+				"dmg_type": "nature", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.5, "cooldown": 4, "aoe": true, "anim": "attack03",
+				"special": "choking_smoke",
+				"perfect_id": "", "perfect_text": "Blinds for 3 turns instead of 2",
+				"description": "Foul the air: EVERY enemy is Blinded\nfor 2 turns — 50% more likely to miss.\nArea attacks never miss, so it blanks\nsingle-target blows only."})
+		# AXIS: the traps stop waiting.
+		"Snare Line":
+			return Ability.make({"display_name": "Snare Line",
+				"dmg_type": "nature", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.5, "cooldown": 4, "anim": "attack03",
+				"special": "snare_line",
+				"perfect_id": "", "perfect_text": "The line holds a second turn",
+				"description": "Run a line across the whole field: the\nnext turn EVERY enemy that acts springs\none of your traps where it stands —\nteeth, Break and all. It fills no trap\nslot and spends no placed trap."})
+	return null
 
 
 # ---------- the vault, unsealed ----------

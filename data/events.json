@@ -456,6 +456,23 @@
                 "outcome": "Four days of forms in one afternoon. Everyone limps. Everyone is better."
             },
             {
+                "label": "Pay 200 gold to be taught a new form",
+                "requires": {
+                    "min_gold": 200
+                },
+                "effects": [
+                    {
+                        "effect": "gold",
+                        "amount": -200
+                    },
+                    {
+                        "effect": "ability_draft",
+                        "target": "random"
+                    }
+                ],
+                "outcome": "The drill-master's echo walks one of you through it until it is theirs."
+            },
+            {
                 "label": "Save your coin",
                 "effects": [],
                 "outcome": "The posts creak their disappointment as you go."
@@ -503,6 +520,21 @@
                     }
                 ],
                 "outcome": "It speaks through one of you, and leaves something written on the inside."
+            },
+            {
+                "label": "Listen until it teaches (one hero -30% health, and a new ability)",
+                "effects": [
+                    {
+                        "effect": "damage_pct",
+                        "amount": 0.3,
+                        "target": "random"
+                    },
+                    {
+                        "effect": "ability_draft",
+                        "target": "random"
+                    }
+                ],
+                "outcome": "The dream shows one of you a thing the Warden knows how to do."
             },
             {
                 "label": "Cover your ears",

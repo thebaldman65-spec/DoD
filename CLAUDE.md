@@ -637,6 +637,235 @@ meter is ungoverned. meter | what governs it | where the governor lives:
   count and peak together at battle start, before the opening oath; one ratchet site in
   `_gain_faith` | battle.gd ~8125-8171.
 
+### STANDING REFERENCE — THE ABILITY DRAFT, THE SEVEN-SLOT CAP AND THE TWELVE PROTECTED CORES (Batch BO)
+**A SECOND ABILITY SOURCE BESIDE THE BOSS PICK, AND IT IS A SEPARATE POOL ON PURPOSE.**
+`Classes.SPEC_DRAFT_POOLS` / `CLASS_DRAFT_POOLS` are what elites, merchants and events offer;
+`SPEC_POOLS` is still what a ZONE BOSS offers and it is byte-untouched. Sharing one pool would
+have re-weighted every boss offer in the game the moment eighteen entries landed, which is what
+"the existing pick, unchanged" forbids. **A drafted ability lands in `member["bm_abilities"]`,
+the SAME list a boss pick writes**, so the battle spawn, the hero sheet, `Talents.ability_names`,
+the rune eligibility filter and the upgrade pairing all pick it up with no new plumbing —
+**NO SAVE VERSION MOVES (still v10)**; the new member keys (`draft_candidates`,
+`draft_picks_owed`, `draft_refused`) ride the party dict, which is saved wholesale.
+· **THE CAP IS 7 (`Run.ABILITY_SLOT_CAP`) AND IT BINDS EVERY SOURCE**, the boss pick included.
+  §3 leaves the boss OFFER unchanged, but a cap that one pool can walk past is not a cap: a
+  Beastmaster's five spec-pool entries alone reach eight. `Run.ability_slots_used` =
+  `Classes.core_slots(spec)` + earned.size().
+· **PROTECTED = THE OPENING KIT. EARNED = DROPPABLE.** `Run.drop_earned_ability` is THE ONE
+  PLACE a drop is written and it refuses anything not in `bm_abilities` — so "a protected
+  ability can never be dropped" is not a branch that could be got wrong, it is the absence of
+  the name from the list. Both pick paths call it.
+· **DECLINING REFUSES THE WHOLE OFFER; TAKING ONE REFUSES NOTHING.** `draft_refused` is the
+  no-return ledger, per hero per run. A DROP writes it too.
+· **THE OFFER FILLS SHORT rather than padding with repeats** (AP §3's rule, unchanged), and
+  `Run.draft_card_is_class` is the one-in-four seam — **its own function precisely so a test
+  can drive it 4000 times while both class pools are still empty.** A check on the roller could
+  only ever measure zero today, and a check that can only pass is a gap (BK's zero-blacksmith
+  lesson).
+· **THE UI IS THE EXISTING OVERLAY, NOT A SECOND ONE.** `map_screen._open_pick_overlay` gained
+  a "draft" kind and a `pending` argument; the drop step is the same overlay redrawn.
+**THE TWELVE PROTECTED CORES — `Classes.PROTECTED_CORES`, AND THE `enablers` COLUMN IS THE
+THING A LATER BATCH WOULD MOST EASILY BREAK.** It is AUTHORED rather than derived, and
+test_batch_bo asserts every named enabler is in that spec's opening kit and in NO pool. The
+failure it prevents is SILENT: a spine that stops working because its enabler became draftable.
+`slots` | spec | what the passive cannot function without:
+· 3 **Berserker** — nothing (Blood Frenzy reads his own health bar).
+· 3 **Warden** — nothing (Heavy Plating is a Block rule, it reads no ability).
+· 3 **Swordmaster** — **Guard Change** (the only stance swap in the game, AK's own finding).
+· 3 **Pyromancer** — **Fireball, Detonation** (Overburn needs an applier AND a spender).
+· 3 **Cryomancer** — **Frostbolt, Ice Lance** (a Chilled applier, and a release).
+· 3 **Arcanist** — **Arcane Explosion** (the free cast that guarantees a build every turn).
+· 4 **Holy** — **Heal, Hymn of Hope** (Mercy must be spendable; Empower needs a heal).
+· 3 **Devout** — **Divine Shield, Consecrated Ground** (the only Faith trigger, and the drip BI
+  measured at 66% of all Faith).
+· 3 **Occultist** — **Shadowrend, Hex of Ruin** (the debuffs the passive marks off).
+· 3 **Beastmaster** — **all three summons**. **FIVE ABILITIES IN THREE SLOTS** — the summon
+  picker has been ONE bar entry since AH, and counting three would take a spec to two draftable
+  picks for a bookkeeping reason.
+· 3 **Sharpshooter** — **Quick Shot** (Lethal Aim counts consecutive single-target attacks).
+· 3 **Survivalist** — nothing (Trapper's breadth term counts statuses from ANY source).
+**THE WARRIOR POOLS ARE OWED.** All three draft pools are NAMED and EMPTY: the lane names only
+arrived in BM and their pools want the same discussion the other nine had. So is the whole
+CLASS-WIDE tranche — 6 per class, 24 in all, **none shipped in BO**. A Warrior's draft offer
+fills short (empty) today and that is the visible shape of the debt, not a bug.
+**CLASS-WIDE AUTHORING RULES, recorded with the empty arrays so they travel with the content:**
+deliberately UNTIED AND GENERAL (Magic Barrier, not Frostbolt — the test is whether it would
+read as off-theme for ANY spec of that class), and **WEAKER THAN SPEC ABILITIES AND
+UNCONDITIONAL** — they feed no passive, so at equal power they would be a safe default that
+dilutes every build.
+
+BATCH BO (08-13) — THE ABILITY DRAFT, AND TRANCHE 1. **§1-§4 build the draft machinery, §5
+authors the first tranche of content into it** — machinery first, because the schema decides
+what an ability has to carry. **The machinery is the standing reference directly above; this
+block is the content, the corrections and the verification.** No save version moves (still v10);
+no talent node, no magnitude and no existing ability changed.
+
+§5 **EIGHTEEN SHIP, NOT TWENTY-FOUR, AND IT IS SAID PLAINLY RATHER THAN LEFT AS A GAP** — six
+MAGE, six CLERIC, six HUNTER. Full table in the changelog and in master.html §6b; the pools are
+`Classes.SPEC_DRAFT_POOLS` and the defs `Classes.draft_ability`, a plain match hooked in at the
+TOP of `pool_ability` so a drafted ability resolves everywhere an earned one already did.
+**Pyromancer** Cinderfall / Ember Debt · **Cryomancer** Winter's Toll / Rimebinding ·
+**Arcanist** Null Field / Kindled Mind · **Holy** Second Wind / Rite of Return · **Devout** Vow
+of Suffering / Aegis Reversal · **Occultist** Blight the Well / Covenant of Ash ·
+**Beastmaster** Twin Hunt / Call the Wilds · **Sharpshooter** Called Volley / Quarry's Mark ·
+**Survivalist** Choking Smoke / Snare Line.
+· **ONE NUMBER PER ABILITY IS THIS BATCH'S RATHER THAN THE BRIEF'S: BREAK DAMAGE.** §5
+  specifies cost, initiative, cooldown, target and effect for all eighteen and says nothing
+  about `pressure` — exactly as AT's brief said nothing about Death Ray's, and that omission
+  became a thread three batches long. The two that are ordinary attacks carry BD in line with
+  their siblings (Cinderfall 8, Called Volley 8, Kindled Mind 6, Twin Hunt 12); the rest are
+  not attacks and carry none. **Flagged, not buried.**
+· **NEW UNIT-SIDE STATE, one read site each**: `ember_debt` (on the ENEMY), `aegis_bonus`,
+  `free_ability` (a COUNT, the `free_summons` shape), `dmg_by_turn` + `battle_turn`, and three
+  callbacks — `vow_cb`, `blight_cb`, `rite_cb`. The callbacks exist for the reason every other
+  one in unit.gd does: an effect that has to reach ANOTHER unit hands the number back to
+  battle.gd rather than reaching across. **`blight_cb` is the load-bearing one**: dealing the
+  damage inside `heal_amount` would kill a unit at a site that cannot reach `_on_enemy_death`,
+  so every payoff of that kill would silently not fire.
+· **`_drain_burn_turns` IS A SECOND DENOMINATOR, NOT A DISCOUNT ON THE FIRST.** Ember Debt
+  exempts its enemy from Overburn's DRAIN and from nothing else — `_overburn_mult` still reads
+  `_total_burn_turns`, so the marked fire pays the damage bonus while costing no Mana. **That
+  gap IS the ability; collapsing the two functions deletes it.**
+· **RITE OF RETURN GOES FIRST in `_holy_reversal`**, ahead of Intercession and Martyrdom, and
+  it is AV's own ordering argument taken one step further: the more specifically bought and the
+  shorter-lived a refusal is, the sooner it should spend. It was cast on THIS ally by name,
+  holds 3 turns and is already paid for.
+· **VOW OF SUFFERING SITS DIRECTLY BELOW THE BARRIER BLOCK in `take_hit`** and that position is
+  load-bearing: a Divine Shield is the Devout's own work and must eat first, so the vow
+  relocates half of what GETS THROUGH. Above the barrier he would pay twice for one hit. It
+  returns the share ACTUALLY billed, so a vow with nobody left to carry it costs the ally
+  nothing rather than deleting half a wound.
+· **WINTER'S TOLL ADDS NO UNGOVERNED METER — CHECKED, NOT ASSUMED.** It reads `hold_turns`,
+  which `_hold_sync` already clamps at `SHATTER_TURN_CAP` (12), so the same governor Shatter
+  rides bounds it. It is deliberately NOT routed through `_hold_release` (the Cryoclasm
+  precedent), so no release payoff fires and the prison stands.
+· **COVENANT OF ASH'S RECURSION IS BROKEN BY IDENTITY, NOT BY A FLAG**: the mirror is the last
+  thing `_gain_ruin` does, the mirrored stacks land on the BEARER, and a stack landing on the
+  bearer finds `mirror == target` and stops. One covenant exists at a time (the cast clears the
+  field first), so there is no chain to guard.
+· **CHOKING SMOKE USES THE EXISTING BLIND** and the miss stacking was READ rather than assumed:
+  `_miss_chance` is `MISS_CHANCE 0.05 + 0.20 (dazed) + 0.50 (blind)`, **flat percentage POINTS,
+  never a multiplier**, with `no_cover` bypassing the whole function. And **AoE ATTACKS ROLL NO
+  MISS AT ALL** — the single-target branch is gated `not ab.aoe` and the per-strike roll only
+  fires for multi/random/choose-N — so Blind blanks single-target blows only, which is what
+  prices a field-wide 50%.
+
+§5 **TWO PREMISES IN THE BRIEF WERE STALE AND ARE CORRECTED TOWARD THE CODE, not quietly
+reinterpreted** (the AR §6 / AX §7 / BD §3 / AY §1 precedent):
+· **A SWAP HAS NEVER COST LOYALTY, so Call the Wilds' stated reason is wrong.** §5 says the
+  Loyalty loss is why BJ measured swaps at 0.05 per trash battle. Loyalty lives on the HUNTER's
+  own dict and is written in exactly four places, **none of them a swap** — only a beast's
+  DEATH breaks the meter (`_on_beast_death`) and only Primal Surge spends it; `_free_beast`
+  does not touch it. What a swap actually costs is a TURN and the shared 3-turn Swap cooldown.
+  **THE ABILITY SHIPS AGAINST THE REAL TAX**: it erases the shared cooldown and the arriving
+  beast strikes immediately, and the Loyalty half is kept as an EXPLICIT guarantee (asserted at
+  the site and in the suite) rather than dropped, because it is what the card promises and a
+  later batch could make it false.
+· **CALLED VOLLEY'S CLAUSE IS TRUE BUT IT IS NOT A DISTINCTION.** The Focus engine has been
+  gated `not ab.aoe` since AZ, so **NO AREA ATTACK HAS EVER CLEARED FOCUS**; §5's supporting
+  line ("every other multi-target option costs him his meter") does not survive reading the
+  code either — `choose_two` and `multi_hits` abilities call the engine against their PRIMARY
+  target and cost nothing when that is already his mark. Shipped as specified, and what the
+  batch buys is that the guarantee is now NAMED and TESTED (`_focus_safe`) instead of being a
+  side effect of one condition in an unrelated branch.
+
+§3 **TWO DECISIONS THE BRIEF DID NOT MAKE, REPORTED RATHER THAN BURIED.** (a) **ONE HERO PER
+ELITE, drawn at random and independently of the rune looter** — §3 says "always, on victory"
+and not to whom, and offering every hero a card at every elite would hand out ~26 picks a run
+against four draftable slots, which is not a draft. (b) **THE MERCHANT'S PRICE, 120 / 180 / 240
+by zone**, deliberately below the blacksmith's 150/225/300: the smith buys a permanent upgrade
+to something you already hold and BK measured it converting 41-47% of ALL run income, so an
+ability is the cheaper, more frequent question.
+
+§5 **REPORTED NOT ACTED ON — A NAME COLLISION THIS BATCH CREATED.** **SECOND WIND** is also the
+Berserker's `bz_bloodied_hide` talent node (Warpath row 5, "the first drop below 25% grants 60
+Rage"). **It is a LABEL collision only** — a talent node's name is not an ability name, nothing
+resolves it, `BattleUnit.second_wind` is the Berserker's field and the ability's special is
+`second_wind_holy` — so nothing breaks. It is shipped as specified and flagged, on the AV
+Shared Vigil / AJ Overkill precedent: renaming either is the designer's call and one string.
+
+§5 **THE BOT: ONE HOOK, NOT NINE ROTATIONS.** Every spec's rotation is hand-authored and names
+its own kit, so a drafted ability would never be cast at all — and a spec whose new cards never
+fire is a spec no sim and no live autoplay can verify. `_autoplay_pick` now wraps
+`_autoplay_pick_kit` and substitutes a usable drafted ability **only when the real rotation came
+back with the free basic attack**, i.e. when the bot had nothing it wanted to do anyway.
+**IT RE-WEIGHTS NO EXISTING ROTATION, so no measurement taken before this batch stops being
+comparable.** It is NOT a policy for playing these abilities well; that is each ability's own
+tuning pass, in play.
+
+§7 **VERIFIED — AND PER THE DESIGNER'S STANDING INSTRUCTION FROM THIS BATCH ONWARD, THAT MEANS
+THE CODE LANDED AND WORKS. NO SWEEPS, NO BANDS, NO BALANCE MEASUREMENT WAS RUN, and none should
+be quoted from this batch.** check_parse 0 · check_flow 0 (11 screens) · 13 scenes 0 SCRIPT
+ERROR · check_map_screen OK (three positions, both overlays) · run-harness gates 1/2/3 PASS ·
+**NEW test_batch_bo.gd 449/0, stable 4/4**.
+**ALL EIGHT OF THE CLAUSES §7 NAMED AS ABLE TO SILENTLY DO NOTHING ARE DRIVEN LIVE** and
+asserted against the state they change, never against the cast returning. **THREE OF THEM ARE
+BUILT SO A BROKEN IMPLEMENTATION STILL FAILS**: Winter's Toll's "the hold continues" is
+trivially true of an ability that does nothing, so the DAMAGE is asserted beside it; Null
+Field's "reads current stacks" is trivially true of a cast-time stamp, so the SAME field is
+measured at two different stack counts; Call the Wilds' "keeps Loyalty" is trivially true if no
+swap happened, so the beast on the field is asserted to have CHANGED.
+**EIGHT NEGATIVE CONTROLS, each applied to product code and reverted** (the three touched files
+came back byte-identical by hash and the suite to 449/0 after the last): a protected ability
+made droppable **trips 7**; Ember Debt's two denominators collapsed into one **trips 1**; Null
+Field frozen at cast time **trips 1**; a decline that does not write the no-return ledger
+**trips 3**; an offer padding with repeats instead of filling short **trips 3**; Winter's Toll
+routed through `_hold_release` **trips 2**; an enabler moved into its own spec's draft pool
+**trips 2**; and **Rite of Return billing its toll before restoring the health trips 2** — that
+last is the control for the batch's one genuinely subtle ordering, below.
+**ONE EDGE FOUND BY REVIEW RATHER THAN BY A TEST, AND IT IS THE ORDERING `_on_rite_return` IS
+WRITTEN AROUND: HOLY CAN SWEAR THE RITE ON HERSELF.** Her 30% toll runs `take_tick_damage`,
+which re-enters `_holy_reversal` — so the promise must be SPENT before the bill (or it answers
+its own toll forever) and the health RESTORED before it (or the toll is billed against zero and
+`_die` marks her dead one line before the restore would have run). That is why this reversal's
+handler performs the restore while Intercession's and Martyrdom's do not; the deviation is
+deliberate and the suite drives the self-save case.
+**SCRATCHPAD, NOT COMMITTED (the AQ check_aq.gd precedent): check_bo.gd 27/0** drives the DRAWN
+half test_batch_bo cannot see — the `◆ 1 draft` badge on a real map card, the CHOOSE button
+naming the draft, the overlay's slot ledger and Decline button and short-offer note, the DROP
+step listing only earned abilities (and never a protected one), and the merchant's counter
+refusing a Warrior's empty pool rather than taking the gold.
+**LIVE AUTOPLAY CLEAN across three real battles, 0 SCRIPT ERROR**, with six of the eighteen
+firing in ordinary fights (Vow of Suffering, Null Field ×3, Kindled Mind, Blight the Well,
+Choking Smoke) — e.g. "Devout: Vow of Suffering — half of Berserker's wounds come to him for 4
+turns [PERFECT]". **A `--run 6` was walked ONLY to exercise RunSim's elite path** (8.00
+offers/run, 7.50 cards shown, 4.67 taken, 4.67 short offers, 3.33 nothing-left-to-offer — the
+expected shape of a thin pool); **its Matrix row is NOT a difficulty reading** and none is
+quoted. profile.json / relics.json / trees.json byte-identical afterwards; no run_save.bin was
+created and the designer had none in flight.
+**FULL BATTERY GREEN**: ah 5500, ah_battle 65, ai 2217, an 3614, aj 418, ak 528, al 560, ar 914,
+as 396, at 470, au 336, av 324, aw 350, ax 338, ay 484, az 519, ba 689, bb 172, bc 91, bd 69,
+be 34, bf 78, bg 47, bh 233, bi 88, bj 67, bk 130, bm 1890, bn 77, bo 449, runes 2973,
+rune_battle 96 — all 0 failures except AL's standing flake below. **ZERO DRIFT FROM THIS BATCH,
+AND IT WAS MEASURED RATHER THAN ASSUMED**: ar / ai / aj / ak / al / bm / bk were re-run on
+STASHED, UNMODIFIED HEAD and read the same counts to the check.
+· **THE SUITE-COUNT LISTS IN THE OLDER BLOCKS BELOW ARE STALE, AND THEY WERE STALE BEFORE THIS
+  BATCH** (BI's list says ah 5587, an 6053, ar 887, ai 2036; HEAD reads 5500 / 3614 / 914 /
+  2217). BK, BM and BN moved them without updating that list. The line above is the current one.
+· **FOUR SUITES RE-POINTED IN PLACE, with the reason in each file.** THREE OF THEM ARE THE SAME
+  ASSERTION: the master.html STAMP GATE is duplicated in test_batch_ah, test_batch_bb AND
+  test_batch_bn, and **all three must move together** or a batch that bumps the timestamp trips
+  two suites it never touched. The fourth is test_batch_ar's `_overburn_refund` call-site count,
+  **2 -> 3, INVERTED IN SPIRIT RATHER THAN DELETED**: the question — does every Burn consumer
+  share the one implementation — is still worth asking, and Cinderfall inheriting it is AR's own
+  rule working. A fourth consumer has to come and say so, which is the point of pinning a count.
+· **KNOWN-BAD, NOT OURS, AND REPRODUCED ON UNMODIFIED HEAD: test_batch_ah AND test_batch_an BOTH
+  CALL `Run.award_talent_points`, WHICH BATCH BM DELETED.** Each throws a SCRIPT ERROR that
+  ABORTS ITS OWN FUNCTION while the suite still prints "0 failures" — exactly the trap BC
+  documented. **Both suites have therefore been silently under-testing their reward sections for
+  two batches.** Not repaired here (it is BM's thread and repairing it is authoring new
+  assertions about a talent economy that no longer exists), but it should not go unrecorded
+  again. test_batch_an's total also DRIFTS ~3614-3624 run to run on HEAD and on this build
+  alike — never pin it.
+· **test_batch_al's standing "Spite reflects damage at the attacker" FLAKE reproduced once in
+  four runs**, as recorded since BI/AQ. Nothing in this batch is on the Warden's path.
+· **ONE FLAKE OF THIS BATCH'S OWN WAS FOUND AND FIXED IN THE TEST, NOT WORKED AROUND**: the
+  Snare Line coverage check failed ~1 run in 3 against working code, because the battle's turn
+  loop advances on real timers while the suite drives `_resolve` by hand (the AQ harness race) —
+  and the line SPRINGS AND REMOVES ITSELF at an enemy's turn start, leaving nothing observable
+  (the stun it lands is consumed by the same turn that sprang it). The enemies' clocks are
+  pushed out so none takes a turn during the check. **Forced determinism, not a retry.**
+
 BATCH BN (08-13) — THE CRASH, AND THE GATE. Two items, both blockers, neither large. **§1 is
 a bug fix. §2 is one float, chosen by measurement rather than by guess.** No save version moves
 (still v10); no node, no magnitude and no ability changed.

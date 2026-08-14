@@ -2929,3 +2929,47 @@ measures 12% completions. It would have been easy — and wrong — to move rung
 until that read like a number a first run should have. This batch created that baseline, and
 the batch that creates a baseline must not correct against it; four consecutive Devout batches
 went wrong exactly that way. The number is the deliverable. The lever is one float.
+
+## Batch BO — the ability draft, and tranche 1
+
+**The cap exists to make the draft a decision rather than an accumulation.** Without it, an
+elite that always offers an ability is just a slow drip of strictly-more, and by zone 3 every
+hero is holding everything their spec can hold. Seven slots turns each offer into a question:
+is this better than the worst thing I already have? The number is deliberately just above what
+a run can currently fill, so the cap only starts biting on a route that hunted elites — which
+is the same axis the map's risk already runs on.
+
+**The protected core is the half of the cap that keeps it honest.** A cap with nothing
+protected would eventually let a player trade away the ability their passive is built on, and
+that failure would be silent: nothing crashes, the spec just quietly stops working and reads as
+badly balanced. The reason the minimum is decided per spec rather than by a rule is that the
+passives genuinely differ in what they read — Overburn needs a Burn applier *and* a spender,
+Blood Frenzy reads nothing but a health bar — and a rule general enough to cover both would
+either over-protect the Berserker or under-protect the Pyromancer.
+
+**Declining had to be free, and that is a statement about how a build should end.** The
+alternative — take one or lose the offer — makes a finished kit worse the longer a run goes on,
+because eventually every card on offer is worse than everything you hold and the game is asking
+you to make yourself weaker. A settled build is a legitimate end state, and the no-return rule
+is what stops "no thank you" from being asked again three fights later.
+
+**Class-wide abilities are weaker on purpose, and it is the interesting half of the design.**
+An ability that feeds no passive is unconditional, and unconditional is worth more than it
+looks in the fights where your engine is not running — the first two turns, the fight after
+your beast died, the boss that resists your status. If they were priced at spec strength they
+would be the safe default in every draft and the spec pools would stop mattering. Slightly
+weaker but always-on gives them a role instead of a rank.
+
+**On authoring machinery before content.** The order was not a preference. The schema decides
+what an ability has to carry, and eighteen abilities authored before the pools, the cap and the
+protected cores existed would have been authored twice — once against a guess and once against
+the real shape. The same argument applies to the ninety-six: the tranches exist so the shape can
+be wrong early and cheaply.
+
+**On shipping two cards whose stated reason turned out to be false.** Call the Wilds was
+specified around a Loyalty loss that does not exist, and Called Volley around a Focus clear that
+area attacks have never caused. Both still ship, because both name a real axis and the axis
+survives the correction — rotation *is* taxed, just by a cooldown rather than by the meter, and
+Focus surviving a volley *is* worth a card even when it is a guarantee rather than a
+distinction. What changes is that the reason in the file is now the true one. A design note
+built on a premise nobody re-read is how a system acquires numbers nobody can defend.

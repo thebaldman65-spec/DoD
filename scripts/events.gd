@@ -56,7 +56,7 @@ const DATA_PATH := "res://data/events.json"
 
 const VERBS := ["gold", "gold_pct", "heal_pct", "damage_pct", "mana_pct",
 	"max_hp_pct", "attack_pct", "item", "random_item",
-	"revive_pct", "relic_grant", "rune_grant"]
+	"revive_pct", "relic_grant", "rune_grant", "ability_draft"]
 
 # §4's own worked example — "health for a rune" — needs a rune the event can
 # hand over, and nothing in the vocabulary could hand one over. ONE new verb,
@@ -307,6 +307,25 @@ static func apply(run: Node, fx: Dictionary) -> String:
 			if granted.is_empty():
 				return ""
 			return "RUNE: %s" % ", ".join(granted)
+		"ability_draft":
+			# BATCH BO §3 — SOME EVENTS OFFER A DRAFT AS A TRADE, the fourth
+			# pick source. It grants the OFFER, not a named ability: three
+			# cards drawn now and resolved on the hero's card by the same
+			# overlay every other owed pick uses.
+			#
+			# The selector picks who, so an event can hand it to the party's
+			# weakest, to a class, or at random — but a hero with nothing left
+			# in its pool is SKIPPED rather than paid a dead pick, which is the
+			# rune verb's own "say nothing rather than lie" rule. A Warrior's
+			# draft pool is empty until its tranche lands, so this branch is
+			# reachable today and not a theoretical guard.
+			var drafted := PackedStringArray()
+			for m in _targets(run, fx):
+				if run.award_draft_pick(m):
+					drafted.append(_who(m))
+			if drafted.is_empty():
+				return ""
+			return "THE DRAFT: %s may choose a new ability" % ", ".join(drafted)
 		"relic_grant":
 			# Optional {"tier": "common"|"rare"} narrows the pool (Batch 39
 			# tiering exists exactly so events can promise rarity).

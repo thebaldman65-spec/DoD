@@ -516,6 +516,7 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 	var owed_runes := int(member.get("rune_picks_owed", 0))
 	var owed_abs := int(member.get("bm_picks_owed", 0))
 	var owed_ups := int(member.get("up_picks_owed", 0))
+	var owed_draft := int(member.get("draft_picks_owed", 0))  # BATCH BO §3
 
 	var panel := Panel.new()
 	panel.position = at
@@ -530,7 +531,7 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 	sb.border_color = Color(0.24, 0.22, 0.28)
 	if owed_runes > 0:
 		sb.border_color = Color(0.75, 0.45, 1.0)
-	elif owed_abs > 0 or owed_ups > 0:
+	elif owed_abs > 0 or owed_ups > 0 or owed_draft > 0:
 		sb.border_color = Color(0.95, 0.85, 0.4)
 	panel.add_theme_stylebox_override("panel", sb)
 	add_child(panel)
@@ -648,6 +649,8 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 	var badges := PackedStringArray()
 	if owed_abs > 0:
 		badges.append("◆ %d ability" % owed_abs)
+	if owed_draft > 0:
+		badges.append("◆ %d draft" % owed_draft)
 	if owed_ups > 0:
 		badges.append("◆ %d upgrade" % owed_ups)
 	if owed_runes > 0:
@@ -665,10 +668,11 @@ func _draw_hero_card(idx: int, at: Vector2) -> void:
 	# An owed pick opens its own overlay. It stays ON THE CARD in the sense
 	# that matters — the player never has to know which screen to visit — but
 	# the three choices need room to say what they are.
-	if owed_abs > 0 or owed_ups > 0 or owed_runes > 0:
+	if owed_abs > 0 or owed_draft > 0 or owed_ups > 0 or owed_runes > 0:
 		var pick_btn := Button.new()
 		pick_btn.text = "CHOOSE — %s" % ("ability" if owed_abs > 0
-			else ("upgrade" if owed_ups > 0 else "rune"))
+			else ("draft" if owed_draft > 0
+			else ("upgrade" if owed_ups > 0 else "rune")))
 		pick_btn.position = at + Vector2(8, 114)
 		pick_btn.custom_minimum_size = Vector2(CARD_W - 16, 30)
 		pick_btn.add_theme_font_size_override("font_size", 12)
@@ -723,18 +727,30 @@ func _bar(at: Vector2, w: float, h: float, frac: float, fill: Color,
 # three near-identical inline rows were three places for the same bug. The
 # card's CHOOSE button opens it; picking closes it and redraws.
 #
-# PRECEDENCE matches the card badge: ability, then upgrade, then rune. A hero
+# PRECEDENCE matches the card badge: ability, draft, upgrade, rune. A hero
 # owed two picks resolves them one overlay at a time.
-func _open_pick_overlay(idx: int) -> void:
+#
+# BATCH BO §3: THE DRAFT REUSES THIS OVERLAY RATHER THAN BUILDING A SECOND
+# ONE. A draft offer is "choose one of three, with a description each" — the
+# thing this overlay already is — plus two rules the boss pick never needed:
+# a DROP step once the kit is at the seven-slot cap, and an explicit DECLINE.
+# `pending` carries the card chosen but not yet paid for, so the drop step is
+# the same overlay redrawn rather than a second screen.
+func _open_pick_overlay(idx: int, pending := "") -> void:
 	var member: Dictionary = Run.party[idx]
 	var kind := ""
 	if int(member.get("bm_picks_owed", 0)) > 0:
 		kind = "ability"
+	elif int(member.get("draft_picks_owed", 0)) > 0:
+		kind = "draft"
 	elif int(member.get("up_picks_owed", 0)) > 0:
 		kind = "upgrade"
 	elif int(member.get("rune_picks_owed", 0)) > 0:
 		kind = "rune"
 	if kind == "":
+		return
+	if pending != "":
+		_open_drop_overlay(idx, kind, pending)
 		return
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -752,9 +768,10 @@ func _open_pick_overlay(idx: int) -> void:
 	box.add_theme_constant_override("separation", 8)
 	panel.add_child(box)
 
-	var heading: String = {"ability": "NEW ABILITY", "upgrade": "ABILITY UPGRADE",
-		"rune": "RUNE"}[kind]
+	var heading: String = {"ability": "NEW ABILITY", "draft": "THE DRAFT",
+		"upgrade": "ABILITY UPGRADE", "rune": "RUNE"}[kind]
 	var tint: Color = {"ability": Color(0.95, 0.85, 0.4),
+		"draft": Color(0.95, 0.85, 0.4),
 		"upgrade": Color(0.95, 0.85, 0.4),
 		"rune": Color(0.85, 0.6, 1.0)}[kind]
 	var title := Label.new()
@@ -767,6 +784,21 @@ func _open_pick_overlay(idx: int) -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
 
+	# BATCH BO §2: the slot ledger, stated before the choice rather than
+	# discovered by it. At the cap the buttons below open the DROP step.
+	if kind in ["ability", "draft"]:
+		var used := Run.ability_slots_used(member)
+		var slots := Label.new()
+		slots.text = "Ability slots %d of %d%s" % [used, Run.ABILITY_SLOT_CAP,
+			"  —  taking one means dropping one" if used >= Run.ABILITY_SLOT_CAP
+			else ""]
+		slots.add_theme_font_size_override("font_size", 13)
+		slots.add_theme_color_override("font_color",
+			Color(0.95, 0.6, 0.45) if used >= Run.ABILITY_SLOT_CAP
+			else Color(0.6, 0.58, 0.55))
+		slots.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		box.add_child(slots)
+
 	match kind:
 		"ability":
 			var queue: Array = member.get("bm_candidates", [])
@@ -777,6 +809,39 @@ func _open_pick_overlay(idx: int) -> void:
 					ab.description if ab != null else "",
 					Color(0.85, 0.82, 0.75),
 					_pick_ability.bind(idx, String(pool_name)), overlay)
+		"draft":
+			var d_queue: Array = member.get("draft_candidates", [])
+			var d_spec := String(member.get("spec", ""))
+			var d_offer: Array = d_queue[0] if not d_queue.is_empty() else []
+			for card in d_offer:
+				var d_ab: Ability = Classes.pool_ability(String(card))
+				_pick_button(box, String(card),
+					d_ab.description if d_ab != null else "",
+					Color(0.85, 0.82, 0.75),
+					_pick_draft.bind(idx, String(card)), overlay)
+			# THE OFFER FILLS SHORT rather than padding with repeats (§3), so
+			# a thin pool shows two cards, or one, and SAYS SO — a silently
+			# short offer reads as a bug.
+			if d_offer.size() < 3:
+				var short := Label.new()
+				short.text = "The %s pool holds no more to offer this run." % (
+					Classes.SPEC_INFO.get(d_spec, {}).get("name", "spec"))
+				short.add_theme_font_size_override("font_size", 12)
+				short.add_theme_color_override("font_color", Color(0.55, 0.53, 0.5))
+				short.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				box.add_child(short)
+			# DECLINING IS ALWAYS ALLOWED, full or not. A settled kit is a
+			# legitimate end state; being forced to churn would make a good
+			# build worse as the run goes on.
+			var pass_btn := Button.new()
+			pass_btn.text = "Decline — my kit is as I want it"
+			pass_btn.custom_minimum_size = Vector2(600, 30)
+			pass_btn.add_theme_font_size_override("font_size", 13)
+			pass_btn.add_theme_color_override("font_color", Color(0.7, 0.68, 0.65))
+			pass_btn.pressed.connect(Music.click)
+			pass_btn.pressed.connect(overlay.queue_free)
+			pass_btn.pressed.connect(_decline_draft.bind(idx))
+			box.add_child(pass_btn)
 		"upgrade":
 			var queue2: Array = member.get("up_candidates", [])
 			var offer: Array = queue2[0] if not queue2.is_empty() else []
@@ -829,10 +894,85 @@ func _pick_button(box: VBoxContainer, label: String, desc: String,
 	box.add_child(text)
 
 
-func _pick_ability(idx: int, pool_name: String) -> void:
+# THE DROP STEP (Batch BO §2). At the cap an offer becomes take-one-and-drop-
+# one: the player picks the incoming ability and THEN names which one it
+# replaces. Only EARNED abilities are listed — a protected one can never appear
+# here, which is what makes the cap unable to break a passive.
+func _open_drop_overlay(idx: int, kind: String, incoming: String) -> void:
+	var member: Dictionary = Run.party[idx]
+	var droppable := Run.earned_ability_names(member)
+	if droppable.is_empty():
+		# Nothing earned to drop and the kit still reads full — the protected
+		# core alone cannot exceed the cap, so this is unreachable today. It
+		# refuses rather than silently exceeding the cap.
+		_toast("%s has nothing that can be dropped." % String(member["key"]).capitalize())
+		return
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = 60
+	add_child(overlay)
+	var dim := ColorRect.new()
+	dim.size = Vector2(1280, 720)
+	dim.color = Color(0, 0, 0, 0.82)
+	overlay.add_child(dim)
+	var panel := PanelContainer.new()
+	panel.position = Vector2(320, 180)
+	panel.custom_minimum_size = Vector2(640, 300)
+	overlay.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	panel.add_child(box)
+
+	var title := Label.new()
+	title.text = "%s replaces which ability?" % incoming
+	title.add_theme_font_override("font", NAME_FONT)
+	title.add_theme_font_size_override("font_size", 26)
+	title.add_theme_color_override("font_color", Color(0.95, 0.6, 0.45))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	var note := Label.new()
+	note.text = "The kit is full at %d slots. Protected abilities cannot be dropped,\nand a dropped one does not come back this run." % Run.ABILITY_SLOT_CAP
+	note.add_theme_font_size_override("font_size", 12)
+	note.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(note)
+
+	var spec := String(member.get("spec", ""))
+	for name in droppable:
+		var ab: Ability = Classes.spec_pool_ability(spec, String(name))
+		_pick_button(box, "Drop %s" % String(name),
+			ab.description if ab != null else "", Color(0.9, 0.7, 0.6),
+			_finish_take.bind(idx, kind, incoming, String(name)), overlay)
+
+	var back := Button.new()
+	back.text = "Back"
+	back.custom_minimum_size = Vector2(200, 30)
+	back.pressed.connect(Music.click)
+	back.pressed.connect(overlay.queue_free)
+	box.add_child(back)
+
+
+func _finish_take(idx: int, kind: String, incoming: String, drop_name: String) -> void:
+	if kind == "draft":
+		_pick_draft(idx, incoming, drop_name)
+	else:
+		_pick_ability(idx, incoming, drop_name)
+
+
+func _pick_ability(idx: int, pool_name: String, drop_name := "") -> void:
 	var member: Dictionary = Run.party[idx]
 	if int(member.get("bm_picks_owed", 0)) < 1 \
 			or pool_name in member.get("bm_abilities", []):
+		return
+	# BATCH BO §2: THE CAP BINDS THE BOSS PICK TOO. §3 leaves the boss OFFER
+	# unchanged — same source, same timing, same SPEC_POOLS draw — but the
+	# seven-slot cap is a rule about a KIT, not about one pool, and a boss pick
+	# that could walk past it would not be a cap at all (a Beastmaster's five
+	# spec-pool entries alone reach eight).
+	if drop_name == "" and Run.ability_slots_full(member):
+		_open_drop_overlay(idx, "ability", pool_name)
+		return
+	if drop_name != "" and not Run.drop_earned_ability(member, drop_name):
 		return
 	# Spend the triple this pick came from: the other two are gone, not
 	# banked for the next award.
@@ -844,7 +984,38 @@ func _pick_ability(idx: int, pool_name: String) -> void:
 	member["bm_picks_owed"] = int(member.get("bm_picks_owed", 0)) - 1
 	Run.save_run()
 	_draw_screen()
-	_toast("%s learns %s." % [String(member["key"]).capitalize(), pool_name])
+	if drop_name != "":
+		_toast("%s trades %s for %s." % [String(member["key"]).capitalize(),
+			drop_name, pool_name])
+	else:
+		_toast("%s learns %s." % [String(member["key"]).capitalize(), pool_name])
+
+
+func _pick_draft(idx: int, card: String, drop_name := "") -> void:
+	var member: Dictionary = Run.party[idx]
+	if drop_name == "" and Run.ability_slots_full(member):
+		_open_drop_overlay(idx, "draft", card)
+		return
+	var refused := Run.take_draft_ability(member, card, drop_name)
+	if refused != "":
+		_toast(refused)
+		return
+	Run.save_run()
+	_draw_screen()
+	if drop_name != "":
+		_toast("%s trades %s for %s." % [String(member["key"]).capitalize(),
+			drop_name, card])
+	else:
+		_toast("%s drafts %s." % [String(member["key"]).capitalize(), card])
+
+
+func _decline_draft(idx: int) -> void:
+	var member: Dictionary = Run.party[idx]
+	if not Run.decline_draft(member):
+		return
+	Run.save_run()
+	_draw_screen()
+	_toast("%s keeps the kit as it is." % String(member["key"]).capitalize())
 
 
 func _pick_upgrade(idx: int, choice: int) -> void:

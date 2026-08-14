@@ -96,6 +96,44 @@ func _draw_screen() -> void:
 		add_child(btn)
 		row += 1
 
+	# BATCH BO §3 — THE MERCHANT SELLS A DRAFT PICK. The third of the four
+	# sources: an elite always gives one, an event may trade one, and this is
+	# the one you can simply BUY. It sells the OFFER, not a named ability —
+	# three cards are drawn at purchase and wait on the hero's card, resolved
+	# by the same overlay every other owed pick uses.
+	var draft_header := Label.new()
+	draft_header.text = "THE DRAFT  (%dg each — a choice of three, on the hero's card)" % \
+		Run.draft_price()
+	draft_header.add_theme_font_size_override("font_size", 15)
+	draft_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
+	draft_header.position = Vector2(140, 452)
+	add_child(draft_header)
+	for i in Run.party.size():
+		var member: Dictionary = Run.party[i]
+		var pools: Dictionary = Run.draft_pool_left(member)
+		var left: int = pools["spec"].size() + pools["class"].size()
+		var price := Run.draft_price()
+		var dbtn := Button.new()
+		dbtn.text = "%s — %dg" % [_hero_label(member), price]
+		dbtn.custom_minimum_size = Vector2(360, 40)
+		dbtn.position = Vector2(140, 482 + i * 44)
+		dbtn.add_theme_font_size_override("font_size", 13)
+		if left < 1:
+			# THE POOL IS THIN UNTIL TRANCHE 3 and a Warrior's is empty
+			# outright, so "nothing to sell you" is a state a player will
+			# meet — and it says so rather than taking the gold.
+			dbtn.text = "%s — nothing left to offer" % _hero_label(member)
+			dbtn.tooltip_text = "Every ability this run could offer %s has been\nlearned, declined or dropped." % \
+				_hero_label(member)
+			dbtn.disabled = true
+		else:
+			dbtn.tooltip_text = "Draw three abilities for %s (%d still in the pool).\nThe cards are drawn NOW and wait on their hero card.\nAbility slots %d of %d." % [
+				_hero_label(member), left, Run.ability_slots_used(member),
+				Run.ABILITY_SLOT_CAP]
+			dbtn.disabled = Run.gold < price
+			dbtn.pressed.connect(_buy_draft.bind(i))
+		add_child(dbtn)
+
 	# Rune offers column.
 	var rune_header := Label.new()
 	rune_header.text = "RUNES  (one of each, permanent for this run)"
@@ -155,6 +193,27 @@ func _buy_item(id: String) -> void:
 	if Run.gold < price or Run.item_full(id):
 		return
 	if Run.add_item(id) < 1:
+		return
+	Run.gold -= price
+	Run.tally_add("gold_spent", price)
+	_draw_screen()
+
+
+func _hero_label(member: Dictionary) -> String:
+	var spec := String(member.get("spec", ""))
+	if Classes.SPEC_INFO.has(spec):
+		return String(Classes.SPEC_INFO[spec]["name"])
+	return String(member["key"]).capitalize()
+
+
+func _buy_draft(member_idx: int) -> void:
+	var member: Dictionary = Run.party[member_idx]
+	var price := Run.draft_price()
+	# The offer is rolled BEFORE the gold moves, so a purchase that cannot
+	# land never costs anything — the item cap's rule, applied to the draft.
+	if Run.gold < price:
+		return
+	if not Run.award_draft_pick(member):
 		return
 	Run.gold -= price
 	Run.tally_add("gold_spent", price)

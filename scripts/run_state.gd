@@ -1277,6 +1277,193 @@ func award_ability_pick(member: Dictionary) -> bool:
 	return true
 
 
+# ---------- THE ABILITY DRAFT (Batch BO §2/§3) ----------
+#
+# ABILITY SLOTS CAP AT SEVEN, AND THE PROTECTED CORE COUNTS AGAINST IT — so
+# most specs carry 3 protected and 4 draftable (Holy carries 4 and 3; see
+# `Classes.PROTECTED_CORES` for the twelve-core table and why the Beastmaster's
+# five opening abilities are three slots).
+#
+# EVERY DROP DECISION IS AMONG EARNED ABILITIES. Protected ones can never be
+# dropped, which is what makes the cap unable to break a passive: the failure
+# mode this whole section exists to prevent is a spine that stops working
+# because its enabler was droppable, and that failure is SILENT.
+const ABILITY_SLOT_CAP := 7
+
+
+# What the hero has EARNED — boss picks and drafted cards alike, in the one
+# list `bm_abilities` they have always shared. This is the drop pool, and
+# nothing else in it can be dropped.
+func earned_ability_names(member: Dictionary) -> Array:
+	return member.get("bm_abilities", []).duplicate()
+
+
+func ability_slots_used(member: Dictionary) -> int:
+	var spec := String(member.get("spec", ""))
+	if spec == "":
+		return 0
+	return Classes.core_slots(spec) + earned_ability_names(member).size()
+
+
+func ability_slots_full(member: Dictionary) -> bool:
+	return ability_slots_used(member) >= ABILITY_SLOT_CAP
+
+
+# THE NO-RETURN LEDGER. A declined or dropped ability does not come back to
+# that run's pool — otherwise the offer keeps re-presenting exactly what was
+# just refused. Per hero, per run; it rides the member dict, so it is saved and
+# loaded with everything else and NO SAVE VERSION MOVES (still v10).
+func draft_refused(member: Dictionary) -> Array:
+	return member.get("draft_refused", [])
+
+
+func _refuse_draft(member: Dictionary, name: String) -> void:
+	if name == "":
+		return
+	var refused: Array = member.get("draft_refused", [])
+	if not refused.has(name):
+		refused.append(name)
+	member["draft_refused"] = refused
+
+
+# What this hero could still be offered, split by side. Neither side may hold
+# something already owned (from ANY source — kit, talent grant, boss pick or an
+# earlier draft) or already refused this run.
+func draft_pool_left(member: Dictionary) -> Dictionary:
+	var spec := String(member.get("spec", ""))
+	if spec == "":
+		return {"spec": [], "class": []}
+	var blocked: Array = owned_ability_names(member)
+	blocked.append_array(draft_refused(member))
+	var spec_left: Array = Classes.spec_draft_pool(spec).filter(
+		func(n): return not blocked.has(n))
+	var class_left: Array = Classes.class_draft_pool(
+		Classes.class_of_spec(spec)).filter(func(n): return not blocked.has(n))
+	return {"spec": spec_left, "class": class_left}
+
+
+# ROUGHLY ONE CARD IN FOUR IS CLASS-WIDE. Its own function so the ratio has a
+# seam a test can drive a few hundred times — with both pools empty until
+# tranche 2, a check on the ROLLER could only ever measure zero, and a check
+# that can only pass is a gap (the BK zero-blacksmith lesson).
+func draft_card_is_class(spec_left: int, class_left: int) -> bool:
+	if class_left < 1:
+		return false
+	if spec_left < 1:
+		return true
+	return randf() < Classes.CLASS_DRAFT_SHARE
+
+
+# EVERY OFFER IS 3 CARDS. If the pool cannot fill three — likely until tranche
+# 3 — IT FILLS SHORT RATHER THAN PADDING WITH REPEATS. That is AP §3's existing
+# rule for upgrade offers, applied unchanged.
+func roll_draft_offer(member: Dictionary) -> Array:
+	var pools := draft_pool_left(member)
+	var spec_left: Array = pools["spec"]
+	var class_left: Array = pools["class"]
+	spec_left.shuffle()
+	class_left.shuffle()
+	var out: Array = []
+	for _card in 3:
+		if spec_left.is_empty() and class_left.is_empty():
+			break
+		if draft_card_is_class(spec_left.size(), class_left.size()):
+			out.append(class_left.pop_back())
+		else:
+			out.append(spec_left.pop_back())
+	return out
+
+
+# Queue one draft offer on a hero. The offer is ROLLED NOW and stored, so the
+# cards waiting on the hero card are the cards that dropped — the same promise
+# `award_ability_pick` makes for the boss pick. Returns false when there is
+# nothing left to offer, which is a fact the roll knows and no caller has to
+# guess at.
+func award_draft_pick(member: Dictionary) -> bool:
+	var offer := roll_draft_offer(member)
+	if offer.is_empty():
+		return false
+	member["draft_candidates"] = member.get("draft_candidates", []) + [offer]
+	member["draft_picks_owed"] = int(member.get("draft_picks_owed", 0)) + 1
+	return true
+
+
+func owed_draft_picks() -> int:
+	var n := 0
+	for member in party:
+		n += int(member.get("draft_picks_owed", 0))
+	return n
+
+
+# THE ONE PLACE A DROP IS WRITTEN. Both pick paths — the boss pick and the
+# draft — call it, so the no-return rule cannot be applied in one and forgotten
+# in the other. It refuses anything that is not an EARNED ability, which is the
+# mechanical form of "protected abilities can never be dropped": a protected
+# name is simply not in this list, so there is no branch to get wrong.
+func drop_earned_ability(member: Dictionary, name: String) -> bool:
+	var kept := earned_ability_names(member)
+	if not kept.has(name):
+		return false
+	kept.erase(name)
+	member["bm_abilities"] = kept
+	_refuse_draft(member, name)
+	return true
+
+
+# TAKE ONE. At the cap this is take-one-AND-DROP-ONE: the caller names the
+# earned ability the incoming card replaces, and a drop that is not an EARNED
+# ability is refused outright — a protected ability can never be named here.
+# Returns "" on success, or the reason it was refused.
+func take_draft_ability(member: Dictionary, name: String,
+		drop_name := "") -> String:
+	if int(member.get("draft_picks_owed", 0)) < 1:
+		return "no pick is owed"
+	var queue: Array = member.get("draft_candidates", [])
+	if queue.is_empty() or not queue[0].has(name):
+		return "that card is not in the offer"
+	if owned_ability_names(member).has(name):
+		return "already known"
+	if ability_slots_full(member):
+		if drop_name == "":
+			return "the kit is full — name an ability to drop"
+		if not drop_earned_ability(member, drop_name):
+			return "%s cannot be dropped" % drop_name
+	queue.pop_front()
+	member["draft_candidates"] = queue
+	member["bm_abilities"] = member.get("bm_abilities", []) + [name]
+	member["draft_picks_owed"] = int(member.get("draft_picks_owed", 0)) - 1
+	return ""
+
+
+# DECLINING IS ALWAYS ALLOWED, at any point, full or not. A settled kit is a
+# legitimate end state, and being forced to churn would make a good build worse
+# as the run goes on. The WHOLE offer is refused, not just one card of it —
+# otherwise the next offer keeps re-presenting exactly what was just turned
+# down, which is the rule's stated reason for existing.
+func decline_draft(member: Dictionary) -> bool:
+	if int(member.get("draft_picks_owed", 0)) < 1:
+		return false
+	var queue: Array = member.get("draft_candidates", [])
+	if not queue.is_empty():
+		for card in queue.pop_front():
+			_refuse_draft(member, String(card))
+		member["draft_candidates"] = queue
+	member["draft_picks_owed"] = int(member.get("draft_picks_owed", 0)) - 1
+	return true
+
+
+# THE MERCHANT'S PRICE, by zone — the third pick source (§3). Sits below the
+# blacksmith's [150, 225, 300] on purpose: the smith buys a permanent upgrade
+# to something you already hold, and BK measured it converting 41-47% of ALL
+# run income. An ability is the cheaper, more frequent question.
+const DRAFT_PRICES := [120, 180, 240]
+
+
+func draft_price() -> int:
+	var base: int = DRAFT_PRICES[clampi(zone_idx, 0, DRAFT_PRICES.size() - 1)]
+	return maxi(int(round(base * (1.0 - relic_add("shop_discount")))), 1)
+
+
 func rotation_enabled() -> bool:
 	return OS.get_environment("DOD_ZONE_ROTATION") == "1"
 

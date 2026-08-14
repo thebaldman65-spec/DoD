@@ -147,6 +147,16 @@ static var rune_elite_equipped := 0 # ...of those, worn (a slot was free)
 # (2 awards a zone, 6 a run, when both pools still hold something).
 static var ability_offered := 0
 static var ability_taken := 0
+# BATCH BO §3 — THE DRAFT. `draft_short` is the one worth watching for the
+# next two batches: pools are thin until tranche 3, so an offer of three will
+# often come up two or one, and the report says so rather than letting a short
+# offer read as a broken instrument.
+static var draft_attempts := 0    # elites that offered one (i.e. all of them)
+static var draft_offered := 0     # cards SHOWN (3 per offer at a full pool)
+static var draft_taken := 0       # offers resolved into an ability
+static var draft_dropped := 0     # ...of those, ones that cost a drop
+static var draft_short := 0       # offers that could not fill three cards
+static var draft_refused_pool := 0  # offers with nothing left to show at all
 static var rune_refused_noslot := 0 # never offered: every slot already worn
 static var rune_refused_gold := 0   # offered, left on the counter: 40g reserve
 static var rune_refused_dupe := 0   # re-roll kept landing on an owned rune
@@ -681,6 +691,13 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		run.add_item(run.random_loot())
 		for extra_i in int(run.relic_add("loot_extra")):
 			run.add_item(run.random_loot())
+		# BATCH BO §3 — AN ELITE ALWAYS OFFERS A DRAFT, to one hero drawn
+		# independently of the rune looter (battle.gd's victory branch makes
+		# the same two draws). Resolved instantly here rather than owed to a
+		# screen, exactly as the trophy pick already is: the bot rolls the SAME
+		# offer a player would see and takes from THAT, so a sim can never hold
+		# a card the real flow would not have shown it.
+		_award_draft(run, run.party.pick_random())
 	# §6: clearing ANY slot heals 15%, with the relic stacking on top.
 	run.heal_party(run.victory_heal_pct())
 	var v_mana: float = run.relic_add("victory_mana_pct")
@@ -809,6 +826,39 @@ static func _award_trophies(run: Node) -> void:
 		m["bm_abilities"] = m.get("bm_abilities", []) + [pick]
 		ability_offered += offer.size()
 		ability_taken += 1
+
+
+# BATCH BO §3 — ONE DRAFT OFFER, resolved instantly by bot policy. THE POLICY
+# IS DUMB AND PRINTED: take the first card of the shuffled offer, and at the
+# seven-slot cap drop the OLDEST earned ability to make room. IT NEVER
+# DECLINES — declining is a real player choice and a legitimate end state, but
+# a bot that declined would measure the machinery less, not more, and the
+# take-one-drop-one path is exactly the one worth exercising at scale.
+static func _award_draft(run: Node, m: Dictionary) -> void:
+	draft_attempts += 1
+	if not run.award_draft_pick(m):
+		draft_refused_pool += 1
+		return
+	var queue: Array = m.get("draft_candidates", [])
+	if queue.is_empty():
+		return
+	var offer: Array = queue[0]
+	draft_offered += offer.size()
+	if offer.size() < 3:
+		draft_short += 1
+	var drop := ""
+	if run.ability_slots_full(m):
+		var earned: Array = run.earned_ability_names(m)
+		if earned.is_empty():
+			return
+		drop = String(earned[0])
+	# Through the SAME door the map screen calls, so a sim can never resolve a
+	# draft by a rule the real flow does not have.
+	if run.take_draft_ability(m, String(offer[0]), drop) != "":
+		return
+	draft_taken += 1
+	if drop != "":
+		draft_dropped += 1
 
 
 # BATCH BM — THE BOT NO LONGER SPENDS POINTS, IT EQUIPS A LOADOUT. Talents
@@ -1202,6 +1252,17 @@ static func _print_report(battle) -> void:
 		ability_taken / runs / 4.0])
 	print("  Upgrades %.2f/hero/run taken   ceiling 3.00 (one per mini-boss)" % [
 		upgrade_taken / runs / 4.0])
+	# BATCH BO §3 — THE DRAFT, and it is ROUTE-DEPENDENT by construction: an
+	# elite always offers one, elites run 0-3 a zone since BK, so a greedy
+	# route drafts far more than a cautious one. Read `short` and `dry`
+	# together — pools are thin until tranche 3 and BOTH are expected to be
+	# large until then. They are printed rather than smoothed over precisely
+	# so "the pool is thin" never gets mistaken for "the roller is broken".
+	print("  Draft    %.2f offers/run   %.2f cards shown   taken %.2f   cost a drop %.2f" % [
+		draft_attempts / runs, draft_offered / runs, draft_taken / runs,
+		draft_dropped / runs])
+	print("           short offers (pool under 3) %.2f/run   nothing left to offer %.2f/run" % [
+		draft_short / runs, draft_refused_pool / runs])
 
 	# ---------- Rune economy (Batch AD stage 0a) ----------
 	# The half of the rune question no measurement has ever shown. Read it
