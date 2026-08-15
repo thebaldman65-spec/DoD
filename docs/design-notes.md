@@ -4,6 +4,39 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Splitting beats moving when something else reads the file (Batch BZ) — 2026-08-15
+
+BY measured the sync and named the changelog as the archive candidate, which was
+right, and recommended moving the whole file out, which was not quite. The file
+has a reader: `build_docs.py` finds it by relative path. Move it and the script
+breaks until someone updates the path — and the fix is worse than it sounds,
+because it points a repo script at a folder outside the repo.
+
+The split costs almost nothing and avoids all of that. The live file stays
+exactly where it is, so nothing that reads it notices; only the old entries
+leave. It gives up about 60 KB of the 780 KB saving and keeps ten batches of
+recent context in the sync, which is the half anyone actually reads.
+
+**The general shape: when a file is too big and something reads it, ask whether
+the reader needs all of it. Usually it needs the recent end, and then the answer
+is a cut rather than a move.** The same cut will be owed again in ten batches or
+so, and it is cheap to repeat.
+
+The thing that needed care was not the cut, it was proving it. Two files that
+sum to the right number of bytes are consistent with one entry duplicated and
+another dropped. So the check is on the entries themselves — every heading
+extracted from all three files, the two halves proved disjoint and their union
+proved equal to the original, and the bodies re-concatenated compared byte for
+byte. **A split that loses one entry of 118 looks exactly like a split that
+didn't.**
+
+The uncomfortable half is §1's risk and it is worth stating in the notes as
+well as the guide: the saving comes from putting text somewhere GitHub is not.
+That is fine for frozen history *provided the machine is backed up*, and this
+machine currently is not. The history archived today survives in the repo's
+pushed git history regardless, so nothing is at risk yet — but the folder needs
+a backup before it holds anything that isn't already in a commit.
+
 ## A card type that says NO is a different design from one that says INSTEAD (Batch BW) — 2026-08-14
 
 Batch BP gave the Swordmaster two stance cards and a rule for them: each branch

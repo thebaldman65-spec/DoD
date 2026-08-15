@@ -18,7 +18,8 @@ updated alongside `docs/changelog.html` (the living changelog). The original
   no vault lists, no "was/now/moved/reworked/renamed" notes, no decision
   dates — change history belongs in changelog.html alone.
 - Terminology: damage against the Break meter = "Break damage (BD)" everywhere.
-- `docs/addendum.html` is RETIRED (frozen history; do not update it).
+- `addendum.html` is RETIRED (frozen history; do not update it). **Batch BZ MOVED IT OUT OF THE
+  REPO** to `/Users/zipples/Documents/DoD-archive/addendum.html`; it is no longer `docs/addendum.html`.
 - User drops new assets in `../imported files/` — always check there.
   New character sprites need the Soldier format: 100x100 frame strips named
   `Name_Idle/Walk/Attack01-03/Hurt/Death.png`.
@@ -26,33 +27,55 @@ updated alongside `docs/changelog.html` (the living changelog). The original
   `/Applications/Godot.app/Contents/MacOS/Godot --path <this dir>` (background,
   watch stderr for errors).
 
-## Repo weight and the knowledge-base sync (STANDING — Batch BY)
+## Repo weight and the knowledge-base sync (STANDING — Batch BY, ACTED ON AT BZ)
 **The number that matters is not the repo, it is the TEXT.** The repo is 37.72 MB over 219 tracked
 files, but 32.3 MB of that is `assets/` — mp3/wav/png/ttf that a knowledge-base sync does not
-ingest. **The sync sees 5.41 MB across 169 text files, and that is the only figure to watch.** BY
-deleted one file (`assets/.DS_Store`, 10 KB — 37.73 MB before, 37.72 MB after), so the audit's
-honest finding is that **the repo is not carrying dead weight — it is carrying its own history.**
-- **THE FOUR HEAVIEST TEXT FILES ARE 48% OF THE SYNC**: `scripts/battle.gd` 893 KB (16.1%),
-  `docs/changelog.html` 835 KB (15.1%), `CLAUDE.md` 669 KB (12.1%), `docs/master.html` 271 KB
-  (4.9%). Two of those four are working files and must stay.
-- **ARCHIVE MEANS MOVE OUT OF THE REPO, NEVER DELETE** — to `/Users/zipples/Documents/DoD/`, where
-  the `.docx` exports already live outside git.
-- **THE RECOMMENDATION, IN ORDER, AND IT WILL RECUR AS THE CHANGELOG GROWS:**
-  1. `docs/changelog.html` (835 KB) — **the strongest candidate by a distance**: the largest file
-     that is not working code, it grows every batch, and the design conversation is explicitly told
-     not to source premises from it. **It is an ABSOLUTE non-deletion — it is the project's
-     memory.** Archiving it means the docx export keeps carrying it, and **`docs/build_docs.py`
-     reads it by relative path, so moving the file breaks that script until the path is updated.**
-     Archive it only with that in mind.
-  2. `docs/addendum.html` (33 KB) — RETIRED and frozen since 2026-07-08. It is the definition of a
-     non-working file and nothing but this guide references it.
-  - **Those two together are 868 KB — 15.7% of the sync, taking it from 5.41 MB to 4.56 MB.**
-  3. **Only if that is not enough**: the seven oldest suites (`test_batch_ah/ah_battle/ai/aj/ak/al/an`,
-     180 KB combined) — but read the next line first.
-- **DO NOT ARCHIVE TEST SUITES AS A FIRST RESORT.** All 47 are 1.50 MB, so the whole harness is
-  under twice the changelog, and each suite encodes decisions in assertion form (AV, BR and BS
-  re-pointed suites in place *with their reason* precisely so a later batch could not quietly
-  reverse a decision). Trading that record for 180 KB is a bad trade while option 1 is untaken.
+ingest. **The sync is the only figure to watch, and BZ took it from 5.43 MB across 169 text files
+to 4.73 MB across 168 — a saving of 711 KB, 12.8%** (the raw split saved 744 KB; BZ's own
+documentation spent 33 KB of it back). BY's honest finding still stands and is why
+the saving came from history rather than from deletion: **the repo is not carrying dead weight —
+it is carrying its own history.**
+- **THE ARCHIVE FOLDER IS `/Users/zipples/Documents/DoD-archive/`**, outside the repo, beside the
+  `.docx` exports. It holds `changelog-archive.html` and the retired `addendum.html`.
+  **ARCHIVE MEANS MOVE OUT OF THE REPO, NEVER DELETE.**
+- **A FILE IN THERE IS NOT IN VERSION CONTROL AND IS NOT BACKED UP BY GITHUB. If the machine is
+  lost, it is lost with it.** **THE ARCHIVE FOLDER MUST LIVE SOMEWHERE THE MACHINE BACKS UP** — an
+  iCloud-synced Documents folder, a Time Machine target, or a second private repo.
+  **AT BZ NONE OF THE THREE WAS IN PLACE — iCloud Drive is off and `tmutil` reports no Time Machine
+  destination — and it is the designer's call to fix.** What is safe regardless: **everything
+  archived at BZ is still in this repo's pushed git history** (commit `3725164`, Batch BY), so the
+  exposure is anything written into the archive AFTER the split, which should be nothing.
+- **THE CHANGELOG IS SPLIT, NOT MOVED, AND THAT IS WHY `docs/build_docs.py` STILL WORKS.** It reads
+  the changelog by RELATIVE path; the live file never moved. **`docs/changelog.html` STARTS AT
+  BATCH BP (2026-08-13) and runs forward** (11 entries, 163 KB at the split);
+  **`changelog-archive.html` ENDS AT BATCH BO and runs back to Batch 1** (108 entries, 696 KB).
+  Both files carry a header naming the batch they stop at and the full path of the other half.
+  **THE SAME CUT WILL BE OWED AGAIN AS THE LIVE FILE GROWS** — repeat it at a batch boundary,
+  around 150 KB, and assert the two halves re-concatenate byte for byte before trusting it.
+- **ONE CONSEQUENCE, KNOWN AND NOT WORKED AROUND: the Word export now carries the recent half
+  only** (`DoD Changelog.docx` 392 KB -> 74 KB). Restoring a full-history export is one line in
+  `build_docs.py`'s `DOCS` dict pointing at the archive; **not taken**, because pointing that
+  script at an out-of-repo source is a decision about what it is for.
+- **THREE SUITES ASSERT AGAINST NOW-ARCHIVED ENTRIES AND FAIL: `test_batch_bb` (the Batch BB
+  entry's Ruin-detonation numbers — and its slice THROWS on the missing anchor, aborting its own
+  function while the suite still prints a count, the BC trap), `test_batch_bn` and `test_batch_bo`
+  (one bare "the changelog has my entry" check each). REPORTED, NOT RE-POINTED** — what those
+  assertions were for is a decision. The other nine changelog-reading suites (bp, bq, br, bs, bt,
+  bu, bv, bw, bx) pass, because each batch's own entry is recent by construction.
+- **THE HEAVIEST TEXT FILES AFTER THE SPLIT**: `scripts/battle.gd` 893 KB (18.5%), `CLAUDE.md`
+  673 KB (13.9%), `docs/master.html` 271 KB (5.6%), `docs/design-notes.md` 208 KB (4.3%). The
+  changelog is no longer in the top four.
+- **DO NOT ARCHIVE TEST SUITES. THEY ARE THE SINGLE LARGEST BLOCK IN THE SYNC AND THEY CANNOT BE
+  ARCHIVED — 43 suites, 1.50 MB, 28% of the old sync and 32% of the new one** (they did not grow;
+  the denominator shrank, so after BZ they are larger than any single file). **They must be in the
+  repo to run.** That is a constraint of a whole-repo sync, not a judgement about their value: each
+  suite encodes decisions in assertion form (AV, BR and BS re-pointed suites in place *with their
+  reason* precisely so a later batch could not quietly reverse a decision). **Written down before
+  someone proposes deleting them for space.** (BY said "47"; the live count is **43**.)
+- **`scripts/battle.gd` IS 893 KB IN ONE FILE — larger than the changelog was, and 18.5% of the
+  sync on its own. NOT a sync problem that can be solved**, because it is read constantly.
+  **Recorded as a CODE-HEALTH observation: a file that size wants splitting eventually, and doing
+  it deliberately is far cheaper than doing it when it becomes unworkable.**
 
 ## Verify before shipping
 - Parse: run each scene headless with `--quit-after 90`, grep "SCRIPT ERROR".
@@ -946,6 +969,35 @@ claim, so a tranche that fills three pools trips them by construction. Two shape
   refusal reach the spec pool too (bq, br) or by moving it onto a **Berserker**, whose pool is
   genuinely still two (bo). **WHEN THE WARRIOR THIRD LANDS, bo's version has to move again** — and
   that forced move is the honest signal that the last of tranche 2 is paid.
+
+BATCH BZ (08-15) — THE CHANGELOG IS SPLIT. **THE SYNC GOES 5.43 MB / 169 TEXT FILES -> 4.73 MB /
+168, A SAVING OF 711 KB (12.8%)** — the raw split saved 744 KB and this batch's own documentation
+spent 33 KB of it back, which is the honest figure. No game code changed: no ability, no node, no magnitude, no save
+version (still v10). **BY RECOMMENDED MOVING THE WHOLE CHANGELOG OUT; THIS SPLITS IT INSTEAD** —
+moving it would have cost `docs/build_docs.py` its relative path and removed all recent context from
+the sync. **The live file never moves, so the script never breaks.** Sizes, the archive's location,
+the backup requirement and the two standing notes all live in "Repo weight and the knowledge-base
+sync" at the top of this file and are deliberately NOT repeated here.
+- **THE CUT IS AT A BATCH BOUNDARY AND NO ENTRY WAS EDITED.** `docs/changelog.html` starts at
+  **Batch BP**; `changelog-archive.html` ends at **Batch BO**. `docs/addendum.html` moved whole.
+- **THE VERIFICATION IS THE PART WORTH REUSING, BECAUSE A SPLIT THAT DROPS ONE ENTRY OF 118 IS
+  INVISIBLE AND NO SUITE WOULD HAVE CAUGHT IT.** Every `<h2>` heading was extracted from the
+  original and from both halves: **118 = 10 + 108, nothing missing, ZERO overlap, order preserved,
+  and the two bodies re-concatenated are BYTE-IDENTICAL to the original.** Assert that, not the
+  file sizes — sizes agreeing is consistent with a duplicated entry and a dropped one.
+- **BOTH HALVES CARRY A HEADER NAMING THE OTHER.** In a year neither file's contents will say where
+  the rest went; the archive names the batch it ends at, the live file the batch it starts at, and
+  both give the counterpart's full path.
+- **BY'S TWO FLAGGED REFERENCES ARE COMMENT MENTIONS, NOT LOADS — CHECKED AT THEIR SITES.**
+  `run_state.gd:1117` names `test_runes.gd` in the note saying the `DOD_SIM_RUNE_ECON` double gate
+  is *asserted* rather than merely intended; `battle.gd:335` names `sim.sh` in the header of the
+  sweep block, and **battle.gd reads the ENVIRONMENT, never the script** — sim.sh invokes Godot, so
+  the dependency runs the other way round. **NO PRODUCTION CODE DEPENDS ON A TEST FILE.** BY's
+  reference count is string-match based, which is what put them on the list.
+- **VERIFIED — AND PER THE STANDING INSTRUCTION, THAT MEANS THE CODE LANDED AND WORKS.**
+  `python3 docs/build_docs.py` runs, exit 0, printing both `built ...` lines. Both HTML files open
+  and are valid. **NO NEW SUITE** — this batch ships no code to assert against, and the split's own
+  verification is a one-shot property of two files rather than a standing invariant.
 
 BATCH BY (08-15) — THE REPO AUDIT, AT FILE LEVEL. **THE RESULT IS THE OPPOSITE OF THE ONE THE BATCH
 EXPECTED: the whole repo held ONE dead file** — `assets/.DS_Store`, 10 KB of Finder metadata already

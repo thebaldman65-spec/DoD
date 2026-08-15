@@ -43,4 +43,20 @@ Turn-based, party-based roguelike RPG. Phase 1: combat prototype.
 - `scripts/ability.gd` — ability data definition
 - `assets/sprites/` — Soldier + Orc sheets (100x100 frames)
 
+## Documentation
+
+- `docs/master.html` — the authoritative design reference (current truth)
+- `docs/changelog.html` — what changed and when, newest first. **This is the RECENT
+  half only: it starts at Batch BP (2026-08-13).** Everything older lives in
+  `changelog-archive.html` in the archive folder below.
+- `docs/design-notes.md` — the "why" behind each batch, rationale only
+- `docs/build_docs.py` — builds the Word exports of master + changelog into `DoD/*.docx`
+
+**The archive folder is `DoD-archive/`**, one level up beside the `.docx` exports and
+**outside this repo**. It holds the older half of the changelog (`changelog-archive.html`,
+Batch BO back to Batch 1) and the retired `addendum.html`. It is kept out of the repo so
+the knowledge-base sync does not carry it — but that means **it is not in version control
+and is not backed up by GitHub**, so the folder needs to sit somewhere the machine itself
+backs up (iCloud Drive, a Time Machine target, or a second private repo).
+
 Design docs live one folder up in `DoD/*.docx`.
