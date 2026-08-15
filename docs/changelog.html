@@ -5,6 +5,174 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-14 &mdash; Batch BW: tranche 2, the Warrior nine (TRANCHE 2 COMPLETE)</h2>
+<p><i><b>LEAD WITH THE DEBT BEING PAID.</b> Since Batch BP the Warrior three have been the visible
+shape of what the draft still owed &mdash; two cards apiece against everybody else's five, so a
+Berserker, a Warden or a Swordmaster was the one hero whose offer of three came up short. That is
+over. <b>All twelve specs draft from five, the asymmetry is gone, and the draft holds 84 of a
+target ~96.</b> What remains is a third tranche, and it is owed by all twelve equally rather than
+by three of them. <b>The mechanically new thing is the STANCE-GATED ABILITY</b> &mdash; the first
+cards in the game that are refused outright unless the Swordmaster is standing in the right
+guard.</i></p>
+
+<p><b>Nine spec draft abilities, three per Warrior spec.</b> Nothing else ships: no talent node, no
+magnitude, no existing ability changed, and no save version moves (still v10). <b>ONE new unit-side
+field for nine abilities</b> (Berserk's charge count) &mdash; everything with a duration is a
+STATUS, per BQ's standard.</p>
+
+<p><b>STANCE-GATED ABILITIES ARE THE NEW MECHANIC, AND THE RULE IS WORTH MORE THAN THE TWO CARDS.
+READERS BRANCH AND FLIP; GATED ONES REQUIRE AND STAY.</b> BP shipped the readers &mdash; Precision
+Strike and Feint branch on the stance and then switch it, each branch buying what the guard he is
+<i>arriving</i> in wants. A gated card is a different animal: it is <b>refused outright</b> in the
+wrong stance (unavailable, not a weaker branch) and casting it <b>moves nothing</b>.
+<b><code>_ability_usable</code> is the door</b>, matching how Death Ray's Resonance gate and BV's
+nine are refused &mdash; so the greyed button, the bot's pool and the cast itself can never
+disagree. Getting the two card types backwards is the single easiest mistake to make on this spec,
+which is why it ships as a standing rule.</p>
+
+<p><b>BERSERKER &mdash; spend the rage, take the risk, and finally get paid back.</b> His pool was
+Blood Offering and Gut Rip: both single-target, both about him getting low, and nothing paid him
+back for being there.</p>
+<ul>
+<li><b>Reckless Abandon</b> &mdash; 0 Rage, 1.5, 4cd, self. He spends <b>ALL his Rage</b>; for 3
+turns he deals <b>+2% damage per 10 points SPENT</b> (Perfect: 3%). <i>Axis: the dump.</i> A full
+bar is +20% and costs him every ability he might have cast in that window, which is the trade.
+<b>It scales off what was actually spent, not off his maximum</b> &mdash; a half-full Berserker
+buys half the buff. Refused outright at zero Rage (BO §5's rule). <i>Builds with</i> <b>Blood
+Offering</b>, <b>Blood Tithe</b> and <b>Bloodied Momentum</b>; a deliberate <b>anti-synergy with
+Bloodwake</b>, which pays him for <i>holding</i> Rage.</li>
+<li><b>Berserk</b> &mdash; 25 Rage, 2.0, 5cd, self. His next <b>3 strikes each land twice</b>
+(Perfect: 4), and he <b>takes 30% more damage for 3 turns</b>. <i>Axis: the risk dial at maximum,
+and the drawback IS the payoff</i> &mdash; Blood Frenzy scales his damage with missing health, so
+taking 30% more drives him into his own power band. <b>TWO DIFFERENT CLOCKS ON ONE CARD</b>: the
+strikes are CHARGES and wait until spent, the 30% is an ordinary 3-turn status. <b>Per BR §1 the
+charges count HITS, not casts</b>, so Hack and Slash empties the whole bank in one cast and lands
+six blows. <b>FLAGGED AS PROBABLY THE STRONGEST CARD IN THE WARRIOR SET AND SHIPPED TO BE WATCHED
+RATHER THAN PRE-TUNED.</b></li>
+<li><b>Blood Debt</b> &mdash; 20 Rage, 2.0, 4cd, one enemy, 10 BD. Strikes for 30% of Attack and
+<b>marks the enemy for the rest of the battle</b>; every time it bleeds out he heals <b>25% of his
+maximum health</b> (Perfect: 35%). <i>Axis: a reason to survive being low.</i> <b>THE MARK SURVIVES
+THE BLEEDOUT IT PAYS FOR</b>, which is the clause most likely to be built as one-shot by accident
+and the whole card: <b>Slaughterhouse</b> drops a bleedout to 50 rather than 0, so the same marked
+enemy bleeds out repeatedly and one mark pays three or four times.</li>
+</ul>
+
+<p><b>SWORDMASTER &mdash; the first stance-GATED cards.</b></p>
+<ul>
+<li><b>Sever</b> <i>(requires Aggressive)</i> &mdash; 25 Rage, 2.5, 4cd, one enemy, 15 BD. 40% of
+Attack, and <b>if the target is Broken this ability's cooldown is cleared outright</b>. <i>Axis:
+the Break window rewards aggression</i> &mdash; his Breaker lane opens a one-turn window and
+nothing let him swing repeatedly inside it. <i>Builds with</i> <b>Shatterpoint</b>,
+<b>Punishment</b>, <b>Off Balance</b>, <b>Pressure Point</b> and <b>Guard Breaker</b>, all of which
+live in that window.</li>
+<li><b>Battle Poise</b> <i>(requires Defensive)</i> &mdash; 25 Rage, 2.0, 4cd, self. For 3 turns
+<b>every attack he parries takes a turn off all his cooldowns</b> (Perfect: 4 turns). <i>Axis:
+defence buys tempo.</i> He is the only parry-<b>stat</b> hero in the game and all of it merely made
+hits smaller; <b>this is the connection his three lanes have never had</b>. <b>It pays PER PARRY</b>
+and goes through <code>_tick_cooldowns</code>, BQ's one implementation of cooldown reduction; it
+skips its own recast, because a defensive window that shortens its own return is a different and
+unbounded card.</li>
+<li><b>Feigned Guard</b> &mdash; 20 Rage, 1.0, 3cd, self. For 2 turns his <b>abilities resolve as
+though cast from the other stance &mdash; AND satisfy that stance's gate &mdash; without switching
+him</b> (Perfect: 3 turns). <i>Axis: the only card in the game that lets a build have both halves of
+its own toggle.</i> <b>THE GATE-SATISFYING CLAUSE IS LOAD-BEARING, NOT A CONVENIENCE</b>: without
+it this is a minor modifier; with it, an Aggressive build can cast Battle Poise and a Defensive
+build can cast Sever. <b>It is satisfied in <code>_ability_usable</code>, not merely branched at
+resolution</b> &mdash; two different sites, and only the first makes the card true. <b>IT DOES NOT
+SWITCH THE STANCE AND MUST NOT BE BUILT TO</b>, and <b>his PASSIVE keeps reading the guard he is
+actually in</b>, so an Aggressive build keeps Aggressive's damage bonus the whole time.</li>
+</ul>
+
+<p><b>WARDEN &mdash; his bulk as a weapon, a permanent duel, and Block that pays the party.</b> His
+pool was Covering Guard and Eye of the Storm: both defensive, and he had no offense at all.</p>
+<ul>
+<li><b>Shield Slam</b> &mdash; 25 Rage, 2.5, 3cd, one enemy. Damage equal to <b>15% of his maximum
+health</b> (Perfect: 20%) plus <b>40 Break damage</b>. <i>Axis: his bulk as a weapon</i>, and the
+Break contributes to a Warrior party's central axis rather than to his own damage number. <b>It
+reads the maximum LIVE</b>, so Heavy Plating's climb and every +15 Tenacity adds during the fight
+feed it.</li>
+<li><b>Vendetta</b> &mdash; 20 Rage, 1.5, 4cd, one enemy. <b>For the rest of the battle that enemy
+can attack nobody but the Warden</b>, and he takes <b>20% less damage from it</b> (Perfect: 30%).
+<i>Axis: a permanent duel</i> &mdash; Eye of the Storm taunts everything for two turns, this locks
+one thing forever. <b>It reuses the taunt system rather than writing a parallel one</b> (a
+<code>mocked</code> status at -1 turns, exactly the shape The Whole Room installs), so <b>the lock
+releases if the Warden falls</b> for free: the targeting narrow re-resolves the taunter live and
+ignores a dead one.</li>
+<li><b>Aegis Wall</b> &mdash; 25 Rage, 2.0, 5cd, self. For 3 turns (Perfect: 4) <b>every attack he
+BLOCKS heals all allies 8% of his maximum health</b>. <i>Axis: his signature stat feeds the
+party.</i> Block negates an attack entirely and paid him nothing beyond that; this is the first
+thing that makes a block worth something to anyone else. <b>It reads BLOCKS, not attacks taken</b>
+&mdash; a blow that gets through pays nothing &mdash; and it reads the maximum LIVE.</li>
+</ul>
+
+<p><b>ONE NAME COLLISION, FOUND BY BR §1's SWEEP AND RESOLVED RATHER THAN FLAGGED &mdash; THE CARD
+MOVED, NOT THE TALENT.</b> The Warden's permanent duel was authored as <b>GRUDGE</b>, and
+<code>wd_grudge</code> is already a Warden <b>Threat-lane talent</b> (row 7: +25% damage against
+enemies his taunt binds), with a <b>Rune of Grudges</b> paying into the same term. <b>Same spec,
+same lane, one row apart, and mechanically adjacent</b> &mdash; the talent's effect is precisely
+what the card's taunt would feed. That is closer than BP's Precision Strike / Precision Strikes and
+closer than BV's Ghostpack / Ghost Pack, and unlike those it was avoidable: the talent's id is
+save-migrated and its ranks travel with it, while the card was unshipped. <b>The card is
+VENDETTA.</b> The two still compose exactly as intended &mdash; Grudge pays +25% against a target
+his taunt binds, and Vendetta is a taunt that never lapses. The other eight names are clean against
+every ability, talent node, status and rune, and the whole sweep ships as a test.</p>
+
+<p><b>BREAK DAMAGE ASSIGNED DELIBERATELY (the standing rule since BO), AND REPORTED.</b> §1 names
+one figure; the other two are this batch's. <b>THREE of the nine are attacks and carry it</b>:
+<b>Shield Slam 40</b> (the brief's), <b>Sever 15</b> &mdash; 40% of Attack for 25 Rage, priced
+beside Feint (35% / 12) and Precision Strike's Defensive branch (15% / 15), and worth noting that
+its Break matters most on the FIRST cast, because it is what opens the window the cooldown clause
+then exploits &mdash; and <b>Blood Debt 10</b>, one step under Feint on the same curve with Gut
+Rip's 20 at the 30-Rage end of it. <b>The other six land no blow at all</b>, so Break would have
+nothing to ride: that is a decision on each of them, not an omission on any.</p>
+
+<p><b>TWO STATUSES SIT ON AN ENEMY, AND THAT PUT THEM IN A LIST THE OBVIOUS READING WOULD HAVE
+MISSED.</b> <code>blood_debt</code> and <code>vendetta</code> are MARKS, so neither is in
+<code>DEBUFF_IDS</code> &mdash; a battle-long entry there reads as 999 turns remaining and a
+mender's longest-first Cleansing Rite would take it every single time (<code>feinted</code>'s
+reason). But <code>_dispellable_buffs</code> is <b>DERIVED from exactly that absence</b>, so
+leaving them out of both lists would have made them beneficial statuses in the eyes of the one
+ability that strips those: <b>a Mage's Dispel would have stripped the party's own marks FOR the
+enemy carrying them.</b> Both are in <code>DISPEL_NEVER</code>. This is BU's Suffering trap
+arriving through the mark door. <b>Vendetta's taunt half is a separate <code>mocked</code> status
+and is deliberately still cleansable</b>, because <code>mocked</code> always has been &mdash; that
+is the same exposure The Whole Room's permanent taunt already carries, and a carve-out for one card
+would make two permanent taunts behave differently.</p>
+
+<p><b>BERSERK'S DOUBLING EXPANDS THE HIT COUNT RATHER THAN RE-ENTERING THE STRIKE BODY</b>, so
+every doubled blow is an ORDINARY blow: it rolls its own crit, miss and parry and carries his bleed
+buildup, which is what feeds Gut Rip and Blood Debt twice as fast. <b>The target-list expansion
+beside it looks optional and is not</b>: the strike loop reads <code>strike_targets[hit_i]</code> on
+the area and chosen-pair branches, so raising the hit count without growing the list runs the
+doubled strikes off its end. <code>multi_hits</code> and <code>random_hits</code> re-pick their own
+target every iteration and need no expansion, which is why the expansion is gated to the other
+branch.</p>
+
+<p><b>BERSERK'S 30% IS DELIBERATELY NOT FOLDED INTO <code>dmg_taken_bonus</code></b>, the stat
+field talents and runes write. Two reasons, and the second is load-bearing: that field is permanent
+and this is a 3-turn status, and <b>MEASURED RAGE zeroes <code>dmg_taken_bonus</code> outright</b>
+to cancel Reckless Fury. Letting a talent delete a drafted card's drawback would delete the card,
+because the 30% <i>is</i> the payoff. Two effects sharing one field is how one of them silently
+stops existing.</p>
+
+<p><b>THE BOT GOT NO ROTATION, ON PURPOSE</b> &mdash; all nine ride BO §5's wrapper, so no existing
+rotation is re-weighted and no prior measurement stops being comparable. Four of the nine joined
+the self-cast list (Reckless Abandon, Berserk, Battle Poise, Feigned Guard and Aegis Wall have
+nothing to click); Shield Slam, Vendetta, Blood Debt and Sever each name one enemy and fall through
+to the ordinary target picker. <b>The two stance gates need no bot rule at all</b>: they live in
+<code>_ability_usable</code>, which the bot's drafted-pick wrapper already consults.</p>
+
+<p><b>ONE GLOSSARY ENTRY ADDED (88 -> 89): <code>stance_gated</code>.</b> "Requires Aggressive" is a
+rule the game has never had before, and a player meeting a greyed-out card needs to know why it is
+dark and what Feigned Guard does about it. The existing <code>stance</code> entry cross-links to it
+and now says two of his abilities REQUIRE a guard.</p>
+
+<p><b>MASTER.HTML CORRECTED TOWARD THE CODE WHERE IT HAD DRIFTED</b>, beside the ordinary update:
+the draft table's intro read "the fifty-four drafted abilities" against a table already holding
+seventy-five rows (BT, BU and BV each added rows without moving that sentence), and the Swordmaster
+group header still read "both cards read the stance and then switch it" against a lane that now
+holds five. Both now state what the code does.</p>
+
 <h2>2026-08-14 &mdash; Batch BV: tranche 2, the Hunter nine</h2>
 <p><i><b>LEAD WITH PREPARATION, because it is the first extra-turn mechanic in the game.</b>
 <b>PREPARATION</b> (Survivalist) is 25 Mana for a plain sentence: after his NEXT turn he

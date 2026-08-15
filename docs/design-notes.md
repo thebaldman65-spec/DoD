@@ -4,6 +4,55 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A card type that says NO is a different design from one that says INSTEAD (Batch BW) — 2026-08-14
+
+Batch BP gave the Swordmaster two stance cards and a rule for them: each branch
+buys what the guard he is *arriving* in wants, so a switch is never a tax. That
+rule is about generosity — whichever guard you are in, the card has something
+for you, and it hands you the thing you will want next.
+
+BW's two gated cards are the opposite gesture and they are better for it. Sever
+does not do something smaller in the Defensive guard; it is simply not there.
+The button is dark. And that turns out to matter more than any number on the
+card, because **a stance you can be locked out of is a stance you have to
+think about**, where a stance that merely changes what you get is one you can
+drift through. For most of this project the Swordmaster's toggle has been a
+pair of passive modifiers with a free button to flip them, and a player could
+play him competently without ever forming an opinion about which guard they
+wanted to be in.
+
+The interesting consequence is that the gate created a problem worth solving,
+and Feigned Guard is the solution rather than a third card. Once two of his
+abilities can refuse him, "I am in the wrong guard" becomes a real and
+frequent complaint — and the answer is not to soften the gates, it is to sell
+him a way to lie about which guard he is in. That is a much better card than
+anything that could have existed before the gates did. It is only worth a slot
+because being locked out is worth avoiding.
+
+**This is why the gate-satisfying clause had to live at the door and not at
+resolution.** The two implementations look identical in a tooltip and one of
+them is a minor damage modifier while the other is the whole card. If Feigned
+Guard only changed which *branch* an ability took, it would do nothing for
+Sever and Battle Poise — the cards a build actually wants it for — and it
+would have shipped feeling weak for a reason nobody could see from the text.
+
+The Warden's three came out of a plainer observation: he had two defensive
+cards and no offense at all, so the question was not "what else can he protect"
+but "what can he do with what he has already stacked". His maximum health is
+the biggest number in the party and nothing read it. Block is his signature
+stat and it paid him alone. Both of those are stats a player has been growing
+all run and being handed nothing for — and turning an accumulated stat into a
+new verb is a much cheaper way to make a spec feel deeper than adding a
+mechanic to it.
+
+The Berserker's is the oldest complaint in the file. His passive rewards being
+nearly dead and his kit gave him no way to survive there, so the whole spec
+read as a dare rather than a plan. Blood Debt does not heal him; it makes his
+*own engine* pay him, which is the difference between a sustain card and a
+sustain build. And Berserk is the same idea pointed the other way: its
+drawback drives him into the band his passive pays for, so the card that looks
+like a risk is actually the most direct way to switch him on.
+
 ## A punishing passive grows its own lane of antidotes (Batch BS) — 2026-08-14
 
 The Pyromancer's INFERNO lane had eight nodes and one subject. Fire Walker

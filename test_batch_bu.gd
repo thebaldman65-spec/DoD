@@ -161,13 +161,17 @@ func _pools() -> void:
 	for spec in ["beastmaster", "sharpshooter", "mystic"]:
 		ok(Classes.spec_draft_pool(spec).size() == 5,
 			"%s joined them at FIVE in Batch BV" % spec)
+	# RE-POINTED BY BATCH BW, AND IT IS AN INVERSION: this asserted the WARRIOR
+	# three were still at TWO because that debt was real and had to stay visible
+	# in code. BW paid it, so tranche 2 is complete and what is asserted is that
+	# ALL TWELVE are five. A pool quietly emptying still trips.
 	for spec in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(spec).size() == 2,
-			"%s is still TWO deep — the WARRIOR third is the last one owed" % spec)
+		ok(Classes.spec_draft_pool(spec).size() == 5,
+			"%s joined them at FIVE in Batch BW — tranche 2 is complete" % spec)
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 51, "the spec pools hold 51 (42 + BV's Hunter nine), got %d" % total)
+	ok(total == 60, "the spec pools hold 60 (51 + BW's Warrior nine), got %d" % total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH CLERIC POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -419,10 +423,10 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch BV"), "master.html is stamped Batch BV")
+	ok(master.contains("Batch BW"), "master.html is stamped Batch BW")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("75 of"), "master.html states the current draft count")
+	ok(master.contains("84 of"), "master.html states the current draft count")
 	var chlog := FileAccess.get_file_as_string("res://docs/changelog.html")
 	ok(chlog.contains("Batch BU"), "the changelog carries a BU entry")
 

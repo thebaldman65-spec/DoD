@@ -169,6 +169,26 @@ const STATUS_INFO := {
 	"bloodbond": ["Bloodbond", "Bb", Color(0.85, 0.30, 0.35), "Sworn to the beast: the next blow that\nwould fell a companion is refused, and\nthe hunter takes HALF of it instead.\nIt waits until it is needed — and the\nhalf he takes can kill him."],
 	"ghostpack": ["Ghostpack", "Gp", Color(0.60, 0.70, 0.90), "The whole pack runs, living and lost:\nEVERY companion summoned this battle\nstrikes alongside his attacks for 40%,\nincluding the ones no longer standing."],
 	"crossfire": ["Crossfire", "Cf", Color(0.95, 0.55, 0.25), "The lines are laid: every CRITICAL hit\nhe lands also strikes 2 other enemies\nfor 40% of that crit's damage."],
+	# ---- BATCH BW: the Warrior draft's tranche-2 statuses ----
+	# SEVEN FOR NINE ABILITIES, and BERSERK CARRIES TWO OF THEM BECAUSE IT HAS
+	# TWO CLOCKS: `berserk` is a CHARGE COUNT that waits until spent (the
+	# `feint_guard` / `mirror` shape — a turn counter would tick his doubled
+	# strikes away unspent) and `berserk_risk` is an ordinary 3-turn window.
+	# One card, two chips, and the player can read which is which.
+	#
+	# `blood_debt` and `vendetta` are both applied BATTLE-LONG (-1 turns) and
+	# both are MARKS rather than debuffs: neither is in DEBUFF_IDS, for the
+	# reason `feinted` is not (a battle-long entry there is cleansed first every
+	# single time a mender stands). Sever and Shield Slam resolve inside the
+	# cast that fires them and carry nothing.
+	"reckless_abandon": ["Reckless Abandon", "RA", Color(0.95, 0.35, 0.30), "Everything thrown at it: deals more\ndamage for every 10 Rage that was\nspent to buy this — and there is none\nleft to cast with."],
+	"berserk": ["Berserk", "Bk", Color(0.90, 0.25, 0.25), "Strikes banked: each of these lands\nTWICE. They count HITS, not casts, so\na multi-hit blow spends one a strike —\nand they wait until they are spent."],
+	"berserk_risk": ["Berserk", "Bk!", Color(0.75, 0.20, 0.25), "Nothing held back: takes 30% MORE\ndamage. Blood Frenzy pays for missing\nhealth, so this is the way into his\nown power band."],
+	"blood_debt": ["Blood Debt", "BD!", Color(0.85, 0.20, 0.30), "The debt is named: every time this\nenemy BLEEDS OUT the Berserker heals.\nThe mark SURVIVES the bleedout, so a\nre-opened wound pays again."],
+	"battle_poise": ["Battle Poise", "BP", Color(0.45, 0.88, 1.0), "The blade is answering: every attack\nhe PARRIES takes a turn off all of his\ncooldowns."],
+	"feigned_guard": ["Feigned Guard", "FG", Color(0.60, 0.80, 1.0), "Showing the wrong guard: his ABILITIES\nresolve as though cast from the OTHER\nstance, and satisfy that stance's\nrequirement. His actual guard — and\neverything his passive reads — has not\nmoved."],
+	"vendetta": ["Vendetta", "Vd", Color(0.90, 0.45, 0.35), "Sworn on: this enemy can attack the\nWarden and nobody else for the rest of\nthe battle, and he takes less damage\nfrom it. It ends only when one of them\ndoes."],
+	"aegis_wall": ["Aegis Wall", "AW", Color(0.70, 0.85, 0.95), "The wall answers for everyone: every\nattack he BLOCKS heals the whole party\nfor a share of his maximum health. A\nblow that gets THROUGH pays nothing."],
 	# ---- BATCH BP: the Warrior draft's statuses ----
 	# Five of the six carry one; Gut Rip is an instant. Feint carries TWO,
 	# because its branches land on opposite sides of the board.
@@ -361,6 +381,25 @@ const FEINT_STRIKE_PCT := 35
 const FEINT_BD := 12
 const FEINT_GUARDS := 2           # charges the Defensive branch banks
 const EYE_STORM_CUT_PCT := 8      # damage cut per enemy ACTUALLY taunted
+# ---- BATCH BW: the tranche-2 Warrior magnitudes read AWAY FROM THE CAST ----
+# Every one of these is read at a site the ability itself never touches — a
+# bleedout, a parry, a block, a mitigation slice — so a literal at that site
+# would be a number nobody looking at the card could find. Same reason
+# CONSECRATION_PCT and VIGIL_SHARE are named below.
+const RECKLESS_PCT_PER_10 := 2    # damage % per 10 Rage actually SPENT
+const RECKLESS_PERFECT_PER_10 := 3
+const RECKLESS_STEP := 10         # ...and the size of one step, which is also
+                                  # the gate: below one step the cast buys zero
+const BERSERK_STRIKES := 3        # doubled strikes banked (4 on a perfect)
+const BERSERK_RISK_PCT := 30      # extra damage TAKEN, its own 3-turn clock
+const BLOOD_DEBT_HEAL := 0.25     # of his max health, per bleedout of the mark
+const BLOOD_DEBT_PERFECT_HEAL := 0.35
+const BATTLE_POISE_TICK := 1      # turns off every cooldown, per PARRY
+const SHIELD_SLAM_PCT := 0.15     # of his LIVE maximum health (0.20 perfect)
+const SHIELD_SLAM_PERFECT_PCT := 0.20
+const VENDETTA_CUT := 0.20        # damage he takes from the sworn enemy
+const VENDETTA_PERFECT_CUT := 0.30
+const AEGIS_WALL_PCT := 0.08      # of his LIVE maximum health, to every ally
 # ---- BATCH BQ: the two class-wide magnitudes that are not on an Ability ----
 # Everything else in the twelve is a percentage inside its own `special` and
 # reads once; these two are read at a site the ability itself never touches — a
@@ -2941,7 +2980,16 @@ func _player_turn(u: BattleUnit) -> void:
 				# ally-facing and fall through to the ALLY branch below.
 				# `reprisal`, `suffering` and `transference` each name ONE enemy
 				# and fall through to the ordinary target picker.
-				"shared_grief", "ordination", "reliquary", "anointing"]:
+				"shared_grief", "ordination", "reliquary", "anointing",
+				# BATCH BW. FOUR of the nine have nothing to click:
+				# `reckless_abandon` and `berserk` spend his own bar,
+				# `battle_poise` and `feigned_guard` are the Swordmaster's own
+				# guard, and `aegis_wall` pays the WHOLE party, which is the
+				# same thing to this list. `shield_slam` and `vendetta` each
+				# name ONE enemy and `blood_debt` and `sever` are ordinary
+				# attacks — all four fall through to the ordinary target picker.
+				"reckless_abandon", "berserk", "battle_poise", "feigned_guard",
+				"aegis_wall"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -4291,6 +4339,35 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if ab.special == "rally_ally":
 		if not heroes.any(func(a): return a != u and not a.dead):
 			return false
+	# ---- BATCH BW: THE FIRST STANCE-GATED ABILITIES ----
+	# THE STANDING RULE THIS ESTABLISHES: **READERS BRANCH AND FLIP; GATED ONES
+	# REQUIRE AND STAY.** BP's Precision Strike and Feint branch on the stance
+	# and then switch it. These two are REFUSED OUTRIGHT in the wrong stance —
+	# not a weaker branch, unavailable — and casting them moves nothing.
+	#
+	# THIS IS THE DOOR, and it being the door is what makes Feigned Guard true:
+	# `_eff_stance` is read HERE, so a Feigned Guard genuinely LETS AN AGGRESSIVE
+	# SWORDMASTER CAST BATTLE POISE rather than merely changing which branch he
+	# would have taken had he been allowed to press the button. Those are two
+	# different sites and only this one makes the card worth a slot.
+	if ab.display_name == "Sever" and _eff_stance(u) != "aggressive":
+		return false
+	if ab.special == "battle_poise" and _eff_stance(u) != "defensive":
+		return false
+	# RECKLESS ABANDON SPENDS ALL HIS RAGE and pays per FULL step of 10, so
+	# anything under a step buys exactly zero — BO §5's rule, and the reason
+	# Reprisal and Transference are gated.
+	#
+	# **THE GATE IS ONE STEP, NOT ZERO, AND THAT IS A DELIBERATE WIDENING OF
+	# §6's LETTER — REPORTED.** §6 names the zero case; a live smoke found a
+	# Swordmaster casting it on 5 Rage and spending a turn and a 4-turn cooldown
+	# to buy +0%, which is the same dud one point along. BO §5 says a gate
+	# refuses a cast that could only ever do nothing, and at 1-9 Rage it can only
+	# ever do nothing. THE RESOLUTION IS STILL SAFE BELOW A STEP (it applies no
+	# status and says so in the log), because the gate and the arithmetic are two
+	# different promises; test_batch_bw drives both.
+	if ab.special == "reckless_abandon" and u.resource < RECKLESS_STEP:
+		return false
 	# Primal Surge needs a beast with Loyalty to spend.
 	if ab.special == "primal_surge":
 		if not _beasts(u).any(func(b): \
@@ -5499,7 +5576,22 @@ func _cleansable_debuffs(u: BattleUnit) -> Array:
 # WIND-UP IS WHAT A BREAK IS FOR (Batch V), and handing that to a 15-Mana
 # utility card would quietly delete the Ash Hurler's whole lesson.
 const DISPEL_NEVER := ["covenant", "quarry", "snare_line", "feinted",
-	"hunt_mark", "ruin_primed", "charging", "spec_passive"]
+	"hunt_mark", "ruin_primed", "charging", "spec_passive",
+	# BATCH BW — `blood_debt` and `vendetta` are the party's OWN MARKS, laid on
+	# an enemy, and this list is what stops a Mage's Dispel stripping them FOR
+	# that enemy. They are deliberately NOT in `DEBUFF_IDS` (they are marks, and
+	# a battle-long entry there reads as 999 turns remaining, so a mender's
+	# longest-first Cleansing Rite would take them every single time — `feinted`'s
+	# reason) — and `_dispellable_buffs` is DERIVED from exactly that absence, so
+	# leaving them out of both lists would have made them beneficial statuses in
+	# the eyes of the one ability that strips those. BU named this trap through
+	# the Suffering door; this is it arriving through the mark door.
+	#
+	# VENDETTA'S TAUNT HALF IS A SEPARATE `mocked` STATUS AND IS DELIBERATELY
+	# STILL CLEANSABLE, because `mocked` has always been — that is the same
+	# exposure The Whole Room's permanent taunt already carries, and inventing a
+	# carve-out for one card would make two permanent taunts behave differently.
+	"blood_debt", "vendetta"]
 
 
 func _dispellable_buffs(u: BattleUnit) -> Array:
@@ -5986,6 +6078,39 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if ab.display_name == "Razor Ice" and attacker.splinter_ranks > 0:
 			total_hits += 1
 			_log("Talent: Splintering Shards — Razor Ice splinters again!", "#b0a8e0")
+		# BATCH BW — BERSERK. EACH BANKED STRIKE LANDS TWICE, AND PER BR §1 THE
+		# CHARGES COUNT **HITS, NOT CASTS** — so a three-hit Hack and Slash spends
+		# all three in one cast and lands six, which is what makes the card very
+		# large in a multi-hit kit and is stated on the card for that reason.
+		#
+		# IT IS DONE BY EXPANDING THE HIT COUNT rather than by re-entering the
+		# strike body, so every doubled blow is an ORDINARY blow: it rolls its
+		# own crit, its own miss, its own parry, and it carries his bleed
+		# buildup — which is what feeds Gut Rip and Blood Debt.
+		#
+		# THE `strike_targets` EXPANSION IS THE PART THAT LOOKS OPTIONAL AND IS
+		# NOT. The loop below reads `strike_targets[hit_i]` on the area / chosen-
+		# pair branches, so raising `total_hits` without growing the list runs
+		# the doubled strikes straight off its end. `multi_hits` and
+		# `random_hits` re-pick their own target every iteration and need no
+		# expansion, which is why the expansion is gated to the other branch.
+		if attacker.berserk_strikes > 0 and not is_counter and ab.damage > 0:
+			var bk_doubled: int = mini(total_hits, attacker.berserk_strikes)
+			if bk_doubled > 0:
+				attacker.berserk_strikes -= bk_doubled
+				_stamp_berserk_chip(attacker)
+				if ab.random_hits == 0 and ab.multi_hits == 0:
+					var bk_expanded: Array = []
+					for bk_i in strike_targets.size():
+						bk_expanded.append(strike_targets[bk_i])
+						if bk_i < bk_doubled:
+							bk_expanded.append(strike_targets[bk_i])
+					strike_targets = bk_expanded
+				total_hits += bk_doubled
+				_log("Berserk: %d strike%s land%s TWICE (%d left)" % [
+					bk_doubled, "" if bk_doubled == 1 else "s",
+					"s" if bk_doubled == 1 else "", attacker.berserk_strikes],
+					"#e05050")
 		# BATCH BV — CALIBRATING SHOT reads MISSING HEALTH BEFORE ITS OWN SHOT,
 		# and that snapshot is the whole reason the number is taken here rather
 		# than beside the other Sharpshooter riders below the loop. By the time
@@ -6248,6 +6373,41 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						attacker.float_text("+%d BD" % bg_bd, Color(0.8, 0.5, 1.0))
 						_log("   → Talent: Bruising Guard — the block deals %d Break damage to %s" % [
 							bg_bd, attacker.unit_name], "#b0a8e0")
+					# BATCH BW — AEGIS WALL. **IT PAYS ON A BLOCK, NOT ON A HIT
+					# TAKEN**, and that is the clause that could silently be
+					# built wrong: this branch is only reached when the attack
+					# was NEGATED, so a blow that got through pays nothing.
+					# Sitting inside the block branch is what makes that true
+					# rather than a condition anybody has to remember.
+					#
+					# **IT READS `max_hp` LIVE**, so Heavy Plating's climb and
+					# every +15 Tenacity has added while the wall stands feed a
+					# wall raised turns earlier — Covering Guard's own rule.
+					# The Unkillable runaway two blocks below is the reason to
+					# say this out loud AND the reason it is safe here: that one
+					# was a permanent self-heal that made him unkillable, so
+					# blocks accumulated without end; this is a 3-turn window on
+					# a 5-turn cooldown that heals the PARTY.
+					#
+					# It fires off ANY block he makes, whatever the source —
+					# Interpose's guaranteed charges included — because the card
+					# says "every attack you block" and a source test would make
+					# Interpose and Aegis Wall quietly refuse to combine.
+					if strike_target.has_status("aegis_wall"):
+						var aw_heal := maxi(int(round(
+							strike_target.max_hp * AEGIS_WALL_PCT)), 1)
+						var aw_n := 0
+						for aw_h in heroes:
+							if aw_h.dead:
+								continue
+							aw_h.heal_amount(aw_heal)
+							_stat_heal(strike_target, aw_heal, aw_h)
+							aw_h.float_text("+%d" % aw_heal, Color(0.7, 0.85, 0.95))
+							aw_n += 1
+						_log("   → Aegis Wall: the block mends %d %s for %d each (%d%% of his %d maximum)" % [
+							aw_n, "ally" if aw_n == 1 else "allies", aw_heal,
+							int(round(AEGIS_WALL_PCT * 100.0)),
+							strike_target.max_hp], "#8c9cc8")
 					# Tenacity / Rally feed on Heavy Plating blocks alone.
 					if block_source == "Heavy Plating":
 						if strike_target.tenacity > 0:
@@ -6368,6 +6528,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# High Guard: a parry hardens the stance for a turn.
 				if strike_target.high_guard > 0:
 					_apply_status(strike_target, "high_guard", 3)
+				# BATCH BW — BATTLE POISE. **PER PARRY, NOT PER TURN**, which is
+				# what makes the Poise lane feed the other two: Riposte,
+				# Deflection and Waiting Guard all raise how often he turns a
+				# blade, and every one of those turns is now a turn off every
+				# cooldown he holds.
+				#
+				# IT GOES THROUGH `_tick_cooldowns` — BQ's ONE implementation of
+				# cooldown reduction, extracted from four hand-written copies —
+				# rather than walking the dictionary a fifth time. The card is
+				# SKIPPED from its own reduction the way Follow-Through skips
+				# its ability: a defensive window that shortens its own recast
+				# is a different (and unbounded) card.
+				if strike_target.has_status("battle_poise"):
+					var bp_n := _tick_cooldowns(strike_target, BATTLE_POISE_TICK,
+						"Battle Poise")
+					if bp_n > 0:
+						_log("   → Battle Poise: the parry takes a turn off %d cooldown%s" % [
+							bp_n, "" if bp_n == 1 else "s"], "#7cc8f0")
 			# Pommel Strike carries its own keen 25% crit base.
 			var crit_chance := (0.25 if ab.display_name == "Pommel Strike" else CRIT_CHANCE) \
 				+ (0.25 if strike_target.broken else 0.0)
@@ -6873,6 +7051,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# card compose additively rather than one silently winning.
 			if attacker.has_status("warcry"):
 				raw *= 1.0 + attacker.status_power("warcry") / 100.0
+			# BATCH BW — RECKLESS ABANDON RIDES THE SAME READ, two lines below
+			# the two cards it is priced against. THE THIRD USER of the one
+			# implementation of "this unit deals N% more damage" — the power is
+			# fixed at the cast (it is a record of Rage actually SPENT, not a
+			# live read of a bar he has since refilled), so it belongs here
+			# rather than anywhere that recomputes.
+			if attacker.has_status("reckless_abandon"):
+				raw *= 1.0 + attacker.status_power("reckless_abandon") / 100.0
 			# Blood Price: strength bought with his own blood.
 			if attacker.has_status("blood_price"):
 				raw *= 1.25
@@ -7260,6 +7446,31 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				raw *= 1.0 + dtb
 				if raw < dtb_was and strike_target.is_hero:
 					_prev(strike_target, dtb_was - raw)
+			# BATCH BW — BERSERK's half of the trade, beside `dmg_taken_bonus`
+			# because it is the same kind of term, and NOT folded into it for
+			# two reasons. First, `dmg_taken_bonus` is a permanent stat field
+			# talents and runes write and this is a 3-turn status. Second, and
+			# load-bearing: MEASURED RAGE ZEROES `dtb` OUTRIGHT, and that node
+			# cancels RECKLESS FURY specifically — letting it also delete a
+			# drafted card's drawback would delete the card, since the 30% IS
+			# the payoff (it drives him into Blood Frenzy's band). Two effects
+			# sharing one field is how one of them silently stops existing.
+			if strike_target.has_status("berserk_risk"):
+				raw *= 1.0 + strike_target.status_power("berserk_risk") / 100.0
+			# BATCH BW — VENDETTA. The cut is the WARDEN'S and it applies only
+			# to the enemy he swore it on, so it is read off the ATTACKER's mark
+			# rather than off anything on him: the status sits on the enemy,
+			# carries the Warden's name, and pays only when that enemy is the
+			# one swinging. A second Warden's duel therefore cannot shelter the
+			# first, and the same enemy hitting anybody else pays nothing —
+			# which is moot while the taunt holds and correct the moment
+			# something (a Cleansing Rite, a Dispel) takes the taunt off.
+			if attacker.has_status("vendetta") and strike_target.is_hero:
+				var vd_st: Dictionary = attacker.get_status("vendetta")
+				if String(vd_st.get("src_name", "")) == strike_target.unit_name:
+					var vd_was := raw
+					raw *= 1.0 - 0.01 * maxi(attacker.status_power("vendetta"), 0)
+					_prev(strike_target, vd_was - raw)
 			# Seasoned Fighter: the guard decides what gets through — Defensive
 			# turns blows aside (talent-deepened), Aggressive leaves openings.
 			if strike_target.passive_id == "seasoned":
@@ -7838,12 +8049,67 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# UPGRADED (the sm_lunge node landing on a Lunge he already
 			# earned): both wounds, whatever guard he holds.
 			if ab.display_name == "Lunge" and not strike_target.dead:
+				# BATCH BW: `_eff_stance` — Lunge is an ABILITY whose branch reads
+				# the stance, so a Feigned Guard changes which wound it leaves,
+				# exactly as it changes Precision Strike's and Feint's branches.
 				var lunge_hits: Array = ["exposed", "cripple"] \
 					if attacker.lunge_upgraded > 0 \
-					else ["exposed" if attacker.stance == "aggressive" else "cripple"]
+					else ["exposed" if _eff_stance(attacker) == "aggressive" else "cripple"]
 				for lunge_status in lunge_hits:
 					_apply_status(strike_target, lunge_status, 3)
 					_note_debuff_applied(attacker, lunge_status)
+			# BATCH BW — SEVER'S COOLDOWN CLEARS AGAINST A BROKEN TARGET, and it
+			# is an ordinary attack rider for the same reason Blood Debt's mark
+			# below is: it is a 40% strike and a `special` would cost it the
+			# whole attack pipeline.
+			#
+			# `cooldowns.erase` IS THE HOUSE IDIOM for "no cooldown at all" (Hex
+			# of Ruin's perfect uses it), and it is correct rather than setting
+			# 0 — `start_cooldown` writes `cooldown + 1` because the counter
+			# ticks at his next turn start, so a 0 left in the dictionary and an
+			# absent key mean the same thing to `ability_ready` and the erase
+			# says so plainly.
+			#
+			# READ **AFTER** THE BLOW LANDS, which is the whole window: a strike
+			# that BREAKS the target clears its own cooldown, so the card opens
+			# the window and then swings through it. The check is on `broken`
+			# alone — Exposed, Crippled and the rest are not the Break window and
+			# widening it here would make the Breaker lane's own clause generic.
+			if ab.display_name == "Sever" and strike_target.broken:
+				attacker.cooldowns.erase(ab.display_name)
+				_log("   → Sever: %s is BROKEN, so the cut costs him no cooldown" % \
+					strike_target.unit_name, "#7cc8f0")
+			# BATCH BW — BLOOD DEBT lays its mark here rather than through a
+			# `special`, for the BT Arcane Bolt reason: it is an ORDINARY 30%
+			# strike and sending it down `_resolve_special` would hand-roll the
+			# blow and lose the crit, the armor read, the Break, the parry roll
+			# and every talent rider that reads a strike.
+			#
+			# BATTLE-LONG (-1 turns) AND **NOT** IN `DEBUFF_IDS` — it is a MARK,
+			# and `feinted`/`quarry`/`covenant` are there for the same reason: a
+			# battle-long entry in that list reads as 999 turns remaining, so a
+			# mender's longest-first Cleansing Rite would take it EVERY time.
+			#
+			# The mark carries the Berserker so a second one cannot collect on
+			# the first's debt, and it is applied on a LANDED hit — a missed or
+			# blocked Blood Debt marks nothing, which is the ordinary rule for
+			# every on-hit rider in this block.
+			#
+			# THE SHARE RIDES THE STATUS'S POWER AS PERCENTAGE **POINTS** (25, or
+			# 35 on a perfect) — Eye of the Storm's idiom, and it is what lets
+			# the bleedout site read one number instead of re-deriving whether
+			# the cast that laid the mark was perfect turns ago.
+			if ab.display_name == "Blood Debt" and not strike_target.dead \
+					and not strike_target.is_hero:
+				var bd_pct := int(round(100.0 * (BLOOD_DEBT_PERFECT_HEAL \
+					if is_perfect else BLOOD_DEBT_HEAL)))
+				_apply_status(strike_target, "blood_debt", -1, bd_pct, 0, attacker)
+				strike_target.update_status("blood_debt", "BD!",
+					"Blood Debt: every time this enemy BLEEDS\nOUT, %s heals %d%% of his maximum\nhealth. The mark SURVIVES the bleedout,\nso a re-opened wound pays again." % [
+						attacker.unit_name, bd_pct], bd_pct)
+				_log("   → Blood Debt: the debt is named on %s — every bleedout pays %s %d%% of maximum health%s" % [
+					strike_target.unit_name, attacker.unit_name, bd_pct,
+					" [PERFECT]" if is_perfect else ""], "#e05050")
 			# Crushing Blow (Warden talents): resist shred + BD splash.
 			if ab.display_name == "Crushing Blow" and not strike_target.dead \
 					and attacker.elem_weak_ranks > 0:
@@ -10596,6 +10862,30 @@ func _living_devout() -> BattleUnit:
 # BEYOND the pivot — its Break damage, Sunder Guard, No Quarter, the parry
 # perfect — stays on Guard Change, because those are on its card and on no
 # other.
+# BATCH BW — THE STANCE AN ABILITY RESOLVES FROM, WHICH IS NOT ALWAYS THE
+# STANCE HE IS STANDING IN.
+#
+# FEIGNED GUARD IS THE ONLY THING THAT MAKES THE TWO DIFFER: for 2 turns his
+# ABILITIES resolve as though cast from the other stance and SATISFY THAT
+# STANCE'S GATE, while he keeps the guard he is actually holding.
+#
+# **THE SCOPE IS ABILITIES AND NOTHING ELSE, AND THAT IS THE DESIGN RATHER THAN
+# A CONVENIENCE.** Seasoned Fighter (the passive), Killing Edge, Bracing and
+# Untouchable all keep reading `u.stance` directly — so an Aggressive build
+# under a Feigned Guard gets Battle Poise AND Precision Strike's Defensive
+# branch WHILE KEEPING AGGRESSIVE'S DAMAGE BONUS THE WHOLE TIME, which is the
+# synergy the card is sold on. Widening this helper to the passive would delete
+# that, and it would do it silently.
+#
+# FOUR CALLERS, all of them abilities: `_ability_usable`'s two gates (Sever,
+# Battle Poise), the `precision_strike` and `feint` branches, and Lunge's
+# stance-keyed wound.
+func _eff_stance(u: BattleUnit) -> String:
+	if u.has_status("feigned_guard"):
+		return "defensive" if u.stance == "aggressive" else "aggressive"
+	return u.stance
+
+
 func _swordmaster_switch(u: BattleUnit) -> void:
 	u.stance = "defensive" if u.stance == "aggressive" else "aggressive"
 	var sw_label := "Aggressive" if u.stance == "aggressive" else "Defensive"
@@ -10627,6 +10917,25 @@ func _stamp_feint_chip(u: BattleUnit) -> void:
 		var fi: Array = STATUS_INFO["feint_guard"]
 		u.add_status("feint_guard", fi[0], "Fg%d" % u.feint_guards, fi[2], -1,
 			fg_desc, u.feint_guards)
+
+
+# BATCH BW — BERSERK's doubled strikes, rendered. Same rule as every other bank
+# in the file (Feint's above, Mirror Image's, Arcane Arrows'): the COUNT is the
+# status's power and this is the ONE place it is written, so the chip and the
+# spend site cannot disagree about how many are left. BATTLE-LONG (-1 turns) is
+# what makes "they wait until spent" true rather than a second, unadvertised
+# clock — and it is the half of the card that is NOT the 3-turn `berserk_risk`.
+func _stamp_berserk_chip(u: BattleUnit) -> void:
+	if u.berserk_strikes <= 0:
+		u.remove_status("berserk")
+		return
+	var bk_desc := "Berserk: %d strike(s) banked. Each one\nlands TWICE. They count HITS, not casts,\nso a multi-hit blow spends one a strike —\nand they wait until they are spent." % \
+		u.berserk_strikes
+	if not u.update_status("berserk", "Bk%d" % u.berserk_strikes, bk_desc,
+			u.berserk_strikes):
+		var bi: Array = STATUS_INFO["berserk"]
+		u.add_status("berserk", bi[0], "Bk%d" % u.berserk_strikes, bi[2], -1,
+			bk_desc, u.berserk_strikes)
 
 
 # THE ONE ANSWER TO "what is this unit's Block chance right now", and the whole
@@ -12426,6 +12735,80 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						_message("%s falls!" % target.unit_name)
 						_log("† %s dies" % target.unit_name, "#e05050")
 						_on_enemy_death(target)
+		# ============ BATCH BW — THE WARRIOR NINE, TRANCHE 2 ============
+		"reckless_abandon":
+			# AXIS: the dump. Rage is a resource he accumulates and spends in
+			# 20-to-35 point sips; nothing in the kit ever asked what a FULL BAR
+			# is worth all at once. At 100 Rage this is +20% for three turns and
+			# it costs him every ability he might have cast in that window.
+			#
+			# IT SCALES OFF WHAT WAS **ACTUALLY SPENT**, not off his maximum, and
+			# that is the whole card: the number is read from the bar BEFORE it
+			# is emptied, so a half-full Berserker buys half the buff and pays
+			# half the price. A version reading `max_resource` would be a flat
+			# +20% that costs nothing to time, which is a different (and worse)
+			# ability wearing this one's text.
+			#
+			# THE BUFF RIDES BATTLE SHOUT'S OWN READ SITE, so there is ONE
+			# implementation of "this unit deals N% more damage" (Warcry's rule
+			# from BR, one card along) and the chip and the arithmetic cannot
+			# disagree.
+			var ra_spent: int = attacker.resource
+			var ra_step := RECKLESS_PERFECT_PER_10 if is_perfect \
+				else RECKLESS_PCT_PER_10
+			var ra_pct := (ra_spent / RECKLESS_STEP) * ra_step
+			var ra_turns := 3
+			attacker.resource = 0
+			attacker.refresh_bars()
+			if ra_pct > 0:
+				_apply_status(attacker, "reckless_abandon", ra_turns, ra_pct)
+				attacker.update_status("reckless_abandon", "+%d%%" % ra_pct,
+					"Reckless Abandon: +%d%% damage for %d turns —\n%d Rage was spent to buy it, at %d%%\nper 10. There is nothing left to cast." % [
+						ra_pct, ra_turns, ra_spent, ra_step], ra_pct)
+			_sfx("crit", -7.0, 0.7)
+			attacker.float_text("-%d %s" % [ra_spent, attacker.resource_name],
+				Color(1.0, 0.5, 0.4))
+			_message("%s throws everything at it!" % attacker.unit_name)
+			# THE LOG NAMES THE CASTER'S OWN RESOURCE AND ONLY ADVERTISES A
+			# WINDOW IT ACTUALLY OPENED. Both halves were found by watching a
+			# smoke run, and both teach a player the wrong rule: a hardcoded
+			# "Rage" is BU's Fortified Spirit line through the same door, and
+			# "5 Rage spent for +0% damage over 3 turns" announces a buff that
+			# was never applied.
+			if ra_pct > 0:
+				_log("%s: Reckless Abandon — %d %s spent for +%d%% damage over %d turns%s" % [
+					attacker.unit_name, ra_spent, attacker.resource_name, ra_pct,
+					ra_turns, " [PERFECT]" if is_perfect else ""], "#e05050")
+			else:
+				_log("%s: Reckless Abandon — %d %s spent, which is not a full %d and buys NOTHING" % [
+					attacker.unit_name, ra_spent, attacker.resource_name,
+					RECKLESS_STEP], "#909090")
+		"berserk":
+			# AXIS: the risk dial at maximum, and THE DRAWBACK IS THE PAYOFF —
+			# Blood Frenzy scales his damage with missing health, so taking 30%
+			# more drives him into his own power band. It is the only card in the
+			# game whose downside feeds the passive of the hero holding it.
+			#
+			# TWO DIFFERENT CLOCKS, AND THEY ARE TWO DIFFERENT MECHANISMS ON
+			# PURPOSE. The doubled strikes are CHARGES on `berserk_strikes` and
+			# wait until spent; the 30% is an ordinary 3-turn status. Wiring the
+			# strikes to a turn count instead would tick them away unspent on a
+			# turn he could not reach anybody, which is exactly the failure
+			# Feint's charges exist to avoid.
+			var bk_charges := (BERSERK_STRIKES + 1) if is_perfect \
+				else BERSERK_STRIKES
+			attacker.berserk_strikes += bk_charges
+			_stamp_berserk_chip(attacker)
+			_apply_status(attacker, "berserk_risk", 3, BERSERK_RISK_PCT)
+			attacker.update_status("berserk_risk", "+%d%%" % BERSERK_RISK_PCT,
+				"Berserk: he takes %d%% MORE damage for\n3 turns. Blood Frenzy pays for missing\nhealth, so this is the way into his own\npower band." % BERSERK_RISK_PCT,
+				BERSERK_RISK_PCT)
+			_sfx("crit", -5.0, 0.7)
+			attacker.float_text("BERSERK", Color(0.90, 0.25, 0.25), true)
+			_message("%s lets it take him!" % attacker.unit_name)
+			_log("%s: Berserk — his next %d STRIKES land twice (they wait until spent), and he takes %d%% more damage for 3 turns%s" % [
+				attacker.unit_name, attacker.berserk_strikes, BERSERK_RISK_PCT,
+				" [PERFECT]" if is_perfect else ""], "#e05050")
 		"precision_strike":
 			# AXIS: the same blade, two intentions — and THE BRANCH BUYS WHAT THE
 			# STANCE HE IS ARRIVING IN WANTS. Cast from Aggressive he lands in
@@ -12436,7 +12819,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# FIRST AND SWITCHED LAST, below, so the branch and the arrival can
 			# never disagree.
 			if target != null and not target.dead:
-				var ps_aggressive := attacker.stance == "aggressive"
+				# BATCH BW: `_eff_stance`, not `stance` — a Feigned Guard makes
+				# his ABILITIES resolve from the other guard. The switch below
+				# still moves his REAL stance, so a reader still flips.
+				var ps_aggressive := _eff_stance(attacker) == "aggressive"
 				var ps_turns := 4 if is_perfect else 3
 				var ps_hits := 2 if ps_aggressive else 1
 				var ps_pct := PRECISION_AGGRO_PCT if ps_aggressive \
@@ -12498,7 +12884,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# Aggressive (leaving for Defensive) buys the redirect he will want
 			# while turtling; Defensive (leaving for Aggressive) buys charges
 			# that answer the blows he is about to invite.
-			var ft_aggressive := attacker.stance == "aggressive"
+			# BATCH BW: `_eff_stance` for the same reason Precision Strike's
+			# branch reads it — the ability resolves from the feigned guard, the
+			# switch below still moves the real one.
+			var ft_aggressive := _eff_stance(attacker) == "aggressive"
 			if ft_aggressive:
 				if target != null and not target.dead:
 					var ft_pct := 45 if is_perfect else FEINT_STRIKE_PCT
@@ -12548,6 +12937,50 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("   → Feint: the guard changes — he comes up %s" % (
 				"Aggressive" if attacker.stance == "aggressive" else "Defensive"),
 				"#7cc8f0")
+		"battle_poise":
+			# AXIS: defence buys tempo. He is the only parry-STAT hero in the
+			# game — 12% base plus Sword Mastery and High Guard — and every
+			# point of it currently just makes hits smaller. THIS IS THE
+			# CONNECTION HIS THREE LANES HAVE NEVER HAD: Poise feeding Blade and
+			# Breaker.
+			#
+			# The card carries no number of its own beyond its duration; the
+			# work happens at the PARRY ROLL, where Riposte, Deflection and
+			# Waiting Guard all decide how often it fires.
+			var bp_turns := 4 if is_perfect else 3
+			_apply_status(attacker, "battle_poise", bp_turns)
+			_sfx("parry", -7.0, 0.9)
+			attacker.float_text("BATTLE POISE", Color(0.45, 0.88, 1.0))
+			_message("%s settles into the guard" % attacker.unit_name)
+			_log("%s: Battle Poise — for %d turns every attack he PARRIES takes a turn off all his cooldowns%s" % [
+				attacker.unit_name, bp_turns,
+				" [PERFECT]" if is_perfect else ""], "#7cc8f0")
+		"feigned_guard":
+			# AXIS: the only card in the game that lets a build have BOTH HALVES
+			# of its own toggle.
+			#
+			# **IT DOES NOT SWITCH THE STANCE AND MUST NOT BE BUILT TO** — there
+			# is deliberately no `_swordmaster_switch` call in this branch, and
+			# its absence is the whole distinction between a READER (branch and
+			# flip) and a GATED card (require and stay). A future author adding
+			# the switch here "for consistency with the other two stance cards"
+			# would delete the ability.
+			#
+			# The gate-satisfying half is not written here at all: it lives in
+			# `_eff_stance`, which `_ability_usable` reads. That is the site that
+			# makes the card true, and it is a different site from this one.
+			var fg_turns := 3 if is_perfect else 2
+			_apply_status(attacker, "feigned_guard", fg_turns)
+			var fg_shown := "Defensive" if attacker.stance == "aggressive" \
+				else "Aggressive"
+			var fg_real := "Aggressive" if attacker.stance == "aggressive" \
+				else "Defensive"
+			_sfx("parry", -7.0, 1.1)
+			attacker.float_text("FEIGNED GUARD", Color(0.60, 0.80, 1.0))
+			_message("%s shows them the wrong guard" % attacker.unit_name)
+			_log("%s: Feigned Guard — for %d turns his abilities resolve as %s (and satisfy its requirement) while he still stands %s%s" % [
+				attacker.unit_name, fg_turns, fg_shown, fg_real,
+				" [PERFECT]" if is_perfect else ""], "#7cc8f0")
 		"covering_guard":
 			# AXIS: his stat protecting someone else. THIS IS NOT REDIRECTION —
 			# nothing moves to him, the attack simply STOPS, which is what Block
@@ -12609,6 +13042,109 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, es_n, "enemy" if es_n == 1 else "enemies",
 				es_turns, es_n * EYE_STORM_CUT_PCT,
 				" [PERFECT]" if is_perfect else ""], "#c8a0e0")
+		"shield_slam":
+			# AXIS: his bulk as a weapon. BP left him with two DEFENSIVE cards
+			# and no offense at all; this is offense made out of the stat his
+			# whole Plate lane already stacks.
+			#
+			# **IT READS `max_hp` LIVE, AT THE MOMENT OF THE CAST.** Heavy Plating
+			# grows that maximum every time he blocks (Tenacity, +15 a block), so
+			# a snapshot taken anywhere earlier would make the Plate lane
+			# silently stop feeding the card — the class of bug that fails no
+			# test and reads as the ability merely being weak.
+			#
+			# The damage is dealt DIRECTLY rather than through the attack
+			# pipeline because it is not a percentage of Attack: routing a
+			# health-scaled blow through `raw` would multiply it by every
+			# Attack-side term in the game. Armor still applies, and the Break
+			# rides `ab.pressure` so it books through the ordinary ledger.
+			if target != null and not target.dead:
+				var ss_pct := SHIELD_SLAM_PERFECT_PCT if is_perfect \
+					else SHIELD_SLAM_PCT
+				var ss_raw := attacker.max_hp * ss_pct * mult \
+					* randf_range(0.9, 1.1)
+				var ss_final := maxi(int(round(ss_raw
+					* (1.0 - target.effective_armor()))), 1)
+				var ss_res: Dictionary = target.take_hit(ss_final, ab.pressure)
+				_stat("dmg_hero_" + attacker.unit_name, ss_final)
+				_stat_bd(attacker, ab.pressure)
+				target.float_text("%d" % ss_final, Color(0.75, 0.82, 0.95))
+				_sfx("break", -5.0, 0.8)
+				_message("%s puts the shield through them!" % attacker.unit_name)
+				_log("%s: Shield Slam — %d damage (%d%% of his %d maximum health) and %d BD%s" % [
+					attacker.unit_name, ss_final, int(round(ss_pct * 100.0)),
+					attacker.max_hp, ab.pressure,
+					" [PERFECT]" if is_perfect else ""], "#8c9cc8")
+				if ss_res["broke"]:
+					_stat("breaks_on_enemies")
+					_sfx("break", -3.0)
+					_message("%s BREAKS!" % target.unit_name)
+					_log("!! %s BREAKS" % target.unit_name, "#c070e0")
+					await _break_impact()
+				if ss_res.died:
+					_stat("enemy_deaths")
+					_sfx("death", -4.0)
+					_message("%s falls!" % target.unit_name)
+					_log("† %s dies" % target.unit_name, "#e05050")
+					_on_enemy_death(target)
+		"vendetta":
+			# AXIS: a permanent duel. Eye of the Storm taunts EVERYTHING for two
+			# turns; this locks ONE thing forever, which is the opposite trade.
+			#
+			# **IT REUSES THE TAUNT SYSTEM AND WRITES NO PARALLEL ONE.** The lock
+			# is an ordinary `mocked` status at -1 turns — exactly the shape The
+			# Whole Room (Threat row 8) already installs — so `_choose_enemy_action`
+			# narrows the enemy's target list with the code it has always used,
+			# and Grudge the TALENT (+25% against a target his taunt binds) pays
+			# on it for free.
+			#
+			# **THE LOCK RELEASES IF THE WARDEN FALLS, AND IT DOES SO FOR FREE
+			# RATHER THAN BY A CLAUSE HERE**: that narrowing re-resolves the
+			# taunter live and ignores a dead one, so a fallen Warden stops
+			# holding anything the instant he drops. A release written into this
+			# branch would be a second answer to the same question.
+			if target != null and not target.dead and not target.is_hero:
+				var vd_idx := heroes.find(attacker)
+				if vd_idx >= 0:
+					var vd_cut := VENDETTA_PERFECT_CUT if is_perfect \
+						else VENDETTA_CUT
+					var vd_pct := int(round(vd_cut * 100.0))
+					_apply_status(target, "mocked", -1, vd_idx, 0, attacker)
+					_note_debuff_applied(attacker, "mocked")
+					_apply_status(target, "vendetta", -1, vd_pct, 0, attacker)
+					target.update_status("vendetta", "-%d%%" % vd_pct,
+						"Vendetta: sworn to %s. It can attack\nnobody else for the rest of the battle,\nand he takes %d%% less damage from it." % [
+							attacker.unit_name, vd_pct], vd_pct)
+					_sfx("break", -7.0, 0.6)
+					target.float_text("VENDETTA", Color(0.90, 0.45, 0.35))
+					_message("%s makes it personal" % attacker.unit_name)
+					_log("%s: Vendetta — %s can attack nobody but him for the rest of the battle, and he takes %d%% less from it%s" % [
+						attacker.unit_name, target.unit_name, vd_pct,
+						" [PERFECT]" if is_perfect else ""], "#e08850")
+		"aegis_wall":
+			# AXIS: his signature stat feeds the party. BLOCK NEGATES AN ATTACK
+			# ENTIRELY AND PAYS HIM NOTHING BEYOND THAT — this is the first thing
+			# in the game that makes a block worth something to anyone else.
+			#
+			# The status carries only the duration; the SHARE and the maximum it
+			# reads are both resolved at the BLOCK, so Heavy Plating's climb and
+			# every point of maximum health Tenacity adds while the wall stands
+			# feed a wall raised turns earlier. Covering Guard's rule, applied to
+			# the other half of the same roll.
+			var aw_turns := 4 if is_perfect else 3
+			_apply_status(attacker, "aegis_wall", aw_turns)
+			attacker.update_status("aegis_wall", "AW",
+				"Aegis Wall: every attack he BLOCKS heals\nthe whole party for %d%% of his maximum\nhealth (%d right now). A blow that gets\nTHROUGH pays nothing — only a block." % [
+					int(round(AEGIS_WALL_PCT * 100.0)),
+					maxi(int(round(attacker.max_hp * AEGIS_WALL_PCT)), 1)])
+			_sfx("parry", -7.0, 0.6)
+			attacker.float_text("AEGIS WALL", Color(0.70, 0.85, 0.95), true)
+			_message("%s raises the wall for everyone" % attacker.unit_name)
+			_log("%s: Aegis Wall — for %d turns every attack he BLOCKS heals all allies %d%% of his maximum health (%d right now)%s" % [
+				attacker.unit_name, aw_turns,
+				int(round(AEGIS_WALL_PCT * 100.0)),
+				maxi(int(round(attacker.max_hp * AEGIS_WALL_PCT)), 1),
+				" [PERFECT]" if is_perfect else ""], "#8c9cc8")
 		# ============ BATCH BQ: THE CLASS-WIDE TWELVE ============
 		# TEN OF THE TWELVE RESOLVE HERE. Magic Missiles and Chastise are
 		# ordinary attacks and need no case at all — which is the point of a
@@ -15899,6 +16435,41 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 			# BJ §3a: an enemy BLEEDING OUT is the Berserker's signature
 			# moment (banked only when one stands — the _sig slice rule).
 			_sig("bloodrage")
+			# BATCH BW — BLOOD DEBT COLLECTS, and it sits beside Bloodcraze
+			# because it is the marked version of the same idea at much larger
+			# scale (holding both is a real sustain build).
+			#
+			# **THE MARK IS NOT REMOVED.** That is the whole card and it is the
+			# clause most likely to be built as one-shot by accident:
+			# SLAUGHTERHOUSE re-seeds this meter to 50 rather than 0 a few lines
+			# above, so the SAME enemy bleeds out repeatedly and one mark pays
+			# three or four times. A `remove_status` here would leave the card
+			# working, logging, and quietly worth a quarter of what it says.
+			#
+			# It reads the mark's stamped `src_name` so a second Berserker
+			# cannot collect on the first's debt, and it is resolved LIVE
+			# against the living party — a dead Berserker collects nothing.
+			if victim.has_status("blood_debt"):
+				var debt_st: Dictionary = victim.get_status("blood_debt")
+				var debt_owner := String(debt_st.get("src_name", ""))
+				for creditor in heroes:
+					if creditor.dead or creditor.unit_name != debt_owner:
+						continue
+					var debt_pct: int = maxi(victim.status_power("blood_debt"), 0)
+					var debt_heal := maxi(int(round(
+						creditor.max_hp * 0.01 * debt_pct)), 1)
+					creditor.heal_amount(debt_heal)
+					# BOOKED THROUGH `_stat_heal`, BC's ONE credit door, because
+					# this is an ABILITY's output and abilities are credited.
+					# Bloodcraze directly below does NOT book, and that is a
+					# pre-existing TALENT-instrumentation gap rather than a
+					# precedent to copy — matching it here would make a drafted
+					# card invisible to every contribution row in the project.
+					_stat_heal(creditor, debt_heal, creditor)
+					creditor.float_text("+%d Blood Debt" % debt_heal,
+						Color(0.85, 0.2, 0.3))
+					_log("   → Blood Debt: %s collects on the mark (+%d HP, %d%% of maximum)" % [
+						creditor.unit_name, debt_heal, debt_pct], "#e05050")
 			for feaster in heroes:
 				if not feaster.dead and feaster.bloodcraze > 0:
 					var craze := maxi(int(feaster.max_hp * 0.12 * feaster.bloodcraze), 1)

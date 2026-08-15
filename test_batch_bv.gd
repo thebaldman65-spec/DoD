@@ -182,22 +182,26 @@ func _pools() -> void:
 	for spec in five:
 		var pool: Array = Classes.spec_draft_pool(spec)
 		ok(pool.size() == 5, "%s drafts FIVE (got %d)" % [spec, pool.size()])
+	# RE-POINTED BY BATCH BW, AND IT IS AN INVERSION: this asserted the WARRIOR
+	# three were still at TWO because that debt was real and had to stay visible
+	# in code. BW paid it, so tranche 2 is complete and what is asserted is that
+	# ALL TWELVE are five. A pool quietly emptying still trips.
 	var still_two := ["berserker", "warden", "swordmaster"]
 	for spec in still_two:
-		ok(Classes.spec_draft_pool(spec).size() == 2,
-			"%s is still TWO deep — the WARRIOR third of tranche 2 owes it (got %d)"
+		ok(Classes.spec_draft_pool(spec).size() == 5,
+			"%s drafts FIVE since Batch BW — the WARRIOR third is PAID (got %d)"
 				% [spec, Classes.spec_draft_pool(spec).size()])
 	# And nothing else exists: twelve specs, nine at five and three at two.
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12, "there are twelve spec pools")
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 51, "the spec pools hold 51 (42 + this tranche's 9), got %d" % total)
+	ok(total == 60, "the spec pools hold 60 (51 + BW's Warrior nine), got %d" % total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 75,
-		"the whole draft is 75 of a target ~96 (got %d)" % draft_total)
+	ok(draft_total == 84,
+		"the whole draft is 84 of a target ~96 (got %d)" % draft_total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH HUNTER POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -577,10 +581,10 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch BV"), "master.html is stamped Batch BV")
+	ok(master.contains("Batch BW"), "master.html is stamped Batch BW")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("75 of"), "master.html states the new draft count")
+	ok(master.contains("84 of"), "master.html states the new draft count")
 	ok(master.contains("Builds with"),
 		"and the draft tables still carry the synergy line a player reads")
 	var chlog := FileAccess.get_file_as_string("res://docs/changelog.html")

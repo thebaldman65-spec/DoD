@@ -117,17 +117,26 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.SPEC_DRAFT_POOLS[spec].size()
-	ok(total == 51,
-		"§5+BT+BU+BV: BO's eighteen, BP's six, BT's nine, BU's nine, BV's nine (got %d)" % total)
+	# RE-POINTED AGAIN BY BATCH BW, WHICH CLOSES THE SERIES: tranche 2 is
+	# complete, so every spec pool holds five and the total is 60.
+	ok(total == 60,
+		"§5+tranche 2: BO's eighteen, BP's six and tranche 2's thirty-six (got %d)" % total)
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12,
 		"§5: all twelve specs are named")
 	for spec2 in Classes.SPEC_DRAFT_POOLS:
 		ok(not Classes.spec_draft_pool(spec2).is_empty(),
 			"§5: EVERY spec has a draft now — %s is not empty" % spec2)
+	# BATCH BW RE-POINTED THIS FROM AN EQUALITY TO A PREFIX, on BO's own
+	# precedent: A LATER TRANCHE APPENDS, IT DOES NOT REWRITE. BP's six are still
+	# pinned as LITERALS and still lead their pools — which is what would catch a
+	# tranche quietly reordering or replacing them — but the pools are five deep
+	# now and an equality would assert the debt is still owed.
 	for w in TRANCHE_2:
 		var live: Array = Classes.spec_draft_pool(w)
-		ok(live == TRANCHE_2[w],
-			"§5: %s's pool is %s (got %s)" % [w, TRANCHE_2[w], live])
+		ok(live.size() >= TRANCHE_2[w].size(),
+			"§5: %s's pool still holds BP's pair and more" % w)
+		ok(live.slice(0, TRANCHE_2[w].size()) == TRANCHE_2[w],
+			"§5: %s's pool still LEADS with %s (got %s)" % [w, TRANCHE_2[w], live])
 	# THE REMAINING DEBT IS PAID. RE-POINTED IN PLACE TWICE AND BOTH RE-POINTS
 	# ARE INVERSIONS: BP asserted all four class pools were empty because none
 	# had been written; BQ wrote the Mage and Cleric six; BATCH BR wrote the
@@ -269,8 +278,12 @@ func _warrior_draft_flow() -> void:
 	var offer: Array = run.roll_draft_offer(m)
 	ok(offer.size() == 3,
 		"§5: a Warrior's offer FILLS THREE now — two spec plus six class (got %d)" % offer.size())
+	# RE-POINTED BY BATCH BW: the literal held BP's PAIR, and a Swordmaster now
+	# drafts from FIVE. The question — is every offered card his own spec's or
+	# his class's — is unchanged, and it is asked against the LIVE pool so it
+	# cannot go stale again.
 	for c in offer:
-		ok(TRANCHE_2["swordmaster"].has(String(c))
+		ok(Classes.spec_draft_pool("swordmaster").has(String(c))
 			or Classes.class_draft_pool("warrior").has(String(c)),
 			"§5: ...and every card is his own spec's or his CLASS's (%s)" % c)
 	ok(run.award_draft_pick(m), "§7: a Warrior can be owed a pick")
@@ -331,11 +344,15 @@ func _warrior_draft_flow() -> void:
 	# SPEC pools. RE-POINTED BY BATCH BR: his CLASS six are legitimately his
 	# now, so the check names what must never appear rather than what may.
 	var m3 := {"key": "warrior", "spec": "warden", "bm_abilities": []}
+	# RE-POINTED AGAIN BY BATCH BW: both halves read the LIVE pools now, so this
+	# check cannot go stale a third time — and the negative half got STRICTER
+	# rather than merely current, because it used to name only BP's two cards per
+	# sibling spec and now names all five.
 	for c3 in run.roll_draft_offer(m3):
-		ok(not TRANCHE_2["berserker"].has(String(c3))
-			and not TRANCHE_2["swordmaster"].has(String(c3)),
+		ok(not Classes.spec_draft_pool("berserker").has(String(c3))
+			and not Classes.spec_draft_pool("swordmaster").has(String(c3)),
 			"§5: a Warden is never offered another Warrior spec's card (%s)" % c3)
-		ok(TRANCHE_2["warden"].has(String(c3))
+		ok(Classes.spec_draft_pool("warden").has(String(c3))
 			or Classes.class_draft_pool("warrior").has(String(c3)),
 			"§5: ...only his own spec's or his class's (%s)" % c3)
 
@@ -901,7 +918,7 @@ func _docs() -> void:
 	# test_batch_bs and test_batch_bu. The count grows by one each time a new
 	# suite checks the stamp, and every one of them is a suite this batch did
 	# not otherwise touch — which is the cost the duplication keeps charging.)
-	ok(master.contains("Batch BV"),
+	ok(master.contains("Batch BW"),
 		"§6: master.html's stamp is bumped to the current batch")
 	ok(changelog.contains("Batch BP"),
 		"§6: the changelog carries a Batch BP entry")

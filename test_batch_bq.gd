@@ -214,11 +214,12 @@ func _pools() -> void:
 	# half of it, so it moves when the spec pools legitimately grow. BT added
 	# nine Mage SPEC cards and no class card at all — `CLASS_DRAFT_POOLS` is
 	# asserted at 24 two lines up, which is the half that must NOT move.
-	# RE-POINTED AGAIN BY BATCH BV on the same argument: BV added nine Hunter
-	# SPEC cards and no class card, so the spec side is 51 and the class side is
-	# still 24 — which is the half that must NOT move.
-	ok(spec_total == 51,
-		"§1: ...at BP's 24 plus BT's, BU's and BV's twenty-seven, with no class card among them (%d)"
+	# RE-POINTED AGAIN BY BATCH BV on the same argument, and AGAIN BY BATCH BW,
+	# which closes it: BW added nine WARRIOR spec cards and no class card, so the
+	# spec side is 60 (twelve specs at five apiece, tranche 2 complete) and the
+	# class side is still 24 — which is the half that must NOT move.
+	ok(spec_total == 60,
+		"§1: ...at BP's 24 plus tranche 2's thirty-six, with no class card among them (%d)"
 			% spec_total)
 
 
@@ -651,7 +652,15 @@ func _live_dispel() -> void:
 	var battle_src := _src("res://scripts/battle.gd")
 	ok(battle_src.contains("const DISPEL_NEVER := [\"covenant\", \"quarry\", \"snare_line\","),
 		"§3: ...and the exclusion list names every mark that would otherwise read as a buff")
-	ok(battle_src.contains("\"hunt_mark\", \"ruin_primed\", \"charging\", \"spec_passive\"]"),
+	# BATCH BW RE-POINTED THIS IN PLACE, and the re-point made it BETTER rather
+	# than merely live again. It asserted the list's LAST FOUR ENTRIES, i.e. it
+	# required `spec_passive` to be the final element — an accident of authoring
+	# order rather than the question. BW appended `blood_debt` and `vendetta`
+	# (the Warden's and the Berserker's marks, which sit on an ENEMY and would
+	# otherwise read as that enemy's buffs), so the tail moved. The question is
+	# unchanged: is `charging` still named, and is the list still the place the
+	# party's marks are protected?
+	ok(battle_src.contains("\"hunt_mark\", \"ruin_primed\", \"charging\", \"spec_passive\""),
 		"§3: ...including `charging`, because cancelling a wind-up is what a BREAK is for")
 	await _drop(scene)
 
@@ -979,7 +988,7 @@ func _docs() -> void:
 	var master := _src("res://docs/master.html")
 	# THE STAMP GATE, SEVENTH COPY (see test_batch_bp's note). It reads the
 	# CURRENT batch, not BQ's, and all seven move together.
-	ok(master.contains("Batch BV"), "§5: master.html is stamped for the current batch")
+	ok(master.contains("Batch BW"), "§5: master.html is stamped for the current batch")
 	for cls in TRANCHE_3:
 		for nm in TRANCHE_3[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)

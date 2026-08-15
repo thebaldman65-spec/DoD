@@ -135,11 +135,11 @@ func _pools() -> void:
 	# the LIVE dict is what catches that either way.
 	# RE-POINTED AGAIN BY BATCH BU on the same argument: the live total is 42
 	# (BO's 18 + BP's Warrior 6 + BT's Mage 9 + BU's Cleric 9).
-	# RE-POINTED AGAIN BY BATCH BV, same argument, last time for tranche 2's
-	# spec half: 51 (BO's 18 + BP's Warrior 6 + BT's Mage 9 + BU's Cleric 9 +
-	# BV's Hunter 9). Only the WARRIOR three are still at two.
-	ok(total == 51,
-		"§5+BP+BT+BU+BV: fifty-one ship — BO's 18, BP's 6, BT's 9, BU's 9, BV's 9 (got %d)"
+	# RE-POINTED AGAIN BY BATCH BV, same argument, and CLOSED BY BATCH BW, which
+	# paid the Warrior third: 60 (BO's 18 + BP's Warrior 6 + tranche 2's 36).
+	# Tranche 2 is complete and every spec pool holds five.
+	ok(total == 60,
+		"§5+BP+tranche 2: sixty ship — BO's 18, BP's 6 and tranche 2's 36 (got %d)"
 			% total)
 	# TRANCHE 1'S ENTRIES MUST STILL LEAD THEIR POOLS, which is the half of this
 	# check that survives BT untouched: a later tranche APPENDS, it does not
@@ -152,20 +152,21 @@ func _pools() -> void:
 		ok(head == TRANCHE_1[spec],
 			"§5: %s's pool still OPENS with tranche 1's %s (got %s)" % [
 				spec, TRANCHE_1[spec], head])
-	# AND THE MAGE THREE ARE THE ONLY ONES THAT GREW (Batch BT). The other nine
-	# are still two deep, so the fill-short rule below still bites where it was
-	# written to bite.
-	for spec in ["pyromancer", "cryomancer", "arcanist",
-			"holy", "inquisitor", "occultist"]:
+	# AND EVERY SPEC POOL IS FIVE DEEP (Batch BW closed tranche 2). This loop
+	# has been re-pointed once per tranche and each re-point was an INVERSION of
+	# the debt the previous one recorded; it names all twelve now, so there is
+	# no list left to extend.
+	for spec in Classes.SPEC_DRAFT_POOLS:
 		ok(Classes.spec_draft_pool(spec).size() == 5,
-			"§5+BT+BU: %s drafts FIVE" % spec)
-	# THE WARRIOR POOLS ARE NAMED **AND FILLED** SINCE BATCH BP (was: named and
-	# empty). One of four heroes in every party had no draft at all until it.
+			"§5+tranche 2: %s drafts FIVE" % spec)
+	# THE WARRIOR POOLS ARE NAMED **AND FULL** — named and empty at BO, filled to
+	# two at BP, and five at BW. One of four heroes in every party had no draft
+	# at all until BP, and had the shallowest one in the game until BW.
 	for w in ["berserker", "warden", "swordmaster"]:
 		ok(Classes.SPEC_DRAFT_POOLS.has(w),
 			"§5: %s's draft pool is NAMED" % w)
-		ok(Classes.spec_draft_pool(w).size() == 2,
-			"BP: ...and FILLED — %s drafts two of its own" % w)
+		ok(Classes.spec_draft_pool(w).size() == 5,
+			"BW: ...and FULL — %s drafts five of its own" % w)
 	# CLASS-WIDE: four keys, ALL FOUR FILLED.
 	# RE-POINTED IN PLACE TWICE, AND BOTH RE-POINTS ARE INVERSIONS — the honest
 	# treatment when a later batch pays a debt an older suite was recording.
@@ -314,17 +315,22 @@ func _offer_and_ratio() -> void:
 	# repeats, and the no-return ledger is what still makes a pool thin.
 	ok(offer.size() == 3,
 		"§3: a Mage's offer fills THREE now — spec plus class (Batch BQ)")
-	# RE-POINTED BY BATCH BV, AND THE REASON IS THE SAME INVERSION AGAIN: this
-	# was built on a SHARPSHOOTER because his spec pool held two, and BV took the
-	# three Hunter pools to FIVE, so that hero now fills a full three and the
-	# check stopped biting. It moves to a BERSERKER — the Warrior three are the
-	# last pools still at two, so this is the only place in the game where the
-	# rule can still be measured against a genuinely thin pool. When tranche 2's
-	# Warrior third lands, this construction has to move again, to a hero who has
-	# REFUSED his way down (BR's version of it) — and that is the honest signal
-	# that the debt is paid rather than a check quietly weakening.
+	# RE-POINTED BY BATCH BW, AND THIS IS THE FORCED MOVE BV PREDICTED IN
+	# WRITING — the honest signal that tranche 2 is paid rather than a check
+	# quietly weakening. The construction has now moved three times for the same
+	# reason each time: it stood on a SHARPSHOOTER until BV filled the Hunter
+	# pools, then on a BERSERKER because the Warrior three were the last at two,
+	# and BW filled those. THERE IS NO THIN POOL LEFT IN THE GAME, so the rule
+	# has to be measured the only way it can still bite — a hero who has REFUSED
+	# his way down (BR's version of it), which is what the no-return ledger is
+	# for. THE RULE WAS NEVER ABOUT WHICH POOL IS THIN: it is about an offer
+	# never padding with repeats, and refusing all six class cards plus three of
+	# his own five leaves exactly two cards in the game he can be shown.
+	var bz_pool: Array = Classes.spec_draft_pool("berserker")
+	var worn: Array = Classes.class_draft_pool("warrior").duplicate()
+	worn.append_array(bz_pool.slice(0, 3))
 	var thin := {"key": "warrior", "spec": "berserker", "bm_abilities": [],
-		"draft_refused": Classes.class_draft_pool("warrior").duplicate()}
+		"draft_refused": worn}
 	var thin_offer: Array = run.roll_draft_offer(thin)
 	ok(thin_offer.size() == 2,
 		"§3: a pool worn down to two still fills SHORT (2 cards, not 3) — never padding (got %d)" % thin_offer.size())
@@ -1139,7 +1145,7 @@ func _docs() -> void:
 	# TOGETHER or a batch that bumps the timestamp trips suites it never
 	# touched. (BO had its own copy phrased as "this batch"; it is the same
 	# gate.)
-	ok(master.contains("Batch BV"),
+	ok(master.contains("Batch BW"),
 		"§6: master.html is stamped for the current batch")
 	ok(master.contains("THE ABILITY DRAFT") or master.contains("The Ability Draft"),
 		"§6: ...and carries the draft's own section")

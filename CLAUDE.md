@@ -279,6 +279,12 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   untyped funcs, edits via python heredocs (apostrophes!) — use chr(39),
   min()/max() are numeric-only (String args = runtime error mid-_init and
   a headless --script run then idles forever — compare with < instead).
+- **EVERY data/*.json FILE IS TAB-INDENTED, so `json.dumps(..., indent=2)`
+  REWRITES THE WHOLE FILE** — a one-entry glossary edit came out as a 1,966-line
+  diff that buried the change and reset a shipped file's formatting convention.
+  Use `indent="\t"` and `ensure_ascii=False`, and ROUND-TRIP FIRST (dump the
+  unmodified parse and assert it equals the file byte for byte) before writing.
+  Caught at review, not by a test — nothing asserts a data file's whitespace.
 
 ## Architecture (all UI built in code, no editor scenes)
 - `scripts/run_state.gd` (autoload `Run`): party/items/gold/the LINE/zones,
@@ -700,12 +706,17 @@ failure it prevents is SILENT: a spine that stops working because its enabler be
   picks for a bookkeeping reason.
 · 3 **Sharpshooter** — **Quick Shot** (Lethal Aim counts consecutive single-target attacks).
 · 3 **Survivalist** — nothing (Trapper's breadth term counts statuses from ANY source).
-**TRANCHE 2 IS THREE QUARTERS PAID (BT the Mage nine, BU the Cleric nine, BV the Hunter nine) —
-`SPEC_DRAFT_POOLS` IS 51 AND THE DRAFT IS 75 OF ~96. THE WARRIOR THREE ARE THE LAST THIRD OWED and
-are the ONLY pools still at two**, so a Berserker/Warden/Swordmaster offer of three still fills
-SHORT where every other hero's comes up full. test_batch_bv asserts both halves (five for the nine
-deep pools, two for the Warrior three) and test_batch_br still drives the fill-short rule on a
-worn-down pool, so the debt stays visible in code rather than only in prose.
+**TRANCHE 2 IS COMPLETE (BT the Mage nine, BU the Cleric nine, BV the Hunter nine, BW the WARRIOR
+nine) — `SPEC_DRAFT_POOLS` IS 60 AND THE DRAFT IS 84 OF ~96. ALL TWELVE SPECS DRAFT FROM FIVE AND
+THE ASYMMETRY IS GONE.** The Warrior deficit that had been the visible shape of the debt since BP
+is paid; what is still owed is TRANCHE 3, and it is owed by all twelve equally rather than by three
+of them. **NO OFFER FILLS SHORT FOR A SPEC REASON ANY MORE** — it fills short only when a run has
+refused or taken most of a pool, which is the no-return ledger working. Every draft suite's
+per-spec depth loop is an INVERSION now (it asserts the FLATNESS, where each earlier tranche
+asserted its own asymmetry), and **test_batch_bo's fill-short construction had to move for the
+THIRD time** — onto a hero worn down by `draft_refused`, because there is no thin pool left in the
+game to build it on. **BV PREDICTED THAT FORCED MOVE IN WRITING and called it the honest signal
+that the debt is paid. It is.**
 **THE WARRIOR POOLS WERE OWED AND ARE PAID (Batch BP) — do not re-record them as empty.** All
 three were NAMED and EMPTY at BO because the lane names only arrived in BM; BP filled them with
 two apiece (Berserker Blood Offering / Gut Rip, Warden Covering Guard / Eye of the Storm,
@@ -749,13 +760,41 @@ exactly the inverted card, and it would still read fine on the tooltip.
   text reads "Switching stance grants +30% damage for 1 turn" and NAMES NO ABILITY, so a swap
   that skipped it would make a shipped tooltip false. Everything Guard Change pays BEYOND the
   pivot — its Break damage, Sunder Guard, No Quarter, the parry perfect — stays on Guard Change.
-· **stance-GATED ABILITIES — ones that REQUIRE a stance to cast rather than branching on it —
-  ARE A NOTED FUTURE DIRECTION AND WERE DELIBERATELY NOT BUILT.** They are a different mechanic
-  (they constrain when you may act rather than what the act buys) and they want their own pass.
+· **stance-GATED ABILITIES WERE BUILT IN BATCH BW — see the standing rule directly below.** BP
+  named them a future direction and deliberately did not build them; the rule they wanted is now
+  written, and it is the READERS-BRANCH-AND-FLIP / GATED-REQUIRE-AND-STAY distinction.
 · **"GUARD CHANGE IS THE ONLY STANCE SWAP IN THE GAME" IS NO LONGER TRUE** and `PROTECTED_CORES`
   says so. It is still the Swordmaster's enabler for a sharper reason: it is the only
   UNCONDITIONAL swap — the other two are DRAFTED (he may never be offered either), cost Rage, and
   sit on 3- and 4-turn cooldowns.
+
+### STANDING RULE — READERS BRANCH AND FLIP; GATED ONES REQUIRE AND STAY (Batch BW §3)
+**THERE ARE NOW TWO KINDS OF STANCE CARD AND THE DISTINCTION GOVERNS EVERY FUTURE SWORDMASTER
+ABILITY.** A **READER** works in either guard, does something DIFFERENT in each (BP's
+arriving-stance principle decides which branch buys what), and then **SWITCHES** him — Precision
+Strike and Feint. A **GATED** card **REQUIRES** a guard: in the wrong one it is **REFUSED OUTRIGHT**
+— unavailable, not a weaker branch — and casting it **MOVES NOTHING**. Sever (Aggressive) and
+Battle Poise (Defensive) are the first two. **GETTING THE TWO CARD TYPES BACKWARDS IS THE EASIEST
+MISTAKE TO MAKE ON THIS SPEC**, and both wrong versions read fine on a tooltip.
+· **`_ability_usable` IS THE DOOR**, matching how Death Ray's Resonance gate and BV's nine are
+  refused — so the greyed button, the bot's drafted-pick wrapper and the cast itself can never
+  disagree. A gate written at resolution instead would be a different, much smaller ability.
+· **FEIGNED GUARD SATISFIES THE GATE AT `_ability_usable`, AND THAT CLAUSE IS WHAT MAKES THE CARD
+  WORTH A SLOT.** For 2 turns his ABILITIES resolve as though cast from the other stance **and
+  satisfy that stance's requirement**, while he keeps the guard he is standing in. Merely changing
+  the branch taken at resolution is a minor modifier; satisfying the gate is what lets an
+  Aggressive build cast Battle Poise and a Defensive build cast Sever. **THOSE ARE TWO DIFFERENT
+  SITES AND ONLY THE FIRST MAKES THE CARD TRUE** — test_batch_bw drives it AT THE DOOR.
+· **IT DOES NOT SWITCH THE STANCE AND MUST NOT BE BUILT TO.** There is deliberately no
+  `_swordmaster_switch` call in its branch and test_batch_bw asserts the absence; a later author
+  adding one "for consistency with the other two stance cards" deletes the ability.
+· **ONE HELPER, `_eff_stance(u)`, AND ITS SCOPE IS ABILITIES ONLY.** Four callers: the two gates in
+  `_ability_usable`, the `precision_strike` and `feint` branches, and Lunge's stance-keyed wound.
+  **SEASONED FIGHTER (the passive), KILLING EDGE, BRACING AND UNTOUCHABLE ALL KEEP READING
+  `u.stance` DIRECTLY**, so an Aggressive build under a Feigned Guard keeps Aggressive's damage
+  bonus the whole time — which is the synergy the card is sold on. **Widening the helper to the
+  passive would delete that, silently**; test_batch_bw pins the passive's read site.
+
 
 ### STANDING RULE — CHARGES AND ON-HIT EFFECTS COUNT HITS, NOT CASTS (Batch BR §1)
 **A multi-hit ability spends one charge PER HIT and fires its on-hit effects PER HIT.** Aimed
@@ -863,6 +902,227 @@ claim, so a tranche that fills three pools trips them by construction. Two shape
   refusal reach the spec pool too (bq, br) or by moving it onto a **Berserker**, whose pool is
   genuinely still two (bo). **WHEN THE WARRIOR THIRD LANDS, bo's version has to move again** — and
   that forced move is the honest signal that the last of tranche 2 is paid.
+
+BATCH BW (08-14) — TRANCHE 2, THE WARRIOR NINE. **TRANCHE 2 IS COMPLETE.** Nine spec draft
+abilities, three per Warrior spec; the Warrior pools go 2 -> 5 and **every one of the twelve now
+drafts from FIVE**. The draft goes 75 -> **84 of a target ~96**. **THE WARRIOR DEFICIT THAT HAS
+BEEN THE VISIBLE SHAPE OF THE DEBT SINCE BP IS PAID** — no offer fills short for a SPEC reason any
+more, only because a run has refused or taken most of a pool. Nothing else ships: no talent node,
+no magnitude, no existing ability changed, no save version moves (still v10). **ONE new unit-side
+field for nine abilities** (Berserk's charge count) — everything with a duration is a STATUS, per
+BQ's standard. **The standing rule this batch sets is the READERS-BRANCH-AND-FLIP /
+GATED-REQUIRE-AND-STAY block above**; this block is the content, the decisions and the verification.
+**THE NINE, WITH THEIR AXES AND THEIR COMBOS.** Defs live in `Classes.draft_ability` beside BO's
+through BV's, resolved at the top of `pool_ability` as before. **They are INTERLEAVED with BP's six
+rather than contiguous** (each spec's tranche-2 entries sit under its tranche-1 ones), which is why
+test_batch_bw anchors the BT synergy-rule check PER ABILITY rather than per block — there is no
+single BW region to slice.
+· **BERSERKER — spend the rage, take the risk, and finally get paid back.** BP's pair were both
+  single-target and both about him getting LOW, and nothing paid him back for being there.
+  **Reckless Abandon** (0 Rage, 1.5, 4cd, self — spends ALL his Rage; +2% damage per 10 points
+  SPENT for 3 turns, Perfect 3%; *builds with* Blood Offering, Blood Tithe, Bloodied Momentum, and
+  a deliberate **ANTI-synergy with Bloodwake**) · **Berserk** (25, 2.0, 5cd, self — his next 3
+  STRIKES land twice and he takes 30% more damage for 3 turns; *builds with* Hack and Slash,
+  Wildstrikes, Blood Frenzy, Deathwish, Undying Rage, Scar Tissue) · **Blood Debt** (20, 2.0, 4cd,
+  10 BD — 30% of Attack and a battle-long MARK; every bleedout heals him 25% of his maximum,
+  Perfect 35%; *builds with* **Slaughterhouse** above all, plus Gut Rip, Hemorrhage, Savagery,
+  Bloodcraze).
+· **SWORDMASTER — the first stance-GATED cards.** **Sever** *(requires Aggressive)* (25, 2.5, 4cd,
+  15 BD — 40% of Attack, and against a BROKEN target its cooldown is cleared outright; *builds
+  with* Shatterpoint, Punishment, Off Balance, Pressure Point, Guard Breaker) · **Battle Poise**
+  *(requires Defensive)* (25, 2.0, 4cd, self — for 3 turns every attack he PARRIES takes a turn off
+  all his cooldowns; *builds with* the whole Poise lane) · **Feigned Guard** (20, 1.0, 3cd, self —
+  for 2 turns his abilities resolve as though cast from the OTHER stance and SATISFY that stance's
+  gate, without switching him).
+· **WARDEN — his bulk as a weapon, a permanent duel, and Block that pays the party.** BP's pair
+  were BOTH defensive and he had no offense at all. **Shield Slam** (25, 2.5, 3cd, 40 BD — damage
+  equal to 15% of his LIVE maximum health, Perfect 20%; *builds with* the whole Plate lane) ·
+  **Vendetta** (20, 1.5, 4cd — that enemy can attack nobody but him for the rest of the battle and
+  he takes 20% less from it, Perfect 30%; *builds with* the **Grudge** talent, Spite, Bruising
+  Guard, Immovable) · **Aegis Wall** (25, 2.0, 5cd, self — for 3 turns every attack he BLOCKS heals
+  all allies 8% of his LIVE maximum health; *builds with* Shieldwall, Bulwark Line, Interpose,
+  Heavy Plating, Tenacity).
+**THE NAME COLLISION WAS RESOLVED RATHER THAN FLAGGED, AND IT IS THE FIRST TIME BR §1's SWEEP HAS
+MOVED A CARD SINCE BR ITSELF.** The Warden's duel was authored as **GRUDGE**, and `wd_grudge` is
+already a Warden **THREAT-lane talent** (row 7: +25% damage against enemies his taunt binds), with
+a **Rune of Grudges** paying into the same term. **SAME SPEC, SAME LANE, ONE ROW APART, AND
+MECHANICALLY ADJACENT** — the talent's effect is precisely what the card's taunt feeds. That is
+closer than BP's Precision Strike / Precision Strikes and closer than BV's Ghostpack / Ghost Pack,
+and unlike those it was avoidable: **the talent's id is save-migrated and its ranks travel with it,
+while the card was unshipped, so the CARD moved.** It is **VENDETTA**. The two still compose exactly
+as intended. The other eight are clean against every ability, talent node, status and rune, and the
+sweep ships as a test — **including a check that no ABILITY is named Grudge and that
+`pool_ability("Grudge")` returns null**, so a later batch cannot quietly re-create it.
+**BREAK DAMAGE ASSIGNED DELIBERATELY (the BO rule, applied up front) AND REPORTED.** §1 names one
+figure; the other two are this batch's. **THREE of the nine are attacks and carry it: Shield Slam
+40** (the brief's), **Sever 15** — 40% of Attack for 25 Rage, priced beside Feint (35%/12) and
+Precision Strike's Defensive branch (15%/15), and worth knowing that **its Break matters most on
+the FIRST cast, because it is what OPENS the window the cooldown clause then exploits** — and
+**Blood Debt 10**, one step under Feint on the same curve with Gut Rip's 20 at the 30-Rage end.
+**The other six land no blow at all**, so Break would have nothing to ride: a decision on each of
+them, not an omission on any.
+**TWO STATUSES SIT ON AN ENEMY, AND THAT PUT THEM IN A LIST THE OBVIOUS READING WOULD HAVE MISSED —
+THIS IS BU's SUFFERING TRAP ARRIVING THROUGH THE MARK DOOR.** `blood_debt` and `vendetta` are MARKS,
+so neither is in `DEBUFF_IDS` (a battle-long entry there reads as 999 turns remaining and a mender's
+longest-first Cleansing Rite would take it every single time — `feinted`'s reason). **But
+`_dispellable_buffs` is DERIVED from exactly that absence**, so leaving them out of both lists would
+have made them beneficial statuses in the eyes of the one ability that strips those: **a Mage's
+Dispel would have stripped the party's own marks FOR the enemy carrying them.** Both are in
+`DISPEL_NEVER`. **Vendetta's taunt half is a separate `mocked` status and is deliberately STILL
+cleansable**, because `mocked` always has been — the same exposure The Whole Room's permanent taunt
+already carries, and a carve-out for one card would make two permanent taunts behave differently.
+**BLOOD DEBT'S PAYOUT DOES NOT REMOVE ITS OWN MARK, AND THAT IS THE WHOLE CARD.** Slaughterhouse
+re-seeds the bleed meter to 50 rather than 0 a few lines above it, so the SAME marked enemy bleeds
+out repeatedly and one mark pays three or four times. **A `remove_status` there would leave the card
+working, logging, and quietly worth a quarter of what it says** — it is asserted absent at the
+source AND driven live with a second bleedout.
+**BERSERK HAS TWO CLOCKS AND THEY ARE TWO DIFFERENT MECHANISMS ON PURPOSE.** The doubled strikes are
+CHARGES on `berserk_strikes` and **wait until spent** (the `feint_guards`/`banked_guards` shape);
+the 30% is an ordinary 3-turn `berserk_risk` status. Wiring the strikes to a turn count would tick
+them away unspent on a turn he could not reach anybody. **PER BR §1 THEY COUNT HITS, NOT CASTS**, so
+a three-hit Hack and Slash empties the whole bank in one cast and lands six — **visible in the smoke
+as "Berserk: 3 strikes land TWICE (0 left)" beside "1 strike lands TWICE (2 left)"**. Flagged as
+probably the strongest card in the Warrior set and **shipped to be WATCHED rather than pre-tuned.**
+· **THE DOUBLING EXPANDS THE HIT COUNT RATHER THAN RE-ENTERING THE STRIKE BODY**, so every doubled
+  blow is an ORDINARY blow: its own crit, miss and parry rolls, and his bleed buildup, which is what
+  feeds Gut Rip and Blood Debt twice as fast. **The target-list expansion beside it looks optional
+  and is not** — the loop reads `strike_targets[hit_i]` on the area and chosen-pair branches, so
+  raising the count without growing the list runs the doubled strikes off its end. `multi_hits` and
+  `random_hits` re-pick their own target and need no expansion, which is why it is gated to the
+  other branch.
+· **THE 30% IS DELIBERATELY NOT FOLDED INTO `dmg_taken_bonus`**, and the second reason is
+  load-bearing: that field is a permanent stat talents and runes write, **and MEASURED RAGE ZEROES
+  IT OUTRIGHT** to cancel Reckless Fury. Letting a talent delete a drafted card's drawback would
+  delete the card, because the 30% **is** the payoff. Two effects sharing one field is how one of
+  them silently stops existing.
+**THE WARDEN'S TWO LIVE-`max_hp` READERS.** Shield Slam and Aegis Wall both read his MAXIMUM at the
+moment they act, never at cast. Heavy Plating grows it mid-battle (Tenacity, +15 a block), so a
+snapshot would make the whole Plate lane silently stop feeding them — **the class of bug that fails
+no test and reads as the card merely being weak.** Both are driven at two different maxima in the
+suite. **THE UNKILLABLE RUNAWAY (~127,000 max HP, Batch W) IS THE REASON TO SAY THIS OUT LOUD AND
+ALSO THE REASON IT IS SAFE HERE:** that one was a permanent self-heal that made him unkillable, so
+blocks accumulated without end; Aegis Wall is a 3-turn window on a 5-turn cooldown that heals the
+PARTY, and it grows no maximum of its own.
+**`_eff_stance(u)` IS THE ONE ANSWER TO "which stance is this ABILITY resolving from", AND ITS SCOPE
+IS ABILITIES ALONE.** Four callers — the two gates in `_ability_usable`, the `precision_strike` and
+`feint` branches, and Lunge's stance-keyed wound. **Seasoned Fighter, Killing Edge, Bracing and
+Untouchable all keep reading `u.stance` directly**, which is what lets an Aggressive build under a
+Feigned Guard keep Aggressive's damage bonus the whole time — the synergy the card is sold on.
+Widening the helper to the passive would delete that silently; the suite pins the passive's own read
+site AND measures it live.
+**BATTLE POISE GOES THROUGH `_tick_cooldowns`, BQ's ONE implementation of cooldown reduction**, and
+**SKIPS ITS OWN RECAST** — a defensive window that shortens its own return is a different and
+unbounded card. **SEVER USES `cooldowns.erase`**, Hex of Ruin's idiom, read AFTER the blow lands so
+a strike that BREAKS the target clears its own cooldown.
+**THE BOT GOT NO ROTATION, ON PURPOSE** — all nine ride BO §5's wrapper, so no existing rotation is
+re-weighted and no prior measurement stops being comparable. Five joined the self-cast list
+(`reckless_abandon`, `berserk`, `battle_poise`, `feigned_guard`, `aegis_wall`); Shield Slam,
+Vendetta, Blood Debt and Sever each name one enemy and fall through to the ordinary picker. **THE
+TWO STANCE GATES NEED NO BOT RULE AT ALL** — they live in `_ability_usable`, which the drafted-pick
+wrapper already consults, which is the point of putting them there.
+**TWO LOG-HONESTY FIXES AND ONE GATE WIDENING, ALL THREE FOUND BY WATCHING A SMOKE RUN AND NONE OF
+THEM A MECHANICAL FAULT.** Reckless Abandon printed a hardcoded **"Rage"** whoever cast it (BU's
+Fortified Spirit line through the same door — it reads `attacker.resource_name` now, and the smoke
+shows "66 Mana spent" on a Beastmaster), and it announced **"5 Rage spent for +0% damage over 3
+turns"** — a window it never opened. **AND THAT SECOND LINE IS WHY THE GATE MOVED: it is
+`resource < RECKLESS_STEP` (10), not `<= 0`.** §6 names the ZERO case; a live Swordmaster on 5 Rage
+was spending a turn and a 4-turn cooldown to buy exactly nothing, which is the same dud one point
+along, and BO §5's rule is that a gate refuses a cast that could only ever do nothing. **REPORTED AS
+A DELIBERATE WIDENING OF §6's LETTER rather than done quietly.** The resolution stays safe below a
+step and the suite drives both promises.
+**ONE GLOSSARY ENTRY ADDED (88 -> 89): `stance_gated`.** "Requires Aggressive" is a rule the game has
+never had before, and a player meeting a greyed-out card needs to know why it is dark and what
+Feigned Guard does about it. The existing `stance` entry cross-links to it.
+**MASTER.HTML CORRECTED TOWARD THE CODE WHERE IT HAD DRIFTED**, beside the ordinary update: the draft
+table's intro read **"the fifty-four drafted abilities" against a table already holding
+SEVENTY-FIVE rows** (BT, BU and BV each added rows without moving that sentence), and the Swordmaster
+group header still read **"both cards read the stance and then switch it"** against a lane that now
+holds five. Both now state what the code does.
+**VERIFIED — AND PER THE STANDING INSTRUCTION, THAT MEANS THE CODE LANDED AND WORKS. NO SWEEPS, NO
+BANDS, NO BALANCE MEASUREMENT WAS RUN, and none should be quoted from this batch.**
+check_parse 0 · **NEW test_batch_bw.gd 545/0**.
+**ALL NINE CLAUSES §6 NAMED AS ABLE TO SILENTLY DO NOTHING ARE DRIVEN LIVE, and every one is built
+so a broken implementation still fails** — which for most of them means the obvious assertion is not
+the discriminating one: **Reckless Abandon** is cast at TWO different Rage levels and the two powers
+asserted DIFFERENT (a maximum-reading version returns the same number twice and passes everything
+else); **Berserk** is driven with a THREE-HIT ability, which must empty a bank of three in ONE cast
+(a cast-counting version leaves two standing and passes "the charges went down"), and the two clocks
+are separated by ageing the statuses past the window and asserting the CHARGES SURVIVE; **Blood
+Debt's** enemy is bled out TWICE off a Slaughterhouse re-seed and the SECOND payout is what
+discriminates, with the mark asserted still standing after the first and a foreign `src_name`
+asserted to pay nobody; **Sever** is driven against an UNBROKEN target (cooldown must stand) as well
+as a Broken one, and asserted to clear ONLY its own; **Battle Poise** takes TWO parries inside one
+turn with the drop asserted at EXACTLY two; **Feigned Guard** is driven AT THE DOOR — refused Battle
+Poise, casts, then ALLOWED it while SEVER becomes REFUSED and his stance is asserted UNMOVED;
+**Shield Slam's** maximum is TRIPLED between two casts and compared as a ratio with open ground;
+**Vendetta** is read off `_choose_enemy_action` itself, by identity, and then the Warden is killed
+and the same call asserted to name somebody else; **Aegis Wall** drives the IDENTICAL blow with the
+block roll forced ON and forced OFF, and the second must heal nothing.
+**TWO HARNESS FAULTS IN THE SUITE'S OWN FIRST DRAFT, AND BOTH ARE BU's SOURCE-ANCHOR LESSON
+REPEATING.** A slice anchored on the bare string `"feigned_guard":` finds the **STATUS_INFO row
+hundreds of lines above the match case**, so the "it does not switch the stance" check passed
+against a colour table — **a check that fails OPEN**. Same for `"vendetta":`. Every match-case anchor
+in the suite is taken **at its own indent** now, with a length assertion beside it. **A slice that
+quietly covers the wrong region is a check that has stopped asking its question.**
+**FULL BATTERY GREEN, ZERO FAILURES ANYWHERE**: ah 5500, ah_battle 65, ai 2217, aj 418, ak 528,
+al 560, ar 735, as 396, at 470, au 336, av 324, aw 350, ax 339, ay 484, az 519, ba 690, bb 172,
+bc 91, bd 69, be 34, bf 78, bg 47, bh 233, bi 88, bj 67, bl 88, bm 1891, bn 77, **bo 768**,
+**bp 271**, bq 738, br 1441, bs 262, **bt 463**, bu 476, **bv 893**, **bw 545**, runes 2973,
+rune_battle 97 — all 0 failures. **an and bk are inside their DOCUMENTED run-to-run drift** —
+neither is pinned and neither should be.
+· **FOUR COUNTS MOVED AND EVERY ONE IS EXPLAINED**: **bo 636 -> 768** (its pool loops walk nine more
+  entries and its five-deep loop now covers all twelve specs rather than nine), **bp 268 -> 271**
+  (its pool-literal equality became a PREFIX assertion, which is two checks where it was one, plus
+  a size check), **bt 454 -> 463** (its Warrior loop walks all twelve specs now rather than three)
+  and **bv 476 -> 893** (recorded at 476 in BU's list, which was BU's own count — BV's suite has
+  always read 893). **Nothing else moved by one.**
+**SUITES RE-POINTED IN PLACE WITH THE REASON IN EACH FILE, AND SEVEN OF THE RE-POINTS ARE
+INVERSIONS** — the honest treatment when a batch pays a debt an older suite was recording. Every
+draft suite's "this spec is still TWO deep — the WARRIOR third is owed" became "it drafts FIVE —
+tranche 2 is complete" (bt, bu, bv, br, bo), and bo's and bp's "the Warrior pools are FILLED at two"
+became "FULL at five". The totals moved 51 -> 60 and 75 -> 84 in five files. **bp's pool literal
+became a PREFIX assertion** on BO's own precedent — a later tranche APPENDS, it does not rewrite —
+and its two offer checks now read the LIVE pools so they cannot go stale a third time, which made
+the negative half STRICTER (it names all five sibling cards rather than BP's two).
+· **AND TWO RE-POINTS ARE NOT ABOUT THE DEBT AT ALL, which is worth separating.**
+  **test_batch_bq's DISPEL_NEVER check asserted the list's LAST FOUR ENTRIES**, i.e. it required
+  `spec_passive` to be the final element — an accident of authoring order rather than the question —
+  and BW appended two marks. It reads the four AS A RUN now, not as a tail. And **test_batch_bo's
+  FILL-SHORT CONSTRUCTION HAD TO MOVE FOR THE THIRD TIME**, which is the forced move **BV predicted
+  in writing**: it stood on a Sharpshooter until BV filled the Hunter pools, then on a Berserker
+  because the Warrior three were the last at two, and **there is no thin pool left in the game**, so
+  it now wears a hero down with `draft_refused`. **That forced move is the honest signal that
+  tranche 2 is paid rather than a check quietly weakening.**
+**THE MASTER.HTML STAMP GATE IS DUPLICATED ELEVEN TIMES, NOT TEN** — test_batch_ah, bb, bn, bo, bp,
+bq, br, bs, **bt**, bu and bv — **and all eleven moved to Batch BW**. BV predicted ten; the eleventh
+is test_batch_bt, whose copy phrases its message differently and so survived a sweep keyed on the
+message rather than on the stamp string. test_batch_bw adds a twelfth, so the next batch moves
+twelve. **The count rises by one per batch exactly as this note keeps predicting**, and the honest
+fix — the newest suite being the only one that checks it — is still not taken.
+**LIVE AUTOPLAY CLEAN, 0 SCRIPT ERROR ACROSS EIGHT SMOKE BATTLES, AND EIGHT OF THE NINE FIRE IN
+ORDINARY FIGHTS** — "Reckless Abandon — 15 Rage spent for +3% damage over 3 turns [PERFECT]",
+"Berserk — his next 3 STRIKES land twice (they wait until spent), and he takes 30% more damage for 3
+turns" followed by **"Berserk: 3 strikes land TWICE (0 left)"** and "1 strike lands TWICE (2 left)"
+(the HITS-not-casts rule visible in the log), "Blood Debt: the debt is named on Orc Archer — every
+bleedout pays 25% of maximum health", "Sever on Orc Archer — 32 physical dmg, +18 BD", **"Feigned
+Guard — for 2 turns his abilities resolve as Defensive (and satisfy its requirement) while he still
+stands Aggressive"**, "Shield Slam — 25 damage (15% of his 200 maximum health) and 40 BD", "Vendetta
+— Orc Chief can attack nobody but him for the rest of the battle, and he takes 30% less from it
+[PERFECT]", and **"Aegis Wall: the block mends 3 allies for 16 each (8% of his 200 maximum)"**.
+· **BATTLE POISE IS CAST LIVE (so the Defensive gate does open in real play) BUT ITS PARRY PAYOUT
+  NEVER FIRED IN A SMOKE**, and that is the branch being rare rather than a gap: it needs a parry
+  (12% base) INSIDE a 3-turn window while he is in the Defensive guard. The suite drives it
+  directly, which is where a rare branch belongs (the BB precedent). **Sever's cooldown clear did
+  not fire in a smoke either**, for the same reason — it needs a Broken target inside the cast.
+· **NOTE the smoke's own artefact**: `DOD_SIM_ABILITIES` applies its list to EVERY hero, so a
+  Cryomancer casts Berserk and a Devout casts Shield Slam in the logs — the real draft only ever
+  offers spec-matching cards. It is what made the two log-honesty faults visible, and it is also why
+  Sever fires for a Beastmaster: **`stance` defaults to "aggressive" on every unit in the game**, so
+  a non-Swordmaster holding a gated card always passes its gate. Unreachable in real play (both are
+  Swordmaster-spec cards) and the same property BP's curation rule already recorded.
+· **THE BOT PICKS THE FIRST USABLE DRAFTED ABILITY IN LIST ORDER**, so a smoke granting all nine
+  only ever exercises the first one. Each card was smoked with a NARROWED `DOD_SIM_ABILITIES` for
+  that reason — worth knowing before reading a future tranche's smoke as coverage.
 
 BATCH BV (08-14) — TRANCHE 2, THE HUNTER NINE. **Nine spec draft abilities, three per Hunter
 spec; the Hunter pools go 2 -> 5 and join the Mage and the Cleric.** The draft goes 66 ->

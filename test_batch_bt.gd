@@ -167,19 +167,21 @@ func _pools() -> void:
 	# joined the Mage and Cleric at five, so ONLY THE WARRIOR THREE are still at
 	# two. Kept as an inversion rather than deleted — the half of this check that
 	# matters is that the LAST unpaid third stays visible in code.
+	# RE-POINTED BY BATCH BW, AND IT IS AN INVERSION: this asserted the WARRIOR
+	# three were still at TWO because that debt was real and had to stay visible
+	# in code. BW paid it, so tranche 2 is complete and what is asserted is that
+	# ALL TWELVE are five. A pool quietly emptying still trips.
 	for spec in Classes.SPEC_DRAFT_POOLS:
-		if not (spec in ["berserker", "warden", "swordmaster"]):
-			continue
-		ok(Classes.spec_draft_pool(spec).size() == 2,
-			"%s is still TWO deep — the WARRIOR third is the last one owed" % spec)
+		ok(Classes.spec_draft_pool(spec).size() == 5,
+			"%s drafts FIVE — tranche 2 is complete" % spec)
 	for spec in ["beastmaster", "sharpshooter", "mystic"]:
 		ok(Classes.spec_draft_pool(spec).size() == 5,
 			"%s joined them at FIVE in Batch BV" % spec)
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 51,
-		"the spec pools hold 51 (24 + BT's Mage nine + BU's Cleric nine + BV's Hunter nine), got %d"
+	ok(total == 60,
+		"the spec pools hold 60 (24 + tranche 2's thirty-six), got %d"
 			% total)
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR negative control.
@@ -397,7 +399,7 @@ func _one_shield_door() -> void:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch BV"), "master.html carries the current batch stamp")
+	ok(master.contains("Batch BW"), "master.html carries the current batch stamp")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
 	# §5: THE SYNERGY LINE IS THE INFORMATION THIS TRANCHE WAS AUTHORED FOR, so

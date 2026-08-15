@@ -1040,6 +1040,26 @@ var rite_cb := Callable()
 # and one counter holding two rules is how the reflect would go missing.
 var feint_guards := 0
 
+# ------- BATCH BW — the Warrior draft's tranche-2 unit-side state -------
+#
+# ONE FIELD FOR NINE ABILITIES, and it is a CHARGE COUNT rather than a duration
+# (BQ's standard: everything with a clock is a STATUS, which expires by itself
+# and cannot leak past a battle). The other eight carry statuses alone.
+#
+# BERSERK, THE DOUBLED STRIKES. The `feint_guards` / `banked_guards` shape,
+# and for their reason: charges WAIT UNTIL SPENT rather than expiring, so a
+# Berserk cast on a turn he cannot reach anybody is not wasted. It is
+# deliberately NOT folded into either of those — they are PARRIES and this is
+# an attack multiplier, and one counter holding two rules is how a rule goes
+# missing (BP's own note about not folding Feint's charges into Waiting
+# Guard's, one door along).
+#
+# PER BR §1 IT COUNTS **HITS**, so a multi-hit ability spends one per strike
+# and a three-hit flurry can empty the bank in a single cast. The 30%-more-
+# damage half of the card is a SEPARATE 3-turn status (`berserk_risk`) — two
+# clocks on one card, which is the thing the description has to say plainly.
+var berserk_strikes := 0
+
 # ------- BATCH BQ — the class-wide draft's unit-side state -------
 #
 # ONE CALLBACK AND NO NEW FIELDS AT ALL, for twelve abilities. Everything with

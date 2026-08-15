@@ -96,11 +96,23 @@
 		"id": "stance",
 		"term": "Stance (Seasoned Fighter)",
 		"category": "combat",
-		"short": "The Swordmaster fights Aggressive or Defensive; three abilities switch him.",
+		"short": "The Swordmaster fights Aggressive or Defensive; three abilities switch him, and two REQUIRE a guard.",
 		"long": "Only the Swordmaster has stances, and he is always in one of two. AGGRESSIVE: +15% damage dealt and +10% damage taken. DEFENSIVE: 15% less damage taken and -10% damage dealt. He starts every battle Aggressive, and the stance resets with each new battle - it is never carried between fights. Several of his talents read it (Killing Edge sharpens the Aggressive guard, Bracing hardens the Defensive one, Untouchable makes a Defensive parry absolute), and THREE abilities change it: Guard Change, which does nothing but pivot and press the opening; and the two drafted cards, Precision Strike and Feint, which BRANCH on the stance they are cast from and then switch it. Both branch the same way round, and it is worth knowing: each branch buys what the stance he is ARRIVING in wants. Cast from Aggressive he lands in Defensive, so he is handed defence - a parry buff, or charges that answer blows. Cast from Defensive he lands in Aggressive, so he is handed offence - an armor bypass, or a strike and a misdirected enemy. He is never stranded mid-pivot.",
 		"see_also": [
 			"parry",
-			"crit"
+			"crit",
+			"stance_gated"
+		]
+	},
+	{
+		"id": "stance_gated",
+		"term": "Stance-gated ability",
+		"category": "combat",
+		"short": "Some Swordmaster cards can only be cast from one guard - the button stays dark in the other.",
+		"long": "A stance-gated ability REQUIRES a guard rather than behaving differently in each one. Sever can only be cast from the Aggressive stance and Battle Poise only from the Defensive; in the wrong guard the button is simply unavailable, not weaker. Casting one does NOT switch his stance - that is the difference from a stance READER. Precision Strike and Feint are readers: they work in either guard, do something different in each, and then flip him. Feigned Guard is the answer to being locked out: for 2 turns his abilities resolve as though cast from the OTHER guard and satisfy that guard's requirement, while he keeps the stance he is actually standing in - so an Aggressive Swordmaster can cast Battle Poise without giving up Aggressive's damage. Guard Change is still the free, unconditional way to move between the two.",
+		"see_also": [
+			"stance",
+			"ability_draft"
 		]
 	},
 	{
