@@ -132,18 +132,18 @@ const STATUS_INFO := {
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
 	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],
 	"roar": ["Guardian's Roar", "GR", Color(0.85, 0.60, 0.30), "The bear stands firm: takes 25%\nless damage."],
-	"loyalty": ["Loyalty", "L", Color(0.95, 0.75, 0.30), "Devotion to the Beastmaster: +5%\nstrike damage per stack, plus this\nbeast's own gift. The Pack Bond boon\nclimbs 20% a stack, with NO CEILING.\nLost when the beast dies."],
+	"loyalty": ["Loyalty", "L", Color(0.95, 0.75, 0.30), "Devotion to the Beastmaster: +5%\nstrike damage per stack, plus this\ncompanion's own gift. The Pack Bond boon\nclimbs 20% a stack, with NO CEILING.\nLost when the companion dies."],
 	"blind": ["Blind", "Bd", Color(0.55, 0.55, 0.65), "Attacks are 50% more likely\nto miss."],
-	"elusive": ["Elusiveness", "El", Color(0.55, 0.85, 0.75), "Hard to pin down: enemies are 25%\nmore likely to miss this beast."],
+	"elusive": ["Elusiveness", "El", Color(0.55, 0.85, 0.75), "Hard to pin down: enemies are 25%\nmore likely to miss this companion."],
 	"instinct": ["Hunter's Instinct", "HI", Color(0.85, 0.75, 0.35), "The next Quick Shots deal +10% of\nthe hunter's Attack and mend the\ncompanion for 15% of its max health."],
-	"bestial": ["Bestial Wrath", "BW", Color(0.95, 0.40, 0.25), "The beast is unleashed — Ursus:\ndoubled health and +50% armor;\nCanis: +50% damage, +10 Bleed;\nAguila: +25% damage, strikes Blind."],
+	"bestial": ["Bestial Wrath", "BW", Color(0.95, 0.40, 0.25), "The companion is unleashed — Ursus:\ndoubled health and +50% armor;\nCanis: +50% damage, +10 Bleed;\nAguila: +25% damage, strikes Blind."],
 	"spirit_heal": ["Spirit Bond", "SB", Color(0.45, 0.90, 0.70), "The bond mends: heals 10% of max\nhealth at the next turn start."],
 	"spirit_mana": ["Spirit Flow", "SM", Color(0.40, 0.65, 0.95), "The bond restores 5% max Mana at\neach turn start."],
 	"vigor": ["Vigor", "Vg", Color(0.60, 0.90, 0.45), "Spirit Bond perfected: +10% max\nhealth while it lasts."],
 	"keen_eyes": ["Eagle Eyes", "EE", Color(0.65, 0.85, 0.95), "Aguila watches over the party:\nincreased crit chance."],
 	"primal_surge": ["Primal Surge", "PS", Color(0.95, 0.60, 0.25), "The spent Loyalty burns on:\n+10% damage dealt."],
-	"hunt_mark": ["Marked", "Mk", Color(0.90, 0.50, 0.20), "Marked by the hunt: the Beastmaster\nand their beast deal +25% damage to\nthis enemy, and their strikes on it\nrestore the hunter's Mana."],
-	"vengeance": ["Vengeance", "Vn", Color(0.85, 0.35, 0.30), "The fallen beast's boon lives on in\nthe hunter at FULL strength for the\nrest of the battle, and he strikes\nharder for the loss."],
+	"hunt_mark": ["Marked", "Mk", Color(0.90, 0.50, 0.20), "Marked by the hunt: the Beastmaster\nand their companion deal +25% damage to\nthis enemy, and their strikes on it\nrestore the hunter's Mana."],
+	"vengeance": ["Vengeance", "Vn", Color(0.85, 0.35, 0.30), "The fallen companion's boon lives on in\nthe hunter at FULL strength for the\nrest of the battle, and he strikes\nharder for the loss."],
 	"held_breath": ["Held Breath", "HB", Color(0.70, 0.90, 0.60), "The next attack is a GUARANTEED\ncritical and ignores all armor."],
 	"snared": ["Snared", "Sn", Color(0.75, 0.65, 0.30), "A trap waits underfoot: the next\ntime this enemy acts it is STUNNED\nfor 1 turn and Poisoned."],
 	"caught": ["Caught Fast", "Cf", Color(0.75, 0.55, 0.25), "The trap's teeth hold the wound\nopen: cannot be healed."],
@@ -166,7 +166,7 @@ const STATUS_INFO := {
 	# carry nothing. `bloodbond` is applied BATTLE-LONG (-1 turns) on purpose:
 	# it is a guard that waits until it FIRES, not a window that expires, so a
 	# turn count would be a second rule the card never promised.
-	"bloodbond": ["Bloodbond", "Bb", Color(0.85, 0.30, 0.35), "Sworn to the beast: the next blow that\nwould fell a companion is refused, and\nthe hunter takes HALF of it instead.\nIt waits until it is needed — and the\nhalf he takes can kill him."],
+	"bloodbond": ["Bloodbond", "Bb", Color(0.85, 0.30, 0.35), "Sworn to the bond: the next blow that\nwould fell a companion is refused, and\nthe hunter takes HALF of it instead.\nIt waits until it is needed — and the\nhalf he takes can kill him."],
 	"ghostpack": ["Ghostpack", "Gp", Color(0.60, 0.70, 0.90), "The whole pack runs, living and lost:\nEVERY companion summoned this battle\nstrikes alongside his attacks for 40%,\nincluding the ones no longer standing."],
 	"crossfire": ["Crossfire", "Cf", Color(0.95, 0.55, 0.25), "The lines are laid: every CRITICAL hit\nhe lands also strikes 2 other enemies\nfor 40% of that crit's damage."],
 	# ---- BATCH BW: the Warrior draft's tranche-2 statuses ----
@@ -225,7 +225,7 @@ const STATUS_INFO := {
 	# carries a clock because it is time it buys.
 	"arrows": ["Arcane Arrows", "AA", Color(0.72, 0.62, 0.95), "Quenched in raw magic: each attack\nalso strikes an additional random\nenemy for half damage. ONE CHARGE PER\nHIT — a three-shot volley spends\nthree. They wait until spent."],
 	"camouflage": ["Camouflage", "Cm", Color(0.55, 0.72, 0.50), "Gone to ground: enemies are far less\nlikely to aim here. It stacks with\nGhillie Suit rather than replacing it."],
-	"party_mark": ["Hunter's Mark", "HM", Color(0.85, 0.60, 0.30), "Called out: the WHOLE PARTY deals 15%\nmore damage to this enemy — every\nhero and every beast, not just the one\nwho marked it."],
+	"party_mark": ["Hunter's Mark", "HM", Color(0.85, 0.60, 0.30), "Called out: the WHOLE PARTY deals 15%\nmore damage to this enemy — every\nhero and every companion, not just the one\nwho marked it."],
 	"battle_trance": ["Battle Trance", "BT", Color(0.90, 0.55, 0.40), "Somewhere the pain cannot follow: at\nthe start of each turn, heals 3% of\nmaximum health PLUS HALF the damage\ntaken since the last one. It arrives\nAFTER the beating, never before."],
 	"warcry": ["Warcry", "Wc", Color(0.95, 0.60, 0.35), "The line is on the front foot:\n+20% damage dealt."],
 	"ironclad": ["Iron Will", "IW", Color(0.80, 0.80, 0.88), "Teeth set: cannot be Stunned, Frozen,\nDazed or Broken, and takes 15% less\ndamage. The Break meter still fills —\nto 99, and no further."],
@@ -4198,16 +4198,16 @@ func _show_actions(u: BattleUnit) -> void:
 			group_btn.add_theme_font_size_override("font_size", 13)
 			group_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			if swapping:
-				group_btn.tooltip_text = "Swap the active beast (10 %s, 1.0 int,\nshared 2-turn cooldown). The newcomer\narrives with its swap effect and\n+1 Loyalty." % u.resource_name
+				group_btn.tooltip_text = "Swap the active companion (10 %s, 1.0 int,\nshared 2-turn cooldown). The newcomer\narrives with its swap effect and\n+1 Loyalty." % u.resource_name
 				if u.the_pack > 0:
-					group_btn.tooltip_text += "\nThe newcomer replaces whichever beast\nholds LESS Loyalty (ties: the older)."
+					group_btn.tooltip_text += "\nThe newcomer replaces whichever companion\nholds LESS Loyalty (ties: the older)."
 				if u.cooldowns.get("Swap Companion", 0) > 0:
 					group_btn.tooltip_text += "\n(Swap recovering: %d turn(s))" % \
 						u.cooldowns["Swap Companion"]
 			else:
-				group_btn.tooltip_text = "Choose which beast answers the call.\n" \
+				group_btn.tooltip_text = "Choose which companion answers the call.\n" \
 					+ "Tab cycles the options, Space summons.\n" \
-					+ ("The Pack: two beasts run at once." if u.the_pack > 0 \
+					+ ("The Pack: two companions run at once." if u.the_pack > 0 \
 					else "Only one companion at a time.")
 			group_btn.pressed.connect(_on_summon_group_pressed.bind(popup))
 			list.add_child(group_btn)
@@ -4647,7 +4647,7 @@ func _open_summon_picker(u: BattleUnit) -> void:
 			var beast: String = a.display_name.get_slice(" ", 1)
 			var swap_desc := "Swap the pack: %s arrives with its\nswap effect and +1 Loyalty.\nShared cooldown: 2 turns." % beast
 			if u.the_pack > 0:
-				swap_desc += "\nReplaces whichever beast holds LESS\nLoyalty (ties: the older)."
+				swap_desc += "\nReplaces whichever companion holds LESS\nLoyalty (ties: the older)."
 			_summon_opts.append(Ability.make({"display_name": "Swap " + beast,
 				"cooldown": 0, "cost": 10, "special": "summon", "delay": 1.0,
 				"anim": "attack01", "no_skill_check": true,
@@ -5888,7 +5888,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	attacker.refresh_bars()
 	if was_free_ability:
 		attacker.free_ability -= 1
-		_log("   → Twin Hunt: the beast's kill pays for this one (%d left)" % \
+		_log("   → Twin Hunt: the companion's kill pays for this one (%d left)" % \
 			attacker.free_ability, "#e0a050")
 	if was_snap:
 		# Snap Shot: free, and the cooldown never starts.
@@ -12512,9 +12512,15 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# AXIS: the two bodies acting deliberately, where the rest of his
 			# kit has the beast on its own clock.
 			if target != null and not target.dead:
-				var th_beasts: Array = _beasts(attacker)
+				# BATCH BX §3 — THE DEEPEST BOND, not `beasts[0]`. Under The Pack
+				# this is an ORDERED action and BV's rule says an ordered action
+				# goes to ONE companion; list order picked the earlier summon
+				# rather than the better bond, which is Savage Sweep's rule
+				# pointed the wrong way. `_deepest_bond` is now the one answer to
+				# "which companion", shared by both cards.
+				var th_b: BattleUnit = _deepest_bond(attacker)
 				_message("%s and the pack strike as one!" % attacker.unit_name)
-				_log("%s: Twin Hunt — hunter and beast strike together" % \
+				_log("%s: Twin Hunt — hunter and companion strike together" % \
 					attacker.unit_name, "#e0a050")
 				var th_raw := 0.01 * ab.damage * attacker.attack * mult \
 					* randf_range(0.9, 1.1)
@@ -12530,13 +12536,12 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					_message("%s falls!" % target.unit_name)
 					_log("† %s dies" % target.unit_name, "#e05050")
 					_on_enemy_death(target)
-				elif not th_beasts.is_empty():
-					# The BEAST's blow is the one that can pay: the free cast is
-					# owed only when IT lands the kill, which is what makes the
+				elif th_b != null:
+					# The COMPANION's blow is the one that can pay: the free cast
+					# is owed only when IT lands the kill, which is what makes the
 					# ability about the partnership rather than about a bigger
 					# number. It goes through `_companion_hit`, so Loyalty, the
 					# boon curve and every companion rider apply as usual.
-					var th_b: BattleUnit = th_beasts[0]
 					var th_pct := 0.55 if is_perfect else 0.40
 					await _companion_hit(th_b, target,
 						th_pct * attacker.attack * _bestial_dmg_mult(th_b), 0)
@@ -15027,7 +15032,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var bb_info: Array = STATUS_INFO["bloodbond"]
 			attacker.add_status("bloodbond", bb_info[0], bb_info[1], bb_info[2],
 				-1,
-				"Sworn to the beast: the next blow that\nwould fell a companion is refused, and\nthe hunter takes %d%% of it instead.\nIt waits until it is needed — and the\nshare he takes can kill him." % bb_pct,
+				"Sworn to the bond: the next blow that\nwould fell a companion is refused, and\nthe hunter takes %d%% of it instead.\nIt waits until it is needed — and the\nshare he takes can kill him." % bb_pct,
 				bb_pct)
 			_sfx("heal", -8.0, 0.7)
 			_message("%s swears the bloodbond" % attacker.unit_name)
@@ -15041,22 +15046,19 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# weakest thing standing", so the three cannot drift.
 			#
 			# ONE COMPANION UNDER THE PACK, AND IT IS THE HIGHEST-LOYALTY ONE. An
-			# ORDERED action goes to one beast; the passive strike-alongside goes
-			# to all of them (the rule is recorded in `Classes.draft_ability`).
-			# Picking by Loyalty is The Pack's own text read the other way round
-			# — "the deeper bond always keeps its place" — and it lands the 3
-			# Loyalty where the boon curve compounds hardest. Ties break on list
-			# order, so it is deterministic rather than merely usually-right.
-			var ss_beasts: Array = _beasts(attacker)
-			if ss_beasts.is_empty():
+			# ORDERED action goes to one companion; the passive strike-alongside
+			# goes to all of them (the rule is recorded in
+			# `Classes.draft_ability`). Picking by Loyalty is The Pack's own text
+			# read the other way round — "the deeper bond always keeps its place"
+			# — and it lands the 3 Loyalty where the boon curve compounds
+			# hardest. BATCH BX §3 MOVED THE LOOP INTO `_deepest_bond`, which
+			# TWIN HUNT now shares: two copies of one rule is what BQ's four
+			# cooldown walks cost, and this one had already drifted.
+			var ss_b: BattleUnit = _deepest_bond(attacker)
+			if ss_b == null:
 				_log("%s: Savage Sweep — no companion stands to run the line" % \
 					attacker.unit_name, "#909090")
 			else:
-				var ss_b: BattleUnit = ss_beasts[0]
-				for ss_cand in ss_beasts:
-					if int(attacker.loyalty.get(ss_cand.companion_kind, 0)) \
-							> int(attacker.loyalty.get(ss_b.companion_kind, 0)):
-						ss_b = ss_cand
 				var ss_marks: Array = []
 				var ss_pool: Array = enemies.filter(func(e): return not e.dead)
 				while ss_marks.size() < 3 and not ss_pool.is_empty():
@@ -15145,6 +15147,35 @@ func _beasts(hunter: BattleUnit) -> Array:
 	if hunter == null:
 		return []
 	return hunter.beasts.filter(func(b): return is_instance_valid(b) and not b.dead)
+
+
+# BATCH BX §3 — WHICH COMPANION AN ORDERED ACTION GOES TO, AND THERE IS NOW
+# EXACTLY ONE ANSWER TO IT.
+#
+# BV set the rule — an ORDERED action goes to ONE companion, a passive
+# strike-alongside goes to all of them — and resolved Savage Sweep by picking
+# the DEEPEST BOND. Twin Hunt, a tranche-1 card, went on reading
+# `_beasts(attacker)[0]`, i.e. LIST ORDER, which under The Pack means the
+# earlier summon rather than the better bond. BW reported the inconsistency and
+# deliberately changed nothing (its tranche touched no existing ability); this
+# closes it.
+#
+# IT IS ONE FUNCTION AND NOT TWO COPIES OF A LOOP, on BQ's `_tick_cooldowns`
+# precedent: the rule is "the deeper bond always keeps its place", read off The
+# Pack's own text, and a rule written twice is a rule that will eventually
+# disagree with itself. Ties break on LIST ORDER (the `>` is strict), so the
+# answer is deterministic rather than merely usually-right — which is what lets
+# a test assert an identity instead of a probability.
+func _deepest_bond(hunter: BattleUnit) -> BattleUnit:
+	var pack := _beasts(hunter)
+	if pack.is_empty():
+		return null
+	var best: BattleUnit = pack[0]
+	for cand in pack:
+		if int(hunter.loyalty.get(cand.companion_kind, 0)) \
+				> int(hunter.loyalty.get(best.companion_kind, 0)):
+			best = cand
+	return best
 
 
 # The shared Swap Companion cooldown before Quick Whistle shaves it.
@@ -15288,7 +15319,7 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 	# No Beast Left: an armed free call is consumed by this summon.
 	if hunter.free_summons > 0:
 		hunter.free_summons -= 1
-		_log("   → No Beast Left: the call costs nothing (%d left)" % \
+		_log("   → None Left Behind: the call costs nothing (%d left)" % \
 			hunter.free_summons, "#b0a8e0")
 		# ...and the beast it calls arrives already devoted.
 		if hunter.no_beast_left_loyalty > int(hunter.loyalty.get(kind, 0)):
@@ -16282,7 +16313,7 @@ func _on_beast_death(comp: BattleUnit) -> void:
 			pm.unit_name, kind.capitalize(), pm.vengeance_dmg], "#e0a050")
 	if pm.no_beast_left > 0 and not pm.dead:
 		pm.free_summons = pm.no_beast_left
-		_log("   → No Beast Left: the next %d summons cost nothing" % \
+		_log("   → None Left Behind: the next %d summons cost nothing" % \
 			pm.no_beast_left, "#b0a8e0")
 	# One Soul: the bond closes over the body it lost.
 	_sync_soul_bond(pm)
@@ -17088,15 +17119,38 @@ func _check_end() -> void:
 			# drafts far more than a cautious one, which is the map's risk axis
 			# paying out in a new currency.
 			#
-			# ONE HERO PER ELITE, DRAWN INDEPENDENTLY OF THE RUNE LOOTER, and
-			# that is this batch's decision rather than the brief's: §3 says
-			# "always, on victory" and does not say to whom. Offering every
-			# hero a card at every elite would hand out ~26 picks a run against
-			# four draftable slots, which is not a draft.
-			var d_taker: Dictionary = Run.party.pick_random()
-			if Run.award_draft_pick(d_taker):
-				spoils += "\nTHE DRAFT: the %s may choose a new ability\non their card." % \
-					String(d_taker["key"]).capitalize()
+			# BATCH BX §2 — EVERY LIVING HERO, NOT ONE DRAWN AT RANDOM. BO
+			# offered to one because four offers in sequence after every elite
+			# would slow a run; BX answers that with a SCREEN (one screen, four
+			# columns) rather than with a smaller reach. EACH DRAWS FROM THEIR
+			# OWN POOL — `award_draft_pick` rolls per member off that member's
+			# spec pool, class pool and no-return ledger — so a Pyromancer can
+			# never be offered a Warden card.
+			#
+			# THIS IS A 4x INCREASE IN DRAFTING AND IT SHIPS TO BE FELT. A hero
+			# has five spec cards and six class cards against four draftable
+			# slots, so a hero at cap will be dropping something at nearly every
+			# elite. That may be exactly right or it may be churn; the designer
+			# has taken the call knowingly, and NOTHING HERE IS PRE-TUNED — not
+			# the cap, not the offer size, not the one-in-four seam.
+			#
+			# THE FALLEN ARE ALREADY UP BY THIS LINE, and it is an ordering that
+			# was verified rather than assumed (§2's own instruction). The
+			# revive lives in `BattleUnit.sync_victory_state`, called in the
+			# loop ~50 lines above this one, and it returns a fallen hero at 20%
+			# of their maximum — so "a hero who fell drafts normally" is a
+			# consequence of the existing order, not a rule this batch had to
+			# add. A hero can only be dead here if the party won without them
+			# being restored, which that sync makes impossible.
+			var d_names := PackedStringArray()
+			for d_taker in Run.party:
+				if int(d_taker.get("hp", 0)) <= 0:
+					continue
+				if Run.award_draft_pick(d_taker):
+					d_names.append(_hero_label(d_taker))
+			if not d_names.is_empty():
+				spoils += "\nTHE DRAFT: %s may each choose a new ability." % \
+					" and ".join(d_names)
 			# Rune pick-of-3 (Batch X): candidates rolled NOW and stored on the
 			# member (never rerolled), chosen on the hero card. Empty = runes
 			# off — the spoils keep the item.
@@ -17397,7 +17451,7 @@ const SIG_LABELS := {
 	"mercy": ["Holy", "Resurrections", "Intercessions"],
 	"conviction": ["Devout", "releases", ""],
 	"old_gods": ["Occultist", "Ruin detonations", ""],
-	"pack": ["Beastmaster", "swaps", "beast deaths"],
+	"pack": ["Beastmaster", "swaps", "companion deaths"],
 	"lethal_aim": ["Sharpshooter", "Focus conversions", ""],
 	"trapper": ["Survivalist", "3+-status strikes", ""],
 }
@@ -17457,7 +17511,7 @@ static func pack_report_line(stats: Dictionary) -> String:
 		return ""
 	var line := "Loyalty: deepest reached %d" % deepest
 	if pt > 0.0:
-		line += " | The Pack: two beasts standing on %.0f%% of hunter turns (n=%d)" % [
+		line += " | The Pack: two companions standing on %.0f%% of hunter turns (n=%d)" % [
 			100.0 * stats.get("pack_turns_two", 0.0) / pt, int(pt)]
 	return line
 

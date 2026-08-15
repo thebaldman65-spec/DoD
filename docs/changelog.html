@@ -5,6 +5,132 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-15 &mdash; Batch BX: every hero drafts after an elite</h2>
+<p><i><b>LEAD WITH THE RATE.</b> An elite victory used to hand one hero, drawn at random, a
+choice of three abilities. It now offers a draft to <b>every living hero</b> &mdash; each from
+their own pool, on <b>one screen of four columns</b> rather than four screens in sequence.
+Measured end to end over a walked run: <b>34.00 draft offers a run against BO's ~10, and 62% of
+them arrive at a hero already at the seven-slot cap</b>, so most drafts are now a
+take-one-and-drop-one decision rather than a free addition. That is <b>four times as much
+drafting</b>, and it ships deliberately untuned &mdash; the cap, the offer size and the
+one-in-four class seam are all untouched, because the point is to feel this against the pools as
+they stand before tranche 3 lands thirty-six more cards on top of it.</i></p>
+
+<p><b>No new abilities.</b> No talent node, no magnitude, no existing ability's numbers moved, and
+<b>no save version moves (still v10)</b> &mdash; the party dict is saved wholesale and every key
+this needs was already on it.</p>
+
+<h3>&sect;2 &mdash; The elite draft screen</h3>
+<p><b>Every living hero is offered a draft, and each draws their own three cards</b> from their own
+spec pool and their own class pool at the established one-in-four seam. There is no shared offer
+and no shared ledger: <code>Run.roll_draft_offer</code> is called per member and reads that
+member's own pools and their own <code>draft_refused</code>, so <b>a Pyromancer can never be shown
+a Warden card</b> and one hero's decline can never hide a card from another. <b>That ledger being
+per member is load-bearing</b> &mdash; a shared refusal list is the obvious implementation and the
+wrong one, and it is verified rather than assumed.</p>
+<p><b>ONE SCREEN, FOUR COLUMNS.</b> Four sequential offers after every elite would slow a run
+noticeably, so the shape of the screen is the change and not just its reach. The rules carried over
+unaltered, each still owned by <code>run_state.gd</code> rather than by the screen:</p>
+<ul>
+<li><b>Declining is per hero and independent.</b> One hero taking a card does not commit the
+others.</li>
+<li><b>A declined or dropped card enters that hero's no-return ledger</b> and does not return that
+run &mdash; per member, never shared.</li>
+<li><b>The seven-slot cap holds per column.</b> A hero at the cap must name what the incoming card
+replaces before their column counts as decided, and only <i>earned</i> abilities can be named:
+protected ones are simply not in that list.</li>
+<li><b>Offers fill short rather than padding with repeats</b> (AP &sect;3, unchanged). A hero with
+nothing left to be shown gets no column at all rather than an empty one.</li>
+</ul>
+<p><b>THE SCREEN RESOLVES AS ONE ACTION, and that is the piece that decided the implementation.</b>
+Every column is chosen, then the whole screen is confirmed &mdash; so a player who fills the
+Devout's last slot can still reconsider before the Warden's pick is locked. The choices are
+therefore <b>staged</b>, not committed: nothing touches the run until the confirm, which then walks
+the columns through <code>Run.take_draft_ability</code> and <code>Run.decline_draft</code> &mdash;
+the same two doors the boss pick's overlay already used. <b>Leaving the screen commits nothing</b>
+and the picks stay owed on the hero cards, so a player can go and read a hero sheet mid-draft.
+Clicking a staged card again unstages it, because declining costs a whole offer and must never be
+the only way out of a misclick.</p>
+<p><b>ONE DRAFT RENDERER, NOT TWO.</b> BO's single-hero draft branch inside the pick overlay is
+<b>deleted</b> rather than left unreachable, and the hero card's CHOOSE button now opens the party
+screen. A merchant or event grants a draft to one hero, and that simply renders as a one-column
+version of the same screen.</p>
+<p><b>A FALLEN HERO DRAFTS NORMALLY, AND THE ORDERING WAS VERIFIED RATHER THAN ADDED.</b> &sect;2
+asked which of two cases held &mdash; and it is the first: <b>a post-battle revive already
+existed</b>, inside <code>BattleUnit.sync_victory_state</code>, and it returns a hero who fell at
+<b>20% of maximum</b> rather than at the 1 HP the brief describes. It runs in the victory branch
+~50 lines above the draft award, so "they are alive when the screen opens" is a consequence of the
+existing order rather than a rule this batch had to write. <b>Nothing was changed toward 1 HP</b>:
+the instruction was conditional on no revive existing, and one does. The health gate in the award
+loop is still written and tested, so the rule is stated rather than depending on a fact that could
+stop being true.</p>
+
+<h3>&sect;3 &mdash; Twin Hunt's companion, closed</h3>
+<p>BV established the rule &mdash; <b>an ordered action goes to one companion, a passive
+strike-alongside goes to all of them</b> &mdash; and resolved Savage Sweep by picking the
+<b>highest-Loyalty</b> standing companion. <b>Twin Hunt went on picking by list order</b>, which
+under The Pack means the earlier summon rather than the better bond. BW reported it and changed
+nothing (its tranche touched no existing ability); this points it at the same rule.</p>
+<p><b>It is ONE implementation now, <code>battle._deepest_bond</code>, and not two copies of a
+loop</b> &mdash; Savage Sweep's inline walk moved into it and Twin Hunt calls it. A rule written
+twice eventually disagrees with itself, which is exactly what happened here across two batches.
+Ties break on list order, so the answer is deterministic and a test can assert an identity rather
+than a probability.</p>
+
+<h3>&sect;4 &mdash; Beast becomes companion</h3>
+<p>The prose said companion, the field said <code>beasts</code>, and three node names said Beast.
+<b>Every player-facing string now reads companion</b>: ability descriptions, status tooltips,
+the swap and summon pickers, combat-log lines, the glossary and the Master Document. <b>Code
+identifiers are deliberately untouched</b> &mdash; a missed rename in prose is a typo, a missed
+rename in code is a bug, and mixing the two would have made this batch's diff unreadable.</p>
+<p><b>TWO NODES RENAMED, KEEPING THEIR IDS &mdash; and that is the negative control that matters,
+since a rename that moved an id would break every saved build silently.</b>
+<code>bm_beast_within</code> <b>Beast Within &rarr; The Wild Within</b> and
+<code>bm_no_beast_left</code> <b>No Beast Left &rarr; None Left Behind</b>: same ids, same rows,
+same lanes, same payload fields. <b>Bestial Wrath keeps its name</b>, which reads as a proper name
+rather than as the common noun. Both new names were swept against every ability, talent node,
+status and rune before shipping (BR &sect;1) and are clean.</p>
+<p><b>THE CODE IDENTIFIERS STILL READING "beast", listed so a later batch can take them
+deliberately:</b> the unit fields <code>beasts</code>, <code>beast_committed</code>,
+<code>no_beast_left</code>, <code>no_beast_left_loyalty</code>; the node ids
+<code>bm_beast_within</code> and <code>bm_no_beast_left</code>; the battle functions
+<code>_beasts</code>, <code>_beast_cap</code>, <code>_free_beast</code>,
+<code>_on_beast_death</code>; and the locals <code>bot_beasts</code>, <code>cw_beasts</code>,
+<code>kc_beasts</code>, <code>sb_beast</code>, <code>sb_beasts</code>, <code>tm_beasts</code>.
+(<code>th_beasts</code> and <code>ss_beasts</code> are gone &mdash; &sect;3 deleted both.) No other
+node or rune names the word.</p>
+
+<h3>Verified</h3>
+<p><b>Per the standing instruction, that means the code landed and works. No sweeps, no bands, no
+balance measurement was run, and none should be quoted from this batch.</b> check_parse 0 &middot;
+check_flow 0 &middot; check_map_screen OK (it drives the four-column screen, seats a hero at the cap
+so a column renders its drop step, and confirms) &middot; run-harness gates 1/2/3 PASS &middot;
+<b>NEW test_batch_bx.gd 141/0</b>, full battery green with zero failures anywhere. Every clause &sect;6 named is driven live, and each is built so a
+broken implementation still fails: the per-member ledger is driven on <b>two heroes sharing one
+spec</b>, which is the only arrangement in which a shared list is visible; the one-action rule is
+asserted <b>before</b> the confirm, where a per-column commit passes every "the card landed" check
+and fails this one; the cap is asserted UNDECIDED with a card staged and DECIDED the moment a drop
+is named; the own-pool rule is rolled <b>200 times a hero</b>, because one offer would agree with a
+shared pool by luck; and Twin Hunt is driven by <b>identity</b> &mdash; the two companions carry
+wildly different <code>companion_power</code> so the blow says which one struck &mdash; then
+<b>mirrored</b>, so a version that always picks the second summon fails too.</p>
+<p><b>SEVEN NEGATIVE CONTROLS, each applied to product code and reverted</b> (every touched file
+back byte-identical by hash): Twin Hunt back to list order <b>trips 2</b>; the screen committing per
+column <b>trips 6</b>; a shared <code>draft_refused</code> <b>trips 7</b>; a capped column deciding
+without a drop <b>trips 1</b>; the elite offering one hero again <b>trips 4</b>; a renamed node
+moving its id <b>trips 1</b>; and the revive moved <i>below</i> the draft award <b>trips 5</b>.
+None passed.</p>
+<p><b>One fault was found by an empirical check rather than by reasoning, and it would have
+shipped.</b> <code>Callable.bind</code> appends its arguments <i>after</i> the call's, so
+<code>f.bind(idx).bind(name)</code> resolves to <code>f(name, idx)</code> &mdash; reversed. The drop
+step's staged handler was written as a double bind and would have thrown the moment a player named a
+replacement, in the one path no source check and no headless draw was exercising.</p>
+<p><b>The drafts-per-run figure above is instrumentation, not a difficulty reading</b>: it comes
+from an 8-run walk taken only to exercise RunSim's draft path, and its Matrix row is not quoted.
+<b>The designer had no run in flight and none was created</b> &mdash; no <code>run_save.bin</code>
+exists, and profile.json, relics.json and trees.json are byte-identical by hash across the whole
+battery.</p>
+
 <h2>2026-08-14 &mdash; Batch BW: tranche 2, the Warrior nine (TRANCHE 2 COMPLETE)</h2>
 <p><i><b>LEAD WITH THE DEBT BEING PAID.</b> Since Batch BP the Warrior three have been the visible
 shape of what the draft still owed &mdash; two cards apiece against everybody else's five, so a

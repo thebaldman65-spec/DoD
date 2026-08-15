@@ -656,7 +656,11 @@ meter is ungoverned. meter | what governs it | where the governor lives:
   count and peak together at battle start, before the opening oath; one ratchet site in
   `_gain_faith` | battle.gd ~8125-8171.
 
-### STANDING REFERENCE — THE ABILITY DRAFT, THE SEVEN-SLOT CAP AND THE TWELVE PROTECTED CORES (Batch BO)
+### STANDING REFERENCE — THE ABILITY DRAFT, THE SEVEN-SLOT CAP AND THE TWELVE PROTECTED CORES (Batch BO, reach rewritten at BX)
+**AN ELITE OFFERS A DRAFT TO EVERY LIVING HERO (Batch BX §2), on ONE SCREEN of four columns,
+each hero drawing from their OWN pools and keeping their OWN no-return ledger.** BO offered to
+one hero drawn at random; that is history. Everything else in this block is BO's and still
+current.
 **A SECOND ABILITY SOURCE BESIDE THE BOSS PICK, AND IT IS A SEPARATE POOL ON PURPOSE.**
 `Classes.SPEC_DRAFT_POOLS` / `CLASS_DRAFT_POOLS` are what elites, merchants and events offer;
 `SPEC_POOLS` is still what a ZONE BOSS offers and it is byte-untouched. Sharing one pool would
@@ -902,6 +906,156 @@ claim, so a tranche that fills three pools trips them by construction. Two shape
   refusal reach the spec pool too (bq, br) or by moving it onto a **Berserker**, whose pool is
   genuinely still two (bo). **WHEN THE WARRIOR THIRD LANDS, bo's version has to move again** — and
   that forced move is the honest signal that the last of tranche 2 is paid.
+
+BATCH BX (08-15) — EVERY HERO DRAFTS AFTER AN ELITE. **THE RATE IS THE CHANGE: an elite victory
+offers a draft to EVERY LIVING HERO, each from their own pool, on ONE SCREEN OF FOUR COLUMNS rather
+than four screens in sequence.** Measured end to end on a walked run: **34.00 offers/run against
+BO's ~10, and 62% of them arrive at a hero already at the seven-slot cap** — so most drafts are a
+take-one-and-drop-one decision now, not a free addition. **IT SHIPS DELIBERATELY UNTUNED. DO NOT
+PRE-TUNE THE CAP, THE OFFER SIZE OR THE ONE-IN-FOUR SEAM** — the designer took the 4x knowingly, to
+be felt against the pools as they stand before tranche 3 lands thirty-six more on top. No new
+ability, no talent node, no magnitude, no save version moves (still v10).
+**`draft_refused` IS PER MEMBER AND THAT IS LOAD-BEARING — a shared ledger is the obvious
+implementation and the wrong one.** Four heroes drafting at once must not share a refusal list, or
+declining a card for the Pyromancer would hide it from the Cryomancer. `Run.roll_draft_offer` is
+called PER MEMBER and reads that member's own spec pool, class pool and ledger, so a Pyromancer can
+never be shown a Warden card. test_batch_bx drives it on **TWO HEROES SHARING ONE SPEC**, which is
+the only arrangement in which a shared list is visible at all — the real party holds one of each
+class, so an ordinary run could never catch it.
+**THE SCREEN RESOLVES AS ONE ACTION, AND THAT DECIDED THE IMPLEMENTATION.** Every column is chosen,
+then the whole screen is confirmed — so filling the Devout's last slot can still be reconsidered
+before the Warden's pick locks. The choices are therefore **STAGED** on `map_screen._draft_stage`,
+not committed: nothing touches `Run` until `_confirm_party_draft`, which walks the columns through
+**`Run.take_draft_ability` and `Run.decline_draft`, the same two doors the boss pick already used**.
+The screen owns NO rule — the cap, the drop, the ledger and the fill-short rule all still live in
+`run_state.gd`. **Leaving the screen commits nothing** and the picks stay owed on the hero cards;
+clicking a staged card again UNSTAGES it, because declining costs a whole offer and must never be
+the only way out of a misclick.
+· **ONE DRAFT RENDERER, NOT TWO (§1's instruction).** BO's single-hero draft branch inside
+  `_open_pick_overlay` is **DELETED**, not left unreachable, along with `_pick_draft` and
+  `_decline_draft`; the hero card's CHOOSE button routes to `_open_party_draft`. A merchant or
+  event grants to ONE hero and renders as a one-column version of the same screen. **The DROP step
+  is still one function with two consumers** — `_open_drop_overlay` gained an optional `on_drop`
+  Callable, so the party screen STAGES its replacement where the boss pick COMMITS, and the
+  difference is one Callable rather than a second answer to what may be dropped.
+· **THE FALLEN DRAFT NORMALLY, AND THE ORDERING WAS VERIFIED RATHER THAN ADDED. §2's conditional
+  was FALSE and this is the correction toward the code (the AR §6 / AX §7 / BU precedent): A
+  POST-BATTLE REVIVE ALREADY EXISTED**, inside `BattleUnit.sync_victory_state` ("The fallen refuse
+  to stay down"), and it returns a fallen hero at **20% of maximum, not at 1 HP**. It runs in the
+  victory branch ~50 lines ABOVE the draft award, so a hero who fell is alive when the screen opens
+  as a consequence of the existing order. **NOTHING WAS CHANGED TOWARD 1 HP** — the instruction to
+  add one was conditional on none existing, and cutting 20% to 1 HP is a real nerf nobody asked
+  for. The health gate in both award loops is written and tested anyway, so the rule is stated
+  rather than depending on a fact that could stop being true.
+· **THE SIM WALK MATCHES THE VICTORY BRANCH OR THE MEASUREMENT IS WRONG.** `RunSim` walks the party
+  under the same gate; `run.party.pick_random()` is gone from both sites. **NEW COUNTER
+  `draft_at_cap`, counted at the OFFER rather than at the take** — `draft_dropped` is the same
+  figure only because the bot never declines, and this one stays true of a policy that does.
+· **NO PRE-BX DRAFT RATE IS COMPARABLE.** BT read 8.17 offers/run, BR 9.00, BU 10.33 — all
+  one-hero-per-elite figures. A post-BX row is ~4x by construction.
+**§3 — TWIN HUNT PICKS THE HIGHEST-LOYALTY COMPANION, AND THERE IS ONE IMPLEMENTATION OF THAT RULE
+NOW.** BV set it (an ORDERED action goes to ONE companion; the passive strike-alongside goes to all
+of them) and resolved Savage Sweep by the deepest bond; **Twin Hunt went on reading `beasts[0]`,
+i.e. LIST ORDER, which under The Pack means the earlier summon rather than the better bond.** BW
+reported it and changed nothing. `battle._deepest_bond(hunter)` is the one answer now — Savage
+Sweep's inline loop moved into it, Twin Hunt calls it, and **`th_beasts` and `ss_beasts` are both
+gone**. Ties break on LIST ORDER (the comparison is strict), so the answer is deterministic and a
+test asserts an IDENTITY rather than a probability. **A rule written twice eventually disagrees
+with itself, which is exactly what happened here across two batches.**
+**§4 — BEAST IS COMPANION IN EVERY PLAYER-FACING STRING; THE CODE IDENTIFIERS ARE UNTOUCHED ON
+PURPOSE.** A missed rename in prose is a typo; a missed rename in code is a bug, and mixing the two
+would have made the diff unreadable. Renamed: ability and status descriptions, tooltips, the swap
+and summon pickers, combat-log lines, the sim's own report labels, `data/glossary.json`,
+`data/runes.json` and `docs/master.html`. **COMMENTS ARE LEFT ALONE** — they sit with the code.
+· **TWO NODES RENAMED, KEEPING THEIR IDS, AND THAT IS THE NEGATIVE CONTROL THAT MATTERS**: a rename
+  that moved an id breaks every saved build SILENTLY (the node just stops being owned).
+  `bm_beast_within` **Beast Within -> THE WILD WITHIN** and `bm_no_beast_left` **No Beast Left ->
+  NONE LEFT BEHIND** — same ids, same rows, same lanes, same payload fields, all asserted.
+  **BESTIAL WRATH KEEPS ITS NAME** (a proper name, not the common noun). Both new names swept
+  against every ability, talent node, status and rune (BR §1) and clean; no other node or rune
+  names the word.
+· **THE CODE IDENTIFIERS STILL READING "beast", listed so a later batch can take them
+  deliberately:** unit fields `beasts`, `beast_committed`, `no_beast_left`,
+  `no_beast_left_loyalty`; node ids `bm_beast_within`, `bm_no_beast_left`; battle functions
+  `_beasts`, `_beast_cap`, `_free_beast`, `_on_beast_death`; locals `bot_beasts`, `cw_beasts`,
+  `kc_beasts`, `sb_beast`, `sb_beasts`, `tm_beasts`. `kinds_summoned` and `_beast_cap` were named
+  in the brief; `th_beasts` was too and §3 deleted it.
+· **THE RENAME'S OWN TRAP, WORTH KEEPING: `\n` IN A GDSCRIPT STRING IS TWO CHARACTERS, SO A
+  `\bbeast\b` REGEX SILENTLY FAILS ON EVERY HAND-WRAPPED TOOLTIP.** The `n` of the escape is a
+  WORD character, so "this\nbeast's own gift" has no word boundary before the word and the first
+  pass skipped exactly the multi-line descriptions that matter most. Escapes must be masked to a
+  non-word sentinel first. The same pass also needs an ALL-CAPS rule (`BEAST'S` appears in two
+  descriptions). **Found by re-running the survey after the pass, not by the pass reporting
+  anything — a rename script that silently does 90% of the job looks identical to one that worked.**
+**VERIFIED — AND PER THE STANDING INSTRUCTION, THAT MEANS THE CODE LANDED AND WORKS. NO SWEEPS, NO
+BANDS, NO BALANCE MEASUREMENT WAS RUN, and none should be quoted from this batch.**
+check_parse 0 · check_flow 0 · check_map_screen OK · run-harness gates 1/2/3 PASS ·
+**NEW test_batch_bx.gd 141/0**.
+**check_map_screen GAINED A DRAFT STAGE, and it is the only thing that EXECUTES the four-column
+draw** (the BK rule about the lattice, applied to a second screen): it opens the screen with four
+columns owed, seats hero 0 AT THE CAP so a column renders its DROP step, drives the modal, and
+confirms. **A Callable that does not bind fails at DRAW time and no source check can see it** — see
+the bind trap below, which this is what would have caught.
+**test_batch_bx DRIVES THE REAL VICTORY BRANCH, WHICH NO MEASUREMENT IN THIS PROJECT CAN REACH.**
+`_check_end` branches to RunSim in sim mode, so battle.gd's run-mode victory block — where the four
+picks are handed out — is never executed by a sim or a `--run`. The suite spawns a live ELITE
+encounter, empties the field, **drops one hero to 0 HP**, and calls `_check_end`: four picks owed,
+every hero holding their own cards, and the hero who fell **up again and holding a column**.
+**SEVEN NEGATIVE CONTROLS, each applied to product code and reverted (battle.gd, map_screen.gd,
+run_state.gd and talents.gd all came back byte-identical by hash):** Twin Hunt back to list order
+**trips 2**; the screen committing per column **trips 6**; `draft_refused` shared across the party
+**trips 7**; a capped column deciding without a drop **trips 1**; the elite offering ONE hero again
+**trips 4**; a renamed node moving its id **trips 1**; and **the revive moved BELOW the draft award
+trips 5** — including the LIVE "a real elite victory owes FOUR picks (got 3)", so the ordering
+accident §2 warns about is caught by a driven check and not only by a source position. **NONE
+PASSED.**
+**ONE FAULT FOUND BY AN EMPIRICAL CHECK RATHER THAN BY REASONING, AND IT WOULD HAVE SHIPPED:
+`Callable.bind` APPENDS its arguments AFTER the call's, so `f.bind(idx).bind(name)` resolves to
+`f(name, idx)` — REVERSED.** The drop step's staged handler was written as a double bind and would
+have thrown a type error the moment a player named a replacement, in the one path no source check
+and no headless draw was exercising. Proven with a three-line script rather than argued about; the
+callable is passed BARE now and `_open_drop_overlay` binds both arguments in signature order.
+**FULL BATTERY GREEN, ZERO FAILURES ANYWHERE**: ah 5500, ah_battle 65, ai 2217, aj 418, ak 528,
+al 560, ar 735, as 396, at 470, au 336, av 324, aw 350, ax 339, ay 484, az 519, ba 690, bb 172,
+bc 91, bd 69, be 34, bf 78, bg 47, bh 233, bi 88, bj 67, bl 88, bm 1891, bn 77, **bo 769**, bp 271,
+bq 738, br 1441, bs 262, bt 463, bu 476, bv 893, bw 545, **bx 141**, runes 2973, rune_battle 97 —
+all 0 failures. **an reads 3617 and bk 129, both inside their DOCUMENTED run-to-run drift** —
+neither is pinned and neither should be.
+· **ONE COUNT MOVED AND IT IS EXPLAINED: bo 768 -> 769**, one check ADDED where its
+  draft-is-a-kind-inside-the-overlay assertion was re-pointed.
+· **FOUR SUITES RE-POINTED IN PLACE WITH THE REASON IN EACH FILE, AND THREE OF THE RE-POINTS ARE
+  INVERSIONS.** test_batch_bo's "the sim's elite branch offers it to ONE hero" became "to every
+  living hero", and its "the draft is a kind inside the pick overlay" became "BO's single-hero
+  branch is GONE and the draft has exactly one renderer". test_batch_bb's swap-tooltip needle and
+  test_batch_bj's Call of the Wild needle both rode words §4 renamed — **the questions are
+  byte-for-byte the same; only the fragments moved.** test_batch_ay's two labels name the renamed
+  nodes with their old names in brackets.
+**THE MASTER.HTML STAMP GATE IS DUPLICATED TWELVE TIMES — test_batch_ah, bb, bn, bo, bp, bq, br,
+bs, bt, bu, bv and bw — and all twelve moved to Batch BX.** test_batch_bx adds a thirteenth, so the
+next batch moves thirteen. The count rises by one per batch exactly as this note keeps predicting.
+**LIVE AUTOPLAY CLEAN, 0 SCRIPT ERROR over 155 log lines, and §4 IS VISIBLE IN A REAL FIGHT** —
+"Beastmaster: Twin Hunt — hunter and **companion** strike together", "Savage Sweep — Canis runs at
+the lowest-health enemy", "the **companion's** kill pays for this one". **Both cards chose the SAME
+companion in that fight, which is §3 working in plain sight** — though note the smoke does not
+DISCRIMINATE (Canis was both the first summon and the deeper bond there), which is why the suite
+drives the disagreeing arrangement directly and mirrors it.
+**A `--run 8` WAS WALKED ONLY TO EXERCISE RunSim's DRAFT PATH** (`DOD_SIM_DIFFICULTY=warden`):
+**34.00 offers/run, 99.00 cards shown, taken 34.00, cost a drop 21.00, at cap when offered
+21.00/run (62% of offers), short offers 2.50/run, nothing left to offer 0.00/run.** Against BU's
+10.33 and BT's 8.17 that is the 4x measured end to end. **Its Matrix row is NOT a difficulty
+reading and none is quoted.**
+**THE DESIGNER HAD NO RUN IN FLIGHT and none was created** — no `run_save.bin` exists, and
+**profile.json, relics.json AND trees.json are byte-identical by hash** across the whole battery,
+the negative controls and the walk.
+**KNOWN-BAD, NOT OURS, AND ONE OF THEM IS NEW TO THIS LIST: test_batch_ah and test_batch_an still
+call `Run.award_talent_points`** (deleted at BM, silently under-testing since), and test_runes still
+prints its `start_rune_enabled` SCRIPT ERROR at 2973/0. **NEWLY RECORDED: test_batch_bj throws
+THREE SCRIPT ERRORs of its own** — it drives `sync_victory_state` on a bare `BattleUnit.new()`,
+whose `expire_fortified_spirit` unwind reaches `_refresh_chips` with no nameplate. **REPRODUCED ON
+UNMODIFIED HEAD (3 of 3), so it is not this batch's**, and unlike the BC trap it aborts nothing —
+bj's own assertions all pass and its count is unmoved at 67. Stderr noise, recorded so the next
+reader does not spend a bisect on it. **The same trap bit this suite's first draft**, which is why
+`_live_revive` uses a REAL spawned unit.
 
 BATCH BW (08-14) — TRANCHE 2, THE WARRIOR NINE. **TRANCHE 2 IS COMPLETE.** Nine spec draft
 abilities, three per Warrior spec; the Warrior pools go 2 -> 5 and **every one of the twelve now
@@ -2564,7 +2718,10 @@ reinterpreted** (the AR §6 / AX §7 / BD §3 / AY §1 precedent):
 §3 **TWO DECISIONS THE BRIEF DID NOT MAKE, REPORTED RATHER THAN BURIED.** (a) **ONE HERO PER
 ELITE, drawn at random and independently of the rune looter** — §3 says "always, on victory"
 and not to whom, and offering every hero a card at every elite would hand out ~26 picks a run
-against four draftable slots, which is not a draft. (b) **THE MERCHANT'S PRICE, 120 / 180 / 240
+against four draftable slots, which is not a draft. **SUPERSEDED BY BATCH BX §2, AND ITS OWN
+OBJECTION IS WHAT BX ANSWERS: the reach IS every living hero now, and what makes that bearable
+is a SCREEN (one screen, four columns) rather than four offers in sequence.** Measured at 34.00
+offers/run. Do not re-record the draft as one hero per elite. (b) **THE MERCHANT'S PRICE, 120 / 180 / 240
 by zone**, deliberately below the blacksmith's 150/225/300: the smith buys a permanent upgrade
 to something you already hold and BK measured it converting 41-47% of ALL run income, so an
 ability is the cheaper, more frequent question.

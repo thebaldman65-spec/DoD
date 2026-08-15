@@ -157,6 +157,12 @@ static var draft_taken := 0       # offers resolved into an ability
 static var draft_dropped := 0     # ...of those, ones that cost a drop
 static var draft_short := 0       # offers that could not fill three cards
 static var draft_refused_pool := 0  # offers with nothing left to show at all
+# BATCH BX §2 — THE ONE NUMBER THE RATE CHANGE IS TO BE WATCHED BY, and it is
+# counted at the OFFER rather than at the take: a hero already at the
+# seven-slot cap when the cards were shown. `draft_dropped` counts drops the
+# bot actually made, which is the same figure only because the bot never
+# declines; this one stays true of a policy that does.
+static var draft_at_cap := 0
 static var rune_refused_noslot := 0 # never offered: every slot already worn
 static var rune_refused_gold := 0   # offered, left on the counter: 40g reserve
 static var rune_refused_dupe := 0   # re-roll kept landing on an owned rune
@@ -691,13 +697,21 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 		run.add_item(run.random_loot())
 		for extra_i in int(run.relic_add("loot_extra")):
 			run.add_item(run.random_loot())
-		# BATCH BO §3 — AN ELITE ALWAYS OFFERS A DRAFT, to one hero drawn
-		# independently of the rune looter (battle.gd's victory branch makes
-		# the same two draws). Resolved instantly here rather than owed to a
-		# screen, exactly as the trophy pick already is: the bot rolls the SAME
-		# offer a player would see and takes from THAT, so a sim can never hold
-		# a card the real flow would not have shown it.
-		_award_draft(run, run.party.pick_random())
+		# BATCH BO §3 / BATCH BX §2 — AN ELITE OFFERS A DRAFT TO EVERY LIVING
+		# HERO. BO offered to one drawn at random; BX makes it party-wide, and
+		# the walk has to match battle.gd's victory branch or the sim measures a
+		# draft rate the game does not have. Resolved instantly here rather than
+		# owed to a screen, exactly as the trophy pick already is: the bot rolls
+		# the SAME offer a player would see and takes from THAT, so a sim can
+		# never hold a card the real flow would not have shown it.
+		#
+		# The health gate is the same one battle.gd applies and is likewise never
+		# false in practice — `heal_party` runs below and the victory sync has
+		# already returned the fallen — but a walk that silently depended on that
+		# would be a walk that breaks the day it stops being true.
+		for d_m in run.party:
+			if int(d_m.get("hp", 0)) > 0:
+				_award_draft(run, d_m)
 	# §6: clearing ANY slot heals 15%, with the relic stacking on top.
 	run.heal_party(run.victory_heal_pct())
 	var v_mana: float = run.relic_add("victory_mana_pct")
@@ -848,6 +862,7 @@ static func _award_draft(run: Node, m: Dictionary) -> void:
 		draft_short += 1
 	var drop := ""
 	if run.ability_slots_full(m):
+		draft_at_cap += 1
 		var earned: Array = run.earned_ability_names(m)
 		if earned.is_empty():
 			return
@@ -1263,6 +1278,14 @@ static func _print_report(battle) -> void:
 		draft_dropped / runs])
 	print("           short offers (pool under 3) %.2f/run   nothing left to offer %.2f/run" % [
 		draft_short / runs, draft_refused_pool / runs])
+	# BATCH BX §2 — THE RATE CHANGE, STATED SO IT IS WATCHED RATHER THAN
+	# DISCOVERED. An elite offers to all four heroes now, so the offers line
+	# above is ~4x BO's; `at cap` is the share of those offers where taking a
+	# card meant dropping one, which is the figure the "constant meaningful
+	# decisions, or churn?" question actually turns on.
+	print("           at cap when offered %.2f/run (%.0f%% of offers)" % [
+		draft_at_cap / runs,
+		100.0 * draft_at_cap / maxf(draft_attempts, 1.0)])
 
 	# ---------- Rune economy (Batch AD stage 0a) ----------
 	# The half of the rune question no measurement has ever shown. Read it

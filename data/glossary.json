@@ -589,8 +589,8 @@
 		"id": "pack_bond",
 		"term": "Pack Bond",
 		"category": "combat",
-		"short": "The Beastmaster's passive: each active beast grants its own boon.",
-		"long": "Every beast the Beastmaster fields grants a boon that scales with its Loyalty - Ursus draws enemy attacks and blunts what reaches the hunter, Canis sharpens him against wounded prey, Aguila lifts the whole party's crit chance. The boon is x(1 + 0.20 per Loyalty stack) and it has no ceiling. HE NORMALLY FIELDS ONE BEAST; under THE PACK capstone he fields TWO AT ONCE, each with its own Loyalty meter, and BOTH boons apply at FULL strength - a swap then replaces whichever of the two holds LESS Loyalty, so the deeper bond always keeps its place (a tie falls to the older). Menagerie keeps an absent beast's boon alive at half strength, and Vengeance carries a dead one's for the rest of the battle. Lone Bond is the opposite bargain and closes The Pack outright: one beast, arriving deep, growing twice as fast.",
+		"short": "The Beastmaster's passive: each active companion grants its own boon.",
+		"long": "Every companion the Beastmaster fields grants a boon that scales with its Loyalty - Ursus draws enemy attacks and blunts what reaches the hunter, Canis sharpens him against wounded prey, Aguila lifts the whole party's crit chance. The boon is x(1 + 0.20 per Loyalty stack) and it has no ceiling. HE NORMALLY FIELDS ONE COMPANION; under THE PACK capstone he fields TWO AT ONCE, each with its own Loyalty meter, and BOTH boons apply at FULL strength - a swap then replaces whichever of the two holds LESS Loyalty, so the deeper bond always keeps its place (a tie falls to the older). Menagerie keeps an absent companion's boon alive at half strength, and Vengeance carries a dead one's for the rest of the battle. Lone Bond is the opposite bargain and closes The Pack outright: one companion, arriving deep, growing twice as fast.",
 		"see_also": [
 			"res_loyalty"
 		]
@@ -622,8 +622,8 @@
 		"id": "res_loyalty",
 		"term": "Loyalty",
 		"category": "resources",
-		"short": "The Beastmaster's bond, built per beast, uncapped, lost with it.",
-		"long": "Each living beast builds Loyalty at the hunter's turn start, and there is NO CEILING on it. Every stack is +5% companion strike damage plus that beast's own gift, and the Pack Bond boon itself climbs continuously with the meter - x(1 + 0.20 per stack), so x2 at five, x3 at ten, x5 at twenty, and it never plateaus. Exactly one talent still imposes a cap: Wild Rotation holds it at 3, and that is the price of swapping freely. A beast's death wipes its Loyalty - the bond dies with it, and that is the whole stake of the partnership. It also decides who leaves: under The Pack a third summon replaces whichever standing beast holds LESS Loyalty (a tie falls to the older), so depth is never traded away for a fresh arrival.",
+		"short": "The Beastmaster's bond, built per companion, uncapped, lost with it.",
+		"long": "Each living companion builds Loyalty at the hunter's turn start, and there is NO CEILING on it. Every stack is +5% companion strike damage plus that companion's own gift, and the Pack Bond boon itself climbs continuously with the meter - x(1 + 0.20 per stack), so x2 at five, x3 at ten, x5 at twenty, and it never plateaus. Exactly one talent still imposes a cap: Wild Rotation holds it at 3, and that is the price of swapping freely. A companion's death wipes its Loyalty - the bond dies with it, and that is the whole stake of the partnership. It also decides who leaves: under The Pack a third summon replaces whichever standing companion holds LESS Loyalty (a tie falls to the older), so depth is never traded away for a fresh arrival.",
 		"see_also": [
 			"boss_trophies"
 		]
@@ -934,7 +934,7 @@
 		"term": "The Ability Draft",
 		"category": "progression",
 		"short": "New abilities offered three at a time by elites, merchants and events.",
-		"long": "Beside the zone-boss pick sits a second, larger source of abilities. EVERY ELITE OFFERS ONE ON VICTORY, to one hero; a MERCHANT sells one for gold (120 / 180 / 240 by zone); and some EVENTS trade for one. Every offer is three cards the hero does not already own, drawn from that spec's draft pool with roughly one card in four coming from a wider class-wide pool. If the pool cannot fill three it FILLS SHORT rather than repeating itself. Elites run 0-3 per zone, so how much you draft is a property of the road you walked: a greedy route drafts far more than a cautious one. DECLINING IS ALWAYS ALLOWED, and a declined or dropped ability does not come back to that run's pool.",
+		"long": "Beside the zone-boss pick sits a second, larger source of abilities. EVERY ELITE OFFERS ONE TO EVERY LIVING HERO ON VICTORY, on ONE SCREEN of four columns rather than four screens in sequence; a MERCHANT sells one for gold (120 / 180 / 240 by zone); and some EVENTS trade for one. Every offer is three cards the hero does not already own, drawn from that spec's draft pool with roughly one card in four coming from a wider class-wide pool. EACH HERO DRAWS FROM THEIR OWN POOLS - a Pyromancer is never shown a Warden card, and a hero who fell in the fight is back up before the screen opens and drafts like anyone else. If the pool cannot fill three it FILLS SHORT rather than repeating itself; a hero with nothing left to be shown simply has no column. Elites run 0-3 per zone, so how much you draft is a property of the road you walked: a greedy route drafts far more than a cautious one. DECLINING IS ALWAYS ALLOWED, PER HERO AND INDEPENDENTLY - one hero taking a card does not commit the others. A declined or dropped ability does not come back to that run's pool FOR THAT HERO; the ledger is per hero, so refusing a card for one never hides it from another. THE SCREEN RESOLVES AS ONE ACTION: every column is chosen, then the whole screen is confirmed, so a pick can still be reconsidered until then. At the seven-slot cap a column does not resolve until you have named what the incoming card replaces.",
 		"see_also": [
 			"ability_slots",
 			"protected_core",

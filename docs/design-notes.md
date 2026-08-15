@@ -3344,3 +3344,47 @@ been silently doubling anything that named the beast, and the reason nobody had 
 until now only one ability named it. Writing two more forced the question, and the answer is worth
 more than either card: it means the next Beastmaster ability has a rule to be authored against
 instead of a precedent to be inherited from whichever line of code it happens to resemble.
+
+## Batch BX — every hero drafts after an elite
+
+**Reach and pacing are separate problems, and BO solved the wrong one.** BO's own objection to
+offering a draft to all four heroes was that it would hand out ~26 picks a run — but that objection
+is really about *the number of screens*, not the number of cards. Four sequential offers after every
+elite would be tedious; four columns on one screen is a single decision that happens to have four
+parts. The fix for "too slow" was a layout, and shrinking the reach to one hero at random was paying
+for it with the feature.
+
+**A screen that resolves as one action is a different screen, not the same screen with a button on
+the end.** Once the promise is "reconsider the Devout before the Warden locks", every choice has to
+be *staged* rather than committed, which means the screen holds state the run does not yet know
+about. That is the whole implementation cost, and it is worth it for one reason: a player comparing
+four columns is doing something a player answering four questions in a row cannot do.
+
+**The rules had to stay in `run_state.gd` for the screen to be cheap.** The cap, the drop, the
+no-return ledger and the fill-short rule were already there and already tested, so the second layout
+cost a layout and nothing else. The tell that this went right is the drop step: the party screen and
+the boss pick share one function and differ by a single Callable — one stages, one commits.
+
+**A conditional instruction whose condition is false is not an instruction.** The brief said to add
+a 1 HP post-battle revive *if none existed*. One existed, at 20% of maximum. Following the letter
+would have cut a shipped number by 95% as a side effect of a rename-scale batch, and nobody would
+have asked why. The cheap habit that catches this is reading the site before writing against it.
+
+**Renaming prose is not a find-and-replace, and the failure is silent.** `\n` inside a GDScript
+string is two characters, so the `n` makes "this\nbeast's gift" have no word boundary before the
+word — a word-boundary regex skips exactly the hand-wrapped tooltips that matter most, and reports
+nothing. A rename script that quietly does 90% of the job is indistinguishable from one that worked;
+the only thing that found it was re-running the survey afterwards and expecting zero.
+
+**A word that appears in both the code and the fiction should be renamed in one of them at a time.**
+Doing prose and identifiers together would have produced a diff nobody could review, and the two
+have completely different failure modes: a missed prose rename reads as a typo, a missed code rename
+is a bug. Splitting them means the second half can be declined forever without leaving anything
+half-done.
+
+**Two copies of a rule disagree eventually, and "eventually" was two batches.** BV wrote the
+ordered-action rule and applied it to the card it was authoring; the older card kept reading list
+order, and BW saw it and correctly left it alone. Neither batch was wrong. What was wrong was that
+the rule lived in a loop rather than in a function — so applying it to a second card meant copying
+it, and copying it is what let the first card keep the old answer.
+

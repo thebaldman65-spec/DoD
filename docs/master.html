@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-14 (Batch BW)</b></p>
+<p align="right"><b>Last updated: 2026-08-15 (Batch BX)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -649,14 +649,14 @@ attack's damage.</td></tr>
 <tr><td>Guardian's Roar</td><td>The bear stands firm: Ursus takes 25% less damage
 (on summon/swap, 2 turns).</td></tr>
 <tr><td>Loyalty</td><td>Beastmaster companion chip (UNCAPPED, battle-long): +5% strike
-damage per stack plus the beast's gift, and the Pack Bond boon grows 20% a stack with no
-ceiling. Lost when the beast dies (kept in full under Steadfast Bond).</td></tr>
-<tr><td>Marked</td><td>Mark of the Hunt: the Beastmaster and their beast deal +25% damage
+damage per stack plus the companion's gift, and the Pack Bond boon grows 20% a stack with no
+ceiling. Lost when the companion dies (kept in full under Steadfast Bond).</td></tr>
+<tr><td>Marked</td><td>Mark of the Hunt: the Beastmaster and their companion deal +25% damage
 to this enemy and their strikes on it restore the hunter's Mana (5 turns; kill resets the
 mark's cooldown).</td></tr>
-<tr><td>Primal Surge</td><td>The Beastmaster spent the beast's Loyalty: +10% damage dealt
+<tr><td>Primal Surge</td><td>The Beastmaster spent the companion's Loyalty: +10% damage dealt
 (1 turn per stack spent).</td></tr>
-<tr><td>Vengeance</td><td>The Beastmaster's beast died: +30% damage and its Pack Bond boon
+<tr><td>Vengeance</td><td>The Beastmaster's companion died: +30% damage and its Pack Bond boon
 lives on at FULL strength for the rest of the battle (Vengeance talent).</td></tr>
 <tr><td>Held Breath</td><td>The Sharpshooter's next attack is a GUARANTEED critical and
 ignores all armor (Hold Breath; two attacks with Second Nature — the HB# chip counts
@@ -940,7 +940,7 @@ talent has already granted is never offered again.</p>
 <tr><td><b>Holy</b></td><td>Heal, Renewal, Hymn of Hope, Resurrection (four — see §6.3)</td><td>Divine Plea</td></tr>
 <tr><td><b>Devout</b></td><td>Divine Shield, Consecrated Ground, Blessing of Zeal</td><td>Sacred Resolve, Bulwark of Fortitude</td></tr>
 <tr><td><b>Occultist</b></td><td>Hex of Ruin, Bewitch, Dark Pact</td><td>Mind Flay, Mass Hysteria, Umbral Sigil</td></tr>
-<tr><td><b>Beastmaster</b></td><td>Summon Companion (the three-beast picker counts as one), Hunter's Instinct, Kill Command</td><td>Bestial Wrath, Spirit Bond, Primal Surge, Call of the Wild, Mark of the Hunt</td></tr>
+<tr><td><b>Beastmaster</b></td><td>Summon Companion (the three-companion picker counts as one), Hunter's Instinct, Kill Command</td><td>Bestial Wrath, Spirit Bond, Primal Surge, Call of the Wild, Mark of the Hunt</td></tr>
 <tr><td><b>Sharpshooter</b></td><td>Aimed Shot, Powershot, Hold Breath</td><td>Quick Draw, Triple Shot, Coup de Grâce, Pinning Shot, Called Shot</td></tr>
 <tr><td><b>Survivalist</b></td><td>Tripwire, Shrapnel Charge, Snare Trap</td><td>Explosive Shot, Venom Coating, Hamstring, Deadfall, Harvest</td></tr>
 </table>
@@ -948,7 +948,7 @@ talent has already granted is never offered again.</p>
 abilities plus the class's vaulted ones. <b>Curation rule — an entry has to FUNCTION for a
 sibling.</b> Anything that costs a spec-exclusive secondary resource (Mercy, Faith), reads a
 passive the taker will not have (Burn to consume, Resonance to spend, Loyalty or a living
-beast, the Swordmaster's stance), or is a spec's signature identity piece (the three summons,
+companion, the Swordmaster's stance), or is a spec's signature identity piece (the three summons,
 Kill Command, Hex of Ruin) is spec-pool-only. <b>The zone-boss draw reads the SPEC pool
 alone</b>; the class pool is the standing statement of what an ability could legally be
 offered to, and it is what a re-opened class draw would read.</p>
@@ -979,9 +979,9 @@ that point every new one replaces an old one.</p>
 <p><b>Where picks come from.</b></p>
 <table border="1" cellpadding="4">
 <tr><th>Source</th><th>Offer</th></tr>
-<tr><td><b>Elite</b></td><td><b>Always</b>, on victory — one hero, drawn at random. Elites run
-0–3 per zone, so drafts are <b>route-dependent</b>: a greedy route drafts far more than a
-cautious one.</td></tr>
+<tr><td><b>Elite</b></td><td><b>Always</b>, on victory — <b>to every living hero</b>, each
+from their own pool, on <b>one screen of four columns</b>. Elites run 0–3 per zone, so drafts
+are <b>route-dependent</b>: a greedy route drafts far more than a cautious one.</td></tr>
 <tr><td><b>Merchant</b></td><td>Purchasable with gold, one hero at a time: <b>120 / 180 / 240
 by zone</b>. The three cards are drawn at purchase and wait on that hero's card.</td></tr>
 <tr><td><b>Event</b></td><td>Some events trade for one — the Ancient Training Grounds sells a
@@ -991,6 +991,32 @@ pool, same overlay.</td></tr>
 </table>
 <p><b>Every offer is 3 cards</b>, and if the pool cannot fill three it <b>fills short rather
 than padding with repeats</b> — the same rule ability upgrades already follow.</p>
+
+<p><b>The elite draft screen.</b> An elite victory offers a draft to <b>every living hero at
+once</b>, on <b>one screen with four columns</b> rather than four screens in sequence. Each
+hero draws <b>their own three cards</b> from their own spec pool and their own class pool, at
+the usual one-in-four seam — a Pyromancer is never shown a Warden card. A hero who <b>fell</b>
+during the fight is back on their feet before the screen opens (every won battle returns the
+fallen at 20% of maximum), so they draft like anyone else. A hero whose pool has nothing left
+to show simply has no column.</p>
+<ul>
+<li><b>Declining is per hero and always allowed.</b> One hero taking a card does not commit the
+others, and a settled kit is a legitimate end state.</li>
+<li><b>A declined or dropped card does not come back that run</b>, for <i>that hero</i>. The
+no-return ledger is <b>per hero</b>: refusing a card for the Pyromancer never hides it from
+anyone else.</li>
+<li><b>The seven-slot cap holds per column.</b> A hero already at the cap must name what the
+incoming card replaces before their column counts as decided.</li>
+<li><b>The screen resolves as one action.</b> All four columns are chosen, then the whole
+screen is confirmed — so filling the Devout's last slot can still be reconsidered before the
+Warden's pick is locked. Leaving the screen commits nothing; the picks stay owed on the hero
+cards.</li>
+</ul>
+<p>This is <b>four times as much drafting</b> as one hero per elite. A hero has five spec cards
+and six class cards against four draftable slots, so a hero at the cap will be dropping
+something at nearly every elite. That is the intended shape — constant, meaningful decisions —
+and it is deliberately untuned: neither the cap, nor the offer size, nor the seam is adjusted
+for it.</p>
 
 <p><b>The seven-slot cap, and the protected core.</b> Every spec keeps a <b>protected core</b>:
 its passive, its basic attack, and the minimum abilities its passive needs to function.
@@ -1020,7 +1046,7 @@ not because the passive needs them.</p>
 <tr><td><b>Holy</b></td><td>4</td><td>Heal, Hymn of Hope</td><td>Mercy is earned passively and must be spendable — Hymn pays stacks outright, and Empower needs a heal to empower.</td></tr>
 <tr><td><b>Devout</b></td><td>3</td><td>Divine Shield, Consecrated Ground</td><td>Conviction builds only on Divine Shield absorbs, and the ground's drip is two thirds of all Faith.</td></tr>
 <tr><td><b>Occultist</b></td><td>3</td><td>Shadowrend, Hex of Ruin</td><td>Wrath of the Old Gods marks on debuffs he applies; these two are the debuffs he always holds.</td></tr>
-<tr><td><b>Beastmaster</b></td><td>3</td><td>All three summons</td><td>Pack Bond reads a living beast. With no summon there is no boon, no Loyalty and no passive at all. His five opening abilities cost three slots — the summons share one bar entry.</td></tr>
+<tr><td><b>Beastmaster</b></td><td>3</td><td>All three summons</td><td>Pack Bond reads a living companion. With no summon there is no boon, no Loyalty and no passive at all. His five opening abilities cost three slots — the summons share one bar entry.</td></tr>
 <tr><td><b>Sharpshooter</b></td><td>3</td><td>Quick Shot</td><td>Lethal Aim counts consecutive single-target attacks; the free shot lets him stay on a mark every turn.</td></tr>
 <tr><td><b>Survivalist</b></td><td>3</td><td>—</td><td>Trapper's poison rides being struck, and its breadth term counts statuses from any source — including his allies'.</td></tr>
 </table>
@@ -1138,11 +1164,11 @@ slot.</p>
 <tr><td><b>Transference</b></td><td>20 Mana, 2.0, 3cd, one enemy</td><td><b>Every Ruin stack on the deepest-marked other enemy</b> travels to this one (Perfect: plus 2 more on arrival). <b>Nothing detonates in transit</b> — the stacks arrive as the work they already were. Offered only when there is a mark to move.</td><td>Corruption relocated rather than spent. His worst case is a deep mark on something about to die — twelve stacks of work wasted when the party finishes it.<br><b>Builds with:</b> <b>Unraveling</b> (a detonation seeds 4 Ruin in every other enemy) spreads the mark wide and this pulls it back to a point; <b>Covenant of Ash</b> runs the same round trip twice; and it is what makes <b>Avatar of Ruin</b>'s threshold of 5 reachable on a boss in a fight that started on trash.</td></tr>
 <tr><td><b>Anointing</b></td><td>30 Mana, 2.5, 5cd</td><td>For 3 turns (Perfect: 4), <b>every ally's attacks apply 1 Ruin</b>. It counts <b>HITS, not casts</b> — a three-hit ability applies three.</td><td>The party marks for him. Ruin is his alone; three other heroes swing every turn and contribute nothing to the meter that is his entire spec. <b>The largest generation increase available to him, and the second card here whose value is measured on somebody else's sheet.</b><br><b>Builds with:</b> <b>Entropy</b>, the party-wide per-stack lifesteal and <b>Necrosis</b> (+35% damage from all sources on a Ruined target) — so it makes every hero's damage larger, not only his. Pairs with <b>Suffering</b> above, so the enemy's clock and the party's both feed one pile.</td></tr>
 <tr><td colspan="4"><b>Beastmaster</b> — <i>what does the partnership give you</i></td></tr>
-<tr><td><b>Twin Hunt</b></td><td>25 Mana, 2.5, 3cd, one enemy</td><td>The Beastmaster and his beast strike together, each for 40% of Attack (Perfect: the beast lands 55%). If the beast's blow kills it, his next ability costs nothing.</td><td>The two bodies acting deliberately, where the rest of his kit has the beast on its own clock.</td></tr>
-<tr><td><b>Call the Wilds</b></td><td>20 Mana, 2.0, 5cd</td><td>Calls in the absent beast he is most bonded with, <b>keeping its Loyalty and paying no shared Swap cooldown</b>, and it strikes immediately (Perfect: twice).</td><td>Rotation without the tax — the central verb of an entire lane happens 0.05 times a trash battle.</td></tr>
+<tr><td><b>Twin Hunt</b></td><td>25 Mana, 2.5, 3cd, one enemy</td><td>The Beastmaster and his companion strike together, each for 40% of Attack (Perfect: the companion lands 55%). If the companion's blow kills it, his next ability costs nothing. Under <b>The Pack</b> the <b>deeper bond</b> runs it — the same rule Savage Sweep follows, because an ordered action goes to <i>one</i> companion.</td><td>The two bodies acting deliberately, where the rest of his kit has the companion on its own clock.</td></tr>
+<tr><td><b>Call the Wilds</b></td><td>20 Mana, 2.0, 5cd</td><td>Calls in the absent companion he is most bonded with, <b>keeping its Loyalty and paying no shared Swap cooldown</b>, and it strikes immediately (Perfect: twice).</td><td>Rotation without the tax — the central verb of an entire lane happens 0.05 times a trash battle.</td></tr>
 <tr><td><b>Bloodbond</b></td><td>20 Mana, 2.0, 4cd, self</td><td>The next blow that would <b>fell a companion is REFUSED</b> — and the hunter takes <b>HALF of it</b> instead (Perfect: a quarter). It has <b>no duration and waits until it fires</b>. <b>The half he takes can kill him.</b></td><td>Protecting the single largest investment in the game. At 50 Loyalty a companion's death is the worst thing that happens to him, and he has no answer at all today.<br><b>Builds with:</b> <b>Ancient Pact</b>, which makes the companion unhealable by <i>any</i> source — this is the only answer a Pact build has. <b>Wild Communion</b> (+12% strike damage a stack) and <b>Absolute Devotion</b> are what make a deep bond worth bleeding for; <b>Steadfast Bond</b> softens the meter if it does die.</td></tr>
-<tr><td><b>Savage Sweep</b></td><td>25 Mana, 2.5, 4cd, self</td><td>His companion immediately strikes the <b>three lowest-health enemies</b> and gains <b>3 Loyalty</b> (Perfect: 5). Under <b>The Pack</b> the deeper bond runs it — an ordered action goes to <i>one</i> beast, so it is three strikes whether one stands or two. <i>Ursus mauls the enemies beside each target as it always does, so a bear sweep is wider still.</i></td><td>The partnership made wide. Every companion in the game is single-target and nothing in his kit changes that.<br><b>Builds with:</b> <b>Herald</b> (an arrival strikes two extra targets) and <b>Feral Momentum</b> both pay per body hit; <b>Bestial Wrath</b> sharpens all three blows; and it is the field half of a two-card burst with <b>Twin Hunt</b>.</td></tr>
-<tr><td><b>Ghostpack</b></td><td>25 Mana, 2.5, 5cd, self</td><td>For 3 turns (Perfect: 4), <b>every companion he has summoned this battle</b> strikes alongside his attacks for <b>40%</b> — <b>including the ones no longer standing</b>. A hunter who has cycled all three gets three ghosts an attack; one who never swaps gets one.</td><td>What rotating actually buys. It is the Pack build's payoff and deliberately near-worthless to a Lone Bond build.<br><b>Builds with:</b> <b>Wild Rotation</b>, <b>No Beast Left</b>, <b>Shared Devotion</b> and <b>Instinctive Rotation</b> all make cycling cheap — this is what cycling <i>pays</i>. It stacks with the <b>Ghost Pack</b> node rather than replacing it.</td></tr>
+<tr><td><b>Savage Sweep</b></td><td>25 Mana, 2.5, 4cd, self</td><td>His companion immediately strikes the <b>three lowest-health enemies</b> and gains <b>3 Loyalty</b> (Perfect: 5). Under <b>The Pack</b> the deeper bond runs it — an ordered action goes to <i>one</i> companion, so it is three strikes whether one stands or two. <i>Ursus mauls the enemies beside each target as it always does, so a bear sweep is wider still.</i></td><td>The partnership made wide. Every companion in the game is single-target and nothing in his kit changes that.<br><b>Builds with:</b> <b>Herald</b> (an arrival strikes two extra targets) and <b>Feral Momentum</b> both pay per body hit; <b>Bestial Wrath</b> sharpens all three blows; and it is the field half of a two-card burst with <b>Twin Hunt</b>.</td></tr>
+<tr><td><b>Ghostpack</b></td><td>25 Mana, 2.5, 5cd, self</td><td>For 3 turns (Perfect: 4), <b>every companion he has summoned this battle</b> strikes alongside his attacks for <b>40%</b> — <b>including the ones no longer standing</b>. A hunter who has cycled all three gets three ghosts an attack; one who never swaps gets one.</td><td>What rotating actually buys. It is the Pack build's payoff and deliberately near-worthless to a Lone Bond build.<br><b>Builds with:</b> <b>Wild Rotation</b>, <b>None Left Behind</b>, <b>Shared Devotion</b> and <b>Instinctive Rotation</b> all make cycling cheap — this is what cycling <i>pays</i>. It stacks with the <b>Ghost Pack</b> node rather than replacing it.</td></tr>
 <tr><td colspan="4"><b>Sharpshooter</b> — <i>what breaks the patience, and what pays for it</i></td></tr>
 <tr><td><b>Called Volley</b></td><td>30 Mana, 3.0, 4cd, all enemies</td><td>20% of Attack across the line (Perfect: 26%), and his Focus and his mark survive it untouched.</td><td>Hitting the field without breaking the bond.</td></tr>
 <tr><td><b>Quarry's Mark</b></td><td>15 Mana, 1.5, 3cd, one enemy</td><td>Marks it for the battle: Focus gained from attacking it is doubled. One mark at a time.</td><td>Patience that accelerates. It deliberately does <b>not</b> protect Focus on the marked enemy's death — Overkill already does that.</td></tr>
@@ -1174,7 +1200,7 @@ slot.</p>
 <tr><td><b>Camouflage</b></td><td>20 Mana, 1.5, 4cd, self</td><td>For 2 turns (Perfect: 3) enemies are <b>70% less likely to aim at him</b>. It stacks with the Survivalist's Ghillie Suit as independent chances rather than replacing it.</td><td>Buying time rather than absorbing damage — the defensive shape the class does not have.</td></tr>
 <tr><td><b>Aimed Volley</b></td><td>20 Mana, 2.5, 3cd, one enemy</td><td><b>Three shots at 12% of Attack</b> each with <b>8 Break damage a shot</b> — 24 across the volley (Perfect: a fourth shot).</td><td>The reliable strike. Every Hunter kit is built on a conditional; this works when nothing is set up yet, and being multi-hit is what makes it play with a charge bank.</td></tr>
 <tr><td><b>Bola</b></td><td>15 Mana, 1.5, 3cd, one enemy</td><td>Applies <b>Slowed and Crippled for 3 turns</b> (Perfect: 4). No damage and no Break.</td><td>Two afflictions on one card and nothing else — the price of the breadth is that it is all it does.</td></tr>
-<tr><td><b>Hunter's Mark</b></td><td>15 Mana, 1.5, 4cd, one enemy</td><td>For 4 turns (Perfect: 6) the <b>whole party deals 15% more damage</b> to that enemy. One mark at a time.</td><td>Focus fire made explicit — the only party-wide amplifier the class has. Unlike the Beastmaster's Mark of the Hunt, the mark carries no owner: every hero and every beast reads it.</td></tr>
+<tr><td><b>Hunter's Mark</b></td><td>15 Mana, 1.5, 4cd, one enemy</td><td>For 4 turns (Perfect: 6) the <b>whole party deals 15% more damage</b> to that enemy. One mark at a time.</td><td>Focus fire made explicit — the only party-wide amplifier the class has. Unlike the Beastmaster's Mark of the Hunt, the mark carries no owner: every hero and every companion reads it.</td></tr>
 <tr><td><b>Arcane Arrows</b></td><td>25 Mana, 2.0, 5cd, self</td><td><b>5 charges</b> (Perfect: 6): each of his next five <b>hits</b> also strikes an additional random enemy for half that hit's damage. <b>Banked, not timed</b> — they wait until spent, and a three-shot volley spends three.</td><td>A charge bank, which the class has never had.</td></tr>
 <tr><td colspan="4"><b>Class-wide &mdash; WARRIOR</b> (all three specs) &mdash; <i>three spines that are all melee, all Rage-driven and all reactive: none can make something happen on turn one</i></td></tr>
 <tr><td><b>Battle Trance</b></td><td>15 Rage, 1.5, 4cd, self</td><td>For 3 turns (Perfect: 4), at the start of each of his turns he heals <b>3% of maximum health plus half of all damage taken since his last turn</b>.</td><td>Recovery that scales with the beating. It reads damage <i>taken</i>, not missing health — and it is delayed, so it is not mitigation and cannot save him from a killing blow.</td></tr>
@@ -1528,28 +1554,28 @@ RUIN lane, then madden it.<br>
 <li><b>Beastmaster (Ramp)</b> — <b>Stat block:</b> 160 HP / 15% armor / +20% nature resist,
 +5% physical (the armor is a multiplier across up to three bodies — companions inherit it
 at summon — so it sits below the Survivalist's despite similar Constitution).<br>
-Passive <i>Pack Bond</i>: the active beast grants its boon —
+Passive <i>Pack Bond</i>: the active companion grants its boon —
 <b>Ursus, Savage Presence:</b> enemies are 15% more likely to attack the bear, and the hunter
 takes 10% less damage; <b>Canis:</b> the hunter deals +15% damage for EVERY enemy under 35%
 health; <b>Aguila:</b> the hunter and the whole party gain +10% crit chance.<br>
-<b>Loyalty (per beast, NO MAXIMUM, chip on the companion):</b> a beast gains 1 Loyalty every
+<b>Loyalty (per companion, NO MAXIMUM, chip on the companion):</b> a companion gains 1 Loyalty every
 hunter turn that begins with it active, and 1 more each time it is summoned or swapped in.
-Each stack: +5% companion strike damage, plus that beast's gift — Ursus +3% max health, Canis
+Each stack: +5% companion strike damage, plus that companion's gift — Ursus +3% max health, Canis
 +2 Bleed on its strikes, Aguila ignores 20% of the target's armor. <b>The Pack Bond boon
 itself is a CURVE, not a threshold: ×(1 + 0.20 × Loyalty)</b> — ×2 at five stacks, ×3 at ten,
-×5 at twenty, and it never stops climbing. Each beast keeps its own meter for the whole
-battle; it dies with that beast. (Talents steepen the curve — Absolute Devotion raises the
+×5 at twenty, and it never stops climbing. Each companion keeps its own meter for the whole
+battle; it dies with that companion. (Talents steepen the curve — Absolute Devotion raises the
 step to 35% a stack and Ancient Pact doubles whatever that came to; Lone Bond seats its one
-beast at 6 Loyalty and doubles every gain after. <b>Exactly one node still imposes a ceiling:
+companion at 6 Loyalty and doubles every gain after. <b>Exactly one node still imposes a ceiling:
 Wild Rotation caps Loyalty at 3, and that cap is its cost.</b>)<br>
-<b>Summon-and-swap effects</b> fire whenever a beast is summoned OR swapped in — Ursus:
+<b>Summon-and-swap effects</b> fire whenever a companion is summoned OR swapped in — Ursus:
 <i>Guardian's Roar</i>, taunting the lowest-health enemy (preferring one not already taunted)
 while the bear takes 25% less damage for 2 turns; Canis: <i>Bloodhowl</i>, 15 Bleed to every
 enemy; Aguila: dives a chosen enemy for 15% of the hunter's Attack, Dazing them.<br>
 <b>Companions:</b> one at a time — two under The Pack capstone (placeholder sphere sprites:
 red/blue/green; never two of the same kind). Summoning goes
-through the <b>"Summon Companion" beast picker</b> at the top of the ability list on hotkey W
-(see §10); at beast capacity it becomes <b>"Swap Companion"</b> — 10 Mana, 1.0
+through the <b>"Summon Companion" companion picker</b> at the top of the ability list on hotkey W
+(see §10); at companion capacity it becomes <b>"Swap Companion"</b> — 10 Mana, 1.0
 initiative, shared 2-turn cooldown, no skill check: the newcomer arrives with its swap effect
 and +1 Loyalty (under The Pack it replaces the OLDER of the two). Companions have HP, can be targeted by enemies and healed by allies, and
 inherit the hunter's armor, Constitution, and crit chance (talents can add companion HP and
@@ -1562,37 +1588,37 @@ for 20% of the hunter's Attack, building 20 Bleed.<br>
 Summon Aguila — 20 Mana, 3.0, 3cd. Eagle, 80 HP, always ELUSIVE: strikes the hunter's target
 for 20% of the hunter's Attack, applying Exposed (2 turns).<br>
 Hunter's Instinct — 20 Mana, 2.5, 3cd (no skill check): empowers the next 3 Quick Shots —
-each deals +10% of the hunter's Attack and heals every active beast for 15% of its max
+each deals +10% of the hunter's Attack and heals every active companion for 15% of its max
 health (HI# chip counts the shots).<br>
-Kill Command — 30 Mana, 4.0, 3cd, requires a living companion. The order is the beast's
+Kill Command — 30 Mana, 4.0, 3cd, requires a living companion. The order is the companion's
 own — <b>Ursus:</b> mauls for 45% of the hunter's Attack + 40 BD; <b>Canis:</b> 3 bites of
 18% Attack, each building 10 Bleed (+2 per Loyalty), then feasts to heal 30% of its max
 health; <b>Aguila:</b> strikes TWO chosen enemies for 25% Attack each, Blinding them 3
-turns. Under The Pack BOTH beasts obey the order; if the prey falls mid-order the rest of
-the pack turns on the next weakest. (Perfect: each beast that obeyed gains 1 Loyalty.)<br>
+turns. Under The Pack BOTH companions obey the order; if the prey falls mid-order the rest of
+the pack turns on the next weakest. (Perfect: each companion that obeyed gains 1 Loyalty.)<br>
 <b>Spec pool (earnable, §6a)</b> — the opening three are the Summon Companion picker,
 Hunter's Instinct and Kill Command:<br>
 Bestial Wrath — 25 Mana, 3.5, 3cd, requires a living companion (no skill check): unleashes
-the beast for 3 turns (+1 turn PER Loyalty stack with Devoted Fury) — <b>Ursus:</b> max health
+the companion for 3 turns (+1 turn PER Loyalty stack with Devoted Fury) — <b>Ursus:</b> max health
 DOUBLES, +50% armor, and it taunts 3 random enemies; <b>Canis:</b> +50% damage and +10 Bleed
 on its bleeding strikes; <b>Aguila:</b> +25% damage and every strike Blinds (2 turns). The
 borrowed bulk fades when the Wrath ends.<br>
 Spirit Bond — 20 Mana, 1.5, 3cd, requires a living companion. The hunter and EVERY living
-beast each heal 25% of their own max health now and 10% more at their next turn; the hunter restores 15%
+companion each heal 25% of their own max health now and 10% more at their next turn; the hunter restores 15%
 max Mana now and 5% at each of the next 2 turn starts (Perfect: both gain +10% max health
 for 5 turns).<br>
-Primal Surge — 20 Mana, 3.0, 2cd, requires a beast with Loyalty. Spend ALL Loyalty: each living
-beast strikes for 15% of the hunter's Attack per stack it spends, and the hunter gains
+Primal Surge — 20 Mana, 3.0, 2cd, requires a companion with Loyalty. Spend ALL Loyalty: each living
+companion strikes for 15% of the hunter's Attack per stack it spends, and the hunter gains
 +10% damage for the total turns; Loyalty resets to 0 (Perfect: the Loyalty is spent but NOT
 lost).<br>
-Call of the Wild — 30 Mana, 4.0, 4cd (no skill check), targets an enemy. All three beasts
+Call of the Wild — 30 Mana, 4.0, 4cd (no skill check), targets an enemy. All three companions
 answer: the living ones make their own full strikes (banked Loyalty honored), the absent
 kinds strike for 15% of the hunter's Attack, every arrival effect fires; the absent then
 depart. Lives inside the
 summon picker, not on its own hotkey.<br>
 Mark of the Hunt — 15 Mana, 2.0, 3cd. Marks an enemy for 5 turns (Perfect: 7): the hunter
-and their beast deal +25% damage to it, and every strike on it restores 3% of the hunter's
-max Mana. The cooldown resets if the marked enemy dies. Works with or without a beast.<br>
+and their companion deal +25% damage to it, and every strike on it restores 3% of the hunter's
+max Mana. The cooldown resets if the marked enemy dies. Works with or without a companion.<br>
 <b>Talent lanes:</b> see §7 — Devotion / The Pack / Handler.</li>
 <li><b>Sharpshooter (Nuker)</b> — <b>Stat block:</b> 140 HP / 10% armor / Constitution 90 /
 +10% nature resist, −10% physical (the lightest of the three: a marksman who wants to be at
@@ -1814,7 +1840,7 @@ build lands three distinct statuses.</p>
 <tr><td>8</td><td><b>Font of Light</b> — Overhealing is drawn back as Mana — 1 Mana for every 2 points wasted.</td><td><b>Communion of Mercy</b> — Every stack of Mercy the Cleric holds grants the whole party 2% damage reduction.</td><td><b>Watchtower</b> — When any hero drops below 25% health the Cleric&#x27;s turn comes immediately (at most once a turn).</td></tr>
 <tr><td>CAPSTONE</td><td><b>Sanctum</b> — Your healing is increased by 60%, and ALL of your overhealing spills onto the lowest-health other ally.</td><td><b>Avatar of Mercy</b> — Empowering never consumes a stack, and every Empowered cast GRANTS 1 Mercy instead.</td><td><b>Martyrdom</b> — Resurrection has no cooldown and costs no Mercy, and the first hero to fall each battle is returned automatically at 30% health.</td></tr>
 </table>
-<p><b>Beastmaster</b> — <b>DEVOTION</b> (partnership in depth: one beast, further) · <b>THE PACK</b> (partnership in breadth: many beasts, rotated) · <b>HANDLER</b> (what he does when the partnership is not the answer)</p>
+<p><b>Beastmaster</b> — <b>DEVOTION</b> (partnership in depth: one companion, further) · <b>THE PACK</b> (partnership in breadth: many companions, rotated) · <b>HANDLER</b> (what he does when the partnership is not the answer)</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Bulwark</th><th>Faith</th><th>Zeal</th></tr>
 <tr><td>1</td><td><b>Blessed Barrier</b> — Divine Shield converts 20% of the damage it absorbs into healing for its holder.</td><td><b>Communion</b> — When a party member reaches 5 Faith, every other member who is still BUILDING Faith has a (15 x their own Faith stacks)% chance to gain 1 stack. The chance therefore peaks at 60% on an ally holding 4 — an ally already at 5 is at the payout rather than building, and is not rolled for at all.</td><td><b>Cleansing Waters</b> — While Consecrated Ground or Sacred Resolve holds, each party member has a 50% chance each turn to be cleansed of one harmful effect.</td></tr>
@@ -1844,14 +1870,14 @@ build lands three distinct statuses.</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Devotion</th><th>The Pack</th><th>Handler</th></tr>
 <tr><td>1</td><td><b>Wild Communion</b> — Companion strike damage per Loyalty stack rises to 12% (from the base 5%).</td><td><b>Quick Whistle</b> — Swap Companion has NO cooldown (it shaves 3 turns off the shared 3).</td><td><b>Master&#x27;s Aim</b> — Quick Shot deals +25% of your Attack.</td></tr>
-<tr><td>2</td><td><b>Unbroken Watch</b> — The active beast gains +1 additional Loyalty on any turn it took no damage.</td><td><b>Feral Momentum</b> — +25% companion damage for each DIFFERENT beast summoned this fight.</td><td><b>Beast Within</b> — +40% companion maximum health.</td></tr>
-<tr><td>3</td><td><b>Absolute Devotion</b> — The Pack Bond boon grows 35% per Loyalty stack instead of the base 20%.</td><td><b>Shared Devotion</b> — Summoning or swapping grants +2 Loyalty to EVERY beast, not only the arriving one.</td><td><b>Deep Reserves</b> — Spirit Bond restores +30% more maximum Mana.</td></tr>
-<tr><td>4</td><td><b>Devoted Fury</b> — Bestial Wrath lasts 1 turn(s) longer per Loyalty stack on the beast.</td><td><b>Herald</b> — Arrival effects strike 2 ADDITIONAL targets: Guardian&#x27;s Roar taunts three, Aguila dives three, and Bloodhowl doubles its Bleed on the two bloodiest enemies.</td><td><b>Instinctive</b> — Hunter&#x27;s Instinct empowers 8 Quick Shots instead of 3.</td></tr>
-<tr><td>5</td><td><b>Steadfast Bond</b> — A beast&#x27;s death returns 100% of its Loyalty rather than breaking it — the meter survives it whole.</td><td><b>Menagerie</b> — Every beast summoned this fight keeps its Pack Bond boon at 50% strength while it is away.</td><td><b>Symbiosis</b> — Whenever your companion strikes, you restore 6% maximum Mana.</td></tr>
-<tr><td>6</td><td><b>Ancient Pact</b> — The Pack Bond boon&#x27;s growth per Loyalty stack DOUBLES — but the beast can no longer be healed by ANY source, Spirit Bond and Hunter&#x27;s Instinct included.</td><td><b>No Beast Left</b> — A beast&#x27;s death makes your next 2 summons cost no Mana and ignore their cooldown, and each arriving beast enters at 5 Loyalty.</td><td><b>Vengeance</b> — When a beast dies you take its Pack Bond boon at FULL strength for the rest of the battle — where it would otherwise die with the beast — and deal +30% damage while it holds.</td></tr>
-<tr><td>7</td><td><b>Lone Bond</b> — One beast per fight: it cannot be swapped and cannot be re-summoned if it dies — but it arrives at 6 Loyalty and gains DOUBLE thereafter. It also closes The Pack: you can never field two.</td><td><b>Wild Rotation</b> — Swap Companion has no cooldown — rotate every turn, each arrival effect firing as it comes. Loyalty caps at 3.</td><td><b>Lone Hunter</b> — While no beast stands, your abilities cost 50% less and you deal +30% damage.</td></tr>
-<tr><td>8</td><td><b>Kindred</b> — At 8 or more Loyalty the beast&#x27;s arrival effect fires again at the start of each of the Beastmaster&#x27;s turns.</td><td><b>Instinctive Rotation</b> — Swapping a companion no longer costs the Beastmaster his turn — he acts again immediately.</td><td><b>Ghost Pack</b> — While no beast stands, the Beastmaster&#x27;s attacks still draw a companion strike at 60% power.</td></tr>
-<tr><td>CAPSTONE</td><td><b>One Soul</b> — You and every beast you field share one health pool — all damage to any of you divides evenly between you. Loyalty gain is doubled.</td><td><b>The Pack</b> — TWO beasts may be active at once: both strike when you attack, each keeps its own Loyalty meter, and BOTH Pack Bond boons apply at FULL strength. Swapping replaces whichever of the two holds LESS Loyalty — the deeper bond always keeps its place. Lone Bond closes this door.</td><td><b>Apex Predator</b> — Quick Shot triggers an ADDITIONAL free companion strike, and Kill Command&#x27;s cooldown resets whenever an enemy dies.</td></tr>
+<tr><td>2</td><td><b>Unbroken Watch</b> — The active companion gains +1 additional Loyalty on any turn it took no damage.</td><td><b>Feral Momentum</b> — +25% companion damage for each DIFFERENT companion summoned this fight.</td><td><b>The Wild Within</b> — +40% companion maximum health.</td></tr>
+<tr><td>3</td><td><b>Absolute Devotion</b> — The Pack Bond boon grows 35% per Loyalty stack instead of the base 20%.</td><td><b>Shared Devotion</b> — Summoning or swapping grants +2 Loyalty to EVERY companion, not only the arriving one.</td><td><b>Deep Reserves</b> — Spirit Bond restores +30% more maximum Mana.</td></tr>
+<tr><td>4</td><td><b>Devoted Fury</b> — Bestial Wrath lasts 1 turn(s) longer per Loyalty stack on the companion.</td><td><b>Herald</b> — Arrival effects strike 2 ADDITIONAL targets: Guardian&#x27;s Roar taunts three, Aguila dives three, and Bloodhowl doubles its Bleed on the two bloodiest enemies.</td><td><b>Instinctive</b> — Hunter&#x27;s Instinct empowers 8 Quick Shots instead of 3.</td></tr>
+<tr><td>5</td><td><b>Steadfast Bond</b> — A companion&#x27;s death returns 100% of its Loyalty rather than breaking it — the meter survives it whole.</td><td><b>Menagerie</b> — Every companion summoned this fight keeps its Pack Bond boon at 50% strength while it is away.</td><td><b>Symbiosis</b> — Whenever your companion strikes, you restore 6% maximum Mana.</td></tr>
+<tr><td>6</td><td><b>Ancient Pact</b> — The Pack Bond boon&#x27;s growth per Loyalty stack DOUBLES — but the companion can no longer be healed by ANY source, Spirit Bond and Hunter&#x27;s Instinct included.</td><td><b>None Left Behind</b> — A companion&#x27;s death makes your next 2 summons cost no Mana and ignore their cooldown, and each arriving companion enters at 5 Loyalty.</td><td><b>Vengeance</b> — When a companion dies you take its Pack Bond boon at FULL strength for the rest of the battle — where it would otherwise die with the companion — and deal +30% damage while it holds.</td></tr>
+<tr><td>7</td><td><b>Lone Bond</b> — One companion per fight: it cannot be swapped and cannot be re-summoned if it dies — but it arrives at 6 Loyalty and gains DOUBLE thereafter. It also closes The Pack: you can never field two.</td><td><b>Wild Rotation</b> — Swap Companion has no cooldown — rotate every turn, each arrival effect firing as it comes. Loyalty caps at 3.</td><td><b>Lone Hunter</b> — While no companion stands, your abilities cost 50% less and you deal +30% damage.</td></tr>
+<tr><td>8</td><td><b>Kindred</b> — At 8 or more Loyalty the companion&#x27;s arrival effect fires again at the start of each of the Beastmaster&#x27;s turns.</td><td><b>Instinctive Rotation</b> — Swapping a companion no longer costs the Beastmaster his turn — he acts again immediately.</td><td><b>Ghost Pack</b> — While no companion stands, the Beastmaster&#x27;s attacks still draw a companion strike at 60% power.</td></tr>
+<tr><td>CAPSTONE</td><td><b>One Soul</b> — You and every companion you field share one health pool — all damage to any of you divides evenly between you. Loyalty gain is doubled.</td><td><b>The Pack</b> — TWO companions may be active at once: both strike when you attack, each keeps its own Loyalty meter, and BOTH Pack Bond boons apply at FULL strength. Swapping replaces whichever of the two holds LESS Loyalty — the deeper bond always keeps its place. Lone Bond closes this door.</td><td><b>Apex Predator</b> — Quick Shot triggers an ADDITIONAL free companion strike, and Kill Command&#x27;s cooldown resets whenever an enemy dies.</td></tr>
 </table>
 <p><b>Cryomancer</b> — <b>WINTER</b> (buy more time) · <b>DEEP FREEZE</b> (spend it on denial) · <b>THAW</b> (spend it on the window)</p>
 <table border="1" cellpadding="4">
@@ -2053,7 +2079,7 @@ shadow caster: Hex Bolt; Withering Hex (70% Exposed 2t); Bone Rattle (34 BD). Re
 shadow 50%; soft to holy AND nature.</td></tr>
 <tr><td>Wolfrider (grey)</td><td>2</td><td>skirmisher</td><td>1·2</td><td>130</td><td>Speed
 125: Lunging Bite; Ride-by Slash (50% Cripple 2t). Physical resist 5%; soft to nature
-(living beast — poison rips through).</td></tr>
+(living companion — poison rips through).</td></tr>
 <tr><td>Ashblade (ember)</td><td>2</td><td>skirmisher</td><td>2</td><td>135</td><td>Cinder
 Slash (fire); Flame Lick (60% Burn 2t). Fire resist 50%; soft to frost.</td></tr>
 <tr><td>Orc Ritual Chanter (pale gold)</td><td>2</td><td>mender</td><td>1·2·3</td><td>105</td>
@@ -2192,12 +2218,12 @@ every turn.</li>
 <li><b>Space continues:</b> on a victory screen, Space (or Enter) presses the primary
 button — Continue / Descend / New Run. Defeat screens still require a click.</li>
 <li><b>Summon Companion</b> sits at the TOP of the Beastmaster's ability list on hotkey
-<b>W</b>. Selecting it (key or click) opens the <b>beast picker</b> — a small window listing
-Ursus / Canis / Aguila with costs: <b>Tab cycles</b> the options (unaffordable beasts are
+<b>W</b>. Selecting it (key or click) opens the <b>companion picker</b> — a small window listing
+Ursus / Canis / Aguila with costs: <b>Tab cycles</b> the options (unaffordable companions are
 skipped and greyed), <b>Space summons</b> the highlighted one, <b>X closes</b> the picker,
-and clicking works as always. With a living beast out, the entry reads <b>Swap
+and clicking works as always. With a living companion out, the entry reads <b>Swap
 Companion</b> and the picker offers swaps instead (10 Mana, shared 2-turn cooldown; the
-active beast is greyed out). Summoning or swapping in Aguila then asks for a target — its
+active companion is greyed out). Summoning or swapping in Aguila then asks for a target — its
 arrival dive. Call of the Wild (when owned) joins the picker as a fourth entry. The
 remaining abilities take the following hotkeys in kit order (Hunter's Instinct E, Kill
 Command R; earned abilities follow in the order they were taken — and from the tenth
@@ -2565,7 +2591,7 @@ was deleted, not because anyone priced them.</li>
 <li><b>Art pipeline (Aseprite + Pixel Lab):</b> re-generate the Berserker at the 236px
 template (plus his missing Hurt / Death / second-attack clips); animate the Pyromancer
 (currently a static pose); produce the remaining hero specs, portraits for everyone but the
-Berserker, real beast art for the placeholder companion spheres, and — the big lever for
+Berserker, real companion art for the placeholder companion spheres, and — the big lever for
 scenery scale — battle backgrounds authored at the template density. Own art is battle-only
 so far; draft/spec screens still show the Soldier.</li>
 <li><b>Design hooks awaiting assignment:</b> Weaknesses (who is weak to which damage type —

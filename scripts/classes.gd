@@ -408,7 +408,7 @@ const PROTECTED_CORES := {
 		"why": "Wrath of the Old Gods marks on debuffs HE applies; these two are the debuffs he always holds."},
 	"beastmaster": {"slots": 3,
 		"enablers": ["Summon Ursus", "Summon Canis", "Summon Aguila"],
-		"why": "Pack Bond reads a living beast. With no summon there is no boon, no Loyalty and no passive at all."},
+		"why": "Pack Bond reads a living companion. With no summon there is no boon, no Loyalty and no passive at all."},
 	"sharpshooter": {"slots": 3, "enablers": ["Quick Shot"],
 		"why": "Lethal Aim counts consecutive single-target attacks; the free shot is what lets him stay on a mark every turn."},
 	"mystic": {"slots": 3, "enablers": [],
@@ -1010,16 +1010,16 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Twin Hunt", "cost": 25,
 				"damage": 40, "pressure": 12, "delay": 2.5, "cooldown": 3,
 				"anim": "attack02", "special": "twin_hunt",
-				"perfect_id": "", "perfect_text": "The beast's blow lands at 55% of Attack",
-				"description": "Strike as one: the Beastmaster and his\nbeast each hit for 40% of Attack. If\nthe BEAST'S blow is the killing one,\nhis next ability costs nothing."})
+				"perfect_id": "", "perfect_text": "The companion's blow lands at 55% of Attack",
+				"description": "Strike as one: the Beastmaster and his\ncompanion each hit for 40% of Attack. If\nthe COMPANION'S blow is the killing one,\nhis next ability costs nothing."})
 		# AXIS: rotation without the tax. BJ measured swaps at 0.05 per trash
 		# battle — the central verb of an entire lane barely happens.
 		"Call the Wilds":
 			return Ability.make({"display_name": "Call the Wilds", "cost": 20,
 				"special": "call_wilds", "delay": 2.0, "cooldown": 5,
 				"anim": "attack01",
-				"perfect_id": "", "perfect_text": "The arriving beast strikes twice",
-				"description": "Whistle the pack round: call in the\nabsent beast you are most bonded with,\nkeeping its Loyalty AND paying no Swap\ncooldown — and it strikes the moment\nit arrives."})
+				"perfect_id": "", "perfect_text": "The arriving companion strikes twice",
+				"description": "Whistle the pack round: call in the\nabsent companion you are most bonded with,\nkeeping its Loyalty AND paying no Swap\ncooldown — and it strikes the moment\nit arrives."})
 		# ----- SHARPSHOOTER: what breaks the patience, and what pays for it -----
 		# AXIS: hitting the field without breaking the bond.
 		"Called Volley":
@@ -1919,16 +1919,19 @@ static func draft_ability(display_name: String) -> Ability:
 		# alongside-strike already loops `for cs_b in pack_now` and must, because
 		# that is what The Pack's own text promises. An ordered action must not,
 		# or the capstone silently doubles every card that names the beast.
-		# · BLOODBOND is the exception that proves it: it names no beast at all.
-		#   The guard is placed on the BOND, so under The Pack it covers BOTH and
-		#   is spent by whichever one first takes a killing blow.
+		# · BLOODBOND is the exception that proves it: it names no companion at
+		#   all. The guard is placed on the BOND, so under The Pack it covers
+		#   BOTH and is spent by whichever one first takes a killing blow.
 		# · SAVAGE SWEEP picks the HIGHEST-LOYALTY standing companion — The
 		#   Pack's own rule ("the deeper bond always keeps its place") read the
 		#   other way round, and it puts the 3 Loyalty where the boon curve
-		#   compounds hardest. Three strikes whether one beast stands or two.
-		# REPORTED, NOT CHANGED: TWIN HUNT (tranche 1) still picks `th_beasts[0]`
-		# by list order. It is an existing ability and this tranche changes none,
-		# so the inconsistency is the designer's to close — one call site.
+		#   compounds hardest. Three strikes whether one companion stands or two.
+		# CLOSED IN BATCH BX §3 — TWIN HUNT PICKS THE HIGHEST-LOYALTY COMPANION
+		# TOO. BV reported it picking `beasts[0]` by list order and BW left it
+		# alone (its tranche changed no existing ability); BX pointed it at the
+		# same rule. There is ONE implementation now, `battle._deepest_bond`,
+		# shared by both cards — a rule written twice eventually disagrees with
+		# itself, which is exactly what happened here across two batches.
 		#
 		# AXIS: protecting the single largest investment in the game. At 50
 		# Loyalty a companion's death is the worst thing that happens to him, and
@@ -1971,7 +1974,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "delay": 2.5, "cooldown": 4,
 				"anim": "attack02", "special": "savage_sweep",
 				"perfect_id": "", "perfect_text": "5 Loyalty instead of 3",
-				"description": "Loose the beast down the line: your\ncompanion strikes the THREE lowest-\nhealth enemies, and gains 3 Loyalty.\nUnder The Pack the deeper bond runs."})
+				"description": "Loose the pack down the line: your\ncompanion strikes the THREE lowest-\nhealth enemies, and gains 3 Loyalty.\nUnder The Pack the deeper bond runs."})
 		# AXIS: what rotating actually buys. FERAL MOMENTUM and MENAGERIE both
 		# already reward having cycled, but both are small passive trickles; this
 		# is the Pack build's PAYOFF, and it is deliberately near-worthless to a
@@ -2379,27 +2382,27 @@ static func beastmaster_pool_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Bestial Wrath", "cooldown": 3, "cost": 25,
 				"special": "bestial", "delay": 3.5, "anim": "attack01", "no_skill_check": true,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Unleash the beast for 3 turns —\nUrsus: max health DOUBLES, +50%\narmor, taunts 3 random enemies.\nCanis: +50% damage and +10 Bleed on\nits bleeding strikes. Aguila: +25%\ndamage and every strike BLINDS.\nRequires a living companion."})
+				"description": "Unleash the companion for 3 turns —\nUrsus: max health DOUBLES, +50%\narmor, taunts 3 random enemies.\nCanis: +50% damage and +10 Bleed on\nits bleeding strikes. Aguila: +25%\ndamage and every strike BLINDS.\nRequires a living companion."})
 		"Spirit Bond":
 			return Ability.make({"display_name": "Spirit Bond", "cooldown": 3, "cost": 20,
 				"special": "spirit_bond", "delay": 1.5, "anim": "attack01",
 				"perfect_id": "", "perfect_text": "Both gain +10% max health for 5 turns",
-				"description": "You and every living beast each heal\n25% of your max health now and 10%\nmore next turn. You restore 15% max\nMana now and 5% on each of your next\n2 turns. Requires a living companion."})
+				"description": "You and every living companion each heal\n25% of your max health now and 10%\nmore next turn. You restore 15% max\nMana now and 5% on each of your next\n2 turns. Requires a living companion."})
 		"Primal Surge":
 			return Ability.make({"display_name": "Primal Surge", "cooldown": 2, "cost": 20,
 				"special": "primal_surge", "delay": 3.0, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "The Loyalty is spent but NOT lost",
-				"description": "Spend ALL Loyalty: each living beast\nstrikes for 15% of your Attack per\nstack it spends, and you gain +10%\ndamage for the total turns. Loyalty\nresets to 0. Requires a beast with\nLoyalty."})
+				"description": "Spend ALL Loyalty: each living companion\nstrikes for 15% of your Attack per\nstack it spends, and you gain +10%\ndamage for the total turns. Loyalty\nresets to 0. Requires a companion with\nLoyalty."})
 		"Call of the Wild":
 			return Ability.make({"display_name": "Call of the Wild", "cooldown": 4, "cost": 30,
 				"special": "call_wild", "delay": 4.0, "anim": "attack01", "no_skill_check": true,
 				"perfect_id": "", "perfect_text": "",
-				"description": "The whole pack answers: your living\nbeasts make their own strikes, the\nabsent ones appear to strike for 15%\nof your Attack, every arrival effect\nfires, and the absent depart."})
+				"description": "The whole pack answers: your living\ncompanions make their own strikes, the\nabsent ones appear to strike for 15%\nof your Attack, every arrival effect\nfires, and the absent depart."})
 		"Mark of the Hunt":
 			return Ability.make({"display_name": "Mark of the Hunt", "cooldown": 3, "cost": 15,
 				"special": "mark_hunt", "delay": 2.0, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "The mark lasts 7 turns",
-				"description": "Mark an enemy for 5 turns: you and\nyour companion deal +25% damage to it\nand every strike on it restores 3%\nof your max Mana. The cooldown resets\nif the marked enemy dies.\nWorks with or without a beast."})
+				"description": "Mark an enemy for 5 turns: you and\nyour companion deal +25% damage to it\nand every strike on it restores 3%\nof your max Mana. The cooldown resets\nif the marked enemy dies.\nWorks with or without a companion."})
 	return null
 
 
@@ -2679,7 +2682,7 @@ const SPEC_INFO := {
 	"beastmaster": {"name": "Beastmaster", "constitution": 100, "archetype": "Ramp", "passive": "pack",
 		"max_hp": 160, "armor": 0.15,
 		"resists": {"nature": 0.20, "physical": 0.05},
-		"passive_desc": "Pack Bond — the active beast grants its boon: Ursus, Savage\nPresence: enemies are drawn to the bear and you take 10% less\ndamage; Canis: +15% damage per enemy under 35% health; Aguila: the\nwhole party gains +10% crit. LOYALTY (per beast, NO MAXIMUM): +1\neach turn it stands with you and on summon/swap; +5% strike damage\nper stack plus a beast-specific gift, and the boon itself grows 20%\na stack — x2 at five, and it keeps climbing. A meter dies with its\nbeast.",
+		"passive_desc": "Pack Bond — the active companion grants its boon: Ursus, Savage\nPresence: enemies are drawn to the bear and you take 10% less\ndamage; Canis: +15% damage per enemy under 35% health; Aguila: the\nwhole party gains +10% crit. LOYALTY (per companion, NO MAXIMUM): +1\neach turn it stands with you and on summon/swap; +5% strike damage\nper stack plus a companion-specific gift, and the boon itself grows 20%\na stack — x2 at five, and it keeps climbing. A meter dies with its\ncompanion.",
 		"blurb": "The wilds hunt beside them — every kill is shared."},
 	# The lightest Hunter: a marksman who wants to be at range and pays for
 	# being reached.
@@ -2941,8 +2944,8 @@ static func spec_abilities(spec: String) -> Array:
 					"description": "Empower your next 3 Quick Shots:\neach deals +10% of your Attack and\nheals your companion for 15% of\nits max health."}),
 				Ability.make({"display_name": "Kill Command", "cooldown": 3, "cost": 30, "special": "kill_command",
 					"delay": 4.0, "anim": "attack01",
-					"perfect_id": "", "perfect_text": "The beast gains 1 Loyalty",
-					"description": "The order depends on the beast —\nUrsus: mauls for 45% of your Attack\nplus 40 Break damage. Canis: 3 bites\nof 18% Attack, 10 Bleed each; the wolf\nfeasts, healing 30% of its max health.\nAguila: strikes TWO chosen enemies for\n25% Attack, BLINDING them 3 turns.\nRequires a living companion.\nThe Pack: BOTH beasts obey."}),
+					"perfect_id": "", "perfect_text": "The companion gains 1 Loyalty",
+					"description": "The order depends on the companion —\nUrsus: mauls for 45% of your Attack\nplus 40 Break damage. Canis: 3 bites\nof 18% Attack, 10 Bleed each; the wolf\nfeasts, healing 30% of its max health.\nAguila: strikes TWO chosen enemies for\n25% Attack, BLINDING them 3 turns.\nRequires a living companion.\nThe Pack: BOTH companions obey."}),
 			]
 		"sharpshooter":
 			return [

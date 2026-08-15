@@ -292,7 +292,7 @@ func _magnitudes() -> void:
 	ok(_stat_of("bm_menagerie", "menagerie") == 50,
 		"Menagerie: HALF strength, deliberately unchanged")
 	ok(_stat_of("bm_no_beast_left", "no_beast_left") == 2,
-		"No Beast Left: the next TWO summons are free")
+		"None Left Behind (was No Beast Left, BX §4): the next TWO summons are free")
 	ok(_stat_of("bm_no_beast_left", "no_beast_left_loyalty") == 5,
 		"...and each arrives at 5 Loyalty (two magnitudes, two fields)")
 	ok(_stat_of("bm_wild_rotation", "wild_rotation") == 3,
@@ -301,7 +301,7 @@ func _magnitudes() -> void:
 	ok(_stat_of("bm_masters_aim", "masters_aim_ranks") == 25,
 		"Master's Aim: +25%% of Attack on Quick Shot")
 	ok(abs(float(_stat_of("bm_beast_within", "companion_hp_pct")) - 0.40) < 0.001,
-		"Beast Within: +40%% companion max health")
+		"The Wild Within (was Beast Within, BX §4): +40%% companion max health")
 	ok(_stat_of("bm_reserves", "deep_reserves_ranks") == 30,
 		"Deep Reserves: +30%% max Mana on Spirit Bond")
 	ok(_stat_of("bm_instinctive", "instinctive") == 8,

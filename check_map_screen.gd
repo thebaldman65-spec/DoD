@@ -52,6 +52,44 @@ func _process(_d: float) -> void:
 			map_scene._open_rune_panel(1)
 			print("  rune pouch opened without error")
 			_close()
+			# BATCH BX §2 — THE PARTY-WIDE DRAFT SCREEN, which like the lattice is
+			# only ever EXECUTED here. Four columns is four times the layout, and
+			# a column that overflows or a Callable that does not bind fails at
+			# DRAW time, where no source-level check can see it.
+			# ONE HERO AT THE CAP, so a column renders its DROP step. That
+			# button and the modal it opens are drawn nowhere else, and a
+			# Callable that does not bind fails at DRAW time.
+			var capped: Dictionary = Run.party[0]
+			var cap_pool: Array = Classes.spec_draft_pool(String(capped["spec"]))
+			capped["bm_abilities"] = cap_pool.slice(0,
+				Run.ABILITY_SLOT_CAP - Classes.core_slots(String(capped["spec"])))
+			for m2 in Run.party:
+				Run.award_draft_pick(m2)
+			_open("four heroes owed a draft      ")
+			var d_before: int = _tally(map_scene)["all"]
+			map_scene._open_party_draft()
+			var d_after: Dictionary = _tally(map_scene)
+			print("  party draft added %d nodes, %d Buttons, %d columns owed" % [
+				int(d_after["all"]) - d_before, int(d_after["btn"]),
+				map_scene._draft_columns().size()])
+			# Stage a card on every column and confirm through the real door.
+			for i2 in Run.party.size():
+				var q: Array = Run.party[i2].get("draft_candidates", [])
+				if not q.is_empty() and not q[0].is_empty():
+					map_scene._stage_draft(i2, String(q[0][0]))
+			print("  hero 0 at cap, decided BEFORE naming a drop: %s"
+				% str(map_scene._draft_decided(0)))
+			var pre: int = _tally(map_scene)["all"]
+			map_scene._open_drop_overlay(0, "draft",
+				String((Run.party[0]["draft_candidates"] as Array)[0][0]),
+				map_scene._stage_draft_drop.bind(0))
+			print("  drop step added %d nodes" % (int(_tally(map_scene)["all"]) - pre))
+			map_scene._stage_draft_drop(0,
+				String((Run.party[0]["bm_abilities"] as Array)[0]))
+			print("  ...decided AFTER: %s" % str(map_scene._draft_decided(0)))
+			map_scene._confirm_party_draft()
+			print("  confirmed; picks still owed: %d" % Run.owed_draft_picks())
+			_close()
 			print("check_map_screen: OK")
 			get_tree().quit(0)
 	stage += 1

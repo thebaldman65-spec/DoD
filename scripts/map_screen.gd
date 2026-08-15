@@ -81,6 +81,16 @@ const PICKER_ID_BASE := 100
 # Which hero's pouch is open on the rune overlay, or -1.
 var _rune_panel_for := -1
 
+# BATCH BX §2 — THE PARTY DRAFT'S STAGED CHOICES, and staging them rather than
+# committing them IS the section. The screen resolves as ONE action: every
+# column is decided, then the whole screen is confirmed, so a player who fills
+# the Devout's last slot can still reconsider before the Warden's pick locks.
+# hero index -> {"card": String, "drop": String, "declined": bool}. Nothing
+# here has touched `Run` — `_confirm_party_draft` is the only thing that does,
+# and it goes through the same two doors the single-hero overlay uses.
+var _draft_stage: Dictionary = {}
+var _draft_overlay: Control = null
+
 
 func _ready() -> void:
 	if not Run.active:
@@ -91,7 +101,13 @@ func _ready() -> void:
 	Run.debug_summon = false
 	Music.play("map")
 	_draw_screen()
-	_maybe_show_framing()
+	# The draft screen CHAINS OFF the framing card rather than racing it (the
+	# Batch Z/AE precedent). The two can never actually collide — the framing
+	# card only shows before the first step and no draft is owed then — but a
+	# screen that opens over an orientation card is the failure that ordering
+	# is written to prevent, not one to discover.
+	if not _maybe_show_framing():
+		_maybe_open_party_draft()
 
 
 # First-run orientation (Batch Z): a skippable framing card between the
@@ -165,6 +181,11 @@ func _draw_screen() -> void:
 	for child in get_children():
 		child.queue_free()
 	_rune_panel_for = -1
+	# The draft overlay is a child too, so a redraw takes it with it. The
+	# STAGED CHOICES deliberately survive (`_draft_stage` is not cleared here):
+	# nothing was committed, so reopening from the card's CHOOSE button puts
+	# the player back where they were rather than making them start over.
+	_draft_overlay = null
 
 	var bg := ColorRect.new()
 	bg.size = Vector2(1280, 720)
@@ -752,6 +773,14 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 	if pending != "":
 		_open_drop_overlay(idx, kind, pending)
 		return
+	# BATCH BX §2 — A DRAFT IS A PARTY-WIDE SCREEN NOW, so the card's CHOOSE
+	# button opens the four columns rather than this hero's alone. It is the
+	# same button and the same badge; what changed is that the offer was never
+	# only this hero's. A hero owed an ABILITY pick as well still resolves that
+	# first (the precedence above), which is unchanged.
+	if kind == "draft":
+		_open_party_draft()
+		return
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay.z_index = 60
@@ -768,10 +797,9 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 	box.add_theme_constant_override("separation", 8)
 	panel.add_child(box)
 
-	var heading: String = {"ability": "NEW ABILITY", "draft": "THE DRAFT",
+	var heading: String = {"ability": "NEW ABILITY",
 		"upgrade": "ABILITY UPGRADE", "rune": "RUNE"}[kind]
 	var tint: Color = {"ability": Color(0.95, 0.85, 0.4),
-		"draft": Color(0.95, 0.85, 0.4),
 		"upgrade": Color(0.95, 0.85, 0.4),
 		"rune": Color(0.85, 0.6, 1.0)}[kind]
 	var title := Label.new()
@@ -786,7 +814,7 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 
 	# BATCH BO §2: the slot ledger, stated before the choice rather than
 	# discovered by it. At the cap the buttons below open the DROP step.
-	if kind in ["ability", "draft"]:
+	if kind == "ability":
 		var used := Run.ability_slots_used(member)
 		var slots := Label.new()
 		slots.text = "Ability slots %d of %d%s" % [used, Run.ABILITY_SLOT_CAP,
@@ -809,39 +837,6 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 					ab.description if ab != null else "",
 					Color(0.85, 0.82, 0.75),
 					_pick_ability.bind(idx, String(pool_name)), overlay)
-		"draft":
-			var d_queue: Array = member.get("draft_candidates", [])
-			var d_spec := String(member.get("spec", ""))
-			var d_offer: Array = d_queue[0] if not d_queue.is_empty() else []
-			for card in d_offer:
-				var d_ab: Ability = Classes.pool_ability(String(card))
-				_pick_button(box, String(card),
-					d_ab.description if d_ab != null else "",
-					Color(0.85, 0.82, 0.75),
-					_pick_draft.bind(idx, String(card)), overlay)
-			# THE OFFER FILLS SHORT rather than padding with repeats (§3), so
-			# a thin pool shows two cards, or one, and SAYS SO — a silently
-			# short offer reads as a bug.
-			if d_offer.size() < 3:
-				var short := Label.new()
-				short.text = "The %s pool holds no more to offer this run." % (
-					Classes.SPEC_INFO.get(d_spec, {}).get("name", "spec"))
-				short.add_theme_font_size_override("font_size", 12)
-				short.add_theme_color_override("font_color", Color(0.55, 0.53, 0.5))
-				short.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-				box.add_child(short)
-			# DECLINING IS ALWAYS ALLOWED, full or not. A settled kit is a
-			# legitimate end state; being forced to churn would make a good
-			# build worse as the run goes on.
-			var pass_btn := Button.new()
-			pass_btn.text = "Decline — my kit is as I want it"
-			pass_btn.custom_minimum_size = Vector2(600, 30)
-			pass_btn.add_theme_font_size_override("font_size", 13)
-			pass_btn.add_theme_color_override("font_color", Color(0.7, 0.68, 0.65))
-			pass_btn.pressed.connect(Music.click)
-			pass_btn.pressed.connect(overlay.queue_free)
-			pass_btn.pressed.connect(_decline_draft.bind(idx))
-			box.add_child(pass_btn)
 		"upgrade":
 			var queue2: Array = member.get("up_candidates", [])
 			var offer: Array = queue2[0] if not queue2.is_empty() else []
@@ -898,7 +893,14 @@ func _pick_button(box: VBoxContainer, label: String, desc: String,
 # one: the player picks the incoming ability and THEN names which one it
 # replaces. Only EARNED abilities are listed — a protected one can never appear
 # here, which is what makes the cap unable to break a passive.
-func _open_drop_overlay(idx: int, kind: String, incoming: String) -> void:
+#
+# BATCH BX §2 — ONE DROP STEP, TWO CONSUMERS. `on_drop` is what the party-wide
+# draft screen passes: that screen resolves as one confirmation, so it STAGES
+# the replacement instead of committing it, and the difference between the two
+# consumers is exactly one Callable rather than a second list of what may be
+# dropped. `Run.earned_ability_names` is still the only answer to that.
+func _open_drop_overlay(idx: int, kind: String, incoming: String,
+		on_drop := Callable()) -> void:
 	var member: Dictionary = Run.party[idx]
 	var droppable := Run.earned_ability_names(member)
 	if droppable.is_empty():
@@ -909,7 +911,10 @@ func _open_drop_overlay(idx: int, kind: String, incoming: String) -> void:
 		return
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	overlay.z_index = 60
+	# ABOVE the party-wide draft screen (z 62), which is what it is opened over
+	# when a column is at the cap. Below it the modal would render behind the
+	# columns and still take clicks.
+	overlay.z_index = 64
 	add_child(overlay)
 	var dim := ColorRect.new()
 	dim.size = Vector2(1280, 720)
@@ -942,7 +947,8 @@ func _open_drop_overlay(idx: int, kind: String, incoming: String) -> void:
 		var ab: Ability = Classes.spec_pool_ability(spec, String(name))
 		_pick_button(box, "Drop %s" % String(name),
 			ab.description if ab != null else "", Color(0.9, 0.7, 0.6),
-			_finish_take.bind(idx, kind, incoming, String(name)), overlay)
+			on_drop.bind(idx, String(name)) if on_drop.is_valid()
+			else _finish_take.bind(idx, kind, incoming, String(name)), overlay)
 
 	var back := Button.new()
 	back.text = "Back"
@@ -952,10 +958,13 @@ func _open_drop_overlay(idx: int, kind: String, incoming: String) -> void:
 	box.add_child(back)
 
 
+# BATCH BX §2 — ONE CONSUMER LEFT, and it is the BOSS PICK. The draft used to
+# come through here too; it resolves on the party-wide screen now, which stages
+# its drop rather than committing it (`_open_drop_overlay`'s `on_drop`). The
+# wrapper survives because `kind` is what the drop overlay was told it was
+# resolving, and a caller that lies about that is worth being able to see.
 func _finish_take(idx: int, kind: String, incoming: String, drop_name: String) -> void:
-	if kind == "draft":
-		_pick_draft(idx, incoming, drop_name)
-	else:
+	if kind == "ability":
 		_pick_ability(idx, incoming, drop_name)
 
 
@@ -991,31 +1000,346 @@ func _pick_ability(idx: int, pool_name: String, drop_name := "") -> void:
 		_toast("%s learns %s." % [String(member["key"]).capitalize(), pool_name])
 
 
-func _pick_draft(idx: int, card: String, drop_name := "") -> void:
+# ---------- BATCH BX §2: THE PARTY-WIDE DRAFT SCREEN ----------
+#
+# AN ELITE OFFERS A DRAFT TO EVERY LIVING HERO, ON ONE SCREEN, IN FOUR COLUMNS.
+# Four sequential offers after every elite would slow a run noticeably, and
+# elites run 0-3 a zone since BK — so the shape of the screen is the change,
+# not just its reach.
+#
+# EACH HERO DRAWS FROM THEIR OWN POOLS. There is no shared offer and no shared
+# ledger: `Run.roll_draft_offer` is called per member and reads that member's
+# own spec pool, class pool and `draft_refused`, so a Pyromancer can never be
+# shown a Warden card and one hero's decline can never hide a card from
+# another. THAT LEDGER BEING PER MEMBER IS LOAD-BEARING AND IS WHY §1 SAYS TO
+# VERIFY IT RATHER THAN ASSUME IT — a shared refusal list is the obvious
+# implementation and the wrong one.
+#
+# THE RULES ALL LIVE IN `run_state.gd` AND THIS SCREEN OWNS NONE OF THEM. The
+# cap, the drop, the no-return ledger and the fill-short rule are
+# `Run.take_draft_ability` / `Run.decline_draft` / `Run.roll_draft_offer`,
+# exactly as the single-hero overlay uses them — this is a second LAYOUT, never
+# a second implementation.
+
+const DRAFT_COL_W := 296.0
+const DRAFT_COL_GAP := 12.0
+const DRAFT_COL_Y := 92.0
+const DRAFT_COL_H := 540.0
+
+
+# The heroes with a column: everyone owed a draft pick. A hero who was never
+# offered one (an exhausted pool — `award_draft_pick` returns false and queues
+# nothing) simply has no column, which is the honest rendering of "there is
+# nothing left to show you".
+func _draft_columns() -> Array:
+	var out: Array = []
+	for idx in Run.party.size():
+		if int(Run.party[idx].get("draft_picks_owed", 0)) > 0:
+			out.append(idx)
+	return out
+
+
+func _maybe_open_party_draft() -> void:
+	if Run.sim_run or _draft_columns().is_empty():
+		return
+	_open_party_draft()
+
+
+# A column is DECIDED when the player has either declined it or chosen a card
+# AND, at the seven-slot cap, named what that card replaces. The confirm button
+# reads this for every column, so "the screen resolves as one action" is a
+# property of one predicate rather than of four buttons agreeing.
+func _draft_decided(idx: int) -> bool:
+	var st: Dictionary = _draft_stage.get(idx, {})
+	if bool(st.get("declined", false)):
+		return true
+	if String(st.get("card", "")) == "":
+		return false
+	if Run.ability_slots_full(Run.party[idx]):
+		return String(st.get("drop", "")) != ""
+	return true
+
+
+func _open_party_draft() -> void:
+	var cols := _draft_columns()
+	if cols.is_empty():
+		_close_party_draft()
+		return
+	if _draft_overlay != null and is_instance_valid(_draft_overlay):
+		_draft_overlay.queue_free()
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = 62
+	add_child(overlay)
+	_draft_overlay = overlay
+	var dim := ColorRect.new()
+	dim.size = Vector2(1280, 720)
+	dim.color = Color(0, 0, 0, 0.86)
+	overlay.add_child(dim)
+
+	var title := Label.new()
+	title.text = "THE DRAFT"
+	title.add_theme_font_override("font", NAME_FONT)
+	title.add_theme_font_size_override("font_size", 36)
+	title.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
+	title.position = Vector2(0, 16)
+	title.size = Vector2(1280, 44)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	overlay.add_child(title)
+	var sub := Label.new()
+	sub.text = "Each hero draws from their own pool. Choose or decline for every one, then confirm."
+	sub.add_theme_font_size_override("font_size", 13)
+	sub.add_theme_color_override("font_color", Color(0.62, 0.6, 0.56))
+	sub.position = Vector2(0, 62)
+	sub.size = Vector2(1280, 18)
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	overlay.add_child(sub)
+
+	var span: float = cols.size() * DRAFT_COL_W + (cols.size() - 1) * DRAFT_COL_GAP
+	var x0: float = (1280.0 - span) * 0.5
+	for c in cols.size():
+		_draft_column(overlay, int(cols[c]),
+			Vector2(x0 + c * (DRAFT_COL_W + DRAFT_COL_GAP), DRAFT_COL_Y))
+
+	var undecided := 0
+	for idx in cols:
+		if not _draft_decided(int(idx)):
+			undecided += 1
+	var confirm := Button.new()
+	confirm.text = "Confirm the draft" if undecided == 0 else \
+		"%d hero%s still to decide" % [undecided, "" if undecided == 1 else "es"]
+	confirm.position = Vector2(490, 652)
+	confirm.custom_minimum_size = Vector2(300, 44)
+	confirm.add_theme_font_size_override("font_size", 17)
+	confirm.disabled = undecided > 0
+	if undecided == 0:
+		confirm.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
+	confirm.pressed.connect(Music.click)
+	confirm.pressed.connect(_confirm_party_draft)
+	overlay.add_child(confirm)
+
+	# NOTHING IS COMMITTED UNTIL CONFIRM, so leaving is safe and the picks stay
+	# owed on the members — the card badge and its CHOOSE button reopen this
+	# screen. That is what lets a player go and read a hero sheet mid-draft.
+	var later := Button.new()
+	later.text = "Later"
+	later.position = Vector2(1100, 652)
+	later.custom_minimum_size = Vector2(140, 44)
+	later.add_theme_font_size_override("font_size", 14)
+	later.pressed.connect(Music.click)
+	later.pressed.connect(_close_party_draft)
+	overlay.add_child(later)
+
+
+func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 	var member: Dictionary = Run.party[idx]
-	if drop_name == "" and Run.ability_slots_full(member):
-		_open_drop_overlay(idx, "draft", card)
-		return
-	var refused := Run.take_draft_ability(member, card, drop_name)
-	if refused != "":
-		_toast(refused)
-		return
-	Run.save_run()
-	_draw_screen()
-	if drop_name != "":
-		_toast("%s trades %s for %s." % [String(member["key"]).capitalize(),
-			drop_name, card])
+	var spec := String(member.get("spec", ""))
+	var st: Dictionary = _draft_stage.get(idx, {})
+	var staged := String(st.get("card", ""))
+	var staged_drop := String(st.get("drop", ""))
+	var declined := bool(st.get("declined", false))
+	var full := Run.ability_slots_full(member)
+
+	var panel := PanelContainer.new()
+	panel.position = at
+	panel.custom_minimum_size = Vector2(DRAFT_COL_W, DRAFT_COL_H)
+	panel.size = Vector2(DRAFT_COL_W, DRAFT_COL_H)
+	overlay.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	panel.add_child(box)
+
+	var name_lbl := Label.new()
+	name_lbl.text = Classes.SPEC_INFO.get(spec, {}).get(
+		"name", String(member["key"]).capitalize())
+	name_lbl.add_theme_font_override("font", NAME_FONT)
+	name_lbl.add_theme_font_size_override("font_size", 22)
+	name_lbl.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
+	name_lbl.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 26)
+	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(name_lbl)
+
+	# The slot ledger, stated before the choice rather than discovered by it
+	# (BO §2's rule, per column now). At the cap the card buttons open the drop
+	# step instead of staging outright.
+	var used := Run.ability_slots_used(member)
+	var slots := Label.new()
+	slots.text = "Ability slots %d of %d%s" % [used, Run.ABILITY_SLOT_CAP,
+		"  —  taking one means dropping one" if full else ""]
+	slots.add_theme_font_size_override("font_size", 11)
+	slots.add_theme_color_override("font_color",
+		Color(0.95, 0.6, 0.45) if full else Color(0.6, 0.58, 0.55))
+	slots.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 14)
+	slots.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(slots)
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 388)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	box.add_child(scroll)
+	var cards := VBoxContainer.new()
+	cards.add_theme_constant_override("separation", 2)
+	cards.custom_minimum_size = Vector2(DRAFT_COL_W - 34, 0)
+	scroll.add_child(cards)
+
+	var queue: Array = member.get("draft_candidates", [])
+	var offer: Array = queue[0] if not queue.is_empty() else []
+	for card in offer:
+		var card_name := String(card)
+		var ab: Ability = Classes.pool_ability(card_name)
+		var b := Button.new()
+		var chosen: bool = card_name == staged and not declined
+		b.text = ("▸ " if chosen else "") + card_name
+		b.custom_minimum_size = Vector2(DRAFT_COL_W - 38, 28)
+		b.add_theme_font_size_override("font_size", 13)
+		b.add_theme_color_override("font_color",
+			Color(1.0, 0.9, 0.5) if chosen else Color(0.85, 0.82, 0.75))
+		if chosen:
+			b.modulate = Color(1.15, 1.1, 0.85)
+		b.pressed.connect(Music.click)
+		b.pressed.connect(_stage_draft.bind(idx, card_name))
+		cards.add_child(b)
+		if ab != null and ab.description != "":
+			var text := Label.new()
+			text.text = ab.description
+			text.add_theme_font_size_override("font_size", 11)
+			text.add_theme_color_override("font_color",
+				Color(0.8, 0.76, 0.66) if chosen else Color(0.62, 0.6, 0.57))
+			text.custom_minimum_size = Vector2(DRAFT_COL_W - 38, 0)
+			text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			cards.add_child(text)
+
+	# THE OFFER FILLS SHORT rather than padding with repeats (AP §3, unchanged),
+	# and it SAYS SO — a silently short column reads as a bug, and with the
+	# per-run ledger four columns can now go short at different rates.
+	if offer.size() < 3:
+		var short := Label.new()
+		short.text = "Nothing further left to offer this run." if offer.is_empty() \
+			else "The pool holds no more to offer this run."
+		short.add_theme_font_size_override("font_size", 11)
+		short.add_theme_color_override("font_color", Color(0.55, 0.53, 0.5))
+		short.custom_minimum_size = Vector2(DRAFT_COL_W - 38, 0)
+		short.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		cards.add_child(short)
+
+	# At the cap a staged card is not yet a decision: the column stays undecided
+	# until the replacement is named, and the button says which state it is in.
+	if staged != "" and not declined and full:
+		var drop_btn := Button.new()
+		drop_btn.text = "replaces %s  (change)" % staged_drop if staged_drop != "" \
+			else "Choose what %s replaces" % staged
+		drop_btn.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 26)
+		drop_btn.add_theme_font_size_override("font_size", 12)
+		drop_btn.add_theme_color_override("font_color",
+			Color(0.85, 0.82, 0.75) if staged_drop != "" else Color(0.95, 0.6, 0.45))
+		drop_btn.pressed.connect(Music.click)
+		# THE CALLABLE IS PASSED BARE. `Callable.bind` appends its arguments
+		# AFTER the call's, so `_stage_draft_drop.bind(idx).bind(name)` resolves
+		# to `_stage_draft_drop(name, idx)` — the arguments REVERSED, which is a
+		# type error at the moment a player clicks a drop and nowhere earlier.
+		# `_open_drop_overlay` already holds `idx` and binds both in signature
+		# order.
+		drop_btn.pressed.connect(_open_drop_overlay.bind(idx, "draft", staged,
+			_stage_draft_drop))
+		box.add_child(drop_btn)
+
+	# DECLINING IS ALWAYS ALLOWED, PER HERO, INDEPENDENTLY. One hero taking a
+	# card does not commit the others, and a settled kit is a legitimate end
+	# state — being forced to churn would make a good build worse as the run
+	# goes on. It writes THAT hero's ledger and nobody else's.
+	var pass_btn := Button.new()
+	pass_btn.text = "▸ Declined" if declined else "Decline"
+	pass_btn.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 26)
+	pass_btn.add_theme_font_size_override("font_size", 12)
+	pass_btn.add_theme_color_override("font_color",
+		Color(1.0, 0.9, 0.5) if declined else Color(0.7, 0.68, 0.65))
+	pass_btn.pressed.connect(Music.click)
+	pass_btn.pressed.connect(_stage_draft_decline.bind(idx))
+	box.add_child(pass_btn)
+
+	var state := Label.new()
+	if declined:
+		state.text = "keeps the kit as it is"
+	elif staged == "":
+		state.text = "— undecided —"
+	elif full and staged_drop == "":
+		state.text = "name what it replaces"
+	elif staged_drop != "":
+		state.text = "takes %s for %s" % [staged, staged_drop]
 	else:
-		_toast("%s drafts %s." % [String(member["key"]).capitalize(), card])
+		state.text = "takes %s" % staged
+	state.add_theme_font_size_override("font_size", 12)
+	state.add_theme_color_override("font_color",
+		Color(0.55, 0.53, 0.5) if not _draft_decided(idx) else Color(0.6, 0.85, 0.6))
+	state.custom_minimum_size = Vector2(DRAFT_COL_W - 16, 16)
+	state.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(state)
 
 
-func _decline_draft(idx: int) -> void:
-	var member: Dictionary = Run.party[idx]
-	if not Run.decline_draft(member):
-		return
+# Clicking the staged card again UNSTAGES it, so a column can be taken back to
+# undecided without declining — declining is a real decision with a real cost
+# (the whole offer enters that hero's no-return ledger) and must never be the
+# only way out of a misclick.
+func _stage_draft(idx: int, card: String) -> void:
+	var st: Dictionary = _draft_stage.get(idx, {})
+	if String(st.get("card", "")) == card and not bool(st.get("declined", false)):
+		_draft_stage[idx] = {"card": "", "drop": "", "declined": false}
+	else:
+		_draft_stage[idx] = {"card": card, "drop": "", "declined": false}
+	_open_party_draft()
+
+
+func _stage_draft_drop(idx: int, drop_name: String) -> void:
+	var st: Dictionary = _draft_stage.get(idx, {})
+	st["drop"] = drop_name
+	_draft_stage[idx] = st
+	_open_party_draft()
+
+
+func _stage_draft_decline(idx: int) -> void:
+	var st: Dictionary = _draft_stage.get(idx, {})
+	if bool(st.get("declined", false)):
+		_draft_stage[idx] = {"card": "", "drop": "", "declined": false}
+	else:
+		_draft_stage[idx] = {"card": "", "drop": "", "declined": true}
+	_open_party_draft()
+
+
+func _close_party_draft() -> void:
+	if _draft_overlay != null and is_instance_valid(_draft_overlay):
+		_draft_overlay.queue_free()
+	_draft_overlay = null
+	_draft_stage.clear()
+
+
+# THE ONE COMMIT. Every column resolves here, through the same two doors the
+# single-hero overlay calls — `Run.take_draft_ability` and `Run.decline_draft`
+# — so the cap, the drop, the no-return ledger and the "already known" refusal
+# are the run's rules and not this screen's. It saves ONCE afterwards.
+func _confirm_party_draft() -> void:
+	var took := PackedStringArray()
+	for idx in _draft_columns():
+		var i := int(idx)
+		if not _draft_decided(i):
+			continue
+		var member: Dictionary = Run.party[i]
+		var st: Dictionary = _draft_stage.get(i, {})
+		if bool(st.get("declined", false)):
+			Run.decline_draft(member)
+			continue
+		var card := String(st.get("card", ""))
+		var refused := Run.take_draft_ability(member, card, String(st.get("drop", "")))
+		if refused != "":
+			_toast("%s: %s" % [String(member["key"]).capitalize(), refused])
+			continue
+		took.append("%s takes %s" % [String(member["key"]).capitalize(), card])
+	_close_party_draft()
 	Run.save_run()
 	_draw_screen()
-	_toast("%s keeps the kit as it is." % String(member["key"]).capitalize())
+	if took.is_empty():
+		_toast("The party keeps its kits as they are.")
+	else:
+		_toast(" · ".join(took))
 
 
 func _pick_upgrade(idx: int, choice: int) -> void:

@@ -205,8 +205,11 @@ func _initialize() -> void:
 		"§2: Explosive Shot's perfect states its unit")
 	ok(csrc.contains("20% of Attack as nature"),
 		"§2: Shrapnel Charge states its unit")
-	ok(csrc.contains("your living\\nbeasts make their own strikes"),
-		"§2: Call of the Wild no longer claims 15% for present beasts")
+	# RE-POINTED AT BATCH BX §4 (prose only — "beasts" became "companions").
+	# BJ's question survives whole: the desc must not go back to claiming 15%
+	# for the ones that are STANDING, which is the doc drift BJ found.
+	ok(csrc.contains("your living\\ncompanions make their own strikes"),
+		"§2: Call of the Wild no longer claims 15% for present companions")
 	# The rune descs corrected toward their payloads.
 	var runes_json := FileAccess.get_file_as_string("res://data/runes.json")
 	ok(runes_json.contains("leaves Poison AND Cripple behind"),

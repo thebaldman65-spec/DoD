@@ -2201,7 +2201,7 @@ const LANE_TREES := {
 		# node should pay more (that is a design decision, and the read site
 		# would need to pass the field as the amount).
 		{"id": "bm_unbroken", "name": "Unbroken Watch", "ranks": 1, "lane": "devotion", "row": 2,
-			"desc": "The active beast gains +{v} additional Loyalty on any turn it took no damage.",
+			"desc": "The active companion gains +{v} additional Loyalty on any turn it took no damage.",
 			"scale": {"step": 1},
 			"payload": {"stat": {"unbroken_watch": 1}}},
 		# RE-SPECCED, NOT REPRICED: it used to raise a ceiling, and Batch AY §2
@@ -2212,11 +2212,11 @@ const LANE_TREES := {
 			"scale": {"base": 20, "step": 15},
 			"payload": {"stat": {"absolute_step": 15}}},
 		{"id": "bm_devoted_fury", "name": "Devoted Fury", "ranks": 1, "lane": "devotion", "row": 4,
-			"desc": "Bestial Wrath lasts {v} turn(s) longer per Loyalty stack on the beast.",
+			"desc": "Bestial Wrath lasts {v} turn(s) longer per Loyalty stack on the companion.",
 			"scale": {"step": 1},
 			"payload": {"stat": {"devoted_fury": 1}}},
 		{"id": "bm_steadfast", "name": "Steadfast Bond", "ranks": 1, "lane": "devotion", "row": 5,
-			"desc": "A beast's death returns {v}% of its Loyalty rather than breaking it — the meter survives it whole.",
+			"desc": "A companion's death returns {v}% of its Loyalty rather than breaking it — the meter survives it whole.",
 			"scale": {"step": 100},
 			"payload": {"stat": {"steadfast_bond": 100}}},
 		# RE-SPECCED, NOT REPRICED: tripling AT a threshold is meaningless once
@@ -2224,7 +2224,7 @@ const LANE_TREES := {
 		# Devotion made it — the deep-partnership build, terrifying and fragile
 		# in equal measure.
 		{"id": "bm_ancient_pact", "name": "Ancient Pact", "ranks": 1, "lane": "devotion", "row": 6,
-			"desc": "The Pack Bond boon's growth per Loyalty stack DOUBLES — but the beast can no longer be healed by ANY source, Spirit Bond and Hunter's Instinct included.",
+			"desc": "The Pack Bond boon's growth per Loyalty stack DOUBLES — but the companion can no longer be healed by ANY source, Spirit Bond and Hunter's Instinct included.",
 			"payload": {"stat": {"ancient_pact": 1}}},
 		# RE-SPECCED PAYOFF: a higher ceiling was its reward and there is no
 		# ceiling. It arrives deep and grows twice as fast instead. THE FIELD IS
@@ -2233,7 +2233,7 @@ const LANE_TREES := {
 		# IT ALSO HOLDS THE BEAST CAP AT ONE, which is what makes it and The
 		# Pack impossible to hold together — see battle._beast_cap.
 		{"id": "bm_lone_bond", "name": "Lone Bond", "ranks": 1, "lane": "devotion", "row": 7,
-			"desc": "One beast per fight: it cannot be swapped and cannot be re-summoned if it dies — but it arrives at {v} Loyalty and gains DOUBLE thereafter. It also closes The Pack: you can never field two.",
+			"desc": "One companion per fight: it cannot be swapped and cannot be re-summoned if it dies — but it arrives at {v} Loyalty and gains DOUBLE thereafter. It also closes The Pack: you can never field two.",
 			"scale": {"step": 6},
 			"payload": {"stat": {"lone_bond": 6}}},
 		# --- Lane THE PACK: many beasts, rotated ---
@@ -2242,11 +2242,11 @@ const LANE_TREES := {
 			"scale": {"step": 3},
 			"payload": {"stat": {"quick_whistle_ranks": 3}}},
 		{"id": "bm_momentum", "name": "Feral Momentum", "ranks": 1, "lane": "pack", "row": 2,
-			"desc": "+{v}% companion damage for each DIFFERENT beast summoned this fight.",
+			"desc": "+{v}% companion damage for each DIFFERENT companion summoned this fight.",
 			"scale": {"step": 25},
 			"payload": {"stat": {"momentum_ranks": 25}}},
 		{"id": "bm_shared", "name": "Shared Devotion", "ranks": 1, "lane": "pack", "row": 3,
-			"desc": "Summoning or swapping grants +{v} Loyalty to EVERY beast, not only the arriving one.",
+			"desc": "Summoning or swapping grants +{v} Loyalty to EVERY companion, not only the arriving one.",
 			"scale": {"step": 2},
 			"payload": {"stat": {"shared_devotion": 2}}},
 		{"id": "bm_herald", "name": "Herald", "ranks": 1, "lane": "pack", "row": 4,
@@ -2258,13 +2258,13 @@ const LANE_TREES := {
 		# beast's boon rather than a first's, and it must stay meaningfully
 		# different from the two at full strength beside it.
 		{"id": "bm_menagerie", "name": "Menagerie", "ranks": 1, "lane": "pack", "row": 5,
-			"desc": "Every beast summoned this fight keeps its Pack Bond boon at {v}% strength while it is away.",
+			"desc": "Every companion summoned this fight keeps its Pack Bond boon at {v}% strength while it is away.",
 			"scale": {"step": 50},
 			"payload": {"stat": {"menagerie": 50}}},
 		# Two magnitudes, two fields — one counter cannot honestly hold a call
 		# count and a Loyalty total (AW's `covenant` precedent).
-		{"id": "bm_no_beast_left", "name": "No Beast Left", "ranks": 1, "lane": "pack", "row": 6,
-			"desc": "A beast's death makes your next {v} summons cost no Mana and ignore their cooldown, and each arriving beast enters at 5 Loyalty.",
+		{"id": "bm_no_beast_left", "name": "None Left Behind", "ranks": 1, "lane": "pack", "row": 6,
+			"desc": "A companion's death makes your next {v} summons cost no Mana and ignore their cooldown, and each arriving companion enters at 5 Loyalty.",
 			"scale": {"step": 2},
 			"payload": {"stat": {"no_beast_left": 2, "no_beast_left_loyalty": 5}}},
 		# THE FIELD IS THE GATE AND THE MAGNITUDE IN ONE: 3 is the Loyalty cap
@@ -2279,7 +2279,7 @@ const LANE_TREES := {
 			"desc": "Quick Shot deals +{v}% of your Attack.",
 			"scale": {"step": 25},
 			"payload": {"stat": {"masters_aim_ranks": 25}}},
-		{"id": "bm_beast_within", "name": "Beast Within", "ranks": 1, "lane": "handler", "row": 2,
+		{"id": "bm_beast_within", "name": "The Wild Within", "ranks": 1, "lane": "handler", "row": 2,
 			"desc": "+{v}% companion maximum health.",
 			"scale": {"step": 40},
 			"payload": {"stat": {"companion_hp_pct": 0.40}}},
@@ -2296,11 +2296,11 @@ const LANE_TREES := {
 			"scale": {"step": 6},
 			"payload": {"stat": {"symbiosis": 6}}},
 		{"id": "bm_vengeance", "name": "Vengeance", "ranks": 1, "lane": "handler", "row": 6,
-			"desc": "When a beast dies you take its Pack Bond boon at FULL strength for the rest of the battle — where it would otherwise die with the beast — and deal +{v}% damage while it holds.",
+			"desc": "When a companion dies you take its Pack Bond boon at FULL strength for the rest of the battle — where it would otherwise die with the companion — and deal +{v}% damage while it holds.",
 			"scale": {"step": 30},
 			"payload": {"stat": {"vengeance": 1, "vengeance_dmg": 30}}},
 		{"id": "bm_lone_hunter", "name": "Lone Hunter", "ranks": 1, "lane": "handler", "row": 7,
-			"desc": "While no beast stands, your abilities cost {v}% less and you deal +30% damage.",
+			"desc": "While no companion stands, your abilities cost {v}% less and you deal +30% damage.",
 			"scale": {"step": 50},
 			"payload": {"stat": {"lone_hunter": 50, "lone_hunter_dmg": 30}}},
 		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
@@ -2311,7 +2311,7 @@ const LANE_TREES := {
 		# LOYALTY BUYS A KIND RATHER THAN A QUANTITY: past a depth the beast's
 		# arrival effect becomes something it does, not something it did.
 		{"id": "bm_kindred", "name": "Kindred", "ranks": 1, "lane": "devotion", "row": 8,
-			"desc": "At {v} or more Loyalty the beast's arrival effect fires again at the start of each of the Beastmaster's turns.",
+			"desc": "At {v} or more Loyalty the companion's arrival effect fires again at the start of each of the Beastmaster's turns.",
 			"scale": {"step": 8},
 			"payload": {"stat": {"kindred": 8}}},
 		# ROTATION STOPS COSTING WHAT IT COSTS: BJ measured 0.05 swaps a trash
@@ -2322,13 +2322,13 @@ const LANE_TREES := {
 		# THE BEAST'S ABSENCE BECOMES AN ASSET: Vengeance inherits the boon; this
 		# inherits the STRIKE, so an empty field still fights as a pair.
 		{"id": "bm_ghost_pack", "name": "Ghost Pack", "ranks": 1, "lane": "handler", "row": 8,
-			"desc": "While no beast stands, the Beastmaster's attacks still draw a companion strike at {v}% power.",
+			"desc": "While no companion stands, the Beastmaster's attacks still draw a companion strike at {v}% power.",
 			"scale": {"step": 60},
 			"payload": {"stat": {"ghost_pack": 60}}},
 		# --- Capstones (row 9): take ONE, no lane requirement ---
 		{"id": "bm_one_soul", "name": "One Soul", "ranks": 1, "lane": "devotion", "row": 9,
 			"capstone": true,
-			"desc": "You and every beast you field share one health pool — all damage to any of you divides evenly between you. Loyalty gain is doubled.",
+			"desc": "You and every companion you field share one health pool — all damage to any of you divides evenly between you. Loyalty gain is doubled.",
 			"payload": {"stat": {"one_soul": 1}}},
 		# BUILT BY BATCH AY §1. It had read "coming soon" in the shelf since
 		# Batch 30; most of the machinery was already here (`unit.beasts` is an
@@ -2336,7 +2336,7 @@ const LANE_TREES := {
 		# this was an unfinished switch rather than unbuilt machinery.
 		{"id": "bm_the_pack", "name": "The Pack", "ranks": 1, "lane": "pack", "row": 9,
 			"capstone": true,
-			"desc": "TWO beasts may be active at once: both strike when you attack, each keeps its own Loyalty meter, and BOTH Pack Bond boons apply at FULL strength. Swapping replaces whichever of the two holds LESS Loyalty — the deeper bond always keeps its place. Lone Bond closes this door.",
+			"desc": "TWO companions may be active at once: both strike when you attack, each keeps its own Loyalty meter, and BOTH Pack Bond boons apply at FULL strength. Swapping replaces whichever of the two holds LESS Loyalty — the deeper bond always keeps its place. Lone Bond closes this door.",
 			"payload": {"stat": {"the_pack": 1}}},
 		{"id": "bm_apex", "name": "Apex Predator", "ranks": 1, "lane": "handler", "row": 9,
 			"capstone": true,

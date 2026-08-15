@@ -488,8 +488,14 @@ func _sources() -> void:
 			"§3: an elite ALWAYS offers a draft on victory")
 		ok(not body.contains("randf()"),
 			"§3: ...unconditionally — no roll stands between the elite and the offer")
-	ok(sim.contains("_award_draft(run, run.party.pick_random())"),
-		"§3: ...and the sim's elite branch offers it too")
+	# RE-POINTED AT BATCH BX §2, AND IT IS AN INVERSION. BO offered to ONE hero
+	# drawn at random and this needle pinned that draw; BX offers to EVERY
+	# LIVING hero, so what is worth asserting is that the sim's walk still
+	# MATCHES battle.gd's victory branch — a sim measuring a draft rate the game
+	# does not have is worse than a sim that skips the draft entirely.
+	ok(sim.contains("_award_draft(run, d_m)")
+		and sim.contains("for d_m in run.party:"),
+		"§3: ...and the sim's elite branch offers it to every living hero too")
 	ok(sim.contains("run.take_draft_ability(m, String(offer[0]), drop)"),
 		"§3: ...resolved through the SAME door the map screen calls")
 	# MERCHANT — purchasable, gold.
@@ -535,8 +541,17 @@ func _sources() -> void:
 	# THE OVERLAY IS REUSED, NOT REBUILT (§1's instruction).
 	ok(map.count("func _open_pick_overlay(") == 1,
 		"§3: there is still exactly ONE pick overlay")
-	ok(map.contains("\"draft\": \"THE DRAFT\""),
-		"§3: ...and the draft is a kind inside it")
+	# RE-POINTED AT BATCH BX §2, AND IT IS AN INVERSION. BO's question was "is
+	# the draft reusing the overlay rather than building a second one", and the
+	# answer moved: an elite drafts for FOUR heroes now, which is a screen the
+	# one-hero overlay cannot be. What the question becomes is the same one
+	# pointed at the new shape — is there exactly ONE draft renderer — and BO's
+	# single-hero branch is DELETED rather than left standing beside it.
+	ok(not map.contains("\"draft\": \"THE DRAFT\""),
+		"§3: BO's single-hero draft branch is gone from the pick overlay")
+	ok(map.count("func _open_party_draft(") == 1
+		and map.contains("if kind == \"draft\":\n\t\t_open_party_draft()"),
+		"§3: ...and the draft has exactly one renderer, which CHOOSE routes to")
 
 
 # ---------- LIVE ----------
@@ -1145,7 +1160,7 @@ func _docs() -> void:
 	# TOGETHER or a batch that bumps the timestamp trips suites it never
 	# touched. (BO had its own copy phrased as "this batch"; it is the same
 	# gate.)
-	ok(master.contains("Batch BW"),
+	ok(master.contains("Batch BX"),
 		"§6: master.html is stamped for the current batch")
 	ok(master.contains("THE ABILITY DRAFT") or master.contains("The Ability Draft"),
 		"§6: ...and carries the draft's own section")

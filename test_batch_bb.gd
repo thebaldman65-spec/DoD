@@ -193,8 +193,13 @@ func _swap_rule_source() -> void:
 	ok(src.contains("# Never a second beast of a kind already fielded"),
 		"§1: Batch Q's never-two-of-a-kind clause survives the revert")
 	# The two player-facing tooltips and the capstone all say the same thing.
+	# RE-POINTED AT BATCH BX §4: the needle read "whichever beast holds LESS",
+	# and the player-facing word is COMPANION now. THE QUESTION IS UNCHANGED —
+	# do both swap tooltips state the Loyalty rule rather than an age rule —
+	# and the check below it, which is what actually catches a regression to
+	# AY's eviction, never named the word at all.
 	ok(src.contains("holds LESS Loyalty (ties: the older)")
-		and src.contains("Replaces whichever beast holds LESS"),
+		and src.contains("Replaces whichever companion holds LESS"),
 		"§1: both swap tooltips describe the Loyalty rule")
 	ok(not src.contains("replaces the OLDER") and not src.contains("the OLDER of the two"),
 		"§1: no tooltip still says OLDER")
@@ -796,7 +801,7 @@ func _docs() -> void:
 	# is the canonical one and moves with every batch that touches the doc. What
 	# it is really guarding is that the doc was touched AT ALL. Bump it, do not
 	# delete it.
-	ok(doc.contains("Last updated: 2026-08-14 (Batch BW)"),
+	ok(doc.contains("Last updated: 2026-08-15 (Batch BX)"),
 		"§7: master.html carries the current batch's stamp")
 	ok(doc.contains("Rot"), "§7: §3a's modifier table has Rot back")
 	# The pool tables are verbatim — test_batch_ah asserts them too, so this is
