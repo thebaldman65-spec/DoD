@@ -288,7 +288,11 @@ func _contribution_cannot_see_break() -> void:
 	# far as the share is concerned: `_on_unit_credit` banks it and RETURNS
 	# before it can reach `_devout_heal` (and so `_stat_heal`).
 	var door := src.find("if term == \"devoutness_break\":")
-	var heal := src.find("_devout_heal(src_name, float(amount), term)")
+	# RE-POINTED BY BATCH BU: `_devout_heal` gained a fourth argument (the healed
+	# unit, for Reprisal's ledger), so this fragment grew a `, healed`. The
+	# question is unchanged and is still the one worth asking — is the Break
+	# term branched off BEFORE the healing door, and does it return.
+	var heal := src.find("_devout_heal(src_name, float(amount), term, healed)")
 	ok(door > 0 and heal > door,
 		"§4: the Break term is branched off before the healing door")
 	ok(door > 0 and src.substr(door, heal - door).contains("return"),

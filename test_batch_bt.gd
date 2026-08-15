@@ -151,20 +151,30 @@ func _run() -> void:
 # ---------- the pools ----------
 
 func _pools() -> void:
-	# THE MAGE THREE GO TO FIVE; NOBODY ELSE MOVES. A batch that widens three
-	# pools is exactly where a fourth gets widened by accident.
+	# RE-POINTED IN PLACE BY BATCH BU, AND IT IS AN INVERSION OF THE SECOND
+	# HALF. BT's own line was "the Mage three go to five; NOBODY ELSE MOVES",
+	# which was true of BT and is the exact statement BU pays off: the CLERIC
+	# three joined them. The question the loop asks — which pools are deep and
+	# which are still owed — is unchanged and is still what tells the two
+	# answers apart; only the correct answer moved.
 	for spec in ["pyromancer", "cryomancer", "arcanist"]:
 		var pool: Array = Classes.spec_draft_pool(spec)
 		ok(pool.size() == 5, "%s drafts FIVE (got %d)" % [spec, pool.size()])
+	for spec in ["holy", "inquisitor", "occultist"]:
+		ok(Classes.spec_draft_pool(spec).size() == 5,
+			"%s joined them at FIVE in Batch BU" % spec)
 	for spec in Classes.SPEC_DRAFT_POOLS:
-		if spec in ["pyromancer", "cryomancer", "arcanist"]:
+		if spec in ["pyromancer", "cryomancer", "arcanist",
+				"holy", "inquisitor", "occultist"]:
 			continue
 		ok(Classes.spec_draft_pool(spec).size() == 2,
-			"%s is still TWO deep — tranche 2 owes it" % spec)
+			"%s is still TWO deep — the Hunter/Warrior third owes it" % spec)
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 33, "the spec pools hold 33 (24 + this tranche's 9), got %d" % total)
+	ok(total == 42,
+		"the spec pools hold 42 (24 + BT's Mage nine + BU's Cleric nine), got %d"
+			% total)
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR negative control.
 	for cls in Classes.CLASS_DRAFT_POOLS:
@@ -381,7 +391,7 @@ func _one_shield_door() -> void:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch BT"), "master.html carries the Batch BT stamp")
+	ok(master.contains("Batch BU"), "master.html carries the current batch stamp")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
 	# §5: THE SYNERGY LINE IS THE INFORMATION THIS TRANCHE WAS AUTHORED FOR, so

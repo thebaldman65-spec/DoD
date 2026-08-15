@@ -113,6 +113,15 @@ const STATUS_INFO := {
 	# the first one's mark.
 	"arcane_echo": ["Arcane Echo", "AE", Color(0.72, 0.55, 1.0),
 		"Resonating: every damaging HIT its\nmarker lands anywhere repeats at 30%\nagainst this enemy. A three-bolt\nBarrage echoes three times."],
+	# BATCH BU — SUFFERING's drip. It is a GENUINE DEBUFF and is listed as one in
+	# DEBUFF_IDS, which makes it cleansable by a mender's Cleansing Rite —
+	# BT's `slow_burn` and BO's `blight` precedent, and the counterplay rather
+	# than an oversight. Leaving it OUT would have been the worse error and not
+	# the safer one: `_dispellable_buffs` is DERIVED (anything not a debuff is a
+	# candidate), so an unlisted affliction on an enemy is something a Mage's
+	# Dispel would strip FOR the enemy — `ruin_primed`'s trap through a new door.
+	"suffering": ["Suffering", "Sf", Color(0.72, 0.40, 0.80),
+		"A wound that thinks: gains Ruin at\nthe start of each of its own turns."],
 	"frostbite": ["Frostbite", "Fb", Color(0.45, 0.70, 0.95), "Frostbitten: healing received\nreduced by 50%."],
 	"stabilized": ["Stabilized", "St+", Color(0.55, 0.68, 0.95), "Grounded resonance: takes less\ndamage (10% per stack consumed)."],
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge is spent for this\nbattle — the storm has no feeding\nleft in it."],
@@ -2043,7 +2052,7 @@ func _run_battle() -> void:
 								dot_dmg * 0.01 * h.ashen_skin_heal)), 1)
 							var ash_got: int = h.heal_amount(ash_back)
 							if ash_got > 0:
-								_stat_heal(h, ash_got)
+								_stat_heal(h, ash_got, h)
 								h.float_text("+%d" % ash_got, Color(1.0, 0.7, 0.4))
 								_log("   → Talent: Ashen Skin — %s drinks %d from his own fire" % [
 									h.unit_name, ash_got], "#b0a8e0")
@@ -2086,6 +2095,17 @@ func _run_battle() -> void:
 					_sfx("break", -4.0)
 					_message("%s BREAKS!" % u.unit_name)
 					_log("!! %s BREAKS (Entropy)" % u.unit_name, "#c070e0")
+		# BATCH BU — SUFFERING's drip, and it pays ON THE ENEMY'S CLOCK, which
+		# is the axis of the card: one turn of his buys four of theirs.
+		#
+		# IT RUNS ABOVE THE DETONATION CHECK DELIBERATELY. The stacks it grants
+		# go through `_gain_ruin`, so they can be the ones that cross a
+		# threshold and arm the primer — and arming it one line before the
+		# bearer's own detonation check means the mark it just deepened
+		# detonates on the very turn it earned it, rather than sitting primed
+		# for a whole round. A drip below the check would silently cost a turn.
+		if not u.is_hero and u.has_status("suffering"):
+			_suffering_tick(u)
 		# Wrath of the Old Gods: a primed Ruin detonates as its bearer stirs.
 		if not u.is_hero and u.has_status("ruin_primed"):
 			_detonate_ruin(u)
@@ -2102,7 +2122,7 @@ func _run_battle() -> void:
 			_log("%s regenerates %d HP (Renewal)" % [u.unit_name, ren_got], "#70d878")
 			# Batch W: ticks are the caster's healing too (src stamped at
 			# cast; pre-W the "healing" line never counted ticks at all).
-			_stat_heal(String(ren_stat.get("src_name", "")), ren_got)
+			_stat_heal(String(ren_stat.get("src_name", "")), ren_got, u)
 			# On the Mend (talent, snapshotted on the status): the tick can
 			# wash one harmful effect away.
 			var mend_pct := int(ren_stat.get("mend", 0))
@@ -2126,7 +2146,7 @@ func _run_battle() -> void:
 			u.float_text("+%d" % bw_tick, Color(0.55, 0.75, 0.95))
 			# BATCH BC §1: same gap as Healing Pulse — the Devout capstone's
 			# tick was healing the party and crediting nobody.
-			_devout_heal(_living_devout(), bw_tick, "bulwark")
+			_devout_heal(_living_devout(), bw_tick, "bulwark", u)
 			_log("%s stands fortified — regains %d HP (Bulwark)" % [
 				u.unit_name, bw_tick], "#8c9cc8")
 		# Zeal-lane riders (Batch K): Healing Pulse drips and Cleansing
@@ -2143,7 +2163,7 @@ func _run_battle() -> void:
 					u.float_text("+%d" % pulse_got, Color(0.4, 0.9, 0.45))
 					# BATCH BC §1: never credited to anybody until now, so the
 					# ZEAL control row under-read its own biggest heal.
-					_devout_heal(zl_dv, pulse_got, "pulse")
+					_devout_heal(zl_dv, pulse_got, "pulse", u)
 					_log("   → Talent: Healing Pulse — %s mends %d" % [
 						u.unit_name, pulse_got], "#b0a8e0")
 				if zl_dv.waters_ranks > 0 and randf() < 0.01 * zl_dv.waters_ranks:
@@ -2263,7 +2283,7 @@ func _run_battle() -> void:
 					* _healing_done_mult(u))), 1)
 				var bc_got: int = bc_h.heal_amount(bc_amt, bc_h != u)
 				bc_h.float_text("+%d" % bc_got, Color(0.95, 0.9, 0.6))
-				_stat_heal(u, bc_got)
+				_stat_heal(u, bc_got, bc_h)
 				_log("   → Talent: Beacon — the light finds %s (+%d)" % [
 					bc_h.unit_name, bc_got], "#b0a8e0")
 		# Survivalist traps spring the moment their victim moves: the snare
@@ -2410,6 +2430,14 @@ func _run_battle() -> void:
 		# turn, because the whole ability is that the recovery is DELAYED — he
 		# has to survive the damage before he gets any of it back.
 		_battle_trance_tick(u)
+		# BATCH BU — FORTIFIED SPIRIT sheds a step. Its own function for the
+		# standing reason (`_run_battle` cannot be driven headlessly, so a rule
+		# buried in this loop could only ever be checked by a grep and its
+		# negative control could never fail), and called from HERE, at the start
+		# of the HOLDER's turn, because the decay is what the ability is about:
+		# the ally has to be healed INSIDE the window or the loan takes real
+		# health back out on the way down.
+		_fortified_tick(u)
 		# Endurance (Warden talent): armor stacks while unhealed by others,
 		# shown as a buff chip that tracks the current bonus.
 		if u.endurance_ranks > 0:
@@ -2893,7 +2921,17 @@ func _player_turn(u: BattleUnit) -> void:
 				# Cinderfall and Blizzard already do. `funeral_pyre`,
 				# `flash_freeze`, Stoke, Arcane Bolt and Arcane Echo all name
 				# ONE enemy and fall through to the ordinary target picker.
-				"slow_burn", "hoarfrost_armor", "inner_arcane"]:
+				"slow_burn", "hoarfrost_armor", "inner_arcane",
+				# BATCH BU. `shared_grief` is self; `ordination` picks the
+				# LOWEST-Faith ally by rule rather than by click, which is the
+				# whole design and is why it is a self-cast rather than an
+				# ally-facing one; `reliquary` pays the WHOLE party and
+				# `anointing` anoints it, which is the same thing to this list.
+				# `recant` and `fortified_spirit` are NOT here — both are
+				# ally-facing and fall through to the ALLY branch below.
+				# `reprisal`, `suffering` and `transference` each name ONE enemy
+				# and fall through to the ordinary target picker.
+				"shared_grief", "ordination", "reliquary", "anointing"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -3054,7 +3092,7 @@ func _player_turn(u: BattleUnit) -> void:
 			for pp_h in heroes.filter(func(h): return not h.dead and not h.is_companion):
 				var pp_got: int = pp_h.heal_amount(pp_amt, pp_h != u)
 				pp_h.float_text("+%d" % pp_got, Color(0.7, 0.4, 0.9))
-				_stat_heal(u, pp_got)
+				_stat_heal(u, pp_got, pp_h)
 			_log("   → Talent: Pleasure from Pain — %d unique debuff%s feed the party (%d each)" % [
 				pp_uniques, "" if pp_uniques == 1 else "s", pp_amt], "#b0a8e0")
 	# Divine Presence (Holy talent): the light settles on the most wounded
@@ -3068,7 +3106,7 @@ func _player_turn(u: BattleUnit) -> void:
 					* u.divine_presence_pct * _healing_done_mult(u))), 1)
 				var dp_got: int = dp_t.heal_amount(dp_amt, dp_t != u)
 				dp_t.float_text("+%d" % dp_got, Color(0.4, 0.9, 0.45))
-				_stat_heal(u, dp_got)
+				_stat_heal(u, dp_got, dp_t)
 				_vestments_ward(u, dp_t, dp_got)
 				_log("   → Talent: Divine Presence — %s mends %d" % [
 					dp_t.unit_name, dp_got], "#b0a8e0")
@@ -3138,6 +3176,34 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 					if rl_h.next_time > rl_pick.next_time:
 						rl_pick = rl_h
 				return [ab, rl_pick]
+			# BATCH BU — RECANT WANTS THE EMPTIEST HERO, NOT THE MOST WOUNDED.
+			# `_lowest_hp` is the ordinary ally pick and it is exactly wrong
+			# here: the hero on 20% health is very often the one who has not
+			# cast anything, and handing 30% of a full bar back reads as the
+			# card doing nothing. Lowest resource FRACTION, and skipped
+			# entirely when nobody has spent anything.
+			if ab.special == "recant":
+				var rc_pool := allies.filter(func(h): \
+					return h.max_resource > 0 and h.resource < h.max_resource)
+				if rc_pool.is_empty():
+					continue
+				var rc_pick: BattleUnit = rc_pool[0]
+				for rc_h in rc_pool:
+					if float(rc_h.resource) / float(rc_h.max_resource) \
+							< float(rc_pick.resource) / float(rc_pick.max_resource):
+						rc_pick = rc_h
+				return [ab, rc_pick]
+			# BATCH BU — FORTIFIED SPIRIT NEVER LANDS ON AN ALLY ALREADY
+			# CARRYING IT. A re-cast unwinds the standing loan and lays a fresh
+			# one, which is correct behaviour and a wasted turn: the bot would
+			# otherwise re-lend to the same body every four turns and no second
+			# ally would ever be covered.
+			if ab.special == "fortified_spirit":
+				var fs_pool := allies.filter(func(h): \
+					return not h.has_status("fortified"))
+				if fs_pool.is_empty():
+					continue
+				return [ab, _lowest_hp(fs_pool)]
 			if ab.special == "aegis_reversal":
 				for h in allies:
 					var st: Dictionary = h.get_status("barrier")
@@ -3201,6 +3267,28 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 				if ae_e.hp > ae_pick.hp:
 					ae_pick = ae_e
 			return [ab, ae_pick]
+		# BATCH BU — TWO MORE OF THE SAME SHAPE, and both are the Arcane Echo
+		# case exactly: a card whose payload arrives over the NEXT few turns
+		# aimed at the enemy about to die spends its whole window on a corpse.
+		#
+		# SUFFERING drips for four of the target's own turns and TRANSFERENCE
+		# is the card that exists to move a mark OFF something about to die, so
+		# both want the enemy still standing at the end of it — the highest
+		# health on the field, which on a boss node is the boss.
+		if ab.special in ["suffering", "transference"]:
+			var bu_pick: BattleUnit = foes[0]
+			for bu_e in foes:
+				if bu_e.hp > bu_pick.hp:
+					bu_pick = bu_e
+			# Transference must not name its own source: moving a pile onto the
+			# body it already sits on is a no-op the ability refuses anyway, and
+			# the bot should not spend the turn discovering that.
+			if ab.special == "transference":
+				var bu_others := foes.filter(func(e): \
+					return e != bu_pick and e.status_stacks("ruin") > 0)
+				if bu_others.is_empty():
+					continue
+			return [ab, bu_pick]
 		return [ab, mark]
 	return []
 
@@ -4208,6 +4296,22 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 			return false
 	if ab.special == "resurrection" and not heroes.any(func(h): return h.dead):
 		return false
+	# BATCH BU — TWO CARDS THAT READ AN ACCUMULATION AND DO NOTHING AT ZERO ARE
+	# GATED OUT, on Shatter's and Cryoclasm's precedent directly below. Both
+	# would otherwise be castable buttons that spend a turn and a cost to print
+	# a "nothing to do" line, which is the dud AP §3's eligibility rule exists
+	# to prevent arriving through the ability side instead of the upgrade side.
+	#
+	# REPRISAL needs healing landed in the last two turns; TRANSFERENCE needs a
+	# mark on some OTHER enemy to move. Note the deliberate contrast with SLOW
+	# BURN, which is ungated on purpose because casting it before the fire is
+	# the setup half of its own strongest sequence — there is no equivalent
+	# reading here, since neither of these sets anything up.
+	if ab.special == "reprisal" and u.healing_done_recent() <= 0:
+		return false
+	if ab.special == "transference" and not enemies.any(func(e): \
+			return not e.dead and e.status_stacks("ruin") > 0):
+		return false
 	# Execute: needs an enemy below 20% health — or a Broken one; the
 	# Bruiser's own loop sets up his finisher. The upgraded copy raises the
 	# threshold to 35%.
@@ -4304,6 +4408,14 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	if ab.special == "overcharge" and not u.overcharge_ready():
 		ab_btn.tooltip_text += "\n(Already Overcharged %s this battle)" % (
 			"twice" if u.overcharge_extra > 0 else "once")
+	# BATCH BU — a gate that darkens a button has to SAY why, and say the LIVE
+	# number, or the player learns the wrong rule (Death Ray's lesson, directly
+	# below). Both of these read an accumulation that is simply not there yet.
+	if ab.special == "reprisal" and u.healing_done_recent() <= 0:
+		ab_btn.tooltip_text += "\n(No healing landed in the last two turns)"
+	if ab.special == "transference" and not enemies.any(func(e): \
+			return not e.dead and e.status_stacks("ruin") > 0):
+		ab_btn.tooltip_text += "\n(No Ruin on the field to move)"
 	# Death Ray's gate has to SAY so, and say the LIVE number, or a button dark
 	# for most of a fight reads as a bug rather than as the ramp it measures.
 	if ab.display_name == "Death Ray" and u.second_resource < DEATH_RAY_STACKS:
@@ -5701,9 +5813,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		await _resolve_special(attacker, ab, target, grade, dmg_mult)
 	elif ab.heal > 0:
 		var amount := int(ab.heal * dmg_mult)
-		_stat_heal(attacker, amount)
 		_sfx("heal", -8.0)
 		target.heal_amount(amount, target != attacker)
+		_stat_heal(attacker, amount, target)
 		target.float_text("+%d" % amount, Color(0.4, 0.9, 0.45))
 		_message("%s heals %s for %d" % [attacker.unit_name, target.unit_name, amount])
 		_log("%s: %s on %s heals %d%s" % [attacker.unit_name, ab.display_name,
@@ -7210,7 +7322,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					var rl_heal := maxi(int(round(final * leech_pct)), 1)
 					var rl_got: int = attacker.heal_amount(rl_heal)
 					attacker.float_text("+%d" % rl_got, Color(0.7, 0.4, 0.9))
-					_stat_heal(occ_leech, rl_got)
+					_stat_heal(occ_leech, rl_got, attacker)
 					# The base draught stays silent (float text only); the
 					# deepened one logs so the talent's work is auditable.
 					if occ_leech.gluttony_ranks > 0:
@@ -7224,7 +7336,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 								continue
 							var sg_got: int = sg_h.heal_amount(rl_heal, sg_h != occ_leech)
 							sg_h.float_text("+%d" % sg_got, Color(0.7, 0.4, 0.9))
-							_stat_heal(occ_leech, sg_got)
+							_stat_heal(occ_leech, sg_got, sg_h)
 						_log("   → Talent: Soul Glut — the whole party drinks (+%d each)" % \
 							rl_heal, "#b0a8e0")
 			# Madness plumbing (Batch L): an enemy striking its FELLOW feeds
@@ -7244,7 +7356,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						for ck_h in heroes.filter(func(he): return not he.dead and not he.is_companion):
 							var ck_got: int = ck_h.heal_amount(ck_amt, ck_h != mad_occ)
 							ck_h.float_text("+%d" % ck_got, Color(0.7, 0.4, 0.9))
-							_stat_heal(mad_occ, ck_got)
+							_stat_heal(mad_occ, ck_got, ck_h)
 						_log("   → Talent: Cackling Mirror — the party drinks %d from the wound" % \
 							ck_amt, "#b0a8e0")
 			# Unity: the bound party splits incoming damage evenly (Pressure
@@ -7330,7 +7442,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						var bc_got: int = bc_t.heal_amount(bc_amt, bc_t != attacker)
 						if bc_got > 0:
 							bc_t.float_text("+%d" % bc_got, Color(0.7, 0.4, 0.9))
-							_stat_heal(attacker, bc_got)
+							_stat_heal(attacker, bc_got, bc_t)
 			if not sim and not result.died:
 				strike_target.hit_react((strike_target.position - attacker.position).normalized())
 			# Overpower: a blow into an already-Broken guard holds the wound
@@ -7468,7 +7580,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							continue
 						var well_got: int = wh.heal_amount(well, wh != cg_dv)
 						wh.float_text("+%d" % well_got, Color(0.4, 0.9, 0.45))
-						_devout_heal(cg_dv, well_got, "lifewell")
+						_devout_heal(cg_dv, well_got, "lifewell", wh)
 					_log("   → Talent: Lifewell — the reflected pain mends the party for %d" % \
 						well, "#b0a8e0")
 				# Judgement: the ground passes sentence on the attacker.
@@ -8003,6 +8115,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and attacker.status_power("arrows") > 0 and final > 0 \
 					and not attacker.dead:
 				await _arcane_arrow_splash(attacker, strike_target, final)
+			# BATCH BU — ANOINTING MARKS HERE, INSIDE THE HIT LOOP, and it sits
+			# BESIDE Arcane Arrows' splash for exactly the reason that one does:
+			# BR §1's standing rule is that on-hit effects count HITS, not
+			# casts, so an ally's three-hit ability applies THREE Ruin. The
+			# card's own text says so, because a player will assume per cast.
+			#
+			# `final > 0` is the same gate the splash uses: a MISSED, BLOCKED or
+			# absolutely-parried blow marks nothing, because a blow that never
+			# landed cannot carry anything onto a body.
+			#
+			# `_gain_ruin` refuses a hero target and returns without a living
+			# Occultist, so the anointing on a party with no Occultist standing
+			# is inert by construction rather than by a second check here.
+			if attacker.is_hero and ab.damage > 0 and final > 0 \
+					and not strike_target.is_hero \
+					and attacker.has_status("anointed"):
+				_gain_ruin(strike_target, 1)
 			# BATCH BT — ARCANE ECHO REPEATS HERE, INSIDE THE HIT LOOP, FOR THE
 			# SAME REASON ARCANE ARROWS SPLASHES HERE: BR §1's standing rule is
 			# that on-hit effects count HITS, not casts, so a three-bolt Barrage
@@ -8427,7 +8556,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			var leech_heal := maxi(int(round(total_dealt * 0.01 * chan_r)), 1)
 			var chan_got: int = blessed.heal_amount(leech_heal)
 			blessed.float_text("+%d" % chan_got, Color(0.7, 0.4, 0.9))
-			_stat_heal(_living_hero_with("channeling_ranks"), chan_got)
+			_stat_heal(_living_hero_with("channeling_ranks"), chan_got, blessed)
 			_log("   → Talent: Corrupted Channeling — %s heals %d" % [blessed.unit_name,
 				chan_got], "#b0a8e0")
 		# Resonance builds only on the Mage's own casts — parry counters don't
@@ -9829,7 +9958,7 @@ func _radiant_cascade(caster: BattleUnit, healed: int, primary: BattleUnit) -> v
 		return
 	var cc_got: int = cc_t.heal_amount(cc_amt, cc_t != caster)
 	cc_t.float_text("+%d" % cc_got, Color(0.95, 0.9, 0.6))
-	_stat_heal(caster, cc_got)
+	_stat_heal(caster, cc_got, cc_t)
 	_vestments_ward(caster, cc_t, cc_got)
 	_log("   → Talent: Radiant Cascade — the crit splashes %d onto %s" % [
 		cc_got, cc_t.unit_name], "#b0a8e0")
@@ -9853,7 +9982,7 @@ func _overflow_spill(caster: BattleUnit, target: BattleUnit) -> void:
 		return
 	var ov_got: int = ov_t.heal_amount(ov_amt, ov_t != caster)
 	ov_t.float_text("+%d" % ov_got, Color(0.95, 0.9, 0.6))
-	_stat_heal(caster, ov_got)
+	_stat_heal(caster, ov_got, ov_t)
 	_vestments_ward(caster, ov_t, ov_got)
 	_log("   → Talent: Overflow — %d overhealing spills onto %s" % [
 		ov_got, ov_t.unit_name], "#b0a8e0")
@@ -9886,7 +10015,7 @@ func _grace_spill(cleric: BattleUnit, low_ally: BattleUnit) -> void:
 		* _healing_done_mult(cleric))), 1)
 	var gr_got: int = low_ally.heal_amount(gr_amt, low_ally != cleric)
 	low_ally.float_text("+%d" % gr_got, Color(0.95, 0.9, 0.6))
-	_stat_heal(cleric, gr_got)
+	_stat_heal(cleric, gr_got, low_ally)
 	_vestments_ward(cleric, low_ally, gr_got)
 	_log("   → Talent: Grace — the Mercy she cannot hold mends %s (+%d)" % [
 		low_ally.unit_name, gr_got], "#b0a8e0")
@@ -10217,7 +10346,7 @@ func _bewitched_strike(u: BattleUnit) -> bool:
 				var mi_heal := maxi(int(round(occ.max_hp * 0.01 * mi_ranks)), 1)
 				var mi_got: int = mi_t.heal_amount(mi_heal, mi_t != occ)
 				mi_t.float_text("+%d" % mi_got, Color(0.7, 0.4, 0.9))
-				_stat_heal(occ, mi_got)
+				_stat_heal(occ, mi_got, mi_t)
 				_log("   → Talent: Murderous Intent — %s feeds on the kill (+%d)" % [
 					mi_t.unit_name, mi_got], "#b0a8e0")
 	return true
@@ -10449,7 +10578,7 @@ func _detonate_ruin(target: BattleUnit) -> void:
 		var rw_heal := maxi(int(round(occ.max_hp * 0.25)), 1)
 		var rw_got: int = h.heal_amount(rw_heal, h != occ)
 		h.float_text("+%d" % rw_got, Color(0.7, 0.4, 0.9))
-		_stat_heal(occ, rw_got)
+		_stat_heal(occ, rw_got, h)
 	_log("   → the party feasts on the ruin (25% of the Occultist's health each)",
 		"#b070d0")
 	# Unraveling: the blast seeds Ruin in every OTHER enemy. One propagation
@@ -10696,7 +10825,7 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	# now guessed without being able to tell them apart.
 	_stat("faith_releases")
 	_sig("conviction")  # BJ §3a: a release IS the Devout's signature moment
-	_devout_heal(devout, f_got, "release")
+	_devout_heal(devout, f_got, "release", u)
 	var d_mana := maxi(int(round(devout.max_resource * 0.03)), 1)
 	devout.resource = mini(devout.resource + d_mana, devout.max_resource)
 	devout.refresh_bars()
@@ -10804,7 +10933,7 @@ func _conviction_growth(devout: BattleUnit, consumed := true) -> void:
 	var grow_got: int = devout.heal_amount(step)
 	devout.float_text("+%d MAX" % step, Color(0.98, 0.85, 0.45))
 	devout.refresh_bars()
-	_devout_heal(devout, grow_got, "growth")
+	_devout_heal(devout, grow_got, "growth", devout)
 	_log("   → Conviction: the principal grows — %s's maximum health rises %d (now %d)%s" % [
 		devout.unit_name, step, devout.max_hp,
 		"" if consumed else " (half — the Faith was never spent)"], "#e8c860")
@@ -10868,7 +10997,7 @@ func _consecration_tick(u: BattleUnit) -> void:
 	if cn_got <= 0:
 		return
 	u.float_text("+%d" % cn_got, Color(0.95, 0.88, 0.60))
-	_stat_heal(String(u.get_status("consecration").get("src_name", "")), cn_got)
+	_stat_heal(String(u.get_status("consecration").get("src_name", "")), cn_got, u)
 	_log("%s regains %d on consecrated ground" % [u.unit_name, cn_got], "#c8b880")
 
 
@@ -10922,7 +11051,7 @@ func _on_lethal_saved(saved: BattleUnit) -> void:
 	var cov_heal := maxi(int(round(saved.max_hp * 0.01 * devout.covenant_heal)), 1)
 	var cov_got: int = saved.heal_amount(cov_heal, saved != devout)
 	saved.float_text("+%d" % cov_got, Color(0.95, 0.9, 0.6))
-	_devout_heal(devout, cov_got, "covenant")
+	_devout_heal(devout, cov_got, "covenant", saved)
 	_log("   → Talent: Sacred Covenant — the shield held the line; %s heals %d and keeps the Faith" % [
 		saved.unit_name, cov_got], "#b0a8e0")
 	_gain_faith(saved, maxi(devout.covenant_faith, 1), "covenant")
@@ -11158,7 +11287,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.heal_amount(overflow)
 				attacker.float_text("+%d" % overflow, Color(0.4, 0.9, 0.45))
 			_sfx("heal", -6.0)
-			_stat_heal(attacker, base)
+			_stat_heal(attacker, base, target)
 			_message("%s calls the dawn" % attacker.unit_name)
 			_log("%s: Dawnbreak heals %s for %d (overflow %d to self)" % [
 				attacker.unit_name, target.unit_name, applied, overflow], "#70d878")
@@ -11178,7 +11307,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var got: int = h.heal_amount(amt, h != attacker)
 				h.float_text("+%d%s" % [got, "!" if h_crit > 1.0 else ""],
 					Color(0.4, 0.9, 0.45), h_crit > 1.0)
-				_stat_heal(attacker, got)
+				_stat_heal(attacker, got, h)
 				_bank_overheal(attacker, h)
 				_overflow_spill(attacker, h)
 				_vestments_ward(attacker, h, got)
@@ -11197,7 +11326,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var amt := int(h.max_hp * sanct_pct)
 				h.heal_amount(amt, h != attacker)
 				h.float_text("+%d" % amt, Color(0.4, 0.9, 0.45))
-				_stat_heal(attacker, amt)
+				_stat_heal(attacker, amt, h)
 			_message("Sanctuary!")
 			_log("%s: Sanctuary — party healed" % attacker.unit_name, "#70d878")
 		"unity":
@@ -11266,7 +11395,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					var bw_heal := maxi(int(round(h.max_hp * 0.05)), 1)
 					var bw_got: int = h.heal_amount(bw_heal, h != attacker)
 					h.float_text("+%d" % bw_got, Color(0.4, 0.9, 0.45))
-					_stat_heal(attacker, bw_got)
+					_stat_heal(attacker, bw_got, h)
 			_message("%s raises the BULWARK OF FORTITUDE!" % attacker.unit_name)
 			_log("%s: Bulwark of Fortitude — no Break damage, armor +50%%, 10%% healing per turn (%d turns)" % [
 				attacker.unit_name, bw_turns], "#8c9cc8")
@@ -11303,7 +11432,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var dp_amt := maxi(int(round(h.max_hp * pact_heal_pct)), 1)
 				var dp_hgot: int = h.heal_amount(dp_amt, true)
 				h.float_text("+%d" % dp_hgot, Color(0.7, 0.4, 0.9))
-				_stat_heal(attacker, dp_hgot)
+				_stat_heal(attacker, dp_hgot, h)
 			if attacker.barter_step > 0:
 				_log("   → Talent: Dark Barter — the party drinks %d%% (up from 15%%)" % \
 					int(round(pact_heal_pct * 100)), "#b0a8e0")
@@ -11620,9 +11749,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					_log("%s: Second Wind — %s has taken nothing to take back" % [
 						attacker.unit_name, target.unit_name], "#909090")
 				else:
-					_stat_heal(attacker, sw_amount)
 					_sfx("heal", -8.0)
 					var sw_got := target.heal_amount(sw_amount, target != attacker)
+					_stat_heal(attacker, sw_amount, target)
 					target.float_text("+%d" % sw_got, Color(0.4, 0.9, 0.45))
 					_message("%s takes back the last two turns" % attacker.unit_name)
 					_log("%s: Second Wind — %s regains %d, the damage of the last two turns%s" % [
@@ -12265,7 +12394,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# rule): a heal into a full bar must not read like a heal into
 				# an empty one.
 				var mn_got := target.heal_amount(mn_amount, target != attacker)
-				_stat_heal(attacker, mn_got)
+				_stat_heal(attacker, mn_got, target)
 				target.float_text("+%d" % mn_got, Color(0.4, 0.9, 0.45))
 				_message("%s ministers to %s" % [attacker.unit_name,
 					target.unit_name])
@@ -12387,7 +12516,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				maxi(int(round(attacker.max_hp * fd_pct)), 1))
 			var fd_shed := attacker.dispel_one_debuff()
 			attacker.refresh_bars()
-			_stat_heal(attacker, fd_healed)
+			_stat_heal(attacker, fd_healed, attacker)
 			_sfx("heal", -9.0, 1.0)
 			attacker.float_text("+%d" % fd_healed, Color(0.4, 0.9, 0.45))
 			_message("%s binds the wound" % attacker.unit_name)
@@ -13590,7 +13719,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var hh_got: int = target.heal_amount(hh_amt, target != attacker)
 			target.float_text("+%d%s" % [hh_got, "!" if hh_crit > 1.0 else ""],
 				Color(0.4, 0.9, 0.45), hh_crit > 1.0)
-			_stat_heal(attacker, hh_got)
+			_stat_heal(attacker, hh_got, target)
 			_bank_overheal(attacker, target)
 			_overflow_spill(attacker, target)
 			if hh_crit > 1.0:
@@ -13605,7 +13734,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var hh_self := maxi(int(round(attacker.max_hp * 0.05)), 1)
 				var self_got: int = attacker.heal_amount(hh_self)
 				attacker.float_text("+%d" % self_got, Color(0.4, 0.9, 0.45))
-				_stat_heal(attacker, self_got)
+				_stat_heal(attacker, self_got, attacker)
 			_message("%s mends %s" % [attacker.unit_name, target.unit_name])
 			_log("%s: Heal — %s recovers %d%s (40%% of the Cleric's health)%s" % [
 				attacker.unit_name, target.unit_name, hh_got,
@@ -13630,7 +13759,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_sfx("heal", -4.0, 0.7)
 			var dp_got: int = target.heal_amount(target.max_hp, target != attacker)
 			target.float_text("+%d" % dp_got, Color(0.4, 0.9, 0.45))
-			_stat_heal(attacker, dp_got)
+			_stat_heal(attacker, dp_got, target)
 			_vestments_ward(attacker, target, dp_got)
 			var dp_note := ""
 			if empowered:
@@ -13682,7 +13811,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				var ren_burst := maxi(int(round(attacker.max_hp * 0.05 * rb_crit)), 1)
 				var burst_got: int = target.heal_amount(ren_burst, target != attacker)
 				target.float_text("+%d" % burst_got, Color(0.4, 0.9, 0.45))
-				_stat_heal(attacker, burst_got)
+				_stat_heal(attacker, burst_got, target)
 				_bank_overheal(attacker, target)
 				_overflow_spill(attacker, target)
 				if rb_crit > 1.0:
@@ -13692,6 +13821,299 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_log("%s: Renewal on %s — %d HP/turn for 5 turns%s" % [attacker.unit_name,
 				target.unit_name, ren_tick,
 				" (Empowered: the Cleric too)" if empowered else ""], "#70d878")
+		# ========== BATCH BU: TRANCHE 2, THE CLERIC NINE ==========
+		"recant":
+			# THE PRIMARY RESOURCE ONLY, AND THE GUARD IS THE RULE. `resource`
+			# is what a hero casts with — Rage, Mana or Focus — and
+			# `second_resource` is the SPEC METER (Resonance, Mercy, Faith, the
+			# converted half of Focus). This line never touches the second one,
+			# so an Arcanist cannot be handed his compounding curve back for 25
+			# Mana and Holy cannot refill her own Mercy with it.
+			var rc_pct := 0.40 if is_perfect else 0.30
+			if target == null or target.dead or target.resource_name == "" \
+					or target.max_resource <= 0:
+				_log("%s: Recant finds nothing to give back" % attacker.unit_name,
+					"#909090")
+			else:
+				# Booked as what LANDED rather than what was asked for: a hero
+				# already near full takes less than the card's headline, and
+				# printing the headline would teach a wrong rule (BT's Inner
+				# Arcane lesson).
+				var rc_before := target.resource
+				var rc_amt := maxi(int(round(target.max_resource * rc_pct)), 1)
+				target.resource = mini(target.resource + rc_amt,
+					target.max_resource)
+				var rc_got := target.resource - rc_before
+				target.refresh_bars()
+				_sfx("heal", -9.0, 1.3)
+				target.float_text("+%d %s" % [rc_got, target.resource_name],
+					Color(0.5, 0.8, 1.0))
+				_message("%s recants %s's spending" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Recant — %s takes back %d %s (%d%% of maximum)%s" % [
+					attacker.unit_name, target.unit_name, rc_got,
+					target.resource_name, int(round(rc_pct * 100)),
+					" [PERFECT]" if is_perfect else ""], "#70d878")
+		"shared_grief":
+			# THE HEALTH IS REMOVED DIRECTLY RATHER THAN THROUGH `take_hit`, on
+			# BLOOD OFFERING's precedent and for a second reason of its own.
+			# First, this is a PRICE SHE PAYS, not a wound anyone dealt: the
+			# damage path would feed Blood Price, the recap's damage-taken
+			# ledger and every on-damage rider with an event that has no
+			# attacker. Second, and this is the one specific to Mercy: crossing
+			# below half health is exactly what GENERATES a Mercy stack, so a
+			# hit routed through `take_hit` would sometimes pay a fourth one and
+			# the card would stop paying "exactly 3".
+			var sg_cost := maxi(int(round(attacker.max_hp * 0.25)), 1)
+			var sg_grant := 4 if is_perfect else 3
+			attacker.hp = maxi(attacker.hp - sg_cost, 1)
+			attacker.refresh_bars()
+			attacker.float_text("-%d" % sg_cost, Color(0.85, 0.35, 0.35))
+			if attacker.second_resource_name != "Mercy":
+				_log("%s: Shared Grief — %s holds no Mercy to gain" % [
+					attacker.unit_name, attacker.unit_name], "#909090")
+			else:
+				var sg_before := attacker.second_resource
+				attacker.second_resource = mini(
+					attacker.second_resource + sg_grant, attacker.second_max)
+				var sg_got := attacker.second_resource - sg_before
+				attacker.refresh_bars()
+				attacker.float_text("+%d Mercy" % sg_got, Color(0.95, 0.8, 0.3))
+				_sfx("heal", -9.0, 0.6)
+				_message("%s takes the grief upon herself" % attacker.unit_name)
+				_log("%s: Shared Grief — %d health for %d Mercy (%d/%d)%s" % [
+					attacker.unit_name, sg_cost, sg_got,
+					attacker.second_resource, attacker.second_max,
+					" [PERFECT]" if is_perfect else ""], "#e8c860")
+		"reprisal":
+			# HEALING LANDED IN THE LAST TWO TURNS, read off the ledger
+			# `_book_healing` keeps — never off the contribution stat, which is
+			# sim-only and counts overheal.
+			var rp_healed := attacker.healing_done_recent()
+			var rp_share := 0.75 if is_perfect else 0.50
+			if rp_healed <= 0 or target == null or target.dead:
+				_log("%s: Reprisal — no healing in the last two turns to answer for" % \
+					attacker.unit_name, "#909090")
+			else:
+				var rp_raw := rp_healed * rp_share * mult * randf_range(0.9, 1.1)
+				rp_raw *= 1.0 - float(target.resists.get("holy", 0.0))
+				var rp_final := maxi(int(round(rp_raw
+					* (1.0 - target.effective_armor()))), 1)
+				var rp_hit: Dictionary = target.take_hit(rp_final, ab.pressure)
+				_stat("dmg_hero_" + attacker.unit_name, rp_final)
+				_stat_bd(attacker, ab.pressure)
+				target.float_text("%d" % rp_final, Color(0.98, 0.90, 0.55))
+				_sfx("crit", -7.0, 1.2)
+				_message("%s answers for the wounded!" % attacker.unit_name)
+				_log("%s: Reprisal — %d damage, %d%% of the %d she healed in the last two turns%s" % [
+					attacker.unit_name, rp_final, int(round(rp_share * 100)),
+					rp_healed, " [PERFECT]" if is_perfect else ""], "#70d878")
+				if rp_hit.died:
+					_stat("enemy_deaths")
+					_sfx("death", -4.0)
+					_message("%s falls!" % target.unit_name)
+					_log("† %s dies" % target.unit_name, "#e05050")
+					_on_enemy_death(target)
+		"ordination":
+			# THE LOWEST HOLDER, NOT A CLICK. `faith_stacks` caps at five, so
+			# three granted to an ally already on four throws two away; aiming
+			# at the floor makes the grant worth its full three every time. It
+			# also points the card at the ally COMMUNION CANNOT REACH — that
+			# roll is (15 x their OWN stacks)%, i.e. zero for an ally on zero.
+			# THE CASTER IS EXCLUDED: his own Faith holds at five and never
+			# releases (BH §2), so a stack spent on him buys held mitigation and
+			# none of the release engine this card exists to start.
+			var od_grant := 4 if is_perfect else 3
+			var od_pick: BattleUnit = null
+			for od_h in heroes:
+				if od_h.dead or od_h.is_companion or od_h == attacker:
+					continue
+				if od_pick == null or od_h.faith_stacks < od_pick.faith_stacks:
+					od_pick = od_h
+			if od_pick == null or _living_devout() == null:
+				_log("%s: Ordination finds nobody to ordain" % attacker.unit_name,
+					"#909090")
+			else:
+				var od_before := od_pick.faith_stacks
+				_sfx("heal", -9.0, 0.9)
+				_message("%s ordains %s" % [attacker.unit_name, od_pick.unit_name])
+				_log("%s: Ordination — %s held the least Faith (%d) and is granted %d%s" % [
+					attacker.unit_name, od_pick.unit_name, od_before, od_grant,
+					" [PERFECT]" if is_perfect else ""], "#c8b880")
+				_gain_faith(od_pick, od_grant, "ordination")
+		"fortified_spirit":
+			# THE LOAN IS THREE EQUAL STEPS OF TEN PERCENTAGE POINTS, and it is
+			# built that way so the decay is exact rather than a re-derivation
+			# that drifts: `step` is 10% of HIS maximum captured at cast, the
+			# grant is three of them (four on a perfect), and each turn hands
+			# exactly one back. 30 -> 20 -> 10 -> gone, arithmetically.
+			#
+			# `turns` IS -1 AND THE CLOCK IS `_fortified_tick`'s, deliberately:
+			# the generic status tick decrements and never touches `max_hp`, so
+			# a status expiring by itself would strand the lent health on the
+			# ally forever. One clock, one owner.
+			var fs_steps := 4 if is_perfect else 3
+			var fs_step := maxi(int(round(attacker.max_hp * 0.10)), 1)
+			var fs_lent := fs_step * fs_steps
+			if target == null or target.dead:
+				_log("%s: Fortified Spirit finds nobody to lend to" % \
+					attacker.unit_name, "#909090")
+			else:
+				# A RE-CAST UNWINDS THE STANDING LOAN FIRST. Two loans on one
+				# body would each believe they owned a share of `max_hp`, and
+				# the second to expire would hand back health the first already
+				# had — the compounding leak this whole effect is guarded
+				# against.
+				target.expire_fortified_spirit()
+				target.max_hp += fs_lent
+				var fs_got: int = target.heal_amount(fs_lent, target != attacker)
+				target.add_status("fortified", "Fortified Spirit",
+					"FS%d" % fs_steps, Color(0.95, 0.88, 0.60), -1,
+					"Maximum health lent by the Devout.\nIt sheds a tenth of his maximum at the\nstart of each of this ally's turns —\ncurrent health clamps under it.")
+				var fs_st := target.get_status("fortified")
+				fs_st["lent"] = fs_lent
+				fs_st["step"] = fs_step
+				fs_st["src_name"] = attacker.unit_name
+				target.refresh_bars()
+				target.float_text("+%d MAX" % fs_lent, Color(0.95, 0.88, 0.60))
+				_sfx("heal", -8.0, 0.8)
+				_message("%s lends %s his own bulk" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Fortified Spirit — %s's maximum rises %d (%d%% of his own) and heals %d; it sheds %d a turn%s" % [
+					attacker.unit_name, target.unit_name, fs_lent,
+					fs_steps * 10, fs_got, fs_step, " [PERFECT]" if is_perfect else ""], "#c8b880")
+		"reliquary":
+			# IT READS `faith_peak`, NOT `faith_stacks`. The peak is BI's
+			# high-water mark: it ratchets with the count and never falls inside
+			# a battle, so an ally who released down to zero is still paid in
+			# full for what they carried. Reading the live count would pay most
+			# to whoever happens not to have cashed in yet, which is the exact
+			# antagonism BI introduced the field to remove.
+			var rq_pct := 0.035 if is_perfect else 0.025
+			var rq_paid := 0
+			for rq_h in heroes:
+				if rq_h.dead or rq_h.is_companion or rq_h.faith_peak <= 0:
+					continue
+				var rq_amt := maxi(int(round(attacker.max_hp * rq_pct
+					* rq_h.faith_peak)), 1)
+				var rq_got: int = rq_h.heal_amount(rq_amt, rq_h != attacker)
+				if rq_got <= 0:
+					continue
+				rq_paid += 1
+				rq_h.float_text("+%d" % rq_got, Color(0.95, 0.88, 0.60))
+				_stat_heal(attacker, rq_got, rq_h)
+				_log("   → Reliquary: %s is paid for a peak of %d Faith (+%d)" % [
+					rq_h.unit_name, rq_h.faith_peak, rq_got], "#c8b880")
+			if rq_paid == 0:
+				_log("%s: Reliquary — nobody has carried any Faith yet" % \
+					attacker.unit_name, "#909090")
+			else:
+				_sfx("heal", -7.0, 0.7)
+				_message("%s opens the reliquary" % attacker.unit_name)
+				_log("%s: Reliquary — %d ally(s) paid %.1f%% of his maximum per point of PEAK Faith%s" % [
+					attacker.unit_name, rq_paid, rq_pct * 100.0, " [PERFECT]" if is_perfect else ""],
+					"#c8b880")
+		"suffering":
+			# THE HEAL IS 100% OF THIS CAST'S OWN DAMAGE AND IT DOES NOT GO
+			# THROUGH THE RUIN LIFESTEAL. That door is the strike loop's, it is
+			# capped at RUIN_LEECH_CAP (0.40) whatever the stacks and whatever
+			# the talents, and routing this through it would silently pay 40%
+			# with nothing to complain about. Different mechanism, different
+			# door — and ON CAST, off `su_final`, never per tick.
+			var su_raw := 0.01 * ab.damage * attacker.attack * mult \
+				* randf_range(0.9, 1.1)
+			su_raw *= 1.0 - float(target.resists.get("shadow", 0.0))
+			var su_final := maxi(int(round(su_raw
+				* (1.0 - target.effective_armor()))), 1)
+			var su_hit: Dictionary = target.take_hit(su_final, ab.pressure)
+			_stat("dmg_hero_" + attacker.unit_name, su_final)
+			_stat_bd(attacker, ab.pressure)
+			target.float_text("%d" % su_final, Color(0.75, 0.45, 0.85))
+			var su_got: int = attacker.heal_amount(su_final)
+			attacker.float_text("+%d" % su_got, Color(0.4, 0.9, 0.45))
+			_stat_heal(attacker, su_got, attacker)
+			attacker.refresh_bars()
+			_sfx("crit", -7.0, 0.6)
+			_message("%s opens a wound that thinks" % attacker.unit_name)
+			_log("%s: Suffering — %d damage to %s and %d healed (the whole of it)%s" % [
+				attacker.unit_name, su_final, target.unit_name, su_got,
+				" [PERFECT]" if is_perfect else ""], "#a050b0")
+			if su_hit.died:
+				_stat("enemy_deaths")
+				_sfx("death", -4.0)
+				_message("%s falls!" % target.unit_name)
+				_log("† %s dies" % target.unit_name, "#e05050")
+				_on_enemy_death(target)
+			else:
+				# THE DRIP RIDES THE ENEMY AND PAYS ON THE ENEMY'S CLOCK, which
+				# is the axis: eight stacks bought with one turn of his.
+				var su_rate := 3 if is_perfect else 2
+				_apply_status(target, "suffering", 4, su_rate, 0, attacker)
+				_log("   → Suffering: %s gains %d Ruin at the start of each of its next 4 turns" % [
+					target.unit_name, su_rate], "#a050b0")
+		"transference":
+			# A MOVE IS NOT A GAIN. It deliberately does NOT go through
+			# `_gain_ruin` — that function arms the detonation threshold on
+			# every stack it adds, and stacks already earned once must not arm
+			# it a second time simply for changing bodies. CRYOCLASM's precedent
+			# exactly, which is likewise kept out of `_hold_release` so no
+			# release payoff fires on a relocation.
+			var tf_from: BattleUnit = null
+			for tf_e in enemies:
+				if tf_e.dead or tf_e == target:
+					continue
+				if tf_e.status_stacks("ruin") <= 0:
+					continue
+				if tf_from == null \
+						or tf_e.status_stacks("ruin") > tf_from.status_stacks("ruin"):
+					tf_from = tf_e
+			if tf_from == null or target == null or target.dead:
+				_log("%s: Transference finds no mark to move" % attacker.unit_name,
+					"#909090")
+			else:
+				var tf_moved := tf_from.status_stacks("ruin")
+				var tf_have := target.status_stacks("ruin")
+				var tf_bonus := 2 if is_perfect else 0
+				tf_from.set_ruin_stacks(0)
+				_stamp_ruin_chip(tf_from)
+				if tf_have <= 0:
+					# The destination carries no mark yet, so one has to exist
+					# before its depth can be set. `_apply_status` ADDS the
+					# status without arming anything — the threshold lives in
+					# `_gain_ruin` alone — and the count is corrected on the
+					# next line.
+					_apply_status(target, "ruin", -1, 0, 0, attacker)
+					tf_have = target.status_stacks("ruin")
+				target.set_ruin_stacks(tf_have + tf_moved + tf_bonus)
+				_stamp_ruin_chip(target)
+				_sfx("break", -9.0, 0.8)
+				_message("%s drags the ruin onto %s!" % [attacker.unit_name,
+					target.unit_name])
+				_log("%s: Transference — %d Ruin moves from %s to %s (now %d), and nothing detonates in transit%s" % [
+					attacker.unit_name, tf_moved, tf_from.unit_name,
+					target.unit_name, target.status_stacks("ruin"),
+					" [PERFECT]" if is_perfect else ""], "#a050b0")
+		"anointing":
+			# THE PARTY MARKS FOR HIM. Ruin is his alone and three other heroes
+			# swing every turn contributing nothing to the meter that IS his
+			# spec; for three turns their blades carry it too.
+			#
+			# THE STATUS RIDES EACH HERO, so the hook in the strike loop asks
+			# the ATTACKER a question rather than searching the board, and an
+			# ally who dies simply stops carrying it.
+			var an_turns := 4 if is_perfect else 3
+			var an_n := 0
+			for an_h in heroes:
+				if an_h.dead or an_h.is_companion:
+					continue
+				an_h.add_status("anointed", "Anointed", "An",
+					Color(0.72, 0.40, 0.80), an_turns,
+					"Every hit this ally lands applies\n1 Ruin. It counts HITS, not casts.")
+				an_n += 1
+			_sfx("break", -9.0, 1.2)
+			_message("%s anoints the party's blades" % attacker.unit_name)
+			_log("%s: Anointing — %d allies' attacks apply 1 Ruin per HIT for %d turns%s" % [
+				attacker.unit_name, an_n, an_turns, " [PERFECT]" if is_perfect else ""], "#a050b0")
 
 
 # ---------- Beastmaster companions ----------
@@ -14420,6 +14842,70 @@ const DEADFALL_SPRING_PCT := 0.20  # of Attack, per spring (was 0.35, once)
 #
 # THE 3% FLOOR PAYS EVEN WHEN HE TOOK NOTHING. That is not a rounding artefact —
 # it is what stops the card being dead in the fight where nobody hits him.
+# BATCH BU — FORTIFIED SPIRIT sheds one step of the Devout's lent bulk.
+#
+# THE CLAMP IS THE ABILITY. `hp = mini(hp, max_hp)` is what makes an ally kept
+# topped up lose REAL health each turn while an ally sitting at half never
+# notices the loan shrinking — so the card rewards healing them inside the
+# window rather than after it. Without that line the decay would be invisible
+# and the effect would be a free three turns of a bigger bar.
+#
+# ONE OWNER FOR THE CLOCK. The status carries `turns = -1`, so the generic
+# `tick_statuses` decrement never touches it; this function counts it down by
+# handing back `step` at a time and removes the status when the loan is spent.
+# Two clocks on one loan would eventually disagree about how much is still out.
+func _fortified_tick(u: BattleUnit) -> void:
+	if u.dead or not u.has_status("fortified"):
+		return
+	var f := u.get_status("fortified")
+	var step := int(f.get("step", 0))
+	var lent := int(f.get("lent", 0))
+	if step <= 0 or lent <= 0:
+		u.expire_fortified_spirit()
+		return
+	var shed := mini(step, lent)
+	u.max_hp = maxi(u.max_hp - shed, 1)
+	u.hp = mini(u.hp, u.max_hp)
+	var left := lent - shed
+	f["lent"] = left
+	if left <= 0:
+		u.remove_status("fortified")
+		u.refresh_bars()
+		u.float_text("-%d MAX" % shed, Color(0.85, 0.70, 0.45))
+		_log("   → Fortified Spirit fades from %s — the lent bulk is returned" % \
+			u.unit_name, "#c8b880")
+		return
+	# The desc is read back out and handed straight in: `update_status` REWRITES
+	# it, so passing "" here would quietly strip the chip's tooltip.
+	u.update_status("fortified",
+		"FS%d" % maxi(int(round(float(left) / float(step))), 1),
+		String(f.get("desc", "")))
+	u.refresh_bars()
+	u.float_text("-%d MAX" % shed, Color(0.85, 0.70, 0.45))
+	_log("   → Fortified Spirit: %s's lent bulk sheds %d (%d still lent)" % [
+		u.unit_name, shed, left], "#c8b880")
+
+
+# BATCH BU — SUFFERING: the enemy's own turn feeds the mark.
+#
+# THE STACKS GO THROUGH `_gain_ruin`, WHICH IS THE POINT. They must arm the
+# detonation threshold, deepen the chip, mirror through Covenant of Ash and book
+# the AX depth reading exactly as a directly-applied stack does — this card buys
+# GENERATION, and generation that skipped the threshold would buy nothing at
+# all. Contrast Transference directly below, which MOVES stacks and therefore
+# must not go through it.
+#
+# Its own function for the standing reason: `_run_battle` cannot be driven
+# headlessly, so a rule left inside that loop could only ever be greped for.
+func _suffering_tick(u: BattleUnit) -> void:
+	if u.dead or not u.has_status("suffering"):
+		return
+	var rate := maxi(u.status_power("suffering"), 1)
+	_log("   → Suffering: the wound in %s works on its own (+%d Ruin)" % [
+		u.unit_name, rate], "#a050b0")
+	_gain_ruin(u, rate)
+
+
 func _battle_trance_tick(u: BattleUnit) -> void:
 	if u == null or u.dead or not u.has_status("battle_trance"):
 		return
@@ -14431,7 +14917,7 @@ func _battle_trance_tick(u: BattleUnit) -> void:
 	if healed <= 0:
 		return
 	u.refresh_bars()
-	_stat_heal(u, healed)
+	_stat_heal(u, healed, u)
 	u.float_text("+%d" % healed, Color(0.90, 0.55, 0.40))
 	_log("   → Battle Trance: %s comes back %d — %d%% of maximum plus half of the %d he took since his last turn" % [
 		u.unit_name, healed, int(round(BATTLE_TRANCE_FLOOR * 100)), taken],
@@ -16685,13 +17171,65 @@ func _prev(owner, cut: float) -> void:
 # Healing done, credited to the hero whose KIT produced it — lifesteal a
 # debuff grants credits the debuffer, not the striker. Always feeds the
 # old aggregate "healing" stat so that line stays comparable.
-func _stat_heal(owner, amount: float) -> void:
+func _stat_heal(owner, amount: float, healed: BattleUnit = null) -> void:
 	_stat("healing", amount)
+	# BATCH BU — REPRISAL'S LEDGER RIDES THIS DOOR AND SITS ABOVE THE `sim`
+	# GUARD ON PURPOSE. Everything below this line is measurement; the ledger is
+	# a shipped ABILITY, and an ability that only worked inside the sim would be
+	# an ability no player could ever use (BS's Backblast, whose early return was
+	# split for exactly this, and BL's dropped `sim and` in the DoT loop from the
+	# other side). The SIM COLUMNS ARE BYTE-UNCHANGED — they still book `amount`,
+	# so every contribution row ever measured stays comparable.
+	_book_healing(owner, amount, healed)
 	if not sim or amount <= 0.0:
 		return
 	var name := _contrib_name(owner)
 	if name != "":
 		_stat("heal_hero_" + name, amount)
+
+
+# BATCH BU — WHAT REPRISAL READS, WRITTEN AT THE ONE PLACE HEALING IS CREDITED.
+# `_stat_heal` is BC's "one booking door" and every heal in the game that names
+# an owner arrives here, so a heal added by a later batch books into this ledger
+# without anybody remembering to — which is the property the ability needs and
+# the reason it is not a private counter inside the Holy branch.
+#
+# `healed` IS THE RECIPIENT AND IT IS WHAT MAKES "LANDED" TRUE. `heal_amount`
+# returns the heal's WORTH after multipliers, not the health it actually
+# restored, and stamps the difference on the recipient as `last_overheal`.
+# Subtracting it here is the whole of the overheal rule: a heal into a full bar
+# books nothing, so Sanctum's spill is paid for once — as the heal it becomes —
+# rather than twice.
+func _book_healing(owner, amount: float, healed: BattleUnit) -> void:
+	if amount <= 0.0:
+		return
+	var landed := int(round(amount))
+	if healed != null and is_instance_valid(healed):
+		landed -= healed.last_overheal
+	if landed <= 0:
+		return
+	var name := _contrib_name(owner)
+	if name == "" or name == "(unattributed)":
+		return
+	var u := _hero_named(name)
+	if u == null:
+		return
+	u.heal_by_turn[u.battle_turn] = int(u.heal_by_turn.get(u.battle_turn, 0)) \
+		+ landed
+	for stale in u.heal_by_turn.keys():
+		if int(stale) < u.battle_turn - 1:
+			u.heal_by_turn.erase(stale)
+
+
+# A living hero by display name, or null. The mirror of `_contrib_name`: several
+# credit sites hand over a NAME rather than a unit (the applier of a Renewal or
+# a Consecration may be dead by the time its tick pays out), and the ledger
+# above has to land on a body.
+func _hero_named(name: String) -> BattleUnit:
+	for h in heroes:
+		if h.unit_name == name and not h.is_companion:
+			return h
+	return null
 
 
 # ---------- BATCH BL §2: the damage-taken ledger ----------
@@ -16817,7 +17355,7 @@ func _backblast_check(u: BattleUnit) -> void:
 	u.backblast_used = true
 	var bb_heal := u.heal_amount(maxi(int(round(u.max_hp * 0.01 * u.backblast)), 1))
 	if bb_heal > 0:
-		_stat_heal(u, bb_heal)
+		_stat_heal(u, bb_heal, u)
 		u.float_text("+%d" % bb_heal, Color(1.0, 0.7, 0.4))
 	var bb_lit := 0
 	for foe in enemies:
@@ -16863,7 +17401,8 @@ func _on_barrier_prevented(src_name: String, absorbed: int, holder: BattleUnit,
 # ONE TERM IS NOT A HEAL and is routed here rather than at its call site: the
 # Break points Devoutness removes are a different unit and must not be summed
 # with healing.
-func _on_unit_credit(src_name: String, amount: int, term: String) -> void:
+func _on_unit_credit(src_name: String, amount: int, term: String,
+		healed: BattleUnit = null) -> void:
 	if term == "devoutness_break":
 		_stat("faith_break_cut", float(amount))
 		_prev_bd(src_name, float(amount), "devoutness")
@@ -16874,7 +17413,7 @@ func _on_unit_credit(src_name: String, amount: int, term: String) -> void:
 	if term.begins_with("bd_"):
 		_prev_bd(src_name, float(amount), term.trim_prefix("bd_"))
 		return
-	_devout_heal(src_name, float(amount), term)
+	_devout_heal(src_name, float(amount), term, healed)
 
 
 # BATCH BQ — UNDYING VIGIL's fork. Fired from `heal_amount` for the WARDED ally
@@ -16904,7 +17443,7 @@ func _on_vigil_heal(healed: BattleUnit, amount: int) -> void:
 	if got <= 0:
 		return
 	second.float_text("+%d" % got, Color(0.95, 0.90, 0.70))
-	_stat_heal(String(healed.get_status("vigil").get("src_name", "")), got)
+	_stat_heal(String(healed.get_status("vigil").get("src_name", "")), got, second)
 	_log("   → Undying Vigil: the mending reaches %s as well (+%d)" % [
 		second.unit_name, got], "#e8d890")
 
@@ -16915,8 +17454,9 @@ func _on_vigil_heal(healed: BattleUnit, amount: int) -> void:
 # kit produces goes through here with its term named, so the report can print
 # the parts rather than the sum — and so the parts can never disagree with the
 # total, which they would the moment a site banked one and forgot the other.
-func _devout_heal(owner, amount: float, term: String) -> void:
-	_stat_heal(owner, amount)
+func _devout_heal(owner, amount: float, term: String,
+		healed: BattleUnit = null) -> void:
+	_stat_heal(owner, amount, healed)
 	if sim and amount > 0.0:
 		_stat("faith_heal_" + term, amount)
 

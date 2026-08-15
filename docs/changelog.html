@@ -5,6 +5,147 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-14 &mdash; Batch BU: tranche 2, the Cleric nine</h2>
+<p><i><b>LEAD WITH THE TWO CROSS-SPEC CARDS, because they are the first draft abilities whose
+value is measured on somebody else's sheet.</b> <b>RECANT</b> (Holy) hands an ally back 30% of
+their maximum Rage or Mana &mdash; it is a different ability in every party, worth most beside
+the hero whose engine is the party's engine. <b>ANOINTING</b> (Occultist) makes every ally's
+attacks apply Ruin for three turns, so three heroes who have never contributed to the meter that
+is his entire spec start feeding it. Every card before these paid off on the sheet of the hero
+who cast it.</i></p>
+
+<p><b>Nine spec draft abilities, three per Cleric spec. The Cleric pools go from two to five,
+joining the Mage.</b> The Hunter and Warrior thirds of tranche 2 are owed next, and tranche 3
+after them. The draft holds <b>66 of a target ~96</b>. Nothing else ships: no talent node, no
+magnitude, no existing ability changed, and no save version moves (still v10).</p>
+
+<p><b>HOLY &mdash; what else can be reversed.</b> Her pool was Second Wind (undo recent damage)
+and Rite of Return (prevent a death): both reactive, both defensive, and she had no offence at
+all.</p>
+<ul>
+<li><b>Recant</b> &mdash; 25 Mana, 2.0, 4cd, one ally. Restores 30% of their maximum resource
+(Perfect: 40%). <i>Axis: reversal of expenditure.</i> <b>The primary resource only</b> &mdash;
+Resonance, Mercy, Faith and Focus are spec meters and are untouched, because handing an Arcanist
+his compounding curve back for 25 Mana would make one card worth more than the passive it feeds.</li>
+<li><b>Shared Grief</b> &mdash; 20 Mana, 2.0, 4cd, self. She takes 25% of her maximum health as
+damage and gains <b>3</b> Mercy (Perfect: 4); it can never take her below 1. <i>Axis: martyrdom
+as an economy</i> &mdash; her meter has only ever filled by letting the party be hurt. A flat 3
+rather than a scaling count, deliberately: the first draft paid per wounded ally, which in any
+real fight is her whole meter for one cast.</li>
+<li><b>Reprisal</b> &mdash; 25 Mana, 2.5, 3cd, one enemy, 6 BD. Damage equal to 50% of the healing
+she has <b>landed</b> in the last two turns (Perfect: 75%). <i>Axis: her healing becomes a
+weapon</i> &mdash; her only offence, and the answer to the turn where nobody is hurt.
+<b>Overheal does not count</b>, or Sanctum's 60% spill would pay twice.</li>
+</ul>
+
+<p><b>DEVOUT &mdash; what else can he place.</b> His pool was Vow of Suffering and Aegis Reversal,
+both acting on shields already out; he could not put Faith on anyone directly, and nothing in the
+game read <code>faith_peak</code> except the held-value multiplier Batch BI wrote.</p>
+<ul>
+<li><b>Ordination</b> &mdash; 25 Mana, 2.0, 4cd. Grants 3 Faith (Perfect: 4) to the ally holding
+the <b>least</b>. <i>Axis: starting the engine without waiting to be hit.</i> The lowest-Faith
+targeting is a design decision and <b>is not player-chosen</b>: Faith caps at five, so three
+granted to an ally on four throws two away, and aiming at the floor points the card at the ally
+Communion can never roll for.</li>
+<li><b>Fortified Spirit</b> &mdash; 25 Mana, 2.0, 4cd, one ally. Their maximum health rises by 30%
+of the Devout's (Perfect: 40%), healing them for the same, and <b>the loan decays by a tenth of
+his maximum each of their turns</b>. <i>Axis: lending the number his whole kit is built on.</i>
+Current health clamps under the shrinking maximum, so it rewards healing them <i>inside</i> the
+window.</li>
+<li><b>Reliquary</b> &mdash; 30 Mana, 2.5, 5cd, all allies. Each ally is healed for 2.5% of the
+Devout's maximum per point of their <b>PEAK</b> Faith (Perfect: 3.5%). <i>Axis: cashing an
+accumulation nothing else reads.</i> An ally who released down to zero is still paid in full for
+what they carried &mdash; which is the whole reason Batch BI introduced the field.</li>
+</ul>
+
+<p><b>OCCULTIST &mdash; what else can be done to a mark.</b> His pool was Blight the Well and
+Covenant of Ash, both about where corruption lands. The mark itself was a number and nothing but
+a number: everything read its depth, nothing moved it, fed it or traded it.</p>
+<ul>
+<li><b>Suffering</b> &mdash; 25 Mana, 2.5, 4cd, one enemy, 8 BD. 20% of Attack, healing him for
+<b>all</b> of the damage dealt, and for 4 turns the enemy gains 2 Ruin at the start of each of
+<i>its</i> turns (Perfect: 3). <i>Axis: corruption that works on the enemy's clock.</i> One cast
+buys eight stacks without another turn spent. <b>The heal does not route through the Ruin
+lifesteal</b>, which is capped at 40%.</li>
+<li><b>Transference</b> &mdash; 20 Mana, 2.0, 3cd, one enemy. Moves every Ruin stack from the
+deepest-marked other enemy onto this one (Perfect: plus 2). <i>Axis: corruption relocated rather
+than spent.</i> <b>Nothing detonates in transit</b> &mdash; Cryoclasm's precedent exactly.</li>
+<li><b>Anointing</b> &mdash; 30 Mana, 2.5, 5cd. For 3 turns (Perfect: 4) every ally's attacks
+apply 1 Ruin, counting <b>hits, not casts</b>. <i>Axis: the party marks for him.</i>
+<b>Flagged as possibly the strongest card in the tranche and shipped to be watched rather than
+pre-tuned</b> &mdash; Batch AY had to double Ruin generation because trash detonations measured
+0.00, and four heroes marking instead of one could overshoot the other way. The designer has
+taken that call knowingly.</li>
+</ul>
+
+<p><b>THREE PREMISES IN THE BRIEF WERE STALE AND ARE CORRECTED TOWARD THE CODE</b> (the
+AR&nbsp;&sect;6 / AX&nbsp;&sect;7 / BD&nbsp;&sect;3 / AY&nbsp;&sect;1 / BS / BT precedent):</p>
+<ul>
+<li><b>Recant is not the first thing to restore another hero's resource.</b> <b>War Stomp</b>
+refuels every ally 10% (20% perfect), <b>Cold Storage</b> (Cryomancer, Deep Freeze row 8) drips
+the party a share per held prison, and <b>Rally</b>'s perfect hands its target 15%. What is true
+is the smaller and more useful claim: nothing was a deep single-target restore, and nothing
+existed whose entire payload was the restore.</li>
+<li><b>There are only TWO primary resources, not three.</b> The brief has Recant reading "Rage,
+Mana and Focus alike"; <code>resource_name</code> is Rage for the Warrior and Mana for the other
+three classes, and <b>Focus is a SECOND resource</b> (Batch AZ) &mdash; a spec meter, i.e. exactly
+what the card must not restore. The card's own text says so.</li>
+<li><b>The Apostle release loop Ordination's targeting was justified by cannot happen.</b> The
+brief argues that under Apostle a release consumes no stacks, so granting 3 to an ally on 4 would
+release them, leave them at 5, and re-release on every later gain. <b>Batch BG moved Apostle onto
+the HELD half and Batch BH deleted Binding Oath's remnant</b>, so a release resets an ally to zero
+unconditionally and nothing parks anyone at five. The targeting rule is right and ships as
+specified; its stated reason was two batches stale, and the real ones are the cap at five and
+Communion's blind spot. Binding Oath's synergy line was corrected the same way &mdash; it swears
+the <i>Devout</i> a stack now, it does not keep three through a release.</li>
+</ul>
+
+<p><b>ONE NAME ADJACENCY, REPORTED AND NOT RESOLVED (BR&nbsp;&sect;1).</b> <b>SUFFERING</b> sits
+inside <b>VOW OF SUFFERING</b>, the Devout's own tranche-1 card &mdash; same class, both in the
+draft, and one name a strict substring of the other. Nothing breaks: <code>pool_ability</code> is
+keyed on the whole <code>display_name</code>, the two strings differ, and the two share no
+<code>special</code>; test_batch_bu pins all three facts. Renaming either is the designer's call
+and one string. The other eight names are clean against every ability, talent node, status and
+rune in the game.</p>
+
+<p><b>BREAK DAMAGE ASSIGNED DELIBERATELY, NOT BY OMISSION</b> (the BO/BP/BQ/BR/BT rule). The brief
+names no figure, so all nine are this batch's. <b>Suffering 8</b>, level with Stoke and Arcane
+Bolt and below the free Shadowrend's 16 &mdash; a card that supplements the free basic must not
+out-Break it. <b>Reprisal 6</b>, level with Kindled Mind and well below the free Smite's 16,
+because a card that already converts her whole throughput into damage must not also out-Break her
+basic. <b>The other seven carry none</b> &mdash; they land no blow.</p>
+
+<p><b>ONE UNIT-SIDE FIELD FOR NINE ABILITIES, and it is a ledger rather than a duration.</b>
+<code>heal_by_turn</code> is the mirror of the <code>dmg_by_turn</code> Second Wind already rides:
+bounded to two keys, written by <code>_book_healing</code> at <code>_stat_heal</code> &mdash; BC's
+one credit door, so every heal in the game reaches it and one added later cannot forget.
+<b>It books LANDED healing</b>, subtracting the recipient's <code>last_overheal</code>, and it
+sits <b>above</b> the <code>sim</code> guard because an ability that only worked inside the sim
+would be an ability no player could use. <b>The sim's contribution columns are byte-unchanged.</b>
+Everything else with a duration is a status.</p>
+
+<p><b>FORTIFIED SPIRIT IS FORCED TO EXPIRE AT THE VICTORY SYNC RATHER THAN GAINING A FOURTH
+FIELD THERE</b>, and the choice is the whole landmine. A mid-battle <code>max_hp</code> change
+leaks through <code>sync_victory_state</code> &mdash; the arithmetic with a ~127,000 max-HP runaway
+in its history and the reason <code>rot</code> was dropped from Batch AQ. The effect is
+<i>explicitly</i> temporary, so there is nothing to preserve and no question a fourth sign would
+answer; unwinding the loan first leaves <code>tenacity_hp_gained</code>,
+<code>conviction_hp_gained</code> and <code>rot_hp_lost</code> untouched and still comparable with
+every batch that reasoned about them.</p>
+
+<p><b>ONE GLOSSARY ENTRY ADDED (86 &rarr; 87): <i>Lent Maximum Health</i>.</b> Fortified Spirit
+is the one thing in the batch a player meets with no explanation anywhere else &mdash; a maximum
+that rises and then decays, with current health clamping under it on the way down. The entry says
+both halves. Everything else the nine do rides a mechanic the player already meets (Faith, Ruin,
+Mercy, a resource bar), so nothing else needed one.</p>
+
+<p><b>VERIFIED &mdash; and per the standing instruction that means the code landed and works.
+NO SWEEPS, NO BANDS, NO BALANCE MEASUREMENT WAS RUN, and none should be quoted from this
+batch.</b> check_parse 0 &middot; check_flow 0 &middot; <b>new test_batch_bu.gd 476/0</b>, with all
+eight clauses &sect;6 named as able to silently do nothing driven live and built so a broken
+implementation still fails. Ten negative controls were applied to product code and reverted, and
+classes.gd, battle.gd and unit.gd all came back byte-identical by hash.</p>
+
 <h2>2026-08-14 &mdash; Batch BT: tranche 2, the Mage nine</h2>
 <p><i><b>THE RULE FIRST, because it outlives the content: FROM THIS TRANCHE ON, EVERY ABILITY
 NAMES WHAT IT BUILDS WITH.</b> Tranche 1 asked what <i>gap</i> a card filled, which was the right

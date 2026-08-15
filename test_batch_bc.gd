@@ -121,6 +121,20 @@ func _run() -> void:
 
 # ---------- helpers ----------
 
+
+# Argument lists wrapped across lines read as `foo,\n\t\t\t"bar"`. Collapsing a
+# comma-plus-newline-plus-tabs to a plain `, ` lets a source-level needle name
+# an argument without also having to know the file's line width.
+func _joined(src: String) -> String:
+	var out := src
+	while out.contains(",\n"):
+		out = out.replace(",\n", ", ")
+	while out.contains(",  "):
+		out = out.replace(",  ", ", ")
+	while out.contains(", \t"):
+		out = out.replace(", \t", ", ")
+	return out
+
 func _src(path: String) -> String:
 	var f := FileAccess.open(path, FileAccess.READ)
 	return "" if f == null else f.get_as_text()
@@ -302,13 +316,28 @@ func _report_line_terms() -> void:
 	# confident 0 forever because nothing banks its key is the failure this
 	# guards: `_devout_heal`'s third argument IS the term, so the set of terms
 	# the line reads and the set the code writes have to match.
-	var both := src + _src("res://scripts/unit.gd")
+	# RE-POINTED IN PLACE BY BATCH BU, AND THE QUESTION IS UNCHANGED: does
+	# something actually WRITE each term the report line reads. The old needle
+	# ended in `")`, i.e. it required the term to be the LAST argument — and BU
+	# gave `_devout_heal` a fourth (the healed unit, for Reprisal's ledger), so
+	# every one of these fragments vanished from working code. Anchored on the
+	# term AS AN ARGUMENT now (`, "release"`), which is a strictly better
+	# anchor: it survives another argument being added and still refuses a term
+	# that appears only in a comment. The AZ Follow-Through / BQ Ghillie
+	# precedent exactly.
+	# ONE MORE THING THE RE-POINT NEEDS: an argument list WRAPPED across lines
+	# puts a newline and tabs between the comma and the term (Afterglow's call
+	# is the one that does), so the needle is searched against a copy with
+	# post-comma line breaks collapsed. Without it this check reads "nothing
+	# writes faith_heal_afterglow" against working code — a false alarm caused
+	# purely by line width.
+	var both := _joined(src + _src("res://scripts/unit.gd"))
 	for t in HEAL_TERMS:
-		var needle := "\"" + String(t) + "\")"
+		var needle := ", \"" + String(t) + "\""
 		ok(both.contains(needle), "§1: something writes faith_heal_%s" % t)
 	for t in PREV_TERMS:
 		var pneedle := "faith_prev_shield" if t == "shield" \
-			else "\"" + String(t) + "\")"
+			else ", \"" + String(t) + "\""
 		ok(both.contains(pneedle), "§1: something writes faith_prev_%s" % t)
 
 
@@ -323,7 +352,10 @@ func _one_booking_door() -> void:
 	ok(src.count("func _devout_prev(") == 1,
 		"§1: `_devout_prev` has exactly ONE implementation")
 	# Every named term goes through it — the door, not around it.
-	ok(src.contains("_stat_heal(owner, amount)"),
+	# RE-POINTED BY BATCH BU with the fourth argument threaded through: the
+	# question — does the Devout door FEED the Batch W ledger rather than
+	# replace it — is unchanged.
+	ok(src.contains("_stat_heal(owner, amount, healed)"),
 		"§1: `_devout_heal` still feeds the Batch W ledger, it does not replace it")
 	ok(src.contains("_prev(owner, cut)"),
 		"§1: `_devout_prev` still feeds the Batch W ledger")
@@ -338,31 +370,39 @@ func _one_booking_door() -> void:
 # THE §6 REQUIREMENT IN ONE FUNCTION: the terms are read from the sites that
 # compute them rather than recomputed. Each assertion pins the booking call
 # NEXT TO the expression that produced the number, using that site's own local.
+# RE-POINTED IN PLACE BY BATCH BU. Each pin below names the booking call NEXT
+# TO the expression that produced the number, and BU added a fourth argument to
+# `_devout_heal` (the healed unit, so Reprisal's ledger can subtract overheal).
+# The fragments moved; the question — is the term read at the site that computed
+# it, or recomputed somewhere else — is byte-for-byte the same one.
 func _terms_read_at_their_sites() -> void:
 	var src := _src("res://scripts/battle.gd")
 	var usrc := _src("res://scripts/unit.gd")
-	ok(src.contains("_devout_heal(devout, f_got, \"release\")"),
+	ok(src.contains("_devout_heal(devout, f_got, \"release\", u)"),
 		"§1: the release term reads the release's own `f_got`")
 	ok(src.contains("_stat(\"faith_releases\")"),
 		"§1: the release COUNT is banked at the release")
-	ok(src.contains("_devout_heal(devout, grow_got, \"growth\")"),
+	ok(src.contains("_devout_heal(devout, grow_got, \"growth\", devout)"),
 		"§1: growth reads `_conviction_growth`'s own `grow_got`")
-	ok(src.contains("_devout_heal(devout, cov_got, \"covenant\")"),
+	ok(src.contains("_devout_heal(devout, cov_got, \"covenant\", saved)"),
 		"§1: Sacred Covenant reads its own `cov_got`")
-	ok(src.contains("_devout_heal(cg_dv, well_got, \"lifewell\")"),
+	ok(src.contains("_devout_heal(cg_dv, well_got, \"lifewell\", wh)"),
 		"§1: Lifewell reads its own `well_got`")
 	# Healing Pulse and Bulwark of Fortitude live inside `_run_battle`, which
 	# cannot be driven headlessly (the AR trap), so they are pinned against the
 	# source at their own sites instead of driven.
-	ok(src.contains("_devout_heal(zl_dv, pulse_got, \"pulse\")"),
+	ok(src.contains("_devout_heal(zl_dv, pulse_got, \"pulse\", u)"),
 		"§1: Healing Pulse reads its own `pulse_got`")
-	ok(src.contains("_devout_heal(_living_devout(), bw_tick, \"bulwark\")"),
+	ok(src.contains("_devout_heal(_living_devout(), bw_tick, \"bulwark\", u)"),
 		"§1: Bulwark of Fortitude reads its own `bw_tick`")
 	# The two unit.gd heals bank what LANDED, not what was asked for: Blessed
 	# Barrier was discarding heal_amount's return entirely.
 	ok(usrc.contains("var bb_got := heal_amount(bb_heal)"),
 		"§1: Blessed Barrier captures what the heal actually landed")
-	ok(usrc.contains("credit_cb.call(String(s.get(\"src\", \"\")), bb_got, \"blessed\")"),
+	# RE-POINTED BY BATCH BU: `credit_cb` gained a fourth argument (the healed
+	# unit), so the caller grew a `, self`. The question is unchanged — is the
+	# credit stamped with the barrier's OWNER rather than with its wearer.
+	ok(usrc.contains("credit_cb.call(String(s.get(\"src\", \"\")), bb_got, \"blessed\", self)"),
 		"§1: Blessed Barrier credits the caster stamped on the barrier")
 	ok(usrc.contains("credit_cb.call(String(s.get(\"src\", \"\")), glow_got,"),
 		"§1: Afterglow credits the same caster, with its own `glow_got`")

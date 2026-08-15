@@ -41,6 +41,11 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	# battle-long, which `_cleansable_debuffs` reads as 999 turns remaining. A
 	# mender's longest-first pick would therefore take it EVERY time, which is
 	# the exact fault Batch AS carved the Glacial Hold out for.
+	# BATCH BU: `suffering` is a genuine affliction and is listed, for the same
+	# reason `slow_burn` and `blight` are. `anointed` and `fortified` are NOT
+	# here and must not be — both are BUFFS the Cleric lays on his own party,
+	# and listing either would make an ally's own Dispel strip it.
+	"suffering",
 	"blight"]
 
 var frame_size := 100      # square frame edge of this unit's sprite strips
@@ -817,6 +822,23 @@ var rot_hp_lost := 0          # Rot: max HP taken for one fight (added back at t
 # licence to merge them: they answer different questions and one of them is
 # read somewhere else.
 func sync_victory_state(member: Dictionary) -> void:
+	# BATCH BU — FORTIFIED SPIRIT IS FORCED TO EXPIRE HERE, AND THE CHOICE
+	# BETWEEN THIS AND A FOURTH FIELD IS THE WHOLE DECISION. The Devout's loan
+	# raises an ally's `max_hp` mid-battle, which is exactly the leak that got
+	# `rot` dropped from Batch AQ and the leak the three fields below exist to
+	# plug: if the last enemy dies while the loan is up, the sync writes the
+	# INFLATED maximum onto the party member and the ally walks out of the fight
+	# permanently larger, one battle at a time, with nothing crashing.
+	#
+	# A FOURTH SIGN AT THIS SITE WAS REFUSED. The effect is EXPLICITLY temporary
+	# — it decays to nothing over three turns by design — so unlike Tenacity's
+	# and Conviction's gains there is nothing to preserve and no question the
+	# field would answer. Adding one to arithmetic with a ~127,000 max-HP runaway
+	# in its history buys a permanent hazard to avoid a cleanup. UNWINDING IT
+	# FIRST means `max_hp` is already true by the time the line below reads it,
+	# so the three signs are untouched and stay comparable with every batch that
+	# reasoned about them.
+	expire_fortified_spirit()
 	var save_max: int = max_hp - tenacity_hp_gained - conviction_hp_gained \
 		+ rot_hp_lost
 	# The fallen refuse to stay down: heroes return from a won fight at 20%,
@@ -825,6 +847,23 @@ func sync_victory_state(member: Dictionary) -> void:
 	member["max_hp"] = save_max
 	if resource_name == "Mana":
 		member["mana"] = resource
+
+
+# BATCH BU — FORTIFIED SPIRIT: hand the lent health back and clamp under it.
+# Called at every turn the loan runs out (battle.gd's `_fortified_tick`) AND
+# unconditionally from `sync_victory_state` above, so a victory taken while the
+# loan still holds cannot carry it out of the battle. IDEMPOTENT: with no loan
+# standing it is a no-op, which is what makes the unconditional call safe.
+func expire_fortified_spirit() -> void:
+	var f := get_status("fortified")
+	if f.is_empty():
+		remove_status("fortified")
+		return
+	var lent := int(f.get("lent", 0))
+	if lent > 0:
+		max_hp = maxi(max_hp - lent, 1)
+		hp = mini(hp, max_hp)
+	remove_status("fortified")
 
 
 var communion_ranks := 0      # Communion: (N x their own stacks)% to spread
@@ -955,6 +994,22 @@ var battle_turn := 0        # stamped by battle.gd each turn; the key above
 # BY BATTLE.GD AT EACH TICK OF THE TRANCE — a share of MISSING HEALTH is the
 # alternative reading and it is a different, worse ability.
 var trance_taken := 0
+# BATCH BU — REPRISAL (Holy). Healing this unit has DONE, by battle turn index:
+# the exact mirror of `dmg_by_turn` above, and it reads the same two-turn window
+# the ability it serves reads.
+#
+# WHAT GOES IN IS HEALING LANDED, NOT HEALING ATTEMPTED, and that is the whole
+# reason the ledger exists rather than the ability reading the contribution
+# stat. `heal_amount` returns what the heal was WORTH after multipliers, which
+# includes the part that spilled off a full health bar; battle.gd's
+# `_book_healing` subtracts `last_overheal` before writing here. Counting the
+# spill would pay Sanctum twice — once as the overheal it came from and again as
+# the heal that overheal becomes.
+#
+# BOUNDED TO TWO KEYS for `dmg_by_turn`'s reason: the ability reads two turns
+# and nothing else reads it at all, so a 90-round stalemate must not grow a
+# dictionary nobody looks at.
+var heal_by_turn := {}
 # VOW OF SUFFERING (Devout) — fired from take_hit with (victim, share) when
 # the vow redirects half a wound. battle.gd bills the Devout and kindles the
 # ally's Faith; unit.gd only decides the split.
@@ -2173,7 +2228,7 @@ func frenzy_bonus() -> float:
 # crediting it would put an enemy's Constitution in a hero's column.
 func _credit_bd(cut: int, term: String, src: String) -> void:
 	if cut > 0 and is_hero and credit_cb.is_valid():
-		credit_cb.call(src, cut, term)
+		credit_cb.call(src, cut, term, self)
 
 
 func take_hit(amount: int, pressure_add: int) -> Dictionary:
@@ -2219,7 +2274,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 				var bb_got := heal_amount(bb_heal)
 				float_text("+%d" % bb_got, Color(0.4, 0.9, 0.45))
 				if bb_got > 0 and credit_cb.is_valid():
-					credit_cb.call(String(s.get("src", "")), bb_got, "blessed")
+					credit_cb.call(String(s.get("src", "")), bb_got, "blessed", self)
 				_proc_log("Talent: Blessed Barrier — %s converts %d absorbed into healing" % [
 					unit_name, bb_got])
 			# Conviction: only Divine Shield absorbs build Faith.
@@ -2258,7 +2313,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 					float_text("+%d" % glow_got, Color(0.95, 0.9, 0.6))
 					if glow_got > 0 and credit_cb.is_valid():
 						credit_cb.call(String(s.get("src", "")), glow_got,
-							"afterglow")
+							"afterglow", self)
 					_proc_log("Talent: Afterglow — the breaking shield mends %s for %d" % [
 						unit_name, glow_got])
 			break
@@ -2593,6 +2648,38 @@ func damage_taken_recent() -> int:
 		if int(key) >= battle_turn - 1:
 			total += int(dmg_by_turn[key])
 	return total
+
+
+# BATCH BU — REPRISAL's subject: the healing this unit has LANDED across the
+# current turn and the one before it. Written by battle.gd's `_book_healing`
+# (the one credit door, so every heal her kit produces reaches it and a heal
+# added later cannot forget) and its own function for `damage_taken_recent`'s
+# reason — a test can read it without driving a cast.
+func healing_done_recent() -> int:
+	var total := 0
+	for key in heal_by_turn:
+		if int(key) >= battle_turn - 1:
+			total += int(heal_by_turn[key])
+	return total
+
+
+# BATCH BU — TRANSFERENCE (Occultist). The ONE place a Ruin pile is MOVED rather
+# than GAINED, on `set_chilled_stacks`'s precedent directly above, and the reason
+# it exists at all is that `battle._gain_ruin` arms the detonation threshold on
+# every stack it adds. Stacks that were already earned once must not arm it a
+# second time simply for changing bodies, so relocation cannot go through the
+# gain path — the same argument that keeps Cryoclasm out of `_hold_release`.
+# `n <= 0` REMOVES the mark outright, which is what empties the source.
+func set_ruin_stacks(n: int) -> void:
+	if n <= 0:
+		remove_status("ruin")
+		return
+	for st in statuses:
+		if st.id == "ruin":
+			st.stacks = n
+			st.short = "R%d" % n
+			_refresh_chips()
+			return
 
 
 func take_tick_damage(amount: int, label: String, color: Color) -> bool:

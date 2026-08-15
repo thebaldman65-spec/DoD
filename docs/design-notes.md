@@ -3204,3 +3204,48 @@ hero who cannot hold the meter read "+2 (now 0)"; Stoke printed "1 turns". None 
 mechanical fault and no test would have been written for any of them. They are all cases of the
 log describing a bigger or different event than the one that happened, which is the class of defect
 that teaches a player the wrong rule.
+
+## Batch BU — tranche 2, the Cleric nine
+
+**The first two cards whose value is measured on somebody else's sheet.** Every draft ability
+before these paid off on the sheet of the hero who cast it. Recant hands an ally back 30% of their
+maximum resource and Anointing makes every ally's attacks apply Ruin — so both are worth a
+different amount in every party, and the question they ask a player is about the *party* rather
+than about the hero holding the card. That is a genuinely new axis for the draft and it is why
+they lead the changelog entry. It also means neither can be balanced by looking at one hero's
+numbers, which is worth remembering the first time somebody wants to tune them.
+
+**Three of the brief's premises were stale, and all three were found the same way: by reading the
+site before writing against it.** This keeps happening (AR, AX, BD, AY, BS, BT and now BU), and
+the pattern is always that a claim was true when someone wrote it down and a later batch moved the
+ground under it. Two of the three here were harmless once caught — nothing was the first thing to
+restore an ally's resource, and Focus is a second resource rather than a third primary one. The
+third was not: Ordination's lowest-Faith targeting was justified by an Apostle release loop that
+Batch BG made impossible two batches ago. **The rule was right and the reason was wrong**, which
+is the most dangerous shape a stale premise can take — a later batch reading only the reason would
+conclude the rule no longer applies and "improve" the targeting into a player-chosen click. The
+correction is therefore recorded as *new reasons for the same rule* rather than as a footnote.
+
+**A temporary maximum-health change is the one leak this project has already paid for twice.**
+`rot` was authored, implemented and dropped in Batch AQ because a mid-battle `max_hp` change
+follows the party out of the fight through the victory sync, and Batch W's ~127,000 max-HP runaway
+is the same fault at scale. Fortified Spirit is a third instance, and the interesting thing is that
+the *right* fix was the smaller one: because the effect is explicitly temporary, there was nothing
+to preserve, so a forced unwind beat adding a fourth sign to arithmetic that already carries three.
+The general shape — **when a leak guard is expensive, ask first whether the thing being guarded
+needs to survive at all** — is worth having.
+
+**The clamp is the ability.** Fortified Spirit's decay would be invisible without one line that
+pulls current health down under the shrinking maximum, and without it the card would be three free
+turns of a bigger bar. It is a good example of a mechanic whose *interesting* half is a single
+consequence rather than the headline number: an ally kept topped up pays for the loan, an ally
+sitting at half does not, and that asymmetry is the whole decision the card asks a healer to make.
+
+**"Landed" is not one thing, and the healing ledger had to pick.** `heal_amount` returns what a
+heal was worth after multipliers, which is what this project has called "landed" since Batch BC —
+but it includes the part that spilled off a full health bar. Reprisal needed the other reading, or
+Sanctum's overheal spill would have been paid for twice: once as the overheal it came from and
+again as the heal it becomes. The cost of getting it right was threading the recipient through
+thirty-four credit sites, which felt disproportionate for one clause of one card and was not: the
+alternative was an accumulator that silently over-counted in exactly the builds the card is
+designed for.

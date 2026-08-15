@@ -1,960 +1,968 @@
 [
- {
-  "id": "initiative",
-  "term": "The Initiative Timeline",
-  "category": "combat",
-  "short": "Faster abilities bring your next turn sooner.",
-  "long": "Turn order is a clock, not a queue: after acting, a unit's next turn arrives in Initiative-cost x 100 / EFFECTIVE Speed ticks - effective, so every speed change really does bend it. Every ability lists its Initiative cost (a basic action costs 2.0) - a cheap, quick ability means you act again sooner, a heavy one leaves you exposed longer. Slowed cuts speed a quarter; Chilled cuts it a quarter at one stack and a half at two or more, so a chilled enemy genuinely waits longer between turns; Quick Draw shrinks the wait. The opening roll of the battle reads effective speed too, so a fight that starts with everyone Chilled or Frenzied starts in the order that implies. Losing a turn to Stun, Freeze, or Break still pushes the clock forward a full basic action - but a Cryomancer's Glacial Hold is not a lost turn, it is removal: a held enemy leaves the bar entirely until he releases it. The bar across the top of the battle shows the coming turns; hovering an ability shows a gold ghost of where it would put your next one.",
-  "see_also": [
-   "skill_check",
-   "status_slow",
-   "status_chilled",
-   "glacial_hold"
-  ]
- },
- {
-  "id": "skill_check",
-  "term": "The Skill Check",
-  "category": "combat",
-  "short": "Stop the sweeping marker in the center for a stronger action.",
-  "long": "Every action you take runs a timing check: a marker sweeps the bar (about 0.7s each way) - press SPACE or click to stop it. The gold center is PERFECT: +15% damage or healing, +25% Break damage, and many abilities add a unique bonus effect on top. The green band is Good: full normal effect. Outside both is Sloppy: only 60% damage and half the Break damage. The check never changes your chance to miss, be parried, or crit - it multiplies what lands. Your timing matters as much as your build.",
-  "see_also": [
-   "initiative",
-   "pressure_break"
-  ]
- },
- {
-  "id": "pressure_break",
-  "term": "Pressure & Break",
-  "category": "combat",
-  "short": "Attacks fill a Break meter; a full meter costs the victim a turn.",
-  "long": "Alongside HP damage, most attacks carry Pressure - Break damage (BD) - which fills the target's Break meter (0-100). High Constitution shrinks incoming BD proportionally; crits deal 1.5x BD. The meter never drains on its own: it keeps climbing until it fills and the unit BREAKS - losing its next turn, dropping 30% of its armor, and taking +25% crit chance against it. When the Broken turn passes, the unit recovers and its meter empties back to zero. Breaking a boss also strips its immunity to stuns and mind magic for the duration.",
-  "see_also": [
-   "status_broken",
-   "skill_check"
-  ]
- },
- {
-  "id": "crit",
-  "term": "Critical Hits",
-  "category": "combat",
-  "short": "10% base chance: 1.5x damage and 1.5x Break damage.",
-  "long": "Attacks have a 10% base chance to crit for 1.5x damage and 1.5x Break damage. A Broken target takes +25% crit chance from everyone. Many talents and spec mechanics push the roll further - the Sharpshooter's Focus adds +0.5% per point up to its conversion point (past which it buys critical MULTIPLIER instead), and Resonance stacks add a flat +1% each for the Arcanist. Only a few effects raise the 1.5x multiplier itself.",
-  "see_also": [
-   "status_broken",
-   "res_focus"
-  ]
- },
- {
-  "id": "hits_not_casts",
-  "term": "Hits, Not Casts",
-  "category": "combat",
-  "short": "A multi-hit ability spends one charge and fires its on-hit effects PER STRIKE.",
-  "long": "Some abilities strike more than once from a single cast - three shots into one enemy, a volley, a flurry. WHEN ONE OF THOSE MEETS A CHARGE BANK OR AN ON-HIT EFFECT, EVERY STRIKE COUNTS SEPARATELY. Arcane Arrows banks five charges and each of the next five HITS forks into a second enemy - so a three-shot Aimed Volley spends THREE of the five and forks three times, not one and once. The same rule runs the other way: Mirror Image's images are spent one per incoming hit, so a three-strike blow eats three of them. A strike that MISSED or was BLOCKED spends nothing - a charge rides a blow that landed. This is a real power increase for multi-hit abilities and it is deliberate: it is what makes a multi-hit kit and a charge bank a BUILD rather than a coincidence. Area attacks are the exception that proves it - they roll no miss at all, so they never spend an image.",
-  "see_also": [
-   "ability_draft",
-   "class_draft",
-   "crit",
-   "pressure_break"
-  ]
- },
- {
-  "id": "miss",
-  "term": "Missing",
-  "category": "combat",
-  "short": "5% base chance for any single-target attack to whiff.",
-  "long": "Single-target attacks miss 5% of the time at base. Being Dazed adds +20%, Blind adds +50%, and attacking an Elusive target adds +25%. Area attacks never miss. A miss deals nothing at all - no damage, no Break, no on-hit effects.",
-  "see_also": [
-   "status_dazed",
-   "status_blind",
-   "parry"
-  ]
- },
- {
-  "id": "parry",
-  "term": "Parry",
-  "category": "combat",
-  "short": "A parried hit still lands, but at a quarter strength.",
-  "long": "Heroes parry incoming melee attacks 5% of the time at base (enemies 2.5%); talents, stances, and buffs raise it. A parried hit is not negated - it lands at 25% damage and 25% Break damage. Ranged attacks cannot be parried (unless a talent says otherwise), area attacks cannot be parried, and a Broken unit cannot parry at all.",
-  "see_also": [
-   "miss",
-   "status_broken"
-  ]
- },
- {
-  "id": "stance",
-  "term": "Stance (Seasoned Fighter)",
-  "category": "combat",
-  "short": "The Swordmaster fights Aggressive or Defensive; three abilities switch him.",
-  "long": "Only the Swordmaster has stances, and he is always in one of two. AGGRESSIVE: +15% damage dealt and +10% damage taken. DEFENSIVE: 15% less damage taken and -10% damage dealt. He starts every battle Aggressive, and the stance resets with each new battle - it is never carried between fights. Several of his talents read it (Killing Edge sharpens the Aggressive guard, Bracing hardens the Defensive one, Untouchable makes a Defensive parry absolute), and THREE abilities change it: Guard Change, which does nothing but pivot and press the opening; and the two drafted cards, Precision Strike and Feint, which BRANCH on the stance they are cast from and then switch it. Both branch the same way round, and it is worth knowing: each branch buys what the stance he is ARRIVING in wants. Cast from Aggressive he lands in Defensive, so he is handed defence - a parry buff, or charges that answer blows. Cast from Defensive he lands in Aggressive, so he is handed offence - an armor bypass, or a strike and a misdirected enemy. He is never stranded mid-pivot.",
-  "see_also": [
-   "parry",
-   "crit"
-  ]
- },
- {
-  "id": "fallen",
-  "term": "Fallen Heroes",
-  "category": "combat",
-  "short": "The dead sit the fight out - but victory brings everyone back at 20%.",
-  "long": "A hero at 0 HP falls: they lose every status, take no turns, and contribute nothing until raised. Mid-battle, a Revive Potion brings them back at 50% HP and the Cleric's Resurrection at 20-25%. If the party WINS the battle, the Untouched refuse to stay down: every hero - fallen or merely battered - leaves the fight with at least 20% of their max HP. Only losing everyone ends the run.",
-  "see_also": [
-   "wipe",
-   "consumables"
-  ]
- },
- {
-  "id": "status_broken",
-  "term": "Broken",
-  "category": "statuses",
-  "short": "Loses next turn. -30% armor, +25% crit chance against this unit.",
-  "long": "The Break meter filled: this unit loses its next turn, its armor drops by 30%, everyone crits it +25% more often, and it can neither Block nor parry. A Broken boss also loses its immunity to stuns and mind magic. When the lost turn passes the unit recovers and its Break meter resets to zero - the window is short, so spend it hard.",
-  "see_also": [
-   "pressure_break"
-  ]
- },
- {
-  "id": "status_stunned",
-  "term": "Stunned",
-  "category": "statuses",
-  "short": "Loses their next turn.",
-  "long": "A stunned unit skips its next turn entirely (statuses and cooldowns still tick during the skipped turn). Bosses are immune unless Broken. Sources include Pommel Strike, sprung traps, and some enemy attacks.",
-  "see_also": [
-   "status_broken",
-   "status_frozen"
-  ]
- },
- {
-  "id": "status_slow",
-  "term": "Slowed",
-  "category": "statuses",
-  "short": "-25% speed; turns arrive later.",
-  "long": "Slowed cuts speed by 25%, which pushes every coming turn later on the initiative timeline. It does not stack with itself - reapplying just refreshes the longer duration.",
-  "see_also": [
-   "initiative",
-   "status_chilled"
-  ]
- },
- {
-  "id": "status_chilled",
-  "term": "Chilled",
-  "category": "statuses",
-  "short": "Stacking frost: slower each stack; 4 stacks freeze solid.",
-  "long": "Chill stacks up to 4: one stack is -25% speed, two is -50%, three also cuts the victim's damage dealt by 15%, and the fourth FREEZES them. A new application resets the timer of the whole pile. Chill applied by a Cryomancer NEVER expires on its own, and his fourth stack is not a brief freeze but a Glacial Hold: the pile stays at 4 for as long as he holds the enemy, and drops to one lingering stack only when he releases it, so the next build starts warm.",
-  "see_also": [
-   "status_frozen",
-   "glacial_hold",
-   "dmg_frost"
-  ]
- },
- {
-  "id": "status_frozen",
-  "term": "Frozen",
-  "category": "statuses",
-  "short": "Frozen solid: skips turns until the ice thaws.",
-  "long": "A frozen unit loses its turns until the freeze expires (it thaws one step during each skipped turn). Freezing comes from stacking Chilled to 4. Bosses are immune unless Broken. A freeze the CRYOMANCER causes is different: it never expires at all - see Glacial Hold.",
-  "see_also": [
-   "status_chilled",
-   "glacial_hold",
-   "status_stunned"
-  ]
- },
- {
-  "id": "glacial_hold",
-  "term": "Glacial Hold",
-  "category": "statuses",
-  "short": "The Cryomancer's freeze: indefinite, and only he can end it.",
-  "long": "The Cryomancer's passive. Four stacks of his Chilled put an enemy in a HOLD rather than a brief freeze: it leaves the turn order entirely and stays there INDEFINITELY. Nothing thaws it by accident - not damage from your allies, not his own Blizzard, not the passing of turns, not an enemy Cleansing Rite. It ends only when he ends it: Ice Lance on the held enemy, the Shatter capstone (which breaks every hold at once), or a new freeze past his limit, which frees the oldest. He holds ONE enemy, two with Second Prison, any number under Absolute Zero; Cryoclasm moves a hold to a different enemy without spending it. A held enemy takes +15% damage from EVERY source (+30% with Killing Frost), so the hold is a party-wide damage window as well as a lockdown. A released enemy comes back on 1 stack of Chilled. BOSSES: they resist the freeze until Broken, and a held boss shrugs the ice off after one turn.",
-  "see_also": [
-   "status_chilled",
-   "status_frozen",
-   "initiative",
-   "dmg_frost"
-  ]
- },
- {
-  "id": "status_frostbite",
-  "term": "Frostbite",
-  "category": "statuses",
-  "short": "Healing received reduced by 50%.",
-  "long": "Frostbitten flesh knits badly: all healing this unit receives is halved while it lasts.",
-  "see_also": [
-   "status_chilled"
-  ]
- },
- {
-  "id": "status_burn",
-  "term": "Burn",
-  "category": "statuses",
-  "short": "Fire damage at each turn start; reapplying extends it.",
-  "long": "A burning unit takes fire damage at the start of each of its turns - about 6% of the applier's Attack, locked in when the burn lands. Burn is fire-typed: fire resists shrink the ticks and fire vulnerability feeds them. Reapplying Burn ADDS duration rather than resetting it, so a fire build can keep a target lit indefinitely. The duration otherwise counts down one turn at a time; the Pyromancer's SLOW BURN stops that countdown for three turns without stopping the damage, so the fire burns exactly as hard and simply does not get shorter, and his STOKE doubles what is left on one target.",
-  "see_also": [
-   "dmg_fire",
-   "status_poison"
-  ]
- },
- {
-  "id": "status_poison",
-  "term": "Poison",
-  "category": "statuses",
-  "short": "Stacking nature damage at each turn start.",
-  "long": "Each poison stack ticks for about 3% of the applier's Attack at the victim's turn start, plus a flat bonus per stack from Potent Toxins, and stacks have no cap - the pile grows, and each new stack refreshes the timer. Poison is nature-typed, so nature resists blunt it. The Survivalist's Venom lane makes each application CARRY a second affliction: Coated Blades adds Cripple, Distillate adds Exposed, Slow Acting adds Slowed. Some poisons (Slow Acting, Perfected Toxin) are sticky and cannot be cleansed - and a sticky poison survives a Harvest, so Harvest is not paid for it. CREEPING DEATH reads the clock: applying any status to a poisoned enemy refreshes that poison to full duration, and if the poison is PERMANENT - which is what Perfected Toxin makes it - there is no duration to refresh, so it adds a stack instead, once per enemy per turn. You cannot extend forever, so you deepen.",
-  "see_also": [
-   "dmg_nature",
-   "status_burn"
-  ]
- },
- {
-  "id": "status_bleed",
-  "term": "Bleed",
-  "category": "statuses",
-  "short": "Buildup meter: at 100 the target bleeds out for 20% max HP.",
-  "long": "Wounding attacks add Bleed buildup (0-100). The meter never decays - it only climbs - and at 100 the target BLEEDS OUT: an immediate 20% of its max HP, ignoring armor and dealing no Break, after which the meter resets and builds again. Berserker talents feed on bleedouts and can chain the burst to other enemies.",
-  "see_also": [
-   "pressure_break"
-  ]
- },
- {
-  "id": "status_sunder",
-  "term": "Sunder",
-  "category": "statuses",
-  "short": "-35% armor.",
-  "long": "Sundered armor protects 35% less while the status lasts. It multiplies with a Break's -30%, so a Broken, Sundered target is close to bare.",
-  "see_also": [
-   "status_broken",
-   "resists_vulns"
-  ]
- },
- {
-  "id": "status_mocked",
-  "term": "Mocked",
-  "category": "statuses",
-  "short": "Must attack the taunter.",
-  "long": "A mocked enemy can only aim its attacks at whoever taunted it - the Warden's Mocking Blow and the bear's Guardian's Roar both force the fight onto the party's sturdiest shoulders.",
-  "see_also": []
- },
- {
-  "id": "status_exposed",
-  "term": "Exposed",
-  "category": "statuses",
-  "short": "Takes 15% more damage.",
-  "long": "An exposed unit takes 15% more damage from every source while the status lasts.",
-  "see_also": [
-   "status_cripple"
-  ]
- },
- {
-  "id": "status_cripple",
-  "term": "Cripple",
-  "category": "statuses",
-  "short": "-25% damage dealt.",
-  "long": "A crippled unit deals 25% less damage with everything until it fades.",
-  "see_also": [
-   "status_exposed"
-  ]
- },
- {
-  "id": "status_dazed",
-  "term": "Dazed",
-  "category": "statuses",
-  "short": "Attacks are 20% more likely to miss.",
-  "long": "A dazed unit's attacks miss an extra 20% of the time, on top of the 5% base.",
-  "see_also": [
-   "miss",
-   "status_blind"
-  ]
- },
- {
-  "id": "status_blind",
-  "term": "Blind",
-  "category": "statuses",
-  "short": "Attacks are 50% more likely to miss.",
-  "long": "Blinded attacks miss an extra 50% of the time - most of what this unit swings at, it will not hit.",
-  "see_also": [
-   "miss",
-   "status_dazed"
-  ]
- },
- {
-  "id": "status_bewitch",
-  "term": "Bewitched",
-  "category": "statuses",
-  "short": "Charmed: strikes its own allies, dazing them.",
-  "long": "A bewitched unit turns on its own side, basic-attacking its allies and Dazing them with every strike. Bosses REFUSE it outright until they are BROKEN - the key is the Break meter, so grind it down first (the Occultist's own Broken Will and Entropy exist for exactly that job).",
-  "see_also": [
-   "status_psychosis",
-   "status_hysteria"
-  ]
- },
- {
-  "id": "status_psychosis",
-  "term": "Psychosis",
-  "category": "statuses",
-  "short": "50% each turn to act against its own side.",
-  "long": "Madness: each turn there is a 50% chance the unit turns on its own - attacking a fellow, or casting its helpful magic on the enemy side. Bosses REFUSE it outright until they are BROKEN - the key is the Break meter, so grind it down first (the Occultist's own Broken Will and Entropy exist for exactly that job).",
-  "see_also": [
-   "status_bewitch",
-   "status_hysteria"
-  ]
- },
- {
-  "id": "status_decay",
-  "term": "Decay",
-  "category": "statuses",
-  "short": "10 Break damage at the start of each turn.",
-  "long": "Rot eats at the will: a decaying unit takes 10 Break damage at each of its turn starts, marching its own meter toward a Break with no further help.",
-  "see_also": [
-   "pressure_break"
-  ]
- },
- {
-  "id": "status_ruin",
-  "term": "Ruin",
-  "category": "statuses",
-  "short": "Marked 2 per debuff: +2% damage taken per stack; no cap, never clears.",
-  "long": "The Occultist's debuffs mark enemies with 2 Ruin apiece, and the mark is permanent: it has NO MAXIMUM and it NEVER CLEARS, not even when it detonates. Each stack is +2% damage taken (5% with Deeper Hex), and each stack deepens the draught heroes drink when they strike it - 2% of the damage dealt per stack, capped at 40% however many stacks and talents pile up. Every TENTH stack the mark is primed and DETONATES when the victim next acts: shadow damage off the Occultist's Attack, and the party is mended by the Old Gods' feast. The stacks SURVIVE the blast, so the next one waits for the next multiple of ten - and the Avatar of Ruin capstone moves that to every fifth.",
-  "see_also": [
-   "res_ruin",
-   "dmg_shadow"
-  ]
- },
- {
-  "id": "status_hysteria",
-  "term": "Mass Hysteria",
-  "category": "statuses",
-  "short": "Next turn: strikes a fellow with double Break damage.",
-  "long": "The maddened unit spends its next turn striking one of its own with DOUBLE Break damage, Sundering them in the bargain. Bosses REFUSE it outright until they are BROKEN - the key is the Break meter, so grind it down first (the Occultist's own Broken Will and Entropy exist for exactly that job).",
-  "see_also": [
-   "status_psychosis",
-   "status_sunder"
-  ]
- },
- {
-  "id": "status_umbral_sigil",
-  "term": "Umbral Sigil",
-  "category": "statuses",
-  "short": "Branded: half its damage taken echoes to its whole party.",
-  "long": "A branded unit becomes a conduit: half of all attack damage it takes echoes out to every member of its party. Focus fire on the sigil and the whole warband pays.",
-  "see_also": [
-   "dmg_shadow"
-  ]
- },
- {
-  "id": "status_elem_weak",
-  "term": "Elemental Weakness",
-  "category": "statuses",
-  "short": "Elemental resistances reduced.",
-  "long": "The victim's resistances to non-physical schools are lowered while this holds, deepening every elemental hit against it.",
-  "see_also": [
-   "resists_vulns"
-  ]
- },
- {
-  "id": "status_melted",
-  "term": "Melted Armor",
-  "category": "statuses",
-  "short": "Armor permanently burned away.",
-  "long": "Armor burned away for the rest of the battle - a small permanent reduction that keeps deepening while the target burns. NOTE: nothing in the game applies this today. Batch AR re-specced the Pyromancer talent that did, and the status is kept the way a vaulted ability is kept, so a later batch can point something at it again.",
-  "see_also": [
-   "status_burn",
-   "status_sunder"
-  ]
- },
- {
-  "id": "status_snared",
-  "term": "Snared",
-  "category": "statuses",
-  "short": "A trap waits: next action springs a stun and poison.",
-  "long": "A Survivalist trap waits underfoot: the next time this enemy acts, the trap springs - it is Stunned for a turn and Poisoned. Trap talents add crippling, bone-breaking Break damage, or wounds that refuse healing. A SNARE IS SET UNDER ONE ENEMY AND SPRINGS ONCE; a Deadfall is untargeted, takes whoever acts next, and springs three times over a fight with two turns of rest between.",
-  "see_also": [
-   "status_stunned",
-   "status_caught"
-  ]
- },
- {
-  "id": "status_caught",
-  "term": "Caught Fast",
-  "category": "statuses",
-  "short": "Cannot be healed.",
-  "long": "The trap's teeth hold the wound open: this unit cannot be healed at all - potions, spells, and regeneration all fail while it lasts.",
-  "see_also": [
-   "status_snared"
-  ]
- },
- {
-  "id": "status_quickdraw",
-  "term": "Quick Draw",
-  "category": "statuses",
-  "short": "All abilities act 50% faster.",
-  "long": "The Sharpshooter's Quick Draw hastens its bearer by 50% for several turns - every ability's next turn arrives sooner on the timeline. One of the boss-trophy abilities.",
-  "see_also": [
-   "initiative",
-   "boss_trophies"
-  ]
- },
- {
-  "id": "dmg_schools",
-  "term": "The Seven Schools",
-  "category": "damage",
-  "short": "Every attack carries one damage type; resists and weaknesses key off it.",
-  "long": "All damage in the game belongs to one of seven schools: Physical, Fire, Frost, Nature, Shadow, Arcane, and Holy. Each enemy resists some schools and is vulnerable to others - the same Fireball can be shrugged off by one warband and ruin another. Scouting a fight node on the map shows the warband's identity ('Resists / Soft to'); hovering a unit in battle shows its exact percentages.",
-  "see_also": [
-   "resists_vulns"
-  ]
- },
- {
-  "id": "dmg_physical",
-  "term": "Physical",
-  "category": "damage",
-  "short": "The steel school - most weapon attacks.",
-  "long": "The default school: swords, arrows, claws. Few enemies resist it outright and none are very soft to it - physical damage is reliable but rarely finds a weakness to exploit.",
-  "see_also": [
-   "dmg_schools"
-  ]
- },
- {
-  "id": "dmg_fire",
-  "term": "Fire",
-  "category": "damage",
-  "short": "The Pyromancer's school; Burn ticks are fire-typed.",
-  "long": "Fire burns twice: the hit itself, and the Burn it so often leaves behind - Burn ticks check fire resistance too. Fire is the counter the forest fears.",
-  "see_also": [
-   "status_burn",
-   "dmg_schools"
-  ]
- },
- {
-  "id": "dmg_frost",
-  "term": "Frost",
-  "category": "damage",
-  "short": "The Cryomancer's school of Chill and Freeze.",
-  "long": "Frost trades raw numbers for control: its hits Chill, and stacked Chill freezes. Several ranged enemy kinds are soft to it.",
-  "see_also": [
-   "status_chilled",
-   "status_frozen"
-  ]
- },
- {
-  "id": "dmg_nature",
-  "term": "Nature",
-  "category": "damage",
-  "short": "The Survivalist's school; Poison ticks are nature-typed.",
-  "long": "Venom, thorn, and rot. Poison ticks check nature resistance, so a nature-resistant enemy blunts a poison build twice - and forest wardens resist it heavily.",
-  "see_also": [
-   "status_poison",
-   "dmg_schools"
-  ]
- },
- {
-  "id": "dmg_shadow",
-  "term": "Shadow",
-  "category": "damage",
-  "short": "The Occultist's school of hexes and Ruin.",
-  "long": "The Old Gods' school: hexes, sigils, and Ruin detonations. A good share of the wilds' brutes and shamans are soft to shadow.",
-  "see_also": [
-   "status_ruin",
-   "status_umbral_sigil"
-  ]
- },
- {
-  "id": "dmg_arcane",
-  "term": "Arcane",
-  "category": "damage",
-  "short": "The Arcanist's school of raw magic.",
-  "long": "Raw magical force, fed by Resonance. Armored line-holders - shieldmasters and chiefs - tend to be soft to arcane where steel fails.",
-  "see_also": [
-   "res_resonance",
-   "dmg_schools"
-  ]
- },
- {
-  "id": "dmg_holy",
-  "term": "Holy",
-  "category": "damage",
-  "short": "The Cleric's rare school of smites.",
-  "long": "The rarest school - a handful of Cleric smites carry it. Little in the wilds resists the light.",
-  "see_also": [
-   "dmg_schools"
-  ]
- },
- {
-  "id": "resists_vulns",
-  "term": "Resists & Vulnerabilities",
-  "category": "damage",
-  "short": "Resists shrink a school's damage; vulnerabilities amplify it.",
-  "long": "A resistance removes that fraction of incoming damage of its school BEFORE armor is applied - 50% frost resist halves every frost hit. A vulnerability is the same dial pushed negative: 'Vulnerable: Fire +25%' means every fire hit lands 25% harder. Armor then reduces what remains (never beyond 85%), and every hit that connects deals at least 1 damage. Warband resists are worth scouting on the map before you commit to the fight.",
-  "see_also": [
-   "dmg_schools",
-   "status_elem_weak"
-  ]
- },
- {
-  "id": "res_rage",
-  "term": "Rage",
-  "category": "resources",
-  "short": "The Warrior's fuel: builds in the fight, spent on his heaviest blows.",
-  "long": "Warriors start every battle at 0 Rage (cap 100) and build it by fighting: +5 at each turn start, +10 every time they are hit, and more from rage-generating attacks like Strike. Their strongest abilities spend it. A Warrior who has been in the thick of it longest hits the hardest.",
-  "see_also": [
-   "res_mana"
-  ]
- },
- {
-  "id": "res_mana",
-  "term": "Mana",
-  "category": "resources",
-  "short": "The casters' pool: regenerates slowly, restored by potions and victories.",
-  "long": "Mage, Cleric, and Hunter abilities spend Mana (cap 100). It regenerates +12 at each turn start (the Mage's Evocation nearly doubles that), and potions and victory relics refill it between fights. Unlike Rage it carries over between battles - a drained Cleric stays drained until the party recovers.",
-  "see_also": [
-   "res_rage",
-   "node_types"
-  ]
- },
- {
-  "id": "res_resonance",
-  "term": "Resonance",
-  "category": "resources",
-  "short": "The Arcanist's stacks: UNCAPPED, permanent, and compounding both ways.",
-  "long": "Damaging casts build Resonance - 1 per cast, 2 on a crit - and it has NO MAXIMUM. Nothing removes it either: no decay, no cap, no reset, and it persists to the end of the battle. The bonuses COMPOUND rather than scaling per stack: at N stacks the damage bonus is 1.5% x N(N+1)/2 and the damage TAKEN penalty is 0.75% x N(N+1)/2, both uncapped, plus a flat +1% crit chance per stack. So 5 stacks is +22% damage and +11% taken; 8 is +54%/+27%; 12 is +117%/+59%; 16 is +204%/+102%. That curve IS the Arcanist - nothing early, everything late: at five stacks he is weaker than a flat per-stack ramp would make him, and by twelve he has roughly doubled while taking half again as much. TWO things remove Resonance and both must be EARNED - he starts with neither, and they are deliberately different shapes. STABILIZE (a boss-pool pick) VENTS everything above 2 for Mana and a short damage shield: the escape hatch from the escalation. ARCANE BOLT (a draft card) spends it as damage - 15% of Attack per stack, and then HALVES what he holds, so the curve keeps compounding from where it lands instead of restarting. One is a way out; the other is a change of slope.",
-  "see_also": [
-   "dmg_arcane",
-   "crit"
-  ]
- },
- {
-  "id": "res_mercy",
-  "term": "Mercy",
-  "category": "resources",
-  "short": "The Holy cleric's stacks, earned when allies fall into danger.",
-  "long": "Whenever any party member drops below half health, the Holy cleric gains a stack of Mercy (cap 5). Each held stack adds +5% to all healing done, and stacks are the fuel for Empowering casts. Mercy rewards the healer who waits for the moment of need.",
-  "see_also": [
-   "res_empower"
-  ]
- },
- {
-  "id": "res_empower",
-  "term": "Empower",
-  "category": "resources",
-  "short": "Spend a Mercy stack to supercharge the next Holy cast.",
-  "long": "The Holy cleric can arm an Empower (E in battle), spending 1 Mercy to supercharge the next Heal, Renewal, Hymn, Resurrection, or Divine Plea - Resurrection, for one, returns the fallen at FULL health. An Empowered cast forgoes its Perfect skill-check bonus; the surge replaces finesse.",
-  "see_also": [
-   "res_mercy",
-   "skill_check"
-  ]
- },
- {
-  "id": "res_faith",
-  "term": "Faith",
-  "category": "resources",
-  "short": "The Devout's gift: stacks that grow on shielded allies and on holy ground, and pay off the deepest count you have held.",
-  "long": "Faith lives mostly on the Devout's ALLIES - but he carries it too, and HIS never releases: his count holds at 5, paying him exactly what it pays everyone else. Under BINDING OATH every ally release swears him another. Two things build it for everyone: every hit a Divine Shield absorbs builds TWO stacks on its bearer, and every ally standing on Consecrated Ground gains one at the start of their turn (cap 5). WHAT A STACK IS WORTH IS PAID ON THE HIGHEST COUNT YOU HAVE HELD THIS BATTLE, not on the count you hold right now - so a release never takes the benefit away, and Faith is a high-water mark rather than a balance. Each of those stacks grants 2% damage reduction and +1.5% damage dealt; APOSTLE adds another 1x and FERVOR another again while the carrier stands on Consecrated Ground, so the two together make a stack worth TRIPLE - 6% and +4.5% - and never quadruple, because the nodes add to the base rather than multiplying each other. At 5 an ALLY'S Faith releases - a heal of 15%+ max HP - and the COUNT resets to build again while the high-water mark stands. Every release also makes the Devout himself a little bigger: his maximum health rises 3% for the rest of the battle and he is healed for the same amount, so the more his shields are tested, the more there is to shield with. The high-water mark is per-battle: the next fight opens at zero.",
-  "see_also": [
-   "res_mercy"
-  ]
- },
- {
-  "id": "res_focus",
-  "term": "Focus",
-  "category": "resources",
-  "short": "The Sharpshooter's aim: builds on one target, lost on switching.",
-  "long": "Every attack on the SAME target builds +20 Focus and THE METER HAS NO CEILING; switching targets dumps it to zero, and a kill banks up to 50 toward the next mark (all of it under Overkill). THE PAYOFF CONVERTS AT 100: the first 100 points each grant +0.5% critical chance, and every point beyond 100 grants +0.5% of critical MULTIPLIER instead - so Lethal Aim's x2 becomes x2.5 at 200 Focus and x3 at 300, and it never stops paying. Patience buys certainty first, then force. Deep Focus moves that conversion point down to 60; Spray of Arrows is the one talent that still imposes a ceiling, at 50. Coup de Grace spends the whole meter but reads at most 200 points of it, and the One Shot capstone fires at 200.",
-  "see_also": [
-   "crit",
-   "status_quickdraw"
-  ]
- },
- {
-  "id": "pack_bond",
-  "term": "Pack Bond",
-  "category": "combat",
-  "short": "The Beastmaster's passive: each active beast grants its own boon.",
-  "long": "Every beast the Beastmaster fields grants a boon that scales with its Loyalty - Ursus draws enemy attacks and blunts what reaches the hunter, Canis sharpens him against wounded prey, Aguila lifts the whole party's crit chance. The boon is x(1 + 0.20 per Loyalty stack) and it has no ceiling. HE NORMALLY FIELDS ONE BEAST; under THE PACK capstone he fields TWO AT ONCE, each with its own Loyalty meter, and BOTH boons apply at FULL strength - a swap then replaces whichever of the two holds LESS Loyalty, so the deeper bond always keeps its place (a tie falls to the older). Menagerie keeps an absent beast's boon alive at half strength, and Vengeance carries a dead one's for the rest of the battle. Lone Bond is the opposite bargain and closes The Pack outright: one beast, arriving deep, growing twice as fast.",
-  "see_also": [
-   "res_loyalty"
-  ]
- },
- {
-  "id": "overburn",
-  "term": "Overburn (Pyromancer)",
-  "category": "combat",
-  "short": "The Pyromancer is paid for every turn of Burn standing on the enemy team.",
-  "long": "The Pyromancer has no bar of his own - his power is the FIRE ALREADY ON THE BOARD. Two clauses. BONUS: he deals +2% more damage for every remaining turn of Burn standing across the whole enemy team, up to +40%. One enemy burning for six turns feeds him exactly as hard as six burning for one. REFUND: every turn of Burn he CONSUMES hands him back 1 Mana - Detonation, Wildfire, Cinderfall and Ember Debt all pay it, because the refund belongs to the passive rather than to any one ability. HOLDING FIRE COSTS HIM NOTHING. What makes him a commitment spec is that his damage is DEFERRED: Burn ticks are small, Detonation pays 250% of the bank it empties, and turns spent lighting fires are turns not spent killing - he is weak until he cashes in.",
-  "see_also": [
-   "status_burn",
-   "dmg_fire",
-   "res_mana"
-  ]
- },
- {
-  "id": "enemy_intent",
-  "term": "Enemy Intent",
-  "category": "combat",
-  "short": "Every enemy shows what it is about to do, and it can be denied.",
-  "long": "Each enemy picks its next action the moment its turn ends - and every enemy picks once before the first turn of a fight - then shows that choice until it acts. The icon appears twice: under the enemy's portrait in the turn bar (on its next turn's slot only) and on its nameplate, where it is written out. Seven categories: Strike (single-target damage), Sweep (an attack that hits the whole party or several of it), Crush (more Break damage than health damage), Afflict (applies a status, and the status is named), Bolster (buffs, wards or cleanses its own side), Mend (heals) and Wind-up (a charged blow landing on a later turn, with the turns remaining).\n\nNO DAMAGE NUMBER IS SHOWN, deliberately. The only honest preview would be one produced by the same code the real hit runs, and that code cannot be run twice for the same answer - it rolls damage variance and a critical on the way through. A number worked out a second way would drift from the ability it claims to describe, so the category and the ability's own name are shown instead.\n\nA DECLARED ACTION CAN BE DENIED, and that is the point. Stun, Freeze, Break or hold the enemy and the announced action is DISCARDED - not saved for later, exactly as cancelling a wind-up has always worked. Hysteria, Bewitch and Psychosis take the turn the same way. Two softer cases: kill the target it named and it re-targets WITH THE SAME ABILITY (the plan holds, only the victim changes); leave it unable to pay for the ability and it falls back to its basic attack, and the combat log says so rather than substituting in silence.",
-  "see_also": [
-   "pressure_break",
-   "initiative"
-  ]
- },
- {
-  "id": "res_loyalty",
-  "term": "Loyalty",
-  "category": "resources",
-  "short": "The Beastmaster's bond, built per beast, uncapped, lost with it.",
-  "long": "Each living beast builds Loyalty at the hunter's turn start, and there is NO CEILING on it. Every stack is +5% companion strike damage plus that beast's own gift, and the Pack Bond boon itself climbs continuously with the meter - x(1 + 0.20 per stack), so x2 at five, x3 at ten, x5 at twenty, and it never plateaus. Exactly one talent still imposes a cap: Wild Rotation holds it at 3, and that is the price of swapping freely. A beast's death wipes its Loyalty - the bond dies with it, and that is the whole stake of the partnership. It also decides who leaves: under The Pack a third summon replaces whichever standing beast holds LESS Loyalty (a tie falls to the older), so depth is never traded away for a fresh arrival.",
-  "see_also": [
-   "boss_trophies"
-  ]
- },
- {
-  "id": "res_ruin",
-  "term": "Ruin (Occultist)",
-  "category": "resources",
-  "short": "The Occultist's meter lives on the enemy, as Ruin stacks.",
-  "long": "The Occultist has no bar of their own - their power accumulates on ENEMIES as stacks of Ruin - 2 for every debuff they apply - with no ceiling and no expiry. See the Ruin status for what the mark does and how it detonates.",
-  "see_also": [
-   "status_ruin"
-  ]
- },
- {
-  "id": "talent_lanes",
-  "term": "Talent Lanes",
-  "category": "progression",
-  "short": "Three lanes crossed by eight rows, plus a capstone shelf at row 9.",
-  "long": "Each spec's tree is three themed LANES crossed by eight ROWS, plus a capstone shelf at row 9 - 27 CELLS in all. A ROW HOLDS ONE NODE PER LANE AND YOU EQUIP EXACTLY ONE for a run: the other two are shut until the run ends. ROW 8 is the node that only matters once the rest of the lane is bought - it reads what the lane has accumulated, removes a constraint it has worked around, or converts its currency into something new. It is never a bigger version of a node above it. The CAPSTONE SHELF is one per hero, ever, from any lane, and it sits behind difficulty 2.",
-  "see_also": [
-   "talent_cost",
-   "talent_points"
-  ]
- },
- {
-  "id": "talent_cost",
-  "term": "Tier Costs",
-  "category": "progression",
-  "short": "A cell costs by tier: rows 1-3 cost 1 point, 4-6 cost 2, 7-9 cost 3.",
-  "long": "Unlocking a cell costs by the tier its row sits in: rows 1-3 cost 1 point, rows 4-6 cost 2, rows 7-9 cost 3. Twenty-seven cells is 54 POINTS TO FILL ONE SPEC, which at 3 points a completed run is eighteen completions. Points are freely reassignable between runs at no cost - pull one back out and put it somewhere else, or respec the whole spec - and never during a run. The real price of a pick is still the two doors it closes in that row.",
-  "see_also": [
-   "talent_lanes",
-   "talent_points"
-  ]
- },
- {
-  "id": "talent_points",
-  "term": "Talent Points",
-  "category": "progression",
-  "short": "Earned per spec, per zone boss, and banked forever. A run pays none.",
-  "long": "Talent points are PERMANENT META PROGRESSION. You earn 1 PER SPEC PER ZONE BOSS DEFEATED - three zone bosses, so 3 a spec for a completed run, and a run that dies in zone 2 still banks 1 or 2. Only the specs that were in the party earn. Points are per spec and never transfer, and they bank without limit. NOTHING IN A RUN AWARDS ONE: fights, elites and mini-bosses pay gold and their own spoils, and the END BOSS pays a relic. Spent between runs on the Talents screen.",
-  "see_also": [
-   "talent_cost",
-   "elites"
-  ]
- },
- {
-  "id": "boss_trophies",
-  "term": "Boss Trophies",
-  "category": "progression",
-  "short": "Each zone boss grants every hero a new ability from their spec pool.",
-  "long": "Felling a zone boss lets EVERY hero claim a trophy: one new ability, offered as a pick from their own spec's pool on the Party screen. All twelve specs carry a pool (one to five abilities deep). The end boss instead leaves a relic and gold - the run's final prize.",
-  "see_also": [
-   "talent_points",
-   "relics_vs_runes",
-   "ability_upgrades"
-  ]
- },
- {
-  "id": "ability_upgrades",
-  "term": "Ability Upgrades",
-  "category": "progression",
-  "short": "Every mini-boss hands each hero one; the blacksmith sells more.",
-  "long": "Clearing a MINI-BOSS awards every hero an ability upgrade - a pick of three, resolved on that hero's map card. An upgrade is a permanent change to ONE ability the hero already owns, and it lasts the rest of the run. There are eight: HONED (+50% damage), QUICKENED (-2 turns of cooldown, minimum 0), EFFORTLESS (costs no Rage / Mana / Focus - Mercy is unaffected), SWIFT (arrives 25% sooner), WEIGHTED (Break damage doubled), WIDENED (one more target, or one more hit), PIERCING (ignores half the target's armor) and CERTAIN (its status application always lands). Three mini-bosses a run means three upgrades per hero, twelve across the party - and the BLACKSMITH sells more on top of that, for gold. Upgrades STACK on a single ability - one ability can end a run Honed and Swift at once - but the SAME upgrade never comes twice to the same hero from a mini-boss. (The blacksmith is not that pool: it will sell you a second Honed for a different ability, and buying one never uses up a mini-boss pick.) They apply LAST, after talents and after equipped runes, so an upgrade always wins over a talent that sets the same field. You are only ever offered an upgrade that has something to change: Honed is never offered on a heal, Effortless never on a free ability, Weighted never on something that deals no Break damage, Widened never on a single-target attack (nor on an area attack, which already hits everything), Certain never on a status that already always lands. Because three are drawn from eight, any one upgrade turns up about half as often as it used to - a hero can finish a run having never been offered the one their build wanted, which is the variety working rather than a fault. An upgraded ability wears a gold diamond on its button in battle and on its chip on the hero sheet; hovering it names the upgrades.",
-  "see_also": [
-   "boss_trophies",
-   "talent_points",
-   "bargain",
-   "blacksmith"
-  ]
- },
- {
-  "id": "node_scaling",
-  "term": "Node Scaling",
-  "category": "progression",
-  "short": "Every combat win makes the party permanently stronger this run.",
-  "long": "Each battle won grants every hero +2% of their base Attack and HP for the rest of the run. Enemies climb their own ladder - roughly +2% Attack and +2.5% HP per slot, with a hard jump between zones - so the party and the map rise together, and every slot fought feeds the curve. A route that takes more fights arrives stronger; a route that takes fewer arrives sooner.",
-  "see_also": [
-   "zones_tiers",
-   "elites"
-  ]
- },
- {
-  "id": "runes",
-  "term": "Runes",
-  "category": "gear",
-  "short": "This run's gear: three slots per hero, from the first step.",
-  "long": "Runes are equippable power for a single hero, found at the Peddler and in elite spoils (a pick of three). Every hero carries three slots from the run's start. A rune's scope limits who can wear it - universal, one class, or one spec - and its rarity tells you its KIND, not just its size: common runes are flat stats, rares alter an ability you own or act like an extra talent, epics grant whole abilities or break a rule. Runes vanish with the run.",
-  "see_also": [
-   "scarred_runes",
-   "relics_vs_runes"
-  ]
- },
- {
-  "id": "scarred_runes",
-  "term": "Scarred Runes",
-  "category": "gear",
-  "short": "Crimson bargains: real power with a cost carved in.",
-  "long": "A Scarred rune (crimson name) is a rare or epic with a drawback baked into it - more power than its clean cousin would dare, priced cheaper, and the cost is always written in the text. Read them twice; some scars are worth wearing.",
-  "see_also": [
-   "runes"
-  ]
- },
- {
-  "id": "relics_vs_runes",
-  "term": "Relics vs Runes",
-  "category": "gear",
-  "short": "Relics outlive the run; runes die with it.",
-  "long": "The two are easy to confuse and could not be more different. RELICS are permanent: every zone boss you fell unlocks one FOREVER, and at the draft you choose up to 3 unlocked relics to carry - party-wide effects for the whole run. RUNES are of the run: bought and found along the way, worn by one hero, and gone the moment the run ends - by death or by victory. When you wipe, the relic you unlocked stays; the runes you were wearing do not.",
-  "see_also": [
-   "runes",
-   "wipe"
-  ]
- },
- {
-  "id": "consumables",
-  "term": "Consumables",
-  "category": "gear",
-  "short": "The party's shared satchel, used in battle.",
-  "long": "Five items, shared by the whole party and used in battle (press ALT or use the Items action): Health Potion (40 HP), Mana Potion (40 Mana or Rage), Bomb (50 damage to all enemies), Revive Potion (raise a fallen ally at 50% HP), and Defense Potion (+10% armor to the party, 3 turns). Loot nodes, shops, and elite spoils refill the satchel.",
-  "see_also": [
-   "fallen",
-   "node_types"
-  ]
- },
- {
-  "id": "zones_tiers",
-  "term": "Zones & Tiers",
-  "category": "run",
-  "short": "Three zones, each a generated 16-slot map to its boss.",
-  "long": "A run is three zones and 48 encounters. Each zone is a GENERATED MAP, not a road: 16 slots deep and three rows wide, branching from slot 1 to slot 7, converging on the MINI-BOSS at slot 8, branching again to slot 15, and converging on the ZONE BOSS at slot 16. You walk one node per column - 14 free encounters plus the two that everything funnels into. Enemies grow with every slot and take a hard step up each zone; killing a boss fully restores the party and sends you into the next zone. The third boss ends the run in victory.",
-  "see_also": [
-   "node_types",
-   "node_scaling",
-   "wipe"
-  ]
- },
- {
-  "id": "node_types",
-  "term": "Map Nodes",
-  "category": "run",
-  "short": "Fight, Elite, Smith, Trade and ??? - three ways forward, hover to scout.",
-  "long": "Five kinds stand on the map. FIGHT nodes are battles - hover one to scout its warband and what it resists. ELITE nodes are harder fights with the best rewards on the board. SMITH is the blacksmith, who sells one ability upgrade for gold. TRADE is the Peddler, with potions and runes. ??? is an event, and it does not say which kind it is until you are standing on it. The MINI-BOSS at slot 8 and the BOSS at slot 16 are unavoidable; everything else is a route you chose. NOTHING IS GUARANTEED ON A ROUTE. A zone holds 6 elites, 6 smiths, 5 peddlers and 5 events, but you walk 14 nodes out of about 40 - route past every smith and you get no smith that zone. Edges only ever reach the same row or the one next to it and they never cross, so a step down closes the corridor above you for the next three or four columns. That is what makes a fork a decision instead of a detour.",
-  "see_also": [
-   "elites",
-   "blacksmith",
-   "merchant",
-   "events",
-   "zones_tiers"
-  ]
- },
- {
-  "id": "elites",
-  "term": "Elites",
-  "category": "run",
-  "short": "The map's hardest fights - and its best paydays. Zero to three a zone.",
-  "long": "Six ELITE nodes stand in every zone, never two in adjacent columns and never in column 1. You will not meet them all: a route takes about two, a route that hunts them takes three or four, and a route that ducks every one takes NONE. Tougher warbands, often led by a chief. The payout is the run's snowball engine - 80-100 gold, 1 talent point per hero, a consumable, and a rune cache where one hero picks one of three runes. A bargain is offered at the door of every one. Skipping them all is a real option and a weak one: an elite you did not fight is a talent point and a rune you do not have.",
-  "see_also": [
-   "talent_points",
-   "runes",
-   "node_scaling",
-   "bargain"
-  ]
- },
- {
-  "id": "blacksmith",
-  "term": "The Blacksmith",
-  "category": "run",
-  "short": "Buys one ability upgrade with gold. Six on the map, about two on your route.",
-  "long": "A SMITH node sells ABILITY UPGRADES - the same eight the mini-boss awards, on the same abilities, with the same rules about what fits what. Three pairings on the counter, one hero each; you buy ONE and the visit is over. Gold only: no health cost, no second currency. The price scales with the zone - 150, then 225, then 300 - so late gold still has somewhere to go. An upgrade bought here does NOT use up a mini-boss pick, and it does not stop a mini-boss offering the same upgrade later: you may buy Honed twice in a run on two different abilities. The one thing you can never do is put the same upgrade on the same ability twice. Six smiths stand in every zone and a route walks about two, so a run that wants them has to be routed toward them.",
-  "see_also": [
-   "ability_upgrades",
-   "node_types",
-   "merchant"
-  ]
- },
- {
-  "id": "merchant",
-  "term": "The Peddler (Trade)",
-  "category": "run",
-  "short": "A shop you can see coming, and plan to arrive at with gold.",
-  "long": "The Peddler used to turn up after a won fight, about two fights in five. Now they stand on the map as a TRADE node - five a zone, about two on a route - so a shop is something you route toward with gold in hand rather than something that happens to you. The stock is unchanged: potions, and one rune offered to each hero who has a free slot. The only merchant that still follows a fight is the one a severity-4 BARGAIN pays out, and that one was bought with a modifier.",
-  "see_also": [
-   "node_types",
-   "blacksmith",
-   "runes",
-   "bargain"
-  ]
- },
- {
-  "id": "bargain",
-  "term": "The Bargain",
-  "category": "run",
-  "short": "Three offers before every elite and mini-boss: a modifier plus a reward.",
-  "long": "Before every ELITE and every MINI-BOSS - one to four a zone now that elites are routed to rather than fixed, and never before a plain fight or a boss - the road stops and offers three bargains. Each is one MODIFIER plus one REWARD, both shown before you choose. There is no decline: one of the three is taken. The modifier is the price and binds the coming battle only; the reward pays ON VICTORY, which is why 'a merchant follows the fight' is a reward you have to earn rather than a shop you walk into. Lose the fight and you paid the price for nothing. The offer screen shows the warband you are about to face and your party's health alongside the three cards, because choosing a severity-4 bargain at 30% health should be a decision, not a surprise.",
-  "see_also": [
-   "modifier",
-   "severity",
-   "elites"
-  ]
- },
- {
-  "id": "modifier",
-  "term": "Modifier",
-  "category": "run",
-  "short": "A condition binding BOTH parties for one battle.",
-  "long": "A modifier is a rule change that holds for exactly one battle and binds BOTH PARTIES - never just yours and never just theirs. Under Feverish everyone deals 25% more damage; under Bloodless nobody heals, on either side. That symmetry is the whole design: a modifier is a change to the fight, not a difficulty slider, so 'no items this fight' is not a modifier that exists because the enemy carries none. There are twenty, weighted toward the mild end because the safe slot on every bargain draws from that end and is therefore what you see most. The modifier is stamped on every combatant when the fight begins - a companion summoned mid-battle is bound by it too - and it is gone the moment the fight ends.",
-  "see_also": [
-   "bargain",
-   "severity"
-  ]
- },
- {
-  "id": "severity",
-  "term": "Severity",
-  "category": "run",
-  "short": "1-4: how harsh a modifier is, and the only thing the reward reads.",
-  "long": "Every modifier carries a severity of 1 to 4, shown as pips on its bargain card. The REWARD TABLE READS SEVERITY AND NOTHING ELSE: a 1 pays 40 gold, a 2 pays 80 gold or a potion, a 3 pays 140 gold or a rune, a 4 pays 220 gold, a rune, or a merchant after the fight. Severity is FLAT and deliberately ignores your party: a modifier that happens to be cheap for your build is a good deal you earned by building that way, and a severity that read the party would quietly tax every build for being good at something. EVERY OFFER HOLDS AT LEAST ONE OPTION OF SEVERITY 1 OR 2, guaranteed by how the cards are dealt rather than by luck, so a party on its last legs always has a survivable choice - and the other two cards are always 3s and 4s, so every bargain reads the same way: one safe option, two gambles.",
-  "see_also": [
-   "bargain",
-   "modifier"
-  ]
- },
- {
-  "id": "events",
-  "term": "Events (???)",
-  "category": "run",
-  "short": "??? - a trade, a gift, or a toll. You will not know which until you arrive.",
-  "long": "Five ??? nodes stand in every zone, and all three kinds wear the same icon. Most are TRADEOFFS: two or three conversions of one resource into another - health for a rune, gold for maximum health, health for talent points - at a rate you take or decline, and DECLINING IS ALWAYS ONE OF THE BUTTONS. Some are BOONS, a straight gift at no cost. A few are BANES, a straight cost with nothing to choose. The three are indistinguishable on the map on purpose: a node that announced itself as a bane would simply never be walked onto. No bane can kill a hero or take anyone below 1 HP - it costs a resource, never a run.",
-  "see_also": [
-   "node_types",
-   "blacksmith"
-  ]
- },
- {
-  "id": "wipe",
-  "term": "The Wipe",
-  "category": "run",
-  "short": "All four down ends the run - relics and the chronicle survive.",
-  "long": "When the whole party falls, the run is over: gold, talents, runes, items, and the map are all lost. Two things survive every death - the RELICS you have unlocked (yours forever, pickable at the next draft) and the chronicle of cycles survived and lost. The run summary lays out how the attempt ended and what the party had built; the next climb starts wiser.",
-  "see_also": [
-   "relics_vs_runes",
-   "fallen"
-  ]
- },
- {
-  "id": "difficulty",
-  "term": "The Road (Difficulty)",
-  "category": "run",
-  "short": "Standard, or the gentler Wanderer's road - chosen at the draft.",
-  "long": "At the draft you choose the road: STANDARD is the game as designed; WANDERER softens every enemy to 70% of its strength. Wanderer exists so any tester can see all three zones and the finale - take it without shame, the game is being tuned and your eyes on the later zones are worth more than your pride.",
-  "see_also": [
-   "zones_tiers"
-  ]
- },
- {
-  "id": "talent_unlock",
-  "term": "Unlock vs Equip",
-  "category": "progression",
-  "short": "Buying a cell unlocks an OPTION. It does not equip it.",
-  "long": "This is the distinction the whole talent system rests on. BUYING a cell spends points and unlocks it forever. EQUIPPING is a separate act: you still take ONE node per row, and it locks for the whole run the moment your spec is confirmed. Owning all three cells in a row makes that row a real three-way argument; owning one leaves no argument in it. That is why filling a tree makes your choices better rather than making them for you.",
-  "see_also": [
-   "talent_lanes",
-   "talent_cost",
-   "talent_rows"
-  ]
- },
- {
-  "id": "talent_rows",
-  "term": "Row Unlocks",
-  "category": "progression",
-  "short": "Rows open by beating the END BOSS: 1-3 at difficulty 1, 4-6 at 2, 7-9 at 3.",
-  "long": "A fresh save has NO ROWS, no points and no talents at all. Beating the end boss on difficulty 1 opens rows 1-3; difficulty 2 opens 4-6; difficulty 3 opens 7-9, the capstone shelf with them. ROW UNLOCKS ARE GLOBAL - they apply to every spec at once, unlike points, which are per spec. A tier arrives FULLY unlocked, so beating difficulty 2 makes all nine cells of rows 4-6 buyable at once. That is what an uncapped bank is for.",
-  "see_also": [
-   "talent_points",
-   "difficulty_ladder",
-   "end_boss"
-  ]
- },
- {
-  "id": "difficulty_ladder",
-  "term": "The Difficulty Ladder",
-  "category": "run",
-  "short": "Three rungs, chosen at the draft. Each above the first adds a named twist.",
-  "long": "The road has three rungs. WANDERER is the opening rung, tuned below the rest so an untalented party can meet it. WARDEN raises the enemies and RAISES THE SEVERITY FLOOR - the guaranteed mild bargain option gets less mild. RUIN raises both again and adds the second twist: FIXED ENCOUNTERS CARRY A MODIFIER, so the mini-boss and every boss - the nodes a route cannot duck - fight under one. Beating the END BOSS on a rung is what opens that tier of the talent tree, for every spec at once.",
-  "see_also": [
-   "talent_rows",
-   "end_boss",
-   "modifier",
-   "severity"
-  ]
- },
- {
-  "id": "end_boss",
-  "term": "The End Boss",
-  "category": "run",
-  "short": "A fourth boss after zone 3. Awards a relic, no points, and opens talent rows.",
-  "long": "Three ZONE BOSSES pay a talent point apiece; after the third zone stands THE END BOSS, the forty-ninth encounter. It is FIXED rather than drawn from a pool, so it can be learned, and it GAINS STATS AND MECHANICS WITH DIFFICULTY - a fourth ability at rung 2 and a fifth at rung 3. It always awards a relic. It awards NO talent points and no ability pick, because nothing follows it. What it does award is the tier of talent rows matching the rung you beat it on.",
-  "see_also": [
-   "talent_rows",
-   "difficulty_ladder",
-   "relics_vs_runes"
-  ]
- },
- {
-  "id": "ability_draft",
-  "term": "The Ability Draft",
-  "category": "progression",
-  "short": "New abilities offered three at a time by elites, merchants and events.",
-  "long": "Beside the zone-boss pick sits a second, larger source of abilities. EVERY ELITE OFFERS ONE ON VICTORY, to one hero; a MERCHANT sells one for gold (120 / 180 / 240 by zone); and some EVENTS trade for one. Every offer is three cards the hero does not already own, drawn from that spec's draft pool with roughly one card in four coming from a wider class-wide pool. If the pool cannot fill three it FILLS SHORT rather than repeating itself. Elites run 0-3 per zone, so how much you draft is a property of the road you walked: a greedy route drafts far more than a cautious one. DECLINING IS ALWAYS ALLOWED, and a declined or dropped ability does not come back to that run's pool.",
-  "see_also": [
-   "ability_slots",
-   "protected_core",
-   "boss_trophies",
-   "ability_upgrades",
-   "hits_not_casts"
-  ]
- },
- {
-  "id": "class_draft",
-  "term": "Class-Wide Abilities",
-  "category": "progression",
-  "short": "Roughly one draft card in four is drawn from a pool the whole CLASS shares.",
-  "long": "Every draft offer mixes two pools. Most cards come from your SPEC's own pool; roughly ONE IN FOUR comes from a CLASS-WIDE pool that every spec of that class draws from - so a Pyromancer, a Cryomancer and an Arcanist can all be offered Magic Barrier. They are deliberately UNTIED AND GENERAL: a class card would not read as off-theme for any spec of the class, which is why it is Magic Barrier and not Frostbolt. AND THEY ARE WEAKER THAN SPEC ABILITIES, ON PURPOSE - but unconditional. A class card feeds no passive: a barrier does nothing for Overburn, a heal does nothing for Ruin. If they were as strong as spec cards they would be the safe default in every build, and every hero would end up holding the same six. Slightly weaker but always-on makes them the pick you take when your spec's engine is not online yet, which is a real and different role. ALL FOUR CLASS POOLS ARE WRITTEN, six abilities apiece, so the class card in an offer draws a real entry for every hero in the game.",
-  "see_also": [
-   "ability_draft",
-   "ability_slots",
-   "protected_core",
-   "boss_trophies"
-  ]
- },
- {
-  "id": "ability_slots",
-  "term": "Ability Slots",
-  "category": "progression",
-  "short": "A kit holds seven abilities. Past that, taking one means dropping one.",
-  "long": "A hero's kit has room for SEVEN abilities, and the protected core counts against it - so most specs open with 3 filled and 4 to fill. AT THE CAP AN OFFER BECOMES TAKE-ONE-AND-DROP-ONE: you pick the incoming ability and then name which of your EARNED abilities it replaces. Only earned abilities can be named; the protected core never can. A dropped ability does not return to that run's pool, so the choice is real. The cap binds every source alike - a zone-boss pick at seven slots asks for a drop exactly as a drafted card does.",
-  "see_also": [
-   "ability_draft",
-   "protected_core",
-   "boss_trophies",
-   "hits_not_casts"
-  ]
- },
- {
-  "id": "protected_core",
-  "term": "Protected Abilities",
-  "category": "progression",
-  "short": "The passive, the basic attack, and whatever the passive needs to work.",
-  "long": "Every spec keeps a PROTECTED CORE: its passive, its basic attack, and the minimum abilities its passive cannot function without. Protected abilities CAN NEVER BE DROPPED, which is what stops the seven-slot cap from breaking a spec - a Pyromancer can never trade away the Detonation that Overburn exists to spend, and a Beastmaster can never trade away the summons Pack Bond reads. The minimum varies by spec rather than following a rule: Overburn needs a Burn applier AND a spender, while the Berserker's Blood Frenzy reads nothing but his own health bar and needs no ability at all.",
-  "see_also": [
-   "ability_slots",
-   "ability_draft"
-  ]
- }
+	{
+		"id": "initiative",
+		"term": "The Initiative Timeline",
+		"category": "combat",
+		"short": "Faster abilities bring your next turn sooner.",
+		"long": "Turn order is a clock, not a queue: after acting, a unit's next turn arrives in Initiative-cost x 100 / EFFECTIVE Speed ticks - effective, so every speed change really does bend it. Every ability lists its Initiative cost (a basic action costs 2.0) - a cheap, quick ability means you act again sooner, a heavy one leaves you exposed longer. Slowed cuts speed a quarter; Chilled cuts it a quarter at one stack and a half at two or more, so a chilled enemy genuinely waits longer between turns; Quick Draw shrinks the wait. The opening roll of the battle reads effective speed too, so a fight that starts with everyone Chilled or Frenzied starts in the order that implies. Losing a turn to Stun, Freeze, or Break still pushes the clock forward a full basic action - but a Cryomancer's Glacial Hold is not a lost turn, it is removal: a held enemy leaves the bar entirely until he releases it. The bar across the top of the battle shows the coming turns; hovering an ability shows a gold ghost of where it would put your next one.",
+		"see_also": [
+			"skill_check",
+			"status_slow",
+			"status_chilled",
+			"glacial_hold"
+		]
+	},
+	{
+		"id": "skill_check",
+		"term": "The Skill Check",
+		"category": "combat",
+		"short": "Stop the sweeping marker in the center for a stronger action.",
+		"long": "Every action you take runs a timing check: a marker sweeps the bar (about 0.7s each way) - press SPACE or click to stop it. The gold center is PERFECT: +15% damage or healing, +25% Break damage, and many abilities add a unique bonus effect on top. The green band is Good: full normal effect. Outside both is Sloppy: only 60% damage and half the Break damage. The check never changes your chance to miss, be parried, or crit - it multiplies what lands. Your timing matters as much as your build.",
+		"see_also": [
+			"initiative",
+			"pressure_break"
+		]
+	},
+	{
+		"id": "pressure_break",
+		"term": "Pressure & Break",
+		"category": "combat",
+		"short": "Attacks fill a Break meter; a full meter costs the victim a turn.",
+		"long": "Alongside HP damage, most attacks carry Pressure - Break damage (BD) - which fills the target's Break meter (0-100). High Constitution shrinks incoming BD proportionally; crits deal 1.5x BD. The meter never drains on its own: it keeps climbing until it fills and the unit BREAKS - losing its next turn, dropping 30% of its armor, and taking +25% crit chance against it. When the Broken turn passes, the unit recovers and its meter empties back to zero. Breaking a boss also strips its immunity to stuns and mind magic for the duration.",
+		"see_also": [
+			"status_broken",
+			"skill_check"
+		]
+	},
+	{
+		"id": "crit",
+		"term": "Critical Hits",
+		"category": "combat",
+		"short": "10% base chance: 1.5x damage and 1.5x Break damage.",
+		"long": "Attacks have a 10% base chance to crit for 1.5x damage and 1.5x Break damage. A Broken target takes +25% crit chance from everyone. Many talents and spec mechanics push the roll further - the Sharpshooter's Focus adds +0.5% per point up to its conversion point (past which it buys critical MULTIPLIER instead), and Resonance stacks add a flat +1% each for the Arcanist. Only a few effects raise the 1.5x multiplier itself.",
+		"see_also": [
+			"status_broken",
+			"res_focus"
+		]
+	},
+	{
+		"id": "hits_not_casts",
+		"term": "Hits, Not Casts",
+		"category": "combat",
+		"short": "A multi-hit ability spends one charge and fires its on-hit effects PER STRIKE.",
+		"long": "Some abilities strike more than once from a single cast - three shots into one enemy, a volley, a flurry. WHEN ONE OF THOSE MEETS A CHARGE BANK OR AN ON-HIT EFFECT, EVERY STRIKE COUNTS SEPARATELY. Arcane Arrows banks five charges and each of the next five HITS forks into a second enemy - so a three-shot Aimed Volley spends THREE of the five and forks three times, not one and once. The same rule runs the other way: Mirror Image's images are spent one per incoming hit, so a three-strike blow eats three of them. A strike that MISSED or was BLOCKED spends nothing - a charge rides a blow that landed. This is a real power increase for multi-hit abilities and it is deliberate: it is what makes a multi-hit kit and a charge bank a BUILD rather than a coincidence. Area attacks are the exception that proves it - they roll no miss at all, so they never spend an image.",
+		"see_also": [
+			"ability_draft",
+			"class_draft",
+			"crit",
+			"pressure_break"
+		]
+	},
+	{
+		"id": "miss",
+		"term": "Missing",
+		"category": "combat",
+		"short": "5% base chance for any single-target attack to whiff.",
+		"long": "Single-target attacks miss 5% of the time at base. Being Dazed adds +20%, Blind adds +50%, and attacking an Elusive target adds +25%. Area attacks never miss. A miss deals nothing at all - no damage, no Break, no on-hit effects.",
+		"see_also": [
+			"status_dazed",
+			"status_blind",
+			"parry"
+		]
+	},
+	{
+		"id": "parry",
+		"term": "Parry",
+		"category": "combat",
+		"short": "A parried hit still lands, but at a quarter strength.",
+		"long": "Heroes parry incoming melee attacks 5% of the time at base (enemies 2.5%); talents, stances, and buffs raise it. A parried hit is not negated - it lands at 25% damage and 25% Break damage. Ranged attacks cannot be parried (unless a talent says otherwise), area attacks cannot be parried, and a Broken unit cannot parry at all.",
+		"see_also": [
+			"miss",
+			"status_broken"
+		]
+	},
+	{
+		"id": "stance",
+		"term": "Stance (Seasoned Fighter)",
+		"category": "combat",
+		"short": "The Swordmaster fights Aggressive or Defensive; three abilities switch him.",
+		"long": "Only the Swordmaster has stances, and he is always in one of two. AGGRESSIVE: +15% damage dealt and +10% damage taken. DEFENSIVE: 15% less damage taken and -10% damage dealt. He starts every battle Aggressive, and the stance resets with each new battle - it is never carried between fights. Several of his talents read it (Killing Edge sharpens the Aggressive guard, Bracing hardens the Defensive one, Untouchable makes a Defensive parry absolute), and THREE abilities change it: Guard Change, which does nothing but pivot and press the opening; and the two drafted cards, Precision Strike and Feint, which BRANCH on the stance they are cast from and then switch it. Both branch the same way round, and it is worth knowing: each branch buys what the stance he is ARRIVING in wants. Cast from Aggressive he lands in Defensive, so he is handed defence - a parry buff, or charges that answer blows. Cast from Defensive he lands in Aggressive, so he is handed offence - an armor bypass, or a strike and a misdirected enemy. He is never stranded mid-pivot.",
+		"see_also": [
+			"parry",
+			"crit"
+		]
+	},
+	{
+		"id": "fallen",
+		"term": "Fallen Heroes",
+		"category": "combat",
+		"short": "The dead sit the fight out - but victory brings everyone back at 20%.",
+		"long": "A hero at 0 HP falls: they lose every status, take no turns, and contribute nothing until raised. Mid-battle, a Revive Potion brings them back at 50% HP and the Cleric's Resurrection at 20-25%. If the party WINS the battle, the Untouched refuse to stay down: every hero - fallen or merely battered - leaves the fight with at least 20% of their max HP. Only losing everyone ends the run.",
+		"see_also": [
+			"wipe",
+			"consumables"
+		]
+	},
+	{
+		"id": "status_broken",
+		"term": "Broken",
+		"category": "statuses",
+		"short": "Loses next turn. -30% armor, +25% crit chance against this unit.",
+		"long": "The Break meter filled: this unit loses its next turn, its armor drops by 30%, everyone crits it +25% more often, and it can neither Block nor parry. A Broken boss also loses its immunity to stuns and mind magic. When the lost turn passes the unit recovers and its Break meter resets to zero - the window is short, so spend it hard.",
+		"see_also": [
+			"pressure_break"
+		]
+	},
+	{
+		"id": "status_stunned",
+		"term": "Stunned",
+		"category": "statuses",
+		"short": "Loses their next turn.",
+		"long": "A stunned unit skips its next turn entirely (statuses and cooldowns still tick during the skipped turn). Bosses are immune unless Broken. Sources include Pommel Strike, sprung traps, and some enemy attacks.",
+		"see_also": [
+			"status_broken",
+			"status_frozen"
+		]
+	},
+	{
+		"id": "status_slow",
+		"term": "Slowed",
+		"category": "statuses",
+		"short": "-25% speed; turns arrive later.",
+		"long": "Slowed cuts speed by 25%, which pushes every coming turn later on the initiative timeline. It does not stack with itself - reapplying just refreshes the longer duration.",
+		"see_also": [
+			"initiative",
+			"status_chilled"
+		]
+	},
+	{
+		"id": "status_chilled",
+		"term": "Chilled",
+		"category": "statuses",
+		"short": "Stacking frost: slower each stack; 4 stacks freeze solid.",
+		"long": "Chill stacks up to 4: one stack is -25% speed, two is -50%, three also cuts the victim's damage dealt by 15%, and the fourth FREEZES them. A new application resets the timer of the whole pile. Chill applied by a Cryomancer NEVER expires on its own, and his fourth stack is not a brief freeze but a Glacial Hold: the pile stays at 4 for as long as he holds the enemy, and drops to one lingering stack only when he releases it, so the next build starts warm.",
+		"see_also": [
+			"status_frozen",
+			"glacial_hold",
+			"dmg_frost"
+		]
+	},
+	{
+		"id": "status_frozen",
+		"term": "Frozen",
+		"category": "statuses",
+		"short": "Frozen solid: skips turns until the ice thaws.",
+		"long": "A frozen unit loses its turns until the freeze expires (it thaws one step during each skipped turn). Freezing comes from stacking Chilled to 4. Bosses are immune unless Broken. A freeze the CRYOMANCER causes is different: it never expires at all - see Glacial Hold.",
+		"see_also": [
+			"status_chilled",
+			"glacial_hold",
+			"status_stunned"
+		]
+	},
+	{
+		"id": "glacial_hold",
+		"term": "Glacial Hold",
+		"category": "statuses",
+		"short": "The Cryomancer's freeze: indefinite, and only he can end it.",
+		"long": "The Cryomancer's passive. Four stacks of his Chilled put an enemy in a HOLD rather than a brief freeze: it leaves the turn order entirely and stays there INDEFINITELY. Nothing thaws it by accident - not damage from your allies, not his own Blizzard, not the passing of turns, not an enemy Cleansing Rite. It ends only when he ends it: Ice Lance on the held enemy, the Shatter capstone (which breaks every hold at once), or a new freeze past his limit, which frees the oldest. He holds ONE enemy, two with Second Prison, any number under Absolute Zero; Cryoclasm moves a hold to a different enemy without spending it. A held enemy takes +15% damage from EVERY source (+30% with Killing Frost), so the hold is a party-wide damage window as well as a lockdown. A released enemy comes back on 1 stack of Chilled. BOSSES: they resist the freeze until Broken, and a held boss shrugs the ice off after one turn.",
+		"see_also": [
+			"status_chilled",
+			"status_frozen",
+			"initiative",
+			"dmg_frost"
+		]
+	},
+	{
+		"id": "status_frostbite",
+		"term": "Frostbite",
+		"category": "statuses",
+		"short": "Healing received reduced by 50%.",
+		"long": "Frostbitten flesh knits badly: all healing this unit receives is halved while it lasts.",
+		"see_also": [
+			"status_chilled"
+		]
+	},
+	{
+		"id": "status_burn",
+		"term": "Burn",
+		"category": "statuses",
+		"short": "Fire damage at each turn start; reapplying extends it.",
+		"long": "A burning unit takes fire damage at the start of each of its turns - about 6% of the applier's Attack, locked in when the burn lands. Burn is fire-typed: fire resists shrink the ticks and fire vulnerability feeds them. Reapplying Burn ADDS duration rather than resetting it, so a fire build can keep a target lit indefinitely. The duration otherwise counts down one turn at a time; the Pyromancer's SLOW BURN stops that countdown for three turns without stopping the damage, so the fire burns exactly as hard and simply does not get shorter, and his STOKE doubles what is left on one target.",
+		"see_also": [
+			"dmg_fire",
+			"status_poison"
+		]
+	},
+	{
+		"id": "status_poison",
+		"term": "Poison",
+		"category": "statuses",
+		"short": "Stacking nature damage at each turn start.",
+		"long": "Each poison stack ticks for about 3% of the applier's Attack at the victim's turn start, plus a flat bonus per stack from Potent Toxins, and stacks have no cap - the pile grows, and each new stack refreshes the timer. Poison is nature-typed, so nature resists blunt it. The Survivalist's Venom lane makes each application CARRY a second affliction: Coated Blades adds Cripple, Distillate adds Exposed, Slow Acting adds Slowed. Some poisons (Slow Acting, Perfected Toxin) are sticky and cannot be cleansed - and a sticky poison survives a Harvest, so Harvest is not paid for it. CREEPING DEATH reads the clock: applying any status to a poisoned enemy refreshes that poison to full duration, and if the poison is PERMANENT - which is what Perfected Toxin makes it - there is no duration to refresh, so it adds a stack instead, once per enemy per turn. You cannot extend forever, so you deepen.",
+		"see_also": [
+			"dmg_nature",
+			"status_burn"
+		]
+	},
+	{
+		"id": "status_bleed",
+		"term": "Bleed",
+		"category": "statuses",
+		"short": "Buildup meter: at 100 the target bleeds out for 20% max HP.",
+		"long": "Wounding attacks add Bleed buildup (0-100). The meter never decays - it only climbs - and at 100 the target BLEEDS OUT: an immediate 20% of its max HP, ignoring armor and dealing no Break, after which the meter resets and builds again. Berserker talents feed on bleedouts and can chain the burst to other enemies.",
+		"see_also": [
+			"pressure_break"
+		]
+	},
+	{
+		"id": "status_sunder",
+		"term": "Sunder",
+		"category": "statuses",
+		"short": "-35% armor.",
+		"long": "Sundered armor protects 35% less while the status lasts. It multiplies with a Break's -30%, so a Broken, Sundered target is close to bare.",
+		"see_also": [
+			"status_broken",
+			"resists_vulns"
+		]
+	},
+	{
+		"id": "status_mocked",
+		"term": "Mocked",
+		"category": "statuses",
+		"short": "Must attack the taunter.",
+		"long": "A mocked enemy can only aim its attacks at whoever taunted it - the Warden's Mocking Blow and the bear's Guardian's Roar both force the fight onto the party's sturdiest shoulders.",
+		"see_also": []
+	},
+	{
+		"id": "status_exposed",
+		"term": "Exposed",
+		"category": "statuses",
+		"short": "Takes 15% more damage.",
+		"long": "An exposed unit takes 15% more damage from every source while the status lasts.",
+		"see_also": [
+			"status_cripple"
+		]
+	},
+	{
+		"id": "status_cripple",
+		"term": "Cripple",
+		"category": "statuses",
+		"short": "-25% damage dealt.",
+		"long": "A crippled unit deals 25% less damage with everything until it fades.",
+		"see_also": [
+			"status_exposed"
+		]
+	},
+	{
+		"id": "status_dazed",
+		"term": "Dazed",
+		"category": "statuses",
+		"short": "Attacks are 20% more likely to miss.",
+		"long": "A dazed unit's attacks miss an extra 20% of the time, on top of the 5% base.",
+		"see_also": [
+			"miss",
+			"status_blind"
+		]
+	},
+	{
+		"id": "status_blind",
+		"term": "Blind",
+		"category": "statuses",
+		"short": "Attacks are 50% more likely to miss.",
+		"long": "Blinded attacks miss an extra 50% of the time - most of what this unit swings at, it will not hit.",
+		"see_also": [
+			"miss",
+			"status_dazed"
+		]
+	},
+	{
+		"id": "status_bewitch",
+		"term": "Bewitched",
+		"category": "statuses",
+		"short": "Charmed: strikes its own allies, dazing them.",
+		"long": "A bewitched unit turns on its own side, basic-attacking its allies and Dazing them with every strike. Bosses REFUSE it outright until they are BROKEN - the key is the Break meter, so grind it down first (the Occultist's own Broken Will and Entropy exist for exactly that job).",
+		"see_also": [
+			"status_psychosis",
+			"status_hysteria"
+		]
+	},
+	{
+		"id": "status_psychosis",
+		"term": "Psychosis",
+		"category": "statuses",
+		"short": "50% each turn to act against its own side.",
+		"long": "Madness: each turn there is a 50% chance the unit turns on its own - attacking a fellow, or casting its helpful magic on the enemy side. Bosses REFUSE it outright until they are BROKEN - the key is the Break meter, so grind it down first (the Occultist's own Broken Will and Entropy exist for exactly that job).",
+		"see_also": [
+			"status_bewitch",
+			"status_hysteria"
+		]
+	},
+	{
+		"id": "status_decay",
+		"term": "Decay",
+		"category": "statuses",
+		"short": "10 Break damage at the start of each turn.",
+		"long": "Rot eats at the will: a decaying unit takes 10 Break damage at each of its turn starts, marching its own meter toward a Break with no further help.",
+		"see_also": [
+			"pressure_break"
+		]
+	},
+	{
+		"id": "status_ruin",
+		"term": "Ruin",
+		"category": "statuses",
+		"short": "Marked 2 per debuff: +2% damage taken per stack; no cap, never clears.",
+		"long": "The Occultist's debuffs mark enemies with 2 Ruin apiece, and the mark is permanent: it has NO MAXIMUM and it NEVER CLEARS, not even when it detonates. Each stack is +2% damage taken (5% with Deeper Hex), and each stack deepens the draught heroes drink when they strike it - 2% of the damage dealt per stack, capped at 40% however many stacks and talents pile up. Every TENTH stack the mark is primed and DETONATES when the victim next acts: shadow damage off the Occultist's Attack, and the party is mended by the Old Gods' feast. The stacks SURVIVE the blast, so the next one waits for the next multiple of ten - and the Avatar of Ruin capstone moves that to every fifth.",
+		"see_also": [
+			"res_ruin",
+			"dmg_shadow"
+		]
+	},
+	{
+		"id": "status_hysteria",
+		"term": "Mass Hysteria",
+		"category": "statuses",
+		"short": "Next turn: strikes a fellow with double Break damage.",
+		"long": "The maddened unit spends its next turn striking one of its own with DOUBLE Break damage, Sundering them in the bargain. Bosses REFUSE it outright until they are BROKEN - the key is the Break meter, so grind it down first (the Occultist's own Broken Will and Entropy exist for exactly that job).",
+		"see_also": [
+			"status_psychosis",
+			"status_sunder"
+		]
+	},
+	{
+		"id": "status_umbral_sigil",
+		"term": "Umbral Sigil",
+		"category": "statuses",
+		"short": "Branded: half its damage taken echoes to its whole party.",
+		"long": "A branded unit becomes a conduit: half of all attack damage it takes echoes out to every member of its party. Focus fire on the sigil and the whole warband pays.",
+		"see_also": [
+			"dmg_shadow"
+		]
+	},
+	{
+		"id": "status_elem_weak",
+		"term": "Elemental Weakness",
+		"category": "statuses",
+		"short": "Elemental resistances reduced.",
+		"long": "The victim's resistances to non-physical schools are lowered while this holds, deepening every elemental hit against it.",
+		"see_also": [
+			"resists_vulns"
+		]
+	},
+	{
+		"id": "status_melted",
+		"term": "Melted Armor",
+		"category": "statuses",
+		"short": "Armor permanently burned away.",
+		"long": "Armor burned away for the rest of the battle - a small permanent reduction that keeps deepening while the target burns. NOTE: nothing in the game applies this today. Batch AR re-specced the Pyromancer talent that did, and the status is kept the way a vaulted ability is kept, so a later batch can point something at it again.",
+		"see_also": [
+			"status_burn",
+			"status_sunder"
+		]
+	},
+	{
+		"id": "status_snared",
+		"term": "Snared",
+		"category": "statuses",
+		"short": "A trap waits: next action springs a stun and poison.",
+		"long": "A Survivalist trap waits underfoot: the next time this enemy acts, the trap springs - it is Stunned for a turn and Poisoned. Trap talents add crippling, bone-breaking Break damage, or wounds that refuse healing. A SNARE IS SET UNDER ONE ENEMY AND SPRINGS ONCE; a Deadfall is untargeted, takes whoever acts next, and springs three times over a fight with two turns of rest between.",
+		"see_also": [
+			"status_stunned",
+			"status_caught"
+		]
+	},
+	{
+		"id": "status_caught",
+		"term": "Caught Fast",
+		"category": "statuses",
+		"short": "Cannot be healed.",
+		"long": "The trap's teeth hold the wound open: this unit cannot be healed at all - potions, spells, and regeneration all fail while it lasts.",
+		"see_also": [
+			"status_snared"
+		]
+	},
+	{
+		"id": "status_quickdraw",
+		"term": "Quick Draw",
+		"category": "statuses",
+		"short": "All abilities act 50% faster.",
+		"long": "The Sharpshooter's Quick Draw hastens its bearer by 50% for several turns - every ability's next turn arrives sooner on the timeline. One of the boss-trophy abilities.",
+		"see_also": [
+			"initiative",
+			"boss_trophies"
+		]
+	},
+	{
+		"id": "dmg_schools",
+		"term": "The Seven Schools",
+		"category": "damage",
+		"short": "Every attack carries one damage type; resists and weaknesses key off it.",
+		"long": "All damage in the game belongs to one of seven schools: Physical, Fire, Frost, Nature, Shadow, Arcane, and Holy. Each enemy resists some schools and is vulnerable to others - the same Fireball can be shrugged off by one warband and ruin another. Scouting a fight node on the map shows the warband's identity ('Resists / Soft to'); hovering a unit in battle shows its exact percentages.",
+		"see_also": [
+			"resists_vulns"
+		]
+	},
+	{
+		"id": "dmg_physical",
+		"term": "Physical",
+		"category": "damage",
+		"short": "The steel school - most weapon attacks.",
+		"long": "The default school: swords, arrows, claws. Few enemies resist it outright and none are very soft to it - physical damage is reliable but rarely finds a weakness to exploit.",
+		"see_also": [
+			"dmg_schools"
+		]
+	},
+	{
+		"id": "dmg_fire",
+		"term": "Fire",
+		"category": "damage",
+		"short": "The Pyromancer's school; Burn ticks are fire-typed.",
+		"long": "Fire burns twice: the hit itself, and the Burn it so often leaves behind - Burn ticks check fire resistance too. Fire is the counter the forest fears.",
+		"see_also": [
+			"status_burn",
+			"dmg_schools"
+		]
+	},
+	{
+		"id": "dmg_frost",
+		"term": "Frost",
+		"category": "damage",
+		"short": "The Cryomancer's school of Chill and Freeze.",
+		"long": "Frost trades raw numbers for control: its hits Chill, and stacked Chill freezes. Several ranged enemy kinds are soft to it.",
+		"see_also": [
+			"status_chilled",
+			"status_frozen"
+		]
+	},
+	{
+		"id": "dmg_nature",
+		"term": "Nature",
+		"category": "damage",
+		"short": "The Survivalist's school; Poison ticks are nature-typed.",
+		"long": "Venom, thorn, and rot. Poison ticks check nature resistance, so a nature-resistant enemy blunts a poison build twice - and forest wardens resist it heavily.",
+		"see_also": [
+			"status_poison",
+			"dmg_schools"
+		]
+	},
+	{
+		"id": "dmg_shadow",
+		"term": "Shadow",
+		"category": "damage",
+		"short": "The Occultist's school of hexes and Ruin.",
+		"long": "The Old Gods' school: hexes, sigils, and Ruin detonations. A good share of the wilds' brutes and shamans are soft to shadow.",
+		"see_also": [
+			"status_ruin",
+			"status_umbral_sigil"
+		]
+	},
+	{
+		"id": "dmg_arcane",
+		"term": "Arcane",
+		"category": "damage",
+		"short": "The Arcanist's school of raw magic.",
+		"long": "Raw magical force, fed by Resonance. Armored line-holders - shieldmasters and chiefs - tend to be soft to arcane where steel fails.",
+		"see_also": [
+			"res_resonance",
+			"dmg_schools"
+		]
+	},
+	{
+		"id": "dmg_holy",
+		"term": "Holy",
+		"category": "damage",
+		"short": "The Cleric's rare school of smites.",
+		"long": "The rarest school - a handful of Cleric smites carry it. Little in the wilds resists the light.",
+		"see_also": [
+			"dmg_schools"
+		]
+	},
+	{
+		"id": "resists_vulns",
+		"term": "Resists & Vulnerabilities",
+		"category": "damage",
+		"short": "Resists shrink a school's damage; vulnerabilities amplify it.",
+		"long": "A resistance removes that fraction of incoming damage of its school BEFORE armor is applied - 50% frost resist halves every frost hit. A vulnerability is the same dial pushed negative: 'Vulnerable: Fire +25%' means every fire hit lands 25% harder. Armor then reduces what remains (never beyond 85%), and every hit that connects deals at least 1 damage. Warband resists are worth scouting on the map before you commit to the fight.",
+		"see_also": [
+			"dmg_schools",
+			"status_elem_weak"
+		]
+	},
+	{
+		"id": "res_rage",
+		"term": "Rage",
+		"category": "resources",
+		"short": "The Warrior's fuel: builds in the fight, spent on his heaviest blows.",
+		"long": "Warriors start every battle at 0 Rage (cap 100) and build it by fighting: +5 at each turn start, +10 every time they are hit, and more from rage-generating attacks like Strike. Their strongest abilities spend it. A Warrior who has been in the thick of it longest hits the hardest.",
+		"see_also": [
+			"res_mana"
+		]
+	},
+	{
+		"id": "res_mana",
+		"term": "Mana",
+		"category": "resources",
+		"short": "The casters' pool: regenerates slowly, restored by potions and victories.",
+		"long": "Mage, Cleric, and Hunter abilities spend Mana (cap 100). It regenerates +12 at each turn start (the Mage's Evocation nearly doubles that), and potions and victory relics refill it between fights. Unlike Rage it carries over between battles - a drained Cleric stays drained until the party recovers.",
+		"see_also": [
+			"res_rage",
+			"node_types"
+		]
+	},
+	{
+		"id": "res_resonance",
+		"term": "Resonance",
+		"category": "resources",
+		"short": "The Arcanist's stacks: UNCAPPED, permanent, and compounding both ways.",
+		"long": "Damaging casts build Resonance - 1 per cast, 2 on a crit - and it has NO MAXIMUM. Nothing removes it either: no decay, no cap, no reset, and it persists to the end of the battle. The bonuses COMPOUND rather than scaling per stack: at N stacks the damage bonus is 1.5% x N(N+1)/2 and the damage TAKEN penalty is 0.75% x N(N+1)/2, both uncapped, plus a flat +1% crit chance per stack. So 5 stacks is +22% damage and +11% taken; 8 is +54%/+27%; 12 is +117%/+59%; 16 is +204%/+102%. That curve IS the Arcanist - nothing early, everything late: at five stacks he is weaker than a flat per-stack ramp would make him, and by twelve he has roughly doubled while taking half again as much. TWO things remove Resonance and both must be EARNED - he starts with neither, and they are deliberately different shapes. STABILIZE (a boss-pool pick) VENTS everything above 2 for Mana and a short damage shield: the escape hatch from the escalation. ARCANE BOLT (a draft card) spends it as damage - 15% of Attack per stack, and then HALVES what he holds, so the curve keeps compounding from where it lands instead of restarting. One is a way out; the other is a change of slope.",
+		"see_also": [
+			"dmg_arcane",
+			"crit"
+		]
+	},
+	{
+		"id": "res_mercy",
+		"term": "Mercy",
+		"category": "resources",
+		"short": "The Holy cleric's stacks, earned when allies fall into danger.",
+		"long": "Whenever any party member drops below half health, the Holy cleric gains a stack of Mercy (cap 5). Each held stack adds +5% to all healing done, and stacks are the fuel for Empowering casts. Mercy rewards the healer who waits for the moment of need.",
+		"see_also": [
+			"res_empower"
+		]
+	},
+	{
+		"id": "res_empower",
+		"term": "Empower",
+		"category": "resources",
+		"short": "Spend a Mercy stack to supercharge the next Holy cast.",
+		"long": "The Holy cleric can arm an Empower (E in battle), spending 1 Mercy to supercharge the next Heal, Renewal, Hymn, Resurrection, or Divine Plea - Resurrection, for one, returns the fallen at FULL health. An Empowered cast forgoes its Perfect skill-check bonus; the surge replaces finesse.",
+		"see_also": [
+			"res_mercy",
+			"skill_check"
+		]
+	},
+	{
+		"id": "res_faith",
+		"term": "Faith",
+		"category": "resources",
+		"short": "The Devout's gift: stacks that grow on shielded allies and on holy ground, and pay off the deepest count you have held.",
+		"long": "Faith lives mostly on the Devout's ALLIES - but he carries it too, and HIS never releases: his count holds at 5, paying him exactly what it pays everyone else. Under BINDING OATH every ally release swears him another. Two things build it for everyone: every hit a Divine Shield absorbs builds TWO stacks on its bearer, and every ally standing on Consecrated Ground gains one at the start of their turn (cap 5). WHAT A STACK IS WORTH IS PAID ON THE HIGHEST COUNT YOU HAVE HELD THIS BATTLE, not on the count you hold right now - so a release never takes the benefit away, and Faith is a high-water mark rather than a balance. Each of those stacks grants 2% damage reduction and +1.5% damage dealt; APOSTLE adds another 1x and FERVOR another again while the carrier stands on Consecrated Ground, so the two together make a stack worth TRIPLE - 6% and +4.5% - and never quadruple, because the nodes add to the base rather than multiplying each other. At 5 an ALLY'S Faith releases - a heal of 15%+ max HP - and the COUNT resets to build again while the high-water mark stands. Every release also makes the Devout himself a little bigger: his maximum health rises 3% for the rest of the battle and he is healed for the same amount, so the more his shields are tested, the more there is to shield with. The high-water mark is per-battle: the next fight opens at zero.",
+		"see_also": [
+			"res_mercy"
+		]
+	},
+	{
+		"id": "res_focus",
+		"term": "Focus",
+		"category": "resources",
+		"short": "The Sharpshooter's aim: builds on one target, lost on switching.",
+		"long": "Every attack on the SAME target builds +20 Focus and THE METER HAS NO CEILING; switching targets dumps it to zero, and a kill banks up to 50 toward the next mark (all of it under Overkill). THE PAYOFF CONVERTS AT 100: the first 100 points each grant +0.5% critical chance, and every point beyond 100 grants +0.5% of critical MULTIPLIER instead - so Lethal Aim's x2 becomes x2.5 at 200 Focus and x3 at 300, and it never stops paying. Patience buys certainty first, then force. Deep Focus moves that conversion point down to 60; Spray of Arrows is the one talent that still imposes a ceiling, at 50. Coup de Grace spends the whole meter but reads at most 200 points of it, and the One Shot capstone fires at 200.",
+		"see_also": [
+			"crit",
+			"status_quickdraw"
+		]
+	},
+	{
+		"id": "pack_bond",
+		"term": "Pack Bond",
+		"category": "combat",
+		"short": "The Beastmaster's passive: each active beast grants its own boon.",
+		"long": "Every beast the Beastmaster fields grants a boon that scales with its Loyalty - Ursus draws enemy attacks and blunts what reaches the hunter, Canis sharpens him against wounded prey, Aguila lifts the whole party's crit chance. The boon is x(1 + 0.20 per Loyalty stack) and it has no ceiling. HE NORMALLY FIELDS ONE BEAST; under THE PACK capstone he fields TWO AT ONCE, each with its own Loyalty meter, and BOTH boons apply at FULL strength - a swap then replaces whichever of the two holds LESS Loyalty, so the deeper bond always keeps its place (a tie falls to the older). Menagerie keeps an absent beast's boon alive at half strength, and Vengeance carries a dead one's for the rest of the battle. Lone Bond is the opposite bargain and closes The Pack outright: one beast, arriving deep, growing twice as fast.",
+		"see_also": [
+			"res_loyalty"
+		]
+	},
+	{
+		"id": "overburn",
+		"term": "Overburn (Pyromancer)",
+		"category": "combat",
+		"short": "The Pyromancer is paid for every turn of Burn standing on the enemy team.",
+		"long": "The Pyromancer has no bar of his own - his power is the FIRE ALREADY ON THE BOARD. Two clauses. BONUS: he deals +2% more damage for every remaining turn of Burn standing across the whole enemy team, up to +40%. One enemy burning for six turns feeds him exactly as hard as six burning for one. REFUND: every turn of Burn he CONSUMES hands him back 1 Mana - Detonation, Wildfire, Cinderfall and Ember Debt all pay it, because the refund belongs to the passive rather than to any one ability. HOLDING FIRE COSTS HIM NOTHING. What makes him a commitment spec is that his damage is DEFERRED: Burn ticks are small, Detonation pays 250% of the bank it empties, and turns spent lighting fires are turns not spent killing - he is weak until he cashes in.",
+		"see_also": [
+			"status_burn",
+			"dmg_fire",
+			"res_mana"
+		]
+	},
+	{
+		"id": "enemy_intent",
+		"term": "Enemy Intent",
+		"category": "combat",
+		"short": "Every enemy shows what it is about to do, and it can be denied.",
+		"long": "Each enemy picks its next action the moment its turn ends - and every enemy picks once before the first turn of a fight - then shows that choice until it acts. The icon appears twice: under the enemy's portrait in the turn bar (on its next turn's slot only) and on its nameplate, where it is written out. Seven categories: Strike (single-target damage), Sweep (an attack that hits the whole party or several of it), Crush (more Break damage than health damage), Afflict (applies a status, and the status is named), Bolster (buffs, wards or cleanses its own side), Mend (heals) and Wind-up (a charged blow landing on a later turn, with the turns remaining).\n\nNO DAMAGE NUMBER IS SHOWN, deliberately. The only honest preview would be one produced by the same code the real hit runs, and that code cannot be run twice for the same answer - it rolls damage variance and a critical on the way through. A number worked out a second way would drift from the ability it claims to describe, so the category and the ability's own name are shown instead.\n\nA DECLARED ACTION CAN BE DENIED, and that is the point. Stun, Freeze, Break or hold the enemy and the announced action is DISCARDED - not saved for later, exactly as cancelling a wind-up has always worked. Hysteria, Bewitch and Psychosis take the turn the same way. Two softer cases: kill the target it named and it re-targets WITH THE SAME ABILITY (the plan holds, only the victim changes); leave it unable to pay for the ability and it falls back to its basic attack, and the combat log says so rather than substituting in silence.",
+		"see_also": [
+			"pressure_break",
+			"initiative"
+		]
+	},
+	{
+		"id": "res_loyalty",
+		"term": "Loyalty",
+		"category": "resources",
+		"short": "The Beastmaster's bond, built per beast, uncapped, lost with it.",
+		"long": "Each living beast builds Loyalty at the hunter's turn start, and there is NO CEILING on it. Every stack is +5% companion strike damage plus that beast's own gift, and the Pack Bond boon itself climbs continuously with the meter - x(1 + 0.20 per stack), so x2 at five, x3 at ten, x5 at twenty, and it never plateaus. Exactly one talent still imposes a cap: Wild Rotation holds it at 3, and that is the price of swapping freely. A beast's death wipes its Loyalty - the bond dies with it, and that is the whole stake of the partnership. It also decides who leaves: under The Pack a third summon replaces whichever standing beast holds LESS Loyalty (a tie falls to the older), so depth is never traded away for a fresh arrival.",
+		"see_also": [
+			"boss_trophies"
+		]
+	},
+	{
+		"id": "res_ruin",
+		"term": "Ruin (Occultist)",
+		"category": "resources",
+		"short": "The Occultist's meter lives on the enemy, as Ruin stacks.",
+		"long": "The Occultist has no bar of their own - their power accumulates on ENEMIES as stacks of Ruin - 2 for every debuff they apply - with no ceiling and no expiry. See the Ruin status for what the mark does and how it detonates.",
+		"see_also": [
+			"status_ruin"
+		]
+	},
+	{
+		"id": "talent_lanes",
+		"term": "Talent Lanes",
+		"category": "progression",
+		"short": "Three lanes crossed by eight rows, plus a capstone shelf at row 9.",
+		"long": "Each spec's tree is three themed LANES crossed by eight ROWS, plus a capstone shelf at row 9 - 27 CELLS in all. A ROW HOLDS ONE NODE PER LANE AND YOU EQUIP EXACTLY ONE for a run: the other two are shut until the run ends. ROW 8 is the node that only matters once the rest of the lane is bought - it reads what the lane has accumulated, removes a constraint it has worked around, or converts its currency into something new. It is never a bigger version of a node above it. The CAPSTONE SHELF is one per hero, ever, from any lane, and it sits behind difficulty 2.",
+		"see_also": [
+			"talent_cost",
+			"talent_points"
+		]
+	},
+	{
+		"id": "talent_cost",
+		"term": "Tier Costs",
+		"category": "progression",
+		"short": "A cell costs by tier: rows 1-3 cost 1 point, 4-6 cost 2, 7-9 cost 3.",
+		"long": "Unlocking a cell costs by the tier its row sits in: rows 1-3 cost 1 point, rows 4-6 cost 2, rows 7-9 cost 3. Twenty-seven cells is 54 POINTS TO FILL ONE SPEC, which at 3 points a completed run is eighteen completions. Points are freely reassignable between runs at no cost - pull one back out and put it somewhere else, or respec the whole spec - and never during a run. The real price of a pick is still the two doors it closes in that row.",
+		"see_also": [
+			"talent_lanes",
+			"talent_points"
+		]
+	},
+	{
+		"id": "talent_points",
+		"term": "Talent Points",
+		"category": "progression",
+		"short": "Earned per spec, per zone boss, and banked forever. A run pays none.",
+		"long": "Talent points are PERMANENT META PROGRESSION. You earn 1 PER SPEC PER ZONE BOSS DEFEATED - three zone bosses, so 3 a spec for a completed run, and a run that dies in zone 2 still banks 1 or 2. Only the specs that were in the party earn. Points are per spec and never transfer, and they bank without limit. NOTHING IN A RUN AWARDS ONE: fights, elites and mini-bosses pay gold and their own spoils, and the END BOSS pays a relic. Spent between runs on the Talents screen.",
+		"see_also": [
+			"talent_cost",
+			"elites"
+		]
+	},
+	{
+		"id": "boss_trophies",
+		"term": "Boss Trophies",
+		"category": "progression",
+		"short": "Each zone boss grants every hero a new ability from their spec pool.",
+		"long": "Felling a zone boss lets EVERY hero claim a trophy: one new ability, offered as a pick from their own spec's pool on the Party screen. All twelve specs carry a pool (one to five abilities deep). The end boss instead leaves a relic and gold - the run's final prize.",
+		"see_also": [
+			"talent_points",
+			"relics_vs_runes",
+			"ability_upgrades"
+		]
+	},
+	{
+		"id": "ability_upgrades",
+		"term": "Ability Upgrades",
+		"category": "progression",
+		"short": "Every mini-boss hands each hero one; the blacksmith sells more.",
+		"long": "Clearing a MINI-BOSS awards every hero an ability upgrade - a pick of three, resolved on that hero's map card. An upgrade is a permanent change to ONE ability the hero already owns, and it lasts the rest of the run. There are eight: HONED (+50% damage), QUICKENED (-2 turns of cooldown, minimum 0), EFFORTLESS (costs no Rage / Mana / Focus - Mercy is unaffected), SWIFT (arrives 25% sooner), WEIGHTED (Break damage doubled), WIDENED (one more target, or one more hit), PIERCING (ignores half the target's armor) and CERTAIN (its status application always lands). Three mini-bosses a run means three upgrades per hero, twelve across the party - and the BLACKSMITH sells more on top of that, for gold. Upgrades STACK on a single ability - one ability can end a run Honed and Swift at once - but the SAME upgrade never comes twice to the same hero from a mini-boss. (The blacksmith is not that pool: it will sell you a second Honed for a different ability, and buying one never uses up a mini-boss pick.) They apply LAST, after talents and after equipped runes, so an upgrade always wins over a talent that sets the same field. You are only ever offered an upgrade that has something to change: Honed is never offered on a heal, Effortless never on a free ability, Weighted never on something that deals no Break damage, Widened never on a single-target attack (nor on an area attack, which already hits everything), Certain never on a status that already always lands. Because three are drawn from eight, any one upgrade turns up about half as often as it used to - a hero can finish a run having never been offered the one their build wanted, which is the variety working rather than a fault. An upgraded ability wears a gold diamond on its button in battle and on its chip on the hero sheet; hovering it names the upgrades.",
+		"see_also": [
+			"boss_trophies",
+			"talent_points",
+			"bargain",
+			"blacksmith"
+		]
+	},
+	{
+		"id": "node_scaling",
+		"term": "Node Scaling",
+		"category": "progression",
+		"short": "Every combat win makes the party permanently stronger this run.",
+		"long": "Each battle won grants every hero +2% of their base Attack and HP for the rest of the run. Enemies climb their own ladder - roughly +2% Attack and +2.5% HP per slot, with a hard jump between zones - so the party and the map rise together, and every slot fought feeds the curve. A route that takes more fights arrives stronger; a route that takes fewer arrives sooner.",
+		"see_also": [
+			"zones_tiers",
+			"elites"
+		]
+	},
+	{
+		"id": "runes",
+		"term": "Runes",
+		"category": "gear",
+		"short": "This run's gear: three slots per hero, from the first step.",
+		"long": "Runes are equippable power for a single hero, found at the Peddler and in elite spoils (a pick of three). Every hero carries three slots from the run's start. A rune's scope limits who can wear it - universal, one class, or one spec - and its rarity tells you its KIND, not just its size: common runes are flat stats, rares alter an ability you own or act like an extra talent, epics grant whole abilities or break a rule. Runes vanish with the run.",
+		"see_also": [
+			"scarred_runes",
+			"relics_vs_runes"
+		]
+	},
+	{
+		"id": "scarred_runes",
+		"term": "Scarred Runes",
+		"category": "gear",
+		"short": "Crimson bargains: real power with a cost carved in.",
+		"long": "A Scarred rune (crimson name) is a rare or epic with a drawback baked into it - more power than its clean cousin would dare, priced cheaper, and the cost is always written in the text. Read them twice; some scars are worth wearing.",
+		"see_also": [
+			"runes"
+		]
+	},
+	{
+		"id": "relics_vs_runes",
+		"term": "Relics vs Runes",
+		"category": "gear",
+		"short": "Relics outlive the run; runes die with it.",
+		"long": "The two are easy to confuse and could not be more different. RELICS are permanent: every zone boss you fell unlocks one FOREVER, and at the draft you choose up to 3 unlocked relics to carry - party-wide effects for the whole run. RUNES are of the run: bought and found along the way, worn by one hero, and gone the moment the run ends - by death or by victory. When you wipe, the relic you unlocked stays; the runes you were wearing do not.",
+		"see_also": [
+			"runes",
+			"wipe"
+		]
+	},
+	{
+		"id": "consumables",
+		"term": "Consumables",
+		"category": "gear",
+		"short": "The party's shared satchel, used in battle.",
+		"long": "Five items, shared by the whole party and used in battle (press ALT or use the Items action): Health Potion (40 HP), Mana Potion (40 Mana or Rage), Bomb (50 damage to all enemies), Revive Potion (raise a fallen ally at 50% HP), and Defense Potion (+10% armor to the party, 3 turns). Loot nodes, shops, and elite spoils refill the satchel.",
+		"see_also": [
+			"fallen",
+			"node_types"
+		]
+	},
+	{
+		"id": "zones_tiers",
+		"term": "Zones & Tiers",
+		"category": "run",
+		"short": "Three zones, each a generated 16-slot map to its boss.",
+		"long": "A run is three zones and 48 encounters. Each zone is a GENERATED MAP, not a road: 16 slots deep and three rows wide, branching from slot 1 to slot 7, converging on the MINI-BOSS at slot 8, branching again to slot 15, and converging on the ZONE BOSS at slot 16. You walk one node per column - 14 free encounters plus the two that everything funnels into. Enemies grow with every slot and take a hard step up each zone; killing a boss fully restores the party and sends you into the next zone. The third boss ends the run in victory.",
+		"see_also": [
+			"node_types",
+			"node_scaling",
+			"wipe"
+		]
+	},
+	{
+		"id": "node_types",
+		"term": "Map Nodes",
+		"category": "run",
+		"short": "Fight, Elite, Smith, Trade and ??? - three ways forward, hover to scout.",
+		"long": "Five kinds stand on the map. FIGHT nodes are battles - hover one to scout its warband and what it resists. ELITE nodes are harder fights with the best rewards on the board. SMITH is the blacksmith, who sells one ability upgrade for gold. TRADE is the Peddler, with potions and runes. ??? is an event, and it does not say which kind it is until you are standing on it. The MINI-BOSS at slot 8 and the BOSS at slot 16 are unavoidable; everything else is a route you chose. NOTHING IS GUARANTEED ON A ROUTE. A zone holds 6 elites, 6 smiths, 5 peddlers and 5 events, but you walk 14 nodes out of about 40 - route past every smith and you get no smith that zone. Edges only ever reach the same row or the one next to it and they never cross, so a step down closes the corridor above you for the next three or four columns. That is what makes a fork a decision instead of a detour.",
+		"see_also": [
+			"elites",
+			"blacksmith",
+			"merchant",
+			"events",
+			"zones_tiers"
+		]
+	},
+	{
+		"id": "elites",
+		"term": "Elites",
+		"category": "run",
+		"short": "The map's hardest fights - and its best paydays. Zero to three a zone.",
+		"long": "Six ELITE nodes stand in every zone, never two in adjacent columns and never in column 1. You will not meet them all: a route takes about two, a route that hunts them takes three or four, and a route that ducks every one takes NONE. Tougher warbands, often led by a chief. The payout is the run's snowball engine - 80-100 gold, 1 talent point per hero, a consumable, and a rune cache where one hero picks one of three runes. A bargain is offered at the door of every one. Skipping them all is a real option and a weak one: an elite you did not fight is a talent point and a rune you do not have.",
+		"see_also": [
+			"talent_points",
+			"runes",
+			"node_scaling",
+			"bargain"
+		]
+	},
+	{
+		"id": "blacksmith",
+		"term": "The Blacksmith",
+		"category": "run",
+		"short": "Buys one ability upgrade with gold. Six on the map, about two on your route.",
+		"long": "A SMITH node sells ABILITY UPGRADES - the same eight the mini-boss awards, on the same abilities, with the same rules about what fits what. Three pairings on the counter, one hero each; you buy ONE and the visit is over. Gold only: no health cost, no second currency. The price scales with the zone - 150, then 225, then 300 - so late gold still has somewhere to go. An upgrade bought here does NOT use up a mini-boss pick, and it does not stop a mini-boss offering the same upgrade later: you may buy Honed twice in a run on two different abilities. The one thing you can never do is put the same upgrade on the same ability twice. Six smiths stand in every zone and a route walks about two, so a run that wants them has to be routed toward them.",
+		"see_also": [
+			"ability_upgrades",
+			"node_types",
+			"merchant"
+		]
+	},
+	{
+		"id": "merchant",
+		"term": "The Peddler (Trade)",
+		"category": "run",
+		"short": "A shop you can see coming, and plan to arrive at with gold.",
+		"long": "The Peddler used to turn up after a won fight, about two fights in five. Now they stand on the map as a TRADE node - five a zone, about two on a route - so a shop is something you route toward with gold in hand rather than something that happens to you. The stock is unchanged: potions, and one rune offered to each hero who has a free slot. The only merchant that still follows a fight is the one a severity-4 BARGAIN pays out, and that one was bought with a modifier.",
+		"see_also": [
+			"node_types",
+			"blacksmith",
+			"runes",
+			"bargain"
+		]
+	},
+	{
+		"id": "bargain",
+		"term": "The Bargain",
+		"category": "run",
+		"short": "Three offers before every elite and mini-boss: a modifier plus a reward.",
+		"long": "Before every ELITE and every MINI-BOSS - one to four a zone now that elites are routed to rather than fixed, and never before a plain fight or a boss - the road stops and offers three bargains. Each is one MODIFIER plus one REWARD, both shown before you choose. There is no decline: one of the three is taken. The modifier is the price and binds the coming battle only; the reward pays ON VICTORY, which is why 'a merchant follows the fight' is a reward you have to earn rather than a shop you walk into. Lose the fight and you paid the price for nothing. The offer screen shows the warband you are about to face and your party's health alongside the three cards, because choosing a severity-4 bargain at 30% health should be a decision, not a surprise.",
+		"see_also": [
+			"modifier",
+			"severity",
+			"elites"
+		]
+	},
+	{
+		"id": "modifier",
+		"term": "Modifier",
+		"category": "run",
+		"short": "A condition binding BOTH parties for one battle.",
+		"long": "A modifier is a rule change that holds for exactly one battle and binds BOTH PARTIES - never just yours and never just theirs. Under Feverish everyone deals 25% more damage; under Bloodless nobody heals, on either side. That symmetry is the whole design: a modifier is a change to the fight, not a difficulty slider, so 'no items this fight' is not a modifier that exists because the enemy carries none. There are twenty, weighted toward the mild end because the safe slot on every bargain draws from that end and is therefore what you see most. The modifier is stamped on every combatant when the fight begins - a companion summoned mid-battle is bound by it too - and it is gone the moment the fight ends.",
+		"see_also": [
+			"bargain",
+			"severity"
+		]
+	},
+	{
+		"id": "severity",
+		"term": "Severity",
+		"category": "run",
+		"short": "1-4: how harsh a modifier is, and the only thing the reward reads.",
+		"long": "Every modifier carries a severity of 1 to 4, shown as pips on its bargain card. The REWARD TABLE READS SEVERITY AND NOTHING ELSE: a 1 pays 40 gold, a 2 pays 80 gold or a potion, a 3 pays 140 gold or a rune, a 4 pays 220 gold, a rune, or a merchant after the fight. Severity is FLAT and deliberately ignores your party: a modifier that happens to be cheap for your build is a good deal you earned by building that way, and a severity that read the party would quietly tax every build for being good at something. EVERY OFFER HOLDS AT LEAST ONE OPTION OF SEVERITY 1 OR 2, guaranteed by how the cards are dealt rather than by luck, so a party on its last legs always has a survivable choice - and the other two cards are always 3s and 4s, so every bargain reads the same way: one safe option, two gambles.",
+		"see_also": [
+			"bargain",
+			"modifier"
+		]
+	},
+	{
+		"id": "events",
+		"term": "Events (???)",
+		"category": "run",
+		"short": "??? - a trade, a gift, or a toll. You will not know which until you arrive.",
+		"long": "Five ??? nodes stand in every zone, and all three kinds wear the same icon. Most are TRADEOFFS: two or three conversions of one resource into another - health for a rune, gold for maximum health, health for talent points - at a rate you take or decline, and DECLINING IS ALWAYS ONE OF THE BUTTONS. Some are BOONS, a straight gift at no cost. A few are BANES, a straight cost with nothing to choose. The three are indistinguishable on the map on purpose: a node that announced itself as a bane would simply never be walked onto. No bane can kill a hero or take anyone below 1 HP - it costs a resource, never a run.",
+		"see_also": [
+			"node_types",
+			"blacksmith"
+		]
+	},
+	{
+		"id": "wipe",
+		"term": "The Wipe",
+		"category": "run",
+		"short": "All four down ends the run - relics and the chronicle survive.",
+		"long": "When the whole party falls, the run is over: gold, talents, runes, items, and the map are all lost. Two things survive every death - the RELICS you have unlocked (yours forever, pickable at the next draft) and the chronicle of cycles survived and lost. The run summary lays out how the attempt ended and what the party had built; the next climb starts wiser.",
+		"see_also": [
+			"relics_vs_runes",
+			"fallen"
+		]
+	},
+	{
+		"id": "difficulty",
+		"term": "The Road (Difficulty)",
+		"category": "run",
+		"short": "Standard, or the gentler Wanderer's road - chosen at the draft.",
+		"long": "At the draft you choose the road: STANDARD is the game as designed; WANDERER softens every enemy to 70% of its strength. Wanderer exists so any tester can see all three zones and the finale - take it without shame, the game is being tuned and your eyes on the later zones are worth more than your pride.",
+		"see_also": [
+			"zones_tiers"
+		]
+	},
+	{
+		"id": "talent_unlock",
+		"term": "Unlock vs Equip",
+		"category": "progression",
+		"short": "Buying a cell unlocks an OPTION. It does not equip it.",
+		"long": "This is the distinction the whole talent system rests on. BUYING a cell spends points and unlocks it forever. EQUIPPING is a separate act: you still take ONE node per row, and it locks for the whole run the moment your spec is confirmed. Owning all three cells in a row makes that row a real three-way argument; owning one leaves no argument in it. That is why filling a tree makes your choices better rather than making them for you.",
+		"see_also": [
+			"talent_lanes",
+			"talent_cost",
+			"talent_rows"
+		]
+	},
+	{
+		"id": "talent_rows",
+		"term": "Row Unlocks",
+		"category": "progression",
+		"short": "Rows open by beating the END BOSS: 1-3 at difficulty 1, 4-6 at 2, 7-9 at 3.",
+		"long": "A fresh save has NO ROWS, no points and no talents at all. Beating the end boss on difficulty 1 opens rows 1-3; difficulty 2 opens 4-6; difficulty 3 opens 7-9, the capstone shelf with them. ROW UNLOCKS ARE GLOBAL - they apply to every spec at once, unlike points, which are per spec. A tier arrives FULLY unlocked, so beating difficulty 2 makes all nine cells of rows 4-6 buyable at once. That is what an uncapped bank is for.",
+		"see_also": [
+			"talent_points",
+			"difficulty_ladder",
+			"end_boss"
+		]
+	},
+	{
+		"id": "difficulty_ladder",
+		"term": "The Difficulty Ladder",
+		"category": "run",
+		"short": "Three rungs, chosen at the draft. Each above the first adds a named twist.",
+		"long": "The road has three rungs. WANDERER is the opening rung, tuned below the rest so an untalented party can meet it. WARDEN raises the enemies and RAISES THE SEVERITY FLOOR - the guaranteed mild bargain option gets less mild. RUIN raises both again and adds the second twist: FIXED ENCOUNTERS CARRY A MODIFIER, so the mini-boss and every boss - the nodes a route cannot duck - fight under one. Beating the END BOSS on a rung is what opens that tier of the talent tree, for every spec at once.",
+		"see_also": [
+			"talent_rows",
+			"end_boss",
+			"modifier",
+			"severity"
+		]
+	},
+	{
+		"id": "end_boss",
+		"term": "The End Boss",
+		"category": "run",
+		"short": "A fourth boss after zone 3. Awards a relic, no points, and opens talent rows.",
+		"long": "Three ZONE BOSSES pay a talent point apiece; after the third zone stands THE END BOSS, the forty-ninth encounter. It is FIXED rather than drawn from a pool, so it can be learned, and it GAINS STATS AND MECHANICS WITH DIFFICULTY - a fourth ability at rung 2 and a fifth at rung 3. It always awards a relic. It awards NO talent points and no ability pick, because nothing follows it. What it does award is the tier of talent rows matching the rung you beat it on.",
+		"see_also": [
+			"talent_rows",
+			"difficulty_ladder",
+			"relics_vs_runes"
+		]
+	},
+	{
+		"id": "ability_draft",
+		"term": "The Ability Draft",
+		"category": "progression",
+		"short": "New abilities offered three at a time by elites, merchants and events.",
+		"long": "Beside the zone-boss pick sits a second, larger source of abilities. EVERY ELITE OFFERS ONE ON VICTORY, to one hero; a MERCHANT sells one for gold (120 / 180 / 240 by zone); and some EVENTS trade for one. Every offer is three cards the hero does not already own, drawn from that spec's draft pool with roughly one card in four coming from a wider class-wide pool. If the pool cannot fill three it FILLS SHORT rather than repeating itself. Elites run 0-3 per zone, so how much you draft is a property of the road you walked: a greedy route drafts far more than a cautious one. DECLINING IS ALWAYS ALLOWED, and a declined or dropped ability does not come back to that run's pool.",
+		"see_also": [
+			"ability_slots",
+			"protected_core",
+			"boss_trophies",
+			"ability_upgrades",
+			"hits_not_casts"
+		]
+	},
+	{
+		"id": "class_draft",
+		"term": "Class-Wide Abilities",
+		"category": "progression",
+		"short": "Roughly one draft card in four is drawn from a pool the whole CLASS shares.",
+		"long": "Every draft offer mixes two pools. Most cards come from your SPEC's own pool; roughly ONE IN FOUR comes from a CLASS-WIDE pool that every spec of that class draws from - so a Pyromancer, a Cryomancer and an Arcanist can all be offered Magic Barrier. They are deliberately UNTIED AND GENERAL: a class card would not read as off-theme for any spec of the class, which is why it is Magic Barrier and not Frostbolt. AND THEY ARE WEAKER THAN SPEC ABILITIES, ON PURPOSE - but unconditional. A class card feeds no passive: a barrier does nothing for Overburn, a heal does nothing for Ruin. If they were as strong as spec cards they would be the safe default in every build, and every hero would end up holding the same six. Slightly weaker but always-on makes them the pick you take when your spec's engine is not online yet, which is a real and different role. ALL FOUR CLASS POOLS ARE WRITTEN, six abilities apiece, so the class card in an offer draws a real entry for every hero in the game.",
+		"see_also": [
+			"ability_draft",
+			"ability_slots",
+			"protected_core",
+			"boss_trophies"
+		]
+	},
+	{
+		"id": "ability_slots",
+		"term": "Ability Slots",
+		"category": "progression",
+		"short": "A kit holds seven abilities. Past that, taking one means dropping one.",
+		"long": "A hero's kit has room for SEVEN abilities, and the protected core counts against it - so most specs open with 3 filled and 4 to fill. AT THE CAP AN OFFER BECOMES TAKE-ONE-AND-DROP-ONE: you pick the incoming ability and then name which of your EARNED abilities it replaces. Only earned abilities can be named; the protected core never can. A dropped ability does not return to that run's pool, so the choice is real. The cap binds every source alike - a zone-boss pick at seven slots asks for a drop exactly as a drafted card does.",
+		"see_also": [
+			"ability_draft",
+			"protected_core",
+			"boss_trophies",
+			"hits_not_casts"
+		]
+	},
+	{
+		"id": "protected_core",
+		"term": "Protected Abilities",
+		"category": "progression",
+		"short": "The passive, the basic attack, and whatever the passive needs to work.",
+		"long": "Every spec keeps a PROTECTED CORE: its passive, its basic attack, and the minimum abilities its passive cannot function without. Protected abilities CAN NEVER BE DROPPED, which is what stops the seven-slot cap from breaking a spec - a Pyromancer can never trade away the Detonation that Overburn exists to spend, and a Beastmaster can never trade away the summons Pack Bond reads. The minimum varies by spec rather than following a rule: Overburn needs a Burn applier AND a spender, while the Berserker's Blood Frenzy reads nothing but his own health bar and needs no ability at all.",
+		"see_also": [
+			"ability_slots",
+			"ability_draft"
+		]
+	},
+	{
+		"id": "lent_health",
+		"term": "Lent Maximum Health",
+		"category": "combat",
+		"short": "A temporary rise in your maximum health that decays - and current health clamps under it.",
+		"long": "The Devout's Fortified Spirit lends an ally a share of HIS maximum health: their maximum rises by 30% of his (40% on a perfect cast) and they are healed for the same amount at once, so the new room arrives full rather than empty. THE LOAN THEN DECAYS - a tenth of his maximum is handed back at the start of each of that ally's turns, so 30% becomes 20%, then 10%, then nothing. CURRENT HEALTH CLAMPS UNDER THE SHRINKING MAXIMUM, which is the part worth knowing: an ally kept topped up loses real health on the way down, while one sitting at half never notices it. That is deliberate - it rewards healing them INSIDE the window rather than after it. The loan is temporary in the strictest sense: it is unwound at the end of the battle whatever state it is in, so no lent health ever follows a hero out of the fight.",
+		"see_also": []
+	}
 ]

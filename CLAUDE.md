@@ -708,13 +708,14 @@ draft.** **THE CLASS-WIDE TRANCHE IS PAID IN FULL (Batch BQ then BR) — DO NOT 
 AS OWED.** BQ shipped six MAGE and six CLERIC; **BR shipped six HUNTER and six WARRIOR**, so
 `CLASS_DRAFT_POOLS` is 24 of a target 24 and **THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR
 EVERY HERO IN THE GAME** — no class rolls an empty pool and no offer loses its class card. The
-draft holds **57 of a target ~96 (Batch BT)**. **THE SPEC POOLS ARE UNEVEN NOW, AND THAT IS THE
-SHAPE OF THE DEBT RATHER THAN A BUG: the three MAGE specs draft from FIVE apiece; the other nine
-are still at TWO.** BT paid the first third of tranche 2; the Cleric, Hunter and Warrior thirds
-are owed next, and tranche 3 after them. So a Cryomancer's offer comes up FULL where a Warden's
-still fills SHORT — test_batch_bt asserts both halves (five for the Mage three, two for everybody
-else) and test_batch_br still drives the fill-short rule on a worn-down pool, so the debt stays
-visible in code rather than only in prose.
+draft holds **66 of a target ~96 (Batch BU)**. **THE SPEC POOLS ARE UNEVEN NOW, AND THAT IS THE
+SHAPE OF THE DEBT RATHER THAN A BUG: the three MAGE specs and the three CLERIC specs draft from
+FIVE apiece; the HUNTER and WARRIOR six are still at TWO.** BT paid the first third of tranche 2
+and BU the second; the Hunter and Warrior thirds are owed next, and tranche 3 after them. So a
+Cryomancer's or a Devout's offer comes up FULL where a Warden's still fills SHORT —
+test_batch_bu asserts both halves (five for the six deep pools, two for the other six) and
+test_batch_br still drives the fill-short rule on a worn-down pool, so the debt stays visible in
+code rather than only in prose.
 **CLASS-WIDE AUTHORING RULES, recorded with the arrays so they travel with the content:**
 deliberately UNTIED AND GENERAL (Magic Barrier, not Frostbolt — the test is whether it would
 read as off-theme for ANY spec of that class), and **WEAKER THAN SPEC ABILITIES AND
@@ -819,6 +820,229 @@ call and one string).
   Worse than BP's Precision Strike (same spec, but a node against a SPEC card). Nothing breaks, and
   **the ability's status is `ironclad` with its own chip** precisely so a Warden holding both never
   sees two chips reading the same word.
+
+BATCH BU (08-14) — TRANCHE 2, THE CLERIC NINE. **Nine spec draft abilities, three per Cleric
+spec; the Cleric pools go 2 -> 5 and join the Mage.** The draft goes 57 -> **66 of a target ~96**.
+Nothing else ships — no talent node, no magnitude, no existing ability changed, no save version
+moves (still v10). **ONE new unit-side field for nine abilities and it is a LEDGER rather than a
+duration** (`heal_by_turn`); everything with a duration is a STATUS, per BQ's standard.
+**THE NINE, WITH THEIR AXES AND THEIR COMBOS.** Defs live in `Classes.draft_ability` beside BO's
+through BT's, resolved at the top of `pool_ability` as before.
+· **HOLY — what else can be reversed.** Her pool was two REACTIVE DEFENSIVE cards and she had no
+  offence at all. **Recant** (25 Mana, 2.0, 4cd, one ally — 30% of their maximum PRIMARY resource;
+  *builds with* whichever ally is the party's engine) · **Shared Grief** (20, 2.0, 4cd, self — 25%
+  of her maximum health for **3** Mercy, never below 1; *builds with* Ardor, Heavenly Aura,
+  Martyr's Vigor, Sanctified) · **Reprisal** (25, 2.5, 3cd, 6 BD — damage equal to 50% of the
+  healing she LANDED in the last two turns; *builds with* Triage, Heavenly Aura, Sanctum, Radiant
+  Cascade).
+· **DEVOUT — what else can he place.** **Ordination** (25, 2.0, 4cd — 3 Faith to the ally holding
+  the LEAST) · **Fortified Spirit** (25, 2.0, 4cd, one ally — their maximum rises 30% of HIS and
+  heals the same, decaying a tenth of his maximum a turn) · **Reliquary** (30, 2.5, 5cd, all
+  allies — 2.5% of his maximum per point of their PEAK Faith).
+· **OCCULTIST — what else can be done to a mark.** **Suffering** (25, 2.5, 4cd, 8 BD — 20% of
+  Attack, healed for ALL of it, and 2 Ruin at the start of each of the enemy's next 4 turns) ·
+  **Transference** (20, 2.0, 3cd — every Ruin stack on the deepest-marked OTHER enemy moves here)
+  · **Anointing** (30, 2.5, 5cd — for 3 turns every ally's attacks apply 1 Ruin).
+**THREE PREMISES IN THE BRIEF WERE STALE AND ARE CORRECTED TOWARD THE CODE** (the AR §6 / AX §7 /
+BD §3 / AY §1 / BS / BT precedent). **All three were found by reading the site before writing
+against it, which is the only reason they were found at all:**
+· **RECANT IS NOT THE FIRST THING TO RESTORE ANOTHER HERO'S RESOURCE.** §2 is written on the claim
+  that nothing does. **THREE THINGS ALREADY DO: War Stomp** refuels every ally 10% (20% perfect),
+  **Cold Storage** (Cryomancer, Deep Freeze row 8) drips the party a share per held prison, and
+  **Rally's PERFECT** hands its target 15%. The smaller true claim is the useful one and is what
+  the card is authored against: nothing was a DEEP SINGLE-TARGET restore and nothing existed whose
+  ENTIRE PAYLOAD was the restore.
+· **THERE ARE ONLY TWO PRIMARY RESOURCES, NOT THREE.** §2 has it reading "Rage, Mana and Focus
+  alike". `resource_name` is decided ONCE in `Classes.CONFIGS` — Rage for the Warrior, Mana for the
+  other three classes, no spec override — and **FOCUS IS A SECOND RESOURCE (Batch AZ)**, i.e. a
+  spec meter, which is exactly what the card must NOT restore. The rule shipped is therefore
+  simpler than the brief's: **the primary resource only, never `second_resource`**, and the card's
+  own text names Focus among the meters it does not reach.
+· **THE APOSTLE RELEASE LOOP ORDINATION'S TARGETING WAS JUSTIFIED BY CANNOT HAPPEN, AND HAS NOT
+  SINCE BATCH BG.** §3 argues that under Apostle a release consumes no stacks, so granting 3 to an
+  ally on 4 would release them, leave them at 5 and re-release on every later gain. **BG §2 moved
+  Apostle onto the HELD half (it is a per-stack multiplier now, not a release modifier) and BH §2
+  deleted Binding Oath's remnant**, so `_gain_faith` resets an ALLY to ZERO on every release with
+  no survivor at all and nothing in any shipped build parks anyone at five. **THE TARGETING RULE IS
+  RIGHT AND SHIPS AS SPECIFIED; ITS STATED REASON WAS TWO BATCHES STALE.** The real reasons are
+  (a) `faith_stacks` caps at 5, so three granted to an ally on four throws two away, and (b) it
+  points the card at the ally **Communion can never roll for** (the roll is 15% x their OWN
+  stacks, i.e. zero at zero — BF §2). **Binding Oath's synergy line was corrected the same way**:
+  it swears the DEVOUT a stack now, it does not keep three through a release.
+**ORDINATION'S LOWEST-FAITH TARGETING MUST NOT BECOME PLAYER-CHOSEN** — that is the thing a later
+batch would most easily "improve", and the two reasons above are why it is a rule. **THE CASTER IS
+EXCLUDED** as well: his own Faith holds at five and never releases (BH §2), so a stack spent on him
+buys held mitigation and none of the release engine the card exists to start.
+**FORTIFIED SPIRIT IS FORCED TO EXPIRE AT THE VICTORY SYNC RATHER THAN GAINING A FOURTH FIELD
+THERE, AND THE CHOICE IS THE WHOLE LANDMINE.** A mid-battle `max_hp` change leaks through
+`BattleUnit.sync_victory_state` — the arithmetic with a ~127,000 max-HP runaway in its history and
+the reason `rot` was dropped from AQ — so if the last enemy dies while the loan is up the ally
+walks out permanently larger, one battle at a time, with nothing crashing. **`expire_fortified_
+spirit()` is called at the TOP of that function**, before `save_max` is computed: the effect is
+EXPLICITLY temporary, so there is nothing to preserve and no question a fourth sign would answer,
+and unwinding it first leaves `tenacity_hp_gained`, `conviction_hp_gained` and `rot_hp_lost`
+byte-untouched and still comparable with every batch that reasoned about them. **The same call is
+what `_fortified_tick` uses when the loan runs out, so there is ONE unwind.**
+· **THE CLAMP IS THE ABILITY.** `hp = mini(hp, max_hp)` at each tick is what makes an ally kept
+  topped up lose REAL health while an ally at half never notices — without it the decay is
+  invisible and the card is three free turns of a bigger bar. **The status carries `turns = -1`
+  and `_fortified_tick` owns the clock**, because the generic `tick_statuses` decrement never
+  touches `max_hp` and a status expiring by itself would strand the lent health forever.
+**SUFFERING'S HEAL IS OUTSIDE THE RUIN LIFESTEAL DOOR AND MUST STAY THERE.** That door is the
+strike loop's, capped at `RUIN_LEECH_CAP` (0.40) whatever the stacks and whatever the talents;
+routing this through it would silently pay 40% and nothing would complain. It heals ON CAST off
+`su_final`, the cast's own damage. **Its drip, by contrast, GOES THROUGH `_gain_ruin` and must** —
+those stacks have to arm the threshold, deepen the chip and mirror through Covenant of Ash, or the
+card buys nothing. **TRANSFERENCE IS THE OPPOSITE RULE THROUGH THE OPPOSITE DOOR**: a MOVE is not
+a GAIN, so it uses the new `BattleUnit.set_ruin_stacks` (the `set_chilled_stacks` precedent) and
+never `_gain_ruin` — stacks already earned once must not arm the threshold again simply for
+changing bodies. Cryoclasm's argument exactly.
+**ANOINTING IS RECORDED AS KNOWINGLY UNTUNED.** Flagged as possibly the strongest card in the
+tranche and shipped to be WATCHED rather than pre-tuned: AY §8 had to DOUBLE Ruin generation
+because trash detonations measured 0.00, and four heroes marking instead of one for three turns
+could overshoot the other way. **The designer has taken that call knowingly.** Per BR §1 it counts
+**HITS, not casts** — the hook sits beside Arcane Arrows' splash INSIDE `_resolve`'s hit loop, so
+a three-hit ability applies three, and the card's own text says so because a player will assume
+otherwise.
+**THE HEALING LEDGER, AND IT IS THE ONE PIECE OF NEW PLUMBING.** `BattleUnit.heal_by_turn` is the
+mirror of the `dmg_by_turn` Second Wind already rides: bounded to two keys, read by
+`healing_done_recent()`. It is written by `battle._book_healing` **at `_stat_heal` — BC's ONE
+credit door — so every heal in the game that names an owner reaches it and a heal added by a later
+batch cannot forget to report.** Two things about it are load-bearing:
+· **IT BOOKS LANDED HEALING, NOT ATTEMPTED.** `heal_amount` returns the heal's WORTH after
+  multipliers, not the health it restored, and stamps the difference as `last_overheal`;
+  `_book_healing` subtracts it. **Counting the spill would pay SANCTUM TWICE** — once as the
+  overheal it came from and again as the heal that overheal becomes. This is why `_stat_heal`
+  gained a third argument (the RECIPIENT) at all 34 of its call sites, and why `_devout_heal` and
+  `credit_cb` thread it too.
+· **IT SITS ABOVE THE `sim` GUARD.** Everything below that line is measurement; this is a shipped
+  ABILITY, and one that only worked inside the sim would be one no player could use (BS's
+  Backblast, whose early return was split for exactly this). **THE SIM'S CONTRIBUTION COLUMNS ARE
+  BYTE-UNCHANGED** — they still book `amount`, so every row ever measured stays comparable.
+**BREAK DAMAGE ASSIGNED DELIBERATELY (the BO/BP/BQ/BR/BT rule, applied up front).** The brief names
+no figure, so all nine are this batch's. **Suffering 8**, level with Stoke and Arcane Bolt and
+BELOW the free Shadowrend's 16 — a card that supplements the free basic must not out-Break it.
+**Reprisal 6**, level with Kindled Mind and well below the free Smite's 16, because a card that
+already converts her whole throughput into damage must not also out-Break her basic. **The other
+seven carry NONE** — they land no blow.
+**TWO CARDS ARE GATED OUT AT ZERO** (Shatter's and Cryoclasm's precedent): Reprisal needs healing
+landed in the last two turns, Transference needs a mark on some OTHER enemy. Both would otherwise
+be buttons that spend a turn and a cost to print a refusal, and **both gates SAY SO in the darkened
+button's tooltip** (Death Ray's rule). Deliberate contrast with Slow Burn, which is ungated because
+casting it before the fire is the setup half of its own sequence; neither of these sets anything up.
+**ONE NAME ADJACENCY, REPORTED AND NOT RESOLVED (BR §1): SUFFERING sits inside VOW OF SUFFERING**,
+the Devout's own tranche-1 card — **same CLASS, both in the draft, and one name a strict SUBSTRING
+of the other**, which is the closest the draft has come. **NOTHING BREAKS**: `pool_ability` is
+keyed on the whole `display_name`, the two strings differ, and the two share no `special`;
+test_batch_bu pins all three. Renaming either is the designer's call and one string. **The other
+eight are clean against every ability, talent node, status and rune**, and the sweep ships as a
+test. **A SOURCE-LEVEL SLICE ANCHORED ON THE BARE STRING `"suffering":` COVERS THE WRONG REGION** —
+it finds the STATUS_INFO entry hundreds of lines above the match case, which is BT's own harness
+lesson repeating; every slice in the suite is anchored **at its own indent**.
+**`suffering` IS IN `DEBUFF_IDS` AND `anointed`/`fortified` ARE NOT, and the asymmetry is
+deliberate.** Listing the affliction makes it cleansable by a mender's Cleansing Rite (BT's
+`slow_burn`, BO's `blight`) — but the reason it MUST be listed is the other way round:
+`_dispellable_buffs` is DERIVED, so an unlisted affliction on an enemy is something a Mage's
+**Dispel would strip FOR the enemy** (`ruin_primed`'s trap through a new door). The two BUFFS are
+laid on his own party, and listing either would let an ally's own Dispel strip it.
+**ONE GLOSSARY ENTRY ADDED (86 -> 87): `lent_health`.** It is the one thing in the batch a player
+meets with no explanation anywhere else — a maximum-health number that RISES and then DECAYS, with
+current health clamping under it on the way down. Everything else the nine do is a mechanic the
+player already meets (Faith, Ruin, Mercy, a resource bar), so nothing else needed an entry.
+**THE BOT GOT NO ROTATION, ON PURPOSE** — all nine ride BO §5's wrapper, so no existing rotation is
+re-weighted and no prior measurement stops being comparable. **FOUR TARGETING REFINEMENTS** inside
+that wrapper, each closing a case where the default mark makes a card read as inert: **Recant aims
+at the EMPTIEST hero** (the ordinary `_lowest_hp` ally pick is exactly wrong — the hero on 20%
+health is very often the one who has cast nothing); **Fortified Spirit never re-lends to an ally
+already carrying it**; and **Suffering and Transference aim at the HIGHEST-health enemy**, because
+a payload arriving over the next four turns spends its window on a corpse (Arcane Echo's case
+exactly).
+**VERIFIED — AND PER THE STANDING INSTRUCTION, THAT MEANS THE CODE LANDED AND WORKS. NO SWEEPS,
+NO BANDS, NO BALANCE MEASUREMENT WAS RUN, and none should be quoted from this batch.**
+check_parse 0 · check_flow 0 · check_map_screen OK · run-harness gates 1/2/3 PASS ·
+**NEW test_batch_bu.gd 476/0**.
+**FULL BATTERY GREEN, ZERO FAILURES ANYWHERE**: ah 5500, ah_battle 65, ai 2217, aj 418, ak 528,
+al 560, ar 735, as 396, at 470, au 336, av 324, aw 350, ax 339, ay 484, az 519, ba 690, bb 172,
+bc 91, bd 69, be 34, bf 78, bg 47, bh 233, bi 88, bj 67, bl 88, bm 1891, bn 77, **bo 636**,
+bp 268, bq 738, br 1441, bs 262, **bt 454**, **bu 476**, runes 2973, rune_battle 97 — all 0
+failures. **an reads 3622 and bk is inside its DOCUMENTED run-to-run drift** — neither is pinned
+and neither should be.
+· **ONE COUNT MOVED AND IT IS EXPLAINED: bo 570 -> 636.** Its pool loops walk nine more entries
+  and its five-deep loop now covers six specs rather than three. **Nothing else moved by one.**
+**SUITES RE-POINTED IN PLACE WITH THE REASON IN EACH FILE, AND SIXTEEN OF THE RE-POINTS ARE THE
+SAME CLASS OF THING: A SIGNATURE GREW AND EVERY SOURCE-LEVEL NEEDLE ANCHORED ON ITS LAST ARGUMENT
+STOPPED MATCHING.** That is the AZ Follow-Through / BQ Ghillie precedent, and it is worth
+recording that it hit FOURTEEN checks in one suite at once. **test_batch_bc** (its term-writer
+sweep, its door check, its six read-at-their-site pins and its Blessed Barrier pin — 91/0, count
+unmoved) and **test_batch_be** (its Break-branch pair — 34/0, unmoved) both broke purely because
+`_devout_heal` and `credit_cb` gained a fourth argument. **The questions are byte-for-byte the
+same; only the fragments moved.**
+· **AND THE RE-POINT MADE TWO CHECKS STRICTLY BETTER RATHER THAN MERELY LIVE AGAIN.** BC's needle
+  was `"release")` — it required the term to be the LAST argument, which is an accident of the
+  signature rather than the question. It is `, "release"` now (the term AS AN ARGUMENT), which
+  survives another argument being added and still refuses a term that appears only in a comment.
+  A `_joined()` helper collapses post-comma line breaks first, because Afterglow's call WRAPS and
+  the un-collapsed needle would have reported "nothing writes faith_heal_afterglow" against
+  working code — **a false alarm caused purely by line width, which is the most expensive kind.**
+**THE MASTER.HTML STAMP GATE IS DUPLICATED EIGHT TIMES** — test_batch_ah, bb, bn, bo, bp, bq, br
+and bs — **and all eight moved together to Batch BU**. test_batch_bu deliberately does NOT add a
+ninth; the honest fix, if anyone wants one, is still for the newest suite to be the only one that
+checks it.
+· **KNOWN-BAD, NOT OURS, AND UNCHANGED: test_batch_ah and test_batch_an both still call
+  `Run.award_talent_points`, which BM deleted** — each throws a SCRIPT ERROR that aborts its own
+  section while the suite prints 0 failures, so both have been silently under-testing since BM.
+  test_runes still prints its pre-existing `start_rune_enabled` SCRIPT ERROR and still reads
+  2973/0.
+**ALL EIGHT CLAUSES §6 NAMED AS ABLE TO SILENTLY DO NOTHING ARE DRIVEN LIVE, and every one is
+built so a broken implementation still fails** — which for most of them means the obvious
+assertion is not the discriminating one: Recant reads the SECOND meter in the same breath as the
+first (and is driven at an Arcanist and at Holy, the two for whom getting it wrong matters most);
+Shared Grief is cast from ABOVE half health so the cost carries her across the Mercy window, where
+a `take_hit` cost would pay FOUR rather than three; Reprisal's ledger is driven with a REAL heal
+into a FULL bar (which must book nothing) before it is driven with one that closed a wound;
+Ordination is given three allies at three DIFFERENT depths; Fortified Spirit's ally is TOPPED UP
+before every tick, because an ally at half never feels the clamp; Reliquary's discriminating case
+is an ally RELEASED DOWN TO ZERO; Suffering is driven against an enemy carrying a DEEP Ruin pile,
+the state in which the capped door would bind, and the ratio is asserted with open ground between
+1.15 and 0.46; and Transference's two piles are chosen to SUM TO A MULTIPLE OF THE THRESHOLD, the
+one arrangement in which a move routed through `_gain_ruin` would arm the primer. **Anointing is
+an exact IDENTITY between a three-hit ability and a single-strike one in the same battle**, which
+is what tells three per VOLLEY from three per CAST (BR's Aimed Volley construction).
+**TEN NEGATIVE CONTROLS, each applied to product code and reverted** (classes.gd, battle.gd and
+unit.gd all came back byte-identical by hash): Recant also refilling the spec meter **trips 5**;
+Shared Grief's cost routed through `take_hit` **trips 1** — and that ONE is the whole design, the
+"exactly 3 Mercy" check catching the fourth stack the below-half generator would pay; the ledger
+booking ATTEMPTED healing **trips 3**; Ordination finding the HIGHEST holder **trips 3**; Fortified
+Spirit not clamping current health **trips 3**; the victory sync not unwinding the loan **trips 3**;
+Reliquary reading CURRENT Faith **trips 3**; Suffering's heal capped at the lifesteal's 40% **trips
+3**; Transference routed through `_gain_ruin` **trips 2**; and Anointing marking once per CAST
+**trips 2**. **NONE PASSED**, which is the second battery running where that is true.
+· **ONE HARNESS FAULT WORTH RECORDING, AND IT IS BA'S LESSON THROUGH A NEW DOOR.** `_run_battle`
+  opens with `await _wait(0.6)` on a REAL SceneTreeTimer and its opening block runs
+  `_reset_faith_meters()`, which zeroes every Faith count AND peak. Checks that set Faith after
+  twenty frames and then awaited a cast had their values **wiped out from under them** and read as
+  a magnitude bug. `Engine.time_scale = 50.0` for the spawn wait (it scales those timers and
+  nothing the battle computes) plus 90 frames is the fix.
+**LIVE AUTOPLAY CLEAN, 0 SCRIPT ERROR, ALL NINE FIRING IN ORDINARY FIGHTS** — "Recant — Berserker
+takes back 40 Rage (40% of maximum) [PERFECT]", "Shared Grief — 38 health for 4 Mercy (4/5)",
+"Reprisal — 10 damage, 50% of the 21 she healed in the last two turns", "Ordination — Berserker
+held the least Faith (1) and is granted 3", "Fortified Spirit — Berserker's maximum rises 54 (30%
+of his own) and heals 54; it sheds 18 a turn" **followed by "sheds 18 (36 still lent)" and then
+"fades from Berserker — the lent bulk is returned"**, "Reliquary: Berserker is paid for a peak of
+5 Faith (+22)", "Suffering — 15 damage to Orc Chief and 17 healed (the whole of it)" **followed by
+"the wound in Orc Chief works on its own (+2 Ruin)"**, "Transference — 14 Ruin moves from Orc Chief
+to Orc Raider (now 17), and nothing detonates in transit", and "Anointing — 4 allies' attacks apply
+1 Ruin per HIT for 3 turns". **NOTE the smoke's own artefact**: `DOD_SIM_ABILITIES` applies its
+list to EVERY hero, so a Beastmaster casts Fortified Spirit in the log — the real draft only ever
+offers spec-matching cards, which is what makes the "holds no Mercy to gain" and "finds nobody to
+ordain" lines worth having.
+· **ONE LOG-HONESTY FIX FOUND BY WATCHING THE SMOKE**: Fortified Spirit's line read "(30% of the
+  Devout's)" whoever cast it. It reads "(30% of his own)" now — true in every party.
+**A `--run 6` WAS WALKED ONLY TO EXERCISE RunSim's DRAFT PATH** (`DOD_SIM_DIFFICULTY=warden`):
+**10.33 offers/run, 31.00 cards shown, taken 10.33** — exactly three cards an offer, never short,
+which is the deepened Cleric pools measured end to end. **Its Matrix row is NOT a difficulty
+reading and none is quoted.** **THE DESIGNER HAD NO RUN IN FLIGHT and none was created** — no
+`run_save.bin` exists afterwards.
 
 BATCH BT (08-14) — TRANCHE 2, THE MAGE NINE. **Nine spec draft abilities, three per Mage spec;
 the Mage pools go 2 -> 5 and nobody else moves.** The draft goes 48 -> **57 of a target ~96**.

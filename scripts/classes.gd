@@ -270,21 +270,25 @@ const SPEC_DRAFT_POOLS := {
 	"berserker": ["Blood Offering", "Gut Rip"],
 	"warden": ["Covering Guard", "Eye of the Storm"],
 	"swordmaster": ["Precision Strike", "Feint"],
-	# MAGE — FIVE APIECE SINCE BATCH BT (tranche 2's first third). The Cleric,
-	# Hunter and Warrior halves of tranche 2 are still owed at two, and tranche
-	# 3 after them, so a Cleric/Hunter/Warrior offer still fills SHORT while a
-	# Mage one does not. That asymmetry is the visible shape of the remaining
-	# debt rather than a bug, and test_batch_bt drives both sides of it.
+	# MAGE — FIVE APIECE SINCE BATCH BT (tranche 2's first third), and the
+	# CLERIC three joined them at BATCH BU. The Hunter and Warrior halves of
+	# tranche 2 are still owed at two, and tranche 3 after them, so a
+	# Hunter/Warrior offer still fills SHORT while a Mage or Cleric one does
+	# not. That asymmetry is the visible shape of the remaining debt rather
+	# than a bug, and test_batch_bu drives both sides of it.
 	"pyromancer": ["Cinderfall", "Ember Debt", "Slow Burn", "Stoke",
 		"Funeral Pyre"],
 	"cryomancer": ["Winter's Toll", "Rimebinding", "Flash Freeze",
 		"Killing Frost", "Hoarfrost Armor"],
 	"arcanist": ["Null Field", "Kindled Mind", "Arcane Bolt", "Inner Arcane",
 		"Arcane Echo"],
-	# CLERIC.
-	"holy": ["Second Wind", "Rite of Return"],
-	"inquisitor": ["Vow of Suffering", "Aegis Reversal"],
-	"occultist": ["Blight the Well", "Covenant of Ash"],
+	# CLERIC — FIVE APIECE SINCE BATCH BU (tranche 2's second third).
+	"holy": ["Second Wind", "Rite of Return", "Recant", "Shared Grief",
+		"Reprisal"],
+	"inquisitor": ["Vow of Suffering", "Aegis Reversal", "Ordination",
+		"Fortified Spirit", "Reliquary"],
+	"occultist": ["Blight the Well", "Covenant of Ash", "Suffering",
+		"Transference", "Anointing"],
 	# HUNTER.
 	"beastmaster": ["Twin Hunt", "Call the Wilds"],
 	"sharpshooter": ["Called Volley", "Quarry's Mark"],
@@ -1378,6 +1382,252 @@ static func draft_ability(display_name: String) -> Ability:
 				"cooldown": 4, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "The echo holds a 4th turn",
 				"description": "Set a resonance in one enemy: 20% of\nAttack, and for 3 turns every damaging\nHIT you land anywhere repeats at 30%\nagainst this target.\nA three-bolt Barrage echoes THREE\ntimes. One mark at a time."})
+		# ========== BATCH BU: TRANCHE 2, THE CLERIC NINE ==========
+		#
+		# ----- HOLY: what else can be reversed. Her pool was Second Wind (undo
+		# recent damage) and Rite of Return (prevent a death) — BOTH REACTIVE
+		# AND BOTH DEFENSIVE. She had no offence at all, and Mercy was a meter
+		# she waited for rather than one she controlled. These three are a third
+		# reversal, a way to MAKE Mercy, and her first weapon.
+		#
+		# AXIS: reversal of expenditure, the one form of undoing she does not
+		# have. It is the tranche's cross-spec card — its whole value is
+		# measured on somebody else's sheet, and it reads Rage, Mana and Focus
+		# alike: a Pyromancer who just emptied himself into Detonation, an
+		# Arcanist halved by Arcane Bolt, a Berserker out of Rage before Gut Rip.
+		#
+		# SECOND CORRECTION TOWARD THE CODE: the brief says it reads "Rage, Mana
+		# and Focus alike". THERE ARE ONLY TWO PRIMARY RESOURCES IN THE GAME —
+		# `resource_name` is Rage for the Warrior and Mana for the other three
+		# classes, decided once in `Classes.CONFIGS` with no spec override. FOCUS
+		# IS A SECOND RESOURCE (Batch AZ), i.e. a spec meter, so it falls under
+		# the rule below rather than beside Rage and Mana. The card's own text
+		# says so.
+		#
+		# THE PRIMARY RESOURCE ONLY, AND THAT IS A RULE RATHER THAN AN
+		# OVERSIGHT. Spec meters — Resonance, Mercy, Faith, Focus's converted
+		# half — are not resources in this sense: they are earned curves, and
+		# handing an Arcanist his curve back for 25 Mana would make one card
+		# worth more than the passive it feeds.
+		#
+		# CORRECTION TOWARD THE CODE, RECORDED RATHER THAN GLOSSED: the brief
+		# says nothing in the game restores another hero's resource. THREE
+		# THINGS ALREADY DO — War Stomp refuels every ally 10% (20% perfect),
+		# Cold Storage (Cryomancer, Deep Freeze row 8) drips the party a share
+		# per held prison, and Rally's PERFECT hands its target 15%. What is
+		# true is the smaller, more useful claim: nothing is a DEEP,
+		# SINGLE-TARGET restore, and nothing exists whose entire payload is the
+		# restore. At 30% of one ally's maximum this is three times War Stomp's
+		# share aimed at the hero who actually needs it.
+		# SYNERGY: it is the only card in the game that reads as a different
+		# ability in every party. Beside the Pyromancer it is a second
+		# Detonation; beside the Arcanist it buys back the Mana Arcane Bolt
+		# spent; beside a Berserker it is 30 Rage toward Gut Rip. On her own
+		# sheet it pairs with HEAVENLY AURA and SANCTIFIED, which make every
+		# Mercy stack she is not spending on it worth more.
+		"Recant":
+			return Ability.make({"display_name": "Recant",
+				"dmg_type": "holy", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 4, "anim": "attack02",
+				"special": "recant", "target": Ability.Target.ALLY,
+				"perfect_id": "", "perfect_text": "Restores 40% instead of 30%",
+				"description": "Unspend it: one ally regains 30% of\ntheir MAXIMUM Rage or Mana.\nIt reaches the resource they cast\nwith — never a spec meter like\nResonance, Mercy, Faith or Focus."})
+		# AXIS: martyrdom as an economy. Mercy arrives when somebody crosses
+		# below half health, so until now the only way to fill her meter was to
+		# let the party be hurt. This is her buying a stack with her own blood,
+		# on turn one, at a moment she chooses.
+		#
+		# A FLAT 3 RATHER THAN A SCALING COUNT, DELIBERATELY. The first draft
+		# paid per wounded ally, which in any real fight is her whole meter for
+		# one cast — and a meter that fills itself is not a meter.
+		#
+		# IT MUST NEVER KILL HER: 25% of MAXIMUM, floored at 1 health.
+		# SYNERGY: it is the switch that starts her engine on turn one.
+		# HEAVENLY AURA pays +12% healing per stack held, ARDOR stops Empower
+		# consuming a stack at 3+ (so this single cast turns Ardor ON), MARTYR'S
+		# VIGOR raises the ceiling to 8, and SANCTIFIED gives every spend a 35%
+		# chance to cost nothing. Without those it is expensive; with them it is
+		# the first button she presses.
+		"Shared Grief":
+			return Ability.make({"display_name": "Shared Grief",
+				"dmg_type": "holy", "cost": 20, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 4, "anim": "hurt",
+				"special": "shared_grief",
+				"perfect_id": "", "perfect_text": "4 Mercy instead of 3",
+				"description": "Take the wound yourself: lose 25% of\nyour MAXIMUM health and gain 3 Mercy.\nIt can never take you below 1.\nThe grief is the price — the Mercy is\nyours to spend at once."})
+		# AXIS: her healing becomes a weapon. This is her ONLY offence and the
+		# answer to the turn where nobody is hurt — the turn a healer has
+		# nothing to do is the turn she has done her job.
+		#
+		# IT READS HEALING LANDED, NOT HEALING ATTEMPTED, and that is the clause
+		# that would most easily be got wrong. Overheal does not count, or
+		# SANCTUM's 60% spill would pay twice: once as the overheal it came from
+		# and again as the heal it becomes.
+		# SYNERGY: everything that raises her throughput raises this, which is
+		# what makes it the Radiance lane's payoff card — TRIAGE (+30% on
+		# instant heals), HEAVENLY AURA (+12% per Mercy stack), SANCTUM (the
+		# overheal spill) and RADIANT CASCADE (a share of every heal to a second
+		# ally) all feed the same two-turn window this reads.
+		"Reprisal":
+			return Ability.make({"display_name": "Reprisal",
+				"dmg_type": "holy", "cost": 25, "damage": 0, "pressure": 6,
+				"delay": 2.5, "cooldown": 3, "anim": "attack01",
+				"special": "reprisal",
+				"perfect_id": "", "perfect_text": "75% of the healing instead of 50%",
+				"description": "Answer for them: deal holy damage\nequal to 50% of the healing you have\nLANDED in the last two turns.\nOverhealing is not healing — only what\nactually closed a wound counts."})
+		# ----- DEVOUT: what else can he place. His pool was Vow of Suffering
+		# and Aegis Reversal — BOTH ACT ON SHIELDS ALREADY OUT. He could not put
+		# Faith on anyone directly, and nothing in the game read `faith_peak`
+		# except the held-value multiplier BI wrote.
+		#
+		# AXIS: starting the engine without waiting to be hit. Every Faith
+		# source he owns is reactive (an absorb) or slow (the ground's drip);
+		# this is the one that simply grants it.
+		#
+		# THE LOWEST-FAITH TARGETING IS A DESIGN DECISION AND MUST NOT BECOME
+		# PLAYER-CHOSEN. It points the card at the ally COMMUNION CANNOT REACH —
+		# Communion rolls at (15 x their own stacks)%, so the ally on zero is
+		# the one it never touches — and it wastes nothing: `faith_stacks` caps
+		# at five, so three granted to an ally already on four throws two away.
+		# Aiming at the floor makes the grant worth its full three every time.
+		#
+		# CORRECTION TOWARD THE CODE, RECORDED RATHER THAN GLOSSED: the brief
+		# justifies this with an Apostle release loop — grant 3 to an ally at 4,
+		# they release, Apostle leaves them at 5, and every later gain releases
+		# again. THAT LOOP CANNOT HAPPEN AND HAS NOT SINCE BATCH BG. Apostle was
+		# taken off the release axis there (it is a HELD-value multiplier now)
+		# and Binding Oath's remnant went at BH, so `_gain_faith` resets an
+		# ally's count to ZERO on every release with no survivor at all. The
+		# targeting rule is right; its stated reason was two batches stale.
+		# SYNERGY: BLESSED ARE THE FAITHFUL makes the release it walks an ally
+		# toward heal 35% of their maximum; COMMUNION spreads on that release,
+		# and this feeds it the one ally it cannot roll for; RELIQUARY below
+		# cashes the peak this raises. BINDING OATH pays HIM a stack every time
+		# an ally releases, so a card that manufactures releases manufactures
+		# his own held mitigation too.
+		"Ordination":
+			return Ability.make({"display_name": "Ordination",
+				"dmg_type": "holy", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 4, "anim": "attack02",
+				"special": "ordination",
+				"perfect_id": "", "perfect_text": "4 Faith instead of 3",
+				"description": "Ordain the least of them: grant 3 Faith\nto the ally holding the LEAST.\nIt always finds the floor — never the\nally who is nearly there — so no stack\nis ever wasted over the cap of five."})
+		# AXIS: lending the number his whole kit is built on. Divine Shield
+		# absorbs 30% of HIS maximum, Afterglow heals 20% of it, Healing Pulse
+		# ticks 8% of it — every one of those spends the figure. THIS IS THE
+		# FIRST THING THAT LENDS THE FIGURE ITSELF, and it stacks with a shield
+		# rather than duplicating one: a shield is a bucket that empties, this
+		# is a bigger bucket.
+		#
+		# THE DECAY IS THE INTERESTING HALF AND IT IS BUILT TO BE FELT. Current
+		# health clamps under the shrinking maximum, so an ally kept topped up
+		# loses real health each turn while an ally at half never notices it.
+		# It rewards healing them INSIDE the window rather than after it.
+		# SYNERGY: UNWAVERING FAITH (+20% his maximum) makes every point of it
+		# larger, and so does CONVICTION's own growth as the fight runs.
+		# Strongest laid on the ally a WARDEN is already covering, and
+		# strongest of all with HEALING PULSE and CONSECRATED GROUND up, because
+		# both tick a share into the window before it closes.
+		"Fortified Spirit":
+			return Ability.make({"display_name": "Fortified Spirit",
+				"dmg_type": "holy", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 4, "anim": "attack02",
+				"special": "fortified_spirit", "target": Ability.Target.ALLY,
+				"perfect_id": "", "perfect_text": "Opens at 40% of your maximum instead of 30%",
+				"description": "Lend one ally your own bulk: their\nmaximum health rises by 30% of YOURS\nand they are healed for the same.\nThe loan DECAYS 10 points a turn over\n3 turns — health clamps under it, so\nheal them while it holds."})
+		# AXIS: cashing an accumulation nothing else reads. `faith_peak` is the
+		# high-water mark BI introduced so the held half of Faith would stop
+		# fighting the release; it ratchets and never falls inside a battle, so
+		# this grows all fight and pays most to whoever has CARRIED the most
+		# faith rather than whoever happens to hold it now.
+		#
+		# 2.5% PER POINT, NOT 5%. At a peak of five that is 12.5% of the
+		# tankiest hero in the party's maximum to EVERY ally — a real party heal
+		# without being a second Hymn of Hope.
+		# SYNERGY: UNWAVERING FAITH (+20% his maximum) and CONVICTION's growth
+		# both enlarge every point of it, and ORDINATION above raises the very
+		# peaks it reads. It reads PEAK, not current, so an ally who released
+		# down to zero is still paid in full for what they carried — which is
+		# the whole reason BI introduced the field.
+		"Reliquary":
+			return Ability.make({"display_name": "Reliquary",
+				"dmg_type": "holy", "cost": 30, "damage": 0, "pressure": 0,
+				"delay": 2.5, "cooldown": 5, "anim": "attack03",
+				"special": "reliquary",
+				"perfect_id": "", "perfect_text": "3.5% per point instead of 2.5%",
+				"description": "Open the reliquary: every ally is healed\nfor 2.5% of YOUR maximum health per\npoint of their PEAK Faith this battle.\nThe peak never falls — an ally who\nreleased down to zero is still paid for\nwhat they carried."})
+		# ----- OCCULTIST: what else can be done to a mark. His pool was Blight
+		# the Well and Covenant of Ash — BOTH ABOUT WHERE CORRUPTION LANDS. The
+		# mark itself was a number and nothing but a number: everything read its
+		# depth, nothing moved it, fed it or traded it.
+		#
+		# AXIS: corruption that works on the enemy's clock rather than on his.
+		# One cast buys 8 stacks without another turn spent, which is the only
+		# generation in his kit that does not need his attention. Best on a
+		# boss, which is exactly where his tenth-stack threshold lives.
+		#
+		# THE 100% HEAL DOES NOT ROUTE THROUGH THE RUIN LIFESTEAL, which is
+		# capped at 40% of the damage dealt whatever the stacks. Different
+		# mechanism, different door — if they shared one this would silently pay
+		# 40% and nothing would complain. The heal is ON CAST, off the cast's
+		# own damage, never per tick.
+		# SYNERGY: ENTROPY (Ruin bearers take 20 Break at their turn start) and
+		# the per-stack lifesteal both scale with depth, and DEEPER HEX makes
+		# each of those 8 stacks +5% damage taken rather than +2%. Cast early on
+		# the body the party will still be hitting in four turns.
+		"Suffering":
+			return Ability.make({"display_name": "Suffering",
+				"dmg_type": "shadow", "cost": 25, "damage": 20, "pressure": 8,
+				"delay": 2.5, "cooldown": 4, "anim": "attack01",
+				"special": "suffering",
+				"perfect_id": "", "perfect_text": "3 Ruin a turn instead of 2",
+				"description": "Open a wound that thinks: 20% of Attack,\nand you are healed for ALL of the damage\nit deals.\nFor 4 turns the enemy gains 2 Ruin at\nthe start of each of ITS turns — eight\nstacks bought with one turn of yours."})
+		# AXIS: corruption relocated rather than spent. His worst case is a deep
+		# mark on something about to die — twelve stacks of work wasted when the
+		# party finishes it. This carries the pile to the boss instead.
+		#
+		# IT FIRES NO DETONATION AND NO CONSUME PAYOFF IN TRANSIT, on
+		# CRYOCLASM's precedent exactly: a move is not a gain, so it does not go
+		# through `_gain_ruin` and the threshold cannot arm on stacks that were
+		# already earned once.
+		# SYNERGY: UNRAVELING (a detonation seeds 4 Ruin in every OTHER enemy)
+		# spreads the mark wide and this pulls it back to a point, which is the
+		# pairing the card exists for. Beside COVENANT OF ASH the same round
+		# trip runs twice. And it is what makes AVATAR OF RUIN's threshold of 5
+		# reachable on a boss in a fight that started on trash.
+		"Transference":
+			return Ability.make({"display_name": "Transference",
+				"dmg_type": "shadow", "cost": 20, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 3, "anim": "attack02",
+				"special": "transference",
+				"perfect_id": "", "perfect_text": "The moved pile gains 2 more stacks",
+				"description": "Move the whole mark: EVERY Ruin stack on\nthe deepest-marked other enemy travels\nto this one.\nNothing detonates on the way — the\nstacks arrive as the work they already\nwere."})
+		# AXIS: the party marks for him. Ruin is his alone; three other heroes
+		# swing every turn and contribute nothing to the meter that IS his
+		# entire spec. This is the tranche's other cross-spec card and the
+		# largest generation increase available to him.
+		#
+		# ALLY APPLICATIONS COUNT HITS (BR §1), so a three-hit ability applies
+		# THREE. The description says so outright because a player will assume
+		# per cast.
+		#
+		# FLAGGED AS POSSIBLY THE STRONGEST CARD IN THE TRANCHE AND SHIPPED TO
+		# BE WATCHED RATHER THAN PRE-TUNED. AY §8 had to DOUBLE Ruin generation
+		# because trash detonations measured 0.00; four heroes marking instead
+		# of one for three turns could overshoot the other way. The designer has
+		# taken that call knowingly.
+		# SYNERGY: it feeds ENTROPY, the party-wide per-stack lifesteal and
+		# NECROSIS (+35% damage from ALL sources on a Ruined target) — so it
+		# makes every hero's damage larger, not only his. Cast it before the
+		# party's own burst rather than after, and pair it with SUFFERING above
+		# so the enemy's clock and the party's both feed one pile.
+		"Anointing":
+			return Ability.make({"display_name": "Anointing",
+				"dmg_type": "shadow", "cost": 30, "damage": 0, "pressure": 0,
+				"delay": 2.5, "cooldown": 5, "anim": "attack03",
+				"special": "anointing",
+				"perfect_id": "", "perfect_text": "Holds a 4th turn",
+				"description": "Anoint their blades: for 3 turns EVERY\nally's attacks apply 1 Ruin.\nIt counts HITS, not casts — a three-hit\nability applies three."})
 	return null
 
 

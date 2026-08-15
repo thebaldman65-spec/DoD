@@ -117,7 +117,8 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.SPEC_DRAFT_POOLS[spec].size()
-	ok(total == 33, "§5+BT: BO's eighteen, BP's six, BT's Mage nine (got %d)" % total)
+	ok(total == 42,
+		"§5+BT+BU: BO's eighteen, BP's six, BT's nine, BU's nine (got %d)" % total)
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12,
 		"§5: all twelve specs are named")
 	for spec2 in Classes.SPEC_DRAFT_POOLS:
@@ -897,7 +898,7 @@ func _docs() -> void:
 	# test_batch_bn, test_batch_bo, HERE, test_batch_bq and test_batch_br. ALL
 	# SEVEN MUST MOVE TOGETHER or a batch that bumps the timestamp trips suites
 	# it never touched.
-	ok(master.contains("Batch BT"),
+	ok(master.contains("Batch BU"),
 		"§6: master.html's stamp is bumped to the current batch")
 	ok(changelog.contains("Batch BP"),
 		"§6: the changelog carries a Batch BP entry")
