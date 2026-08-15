@@ -5,6 +5,182 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-15 &mdash; Batch BY: the repo audit, at file level</h2>
+<p><i><b>LEAD WITH THE RESULT, BECAUSE IT IS NOT THE ONE THE BATCH EXPECTED.</b> BJ swept fields,
+functions and constants; this swept FILES, and it found <b>one dead file in the whole repo</b> — a
+10 KB macOS <code>.DS_Store</code>. Everything else that looked dead turned out to be reached by a
+path a text search cannot see. <b>The repo is 37.72 MB over 219 tracked files and it is not
+carrying dead weight; it is carrying its own history.</b> So the useful half of this batch is the
+other half: <b>a knowledge-base sync ingests 5.41 MB of TEXT, not 37.72 MB of repo</b>, and the
+recommendation is to archive 868 KB of it — 15.7% — without deleting a byte.</i></p>
+
+<h3>&sect;1 The inventory — 219 files, every one attributed</h3>
+<p>Path, size, modification date and inbound reference for every tracked file, sorted by size
+descending, with a reason recorded for every file that has no inbound reference.
+<b>AFTER ATTRIBUTION THERE ARE ZERO UNEXPLAINED FILES.</b> The counts:</p>
+<ul>
+<li><b>106 live</b> — reached by <code>preload</code>/<code>load</code>, a <code>.tscn</code>
+<code>ext_resource</code>, <code>project.godot</code>, or a <code>class_name</code> global.</li>
+<li><b>64 <code>.uid</code> sidecars</b> — Godot engine metadata, one per script, 1.2 KB in total.
+Each was checked for an orphan (a <code>.uid</code> whose script is gone); <b>there are none</b>.</li>
+<li><b>40 test suites</b> — run by the harness via <code>--script</code>, never imported. &sect;3.</li>
+<li><b>6 entry points</b> — <code>project.godot</code>, <code>.gitignore</code>,
+<code>docs/build_docs.py</code>, and <code>check_parse</code>/<code>check_flow</code>/<code>check_map</code>,
+the instruments run by hand each batch.</li>
+<li><b>2 documentation</b> (<code>README.md</code>, the retired <code>docs/addendum.html</code>) and
+<b>1 licence</b> (<code>assets/fonts/OFL.txt</code>, the SIL licence that must travel with PirataOne
+— legally paired, never a candidate).</li>
+</ul>
+<p><b>The full 219-row table is not reproduced here</b> — it is regenerable, and pasting 219 rows
+into the project's largest file to save 10 KB elsewhere would be self-defeating. What is worth
+keeping is the reason column for the files with no inbound reference, which is &sect;2b.</p>
+
+<h3>&sect;2 What was deleted — the complete list, one file</h3>
+<p><b>This list is the audit trail and it is exhaustive. Nothing else was removed.</b></p>
+<ul>
+<li><b><code>assets/.DS_Store</code> — 10,244 bytes, last modified 2026-07-09.</b> Reason: macOS
+Finder metadata, no function in the project, referenced by nothing and loadable by nothing. It is
+<b>already matched by <code>.gitignore:4</code></b> and was only ever tracked because it was
+committed before that ignore rule landed on 2026-07-27. Removed from the index and the working
+tree; the ignore rule keeps it out from here.</li>
+</ul>
+
+<h3>&sect;2b What LOOKED dead and is not — the near-misses, recorded because they are the trap</h3>
+<p><b>A reference count of zero was wrong four separate ways, and every one of them would have
+broken the build.</b> This is the part of the audit worth keeping:</p>
+<ul>
+<li><b>SIXTEEN SPRITE FILES HAVE NO LITERAL REFERENCE ANYWHERE AND ALL SIXTEEN ARE LIVE.</b> Of the
+20 files under <code>assets/sprites/</code>, <b>exactly two are named in source</b>
+(<code>Berserker_Portrait.png</code>, <code>Soldier_Idle.png</code>). The other sixteen are built at
+runtime by <code>unit.gd:1379</code> — <code>"%s/%s_%s.png" % [sheet_dir, prefix, suffix]</code>
+over seven animation suffixes — where <code>sheet_dir</code> is a <i>directory</i> constant
+(<code>enemies.gd:10</code> <code>const SHEET := "res://assets/sprites/orc"</code>,
+<code>battle.gd:600</code> SPEC_ART, <code>classes.gd:49</code>). <b>A grep-driven audit deletes
+every orc, soldier and berserker animation frame in the game and the parse gate still passes,
+because the load is a string built at runtime.</b></li>
+<li><b>FOUR SCRIPTS HAVE NO PATH REFERENCE BECAUSE THEY ARE <code>class_name</code> GLOBALS</b> —
+<code>profile.gd</code> (Profile, 70 uses), <code>enemies.gd</code> (Enemies, 30),
+<code>glossary.gd</code> (Glossary, 10), <code>glossary_panel.gd</code> (GlossaryPanel, 7). A
+global class is reached by its NAME; no <code>preload</code> of the file exists to find.</li>
+<li><b><code>check_map_screen.gd</code> and <code>check_map_screen.tscn</code> reference only each
+other</b> — a closed two-file loop with nothing pointing in. Both are live: the scene is launched
+by hand each batch and is the only thing that executes the lattice draw.</li>
+<li><b><code>assets/fonts/OFL.txt</code></b> is referenced by nothing and may not be removed: it is
+the font's licence.</li>
+</ul>
+
+<h3>&sect;2c Reported, not deleted — the two ambiguous files</h3>
+<p><b><code>assets/sprites/soldier/Soldier.png</code> (13,710 B, 900x700) and
+<code>assets/sprites/orc/Orc.png</code> (12,256 B, 800x600).</b> These are the only asset files the
+sweep could not resolve either way. They are <b>not</b> loaded: <code>_build_sprite</code> only ever
+builds <code>Prefix_Suffix.png</code> and neither bare name carries a suffix, so nothing reaches
+them. But their dimensions say what they are — <b>the original unsplit sheets the live per-animation
+strips were cut from</b> (7 rows x 100px and 6 rows x 100px against the 600x100 strips beside them).
+That makes them source art rather than a backup copy, and <b>&sect;2's rule is that an ambiguous file
+is reported, not deleted</b>. The cost of keeping them is 26 KB; the cost of deleting the master art
+is not recoverable from the repo. <b>They stay, and this entry is the record of why.</b></p>
+
+<h3>&sect;4 The archive recommendation — report only, nothing moved</h3>
+<p><b>THE REPO IS THE WRONG NUMBER.</b> 37.72 MB across 219 files sounds like the problem, but
+32.3 MB of it is <code>assets/</code> — mp3, wav, png, ttf — which a knowledge-base sync does not
+ingest. <b>The sync sees 5.41 MB across 169 text files.</b> Against that denominator:</p>
+<ul>
+<li><b><code>docs/changelog.html</code> — 835.0 KB, 15.1% of the sync. The strongest candidate by a
+distance</b>, and an <b>ABSOLUTE NON-DELETION</b>: it is the project's memory, it grows every batch,
+and the design conversation is explicitly told not to source premises from it — valuable, but not a
+working file. <b>One caveat that must travel with the move:
+<code>docs/build_docs.py</code> reads it by relative path</b>, so archiving it breaks the docx build
+until that path is updated.</li>
+<li><b><code>docs/addendum.html</code> — 32.9 KB, 0.6%.</b> RETIRED and frozen since 2026-07-08;
+nothing but CLAUDE.md mentions it. The definition of a non-working file.</li>
+<li><b>TOGETHER: 867.9 KB, 15.7% of the sync — taking it from 5.41 MB to 4.56 MB</b>, without
+deleting anything.</li>
+</ul>
+<p><b>AND A RECOMMENDATION AGAINST, which is the more useful half:</b> &sect;4 offered old test
+suites as a candidate and <b>they should not be taken while the changelog is untaken</b>. All 47
+suites together are 1.50 MB — the whole harness is barely more than the changelog and CLAUDE.md
+combined — and the seven oldest (<code>ah</code>, <code>ah_battle</code>, <code>ai</code>,
+<code>aj</code>, <code>ak</code>, <code>al</code>, <code>an</code>) come to <b>179.6 KB, or 3.2%</b>.
+<b>That is a bad trade: AV, BR and BS each re-pointed a suite in place WITH ITS REASON precisely so
+a later batch could not quietly reverse a decision, and 3.2% does not buy that record back.</b></p>
+
+<h3>&sect;5 The "beast" identifiers — the list, and BX's list corrected</h3>
+<p><b>Reported, not renamed</b>, per the batch: a field rename is a different risk from a file audit
+and wants its own pass. BX produced a list; <b>BY re-swept it against live code and it is wrong in
+three places</b>, so the corrected list now lives in CLAUDE.md's open threads. The corrections:</p>
+<ul>
+<li><b><code>beastmaster</code> IS NOT A RENAME CANDIDATE AND MUST NOT BE SWEPT.</b> The spec is
+still <i>called</i> the Beastmaster in game (<code>classes.gd</code> <code>"name":
+"Beastmaster"</code>), so the key is a <b>proper name</b> — exactly the reasoning BX used to keep
+Bestial Wrath. That covers 143 occurrences of the key, <code>beastmaster_pool_ability</code>, and
+every pool table keyed on it. <b>An over-eager sweep of BX's list renames a live spec key.</b></li>
+<li><b>BX was RIGHT that <code>th_beasts</code> and <code>ss_beasts</code> are gone</b> — they
+survive only in <code>test_batch_bx.gd:645-649</code> as <b>negative assertions proving the
+deletion</b>. That is a record to keep, not a leftover to sweep.</li>
+<li><b>BX's list missed three</b>, all test-side: <code>_live_two_beasts</code>,
+<code>_live_beastmaster</code>, <code>beast_key</code>. And <code>kinds_summoned</code> — which the
+batch brief expected to be a candidate — <b>is already neutral</b>; only its comment says "beasts".</li>
+</ul>
+<p>The rest of BX's list is confirmed intact: the unit fields <code>beasts</code>,
+<code>beast_committed</code>, <code>no_beast_left</code>, <code>no_beast_left_loyalty</code>; the
+battle functions <code>_beasts</code>, <code>_beast_cap</code>, <code>_free_beast</code>,
+<code>_on_beast_death</code>; the six locals; and the two node ids <code>bm_beast_within</code> /
+<code>bm_no_beast_left</code>, <b>which are save-bearing — renaming those two moves the save
+format</b>, which is the strongest single reason this is a separate pass.</p>
+
+<h3>&sect;6 What a field-level sweep could not see</h3>
+<p>Both classes BJ was blind to were checked and <b>both are clean</b>. No whole file has become
+dead beyond the <code>.DS_Store</code>. At file scope: <b>all four <code>data/*.json</code> are
+still reached</b> by a live loader; <b>all thirteen scenes</b> are reached from a live script
+(<code>relics_screen.tscn</code> and <code>settings.tscn</code> hang off single call sites in
+<code>main_menu.gd:88</code> and <code>:92</code> — thin, but real); and <b>all 21 enemy kinds in
+<code>enemies.json</code> carry both a zone list and a role tag</b>, so no kind is undealable, with
+all three bosses named by a zone def or <code>END_BOSS_KIND</code>.</p>
+
+<h3>Verified</h3>
+<p><b>Per the standing instruction, that means the code landed and works. No sweeps, no bands, no
+balance measurement was run, and none should be quoted from this batch.</b> check_parse 0 &middot;
+check_flow 0 (11 screens) &middot; check_map_screen OK (the lattice at three positions, both
+overlays, and the four-column draft driven to confirm) &middot; <b>all 13 scenes 0 SCRIPT
+ERROR</b> &middot; run-harness gates 1/2/3 PASS &mdash; <b>but see below, because one of those
+three PASSes is hollow</b> &middot; <b>the full 47-suite battery at zero failures, and NO SUITE'S
+COUNT FELL.</b> The designer had no run in flight (<code>run_save.bin</code> does not exist) and
+none was created.</p>
+
+<p><b>THE FIND OF THE BATCH IS NOT A FILE. IT IS THAT `run-harness GATE 2 PASSES WITHOUT RUNNING A
+SINGLE ASSERTION`.</b> <code>test_run_harness.gd:125</code> calls <code>run.award_spec_point(i)</code>
+and line 142 calls <code>run.award_talent_points(...)</code> &mdash; <b>both deleted by Batch BM
+&sect;6</b>. The error aborts <code>_gate_talent_conservation</code> at line 125, which is
+<b>above every <code>_check</code> in the function</b>, so zero checks run, zero fail, and the gate
+prints <b>"GATE 2 PASS"</b>. <b>The aborted region is precisely the half BM RE-POINTED IN PLACE</b>
+&mdash; its own comment says "the income half of this gate measured a purse that no longer exists;
+what replaces it is the half that IS still load-bearing" &mdash; so <b>BM's replacement assertions
+have never once executed</b>, and every VERIFIED block since BM has quoted "gates 1/2/3 PASS" on
+the strength of it. <b>A count of zero failures is not evidence when the count of checks is also
+zero</b>, and unlike the ah/an cases this one prints the word PASS rather than a number, which is
+why nobody caught it. <b>It is REPORTED AND NOT FIXED here for the same reason &sect;5's renames
+are</b>: deciding what BM's superseded lines should now assert is BM's decision to re-point, not a
+file audit's, and it wants its own pass with its own test. <b>Until then, "run-harness gates 1/2/3
+PASS" should be quoted as gates 1 and 3.</b></p>
+
+<p><b>Three previously recorded faults reproduced exactly and none is this batch's</b>, which is
+the useful control: <code>test_batch_ah</code> (5500/0) and <code>test_batch_an</code> (3621/0)
+still call <code>award_talent_points</code> and still abort their reward sections while printing 0
+failures; <code>test_runes</code> still prints its stale <code>start_rune_enabled</code> error at
+2973/0; and <code>test_batch_bj</code> still throws its three <code>_refresh_chips</code> errors
+at an unmoved 67/0. <b>Matching the last recorded run fault-for-fault is what licenses the claim
+that the deletion changed nothing.</b></p>
+
+<p><b>AND ONE TESTING LESSON, LEARNED THE SAME WAY THE FILE AUDIT'S LESSONS WERE.</b> The first
+battery reported <code>test_batch_bl</code> at <b>88 checks, 4 failures</b> &mdash; every one of
+them a recap-ledger assertion that needs a real-play battle to FINISH. The cause was not the code:
+<b>zsh does not word-split unquoted parameter expansions</b>, so a battery script holding
+<code>fps="--fixed-fps 12"</code> and passing bare <code>$fps</code> hands Godot <b>one token</b>,
+the flag is rejected, and bl runs at the default step &mdash; <b>reproducing CLAUDE.md's documented
+symptom precisely.</b> Invoked correctly it is <b>88/0, twice in a row</b>. In zsh a flag list must
+be an ARRAY (<code>fps=(--fixed-fps 12)</code>); the bash habit of a bare string silently
+under-runs the one suite that most needs the flag.</p>
+
 <h2>2026-08-15 &mdash; Batch BX: every hero drafts after an elite</h2>
 <p><i><b>LEAD WITH THE RATE.</b> An elite victory used to hand one hero, drawn at random, a
 choice of three abilities. It now offers a draft to <b>every living hero</b> &mdash; each from

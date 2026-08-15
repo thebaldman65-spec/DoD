@@ -2,7 +2,7 @@
 
 Turn-based party roguelike (Godot 4.7, GDScript). **`docs/master.html`
 ("DoD Master Document.docx") is the authoritative design reference** — keep it
-updated alongside `docs/addendum.html` (the living changelog). The original
+updated alongside `docs/changelog.html` (the living changelog). The original
 `../*.docx` concept docs are superseded by both.
 
 ## Working agreement (user's standing rules)
@@ -25,6 +25,34 @@ updated alongside `docs/addendum.html` (the living changelog). The original
 - Commit AND PUSH (origin/main) after each change batch. Launch the game for playtesting via
   `/Applications/Godot.app/Contents/MacOS/Godot --path <this dir>` (background,
   watch stderr for errors).
+
+## Repo weight and the knowledge-base sync (STANDING — Batch BY)
+**The number that matters is not the repo, it is the TEXT.** The repo is 37.72 MB over 219 tracked
+files, but 32.3 MB of that is `assets/` — mp3/wav/png/ttf that a knowledge-base sync does not
+ingest. **The sync sees 5.41 MB across 169 text files, and that is the only figure to watch.** BY
+deleted one file (`assets/.DS_Store`, 10 KB — 37.73 MB before, 37.72 MB after), so the audit's
+honest finding is that **the repo is not carrying dead weight — it is carrying its own history.**
+- **THE FOUR HEAVIEST TEXT FILES ARE 48% OF THE SYNC**: `scripts/battle.gd` 893 KB (16.1%),
+  `docs/changelog.html` 835 KB (15.1%), `CLAUDE.md` 669 KB (12.1%), `docs/master.html` 271 KB
+  (4.9%). Two of those four are working files and must stay.
+- **ARCHIVE MEANS MOVE OUT OF THE REPO, NEVER DELETE** — to `/Users/zipples/Documents/DoD/`, where
+  the `.docx` exports already live outside git.
+- **THE RECOMMENDATION, IN ORDER, AND IT WILL RECUR AS THE CHANGELOG GROWS:**
+  1. `docs/changelog.html` (835 KB) — **the strongest candidate by a distance**: the largest file
+     that is not working code, it grows every batch, and the design conversation is explicitly told
+     not to source premises from it. **It is an ABSOLUTE non-deletion — it is the project's
+     memory.** Archiving it means the docx export keeps carrying it, and **`docs/build_docs.py`
+     reads it by relative path, so moving the file breaks that script until the path is updated.**
+     Archive it only with that in mind.
+  2. `docs/addendum.html` (33 KB) — RETIRED and frozen since 2026-07-08. It is the definition of a
+     non-working file and nothing but this guide references it.
+  - **Those two together are 868 KB — 15.7% of the sync, taking it from 5.41 MB to 4.56 MB.**
+  3. **Only if that is not enough**: the seven oldest suites (`test_batch_ah/ah_battle/ai/aj/ak/al/an`,
+     180 KB combined) — but read the next line first.
+- **DO NOT ARCHIVE TEST SUITES AS A FIRST RESORT.** All 47 are 1.50 MB, so the whole harness is
+  under twice the changelog, and each suite encodes decisions in assertion form (AV, BR and BS
+  re-pointed suites in place *with their reason* precisely so a later batch could not quietly
+  reverse a decision). Trading that record for 180 KB is a bad trade while option 1 is untaken.
 
 ## Verify before shipping
 - Parse: run each scene headless with `--quit-after 90`, grep "SCRIPT ERROR".
@@ -133,7 +161,19 @@ updated alongside `docs/addendum.html` (the living changelog). The original
   scene-spawning tests on the first process_frame (scratchpad
   test_run_harness.gd = the 3 correctness gates: hero win scaling, talent
   spend conservation, enemy tier×slot scaling — rerun it before trusting
-  any --run report after touching spawn/scaling code). Batch S verdicts:
+  any --run report after touching spawn/scaling code).
+- **QUOTE THE RUN HARNESS AS "GATES 1 AND 3", NOT "1/2/3" (Batch BY). GATE 2 PRINTS PASS WITHOUT
+  RUNNING A SINGLE ASSERTION.** `test_run_harness.gd:125` calls `run.award_spec_point` and `:142`
+  calls `run.award_talent_points` — **both deleted by Batch BM §6**. The error aborts
+  `_gate_talent_conservation` at line 125, which is **above every `_check` in the function**, so
+  zero checks run, zero fail, and it prints `GATE 2 PASS`. **The aborted region is exactly the half
+  BM re-pointed in place** ("the income half of this gate measured a purse that no longer exists;
+  what replaces it is the half that IS still load-bearing") — so **BM's replacement assertions have
+  never executed**, and every VERIFIED block since BM quoted 1/2/3 on the strength of it.
+  **A count of zero failures is not evidence when the count of checks is also zero**, and this one
+  prints a WORD rather than a number, which is why it outlived the ah/an cases that print counts.
+  Fixing it means deciding what BM's superseded lines should now assert — **that is a re-point with
+  a reason, and it wants its own pass**; BY reported it rather than guessing. Batch S verdicts:
   Cryomancer share FALLS with field size (49%→38%, budgets 3→12) = baseline
   overtune, fix his NUMBERS not his AoE; fields are empty entering round 3
   at every budget; --run 50 floor = 0/50 completions, wipes cluster z1
@@ -906,6 +946,33 @@ claim, so a tranche that fills three pools trips them by construction. Two shape
   refusal reach the spec pool too (bq, br) or by moving it onto a **Berserker**, whose pool is
   genuinely still two (bo). **WHEN THE WARRIOR THIRD LANDS, bo's version has to move again** — and
   that forced move is the honest signal that the last of tranche 2 is paid.
+
+BATCH BY (08-15) — THE REPO AUDIT, AT FILE LEVEL. **THE RESULT IS THE OPPOSITE OF THE ONE THE BATCH
+EXPECTED: the whole repo held ONE dead file** — `assets/.DS_Store`, 10 KB of Finder metadata already
+matched by `.gitignore:4` and tracked only because it predates that rule. Everything else that read
+as dead is reached by a path a text search cannot see. **219 tracked files, every one attributed,
+zero unexplained.** Sizes and the standing archive recommendation live in "Repo weight and the
+knowledge-base sync" at the top of this file; **the corrected beast-identifier list is in Known open
+threads**; both are deliberately NOT repeated here.
+- **THE REUSABLE LESSON IS THAT A REFERENCE COUNT OF ZERO WAS WRONG FOUR WAYS, AND EVERY ONE WOULD
+  HAVE BROKEN THE BUILD.** (1) **Sixteen of the twenty sprite files are named nowhere in source** —
+  `unit.gd:1379` builds `"%s/%s_%s.png" % [sheet_dir, prefix, suffix]` at runtime and `sheet_dir` is
+  a DIRECTORY constant, so a grep-driven audit deletes every orc, soldier and berserker frame **and
+  the parse gate still passes**. (2) Four scripts have no path reference because they are
+  `class_name` globals (`Profile` 70 uses, `Enemies` 30, `Glossary` 10, `GlossaryPanel` 7) —
+  **a global class is reached by NAME and no `preload` exists to find**. (3) `check_map_screen.gd`
+  and `.tscn` reference only each other, a closed loop with nothing pointing in, and both are live.
+  (4) `assets/fonts/OFL.txt` is the font's LICENCE and may not be removed at any reference count.
+- **REPORTED, NOT DELETED — `Soldier.png` (900x700) and `Orc.png` (800x600).** Nothing loads them
+  (`_build_sprite` only ever builds `Prefix_Suffix.png`), but their dimensions identify them as
+  **the original unsplit sheets the live 600x100 strips were cut from** — source art, not a backup
+  copy. 26 KB to keep; not recoverable from the repo if wrong. **§2's ambiguity rule decided it.**
+- **A BATTERY SCRIPT MUST HOLD FLAGS IN AN ARRAY, NOT A STRING — zsh DOES NOT WORD-SPLIT UNQUOTED
+  EXPANSIONS.** `fps="--fixed-fps 12"` passed as bare `$fps` reaches Godot as **one token**, the
+  flag is rejected, and `test_batch_bl` runs at the default step — **reporting 88 checks / 4
+  failures, every one a recap assertion needing a battle that FINISHES, which is CLAUDE.md's
+  documented symptom reproduced exactly.** Correctly invoked (`fps=(--fixed-fps 12)`) it is 88/0,
+  twice. The bash habit silently under-runs the one suite that most needs the flag.
 
 BATCH BX (08-15) — EVERY HERO DRAFTS AFTER AN ELITE. **THE RATE IS THE CHANGE: an elite victory
 offers a draft to EVERY LIVING HERO, each from their own pool, on ONE SCREEN OF FOUR COLUMNS rather
@@ -8257,6 +8324,30 @@ Battle has burger menu (restart/settings overlay/exit); skill checks accept
 Space or left click; no announcer text (combat log only).
 
 ## Known open threads
+- **THE CODE IDENTIFIERS STILL READING "beast" (BX renamed the PROSE, BY re-verified the list
+  against live code and did not touch it).** BX's reasoning stands and is why this is still open:
+  **a missed rename in prose is a typo, a missed rename in a field is a bug**, so the two want
+  separate passes with separate tests. The list below is BY's sweep, not BX's — it is checked
+  against the code as it actually is, and it **corrects BX's list in three places**.
+  · **`beastmaster` / `Beastmaster` / `BEASTMASTER` ARE NOT ON THIS LIST AND MUST NOT BE RENAMED.**
+    The spec is still *called* the Beastmaster in game (`classes.gd` `"name": "Beastmaster"`), so
+    the key is a **proper name**, exactly like Bestial Wrath which BX kept deliberately. That covers
+    the spec key, `beastmaster_pool_ability`, and every pool/`SPEC` table keyed on it.
+  · **Unit fields** (`scripts/unit.gd`): `beasts` (115), `beast_committed` (164), `no_beast_left`
+    (146), `no_beast_left_loyalty` (147).
+  · **Battle functions** (`scripts/battle.gd`): `_beasts` (38 uses), `_free_beast` (15229),
+    `_on_beast_death` (8403), and `_beast_cap` (7 uses, referenced by name from `talents.gd:2234`).
+  · **Battle locals**: `bot_beasts`, `cw_beasts`, `kc_beasts`, `sb_beast`, `sb_beasts`, `tm_beasts`.
+  · **Node ids** (`scripts/talents.gd`): `bm_beast_within` (2282) and `bm_no_beast_left` (2266) —
+    **the ids outlived their renamed labels** ("The Wild Within", "None Left Behind"), which is the
+    normal and correct state for a save-bearing id. Renaming these two moves the save format.
+  · **BX was RIGHT that `th_beasts` and `ss_beasts` are gone from production** — they survive only
+    inside `test_batch_bx.gd:645-649` as **negative assertions proving the deletion**, which is a
+    record to keep, not a leftover to sweep.
+  · **BX's list MISSED these**, all test-side: `_live_two_beasts` (`test_batch_ay.gd:685`),
+    `_live_beastmaster` (`test_batch_bo.gd:955`), `beast_key` (`test_batch_ay.gd:905`).
+  · **`kinds_summoned` is already neutral** — only its comment says "beasts". So is `ghost_pack`;
+    "beastless" appears in three *comments* and no identifier.
 - **CLOSED IN BATCH BN §1 — THE `_hold_release` / `_hold_freeze` RECURSION. THE MECHANISM IS KEPT
   HERE ON PURPOSE, BECAUSE ONE FLAG IS THE ONLY THING PREVENTING IT AND A LATER BATCH COULD
   DELETE THAT FLAG FOR LOOKING REDUNDANT.** It stood as the first open thread from BF §3 to BN,
