@@ -1063,6 +1063,33 @@ var feint_guards := 0
 # board — the `blight_cb` rule, through a friendlier door.
 var vigil_cb := Callable()
 
+# ------- BATCH BV — the Hunter draft's unit-side state -------
+#
+# ONE CALLBACK AND ONE COUNTER for nine abilities. Everything with a duration is
+# a STATUS (`bloodbond`, `ghostpack`, `crossfire`), per BQ's standard; the other
+# six carry no state at all — Savage Sweep, Calibrating Shot, Trophy Shot,
+# Loaded Shot and Hunt all resolve inside the cast that fires them.
+#
+# BLOODBOND (Beastmaster) — fired from take_hit with (companion, amount) when a
+# blow would put a beast below 1. battle.gd bills the hunter HALF of it and
+# spends the guard; unit.gd only asks the question, because the redirect can
+# KILL the hunter and a death has to route through the battle's own handling.
+# It is the `vow_cb` shape aimed at the other side of the bond.
+var bloodbond_cb := Callable()
+# PREPARATION (Survivalist) — the first extra-turn mechanic in the game.
+#
+# A COUNTER RATHER THAN A BOOL, AND THAT IS WHAT MAKES THE DELAY EXACT: the cast
+# sets it to 2, the end of every one of his turns decrements it, and the extra
+# turn is granted the moment it reaches 0. So the turn he CAST on burns 2 -> 1
+# and fires nothing, and his NEXT turn burns 1 -> 0 and fires. A bool would have
+# needed a second "was it cast this turn" flag to say the same thing.
+#
+# IT IS ALSO THE NO-CHAIN GATE: `_ability_usable` refuses the cast whenever this
+# is above zero, so Preparation can never be cast on the extra turn it bought.
+# That refusal is load-bearing rather than tidy — without it the ability is an
+# unbounded loop, which is a hang and not a balance problem.
+var prep_pending := 0
+
 # Occultist tree (07-24; lanes re-specced Batch L 07-30; every counter went
 # ADDITIVE in Batch AX — the field holds the MAGNITUDE, not a rank, and the
 # read site applies no step of its own). See talents.gd for the node text.
@@ -1821,10 +1848,12 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 				s.power = maxi(s.power, power)
 				if tick > 0:
 					s["tick"] = tick
+			_note_full_turns(s, turns)
 			_refresh_chips()
 			return
 	var entry := {"id": id, "label": label, "short": short, "color": color,
-		"turns": turns, "desc": desc, "power": power, "stacks": 1, "tick": tick}
+		"turns": turns, "desc": desc, "power": power, "stacks": 1, "tick": tick,
+		"full_turns": turns}
 	if id == "poison":
 		entry["fresh"] = true  # no tick on the turn it lands
 	if id == "chilled":
@@ -1833,6 +1862,27 @@ func add_status(id: String, label: String, short: String, color: Color, turns: i
 	statuses.append(entry)
 	float_text(label, color)
 	_refresh_chips()
+
+
+# BATCH BV — THE `full_turns` LEDGER, written by the ONE function that applies a
+# status so it can never drift from what was actually applied. It is the longest
+# duration this status has EVER been given on this body, which is what LOADED
+# SHOT (Survivalist draft) means by "reset to full": a table of defaults would be
+# wrong the moment a talent lengthened something (Slow Acting doubles its
+# poison's duration, Perfected Toxin makes it permanent), and re-deriving it at
+# the read site would put the answer in two places.
+#
+# A PERMANENT STATUS PINS AT -1 AND NEVER CLIMBS OUT. Batch AS's Permafrost and
+# BA's Perfected Toxin both arrive with `turns = -1`, where a negative count is a
+# PERMANENCE FLAG rather than a duration (add_status says so at the top). Letting
+# a later 3-turn application raise the ledger to 3 would let Loaded Shot write a
+# real duration onto a permanent status and quietly UN-permanent it — the one way
+# a refresh card could make a status shorter.
+static func _note_full_turns(s: Dictionary, turns: int) -> void:
+	if int(s.get("full_turns", 0)) < 0 or turns < 0:
+		s["full_turns"] = -1
+	else:
+		s["full_turns"] = maxi(int(s.get("full_turns", 0)), turns)
 
 
 static func _chilled_desc(stacks: int, permanent := false) -> String:
@@ -2391,6 +2441,21 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		amount = maxi(hp - 1, 0)
 		float_text("KILN-FORGED", Color(1.0, 0.6, 0.3))
 		_proc_log("Talent: Kiln-Forged — %s is fired hard and cannot fall (1 HP)" % unit_name)
+	# BATCH BV — BLOODBOND (Beastmaster draft). It sits with Event Horizon and
+	# Kiln-Forged rather than with the death-refusals below the subtraction, and
+	# the position is the promise: "damage that would reduce his companion below
+	# 1 is REFUSED", so nothing downstream may ever see a lethal number. Below
+	# the barrier and One Soul for the Vow's reason — it relocates half of what
+	# GOT THROUGH, never half of what was aimed.
+	#
+	# THE CALLBACK DECIDES, NOT THIS LINE. It bills the hunter half the blow and
+	# spends the guard battle-side, and it returns false when there is nothing to
+	# bill (the hunter is gone, or already dead) — a relocation that never landed
+	# must not also refuse the wound.
+	if is_companion and amount > 0 and amount >= hp and bloodbond_cb.is_valid():
+		if bool(bloodbond_cb.call(self, amount)):
+			amount = maxi(hp - 1, 0)
+			float_text("BLOODBOND", Color(0.85, 0.30, 0.35))
 	var was_above_half := hp > max_hp * 0.5
 	var was_above_quarter := hp > max_hp * 0.25
 	var was_below_deathwish := hp < max_hp * 0.35

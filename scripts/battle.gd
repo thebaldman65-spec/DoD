@@ -159,6 +159,16 @@ const STATUS_INFO := {
 	"covenant": ["Covenant of Ash", "CA", Color(0.60, 0.45, 0.50), "Bound to the ash: every stack of Ruin\napplied to ANY enemy also lands here."],
 	"quarry": ["Quarry", "Qy", Color(0.60, 0.85, 0.45), "Named the quarry: Focus gained from\nattacking this enemy is DOUBLED.\nSwitching away still clears him."],
 	"snare_line": ["Snare Line", "SL", Color(0.75, 0.65, 0.30), "A line runs across the ground: the\nnext time this enemy acts it springs\na trap where it stands."],
+	# ---- BATCH BV: the Hunter draft's statuses ----
+	# THREE FOR NINE ABILITIES. Bloodbond and Ghostpack sit on the HUNTER (a
+	# placed guard and a summoning window, both his), Crossfire on the
+	# Sharpshooter; the other six resolve inside the cast that fires them and
+	# carry nothing. `bloodbond` is applied BATTLE-LONG (-1 turns) on purpose:
+	# it is a guard that waits until it FIRES, not a window that expires, so a
+	# turn count would be a second rule the card never promised.
+	"bloodbond": ["Bloodbond", "Bb", Color(0.85, 0.30, 0.35), "Sworn to the beast: the next blow that\nwould fell a companion is refused, and\nthe hunter takes HALF of it instead.\nIt waits until it is needed — and the\nhalf he takes can kill him."],
+	"ghostpack": ["Ghostpack", "Gp", Color(0.60, 0.70, 0.90), "The whole pack runs, living and lost:\nEVERY companion summoned this battle\nstrikes alongside his attacks for 40%,\nincluding the ones no longer standing."],
+	"crossfire": ["Crossfire", "Cf", Color(0.95, 0.55, 0.25), "The lines are laid: every CRITICAL hit\nhe lands also strikes 2 other enemies\nfor 40% of that crit's damage."],
 	# ---- BATCH BP: the Warrior draft's statuses ----
 	# Five of the six carry one; Gut Rip is an instant. Feint carries TWO,
 	# because its branches land on opposite sides of the board.
@@ -3110,6 +3120,12 @@ func _player_turn(u: BattleUnit) -> void:
 				_vestments_ward(u, dp_t, dp_got)
 				_log("   → Talent: Divine Presence — %s mends %d" % [
 					dp_t.unit_name, dp_got], "#b0a8e0")
+	# BATCH BV — PREPARATION (Survivalist draft). LAST IN THE TURN, below every
+	# end-of-turn node above, because the extra turn is the turn ENDING and
+	# beginning again — anything that fires "as his turn ends" must have fired
+	# before the next one starts. It decrements the counter the cast set to 2, so
+	# the turn he cast on burns one and fires nothing and his NEXT turn fires.
+	_preparation_tick(u)
 	_preview_locked = false
 	current_hero = null
 
@@ -3289,6 +3305,38 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 				if bu_others.is_empty():
 					continue
 			return [ab, bu_pick]
+		# BATCH BV — TWO MORE, same shape, same reason.
+		#
+		# HUNT is paid PER DIFFERENT AFFLICTION and `mark` is the lowest-health
+		# enemy, which in a Survivalist fight is very often the clean one his
+		# poisons have not reached yet. Aimed there the card reads as a weak
+		# 15%-of-Attack strike and a smoke test would never see it work.
+		if ab.display_name == "Hunt":
+			var hv_pick: BattleUnit = foes[0]
+			var hv_best := -1
+			for hv_e in foes:
+				var hv_n := _status_count(hv_e)
+				if hv_n > hv_best:
+					hv_best = hv_n
+					hv_pick = hv_e
+			return [ab, hv_pick]
+		# LOADED SHOT refreshes what is already ON a body, so it wants the WIDEST
+		# board rather than the weakest enemy — and it wants one that will live
+		# long enough to spend the durations it just restored, which the
+		# lowest-health mark by definition will not.
+		if ab.display_name == "Loaded Shot":
+			var ls_pick: BattleUnit = null
+			var ls_best := 0
+			for ls_e in foes:
+				var ls_n := _status_count(ls_e)
+				if ls_n > ls_best or (ls_n == ls_best and ls_pick != null \
+						and ls_e.hp > ls_pick.hp):
+					ls_best = ls_n
+					ls_pick = ls_e
+			if ls_pick != null:
+				return [ab, ls_pick]
+			# Nothing is afflicted: it still lands its 20%, so it falls through to
+			# the ordinary mark rather than being skipped.
 		return [ab, mark]
 	return []
 
@@ -4375,6 +4423,39 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# NOTHING, so the gate is the only thing that stands between him and it.
 	if ab.display_name == "Death Ray" and u.second_resource < DEATH_RAY_STACKS:
 		return false
+	# ---- BATCH BV: the Hunter nine's gates ----
+	# Each refuses a cast that could only ever do nothing — BO's own rule, and
+	# five of the nine need no gate at all because they deal damage whatever the
+	# board looks like (Crossfire, Calibrating Shot, Trophy Shot, Loaded Shot).
+	#
+	# BLOODBOND is refused only while the guard he already swore is still
+	# STANDING. It is deliberately NOT gated on a beast being out: the guard is
+	# sworn to the BOND, so placing it before summoning — or while the field is
+	# empty and a swap is coming — is a real line of play, and the guard has no
+	# duration to waste.
+	if ab.special == "bloodbond" and u.has_status("bloodbond"):
+		return false
+	# SAVAGE SWEEP is an ORDERED action: with no companion standing there is
+	# nobody to give the order to. Twin Hunt's gate, exactly.
+	if ab.special == "savage_sweep" and _beasts(u).is_empty():
+		return false
+	# GHOSTPACK pays per kind SUMMONED THIS BATTLE, so before the first summon it
+	# is a 25-Mana cast that calls nothing. The gate is at one kind and not
+	# higher — choosing to cash a shallow rotation is the decision the card is
+	# for, which is Arcane Bolt's reasoning arriving through the Hunter's door.
+	if ab.special == "ghostpack" and u.kinds_summoned.is_empty():
+		return false
+	# HUNT reads the count and nothing else: against a clean field it is
+	# `damage * 0` and lands the floor of 1.
+	if ab.display_name == "Hunt" and not enemies.any(func(e): \
+			return not e.dead and _status_count(e) > 0):
+		return false
+	# PREPARATION CANNOT CHAIN, AND THIS LINE IS THE WHOLE REASON IT CANNOT.
+	# Casting it ON the extra turn it bought is the unbounded loop — a hang, not
+	# a balance question — so the cast is refused while one is pending. It is the
+	# negative control test_batch_bv drives directly.
+	if ab.special == "preparation" and u.prep_pending > 0:
+		return false
 	return true
 
 
@@ -4432,6 +4513,21 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 		ab_btn.tooltip_text += "\n(No Chilled enemy)"
 	if ab.display_name == "Arcane Bolt" and u.second_resource < 1:
 		ab_btn.tooltip_text += "\n(Requires at least 1 Resonance)"
+	# BATCH BV — same rule again: every gate above SAYS so on the button it
+	# darkens, and Preparation's says it in the words of the mechanic rather than
+	# the field, because a player meeting the first extra turn in the game has
+	# nothing else to learn the rule from.
+	if ab.special == "bloodbond" and u.has_status("bloodbond"):
+		ab_btn.tooltip_text += "\n(The bond is already sworn)"
+	if ab.special == "savage_sweep" and _beasts(u).is_empty():
+		ab_btn.tooltip_text += "\n(No living companion)"
+	if ab.special == "ghostpack" and u.kinds_summoned.is_empty():
+		ab_btn.tooltip_text += "\n(You have summoned nothing yet this battle)"
+	if ab.display_name == "Hunt" and not enemies.any(func(e): \
+			return not e.dead and _status_count(e) > 0):
+		ab_btn.tooltip_text += "\n(Nothing on the field is afflicted)"
+	if ab.special == "preparation" and u.prep_pending > 0:
+		ab_btn.tooltip_text += "\n(An extra turn is already pending)"
 	_mark_upgraded(ab_btn, u, ab)
 	ab_btn.disabled = not _ability_usable(u, ab)
 	ab_btn.pressed.connect(_on_popup_ability.bind(popup, ab))
@@ -5890,6 +5986,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if ab.display_name == "Razor Ice" and attacker.splinter_ranks > 0:
 			total_hits += 1
 			_log("Talent: Splintering Shards — Razor Ice splinters again!", "#b0a8e0")
+		# BATCH BV — CALIBRATING SHOT reads MISSING HEALTH BEFORE ITS OWN SHOT,
+		# and that snapshot is the whole reason the number is taken here rather
+		# than beside the other Sharpshooter riders below the loop. By the time
+		# those run the target has already been hit, so a "fresh" enemy would be
+		# missing exactly this shot's damage and the card's own promise — "a
+		# fresh enemy pays nothing" — would be false by a few Focus every cast.
+		var calib_missing := 0
+		if ab.display_name == "Calibrating Shot" and target != null:
+			calib_missing = maxi(target.max_hp - target.hp, 0)
 		var total_dealt := 0
 		var enemies_struck := 0  # landed strikes (Magi's Wrath recoil fades per hit)
 		var struck_before: BattleUnit = null  # last random-hit victim (Explosion)
@@ -6498,6 +6603,26 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if is_perfect:
 					raw = 0.20 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
 				raw *= float(maxi(attacker.second_resource, 0))
+			# BATCH BV — HUNT (Survivalist draft): 15% of Attack PER DIFFERENT
+			# harmful effect on the target, and the perfect moves the per-affliction
+			# RATE rather than adding a flat lump (the Arcane Bolt shape one card
+			# later). `ab.damage` is the 15, so this multiplies by the count.
+			#
+			# THE COUNT IS `_status_count`, WHICH IS TRAPPER'S OWN — the same function
+			# his passive's +8%-per-status term reads. So DISTINCT-NOT-STACKS falls
+			# out of sharing one implementation rather than being a second rule that
+			# could drift: five Poison stacks are one affliction to the card and to
+			# the passive alike. `broken` is excluded there and stays excluded here —
+			# a Break meter is not an affliction, and counting it would pay the
+			# Survivalist for the party's Break work.
+			if ab.display_name == "Hunt":
+				var hunt_n := _status_count(strike_target)
+				if is_perfect:
+					raw = 0.20 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
+				raw *= float(hunt_n)
+				_log("   → Hunt reads %d different affliction%s on %s" % [
+					hunt_n, "" if hunt_n == 1 else "s",
+					strike_target.unit_name], "#9ad070")
 			# Overburn reads the field as it stands BEFORE this strike eats any
 			# of it — Detonation's own consumption must not shrink the bonus
 			# the consuming cast is paid (Batch AG).
@@ -7480,6 +7605,21 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					attacker.resource = mini(attacker.resource + ab.cost,
 						attacker.max_resource)
 					attacker.refresh_bars()
+				# BATCH BV — CROSSFIRE (Sharpshooter draft). IT SITS INSIDE THE
+				# `is_crit` BLOCK, which is the whole card: the splash fires ONLY
+				# on a critical hit, so past 100 Focus — where the meter stops
+				# buying crit CHANCE and starts buying an uncapped MULTIPLIER —
+				# the deeper his patience the wider a single blow lands.
+				#
+				# IT READS `final`, THE DAMAGE THIS HIT ACTUALLY DEALT, on the
+				# `_arcane_arrow_splash` precedent (BR §1) — never the ability's
+				# nominal damage, which would drift the moment the crit
+				# multiplier, a resist or an armor read differed. "40% of that
+				# crit's damage" is only true if the crit is what is measured.
+				# And because it lives in the strike loop it counts HITS rather
+				# than casts, which is the same standing rule.
+				if attacker.has_status("crossfire") and not is_counter:
+					await _crossfire_splash(attacker, strike_target, final)
 			# Overkill: the excess of a killing blow carries onward, full value.
 			if result.died and attacker.overkill > 0 and not strike_target.is_hero:
 				var excess := final - hp_before
@@ -8392,6 +8532,42 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_apply_status(sv_t, "cripple", 2, 0, 0, attacker)
 				if attacker.has_status("venom_coat"):
 					_apply_poison(attacker, sv_t, 5)
+		# BATCH BV — LOADED SHOT, AND IT IS DELIBERATELY *OUTSIDE* THE SURVIVALIST
+		# PACKAGE ABOVE. It first landed inside that block, where it worked
+		# perfectly and depended on the caster's PASSIVE rather than on the card:
+		# a Loaded Shot in anyone else's hands would have refreshed nothing, silently
+		# and without a log line. The card is spec-locked today so nothing was
+		# reachable in play, but a card whose effect reads the caster's passive is
+		# the BT indentation fault wearing a different hat — the effect belongs to
+		# the ABILITY. Gated on the display name alone, and placed AFTER the package
+		# for the ordering reason that block gave it: everything above may have just
+		# applied a fresh affliction, and a refresh running first would leave the
+		# turn's own work un-refreshed.
+		if ab.display_name == "Loaded Shot" and attacker.is_hero and not is_counter:
+			for ls_t in [target, second_target, third_target]:
+				if ls_t == null or ls_t.dead or ls_t.is_hero:
+					continue
+				_loaded_shot_refresh(attacker, ls_t)
+				if is_perfect:
+					_apply_poison(attacker, ls_t, 2)
+		# BATCH BV — CROSSFIRE ARMS ITS OWN WINDOW, and like Loaded Shot below it is
+		# OUTSIDE the passive-gated block it first landed in, for the same reason:
+		# the window belongs to the ABILITY, not to whoever is holding a Focus
+		# meter. The SPLASH it arms was never passive-gated — it lives in the
+		# on-crit rider block — so leaving the arming behind a passive would have
+		# been the half that quietly failed.
+		#
+		# APPLIED AFTER THE STRIKE THAT CARRIED IT, deliberately: the card promises
+		# the NEXT 3 turns of crits, and arming it before the loop would let its own
+		# opening shot splash, which the description does not claim.
+		if ab.display_name == "Crossfire" and attacker.is_hero and not is_counter:
+			var cf_turns := 4 if is_perfect else 3
+			var cf_info: Array = STATUS_INFO["crossfire"]
+			attacker.add_status("crossfire", cf_info[0], cf_info[1], cf_info[2],
+				cf_turns, cf_info[3])
+			_log("   → Crossfire: for %d turns every CRIT also rakes 2 other enemies for %d%% of it%s" % [
+				cf_turns, int(round(CROSSFIRE_SHARE * 100.0)),
+				" [PERFECT]" if is_perfect else ""], "#e08840")
 		# QUARTERMASTER (Batch BA §2, replacing Plague Bearer): his ALLIES' basic
 		# attacks also carry his poison — he oils their blades before the fight.
 		# It is party-wide CRAFT with nothing self-propagating, which is what
@@ -8417,7 +8593,30 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if attacker.is_hero and attacker.passive_id == "lethal_aim" \
 				and ab.damage > 0 and not is_counter and not _focus_safe(ab) \
 				and target != null and not target.is_hero:
-			_sharpshooter_focus(attacker, target)
+			_sharpshooter_focus(attacker, target, ab)
+			# BATCH BV — CALIBRATING SHOT: Focus equal to a share of the target's
+			# MISSING health. THE ZERO AGAINST A FULL-HEALTH TARGET IS THE DESIGN,
+			# not a failure to fire, and the log says so rather than staying silent
+			# — a card that pays nothing without explaining itself reads as broken.
+			#
+			# MEASURED AFTER HIS OWN BLOW LANDED, which is what makes it accelerate
+			# hardest exactly when the target is about to die and clear his meter:
+			# a killing Calibrating Shot pays the full share of maximum health. It
+			# is added ON TOP of the ordinary engine above rather than replacing it,
+			# so Muscle Memory, Unwavering and Quarry's Mark all still pay.
+			if ab.display_name == "Calibrating Shot":
+				var cs_pct := 0.15 if is_perfect else 0.10
+				var cs_missing := calib_missing
+				var cs_gain := int(round(cs_missing * cs_pct))
+				if cs_gain > 0:
+					_gain_focus(attacker, cs_gain)
+					_log("   → Calibrating Shot: %d Focus, %d%% of the %d health %s had already lost%s" % [
+						cs_gain, int(round(cs_pct * 100.0)), cs_missing,
+						target.unit_name,
+						" [PERFECT]" if is_perfect else ""], "#7ba8e8")
+				else:
+					_log("   → Calibrating Shot: %s was unhurt when the shot left, so the range pays nothing" % \
+						target.unit_name, "#909090")
 			if ab.display_name == "Pinning Shot" and not target.dead:
 				_apply_status(target, "dazed", 3)
 			if ab.display_name == "Called Shot" and not target.dead:
@@ -8505,6 +8704,34 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					if attacker.vengeance_kind != "" else "canis"
 				_ghost_hit(attacker, gp_kind, comp_target,
 					0.20 * attacker.attack * attacker.ghost_pack / 100.0)
+			# BATCH BV — GHOSTPACK (Beastmaster draft). It rides the SAME
+			# `_ghost_hit` door the node above uses, which is what makes both
+			# credit the hunter: BB §4 repaired that site after AY found it
+			# booking damage to nobody, and a second bodiless striker with an
+			# implementation of its own would have undone the repair silently.
+			#
+			# EVERY KIND IN `kinds_summoned`, STANDING OR NOT — the reading the
+			# card's own text carries, decided rather than inferred. Excluding the
+			# ones currently standing would make the ability get SMALLER the moment
+			# a beast arrived, so a Pack build with two out would be paid LESS than
+			# one with none. It reuses AY's ledger rather than writing a second one
+			# that could disagree about what "summoned this battle" means.
+			#
+			# IT STACKS WITH THE GHOST PACK NODE ABOVE rather than replacing it.
+			# The two answer different questions — the node covers the beastless
+			# case permanently at 60%, the card pays for having ROTATED, for 3
+			# turns — so a Beastmaster holding both while standing beastless gets
+			# both. FLAGGED IN THE CHANGELOG rather than pre-tuned, per the
+			# standing testing scope.
+			if attacker.has_status("ghostpack") and comp_target != null \
+					and not comp_target.dead:
+				for gpk in ["ursus", "canis", "aguila"]:
+					if not attacker.kinds_summoned.has(gpk):
+						continue
+					if comp_target.dead:
+						break
+					await _ghost_hit(attacker, gpk, comp_target,
+						GHOSTPACK_SHARE * attacker.attack)
 			for cs_b in pack_now:
 				if comp_target == null or comp_target.is_hero or comp_target.dead:
 					var foes := enemies.filter(func(e): return not e.dead)
@@ -9460,6 +9687,12 @@ func _evade_chance(u: BattleUnit) -> float:
 # The victim takes it through `take_hit` with NO Break damage, so the arrow
 # cannot open a meter the shot itself never touched, and a kill routes through
 # `_on_enemy_death` like every other one.
+# Ghostpack's share of the hunter's Attack per remembered companion, and
+# Crossfire's splash share of the crit that fired it (Batch BV).
+const GHOSTPACK_SHARE := 0.40
+const CROSSFIRE_SHARE := 0.40
+
+
 func _arcane_arrow_splash(attacker: BattleUnit, struck: BattleUnit,
 		final: int) -> void:
 	var left := attacker.status_power("arrows")
@@ -9484,6 +9717,54 @@ func _arcane_arrow_splash(attacker: BattleUnit, struck: BattleUnit,
 		_message("%s falls!" % victim.unit_name)
 		_log("† %s dies" % victim.unit_name, "#e05050")
 		_on_enemy_death(victim)
+	await _wait(0.2)
+
+
+# BATCH BV — CROSSFIRE (Sharpshooter draft): a crit that lands on the field.
+# Called from INSIDE the `is_crit` rider block in `_resolve`'s strike loop, so it
+# fires per HIT and only ever on a CRITICAL hit — a three-shot volley that crits
+# twice splashes twice, which is BR §1's standing rule arriving through a third
+# door.
+#
+# EXACTLY TWO ADDITIONAL ENEMIES, AT 40% OF THE CRIT'S OWN DAMAGE. The pool
+# excludes the enemy actually struck, so "2 OTHER enemies" is true rather than
+# nearly true, and it fills SHORT on a thin field (one other enemy = one splash)
+# rather than hitting the same body twice — AP §3's rule, applied to a target
+# list instead of an offer.
+#
+# THE VICTIMS ARE THE LOWEST-HEALTH TWO rather than random. Crossfire is bought
+# by a crit build to CLOSE fights, and a random scatter would make the card worse
+# the more it was needed; it is also the same `_lowest_hp` answer Overkill's carry
+# and Savage Sweep use, so "the weakest thing standing" has one implementation.
+func _crossfire_splash(attacker: BattleUnit, struck: BattleUnit,
+		final: int) -> void:
+	if final <= 0:
+		return
+	var pool: Array = enemies.filter(func(e): return not e.dead and e != struck)
+	if pool.is_empty():
+		return
+	var picks: Array = []
+	while picks.size() < 2 and not pool.is_empty():
+		var pick: BattleUnit = _lowest_hp(pool)
+		picks.append(pick)
+		pool.erase(pick)
+	for victim in picks:
+		if victim.dead:
+			continue
+		var splash := maxi(int(round(final * CROSSFIRE_SHARE)), 1)
+		splash = maxi(int(round(splash
+			* (1.0 - float(victim.resists.get("physical", 0.0))))), 1)
+		var res: Dictionary = victim.take_hit(splash, 0)
+		victim.float_text("%d" % splash, Color(0.95, 0.55, 0.25))
+		_stat("dmg_hero_" + _contrib_name(attacker), splash)
+		_log("   → Crossfire: the crit rakes %s for %d" % [
+			victim.unit_name, splash], "#e08840")
+		if res.died:
+			_stat("enemy_deaths")
+			_sfx("death", -4.0)
+			_message("%s falls!" % victim.unit_name)
+			_log("† %s dies" % victim.unit_name, "#e05050")
+			_on_enemy_death(victim)
 	await _wait(0.2)
 
 
@@ -10112,6 +10393,86 @@ func _on_vow_share(ally: BattleUnit, share: int) -> int:
 	if devout.dead:
 		_log("† %s falls under the weight of the vow" % devout.unit_name, "#e05050")
 	return share
+
+
+# BATCH BV — BLOODBOND (Beastmaster draft). Asked by a COMPANION's take_hit
+# whether a killing blow may be refused. Returns true only when the hunter
+# actually paid, so unit.gd's refusal and the bill can never come apart.
+#
+# HALF OF THE BLOW, AND IT CAN KILL HIM. It goes through `take_tick_damage` on
+# the Vow's precedent — a redirect is not an attack, so it must not roll a
+# parry, feed a counter or wake an on-being-struck talent — and the hunter's
+# death is reported here rather than swallowed, because a guard that cannot cost
+# anything is not a decision.
+#
+# THE GUARD IS SPENT WHETHER OR NOT THE HUNTER SURVIVES PAYING. "It holds until
+# it fires" is one firing, and a Beastmaster who dies covering his beast has
+# still covered it.
+func _on_bloodbond_guard(comp: BattleUnit, amount: int) -> bool:
+	if comp == null or amount <= 0:
+		return false
+	var hunter: BattleUnit = comp.pack_master
+	if hunter == null or hunter.dead or not hunter.has_status("bloodbond"):
+		return false
+	# The perfect halves his share again — the number lives on the status, put
+	# there by the cast, so the chip and the bill cannot disagree about it.
+	# THE SHARE IS THE STATUS'S OWN NUMBER. A `maxi(..., 50)` here would read as
+	# a harmless default and would silently clamp the PERFECT (25%) back up to
+	# 50 — the chip would say a quarter and the bill would take a half.
+	var share_pct: int = hunter.status_power("bloodbond")
+	if share_pct <= 0:
+		share_pct = 50
+	var share := maxi(int(round(amount * share_pct / 100.0)), 1)
+	hunter.remove_status("bloodbond")
+	_sfx("crit", -6.0, 0.8)
+	_message("%s takes the wound meant for %s!" % [hunter.unit_name,
+		comp.unit_name])
+	_log("%s: Bloodbond — the blow that would have felled %s is REFUSED; %s takes %d of it" % [
+		hunter.unit_name, comp.unit_name, hunter.unit_name, share], "#e05070")
+	_dmg_frame(hunter, "Bloodbond")
+	hunter.take_tick_damage(share, "-%d" % share, Color(0.85, 0.30, 0.35))
+	if hunter.dead:
+		_log("† %s falls paying the bond" % hunter.unit_name, "#e05050")
+	return true
+
+
+# BATCH BV — PREPARATION (Survivalist draft), the first extra-turn mechanic in
+# the game. IT IS THE `_rally_forward` WRITE AIMED AT THE CASTER: Rally is the
+# only turn-order manipulator the project had, and it proved that "acts next"
+# has to mean pulling ahead of the EARLIEST unit on the field rather than to the
+# actor's own clock — by the time this runs he has already paid his delay, so
+# reading his own `next_time` would sometimes leave him behind an enemy that was
+# already sooner.
+#
+# THE EXTRA TURN IS A FULL TURN AND IT RE-TICKS HIS STATUSES, and that falls out
+# of the implementation rather than being bolted on: he re-enters the ordinary
+# initiative loop, so his DoTs bite, his buffs shorten and his cooldowns tick,
+# exactly as they would on any turn. The cost is real without being punishing
+# because ENEMY statuses tick on ENEMY turns — the board he just armed is
+# untouched by his second action.
+#
+# WHY IT CANNOT PRODUCE UNBOUNDED CONSECUTIVE TURNS, which is the whole risk of
+# an extra-turn mechanic: `prep_pending` is set to 2 by the cast and decremented
+# only here, `_ability_usable` REFUSES Preparation while it is above zero, and
+# the ability holds a 5-turn cooldown besides. One turn is granted; nothing
+# repeats. test_batch_bv drives the refusal directly as its negative control.
+func _preparation_tick(u: BattleUnit) -> void:
+	if u == null or u.dead or battle_over or u.prep_pending <= 0:
+		return
+	u.prep_pending -= 1
+	if u.prep_pending > 0:
+		return
+	var soonest := u.next_time
+	for other in heroes + enemies + companions:
+		if other.dead or other == u:
+			continue
+		soonest = minf(soonest, other.next_time)
+	u.next_time = soonest - 0.01
+	u.float_text("PREPARED", Color(0.65, 0.85, 0.45))
+	_sfx("crit", -8.0, 1.1)
+	_message("%s was ready — and acts again!" % u.unit_name)
+	_log("%s: Preparation — the groundwork pays; he takes ANOTHER turn at once" % \
+		u.unit_name, "#a0d060")
 
 
 # BLIGHT THE WELL (Occultist). Healing became damage; unit.gd returned 0 and
@@ -14114,6 +14475,122 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s anoints the party's blades" % attacker.unit_name)
 			_log("%s: Anointing — %d allies' attacks apply 1 Ruin per HIT for %d turns%s" % [
 				attacker.unit_name, an_n, an_turns, " [PERFECT]" if is_perfect else ""], "#a050b0")
+		# ========== BATCH BV: THE HUNTER FOUR THAT ARE PURE EFFECT ==========
+		# The other five carry no `special` at all and ride the ordinary attack
+		# pipeline — see the header in `Classes.draft_ability` for why.
+		"bloodbond":
+			# A PLACED GUARD, NOT A WINDOW: battle-long (-1 turns), so it is
+			# never wasted on a turn nothing threatened the beast and it holds
+			# until it FIRES. `_on_bloodbond_guard` is what spends it.
+			#
+			# THE PERFECT'S NUMBER RIDES THE STATUS rather than a second field,
+			# so the chip a player reads and the bill the callback sends are one
+			# value — Batch BP's Eye of the Storm is what two copies of one
+			# number costs.
+			var bb_pct := 25 if is_perfect else 50
+			var bb_info: Array = STATUS_INFO["bloodbond"]
+			attacker.add_status("bloodbond", bb_info[0], bb_info[1], bb_info[2],
+				-1,
+				"Sworn to the beast: the next blow that\nwould fell a companion is refused, and\nthe hunter takes %d%% of it instead.\nIt waits until it is needed — and the\nshare he takes can kill him." % bb_pct,
+				bb_pct)
+			_sfx("heal", -8.0, 0.7)
+			_message("%s swears the bloodbond" % attacker.unit_name)
+			_log("%s: Bloodbond — the next killing blow against a companion is refused; he takes %d%% of it instead, and it waits until it is needed%s" % [
+				attacker.unit_name, bb_pct,
+				" [PERFECT]" if is_perfect else ""], "#e05070")
+		"savage_sweep":
+			# THE THREE LOWEST-HEALTH ENEMIES, NOT THREE AT RANDOM. It is a
+			# finisher, and `_lowest_hp` is the same answer Overkill's carry and
+			# the beast's own retarget already give — one implementation of "the
+			# weakest thing standing", so the three cannot drift.
+			#
+			# ONE COMPANION UNDER THE PACK, AND IT IS THE HIGHEST-LOYALTY ONE. An
+			# ORDERED action goes to one beast; the passive strike-alongside goes
+			# to all of them (the rule is recorded in `Classes.draft_ability`).
+			# Picking by Loyalty is The Pack's own text read the other way round
+			# — "the deeper bond always keeps its place" — and it lands the 3
+			# Loyalty where the boon curve compounds hardest. Ties break on list
+			# order, so it is deterministic rather than merely usually-right.
+			var ss_beasts: Array = _beasts(attacker)
+			if ss_beasts.is_empty():
+				_log("%s: Savage Sweep — no companion stands to run the line" % \
+					attacker.unit_name, "#909090")
+			else:
+				var ss_b: BattleUnit = ss_beasts[0]
+				for ss_cand in ss_beasts:
+					if int(attacker.loyalty.get(ss_cand.companion_kind, 0)) \
+							> int(attacker.loyalty.get(ss_b.companion_kind, 0)):
+						ss_b = ss_cand
+				var ss_marks: Array = []
+				var ss_pool: Array = enemies.filter(func(e): return not e.dead)
+				while ss_marks.size() < 3 and not ss_pool.is_empty():
+					var ss_pick: BattleUnit = _lowest_hp(ss_pool)
+					ss_marks.append(ss_pick)
+					ss_pool.erase(ss_pick)
+				_message("%s looses %s down the line!" % [attacker.unit_name,
+					ss_b.unit_name])
+				_log("%s: Savage Sweep — %s runs at the %d lowest-health enem%s" % [
+					attacker.unit_name, ss_b.unit_name, ss_marks.size(),
+					"y" if ss_marks.size() == 1 else "ies"], "#e0a050")
+				for ss_t in ss_marks:
+					if ss_b.dead:
+						break
+					if ss_t.dead:
+						continue
+					await _companion_strike(ss_b, ss_t, 1.0, false)
+				var ss_gain := 5 if is_perfect else 3
+				_gain_loyalty(attacker, ss_b.companion_kind, ss_gain)
+				_log("   → Savage Sweep: the run deepens the bond (+%d Loyalty on %s)%s" % [
+					ss_gain, ss_b.companion_kind.capitalize(),
+					" [PERFECT]" if is_perfect else ""], "#c08850")
+		"ghostpack":
+			# THE LEDGER IS `kinds_summoned`, WHICH ALREADY EXISTED — AY keeps it
+			# for Feral Momentum and Menagerie, so this reuses the answer rather
+			# than writing a second one that could disagree about what "summoned
+			# this battle" means. The strikes themselves ride `_ghost_hit`, WHICH
+			# CREDITS THE HUNTER: BB §4 fixed that exact site after AY found it
+			# booking damage to nobody, and a second uncredited striker would
+			# undo the repair.
+			var gp_turns := 4 if is_perfect else 3
+			var gp_info: Array = STATUS_INFO["ghostpack"]
+			attacker.add_status("ghostpack", gp_info[0], gp_info[1], gp_info[2],
+				gp_turns, gp_info[3])
+			var gp_n: int = attacker.kinds_summoned.size()
+			_sfx("crit", -9.0, 0.7)
+			_message("%s calls the whole pack — living and lost" % \
+				attacker.unit_name)
+			_log("%s: Ghostpack — %d companion%s summoned this battle %s alongside him at %d%% for %d turns%s" % [
+				attacker.unit_name, gp_n, "" if gp_n == 1 else "s",
+				"now strikes" if gp_n == 1 else "now strike",
+				int(round(GHOSTPACK_SHARE * 100.0)), gp_turns,
+				" [PERFECT]" if is_perfect else ""], "#8898c8")
+			if gp_n == 0:
+				_log("   → Ghostpack: he has summoned nothing yet, so nothing answers",
+					"#909090")
+		"preparation":
+			# TWO, NOT ONE, AND THAT IS THE DELAY MADE EXACT: the end of THIS
+			# turn burns 2 -> 1 and fires nothing, and the end of his NEXT turn
+			# burns 1 -> 0 and grants the extra one. `_preparation_tick` is the
+			# only place it ever decrements.
+			#
+			# IT CANNOT CHAIN. `_ability_usable` refuses this cast while the
+			# counter is above zero, so Preparation can never be cast on the turn
+			# it bought. The refusal is load-bearing — without it the ability is
+			# an unbounded loop, i.e. a hang rather than a balance question — and
+			# test_batch_bv drives it as a negative control.
+			attacker.prep_pending = 2
+			if is_perfect:
+				var pr_mana := 15
+				attacker.resource = mini(attacker.resource + pr_mana,
+					attacker.max_resource)
+				attacker.refresh_bars()
+				attacker.float_text("+%d %s" % [pr_mana, attacker.resource_name],
+					Color(0.5, 0.7, 1.0))
+			_sfx("heal", -9.0, 1.1)
+			_message("%s makes ready" % attacker.unit_name)
+			_log("%s: Preparation — after his next turn he immediately takes another%s" % [
+				attacker.unit_name,
+				" [PERFECT]" if is_perfect else ""], "#a0d060")
 
 
 # ---------- Beastmaster companions ----------
@@ -14324,6 +14801,11 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 	if comp_mod != "":
 		_stamp_modifier(comp, comp_mod, true)
 	comp.next_time = INF  # never drawn a turn from the timeline
+	# BATCH BV — BLOODBOND. Wired at the ONE place a companion is built, so a
+	# beast summoned mid-fight is covered by a guard placed before it arrived —
+	# the guard is sworn to the BOND, not to whichever animal happened to be
+	# standing at the time. `_on_bloodbond_guard` decides whether it fires.
+	comp.bloodbond_cb = _on_bloodbond_guard
 	companions.append(comp)
 	hunter.beasts.append(comp)
 	_sfx("heal", -7.0, 0.6)
@@ -14635,6 +15117,46 @@ func _status_count(u: BattleUnit) -> int:
 		if id != "broken" and u.has_status(id):
 			n += 1
 	return n
+
+
+# BATCH BV — LOADED SHOT (Survivalist draft): every harmful effect on the body
+# put back to FULL. It is the counterpart to `_status_count` above — that one
+# asks how many afflictions stand, this one keeps them standing.
+#
+# THREE THINGS IT DELIBERATELY DOES NOT DO, each of which is a way the card could
+# have been quietly wrong:
+# · IT DOES NOT USE THE PURGE FILTER. `_harvest_yield` skips STICKY statuses
+#   because a cleanse cannot take them; a refresh is the opposite question, so a
+#   Slow Acting or Perfected Toxin poison IS refreshed — "the uncleansable ones
+#   too" is the description's own promise and the reason the two walks differ.
+# · IT NEVER SHORTENS ANYTHING. A re-applied Burn ADDS its turns to the running
+#   timer (unit.gd's own rule), so a Burn can legitimately stand longer than it
+#   ever started; `maxi` is what keeps a maintenance card from being a nerf.
+# · IT LEAVES PERMANENT STATUSES ALONE. A negative turn count is a permanence
+#   FLAG, not a duration, and `full_turns` pins at -1 for exactly this — writing
+#   a real number onto Permafrost or a Perfected Toxin would un-permanent it.
+func _loaded_shot_refresh(attacker: BattleUnit, victim: BattleUnit) -> void:
+	if victim == null or victim.dead:
+		return
+	var refreshed := 0
+	for st in victim.statuses:
+		if st.id == "broken" or not BattleUnit.DEBUFF_IDS.has(st.id):
+			continue
+		var full := int(st.get("full_turns", 0))
+		if full <= 0 or int(st.turns) < 0:
+			continue
+		if int(st.turns) < full:
+			st.turns = full
+			refreshed += 1
+	if refreshed <= 0:
+		_log("   → Loaded Shot: nothing on %s had run down" % victim.unit_name,
+			"#909090")
+		return
+	victim._refresh_chips()
+	victim.float_text("RELOADED", Color(0.75, 0.85, 0.45))
+	_log("   → %s: Loaded Shot — %d affliction%s on %s reset to full duration" % [
+		attacker.unit_name, refreshed, "" if refreshed == 1 else "s",
+		victim.unit_name], "#9ad070")
 
 
 # WHAT HARVEST WOULD ACTUALLY REAP off this body (Batch BA §7) — the distinct
@@ -15132,13 +15654,30 @@ func _focus_safe(ab: Ability) -> bool:
 	return ab.aoe or ab.display_name == "Called Volley"
 
 
-func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit) -> void:
+func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit,
+		ab: Ability = null) -> void:
 	if attacker.second_resource_name != "Focus" or victim == null:
 		return
 	if victim.dead:
 		# The mark is gone, so the streak is too — but the meter is not. Overkill
 		# carries the blow onward at full value and keeps the Focus whole with it.
-		if attacker.overkill <= 0:
+		#
+		# BATCH BV — TROPHY SHOT is the second thing that keeps it whole, and the
+		# ONLY reason this function now takes the ability at all. THE CLAUSE IS
+		# KILL-ONLY BY CONSTRUCTION: it is read inside the `victim.dead` branch
+		# and nowhere else, so a Trophy Shot that did not kill cannot reach it and
+		# falls through to the ordinary switch rules below — the card behaves as a
+		# plain 35% strike, exactly as its description promises.
+		#
+		# "Carries whole to the next enemy he attacks" needs no code of its own:
+		# `last_attack_target` is set to null two lines down, and a null last
+		# target matches NEITHER branch on his next shot, so the meter is not
+		# cleared by the switch either. Overkill has relied on that since AZ.
+		var trophy: bool = ab != null and ab.display_name == "Trophy Shot"
+		if trophy:
+			_log("   → Trophy Shot: the kill costs him NOTHING — all %d Focus carries to the next mark" % \
+				attacker.second_resource, "#e0a050")
+		elif attacker.overkill <= 0:
 			attacker.second_resource = mini(attacker.second_resource, 50)
 		elif attacker.second_resource > 50:
 			_log("   → Overkill: the chain keeps all %d Focus" % \

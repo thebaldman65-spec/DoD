@@ -13,6 +13,17 @@
 		]
 	},
 	{
+		"id": "extra_turn",
+		"term": "The Extra Turn",
+		"category": "combat",
+		"short": "A second turn taken immediately, and your own statuses tick again for it.",
+		"long": "An extra turn is a WHOLE turn, not a free action. When one is granted you are pulled straight to the front of the initiative bar and act again at once - and because it is a real turn, everything that happens at the start of YOUR turn happens again: your damage-over-time effects bite, your buffs and shields count down, and your cooldowns tick. That last part is usually in your favour. What does NOT re-tick is anything standing on an ENEMY: their Burn, Poison and Chill count down on THEIR turns, so the board you spent a turn arming is untouched by your second action. Preparation (Survivalist) is the only source of one, and it is deliberately DELAYED - you take the extra turn after your NEXT turn, not this one, so it is a setup card rather than a way to act twice on the spot. Only one may ever be pending: Preparation cannot be cast while one is waiting, so extra turns can never chain. Two nearby effects are NOT extra turns and are worth telling apart: Rally hands one ALLY the next slot in the order (they still spend that turn, and nobody gains one), and Instinctive Rotation makes a Beastmaster's companion swap cost no turn at all (one specific action becomes free).",
+		"see_also": [
+			"initiative",
+			"pressure_break"
+		]
+	},
+	{
 		"id": "skill_check",
 		"term": "The Skill Check",
 		"category": "combat",

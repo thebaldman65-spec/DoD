@@ -214,8 +214,11 @@ func _pools() -> void:
 	# half of it, so it moves when the spec pools legitimately grow. BT added
 	# nine Mage SPEC cards and no class card at all — `CLASS_DRAFT_POOLS` is
 	# asserted at 24 two lines up, which is the half that must NOT move.
-	ok(spec_total == 42,
-		"§1: ...at BP's 24 plus BT's and BU's eighteen, with no class card among them (%d)"
+	# RE-POINTED AGAIN BY BATCH BV on the same argument: BV added nine Hunter
+	# SPEC cards and no class card, so the spec side is 51 and the class side is
+	# still 24 — which is the half that must NOT move.
+	ok(spec_total == 51,
+		"§1: ...at BP's 24 plus BT's, BU's and BV's twenty-seven, with no class card among them (%d)"
 			% spec_total)
 
 
@@ -389,7 +392,15 @@ func _draft_flow() -> void:
 		ok(Classes.spec_draft_pool("sharpshooter").has(nm2)
 			or Classes.class_draft_pool("hunter").has(nm2),
 			"§0+BR: ...from his own spec or his class (%s)" % nm2)
+	# RE-POINTED BY BATCH BV: this refused the Hunter CLASS pool to leave a
+	# Sharpshooter on his two spec cards, and BV took the three Hunter pools to
+	# FIVE — so refusing the class pool now leaves five and the check stopped
+	# biting. The refusal has to reach the spec pool too, which is the honest
+	# version of the same construction: an offer never pads with repeats,
+	# whatever wore the pool down.
 	hunter["draft_refused"] = Classes.class_draft_pool("hunter").duplicate()
+	for wq in Classes.spec_draft_pool("sharpshooter").slice(0, 3):
+		hunter["draft_refused"].append(wq)
 	var worn: Array = run.roll_draft_offer(hunter)
 	ok(worn.size() == 2,
 		"§1: a pool worn down to two still fills SHORT rather than padding (%d)" % worn.size())
@@ -968,7 +979,7 @@ func _docs() -> void:
 	var master := _src("res://docs/master.html")
 	# THE STAMP GATE, SEVENTH COPY (see test_batch_bp's note). It reads the
 	# CURRENT batch, not BQ's, and all seven move together.
-	ok(master.contains("Batch BU"), "§5: master.html is stamped for the current batch")
+	ok(master.contains("Batch BV"), "§5: master.html is stamped for the current batch")
 	for cls in TRANCHE_3:
 		for nm in TRANCHE_3[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)

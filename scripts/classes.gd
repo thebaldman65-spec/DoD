@@ -270,12 +270,12 @@ const SPEC_DRAFT_POOLS := {
 	"berserker": ["Blood Offering", "Gut Rip"],
 	"warden": ["Covering Guard", "Eye of the Storm"],
 	"swordmaster": ["Precision Strike", "Feint"],
-	# MAGE — FIVE APIECE SINCE BATCH BT (tranche 2's first third), and the
-	# CLERIC three joined them at BATCH BU. The Hunter and Warrior halves of
-	# tranche 2 are still owed at two, and tranche 3 after them, so a
-	# Hunter/Warrior offer still fills SHORT while a Mage or Cleric one does
+	# MAGE — FIVE APIECE SINCE BATCH BT (tranche 2's first third), the CLERIC
+	# three joined them at BATCH BU and the HUNTER three at BATCH BV. Only the
+	# WARRIOR half of tranche 2 is still owed at two, and tranche 3 after it, so
+	# a WARDEN's offer still fills SHORT while a Mage, Cleric or Hunter one does
 	# not. That asymmetry is the visible shape of the remaining debt rather
-	# than a bug, and test_batch_bu drives both sides of it.
+	# than a bug, and test_batch_bv drives both sides of it.
 	"pyromancer": ["Cinderfall", "Ember Debt", "Slow Burn", "Stoke",
 		"Funeral Pyre"],
 	"cryomancer": ["Winter's Toll", "Rimebinding", "Flash Freeze",
@@ -289,10 +289,13 @@ const SPEC_DRAFT_POOLS := {
 		"Fortified Spirit", "Reliquary"],
 	"occultist": ["Blight the Well", "Covenant of Ash", "Suffering",
 		"Transference", "Anointing"],
-	# HUNTER.
-	"beastmaster": ["Twin Hunt", "Call the Wilds"],
-	"sharpshooter": ["Called Volley", "Quarry's Mark"],
-	"mystic": ["Choking Smoke", "Snare Line"],
+	# HUNTER — FIVE APIECE SINCE BATCH BV (tranche 2's third third).
+	"beastmaster": ["Twin Hunt", "Call the Wilds", "Bloodbond", "Savage Sweep",
+		"Ghostpack"],
+	"sharpshooter": ["Called Volley", "Quarry's Mark", "Crossfire",
+		"Calibrating Shot", "Trophy Shot"],
+	"mystic": ["Choking Smoke", "Snare Line", "Loaded Shot", "Hunt",
+		"Preparation"],
 }
 
 # CLASS-WIDE DRAFT ABILITIES — COMPLETE (Batch BR). Six per class,
@@ -515,7 +518,7 @@ static func pool_ability(display_name: String) -> Ability:
 	return Talents.granted_ability(display_name)
 
 
-# --- THE DRAFTED ABILITIES — FORTY-EIGHT OF A TARGET ~96 (BO §5, BP, BQ, BR) -
+# --- THE DRAFTED ABILITIES — SEVENTY-FIVE OF A TARGET ~96 (BO..BV) -----------
 #
 # BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
 # six WARRIOR entries as owed rather than pretending the pools were full.
@@ -524,8 +527,12 @@ static func pool_ability(display_name: String) -> Ability:
 # BATCH BQ ADDED THE FIRST TWELVE CLASS-WIDE ONES — six MAGE, six CLERIC.
 # BATCH BR ADDS THE OTHER TWELVE — six HUNTER, six WARRIOR — so
 # `CLASS_DRAFT_POOLS` IS FULL AT 24 AND THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL
-# ENTRY FOR EVERY HERO IN THE GAME. Tranches 2 and 3 are still owed: spec pools
-# remain thin at two apiece and an offer of three will still fill short.
+# ENTRY FOR EVERY HERO IN THE GAME.
+# TRANCHE 2 IS THREE QUARTERS PAID: BATCH BT the MAGE nine, BATCH BU the CLERIC
+# nine, BATCH BV the HUNTER nine — nine spec cards apiece, three per spec, so
+# those nine specs draft from FIVE. THE WARRIOR THREE ARE THE LAST THIRD OWED
+# and still sit at two, so a Berserker/Warden/Swordmaster offer of three still
+# fills SHORT where every other hero's now comes up full. Tranche 3 follows.
 #
 # EVERY ABILITY NAMES THE AXIS IT SERVES, in its comment. That rule is here
 # because the twelve tree batches spent themselves removing nodes that existed
@@ -1628,6 +1635,250 @@ static func draft_ability(display_name: String) -> Ability:
 				"special": "anointing",
 				"perfect_id": "", "perfect_text": "Holds a 4th turn",
 				"description": "Anoint their blades: for 3 turns EVERY\nally's attacks apply 1 Ruin.\nIt counts HITS, not casts — a three-hit\nability applies three."})
+		# ========== BATCH BV: TRANCHE 2, THE HUNTER NINE ==========
+		#
+		# FIVE OF THE NINE CARRY NO `special` AT ALL, AND THAT IS A DECISION
+		# RATHER THAN AN OMISSION — the BT ARCANE BOLT pattern. `_resolve` sends
+		# ANY ability holding a `special` down `_resolve_special`, which means
+		# hand-rolling the blow and losing the whole attack pipeline with it:
+		# crits, armor, resists, Break, the parry roll, the Focus engine and
+		# every talent rider that reads a strike. Crossfire is defined by a CRIT,
+		# Calibrating Shot and Trophy Shot are defined by the FOCUS ENGINE, Hunt
+		# scales the raw damage, and Loaded Shot rides a landed hit — all five
+		# NEED that pipeline, so they key on `display_name` at the ordinary rider
+		# sites instead. The four that genuinely do nothing but their own effect
+		# (Bloodbond, Savage Sweep, Ghostpack, Preparation) keep a `special`.
+		#
+		# ----- BEASTMASTER: the partnership protected, widened, and paid back.
+		# His pool was Twin Hunt and Call the Wilds — BOTH ABOUT THE COMPANION
+		# STRIKING. Nothing protected it, and Loyalty (uncapped, measured
+		# reaching 50) DIES WITH IT. These three guard the investment, make it
+		# wide, and pay out the rotation the Pack lane spends itself buying.
+		#
+		# WHAT "HIS COMPANION" RESOLVES TO UNDER THE PACK — DECIDED HERE RATHER
+		# THAN BY WHICHEVER `beasts[0]` THE FILE REACHES FIRST, and the general
+		# rule is worth more than either card: AN ORDERED ACTION GOES TO ONE
+		# COMPANION; THE PASSIVE STRIKE-ALONGSIDE GOES TO ALL OF THEM. The
+		# alongside-strike already loops `for cs_b in pack_now` and must, because
+		# that is what The Pack's own text promises. An ordered action must not,
+		# or the capstone silently doubles every card that names the beast.
+		# · BLOODBOND is the exception that proves it: it names no beast at all.
+		#   The guard is placed on the BOND, so under The Pack it covers BOTH and
+		#   is spent by whichever one first takes a killing blow.
+		# · SAVAGE SWEEP picks the HIGHEST-LOYALTY standing companion — The
+		#   Pack's own rule ("the deeper bond always keeps its place") read the
+		#   other way round, and it puts the 3 Loyalty where the boon curve
+		#   compounds hardest. Three strikes whether one beast stands or two.
+		# REPORTED, NOT CHANGED: TWIN HUNT (tranche 1) still picks `th_beasts[0]`
+		# by list order. It is an existing ability and this tranche changes none,
+		# so the inconsistency is the designer's to close — one call site.
+		#
+		# AXIS: protecting the single largest investment in the game. At 50
+		# Loyalty a companion's death is the worst thing that happens to him, and
+		# he has no answer at all today. IT IS A PLACED GUARD, NOT A WINDOW —
+		# no duration, so it is never wasted on a turn nothing threatened the
+		# beast, and it holds until it fires.
+		#
+		# THE REDIRECTED HALF STILL HITS HIM AND CAN KILL HIM, and the
+		# description says so outright. A guard that cannot cost anything is not
+		# a decision, it is a free stat.
+		# SYNERGY: ANCIENT PACT makes the companion unhealable BY ANY SOURCE, so
+		# nothing else in the game can save it — Bloodbond is the only answer a
+		# Pact build has. WILD COMMUNION (+12% strike damage per Loyalty stack)
+		# and ABSOLUTE DEVOTION (the +35% step) are what make a deep bond worth
+		# bleeding for, and STEADFAST BOND softens the meter's loss if it ever
+		# does die. It is the card that lets the devotion lane commit.
+		"Bloodbond":
+			return Ability.make({"display_name": "Bloodbond", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 4,
+				"anim": "attack01", "special": "bloodbond",
+				"perfect_id": "", "perfect_text": "The hunter takes only a QUARTER of the blow",
+				"description": "Swear the bond: the next blow that\nwould fell your companion is REFUSED,\nand you take HALF of it instead.\nIt waits until it is needed — and the\nhalf you take can kill you."})
+		# AXIS: the partnership made wide. Every companion in the game is
+		# single-target and nothing in his kit changes that, so a Beastmaster
+		# facing four bodies watches his best damage go into one of them.
+		#
+		# LOWEST-HEALTH TARGETING, NOT RANDOM, AND THAT IS THE CARD. It is a
+		# finisher; a random spread would make it a worse Cinderfall and put it
+		# straight into BD §4's "strictly better version of another" bin from the
+		# wrong end. It reuses `_lowest_hp`, the same answer Overkill's carry and
+		# the beast's own retarget already give.
+		# SYNERGY: HERALD (an arriving beast's effects strike two additional
+		# targets) and FERAL MOMENTUM (+25% companion damage per different
+		# companion summoned) both pay per body hit, so this is the card that
+		# gives them three at once. Beside TWIN HUNT from tranche 1 it is the
+		# other half of a two-card burst — Twin Hunt for one target, this for the
+		# field — and BESTIAL WRATH sharpens all three blows at 1.5x on the wolf.
+		"Savage Sweep":
+			return Ability.make({"display_name": "Savage Sweep", "cost": 25,
+				"damage": 0, "pressure": 0, "delay": 2.5, "cooldown": 4,
+				"anim": "attack02", "special": "savage_sweep",
+				"perfect_id": "", "perfect_text": "5 Loyalty instead of 3",
+				"description": "Loose the beast down the line: your\ncompanion strikes the THREE lowest-\nhealth enemies, and gains 3 Loyalty.\nUnder The Pack the deeper bond runs."})
+		# AXIS: what rotating actually buys. FERAL MOMENTUM and MENAGERIE both
+		# already reward having cycled, but both are small passive trickles; this
+		# is the Pack build's PAYOFF, and it is deliberately near-worthless to a
+		# Lone Bond build, which fields one companion and never swaps.
+		#
+		# EVERY KIND HE HAS SUMMONED THIS BATTLE, STANDING OR NOT — decided
+		# rather than inferred, because the two readings differ by a third of the
+		# card. Excluding the ones currently standing would make the ability get
+		# SMALLER the moment a beast arrived, which is the opposite of what a
+		# Pack payoff should feel like; a rotator who has fielded all three gets
+		# three ghosts every attack whatever is on the board. Lone Bond gets one.
+		# IT REUSES `kinds_summoned` (the ledger AY already keeps for Feral
+		# Momentum and Menagerie) rather than writing a second one, and it rides
+		# `_ghost_hit`, WHICH CREDITS THE HUNTER — BB §4 fixed exactly that site
+		# after AY found it booking nothing, and a second uncredited striker
+		# would undo the repair.
+		# SYNERGY: WILD ROTATION, NO BEAST LEFT, SHARED DEVOTION and INSTINCTIVE
+		# ROTATION all exist to make cycling cheap; this is what cycling PAYS.
+		# HERALD makes each arrival wider on the way in. It stacks with the
+		# GHOST PACK node rather than replacing it — see the changelog.
+		"Ghostpack":
+			return Ability.make({"display_name": "Ghostpack", "cost": 25,
+				"damage": 0, "pressure": 0, "delay": 2.5, "cooldown": 5,
+				"anim": "attack03", "special": "ghostpack",
+				"perfect_id": "", "perfect_text": "Holds a 4th turn",
+				"description": "Call the whole pack, living and lost:\nfor 3 turns EVERY companion you have\nsummoned this battle strikes alongside\nyour attacks for 40% — including the\nones no longer standing."})
+		# ----- SHARPSHOOTER: the multiplier half, the finish, and the field.
+		# His pool was Called Volley and Quarry's Mark — BOTH ABOUT GENERATING
+		# AND KEEPING FOCUS. Nothing read the half PAST 100, where Focus stops
+		# buying crit chance and starts buying crit MULTIPLIER without a ceiling.
+		#
+		# AXIS: the crit build goes wide. Past 100 Focus his multiplier climbs
+		# without limit, so at x3.5 a single crit is already a field event — the
+		# deeper his patience, the wider it hits. It is the one card that turns
+		# the uncapped half of his meter into board presence rather than a bigger
+		# number on one body.
+		#
+		# ANTI-SYNERGY WITH CONSISTENT AIM, DELIBERATELY AND NAMED: that node
+		# trades multiplier for chance, so a Consistent build wants a different
+		# card. That is what makes this a BUILD DECISION rather than a strict
+		# pick, which is the whole subject of BT's synergy rule.
+		# SYNERGY: EXECUTIONER'S EYE (x2.5) and TUNNEL VISION (+100% crit chance
+		# on the enemy he has been working) make the crits reliable;
+		# FOLLOW-THROUGH (crits cut all cooldowns), RAPID FIRE and SECOND NATURE
+		# all multiply how many crits land inside the window. TROPHY SHOT below
+		# is its setup card — carry 200 Focus into a fresh enemy with the splash
+		# still live.
+		"Crossfire":
+			return Ability.make({"display_name": "Crossfire", "cost": 25,
+				"damage": 30, "pressure": 10, "delay": 2.5, "cooldown": 4,
+				"anim": "attack02",
+				"perfect_id": "", "perfect_text": "Holds a 4th turn",
+				"description": "Set the crossfire: 30% of Attack, and\nfor 3 turns every CRITICAL hit you\nland also strikes 2 other enemies for\n40% of that crit's damage."})
+		# AXIS: patience rewarded for finishing what he started. A fresh enemy
+		# pays nothing; one at 20% health pays 8 Focus on top of the ordinary
+		# gain — so it accelerates hardest exactly when the target is about to
+		# die and clear his meter.
+		#
+		# IT READS MISSING HEALTH, WHICH IS THE CLAUSE THAT WOULD MOST EASILY BE
+		# GOT WRONG: against a full-health target it pays literally nothing, and
+		# that zero is the design rather than a failure to fire.
+		# SYNERGY: COUP DE GRÂCE reads missing health too and caps its reading at
+		# 200 Focus, so this feeds the card that spends it. OVERKILL, MUSCLE
+		# MEMORY and UNWAVERING all stack on top of the ordinary gain this
+		# arrives beside, and QUARRY'S MARK from tranche 1 doubles that half.
+		"Calibrating Shot":
+			return Ability.make({"display_name": "Calibrating Shot", "cost": 20,
+				"damage": 20, "pressure": 8, "delay": 1.5, "cooldown": 3,
+				"anim": "attack01",
+				"perfect_id": "", "perfect_text": "15% of missing health instead of 10%",
+				"description": "Range them as you fire: 20% of Attack,\nand you gain Focus equal to 10% of\nthe target's MISSING health.\nA fresh enemy pays nothing."})
+		# AXIS: the kill stops costing him. A target dying is the most common
+		# event in a fight and it drops him to 50 retained — so the spec whose
+		# entire engine is a meter is punished by the thing it is trying to do.
+		# THIS IS THE ONLY CARD THAT MAKES FINISHING A KILL GOOD FOR THE METER
+		# rather than the event that resets it.
+		#
+		# THE CLAUSE IS KILL-ONLY. If it does not kill it is an ordinary 35%
+		# strike and the ordinary switch rules apply, and the description says
+		# so — a conditional card that reads unconditional is a tooltip lying.
+		# SYNERGY: OVERKILL already keeps Focus whole on a kill-CHAIN carry, so
+		# this is its single-target cousin; holding both means the excess damage
+		# carries AND the meter survives. BONECRACKER (+40% vs Broken) and
+		# EXPOSED NERVE help it land the kill in the first place. It is the setup
+		# card for CROSSFIRE above.
+		"Trophy Shot":
+			return Ability.make({"display_name": "Trophy Shot", "cost": 25,
+				"damage": 35, "pressure": 12, "delay": 2.5, "cooldown": 4,
+				"anim": "attack02",
+				"perfect_id": "", "perfect_text": "Deals 45% of Attack instead",
+				"description": "Take the trophy: 35% of Attack. If\nthis KILLS the target your Focus is\nnot reduced at all and carries whole\nto the next enemy you attack.\nIf it does not kill, it is just a shot."})
+		# ----- SURVIVALIST: hold the breadth, cash the breadth, buy a turn.
+		# His pool was Choking Smoke and Snare Line — BOTH WIDE, BOTH ONE-SHOT.
+		# His engine is breadth and BREADTH DECAYS: Cripple runs out while he is
+		# applying Slow, and the count Trapper pays him for quietly shrinks.
+		#
+		# AXIS: craft as maintenance, on a turn he would have been attacking
+		# anyway. Every other answer to decay costs him a whole cast re-applying
+		# one status; this refreshes the entire board and still deals damage.
+		#
+		# TO FULL ORIGINAL DURATION, INCLUDING THE UNCLEANSABLE ONES. It reads
+		# the `full_turns` ledger `add_status` keeps rather than a table of
+		# defaults, because a talent that lengthened a status lengthened its full
+		# value too — and it can only ever LENGTHEN: a re-applied Burn whose
+		# running timer already exceeds its original is left alone.
+		# SYNERGY: SLOW ACTING (halved tick, doubled duration, uncleansable) and
+		# PERFECTED TOXIN both extend; this refreshes all of it at once. CREEPING
+		# DEATH already refreshes the poison whenever any status lands — this
+		# generalises that node to every affliction on the body. It is what makes
+		# CHOKING SMOKE and SNARE LINE, which apply wide and then run down, worth
+		# building around, and it holds the count HUNT below is paid on.
+		"Loaded Shot":
+			return Ability.make({"display_name": "Loaded Shot",
+				"dmg_type": "nature", "cost": 20, "damage": 20, "pressure": 8,
+				"delay": 2.0, "cooldown": 4, "anim": "attack01",
+				"perfect_id": "", "perfect_text": "Also lands 2 turns of Poison",
+				"description": "Reload with the good powder: 20% of\nAttack, and EVERY harmful effect on\nthe target has its duration reset to\nfull — the uncleansable ones too."})
+		# AXIS: the count made into a weapon. It reads how many DIFFERENT
+		# afflictions stand on the body and nothing else — at four statuses 60%
+		# of Attack, at six 90%. The Survivalist's passive has always paid for
+		# breadth; this is the first thing that lets him SPEND it.
+		#
+		# DISTINCT EFFECTS, NEVER STACKS. It shares `_status_count` with
+		# Trapper's own +8%-per-status term, so the card and the passive can
+		# never disagree about what breadth is — five stacks of Poison is one
+		# affliction to both of them.
+		# SYNERGY: VULTURE (+60% against 3+ afflictions) and FORCE OF NATURE
+		# (Trapper's bonus rises to +20% AND applies to the whole party) read the
+		# same quantity, so a breadth build is paid three times on one cast. Its
+		# maintenance card is LOADED SHOT above, and PREPARATION below is what
+		# buys the extra turn a wide board costs to arm.
+		"Hunt":
+			return Ability.make({"display_name": "Hunt",
+				"dmg_type": "nature", "cost": 25, "damage": 15, "pressure": 10,
+				"delay": 2.5, "cooldown": 4, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "20% of Attack per affliction instead",
+				"description": "Run the quarry down: 15% of Attack for\nevery DIFFERENT harmful effect on the\ntarget. Stacks do not count twice —\nfive Poison stacks are one affliction."})
+		# AXIS: AN EXTRA ACTION IS EXTRA BREADTH, for a spec where every status
+		# costs a whole cast. It is the first extra-turn mechanic in the game.
+		#
+		# THREE RULES, DECIDED HERE RATHER THAN BY WHICHEVER BRANCH THE CODE
+		# FALLS INTO — all three are in CLAUDE.md and asserted in test_batch_bv:
+		# · THE EXTRA TURN IS A FULL TURN AND IT RE-TICKS HIS STATUSES. It is a
+		#   normal trip through the initiative loop, so his DoTs bite, his buffs
+		#   shorten and his cooldowns tick. Simpler, legible, and the cost is
+		#   real without being punishing — ENEMY statuses tick on ENEMY turns, so
+		#   the board he just armed is untouched.
+		# · IT MUST NOT CHAIN. Casting Preparation ON the extra turn to earn
+		#   another is the loop, so the cast is REFUSED while one is pending.
+		#   That refusal is load-bearing, not a nicety.
+		# · THE DELAY IS WHAT MAKES IT A SETUP CARD rather than "take two turns
+		#   now" — cast it, spend the next turn arming something, then
+		#   immediately capitalise.
+		# SYNERGY: everything of his that costs a turn — COATED BLADES,
+		# DISTILLATE, trap placement, DEADFALL NETWORK's three slots. HIT AND RUN
+		# grants Elusive whenever he applies a status, so an extra turn is an
+		# extra Elusive. And it is the direct setup for LOADED SHOT and HUNT
+		# above: refresh the board, then swing at the count.
+		"Preparation":
+			return Ability.make({"display_name": "Preparation", "cost": 25,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
+				"anim": "attack01", "special": "preparation",
+				"perfect_id": "", "perfect_text": "The extra turn also refunds 15 Mana",
+				"description": "Ready everything: after your NEXT turn\nyou immediately take ANOTHER one.\nIt is a full turn — your own statuses\ntick again. Only one may be pending."})
 	return null
 
 

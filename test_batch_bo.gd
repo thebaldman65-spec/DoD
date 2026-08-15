@@ -135,8 +135,11 @@ func _pools() -> void:
 	# the LIVE dict is what catches that either way.
 	# RE-POINTED AGAIN BY BATCH BU on the same argument: the live total is 42
 	# (BO's 18 + BP's Warrior 6 + BT's Mage 9 + BU's Cleric 9).
-	ok(total == 42,
-		"§5+BP+BT+BU: forty-two ship — BO's 18, BP's 6, BT's 9, BU's 9 (got %d)"
+	# RE-POINTED AGAIN BY BATCH BV, same argument, last time for tranche 2's
+	# spec half: 51 (BO's 18 + BP's Warrior 6 + BT's Mage 9 + BU's Cleric 9 +
+	# BV's Hunter 9). Only the WARRIOR three are still at two.
+	ok(total == 51,
+		"§5+BP+BT+BU+BV: fifty-one ship — BO's 18, BP's 6, BT's 9, BU's 9, BV's 9 (got %d)"
 			% total)
 	# TRANCHE 1'S ENTRIES MUST STILL LEAD THEIR POOLS, which is the half of this
 	# check that survives BT untouched: a later tranche APPENDS, it does not
@@ -311,13 +314,22 @@ func _offer_and_ratio() -> void:
 	# repeats, and the no-return ledger is what still makes a pool thin.
 	ok(offer.size() == 3,
 		"§3: a Mage's offer fills THREE now — spec plus class (Batch BQ)")
-	var thin := {"key": "hunter", "spec": "sharpshooter", "bm_abilities": [],
-		"draft_refused": Classes.class_draft_pool("hunter").duplicate()}
+	# RE-POINTED BY BATCH BV, AND THE REASON IS THE SAME INVERSION AGAIN: this
+	# was built on a SHARPSHOOTER because his spec pool held two, and BV took the
+	# three Hunter pools to FIVE, so that hero now fills a full three and the
+	# check stopped biting. It moves to a BERSERKER — the Warrior three are the
+	# last pools still at two, so this is the only place in the game where the
+	# rule can still be measured against a genuinely thin pool. When tranche 2's
+	# Warrior third lands, this construction has to move again, to a hero who has
+	# REFUSED his way down (BR's version of it) — and that is the honest signal
+	# that the debt is paid rather than a check quietly weakening.
+	var thin := {"key": "warrior", "spec": "berserker", "bm_abilities": [],
+		"draft_refused": Classes.class_draft_pool("warrior").duplicate()}
 	var thin_offer: Array = run.roll_draft_offer(thin)
 	ok(thin_offer.size() == 2,
 		"§3: a pool worn down to two still fills SHORT (2 cards, not 3) — never padding (got %d)" % thin_offer.size())
 	for tc in thin_offer:
-		ok(Classes.spec_draft_pool("sharpshooter").has(String(tc)),
+		ok(Classes.spec_draft_pool("berserker").has(String(tc)),
 			"§3: ...and what is left is his own spec's (%s)" % tc)
 	ok(offer.size() == offer.duplicate().size(),
 		"§3: ...and never pads")
@@ -1127,7 +1139,7 @@ func _docs() -> void:
 	# TOGETHER or a batch that bumps the timestamp trips suites it never
 	# touched. (BO had its own copy phrased as "this batch"; it is the same
 	# gate.)
-	ok(master.contains("Batch BU"),
+	ok(master.contains("Batch BV"),
 		"§6: master.html is stamped for the current batch")
 	ok(master.contains("THE ABILITY DRAFT") or master.contains("The Ability Draft"),
 		"§6: ...and carries the draft's own section")

@@ -700,6 +700,12 @@ failure it prevents is SILENT: a spine that stops working because its enabler be
   picks for a bookkeeping reason.
 · 3 **Sharpshooter** — **Quick Shot** (Lethal Aim counts consecutive single-target attacks).
 · 3 **Survivalist** — nothing (Trapper's breadth term counts statuses from ANY source).
+**TRANCHE 2 IS THREE QUARTERS PAID (BT the Mage nine, BU the Cleric nine, BV the Hunter nine) —
+`SPEC_DRAFT_POOLS` IS 51 AND THE DRAFT IS 75 OF ~96. THE WARRIOR THREE ARE THE LAST THIRD OWED and
+are the ONLY pools still at two**, so a Berserker/Warden/Swordmaster offer of three still fills
+SHORT where every other hero's comes up full. test_batch_bv asserts both halves (five for the nine
+deep pools, two for the Warrior three) and test_batch_br still drives the fill-short rule on a
+worn-down pool, so the debt stays visible in code rather than only in prose.
 **THE WARRIOR POOLS WERE OWED AND ARE PAID (Batch BP) — do not re-record them as empty.** All
 three were NAMED and EMPTY at BO because the lane names only arrived in BM; BP filled them with
 two apiece (Berserker Blood Offering / Gut Rip, Warden Covering Guard / Eye of the Storm,
@@ -820,6 +826,211 @@ call and one string).
   Worse than BP's Precision Strike (same spec, but a node against a SPEC card). Nothing breaks, and
   **the ability's status is `ironclad` with its own chip** precisely so a Warden holding both never
   sees two chips reading the same word.
+
+**FIVE NEGATIVE CONTROLS RUN AND REVERTED (battle.gd and unit.gd byte-identical by hash
+afterwards), AND TWO OF THEM TAUGHT SOMETHING THE PASSING SUITE COULD NOT.**
+· **NC1 FOUND A CHECK PASSING FOR THE WRONG REASON, WHICH IS THE FAILURE MODE A GREEN SUITE CANNOT
+  SHOW YOU.** Deleting Preparation's no-chain refusal did NOT trip the check written to catch it:
+  the cast had just started a 5-turn cooldown, so `_ability_usable` went on refusing on the
+  COOLDOWN and the assertion stayed green. **A check only discriminates once the thing under test is
+  the ONLY thing that can produce the answer** — the fix is `sv.cooldowns.clear()` immediately
+  before it. This is BQ's "a check that can only pass is a gap" arriving from the other side: a
+  check that PASSES FOR A REASON IT IS NOT TESTING is the same gap, and only a negative control
+  finds it.
+· **NC3 VALIDATED BS's RATIO RULE IN THE FIELD.** Pointing Ghostpack at the LIVING pack instead of
+  the summoned ledger left the bare `with_ghost > without` comparison PASSING on noise (17 vs 15);
+  the ratio assertion beside it — `> without * 1.15` — is what failed. **A bare `<`/`>` between two
+  blows is not a check, it is a coin flip with good odds.**
+· The other three: the `full_turns` permanence pin (NC2), Savage Sweep's lowest-health targeting
+  (NC4) and Crossfire's crit gate (NC5) each tripped the checks written for them, 1, 4 and 1
+  failures respectively.
+
+**THE MASTER.HTML STAMP GATE IS DUPLICATED NINE TIMES AND ALL NINE MOVED TO BATCH BV** —
+test_batch_ah, bb, bn, bo, bp, bq, br, bs **and bu**. BU's own suite joined the pile the moment BV
+bumped the stamp, which is exactly the growth this note keeps predicting: the count rises by one
+per batch and every one of them is a suite the moving batch did not otherwise touch.
+test_batch_bv adds a tenth (it checks its own stamp), so the next batch moves ten.
+**FOUR MORE SUITES NEEDED RE-POINTING FOR A REASON THAT IS NOT THE STAMP, and it is worth
+separating** — test_batch_bo, bp, bq and br all hard-code the DRAFT TOTALS and the "still at two"
+claim, so a tranche that fills three pools trips them by construction. Two shapes:
+· **THE TOTALS** (42 -> 51, and BR's 66 -> 75 of ~96). These are working as designed: BP, BT and BU
+  each re-pointed them in place for the same reason, and the check is what would catch a pool
+  quietly EMPTYING.
+· **THE FILL-SHORT CONSTRUCTIONS, WHICH IS THE SUBTLER ONE.** bo, bq and br each built a thin pool
+  by refusing a hero's whole CLASS pool and leaving him on his two SPEC cards. **BV took the three
+  Hunter pools to five, so those constructions stopped producing a thin pool and started passing
+  three** — a check that no longer measures what it was written to measure. Repaired by making the
+  refusal reach the spec pool too (bq, br) or by moving it onto a **Berserker**, whose pool is
+  genuinely still two (bo). **WHEN THE WARRIOR THIRD LANDS, bo's version has to move again** — and
+  that forced move is the honest signal that the last of tranche 2 is paid.
+
+BATCH BV (08-14) — TRANCHE 2, THE HUNTER NINE. **Nine spec draft abilities, three per Hunter
+spec; the Hunter pools go 2 -> 5 and join the Mage and the Cleric.** The draft goes 66 ->
+**75 of a target ~96**. **THE WARRIOR THREE ARE THE LAST THIRD OF TRANCHE 2 OWED** and still sit
+at two, so a Berserker/Warden/Swordmaster offer of three still fills SHORT where every other
+hero's now comes up full; test_batch_bv asserts both halves. Nothing else ships — no talent node,
+no magnitude, no existing ability changed, no save version moves (still v10). **ONE new callback
+and ONE new counter for nine abilities**, plus one LEDGER field on the status dict; everything
+with a duration is a STATUS (`bloodbond`, `ghostpack`, `crossfire`), per BQ's standard.
+**THE NINE, WITH THEIR AXES AND THEIR COMBOS.** Defs live in `Classes.draft_ability` beside BO's
+through BU's, resolved at the top of `pool_ability` as before.
+· **BEASTMASTER — the partnership protected, widened, paid back.** His pool was two cards about
+  the companion STRIKING; nothing protected it and Loyalty dies with it. **Bloodbond** (20 Mana,
+  2.0, 4cd, self — the next blow that would FELL a companion is refused and he takes HALF instead;
+  *builds with* Ancient Pact, Wild Communion, Absolute Devotion, Steadfast Bond) · **Savage Sweep**
+  (25, 2.5, 4cd, self — his companion strikes the THREE LOWEST-HEALTH enemies and gains 3 Loyalty;
+  *builds with* Herald, Feral Momentum, Bestial Wrath, Twin Hunt) · **Ghostpack** (25, 2.5, 5cd,
+  self — for 3 turns EVERY kind summoned this battle strikes alongside his attacks at 40%,
+  including ones no longer standing; *builds with* Wild Rotation, No Beast Left, Shared Devotion,
+  Instinctive Rotation — it is what cycling PAYS).
+· **SHARPSHOOTER — the multiplier half, the finish, the field.** Nothing read the half PAST 100,
+  where Focus buys crit MULTIPLIER rather than chance. **Crossfire** (25, 2.5, 4cd, 10 BD — 30% of
+  Attack, and for 3 turns every CRIT also strikes 2 others for 40% of that crit; *builds with*
+  Executioner's Eye, Tunnel Vision, Follow-Through, Rapid Fire, Second Nature — and **ANTI-synergy
+  with Consistent Aim**, deliberately) · **Calibrating Shot** (20, 1.5, 3cd, 8 BD — 20% of Attack
+  plus Focus equal to 10% of the target's MISSING health; *builds with* Coup de Grâce, Overkill,
+  Muscle Memory, Unwavering, Quarry's Mark) · **Trophy Shot** (25, 2.5, 4cd, 12 BD — 35% of Attack;
+  if it KILLS, his Focus is not reduced at all; *builds with* Overkill, Bonecracker, Exposed Nerve,
+  and it is the setup for Crossfire).
+· **SURVIVALIST — hold the breadth, cash the breadth, buy a turn.** His engine is breadth and
+  BREADTH DECAYS. **Loaded Shot** (20, 2.0, 4cd, 8 BD — 20% of Attack, and EVERY harmful effect on
+  the target is reset to FULL, uncleansable ones included; *builds with* Slow Acting, Perfected
+  Toxin, Creeping Death, Choking Smoke, Snare Line) · **Hunt** (25, 2.5, 4cd, 10 BD — 15% of Attack
+  per DIFFERENT harmful effect; *builds with* Vulture, Force of Nature, Loaded Shot) ·
+  **Preparation** (25, 2.0, 5cd, self — after his NEXT turn he immediately takes another; *builds
+  with* Coated Blades, Distillate, trap placement, Deadfall Network, Hit and Run).
+
+**PREPARATION IS THE FIRST EXTRA-TURN MECHANIC IN THE GAME, AND ITS THREE RULES ARE THE MOST
+LOAD-BEARING THING THIS BATCH DECIDED.** Nothing before it handed a hero a second action. Two
+things came close and neither is this, which is worth knowing before a later batch "unifies" them:
+**Rally** hands an ALLY the next slot in the order (they still spend that turn; nobody gains one),
+and **Instinctive Rotation** makes ONE specific action — the companion swap — cost no turn.
+· **THE EXTRA TURN IS A FULL TURN AND IT RE-TICKS HIS STATUSES.** Designer's call, and it FALLS
+  OUT of the implementation rather than being bolted on: `_preparation_tick` pulls him to the front
+  of the ordinary initiative loop, so his DoTs bite, his buffs shorten and his cooldowns tick
+  exactly as on any turn. **The cost is real without being punishing because ENEMY statuses tick on
+  ENEMY turns** — the board he just armed is untouched by his second action.
+· **IT MUST NOT CHAIN, AND `_ability_usable` REFUSING THE CAST WHILE ONE IS PENDING IS WHAT MAKES
+  THAT TRUE.** Casting Preparation ON the extra turn is an unbounded loop — **a hang, not a balance
+  problem**. That one line is load-bearing rather than tidy; test_batch_bv drives it as the batch's
+  negative control.
+· **THE DELAY IS EXACT BECAUSE `prep_pending` IS A COUNTER ARMED AT 2, NOT A BOOL.** The end of
+  every one of his turns decrements it, so the turn he CAST on burns 2 -> 1 and fires nothing and
+  his NEXT turn burns 1 -> 0 and fires. A bool would have needed a second "was it cast this turn"
+  flag to say the same thing. It decrements in exactly ONE place (asserted).
+· **`Improvised` IS THE INTERACTION TO WATCH, IT IS REPORTED RATHER THAN PRE-TUNED, AND THE
+  MEASUREMENT DISAGREED WITH THE BRIEF'S NUMBER.** The first two abilities each fight do not start
+  their cooldowns; BV §4 predicted "a Guerilla build opens with Preparation twice. Bounded at two."
+  **TWO IS THE BOUND ON THE FREE CASTS, NOT ON THE OPENING.** Driven honestly in test_batch_bv such
+  a build gets **THREE Preparations in its first five turns** — two Improvised-funded, then a third
+  the shortened clock already allows, **because the extra turn each cast buys is a REAL turn and
+  ticks the cooldown with it. THE CARD ACCELERATES ITS OWN COOLDOWN**, which no reading of the code
+  would have shown and which a later batch touching Preparation's 5cd needs to know.
+· **WHAT IS ACTUALLY BOUNDED IS THE THING THAT MAKES THE MECHANIC SAFE, and it is asserted rather
+  than described:** every cast buys EXACTLY ONE extra turn (`casts == extra_turns`), the counter
+  never rises above 2, and two can never be pending at once. Those hold however fast he casts,
+  which is why they are the assertions and the cadence is a pinned REPORT (`first_five == 3`) that
+  a later cooldown change will move.
+
+**WHAT "HIS COMPANION" RESOLVES TO UNDER THE PACK — DECIDED, NOT LEFT TO THE FIRST `beasts[0]` IN
+THE FILE. The general rule is worth more than either card: AN ORDERED ACTION GOES TO ONE COMPANION;
+THE PASSIVE STRIKE-ALONGSIDE GOES TO ALL OF THEM.** The alongside-strike already loops `for cs_b in
+pack_now` and must, because that is what The Pack's own text promises. An ordered action must not,
+or the capstone silently doubles every card that names the beast.
+· **BLOODBOND is the exception that proves it: it names no beast at all.** The guard is placed on
+  the BOND, so under The Pack it covers BOTH and is spent by whichever one first takes a killing
+  blow. It is wired at the ONE place a companion is built (`_do_summon`), so **a beast summoned
+  after the guard was sworn is covered too**.
+· **SAVAGE SWEEP picks the HIGHEST-LOYALTY standing companion** — The Pack's own rule ("the deeper
+  bond always keeps its place") read the other way round — and lands its 3 Loyalty where the boon
+  curve compounds hardest. **Three strikes whether one beast stands or two.** Ties break on list
+  order, so it is deterministic rather than merely usually-right.
+· **REPORTED, NOT CHANGED: TWIN HUNT (tranche 1) STILL PICKS `th_beasts[0]` BY LIST ORDER.** It is
+  an existing ability and this tranche changes none, so the inconsistency is the designer's to
+  close — one call site.
+
+**GHOSTPACK COLLIDES WITH THE `Ghost Pack` TALENT NODE AND IT IS THE CLOSEST COLLISION THE PROJECT
+HAS HAD.** `bm_ghost_pack` is Beastmaster **Handler row 8 — the SAME SPEC**, so one hero can hold
+both; the names are ONE SPACE apart; and they are **mechanically adjacent** (the node makes a
+beastless hunter's attacks still draw a companion strike at 60%). Per BR §1 it **SHIPS AS SPECIFIED
+AND IS FLAGGED** — a node's name is not an ability name, nothing resolves it, and
+`pool_ability("Ghost Pack")` returns null (asserted). **TWO THINGS FOR THE DESIGNER: they STACK** —
+a Beastmaster holding both while standing beastless gets the node's 60% strike AND a 40% ghost per
+kind summoned, up to 180% of Attack in extra strikes per attack for three turns, not pre-tuned —
+**and renaming the card is one string.**
+· **THE CARD FIRES FOR EVERY KIND IN `kinds_summoned`, STANDING OR NOT**, and that reading was
+  decided rather than inferred because the two readings differ by a third of the card. Excluding
+  the standing ones would make the ability get SMALLER the moment a beast arrived, so a Pack build
+  with two out would be paid LESS than one with none.
+· **IT REUSES AY's `kinds_summoned` LEDGER** (Feral Momentum and Menagerie already read it) rather
+  than writing a second one, and it strikes through **`_ghost_hit`, WHICH CREDITS THE HUNTER** —
+  BB §4 repaired exactly that site after AY found it booking damage to nobody, and a second
+  uncredited bodiless striker would have undone the repair silently.
+
+**TROPHY SHOT'S KILL-ONLY CLAUSE IS KILL-ONLY BY CONSTRUCTION.** It is read INSIDE
+`_sharpshooter_focus`'s `victim.dead` branch and nowhere else, so a Trophy Shot that did not kill
+cannot reach it and falls through to the ordinary switch rules — the card behaves as a plain 35%
+strike, exactly as its description promises. **"Carries whole to the next enemy" needs no code of
+its own**: a kill sets `last_attack_target` to null, and a null last target matches NEITHER branch
+on his next shot, so the switch cannot clear him either. Overkill has relied on that since AZ.
+
+**CALIBRATING SHOT READS MISSING HEALTH *BEFORE* ITS OWN SHOT**, snapshotted before the strike loop
+rather than beside the other Sharpshooter riders. By the time those run the target has already been
+hit, so a "fresh" enemy would be missing exactly this shot's damage and the card's own promise —
+"a fresh enemy pays nothing" — would be false by a few Focus every cast.
+
+**FIVE OF THE NINE DELIBERATELY CARRY NO `special` (the BT ARCANE BOLT PATTERN), AND IT LOOKS LIKE
+AN OMISSION, WHICH IS WHY IT IS RECORDED.** `_resolve` sends ANY ability holding a `special` down
+`_resolve_special`, which means hand-rolling the blow and losing the whole attack pipeline with it:
+crits, armor, resists, Break, the parry roll, the Focus engine and every talent rider that reads a
+strike. Crossfire is DEFINED by a crit, Calibrating Shot and Trophy Shot by the Focus engine, Hunt
+scales the raw damage and Loaded Shot rides a landed hit — all five NEED that pipeline, so they key
+on `display_name` at the ordinary rider sites. **test_batch_bv asserts the split BOTH WAYS ROUND**,
+because either half getting it wrong is silent.
+
+**THE `full_turns` LEDGER (unit.gd) IS WHAT "RESET TO FULL" MEANS, AND ITS ONE TRAP IS PERMANENCE.**
+Written by `add_status` — the one function that applies a status — so it can never drift from what
+was actually applied; a table of defaults would be wrong the moment a talent lengthened something.
+**A PERMANENT STATUS PINS AT -1 AND NEVER CLIMBS OUT** (`_note_full_turns`): a negative turn count
+is a PERMANENCE FLAG rather than a duration, and letting a later 3-turn application raise the ledger
+would let Loaded Shot write a real number onto Permafrost or a Perfected Toxin and quietly
+un-permanent it — the one way a refresh card could make a status SHORTER. Loaded Shot also
+`maxi`es rather than assigns, so a re-applied Burn standing longer than it started is left alone,
+and it does NOT borrow `_harvest_yield`'s sticky filter: a cleanse cannot take a sticky poison, but
+a refresh must.
+
+**HUNT SHARES `_status_count` WITH THE TRAPPER PASSIVE'S OWN BREADTH TERM**, so DISTINCT-NOT-STACKS
+is a property of one implementation rather than a second rule that could drift: five Poison stacks
+are one affliction to the card and to the passive alike, and `broken` is excluded from both — a
+Break meter is not an affliction, and counting it would pay the Survivalist for the party's Break
+work.
+
+**A BEAR SAVAGE SWEEP IS MUCH WIDER THAN THREE, and it is a finding rather than a bug.** **URSUS'S
+OWN BLOW MAULS THE ENEMIES BESIDE ITS TARGET** (`_adjacent_enemies`, its kit since Batch 30), so a
+sweep run by the bear touches up to three targets AND their neighbours while the same card run by
+the wolf or the eagle hits exactly three. It is the beast's own rule composing with a new card, it
+is a real reason to choose which companion runs it, and it is in master.html so a player is not
+surprised. **It is also a harness fact**: any future check asserting sweep TARGETING must drive the
+canis or the aguila, or the bear's own splash makes an identity assertion impossible.
+
+**BT's ONE-TAB INDENTATION FAULT HAPPENED TWICE IN THIS BATCH AND THE SUITE CAUGHT BOTH.**
+Crossfire's splash landed inside `if attacker.through_and_through > 0` (so it would have worked
+only for a Sharpshooter holding Through and Through) and Loaded Shot's refresh landed inside
+`if attacker.has_status("venom_coat")` (so it would have worked only under Venom Coating). Neither
+crashed, neither logged. **The rule, now twice-proven: A HOOK ADDED TO AN EXISTING BLOCK MUST BE
+CHECKED AGAINST THE BLOCK IT LANDED IN, NOT THE BLOCK IT WAS AIMED AT** — and the only reason both
+were found is that the checks drove the effect directly and asserted an EXACT number rather than
+that the cast returned.
+
+**A SECOND BT LESSON REPEATED: `code.find('if ab.display_name == "Hunt":')` MATCHES THE BOT'S
+TARGETING REFINEMENT FIRST.** That string appears three times — the damage block, the bot's pick and
+the usability gate — so a source slice anchored on it sweeps the wrong region. Anchor on a line that
+exists once (`var hunt_n := _status_count(strike_target)`).
+
+**`check_parse.gd` PRINTS "0 failures" WHEN A SCRIPT FAILS TO LOAD.** Seen repeatedly this batch: a
+`SCRIPT ERROR: Parse Error` on battle.gd still ends with `check_parse: 0 failures`. The gate's real
+signal is the stderr grep the working agreement already specifies — **grep "SCRIPT ERROR", never
+trust the count line alone.** (Same shape as BO's suite-count trap, one layer down.)
 
 BATCH BU (08-14) — TRANCHE 2, THE CLERIC NINE. **Nine spec draft abilities, three per Cleric
 spec; the Cleric pools go 2 -> 5 and join the Mage.** The draft goes 57 -> **66 of a target ~96**.

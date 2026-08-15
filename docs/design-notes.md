@@ -3249,3 +3249,49 @@ again as the heal it becomes. The cost of getting it right was threading the rec
 thirty-four credit sites, which felt disproportionate for one clause of one card and was not: the
 alternative was an accumulator that silently over-counted in exactly the builds the card is
 designed for.
+
+## Batch BV — tranche 2, the Hunter nine
+
+**An extra turn is the first mechanic in this game with no precedent to lean on, and the risk it
+carries is not a balance risk.** Every other card in the draft can be wrong by a number; Preparation
+can be wrong by an infinite loop. That changes what "decided" has to mean — the no-chain refusal is
+not a nicety attached after the fact, it is the thing that makes the ability a mechanic at all, and
+it belongs in the same breath as the effect rather than in a tuning pass. The other two rules fell
+out easily once the first was fixed: the extra turn is a *whole* turn because that is what the
+initiative loop already does with a unit it picks, and making it a partial turn would have meant
+authoring an exception to a system that has none.
+
+**The delay is what makes it a card rather than a bigger number.** "Take two turns now" is a
+damage multiplier wearing a costume. "Take a turn after your next one" asks a question — what do
+you spend the turn in between on? — and for a spec whose every status costs a whole cast, that
+question is the entire subject of the ability. The counter armed at 2 rather than a bool is the
+cheapest possible way to say it exactly, and it is a small reminder that the shape of the state is
+usually the shape of the rule.
+
+**A guard with no duration is a different design object from a guard with one, and the difference
+is where the waste goes.** Bloodbond has no timer, so it is never spent on a turn where nothing
+threatened the companion — which sounds like pure upside until you notice that it also means the
+hunter can never be *sure* it is still there to sell. The cost had to go somewhere, and putting it
+in the payment (half the blow, and it can kill him) rather than in a clock is what keeps it a
+decision. A protective ability that cannot cost anything is a stat, not a choice.
+
+**Reading a number "before" or "after" the blow that changes it is a design decision disguised as
+an implementation detail.** Calibrating Shot's promise is "a fresh enemy pays nothing", and measured
+after its own shot that sentence is false by a few Focus every cast — small enough that nobody would
+ever file it, large enough that the card's stated identity would be a lie. The general point is that
+a snapshot is worth taking whenever the ability's own effect moves the quantity it is paid on, and
+the tell is a description containing an absolute like "nothing".
+
+**Two readings of one sentence differed by a third of a card.** Ghostpack says "every companion he
+has summoned this battle... including ones no longer standing", and the tempting implementation —
+only the absent ones, so nothing double-dips with the beast already striking — makes the ability get
+*smaller* the moment a beast arrives. A Pack build fielding two would be paid less than one fielding
+none, which inverts the card's whole reason to exist. Where two readings are both defensible, the
+one to take is the one whose magnitude curve points the same way as the build it is for.
+
+**The most useful thing this batch produced is not a card.** It is the rule that an *ordered* action
+goes to one companion while the passive strike-alongside goes to all of them. The Pack capstone had
+been silently doubling anything that named the beast, and the reason nobody had noticed is that
+until now only one ability named it. Writing two more forced the question, and the answer is worth
+more than either card: it means the next Beastmaster ability has a rule to be authored against
+instead of a precedent to be inherited from whichever line of code it happens to resemble.

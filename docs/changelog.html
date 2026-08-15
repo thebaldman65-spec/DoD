@@ -5,6 +5,210 @@
 <p><i>Newest first. The Master Document holds current truth; this records what changed and
 when. (Earlier history lives in the retired Implementation Addendum.)</i></p>
 
+<h2>2026-08-14 &mdash; Batch BV: tranche 2, the Hunter nine</h2>
+<p><i><b>LEAD WITH PREPARATION, because it is the first extra-turn mechanic in the game.</b>
+<b>PREPARATION</b> (Survivalist) is 25 Mana for a plain sentence: after his NEXT turn he
+immediately takes another one. Nothing in Dawn of Decay has ever handed a hero a second action.
+Two things came close and neither is this &mdash; <b>Rally</b> hands an ALLY the next slot in the
+order (they still spend that turn; nobody gains one), and <b>Instinctive Rotation</b> makes one
+specific action, the companion swap, cost no turn. Preparation is a whole turn out of nowhere, and
+because it is a whole turn it carries a whole turn's costs: <b>his own statuses tick again for
+it.</b> Three rules were decided here rather than left to whichever branch the code fell into, and
+all three are in CLAUDE.md.</i></p>
+
+<p><b>Nine spec draft abilities, three per Hunter spec. The Hunter pools go from two to five,
+joining the Mage and the Cleric.</b> <b>The Warrior three are the last third of tranche 2 owed</b>,
+and tranche 3 after them. The draft holds <b>75 of a target ~96</b>. Nothing else ships: no talent
+node, no magnitude, no existing ability changed, and no save version moves (still v10).</p>
+
+<p><b>BEASTMASTER &mdash; the partnership protected, widened, and paid back.</b> His pool was Twin
+Hunt and Call the Wilds: both about the companion striking. Nothing protected it, and Loyalty
+&mdash; uncapped, measured reaching 50 &mdash; dies with it.</p>
+<ul>
+<li><b>Bloodbond</b> &mdash; 20 Mana, 2.0, 4cd, self. The next blow that would fell a companion is
+<b>refused</b>, and the hunter takes <b>half</b> of it instead (Perfect: a quarter). <i>Axis:
+protecting the single largest investment in the game.</i> <b>It is a placed guard, not a
+window</b> &mdash; no duration, so it is never wasted on a turn nothing threatened the beast, and
+it holds until it fires. <b>The half he takes can kill him, and the card says so</b>: a guard that
+cannot cost anything is not a decision.</li>
+<li><b>Savage Sweep</b> &mdash; 25 Mana, 2.5, 4cd, self. His companion strikes the <b>three
+lowest-health</b> enemies and gains 3 Loyalty (Perfect: 5). <i>Axis: the partnership made wide.</i>
+Lowest-health rather than random, deliberately: it is a finisher, and a random spread would make it
+a worse Cinderfall.</li>
+<li><b>Ghostpack</b> &mdash; 25 Mana, 2.5, 5cd, self. For 3 turns (Perfect: 4) every companion he
+has summoned this battle strikes alongside his attacks at 40%, <b>including the ones no longer
+standing</b>. <i>Axis: what rotating actually buys.</i> It is the Pack build's payoff and
+deliberately near-worthless to a Lone Bond build, which fields one companion and never swaps.</li>
+</ul>
+
+<p><b>SHARPSHOOTER &mdash; the multiplier half, the finish, and the field.</b> His pool was Called
+Volley and Quarry's Mark: both about generating and keeping Focus. Nothing read the half past 100,
+where Focus stops buying crit chance and starts buying crit <i>multiplier</i> without a ceiling.</p>
+<ul>
+<li><b>Crossfire</b> &mdash; 25 Mana, 2.5, 4cd, one enemy, 10 BD. 30% of Attack, and for 3 turns
+(Perfect: 4) every <b>critical</b> hit also strikes 2 other enemies for 40% of that crit's damage.
+<i>Axis: the crit build goes wide.</i> <b>Anti-synergy with Consistent Aim is deliberate and
+named</b> &mdash; that node trades multiplier for chance, so a Consistent build wants a different
+card, and that is what makes this a build decision rather than a strict pick.</li>
+<li><b>Calibrating Shot</b> &mdash; 20 Mana, 1.5, 3cd, one enemy, 8 BD. 20% of Attack, and Focus
+equal to 10% of the target's <b>missing</b> health (Perfect: 15%). <i>Axis: patience rewarded for
+finishing what he started.</i> <b>The reading is taken BEFORE this shot lands</b>, so "a fresh enemy
+pays nothing" is literally true rather than nearly true &mdash; measured afterwards, the shot's own
+damage would have paid a few Focus every cast and quietly made the card's promise false.</li>
+<li><b>Trophy Shot</b> &mdash; 25 Mana, 2.5, 4cd, one enemy, 12 BD. 35% of Attack (Perfect: 45%).
+<b>If this kills, his Focus is not reduced at all</b> and carries whole to the next enemy.
+<i>Axis: the kill stops costing him.</i> <b>If it does not kill it is an ordinary shot</b> and the
+ordinary switch rules apply &mdash; the card's own text says so, because a conditional card that
+reads unconditional is a tooltip lying.</li>
+</ul>
+
+<p><b>SURVIVALIST &mdash; hold the breadth, cash the breadth, buy a turn.</b> His pool was Choking
+Smoke and Snare Line: both wide, both one-shot. His engine is breadth and breadth decays &mdash;
+Cripple runs out while he is applying Slow, and the count Trapper pays him for quietly shrinks.</p>
+<ul>
+<li><b>Loaded Shot</b> &mdash; 20 Mana, 2.0, 4cd, one enemy, 8 BD. 20% of Attack, and every harmful
+effect on the target is reset to <b>full</b> duration, <b>the uncleansable ones included</b>
+(Perfect: it also lands 2 turns of Poison). <i>Axis: craft as maintenance, on a turn he would have
+been attacking anyway.</i> It reads a new <code>full_turns</code> ledger written by
+<code>add_status</code> itself rather than a table of defaults, so a talent that lengthened a status
+lengthened its full value too. <b>It can only lengthen</b>: a re-applied Burn already standing
+longer than it started is left alone, and a permanent affliction stays permanent.</li>
+<li><b>Hunt</b> &mdash; 25 Mana, 2.5, 4cd, one enemy, 10 BD. 15% of Attack for every
+<b>different</b> harmful effect on the target (Perfect: 20%) &mdash; 60% at four, 90% at six.
+<i>Axis: the count made into a weapon.</i> <b>Distinct effects, never stacks</b>, and that is a
+property of one implementation rather than a second rule: it shares <code>_status_count</code> with
+the Trapper passive's own breadth term, so the card and the passive can never disagree about what
+breadth is.</li>
+<li><b>Preparation</b> &mdash; 25 Mana, 2.0, 5cd, self. After his next turn he immediately takes
+another (Perfect: the extra turn also refunds 15 Mana). <i>Axis: an extra action IS extra
+breadth</i>, for a spec where every status costs a whole cast.</li>
+</ul>
+
+<p><b>PREPARATION'S THREE RULES, DECIDED HERE RATHER THAN BY WHICHEVER BRANCH THE CODE FELL
+INTO.</b></p>
+<ul>
+<li><b>The extra turn is a FULL turn and it re-ticks his statuses.</b> Designer's call: simpler and
+legible. It falls out of the implementation rather than being bolted on &mdash; he re-enters the
+ordinary initiative loop, so his damage-over-time effects bite, his buffs shorten and his cooldowns
+tick, exactly as on any turn. <b>The cost is real without being punishing because ENEMY statuses
+tick on ENEMY turns</b>, so the board he just armed is untouched by his second action.</li>
+<li><b>It must not chain.</b> Casting Preparation <i>on</i> the extra turn to earn another is an
+unbounded loop &mdash; a hang, not a balance question &mdash; so <b>the cast is refused while one is
+pending</b>. That refusal is load-bearing rather than tidy, and it is the negative control
+test_batch_bv drives directly.</li>
+<li><b>The delay is what makes it a setup card</b> rather than "take two turns now". A counter
+armed at 2 and decremented at the end of each of his turns is what makes that exact: the turn he
+cast on burns one and grants nothing, and his next turn grants the extra one.</li>
+</ul>
+
+<p><b>THE <code>Improvised</code> INTERACTION IS REPORTED, NOT PRE-TUNED &mdash; AND THE
+MEASUREMENT DISAGREED WITH THE BRIEF.</b> Improvised (Survivalist, Guerilla row 7) stops the first
+two abilities of each fight starting their cooldowns, and the brief predicted a Guerilla build
+"opens with Preparation twice &mdash; bounded at two". <b>Two is the bound on the FREE casts, not on
+the opening.</b> Driven honestly in test_batch_bv &mdash; cast whenever the gate allows, tick at the
+end of every turn &mdash; such a build gets <b>three</b> Preparations in its first five turns: two
+Improvised-funded, and then a third the shortened clock already allows, <b>because the extra turn
+each cast buys is a REAL turn and ticks the cooldown with it</b>. The card accelerates its own
+cooldown, which nothing in the brief anticipated and no reading of the code would have shown.
+<b>What IS bounded is the thing that makes the mechanic safe</b>, and it is asserted rather than
+described: every cast buys exactly one extra turn, the counter never rises above 2, and two can
+never be pending at once. Shipped as specified and flagged; the number to watch in play is the
+opening cadence, and the lever if it reads hot is Preparation's 5-turn cooldown.</p>
+
+<p><b>WHAT "HIS COMPANION" RESOLVES TO UNDER THE PACK, decided rather than left to the first
+<code>beasts[0]</code> in the file.</b> The general rule is worth more than either card:
+<b>an ORDERED action goes to ONE companion; the passive strike-alongside goes to ALL of them.</b>
+The alongside-strike already loops every beast and must, because that is what The Pack's own text
+promises; an ordered action must not, or the capstone silently doubles every card that names the
+beast.</p>
+<ul>
+<li><b>Bloodbond</b> is the exception that proves it: it names no beast at all. The guard is placed
+on the BOND, so under The Pack it covers both and is spent by whichever one first takes a killing
+blow. It is wired at the one place a companion is built, so a beast summoned <i>after</i> the guard
+was sworn is covered too.</li>
+<li><b>Savage Sweep</b> picks the <b>highest-Loyalty</b> standing companion &mdash; The Pack's own
+rule ("the deeper bond always keeps its place") read the other way round &mdash; and lands its 3
+Loyalty where the boon curve compounds hardest. Three strikes whether one beast stands or two. Ties
+break on list order, so it is deterministic rather than merely usually-right.</li>
+<li><b>REPORTED, NOT CHANGED: Twin Hunt (tranche 1) still picks <code>beasts[0]</code> by list
+order.</b> It is an existing ability and this tranche changes none, so the inconsistency is the
+designer's to close &mdash; one call site.</li>
+</ul>
+
+<p><b>GHOSTPACK COLLIDES WITH THE <i>GHOST PACK</i> TALENT NODE, and it is the closest collision the
+project has had.</b> <code>bm_ghost_pack</code> is a Beastmaster Handler row 8 node &mdash; the
+<b>same spec</b>, so one hero can hold both &mdash; the two names are one space apart, and they are
+<b>mechanically adjacent</b>: the node makes a beastless hunter's attacks still draw a companion
+strike at 60%. Per the BR&nbsp;&sect;1 rule this <b>ships as specified and is flagged</b>: a node's
+name is not an ability name, nothing resolves it, and <code>pool_ability("Ghost Pack")</code>
+returns null (asserted). <b>Two things for the designer.</b> They <b>stack</b>: a Beastmaster
+holding both while standing beastless gets the node's 60% strike <i>and</i> a 40% ghost for every
+kind he has summoned &mdash; up to 180% of Attack in extra strikes per attack for three turns. That
+is not pre-tuned. And renaming the card is one string.</p>
+
+<p><b>THE CARD FIRES FOR EVERY KIND SUMMONED, STANDING OR NOT</b>, and that reading was decided
+rather than inferred, because the two readings differ by a third of the card. Excluding the beasts
+currently standing would make the ability get <i>smaller</i> the moment one arrived, so a Pack build
+with two out would be paid less than one with none &mdash; the opposite of what a Pack payoff should
+feel like. It reuses <code>kinds_summoned</code>, the ledger Batch AY already keeps for Feral
+Momentum and Menagerie, rather than writing a second one, and it strikes through
+<code>_ghost_hit</code>, <b>which credits the hunter</b> &mdash; Batch BB repaired exactly that site
+after AY found it booking damage to nobody, and a second uncredited bodiless striker would have
+undone the repair silently.</p>
+
+<p><b>ONE THING THE BRIEF DID NOT ANTICIPATE, FOUND WHILE TESTING: a bear Savage Sweep is much wider
+than three.</b> <b>Ursus's own blow mauls the enemies beside its target</b> (its kit since Batch 30),
+so a Savage Sweep run by the bear touches up to three targets <i>and</i> their neighbours, while the
+same card run by the wolf or the eagle hits exactly three. Nothing is wrong &mdash; it is the beast's
+own rule composing with a new card &mdash; but it is a real reason to pick which companion runs it,
+and it is now in master.html so a player is not surprised by it.</p>
+
+<p><b>FIVE OF THE NINE DELIBERATELY CARRY NO <code>special</code></b> (the Batch BT Arcane Bolt
+pattern), and it is recorded because it looks like an omission. <code>_resolve</code> sends <i>any</i>
+ability holding a <code>special</code> down <code>_resolve_special</code>, which means hand-rolling
+the blow and losing the whole attack pipeline with it: crits, armor, resists, Break, the parry roll,
+the Focus engine and every talent rider that reads a strike. Crossfire is <i>defined</i> by a crit,
+Calibrating Shot and Trophy Shot by the Focus engine, Hunt scales the raw damage and Loaded Shot
+rides a landed hit &mdash; all five need that pipeline, so they key on their display name at the
+ordinary rider sites. test_batch_bv asserts the split <b>both ways round</b>, because either half
+getting it wrong is silent.</p>
+
+<p><b>BREAK DAMAGE WAS ASSIGNED DELIBERATELY RATHER THAN BY OMISSION</b> (the standing rule since
+BO): the five that strike carry it in line with their siblings &mdash; Crossfire 10, Calibrating
+Shot 8, Trophy Shot 12, Loaded Shot 8, Hunt 10 &mdash; and the four that land no blow carry none,
+because Break from an ability that never hits is Break from nowhere.</p>
+
+<p><b>UNIT-SIDE COST: ONE CALLBACK AND ONE COUNTER FOR NINE ABILITIES</b>, plus one field on the
+status dictionary. Everything with a duration is a STATUS (<code>bloodbond</code>,
+<code>ghostpack</code>, <code>crossfire</code>), which is BQ's standard &mdash; statuses expire by
+themselves and cannot leak past a battle. <code>bloodbond_cb</code> is the Vow of Suffering shape
+aimed at the other side of the bond; <code>prep_pending</code> is a counter rather than a bool
+because that is what makes Preparation's delay exact. The new <code>full_turns</code> entry on each
+status is a LEDGER, not a duration, and it <b>pins at -1 for a permanent status and never climbs
+out</b> &mdash; without that, a later timed application would let Loaded Shot write a real number
+onto Permafrost or a Perfected Toxin and quietly un-permanent it.</p>
+
+<p><b>NINE SUITES MOVED FOR THE MASTER.HTML STAMP AND FOUR MORE FOR THE POOL TOTALS, AND THE SECOND
+GROUP IS THE ONE WORTH KNOWING ABOUT.</b> The stamp gate is duplicated across nine suites and all
+nine move together every time the timestamp is bumped &mdash; ordinary, predicted, and growing by one
+a batch. The other four (test_batch_bo, bp, bq, br) hard-code the draft totals, and three of them
+built their "an offer fills SHORT rather than padding" check by refusing a hero's whole CLASS pool
+and leaving him on his two SPEC cards. <b>Taking the Hunter pools to five stopped that construction
+producing a thin pool: those checks began passing three and quietly stopped measuring what they were
+written to measure.</b> Repaired by making the refusal reach the spec pool too, and in one case by
+moving it onto a Berserker &mdash; whose pool is genuinely still two. When the Warrior third lands
+that one has to move again, and the forced move is the honest signal that tranche 2 is finished.</p>
+
+<p><b>THE BATCH BT INDENTATION FAULT HAPPENED TWICE HERE AND THE SUITE CAUGHT BOTH.</b> BT recorded
+that a one-tab error can make an effect fire only for holders of an unrelated ability; in this batch
+<b>Crossfire's splash landed inside <code>if attacker.through_and_through > 0</code></b> (so it would
+have worked only for a Sharpshooter holding Through and Through) and <b>Loaded Shot's refresh landed
+inside <code>if attacker.has_status("venom_coat")</code></b> (so it would have worked only under
+Venom Coating). Neither crashed, neither logged, and both were found only because the checks drove
+the effect directly and asserted the exact number rather than that the cast returned. The lesson
+stands and is now twice-proven: <b>a hook added to an existing block must be checked against the
+block it landed in, not the block it was aimed at.</b></p>
+
 <h2>2026-08-14 &mdash; Batch BU: tranche 2, the Cleric nine</h2>
 <p><i><b>LEAD WITH THE TWO CROSS-SPEC CARDS, because they are the first draft abilities whose
 value is measured on somebody else's sheet.</b> <b>RECANT</b> (Holy) hands an ally back 30% of

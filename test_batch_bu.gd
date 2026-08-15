@@ -154,16 +154,20 @@ func _pools() -> void:
 	for spec in five:
 		var pool: Array = Classes.spec_draft_pool(spec)
 		ok(pool.size() == 5, "%s drafts FIVE (got %d)" % [spec, pool.size()])
-	for spec in Classes.SPEC_DRAFT_POOLS:
-		if spec in five:
-			continue
+	# RE-POINTED BY BATCH BV, which paid the HUNTER third: those three joined the
+	# Mage and Cleric at five, so ONLY THE WARRIOR THREE are still at two. Kept
+	# as an inversion rather than deleted — what matters is that the LAST unpaid
+	# third stays visible in code rather than only in prose.
+	for spec in ["beastmaster", "sharpshooter", "mystic"]:
+		ok(Classes.spec_draft_pool(spec).size() == 5,
+			"%s joined them at FIVE in Batch BV" % spec)
+	for spec in ["berserker", "warden", "swordmaster"]:
 		ok(Classes.spec_draft_pool(spec).size() == 2,
-			"%s is still TWO deep — the Hunter/Warrior third of tranche 2 owes it"
-				% spec)
+			"%s is still TWO deep — the WARRIOR third is the last one owed" % spec)
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 42, "the spec pools hold 42 (33 + this tranche's 9), got %d" % total)
+	ok(total == 51, "the spec pools hold 51 (42 + BV's Hunter nine), got %d" % total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH CLERIC POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -415,10 +419,10 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch BU"), "master.html is stamped Batch BU")
+	ok(master.contains("Batch BV"), "master.html is stamped Batch BV")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("66 of"), "master.html states the new draft count")
+	ok(master.contains("75 of"), "master.html states the current draft count")
 	var chlog := FileAccess.get_file_as_string("res://docs/changelog.html")
 	ok(chlog.contains("Batch BU"), "the changelog carries a BU entry")
 
