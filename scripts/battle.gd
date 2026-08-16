@@ -229,6 +229,29 @@ const STATUS_INFO := {
 	"battle_trance": ["Battle Trance", "BT", Color(0.90, 0.55, 0.40), "Somewhere the pain cannot follow: at\nthe start of each turn, heals 3% of\nmaximum health PLUS HALF the damage\ntaken since the last one. It arrives\nAFTER the beating, never before."],
 	"warcry": ["Warcry", "Wc", Color(0.95, 0.60, 0.35), "The line is on the front foot:\n+20% damage dealt."],
 	"ironclad": ["Iron Will", "IW", Color(0.80, 0.80, 0.88), "Teeth set: cannot be Stunned, Frozen,\nDazed or Broken, and takes 15% less\ndamage. The Break meter still fills —\nto 99, and no further."],
+	# ---- BATCH CB: the Mage draft's tranche-3 statuses ----
+	# FIVE FOR NINE ABILITIES. Firedraw, Pyre Wake, Deep Winter and Cold Iron all
+	# resolve inside the cast that fires them and carry nothing.
+	#
+	# THREE OF THE FIVE SIT ON A HERO (`emberkeep`, `resonant_field`,
+	# `threshold_lock`) and TWO SIT ON AN ENEMY (`frostbind`, `unmade`) — which is
+	# the split that decides the two lists below, and BU's suffering trap is why
+	# it is written down rather than inferred. Both enemy-side ones are
+	# AFFLICTIONS rather than marks, so both go in `DEBUFF_IDS`: that makes them
+	# cleansable by a mender's Cleansing Rite (real counterplay, and neither is
+	# battle-long so neither is the longest-remaining debuff every single time),
+	# AND — the half that actually matters — it keeps them out of the DERIVED
+	# `_dispellable_buffs` set, so a Mage's own Dispel can never strip the party's
+	# work off the enemy carrying it.
+	#
+	# `resonant_field` DELIBERATELY CARRIES NO NUMBER, which is Null Field's rule:
+	# the share is computed at the attacker block off the Arcanist's LIVE meter,
+	# so stamping a value here would freeze it at cast time and delete the card.
+	"emberkeep": ["Emberkeep", "Ek", Color(1.0, 0.68, 0.30), "The embers are kept: every Burn HE\napplies lands at DOUBLE duration.\nIt changes what ARRIVES — fire already\nstanding on the board is untouched."],
+	"frostbind": ["Frostbind", "Fb", Color(0.55, 0.80, 1.0), "Chained to another: Chilled landing on\neither lands on both, and damage dealt\nto one is dealt to the other at 40%.\nThe mirrored blow does not mirror back.\nIf both reach the threshold, the pair\nfreezes together."],
+	"unmade": ["Unmaking", "Um", Color(0.75, 0.45, 0.95), "Coming apart: this enemy cannot be\nhealed by anything at all."],
+	"resonant_field": ["Resonant Field", "RF", Color(0.80, 0.55, 1.0), "Tuned to the storm: deals bonus damage\nequal to HALF the Arcanist's CURRENT\nResonance bonus. It reads his meter\nlive — as he climbs, so does this."],
+	"threshold_lock": ["Threshold", "Th", Color(0.65, 0.50, 0.90), "Bought and spent: his Resonance was\nset outright, and he can gain no more\nwhile this holds. Nothing raises it —\nnot a cast, not a crit, not a kill."],
 }
 
 # Buff/Debuff keyword registry (DEBUFF_IDS) lives in unit.gd so chips can
@@ -309,6 +332,20 @@ var _holds: Array[BattleUnit] = []
 # and _hold_freeze, and REMOVING IT RESTORES A CRASH — see the block above
 # _hold_release for the two-body cycle it breaks.
 var _releasing := false
+
+# BATCH CB — FROSTBIND'S TWO RE-ENTRANCY LOCKS, and they guard the two halves of
+# the bond separately because the two halves recurse through DIFFERENT functions.
+# `_frostbinding` covers the Chilled copy (which re-enters `_apply_status`);
+# `_frostbind_mirroring` covers the 40% damage mirror (which re-enters
+# `_on_damage_taken` through unit.gd's `_report_taken`).
+#
+# THE MIRROR NOT MIRRORING BACK IS A DESIGN RULE, NOT AN OPTIMISATION, and it is
+# the first of the card's three: a bond that recursed would trade a blow back and
+# forth until the stack limit — the AS crash in a new costume — and each pass is
+# 40% of the last, so it would not even terminate on the damage running out
+# before the stack did. Both flags are set and cleared in ONE place each.
+var _frostbinding := false
+var _frostbind_mirroring := false
 # BATCH BQ — NO FORK MAY BEGIN WHILE A FORK IS RESOLVING. Undying Vigil hangs
 # off `heal_amount`, so the heal it sends to the second ally re-enters that
 # function — and a second ally who is ALSO warded would fork again. It is not
@@ -2947,6 +2984,15 @@ func _player_turn(u: BattleUnit) -> void:
 				# to click; `covering_guard` is ally-facing and falls through to
 				# the ALLY branch below, where its pool excludes him.
 				"blood_offering", "eye_of_storm",
+				# BATCH CB. FOUR of the nine name no target. `deep_winter` reads the
+				# ledger of HELD enemies rather than a click (Winter's Toll's reason,
+				# one card later); `emberkeep`, `resonant_field` and `threshold` are
+				# ordinary self-casts. `firedraw`, `pyre_wake` and `frostbind` are NOT
+				# here — all three name an enemy, and Frostbind names TWO (it carries
+				# `choose_two`, so the second click is the existing picker Shrapnel
+				# Charge and Hex of Ruin already use). Cold Iron and Unmaking carry no
+				# `special` at all and never reach this list.
+				"deep_winter", "emberkeep", "resonant_field", "threshold",
 				# BATCH BQ. Four of the twelve are self-casts and two are
 				# party-wide, which is the same thing to this list. `dispel`,
 				# `ministration`, `unburden` and `undying_vigil` are NOT here:
@@ -3385,6 +3431,63 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 				return [ab, ls_pick]
 			# Nothing is afflicted: it still lands its 20%, so it falls through to
 			# the ordinary mark rather than being skipped.
+		# BATCH CB — FOUR MORE TARGETING REFINEMENTS, SAME SHAPE AND SAME
+		# REASON. NONE of the nine is added to `_autoplay_pick_kit`, so no
+		# existing rotation is re-weighted and no measurement taken before
+		# this batch stops being comparable — BO §5's rule, kept unchanged by
+		# BP, BQ, BR, BT, BU, BV and BW.
+		#
+		# FIREDRAW and PYRE WAKE both read ONE enemy's Burn — one deepens it,
+		# one scatters it — so both want the DEEPEST stack on the field, and
+		# for OPPOSITE reasons. Firedraw does not touch its target's own
+		# Burn, so aiming at the deepest gives the deepest possible result;
+		# Pyre Wake consumes all of it, so the deepest is the widest scatter.
+		# `mark` is the lowest-health enemy, which is very often carrying no
+		# fire at all — this is Stoke's and Funeral Pyre's case exactly.
+		if ab.special in ["firedraw", "pyre_wake"]:
+			var cb_ripest: BattleUnit = null
+			var cb_turns := 0
+			for cb_e in foes:
+				var cb_left := int(cb_e.get_status("burn").get("turns", 0))
+				if cb_left > cb_turns:
+					cb_turns = cb_left
+					cb_ripest = cb_e
+			if cb_ripest != null:
+				return [ab, cb_ripest]
+			continue
+		# COLD IRON DOUBLES AGAINST A FROZEN TARGET and its whole point is
+		# that it does not open the cell — so a bot aiming it anywhere but
+		# the prison measures a 25% strike and never once exercises the
+		# clause the card is sold on. It falls through to the ordinary mark
+		# rather than being skipped when nothing is frozen, because a 25% hit
+		# on the lowest-health enemy is still a perfectly good use of it.
+		if ab.display_name == "Cold Iron":
+			var ci_held := foes.filter(func(e): return e.has_status("frozen"))
+			if not ci_held.is_empty():
+				return [ab, ci_held[0]]
+		# FROSTBIND wants the deepest Chilled pile as its FIRST body — the
+		# fallback inside the special then picks the next-deepest as the
+		# second, so the pair the bot chains is the pair closest to freezing
+		# together, which is the card's own synergy line.
+		if ab.special == "frostbind":
+			if foes.size() < 2:
+				continue
+			var fbp: BattleUnit = foes[0]
+			for fb_e in foes:
+				if fb_e.status_stacks("chilled") > fbp.status_stacks("chilled"):
+					fbp = fb_e
+			return [ab, fbp]
+		# UNMAKING is a big single-target blow plus a THREE-TURN heal lock,
+		# so it wants the enemy still standing to feel the lock — the highest
+		# health on the field, which on a boss node is the boss. Aimed at the
+		# lowest-health mark the lock spends its window on a corpse, which is
+		# Arcane Echo's case and Suffering's.
+		if ab.display_name == "Unmaking":
+			var um_pick: BattleUnit = foes[0]
+			for um_e in foes:
+				if um_e.hp > um_pick.hp:
+					um_pick = um_e
+			return [ab, um_pick]
 		return [ab, mark]
 	return []
 
@@ -4480,6 +4583,37 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# choosing when to cash a shallow meter is the decision the card exists for.
 	if ab.display_name == "Arcane Bolt" and u.second_resource < 1:
 		return false
+	# ---- BATCH CB: the Mage nine's gates (tranche 3) ----
+	# THREE OF THE NINE ARE GATED AND SIX ARE NOT, and each half is a decision.
+	#
+	# FIREDRAW and PYRE WAKE both CONSUME a bank, so with nothing alight there is
+	# nothing to move and nothing to scatter — Funeral Pyre's rule exactly, and
+	# Firedraw needs the fire to be on somebody ELSE, which is the whole card.
+	# Both gates SAY SO in the darkened button's tooltip (Death Ray's rule).
+	if ab.special == "firedraw" \
+			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
+		return false
+	if ab.special == "pyre_wake" \
+			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
+		return false
+	# UNMAKING pays per stack: at zero it is a 30-Mana cast for nothing, which is
+	# Arcane Bolt's gate five lines above and for its reason. ONE stack is a real
+	# (small) blow, so the gate is at one and not at the eight Death Ray uses.
+	if ab.display_name == "Unmaking" and u.second_resource < 1:
+		return false
+	# THE OTHER SIX ARE UNGATED, DELIBERATELY.
+	#   · DEEP WINTER with no hold does nothing and SAYS so — but Slow Burn's
+	#     precedent applies in reverse: a gate here would refuse the cast on the
+	#     exact turn the hold breaks, and the card is cheap enough that a
+	#     misfire is a mistake rather than a trap. The log names the missing
+	#     half, which is what §3 asked for.
+	#   · EMBERKEEP, RESONANT FIELD and THRESHOLD are self-buffs that are always
+	#     legal; Threshold ABOVE 15 is a real cost, and refusing it there would
+	#     be the game declining to let him make a mistake the card is honest
+	#     about ("above 15 it takes them AWAY").
+	#   · COLD IRON works on any target and merely works BETTER on a frozen one.
+	#   · FROSTBIND needs two living enemies, and `_resolve_special` says so
+	#     rather than the button greying out on a field that is about to change.
 	# SLOW BURN IS DELIBERATELY UNGATED and that is a decision rather than an
 	# omission. Its marker rides enemies not yet alight, so casting it into an
 	# unlit field and THEN casting Firestorm is a real line of play — gating on
@@ -4589,6 +4723,13 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 			and not enemies.any(func(e): return not e.dead and e.has_status("chilled")):
 		ab_btn.tooltip_text += "\n(No Chilled enemy)"
 	if ab.display_name == "Arcane Bolt" and u.second_resource < 1:
+		ab_btn.tooltip_text += "\n(Requires at least 1 Resonance)"
+	# BATCH CB — the three tranche-3 gates say so too. A darkened button that
+	# does not explain itself is the same bug in a smaller form.
+	if ab.special in ["firedraw", "pyre_wake"] \
+			and not enemies.any(func(e): return not e.dead and e.has_status("burn")):
+		ab_btn.tooltip_text += "\n(Nothing is Burning)"
+	if ab.display_name == "Unmaking" and u.second_resource < 1:
 		ab_btn.tooltip_text += "\n(Requires at least 1 Resonance)"
 	# BATCH BV — same rule again: every gate above SAYS so on the button it
 	# darkens, and Preparation's says it in the words of the mechanic rather than
@@ -6781,6 +6922,44 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if is_perfect:
 					raw = 0.20 * attacker.attack * randf_range(0.9, 1.1) * dmg_mult
 				raw *= float(maxi(attacker.second_resource, 0))
+			# BATCH CB — UNMAKING (Arcanist draft, tranche 3): 10% of Attack PER
+			# Resonance stack, written on ARCANE BOLT's shape one clause above
+			# and for its reason — it rides the ORDINARY raw block rather than a
+			# `special`, so the compounding Resonance multiplier a dozen lines
+			# below still lands on it, and so do crits, Break and the parry roll.
+			#
+			# IT SPENDS NOTHING, WHICH IS THE DISTINCTION FROM ARCANE BOLT. Bolt
+			# HALVES the meter and is a change of slope; this READS the meter and
+			# leaves it standing, so it is the payoff a deep Arcanist keeps
+			# casting rather than a decision about his own ramp. Two cards
+			# reading one meter with one shape would be one card with two prices
+			# (BI's rule); these are a spender and a reader.
+			#
+			# ITS TWO BYPASSES ARE AT THEIR OWN SITES BELOW, because RESISTANCE
+			# AND ARMOR ARE TWO SEPARATE DOORS in this file — §1 asked whether
+			# there was one hook or two, and the answer is two.
+			if ab.display_name == "Unmaking" \
+					and attacker.second_resource_name == "Resonance":
+				raw *= float(maxi(attacker.second_resource, 0))
+			# BATCH CB — COLD IRON (Cryomancer draft, tranche 3): DOUBLE against
+			# a FROZEN target, and it does NOT release the hold.
+			#
+			# THE NOT-RELEASING HALF IS THE WHOLE CARD, AND IT IS THE ABSENCE OF
+			# A LINE RATHER THAN A FLAG: `_hold_release` is the one place a hold
+			# ends and this ability never calls it, so the ice and the party-wide
+			# +15% damage window both stand. ICE LANCE *IS* THE RELEASE, which is
+			# why his best blow into his own prison has always ended it — see the
+			# CB block in CLAUDE.md for why this does not outclass the Lance.
+			#
+			# IT READS `frozen`, NOT `_is_held`, DELIBERATELY: an ordinary
+			# flash-freeze with no Cryomancer standing is still a frozen target
+			# and the blow should still land double on it. The hold is the common
+			# case, not the condition — and a card that quietly did nothing in a
+			# party without a Cryomancer would be the passive-gated block BT and
+			# BV both warn about.
+			if ab.display_name == "Cold Iron" \
+					and strike_target.has_status("frozen"):
+				raw *= COLD_IRON_FROZEN_MULT
 			# BATCH BV — HUNT (Survivalist draft): 15% of Attack PER DIFFERENT
 			# harmful effect on the target, and the perfect moves the per-affliction
 			# RATE rather than adding a flat lump (the Arcane Bolt shape one card
@@ -7051,6 +7230,28 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# card compose additively rather than one silently winning.
 			if attacker.has_status("warcry"):
 				raw *= 1.0 + attacker.status_power("warcry") / 100.0
+			# BATCH CB — RESONANT FIELD (Arcanist draft, tranche 3) RIDES THE SAME
+			# READ, and it is the FOURTH user of the one implementation of "this
+			# unit deals N% more damage" — so it composes ADDITIVELY with Battle
+			# Shout, Warcry and Reckless Abandon rather than one of them silently
+			# winning.
+			#
+			# IT IS THE ONE OF THE FOUR THAT READS ITS NUMBER OFF SOMEBODY ELSE,
+			# AND IT READS IT LIVE. The status deliberately carries NO power (Null
+			# Field's rule): the share is HALF the Arcanist's CURRENT Resonance
+			# bonus, resolved through the `src_name` the field stamped, so a field
+			# opened at 4 stacks really does deepen as he keeps casting. Stamping
+			# the value at cast time would freeze it and delete the whole axis —
+			# and it would read exactly like the card working.
+			#
+			# THE ARCANIST HIMSELF IS NEVER IN THIS BRANCH: the cast excludes him
+			# from the status, because he already deals the FULL bonus and handing
+			# him half of it again would turn a card sold on SHARING the curve into
+			# a self-multiplier on it.
+			if attacker.has_status("resonant_field"):
+				var rf_src := _resonant_field_source(attacker)
+				if rf_src != null:
+					raw *= 1.0 + rf_src.resonance_dmg_bonus() * RESONANT_FIELD_SHARE
 			# BATCH BW — RECKLESS ABANDON RIDES THE SAME READ, two lines below
 			# the two cards it is priced against. THE THIRD USER of the one
 			# implementation of "this unit deals N% more damage" — the power is
@@ -7513,6 +7714,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Elemental Weakness: Crushing Blow strips non-physical resists.
 			if ab.dmg_type != "physical" and strike_target.has_status("elem_weak"):
 				resist -= strike_target.status_power("elem_weak") / 100.0
+			# BATCH CB — UNMAKING IGNORES RESISTANCE OUTRIGHT, AND THIS IS THE
+			# FIRST OF ITS TWO DOORS. §1 asked whether a combined
+			# resistance-and-armor bypass already existed, on the strength of
+			# BP's Precision Strike bypassing armor. IT DOES NOT: this file has
+			# TWO SEPARATE SITES and nothing has ever crossed both. Neither
+			# existing resist hook would have served either — `avatar_flame` is
+			# FIRE-ONLY and positive-only, and `rune_resist_pierce` THINS a
+			# resistance by a fraction rather than removing it.
+			#
+			# IT ZEROES RATHER THAN CLAMPING, so a WEAKNESS (a negative resist)
+			# is destroyed along with a resistance. That is the honest reading of
+			# "its resistances are ignored" and it costs the card real damage
+			# against a vulnerable target. The alternative — `maxf(resist, 0.0)`,
+			# keeping weaknesses — would make an ability sold on beating defence
+			# ALSO the best card against no defence, which is a strictly-better
+			# card wearing a bypass's clothes (BD §4's rule).
+			if ab.display_name == "Unmaking":
+				resist = 0.0
 			# Mitigation is logged with its amounts: what the resist ate
 			# (negative = a Weakness ADDED damage) and what armor blocked.
 			var resist_cut := 0
@@ -7540,9 +7759,19 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# "+50% of zero" against every unarmoured enemy in the game — a
 			# clause that silently does nothing, which is the exact dud AP §3's
 			# eligibility rule exists to prevent.
+			# BATCH CB — UNMAKING JOINS THEM, AND IT IS THE SECOND OF ITS TWO
+			# DOORS. The resistance half is thirty lines above; nothing in this
+			# file has ever crossed both, so an ability whose text promises
+			# "resistances AND armor are ignored" has to be written at two
+			# sites — which is the answer to §1's question and the reason it
+			# was worth asking. IT BYPASSES RATHER THAN PENETRATES for BP's
+			# reason directly above: `pen` is a fraction OF the target's armor,
+			# so a percentage clause reads "+100% of zero" against every
+			# unarmoured enemy and silently does nothing.
 			if attacker.through_and_through > 0 \
 					or attacker.has_status("held_breath") or one_shot_exec \
-					or attacker.has_status("open_guard"):
+					or attacker.has_status("open_guard") \
+					or ab.display_name == "Unmaking":
 				effective_armor = 0.0
 			# The universal floor of 1 yields to Untouchable's absolute parry.
 			var final := 0 if wall_parry \
@@ -8626,6 +8855,26 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			_log("   → Arcane Echo marks %s: every HIT repeats at %d%% here for %d turns%s" % [
 				target.unit_name, int(ARCANE_ECHO_SHARE * 100), ae_turns,
 				" [PERFECT]" if is_perfect else ""], "#b085e0")
+		# BATCH CB — UNMAKING'S HEAL LOCK, laid AFTER the blow rather than before
+		# it. The order is the ability: the strike is what unmakes the thing, and
+		# a lock applied first would refuse a heal on a target the cast then
+		# failed to reach (a miss, a parry, a death earlier in the same volley).
+		# It reaches an ordinary rider site at all because the card carries NO
+		# `special` — see its definition in `Classes.draft_ability`.
+		#
+		# THE REFUSAL ITSELF LIVES IN `unit.heal_amount`, WITH THE OTHER
+		# ABSOLUTES (Bloodless, Ancient Pact, Caught Fast, Weight of Ruin, Blight
+		# the Well) rather than in the multiplier block below them, because
+		# "cannot be healed" is a RULE and not an amount — BM's own words for
+		# Weight of Ruin, and this is the same claim arriving from a card.
+		if ab.display_name == "Unmaking" and attacker.is_hero \
+				and target != null and not target.dead:
+			var um_turns := UNMAKING_LOCK_TURNS + (1 if is_perfect else 0)
+			_apply_status(target, "unmade", um_turns, 0, 0, attacker)
+			_note_debuff_applied(attacker, "unmade")
+			_log("   → Unmaking: %s cannot be healed for %d turns%s" % [
+				target.unit_name, um_turns,
+				" [PERFECT]" if is_perfect else ""], "#b085e0")
 		# War Stomp: the tremor rallies the line — allies regain 10% resource
 		# (20% on a perfect cast; the damage is a 75-Attack tank's, the
 		# party refuel is the real payload).
@@ -9237,6 +9486,30 @@ func _hold_tooltip(timed: bool) -> String:
 
 
 # ONE enemy, TWO with Second Prison, ANY number under Absolute Zero.
+# BATCH CB — HOW MANY CELLS THE PRISONS OCCUPY. A FROSTBOUND PAIR COUNTS AS
+# ONE, which is what makes "if both partners reach the threshold the pair
+# freezes together" true at a hold limit of 1.
+#
+# IT TERMINATES, AND THAT IS WORTH SAYING BECAUSE THE CALLER IS A `while`:
+# releasing one half of a pair leaves the COUNT unchanged for one iteration
+# (the survivor becomes a single cell), and the next pass releases the
+# survivor. `_holds` shrinks by one every iteration either way, so the loop
+# cannot spin — and the caller carries an `is_empty` guard as the belt to that
+# brace.
+func _hold_cells() -> int:
+	var n := 0
+	var counted := {}
+	for h in _holds:
+		if counted.has(h):
+			continue
+		counted[h] = true
+		var mate := _frostbind_partner(h)
+		if mate != null and _holds.has(mate):
+			counted[mate] = true
+		n += 1
+	return n
+
+
 func _hold_limit() -> int:
 	if _living_hero_with("absolute_zero") != null:
 		return 99
@@ -9320,7 +9593,20 @@ func _hold_freeze(target: BattleUnit, src: BattleUnit, force := false) -> void:
 	# Over the limit: the OLDEST prison gives out. This is a RELEASE, so it
 	# pays out through _hold_release like every other one — Shattered Tempo
 	# and Honed Shards fire on it too.
-	while _holds.size() > _hold_limit():
+	# BATCH CB — IT COUNTS CELLS, NOT BODIES, AND A FROSTBOUND PAIR IS ONE
+	# CELL. Frostbind's own text promises that a pair reaching the threshold
+	# "freezes together", and against `_holds.size()` that promise was FALSE BY
+	# ONE LINE: the second partner's freeze pushed the count past a limit of 1
+	# and immediately evicted the first, so the pair took turns being held.
+	# FOUND BY DRIVING IT RATHER THAN BY READING IT — the card looked like it
+	# worked, because one of the two really was frozen.
+	#
+	# THIS IS THE ONLY WAY THE CARD PAYS OFF ITS OWN SYNERGY LINE ("how a
+	# one-hold Cryomancer comes to hold two") WITHOUT TOUCHING `_hold_limit`,
+	# which is what Second Prison and Absolute Zero buy and what a limit bump
+	# here would silently make free. A bound pair is ONE prison with two bodies
+	# in it, and a THIRD enemy still evicts them both, oldest first.
+	while _hold_cells() > _hold_limit() and not _holds.is_empty():
 		_hold_release(_holds[0], "the oldest prison gives out")
 
 
@@ -9535,6 +9821,29 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 	if id == "chilled" and src != null and src.is_hero \
 			and src.passive_id == "permafrost":
 		eff_turns = -1
+	# BATCH CB — EMBERKEEP (Pyromancer draft, tranche 3), AND THIS ONE CLAUSE IS
+	# THE WHOLE ABILITY. Burn the holder applies lands at DOUBLE duration.
+	#
+	# IT IS SCOPED TO THE SRC, EXACTLY AS PERMAFROST IS ONE LINE ABOVE, and that
+	# is what makes it correct rather than merely working: an enemy Ashblade's
+	# burn, a rune's burn and a second applier's burn all pass through this same
+	# function, and none of them is his. It is also why there is no per-ability
+	# list to keep up to date — Fireball, Flamewave, Firestorm, Ember Debt,
+	# Cinder Trail and anything a later batch adds ride it by doing nothing.
+	#
+	# IT DOUBLES AT APPLICATION AND IS NOT RETROACTIVE, which is the card's own
+	# text and the distinction from STOKE (which doubles what is already
+	# standing). Fire on the board when the window opens is untouched, because
+	# this site only ever sees Burn ARRIVING.
+	#
+	# THE GUARD ON `turns > 0` IS LOAD-BEARING AND IS THE `full_turns` LESSON
+	# THROUGH A NEW DOOR (Batch BV): a NEGATIVE turn count is a PERMANENCE FLAG
+	# rather than a duration, so doubling it would turn -1 into -2 — a number
+	# nothing downstream understands — and would quietly un-permanent a
+	# battle-long fire.
+	if id == "burn" and turns > 0 and src != null \
+			and src.has_status("emberkeep"):
+		eff_turns = turns * EMBERKEEP_MULT
 	# BATCH BM §2 — THE THREE "IT STOPS EXPIRING" ROW-8 NODES, at ONE site,
 	# because they are one rule pointed at three status families and three
 	# copies of it would drift. -1 is the project's existing battle-long
@@ -9565,6 +9874,30 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		var st_stamp := target.get_status(id)
 		if not st_stamp.is_empty():
 			st_stamp["src_name"] = src.unit_name
+	# BATCH CB — FROSTBIND'S FIRST CLAUSE: Chilled landing on either partner
+	# lands on the other too. It sits HERE for CREEPING DEATH's exact reason —
+	# above every per-status branch, because the `chilled` branch below returns
+	# early and a hook under it would never run.
+	#
+	# `_frostbinding` IS A RE-ENTRANCY LOCK, NOT A CONVENIENCE. Without it the
+	# copy onto the partner re-enters this function, finds the partner bound, and
+	# copies straight back — a two-body cycle that runs to GDScript's stack
+	# limit, which is the AS crash in a new costume and exactly what BN's guard
+	# was built to stop on the freeze side.
+	#
+	# IT RUNS THROUGH `_apply_status` RATHER THAN WRITING THE PILE, so the
+	# partner's fourth stack FLASH-FREEZES exactly as its own would — which is
+	# how "if both partners reach the threshold the pair freezes together" is
+	# true without a line of its own. BN'S GUARD IS RESPECTED BY CONSTRUCTION
+	# rather than worked around: the freeze that follows goes through
+	# `_hold_freeze`, whose first line already refuses to begin one while a
+	# release resolves.
+	if id == "chilled" and not _frostbinding and target.has_status("frostbind"):
+		var fb_mate := _frostbind_partner(target)
+		if fb_mate != null:
+			_frostbinding = true
+			_apply_status(fb_mate, "chilled", turns, power, tick, src, force)
+			_frostbinding = false
 	# CREEPING DEATH sits HERE, above every per-status branch, because three of
 	# those branches (chilled, burn, poison) return early and a hook below them
 	# would silently miss the statuses a Cryomancer or a Pyromancer lands. It is
@@ -9808,6 +10141,49 @@ const ARCANE_BOLT_KEEP := 0.5
 const ARCANE_ECHO_SHARE := 0.30
 const ARCANE_ECHO_TURNS := 3
 
+# ---------- BATCH CB: TRANCHE 3, THE MAGE NINE ----------
+# FIREDRAW: how many turns of Burn it pulls from EACH other enemy. It takes
+# what is there or this, WHICHEVER IS LESS — an enemy holding 2 gives 2, never
+# a debt — and the target's own Burn is never touched.
+const FIREDRAW_TAKE := 4
+const FIREDRAW_TAKE_PERFECT := 6
+# PYRE WAKE: how long each scattered fire burns. ONE turn, deliberately — the
+# card's whole shape is DEPTH becoming WIDTH, and a scatter that also went deep
+# would be Firedraw pointed the other way rather than its opposite.
+const PYRE_WAKE_TURNS := 1
+# EMBERKEEP: the window, and the multiplier applied at APPLICATION. The
+# multiplier is a const rather than a literal 2 because the doubling is read at
+# `_apply_status` — a long way from this card — and a bare 2 there would be
+# unattributable.
+const EMBERKEEP_TURNS := 3
+const EMBERKEEP_MULT := 2
+# COLD IRON: what a FROZEN target multiplies the blow by. It does NOT release
+# the hold, which is the whole card and is a property of this ability never
+# calling `_hold_release` rather than of any flag.
+const COLD_IRON_FROZEN_MULT := 2.0
+# FROSTBIND: the window and the share of a blow the partner also takes.
+const FROSTBIND_TURNS := 3
+const FROSTBIND_SHARE := 0.40
+# RESONANT FIELD: the share of his LIVE Resonance bonus each ally deals. Half,
+# and it is read at the attacker block off his current meter — the status
+# carries no number at all (Null Field's rule).
+const RESONANT_FIELD_TURNS := 3
+const RESONANT_FIELD_SHARE := 0.50
+# THRESHOLD: the depth it buys and how long he is locked out afterwards.
+#
+# FIFTEEN IS THE NUMBER THE DESIGNER TRUSTS LEAST IN THIS BATCH and it SHIPS
+# UNTUNED, to be watched in play. It is not arbitrary — Death Ray gates at 8 and
+# Terminal Velocity clears its cooldown at 15, so this reaches both at once —
+# but too low and the card is never worth casting, too high and it skips the
+# spine the whole spec is built on.
+const THRESHOLD_STACKS := 15
+const THRESHOLD_LOCK_TURNS := 3
+const THRESHOLD_LOCK_TURNS_PERFECT := 2
+# UNMAKING: the heal lock's window. The per-stack damage is `ab.damage` (10) and
+# the two bypasses are at their own sites, because RESISTANCE AND ARMOR ARE TWO
+# SEPARATE DOORS in this file rather than one — see the CB block in CLAUDE.md.
+const UNMAKING_LOCK_TURNS := 3
+
 
 # The turn-start Mana drip, in ONE place — the drip itself reads it, and so
 # does Ash Lung, whose whole condition is "the drain outruns the regen".
@@ -9820,6 +10196,85 @@ const ARCANE_ECHO_TURNS := 3
 # spends — 12 plus Evocation's 10 plus whatever a rune adds — rather than a
 # constant copied out of this function years ago. The log line and the sim
 # instrument both read the same call.
+# BATCH CB — THE ONE ANSWER TO "WHO IS THIS ENEMY CHAINED TO". Both readers go
+# through it (the Chilled copy in `_apply_status` and the damage mirror in
+# `_on_damage_taken`), so the two halves of the bond can never disagree about
+# who the partner is.
+#
+# IT REQUIRES BOTH ENDS TO STILL HOLD THE STATUS, and that is the clause that
+# makes a cleanse honest: `frostbind` is in DEBUFF_IDS, so a mender's Cleansing
+# Rite can take it off ONE partner — and when it does, this returns null from
+# both directions rather than leaving a half-bond pointing at a body that is no
+# longer bound. Resolving by NAME through the status rather than holding a unit
+# reference is the `src_name` idiom `_apply_status` already stamps: a bound enemy
+# can die and be freed while the other still carries its side.
+func _frostbind_partner(u: BattleUnit) -> BattleUnit:
+	if u == null or u.dead:
+		return null
+	var st: Dictionary = u.get_status("frostbind")
+	if st.is_empty():
+		return null
+	var mate_name: String = String(st.get("partner", ""))
+	if mate_name == "":
+		return null
+	for foe in enemies:
+		if foe.dead or foe == u or foe.unit_name != mate_name:
+			continue
+		# BOTH ENDS, OR NO BOND.
+		if not foe.has_status("frostbind"):
+			return null
+		return foe
+	return null
+
+
+# BATCH CB — WHOSE FIELD IS THIS ALLY STANDING IN. It resolves the Arcanist
+# by the `src_name` `_apply_status` already stamps, rather than by scanning for
+# "a living hero holding Resonance": one Mage stands in a party today, but a
+# scan would be a rule that happens to be right rather than one that is, and it
+# would silently pick the wrong caster the first time it stopped being true.
+#
+# A DEAD ARCANIST PAYS NOBODY. The field is his meter shared out, so it is worth
+# what his meter is worth — and when he is gone that is nothing. Returning null
+# here rather than freezing the last value is the same call `_covering_warden`
+# made for Covering Guard: his body is the ward.
+func _resonant_field_source(ally: BattleUnit) -> BattleUnit:
+	if ally == null:
+		return null
+	var st: Dictionary = ally.get_status("resonant_field")
+	if st.is_empty():
+		return null
+	var owner: String = String(st.get("src_name", ""))
+	if owner == "":
+		return null
+	for h in heroes:
+		if not h.dead and h.unit_name == owner \
+				and h.second_resource_name == "Resonance":
+			return h
+	return null
+
+
+# BATCH CB — WHO LAID THIS BOND. It is the same shape as
+# `_resonant_field_source` and for the same reason: the answer is read off the
+# `src_name` `_apply_status` stamps rather than scanned for, so a second
+# Cryomancer can never collect on the first one's chain, and a DEAD one
+# collects nothing. The bond itself keeps working when its caster falls — the
+# chain is on the enemies, not on him — so this returns null and the damage
+# simply books to nobody, which is honest rather than wrong.
+func _frostbind_caster(u: BattleUnit) -> BattleUnit:
+	if u == null:
+		return null
+	var st: Dictionary = u.get_status("frostbind")
+	if st.is_empty():
+		return null
+	var owner: String = String(st.get("src_name", ""))
+	if owner == "":
+		return null
+	for h in heroes:
+		if not h.dead and not h.is_companion and h.unit_name == owner:
+			return h
+	return null
+
+
 func _mana_regen(u: BattleUnit) -> int:
 	var regen := 12 + u.mana_regen_bonus
 	if u.has_status("mana_well"):
@@ -10382,6 +10837,24 @@ func _party_crit_bonus() -> float:
 # EARNED Stabilize — a deliberate exception a player buys out of the spec pool.
 func _gain_resonance(caster: BattleUnit, stacks: int) -> void:
 	if caster.second_resource_name != "Resonance":
+		return
+	# BATCH CB — THRESHOLD'S LOCKOUT, AND THIS IS WHY IT IS ONE LINE. Every
+	# source of Resonance in the game comes through this function, so refusing
+	# here refuses ALL of them without naming any: the passive's own +1 a
+	# damaging cast, Kindled Mind, Inner Arcane, Cascade, Critical Mass,
+	# Backlash, On the Edge, Entropy's toll and Singularity's crit and kill
+	# builds alike. A list of sources at the card would go stale the first time
+	# a node was added, and it would go stale SILENTLY.
+	#
+	# IT SITS ABOVE HARMONIC CONVERGENCE ON PURPOSE: the convergence multiplies
+	# what is being gained, and multiplying a refused gain is still a refused
+	# gain — but reading the meter to compute it while the card says he cannot
+	# gain would be the kind of half-applied rule that reads as working.
+	#
+	# THRESHOLD ITSELF DOES NOT COME THROUGH HERE. It SETS the meter, which can
+	# move it DOWN, and this door only ever adds — see the `threshold` case in
+	# `_resolve_special`.
+	if caster.has_status("threshold_lock"):
 		return
 	# BATCH BM §2 — HARMONIC CONVERGENCE (Arcanist, Resonance row 8): THE
 	# BUILD RATE READS THE BUILD. AT §3 measured that build rate beats
@@ -13788,6 +14261,336 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				", and he is below half health" if ia_low else "", ia_got,
 				attacker.second_resource,
 				" [PERFECT]" if is_perfect else ""], "#b085e0")
+		# ========== BATCH CB: TRANCHE 3, THE MAGE NINE ==========
+		# SEVEN OF THE NINE RESOLVE HERE. COLD IRON and UNMAKING deliberately
+		# carry NO `special` (the BV five-of-nine pattern): both are ordinary
+		# strikes that need crits, armor, resists, Break and the parry roll, and
+		# `_resolve` sends anything holding a `special` down this function
+		# instead — so both key on `display_name` at the ordinary rider sites.
+		"firedraw":
+			# AXIS: the bank CONSOLIDATED. Detonation pays 250% of ONE enemy's
+			# remaining Burn, so a field of shallow fires is worth far less than
+			# one deep one, and this is how the field becomes one deep one.
+			#
+			# THREE CLAUSES THAT COULD EACH SILENTLY DO NOTHING, and all three
+			# are properties of the loop rather than of a guard bolted on:
+			#   · IT TAKES UP TO 4 FROM EACH — `mini(take, left)`, so an enemy
+			#     holding 2 gives 2 and is not left owing a debt;
+			#   · IT NEVER TOUCHES THE TARGET'S OWN BURN — the `foe == target`
+			#     skip, which is what makes this a consolidation rather than a
+			#     no-op that moves a stack onto itself;
+			#   · WITH ONE ENEMY ON THE FIELD IT MOVES NOTHING, which falls out
+			#     of the same skip and is said in the log rather than printed as
+			#     "0 turns" as though that were the effect (the Stoke line's
+			#     rule).
+			if target != null and not target.dead:
+				var fd_take := FIREDRAW_TAKE_PERFECT if is_perfect \
+					else FIREDRAW_TAKE
+				var fd_binfo: Array = STATUS_INFO["burn"]
+				var fd_moved := 0
+				var fd_from := 0
+				for foe in enemies:
+					if foe.dead or foe == target:
+						continue
+					var fd_st: Dictionary = foe.get_status("burn")
+					var fd_left: int = maxi(int(fd_st.get("turns", 0)), 0)
+					if fd_left <= 0:
+						continue
+					var fd_spent: int = mini(fd_take, fd_left)
+					if fd_left - fd_spent <= 0:
+						foe.remove_status("burn")
+					else:
+						foe.update_status("burn", fd_binfo[1], fd_binfo[3], -1,
+							fd_left - fd_spent)
+					fd_moved += fd_spent
+					fd_from += 1
+				if fd_moved > 0:
+					# It goes through `_apply_status`, which ADDS turns on a
+					# re-application (unit.gd's burn branch) — so the fire lands
+					# ON TOP of what the target already holds rather than
+					# replacing it. NOTE it therefore also rides EMBERKEEP if he
+					# is holding one: that is the two cards composing and is
+					# documented at Emberkeep rather than carved out here.
+					_apply_status(target, "burn", fd_moved, 0,
+						_dot_tick("burn", attacker), attacker)
+				_sfx("bomb", -9.0, 0.75)
+				attacker.float_text("FIREDRAW", Color(1.0, 0.55, 0.25))
+				if fd_moved <= 0:
+					_message("%s finds no other fire to draw" % attacker.unit_name)
+					_log("%s: Firedraw — no OTHER enemy is alight, so nothing moves" % \
+						attacker.unit_name, "#909090")
+				else:
+					_message("%s draws the field's fire together" % attacker.unit_name)
+					_log("%s: Firedraw — %d turn%s of Burn pulled from %d %s onto %s%s" % [
+						attacker.unit_name, fd_moved,
+						"" if fd_moved == 1 else "s", fd_from,
+						"enemy" if fd_from == 1 else "enemies", target.unit_name,
+						" [PERFECT]" if is_perfect else ""], "#e08850")
+		"pyre_wake":
+			# AXIS: the bank SCATTERED rather than cashed — the only card in the
+			# game that converts DEPTH into WIDTH. A twelve-turn stack becomes
+			# twelve small fires and 96% of Attack spread across the board.
+			#
+			# THE OVERBURN READ IS TAKEN BEFORE THE CONSUME, which is
+			# Detonation's ordering rule since AG and Cinderfall's and Wildfire's
+			# since: THIS cast is not paid for the turns it is about to destroy,
+			# and every later one is correctly paid for what is left.
+			if target != null and not target.dead:
+				var pw_inferno := _overburn_mult(attacker, _total_burn_turns())
+				var pw_st: Dictionary = target.get_status("burn")
+				var pw_turns: int = maxi(int(pw_st.get("turns", 0)), 0)
+				target.remove_status("burn")
+				var pw_pct := 12 if is_perfect else ab.damage
+				var pw_total := 0
+				var pw_lit := 0
+				for _pw_i in pw_turns:
+					var pw_pool := enemies.filter(func(e): return not e.dead)
+					if pw_pool.is_empty():
+						break
+					var pw_mark: BattleUnit = pw_pool.pick_random()
+					var pw_raw := 0.01 * pw_pct * attacker.attack * mult \
+						* pw_inferno * randf_range(0.9, 1.1)
+					var pw_res := float(pw_mark.resists.get("fire", 0.0))
+					if attacker.avatar_flame > 0 and pw_res > 0.0:
+						pw_res = 0.0
+					pw_raw *= 1.0 - pw_res
+					var pw_final := maxi(int(round(pw_raw
+						* (1.0 - pw_mark.effective_armor()))), 1)
+					var pw_hit: Dictionary = pw_mark.take_hit(pw_final, ab.pressure)
+					_stat("dmg_hero_" + attacker.unit_name, pw_final)
+					pw_total += pw_final
+					pw_mark.float_text("%d Pyre Wake" % pw_final,
+						Color(1.0, 0.55, 0.25))
+					if pw_hit.died:
+						_stat("enemy_deaths")
+						_sfx("death", -4.0)
+						_message("%s falls!" % pw_mark.unit_name)
+						_log("† %s dies" % pw_mark.unit_name, "#e05050")
+						_on_enemy_death(pw_mark)
+						continue
+					# The fire is laid AFTER the blow, on a body still standing.
+					_apply_status(pw_mark, "burn", PYRE_WAKE_TURNS, 0,
+						_dot_tick("burn", attacker), attacker)
+					pw_lit += 1
+				_sfx("bomb", -8.0, 1.1)
+				if pw_turns <= 0:
+					# A LEGAL CAST THAT FINDS NOTHING — the gate only asks that
+					# SOMETHING on the field is alight, so a player can aim this
+					# at the wrong body. Funeral Pyre's rule, same words.
+					_message("%s finds no pyre to scatter" % attacker.unit_name)
+					_log("%s: Pyre Wake finds no Burn on %s" % [attacker.unit_name,
+						target.unit_name], "#909090")
+				else:
+					_message("%s scatters the pyre across the field!" % \
+						attacker.unit_name)
+					_log("%s: Pyre Wake — %d turn%s consumed from %s becomes %d fire%s for %d damage%s" % [
+						attacker.unit_name, pw_turns,
+						"" if pw_turns == 1 else "s", target.unit_name, pw_lit,
+						"" if pw_lit == 1 else "s", pw_total,
+						" [PERFECT]" if is_perfect else ""], "#e08850")
+				# The refund is the PASSIVE's, through the ONE door Detonation,
+				# Wildfire, Cinderfall, Ember Debt and Funeral Pyre already
+				# share. A SIXTH consumer arriving and inheriting it is AR's rule
+				# still working — test_batch_ar's pinned call-site count goes
+				# 5 -> 6.
+				_overburn_refund(attacker, pw_turns)
+		"emberkeep":
+			# AXIS: THE MULTIPLIER ON GETTING FIRE. Everything else in his pool
+			# is downstream of already having a bank; this is the only card that
+			# changes how much arrives.
+			#
+			# THE WHOLE MECHANIC IS ONE CLAUSE AT `_apply_status`'s `eff_turns`
+			# BLOCK, scoped to the SRC exactly as Permafrost is — so an enemy
+			# Ashblade's burn, a rune's burn and a second applier's burn are all
+			# correctly untouched, and every Burn HE applies rides it with no
+			# per-ability list to keep up to date. THE CAST ITSELF ONLY OPENS THE
+			# WINDOW.
+			var ek_turns := EMBERKEEP_TURNS + (1 if is_perfect else 0)
+			_apply_status(attacker, "emberkeep", ek_turns)
+			_sfx("heal", -9.0, 0.8)
+			attacker.float_text("EMBERKEEP", Color(1.0, 0.68, 0.30))
+			_message("%s banks the heat" % attacker.unit_name)
+			_log("%s: Emberkeep — for %d turns every Burn HE applies lands at DOUBLE duration (fire already burning is untouched)%s" % [
+				attacker.unit_name, ek_turns,
+				" [PERFECT]" if is_perfect else ""], "#e08850")
+		"deep_winter":
+			# AXIS: the hold as a TEMPLATE, applied wide. Rimebinding copies the
+			# prison to one enemy; this copies it to all of them.
+			#
+			# THE STACKS GO ON ONE `_apply_status` CALL AT A TIME, which is
+			# KILLING FROST's rule and is load-bearing for the same reason:
+			# `add_status` clamps chilled at 4 and the branch inside
+			# `_apply_status` is where four stacks FLASH-FREEZE. Writing the pile
+			# directly would skip both, so an enemy driven to four by this card
+			# would sit there un-frozen — the card's own synergy line made false.
+			# It also means BN's re-entrancy guard covers this card for free.
+			var dw_deepest := 0
+			for dw_held in _holds:
+				if not dw_held.dead:
+					dw_deepest = maxi(dw_deepest, dw_held.status_stacks("chilled"))
+			if dw_deepest < 1:
+				# STATED RATHER THAN LEFT TO FIZZLE (§3's instruction): the card
+				# is a template with no template, and the log says which half is
+				# missing rather than printing a silent nothing.
+				_log("%s: Deep Winter — he holds nothing, so there is no prison to copy" % \
+					attacker.unit_name, "#909090")
+			else:
+				# HALF, ROUNDED DOWN. The perfect rounds UP instead, which is
+				# worth exactly one stack and only on an odd pile — a deliberate
+				# small perfect on a card whose base effect is already wide.
+				var dw_n: int = int(dw_deepest / 2)
+				if is_perfect:
+					dw_n = int((dw_deepest + 1) / 2)
+				if dw_n < 1:
+					_log("%s: Deep Winter — the prison is only %d stack deep, so half of it is nothing" % [
+						attacker.unit_name, dw_deepest], "#909090")
+				else:
+					var dw_hit := 0
+					for foe in enemies:
+						if foe.dead:
+							continue
+						for _dw_i in dw_n:
+							if not foe.dead:
+								_apply_status(foe, "chilled", 3, 0, 0, attacker)
+						dw_hit += 1
+					_note_debuff_applied(attacker, "chilled")
+					_sfx("break", -9.0, 0.9)
+					_message("%s spreads the winter" % attacker.unit_name)
+					_log("%s: Deep Winter — the prison stands %d deep, so %d %s gain %d stack%s of Chilled each%s" % [
+						attacker.unit_name, dw_deepest, dw_hit,
+						"enemy" if dw_hit == 1 else "enemies", dw_n,
+						"" if dw_n == 1 else "s",
+						" [PERFECT]" if is_perfect else ""], "#7cc8f0")
+		"frostbind":
+			# AXIS: TWO PRISONERS ON ONE CHAIN. It grants no second hold — it
+			# gives him a second body that suffers with the first.
+			#
+			# THE SECOND TARGET IS THE PLAYER'S CLICK (`choose_two`, which has
+			# existed since Shrapnel Charge). THE FALLBACK BELOW IS §3's RULE AND
+			# IT IS WHERE THAT RULE ACTUALLY BITES: autoplay skips the clicks, so
+			# without this the bot would bind a RANDOM partner. The deepest
+			# Chilled pile is the right automatic answer for the same reason
+			# Ordination's lowest-Faith ally is — the card wants the body already
+			# closest to the threshold, because a pair that freezes together is
+			# the whole point.
+			var fb_first: BattleUnit = target
+			var fb_second: BattleUnit = second_target
+			if fb_first != null and (fb_second == null or fb_second.dead \
+					or fb_second == fb_first):
+				var fb_pool := enemies.filter(
+					func(e): return not e.dead and e != fb_first)
+				fb_second = null
+				for fb_cand in fb_pool:
+					if fb_second == null or fb_cand.status_stacks("chilled") \
+							> fb_second.status_stacks("chilled"):
+						fb_second = fb_cand
+			if fb_first == null or fb_first.dead or fb_second == null \
+					or fb_second.dead:
+				_log("%s: Frostbind — there is no second body to chain to" % \
+					attacker.unit_name, "#909090")
+			else:
+				var fb_turns := FROSTBIND_TURNS + (1 if is_perfect else 0)
+				# THE BOND IS STORED ON BOTH ENDS AND READ FROM BOTH, so a
+				# Cleansing Rite taking it off ONE partner breaks the chain
+				# honestly rather than leaving a half-bond pointing at a body
+				# that is no longer bound. `_frostbind_partner` is THE ONE answer
+				# to "who is this chained to" and every reader goes through it.
+				_apply_status(fb_first, "frostbind", fb_turns, 0, 0, attacker)
+				_apply_status(fb_second, "frostbind", fb_turns, 0, 0, attacker)
+				var fb_st1 := fb_first.get_status("frostbind")
+				if not fb_st1.is_empty():
+					fb_st1["partner"] = fb_second.unit_name
+				var fb_st2 := fb_second.get_status("frostbind")
+				if not fb_st2.is_empty():
+					fb_st2["partner"] = fb_first.unit_name
+				_sfx("break", -9.0, 0.8)
+				fb_first.float_text("BOUND", Color(0.55, 0.80, 1.0))
+				fb_second.float_text("BOUND", Color(0.55, 0.80, 1.0))
+				_message("%s chains two enemies together" % attacker.unit_name)
+				_log("%s: Frostbind — %s and %s are bound for %d turns: Chilled lands on both, and %d%% of any blow is dealt to the other%s" % [
+					attacker.unit_name, fb_first.unit_name, fb_second.unit_name,
+					fb_turns, int(FROSTBIND_SHARE * 100),
+					" [PERFECT]" if is_perfect else ""], "#7cc8f0")
+		"resonant_field":
+			# AXIS: THE CURVE ARMS THE PARTY — the cross-spec card his pool does
+			# not have. At 12 stacks he is at +117%, so allies get +58%.
+			#
+			# THE STATUS CARRIES NO NUMBER, which is NULL FIELD's rule and the
+			# whole card: the share is computed at the attacker block off his
+			# CURRENT meter, so a field opened at 4 stacks really does deepen as
+			# he keeps casting. Stamping the value here would freeze it at cast
+			# time and quietly delete the axis.
+			#
+			# ALLIES ONLY, AND HE IS EXCLUDED DELIBERATELY: he already deals the
+			# FULL bonus, and handing him half of it again would make the card a
+			# self-multiplier on the curve it is supposed to be sharing.
+			var rf_turns := RESONANT_FIELD_TURNS + (1 if is_perfect else 0)
+			var rf_n := 0
+			for ally in heroes:
+				if ally.dead or ally == attacker or ally.is_companion:
+					continue
+				_apply_status(ally, "resonant_field", rf_turns, 0, 0, attacker)
+				rf_n += 1
+			_sfx("perfect", -9.0, 0.9)
+			attacker.float_text("RESONANT FIELD", Color(0.80, 0.55, 1.0))
+			var rf_share := int(round(attacker.resonance_dmg_bonus()
+				* RESONANT_FIELD_SHARE * 100.0))
+			_message("%s tunes the party to the storm" % attacker.unit_name)
+			# LOG HONESTY, FOUND BY WATCHING A SMOKE — Inner Arcane's lesson one
+			# tranche later, and it needed saying twice because the failure is the
+			# same shape from the other end. `DOD_SIM_ABILITIES` hands every card to
+			# every hero, so a Beastmaster can open a field; `_resonant_field_source`
+			# then correctly finds no Arcanist behind it and every ally standing in
+			# it is paid nothing. Announcing "3 allies deal +0%" is a buff that did
+			# not happen, and a player who read it would learn the wrong rule.
+			# Unreachable in a real draft (only an Arcanist is ever offered this).
+			if attacker.second_resource_name != "Resonance":
+				_log("%s: Resonant Field — he holds no Resonance, so there is nothing to share" % \
+					attacker.unit_name, "#909090")
+			else:
+				_log("%s: Resonant Field — %d all%s deal +%d%% for %d turns (half his own +%d%% at %d stacks, read LIVE)%s" % [
+					attacker.unit_name, rf_n, "y" if rf_n == 1 else "ies", rf_share,
+					rf_turns, int(round(attacker.resonance_dmg_bonus() * 100.0)),
+					attacker.second_resource,
+					" [PERFECT]" if is_perfect else ""], "#b085e0")
+		"threshold":
+			# AXIS: the late game bought early, at the cost of the ramp.
+			#
+			# IT SETS RATHER THAN GAINS, AND THAT IS WHY IT DOES NOT GO THROUGH
+			# `_gain_resonance`: that door only ever ADDS (and Harmonic
+			# Convergence multiplies what it adds), where this writes an absolute
+			# number that can move DOWNWARD. Above 15 it is a real cost, which is
+			# the card — an emergency, not an opener — and the log says so rather
+			# than announcing a gain that did not happen.
+			#
+			# THE LOCKOUT IS ENFORCED AT `_gain_resonance`, THE ONE DOOR, so it
+			# refuses EVERY source without naming any of them: the passive's own
+			# +1 a cast, Kindled Mind, Inner Arcane, Cascade, Critical Mass,
+			# Backlash, On the Edge and Singularity's crit and kill builds alike.
+			# A list of sources here would go stale the first time a node was
+			# added.
+			if attacker.second_resource_name != "Resonance":
+				# `DOD_SIM_ABILITIES` hands every card to every hero, so a Devout
+				# can reach this branch in a smoke. Inner Arcane's log-honesty
+				# lesson, one card later: say nothing happened rather than
+				# announcing a meter he does not own.
+				_log("%s: Threshold — he holds no Resonance to set" % \
+					attacker.unit_name, "#909090")
+			else:
+				var th_before := attacker.second_resource
+				attacker.second_resource = THRESHOLD_STACKS
+				attacker.refresh_bars()
+				var th_lock := THRESHOLD_LOCK_TURNS_PERFECT if is_perfect \
+					else THRESHOLD_LOCK_TURNS
+				_apply_status(attacker, "threshold_lock", th_lock)
+				_sfx("perfect", -8.0, 0.8)
+				attacker.float_text("THRESHOLD", Color(0.65, 0.50, 0.90))
+				_message("%s crosses the threshold" % attacker.unit_name)
+				var th_verb := "climbs" if THRESHOLD_STACKS > th_before \
+					else ("FALLS" if THRESHOLD_STACKS < th_before else "holds")
+				_log("%s: Threshold — Resonance %s from %d to %d, and he can gain none for %d turns%s" % [
+					attacker.unit_name, th_verb, th_before, THRESHOLD_STACKS,
+					th_lock, " [PERFECT]" if is_perfect else ""], "#b085e0")
 		"venom_coat":
 			_apply_status(attacker, "venom_coat", 4)
 			_sfx("heal", -9.0, 0.7)
@@ -18459,7 +19262,64 @@ func _bank_run_ledgers() -> void:
 
 
 func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
-	if lost <= 0 or victim == null or not victim.is_hero or victim.is_companion:
+	if lost <= 0 or victim == null:
+		return
+	# BATCH CB — FROSTBIND'S SECOND CLAUSE, AND IT SITS ABOVE THE HERO GATE
+	# BELOW ON PURPOSE. Its victims are ENEMIES, and every line under that gate
+	# is hero-side bookkeeping (Backblast, the recap's taken ledger); putting the
+	# mirror below it would make the card silently do nothing.
+	#
+	# IT RIDES BL's ONE DOOR, which is the whole point of that door: a strike, a
+	# splash, an echo, a Burn tick, a Killing Frost, a Winter's Toll and a
+	# reflect all arrive here, so "damage dealt to one is dealt to the other"
+	# needs no list of sources and a later damage source cannot forget to report.
+	# It reports the DELTA and sits BELOW every death refusal, so what mirrors is
+	# health that genuinely left the body.
+	#
+	# THE MIRRORED BLOW DOES NOT MIRROR BACK — `_frostbind_mirroring`, and see
+	# the flag's own comment for why that is a rule rather than a tidy-up. It is
+	# dealt through `take_tick_damage` so it cannot itself be parried, blocked or
+	# crit: it is not a blow anybody swung, it is the bond paying out.
+	#
+	# IT CARRIES NO BREAK, DELIBERATELY. Break is a party resource and a bond
+	# that doubled the party's Break output would be a second axis nobody asked
+	# for — the card is sold on damage suffering twice, not on the meter filling
+	# twice.
+	if not _frostbind_mirroring and not victim.is_hero \
+			and victim.has_status("frostbind"):
+		var fb_mate := _frostbind_partner(victim)
+		if fb_mate != null:
+			var fb_share := maxi(int(round(lost * FROSTBIND_SHARE)), 1)
+			var fb_owner := _frostbind_caster(victim)
+			_frostbind_mirroring = true
+			# THE FRAME NAMES THE BOND WHILE THE BOND IS DEALING DAMAGE, and is
+			# restored on the way out — BL §2's rule through the same door Forge
+			# Body's throw already uses. Without the restore every later hit of
+			# the same cast would book against Frostbind.
+			var fb_was_src := _dmg_src
+			var fb_was_label := _dmg_label
+			var fb_was_name := _dmg_src_name
+			if fb_owner != null:
+				_dmg_frame(fb_owner, "Frostbind", fb_owner.unit_name)
+			fb_mate.take_tick_damage(fb_share, "-%d" % fb_share,
+				Color(0.55, 0.80, 1.0))
+			# IT CREDITS THE CRYOMANCER WHO LAID THE BOND, which is BB §4's
+			# `_ghost_hit` repair arriving through a new door: a damage source
+			# that books to nobody is invisible to every instrument this project
+			# owns, and AY shipped exactly that gap and found it a batch later.
+			# It resolves the owner through the `src_name` the status carries, so
+			# a second Cryomancer could never collect on the first one's chain.
+			if fb_owner != null:
+				_stat("dmg_hero_" + fb_owner.unit_name, fb_share)
+			_log("   → Frostbind: %s suffers with %s (%d)" % [fb_mate.unit_name,
+				victim.unit_name, fb_share], "#7cc8f0")
+			if fb_mate.dead:
+				_stat("enemy_deaths")
+				_log("† %s dies" % fb_mate.unit_name, "#e05050")
+				_on_enemy_death(fb_mate)
+			_dmg_frame(fb_was_src, fb_was_label, fb_was_name)
+			_frostbind_mirroring = false
+	if not victim.is_hero or victim.is_companion:
 		return
 	# BACKBLAST (Pyromancer, Inferno row 5 — BATCH BS §3) RIDES BL'S ONE DOOR,
 	# which is the whole point of that door: it fires for a strike, a splash, a

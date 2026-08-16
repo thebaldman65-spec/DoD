@@ -21,6 +21,16 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	"bewitch", "psychosis", "decay", "ruin", "hysteria",
 	"umbral_sigil", "elem_weak", "melted", "blind", "snared", "caught", "broken",
 	"slow_burn",
+	# BATCH CB — `frostbind` AND `unmade` are the tranche-3 Mage draft's two
+	# enemy-side statuses and both are genuine AFFLICTIONS, so both are listed.
+	# Same two consequences as `slow_burn` and `blight` above: a mender's
+	# Cleansing Rite can take either (real counterplay, and neither is
+	# battle-long so neither is picked first every single time), and — the half
+	# that actually matters — listing them keeps them OUT of the derived
+	# `_dispellable_buffs` set, so a Mage's own Dispel can never strip the
+	# party's work off the enemy carrying it. `emberkeep`, `resonant_field` and
+	# `threshold_lock` are NOT here and must not be: all three sit on a HERO.
+	"frostbind", "unmade",
 	# BATCH BT — `slow_burn` IS a genuine debuff and is listed as one, which
 	# makes it CLEANSABLE by a mender's Cleansing Rite. That is the counterplay
 	# rather than an oversight (Blight the Well's precedent): a card that makes
@@ -2872,6 +2882,20 @@ func heal_amount(amount: int, external := false) -> int:
 	if has_status("caught"):
 		if amount > 0:
 			float_text("CAUGHT", Color(0.75, 0.6, 0.3))
+		return 0
+	# BATCH CB — UNMAKING (Arcanist draft, tranche 3). It joins the ABSOLUTE
+	# refusals rather than the multiplier block below for Weight of Ruin's
+	# stated reason: "cannot be healed" is a RULE, not an amount, and a card
+	# whose whole justification is that a boss cannot answer it must not be
+	# answerable by a large enough heal.
+	#
+	# IT IS A STATUS RATHER THAN A FIELD so it expires by itself and cannot leak
+	# past a battle (BQ's standard), and it is in `DEBUFF_IDS` so a mender's
+	# Cleansing Rite is real counterplay — the warband can spend a turn not
+	# healing to buy back the ability to heal.
+	if has_status("unmade"):
+		if amount > 0:
+			float_text("UNMADE", Color(0.75, 0.45, 0.95))
 		return 0
 	# BATCH BM §2 — WEIGHT OF RUIN's second half (Occultist, Ruin row 8). It
 	# sits with the other ABSOLUTE refusals rather than in the multiplier

@@ -176,12 +176,19 @@ func _pools() -> void:
 	# NOT MOVE. A batch that widens three pools is exactly where a fourth gets
 	# widened by accident, and the Warrior debt has to stay visible IN CODE
 	# rather than only in prose — it is the last third of tranche 2.
-	var five := ["pyromancer", "cryomancer", "arcanist",
-		"holy", "inquisitor", "occultist",
+	# RE-POINTED BY BATCH CB, THE FOURTH INVERSION: the three MAGE pools went
+	# to EIGHT when tranche 3's first third landed, so the Hunter three this
+	# suite shipped are no longer level with them. What still has to stay
+	# visible in code is which thirds are owed.
+	var five := ["holy", "inquisitor", "occultist",
 		"beastmaster", "sharpshooter", "mystic"]
 	for spec in five:
 		var pool: Array = Classes.spec_draft_pool(spec)
 		ok(pool.size() == 5, "%s drafts FIVE (got %d)" % [spec, pool.size()])
+	for spec in ["pyromancer", "cryomancer", "arcanist"]:
+		ok(Classes.spec_draft_pool(spec).size() == 8,
+			"%s drafts EIGHT since Batch CB (got %d)"
+				% [spec, Classes.spec_draft_pool(spec).size()])
 	# RE-POINTED BY BATCH BW, AND IT IS AN INVERSION: this asserted the WARRIOR
 	# three were still at TWO because that debt was real and had to stay visible
 	# in code. BW paid it, so tranche 2 is complete and what is asserted is that
@@ -196,12 +203,12 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 60, "the spec pools hold 60 (51 + BW's Warrior nine), got %d" % total)
+	ok(total == 69, "the spec pools hold 69 (60 + CB's Mage nine), got %d" % total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 84,
-		"the whole draft is 84 of a target ~96 (got %d)" % draft_total)
+	ok(draft_total == 93,
+		"the whole draft is 93 of a target ~96 (got %d)" % draft_total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH HUNTER POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -581,10 +588,10 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch BX"), "master.html is stamped Batch BX")
+	ok(master.contains("Batch CB"), "master.html is stamped Batch CB")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("84 of"), "master.html states the new draft count")
+	ok(master.contains("93 of"), "master.html states the new draft count")
 	ok(master.contains("Builds with"),
 		"and the draft tables still carry the synergy line a player reads")
 	var chlog := FileAccess.get_file_as_string("res://docs/changelog.html")

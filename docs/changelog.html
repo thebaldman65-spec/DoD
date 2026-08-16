@@ -13,6 +13,304 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-15 &mdash; Batch CB: tranche 3, the Mage nine (THE MAGE IS THE FIRST CLASS COMPLETE)</h2>
+<p><i><b>Nine spec draft abilities, three per Mage spec. The Mage pools go 5 &rarr; 8 and the
+draft goes 84 &rarr; 93 of a target ~96.</b> The Pyromancer, the Cryomancer and the Arcanist are
+the first specs in the game to draft from EIGHT; the other nine still draft from five, so the
+asymmetry tranche 2 removed is back and pointing the other way &mdash; what is owed now is the
+Cleric, Hunter and Warrior thirds of tranche 3. Nothing else ships: no talent node, no
+magnitude, no existing ability changed, no save version moves (still v10). <b>ONE new unit-side
+field for nine abilities &mdash; and it is not a field at all: every one of the nine is carried
+by a status or by an existing counter</b>, per BQ's standard.</i></p>
+
+<p><b>THE BRIEF'S FIRST INSTRUCTION WAS TO VERIFY RATHER THAN ASSUME, AND TWO OF ITS FOUR
+PREMISES DID NOT HOLD.</b> Both are corrected toward the code (the AR &sect;6 / AX &sect;7 / BD
+&sect;3 / AY &sect;1 / BS / BT / BU / BX precedent), and one of them moved a card's name.</p>
+
+<h3>&sect;1 &mdash; what the sweep found</h3>
+<ul>
+<li><b>BACKDRAFT IS NOT FREE, AND THE CARD WAS RENAMED. This is the first time BR &sect;1's
+sweep has forced a rename since BW's Vendetta, and unlike a label collision it is a REAL
+BREAK.</b> &sect;1 asked for confirmation that BS's rebuild removed the old Kindling row-4 node.
+It did not: <code>py_melt</code> both <i>carries</i> the name Backdraft AND <i>grants an
+ability</i> whose <code>display_name</code> is Backdraft (20 Mana, 2.0, 3cd &mdash; +2 turns of
+Burn to every burning enemy). What BS actually renamed was the INFERNO row-5 node, to Backblast,
+to dodge exactly this collision. <b><code>Classes.pool_ability</code> is keyed on
+<code>display_name</code></b>, so a second Backdraft would make the resolver answer the wrong
+question. The card ships as <b>FIREDRAW</b>, swept clean against every ability, talent node,
+status and rune. test_batch_cb pins the collision in assertion form &mdash; the node still named
+Backdraft, the name still resolving to the TALENT's ability, and no draft card answering to it
+&mdash; so a later batch cannot quietly restore the brief's name.</li>
+<li><b>NOTHING BINDS TWO ENEMIES TOGETHER, so Frostbind is the first.</b> Three things came
+close and none is this: <code>soul_bond</code> (One Soul) links the hunter to his companions and
+DIVIDES a blow, <code>covenant</code> mirrors Ruin STACKS one-way from any enemy onto a bearer,
+and <code>umbral_sigil</code> echoes damage to a whole party rather than to a partner. Hence the
+new glossary entry.</li>
+<li><b>THERE IS NO COMBINED RESISTANCE-AND-ARMOR BYPASS DOOR &mdash; THERE ARE TWO, AND NOTHING
+HAD EVER CROSSED BOTH.</b> &sect;1 suspected one hook on the strength of BP's Precision Strike.
+Armor has a genuine bypass arm (<code>effective_armor = 0.0</code>, shared by Through and
+Through, Held Breath, One Shot and Open Guard); resistance has NO outright bypass at all
+&mdash; <code>avatar_flame</code> is fire-only and positive-only, and
+<code>rune_resist_pierce</code> THINS a resistance by a fraction. Unmaking is written at both
+sites and the suite asserts both, because deleting one would leave the card's description
+promising something it no longer does.</li>
+<li><b>The other eight names are clean.</b> Two adjacencies are reported and not resolved:
+<b>Resonant Field</b> sits beside the <i>Rune of the Resonant Core</i> (different string,
+different namespace), and <b>Threshold</b> is a word several code identifiers use
+(<code>RUIN_THRESHOLD</code>, <code>mercy_threshold</code>) and no player-facing name uses.</li>
+</ul>
+
+<h3>&sect;2 &mdash; Pyromancer: consolidate it, scatter it, and make it arrive bigger</h3>
+<p>His whole pool moves fire that already exists &mdash; Cinderfall skims it, Stoke doubles one
+stack, Funeral Pyre spends it, Ember Debt places it &mdash; and <b>nothing in it changed how much
+arrives</b>.</p>
+<ul>
+<li><b>FIREDRAW</b> (25 Mana, 2.5, 4cd, one enemy) &mdash; consumes 4 turns of Burn from every
+OTHER enemy (Perfect: 6) and adds all of it to this one. <i>Axis: the bank consolidated.</i>
+<b>It takes what is there or 4, whichever is less</b> &mdash; an enemy holding 2 gives 2, not a
+debt &mdash; and it never touches the target's own Burn. <i>Builds with</i> Total Commitment,
+Powder Keg and Cataclysm; the deliberate counterpart to Cinderfall.</li>
+<li><b>PYRE WAKE</b> (25 Mana, 2.5, 4cd, one enemy) &mdash; consumes ALL its Burn; for each turn
+consumed a random enemy is set Burning 1 turn and takes 8% of Attack (Perfect: 12%). <i>Axis:
+the bank scattered rather than cashed</i> &mdash; a twelve-turn stack becomes twelve small fires
+and 96% of Attack across the board. <b>The only card in the game that converts DEPTH into
+WIDTH.</b> <i>Builds with</i> Sea of Flame and Slow Burn.</li>
+<li><b>EMBERKEEP</b> (20 Mana, 1.5, 4cd, self) &mdash; for 3 turns (Perfect: 4) every Burn he
+applies lands at DOUBLE duration. <i>Axis: the multiplier on GETTING fire.</i> <b>Firestorm's
+6&ndash;8 bolts each land 4 turns instead of 2 &mdash; 24 to 32 burn-turns from one cast.</b></li>
+</ul>
+<p><b>EMBERKEEP IS ONE CLAUSE AT <code>_apply_status</code>'s <code>eff_turns</code> BLOCK,
+SCOPED TO THE SRC EXACTLY AS PERMAFROST IS.</b> That is what makes an enemy Ashblade's burn, a
+rune's burn and a second applier's burn all correctly untouched, and why there is no
+per-ability list to keep up to date &mdash; Fireball, Flamewave, Firestorm, Ember Debt, Cinder
+Trail and anything a later batch adds ride it by doing nothing. <b>It doubles at APPLICATION and
+is not retroactive</b>: fire already on the board is Stoke's subject, and the two must not
+collapse into each other (the Deadfall/Snare Trap duplication BD found, avoided up front).
+<b>ONE GUARD IN IT IS LOAD-BEARING and is BV's <code>full_turns</code> lesson through a new
+door: it doubles only a POSITIVE turn count</b>, because a negative one is a PERMANENCE FLAG
+rather than a duration and doubling &minus;1 into &minus;2 would quietly un-permanent a
+battle-long fire.</p>
+<p><b>HIS TRANSFERS RIDE THE WINDOW TOO, AND THAT IS DOCUMENTED RATHER THAN CARVED OUT.</b>
+Firedraw's deposit is an application of Burn by him, so under an Emberkeep it arrives doubled
+&mdash; a real two-card combo, and the alternative (an exemption at a shared door) is the kind
+of invisible special case this file keeps warning about. <b>It is also what makes the
+target-exclusion TESTABLE:</b> the transfer is otherwise CONSERVATIVE, so a version that wrongly
+drew from its own target lands on the same total and passes every obvious assertion. Under the
+window the two readings diverge loudly &mdash; 22 against 26 &mdash; and that is the check the
+suite ships.</p>
+<p><b>PYRE WAKE IS THE SIXTH CONSUMER OF THE ONE REFUND DOOR</b> (<code>_overburn_refund</code>),
+which is AR's rule still working: a new Burn consumer arrives and inherits the refund with no
+second implementation, Crucible's doubling included. The pinned call-site count goes <b>5
+&rarr; 6</b>. Its Overburn multiplier is read BEFORE the consume &mdash; Detonation's ordering
+rule since AG &mdash; so the cast is not paid for the turns it is about to destroy.</p>
+
+<h3>&sect;3 &mdash; Cryomancer: copy wide, hit the prisoner, chain two bodies</h3>
+<ul>
+<li><b>DEEP WINTER</b> (25 Mana, 2.5, 4cd, no target) &mdash; every enemy gains Chilled equal to
+HALF the stacks on the held enemy, rounded down (Perfect: up). <i>Axis: the hold as a template,
+applied wide.</i> <b>Holding nothing it does nothing, and the log says so</b> rather than
+fizzling silently (&sect;3's own instruction). The stacks go on ONE <code>_apply_status</code>
+call at a time &mdash; Killing Frost's rule &mdash; so a fourth stack still flash-freezes and
+BN's guard covers the card for free.</li>
+<li><b>COLD IRON</b> (20 Mana, 2.0, 3cd, one enemy, 6 BD) &mdash; 25% of Attack (Perfect: 35%),
+DOUBLE against a Frozen target, and <b>it does NOT release the hold</b>. <i>Axis: hitting the
+prisoner without opening the cell.</i> The hold is a party-wide +15% damage window that only he
+can close, and until now nothing of his own could safely strike into it &mdash; Ice Lance IS the
+release.</li>
+<li><b>FROSTBIND</b> (25 Mana, 2.5, 4cd, TWO enemies) &mdash; for 3 turns (Perfect: 4) the pair
+is bound: Chilled landing on either lands on both, and damage dealt to one is dealt to the other
+at 40%. <i>Axis: two prisoners on one chain.</i></li>
+</ul>
+<p><b>&sect;3'S SECOND RULE WAS CONDITIONAL AND THE CONDITION WAS FALSE.</b> It asked for an
+automatic most-Chilled second target &ldquo;if nothing selects two enemies today&rdquo;.
+<code>Ability.choose_two</code> has existed since Shrapnel Charge and Hex of Ruin uses
+<code>choose_three</code> beside it, so the UI answer already shipped and <b>the player picks
+both bodies</b>. &sect;3's rule is kept where it actually bites &mdash; as the FALLBACK when no
+second target was chosen, which is the BOT's path (autoplay skips the clicks) and the
+one-enemy-left path. Without it <code>_resolve</code>'s generic fallback picks a RANDOM partner,
+and a bond is not a card anyone wants aimed at random.</p>
+<p><b>THE OTHER TWO RULES SHIP AS SPECIFIED AND BOTH ARE ASSERTED.</b> The 40% mirror does not
+itself mirror (<code>_frostbind_mirroring</code>, a re-entrancy lock on the
+<code>_rime_echoing</code>/<code>_bitter_echoing</code>/<code>_echoing</code> pattern &mdash; a
+bond that recursed is the AS crash in a new costume, and each pass being 40% of the last would
+not even terminate on the damage running out before the stack did), and the Chilled copy has a
+lock of its own (<code>_frostbinding</code>) because the two halves recurse through DIFFERENT
+functions. <b>The mirror rides BL's ONE damage-taken door</b>, so a strike, a splash, an echo, a
+Burn tick, a Killing Frost and a Winter's Toll all mirror without a list of sources &mdash; and
+it sits ABOVE that function's hero gate, because its victims are enemies and everything below
+the gate is hero-side bookkeeping. <b>It carries no Break, deliberately:</b> a bond that doubled
+the party's Break output would be a second axis nobody asked for.</p>
+<p><b>ONE THING FROSTBIND'S OWN TEXT PROMISED WAS FALSE BY ONE LINE, AND IT WAS FOUND BY DRIVING
+IT RATHER THAN BY READING IT.</b> &ldquo;If both partners reach the threshold the pair freezes
+together &mdash; which is how a one-hold Cryomancer comes to hold two&rdquo; could not happen:
+the second partner's freeze pushed <code>_holds.size()</code> past a limit of 1 and immediately
+evicted the first, so the pair took turns being held. <b>The card LOOKED like it worked, because
+one of the two really was frozen.</b> The eviction loop counts CELLS now
+(<code>_hold_cells()</code>) and <b>a frostbound pair is ONE cell</b>. It is deliberately NOT a
+limit increase &mdash; that is what Second Prison and Absolute Zero buy, and bumping the limit
+here would make them free &mdash; and a THIRD enemy still evicts the pair, oldest first.</p>
+<p><b>VERIFIED AGAINST ICE LANCE, AS &sect;3 ASKED, AND COLD IRON DOES NOT OUTCLASS IT.</b>
+Against a Frozen target the Lance lands 55% of Attack (35% + 5% per Chilled stack) and ALWAYS
+crits &mdash; 110%+ &mdash; for 15 Break, and it IS the release; Cold Iron lands 50% at ordinary
+crit odds for 6 Break. It is cheaper (20 against 25) and faster (2.0 against 3.0) on a LONGER
+cooldown (3 against 2), and what it is sold on is not opening the cell. The suite drives both in
+the same battle, because &ldquo;it does not release&rdquo; is trivially true of a battle where
+nothing releases.</p>
+
+<h3>&sect;4 &mdash; Arcanist: share the curve, buy it early, make it unanswerable</h3>
+<ul>
+<li><b>RESONANT FIELD</b> (25 Mana, 2.0, 4cd, no target) &mdash; for 3 turns (Perfect: 4) every
+ALLY deals bonus damage equal to HALF his current Resonance bonus. <i>Axis: the curve arms the
+party</i> &mdash; the cross-spec card the pool does not have. At 12 stacks he is at +117%, so
+allies get +58%.</li>
+<li><b>THRESHOLD</b> (20 Mana, 1.5, 5cd, self) &mdash; his Resonance is SET to 15 at once and he
+can gain none for 3 turns (Perfect: 2). <i>Axis: the late game bought early, at the cost of the
+ramp.</i></li>
+<li><b>UNMAKING</b> (30 Mana, 3.0, 5cd, one enemy, 8 BD) &mdash; 10% of Attack per Resonance
+stack, resistances AND armor ignored, and it cannot be healed for 3 turns (Perfect: 4).
+<i>Axis: the curve made unanswerable.</i></li>
+</ul>
+<p><b>RESONANT FIELD READS HIS BONUS LIVE, AND THE STATUS CARRIES NO NUMBER AT ALL</b> &mdash;
+Null Field's rule, for its reason: stamping the value at cast time would freeze it and delete
+the card's whole axis, <i>and it would read exactly like the card working</i>. It resolves the
+Arcanist through the <code>src_name</code> <code>_apply_status</code> already stamps rather than
+by scanning for &ldquo;a living hero holding Resonance&rdquo;, because one Mage stands in a
+party today and a scan is a rule that happens to be right. <b>A dead Arcanist pays nobody</b>
+(<code>_covering_warden</code>'s call: his body is the ward). It is the FOURTH user of the one
+implementation of &ldquo;this unit deals N% more damage&rdquo;, so it composes additively with
+Battle Shout, Warcry and Reckless Abandon; and <b>he is excluded from his own field</b>, because
+he already deals the full bonus and half of it again would make a card sold on SHARING the curve
+into a self-multiplier on it.</p>
+<p><b>THRESHOLD'S LOCKOUT IS ONE LINE AT <code>_gain_resonance</code>, THE ONE DOOR.</b> Every
+source of Resonance in the game comes through that function, so refusing there refuses all of
+them without naming any &mdash; the passive's own +1 a damaging cast, Kindled Mind, Inner
+Arcane, Cascade, Critical Mass, Backlash, On the Edge, Entropy's toll and Singularity's crit and
+kill builds alike. A list at the card would go stale the first time a node was added, and it
+would go stale SILENTLY. <b>Threshold itself does not come through that door</b>: it SETS the
+meter, which can move it DOWN, and the door only ever adds. <b>The damage-taken penalty arrives
+with the stacks</b> &mdash; the curve is read live and knows nothing about how the meter got
+there &mdash; so 15 stacks is +90% damage taken on the spot.</p>
+<p><b>FLAGGED: 15 IS THE NUMBER THE DESIGNER TRUSTS LEAST IN THIS BATCH.</b> Too low and the
+card is never worth casting; too high and it skips the spine the whole spec is built on.
+<b>SHIPPED TO BE WATCHED IN PLAY. DO NOT PRE-TUNE IT.</b></p>
+<p><b>THE UNMAKING / DEATH RAY COMPARISON WAS ASKED FOR AND THE ANSWER IS NOT THE COMFORTABLE
+ONE. REPORTED, NOT RE-TUNED.</b> Death Ray is 150% of Attack flat at 55 Mana and a 5.0 delay, so
+<b>the crossover is EXACTLY 15 STACKS</b> (10 &times; 15 = 150) and above it Unmaking deals MORE
+raw damage for 25 less Mana and 2.0 less delay. Both are multiplied by the same Resonance curve,
+so the comparison is on the base percentage. What Death Ray keeps is a shorter cooldown (3
+against 5) and a gate at 8 rather than 1; what Unmaking is justified on is the double bypass and
+the heal lock. <b>And THRESHOLD, one card above it in the same pool, sets him to exactly 15</b>
+&mdash; so the two cards meet precisely at the crossover, which is worth knowing before either
+number is moved.</p>
+<p><b>UNMAKING'S BREAK IS FLAT RATHER THAN PER-STACK</b>, which is Arcane Bolt's own rule: a
+per-stack Break term is Arcane Cannon's and Magi's Wrath's axis, and duplicating it here is the
+squaring trap AT exists around arriving through the Break door. <b>Its resist bypass ZEROES
+rather than clamping</b>, so a WEAKNESS is destroyed along with a resistance &mdash; the honest
+reading of &ldquo;its resistances are ignored&rdquo;, and it costs the card real damage against
+a vulnerable target. Keeping weaknesses would make an ability sold on beating defence also the
+best card against no defence, which is a strictly-better card wearing a bypass's clothes (BD
+&sect;4). <b>The heal lock joins the ABSOLUTE refusals in <code>unit.heal_amount</code></b>
+(Bloodless, Ancient Pact, Caught Fast, Weight of Ruin, Blight the Well) rather than the
+multiplier block, for BM's stated reason: &ldquo;cannot be healed&rdquo; is a RULE, not an
+amount.</p>
+
+<h3>&sect;5 &mdash; one card set aside deliberately</h3>
+<p><b>ASH WAKE</b> &mdash; <i>for 3 turns, every enemy that dies sets every other enemy
+Burning</i> &mdash; was authored for this tranche and <b>the designer moved it to the RUNE PILE
+instead</b>. Recorded here so it is not re-authored as a draft card later, and so whoever writes
+the next rune batch knows it is waiting.</p>
+
+<h3>Break damage, assigned deliberately</h3>
+<p>The standing rule since BO, applied up front. <b>TWO of the nine carry it and seven do
+not</b>, and each of the seven is a decision rather than an omission. <b>Cold Iron 6</b> &mdash;
+level with Killing Frost, his other tranche-2 attack, and well below the FREE Frostbolt's 15,
+which is BQ's floor rule (a card that supplements the free basic must not out-Break it).
+<b>Unmaking 8</b> &mdash; level with Arcane Bolt and flat, for the reason above. <b>PYRE WAKE IS
+THE INTERESTING ZERO:</b> it genuinely deals damage and still carries none, because its hit
+count is UNBOUNDED (a twelve-turn stack is twelve hits) and a per-hit Break term on an uncapped
+count is the same squaring trap from a third direction. The other six land no blow at all.</p>
+
+<h3>Statuses, and the two lists</h3>
+<p><b>FIVE STATUSES FOR NINE ABILITIES, and the split between the two lists is BU's suffering
+trap written down rather than inferred.</b> Three sit on a HERO (<code>emberkeep</code>,
+<code>resonant_field</code>, <code>threshold_lock</code>) and are correctly absent from
+<code>DEBUFF_IDS</code>. Two sit on an ENEMY (<code>frostbind</code>, <code>unmade</code>) and
+are genuine afflictions, so both are listed &mdash; which makes them cleansable by a mender's
+Cleansing Rite (real counterplay, and neither is battle-long so neither is taken first every
+time) and, <b>the half that actually matters</b>, keeps them OUT of the derived
+<code>_dispellable_buffs</code> set, so a Mage's own Dispel can never strip the party's work off
+the enemy carrying it. Firedraw, Pyre Wake, Deep Winter and Cold Iron resolve inside the cast
+that fires them and carry nothing.</p>
+
+<h3>The bot</h3>
+<p><b>NO ROTATION, ON PURPOSE</b> &mdash; all nine ride BO &sect;5's wrapper, so no existing
+rotation is re-weighted and no measurement taken before this batch stops being comparable (BP,
+BQ, BR, BT, BU, BV and BW each did the same). <b>FOUR TARGETING REFINEMENTS</b> inside that
+wrapper, each closing a case where the default mark makes a card read as inert: Firedraw and
+Pyre Wake aim at the DEEPEST burning stack (for opposite reasons &mdash; one does not touch its
+target's fire, so the deepest gives the deepest result; the other consumes all of it, so the
+deepest is the widest scatter); Cold Iron aims at a FROZEN enemy, without which a smoke measures
+a 25% strike and never once exercises the clause the card is sold on; Frostbind takes the
+deepest Chilled pile as its first body so the pair it chains is the pair closest to freezing
+together; and Unmaking aims at the HIGHEST-health enemy, because a three-turn heal lock aimed at
+the enemy about to die spends its window on a corpse (Arcane Echo's case, and Suffering's).</p>
+
+<h3>Documentation</h3>
+<p><code>docs/master.html</code> stamped Batch CB; &sect;6b's draft tables gain the nine with
+their <i>Builds with</i> lines, the pool summary moves to eight for the three Mage specs, and
+the table's intro states the count (93) and <b>that the Mage is the first class complete</b>.
+<b>One glossary entry added (89 &rarr; 90): <code>status_bound</code></b>, because Frostbind is
+the first two-enemy link in the game and a player meeting the chip has nowhere else to learn
+that the mirror does not mirror back or that a bound pair costs one hold slot rather than
+two.</p>
+
+<h3>One more repair, found by re-reading the shipped code</h3>
+<p>Frostbind's mirror carried a comment claiming the damage frame was saved and restored
+&ldquo;or every later hit of the same cast would book against the bond&rdquo; &mdash; <b>but
+nothing ever SET a bond frame</b>, so the restore was a no-op and the sentence described a hazard
+the code was not handling. The code moved rather than the comment: the frame names the bond while
+the bond is dealing damage. <b>Underneath it was a second fault &mdash; the mirrored damage
+credited nobody</b>, which is BB's <code>_ghost_hit</code> finding arriving through a new door. It
+books to the Cryomancer who laid the bond, resolved through the <code>src_name</code> the status
+carries, so a second Cryomancer could never collect on the first one's chain; a dead caster credits
+nothing and the bond keeps working, because the chain is on the enemies rather than on him.
+<b>The transferable half is the comment, not the credit: a comment describing a hazard the code
+does not actually handle is worse than no comment</b>, because it tells the next reader the
+question has already been answered &mdash; and this one would have survived every test in the
+suite.</p>
+
+<h3>Verified</h3>
+<p><b>Per the standing instruction, that means THE CODE LANDED AND WORKS. NO SWEEPS, NO BANDS,
+NO BALANCE MEASUREMENT WAS RUN, and none should be quoted from this batch.</b></p>
+<p><code>check_parse</code> 0 &middot; <code>check_flow</code> 0 &middot;
+<code>check_map_screen</code> OK &middot; <b>run-harness gates 1/2/3 PASS at 22 / 165 / 8
+checks</b> (Batch CA's recorded counts, unmoved) &middot; <b>NEW <code>test_batch_cb.gd</code>
+1154 / 0, stable across runs</b>. <b>Seventeen negative controls, each applied to product code and
+reverted &mdash; <code>battle.gd</code>, <code>unit.gd</code> and <code>classes.gd</code> all came
+back byte-identical by hash &mdash; and all seventeen trip. None passed.</b> Live autoplay clean
+with all nine firing in ordinary fights, 0 SCRIPT ERROR.</p>
+<p><b>Full battery green, zero failures anywhere across 43 suites.</b> ah 5500, ah_battle 65,
+ai 2217, aj 418, ak 528, al 560, ar 735, as 396, at 470, au 336, av 324, aw 350, ax 339, ay 484,
+az 519, ba 690, bb 168, bc 91, bd 69, be 34, bf 78, bg 47, bh 233, bi 88, bj 67, bl 88, bm 1891,
+bn 77, <b>bo 832</b>, bp 271, bq 738, br 1441, bs 262, <b>bt 460</b>, bu 476, bv 893, bw 545,
+bx 141, <b>cb 1154</b>, runes 2973, rune_battle 97. (<code>an</code> 3622 and <code>bk</code> 130
+sit inside their documented run-to-run drift and are not pinned.) <b>Two counts moved and both are
+explained</b>: <code>bo</code> 769 &rarr; 832 is its two entry-walking loops meeting nine more
+entries at seven checks each &mdash; exactly 63, computed rather than shrugged at &mdash; and
+<code>bt</code> 463 &rarr; 460 is its twelve-spec depth loop becoming a nine-spec one, because the
+Mage three moved to their own eight-deep check. <b>The five suites that throw SCRIPT ERRORs are all
+documented and pre-existing</b>, and <code>bb</code> reading 168 rather than 172 is the archived
+changelog anchor Batch BZ predicted.</p>
+<p><b>Suites re-pointed in place with the reason in each file, and the pool-depth re-point is the
+fourth inversion of the same loop</b> &mdash; it has asserted each earlier tranche's own asymmetry,
+then the flatness tranche 2 achieved, and now a new asymmetry pointing the other way. The setups
+are byte-identical, because they are still what tells the two answers apart. Totals move 60 &rarr;
+69 and 84 &rarr; 93 across <code>bo</code>, <code>bp</code>, <code>bq</code>, <code>br</code>,
+<code>bt</code>, <code>bu</code>, <code>bv</code> and <code>bw</code>; the
+<code>_overburn_refund</code> call-site count moves 5 &rarr; 6 in <b>both</b> <code>ar</code> and
+<code>bs</code>, which two suites pin for the same reason. The master.html stamp gate moved in all
+thirteen copies.</p>
+
 <h2>2026-08-15 &mdash; Batch CA: twelve batches of hollow verification</h2>
 <p><i><b>THE FINDING IS THE ENTRY; THE FIX IS ITS CONSEQUENCE. From Batch BM to Batch BY,
 every VERIFIED block in this changelog that reads &ldquo;run-harness gates 1/2/3 PASS&rdquo; was

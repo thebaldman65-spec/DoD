@@ -218,8 +218,14 @@ func _pools() -> void:
 	# which closes it: BW added nine WARRIOR spec cards and no class card, so the
 	# spec side is 60 (twelve specs at five apiece, tranche 2 complete) and the
 	# class side is still 24 — which is the half that must NOT move.
-	ok(spec_total == 60,
-		"§1: ...at BP's 24 plus tranche 2's thirty-six, with no class card among them (%d)"
+	# RE-POINTED BY BATCH CB: tranche 3's first third landed, so the spec side
+	# is 60 plus the Mage nine. The question — is the count what the batches
+	# claim they shipped — is unchanged; a pool quietly EMPTYING still trips,
+	# which is what pinning a count is for.
+	# The CLASS side staying at 24 is the half that must NOT move, and it is
+	# asserted separately above — CB adds no class card.
+	ok(spec_total == 69,
+		"§1: ...at 60 plus CB's Mage nine, with no class card among them (%d)"
 			% spec_total)
 
 
@@ -988,7 +994,7 @@ func _docs() -> void:
 	var master := _src("res://docs/master.html")
 	# THE STAMP GATE, SEVENTH COPY (see test_batch_bp's note). It reads the
 	# CURRENT batch, not BQ's, and all seven move together.
-	ok(master.contains("Batch BX"), "§5: master.html is stamped for the current batch")
+	ok(master.contains("Batch CB"), "§5: master.html is stamped for the current batch")
 	for cls in TRANCHE_3:
 		for nm in TRANCHE_3[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)

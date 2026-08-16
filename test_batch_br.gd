@@ -189,18 +189,33 @@ func _pools() -> void:
 	# RE-POINTED AGAIN BY BATCH BW, WHICH CLOSES TRANCHE 2: the Warrior third
 	# landed, so SPEC_DRAFT_POOLS is BP's 24 plus tranche 2's 36 and the whole
 	# draft is 84.
-	ok(spec_total == 60,
-		"§4+tranche 2: SPEC_DRAFT_POOLS is BP's 24 plus tranche 2's thirty-six (%d)"
+	# RE-POINTED BY BATCH CB: tranche 3's first third landed, so the spec
+	# pools are 60 plus the Mage nine and the whole draft is 93. The check is
+	# what would catch a pool quietly EMPTYING, which is why it is a pinned
+	# count rather than a range.
+	ok(spec_total == 69,
+		"§4+tranche 3: SPEC_DRAFT_POOLS is 60 plus CB's Mage nine (%d)"
 			% spec_total)
-	ok(spec_total + total == 84,
-		"§0+tranche 2: the draft holds 84 of a target ~96 (%d)" % (spec_total + total))
+	ok(spec_total + total == 93,
+		"§0+tranche 3: the draft holds 93 of a target ~96 (%d)" % (spec_total + total))
 	# THE UNEVENNESS IS GONE, AND THAT IS THE INVERSION. Every earlier version of
 	# this loop asserted an asymmetry (five here, two there) because the debt was
 	# real and had to stay visible in code; BW paid the last of it, so what is
 	# asserted now is the FLATNESS. A pool quietly emptying still trips.
-	for sp2 in Classes.SPEC_DRAFT_POOLS:
+	# RE-POINTED BY BATCH CB, AND IT IS THE FOURTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, and now a NEW asymmetry pointing the other way — the
+	# three MAGE pools are EIGHT deep and the other nine are five, because CB
+	# paid tranche 3's first third. The question is unchanged and is still what
+	# tells the two answers apart; what is owed now is the Cleric, Hunter and
+	# Warrior thirds of tranche 3, and it has to stay visible in code.
+	for sp2 in ["pyromancer", "cryomancer", "arcanist"]:
+		ok(Classes.spec_draft_pool(sp2).size() == 8,
+			"§0+tranche 3: %s's SPEC pool is EIGHT deep" % sp2)
+	for sp2 in ["holy", "inquisitor", "occultist", "beastmaster",
+			"sharpshooter", "mystic", "berserker", "warden", "swordmaster"]:
 		ok(Classes.spec_draft_pool(sp2).size() == 5,
-			"§0+tranche 2: %s's SPEC pool is FIVE deep" % sp2)
+			"§0+tranche 3: %s is still FIVE — its third is owed" % sp2)
 	# EVERY ENTRY RESOLVES THROUGH THE ONE RESOLVER, which is what makes the
 	# battle spawn, the hero sheet, the rune filter and the blacksmith pairing
 	# all pick them up with no new plumbing.
@@ -1193,7 +1208,7 @@ func _live_hits_not_casts() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	ok(master.contains("Batch BX"), "§5: master.html is stamped Batch BX")
+	ok(master.contains("Batch CB"), "§5: master.html is stamped Batch CB")
 	for cls in TRANCHE_4:
 		for nm in TRANCHE_4[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)

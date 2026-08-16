@@ -775,8 +775,14 @@ func _live_refund() -> void:
 	# implementation — is unchanged; only the answer's size moved, which is what
 	# pinning a count is for: a new consumer has to COME AND SAY SO rather than
 	# writing its own refund.
-	ok(src.count("_overburn_refund(attacker,") == 5,
-		"...and exactly FIVE call sites: Detonation, Wildfire, Cinderfall, Ember Debt, Funeral Pyre")
+	# RE-POINTED 5 -> 6 (Batch CB): PYRE WAKE is the SIXTH consumer of the one
+	# refund door. The question — does every Burn consumer share the single
+	# implementation — is unchanged; only the answer's size moved, which is
+	# exactly what pinning a count is for. A new consumer has to COME AND SAY
+	# SO rather than quietly writing a refund of its own, and this check is
+	# the thing that makes it say so.
+	ok(src.count("_overburn_refund(attacker,") == 6,
+		"...and exactly SIX call sites: Detonation, Wildfire, Cinderfall, Ember Debt, Funeral Pyre, Pyre Wake")
 	var scene := await _spawn({}, ["raider", "raider"])
 	var py := _py(scene)
 	if py == null:

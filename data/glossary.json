@@ -196,6 +196,18 @@
 		]
 	},
 	{
+		"id": "status_bound",
+		"term": "Bound (Frostbind)",
+		"category": "statuses",
+		"short": "Two enemies chained together: what lands on one lands on both.",
+		"long": "A bond is the first thing in the game to link two ENEMIES to each other. While it holds, Chilled applied to either partner is applied to the other as well, and damage dealt to one is dealt to the other at 40%. Two rules make it readable. THE MIRRORED BLOW DOES NOT MIRROR BACK - the partner's share is not itself passed on, so a bond can never trade a blow back and forth between two bodies. AND A BOND IS NOT A HOLD: it grants the Cryomancer no extra prison. What it gives him is a second body that suffers with the first, so if both partners reach four stacks of Chilled the pair freezes together - and a bound pair then occupies ONE of his hold slots rather than two, which is how a Cryomancer limited to a single prison comes to hold two. Cleansing the bond from either partner breaks it for both.",
+		"see_also": [
+			"status_chilled",
+			"status_frozen",
+			"glacial_hold"
+		]
+	},
+	{
 		"id": "status_frostbite",
 		"term": "Frostbite",
 		"category": "statuses",

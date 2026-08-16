@@ -886,7 +886,7 @@ func _rename() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	ok(master.contains("Batch BX"), "§5: master.html is stamped Batch BX")
+	ok(master.contains("Batch CB"), "§5: master.html is stamped Batch CB")
 	var low := master.to_lower()
 	ok(low.contains("every living hero") or low.contains("all four heroes"),
 		"§5: master.html says an elite offers a draft to every living hero")

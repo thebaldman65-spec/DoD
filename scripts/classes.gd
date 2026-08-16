@@ -276,19 +276,21 @@ const SPEC_DRAFT_POOLS := {
 		"Aegis Wall"],
 	"swordmaster": ["Precision Strike", "Feint", "Sever", "Battle Poise",
 		"Feigned Guard"],
-	# MAGE — FIVE APIECE SINCE BATCH BT (tranche 2's first third), the CLERIC
-	# three joined them at BATCH BU, the HUNTER three at BATCH BV and the
-	# WARRIOR three at BATCH BW. TRANCHE 2 IS COMPLETE: all twelve specs sit at
-	# five, no pool is deeper than any other, and NO OFFER FILLS SHORT FOR A
-	# SPEC REASON any more. What is still owed is tranche 3, which is owed by
-	# every spec equally — the asymmetry is gone, and test_batch_bw asserts the
-	# flatness rather than the old two-versus-five split.
+	# MAGE — EIGHT APIECE SINCE BATCH CB, AND THE MAGE IS THE FIRST CLASS
+	# COMPLETE. BT took the three Mage pools to five (tranche 2's first third),
+	# BU the Cleric three, BV the Hunter three and BW the Warrior three; CB
+	# lands tranche 3's first third here. THE ASYMMETRY IS BACK AND IT POINTS
+	# THE OTHER WAY THIS TIME: the Mage three draft from EIGHT and the other
+	# nine from FIVE, so what is owed is the Cleric, Hunter and Warrior thirds
+	# of tranche 3. test_batch_cb asserts both halves, so the debt stays visible
+	# in code rather than only in prose.
 	"pyromancer": ["Cinderfall", "Ember Debt", "Slow Burn", "Stoke",
-		"Funeral Pyre"],
+		"Funeral Pyre", "Firedraw", "Pyre Wake", "Emberkeep"],
 	"cryomancer": ["Winter's Toll", "Rimebinding", "Flash Freeze",
-		"Killing Frost", "Hoarfrost Armor"],
+		"Killing Frost", "Hoarfrost Armor", "Deep Winter", "Cold Iron",
+		"Frostbind"],
 	"arcanist": ["Null Field", "Kindled Mind", "Arcane Bolt", "Inner Arcane",
-		"Arcane Echo"],
+		"Arcane Echo", "Resonant Field", "Threshold", "Unmaking"],
 	# CLERIC — FIVE APIECE SINCE BATCH BU (tranche 2's second third).
 	"holy": ["Second Wind", "Rite of Return", "Recant", "Shared Grief",
 		"Reprisal"],
@@ -1646,6 +1648,228 @@ static func draft_ability(display_name: String) -> Ability:
 				"cooldown": 4, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "The echo holds a 4th turn",
 				"description": "Set a resonance in one enemy: 20% of\nAttack, and for 3 turns every damaging\nHIT you land anywhere repeats at 30%\nagainst this target.\nA three-bolt Barrage echoes THREE\ntimes. One mark at a time."})
+		# ========== BATCH CB: TRANCHE 3, THE MAGE NINE ==========
+		#
+		# THE MAGE POOLS GO 5 -> 8 AND THE MAGE BECOMES THE FIRST CLASS COMPLETE.
+		# The Cleric, Hunter and Warrior thirds of tranche 3 are owed after this.
+		#
+		# ----- PYROMANCER: consolidate it, scatter it, and make it ARRIVE
+		# BIGGER. His whole pool moves fire that already exists — Cinderfall
+		# skims it, Stoke doubles one stack, Funeral Pyre spends it, Ember Debt
+		# places it — and NOTHING in it changes how much arrives. Two of these
+		# three are still bank moves (a consolidation and a scattering, the two
+		# directions nothing covered); the third is the multiplier on GETTING
+		# fire, which the pool has never had.
+		#
+		# AXIS: the bank CONSOLIDATED. Detonation pays 250% of ONE enemy's
+		# remaining Burn (325% with Focused Flame), so a field of shallow fires
+		# is worth far less than one deep one — and until now the only way to
+		# build a deep stack was to keep casting at the same body.
+		# SYNERGY: TOTAL COMMITMENT (Detonation consumes from the target AND its
+		# two neighbours), POWDER KEG (Detonation banks 30% into the next) and
+		# CATACLYSM. It is the deliberate counterpart to CINDERFALL, which
+		# spreads the spend where this concentrates it.
+		#
+		# RENAMED FROM BACKDRAFT, AND THE BRIEF'S PREMISE WAS STALE — §1 asked
+		# for it to be confirmed and it does not hold. BACKDRAFT IS STILL LIVE:
+		# it is the Pyromancer's OWN Kindling row-4 node `py_melt`, which both
+		# carries that name AND grants an ability whose `display_name` is
+		# "Backdraft" (20 Mana, 2.0, 3cd — +2 turns of Burn to every burning
+		# enemy). BS renamed the INFERNO row-5 node to Backblast to dodge exactly
+		# this collision and left the Kindling node standing.
+		# `Classes.pool_ability` is keyed on `display_name`, so a second
+		# Backdraft would make the resolver answer the wrong question — an
+		# ABILITY-vs-ABILITY duplicate, which BR §1 calls a REAL BREAK to be
+		# RENAMED rather than a label collision to be flagged. FIREDRAW is swept
+		# clean against every ability, talent node, status and rune.
+		"Firedraw":
+			return Ability.make({"display_name": "Firedraw", "dmg_type": "fire",
+				"cost": 25, "damage": 0, "pressure": 0, "delay": 2.5,
+				"cooldown": 4, "anim": "attack03", "special": "firedraw",
+				"perfect_id": "", "perfect_text": "Draws 6 turns from each instead of 4",
+				"description": "Pull the field's fire into one body:\nconsume 4 turns of Burn from every\nOTHER enemy and add all of it here.\nIt takes what is there or 4, whichever\nis less, and never touches this\nenemy's own Burn."})
+		# AXIS: the bank SCATTERED rather than cashed. A twelve-turn stack
+		# becomes twelve small fires and 96% of Attack spread across the board —
+		# the only card in the game that converts DEPTH into WIDTH.
+		# SYNERGY: SEA OF FLAME (+7% fire damage per burning enemy) wants the
+		# field wide and nothing else he owns widens it; feeds SLOW BURN
+		# (scatter, then stop the tick-down); and it is the natural answer when
+		# the deep target is about to die anyway and the bank would die with it.
+		# Overburn's refund pays 1 Mana per turn consumed (2 with Crucible)
+		# through the SAME door Detonation and Funeral Pyre use — there is no
+		# second one.
+		"Pyre Wake":
+			return Ability.make({"display_name": "Pyre Wake", "dmg_type": "fire",
+				"cost": 25, "damage": 8, "pressure": 0, "delay": 2.5,
+				"cooldown": 4, "anim": "attack02", "special": "pyre_wake",
+				"perfect_id": "", "perfect_text": "Each fire lands for 12% of Attack instead of 8%",
+				"description": "Scatter the pyre: consume ALL of one\nenemy's Burn. For EVERY turn consumed,\na random enemy is set Burning 1 turn\nand takes 8% of Attack.\nOverburn refunds every turn consumed."})
+		# AXIS: THE MULTIPLIER ON GETTING FIRE, not on moving it — and it is the
+		# thing the pool most obviously lacks, because everything else in it is
+		# downstream of already having a bank.
+		# SYNERGY: FLAMEWAVE lays 4 turns on everyone instead of 2. FIRESTORM's
+		# 6-8 bolts each land 4 instead of 2 — 24 to 32 burn-turns from ONE cast.
+		# Then SLOW BURN freezes the tick-down and Detonation pays 250% of it. It
+		# also doubles CINDER TRAIL (Fireball 4 -> 8) and CONFLAGRATION.
+		#
+		# IT DOUBLES AT APPLICATION AND IS NOT RETROACTIVE. Fire already standing
+		# on the board is untouched — that is STOKE's job, and the two must not
+		# collapse into each other (the Deadfall/Snare Trap duplication BD found,
+		# avoided up front rather than discovered later). The implementation is
+		# ONE clause at `_apply_status`'s `eff_turns` block, scoped to the SRC
+		# exactly as Permafrost is, so an enemy Ashblade's burn and a rune's burn
+		# are both correctly untouched.
+		"Emberkeep":
+			return Ability.make({"display_name": "Emberkeep", "dmg_type": "fire",
+				"cost": 20, "damage": 0, "pressure": 0, "delay": 1.5,
+				"cooldown": 4, "anim": "attack01", "special": "emberkeep",
+				"perfect_id": "", "perfect_text": "Holds a 4th turn",
+				"description": "Keep the embers: for 3 turns every\nBurn YOU apply lands at DOUBLE\nduration.\nIt changes what ARRIVES, not what is\nalready burning — fire already on the\nboard is untouched."})
+		# ----- CRYOMANCER: copy wide, hit the prisoner, chain two bodies. His
+		# pool assumes a hold and acts on ONE enemy, and his control has always
+		# been one enemy at a time.
+		#
+		# AXIS: the hold as a TEMPLATE, applied wide. Rimebinding copies it to
+		# one; this copies it to all.
+		# SYNERGY: BITTER COLD, WHITEOUT and ETERNAL WINTER all widen, and this
+		# is the card that makes a deep prison pay for the whole field. Sets up
+		# KILLING FROST, which pays every Chilled enemy.
+		"Deep Winter":
+			return Ability.make({"display_name": "Deep Winter", "dmg_type": "frost",
+				"cost": 25, "damage": 0, "pressure": 0, "delay": 2.5,
+				"cooldown": 4, "anim": "attack03", "special": "deep_winter",
+				"perfect_id": "", "perfect_text": "Rounds UP instead of down",
+				"description": "Spread the prison thin: every enemy\ngains Chilled equal to HALF the stacks\non the enemy you hold, rounded down.\nHOLDING NOTHING, IT DOES NOTHING —\nthe prison is the template."})
+		# AXIS: hitting the prisoner WITHOUT opening the cell. The hold is a
+		# party-wide +15% damage window that only he can close, and until now
+		# nothing of his own could safely strike into it — ICE LANCE IS THE
+		# RELEASE, so his best blow against a held enemy ends the hold.
+		# SYNERGY: BRITTLE ICE (held enemies are 6% likelier to be crit),
+		# WINTER'S TOLL (collects on the hold without releasing it, the same rule
+		# from the other side) and KILLING FROST.
+		#
+		# IT CARRIES NO `special`, THE BV FIVE-OF-NINE PATTERN, AND THAT IS
+		# DELIBERATE: `_resolve` sends any ability holding a `special` down
+		# `_resolve_special`, which means hand-rolling the blow and losing crits,
+		# armor, resists, Break and the parry roll with it. This is an ORDINARY
+		# strike with one conditional multiplier, so it keys on `display_name` at
+		# the raw-damage block instead and keeps the whole pipeline.
+		#
+		# VERIFIED AGAINST ICE LANCE AND IT DOES NOT OUTCLASS IT — the arithmetic
+		# is in the CB block in CLAUDE.md. Against a Frozen target the Lance
+		# lands 55% of Attack and ALWAYS crits (110%+) for 15 BD; this lands 50%
+		# at ordinary crit odds for 6 BD. It is cheaper (20 vs 25) and faster
+		# (2.0 vs 3.0) on a LONGER cooldown (3 vs 2), and the distinction it is
+		# sold on is that it does not open the cell.
+		"Cold Iron":
+			return Ability.make({"display_name": "Cold Iron", "dmg_type": "frost",
+				"cost": 20, "damage": 25, "pressure": 6, "delay": 2.0,
+				"cooldown": 3, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "Deals 35% of Attack instead of 25%",
+				"description": "Strike the prisoner: 25% of Attack.\nAgainst a FROZEN target it deals\nDOUBLE — and it does NOT release the\nhold, so the ice and the damage window\nboth stand."})
+		# AXIS: TWO PRISONERS ON ONE CHAIN. It does not grant another hold — it
+		# gives him a second body that SUFFERS WITH THE FIRST, so everything he
+		# does to one happens twice.
+		# SYNERGY: KILLING FROST hits both, RIMEBINDING's copied stacks
+		# immediately double, RAZOR ICE's three stacks become six across two
+		# enemies, WINTER'S TOLL collects on one while the other bleeds. And if
+		# both partners reach the freeze threshold THE PAIR FREEZES TOGETHER,
+		# which is how a one-hold Cryomancer comes to hold two.
+		#
+		# THE SECOND TARGET IS A CLICK, AND THE BRIEF'S CONDITIONAL WAS FALSE:
+		# §3 said to use a most-Chilled rule "if nothing selects two enemies
+		# today". `Ability.choose_two` HAS EXISTED SINCE SHRAPNEL CHARGE and Hex
+		# of Ruin uses `choose_three` beside it, so the UI answer already shipped
+		# and the player picks both bodies. §3's rule is kept where it actually
+		# bites — as the FALLBACK when no second target was chosen, which is the
+		# BOT's path (autoplay skips the clicks) and the one-enemy-left path.
+		# Without it `_resolve`'s generic fallback picks a RANDOM partner, and a
+		# bond is not a card anyone wants aimed at random.
+		"Frostbind":
+			return Ability.make({"display_name": "Frostbind", "dmg_type": "frost",
+				"cost": 25, "damage": 0, "pressure": 0, "delay": 2.5,
+				"cooldown": 4, "anim": "attack03", "special": "frostbind",
+				"choose_two": true,
+				"perfect_id": "", "perfect_text": "The bond holds a 4th turn",
+				"description": "Chain two enemies together for 3 turns:\nChilled landing on either lands on\nboth, and damage dealt to one is dealt\nto the other at 40%.\nThe mirrored blow does NOT mirror back.\nIf both reach the threshold, the pair\nfreezes together."})
+		# ----- ARCANIST: share the curve, buy it early, make it unanswerable.
+		# EVERYTHING HE HAS IS HIS OWN CURVE — nothing shares it, nothing changes
+		# its shape, and nothing gets past what a boss's armor and healing do to
+		# it.
+		#
+		# AXIS: the curve ARMS THE PARTY. This is the cross-spec card the pool
+		# does not have — at 12 stacks he is at +117%, so allies get +58%:
+		# enormous, brief, and it makes a deep Arcanist a party buff rather than
+		# a solo act.
+		# SYNERGY: SINGULARITY doubles the build rate, so a capstone build shares
+		# a far bigger number; CASCADE and CRITICAL MASS get him deep faster; and
+		# it pairs with the whole ENTROPY lane — the same stacks killing him now
+		# pay three other people.
+		#
+		# IT READS HIS BONUS LIVE, NOT AT CAST — the status carries no number at
+		# all, which is NULL FIELD's own rule and for the same reason: stamping
+		# the value here would freeze it at cast time and delete the card's whole
+		# axis. If he keeps building during the window the allies' share climbs
+		# with him, which is the escalation being SHARED rather than a snapshot
+		# being handed out.
+		"Resonant Field":
+			return Ability.make({"display_name": "Resonant Field", "dmg_type": "arcane",
+				"cost": 25, "damage": 0, "pressure": 0, "delay": 2.0,
+				"cooldown": 4, "anim": "attack01", "special": "resonant_field",
+				"perfect_id": "", "perfect_text": "Holds a 4th turn",
+				"description": "Tune the party to the storm: for 3\nturns every ALLY deals bonus damage\nequal to HALF your current Resonance\nbonus.\nIt reads the meter LIVE — keep\nbuilding and their share climbs too."})
+		# AXIS: the late game bought early, at the cost of the ramp. Below 15 it
+		# is a huge jump; above 15 it is a nerf he would never take — so it
+		# RESCUES A SLOW START and becomes dead weight in a long fight, which is
+		# the right shape for an escalation spec's emergency.
+		# SYNERGY: DEATH RAY gates at 8 and TERMINAL VELOCITY clears its cooldown
+		# at 15, so this reaches both instantly; NULL FIELD at 15 stacks is 75%
+		# mitigation.
+		#
+		# THE DAMAGE-TAKEN PENALTY ARRIVES WITH THE STACKS — the curve is read
+		# live at the strike-target block and knows nothing about how the meter
+		# got there — so it is genuinely dangerous rather than free: 15 stacks is
+		# +90% damage taken on the spot.
+		#
+		# FLAGGED: 15 IS THE NUMBER THE DESIGNER TRUSTS LEAST IN THIS BATCH. Too
+		# low and it is never worth casting, too high and it skips the spine.
+		# SHIPPED TO BE WATCHED IN PLAY; DO NOT PRE-TUNE IT.
+		"Threshold":
+			return Ability.make({"display_name": "Threshold", "dmg_type": "arcane",
+				"cost": 20, "damage": 0, "pressure": 0, "delay": 1.5,
+				"cooldown": 5, "anim": "attack01", "special": "threshold",
+				"perfect_id": "", "perfect_text": "The lockout is 2 turns instead of 3",
+				"description": "Skip the climb: your Resonance is SET\nto 15 at once, and you cannot gain any\nmore for 3 turns.\nThe damage-taken penalty arrives with\nthe stacks. Above 15 it takes them\nAWAY — this is an emergency, not an\nopener."})
+		# AXIS: the curve made UNANSWERABLE. His scaling damage is still checked
+		# by armor, resists and enemy healing, and a boss has all three. At 16
+		# stacks this is 160% of Attack THROUGH EVERYTHING, and the heal lock
+		# holds while the rest of the party finishes.
+		# SYNERGY: ARCANE ECHO repeats it at 30% PER HIT; TERMINAL VELOCITY. It
+		# answers the same warband problem BLIGHT THE WELL does from the
+		# Occultist's side, so a party holding both locks a healer out entirely.
+		#
+		# IT CARRIES NO `special` (the BV pattern again): it needs crits, Break,
+		# the parry roll and the compounding Resonance multiplier, so it rides
+		# the ordinary strike and keys on `display_name` at FOUR rider sites —
+		# the raw block (10% per stack), the resist block, the armor block and
+		# the post-strike block that lays the lock.
+		#
+		# ITS BREAK IS FLAT RATHER THAN PER-STACK, DELIBERATELY, which is ARCANE
+		# BOLT's own rule: a per-stack Break term is Arcane Cannon's and Magi's
+		# Wrath's axis, and duplicating it here is the squaring trap AT exists
+		# around, arriving through the Break door.
+		#
+		# REPORTED, NOT RE-TUNED — §4 ASKED FOR THIS COMPARISON AND THE ANSWER IS
+		# NOT THE COMFORTABLE ONE. Death Ray is 150% of Attack flat, so the
+		# crossover is EXACTLY 15 STACKS (10 x 15 = 150) and above it Unmaking
+		# deals MORE raw damage for 25 less Mana and 2.0 less delay. THRESHOLD,
+		# one card above, SETS HIM TO EXACTLY 15. See the CB block in CLAUDE.md.
+		"Unmaking":
+			return Ability.make({"display_name": "Unmaking", "dmg_type": "arcane",
+				"cost": 30, "damage": 10, "pressure": 8, "delay": 3.0,
+				"cooldown": 5, "anim": "attack02",
+				"perfect_id": "", "perfect_text": "The heal lock holds a 4th turn",
+				"description": "Undo it: 10% of Attack for EVERY\nResonance stack you hold. Its\nresistances and its armor are IGNORED,\nand it cannot be healed for 3 turns.\nAt 16 stacks that is 160% of Attack\nthrough everything."})
 		# ========== BATCH BU: TRANCHE 2, THE CLERIC NINE ==========
 		#
 		# ----- HOLY: what else can be reversed. Her pool was Second Wind (undo

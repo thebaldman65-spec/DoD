@@ -3451,3 +3451,40 @@ bug was a dead call at the top of a function, so the obvious rules — count the
 passes again. The question worth asking of any structural fix is not "does this catch the bug I
 found" but "what is the smallest change to the bug that gets past it", and here the answer was
 moving one line.
+
+## Batch CB — a conservative transfer hides its own bug
+
+**The thing worth keeping from this batch is not a card, it is a shape: an ability that MOVES a
+quantity from A to B cannot be tested by looking at the total.** Firedraw draws Burn off every
+enemy except its target and deposits it on that target. The rule that matters is that it never
+draws from the target itself — and every obvious assertion about that rule passes whether the code
+follows it or not, because the transfer is conservative. Take four turns off the target and give
+them straight back and the target is exactly where it started. The bug and the fix are
+indistinguishable by arithmetic.
+
+What made it testable was an unrelated card. Emberkeep doubles Burn at application, so under its
+window the deposit is worth twice what was drawn — and suddenly drawing four extra turns from the
+target is worth eight, and the two readings differ by four. **The general lesson is that a
+conservation law is the enemy of a test, and the way past it is to find the thing in the system
+that breaks the conservation and measure there.** It is the same move as measuring a mitigation
+term at an amplified magnitude (Batch BS) — not because the shipped number is wrong, but because
+the shipped number sits where the signal and the noise overlap.
+
+**A second one, smaller and more embarrassing: the card whose text was false by one line looked
+like it worked.** Frostbind promises that a bound pair reaching the freeze threshold freezes
+together. It did not — the second freeze pushed the hold count past its limit and evicted the
+first, so the pair took turns being held. Nothing crashed, nothing logged, and a smoke test showed
+a frozen enemy and a bound pair, which is what the card promises if you are not counting. The
+check that caught it asserts BOTH partners are frozen at once, and it only exists because the
+brief happened to spell out the consequence ("which is how a one-hold Cryomancer comes to hold
+two") rather than only the mechanic. **A design note that states the OUTCOME as well as the rule
+is worth more than one that states the rule twice**, because the outcome is what a test can be
+written against.
+
+**And a note on stale premises, which this project keeps meeting.** Four things were named for
+verification and two of them did not hold — including a name the brief believed had been freed two
+batches earlier and which was, in fact, still attached to a live talent-granted ability. The
+instruction to verify rather than assume paid for itself twice in one batch. What is worth
+recording is that the failed premise was not careless: it was a reasonable inference from a real
+change (BS did rename a node to dodge that exact collision — just a different node). **The most
+dangerous premise is the one that is nearly true.**

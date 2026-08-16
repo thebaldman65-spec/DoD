@@ -177,19 +177,31 @@ func _pools() -> void:
 	# had to stay visible in code. There is no asymmetry left to assert, so this
 	# suite asserts the FLATNESS instead — and a pool quietly emptying, or a
 	# thirteenth appearing, still trips.
-	for spec in Classes.SPEC_DRAFT_POOLS:
+	# RE-POINTED BY BATCH CB, AND IT IS THE FOURTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, and now a NEW asymmetry pointing the other way — the
+	# three MAGE pools are EIGHT deep and the other nine are five, because CB
+	# paid tranche 3's first third. The question is unchanged and is still what
+	# tells the two answers apart; what is owed now is the Cleric, Hunter and
+	# Warrior thirds of tranche 3, and it has to stay visible in code.
+	for spec in ["pyromancer", "cryomancer", "arcanist"]:
+		ok(Classes.spec_draft_pool(spec).size() == 8,
+			"%s drafts EIGHT (got %d)"
+				% [spec, Classes.spec_draft_pool(spec).size()])
+	for spec in ["holy", "inquisitor", "occultist", "beastmaster",
+			"sharpshooter", "mystic", "berserker", "warden", "swordmaster"]:
 		var pool: Array = Classes.spec_draft_pool(spec)
-		ok(pool.size() == 5, "%s drafts FIVE (got %d)" % [spec, pool.size()])
+		ok(pool.size() == 5, "%s is still FIVE (got %d)" % [spec, pool.size()])
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12, "there are twelve spec pools")
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 60, "the spec pools hold 60 (51 + this tranche's 9), got %d" % total)
+	ok(total == 69, "the spec pools hold 69 (60 + CB's Mage nine), got %d" % total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 84,
-		"the whole draft is 84 of a target ~96 (got %d)" % draft_total)
+	ok(draft_total == 93,
+		"the whole draft is 93 of a target ~96 (got %d)" % draft_total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH WARRIOR POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -584,10 +596,10 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch BX"), "master.html is stamped Batch BX")
+	ok(master.contains("Batch CB"), "master.html is stamped Batch CB")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("84 of"), "master.html states the new draft count")
+	ok(master.contains("93 of"), "master.html states the new draft count")
 	ok(master.contains("Builds with"),
 		"and the draft tables still carry the synergy line a player reads")
 	var chlog := FileAccess.get_file_as_string("res://docs/changelog.html")

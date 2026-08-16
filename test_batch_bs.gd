@@ -171,8 +171,12 @@ func _deletions() -> void:
 	# "whatever it is today" is what that would look like.
 	ok(src.count("func _overburn_refund") == 1,
 		"the refund still has exactly ONE implementation")
-	ok(src.count("_overburn_refund(attacker,") == 5,
-		"...and FIVE call sites (got %d)" % src.count("_overburn_refund(attacker,"))
+	# RE-POINTED 5 -> 6 (Batch CB): PYRE WAKE is the SIXTH consumer of the one
+	# refund door. BS pinned this count for the same reason AR did — a new Burn
+	# consumer has to COME AND SAY SO rather than writing a refund of its own —
+	# and the question is unchanged; only the answer's size moved.
+	ok(src.count("_overburn_refund(attacker,") == 6,
+		"...and SIX call sites (got %d)" % src.count("_overburn_refund(attacker,"))
 	ok(src.count("func _overburn_mult") == 1, "the bonus still has one home")
 	# GAP FOUND BY A NEGATIVE CONTROL, WHICH IS THE WHOLE REASON TO RUN THEM:
 	# THE FUNCTION-ABSENCE GREPS ABOVE DO NOT CATCH A BILL WRITTEN STRAIGHT INTO
@@ -345,7 +349,7 @@ func _rune_audit() -> void:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch BX"), "§5: master.html is stamped Batch BX")
+	ok(master.contains("Batch CB"), "§5: master.html is stamped Batch CB")
 	ok(master.contains("TWO clauses"),
 		"§5: master.html's Overburn entry states two clauses")
 	ok(master.contains("Holding fire\ncosts him nothing.</b>")

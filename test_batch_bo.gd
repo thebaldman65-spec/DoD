@@ -138,8 +138,12 @@ func _pools() -> void:
 	# RE-POINTED AGAIN BY BATCH BV, same argument, and CLOSED BY BATCH BW, which
 	# paid the Warrior third: 60 (BO's 18 + BP's Warrior 6 + tranche 2's 36).
 	# Tranche 2 is complete and every spec pool holds five.
-	ok(total == 60,
-		"§5+BP+tranche 2: sixty ship — BO's 18, BP's 6 and tranche 2's 36 (got %d)"
+	# RE-POINTED BY BATCH CB: tranche 3's first third landed, so the spec side
+	# is 60 plus the Mage nine. The question — is the count what the batches
+	# claim they shipped — is unchanged; a pool quietly EMPTYING still trips,
+	# which is what pinning a count is for.
+	ok(total == 69,
+		"§5+BP+tranche 3: sixty-nine ship — BO's 18, BP's 6, tranche 2's 36 and CB's 9 (got %d)"
 			% total)
 	# TRANCHE 1'S ENTRIES MUST STILL LEAD THEIR POOLS, which is the half of this
 	# check that survives BT untouched: a later tranche APPENDS, it does not
@@ -156,9 +160,20 @@ func _pools() -> void:
 	# has been re-pointed once per tranche and each re-point was an INVERSION of
 	# the debt the previous one recorded; it names all twelve now, so there is
 	# no list left to extend.
-	for spec in Classes.SPEC_DRAFT_POOLS:
+	# RE-POINTED BY BATCH CB, AND IT IS THE FOURTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, and now a NEW asymmetry pointing the other way — the
+	# three MAGE pools are EIGHT deep and the other nine are five, because CB
+	# paid tranche 3's first third. The question is unchanged and is still what
+	# tells the two answers apart; what is owed now is the Cleric, Hunter and
+	# Warrior thirds of tranche 3, and it has to stay visible in code.
+	for spec in ["pyromancer", "cryomancer", "arcanist"]:
+		ok(Classes.spec_draft_pool(spec).size() == 8,
+			"§5+tranche 3: %s drafts EIGHT" % spec)
+	for spec in ["holy", "inquisitor", "occultist", "beastmaster",
+			"sharpshooter", "mystic", "berserker", "warden", "swordmaster"]:
 		ok(Classes.spec_draft_pool(spec).size() == 5,
-			"§5+tranche 2: %s drafts FIVE" % spec)
+			"§5+tranche 3: %s is still FIVE — its third is owed" % spec)
 	# THE WARRIOR POOLS ARE NAMED **AND FULL** — named and empty at BO, filled to
 	# two at BP, and five at BW. One of four heroes in every party had no draft
 	# at all until BP, and had the shallowest one in the game until BW.
@@ -1160,7 +1175,7 @@ func _docs() -> void:
 	# TOGETHER or a batch that bumps the timestamp trips suites it never
 	# touched. (BO had its own copy phrased as "this batch"; it is the same
 	# gate.)
-	ok(master.contains("Batch BX"),
+	ok(master.contains("Batch CB"),
 		"§6: master.html is stamped for the current batch")
 	ok(master.contains("THE ABILITY DRAFT") or master.contains("The Ability Draft"),
 		"§6: ...and carries the draft's own section")
