@@ -169,7 +169,7 @@ func _pools() -> void:
 		var live: Array = Classes.class_draft_pool(cls3)
 		for nm in TRANCHE_4[cls3]:
 			ok(live.has(nm), "§2/§3: %s is in the %s class pool" % [nm, cls3])
-	# THE DRAFT IS 48 OF ~96, AND TRANCHES 2 AND 3 ARE STILL OWED. Recorded as
+	# THE DRAFT WAS 48 OF 120 AT BR, AND TRANCHES 2 AND 3 WERE STILL OWED. Recorded as
 	# an assertion for the same reason BQ recorded its own debt: a later batch
 	# reading "the seam is closed" must not read it as "the draft is finished".
 	var spec_total := 0
@@ -197,7 +197,7 @@ func _pools() -> void:
 		"§4+tranche 3: SPEC_DRAFT_POOLS is 60 plus CB's Mage nine (%d)"
 			% spec_total)
 	ok(spec_total + total == 93,
-		"§0+tranche 3: the draft holds 93 of a target ~96 (%d)" % (spec_total + total))
+		"§0+tranche 3: the draft holds 93 of a target 120 (%d)" % (spec_total + total))
 	# THE UNEVENNESS IS GONE, AND THAT IS THE INVERSION. Every earlier version of
 	# this loop asserted an asymmetry (five here, two there) because the debt was
 	# real and had to stay visible in code; BW paid the last of it, so what is
@@ -1208,15 +1208,20 @@ func _live_hits_not_casts() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	ok(master.contains("Batch CB"), "§5: master.html is stamped Batch CB")
+	ok(master.contains("Batch CD"), "§5: master.html is stamped Batch CD")
 	for cls in TRANCHE_4:
 		for nm in TRANCHE_4[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)
 	ok(not master.to_lower().contains("half-filled")
 		and not master.to_lower().contains("half filled"),
 		"§5: master.html no longer records the class seam as HALF filled")
-	ok(master.contains("48") or master.contains("Forty-eight"),
-		"§5: ...and the pool count moved to 48 of ~96")
+	# RE-POINTED BY BATCH CD. BR asserted master.html carried the string "48",
+	# which four tranches later is a check that CAN ONLY PASS — "48" turns up in
+	# any document with enough numbers in it — and BQ's rule is that a check
+	# which can only pass is a gap. It asks BR's real question instead: does
+	# master.html state the draft's LIVE pool count against the REAL target?
+	ok(master.contains("93 of 120"),
+		"§5: ...and master.html states the live pool count against the real target")
 	var changelog := _src("res://docs/changelog.html")
 	ok(changelog.find("Batch BR") >= 0, "§5: the changelog has a Batch BR entry")
 	# SLICE ON THE HEADING, NOT ON THE PHRASE — the BE lesson, and it is a real

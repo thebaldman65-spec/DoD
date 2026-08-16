@@ -201,7 +201,7 @@ func _pools() -> void:
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
 	ok(draft_total == 93,
-		"the whole draft is 93 of a target ~96 (got %d)" % draft_total)
+		"the whole draft is 93 of a target 120 (got %d)" % draft_total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH WARRIOR POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -596,7 +596,7 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CB"), "master.html is stamped Batch CB")
+	ok(master.contains("Batch CD"), "master.html is stamped Batch CD")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
 	ok(master.contains("93 of"), "master.html states the new draft count")

@@ -658,6 +658,16 @@ func _source_has(path: String, needle: String, msg: String) -> void:
 	ok(f.get_as_text().contains(needle), msg)
 
 
+# The other half of `_source_has`, added by Batch CD: this file's whole §5
+# habit is pinning a DELETED name absent, and §4 now needs the same of BM's.
+func _source_lacks(path: String, needle: String, msg: String) -> void:
+	var f := FileAccess.open(path, FileAccess.READ)
+	if f == null:
+		ok(false, "%s (cannot open %s)" % [msg, path])
+		return
+	ok(not f.get_as_text().contains(needle), msg)
+
+
 func _spawn_battle(run: Node, mod_id: String,
 		specs := ["berserker", "pyromancer", "holy", "sharpshooter"]) -> Node:
 	run.new_run(["warrior", "mage", "cleric", "hunter"], [], "standard")
@@ -688,14 +698,37 @@ func _test_rewards(RunState) -> void:
 	for m in run.party:
 		m["spec"] = "berserker"
 		m["tree"] = Talents.generate_tree("berserker", "warrior")
-	# The point schedule: 1 apiece from elite / mini-boss / boss, 0 from
-	# fights, and the END boss pays too (it used to pay nothing).
-	ok(run.award_talent_points("fight") == 0, "an ordinary fight pays no point")
-	ok(run.award_talent_points("elite") == 1, "an elite pays 1")
-	ok(run.award_talent_points("miniboss") == 1, "a mini-boss pays 1")
-	ok(run.award_talent_points("boss") == 1, "a zone boss pays 1")
+	# THE POINT SCHEDULE THIS SECTION WAS WRITTEN FOR NO LONGER EXISTS, AND THE
+	# RE-POINT IS AN INVERSION (Batch CD). AN shipped 1 apiece from elite /
+	# mini-boss / boss and 0 from fights; BATCH BM §6 DELETED THE WHOLE IN-RUN
+	# ECONOMY — `award_talent_points`, `award_spec_point`, `member["talent_points"]`
+	# and `member["talent_flex"]` — and moved the currency to the META layer,
+	# where a ZONE BOSS banks 1 per spec that played, to Profile, through
+	# `bank_zone_boss_points`. So the five calls below have been throwing
+	# `Invalid call ... award_talent_points` since BM, ABORTING THE WHOLE OF
+	# `_test_rewards` while the suite printed a clean count: the upgrade-pool
+	# section, the 200-trial never-re-offered loop and the 300-trial spec-pool
+	# loop underneath had not run for twelve batches. That is the BC trap and
+	# it is what Batch CD exists to close.
+	#
+	# WHAT IS ASSERTED INSTEAD IS THE DELETION ITSELF, in the file that used to
+	# encode the schedule — because a schedule that is gone is not a smaller
+	# schedule, and pinning ABSENCE is this suite's own pattern (§5 does the
+	# same to BK's deleted scheduling). The banking door's BEHAVIOUR is driven
+	# and negative-controlled in test_run_harness's gate 2, which redirects
+	# Profile to a scratch file to do it; nothing here writes the ledger.
+	ok(not run.has_method("award_talent_points"),
+		"BM deleted the in-run point schedule outright")
+	ok(not run.has_method("award_spec_point"),
+		"...and the awakening point with it")
+	for m2 in run.party:
+		ok(not m2.has("talent_points"), "no member carries an in-run purse")
+		ok(not m2.has("talent_flex"), "...nor AN's flex purse beside it")
+	ok(run.has_method("bank_zone_boss_points"),
+		"what replaced them is ONE door, and a ZONE BOSS is what opens it")
+	_source_lacks("res://scripts/run_state.gd", "func award_talent_points",
+		"...asserted at the source too, so a later batch cannot quietly re-add it")
 	run.zone_idx = 2
-	ok(run.award_talent_points("boss") == 1, "the END boss pays 1 as well")
 	# BATCH BK: THE PER-RUN TOTAL IS NO LONGER A CONSTANT. AN's authored line
 	# held exactly two elites a zone, so points-per-run was arithmetic: 4 a
 	# zone, 12 a run. On a branching map the elites are 0-3 a WALKED zone, so
@@ -709,8 +742,17 @@ func _test_rewards(RunState) -> void:
 				elite_columns += 1
 	ok(elite_columns == int(run.NODE_COPIES["elite"]),
 		"a zone holds %d elites to route toward" % int(run.NODE_COPIES["elite"]))
-	ok(run.award_talent_points("miniboss") + run.award_talent_points("boss") == 2,
-		"the guaranteed floor is 2 points a zone — the mini-boss and the boss")
+	# INVERTED BY BATCH CD with the rest of the schedule. AN's floor was "2
+	# points a zone, the mini-boss and the boss"; under BM the MINI-BOSS pays
+	# no point at all, so the floor is one ZONE BOSS banking per zone and the
+	# arithmetic is a property of the board rather than of the node types. What
+	# is still worth asserting here — and is the half AN really meant — is that
+	# the zone's guaranteed spine is unduckable: one mini-boss, one boss, on
+	# every route.
+	ok(run.map[run.MINI_SLOT].size() == 1,
+		"every route crosses ONE mini-boss (the zone's convergence)")
+	ok(run.map[run.BOSS_SLOT].size() == 1,
+		"...and ends on ONE boss, which is the zone's guaranteed banking")
 	run.zone_idx = 0
 	# THE MINI-BOSS: a generic ability upgrade, chosen from three.
 	# RE-POINTED IN PLACE (Batch BH §1): AN shipped a PLACEHOLDER pool of four

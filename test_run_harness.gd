@@ -19,7 +19,15 @@
 #      checks)`, never a bare `GATE 2 PASS`. A test that reports a QUANTITY is
 #      auditable at a glance; a test that reports a VERDICT is only auditable
 #      by reading it, and that is precisely why this one outlived the `ah` and
-#      `an` cases — those printed counts that looked wrong.
+#      `an` cases — those printed counts.
+#      CORRECTED BY BATCH CD, AND THE CORRECTION MATTERS MORE THAN THE RULE:
+#      CA's next clause read "those printed counts that LOOKED WRONG", and they
+#      did not. `ah` and `an` printed counts that were low by 125 and 2,434
+#      checks and nobody saw it for twelve batches; three more suites were
+#      doing the same thing. A QUANTITY IS ONLY AUDITABLE AT A GLANCE IF
+#      SOMETHING IS COMPARING IT TO WHAT IT SHOULD BE. Until CD nothing was.
+#      A COUNT THAT NOBODY DIFFS IS A WORD — test_batch_cd §1 is what diffs
+#      the repaired five, as a FLOOR per suite; extend it, do not trust a reader.
 #   2. A GATE THAT RUNS ZERO CHECKS MUST FAIL. An empty gate is a broken gate,
 #      and it is the one case where silence has to be loud. A gate printing a
 #      count of zero is VISIBLY broken; the same gate printing PASS is not.

@@ -257,13 +257,13 @@ const CLASS_POOLS := {
 # plumbing and NO SAVE VERSION MOVES (still v10). What the draft adds beside it
 # is `member["draft_refused"]` — the names this run may never offer again.
 #
-# POOLS ARE THIN UNTIL TRANCHE 3 AND THAT IS EXPECTED, NOT A BUG: eighteen
-# abilities against a target of about ninety-six, so an offer of three will
-# often come up two or one. It fills SHORT rather than padding with repeats,
-# which is AP §3's existing rule for upgrade offers applied unchanged.
-# (BATCH BW: the draft is 84 of ~96 and every spec is five deep, so an offer
-# fills short only when the run has already REFUSED or taken most of a pool —
-# never because of which hero drew it.)
+# POOLS WERE THIN UNTIL TRANCHE 2 AND THAT WAS EXPECTED, NOT A BUG: BO's
+# eighteen abilities against a target of 120, so an offer of three often came
+# up two or one. It fills SHORT rather than padding with repeats, which is
+# AP §3's existing rule for upgrade offers applied unchanged.
+# (BATCH BW took every spec to five and BATCH CB the Mage three to eight, so
+# the draft is 93 of 120 and an offer fills short only when the run has already
+# REFUSED or taken most of a pool — never because of which hero drew it.)
 const SPEC_DRAFT_POOLS := {
 	# WARRIOR — THE DEBT BO LEFT OPEN, CLOSED IN BATCH BP AND PAID OFF IN BATCH
 	# BW. All three pools were NAMED AND EMPTY, so one of four heroes in every
@@ -313,11 +313,19 @@ const SPEC_DRAFT_POOLS := {
 # CLASS SEAM NOW DRAWS A REAL ENTRY FOR EVERY HERO IN THE GAME. No class rolls
 # an empty pool any more, and no offer loses its class card.
 #
-# THE DRAFT IS 84 OF A TARGET ~96 (60 spec + 24 class-wide) AS OF BATCH BW.
+# THE DRAFT IS 93 OF A TARGET 120 (69 spec + 24 class-wide) AS OF BATCH CB.
+#
+# THE TARGET IS 120, NOT ~96, AND BATCH CD CORRECTED IT HERE (§2). The ~96 came
+# from an older assumption of SIX spec cards per spec; CB completed the Mage at
+# EIGHT, which makes the spec target 12 x 8 = 96 and the whole draft 96 + 24 =
+# 120. test_batch_bt has asserted depth 8 since CB, so the tests encoded the
+# right figure while three comments in this file and master.html carried the
+# old one. 27 are still owed and every one of them is a SPEC card: the Cleric,
+# Hunter and Warrior thirds of tranche 3, nine apiece.
+#
 # This block read "48 ... spec pools remain thin at two apiece" from BR until
 # BW corrected it toward the code: TRANCHE 2 IS COMPLETE and every spec pool is
-# five deep. TRANCHE 3 is the last third owed, and it is owed by all twelve
-# specs equally rather than by three of them.
+# at least five deep.
 #
 # THIS IS A SEPARATE STRUCTURE FROM `CLASS_POOLS` ABOVE AND IT MUST STAY ONE.
 # The reason is BO's own, applied to the other pool: `CLASS_POOLS` feeds the
@@ -528,7 +536,7 @@ static func pool_ability(display_name: String) -> Ability:
 	return Talents.granted_ability(display_name)
 
 
-# --- THE DRAFTED ABILITIES — SEVENTY-FIVE OF A TARGET ~96 (BO..BV) -----------
+# --- THE DRAFTED ABILITIES — NINETY-THREE OF A TARGET 120 (BO..CB) -----------
 #
 # BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
 # six WARRIOR entries as owed rather than pretending the pools were full.
@@ -538,15 +546,18 @@ static func pool_ability(display_name: String) -> Ability:
 # BATCH BR ADDS THE OTHER TWELVE — six HUNTER, six WARRIOR — so
 # `CLASS_DRAFT_POOLS` IS FULL AT 24 AND THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL
 # ENTRY FOR EVERY HERO IN THE GAME.
-# TRANCHE 2 IS THREE QUARTERS PAID: BATCH BT the MAGE nine, BATCH BU the CLERIC
-# nine, BATCH BV the HUNTER nine — nine spec cards apiece, three per spec, so
-# those nine specs draft from FIVE. THE WARRIOR THREE ARE THE LAST THIRD OWED
-# and still sit at two, so a Berserker/Warden/Swordmaster offer of three still
-# fills SHORT where every other hero's now comes up full. Tranche 3 follows.
+# TRANCHE 2 IS COMPLETE: BATCH BT the MAGE nine, BATCH BU the CLERIC nine,
+# BATCH BV the HUNTER nine and BATCH BW the WARRIOR nine — nine spec cards
+# apiece, three per spec — so all twelve specs draft from at least FIVE and no
+# offer fills short for a SPEC reason any more.
+# TRANCHE 3 HAS BEGUN: BATCH CB paid its first third, taking the three MAGE
+# pools to EIGHT, so THE MAGE IS THE FIRST CLASS COMPLETE. The Cleric, Hunter
+# and Warrior thirds are what is left — 27 cards, nine apiece.
 #
 # EVERY ABILITY NAMES THE AXIS IT SERVES, in its comment. That rule is here
 # because the twelve tree batches spent themselves removing nodes that existed
-# to fill a grid, and ninety-six abilities has the same risk in a larger form.
+# to fill a grid, and a hundred and twenty abilities has the same risk in a
+# larger form.
 # NO ABILITY MAY BE A STRICTLY BETTER VERSION OF ANOTHER IN THE SAME POOL —
 # Batch BD found Deadfall had duplicated Snare Trap for fourteen batches.
 #

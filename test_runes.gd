@@ -677,17 +677,37 @@ func _boolean_fields(data: Dictionary, battle_src: String) -> void:
 
 # ---------- Batch AE: what the opening pick can actually deal ----------
 #
-# The batch's whole deliverable is one pick of three at spec confirmation,
-# rolled through the ORDINARY roller at zone slot 1. The report-back the
-# designer asked for is how often that triple contains a spec-scoped rune,
-# and the sim measured 36-42% across ten rows. That number is a property of
-# the POOL and the slot-1 rarity weights, so it belongs in a test: if a
-# future batch adds spec entries or moves RARITY_WEIGHTS, this is the check
-# that tells the designer the opening-pick hit rate moved with it.
+# Batch AE's deliverable was one pick of three at spec confirmation, rolled
+# through the ORDINARY roller at zone slot 1. The report-back the designer
+# asked for is how often that triple contains a spec-scoped rune, and the sim
+# measured 36-42% across ten rows. That number is a property of the POOL and
+# the slot-1 rarity weights, so it belongs in a test: if a future batch adds
+# spec entries or moves RARITY_WEIGHTS, this is the check that tells the
+# designer the hit rate moved with it.
+#
+# RE-POINTED IN PLACE BY BATCH CD, AND THE FIRST LINE IS AN INVERSION. BATCH
+# AN DELETED THE OPENING PICK — `start_rune_enabled`, `spec_opening_enabled`,
+# `grant_start_runes` and `_generate_spec_rune` all went with it, and heroes
+# now begin with no runes and three empty slots. The call below therefore
+# threw `Invalid call ... start_rune_enabled` and ABORTED THIS WHOLE FUNCTION
+# while the suite printed a clean 2973: the 144 triple checks and the drift
+# alarm underneath had not run since AN. That is the BC trap, and it is what
+# Batch CD exists to close.
+#
+# THE MEASUREMENT IS UNCHANGED AND STILL WORTH TAKING — `roll_rune_candidates`
+# is the same function AE measured, on the same slot-1 weights; what moved is
+# WHICH pick it feeds. Its one live caller is the ELITE RUNE CACHE, so the
+# alarm now guards that triple. The deleted name is pinned ABSENT rather than
+# deleted outright, so a later batch reviving an opening pick has to come here
+# and say so.
 func _start_rune_pool(run: Node) -> void:
 	var had_sim: bool = run.sim_run
 	run.sim_run = false
-	ok(run.start_rune_enabled(), "the start rune is off by default — AE ships it ON")
+	ok(not run.has_method("start_rune_enabled"),
+		"AN deleted the opening pick — heroes begin with no runes")
+	ok(not run.has_method("grant_start_runes"), "...and nothing grants one")
+	ok(run.has_method("roll_rune_candidates"),
+		"the roller AE measured is still live — it is the elite cache's now")
 	var trials := 0
 	var with_spec := 0
 	for key in Classes.SPEC_IDS:
@@ -697,7 +717,7 @@ func _start_rune_pool(run: Node) -> void:
 					"bm_abilities": []}
 				var triple: Array = run.roll_rune_candidates(member)
 				ok(triple.size() == 3,
-					"%s: the opening deal rolled %d candidates" % [spec, triple.size()])
+					"%s: the cache deal rolled %d candidates" % [spec, triple.size()])
 				trials += 1
 				for c in triple:
 					if String(c.get("scope", "")) == "spec:%s" % spec:
@@ -707,8 +727,8 @@ func _start_rune_pool(run: Node) -> void:
 	# Deliberately a WIDE band: this is a drift alarm on the pool, not a
 	# balance assertion. The measured sim figure sits near the middle of it.
 	ok(rate > 20.0 and rate < 70.0,
-		"a spec rune is in the opening triple %.0f%% of the time — outside the 20-70%% band Batch AE measured (36-42%%); the pool or RARITY_WEIGHTS moved" % rate)
-	print("  (Batch AE report-back: a spec-scoped rune is among the opening three %.0f%% of the time)" % rate)
+		"a spec rune is in the cache triple %.0f%% of the time — outside the 20-70%% band Batch AE measured (36-42%%); the pool or RARITY_WEIGHTS moved" % rate)
+	print("  (Batch AE report-back, re-pointed at the elite cache by CD: a spec-scoped rune is among the three %.0f%% of the time)" % rate)
 	run.sim_run = had_sim
 
 

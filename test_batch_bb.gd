@@ -801,7 +801,7 @@ func _docs() -> void:
 	# is the canonical one and moves with every batch that touches the doc. What
 	# it is really guarding is that the doc was touched AT ALL. Bump it, do not
 	# delete it.
-	ok(doc.contains("Last updated: 2026-08-15 (Batch CB)"),
+	ok(doc.contains("Last updated: 2026-08-16 (Batch CD)"),
 		"§7: master.html carries the current batch's stamp")
 	ok(doc.contains("Rot"), "§7: §3a's modifier table has Rot back")
 	# The pool tables are verbatim — test_batch_ah asserts them too, so this is
@@ -835,7 +835,40 @@ func _docs() -> void:
 		"§7: CLAUDE.md states the three-field ordering at the victory sync")
 	ok(cm.contains("BATCH BB"), "§7: CLAUDE.md carries the batch block")
 	var log := _src("res://docs/changelog.html")
-	ok(log.contains("Batch BB"), "§7: the changelog has this batch's entry")
+	# RE-POINTED AT THE ARCHIVE BY BATCH CD. BATCH BZ SPLIT THE CHANGELOG at a
+	# batch boundary: the live file starts at Batch BP and everything older —
+	# BB included — moved OUT OF THE REPO to `changelog-archive.html`. BZ said
+	# in writing that this suite would trip and called it the BC trap, and it
+	# did: `log.contains("Batch BB")` went on passing (two LATER entries name
+	# the batch in their prose), and the slice below then threw `Out of bounds
+	# get index '1'`, ABORTING `_docs` with four assertions left unrun. That is
+	# why this suite has read 168 rather than 172 since BZ.
+	#
+	# THE PATH IS READ OUT OF THE LIVE CHANGELOG'S OWN HEADER rather than
+	# hardcoded, because BZ made both halves carry the full path of the other
+	# precisely so a reader could follow it — so this check follows the repo's
+	# own pointer, and a later split that moves the archive moves this with it.
+	# `/changelog-archive.html</code>` with the LEADING SLASH is the anchor: the
+	# header names the file twice and the bare-filename mention comes first.
+	#
+	# ONE CONSEQUENCE, STATED RATHER THAN BURIED: this suite now depends on a
+	# file that is NOT IN VERSION CONTROL. On a machine without the archive it
+	# FAILS LOUDLY, which is correct — CLAUDE.md already records that the
+	# archive must live somewhere backed up, and a check that passed quietly
+	# when the file was missing would be a check that can only pass.
+	var mark := log.find("/changelog-archive.html</code>")
+	ok(mark > 0, "§7: the live changelog names the archive's full path")
+	var open_at := log.rfind("<code>", mark) + 6
+	var archive_path := log.substr(open_at,
+		mark + "/changelog-archive.html".length() - open_at)
+	var archive := _src(archive_path)
+	ok(archive.length() > 100000,
+		"§7: the archive opens at %s (%d chars)" % [archive_path, archive.length()])
+	ok(not log.contains("<h2>2026-08-09 &mdash; Batch BB"),
+		"§7: BZ moved this batch's entry OUT of the live changelog")
+	ok(archive.contains("<h2>2026-08-09 &mdash; Batch BB"),
+		"§7: ...and the archive has it")
+	log = archive
 	# §7: the entry LEADS with §3's number, and it carries both halves with
 	# sample counts and deepest marks the way AX printed them, so the three
 	# rows are comparable. The number is what §3 was actually asking for, and

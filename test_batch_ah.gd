@@ -292,14 +292,28 @@ func _test_map(RunState) -> void:
 		run.SLOTS_PER_ZONE, steps])
 	ok(run.slot_idx == run.BOSS_SLOT, "...and it ends on the boss")
 	ok(run.reachable().is_empty(), "nothing follows the boss")
-	# Rewards: elite-tier points and gold, and its own ability pick.
+	# Rewards: elite-tier gold, and its own ability pick.
 	run.new_run()
 	run.party[0]["spec"] = "berserker"
-	var before: int = run.party[0].get("talent_points", 0)
-	# Batch AI re-cut the schedule: 1 for the mini-boss, out of a run total
-	# of exactly 8 (spec choice 1 + 3 mini-bosses + 2 zone bosses x2).
-	ok(run.award_talent_points("miniboss") == 1, "the mini-boss pays 1 talent point")
-	ok(run.party[0]["talent_points"] == before + 1, "...to every hero")
+	# RE-POINTED IN PLACE BY BATCH CD, AND IT IS AN INVERSION. This asserted
+	# that a mini-boss paid 1 in-run talent point into `member["talent_points"]`
+	# — Batch AI's schedule. BATCH BM §6 DELETED BOTH the award and the member
+	# purse, so the call has been throwing `Invalid call ... award_talent_points`
+	# ever since, ABORTING THE REST OF `_test_map` while the suite printed a
+	# clean count. That is the BC trap, and it is what Batch CD exists to close:
+	# the gold checks and the 120-check compose loop below this line had not run
+	# since BM. THE QUESTION IS STILL WORTH ASKING — what does a mini-boss pay?
+	# — and only the answer moved: gold and an upgrade pick, and NO talent point
+	# from any node, because a RUN awards none at all. Points are META now and a
+	# ZONE BOSS banks them to Profile through one door; that door is gated,
+	# driven and negative-controlled in test_run_harness's gate 2, which is why
+	# it is asserted PRESENT here rather than driven a second time.
+	ok(not run.has_method("award_talent_points"),
+		"BM deleted the in-run award — a mini-boss pays no talent point")
+	ok(not run.party[0].has("talent_points"),
+		"...and no member carries an in-run purse for it to pay into")
+	ok(run.has_method("bank_zone_boss_points"),
+		"...the live door is the ZONE BOSS's, and it banks to Profile")
 	var gold_before: int = run.gold
 	var paid: int = run.award_gold("miniboss")
 	ok(paid >= 80 and paid <= 130, "the mini-boss pays elite gold (%d)" % paid)
@@ -419,7 +433,7 @@ func _test_doc_matches_code() -> void:
 	# The stamp moves with every batch that touches the doc; what this line
 	# is really guarding is that the doc was touched AT ALL when the code
 	# below it changed. Bump it, do not delete it.
-	ok(doc.contains("Last updated: 2026-08-15 (Batch CB)"),
+	ok(doc.contains("Last updated: 2026-08-16 (Batch CD)"),
 		"master.html carries the current batch's stamp")
 	for spec in Classes.SPEC_POOLS:
 		var listed: String = ", ".join(Classes.SPEC_POOLS[spec])

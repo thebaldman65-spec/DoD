@@ -56,17 +56,25 @@ it is carrying its own history.**
   only** (`DoD Changelog.docx` 392 KB -> 74 KB). Restoring a full-history export is one line in
   `build_docs.py`'s `DOCS` dict pointing at the archive; **not taken**, because pointing that
   script at an out-of-repo source is a decision about what it is for.
-- **THREE SUITES ASSERT AGAINST NOW-ARCHIVED ENTRIES AND FAIL: `test_batch_bb` (the Batch BB
-  entry's Ruin-detonation numbers — and its slice THROWS on the missing anchor, aborting its own
-  function while the suite still prints a count, the BC trap), `test_batch_bn` and `test_batch_bo`
-  (one bare "the changelog has my entry" check each). REPORTED, NOT RE-POINTED** — what those
-  assertions were for is a decision. The other nine changelog-reading suites (bp, bq, br, bs, bt,
-  bu, bv, bw, bx) pass, because each batch's own entry is recent by construction.
+- **THREE SUITES ASSERT AGAINST NOW-ARCHIVED ENTRIES. `test_batch_bb` IS RE-POINTED (Batch CD §1)
+  — it reads the archive now, and it finds the path in the LIVE changelog's own header rather than
+  hardcoding it, so the split's own pointer is what the check follows.** BZ's prediction was
+  exact: its slice threw on the missing anchor and aborted its own function while the suite went
+  on printing a count, which is the BC trap and cost it four checks for six batches.
+  **`test_batch_bn` AND `test_batch_bo` ARE THE OTHER TWO AND THEY ARE NOT RE-POINTED, BECAUSE
+  THEY DO NOT FAIL — AND THAT IS THE PROBLEM, NOT THE REASON TO LEAVE THEM.** Each holds one bare
+  `changelog.contains("Batch BN"/"Batch BO")`, and a LATER entry naming the batch in its own prose
+  satisfies it, so both **PASS WITHOUT THEIR SUBJECT BEING IN THE FILE AT ALL** — a check that has
+  stopped asking its question, which is the same gap CD's §1 exists to close, arriving without a
+  throw to announce it. **REPORTED, NOT REPAIRED: the fix is bb's pattern applied twice** (anchor
+  on the `<h2>` heading, follow the header's path into the archive) and it is one line each. The
+  other nine changelog-reading suites (bp, bq, br, bs, bt, bu, bv, bw, bx) pass honestly, because
+  each batch's own entry is recent by construction.
 - **THE HEAVIEST TEXT FILES AFTER THE SPLIT**: `scripts/battle.gd` 893 KB (18.5%), `CLAUDE.md`
   673 KB (13.9%), `docs/master.html` 271 KB (5.6%), `docs/design-notes.md` 208 KB (4.3%). The
   changelog is no longer in the top four.
 - **DO NOT ARCHIVE TEST SUITES. THEY ARE THE SINGLE LARGEST BLOCK IN THE SYNC AND THEY CANNOT BE
-  ARCHIVED — 43 suites, 1.50 MB, 28% of the old sync and 32% of the new one** (they did not grow;
+  ARCHIVED — 44 suites, 1.7 MB at Batch CD, 28% of the old sync and 32% of the new one** (they did not grow;
   the denominator shrank, so after BZ they are larger than any single file). **They must be in the
   repo to run.** That is a constraint of a whole-repo sync, not a judgement about their value: each
   suite encodes decisions in assertion form (AV, BR and BS re-pointed suites in place *with their
@@ -193,8 +201,15 @@ it is carrying its own history.**
   on the way out. **129 of BM's own replacement assertions had never executed once**, and twelve
   batches of VERIFIED blocks quoted "gates 1/2/3" on the strength of a word that was never earned.
   **A COUNT OF ZERO FAILURES IS NOT EVIDENCE WHEN THE COUNT OF CHECKS IS ALSO ZERO**, and this one
-  printed a WORD rather than a number, which is why it outlived the `ah` and `an` cases — those
-  print counts, and a count that reads wrong is visible at a glance.
+  printed a WORD rather than a number, which is why it outlived the `ah` and `an` cases.
+  **CA'S NEXT CLAUSE READ "those print counts, and a count that reads wrong is visible at a
+  glance", AND BATCH CD DISPROVED IT — THE CORRECTION IS THE MORE USEFUL HALF OF THE RULE.** `ah`
+  and `an` DID print counts, those counts WERE wrong by 125 and 2,434 checks, and nobody saw it
+  for twelve batches; three more suites were doing the same thing. **A COUNT IS ONLY VISIBLE AT A
+  GLANCE IF SOMETHING IS COMPARING IT TO WHAT IT SHOULD BE** — and until CD nothing was, because
+  the battery's counts lived in prose in this file and were transcribed forward by hand. **THE
+  REAL RULE: A COUNT THAT NOBODY DIFFS IS A WORD.** test_batch_cd §1 is what diffs the five, as a
+  FLOOR per suite; extend it rather than trusting a reader.
   **THE TWO STANDING RULES CA SHIPPED BIND EVERY GATE IN THE HARNESS, PRESENT AND FUTURE. They live
   in `_check` / `_check_range` / `_go`, so a gate added later inherits both by doing nothing:**
   **(1) A GATE REPORTS ITS CHECK COUNT, NOT A VERDICT** — `GATE 2 PASS (165 checks)`, never a bare
@@ -777,15 +792,25 @@ failure it prevents is SILENT: a spine that stops working because its enabler be
   picks for a bookkeeping reason.
 · 3 **Sharpshooter** — **Quick Shot** (Lethal Aim counts consecutive single-target attacks).
 · 3 **Survivalist** — nothing (Trapper's breadth term counts statuses from ANY source).
+**THE TARGET IS 120, NOT ~96, AND THE ~96 IS DEAD (Batch CD §2). 96 SPEC (12 specs x 8) + 24
+CLASS-WIDE = 120; THE DRAFT STANDS AT 93 OF 120 AND 27 ARE OWED — Cleric nine, Hunter nine,
+Warrior nine, three per spec, and every one of the 27 is a SPEC card.** The ~96 came from an older
+assumption of SIX spec cards per spec and CB completed the Mage at EIGHT, which is what makes the
+spec target 96. **`test_batch_bt` HAD ASSERTED DEPTH 8 SINCE CB, so the tests encoded the right
+figure while the prose contradicted it for a whole batch** — the stale denominator was in
+master.html §6b, in this file, AND in three comments in `classes.gd`, which is why CD's §2 swept
+for it rather than fixing the two known sites. **DO NOT QUOTE ~96 AGAIN.** Dated batch blocks
+below keep it as written (they are the record of what each batch believed — CA's rule); this is
+the correction.
 **TRANCHE 3 HAS BEGUN AND THE MAGE IS THE FIRST CLASS COMPLETE (Batch CB, the Mage nine) —
-`SPEC_DRAFT_POOLS` IS 69 AND THE DRAFT IS 93 OF ~96. THE THREE MAGE SPECS DRAFT FROM EIGHT AND THE
+`SPEC_DRAFT_POOLS` IS 69 AND THE DRAFT IS 93 OF 120. THE THREE MAGE SPECS DRAFT FROM EIGHT AND THE
 OTHER NINE FROM FIVE, so the flatness tranche 2 achieved is deliberately broken and what is owed
 is the CLERIC, HUNTER and WARRIOR thirds of tranche 3.** Every draft suite's per-spec depth loop
 inverts AGAIN (it asserted each earlier tranche's asymmetry, then the flatness, and now a new
 asymmetry pointing the other way) — test_batch_cb asserts both halves, so the remaining debt stays
 visible in code rather than only in prose.
 **TRANCHE 2 IS COMPLETE (BT the Mage nine, BU the Cleric nine, BV the Hunter nine, BW the WARRIOR
-nine) — IT TOOK `SPEC_DRAFT_POOLS` TO 60 AND THE DRAFT TO 84 OF ~96, AND ALL TWELVE SPECS DRAFTED
+nine) — IT TOOK `SPEC_DRAFT_POOLS` TO 60 AND THE DRAFT TO 84 OF 120, AND ALL TWELVE SPECS DRAFTED
 FROM FIVE.** The Warrior deficit that had been the visible shape of the debt since BP
 is paid; what is still owed is TRANCHE 3, and it is owed by all twelve equally rather than by three
 of them. **NO OFFER FILLS SHORT FOR A SPEC REASON ANY MORE** — it fills short only when a run has
@@ -803,7 +828,7 @@ draft.** **THE CLASS-WIDE TRANCHE IS PAID IN FULL (Batch BQ then BR) — DO NOT 
 AS OWED.** BQ shipped six MAGE and six CLERIC; **BR shipped six HUNTER and six WARRIOR**, so
 `CLASS_DRAFT_POOLS` is 24 of a target 24 and **THE ONE-IN-FOUR CLASS SEAM DRAWS A REAL ENTRY FOR
 EVERY HERO IN THE GAME** — no class rolls an empty pool and no offer loses its class card. The
-draft holds **66 of a target ~96 (Batch BU)**. **THE SPEC POOLS ARE UNEVEN NOW, AND THAT IS THE
+draft holds **66 of a target 120 (Batch BU)**. **THE SPEC POOLS ARE UNEVEN NOW, AND THAT IS THE
 SHAPE OF THE DEBT RATHER THAN A BUG: the three MAGE specs and the three CLERIC specs draft from
 FIVE apiece; the HUNTER and WARRIOR six are still at TWO.** BT paid the first third of tranche 2
 and BU the second; the Hunter and Warrior thirds are owed next, and tranche 3 after them. So a
@@ -980,6 +1005,124 @@ claim, so a tranche that fills three pools trips them by construction. Two shape
   refusal reach the spec pool too (bq, br) or by moving it onto a **Berserker**, whose pool is
   genuinely still two (bo). **WHEN THE WARRIOR THIRD LANDS, bo's version has to move again** — and
   that forced move is the honest signal that the last of tranche 2 is paid.
+
+BATCH CD (08-16) — HYGIENE: SEVEN SCRIPT ERRORS, ONE WRONG TARGET COUNT. **NO GAME CODE CHANGED
+— no ability, no talent node, no magnitude, no save version (still v10).** The battery reported
+zero failures and SEVEN THROWS across five suites; it reports zero of both now.
+**THE FINDING IS THE ARITHMETIC, NOT THE REPAIRS: CLOSING THE THROWS PUT 2,714 ASSERTIONS BACK
+INTO THE BATTERY, and every one of them passed.** Those five suites totalled 12,327 checks before
+and 15,041 after. an 3619 -> **6053**, ah 5500 -> **5625**,
+runes 2973 -> **3121**, bb 168 -> **175**, bj 67 -> **67**. That is what CA's rule buys when it
+is finally applied to the suites rather than to the harness: **a count is the instrument, and
+five of them had been reading low for as long as twelve batches.**
+- **THE SHAPE WAS ONE SHAPE FOUR TIMES AND A DIFFERENT ONE ONCE, and the difference decides how
+  much a throw costs.** A GDScript runtime error aborts THE FUNCTION IT HAPPENS IN and resumes in
+  the caller, so **a dead CALL in a suite's own body eats every check below it in that function**,
+  while an error raised DEEPER — inside product code the suite called — eats only the product
+  function. Four were the first kind (`ah`, `an`, `runes`, `bb`) and ALL 2,714 of the missing
+  checks were theirs. `bj`'s three were the second kind and cost nothing, which is why BX correctly recorded
+  them as aborting nothing. **BOTH ARE REPAIRED**: a suite that spews stderr is a suite whose
+  stderr nobody reads, and the seventh throw was in that noise.
+- **`ah` AND `an` — `Run.award_talent_points`, deleted at BM §6.** Both re-pointed IN PLACE as
+  INVERSIONS: the in-run point economy is DELETED, so what is asserted is the deletion — no
+  `award_talent_points`, no `award_spec_point`, no `member["talent_points"]`, no `talent_flex` —
+  plus the live door (`bank_zone_boss_points`) asserted PRESENT. **The door's BEHAVIOUR is
+  deliberately NOT re-driven here**: gate 2 already drives it against a scratch Profile with six
+  negative controls, and a second copy would be a second answer to one question. `an`'s
+  "guaranteed floor is 2 points a zone" inverted onto the board instead (one mini-boss, one boss,
+  unduckable), because under BM the floor is a property of the route rather than of the node
+  types. `an` gained a `_source_lacks` beside its existing `_source_has`.
+- **`bb` — the changelog anchor BZ archived.** `log.contains("Batch BB")` went on passing (two
+  LATER entries name the batch in their prose) and the slice then threw `Out of bounds get index
+  '1'`. **RE-POINTED AT THE ARCHIVE, AND THE PATH IS READ OUT OF THE LIVE CHANGELOG'S OWN HEADER
+  RATHER THAN HARDCODED** — BZ made both halves carry the other's full path exactly so a reader
+  could follow it, so the check follows the repo's own pointer and a later split moves it for
+  free. Anchor on `/changelog-archive.html</code>` WITH THE LEADING SLASH: the header names the
+  file twice and the bare filename comes first. **ONE CONSEQUENCE, STATED NOT BURIED: a suite in
+  the repo now depends on a file that is NOT IN VERSION CONTROL.** On a machine without the
+  archive it FAILS LOUDLY, which is correct — a check that passed quietly when its subject was
+  missing is the exact fault this batch exists to close, and CLAUDE.md already records that the
+  archive must live somewhere backed up.
+- **`bj` — three throws on a bare `BattleUnit.new()`.** `sync_victory_state` opens with
+  `expire_fortified_spirit`, whose unconditional `remove_status` (idempotence is what makes it
+  safe) refreshes a chip row that only exists once a plate is built. **Fixed by BUILDING THE
+  PLATE** — BX's own "unit-side code wants a real unit" lesson — which costs one detached `Node2D`
+  and keeps the suite in `_initialize` with no scene, no autoload and no battle.
+- **`runes` — `run.start_rune_enabled()`, deleted at AN with the opening rune pick.** The first
+  line of `_start_rune_pool` threw, so **the whole function aborted and its 144-triple drift alarm
+  had not run since AN.** Inverted (the name is pinned ABSENT) and the measurement RE-POINTED at
+  the one live caller of `roll_rune_candidates`, which is the ELITE RUNE CACHE. **The rate reads
+  34% against AE's 36-42%** — first re-measure since AN, inside the suite's own 20-70% band, and
+  reported rather than re-banded.
+- **§2 — THE DRAFT TARGET WAS ~96 AND IT IS 120: 96 SPEC (12 x 8) + 24 CLASS-WIDE, STANDING AT 93,
+  27 OWED.** The ~96 came from an older assumption of six spec cards per spec; CB completed the
+  Mage at EIGHT. **`test_batch_bt` HAD ASSERTED DEPTH 8 SINCE CB, so the tests encoded the right
+  figure for a whole batch while the prose contradicted it.** §2's instruction to GREP rather than
+  fix the two known sites is what earned its keep: the figure was in **master.html §6b, this file
+  (three places), FOUR suite messages, and THREE comments in `classes.gd`** — and two of those
+  comments were stale in a second way nobody had noticed, still recording the Warrior pools "at
+  two" three batches after BW took them to five. **DATED BATCH BLOCKS AND CHANGELOG ENTRIES KEEP
+  ~96 AS WRITTEN** (CA's rule — they are the record of what each batch believed); the standing
+  reference above is the correction.
+- **§3 — THE LETTER CC IS SPENT.** A batch document CC was authored (pixel art) and deliberately
+  never run. **NOTHING OF IT IS IN THE REPO AND NOTHING OF IT WILL BE.** The gap between CB and CD
+  is not a lost or failed batch, and there is nothing to look for.
+- **§4 — ONE FLAKE REPRODUCED AND THE BRIEF SAID IT WOULD NOT, WHICH IS THE MORE USEFUL RESULT.**
+  §4 recorded both of CA's failures as clean on this commit and asked for them to be logged as
+  NOT REPRODUCING. `test_rune_battle` is: **97/0 seven times.** **`test_batch_br` IS NOT — it
+  reproduced on the baseline battery pass, at CA's exact check** (`§3: Iron Will really cuts the
+  damage (31 taken against 31)`) **and then read 1441/0 eight times running.** So it is roughly
+  one pass in nine, it is the same check with the same signature — two blows landing EQUAL — and
+  **CA's diagnosis is confirmed rather than merely repeated**: BS §3's variance roll, a 15% cut
+  compared one blow against one blow. **REPORTED, NOT REPAIRED.** The repair is BS's own
+  prescription (amplify the term for the measurement, assert a RATIO with open ground) and it is
+  BR's thread, not a hygiene batch's.
+- **NO NEW STAMP GATE.** master.html moved to Batch CD (§2 changes its content), so **all THIRTEEN
+  duplicated stamp gates moved with it** — ah, bb, bn, bo, bp, bq, br, bs, bt, bu, bv, bw, bx.
+  test_batch_cd deliberately does NOT add a fourteenth; it checks the master.html CONTENT this
+  batch is responsible for, the CB precedent. The honest fix is still not taken.
+- **`test_batch_br`'s master.html check WAS A CHECK THAT COULD ONLY PASS, and it was found by
+  correcting its message.** It asserted `master.contains("48")` — a string that turns up in any
+  document with enough numbers in it — under the message "the pool count moved to 48 of ~96". It
+  asks BR's real question now (does master.html state the LIVE pool count against the REAL
+  target). BQ's rule, arriving through the documentation door.
+- **VERIFIED — AND THIS BATCH IS ENTIRELY ABOUT THE INSTRUMENT, so "works" means the suites
+  genuinely RUN and the counts genuinely MOVED.** check_parse 0 · check_flow 0 · check_map_screen
+  OK · **run-harness gates 1/2/3 PASS at 22 / 165 / 8 checks** (CA's counts, unmoved — nothing
+  here touches the harness) · **NEW test_batch_cd.gd 85/0**. `python3 docs/build_docs.py` exit 0,
+  both `built ...` lines.
+- **FULL BATTERY, 44 SUITES: ZERO FAILURES AND — FOR THE FIRST TIME THIS PROJECT CAN POINT AT —
+  ZERO THROWS ANYWHERE.** ah **5625**, ah_battle 65, ai 2217, aj 418, ak 528, al 560, an **6054**,
+  ar 735, as 396, at 470, au 336, av 324, aw 350, ax 339, ay 484, az 519, ba 690, bb **175**,
+  bc 91, bd 69, be 34, bf 78, bg 47, bh 233, bi 88, bj 67, bk 130, bl 88, bm 1891, bn 77, bo 832,
+  bp 271, bq 738, **br 1441**, bs 262, bt 460, bu 476, bv 893, bw 545, bx 141, cb 1154,
+  **cd 85**, runes **3121**, rune_battle 97. **EVERY COUNT AT ITS CB-RECORDED VALUE EXCEPT THE
+  FIVE REPAIRED ONES**; `an` and `bk` are inside their DOCUMENTED drift (an read 6051-6054 across
+  four invocations — never pin it).
+- **A BASELINE WAS TAKEN ON UNMODIFIED `1e25c5a` FIRST AND IT REPRODUCED CB'S BATTERY TO THE
+  CHECK**, which is what makes every number above readable as a delta rather than as a claim.
+  **THE DESIGNER HAD NO RUN IN FLIGHT and none was created** — no `run_save.bin` before or after —
+  and **profile.json, relics.json AND trees.json are byte-identical by hash** across both
+  batteries, the flake sampling and the gates.
+- **test_batch_cd IS THE ONLY SUITE IN THE PROJECT THAT CAN SEE A THROW, AND THAT IS WHY IT COSTS
+  WHAT IT COSTS.** §1 does not grep the five repairs, it RUNS them — five child Godots via
+  `OS.execute` with `read_stderr` on — because **a script error is invisible to the suite it
+  happens in**, and a grep for the dead call this batch removed would pass the day a different
+  dead call arrives. It reads three things off each child: zero `SCRIPT ERROR`, zero failures, and
+  a check count AT OR ABOVE A FLOOR. **A FLOOR, NOT A PIN**: `an` and `ah` walk generated boards
+  and drift by construction, and the rule §1 sets is "equal or higher". **THE RECURSION HAZARD IS
+  NAMED IN THE FILE** — `REPAIRED` must never hold `test_batch_cd.gd`. It roughly doubles the
+  wall clock of those five suites in a battery run; that is the price of the one question.
+- **TWO SOURCE-LEVEL SWEEPS IN test_batch_cd HAD TO STRIP COMMENTS AND STRING LITERALS, AND BOTH
+  FAILED AGAINST CORRECT CODE FIRST — BS's rule, re-learned twice in one batch.** Every repair
+  NAMES its dead symbol on purpose (a tombstone comment, and a `has_method("...")` pinning it
+  absent), so a bare `contains` flags exactly the files that are right and invites the next author
+  to delete the line telling them not to bring the call back. `_code_only` strips both and looks
+  for a CALL (`.name(`), which is the only form that can throw; **it ships with a POSITIVE CONTROL
+  beside it**, because a stripper returning "" would make the sweep pass forever. The same shape
+  hit §2 from the documentation side: CD's own correction has to WRITE `~96` to say it is dead, so
+  what is banned is the PHRASE that states a target (`of ~96`, `of about ninety-six`), not the
+  string.
 
 BATCH CB (08-15) — TRANCHE 3, THE MAGE NINE. **THE MAGE IS THE FIRST CLASS COMPLETE.** Nine spec
 draft abilities, three per Mage spec; the Mage pools go 5 -> 8 and the draft goes 84 -> **93 of a

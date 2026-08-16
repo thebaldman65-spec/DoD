@@ -4,6 +4,36 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A count is the instrument; a clean line is not evidence (Batch CD) — 2026-08-16
+
+Batch CA found the run harness printing `GATE 2 PASS` on zero assertions and wrote the rule: a
+gate reports its check count, not a verdict. It applied that rule to the harness and stopped
+there. The suites were left alone, and five of them were doing the same thing — aborting a
+function partway on a dead call and printing a clean count on the way out. Closing them put 2,711
+assertions back into the battery.
+
+**Why it survived twelve batches is the part worth keeping.** Every one of these was *recorded*.
+CLAUDE.md named `ah` and `an` from Batch BO onward, `bb` from BZ, `bj` from BX, `runes` from BK.
+Each was correctly diagnosed, correctly attributed, and correctly declared not that batch's
+thread — and each of those judgements was locally right. What none of them did was put a number on
+it. "Silently under-testing" is a sentence you can read past for a year; "2,644 checks are not
+running" is not. **The report that names a fault without sizing it is the one that gets deferred
+forever.**
+
+**The second lesson is about who owns hygiene.** The reason every batch deferred these is that
+each throw belonged to some *other* batch's subject — BM's talent economy, AN's opening rune, BZ's
+archive split. That reasoning is sound for a content batch and fatal in aggregate: a fault that is
+nobody's subject is nobody's job. The answer is not to make content batches fix things outside
+their scope. It is that hygiene needs its own batch occasionally, which is what this was.
+
+**And a note on tombstones.** Two of this batch's own source-level sweeps failed against correct
+code, because every repair here deliberately *names* the thing it deleted — in a comment saying
+why it went, and in an assertion pinning it absent. A naive grep flags exactly the files that are
+right, and the obvious way to make it pass is to delete the line that tells the next author not to
+bring the call back. Batch BS learned this once; this batch learned it twice in one sitting, from
+the code side and the documentation side. **A project that writes tombstones needs sweeps that can
+tell a tombstone from a body.**
+
 ## Splitting beats moving when something else reads the file (Batch BZ) — 2026-08-15
 
 BY measured the sync and named the changelog as the archive candidate, which was

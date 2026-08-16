@@ -13,6 +13,164 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-16 &mdash; Batch CD: seven script errors, one wrong target count</h2>
+<p><i><b>No game code changed &mdash; no ability, no talent node, no magnitude, no save version
+(still v10).</b> The battery reported zero failures and SEVEN THROWS across five suites. It
+reports zero of both now. <b>The finding is the arithmetic rather than the repairs: closing the
+throws put 2,714 assertions back into the battery &mdash; those five suites totalled 12,327
+checks before and 15,041 after &mdash; and every one of them passed.</b></i></p>
+
+<h3>&sect;1 &mdash; the seven throws</h3>
+<p><b>A count is the instrument, and five of them had been reading low for as long as twelve
+batches.</b> Batch CA found the run harness printing <code>GATE 2 PASS</code> on zero assertions
+and wrote the rule that a gate reports its check count rather than a verdict. The suites were
+never brought under it. Each of these five was aborting a function partway and still printing a
+clean line:</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Suite</th><th>What threw</th><th>Deleted at</th><th>Before</th><th>After</th></tr>
+<tr><td><code>test_batch_an</code></td><td><code>Run.award_talent_points</code></td><td>BM &sect;6</td><td>3619</td><td><b>6053</b></td></tr>
+<tr><td><code>test_batch_ah</code></td><td><code>Run.award_talent_points</code></td><td>BM &sect;6</td><td>5500</td><td><b>5625</b></td></tr>
+<tr><td><code>test_runes</code></td><td><code>run.start_rune_enabled()</code></td><td>AN</td><td>2973</td><td><b>3121</b></td></tr>
+<tr><td><code>test_batch_bb</code></td><td>the changelog anchor</td><td>archived at BZ</td><td>168</td><td><b>175</b></td></tr>
+<tr><td><code>test_batch_bj</code></td><td>a plateless <code>BattleUnit.new()</code> (&times;3)</td><td>&mdash;</td><td>67</td><td>67</td></tr>
+</table>
+
+<p><b>The shape was one shape four times and a different one once, and the difference is what
+decides the cost.</b> A GDScript runtime error aborts <b>the function it happens in</b> and
+resumes in the caller. So a dead CALL in a suite's own body eats every check below it in that
+function &mdash; four of the five, and all 2,714 of the missing checks were theirs &mdash; while an error raised deeper,
+inside product code the suite called, eats only the product function. <b>That is why bj's three
+cost nothing and its count did not move</b>, exactly as Batch BX recorded. They are repaired
+anyway: a suite that spews stderr is a suite whose stderr nobody reads, and the seventh throw was
+sitting in that noise.</p>
+
+<p><b><code>ah</code> and <code>an</code> &mdash; the in-run talent economy.</b> Both re-pointed
+in place as INVERSIONS. Batch BM &sect;6 deleted the whole thing, so what is asserted is the
+deletion: no <code>award_talent_points</code>, no <code>award_spec_point</code>, no
+<code>member["talent_points"]</code>, no <code>talent_flex</code> &mdash; with the live door
+(<code>bank_zone_boss_points</code>) asserted present. <b>Its behaviour is deliberately not
+re-driven here.</b> The run harness's gate 2 already drives it against a scratch Profile with six
+negative controls, and a second copy would be a second answer to one question. <code>an</code>'s
+&ldquo;guaranteed floor is 2 points a zone&rdquo; inverted onto the board instead &mdash; one
+mini-boss, one boss, unduckable &mdash; because under BM the floor is a property of the route
+rather than of the node types.</p>
+
+<p><b><code>bb</code> &mdash; the changelog anchor Batch BZ archived, and BZ predicted this
+exactly.</b> <code>log.contains("Batch BB")</code> went on passing, because two LATER entries name
+the batch in their own prose; the slice underneath then threw <code>Out of bounds get index
+'1'</code>. <b>It reads the archive now, and it finds the archive by reading the live changelog's
+own header rather than by hardcoding a path</b> &mdash; BZ made both halves carry the other's full
+path precisely so a reader could follow it, so the check follows the repo's own pointer and a
+later split moves it for free. <b>One consequence, stated rather than buried: a suite in the repo
+now depends on a file that is not in version control.</b> On a machine without the archive it
+fails loudly, which is correct &mdash; a check that passed quietly when its subject was missing is
+the exact fault this batch exists to close.</p>
+
+<p><b><code>bj</code> &mdash; three throws on a bare unit.</b> <code>sync_victory_state</code>
+opens with <code>expire_fortified_spirit</code>, whose unconditional <code>remove_status</code>
+(idempotence is what makes the unconditional call safe) refreshes a chip row that only exists once
+a plate is built. Fixed by <b>building the plate</b>, which is Batch BX's own lesson that unit-side
+code wants a real unit. It costs one detached <code>Node2D</code> and keeps the suite in
+<code>_initialize</code> with no scene, no autoload and no battle.</p>
+
+<p><b><code>runes</code> &mdash; and this one had lost the most in proportion.</b> The dead call
+was the FIRST line of <code>_start_rune_pool</code>, so the whole function aborted and its
+144-triple drift alarm had not run since Batch AN deleted the opening rune pick. The name is
+pinned absent and the measurement re-pointed at the one live caller of
+<code>roll_rune_candidates</code>, which is the <b>elite rune cache</b>. <b>The rate reads 34%
+against Batch AE's 36-42%</b> &mdash; the first re-measure since AN, inside the suite's own
+20-70% alarm band, reported rather than re-banded.</p>
+
+<h3>&sect;2 &mdash; the draft target is 120, not ~96</h3>
+<p><b>96 spec (twelve specs at eight apiece) + 24 class-wide = 120. The draft stands at 93, and 27
+are owed: Cleric nine, Hunter nine, Warrior nine, three per spec.</b> The ~96 came from an older
+assumption of six spec cards per spec, and Batch CB completed the Mage at eight.
+<b><code>test_batch_bt</code> has asserted depth 8 since CB, so the tests encoded the right figure
+for a whole batch while the prose contradicted it.</b></p>
+<p><b>The instruction to sweep rather than fix the two known sites is what earned its keep.</b>
+The stale denominator was in master.html &sect;6b, in CLAUDE.md (three places), in FOUR suite
+messages, and in THREE comments in <code>classes.gd</code> &mdash; and two of those comments were
+stale in a second way nobody had noticed, still recording the Warrior pools as sitting &ldquo;at
+two&rdquo; three batches after Batch BW took them to five. <b>Dated batch blocks and changelog
+entries keep ~96 as written</b> (Batch CA's rule &mdash; they are the record of what each batch
+believed); the standing reference is the correction.</p>
+<p><b>One check that could only pass was found by correcting its message.</b>
+<code>test_batch_br</code> asserted that master.html contained the string
+<code>"48"</code> &mdash; which turns up in any document with enough numbers in it &mdash; under
+the message &ldquo;the pool count moved to 48 of ~96&rdquo;. It asks BR's real question now: does
+master.html state the LIVE pool count against the REAL target?</p>
+
+<h3>&sect;3 &mdash; the letter CC is spent</h3>
+<p>A batch document CC was authored (pixel art) and deliberately never run. <b>Nothing of it is in
+the repo and nothing of it will be.</b> Recorded so that a later reader does not take the gap
+between CB and CD for a lost or failed batch: there is nothing to look for.</p>
+
+<h3>&sect;4 &mdash; the two flakes, and the brief was wrong about one of them</h3>
+<p>&sect;4 recorded both of Batch CA's failures as coming back clean on this commit and asked for
+them to be logged as NOT REPRODUCING rather than as fixed. <b><code>test_rune_battle</code> is:
+97/0 seven times.</b></p>
+<p><b><code>test_batch_br</code> is not. It reproduced on the baseline battery pass &mdash; at CA's
+exact check, <code>&sect;3: Iron Will really cuts the damage (31 taken against 31)</code> &mdash;
+and then read 1441/0 eight times running.</b> So it is roughly one pass in nine, it is the same
+check with the same signature (two blows landing EQUAL), and <b>CA's diagnosis is confirmed rather
+than merely repeated</b>: Batch BS &sect;3's variance roll, a 15% cut compared one blow against one
+blow. <b>Reported, not repaired.</b> The repair is BS's own prescription &mdash; amplify the term
+for the measurement and assert a ratio with open ground &mdash; and it is BR's thread, not a
+hygiene batch's.</p>
+
+<h3>&sect;5 &mdash; the suite, and why it costs what it costs</h3>
+<p><b><code>test_batch_cd.gd</code> is the only suite in the project that can see a throw.</b>
+&sect;1 does not grep the five repairs, it RUNS them &mdash; five child Godots via
+<code>OS.execute</code> with <code>read_stderr</code> on &mdash; because <b>a script error is
+invisible to the suite it happens in</b>, and a grep for the dead call this batch removed would
+pass the day a different dead call arrives. It reads three things off each child: zero
+<code>SCRIPT ERROR</code>, zero failures, and a check count <b>at or above a floor</b>. A floor
+rather than a pin, because <code>an</code> and <code>ah</code> walk generated boards and drift by
+construction, and because &sect;1's rule is &ldquo;equal or higher&rdquo;. The recursion hazard is
+named in the file. It roughly doubles the wall clock of those five suites in a battery run; that
+is the price of the one question.</p>
+<p><b>Two of its source sweeps failed against correct code first, and the reason is Batch BS's
+rule re-learned twice in one batch.</b> Every repair NAMES its dead symbol on purpose &mdash; in a
+tombstone comment saying why it went, and in a <code>has_method("...")</code> assertion pinning it
+absent &mdash; so a bare <code>contains</code> flags exactly the files that are right, and invites
+the next author to delete the line telling them not to bring the call back. The sweep strips
+comments and string literals and looks for a CALL, which is the only form that can throw, and it
+<b>ships with a positive control beside it</b>, because a stripper returning "" would make it pass
+forever. The same shape hit &sect;2 from the documentation side: this batch's own correction has
+to WRITE <code>~96</code> in order to say it is dead, so what is banned is the phrase that STATES
+a target, not the string.</p>
+<p><b>No new stamp gate.</b> master.html moved to Batch CD, so all THIRTEEN duplicated stamp gates
+moved with it &mdash; ah, bb, bn, bo, bp, bq, br, bs, bt, bu, bv, bw, bx. <code>test_batch_cd</code>
+deliberately does not add a fourteenth; it checks the master.html CONTENT this batch is
+responsible for, which is the Batch CB precedent.</p>
+<p><b>Reported, not repaired &mdash; two more checks that pass without their subject.</b>
+<code>test_batch_bn</code> and <code>test_batch_bo</code> each hold one bare
+<code>changelog.contains("Batch BN"/"Batch BO")</code>, and a LATER entry naming the batch in its
+own prose satisfies it, so both pass with their entries archived out of the file entirely. It is
+the same gap &sect;1 exists to close, arriving without a throw to announce it. The fix is
+<code>bb</code>'s pattern applied twice and it is one line each.</p>
+
+<h3>Verified</h3>
+<p><b>This batch is entirely about the instrument, so &ldquo;works&rdquo; means the suites
+genuinely RUN and the counts genuinely MOVED.</b> check_parse 0 &middot; check_flow 0 &middot;
+check_map_screen OK &middot; <b>run-harness gates 1/2/3 PASS at 22 / 165 / 8 checks</b> (Batch CA's
+counts, unmoved &mdash; nothing here touches the harness) &middot; <b>NEW test_batch_cd.gd
+85/0</b>. <code>python3 docs/build_docs.py</code> exit 0, both <code>built ...</code> lines.</p>
+<p><b>A baseline was taken on unmodified <code>1e25c5a</code> FIRST and it reproduced Batch CB's
+battery to the check</b>, which is what makes every number here readable as a delta rather than as
+a claim.</p>
+<p><b>Full battery, 44 suites: zero failures and &mdash; for the first time this project can point
+at &mdash; zero throws anywhere.</b> ah <b>5625</b>, ah_battle 65, ai 2217, aj 418, ak 528, al 560,
+an <b>6054</b>, ar 735, as 396, at 470, au 336, av 324, aw 350, ax 339, ay 484, az 519, ba 690,
+bb <b>175</b>, bc 91, bd 69, be 34, bf 78, bg 47, bh 233, bi 88, bj 67, bk 130, bl 88, bm 1891,
+bn 77, bo 832, bp 271, bq 738, br 1441, bs 262, bt 460, bu 476, bv 893, bw 545, bx 141, cb 1154,
+<b>cd 85</b>, runes <b>3121</b>, rune_battle 97. Every count at its CB-recorded value except the
+five repaired ones; <code>an</code> and <code>bk</code> are inside their documented drift
+(<code>an</code> read 6051-6054 across four invocations &mdash; never pin it).</p>
+<p><b>The designer had no run in flight and none was created</b> &mdash; no
+<code>run_save.bin</code> before or after &mdash; and <b>profile.json, relics.json and trees.json
+are byte-identical by hash</b> across both batteries, the flake sampling and the gates.</p>
+
 <h2>2026-08-15 &mdash; Batch CB: tranche 3, the Mage nine (THE MAGE IS THE FIRST CLASS COMPLETE)</h2>
 <p><i><b>Nine spec draft abilities, three per Mage spec. The Mage pools go 5 &rarr; 8 and the
 draft goes 84 &rarr; 93 of a target ~96.</b> The Pyromancer, the Cryomancer and the Arcanist are

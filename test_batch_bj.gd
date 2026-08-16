@@ -100,7 +100,25 @@ func _initialize() -> void:
 	# The sync's math, driven directly (the three signs, the 20% return floor,
 	# the clamp, the Mana write) — deliberately different magnitudes so a sign
 	# error cannot hide in a cancellation (test_batch_bb's rule).
+	# A BARE `BattleUnit.new()` HAS NO NAMEPLATE, AND THAT IS WHERE BJ'S THREE
+	# SCRIPT ERRORS CAME FROM (repaired by Batch CD). `sync_victory_state`
+	# opens with `expire_fortified_spirit`, which calls `remove_status`
+	# UNCONDITIONALLY — idempotence is what makes the unconditional call safe —
+	# and `remove_status` refreshes the chip row, whose `_chips_root` only
+	# exists once a plate is built. Three drives, three throws.
+	#
+	# THEY ABORTED ONLY `_refresh_chips`, not this function, so bj's own count
+	# never moved and all three were harmless stderr noise (BX reproduced them
+	# on unmodified HEAD and recorded exactly that). THEY ARE STILL REPAIRED,
+	# because a suite that spews throws is a suite nobody reads the stderr of —
+	# and the seventh throw in this battery is the one that WAS eating checks.
+	#
+	# THE FIX IS BX'S OWN LESSON, WHICH IS THAT UNIT-SIDE CODE WANTS A REAL
+	# UNIT: build the plate. It costs one detached Node2D and needs no scene,
+	# no autoload and no battle, so this suite stays safe in `_initialize`.
+	var plate := Node2D.new()
 	var u := BattleUnit.new()
+	u.build_plate(plate)
 	u.max_hp = 300
 	u.hp = 0
 	u.tenacity_hp_gained = 45
@@ -120,7 +138,9 @@ func _initialize() -> void:
 	u.sync_victory_state(member)
 	ok(int(member["hp"]) == 325,
 		"§1: hp is clamped under the restored maximum in the same step")
+	var plate2 := Node2D.new()
 	var u2 := BattleUnit.new()
+	u2.build_plate(plate2)
 	u2.max_hp = 200
 	u2.hp = 150
 	u2.resource_name = "Rage"
@@ -129,8 +149,12 @@ func _initialize() -> void:
 	u2.sync_victory_state(member2)
 	ok(not member2.has("mana"),
 		"§1: a Rage hero writes no mana key")
+	# The plates are siblings, not children (battle.gd's rule), so they are
+	# freed alongside rather than with the units.
 	u.free()
 	u2.free()
+	plate.free()
+	plate2.free()
 
 	# ---------- §3a: the signature instrument ----------
 	ok(battle_script.signature_report_block({}) == "",
