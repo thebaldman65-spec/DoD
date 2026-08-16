@@ -1,16 +1,57 @@
 # test_run_harness.gd — the 3 correctness gates (recreated for Batch T; the
 # original scratchpad copy died with its session):
 #   DOD_GATE=1  hero win scaling, plus the Batch T awakening HP sync
-#   DOD_GATE=2  talent spend conservation (RunSim ledger vs price replay)
+#   DOD_GATE=2  talent conservation — a run earns nothing, and what it WEARS
+#               is legal (BATCH BM's subject; BATCH CA made it run)
 #   DOD_GATE=3  enemy tier x slot scaling at the battle spawn site
-# Run via run_harness.sh. Scene-spawning gates take one Godot process each
-# and quit() before ever yielding a frame — the parked _run_battle timers
-# never fire, so freed-object noise can't pollute a SCRIPT ERROR grep.
+# Run one gate per process:
+#   DOD_GATE=2 godot --headless --path . --script test_run_harness.gd
+# Scene-spawning gates take one Godot process each and quit() before ever
+# yielding a frame — the parked _run_battle timers never fire, so freed-object
+# noise can't pollute a SCRIPT ERROR grep.
+#
+# ============================================================================
+# BATCH CA — THREE STANDING RULES FOR EVERY GATE IN THIS FILE, PRESENT AND
+# FUTURE. THEY EXIST BECAUSE GATE 2 PRINTED `GATE 2 PASS` ON ZERO ASSERTIONS
+# FOR TWELVE BATCHES AND NOTHING LOOKED WRONG.
+#
+#   1. A GATE REPORTS ITS CHECK COUNT, NOT A VERDICT. `GATE 2 PASS (165
+#      checks)`, never a bare `GATE 2 PASS`. A test that reports a QUANTITY is
+#      auditable at a glance; a test that reports a VERDICT is only auditable
+#      by reading it, and that is precisely why this one outlived the `ah` and
+#      `an` cases — those printed counts that looked wrong.
+#   2. A GATE THAT RUNS ZERO CHECKS MUST FAIL. An empty gate is a broken gate,
+#      and it is the one case where silence has to be loud. A gate printing a
+#      count of zero is VISIBLY broken; the same gate printing PASS is not.
+#   3. A GATE MUST REACH ITS OWN END. Every gate's last statement is
+#      `_finish()`, and `_go` fails a gate that never got there. RULES 1 AND 2
+#      DO NOT COVER THIS CASE ON THEIR OWN and that is why it is here: an abort
+#      BELOW a gate's first check leaves a non-zero count, so it would print
+#      `PASS (40 checks)` — visible to a reader who knows the number, but not
+#      caught. Rule 3 is what makes the shape impossible rather than merely
+#      legible, which is the whole point of the exercise.
+#
+# All three live in `_check` / `_check_range` / `_go` plus one call at the foot
+# of each gate, so they bind every gate at once and a gate added later inherits
+# 1 and 2 by doing nothing. THE SHAPE THEY CLOSE: a deleted function called
+# ANYWHERE in a gate aborts the rest of it, and before Batch CA that was
+# indistinguishable from a pass.
+# ============================================================================
 extends SceneTree
 
 const SPECS := ["berserker", "cryomancer", "inquisitor", "beastmaster"]
 
+# Gate 2 drives the META talent ledger, which lives on `Profile`. It is
+# redirected to a scratch file for the duration and restored afterwards
+# (`Profile.save_path` is a var for exactly this) — a gate that wrote the
+# player's ledger would be a gate nobody could afford to run.
+const SCRATCH_PROFILE := "user://gate2_profile.json"
+
 var fails := 0
+var checks := 0
+# Set by `_finish()`, which is the LAST statement of every gate. An aborted
+# gate never reaches it — see rule 3 in the header.
+var finished := false
 
 
 func _initialize() -> void:
@@ -21,6 +62,7 @@ func _initialize() -> void:
 
 func _go() -> void:
 	var gate := OS.get_environment("DOD_GATE")
+	var known := gate in ["1", "2", "3"]
 	match gate:
 		"1":
 			_gate_win_scaling()
@@ -29,13 +71,27 @@ func _go() -> void:
 		"3":
 			_gate_enemy_scaling()
 		_:
-			fails += 1
-			print("  FAIL unknown DOD_GATE '%s'" % gate)
-	print("GATE %s %s" % [gate, "PASS" if fails == 0 else "FAIL"])
+			# Routed through _check so an unknown gate is a FAILED CHECK rather
+			# than a bare failure — otherwise it would trip the zero-check rule
+			# below as well and report one problem twice.
+			_check("DOD_GATE names a gate", gate, "1|2|3")
+	# BATCH CA rules 3 and 2, in that order and deliberately EXCLUSIVE — a gate
+	# that aborted above its first check satisfies both, and one problem should
+	# be reported once.
+	if known and not finished:
+		fails += 1
+		print("  FAIL GATE %s ABORTED before its end — %d checks ran, the rest never did"
+			% [gate, checks])
+	elif checks == 0:
+		fails += 1
+		print("  FAIL GATE %s ran ZERO checks — an empty gate is a broken gate" % gate)
+	# BATCH CA rule 1: report the count, never a bare verdict.
+	print("GATE %s %s (%d checks)" % [gate, "PASS" if fails == 0 else "FAIL", checks])
 	quit(0 if fails == 0 else 1)
 
 
 func _check(label: String, got, want) -> void:
+	checks += 1
 	if got == want:
 		print("  ok   %s (%s)" % [label, str(got)])
 	else:
@@ -47,11 +103,51 @@ func _check(label: String, got, want) -> void:
 # ranges. A range check states BOTH ends so it still fails on a real drift —
 # a bare "is it plausible" would be the check quietly giving up.
 func _check_range(label: String, got: float, lo: float, hi: float) -> void:
+	checks += 1
 	if got >= lo and got <= hi:
 		print("  ok   %s (%s in [%s, %s])" % [label, str(got), str(lo), str(hi)])
 	else:
 		fails += 1
 		print("  FAIL %s: got %s, want [%s, %s]" % [label, str(got), str(lo), str(hi)])
+
+
+# THE LAST STATEMENT OF EVERY GATE. Do not move it, do not make it
+# conditional, and do not add an early `return` above it — a gate that can
+# leave without reaching this line is a gate that can abort silently again.
+func _finish() -> void:
+	finished = true
+
+
+# ---------- gate 2's ledger scaffolding ----------
+
+func _src(path: String) -> String:
+	var f := FileAccess.open(path, FileAccess.READ)
+	return f.get_as_text() if f != null else ""
+
+
+# Every point banked by every spec. A total rather than a per-spec read, so
+# "the walk banked nothing" cannot be satisfied by looking at the wrong spec.
+func _purse_total() -> int:
+	var total := 0
+	for spec in Classes.all_specs():
+		total += Profile.talent_points_earned(String(spec))
+	return total
+
+
+func _profile_scratch() -> void:
+	Profile.save_path = SCRATCH_PROFILE
+	Profile.data = {}
+	Profile.loaded = false
+	if FileAccess.file_exists(SCRATCH_PROFILE):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(SCRATCH_PROFILE))
+
+
+func _profile_restore() -> void:
+	if FileAccess.file_exists(SCRATCH_PROFILE):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(SCRATCH_PROFILE))
+	Profile.save_path = "user://profile.json"
+	Profile.data = {}
+	Profile.loaded = false
 
 
 func _setup_run(run: Node) -> void:
@@ -106,28 +202,71 @@ func _gate_win_scaling() -> void:
 		_check("win-scaled max_hp %s" % spec, int(u.max_hp),
 			spec_hp + int(round(spec_hp * 0.02 * wins)))
 		_check("member hp carried %s" % spec, int(u.hp), int(run.party[i]["hp"]))
+	_finish()
 
 
-# ---------- gate 2: talent spend conservation ----------
+# ---------- gate 2: talent conservation ----------
+#
+# BATCH CA — READ THIS BEFORE CHANGING ANYTHING BELOW. This gate's first
+# statement used to be `run.award_spec_point(i)`, which Batch BM DELETED, and
+# that call sat ABOVE every `_check` in the function. The error aborted the
+# whole body: zero checks ran, zero failed, and the gate printed `GATE 2 PASS`
+# on the way out — for twelve batches, with every VERIFIED block since BM
+# quoting "gates 1/2/3" on the strength of it. The three structural rules in
+# this file's header are what make that shape impossible; what follows is the
+# re-point, and it is a re-point WITH A REASON, so it is written down.
+#
+# THE ORIGINAL SUBJECT was "talent spend conservation": points EARNED against
+# points PAID inside one run, replayed against a price curve. BATCH BM DELETED
+# THE THING BEING CONSERVED — talents are META now, bought per spec on
+# `Profile` out of zone-boss income and EQUIPPED before a run begins, so there
+# is no in-run purse to conserve. BM re-pointed the gate in place and the
+# replacement has never executed once. It executes now, in two halves that
+# match BM's own split of the old subject:
+#
+#   §1 INCOME. A RUN AWARDS NOTHING. The whole board is walked and pays not a
+#      single point; the ONE door is `Run.bank_zone_boss_points`, it opens at
+#      a ZONE boss and nowhere else, the END boss opens it never, and a SIM
+#      must never open it at all.
+#   §2 THE LOADOUT. What a run WEARS is legal: exactly one node per row, every
+#      id real, every rank 1, and nothing bought along the way. These are BM's
+#      own assertions, running for the first time.
+#
+# THE DIVERGENCE FROM THE BRIEF, STATED: Batch CA §3 offered the income rules
+# as "a starting point and not an instruction" and asked that a different
+# original intent be tested instead and recorded. Both are here. §1 is the
+# brief's list; §2 is what the surviving lines below the abort actually asked,
+# and it is the half this HARNESS specifically owes — gates 1 and 3 pin what a
+# SIM's units are spawned with, so gate 2 pins what a SIM's heroes are BUILT
+# with. Dropping §2 would have left `RunSim.install_builds` ungated.
 
 func _gate_talent_conservation() -> void:
 	var run: Node = root.get_node("Run")
 	run.sim_run = true
+	# The ledger is redirected BEFORE anything can read it, and restored at the
+	# end of the gate.
+	_profile_scratch()
 	run.new_run()
 	for i in run.party.size():
 		run.party[i]["spec"] = SPECS[i]
 		run.party[i]["tree"] = Talents.generate_tree(SPECS[i], run.party[i]["key"])
 		run.sync_spec_hp(i)
-	# Income: the awakening pays 1, then 1 apiece from every elite, mini-boss
-	# and boss. Since Batch BK the elites are ROUTED TO, so the run's supply
-	# is a floor of 7 plus whatever this walk reached — books it either way.
-	for i in run.party.size():
-		run.award_spec_point(i)
-	# BATCH BK: walk the generated MAP and let it pay what it pays — one purse,
-	# 1 point per elite / mini-boss / boss, nothing from ordinary fights. The
-	# whole point of driving the real board rather than a hand count is that
-	# the schedule and the map can never drift apart; on a lattice that means
-	# an actual walk, and the total is a RANGE rather than a constant.
+
+	# ---- §1 income: a run awards nothing ----
+	# The two verbs this gate used to call are gone, and they are pinned ABSENT
+	# rather than merely unused — a later batch re-adding either would be
+	# re-adding the in-run purse BM deleted.
+	_check("Run.award_spec_point is gone", run.has_method("award_spec_point"), false)
+	_check("Run.award_talent_points is gone",
+		run.has_method("award_talent_points"), false)
+	_check("the one income door exists",
+		run.has_method("bank_zone_boss_points"), true)
+	# BATCH BK's structure, kept and re-pointed: walk the generated MAP rather
+	# than counting by hand, because a hand count and the board can drift apart
+	# and a walk cannot. What it asks now is the opposite of what it asked
+	# then — the board must pay NOTHING.
+	var walked := 0
+	var counts := {}
 	for zone in run.SLOT_COUNT:
 		run.zone_idx = zone
 		run.slot_idx = -1
@@ -139,19 +278,77 @@ func _gate_talent_conservation() -> void:
 			if reach.is_empty():
 				break
 			run.advance(int(reach[0]))
-			run.award_talent_points(String(run.current_node()["type"]))
-	var before := 0
-	# BATCH BM: the income half of this gate measured a purse that no longer
-	# exists. What replaces it is the half that IS still load-bearing — the
-	# loadout was INSTALLED before the run and every hero wears exactly what
-	# was asked for.
+			var ty := String(run.current_node()["type"])
+			counts[ty] = int(counts.get(ty, 0)) + 1
+			walked += 1
+	# A walk that met no elite proves nothing about elites, so the types are
+	# asserted PRESENT before the purse is asserted empty — otherwise "nothing
+	# paid" is satisfied by a board nobody crossed.
+	for ty in ["fight", "elite", "miniboss", "blacksmith", "merchant", "event"]:
+		_check("the walk crossed a %s" % ty, int(counts.get(ty, 0)) > 0, true)
+	_check("the walk is 49 encounters", walked, 49)
+	_check("three ZONE bosses", int(counts.get("boss", 0)), 3)
+	_check("one END boss", int(counts.get("endboss", 0)), 1)
+	# An unsteered route takes what it is offered, so the ordinary-fight count
+	# is a RANGE. Both ends stated, so it still fails on a real drift.
+	_check_range("ordinary fights walked", float(counts.get("fight", 0)), 9.0, 33.0)
+	_check("the whole walk banked NOTHING", _purse_total(), 0)
+
+	# THE ONE DOOR. A SIM MUST NEVER OPEN IT — a simulated run that wrote the
+	# player's ledger would make every baseline depend on whoever ran it, and
+	# the guard is one `sim_run` check that a later batch could delete without
+	# anything failing.
+	run.bank_zone_boss_points()
+	_check("a SIM banks nothing at a zone boss", _purse_total(), 0)
+	# Off the harness rails for exactly three statements. `sim_run` is what
+	# makes save/clear no-ops, so nothing between here and the re-arm below
+	# may touch the run save.
+	run.sim_run = false
+	run.bank_zone_boss_points()
+	for spec in SPECS:
+		_check("a zone boss banks 1 to %s" % spec,
+			Profile.talent_points_earned(spec), 1)
+	_check("a spec that did not play banks 0",
+		Profile.talent_points_earned("holy"), 0)
+	_check("the party's specs each bank their own", _purse_total(), SPECS.size())
+	# A run that dies in zone 2 keeps what the zone bosses it CLEARED paid.
+	# Partial credit is the mechanism, not a rule beside it.
+	run.bank_zone_boss_points()
+	for spec in SPECS:
+		_check("a zone-2 wipe keeps 2 for %s" % spec,
+			Profile.talent_points_earned(spec), 2)
+	# An un-awakened hero has no spec and banks nothing.
+	var held := String(run.party[0]["spec"])
+	run.party[0]["spec"] = ""
+	run.bank_zone_boss_points()
+	_check("an un-awakened hero banks nothing", Profile.talent_points_earned(""), 0)
+	_check("the awakened three still banked", Profile.talent_points_earned(SPECS[1]), 3)
+	_check("the un-awakened one did not", Profile.talent_points_earned(held), 2)
+	run.party[0]["spec"] = held
+	run.sim_run = true
+	# THE END BOSS AWARDS NONE, and that is a rule about what `_resolve_boss`
+	# does NOT call — so it is asserted against the source, which is the only
+	# place a rule with no reachable gate can be checked at all (BM's idiom).
+	var bs := _src("res://scripts/battle.gd")
+	var body := bs.substr(bs.find("func _resolve_boss"), 2400)
+	var end_half := body.substr(body.find("# The end boss."))
+	_check("the end boss banks no talent points",
+		end_half.contains("bank_zone_boss_points"), false)
+	_check("the zone boss does", body.contains("Run.bank_zone_boss_points()"), true)
+
+	# ---- §2 the loadout: what a run WEARS is legal ----
+	# BATCH BM's replacement assertions. They needed a loadout to look at and
+	# never had one — `new_run` installs nothing, so every check below would
+	# have failed on the day BM wrote it had the function reached them.
+	RunSim.install_builds(run)
+	for i in run.party.size():
+		run.equip_spec_talents(i)
 	_check("the sim installed a loadout", run.sim_talents.is_empty(), false)
 	for m in run.party:
 		_check("no in-run purse on the member (%s)" % m["spec"],
 			m.has("talent_points") or m.has("talent_flex"), false)
 		_check("the member wears the installed loadout (%s)" % m["spec"],
 			(m.get("talents", {}) as Dictionary).size(), RunSim.rows_built)
-	var replay_total := 0  # BATCH BM: always 0 — a run spends nothing
 	for m in run.party:
 		var tree: Array = m["tree"]
 		var learned: Dictionary = m.get("talents", {})
@@ -180,7 +377,23 @@ func _gate_talent_conservation() -> void:
 		# The harness equips the same depth for every hero, so the count is
 		# exactly what DOD_SIM_ROWS asked for.
 		_check("loadout depth (%s)" % m["spec"], learned.size(), RunSim.rows_built)
-	_check("no points were spent in a run at all", replay_total, 0)
+	# BATCH CA: "nothing was spent in a run" used to be `_check(replay_total, 0)`
+	# against a local initialised to 0 and never touched — a check that could
+	# only ever pass, which is the same gap this whole batch is about arriving
+	# from the other side. It asks the question mechanically now: the verbs that
+	# spent an in-run purse are GONE, so there is no spending to conserve.
+	# `Talents` is a class_name script rather than an instance, so `has_method`
+	# is not available on it — the absences are asserted against the SOURCE,
+	# which is BM's own idiom for a rule with no reachable gate.
+	var ts := _src("res://scripts/talents.gd")
+	for verb in ["can_learn", "purse_for", "points_spent"]:
+		_check("Talents.%s is gone" % verb, ts.contains("func %s(" % verb), false)
+	_check("MAX_PER_ROW is gone", ts.contains("MAX_PER_ROW"), false)
+	_check("the meta spend door exists", ts.contains("func can_buy("), true)
+	_check("buying and equipping are separate questions",
+		ts.contains("func can_equip("), true)
+	_profile_restore()
+	_finish()
 
 
 # ---------- gate 3: enemy tier x slot scaling ----------
@@ -208,3 +421,4 @@ func _gate_enemy_scaling() -> void:
 		_check("tier-scaled attack %s" % kinds[i], int(e.attack),
 			int(round(int(base["attack"]) * slot_mult
 				* (1.0 + 0.02 * zone_tier))))
+	_finish()

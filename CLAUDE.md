@@ -185,18 +185,22 @@ it is carrying its own history.**
   test_run_harness.gd = the 3 correctness gates: hero win scaling, talent
   spend conservation, enemy tier×slot scaling — rerun it before trusting
   any --run report after touching spawn/scaling code).
-- **QUOTE THE RUN HARNESS AS "GATES 1 AND 3", NOT "1/2/3" (Batch BY). GATE 2 PRINTS PASS WITHOUT
-  RUNNING A SINGLE ASSERTION.** `test_run_harness.gd:125` calls `run.award_spec_point` and `:142`
-  calls `run.award_talent_points` — **both deleted by Batch BM §6**. The error aborts
-  `_gate_talent_conservation` at line 125, which is **above every `_check` in the function**, so
-  zero checks run, zero fail, and it prints `GATE 2 PASS`. **The aborted region is exactly the half
-  BM re-pointed in place** ("the income half of this gate measured a purse that no longer exists;
-  what replaces it is the half that IS still load-bearing") — so **BM's replacement assertions have
-  never executed**, and every VERIFIED block since BM quoted 1/2/3 on the strength of it.
-  **A count of zero failures is not evidence when the count of checks is also zero**, and this one
-  prints a WORD rather than a number, which is why it outlived the ah/an cases that print counts.
-  Fixing it means deciding what BM's superseded lines should now assert — **that is a re-point with
-  a reason, and it wants its own pass**; BY reported it rather than guessing. Batch S verdicts:
+- **QUOTE THE RUN HARNESS AS "GATES 1/2/3" AGAIN — BATCH CA REPAIRED GATE 2, AND BY'S INSTRUCTION
+  TO QUOTE ONLY 1 AND 3 IS SUPERSEDED. THE REASON IT EXISTED IS WHY THE HARNESS NOW PRINTS A
+  COUNT.** From BM to BY, `test_run_harness.gd:125` called `run.award_spec_point` — **deleted by
+  BM §6** — from **above every `_check` in the function**. The error aborted
+  `_gate_talent_conservation` outright: zero checks ran, zero failed, and it printed `GATE 2 PASS`
+  on the way out. **129 of BM's own replacement assertions had never executed once**, and twelve
+  batches of VERIFIED blocks quoted "gates 1/2/3" on the strength of a word that was never earned.
+  **A COUNT OF ZERO FAILURES IS NOT EVIDENCE WHEN THE COUNT OF CHECKS IS ALSO ZERO**, and this one
+  printed a WORD rather than a number, which is why it outlived the `ah` and `an` cases — those
+  print counts, and a count that reads wrong is visible at a glance.
+  **THE TWO STANDING RULES CA SHIPPED BIND EVERY GATE IN THE HARNESS, PRESENT AND FUTURE. They live
+  in `_check` / `_check_range` / `_go`, so a gate added later inherits both by doing nothing:**
+  **(1) A GATE REPORTS ITS CHECK COUNT, NOT A VERDICT** — `GATE 2 PASS (165 checks)`, never a bare
+  `GATE 2 PASS`. **(2) A GATE THAT RUNS ZERO CHECKS MUST FAIL** — an empty gate is a broken gate,
+  and it is the one case where silence has to be loud. **THE LIVE COUNTS ARE 22 / 165 / 8.** Quote
+  them beside the verdict, and treat a moved count as something to explain rather than a nuisance. Batch S verdicts:
   Cryomancer share FALLS with field size (49%→38%, budgets 3→12) = baseline
   overtune, fix his NUMBERS not his AoE; fields are empty entering round 3
   at every budget; --run 50 floor = 0/50 completions, wipes cluster z1
@@ -969,6 +973,139 @@ claim, so a tranche that fills three pools trips them by construction. Two shape
   refusal reach the spec pool too (bq, br) or by moving it onto a **Berserker**, whose pool is
   genuinely still two (bo). **WHEN THE WARRIOR THIRD LANDS, bo's version has to move again** — and
   that forced move is the honest signal that the last of tranche 2 is paid.
+
+BATCH CA (08-15) — GATE 2 HAD BEEN PRINTING PASS ON ZERO ASSERTIONS. **THE FINDING OUTRANKS THE
+FIX AND IS THE HALF WORTH CARRYING: TWELVE BATCHES OF VERIFIED BLOCKS QUOTED "run-harness gates
+1/2/3 PASS" WHILE GATE 2 RAN NOT ONE CHECK.** No game code changed — no ability, no node, no
+magnitude, no save version (still v10), and **master.html is deliberately UNTOUCHED**, so the
+stamp gate stays where it is and the thirteen suites that check it do not move (the BC precedent:
+do not bump the stamp for a batch that ships no design change).
+- **THE MECHANISM, AND IT IS A SHAPE RATHER THAN A TYPO.** `test_run_harness.gd:125` called
+  `run.award_spec_point`, which **BM §6 deleted**, and the call sat **above every `_check` in the
+  function**. GDScript aborts the function on the error; `_go` then printed
+  `GATE %s %s % [gate, "PASS" if fails == 0 else "FAIL"]` — and with the body aborted, `fails` was
+  still 0. **Zero checks ran. Zero failed. It reported a pass.** The aborted region was exactly the
+  half BM re-pointed in place, so **BM's replacement assertions had never executed once.**
+- **THE NUMBER: 129 ASSERTIONS HAD BEEN SILENTLY SKIPPED SINCE BM.** That is BM's own surviving
+  half — 1 loadout check, 8 across the party, and 30 per hero (a `talent_order` pin, 9 single-rank
+  checks, 9 id-is-real checks, 9 one-node-per-row checks, a purse pin and a depth check). **The
+  gate now runs 165**, the difference being CA's re-pointed income half (30) and six source pins
+  replacing a tautology (see below).
+- **WHY THIS ONE SURVIVED WHEN `ah` AND `an` DID NOT, AND IT IS THE TRANSFERABLE PART: IT PRINTED A
+  WORD INSTEAD OF A NUMBER.** The earlier hollow-verification cases were caught because a FIGURE
+  looked wrong — a count that did not move, a rate that read zero. **Nothing looks wrong about the
+  string `PASS`.** Recorded in `docs/design-notes.md` as the finding, separately from the fix,
+  because it applies to every gate in the harness and to every future one.
+- **THREE STRUCTURAL RULES, NOT THE BRIEF'S TWO, AND THE THIRD IS FLAGGED AS AN ADDITION RATHER
+  THAN SLIPPED IN — see "Verify before shipping" above, which is where they will be looked for.**
+  (1) a gate reports its CHECK COUNT, not a verdict; (2) a gate that runs ZERO checks FAILS;
+  **(3) a gate must REACH ITS OWN END** — every gate's last statement is `_finish()` and `_go`
+  fails a gate that never got there. **RULE 3 EXISTS BECAUSE RULES 1 AND 2 DO NOT ACTUALLY CLOSE
+  THE SHAPE.** They catch an abort ABOVE a gate's first check; an abort BELOW it leaves a non-zero
+  count, so it prints `PASS (2 checks)` — legible to a reader who knows the number, and caught by
+  nothing. **§4 of the brief is titled "make the failure mode impossible, not just fixed", and two
+  rules only made it legible.** Driven both ways: the abort put back above gate 1's checks reports
+  `GATE 1 FAIL (0 checks)`, below gate 3's reports `GATE 3 FAIL (2 checks)`.
+  Rules 1 and 2 live in `_check` / `_check_range` / `_go`, so **applying them to "every gate in the
+  harness" cost nothing beyond writing them once** — gates 1 and 3 carried the same latent fault
+  and needed no edit of their own; rule 3 costs one line per gate. **The unknown-gate branch was
+  routed through `_check`**, and rules 3 and 2 are **exclusive**, so one problem is reported once
+  rather than twice.
+- **THE RE-POINT, WITH ITS REASON, IN TWO HALVES THAT MATCH BM's OWN SPLIT OF THE OLD SUBJECT.**
+  The original subject was "talent spend conservation" — points earned against points paid inside
+  one run, replayed against a price curve — and **BM deleted the thing being conserved.**
+  · **§1 INCOME: a run awards nothing.** The BK map WALK is kept and inverted — it drives the real
+    board (49 encounters, 3 zone bosses, 1 end boss) and asserts it pays **nothing**, with the node
+    types asserted PRESENT first so "nothing paid" cannot be satisfied by a board nobody crossed.
+    Then the ONE door, `Run.bank_zone_boss_points`: a **SIM banks nothing** (the `sim_run` guard,
+    which a later batch could delete with nothing failing), a zone boss banks **1 per spec that
+    played**, a spec that did not play banks **0**, two zone bosses bank **2** (a zone-2 wipe keeps
+    what it cleared), an un-awakened hero banks nothing, and **the END boss banks none** — asserted
+    against `_resolve_boss`'s source, BM's own idiom for a rule with no reachable gate.
+  · **§2 THE LOADOUT: what a run WEARS is legal.** BM's assertions, running for the first time —
+    one node per row, every id real, every rank 1, no in-run purse on the member, depth exactly
+    `RunSim.rows_built`. **They needed a loadout and never had one**: `new_run` installs nothing, so
+    every one of them would have FAILED the day BM wrote them had the function reached them. The
+    gate calls `RunSim.install_builds` + `equip_spec_talents` first.
+  · **THE DIVERGENCE FROM THE BRIEF, STATED AS §3 ASKED.** CA §3 offered the income rules as a
+    starting point; both halves ship. §2 is what the surviving lines actually asked, and it is the
+    half THIS harness specifically owes — gates 1 and 3 pin what a sim's units are SPAWNED with, so
+    gate 2 pins what a sim's heroes are BUILT with. Dropping it would have left
+    `RunSim.install_builds` ungated by anything.
+- **ONE CHECK THAT COULD ONLY EVER PASS WAS FOUND AND REPLACED, WHICH IS THIS BATCH'S OWN LESSON
+  ARRIVING FROM THE OTHER SIDE.** BM's last line was `_check("no points were spent in a run at
+  all", replay_total, 0)` against a local **initialised to 0 and never touched**. It now asks the
+  question mechanically: `Talents.can_learn` / `purse_for` / `points_spent` / `MAX_PER_ROW` are
+  pinned ABSENT in the source and `can_buy` / `can_equip` pinned PRESENT.
+- **THE PROFILE IS REDIRECTED TO A SCRATCH FILE FOR THE WHOLE OF GATE 2 AND RESTORED AFTERWARDS**
+  (`Profile.save_path` is a var for exactly this — test_batch_bm's pattern). **A gate that wrote
+  the player's ledger would be a gate nobody could afford to run.** `sim_run` is dropped for
+  exactly three statements so the real banking path can be driven at all, and re-armed immediately;
+  nothing in that window touches the run save.
+- **THE OLDER VERIFIED BLOCKS BELOW ARE LEFT AS WRITTEN.** Every "run-harness gates 1/2/3 PASS"
+  from BM to BY is quoting gate 2 on zero assertions. They are the record of what each batch
+  believed at the time and rewriting them would destroy that; **this block is the correction.**
+- **THE CORRECTED BEAST-IDENTIFIER LIST IN "Known open threads" WAS CONFIRMED AND LEFT ALONE.**
+  Re-checked against live code, not trusted: the four unit fields and four battle functions are
+  present, both node ids (`bm_beast_within`, `bm_no_beast_left`) still carry their renamed labels,
+  `"name": "Beastmaster"` is in classes.gd so **`beastmaster` is a proper name and an over-eager
+  pass would rename a live spec key**, `th_beasts`/`ss_beasts` appear in NO production file and
+  survive only in test_batch_bx as negative assertions proving the deletion, and BY's three
+  test-side additions are at the lines it names. **NOT ACTED ON, deliberately** — a field rename
+  wants its own pass with its own tests, and mixing it into a test repair is exactly the scope
+  creep that makes a failure hard to attribute.
+- **VERIFIED — AND PER THE STANDING INSTRUCTION, THAT MEANS THE CODE LANDED AND WORKS. This batch
+  is entirely about the instrument, so "works" means the gate genuinely RUNS and can genuinely
+  FAIL.** check_parse 0 · check_flow 0 · check_map_screen OK · **run-harness gates 1/2/3 PASS at
+  22 / 165 / 8 checks**, and gate 2 is **stable at 165 over 7 runs** (its one range check reads
+  16-23 walked fights inside a stated band of 9-33). Live autoplay clean, **0 SCRIPT ERROR over 87
+  log lines**. `python3 docs/build_docs.py` exit 0, both `built ...` lines.
+- **THE ACCEPTANCE TEST IS THAT THE GATE CAN FAIL, and it was driven rather than argued.**
+  **SIX NEGATIVE CONTROLS, each applied and reverted** (`run_state.gd`, `run_sim.gd` and
+  `test_run_harness.gd` all came back byte-identical by hash): an **ELITE awarding a talent point**
+  trips 13 · **the zone boss banking nothing** trips 11 · **the sim-purity guard deleted, so a sim
+  writes the player's ledger,** trips 12 · **a row holding every node instead of one** trips 80 ·
+  **the deleted call restored ABOVE gate 1's checks** gives `GATE 1 FAIL (0 checks)` · **the same
+  call BELOW gate 3's first checks** gives `GATE 3 FAIL (2 checks)`. **NONE PASSED**, and the last
+  two are the ones that matter: **before this batch both printed PASS.**
+- **FULL BATTERY, 42 SUITES: every count at its BX-recorded value** — ah 5500, ah_battle 65,
+  ai 2217, aj 418, ak 528, al 560, ar 735, as 396, at 470, au 336, av 324, aw 350, ax 339, ay 484,
+  az 519, ba 690, bc 91, bd 69, be 34, bf 78, bg 47, bh 233, bi 88, bj 67, bl 88, bm 1891, bn 77,
+  bo 769, bp 271, bq 738, br 1441, bs 262, bt 463, bu 476, bv 893, bw 545, bx 141, runes 2973,
+  rune_battle 97 — with **an 3614 and bk 130 inside their DOCUMENTED drift**, and **ONE count moved
+  and it is not this batch's: bb 172 -> 168** (see below). **profile.json, relics.json AND
+  trees.json are byte-identical by hash** across the whole battery, and **no `run_save.bin` exists
+  before or after** — the designer had no run in flight and none was created. The gate's scratch
+  profile is removed on the way out.
+- **TWO FAILURES, BOTH KNOWN-BAD AND NEITHER ON THIS BATCH'S PATH — AND ONE OF THEM IS A STANDING
+  OPEN ITEM THAT IS NOW CLOSED AS A DIAGNOSIS.**
+  · **test_batch_br 1441/1, AND THE FAILING CHECK IS CAPTURED AT LAST: `§3: Iron Will really cuts
+    the damage (31 taken against 31)`.** BS recorded this exact flake as "seen once, not
+    reproduced... the failing check was not captured" and it has sat unnamed since. **1441/0 on
+    three clean re-runs here.** The diagnosis is BS §3's own lesson arriving in the suite that
+    documented it: it is a 15% cut compared **one blow against one blow with the ±10% variance roll
+    live**, so noise swamps it — and BS's prescription is the fix (amplify the term for the
+    measurement and assert a RATIO with open ground, never a bare comparison of two blows).
+    **REPORTED, NOT REPAIRED** — nothing in CA touches the Warrior class-card path, and repairing
+    it is BR's thread.
+  · **test_rune_battle 97/1, `pyromancer: rune_resist_pierce never fired against a resistant
+    warband`** — the standing defect **diagnosed at BC**: the check drives `_resolve` by hand and
+    `no_cover` is armed nowhere in that file, so the forced hit still rolls the 5% miss and a missed
+    hit writes no resist line. Unchanged, still one line at the forced hit, still not CA's.
+- **FOUR SUITES THROW SCRIPT ERRORS, ALL FOUR DOCUMENTED AND ALL FOUR PRE-EXISTING** — and **TWO OF
+  THEM ARE THIS BATCH'S OWN DEFECT WEARING A SUITE'S CLOTHES, WHICH IS WORTH SAYING OUT LOUD.**
+  **test_batch_ah and test_batch_an still call `Run.award_talent_points`, deleted at BM**, so each
+  aborts its own section while printing a count and zero failures — **the identical shape gate 2
+  had, in two suites, recorded since BO and still open.** Their counts are stable (5500, 3614), so
+  what they have been under-testing has been under-tested consistently. **NOT REPAIRED HERE: it is
+  BM's thread, and repairing it means authoring new assertions about a talent economy that no
+  longer exists** — the same reason BY reported gate 2 rather than fixing it. The other two:
+  **test_batch_bb** throws `Out of bounds get index '1'` on the changelog anchor BZ archived,
+  **which is why its count fell 172 -> 168 — four checks stopped existing and nothing failed**
+  (BZ predicted exactly this and called it the BC trap); **test_batch_bj** throws three of its own
+  on a bare `BattleUnit.new()`, reproduced on unmodified HEAD at BX and aborting nothing.
+  **READ THE COUNTS, NOT ONLY THE FAILURES** — `bb` is the standing proof that the rule earns its
+  keep.
 
 BATCH BZ (08-15) — THE CHANGELOG IS SPLIT. **THE SYNC GOES 5.43 MB / 169 TEXT FILES -> 4.73 MB /
 168, A SAVING OF 711 KB (12.8%)** — the raw split saved 744 KB and this batch's own documentation

@@ -3421,3 +3421,33 @@ order, and BW saw it and correctly left it alone. Neither batch was wrong. What 
 the rule lived in a loop rather than in a function — so applying it to a second card meant copying
 it, and copying it is what let the first card keep the old answer.
 
+
+**A test that reports a verdict is only auditable by reading it; a test that reports a quantity is
+auditable at a glance.** The two earlier hollow-verification cases were caught because a *figure*
+looked wrong — a count that did not move, a rate that read zero. Nothing looks wrong about the word
+`PASS`. That is the whole reason GATE 2 survived twelve batches of being quoted as evidence while
+running no assertions at all: it printed a word, and a word has no shape to be wrong. So the repair
+worth keeping is not the re-point, it is that gates now count. `GATE 2 PASS (165 checks)` carries
+its own audit; a gate that runs nothing prints `(0 checks)` and is visibly broken to anyone
+glancing at the line, which is the only kind of checking that actually happens every time.
+
+**The corollary is that "zero" has to be loud rather than quiet.** An empty gate reporting zero is
+only useful if somebody reads it, and the honest way to make sure somebody does is to fail. This is
+the one place where silence is the failure mode — a gate with nothing in it is not neutral, it is a
+gate that has stopped asking its question, and it should be as loud as a gate whose question got
+the wrong answer.
+
+**Making a failure legible and making it impossible are different jobs, and it is easy to stop
+after the first.** Printing the check count fixes the audit — a reader who glances at
+`GATE 3 PASS (2 checks)` and knows it should say 8 will catch it. But that reader has to exist, and
+has to know the number, and has to be looking; the whole reason the original defect lasted twelve
+batches is that nobody was doing any of those things. The count is worth having anyway, because it
+is what makes the failure *explicable* once found. What actually closes the hole is the gate
+asserting that it reached its own last line, because that needs no reader at all.
+
+**A rule that only covers the case you happened to hit is a rule with a soft edge.** The reported
+bug was a dead call at the top of a function, so the obvious rules — count the checks, fail on zero
+— both key on the count being zero. Move the same dead call ten lines down and every one of them
+passes again. The question worth asking of any structural fix is not "does this catch the bug I
+found" but "what is the smallest change to the bug that gets past it", and here the answer was
+moving one line.

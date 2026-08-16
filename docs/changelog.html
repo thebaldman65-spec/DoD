@@ -13,6 +13,177 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-15 &mdash; Batch CA: twelve batches of hollow verification</h2>
+<p><i><b>THE FINDING IS THE ENTRY; THE FIX IS ITS CONSEQUENCE. From Batch BM to Batch BY,
+every VERIFIED block in this changelog that reads &ldquo;run-harness gates 1/2/3 PASS&rdquo; was
+quoting a gate that ran NOT ONE ASSERTION.</b> GATE 2's first statement was a call to a function
+BM had deleted, and it sat above every check in the function &mdash; so the error aborted the
+whole body, no check ran, no check failed, and the gate printed <code>GATE 2 PASS</code> on the
+way out. <b>129 of BM's own replacement assertions had never executed once.</b> Twelve batches of
+evidence rested on a word that was never earned. No game code changes in this batch: no ability,
+no talent node, no magnitude, no save version (still v10), and <b>master.html is deliberately
+untouched</b>, so the stamp gate does not move.</i></p>
+
+<h3>&sect;1 What actually happened, and why it is a shape rather than a typo</h3>
+<ul>
+<li><b><code>test_run_harness.gd:125</code> called <code>run.award_spec_point</code>, which
+<b>Batch BM &sect;6 deleted</b> when talents became meta progression.</b> GDScript aborts the
+executing function on a nonexistent-method error. That line sat <b>above every
+<code>_check</code></b> in <code>_gate_talent_conservation</code>.</li>
+<li><b>The verdict was computed from a failure counter that the abort had left at zero.</b>
+<code>_go</code> printed <code>"PASS" if fails == 0 else "FAIL"</code> &mdash; and with the body
+never entered, <code>fails</code> was 0, which is indistinguishable from a gate that ran two
+hundred checks and passed them all.</li>
+<li><b>The aborted region was exactly the half BM re-pointed in place.</b> BM's comment says it
+outright &mdash; &ldquo;the income half of this gate measured a purse that no longer exists; what
+replaces it is the half that IS still load-bearing&rdquo; &mdash; and that replacement half is
+what never ran.</li>
+<li><b>The count of what was skipped is 129</b>: one loadout check, eight across the party, and
+thirty per hero (a <code>talent_order</code> pin, nine single-rank checks, nine
+id-is-real checks, nine one-node-per-row checks, a purse pin and a depth check).</li>
+</ul>
+
+<h3>&sect;2 WHY THIS ONE SURVIVED WHEN <code>ah</code> AND <code>an</code> DID NOT</h3>
+<p><b>Because it printed a word instead of a number.</b> The two earlier hollow-verification cases
+in this project were caught because a <i>figure</i> looked wrong &mdash; a count that did not move,
+a rate that read zero. <b>Nothing looks wrong about the string <code>PASS</code>.</b></p>
+<p><b>A test that reports a QUANTITY is auditable at a glance; a test that reports a VERDICT is
+only auditable by reading it.</b> That is recorded in <code>docs/design-notes.md</code> as the
+finding, separately from the fix, because it applies to every gate in the harness and to every
+future one.</p>
+
+<h3>&sect;3 The structural changes &mdash; standing rules for EVERY gate</h3>
+<p>Repairing one call site would have left the shape intact: any future deleted function called
+inside a gate reproduces this exactly. Three rules, all small, and all binding on gates 1 and 3 as
+well &mdash; they carried the same latent fault. <b>The brief asked for two; the third is this
+batch's and is flagged as such.</b></p>
+<ul>
+<li><b>A GATE REPORTS ITS CHECK COUNT, NOT A VERDICT.</b> <code>GATE 2 PASS (165 checks)</code>,
+never a bare <code>GATE 2 PASS</code>. This is &sect;2's lesson applied rather than merely
+recorded.</li>
+<li><b>A GATE THAT RUNS ZERO CHECKS MUST FAIL.</b> An empty gate is a broken gate, and it is the
+one case where silence has to be loud. <b>A gate printing a count of zero is visibly broken; the
+same gate printing PASS is not.</b></li>
+<li><b>A GATE MUST REACH ITS OWN END &mdash; a THIRD rule, added because the brief's two do not
+actually close the shape, and flagged rather than slipped in.</b> Every gate's last statement is
+<code>_finish()</code>, and a gate that never got there fails. Rules 1 and 2 catch an abort ABOVE a
+gate's first check; an abort BELOW it leaves a NON-ZERO count, so it prints
+<code>PASS (2 checks)</code> &mdash; legible to a reader who already knows the number, and caught by
+nothing. <b>&sect;4 of the brief is titled &ldquo;make the failure mode impossible, not just
+fixed&rdquo;, and two rules only made it legible.</b></li>
+<li><b>Applying rules 1 and 2 to every gate cost nothing beyond writing them once</b>, because the
+counter lives in <code>_check</code> / <code>_check_range</code> and the rule lives in
+<code>_go</code>: gates 1 and 3 carried the same latent fault and needed no edit of their own. Rule
+3 costs one line per gate. <b>Rules 3 and 2 are exclusive</b>, so a gate that aborts above its first
+check reports one problem once rather than twice.</li>
+<li><b>The unknown-<code>DOD_GATE</code> branch was routed through <code>_check</code></b> so a
+bad gate id is a FAILED CHECK rather than a bare failure &mdash; otherwise it would trip the
+zero-check rule as well and report one problem twice.</li>
+</ul>
+
+<h3>&sect;4 The re-point, in two halves</h3>
+<p>The original subject was <b>talent spend conservation</b> &mdash; points earned against points
+paid inside one run, replayed against a price curve. <b>Batch BM deleted the thing being
+conserved</b>: talents are meta now, bought per spec on <code>Profile</code> out of zone-boss
+income and equipped before a run begins, so there is no in-run purse. This is a re-point with a
+reason, and the reason is written into the file above the function.</p>
+<ul>
+<li><b>&sect;1 INCOME &mdash; A RUN AWARDS NOTHING.</b> Batch BK's map walk is kept and inverted:
+it drives the real generated board (49 encounters, three zone bosses, one end boss) and asserts it
+pays <b>nothing at all</b>. The node types are asserted PRESENT first, so &ldquo;nothing
+paid&rdquo; cannot be satisfied by a board nobody crossed. Then the one door,
+<code>Run.bank_zone_boss_points</code>: <b>a SIM banks nothing</b> (the <code>sim_run</code> guard,
+which a later batch could delete with nothing else failing), a zone boss banks <b>1 per spec that
+played</b>, a spec that did not play banks <b>0</b>, two zone bosses bank <b>2</b> (a zone-2 wipe
+keeps what it cleared), an un-awakened hero banks nothing, and <b>the END boss banks none</b>
+&mdash; asserted against <code>_resolve_boss</code>'s source, which is BM's own idiom for a rule
+with no reachable gate.</li>
+<li><b>&sect;2 THE LOADOUT &mdash; WHAT A RUN WEARS IS LEGAL.</b> BM's assertions, executing for
+the first time: exactly one node per row, every id real, every rank 1, no in-run purse on the
+member, depth exactly <code>RunSim.rows_built</code>. <b>They needed a loadout and never had
+one</b> &mdash; <code>new_run</code> installs nothing, so every one of them would have FAILED on
+the day BM wrote it had the function reached them. The gate installs the build first.</li>
+<li><b>The divergence from the brief, stated because the brief asked for it.</b> Batch CA &sect;3
+offered the income rules as a starting point rather than an instruction. Both halves ship: the
+income half is the brief's list, and the loadout half is what the surviving lines actually asked.
+That second half is the one <i>this harness</i> owes &mdash; gates 1 and 3 pin what a sim's units
+are SPAWNED with, so gate 2 pins what a sim's heroes are BUILT with, and dropping it would have
+left <code>RunSim.install_builds</code> ungated by anything in the project.</li>
+</ul>
+
+<h3>&sect;5 A check that could only ever pass, found on the way through</h3>
+<p>BM's closing line was <code>_check("no points were spent in a run at all", replay_total, 0)</code>
+&mdash; against a local <b>initialised to 0 on the line above and never touched again</b>. It is
+this batch's own lesson arriving from the other side, and it now asks the question mechanically:
+<code>Talents.can_learn</code>, <code>purse_for</code>, <code>points_spent</code> and
+<code>MAX_PER_ROW</code> are pinned ABSENT in the source, and <code>can_buy</code> /
+<code>can_equip</code> pinned PRESENT &mdash; buying and equipping being separate questions is
+the load-bearing rule of the whole talent system.</p>
+
+<h3>&sect;6 The ledger is redirected, never written</h3>
+<p><b><code>Profile.save_path</code> points at a scratch file for the whole of gate 2 and is
+restored afterwards</b> (it is a <code>var</code> for exactly this; test_batch_bm's pattern).
+A gate that wrote the player's ledger would be a gate nobody could afford to run.
+<code>sim_run</code> is dropped for exactly three statements so the real banking path can be
+driven at all, and re-armed immediately; nothing in that window touches the run save.
+<b>profile.json, relics.json and trees.json are byte-identical by hash across the whole
+batch</b>, and no <code>run_save.bin</code> exists before or after &mdash; the designer had no
+run in flight.</p>
+
+<h3>&sect;7 Verification &mdash; the acceptance test is that the gate CAN FAIL</h3>
+<p><b>A repair that only checks the happy path proves nothing, because a gate that passes when it
+should fail is the entire defect.</b></p>
+<ul>
+<li><b>All three gates run and report a non-zero count: <code>GATE 1 PASS (22 checks)</code>,
+<code>GATE 2 PASS (165 checks)</code>, <code>GATE 3 PASS (8 checks)</code>.</b></li>
+<li><b>THE ACCEPTANCE TEST, and it reproduces the original defect on UNTOUCHED gates:</b> the
+deleted <code>run.award_spec_point</code> call was put back ABOVE gate 1's checks &mdash;
+<b><code>GATE 1 FAIL (0 checks)</code></b> &mdash; and BELOW gate 3's first checks, the case rules 1
+and 2 miss &mdash; <b><code>GATE 3 FAIL (2 checks)</code></b>. <b>Before this batch both
+constructions printed PASS.</b></li>
+<li><b>SIX NEGATIVE CONTROLS, each applied and reverted</b> (<code>run_state.gd</code>,
+<code>run_sim.gd</code> and <code>test_run_harness.gd</code> all came back byte-identical by hash):
+an <b>ELITE awarding a talent point</b> trips 13; <b>the zone boss banking nothing</b> trips 11;
+<b>the sim-purity guard deleted</b>, so a sim writes the player's ledger, trips 12; <b>a row holding
+every node instead of one</b> trips 80; and the two abort controls above. <b>None passed.</b></li>
+<li><b>Gate 2 is stable at 165 checks over seven runs.</b> Its one range check reads 16&ndash;23
+walked ordinary fights inside a stated band of 9&ndash;33, so the band has headroom on both sides
+while still failing on a board that stopped generating fights.</li>
+<li><b>check_parse 0 &middot; check_flow 0 &middot; check_map_screen OK &middot; live autoplay clean
+at 0 SCRIPT ERROR over 87 log lines &middot; <code>build_docs.py</code> exit 0.</b></li>
+<li><b>FULL BATTERY, 42 SUITES, EVERY COUNT AT ITS RECORDED VALUE</b> (an and bk inside their
+documented drift). <b>One count moved and it is not this batch's: bb 172 &rarr; 168</b> &mdash; see
+below. <b>profile.json, relics.json and trees.json are byte-identical by hash</b> across the whole
+battery, and no <code>run_save.bin</code> exists before or after.</li>
+</ul>
+
+<h3>&sect;8 Two failures, both known-bad &mdash; and one standing open item closed as a diagnosis</h3>
+<ul>
+<li><b>test_batch_br 1441/1, AND THE FAILING CHECK IS CAPTURED AT LAST:
+<code>&sect;3: Iron Will really cuts the damage (31 taken against 31)</code>.</b> Batch BS recorded
+this exact flake as &ldquo;seen once, not reproduced &mdash; the failing check was not
+captured&rdquo;, and it has sat unnamed since. It read <b>1441/0 on three clean re-runs</b> here.
+The diagnosis is BS's own lesson arriving in the suite that documented it: a <b>15% cut compared one
+blow against one blow with the &plusmn;10% variance roll live</b>, so noise swamps the signal. BS's
+prescription is the fix &mdash; amplify the term for the measurement and assert a <i>ratio</i> with
+open ground, never a bare comparison of two blows. <b>Reported, not repaired</b>: nothing in this
+batch touches the Warrior class-card path.</li>
+<li><b>test_rune_battle 97/1</b>, <code>pyromancer: rune_resist_pierce never fired against a
+resistant warband</code> &mdash; the standing defect diagnosed at Batch BC (the check drives
+<code>_resolve</code> by hand and <code>no_cover</code> is armed nowhere in that file, so the forced
+hit still rolls the 5% miss). Unchanged and still not this batch's.</li>
+<li><b>FOUR SUITES THROW SCRIPT ERRORS, ALL PRE-EXISTING &mdash; AND TWO OF THEM ARE THIS BATCH'S
+OWN DEFECT WEARING A SUITE'S CLOTHES.</b> <b>test_batch_ah and test_batch_an still call
+<code>Run.award_talent_points</code>, deleted at BM</b>, so each aborts its own section while
+printing a count and zero failures &mdash; <b>the identical shape GATE 2 had, in two suites,
+recorded since Batch BO and still open.</b> Not repaired here for the same reason BY reported gate 2
+rather than fixing it: it means authoring new assertions about a talent economy that no longer
+exists. <b>test_batch_bb</b> throws on the changelog anchor BZ archived, <b>which is why its count
+fell 172 &rarr; 168 &mdash; four checks stopped existing and nothing failed</b>, exactly as BZ
+predicted. <b>test_batch_bj</b> throws three of its own, reproduced on unmodified HEAD at BX.
+<b>Read the counts, not only the failures.</b></li>
+</ul>
+
 <h2>2026-08-15 &mdash; Batch BZ: the changelog is split</h2>
 <p><i><b>THE NUMBER THIS BATCH EXISTS FOR: the knowledge-base sync goes from 5.43 MB across 169
 text files to 4.73 MB across 168 &mdash; a saving of 711 KB, 12.8%.</b> (The raw split saved
