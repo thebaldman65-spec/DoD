@@ -86,6 +86,19 @@ it is carrying its own history.**
   it deliberately is far cheaper than doing it when it becomes unworkable.**
 
 ## Verify before shipping
+- **STANDING CONVENTION, SET AT BATCH CG AND BINDING ON EVERY CONTENT BATCH FROM IT: A CONTENT
+  BATCH DOES NOT SHIP A TEST SUITE.** No new suite, no negative controls, no smoke sweeps, no
+  measurement. **THE FLOOR IS: IT PARSES, IT RUNS, AND A LIVE BATTLE THROWS NOTHING** — that is
+  the whole verification ask. **TESTING MOVES TO PERIODIC DEDICATED TEST BATCHES INSTEAD.**
+  · **WHAT THIS DOES NOT LICENSE: LEAVING AN EXISTING SUITE ASSERTING SOMETHING THE BATCH JUST
+    MADE FALSE.** A check whose subject was renamed or deleted has stopped asking its question,
+    which is the exact fault CA, CD and CE spent three batches closing — so a content batch still
+    RE-POINTS IN PLACE, with the reason in the file, and INVERTS rather than deletes where the
+    correct answer moved. CG re-pointed three suites (ce, bi, av) under this rule while writing
+    none.
+  · Every "VERIFIED" block below BATCH CE was written under the old convention (a new suite, a
+    battery pass and a wall of negative controls per batch). **They are the record of what each
+    batch did, not a standard a content batch is now held to.**
 - Parse: run each scene headless with `--quit-after 90`, grep "SCRIPT ERROR".
   **TWELVE scenes since Batch BK** (blacksmith is new). `check_parse.gd`
   force-loads every script and scene in one pass and is the faster gate.
@@ -1007,6 +1020,212 @@ claim, so a tranche that fills three pools trips them by construction. Two shape
   genuinely still two (bo). **WHEN THE WARRIOR THIRD LANDS, bo's version has to move again** — and
   that forced move is the honest signal that the last of tranche 2 is paid.
 
+BATCH CG (08-16) — THE CE REVISION. **SEVEN CHANGES TO THE NINE CLERIC CARDS CE SHIPPED, AND THE
+BLOCK BELOW IS THE CORRECTION TO CE'S** (CA's rule: a dated block is the record of what that batch
+believed, so CE's is left as written). No new ability, no talent node, no save version moves (still
+v10). **`SPEC_DRAFT_POOLS` STAYS AT 78 AND THE DRAFT STAYS AT 102 OF 120** — what is owed is still
+the Hunter and Warrior thirds of tranche 3.
+**§0 — THE LETTER CF IS SPENT, recorded beside CC's under Batch CD §3 above. The Hunter third
+lands as CH.**
+**THE FOUR NAMES THAT MOVED, so a reader of CE's block below knows which of the nine are live:
+MATINS is DIVINE PRESENCE · OBSERVANCE is DELETED and VESPERS holds its slot · JUBILEE is BLESSING
+OF THE FAITHFUL · ANATHEMA is BREAKING DARKNESS.** Alms, Elevation, Mantle, Requiem and Penance
+keep their names; Elevation and Penance keep nothing else.
+**§1 — DIVINE PRESENCE PAYS IN TWOS, EVERY SECOND TURN, AND THE SHAPE IS THE POINT RATHER THAN THE
+RATE.** 2 Mercy at the start of every SECOND turn of hers, 4 turns (Perfect: 6) — so it fires twice
+for 4 Mercy or three times for 6. Cost and cooldown unchanged at 20 Mana / 4cd, and **the watch
+condition is exactly as CE shipped it**: a fall below the window breaks that turn's watch and the
+passive pays instead.
+· **IT CAN OVERFLOW THE MERCY CAP INTO ALMS, AND THAT IS THE FIRST TIME TWO OF HER OWN DRAFT CARDS
+  FEED EACH OTHER.** Two stacks arriving together cross the ceiling FROM BELOW, where a drip of one
+  could only ever reach it one stack at a time and had nothing to hand on. **GRACE IS DELIBERATELY
+  NOT FIRED BY THAT OVERFLOW** — at `_on_hero_below_half` the two spill together by design (BD §4),
+  but the card the brief names is ALMS, and paying a talent node off a second unasked-for trigger
+  is a power change nobody specified. **REPORTED FOR THE DESIGNER; it is one line if wanted.**
+· **THE CADENCE COUNTS HER TURNS ON THE STATUS'S OWN COUNTER RATHER THAN READING ITS REMAINING
+  TURNS**, and that is load-bearing: `turns` is what `tick_statuses` decrements, and FLEETING (a
+  battle modifier) takes a turn off a status at application — so a payout keyed on the remaining
+  count would silently move its payout turns under a modifier with nothing to do with this card.
+· **THE BROKEN FLAG IS READ AND CLEARED ON EVERY ONE OF HER TURNS, PAYOUT OR NOT**, and it is read
+  BEFORE the cadence check. A fall on an idle turn must cost her nothing and must not be banked
+  against the next payout.
+· **FLAGGED, NOT TUNED: 4 turns on a 4-turn cooldown is 100% UPTIME**, where Matins ran at 75%.
+  Left as the designer chose it; it is a playtest question rather than a batch's.
+· **FLAGGED — A LABEL COLLISION ON HER OWN SHEET, AND THE CLOSEST THE PROJECT HAS SHIPPED.**
+  `hl_presence` is a HOLY TALENT NODE already named **Divine Presence** (Vigil row 2, the
+  end-of-turn drip to the most wounded ally). Per BR §1 that is a LABEL collision and not a break —
+  a node's name is not an ability name, nothing resolves it, and the two carry different fields
+  (`divine_presence_pct` against the card's `divine_presence` special) — so it **SHIPS AS SPECIFIED
+  AND IS RECORDED**. Closer than BP's Precision Strike / Precision Strikes: same spec, and an exact
+  match rather than a plural. Renaming either is the designer's call and one string.
+**§1 — OBSERVANCE IS DELETED ENTIRELY AND VESPERS TAKES ITS SLOT.** `_observance_pay`, the status
+and the Empower-keeps-the-perfect rule all go; **an Empowered cast forfeits its perfect bonus
+exactly as it did before Batch CE**, and there is no constant, status or half-function left for a
+later batch to re-arm.
+· **WHAT SURVIVES CE AND IS NOT UNDONE: THE HYMN'S ORDERING.** Its Empowered share (35%) is written
+  LAST, so a cast that paid a Mercy for the surge can never be handed the smaller perfect share
+  (25%). CE wrote it against Observance; it costs nothing and it is the half of CE's reasoning that
+  was about the Hymn rather than about the card. The three `if empowered ... if is_perfect` splits
+  stay split for the same reason — they are behaviourally invisible again, and the next thing that
+  makes the pair reachable should not have to find those lines first.
+**VESPERS** (25 Mana, 2.0, 4cd, one ally): for 4 turns (Perfect: 6), **or until it fires**, the
+next blow that would take that ally below half health is absorbed for **20% of HOLY'S maximum
+health**.
+· **THE LAST CLAUSE IS THE WHOLE CARD AND MUST NOT BE DROPPED AS AN EDGE CASE: IF THE ALLY DOES NOT
+  CROSS, SHE EARNS NO MERCY FOR A CROSSING THAT NEVER HAPPENED.** It is the only place in her pool
+  where helping an ally starves her own engine. **IT IS NOT A RULE WRITTEN ANYWHERE** — the absorb
+  sits ABOVE the subtraction in `unit.take_hit` and therefore above `_check_below_half`, so the
+  generator simply never fires. **MOVING IT BELOW THE SUBTRACTION WOULD LEAVE THE CARD WORKING AND
+  QUIETLY HAND HER THE STACK ANYWAY**, which is the one way to make its price disappear.
+· **IT READS `mercy_threshold`, NEVER A LITERAL HALF.** GUARDIAN ANGEL moves the Mercy line to 65%,
+  and a ward watching a different line from the generator would make the trade false in exactly the
+  build that cares most about it.
+· **A PARTIAL CATCH IS A REAL OUTCOME**: a blow bigger than the ward still crosses, still costs the
+  health it did not catch, and still pays her. **NO COPY IN `take_tick_damage`, DELIBERATELY** — the
+  card says "the next BLOW", and BS's Kiln-Forged is the precedent this file already follows (a Burn
+  tick is not a hit). The absorb is sized at cast off HER maximum and carried on the STATUS POWER
+  (the Alms pattern), so a Holy who falls afterwards does not take the ward with her.
+· **IT IS A BUFF AND IS CORRECTLY OUT OF `DEBUFF_IDS`**, with the other two Holy statuses — and it
+  is the first of the three that sits on an ALLY rather than on Holy herself, so a listing would
+  have made it a ward a Cleansing Rite could take off the party.
+**§2 — ELEVATION GRANTS REAL FAITH: every ally gains 2 stacks (Perfect: 3), visible on the bar.**
+Cost 30 → **35 Mana**; cooldown stays 5. It goes through **`_gain_faith`, THE ONE DOOR**, so the
+peak still ratchets on the way up, Blessing of Zeal still doubles, and the source table books it —
+**a SEVENTH gain term**, because a six-term table would stop adding up the moment the card was
+drafted (BI §2's parts-sum-to-total property, which test_batch_bi asserts).
+· **THE RELEASE IS A CONSEQUENCE TO IMPLEMENT RATHER THAN GUARD AGAINST.** An ally already holding
+  3 or more reaches the cap of 5 and RELEASES — healed 15% of maximum, count reset, Devout paid 3%
+  of his Mana. **THE PEAK IS UNTOUCHED BY A RELEASE (BI §1), so the release is pure upside**, and
+  Binding Oath and Communion ride it exactly as they ride any other release because it IS one.
+· **THE GATE IS GONE, AND REMOVING IT IS THE REPAIR RATHER THAN A LOOSENING.** CE refused the cast
+  once every peak stood at the floor — the right question about a card that raised a FLOOR and
+  meaningless about one that hands over stacks; it would have darkened the button in exactly the
+  late-fight state the card is now worth most in. A plain grant can only be a dud if nobody can
+  gain, and an ALLY never sits at the cap (reaching it releases them).
+· **`_raise_faith_peak` IS DELETED, NOT LEFT UNREACHABLE.** It was Elevation's write and its only
+  caller, so **NOTHING IN THE GAME RAISES `faith_peak` WITHOUT THE COUNT ANY MORE** — the peak
+  follows the count at the one ratchet in `_gain_faith`, which is the state BI §1 shipped. Its
+  ABSENCE is pinned in test_batch_bi where its presence used to be.
+· **CE'S SUITE ASSERTED ELEVATION DOES NOT GRANT FAITH. THAT ASSERTION IS INVERTED, NOT DELETED**,
+  and the setups are the ones CE built, because they are still what tells the two readings apart.
+**§2 — JUBILEE IS BLESSING OF THE FAITHFUL, AND IT NOW COSTS THE PEAK.** Spending his Faith **drops
+his high-water mark to match**. Everything else holds — all stacks spent, 6% max health and 3% max
+Mana per stack (Perfect: 8%), gated at 3 held, 20 Mana / 4cd — and it is **still not a release** (no
+principal growth, no Communion, no Binding Oath).
+· **THIS IS THE POINT OF THE CHANGE:** as CE shipped it he kept the peak, so the payout was FREE —
+  the count bought him nothing while he held it, so emptying it cost him nothing either. Now it is
+  burst sustain bought with permanent mitigation and damage for the rest of the fight.
+· **IT IS A DELIBERATE EXCEPTION TO BI §1 AND MUST NOT BE READ AS A REVERSAL OF IT.** BI's repair
+  was that a RELEASE must not silently cost held value; here the surrender is NAMED ON THE CARD and
+  paid once by one deliberate cast. `_gain_faith`'s release branch still leaves every peak standing.
+  **THIS IS THE ONLY SITE IN THE GAME THAT LOWERS A PEAK**, and test_batch_bi pins that too.
+  **CE'S NEGATIVE CONTROL ASSERTED THE PEAK DOES NOT DROP; IT IS INVERTED.**
+· **THE SPECIAL ID SURVIVES THE RENAME (`jubilee`)**, which is this project's convention for a
+  resolver-bearing identifier (BX renamed two talent nodes and kept their ids for the same reason):
+  the label is what moved, and a moved id is what silently breaks a saved kit.
+· **FLAGGED: the Devout's core already holds BLESSING OF ZEAL**, so his sheet carries two abilities
+  beginning "Blessing of…". Not a break (`pool_ability` is keyed on the WHOLE display name and the
+  two strings differ); it is the near-miss BR §1's sweep would ordinarily raise, and it was **NAMED
+  DELIBERATELY BY THE DESIGNER**. Recorded rather than silently accepted.
+**§3 — ANATHEMA IS BREAKING DARKNESS AND THE AMPLIFIER IS 25%, NOT 50%.** Ability, status id and
+display name all move. **Everything structural holds**: 25 Mana, 2.0, 4cd, one enemy, 20 Break
+damage, 3 turns (Perfect: 4), the cast's own Break lands BEFORE the mark so it cannot amplify
+itself, and the amplifier sits ABOVE the reducers so every defence still answers it. CE recorded 50
+as the number the designer trusted least in that batch and shipped it to be watched; **this is the
+answer to watching it.**
+· **THE STATUS ABBREVIATION IS `Dk!` AND MUST NOT BE `BD`.** "BD" is this game's shorthand for
+  BREAK DAMAGE in every log line and tooltip it has, so the one abbreviation the new name fits best
+  is the one it may not use. Both halves are pinned in test_batch_ce.
+**§3 — PENANCE IS A MIRROR.** For 3 turns (Perfect: 4) the enemy **takes shadow damage equal to 50%
+of the damage it DEALS**, whoever it hits. Cost and cooldown unchanged at 25 Mana / 4cd.
+· **IT NO LONGER READS THE TARGET'S `attack` STAT.** That property, and the snapshot rule that came
+  with it, go away — **NO ABILITY ANYWHERE READS AN ENEMY'S ATTACK NOW**, which is the state that
+  held before CE. `_penance_tick` no longer exists and the turn loop has nothing left for it.
+· **IT PAYS NOTHING AGAINST AN ENEMY THAT DOES NOT ATTACK** — stunned, charmed, frozen, holding
+  still. **THE GUARANTEED FLOOR IS GONE AND THAT IS ACCEPTED**; what it buys instead is that a blow
+  landing on the whole party bills the body that threw it.
+· **THE BOT'S MARK IS UNCHANGED and the rule SURVIVED the reshape rather than being re-derived**:
+  the HIGHEST-ATTACK enemy reflects the most because it deals the most.
+· **IT RIDES BL'S ONE DAMAGE DOOR (`_on_damage_taken`)**, which is what makes "whoever it hits" true
+  without a list of sources: a strike, its splash, an echo, a retaliation, a DoT tick and a reflect
+  all arrive there, and a damage source added later cannot forget to be mirrored. **IT SITS ABOVE
+  THAT FUNCTION'S HERO GATE**, exactly as Frostbind's mirror does — a Feint redirect, a Bewitch, a
+  Psychosis and a Hysteria all make its victim one of its OWN, so a mirror written below the gate
+  would silently do nothing on precisely the turns the Occultist engineered.
+· **IT READS THE DEALER (`_dmg_src`), NOT THE VICTIM**, and carries a re-entrancy lock
+  (`_penance_mirroring`) on Frostbind's pattern, because the mirror's own payment re-enters the
+  same door with the frame still naming the marked enemy. **SELF-INFLICTED IS EXCLUDED BY
+  IDENTITY** (`_dmg_src != victim`) — the same rule the recap's ledger uses fifteen lines down —
+  because recoil and Blood Price are damage a unit deals to ITSELF and "whoever it hits" means
+  somebody else.
+· It is shadow-typed (resists and weaknesses both read) and **credits the Occultist who set it**
+  through the `src_name` the status carries; a dead caster credits nobody and the penance goes on
+  being paid, which is honest rather than wrong. **NO `_on_enemy_death` CALL**, the consistency the
+  tick had before it — every non-strike damage site in this file reports the death and none fires
+  the on-death hooks.
+**§4 — DOCUMENTATION.** `docs/changelog.html`, this file and `docs/master.html` §6b carry the three
+renames and one replacement; **the count is unchanged at 102 of 120** and master.html is stamped
+Batch CG. **ONE GLOSSARY ENTRY CORRECTED TOWARD THE CODE (91 entries, unchanged): `mercy_window`
+named MATINS by name**, and a glossary that teaches a card nobody can draw is worse than one that
+omits it — it names Divine Presence and Vespers now, including the overflow into Alms and the
+crossing Vespers refuses.
+**VERIFIED, AND THE FLOOR IS THE ONE THE NEW CONVENTION SETS (see "Verify before shipping"):
+check_parse 0 · check_flow 0 · LIVE AUTOPLAY CLEAN, 0 SCRIPT ERROR across three full-kit smokes
+(Holy, Devout and Occultist parties, all nine cards granted).** No suite was written, no negative
+control run, no sweep and no measurement taken — **and none should be quoted from this batch.**
+**FIVE OF THE SIX CHANGED CARDS FIRE IN ORDINARY FIGHTS** — "Divine Presence — for 4 turns she
+gains 2 Mercy at the start of every second turn of hers on which nobody fell" followed by "the
+watch is broken — an ally fell, and the passive paid instead"; **"Vespers — the evening office
+catches 19 of the blow on Berserker"** followed by a Mercy line, which is the PARTIAL CATCH
+reading correctly (a blow bigger than the ward still crosses and still pays her); "Elevation — 4
+ally(s) gain 2 stacks of Faith" followed by two "Conviction: … Faith overflows" releases, which is
+§2's consequence in plain sight; "Breaking Darkness — Orc Chief takes +19 BD now, and every source
+of Break lands 25% harder on it" followed by "!! Orc Chief BREAKS"; and "Penance — for 3 turns Orc
+Raider takes shadow damage equal to 50% of the damage it deals, whoever it hits" followed by
+**"Penance: Orc Raider pays for the blow — 13 shadow damage"**.
+· **BLESSING OF THE FAITHFUL DID NOT FIRE IN A SMOKE, AND THAT IS THE GATE BEING RARE RATHER THAN
+  A GAP** — it needs the DEVOUT HIMSELF holding 3 Faith, and his own meter fills off a drip. The
+  suite drives it directly, which is where a rare branch belongs (the BB / BW precedent).
+· **ONE LOG-HONESTY FIX FOUND BY WATCHING THE SMOKE AND IT IS NOT A MECHANICAL FAULT** (BU's
+  Fortified Spirit shape, one tranche later): Vespers announced "(20% of HER maximum)" whoever cast
+  it, which `DOD_SIM_ABILITIES` makes visible by handing the card to a Pyromancer. It reads
+  "(20% of their own maximum)" now — true in every party.
+· **THE SMOKE'S OWN ARTEFACT, unchanged from CE**: `DOD_SIM_ABILITIES` hands every card to every
+  hero, so a Beastmaster names an enemy accursed and a Pyromancer says the evening office.
+  Unreachable in a real draft — and it is exactly what makes the "he holds no Mercy to keep the
+  watch for" line worth having.
+**THE DESIGNER HAD NO RUN IN FLIGHT and none was created** — no `run_save.bin` before or after —
+and **profile.json, relics.json AND trees.json are byte-identical by hash** across every gate,
+suite and smoke above.
+**THREE SUITES RE-POINTED IN PLACE, WITH THE REASON IN EACH FILE, AND THAT IS NOT AN EXCEPTION TO
+THE CONVENTION BUT THE OTHER HALF OF IT** — a check whose subject was renamed or deleted has
+stopped asking its question. **test_batch_ce 1063 -> 1087/0**: it carries the two inversions §2
+names plus the renames, and its Matins and Observance sections are REPLACED rather than dropped
+(one drives the new cadence AND the Alms overflow, the other drives Vespers and its no-Mercy
+clause). **test_batch_bi 91/0, count unmoved**: `_raise_faith_peak` is pinned ABSENT where it used
+to be pinned present, the assignment count goes back 2 -> 1, and a NEW pin says exactly one site
+LOWERS a peak. **test_batch_av 324/0, count unmoved**: the Sanctified caller count goes back
+4 -> 3 with Observance gone.
+· **ONE CHECK OF CE's WAS INVERTED RATHER THAN LOOSENED AND IT IS THE ONE WORTH NAMING: THE NAME
+  SWEEP.** CE's §4 asserted no talent NODE wears any of the nine names and reported the sweep clean;
+  CG's Divine Presence collides with `hl_presence`, so the sweep NAMES that one collision (and
+  asserts it is still there) while the other eight stay pinned clean — **a new collision cannot hide
+  behind the flagged one**, which is what deleting the check would have allowed.
+· **AND ONE OF THE NEW CHECKS TRIPPED ON THIS BATCH'S OWN TOMBSTONE, which is BS's rule arriving
+  again**: "the Empower buy-back is GONE" was written as a bare `contains("_observance_pay")` and
+  failed against CORRECT code, because the comment that tells the next author not to bring the
+  function back names it. It looks for the CALL form (`_observance_pay(`) now.
+**ALL SIXTEEN SUITES TOUCHED OR STAMP-MOVED READ GREEN AT THEIR CE-RECORDED COUNTS**: ah 5625,
+av 324, bb 175, bi 91, bn 80, bo 898, bp 271, bq 738, br 1441, bs 262, bt 457, bu 476, bv 893,
+bw 545, bx 141, cb 1163, cd 85 — **every one unmoved, and `ce` is the only count that moved**.
+**THE MASTER.HTML STAMP GATE IS DUPLICATED THIRTEEN TIMES, NOT FOURTEEN, AND CE'S OWN COUNT WAS
+WRONG — CORRECTED HERE RATHER THAN CARRIED FORWARD.** The thirteen are ah, bb, bn, bo, bp, bq, br,
+bs, bt, bu, bv, bw and bx, and **all thirteen move to Batch CG**. CE's block lists a fourteenth,
+`test_batch_cd` — but cd checks master.html's CONTENT (`102 of 120`, `96 spec`) and deliberately
+carries no stamp gate at all, which CD's own block says in as many words. **The count did not move
+at CE and it does not move here**, because CE and CG both check content instead; the honest fix —
+the newest suite being the only one that checks the stamp — is still not taken.
+
 BATCH CE (08-16) — TRANCHE 3, THE CLERIC NINE. **THE CLERIC IS THE SECOND CLASS COMPLETE.** Nine
 spec draft abilities, three per Cleric spec; the Cleric pools go 5 -> 8 and the draft goes 93 ->
 **102 of a target 120**. **CB'S ASYMMETRY IS HALF WHAT IT WAS**: the MAGE AND CLERIC six draft
@@ -1355,6 +1574,10 @@ five of them had been reading low for as long as twelve batches.**
 - **§3 — THE LETTER CC IS SPENT.** A batch document CC was authored (pixel art) and deliberately
   never run. **NOTHING OF IT IS IN THE REPO AND NOTHING OF IT WILL BE.** The gap between CB and CD
   is not a lost or failed batch, and there is nothing to look for.
+  · **AND THE LETTER CF IS SPENT THE SAME WAY (recorded at Batch CG §0).** A batch document CF
+    (the HUNTER NINE) was authored and deliberately never run; nothing of it is in the repo and
+    nothing of it will be. The gap between CE and CG is not a lost batch either.
+    **THE HUNTER THIRD OF TRANCHE 3 WILL LAND AS CH.**
 - **§4 — ONE FLAKE REPRODUCED AND THE BRIEF SAID IT WOULD NOT, WHICH IS THE MORE USEFUL RESULT.**
   §4 recorded both of CA's failures as clean on this commit and asked for them to be logged as
   NOT REPRODUCING. `test_rune_battle` is: **97/0 seven times.** **`test_batch_br` IS NOT — it

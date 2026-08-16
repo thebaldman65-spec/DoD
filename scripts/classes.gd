@@ -302,11 +302,12 @@ const SPEC_DRAFT_POOLS := {
 	# raise nothing, resolve nothing, and ship three cards no hero could ever be
 	# offered.
 	"holy": ["Second Wind", "Rite of Return", "Recant", "Shared Grief",
-		"Reprisal", "Matins", "Alms", "Observance"],
+		"Reprisal", "Divine Presence", "Alms", "Vespers"],
 	"inquisitor": ["Vow of Suffering", "Aegis Reversal", "Ordination",
-		"Fortified Spirit", "Reliquary", "Elevation", "Jubilee", "Mantle"],
+		"Fortified Spirit", "Reliquary", "Elevation",
+		"Blessing of the Faithful", "Mantle"],
 	"occultist": ["Blight the Well", "Covenant of Ash", "Suffering",
-		"Transference", "Anointing", "Anathema", "Requiem", "Penance"],
+		"Transference", "Anointing", "Breaking Darkness", "Requiem", "Penance"],
 	# HUNTER — FIVE APIECE SINCE BATCH BV (tranche 2's third third).
 	"beastmaster": ["Twin Hunt", "Call the Wilds", "Bloodbond", "Savage Sweep",
 		"Ghostpack"],
@@ -2408,20 +2409,42 @@ static func draft_ability(display_name: String) -> Ability:
 		# A fall breaks the watch and the passive pays instead; no fall and the
 		# watch pays. It can never double up and it can never be nothing on a
 		# quiet fight, which is the fight the passive leaves her empty in.
+		#
+		# BATCH CG §1 — IT PAYS IN TWOS, EVERY SECOND TURN, AND THE SHAPE IS THE
+		# POINT RATHER THAN THE RATE. Two Mercy arriving at once CAN OVERFLOW THE
+		# CAP, which is the first time two of her own draft cards feed each other:
+		# the spill lands in ALMS rather than being thrown away. A drip of one a
+		# turn could only ever reach the ceiling one stack at a time and had
+		# nothing to hand on.
+		#
+		# FLAGGED, NOT TUNED: 4 turns on a 4-turn cooldown is 100% UPTIME, where
+		# the 3-turn version ran at 75%. Left as the designer chose it; it is a
+		# playtest question rather than a batch's.
+		#
+		# FLAGGED — A LABEL COLLISION THIS BATCH CREATES, ON HER OWN SHEET.
+		# `hl_presence` is a HOLY TALENT NODE already named "Divine Presence"
+		# (Vigil row 2, the end-of-turn drip to the most wounded ally), so a
+		# player building Holy meets both names. Per BR §1 that is a LABEL
+		# collision and not a break — a node's name is not an ability name,
+		# nothing resolves it, and the two carry different fields
+		# (`divine_presence_pct` against this card's `divine_presence` special) —
+		# so it SHIPS AS SPECIFIED AND IS RECORDED. It is closer than BP's
+		# Precision Strike / Precision Strikes (same spec, and an exact match
+		# rather than a plural), and renaming either is one string.
 		# SYNERGY: HEAVENLY AURA (+12% healing per stack HELD) is what makes a
 		# stack worth carrying rather than spending, so a quiet fight becomes a
 		# throughput fight; ARDOR stops Empower consuming a stack at 3+, and
 		# three quiet turns is exactly what turns Ardor on; MARTYR'S VIGOR
 		# raises the ceiling this can climb to. Beside ALMS below it is the
 		# whole answer to the cap: one card fills the meter on the quiet turns
-		# and the other spends what will not fit.
-		"Matins":
-			return Ability.make({"display_name": "Matins",
+		# and the other catches what will not fit.
+		"Divine Presence":
+			return Ability.make({"display_name": "Divine Presence",
 				"dmg_type": "holy", "cost": 20, "damage": 0, "pressure": 0,
 				"delay": 2.0, "cooldown": 4, "anim": "attack03",
-				"special": "matins",
-				"perfect_id": "", "perfect_text": "The office is kept a fourth turn",
-				"description": "Keep the office: for 3 turns, gain 1\nMercy at the start of each of your\nturns on which NO ally fell below the\nwindow. A fall pays the passive\ninstead and breaks that turn's watch."})
+				"special": "divine_presence",
+				"perfect_id": "", "perfect_text": "Holds 6 turns instead of 4",
+				"description": "Keep the watch: for 4 turns, gain 2\nMercy at the start of every SECOND\nturn of yours on which NO ally fell\nbelow the window. A fall pays the\npassive instead and breaks that watch."})
 		# AXIS: the overflow. Mercy caps at 5 and a bad fight over-earns it; the
 		# excess is simply gone. This is the sixth stack going somewhere.
 		#
@@ -2445,51 +2468,44 @@ static func draft_ability(display_name: String) -> Ability:
 				"special": "alms",
 				"perfect_id": "", "perfect_text": "Holds 6 turns instead of 4",
 				"description": "Give away what will not fit: for 4\nturns, every stack of Mercy earned at\nthe CAP instead wards the ally who\nearned it, absorbing 12% of your\nmaximum health."})
-		# AXIS: the Empower tax. Every Empowered cast forfeits its perfect
-		# bonus — a permanent standing charge no card has ever engaged with.
-		# This is the surge AND the finesse, at a real price.
+		# AXIS: the crossing itself. Her engine is fuelled by allies falling
+		# below the window, and every other card of hers is about what to do
+		# once one has. This is the one that REFUSES the fall — and it is the
+		# only place in her pool where helping an ally starves her own engine.
 		#
-		# THE BRIEF'S PREMISE IS TRUE AS A RULE AND SMALLER IN PRACTICE THAN IT
-		# READS, AND THE ACCOUNTING GOES ON THE PAGE RATHER THAN STAYING IN A
-		# CONVERSATION (BS §3's habit). `_resolve_special` zeroes `is_perfect`
-		# for every Empowered cast, so the tax is real — but three of her five
-		# Empowerable casts wrote their two branches as
-		# `if empowered ... elif is_perfect`, WHICH COULD ONLY EVER BE AN `elif`
-		# BECAUSE THE TWO WERE UNREACHABLE TOGETHER. Splitting them is a
-		# behavioural no-op today and is what makes this card fire at all.
-		# WHAT IT IS ACTUALLY WORTH, MEASURED AGAINST THE LIVE KIT RATHER THAN
-		# ASSUMED (BQ's third rule):
-		#   · HEAL — the perfect's 5%-of-maximum self-heal, genuinely lost today.
-		#   · RENEWAL — the perfect's instant 5% heal. Already an independent
-		#     `if`, so this is the one cast where the tax was always payable.
-		#   · DIVINE PLEA — the perfect's 10 Mana.
-		#   · HYMN OF HOPE — NOTHING. Empowered is 35% and perfect 25%, so the
-		#     Empowered share is strictly bigger and the perfect adds no term.
-		#   · RESURRECTION — NOTHING, for the same reason (100% against 25%).
-		# THREE OF FIVE, REPORTED RATHER THAN PAPERED OVER WITH A NEW NUMBER:
-		# inventing a bonus for the two that supersede would be authoring a
-		# magnitude the brief did not ask for. IT IS THE CARD WHOSE VALUE THE
-		# DESIGNER SHOULD WATCH.
+		# THE LAST CLAUSE IS THE WHOLE CARD AND IS NOT AN EDGE CASE: IF THE ALLY
+		# DOES NOT CROSS, SHE EARNS NO MERCY FOR A CROSSING THAT NEVER HAPPENED.
+		# It is not a rule written anywhere — it falls out of the absorb landing
+		# ABOVE `_check_below_half`, so the generator simply never fires. The
+		# guard reads `mercy_threshold` rather than a literal half FOR THAT
+		# REASON: GUARDIAN ANGEL moves the Mercy line to 65%, and a ward reading
+		# a different line from the generator would make the trade it is sold on
+		# false in exactly the build that cares most.
 		#
-		# THE PRICE IS A SECOND STACK, PAID PER CAST, AND IT IS DELIBERATELY NOT
-		# WAIVED BY ANYTHING. Avatar of Mercy and Ardor both answer the ORDINARY
-		# surcharge; this is a separate charge on top, so a capstone build does
-		# not get the finesse free. SANCTIFIED may refund it, because Sanctified
-		# is the one roll every Mercy spend in the game already passes through
-		# and carving this one out would be a second answer to one question.
-		# IF SHE CANNOT PAY THE SECOND STACK THE CAST SIMPLY RESOLVES AS AN
-		# ORDINARY EMPOWER — no refusal, no wasted turn, and the tooltip says so.
-		# SYNERGY: SANCTIFIED (35% of spends cost nothing) is the build; ARDOR
-		# and AVATAR OF MERCY pay the first stack so this only ever costs the
-		# second; and it is worth most on the casts with the biggest perfects —
-		# an Empowered RESURRECTION at full health, an Empowered HYMN at 25%.
-		"Observance":
-			return Ability.make({"display_name": "Observance",
+		# ONE-SHOT, NOT A BUCKET. It waits until the blow arrives ("or until it
+		# fires"), so a fight in which nobody is threatened does not waste it —
+		# and one that never comes costs her only the turn.
+		# SYNERGY: GUARDIAN ANGEL widens the window it watches, so it catches
+		# the blow earlier and on more of the party's health bar; INTERCESSION
+		# and MARTYRDOM answer the LETHAL blow where this answers the one
+		# before it, so a party holding all three has three separate nets;
+		# UNWAVERING FAITH and any max-health node enlarge the absorb, which is
+		# a share of HER bulk rather than the ally's. The deliberate
+		# ANTI-SYNERGY is with her own engine — with ALMS and with DIVINE
+		# PRESENCE's overflow above, both of which want the crossings this
+		# refuses.
+		#
+		# BATCH CG §1 — IT REPLACES OBSERVANCE IN THIS SLOT, AND THE EMPOWER
+		# CARD IS GONE RATHER THAN RETIRED: the "an Empowered cast keeps its
+		# perfect bonus for a second Mercy" rule went with it, so an Empowered
+		# cast forfeits its perfect exactly as it did before Batch CE.
+		"Vespers":
+			return Ability.make({"display_name": "Vespers",
 				"dmg_type": "holy", "cost": 25, "damage": 0, "pressure": 0,
-				"delay": 2.0, "cooldown": 5, "anim": "attack03",
-				"special": "observance",
-				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
-				"description": "Keep the form exactly: for 3 turns an\nEmpowered cast KEEPS its perfect\nbonus — and costs 1 additional Mercy.\nWithout the second stack it is an\nordinary Empower."})
+				"delay": 2.0, "cooldown": 4, "anim": "attack03",
+				"special": "vespers", "target": Ability.Target.ALLY,
+				"perfect_id": "", "perfect_text": "Holds 6 turns instead of 4",
+				"description": "Say the evening office over them: for 4\nturns, or until it fires, the next blow\nthat would take that ally below half\nhealth is absorbed for 20% of YOUR\nmaximum. No crossing, no Mercy."})
 		# ----- DEVOUT: two cards against the asymmetry nobody had exploited,
 		# and one shield. FAITH IS PAID ON THE HIGHEST COUNT HELD THIS BATTLE
 		# (`faith_peak`, Batch BI), so an early spike is worth exactly as much
@@ -2498,29 +2514,36 @@ static func draft_ability(display_name: String) -> Ability:
 		# LET HIM BUY ONE. Second gap: his own Faith HOLDS and never releases
 		# (BH §2), so the release payout does not exist for him at all.
 		#
-		# AXIS: buying the peak outright. It writes `faith_peak` and NOT
-		# `faith_stacks`, which is what makes it a spike rather than a second
-		# Ordination: nobody holds another stack, nobody is walked toward a
-		# release, and the party is paid all fight for a count it never carried.
+		# AXIS: buying the meter outright. Both of his builders are slow drips —
+		# 2 a shielded hit, 1 an ally turn on the ground — and nothing in the
+		# game let him hand a stack over. This is a whole party's worth at once.
 		#
-		# TO AT LEAST 3, NOT BY 3, AND THAT IS THE GOVERNOR. A card that ADDED
-		# peak would run every ally to the ceiling in a long fight for nothing;
-		# a card that raises the FLOOR is worth most on turn one and worth
-		# nothing once the grind has passed it — which is exactly the shape a
-		# card selling "early" should have. It can never lower a peak (the write
-		# is a ratchet, the same `maxi` `_gain_faith` uses) and never exceed 5.
+		# BATCH CG §2 — IT GRANTS REAL FAITH NOW, NOT A HIGH-WATER MARK. The
+		# peak-floor version wrote `faith_peak` and never `faith_stacks`, so the
+		# party was paid for a count it never carried and nobody was ever walked
+		# toward a release. Two stacks on the bar go through `_gain_faith`, THE
+		# ONE DOOR, which is what makes the consequence below real rather than
+		# guarded against.
+		#
+		# AN ALLY ALREADY HOLDING 3 OR MORE REACHES THE CAP AND RELEASES —
+		# healed 15% of maximum, the count reset, the Devout paid 3% of his
+		# Mana. THAT IS CORRECT AND INTENDED rather than an edge case to gate
+		# out: the peak is untouched by a release (BI §1), so a release costs
+		# the ally nothing it was holding and the card is pure upside on a
+		# party that has been building.
 		# SYNERGY: APOSTLE and FERVOR are multipliers on the held half, so both
-		# multiply everything this buys — at x3 a peak of 3 is 18% mitigation
-		# and +13.5% damage on every ally from turn one. RELIQUARY reads the
-		# very peaks this raises and pays 2.5% of his maximum per point of them.
-		# UNWAVERING FAITH enlarges the figure both of those are shares of.
+		# multiply everything this buys; RELIQUARY reads the peaks these stacks
+		# ratchet on their way up and pays 2.5% of his maximum per point;
+		# UNWAVERING FAITH enlarges the figure both of those are shares of; and
+		# BINDING OATH swears him a stack of his own on every release this
+		# triggers, so a party at three turns one cast into four payouts.
 		"Elevation":
 			return Ability.make({"display_name": "Elevation",
-				"dmg_type": "holy", "cost": 30, "damage": 0, "pressure": 0,
+				"dmg_type": "holy", "cost": 35, "damage": 0, "pressure": 0,
 				"delay": 2.5, "cooldown": 5, "anim": "attack03",
 				"special": "elevation",
-				"perfect_id": "", "perfect_text": "Raises every peak to 4 instead of 3",
-				"description": "Raise them up: every ally's PEAK Faith\nthis battle rises to at least 3.\nThey hold no extra stacks — they are\npaid as though they had carried them,\nfor the rest of the fight."})
+				"perfect_id": "", "perfect_text": "3 stacks to every ally instead of 2",
+				"description": "Raise them up: every ally gains 2\nstacks of Faith.\nAn ally already holding 3 crosses the\ncap and RELEASES on the spot — and\ntheir peak does not fall for it."})
 		# AXIS: the payout that does not exist for him. An ally's fifth stack
 		# heals them 15% and hands him Mana; HIS count holds at five and never
 		# releases, so his Faith pools and buys him nothing beyond the peak it
@@ -2533,22 +2556,36 @@ static func draft_ability(display_name: String) -> Ability:
 		# payout at its own site: no `_conviction_growth`, no Communion roll, no
 		# Binding Oath, and it does NOT go through `_gain_faith`.
 		#
-		# GATED AT THREE, AND THE GATE IS WHAT STOPS IT BEING A SPAM HEAL. His
-		# peak does not fall when the count empties, so the count is the only
-		# thing this costs — and at a floor of three it is a real accumulation
-		# rather than a button he presses every time one stack arrives.
+		# GATED AT THREE, AND THE GATE IS WHAT STOPS IT BEING A SPAM HEAL.
+		#
+		# BATCH CG §2 — AND IT NOW COSTS THE PEAK. Spending his Faith DROPS HIS
+		# HIGH-WATER MARK TO MATCH, which is the point of the change: as CE
+		# shipped it he kept the peak, so the payout was free and the only thing
+		# the card ever cost was a count that bought him nothing anyway. Now it
+		# is burst sustain bought with permanent mitigation and damage for the
+		# rest of the fight — 2% mitigation and +1.5% damage a point, multiplied
+		# by Apostle and Fervor, surrendered on the spot.
+		#
+		# THIS IS A DELIBERATE EXCEPTION TO BI §1 AND MUST NOT BE READ AS A
+		# REVERSAL OF IT. BI's repair was that HELD VALUE MUST NOT BE COUPLED TO
+		# SPEND FREQUENCY — that the meter emptying must not silently cost the
+		# mitigation. Here the surrender IS the price, it is named on the card,
+		# and it is paid once by one cast rather than by every release in the
+		# fight. The passive still never lowers a peak; this one ability does,
+		# at its own site.
 		# SYNERGY: BINDING OATH swears him a stack every time an ALLY releases,
-		# so a party that is releasing is a party refilling this; CONSECRATED
-		# GROUND drips onto its own caster, which is his other refill; and
-		# UNWAVERING FAITH (+20% his maximum) makes every point of the heal
-		# larger, because all of it is a share of his own bulk.
-		"Jubilee":
-			return Ability.make({"display_name": "Jubilee",
+		# so a party that is releasing is a party rebuilding both the count and
+		# the peak this spends; CONSECRATED GROUND drips onto its own caster,
+		# which is his other refill; and UNWAVERING FAITH (+20% his maximum)
+		# makes every point of the heal larger, because all of it is a share of
+		# his own bulk.
+		"Blessing of the Faithful":
+			return Ability.make({"display_name": "Blessing of the Faithful",
 				"dmg_type": "holy", "cost": 20, "damage": 0, "pressure": 0,
 				"delay": 2.0, "cooldown": 4, "anim": "attack02",
 				"special": "jubilee",
 				"perfect_id": "", "perfect_text": "8% health per stack instead of 6%",
-				"description": "The year of release: spend ALL your\nown Faith — 6% of your maximum health\nand 3% of maximum Mana per stack.\nNeeds 3 held. Your PEAK does not fall,\nso the mitigation it bought stays."})
+				"description": "Spend ALL your own Faith — 6% of your\nmaximum health and 3% of maximum Mana\nper stack. Needs 3 held.\nYour PEAK DROPS TO MATCH: the\nmitigation it bought is spent with it."})
 		# AXIS: the absorb, which BI §2 measured as the DRY source of the whole
 		# engine — 1.5 absorbed hits a battle, against the ground's 9.1 Faith.
 		# Conviction builds ONLY on Divine Shield absorbs, so a shield that
@@ -2596,13 +2633,18 @@ static func draft_ability(display_name: String) -> Ability:
 		# (+% Break dealt) and ENTROPY (Ruin bearers take Break at their own turn
 		# start) both feed the meter this multiplies, and BEWITCH, MIND FLAY and
 		# MASS HYSTERIA are what the open gate is FOR.
-		"Anathema":
-			return Ability.make({"display_name": "Anathema",
+		#
+		# BATCH CG §3 — THE AMPLIFIER IS 25%, NOT 50%, and everything structural
+		# holds: the cast's own Break still lands BEFORE the mark so the card
+		# cannot amplify itself, and the amplifier still sits ABOVE the reducers
+		# so every defence in the game still answers it.
+		"Breaking Darkness":
+			return Ability.make({"display_name": "Breaking Darkness",
 				"dmg_type": "shadow", "cost": 25, "damage": 0, "pressure": 20,
 				"delay": 2.0, "cooldown": 4, "anim": "attack02",
-				"special": "anathema",
+				"special": "breaking_darkness",
 				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
-				"description": "Name it accursed: 20 Break damage, and\nfor 3 turns EVERY source of Break\ndamage lands on it 50% harder.\nBreak is what opens the madness a boss\nwould otherwise refuse."})
+				"description": "Break the dark over it: 20 Break\ndamage, and for 3 turns EVERY source\nof Break damage lands on it 25%\nharder. Break is what opens the madness\na boss would otherwise refuse."})
 		# AXIS: the detonation cadence, and the lever nothing pulls. Ruin
 		# detonates on every TENTH stack and the stacks SURVIVE the blast, so a
 		# deep mark is an accumulation the game never lets him cash. This trades
@@ -2641,27 +2683,33 @@ static func draft_ability(display_name: String) -> Ability:
 		# the one that still works in the trash fight that ends on round seven,
 		# which is precisely where AX measured 0.00 detonations a battle.
 		#
-		# IT READS THE TARGET'S OWN ATTACK, WHICH NOTHING ELSE IN THE GAME DOES.
-		# Powershot reads the target's Break meter and Corrupted Channeling reads
-		# a blow that landed; no ability anywhere reads the enemy's `attack`
-		# stat. The mightier it is, the worse it suffers — which is corruption's
-		# own argument and, usefully, points him at the body worth killing.
+		# BATCH CG §3 — IT IS A MIRROR NOW, NOT A TICK. For its duration the
+		# enemy takes shadow damage equal to 50% OF THE DAMAGE IT DEALS, whoever
+		# it hits — so its own violence is what bills it rather than a number
+		# read off its sheet at the moment it was named.
 		#
-		# THE TICK IS SNAPSHOTTED AT APPLICATION, the same rule every DoT in the
-		# game follows (burn and poison both snapshot the applier's Attack), so a
-		# Sundered or Crippled enemy suffers what it was worth when it was named.
+		# THREE CONSEQUENCES, ALL DELIBERATE:
+		#   · IT NO LONGER READS THE TARGET'S `attack` STAT. That property, and
+		#     the snapshot rule that came with it, go away — no ability anywhere
+		#     reads an enemy's Attack now, and none did before Batch CE.
+		#   · IT PAYS NOTHING AGAINST AN ENEMY THAT DOES NOT ATTACK — stunned,
+		#     charmed, frozen, holding still. The guaranteed floor a snapshotted
+		#     tick gave it is gone. ACCEPTED: what it buys instead is that a
+		#     blow which lands on the whole party bills the body that threw it.
+		#   · THE BOT'S MARK IS UNCHANGED and still right: the HIGHEST-ATTACK
+		#     enemy reflects the most, because it is the one that deals the most.
 		# SYNERGY: BLIGHT THE WELL is the other card of his that spends a turn
 		# doing nothing visible and pays over the following ones, and both want
-		# the same body; DECAY and ENTROPY grind the same enemy's clock, so a
-		# turn start becomes three separate bills; and it is the card to hold
-		# when ANATHEMA has already named the target the party is grinding.
+		# the same body; DECAY and ENTROPY grind the same enemy's clock; and it
+		# is the card to hold when BREAKING DARKNESS has already named the
+		# target the party is grinding.
 		"Penance":
 			return Ability.make({"display_name": "Penance",
 				"dmg_type": "shadow", "cost": 25, "damage": 0, "pressure": 0,
 				"delay": 2.5, "cooldown": 4, "anim": "attack03",
 				"special": "penance",
 				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
-				"description": "Set the penance: for 3 turns, at the\nstart of each of its turns that enemy\ntakes shadow damage equal to 20% of\nITS OWN Attack. The mightier it is,\nthe more it pays."})
+				"description": "Set the penance: for 3 turns that enemy\ntakes shadow damage equal to 50% of\nthe damage it deals, whoever it hits.\nAn enemy that never swings never pays."})
 	return null
 
 

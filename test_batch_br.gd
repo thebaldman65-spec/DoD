@@ -1216,7 +1216,7 @@ func _live_hits_not_casts() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	ok(master.contains("Batch CE"), "§5: master.html is stamped Batch CE")
+	ok(master.contains("Batch CG"), "§5: master.html is stamped Batch CG")
 	for cls in TRANCHE_4:
 		for nm in TRANCHE_4[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)

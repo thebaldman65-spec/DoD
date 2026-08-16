@@ -4,6 +4,45 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A payout that costs nothing is not a trade (Batch CG) — 2026-08-16
+
+Two of this batch's seven changes are the same correction made twice, and the shape is worth
+keeping separately from either card.
+
+**Jubilee spent all of the Devout's Faith and left his high-water mark standing.** That reads
+generous and was, on inspection, hollow: since Batch BI the peak is the thing his stacks are
+actually paying him for, so a spend that emptied the count and kept the peak cost him *nothing he
+was using*. The card was a free heal with a three-stack entry fee. Making the peak fall with the
+count is what turns it into a decision — burst sustain bought with permanent mitigation — and it
+is the second card in a row whose repair was to give it a price rather than to change its
+numbers.
+
+**Elevation was the same fault from the other side.** It wrote the peak and never the count, so
+the party was paid all fight for Faith it never carried, nobody was ever walked toward a release,
+and the card could not interact with the release engine it sat next to. Handing over real stacks
+costs it the "free" property and buys it every consequence of a Faith gain for nothing — the
+release, the heal, Binding Oath, Communion — because it now goes through the one door instead of
+around it.
+
+**The general rule: an ability that writes a DERIVED quantity instead of the real one is usually
+avoiding a cost, and the cost is usually what would have made it interesting.** BI built
+`faith_peak` precisely so that held value and spend frequency could stop fighting, and the first
+two cards to touch it both reached for the derived half because it had no downside attached. That
+is not an argument against derived quantities; it is an argument for asking, of any card that
+names one, what the card would look like if it had to use the meter itself.
+
+**One deliberate exception is recorded with it, so it does not read as a reversal.** BI's rule is
+that a RELEASE must not silently cost held value — that the meter emptying must not delete the
+mitigation. Blessing of the Faithful lowers the peak anyway, and that is legitimate because the
+surrender is *named on the card* and paid once by a deliberate cast, not levied on every release
+in the fight. The distinction that matters is not whether a peak can fall; it is whether the
+player chose it.
+
+**And a smaller one, about deleting a card rather than retiring it.** Observance is gone entirely
+— function, status, constant — rather than left dormant behind a flag. The reason is the one this
+file keeps recording under other names: a half-removed rule is an invitation, and the next author
+to find `_observance_pay` returning false would reasonably conclude it was waiting for something.
+
 ## An `elif` is a rule until something makes the pair reachable (Batch CE) — 2026-08-16
 
 Observance is a card that lets an Empowered cast keep its perfect bonus for a second Mercy. The

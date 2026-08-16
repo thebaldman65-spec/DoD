@@ -59,11 +59,18 @@ const REAL_SAVE := "user://run_save.bin"
 # Mirrored from battle.gd so each check states what it depends on rather than
 # hiding it inside a magic number.
 const ALMS_WARD_PCT_TEST := 12
-const ELEVATION_FLOOR_TEST := 3
-const JUBILEE_MIN_FAITH_TEST := 3
 const MANTLE_HOPS_TEST := 2
-const ANATHEMA_BD_PCT_TEST := 50
-const PENANCE_SHARE_TEST := 0.20
+const JUBILEE_MIN_FAITH_TEST := 3
+# RE-POINTED BY BATCH CG. Four of CE's magnitudes moved and one arrived; the
+# figures are transcribed here rather than read off the constants they check,
+# for the same reason CE transcribed them — a check that reads the number it is
+# checking has stopped asking its question.
+const DIVINE_PRESENCE_MERCY_TEST := 2
+const DIVINE_PRESENCE_EVERY_TEST := 2
+const VESPERS_PCT_TEST := 0.20
+const ELEVATION_STACKS_TEST := 2
+const BREAKING_DARKNESS_BD_PCT_TEST := 25
+const PENANCE_MIRROR_TEST := 0.50
 
 var checks := 0
 var fails: Array = []
@@ -73,15 +80,15 @@ var _had_save := false
 # The nine, transcribed once: name -> [spec, cost, delay, cooldown, break].
 # This table is the machine-checkable half of "the batch shipped what it said".
 const NINE := {
-	"Matins":     ["holy", 20, 2.0, 4, 0],
-	"Alms":       ["holy", 20, 2.0, 4, 0],
-	"Observance": ["holy", 25, 2.0, 5, 0],
-	"Elevation":  ["inquisitor", 30, 2.5, 5, 0],
-	"Jubilee":    ["inquisitor", 20, 2.0, 4, 0],
-	"Mantle":     ["inquisitor", 25, 2.5, 4, 0],
-	"Anathema":   ["occultist", 25, 2.0, 4, 20],
-	"Requiem":    ["occultist", 30, 3.0, 5, 8],
-	"Penance":    ["occultist", 25, 2.5, 4, 0],
+	"Divine Presence": ["holy", 20, 2.0, 4, 0],
+	"Alms":            ["holy", 20, 2.0, 4, 0],
+	"Vespers":         ["holy", 25, 2.0, 4, 0],
+	"Elevation":       ["inquisitor", 35, 2.5, 5, 0],
+	"Blessing of the Faithful": ["inquisitor", 20, 2.0, 4, 0],
+	"Mantle":          ["inquisitor", 25, 2.5, 4, 0],
+	"Breaking Darkness": ["occultist", 25, 2.0, 4, 20],
+	"Requiem":         ["occultist", 30, 3.0, 5, 8],
+	"Penance":         ["occultist", 25, 2.5, 4, 0],
 }
 
 # THE DEVOUT'S POOL KEY IS `inquisitor` AND NOT `devout`, and it is pinned here
@@ -121,13 +128,13 @@ func _run() -> void:
 	_empower_split()
 	_docs()
 
-	await _live_matins()
+	await _live_divine_presence()
 	await _live_alms()
-	await _live_observance()
+	await _live_vespers()
 	await _live_elevation()
-	await _live_jubilee()
+	await _live_blessing_of_the_faithful()
 	await _live_mantle()
-	await _live_anathema()
+	await _live_breaking_darkness()
 	await _live_requiem()
 	await _live_penance()
 
@@ -157,7 +164,7 @@ func _pool_key() -> void:
 		"§0: ...and NOT `devout` — a `devout` key would resolve nothing")
 	ok(String(Classes.SPEC_INFO[DEVOUT_KEY]["name"]) == "Devout",
 		"§0: ...while SPEC_INFO['inquisitor'] still DISPLAYS 'Devout'")
-	for n in ["Elevation", "Jubilee", "Mantle"]:
+	for n in ["Elevation", "Blessing of the Faithful", "Mantle"]:
 		ok(Classes.spec_draft_pool(DEVOUT_KEY).has(n),
 			"§0: %s landed in the `inquisitor` pool where a hero can draw it" % n)
 
@@ -260,7 +267,8 @@ func _definitions() -> void:
 	# BREAK DAMAGE ASSIGNED DELIBERATELY (the BO rule): TWO of the nine carry it
 	# and SEVEN do not, and each of the seven is a decision rather than an
 	# oversight — six of them land no blow at all, and PENANCE's damage arrives
-	# as a tick on the enemy's own clock, where Break has nothing to ride.
+	# as a MIRROR off the enemy's own blows (Batch CG §3), where Break has
+	# nothing to ride.
 	var with_bd := 0
 	for n in NINE:
 		if int(NINE[n][4]) > 0:
@@ -274,7 +282,13 @@ func _definitions() -> void:
 	# The two ally-facing cards are the only ones that name a target.
 	ok(Classes.pool_ability("Mantle").target == Ability.Target.ALLY,
 		"Mantle is ally-facing")
-	for n in ["Matins", "Alms", "Observance", "Elevation", "Jubilee"]:
+	# BATCH CG — VESPERS IS THE POOL'S SECOND ALLY-FACING CARD (it took
+	# Observance's slot, and Observance was a self-cast), so it moves up beside
+	# Mantle and leaves four names here.
+	ok(Classes.pool_ability("Vespers").target == Ability.Target.ALLY,
+		"Vespers is ally-facing")
+	for n in ["Divine Presence", "Alms", "Elevation",
+			"Blessing of the Faithful"]:
 		ok(Classes.pool_ability(n).target == Ability.Target.ENEMY,
 			"%s takes no ally click — it is a self/party effect" % n)
 
@@ -329,14 +343,27 @@ func _names() -> void:
 		ok(Talents.granted_ability(n) == null,
 			"no talent grants an ability called %s" % n)
 	# And no talent NODE, status or rune wears the name either. A node's name is
-	# not an ability name and nothing resolves it, so a hit here would ship
-	# FLAGGED rather than renamed — but there is nothing to flag.
+	# not an ability name and nothing resolves it, so a hit here ships FLAGGED
+	# rather than renamed (BR §1).
+	#
+	# BATCH CG SHIPPED EXACTLY ONE, AND THE PIN IS INVERTED FOR IT RATHER THAN
+	# LOOSENED. `hl_presence` is a HOLY TALENT NODE already named DIVINE
+	# PRESENCE (Vigil row 2), so the collision is same-spec and an exact match —
+	# closer than BP's Precision Strike / Precision Strikes. It is NAMED here so
+	# the sweep still reports it every run instead of falling silent, and the
+	# other eight are asserted clean, so a NEW collision cannot hide behind it.
+	const FLAGGED_NODE_COLLISIONS := {"Divine Presence": "hl_presence"}
 	var node_names := {}
 	for spec in Classes.SPEC_IDS:
 		for sp in Classes.SPEC_IDS[spec]:
 			for node in Talents.generate_tree(String(sp), String(spec)):
 				node_names[String(node.get("name", ""))] = 1
 	for n in NINE:
+		if FLAGGED_NODE_COLLISIONS.has(n):
+			ok(node_names.has(n),
+				"%s collides with the talent node %s — FLAGGED, shipped as specified"
+					% [n, String(FLAGGED_NODE_COLLISIONS[n])])
+			continue
 		ok(not node_names.has(n), "no talent NODE is called %s" % n)
 	var runes_src := _src("res://data/runes.json")
 	for n in NINE:
@@ -351,21 +378,26 @@ func _status_lists() -> void:
 	# half that actually matters, keeps them OUT of the derived
 	# `_dispellable_buffs` set, so a Mage's Dispel can never strip the party's
 	# work off the enemy carrying it.
-	for sid in ["anathema", "penance"]:
+	for sid in ["breaking_darkness", "penance"]:
 		ok(BattleUnit.DEBUFF_IDS.has(sid),
 			"`%s` sits on an ENEMY and is listed in DEBUFF_IDS" % sid)
 	# THE OTHER THREE SIT ON HOLY and are correctly absent — a hero-side buff in
 	# that list would be a hero-side buff a Cleansing Rite could take.
-	for sid in ["matins", "alms", "observance"]:
+	# BATCH CG — `vespers` REPLACES `observance` HERE AND THE RULE IS THE SAME
+	# ONE ASKED OF A NEW SHAPE: it is a BUFF, and it is the first of the three
+	# that sits on an ALLY rather than on Holy herself, so a listing would have
+	# made a ward a Cleansing Rite could take off the party.
+	for sid in ["divine_presence", "alms", "vespers"]:
 		ok(not BattleUnit.DEBUFF_IDS.has(sid),
-			"`%s` sits on HOLY and is NOT in DEBUFF_IDS" % sid)
+			"`%s` is the party's and is NOT in DEBUFF_IDS" % sid)
 	# MANTLE HAS NO STATUS ID OF ITS OWN, deliberately: it rides the existing
 	# `barrier`, which is what makes every hop a REAL Divine Shield for
 	# Conviction rather than a private ward that builds no Faith.
 	var bsrc := _src("res://scripts/battle.gd")
 	ok(not bsrc.contains('"mantle": ['),
 		"Mantle registers no status of its own — it rides `barrier`")
-	for sid in ["matins", "alms", "observance", "anathema", "penance"]:
+	for sid in ["divine_presence", "alms", "vespers", "breaking_darkness",
+			"penance"]:
 		ok(bsrc.contains('"%s": [' % sid), "`%s` has a STATUS_INFO row" % sid)
 
 
@@ -417,16 +449,28 @@ func _empower_split() -> void:
 		ok(perfect_at > 0 and emp_at > 0,
 			"the Hymn sets both shares independently")
 		ok(perfect_at < emp_at,
-			"...with the bigger Empowered share written LAST, so Observance can never downgrade it")
-	ok(src.contains("_observance_pay(attacker)"),
-		"the Empower's perfect is decided at ONE site")
+			"...with the bigger Empowered share written LAST, so a paid Empower can never be downgraded")
+	# BATCH CG §1 — OBSERVANCE IS DELETED AND THE PIN IS INVERTED RATHER THAN
+	# REMOVED. CE's check asked that the Empower's perfect be decided at ONE
+	# site (`_observance_pay`); what is worth asking now is that NOTHING can
+	# buy the perfect back, so the tax is unconditional again. The Hymn's
+	# ordering above stays pinned regardless — it costs nothing and it is the
+	# half of CE's reasoning that was about the Hymn rather than the card.
+	# THE CALL FORM, NOT THE NAME. This batch's own tombstone comment names the
+	# deleted function on purpose — a bare `contains` would fail against correct
+	# code and invite the next author to delete the line telling them not to
+	# bring it back (BS's rule, CD's `_code_only` for the same reason).
+	ok(not src.contains("_observance_pay("),
+		"the Empower buy-back is GONE from battle.gd, not left dormant")
+	ok(src.contains("var empowered := _consume_empower(attacker, ab)\n\tif empowered:\n\t\tis_perfect = false"),
+		"...so an Empowered cast forfeits its perfect unconditionally again")
 
 
 func _docs() -> void:
 	var doc := _src("res://docs/master.html")
 	ok(doc != "", "master.html is readable")
-	ok(doc.contains("Last updated: 2026-08-16 (Batch CE)"),
-		"master.html carries this batch's stamp")
+	ok(doc.contains("Last updated: 2026-08-16 (Batch CG)"),
+		"master.html carries the LIVE stamp")
 	ok(doc.contains("102 of 120") or doc.contains("102 of a target 120"),
 		"master.html states the LIVE draft count against the REAL target")
 	for n in NINE:
@@ -435,6 +479,7 @@ func _docs() -> void:
 		"...and the table still PRINTS 'Devout' for the `inquisitor` pool")
 	var cm := _src("res://CLAUDE.md")
 	ok(cm.contains("BATCH CE"), "CLAUDE.md carries the batch block")
+	ok(cm.contains("BATCH CG"), "...and CG's, which revised it")
 	ok(cm.contains("SECOND CLASS COMPLETE") or cm.contains("second complete class")
 		or cm.contains("SECOND COMPLETE CLASS"),
 		"...and records that the Cleric is the second class complete")
@@ -442,7 +487,14 @@ func _docs() -> void:
 	ok(notes.contains("Batch CE"), "design-notes.md carries a why entry")
 	var gl := _src("res://data/glossary.json")
 	ok(gl.contains("mercy_window"),
-		"the glossary teaches the Mercy window a player meets in Matins and Alms")
+		"the glossary teaches the Mercy window a player meets in these cards")
+	# BATCH CG — THE ENTRY NAMED MATINS BY NAME AND MATINS NO LONGER EXISTS. A
+	# glossary that teaches a card nobody can draw is worse than one that omits
+	# it, so the pin follows the rename rather than being dropped.
+	ok(not gl.contains("Matins") and not gl.contains("Observance"),
+		"...and names no card CG deleted or renamed")
+	ok(gl.contains("DIVINE PRESENCE"),
+		"...naming the live card instead")
 	ok(gl.contains("GUARDIAN ANGEL WIDENS THAT WINDOW"),
 		"...including that the line moves")
 	# THE ENTRY IS THE ONLY ONE ADDED. CB added one for the same reason: the
@@ -496,8 +548,8 @@ func _spawn(spec: String, lineup := ["raider", "raider", "archer"]) -> Node:
 	# SceneTreeTimer, and its opening block runs `_reset_faith_meters()` — which
 	# zeroes every Faith count AND peak. Setting Faith after twenty frames and
 	# then awaiting a cast has the values wiped out from under it, and it reads
-	# as a magnitude bug: Elevation's untouched-peak check came back 3 instead
-	# of 4 and Jubilee's ratio read 61 instead of 1.67.
+	# as a magnitude bug: Elevation's peak check came back 3 instead of 4 and
+	# Blessing of the Faithful's ratio read 61 instead of 1.67.
 	# `Engine.time_scale` scales those timers and NOTHING the battle computes.
 	Engine.time_scale = 50.0
 	for _i in 90:
@@ -530,7 +582,12 @@ func _allies(scene: Node, except: BattleUnit) -> Array:
 
 # ---------- HOLY ----------
 
-func _live_matins() -> void:
+func _live_divine_presence() -> void:
+	# RE-POINTED BY BATCH CG §1 — Matins is DIVINE PRESENCE, it pays TWO Mercy on
+	# every SECOND turn of hers, and it holds four turns. THE WATCH CONDITION IS
+	# UNCHANGED and is still driven three ways (unbroken, straight after a fall,
+	# again the turn after), because a no-flag version fails the second and a
+	# LATCHING one fails the third.
 	var scene := await _spawn("holy")
 	var holy := _cleric(scene, "mercy")
 	ok(holy != null, "Holy spawned")
@@ -541,36 +598,69 @@ func _live_matins() -> void:
 	var ally: BattleUnit = _allies(scene, holy)[0]
 	holy.grace_pct = 0
 	holy.second_resource = 0
-	# A TICK WITH NO OFFICE PAYS NOTHING — the control that stops every check
+	holy.remove_status("alms")
+	# A TICK WITH NO WATCH PAYS NOTHING — the control that stops every check
 	# below passing off a card that simply grants Mercy every turn.
-	scene.call("_matins_tick", holy)
-	ok(holy.second_resource == 0, "no office, no Mercy (%d)" % holy.second_resource)
-	scene.call("_apply_status", holy, "matins", 9)
-	# 1) AN UNBROKEN WATCH PAYS.
-	scene.call("_matins_tick", holy)
-	ok(holy.second_resource == 1,
-		"an unbroken office pays 1 Mercy (%d)" % holy.second_resource)
+	scene.call("_divine_presence_tick", holy)
+	ok(holy.second_resource == 0, "no watch, no Mercy (%d)" % holy.second_resource)
+	scene.call("_apply_status", holy, "divine_presence", 9)
+	# 1) THE CADENCE, AND IT IS THE DISCRIMINATING CHECK. Her FIRST turn under
+	# the watch pays nothing; her SECOND pays two. A per-turn implementation
+	# passes every other check in this function and fails this one twice.
+	scene.call("_divine_presence_tick", holy)
+	ok(holy.second_resource == 0,
+		"the first turn of the watch pays NOTHING (%d)" % holy.second_resource)
+	scene.call("_divine_presence_tick", holy)
+	ok(holy.second_resource == DIVINE_PRESENCE_MERCY_TEST,
+		"the second turn pays %d Mercy at once (%d)"
+			% [DIVINE_PRESENCE_MERCY_TEST, holy.second_resource])
 	# 2) A FALL BREAKS THAT TURN'S WATCH — and the passive pays instead, which
-	# is the property that makes the two sources mutually exclusive.
+	# is the property that makes the two sources mutually exclusive. The fall is
+	# staged so the broken turn is a PAYOUT turn; a fall on an idle turn could
+	# never discriminate.
+	holy.second_resource = 0
+	scene.call("_divine_presence_tick", holy)  # idle turn (3rd)
 	ally.hp = int(ally.max_hp * 0.4)
 	scene.call("_on_hero_below_half", ally)
-	ok(holy.second_resource == 2, "the PASSIVE paid for the fall (%d)"
+	ok(holy.second_resource == 1, "the PASSIVE paid for the fall (%d)"
 		% holy.second_resource)
 	var after_fall: int = holy.second_resource
-	scene.call("_matins_tick", holy)
+	scene.call("_divine_presence_tick", holy)  # payout turn (4th), broken
 	ok(holy.second_resource == after_fall,
 		"...and the broken watch pays NOTHING that turn (%d)" % holy.second_resource)
 	# 3) AND ONLY THAT TURN. A latching implementation fails here and passes
-	# everything above it.
-	scene.call("_matins_tick", holy)
-	ok(holy.second_resource == after_fall + 1,
-		"the office is kept again the next turn (%d)" % holy.second_resource)
-	# At the cap it pays nothing and says so — ALMS is the card that answers
-	# that, and this must not become a second spill site.
-	holy.second_resource = holy.second_max
-	scene.call("_matins_tick", holy)
+	# everything above it. Two ticks, because the next payout is two turns on.
+	scene.call("_divine_presence_tick", holy)
+	scene.call("_divine_presence_tick", holy)
+	ok(holy.second_resource == after_fall + DIVINE_PRESENCE_MERCY_TEST,
+		"the watch is kept again at the next payout (%d)" % holy.second_resource)
+	# 4) THE OVERFLOW, WHICH IS WHY IT PAYS IN TWOS. Two stacks arriving at once
+	# can cross the ceiling FROM BELOW, and Alms catches what will not fit —
+	# the first time two of her own draft cards feed each other. Driven from one
+	# short of the cap, so exactly one stack lands and exactly one spills.
+	holy.second_resource = holy.second_max - 1
+	scene.call("_apply_status", holy, "alms", 9, ALMS_WARD_PCT_TEST)
+	ally.remove_status("barrier")
+	ally.hp = ally.max_hp
+	scene.call("_divine_presence_tick", holy)
+	scene.call("_divine_presence_tick", holy)
 	ok(holy.second_resource == holy.second_max,
-		"at the cap the office earns exactly what the passive would: nothing")
+		"the watch fills the meter to the cap (%d/%d)"
+			% [holy.second_resource, holy.second_max])
+	ok(holy.has_status("barrier"),
+		"...and the stack that would not fit spills into ALMS, warding her")
+	var ward: int = holy.status_power("barrier")
+	ok(ward == maxi(int(round(holy.max_hp * 0.01 * ALMS_WARD_PCT_TEST)), 1),
+		"...for %d%% of her maximum (%d)" % [ALMS_WARD_PCT_TEST, ward])
+	# WITHOUT ALMS THE SPILL IS SIMPLY LOST, which is the control that proves the
+	# check above measures Alms rather than measuring any barrier at all.
+	holy.remove_status("alms")
+	holy.remove_status("barrier")
+	holy.second_resource = holy.second_max
+	scene.call("_divine_presence_tick", holy)
+	scene.call("_divine_presence_tick", holy)
+	ok(not holy.has_status("barrier"),
+		"with no Alms up the overflow is thrown away as it always was")
 	scene.queue_free()
 	await process_frame
 
@@ -626,62 +716,109 @@ func _live_alms() -> void:
 	await process_frame
 
 
-func _live_observance() -> void:
+func _live_vespers() -> void:
+	# BATCH CG §1 — VESPERS REPLACES OBSERVANCE IN THIS SLOT, so the section is
+	# REPLACED rather than deleted: the old one drove the Empower buy-back, which
+	# no longer exists, and this drives the card that took its place.
+	#
+	# THE LAST CLAUSE IS THE WHOLE CARD AND IT IS WHAT THIS SECTION IS BUILT
+	# AROUND: an ally who does not cross earns her NO MERCY. The obvious
+	# assertion (the blow got smaller) is not the discriminating one — an absorb
+	# written below the subtraction would pass it and still hand her the stack.
 	var scene := await _spawn("holy")
 	var holy := _cleric(scene, "mercy")
+	ok(holy != null, "Holy spawned")
 	if holy == null:
 		scene.queue_free()
 		return
 	var ally: BattleUnit = _allies(scene, holy)[0]
-	var plea: Ability = Classes.pool_ability("Divine Plea")
-	ok(plea != null and plea.faith_cost == 2, "Divine Plea costs 2 Mercy")
-	# WITHOUT THE OFFICE: an Empowered PERFECT cast forfeits its perfect, so the
-	# 10 Mana never arrives — and exactly 3 Mercy leave her hand (2 + 1).
-	holy.second_resource = holy.second_max
-	holy.resource = 0
-	ally.hp = 1
-	var mercy0: int = holy.second_resource
-	scene.set("empower_armed", true)
-	await scene.call("_resolve", holy, plea, ally, "perfect")
-	ok(holy.resource == 0,
-		"without Observance the Empowered cast forfeits its perfect (%d Mana)"
-			% holy.resource)
-	ok(mercy0 - holy.second_resource == 3,
-		"...and costs 2 Mercy plus the Empower's 1 (spent %d)"
-			% (mercy0 - holy.second_resource))
-	# WITH THE OFFICE: both halves move. Either alone would be a half-built card.
-	scene.call("_apply_status", holy, "observance", 9)
-	holy.second_resource = holy.second_max
-	holy.resource = 0
-	ally.hp = 1
-	var mercy1: int = holy.second_resource
-	scene.set("empower_armed", true)
-	await scene.call("_resolve", holy, plea, ally, "perfect")
-	ok(holy.resource == 10,
-		"under Observance the perfect SURVIVES the Empower (+%d Mana)"
-			% holy.resource)
-	ok(mercy1 - holy.second_resource == 4,
-		"...and the second stack is what pays for it (spent %d)"
-			% (mercy1 - holy.second_resource))
-	# UNPAYABLE IS NOT REFUSED: with no second stack in hand the cast resolves as
-	# an ordinary Empower rather than costing her a turn.
-	holy.second_resource = 3
-	holy.resource = 0
-	ally.hp = 1
-	scene.set("empower_armed", true)
-	await scene.call("_resolve", holy, plea, ally, "perfect")
+	holy.grace_pct = 0
+	holy.remove_status("alms")
+	ally.remove_status("barrier")
+	ally.armor = 0.0
+	ally.block_chance = 0.0
+	ally.parry_chance = 0.0
+	var absorb := maxi(int(round(holy.max_hp * VESPERS_PCT_TEST)), 1)
+	# THE NUMBERS ARE BUILT FROM THE ABSORB RATHER THAN CHOSEN, so the pair below
+	# discriminates whatever Holy's maximum is: the ally stands EXACTLY `absorb`
+	# above the window and the blow is `absorb + 5`. Unwarded he lands 5 under
+	# the line; warded, the ward eats the whole absorb and he lands 5 above it.
+	ally.max_hp = 400
+	ally.mercy_threshold = 0.5
+	var line := int(ally.max_hp * 0.5)
+	var blow := absorb + 5
+	# THE CONTROL FIRST: with no ward, that blow crosses AND pays her the Mercy.
+	# Everything below is read against this.
+	holy.second_resource = 0
+	ally.hp = line + absorb
+	ally.take_hit(blow, 0)
+	ok(ally.hp == line - 5, "the unwarded blow lands whole (%d)" % ally.hp)
+	ok(holy.second_resource == 1,
+		"...and the crossing pays her 1 Mercy (%d)" % holy.second_resource)
+	# 1) THE WARD CATCHES THE BLOW THAT WOULD CROSS, AND SHE IS PAID NOTHING.
+	holy.second_resource = 0
+	ally.hp = line + absorb
+	await scene.call("_resolve", holy, _card("Vespers"), ally, "good")
+	ok(ally.has_status("vespers"), "the office is said over the ally")
+	ok(ally.status_power("vespers") == absorb,
+		"...carrying %d, 20%% of HER maximum rather than his (%d)"
+			% [absorb, ally.status_power("vespers")])
+	ally.take_hit(blow, 0)
+	ok(ally.hp == line + absorb - 5,
+		"the blow is absorbed for %d (%d left)" % [absorb, ally.hp])
+	ok(ally.hp > line,
+		"...leaving him ABOVE the window (%d of %d)" % [ally.hp, ally.max_hp])
 	ok(holy.second_resource == 0,
-		"with exactly the ordinary price in hand the cast still goes off (%d left)"
+		"...AND SHE EARNS NO MERCY FOR A CROSSING THAT NEVER HAPPENED (%d)"
 			% holy.second_resource)
-	ok(holy.resource == 0,
-		"...as an ordinary Empower, perfect forfeited (%d Mana)" % holy.resource)
+	# 2) IT FIRES ONCE. "Or until it fires" — the next blow is unwarded.
+	ok(not ally.has_status("vespers"), "the ward is spent as it fires")
+	# 3) A PARTIAL CATCH IS A REAL OUTCOME, not a failure state: a blow bigger
+	# than the absorb still crosses, still costs the health it did not catch,
+	# and still pays her. This is the check a "refuse the crossing outright"
+	# implementation fails.
+	holy.second_resource = 0
+	ally.hp = line + absorb
+	scene.call("_apply_status", ally, "vespers", 9, absorb, 0, holy)
+	ally.take_hit(absorb + 100, 0)
+	ok(ally.hp < line, "a blow bigger than the ward still crosses (%d)" % ally.hp)
+	ok(holy.second_resource == 1,
+		"...and a real crossing still pays her (%d)" % holy.second_resource)
+	# 4) IT WATCHES THE MERCY LINE, NOT A LITERAL HALF, AND THIS IS THE
+	# CONSTRUCTION THAT TELLS THE TWO APART. Guardian Angel moves the window to
+	# 65%; the ally stands `absorb` above THAT line and takes exactly `absorb`,
+	# so the blow crosses the 65% line and does not come anywhere near the 50%
+	# one. A ward reading a literal half never fires here at all.
+	holy.second_resource = 0
+	ally.mercy_threshold = 0.65
+	var wide := int(ally.max_hp * 0.65)
+	ally.hp = wide + absorb
+	scene.call("_apply_status", ally, "vespers", 9, absorb, 0, holy)
+	ally.take_hit(absorb, 0)
+	ok(not ally.has_status("vespers"),
+		"under Guardian Angel the ward fires at the WIDER window")
+	ok(ally.hp == wide + absorb,
+		"...catching the whole blow (%d)" % ally.hp)
+	ok(holy.second_resource == 0,
+		"...and still earns her nothing (%d)" % holy.second_resource)
+	ally.mercy_threshold = 0.5
+	# 5) A BLOW THAT DOES NOT REACH THE WINDOW LEAVES IT STANDING. Without this
+	# a version that fired on the first hit of any size would pass every check
+	# above and quietly be a different card.
+	ally.hp = ally.max_hp
+	scene.call("_apply_status", ally, "vespers", 9, absorb, 0, holy)
+	ally.take_hit(10, 0)
+	ok(ally.has_status("vespers"),
+		"a blow nowhere near the window does not spend the ward")
 	scene.queue_free()
 	await process_frame
 
-
-# ---------- DEVOUT ----------
-
 func _live_elevation() -> void:
+	# INVERTED BY BATCH CG §2, NOT DELETED. CE's section asserted that Elevation
+	# grants NO Faith — that it wrote the peak alone — and that assertion is now
+	# wrong: the card hands over REAL STACKS. The setups below are deliberately
+	# the same ones CE built, because they are still what tells the two readings
+	# apart; only the correct answer moved.
 	var scene := await _spawn(DEVOUT_KEY)
 	var dv := _cleric(scene, "conviction")
 	ok(dv != null, "the Devout spawned")
@@ -695,64 +832,83 @@ func _live_elevation() -> void:
 	for h in scene.get("heroes"):
 		h.faith_stacks = 0
 		h.faith_peak = 0
-	high.faith_peak = 4
-	# THE ALLY AT TWO IS THE ONLY CONSTRUCTION THAT DISCRIMINATES, AND IT WAS
-	# ADDED BECAUSE A NEGATIVE CONTROL PASSED WITHOUT IT — the whole reason to
-	# run them. An ADDING version of the write is invisible at both ends: the
-	# ally on 4 is skipped by the loop's own `>= floor` guard before the write
-	# is ever reached, and the ally on 0 lands on 3 either way. Only a peak
-	# BETWEEN the two tells "raised TO the floor" (3) from "raised BY it" (5).
-	mid.faith_peak = 2
+	# NOBODY MAY BE PARKED AT THE THRESHOLD FOR THE FIRST DRIVE: three allies at
+	# 0, 1 and 2 so every gain lands on the bar and nothing releases yet.
+	low.faith_stacks = 0
+	mid.faith_stacks = 1
+	high.faith_stacks = 2
 	await scene.call("_resolve", dv, _card("Elevation"), dv, "good")
-	# IT RAISES A FLOOR, NOT A TOTAL.
-	ok(high.faith_peak == 4,
-		"a peak already ABOVE the floor is untouched (%d)" % high.faith_peak)
-	ok(low.faith_peak == ELEVATION_FLOOR_TEST,
-		"a peak below it is raised TO the floor (%d)" % low.faith_peak)
-	ok(mid.faith_peak == ELEVATION_FLOOR_TEST,
-		"a peak of 2 is raised TO %d, not BY it (%d)" % [
-			ELEVATION_FLOOR_TEST, mid.faith_peak])
-	# AND IT WRITES THE PEAK, NOT THE COUNT. A version that granted Faith would
-	# move both, walk allies toward a release and change the whole card.
-	for h in scene.get("heroes"):
-		if h.is_companion:
-			continue
-		ok(h.faith_stacks == 0,
-			"%s holds no extra stack — Elevation writes the PEAK alone (%d)"
-				% [h.unit_name, h.faith_stacks])
-	# THE GATE: with every peak at or above the floor there is nothing to raise,
-	# so the button is refused rather than spending a turn to print a no-op.
-	#
-	# THE COOLDOWN IS CLEARED FIRST AND THAT IS BV'S NC1 LESSON, NOT TIDINESS:
-	# the cast above started a 5-turn cooldown, so `_ability_usable` would go on
-	# refusing for a reason that has nothing to do with the peaks and the check
-	# would pass while testing nothing. A check only discriminates once the thing
-	# under test is the ONLY thing that can produce the answer.
+	# IT GRANTS REAL FAITH — the inversion, driven three ways so a version that
+	# wrote a floor rather than adding a count fails at every depth.
+	ok(low.faith_stacks == ELEVATION_STACKS_TEST,
+		"an ally at 0 is handed %d stacks (%d)"
+			% [ELEVATION_STACKS_TEST, low.faith_stacks])
+	ok(mid.faith_stacks == 1 + ELEVATION_STACKS_TEST,
+		"an ally at 1 is handed %d MORE, not raised to a floor (%d)"
+			% [ELEVATION_STACKS_TEST, mid.faith_stacks])
+	ok(high.faith_stacks == 2 + ELEVATION_STACKS_TEST,
+		"an ally at 2 likewise (%d)" % high.faith_stacks)
+	# AND THE PEAK FOLLOWS THE COUNT rather than being written on its own. This
+	# is BI §1's one ratchet doing the work: no second writer exists any more.
+	ok(low.faith_peak == low.faith_stacks
+			and mid.faith_peak == mid.faith_stacks
+			and high.faith_peak == high.faith_stacks,
+		"every peak follows the count it just gained (%d/%d/%d)"
+			% [low.faith_peak, mid.faith_peak, high.faith_peak])
+	# THE CONSEQUENCE TO IMPLEMENT RATHER THAN GUARD AGAINST: an ally already
+	# holding 3 crosses the cap and RELEASES — healed, count reset, the Devout
+	# paid. Driven with the ally on 1 HP so the heal is unmistakable.
 	dv.cooldowns.clear()
-	ok(not scene.call("_ability_usable", dv, _card("Elevation")),
-		"the card is refused once every peak stands at the floor")
-	low.faith_peak = 0
-	dv.cooldowns.clear()
-	ok(scene.call("_ability_usable", dv, _card("Elevation")),
-		"...and allowed again the moment one falls below it")
-	# The perfect raises the floor by one, and never past five.
 	for h in scene.get("heroes"):
+		h.faith_stacks = 0
+		h.faith_peak = 0
+	low.faith_stacks = 3
+	low.faith_peak = 3
+	low.hp = 1
+	var dv_mana: int = dv.resource
+	dv.resource = 0
+	await scene.call("_resolve", dv, _card("Elevation"), dv, "good")
+	ok(low.faith_stacks == 0,
+		"an ally at 3 crosses the cap and RELEASES — the count resets (%d)"
+			% low.faith_stacks)
+	ok(low.hp > 1, "...he is healed for it (%d)" % low.hp)
+	ok(dv.resource > 0,
+		"...and the Devout is paid his share of Mana (%d)" % dv.resource)
+	# THE PEAK IS UNTOUCHED BY THE RELEASE, so the release is pure upside — the
+	# property BI §1 shipped and the reason this card can be a plain grant.
+	ok(low.faith_peak == 5,
+		"...while his PEAK stands at the 5 he reached (%d)" % low.faith_peak)
+	dv.resource = dv_mana
+	# THE PERFECT HANDS OVER ONE MORE.
+	dv.cooldowns.clear()
+	for h in scene.get("heroes"):
+		h.faith_stacks = 0
 		h.faith_peak = 0
 	await scene.call("_resolve", dv, _card("Elevation"), dv, "perfect")
-	ok(low.faith_peak == ELEVATION_FLOOR_TEST + 1,
-		"a perfect raises every peak to %d (%d)"
-			% [ELEVATION_FLOOR_TEST + 1, low.faith_peak])
+	ok(low.faith_stacks == ELEVATION_STACKS_TEST + 1,
+		"a perfect hands over %d stacks (%d)"
+			% [ELEVATION_STACKS_TEST + 1, low.faith_stacks])
+	# AND THE GATE IS GONE. CE refused the cast once every peak stood at the
+	# floor, which was the right question about a card that raised a FLOOR and
+	# is meaningless about one that hands over stacks — it would have darkened
+	# the button in exactly the late-fight state the card is now worth most in.
+	dv.cooldowns.clear()
+	dv.resource = dv.max_resource
+	for h in scene.get("heroes"):
+		h.faith_peak = 5
+	ok(scene.call("_ability_usable", dv, _card("Elevation")),
+		"the card is NOT refused for a peak it no longer reads")
 	scene.queue_free()
 	await process_frame
 
 
-func _live_jubilee() -> void:
+func _live_blessing_of_the_faithful() -> void:
 	var scene := await _spawn(DEVOUT_KEY)
 	var dv := _cleric(scene, "conviction")
 	if dv == null:
 		scene.queue_free()
 		return
-	var jub := _card("Jubilee")
+	var jub := _card("Blessing of the Faithful")
 	# THE GATE IS WHAT STOPS IT BEING A HEAL HE PRESSES EVERY TURN. Cooldowns
 	# cleared either side of the pair for BV's NC1 reason, so the ONLY thing
 	# that can produce the two answers is the Faith he holds.
@@ -778,11 +934,16 @@ func _live_jubilee() -> void:
 	await scene.call("_resolve", dv, jub, dv, "good")
 	var healed3: int = dv.hp - 1
 	ok(dv.faith_stacks == 0, "the count is emptied (%d)" % dv.faith_stacks)
-	# THE PEAK STANDS. BI's whole repair was that spending must not cost held
-	# value; a version that reset the peak passes a bare heal check and deletes
-	# the mitigation the Devout had already earned.
-	ok(dv.faith_peak == 5, "his PEAK is untouched (%d)" % dv.faith_peak)
+	# INVERTED BY BATCH CG §2 — THE PEAK DROPS TO MATCH, AND THIS WAS CE'S
+	# NEGATIVE CONTROL. CE asserted the high-water mark STANDS through the spend,
+	# on BI §1's rule that spending must not cost held value; CG makes the
+	# surrender the card's price and names it on the card, so the check is
+	# INVERTED rather than deleted and the setup is byte-identical because it is
+	# still what tells the two readings apart.
+	ok(dv.faith_peak == 0,
+		"his PEAK drops to match the count he spent (%d)" % dv.faith_peak)
 	dv.faith_stacks = 5
+	dv.faith_peak = 5
 	dv.hp = 1
 	await scene.call("_resolve", dv, jub, dv, "good")
 	var healed5: int = dv.hp - 1
@@ -791,9 +952,11 @@ func _live_jubilee() -> void:
 	var ratio := float(healed5) / maxf(float(healed3), 1.0)
 	ok(ratio > 1.4 and ratio < 1.9,
 		"...and pay PER STACK rather than flat (ratio %.2f, want ~1.67)" % ratio)
+	ok(dv.faith_peak == 0, "...and the peak falls again (%d)" % dv.faith_peak)
 	# IT IS NOT A RELEASE, AND THIS IS THE LOAD-BEARING HALF. A release would
 	# grow the principal, roll Communion and swear Binding Oath — the frequency
-	# loop BH §2 took the Devout off.
+	# loop BH §2 took the Devout off. UNCHANGED BY CG: the peak drop is a price
+	# paid at this site, not a release arriving through the back door.
 	ok(dv.conviction_hp_gained == growth_before,
 		"the principal did NOT grow — this is not a release (%d)"
 			% dv.conviction_hp_gained)
@@ -810,7 +973,7 @@ func _live_jubilee() -> void:
 	var hp_was: int = holy_like.hp
 	await scene.call("_resolve", holy_like, jub, holy_like, "good")
 	ok(holy_like.hp == hp_was,
-		"an ally holding five Faith cannot call the year (%d)" % holy_like.hp)
+		"an ally holding five Faith cannot call the blessing (%d)" % holy_like.hp)
 	scene.queue_free()
 	await process_frame
 
@@ -890,7 +1053,7 @@ func _live_mantle() -> void:
 
 # ---------- OCCULTIST ----------
 
-func _live_anathema() -> void:
+func _live_breaking_darkness() -> void:
 	var scene := await _spawn("occultist")
 	var occ := _cleric(scene, "old_gods")
 	ok(occ != null, "the Occultist spawned")
@@ -907,16 +1070,26 @@ func _live_anathema() -> void:
 	control.constitution = 100
 	marked.pressure = 0
 	control.pressure = 0
-	await scene.call("_resolve", occ, _card("Anathema"), marked, "good")
+	await scene.call("_resolve", occ, _card("Breaking Darkness"), marked, "good")
 	# THE CAST'S OWN BREAK IS NOT AMPLIFIED BY ITS OWN MARK. A mark applied one
-	# line earlier would read 30 here and the card's headline number would depend
+	# line earlier would read 25 here and the card's headline number would depend
 	# on the order of two lines.
 	ok(marked.pressure == 20,
 		"the cast's own 20 Break lands BEFORE the mark (%d)" % marked.pressure)
-	ok(marked.has_status("anathema"), "...and the mark is on")
-	ok(marked.status_power("anathema") == ANATHEMA_BD_PCT_TEST,
-		"...carrying %d%% (%d)" % [ANATHEMA_BD_PCT_TEST,
-			marked.status_power("anathema")])
+	ok(marked.has_status("breaking_darkness"), "...and the mark is on")
+	ok(marked.status_power("breaking_darkness") == BREAKING_DARKNESS_BD_PCT_TEST,
+		"...carrying %d%% (%d)" % [BREAKING_DARKNESS_BD_PCT_TEST,
+			marked.status_power("breaking_darkness")])
+	# THE ABBREVIATION MUST NOT BE `BD`. That is this game's shorthand for BREAK
+	# DAMAGE in every log line and tooltip it has, so the one abbreviation the
+	# name fits best is the one it may not use.
+	var bsrc := _src("res://scripts/battle.gd")
+	var row_at := bsrc.find('"breaking_darkness": [')
+	ok(row_at > 0, "the status has a STATUS_INFO row")
+	var row := bsrc.substr(row_at, 90)
+	ok(not row.contains('"BD"'),
+		"the chip is not `BD` — that is Break damage everywhere else")
+	ok(row.contains('"Dk!"'), "...it is `Dk!` (%s)" % row.substr(0, 60))
 	# THE SAME BLOW INTO BOTH. This is the whole card and it is exact.
 	marked.pressure = 0
 	control.pressure = 0
@@ -924,19 +1097,19 @@ func _live_anathema() -> void:
 	control.take_hit(0, 20)
 	ok(control.pressure == 20, "the unmarked control takes 20 (%d)"
 		% control.pressure)
-	ok(marked.pressure == 30, "the marked one takes 30 — 50%% harder (%d)"
+	ok(marked.pressure == 25, "the marked one takes 25 — 25%% harder (%d)"
 		% marked.pressure)
 	# IT AMPLIFIES EVERY SOURCE, not just an attack: a Decay tick through the
 	# same door reads the same multiplier.
 	marked.pressure = 0
 	control.pressure = 0
-	marked.take_hit(0, 10)
-	control.take_hit(0, 10)
-	ok(marked.pressure == 15 and control.pressure == 10,
-		"a 10-point source lands 15 against 10 (%d / %d)"
+	marked.take_hit(0, 40)
+	control.take_hit(0, 40)
+	ok(marked.pressure == 50 and control.pressure == 40,
+		"a 40-point source lands 50 against 40 (%d / %d)"
 			% [marked.pressure, control.pressure])
 	# AND IT IS AN AFFLICTION, so a Mage's Dispel cannot strip the party's work.
-	ok(not scene.call("_dispellable_buffs", marked).has("anathema"),
+	ok(not scene.call("_dispellable_buffs", marked).has("breaking_darkness"),
 		"Dispel cannot take the mark off the enemy wearing it")
 	scene.queue_free()
 	await process_frame
@@ -1014,52 +1187,95 @@ func _live_requiem() -> void:
 
 
 func _live_penance() -> void:
+	# REPLACED BY BATCH CG §3 — PENANCE IS A MIRROR, NOT A TICK. CE's section
+	# drove a snapshot off the target's own Attack and asserted the snapshot rule
+	# held; both the stat and the rule are gone, so what is driven here is the
+	# damage the enemy DEALS coming back to it.
 	var scene := await _spawn("occultist")
 	var occ := _cleric(scene, "old_gods")
 	if occ == null:
 		scene.queue_free()
 		return
 	var foes := _live_foes(scene)
-	var strong: BattleUnit = foes[0]
-	var weak: BattleUnit = foes[1]
-	# THE CONSTRUCTION THAT DISCRIMINATES: two Attack stats. A version reading
-	# the CASTER's Attack returns the same tick for both and passes every other
-	# check in this function.
-	strong.attack = 100
-	weak.attack = 50
-	for e in [strong, weak]:
+	var biter: BattleUnit = foes[0]
+	var bystander: BattleUnit = foes[1]
+	var ally: BattleUnit = _allies(scene, occ)[0]
+	for e in [biter, bystander]:
 		e.resists = {}
 		e.max_hp = 2000
 		e.hp = 2000
-	await scene.call("_resolve", occ, _card("Penance"), strong, "good")
-	await scene.call("_resolve", occ, _card("Penance"), weak, "good")
-	var t_strong := int(strong.get_status("penance").get("tick", 0))
-	var t_weak := int(weak.get_status("penance").get("tick", 0))
-	ok(t_strong == int(round(100 * PENANCE_SHARE_TEST)),
-		"the mighty enemy is set to 20%% of ITS OWN Attack — %d (got %d)"
-			% [int(round(100 * PENANCE_SHARE_TEST)), t_strong])
-	ok(t_weak == int(round(50 * PENANCE_SHARE_TEST)),
-		"...and the weak one to 20%% of ITS OWN — %d (got %d)"
-			% [int(round(50 * PENANCE_SHARE_TEST)), t_weak])
-	ok(t_strong == 2 * t_weak,
-		"...so the tick tracks the TARGET rather than the caster (%d / %d)"
-			% [t_strong, t_weak])
-	# AND IT BILLS AT THE START OF THE ENEMY'S OWN TURN.
-	var hp0: int = strong.hp
-	scene.call("_penance_tick", strong)
-	ok(hp0 - strong.hp == t_strong,
-		"the penance is paid at its own turn start (%d)" % (hp0 - strong.hp))
-	# A HERO NEVER PAYS ONE — the tick is enemy-side by its own gate.
-	var ally: BattleUnit = _allies(scene, occ)[0]
-	scene.call("_apply_status", ally, "penance", 3, 0, 40, occ)
-	var ahp: int = ally.hp
-	scene.call("_penance_tick", ally)
-	ok(ally.hp == ahp, "a hero carrying the status pays nothing (%d)" % ally.hp)
-	# The tick is SNAPSHOTTED: weakening the enemy afterwards does not change it.
-	strong.attack = 10
-	var hp1: int = strong.hp
-	scene.call("_penance_tick", strong)
-	ok(hp1 - strong.hp == t_strong,
-		"the tick was snapshotted at application (%d)" % (hp1 - strong.hp))
+	ally.max_hp = 2000
+	ally.hp = 2000
+	ally.armor = 0.0
+	ally.remove_status("barrier")
+	await scene.call("_resolve", occ, _card("Penance"), biter, "good")
+	ok(biter.has_status("penance"), "the penance is set on the biter")
+	ok(biter.status_power("penance") == int(round(PENANCE_MIRROR_TEST * 100.0)),
+		"...carrying the SHARE (%d%%) rather than a snapshotted tick (%d)"
+			% [int(round(PENANCE_MIRROR_TEST * 100.0)),
+				biter.status_power("penance")])
+	# NOTHING IS SNAPSHOTTED AND NOTHING READS THE ENEMY'S SHEET. `tick` is the
+	# field the old snapshot rode; a version that kept it would pass the mirror
+	# checks below and quietly still be reading a stat.
+	ok(int(biter.get_status("penance").get("tick", 0)) == 0,
+		"...and no snapshot rides the status at all (%d)"
+			% int(biter.get_status("penance").get("tick", 0)))
+	# 1) THE MIRROR. The frame names the biter as the dealer, exactly as
+	# `_resolve` sets it for a real swing, and the blow is driven through the ONE
+	# damage door so what is measured is the mechanism rather than a copy of it.
+	var biter_hp: int = biter.hp
+	scene.call("_dmg_frame", biter, "Strike")
+	ally.take_hit(100, 0)
+	ok(biter_hp - biter.hp == int(round(100 * PENANCE_MIRROR_TEST)),
+		"the biter pays %d for a 100-point blow (%d)"
+			% [int(round(100 * PENANCE_MIRROR_TEST)), biter_hp - biter.hp])
+	# 2) WHOEVER IT HITS. A blow landing on one of its OWN — a Feint redirect, a
+	# Bewitch, a Psychosis — bills it just the same, and this is the check a
+	# mirror written below the hero gate fails while passing everything else.
+	bystander.hp = 2000
+	biter_hp = biter.hp
+	scene.call("_dmg_frame", biter, "Strike")
+	bystander.take_hit(100, 0)
+	ok(biter_hp - biter.hp == int(round(100 * PENANCE_MIRROR_TEST)),
+		"...and pays the same when it hits one of its own (%d)"
+			% (biter_hp - biter.hp))
+	# 3) IT SCALES WITH WHAT WAS ACTUALLY DEALT, not with a stored figure. A
+	# snapshot returns the same number twice and fails here.
+	biter_hp = biter.hp
+	scene.call("_dmg_frame", biter, "Strike")
+	ally.take_hit(200, 0)
+	ok(biter_hp - biter.hp == int(round(200 * PENANCE_MIRROR_TEST)),
+		"twice the blow is twice the penance (%d)" % (biter_hp - biter.hp))
+	# 4) AN UNMARKED ENEMY PAYS NOTHING — the control that stops every check
+	# above passing off a mirror that bills whoever swung.
+	bystander.remove_status("penance")
+	var by_hp: int = bystander.hp
+	scene.call("_dmg_frame", bystander, "Strike")
+	ally.take_hit(100, 0)
+	ok(bystander.hp == by_hp,
+		"an unmarked enemy pays nothing for the same blow (%d)" % bystander.hp)
+	# 5) AN ENEMY THAT DOES NOT ATTACK PAYS NOTHING AT ALL. The guaranteed floor
+	# the snapshot bought is gone, knowingly — a hero striking THROUGH the mark
+	# is not the mark dealing damage.
+	biter_hp = biter.hp
+	scene.call("_dmg_frame", occ, "Shadowrend")
+	biter.take_hit(100, 0)
+	ok(biter_hp - biter.hp == 100,
+		"a blow INTO the mark is not a blow BY it — no mirror (%d)"
+			% (biter_hp - biter.hp))
+	# 6) THE MIRROR DOES NOT MIRROR. Its own payment is damage the marked enemy
+	# takes, and without the re-entrancy lock it would bill itself forever.
+	biter_hp = biter.hp
+	scene.call("_dmg_frame", biter, "Strike")
+	ally.take_hit(100, 0)
+	ok(biter_hp - biter.hp == int(round(100 * PENANCE_MIRROR_TEST)),
+		"the mirror pays exactly once (%d)" % (biter_hp - biter.hp))
+	# 7) SELF-INFLICTED IS EXCLUDED BY IDENTITY: recoil and Blood Price are
+	# damage a unit deals to ITSELF, and "whoever it hits" means somebody else.
+	biter_hp = biter.hp
+	scene.call("_dmg_frame", biter, "Recoil")
+	biter.take_hit(100, 0)
+	ok(biter_hp - biter.hp == 100,
+		"a self-inflicted wound is not billed twice (%d)" % (biter_hp - biter.hp))
 	scene.queue_free()
 	await process_frame

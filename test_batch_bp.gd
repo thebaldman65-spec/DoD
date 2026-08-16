@@ -922,7 +922,7 @@ func _docs() -> void:
 	# test_batch_bs and test_batch_bu. The count grows by one each time a new
 	# suite checks the stamp, and every one of them is a suite this batch did
 	# not otherwise touch — which is the cost the duplication keeps charging.)
-	ok(master.contains("Batch CE"),
+	ok(master.contains("Batch CG"),
 		"§6: master.html's stamp is bumped to the current batch")
 	ok(changelog.contains("Batch BP"),
 		"§6: the changelog carries a Batch BP entry")

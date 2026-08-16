@@ -122,23 +122,33 @@ const STATUS_INFO := {
 	# Dispel would strip FOR the enemy — `ruin_primed`'s trap through a new door.
 	"suffering": ["Suffering", "Sf", Color(0.72, 0.40, 0.80),
 		"A wound that thinks: gains Ruin at\nthe start of each of its own turns."],
-	# ---------- BATCH CE: THE CLERIC NINE ----------
+	# ---------- BATCH CE: THE CLERIC NINE (REVISED AT BATCH CG) ----------
 	# FIVE STATUSES FOR NINE ABILITIES, split the way BU's Suffering trap says to
 	# split them. THREE SIT ON HOLY and are correctly absent from DEBUFF_IDS;
-	# TWO SIT ON AN ENEMY and are listed there. Elevation, Jubilee and Requiem
-	# resolve inside the cast that fires them and carry nothing at all, and
-	# MANTLE deliberately has no id of its own — it rides the existing `barrier`,
-	# which is what makes every hop a real Divine Shield for Conviction.
-	"matins": ["Matins", "Mt", Color(0.95, 0.88, 0.62),
-		"The office kept: 1 Mercy at the start\nof each of her turns on which no ally\nfell below the window. A fall breaks\nthat turn's watch — the passive pays\ninstead."],
+	# TWO SIT ON AN ENEMY and are listed there. Elevation, Blessing of the
+	# Faithful and Requiem resolve inside the cast that fires them and carry
+	# nothing at all, and MANTLE deliberately has no id of its own — it rides the
+	# existing `barrier`, which is what makes every hop a real Divine Shield for
+	# Conviction.
+	#
+	# BATCH CG MOVED THREE OF THE FIVE AND THE SPLIT IS UNCHANGED: `matins` is
+	# `divine_presence`, `observance` is DELETED and `vespers` takes its slot —
+	# a BUFF laid on an ally, so it joins the other two Holy statuses OUT of
+	# DEBUFF_IDS — and `anathema` is `breaking_darkness`.
+	"divine_presence": ["Divine Presence", "DP", Color(0.95, 0.88, 0.62),
+		"The watch kept: 2 Mercy at the start\nof every SECOND turn of hers on which\nno ally fell below the window. A fall\nbreaks that watch — the passive pays\ninstead."],
 	"alms": ["Alms", "Al", Color(0.95, 0.85, 0.55),
 		"What will not fit is given away:\nMercy earned at the CAP wards the ally\nwho earned it instead of being lost."],
-	"observance": ["Observance", "Ob", Color(0.98, 0.80, 0.50),
-		"The form kept exactly: an Empowered\ncast KEEPS its perfect bonus and costs\n1 additional Mercy. Without the second\nstack it is an ordinary Empower."],
-	"anathema": ["Anathema", "An!", Color(0.80, 0.35, 0.70),
-		"Named accursed: every source of Break\ndamage lands on this unit harder."],
+	"vespers": ["Vespers", "Vs", Color(0.98, 0.80, 0.50),
+		"The evening office said over them:\nthe next blow that would take them\nbelow the window is absorbed. It fires\nONCE — and a crossing that never\nhappens earns her no Mercy."],
+	# THE ABBREVIATION IS `Dk!` AND MUST NOT BE `BD`. "BD" is this game's
+	# shorthand for BREAK DAMAGE in every log line and tooltip it has, and a
+	# chip reading BD beside a meter filling with BD is the one abbreviation
+	# that could not be allowed however well it fits the name.
+	"breaking_darkness": ["Breaking Darkness", "Dk!", Color(0.80, 0.35, 0.70),
+		"The dark broken over it: every source\nof Break damage lands on this unit\nharder."],
 	"penance": ["Penance", "Pn", Color(0.70, 0.38, 0.78),
-		"Set to penance: takes shadow damage\nequal to a share of its OWN Attack at\nthe start of each of its turns."],
+		"Set to penance: takes shadow damage\nequal to half of the damage it deals,\nwhoever it hits."],
 	"frostbite": ["Frostbite", "Fb", Color(0.45, 0.70, 0.95), "Frostbitten: healing received\nreduced by 50%."],
 	"stabilized": ["Stabilized", "St+", Color(0.55, 0.68, 0.95), "Grounded resonance: takes less\ndamage (10% per stack consumed)."],
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge is spent for this\nbattle — the storm has no feeding\nleft in it."],
@@ -363,6 +373,12 @@ var _releasing := false
 # before the stack did. Both flags are set and cleared in ONE place each.
 var _frostbinding := false
 var _frostbind_mirroring := false
+# BATCH CG §3 — PENANCE'S MIRROR NEEDS THE SAME LOCK FOR THE SAME REASON. The
+# mirror is dealt to the marked enemy through `take_tick_damage`, which
+# re-enters `_on_damage_taken`, and the frame still names that enemy as the
+# dealer while it is being paid — so without the flag a mark would bill itself
+# for its own bill, forever. Set and cleared in ONE place.
+var _penance_mirroring := false
 # BATCH BQ — NO FORK MAY BEGIN WHILE A FORK IS RESOLVING. Undying Vigil hangs
 # off `heal_amount`, so the heal it sends to the second ally re-enters that
 # function — and a second ally who is ALSO warded would fork again. It is not
@@ -2177,15 +2193,13 @@ func _run_battle() -> void:
 		if u.dead:
 			_check_end()
 			continue
-		# BATCH CE — PENANCE bills the enemy for its own strength, at the start
-		# of its own turn and beside the other three turn-start bills (the DoT
-		# pass above, Decay and Entropy below). Its own function for the standing
-		# reason; its own death check because Decay and Entropy deal no health
-		# damage and the next one in this loop is fifty lines down.
-		_penance_tick(u)
-		if u.dead:
-			_check_end()
-			continue
+		# BATCH CG §3 — PENANCE NO LONGER BILLS AT A TURN START. It was a
+		# snapshotted tick here, beside the DoT pass above and Decay and Entropy
+		# below; it is a MIRROR now and fires from `_on_damage_taken` — BL's one
+		# damage door — whenever the marked enemy deals damage to anybody. There
+		# is deliberately nothing left in this loop for it: an enemy that does
+		# not attack pays nothing at all, which is the floor the reshape traded
+		# away knowingly.
 		# Decay: rot gnaws at the Break meter every turn.
 		if u.has_status("decay") and not u.broken:
 			var decay_result: Dictionary = u.take_hit(0, 10)
@@ -2290,11 +2304,11 @@ func _run_battle() -> void:
 							washed, u.unit_name], "#b0a8e0")
 		# Batch AW §2: the holy ground is a Faith engine in the BASE KIT now.
 		_ground_faith_tick(u)
-		# BATCH CE — MATINS pays here, ABOVE `tick_statuses`, so a 3-turn office
-		# is read on three of her turns rather than two. Beside the ground's drip
-		# because it is the same kind of thing: a resource that arrives at a turn
-		# start rather than off a hit.
-		_matins_tick(u)
+		# BATCH CE — DIVINE PRESENCE (Matins, renamed at CG §1) pays here, ABOVE
+		# `tick_statuses`, so a 4-turn watch is read on four of her turns rather
+		# than three. Beside the ground's drip because it is the same kind of
+		# thing: a resource that arrives at a turn start rather than off a hit.
+		_divine_presence_tick(u)
 		# BATCH BQ — Consecration's drip, in its own function for the standing
 		# reason: a rule left inside this loop can only ever be checked by a
 		# grep, because `_run_battle` cannot be driven headlessly.
@@ -3071,15 +3085,16 @@ func _player_turn(u: BattleUnit) -> void:
 				# attacks — all four fall through to the ordinary target picker.
 				"reckless_abandon", "berserk", "battle_poise", "feigned_guard",
 				"aegis_wall",
-				# BATCH CE. FIVE of the nine have nothing to click: `matins`,
-				# `alms` and `observance` open a window on HOLY herself,
-				# `jubilee` spends the Devout's own meter, and `elevation`
-				# raises the WHOLE party's peak, which is the same thing to this
-				# list. `mantle` is NOT here — it is ally-facing and falls
-				# through to the ALLY branch below; `anathema`, `requiem` and
+				# BATCH CE, REVISED AT CG. FOUR of the nine have nothing to click:
+				# `divine_presence` and `alms` open a window on HOLY herself,
+				# `jubilee` (Blessing of the Faithful) spends the Devout's own
+				# meter, and `elevation` hands Faith to the WHOLE party, which is
+				# the same thing to this list. `mantle` is NOT here — it is
+				# ally-facing and falls through to the ALLY branch below, and CG's
+				# `vespers` joins it there; `breaking_darkness`, `requiem` and
 				# `penance` each name ONE enemy and fall through to the ordinary
 				# target picker.
-				"matins", "alms", "observance", "jubilee", "elevation"]:
+				"divine_presence", "alms", "jubilee", "elevation"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -3472,11 +3487,11 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 			if rq_pick == null:
 				continue
 			return [ab, rq_pick]
-		# ANATHEMA opens the Madness gate, so it wants the body whose gate is
-		# still shut and whose fight is still ahead — the highest health, which
-		# on a boss node is the boss. A mark on the enemy about to die spends its
-		# three turns on a corpse (Arcane Echo's case).
-		if ab.special == "anathema":
+		# BREAKING DARKNESS opens the Madness gate, so it wants the body whose
+		# gate is still shut and whose fight is still ahead — the highest health,
+		# which on a boss node is the boss. A mark on the enemy about to die
+		# spends its three turns on a corpse (Arcane Echo's case).
+		if ab.special == "breaking_darkness":
 			var an_pick: BattleUnit = foes[0]
 			for an_e in foes:
 				if an_e.is_boss and not an_pick.is_boss:
@@ -3484,9 +3499,12 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 				elif an_e.is_boss == an_pick.is_boss and an_e.hp > an_pick.hp:
 					an_pick = an_e
 			return [ab, an_pick]
-		# PENANCE is paid out of the TARGET'S OWN Attack, so the mightiest enemy
-		# is the point of the card. Aimed at the weakest it reads as a small DoT
-		# and a smoke would never see the clause it is sold on.
+		# PENANCE IS A MIRROR SINCE BATCH CG §3, AND THE MARK IS UNCHANGED — the
+		# rule survived the reshape rather than being re-derived. The
+		# HIGHEST-ATTACK enemy reflects the most because it deals the most, so
+		# what used to be "it is billed for its own strength" is now "it is
+		# billed for what its strength does". Aimed at the weakest it reads as a
+		# trickle and a smoke would never see the clause it is sold on.
 		if ab.special == "penance":
 			var pn_pick: BattleUnit = foes[0]
 			for pn_e in foes:
@@ -4636,20 +4654,24 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 		return false
 	# BATCH CE — THREE MORE OF THE SAME SHAPE, and each reads an accumulation
 	# that is simply not there yet. JUBILEE spends held Faith and needs three;
-	# REQUIEM consumes a mark and needs one on the field; ELEVATION raises a
-	# FLOOR, so with every peak already at or above it there is nothing to
-	# raise. Note the deliberate contrast with MATINS, ALMS and OBSERVANCE,
-	# which are ungated on purpose: all three open a WINDOW, and casting one
-	# before the thing it answers has happened is the setup half of its own
-	# sequence (Slow Burn's rule).
+	# REQUIEM consumes a mark and needs one on the field.
+	#
+	# BATCH CG §2 — ELEVATION HAS NO GATE ANY MORE, and removing it is the
+	# repair rather than a loosening. The gate read "every peak already stands
+	# at or above the floor", which was the right question about a card that
+	# raised a FLOOR and is meaningless about one that HANDS OVER STACKS — it
+	# would have darkened the button in exactly the late-fight state the card
+	# is now worth most in. A plain grant can only be a dud if nobody can gain,
+	# and an ALLY never sits at the cap (reaching it releases them), so the
+	# case does not arise.
+	#
+	# DIVINE PRESENCE, ALMS AND VESPERS ARE UNGATED ON PURPOSE, unchanged: all
+	# three open a WINDOW, and casting one before the thing it answers has
+	# happened is the setup half of its own sequence (Slow Burn's rule).
 	if ab.special == "jubilee" and u.faith_stacks < JUBILEE_MIN_FAITH:
 		return false
 	if ab.special == "requiem" and not enemies.any(func(e): \
 			return not e.dead and e.status_stacks("ruin") > 0):
-		return false
-	if ab.special == "elevation" and not heroes.any(func(h): \
-			return not h.dead and not h.is_companion \
-			and h.faith_peak < ELEVATION_FLOOR):
 		return false
 	# Execute: needs an enemy below 20% health — or a Broken one; the
 	# Bruiser's own loop sets up his finisher. The upgraded copy raises the
@@ -4819,19 +4841,15 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	if ab.special == "transference" and not enemies.any(func(e): \
 			return not e.dead and e.status_stacks("ruin") > 0):
 		ab_btn.tooltip_text += "\n(No Ruin on the field to move)"
-	# BATCH CE — the three tranche-3 Cleric gates say so too, with the LIVE
-	# number. A darkened button that does not explain itself reads as a bug.
+	# BATCH CE — the tranche-3 Cleric gates say so too, with the LIVE number. A
+	# darkened button that does not explain itself reads as a bug. ELEVATION
+	# lost its gate at CG §2 and so has nothing to explain here.
 	if ab.special == "jubilee" and u.faith_stacks < JUBILEE_MIN_FAITH:
 		ab_btn.tooltip_text += "\n(Requires %d Faith held — you have %d)" % [
 			JUBILEE_MIN_FAITH, u.faith_stacks]
 	if ab.special == "requiem" and not enemies.any(func(e): \
 			return not e.dead and e.status_stacks("ruin") > 0):
 		ab_btn.tooltip_text += "\n(No Ruin on the field to consume)"
-	if ab.special == "elevation" and not heroes.any(func(h): \
-			return not h.dead and not h.is_companion \
-			and h.faith_peak < ELEVATION_FLOOR):
-		ab_btn.tooltip_text += "\n(Every peak already stands at %d or better)" % \
-			ELEVATION_FLOOR
 	# Death Ray's gate has to SAY so, and say the LIVE number, or a button dark
 	# for most of a fight reads as a bug rather than as the ramp it measures.
 	if ab.display_name == "Death Ray" and u.second_resource < DEATH_RAY_STACKS:
@@ -10308,15 +10326,28 @@ const THRESHOLD_LOCK_TURNS_PERFECT := 2
 # SEPARATE DOORS in this file rather than one — see the CB block in CLAUDE.md.
 const UNMAKING_LOCK_TURNS := 3
 
-# ---------- BATCH CE: THE CLERIC NINE ----------
+# ---------- BATCH CE: THE CLERIC NINE (REVISED AT BATCH CG) ----------
+# DIVINE PRESENCE (was MATINS): the Mercy each payout is worth, and how many of
+# HER turns pass between payouts. TWO NUMBERS RATHER THAN ONE because they are
+# two decisions: the size is what can overflow the cap into Alms, and the
+# cadence is what keeps a 4-turn office worth 4 Mercy rather than 8.
+const DIVINE_PRESENCE_MERCY := 2
+const DIVINE_PRESENCE_EVERY := 2
 # ALMS: the ward's size, as a PERCENTAGE OF HOLY'S MAXIMUM, and it rides the
 # status power so the chip and the ward are one number.
 const ALMS_WARD_PCT := 12
-# ELEVATION: the PEAK it raises every ally's high-water mark TO (a perfect adds
-# one). A FLOOR, not an addition — a card that ADDED peak would run the whole
-# party to the ceiling in a long fight, where raising the floor is worth most on
-# turn one and worth nothing once the grind has passed it.
-const ELEVATION_FLOOR := 3
+# VESPERS (Batch CG, replacing OBSERVANCE): the absorb, as a share of HOLY'S
+# maximum health rather than the warded ally's. It is resolved at cast and
+# carried on the status power, the Alms pattern — so a Holy who dies after
+# laying it does not take the ward with her, and one number is read by the chip
+# and by the absorb alike.
+const VESPERS_PCT := 0.20
+# ELEVATION: the stacks of REAL Faith it hands every ally (a perfect adds one).
+#
+# BATCH CG §2 — IT WAS A PEAK FLOOR AND IS A PLAIN GRANT. The old constant was
+# the high-water mark it raised every ally TO; this is a count it ADDS, through
+# `_gain_faith`, which is what makes an ally at three cross the cap and release.
+const ELEVATION_STACKS := 2
 # JUBILEE: the Faith he must be HOLDING before the year can be called. The gate
 # is what stops it being a heal he presses every time one stack arrives — his
 # peak does not fall when the count empties, so the count is the only thing this
@@ -10325,21 +10356,28 @@ const JUBILEE_MIN_FAITH := 3
 # MANTLE: the shield's share of HIS maximum, and how many times it passes on.
 const MANTLE_PCT := 0.25
 const MANTLE_HOPS := 2
-# ANATHEMA: the percentage POINTS of extra Break damage the mark buys, read at
-# `unit.take_hit`'s pressure block — THE ONE PLACE BREAK IS EVER AMPLIFIED.
+# BREAKING DARKNESS (was ANATHEMA): the percentage POINTS of extra Break damage
+# the mark buys, read at `unit.take_hit`'s pressure block — THE ONE PLACE BREAK
+# IS EVER AMPLIFIED.
 #
-# FIFTY IS THE NUMBER THE DESIGNER TRUSTS LEAST IN THIS BATCH and it SHIPS
-# UNTUNED, to be watched in play (Threshold's 15, one tranche later). Too low
-# and a boss's Break stays out of reach whatever he spends; too high and the
-# Madness gate stops being a gate at all.
-const ANATHEMA_BD_PCT := 50
+# BATCH CG §3 — TWENTY-FIVE, HALF OF WHAT CE SHIPPED. CE recorded 50 as the
+# number the designer trusted least in that batch and shipped it to be watched;
+# this is the answer to watching it. Nothing structural moved with it.
+const BREAKING_DARKNESS_BD_PCT := 25
 # REQUIEM: the share of Attack each consumed stack of Ruin is worth. The BREAK
 # it carries is FLAT (`ab.pressure`, 8) rather than per-stack, which is ARCANE
 # BOLT's rule: Ruin has no ceiling and a per-stack Break term on an uncapped
 # count is the squaring trap.
 const REQUIEM_PER_STACK := 0.08
-# PENANCE: the share of the TARGET'S OWN Attack it pays each of its turns.
-const PENANCE_SHARE := 0.20
+# PENANCE: the share of the damage the marked enemy DEALS that comes back to it
+# as shadow.
+#
+# BATCH CG §3 — IT IS A MIRROR, NOT A TICK. The old constant was a share of the
+# target's own Attack, snapshotted at application and paid at each of its turn
+# starts; NOTHING READS AN ENEMY'S `attack` STAT ANY MORE, and the guaranteed
+# floor that snapshot bought is deliberately gone with it — an enemy that does
+# not attack pays nothing at all.
+const PENANCE_MIRROR := 0.50
 
 
 # The turn-start Mana drip, in ONE place — the drip itself reads it, and so
@@ -11223,84 +11261,78 @@ func _alms_spill(cleric: BattleUnit, low_ally: BattleUnit) -> void:
 		low_ally.unit_name, al_power], "#e8c860")
 
 
-# BATCH CE — MATINS (Holy draft, tranche 3). ITS OWN FUNCTION FOR THE STANDING
-# REASON: `_run_battle` cannot be driven headlessly (the AR trap), so a rule
-# buried in that loop could only ever be checked by a grep and its negative
-# control could never fail (the AW `_ground_faith_tick` / BA
-# `_perfected_toxin_tick` / BR `_battle_trance_tick` precedent).
+# BATCH CE — MATINS, RENAMED DIVINE PRESENCE AND RESHAPED AT BATCH CG §1 (Holy
+# draft, tranche 3). ITS OWN FUNCTION FOR THE STANDING REASON: `_run_battle`
+# cannot be driven headlessly (the AR trap), so a rule buried in that loop could
+# only ever be checked by a grep and its negative control could never fail (the
+# AW `_ground_faith_tick` / BA `_perfected_toxin_tick` / BR `_battle_trance_tick`
+# precedent).
 #
-# CALLED FROM ABOVE `tick_statuses`, which is what makes a 3-turn office pay
-# THREE times rather than two: the office is read at the top of her turn and
-# only decremented afterwards.
+# CALLED FROM ABOVE `tick_statuses`, which is what makes a 4-turn watch reach
+# FOUR of her turns rather than three: the watch is read at the top of her turn
+# and only decremented afterwards.
 #
-# THE FLAG IS CLEARED AS IT IS READ, so "since her last turn" is true rather
-# than "at any point since the cast" — one broken turn does not poison the rest
-# of the watch.
-func _matins_tick(u: BattleUnit) -> void:
-	if u.dead or not u.has_status("matins"):
+# THE CADENCE COUNTS HER TURNS ON ITS OWN COUNTER RATHER THAN READING THE
+# STATUS'S REMAINING TURNS, and that is load-bearing rather than tidy: `turns`
+# is what `tick_statuses` decrements, and FLEETING (a battle modifier) can take
+# a turn off a status at application, so a payout keyed on the remaining count
+# would silently move its payout turns under a modifier that has nothing to do
+# with this card. The counter starts at zero and pays on every DIVINE_PRESENCE_
+# EVERY-th of HER turns — so a 4-turn watch fires twice for 4 Mercy and a
+# perfect's 6 fires three times for 6.
+#
+# THE FLAG IS CLEARED ON EVERY ONE OF HER TURNS, PAYOUT OR NOT, so "since her
+# last turn" is true rather than "at any point since the cast" — one broken turn
+# does not poison the rest of the watch. It is read BEFORE the cadence check for
+# that reason: a fall on a non-payout turn still costs her nothing, and must not
+# be banked and charged against the next payout.
+func _divine_presence_tick(u: BattleUnit) -> void:
+	if u.dead or not u.has_status("divine_presence"):
 		return
-	var mt: Dictionary = u.get_status("matins")
-	if bool(mt.get("broken", false)):
-		mt["broken"] = false
+	var dp: Dictionary = u.get_status("divine_presence")
+	var dp_broken := bool(dp.get("broken", false))
+	dp["broken"] = false
+	var dp_seen := int(dp.get("turn", 0)) + 1
+	dp["turn"] = dp_seen
+	if dp_seen % DIVINE_PRESENCE_EVERY != 0:
+		return
+	if dp_broken:
 		u.float_text("watch broken", Color(0.7, 0.68, 0.6))
-		_log("   → Matins: the watch is broken — an ally fell, and the passive paid instead",
+		_log("   → Divine Presence: the watch is broken — an ally fell, and the passive paid instead",
 			"#909090")
 		return
 	if u.second_resource_name != "Mercy":
-		_log("   → Matins: %s holds no Mercy to gain" % u.unit_name, "#909090")
+		_log("   → Divine Presence: %s holds no Mercy to gain" % u.unit_name,
+			"#909090")
 		return
-	if u.second_resource >= u.second_max:
-		# At the cap the office earns exactly what the passive would, which is
-		# nothing — and ALMS is the card that answers that, so this stays a
-		# report rather than a second spill site.
-		_log("   → Matins: the office is kept, but %s is already at %d/%d Mercy" % [
-			u.unit_name, u.second_resource, u.second_max], "#909090")
-		return
-	u.second_resource += 1
-	u.refresh_bars()
-	u.float_text("+1 Mercy", Color(0.95, 0.8, 0.3))
-	_log("   → Matins: the office is kept — %s gains 1 Mercy (%d/%d)" % [
-		u.unit_name, u.second_resource, u.second_max], "#e8c860")
-
-
-# BATCH CE — PENANCE (Occultist draft, tranche 3). Its own function for the
-# same standing reason as `_matins_tick` above.
-#
-# THE TICK IS SNAPSHOTTED AT APPLICATION and carried on the status, exactly as
-# burn and poison carry theirs — so a Sundered or Crippled enemy pays what it
-# was worth when it was named, and the card cannot be gamed by debuffing the
-# target afterwards. Shadow-typed, so shadow resists and weaknesses both read.
-func _penance_tick(u: BattleUnit) -> void:
-	if u.dead or u.is_hero or not u.has_status("penance"):
-		return
-	var pn: Dictionary = u.get_status("penance")
-	var pn_base := maxi(int(pn.get("tick", 0)), 1)
-	var pn_resist := float(u.resists.get("shadow", 0.0))
-	var pn_dmg := maxi(int(round(pn_base * (1.0 - pn_resist))), 1)
-	var pn_tag := ""
-	if pn_resist > 0.0:
-		pn_tag = " (resisted)"
-	elif pn_resist < 0.0:
-		pn_tag = " (WEAK!)"
-	var pn_src := String(pn.get("src_name", ""))
-	_dmg_frame(null, "Penance", pn_src)
-	if pn_src != "":
-		_stat("dmg_hero_" + pn_src, pn_dmg)
-	_sfx("hit", -14.0, 0.7)
-	var pn_died := u.take_tick_damage(pn_dmg, "-%d PENANCE" % pn_dmg,
-		Color(0.70, 0.38, 0.78))
-	_log("%s pays its penance — %d shadow damage (a share of its own Attack)%s" % [
-		u.unit_name, pn_dmg, pn_tag], "#a050b0")
-	# NO `_on_enemy_death` CALL, and that is deliberate consistency rather than
-	# an omission: EVERY turn-start damage site in this loop behaves the same way
-	# — the DoT pass, Decay, Entropy and the Ruin detonation all report the death
-	# and none of them fires the on-death hooks. Diverging here would make one
-	# card's kills pay Scavenger and Overkill where a Burn's kills do not.
-	if pn_died:
-		_stat("enemy_deaths")
-		_sfx("death", -4.0)
-		_message("%s falls!" % u.unit_name)
-		_log("† %s dies" % u.unit_name, "#e05050")
+	# THE OVERFLOW IS THE POINT OF PAYING IN TWOS AND IS WHY THIS IS NO LONGER A
+	# BARE `>= cap` REPORT (Batch CG §1). Two stacks arriving at once can cross
+	# the ceiling from below, so the spill is a REAL event on an ordinary turn
+	# rather than only on a fall — and ALMS catches it. It is the first time two
+	# of her own draft cards feed each other.
+	#
+	# GRACE IS DELIBERATELY NOT FIRED HERE AND THAT IS A DECISION RATHER THAN AN
+	# OVERSIGHT. At `_on_hero_below_half` the two spill together by design (one
+	# trigger, two sheets — BD §4), but the card this batch names is ALMS, and
+	# paying a talent node off a second, unasked-for trigger is a power change
+	# nobody specified. REPORTED FOR THE DESIGNER; it is one line if wanted.
+	var dp_room := maxi(u.second_max - u.second_resource, 0)
+	var dp_got := mini(DIVINE_PRESENCE_MERCY, dp_room)
+	var dp_spill := DIVINE_PRESENCE_MERCY - dp_got
+	if dp_got > 0:
+		u.second_resource += dp_got
+		u.refresh_bars()
+		u.float_text("+%d Mercy" % dp_got, Color(0.95, 0.8, 0.3))
+		_log("   → Divine Presence: the watch is kept — %s gains %d Mercy (%d/%d)" % [
+			u.unit_name, dp_got, u.second_resource, u.second_max], "#e8c860")
+	if dp_spill > 0:
+		_log("   → Divine Presence: %d stack(s) will not fit at %d/%d Mercy" % [
+			dp_spill, u.second_resource, u.second_max], "#909090")
+		# ONE CALL RATHER THAN ONE PER SPILLED STACK, because `add_status` merges
+		# a repeated `barrier` by `maxi` on the power rather than by adding: two
+		# calls would log twice and ward once, which is the existing behaviour
+		# of an ally who crosses the window twice under Alms.
+		_alms_spill(u, u)
 
 
 # Intercession (Batch AV): THE ONE PLACE THE REFUSAL IS DECIDED. Asked by
@@ -12151,23 +12183,16 @@ func _reset_faith_meters() -> void:
 		h.remove_status("faith")
 
 
-# BATCH CE — ELEVATION's write, and THE ONLY PLACE `faith_peak` IS RAISED
-# WITHOUT THE COUNT. `_gain_faith` ratchets the peak off the count; this raises
-# the peak alone, which is the asymmetry BI's high-water mark left unexploited:
-# the value is paid on the HIGHEST count held this battle, so an early spike is
-# worth exactly as much as a long grind and lasts the whole fight.
+# BATCH CG §2 — `_raise_faith_peak` IS DELETED, NOT LEFT UNREACHABLE. It was
+# ELEVATION's write and its only caller, and Elevation grants real Faith now, so
+# NOTHING IN THE GAME RAISES `faith_peak` WITHOUT THE COUNT ANY MORE — the peak
+# follows the count at the one ratchet in `_gain_faith`, which is the state BI §1
+# shipped. A dead function that a later batch could re-arm is exactly the kind of
+# thing this file deletes rather than keeps (BJ §1's rule), and its absence is
+# pinned in test_batch_bi where its presence used to be.
 #
-# IT IS A RATCHET, THE SAME `maxi` `_gain_faith` USES, and it clamps at five —
-# so it can never LOWER a peak an ally has already ground out, and it can never
-# push one past what the count itself could have reached. Both halves matter:
-# a card that lowered a peak would re-couple the two axes BI separated, and one
-# that exceeded five would pay for a count the meter cannot hold.
-func _raise_faith_peak(u: BattleUnit, to: int) -> void:
-	var devout := _living_devout()
-	if devout == null or u.dead or u.is_companion or not u.is_hero:
-		return
-	u.faith_peak = maxi(u.faith_peak, mini(to, 5))
-	_refresh_faith_chip(u, devout)
+# THE ONE SITE THAT LOWERS A PEAK IS NOW BLESSING OF THE FAITHFUL, at its own
+# resolver, and it is named there.
 
 
 # BATCH CE — MANTLE. Fired by `unit.barrier_broken_cb` when a barrier is
@@ -12535,17 +12560,17 @@ func _on_hero_below_half(low_ally: BattleUnit) -> void:
 	for h in heroes:
 		if h.dead or h.second_resource_name != "Mercy":
 			continue
-		# BATCH CE — MATINS' WATCH IS BROKEN HERE, AND THIS IS THE ONLY SITE
-		# THAT CAN BREAK IT, because this is the only site that knows an ally
-		# crossed the window. The flag rides the STATUS rather than a field on
-		# her, so it dies with the office and costs no unit-side state.
+		# BATCH CE — DIVINE PRESENCE'S WATCH IS BROKEN HERE, AND THIS IS THE ONLY
+		# SITE THAT CAN BREAK IT, because this is the only site that knows an
+		# ally crossed the window. The flag rides the STATUS rather than a field
+		# on her, so it dies with the watch and costs no unit-side state.
 		#
 		# IT BREAKS WHETHER OR NOT A STACK LANDED — a fall at the cap pays her
 		# nothing (or pays Alms below), and the rule the card is sold on is "a
 		# fall pays the passive instead", not "a fall pays her". Reading the cap
 		# here would make the two cards double up on exactly the turns Alms was
 		# authored to cover.
-		var mt: Dictionary = h.get_status("matins")
+		var mt: Dictionary = h.get_status("divine_presence")
 		if not mt.is_empty():
 			mt["broken"] = true
 		if h.second_resource < h.second_max:
@@ -12599,39 +12624,20 @@ func _consume_empower(attacker: BattleUnit, ab: Ability) -> bool:
 	return true
 
 
-# BATCH CE — OBSERVANCE (Holy draft, tranche 3). THE EMPOWER TAX, PAID RATHER
-# THAN WAIVED. An Empowered cast has always forfeited its perfect bonus — a
-# permanent standing charge, and the one thing about Mercy no card had engaged
-# with. This buys it back for a SECOND stack, per cast.
+# BATCH CG §1 — OBSERVANCE IS DELETED AND `_observance_pay` WENT WITH IT. The
+# card bought back the perfect bonus an Empowered cast forfeits, for a SECOND
+# Mercy per cast; VESPERS takes its slot in the Holy draft pool, and the Empower
+# tax goes back to being unbuyable. Nothing is left of the rule — no constant,
+# no status, no half-function for a later batch to re-arm — so an Empowered cast
+# forfeits its perfect exactly as it did before Batch CE.
 #
-# IT IS ASKED AFTER `_consume_empower` HAS ALREADY SETTLED THE ORDINARY
-# SURCHARGE, and that ordering is the rule: Avatar of Mercy and Ardor answer the
-# FIRST stack and are deliberately not consulted here, so a capstone build does
-# not get the finesse free on top of getting the surge free. SANCTIFIED is
-# consulted, because it is the one roll every Mercy spend in the game already
-# passes through (`_sanctified_refund` is THE site) and carving this spend out
-# would be a second answer to one question.
-#
-# UNPAYABLE IS NOT REFUSED. With no second stack in hand it returns false and
-# the cast resolves as an ordinary Empower — no wasted turn, no error, and the
-# card's own text says so.
-func _observance_pay(attacker: BattleUnit) -> bool:
-	if not attacker.has_status("observance"):
-		return false
-	if attacker.second_resource_name != "Mercy" or attacker.second_resource < 1:
-		_log("   → Observance: no second stack in hand — the cast Empowers as usual",
-			"#909090")
-		return false
-	if _sanctified_refund(attacker):
-		_log("   → Talent: Sanctified — Observance's second stack costs nothing",
-			"#b0a8e0")
-	else:
-		attacker.second_resource -= 1
-	attacker.refresh_bars()
-	attacker.float_text("OBSERVED", Color(0.98, 0.80, 0.50))
-	_log("   → Observance: a second Mercy keeps the perfect bonus through the Empower (%d/%d)" % [
-		attacker.second_resource, attacker.second_max], "#e8c860")
-	return true
+# WHAT SURVIVES CE HERE AND IS NOT A NO-OP TO UNDO: the casts whose two branches
+# CE split from `if empowered ... elif is_perfect` into two independent `if`s
+# stay split. With nothing able to keep a perfect through an Empower the two are
+# unreachable together again, so the split is once more behaviourally invisible
+# — but THE HYMN'S ORDERING IS A REAL RULE AND STAYS WHERE CE PUT IT: its
+# Empowered share (35%) is written LAST, so a cast that paid a Mercy for the
+# privilege can never be handed the smaller perfect share (25%) instead.
 
 
 # A cost/cooldown-free copy of an attack for reaction casts (Opportunist,
@@ -12681,11 +12687,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		grade: String, mult: float) -> void:
 	var is_perfect := grade == "perfect"
 	# Mercy Empowerment: pays +1 stack and forfeits the perfect bonus.
-	# BATCH CE — unless OBSERVANCE is up and she can pay a second stack, which
-	# is the whole of that card. ONE SITE DECIDES: `_observance_pay` both bills
-	# and answers, so "she paid" and "the perfect survives" can never disagree.
+	# BATCH CG §1 — UNCONDITIONALLY AGAIN. Batch CE's Observance could buy the
+	# perfect back for a second stack; the card is deleted and the exception went
+	# with it, so this is the pre-CE line.
 	var empowered := _consume_empower(attacker, ab)
-	if empowered and not _observance_pay(attacker):
+	if empowered:
 		is_perfect = false
 	match ab.special:
 		"rally":
@@ -12815,12 +12821,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		"hymn":
 			# 20% of each ally's max health; Empowered 35%; perfect 25%.
 			# BATCH CE — REORDERED RATHER THAN SPLIT, and the order is the
-			# decision: OBSERVANCE can make both true now, and 35% Empowered is
-			# STRICTLY BIGGER than 25% perfect, so the Empowered share must be
-			# written LAST or the card would quietly DOWNGRADE the cast it just
-			# charged a second Mercy for. A behavioural no-op today (only one
-			# could ever be true), and it is why Observance is worth NOTHING on
-			# the Hymn — reported rather than papered over with a new number.
+			# decision: 35% Empowered is STRICTLY BIGGER than 25% perfect, so
+			# the Empowered share must be written LAST or a cast that paid a
+			# Mercy for the surge could be handed the smaller number instead.
+			# CE wrote it against Observance, which could make both true;
+			# BATCH CG §1 DELETED THAT CARD AND THE ORDER STAYS, because it
+			# costs nothing and it is the half of CE's reasoning that was
+			# about the Hymn rather than about the card.
 			var pct := 0.20
 			if is_perfect:
 				pct = 0.25
@@ -14977,22 +14984,23 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					attacker.unit_name, th_verb, th_before, THRESHOLD_STACKS,
 					th_lock, " [PERFECT]" if is_perfect else ""], "#b085e0")
 		# ========== BATCH CE: TRANCHE 3, THE CLERIC NINE ==========
-		"matins":
-			# The office is REFUSED rather than laid when there is no Mercy to
+		"divine_presence":
+			# The watch is REFUSED rather than laid when there is no Mercy to
 			# keep it for. `DOD_SIM_ABILITIES` hands every card to every hero, so
 			# a Beastmaster reaches this branch in a smoke — and a chip promising
 			# a resource he does not own is a lie on the bar (Threshold's rule,
 			# Inner Arcane's lesson).
 			if attacker.second_resource_name != "Mercy":
-				_log("%s: Matins — he holds no Mercy to keep the office for" % \
+				_log("%s: Divine Presence — he holds no Mercy to keep the watch for" % \
 					attacker.unit_name, "#909090")
 			else:
-				var mt_turns := 4 if is_perfect else 3
-				_apply_status(attacker, "matins", mt_turns)
+				var mt_turns := 6 if is_perfect else 4
+				_apply_status(attacker, "divine_presence", mt_turns)
 				_sfx("heal", -9.0, 0.8)
-				_message("%s keeps the office" % attacker.unit_name)
-				_log("%s: Matins — for %d turns she gains 1 Mercy at the start of each of her turns on which nobody fell%s" % [
-					attacker.unit_name, mt_turns,
+				_message("%s keeps the watch" % attacker.unit_name)
+				_log("%s: Divine Presence — for %d turns she gains %d Mercy at the start of every %s turn of hers on which nobody fell%s" % [
+					attacker.unit_name, mt_turns, DIVINE_PRESENCE_MERCY,
+					"second" if DIVINE_PRESENCE_EVERY == 2 else str(DIVINE_PRESENCE_EVERY) + "th",
 					" [PERFECT]" if is_perfect else ""], "#e8c860")
 		"alms":
 			if attacker.second_resource_name != "Mercy":
@@ -15009,46 +15017,77 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Alms — for %d turns Mercy earned at the cap wards the ally who earned it (%d%% of her maximum)%s" % [
 					attacker.unit_name, al_turns, ALMS_WARD_PCT,
 					" [PERFECT]" if is_perfect else ""], "#e8c860")
-		"observance":
-			if attacker.second_resource_name != "Mercy":
-				_log("%s: Observance — he has no Empowerment to keep the form of" % \
+		"vespers":
+			# BATCH CG §1 — THE ABSORB IS SIZED AND STAMPED AT CAST, off HER
+			# maximum, and carried on the status power (the Alms pattern). Two
+			# consequences worth having: a Holy who falls after laying it does
+			# not take the ward with her, and the chip a player reads and the
+			# absorb `unit.take_hit` performs are ONE number.
+			if target == null or target.dead:
+				_log("%s: Vespers finds nobody to say it over" % \
 					attacker.unit_name, "#909090")
 			else:
-				var ob_turns := 4 if is_perfect else 3
-				_apply_status(attacker, "observance", ob_turns)
-				_sfx("perfect", -9.0, 0.9)
-				_message("%s keeps the form exactly" % attacker.unit_name)
-				_log("%s: Observance — for %d turns an Empowered cast keeps its perfect bonus for 1 additional Mercy%s" % [
-					attacker.unit_name, ob_turns,
+				var vs_turns := 6 if is_perfect else 4
+				var vs_power := maxi(int(round(attacker.max_hp * VESPERS_PCT)), 1)
+				_apply_status(target, "vespers", vs_turns, vs_power, 0, attacker)
+				target.float_text("VESPERS %d" % vs_power,
+					Color(0.98, 0.80, 0.50))
+				_sfx("heal", -9.0, 0.9)
+				_message("%s says the evening office over %s" % [
+					attacker.unit_name, target.unit_name])
+				_log("%s: Vespers — for %d turns, or until it fires, the next blow that would take %s below the window is absorbed for %d (20%% of their own maximum)%s" % [
+					attacker.unit_name, vs_turns, target.unit_name, vs_power,
 					" [PERFECT]" if is_perfect else ""], "#e8c860")
 		"elevation":
-			# IT WRITES THE PEAK AND NOT THE COUNT, which is the whole card:
-			# nobody holds another stack, nobody is walked toward a release, and
-			# the party is paid all fight for a count it never carried. That is
-			# the asymmetry BI built `faith_peak` for and the first thing to
-			# exploit it deliberately.
+			# BATCH CG §2 — IT GRANTS REAL FAITH NOW. CE's version wrote
+			# `faith_peak` and never `faith_stacks`, so nobody held anything and
+			# nobody was ever walked toward a release. These are stacks on the
+			# bar, handed over through `_gain_faith` — THE ONE DOOR — so every
+			# consequence of a Faith gain follows for free rather than being
+			# reimplemented here: the peak still ratchets on the way up, Zeal
+			# still doubles, the source table still books it, and an ally who
+			# crosses the cap RELEASES.
+			#
+			# THE RELEASE IS THE POINT, NOT AN EDGE CASE TO GUARD AGAINST. An
+			# ally already holding 3 reaches 5 and pays out — healed 15% of
+			# maximum, count reset, the Devout given 3% of his Mana — and their
+			# PEAK is untouched by the reset (BI §1), so the release costs them
+			# nothing they were holding. Binding Oath and Communion ride it
+			# exactly as they ride any other release, because it IS one.
 			if _living_devout() == null:
 				_log("%s: Elevation — no Devout stands, so Faith pays nothing" % \
 					attacker.unit_name, "#909090")
 			else:
-				var el_floor := ELEVATION_FLOOR + (1 if is_perfect else 0)
+				var el_stacks := ELEVATION_STACKS + (1 if is_perfect else 0)
 				var el_n := 0
 				for el_h in heroes:
-					if el_h.dead or el_h.is_companion or el_h.faith_peak >= el_floor:
+					if el_h.dead or el_h.is_companion:
 						continue
-					_raise_faith_peak(el_h, el_floor)
-					el_h.float_text("PEAK %d" % el_h.faith_peak,
+					_gain_faith(el_h, el_stacks, "elevation")
+					el_h.float_text("+%d Faith" % el_stacks,
 						Color(0.98, 0.85, 0.45))
 					el_n += 1
 				if el_n == 0:
-					_log("%s: Elevation — every peak already stands at %d or better" % [
-						attacker.unit_name, el_floor], "#909090")
+					_log("%s: Elevation — there is nobody left to raise up" % \
+						attacker.unit_name, "#909090")
 				else:
 					_sfx("perfect", -8.0, 0.7)
 					_message("%s raises them up" % attacker.unit_name)
-					_log("%s: Elevation — %d ally(s) raised to a PEAK of %d Faith for the rest of the battle%s" % [
-						attacker.unit_name, el_n, el_floor,
+					_log("%s: Elevation — %d ally(s) gain %d stacks of Faith%s" % [
+						attacker.unit_name, el_n, el_stacks,
 						" [PERFECT]" if is_perfect else ""], "#c8b880")
+		# BATCH CG §2 — JUBILEE IS DISPLAYED AS "BLESSING OF THE FAITHFUL". The
+		# SPECIAL ID SURVIVES THE RENAME, which is this project's own convention
+		# for a save- and resolver-bearing identifier (BX renamed two talent
+		# nodes and kept their ids for exactly this reason): the label is what
+		# moved, and a moved id is what silently breaks a saved kit.
+		#
+		# FLAGGED, NOT RESOLVED — THE DEVOUT'S CORE ALREADY HOLDS BLESSING OF
+		# ZEAL, so his sheet now carries two abilities beginning "Blessing of…".
+		# It is not a break (`pool_ability` is keyed on the WHOLE display name
+		# and the two strings differ), it is the near-miss BR §1's sweep would
+		# ordinarily raise, and it was NAMED DELIBERATELY BY THE DESIGNER.
+		# Recorded here rather than silently accepted.
 		"jubilee":
 			# THIS IS NOT A RELEASE AND MUST NEVER BECOME ONE. BH §2 took the
 			# Devout off the release branch because a releasing Devout puts the
@@ -15058,20 +15097,32 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# does NOT go through `_gain_faith`: no growth, no Communion, no
 			# Binding Oath, no chain.
 			if attacker.passive_id != "conviction":
-				_log("%s: Jubilee — only the Devout carries Faith that never releases" % \
+				_log("%s: Blessing of the Faithful — only the Devout carries Faith that never releases" % \
 					attacker.unit_name, "#909090")
 			elif attacker.faith_stacks < JUBILEE_MIN_FAITH:
-				_log("%s: Jubilee — only %d Faith held; the year needs %d" % [
+				_log("%s: Blessing of the Faithful — only %d Faith held; the blessing needs %d" % [
 					attacker.unit_name, attacker.faith_stacks,
 					JUBILEE_MIN_FAITH], "#909090")
 			else:
 				var jb_stacks := attacker.faith_stacks
 				var jb_pct := 0.08 if is_perfect else 0.06
-				# THE PEAK IS DELIBERATELY UNTOUCHED. BI's whole repair was that
-				# spending must not cost held value; the count empties, the
-				# high-water mark stands, and every point of mitigation it bought
-				# keeps paying. Lowering it here would re-couple the two axes.
+				var jb_peak_was := attacker.faith_peak
+				# BATCH CG §2 — THE PEAK DROPS TO MATCH THE COUNT, AND THAT IS
+				# THE POINT OF THE CHANGE. As CE shipped it the high-water mark
+				# stood through the spend, so the payout was FREE: the count
+				# bought him nothing while he held it, so emptying it cost him
+				# nothing either. Now the burst is bought with the mitigation and
+				# damage the peak was paying for the rest of the fight.
+				#
+				# IT IS A DELIBERATE EXCEPTION TO BI §1 RATHER THAN A REVERSAL OF
+				# IT. BI's repair was that HELD VALUE MUST NOT BE COUPLED TO
+				# SPEND FREQUENCY — that a release must not silently cost the
+				# mitigation. Here the surrender is NAMED ON THE CARD and paid
+				# once by one deliberate cast; `_gain_faith`'s release branch
+				# still leaves every peak standing, and this is the only site in
+				# the game that lowers one.
 				attacker.faith_stacks = 0
+				attacker.faith_peak = 0
 				_refresh_faith_chip(attacker, attacker)
 				var jb_heal := maxi(int(round(attacker.max_hp * jb_pct
 					* jb_stacks)), 1)
@@ -15086,11 +15137,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.refresh_bars()
 				attacker.float_text("+%d" % jb_got, Color(0.98, 0.85, 0.45))
 				_sfx("heal", -8.0, 0.7)
-				_message("%s calls the year of release" % attacker.unit_name)
-				_log("%s: Jubilee — %d Faith spent for %d health and %d Mana; his PEAK of %d stands%s" % [
+				_message("%s blesses the faithful" % attacker.unit_name)
+				_log("%s: Blessing of the Faithful — %d Faith spent for %d health and %d Mana; his PEAK falls from %d to %d with it%s" % [
 					attacker.unit_name, jb_stacks, jb_got, jb_res,
-					attacker.faith_peak, " [PERFECT]" if is_perfect else ""],
-					"#c8b880")
+					jb_peak_was, attacker.faith_peak,
+					" [PERFECT]" if is_perfect else ""], "#c8b880")
 		"mantle":
 			if target == null or target.dead or _living_devout() == null:
 				_log("%s: Mantle finds nobody to lay it on" % attacker.unit_name,
@@ -15113,10 +15164,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Mantle — %s is shielded for %d, and when it breaks it passes %d more time(s)%s" % [
 					attacker.unit_name, target.unit_name, mn_power, mn_hops,
 					" [PERFECT]" if is_perfect else ""], "#c8b880")
-		"anathema":
+		"breaking_darkness":
 			if target == null or target.dead:
-				_log("%s: Anathema finds nothing to name" % attacker.unit_name,
-					"#909090")
+				_log("%s: Breaking Darkness finds nothing to name" % \
+					attacker.unit_name, "#909090")
 			else:
 				var an_turns := 4 if is_perfect else 3
 				# THE CAST'S OWN BREAK LANDS BEFORE THE MARK, so the card does
@@ -15127,19 +15178,20 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_stat_bd(attacker, ab.pressure)
 				target.float_text("+%d BD" % an_hit.get("bd", 0),
 					Color(0.80, 0.35, 0.70))
-				_apply_status(target, "anathema", an_turns, ANATHEMA_BD_PCT,
-					0, attacker)
+				_apply_status(target, "breaking_darkness", an_turns,
+					BREAKING_DARKNESS_BD_PCT, 0, attacker)
 				_sfx("break", -8.0, 0.7)
-				_message("%s names %s accursed" % [attacker.unit_name,
+				_message("%s breaks the dark over %s" % [attacker.unit_name,
 					target.unit_name])
-				_log("%s: Anathema — %s takes +%d BD now, and every source of Break lands %d%% harder on it for %d turns%s" % [
+				_log("%s: Breaking Darkness — %s takes +%d BD now, and every source of Break lands %d%% harder on it for %d turns%s" % [
 					attacker.unit_name, target.unit_name, an_hit.get("bd", 0),
-					ANATHEMA_BD_PCT, an_turns,
+					BREAKING_DARKNESS_BD_PCT, an_turns,
 					" [PERFECT]" if is_perfect else ""], "#a050b0")
 				if an_hit.broke:
 					_sfx("break", -4.0)
 					_message("%s BREAKS!" % target.unit_name)
-					_log("!! %s BREAKS (Anathema)" % target.unit_name, "#c070e0")
+					_log("!! %s BREAKS (Breaking Darkness)" % target.unit_name,
+						"#c070e0")
 		"requiem":
 			var rq_stacks: int = 0 if target == null else target.status_stacks("ruin")
 			if target == null or target.dead or rq_stacks <= 0:
@@ -15205,20 +15257,21 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					"#909090")
 			else:
 				var pn_turns := 4 if is_perfect else 3
-				# SNAPSHOTTED AT APPLICATION, the rule every DoT in the game
-				# follows — and here it reads the TARGET'S OWN Attack rather than
-				# the caster's, which nothing else in the game does.
-				var pn_tick := maxi(int(round(target.attack * PENANCE_SHARE)), 1)
-				_apply_status(target, "penance", pn_turns, 0, pn_tick, attacker)
+				# BATCH CG §3 — NOTHING IS SNAPSHOTTED AND NOTHING READS THE
+				# TARGET'S SHEET. The mark carries only its SHARE, as percentage
+				# points on the status power (the Alms/Breaking Darkness
+				# pattern), and the mirror reads the damage the enemy actually
+				# deals at the moment it deals it. That is what makes a Sundered
+				# or Crippled enemy pay less: it is billed for what it did, not
+				# for what it was worth when it was named.
+				_apply_status(target, "penance", pn_turns,
+					int(round(PENANCE_MIRROR * 100.0)), 0, attacker)
 				_sfx("break", -9.0, 0.6)
 				_message("%s sets %s to penance" % [attacker.unit_name,
 					target.unit_name])
-				# THE FIGURE IS PRE-RESISTANCE and the line says so. The tick
-				# itself is shadow-typed, so a resistant body pays less than
-				# this and a weak one pays more — and the tick's own line
-				# reports the number that actually landed, tagged.
-				_log("%s: Penance — %s is set to pay %d shadow before its resistances, at the start of each of its next %d turns (20%% of its OWN Attack)%s" % [
-					attacker.unit_name, target.unit_name, pn_tick, pn_turns,
+				_log("%s: Penance — for %d turns %s takes shadow damage equal to %d%% of the damage it deals, whoever it hits%s" % [
+					attacker.unit_name, pn_turns, target.unit_name,
+					int(round(PENANCE_MIRROR * 100.0)),
 					" [PERFECT]" if is_perfect else ""], "#a050b0")
 		"venom_coat":
 			_apply_status(attacker, "venom_coat", 4)
@@ -16068,10 +16121,12 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# BEHAVIOURAL NO-OP TODAY. An Empowered cast has ALWAYS zeroed
 			# `is_perfect`, so the two could never both be true and the `elif`
 			# was an accident of that impossibility rather than a rule.
-			# OBSERVANCE is what makes the pair reachable, and the branches touch
-			# different things, so both may run. Verified as a no-op before it
-			# was made: with no Observance up, `empowered` still implies
-			# `not is_perfect` and this reads exactly as the `elif` did.
+			# OBSERVANCE made the pair reachable, and BATCH CG §1 DELETED THAT
+			# CARD — so the two are unreachable together again and this reads
+			# exactly as the `elif` did. It stays split because the shape is
+			# the honest one: nothing about these two branches requires them
+			# to be exclusive, and the next thing that makes them reachable
+			# should not have to find this line first.
 			if is_perfect:
 				var hh_self := maxi(int(round(attacker.max_hp * 0.05)), 1)
 				var self_got: int = attacker.heal_amount(hh_self)
@@ -16112,10 +16167,12 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# BEHAVIOURAL NO-OP TODAY. An Empowered cast has ALWAYS zeroed
 			# `is_perfect`, so the two could never both be true and the `elif`
 			# was an accident of that impossibility rather than a rule.
-			# OBSERVANCE is what makes the pair reachable, and the branches touch
-			# different things, so both may run. Verified as a no-op before it
-			# was made: with no Observance up, `empowered` still implies
-			# `not is_perfect` and this reads exactly as the `elif` did.
+			# OBSERVANCE made the pair reachable, and BATCH CG §1 DELETED THAT
+			# CARD — so the two are unreachable together again and this reads
+			# exactly as the `elif` did. It stays split because the shape is
+			# the honest one: nothing about these two branches requires them
+			# to be exclusive, and the next thing that makes them reachable
+			# should not have to find this line first.
 			if is_perfect:
 				attacker.resource = mini(attacker.resource + 10, attacker.max_resource)
 				attacker.float_text("+10 Mana", Color(0.5, 0.7, 1.0))
@@ -19086,10 +19143,16 @@ static func faith_report_line(stats: Dictionary) -> String:
 	# are Faith too, and printing four while counting six would break the one
 	# property that makes the table worth reading — the parts summing to the
 	# total, which test_batch_bi asserts.
+	#
+	# SEVEN SINCE BATCH CG §2, for that exact reason: ELEVATION hands out real
+	# Faith now and books through `_faith_gained` like every other source, so a
+	# six-term table would silently stop adding up the moment the card was
+	# drafted.
 	var gain_terms := [
 		["absorb", "absorbs"], ["ground", "ground drip"],
 		["communion", "Communion"], ["covenant", "Covenant"],
-		["oath", "Binding Oath"], ["opening", "opening rune"]]
+		["oath", "Binding Oath"], ["opening", "opening rune"],
+		["elevation", "Elevation"]]
 	var gain_parts := PackedStringArray()
 	for t in gain_terms:
 		gain_parts.append("%s %.2f" % [
@@ -19964,6 +20027,73 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int) -> void:
 				_on_enemy_death(fb_mate)
 			_dmg_frame(fb_was_src, fb_was_label, fb_was_name)
 			_frostbind_mirroring = false
+	# BATCH CG §3 — PENANCE, AND IT SITS ABOVE THE HERO GATE BELOW FOR EXACTLY
+	# FROSTBIND'S REASON. The card bills the marked enemy for the damage IT
+	# deals, "whoever it hits" — and a Feint redirect, a Bewitch, a Psychosis or
+	# a Hysteria all make its victim one of its own, so a mirror written below
+	# the gate would silently do nothing on precisely the turns the Occultist
+	# engineered. IT READS THE DEALER (`_dmg_src`), NOT THE VICTIM.
+	#
+	# RIDING BL'S ONE DOOR IS WHAT MAKES "whoever it hits" TRUE WITHOUT A LIST:
+	# a strike, its splash, an echo, a retaliation, a DoT tick and a reflect all
+	# arrive here, so a damage source added later cannot forget to be mirrored.
+	# It reports the DELTA and sits BELOW every death refusal, so what mirrors is
+	# health that genuinely left a body rather than a number that was refused.
+	#
+	# SELF-INFLICTED IS EXCLUDED BY IDENTITY, the same rule the recap's ledger
+	# uses fifteen lines down: recoil, Blood Price and the mirror's own payment
+	# are damage a unit deals to ITSELF, and "whoever it hits" means somebody
+	# else. Without it a recoil would be billed twice and the mirror would have
+	# a second door into its own loop.
+	if not _penance_mirroring and _dmg_src != null \
+			and is_instance_valid(_dmg_src) and _dmg_src != victim \
+			and not _dmg_src.is_hero and _dmg_src.has_status("penance"):
+		var pn_owed := _dmg_src
+		var pn_share := maxi(int(round(lost * 0.01
+			* maxi(pn_owed.status_power("penance"), 1))), 1)
+		# SHADOW-TYPED, so shadow resists and weaknesses both read — the same
+		# arithmetic the snapshotted tick did before CG, applied to a live
+		# figure rather than a stored one.
+		var pn_resist := float(pn_owed.resists.get("shadow", 0.0))
+		pn_share = maxi(int(round(pn_share * (1.0 - pn_resist))), 1)
+		var pn_tag := ""
+		if pn_resist > 0.0:
+			pn_tag = " (resisted)"
+		elif pn_resist < 0.0:
+			pn_tag = " (WEAK!)"
+		var pn_stat: Dictionary = pn_owed.get_status("penance")
+		var pn_owner := String(pn_stat.get("src_name", ""))
+		_penance_mirroring = true
+		# THE FRAME NAMES PENANCE WHILE PENANCE IS DEALING DAMAGE and is restored
+		# on the way out — BL §2's rule, through the door Frostbind's mirror and
+		# Forge Body's throw already use.
+		var pn_was_src := _dmg_src
+		var pn_was_label := _dmg_label
+		var pn_was_name := _dmg_src_name
+		_dmg_frame(null, "Penance", pn_owner)
+		# IT CREDITS THE OCCULTIST WHO SET IT, resolved through the `src_name`
+		# the status carries rather than through a live unit — a dead caster
+		# credits nobody and the penance goes on being paid, which is honest
+		# rather than wrong (the mark is on the enemy, not on him).
+		if pn_owner != "":
+			_stat("dmg_hero_" + pn_owner, pn_share)
+		_sfx("hit", -14.0, 0.7)
+		pn_owed.take_tick_damage(pn_share, "-%d PENANCE" % pn_share,
+			Color(0.70, 0.38, 0.78))
+		_log("   → Penance: %s pays for the blow — %d shadow damage%s" % [
+			pn_owed.unit_name, pn_share, pn_tag], "#a050b0")
+		if pn_owed.dead:
+			# NO `_on_enemy_death` CALL, and that is the consistency the tick had
+			# before it: every non-strike damage site in this file reports the
+			# death and none of them fires the on-death hooks, so one card's
+			# kills would otherwise pay Scavenger and Overkill where a Burn's do
+			# not.
+			_stat("enemy_deaths")
+			_sfx("death", -4.0)
+			_message("%s falls!" % pn_owed.unit_name)
+			_log("† %s dies" % pn_owed.unit_name, "#e05050")
+		_dmg_frame(pn_was_src, pn_was_label, pn_was_name)
+		_penance_mirroring = false
 	if not victim.is_hero or victim.is_companion:
 		return
 	# BACKBLAST (Pyromancer, Inferno row 5 — BATCH BS §3) RIDES BL'S ONE DOOR,

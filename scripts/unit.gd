@@ -31,15 +31,18 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	# party's work off the enemy carrying it. `emberkeep`, `resonant_field` and
 	# `threshold_lock` are NOT here and must not be: all three sit on a HERO.
 	"frostbind", "unmade",
-	# BATCH CE — `anathema` AND `penance` are the tranche-3 Cleric draft's two
-	# enemy-side statuses and both are genuine AFFLICTIONS, so both are listed,
-	# for the same two consequences: a mender's Cleansing Rite can take either
-	# (real counterplay, and neither is battle-long so neither is picked first
-	# every single time), and — the half that matters — listing them keeps them
-	# OUT of the derived `_dispellable_buffs` set, so a Mage's own Dispel can
-	# never strip the party's work off the enemy carrying it. `matins`, `alms`
-	# and `observance` are NOT here and must not be: all three sit on HOLY.
-	"anathema", "penance",
+	# BATCH CE — `breaking_darkness` (Anathema, renamed at CG §3) AND `penance`
+	# are the tranche-3 Cleric draft's two enemy-side statuses and both are
+	# genuine AFFLICTIONS, so both are listed, for the same two consequences: a
+	# mender's Cleansing Rite can take either (real counterplay, and neither is
+	# battle-long so neither is picked first every single time), and — the half
+	# that matters — listing them keeps them OUT of the derived
+	# `_dispellable_buffs` set, so a Mage's own Dispel can never strip the
+	# party's work off the enemy carrying it. `divine_presence`, `alms` and
+	# BATCH CG's `vespers` are NOT here and must not be: all three sit on the
+	# PARTY — the first two on Holy herself, the third a ward she lays on an
+	# ally.
+	"breaking_darkness", "penance",
 	# BATCH BT — `slow_burn` IS a genuine debuff and is listed as one, which
 	# makes it CLEANSABLE by a mender's Cleansing Rite. That is the counterplay
 	# rather than an oversight (Blight the Well's precedent): a card that makes
@@ -2513,6 +2516,36 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		if bool(bloodbond_cb.call(self, amount)):
 			amount = maxi(hp - 1, 0)
 			float_text("BLOODBOND", Color(0.85, 0.30, 0.35))
+	# BATCH CG §1 — VESPERS (Holy draft, tranche 3, replacing Observance). THE
+	# BLOW THAT WOULD CROSS THE WINDOW IS THE ONE IT CATCHES, and its position is
+	# the whole card: it sits ABOVE the subtraction and therefore above
+	# `_check_below_half`, so an ally the ward keeps on the right side of the line
+	# NEVER CROSSES — and HOLY EARNS NO MERCY FOR A CROSSING THAT NEVER HAPPENED.
+	# That clause is not written anywhere; it falls out of standing here. Moving
+	# this below the subtraction would leave the card working and quietly hand her
+	# the stack anyway, which is the one way to make its price disappear.
+	#
+	# IT READS `mercy_threshold` RATHER THAN A LITERAL HALF for the same reason:
+	# GUARDIAN ANGEL moves the Mercy line to 65%, and a ward watching a different
+	# line from the generator would make the trade false in exactly the build
+	# that cares most about it.
+	#
+	# ONE-SHOT — it is REMOVED as it fires ("or until it fires"), so a blow bigger
+	# than the absorb still crosses, still pays her the Mercy, and still spends
+	# the ward. A PARTIAL CATCH IS A REAL OUTCOME, not a failure state.
+	#
+	# NO COPY IN `take_tick_damage`, DELIBERATELY: the card says "the next BLOW",
+	# and BS's Kiln-Forged set the precedent this file already follows — a Burn
+	# tick is not a hit.
+	if amount > 0 and has_status("vespers") \
+			and hp > max_hp * mercy_threshold \
+			and hp - amount <= max_hp * mercy_threshold:
+		var vs_caught := mini(maxi(status_power("vespers"), 1), amount)
+		amount -= vs_caught
+		remove_status("vespers")
+		float_text("VESPERS -%d" % vs_caught, Color(0.98, 0.80, 0.50))
+		_proc_log("Vespers — the evening office catches %d of the blow on %s" % [
+			vs_caught, unit_name])
 	var was_above_half := hp > max_hp * 0.5
 	var was_above_quarter := hp > max_hp * 0.25
 	var was_below_deathwish := hp < max_hp * 0.35
@@ -2625,22 +2658,24 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		eff_con = maxf(eff_con * (1.0 - minf(thin, 0.75)), 10.0)
 	var bd_raw := pressure_add
 	pressure_add = int(round(pressure_add * 100.0 / maxf(eff_con, 1.0)))
-	# BATCH CE — ANATHEMA (Occultist draft, tranche 3): THE ONE PLACE BREAK
-	# DAMAGE IS EVER AMPLIFIED. Every other line in this block REDUCES it, and
-	# that asymmetry is exactly why the card exists — the Madness lane is gated
-	# on Broken and nothing in the game had ever made a Break meter fill faster.
+	# BATCH CE — BREAKING DARKNESS (Occultist draft, tranche 3; it was ANATHEMA
+	# until Batch CG §3, and the amplifier came down 50% -> 25% with the name):
+	# THE ONE PLACE BREAK DAMAGE IS EVER AMPLIFIED. Every other line in this
+	# block REDUCES it, and that asymmetry is exactly why the card exists — the
+	# Madness lane is gated on Broken and nothing in the game had ever made a
+	# Break meter fill faster.
 	#
 	# IT SITS ABOVE THE REDUCERS DELIBERATELY. Bulwark still refuses the whole of
 	# it, Devoutness still cuts its share and Iron Will still caps the meter at
 	# 99 — the amplifier raises the number those then act on, which is the honest
-	# reading of "every source lands 50% harder" and keeps every defence in the
+	# reading of "every source lands 25% harder" and keeps every defence in the
 	# game answering it.
 	#
 	# IT IS NOT BOOKED THROUGH `_credit_bd`: that ledger is Break REFUSED OR
 	# REDUCED (BF §1), and an increase is neither of those things.
-	if pressure_add > 0 and has_status("anathema"):
+	if pressure_add > 0 and has_status("breaking_darkness"):
 		pressure_add += int(round(pressure_add
-			* maxi(status_power("anathema"), 1) / 100.0))
+			* maxi(status_power("breaking_darkness"), 1) / 100.0))
 	if bracing_ranks > 0 and stance == "defensive":
 		# What the same hit would have cost at his UNBRACED Constitution: the
 		# node's whole effect is the gap between the two divisors.

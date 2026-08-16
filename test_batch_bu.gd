@@ -437,7 +437,7 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CE"), "master.html is stamped Batch CE")
+	ok(master.contains("Batch CG"), "master.html is stamped Batch CG")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
 	ok(master.contains("102 of"), "master.html states the current draft count")

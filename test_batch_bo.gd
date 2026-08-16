@@ -1183,7 +1183,7 @@ func _docs() -> void:
 	# TOGETHER or a batch that bumps the timestamp trips suites it never
 	# touched. (BO had its own copy phrased as "this batch"; it is the same
 	# gate.)
-	ok(master.contains("Batch CE"),
+	ok(master.contains("Batch CG"),
 		"§6: master.html is stamped for the current batch")
 	ok(master.contains("THE ABILITY DRAFT") or master.contains("The Ability Draft"),
 		"§6: ...and carries the draft's own section")

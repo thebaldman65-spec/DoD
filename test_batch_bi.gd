@@ -261,24 +261,29 @@ func _the_field_exists_and_has_one_ratchet() -> void:
 	ok(usrc.contains("var faith_peak := 0"),
 		"§1: unit.gd carries `faith_peak`")
 	var bsrc := _src("res://scripts/battle.gd")
-	# RE-POINTED BY BATCH CE, AND THE QUESTION IT ASKS IS THE SAME ONE, ASKED
-	# MORE PRECISELY. §1's rule is that the peak FOLLOWING THE COUNT has exactly
-	# one site, so the two can never drift apart — and drift here is invisible,
-	# because every number stays plausible. CE's ELEVATION writes the peak
-	# WITHOUT the count on purpose (that asymmetry is the card), so a bare count
-	# of the assignment now reads two. What is pinned instead is the half that
-	# matters: exactly ONE site raises the peak FROM `faith_stacks`, and the one
-	# deliberate other writer does not read the count at all.
+	# RE-POINTED BY BATCH CE AND AGAIN BY BATCH CG, AND THE QUESTION IT ASKS IS
+	# THE SAME ONE THROUGHOUT. §1's rule is that the peak FOLLOWING THE COUNT has
+	# exactly one site, so the two can never drift apart — and drift here is
+	# invisible, because every number stays plausible. CE's ELEVATION wrote the
+	# peak WITHOUT the count on purpose, so a bare count of the assignment read
+	# two; CG §2 made that card a plain Faith grant and DELETED `_raise_faith_
+	# peak` with it, so the peak-only writer is pinned ABSENT rather than pinned
+	# to one, and the assignment count is back to ONE.
 	ok(bsrc.count("u.faith_peak = maxi(u.faith_peak, u.faith_stacks)") == 1,
 		"§1: exactly ONE site raises the peak FROM the count")
-	ok(bsrc.count("func _raise_faith_peak(") == 1,
-		"§1: ...and CE's deliberate peak-only writer is one function")
-	var rfp := bsrc.find("func _raise_faith_peak(")
-	ok(rfp > 0 and not bsrc.substr(rfp, 500).contains("faith_stacks"),
-		"§1: ...which reads no count at all, so the two cannot drift")
-	ok(bsrc.count("u.faith_peak = maxi(") == 2,
-		"§1: the peak is raised in exactly TWO places, both accounted for (found %d)"
+	ok(not bsrc.contains("func _raise_faith_peak("),
+		"§1: ...and CG deleted the peak-only writer rather than leaving it dead")
+	ok(bsrc.count("u.faith_peak = maxi(") == 1,
+		"§1: the peak is RAISED in exactly ONE place (found %d)"
 			% bsrc.count("u.faith_peak = maxi("))
+	# BATCH CG §2 — AND EXACTLY ONE SITE LOWERS ONE, WHICH IS NEW. Blessing of
+	# the Faithful drops his high-water mark to match the count it spends, and
+	# that is a DELIBERATE EXCEPTION to §1 rather than a reversal of it: the
+	# surrender is named on the card and paid once by one cast, where BI's repair
+	# was that a RELEASE must not silently cost held value. The release branch
+	# still leaves every peak standing, and this pins that only one site does it.
+	ok(bsrc.count("attacker.faith_peak = 0") == 1,
+		"§1: exactly ONE site LOWERS a peak, and it is the card that names it")
 	ok(bsrc.contains("func _reset_faith_meters() -> void:"),
 		"§1: the reset is its own function, drivable headlessly")
 	ok(bsrc.count("_reset_faith_meters()") == 2,
