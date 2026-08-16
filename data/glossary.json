@@ -562,6 +562,18 @@
 		"short": "The Holy cleric's stacks, earned when allies fall into danger.",
 		"long": "Whenever any party member drops below half health, the Holy cleric gains a stack of Mercy (cap 5). Each held stack adds +5% to all healing done, and stacks are the fuel for Empowering casts. Mercy rewards the healer who waits for the moment of need.",
 		"see_also": [
+			"mercy_window",
+			"res_empower"
+		]
+	},
+	{
+		"id": "mercy_window",
+		"term": "The Mercy Window",
+		"category": "resources",
+		"short": "Mercy is paid for CROSSING below half health, once - and at the cap the stack is simply lost.",
+		"long": "Mercy has two edges and both are easy to meet without ever being told about them. THE FIRST IS THAT IT PAYS FOR A CROSSING, NOT FOR A STATE: an ally earns the Holy cleric a stack at the moment they fall below half of their maximum health, and never again while they stay there. A party already bloodied is a party paying her nothing. GUARDIAN ANGEL WIDENS THAT WINDOW - the line moves up from 50% toward 65%, so allies cross it sooner and cross it more often. THE SECOND EDGE IS THE CAP: she holds at most 5 (MARTYR'S VIGOR raises the ceiling), and a stack earned while she is full is thrown away entirely. Two things catch it - the GRACE talent turns the wasted stack into healing for the ally who earned it, and the drafted ALMS turns it into a ward on the same ally - and they stack, because one pays health a full bar discards and the other pays a barrier a full bar keeps. The drafted MATINS answers the first edge from the other side: it pays her on the turns nobody crossed at all, which is exactly the turn the passive leaves her empty.",
+		"see_also": [
+			"res_mercy",
 			"res_empower"
 		]
 	},

@@ -193,11 +193,11 @@ func _pools() -> void:
 	# pools are 60 plus the Mage nine and the whole draft is 93. The check is
 	# what would catch a pool quietly EMPTYING, which is why it is a pinned
 	# count rather than a range.
-	ok(spec_total == 69,
-		"§4+tranche 3: SPEC_DRAFT_POOLS is 60 plus CB's Mage nine (%d)"
+	ok(spec_total == 78,
+		"§4+tranche 3: SPEC_DRAFT_POOLS is 60 plus CB's Mage nine and CE's Cleric nine (%d)"
 			% spec_total)
-	ok(spec_total + total == 93,
-		"§0+tranche 3: the draft holds 93 of a target 120 (%d)" % (spec_total + total))
+	ok(spec_total + total == 102,
+		"§0+tranche 3: the draft holds 102 of a target 120 (%d)" % (spec_total + total))
 	# THE UNEVENNESS IS GONE, AND THAT IS THE INVERSION. Every earlier version of
 	# this loop asserted an asymmetry (five here, two there) because the debt was
 	# real and had to stay visible in code; BW paid the last of it, so what is
@@ -209,11 +209,19 @@ func _pools() -> void:
 	# paid tranche 3's first third. The question is unchanged and is still what
 	# tells the two answers apart; what is owed now is the Cleric, Hunter and
 	# Warrior thirds of tranche 3, and it has to stay visible in code.
-	for sp2 in ["pyromancer", "cryomancer", "arcanist"]:
+	# RE-POINTED BY BATCH CE, AND IT IS THE FIFTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, then CB's new asymmetry, and now that asymmetry HALVED
+	# — the CLERIC three joined the Mage three at EIGHT when tranche 3's second
+	# third landed, so six pools are eight deep and six are five. The question is
+	# unchanged and is still what tells the two answers apart; what is owed now
+	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
+	for sp2 in ["pyromancer", "cryomancer", "arcanist",
+			"holy", "inquisitor", "occultist"]:
 		ok(Classes.spec_draft_pool(sp2).size() == 8,
 			"§0+tranche 3: %s's SPEC pool is EIGHT deep" % sp2)
-	for sp2 in ["holy", "inquisitor", "occultist", "beastmaster",
-			"sharpshooter", "mystic", "berserker", "warden", "swordmaster"]:
+	for sp2 in ["beastmaster", "sharpshooter", "mystic",
+			"berserker", "warden", "swordmaster"]:
 		ok(Classes.spec_draft_pool(sp2).size() == 5,
 			"§0+tranche 3: %s is still FIVE — its third is owed" % sp2)
 	# EVERY ENTRY RESOLVES THROUGH THE ONE RESOLVER, which is what makes the
@@ -1208,7 +1216,7 @@ func _live_hits_not_casts() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	ok(master.contains("Batch CD"), "§5: master.html is stamped Batch CD")
+	ok(master.contains("Batch CE"), "§5: master.html is stamped Batch CE")
 	for cls in TRANCHE_4:
 		for nm in TRANCHE_4[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)
@@ -1220,7 +1228,7 @@ func _docs() -> void:
 	# any document with enough numbers in it — and BQ's rule is that a check
 	# which can only pass is a gap. It asks BR's real question instead: does
 	# master.html state the draft's LIVE pool count against the REAL target?
-	ok(master.contains("93 of 120"),
+	ok(master.contains("102 of 120"),
 		"§5: ...and master.html states the live pool count against the real target")
 	var changelog := _src("res://docs/changelog.html")
 	ok(changelog.find("Batch BR") >= 0, "§5: the changelog has a Batch BR entry")

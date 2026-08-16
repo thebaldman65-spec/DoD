@@ -480,7 +480,7 @@ func _docs() -> void:
 	# test_batch_bb carry — three copies of one assertion, and all three must
 	# move together or the batch that bumps master.html trips two suites it did
 	# not touch.
-	ok(doc.contains("Last updated: 2026-08-16 (Batch CD)"),
+	ok(doc.contains("Last updated: 2026-08-16 (Batch CE)"),
 		"master.html carries the current batch's stamp")
 	# The number AND the reason it was chosen travel together, or the next
 	# reader sees a float with no argument behind it.
@@ -497,7 +497,43 @@ func _docs() -> void:
 	# preventing it and a later batch could remove it for looking redundant.
 	ok(claude.contains("_releasing"),
 		"CLAUDE.md names the guard, so a later batch meets it before deleting it")
-	var log_doc := _src("res://docs/changelog.html")
-	ok(log_doc.contains("Batch BN"), "changelog.html carries a Batch BN entry")
+	# RE-POINTED AT THE ARCHIVE BY BATCH CE §5, AND THE OLD CHECK IS THE REASON
+	# THE PATTERN EXISTS. It read `changelog.contains("Batch BN")` against the
+	# LIVE file — and BATCH BZ split the changelog at a batch boundary, moving
+	# everything up to and including BO out of the repo. The check went on
+	# passing anyway, because a LATER entry names Batch BN in its own prose, so
+	# it PASSED WITHOUT ITS SUBJECT BEING IN THE FILE AT ALL: a check that has
+	# stopped asking its question, arriving without a throw to announce it.
+	# CD reported both this and test_batch_bo's copy and deliberately did not
+	# repair them; this is that repair, on the pattern CD gave test_batch_bb.
+	#
+	# THE PATH IS READ OUT OF THE LIVE CHANGELOG'S OWN HEADER rather than
+	# hardcoded: BZ made both halves carry the other's full path precisely so a
+	# reader could follow it, so this follows the repo's own pointer and a later
+	# split moves it for free. `/changelog-archive.html</code>` WITH THE LEADING
+	# SLASH is the anchor — the header names the file twice and the bare
+	# filename comes first.
+	#
+	# THE ANCHOR IS THE `<h2>` HEADING, not the phrase, for the same reason
+	# BATCH BE had to repair test_batch_bb's: a bare phrase is something a later
+	# entry's prose can reproduce, and a heading is not.
+	#
+	# ONE CONSEQUENCE, STATED RATHER THAN BURIED: this suite now depends on a
+	# file that is NOT IN VERSION CONTROL. On a machine without the archive it
+	# FAILS LOUDLY, which is correct — a check that passed quietly when its
+	# subject was missing is the exact fault this repair exists to close.
+	var live_log := _src("res://docs/changelog.html")
+	var mark := live_log.find("/changelog-archive.html</code>")
+	ok(mark > 0, "the live changelog names the archive's full path")
+	var open_at := live_log.rfind("<code>", mark) + 6
+	var archive_path := live_log.substr(open_at,
+		mark + "/changelog-archive.html".length() - open_at)
+	var log_doc := _src(archive_path)
+	ok(log_doc.length() > 100000,
+		"the archive opens at %s (%d chars)" % [archive_path, log_doc.length()])
+	ok(not live_log.contains("<h2>2026-08-13 &mdash; Batch BN"),
+		"BZ moved this batch's entry OUT of the live changelog")
+	ok(log_doc.contains("<h2>2026-08-13 &mdash; Batch BN"),
+		"...and the archive carries the Batch BN entry")
 	var notes := _src("res://docs/design-notes.md")
 	ok(notes.contains("Batch BN"), "design-notes.md carries a Batch BN entry")

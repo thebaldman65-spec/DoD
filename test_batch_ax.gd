@@ -617,8 +617,25 @@ func _negative_control_source() -> void:
 	var usrc := FileAccess.get_file_as_string("res://scripts/unit.gd")
 	# (1) A DETONATION CLEARING THE STACKS. This is the whole batch, and it
 	# would look exactly like a working detonation if it regressed.
-	ok(not bsrc.contains('target.remove_status("ruin")\n'),
+	#
+	# RE-POINTED BY BATCH CE AND IT IS STRICTLY SHARPER THAN IT WAS. This used
+	# to grep the WHOLE FILE for `target.remove_status("ruin")`, which was only
+	# ever a proxy: it asked "does anything anywhere wash the mark off" when the
+	# question is "does the DETONATION". Batch CE's REQUIEM consumes the pile
+	# deliberately — that is the entire card — so the file-wide form would have
+	# failed against correct code, and it would ALSO have passed forever if a
+	# later batch renamed `_detonate_ruin`. It reads the detonation's own body
+	# now, and asserts Requiem's site exists separately, so the two cannot be
+	# confused for each other.
+	var det_at := bsrc.find("func _detonate_ruin(")
+	ok(det_at > 0, "the detonation is findable")
+	var det_body := bsrc.substr(det_at, 2600) if det_at > 0 else ""
+	ok(not det_body.contains('target.remove_status("ruin")\n'),
 		"NEGATIVE CONTROL: nothing removes the Ruin status on detonation")
+	ok(det_body.contains('target.remove_status("ruin_primed")'),
+		"...only the PRIMER is consumed there")
+	ok(bsrc.contains('\t\t\t\ttarget.remove_status("ruin")\n'),
+		"...and Requiem's deliberate SPEND of the pile is a different site (Batch CE)")
 	ok(bsrc.contains('target.remove_status("ruin_primed")'),
 		"...only the PRIMER is consumed")
 	# (2) THE LIFESTEAL UNCAPPED. Per-stack against uncapped stacks would let

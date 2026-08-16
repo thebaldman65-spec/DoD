@@ -224,8 +224,8 @@ func _pools() -> void:
 	# which is what pinning a count is for.
 	# The CLASS side staying at 24 is the half that must NOT move, and it is
 	# asserted separately above — CB adds no class card.
-	ok(spec_total == 69,
-		"§1: ...at 60 plus CB's Mage nine, with no class card among them (%d)"
+	ok(spec_total == 78,
+		"§1: ...at 60 plus CB's Mage nine and CE's Cleric nine, with no class card among them (%d)"
 			% spec_total)
 
 
@@ -994,7 +994,7 @@ func _docs() -> void:
 	var master := _src("res://docs/master.html")
 	# THE STAMP GATE, SEVENTH COPY (see test_batch_bp's note). It reads the
 	# CURRENT batch, not BQ's, and all seven move together.
-	ok(master.contains("Batch CD"), "§5: master.html is stamped for the current batch")
+	ok(master.contains("Batch CE"), "§5: master.html is stamped for the current batch")
 	for cls in TRANCHE_3:
 		for nm in TRANCHE_3[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)

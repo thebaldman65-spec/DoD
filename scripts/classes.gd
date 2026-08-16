@@ -261,9 +261,10 @@ const CLASS_POOLS := {
 # eighteen abilities against a target of 120, so an offer of three often came
 # up two or one. It fills SHORT rather than padding with repeats, which is
 # AP §3's existing rule for upgrade offers applied unchanged.
-# (BATCH BW took every spec to five and BATCH CB the Mage three to eight, so
-# the draft is 93 of 120 and an offer fills short only when the run has already
-# REFUSED or taken most of a pool — never because of which hero drew it.)
+# (BATCH BW took every spec to five, BATCH CB the Mage three to eight and BATCH
+# CE the Cleric three, so the draft is 102 of 120 and an offer fills short only
+# when the run has already REFUSED or taken most of a pool — never because of
+# which hero drew it.)
 const SPEC_DRAFT_POOLS := {
 	# WARRIOR — THE DEBT BO LEFT OPEN, CLOSED IN BATCH BP AND PAID OFF IN BATCH
 	# BW. All three pools were NAMED AND EMPTY, so one of four heroes in every
@@ -276,14 +277,15 @@ const SPEC_DRAFT_POOLS := {
 		"Aegis Wall"],
 	"swordmaster": ["Precision Strike", "Feint", "Sever", "Battle Poise",
 		"Feigned Guard"],
-	# MAGE — EIGHT APIECE SINCE BATCH CB, AND THE MAGE IS THE FIRST CLASS
+	# MAGE — EIGHT APIECE SINCE BATCH CB, AND THE MAGE WAS THE FIRST CLASS
 	# COMPLETE. BT took the three Mage pools to five (tranche 2's first third),
 	# BU the Cleric three, BV the Hunter three and BW the Warrior three; CB
-	# lands tranche 3's first third here. THE ASYMMETRY IS BACK AND IT POINTS
-	# THE OTHER WAY THIS TIME: the Mage three draft from EIGHT and the other
-	# nine from FIVE, so what is owed is the Cleric, Hunter and Warrior thirds
-	# of tranche 3. test_batch_cb asserts both halves, so the debt stays visible
-	# in code rather than only in prose.
+	# lands tranche 3's first third here and CE its second.
+	# THE ASYMMETRY IS STILL THERE AND IT STILL POINTS THE SAME WAY, only
+	# smaller: the MAGE AND CLERIC six draft from EIGHT and the HUNTER AND
+	# WARRIOR six from FIVE, so what is owed is the Hunter and Warrior thirds of
+	# tranche 3 — eighteen cards, nine apiece. test_batch_ce asserts both
+	# halves, so the debt stays visible in code rather than only in prose.
 	"pyromancer": ["Cinderfall", "Ember Debt", "Slow Burn", "Stoke",
 		"Funeral Pyre", "Firedraw", "Pyre Wake", "Emberkeep"],
 	"cryomancer": ["Winter's Toll", "Rimebinding", "Flash Freeze",
@@ -291,13 +293,20 @@ const SPEC_DRAFT_POOLS := {
 		"Frostbind"],
 	"arcanist": ["Null Field", "Kindled Mind", "Arcane Bolt", "Inner Arcane",
 		"Arcane Echo", "Resonant Field", "Threshold", "Unmaking"],
-	# CLERIC — FIVE APIECE SINCE BATCH BU (tranche 2's second third).
+	# CLERIC — EIGHT APIECE SINCE BATCH CE, AND THE CLERIC IS THE SECOND CLASS
+	# COMPLETE. BU took the three pools to five (tranche 2's second third); CE
+	# lands tranche 3's second third here. THE DEVOUT'S KEY IS `inquisitor` AND
+	# HAS BEEN SINCE THE SPEC WAS NAMED — `SPEC_INFO["inquisitor"]` carries the
+	# display name "Devout" and master.html's draft table prints "Devout", so
+	# the docs and the code disagree BY DESIGN. A `"devout":` entry here would
+	# raise nothing, resolve nothing, and ship three cards no hero could ever be
+	# offered.
 	"holy": ["Second Wind", "Rite of Return", "Recant", "Shared Grief",
-		"Reprisal"],
+		"Reprisal", "Matins", "Alms", "Observance"],
 	"inquisitor": ["Vow of Suffering", "Aegis Reversal", "Ordination",
-		"Fortified Spirit", "Reliquary"],
+		"Fortified Spirit", "Reliquary", "Elevation", "Jubilee", "Mantle"],
 	"occultist": ["Blight the Well", "Covenant of Ash", "Suffering",
-		"Transference", "Anointing"],
+		"Transference", "Anointing", "Anathema", "Requiem", "Penance"],
 	# HUNTER — FIVE APIECE SINCE BATCH BV (tranche 2's third third).
 	"beastmaster": ["Twin Hunt", "Call the Wilds", "Bloodbond", "Savage Sweep",
 		"Ghostpack"],
@@ -313,15 +322,15 @@ const SPEC_DRAFT_POOLS := {
 # CLASS SEAM NOW DRAWS A REAL ENTRY FOR EVERY HERO IN THE GAME. No class rolls
 # an empty pool any more, and no offer loses its class card.
 #
-# THE DRAFT IS 93 OF A TARGET 120 (69 spec + 24 class-wide) AS OF BATCH CB.
+# THE DRAFT IS 102 OF A TARGET 120 (78 spec + 24 class-wide) AS OF BATCH CE.
 #
 # THE TARGET IS 120, NOT ~96, AND BATCH CD CORRECTED IT HERE (§2). The ~96 came
 # from an older assumption of SIX spec cards per spec; CB completed the Mage at
 # EIGHT, which makes the spec target 12 x 8 = 96 and the whole draft 96 + 24 =
 # 120. test_batch_bt has asserted depth 8 since CB, so the tests encoded the
 # right figure while three comments in this file and master.html carried the
-# old one. 27 are still owed and every one of them is a SPEC card: the Cleric,
-# Hunter and Warrior thirds of tranche 3, nine apiece.
+# old one. 18 are still owed and every one of them is a SPEC card: the Hunter
+# and Warrior thirds of tranche 3, nine apiece.
 #
 # This block read "48 ... spec pools remain thin at two apiece" from BR until
 # BW corrected it toward the code: TRANCHE 2 IS COMPLETE and every spec pool is
@@ -536,7 +545,7 @@ static func pool_ability(display_name: String) -> Ability:
 	return Talents.granted_ability(display_name)
 
 
-# --- THE DRAFTED ABILITIES — NINETY-THREE OF A TARGET 120 (BO..CB) -----------
+# --- THE DRAFTED ABILITIES — ONE HUNDRED AND TWO OF A TARGET 120 (BO..CE) ----
 #
 # BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
 # six WARRIOR entries as owed rather than pretending the pools were full.
@@ -550,9 +559,9 @@ static func pool_ability(display_name: String) -> Ability:
 # BATCH BV the HUNTER nine and BATCH BW the WARRIOR nine — nine spec cards
 # apiece, three per spec — so all twelve specs draft from at least FIVE and no
 # offer fills short for a SPEC reason any more.
-# TRANCHE 3 HAS BEGUN: BATCH CB paid its first third, taking the three MAGE
-# pools to EIGHT, so THE MAGE IS THE FIRST CLASS COMPLETE. The Cleric, Hunter
-# and Warrior thirds are what is left — 27 cards, nine apiece.
+# TRANCHE 3 IS TWO THIRDS PAID: BATCH CB took the three MAGE pools to EIGHT and
+# BATCH CE the three CLERIC pools, so THE CLERIC IS THE SECOND CLASS COMPLETE.
+# The Hunter and Warrior thirds are what is left — 18 cards, nine apiece.
 #
 # EVERY ABILITY NAMES THE AXIS IT SERVES, in its comment. That rule is here
 # because the twelve tree batches spent themselves removing nodes that existed
@@ -2374,6 +2383,285 @@ static func draft_ability(display_name: String) -> Ability:
 				"anim": "attack01", "special": "preparation",
 				"perfect_id": "", "perfect_text": "The extra turn also refunds 15 Mana",
 				"description": "Ready everything: after your NEXT turn\nyou immediately take ANOTHER one.\nIt is a full turn — your own statuses\ntick again. Only one may be pending."})
+		# ========== BATCH CE: TRANCHE 3, THE CLERIC NINE ==========
+		#
+		# A CONTIGUOUS BLOCK, like CB's and unlike BW's — but the AXIS/SYNERGY
+		# check still anchors PER ABILITY, because a shared header must not be
+		# able to satisfy all nine at once.
+		#
+		# ----- HOLY: three cards against the three things Mercy cannot do.
+		# HER POOL COMPETES FOR THREE SLOTS, THE TIGHTEST IN THE GAME: her core
+		# takes FOUR of the seven (Batch AV gave her Resurrection on purpose),
+		# so eight cards fight over three. Every one of these has to earn its
+		# place against a stiffer bar than any other spec's.
+		#
+		# THE GAP ALL THREE ARE AUTHORED AGAINST: MERCY IS ENTIRELY REACTIVE.
+		# She gains a stack only when an ally crosses below half health, so her
+		# engine is fuelled by the party taking damage — she can play perfectly
+		# and be starved. Three consequences, one card each: she cannot MAKE a
+		# stack, the CAP wastes what she over-earns, and every Empowered cast
+		# TRADES the skill-check bonus for the surge.
+		#
+		# AXIS: Mercy on her own terms. It pays her on exactly the turns the
+		# passive did not, which is what makes it impossible to be simply better
+		# than waiting: THE TWO SOURCES ARE MUTUALLY EXCLUSIVE BY CONSTRUCTION.
+		# A fall breaks the watch and the passive pays instead; no fall and the
+		# watch pays. It can never double up and it can never be nothing on a
+		# quiet fight, which is the fight the passive leaves her empty in.
+		# SYNERGY: HEAVENLY AURA (+12% healing per stack HELD) is what makes a
+		# stack worth carrying rather than spending, so a quiet fight becomes a
+		# throughput fight; ARDOR stops Empower consuming a stack at 3+, and
+		# three quiet turns is exactly what turns Ardor on; MARTYR'S VIGOR
+		# raises the ceiling this can climb to. Beside ALMS below it is the
+		# whole answer to the cap: one card fills the meter on the quiet turns
+		# and the other spends what will not fit.
+		"Matins":
+			return Ability.make({"display_name": "Matins",
+				"dmg_type": "holy", "cost": 20, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 4, "anim": "attack03",
+				"special": "matins",
+				"perfect_id": "", "perfect_text": "The office is kept a fourth turn",
+				"description": "Keep the office: for 3 turns, gain 1\nMercy at the start of each of your\nturns on which NO ally fell below the\nwindow. A fall pays the passive\ninstead and breaks that turn's watch."})
+		# AXIS: the overflow. Mercy caps at 5 and a bad fight over-earns it; the
+		# excess is simply gone. This is the sixth stack going somewhere.
+		#
+		# A WARD RATHER THAN A HEAL, AND THAT IS THE WHOLE DISTINCTION FROM
+		# GRACE (Mercy row 5), which already turns a wasted stack into healing
+		# for the ally who earned it. Two effects, one trigger, DIFFERENT
+		# SHEETS: Grace pays health that a full bar throws away, this pays a
+		# barrier that a full bar keeps. They STACK on the same spill rather
+		# than replacing each other, which is what stops this being a strictly
+		# better Grace wearing a draft card's clothes (BD §4).
+		# SYNERGY: GRACE above all, for that reason. MARTYR'S VIGOR raises the
+		# cap and so makes the spill RARER — a real anti-synergy, and the
+		# correct one: the two answer the same problem from opposite ends.
+		# BLESSED VESTMENTS wards on every heal she lands, so a party wearing
+		# both is wearing two layers; and it is at its best in exactly the
+		# fights HEAVENLY AURA wants, where she is holding rather than spending.
+		"Alms":
+			return Ability.make({"display_name": "Alms",
+				"dmg_type": "holy", "cost": 20, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 4, "anim": "attack02",
+				"special": "alms",
+				"perfect_id": "", "perfect_text": "Holds 6 turns instead of 4",
+				"description": "Give away what will not fit: for 4\nturns, every stack of Mercy earned at\nthe CAP instead wards the ally who\nearned it, absorbing 12% of your\nmaximum health."})
+		# AXIS: the Empower tax. Every Empowered cast forfeits its perfect
+		# bonus — a permanent standing charge no card has ever engaged with.
+		# This is the surge AND the finesse, at a real price.
+		#
+		# THE BRIEF'S PREMISE IS TRUE AS A RULE AND SMALLER IN PRACTICE THAN IT
+		# READS, AND THE ACCOUNTING GOES ON THE PAGE RATHER THAN STAYING IN A
+		# CONVERSATION (BS §3's habit). `_resolve_special` zeroes `is_perfect`
+		# for every Empowered cast, so the tax is real — but three of her five
+		# Empowerable casts wrote their two branches as
+		# `if empowered ... elif is_perfect`, WHICH COULD ONLY EVER BE AN `elif`
+		# BECAUSE THE TWO WERE UNREACHABLE TOGETHER. Splitting them is a
+		# behavioural no-op today and is what makes this card fire at all.
+		# WHAT IT IS ACTUALLY WORTH, MEASURED AGAINST THE LIVE KIT RATHER THAN
+		# ASSUMED (BQ's third rule):
+		#   · HEAL — the perfect's 5%-of-maximum self-heal, genuinely lost today.
+		#   · RENEWAL — the perfect's instant 5% heal. Already an independent
+		#     `if`, so this is the one cast where the tax was always payable.
+		#   · DIVINE PLEA — the perfect's 10 Mana.
+		#   · HYMN OF HOPE — NOTHING. Empowered is 35% and perfect 25%, so the
+		#     Empowered share is strictly bigger and the perfect adds no term.
+		#   · RESURRECTION — NOTHING, for the same reason (100% against 25%).
+		# THREE OF FIVE, REPORTED RATHER THAN PAPERED OVER WITH A NEW NUMBER:
+		# inventing a bonus for the two that supersede would be authoring a
+		# magnitude the brief did not ask for. IT IS THE CARD WHOSE VALUE THE
+		# DESIGNER SHOULD WATCH.
+		#
+		# THE PRICE IS A SECOND STACK, PAID PER CAST, AND IT IS DELIBERATELY NOT
+		# WAIVED BY ANYTHING. Avatar of Mercy and Ardor both answer the ORDINARY
+		# surcharge; this is a separate charge on top, so a capstone build does
+		# not get the finesse free. SANCTIFIED may refund it, because Sanctified
+		# is the one roll every Mercy spend in the game already passes through
+		# and carving this one out would be a second answer to one question.
+		# IF SHE CANNOT PAY THE SECOND STACK THE CAST SIMPLY RESOLVES AS AN
+		# ORDINARY EMPOWER — no refusal, no wasted turn, and the tooltip says so.
+		# SYNERGY: SANCTIFIED (35% of spends cost nothing) is the build; ARDOR
+		# and AVATAR OF MERCY pay the first stack so this only ever costs the
+		# second; and it is worth most on the casts with the biggest perfects —
+		# an Empowered RESURRECTION at full health, an Empowered HYMN at 25%.
+		"Observance":
+			return Ability.make({"display_name": "Observance",
+				"dmg_type": "holy", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 5, "anim": "attack03",
+				"special": "observance",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Keep the form exactly: for 3 turns an\nEmpowered cast KEEPS its perfect\nbonus — and costs 1 additional Mercy.\nWithout the second stack it is an\nordinary Empower."})
+		# ----- DEVOUT: two cards against the asymmetry nobody had exploited,
+		# and one shield. FAITH IS PAID ON THE HIGHEST COUNT HELD THIS BATTLE
+		# (`faith_peak`, Batch BI), so an early spike is worth exactly as much
+		# as a long grind and lasts the whole fight — and both his builders are
+		# slow drips (2 a shielded hit, 1 an ally turn on the ground). NOTHING
+		# LET HIM BUY ONE. Second gap: his own Faith HOLDS and never releases
+		# (BH §2), so the release payout does not exist for him at all.
+		#
+		# AXIS: buying the peak outright. It writes `faith_peak` and NOT
+		# `faith_stacks`, which is what makes it a spike rather than a second
+		# Ordination: nobody holds another stack, nobody is walked toward a
+		# release, and the party is paid all fight for a count it never carried.
+		#
+		# TO AT LEAST 3, NOT BY 3, AND THAT IS THE GOVERNOR. A card that ADDED
+		# peak would run every ally to the ceiling in a long fight for nothing;
+		# a card that raises the FLOOR is worth most on turn one and worth
+		# nothing once the grind has passed it — which is exactly the shape a
+		# card selling "early" should have. It can never lower a peak (the write
+		# is a ratchet, the same `maxi` `_gain_faith` uses) and never exceed 5.
+		# SYNERGY: APOSTLE and FERVOR are multipliers on the held half, so both
+		# multiply everything this buys — at x3 a peak of 3 is 18% mitigation
+		# and +13.5% damage on every ally from turn one. RELIQUARY reads the
+		# very peaks this raises and pays 2.5% of his maximum per point of them.
+		# UNWAVERING FAITH enlarges the figure both of those are shares of.
+		"Elevation":
+			return Ability.make({"display_name": "Elevation",
+				"dmg_type": "holy", "cost": 30, "damage": 0, "pressure": 0,
+				"delay": 2.5, "cooldown": 5, "anim": "attack03",
+				"special": "elevation",
+				"perfect_id": "", "perfect_text": "Raises every peak to 4 instead of 3",
+				"description": "Raise them up: every ally's PEAK Faith\nthis battle rises to at least 3.\nThey hold no extra stacks — they are\npaid as though they had carried them,\nfor the rest of the fight."})
+		# AXIS: the payout that does not exist for him. An ally's fifth stack
+		# heals them 15% and hands him Mana; HIS count holds at five and never
+		# releases, so his Faith pools and buys him nothing beyond the peak it
+		# already ratcheted. This is the card that finally spends it.
+		#
+		# IT IS NOT A RELEASE AND MUST NEVER BECOME ONE. BH §2 took the Devout
+		# off the release branch because a releasing Devout puts the FREQUENCY
+		# LOOP straight back — his release would heal, grow the principal and
+		# roll Communion, which feeds further releases. So this pays its own
+		# payout at its own site: no `_conviction_growth`, no Communion roll, no
+		# Binding Oath, and it does NOT go through `_gain_faith`.
+		#
+		# GATED AT THREE, AND THE GATE IS WHAT STOPS IT BEING A SPAM HEAL. His
+		# peak does not fall when the count empties, so the count is the only
+		# thing this costs — and at a floor of three it is a real accumulation
+		# rather than a button he presses every time one stack arrives.
+		# SYNERGY: BINDING OATH swears him a stack every time an ALLY releases,
+		# so a party that is releasing is a party refilling this; CONSECRATED
+		# GROUND drips onto its own caster, which is his other refill; and
+		# UNWAVERING FAITH (+20% his maximum) makes every point of the heal
+		# larger, because all of it is a share of his own bulk.
+		"Jubilee":
+			return Ability.make({"display_name": "Jubilee",
+				"dmg_type": "holy", "cost": 20, "damage": 0, "pressure": 0,
+				"delay": 2.0, "cooldown": 4, "anim": "attack02",
+				"special": "jubilee",
+				"perfect_id": "", "perfect_text": "8% health per stack instead of 6%",
+				"description": "The year of release: spend ALL your\nown Faith — 6% of your maximum health\nand 3% of maximum Mana per stack.\nNeeds 3 held. Your PEAK does not fall,\nso the mitigation it bought stays."})
+		# AXIS: the absorb, which BI §2 measured as the DRY source of the whole
+		# engine — 1.5 absorbed hits a battle, against the ground's 9.1 Faith.
+		# Conviction builds ONLY on Divine Shield absorbs, so a shield that
+		# becomes three shields is three times the trigger.
+		#
+		# IT IS THE POOL'S ONE SHIELD VARIANT, deliberately, and it is a shield
+		# nothing else in the game is: DIVINE SHIELD is a bucket on one ally,
+		# UNYIELDING AEGIS re-forms a broken one on THE SAME ally, and AEGIS
+		# REVERSAL eats one that was never spent. This one LEAVES — it passes to
+		# the ally with the lowest health fraction OTHER than the one it just
+		# left, so it cannot bounce in place and it finds the fight.
+		# SYNERGY: every Divine Shield rider rides each hop, because each hop is
+		# a real Divine Shield — BLESSED BARRIER (absorbs become healing),
+		# AFTERGLOW (the breaking shield mends), WARDED ROBES, SACRED COVENANT.
+		# UNYIELDING AEGIS is the deliberate ANTI-synergy: a re-formed shield has
+		# not broken, so it does not pass, and a player holding both trades hops
+		# for depth. BLESSING OF ZEAL doubles the Faith every absorb pays.
+		"Mantle":
+			return Ability.make({"display_name": "Mantle",
+				"dmg_type": "holy", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.5, "cooldown": 4, "anim": "attack03",
+				"special": "mantle", "target": Ability.Target.ALLY,
+				"perfect_id": "", "perfect_text": "It passes three times instead of twice",
+				"description": "Lay the mantle: a Divine Shield worth\n25% of your maximum health — and when\nit BREAKS it passes to the ally on the\nlowest health, twice. Every one of them\nbuilds Faith like the first."})
+		# ----- OCCULTIST: he is the boss specialist by construction and the
+		# boss refuses half his kit. Ruin detonates on every tenth stack and
+		# never washes off, so trash dies before the mark matters; meanwhile the
+		# whole Madness lane is refused by a boss UNTIL IT IS BROKEN, which
+		# makes Break his gate — and his pool held nothing that ground it.
+		#
+		# AXIS: Break pressure, so the Madness gate is something he OPENS rather
+		# than waits for. It is deliberately not a big number of his own: 20
+		# Break damage is one Hex of Ruin's worth, and what the card sells is
+		# that THE WHOLE PARTY'S Break lands harder for three turns.
+		#
+		# AN AMPLIFIER RATHER THAN A HIT, BECAUSE THE PARTY IS WHERE THE BREAK
+		# IS. A Warden's Threat lane deals 320 Break a battle and the Occultist
+		# deals a fraction of that; the lever with leverage is the multiplier,
+		# not another cast of his own. NOTHING IN THE GAME HAS EVER AMPLIFIED
+		# BREAK DAMAGE — Hunter's Mark amplifies damage, Iron Will and Bulwark
+		# REFUSE Break, Devoutness and Hold the Line CUT it, and the reducers all
+		# read a number this one has already raised.
+		# SYNERGY: the WARDEN's whole Threat lane, above all — Sundering,
+		# Bruising Guard and Shield Slam's 40. On his own sheet, BROKEN WILL
+		# (+% Break dealt) and ENTROPY (Ruin bearers take Break at their own turn
+		# start) both feed the meter this multiplies, and BEWITCH, MIND FLAY and
+		# MASS HYSTERIA are what the open gate is FOR.
+		"Anathema":
+			return Ability.make({"display_name": "Anathema",
+				"dmg_type": "shadow", "cost": 25, "damage": 0, "pressure": 20,
+				"delay": 2.0, "cooldown": 4, "anim": "attack02",
+				"special": "anathema",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Name it accursed: 20 Break damage, and\nfor 3 turns EVERY source of Break\ndamage lands on it 50% harder.\nBreak is what opens the madness a boss\nwould otherwise refuse."})
+		# AXIS: the detonation cadence, and the lever nothing pulls. Ruin
+		# detonates on every TENTH stack and the stacks SURVIVE the blast, so a
+		# deep mark is an accumulation the game never lets him cash. This trades
+		# the whole pile for one blow.
+		#
+		# IT IS A BAD TRADE MOST OF THE TIME AND THAT IS THE DESIGN. The mark he
+		# spends is worth +2% damage taken a stack for the rest of the battle
+		# (+5% under Deeper Hex) and it is what every later detonation is
+		# counted toward; spending twenty stacks buys 160% of Attack now and
+		# costs the party 40% more damage on that body for the whole fight. It
+		# is the answer to "I need it dead this turn", not a rotation piece.
+		#
+		# IT SPENDS RATHER THAN DETONATES: it fires no detonation, so Unraveling
+		# does not seed, Grim Focus does not deepen it and the party does not
+		# feast — and it clears the PRIMER with the pile, or a mark primed at
+		# ten would detonate for nothing at its next turn.
+		#
+		# THE DAMAGE IS PER STACK AND THE BREAK IS FLAT, which is ARCANE BOLT's
+		# rule for exactly this reason: Ruin has no ceiling, and a per-stack
+		# Break term on an uncapped count is the squaring trap.
+		# SYNERGY: TRANSFERENCE gathers every mark on the field onto one body
+		# and this cashes it; COVENANT OF ASH doubles what the gathering is worth;
+		# ANOINTING makes the party build the pile in the first place; and
+		# SUFFERING buys eight stacks with one turn of his. DEEPER HEX is the
+		# deliberate ANTI-synergy — it makes holding the pile worth more.
+		"Requiem":
+			return Ability.make({"display_name": "Requiem",
+				"dmg_type": "shadow", "cost": 30, "damage": 0, "pressure": 8,
+				"delay": 3.0, "cooldown": 5, "anim": "attack03",
+				"special": "requiem",
+				"perfect_id": "", "perfect_text": "10% of Attack per stack instead of 8%",
+				"description": "Sing it out: CONSUMES every stack of\nRuin on one enemy for 8% of Attack\neach, and the party is healed 2% of\nyour maximum per stack.\nNothing detonates — the mark is spent."})
+		# AXIS: the free one, and it is aimed at the half of the game his spec
+		# cannot reach. IT IS THE ONLY CARD OF HIS THAT READS NO RUIN AT ALL —
+		# no stacks to build, no threshold to reach, no mark to spend — so it is
+		# the one that still works in the trash fight that ends on round seven,
+		# which is precisely where AX measured 0.00 detonations a battle.
+		#
+		# IT READS THE TARGET'S OWN ATTACK, WHICH NOTHING ELSE IN THE GAME DOES.
+		# Powershot reads the target's Break meter and Corrupted Channeling reads
+		# a blow that landed; no ability anywhere reads the enemy's `attack`
+		# stat. The mightier it is, the worse it suffers — which is corruption's
+		# own argument and, usefully, points him at the body worth killing.
+		#
+		# THE TICK IS SNAPSHOTTED AT APPLICATION, the same rule every DoT in the
+		# game follows (burn and poison both snapshot the applier's Attack), so a
+		# Sundered or Crippled enemy suffers what it was worth when it was named.
+		# SYNERGY: BLIGHT THE WELL is the other card of his that spends a turn
+		# doing nothing visible and pays over the following ones, and both want
+		# the same body; DECAY and ENTROPY grind the same enemy's clock, so a
+		# turn start becomes three separate bills; and it is the card to hold
+		# when ANATHEMA has already named the target the party is grinding.
+		"Penance":
+			return Ability.make({"display_name": "Penance",
+				"dmg_type": "shadow", "cost": 25, "damage": 0, "pressure": 0,
+				"delay": 2.5, "cooldown": 4, "anim": "attack03",
+				"special": "penance",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Set the penance: for 3 turns, at the\nstart of each of its turns that enemy\ntakes shadow damage equal to 20% of\nITS OWN Attack. The mightier it is,\nthe more it pays."})
 	return null
 
 

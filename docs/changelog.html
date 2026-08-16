@@ -13,6 +13,311 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-16 &mdash; Batch CE: tranche 3, the Cleric nine (THE CLERIC IS THE SECOND CLASS COMPLETE)</h2>
+<p><i>Nine spec draft abilities, three per Cleric spec. The Cleric pools go 5 &rarr; 8 and the
+draft goes 93 &rarr; <b>102 of a target 120</b>. <b>The asymmetry CB opened is now half what it
+was</b>: the Mage and Cleric six draft from EIGHT and the Hunter and Warrior six from FIVE, so
+what is owed is the Hunter and Warrior thirds &mdash; 18 cards, nine apiece. Nothing else ships:
+no talent node, no magnitude, no existing ability changed, no save version moves (still v10).
+<b>ONE new unit-side field for nine abilities</b>, and it is a door rather than a number.</i></p>
+
+<h3>&sect;0 &mdash; the Devout's pool key is <code>inquisitor</code>, not <code>devout</code></h3>
+<p><code>SPEC_INFO["inquisitor"]</code> carries the display name <b>Devout</b> and the draft
+table above prints <b>Devout</b>, so the docs and the code disagree <b>by design</b> and have
+since the spec was named. A <code>"devout"</code> key would raise nothing, resolve nothing, and
+ship three cards no hero could ever be offered. <code>test_batch_ce</code> pins all three halves
+&mdash; the key present, <code>"devout"</code> absent, and the display name still reading Devout.</p>
+
+<h3>&sect;1 &mdash; HOLY: three cards against the three things Mercy cannot do</h3>
+<p><b>Her pool competes for the tightest three slots in the game.</b> Her core takes FOUR of the
+seven (Batch AV gave her Resurrection on purpose), so eight cards fight over three. Every one of
+these had to earn its place against a stiffer bar than any other spec's.</p>
+<p><b>The gap all three are authored against: Mercy is entirely reactive.</b> She gains a stack
+only when an ally crosses below half health, so her engine is fuelled by the party taking damage
+&mdash; she can play perfectly and be starved. Three consequences, one card each.</p>
+<ul>
+<li><b>MATINS</b> (20 Mana, 2.0, 4cd, self) &mdash; for 3 turns she gains 1 Mercy at the start of
+each of her turns <b>on which no ally fell below the window</b> (Perfect: 4 turns). <b>It pays
+her on exactly the turns the passive did not, and the two sources are mutually exclusive BY
+CONSTRUCTION</b> &mdash; a fall breaks that turn's watch and the passive pays instead, which is
+what makes it impossible for the card to be simply better than waiting. The flag is <b>cleared
+as it is read</b>, so one broken turn does not poison the rest of the office.</li>
+<li><b>ALMS</b> (20 Mana, 2.0, 4cd, self) &mdash; for 4 turns (Perfect: 6) every stack of Mercy
+earned <b>at the cap</b> wards the ally who earned it for 12% of her maximum, instead of being
+lost. <b>A WARD RATHER THAN A HEAL, AND THAT IS THE WHOLE DISTINCTION FROM GRACE</b>, which
+already turns the same wasted stack into healing: one trigger, two effects, different sheets, and
+they <b>STACK on the same spill</b> rather than replacing each other. That is what stops this
+being a strictly better Grace wearing a draft card's clothes (BD &sect;4). The ward is
+deliberately <b>not <code>divine</code></b>: a Mercy overflow feeding the DEVOUT's Conviction
+would be one spec's engine leaking out through another spec's card.</li>
+<li><b>OBSERVANCE</b> (25 Mana, 2.0, 5cd, self) &mdash; for 3 turns (Perfect: 4) an Empowered
+cast <b>keeps its perfect bonus</b> and costs <b>1 additional Mercy</b>. Unpayable is not
+refused: with no second stack it resolves as an ordinary Empower.</li>
+</ul>
+<p><b>&sect;1's Empower premise is true as a rule and smaller in practice than it reads, and the
+accounting goes on the page rather than staying in a conversation.</b>
+<code>_resolve_special</code> zeroes <code>is_perfect</code> for every Empowered cast, so the tax
+is real &mdash; but three of her five Empowerable casts wrote their two branches as <code>if
+empowered ... elif is_perfect</code>, <b>which could only ever be an <code>elif</code> because
+the two were unreachable together</b>. Splitting them is a <b>behavioural no-op today</b> and is
+what makes the card fire at all. Measured against the live kit rather than assumed (BQ's third
+rule), what Observance is actually worth: <b>Heal</b> (the perfect's 5%-of-maximum self-heal),
+<b>Renewal</b> (its instant 5% &mdash; already an independent <code>if</code>, so this is the one
+cast where the tax was always payable) and <b>Divine Plea</b> (its 10 Mana). <b>NOTHING on Hymn
+of Hope or Resurrection</b>, whose Empowered share is strictly bigger than their perfect.
+<b>Three of five, reported rather than papered over with a new number</b> &mdash; inventing a
+bonus for the two that supersede would be authoring a magnitude the brief did not ask for.
+<b>THE HYMN'S ORDER IS PINNED IN THE SUITE</b>: 35% Empowered against 25% perfect, so the
+Empowered share must be written LAST or the card would quietly DOWNGRADE the cast it just charged
+a second Mercy for.</p>
+
+<h3>&sect;2 &mdash; DEVOUT: the asymmetry nobody had exploited, and one shield</h3>
+<p>Faith is paid on <b>the highest count held this battle</b> (<code>faith_peak</code>, Batch
+BI), so an early spike is worth exactly as much as a long grind and lasts the whole fight
+&mdash; and both his builders are slow drips. <b>Nothing let him buy one.</b> Second gap: his own
+Faith HOLDS and never releases (BH &sect;2), so the release payout does not exist for him at all.</p>
+<ul>
+<li><b>ELEVATION</b> (30 Mana, 2.5, 5cd, all allies) &mdash; every ally's PEAK Faith rises <b>to
+at least 3</b> (Perfect: 4). <b>It writes the peak and NOT the count</b>, which is what makes it a
+spike rather than a second Ordination: nobody holds another stack and nobody is walked toward a
+release. <b>TO at least 3, not BY 3, and that is the governor</b> &mdash; a card that ADDED peak
+would run every ally to the ceiling in a long fight, where raising a FLOOR is worth most on turn
+one and worth nothing once the grind has passed it. The write is a ratchet (the same
+<code>maxi</code> <code>_gain_faith</code> uses) and clamps at five.</li>
+<li><b>JUBILEE</b> (20 Mana, 2.0, 4cd, self) &mdash; spends ALL of his own Faith for <b>6% of his
+maximum health and 3% of maximum Mana per stack</b> (Perfect: 8%), gated at <b>3 held</b>. <b>IT
+IS NOT A RELEASE AND MUST NEVER BECOME ONE</b>: BH &sect;2 took the Devout off the release branch
+because a releasing Devout puts the FREQUENCY LOOP straight back &mdash; his release would heal,
+grow the principal and roll Communion, which feeds further releases. So it pays its own payout at
+its own site and does not go through <code>_gain_faith</code>. <b>His PEAK does not fall</b>, so
+the mitigation those stacks bought keeps paying; the count is the only thing the card costs, and
+the gate at three is what stops it being a heal he presses every time one stack arrives.</li>
+<li><b>MANTLE</b> (25 Mana, 2.5, 4cd, one ally) &mdash; a Divine Shield worth 25% of his maximum,
+and <b>when it BREAKS it passes to the ally on the lowest health</b>, twice (Perfect: three
+times). <b>THE ABSORB IS THE DRY SOURCE OF HIS WHOLE ENGINE</b> &mdash; BI &sect;2 measured 1.5
+absorbed hits a battle against the ground's 9.1 Faith &mdash; and Conviction builds ONLY on
+Divine Shield absorbs, so a shield that becomes three shields is three times the trigger. <b>It
+never passes back to the body it just left</b>, which is load-bearing rather than tidy: that ally
+is very often the lowest health, so without the exclusion the mantle would bounce in place and
+cover one hero three times instead of finding the fight. <b>Every hop is a REAL Divine Shield</b>,
+granted through the one door, so Blessed Barrier, Afterglow, Warded Robes and Sacred Covenant all
+ride each of them.</li>
+</ul>
+<p><b>The pool's one shield variant, deliberately.</b> Divine Shield is a bucket on one ally,
+Unyielding Aegis re-forms a broken one on the SAME ally, and Aegis Reversal eats one that was
+never spent. This one LEAVES. <b>Unyielding Aegis is the deliberate anti-synergy</b>: a re-formed
+shield has not broken, so it does not pass &mdash; and that is decided at the ONE unit-side site
+where a shield is removed, so the two nodes can never disagree about what "broken" means.</p>
+
+<h3>&sect;3 &mdash; OCCULTIST: the gate he could not open, and the lever nothing pulled</h3>
+<p>He is the boss specialist by construction and <b>the boss refuses half his kit</b>. Ruin
+detonates on every tenth stack and never washes off, so trash dies before the mark matters;
+meanwhile the whole Madness lane is refused by a boss <b>until it is Broken</b>, which makes Break
+his gate &mdash; and his pool held nothing that ground it.</p>
+<ul>
+<li><b>ANATHEMA</b> (25 Mana, 2.0, 4cd, one enemy, 20 BD) &mdash; 20 Break damage, and for 3 turns
+(Perfect: 4) <b>every source of Break damage lands on that enemy 50% harder</b>. <b>NOTHING IN THE
+GAME HAD EVER AMPLIFIED BREAK DAMAGE</b>: Hunter's Mark amplifies damage, Iron Will and Bulwark
+REFUSE Break, Devoutness and Hold the Line CUT it. This is the one place it is ever raised, and it
+sits <b>above the reducers</b> so every defence in the game still answers it. <b>The cast's own
+Break lands BEFORE the mark</b>, so the card cannot amplify itself and its headline number does
+not depend on the order of two lines. <b>An amplifier rather than a bigger number, because the
+party is where the Break is</b> &mdash; a Warden's Threat lane deals 320 Break a battle and the
+Occultist a fraction of that, so the lever with leverage is the multiplier.</li>
+<li><b>REQUIEM</b> (30 Mana, 3.0, 5cd, one enemy, 8 BD) &mdash; <b>consumes every stack of Ruin on
+one enemy</b> for 8% of Attack each (Perfect: 10%), and the party is healed 2% of his maximum per
+stack. It fires <b>no detonation</b>: Unraveling does not seed, Grim Focus does not deepen it, the
+party does not feast &mdash; and <b>the primer goes with the pile</b>, or a mark primed at ten
+would detonate for a full 90% of Attack off a pile that no longer exists. <b>It is a bad trade
+most of the time and that is the design</b>: the mark it spends is +2% damage taken a stack for the
+rest of the battle (+5% under Deeper Hex). It is the answer to "I need it dead this turn", not a
+rotation piece. <b>The damage is per stack and the Break is FLAT</b>, which is Arcane Bolt's rule
+for its reason: Ruin has no ceiling, and a per-stack Break term on an uncapped count is the
+squaring trap.</li>
+<li><b>PENANCE</b> (25 Mana, 2.5, 4cd, one enemy) &mdash; for 3 turns (Perfect: 4) that enemy
+takes shadow damage equal to <b>20% of ITS OWN Attack</b> at the start of each of its turns.
+<b>It is the only card of his that reads no Ruin at all</b> &mdash; no stacks to build, no
+threshold to reach, no mark to spend &mdash; so it is the one that still works in the trash fight
+that ends on round seven, which is exactly where AX measured 0.00 detonations a battle. <b>Nothing
+else in the game reads the target's own Attack stat</b>; the tick is snapshotted at application,
+the same rule burn and poison follow.</li>
+</ul>
+
+<h3>&sect;4 &mdash; the names, and the sweep</h3>
+<p><b>All nine came back clean against every ability, talent node, status and rune</b> &mdash; the
+first tranche since BO with nothing to report, and BR &sect;1's sweep ships as a test rather than
+as a claim. The register is priestly and old (<b>rites, offices, practices</b>): Matins, Alms,
+Observance, Elevation, Jubilee, Mantle, Anathema, Requiem, Penance. Words about what a cleric
+<i>does</i> rather than which side he is on &mdash; which is why the Occultist three sit on his
+tongue as easily as on Holy's, and why the batch went looking for a practice word (Penance) rather
+than a vice.</p>
+
+<h3>&sect;5 &mdash; two checks that had stopped asking their question</h3>
+<p><b><code>test_batch_bn</code> and <code>test_batch_bo</code> each held a bare
+<code>changelog.contains("Batch BN")</code> / <code>("Batch BO")</code> against the LIVE file
+&mdash; and Batch BZ moved both of those entries into the archive.</b> They went on passing
+because a LATER entry names each batch in its own prose, so <b>both PASSED WITHOUT THEIR SUBJECT
+BEING IN THE FILE AT ALL</b>. Batch CD reported them and deliberately did not repair them; this is
+that repair, on the pattern CD gave <code>test_batch_bb</code>. <b>The anchor is the
+<code>&lt;h2&gt;</code> heading rather than a phrase</b> (a phrase is something a later entry's
+prose can reproduce), and <b>the archive's path is read out of the live changelog's own header</b>
+rather than hardcoded, so a later split moves both checks for free. <b>One consequence, stated
+rather than buried:</b> two more suites now depend on a file that is not in version control, and
+on a machine without the archive they FAIL LOUDLY &mdash; which is correct, and is the exact fault
+this repair exists to close.</p>
+
+<h3>&sect;6 &mdash; what shipped beside the nine</h3>
+<p><b>Five statuses for nine abilities, and the split between the two lists is BU's Suffering trap
+written down rather than inferred.</b> Three sit on HOLY (<code>matins</code>, <code>alms</code>,
+<code>observance</code>) and are correctly absent from <code>DEBUFF_IDS</code>; two sit on an
+ENEMY (<code>anathema</code>, <code>penance</code>) and are genuine afflictions, so both are
+LISTED &mdash; which makes them cleansable by a mender's Cleansing Rite (real counterplay, and
+neither is battle-long so neither is taken first every time) and, the half that matters, keeps
+them OUT of the derived <code>_dispellable_buffs</code> set, so a Mage's own Dispel can never
+strip the party's work off the enemy carrying it. <b>MANTLE REGISTERS NO STATUS OF ITS OWN</b>: it
+rides the existing <code>barrier</code>, which is precisely what makes every hop a real Divine
+Shield. Elevation, Jubilee and Requiem resolve inside the cast that fires them and carry nothing.</p>
+<p><b>ONE new unit-side field for nine abilities</b> &mdash; <code>barrier_broken_cb</code>, a
+door rather than a number, fired when a barrier is exhausted and removed. <b>Its position is the
+whole contract</b>: it sits in the <code>else</code> branch below Unyielding Aegis, so a shield
+the Aegis re-forms has not broken and does not pass.</p>
+<p><b>Break damage assigned deliberately (the BO rule, applied up front).</b> <b>TWO of the nine
+carry it and SEVEN do not</b>, and each of the seven is a decision rather than an oversight:
+<b>Anathema 20</b> (one Hex of Ruin's worth &mdash; the card sells the multiplier, not the number)
+and <b>Requiem 8</b> (flat, level with Arcane Bolt). Six of the others land no blow at all, and
+<b>PENANCE is the interesting zero</b>: it genuinely deals damage, but on the enemy's own clock as
+a tick, where Break has nothing to ride.</p>
+<p><b>The bot got no rotation, on purpose</b> &mdash; all nine ride BO &sect;5's wrapper, so no
+existing rotation is re-weighted and no measurement taken before this batch stops being
+comparable. <b>Four targeting refinements</b>, each closing a case where the default mark makes a
+card read as inert: <b>Requiem</b> aims at the DEEPEST pile (aimed at the lowest-health enemy it
+would eat two stacks off something about to die), <b>Anathema</b> at the boss or the
+highest-health body (a three-turn mark on the enemy about to die spends its window on a corpse),
+<b>Penance</b> at the HIGHEST-ATTACK enemy (which is the point of the card), and <b>Mantle</b>
+never at an ally already wearing a shield (a re-cast merges into the standing barrier and would
+overwrite a live mantle's remaining passes with this cast's).</p>
+<p><b>One glossary entry added (90 &rarr; 91): <code>mercy_window</code>.</b> Matins and Alms both
+read the same line and a player had nowhere to learn either edge of it &mdash; that Mercy pays for
+a CROSSING and not for a state (a party already bloodied pays her nothing), that GUARDIAN ANGEL
+moves the line, and that a stack earned at the cap is thrown away unless Grace or Alms catches it.
+Everything else the nine do is a mechanic the player already meets.</p>
+
+<h3>&sect;7 &mdash; verified</h3>
+<p><b>Per the standing instruction, "verified" means the code landed and works. NO SWEEPS, NO
+BANDS, NO BALANCE MEASUREMENT WAS RUN, and none should be quoted from this batch.</b>
+check_parse 0 &middot; check_flow 0 &middot; check_map_screen OK &middot; <b>run-harness gates
+1/2/3 PASS at 22 / 165 / 8 checks</b> (CA's recorded counts, unmoved) &middot; <b>NEW
+test_batch_ce.gd 1063/0</b>.</p>
+<p><b>Every clause that could silently do nothing is driven live, and for most of them the
+obvious assertion is not the discriminating one.</b> MATINS is driven THREE times &mdash;
+unbroken (must pay), immediately after a fall (must pay nothing) and again the turn after (must
+pay again), so a no-flag version fails the second and a LATCHING one the third. ALMS is driven
+BELOW the cap as well as at it, and asserted NOT to be a Divine Shield. OBSERVANCE's
+discriminator is Divine Plea's perfect &mdash; 10 Mana, an exact integer &mdash; measured beside
+the Mercy actually spent (3 against 4). ELEVATION is driven on an ally at 4 (untouched), one at 0
+(raised to 3) and one at 2, and NOBODY's count may move. JUBILEE asserts everything a release
+would ALSO have done and this must not. MANTLE is driven with the holder made the LOWEST HEALTH
+IN THE PARTY, the only arrangement in which a naive pick bounces it in place. ANATHEMA drives the
+same 20 Break into a marked enemy and an unmarked control &mdash; 30 against 20, exact. REQUIEM
+builds 5 and 20 stacks on identical bodies and asserts the damage RATIO with open ground. PENANCE
+uses two enemies with DIFFERENT Attack stats, which is the only construction that tells the
+target's Attack from the caster's.</p>
+<p><b>EIGHTEEN NEGATIVE CONTROLS, each applied to product code and reverted &mdash; battle.gd,
+unit.gd and classes.gd all came back byte-identical by hash &mdash; and ALL EIGHTEEN TRIP.</b>
+Matins' watch never broken <b>trips 2</b>; the flag LATCHING <b>trips 1</b>; Alms warding on every
+Mercy gain <b>trips 1</b>; the ward made <code>divine</code> <b>trips 1</b>; Observance never
+keeping the perfect <b>trips 2</b>; the Hymn's Empowered share written FIRST <b>trips 1</b>;
+Elevation ADDING peak <b>trips 1</b>; Elevation granting Faith <b>trips 4</b>; Jubilee lowering
+his peak <b>trips 1</b>; Jubilee growing the principal <b>trips 2</b>; Mantle passing back to the
+body it left <b>trips 3</b>; the hop count never decrementing <b>trips 3</b>; Anathema's mark
+landing before its own Break <b>trips 1</b>; the Break amplifier deleted <b>trips 2</b>; Requiem
+leaving the primer <b>trips 1</b>; Requiem paying flat <b>trips 2</b>; Penance reading the
+CASTER's Attack <b>trips 2</b>; and a spec card leaking into a class pool <b>trips 5</b>.</p>
+<p><b>ONE OF THEM PASSED ON THE FIRST RUN AND FOUND A CHECK THAT COULD NOT FAIL &mdash; which is
+the whole reason to run them.</b> "Elevation ADDS peak instead of raising a floor" tripped
+NOTHING: the ally on 4 is skipped by the loop's own <code>&gt;= floor</code> guard before the
+write is ever reached, and the ally on 0 lands on 3 under either reading. <b>Only a peak BETWEEN
+the two discriminates</b> &mdash; an ally on 2 goes to 3 correctly and to 5 wrongly. That third
+ally is in the suite now and the control trips.</p>
+<p><b>LIVE AUTOPLAY CLEAN, 0 SCRIPT ERROR across four smoke battles, with the cards firing in
+ordinary fights</b> &mdash; "Matins &mdash; for 4 turns she gains 1 Mercy at the start of each of
+her turns on which nobody fell [PERFECT]" followed by three "the office is kept &mdash; Holy gains
+1 Mercy (3/5) &hellip; (4/5) &hellip; (5/5)" lines (the ABOVE-<code>tick_statuses</code> placement
+visible in the log: a 3-turn office pays three times), "Alms &mdash; for 6 turns Mercy earned at
+the cap wards the ally who earned it (12% of her maximum) [PERFECT]", "Elevation &mdash; 4 ally(s)
+raised to a PEAK of 4 Faith for the rest of the battle [PERFECT]", "Mantle &mdash; Devout is
+shielded for 40, and when it breaks it passes 2 more time(s)" followed by <b>"Mantle: the broken
+shield passes from Devout to Pyromancer (1 pass(es) left)"</b>, "Anathema &mdash; Orc Chief takes
++23 BD now, and every source of Break lands 50% harder on it for 4 turns [PERFECT]" followed by
+<b>"!! Orc Chief BREAKS (Anathema)"</b>, "Requiem &mdash; 3 stacks of Ruin consumed for 29 shadow,
+and 3 ally(s) mended 25 in all", and "Penance &mdash; Orc Chief is set to pay 20 shadow before its
+resistances" followed by "Orc Chief pays its penance &mdash; 20 shadow damage".</p>
+<p><b>Two log-honesty fixes found by watching the smoke rather than by a test</b>, both the same
+shape as BT's Inner Arcane: <b>Requiem announced the party heal it ASKED for</b> rather than what
+landed (an ally at full health takes none of it), and <b>Penance's cast line printed a
+pre-resistance figure without saying so</b>. Both say what they mean now. <b>Note the smoke's own
+artefact</b>: <code>DOD_SIM_ABILITIES</code> hands every card to every hero, so a Beastmaster lays
+a Mantle and a Berserker keeps an office in the logs &mdash; the real draft only ever offers
+spec-matching cards, and it is exactly what makes the "he holds no Mercy" and "only the Devout
+carries Faith that never releases" lines worth having.</p>
+<p><b>FULL BATTERY, 45 SUITES: ZERO THROWS ANYWHERE, AND ONE FAILURE THAT DID NOT REPRODUCE (see below).</b> ah 5625, ah_battle 65,
+ai 2217, aj 418, ak 528, al 560, an 6059, ar 735, as 396, at 470, au 336, av 324, aw 350,
+<b>ax 342</b>, ay 484, az 519, ba 690, bb 175, bc 91, bd 69, be 34, bf 78, bg 47, bh 233,
+<b>bi 91</b>, bj 67, bk 130, bl 88, bm 1891, <b>bn 80</b>, <b>bo 898</b>, bp 271, bq 738, br 1441,
+bs 262, <b>bt 457</b>, bu 476, bv 893, bw 545, bx 141, <b>cb 1163</b>, cd 85, <b>ce 1063</b>,
+runes 3121, rune_battle 97. <b>Every count at its CD-recorded value except the six that moved,
+and every one of the six is explained</b>: <b>bo 832 &rarr; 898</b> is its two entry-walking loops
+meeting nine more entries (7 &times; 9 = 63) plus &sect;5's three; <b>cb 1154 &rarr; 1163</b> is
+its name loop walking nine more; <b>ax 339 &rarr; 342</b> and <b>bi 88 &rarr; 91</b> are three
+added by each re-point; <b>bn 77 &rarr; 80</b> is &sect;5's archive re-point; and <b>bt 460 &rarr;
+457</b> is its twelve-spec depth loop becoming a six-spec one, because the Cleric three moved up
+to the eight-deep check three lines above. <b>Nothing else moved by one.</b> <code>an</code> reads
+6059 against CD's 6054, inside its DOCUMENTED run-to-run drift &mdash; it is not pinned and should
+not be.</p>
+<p><b>SEEN ONCE, NOT REPRODUCED, AND THE INSTRUMENT FAULT IS THE MORE USEFUL HALF (the AO
+precedent).</b> <code>test_batch_bk</code> &mdash; the map-generation suite, which walks 1000
+generated zones &mdash; read <b>130 checks / 1 failure</b> on the battery pass and <b>130/0,
+130/0 and 129/0</b> on three re-runs immediately afterwards (the 129 is its own DOCUMENTED
+&plusmn;1 drift: two report loops iterate columns whose width the generator decides). <b>Nothing
+in this batch touches map generation</b> &mdash; no generator, no deck, no node type.
+<b>THE FAILING CHECK WAS NOT CAPTURED, AND THAT IS THE BATTERY SCRIPT'S FAULT RATHER THAN
+BAD LUCK: <code>test_batch_bk</code> prints <code>FAIL: &lt;msg&gt;</code> with NO leading
+spaces, and the harness was grepping for <code>^&nbsp;&nbsp;FAIL:</code></b> &mdash; so a suite
+whose failure format differs by two characters reports its COUNT and swallows its reason. The
+grep is widened. It is the same shape CA named in the harness and CD named in the suites,
+arriving one layer further out: <b>a report that can see a number but not the sentence beside it
+is a report that defers the diagnosis to the next person who sees it.</b></p>
+<p><b>FOUR SUITES RE-POINTED IN PLACE BESIDE THE DEBT SWEEP, and each is a question asked more
+precisely rather than a weaker one.</b> <code>test_batch_av</code>'s Sanctified check counts FOUR
+callers now, because Observance's second stack is a Mercy spend like any other and goes through
+the one roll. <code>test_batch_ax</code>'s "nothing removes the Ruin status on detonation" used to
+grep the WHOLE FILE, which was only ever a proxy &mdash; Requiem consumes the pile deliberately,
+so the file-wide form would have failed against correct code AND would have passed forever if a
+later batch renamed <code>_detonate_ruin</code>; it reads the detonation's own body now, with
+Requiem's site asserted separately. <code>test_batch_bi</code>'s "the peak is raised in exactly
+ONE place" is now "exactly ONE site raises it FROM the count", plus a pin that CE's peak-only
+writer reads no count at all &mdash; which is the property BI actually cares about (the two must
+not drift). <code>test_batch_cb</code>'s two doc claims moved from CB's to CE's.</p>
+<p><b>THE DESIGNER HAD NO RUN IN FLIGHT and none was created</b> &mdash; no
+<code>run_save.bin</code> before or after &mdash; and <b>profile.json, relics.json AND trees.json
+are byte-identical by hash</b> across the battery, the eighteen controls and the smokes.</p>
+<p><b>THE MASTER.HTML STAMP GATE IS DUPLICATED FOURTEEN TIMES</b> &mdash; test_batch_ah, bb, bn,
+bo, bp, bq, br, bs, bt, bu, bv, bw, bx <b>and cd</b> &mdash; and all fourteen moved to Batch CE.
+test_batch_ce deliberately does NOT add a fifteenth; it checks the master.html CONTENT this batch
+is responsible for instead (the CB precedent). The honest fix is still not taken.</p>
+<p><b>REPORTED, NOT ACTED ON: <code>docs/changelog.html</code> IS 228 KB.</b> Batch BZ's standing
+note says to repeat the split at a batch boundary <b>around 150 KB</b>, and the live file passed
+that some batches ago. It is a whole batch's work (the split has to be verified entry by entry and
+re-concatenated byte for byte before it can be trusted), so it is recorded here rather than done
+here.</p>
+
+<h3>&sect;7 &mdash; the numbers this batch is least sure of</h3>
+<p><b>ANATHEMA'S 50% IS THE NUMBER THE DESIGNER TRUSTS LEAST AND IT SHIPS UNTUNED, to be watched
+in play</b> (Threshold's 15, one tranche later). Too low and a boss's Break stays out of reach
+whatever he spends; too high and the Madness gate stops being a gate at all. <b>OBSERVANCE'S VALUE
+IS THE OTHER ONE</b> &mdash; three of five Empowerable casts, and each of those three perfects is
+small. Both are flagged rather than pre-tuned.</p>
+
 <h2>2026-08-16 &mdash; Batch CD: seven script errors, one wrong target count</h2>
 <p><i><b>No game code changed &mdash; no ability, no talent node, no magnitude, no save version
 (still v10).</b> The battery reported zero failures and SEVEN THROWS across five suites. It

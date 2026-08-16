@@ -410,10 +410,16 @@ func _additive_units() -> void:
 			"living_sanctum", "serenity_guard"]:
 		ok(not bsrc.contains(dead) and not usrc.contains(dead),
 			"the ranked counter %s is gone from every read site" % dead)
-	# THE ONE PLACE THE SANCTIFIED ROLL HAPPENS — three spenders, one rule.
+	# THE ONE PLACE THE SANCTIFIED ROLL HAPPENS — one rule, and the SPENDERS
+	# ARE WHAT GROWS. RE-POINTED BY BATCH CE (three callers -> four): Observance
+	# charges a SECOND Mercy to keep an Empowered cast's perfect bonus, and that
+	# is a Mercy spend like any other, so it passes through this roll rather
+	# than carving itself out. The question — is there exactly ONE definition
+	# and does every spender go through it — is unchanged; only the count moved,
+	# and a count is what makes a fifth spender come and say so.
 	ok(bsrc.count("func _sanctified_refund") == 1
-		and bsrc.count("_sanctified_refund(") == 4,
-		"the Sanctified roll has one definition and three callers (faith_cost, Empower, Intercession)")
+		and bsrc.count("_sanctified_refund(") == 5,
+		"the Sanctified roll has one definition and FOUR callers (faith_cost, Empower, Observance, Intercession)")
 	# THE ONE PLACE THE OVERFLOW SHARE IS DECIDED.
 	ok(bsrc.count("func _overflow_share") == 1,
 		"the overflow share has exactly one implementation")

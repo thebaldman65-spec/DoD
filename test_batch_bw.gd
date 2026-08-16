@@ -184,24 +184,32 @@ func _pools() -> void:
 	# paid tranche 3's first third. The question is unchanged and is still what
 	# tells the two answers apart; what is owed now is the Cleric, Hunter and
 	# Warrior thirds of tranche 3, and it has to stay visible in code.
-	for spec in ["pyromancer", "cryomancer", "arcanist"]:
+	# RE-POINTED BY BATCH CE, AND IT IS THE FIFTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, then CB's new asymmetry, and now that asymmetry HALVED
+	# — the CLERIC three joined the Mage three at EIGHT when tranche 3's second
+	# third landed, so six pools are eight deep and six are five. The question is
+	# unchanged and is still what tells the two answers apart; what is owed now
+	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
+	for spec in ["pyromancer", "cryomancer", "arcanist",
+			"holy", "inquisitor", "occultist"]:
 		ok(Classes.spec_draft_pool(spec).size() == 8,
 			"%s drafts EIGHT (got %d)"
 				% [spec, Classes.spec_draft_pool(spec).size()])
-	for spec in ["holy", "inquisitor", "occultist", "beastmaster",
-			"sharpshooter", "mystic", "berserker", "warden", "swordmaster"]:
+	for spec in ["beastmaster", "sharpshooter", "mystic",
+			"berserker", "warden", "swordmaster"]:
 		var pool: Array = Classes.spec_draft_pool(spec)
 		ok(pool.size() == 5, "%s is still FIVE (got %d)" % [spec, pool.size()])
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12, "there are twelve spec pools")
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 69, "the spec pools hold 69 (60 + CB's Mage nine), got %d" % total)
+	ok(total == 78, "the spec pools hold 78 (60 + CB's Mage nine + CE's Cleric nine), got %d" % total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 93,
-		"the whole draft is 93 of a target 120 (got %d)" % draft_total)
+	ok(draft_total == 102,
+		"the whole draft is 102 of a target 120 (got %d)" % draft_total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH WARRIOR POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -596,10 +604,10 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CD"), "master.html is stamped Batch CD")
+	ok(master.contains("Batch CE"), "master.html is stamped Batch CE")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("93 of"), "master.html states the new draft count")
+	ok(master.contains("102 of"), "master.html states the new draft count")
 	ok(master.contains("Builds with"),
 		"and the draft tables still carry the synergy line a player reads")
 	var chlog := FileAccess.get_file_as_string("res://docs/changelog.html")

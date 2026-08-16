@@ -142,8 +142,8 @@ func _pools() -> void:
 	# is 60 plus the Mage nine. The question — is the count what the batches
 	# claim they shipped — is unchanged; a pool quietly EMPTYING still trips,
 	# which is what pinning a count is for.
-	ok(total == 69,
-		"§5+BP+tranche 3: sixty-nine ship — BO's 18, BP's 6, tranche 2's 36 and CB's 9 (got %d)"
+	ok(total == 78,
+		"§5+BP+tranche 3: seventy-eight ship — BO's 18, BP's 6, tranche 2's 36, CB's 9 and CE's 9 (got %d)"
 			% total)
 	# TRANCHE 1'S ENTRIES MUST STILL LEAD THEIR POOLS, which is the half of this
 	# check that survives BT untouched: a later tranche APPENDS, it does not
@@ -167,11 +167,19 @@ func _pools() -> void:
 	# paid tranche 3's first third. The question is unchanged and is still what
 	# tells the two answers apart; what is owed now is the Cleric, Hunter and
 	# Warrior thirds of tranche 3, and it has to stay visible in code.
-	for spec in ["pyromancer", "cryomancer", "arcanist"]:
+	# RE-POINTED BY BATCH CE, AND IT IS THE FIFTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, then CB's new asymmetry, and now that asymmetry HALVED
+	# — the CLERIC three joined the Mage three at EIGHT when tranche 3's second
+	# third landed, so six pools are eight deep and six are five. The question is
+	# unchanged and is still what tells the two answers apart; what is owed now
+	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
+	for spec in ["pyromancer", "cryomancer", "arcanist",
+			"holy", "inquisitor", "occultist"]:
 		ok(Classes.spec_draft_pool(spec).size() == 8,
 			"§5+tranche 3: %s drafts EIGHT" % spec)
-	for spec in ["holy", "inquisitor", "occultist", "beastmaster",
-			"sharpshooter", "mystic", "berserker", "warden", "swordmaster"]:
+	for spec in ["beastmaster", "sharpshooter", "mystic",
+			"berserker", "warden", "swordmaster"]:
 		ok(Classes.spec_draft_pool(spec).size() == 5,
 			"§5+tranche 3: %s is still FIVE — its third is owed" % spec)
 	# THE WARRIOR POOLS ARE NAMED **AND FULL** — named and empty at BO, filled to
@@ -1175,7 +1183,7 @@ func _docs() -> void:
 	# TOGETHER or a batch that bumps the timestamp trips suites it never
 	# touched. (BO had its own copy phrased as "this batch"; it is the same
 	# gate.)
-	ok(master.contains("Batch CD"),
+	ok(master.contains("Batch CE"),
 		"§6: master.html is stamped for the current batch")
 	ok(master.contains("THE ABILITY DRAFT") or master.contains("The Ability Draft"),
 		"§6: ...and carries the draft's own section")
@@ -1207,6 +1215,29 @@ func _docs() -> void:
 		"§6: ...as PAID IN FULL (BQ then BR)")
 	ok(claude.contains("TRANCHES 2 AND 3"),
 		"§6: ...and the spec pools' depth named as the debt that remains")
-	var chlog := _src("res://docs/changelog.html")
-	ok(chlog.contains("BATCH BO") or chlog.contains("Batch BO"),
-		"§6: the changelog has a Batch BO entry")
+	# RE-POINTED AT THE ARCHIVE BY BATCH CE §5, and this copy was the worse of
+	# the two: `contains("BATCH BO") or contains("Batch BO")` against the LIVE
+	# file, which BATCH BZ split at a batch boundary — BO is the LAST entry in
+	# the archive, so it is exactly the one the split moved out. It went on
+	# passing because later entries name Batch BO constantly (BP through CD all
+	# cite it), so it PASSED WITHOUT ITS SUBJECT BEING IN THE FILE AT ALL.
+	# CD reported it and deliberately did not repair it; this is that repair, on
+	# the pattern CD gave test_batch_bb — anchor on the `<h2>` heading, and read
+	# the archive's path out of the LIVE changelog's own header rather than
+	# hardcoding it, so a later split moves this with it. See the same block in
+	# test_batch_bn for the full reasoning and the one consequence (this suite
+	# now depends on a file that is not in version control, and FAILS LOUDLY
+	# without it, which is correct).
+	var live_log := _src("res://docs/changelog.html")
+	var arch_mark := live_log.find("/changelog-archive.html</code>")
+	ok(arch_mark > 0, "§6: the live changelog names the archive's full path")
+	var arch_open := live_log.rfind("<code>", arch_mark) + 6
+	var arch_path := live_log.substr(arch_open,
+		arch_mark + "/changelog-archive.html".length() - arch_open)
+	var chlog := _src(arch_path)
+	ok(chlog.length() > 100000,
+		"§6: the archive opens at %s (%d chars)" % [arch_path, chlog.length()])
+	ok(not live_log.contains("<h2>2026-08-13 &mdash; Batch BO"),
+		"§6: BZ moved this batch's entry OUT of the live changelog")
+	ok(chlog.contains("<h2>2026-08-13 &mdash; Batch BO"),
+		"§6: ...and the archive carries the Batch BO entry")

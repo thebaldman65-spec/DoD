@@ -165,8 +165,8 @@ func _pools() -> void:
 		var pool: Array = Classes.spec_draft_pool(spec)
 		ok(pool.size() == 8, "%s drafts EIGHT (got %d)" % [spec, pool.size()])
 	for spec in ["holy", "inquisitor", "occultist"]:
-		ok(Classes.spec_draft_pool(spec).size() == 5,
-			"%s joined them at FIVE in Batch BU" % spec)
+		ok(Classes.spec_draft_pool(spec).size() == 8,
+			"%s joined them at EIGHT in Batch CE" % spec)
 	# RE-POINTED BY BATCH BV, which paid the HUNTER third: the three Hunter pools
 	# joined the Mage and Cleric at five, so ONLY THE WARRIOR THREE are still at
 	# two. Kept as an inversion rather than deleted — the half of this check that
@@ -182,8 +182,15 @@ func _pools() -> void:
 	# paid tranche 3's first third. The question is unchanged and is still what
 	# tells the two answers apart; what is owed now is the Cleric, Hunter and
 	# Warrior thirds of tranche 3, and it has to stay visible in code.
-	for spec in ["holy", "inquisitor", "occultist", "beastmaster",
-			"sharpshooter", "mystic", "berserker", "warden", "swordmaster"]:
+	# RE-POINTED BY BATCH CE, AND IT IS THE FIFTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, then CB's new asymmetry, and now that asymmetry HALVED
+	# — the CLERIC three joined the Mage three at EIGHT when tranche 3's second
+	# third landed, so six pools are eight deep and six are five. The question is
+	# unchanged and is still what tells the two answers apart; what is owed now
+	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
+	for spec in ["beastmaster", "sharpshooter", "mystic",
+			"berserker", "warden", "swordmaster"]:
 		ok(Classes.spec_draft_pool(spec).size() == 5,
 			"%s is still FIVE — its third of tranche 3 is owed" % spec)
 	for spec in ["beastmaster", "sharpshooter", "mystic"]:
@@ -192,8 +199,8 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 69,
-		"the spec pools hold 69 (60 + CB's Mage nine), got %d"
+	ok(total == 78,
+		"the spec pools hold 78 (60 + CB's Mage nine + CE's Cleric nine), got %d"
 			% total)
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR negative control.
@@ -411,7 +418,7 @@ func _one_shield_door() -> void:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CD"), "master.html carries the current batch stamp")
+	ok(master.contains("Batch CE"), "master.html carries the current batch stamp")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
 	# §5: THE SYNERGY LINE IS THE INFORMATION THIS TRANCHE WAS AUTHORED FOR, so

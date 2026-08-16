@@ -4,6 +4,34 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## An `elif` is a rule until something makes the pair reachable (Batch CE) — 2026-08-16
+
+Observance is a card that lets an Empowered cast keep its perfect bonus for a second Mercy. The
+brief called the forfeit "a permanent standing tax", which is true of the rule and turned out to
+be much smaller than it reads. Three of Holy's five Empowerable casts had written their two
+outcomes as `if empowered ... elif is_perfect` — and that `elif` was never a decision. It was an
+accident of the fact that `_resolve_special` zeroes `is_perfect` the moment a cast is Empowered,
+so the two could not both be true and nobody had to choose. Splitting them is a behavioural no-op
+against every board state that exists today, and it is the only reason the new card fires at all.
+
+**The transferable half is that unreachable code shapes itself around what is currently
+impossible, and a new card is exactly the thing that makes it possible.** Nothing was broken. No
+test could have caught it, because there was no wrong behaviour to catch — right up until the
+moment the card shipped, when the same three `elif`s would have made it silently inert. The
+failure mode is a card that does nothing and reads fine on its tooltip, which is the fault this
+project keeps meeting under different names.
+
+**The Hymn is why the order matters and not just the split.** Its Empowered share is 35% and its
+perfect 25%, so two independent `if`s written the wrong way round would have handed the
+*smaller* number to the cast that had just paid a second Mercy for the privilege. The card would
+have been a downgrade you paid for. That is pinned in the suite rather than trusted, because the
+correct order is invisible from either line on its own.
+
+**And the honest accounting was worth more than the card.** Writing down what Observance is
+actually worth — three of five casts, and nothing on the two whose Empowered branch already
+supersedes their perfect — is a smaller claim than the brief's and a more useful one. A tax you
+can name the size of is a tax somebody can decide about.
+
 ## A count is the instrument; a clean line is not evidence (Batch CD) — 2026-08-16
 
 Batch CA found the run harness printing `GATE 2 PASS` on zero assertions and wrote the rule: a

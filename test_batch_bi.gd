@@ -261,8 +261,23 @@ func _the_field_exists_and_has_one_ratchet() -> void:
 	ok(usrc.contains("var faith_peak := 0"),
 		"§1: unit.gd carries `faith_peak`")
 	var bsrc := _src("res://scripts/battle.gd")
-	ok(bsrc.count("u.faith_peak = maxi(") == 1,
-		"§1: the peak is raised in exactly ONE place (found %d)"
+	# RE-POINTED BY BATCH CE, AND THE QUESTION IT ASKS IS THE SAME ONE, ASKED
+	# MORE PRECISELY. §1's rule is that the peak FOLLOWING THE COUNT has exactly
+	# one site, so the two can never drift apart — and drift here is invisible,
+	# because every number stays plausible. CE's ELEVATION writes the peak
+	# WITHOUT the count on purpose (that asymmetry is the card), so a bare count
+	# of the assignment now reads two. What is pinned instead is the half that
+	# matters: exactly ONE site raises the peak FROM `faith_stacks`, and the one
+	# deliberate other writer does not read the count at all.
+	ok(bsrc.count("u.faith_peak = maxi(u.faith_peak, u.faith_stacks)") == 1,
+		"§1: exactly ONE site raises the peak FROM the count")
+	ok(bsrc.count("func _raise_faith_peak(") == 1,
+		"§1: ...and CE's deliberate peak-only writer is one function")
+	var rfp := bsrc.find("func _raise_faith_peak(")
+	ok(rfp > 0 and not bsrc.substr(rfp, 500).contains("faith_stacks"),
+		"§1: ...which reads no count at all, so the two cannot drift")
+	ok(bsrc.count("u.faith_peak = maxi(") == 2,
+		"§1: the peak is raised in exactly TWO places, both accounted for (found %d)"
 			% bsrc.count("u.faith_peak = maxi("))
 	ok(bsrc.contains("func _reset_faith_meters() -> void:"),
 		"§1: the reset is its own function, drivable headlessly")

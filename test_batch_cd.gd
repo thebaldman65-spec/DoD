@@ -50,7 +50,11 @@ const DEAD_TEST_SYMBOLS := ["award_talent_points", "award_spec_point",
 const SPEC_TARGET := 96      # 12 specs x 8
 const CLASS_TARGET := 24     # 4 classes x 6
 const DRAFT_TARGET := 120    # 96 + 24
-const MAGE_SPECS := ["pyromancer", "cryomancer", "arcanist"]
+# RE-POINTED BY BATCH CE: the CLERIC three joined the Mage three at eight
+# when tranche 3's second third landed, so what this list names is "the pools
+# tranche 3 has already paid" rather than one class.
+const DEEP_SPECS := ["pyromancer", "cryomancer", "arcanist",
+	"holy", "inquisitor", "occultist"]
 
 # The forms the dead denominator was written in, across four files. Matched as
 # PHRASES rather than as the bare number, for the reason at `_target` below.
@@ -236,7 +240,7 @@ func _target() -> void:
 	# rule — so there it can be held to the stricter form: the string at all.
 	var master := _src("res://docs/master.html")
 	ok(not master.contains("~96"), "master.html carries no ~96 at all")
-	ok(master.contains("93 of 120"), "master.html states 93 of 120")
+	ok(master.contains("102 of 120"), "master.html states 102 of 120")
 	ok(master.contains("96 spec"), "...and names the 96-card spec half")
 	var classes := _src("res://scripts/classes.gd")
 	for phrase in STALE_TARGET_PHRASES:
@@ -259,9 +263,13 @@ func _target() -> void:
 	for phrase in STALE_TARGET_PHRASES:
 		ok(not _states_stale_target(block, phrase),
 			"the standing reference states no \"%s\"" % phrase)
-	ok(block.contains("93 OF 120") or block.contains("93 of 120"),
-		"...it states 93 of 120")
-	ok(block.contains("27"), "...and names the 27 still owed")
+	# RE-POINTED BY BATCH CE, and the question is unchanged: does the STANDING
+	# reference carry the LIVE count against the REAL target? Only the correct
+	# answer moved — CE paid tranche 3's second third, so the draft is 102 and
+	# what is owed is the Hunter and Warrior thirds.
+	ok(block.contains("102 OF 120") or block.contains("102 of 120"),
+		"...it states 102 of 120")
+	ok(block.contains("18"), "...and names the 18 still owed")
 	# No suite may carry the stale denominator either: a test whose MESSAGE
 	# states a wrong target teaches it to whoever reads the failure — and four
 	# suites carried it in exactly that form. This file is the one legitimate
@@ -289,21 +297,21 @@ func _pools() -> void:
 	for spec in specs:
 		var pool: Array = Classes.spec_draft_pool(spec)
 		spec_total += pool.size()
-		var want := 8 if MAGE_SPECS.has(spec) else 5
+		var want := 8 if DEEP_SPECS.has(spec) else 5
 		ok(pool.size() == want, "%s drafts %d (want %d)" % [spec, pool.size(), want])
 		# A pool with a repeat would keep the count and change the draft.
 		var seen := {}
 		for n in pool:
 			seen[String(n)] = 1
 		ok(seen.size() == pool.size(), "%s's pool holds no duplicate" % spec)
-	ok(spec_total == 69, "SPEC_DRAFT_POOLS holds 69 entries (got %d)" % spec_total)
-	ok(spec_total == 3 * 8 + 9 * 5, "...which is three at eight and nine at five")
+	ok(spec_total == 78, "SPEC_DRAFT_POOLS holds 78 entries (got %d)" % spec_total)
+	ok(spec_total == 6 * 8 + 6 * 5, "...which is six at eight and six at five")
 	var class_total := 0
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		class_total += (Classes.CLASS_DRAFT_POOLS[cls] as Array).size()
 	ok(class_total == CLASS_TARGET,
 		"CLASS_DRAFT_POOLS is full at %d (got %d)" % [CLASS_TARGET, class_total])
-	ok(spec_total + class_total == 93, "the draft stands at 93")
-	ok(DRAFT_TARGET - (spec_total + class_total) == 27,
-		"27 are owed — the Cleric, Hunter and Warrior thirds of tranche 3")
-	ok(SPEC_TARGET - spec_total == 27, "...and every one of them is a SPEC card")
+	ok(spec_total + class_total == 102, "the draft stands at 102")
+	ok(DRAFT_TARGET - (spec_total + class_total) == 18,
+		"18 are owed — the Hunter and Warrior thirds of tranche 3")
+	ok(SPEC_TARGET - spec_total == 18, "...and every one of them is a SPEC card")

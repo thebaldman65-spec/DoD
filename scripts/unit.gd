@@ -31,6 +31,15 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	# party's work off the enemy carrying it. `emberkeep`, `resonant_field` and
 	# `threshold_lock` are NOT here and must not be: all three sit on a HERO.
 	"frostbind", "unmade",
+	# BATCH CE — `anathema` AND `penance` are the tranche-3 Cleric draft's two
+	# enemy-side statuses and both are genuine AFFLICTIONS, so both are listed,
+	# for the same two consequences: a mender's Cleansing Rite can take either
+	# (real counterplay, and neither is battle-long so neither is picked first
+	# every single time), and — the half that matters — listing them keeps them
+	# OUT of the derived `_dispellable_buffs` set, so a Mage's own Dispel can
+	# never strip the party's work off the enemy carrying it. `matins`, `alms`
+	# and `observance` are NOT here and must not be: all three sit on HOLY.
+	"anathema", "penance",
 	# BATCH BT — `slow_burn` IS a genuine debuff and is listed as one, which
 	# makes it CLEANSABLE by a mender's Cleansing Rite. That is the counterplay
 	# rather than an oversight (Blight the Well's precedent): a card that makes
@@ -940,6 +949,16 @@ var lethal_saved_cb := Callable()
 # for this unit (the only source of Faith).
 var shield_absorbed_cb := Callable()
 var prevented_cb := Callable()  # Batch W sim ledger: barrier absorbs → (src_name, absorbed, holder, divine)
+# BATCH CE — MANTLE (Devout draft, tranche 3): the ONE new unit-side field for
+# nine abilities, and it is a door rather than a number. Fires when a barrier is
+# EXHAUSTED AND REMOVED, so the battle scene can decide whether anything should
+# happen next — which for the Mantle means passing to another ally.
+#
+# ITS POSITION IS THE WHOLE CONTRACT: it fires in the `else` branch below
+# UNYIELDING AEGIS, so a shield the Aegis re-forms has NOT broken and does not
+# pass. A shield cannot both re-form here and leave, and deciding that at the
+# one site is what stops the two nodes disagreeing about what "broken" means.
+var barrier_broken_cb := Callable()
 # BATCH BC §1 — the sim ledger's door out of unit.gd, for effects computed
 # HERE that the battle scene cannot see. Three ride it, and none of the three
 # had ever been credited to anybody: Blessed Barrier's conversion, Afterglow's
@@ -2387,7 +2406,15 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 					_proc_log("Talent: Unyielding Aegis — %s's shield re-forms at %d" % [
 						unit_name, s.power])
 				else:
+					var broke_stat: Dictionary = s.duplicate()
 					remove_status("barrier")
+					# BATCH CE — MANTLE passes here and only here. The status is
+					# handed over as a COPY because `remove_status` has already
+					# taken the live one, and the battle side needs the riders
+					# (whose mantle it was, how many passes are left) to lay the
+					# next shield with them.
+					if barrier_broken_cb.is_valid():
+						barrier_broken_cb.call(self, broke_stat)
 				if glow > 0:
 					var glow_got := heal_amount(glow)
 					float_text("+%d" % glow_got, Color(0.95, 0.9, 0.6))
@@ -2598,6 +2625,22 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		eff_con = maxf(eff_con * (1.0 - minf(thin, 0.75)), 10.0)
 	var bd_raw := pressure_add
 	pressure_add = int(round(pressure_add * 100.0 / maxf(eff_con, 1.0)))
+	# BATCH CE — ANATHEMA (Occultist draft, tranche 3): THE ONE PLACE BREAK
+	# DAMAGE IS EVER AMPLIFIED. Every other line in this block REDUCES it, and
+	# that asymmetry is exactly why the card exists — the Madness lane is gated
+	# on Broken and nothing in the game had ever made a Break meter fill faster.
+	#
+	# IT SITS ABOVE THE REDUCERS DELIBERATELY. Bulwark still refuses the whole of
+	# it, Devoutness still cuts its share and Iron Will still caps the meter at
+	# 99 — the amplifier raises the number those then act on, which is the honest
+	# reading of "every source lands 50% harder" and keeps every defence in the
+	# game answering it.
+	#
+	# IT IS NOT BOOKED THROUGH `_credit_bd`: that ledger is Break REFUSED OR
+	# REDUCED (BF §1), and an increase is neither of those things.
+	if pressure_add > 0 and has_status("anathema"):
+		pressure_add += int(round(pressure_add
+			* maxi(status_power("anathema"), 1) / 100.0))
 	if bracing_ranks > 0 and stance == "defensive":
 		# What the same hit would have cost at his UNBRACED Constitution: the
 		# node's whole effect is the gap between the two divisors.

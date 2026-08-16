@@ -153,10 +153,17 @@ func _pools() -> void:
 	# written beside went to EIGHT when tranche 3's first third landed, so the
 	# CLERIC three it shipped are no longer level with them. BU's own five are
 	# still the first five of each Cleric pool, because a later tranche APPENDS.
+	# RE-POINTED BY BATCH CE, AND IT IS THE FIFTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, then CB's new asymmetry, and now that asymmetry HALVED
+	# — the CLERIC three joined the Mage three at EIGHT when tranche 3's second
+	# third landed, so six pools are eight deep and six are five. The question is
+	# unchanged and is still what tells the two answers apart; what is owed now
+	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
 	var five := ["holy", "inquisitor", "occultist"]
 	for spec in five:
 		var pool: Array = Classes.spec_draft_pool(spec)
-		ok(pool.size() == 5, "%s drafts FIVE (got %d)" % [spec, pool.size()])
+		ok(pool.size() == 8, "%s drafts EIGHT since Batch CE (got %d)" % [spec, pool.size()])
 	for spec in ["pyromancer", "cryomancer", "arcanist"]:
 		ok(Classes.spec_draft_pool(spec).size() == 8,
 			"%s drafts EIGHT since Batch CB (got %d)"
@@ -178,7 +185,7 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 69, "the spec pools hold 69 (60 + CB's Mage nine), got %d" % total)
+	ok(total == 78, "the spec pools hold 78 (60 + CB's Mage nine + CE's Cleric nine), got %d" % total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH CLERIC POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -430,10 +437,10 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CD"), "master.html is stamped Batch CD")
+	ok(master.contains("Batch CE"), "master.html is stamped Batch CE")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("93 of"), "master.html states the current draft count")
+	ok(master.contains("102 of"), "master.html states the current draft count")
 	var chlog := FileAccess.get_file_as_string("res://docs/changelog.html")
 	ok(chlog.contains("Batch BU"), "the changelog carries a BU entry")
 
