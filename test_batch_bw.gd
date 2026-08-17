@@ -205,18 +205,30 @@ func _pools() -> void:
 	# only the WARRIOR THREE are still at five. The question is unchanged and is
 	# still what tells the two answers apart; what is owed is the Warrior third,
 	# and it is the LAST of the debt, so it has to stay visible in code.
+	# RE-POINTED BY BATCH CI, AND IT IS THE SEVENTH AND LAST INVERSION OF THIS
+	# LOOP. It has asserted, in order: each earlier tranche's own asymmetry, then
+	# the FLATNESS tranche 2 achieved, then CB's new asymmetry, that asymmetry
+	# HALVED at CE, QUARTERED at CH — and now GONE. The WARRIOR three joined the
+	# other nine at EIGHT when tranche 3's last third landed, so ALL TWELVE specs
+	# draft from eight and the draft is 120 of 120.
+	#
+	# **THERE IS NO DEBT LEFT TO KEEP VISIBLE, so what this loop guards from here
+	# on is the FLATNESS rather than an asymmetry**: a pool that quietly EMPTIES
+	# trips, where before it would have read as the old debt coming back. That is
+	# the reason it inverts rather than being deleted — the question is still
+	# worth asking, only the correct answer moved, and it moved for the last time.
 	for spec in ["berserker", "warden", "swordmaster"]:
 		var pool: Array = Classes.spec_draft_pool(spec)
-		ok(pool.size() == 5, "%s is still FIVE (got %d)" % [spec, pool.size()])
+		ok(pool.size() == 8, "%s drafts EIGHT (got %d)" % [spec, pool.size()])
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12, "there are twelve spec pools")
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 87, "the spec pools hold 78 (60 + CB's Mage nine + CE's Cleric nine), got %d" % total)
+	ok(total == 96, "the spec pools hold 96 (60 + tranche 3's 36: CB, CE, CH and CI), got %d" % total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 111,
+	ok(draft_total == 120,
 		"the whole draft is 102 of a target 120 (got %d)" % draft_total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH WARRIOR POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
@@ -519,11 +531,25 @@ func _source_rules() -> void:
 	# FEIGNED GUARD SATISFIES THE GATE AT `_ability_usable`. That is the site
 	# that makes the card true, and it is a different site from resolution — so
 	# the gate is asserted to read `_eff_stance` rather than `stance`.
-	var at_gate := code.find('ab.display_name == "Sever" and _eff_stance')
+	# RE-POINTED BY BATCH CI, AND THE QUESTION IS BYTE-FOR-BYTE THE SAME — only
+	# the fragment moved (the AZ Follow-Through / AL Ghillie Suit precedent).
+	# CI's FORMLESS counts as BOTH guards at once, which `_eff_stance` cannot
+	# express because it returns ONE guard, so both gates now ask
+	# `_stance_satisfies` — the one answer to "does this unit count as standing
+	# in guard X". That helper reads `_eff_stance` underneath, so what this check
+	# protects (the gate reads the EFFECTIVE guard and not the raw one, and
+	# Feigned Guard therefore genuinely opens the door) is unchanged.
+	var at_gate := code.find('ab.display_name == "Sever" and not _stance_satisfies')
 	ok(at_gate > 0, "Sever's gate reads the EFFECTIVE stance, not the raw one")
-	var at_bpgate := code.find('ab.special == "battle_poise" and _eff_stance')
+	var at_bpgate := code.find('ab.special == "battle_poise" and not _stance_satisfies')
 	ok(at_bpgate > 0,
 		"Battle Poise's gate reads the EFFECTIVE stance, not the raw one")
+	# AND `_stance_satisfies` STILL GOES THROUGH `_eff_stance`, which is what
+	# keeps Feigned Guard working underneath Formless rather than being shadowed
+	# by it. Asserted, because a later batch could make Formless the only reader.
+	var at_sat := code.find("func _stance_satisfies(")
+	ok(at_sat > 0 and code.substr(at_sat, 240).contains("_eff_stance("),
+		"...and `_stance_satisfies` still resolves through `_eff_stance`")
 	# BOTH GATES SIT INSIDE `_ability_usable`, not somewhere that only the bot or
 	# only the button reads. One door, three affordances.
 	var at_usable := code.find("func _ability_usable(")
@@ -564,7 +590,15 @@ func _source_rules() -> void:
 	# line. Asserted at the passive's own read site.
 	var at_seasoned := code.find('strike_target.passive_id == "seasoned"')
 	ok(at_seasoned > 0, "the Seasoned Fighter mitigation site exists")
-	var sf_body := code.substr(at_seasoned, 260)
+	# RE-POINTED BY BATCH CI: THE SLICE WAS A FIXED 260-BYTE WINDOW, which is an
+	# accident of how long that branch happens to be — CI's Formless and
+	# Discipline terms pushed the stance read off the end and it failed against
+	# CORRECT code. That is the same fault CH repaired in this file's
+	# `DISPEL_NEVER` check, so it takes the same repair: the slice ends at the
+	# branch's OWN last statement rather than at a byte count.
+	var sf_end := code.find("_prev(strike_target, pv_was - raw)", at_seasoned)
+	ok(sf_end > at_seasoned, "the mitigation branch has a readable end")
+	var sf_body := code.substr(at_seasoned, sf_end - at_seasoned)
 	ok(sf_body.contains("strike_target.stance"),
 		"the passive reads his REAL stance, not the feigned one")
 	ok(not sf_body.contains("_eff_stance"),
@@ -622,10 +656,10 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CH"), "master.html is stamped Batch CH")
+	ok(master.contains("Batch CI"), "master.html is stamped Batch CI")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("111 of"), "master.html states the new draft count")
+	ok(master.contains("120 of"), "master.html states the new draft count")
 	ok(master.contains("Builds with"),
 		"and the draft tables still carry the synergy line a player reads")
 	var chlog := FileAccess.get_file_as_string("res://docs/changelog.html")

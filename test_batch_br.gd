@@ -193,11 +193,11 @@ func _pools() -> void:
 	# pools are 60 plus the Mage nine and the whole draft is 93. The check is
 	# what would catch a pool quietly EMPTYING, which is why it is a pinned
 	# count rather than a range.
-	ok(spec_total == 87,
+	ok(spec_total == 96,
 		"§4+tranche 3: SPEC_DRAFT_POOLS is 60 plus CB's Mage nine and CE's Cleric nine (%d)"
 			% spec_total)
-	ok(spec_total + total == 111,
-		"§0+tranche 3: the draft holds 111 of a target 120 (%d)" % (spec_total + total))
+	ok(spec_total + total == 120,
+		"§0+tranche 3: the draft holds 120 of a target 120 (%d)" % (spec_total + total))
 	# THE UNEVENNESS IS GONE, AND THAT IS THE INVERSION. Every earlier version of
 	# this loop asserted an asymmetry (five here, two there) because the debt was
 	# real and had to stay visible in code; BW paid the last of it, so what is
@@ -222,8 +222,8 @@ func _pools() -> void:
 		ok(Classes.spec_draft_pool(sp2).size() == 8,
 			"§0+tranche 3: %s's SPEC pool is EIGHT deep" % sp2)
 	for sp2 in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(sp2).size() == 5,
-			"§0+tranche 3: %s is still FIVE — its third is owed" % sp2)
+		ok(Classes.spec_draft_pool(sp2).size() == 8,
+			"§0+tranche 3: %s drafts EIGHT — the Warrior third is paid" % sp2)
 	# EVERY ENTRY RESOLVES THROUGH THE ONE RESOLVER, which is what makes the
 	# battle spawn, the hero sheet, the rune filter and the blacksmith pairing
 	# all pick them up with no new plumbing.
@@ -250,6 +250,18 @@ func _pools() -> void:
 	# only the WARRIOR THREE are still at five. The question is unchanged and is
 	# still what tells the two answers apart; what is owed is the Warrior third,
 	# and it is the LAST of the debt, so it has to stay visible in code.
+	# RE-POINTED BY BATCH CI, AND IT IS THE SEVENTH AND LAST INVERSION OF THIS
+	# LOOP. It has asserted, in order: each earlier tranche's own asymmetry, then
+	# the FLATNESS tranche 2 achieved, then CB's new asymmetry, that asymmetry
+	# HALVED at CE, QUARTERED at CH — and now GONE. The WARRIOR three joined the
+	# other nine at EIGHT when tranche 3's last third landed, so ALL TWELVE specs
+	# draft from eight and the draft is 120 of 120.
+	#
+	# **THERE IS NO DEBT LEFT TO KEEP VISIBLE, so what this loop guards from here
+	# on is the FLATNESS rather than an asymmetry**: a pool that quietly EMPTIES
+	# trips, where before it would have read as the old debt coming back. That is
+	# the reason it inverts rather than being deleted — the question is still
+	# worth asking, only the correct answer moved, and it moved for the last time.
 	for spec in ["berserker", "warden", "swordmaster"]:
 		ok(Classes.class_of_spec(spec) == "warrior",
 			"§6: %s is a Warrior, so the Warrior class pool is his" % spec)
@@ -578,9 +590,18 @@ func _draft_flow() -> void:
 	# by `draft_refused` alone.
 	var worn_hero := {"key": "warrior", "spec": "swordmaster", "bm_abilities": [],
 		"draft_refused": []}
+	#
+	# REBUILT BY BATCH CI, AND ITS OWN PREDICTION IS WHAT CAME TRUE. The note
+	# above says "when the Warrior third lands there will be no five-deep pool in
+	# the game and this moves once more, onto a hero worn down by `draft_refused`
+	# alone" — CI landed it, and that is exactly what this is. There is no hero
+	# left to relocate to (twelve specs at eight, four classes at six, 120 of
+	# 120), so the REFUSAL is written relative to the live pool size: everything
+	# but two. It cannot go stale again, because a deeper pool moves the setup
+	# and not the answer.
+	var wn_spec: Array = Classes.spec_draft_pool("swordmaster")
 	worn_hero["draft_refused"] = Classes.class_draft_pool("warrior").duplicate()
-	for wn in Classes.spec_draft_pool("swordmaster").slice(0, 3):
-		worn_hero["draft_refused"].append(wn)
+	worn_hero["draft_refused"].append_array(wn_spec.slice(0, wn_spec.size() - 2))
 	var worn: Array = run.roll_draft_offer(worn_hero)
 	ok(worn.size() == 2,
 		"§4: a pool worn down to two fills SHORT rather than padding (%d)" % worn.size())
@@ -1238,7 +1259,7 @@ func _live_hits_not_casts() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	ok(master.contains("Batch CH"), "§5: master.html is stamped Batch CH")
+	ok(master.contains("Batch CI"), "§5: master.html is stamped Batch CH")
 	for cls in TRANCHE_4:
 		for nm in TRANCHE_4[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)
@@ -1250,7 +1271,7 @@ func _docs() -> void:
 	# any document with enough numbers in it — and BQ's rule is that a check
 	# which can only pass is a gap. It asks BR's real question instead: does
 	# master.html state the draft's LIVE pool count against the REAL target?
-	ok(master.contains("111 of 120"),
+	ok(master.contains("120 of 120"),
 		"§5: ...and master.html states the live pool count against the real target")
 	var changelog := _src("res://docs/changelog.html")
 	ok(changelog.find("Batch BR") >= 0, "§5: the changelog has a Batch BR entry")

@@ -97,7 +97,7 @@
 		"term": "Stance (Seasoned Fighter)",
 		"category": "combat",
 		"short": "The Swordmaster fights Aggressive or Defensive; three abilities switch him, and two REQUIRE a guard.",
-		"long": "Only the Swordmaster has stances, and he is always in one of two. AGGRESSIVE: +15% damage dealt and +10% damage taken. DEFENSIVE: 15% less damage taken and -10% damage dealt. He starts every battle Aggressive, and the stance resets with each new battle - it is never carried between fights. Several of his talents read it (Killing Edge sharpens the Aggressive guard, Bracing hardens the Defensive one, Untouchable makes a Defensive parry absolute), and THREE abilities change it: Guard Change, which does nothing but pivot and press the opening; and the two drafted cards, Precision Strike and Feint, which BRANCH on the stance they are cast from and then switch it. Both branch the same way round, and it is worth knowing: each branch buys what the stance he is ARRIVING in wants. Cast from Aggressive he lands in Defensive, so he is handed defence - a parry buff, or charges that answer blows. Cast from Defensive he lands in Aggressive, so he is handed offence - an armor bypass, or a strike and a misdirected enemy. He is never stranded mid-pivot.",
+		"long": "Only the Swordmaster has stances, and he is normally in one of two - FORMLESS is the one card that puts him in neither and both at once. AGGRESSIVE: +15% damage dealt and +10% damage taken. DEFENSIVE: 15% less damage taken and -10% damage dealt. He starts every battle Aggressive, and the stance resets with each new battle - it is never carried between fights. Several of his talents read it (Killing Edge sharpens the Aggressive guard, Bracing hardens the Defensive one, Untouchable makes a Defensive parry absolute), and THREE abilities change it: Guard Change, which does nothing but pivot and press the opening; and the two drafted cards, Precision Strike and Feint, which BRANCH on the stance they are cast from and then switch it. Both branch the same way round, and it is worth knowing: each branch buys what the stance he is ARRIVING in wants. Cast from Aggressive he lands in Defensive, so he is handed defence - a parry buff, or charges that answer blows. Cast from Defensive he lands in Aggressive, so he is handed offence - an armor bypass, or a strike and a misdirected enemy. He is never stranded mid-pivot.",
 		"see_also": [
 			"parry",
 			"crit",
@@ -109,7 +109,7 @@
 		"term": "Stance-gated ability",
 		"category": "combat",
 		"short": "Some Swordmaster cards can only be cast from one guard - the button stays dark in the other.",
-		"long": "A stance-gated ability REQUIRES a guard rather than behaving differently in each one. Sever can only be cast from the Aggressive stance and Battle Poise only from the Defensive; in the wrong guard the button is simply unavailable, not weaker. Casting one does NOT switch his stance - that is the difference from a stance READER. Precision Strike and Feint are readers: they work in either guard, do something different in each, and then flip him. Feigned Guard is the answer to being locked out: for 2 turns his abilities resolve as though cast from the OTHER guard and satisfy that guard's requirement, while he keeps the stance he is actually standing in - so an Aggressive Swordmaster can cast Battle Poise without giving up Aggressive's damage. Guard Change is still the free, unconditional way to move between the two.",
+		"long": "A stance-gated ability REQUIRES a guard rather than behaving differently in each one. Sever can only be cast from the Aggressive stance and Battle Poise only from the Defensive; in the wrong guard the button is simply unavailable, not weaker. Casting one does NOT switch his stance - that is the difference from a stance READER. Precision Strike and Feint are readers: they work in either guard, do something different in each, and then flip him. FORMLESS is the widest answer to being locked out: while it holds he counts as BOTH guards, so every gated card in his kit is castable - and he cannot Guard Change, because there is no stance to change. Feigned Guard is the cheaper, narrower answer: for 2 turns his abilities resolve as though cast from the OTHER guard and satisfy that guard's requirement, while he keeps the stance he is actually standing in - so an Aggressive Swordmaster can cast Battle Poise without giving up Aggressive's damage. Guard Change is still the free, unconditional way to move between the two.",
 		"see_also": [
 			"stance",
 			"ability_draft"
@@ -1011,5 +1011,28 @@
 		"short": "A temporary rise in your maximum health that decays - and current health clamps under it.",
 		"long": "The Devout's Fortified Spirit lends an ally a share of HIS maximum health: their maximum rises by 30% of his (40% on a perfect cast) and they are healed for the same amount at once, so the new room arrives full rather than empty. THE LOAN THEN DECAYS - a tenth of his maximum is handed back at the start of each of that ally's turns, so 30% becomes 20%, then 10%, then nothing. CURRENT HEALTH CLAMPS UNDER THE SHRINKING MAXIMUM, which is the part worth knowing: an ally kept topped up loses real health on the way down, while one sitting at half never notices it. That is deliberate - it rewards healing them INSIDE the window rather than after it. The loan is temporary in the strictest sense: it is unwound at the end of the battle whatever state it is in, so no lent health ever follows a hero out of the fight.",
 		"see_also": []
+	},
+	{
+		"id": "frenzy_floor",
+		"term": "Blood Frenzy's floor",
+		"category": "combat",
+		"short": "The Berserker keeps HALF the biggest Frenzy bonus he reaches, even after he is healed back up.",
+		"long": "Blood Frenzy pays the Berserker +2% damage for every 5% of maximum health he is MISSING, so his power rises as he falls. The floor is the half of it people miss: the highest bonus he reaches in a battle leaves a permanent mark worth HALF of it, and his live bonus never drops below that mark for the rest of the fight. Heal him to full and he keeps the floor. It is why diving early is worth something even if the party pulls him straight back out, and it resets with each new battle. THREE THINGS CHANGE IT. Scar Tissue (talent) makes the floor keep 85% of the peak instead of half - or all of it alongside Unstoppable. UNSLAKED (draft card) makes it keep the FULL bonus for a few turns, so the play is to cast it and then dive. BOIL OVER (draft card) spends the live bonus as damage and then leaves him receiving ONLY the floor for two turns - the floor itself is untouched, which is exactly why a deep one makes that recovery cost almost nothing.",
+		"see_also": [
+			"stance",
+			"protected_core"
+		]
+	},
+	{
+		"id": "plating_climb",
+		"term": "Heavy Plating's climb",
+		"category": "combat",
+		"short": "The Warden's Block chance rises with every hit that gets through - and a successful Block throws all of it away.",
+		"long": "Heavy Plating gives the Warden a flat 15% Block chance, and adds another 8% every time an attack gets THROUGH him (Plate Discipline steepens that to 20% a hit), up to +40%. It is bad-luck protection: the longer he goes without blocking, the likelier the next block becomes. THE CATCH IS THAT BLOCKING RESETS THE CLIMB TO ZERO, which is what makes his defence a sawtooth rather than a ramp - and several of his talents (Tenacity's +15 maximum health, Rally's party-wide healing bonus) only fire on a Heavy Plating block, so he wants the blocks and pays for them. THREE DRAFT CARDS ANSWER THE RESET AND TWO OF THEM CANNOT BE USED TOGETHER. ANVIL stops Blocking resetting the climb at all, so it reaches its ceiling and stays there. RECOMPENSE is paid BY the reset instead, returning Rage equal to the percentage points it took. Holding both means the second is paid nothing while the first is up - they are two answers to the same problem rather than a stack. TURN THE BLADE ignores the reset entirely and makes each Block deal Break damage back to the attacker.",
+		"see_also": [
+			"pressure_break",
+			"res_rage",
+			"stance"
+		]
 	}
 ]

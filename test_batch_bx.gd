@@ -226,7 +226,12 @@ func _own_pools() -> void:
 	var pyro: Dictionary = run.party[1]
 	ok(String(pyro["spec"]) == "pyromancer", "§2: the harness seated a Pyromancer")
 	var warden_cards: Array = Classes.spec_draft_pool("warden")
-	ok(warden_cards.size() == 5, "§2: the Warden has five spec cards to be offered")
+	# RE-POINTED BY BATCH CI: the Warrior third landed and the Warden drafts
+	# EIGHT. The question — is there a real pool of his own that a Pyromancer
+	# must never be shown — is unchanged, so it is written against the LIVE pool
+	# rather than a literal, which is the shape the rest of this suite already
+	# uses and the reason it needed no other repair this batch.
+	ok(warden_cards.size() == 8, "§2: the Warden has eight spec cards to be offered")
 	var leaked := 0
 	for _i in 200:
 		for card in run.roll_draft_offer(pyro):
@@ -893,7 +898,7 @@ func _rename() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	ok(master.contains("Batch CH"), "§5: master.html is stamped Batch CH")
+	ok(master.contains("Batch CI"), "§5: master.html is stamped Batch CH")
 	var low := master.to_lower()
 	ok(low.contains("every living hero") or low.contains("all four heroes"),
 		"§5: master.html says an elite offers a draft to every living hero")

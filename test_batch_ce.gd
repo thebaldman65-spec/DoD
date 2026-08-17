@@ -196,24 +196,40 @@ func _pools() -> void:
 	# only the WARRIOR THREE are still at five. The question is unchanged and is
 	# still what tells the two answers apart; what is owed is the Warrior third,
 	# and it is the LAST of the debt, so it has to stay visible in code.
+	# RE-POINTED BY BATCH CI, AND IT IS THE SEVENTH AND LAST INVERSION OF THIS
+	# LOOP. It has asserted, in order: each earlier tranche's own asymmetry, then
+	# the FLATNESS tranche 2 achieved, then CB's new asymmetry, that asymmetry
+	# HALVED at CE, QUARTERED at CH — and now GONE. The WARRIOR three joined the
+	# other nine at EIGHT when tranche 3's last third landed, so ALL TWELVE specs
+	# draft from eight and the draft is 120 of 120.
+	#
+	# **THERE IS NO DEBT LEFT TO KEEP VISIBLE, so what this loop guards from here
+	# on is the FLATNESS rather than an asymmetry**: a pool that quietly EMPTIES
+	# trips, where before it would have read as the old debt coming back. That is
+	# the reason it inverts rather than being deleted — the question is still
+	# worth asking, only the correct answer moved, and it moved for the last time.
 	for spec in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(spec).size() == 5,
-			"%s is still at FIVE — its third of tranche 3 is owed" % spec)
+		ok(Classes.spec_draft_pool(spec).size() == 8,
+			"%s drafts EIGHT — tranche 3 is complete" % spec)
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 87, "the spec pools hold 78 (69 + this batch's nine), got %d"
+	ok(total == 96, "the spec pools hold 96 (60 + tranche 3's 36: CB, CE, CH and CI), got %d"
 		% total)
-	ok(total == 9 * 8 + 3 * 5,
-		"...which is NINE at eight and THREE at five (Batch CH)")
+	ok(total == 12 * 8,
+		"...which is ALL TWELVE at eight — the draft is complete (Batch CI)")
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 111, "the draft holds 111 of a target 120 (got %d)"
+	ok(draft_total == 120, "the draft holds 120 of a target 120 (got %d)"
 		% draft_total)
-	ok(120 - draft_total == 9,
-		"9 are owed — the WARRIOR third of tranche 3, and it is the last of it")
-	ok(96 - total == 9, "...and every one of them is a SPEC card")
+	# INVERTED BY BATCH CI RATHER THAN DELETED. These asserted a DEBT for three
+	# batches; CI paid it, so what they assert now is that there is none — which
+	# is the thing a later batch could break (a pool emptying, a card removed),
+	# and it is the same question with the correct answer moved.
+	ok(120 - draft_total == 0,
+		"NOTHING is owed — the draft is complete at 120 of 120")
+	ok(96 - total == 0, "...and the spec half is full at 96")
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR/BT/CB negative control.
 	for cls in Classes.CLASS_DRAFT_POOLS:
@@ -478,9 +494,9 @@ func _empower_split() -> void:
 func _docs() -> void:
 	var doc := _src("res://docs/master.html")
 	ok(doc != "", "master.html is readable")
-	ok(doc.contains("Last updated: 2026-08-16 (Batch CH)"),
+	ok(doc.contains("Last updated: 2026-08-16 (Batch CI)"),
 		"master.html carries the LIVE stamp")
-	ok(doc.contains("111 of 120") or doc.contains("111 of a target 120"),
+	ok(doc.contains("120 of 120") or doc.contains("120 of a target 120"),
 		"master.html states the LIVE draft count against the REAL target")
 	for n in NINE:
 		ok(doc.contains(n), "master.html's draft table lists %s" % n)
@@ -509,8 +525,13 @@ func _docs() -> void:
 	# THE ENTRY IS THE ONLY ONE ADDED. CB added one for the same reason: the
 	# glossary teaches what a player has nowhere else to learn, not every status.
 	var gj: Array = JSON.parse_string(gl)
-	ok(gj != null and gj.size() == 91,
-		"the glossary holds 91 entries (90 + this batch's one)")
+	# RE-POINTED BY BATCH CI: it added `frenzy_floor` and `plating_climb`,
+	# because two of its nine read Blood Frenzy's floor and three read Heavy
+	# Plating's climb and the glossary taught neither. The question this check
+	# asks is unchanged — the glossary grows deliberately, one entry per thing a
+	# player has nowhere else to learn, rather than one per status.
+	ok(gj != null and gj.size() == 93,
+		"the glossary holds 93 entries (91 + CI's two)")
 	var log_live := _src("res://docs/changelog.html")
 	ok(log_live.contains("Batch CE"), "the changelog carries a Batch CE entry")
 	ok(log_live.contains("102"), "...and states the new draft count")

@@ -806,8 +806,7 @@ failure it prevents is SILENT: a spine that stops working because its enabler be
 · 3 **Sharpshooter** — **Quick Shot** (Lethal Aim counts consecutive single-target attacks).
 · 3 **Survivalist** — nothing (Trapper's breadth term counts statuses from ANY source).
 **THE TARGET IS 120, NOT ~96, AND THE ~96 IS DEAD (Batch CD §2). 96 SPEC (12 specs x 8) + 24
-CLASS-WIDE = 120; THE DRAFT STANDS AT 111 OF 120 AND 9 ARE OWED — the WARRIOR nine, three per
-spec, and every one of the 9 is a SPEC card.** The ~96 came from an older
+CLASS-WIDE = 120; THE DRAFT STANDS AT 120 OF 120 AND NOTHING IS OWED (Batch CI).** The ~96 came from an older
 assumption of SIX spec cards per spec and CB completed the Mage at EIGHT, which is what makes the
 spec target 96. **`test_batch_bt` HAD ASSERTED DEPTH 8 SINCE CB, so the tests encoded the right
 figure while the prose contradicted it for a whole batch** — the stale denominator was in
@@ -815,20 +814,28 @@ master.html §6b, in this file, AND in three comments in `classes.gd`, which is 
 for it rather than fixing the two known sites. **DO NOT QUOTE ~96 AGAIN.** Dated batch blocks
 below keep it as written (they are the record of what each batch believed — CA's rule); this is
 the correction.
-**TRANCHE 3 IS THREE QUARTERS PAID AND THE HUNTER IS THE THIRD CLASS COMPLETE (Batch CB the Mage
-nine, Batch CE the Cleric nine, Batch CH the Hunter nine) — `SPEC_DRAFT_POOLS` IS 87 AND THE
-DRAFT IS 111 OF 120. NINE SPECS DRAFT FROM EIGHT AND THE THREE WARRIOR SPECS FROM FIVE, so CB's
-asymmetry is QUARTERED and all that is owed is the WARRIOR third of tranche 3 — nine cards, and
-it is the LAST of the debt.** Every draft suite's per-spec depth loop inverts AGAIN — the SIXTH
-time (each earlier tranche's asymmetry, then the flatness tranche 2 achieved, then CB's new
-asymmetry, then that asymmetry halved at CE, and now quartered) — and the suites assert both
-halves, so the last of the debt stays visible in code rather than only in prose.
-**THE FILL-SHORT CONSTRUCTIONS ARE ALL ON A WARRIOR NOW, AND WHEN THE WARRIOR THIRD LANDS THERE
-WILL BE NO FIVE-DEEP POOL LEFT IN THE GAME.** CH moved test_batch_bq's onto a Berserker and
-test_batch_br's onto a Swordmaster (bo's and bx's were already there); the next tranche has to
-move all four onto heroes worn down by `draft_refused` alone, which is the shape bo, br and bx
-already carry. **A construction that has to relocate is how a paid debt announces itself** — BV
-predicted the move at BW and it has now happened twice more.
+**TRANCHE 3 IS COMPLETE AND THE ABILITY DRAFT IS FINISHED (Batch CB the Mage nine, CE the Cleric
+nine, CH the Hunter nine, CI the WARRIOR nine) — `SPEC_DRAFT_POOLS` IS 96 AND THE DRAFT IS 120 OF
+120. ALL TWELVE SPECS DRAFT FROM EIGHT, ALL FOUR CLASS POOLS HOLD SIX, AND NOTHING IS OWED.**
+**THE ASYMMETRY THAT SHAPED EVERY BATCH FROM BO TO CH IS GONE. DO NOT RE-RECORD ANY PART OF THE
+DRAFT AS OWED, AND DO NOT WRITE "the Hunter and Warrior six draft from five" ANYWHERE AGAIN** —
+that sentence is dead in master.html §6b, in `classes.gd`'s header comment and here.
+· **WHAT THE SUITES GUARD FROM HERE ON IS THE FLATNESS, NOT A DEBT.** Every draft suite's per-spec
+  depth loop inverted for the SEVENTH and LAST time at CI. It has asserted, in order: each earlier
+  tranche's own asymmetry, then the flatness tranche 2 achieved, then CB's new asymmetry, that
+  asymmetry halved at CE, quartered at CH, and now gone. A pool that quietly EMPTIES now trips,
+  where before it would have read as the old debt coming back.
+**THE FILL-SHORT CONSTRUCTIONS HAD NOWHERE LEFT TO GO, SO THE ARITHMETIC MOVED INSTEAD (Batch CI
+§5), AND THE SHAPE THEY LANDED IN IS THE ONE A LATER BATCH MUST KEEP.** Three of the four
+(test_batch_bo, bq, br) refused the whole class pool plus a HARDCODED three of the hero's own
+cards — an arithmetic that assumed a five-deep pool, and at eight it leaves FIVE standing so the
+offer comes up FULL and the check stops measuring the fill-short rule. **There is no thin pool and
+no hero left to relocate to**, so the refusal is written RELATIVE TO THE LIVE POOL SIZE now
+(refuse everything but two), which is test_batch_bx's shape — bx was already pool-size-relative
+and needed no repair at all. **A later tranche that deepened a pool would move those setups and
+NOT their answers**, which is what makes this the last time they could need it. **A construction
+that has to relocate is how a paid debt announces itself; one that can no longer relocate is how
+a finished one does.**
 **TRANCHE 2 IS COMPLETE (BT the Mage nine, BU the Cleric nine, BV the Hunter nine, BW the WARRIOR
 nine) — IT TOOK `SPEC_DRAFT_POOLS` TO 60 AND THE DRAFT TO 84 OF 120, AND ALL TWELVE SPECS DRAFTED
 FROM FIVE.** The Warrior deficit that had been the visible shape of the debt since BP
@@ -1025,6 +1032,239 @@ claim, so a tranche that fills three pools trips them by construction. Two shape
   refusal reach the spec pool too (bq, br) or by moving it onto a **Berserker**, whose pool is
   genuinely still two (bo). **WHEN THE WARRIOR THIRD LANDS, bo's version has to move again** — and
   that forced move is the honest signal that the last of tranche 2 is paid.
+
+BATCH CI (08-16) — TRANCHE 3, THE WARRIOR NINE. **THE DRAFT IS COMPLETE.** Nine spec draft
+abilities, three per Warrior spec; the Warrior pools go 5 -> 8 and the draft goes 111 ->
+**120 of 120**. **TRANCHE 3 CLOSES AND THE ABILITY DRAFT IS FINISHED** — all twelve specs draft
+from EIGHT, all four class pools hold SIX, and **the asymmetry that shaped every batch from BO to
+CH is GONE**. Nothing else ships: no talent node, no magnitude, no existing ability changed, no
+save version moves (still v10). **TWO new unit-side fields for nine abilities**, and both are
+cases a STATUS genuinely cannot hold.
+**§0 — NO KEY TRAP, AND THE WARRIOR IS THE ONLY CLASS OF THE FOUR WHERE THAT IS TRUE.**
+`berserker`, `warden` and `swordmaster` are the real pool keys AND the real display names, unlike
+the Devout (`inquisitor`) and the Survivalist (`mystic`), each of which cost an earlier tranche a
+§0 warning. **BR §1'S SWEEP RAN AGAINST ALL NINE NAMES AND FOUND ONE COLLISION AND ONE
+NEAR-MISS.**
+· **SPITE IS A LIVE WARDEN TALENT NODE** — `wd_spiked`, Threat row 5, with `spite_ranks` and
+  `spite_break` behind it — and the card is a **BERSERKER** card. Unlike BW's Grudge (same spec,
+  same lane, mechanically adjacent, and therefore moved) **the two can never appear on one hero's
+  sheet**: no Berserker can hold a Warden node. It is a LABEL collision — a node's name is not an
+  ability name, nothing resolves it, and `pool_ability` is keyed on `display_name`, where no
+  ability answers to Spite. **SHIPPED AS SPECIFIED AND FLAGGED**, on the Iron Will / Precision
+  Strike / Shared Vigil precedent; renaming either is the designer's call and one string.
+· **DISCIPLINE sits one word from PLATE DISCIPLINE** (Warden). Different spec, different string,
+  nothing resolves either. Reported, not resolved.
+· §4's three named near-misses are all clean: **Bulwark** (the VAULTED Warden passive) was NOT
+  revived as a card name, **Battle Poise** and Discipline are different strings in one pool, and
+  **Perfect** is the skill-check keyword, which is why the both-stances card is FORMLESS. His pool
+  already holds Covering Guard and Feigned Guard, so there is **no fourth "Guard" card**.
+**THE NINE, WITH THEIR AXES.** Defs live in `Classes.draft_ability` as a CONTIGUOUS block
+(CB/CE/CH's shape rather than BW's interleaved one), with the AXIS/SYNERGY check still anchoring
+PER ABILITY so a shared header cannot satisfy all nine at once.
+· **BERSERKER — the ratchet, the band, the payout.** **Unslaked** (30 Rage, 2.0, 5cd, self — 3
+  turns, Blood Frenzy's floor captures the FULL bonus he reaches rather than half, Perfect 4) ·
+  **Spite** (20, 1.5, 4cd, self — 4 turns, 1% less damage taken per 5% of maximum health MISSING
+  to a cap of 30%, Perfect 6 turns and 40%) · **Boil Over** (40, 2.5, 5cd, one enemy, 15 BD — 30%
+  of Attack plus 2% per POINT of his live Frenzy bonus, then 2 turns receiving only the FLOOR,
+  Perfect 1).
+· **WARDEN — deny the reset, get paid for it, or turn it outward.** **Anvil** (25, 2.0, 5cd, self
+  — 3 turns, Blocking does NOT reset the Heavy Plating bonus, Perfect 4) · **Recompense** (20,
+  1.5, 4cd, self — 4 turns, a reset pays Rage equal to the percentage points lost, Perfect 6) ·
+  **Turn the Blade** (25, 2.0, 4cd, self — 3 turns, each Block deals Break equal to HALF the
+  damage the block refused, Perfect 4).
+· **SWORDMASTER — dwell, parry, and neither stance.** **Discipline** (25, 2.0, 5cd, self — 5
+  turns, each consecutive turn in one stance strengthens that stance by 3% to a cap of 15%, a
+  Guard Change resets it, Perfect 4% and 7 turns) · **Answering Steel** (20, 1.5, 4cd, self — 4
+  turns, +15% parry and each parry grants 15 Rage and a turn off every cooldown, Perfect 20% and
+  6) · **Formless** (35, 2.5, 6cd, self — 3 turns of BOTH stances' upsides and neither downside,
+  counting as BOTH stances, then both downsides for 2 turns, Perfect 4).
+**THE FIRST CARDS IN THE GAME THAT READ `frenzy_floor` AT ALL, AND BOTH LIVE INSIDE
+`frenzy_bonus()` (unit.gd) RATHER THAN AT A DAMAGE SITE.** That helper is the ONE place the floor
+is decided, so the strike multiplier, the nameplate readout and the spec chip all answer Unslaked
+and Boil Over for free; **a branch written at any one of those would have been true there and
+quietly false everywhere else.** Unslaked uses `maxf` rather than an assignment, so a Scar Tissue
+Berserker already keeping 100% is never lowered to it — **the card can only ever RAISE what is
+kept**. Boil Over is written as a RETURN value rather than as a write to `frenzy_floor`, because a
+card that lowered the floor would be permanent where this is two turns.
+**BOIL OVER'S ORDERING IS LOAD-BEARING AND IS WHAT THE CARD COULD MOST EASILY GET WRONG.** Its
+per-point term is read at the raw-damage block, ABOVE the strike; the recovery status is applied
+AFTER the strike loop. Applied first, the term would have read the floor it was about to impose —
+the card paying a fraction of what it promises with nothing to announce it. **THE RATCHET STILL
+RUNS INSIDE THE WINDOW**, so a dive taken during the recovery still banks its floor, which is
+exactly what makes Unslaked pair with it. It draws **no variance roll of its own** (`raw` already
+carries one, and a second `randf_range` shifts every later roll in the battle — AQ's draw-order
+gotcha through a damage term).
+**SPITE IS MITIGATION AND NEVER HEALING, AND THAT IS THE WHOLE CARD.** A heal here would take back
+the missing health Blood Frenzy is paying him for, so the card would cancel itself; this keeps him
+inside the band and makes it survivable, and it GROWS as he drops. **FLAGGED — ITS CAP CANNOT
+BIND AT THE SPECIFIED RATE, AND IT SHIPS AS SPECIFIED ANYWAY.** At 1% per 5% of maximum health
+missing the term tops out near **19-20%** (he is dead at 100% missing), so the 30% cap — and the
+perfect's 40% — are decorative and the perfect's only live effect is its DURATION (4 -> 6 turns).
+The lever, if the designer wants the cap to bind, is **the RATE and not the cap**. Reported rather
+than silently retuned, on the AR White Flame precedent; the clamp itself is real and is driven.
+**ANVIL AND RECOMPENSE ACTIVELY FIGHT EACH OTHER AND THAT IS INTENDED.** Anvil prevents the Heavy
+Plating reset; Recompense is PAID BY it. A Warden holding both gets nothing from the second while
+the first is up — and **that falls out of the ordering at the one site rather than being a
+carve-out**: with no reset there is nothing to pay for. **THEY ARE TWO ANSWERS TO THE SAME
+CRUELTY, NOT A STACK. DO NOT SMOOTH THIS OVER**, and both card descriptions say so outright.
+Recompense reads the bonus BEFORE the reset, in percentage POINTS, which is the unit the card
+advertises; read after the write it would always be zero — the class of mistake that reads exactly
+like the card doing nothing.
+· **FLAGGED, NOT TUNED: ANVIL is potentially the strongest card in the batch** — with the bonus
+  free to climb to its +40% ceiling and STAY there, and Plate Discipline steepening the climb to
+  +12% a hit, it reaches that ceiling in two hits and holds it. **Shipped as written; let play
+  price it** (BW's Berserk and CH's Fault Line precedent).
+**TURN THE BLADE MAKES THREE SPECS ACROSS THREE CLASSES GENERATING BREAK THAT THE OCCULTIST'S
+BREAKING DARKNESS AMPLIFIES** — the Warden here, the Sharpshooter's FAULT LINE and the Occultist
+himself. That web is deliberate. **It reads the number Batch W already defined for this exact
+question**: the nominal blow through the blocker's armor, because `final` was zeroed by the block
+and a hit that was never rolled has no crit, variance or riders to read. **ITS 50% RATE IS THIS
+BATCH'S OWN AND IS FLAGGED** — §2 names no figure, and the rate rides an UNCAPPED block count (BJ
+measured 6.3 blocks a trash battle and 9.2 on a boss), so chosen high it would out-Break a
+Warden's whole Threat lane off a 4-turn card and chosen low it leaves the third Break source
+inert. **DO NOT PRE-TUNE IT.**
+**DISCIPLINE'S RESET LIVES IN `_swordmaster_switch`, THE ONE PIVOT WITH THREE CALLERS**, so Guard
+Change, Precision Strike AND Feint all throw the accumulation away by doing nothing at all — a
+list at the card's own site would have gone stale the first time a fourth switcher was authored.
+The streak is counted at the START of his turn, so it means turns he actually TOOK holding the
+guard: a Swordmaster who spent the round stunned or frozen never reaches that line and banks
+nothing. **A RE-CAST INSIDE A STANDING WINDOW RESTARTS THE ACCUMULATION** — the honest reading of
+a fresh vow, and worth knowing before pressing it twice.
+**ANSWERING STEEL PAYS TEMPO AND NEVER DAMAGE. THE RIPOSTE TALENT ALREADY GRANTS A COUNTER-ATTACK
+ON PARRY AND THIS DOES NOT DUPLICATE IT** — Riposte fires at its own site in the same branch, so a
+hero holding both gets the counter AND the tempo off one turned blade. Its cooldown half goes
+through `_tick_cooldowns` (BQ's ONE implementation) and **SKIPS ITSELF**, for Battle Poise's stated
+reason. It adds its own slice to `_roll_parry` with its own LABEL rather than writing into
+`parry_up`, because that status is shared with a perfect Guard Change and one status holding two
+windows means the shorter silently ends the longer. **BATTLE POISE IS A STACKING PARTNER RATHER
+THAN A RIVAL:** both pay per parry, so one parry held under both takes TWO turns off everything.
+**FORMLESS'S TWO IMPLEMENTATION CALLS, BOTH DELIBERATE AND BOTH DECIDED AT `_ability_usable` —
+THE SAME DOOR BW'S GATED CARDS USE**, so the greyed button, the bot's pool and the cast cannot
+disagree. **He counts as BOTH stances for stance-gated abilities**, which is what makes the card a
+build-enabler rather than a stat buff; and **Guard Change is REFUSED while it holds**, because
+there is no stance to change. `_stance_satisfies` is the one answer to "does this unit count as
+standing in guard X" and is deliberately SEPARATE from `_eff_stance` — **that helper returns ONE
+guard and a single string cannot express "both"**. Feigned Guard still works underneath it, so the
+two compose: a Feigned Guard satisfies the OTHER gate, a Formless satisfies both.
+· **REPORTED, NOT EXTENDED: PRECISION STRIKE AND FEINT STILL CAST DURING THE WINDOW.** §3 names
+  Guard Change and only Guard Change. Both are READERS (they branch and flip) and stay legal — the
+  flip moves his underlying `stance`, which Formless is not reading, so nothing breaks and he
+  leaves the window in whichever guard he last flipped to. Refusing them too would delete two more
+  cards from his pool for three turns, a larger change than §3 asks for. **It is the designer's
+  call and it is one condition.**
+· **ITS FOUR NUMBERS ARE SEASONED FIGHTER'S OWN**, read at the passive's two read sites rather
+  than at a third, so the card cannot drift from what it quotes; the recoil is the exact pair of
+  downsides it refused. The debt is armed at the cast on `formless_pending` and paid the moment
+  the window lapses, **in the turn loop beside Vigor's and Vengeance's own just-expired checks** —
+  the one position where the status has genuinely gone, so the two windows can neither overlap nor
+  leave a turn's gap. The flag is cleared as it is read, so one window pays exactly one recoil.
+**TWO NEW UNIT-SIDE FIELDS FOR NINE ABILITIES** (BQ's standard otherwise applies): `discipline_turns`,
+a COUNT of consecutive turns held which is not a duration and does not tick down, and
+`formless_pending`, a FLAG rather than a clock. **TEN STATUSES AND EVERY ONE SITS ON A HERO**, so
+all ten are correctly ABSENT from `DEBUFF_IDS` — **the first Warrior tranche with nothing to put on
+an enemy at all**, which is what a class third made of self-buffs and passive-readers looks like.
+**EIGHT OF THE NINE CARRY A `special`; BOIL OVER DELIBERATELY DOES NOT** (the BV five-of-nine / CB
+Cold Iron pattern, recorded because it looks like an omission): `_resolve` sends any ability with a
+`special` down `_resolve_special`, which costs it the whole attack pipeline — crits, armor,
+resists, Break, the parry roll AND Blood Frenzy's own multiplier — and Boil Over is an ordinary
+strike with two riders that NEEDS all of it.
+**BREAK DAMAGE ASSIGNED DELIBERATELY (the BO rule, up front): ONE of the nine carries it and EIGHT
+do not.** Boil Over 15, flat, between Blood Debt's 10 and Gut Rip's 20 on the same hero — FLAT
+because the DAMAGE term is what scales, and a per-point Break term beside it is the squaring trap
+three earlier tranches each refused from their own side. The other eight land no blow. **TURN THE
+BLADE IS THE INTERESTING ZERO**: it is the batch's largest Break source and carries none of its
+own, because every point is dealt at the BLOCK rather than by the cast.
+**THE BOT GOT NO ROTATION, ON PURPOSE** — all nine ride BO §5's wrapper, so no existing rotation is
+re-weighted and no measurement taken before this batch stops being comparable. Eight joined the
+self-cast list; Boil Over names one enemy and carries no `special`, so it never reaches that list.
+**§5 — THE FILL-SHORT CHECKS HAD NOWHERE LEFT TO GO, SO THE ARITHMETIC MOVED INSTEAD.** Three of
+the four (bo, bq, br) refused the whole class pool plus a HARDCODED three of the hero's own cards,
+which assumed a five-deep pool; at eight that leaves FIVE and the offer comes up full, so the
+checks would have gone on measuring something that was no longer the fill-short rule. **THERE IS
+NO THIN POOL AND NO HERO LEFT TO RELOCATE TO**, so the refusal is RELATIVE TO THE LIVE POOL SIZE
+now — refuse everything but two. **That is test_batch_bx's shape, and bx was ALREADY
+pool-size-relative and needed no repair at all**, which is the evidence the form is right. A later
+tranche that deepened a pool would move those setups and NOT their answers. **A construction that
+has to relocate is how a paid debt announces itself; one that can no longer relocate is how a
+finished one does.**
+**TWO GLOSSARY ENTRIES ADDED (91 -> 93) AND TWO CORRECTED TOWARD THE CODE.** Two of the nine read
+Blood Frenzy's FLOOR and three read Heavy Plating's CLIMB, and **the glossary taught neither** — a
+player meeting Unslaked or Anvil had nowhere to learn what the card is talking about, which is the
+CB `status_bound` situation exactly. `frenzy_floor` explains the ratchet and names all three things
+that change it (Scar Tissue, Unslaked, Boil Over); `plating_climb` explains the sawtooth, why he
+WANTS the blocks that reset it (Tenacity and Rally fire only on a Heavy Plating block), and **that
+Anvil and Recompense cannot be used together**. Corrected: `stance` said he "is always in one of
+two", which Formless makes false, and `stance_gated` named Feigned Guard as the answer to being
+locked out, where Formless is now the wider one. Everything else the nine do is a mechanic the
+player already meets.
+**VERIFIED, AND THE FLOOR IS THE ONE THE STANDING CONVENTION SETS (see "Verify before shipping"):
+check_parse 0 · check_flow 0 · check_map_screen OK · LIVE SMOKES CLEAN, 0 SCRIPT ERROR across
+three full-kit runs (one per Warrior spec, all nine granted).** No suite was written, no negative
+control run under a shipped name, no sweep and no measurement taken — **and none should be quoted
+from this batch.**
+**ALL NINE FIRE IN ORDINARY FIGHTS.** "Berserker: Unslaked — for 3 turns Blood Frenzy's floor
+captures the FULL bonus he reaches rather than half (it stands at +7%)"; "Berserker: Spite — for 4
+turns he takes 1% less damage per 5% of maximum health missing, up to 30% (it is 5% right now)";
+"Berserker: Boil Over on Orc Archer — 48 physical dmg" followed by "→ Boil Over: for 2 turn(s) he
+receives only the FLOOR (+5%), not the live bonus"; "→ Turn the Blade: the block turns 8 Break
+damage back onto Orc Chief"; "Swordmaster: Discipline — for 7 turns each consecutive turn held in
+the same guard strengthens that stance by 4%, to a ceiling of 15% [PERFECT]"; and "Formless fades —
+he suffers BOTH guards' downsides for 2 turns (+10% damage taken, -10% dealt)".
+· **BOIL OVER'S SMOKE IS THE ONE WORTH READING TWICE and it is the passive gate working in plain
+  sight**: the Berserker's blow lands 48 where a borrowed caster's PERFECT lands 38, and only the
+  Berserker's cast leaves a recovery status behind.
+· **ANVIL'S AND RECOMPENSE'S PAYOUTS DID NOT FIRE IN A SMOKE, AND THAT IS THE BRANCH BEING RARE
+  RATHER THAN A GAP** (the BB / BW / CG precedent). Both need a BLOCK landing inside a 3-or-4-turn
+  window on a Warden whose plating bonus has already climbed. They are driven directly instead.
+· **THE SMOKE'S OWN ARTEFACT, unchanged since CB**: `DOD_SIM_ABILITIES` hands every card to every
+  hero, so a Cryomancer swears Unslaked and a Devout sets an Anvil in the logs. Unreachable in a
+  real draft — and it is what makes the "he holds no Heavy Plating to reset" branches worth having,
+  and what proved the Recompense log names the CASTER'S OWN resource ("15 Mana", not a hardcoded
+  Rage — BU's Fortified Spirit lesson through a third door).
+· **FIVE CLAUSES ARE TOO RARE OR TOO EXACT FOR A SMOKE and were driven in a SCRATCHPAD DRIVER (NOT
+  COMMITTED — this batch ships no suite): 59 checks / 0 failures.** They cover Unslaked's floor
+  against a CONTROL floor (the discriminating read is what the floor KEEPS after he is healed back
+  up, not the bonus while he is low), Boil Over's recovery returning the floor EXACTLY while the
+  ratchet still runs inside the window, **all four arrangements of the Anvil/Recompense pair**
+  including the one that matters (holding both pays nothing), Turn the Blade with the block forced
+  ON and OFF, Discipline's climb and its reset at the pivot, Answering Steel's exact 15 Rage
+  measured as a DELTA against a control parry, and Formless driven AT THE DOOR.
+· **THE DRIVER FOUND ONE FAULT IN THIS BATCH'S OWN CODE, WHICH IS THE WHOLE REASON TO RUN ONE.**
+  The Anvil guard was spliced in ABOVE the original unconditional Heavy Plating reset rather than
+  replacing it, so **the climb reset anyway while the log announced that it had HELD** — a card
+  doing nothing and saying it worked, which every live smoke passed and no source-level grep would
+  have caught.
+**SIX SUITE COUNTS WERE ALREADY STALE ON UNMODIFIED HEAD, AND TAKING A BASELINE IS WHAT FOUND IT
+— CD's rule ("A COUNT THAT NOBODY DIFFS IS A WORD") arriving one layer further out.** Every suite
+this batch touches was run on unmodified `7e86616` FIRST, so every figure below reads as a DELTA
+rather than as a claim (CD's own precedent). The baseline came back **bb 176, bo 961, bt 454,
+bv 896, cb 1172, ce 1099** against the recorded **175, 898, 457, 893, 1163, 1087**. **NONE OF THE
+SIX IS THIS BATCH'S DOING — all six moved at CH and were not recorded**, which is exactly the
+drift test_batch_cd §1 exists to catch and exactly what a hand-transcribed list of counts does
+over time. **READ THE CI FIGURES AS DELTAS AGAINST THE HEAD BASELINE BELOW, NEVER AGAINST THE
+OLDER RECORDED LISTS**, and prefer re-baselining to trusting any of them again.
+**THE SIXTEEN TOUCHED SUITES, HEAD -> CI, AND EVERY MOVE IS COMPUTED RATHER THAN SHRUGGED AT:**
+ah 5625 -> 5625 · bb 176 -> 176 · bn 80 -> 80 · **bo 961 -> 1024** · bp 271 -> 271 · bq 738 -> 738
+· br 1441 -> 1441 · bs 262 -> 262 · bt 454 -> 454 · bu 476 -> 476 · bv 896 -> 896 · **bw 545 ->
+547** · bx 141 -> 141 · **cb 1172 -> 1181** · **cd 85 -> 86** · **ce 1099 -> 1108**. ALL SIXTEEN
+AT 0 FAILURES. **bo +63** is its two entry-walking loops meeting nine more entries (7 x 9 =
+**exactly 63**, CH's own arithmetic reproduced); **cb +9** and **ce +9** are their name loops
+walking nine more; **cd +1** is the added "no longer names a debt that has been paid" pin; and
+**bw +2** is the two checks its own re-point added (`_stance_satisfies` still resolving through
+`_eff_stance`, and the mitigation slice having a readable end). **Nothing else moved by one.**
+**FOUR SUITES NEEDED RE-POINTING FOR A REASON THAT IS NOT THE DEBT, AND THREE OF THE FOUR ARE
+STRICTLY BETTER FOR IT.** test_batch_bw's two stance gates read `_eff_stance` BY NAME at the
+source level and CI's gates ask `_stance_satisfies` — the AZ Follow-Through / AL Ghillie Suit
+shape, where the question is byte-for-byte the same and only the fragment moved — so a check was
+ADDED beside them asserting the new helper still resolves THROUGH `_eff_stance`, which is what
+keeps Feigned Guard working underneath Formless rather than being shadowed by it. **AND bw's
+passive check WAS A FIXED 260-BYTE WINDOW THAT FAILED AGAINST CORRECT CODE** once CI's terms
+pushed the stance read off the end — the identical fault CH repaired in this same file's
+`DISPEL_NEVER` check one batch earlier, and it takes the identical repair: the slice ends at the
+branch's OWN last statement now rather than at a byte count. test_batch_bx's Warden literal and
+test_batch_cb's two master.html reads moved with their subjects, and cb's second INVERTED — there
+is no longer a SUBSET of complete classes to record, so what the doc must state is that all twelve
+draft from eight.
 
 BATCH CH (08-16) — TRANCHE 3, THE HUNTER NINE. **THE HUNTER IS THE THIRD CLASS COMPLETE.** Nine
 spec draft abilities, three per Hunter spec; the Hunter pools go 5 -> 8 and the draft goes 102 ->

@@ -234,6 +234,25 @@ const STATUS_INFO := {
 	"feigned_guard": ["Feigned Guard", "FG", Color(0.60, 0.80, 1.0), "Showing the wrong guard: his ABILITIES\nresolve as though cast from the OTHER\nstance, and satisfy that stance's\nrequirement. His actual guard — and\neverything his passive reads — has not\nmoved."],
 	"vendetta": ["Vendetta", "Vd", Color(0.90, 0.45, 0.35), "Sworn on: this enemy can attack the\nWarden and nobody else for the rest of\nthe battle, and he takes less damage\nfrom it. It ends only when one of them\ndoes."],
 	"aegis_wall": ["Aegis Wall", "AW", Color(0.70, 0.85, 0.95), "The wall answers for everyone: every\nattack he BLOCKS heals the whole party\nfor a share of his maximum health. A\nblow that gets THROUGH pays nothing."],
+	# ---- BATCH CI: the tranche-3 Warrior's statuses ----
+	# TEN CHIPS FOR NINE ABILITIES AND EVERY ONE OF THEM SITS ON A HERO, so all
+	# ten are correctly ABSENT from `DEBUFF_IDS` — this is the first Warrior
+	# tranche with nothing to put on an enemy at all, which is what a third made
+	# of self-buffs and passive-readers looks like. Boil Over's strike leaves its
+	# target nothing beyond damage and Break; the only status it writes is the
+	# RECOVERY it charges its own caster. Formless carries TWO because its window
+	# and the debt that window incurs are two different states and a player has
+	# to be able to tell them apart on the bar.
+	"unslaked": ["Unslaked", "Un", Color(0.90, 0.30, 0.35), "The thirst does not settle: Blood\nFrenzy's floor captures the FULL bonus\nhe reaches while this holds, instead\nof half of it. Dive now and the floor\nkeeps all of it."],
+	"spite": ["Spite", "Sp", Color(0.85, 0.40, 0.40), "Pure spite: less damage taken for\nevery 5% of maximum health MISSING.\nIt keeps him inside the frenzy band\nrather than lifting him out of it —\nthis is mitigation, never healing."],
+	"boil_over": ["Boil Over", "Bo", Color(0.80, 0.35, 0.25), "Spent: he receives only Blood Frenzy's\nFLOOR, not the live bonus. The floor\nitself is untouched — a high one makes\nthis cost very little."],
+	"anvil": ["Anvil", "An", Color(0.75, 0.80, 0.90), "The anvil does not move: BLOCKING no\nlonger resets the Heavy Plating bonus,\nso the sawtooth becomes a staircase.\nWhile this holds RECOMPENSE is paid\nnothing — there is no reset to pay it."],
+	"recompense": ["Recompense", "Rc", Color(0.85, 0.80, 0.65), "Paid for the loss: every Heavy Plating\nreset returns Rage equal to the\npercentage points it took. ANVIL\nprevents those resets, so the two\nfight each other by design."],
+	"turn_the_blade": ["Turn the Blade", "TB", Color(0.80, 0.55, 0.95), "The block answers: every attack he\nBLOCKS deals Break damage back to the\nattacker, scaling on how much damage\nthe block refused."],
+	"discipline": ["Discipline", "Di", Color(0.50, 0.85, 1.0), "Held: each consecutive turn in the\nSAME stance strengthens that stance's\neffect, to a ceiling. A GUARD CHANGE\nresets the accumulation to nothing."],
+	"answering_steel": ["Answering Steel", "AS", Color(0.55, 0.90, 1.0), "The blade answers: parry chance is\nraised, and every successful PARRY\ngrants Rage and takes a turn off all\nhis cooldowns. It pays TEMPO, not\ndamage — Riposte still answers too."],
+	"formless": ["Formless", "Fm", Color(0.65, 0.95, 1.0), "Neither guard and both: he deals MORE\ndamage AND takes less, counts as BOTH\nstances for anything that requires one,\nand cannot Guard Change — there is no\nstance to change. When it ends he pays\nboth downsides."],
+	"formless_recoil": ["Formless", "Fm!", Color(0.55, 0.65, 0.80), "The form is paid for: he suffers BOTH\nstances' downsides at once — more\ndamage taken and less dealt — for two\nturns."],
 	# ---- BATCH BP: the Warrior draft's statuses ----
 	# Five of the six carry one; Gut Rip is an instant. Feint carries TWO,
 	# because its branches land on opposite sides of the board.
@@ -493,6 +512,43 @@ const SHIELD_SLAM_PERFECT_PCT := 0.20
 const VENDETTA_CUT := 0.20        # damage he takes from the sworn enemy
 const VENDETTA_PERFECT_CUT := 0.30
 const AEGIS_WALL_PCT := 0.08      # of his LIVE maximum health, to every ally
+# ---- BATCH CI: the tranche-3 Warrior magnitudes, all read AWAY FROM THE CAST ----
+# Every one of these is read at a site the ability never touches — the passive's
+# own floor, a mitigation slice, a block, a parry, a stance multiplier — so a
+# literal at that site would be a number nobody reading the card could find.
+# Same reason BW's block above exists.
+const SPITE_PER_5_MISSING := 1    # % less damage taken per FULL 5% of maximum
+                                  # health missing...
+const SPITE_CAP := 30             # ...and the ceiling it climbs to (40 perfect)
+const SPITE_PERFECT_CAP := 40
+const BOIL_OVER_PER_POINT := 2    # % of Attack per POINT of his live Blood
+                                  # Frenzy bonus, on top of the ability's own
+                                  # base damage
+const BOIL_OVER_RECOVERY := 2     # turns receiving only the floor (1 perfect)
+# TURN THE BLADE'S RATE IS THIS BATCH'S OWN NUMBER — §2 says "scaling on the
+# damage negated" and names no figure. 50% of the nominal blow the block
+# refused, floored at 1. FLAGGED AND SHIPPED UNTUNED: it rides an UNCAPPED
+# count (BJ measured 6.3 blocks a trash battle and 9.2 on a boss), so a rate
+# chosen high would out-Break a Warden's whole Threat lane off a 4-turn card,
+# and one chosen low would leave the third Break source §2 sells it as inert.
+const TURN_THE_BLADE_SHARE := 0.50
+const DISCIPLINE_STEP := 3        # % added to the held stance's own effect per
+const DISCIPLINE_PERFECT_STEP := 4  # consecutive turn held in it...
+const DISCIPLINE_CAP := 15        # ...and the ceiling, which the perfect does
+                                  # NOT raise — it only arrives sooner
+const ANSWERING_PARRY_PCT := 15   # parry chance the window grants (20 perfect)
+const ANSWERING_PERFECT_PARRY := 20
+const ANSWERING_RAGE := 15        # ...and what a successful parry pays back
+const ANSWERING_TICK := 1         # turns off every cooldown, per PARRY
+# FORMLESS holds BOTH stances' upsides and NEITHER downside, and the four
+# numbers below are Seasoned Fighter's own — read at the passive's two read
+# sites rather than at a third, so the card cannot drift from the thing it is
+# quoting. The recoil is the exact pair of downsides it refused.
+const FORMLESS_DEALT := 1.15      # the Aggressive upside...
+const FORMLESS_TAKEN := 0.85      # ...and the Defensive one, held together
+const FORMLESS_RECOIL_DEALT := 0.90   # the Defensive downside...
+const FORMLESS_RECOIL_TAKEN := 1.10   # ...and the Aggressive one, likewise
+const FORMLESS_RECOIL_TURNS := 2
 # ---- BATCH BQ: the two class-wide magnitudes that are not on an Ability ----
 # Everything else in the twelve is a percentage inside its own `special` and
 # reads once; these two are read at a site the ability itself never touches — a
@@ -2532,6 +2588,25 @@ func _run_battle() -> void:
 			continue
 		u.tick_statuses()
 		u.tick_cooldowns()
+		# BATCH CI — FORMLESS'S OWED DOWNSIDE, PAID THE MOMENT THE WINDOW
+		# LAPSES. Read HERE, immediately after `tick_statuses`, beside Vigor's
+		# and Vengeance's own just-expired checks directly below — the one
+		# position where the status has genuinely gone, so the two windows can
+		# neither overlap nor leave a turn's gap between them. Checked in the
+		# turn-start block instead it would fire a turn late; decided at the
+		# cast it could not know when the window ended at all.
+		#
+		# **THE FLAG IS CLEARED AS IT IS READ**, so one window pays exactly one
+		# recoil however many times he crosses this line — the same shape CG's
+		# Divine Presence uses for its broken-watch flag.
+		if u.formless_pending > 0 and not u.has_status("formless"):
+			u.formless_pending = 0
+			_apply_status(u, "formless_recoil", FORMLESS_RECOIL_TURNS)
+			u.float_text("FORMLESS FADES", Color(0.55, 0.65, 0.80))
+			_log("%s's Formless fades — he suffers BOTH guards' downsides for %d turns (+%d%% damage taken, -%d%% dealt)" % [
+				u.unit_name, FORMLESS_RECOIL_TURNS,
+				int(round((FORMLESS_RECOIL_TAKEN - 1.0) * 100.0)),
+				int(round((1.0 - FORMLESS_RECOIL_DEALT) * 100.0))], "#8fa0c0")
 		# Vigor (Spirit Bond perfect) fading: the borrowed health leaves.
 		if not u.has_status("vigor") and u.vigor_hp_bonus > 0:
 			u.max_hp -= u.vigor_hp_bonus
@@ -2588,6 +2663,20 @@ func _run_battle() -> void:
 		# turn, because the whole ability is that the recovery is DELAYED — he
 		# has to survive the damage before he gets any of it back.
 		_battle_trance_tick(u)
+		# BATCH CI — DISCIPLINE'S STREAK. Counted at the START of his turn, so
+		# "each consecutive turn held in the same stance" means turns he
+		# actually TOOK holding it: a Swordmaster who spent the round stunned
+		# or frozen never reaches this line (both branches `continue` above)
+		# and banks nothing, which is the honest reading of holding a guard.
+		#
+		# THE RESET IS NOT HERE. It lives in `_swordmaster_switch`, the ONE
+		# pivot with three callers, so Guard Change, Precision Strike AND Feint
+		# all throw the accumulation away by doing nothing at all — which is
+		# the tension the card is sold on rather than a list this site would
+		# have to keep up to date.
+		if u.has_status("discipline"):
+			u.discipline_turns += 1
+			_stamp_discipline_chip(u)
 		# BATCH BU — FORTIFIED SPIRIT sheds a step. Its own function for the
 		# standing reason (`_run_battle` cannot be driven headlessly, so a rule
 		# buried in this loop could only ever be checked by a grep and its
@@ -3125,7 +3214,17 @@ func _player_turn(u: BattleUnit) -> void:
 				# ordinary attack — all three fall through to the target picker.
 				"divine_presence", "alms", "jubilee", "elevation",
 				"last_howl", "succession", "fault_line", "stalking_horse",
-				"downwind"]:
+				"downwind",
+				# BATCH CI. EIGHT of the nine have nothing to click, which is what a
+				# class third made of self-buffs and passive-readers looks like:
+				# `unslaked` and `spite` open windows on the Berserker himself,
+				# `anvil`, `recompense` and `turn_the_blade` change what one of his
+				# OWN blocks does, and `discipline`, `answering_steel` and `formless`
+				# are the Swordmaster's own guard. BOIL OVER is the only one of the
+				# nine that is not here — it names ONE enemy, and it carries no
+				# `special` at all, so it never reaches this list in the first place.
+				"unslaked", "spite", "anvil", "recompense", "turn_the_blade",
+				"discipline", "answering_steel", "formless"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -4627,9 +4726,34 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# SWORDMASTER CAST BATTLE POISE rather than merely changing which branch he
 	# would have taken had he been allowed to press the button. Those are two
 	# different sites and only this one makes the card worth a slot.
-	if ab.display_name == "Sever" and _eff_stance(u) != "aggressive":
+	# BATCH CI — FORMLESS SATISFIES **BOTH** GATES, and it is decided HERE
+	# for the reason BW gave when it put these gates here at all: THIS IS
+	# THE DOOR, so the greyed button, the bot's drafted-pick wrapper and
+	# the cast itself can never disagree. `_stance_satisfies` is the one
+	# answer to "does this unit count as standing in guard X", and it is
+	# deliberately SEPARATE from `_eff_stance` — that helper returns ONE
+	# guard and a single string cannot express "both", which is precisely
+	# what Formless is. Feigned Guard still works underneath it, so the two
+	# cards compose: a Feigned Guard satisfies the OTHER gate, a Formless
+	# satisfies both at once.
+	if ab.display_name == "Sever" and not _stance_satisfies(u, "aggressive"):
 		return false
-	if ab.special == "battle_poise" and _eff_stance(u) != "defensive":
+	if ab.special == "battle_poise" and not _stance_satisfies(u, "defensive"):
+		return false
+	# ...AND FORMLESS REFUSES THE PIVOT: there is no stance to change while
+	# he holds neither and both. Refused at this same door rather than at
+	# resolution, so what the player sees is a greyed Guard Change with the
+	# reason on it, and the bot's pool loses it for free.
+	#
+	# **REPORTED, NOT EXTENDED — PRECISION STRIKE AND FEINT STILL CAST.**
+	# §3 names Guard Change and only Guard Change. Those two are READERS
+	# (they branch and flip) and they stay legal during the window: the
+	# flip moves his underlying `stance`, which Formless is not reading, so
+	# nothing breaks and he simply leaves the window in whichever guard he
+	# last flipped to. Refusing them as well would delete two more cards
+	# from his pool for three turns, which is a larger change than §3 asks
+	# for. It is the designer's call and it is one condition.
+	if ab.special == "guard_change" and u.has_status("formless"):
 		return false
 	# RECKLESS ABANDON SPENDS ALL HIS RAGE and pays per FULL step of 10, so
 	# anything under a step buys exactly zero — BO §5's rule, and the reason
@@ -6223,6 +6347,16 @@ func _roll_parry(defender: BattleUnit) -> String:
 	if defender.has_status("parry_up"):
 		var pw := defender.status_power("parry_up")
 		buff = (pw if pw > 0 else 15) / 100.0
+	# BATCH CI — ANSWERING STEEL'S OWN SLICE. It is deliberately NOT
+	# written into `parry_up`: that status is shared with a perfect Guard
+	# Change and with Precision Strike's Aggressive branch, and one status
+	# holding two windows means the shorter one silently ends the longer.
+	# Its OWN LABEL for the reason Bulwark Line and Covering Guard have
+	# theirs — the log has to be able to name what turned the blade.
+	var answering := 0.0
+	if defender.has_status("answering_steel"):
+		var aw_pct := defender.status_power("answering_steel")
+		answering = float(aw_pct if aw_pct > 0 else ANSWERING_PARRY_PCT) / 100.0
 	var roll := randf()
 	if roll < base:
 		return "reflexes"
@@ -6230,6 +6364,8 @@ func _roll_parry(defender: BattleUnit) -> String:
 		return "Sword Mastery"
 	if roll < base + talent + buff:
 		return "Parry Up"
+	if roll < base + talent + buff + answering:
+		return "Answering Steel"
 	return ""
 
 
@@ -6712,11 +6848,46 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_log("%s BLOCKS %s's %s (%s)" % [strike_target.unit_name,
 						attacker.unit_name, ab.display_name, block_source], "#8c9cc8")
 					# Any Block resets the Heavy Plating climb (the chip follows).
+					#
+					# BATCH CI — ANVIL AND RECOMPENSE ARE BOTH DECIDED HERE, AND THEY
+					# ACTIVELY FIGHT EACH OTHER, WHICH IS INTENDED (§2). Anvil REFUSES
+					# the reset; Recompense is PAID BY it. A Warden holding both gets
+					# nothing from the second while the first is up — and that falls out
+					# of the ordering rather than being a carve-out anybody has to
+					# remember: with no reset there is nothing to pay for. THEY ARE TWO
+					# ANSWERS TO THE SAME CRUELTY, NOT A STACK, and both cards say so on
+					# their own text rather than leaving a player to discover it.
 					if strike_target.passive_id == "heavy_plating" \
 							and strike_target.plating_bonus > 0.0:
-						strike_target.plating_bonus = 0.0
-						strike_target.refresh_bars()
-						_log("   → Heavy Plating: the climbing bonus resets", "#8c9cc8")
+						if strike_target.has_status("anvil"):
+							_log("   → Anvil: the climb HOLDS at +%d%% — a block no longer resets it" % \
+								int(round(strike_target.plating_bonus * 100.0)), "#8c9cc8")
+						else:
+							# READ BEFORE THE RESET, in percentage POINTS, which is the
+							# unit the card advertises: "a reset from +32% pays 32 Rage".
+							# After the write it would always be zero, which is the class
+							# of mistake that reads exactly like the card doing nothing.
+							var rc_points := int(round(strike_target.plating_bonus * 100.0))
+							strike_target.plating_bonus = 0.0
+							strike_target.refresh_bars()
+							_log("   → Heavy Plating: the climbing bonus resets", "#8c9cc8")
+							if strike_target.has_status("recompense") and rc_points > 0 \
+									and strike_target.max_resource > 0:
+								var rc_before := strike_target.resource
+								strike_target.resource = mini(strike_target.resource + rc_points,
+									strike_target.max_resource)
+								var rc_paid := strike_target.resource - rc_before
+								strike_target.refresh_bars()
+								strike_target.float_text("+%d %s" % [rc_paid,
+									strike_target.resource_name], Color(1.0, 0.5, 0.4))
+								# THE LOG NAMES THE BLOCKER'S OWN RESOURCE rather than a
+								# hardcoded "Rage" (BU's Fortified Spirit lesson, and BW's
+								# Reckless Abandon through the same door) — `DOD_SIM_ABILITIES`
+								# hands every card to every hero, so a Cryomancer holding this
+								# would otherwise be told he gained Rage.
+								_log("   → Recompense: the %d points lost pay %s %d %s" % [
+									rc_points, strike_target.unit_name, rc_paid,
+									strike_target.resource_name], "#e0c060")
 					# Unkillable: blocking mends the Warden — 8%/rank of the
 					# pool he brought INTO the battle, not the one Tenacity
 					# grows during it. Both talents trigger on the same Heavy
@@ -6794,6 +6965,48 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 							aw_n, "ally" if aw_n == 1 else "allies", aw_heal,
 							int(round(AEGIS_WALL_PCT * 100.0)),
 							strike_target.max_hp], "#8c9cc8")
+					# BATCH CI — TURN THE BLADE. **IT PAYS ON A BLOCK, NOT ON A HIT
+					# TAKEN**, and sitting inside this branch is what makes that true
+					# rather than a condition somebody has to remember — Aegis Wall's own
+					# argument, one card along. It fires off ANY block he makes, whatever
+					# the source, for Aegis Wall's reason as well: the card says "every
+					# attack you block", and a source test would make Interpose and this
+					# quietly refuse to combine.
+					#
+					# THE NUMBER IT SCALES ON IS THE ONE BATCH W ALREADY DEFINED FOR
+					# EXACTLY THIS QUESTION: the nominal blow through the blocker's armor,
+					# i.e. "what the blocked swing would have carried". It cannot come from
+					# `final` — the block zeroed that — and variance, crits and riders
+					# cannot be known for a hit that was never rolled. The identical
+					# expression is computed above for the prevented-damage ledger; it is
+					# recomputed rather than shared because THAT one is gated on the
+					# blocker being a HERO, and this pays whoever blocked.
+					#
+					# **IT IS BREAK RATHER THAN DAMAGE AND THAT IS THE CROSS-ROSTER POINT
+					# (§2)**: this makes THREE specs across three classes generating Break
+					# that the Occultist's BREAKING DARKNESS amplifies — the Warden here,
+					# the Sharpshooter's FAULT LINE and the Occultist himself. Bruising
+					# Guard pays flat Break on this same trigger and the two simply ADD;
+					# neither is folded into the other, because one is a talent's number
+					# and one is a card's.
+					if strike_target.has_status("turn_the_blade") \
+							and not attacker.dead and not attacker.is_hero \
+							and ab.damage > 0:
+						var tb_negated := ab.damage * 0.01 * attacker.attack \
+							* (1.0 - strike_target.effective_armor())
+						var tb_bd := maxi(int(round(tb_negated * TURN_THE_BLADE_SHARE)), 1)
+						var tb_res: Dictionary = attacker.take_hit(0, tb_bd)
+						_stat_bd(strike_target, tb_bd)
+						attacker.float_text("+%d BD" % int(tb_res["bd"]),
+							Color(0.8, 0.35, 1.0))
+						_log("   → Turn the Blade: the block turns %d Break damage back onto %s" % [
+							int(tb_res["bd"]), attacker.unit_name], "#c890f0")
+						if tb_res["broke"]:
+							_stat("breaks_on_enemies")
+							_sfx("break", -3.0)
+							_message("%s BREAKS!" % attacker.unit_name)
+							_log("!! %s BREAKS" % attacker.unit_name, "#c070e0")
+							await _break_impact()
 					# Tenacity / Rally feed on Heavy Plating blocks alone.
 					if block_source == "Heavy Plating":
 						if strike_target.tenacity > 0:
@@ -6926,6 +7139,44 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# SKIPPED from its own reduction the way Follow-Through skips
 				# its ability: a defensive window that shortens its own recast
 				# is a different (and unbounded) card.
+				# BATCH CI — ANSWERING STEEL'S PAYOUT. **IT PAYS TEMPO AND NEVER
+				# DAMAGE, WHICH IS THE WHOLE RULE (§3): THE RIPOSTE TALENT ALREADY
+				# GRANTS A COUNTER-ATTACK ON PARRY AND THIS MUST NOT DUPLICATE IT.**
+				# Riposte fires at its own site further down this same branch, so a
+				# hero holding both gets the counter AND the tempo off one turned
+				# blade, and the two stack cleanly — which is exactly what the card is
+				# sold on. Nothing here touches damage.
+				#
+				# It fires off ANY parry, whatever produced it — a Waiting Guard, a
+				# Feint charge, Sword Mastery, or its own slice — because the card says
+				# "every attack you parry" and a source test would make it quietly
+				# refuse to combine with the Poise lane it exists to serve.
+				#
+				# THE COOLDOWN HALF GOES THROUGH `_tick_cooldowns` (BQ's ONE
+				# implementation of cooldown reduction) AND SKIPS ITSELF, for Battle
+				# Poise's stated reason directly below: a defensive window that
+				# shortens its own recast is a different and unbounded card. The two
+				# cards are DELIBERATE STACKING PARTNERS rather than rivals — a single
+				# parry held under both takes TWO turns off everything he holds.
+				if strike_target.has_status("answering_steel"):
+					if strike_target.max_resource > 0:
+						var as_before := strike_target.resource
+						strike_target.resource = mini(
+							strike_target.resource + ANSWERING_RAGE,
+							strike_target.max_resource)
+						var as_paid := strike_target.resource - as_before
+						if as_paid > 0:
+							strike_target.refresh_bars()
+							strike_target.float_text("+%d %s" % [as_paid,
+								strike_target.resource_name], Color(1.0, 0.5, 0.4))
+							_log("   → Answering Steel: the parry pays %s %d %s" % [
+								strike_target.unit_name, as_paid,
+								strike_target.resource_name], "#7cc8f0")
+					var as_n := _tick_cooldowns(strike_target, ANSWERING_TICK,
+						"Answering Steel")
+					if as_n > 0:
+						_log("   → Answering Steel: the parry takes a turn off %d cooldown%s" % [
+							as_n, "" if as_n == 1 else "s"], "#7cc8f0")
 				if strike_target.has_status("battle_poise"):
 					var bp_n := _tick_cooldowns(strike_target, BATTLE_POISE_TICK,
 						"Battle Poise")
@@ -7429,6 +7680,37 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# the unit-side helper ratchets and returns in one motion.
 			if attacker.passive_id == "bloodrage":
 				raw *= 1.0 + attacker.frenzy_bonus()
+			# BATCH CI — UNSLAKED and BOIL OVER both live INSIDE the helper
+			# above (`frenzy_bonus`, unit.gd) rather than out here, which is what
+			# makes this site — and every other site that reads the bonus —
+			# answer them for free. A card that branched HERE would have been
+			# true of one read of the passive and false of all the others.
+			#
+			# BOIL OVER'S PER-POINT TERM. **IT READS THE LIVE BONUS, WHICH IS THE
+			# VERY NUMBER THE CARD IS ABOUT TO STOP PAYING HIM**, and it is read
+			# HERE, above the strike, so the blow is priced on what he walked in
+			# holding rather than on the floor his own recovery is about to hand
+			# him. The recovery status is applied AFTER the strike loop for
+			# exactly that reason: applied first, this line would read the floor
+			# and the card would quietly pay a fraction of what it promises.
+			#
+			# It carries NO `special`, so the whole attack pipeline reaches it —
+			# crit, armor, resist, Break, the parry roll, and Blood Frenzy's own
+			# multiplier one line above. THE BONUS IS THEREFORE IN THIS BLOW
+			# TWICE, once as the passive every strike gets and once as the term
+			# the card is sold on. That is the design rather than an oversight:
+			# it is the only card in the game that CASHES the meter instead of
+			# carrying it, and the two turns below are what it pays for that.
+			if ab.display_name == "Boil Over" \
+					and attacker.passive_id == "bloodrage":
+				# IT TAKES THE GRADE MULTIPLIER AND **DELIBERATELY DRAWS NO
+				# VARIANCE ROLL OF ITS OWN**: `raw` above already carries one, and
+				# a second `randf_range` here would shift every later roll in the
+				# battle — the draw-order gotcha AQ spent a bisect on, arriving
+				# through a damage term rather than through a talent branch.
+				var bo_pts := int(round(attacker.frenzy_bonus() * 100.0))
+				raw += 0.01 * BOIL_OVER_PER_POINT * bo_pts * attacker.attack \
+					* dmg_mult
 			# BATCH BM §2 — DEBT OF IRON, the SPEND half. Crushing Blow is
 			# the one button he swings, so the bank pays out through it and
 			# empties. Read before the multipliers below so the bank is a
@@ -7560,8 +7842,23 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Seasoned Fighter: the chosen stance decides the blade's weight —
 			# Aggressive presses (talent-deepened), Defensive pulls the cut.
 			if attacker.passive_id == "seasoned":
-				raw *= (1.15 + attacker.seasoned_off_bonus) \
-					if attacker.stance == "aggressive" else 0.90
+				# BATCH CI — FORMLESS AND DISCIPLINE BOTH LAND ON THE PASSIVE'S OWN
+				# READ SITE rather than at a third site of their own, so neither can
+				# drift from the thing it is quoting. FORMLESS holds BOTH stances'
+				# upsides and NEITHER downside, so it REPLACES the branch; its recoil
+				# is the exact pair of downsides it refused. DISCIPLINE deepens
+				# whichever UPSIDE he is actually receiving — never a downside, which
+				# is what "strengthens that stance's effect" means — and it composes
+				# ADDITIVELY with the node that already deepens the same term.
+				var sf_disc := 0.01 * _discipline_bonus(attacker)
+				if attacker.has_status("formless"):
+					raw *= FORMLESS_DEALT + sf_disc
+				elif attacker.has_status("formless_recoil"):
+					raw *= FORMLESS_RECOIL_DEALT
+				elif attacker.stance == "aggressive":
+					raw *= 1.15 + attacker.seasoned_off_bonus + sf_disc
+				else:
+					raw *= 0.90
 			# Overwhelm: every wound on the target is leverage (+3%/rank per
 			# debuff — the curated DEBUFF_IDS count, Broken excluded).
 			if attacker.overwhelm_ranks > 0:
@@ -7938,10 +8235,46 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_prev(strike_target, vd_was - raw)
 			# Seasoned Fighter: the guard decides what gets through — Defensive
 			# turns blows aside (talent-deepened), Aggressive leaves openings.
+			# BATCH CI — SPITE. **MITIGATION, NOT HEALING, AND THAT IS THE WHOLE
+			# CARD (§1).** Every other answer to a Berserker being low is a heal,
+			# and a heal here would fight his own passive: it would take back the
+			# missing health Blood Frenzy is paying him for, so the card would
+			# cancel itself. This keeps him exactly where he is and makes the band
+			# survivable — and it GROWS as he drops, which is the only defensive
+			# term in the game that rewards being nearly dead.
+			#
+			# IT READS MISSING HEALTH LIVE, in the same 5% steps the passive
+			# itself counts in, so the two can never disagree about which band he
+			# is standing in. The CAP is carried on the status power (30, or 40 on
+			# a perfect) rather than as a constant here, because the perfect moves
+			# it and a stamped-at-cast reading is what the Alms pattern exists to
+			# get right.
+			if strike_target.has_status("spite"):
+				var sp_missing := int((1.0 - strike_target.hp
+					/ float(strike_target.max_hp)) * 100.0 / 5.0)
+				var sp_cap := maxi(strike_target.status_power("spite"), 0)
+				var sp_cut := mini(sp_missing * SPITE_PER_5_MISSING, sp_cap)
+				if sp_cut > 0:
+					var sp_was := raw
+					raw *= 1.0 - 0.01 * sp_cut
+					_prev(strike_target, sp_was - raw)
 			if strike_target.passive_id == "seasoned":
 				var pv_was := raw
-				raw *= 1.10 if strike_target.stance == "aggressive" \
-					else (0.85 - strike_target.seasoned_def_bonus)
+				# BATCH CI — the mirror of the offence site above. The `maxf` floors
+				# are new and they guard the term THIS batch adds: Discipline caps at
+				# 15 points and `seasoned_def_bonus` is a talent on top of it, so a
+				# deeply built Swordmaster could otherwise drive the multiplier
+				# through zero and turn incoming damage into healing — the sign flip
+				# `heal_amount`'s own clamp exists to refuse one door along.
+				var sf_disc := 0.01 * _discipline_bonus(strike_target)
+				if strike_target.has_status("formless"):
+					raw *= maxf(FORMLESS_TAKEN - sf_disc, 0.0)
+				elif strike_target.has_status("formless_recoil"):
+					raw *= FORMLESS_RECOIL_TAKEN
+				elif strike_target.stance == "aggressive":
+					raw *= 1.10
+				else:
+					raw *= maxf(0.85 - strike_target.seasoned_def_bonus - sf_disc, 0.0)
 				if raw < pv_was:
 					_prev(strike_target, pv_was - raw)
 			# Molten Core: burning attackers bite softer on the Pyromancer.
@@ -9374,6 +9707,30 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					fa_t.freezing_adv_mark = false
 					_log("   → Talent: Freezing Advance — the opening is taken (+%d%%)" % (
 						10 * attacker.freezing_ranks), "#b0a8e0")
+		# BATCH CI — BOIL OVER'S RECOVERY, APPLIED AFTER THE STRIKE AND NOT
+		# BEFORE. The per-point term up at the raw-damage block reads his LIVE
+		# Blood Frenzy bonus; this status makes `frenzy_bonus()` hand back the
+		# FLOOR instead. Applied first it would have priced the blow on the
+		# floor it was about to impose — the card quietly paying a fraction of
+		# what it promises, with nothing to announce it.
+		#
+		# THE FLOOR ITSELF IS UNTOUCHED: unit.gd's ratchet still runs inside
+		# the window, so a dive taken during the recovery banks its floor
+		# exactly as it would outside one. That is what makes UNSLAKED pair
+		# with this card — a floor holding the FULL peak makes the recovery
+		# nearly free — and it is why the window is written as a RETURN value
+		# rather than as a write to `frenzy_floor`, which would be permanent
+		# where this is two turns.
+		if ab.display_name == "Boil Over" \
+				and attacker.passive_id == "bloodrage" and not is_counter:
+			var bo_turns := 1 if is_perfect else BOIL_OVER_RECOVERY
+			_apply_status(attacker, "boil_over", bo_turns)
+			attacker.update_status("boil_over", "Bo",
+				"Boil Over: for %d more turn(s) he receives\nonly Blood Frenzy's FLOOR (+%d%%), not the\nlive bonus. The floor itself is untouched." % [
+					bo_turns, int(round(attacker.frenzy_floor * 100.0))])
+			_log("   → Boil Over: for %d turn(s) he receives only the FLOOR (+%d%%), not the live bonus%s" % [
+				bo_turns, int(round(attacker.frenzy_floor * 100.0)),
+				" [PERFECT]" if is_perfect else ""], "#e07050")
 		# Survivalist on-hit package: Shrapnel's poison (perfect adds Slowed),
 		# Hamstring's trio, Coated Blades on basics, Venom Coating on all.
 		if attacker.is_hero and attacker.passive_id == "trapper" \
@@ -11946,7 +12303,70 @@ func _eff_stance(u: BattleUnit) -> String:
 	return u.stance
 
 
+# BATCH CI — THE ONE ANSWER TO "does this unit count as standing in
+# guard X", and it is deliberately NOT folded into `_eff_stance` above.
+# That helper returns ONE guard (the feigned one, or the real one) and a
+# single string cannot express BOTH, which is exactly what FORMLESS is.
+#
+# TWO CALLERS, both of them the stance gates in `_ability_usable` — the
+# door BW established for this question, so the greyed button, the bot's
+# pool and the cast cannot disagree. FEIGNED GUARD STILL WORKS THROUGH
+# `_eff_stance` UNDERNEATH, so the two cards compose rather than one
+# shadowing the other: a Feigned Guard satisfies the OTHER gate, a
+# Formless satisfies both.
+func _stance_satisfies(u: BattleUnit, want: String) -> bool:
+	if u.has_status("formless"):
+		return true
+	return _eff_stance(u) == want
+
+
+# BATCH CI — DISCIPLINE'S LIVE BONUS, IN PERCENTAGE POINTS, AND THE ONE
+# PLACE THE CAP IS DECIDED. Read at the passive's two stance sites and by
+# the chip, so the number a player is shown is the number the arithmetic
+# uses — the fault BP's Eye of the Storm shipped with (three copies of one
+# figure, and the chip silently winning) and repaired with a local.
+#
+# THE STEP LIVES ON THE STATUS POWER because the perfect moves it (3 -> 4)
+# and a constant here could not see that. The CAP does not move: a perfect
+# Discipline reaches the ceiling sooner, it does not raise it.
+func _discipline_bonus(u: BattleUnit) -> int:
+	if not u.has_status("discipline"):
+		return 0
+	var step: int = u.status_power("discipline")
+	if step <= 0:
+		step = DISCIPLINE_STEP
+	return mini(u.discipline_turns * step, DISCIPLINE_CAP)
+
+
+# Discipline's streak, rendered. Its own function on `_stamp_feint_chip`'s
+# and `_stamp_berserk_chip`'s precedent: the cast writes it and the
+# turn-start tick rewrites it, and a chip written in two places is a chip
+# that eventually disagrees with the counter behind it.
+func _stamp_discipline_chip(u: BattleUnit) -> void:
+	if not u.has_status("discipline"):
+		return
+	var d_pct := _discipline_bonus(u)
+	var d_guard := "Aggressive" if u.stance == "aggressive" else "Defensive"
+	u.update_status("discipline", "+%d%%" % d_pct,
+		"Discipline: %d consecutive turn(s) held in\nthe %s guard, so that stance's own effect\nis %d%% stronger (ceiling %d%%). A GUARD\nCHANGE resets this to nothing." % [
+			u.discipline_turns, d_guard, d_pct, DISCIPLINE_CAP])
+
 func _swordmaster_switch(u: BattleUnit) -> void:
+	# BATCH CI — DISCIPLINE'S ACCUMULATION DIES HERE, AT THE ONE PIVOT WITH
+	# THREE CALLERS, so Guard Change, Precision Strike and Feint all throw it
+	# away by doing nothing at all. That is the whole tension the card is sold
+	# on: the spec is built on switching, and this is the first thing that
+	# pays him for refusing to. A list of switchers at the card's own site
+	# would have gone stale the first time a fourth one was authored.
+	#
+	# It fires BEFORE the flip below so the log line names the guard he is
+	# leaving rather than the one he lands in.
+	if u.discipline_turns > 0:
+		u.discipline_turns = 0
+		if u.has_status("discipline"):
+			_log("   → Discipline: the guard changes and the accumulation is lost",
+				"#7cc8f0")
+		_stamp_discipline_chip(u)
 	u.stance = "defensive" if u.stance == "aggressive" else "aggressive"
 	var sw_label := "Aggressive" if u.stance == "aggressive" else "Defensive"
 	_sfx("parry", -6.0, 0.8)
@@ -14308,6 +14728,200 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				int(round(AEGIS_WALL_PCT * 100.0)),
 				maxi(int(round(attacker.max_hp * AEGIS_WALL_PCT)), 1),
 				" [PERFECT]" if is_perfect else ""], "#8c9cc8")
+		# ====== BATCH CI: TRANCHE 3, THE WARRIOR NINE — EIGHT RESOLVE HERE ======
+		# BOIL OVER is the ninth and needs no case at all: it is an ordinary
+		# strike with two riders, so it keys on `display_name` at the raw-damage
+		# block and again after the strike loop, and keeps the whole attack
+		# pipeline (crit, armor, resist, Break, parry) that a `special` would
+		# have cost it. CB's Cold Iron and Unmaking made the same call.
+		"unslaked":
+			# AXIS: the ratchet rate. **THE FIRST CARD IN THE GAME THAT READS
+			# `frenzy_floor` AT ALL** — the half of Blood Frenzy nothing has ever
+			# had a lever on. The window does not raise the floor itself; it
+			# changes what the floor CAPTURES while it holds, which is why the
+			# play pattern is the point: cast it, THEN dive.
+			#
+			# THE EFFECT LIVES IN `frenzy_bonus()` (unit.gd), the ONE place the
+			# floor is decided, so every site that reads the bonus answers it —
+			# the strike multiplier, the nameplate readout and the spec chip
+			# alike. A branch written at any one of those would have been true
+			# there and quietly false everywhere else.
+			var un_turns := 4 if is_perfect else 3
+			_apply_status(attacker, "unslaked", un_turns)
+			attacker.update_status("unslaked", "Un",
+				"Unslaked: for %d more turn(s) Blood\nFrenzy's floor keeps the FULL bonus he\nreaches instead of half. It stands at\n+%d%% right now — dive and it keeps all\nof what you reach." % [
+					un_turns, int(round(attacker.frenzy_floor * 100.0))])
+			_sfx("crit", -6.0, 0.7)
+			attacker.float_text("UNSLAKED", Color(0.90, 0.30, 0.35), true)
+			_message("%s will not be slaked" % attacker.unit_name)
+			_log("%s: Unslaked — for %d turns Blood Frenzy's floor captures the FULL bonus he reaches rather than half (it stands at +%d%%)%s" % [
+				attacker.unit_name, un_turns,
+				int(round(attacker.frenzy_floor * 100.0)),
+				" [PERFECT]" if is_perfect else ""], "#e05050")
+		"spite":
+			# AXIS: surviving the band he is paid for standing in. **MITIGATION,
+			# NEVER HEALING, AND THAT IS THE WHOLE CARD (§1)** — a heal here would
+			# take back the missing health Blood Frenzy is paying him for, so the
+			# card would cancel itself. This keeps him exactly where he is.
+			#
+			# THE CAP RIDES THE STATUS POWER rather than a constant at the read
+			# site, because the perfect moves it (30 -> 40) and a figure stamped
+			# here could not be seen from there.
+			var sp_turns := 6 if is_perfect else 4
+			var sp_cap := SPITE_PERFECT_CAP if is_perfect else SPITE_CAP
+			_apply_status(attacker, "spite", sp_turns, sp_cap)
+			var sp_now := mini(int((1.0 - attacker.hp / float(attacker.max_hp))
+				* 100.0 / 5.0) * SPITE_PER_5_MISSING, sp_cap)
+			attacker.update_status("spite", "-%d%%" % sp_now,
+				"Spite: %d%% less damage taken right now —\n%d%% for every 5%% of maximum health\nmissing, to a ceiling of %d%%. It is\nmitigation and never healing, so it\nkeeps him inside the frenzy band." % [
+					sp_now, SPITE_PER_5_MISSING, sp_cap], sp_cap)
+			_sfx("parry", -7.0, 0.6)
+			attacker.float_text("SPITE", Color(0.85, 0.40, 0.40), true)
+			_message("%s keeps his feet out of spite" % attacker.unit_name)
+			_log("%s: Spite — for %d turns he takes %d%% less damage per 5%% of maximum health missing, up to %d%% (it is %d%% right now)%s" % [
+				attacker.unit_name, sp_turns, SPITE_PER_5_MISSING, sp_cap, sp_now,
+				" [PERFECT]" if is_perfect else ""], "#e05050")
+		"anvil":
+			# AXIS: the sawtooth becomes a staircase. Heavy Plating's climb exists
+			# as bad-luck protection and a BLOCK throws the whole of it away, so
+			# the passive taxes him for the very thing the climb is meant to buy.
+			#
+			# **FLAGGED, NOT TUNED (§2)**: with the bonus free to reach its +40%
+			# ceiling and STAY there, this is potentially the strongest card in
+			# the batch. It ships as written and play prices it — BW's Berserk and
+			# CH's Fault Line got the same treatment for the same reason.
+			var an_turns := 4 if is_perfect else 3
+			_apply_status(attacker, "anvil", an_turns)
+			attacker.update_status("anvil", "An",
+				"Anvil: for %d more turn(s) BLOCKING does\nnot reset the Heavy Plating bonus (it\nstands at +%d%%). RECOMPENSE is paid\nnothing while this holds — there is no\nreset left to pay it." % [
+					an_turns, int(round(attacker.plating_bonus * 100.0))])
+			_sfx("parry", -6.0, 0.7)
+			attacker.float_text("ANVIL", Color(0.75, 0.80, 0.90), true)
+			_message("%s sets his feet" % attacker.unit_name)
+			_log("%s: Anvil — for %d turns Blocking no longer resets the Heavy Plating climb (it stands at +%d%%)%s" % [
+				attacker.unit_name, an_turns,
+				int(round(attacker.plating_bonus * 100.0)),
+				" [PERFECT]" if is_perfect else ""], "#8c9cc8")
+		"recompense":
+			# AXIS: getting PAID for the cruelty instead of preventing it. The
+			# deeper the climb was, the larger the payout — so the same term that
+			# makes the sawtooth hurt is the term that makes this card good.
+			#
+			# **IT AND ANVIL ACTIVELY FIGHT EACH OTHER AND THAT IS INTENDED**, and
+			# the description says so outright rather than leaving a Warden to
+			# find out by holding both. See the block roll, where the ordering
+			# makes it true without a special case.
+			var rp_turns := 6 if is_perfect else 4
+			_apply_status(attacker, "recompense", rp_turns)
+			attacker.update_status("recompense", "Rc",
+				"Recompense: for %d more turn(s) every Heavy\nPlating reset returns %s equal to the\npercentage points it took. ANVIL prevents\nthose resets, so the two do not stack." % [
+					rp_turns, attacker.resource_name])
+			_sfx("crit", -8.0, 0.6)
+			attacker.float_text("RECOMPENSE", Color(0.85, 0.80, 0.65), true)
+			_message("%s will be paid for it" % attacker.unit_name)
+			_log("%s: Recompense — for %d turns a Heavy Plating reset pays him %s equal to the percentage points lost%s" % [
+				attacker.unit_name, rp_turns, attacker.resource_name,
+				" [PERFECT]" if is_perfect else ""], "#e0c060")
+		"turn_the_blade":
+			# AXIS: the block pointed outward. A Block negates an attack entirely
+			# and pays him nothing beyond that; Aegis Wall made it worth something
+			# to the party, and this makes it cost something to the enemy.
+			#
+			# THE SHARE AND THE BLOW IT READS ARE BOTH RESOLVED AT THE BLOCK, not
+			# here — Aegis Wall's and Covering Guard's rule — so a wall raised in
+			# round one prices a round-four swing correctly.
+			var tt_turns := 4 if is_perfect else 3
+			_apply_status(attacker, "turn_the_blade", tt_turns)
+			attacker.update_status("turn_the_blade", "TB",
+				"Turn the Blade: for %d more turn(s) every\nattack he BLOCKS deals Break damage to\nthe attacker equal to %d%% of the damage\nthe block refused. A blow that gets\nTHROUGH pays nothing." % [
+					tt_turns, int(round(TURN_THE_BLADE_SHARE * 100.0))])
+			_sfx("break", -8.0, 0.7)
+			attacker.float_text("TURN THE BLADE", Color(0.80, 0.55, 0.95), true)
+			_message("%s turns the blade back" % attacker.unit_name)
+			_log("%s: Turn the Blade — for %d turns every attack he BLOCKS deals Break damage back, worth %d%% of what the block refused%s" % [
+				attacker.unit_name, tt_turns,
+				int(round(TURN_THE_BLADE_SHARE * 100.0)),
+				" [PERFECT]" if is_perfect else ""], "#c890f0")
+		"discipline":
+			# AXIS: paying him for REFUSING to switch. His whole spec is built on
+			# the pivot and nothing has ever rewarded standing still.
+			#
+			# **THE STREAK STARTS AT NOTHING ON THE CAST**, and climbs at the start
+			# of each of his turns, so the card pays for turns he actually holds
+			# the guard rather than for the turn he spent casting it. A re-cast
+			# inside a standing window therefore RESTARTS the accumulation, which
+			# is the honest reading of a fresh vow and is worth knowing before
+			# pressing it twice.
+			var di_turns := 7 if is_perfect else 5
+			var di_step := DISCIPLINE_PERFECT_STEP if is_perfect \
+				else DISCIPLINE_STEP
+			attacker.discipline_turns = 0
+			_apply_status(attacker, "discipline", di_turns, di_step)
+			_stamp_discipline_chip(attacker)
+			_sfx("parry", -7.0, 0.7)
+			attacker.float_text("DISCIPLINE", Color(0.50, 0.85, 1.0), true)
+			_message("%s will not be moved" % attacker.unit_name)
+			_log("%s: Discipline — for %d turns each consecutive turn held in the same guard strengthens that stance by %d%%, to a ceiling of %d%%. A Guard Change resets it%s" % [
+				attacker.unit_name, di_turns, di_step, DISCIPLINE_CAP,
+				" [PERFECT]" if is_perfect else ""], "#7cc8f0")
+		"answering_steel":
+			# AXIS: the parry stat finally buying something. He is the only
+			# parry-STAT character in the game and every point of it has only ever
+			# made hits smaller.
+			#
+			# **IT PAYS TEMPO AND NEVER DAMAGE (§3): RIPOSTE ALREADY GRANTS THE
+			# COUNTER-ATTACK ON PARRY AND THIS MUST NOT DUPLICATE IT.** The payout
+			# lives in the parry branch beside Battle Poise's; nothing in it
+			# touches damage, so a hero holding both gets the counter AND the
+			# tempo off one turned blade.
+			var an2_turns := 6 if is_perfect else 4
+			var an2_pct := ANSWERING_PERFECT_PARRY if is_perfect \
+				else ANSWERING_PARRY_PCT
+			_apply_status(attacker, "answering_steel", an2_turns, an2_pct)
+			attacker.update_status("answering_steel", "+%d%%" % an2_pct,
+				"Answering Steel: +%d%% parry for %d more\nturn(s), and every attack he PARRIES\ngrants %d %s and takes a turn off all\nhis cooldowns. It pays tempo, not\ndamage — Riposte still answers too." % [
+					an2_pct, an2_turns, ANSWERING_RAGE, attacker.resource_name],
+				an2_pct)
+			_sfx("parry", -6.0, 0.8)
+			attacker.float_text("ANSWERING STEEL", Color(0.55, 0.90, 1.0), true)
+			_message("%s lets the blade answer" % attacker.unit_name)
+			_log("%s: Answering Steel — for %d turns parry chance +%d%%, and every parry grants %d %s and takes a turn off every cooldown%s" % [
+				attacker.unit_name, an2_turns, an2_pct, ANSWERING_RAGE,
+				attacker.resource_name,
+				" [PERFECT]" if is_perfect else ""], "#7cc8f0")
+		"formless":
+			# AXIS: being neither, and both. The stance is the spec's one binary
+			# and every card in his pool sits on one side of it; this refuses the
+			# question for three turns.
+			#
+			# TWO IMPLEMENTATION CALLS, BOTH DELIBERATE (§3) AND BOTH DECIDED
+			# ELSEWHERE, WHICH IS THE POINT: he counts as BOTH stances for
+			# stance-gated abilities and CANNOT Guard Change, and both are settled
+			# at `_ability_usable` — the door BW's gated cards are refused at — so
+			# the greyed button, the bot's pool and the cast agree by construction.
+			# The stat halves ride SEASONED FIGHTER'S OWN TWO READ SITES rather
+			# than a third, so the card cannot drift from the passive it quotes.
+			#
+			# `formless_pending` IS ARMED HERE AND PAID WHEN THE WINDOW LAPSES, in
+			# the turn loop beside Vigor's and Vengeance's just-expired checks. A
+			# recoil applied here with a longer duration would have been a second
+			# clock that could drift out of step with the first.
+			var fm_turns := 4 if is_perfect else 3
+			attacker.formless_pending = 1
+			_apply_status(attacker, "formless", fm_turns)
+			attacker.update_status("formless", "Fm",
+				"Formless: for %d more turn(s) he deals\n+%d%% damage AND takes %d%% less, counts\nas BOTH stances for anything that\nrequires one, and cannot Guard Change.\nWhen it ends he pays both downsides for\n%d turns." % [
+					fm_turns, int(round((FORMLESS_DEALT - 1.0) * 100.0)),
+					int(round((1.0 - FORMLESS_TAKEN) * 100.0)),
+					FORMLESS_RECOIL_TURNS])
+			_sfx("crit", -8.0, 0.8)
+			attacker.float_text("FORMLESS", Color(0.65, 0.95, 1.0), true)
+			_message("%s holds no guard at all" % attacker.unit_name)
+			_log("%s: Formless — for %d turns he deals +%d%% AND takes %d%% less, counts as BOTH stances, and cannot Guard Change%s" % [
+				attacker.unit_name, fm_turns,
+				int(round((FORMLESS_DEALT - 1.0) * 100.0)),
+				int(round((1.0 - FORMLESS_TAKEN) * 100.0)),
+				" [PERFECT]" if is_perfect else ""], "#7cc8f0")
 		# ============ BATCH BQ: THE CLASS-WIDE TWELVE ============
 		# TEN OF THE TWELVE RESOLVE HERE. Magic Missiles and Chastise are
 		# ordinary attacks and need no case at all — which is the point of a

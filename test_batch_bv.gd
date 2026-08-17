@@ -209,7 +209,7 @@ func _pools() -> void:
 	# ALL TWELVE are five. A pool quietly emptying still trips.
 	var still_two := ["berserker", "warden", "swordmaster"]
 	for spec in still_two:
-		ok(Classes.spec_draft_pool(spec).size() == 5,
+		ok(Classes.spec_draft_pool(spec).size() == 8,
 			"%s drafts FIVE since Batch BW — the WARRIOR third is PAID (got %d)"
 				% [spec, Classes.spec_draft_pool(spec).size()])
 	# And nothing else exists: twelve specs, nine at five and three at two.
@@ -217,11 +217,11 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 87, "the spec pools hold 78 (60 + CB's Mage nine + CE's Cleric nine), got %d" % total)
+	ok(total == 96, "the spec pools hold 96 (60 + tranche 3's 36: CB, CE, CH and CI), got %d" % total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 111,
+	ok(draft_total == 120,
 		"the whole draft is 102 of a target 120 (got %d)" % draft_total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH HUNTER POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
@@ -602,10 +602,10 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CH"), "master.html is stamped Batch CH")
+	ok(master.contains("Batch CI"), "master.html is stamped Batch CI")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("111 of"), "master.html states the new draft count")
+	ok(master.contains("120 of"), "master.html states the new draft count")
 	ok(master.contains("Builds with"),
 		"and the draft tables still carry the synergy line a player reads")
 	var chlog := FileAccess.get_file_as_string("res://docs/changelog.html")

@@ -1092,6 +1092,30 @@ var feint_guards := 0
 # clocks on one card, which is the thing the description has to say plainly.
 var berserk_strikes := 0
 
+# ------- BATCH CI — the tranche-3 Warrior's two unit-side fields -------
+#
+# TWO FIELDS FOR NINE ABILITIES, and both are cases a STATUS genuinely cannot
+# hold (BQ's standard: anything with a duration is a status, which expires by
+# itself and cannot leak past a battle).
+#
+# DISCIPLINE'S ACCUMULATION. A COUNT OF CONSECUTIVE TURNS HELD IN ONE STANCE,
+# which is not a duration and does not tick down — it climbs while he refuses
+# to switch and is ZEROED BY THE PIVOT ITSELF. It lives on the unit rather
+# than in the status's power because the status is the WINDOW (5 turns, or 7)
+# and this is the streak inside it; one number holding both would make a
+# Guard Change end the card rather than reset its accumulation.
+#
+# **THE RESET LIVES IN `_swordmaster_switch`, THE ONE PIVOT WITH THREE
+# CALLERS**, so Guard Change, Precision Strike and Feint all reset it by doing
+# nothing — which is the whole tension the card is sold on.
+var discipline_turns := 0
+# FORMLESS'S OWED DOWNSIDE. A FLAG, NOT A CLOCK: the window is an ordinary
+# 3-turn status and this only records that a recoil is owed when it lapses.
+# Read (and cleared) immediately after `tick_statuses` in the turn loop, beside
+# Vigor's and Vengeance's own just-expired checks — the one position where the
+# status has genuinely gone and the two windows cannot overlap or leave a gap.
+var formless_pending := 0
+
 # ------- BATCH BQ — the class-wide draft's unit-side state -------
 #
 # ONE CALLBACK AND NO NEW FIELDS AT ALL, for twelve abilities. Everything with
@@ -2329,11 +2353,29 @@ func frenzy_bonus() -> float:
 	# (see the Batch AJ header in talents.gd). At 100% the floor tracks the
 	# peak exactly, so the bonus never falls at all.
 	var keep: float = [0.5, 0.85, 1.0][clampi(scar_tissue_ranks, 0, 2)]
+	# BATCH CI — UNSLAKED. The first card in the game to read this passive's
+	# floor at all, and it reads the RATCHET RATE rather than the floor itself:
+	# for its window the floor captures the FULL bonus he reaches instead of
+	# half. `maxf` rather than an assignment, so a Scar Tissue Berserker who
+	# already keeps 100% is never quietly lowered to it — the card can only
+	# ever raise what is kept.
+	if has_status("unslaked"):
+		keep = maxf(keep, 1.0)
 	if current * keep > frenzy_floor:
 		frenzy_floor = current * keep
 		if scar_tissue_ranks > 0:
 			_proc_log("Talent: Scar Tissue — %s's Frenzy floor scars in at +%d%%" % [
 				unit_name, int(round(frenzy_floor * 100.0))])
+	# BATCH CI — BOIL OVER'S RECOVERY. He receives ONLY the floor for two turns
+	# after the strike that cashed the live bonus. **THE RATCHET ABOVE STILL
+	# RUNS AND THAT IS DELIBERATE**: the floor is untouched by the card (a dive
+	# inside the window still banks its floor exactly as it would outside one),
+	# which is what makes UNSLAKED pair with it — a high floor makes the
+	# recovery cost small. Written as a RETURN rather than as a write to
+	# `frenzy_floor`, because a card that lowered the floor would be permanent
+	# where this is two turns.
+	if has_status("boil_over"):
+		return frenzy_floor
 	return maxf(current, frenzy_floor)
 
 

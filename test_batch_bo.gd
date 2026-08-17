@@ -142,8 +142,8 @@ func _pools() -> void:
 	# is 60 plus the Mage nine. The question — is the count what the batches
 	# claim they shipped — is unchanged; a pool quietly EMPTYING still trips,
 	# which is what pinning a count is for.
-	ok(total == 87,
-		"§5+BP+tranche 3: seventy-eight ship — BO's 18, BP's 6, tranche 2's 36, CB's 9 and CE's 9 (got %d)"
+	ok(total == 96,
+		"§5+BP+tranche 3: ninety-six ship — BO's 18, BP's 6, tranche 2's 36, and tranche 3's 36 (got %d)"
 			% total)
 	# TRANCHE 1'S ENTRIES MUST STILL LEAD THEIR POOLS, which is the half of this
 	# check that survives BT untouched: a later tranche APPENDS, it does not
@@ -187,17 +187,29 @@ func _pools() -> void:
 	# only the WARRIOR THREE are still at five. The question is unchanged and is
 	# still what tells the two answers apart; what is owed is the Warrior third,
 	# and it is the LAST of the debt, so it has to stay visible in code.
+	# RE-POINTED BY BATCH CI, AND IT IS THE SEVENTH AND LAST INVERSION OF THIS
+	# LOOP. It has asserted, in order: each earlier tranche's own asymmetry, then
+	# the FLATNESS tranche 2 achieved, then CB's new asymmetry, that asymmetry
+	# HALVED at CE, QUARTERED at CH — and now GONE. The WARRIOR three joined the
+	# other nine at EIGHT when tranche 3's last third landed, so ALL TWELVE specs
+	# draft from eight and the draft is 120 of 120.
+	#
+	# **THERE IS NO DEBT LEFT TO KEEP VISIBLE, so what this loop guards from here
+	# on is the FLATNESS rather than an asymmetry**: a pool that quietly EMPTIES
+	# trips, where before it would have read as the old debt coming back. That is
+	# the reason it inverts rather than being deleted — the question is still
+	# worth asking, only the correct answer moved, and it moved for the last time.
 	for spec in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(spec).size() == 5,
-			"§5+tranche 3: %s is still FIVE — its third is owed" % spec)
+		ok(Classes.spec_draft_pool(spec).size() == 8,
+			"§5+tranche 3: %s drafts EIGHT — the Warrior third is paid" % spec)
 	# THE WARRIOR POOLS ARE NAMED **AND FULL** — named and empty at BO, filled to
 	# two at BP, and five at BW. One of four heroes in every party had no draft
 	# at all until BP, and had the shallowest one in the game until BW.
 	for w in ["berserker", "warden", "swordmaster"]:
 		ok(Classes.SPEC_DRAFT_POOLS.has(w),
 			"§5: %s's draft pool is NAMED" % w)
-		ok(Classes.spec_draft_pool(w).size() == 5,
-			"BW: ...and FULL — %s drafts five of its own" % w)
+		ok(Classes.spec_draft_pool(w).size() == 8,
+			"CI: ...and FULL — %s drafts EIGHT of its own" % w)
 	# CLASS-WIDE: four keys, ALL FOUR FILLED.
 	# RE-POINTED IN PLACE TWICE, AND BOTH RE-POINTS ARE INVERSIONS — the honest
 	# treatment when a later batch pays a debt an older suite was recording.
@@ -357,9 +369,20 @@ func _offer_and_ratio() -> void:
 	# for. THE RULE WAS NEVER ABOUT WHICH POOL IS THIN: it is about an offer
 	# never padding with repeats, and refusing all six class cards plus three of
 	# his own five leaves exactly two cards in the game he can be shown.
+	#
+	# REBUILT BY BATCH CI, AND THIS IS THE LAST TIME IT CAN NEED IT. CI took the
+	# three WARRIOR pools 5 -> 8, so a refusal of "the class pool plus three" now
+	# leaves FIVE standing and the offer comes up FULL — the check would have
+	# gone on measuring something, and it would no longer have been the
+	# fill-short rule. **THERE IS NO POOL LEFT IN THE GAME TO MOVE IT ONTO**:
+	# every spec drafts eight and every class six, so the hero cannot change
+	# again and the ARITHMETIC had to. It is written RELATIVE TO THE LIVE POOL
+	# SIZE now — refuse everything but two — which is test_batch_bx's shape and
+	# the only one that cannot go stale a fourth time. A later tranche that
+	# deepened a pool would move this check's setup and not its answer.
 	var bz_pool: Array = Classes.spec_draft_pool("berserker")
 	var worn: Array = Classes.class_draft_pool("warrior").duplicate()
-	worn.append_array(bz_pool.slice(0, 3))
+	worn.append_array(bz_pool.slice(0, bz_pool.size() - 2))
 	var thin := {"key": "warrior", "spec": "berserker", "bm_abilities": [],
 		"draft_refused": worn}
 	var thin_offer: Array = run.roll_draft_offer(thin)
@@ -1191,7 +1214,7 @@ func _docs() -> void:
 	# TOGETHER or a batch that bumps the timestamp trips suites it never
 	# touched. (BO had its own copy phrased as "this batch"; it is the same
 	# gate.)
-	ok(master.contains("Batch CH"),
+	ok(master.contains("Batch CI"),
 		"§6: master.html is stamped for the current batch")
 	ok(master.contains("THE ABILITY DRAFT") or master.contains("The Ability Draft"),
 		"§6: ...and carries the draft's own section")

@@ -171,18 +171,30 @@ func _pools() -> void:
 	# only the WARRIOR THREE are still at five. The question is unchanged and is
 	# still what tells the two answers apart; what is owed is the Warrior third,
 	# and it is the LAST of the debt, so it has to stay visible in code.
+	# RE-POINTED BY BATCH CI, AND IT IS THE SEVENTH AND LAST INVERSION OF THIS
+	# LOOP. It has asserted, in order: each earlier tranche's own asymmetry, then
+	# the FLATNESS tranche 2 achieved, then CB's new asymmetry, that asymmetry
+	# HALVED at CE, QUARTERED at CH — and now GONE. The WARRIOR three joined the
+	# other nine at EIGHT when tranche 3's last third landed, so ALL TWELVE specs
+	# draft from eight and the draft is 120 of 120.
+	#
+	# **THERE IS NO DEBT LEFT TO KEEP VISIBLE, so what this loop guards from here
+	# on is the FLATNESS rather than an asymmetry**: a pool that quietly EMPTIES
+	# trips, where before it would have read as the old debt coming back. That is
+	# the reason it inverts rather than being deleted — the question is still
+	# worth asking, only the correct answer moved, and it moved for the last time.
 	for spec in ["berserker", "warden", "swordmaster"]:
-		ok(Classes.spec_draft_pool(spec).size() == 5,
-			"%s is still at FIVE — its third of tranche 3 is owed" % spec)
+		ok(Classes.spec_draft_pool(spec).size() == 8,
+			"%s drafts EIGHT — tranche 3 is complete" % spec)
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 87, "the spec pools hold 78 (60 + this batch's nine + CE's Cleric nine), got %d"
+	ok(total == 96, "the spec pools hold 96 (60 + tranche 3's 36: CB, CE, CH and CI), got %d"
 		% total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 111, "the draft holds 111 of a target 120 (got %d)"
+	ok(draft_total == 120, "the draft holds 120 of a target 120 (got %d)"
 		% draft_total)
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR/BT negative control.
@@ -1101,10 +1113,15 @@ func _docs() -> void:
 	# unchanged — does master.html state the live count in words, and does it
 	# record which classes are complete — so a doc that quietly stopped saying
 	# either still trips.
-	ok(master.contains("hundred and two"),
+	# RE-POINTED BY BATCH CI, AND THE SECOND HALF IS AN INVERSION. The count in
+	# words moved with the draft; and there is no longer a SUBSET of classes to
+	# record as complete, because all four are — so what master.html has to say
+	# is that ALL TWELVE specs draft from eight. A doc that quietly went back to
+	# naming a subset would be describing a debt that has been paid.
+	ok(master.contains("hundred and twenty"),
 		"master.html states the new draft count in words")
-	ok(master.contains("Mage and the Cleric are complete"),
-		"master.html records the completed classes (the Mage was CB's, the Cleric CE's)")
+	ok(master.contains("All twelve specs draft from eight"),
+		"master.html records that every class is complete, not a subset of them")
 	# The pool summary rows moved with the pools, or a player reads five where
 	# the game offers eight.
 	ok(master.contains("Funeral Pyre, <b>Firedraw</b>"),

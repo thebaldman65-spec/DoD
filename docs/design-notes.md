@@ -4,6 +4,39 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Two answers to one cruelty, and the discipline of not merging them (Batch CI) — 2026-08-16
+
+The Warrior nine close the draft, and the pair worth recording is **Anvil and Recompense** —
+two Warden cards written to fight each other on purpose.
+
+Heavy Plating climbs +8% Block per unblocked hit and a *successful block throws the whole climb
+away*. That sawtooth is the passive's central cruelty: the ramp exists as bad-luck protection,
+and the passive taxes him for the one outcome the ramp is meant to buy. Anvil refuses the reset.
+Recompense is *paid by* it. Held together, the second gets nothing while the first is up.
+
+The tempting move is to smooth that over — let Recompense pay a little anyway, or have Anvil
+leave one reset through. **Both would be worse, and the reason generalises past these two cards.**
+A player holding both is not being punished by a bug; they are holding two answers to a question
+that only has one answer at a time, which is a legitimate thing for a card pool to contain and a
+genuinely interesting thing to discover. What makes it safe is that it is *legible*: both card
+descriptions say it outright rather than leaving it to be found. **A hidden anti-synergy is a
+trap; a stated one is a build decision.** Batch BW made the same call with Reckless Abandon
+against Bloodwake and it has read well since.
+
+There is an implementation lesson underneath it that is worth more than the pair. The
+non-interaction is not coded anywhere — there is no clause saying "if Anvil, skip Recompense".
+Anvil suppresses the reset, and Recompense hangs off the reset, so *with no reset there is
+nothing to pay for*. The rule falls out of where the two things sit relative to each other. Every
+time this project has instead written the interaction down as its own condition, that condition
+has eventually gone stale; the ordering cannot, because it is the same line of code doing both
+jobs.
+
+**And the batch's own driver proved the point by catching the one place the ordering broke.** The
+Anvil guard was spliced in *above* the original unconditional reset rather than replacing it, so
+the climb reset anyway while the log announced that it had held — a card doing nothing and saying
+it worked. Every live smoke passed it, because a smoke reads the log. Only a check that asserted
+the *state afterwards* could see it.
+
 ## A payout that costs nothing is not a trade (Batch CG) — 2026-08-16
 
 Two of this batch's seven changes are the same correction made twice, and the shape is worth

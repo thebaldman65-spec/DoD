@@ -257,35 +257,43 @@ const CLASS_POOLS := {
 # plumbing and NO SAVE VERSION MOVES (still v10). What the draft adds beside it
 # is `member["draft_refused"]` — the names this run may never offer again.
 #
-# POOLS WERE THIN UNTIL TRANCHE 2 AND THAT WAS EXPECTED, NOT A BUG: BO's
-# eighteen abilities against a target of 120, so an offer of three often came
-# up two or one. It fills SHORT rather than padding with repeats, which is
-# AP §3's existing rule for upgrade offers applied unchanged.
-# (BATCH BW took every spec to five, BATCH CB the Mage three to eight, BATCH CE
-# the Cleric three and BATCH CH the Hunter three, so the draft is 111 of 120 and
-# an offer fills short only when the run has already REFUSED or taken most of a
-# pool — never because of which hero drew it.)
+# **THE DRAFT IS COMPLETE AT 120 OF 120 (BATCH CI): TWELVE SPECS AT EIGHT
+# APIECE (96) PLUS FOUR CLASS POOLS OF SIX (24), AND NOTHING IS OWED.** BO
+# opened with eighteen against that target, so an offer of three routinely came
+# up two or one; tranche 2 took every spec to five (BT/BU/BV/BW) and tranche 3
+# to eight (CB the Mage, CE the Cleric, CH the Hunter, CI the Warrior).
+#
+# AN OFFER STILL FILLS **SHORT** RATHER THAN PADDING WITH REPEATS — AP §3's
+# existing rule for upgrade offers, applied unchanged — but **the only thing
+# that can make it fill short now is a run that has already REFUSED or taken
+# most of a pool.** It can no longer happen because of which hero drew it, and
+# there is no thin pool left anywhere in the game to build one on. The draft
+# suites assert the flatness, so a pool quietly EMPTYING would trip rather than
+# reading as the old asymmetry coming back.
 const SPEC_DRAFT_POOLS := {
-	# WARRIOR — THE DEBT BO LEFT OPEN, CLOSED IN BATCH BP AND PAID OFF IN BATCH
-	# BW. All three pools were NAMED AND EMPTY, so one of four heroes in every
-	# party had no draft at all; BP put two apiece in, and BW's tranche-2 third
-	# takes them to FIVE. The Warrior deficit that has been the shape of the
-	# debt since BP is GONE.
+	# WARRIOR — EIGHT APIECE SINCE BATCH CI, AND THE WARRIOR IS THE FOURTH AND
+	# LAST CLASS COMPLETE. All three pools were NAMED AND EMPTY at BO, so one of
+	# four heroes in every party had no draft at all; BP put two apiece in, BW's
+	# tranche-2 third took them to five, and CI lands tranche 3's last third
+	# here. **THE ASYMMETRY THAT HAS SHAPED EVERY BATCH SINCE BO IS GONE, AND SO
+	# IS THE DEBT** — twelve specs at eight apiece plus four class pools of six
+	# is 120 of 120, and nothing is owed.
+	#
+	# THE WARRIOR IS THE ONE CLASS WHOSE KEYS NEVER LIED: `berserker`, `warden`
+	# and `swordmaster` are the real keys AND the real display names, unlike the
+	# Devout (`inquisitor`) and the Survivalist (`mystic`) above.
 	"berserker": ["Blood Offering", "Gut Rip", "Reckless Abandon", "Berserk",
-		"Blood Debt"],
+		"Blood Debt", "Unslaked", "Spite", "Boil Over"],
 	"warden": ["Covering Guard", "Eye of the Storm", "Shield Slam", "Vendetta",
-		"Aegis Wall"],
+		"Aegis Wall", "Anvil", "Recompense", "Turn the Blade"],
 	"swordmaster": ["Precision Strike", "Feint", "Sever", "Battle Poise",
-		"Feigned Guard"],
+		"Feigned Guard", "Discipline", "Answering Steel", "Formless"],
 	# MAGE — EIGHT APIECE SINCE BATCH CB, AND THE MAGE WAS THE FIRST CLASS
 	# COMPLETE. BT took the three Mage pools to five (tranche 2's first third),
 	# BU the Cleric three, BV the Hunter three and BW the Warrior three; CB
-	# lands tranche 3's first third here and CE its second.
-	# THE ASYMMETRY IS STILL THERE AND IT STILL POINTS THE SAME WAY, smaller
-	# again: since BATCH CH the MAGE, CLERIC AND HUNTER NINE draft from EIGHT and
-	# the WARRIOR THREE from FIVE, so all that is owed is the Warrior third of
-	# tranche 3 — nine cards. The draft suites assert both halves, so the last
-	# of the debt stays visible in code rather than only in prose.
+	# landed tranche 3's first third here, CE its second, CH its third and CI
+	# its last. **ALL TWELVE SPECS NOW DRAFT FROM EIGHT** — the asymmetry that
+	# ran from BO to CH pointed at the Warrior for its whole life and is dead.
 	"pyromancer": ["Cinderfall", "Ember Debt", "Slow Burn", "Stoke",
 		"Funeral Pyre", "Firedraw", "Pyre Wake", "Emberkeep"],
 	"cryomancer": ["Winter's Toll", "Rimebinding", "Flash Freeze",
@@ -331,19 +339,25 @@ const SPEC_DRAFT_POOLS := {
 # CLASS SEAM NOW DRAWS A REAL ENTRY FOR EVERY HERO IN THE GAME. No class rolls
 # an empty pool any more, and no offer loses its class card.
 #
-# THE DRAFT IS 102 OF A TARGET 120 (78 spec + 24 class-wide) AS OF BATCH CE.
+# **THE DRAFT IS 120 OF A TARGET 120 AS OF BATCH CI (96 spec + 24 class-wide),
+# AND NOTHING IS OWED.** Tranche 3 closed with the Warrior third; every one of
+# the twelve spec pools is eight deep and every one of the four class pools is
+# six deep.
 #
 # THE TARGET IS 120, NOT ~96, AND BATCH CD CORRECTED IT HERE (§2). The ~96 came
 # from an older assumption of SIX spec cards per spec; CB completed the Mage at
 # EIGHT, which makes the spec target 12 x 8 = 96 and the whole draft 96 + 24 =
 # 120. test_batch_bt has asserted depth 8 since CB, so the tests encoded the
 # right figure while three comments in this file and master.html carried the
-# old one. 9 are still owed and every one of them is a SPEC card: the WARRIOR
-# third of tranche 3, and it is the last of it.
+# old one.
 #
-# This block read "48 ... spec pools remain thin at two apiece" from BR until
-# BW corrected it toward the code: TRANCHE 2 IS COMPLETE and every spec pool is
-# at least five deep.
+# **WHAT A LATER BATCH CAN STILL BREAK IS NOT THE COUNT BUT THE FLATNESS.** This
+# block read "48 ... spec pools remain thin at two apiece" from BR until BW
+# corrected it toward the code, and every draft suite's per-spec depth loop has
+# been re-pointed SEVEN times since BO — each earlier tranche's asymmetry, then
+# the flatness tranche 2 achieved, then CB's new asymmetry, halved at CE,
+# quartered at CH, and now GONE. It asserts a flat EIGHT now, so a pool that
+# quietly empties trips rather than reading as the old debt returning.
 #
 # THIS IS A SEPARATE STRUCTURE FROM `CLASS_POOLS` ABOVE AND IT MUST STAY ONE.
 # The reason is BO's own, applied to the other pool: `CLASS_POOLS` feeds the
@@ -923,6 +937,258 @@ static func draft_ability(display_name: String) -> Ability:
 				"anim": "attack03", "special": "aegis_wall",
 				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
 				"description": "The wall answers for everyone: for 3\nturns every attack you BLOCK heals the\nwhole party for 8% of your maximum\nhealth. A blow that gets through pays\nnothing — only a block."})
+		# ===== BATCH CI — TRANCHE 3, THE WARRIOR NINE. THE DRAFT IS COMPLETE. =====
+		#
+		# A CONTIGUOUS BLOCK rather than interleaved with BP's and BW's entries
+		# above (CB/CE/CH's shape — BW's had to interleave, these do not). The
+		# AXIS/SYNERGY acceptance check still anchors PER ABILITY, because a
+		# shared header must not be able to satisfy all nine at once.
+		#
+		# EIGHT OF THE NINE CARRY A `special`; BOIL OVER DELIBERATELY DOES NOT,
+		# and that looks like an omission which is why it is recorded (the BV
+		# five-of-nine / CB Cold Iron pattern). `_resolve` sends any ability
+		# holding a `special` down `_resolve_special`, which means hand-rolling
+		# the blow and losing the whole attack pipeline with it — crits, armor,
+		# resists, Break, the parry roll AND Blood Frenzy's own multiplier at the
+		# strike site. Boil Over is an ordinary strike with two riders and NEEDS
+		# that pipeline, so it keys on `display_name` at the ordinary sites.
+		#
+		# ----- BERSERKER: the ratchet, the band, the payout. His two earlier
+		# tranches asked how he gets LOW (BP) and what a full bar buys (BW).
+		# These three are the first cards in the game that read the passive's own
+		# FLOOR — the half of Blood Frenzy that has never had a lever on it.
+		#
+		# AXIS: the ratchet rate. Blood Frenzy's floor keeps HALF the peak he
+		# reaches, and nothing in the game has ever touched that fraction —
+		# Scar Tissue raises it from the tree, and a Berserker who did not buy
+		# that node has no way to. This is the drafted answer, and it is a
+		# WINDOW rather than a permanent raise, so the play pattern is the point:
+		# cast it, THEN dive, and the floor locks in at double its usual value
+		# for the rest of the battle.
+		#
+		# SYNERGY: BLOOD OFFERING is the dive he controls (20% of current health
+		# on demand), so the two are a two-card combo that banks a floor on his
+		# own schedule rather than waiting for an enemy to grant it; BERSERK's
+		# 30%-more-damage-taken is the same dive from the other side and lands
+		# him deeper. SCAR TISSUE composes rather than overlaps — the card can
+		# only ever RAISE what is kept, so a Berserker holding both loses
+		# nothing. BOIL OVER is the card that spends what this banks, and
+		# UNDYING RAGE and DEATHWISH both pay again for living down there.
+		"Unslaked":
+			return Ability.make({"display_name": "Unslaked", "cost": 30,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
+				"anim": "attack02", "special": "unslaked",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Nothing settles it. For 3 turns Blood\nFrenzy's floor keeps the FULL bonus you\nreach instead of half of it. Cast it,\nthen dive: what you bank at the bottom\nis yours for the rest of the battle."})
+		# AXIS: surviving the band he is paid for standing in. Blood Frenzy pays
+		# him for missing health and every other answer to being low is a HEAL,
+		# which lifts him straight back out of his own power band.
+		#
+		# **MITIGATION, NOT HEALING, AND THAT IS THE WHOLE CARD.** A version that
+		# healed him here would fight his passive: it would take back the missing
+		# health the passive is paying for, so the card would cancel itself. This
+		# one keeps him exactly where he is and simply makes it survivable, and
+		# it gets LARGER the deeper he goes — the first defensive card in the
+		# game that rewards being nearly dead.
+		#
+		# SYNERGY: BLOOD FRENZY reads the same missing health this does, so
+		# every point that makes this bigger makes his damage bigger too; BERSERK
+		# and RECKLESS FURY both invite the damage this refuses, and SCAR TISSUE
+		# and UNSLAKED bank the floor he earns on the way down. UNDYING RAGE and
+		# ASHES-shaped death refusals are what the last 15% is for, and BLOOD
+		# DEBT's bleedout heal is the deliberate opposite number — take that one
+		# to leave the band, this one to live in it.
+		"Spite":
+			return Ability.make({"display_name": "Spite", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
+				"anim": "attack02", "special": "spite",
+				"perfect_id": "", "perfect_text": "Holds 6 turns and caps at 40% instead of 4 turns and 30%",
+				"description": "Out of pure spite. For 4 turns take 1%\nless damage for every 5% of maximum\nhealth MISSING, up to 30%. It is\nmitigation and never healing — it keeps\nyou in the frenzy band rather than\nlifting you out of it."})
+		# AXIS: cashing the live bonus instead of carrying it. Blood Frenzy is a
+		# multiplier he holds and never SPENDS; this is the one card that takes
+		# the number itself as payment.
+		#
+		# **THE COST IS THE GAP BETWEEN THE BONUS AND THE FLOOR**, which is what
+		# makes it a different card in every build rather than a flat drawback:
+		# the floor is untouched, so a Berserker who banked a deep one barely
+		# feels the two turns, and one who has not just lost most of his damage.
+		# That is precisely why UNSLAKED is worth a slot beside it.
+		#
+		# SYNERGY: UNSLAKED above all — a floor holding the FULL peak makes the
+		# recovery nearly free, and the two together are the batch's own combo.
+		# SCAR TISSUE does the same thing from the tree. BLOOD OFFERING and
+		# BERSERK drive the live bonus up before the strike lands, and RECKLESS
+		# ABANDON's window multiplies the blow it pays for. Anything that Breaks
+		# the target first (SHIELD SLAM, a Swordmaster's SUNDER GUARD) lands it
+		# into a +25% crit window.
+		"Boil Over":
+			return Ability.make({"display_name": "Boil Over", "cost": 40,
+				"damage": 30, "pressure": 15, "delay": 2.5, "cooldown": 5,
+				"anim": "attack03",
+				"perfect_id": "", "perfect_text": "The recovery costs 1 turn instead of 2",
+				"description": "Spend the rage itself: strike for 30%\nof Attack plus 2% more for every POINT\nof your live Blood Frenzy bonus. For 2\nturns afterwards you receive only the\nFLOOR, not the live bonus — the floor\nitself is untouched."})
+		# ----- WARDEN: deny the reset, get paid for it, or turn it outward.
+		# Heavy Plating climbs +8% Block per unblocked hit and a BLOCK THROWS THE
+		# WHOLE CLIMB AWAY. That sawtooth is his passive's central cruelty and
+		# nothing has ever had an answer to it. These three are three answers,
+		# and two of them are deliberately incompatible.
+		#
+		# AXIS: the sawtooth becomes a staircase. The climb exists as bad-luck
+		# protection, so throwing it away on success is the passive taxing him
+		# for the thing it is meant to buy.
+		#
+		# **FLAGGED, NOT TUNED (§2): with the bonus free to climb to its +40%
+		# ceiling and stay there, this is potentially the strongest card in the
+		# batch.** It ships as written and play prices it — the same treatment
+		# BW's Berserk and CH's Fault Line got, and for the same reason.
+		#
+		# SYNERGY: the whole PLATE lane compounds with it — PLATE DISCIPLINE
+		# steepens the climb to +12% a hit so the ceiling arrives in two hits and
+		# then STAYS, TENACITY banks +15 maximum health per block it keeps
+		# buying, and UNKILLABLE mends on every one. SHIELDWALL and BULWARK LINE
+		# add their own slice on top of a plating bonus that no longer falls.
+		# AEGIS WALL and TURN THE BLADE both pay PER BLOCK, so a card that raises
+		# how often he blocks raises everything they pay. **RECOMPENSE IS THE
+		# DELIBERATE ANTI-SYNERGY** and both cards say so.
+		"Anvil":
+			return Ability.make({"display_name": "Anvil", "cost": 25,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
+				"anim": "attack01", "special": "anvil",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Do not move. For 3 turns BLOCKING no\nlonger resets the Heavy Plating bonus,\nso the climb keeps everything it earns\nand the sawtooth becomes a staircase.\nRECOMPENSE is paid nothing while this\nholds — there is no reset to pay it."})
+		# AXIS: getting paid for the cruelty instead of preventing it. Anvil
+		# refuses the reset; this one is FUNDED BY IT, and the deeper the climb
+		# was the larger the payout — so the same term that makes the sawtooth
+		# hurt is the term that makes this card good.
+		#
+		# **ANVIL AND RECOMPENSE ACTIVELY FIGHT EACH OTHER AND THAT IS INTENDED
+		# (§2).** A Warden holding both gets nothing from the second while the
+		# first is up. They are TWO ANSWERS TO THE SAME CRUELTY, not a stack, and
+		# it must not be smoothed over — both descriptions say so outright, and
+		# it falls out of the implementation rather than being a special case:
+		# Anvil suppresses the reset, and no reset means nothing to pay for.
+		#
+		# SYNERGY: PLATE DISCIPLINE is worth more here than anywhere else — a
+		# +12%-a-hit climb means the resets it feeds on are BIGGER, so the two
+		# nodes that make the sawtooth worse make this card better. Everything he
+		# spends Rage on is the payoff, and his own pool is 100: SHIELD SLAM,
+		# VENDETTA, EYE OF THE STORM and AEGIS WALL all come back sooner off a
+		# bar a single deep reset can refill by a third.
+		"Recompense":
+			return Ability.make({"display_name": "Recompense", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
+				"anim": "attack02",
+				"special": "recompense",
+				"perfect_id": "", "perfect_text": "Holds 6 turns instead of 4",
+				"description": "Be paid for the loss. For 4 turns,\nwhenever Blocking resets your Heavy\nPlating bonus you gain Rage equal to\nthe percentage points lost — a reset\nfrom +32% pays 32 Rage. ANVIL prevents\nthose resets, so the two do not stack."})
+		# AXIS: the block pointed outward. A Block NEGATES an attack entirely and
+		# pays him nothing beyond that; Aegis Wall made it worth something to the
+		# party, and this makes it worth something to the enemy that threw it.
+		#
+		# THIS MAKES **THREE SPECS ACROSS THREE CLASSES** GENERATING BREAK THAT
+		# THE OCCULTIST'S BREAKING DARKNESS AMPLIFIES — the Warden here, the
+		# Sharpshooter's FAULT LINE and the Occultist himself. That web is
+		# deliberate (§2) and it is the reason this card is Break rather than
+		# damage: a Warrior party's central axis is the Break meter, and he is
+		# the hero standing where the blows land.
+		#
+		# SYNERGY: BREAKING DARKNESS (Occultist) lands every point of it 25%
+		# harder, and SUNDERING, ELEMENTAL WEAKNESS and BROKEN WILL all multiply
+		# it from his own tree. BRUISING GUARD pays flat Break on the same
+		# trigger and the two ADD. ANVIL, SHIELDWALL, BULWARK LINE and INTERPOSE
+		# all buy more blocks, which is the only thing that makes this scale.
+		# What it hands over is a BROKEN target: a Swordmaster's SEVER clears its
+		# own cooldown against one and PUNISHMENT pays +60% into it.
+		"Turn the Blade":
+			return Ability.make({"display_name": "Turn the Blade", "cost": 25,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 4,
+				"anim": "attack03", "special": "turn_the_blade",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Send it back. For 3 turns every attack\nyou BLOCK deals Break damage to the\nattacker equal to half the damage the\nblock refused. A blow that gets THROUGH\npays nothing — only a block."})
+		# ----- SWORDMASTER: dwell, parry, and neither stance. BP gave him
+		# readers that branch and flip, BW gated cards that require and stay.
+		# These three are the first that argue with the switch itself.
+		#
+		# AXIS: paying him for REFUSING to switch. His whole spec is built on
+		# the pivot — the passive is two stances, his enabler is the swap, and
+		# five drafted cards read or require a guard — and nothing has ever
+		# rewarded standing still.
+		#
+		# **IT FIGHTS HIS OWN READERS AND HIS OWN GATED CARDS, WHICH IS THE
+		# TENSION WORTH HAVING (§3).** Precision Strike and Feint both flip him,
+		# so casting either throws the accumulation away; Sever and Battle Poise
+		# each demand a specific guard, so holding one means giving up the other.
+		# That is a real decision rather than a drawback.
+		#
+		# SYNERGY: SEASONED FIGHTER is the thing it deepens, so it is worth
+		# exactly as much as the stance he is standing in — and it composes
+		# ADDITIVELY with the two nodes that already deepen that passive
+		# (Aggressive Stance and Defensive Stance), because it writes into their
+		# read sites rather than a third. FEIGNED GUARD is the card that resolves
+		# the whole tension: it satisfies the OTHER stance's requirement WITHOUT
+		# switching him, so a Discipline build can still cast Sever or Battle
+		# Poise without losing a turn of accumulation. KILLING EDGE, BRACING and
+		# UNTOUCHABLE all pay a build that has committed to one guard anyway.
+		"Discipline":
+			return Ability.make({"display_name": "Discipline", "cost": 25,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
+				"anim": "attack01", "special": "discipline",
+				"perfect_id": "", "perfect_text": "4% a turn instead of 3%, and holds 7 turns instead of 5",
+				"description": "Do not be moved. For 5 turns, each\nconsecutive turn held in the SAME\nstance strengthens that stance's own\neffect by 3%, up to 15%. A GUARD CHANGE\nresets the accumulation to nothing —\nand so does any card that switches you."})
+		# AXIS: the parry stat finally buying something. He is the only
+		# parry-STAT character in the game — 12% base, plus Sword Mastery,
+		# Swordsmanship and High Guard — and THIS IS THE FIRST CARD THAT READS
+		# IT (Battle Poise pays per parry too, and this is the card that makes
+		# the roll itself worth raising).
+		#
+		# **THE RIPOSTE TALENT ALREADY GRANTS A COUNTER-ATTACK ON PARRY AND THIS
+		# MUST NOT DUPLICATE IT (§3).** Answering Steel pays TEMPO — Rage and
+		# cooldowns — and never damage, so a hero holding both gets the counter
+		# AND the tempo off one parry and the two stack cleanly.
+		#
+		# SYNERGY: the whole POISE lane raises the roll this doubles down on —
+		# SWORD MASTERY and SWORDSMANSHIP raise the chance, HIGH GUARD hardens
+		# it after every success, DEFLECTION lets him parry ranged attacks at
+		# all, WAITING GUARD banks guaranteed parries and FEINT's charges are two
+		# more, and RIPOSTE answers each one with a free Overpower. BATTLE POISE
+		# is the deliberate stacking partner rather than a rival: both pay per
+		# parry, so a single turned blade takes TWO turns off every cooldown he
+		# holds. What the Rage buys back is FORMLESS, the most expensive card in
+		# his pool at 35.
+		"Answering Steel":
+			return Ability.make({"display_name": "Answering Steel", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
+				"anim": "attack02", "special": "answering_steel",
+				"perfect_id": "", "perfect_text": "+20% parry instead of +15%, and holds 6 turns instead of 4",
+				"description": "Let the blade answer. For 4 turns your\nparry chance is +15%, and every attack\nyou PARRY grants 15 Rage and takes a\nturn off all your cooldowns. It pays\ntempo, not damage — Riposte's counter\nstill answers as well."})
+		# AXIS: being neither, and both. The stance is the spec's one binary and
+		# every card in his pool sits on one side of it; this is the card that
+		# refuses the question for three turns.
+		#
+		# TWO IMPLEMENTATION CALLS, BOTH DELIBERATE AND BOTH WRITTEN DOWN (§3):
+		# · **HE COUNTS AS BOTH STANCES FOR STANCE-GATED ABILITIES**, so every
+		#   gated card in his kit is usable during the window. THAT is what makes
+		#   this a build-enabler rather than a stat buff, and it is decided at
+		#   `_ability_usable` — the same door BW's gated cards are refused at —
+		#   so the greyed button, the bot's pool and the cast cannot disagree.
+		# · **GUARD CHANGE IS REFUSED WHILE IT HOLDS**, at that same door: there
+		#   is no stance to change.
+		#
+		# SYNERGY: SEVER and BATTLE POISE are the two cards it exists for — an
+		# Aggressive build gets the Defensive window and a Defensive build gets
+		# the Aggressive one, without giving up the guard his passive reads.
+		# FEIGNED GUARD is the cheaper, narrower version of the same idea (it
+		# satisfies the OTHER gate; this satisfies BOTH) and they compose. It is
+		# also the one window in which a DISCIPLINE build can cast its gated
+		# cards without switching. The recoil is what SEASONED FIGHTER's own two
+		# downsides look like paid at once, so a build that can spend the two
+		# turns behind a WARDEN's taunt pays very little for it.
+		"Formless":
+			return Ability.make({"display_name": "Formless", "cost": 35,
+				"damage": 0, "pressure": 0, "delay": 2.5, "cooldown": 6,
+				"anim": "attack03", "special": "formless",
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Hold no guard at all. For 3 turns you\ndeal +15% damage AND take 15% less —\nboth stances' upsides and neither\ndownside — and you count as BOTH\nstances for anything that requires one.\nYou cannot Guard Change. When it ends\nyou suffer BOTH downsides for 2 turns."})
 		# ----- PYROMANCER: different answers to how do you commit -----
 		# AXIS: spending wide instead of deep. Detonation empties one bank;
 		# this skims every bank, and Overburn refunds every turn it takes.

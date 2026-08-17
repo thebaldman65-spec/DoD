@@ -224,7 +224,7 @@ func _pools() -> void:
 	# which is what pinning a count is for.
 	# The CLASS side staying at 24 is the half that must NOT move, and it is
 	# asserted separately above — CB adds no class card.
-	ok(spec_total == 87,
+	ok(spec_total == 96,
 		"§1: ...at 60 plus CB's Mage nine and CE's Cleric nine, with no class card among them (%d)"
 			% spec_total)
 
@@ -419,9 +419,19 @@ func _draft_flow() -> void:
 	# shape bo, br and bx already carry.
 	var worn_hero := {"key": "warrior", "spec": "berserker", "bm_abilities": [],
 		"draft_refused": []}
+	#
+	# REBUILT BY BATCH CI, AND THE ARITHMETIC MOVED WHERE THE HERO USED TO. CI
+	# took the three WARRIOR pools 5 -> 8, so refusing three of a Berserker's own
+	# cards leaves FIVE and the offer fills full. **THERE IS NOWHERE LEFT TO MOVE
+	# IT TO** — every spec drafts eight and every class six, and the draft is 120
+	# of 120 — so the construction is written RELATIVE TO THE LIVE POOL SIZE
+	# instead: refuse the whole class pool and everything but two of his own.
+	# That is test_batch_bx's shape, it is the only one that cannot go stale
+	# again, and it states the rule as it actually is — an offer never pads with
+	# repeats, whatever wore the pool down.
+	var wq_spec: Array = Classes.spec_draft_pool("berserker")
 	worn_hero["draft_refused"] = Classes.class_draft_pool("warrior").duplicate()
-	for wq in Classes.spec_draft_pool("berserker").slice(0, 3):
-		worn_hero["draft_refused"].append(wq)
+	worn_hero["draft_refused"].append_array(wq_spec.slice(0, wq_spec.size() - 2))
 	var worn: Array = run.roll_draft_offer(worn_hero)
 	ok(worn.size() == 2,
 		"§1: a pool worn down to two still fills SHORT rather than padding (%d)" % worn.size())
@@ -1008,7 +1018,7 @@ func _docs() -> void:
 	var master := _src("res://docs/master.html")
 	# THE STAMP GATE, SEVENTH COPY (see test_batch_bp's note). It reads the
 	# CURRENT batch, not BQ's, and all seven move together.
-	ok(master.contains("Batch CH"), "§5: master.html is stamped for the current batch")
+	ok(master.contains("Batch CI"), "§5: master.html is stamped for the current batch")
 	for cls in TRANCHE_3:
 		for nm in TRANCHE_3[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)

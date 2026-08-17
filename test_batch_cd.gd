@@ -55,7 +55,14 @@ const DRAFT_TARGET := 120    # 96 + 24
 # tranche 3 has already paid" rather than one class.
 # RE-POINTED AGAIN BY BATCH CH: the HUNTER three joined them, so the list is
 # NINE and what is left outside it is the WARRIOR three alone.
-const DEEP_SPECS := ["pyromancer", "cryomancer", "arcanist",
+# RE-POINTED BY BATCH CI, AND IT IS THE LAST TIME — the WARRIOR three joined
+# too, so the list is ALL TWELVE and there is nothing left outside it. **WHAT
+# IT NAMES IS NO LONGER "the pools tranche 3 has paid" BUT SIMPLY THE POOLS**,
+# and what the loop below guards changes with it: it asserted an ASYMMETRY for
+# three batches and it asserts the FLATNESS now, so a pool that quietly empties
+# trips where before it would have read as the old debt returning.
+const DEEP_SPECS := ["berserker", "warden", "swordmaster",
+	"pyromancer", "cryomancer", "arcanist",
 	"holy", "inquisitor", "occultist",
 	"beastmaster", "sharpshooter", "mystic"]
 
@@ -243,7 +250,7 @@ func _target() -> void:
 	# rule — so there it can be held to the stricter form: the string at all.
 	var master := _src("res://docs/master.html")
 	ok(not master.contains("~96"), "master.html carries no ~96 at all")
-	ok(master.contains("111 of 120"), "master.html states 111 of 120")
+	ok(master.contains("120 of 120"), "master.html states 120 of 120")
 	ok(master.contains("96 spec"), "...and names the 96-card spec half")
 	var classes := _src("res://scripts/classes.gd")
 	for phrase in STALE_TARGET_PHRASES:
@@ -270,12 +277,17 @@ func _target() -> void:
 	# reference carry the LIVE count against the REAL target? Only the correct
 	# answer moved — CE paid tranche 3's second third, so the draft is 102 and
 	# what is owed is the Hunter and Warrior thirds.
-	ok(block.contains("111 OF 120") or block.contains("111 of 120"),
-		"...it states 111 of 120")
-	# RE-POINTED BY BATCH CH: the Hunter third is paid, so what the standing
-	# block has to name is NINE owed rather than eighteen.
-	ok(block.contains("9 ARE OWED") or block.contains("9 are owed"),
-		"...and names the 9 still owed")
+	ok(block.contains("120 OF 120") or block.contains("120 of 120"),
+		"...it states 120 of 120")
+	# RE-POINTED BY BATCH CI, AND IT IS AN INVERSION: the Warrior third is paid,
+	# so the standing block must no longer name ANYTHING as owed. Asserting the
+	# absence of a debt is what keeps §6's "rewrite rather than patch" honest —
+	# a block that still said "9 are owed" beside a 120-of-120 count would be
+	# exactly the half-edited prose CD's own sweep exists to catch.
+	ok(block.contains("NOTHING IS OWED") or block.contains("nothing is owed"),
+		"...and states that NOTHING is owed")
+	ok(not block.contains("9 ARE OWED") and not block.contains("9 are owed"),
+		"...and no longer names a debt that has been paid")
 	# No suite may carry the stale denominator either: a test whose MESSAGE
 	# states a wrong target teaches it to whoever reads the failure — and four
 	# suites carried it in exactly that form. This file is the one legitimate
@@ -310,15 +322,19 @@ func _pools() -> void:
 		for n in pool:
 			seen[String(n)] = 1
 		ok(seen.size() == pool.size(), "%s's pool holds no duplicate" % spec)
-	ok(spec_total == 87, "SPEC_DRAFT_POOLS holds 87 entries (got %d)" % spec_total)
-	ok(spec_total == 9 * 8 + 3 * 5,
-		"...which is NINE at eight and THREE at five (Batch CH)")
+	ok(spec_total == 96, "SPEC_DRAFT_POOLS holds 96 entries (got %d)" % spec_total)
+	ok(spec_total == 12 * 8,
+		"...which is ALL TWELVE at eight — the draft is complete (Batch CI)")
 	var class_total := 0
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		class_total += (Classes.CLASS_DRAFT_POOLS[cls] as Array).size()
 	ok(class_total == CLASS_TARGET,
 		"CLASS_DRAFT_POOLS is full at %d (got %d)" % [CLASS_TARGET, class_total])
-	ok(spec_total + class_total == 111, "the draft stands at 111")
-	ok(DRAFT_TARGET - (spec_total + class_total) == 9,
-		"9 are owed — the WARRIOR third of tranche 3, and it is the last of it")
-	ok(SPEC_TARGET - spec_total == 9, "...and every one of them is a SPEC card")
+	ok(spec_total + class_total == 120, "the draft stands at 120 of 120")
+	# INVERTED BY BATCH CI RATHER THAN DELETED. This asserted a DEBT for four
+	# batches; the debt is paid, so what it asserts now is that there is none —
+	# which is the thing a later batch could actually break (a pool emptying, a
+	# card quietly removed), and it is still the same question.
+	ok(DRAFT_TARGET - (spec_total + class_total) == 0,
+		"NOTHING is owed — the draft is complete at 120 of 120")
+	ok(SPEC_TARGET - spec_total == 0, "...and the spec half is full at 96")
