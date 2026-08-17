@@ -192,23 +192,31 @@ func _pools() -> void:
 	# unchanged and is still what tells the two answers apart; what is owed now
 	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
 	for spec in ["pyromancer", "cryomancer", "arcanist",
-			"holy", "inquisitor", "occultist"]:
+			"holy", "inquisitor", "occultist",
+			"beastmaster", "sharpshooter", "mystic"]:
 		ok(Classes.spec_draft_pool(spec).size() == 8,
 			"%s drafts EIGHT (got %d)"
 				% [spec, Classes.spec_draft_pool(spec).size()])
-	for spec in ["beastmaster", "sharpshooter", "mystic",
-			"berserker", "warden", "swordmaster"]:
+	# RE-POINTED BY BATCH CH, AND IT IS THE SIXTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, then CB's new asymmetry, then that asymmetry HALVED at
+	# CE, and now QUARTERED — the HUNTER three joined the Mage and Cleric at
+	# EIGHT when tranche 3's third third landed, so NINE pools are eight deep and
+	# only the WARRIOR THREE are still at five. The question is unchanged and is
+	# still what tells the two answers apart; what is owed is the Warrior third,
+	# and it is the LAST of the debt, so it has to stay visible in code.
+	for spec in ["berserker", "warden", "swordmaster"]:
 		var pool: Array = Classes.spec_draft_pool(spec)
 		ok(pool.size() == 5, "%s is still FIVE (got %d)" % [spec, pool.size()])
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12, "there are twelve spec pools")
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 78, "the spec pools hold 78 (60 + CB's Mage nine + CE's Cleric nine), got %d" % total)
+	ok(total == 87, "the spec pools hold 78 (60 + CB's Mage nine + CE's Cleric nine), got %d" % total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 102,
+	ok(draft_total == 111,
 		"the whole draft is 102 of a target 120 (got %d)" % draft_total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH WARRIOR POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
@@ -448,7 +456,17 @@ func _status_registry() -> void:
 	var battle_src := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	var dn_at := battle_src.find("const DISPEL_NEVER")
 	ok(dn_at > 0, "DISPEL_NEVER exists")
-	var dn_body := battle_src.substr(dn_at, 1400)
+	# RE-POINTED BY BATCH CH, AND THE CHECK IS STRICTLY BETTER FOR IT. This read
+	# a FIXED 1400-BYTE WINDOW from `const DISPEL_NEVER`, which is an accident of
+	# how long the comments inside that block happened to be rather than the
+	# question — CH appended `reacquire` with a reason above it and pushed
+	# `vendetta` off the end, failing against CORRECT code. It slices to the
+	# const's own CLOSING BRACKET now, so the window is the list itself and no
+	# future comment can move it. Same shape as BW's own tail-versus-run repair
+	# one section down: an assertion keyed on POSITION rather than on membership
+	# stops asking its question the moment the block is edited.
+	var dn_end := battle_src.find("]", dn_at)
+	var dn_body := battle_src.substr(dn_at, maxi(dn_end - dn_at, 0))
 	for id in ["blood_debt", "vendetta"]:
 		ok(dn_body.contains('"%s"' % id),
 			"`%s` is in DISPEL_NEVER — a Dispel must not strip the party's own mark"
@@ -604,10 +622,10 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CG"), "master.html is stamped Batch CG")
+	ok(master.contains("Batch CH"), "master.html is stamped Batch CH")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("102 of"), "master.html states the new draft count")
+	ok(master.contains("111 of"), "master.html states the new draft count")
 	ok(master.contains("Builds with"),
 		"and the draft tables still carry the synergy line a player reads")
 	var chlog := FileAccess.get_file_as_string("res://docs/changelog.html")

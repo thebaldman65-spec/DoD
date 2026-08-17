@@ -179,7 +179,8 @@ func _pools() -> void:
 	# WARRIOR six from FIVE. What is owed has to stay visible in code rather than
 	# only in prose, which is the whole reason this loop keeps moving.
 	for spec in ["pyromancer", "cryomancer", "arcanist",
-			"holy", "inquisitor", "occultist"]:
+			"holy", "inquisitor", "occultist",
+			"beastmaster", "sharpshooter", "mystic"]:
 		var pool: Array = Classes.spec_draft_pool(spec)
 		ok(pool.size() == 8, "%s drafts EIGHT (got %d)" % [spec, pool.size()])
 		var seen := {}
@@ -187,24 +188,32 @@ func _pools() -> void:
 			seen[String(n)] = 1
 		ok(seen.size() == pool.size(),
 			"%s's pool holds no duplicate — a repeat keeps the count and changes the draft" % spec)
-	for spec in ["beastmaster", "sharpshooter", "mystic",
-			"berserker", "warden", "swordmaster"]:
+	# RE-POINTED BY BATCH CH, AND IT IS THE SIXTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, then CB's new asymmetry, then that asymmetry HALVED at
+	# CE, and now QUARTERED — the HUNTER three joined the Mage and Cleric at
+	# EIGHT when tranche 3's third third landed, so NINE pools are eight deep and
+	# only the WARRIOR THREE are still at five. The question is unchanged and is
+	# still what tells the two answers apart; what is owed is the Warrior third,
+	# and it is the LAST of the debt, so it has to stay visible in code.
+	for spec in ["berserker", "warden", "swordmaster"]:
 		ok(Classes.spec_draft_pool(spec).size() == 5,
 			"%s is still at FIVE — its third of tranche 3 is owed" % spec)
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 78, "the spec pools hold 78 (69 + this batch's nine), got %d"
+	ok(total == 87, "the spec pools hold 78 (69 + this batch's nine), got %d"
 		% total)
-	ok(total == 6 * 8 + 6 * 5, "...which is six at eight and six at five")
+	ok(total == 9 * 8 + 3 * 5,
+		"...which is NINE at eight and THREE at five (Batch CH)")
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 102, "the draft holds 102 of a target 120 (got %d)"
+	ok(draft_total == 111, "the draft holds 111 of a target 120 (got %d)"
 		% draft_total)
-	ok(120 - draft_total == 18,
-		"18 are owed — the Hunter and Warrior thirds of tranche 3")
-	ok(96 - total == 18, "...and every one of them is a SPEC card")
+	ok(120 - draft_total == 9,
+		"9 are owed — the WARRIOR third of tranche 3, and it is the last of it")
+	ok(96 - total == 9, "...and every one of them is a SPEC card")
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR/BT/CB negative control.
 	for cls in Classes.CLASS_DRAFT_POOLS:
@@ -469,9 +478,9 @@ func _empower_split() -> void:
 func _docs() -> void:
 	var doc := _src("res://docs/master.html")
 	ok(doc != "", "master.html is readable")
-	ok(doc.contains("Last updated: 2026-08-16 (Batch CG)"),
+	ok(doc.contains("Last updated: 2026-08-16 (Batch CH)"),
 		"master.html carries the LIVE stamp")
-	ok(doc.contains("102 of 120") or doc.contains("102 of a target 120"),
+	ok(doc.contains("111 of 120") or doc.contains("111 of a target 120"),
 		"master.html states the LIVE draft count against the REAL target")
 	for n in NINE:
 		ok(doc.contains(n), "master.html's draft table lists %s" % n)

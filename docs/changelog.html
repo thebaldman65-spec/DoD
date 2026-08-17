@@ -13,6 +13,180 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-16 &mdash; Batch CH: tranche 3, the HUNTER nine (the Hunter is the third class complete)</h2>
+<p><i>Nine spec draft abilities, three per Hunter spec. The Hunter pools go 5 &rarr; 8 and the draft
+goes 102 &rarr; <b>111 of a target 120</b>. <b>THE HUNTER IS THE THIRD CLASS COMPLETE</b> and CB's
+asymmetry is quartered: nine specs draft from EIGHT and only the three WARRIOR specs draft from
+FIVE, so all that is owed is the Warrior third &mdash; nine cards, and it is the last of the debt.
+Nothing else ships: no talent node, no magnitude, no existing ability changed, no save version
+moves (still v10). <b>FOUR new unit-side fields for nine abilities</b>, and every one of them is a
+case a status cannot hold.</i></p>
+
+<h3>&sect;0 &mdash; THREE OF THE BRIEF'S NINE NAMES COLLIDED WITH LIVE CONTENT, AND ALL THREE MOVED</h3>
+<p>The brief predicted a crowded Hunter vocabulary and said to run the Batch BR &sect;1 sweep anyway
+and <b>treat a near-miss as a hit</b>. The sweep came back with three hits, and one of them was not
+a near-miss at all.</p>
+<ul>
+<li><b>HARVEST IS A LIVE ABILITY, IN THE VERY POOL THIS SPEC DRAWS FROM AT A ZONE BOSS.</b> It sits
+in <code>SPEC_POOLS["mystic"]</code> and <code>CLASS_POOLS["hunter"]</code> and has since Batch 33.
+<code>Classes.pool_ability</code> is keyed on <code>display_name</code>, so a second Harvest makes
+the resolver answer the wrong question &mdash; <b>a REAL BREAK by BR &sect;1, not a label collision
+to be flagged</b> &mdash; and the <b>mechanic duplicated too</b> (consume every status on one enemy
+for damage scaling on the count), which is the Deadfall/Snare Trap failure this batch's own &sect;1
+warns about. <b>So the name moved AND the shape did: the card is CULL</b>, and it throws the reaping
+at the WHOLE FIELD where Harvest empties one body and heals him. Neither dominates.</li>
+<li><b>KINDRED IS A LIVE BEASTMASTER CAPSTONE</b> (<code>bm_kindred</code>, devotion row 8) reading
+the same Loyalty depth, in the same spec, and mechanically adjacent to the card. That is closer than
+BW's Grudge, and BW's precedent decides it: the node's id is save-bearing and its ranks travel with
+it, while the card was unshipped, <b>so the CARD moved</b>. It is <b>SUCCESSION</b>.</li>
+<li><b>TRIPLE TAP sits one word from TRIPLE SHOT</b>, the same spec's live boss-pool ability and
+also three strikes on one target. Nothing breaks (<code>pool_ability</code> reads the whole name),
+but a player holding both would see two nearly identical names on one sheet. It is <b>DRUMFIRE</b>,
+and the two now point opposite ways: Triple Shot <i>spends</i> a deep meter, Drumfire <i>builds</i>
+one.</li>
+<li><b>UNLEASH KEEPS ITS NAME AND CHANGED SHAPE.</b> The name is clean against every ability, node,
+status and rune &mdash; it appears only as prose inside Bestial Wrath's description, which is
+reported rather than resolved. What was NOT clean is the mechanic: <b>PRIMAL SURGE</b> (Beastmaster
+boss pool) already spends Loyalty for a companion strike, and the brief's version was a strict
+subset of it. Unleash is one companion at a steeper rate <b>carrying Break</b> on a longer cooldown,
+against the Surge's pack-wide conversion plus a lasting damage buff.</li>
+</ul>
+<p>The other five names &mdash; Last Howl, Reacquire, Fault Line, Stalking Horse, Downwind &mdash;
+are clean against every ability, talent node, status and rune.</p>
+
+<h3>&sect;1 &mdash; BEASTMASTER: keep it, move it, spend it</h3>
+<p><b>LAST HOWL</b> (20 Mana, 1.5, 4cd, self): for the <b>rest of the battle</b>, every companion
+that falls pays him <b>+2% strike damage per stack of Loyalty it had earned</b> (Perfect: 3%).
+<b>IT IS NOT VENGEANCE AND MUST NEVER BE WRITTEN AS "KEEP THE DEAD BEAST'S BOON"</b> &mdash; that is
+the <code>bm_vengeance</code> node, which inherits the <i>boon</i>. This carries the <i>meter</i> to
+the <i>hunter</i>, and a hero holding both gets both. It reads the meter <b>as it stood when the
+beast fell</b>, above Steadfast Bond's rewrite three lines below, because the whole card is that the
+meter outlives the body. <b>PER-COMPANION</b>: under The Pack two beasts falling pay twice, each for
+what IT earned. It is the <b>fifth user of the one implementation of "this unit deals N% more
+damage"</b>, so it composes additively with Battle Shout, Warcry, Resonant Field and Reckless
+Abandon.</p>
+<p><b>SUCCESSION</b> (20 Mana, 1.5, 4cd, self): for 4 turns (Perfect: 6) a swap hands the bond on
+&mdash; the arriving companion starts holding <b>half the Loyalty of the one it replaces</b>.
+<b>THE BRIEF'S PREMISE WAS HALF STALE AND THE CODE IS RIGHT</b> (the AR &sect;6 / BU / CB
+precedent): a swap has NEVER cost Loyalty (Batch BO &sect;5 corrected exactly this), because the
+meter lives on the hunter's dict per kind and only a DEATH breaks it. So a returning beast already
+keeps its depth, and what "starting it at nothing" truly describes is a kind never fielded. <b>It
+RAISES, never assigns</b> &mdash; rotating into a deeper bond must not cost depth, which is the one
+way a card sold on carrying the bond forward could be worse than not holding it. Under The Pack the
+swap evicts the SHALLOWER bond, so what it carries forward is the smaller meter.</p>
+<p><b>UNLEASH</b> (25 Mana, 2.5, 4cd, one enemy, 12 BD): his <b>deepest</b> companion strikes
+immediately for <b>20% of Attack per stack</b> of its Loyalty (Perfect: 25%), and that meter resets
+to zero. <b>Under The Pack it reads the ACTIVE companion only</b>, resolved through
+<code>_deepest_bond</code> &mdash; BX &sect;3's ONE implementation of which companion an ORDERED
+action goes to, and also the bigger meter, which is the right read for a card whose subject is the
+meter. <b>ITS BREAK IS FLAT AND MUST STAY FLAT</b>: the stack count is uncapped, and a per-stack
+Break term on an uncapped meter is the squaring trap Arcane Bolt, Requiem and Pyre Wake each
+refused.</p>
+
+<h3>&sect;2 &mdash; SHARPSHOOTER: the exception, the threshold, the depth</h3>
+<p><b>REACQUIRE</b> (20 Mana, 1.5, 4cd, one enemy): names one enemy for the rest of the battle.
+Leaving it <b>BANKS</b> his Focus instead of clearing it; returning hands the bank back whole.
+Switching between any two OTHER targets still clears. Perfect: 25 Focus on the mark at once.
+<b>It is written as a BANK rather than as a refusal to clear</b>, so every Focus reader in the game
+sees an honest zero while he is away; and it reads the mark's own <code>src_name</code>, so a second
+Sharpshooter can never collect on the first one's quarry.</p>
+<p><b>FAULT LINE</b> (20 Mana, 1.5, 4cd, self): for 4 turns (Perfect: 6), while his Focus stands
+ABOVE the conversion point, every attack he lands also deals <b>20 Break damage</b>. Two gaps at
+once: the first card in the pool to read the conversion threshold at all, and <b>the only Break
+lever the HUNTER CLASS has anywhere</b>. <b>IT READS <code>focus_convert()</code> AND NEVER A LITERAL
+100</b> &mdash; Deep Focus moves the split point down, and a card watching a hardcoded hundred would
+silently stop agreeing with the passive in exactly the build that bought the node (Vespers learned
+this against <code>mercy_threshold</code>). It is added ABOVE Broken Will and the Breaker runes, so
+every existing Break multiplier answers it &mdash; and so does the Occultist's <b>Breaking
+Darkness</b>, which is the cross-roster reach &sect;2 sells it on.</p>
+<p><b>DRUMFIRE</b> (25 Mana, 3.0, 3cd, one enemy, 6 BD a shot): three arrows at one mark, 14% of
+Attack each, and <b>EACH ONE counts separately for Focus</b> (Perfect: a fourth arrow, counted like
+the rest). <b>THIS IS BR &sect;1'S HITS-NOT-CASTS RULE ARRIVING AT THE FOCUS ENGINE FOR THE FIRST
+TIME</b>: that engine has been called once per CAST since AZ, so every existing multi-hit ability
+builds ONE stack of Focus however many arrows it throws. It counts inside the hit loop and shares the
+splash's <code>final &gt; 0</code> gate, so a missed or blocked arrow feeds nothing. <b>THE STREAK IS
+ROLLED BACK BETWEEN HITS</b> &mdash; <code>same_target_turns</code> is what UNWAVERING's ramp reads
+and it counts TURNS, so letting three arrows advance it three times would silently triple a shipped
+node's magnitude off a card that never mentions it.</p>
+
+<h3>&sect;3 &mdash; SURVIVALIST (<code>mystic</code>): draw it, spread it, spend it</h3>
+<p><b>THE POOL KEY IS <code>mystic</code></b>, exactly as the Devout's is <code>inquisitor</code>.
+<code>SPEC_INFO["mystic"]</code> carries the display name "Survivalist" and master.html prints
+"Survivalist", so the docs and the code disagree BY DESIGN; a <code>"survivalist":</code> key would
+raise nothing, resolve nothing, and ship three cards no hero could ever be offered.</p>
+<p><b>STALKING HORSE</b> (25 Mana, 2.0, 4cd, self): for 3 turns (Perfect: 4) enemies are drawn to
+swing at him, and <b>every attacker takes a DIFFERENT affliction</b> &mdash; Poison, Cripple, Slowed,
+Exposed, Dazed, Blind, in turn. <b>It REUSES the existing draw</b> (the site Savage Presence,
+Threatening Presence and Ghillie Suit already live on) rather than inventing a second taunt.
+<b>EVERY ID IN THE CYCLE IS IN <code>DEBUFF_IDS</code>, and that is load-bearing</b>: Trapper's
+breadth term counts that curated list ONLY, so an affliction outside it would apply, log and read as
+working while paying his multiplier nothing &mdash; the card would do exactly half of what it says
+with nothing to announce it. It pays out when a blow <b>LANDS</b>, not when one is declared (BL
+&sect;1 declares a turn early and re-validates at resolution), and its <b>poison goes through
+<code>_apply_poison</code></b> so it is HIS poison rather than a bare status wearing the name.</p>
+<p><b>DOWNWIND</b> (25 Mana, 2.0, 5cd, self): for 3 turns (Perfect: 4) every harmful effect any hero
+lands on an enemy is <b>copied onto a second enemy</b>, preferring one that does not already carry
+it. He is the one spec in the game whose passive an ally can feed &mdash; Trapper's breadth counts
+statuses from ANY source &mdash; and nothing had ever exploited it. <b>It covers every hero, himself
+included, and that is ONE RULE rather than a carve-out</b>: excluding the caster would make the card
+read as inert on every turn he spent applying his own board.</p>
+<p><b>CULL</b> (30 Mana, 3.0, 5cd, one enemy): consumes every affliction on one enemy, and EVERY
+enemy takes <b>10% of Attack in nature damage per status removed</b> (Perfect: 12%). <b>It
+deliberately fights his own passive</b> &mdash; the breadth he spent the fight building is what it
+eats &mdash; and that tension is intended. It reads <code>_harvest_yield</code>, the ONE answer to
+"what would this reap", so it and Harvest can never disagree about what a sticky poison is worth, and
+it MEASURES the purge rather than predicting it (BA &sect;7's repair, inherited). <b>Its Break is
+ZERO on a card that genuinely deals damage</b>, because the multiplier is an uncapped count of
+afflictions and a Break term riding it is the squaring trap from a fourth direction (Pyre Wake's
+precedent).</p>
+
+<h3>&sect;4 &mdash; six statuses, and the split between the two lists</h3>
+<p>Five sit on a HERO (<code>last_howl</code>, <code>succession</code>, <code>fault_line</code>,
+<code>stalking_horse</code>, <code>downwind</code>) and are correctly ABSENT from
+<code>DEBUFF_IDS</code>. <b><code>reacquire</code> sits on an ENEMY and is a MARK</b>, so it is
+absent from <code>DEBUFF_IDS</code> too &mdash; a battle-long entry there reads as 999 turns
+remaining and a mender's longest-first Cleansing Rite would take it every single time &mdash; <b>AND
+it is in <code>DISPEL_NEVER</code></b>, because <code>_dispellable_buffs</code> is DERIVED from that
+absence and would otherwise let a Mage's own Dispel strip the Sharpshooter's mark FOR the enemy
+wearing it. That is BU's Suffering trap and BW's mark trap meeting at one card. Unleash, Drumfire and
+Cull resolve inside the cast that fires them and carry nothing.</p>
+
+<h3>&sect;5 &mdash; the fill-short constructions moved off the Hunter, and two faults the repair found</h3>
+<p><b>TWO fill-short constructions were built on a Hunter hero and both moved to a WARRIOR</b>, who
+is the only class still at five: <code>test_batch_bq</code>'s onto a <b>Berserker</b> and
+<code>test_batch_br</code>'s onto a <b>Swordmaster</b>. Each refused its hero's whole CLASS pool plus
+three of his own spec cards to leave exactly two standing; with the Hunter pools at eight that leaves
+FIVE and the offer comes up full, so the check would have stopped asking its question. <b>This is the
+same forced move test_batch_bo made at BW, and the same honest signal: a construction that has to
+relocate is how a paid debt announces itself.</b> <code>test_batch_bo</code>'s and
+<code>test_batch_bx</code>'s versions already stood on a Berserker and a Warden and needed nothing.
+<b>WHEN THE WARRIOR THIRD LANDS there will be no five-deep pool left in the game</b> and both have to
+move a third time, onto a hero worn down by <code>draft_refused</code> alone.</p>
+<p><b>THE REPAIR PASS FOUND TWO FAULTS IN THIS BATCH'S OWN CODE, AND THAT IS WHY RE-RUNNING THE OLDER
+SUITES IS NOT A FORMALITY.</b> <code>test_batch_bo</code> walks every draft entry and asserts each
+carries a perfect: <b>REACQUIRE SHIPPED WITH AN EMPTY <code>perfect_text</code></b>, and it now takes
+25 Focus on the mark. Writing that fix surfaced the second: <b>DRUMFIRE CARRIED
+<code>perfect_extra_hit: false</code> WHILE ITS PERFECT TEXT PROMISED A FOURTH ARROW</b> &mdash;
+copied from Triple Shot, whose perfect is a guaranteed crit instead. The flag is back at its default
+and the promise is true.</p>
+
+<h3>&sect;6 &mdash; documentation, and a stamp-gate count corrected</h3>
+<p><code>docs/master.html</code> carries the nine new rows, the summary table and the corrected count
+(<b>111 of 120</b>, 9 owed) and is stamped Batch CH; <code>CLAUDE.md</code> and this changelog carry
+the same. <b>THE MASTER.HTML STAMP GATE IS DUPLICATED FOURTEEN TIMES, NOT THIRTEEN, AND BOTH CE'S AND
+CG'S COUNTS WERE WRONG IN DIFFERENT WAYS</b> &mdash; CE said fourteen and named
+<code>test_batch_cd</code>, which carries no stamp gate at all; CG corrected it to thirteen and
+dropped <code>test_batch_ce</code>, which does carry one. The fourteen are ah, bb, bn, bo, bp, bq, br,
+bs, bt, bu, bv, bw, bx <b>and ce</b>, and all fourteen moved to Batch CH.</p>
+
+<h3>&sect;7 &mdash; flagged and shipped untuned, to be watched in play</h3>
+<p><b>FAULT LINE'S 20 BD is the number this batch trusts least</b> (Threshold's 15 and Breaking
+Darkness's 50 are the precedent). It is the only Break the Hunter class has, so too low and the lever
+does not exist; too high and one draft card outdoes a Warden's whole Threat lane, which AL measured at
+320 BD a battle. <b>LAST HOWL'S 2% A STACK</b> reads a meter with no ceiling: at the 50 Loyalty Batch
+AY measured on a DEVOTION build, a single companion's death is +100% strike damage. <b>UNLEASH'S 20% A
+STACK</b> has the same property from the other side. <b>DO NOT PRE-TUNE ANY OF THE THREE.</b></p>
+
 <h2>2026-08-16 &mdash; Batch CG: the CE revision (seven changes to the Cleric nine)</h2>
 <p><i>Seven changes to the nine Cleric cards Batch CE shipped: two renames with new mechanics,
 one card deleted and replaced, one card re-specced, one rename with a re-spec, one magnitude

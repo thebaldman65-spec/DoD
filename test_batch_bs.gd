@@ -349,7 +349,7 @@ func _rune_audit() -> void:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CG"), "§5: master.html is stamped Batch CG")
+	ok(master.contains("Batch CH"), "§5: master.html is stamped Batch CH")
 	ok(master.contains("TWO clauses"),
 		"§5: master.html's Overburn entry states two clauses")
 	ok(master.contains("Holding fire\ncosts him nothing.</b>")

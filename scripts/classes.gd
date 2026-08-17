@@ -261,10 +261,10 @@ const CLASS_POOLS := {
 # eighteen abilities against a target of 120, so an offer of three often came
 # up two or one. It fills SHORT rather than padding with repeats, which is
 # AP §3's existing rule for upgrade offers applied unchanged.
-# (BATCH BW took every spec to five, BATCH CB the Mage three to eight and BATCH
-# CE the Cleric three, so the draft is 102 of 120 and an offer fills short only
-# when the run has already REFUSED or taken most of a pool — never because of
-# which hero drew it.)
+# (BATCH BW took every spec to five, BATCH CB the Mage three to eight, BATCH CE
+# the Cleric three and BATCH CH the Hunter three, so the draft is 111 of 120 and
+# an offer fills short only when the run has already REFUSED or taken most of a
+# pool — never because of which hero drew it.)
 const SPEC_DRAFT_POOLS := {
 	# WARRIOR — THE DEBT BO LEFT OPEN, CLOSED IN BATCH BP AND PAID OFF IN BATCH
 	# BW. All three pools were NAMED AND EMPTY, so one of four heroes in every
@@ -281,11 +281,11 @@ const SPEC_DRAFT_POOLS := {
 	# COMPLETE. BT took the three Mage pools to five (tranche 2's first third),
 	# BU the Cleric three, BV the Hunter three and BW the Warrior three; CB
 	# lands tranche 3's first third here and CE its second.
-	# THE ASYMMETRY IS STILL THERE AND IT STILL POINTS THE SAME WAY, only
-	# smaller: the MAGE AND CLERIC six draft from EIGHT and the HUNTER AND
-	# WARRIOR six from FIVE, so what is owed is the Hunter and Warrior thirds of
-	# tranche 3 — eighteen cards, nine apiece. test_batch_ce asserts both
-	# halves, so the debt stays visible in code rather than only in prose.
+	# THE ASYMMETRY IS STILL THERE AND IT STILL POINTS THE SAME WAY, smaller
+	# again: since BATCH CH the MAGE, CLERIC AND HUNTER NINE draft from EIGHT and
+	# the WARRIOR THREE from FIVE, so all that is owed is the Warrior third of
+	# tranche 3 — nine cards. The draft suites assert both halves, so the last
+	# of the debt stays visible in code rather than only in prose.
 	"pyromancer": ["Cinderfall", "Ember Debt", "Slow Burn", "Stoke",
 		"Funeral Pyre", "Firedraw", "Pyre Wake", "Emberkeep"],
 	"cryomancer": ["Winter's Toll", "Rimebinding", "Flash Freeze",
@@ -308,13 +308,21 @@ const SPEC_DRAFT_POOLS := {
 		"Blessing of the Faithful", "Mantle"],
 	"occultist": ["Blight the Well", "Covenant of Ash", "Suffering",
 		"Transference", "Anointing", "Breaking Darkness", "Requiem", "Penance"],
-	# HUNTER — FIVE APIECE SINCE BATCH BV (tranche 2's third third).
+	# HUNTER — EIGHT APIECE SINCE BATCH CH, AND THE HUNTER IS THE THIRD CLASS
+	# COMPLETE. BV took the three pools to five (tranche 2's third third); CH
+	# lands tranche 3's third third here. THE SURVIVALIST'S KEY IS `mystic` AND
+	# HAS BEEN SINCE THE SPEC WAS NAMED — `SPEC_INFO["mystic"]` carries the
+	# display name "Survivalist" and master.html prints "Survivalist", so the
+	# docs and the code disagree BY DESIGN, exactly as they do for the Devout.
+	# A `"survivalist":` entry here would raise nothing, resolve nothing, and
+	# ship three cards no hero could ever be offered.
 	"beastmaster": ["Twin Hunt", "Call the Wilds", "Bloodbond", "Savage Sweep",
-		"Ghostpack"],
+		"Ghostpack", "Last Howl", "Succession", "Unleash"],
 	"sharpshooter": ["Called Volley", "Quarry's Mark", "Crossfire",
-		"Calibrating Shot", "Trophy Shot"],
+		"Calibrating Shot", "Trophy Shot", "Reacquire", "Fault Line",
+		"Drumfire"],
 	"mystic": ["Choking Smoke", "Snare Line", "Loaded Shot", "Hunt",
-		"Preparation"],
+		"Preparation", "Stalking Horse", "Downwind", "Cull"],
 }
 
 # CLASS-WIDE DRAFT ABILITIES — COMPLETE (Batch BR). Six per class,
@@ -330,8 +338,8 @@ const SPEC_DRAFT_POOLS := {
 # EIGHT, which makes the spec target 12 x 8 = 96 and the whole draft 96 + 24 =
 # 120. test_batch_bt has asserted depth 8 since CB, so the tests encoded the
 # right figure while three comments in this file and master.html carried the
-# old one. 18 are still owed and every one of them is a SPEC card: the Hunter
-# and Warrior thirds of tranche 3, nine apiece.
+# old one. 9 are still owed and every one of them is a SPEC card: the WARRIOR
+# third of tranche 3, and it is the last of it.
 #
 # This block read "48 ... spec pools remain thin at two apiece" from BR until
 # BW corrected it toward the code: TRANCHE 2 IS COMPLETE and every spec pool is
@@ -546,7 +554,7 @@ static func pool_ability(display_name: String) -> Ability:
 	return Talents.granted_ability(display_name)
 
 
-# --- THE DRAFTED ABILITIES — ONE HUNDRED AND TWO OF A TARGET 120 (BO..CE) ----
+# -- THE DRAFTED ABILITIES — ONE HUNDRED AND ELEVEN OF A TARGET 120 (BO..CH) --
 #
 # BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
 # six WARRIOR entries as owed rather than pretending the pools were full.
@@ -560,9 +568,10 @@ static func pool_ability(display_name: String) -> Ability:
 # BATCH BV the HUNTER nine and BATCH BW the WARRIOR nine — nine spec cards
 # apiece, three per spec — so all twelve specs draft from at least FIVE and no
 # offer fills short for a SPEC reason any more.
-# TRANCHE 3 IS TWO THIRDS PAID: BATCH CB took the three MAGE pools to EIGHT and
-# BATCH CE the three CLERIC pools, so THE CLERIC IS THE SECOND CLASS COMPLETE.
-# The Hunter and Warrior thirds are what is left — 18 cards, nine apiece.
+# TRANCHE 3 IS THREE QUARTERS PAID: BATCH CB took the three MAGE pools to EIGHT,
+# BATCH CE the three CLERIC pools and BATCH CH the three HUNTER pools, so THE
+# HUNTER IS THE THIRD CLASS COMPLETE. The WARRIOR third is what is left — 9
+# cards, and it is the last debt the draft carries.
 #
 # EVERY ABILITY NAMES THE AXIS IT SERVES, in its comment. That rule is here
 # because the twelve tree batches spent themselves removing nodes that existed
@@ -2710,6 +2719,257 @@ static func draft_ability(display_name: String) -> Ability:
 				"special": "penance",
 				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
 				"description": "Set the penance: for 3 turns that enemy\ntakes shadow damage equal to 50% of\nthe damage it deals, whoever it hits.\nAn enemy that never swings never pays."})
+		# ========== BATCH CH: TRANCHE 3, THE HUNTER NINE ==========
+		#
+		# A CONTIGUOUS BLOCK (CB's and CE's shape), but the AXIS/SYNERGY check
+		# still anchors PER ABILITY — a shared header must not satisfy all nine.
+		#
+		# THREE OF THE BRIEF'S NINE NAMES COLLIDED WITH LIVE CONTENT AND ALL
+		# THREE MOVED. The brief predicted a crowded vocabulary and said to treat
+		# a near-miss as a hit; the sweep came back with worse than near-misses.
+		# `Kindred` is a live Beastmaster CAPSTONE (`bm_kindred`, devotion row 8)
+		# reading the same Loyalty depth, so the card is SUCCESSION (BW's
+		# Vendetta precedent: the node's id is save-bearing and the card was
+		# unshipped, so the CARD moves). `Triple Tap` sits one word from TRIPLE
+		# SHOT, the same spec's live boss-pool ability and also three strikes on
+		# one target, so the card is DRUMFIRE. `Harvest` was not a near-miss at
+		# all — see CULL below.
+		#
+		# ----- BEASTMASTER: keep it, move it, spend it.
+		# THE GAP ALL THREE ARE AUTHORED AGAINST: LOYALTY IS THE ONLY RESOURCE IN
+		# THE GAME THAT CAN DIE, and until now nothing let him do anything about
+		# that except mourn it. BV's three protected the partnership; these three
+		# treat the METER as a thing he can carry, move and spend.
+		#
+		# AXIS: the meter outliving the body it was earned on. Every other
+		# Beastmaster card reads a LIVING bond; this one is the only thing in his
+		# pool that pays BECAUSE the bond broke.
+		# IT IS NOT VENGEANCE AND MUST NEVER BE WRITTEN AS "KEEP THE DEAD BEAST'S
+		# BOON" — that is the `bm_vengeance` node, which inherits the BOON (the
+		# `_bond_mult` curve plus its own +30%) for the rest of the battle. This
+		# carries the METER to the HUNTER as a personal strike-damage buff, which
+		# is a different quantity arriving in a different place. A hero holding
+		# both gets both, and that stacking is INTENDED — Vengeance keeps the
+		# companion's multiplier alive, Last Howl pays the man.
+		# SYNERGY: STEADFAST BOND above all (it leaves a share of the meter
+		# standing, so the same beast can pay twice), plus NONE LEFT BEHIND and
+		# WILD ROTATION — every node that makes a beast's death routine. And it
+		# is the deliberate counterpart to BLOODBOND, which spends a card
+		# stopping the death this one is paid for.
+		"Last Howl":
+			return Ability.make({"display_name": "Last Howl", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
+				"anim": "attack01", "special": "last_howl", "no_skill_check": true,
+				"perfect_id": "", "perfect_text": "3% a stack instead of 2%",
+				"description": "Swear the last howl: for the rest of the\nbattle, every companion that falls\ngives you +2% strike damage per stack\nof Loyalty it had earned. The meter\nbreaks as it always did — this is paid\nout of what it held, not instead."})
+		# AXIS: the rotation stops costing the bond. THE PACK's whole lane is
+		# named for cycling companions, and BJ measured 0.05 swaps a trash
+		# battle — a verb nobody uses. BM removed the TURN cost (Instinctive
+		# Rotation); this removes the DEPTH cost, which is the half a hunter
+		# actually feels once the meter is uncapped.
+		# READ THE PREMISE CAREFULLY, BECAUSE THE BRIEF'S IS HALF STALE AND THE
+		# CODE IS RIGHT: a swap has NEVER cost Loyalty (BO §5 corrected exactly
+		# this), because the meter lives on the HUNTER's dict per kind and only a
+		# DEATH breaks it. So a RETURNING beast already keeps its own depth, and
+		# what "starting it at nothing" truly describes is a kind that has never
+		# been fielded. This card is what makes the FIRST rotation into a fresh
+		# beast cheap, and it is deliberately a no-op when the incoming beast
+		# already holds more than half of what is leaving.
+		# SYNERGY: WILD ROTATION and QUICK WHISTLE (the two nodes that make him
+		# swap often), MENAGERIE (which pays for kinds fielded), and THE PACK
+		# itself — under the capstone `_swap_victim` evicts the SHALLOWER bond,
+		# so what this carries forward is the smaller of his two meters.
+		"Succession":
+			return Ability.make({"display_name": "Succession", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
+				"anim": "attack01", "special": "succession", "no_skill_check": true,
+				"perfect_id": "", "perfect_text": "Holds 6 turns instead of 4",
+				"description": "For 4 turns a swap hands on the bond:\nthe arriving companion starts with HALF\nthe Loyalty of the one it replaces,\ninstead of whatever it had earned\nbefore. It never lowers a deeper bond."})
+		# AXIS: the meter as AMMUNITION. Loyalty pays continuously and has no
+		# ceiling, so a Beastmaster's only question about it is how deep it can
+		# get — never when to cash it. This is the answer, and it is deliberately
+		# a BAD trade most of the time: the curve he empties is what every other
+		# card of his reads.
+		# IT IS NOT PRIMAL SURGE, AND THE DISTINCTION IS SHAPE RATHER THAN SIZE
+		# (BT's Stabilize/Arcane Bolt rule, through the Hunter door). Primal
+		# Surge is a boss-pool card that spends EVERY companion's meter for 15% a
+		# stack apiece AND leaves him a lasting +10% damage; it is a pack-wide
+		# conversion on a 2-turn cooldown. This is ONE companion, at 20% a stack,
+		# carrying BREAK and leaving nothing behind, on a 4-turn cooldown. Deep
+		# on one bond it out-bursts the Surge and cracks a meter the Hunter has
+		# no other way to crack; across two bonds the Surge pays more and keeps
+		# paying. NEITHER DOMINATES, which is the bar BD §4 sets.
+		# ITS BREAK IS FLAT AND MUST STAY FLAT: the stack count has no ceiling,
+		# and a per-stack Break term on an uncapped meter is the squaring trap
+		# Arcane Bolt, Requiem and Pyre Wake each refused from their own side.
+		# SYNERGY: ABSOLUTE DEVOTION and ANCIENT PACT (the two nodes that steepen
+		# the per-stack curve), UNBROKEN WATCH and SHARED DEVOTION (which fill
+		# the meter faster), and LAST HOWL above — spend the bond, then be paid
+		# again when the body that carried it falls.
+		"Unleash":
+			return Ability.make({"display_name": "Unleash", "cost": 25,
+				"damage": 0, "pressure": 12, "delay": 2.5, "cooldown": 4,
+				"anim": "attack02", "special": "unleash",
+				"perfect_id": "", "perfect_text": "25% of Attack a stack instead of 20%",
+				"description": "Spend the whole bond at once: your\ndeepest companion strikes immediately\nfor 20% of your Attack PER STACK of\nits Loyalty, with Break behind it.\nThat meter resets to zero.\nRequires a companion with Loyalty."})
+		# ----- SHARPSHOOTER: the exception, the threshold, the depth.
+		# THE GAP ALL THREE ARE AUTHORED AGAINST: his pool reads the meter's
+		# FIRST hundred points and nothing else. Focus converts at 100 — every
+		# point below buys crit CHANCE, every point above buys crit MULTIPLIER —
+		# and before this batch not one card in the game read that threshold.
+		#
+		# AXIS: pricing the spec's central decision instead of removing it.
+		# Switching targets clears Focus, which is the whole cost of his spine;
+		# UNWAVERING (the node) pays him for never switching and SPRAY OF ARROWS
+		# opts out of the meter entirely. This is the third answer — he may
+		# juggle exactly TWO enemies deliberately, and pays a card slot for it.
+		# Switching between any other pair still clears normally, so the spine is
+		# intact and what he bought is one named exception.
+		# SYNERGY: TROPHY SHOT and OVERKILL (the two things that already carry
+		# Focus through a kill, so a marked enemy dying costs him nothing at
+		# all), QUARRY'S MARK (a second name on a second body — the two marks are
+		# separate and stack), and CROSSFIRE, which wants a deep meter aimed at
+		# whichever of the two is worth the crit.
+		"Reacquire":
+			return Ability.make({"display_name": "Reacquire", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
+				"anim": "attack01", "special": "reacquire",
+				"perfect_id": "", "perfect_text": "He takes 25 Focus on the mark at once",
+				"description": "Name one enemy for the rest of the\nbattle. Leaving it BANKS your Focus\ninstead of clearing it, and returning\nto it gives the banked meter back.\nSwitching between any two OTHER\ntargets still clears as it always did."})
+		# AXIS: the half of his own passive nothing has ever read, and the Break
+		# lever his whole CLASS lacks. Two separate reasons, and the second is
+		# the one that reaches past this spec: the Hunter has no Break tool
+		# anywhere in twelve specs' worth of kit, so a Sharpshooter holding this
+		# is the only Hunter who can open a boss's meter for the party.
+		# IT READS `focus_convert()` AND NEVER A LITERAL 100. DEEP FOCUS MOVES
+		# THE SPLIT POINT DOWN (floor 1), so a card watching a hardcoded hundred
+		# would silently stop agreeing with the passive in exactly the build that
+		# bought the node — the `mercy_threshold` lesson Vespers already learned.
+		# SYNERGY: DEEP FOCUS above all (it lowers the line this watches),
+		# UNWAVERING and MUSCLE MEMORY (which get him over it), and it reaches
+		# across the roster to the OCCULTIST's BREAKING DARKNESS, which amplifies
+		# every source of Break damage in the game — this one included.
+		"Fault Line":
+			return Ability.make({"display_name": "Fault Line", "cost": 20,
+				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
+				"anim": "attack01", "special": "fault_line", "no_skill_check": true,
+				"perfect_id": "", "perfect_text": "Holds 6 turns instead of 4",
+				"description": "For 4 turns, while your Focus stands\nABOVE the conversion point, every\nattack you land also deals 20 Break\ndamage. Deep Focus moves that line\ndown with it."})
+		# AXIS: driving an uncapped meter DEEP inside a single turn. Every other
+		# way he builds Focus pays once per turn on one mark, so the meter's
+		# depth is a function of how many turns he stays — this is the only thing
+		# that makes it a function of what he CASTS.
+		# IT IS NOT TRIPLE SHOT, AND THE TWO POINT OPPOSITE WAYS. Triple Shot
+		# (boss pool) is 18% a shot with every arrow rolling its own critical —
+		# it SPENDS a deep meter, and its own description calls itself a crit
+		# lottery. This is 14% a shot and each arrow feeds the engine
+		# SEPARATELY, so it BUILDS one. Cheaper, softer, and pointed at the other
+		# end of the same resource; a Sharpshooter holding both opens with this
+		# and closes with that.
+		# THE PER-HIT FOCUS IS BR §1'S RULE ARRIVING AT THE FOCUS ENGINE. That
+		# engine has been called once per CAST since AZ, so every existing
+		# multi-hit ability builds one stack of Focus however many arrows it
+		# throws; this is the first ability in the game to count hits there, and
+		# it says so in its own text because a player will assume otherwise.
+		# SYNERGY: UNWAVERING (its ramp is per-turn, so three hits multiply what
+		# the streak already pays), MUSCLE MEMORY, QUARRY'S MARK (which doubles
+		# every one of the three), and FAULT LINE above — three counted hits is
+		# the fastest way over the line it watches.
+		"Drumfire":
+			return Ability.make({"display_name": "Drumfire", "cost": 25,
+				"damage": 14, "multi_hits": 3, "pressure": 6, "delay": 3.0,
+				"anim": "attack02", "cooldown": 3,
+				# `perfect_extra_hit` IS LEFT AT ITS DEFAULT (true), UNLIKE TRIPLE
+				# SHOT'S, and the two are the reason each other reads the way it
+				# does: Triple Shot buys a guaranteed CRIT with its perfect because
+				# it is the card that spends the meter, and this buys a fourth
+				# ARROW because it is the card that fills one. A fourth arrow is a
+				# fourth COUNTED hit, which is the only perfect on this card that
+				# is about its own mechanic rather than about damage.
+				"perfect_id": "",
+				"perfect_text": "A fourth arrow, counted like the rest.",
+				"description": "Three arrows at one mark, 14% of\nAttack each — and EACH ONE counts\nseparately for Focus, where every\nother volley in the game counts once.\nThe fastest way to a deep meter."})
+		# ----- SURVIVALIST (`mystic`): draw it, spread it, spend it.
+		# THE GAP ALL THREE ARE AUTHORED AGAINST: TRAPPER PAYS FOR BREADTH — +8%
+		# damage per DIFFERENT status on the target — and nothing in his kit has
+		# ever helped him GET breadth except applying afflictions one at a time,
+		# by hand, off his own turns.
+		#
+		# AXIS: the taunt that builds his own engine. He has no draw of any kind
+		# today, and a plain taunt on a 100-Constitution spec would be a Warden
+		# card in the wrong tree — the DIFFERENT-STATUS-PER-ATTACKER clause is
+		# the whole ability, because it turns being attacked into the breadth his
+		# passive promises and nothing has ever delivered.
+		# EVERY STATUS IT LAYS IS IN `DEBUFF_IDS`, AND THAT IS LOAD-BEARING
+		# RATHER THAN TIDY: Trapper's breadth term counts the curated list ONLY,
+		# so a status outside it would apply, log, and read as working while
+		# contributing nothing at all to his multiplier — the card would do
+		# exactly half of what it says with nothing to announce it.
+		# SYNERGY: FORCE OF NATURE and VULTURE (the two nodes paid per different
+		# affliction), HUNT and CULL below (both priced on the count), and HIT
+		# AND RUN, which grants Elusive every time he applies a status — a card
+		# that applies one per incoming attack keeps it up permanently.
+		"Stalking Horse":
+			return Ability.make({"display_name": "Stalking Horse", "cost": 25,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 4,
+				"anim": "attack01", "special": "stalking_horse", "no_skill_check": true,
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "Play the stalking horse for 3 turns:\nenemies are drawn to swing at YOU, and\nevery attacker takes a DIFFERENT\naffliction — Poison, then Cripple, then\nSlowed, Exposed, Dazed and Blind. Your\nown breadth, built off their turns."})
+		# AXIS: the party feeding his engine. Trapper's breadth term counts
+		# statuses from ANY source — his `PROTECTED_CORES` entry says so in as
+		# many words — and he is the ONLY spec in the game whose passive an ally
+		# can pay into. Nothing has ever exploited that, and this is the card
+		# that says it out loud.
+		# IT COVERS EVERY HERO, HIMSELF INCLUDED, AND THAT IS ONE RULE RATHER
+		# THAN A CARVE-OUT. Excluding him would make the card read as inert on
+		# any turn he spent applying his own afflictions, and an invisible
+		# special case at a shared door is exactly what this project keeps
+		# warning about. What it is SOLD on is still the allies — a Pyromancer's
+		# Burn, a Cryomancer's Chilled and an Occultist's whole board become his
+		# breadth, on a second body, for free.
+		# SYNERGY: any ally who applies statuses in volume — the OCCULTIST above
+		# all, then the CRYOMANCER and the PYROMANCER — plus his own QUARTERMASTER
+		# (which already puts his poison on his allies' blades) and CULL below,
+		# which cashes what this spreads.
+		"Downwind":
+			return Ability.make({"display_name": "Downwind", "cost": 25,
+				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
+				"anim": "attack01", "special": "downwind", "no_skill_check": true,
+				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
+				"description": "For 3 turns the wind carries it: every\nharmful effect any hero lands on an\nenemy is copied onto a SECOND enemy,\npreferring one that does not have it.\nHis engine, fed by the whole party."})
+		# AXIS: spending the breadth. It DELIBERATELY FIGHTS HIS OWN PASSIVE —
+		# what Trapper spent the fight building is what this eats — and that
+		# tension is the point of the card rather than a cost to be smoothed
+		# away.
+		# THE BRIEF CALLED THIS ONE HARVEST AND HARVEST IS A LIVE ABILITY, IN THE
+		# VERY POOL THIS SPEC DRAWS FROM AT A ZONE BOSS (`SPEC_POOLS["mystic"]`
+		# and `CLASS_POOLS["hunter"]`). That is not a label collision to flag:
+		# `pool_ability` is keyed on `display_name`, so a second Harvest makes
+		# the resolver answer the wrong question — a REAL BREAK by BR §1 — and
+		# the MECHANIC duplicated too, which is the Deadfall/Snare Trap failure
+		# this batch's own §1 warns about. So the name moved AND the shape did.
+		# HOW IT DIFFERS FROM HARVEST, AND NEITHER DOMINATES: Harvest empties ONE
+		# enemy for 12% of Attack a status and heals him the same — burst plus
+		# sustain, on one body. This empties one enemy and throws the reaping at
+		# the WHOLE FIELD for 10% a status apiece, heals nothing, costs more and
+		# returns more slowly. On a single target Harvest is strictly better; on
+		# a full field this is worth several times as much. It reads
+		# `_harvest_yield` — the ONE answer to "what would this reap" — so the
+		# two can never disagree about what a sticky poison is worth.
+		# ITS BREAK IS ZERO, AND THAT IS A DECISION ON A CARD THAT GENUINELY
+		# DEALS DAMAGE: the multiplier is a count of afflictions with no ceiling
+		# on it, so a Break term riding that count is the squaring trap from a
+		# fourth direction. Pyre Wake is the precedent and the reason is the same.
+		# SYNERGY: DOWNWIND above all (it spreads the board this cashes),
+		# STALKING HORSE (which builds it off enemy turns), and SLOW ACTING and
+		# PERFECTED TOXIN — both make a poison that CANNOT be cleansed, so it
+		# stays on the body and is honestly not paid for.
+		"Cull":
+			return Ability.make({"display_name": "Cull", "dmg_type": "nature",
+				"cost": 30, "damage": 0, "pressure": 0, "delay": 3.0,
+				"cooldown": 5, "anim": "attack03", "special": "cull",
+				"perfect_id": "", "perfect_text": "12% of Attack a status instead of 10%",
+				"description": "CONSUME every affliction on one enemy:\nEVERY enemy takes 10% of Attack in\nnature damage per status removed.\nA poison that cannot be cleansed stays\n— and is not paid for. It strips your\nown Trapper bonus from that body."})
 	return null
 
 

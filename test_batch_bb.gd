@@ -174,8 +174,20 @@ func _swap_rule_source() -> void:
 	var src := _src("res://scripts/battle.gd")
 	ok(src.contains("func _swap_victim("),
 		"§1: the swap victim has ONE implementation, `_swap_victim`")
-	ok(src.contains("_free_beast(hunter, _swap_victim(hunter))"),
-		"§1: `_do_summon` frees the beast `_swap_victim` names")
+	# RE-POINTED BY BATCH CH, AND THE QUESTION IS UNCHANGED — only the fragment
+	# moved. SUCCESSION has to read the OUTGOING bond's depth before the body
+	# leaves the field, so `_do_summon` names the victim into a local and frees
+	# THAT rather than nesting the call inside `_free_beast`. What this check
+	# exists to catch is `_do_summon` picking a victim by any route OTHER than
+	# `_swap_victim` (list order, `beasts[0]`, a second inline loop), and both
+	# halves below still catch exactly that: the victim is ASSIGNED from
+	# `_swap_victim` and the thing freed is that same local. This is the AZ
+	# Follow-Through / BQ Ghillie shape — a source needle keyed on an exact call
+	# form stops matching the moment a legitimate refactor puts a local in it.
+	ok(src.contains("var sc_victim: BattleUnit = _swap_victim(hunter)"),
+		"§1: `_do_summon` names its victim through `_swap_victim` and nothing else")
+	ok(src.contains("_free_beast(hunter, sc_victim)"),
+		"§1: ...and frees THAT beast")
 	# THE REGRESSION IS NAMED SO IT CANNOT BE 'FIXED' BACK. AY's rule shipped as
 	# `_free_beast(hunter, _beasts(hunter)[0])`, and its comment argued for it;
 	# both are gone, and the reason is recorded at the new site.
@@ -801,7 +813,7 @@ func _docs() -> void:
 	# is the canonical one and moves with every batch that touches the doc. What
 	# it is really guarding is that the doc was touched AT ALL. Bump it, do not
 	# delete it.
-	ok(doc.contains("Last updated: 2026-08-16 (Batch CG)"),
+	ok(doc.contains("Last updated: 2026-08-16 (Batch CH)"),
 		"§7: master.html carries the current batch's stamp")
 	ok(doc.contains("Rot"), "§7: §3a's modifier table has Rot back")
 	# The pool tables are verbatim — test_batch_ah asserts them too, so this is

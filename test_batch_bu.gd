@@ -173,19 +173,27 @@ func _pools() -> void:
 	# as an inversion rather than deleted — what matters is that the LAST unpaid
 	# third stays visible in code rather than only in prose.
 	for spec in ["beastmaster", "sharpshooter", "mystic"]:
-		ok(Classes.spec_draft_pool(spec).size() == 5,
-			"%s joined them at FIVE in Batch BV" % spec)
+		ok(Classes.spec_draft_pool(spec).size() == 8,
+			"%s drafts EIGHT since Batch CH — the Hunter is the third class complete" % spec)
 	# RE-POINTED BY BATCH BW, AND IT IS AN INVERSION: this asserted the WARRIOR
 	# three were still at TWO because that debt was real and had to stay visible
 	# in code. BW paid it, so tranche 2 is complete and what is asserted is that
 	# ALL TWELVE are five. A pool quietly emptying still trips.
+	# RE-POINTED BY BATCH CH, AND IT IS THE SIXTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, then CB's new asymmetry, then that asymmetry HALVED at
+	# CE, and now QUARTERED — the HUNTER three joined the Mage and Cleric at
+	# EIGHT when tranche 3's third third landed, so NINE pools are eight deep and
+	# only the WARRIOR THREE are still at five. The question is unchanged and is
+	# still what tells the two answers apart; what is owed is the Warrior third,
+	# and it is the LAST of the debt, so it has to stay visible in code.
 	for spec in ["berserker", "warden", "swordmaster"]:
 		ok(Classes.spec_draft_pool(spec).size() == 5,
 			"%s joined them at FIVE in Batch BW — tranche 2 is complete" % spec)
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 78, "the spec pools hold 78 (60 + CB's Mage nine + CE's Cleric nine), got %d" % total)
+	ok(total == 87, "the spec pools hold 78 (60 + CB's Mage nine + CE's Cleric nine), got %d" % total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH CLERIC POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
 	# two names would keep every count and change what the draft offers.
@@ -437,10 +445,10 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CG"), "master.html is stamped Batch CG")
+	ok(master.contains("Batch CH"), "master.html is stamped Batch CH")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("102 of"), "master.html states the current draft count")
+	ok(master.contains("111 of"), "master.html states the current draft count")
 	var chlog := FileAccess.get_file_as_string("res://docs/changelog.html")
 	ok(chlog.contains("Batch BU"), "the changelog carries a BU entry")
 

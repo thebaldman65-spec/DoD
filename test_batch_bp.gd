@@ -123,7 +123,7 @@ func _pools() -> void:
 	# is 60 plus the Mage nine. The question — is the count what the batches
 	# claim they shipped — is unchanged; a pool quietly EMPTYING still trips,
 	# which is what pinning a count is for.
-	ok(total == 78,
+	ok(total == 87,
 		"§5+tranche 3: BO's eighteen, BP's six, tranche 2's thirty-six, CB's nine and CE's nine (got %d)" % total)
 	ok(Classes.SPEC_DRAFT_POOLS.size() == 12,
 		"§5: all twelve specs are named")
@@ -922,7 +922,7 @@ func _docs() -> void:
 	# test_batch_bs and test_batch_bu. The count grows by one each time a new
 	# suite checks the stamp, and every one of them is a suite this batch did
 	# not otherwise touch — which is the cost the duplication keeps charging.)
-	ok(master.contains("Batch CG"),
+	ok(master.contains("Batch CH"),
 		"§6: master.html's stamp is bumped to the current batch")
 	ok(changelog.contains("Batch BP"),
 		"§6: the changelog carries a Batch BP entry")

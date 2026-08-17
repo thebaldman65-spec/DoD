@@ -53,8 +53,11 @@ const DRAFT_TARGET := 120    # 96 + 24
 # RE-POINTED BY BATCH CE: the CLERIC three joined the Mage three at eight
 # when tranche 3's second third landed, so what this list names is "the pools
 # tranche 3 has already paid" rather than one class.
+# RE-POINTED AGAIN BY BATCH CH: the HUNTER three joined them, so the list is
+# NINE and what is left outside it is the WARRIOR three alone.
 const DEEP_SPECS := ["pyromancer", "cryomancer", "arcanist",
-	"holy", "inquisitor", "occultist"]
+	"holy", "inquisitor", "occultist",
+	"beastmaster", "sharpshooter", "mystic"]
 
 # The forms the dead denominator was written in, across four files. Matched as
 # PHRASES rather than as the bare number, for the reason at `_target` below.
@@ -240,7 +243,7 @@ func _target() -> void:
 	# rule — so there it can be held to the stricter form: the string at all.
 	var master := _src("res://docs/master.html")
 	ok(not master.contains("~96"), "master.html carries no ~96 at all")
-	ok(master.contains("102 of 120"), "master.html states 102 of 120")
+	ok(master.contains("111 of 120"), "master.html states 111 of 120")
 	ok(master.contains("96 spec"), "...and names the 96-card spec half")
 	var classes := _src("res://scripts/classes.gd")
 	for phrase in STALE_TARGET_PHRASES:
@@ -267,9 +270,12 @@ func _target() -> void:
 	# reference carry the LIVE count against the REAL target? Only the correct
 	# answer moved — CE paid tranche 3's second third, so the draft is 102 and
 	# what is owed is the Hunter and Warrior thirds.
-	ok(block.contains("102 OF 120") or block.contains("102 of 120"),
-		"...it states 102 of 120")
-	ok(block.contains("18"), "...and names the 18 still owed")
+	ok(block.contains("111 OF 120") or block.contains("111 of 120"),
+		"...it states 111 of 120")
+	# RE-POINTED BY BATCH CH: the Hunter third is paid, so what the standing
+	# block has to name is NINE owed rather than eighteen.
+	ok(block.contains("9 ARE OWED") or block.contains("9 are owed"),
+		"...and names the 9 still owed")
 	# No suite may carry the stale denominator either: a test whose MESSAGE
 	# states a wrong target teaches it to whoever reads the failure — and four
 	# suites carried it in exactly that form. This file is the one legitimate
@@ -304,14 +310,15 @@ func _pools() -> void:
 		for n in pool:
 			seen[String(n)] = 1
 		ok(seen.size() == pool.size(), "%s's pool holds no duplicate" % spec)
-	ok(spec_total == 78, "SPEC_DRAFT_POOLS holds 78 entries (got %d)" % spec_total)
-	ok(spec_total == 6 * 8 + 6 * 5, "...which is six at eight and six at five")
+	ok(spec_total == 87, "SPEC_DRAFT_POOLS holds 87 entries (got %d)" % spec_total)
+	ok(spec_total == 9 * 8 + 3 * 5,
+		"...which is NINE at eight and THREE at five (Batch CH)")
 	var class_total := 0
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		class_total += (Classes.CLASS_DRAFT_POOLS[cls] as Array).size()
 	ok(class_total == CLASS_TARGET,
 		"CLASS_DRAFT_POOLS is full at %d (got %d)" % [CLASS_TARGET, class_total])
-	ok(spec_total + class_total == 102, "the draft stands at 102")
-	ok(DRAFT_TARGET - (spec_total + class_total) == 18,
-		"18 are owed — the Hunter and Warrior thirds of tranche 3")
-	ok(SPEC_TARGET - spec_total == 18, "...and every one of them is a SPEC card")
+	ok(spec_total + class_total == 111, "the draft stands at 111")
+	ok(DRAFT_TARGET - (spec_total + class_total) == 9,
+		"9 are owed — the WARRIOR third of tranche 3, and it is the last of it")
+	ok(SPEC_TARGET - spec_total == 9, "...and every one of them is a SPEC card")

@@ -3585,3 +3585,46 @@ instruction to verify rather than assume paid for itself twice in one batch. Wha
 recording is that the failed premise was not careless: it was a reasonable inference from a real
 change (BS did rename a node to dodge that exact collision — just a different node). **The most
 dangerous premise is the one that is nearly true.**
+
+
+## Batch CH — why three of the nine names moved, and what a name sweep is actually for
+
+The brief for the Hunter nine predicted a crowded vocabulary and asked for the standing name sweep
+to be run "anyway", with the instruction to treat a near-miss as a hit. That framing turned out to
+be too generous to itself: the sweep did not return near-misses, it returned a live ability.
+
+**HARVEST was already in the Survivalist's boss pool, and had been since Batch 33** — not a similar
+name, the same name, on the same spec, resolving through the same keyed resolver. And the mechanic
+matched too. The interesting question is why a brief written with real care could specify a card
+that already existed. The answer is that the brief was reasoning from the SHAPE OF THE POOL rather
+than from the pool: the Survivalist's draft pool has no spender, and "he needs a spender" is a true
+observation about the DRAFT pool that is false about the spec, because his spender lives in the
+boss pool instead. **A gap in one acquisition channel reads exactly like a gap in the design.**
+
+That generalises past this batch. The project now has two ability pools per spec with different
+acquisition channels, and the temptation each tranche is to audit the one being filled. The check
+that would have caught this is cheap and is not the name sweep: *before authoring, list what the
+spec can already have from every channel, not just the one you are adding to.*
+
+**KINDRED and TRIPLE TAP are the ordinary case and are worth recording only for the rule they
+confirm.** Both were flagged by the sweep working exactly as designed, and both moved rather than
+shipping-and-being-flagged, on Batch BW's Vendetta precedent: when a name collides with something
+whose id is save-bearing, the unshipped side is the side that moves. That rule is cheap to follow
+and it keeps being right.
+
+**The half of this worth carrying is about what a rename does NOT fix.** Renaming Harvest to Cull
+would have satisfied the resolver and left two abilities doing the same thing in the same spec —
+the Deadfall/Snare Trap failure, which took fourteen batches to notice and which this batch's own
+brief cited as the thing to avoid. **A name collision is usually a symptom; the duplicate mechanic
+underneath it is the fault.** Unleash is the same story without the name: it collided with nothing
+and duplicated Primal Surge outright. So the sweep that matters is not the one over names, it is
+the one over what the spec can already do — and the name sweep is valuable mostly because it is the
+thing that makes you look.
+
+**A smaller note, on tests finding this batch's own faults.** Re-running the older suites was not a
+formality: `test_batch_bo` walks every draft entry and asserts each carries a perfect, which caught
+Reacquire shipping with an empty one, and fixing that surfaced Drumfire promising a fourth arrow
+while carrying the flag that suppresses it. Neither would have failed a parse, a smoke or a live
+battle. **The suites that pay for themselves are the ones that assert a PROPERTY of every entry
+rather than facts about particular entries** — a per-entry loop written three tranches ago is what
+caught a card authored today.

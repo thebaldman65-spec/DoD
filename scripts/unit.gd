@@ -1232,6 +1232,24 @@ var metronome := 0            # Metronome: % of Focus that survives a payout
 var kindred := 0              # Kindred: the Loyalty depth that re-fires the arrival
 var free_swap := 0            # Instinctive Rotation: a swap costs no turn
 var ghost_pack := 0           # Ghost Pack: % power of a beastless companion strike
+# BATCH CH — the four the Hunter nine needed. Everything else those cards do is
+# carried by a STATUS, which expires by itself and cannot leak past a battle
+# (BQ's standard); these four are the cases a status cannot hold.
+var last_howl := 0            # Last Howl: % strike damage per Loyalty stack a
+                              # falling companion had earned (0 = not sworn).
+                              # ARMED, not timed — it stands for the rest of the
+                              # battle, so it cannot ride a duration.
+var last_howl_dmg := 0        # ...the buff it has paid out so far, accumulated.
+                              # SEPARATE FROM THE ARMING VALUE on purpose: one is
+                              # the rate, the other the total, and a single
+                              # counter holding both is AW's two-magnitudes trap.
+var reacquire_bank := 0       # Reacquire: the Focus banked while he is away from
+                              # the named mark. A BANK, not a duration — it waits
+                              # until he returns, however many turns that takes.
+var stalking_next := 0        # Stalking Horse: which affliction the NEXT attacker
+                              # takes. It must survive the status's own refresh,
+                              # so a re-cast does not restart the cycle at Poison
+                              # and hand the same enemy the same status twice.
 
 # Active statuses: {id, label, short, color, turns}
 var statuses: Array = []

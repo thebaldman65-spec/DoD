@@ -187,12 +187,19 @@ func _pools() -> void:
 	# third landed, so six pools are eight deep and six are five. The question is
 	# unchanged and is still what tells the two answers apart; what is owed now
 	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
+	# RE-POINTED BY BATCH CH, AND IT IS AN INVERSION OF THIS SUITE'S OWN SUBJECT.
+	# BV is the batch that took these three pools 2 -> 5, so this loop is where
+	# that debt was recorded; CH takes them 5 -> 8 and the Hunter is the third
+	# class complete, so what the loop asserts is the payment rather than the
+	# debt. BV's own five are still the FIRST five of each pool — a later tranche
+	# APPENDS, it does not rewrite — which the literal pins below still check.
 	var five := ["beastmaster", "sharpshooter", "mystic"]
 	for spec in five:
 		var pool: Array = Classes.spec_draft_pool(spec)
-		ok(pool.size() == 5, "%s drafts FIVE (got %d)" % [spec, pool.size()])
+		ok(pool.size() == 8, "%s drafts EIGHT since Batch CH (got %d)" % [spec, pool.size()])
 	for spec in ["pyromancer", "cryomancer", "arcanist",
-			"holy", "inquisitor", "occultist"]:
+			"holy", "inquisitor", "occultist",
+			"beastmaster", "sharpshooter", "mystic"]:
 		ok(Classes.spec_draft_pool(spec).size() == 8,
 			"%s drafts EIGHT since Batch CB/CE (got %d)"
 				% [spec, Classes.spec_draft_pool(spec).size()])
@@ -210,11 +217,11 @@ func _pools() -> void:
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 78, "the spec pools hold 78 (60 + CB's Mage nine + CE's Cleric nine), got %d" % total)
+	ok(total == 87, "the spec pools hold 78 (60 + CB's Mage nine + CE's Cleric nine), got %d" % total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 102,
+	ok(draft_total == 111,
 		"the whole draft is 102 of a target 120 (got %d)" % draft_total)
 	# TRANCHE 1's ENTRIES ARE STILL THE FIRST TWO OF EACH HUNTER POOL. A later
 	# tranche APPENDS; it does not rewrite. Pinned as literals because a swap of
@@ -595,10 +602,10 @@ func _strip_comments(src: String) -> String:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CG"), "master.html is stamped Batch CG")
+	ok(master.contains("Batch CH"), "master.html is stamped Batch CH")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
-	ok(master.contains("102 of"), "master.html states the new draft count")
+	ok(master.contains("111 of"), "master.html states the new draft count")
 	ok(master.contains("Builds with"),
 		"and the draft tables still carry the synergy line a player reads")
 	var chlog := FileAccess.get_file_as_string("res://docs/changelog.html")

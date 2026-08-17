@@ -142,7 +142,7 @@ func _pools() -> void:
 	# is 60 plus the Mage nine. The question — is the count what the batches
 	# claim they shipped — is unchanged; a pool quietly EMPTYING still trips,
 	# which is what pinning a count is for.
-	ok(total == 78,
+	ok(total == 87,
 		"§5+BP+tranche 3: seventy-eight ship — BO's 18, BP's 6, tranche 2's 36, CB's 9 and CE's 9 (got %d)"
 			% total)
 	# TRANCHE 1'S ENTRIES MUST STILL LEAD THEIR POOLS, which is the half of this
@@ -175,11 +175,19 @@ func _pools() -> void:
 	# unchanged and is still what tells the two answers apart; what is owed now
 	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
 	for spec in ["pyromancer", "cryomancer", "arcanist",
-			"holy", "inquisitor", "occultist"]:
+			"holy", "inquisitor", "occultist",
+			"beastmaster", "sharpshooter", "mystic"]:
 		ok(Classes.spec_draft_pool(spec).size() == 8,
 			"§5+tranche 3: %s drafts EIGHT" % spec)
-	for spec in ["beastmaster", "sharpshooter", "mystic",
-			"berserker", "warden", "swordmaster"]:
+	# RE-POINTED BY BATCH CH, AND IT IS THE SIXTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, then CB's new asymmetry, then that asymmetry HALVED at
+	# CE, and now QUARTERED — the HUNTER three joined the Mage and Cleric at
+	# EIGHT when tranche 3's third third landed, so NINE pools are eight deep and
+	# only the WARRIOR THREE are still at five. The question is unchanged and is
+	# still what tells the two answers apart; what is owed is the Warrior third,
+	# and it is the LAST of the debt, so it has to stay visible in code.
+	for spec in ["berserker", "warden", "swordmaster"]:
 		ok(Classes.spec_draft_pool(spec).size() == 5,
 			"§5+tranche 3: %s is still FIVE — its third is owed" % spec)
 	# THE WARRIOR POOLS ARE NAMED **AND FULL** — named and empty at BO, filled to
@@ -1183,7 +1191,7 @@ func _docs() -> void:
 	# TOGETHER or a batch that bumps the timestamp trips suites it never
 	# touched. (BO had its own copy phrased as "this batch"; it is the same
 	# gate.)
-	ok(master.contains("Batch CG"),
+	ok(master.contains("Batch CH"),
 		"§6: master.html is stamped for the current batch")
 	ok(master.contains("THE ABILITY DRAFT") or master.contains("The Ability Draft"),
 		"§6: ...and carries the draft's own section")

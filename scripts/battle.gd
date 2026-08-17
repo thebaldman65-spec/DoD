@@ -149,6 +149,24 @@ const STATUS_INFO := {
 		"The dark broken over it: every source\nof Break damage lands on this unit\nharder."],
 	"penance": ["Penance", "Pn", Color(0.70, 0.38, 0.78),
 		"Set to penance: takes shadow damage\nequal to half of the damage it deals,\nwhoever it hits."],
+	# BATCH CH — SIX STATUSES FOR NINE ABILITIES, AND THE SPLIT BETWEEN THE TWO
+	# LISTS IS BU'S SUFFERING TRAP AND BW'S MARK TRAP MET AT ONE CARD. FIVE sit
+	# on a HERO (`last_howl`, `succession`, `fault_line`, `stalking_horse`,
+	# `downwind`) and are correctly ABSENT from `DEBUFF_IDS`. `reacquire` sits on
+	# an ENEMY and is a MARK rather than an affliction, so it is absent from
+	# `DEBUFF_IDS` too — a battle-long entry there reads as 999 turns remaining
+	# and a mender's longest-first Cleansing Rite would take it every single
+	# time — AND it is in `DISPEL_NEVER`, because `_dispellable_buffs` is DERIVED
+	# from that absence and would otherwise let a Mage's own Dispel strip the
+	# Sharpshooter's mark FOR the enemy wearing it.
+	# Unleash, Drumfire and Cull all resolve inside the cast that fires them and
+	# carry no status at all.
+	"last_howl": ["Last Howl", "LH", Color(0.95, 0.75, 0.30), "The howl is sworn: every companion\nthat falls pays its whole Loyalty to\nthe hunter as strike damage, for the\nrest of the battle."],
+	"succession": ["Succession", "Sc", Color(0.85, 0.70, 0.40), "The bond is handed on: a companion\nswapped in starts with HALF the\nLoyalty of the one it replaces."],
+	"reacquire": ["Reacquire", "Rq", Color(0.90, 0.65, 0.25), "Named quarry: leaving this enemy\nBANKS his Focus instead of clearing\nit, and coming back gives it over."],
+	"fault_line": ["Fault Line", "FL", Color(0.80, 0.55, 0.20), "Reading the fault: while his Focus\nstands ABOVE the conversion point,\nevery attack he lands also deals\nBreak damage."],
+	"stalking_horse": ["Stalking Horse", "SH", Color(0.60, 0.80, 0.45), "Playing the stalking horse: enemies\nare drawn to swing at him, and each\nattacker takes a DIFFERENT affliction."],
+	"downwind": ["Downwind", "Dw", Color(0.55, 0.85, 0.55), "Downwind of the pack: every harmful\neffect any hero lands on an enemy is\ncopied onto a second one."],
 	"frostbite": ["Frostbite", "Fb", Color(0.45, 0.70, 0.95), "Frostbitten: healing received\nreduced by 50%."],
 	"stabilized": ["Stabilized", "St+", Color(0.55, 0.68, 0.95), "Grounded resonance: takes less\ndamage (10% per stack consumed)."],
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge is spent for this\nbattle — the storm has no feeding\nleft in it."],
@@ -373,6 +391,11 @@ var _releasing := false
 # before the stack did. Both flags are set and cleared in ONE place each.
 var _frostbinding := false
 var _frostbind_mirroring := false
+# BATCH CH — DOWNWIND's guard, on the same pattern and for the same reason.
+# The copy re-enters `_apply_status`, which would find the window still open
+# and copy again — a chain with no natural bound, because unlike CE's Mantle
+# there is no hop count decrementing toward zero.
+var _downwind_spreading := false
 # BATCH CG §3 — PENANCE'S MIRROR NEEDS THE SAME LOCK FOR THE SAME REASON. The
 # mirror is dealt to the marked enemy through `take_tick_damage`, which
 # re-enters `_on_damage_taken`, and the frame still names that enemy as the
@@ -3094,7 +3117,15 @@ func _player_turn(u: BattleUnit) -> void:
 				# `vespers` joins it there; `breaking_darkness`, `requiem` and
 				# `penance` each name ONE enemy and fall through to the ordinary
 				# target picker.
-				"divine_presence", "alms", "jubilee", "elevation"]:
+				# BATCH CH. FIVE of the nine have nothing to click: `last_howl`,
+				# `succession` and `fault_line` are windows on the hunter himself,
+				# `stalking_horse` makes him the mark rather than choosing one, and
+				# `downwind` covers the whole field, which is the same thing to this
+				# list. `unleash` and `cull` each name ONE enemy and `drumfire` is an
+				# ordinary attack — all three fall through to the target picker.
+				"divine_presence", "alms", "jubilee", "elevation",
+				"last_howl", "succession", "fault_line", "stalking_horse",
+				"downwind"]:
 			target = u  # self/party effects need no target choice
 		elif ab.special == "summon" and not ab.display_name.ends_with("Aguila"):
 			# Summons are self-casts — except the eagle, whose arrival dive
@@ -3511,6 +3542,37 @@ func _bot_drafted_pick(u: BattleUnit) -> Array:
 				if pn_e.attack > pn_pick.attack:
 					pn_pick = pn_e
 			return [ab, pn_pick]
+		# BATCH CH — THREE MORE, each closing a case where the default mark
+		# makes one of the Hunter nine read as inert in a smoke.
+		#
+		# CULL empties ONE enemy's board and bills the whole field for it, so it
+		# wants the WIDEST board on the table. Aimed at `mark` (the lowest-health
+		# enemy) it would very often reap two afflictions off something already
+		# dying and measure almost nothing — Requiem's case exactly.
+		if ab.special == "cull":
+			var cu_pick: BattleUnit = null
+			var cu_best := 0
+			for cu_e in foes:
+				var cu_n := _harvest_yield(cu_e)
+				if cu_n > cu_best:
+					cu_best = cu_n
+					cu_pick = cu_e
+			if cu_pick == null:
+				continue
+			return [ab, cu_pick]
+		# REACQUIRE names a body he means to come BACK to, so it wants the one
+		# whose fight is still ahead — the highest health, which on a boss node
+		# is the boss. A battle-long mark laid on the enemy about to die is a
+		# card spent on a corpse (Breaking Darkness's case, Arcane Echo's before
+		# it).
+		if ab.special == "reacquire":
+			var rq_pick: BattleUnit = foes[0]
+			for rq_e in foes:
+				if rq_e.is_boss and not rq_pick.is_boss:
+					rq_pick = rq_e
+				elif rq_e.is_boss == rq_pick.is_boss and rq_e.hp > rq_pick.hp:
+					rq_pick = rq_e
+			return [ab, rq_pick]
 		# BATCH BV — TWO MORE, same shape, same reason.
 		#
 		# HUNT is paid PER DIFFERENT AFFLICTION and `mark` is the lowest-health
@@ -4582,6 +4644,24 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# status and says so in the log), because the gate and the arithmetic are two
 	# different promises; test_batch_bw drives both.
 	if ab.special == "reckless_abandon" and u.resource < RECKLESS_STEP:
+		return false
+	# BATCH CH — UNLEASH NEEDS THE SAME THING PRIMAL SURGE NEEDS, and the gate
+	# sits beside it for that reason. BO §5's rule: a button that could only
+	# ever print a refusal is refused at the door instead, so the greyed
+	# tooltip, the bot's drafted-pick wrapper and the cast itself can never
+	# disagree. It asks the DEEPEST bond specifically, because that is the one
+	# companion it will actually spend (`_deepest_bond`, BX §3's one answer to
+	# which companion an ORDERED action goes to).
+	if ab.special == "unleash":
+		var ul_b: BattleUnit = _deepest_bond(u)
+		if ul_b == null or int(u.loyalty.get(ul_b.companion_kind, 0)) < 1:
+			return false
+	# CULL needs something to reap, and it asks `_harvest_yield` — the same
+	# function that decides what it is paid for, so the button and the payout
+	# can never disagree about whether a sticky poison counts. Shatter's and
+	# Cryoclasm's precedent: a spender with an empty board is a dud cast.
+	if ab.special == "cull" and not enemies.any(func(e): \
+			return not e.dead and _harvest_yield(e) > 0):
 		return false
 	# Primal Surge needs a beast with Loyalty to spend.
 	if ab.special == "primal_surge":
@@ -5720,6 +5800,25 @@ func _choose_enemy_action(u: BattleUnit) -> Dictionary:
 					logs.append(["   → Savage Presence: %s draws %s's attack" % [
 						sp_c.unit_name, u.unit_name], "#d8b880"])
 				break
+		# BATCH CH — STALKING HORSE DRAWS HERE, BESIDE SAVAGE PRESENCE, and it
+		# REUSES that machinery rather than inventing a second taunt. This is
+		# the one site in the game where a chosen mark is re-pointed, and
+		# Threatening Presence, Savage Presence and Ghillie Suit already live on
+		# it; a `mocked` taunt would have been a Warden card in a 100-stability
+		# Pressure spec's pool.
+		#
+		# IT SITS ABOVE THE EVASION RE-PICK ON PURPOSE. Ghillie Suit and
+		# Camouflage answer with `_evade_chance` immediately below, so a
+		# Survivalist holding a draw AND an evasion can still be lost track of
+		# — the two are allowed to disagree, and the later roll winning is the
+		# honest order of events (he baited them, then slipped anyway).
+		for sh_h in living:
+			if sh_h.has_status("stalking_horse") and target != sh_h:
+				if randf() < 0.01 * maxi(sh_h.status_power("stalking_horse"), 0):
+					logs.append(["   → Stalking Horse: %s draws %s away from %s" % [
+						sh_h.unit_name, u.unit_name, target.unit_name], "#70d878"])
+					target = sh_h
+				break
 		# Ghillie Suit: the Survivalist fades into the brush while any
 		# other ally still stands. ADDITIVE — the counter is the percentage
 		# chance itself (Batch BA: 65).
@@ -5874,7 +5973,11 @@ const DISPEL_NEVER := ["covenant", "quarry", "snare_line", "feinted",
 	# STILL CLEANSABLE, because `mocked` has always been — that is the same
 	# exposure The Whole Room's permanent taunt already carries, and inventing a
 	# carve-out for one card would make two permanent taunts behave differently.
-	"blood_debt", "vendetta"]
+	# BATCH CH — `reacquire` is the Sharpshooter's own named quarry, battle-long,
+	# laid on an enemy. Same two halves as the two marks above, for the same two
+	# reasons; the other five statuses the Hunter nine register sit on a HERO and
+	# belong in neither list.
+	"blood_debt", "vendetta", "reacquire"]
 
 
 func _dispellable_buffs(u: BattleUnit) -> Array:
@@ -7402,6 +7505,25 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# rather than anywhere that recomputes.
 			if attacker.has_status("reckless_abandon"):
 				raw *= 1.0 + attacker.status_power("reckless_abandon") / 100.0
+			# BATCH CH — LAST HOWL RIDES THE SAME READ, and it is the FIFTH
+			# user of the one implementation of "this unit deals N% more damage",
+			# so it composes ADDITIVELY with the four above rather than one of
+			# them silently winning.
+			#
+			# IT IS THE ONE OF THE FIVE THAT READS A FIELD RATHER THAN A STATUS
+			# POWER, AND THAT IS FORCED BY WHAT IT IS: the buff ACCUMULATES across
+			# every companion that falls, so its value is written after the status
+			# is applied and often several times over. A status power is a number
+			# stamped once at the cast; this is a running total, which is why
+			# `last_howl_dmg` is a SECOND field rather than a second meaning loaded
+			# onto the arming one (AW's two-magnitudes-two-fields rule).
+			#
+			# IT IS A STRIKE-DAMAGE BUFF ON THE HUNTER, NOT ON THE PACK: a beast's
+			# blows go through `_companion_hit`, which never reads this block, so
+			# the companions are correctly untouched. The card says strike damage
+			# and means his.
+			if attacker.last_howl_dmg > 0:
+				raw *= 1.0 + attacker.last_howl_dmg / 100.0
 			# Blood Price: strength bought with his own blood.
 			if attacker.has_status("blood_price"):
 				raw *= 1.25
@@ -7991,6 +8113,34 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			if det_target_burned and attacker.pressure_cooker > 0:
 				pr += 25
 				_log("   → Talent: Pressure Cooker — +25 BD", "#b0a8e0")
+			# BATCH CH — FAULT LINE. THE FIRST AND ONLY BREAK LEVER THE HUNTER
+			# CLASS HAS, in twelve specs' worth of kit.
+			#
+			# IT READS `focus_convert()` AND NEVER A LITERAL 100. DEEP FOCUS MOVES
+			# THE SPLIT POINT DOWN (floor 1), so a card watching a hardcoded
+			# hundred would silently stop agreeing with the passive in exactly the
+			# build that paid for the node — Vespers learned the same lesson
+			# against `mercy_threshold`, and the mis-write reads as the card merely
+			# being weak rather than as a bug.
+			#
+			# IT IS ADDED WHERE IT IS AMPLIFIABLE, on purpose: it sits ABOVE Broken
+			# Will and the Breaker runes, so every existing multiplier on Break
+			# answers it — and so does the OCCULTIST's BREAKING DARKNESS, which is
+			# the cross-roster reach §2 sells the card on.
+			#
+			# STRICTLY ABOVE THE LINE, not at it: the conversion point is where
+			# crit CHANCE stops paying and MULTIPLIER starts, so "above" is the half
+			# of his own meter this card exists to read. A PARRIED blow pays
+			# nothing, which is the rule the whole block above already follows.
+			if attacker.has_status("fault_line") \
+					and attacker.second_resource_name == "Focus" \
+					and attacker.second_resource > attacker.focus_convert() \
+					and ab.damage > 0 and not parried:
+				var fl_add: int = maxi(attacker.status_power("fault_line"), 0)
+				if fl_add > 0:
+					pr += fl_add
+					_log("   → Fault Line: %d Focus stands above the line — +%d BD" % [
+						attacker.second_resource, fl_add], "#e0a050")
 			# Broken Will: the Occultist grinds stability down harder.
 			if attacker.broken_will_ranks > 0:
 				pr = int(round(pr * (1.0 + 0.01 * attacker.broken_will_ranks)))
@@ -8576,6 +8726,38 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and not attacker.dead and randf() < 0.25:
 				_apply_status(attacker, "poison", 5, 0,
 					_dot_tick("poison", strike_target))
+			# BATCH CH — STALKING HORSE PAYS OUT HERE, BESIDE TRAPPER'S OWN BARB,
+			# and the position IS the card: it fires when an attack actually LANDS
+			# on him, not when one was declared at him. BL §1 declares an enemy's
+			# intent a turn early and re-validates it at resolution, so a version
+			# written at the draw would hand out afflictions for blows a stun, a
+			# Break or a dead body cancelled.
+			#
+			# EACH ATTACKER TAKES A DIFFERENT ONE, and the cycle index lives on the
+			# HUNTER rather than on the status, so a re-cast inside a standing
+			# window does not restart at Poison and hand the same body the same
+			# affliction twice — which is exactly the breadth the card is for.
+			#
+			# EVERY ID IN THE CYCLE IS IN `DEBUFF_IDS`, and that is load-bearing
+			# rather than tidy: Trapper's breadth term counts that curated list
+			# ONLY, so an affliction outside it would apply, log and read as working
+			# while paying his multiplier nothing at all.
+			#
+			# THE POISON GOES THROUGH `_apply_poison`, so it is HIS poison — his
+			# Attack, his Potent Toxins and the Venom lane's carriers all ride it. A
+			# bare `_apply_status` here would wear the name and pay none of it,
+			# which is Quartermaster's rule arriving through a second door.
+			if strike_target.has_status("stalking_horse") \
+					and not attacker.is_hero and not attacker.dead:
+				var sh_list: Array = STALKING_HORSE_STATUSES
+				var sh_id := String(sh_list[strike_target.stalking_next % sh_list.size()])
+				strike_target.stalking_next += 1
+				if sh_id == "poison":
+					_apply_poison(strike_target, attacker, 4)
+				else:
+					_apply_status(attacker, sh_id, 3, 0, 0, strike_target)
+				_log("   → Stalking Horse: %s took the bait — %s" % [
+					attacker.unit_name, String(STATUS_INFO[sh_id][0])], "#70d878")
 			# Immolate: whoever strikes the burning Pyromancer ignites — and
 			# that fresh Burn feeds his own engine, drain and all.
 			if strike_target.has_status("immolate") and not attacker.is_hero \
@@ -8876,6 +9058,32 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						_dmg_frame(attacker, ab.display_name)
 						if attacker.dead:
 							break
+			# BATCH CH — DRUMFIRE COUNTS ITS FOCUS HERE, INSIDE THE HIT LOOP, and
+			# it is BR §1's rule arriving at the Focus engine for the first time.
+			# That engine has been called once per CAST since AZ (the post-loop
+			# Sharpshooter block below), so every existing multi-hit ability builds
+			# ONE stack of Focus however many arrows it throws. This is the only
+			# ability in the game that counts hits there, and that IS the card.
+			#
+			# IT SITS BESIDE THE SPLASH AND SHARES ITS GATE for the same reason:
+			# `final > 0` means a MISSED, BLOCKED or absolutely-parried arrow feeds
+			# nothing. A meter fed by blows that never landed is not patience.
+			#
+			# THE STREAK IS ROLLED BACK BETWEEN HITS AND THAT IS LOAD-BEARING.
+			# `same_target_turns` is what UNWAVERING's ramp reads and it counts
+			# TURNS, not blows — letting three arrows advance it three times would
+			# silently triple a shipped node's magnitude off a card that never
+			# mentions it. Rolling it back leaves the ramp paying its correct value
+			# on each of the three, and the streak advancing exactly once.
+			if attacker.is_hero and not is_counter and final > 0 \
+					and ab.display_name == "Drumfire" \
+					and attacker.passive_id == "lethal_aim" \
+					and strike_target != null and not strike_target.is_hero \
+					and not attacker.dead:
+				if hit_i > 0:
+					attacker.same_target_turns = maxi(
+						attacker.same_target_turns - 1, 0)
+				_sharpshooter_focus(attacker, strike_target, ab)
 			# BATCH BR §1 — ARCANE ARROWS SPLASHES HERE, INSIDE THE HIT LOOP,
 			# AND THAT POSITION IS THE WHOLE RULE. Charges and the effects that
 			# ride them count HITS, not casts: a three-shot Aimed Volley spends
@@ -9247,8 +9455,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						attacker.unit_name, qm_h.unit_name], "#70d878")
 		# Sharpshooter: the Focus engine, the promised shot's spending, the
 		# pin, the called spot, and the spray's echo.
+		#
+		# BATCH CH — DRUMFIRE IS EXCLUDED HERE AND ONLY HERE. It has already fed
+		# the engine ONCE PER LANDED ARROW inside the hit loop above, so leaving
+		# it in this post-loop call as well would pay it a FOURTH time off a cast
+		# that threw three. The exclusion is BY NAME at the one site rather than a
+		# flag on the ability, because it is a statement about where this card's
+		# Focus is counted and not a property another card should be able to
+		# inherit by accident.
 		if attacker.is_hero and attacker.passive_id == "lethal_aim" \
 				and ab.damage > 0 and not is_counter and not _focus_safe(ab) \
+				and ab.display_name != "Drumfire" \
 				and target != null and not target.is_hero:
 			_sharpshooter_focus(attacker, target, ab)
 			# BATCH BV — CALIBRATING SHOT: Focus equal to a share of the target's
@@ -10040,6 +10257,50 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 			_frostbinding = true
 			_apply_status(fb_mate, "chilled", turns, power, tick, src, force)
 			_frostbinding = false
+	# BATCH CH — DOWNWIND. THE ONE SPEC IN THE GAME WHOSE PASSIVE AN ALLY CAN
+	# PAY INTO, finally given a card that says so: Trapper's breadth term counts
+	# afflictions from ANY source (his `PROTECTED_CORES` entry says exactly
+	# that), and nothing had ever exploited it.
+	#
+	# IT SITS BESIDE FROSTBIND'S COPY because it is the same shape — a status
+	# landing on one body appearing on a second — and ABOVE the per-status
+	# branches for Creeping Death's reason: `chilled`, `burn` and `poison` each
+	# return early below, so a hook underneath them would silently miss every
+	# affliction a Cryomancer, a Pyromancer or the Survivalist himself applies,
+	# which is most of what the card is for.
+	#
+	# IT COVERS EVERY HERO, HIMSELF INCLUDED, AND THAT IS ONE RULE RATHER THAN A
+	# CARVE-OUT. Excluding the caster would make the card read as inert on every
+	# turn he spent applying his own board, and an invisible special case at a
+	# shared door is the thing this file keeps warning about. Companions are
+	# excluded because a beast is not a hero applying an effect.
+	#
+	# IT PREFERS A BODY THAT DOES NOT ALREADY CARRY THE STATUS, because the
+	# whole point is BREADTH: copying onto an enemy that already has it deepens
+	# nothing and pays Trapper nothing. When every other enemy has it already it
+	# falls back to any of them, so the card never silently does nothing.
+	if not _downwind_spreading and not target.is_hero \
+			and src != null and src.is_hero and not src.is_companion \
+			and BattleUnit.DEBUFF_IDS.has(id) and id != "broken":
+		var dw_src: BattleUnit = null
+		for dw_h in heroes:
+			if not dw_h.dead and dw_h.has_status("downwind"):
+				dw_src = dw_h
+				break
+		if dw_src != null:
+			var dw_others: Array = enemies.filter(
+				func(e): return not e.dead and e != target)
+			var dw_fresh: Array = dw_others.filter(
+				func(e): return not e.has_status(id))
+			var dw_pool: Array = dw_fresh if not dw_fresh.is_empty() else dw_others
+			if not dw_pool.is_empty():
+				var dw_to: BattleUnit = dw_pool.pick_random()
+				_downwind_spreading = true
+				_apply_status(dw_to, id, turns, power, tick, src, force)
+				_downwind_spreading = false
+				_log("   → Downwind: %s carries from %s to %s" % [
+					String(STATUS_INFO[id][0]) if STATUS_INFO.has(id) else id,
+					target.unit_name, dw_to.unit_name], "#70d878")
 	# CREEPING DEATH sits HERE, above every per-status branch, because three of
 	# those branches (chilled, burn, poison) return early and a hook below them
 	# would silently miss the statuses a Cryomancer or a Pyromancer lands. It is
@@ -10891,6 +11152,38 @@ const LOYALTY_UNCAPPED := -1
 # curve reads x2 — EXACTLY today's doubling, so nothing a player learned
 # became wrong — and it keeps climbing past it.
 const BOND_STEP := 0.20
+# ---------- BATCH CH: the Hunter nine's five numbers, together ----------
+#
+# THREE OF THESE ARE FLAGGED AS UNTRUSTED AND SHIPPED TO BE WATCHED IN PLAY
+# rather than pre-tuned (Threshold's 15 and Breaking Darkness's 50 are the
+# precedent). They are gathered here so a reprice is one block, not a hunt.
+#
+# SUCCESSION_SHARE — half, and the card's name says so. A share rather than a
+# flat number because the meter it reads has no ceiling.
+const SUCCESSION_SHARE := 50
+# UNLEASH_BREAK — FLAT, and it must stay flat. The stack count it spends is
+# uncapped, so a per-stack Break term is the squaring trap Arcane Bolt, Requiem
+# and Pyre Wake each refused from their own side. 12 sits level with Trophy
+# Shot's and below Twin Hunt's, which is where a spender belongs.
+const UNLEASH_BREAK := 12
+# FAULT_LINE_BD — **FLAGGED, THE NUMBER THIS BATCH TRUSTS LEAST.** It is the
+# only Break the Hunter class has anywhere, so too low and the lever does not
+# exist; too high and one draft card outdoes a Warden's whole Threat lane (AL
+# measured that at 320 BD a battle). 20 a landed attack is roughly Powershot's
+# and rides only while he is above the conversion point.
+const FAULT_LINE_BD := 20
+# STALKING_PULL — the chance an enemy's chosen mark is re-pointed at him. It
+# sits BELOW Ghillie Suit's 65 deliberately: the Survivalist is a 100-stability
+# Pressure spec, not a Warden, and a certainty would make him a tank.
+const STALKING_PULL := 40
+# THE CYCLE, AND EVERY ONE OF THESE IS IN `DEBUFF_IDS` — checked, not assumed.
+# Trapper's breadth term counts that curated list ONLY, so an affliction outside
+# it would apply, log and read as working while paying his multiplier nothing.
+# Poison is FIRST because it is the one the Survivalist's own lane deepens, and
+# it is applied through `_apply_poison` so it is HIS poison (his Attack, his
+# Potent Toxins, his carriers) rather than a bare status wearing the name.
+const STALKING_HORSE_STATUSES := ["poison", "cripple", "slow", "exposed",
+	"dazed", "blind"]
 # The one clamp §2 forces, and it is a GUARD not a magnitude. Ursus's Savage
 # Presence is `1.0 - 0.10 * boon` on the damage TAKEN, so an uncapped boon
 # would cross zero and start HEALING the hunter off enemy attacks (at the
@@ -15273,6 +15566,170 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					attacker.unit_name, pn_turns, target.unit_name,
 					int(round(PENANCE_MIRROR * 100.0)),
 					" [PERFECT]" if is_perfect else ""], "#a050b0")
+		# ========== BATCH CH: THE HUNTER NINE ==========
+		#
+		# LAST HOWL — ARMED, NOT TIMED. It stands for the rest of the battle, so
+		# the status carries -1 turns and the RATE lives on the unit rather than
+		# on the status power: `_on_beast_death` is the one site that reads it,
+		# and that site is reached long after the cast is over.
+		"last_howl":
+			attacker.last_howl = 3 if is_perfect else 2
+			_apply_status(attacker, "last_howl", -1, attacker.last_howl)
+			_sfx("heal", -9.0, 0.7)
+			_message("%s swears the last howl" % attacker.unit_name)
+			_log("%s: Last Howl — for the rest of the battle a fallen companion pays him +%d%% strike damage per stack of Loyalty it held%s" % [
+				attacker.unit_name, attacker.last_howl,
+				" [PERFECT]" if is_perfect else ""], "#e0a050")
+		# SUCCESSION — the share rides the STATUS POWER (the Alms / Breaking
+		# Darkness pattern), so `_do_summon` reads one number from one place and
+		# a hunter who dies does not take the window with him.
+		"succession":
+			var sc_turns := 6 if is_perfect else 4
+			_apply_status(attacker, "succession", sc_turns, SUCCESSION_SHARE)
+			_sfx("heal", -9.0, 0.7)
+			_message("%s prepares the handover" % attacker.unit_name)
+			_log("%s: Succession — for %d turns a swapped-in companion arrives holding %d%% of the outgoing bond%s" % [
+				attacker.unit_name, sc_turns, SUCCESSION_SHARE,
+				" [PERFECT]" if is_perfect else ""], "#e0a050")
+		# UNLEASH — ONE companion, and `_deepest_bond` is the ONE implementation
+		# of which one (BX §3: an ORDERED action goes to a single companion; the
+		# passive strike-alongside goes to all of them). Under The Pack that is
+		# the deeper bond, which is also the bigger meter — the right read for a
+		# card whose whole subject is the meter.
+		"unleash":
+			var ul_beast: BattleUnit = _deepest_bond(attacker)
+			if ul_beast == null:
+				_log("%s: Unleash finds no companion to loose" % attacker.unit_name,
+					"#909090")
+			else:
+				var ul_kind: String = ul_beast.companion_kind
+				var ul_stacks: int = int(attacker.loyalty.get(ul_kind, 0))
+				if ul_stacks <= 0:
+					_log("%s: Unleash — %s has no bond to spend" % [
+						attacker.unit_name, ul_beast.unit_name], "#909090")
+				else:
+					var ul_tgt: BattleUnit = target
+					if ul_tgt == null or ul_tgt.dead or ul_tgt.is_hero:
+						ul_tgt = _lowest_hp(enemies.filter(
+							func(e): return not e.dead))
+					if ul_tgt == null:
+						_log("%s: Unleash finds nothing to loose it at" % \
+							attacker.unit_name, "#909090")
+					else:
+						# THE STACK COUNT IS CAPTURED BEFORE THE METER IS EMPTIED
+						# AND THE ORDER OF THE TWO IS THEREFORE FREE — checked at
+						# the site rather than assumed. `_companion_hit` reads
+						# `companion_power`, the crit roll, both marks, Necrosis,
+						# resists and armor, and NOT Loyalty: `_comp_dmg_mult` is
+						# applied by its CALLERS. So this cannot pay itself twice
+						# the way Detonation's Overburn read once could, and
+						# Primal Surge spending after its own blow is correct for
+						# the same reason. Emptying first is simply the honest
+						# order to log it in.
+						var ul_pct := 0.25 if is_perfect else 0.20
+						attacker.loyalty[ul_kind] = 0
+						_stamp_loyalty_chip(attacker, ul_beast)
+						_log("%s: Unleash — %s spends its whole bond (%d)%s" % [
+							attacker.unit_name, ul_beast.unit_name, ul_stacks,
+							" [PERFECT]" if is_perfect else ""], "#e0a050")
+						await _companion_hit(ul_beast, ul_tgt,
+							ul_pct * ul_stacks * attacker.attack
+							* _bestial_dmg_mult(ul_beast), UNLEASH_BREAK)
+						attacker.refresh_bars()
+		# REACQUIRE — ONE mark at a time (Hunter's Mark's rule and Quarry's
+		# Mark's). The bank is cleared with the old mark: it is the Focus set
+		# aside FOR THAT ENEMY, and carrying it onto a new name would hand him a
+		# second meter he never earned.
+		"reacquire":
+			if target == null or target.dead:
+				_log("%s: Reacquire finds nobody to name" % attacker.unit_name,
+					"#909090")
+			else:
+				for rq_old in enemies:
+					if rq_old.has_status("reacquire"):
+						rq_old.remove_status("reacquire")
+				attacker.reacquire_bank = 0
+				_apply_status(target, "reacquire", -1, 0, 0, attacker)
+				_sfx("break", -9.0, 0.6)
+				_message("%s names %s" % [attacker.unit_name, target.unit_name])
+				_log("%s: Reacquire — %s is the named quarry for the rest of the battle; leaving it BANKS his Focus instead of clearing it" % [
+					attacker.unit_name, target.unit_name], "#e0a050")
+				# THE PERFECT PAYS THE MARK ITSELF. `_gain_focus` refuses a unit
+				# without the meter, so the smoke artefact (every card handed to
+				# every hero) correctly pays a Devout nothing rather than writing
+				# a second resource onto a body that has none.
+				if is_perfect:
+					_gain_focus(attacker, 25)
+					_log("   → Reacquire [PERFECT]: the mark is worth 25 Focus at once",
+						"#e0a050")
+		# FAULT LINE — the BD rides the status power so the read site needs no
+		# field, and the THRESHOLD is never stored: `focus_convert()` is read
+		# live at the strike, because Deep Focus moves it.
+		"fault_line":
+			var fl_turns := 6 if is_perfect else 4
+			_apply_status(attacker, "fault_line", fl_turns, FAULT_LINE_BD)
+			_sfx("break", -9.0, 0.6)
+			_message("%s reads the fault" % attacker.unit_name)
+			_log("%s: Fault Line — for %d turns every attack he lands above %d Focus also deals %d Break damage%s" % [
+				attacker.unit_name, fl_turns, attacker.focus_convert(),
+				FAULT_LINE_BD, " [PERFECT]" if is_perfect else ""], "#e0a050")
+		# STALKING HORSE — the CYCLE INDEX IS NOT RESET HERE. A re-cast inside a
+		# standing window would otherwise restart at Poison and hand the same
+		# attacker the same affliction twice, which is precisely the breadth the
+		# card exists to build. It resets at battle start with every other field.
+		"stalking_horse":
+			var sh_turns := 4 if is_perfect else 3
+			_apply_status(attacker, "stalking_horse", sh_turns, STALKING_PULL)
+			_sfx("heal", -9.0, 0.7)
+			_message("%s plays the stalking horse" % attacker.unit_name)
+			_log("%s: Stalking Horse — for %d turns enemies are drawn to him, and each attacker takes a DIFFERENT affliction%s" % [
+				attacker.unit_name, sh_turns,
+				" [PERFECT]" if is_perfect else ""], "#70d878")
+		"downwind":
+			var dw_turns := 4 if is_perfect else 3
+			_apply_status(attacker, "downwind", dw_turns)
+			_sfx("heal", -9.0, 0.7)
+			_message("%s puts the field downwind" % attacker.unit_name)
+			_log("%s: Downwind — for %d turns every harmful effect any hero lands is copied onto a second enemy%s" % [
+				attacker.unit_name, dw_turns,
+				" [PERFECT]" if is_perfect else ""], "#70d878")
+		# CULL — HARVEST'S YIELD, THE FIELD'S DAMAGE. It shares `_harvest_yield`
+		# with Harvest so the two can never disagree about what a sticky poison
+		# is worth, and it MEASURES the purge rather than predicting it (BA §7's
+		# repair, inherited rather than re-derived).
+		"cull":
+			if target == null or target.dead:
+				_log("%s: Cull finds nobody to reap" % attacker.unit_name, "#909090")
+			elif _harvest_yield(target) <= 0:
+				_log("%s: Cull — nothing on %s to reap" % [attacker.unit_name,
+					target.unit_name], "#909090")
+			else:
+				var cu_before := _status_count(target)
+				target.purge_debuffs()
+				var cu_n: int = maxi(cu_before - _status_count(target), 0)
+				var cu_pct := 0.12 if is_perfect else 0.10
+				_message("%s culls the field!" % attacker.unit_name)
+				_log("%s: Cull — %d afflictions consumed from %s, and every enemy pays for them%s" % [
+					attacker.unit_name, cu_n, target.unit_name,
+					" [PERFECT]" if is_perfect else ""], "#70d878")
+				_sfx("crit", -6.0, 0.7)
+				for cu_e in enemies.duplicate():
+					if cu_e.dead:
+						continue
+					var cu_raw := cu_pct * attacker.attack * cu_n \
+						* randf_range(0.9, 1.1)
+					cu_raw *= 1.0 - float(cu_e.resists.get("nature", 0.0))
+					var cu_final: int = maxi(int(round(cu_raw \
+						* (1.0 - cu_e.effective_armor()))), 1)
+					var cu_res: Dictionary = cu_e.take_hit(cu_final, 0)
+					cu_e.float_text("%d Cull" % cu_final, Color(0.45, 0.8, 0.3))
+					_stat("dmg_hero_" + attacker.unit_name, cu_final)
+					if cu_res.died:
+						_stat("enemy_deaths")
+						_sfx("death", -4.0)
+						_message("%s falls!" % cu_e.unit_name)
+						_log("† %s dies" % cu_e.unit_name, "#e05050")
+						_on_enemy_death(cu_e)
 		"venom_coat":
 			_apply_status(attacker, "venom_coat", 4)
 			_sfx("heal", -9.0, 0.7)
@@ -16808,12 +17265,34 @@ func _do_summon(hunter: BattleUnit, kind: String, target: BattleUnit = null) -> 
 			_free_beast(hunter, old)
 	var was_swap := false
 	_swapped_free = false
+	# BATCH CH — SUCCESSION reads the OUTGOING bond, so it has to be captured
+	# before `_free_beast` takes the body off the field. The meter itself lives on
+	# the HUNTER's dict and survives a swap untouched (BO §5 corrected exactly this
+	# premise: a swap has never cost Loyalty) — what the card changes is what the
+	# ARRIVING kind starts from, which for a kind never fielded is nothing at all.
+	var sc_out_loyalty := 0
 	if _beasts(hunter).size() >= _beast_cap(hunter):
 		# BATCH BB §1: the shallower bond is the one that breaks — one rule,
 		# one implementation, and `_swap_victim` carries the reason.
 		was_swap = true
 		_swapped_free = hunter.free_swap > 0
-		_free_beast(hunter, _swap_victim(hunter))
+		var sc_victim: BattleUnit = _swap_victim(hunter)
+		if sc_victim != null:
+			sc_out_loyalty = int(hunter.loyalty.get(sc_victim.companion_kind, 0))
+		_free_beast(hunter, sc_victim)
+	# THE HANDOVER ITSELF, and it RAISES rather than assigns. A returning beast
+	# already keeps whatever it earned, so an assignment would let a rotation into
+	# a deep bond LOWER it — a card sold on carrying the bond forward quietly
+	# costing depth, which is the one way it could be worse than not holding it.
+	# It is placed above `prior_l` so Ursus's per-stack health gift reads the
+	# handed-on meter rather than the one it replaced.
+	if was_swap and sc_out_loyalty > 0 and hunter.has_status("succession"):
+		var sc_share: int = maxi(hunter.status_power("succession"), 0)
+		var sc_carry: int = sc_out_loyalty * sc_share / 100
+		if sc_carry > int(hunter.loyalty.get(kind, 0)):
+			hunter.loyalty[kind] = sc_carry
+			_log("   → Succession: the bond is handed on — %s arrives holding %d Loyalty" % [
+				kind.capitalize(), sc_carry], "#e0a050")
 	if was_swap and hunter.wild_rotation == 0:
 		# Quick Whistle shaves the shared swap cooldown; the node shaves all
 		# of it (the floor is zero — "no cooldown" has to be reachable).
@@ -17783,11 +18262,49 @@ func _sharpshooter_focus(attacker: BattleUnit, victim: BattleUnit,
 				gain, "#a0d060")
 		_gain_focus(attacker, gain)
 	elif attacker.last_attack_target != null:
-		if attacker.second_resource > 0:
+		# BATCH CH — REACQUIRE. THE ONE NAMED EXCEPTION TO THE RULE THIS
+		# WHOLE SPEC IS PRICED ON, and it is written as a BANK rather than as a
+		# refusal to clear: the meter really does leave him while he is away, so
+		# every Focus reader in the game (the crit chance, the crit multiplier,
+		# Continuous Aim, Coup de Grace, One Shot, Fault Line) sees an honest zero
+		# on the other target. What he bought is that it is set aside instead of
+		# thrown away.
+		#
+		# IT READS THE MARK'S OWN `src_name`, so a second Sharpshooter can never
+		# collect on the first one's quarry (the Frostbind / Resonant Field rule).
+		# A stale bank is unreachable rather than guarded: the only thing that can
+		# pay it out is an attack on a body still wearing the mark, and a fresh cast
+		# zeroes it.
+		var rq_left: Dictionary = attacker.last_attack_target.get_status("reacquire")
+		if not rq_left.is_empty() \
+				and String(rq_left.get("src_name", "")) == attacker.unit_name:
+			if attacker.second_resource > 0:
+				attacker.reacquire_bank = attacker.second_resource
+				attacker.float_text("Focus banked", Color(0.90, 0.65, 0.25))
+				_log("   → Reacquire: %d Focus is banked on %s rather than lost" % [
+					attacker.reacquire_bank,
+					attacker.last_attack_target.unit_name], "#e0a050")
+		elif attacker.second_resource > 0:
 			attacker.float_text("Focus broken", Color(0.65, 0.65, 0.65))
 		attacker.second_resource = 0
 		attacker.same_target_turns = 0
 		attacker.refresh_bars()
+	# THE RETURN. It sits below BOTH branches deliberately: coming back to the
+	# quarry is a SWITCH like any other, so the meter is cleared above and the
+	# bank is what puts it back — which is why a hero who banked nothing gets
+	# nothing, and why the streak (`same_target_turns`) correctly starts again.
+	if attacker.reacquire_bank > 0 and victim != null \
+			and attacker.last_attack_target != victim:
+		var rq_back: Dictionary = victim.get_status("reacquire")
+		if not rq_back.is_empty() \
+				and String(rq_back.get("src_name", "")) == attacker.unit_name:
+			attacker.second_resource = attacker.reacquire_bank
+			attacker.reacquire_bank = 0
+			attacker.float_text("+%d Focus" % attacker.second_resource,
+				Color(0.90, 0.65, 0.25))
+			_log("   → Reacquire: he is back on %s — %d banked Focus is his again" % [
+				victim.unit_name, attacker.second_resource], "#e0a050")
+			attacker.refresh_bars()
 	attacker.last_attack_target = victim
 
 
@@ -17800,6 +18317,30 @@ func _on_beast_death(comp: BattleUnit) -> void:
 	var kind: String = comp.companion_kind
 	var had: int = int(pm.loyalty.get(kind, 0))
 	_sig("pack_b")  # BJ §3a: a beast's death is the Beastmaster's second moment
+	# BATCH CH — LAST HOWL. IT READS `had`, i.e. THE METER AS IT STOOD WHEN THE
+	# BEAST FELL, and it must: Steadfast Bond rewrites that meter three lines
+	# down, so a read taken afterwards would pay him for the share that SURVIVED
+	# rather than for what the companion actually earned — which is backwards,
+	# because the whole card is that the meter outlives the body.
+	#
+	# IT IS NOT VENGEANCE AND IT SITS ABOVE IT ON PURPOSE. Vengeance inherits the
+	# BOON (the `_bond_mult` curve, plus its own flat +30%) and reads whatever
+	# Loyalty survived, so the two compose exactly as Steadfast Bond and
+	# Vengeance already do: this takes its number from the full meter, that one
+	# from the remainder, and a hero holding all three gets all three.
+	#
+	# PER-COMPANION, DELIBERATELY (§0's question, answered): it reads the DYING
+	# companion's own meter, not the pack's total. Under The Pack that means two
+	# beasts falling pay him twice, each for what IT earned — which is the
+	# honest reading of "its accumulated Loyalty" and the one that keeps a deep
+	# single bond and two shallow ones worth different amounts.
+	if pm.last_howl > 0 and had > 0 and not pm.dead:
+		var lh_gain: int = pm.last_howl * had
+		pm.last_howl_dmg += lh_gain
+		_log("   → Last Howl: %s's %d Loyalty passes to %s — +%d%% strike damage for the rest of the battle (%d%% in all)" % [
+			comp.unit_name, had, pm.unit_name, lh_gain, pm.last_howl_dmg],
+			"#e0a050")
+		pm.float_text("+%d%% dmg" % lh_gain, Color(0.95, 0.75, 0.30))
 	if pm.steadfast_bond > 0 and had > 0:
 		# Steadfast Bond holds a SHARE of the meter (100 = all of it). It
 		# runs before Vengeance deliberately: the boon Vengeance inherits

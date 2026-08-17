@@ -224,7 +224,7 @@ func _pools() -> void:
 	# which is what pinning a count is for.
 	# The CLASS side staying at 24 is the half that must NOT move, and it is
 	# asserted separately above — CB adds no class card.
-	ok(spec_total == 78,
+	ok(spec_total == 87,
 		"§1: ...at 60 plus CB's Mage nine and CE's Cleric nine, with no class card among them (%d)"
 			% spec_total)
 
@@ -405,10 +405,24 @@ func _draft_flow() -> void:
 	# biting. The refusal has to reach the spec pool too, which is the honest
 	# version of the same construction: an offer never pads with repeats,
 	# whatever wore the pool down.
-	hunter["draft_refused"] = Classes.class_draft_pool("hunter").duplicate()
-	for wq in Classes.spec_draft_pool("sharpshooter").slice(0, 3):
-		hunter["draft_refused"].append(wq)
-	var worn: Array = run.roll_draft_offer(hunter)
+	#
+	# RE-POINTED AGAIN BY BATCH CH, AND THE HERO MOVED RATHER THAN THE
+	# ARITHMETIC. CH took the three HUNTER pools 5 -> 8, so refusing three of a
+	# Sharpshooter's own cards leaves FIVE standing and the offer comes up full —
+	# the check would have gone on measuring something, and it would no longer
+	# have been the fill-short rule. **THE WARRIOR IS THE ONLY CLASS STILL AT
+	# FIVE**, so the construction stands on a BERSERKER now, which is exactly the
+	# forced move test_batch_bo made at BW for the same reason and the honest
+	# signal that the Hunter's third of tranche 3 is paid. WHEN THE WARRIOR THIRD
+	# LANDS THERE WILL BE NO FIVE-DEEP POOL LEFT IN THE GAME and this has to move
+	# a third time — onto a hero worn down by `draft_refused` alone, which is the
+	# shape bo, br and bx already carry.
+	var worn_hero := {"key": "warrior", "spec": "berserker", "bm_abilities": [],
+		"draft_refused": []}
+	worn_hero["draft_refused"] = Classes.class_draft_pool("warrior").duplicate()
+	for wq in Classes.spec_draft_pool("berserker").slice(0, 3):
+		worn_hero["draft_refused"].append(wq)
+	var worn: Array = run.roll_draft_offer(worn_hero)
 	ok(worn.size() == 2,
 		"§1: a pool worn down to two still fills SHORT rather than padding (%d)" % worn.size())
 	hunter["draft_refused"] = []
@@ -994,7 +1008,7 @@ func _docs() -> void:
 	var master := _src("res://docs/master.html")
 	# THE STAMP GATE, SEVENTH COPY (see test_batch_bp's note). It reads the
 	# CURRENT batch, not BQ's, and all seven move together.
-	ok(master.contains("Batch CG"), "§5: master.html is stamped for the current batch")
+	ok(master.contains("Batch CH"), "§5: master.html is stamped for the current batch")
 	for cls in TRANCHE_3:
 		for nm in TRANCHE_3[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)

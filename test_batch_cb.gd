@@ -159,22 +159,30 @@ func _pools() -> void:
 	# unchanged and is still what tells the two answers apart; what is owed now
 	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
 	for spec in ["pyromancer", "cryomancer", "arcanist",
-			"holy", "inquisitor", "occultist"]:
+			"holy", "inquisitor", "occultist",
+			"beastmaster", "sharpshooter", "mystic"]:
 		var pool: Array = Classes.spec_draft_pool(spec)
 		ok(pool.size() == 8, "%s drafts EIGHT (got %d)" % [spec, pool.size()])
-	for spec in ["beastmaster", "sharpshooter", "mystic",
-			"berserker", "warden", "swordmaster"]:
+	# RE-POINTED BY BATCH CH, AND IT IS THE SIXTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, then CB's new asymmetry, then that asymmetry HALVED at
+	# CE, and now QUARTERED — the HUNTER three joined the Mage and Cleric at
+	# EIGHT when tranche 3's third third landed, so NINE pools are eight deep and
+	# only the WARRIOR THREE are still at five. The question is unchanged and is
+	# still what tells the two answers apart; what is owed is the Warrior third,
+	# and it is the LAST of the debt, so it has to stay visible in code.
+	for spec in ["berserker", "warden", "swordmaster"]:
 		ok(Classes.spec_draft_pool(spec).size() == 5,
 			"%s is still at FIVE — its third of tranche 3 is owed" % spec)
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 78, "the spec pools hold 78 (60 + this batch's nine + CE's Cleric nine), got %d"
+	ok(total == 87, "the spec pools hold 78 (60 + this batch's nine + CE's Cleric nine), got %d"
 		% total)
 	var draft_total := total
 	for cls in Classes.CLASS_DRAFT_POOLS:
 		draft_total += Classes.class_draft_pool(cls).size()
-	ok(draft_total == 102, "the draft holds 102 of a target 120 (got %d)"
+	ok(draft_total == 111, "the draft holds 111 of a target 120 (got %d)"
 		% draft_total)
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
 	# spec ability leaking into a class pool is the BQ/BR/BT negative control.

@@ -806,8 +806,8 @@ failure it prevents is SILENT: a spine that stops working because its enabler be
 · 3 **Sharpshooter** — **Quick Shot** (Lethal Aim counts consecutive single-target attacks).
 · 3 **Survivalist** — nothing (Trapper's breadth term counts statuses from ANY source).
 **THE TARGET IS 120, NOT ~96, AND THE ~96 IS DEAD (Batch CD §2). 96 SPEC (12 specs x 8) + 24
-CLASS-WIDE = 120; THE DRAFT STANDS AT 102 OF 120 AND 18 ARE OWED — Hunter nine and Warrior nine,
-three per spec, and every one of the 18 is a SPEC card.** The ~96 came from an older
+CLASS-WIDE = 120; THE DRAFT STANDS AT 111 OF 120 AND 9 ARE OWED — the WARRIOR nine, three per
+spec, and every one of the 9 is a SPEC card.** The ~96 came from an older
 assumption of SIX spec cards per spec and CB completed the Mage at EIGHT, which is what makes the
 spec target 96. **`test_batch_bt` HAD ASSERTED DEPTH 8 SINCE CB, so the tests encoded the right
 figure while the prose contradicted it for a whole batch** — the stale denominator was in
@@ -815,14 +815,20 @@ master.html §6b, in this file, AND in three comments in `classes.gd`, which is 
 for it rather than fixing the two known sites. **DO NOT QUOTE ~96 AGAIN.** Dated batch blocks
 below keep it as written (they are the record of what each batch believed — CA's rule); this is
 the correction.
-**TRANCHE 3 IS TWO THIRDS PAID AND THE CLERIC IS THE SECOND CLASS COMPLETE (Batch CB the Mage
-nine, Batch CE the Cleric nine) — `SPEC_DRAFT_POOLS` IS 78 AND THE DRAFT IS 102 OF 120. THE MAGE
-AND CLERIC SIX DRAFT FROM EIGHT AND THE HUNTER AND WARRIOR SIX FROM FIVE, so CB's asymmetry is
-half what it was and what is owed is the HUNTER and WARRIOR thirds of tranche 3.** Every draft
-suite's per-spec depth loop inverts AGAIN — the FIFTH time (each earlier tranche's asymmetry, then
-the flatness tranche 2 achieved, then CB's new asymmetry, and now that asymmetry halved) —
-test_batch_ce asserts both halves, so the remaining debt stays visible in code rather than only in
-prose.
+**TRANCHE 3 IS THREE QUARTERS PAID AND THE HUNTER IS THE THIRD CLASS COMPLETE (Batch CB the Mage
+nine, Batch CE the Cleric nine, Batch CH the Hunter nine) — `SPEC_DRAFT_POOLS` IS 87 AND THE
+DRAFT IS 111 OF 120. NINE SPECS DRAFT FROM EIGHT AND THE THREE WARRIOR SPECS FROM FIVE, so CB's
+asymmetry is QUARTERED and all that is owed is the WARRIOR third of tranche 3 — nine cards, and
+it is the LAST of the debt.** Every draft suite's per-spec depth loop inverts AGAIN — the SIXTH
+time (each earlier tranche's asymmetry, then the flatness tranche 2 achieved, then CB's new
+asymmetry, then that asymmetry halved at CE, and now quartered) — and the suites assert both
+halves, so the last of the debt stays visible in code rather than only in prose.
+**THE FILL-SHORT CONSTRUCTIONS ARE ALL ON A WARRIOR NOW, AND WHEN THE WARRIOR THIRD LANDS THERE
+WILL BE NO FIVE-DEEP POOL LEFT IN THE GAME.** CH moved test_batch_bq's onto a Berserker and
+test_batch_br's onto a Swordmaster (bo's and bx's were already there); the next tranche has to
+move all four onto heroes worn down by `draft_refused` alone, which is the shape bo, br and bx
+already carry. **A construction that has to relocate is how a paid debt announces itself** — BV
+predicted the move at BW and it has now happened twice more.
 **TRANCHE 2 IS COMPLETE (BT the Mage nine, BU the Cleric nine, BV the Hunter nine, BW the WARRIOR
 nine) — IT TOOK `SPEC_DRAFT_POOLS` TO 60 AND THE DRAFT TO 84 OF 120, AND ALL TWELVE SPECS DRAFTED
 FROM FIVE.** The Warrior deficit that had been the visible shape of the debt since BP
@@ -1019,6 +1025,178 @@ claim, so a tranche that fills three pools trips them by construction. Two shape
   refusal reach the spec pool too (bq, br) or by moving it onto a **Berserker**, whose pool is
   genuinely still two (bo). **WHEN THE WARRIOR THIRD LANDS, bo's version has to move again** — and
   that forced move is the honest signal that the last of tranche 2 is paid.
+
+BATCH CH (08-16) — TRANCHE 3, THE HUNTER NINE. **THE HUNTER IS THE THIRD CLASS COMPLETE.** Nine
+spec draft abilities, three per Hunter spec; the Hunter pools go 5 -> 8 and the draft goes 102 ->
+**111 of a target 120**. **CB'S ASYMMETRY IS QUARTERED**: NINE specs draft from EIGHT and the
+THREE WARRIOR specs from FIVE, so all that is owed is the Warrior third — nine cards, and it is
+the LAST of the debt. Nothing else ships: no talent node, no magnitude, no existing ability
+changed, no save version moves (still v10). **FOUR new unit-side fields for nine abilities**, and
+every one is a case a STATUS cannot hold (BQ's standard otherwise applies).
+**§0 — THREE OF THE BRIEF'S NINE NAMES COLLIDED WITH LIVE CONTENT AND ALL THREE MOVED. §4 SAID TO
+RUN BR §1'S SWEEP ANYWAY AND TREAT A NEAR-MISS AS A HIT; ONE OF THE HITS WAS NOT A NEAR-MISS.**
+· **HARVEST IS A LIVE ABILITY, IN THE VERY POOL THIS SPEC DRAWS FROM AT A ZONE BOSS** —
+  `SPEC_POOLS["mystic"]` and `CLASS_POOLS["hunter"]`, since Batch 33. `pool_ability` is keyed on
+  `display_name`, so a second Harvest makes the resolver answer the wrong question: **a REAL BREAK
+  by BR §1, not a label collision to flag** — and **the MECHANIC duplicated too** (consume every
+  status on one enemy for damage scaling on the count), which is the Deadfall/Snare Trap failure
+  this batch's own §1 warns about. **THE NAME MOVED AND THE SHAPE DID: the card is CULL**, and it
+  bills the WHOLE FIELD where Harvest empties one body and heals him. Neither dominates.
+· **KINDRED IS A LIVE BEASTMASTER CAPSTONE** (`bm_kindred`, devotion row 8) reading the same
+  Loyalty depth, SAME SPEC, mechanically adjacent. Closer than BW's Grudge, and BW's precedent
+  decides it — the node's id is save-bearing, the card was unshipped, **so the CARD moved**. It is
+  **SUCCESSION**.
+· **TRIPLE TAP sits one word from TRIPLE SHOT**, the same spec's live boss-pool ability and also
+  three strikes on one target. Nothing breaks; a player holding both would read two near-identical
+  names on one sheet. It is **DRUMFIRE**, and the two now point OPPOSITE ways — Triple Shot
+  *spends* a deep meter, Drumfire *builds* one.
+· **UNLEASH KEEPS ITS NAME AND CHANGED SHAPE.** The name is clean (it appears only as prose inside
+  Bestial Wrath's description — reported, not resolved). The MECHANIC was not: **PRIMAL SURGE**
+  already spends Loyalty for a companion strike, and the brief's version was a strict SUBSET of it.
+· The other five — Last Howl, Reacquire, Fault Line, Stalking Horse, Downwind — are clean.
+**THE NINE, WITH THEIR AXES.** Defs live in `Classes.draft_ability` beside BO's through CE's, a
+CONTIGUOUS block (CB/CE's shape), with the AXIS/SYNERGY check still anchoring PER ABILITY.
+· **BEASTMASTER — keep it, move it, spend it.** **Last Howl** (20 Mana, 1.5, 4cd, self — for the
+  REST OF THE BATTLE a falling companion pays +2%/stack of the Loyalty it earned, Perfect 3%) ·
+  **Succession** (20, 1.5, 4cd, self — 4 turns, a swap hands HALF the outgoing bond to the
+  arriving companion, Perfect 6) · **Unleash** (25, 2.5, 4cd, one enemy, 12 BD — the DEEPEST
+  companion strikes for 20% of Attack PER STACK and that meter resets, Perfect 25%).
+· **SHARPSHOOTER — the exception, the threshold, the depth.** **Reacquire** (20, 1.5, 4cd, one
+  enemy — battle-long mark; leaving BANKS his Focus, returning restores it, Perfect 25 Focus at
+  once) · **Fault Line** (20, 1.5, 4cd, self — 4 turns, attacks above the conversion point deal 20
+  BD, Perfect 6) · **Drumfire** (25, 3.0, 3cd, 6 BD a shot — three arrows at 14%, EACH counted
+  separately for Focus, Perfect a fourth).
+· **SURVIVALIST (`mystic`) — draw it, spread it, spend it.** **Stalking Horse** (25, 2.0, 4cd,
+  self — 3 turns, enemies are drawn to him and each attacker takes a DIFFERENT affliction, Perfect
+  4) · **Downwind** (25, 2.0, 5cd, self — 3 turns, every debuff any hero lands is copied onto a
+  second enemy, Perfect 4) · **Cull** (30, 3.0, 5cd, one enemy — consumes every affliction on it,
+  and EVERY enemy takes 10% of Attack per status removed, Perfect 12%).
+**LAST HOWL IS NOT VENGEANCE AND MUST NEVER BE WRITTEN AS "KEEP THE DEAD BEAST'S BOON".**
+`bm_vengeance` inherits the BOON (the `_bond_mult` curve plus its own +30%); this carries the
+METER to the HUNTER as a personal strike-damage buff. **A hero holding both gets both, and that
+stacking is INTENDED.** It reads `had` — the meter AS IT STOOD when the beast fell — three lines
+ABOVE Steadfast Bond's rewrite, because the whole card is that the meter outlives the body; read
+afterwards it would pay for the share that SURVIVED, which is backwards. **PER-COMPANION (§0's
+question, answered): under The Pack two beasts falling pay twice, each for what IT earned.** It is
+the **FIFTH user of the one implementation of "this unit deals N% more damage"**, so it composes
+ADDITIVELY with Battle Shout, Warcry, Resonant Field and Reckless Abandon — and it is the one of
+the five that reads a FIELD rather than a status power, because the buff ACCUMULATES and a status
+power is a number stamped once at the cast.
+**SUCCESSION'S PREMISE WAS HALF STALE AND THE CODE IS RIGHT (the AR §6 / BU / CB precedent): A
+SWAP HAS NEVER COST LOYALTY.** BO §5 corrected exactly this — the meter lives on the HUNTER's dict
+per kind and only a DEATH breaks it, so a RETURNING beast already keeps its depth. What "starting
+it at nothing" truly describes is a kind never fielded. **IT RAISES, NEVER ASSIGNS**: rotating into
+a deeper bond must not cost depth, which is the one way a card sold on carrying the bond forward
+could be worse than not holding it. Under The Pack `_swap_victim` evicts the SHALLOWER bond, so
+what it carries forward is the smaller meter.
+**UNLEASH IS NOT PRIMAL SURGE, AND THE DISTINCTION IS SHAPE RATHER THAN SIZE** (BT's
+Stabilize/Arcane Bolt rule through the Hunter door). Primal Surge is a boss-pool card spending
+EVERY companion's meter at 15%/stack AND leaving a lasting +10% damage, on a 2-turn cooldown; this
+is ONE companion at 20%/stack carrying BREAK and leaving nothing, on 4. **Under The Pack it reads
+the ACTIVE companion only, through `_deepest_bond`** — BX §3's ONE implementation of which
+companion an ORDERED action goes to, and also the bigger meter. **ITS BREAK IS FLAT AND MUST STAY
+FLAT**: the stack count is uncapped, and a per-stack Break term on an uncapped meter is the
+squaring trap Arcane Bolt, Requiem and Pyre Wake each refused from their own side.
+**FAULT LINE READS `focus_convert()` AND NEVER A LITERAL 100.** Deep Focus moves the split point
+down (floor 1), so a card watching a hardcoded hundred would silently stop agreeing with the
+passive in exactly the build that bought the node — Vespers learned this against
+`mercy_threshold`, and the mis-write reads as the card merely being weak. It is added ABOVE Broken
+Will and the Breaker runes so every existing Break multiplier answers it, **and so does the
+OCCULTIST's BREAKING DARKNESS** — the cross-roster reach §2 sells it on. **IT IS THE ONLY BREAK
+LEVER THE HUNTER CLASS HAS ANYWHERE.**
+**DRUMFIRE IS BR §1'S HITS-NOT-CASTS RULE ARRIVING AT THE FOCUS ENGINE FOR THE FIRST TIME.** That
+engine has been called once per CAST since AZ, so **every existing multi-hit ability builds ONE
+stack of Focus however many arrows it throws**. Drumfire counts INSIDE the hit loop, beside Arcane
+Arrows' splash and sharing its `final > 0` gate (a missed or blocked arrow feeds nothing), and is
+EXCLUDED BY NAME from the post-loop call so it cannot be paid a fourth time. **THE STREAK IS
+ROLLED BACK BETWEEN HITS AND THAT IS LOAD-BEARING**: `same_target_turns` is what UNWAVERING's ramp
+reads and it counts TURNS, so letting three arrows advance it three times would silently TRIPLE a
+shipped node's magnitude off a card that never mentions it.
+**STALKING HORSE REUSES THE EXISTING DRAW AND EVERY AFFLICTION IT LAYS IS IN `DEBUFF_IDS`.** The
+pull sits at `_choose_enemy_action` beside Savage Presence — the one site where a chosen mark is
+re-pointed — rather than inventing a second taunt; a `mocked` taunt would be a Warden card in a
+100-stability Pressure pool. **The `DEBUFF_IDS` half is load-bearing rather than tidy**: Trapper's
+breadth term counts that curated list ONLY, so an affliction outside it would apply, log and read
+as working while paying his multiplier NOTHING — the card doing exactly half of what it says with
+nothing to announce it. **It pays out when a blow LANDS, not when one is DECLARED** (BL §1
+declares a turn early and re-validates at resolution), and **its poison goes through
+`_apply_poison`** so it is HIS poison (his Attack, his Potent Toxins, his carriers) rather than a
+bare status wearing the name — Quartermaster's rule through a second door. **The cycle index lives
+on the HUNTER, not on the status**, so a re-cast inside a standing window does not restart at
+Poison and hand the same body the same affliction twice.
+**DOWNWIND COVERS EVERY HERO, HIMSELF INCLUDED, AND THAT IS ONE RULE RATHER THAN A CARVE-OUT.**
+Excluding the caster would make the card read as inert on every turn he spent applying his own
+board, and an invisible special case at a shared door is what this file keeps warning about. It
+sits beside Frostbind's copy and ABOVE the per-status branches for Creeping Death's reason —
+`chilled`, `burn` and `poison` all return early below, so a hook underneath would miss most of
+what the card is for. `_downwind_spreading` is its re-entrancy guard (the chain has no natural
+bound, unlike CE's Mantle whose hop count decrements). It prefers a body that does NOT already
+carry the status, because the whole point is BREADTH.
+**CULL SHARES `_harvest_yield` WITH HARVEST**, the ONE answer to "what would this reap", so the two
+can never disagree about a sticky poison, and it MEASURES the purge rather than predicting it (BA
+§7's repair, inherited). **Its Break is ZERO on a card that genuinely deals damage**, because the
+multiplier is an uncapped COUNT of afflictions and a Break term riding it is the squaring trap from
+a fourth direction (Pyre Wake's precedent).
+**SIX STATUSES FOR NINE ABILITIES.** Five sit on a HERO (`last_howl`, `succession`, `fault_line`,
+`stalking_horse`, `downwind`) and are correctly ABSENT from `DEBUFF_IDS`. **`reacquire` sits on an
+ENEMY and is a MARK**, so it is absent from `DEBUFF_IDS` too — a battle-long entry there reads as
+999 turns remaining and a mender's longest-first Cleansing Rite would take it every single time —
+**AND it is in `DISPEL_NEVER`**, because `_dispellable_buffs` is DERIVED from that absence and
+would otherwise let a Mage's Dispel strip the Sharpshooter's mark FOR the enemy wearing it. BU's
+Suffering trap and BW's mark trap meeting at one card. Unleash, Drumfire and Cull carry nothing.
+**§5 — TWO FILL-SHORT CONSTRUCTIONS MOVED OFF A HUNTER ONTO A WARRIOR**, who is the only class
+still at five: test_batch_bq's onto a **Berserker**, test_batch_br's onto a **Swordmaster**. Each
+refused its hero's whole CLASS pool plus three of his own spec cards to leave exactly two standing;
+at eight deep that leaves FIVE and the offer fills full. bo's and bx's already stood on a Berserker
+and a Warden. **WHEN THE WARRIOR THIRD LANDS THERE WILL BE NO FIVE-DEEP POOL LEFT IN THE GAME** and
+all four move again, onto heroes worn down by `draft_refused` alone.
+**THE REPAIR PASS FOUND TWO FAULTS IN THIS BATCH'S OWN CODE, WHICH IS WHY RE-RUNNING THE OLDER
+SUITES IS NOT A FORMALITY.** test_batch_bo walks every draft entry and asserts each carries a
+perfect: **REACQUIRE SHIPPED WITH AN EMPTY `perfect_text`** (it takes 25 Focus on the mark now).
+Writing that fix surfaced the second: **DRUMFIRE CARRIED `perfect_extra_hit: false` WHILE ITS
+PERFECT TEXT PROMISED A FOURTH ARROW** — copied from Triple Shot, whose perfect is a guaranteed
+crit instead. The flag is back at its default and the promise is true.
+**TWO OLDER CHECKS WERE RE-POINTED FOR A REASON THAT IS NOT THE DEBT, AND BOTH ARE STRICTLY BETTER
+FOR IT.** test_batch_bw read `DISPEL_NEVER` through a **FIXED 1400-BYTE WINDOW**, which is an
+accident of how long the comments in that block happen to be — CH's own comment pushed `vendetta`
+off the end and it failed against CORRECT code. It slices to the const's **closing bracket** now.
+And test_batch_bx's `_deepest_bond(attacker)` caller count goes **2 -> 3**: Unleash asks the same
+question through the same function rather than reaching for `beasts[0]`, which is the drift BX
+exists to close.
+**VERIFIED, AND THE FLOOR IS THE ONE THE STANDING CONVENTION SETS (see "Verify before shipping"):
+check_parse 0 · check_flow 0 · LIVE SMOKES CLEAN, 0 SCRIPT ERROR across three full-kit runs (one
+per Hunter spec, all nine granted).** No suite was written, no negative control run under a shipped
+name, no sweep and no measurement taken — **and none should be quoted from this batch.**
+**ALL NINE FIRE IN ORDINARY FIGHTS** — "Unleash — Canis spends its whole bond (5)" followed by
+"Canis: strikes Orc Archer for 125 CRIT"; "Stalking Horse: Survivalist draws Orc Chief away from
+Berserker" followed by "Orc Chief took the bait — Poison", then Cripple, Slowed and Exposed on
+later attackers (the cycle advancing in plain sight); **"Downwind: Chilled carries from Orc Chief
+to Orc Archer"**, which is an ALLY's debuff becoming the Survivalist's breadth and is the whole
+pitch of the card; "Cull — 5 afflictions consumed from Orc Chief, and every enemy pays for them";
+and Drumfire throwing three separately-rolled arrows a cast.
+· **FOUR CLAUSES ARE TOO RARE FOR A SMOKE and were driven directly in a SCRATCHPAD driver (NOT
+  COMMITTED — this batch ships no suite): 17 checks / 0 failures**, covering Last Howl's payout
+  (including the discriminating control: UNSWORN, a companion's death must pay NOTHING, and the
+  Steadfast Bond case where a naive read pays for the surviving half), Succession's handover (with
+  the no-window control and the never-lowers case), Reacquire's bank and restore (with the control
+  that an UNNAMED switch still clears outright), and Fault Line above and below the line.
+  **A beast rarely dies in a smoke and BJ measured swaps at 0.05 a trash battle**, so these are the
+  branches being rare rather than a gap — the same place BB, BW and CG put a rare branch.
+· **THE SMOKE'S OWN ARTEFACT, unchanged since CB**: `DOD_SIM_ABILITIES` hands every card to every
+  hero, so a Cryomancer swears the last howl and a Devout names a quarry in the logs. Unreachable
+  in a real draft — and it is what makes the "he holds no Focus to bank" branches worth having.
+**THE MASTER.HTML STAMP GATE IS DUPLICATED FOURTEEN TIMES, AND BOTH CE'S AND CG'S COUNTS WERE
+WRONG IN DIFFERENT WAYS — CORRECTED HERE.** CE said fourteen and named `test_batch_cd`, which
+carries no stamp gate at all; CG corrected it to thirteen and dropped `test_batch_ce`, which does
+carry one. **The fourteen are ah, bb, bn, bo, bp, bq, br, bs, bt, bu, bv, bw, bx AND ce**, and all
+fourteen moved to Batch CH. test_batch_cd still checks master.html's CONTENT rather than its stamp.
+**FLAGGED AND SHIPPED UNTUNED, TO BE WATCHED IN PLAY (Threshold's 15 and Breaking Darkness's 50 are
+the precedent): FAULT LINE'S 20 BD** is the number this batch trusts least — it is the only Break
+the Hunter class has, so too low and the lever does not exist, too high and one draft card outdoes
+a Warden's whole Threat lane (AL measured that at 320 BD a battle). **LAST HOWL'S 2% A STACK** reads
+a meter with NO CEILING: at the 50 Loyalty AY measured on a DEVOTION build, one companion's death
+is +100% strike damage. **UNLEASH'S 20% A STACK** has the same property from the other side.
+**DO NOT PRE-TUNE ANY OF THE THREE.**
 
 BATCH CG (08-16) — THE CE REVISION. **SEVEN CHANGES TO THE NINE CLERIC CARDS CE SHIPPED, AND THE
 BLOCK BELOW IS THE CORRECTION TO CE'S** (CA's rule: a dated block is the record of what that batch

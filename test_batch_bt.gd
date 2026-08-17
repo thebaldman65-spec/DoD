@@ -189,17 +189,24 @@ func _pools() -> void:
 	# third landed, so six pools are eight deep and six are five. The question is
 	# unchanged and is still what tells the two answers apart; what is owed now
 	# is the HUNTER and WARRIOR thirds, and it has to stay visible in code.
-	for spec in ["beastmaster", "sharpshooter", "mystic",
-			"berserker", "warden", "swordmaster"]:
+	# RE-POINTED BY BATCH CH, AND IT IS THE SIXTH INVERSION OF THIS LOOP. It has
+	# asserted, in order: each earlier tranche's own asymmetry, then the FLATNESS
+	# tranche 2 achieved, then CB's new asymmetry, then that asymmetry HALVED at
+	# CE, and now QUARTERED — the HUNTER three joined the Mage and Cleric at
+	# EIGHT when tranche 3's third third landed, so NINE pools are eight deep and
+	# only the WARRIOR THREE are still at five. The question is unchanged and is
+	# still what tells the two answers apart; what is owed is the Warrior third,
+	# and it is the LAST of the debt, so it has to stay visible in code.
+	for spec in ["berserker", "warden", "swordmaster"]:
 		ok(Classes.spec_draft_pool(spec).size() == 5,
 			"%s is still FIVE — its third of tranche 3 is owed" % spec)
 	for spec in ["beastmaster", "sharpshooter", "mystic"]:
-		ok(Classes.spec_draft_pool(spec).size() == 5,
-			"%s joined them at FIVE in Batch BV" % spec)
+		ok(Classes.spec_draft_pool(spec).size() == 8,
+			"%s drafts EIGHT since Batch CH — the Hunter is the third class complete" % spec)
 	var total := 0
 	for spec in Classes.SPEC_DRAFT_POOLS:
 		total += Classes.spec_draft_pool(spec).size()
-	ok(total == 78,
+	ok(total == 87,
 		"the spec pools hold 78 (60 + CB's Mage nine + CE's Cleric nine), got %d"
 			% total)
 	# CLASS_DRAFT_POOLS IS BYTE-UNTOUCHED — this batch adds no class card, and a
@@ -418,7 +425,7 @@ func _one_shield_door() -> void:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CG"), "master.html carries the current batch stamp")
+	ok(master.contains("Batch CH"), "master.html carries the current batch stamp")
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
 	# §5: THE SYNERGY LINE IS THE INFORMATION THIS TRANCHE WAS AUTHORED FOR, so

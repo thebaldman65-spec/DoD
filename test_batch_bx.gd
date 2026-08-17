@@ -636,8 +636,15 @@ func _deepest_bond_source() -> void:
 	var bat := _code("res://scripts/battle.gd")
 	ok(bat.count("func _deepest_bond(") == 1,
 		"§3: exactly one answer to which companion an ordered action goes to")
-	ok(bat.count("_deepest_bond(attacker)") == 2,
-		"§3: ...and BOTH cards call it (got %d)"
+	# RE-POINTED BY BATCH CH: a THIRD caller arrived. UNLEASH spends ONE
+	# companion's Loyalty, so it asks the same question Twin Hunt and Savage
+	# Sweep ask — which companion does an ORDERED action go to — and it asks it
+	# through the same function rather than reaching for `beasts[0]`, which is
+	# the drift BX existed to close. The COUNT is what moved; the question did
+	# not, and a card added later that reads list order still trips the pins
+	# below.
+	ok(bat.count("_deepest_bond(attacker)") == 3,
+		"§3: ...and ALL THREE cards call it — Twin Hunt, Savage Sweep, Unleash (got %d)"
 			% bat.count("_deepest_bond(attacker)"))
 	# THE TWO THINGS IT REPLACED ARE GONE, not left beside it. A list-order read
 	# surviving anywhere on this path is the exact drift BV reported and BW
@@ -886,7 +893,7 @@ func _rename() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	ok(master.contains("Batch CG"), "§5: master.html is stamped Batch CG")
+	ok(master.contains("Batch CH"), "§5: master.html is stamped Batch CH")
 	var low := master.to_lower()
 	ok(low.contains("every living hero") or low.contains("all four heroes"),
 		"§5: master.html says an elite offers a draft to every living hero")
