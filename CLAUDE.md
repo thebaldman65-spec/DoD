@@ -22,11 +22,29 @@ updated alongside `docs/changelog.html` (the living changelog). The original
   EVERY BATCH FROM CJ FORWARD, INCLUDING TUNING THAT COMES OUT OF PLAYTESTING.** Ability
   `description` and `perfect_text`, `passive_desc`, status/chip text, talent nodes, runes,
   relics, glossary, and master.html's tables. The load-bearing rules:
-  · **TWO TIERS. Draft screen and glossary MAY show percentages and formulas; EVERYWHERE ELSE,
-    ESPECIALLY MID-COMBAT, MAY NOT** — a real computed number where one is available at tooltip
-    time, otherwise plain language. **The player must never be asked to do math while choosing
-    an action.** The battle tooltip already computes damage/BD/cooldown/initiative/Perfect, so a
-    description restating them in arithmetic is a second copy of a number the renderer has.
+  · **~~TWO TIERS~~ — SUPERSEDED AT BATCH CL §1. DO NOT APPLY IT.** The rule was: draft screen
+    and glossary may show percentages and formulas, everywhere else may not, because mid-combat
+    surfaces could not show arithmetic. **CL DELETED THE SPLIT by removing its premise** — a
+    percentage is now followed by its computed value in parentheses (`20% of maximum health
+    (34)`) on every surface, so the player is never asked to compute anything AND the formula
+    stays visible so scaling stays legible. One rule, everywhere. `text-standard.html` §1 was
+    REWRITTEN rather than appended to, on the brief's instruction: a superseded rule left in
+    place is how BY's "quote only gates 1 and 3" survived twelve batches. **This bullet is kept
+    only as a pointer, because the two-tier phrasing outlived its own deletion here for three
+    batches** — it is the thing to check when a rule looks like it contradicts the standard.
+  · **THE PARENTHETICAL IS COMPUTED AT RENDER TIME AND NEVER AUTHORED (STANDING, CL §1).**
+    `Classes.resolve_values` expands a token; **a literal digit inside parentheses in any
+    authored field is a defect**, because typing one creates a second copy of a number that can
+    drift from the code — the exact failure `text-audit.html` exists to catch. Four resolution
+    cases: a *final* percentage resolves to the resulting TOTAL **on chips only**; volatile
+    stats resolve live and are allowed to move between reads; where there is nothing to resolve
+    against (glossary, a draft card with no target) the percentage stands alone with **no
+    placeholder and no dash**; and resolution follows **the owner the prose names**, which is
+    why §4.2's name-the-owner rule has to be right before the wiring is.
+  · **The player must never be asked to do math while choosing an action.** This half of the
+    old rule SURVIVES CL and is the reason the parenthetical exists. The battle tooltip already
+    computes damage/BD/cooldown/initiative/Perfect, so a description restating them in
+    arithmetic is still a second copy of a number the renderer has.
   · **NO DESIGN RATIONALE ON A CARD, EVER — it goes in `changelog.html`.** Flavor is welcome:
     ONE short clause, mechanically empty, removable. If it could be mistaken for a rule, cut it.
   · **No pronouns** ("Loses 20% of current health", not "he loses"/"you lose"). **Always name
@@ -127,6 +145,114 @@ it is carrying its own history.**
   **Recorded as a CODE-HEALTH observation: a file that size wants splitting eventually, and doing
   it deliberately is far cheaper than doing it when it becomes unworkable.**
 
+## The skill check — THREE CASES, AND THE BAR IS PARAMETERIC (STANDING, SET AT CM AND CN)
+`docs/master.html` §4.2 documents all three cases. **They share ONE bar, ONE sweep and ONE set of
+zones — and as of BATCH CN those are a PROFILE rather than constants.**
+- **THE DEFAULT PROFILE IS AUTHORITATIVE, NOT A FALLBACK.** `battle.SC_PROFILE_DEFAULT` holds
+  `perfect_half` 0.045, `good_half` 0.16, `centre` 0.5, `sweep_time` 0.72, `presses` 1 — today's
+  numbers exactly — and **every caller uses it; nothing overrides it yet.** **A LATER BATCH THAT
+  EDITS A VALUE THERE CHANGES EVERY CHECK IN THE GAME AT ONCE.** `check_cn.gd` asserts the five
+  values, and asserts that the zone rects and the grade boundaries the profile produces are the
+  ones the pre-CN formulas drew.
+- **`centre` AND `presses` ARE WIRED AND UNUSED.** Nothing in the game moves the window off 0.5
+  or asks for a second press. Multi-press returns the **worst** grade of the set ("how many
+  windows must be landed", read literally). CO is where both get used.
+- **THE ZONE RECTS ARE RESIZED PER CAST** (`_apply_sc_profile`), not built once at UI setup.
+  Grading and drawing come off the same dictionary on the same line of execution — split them and
+  a profile that widens the window grades one thing and draws another, and **the player would be
+  aiming at a lie.**
+- **`up_sure` IS NOW WRITABLE AND WAS DELIBERATELY NOT WRITTEN AT CN.** The comment in
+  `run_state.gd` explaining why it was refused (the window is not a parameter) **is out of date
+  as of CN** on that count. Its second objection still stands and is the harder one: **the bot
+  never runs the bar** — it rolls a grade off hardcoded probabilities — so a widened window is
+  invisible to every instrument the project owns.
+
+### THE RULE EVERY PROFILE IS AUTHORED TO (STANDING, SET AT CN, BINDING ON CO)
+> **VARY THE CHARACTER, HOLD THE DIFFICULTY CONSTANT.** A profile expresses a spec's identity,
+> not its difficulty. **The Perfect window is authored as a FRACTION OF SWEEP TIME, not as a
+> fixed width** — so a fast narrow bar and a slow wide one are exactly as hard to land while
+> feeling nothing alike. **A spec whose bar is genuinely harder is a spec a player can lose
+> access to through no fault of their build**, which is the failure mode that sank timed hits in
+> Legend of Dragoon and Mother 3.
+>
+> **TWO DELIBERATE EXCEPTIONS, BOTH OPT-IN:** the **Sharpshooter**, whose bar is meant to be
+> harder and to pay more, and the **relic that swaps a hero's bar for a riskier one while held.**
+
+### WHERE THE CHECK COMES OFF (STANDING, SET AT BATCH CN §2)
+**113 of the 211 drafted abilities now run no bar at all.** `Ability.runs_skill_check()` is the
+ONE answer, asked by the cast path and by the draft card alike.
+- **THE CRITERION IS MECHANICAL: remove the check wherever the grade multiplier has nothing to
+  multiply.** No damage and no Break damage means ×1.15 and ×0.6 both resolve to nothing.
+- **THE FIELDS ALONE ARE NOT THE CRITERION, AND THIS IS THE TRAP CN FOUND.** Half the corpus does
+  its work inside a `special` handler, so `damage: 0, pressure: 0` is TRUE of **Feint, Guard
+  Change, Kill Command, Savage Sweep, Precision Strike, Harvest, Primal Surge, Call the Wilds**
+  and others that hit hard. `Ability.DAMAGE_SPECIALS` names the handlers that actually resolve
+  damage or BD; **a field-only test would have stripped the bar off every one of them.**
+- **ONLY THE BASE EFFECT COUNTS.** A handler whose only damage sits inside `if is_perfect` is
+  caught — that branch is the orphaned bonus, not a reason to keep grading. **BEWITCH is the
+  whole of that case**: its strike was Perfect-only, so it lost its bar and the strike is now
+  what Bewitch always does.
+- **FOUR OVERRIDES.** **Heals keep their check** (`Ability.HEAL_SPECIALS`, an authored list
+  because "is this a heal" is a question about the card — RENEWAL heals through a status, so
+  nothing heals at cast time and a purely mechanical read would have taken its bar away while
+  HEAL beside it kept one). **Shields lose theirs** whether or not the absorb scaled with the
+  grade. **Pure debuff appliers lose theirs** — the grade has never affected whether a status
+  lands. **Break damage counts as something to multiply**, so an ability with BD and no HP damage
+  KEEPS its bar (Breaking Darkness at 20 BD is the case to check against).
+- **A GATED ABILITY ALWAYS KEEPS ITS BAR, and this clause is CN's own addition.** CM's **Reckless
+  Abandon** has no damage and no BD, so the criterion catches it cleanly — and obeying it there
+  would have deleted a CM feature in silence. **An ability whose Sloppy loses the cast cannot
+  lose the check that produces the Sloppy.**
+- **BASIC ATTACKS RESOLVE AT A FIXED GOOD, EXCEPT THE SHARPSHOOTER'S.** Read off **slot 0** and
+  off the **hero's passive** (`lethal_aim`), not off a name: his basic IS Quick Shot, the same
+  object the Beastmaster and Mystic carry, so there is no card to flag.
+- **THE NO-CHECK TEST SITS ABOVE THE AUTOPLAY ROLL AND THAT ORDER IS LOAD-BEARING.** Leave the
+  bot's 20%-Perfect roll on top and it still rolls Perfects nobody can press for, **every folded
+  bonus gets paid twice in a sim**, and the balance numbers stop describing the player's game.
+- **EVERY ORPHANED PERFECT WAS FOLDED INTO THE BASE EFFECT, NOT DELETED** (105 abilities), and
+  **`perfect_text`/`perfect_id` were cleared on all of them** — CK taught the draft card to render
+  Perfect, so an orphan would advertise a bonus that can never fire. `check_cn.gd` gates it.
+- **NOTHING IS CONSUMED UNTIL AFTER THE GRADE, AND BOTH CM FEATURES ARE BUILT ON THAT.** The
+  Cancel button already returned to the action bar "with nothing spent" even after a target was
+  chosen, so consumption has always happened downstream of the grade. **Neither feature has or
+  needs a refund path.** A gated failure is the existing cancel path with the turn spent instead
+  of returned. **That is what makes three of the five expressible at all**: Requiem eats Ruin off
+  the *enemy*, Unleash eats the *companion's* Loyalty, Boil Over drops the Berserker's live
+  Frenzy bonus — "refund the resource" is undefined for every one of them.
+- **`_grade_skill_check()` TAKES NO ARGUMENTS AND MUST NOT LEARN WHICH ABILITY IT IS GRADING.**
+  The caller knows; the flag is tested at the call site in `_hero_turn`. `_run_skill_check`'s one
+  new argument, `mode`, names *what* is being graded ("" / "gated" / "defensive") and picks only
+  the top line, the tint and which orientation card is owed.
+- **STANDING RULE: NO HEALING OR REVIVAL ABILITY IS EVER GATED.** Resurrection is deliberately
+  excluded and this is a rule, not a scoping choice — **losing a resurrection to a hand slip is
+  the worst outcome the system could produce.** A later batch extending the gated set **must not
+  reach for one**. `check_cm.gd` asserts it over the whole 211-ability corpus, not over the five.
+- **STANDING RULE: THE DEFENSIVE CHECK CAN ONLY MITIGATE.** Perfect is ×0.85 damage and ×0.75
+  Break; **Good and Sloppy are IDENTICAL and never worse.** `_defensive_brace` returns a
+  *boolean* rather than a grade, so the absence of a third outcome is structural rather than a
+  convention somebody has to remember. **A defensive check must never be able to make an incoming
+  blow larger.**
+- **The gated five are `Ability.gated`: Death Ray, Requiem, Reckless Abandon, Boil Over,
+  Unleash.** The tell is `Classes.GATED_TELL`, ONE string on four surfaces (ability button,
+  battle tooltip, draft card, the bar while it sweeps) and **never authored into a description**
+  — CL §1's rule applied to a sentence.
+- **`_has_defensive_check` IS THE ONE ANSWER TO "does this unit get a defensive bar"** (Warden
+  always; Swordmaster only in the Defensive guard; Formless counts as both). **It reads
+  `u.stance` DIRECTLY and deliberately NOT through `_stance_satisfies`** — that helper is for
+  ABILITY gates, and Feigned Guard's scope is abilities and nothing else, so a Feigned Guard does
+  not conjure a defensive check any more than it moves Bracing or Untouchable.
+- **TWO NARROWINGS OF "every qualifying incoming attack", both reported at CM:** a **counter**
+  raises no bar (a free swing drawn by the hero's own action; the offensive bar does not run for
+  one either), and an attack carrying a **`special`** raises none (it never reaches the ordinary
+  strike loop, which is the only place the mitigation is applied). **Exactly one enemy attack is
+  skipped by the second clause today — the Bloodcaller's Blood Tribute.** The Hurler's Siege
+  Stone is NOT skipped: its `windup` deals nothing, and the landing returns a turn later as a
+  plain attack copy.
+- **PACING IS THE KNOWN RISK AND THE NUMBER EXISTS NOW: 6.9–9.4 defensive checks a battle with a
+  Warden in the party, against 22.8–27.3 hero actions.** The party's presses rise about a third;
+  **the WARDEN's own roughly double** (he acts ~7 times and braces 7–9). **Uncapped on purpose
+  for the first pass** — a cap is a retreat available afterwards, and it is a designer's call.
+
 ## Verify before shipping
 - **STANDING CONVENTION, SET AT BATCH CG AND BINDING ON EVERY CONTENT BATCH FROM IT: A CONTENT
   BATCH DOES NOT SHIP A TEST SUITE.** No new suite, no negative controls, no smoke sweeps, no
@@ -144,6 +270,20 @@ it is carrying its own history.**
 - Parse: run each scene headless with `--quit-after 90`, grep "SCRIPT ERROR".
   **TWELVE scenes since Batch BK** (blacksmith is new). `check_parse.gd`
   force-loads every script and scene in one pass and is the faster gate.
+- **`check_cm.gd` (Batch CM) is the GATED-ABILITY invariant gate**, and it is the enforcement
+  behind the standing rule above: it walks the whole 211-ability corpus and fails if the gated
+  set is not the five §1 names, if any gated ability heals or revives, if the draft card's tell
+  disagrees with the flag, or if the tell breaks the standard's 44-character ceiling. **Run it
+  in any batch that touches `Ability.gated` or adds an ability.**
+- **`check_cm_live.gd` (Batch CM) is the only thing that PRESSES THE DEFENSIVE BAR.** Every
+  headless battle takes `_defensive_brace`'s bot branch, so `_run_skill_check`'s defensive path
+  is exercised nowhere else. It spawns a real non-autoplay battle, drives an enemy attack into a
+  Warden, presses the bar by hand, and measures ×0.85 / ×0.75 plus "Sloppy equals Good".
+  · **`block_chance = 0.0` DOES NOT TURN A WARDEN'S BLOCK OFF, and it cost this gate a false
+    failure.** `_live_block_chance` adds `_plating_slice` (0.15 + Heavy Plating's climb) ON TOP
+    of the field. The sum is clamped to [0,1], so **a large NEGATIVE field is what actually
+    disables it** — and because a block throws the climb away, samples must be INTERLEAVED, not
+    run in two consecutive blocks. **Any future Warden measurement wants both.**
 - **`check_map.gd` (Batch BK) is the MAP GENERATION instrument**: N generated
   zones → node count, column widths, out-degree, foreclosure depth, the entry
   guarantee, reach contiguity, and the walked distribution under an unsteered

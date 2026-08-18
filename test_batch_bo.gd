@@ -236,7 +236,15 @@ func _pools() -> void:
 				continue
 			ok(ab.display_name == String(n), "§5: ...to itself (%s)" % n)
 			ok(ab.description != "", "§5: ...and carries a description (%s)" % n)
-			ok(ab.perfect_text != "", "§5: ...and a perfect (%s)" % n)
+			# RE-POINTED BY BATCH CN §2. This asserted that EVERY draft entry states a
+			# perfect. As of CN that is false by design: 113 of the 211 abilities run no
+			# skill check at all, and §3 CLEARED their `perfect_text` precisely so the
+			# draft card cannot advertise a bonus nothing can fire. The durable question
+			# is the BICONDITIONAL — a card states a perfect exactly when it runs a check
+			# — which is strictly stronger than what was here and cannot rot as the
+			# criterion catches more cards.
+			ok(ab.perfect_text != "" if ab.runs_skill_check() else ab.perfect_text == "",
+				"§5: ...and states a perfect exactly when it runs a check (%s)" % n)
 			ok(ab.delay > 0.0, "§5: ...and an initiative cost (%s)" % n)
 	# NO DRAFT NAME MAY COLLIDE WITH AN EXISTING ONE. `pool_ability` resolves
 	# by display name across the whole game, so a collision would silently
@@ -692,18 +700,19 @@ func _live_pyromancer() -> void:
 	await scene.call("_resolve", pyro, ed, foes[0], "good")
 	ok(foes[0].status_stacks("burn") > 0 or not foes[0].get_status("burn").is_empty(),
 		"§5: Ember Debt lights its enemy")
-	ok(int(foes[0].get_status("burn").get("turns", 0)) == 8,
-		"§5: ...for the 8 turns the card promises")
-	ok(pyro.resource == mana_was - ed.cost + 8,
-		"§5: ...and Overburn PAYS THE DEBT UP FRONT — %d - %d + 8 = %d (got %d)" % [
-			mana_was, ed.cost, mana_was - ed.cost + 8, pyro.resource])
+	# BATCH CN §3 folded this ability's Perfect bonus into its base effect.
+	ok(int(foes[0].get_status("burn").get("turns", 0)) == 12,
+		"§5: ...for the 12 turns the card promises (CN folded the perfect in)")
+	ok(pyro.resource == mana_was - ed.cost + 12,
+		"§5: ...and Overburn PAYS THE DEBT UP FRONT — %d - %d + 12 = %d (got %d)" % [
+			mana_was, ed.cost, mana_was - ed.cost + 12, pyro.resource])
 	var total := int(scene.call("_total_burn_turns"))
-	ok(total >= 8, "§5: the field carries the fire (%d turns)" % total)
+	ok(total >= 12, "§5: the field carries the fire (%d turns)" % total)
 	ok(scene.call("_overburn_mult", pyro, total) > 1.0,
 		"§5: ...and the damage BONUS reads it, which is the surviving clause")
 	# THE FIRE IS NOT CONSUMED — the distinction from every other payer, and
 	# "it burns" is trivially true unless the turns are re-read afterwards.
-	ok(int(foes[0].get_status("burn").get("turns", 0)) == 8,
+	ok(int(foes[0].get_status("burn").get("turns", 0)) == 12,
 		"§5: ...while the fire still stands its full term, unconsumed")
 	# A SECOND FIRE COSTS HIM NOTHING TO HOLD EITHER — the inversion of BO's
 	# "everything else still bills as before", and the reason that line had to
@@ -939,9 +948,10 @@ func _live_devout() -> void:
 	await scene.call("_resolve", dv, ag, ally, "good")
 	ok(not ally.has_status("barrier"),
 		"§5: AEGIS REVERSAL CONSUMES THE SHIELD")
-	ok(ally.aegis_bonus == shield_left,
-		"§5: ...and banks exactly what it had left (%d of %d)" % [
-			ally.aegis_bonus, shield_left])
+	# BATCH CN §3 folded this ability's Perfect bonus into its base effect.
+	ok(ally.aegis_bonus == int(round(shield_left * 1.5)),
+		"§5: ...and banks HALF AGAIN what it had left (%d of %d)" % [
+			ally.aegis_bonus, int(round(shield_left * 1.5))])
 	var foe: BattleUnit = scene.get("enemies")[0]
 	foe.max_hp = 99999
 	foe.hp = 99999
@@ -1151,8 +1161,9 @@ func _live_survivalist() -> void:
 		if f.has_status("blind"):
 			blinded += 1
 	ok(blinded == 3, "§5: Choking Smoke Blinds the whole field (%d of 3)" % blinded)
-	ok(int(foes[0].get_status("blind").get("turns", 0)) == 2,
-		"§5: ...for 2 turns")
+	# BATCH CN §3 folded this ability's Perfect bonus into its base effect.
+	ok(int(foes[0].get_status("blind").get("turns", 0)) == 3,
+		"§5: ...for 3 turns (CN folded the perfect in)")
 	# THE MISS STACK IS ADDITIVE PERCENTAGE POINTS ON TOP OF THE BASE, and it
 	# is measured off the live function rather than re-derived from the design.
 	foes[0].no_cover = 0
@@ -1214,8 +1225,21 @@ func _docs() -> void:
 	# TOGETHER or a batch that bumps the timestamp trips suites it never
 	# touched. (BO had its own copy phrased as "this batch"; it is the same
 	# gate.)
-	ok(master.contains("Batch CI"),
-		"§6: master.html is stamped for the current batch")
+	# RE-POINTED BY BATCH CN, to the durable shape Batch CK gave this same gate in
+	# test_batch_br. It read `master.contains("Batch C?")`, a stamp assertion that
+	# has to be hand-bumped every batch — **A CHECK THAT MUST BE EDITED EVERY BATCH
+	# TO KEEP PASSING IS A CHECK THAT WILL BE RED MOST BATCHES**, which stops it
+	# carrying information. It asks the durable version now: the document carries a
+	# stamp, and that stamp is not older than the batch this suite belongs to. No
+	# bump is ever owed again. (Two-letter batch codes sort lexically; a
+	# three-letter code will need one more line.)
+	var stamp_at := master.find("Last updated:")
+	ok(stamp_at >= 0, "master.html carries a Last-updated stamp")
+	var stamp := master.substr(stamp_at, 60)
+	var code_at := stamp.find("(Batch ")
+	var stamped := stamp.substr(code_at + 7, 2) if code_at >= 0 else ""
+	ok(stamped >= "BO",
+		"...and master.html is stamped no older than this suite's own batch (reads '%s')" % stamped)
 	ok(master.contains("THE ABILITY DRAFT") or master.contains("The Ability Draft"),
 		"§6: ...and carries the draft's own section")
 	for spec in TRANCHE_1:

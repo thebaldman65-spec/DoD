@@ -97,6 +97,17 @@ func _select_hero(idx: int) -> void:
 
 # Spec passive text with talent-modified numbers baked in, so the sheet
 # reflects Aggressive/Defensive Stance and Unstoppable ranks.
+#
+# BATCH CL §7 — AND IT IS FLATTENED HERE, NOT IN THE FIELD. The brief and the
+# standard both describe `passive_desc` as rendering only in this autowrapping
+# 400px label, and it has a THIRD surface neither of them names:
+# `battle.gd:1086` hands the same field to `add_status`, and `unit.gd:2291`
+# makes that a Godot default tooltip — which does NOT autowrap and grows to fit
+# its longest line. So the authored breaks STAY in the field and come out at the
+# two surfaces that soft-wrap: this label and the spec-choice column. Deleting
+# them from the field would tidy the ragged block here and render the
+# Arcanist's block as one ~2000px line in the middle of a fight, which is the
+# exact failure §4.7 records for ability descriptions.
 func _passive_desc_live(cfg: Dictionary, spec: String) -> String:
 	var desc: String = Classes.SPEC_INFO[spec]["passive_desc"]
 	match Classes.SPEC_INFO[spec]["passive"]:
@@ -105,9 +116,10 @@ func _passive_desc_live(cfg: Dictionary, spec: String) -> String:
 				int(round((0.15 + float(cfg.get("seasoned_off_bonus", 0.0))) * 100)),
 				int(round((0.15 + float(cfg.get("seasoned_def_bonus", 0.0))) * 100))]
 		"bloodrage":
-			desc = "Blood Frenzy: +%s%% damage for every 5%% of health missing.\nHalf the highest bonus reached each battle is kept as a\nfloor — his fury never fully cools." % \
+			desc = "Blood Frenzy: +%s%% damage for every 5%% of health\nmissing. Half the highest bonus reached in a battle\nis kept as a floor for the rest of it." % \
 				String.num(2.0 + float(cfg.get("bloodrage_step_bonus", 0.0)), 1)
-	return desc
+	return Classes.resolve_values(desc,
+		Classes.value_ctx_from_config(cfg)).replace("\n", " ")
 
 
 func _draw_detail() -> void:
@@ -286,7 +298,11 @@ func _draw_detail() -> void:
 			chip_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
 		chip_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		chip.add_child(chip_label)
-		var tip := ab.description
+		# BATCH CL §1 — the sheet resolves its own tokens. `cfg` is post-prologue
+		# here, so these are the numbers the fight will use, and `member` adds
+		# the live current health the config cannot carry.
+		var vctx := Classes.value_ctx_from_config(cfg, member)
+		var tip := Classes.resolve_values(ab.description, vctx)
 		# BATCH CK §1: the computed lines are `Classes.computed_block` now, and
 		# the draft card renders the SAME function's output. This screen was the
 		# only copy of them, which is why the draft card had none — the fix was
@@ -296,7 +312,7 @@ func _draw_detail() -> void:
 		# lines the block carries; each is a number this sheet already had and
 		# was not showing.
 		tip += "\n%s" % Classes.computed_block(ab, int(cfg.get("attack", 100)),
-			String(cfg.get("resource_name", "Mana")))
+			String(cfg.get("resource_name", "Mana")), vctx)
 		# THE SCALING LINE STAYS HERE AND IS NOT IN THE BLOCK. The sheet is the
 		# page where numbers are studied, so it shows both the range and what
 		# produced it; the draft card would be showing the same figure twice,

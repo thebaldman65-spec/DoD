@@ -142,7 +142,7 @@ func _draw_pairing(i: int, price: int) -> void:
 	var ab: Ability = Classes.pool_ability(String(pairing["ability"]))
 	if ab != null:
 		var about := Label.new()
-		about.text = ab.description
+		about.text = Classes.resolve_values(ab.description)
 		about.add_theme_font_size_override("font_size", 12)
 		about.add_theme_color_override("font_color", Color(0.55, 0.53, 0.5))
 		about.custom_minimum_size = Vector2(335, 90)

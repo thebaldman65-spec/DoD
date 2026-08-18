@@ -4,6 +4,111 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The criterion that could not be read off the fields (Batch CN) — 2026-08-18
+
+The brief said the criterion was mechanical rather than categorical, and it was right about the
+principle and wrong about where to look. "No damage and no Break damage" run against the ability's
+own fields catches 137 of 211 cards — and among them Feint, Guard Change, Kill Command, Savage
+Sweep, Precision Strike, Harvest and Call the Wilds, every one of which hits somebody hard.
+`damage: 0, pressure: 0` is simply what an ability looks like when its work happens inside a
+`special` handler, and roughly half the corpus is built that way. **A mechanical criterion is only
+as good as the thing it is mechanically reading**, and the readable surface here was three fields
+that stopped describing the game some time around the fortieth card.
+
+The fix was to read what actually resolves — walk the handler's call graph down to its damage and
+healing leaves — which is more work and is still mechanical, still checkable, still not a judgment
+per card. The general shape: **when a data-level test disagrees with the design intent, the usual
+fault is that the data stopped being where the behaviour lives.** Worth asking of any rule the
+project writes against `Ability`'s fields.
+
+**One thing the criterion could not decide, and it is the interesting one.** Heals keep their
+check because the grade multiplies a heal — but Renewal heals through a status it applies, so at
+cast time nothing is healed and no mechanical read can tell it from a buff. Heal, sitting beside
+it in the same kit, would have kept its bar while Renewal lost one. That list is authored rather
+than derived, and the boundary is honest: "is this ability a heal" turns out to be a question
+about the card rather than about the code, and pretending otherwise would have produced a
+defensible rule and an incoherent kit.
+
+**And one place obeying the criterion would have deleted a feature in silence.** Reckless Abandon
+spends the whole Rage bar for a three-turn multiplier: no damage, no Break damage, caught cleanly.
+It is also one of Batch CM's five gated abilities, where a Sloppy loses the cast outright — the
+largest thing a grade moves anywhere in the game. **An ability whose Sloppy loses the cast cannot
+lose the check that produces the Sloppy.** The criterion was extended rather than excepted, but
+the lesson is about the shape of the work: a rule applied across a corpus will meet a case the
+rule's author had not met yet, and the batch after the one that introduced it is exactly when that
+happens.
+
+## The feature that was already built (Batch CM) — 2026-08-17
+
+Two features landed here and neither needed a mechanism. The gate — a Sloppy check loses the cast
+— reads like it wants a refund path: five abilities, each spending something different, one of
+them spending a resource that belongs to the *enemy*. Writing "give it back" for Requiem, Unleash
+and Boil Over would have meant inventing three answers to a question nobody had asked, because
+none of the three takes anything from the caster at all. **The Cancel button had already answered
+it.** Cancelling returns to the action bar with nothing spent, *after* a target has been chosen,
+which means consumption has always happened downstream of the grade. A gated failure is that same
+path with the turn spent instead of returned. The whole implementation is declining to enter the
+function where everything is taken.
+
+**The general shape is worth keeping: before building a mechanism for "undo", check whether the
+thing was ever done.** The ordering that made this free was not designed for it — it was designed
+for a cancel button — and it has been sitting there since long before anyone wanted a gate.
+
+**On what the gate is actually spending.** It costs the turn, and *only* the turn, which sounds
+mild until you look at where these abilities sit on the timeline. Death Ray costs 5.0 initiative.
+Losing it is not losing a cast, it is losing a cast plus the five ticks of everyone else's turns
+that were the price of taking it. **The punishment did not have to be invented either; it is the
+initiative system charging its ordinary fee for nothing in return.**
+
+**On the defensive check, and the one number the batch was really for.** The design question was
+never whether mitigation on a timing bar is good — it plainly is, and Sloppy being identical to
+Good makes it strictly free to attempt. The question was pacing, and pacing is not answerable from
+a chair. So it shipped uncapped and measured: **the party's presses go up about a third, but the
+Warden's own roughly double**, because the bar lands on the unit already being attacked most. That
+distinction is the whole finding. A per-party number would have looked fine and hidden the fact
+that one player is now pressing space twice as often as they were, on turns that are not theirs.
+**A cap is now a decision about a measurement rather than a guess, which is what "uncapped for the
+first pass" was for.**
+
+**And one narrowing worth remembering.** Counters raise no bar. The letter of the brief said every
+qualifying incoming attack, and a counter is one — but the offensive bar has never run for a
+counter either, and the symmetry is the better rule: **a bar belongs to an action somebody chose to
+be in.** Reported rather than assumed, because it is a designer's call and it is one condition.
+
+## The rule that outlived its own deletion (Batch CL) — 2026-08-17
+
+CL's §1 removed the two-tier arithmetic split by removing its premise. The tiers existed because
+mid-combat surfaces could not show arithmetic, so formulas were allowed on the draft screen and
+banned everywhere else; once a percentage is followed by its computed value, nobody is doing
+arithmetic anywhere and the formula can stay visible on every surface. **The brief was explicit
+that the standard should be REWRITTEN rather than appended to**, citing BY's "quote only gates 1
+and 3", which survived twelve batches because it was left sitting under the rule that replaced
+it. CL did rewrite `text-standard.html` §1 — and left the same rule standing in `CLAUDE.md`,
+where it survived three more batches until CN went looking for it. **The instruction was
+followed on the document it named and not on the copy nobody thought of as a copy.** The general
+version: a rule that lives in two places is not superseded until both are edited, and the file
+you are editing is never the one that will bite you.
+
+**The other thing CL got right and filed wrong.** §1 predicted the parenthetical would push
+hand-wrapped lines past the 44-character ceiling, and told the batch to ship, measure, then fix
+only what overflowed rather than pre-emptively rewrapping 936 lines — this project has twice set
+a number it had not measured. The measurement came back **zero lines pushed over**, which is the
+best possible answer and the reason no rewrap happened. It went into `text-standard.html` §4.8,
+where it reads as a note about the standard rather than as the report a batch owed. **A report
+filed next to the rule it validates is invisible to anyone asking what the batch did** — the
+finding was not missing, it was misfiled, which is harder to notice than missing.
+
+**And the report CL did not produce at all is the one worth having.** §5 asked what a second cast
+does, per ability, from the code. Reading the code turns up a single root: `add_status` resolves a
+reapplied status as `max(old, new)` on both duration and power. For a constant power that is a
+fine answer. For a power that is a **snapshot of live state** it means the cost is paid and the
+effect discarded — Stabilize spends the Resonance and keeps the older mitigation, Funeral Pyre
+eats the Burn and keeps the older shield. **The tell that this was never a decision is that Batch
+BM already found it**, wrote it down in `_grant_divine_shield`, and fixed it for Divine Shield
+alone while the Layered Faith talent is held. **A default that one batch had to override at one
+call site is a default, not an answer** — and the remaining sites are a design question rather
+than a bug to be swept, which is why §5 said report and not fix.
+
 ## An audit is a claim, and a claim can be wrong (Batch CK) — 2026-08-17
 
 CJ's report named the draft card's missing numbers as its largest bucket-2 finding and ended the

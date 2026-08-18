@@ -834,7 +834,7 @@ func _open_pick_overlay(idx: int, pending := "") -> void:
 			for pool_name in (queue[0] if not queue.is_empty() else []):
 				var ab: Ability = Classes.spec_pool_ability(spec, String(pool_name))
 				_pick_button(box, String(pool_name),
-					ab.description if ab != null else "",
+					Classes.resolve_values(ab.description) if ab != null else "",
 					Color(0.85, 0.82, 0.75),
 					_pick_ability.bind(idx, String(pool_name)), overlay)
 		"upgrade":
@@ -946,7 +946,8 @@ func _open_drop_overlay(idx: int, kind: String, incoming: String,
 	for name in droppable:
 		var ab: Ability = Classes.spec_pool_ability(spec, String(name))
 		_pick_button(box, "Drop %s" % String(name),
-			ab.description if ab != null else "", Color(0.9, 0.7, 0.6),
+			Classes.resolve_values(ab.description) if ab != null else "",
+			Color(0.9, 0.7, 0.6),
 			on_drop.bind(idx, String(name)) if on_drop.is_valid()
 			else _finish_take.bind(idx, kind, incoming, String(name)), overlay)
 
@@ -1206,7 +1207,13 @@ func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 		cards.add_child(b)
 		if ab != null and ab.description != "":
 			var text := Label.new()
-			text.text = ab.description
+			# BATCH CL §1 — NO CTX ON PURPOSE. The map screen has no live hero to
+			# resolve against (the same reason `computed_block` prints a scaling
+			# percentage here and a range on the sheet), so every token falls
+			# through to its bare percentage: no parenthetical, no placeholder,
+			# no dash. Resolving is still CALLED, because an unresolved token
+			# must never reach a label.
+			text.text = Classes.resolve_values(ab.description)
 			text.add_theme_font_size_override("font_size", 11)
 			text.add_theme_color_override("font_color",
 				Color(0.8, 0.76, 0.66) if chosen else Color(0.62, 0.6, 0.57))

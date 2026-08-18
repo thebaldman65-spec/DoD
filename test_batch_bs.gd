@@ -349,7 +349,21 @@ func _rune_audit() -> void:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CI"), "§5: master.html is stamped Batch CH")
+	# RE-POINTED BY BATCH CN, to the durable shape Batch CK gave this same gate in
+	# test_batch_br. It read `master.contains("Batch C?")`, a stamp assertion that
+	# has to be hand-bumped every batch — **A CHECK THAT MUST BE EDITED EVERY BATCH
+	# TO KEEP PASSING IS A CHECK THAT WILL BE RED MOST BATCHES**, which stops it
+	# carrying information. It asks the durable version now: the document carries a
+	# stamp, and that stamp is not older than the batch this suite belongs to. No
+	# bump is ever owed again. (Two-letter batch codes sort lexically; a
+	# three-letter code will need one more line.)
+	var stamp_at := master.find("Last updated:")
+	ok(stamp_at >= 0, "master.html carries a Last-updated stamp")
+	var stamp := master.substr(stamp_at, 60)
+	var code_at := stamp.find("(Batch ")
+	var stamped := stamp.substr(code_at + 7, 2) if code_at >= 0 else ""
+	ok(stamped >= "BS",
+		"...and master.html is stamped no older than this suite's own batch (reads '%s')" % stamped)
 	ok(master.contains("TWO clauses"),
 		"§5: master.html's Overburn entry states two clauses")
 	ok(master.contains("Holding fire\ncosts him nothing.</b>")

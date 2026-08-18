@@ -26,52 +26,95 @@ sentence — every single one is an independently authored paraphrase, and
 same prose. <b>Anyone calibrating "how the cards read" from <code>master.html</code> is
 calibrating from text no player has ever seen.</b></p>
 
-<h2>1. THE TWO TIERS — the load-bearing rule</h2>
-<p><b>DRAFT SCREEN AND GLOSSARY — percentages and formulas are allowed.</b> This is where
-the player is comparing cards and wants the arithmetic available.</p>
-<p><b>EVERYWHERE ELSE, ESPECIALLY MID-COMBAT — no arithmetic.</b> A real computed number
-where one is available at tooltip time; otherwise plain direct language. <b>The player must
-never be asked to do math while choosing an action.</b></p>
-<p>Where a live value is cheap to compute from data already at hand, use it. Where it is
-not, use the formula and leave a note in the batch that writes it — the live-value version
-is a later batch.</p>
-<p><b>Which surface a string lands on is not a matter of opinion, and the tiers cut across a
-single field.</b> One ability <code>description</code> is rendered by five different screens,
-and only some of them are the draft:</p>
+<h2>1. THE VALUE ON THE LINE — the load-bearing rule</h2>
+<p><b>A percentage is followed by its computed value in parentheses:</b>
+<code>20% of maximum health (34)</code>.</p>
+<p><b>THE PARENTHETICAL IS COMPUTED AT RENDER TIME AND IS NEVER AUTHORED INTO A STRING.</b>
+The description holds a TOKEN and the renderer expands it
+(<code>Classes.resolve_values</code>, Batch CL §1). <b>A literal digit inside parentheses in
+any authored field is a defect.</b> Typing the number in would create two hundred new places
+for a value to drift out of sync with the code — the exact failure
+<code>text-audit.html</code> exists to catch, reintroduced at scale.</p>
+<p><b>THIS SUPERSEDES THE TWO-TIER ARITHMETIC SPLIT that stood here until Batch CL.</b> The
+tiers existed because mid-combat surfaces could not show arithmetic. With the value resolved
+on the line the player is never asked to compute anything, and the formula stays visible so
+scaling stays legible — so the split has nothing left to do. It is <b>rewritten rather than
+appended to</b>, because a superseded rule left standing beside its replacement is how BY's
+"quote only gates 1 and 3" survived twelve batches.</p>
+
+<h3>1.1 The four resolution cases</h3>
+<ul>
+<li><b>A percentage that is already final resolves to the resulting TOTAL, on chips only.</b>
+<code>+25% Block chance (→ 35%)</code> on a status chip, because mid-fight the useful number
+is what Block actually is now. <b>Everywhere else a final percentage stands alone</b> — a card
+reading <code>+25% Block chance (25%)</code> is noise.</li>
+<li><b>Volatile stats resolve live and are allowed to move.</b> <code>20% of CURRENT health
+(28)</code> will read differently next turn and that is correct — it is right at the moment it
+is read, and tooltips are re-read every time they open. <b>Do not freeze, snapshot or mark
+them.</b></li>
+<li><b>Where there is nothing to resolve against, the percentage stands alone.</b> Glossary
+entries have no hero; <code>20% of the target's maximum health</code> on a draft card has no
+target. <b>No parenthetical, no placeholder, no dash.</b> The resolver treats an absent base as
+a legal answer, which is why it cannot fail.</li>
+<li><b>Resolve against the owner the text names.</b> The token carries the owner and the
+renderer supplies the words, so §4.2's name-the-owner rule and the base the value divides into
+are ONE edit and cannot drift apart. A self-owned value is bare ("maximum health"); an
+other-owned one says whose.</li>
+</ul>
+
+<h3>1.2 What each surface can resolve against</h3>
+<p><b>Which surface a string lands on is not a matter of opinion.</b> One ability
+<code>description</code> is rendered by seven screens and they do not all hold a hero.
+<b>Every one of them calls the resolver</b> — a surface with nothing to resolve against still
+has to expand its tokens, or a raw <code>{mhp:20}</code> reaches a label.</p>
 <table border="1" cellpadding="4" cellspacing="0">
-<tr><th>Surface</th><th>Shows</th><th>Tier</th></tr>
-<tr><td>Draft card (<code>map_screen.gd</code>)</td><td><code>description</code> ONLY — no
-computed damage, no cost, no cooldown, <b>no Perfect</b></td><td><b>Arithmetic
-allowed</b></td></tr>
-<tr><td>Blacksmith commission (<code>blacksmith_screen.gd</code>)</td><td><code>description</code>
-+ live damage + scaling + Perfect</td><td>Arithmetic allowed</td></tr>
+<tr><th>Surface</th><th>Shows</th><th>Resolves against</th></tr>
+<tr><td>Draft card (<code>map_screen.gd</code>)</td><td><code>description</code> + the computed
+block (CK §1): scaling, BD, hits, cost, cooldown, initiative, <b>Perfect</b></td>
+<td><b>NOTHING</b> — the map screen builds no live Attack, so percentages stand alone</td></tr>
+<tr><td>Offer / drop picker (<code>map_screen.gd</code>)</td><td><code>description</code> ONLY,
+by design</td><td><b>NOTHING</b></td></tr>
+<tr><td>Blacksmith commission (<code>blacksmith_screen.gd</code>)</td>
+<td><code>Run.upgrade_desc</code> + <code>description</code></td><td><b>NOTHING</b></td></tr>
+<tr><td>Spec choice (<code>spec_choice_screen.gd</code>)</td><td>blurb +
+<code>passive_desc</code> + each <code>description</code></td><td>the spec's base
+<b>Attack</b> only — nothing is specced yet, so there is no maximum health that stays true
+after the choice</td></tr>
+<tr><td>Hero sheet (<code>party_screen.gd</code>)</td><td><code>description</code> + the same
+computed block; <code>passive_desc</code> in its own block</td><td>the post-prologue
+<code>cfg</code> <b>and</b> the member's live current health</td></tr>
 <tr><td>Battle button tooltip (<code>battle.gd</code>)</td><td><code>description</code> + live
-damage/BD + cooldown + initiative + Perfect</td><td><b>NO arithmetic</b></td></tr>
-<tr><td>Hero sheet (<code>party_screen.gd</code>)</td><td><code>description</code> + Perfect;
-<code>passive_desc</code> in its own block</td><td>NO arithmetic</td></tr>
-<tr><td>Offer / drop picker (<code>map_screen.gd</code>)</td><td><code>description</code> ONLY
-</td><td>NO arithmetic</td></tr>
+damage/BD + cooldown with turns remaining + initiative + Perfect</td><td><b>the live
+<code>BattleUnit</code> — the richest ctx in the game</b></td></tr>
+<tr><td>Status chip (<code>unit.gd</code>)</td><td>chip tooltip; the spec chip carries
+<code>passive_desc</code></td><td>the live <code>BattleUnit</code>. <b>Four specs rewrite
+theirs live</b> in <code>refresh_bars</code> — bloodrage, heavy plating, seasoned and (Batch
+CL) resonance</td></tr>
 </table>
-<p><b>The battle tooltip already computes the real numbers</b> — damage range against the
-unit's current Attack, Break damage, cooldown with turns remaining, initiative cost, and the
-Perfect line. A description that also states "25% of Attack" is stating in arithmetic what
-the line beneath it states as a number. <b>The live value wins; the formula goes.</b></p>
+<p><b>The battle tooltip already computes damage itself</b> — a range against the unit's
+current Attack, Break damage, cooldown with turns remaining, initiative cost and the Perfect
+line. A description that also states "25% of Attack" is stating in arithmetic what the line
+beneath it states as a number, and that duplication is still wrong. <b>The resolver is for
+values the renderer does NOT already print on its own line.</b></p>
 
 <h2>2. DIRECTNESS</h2>
 <p>State the effect, then the Perfect variant. Stop.</p>
 <p><b>NO DESIGN RATIONALE ON A CARD, EVER.</b> This is the dominant fluff pattern and it is
 everywhere, because these strings were written by whoever was justifying the decision at the
-time. The example to calibrate against — Blood Offering, <b>as <code>master.html</code>
-currently reads</b>:</p>
+time. The example to calibrate against — Blood Offering, <b>as <code>master.html</code> read
+when this standard was written at Batch CJ</b> (Batch CN has since taken Blood Offering's skill
+check away and folded its Perfect into the base, so the live rows no longer carry the
+parenthetical; <b>the example is kept verbatim because it is about the SECOND SENTENCE, and that
+fault is unchanged</b>):</p>
 <blockquote><i>He loses 20% of his CURRENT health and gains 40 Rage (Perfect: 60). Because it
 is a share of what is left rather than of his maximum, it can never take him below 1 — and it
 costs less the lower he is.</i></blockquote>
 <p>The second sentence explains <b>why the number was chosen</b>. That belongs in the
 changelog. The card should read:</p>
-<blockquote><i>Loses 20% of current health. Gains 40 Rage (Perfect: 60).</i></blockquote>
+<blockquote><i>Loses 20% of current health. Gains 60 Rage.</i></blockquote>
 <p><b>The code's card for the same ability is a different string</b>, and it is already much
 closer to the target — which is the shape of the whole problem:</p>
-<blockquote><i>Open a vein on purpose: lose 20% of your CURRENT health and gain 40 Rage. It
+<blockquote><i>Open a vein on purpose: lose 20% of your CURRENT health and gain 60 Rage. It
 can never take you below 1 — and the lower you are, the less it costs.</i></blockquote>
 <p>It still breaks three rules below (second person, a rationale clause, a flavor opener
 carrying mechanics), but it is two sentences rather than three and it does not lecture.
@@ -87,7 +130,8 @@ or why the ability works. <b>If it could be mistaken for a rule, cut it.</b></p>
 subject — cut it and the sentence loses its verb. Flavor must be removable.</li>
 <li><b>Flavor instead of mechanics.</b> Aimed Shot reads, in full: <i>"A perfect line.
 Patient, precise, final."</i> It deals damage, builds Focus and grants +20 Focus on a
-Perfect, and the card says none of it. <b>On the draft screen, where no computed line
+Perfect (Aimed Shot deals damage, so Batch CN left its check alone), and the card says none of
+it. <b>On the draft screen, where no computed line
 follows, that card is blank.</b></li>
 </ul>
 <p><b>"Perfect" is a mechanic and the word is reserved.</b> Aimed Shot's "A perfect line" is
@@ -159,12 +203,20 @@ longest line. The authored <code>\n</code> in an ability description is therefor
 load-bearing on the battle button, the hero sheet and the rune slot: strip it and a 322-character
 description renders as one line roughly two thousand pixels wide.</p>
 <ul>
-<li><b><code>passive_desc</code> — the rule applies now.</b> It renders in an
-<i>autowrapping</i> 400px label on the hero sheet, where the authored breaks fight the soft
-wrap instead of helping it. <b>23 of its 67 lines are wider than the box that holds them</b>
-(measured, up to 71 characters against a 61-character budget), across five specs — Arcanist,
-Holy, Inquisitor, Occultist and Beastmaster. This is the "wraps badly at different widths"
-case, and it is real.</li>
+<li><b><code>passive_desc</code> — the rule applies AT THE RENDERER, NOT IN THE FIELD, and
+Batch CL found out why.</b> It renders in an <i>autowrapping</i> 400px label on the hero
+sheet, where the authored breaks fight the soft wrap instead of helping it: <b>23 of its 67
+lines are wider than the box that holds them</b> (measured, up to 71 characters against a
+61-character budget), across five specs — Arcanist, Holy, Inquisitor, Occultist and
+Beastmaster. That finding is real and it is fixed. <b>But this field has a THIRD surface that
+CJ's audit and CL's brief both missed:</b> <code>battle.gd:1086</code> hands the same string to
+<code>add_status</code>, and <code>unit.gd:2291</code> makes that a chip
+<code>tooltip_text</code> — <b>a Godot default tooltip, which does not autowrap either.</b>
+Deleting the breaks from the field would tidy the hero sheet and render the Arcanist's block as
+one ~2000px line in the middle of a fight, which is the exact failure this section records for
+ability descriptions. <b>So the breaks STAY in the field and are flattened by the two surfaces
+that soft-wrap</b> — the hero sheet's label and the spec-choice column — which is the pattern
+<code>spec_choice_screen</code> already used for ability descriptions.</li>
 <li><b>Ability <code>description</code> — the breaks stay until there is an autowrapping
 tooltip.</b> Removing them is a code batch (a custom tooltip), not a text batch. Until then
 the hand-wrap is what keeps the tooltip readable, and it is held to the ceiling below.</li>
@@ -193,6 +245,21 @@ overflows.</b> The existing hand-wrapping discipline is correct and the ceiling 
 down to record it, not to change it. <b>Everything that overflows is a field that does not
 carry authored breaks at all</b> (talent and rune text, which autowrap and are fine) <b>or
 <code>passive_desc</code></b> (§4.7).</p>
+<p><b>BATCH CL MEASURED WHAT THE PARENTHETICAL COST, and the answer is nothing.</b> §1 warned
+that resolving a value adds five to seven characters after the hand-wrapping is already done,
+and told the batch to ship, measure, and then fix only what overflowed. Measured over the whole
+corpus with tokens expanded against all four class bases (<code>check_cl_width.gd</code>):
+<b>3,864 rendered <code>description</code> lines, zero over the ceiling</b>, and <b>exactly one
+<code>perfect_text</code> line pushed over by a parenthetical</b> — Pyre Wake, at 47 characters
+— which was tightened in place. <b>No rewrap was needed and none was done.</b></p>
+<p><b>One thing the measurement corrected: the 936-of-936 result is about
+<code>description</code> only, and <code>perfect_text</code> has never been held to this
+ceiling.</b> 76 of its 788 rendered lines are over 44 characters and <b>all 76 pre-date Batch
+CL</b> (the widest is Feint's, at 67). That is not the defect it looks like: the draft card's
+computed block <i>autowraps</i>, so the ceiling does not bind there, and the only surface that
+renders <code>perfect_text</code> without wrapping is the battle tooltip, which grows to fit
+rather than clipping. <b>Recorded as measured, not filed as owed</b> — rewrapping 76 lines to a
+ceiling that does not bind them would be work with no reader.</p>
 
 <h2>5. HOW TO APPLY THIS</h2>
 <ol>

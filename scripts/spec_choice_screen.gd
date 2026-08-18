@@ -115,6 +115,11 @@ func _draw_screen() -> void:
 		var body := Label.new()
 		var ability_lines := PackedStringArray()
 		var spec_atk := Classes.spec_attack(spec_id)
+		# BATCH CL §1 — this screen has an Attack and no hero, so Attack tokens
+		# resolve and health tokens correctly stand as bare percentages. Nothing
+		# here is specced yet; there is no maximum health to divide into that
+		# would still be true after the choice is made.
+		var vctx := {"attack": spec_atk}
 		for ab in Classes.spec_abilities(spec_id):
 			var line: String = "• %s" % ab.display_name
 			if ab.damage > 0:
@@ -123,8 +128,16 @@ func _draw_screen() -> void:
 				line += " — %d–%d %s dmg (%d%% Atk)" % [int(hit * 0.9),
 					int(round(hit * 1.1)), ab.dmg_type.capitalize(), ab.damage]
 			ability_lines.append(line)
-			ability_lines.append("   %s" % ab.description.replace("\n", " "))
-		body.text = "%s\n\nPassive: %s\n\n%s" % [info["blurb"], info["passive_desc"],
+			ability_lines.append("   %s" % Classes.resolve_values(
+				ab.description, vctx).replace("\n", " "))
+		# BATCH CL §7 — `passive_desc` IS FLATTENED HERE NOW. The line above has
+		# always flattened `\n` for ability descriptions and this one did not,
+		# one expression later, so the passive block hard-wrapped inside a 298px
+		# column while the abilities beside it wrapped softly. Both land in the
+		# same autowrapping label, and both want the soft wrap.
+		body.text = "%s\n\nPassive: %s\n\n%s" % [info["blurb"],
+			Classes.resolve_values(String(info["passive_desc"]),
+				vctx).replace("\n", " "),
 			"\n".join(ability_lines)]
 		body.add_theme_font_size_override("font_size", 12)
 		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

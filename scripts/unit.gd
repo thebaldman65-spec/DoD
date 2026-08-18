@@ -1876,6 +1876,32 @@ func refresh_bars() -> void:
 					"AGGRESSIVE" if aggressive else "DEFENSIVE", off_pct, def_pct]
 				_refresh_chips()
 				break
+	# BATCH CL §7 — THE ARCANIST'S CHIP CARRIES ITS OWN NUMBERS NOW, and the
+	# algebra is gone from the authored block. It used to state the triangular
+	# curve as `N(N+1)/2` on the hero sheet and then work two examples to make it
+	# legible, which is the exhibit the no-arithmetic rule was written from. The
+	# stack count is known every time this runs, so the live values replace the
+	# formula outright. The three arms above are the pattern — the Arcanist was
+	# the one Ramp passive that never got one, and its nameplate (`_res2_text`,
+	# thirty lines up) has been printing these same two figures from these same
+	# two functions all along.
+	if passive_id == "resonance":
+		for s in statuses:
+			if s.id == "spec_passive":
+				var dmg_pct := resonance_dmg_bonus() * 100.0
+				var taken_pct := resonance_taken_bonus() * 100.0
+				# Read off battle.gd's strike-loop crit expression rather than
+				# restated: the Rune of the Wide Current deepens the per-stack
+				# step through arcane_mastery_ranks, and this has to move with it.
+				var crit_pct := (1.0 + arcane_mastery_ranks) * second_resource
+				s.short = "+%d%%/+%d%%" % [int(round(dmg_pct)),
+					int(round(taken_pct))]
+				s.desc = "Runaway Resonance: %d stack%s held.\nDamaging casts build them (2 on a crit), with\nNO MAXIMUM, and nothing removes them.\nThe bonuses COMPOUND — now +%d%% damage and\n+%d%% damage taken — and each stack adds\n+%d%% critical chance on top." % [
+					second_resource, "" if second_resource == 1 else "s",
+					int(round(dmg_pct)), int(round(taken_pct)),
+					int(round(crit_pct))]
+				_refresh_chips()
+				break
 	var pressure_ratio := clampf(pressure / float(stability), 0.0, 1.0)
 	_pressure_fill.size.x = PLATE_BAR_W * pressure_ratio
 	_pressure_text.text = "Break %d/%d" % [pressure, stability]

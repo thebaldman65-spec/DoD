@@ -183,7 +183,15 @@ func _pools() -> void:
 				continue
 			ok(ab.display_name == nm2, "§1: ...to itself (%s)" % nm2)
 			ok(ab.description != "", "§1: ...carrying a description (%s)" % nm2)
-			ok(ab.perfect_text != "", "§1: ...and a perfect (%s)" % nm2)
+			# RE-POINTED BY BATCH CN §2. This asserted that EVERY draft entry states a
+			# perfect. As of CN that is false by design: 113 of the 211 abilities run no
+			# skill check at all, and §3 CLEARED their `perfect_text` precisely so the
+			# draft card cannot advertise a bonus nothing can fire. The durable question
+			# is the BICONDITIONAL — a card states a perfect exactly when it runs a check
+			# — which is strictly stronger than what was here and cannot rot as the
+			# criterion catches more cards.
+			ok(ab.perfect_text != "" if ab.runs_skill_check() else ab.perfect_text == "",
+				"§1: ...and states a perfect exactly when it runs a check (%s)" % nm2)
 	# AND EVERY SPEC OF THE CLASS CAN DRAW IT — §6's own wording: a Pyromancer,
 	# a Cryomancer and an Arcanist must all be able to draw Magic Barrier.
 	for spec in ["pyromancer", "cryomancer", "arcanist"]:

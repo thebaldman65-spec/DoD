@@ -13,6 +13,468 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-18 &mdash; Batch CN: THE SKILL CHECK BECOMES PARAMETERIC, AND LOSES ITS FILLER</h2>
+<p><i>Two halves. <b>&sect;1 gives the bar parameters it has never had.</b> <b>&sect;2 removes the
+check from everything it was doing nothing on</b>, folding the orphaned Perfect bonuses into base
+effects. <b>Nothing about a remaining check changes</b> &mdash; same sweep, same 0.72s, same 0.045
+and 0.16, same grades, same multipliers. The default profile reproduces today's bar exactly, and
+<code>check_cn.gd</code> asserts that against the pre-CN formulas rather than asking to be
+believed. Save version did not move (still v10).</i></p>
+
+<h3>&sect;1 &mdash; THE PROFILE</h3>
+<p><code>PERFECT_HALF</code> (0.045), <code>GOOD_HALF</code> (0.16) and the 0.72s sweep were bare
+constants read at two places: <code>_grade_skill_check()</code>, which takes no arguments, and a
+ColorRect built once during UI setup. <b>That is why <code>up_sure</code> was never written</b>
+&mdash; the window was not a parameter, so an upgrade meant to widen it had nothing to widen.</p>
+<p>They are a <b>profile</b> now, handed to the check per cast: <code>perfect_half</code>,
+<code>good_half</code>, <code>centre</code> (where the Perfect window sits),
+<code>sweep_time</code>, and <code>presses</code> (how many windows must be landed).
+<b><code>SC_PROFILE_DEFAULT</code> is today's numbers and every caller uses it.</b> Nothing
+overrides it in this batch; the content that will is CO onward.</p>
+<p><b>The zone rects are resized PER CAST</b> (<code>_apply_sc_profile</code>) instead of built
+once, and grading and drawing come off the same dictionary on the same line of execution. Split
+them and a profile that changes the window grades one thing and draws another &mdash; the worst
+failure available here, because the player would be aiming at a lie.</p>
+<p><b><code>_grade_skill_check()</code> still takes no arguments.</b> The profile is a member, so
+Batch CM's rule is kept exactly: the grader is reached from a mouse button and a key press, it
+cannot know which ability is being cast, and it does not learn. <code>centre</code> and
+<code>presses</code> are <b>wired and unused</b> &mdash; nothing moves the window off 0.5 or asks
+for a second press. Multi-press returns the <b>worst</b> grade of the set. The grades, the
+multipliers and <code>_apply_perfect_bonus</code> were not touched.</p>
+
+<h3>&sect;2 &mdash; WHERE THE CHECK COMES OFF: 113 OF 211 ABILITIES</h3>
+<p><b>The criterion is mechanical: remove the check wherever the grade multiplier has nothing to
+multiply.</b> A pure buff has no damage and no Break damage, so &times;1.15 and &times;0.6 both
+resolve to nothing and the bar's only live effect is the Perfect bonus &mdash; consequence-free
+upside charged as an attention tax on a turn that was never in doubt.</p>
+<p><b>THE FIELDS ALONE ARE NOT THE CRITERION, AND FINDING THAT OUT WAS MOST OF WHAT &sect;2
+COST.</b> A first pass over <code>damage == 0 and pressure == 0</code> caught <b>137</b>
+abilities &mdash; including <b>Feint</b>, <b>Guard Change</b>, <b>Kill Command</b>, <b>Savage
+Sweep</b>, <b>Precision Strike</b>, <b>Harvest</b>, <b>Primal Surge</b> and <b>Call the
+Wilds</b>, every one of which hits hard from inside a <code>special</code> handler. A field-only
+test would have stripped the bar off all of them, which is the exact opposite of what the
+criterion says. The criterion is applied to <b>what the ability actually resolves</b>, derived by
+walking <code>_resolve_special</code>'s call graph to its damage and healing leaves.</p>
+<p><b>Only the base effect counts.</b> A handler whose only damage sits inside its
+<code>if is_perfect</code> branch is caught &mdash; that branch is the orphaned bonus, not a
+reason to keep grading. <b>BEWITCH is the whole of that case</b>: its strike was Perfect-only, so
+it lost its bar and the strike became what Bewitch always does.</p>
+<p><b>The four overrides.</b> <b>HEALS KEEP THEIR CHECK</b> &mdash; a heal's magnitude is
+multiplied by the grade &mdash; and that list is <i>authored</i> rather than derived, because
+&ldquo;is this a heal&rdquo; is a question about the card: <b>Renewal</b> heals through a status,
+so nothing heals at cast time and a purely mechanical read would have taken its bar away while
+<b>Heal</b> beside it kept one. <b>SHIELDS LOSE THEIRS</b> whether or not the absorb scaled with
+the grade. <b>PURE DEBUFF APPLIERS LOSE THEIRS</b> &mdash; the grade has never affected whether a
+status lands. <b>BREAK DAMAGE COUNTS AS SOMETHING TO MULTIPLY</b>, so an ability with BD and no
+HP damage keeps its bar: <b>Breaking Darkness</b> at 20 BD was the case checked against, and it
+keeps its bar on its fields alone.</p>
+<p><b>ONE OVERRIDE THE BRIEF DID NOT ASK FOR, AND IT IS REPORTED RATHER THAN BURIED: a GATED
+ability always keeps its check.</b> Batch CM's <b>Reckless Abandon</b> spends the whole Rage bar
+for a three-turn multiplier and has no damage and no Break damage, so the criterion catches it
+cleanly &mdash; and obeying the criterion there would have deleted a CM feature in silence. An
+ability whose Sloppy loses the cast cannot lose the check that produces the Sloppy. The other
+four of the gated five keep their bars on the criterion's own terms.</p>
+<p><b>BASIC ATTACKS RESOLVE AT A FIXED GOOD, EXCEPT THE SHARPSHOOTER'S.</b> That exception is
+read off <b>slot 0</b> and the <b>hero's passive</b>, not off an ability name: his basic IS Quick
+Shot, the same object the Beastmaster and the Mystic carry, so there was no card to flag.</p>
+<p><b>THE NO-CHECK TEST SITS ABOVE THE AUTOPLAY ROLL, AND THAT ORDER IS LOAD-BEARING.</b> The bot
+rolls a 20% Perfect; left on top, it would still roll Perfects nobody can press for, every
+&sect;3 fold would be paid TWICE in a sim, and the balance numbers would stop describing the game
+the player is playing.</p>
+<p><b>The 113 that lost their bar:</b> Aegis Reversal, Aegis Wall, Alms, Anointing, Answering Steel, Anvil, Arcane Arrows, Arcane Surge, Ashes of Al'ar, Battle Poise, Battle Shout, Battle Trance, Berserk, Bewitch, Blessing of Zeal, Blight the Well, Blink, Blood Offering, Blood Price, Bloodbond, Bola, Bulwark of Fortitude, Camouflage, Choking Smoke, Consecrated Ground, Consecration, Covenant of Ash, Covering Guard, Deadfall, Deep Winter, Discipline, Dispel, Divine Presence, Divine Shield, Divine Wrath, Downwind, Elevation, Ember Debt, Emberkeep, Exhortation, Eye of the Storm, Fault Line, Feigned Guard, Firedraw, Flash Freeze, Formless, Frostbind, Funeral Pyre, Ghostpack, Hoarfrost Armor, Hold the Line, Hunter's Mark, Immolate, Inner Arcane, Interpose, Ironclad, Last Howl, Magic Barrier, Mana Shield, Mana Well, Mantle, Mark of the Hunt, Mass Hysteria, Mirror Image, Null Field, Ordination, Overcharge, Penance, Phoenix Rebirth, Preparation, Quarry's Mark, Quick Draw, Rally, Rallying Shout, Reacquire, Recant, Recompense, Resonant Field, Resurrection, Retaliation, Rime, Rimebinding, Rite of Return, Sacred Resolve, Shared Grief, Shieldwall, Slow Burn, Snare Line, Snare Trap, Spite, Stabilize, Stalking Horse, Succession, Threshold, Transference, Tripwire, Turn the Blade, Umbral Sigil, Unburden, Undying Vigil, Unslaked, Vendetta, Vespers, Vow of Suffering, Warcry.</p>
+
+<h3>&sect;3 &mdash; THE ORPHANED PERFECT BONUSES FOLDED INTO THE BASE EFFECT</h3>
+<p><b>105 abilities carried a <code>perfect_text</code> nothing could now trigger, and every one
+of those bonuses became part of what the ability always does</b> &mdash; the ability is slightly
+stronger and nothing is lost. Anvil, Recompense, Turn the Blade, Formless and their neighbours
+hold four turns instead of three; Divine Shield absorbs 35% instead of 30%; Berserk banks four
+doubled strikes instead of three; Interpose now covers the Warden too; Mass Hysteria's cooldown
+is 3 and Mana Shield's initiative cost is 1.5 unconditionally &mdash; those two were the only
+orphans living outside <code>_resolve_special</code>.</p>
+<p><b>Every <code>perfect_text</code> and <code>perfect_id</code> on those 105 was CLEARED, and
+their descriptions were rewritten to carry the folded value.</b> Batch CK taught the draft card to
+render Perfect, so an orphan would now be visible on the screen where cards are compared,
+advertising a bonus that can never fire. <code>check_cn.gd</code> gates it over the whole corpus,
+and re-checks every rewritten description against the measured 44-character card ceiling.</p>
+<p><b><code>_apply_perfect_bonus</code> LOST NO BRANCHES and was not touched.</b> The brief
+expected it to; it did not, because every <code>perfect_id</code> the criterion caught
+(<code>rage5</code>, on Battle Shout) is also carried by an ability that keeps its bar. <b>Four of
+its branches &mdash; <code>mana15</code>, <code>focus</code>, <code>sunder</code>,
+<code>burn</code> &mdash; are authored by no ability anywhere and were already unreachable before
+this batch.</b> Left in place: &sect;1 says not to touch that function, and deleting pre-existing
+dead code is a separate decision. Recorded here so it is a decision rather than an oversight.</p>
+
+<h3>&sect;4 &mdash; TWO CONSEQUENCES RECORDED, NEITHER COMPENSATED FOR</h3>
+<p><b>Break generation falls slightly.</b> A Perfect basic was &times;1.25 Break damage and basics
+now resolve at Good. <b>The Warden leans on Break</b>, and CI's Turn the Blade leans on it
+further. Not compensated for here.</p>
+<p><b>Battles get quieter, which is the point.</b> CM added a defensive bar on every attack the
+Warden takes; this removes the bar from filler turns, so the attention budget moves toward the
+presses that decide something. <b>Whether the net is better is a playtest question</b>, and the
+two batches should be felt together rather than separately.</p>
+
+<h3>&sect;5 &mdash; THE RULE EVERY FUTURE PROFILE IS AUTHORED TO</h3>
+<p>Recorded in <code>CLAUDE.md</code> before CO writes twelve of them:</p>
+<blockquote><p><b>VARY THE CHARACTER, HOLD THE DIFFICULTY CONSTANT.</b> A profile expresses a
+spec's identity, not its difficulty. The Perfect window is authored as a <b>fraction of sweep
+time</b>, not as a fixed width &mdash; so a fast, narrow bar and a slow, wide one are exactly as
+hard to land while feeling nothing alike. A spec whose bar is genuinely harder is a spec a player
+can lose access to through no fault of their build, which is the failure mode that sank timed hits
+in Legend of Dragoon and Mother 3.</p>
+<p><b>Two deliberate exceptions, both opt-in:</b> the Sharpshooter, whose bar is meant to be
+harder and to pay more, and the relic that swaps a hero's bar for a riskier one while held.</p>
+</blockquote>
+
+<h2>2026-08-17 &mdash; Batch CM: GATED SKILL CHECKS, AND THE DEFENSIVE CHECK</h2>
+<p><i>Two additions to the skill check. <b>The existing bar is unchanged</b> &mdash; same sweep,
+same 0.72s, same <code>PERFECT_HALF</code> 0.045 and <code>GOOD_HALF</code> 0.16, same grades,
+same multipliers, same 190 Perfect bonuses. <b>Nothing about a normal cast moves</b>, and the
+two constants were not touched: variable window widths are a different feature
+(<code>up_sure</code>, still parked) and mixing them in here would have put the constants in
+play for no gain. No magnitude moved elsewhere and the save version did not move (still
+v10).</i></p>
+
+<h3>&sect;0 &mdash; THE ONE RULE BOTH HALVES DEPEND ON, AND IT WAS ALREADY TRUE</h3>
+<p><b>NOTHING IS CONSUMED UNTIL AFTER THE GRADE.</b> The Cancel button already returns to the
+action bar &ldquo;with nothing spent&rdquo; even after a target was chosen, so consumption has
+always happened downstream of the grade. Both features are built on that, and <b>neither needs
+a refund path</b>: a gated failure is the existing cancel path with the turn spent instead of
+returned.</p>
+<p><b>THAT IS WHAT MAKES THREE OF THE FIVE EXPRESSIBLE AT ALL.</b> Requiem eats Ruin stacks off
+the <i>enemy</i>, Unleash eats the <i>companion's</i> Loyalty meter, and Boil Over drops the
+Berserker's live Frenzy bonus to the floor. &ldquo;Refund the resource&rdquo; would have been
+undefined for all three. Nothing is taken, so nothing needs giving back.</p>
+<p><b><code>_grade_skill_check()</code> STILL TAKES NO ARGUMENTS AND STILL CANNOT SEE THE
+ABILITY.</b> The caller knows, so the flag is tested at the call site in
+<code>_hero_turn</code> against a grade produced identically for a gated cast and an ordinary
+one. The one new argument on <code>_run_skill_check</code> is a <code>mode</code> string
+naming <i>what</i> is being graded &mdash; it picks the bar's top line, its tint and which
+orientation card is owed, and it changes nothing about the sweep or the grading.</p>
+
+<h3>&sect;1 &mdash; GATED ABILITIES: A SLOPPY LOSES THE CAST</h3>
+<p><code>Ability.gated</code> is a new per-ability flag. On a <b>Sloppy</b> grade the ability
+does not resolve: no damage, no status, no consumption, nothing. <b>Good and Perfect both
+resolve normally</b> &mdash; the gate is missing <code>GOOD_HALF</code> 0.16, not missing the
+&plusmn;0.045 Perfect window; gating on Perfect would fail most casts.</p>
+<table border="1" cellpadding="4">
+<tr><th>Ability</th><th>Spec</th><th>What it spends</th></tr>
+<tr><td><b>Death Ray</b></td><td>Arcanist</td><td>already gated at 8 Resonance &mdash; now two
+gates</td></tr>
+<tr><td><b>Requiem</b></td><td>Occultist</td><td>every stack of Ruin on the target</td></tr>
+<tr><td><b>Reckless Abandon</b></td><td>Berserker</td><td>all Rage</td></tr>
+<tr><td><b>Boil Over</b></td><td>Berserker</td><td>the live Frenzy bonus down to the
+floor</td></tr>
+<tr><td><b>Unleash</b></td><td>Beastmaster</td><td>the companion's entire Loyalty meter</td></tr>
+</table>
+<p><b>A GATED FAILURE COSTS THE TURN AND NOTHING ELSE.</b> Resource unspent, cooldown not
+started, consumed meters untouched. <code>_resolve</code> is where every one of those is taken,
+so <b>refusing to enter it is the whole implementation</b>; the only thing the new
+<code>_gated_failure</code> does is book the loss, say so, and pay the initiative &mdash;
+<code>next_time += ab.delay * 100 / effective_speed()</code>, read off the ability exactly as
+<code>_resolve</code>'s own scheduling line reads it. The punishment is tempo on a timeline
+where everything else keeps moving, which on a 6.0-delay ability is already severe.</p>
+<p><b>THE TURN GOES ON ENDING NORMALLY.</b> The end-of-turn nodes below the call &mdash;
+Practised Hands, Entropy's Toll, Pleasure from Pain, Divine Presence, Preparation's tick &mdash;
+all still run, because the turn <i>did</i> end. Skipping them would have stranded a pending
+extra turn and made the gate cost more than the turn it is supposed to cost.</p>
+<p><b>NO HEALING OR REVIVAL ABILITY IS EVER GATED.</b> Resurrection is deliberately excluded
+and this is a <b>standing rule</b>, not a scoping choice &mdash; losing a resurrection to a hand
+slip is the worst outcome the system could produce. It is recorded in <code>CLAUDE.md</code>,
+and <code>check_cm.gd</code> asserts it over the whole 211-ability corpus rather than over the
+five, so a later batch that gates a sixth cannot gate a heal by accident.</p>
+
+<h3>&sect;1a &mdash; THE TELL, IN FOUR PLACES, RENDERED FROM THE FLAG</h3>
+<p><b>The player must know an ability is gated BEFORE committing to it.</b> A cast silently lost
+to a grade nobody knew was lethal is a bug that reads as jank. It is on the <b>ability
+button</b> (a &ldquo;&#9888;&rdquo; prefix; it deliberately does not tint the label, because
+<code>_mark_upgraded</code> owns the font colour there and two marks fighting over one override
+is how one of them silently stops existing), in the <b>battle tooltip</b>, on the <b>draft
+card</b> through CK's <code>computed_block</code>, and <b>on the bar itself while it
+sweeps</b> &mdash; the one surface the player is actually looking at during the press. The
+Sloppy result line reads <i>&ldquo;SLOPPY &mdash; THE CAST IS LOST&rdquo;</i> there rather than
+&ldquo;Sloppy...&rdquo;.</p>
+<p><b>ONE STRING, <code>Classes.GATED_TELL</code>, AND IT IS NEVER AUTHORED INTO A
+DESCRIPTION.</b> That is CL &sect;1's rule applied to a sentence instead of to a number: five
+cards each carrying their own copy is five places for the gate to outlive itself. <b>No
+description was rewritten in this batch</b> and none of the five mentions the gate in its own
+prose.</p>
+
+<h3>&sect;2 &mdash; THE DEFENSIVE CHECK</h3>
+<p>A timing bar on <b>incoming</b> attacks, for defensive heroes only. <b>PURE MITIGATION
+&mdash; it can only ever reduce incoming damage, never increase it.</b></p>
+<table border="1" cellpadding="4">
+<tr><th>Grade</th><th>Effect</th></tr>
+<tr><td><b>Perfect</b></td><td>incoming damage &times;0.85, incoming Break damage
+&times;0.75</td></tr>
+<tr><td><b>Good</b></td><td>normal</td></tr>
+<tr><td><b>Sloppy</b></td><td>normal &mdash; <b>identical to Good, never worse</b></td></tr>
+</table>
+<p><b>FLAGGED, NOT TUNED:</b> 0.85 / 0.75 mirrors the offensive bar's &times;1.15 / &times;1.25.
+Shipped as written. <b>The guarantee is structural rather than a convention:</b>
+<code>_defensive_brace</code> returns a <i>boolean</i>, not a grade, because there is no third
+outcome for the strike site to learn about &mdash; the only thing a defensive check can tell it
+is whether the blow lands for less.</p>
+<p><b>Who gets one:</b> the <b>Warden</b>, always &mdash; he is the most attacked unit in the
+game and that is the point of the first pass. The <b>Swordmaster</b>, <b>only while in the
+Defensive guard</b>; in Aggressive he gets none. <b>Formless</b> counts as both guards, so it
+grants one, consistent with CI's rule that it satisfies every stance gate. No other spec, no
+exceptions, and <b>one function decides it</b> (<code>_has_defensive_check</code>) so the bar,
+the mitigation, the bot's roll and the sim's count cannot disagree.</p>
+<p><b>IT READS <code>u.stance</code> DIRECTLY AND DELIBERATELY NOT THROUGH
+<code>_stance_satisfies</code>, AND THE REASON IS FEIGNED GUARD RATHER THAN FORMLESS.</b> That
+helper answers &ldquo;does this unit count as standing in guard X&rdquo; <i>for an ability
+gate</i>, and Feigned Guard's scope is abilities and nothing else &mdash; Seasoned Fighter,
+Killing Edge, Bracing and Untouchable, every defensive property the Swordmaster has, all read
+the guard he is actually holding. A defensive check is one of those, not an ability, so a
+Feigned Guard does not conjure one. Formless is named explicitly, for the same reason
+<code>_stance_satisfies</code> names it: a single stance string cannot express
+&ldquo;both&rdquo;.</p>
+<p><b>ONCE PER INCOMING ATTACK, NOT PER STRIKE.</b> The bar runs at the top of
+<code>_resolve</code>, above everything, because &ldquo;once per attack&rdquo; is a statement
+about that function call &mdash; the strike loop below it runs once for a single blow and six
+times for a doubled three-strike, and a bar inside it would ask for six presses on one enemy
+action. The result is an ordinary local, so the recursive calls <code>_resolve</code> makes for
+counters and echoes each get their own: a nested attack can never inherit a brace pressed
+against a different blow. <b>NO CANCEL BUTTON</b> &mdash; <code>cancellable</code> is left at
+its default false rather than passed, because a hero cannot decline to be attacked.</p>
+<p><b>IT DOES NOT TOUCH THE BLOCK OR PARRY ROLLS</b>, exactly as the offensive bar does not
+touch miss, parry or crit. The damage half is applied to <code>raw</code> among the
+<i>defender's</i> own terms, below Vendetta and Seasoned Fighter &mdash; those rolls resolved
+hundreds of lines above and have already written themselves into that number, so the brace
+multiplies what lands. The Break half is applied <b>last of everything that moves
+<code>pr</code></b>, and it is <b>booked through <code>_prev_bd</code></b> so it appears in the
+Break-prevented ledger: BF &sect;1's rule is that every line which lowers Break says so, and a
+defence that measures zero is a defence nobody can tune.</p>
+<p><b>A LANDED BRACE WRITES ONE COMBAT-LOG LINE, AND IT IS WRITTEN ONCE PER ATTACK</b> rather
+than at the two arithmetic sites &mdash; those sit inside the strike loop, where a doubled
+three-strike would print the same brace six times. Silent mitigation is mitigation nobody can
+audit; every other reduction in this file says its name.</p>
+<p><b>TWO NARROWINGS, REPORTED BECAUSE &sect;2 SAYS &ldquo;EVERY QUALIFYING INCOMING
+ATTACK&rdquo;.</b> (1) <b>COUNTERS DO NOT RAISE A BAR.</b> A counter is a free swing drawn by
+the hero's own action rather than a declared incoming attack, and the offensive bar does not run
+for one either &mdash; every counter call site passes a hardcoded &ldquo;good&rdquo;. Excluding
+them keeps the two bars symmetrical and keeps a retaliation chain from asking for presses nobody
+chose to be in. (2) <b>AN ATTACK CARRYING A <code>special</code> DOES NOT RAISE ONE</b>, because
+it never reaches the ordinary strike loop, which is the only place the mitigation is applied; a
+bar there would pause the fight and then reduce nothing. <b>Exactly one enemy attack in the
+roster is skipped by that clause today: the Bloodcaller's BLOOD TRIBUTE.</b> The Hurler's SIEGE
+STONE is <i>not</i> skipped &mdash; its <code>windup</code> hoists the blow and deals nothing,
+and the landing comes back through a turn later as a plain attack copy with no special at all,
+which is exactly when the brace should be offered.</p>
+<p><b>THE PACING NUMBER, WHICH &sect;2 SAYS IS THE VERDICT.</b> Measured over 60 headless
+battles per party, rung 1. With <b>warden / arcanist / inquisitor / beastmaster</b>: <b>9.4
+defensive checks per battle against 27.3 hero actions</b>. With <b>warden / arcanist /
+occultist / beastmaster</b>: <b>6.9 against 22.8</b>. Either way <b>the party's total presses
+rise by about a third</b> &mdash; but that framing understates it, because the presses do not
+land on the party. <b>THE WARDEN ACTS ABOUT SEVEN TIMES A BATTLE AND BRACES SEVEN TO NINE, SO
+THE FEATURE ROUGHLY DOUBLES THE PRESSES THAT BELONG TO HIM</b>, which is exactly what the brief
+predicted, landing on the hero rather than on the party. Perfect braces came in at 18&ndash;21%
+(the bot's 20%), refusing <b>4&ndash;6 Break points a battle</b>. A Swordmaster party measured
+<b>0.4 checks a battle</b>, which is the stance gate working: he opens every battle Aggressive
+and the bot rarely Guard Changes. <b>Uncapped for this first pass; a cap is a retreat available
+afterwards rather than a limit to guess at now, and it is a designer's call on a number that now
+exists.</b></p>
+<p>The sim report prints <code>Defensive checks/battle</code> and <code>Gated casts
+lost/battle</code>, both of them <b>only when there was one</b> &mdash; a zero on a party with
+no Warden and no gated card reads as a broken instrument rather than as a line (Batch AW
+&sect;0's rule).</p>
+
+<h3>&sect;3 &mdash; THE SIM BOT ROLLS A DEFENSIVE GRADE, AND HONOURS THE GATE</h3>
+<p>The bot never runs the bar; it rolls grades off hardcoded probabilities. Without a defensive
+roll the Warden would be untestable in sims and every incoming hit would silently resolve as if
+the bar had not existed. It now rolls one on the same footing: <b>20% Perfect, otherwise no
+mitigation.</b> Sloppy and Good are identical here, so the bot's own 15% Sloppy rate is
+irrelevant to the outcome and is deliberately not rolled.</p>
+<p><b>THE BOT'S OWN 20/15 ROLL IS UNCHANGED, AND THAT IS THE POINT.</b> The gate reads the grade
+that roll already produces, at the same call site a player's grade arrives through, so a bot
+Sloppy on one of the five loses the same cast a player's does &mdash; otherwise the bot would
+play a strictly easier game than the player on exactly the five most decisive abilities.
+Observed live: <b>0.05&ndash;0.12 Death Rays lost per battle</b> in the sims above.</p>
+
+<h3>&sect;4 &mdash; ORIENTATION</h3>
+<p>A second one-time card, on the existing <code>skill_check_taught</code> pattern and with its
+own flag (<code>defensive_check_taught</code>), at the <b>first defensive check</b>. A bar
+appearing on an enemy's turn is unlike anything else in the game and will read as a bug
+otherwise. Kept to what the existing card does: what the bar is, what the grades are worth, and
+that it can only help. <b>The two are mutually exclusive per bar</b> &mdash; whichever kind the
+player meets first teaches itself and the other still waits for its own first time. <b>The gated
+abilities need no card;</b> &sect;1a's tell carries them, and all four of its surfaces are read
+before committing, which is the whole requirement.</p>
+
+<h3>&sect;5 &mdash; VERIFICATION, AND WHAT THIS BATCH DID NOT DO</h3>
+<p><code>check_parse.gd</code> clean; <b><code>check_cm.gd</code> is new</b> and asserts the four
+invariants &sect;1 promises over the whole corpus (the five names are the gated set and nothing
+else is; no gated ability heals or revives; the tell reaches the draft card on exactly the gated
+cards; the tell holds the standard's measured 44-character ceiling). <b>220 headless battles
+across four parties threw zero errors and zero warnings</b>, a 12-run progression sim likewise,
+and a live non-sim autoplay battle with a Warden ran to victory clean.</p>
+<p><b><code>check_cm_live.gd</code> IS ALSO NEW, AND IT EXISTS BECAUSE THE SIMS CANNOT REACH THE
+BAR.</b> Every headless battle takes <code>_defensive_brace</code>'s bot branch, so the one
+thing a player actually touches was exercised nowhere. It spawns a real non-autoplay battle,
+drives an enemy attack into a Warden and <b>presses the bar by hand</b>. It confirms the bar
+appears, that its top line names the incoming blow, that <b>there is no Cancel button</b>, and
+that <b>no bar appears when the same blow is aimed at another hero</b>. Measured over 40 paired
+samples with the rolls neutralised: <b>damage ×0.840</b> (against 0.85), <b>Break ×0.750</b>
+(exact), and &mdash; the promise that matters &mdash; <b>Sloppy 944 against Good 943</b>, the
+same blow, driven rather than asserted.</p>
+<p><b>ONE HARNESS FAULT WORTH RECORDING, BECAUSE IT WILL BITE THE NEXT WARDEN TEST.</b> The
+first run of that gate reported the brace taking <i>more</i> damage than no brace. The code was
+right; the harness was not. <code>block_chance = 0.0</code> is the usual way these suites turn
+the block roll off, and <b>on a Warden it does nothing</b> &mdash;
+<code>_live_block_chance</code> adds <code>_plating_slice</code> (0.15 plus Heavy Plating's
+climb) on top of the field, so he was still blocking one hit in six, and <b>a block throws the
+whole climb away</b>, which makes two consecutive blocks of samples path-dependent rather than
+comparable. The fix is a large NEGATIVE field (the sum is clamped to [0,1]) and interleaving the
+two conditions instead of running them in blocks.</p>
+<p><b>THE NEGATIVE CONTROL IS THE DEFAULT PARTY.</b> Berserker / Cryomancer / Inquisitor /
+Beastmaster holds neither a Warden nor a Defensive Swordmaster nor any of the five, and its
+60-battle report prints <b>neither new line</b> &mdash; no defensive checks, no gated losses.
+A fight nobody in this batch touches is the same fight it was.</p>
+<p><b>THE THREE HARDCODED master.html STAMP GATES WERE RE-POINTED IN PLACE</b> &mdash;
+test_batch_ah, bn and bb, all three of which were <b>already failing before this batch</b>
+(they still named Batch CI while the document said CK). The other five stamp checks read the
+line dynamically and needed nothing. <b>The duplication CLAUDE.md keeps predicting has now cost
+a repair rather than a bump</b>, which is the case for the honest fix it names.</p>
+
+<h2>2026-08-17 &mdash; Batch CL: LIVE VALUES, AND THE PROSE PASS</h2>
+<p><i>Two halves. <b>&sect;1 is a render change</b> &mdash; a percentage is followed by its
+computed value in parentheses, everywhere a value can be resolved. <b>&sect;2&ndash;&sect;8 are
+the prose rewrite</b>, scoped by <code>text-audit.html</code> and governed by
+<code>text-standard.html</code>. <b>Nothing the game DOES changed</b>: no magnitude moved, no
+ability changed, the save version did not move. Every edit changed what the game says.</i></p>
+<p><b>THIS ENTRY WAS WRITTEN AT BATCH CN, THREE BATCHES LATE, AND THAT IS THE FIRST THING TO
+RECORD.</b> CL shipped its code and its two documentation surfaces
+(<code>text-standard.html</code>, <code>master.html</code>) and never wrote a changelog entry, a
+<code>CLAUDE.md</code> note or a design note. <b>CM and CN were then built on top of it, so
+three batches sat uncommitted at once</b> and this entry is reconstructed from the brief, the
+diff and the two check scripts CL left behind. The standing rule that produced the mess is now
+explicit: <b>commit each batch before starting the next.</b></p>
+
+<h3>&sect;1 &mdash; THE RENDER RULE</h3>
+<p><b>A percentage is followed by its computed value in parentheses:</b> <code>20% of maximum
+health (34)</code>. <b>The parenthetical is computed at render time and never authored into a
+string</b> (<code>Classes.resolve_values</code>) &mdash; typing a digit into a description would
+have created two hundred new places for a value to drift out of sync with the code, which is the
+exact failure <code>text-audit.html</code> exists to catch, reintroduced at scale. <b>A literal
+digit inside parentheses in any authored field is a defect.</b></p>
+<p><b>This SUPERSEDES the two-tier arithmetic split</b> that stood in <code>text-standard.html</code>
+&sect;1. The tiers existed because mid-combat surfaces could not show arithmetic; with the value
+resolved on the line the player is never asked to compute anything and the formula stays visible,
+so scaling stays legible. <b>&sect;1 of the standard was REWRITTEN rather than appended to.</b>
+The <code>CLAUDE.md</code> copy of the old rule was <b>missed at CL and is corrected at CN</b> —
+it survived its own deletion for three batches, which is precisely the failure the
+rewrite-don't-append instruction was guarding against.</p>
+<p>Four resolution cases: a percentage that is <b>already final</b> resolves to the resulting
+TOTAL <b>on chips only</b> (<code>+25% Block chance (&rarr; 35%)</code>); <b>volatile stats
+resolve live and are allowed to move</b> between reads and are deliberately not frozen or
+snapshotted; where <b>there is nothing to resolve against</b> the percentage stands alone with no
+placeholder and no dash; and resolution follows <b>the owner the prose names</b>.</p>
+
+<h3>&sect;1's OWED REPORT &mdash; THE OVERFLOW COUNT</h3>
+<p>&sect;1 warned that a parenthetical adds five to seven characters to lines already
+hand-wrapped to the measured 44-character ceiling, and told the batch to ship, measure, then fix
+only what overflowed. <b>Measured over the whole corpus with tokens expanded against all four
+class bases</b> (<code>check_cl_width.gd</code>, re-run at CN against a reconstruction of the
+corpus as CL shipped it):</p>
+<ul>
+<li><b>3,864 rendered <code>description</code> lines &mdash; ZERO over the ceiling.</b></li>
+<li><b>Lines pushed over by the parenthetical alone: ZERO.</b> This is the number &sect;1 asked
+for, and the answer is that the parenthetical cost nothing. <b>No rewrap was needed and none was
+done.</b></li>
+<li><b>The widest rendered line in the corpus is 67 characters</b> &mdash; Feint's
+<code>perfect_text</code>, <i>"Perfect: Defensive banks a third charge; Aggressive strikes for
+45%"</i>.</li>
+<li><b>76 of 788 rendered <code>perfect_text</code> lines are over 44 characters, and all 76
+pre-date CL</b> (19 distinct ability lines, measured across four class bases). <b>The
+measurement corrected an assumption while it was at it:</b> the "936 of 936 lines hold the
+ceiling" result is about <code>description</code> ONLY, and <code>perfect_text</code> has never
+been held to this ceiling. That is not the defect it looks like &mdash; the draft card's
+computed block autowraps, so the ceiling does not bind there, and the only surface that renders
+<code>perfect_text</code> unwrapped is the battle tooltip, which grows to fit rather than
+clipping. <b>Recorded as measured, not filed as owed.</b></li>
+</ul>
+<p><b>The report itself was not missing &mdash; it was filed in the wrong place.</b> CL wrote it
+into <code>text-standard.html</code> &sect;4.8 rather than into a changelog entry that did not
+exist, where nobody looking for a batch report would find it.</p>
+
+<h3>&sect;5's OWED REPORT &mdash; WHERE RECAST IS GENUINELY UNDEFINED</h3>
+<p>&sect;5 asked for recast behaviour to be stated on 53 silent abilities, for the code to be
+read per ability rather than inferred from neighbours, and for anything <b>genuinely undefined
+rather than undocumented</b> to be reported instead of invented. <b>The prose half was not
+completed</b> &mdash; 81 of 108 descriptions that grant a timed effect still say nothing about a
+second cast. <b>The report is below and it is the more useful half, because the undefined cases
+turn out to share one root.</b></p>
+<p><b>THE DEFAULT IS A STORAGE RULE, NOT A DESIGN ANSWER.</b> <code>BattleUnit.add_status</code>
+resolves a reapplied status as <code>turns = max(old, new)</code> and
+<code>power = max(old, new)</code>. For a status whose power is a CONSTANT that is a perfectly
+good answer &mdash; "refreshes, never shortens". <b>For a status whose power is a SNAPSHOT of
+live state, it means a recast at a weaker moment silently does nothing while the cost is paid in
+full.</b> Nothing on the card says so, and nothing at the call site says so.</p>
+<ul>
+<li><b>Stabilize</b> &mdash; the damage reduction is <code>10% per Resonance stack consumed</code>.
+The handler sets Resonance to the floor <i>unconditionally</i>, so a recast on fewer stacks
+<b>spends the Resonance and then has its weaker mitigation discarded by the max()</b>. The player
+pays and receives nothing.</li>
+<li><b>Funeral Pyre</b> &mdash; the shield is worth 200% of the Burn it consumes. Recast on a
+smaller fire, it <b>consumes that Burn and keeps the older, larger barrier</b>. Same shape as
+Stabilize.</li>
+<li><b>Battle Shout</b> &mdash; the bonus is base plus 1% per 20 of the enemy party's Bleed
+buildup <i>at the time of the shout</i>. A second shout after a bleedout has cleared that
+buildup refreshes the DURATION but keeps the OLD magnitude. That is neither refresh nor replace,
+and the chip's own wording ("at the time of the shout") describes one cast, not two.</li>
+<li><b>Vespers</b> and <b>Magic Barrier</b> &mdash; power derived from the caster's maximum
+health, which moves in this game (the Devout grows; Fortified Spirit lends and later sheds max
+HP). Same mechanism, smaller blast radius.</li>
+<li><b>Every ability that writes the shared <code>barrier</code> status</b> &mdash; Magic
+Barrier, Funeral Pyre, Divine Shield and the Aguila's arrival barrier all land in ONE status
+slot, so a smaller shield cast over a larger one is silently absorbed by the max().</li>
+</ul>
+<p><b>THE STRONGEST EVIDENCE THAT THE DEFAULT WAS NEVER A DECISION IS THAT THE PROJECT ALREADY
+OVERRODE IT ONCE.</b> Batch BM's Layered Faith comment in <code>_grant_divine_shield</code> says
+it outright: <i>"<code>add_status</code> MAXES a re-applied barrier's power, so seven rows of
+investment have always been capped at one cast's worth"</i> &mdash; and BM fixed it by
+pre-adding the standing pool, <b>for Divine Shield only, and only while the Layered Faith talent
+is held.</b> The same trap at every other site is untouched. <b>Reported, not fixed:</b> whether
+a snapshot-powered status should refresh, replace, add or refuse is a design question per
+ability, and inventing one answer across five of them is exactly what &sect;5 forbade.</p>
+
+<h3>&sect;2&ndash;&sect;8 &mdash; THE PROSE PASS</h3>
+<p><b>&sect;2 PERSON:</b> pronouns stripped from the ability corpus &mdash; <i>"Loses 20% of
+current health"</i>, never "you lose" or "he loses".</p>
+<p><b>&sect;3 <code>perfect_text</code>:</b> the bare changed value, nothing else. The 107
+"instead of" comparisons went &mdash; the base is on the line above, so "60 Rage instead of 40"
+repeats it. <b>CK made this urgent rather than cosmetic</b> by teaching the draft card to render
+Perfect: all 190 strings became visible on the screen where cards are compared. (<b>Batch CN has
+since cleared 105 of them outright</b>, because the abilities that carried them no longer run a
+skill check.)</p>
+<p><b>&sect;4 DURATION VS COOLDOWN:</b> a bare "N turns" now reads "for 3 turns" when it is a
+duration, and <b>descriptions do not state cooldowns at all</b> &mdash; the renderer prints its
+own <code>Cooldown: N turns</code> line, so a description restating it is a second copy that can
+disagree.</p>
+<p><b>&sect;6 THE STATUS CHIPS:</b> the 41 rows where <code>master.html</code> stated a number
+the chip omitted &mdash; almost always the duration or the source &mdash; filled in with
+&sect;1's resolution applied. Shieldwall's "bonus Block chance" and Elemental Weakness's
+"resistances reduced" now state and resolve their numbers. <b>Ruin</b> and <b>Ironclad</b>
+differed in both directions and got both halves.</p>
+<p><b>&sect;7 <code>passive_desc</code>:</b> twelve blocks, rendering in an <i>autowrapping</i>
+400px label whose budget is 61 characters, with 23 of 67 authored lines running to 71. <b>Its
+authored <code>\n</code> breaks come OUT</b> — unlike ability descriptions, whose breaks stay
+until a custom tooltip exists. <b>The Arcanist's was the exhibit</b>: a triangular-number formula
+in algebra on the hero sheet, worked through two examples. The stack count is known at display
+time, so &sect;1 resolves it and the algebra is gone. One code inconsistency fixed in passing:
+<code>spec_choice_screen.gd</code> flattened <code>\n</code> for ability descriptions and not for
+<code>passive_desc</code> on the very next line, so the passive block hard-wrapped inside a 298px
+column on that screen.</p>
+<p><b>&sect;8 RATIONALE AND THE DOCUMENT:</b> rationale clauses cut; flavor kept only where it
+is removable without breaking the sentence. <b>Aimed Shot needed a description from nothing</b> —
+it read, in full, <i>"A perfect line. Patient, precise, final."</i> for an ability that deals 45
+damage and grants +20 Focus on a Perfect. <b>The corpus was calibrated against the code's own
+strings, not the document's</b>: not one of <code>master.html</code>'s 120 rows carried the
+code's sentence, all were independent paraphrases running a median 3&times; longer, and a pass
+calibrated against the document's verbosity would have over-corrected cards that were already
+most of the way to the target. The document rows were then corrected toward the finished code
+strings &mdash; <b>both copies, or neither.</b></p>
+
 <h2>2026-08-17 &mdash; Batch CK: THE DRAFT CARD, THE IRONCLAD RENAME, AND THE SECOND AUDIT PASS</h2>
 <p><i>Three code changes and one read-only audit. <b>No description was rewritten</b> &mdash;
 that is CL's job, scoped by CJ's report and now by this batch's. <b>No magnitude moved and the

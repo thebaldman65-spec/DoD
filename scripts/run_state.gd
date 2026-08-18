@@ -2115,6 +2115,15 @@ func victory_heal_pct() -> float:
 # takes the slot instead: armor is an axis nothing else in the pool touches,
 # and "the number lands against less" composes with Honed rather than
 # duplicating it.
+#
+# BATCH CN UPDATE — THE FIRST OBJECTION IS GONE AND THE SECOND IS NOT. The
+# window IS a parameter now (`battle.SC_PROFILE_DEFAULT`, handed to the check
+# per cast), and the zone rect is resized from the same dictionary that grades,
+# so a widened Perfect window would be graded and DRAWN correctly. `up_sure` is
+# writable. IT WAS STILL NOT WRITTEN AT CN, because the harder objection stands
+# untouched: **the bot never runs the bar.** It rolls a grade off hardcoded
+# probabilities, so a widened window remains invisible to every sim the project
+# owns, and an upgrade whose worth cannot be measured is one nobody can tune.
 const ABILITY_UPGRADES := {
 	"up_damage": {"name": "Honed", "desc": "+50% damage."},
 	"up_cooldown": {"name": "Quickened", "desc": "-2 turns cooldown (minimum 0)."},

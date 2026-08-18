@@ -240,7 +240,15 @@ func _definitions() -> void:
 		ok(ab.pressure == NINE[n][4],
 			"%s carries %d Break (got %d)" % [n, NINE[n][4], ab.pressure])
 		ok(ab.description != "", "%s has a description" % n)
-		ok(ab.perfect_text != "", "%s states a perfect" % n)
+		# RE-POINTED BY BATCH CN §2. This asserted that EVERY draft entry states a
+		# perfect. As of CN that is false by design: 113 of the 211 abilities run no
+		# skill check at all, and §3 CLEARED their `perfect_text` precisely so the
+		# draft card cannot advertise a bonus nothing can fire. The durable question
+		# is the BICONDITIONAL — a card states a perfect exactly when it runs a check
+		# — which is strictly stronger than what was here and cannot rot as the
+		# criterion catches more cards.
+		ok(ab.perfect_text != "" if ab.runs_skill_check() else ab.perfect_text == "",
+			"...and states a perfect exactly when it runs a check (%s)" % n)
 		ok(Classes.pool_ability(n) != null,
 			"%s resolves through pool_ability" % n)
 	# THE TWO THAT ARE ORDINARY ATTACKS CARRY NO `special`, WHICH IS THE WHOLE

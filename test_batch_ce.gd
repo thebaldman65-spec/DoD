@@ -278,7 +278,15 @@ func _definitions() -> void:
 		ok(ab.description != "", "...with a description (%s)" % n)
 		ok(ab.delay > 0.0, "...and an initiative cost (%s)" % n)
 		ok(ab.cooldown > 0, "...and a cooldown (%s)" % n)
-		ok(ab.perfect_text != "", "...and a perfect (%s)" % n)
+		# RE-POINTED BY BATCH CN §2. This asserted that EVERY draft entry states a
+		# perfect. As of CN that is false by design: 113 of the 211 abilities run no
+		# skill check at all, and §3 CLEARED their `perfect_text` precisely so the
+		# draft card cannot advertise a bonus nothing can fire. The durable question
+		# is the BICONDITIONAL — a card states a perfect exactly when it runs a check
+		# — which is strictly stronger than what was here and cannot rot as the
+		# criterion catches more cards.
+		ok(ab.perfect_text != "" if ab.runs_skill_check() else ab.perfect_text == "",
+			"...and states a perfect exactly when it runs a check (%s)" % n)
 		ok(Classes.draft_ability(n) != null,
 			"...and it is a DRAFT def, so the bot hook can see it (%s)" % n)
 		ok(ab.cost == int(NINE[n][1]),

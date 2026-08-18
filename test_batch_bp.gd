@@ -162,7 +162,15 @@ func _pools() -> void:
 				continue
 			ok(ab.display_name == String(n), "§5: ...to itself (%s)" % n)
 			ok(ab.description != "", "§5: ...with a description (%s)" % n)
-			ok(ab.perfect_text != "", "§5: ...and a perfect (%s)" % n)
+			# RE-POINTED BY BATCH CN §2. This asserted that EVERY draft entry states a
+			# perfect. As of CN that is false by design: 113 of the 211 abilities run no
+			# skill check at all, and §3 CLEARED their `perfect_text` precisely so the
+			# draft card cannot advertise a bonus nothing can fire. The durable question
+			# is the BICONDITIONAL — a card states a perfect exactly when it runs a check
+			# — which is strictly stronger than what was here and cannot rot as the
+			# criterion catches more cards.
+			ok(ab.perfect_text != "" if ab.runs_skill_check() else ab.perfect_text == "",
+				"§5: ...and states a perfect exactly when it runs a check (%s)" % n)
 			ok(ab.delay > 0.0, "§5: ...and an initiative cost (%s)" % n)
 			ok(ab.cooldown > 0, "§5: ...and a cooldown (%s)" % n)
 			ok(Classes.draft_ability(String(n)) != null,
@@ -922,8 +930,21 @@ func _docs() -> void:
 	# test_batch_bs and test_batch_bu. The count grows by one each time a new
 	# suite checks the stamp, and every one of them is a suite this batch did
 	# not otherwise touch — which is the cost the duplication keeps charging.)
-	ok(master.contains("Batch CI"),
-		"§6: master.html's stamp is bumped to the current batch")
+	# RE-POINTED BY BATCH CN, to the durable shape Batch CK gave this same gate in
+	# test_batch_br. It read `master.contains("Batch C?")`, a stamp assertion that
+	# has to be hand-bumped every batch — **A CHECK THAT MUST BE EDITED EVERY BATCH
+	# TO KEEP PASSING IS A CHECK THAT WILL BE RED MOST BATCHES**, which stops it
+	# carrying information. It asks the durable version now: the document carries a
+	# stamp, and that stamp is not older than the batch this suite belongs to. No
+	# bump is ever owed again. (Two-letter batch codes sort lexically; a
+	# three-letter code will need one more line.)
+	var stamp_at := master.find("Last updated:")
+	ok(stamp_at >= 0, "master.html carries a Last-updated stamp")
+	var stamp := master.substr(stamp_at, 60)
+	var code_at := stamp.find("(Batch ")
+	var stamped := stamp.substr(code_at + 7, 2) if code_at >= 0 else ""
+	ok(stamped >= "BP",
+		"...and master.html is stamped no older than this suite's own batch (reads '%s')" % stamped)
 	ok(changelog.contains("Batch BP"),
 		"§6: the changelog carries a Batch BP entry")
 	for spec in TRANCHE_2:
