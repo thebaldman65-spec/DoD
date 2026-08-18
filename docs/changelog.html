@@ -13,6 +13,116 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-18 &mdash; Batch CO: A RECAST THAT WOULD DO NOTHING IS REFUSED</h2>
+<p><i><code>add_status</code> resolves a re-application as <code>max()</code> on duration and
+power. For any status whose power is a <b>snapshot of live state</b>, a recast could therefore
+cost full resource, a full cooldown and the whole turn and return nothing &mdash; the weaker new
+value discarded by the max, and the player never told. <b>58 abilities now refuse that cast at
+the button</b>, and say why. Save version did not move (still v10).</i></p>
+
+<h3>&sect;0 &mdash; THE SCOPE LIMIT, WHICH MATTERS MORE THAN THE RULE</h3>
+<p><b>Refusal is only correct when the status application is the ability&rsquo;s ENTIRE payload.</b>
+An ability that also deals damage, heals, or converts a resource must still cast when its buff
+would not improve: that half is worth the turn on its own, and refusing it would be a worse bug
+than the one being fixed.</p>
+<p>The set was derived by <b>walking <code>_resolve_special</code>&rsquo;s call graph</b>, the way
+Batch CN derived its skill-check tables &mdash; <b>not</b> by reading the <code>damage</code> and
+<code>pressure</code> fields, which are zero on Feint, Guard Change and Kill Command and every
+other card that hits hard from inside a handler. 211 abilities &rarr; 134 with no field-level
+payload &rarr; <b>58 whose whole payload is the status</b>.</p>
+<p><b>Four of the five cards that motivated the batch are deliberately NOT in it</b>, and each
+exclusion is the scope limit working:</p>
+<ul>
+<li><b>Funeral Pyre</b> pays <code>_overburn_refund</code> &mdash; the Burn it eats comes back as
+Mana, so the conversion is a real payload even when the barrier does not grow.</li>
+<li><b>Stabilize</b> vents Resonance into Mana <i>and</i> heals 5% of maximum health.</li>
+<li><b>Battle Shout</b> hands the caster +5 Rage.</li>
+<li><b>Reckless Abandon</b> spends the whole Rage bar (Batch CM already gates it below one step).</li>
+<li><b>Blessing of Zeal</b> ticks cooldowns through Crusader&rsquo;s Tempo.</li>
+</ul>
+<p>Of the named cards only <b>Magic Barrier</b> and <b>Vespers</b> qualify.</p>
+<p><b>Four cards are excluded for a second reason worth recording: their status <code>power</code>
+is an OWNER INDEX, not a magnitude.</b> Mark of the Hunt, Snare Line, Eye of the Storm and
+Vendetta store <code>heroes.find(attacker)</code> there, so a numeric &ldquo;new &le; held&rdquo;
+test would have refused casts on the basis of a hero&rsquo;s slot number.</p>
+
+<h3>&sect;1 &mdash; THE REFUSAL</h3>
+<p>It lives at <b><code>_ability_usable</code></b>, the door the stance gates use, so the greyed
+button, the bot&rsquo;s available pool and the cast itself read one decision &mdash; the rule
+Batch CI set for Formless. It is the <b>last</b> gate in that function on purpose: every gate
+above answers &ldquo;can this be cast at all&rdquo;, and asking the cheap question first keeps the
+walk off the hot path.</p>
+<p><b>The test is exact and computed at cast time.</b> A cast is refused only when <i>every</i>
+unit it could touch already holds <i>everything</i> it would hand out, at no less duration and no
+less power. The powers are recomputed live &mdash; Vespers off the Cleric&rsquo;s current maximum
+health, Magic Barrier off the Mage&rsquo;s, Divine Shield off the Devout&rsquo;s &mdash; because
+refusing a cast that would in fact have improved something is strictly worse than the bug being
+fixed. Two further exactnesses the arithmetic needed: <b>Fleeting is normalised</b> (the target&rsquo;s
+own <code>mod_status_turns</code> is applied before the comparison, as <code>add_status</code>
+applies it), and <b>a negative turn count reads as permanence rather than as a duration</b>, so a
+battle-long status can never be &ldquo;lengthened&rdquo;.</p>
+<p><b>Picked-target cards are judged against the whole pool the picker offers</b>, so a button
+never darkens while a second enemy still stands clean.</p>
+
+<h3>&sect;2 &mdash; BM&rsquo;S DIVINE SHIELD FIX, RECONCILED RATHER THAN ASSUMED</h3>
+<p><code>_grant_divine_shield</code>&rsquo;s bespoke path is <b>Layered Faith</b>, and reading it
+showed it is <b>not a refusal at all</b>: it pre-adds the standing pool so the max lands on the
+sum &mdash; it makes the recast <b>additive</b>. <b>The general rule does not subsume it.</b> Under
+Layered Faith a recast always improves and so is never refused; the two compose. Per &sect;2 it
+stays, and the gate reads Layered Faith when it computes the power so the general rule cannot
+contradict the one build that had already fixed this.</p>
+<p><b>The riders are part of the test.</b> <code>barrier</code> is a SHARED status and
+<code>_grant_divine_shield</code> stamps <code>divine</code>, Blessed Barrier, Afterglow, Warded
+Robes and Unyielding onto it (Mantle adds its hops). A Devout casting over a Mage&rsquo;s
+<i>larger</i> Magic Barrier improves it even though neither duration nor power moves &mdash; it
+becomes divine, which is what feeds Faith &mdash; so a duration-and-power-only test would have
+refused a genuinely improving cast.</p>
+<p><b>A second bespoke instance was found and IS subsumed:</b> Batch BV&rsquo;s
+<code>_ability_usable</code> already refused a second <b>Bloodbond</b> while the first still
+stood. The guard is battle-long and carries a fixed share, so the general rule refuses it in
+exactly the same cases &mdash; the bespoke gate and its tooltip string are <b>deleted</b> rather
+than left unreachable beside it. What BV&rsquo;s comment established stays true: the card is still
+not gated on a beast being out.</p>
+
+<h3>&sect;3 &mdash; THE TELL</h3>
+<p>A greyed button with no reason is a bug from the player&rsquo;s side, so the refusal
+<b>names what is already standing</b>. It is rendered inside <code>_ability_tooltip</code> &mdash;
+the one site every surface reads (the ability popup, the basic-attack button, the draft card)
+&mdash; rather than added to the per-card chain, which is &sect;4&rsquo;s point arriving in code.
+This is the whole benefit of refusing rather than silently replacing: <b>the waste was invisible
+before and is information now.</b></p>
+
+<h3>&sect;4 &mdash; ONE RULE, NOT EIGHTY-ONE STRINGS</h3>
+<p>Batch CL left 81 of 108 timed descriptions saying nothing about a second cast.
+<b>No ability description was touched.</b> With refusal the answer is uniform and systemic, so it
+is stated <b>once in the glossary</b> (<code>recast_refused</code>, &ldquo;Recasting a Standing
+Effect&rdquo;) and carried in the moment by &sect;3&rsquo;s tell. The glossary entry states the
+scope limit too, because the exception is the part a player would otherwise have to infer.</p>
+
+<h3>THE GATE</h3>
+<p><code>check_co.gd</code> does not read the table against another table: it <b>spawns two real
+battles</b>, casts all 58 through <code>_resolve_special</code> onto every unit each can reach,
+and asserts the prediction against what actually landed. <b>57 of 58 refuse after saturation</b>;
+<b>Interpose</b> is named as the one member that can never refuse, because its charges are
+additive and a second cast always improves. Two parties are needed and that is not optional
+&mdash; Alms and Divine Presence write nothing without <b>Mercy</b>, Mantle nothing without a
+living <b>Devout</b> &mdash; so a one-party sweep would report them as untested and read as
+coverage. The excluded cards are asserted <b>out</b> of the set by name.</p>
+<p><b>Both gates were negative-controlled before being believed</b> (Batch CN&rsquo;s rule: a gate
+that can only pass is a gap). Gating <code>stabilize</code> fails the scope assertion; drifting
+one duration in the table (Quick Draw 6&rarr;9) fails the live assertion; a deliberate syntax
+error puts two <code>Parse Error</code> lines on Godot&rsquo;s stderr where a clean tree puts
+zero.</p>
+
+<h3>KNOWN AND RECORDED, NOT FIXED</h3>
+<p><b>On three cards the bug is worse than described, and this batch cannot reach them.</b>
+Battle Shout, Stabilize and Eye of the Storm call <code>update_status</code> with a
+<i>computed</i> power after <code>_apply_status</code>, and <code>update_status</code> ASSIGNS
+power where <code>add_status</code> maxes it. On those three a weaker recast does not merely fail
+to improve &mdash; <b>it overwrites the standing buff downward</b>. All three carry a second
+payload, so &sect;0 puts them outside the refusal; widening the scope to catch them would delete a
+resource conversion the player wanted. Recorded here rather than half-fixed.</p>
+
 <h2>2026-08-18 &mdash; Batch CN: THE SKILL CHECK BECOMES PARAMETERIC, AND LOSES ITS FILLER</h2>
 <p><i>Two halves. <b>&sect;1 gives the bar parameters it has never had.</b> <b>&sect;2 removes the
 check from everything it was doing nothing on</b>, folding the orphaned Perfect bonuses into base

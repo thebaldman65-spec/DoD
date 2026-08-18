@@ -4853,6 +4853,350 @@ func _eff_cost(u: BattleUnit, ab: Ability, target: BattleUnit = null) -> int:
 
 # One place decides "can this ability be picked right now" so the buttons
 # and the hotkeys can never disagree.
+# ================= BATCH CO — A RECAST THAT WOULD DO NOTHING =================
+#
+# `add_status` resolves a re-application as max() on duration and power. For any
+# status whose power is a SNAPSHOT OF LIVE STATE, a recast can therefore cost
+# full resource, a full cooldown and the whole turn and return nothing: the
+# weaker new value is discarded by the max and the player is never told. Vespers
+# scales off the Cleric's maximum health, Magic Barrier off the Mage's, Divine
+# Shield off the Devout's — every one of them moves during a fight.
+#
+# THE REFUSAL LIVES AT `_ability_usable`, THE SAME DOOR THE STANCE GATES USE, so
+# the greyed button, the bot's available pool and the cast itself read from ONE
+# decision. That is the rule CI set for Formless and the reason stance gates
+# have never disagreed with themselves.
+#
+# **THE SCOPE LIMIT MATTERS MORE THAN THE RULE, AND IT IS NOT THE `damage`
+# FIELD.** Refusal is only ever correct when the status application is the
+# ability's ENTIRE payload — an ability that also deals damage, heals, or
+# converts a resource must still cast, because that half is worth the turn on
+# its own and refusing it would be a worse bug than the one being fixed. The set
+# below was derived by walking `_resolve_special`'s call graph the way CN did
+# for the skill-check tables, NOT by reading `damage` and `pressure`: those two
+# fields are zero on Feint, Guard Change and Kill Command, which hit hard from
+# inside their handlers. `check_co.gd` re-walks it so the table cannot rot.
+#
+# **FOUR OF THE FIVE CARDS THAT MOTIVATED THIS BATCH ARE DELIBERATELY NOT IN
+# IT**, and each exclusion is the scope limit doing its job:
+#   · FUNERAL PYRE pays `_overburn_refund` — the Burn it eats comes back as
+#     Mana, so the conversion is a real payload even when the barrier does not
+#     grow.
+#   · STABILIZE vents Resonance into Mana AND heals 5% of maximum health.
+#   · BATTLE SHOUT hands the caster +5 Rage.
+#   · RECKLESS ABANDON spends the whole Rage bar (and CM already gates it below
+#     one full step).
+#   · BLESSING OF ZEAL ticks cooldowns down through Crusader's Tempo.
+# Only MAGIC BARRIER and VESPERS of the named cards qualify.
+#
+# **A KNOWN SHARP EDGE, RECORDED RATHER THAN WIDENED INTO:** Battle Shout,
+# Stabilize and Eye of the Storm call `update_status` with a COMPUTED power
+# after `_apply_status`, and `update_status` ASSIGNS power where `add_status`
+# maxes it. On those three a weaker recast does not merely fail to improve, it
+# overwrites the standing buff downward. All three are outside this batch's
+# scope because their payload is more than the status, so the refusal cannot
+# reach them and this batch does not pretend to fix them.
+
+# THE QUALIFYING SET: 58 abilities whose whole payload is a status application.
+# Membership is asserted against the live corpus by `check_co.gd`.
+const RECAST_GATED := ["aegis_wall", "alms", "anointing", "answering_steel",
+	"anvil", "arcane_arrows", "battle_poise", "bloodbond", "bola", "camouflage",
+	"choking_smoke", "cons_ground", "consecration", "covering_guard",
+	"divine_presence", "divine_shield", "divine_wrath", "downwind", "emberkeep",
+	"exhortation", "feigned_guard", "formless", "ghostpack", "hoarfrost_armor",
+	"hysteria", "immolate", "instinct", "interpose", "ironclad", "last_howl",
+	"magic_barrier", "mana_shield", "mana_well", "mantle", "mirror_image",
+	"null_field", "penance", "quickdraw", "recompense", "resonant_field",
+	"retaliate", "rime", "rite_of_return", "shield_block", "slow_burn", "spite",
+	"stalking_horse", "succession", "tripwire", "turn_the_blade",
+	"umbral_sigil", "undying_vigil", "unity", "unslaked", "venom_coat",
+	"vespers", "vow_suffering", "warcry"]
+
+# The self-buffs whose duration and power are both authored literals. Held as
+# data because forty match arms that each return one dictionary is the same
+# table written forty times, and a table is the thing `check_co.gd` can walk.
+const RECAST_SELF_PLAIN := {
+	"aegis_wall": ["aegis_wall", 4], "anvil": ["anvil", 4],
+	"battle_poise": ["battle_poise", 4], "downwind": ["downwind", 4],
+	"feigned_guard": ["feigned_guard", 3], "formless": ["formless", 4],
+	"ghostpack": ["ghostpack", 4], "immolate": ["immolate", 4],
+	"ironclad": ["ironclad", 4], "mana_shield": ["mana_shield", 3],
+	"mana_well": ["mana_well", 4], "null_field": ["null_field", 4],
+	"quickdraw": ["quickdraw", 6], "recompense": ["recompense", 6],
+	"retaliate": ["retaliate", 4], "turn_the_blade": ["turn_the_blade", 4],
+	"unslaked": ["unslaked", 4], "venom_coat": ["venom_coat", 4],
+}
+
+# The specials in the set that write to the caster and to nobody else.
+const RECAST_SELF_ONLY := ["alms", "answering_steel", "arcane_arrows",
+	"bloodbond", "camouflage", "divine_presence", "emberkeep", "hoarfrost_armor",
+	"instinct", "last_howl", "magic_barrier", "mirror_image", "spite",
+	"stalking_horse", "succession", "tripwire"]
+
+
+# EVERY UNIT THIS CAST COULD WRITE TO. For a picked target that is the pool the
+# player's picker and the bot's wrapper both offer (`_hero_side`, narrowed for
+# Covering Guard exactly as `_player_turn` narrows it), so the button cannot
+# darken over a target the picker would have allowed.
+func _recast_targets(u: BattleUnit, ab: Ability) -> Array:
+	if RECAST_SELF_PLAIN.has(ab.special) or ab.special in RECAST_SELF_ONLY:
+		return [u]
+	match ab.special:
+		"warcry", "unity", "divine_wrath":
+			return heroes.filter(func(h): return not h.dead)
+		"cons_ground", "consecration", "exhortation", "anointing", "interpose", \
+				"shield_block":
+			return heroes.filter(func(h): return not h.dead and not h.is_companion)
+		"resonant_field":
+			return heroes.filter(func(h): return not h.dead and not h.is_companion \
+				and h != u)
+		"hysteria", "slow_burn", "choking_smoke", "rime", "umbral_sigil", \
+				"penance", "bola":
+			return enemies.filter(func(e): return not e.dead)
+		"covering_guard":
+			return _hero_side().filter(func(h): return h != u)
+		"undying_vigil", "vow_suffering", "rite_of_return", "vespers", \
+				"divine_shield", "mantle":
+			return _hero_side()
+	return []
+
+
+# WHAT THIS CAST WOULD WRITE ONTO `t`, COMPUTED AT CAST TIME AND NOT READ OFF
+# THE AUTHORED VALUE. The power of half this set is a live reading — Vespers
+# scales off the Cleric's current maximum health, Magic Barrier off the Mage's,
+# Divine Shield off the Devout's — so a table of authored numbers would refuse
+# casts that would in fact have improved something, which §1 rightly calls the
+# worse of the two bugs.
+#
+# An empty return means this cast writes nothing to this unit, which is the
+# honest answer for Alms and Divine Presence in a kit that holds no Mercy: the
+# handler logs and does nothing, so there is nothing to protect.
+func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
+	if RECAST_SELF_PLAIN.has(ab.special):
+		if t != u:
+			return []
+		var plain: Array = RECAST_SELF_PLAIN[ab.special]
+		return [{"id": String(plain[0]), "turns": int(plain[1]), "power": 0}]
+	if ab.special in RECAST_SELF_ONLY and t != u:
+		return []
+	match ab.special:
+		"emberkeep":
+			return [{"id": "emberkeep", "turns": EMBERKEEP_TURNS + 1, "power": 0}]
+		"hoarfrost_armor":
+			return [{"id": "rimeguard", "turns": HOARFROST_TURNS + 1, "power": 0}]
+		"tripwire":
+			return [{"id": "tripwire", "turns": -1 if u.whole_forest > 0 else 6,
+				"power": 0}]
+		"succession":
+			return [{"id": "succession", "turns": 6, "power": SUCCESSION_SHARE}]
+		"stalking_horse":
+			return [{"id": "stalking_horse", "turns": 4, "power": STALKING_PULL}]
+		"camouflage":
+			return [{"id": "camouflage", "turns": 3, "power": CAMOUFLAGE_PCT}]
+		"spite":
+			return [{"id": "spite", "turns": 6, "power": SPITE_PERFECT_CAP}]
+		"answering_steel":
+			return [{"id": "answering_steel", "turns": 6,
+				"power": ANSWERING_PERFECT_PARRY}]
+		"last_howl":
+			return [{"id": "last_howl", "turns": -1, "power": 3}]
+		"bloodbond":
+			return [{"id": "bloodbond", "turns": -1, "power": 25}]
+		# Alms and Divine Presence are Mercy cards and REFUSE THEMSELVES in a kit
+		# that holds none — the handler says so and applies nothing, so the gate
+		# must agree rather than protect a status that never lands.
+		"alms":
+			if u.second_resource_name != "Mercy":
+				return []
+			return [{"id": "alms", "turns": 6, "power": ALMS_WARD_PCT}]
+		"divine_presence":
+			if u.second_resource_name != "Mercy":
+				return []
+			return [{"id": "divine_presence", "turns": 6, "power": 0}]
+		# THREE BANKED COUNTERS THAT PRE-MAX AGAINST WHAT IS HELD, so a recast
+		# tops the pile back up and only a FULL pile refuses. The arithmetic is
+		# the handler's own, read from the same status it will overwrite.
+		"instinct":
+			return [{"id": "instinct", "turns": -1,
+				"power": u.instinctive if u.instinctive > 0 else 3}]
+		"mirror_image":
+			return [{"id": "mirror", "turns": -1,
+				"power": maxi(4, u.status_power("mirror"))}]
+		"arcane_arrows":
+			return [{"id": "arrows", "turns": -1,
+				"power": maxi(6, u.status_power("arrows"))}]
+		"exhortation":
+			return [{"id": "exhorted", "turns": -1,
+				"power": maxi(35, t.status_power("exhorted"))}]
+		"interpose":
+			var ip_held: int = maxi(t.status_power("shield_charges"), 0) \
+				if t.has_status("shield_charges") else 0
+			return [{"id": "shield_charges", "turns": -1,
+				"power": ip_held + 1 + u.bulwark_line_ranks}]
+		"magic_barrier":
+			return [{"id": "barrier", "turns": 3,
+				"power": maxi(int(round(u.max_hp * 0.20)), 1)}]
+		"shield_block":
+			var sw_turns := 3 + 2 * u.shield_mastery_ranks
+			if t == u:
+				return [{"id": "shieldwall", "turns": sw_turns,
+					"power": SHIELDWALL_BLOCK}]
+			if u.bulwark_ally_block > 0:
+				return [{"id": "bulwark_line", "turns": sw_turns,
+					"power": u.bulwark_ally_block}]
+			return []
+		"warcry":
+			return [{"id": "warcry", "turns": 4, "power": WARCRY_PCT}]
+		"unity":
+			return [{"id": "unity", "turns": 4 + u.resolve_extra_turns, "power": 0}]
+		"divine_wrath":
+			return [{"id": "wrath", "turns": 4, "power": 0}]
+		"cons_ground":
+			return [{"id": "cons_ground", "turns": 3, "power": 0}]
+		"consecration":
+			return [{"id": "consecration", "turns": 4, "power": 0}]
+		"anointing":
+			return [{"id": "anointed", "turns": 4, "power": 0}]
+		"resonant_field":
+			return [{"id": "resonant_field", "turns": RESONANT_FIELD_TURNS + 1,
+				"power": 0}]
+		"hysteria":
+			return [{"id": "hysteria", "turns": -1, "power": 0}]
+		"slow_burn":
+			return [{"id": "slow_burn", "turns": SLOW_BURN_TURNS + 1, "power": 0}]
+		"choking_smoke":
+			return [{"id": "blind", "turns": 3, "power": 0}]
+		"covering_guard":
+			return [{"id": "covering_guard", "turns": 4, "power": 0}]
+		"undying_vigil":
+			return [{"id": "vigil", "turns": 4, "power": 0}]
+		"vow_suffering":
+			return [{"id": "vow", "turns": 4, "power": 0}]
+		"rite_of_return":
+			return [{"id": "rite_return", "turns": 4, "power": 0}]
+		"umbral_sigil":
+			return [{"id": "umbral_sigil", "turns": 4, "power": 0}]
+		"penance":
+			return [{"id": "penance", "turns": 4,
+				"power": int(round(PENANCE_MIRROR * 100.0))}]
+		"rime":
+			return [{"id": "rime", "turns": 4 + u.icy_resolve_ranks, "power": 0},
+				{"id": "frostbite", "turns": 2, "power": 0}]
+		"bola":
+			return [{"id": "slow", "turns": 4, "power": 0},
+				{"id": "cripple", "turns": 4, "power": 0}]
+		"vespers":
+			return [{"id": "vespers", "turns": 6,
+				"power": maxi(int(round(u.max_hp * VESPERS_PCT)), 1)}]
+		# THE TWO DIVINE BARRIER WRITERS, AND THEY CARRY RIDERS. `barrier` is a
+		# SHARED status: `_grant_divine_shield` stamps `divine`, Blessed Barrier,
+		# Afterglow, Warded Robes and Unyielding onto it, and Mantle adds its
+		# hops. A Devout casting over a Mage's larger Magic Barrier improves it
+		# even though neither the duration nor the power moves — it becomes
+		# DIVINE, which is what feeds Faith — so the riders are part of the test
+		# and not decoration.
+		#
+		# LAYERED FAITH IS READ HERE (BM §2's fix, reconciled rather than
+		# assumed): with the node taken the cast ADDS to the standing divine
+		# pool instead of maxing against it, so it always improves and is never
+		# refused. The bespoke path does something this rule does not, so §2 says
+		# leave it — and this line is what stops the general rule contradicting
+		# it.
+		"divine_shield", "mantle":
+			var held: Dictionary = t.get_status("barrier")
+			var base := 0
+			if ab.special == "mantle":
+				if _living_devout() == null:
+					return []
+				base = maxi(int(round(u.max_hp * MANTLE_PCT)), 1)
+			else:
+				base = int(round(u.max_hp * (0.35 + 0.01 * u.stalwart_step)))
+			if u.layered_faith > 0 and not held.is_empty() \
+					and bool(held.get("divine", false)):
+				base += int(held.get("power", 0))
+			var riders := {
+				"divine": 1.0,
+				"blessed_pct": 0.01 * u.blessed_barrier_ranks,
+				"afterglow": float(int(round(u.max_hp * 0.01 * u.afterglow_ranks))),
+				"warded": 0.01 * u.warded_ranks,
+				"unyielding_pct": 0.01 * u.unyielding_ranks,
+			}
+			if ab.special == "mantle":
+				riders["mantle"] = float(MANTLE_HOPS + 1)
+			return [{"id": "barrier", "turns": -1, "power": base,
+				"riders": riders}]
+	return []
+
+
+# WOULD THIS ONE WRITE MAKE THIS ONE UNIT BETTER OFF?
+#
+# FLEETING IS NORMALISED HERE because `add_status` applies it to the TARGET's own
+# count before it maxes (unit.gd's one read site for `mod_status_turns`), so
+# comparing an authored 4 against a shortened 3 would call a real refresh an
+# improvement and never refuse anything on a cursed body.
+#
+# A NEGATIVE COUNT IS A PERMANENCE FLAG RATHER THAN A DURATION — add_status says
+# so at the top — so it reads as longer than any real number, and a battle-long
+# status can never be lengthened by anything.
+func _status_write_improves(t: BattleUnit, w: Dictionary) -> bool:
+	var held: Dictionary = t.get_status(String(w["id"]))
+	if held.is_empty():
+		return true
+	var want_turns := int(w["turns"])
+	if want_turns > 0:
+		want_turns = maxi(want_turns + t.mod_status_turns, 1)
+	var have_turns := int(held.get("turns", 0))
+	if have_turns >= 0 and (want_turns < 0 or want_turns > have_turns):
+		return true
+	if int(w.get("power", 0)) > int(held.get("power", 0)):
+		return true
+	for key in w.get("riders", {}):
+		if float(w["riders"][key]) > float(held.get(key, 0.0)):
+			return true
+	return false
+
+
+# TRUE when every unit this cast could touch already holds everything it would
+# hand out. AN EMPTY POOL IS NOT A REFUSAL: an ability with no legal target has
+# its own gate or its own log line, and answering that question here would put
+# two rules on one button.
+func _recast_refused(u: BattleUnit, ab: Ability) -> bool:
+	if not ab.special in RECAST_GATED:
+		return false
+	var pool := _recast_targets(u, ab)
+	var saw_write := false
+	for t in pool:
+		for w in _recast_writes(u, ab, t):
+			saw_write = true
+			if _status_write_improves(t, w):
+				return false
+	# A CAST THAT PROPOSES NOTHING ANYWHERE IS NOT THIS GATE'S QUESTION. Alms and
+	# Divine Presence write nothing in a kit that holds no Mercy — the sim hands
+	# every card to every hero, so that branch is reachable — and the handler
+	# already logs why. Refusing here would darken a button with a reason this
+	# rule cannot state, which is the §3 bug arriving through the fix for it.
+	return saw_write
+
+
+# §3 — A GREYED BUTTON WITH NO REASON IS A BUG FROM THE PLAYER'S SIDE, so the
+# refusal NAMES the thing that would not improve. This is the whole benefit of
+# refusing rather than silently replacing: the waste was invisible before and is
+# information now.
+func _recast_refusal_note(u: BattleUnit, ab: Ability) -> String:
+	var names: Array = []
+	for t in _recast_targets(u, ab):
+		for w in _recast_writes(u, ab, t):
+			var sid := String(w["id"])
+			var nm: String = String(STATUS_INFO[sid][0]) if STATUS_INFO.has(sid) \
+				else sid.capitalize()
+			if not names.has(nm):
+				names.append(nm)
+	if names.is_empty():
+		return ""
+	return "(%s already stands at full strength — a second cast\nwould not lengthen it or deepen it)" % \
+		" and ".join(PackedStringArray(names))
+
+
 func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	if _eff_cost(u, ab) > u.resource or ab.faith_cost > u.second_resource:
 		return false
@@ -5171,13 +5515,17 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# five of the nine need no gate at all because they deal damage whatever the
 	# board looks like (Crossfire, Calibrating Shot, Trophy Shot, Loaded Shot).
 	#
-	# BLOODBOND is refused only while the guard he already swore is still
-	# STANDING. It is deliberately NOT gated on a beast being out: the guard is
-	# sworn to the BOND, so placing it before summoning — or while the field is
-	# empty and a swap is coming — is a real line of play, and the guard has no
-	# duration to waste.
-	if ab.special == "bloodbond" and u.has_status("bloodbond"):
-		return false
+	# BLOODBOND'S BESPOKE GATE IS GONE, SUBSUMED BY BATCH CO'S GENERAL RULE
+	# rather than left standing beside it. BV refused a second Bloodbond while
+	# the guard he already swore was still STANDING; the guard is battle-long
+	# and carries a fixed share, so a recast improves neither its duration nor
+	# its power and the general rule refuses it for exactly the same reason and
+	# in exactly the same cases. Two rules on one status is how a status ends up
+	# behaving differently from every other for reasons nobody can reconstruct.
+	# What BV's comment established is still true and still load-bearing: the
+	# card is NOT gated on a beast being out, because the guard is sworn to the
+	# BOND — placing it before summoning is a real line of play — and nothing
+	# below reintroduces that condition.
 	# SAVAGE SWEEP is an ORDERED action: with no companion standing there is
 	# nobody to give the order to. Twin Hunt's gate, exactly.
 	if ab.special == "savage_sweep" and _beasts(u).is_empty():
@@ -5198,6 +5546,13 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# a balance question — so the cast is refused while one is pending. It is the
 	# negative control test_batch_bv drives directly.
 	if ab.special == "preparation" and u.prep_pending > 0:
+		return false
+	# ---- BATCH CO — THE RECAST THAT WOULD DO NOTHING ----
+	# LAST, AND DELIBERATELY LAST: every gate above answers "can this be cast at
+	# all", and this one answers "would casting it change anything". Asking the
+	# cheaper question first keeps the expensive walk off the hot path for the
+	# abilities the earlier gates have already refused.
+	if _recast_refused(u, ab):
 		return false
 	return true
 
@@ -5286,8 +5641,10 @@ func _ability_popup_button(u: BattleUnit, ab: Ability, popup: PopupPanel,
 	# darkens, and Preparation's says it in the words of the mechanic rather than
 	# the field, because a player meeting the first extra turn in the game has
 	# nothing else to learn the rule from.
-	if ab.special == "bloodbond" and u.has_status("bloodbond"):
-		ab_btn.tooltip_text += "\n(The bond is already sworn)"
+	#
+	# BLOODBOND'S LINE IS NOT MISSING FROM THIS GROUP, IT MOVED: Batch CO's
+	# general rule refuses that recast now and `_ability_tooltip` states it, so
+	# a second string here would say the same thing twice on one button.
 	if ab.special == "savage_sweep" and _beasts(u).is_empty():
 		ab_btn.tooltip_text += "\n(No living companion)"
 	if ab.special == "ghostpack" and u.kinds_summoned.is_empty():
@@ -5544,6 +5901,15 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 	# removed cannot keep claiming one.
 	if ab.gated:
 		tip += "\n%s" % Classes.GATED_TELL
+	# BATCH CO §3 — A GREYED BUTTON WITH NO REASON IS A BUG FROM THE PLAYER'S
+	# SIDE. It sits in the tooltip rather than in the per-ability chain below
+	# because this is the ONE site every surface reads — the ability popup, the
+	# basic-attack button and the draft card all come through here — and §4's
+	# whole point is that there is one answer rather than one string per card.
+	if _recast_refused(u, ab):
+		var recast_note := _recast_refusal_note(u, ab)
+		if recast_note != "":
+			tip += "\n%s" % recast_note
 	# Mini-boss upgrades on this ability (Batch AP §4): NAMES ONLY. Every
 	# number above already reflects them — the upgrade was baked into the
 	# Ability at spawn — so repeating the magnitudes here would be a second

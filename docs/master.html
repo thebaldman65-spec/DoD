@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-18 (Batch CN)</b></p>
+<p align="right"><b>Last updated: 2026-08-18 (Batch CO)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -400,6 +400,23 @@ and the Berserker keeps his live Blood Frenzy bonus. The hero's next turn is sch
 ability's own delay as normal, so the punishment is tempo. <b>The gate is shown before the
 cast is committed</b>, on the ability button, in its tooltip, on the draft card, and on the bar
 itself while it sweeps. <b>No healing or revival ability is ever gated.</b></p>
+<p><b>A RECAST THAT WOULD NOT IMPROVE IS REFUSED.</b> Re-applying a status keeps the BETTER of
+the two on both counts &mdash; the longer duration and the stronger power, never simply the newer
+one. Many powers are read LIVE at the moment of the cast (Vespers is a fifth of the Cleric's own
+maximum health, Magic Barrier a fifth of the Mage's, Divine Shield better than a third of the
+Devout's), so recasting one while it still stands can produce a <i>smaller</i> number than the one
+already on the board. The smaller number is discarded; the turn, the resource and the cooldown are
+not. <b>So the cast is refused instead:</b> when an ability's whole effect is the status it
+applies, and everything it could reach already holds that status for at least as long and at least
+as strongly, the button is dark and its tooltip names what is already standing.</p>
+<p><b>The limit is deliberate: an ability that ALSO strikes, heals or converts a resource still
+casts</b> even when its buff would not improve, because that half is worth the turn on its own.
+<b>Funeral Pyre</b> still smothers a fire for Mana, <b>Stabilize</b> still vents Resonance and
+heals, <b>Battle Shout</b> still pays its Rage, <b>Reckless Abandon</b> still spends the bar, and
+<b>Blessing of Zeal</b> still ticks cooldowns. <b>58 abilities</b> are refusable &mdash; the pure
+buffs, wards and marks. Two carve-outs run the other way and never refuse: <b>Interpose</b>, whose
+charges are additive, and <b>Divine Shield under Layered Faith</b>, which compounds across casts
+rather than maxing against itself.</p>
 <p><b>THE DEFENSIVE CHECK.</b> A timing bar on <b>incoming</b> attacks, for defensive heroes
 only. <b>Pure mitigation &mdash; it can only ever reduce incoming damage, never increase
 it.</b></p>

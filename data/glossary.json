@@ -1034,5 +1034,16 @@
 			"res_rage",
 			"stance"
 		]
+	},
+	{
+		"id": "recast_refused",
+		"term": "Recasting a Standing Effect",
+		"category": "combat",
+		"short": "A second cast that could not improve an effect is refused rather than wasted.",
+		"long": "Re-applying a status takes the BETTER of the two on both counts - the longer duration and the stronger power, never simply the newer one. That matters because a great many powers are read LIVE at the moment of the cast: Vespers is worth a fifth of the Cleric's own maximum health, Magic Barrier a fifth of the Mage's, Divine Shield better than a third of the Devout's. Casting one of them again while it still stands can therefore produce a SMALLER number than the one already on the board. The smaller number is discarded; the turn, the resource and the cooldown are not. SO THE GAME REFUSES THE CAST INSTEAD. When an ability's whole effect is the status it applies, and everything it could reach already holds that status for at least as long and at least as strongly, the button greys out and its tooltip names what is already standing. There is nothing to learn card by card and no ability that quietly departs from it. THE LIMIT IS DELIBERATE AND WORTH KNOWING: an ability that ALSO strikes, heals or converts a resource still casts even when its buff would not improve, because that half is worth the turn on its own. Funeral Pyre still smothers a fire for Mana, Stabilize still vents Resonance and heals, Battle Shout still pays its Rage. Only the pure buffs, wards and marks are refused.",
+		"see_also": [
+			"stance_gated",
+			"initiative"
+		]
 	}
 ]

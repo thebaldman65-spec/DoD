@@ -4,6 +4,60 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The brief's own examples failed its own scope limit (Batch CO) — 2026-08-18
+
+The batch named five cards as cases of the bug and then, one section later, set a scope limit that
+excludes four of them. That is not a contradiction in the brief; it is the brief being honest that
+**a list of symptoms is not a list of things to fix.** Funeral Pyre, Stabilize, Battle Shout and
+Reckless Abandon all genuinely lose a snapshot to `max()` — and all four also hand the player
+something else on the way through: Mana back from the Burn, Mana and a heal from the vented
+Resonance, five Rage, the whole Rage bar spent on a multiplier. Refuse any of them and you have
+deleted a resource conversion the player deliberately chose.
+
+The generalisable bit: **when a rule and its motivating examples disagree, the examples are
+usually the thing that was observed and the rule is the thing that was reasoned.** The examples got
+onto the list because someone noticed the waste, which is a real observation about a real card. The
+scope limit got written because someone then asked what refusing would cost, which is a different
+question, and only the second question is answerable per card. Deriving the set from the second
+question and letting four of the five headline cards fall out of it felt wrong for about ten
+minutes and is obviously right afterwards.
+
+**The trap CN warned about was here, twice, and the second one was not the one CN named.** The
+first is the known one: `damage: 0` says nothing, because half the corpus works inside a `special`
+handler. The second is that `power` is not always a magnitude. Mark of the Hunt, Snare Line, Eye
+of the Storm and Vendetta store `heroes.find(attacker)` in the status power — the field is an owner
+index there, not a number that can be larger or smaller in any meaningful sense. A rule that
+compares "the power the cast would produce" against "the power already held" is arithmetic on a
+slot number for those four, and would have refused Mark of the Hunt for hero 0 while allowing it
+for hero 2. **A shared field with two meanings is a trap that only springs for the batch that
+first tries to reason about the field generically**, and there is no way to find it except by
+reading every site.
+
+**The sharpest thing found, and it is recorded rather than fixed.** `add_status` maxes power;
+`update_status` *assigns* it. Battle Shout, Stabilize and Eye of the Storm call the second one
+with a computed value right after the first, so on those three cards a weaker recast does not
+merely fail to improve — it drags the standing buff *down*. That is worse than the bug the batch
+was written to fix, and all three are outside the batch's scope because their payload is more than
+the status. Widening the scope to reach them would have meant refusing casts that convert
+resources, which is the exact failure the scope limit exists to prevent. **Two true things can
+both be true and still not belong in the same batch**; the note is here so the next author does
+not have to rediscover it from the symptom.
+
+**On reconciling BM's fix rather than assuming it.** The brief said to read `_grant_divine_shield`
+before touching it because it "may refuse, refresh, or replace". It does none of those: Layered
+Faith pre-adds the standing pool so the max lands on the sum, which makes the recast **additive**.
+The general rule therefore never fires on it, the two compose with no special case, and the
+bespoke path stays. The instructive part is that the reconciliation ran the *other* way too — the
+gate has to read Layered Faith when it computes the power, or the general rule would have refused
+casts for the one build that had already solved the problem. **A bespoke fix you are generalising
+is also a constraint on the generalisation**, not just a candidate for deletion.
+
+The one that *was* deletable turned up on the way past: Batch BV had already written this exact
+rule for Bloodbond alone, as a hand-rolled `has_status` check in the same function. Battle-long,
+fixed share, so the general rule refuses it in precisely the same cases. Two rules on one status
+is how a status ends up behaving differently from every other for reasons nobody can reconstruct,
+so it went.
+
 ## The criterion that could not be read off the fields (Batch CN) — 2026-08-18
 
 The brief said the criterion was mechanical rather than categorical, and it was right about the

@@ -253,6 +253,56 @@ ONE answer, asked by the cast path and by the draft card alike.
   **the WARDEN's own roughly double** (he acts ~7 times and braces 7–9). **Uncapped on purpose
   for the first pass** — a cap is a retreat available afterwards, and it is a designer's call.
 
+## A recast that would not improve is REFUSED (STANDING, SET AT BATCH CO)
+**THE RULE: a status recast that would improve neither duration nor power is refused, and the
+refusal is scoped to abilities whose WHOLE PAYLOAD is the status.** `_recast_refused` is the ONE
+answer; `RECAST_GATED` (58 abilities) is the set.
+
+- **WHY IT EXISTS.** `add_status` resolves a re-application as `max()` on duration and power, so a
+  status whose power is a **snapshot of live state** could be recast at a weaker value, have that
+  value discarded by the max, and still charge full resource, a full cooldown and the turn.
+  Vespers reads the Cleric's current maximum health, Magic Barrier the Mage's, Divine Shield the
+  Devout's — all three move during a fight.
+- **THE SCOPE LIMIT MATTERS MORE THAN THE RULE.** An ability that also deals damage, heals, or
+  converts a resource **must still cast** when its buff would not improve: that half is worth the
+  turn on its own, and refusing it would be a worse bug than the one being fixed.
+  **FUNERAL PYRE, STABILIZE, BATTLE SHOUT, RECKLESS ABANDON and BLESSING OF ZEAL are excluded for
+  exactly that reason** — four of them were the cards that motivated the batch.
+- **DERIVE MEMBERSHIP BY WALKING `_resolve_special`, NEVER BY READING `damage`/`pressure`** — CN's
+  trap, and it is the same trap here: those fields are zero on Feint, Guard Change and Kill
+  Command. 211 abilities → 134 with no field-level payload → 58 that qualify.
+- **NEVER GATE ON A `power` THAT IS NOT A MAGNITUDE.** Mark of the Hunt, Snare Line, Eye of the
+  Storm and Vendetta store `heroes.find(attacker)` in the status power; a numeric test there
+  refuses on a hero's slot number. They are excluded and must stay excluded.
+- **THE TEST IS EXACT AND COMPUTED AT CAST TIME**, never read off the authored value. Refusing a
+  cast that would in fact have improved something is **strictly worse** than the bug. Three things
+  the arithmetic must keep: powers recomputed live; **Fleeting normalised** (the target's own
+  `mod_status_turns`, as `add_status` applies it); **a negative turn count is permanence, not a
+  duration**, so nothing lengthens a battle-long status.
+- **RIDERS COUNT AS IMPROVEMENT.** `barrier` is SHARED and `_grant_divine_shield` stamps `divine`,
+  Blessed Barrier, Afterglow, Warded Robes, Unyielding (Mantle its hops). A Devout casting over a
+  Mage's LARGER barrier improves it — it becomes divine, which feeds Faith — with neither duration
+  nor power moving.
+- **LAYERED FAITH IS NOT SUBSUMED AND MUST BE READ BY THE GATE.** BM's bespoke path is not a
+  refusal: it pre-adds the standing pool so the recast is **additive**, always improves, and is
+  never refused. The two compose. **Interpose is the same shape** and is the one member of the set
+  that can never refuse.
+- **ONE RULE, NOT ONE STRING PER CARD.** No ability description says anything about a second cast.
+  It is stated once in the **glossary** (`recast_refused`) and carried in the moment by the tell,
+  which lives in `_ability_tooltip` — the one site every surface reads.
+- **AN ABILITY THAT PROPOSES NO WRITE AT ALL IS NOT THIS GATE'S QUESTION** (Alms and Divine
+  Presence in a kit without Mercy): the handler already logs why, and refusing there would darken
+  a button with a reason this rule cannot state.
+- **`check_co.gd` IS THE ANTI-ROT PROOF AND IT IS A LIVE ONE.** It spawns **two** real battles —
+  Alms and Divine Presence need Mercy, Mantle needs a living Devout, so one party cannot write the
+  whole set — casts all 58 onto every unit each can reach, and asserts the gate's prediction
+  against what actually landed. It also asserts the excluded cards OUT by name.
+- **KNOWN, RECORDED, NOT FIXED:** Battle Shout, Stabilize and Eye of the Storm call
+  `update_status` with a *computed* power after `_apply_status`, and `update_status` **assigns**
+  power where `add_status` maxes it — so on those three a weaker recast **overwrites the standing
+  buff downward**. All three carry a second payload, so the refusal cannot reach them; widening
+  scope to catch them would delete a resource conversion the player wanted.
+
 ## Verify before shipping
 - **STANDING CONVENTION, SET AT BATCH CG AND BINDING ON EVERY CONTENT BATCH FROM IT: A CONTENT
   BATCH DOES NOT SHIP A TEST SUITE.** No new suite, no negative controls, no smoke sweeps, no
