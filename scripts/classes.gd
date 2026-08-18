@@ -380,7 +380,7 @@ const SPEC_DRAFT_POOLS := {
 # spec's engine is not online yet, which is a real role and a different one.
 const CLASS_DRAFT_POOLS := {
 	"warrior": ["Battle Trance", "Rally", "Charge", "Cleave", "Warcry",
-		"Iron Will"],
+		"Ironclad"],
 	"mage": ["Magic Barrier", "Mirror Image", "Magic Missiles", "Mana Well",
 		"Dispel", "Blink"],
 	"cleric": ["Ministration", "Consecration", "Chastise", "Unburden",
@@ -509,6 +509,83 @@ static func class_of_spec(spec: String) -> String:
 		if SPEC_IDS[class_key].has(spec):
 			return class_key
 	return ""
+
+
+# ---------- THE COMPUTED BLOCK (Batch CK §1) ----------
+#
+# ONE BUILDER, TWO SURFACES, AND THAT IS THE WHOLE POINT OF IT LIVING HERE.
+# The draft card (`map_screen._draft_column`) and the hero sheet
+# (`party_screen._draw_detail`) both put an ability's numbers under its
+# description. Before CK the sheet held the only copy, so the draft card showed
+# the description ALONE — and 30 of the 66 damaging abilities never state their
+# damage in prose, because every other surface computes it (audit §2.1). Ice
+# Lance was the sharpest: `damage: 35` in the dict and a card that reads only
+# "+5% of Attack per Chilled stack", so it drafted as a per-stack ability. A
+# SECOND COPY ON THE MAP SCREEN IS THE DRIFT THIS THREAD IS ABOUT, so both
+# callers come here.
+#
+# THE THIRD SURFACE IS DELIBERATELY NOT FOLDED IN. `battle._ability_tooltip`
+# reads a LIVE BattleUnit: Surge, Empower and the Resonance curve multiply its
+# damage, and it prints "(ready in N)" off that unit's cooldown clock. It is a
+# mid-combat tooltip with live state in it rather than a static card, and
+# merging it would move numbers inside a fight. Recorded in CLAUDE.md as the one
+# remaining copy, with this reason.
+#
+# `attack` IS THE HERO'S LIVE ATTACK STAT, OR 0 WHEN THE CALLER HAS NONE, AND
+# THE TWO PRINT DIFFERENT LINES ON PURPOSE. With a figure it prints the real
+# range the hit will roll; with 0 it prints the ability's own SCALING
+# PERCENTAGE. Both are legal on these two screens and nowhere else — the draft
+# screen and the glossary are the arithmetic-ALLOWED tier in
+# `docs/text-standard.html`. The draft card passes 0 because THE MAP SCREEN HAS
+# NO LIVE ATTACK TO READ: only `party_screen._draw_detail` and the battle spawn
+# build one, each with its own sixty-line prologue (hero_config, kit overrides,
+# passive, spec stats, tree, runes, upgrades, node scaling), and a third copy of
+# THAT on the map screen would be a far worse duplication than the one this
+# function exists to prevent. Extracting it is its own batch; when it lands,
+# this call site changes by one argument and the range appears.
+static func computed_block(ab: Ability, attack: int = 0,
+		resource: String = "") -> String:
+	if ab == null:
+		return ""
+	var lines := PackedStringArray()
+	if ab.damage > 0:
+		var bd := "   BD: %d" % ab.pressure
+		var hits := ""
+		if ab.random_hits > 0 or ab.multi_hits > 0:
+			hits = "   × %d hits" % maxi(ab.random_hits, ab.multi_hits)
+		if attack > 0:
+			# The same 0.9/1.1 variance band the battle tooltip quotes, off the
+			# same field — this is the range the strike loop will roll inside.
+			var hit := ab.damage * 0.01 * float(attack)
+			lines.append("Damage: %d–%d (%s)%s%s" % [int(hit * 0.9),
+				int(round(hit * 1.1)), ab.dmg_type.capitalize(), bd, hits])
+		else:
+			lines.append("Damage: %d%% of Attack (%s)%s%s" % [ab.damage,
+				ab.dmg_type.capitalize(), bd, hits])
+	if ab.heal > 0:
+		lines.append("Heals: %d" % ab.heal)
+	# NO COST LINE ON A FREE ABILITY rather than a "Costs nothing" line: the
+	# card is 258px wide and the block already adds five lines to it, so a line
+	# that says nothing is a line that pushes a real one out of view.
+	if ab.cost > 0 and resource != "":
+		lines.append("Costs %d %s" % [ab.cost, resource])
+	elif ab.cost > 0:
+		lines.append("Costs %d" % ab.cost)
+	# `faith_cost` IS MERCY EVERYWHERE IT APPEARS — Resurrection, Divine Plea
+	# and Hymn of Hope, all three Holy Cleric (see `pending_talent_ability`'s
+	# header). `battle._ability_popup_button` names it off the live unit's
+	# `second_resource_name` because a BattleUnit has one; neither caller here
+	# does, and inventing a generic word for a resource with exactly one owner
+	# would read worse than its name.
+	if ab.faith_cost > 0:
+		lines.append("Costs %d Mercy" % ab.faith_cost)
+	if ab.cooldown > 0:
+		lines.append("Cooldown: %d turn%s" % [ab.cooldown,
+			"" if ab.cooldown == 1 else "s"])
+	lines.append("Initiative cost: %.1f" % ab.delay)
+	if ab.perfect_text != "":
+		lines.append("Perfect: %s" % ab.perfect_text)
+	return "\n".join(lines)
 
 
 # Resolve a pool NAME to its Ability, from either pool. The `spec` argument
@@ -1753,17 +1830,27 @@ static func draft_ability(display_name: String) -> Ability:
 		# "the meter cannot fill" and NOT "Broken is refused": both read the
 		# same in a short test and neither leaves him at 99 afterwards.
 		#
-		# NAME COLLISION, REPORTED NOT RESOLVED: the Warden's Threat row 3 node
-		# is also called IRON WILL, and so is the live status that node's chip
-		# rides. Same class, same spec reachable — worse than BP's Precision
-		# Strike. Nothing breaks (a node's name is not an ability name and
-		# nothing resolves it) and this ability's status is `ironclad` with its
-		# own chip, so neither overwrites the other; renaming either is the
-		# designer's call and one string.
-		"Iron Will":
-			return Ability.make({"display_name": "Iron Will", "cost": 20,
+		# THE NAME COLLISION IS RESOLVED AT BATCH CK §2 AND THIS ABILITY IS THE
+		# HALF THAT MOVED. It was called IRON WILL, which is ALSO the Warden's
+		# Threat row 3 node and the live status that node's chip rides — same
+		# class, same spec reachable, worse than BP's Precision Strike. Nothing
+		# broke (a node's name is not an ability name and nothing resolves it),
+		# but master.html's single "Iron Will" status row described the TALENT,
+		# so a reader checking THIS card got the other mechanic's answer.
+		# **THE TALENT KEEPS THE NAME AND KEEPS `iron_will`.** This one took the
+		# name its own status has always carried: `ironclad`. NO NEW WORD ENTERED
+		# THE GAME — the rename made the card agree with the code rather than the
+		# other way round, and the `special` moved with it so that no `iron_will`
+		# string anywhere in the codebase belongs to this ability any more.
+		#
+		# NOT THE berserk/berserk_risk PATTERN, AND MUST NOT BE READ AS ONE. That
+		# pair and formless/formless_recoil share a label DELIBERATELY — each is
+		# the upside and the price of ONE ability, separated by chip tag and
+		# colour. This was two unrelated mechanics that collided.
+		"Ironclad":
+			return Ability.make({"display_name": "Ironclad", "cost": 20,
 				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
-				"anim": "attack01", "special": "iron_will",
+				"anim": "attack01", "special": "ironclad",
 				"perfect_id": "", "perfect_text": "Holds 4 turns instead of 3",
 				"description": "Set your teeth: for 3 turns you cannot\nbe Stunned, Frozen, Dazed or Broken,\nand take 15% less damage. The Break\nstill piles up to 99 — it just cannot\ncross until this ends."})
 		# ========== BATCH BT: TRANCHE 2, THE MAGE NINE ==========
@@ -1864,10 +1951,15 @@ static func draft_ability(display_name: String) -> Ability:
 		# NAME COLLISION, REPORTED NOT RESOLVED (the BR §1 rule): KILLING FROST
 		# is also a Cryomancer talent node (`cr_freezing`, Thaw row 2, "+15
 		# points on the held-enemy window"). SAME SPEC, so a Cryomancer holding
-		# the node can draft the card — the Iron Will shape. It is a LABEL
-		# collision only: a node's name is not an ability name and nothing
+		# the node can draft the card — what used to be called the Iron Will
+		# shape, and BATCH CK §2 RESOLVED THAT ONE (the ability is Ironclad now),
+		# so this is the last card-vs-node collision left in the game. It is a
+		# LABEL collision only: a node's name is not an ability name and nothing
 		# resolves it, the node's counter is `killing_frost` and the card's
-		# handler is a `special`, and the two touch no shared field.
+		# handler is a `special`, and the two touch no shared field. What made
+		# Iron Will worth renaming and leaves this one alone is that Iron Will's
+		# two mechanics did not resemble each other and master.html documented
+		# only the talent; these two both make a held enemy colder.
 		"Killing Frost":
 			return Ability.make({"display_name": "Killing Frost", "dmg_type": "frost",
 				"cost": 20, "damage": 20, "pressure": 6, "delay": 2.0,
@@ -2900,7 +2992,7 @@ static func draft_ability(display_name: String) -> Ability:
 		# IS. A Warden's Threat lane deals 320 Break a battle and the Occultist
 		# deals a fraction of that; the lever with leverage is the multiplier,
 		# not another cast of his own. NOTHING IN THE GAME HAS EVER AMPLIFIED
-		# BREAK DAMAGE — Hunter's Mark amplifies damage, Iron Will and Bulwark
+		# BREAK DAMAGE — Hunter's Mark amplifies damage, Ironclad and Bulwark
 		# REFUSE Break, Devoutness and Hold the Line CUT it, and the reducers all
 		# read a number this one has already raised.
 		# SYNERGY: the WARDEN's whole Threat lane, above all — Sundering,

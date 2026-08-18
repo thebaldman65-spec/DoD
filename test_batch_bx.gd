@@ -898,7 +898,22 @@ func _rename() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	ok(master.contains("Batch CI"), "§5: master.html is stamped Batch CH")
+	# RE-POINTED BY BATCH CK. THIS CHECK WAS ALREADY RED WHEN CK ARRIVED AND CK
+	# DID NOT BREAK IT: it asserted a HARDCODED batch stamp, which has to be
+	# hand-bumped every batch to keep passing. **FIVE SUITES CARRIED THE SAME
+	# CHECK (bq, br, bt, bx, ce) AND BATCH CJ'S RE-STAMP TURNED ALL FIVE RED AT
+	# ONCE** — the CD §1 fault in its other direction: not a check that can only
+	# pass, but one that can only pass for one batch. It asks the durable version
+	# of its own question now: the document carries a stamp, and that stamp is no
+	# older than the batch this suite belongs to. No bump is ever owed again.
+	# (Two-letter batch codes sort lexically; a three-letter code needs one line.)
+	var _stamp_at := master.find("Last updated:")
+	ok(_stamp_at >= 0, "§5: master.html carries a Last-updated stamp")
+	var _stamp := master.substr(_stamp_at, 60)
+	var _code_at := _stamp.find("(Batch ")
+	var _stamped := _stamp.substr(_code_at + 7, 2) if _code_at >= 0 else ""
+	ok(_stamped >= "BX",
+		"§5: ...stamped no older than this suite's own batch (reads '%s')" % _stamped)
 	var low := master.to_lower()
 	ok(low.contains("every living hero") or low.contains("all four heroes"),
 		"§5: master.html says an elite offers a draft to every living hero")

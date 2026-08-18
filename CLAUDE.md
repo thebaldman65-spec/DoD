@@ -45,12 +45,21 @@ updated alongside `docs/changelog.html` (the living changelog). The original
     **THE TWO ARE NOT THE SAME STRING: of 120 draft ability rows in master.html, ZERO carry the
     code's sentence** (independently authored, median 3.0x longer). **Do not calibrate "how the
     cards read" from master.html — it is text no player has ever seen.**
-  · `docs/text-audit.html` (Batch CJ) is the REPORT of what is currently non-conforming, in
-    three buckets. **Bucket 1 first: polishing the grammar on a wrong description makes it read
-    more confidently while staying wrong.** Its two bucket-1 items are OPEN DESIGN QUESTIONS,
-    not typos: **"Iron Will" is the chip name of TWO unrelated mechanics** (the `ironclad`
-    ability vs the `iron_will` talent — master.html documents only the talent), and **Battle
-    Shout's registry tooltip hardcodes 8% when the code picks 8/12/18 by node**.
+  · `docs/text-audit.html` is the REPORT of what is currently non-conforming, in three buckets,
+    and **IT NOW HOLDS TWO PASSES**: Batch CJ's over abilities, runes, statuses and the length
+    ceiling, and **§CK at the foot** over the 93 glossary entries, all enemy text and all event
+    text. **Bucket 1 first: polishing the grammar on a wrong description makes it read more
+    confidently while staying wrong.**
+    · **CJ'S TWO BUCKET-1 ITEMS ARE BOTH CLOSED BY BATCH CK, AND SO IS ITS LARGEST BUCKET-2
+      ITEM.** (1) **The Warrior ability is `Ironclad` now, not "Iron Will"** — the name its own
+      status id always carried; **the WARDEN TALENT keeps `iron_will` and keeps the name Iron
+      Will**, and master.html §4.6 carries two rows where it carried one. **Do not "restore" Iron
+      Will to the ability; the collision is what was fixed.** (2) **Battle Shout's registry
+      fallback carries NO NUMBERS** — stripped rather than corrected, because there is no single
+      number that is right across nodes 0/1/2. **Do not put a magnitude back into it.**
+      (3) **The draft card renders the computed block** — see the CK §1 standing reference below.
+    · **§CK's OWN bucket 1 is OPEN and is a design question**: the end boss's `Regalia` cannot be
+      cast and its description names the wrong mechanic (recorded under Known open threads).
 - `addendum.html` is RETIRED (frozen history; do not update it). **Batch BZ MOVED IT OUT OF THE
   REPO** to `/Users/zipples/Documents/DoD-archive/addendum.html`; it is no longer `docs/addendum.html`.
 - User drops new assets in `../imported files/` — always check there.
@@ -783,6 +792,48 @@ meter is ungoverned. meter | what governs it | where the governor lives:
 · **faith_peak** (never falls in battle) | the BATTLE RESET: `_reset_faith_meters()` zeroes
   count and peak together at battle start, before the opening oath; one ratchet site in
   `_gain_faith` | battle.gd ~8125-8171.
+
+### STANDING REFERENCE — THE COMPUTED BLOCK: ONE BUILDER, TWO SCREENS, AND THE THIRD COPY THAT STAYS (Batch CK §1)
+**`Classes.computed_block(ab, attack, resource)` IS THE ONLY BUILDER OF AN ABILITY'S NUMBERS FOR
+A STATIC SURFACE, AND TWO SCREENS SHARE IT.** It emits damage (with school, Break damage and hit
+count), heal, cost, cooldown, initiative and **Perfect**. Its two callers:
+- **The DRAFT CARD** (`map_screen._draft_column`) — passes `attack = 0`, so it prints the
+  ability's **scaling percentage** ("Damage: 35% of Attack (Frost)   BD: 10").
+- **The HERO SHEET** (`party_screen._draw_detail`) — passes the hero's live Attack, so it prints
+  the **real range**, and keeps its own `Scaling: N% of Attack` line OUTSIDE the block (on the
+  draft card that line and the block's damage line would be the same figure twice).
+**A LATER BATCH CHANGING THE BLOCK CHANGES BOTH SCREENS. That shared path is the point** — before
+CK the sheet held the only copy, which is exactly why the draft card had none and thirty damaging
+cards drafted with no damage figure at all.
+- **THE DRAFT CARD IS AN ARITHMETIC-ALLOWED SURFACE AND THE OFFER PICKER IN THE SAME FILE IS NOT.**
+  `map_screen._pick_button` (the mini-boss / upgrade / rune offer and the drop step) renders
+  `description` alone BY DESIGN — it is read in the same breath as a fight, so the standard's
+  mid-combat tier binds it. **`map_screen.gd` renders both tiers. Do not "make them consistent".**
+- **THE THIRD COPY IS `battle._ability_tooltip` AND IT IS DELIBERATELY NOT FOLDED IN.** It reads a
+  live `BattleUnit`: Surge, Empower and the Resonance curve multiply its damage and it prints
+  "(ready in N)" off that unit's cooldown clock. It is a mid-combat tooltip with live state in it,
+  not a static card, and merging it would move numbers inside a fight.
+- **OWED: THE LIVE-ATTACK PROLOGUE IS WRITTEN THREE TIMES AND THE MAP SCREEN HAS NONE OF THEM.**
+  `party_screen._draw_detail` and the battle spawn each build a hero's live Attack with their own
+  sixty-line sequence (hero_config, kit overrides, passive, spec stats, tree, runes, upgrades,
+  node scaling); `run_sim` is the third. **Extracting that into one helper is its own batch** —
+  CK did not do it, because a fourth copy on the map screen would be a worse duplication than the
+  one §1 existed to prevent, and because the hero sheet's agreement with the battle spawn is
+  load-bearing. **When it lands, the draft card gets a real damage range by changing ONE
+  ARGUMENT** — `Classes.computed_block(ab, <live attack>, res_name)` — and nothing else moves.
+- **LAYOUT, MEASURED AT CK AND NOT PAPERED OVER.** The draft column's content went from
+  313–389px to **557–671px** against a **388px** scroll viewport (+225 to +282px, 12–14 block
+  lines over three cards) — and **three of the four columns were already at or over that viewport
+  before CK**. Nothing is clipped: it is a `ScrollContainer` with horizontal scrolling disabled
+  and autowrap on. **The cost is that the column runs ~1.5 viewports where it ran ~1**, so a
+  player sees about two cards at a time on the screen built for comparing three. **The font was
+  NOT shrunk and the block was NOT truncated** — if this is to be fixed, fix the layout.
+- **`perfect_text` HAD NEVER BEEN RENDERED ANYWHERE UNTIL CK, AND IS NOW MEASURED**: of 193
+  strings (over 207 resolvable abilities), **17 are wider than the 258px card and wrap to exactly
+  two rows; none reaches three.** CJ's 44-character ceiling holds 936/936 *description* lines and
+  never bound `perfect_text`, which carries no authored breaks and autowraps correctly. **Making
+  Perfect visible also exposed 107 strings in the "60 Rage instead of 40" shape the standard
+  rejects. They were not wrong before; they were invisible.** CL cleans them up.
 
 ### STANDING REFERENCE — THE ABILITY DRAFT, THE SEVEN-SLOT CAP AND THE TWELVE PROTECTED CORES (Batch BO, reach rewritten at BX)
 **AN ELITE OFFERS A DRAFT TO EVERY LIVING HERO (Batch BX §2), on ONE SCREEN of four columns,
@@ -9964,6 +10015,45 @@ Battle has burger menu (restart/settings overlay/exit); skill checks accept
 Space or left click; no announcer text (combat log only).
 
 ## Known open threads
+- **OWED, AND RECORDED SO IT CANNOT QUIETLY DISAPPEAR: THE 324 TALENT NODES HAVE NEVER BEEN
+  AUDITED AGAINST THEIR RUNTIME BEHAVIOUR (deferred by CJ, deferred again by CK §4, deliberately
+  both times).** **92 of them state a number their own payload cannot produce**, which is
+  EXPECTED and is not itself the finding: talent payloads are mostly flag values (`ranks: 1`)
+  whose magnitudes live in `battle.gd` and `unit.gd`. **The consequence is that each of the 92
+  needs its own read-site opened and read** — there is no sweep that answers it, which is why it
+  is a batch by itself rather than a section of one. It is the LAST of the four populations CJ
+  named as unreached; CK closed the other three (the 93 glossary entries, all enemy text, all
+  event text) in `docs/text-audit.html` §CK.
+  · **CK's own stated gap, smaller and in the same shape:** the **65 non-status glossary entries**
+    were read for sense, not traced claim by claim. The 28 status entries were the population
+    where a claim maps onto a constant, and all 28 were hand-read and came back correct.
+- **REPORTED BY CK §4 AND NOT FIXED — THE HOLLOW CROWN'S `Regalia` CANNOT BE CAST, AND ITS
+  DESCRIPTION NAMES THE WRONG MECHANIC.** The END BOSS carries five abilities and this is one of
+  them. Its description says "Wards an ally against the next blow"; its payload is
+  `enemy_shield`, which is **3 turns of 25% less damage** (a one-charge ward is
+  `shield_charges`). **And nothing can select it**: `_enemy_support_action` chooses support casts
+  by literal display name and "Regalia" is not among the six it names, while the attack list
+  filters on `damage > 0` and Regalia has none. **`battle.gd:15020`'s own comment lists it as a
+  live shield source**, so the code's notes believe it fires. A boss met alone also has no ally to
+  ward. **A DESIGN QUESTION, NOT A BUG TO FIX BLIND:** wire it into the chooser, re-point it at
+  itself, or retire it the way Melted Armor is retired — kept, and SAID to be kept.
+- **REPORTED BY CK §4: "Crushing Blow" IS ON BOTH SIDES OF THE FIELD.** An Orc Chief ability
+  (damage 34, BD 56) and the Warrior's own earnable ability (damage 43), beside a Warrior TALENT
+  called **Crushing Blows**. Three things share the stem in one combat log, and the log line is
+  the only place any of them is named — **a worse shape than the card-vs-node collisions BR and
+  CK §2 dealt with, because both halves are abilities.** The BR §1 sweep rule had only ever been
+  applied to the hero corpus; CK swept 211 hero ability names against 50 enemy ones for the first
+  time and this was the one real hit ("Strike", on two enemies with different numbers, is the
+  generic-verb case).
+- **THE FIVE HARDCODED master.html STAMP CHECKS ARE FIXED, AND THE PATTERN IS THE WARNING.**
+  `bq`, `br`, `bt`, `bx` and `ce` each asserted a LITERAL batch stamp, so each had to be
+  hand-bumped every batch to keep passing — **and Batch CJ's re-stamp turned all five red at
+  once, where they sat until CK found them while verifying something else.** This is the CD §1
+  fault in its other direction: not a check that can only pass, but **one that can only pass for a
+  single batch.** All five read the stamp and compare it against their own batch code now, so no
+  bump is ever owed again. **DO NOT AUTHOR ANOTHER LITERAL-STAMP CHECK.** (Two-letter batch codes
+  sort lexically, which is what the comparison leans on; a three-letter code needs one more line
+  in each of the five.)
 - **THE CODE IDENTIFIERS STILL READING "beast" (BX renamed the PROSE, BY re-verified the list
   against live code and did not touch it).** BX's reasoning stands and is why this is still open:
   **a missed rename in prose is a typo, a missed rename in a field is a bug**, so the two want

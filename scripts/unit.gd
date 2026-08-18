@@ -2726,7 +2726,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	# Break meter fill faster.
 	#
 	# IT SITS ABOVE THE REDUCERS DELIBERATELY. Bulwark still refuses the whole of
-	# it, Devoutness still cuts its share and Iron Will still caps the meter at
+	# it, Devoutness still cuts its share and Ironclad still caps the meter at
 	# 99 — the amplifier raises the number those then act on, which is the honest
 	# reading of "every source lands 25% harder" and keeps every defence in the
 	# game answering it.
@@ -2804,7 +2804,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	if not broken:
 		applied_bd = pressure_add
 		pressure += pressure_add
-		# BATCH BR — IRON WILL IS A CAP, NOT AN IMMUNITY, AND THIS LINE IS THE
+		# BATCH BR — IRONCLAD IS A CAP, NOT AN IMMUNITY, AND THIS LINE IS THE
 		# WHOLE DECISION. The meter fills to `stability - 1` — 99 — and stops.
 		# Pressure still ACCUMULATES; it simply cannot cross, so the moment the
 		# status lapses he is sitting one hit from Broken and the enemy's three

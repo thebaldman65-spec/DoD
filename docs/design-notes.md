@@ -4,6 +4,48 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## An audit is a claim, and a claim can be wrong (Batch CK) — 2026-08-17
+
+CJ's report named the draft card's missing numbers as its largest bucket-2 finding and ended the
+item with an instruction: render the same computed block the blacksmith card already builds. CK's
+brief carried that sentence forward verbatim. **The blacksmith card builds no computed block.** It
+renders an upgrade description and an ability description and no computed values at all — thirty
+seconds of reading proves it, and neither the audit nor the brief that quoted the audit had spent
+those thirty seconds.
+
+**Nothing bad happened, and that is the interesting part.** The instruction's *intent* — one
+implementation, not a second copy — was correct, load-bearing, and the whole reason the item
+existed. It was carried out. What was wrong was a factual claim inside the instruction, and the
+claim was wrong in a direction that made the work look *easier* than it was: "reuse that" instead
+of "write the shared one that ought to exist and point two screens at it". **An audit's findings
+get re-read and re-quoted for batches afterwards; its incidental assertions travel with them and
+nobody re-checks those.** The finding was right. The pointer inside it was decoration, and
+decoration is what gets copied.
+
+The practical rule this suggests: **when an audit item ends with "do X, reusing Y", the reuse
+target is a claim about the code and wants verifying before the batch starts, not after.** CK's
+audit section says so about its own findings — it states, in a coverage block, which of its claims
+were traced to a read-site and which were read for sense. That distinction is the useful thing to
+inherit from this, more than any single finding.
+
+**A second note, on what "the computed block" turned out to cost.** The reason the draft card shows
+a scaling percentage rather than a damage range is not a compromise about the standard — the draft
+screen is explicitly allowed arithmetic. It is that **a hero's live Attack is built by a sixty-line
+prologue that exists in three copies and in none of them on the map screen.** Building a fourth
+would have been a much worse duplication than the one the batch was sent to prevent, so the shared
+builder takes an Attack figure as an argument and prints a range when it is given one. **The
+interesting decision was not what to show; it was where to put the seam so the better version costs
+one argument later instead of a rewrite.**
+
+**And a third, on a fault the batch was not looking for.** Five suites each asserted a hardcoded
+master.html batch stamp, so each needed hand-bumping every batch to keep passing — and CJ's
+re-stamp turned all five red at once, where they sat unnoticed. CD established that a check which
+can only pass has stopped asking its question. **This is the mirror: a check that can only pass for
+one batch, which fails so routinely that its failure stops carrying information.** Both ends of
+that spectrum are the same fault, which is that the check's truth is maintained by hand rather than
+derived. Neither is visible from the pass/fail line; both are visible the moment you ask what would
+have to change for this check to be wrong.
+
 ## The card and the document were never the same sentence (Batch CJ) — 2026-08-17
 
 The text standard exists because of one measurement, and it was not the one the batch set out

@@ -22,7 +22,8 @@
 #     initiative hook, and not enabling unbounded consecutive turns;
 #   · Camouflage and Ghillie Suit held together resolving sensibly rather than
 #     one silently overwriting the other;
-#   · Iron Will refusing Stun, Freeze and Daze, and his Break meter reaching
+#   · Ironclad (BR authored it as IRON WILL; renamed at CK §2) refusing Stun,
+#     Freeze and Daze, and his Break meter reaching
 #     EXACTLY 99 and stopping — then breaking on the first hit after it lapses.
 #   · plus `CLASS_POOLS` byte-unchanged, asserted as literals — the same
 #     negative control BQ used, because a boss offer quietly re-weighting is
@@ -44,7 +45,7 @@
 #   · "Camouflage makes him harder to hit" is trivially true of a second roll —
 #     so the combined chance is asserted to be HIGHER than either alone and
 #     LOWER than their sum, which only independent combination gives;
-#   · "Iron Will stops the Break" is trivially true of zeroing the meter — so
+#   · "Ironclad stops the Break" is trivially true of zeroing the meter — so
 #     the meter is asserted to sit at EXACTLY 99, which "the meter cannot fill"
 #     and "Broken is refused" both fail.
 extends SceneTree
@@ -56,9 +57,22 @@ const REAL_SAVE := "user://run_save.bin"
 const TRANCHE_4 := {
 	"hunter": ["Field Dressing", "Camouflage", "Aimed Volley", "Bola",
 		"Hunter's Mark", "Arcane Arrows"],
+	# RE-POINTED BY BATCH CK §2: this entry was "Iron Will". The card took the
+	# name its own status has always carried; the WARDEN TALENT keeps Iron Will.
 	"warrior": ["Battle Trance", "Rally", "Charge", "Cleave", "Warcry",
-		"Iron Will"],
+		"Ironclad"],
 }
+
+# THE SAME TWELVE AS BATCH BR SHIPPED THEM, FROZEN. The only difference from
+# TRANCHE_4 is Ironclad, which BR called Iron Will (renamed at CK §2). This list
+# is what the CHANGELOG is checked against — an old entry records what its batch
+# did and is never edited forward — while TRANCHE_4, the live pool, is what
+# master.html is checked against. A later rename adds a line here and changes
+# TRANCHE_4; if the two ever collapse back into one, the difference between
+# history and current truth has been lost.
+const AS_BR_SHIPPED := ["Field Dressing", "Camouflage", "Aimed Volley", "Bola",
+	"Hunter's Mark", "Arcane Arrows", "Battle Trance", "Rally", "Charge",
+	"Cleave", "Warcry", "Iron Will"]
 
 # THE NEGATIVE CONTROL THAT MATTERS (§6). `CLASS_POOLS` feeds the BOSS pick,
 # and the whole reason `CLASS_DRAFT_POOLS` is a separate structure is that
@@ -307,7 +321,7 @@ func _break_damage() -> void:
 		"Charge": 20,          # THE DESIGNER'S REPRICE, over the batch's 10
 		"Field Dressing": 0, "Camouflage": 0, "Bola": 0, "Hunter's Mark": 0,
 		"Arcane Arrows": 0, "Battle Trance": 0, "Rally": 0, "Warcry": 0,
-		"Iron Will": 0,
+		"Ironclad": 0,   # RE-POINTED BY CK §2, was "Iron Will"
 	}
 	for nm in want:
 		var ab: Ability = Classes.pool_ability(nm)
@@ -483,18 +497,42 @@ func _names_swept() -> void:
 			node_names[String(node.get("name", ""))] = spec
 	ok(node_names.get("Rally", "") == "warden",
 		"§1 COLLISION: 'Rally' is also a Warden talent node (Banner row 2)")
+	# RE-POINTED AND PARTLY INVERTED BY BATCH CK §2. BR asserted that "Iron
+	# Will" named a Warrior CARD, a Warden NODE and a live status LABEL all at
+	# once, and that nothing broke because the ability's own status id was
+	# `ironclad`. CK renamed the CARD to Ironclad — the collision is resolved,
+	# not merely tolerated — so the clause about the ability's chip wearing the
+	# node's word INVERTS instead of being deleted.
+	#
+	# ASSERTED FROM BOTH ENDS ON PURPOSE: the node must still be there and still
+	# be called Iron Will (renaming the wrong half would satisfy a one-sided
+	# check), and the CARD must no longer be. A one-sided version of this passes
+	# if a later batch renames the talent instead.
 	ok(node_names.get("Iron Will", "") == "warden",
-		"§1 COLLISION: 'Iron Will' is also a Warden talent node (Threat row 3)")
-	# AND IRON WILL COLLIDES WITH A LIVE STATUS LABEL TOO, which is why the
-	# ability's own status is `ironclad` — neither can overwrite the other, and
-	# a Warden holding both does not see two chips reading the same word.
+		"§1: 'Iron Will' is the Warden talent node (Threat row 3) — and, since CK §2, only that")
+	ok(not Classes.class_draft_pool("warrior").has("Iron Will")
+		and Classes.class_draft_pool("warrior").has("Ironclad"),
+		"§1 (CK §2): ...and no longer a Warrior card — that card is Ironclad")
+	ok(Classes.pool_ability("Ironclad") != null
+		and Classes.pool_ability("Iron Will") == null,
+		"§1 (CK §2): the resolver answers to Ironclad and no longer to Iron Will")
 	var battle_src := _src("res://scripts/battle.gd")
 	ok(battle_src.contains('u.add_status("iron_will", "Iron Will"'),
-		"§1 COLLISION: ...and 'Iron Will' is a live status LABEL too (the node's chip)")
-	ok(battle_src.contains('"ironclad": ["Iron Will"'),
-		"§1: so the ABILITY's status is `ironclad`, with its own chip")
+		"§1: the NODE's chip keeps the label and keeps the id `iron_will`")
+	ok(battle_src.contains('"ironclad": ["Ironclad"'),
+		"§1 (CK §2, INVERTED): the ABILITY's chip reads Ironclad, off the id it always had")
+	ok(not battle_src.contains('["Iron Will", "IW"'),
+		"§1 (CK §2): ...so no status row reads 'Iron Will' any more")
 	ok(battle_src.contains('_apply_status(attacker, "ironclad"'),
 		"§1: ...and that is the id the ability applies")
+	# THE `special` MOVED WITH THE NAME (CK §2, one site beyond the batch's own
+	# list): an ability called Ironclad dispatching on `iron_will` would have
+	# left the collision alive in the code layer, where a later batch grepping
+	# for the talent would hit it.
+	ok(battle_src.contains('"battle_trance", "ironclad", "warcry",'),
+		"§1 (CK §2): the self-target list names the special `ironclad`")
+	ok(Classes.pool_ability("Ironclad").special == "ironclad",
+		"§1 (CK §2): ...and so does the ability def, so the two cannot drift")
 	# THE TEN THAT DO NOT COLLIDE, asserted so a later rename cannot make one
 	# collide silently.
 	for nm in ["Field Dressing", "Camouflage", "Aimed Volley", "Bola",
@@ -542,9 +580,13 @@ func _draft_flow() -> void:
 	ok(h_left["class"].size() == 6,
 		"§4: a Survivalist's class side holds six (%d)" % h_left["class"].size())
 	# The no-return ledger covers a class card exactly as it covers a spec one.
-	warrior["draft_refused"] = ["Iron Will"]
+	# RE-POINTED BY BATCH CK §2, AND IT HAD TO BE. With the card renamed, a
+	# ledger holding "Iron Will" refuses a name the pool never carried, so the
+	# `has()` below would read false for the wrong reason and the check would
+	# pass without asking its question — the exact fault CD §1 exists to close.
+	warrior["draft_refused"] = ["Ironclad"]
 	var refused_left: Dictionary = run.draft_pool_left(warrior)
-	ok(not refused_left["class"].has("Iron Will"),
+	ok(not refused_left["class"].has("Ironclad"),
 		"§4: a refused class card does not come back this run")
 	warrior["draft_refused"] = []
 	# AND A REAL OFFER NOW HOLDS THEM. Rolled many times because the seam is a
@@ -1066,15 +1108,15 @@ func _live_rally() -> void:
 
 func _live_iron_will() -> void:
 	var scene := await _spawn(["warden", "cryomancer", "holy", "mystic"],
-		{"warden": ["Iron Will"]},
+		{"warden": ["Ironclad"]},
 		["raider", "chief", "archer"])
 	var wd := _hero(scene, "heavy_plating")
 	ok(wd != null, "the Warden spawned")
 	if wd == null:
 		await _drop(scene)
 		return
-	var iw: Ability = scene.call("_find_ability", wd, "Iron Will")
-	ok(iw != null, "§3: Iron Will is assembled onto the unit")
+	var iw: Ability = scene.call("_find_ability", wd, "Ironclad")
+	ok(iw != null, "§3: Ironclad is assembled onto the unit")
 	if iw == null:
 		await _drop(scene)
 		return
@@ -1090,7 +1132,7 @@ func _live_iron_will() -> void:
 	wd.hp = 400
 	wd.resource = wd.max_resource
 	await scene.call("_resolve", wd, iw, wd, "good")
-	ok(wd.has_status("ironclad"), "§6: Iron Will lands `ironclad`")
+	ok(wd.has_status("ironclad"), "§6: Ironclad lands `ironclad`")
 	# ---- IT REFUSES THE THREE STATUSES THAT COST HIM A TURN ----
 	for id in ["stunned", "frozen", "dazed"]:
 		scene.call("_apply_status", wd, id, 3)
@@ -1156,9 +1198,10 @@ func _live_iron_will() -> void:
 	await scene.call("_resolve", foe, strike, wd, "good")
 	var without_iw := hp_b - wd.hp
 	ok(with_iw < without_iw,
-		"§3: Iron Will really cuts the damage (%d taken against %d)" % [with_iw, without_iw])
+		"§3: Ironclad really cuts the damage (%d taken against %d)" % [with_iw, without_iw])
 	var battle_src := _src("res://scripts/battle.gd")
-	ok(battle_src.contains("const IRON_WILL_CUT_PCT := 15"),
+	# RE-POINTED BY BATCH CK §2: was IRON_WILL_CUT_PCT.
+	ok(battle_src.contains("const IRONCLAD_CUT_PCT := 15"),
 		"§3: ...by 15%, off one constant")
 	# THE CAP IS WRITTEN WHERE IT IS DECIDABLE — below the meter write and above
 	# the threshold. Anywhere else and it is one of the two wrong readings.
@@ -1259,7 +1302,26 @@ func _live_hits_not_casts() -> void:
 
 func _docs() -> void:
 	var master := _src("res://docs/master.html")
-	ok(master.contains("Batch CI"), "§5: master.html is stamped Batch CH")
+	# RE-POINTED BY BATCH CK §2, AND IT WAS ALREADY RED WHEN CK ARRIVED — NOT BY
+	# CK'S HAND. The check read `master.contains("Batch CI")` under a message
+	# saying "Batch CH", which is a stamp assertion that has to be hand-bumped
+	# every batch: CH bumped the string and not the message, CI bumped neither,
+	# and CJ re-stamped the document to CJ and left this looking for CI. **A
+	# CHECK THAT MUST BE EDITED EVERY BATCH TO KEEP PASSING IS A CHECK THAT WILL
+	# BE RED MOST BATCHES**, which is the same class of fault as one that can
+	# only pass — it stops carrying information either way.
+	#
+	# IT ASKS THE DURABLE VERSION OF ITS OWN QUESTION NOW: the document carries a
+	# stamp, and that stamp is not older than the batch this suite belongs to. No
+	# bump is ever owed again. (Two-letter batch codes sort lexically, which is
+	# what the comparison leans on; a three-letter code will need one more line.)
+	var stamp_at := master.find("Last updated:")
+	ok(stamp_at >= 0, "§5: master.html carries a Last-updated stamp")
+	var stamp := master.substr(stamp_at, 60)
+	var code_at := stamp.find("(Batch ")
+	var stamped := stamp.substr(code_at + 7, 2) if code_at >= 0 else ""
+	ok(stamped >= "BR",
+		"§5: ...and it is stamped no older than this suite's own batch (reads '%s')" % stamped)
 	for cls in TRANCHE_4:
 		for nm in TRANCHE_4[cls]:
 			ok(master.contains(nm), "§5: master.html lists %s" % nm)
@@ -1285,9 +1347,15 @@ func _docs() -> void:
 		var next_idx := changelog.find("<h2>", head_idx + 4)
 		var entry := changelog.substr(head_idx,
 			(next_idx - head_idx) if next_idx > head_idx else -1)
-		for cls2 in TRANCHE_4:
-			for nm2 in TRANCHE_4[cls2]:
-				ok(entry.contains(nm2), "§5: the BR entry names %s" % nm2)
+		# RE-POINTED BY BATCH CK §2 AND IT READS A DIFFERENT LITERAL FROM THE
+		# master.html LOOP ABOVE, WHICH IS THE POINT. master.html is CURRENT
+		# TRUTH and must name Ironclad; the changelog is HISTORY and BR shipped
+		# the card as Iron Will. Pointing both loops at the live pool would have
+		# demanded the BR entry be rewritten to say something BR did not do —
+		# and CLAUDE.md's rule is the opposite: renames live in the changelog's
+		# own later entry, never by editing an older one.
+		for nm2 in AS_BR_SHIPPED:
+			ok(entry.contains(nm2), "§5: the BR entry names %s" % nm2)
 		ok(entry.contains("Ghillie"), "§5: ...and carries the Camouflage finding")
 		ok(entry.contains("Battle Shout"), "§5: ...and the Warcry finding")
 	var glossary := _src("res://data/glossary.json")

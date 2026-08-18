@@ -287,17 +287,22 @@ func _draw_detail() -> void:
 		chip_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		chip.add_child(chip_label)
 		var tip := ab.description
+		# BATCH CK §1: the computed lines are `Classes.computed_block` now, and
+		# the draft card renders the SAME function's output. This screen was the
+		# only copy of them, which is why the draft card had none — the fix was
+		# one builder, not a second copy of this one. It passes the hero's live
+		# Attack, so it gets the real range where the draft card gets the
+		# scaling percentage. It also gains the cost, cooldown and initiative
+		# lines the block carries; each is a number this sheet already had and
+		# was not showing.
+		tip += "\n%s" % Classes.computed_block(ab, int(cfg.get("attack", 100)),
+			String(cfg.get("resource_name", "Mana")))
+		# THE SCALING LINE STAYS HERE AND IS NOT IN THE BLOCK. The sheet is the
+		# page where numbers are studied, so it shows both the range and what
+		# produced it; the draft card would be showing the same figure twice,
+		# since with no live Attack the block's own damage line IS the scaling.
 		if ab.damage > 0:
-			# Real numbers from the hero's current Attack, plus the scaling
-			# behind them.
-			var hit := ab.damage * 0.01 * float(cfg.get("attack", 100))
-			tip += "\nDamage: %d–%d (%s)   BD: %d" % [int(hit * 0.9),
-				int(round(hit * 1.1)), ab.dmg_type.capitalize(), ab.pressure]
 			tip += "\nScaling: %d%% of Attack" % ab.damage
-		if ab.heal > 0:
-			tip += "\nHeals: %d" % ab.heal
-		if ab.perfect_text != "":
-			tip += "\nPerfect: %s" % ab.perfect_text
 		# Trailing line, names only — the same line and the same place the
 		# battle button's tooltip puts it. The magnitudes are already in the
 		# numbers above, which reflect the upgrade.

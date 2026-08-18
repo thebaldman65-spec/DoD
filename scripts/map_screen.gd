@@ -1182,6 +1182,11 @@ func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 	cards.custom_minimum_size = Vector2(DRAFT_COL_W - 34, 0)
 	scroll.add_child(cards)
 
+	# The class resource `ab.cost` is charged in, for the block below. Read off
+	# `hero_config` rather than carried on the member, which holds no resource
+	# NAME (only `mana`/`max_mana` numbers) — the hero card above does the same.
+	var res_name := String(Classes.hero_config(String(member["key"])).get(
+		"resource_name", "Mana"))
 	var queue: Array = member.get("draft_candidates", [])
 	var offer: Array = queue[0] if not queue.is_empty() else []
 	for card in offer:
@@ -1208,6 +1213,30 @@ func _draft_column(overlay: Control, idx: int, at: Vector2) -> void:
 			text.custom_minimum_size = Vector2(DRAFT_COL_W - 38, 0)
 			text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			cards.add_child(text)
+		# BATCH CK §1 — THE COMPUTED BLOCK. Damage, Break damage, cost,
+		# cooldown, initiative and PERFECT, under the description, on the one
+		# screen whose whole purpose is comparing cards. It is a SECOND LABEL
+		# rather than more text in the first, in a cooler tint, because the
+		# authored sentence and the computed figures are different kinds of
+		# writing and only one of them is a card the designer wrote.
+		#
+		# THIS SURFACE IS ARITHMETIC-ALLOWED AND THE OFFER PICKER TWO HUNDRED
+		# LINES UP IS NOT. `_pick_button` (the mini-boss / upgrade / rune offer
+		# and the drop step) renders `description` alone BY DESIGN — it is read
+		# in the same breath as a fight, so the standard's mid-combat tier binds
+		# it. Do not "make them consistent"; they are on opposite tiers and this
+		# file renders both.
+		if ab != null:
+			var block := Classes.computed_block(ab, 0, res_name)
+			if block != "":
+				var nums := Label.new()
+				nums.text = block
+				nums.add_theme_font_size_override("font_size", 11)
+				nums.add_theme_color_override("font_color",
+					Color(0.78, 0.78, 0.70) if chosen else Color(0.60, 0.62, 0.58))
+				nums.custom_minimum_size = Vector2(DRAFT_COL_W - 38, 0)
+				nums.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+				cards.add_child(nums)
 
 	# THE OFFER FILLS SHORT rather than padding with repeats (AP §3, unchanged),
 	# and it SAYS SO — a silently short column reads as a bug, and with the

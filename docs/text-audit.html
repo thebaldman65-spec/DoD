@@ -1,8 +1,15 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — The Text Audit (Batch CJ)</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-17 (Batch CJ)</b></p>
+<p align="right"><b>Last updated: 2026-08-17 (Batch CK)</b></p>
 <h1>DAWN OF DECAY — THE FULL TEXT AUDIT</h1>
+<p><b>THIS DOCUMENT NOW HOLDS TWO PASSES.</b> Everything down to the coverage table is
+<b>Batch CJ's</b> pass over abilities, runes, statuses and the length ceiling. <b>&sect;CK
+at the foot is Batch CK's second pass</b> — the 93 glossary entries, all enemy text and all
+event text, which are three of the four things CJ could not reach. The fourth, the 324
+talent nodes, is still owed and is recorded as owed in <code>CLAUDE.md</code>.</p>
+<p><b>CJ's two bucket-1 items were FIXED by Batch CK</b> and are marked as such in place;
+their analysis is left standing because it is what the fix was argued from.</p>
 <p><i>Every player-facing string, compared three ways: <b>what the code does</b>, <b>what the
 code's description says</b>, and <b>what <code>master.html</code> says</b>. This is a REPORT.
 Nothing here was fixed — no description was edited, no ability changed, no magnitude moved.
@@ -117,6 +124,13 @@ that collided.</p>
 <p><b>The decision owed:</b> rename one of them, or accept the collision and give the document
 both rows. <b>A rename is an ability/talent change and is out of scope for a text batch</b> —
 which is exactly why this is reported rather than fixed.</p>
+<p><b>RESOLVED — BATCH CK &sect;2 took the first option and renamed the ABILITY.</b> It is
+<b>Ironclad</b> now, chip tag <code>Ir</code>, which is the name its own status id
+(<code>ironclad</code>) has always carried, so no new word entered the game. The TALENT keeps
+the name Iron Will and keeps <code>iron_will</code>. The ability's <code>special</code> moved
+with the name as well, so no <code>iron_will</code> string anywhere in the codebase belongs to
+the ability any more. <code>master.html</code> &sect;4.6 now carries <b>two rows</b> where it
+carried one, and each names which of the two it is.</p>
 
 <h3>1.2 &mdash; Battle Shout's registry tooltip hardcodes the lowest of three tiers</h3>
 <p><code>STATUS_INFO["battle_shout"]</code> (<code>battle.gd:72</code>) reads:</p>
@@ -139,6 +153,12 @@ it is not believed to be reachable in normal play. It is reported because it is 
 of Battle Shout's number that does not move with the node, and because a later batch that
 changes the tiers will not think to change it. <b><code>master.html</code> is CORRECT here</b>
 — its row lists all three tiers.</p>
+<p><b>RESOLVED — BATCH CK &sect;3 STRIPPED THE NUMBERS OUT RATHER THAN CORRECTING THEM.</b>
+The fallback describes what Battle Shout does and states no magnitude and no duration, so it
+cannot disagree with any of the three tiers and cannot drift when a later batch retunes them.
+Correcting 8% to 12% would have made it wrong for two node states instead of two; there is no
+single number that is right here, which is the argument for having none.
+<code>master.html</code> was deliberately left alone.</p>
 
 <h2>BUCKET 2 — INCOMPLETE</h2>
 <p><i>Accurate as far as it goes, but omits something the player needs.</i></p>
@@ -169,6 +189,26 @@ also spends its one sentence on the word "perfect", which is a reserved mechanic
 descriptions — writing the numbers into the prose would put arithmetic back on the mid-combat
 tooltip, which the standard forbids. <b>Owed to a later batch: the draft card should render
 the same computed block the blacksmith card already builds.</b></p>
+<p><b>CLOSED — BATCH CK &sect;1, AND THE SENTENCE ABOVE HAS ONE ERROR IN IT THAT IS WORTH
+RECORDING.</b> <b>The blacksmith card builds no computed block.</b>
+<code>blacksmith_screen.gd</code> renders <code>Run.upgrade_desc</code> and
+<code>ab.description</code> and nothing else; the only two computed blocks in the game were
+<code>battle._ability_tooltip</code> (which reads a live <code>BattleUnit</code>) and an inline
+one in <code>party_screen</code>. CK built the shared one this finding was asking for —
+<code>Classes.computed_block</code> — and pointed BOTH the draft card and the hero sheet at it,
+so the count of copies went from two to two rather than to three.</p>
+<p><b>What the draft card shows, and what it does NOT.</b> It shows the ability's own figures:
+scaling percentage, Break damage, hits, heal, cost, cooldown, initiative and <b>Perfect</b>.
+It does <b>not</b> show a computed damage RANGE, because <b>the map screen has no live Attack
+to compute one from</b> — only <code>party_screen._draw_detail</code> and the battle spawn
+build a hero's live Attack, each with its own sixty-line prologue, and a third copy of that on
+the map screen would be a far worse duplication than the one this finding is about. The shared
+builder takes an Attack figure and prints the range when it is given one, so <b>when that
+prologue is extracted the draft card changes by one argument.</b> Recorded as owed.
+<b>Showing the percentage is not a workaround:</b> the draft screen is one of the two
+arithmetic-ALLOWED surfaces in the standard, which may show percentages and formulas outright.
+Ice Lance now reads <i>"Damage: 35% of Attack (Frost)"</i> under its card, which is the
+misreading this finding was built on.</p>
 
 <h3>2.2 &mdash; 53 of 61 timed abilities never say what a second cast does</h3>
 <p>61 ability descriptions grant an effect "for N turns". <b>Eight say whether recasting
@@ -279,5 +319,284 @@ cannot produce — <b>this is expected and is not itself a finding</b>, but it m
 92 needs a read of its own read-site to confirm. Also not exhaustively verified: the 93
 glossary entries against behaviour, and the enemy and event text. <b>Those three are the honest
 gap in this audit and are the obvious scope for a follow-up.</b></p>
+<hr>
+<h1>&sect;CK — THE SECOND PASS: THE GLOSSARY, THE ENEMIES AND THE EVENTS</h1>
+<p><i>Batch CK, 2026-08-17. <b>REPORT ONLY — nothing in this section was fixed.</b> No glossary
+entry was edited, no enemy or event string was touched, no magnitude moved. Three of CJ's four
+un-reached populations, audited the way CJ audited the rest: the code's behaviour first, the
+string second. Same three buckets. <b>Bucket 1 findings are design questions for the designer,
+not typos.</b></i></p>
+
+<h2>WHAT THIS PASS COVERED, AND HOW MUCH OF IT</h2>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Population</th><th>Count</th><th>Authored where</th><th>How it was checked</th></tr>
+<tr><td>Glossary entries</td><td><b>93</b> (186 strings: a <code>short</code> and a
+<code>long</code> each)</td><td><code>data/glossary.json</code></td><td>302 numeric tokens
+extracted; every status entry hand-read against its constant in <code>battle.gd</code> /
+<code>unit.gd</code></td></tr>
+<tr><td>Enemy names + ability names</td><td><b>21</b> + <b>50</b></td>
+<td><code>data/enemies.json</code></td><td>all 50 abilities traced to their <code>special</code>
+handler and to the AI that selects them</td></tr>
+<tr><td>Enemy ability descriptions</td><td><b>10</b> (of 50)</td>
+<td><code>data/enemies.json</code></td><td>each read against its payload AND its selection
+condition</td></tr>
+<tr><td>Event text</td><td><b>20</b> bodies, <b>46</b> choice labels, <b>46</b> outcomes</td>
+<td><code>data/events.json</code></td><td>every label's numbers diffed against its
+<code>effects</code> payload, mechanically</td></tr>
+</table>
+<p><b>THE HEADLINE IS THE SAME SHAPE AS CJ'S AND ONE STEP WORSE. The numbers are almost sound;
+the gap is that a great deal of what the code does is never stated at all.</b> Two clean
+mechanical results are worth naming before the buckets, because they bound how much of this is
+a repair job:</p>
+<ul>
+<li><b>All 46 event choice labels agree with their payloads — 0 mismatches.</b> Every number a
+label states is in the <code>effects</code> dict beside it (or in its <code>requires</code>
+gate). Nothing here misstates a magnitude.</li>
+<li><b>All 93 <code>see_also</code> cross-references resolve.</b> 0 pointers to a
+non-existent id.</li>
+<li><b>Every status glossary entry that quotes a constant quotes it correctly</b> — Broken
+<code>a *= 0.7</code> and <code>+0.25</code> crit; Sunder <code>a *= 0.65</code> and it really
+does MULTIPLY with Broken's, exactly as the entry claims; Frostbite <code>mult *= 0.5</code>;
+Dazed <code>MISS_CHANCE 0.05 + 0.20</code>, including the "on top of the 5% base" clause; Blind
+<code>+0.50</code>; Chilled 1/2/3/4 with <code>raw *= 0.85</code> at three stacks; Decay 10;
+Ruin's <code>RUIN_THRESHOLD 10</code> and <code>RUIN_LEECH_CAP 0.40</code> and Avatar of Ruin's
+5; Umbral Sigil's <code>final * 0.5</code>; Glacial Hold's <code>HOLD_WINDOW 15</code> and
+<code>+15</code> from Killing Frost making 30; <code>HOLD_RELEASE_STACKS 1</code>; Frostbind's
+40% and its does-not-mirror-back rule; Quick Draw's <code>s *= 1.5</code>; Psychosis' 0.5
+base.</li>
+<li><b>Melted Armor's entry is the most honest string in the game.</b> It says outright
+"nothing in the game applies this today", and that is <b>true</b>: <code>melt_ranks</code> is
+granted by no node and no rune (<code>unit.gd:479</code> — "no node: Melt Armor"). A string
+that documents its own deadness is what the other 92 should aspire to.</li>
+</ul>
+
+<h2>BUCKET 1 — WRONG</h2>
+<p><i>A number or condition that does not match the code. One finding, and it is on the end
+boss.</i></p>
+
+<h3>CK.1.1 &mdash; The Hollow Crown's REGALIA describes a mechanic it does not run, and cannot
+be cast at all</h3>
+<p><b>Severity: highest in this pass, and it is two faults stacked on the end boss.</b>
+<code>hollow_crown</code> is <code>END_BOSS_KIND</code> (<code>run_state.gd:35</code>), power 9.
+It carries five abilities. The third is:</p>
+<blockquote><b>Regalia</b> — <i>"Wards an ally against the next blow."</i>
+&nbsp;&nbsp;<code>{"special": "enemy_shield", "delay": 3.0, "target": "ally"}</code></blockquote>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>&nbsp;</th><th>What the description says</th><th>What the code does</th></tr>
+<tr><td><b>Fault 1 — the mechanic</b></td><td>"against the next blow" — a one-charge ward</td>
+<td><code>enemy_shield</code> (<code>battle.gd:16856</code>) applies <code>shielded</code> for
+<b>3 turns of 25% less damage</b>. A one-charge ward is a different status entirely
+(<code>shield_charges</code> / Interpose), and this is not it.</td></tr>
+<tr><td><b>Fault 2 — it never fires</b></td><td>—</td>
+<td>An enemy declares either a SUPPORT cast or an ATTACK.
+<code>_enemy_support_action</code> chooses support by <b>literal display name</b> — Healing
+Wave, Regenerate, Cleansing Rite, Shielding, Wild Growth, Dark Vigil — and <b>"Regalia" is not
+among them</b>. The attack list is
+<code>u.abilities.filter(a.cost &lt;= resource and a.damage &gt; 0)</code>, and <b>Regalia has
+no <code>damage</code></b>, so it is filtered out. <b>Nothing in the game can select it.</b>
+Its name appears in <code>battle.gd</code> exactly once, in a comment
+(<code>battle.gd:15020</code>) that lists it <i>as a live shield source</i> — so the code's own
+notes believe it fires.</td></tr>
+</table>
+<p><b>Why it is bucket 1 rather than dead-code housekeeping:</b> the boss's kit is what a
+player reads to plan the last fight of a run, and one of its five entries promises a defensive
+behaviour that will never happen. <b>A third consideration makes it a design question rather
+than a bug fix:</b> the Crown's role is <code>boss</code> and a boss met alone has no ally to
+ward, so it is not obvious the ability was ever meant to fire. <b>The decision owed: give the
+Crown adds and wire Regalia into the support chooser, re-point it at itself, or retire it the
+way Melted Armor is retired — kept, and SAID to be kept.</b> Whichever it is, the description
+has to stop naming a one-blow ward.</p>
+
+<h2>BUCKET 2 — INCOMPLETE</h2>
+<p><i>Accurate as far as it goes, but omits something the player needs. This is where the whole
+pass lands, and the two structural items are worth more than the rest together.</i></p>
+
+<h3>CK.2.1 &mdash; THE STRUCTURAL ONE: 17 of 30 event choices do not say what they cost or
+give, and the numbers appear only AFTER the choice is made</h3>
+<p><b>This is the event-screen twin of CJ's &sect;2.1, and it is one code path.</b>
+<code>event_screen.gd:72</code> puts <code>choice["label"]</code> on the button and nothing
+else. The effect summary is built in <code>_choose</code> and rendered by
+<code>_show_outcome</code> — <b>after the button is pressed.</b> So whatever the label does not
+say, the player learns by committing.</p>
+<p><b>30 of the 46 choices carry an effect. 13 state a number in the label. 17 do not — 57%.</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Event</th><th>Bare label</th><th>What it actually does</th></tr>
+<tr><td>old_trapper</td><td><i>"Scavenge it properly"</i></td><td>2 items + 20 gold</td></tr>
+<tr><td>forest_spring</td><td><i>"Drink deep"</i></td><td>party heals 40%, party mana +40%</td></tr>
+<tr><td>blood_altar</td><td><i>"Pay the price"</i></td><td>party -15% health, one hero +20% Attack</td></tr>
+<tr><td>wardens_echo</td><td><i>"Listen"</i></td><td>party -15% health, one hero +20% Attack</td></tr>
+<tr><td>deserters_stash</td><td><i>"Take the stash"</i></td><td>45 gold + an item</td></tr>
+<tr><td>arcane_obelisk</td><td><i>"Let the mage commune"</i></td><td>mage to full Mana, mage +5% Attack</td></tr>
+<tr><td>collectors_grave</td><td><i>"Dig (the dead object)"</i></td><td>party -10% health, a RELIC</td></tr>
+<tr><td>mushroom_ring</td><td><i>"Eat the strange mushrooms"</i></td><td>one hero +8% Attack</td></tr>
+<tr><td>cutpurse</td><td><i>"Count what is left"</i></td><td>-25% of all carried gold</td></tr>
+<tr><td colspan="3"><i>...and 8 more: waystone_cache, abandoned_wagon, scarland_mirage,
+plague_victim, fallen_cairn, ashfall, spoiled_stores, wormrot.</i></td></tr>
+</table>
+<p><b>THE SHARPEST FORM OF IT: five events put a bare choice DIRECTLY BESIDE a fully-stated
+one, on the same screen.</b> The player is asked to compare a named cost against an unnamed
+one, which reads as though the unnamed option is the safe one:</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Event</th><th>The bare choice</th><th>The stated choice next to it</th></tr>
+<tr><td>blood_altar</td><td><i>"Pay the price"</i></td><td><i>"Open every vein (party -30% health, +10% Attack party-wide)"</i></td></tr>
+<tr><td>scarland_mirage</td><td><i>"Chase it"</i></td><td><i>"Run it down (party -25% health, +190 gold)"</i></td></tr>
+<tr><td>wardens_echo</td><td><i>"Listen"</i></td><td><i>"Let it in (one hero -35% health, and a rune)"</i></td></tr>
+<tr><td>collectors_grave</td><td><i>"Dig (the dead object)"</i></td><td><i>"Pay the caretaker 120 gold"</i></td></tr>
+<tr><td>plague_victim</td><td><i>"Help them (one hero risks the rot)"</i></td><td><i>"Spend your medicine on them (-1 Health Potion, +90 gold)"</i></td></tr>
+</table>
+<p><b>The pattern is that the ESCALATED option states its terms and the FIRST option does
+not</b>, which is exactly backwards from where the information is most needed — the first
+option is the one being taken by default. <b>Note that this is a text fix, not a code fix:</b>
+the numbers are all in the payload and 13 labels already prove the format works. The event
+screen is not mid-combat, so the arithmetic tier does not forbid it.</p>
+
+<h3>CK.2.2 &mdash; 40 of 50 enemy abilities carry no description at all</h3>
+<p>Ten do. The other forty are a <code>display_name</code>, a damage figure and a
+<code>pressure</code> figure, and nothing that says what they are. <b>The end boss's four
+attacking abilities — Crown of Thorns, Hollow Wail, Sundering Decree, The Long Dark — carry
+none between them.</b></p>
+<p><b>This is partly by design and it is worth saying which part.</b> Batch BL's intent system
+declares what an enemy is about to do and classifies it into a category
+(<code>_intent_category</code>: windup / mend / bolster / sweep / crush / afflict / strike), so
+a player is told the SHAPE of the incoming action without a description. What the category
+cannot carry is a rule — that Siege Stone can be cancelled, that Blood Tribute scales off the
+enemy dead, that Cleansing Rite thaws Chilled one stack at a time. <b>The ten that have a
+description are, without exception, the ten that have a rule.</b> So the finding is narrower
+than 40: it is that nothing distinguishes "no description because none is needed" from "no
+description because nobody wrote one", and the second case cannot be found by reading the file.</p>
+
+<h3>CK.2.3 &mdash; Every enemy support ability omits the condition that fires it</h3>
+<p>All six support behaviours are gated in <code>_enemy_support_action</code>
+(<code>battle.gd:6003</code>), and <b>not one description states its gate.</b> The gate is the
+part a player could actually plan against.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Enemy / ability</th><th>What the description says</th><th>The gate it does not mention</th></tr>
+<tr><td>Bog Troll / Regenerate</td><td>"heals 25% of max health"</td><td>only below <b>50%</b>
+of its own health. (The "its own rubbery flesh" claim IS correct — the call is
+self-targeted.)</td></tr>
+<tr><td>Withered Warden / Wild Growth</td><td>"Heals an ally for 20% of their max health"</td>
+<td>needs an ally under <b>70%</b>, then fires on a <b>60% roll</b> — and "an ally" includes
+<b>itself</b>.</td></tr>
+<tr><td>Orc Shieldmaster / Shielding</td><td>"25% less damage taken for 3 turns"</td>
+<td>keeps <b>exactly one</b> ally shielded at a time, lowest HP first; the old ward is
+stripped when a new one lands.</td></tr>
+<tr><td>Grave Totem / Dark Vigil</td><td>"Every ally regains 6%"</td><td>only with <b>two or
+more</b> wounded bodies.</td></tr>
+<tr><td>Orc Ritual Chanter / Cleansing Rite</td><td>"Strips one harmful effect from each ally"</td>
+<td>fires only when some ally holds a <i>cleansable</i> debuff — sticky poisons and meters do
+not count, which the entry half-says via the Chilled clause.</td></tr>
+<tr><td>Orc Totemist &amp; Orc Shaman / Healing Wave</td><td>"the most wounded ally under 40%
+health"</td><td><b>correct</b> — and the only two entries in the file that state their gate.
+See CK.3.2 for the fact that the two copies differ.</td></tr>
+</table>
+
+<h3>CK.2.4 &mdash; Three glossary entries state a base number a talent then moves, without
+saying so</h3>
+<p>The same shape as CJ's Battle Shout finding, in the glossary rather than a chip.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Entry</th><th>What it states</th><th>What moves it</th></tr>
+<tr><td><b>Bleed</b></td><td>"at 100 the target BLEEDS OUT: an immediate 20% of its max HP"</td>
+<td><b>Exsanguination</b> (Berserker capstone) makes an enemy bleedout <b>35%</b>
+(<code>battle.gd:19129</code>); a negative <code>pact</code> makes it <b>15%</b>. The entry
+does mention that "Berserker talents feed on bleedouts", so it knows the talents exist — it
+just does not say one changes the number.</td></tr>
+<tr><td><b>Bleed</b></td><td>"after which the meter resets and builds again"</td>
+<td><b>Slaughterhouse</b> resets it to the talent's floor rather than to zero
+(<code>victim.bleed_buildup = mini(butcher.slaughterhouse, 99)</code>), so the next bleedout
+is closer than the entry implies.</td></tr>
+<tr><td><b>Psychosis</b></td><td>"each turn there is a 50% chance"</td><td><b>Whispers</b> adds
++10%/rank on top (<code>psy_chance := 0.5 + 0.01 * whispers_step</code>). The chip is silent
+too.</td></tr>
+</table>
+<p><b>Deliberately NOT filed as bucket 1:</b> each states the base correctly, and a glossary
+entry that omitted every talent interaction in the game would be unreadable. What makes these
+three worth listing is that the talent moves <i>the entry's own headline number</i>, which is
+the case CJ's Battle Shout item established as reportable.</p>
+
+<h2>BUCKET 3 — PROSE ONLY</h2>
+<p><i>Correct and complete, just inconsistent with the rest of the game's text.</i></p>
+
+<h3>CK.3.1 &mdash; The glossary and the events are written in SECOND PERSON, against the
+standard's no-pronouns rule</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Population</th><th>Strings</th><th>Second person</th><th>Third person</th></tr>
+<tr><td>Glossary <code>long</code></td><td>93</td><td><b>28 (30%)</b></td><td>16</td></tr>
+<tr><td>Glossary <code>short</code></td><td>93</td><td>7 (8%)</td><td>4</td></tr>
+<tr><td>Event body text</td><td>20</td><td>5 (25%)</td><td>0</td></tr>
+<tr><td>Event choice labels</td><td>46</td><td>5 (11%)</td><td>0</td></tr>
+<tr><td>Event outcomes</td><td>46</td><td><b>22 (48%)</b></td><td>1</td></tr>
+<tr><td>Enemy ability descriptions</td><td>10</td><td><b>0</b></td><td><b>0</b></td></tr>
+</table>
+<p><b>The enemy descriptions are the most standard-conformant text in the game: ten for ten, no
+pronouns either way.</b> Whoever wrote them was already following the rule the standard now
+states, and they are the calibration example a rewrite pass should use.</p>
+<p><b>The event outcomes are the least, at 48% — and a rewrite should probably LEAVE THEM.</b>
+An outcome is narrative prose shown after the decision, carrying no rule and no number; it is
+the one place in the game where flavour is the entire job. <b>Recorded as a scope question for
+the rewrite batch rather than as a defect</b>: if the no-pronoun rule is about decision
+surfaces, outcomes are not one.</p>
+
+<h3>CK.3.2 &mdash; One ability, two enemies, two different descriptions</h3>
+<p>The Orc Totemist and the Orc Shaman both carry <b>Healing Wave</b> with identical payloads.
+Their descriptions differ: the Shaman's ends <i>"(tanks and healers first)"</i> and the
+Totemist's does not. <b>The clause is true of both</b> — the priority lives in
+<code>_enemy_support_action</code>, which is keyed on the ability name and cannot tell the two
+casters apart. Same ability, same behaviour, two strings, one of them thinner.</p>
+
+<h3>CK.3.3 &mdash; 77 of 93 glossary entries use an ASCII hyphen where the whole rest of the
+game uses an em dash</h3>
+<p><code>" - "</code> rather than <code>" — "</code>, in 77 of 93 entries. Every authored string
+in <code>classes.gd</code>, <code>battle.gd</code> and <code>talents.gd</code> uses the em
+dash. Purely cosmetic, mechanical to fix, and listed because it is the single most consistent
+deviation found in this pass — it is not a judgement call in 77 places, it is one judgement
+call applied 77 times.</p>
+
+<h3>CK.3.4 &mdash; NAME COLLISIONS ACROSS THE TWO SIDES OF THE FIELD, swept and reported</h3>
+<p>BR &sect;1's rule is to sweep a name against the whole roster before authoring it, and the
+roster it was applied to was the hero corpus. <b>Swept against the enemy file for the first
+time here: 211 hero ability names against 50 enemy ability names, 3 shared.</b></p>
+<ul>
+<li><b>"Crushing Blow" is an Orc Chief ability (damage 34, BD 56) AND the Warrior's own
+earnable ability (damage 43)</b> — different numbers, opposite sides of the field. A Warrior
+TALENT is called <b>Crushing Blows</b> (plural, <code>crushing_blows_ranks</code>), so three
+things in one fight share the stem. <b>This is a worse shape than the card-vs-node collisions
+BR and CK &sect;2 dealt with</b>, because both halves are abilities, both appear in the same
+combat log, and the log line is the only place either is named.</li>
+<li><b>"Strike" is on the Orc Shieldmaster (37/20) and the Orc Chief (28/26)</b> with different
+magnitudes. No hero holds it (the class core attacks are renamed by
+<code>apply_kit_overrides</code>), so this is enemy-vs-enemy only, and it is the generic-verb
+case rather than a real collision.</li>
+</ul>
+<p><b>Reported, not resolved</b>, and the Crushing Blow one is a designer question of the same
+kind &sect;2 answered for Iron Will: rename one, or decide that a warband chief hitting as hard
+as a Warrior is the point.</p>
+
+<h2>&sect;CK COVERAGE — WHAT THIS PASS DID AND DID NOT REACH</h2>
+<p><b>Mechanically checked, whole population:</b> all 46 event choice labels against their
+<code>effects</code> and <code>requires</code> payloads; all 93 <code>see_also</code> pointers;
+all 50 enemy abilities against the two selection paths that can pick them; the full person
+sweep over all 308 glossary, event and enemy strings; the ASCII-hyphen sweep; 211 hero ability names
+against 50 enemy ones.</p>
+<p><b>Hand-read against <code>battle.gd</code> / <code>unit.gd</code>:</b> all 28 status
+glossary entries against their constants; the six enemy support gates in
+<code>_enemy_support_action</code>; the bleedout block; the Psychosis roll; the
+<code>enemy_shield</code>, <code>healing_wave</code>, <code>wild_growth</code> and
+<code>totem_pulse</code> handlers; <code>melt_ranks</code>' grant sites (there are none).</p>
+<p><b>NOT verified, and stated plainly:</b></p>
+<ul>
+<li><b>The 65 non-status glossary entries were read for sense, not traced claim by claim.</b>
+The 28 status entries were the population where a claim maps onto a constant; the run,
+progression, resources and gear entries mostly describe systems, and tracing all 302 numeric
+tokens to a read-site is the same per-item job the 324 talent nodes are, at a third the size.
+<b>This is the honest gap in THIS pass.</b></li>
+<li><b>The 324 talent nodes remain un-audited</b>, unchanged from CJ. 92 of them state a number
+their own payload cannot produce because talent payloads are mostly flag values whose
+magnitudes live in <code>battle.gd</code> and <code>unit.gd</code>, so each needs its own
+read-site checked. <b>That is a batch by itself and it is recorded as owed in
+<code>CLAUDE.md</code></b> so it cannot quietly disappear.</li>
+<li><b>Enemy stat blocks were not audited against the difficulty ladder</b> — this pass read
+enemy TEXT, and whether the Orc Chief's 34 damage is the right 34 is a balance question, not a
+text one.</li>
+</ul>
 </body>
 </html>

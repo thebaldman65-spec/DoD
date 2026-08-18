@@ -332,7 +332,8 @@ func _names() -> void:
 	# THE ONE COLLISION THIS BATCH SHIPS, PINNED BY NAME SO IT CANNOT BE
 	# "DISCOVERED" AGAIN: KILLING FROST is also a Cryomancer talent NODE
 	# (`cr_freezing`, Thaw row 2). SAME SPEC — a Cryomancer holding the node can
-	# draft the card — which is the Iron Will shape rather than BP's Precision
+	# draft the card — what BR called the Iron Will shape (BATCH CK §2 resolved
+	# THAT one by renaming the card to Ironclad) rather than BP's Precision
 	# Strike. It is a LABEL collision only, and these two checks are what say
 	# so: the node's counter and the card's handler share no field.
 	# `LANE_TREES[spec]` is a FLAT ARRAY of node dicts, not a dict of lanes —
@@ -437,7 +438,22 @@ func _one_shield_door() -> void:
 
 func _docs() -> void:
 	var master := FileAccess.get_file_as_string("res://docs/master.html")
-	ok(master.contains("Batch CI"), "master.html carries the current batch stamp")
+	# RE-POINTED BY BATCH CK. THIS CHECK WAS ALREADY RED WHEN CK ARRIVED AND CK
+	# DID NOT BREAK IT: it asserted a HARDCODED batch stamp, which has to be
+	# hand-bumped every batch to keep passing. **FIVE SUITES CARRIED THE SAME
+	# CHECK (bq, br, bt, bx, ce) AND BATCH CJ'S RE-STAMP TURNED ALL FIVE RED AT
+	# ONCE** — the CD §1 fault in its other direction: not a check that can only
+	# pass, but one that can only pass for one batch. It asks the durable version
+	# of its own question now: the document carries a stamp, and that stamp is no
+	# older than the batch this suite belongs to. No bump is ever owed again.
+	# (Two-letter batch codes sort lexically; a three-letter code needs one line.)
+	var _stamp_at := master.find("Last updated:")
+	ok(_stamp_at >= 0, "§5: master.html carries a Last-updated stamp")
+	var _stamp := master.substr(_stamp_at, 60)
+	var _code_at := _stamp.find("(Batch ")
+	var _stamped := _stamp.substr(_code_at + 7, 2) if _code_at >= 0 else ""
+	ok(_stamped >= "BT",
+		"§5: ...stamped no older than this suite's own batch (reads '%s')" % _stamped)
 	for n in NINE:
 		ok(master.contains(n), "master.html lists %s" % n)
 	# §5: THE SYNERGY LINE IS THE INFORMATION THIS TRANCHE WAS AUTHORED FOR, so

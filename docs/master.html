@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-17 (Batch CJ)</b></p>
+<p align="right"><b>Last updated: 2026-08-17 (Batch CK)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -584,8 +584,14 @@ talent, on dropping below half HP); the chip shows the live bonus.</td></tr>
 dropping below 25% HP; at most once every 5 turns).</td></tr>
 <tr><td>Endurance</td><td>+3% armor per turn without an external heal, capped at +75% (Warden talent);
 the chip tracks the streak and clears when healed.</td></tr>
-<tr><td>Iron Will</td><td>Takes 12% LESS damage per debuff on the Warden (talent); a
-permanent chip whose value follows the live debuff count.</td></tr>
+<tr><td>Ironclad</td><td>Cannot be Stunned, Frozen, Dazed or Broken, and takes 15% less
+damage (the Warrior class-wide <b>ability</b>, chip tag <code>Ir</code>). The Break half is a
+<b>cap, not an immunity</b>: the meter fills to 99 and no further. Timed, and it carries no
+live counter.</td></tr>
+<tr><td>Iron Will</td><td>Takes 12% LESS damage per debuff on the Warden (the Warden
+<b>talent</b>, Threat row 3); a permanent chip whose value follows the live debuff count.
+<b>A different mechanic from Ironclad above, and the only one of the two that wears this
+name.</b></td></tr>
 <tr><td>Crushing Blows</td><td>+9% armor penetration per 20 total enemy-party
 bloodloss — per 15 if Savagery was taken too (Berserker talent); a permanent chip with the
 live value, which names the step it is currently counting in.</td></tr>
@@ -1023,6 +1029,16 @@ incoming card replaces before their column counts as decided.</li>
 screen is confirmed — so filling the Devout's last slot can still be reconsidered before the
 Warden's pick is locked. Leaving the screen commits nothing; the picks stay owed on the hero
 cards.</li>
+<li><b>EVERY CARD SHOWS ITS NUMBERS, NOT JUST ITS DESCRIPTION.</b> Under each card's sentence
+sit its <b>damage</b> (as a share of Attack, with its school), its <b>Break damage</b>, its
+<b>hit count</b> where it strikes more than once, its <b>heal</b>, its <b>cost</b>, its
+<b>cooldown</b>, its <b>initiative cost</b> and its <b>Perfect bonus</b>. The draft screen and
+the glossary are the two surfaces
+<a href="text-standard.html">the text standard</a> allows arithmetic on, and this is the screen
+whose whole purpose is comparing cards — 30 of the 66 damaging abilities never state their
+damage in prose, so before this they drafted blind. <b>The offer / drop picker on the same
+screen deliberately does NOT do this</b>: it is read in the same breath as a fight, so the
+no-arithmetic tier binds it, and it shows the description alone.</li>
 </ul>
 <p>This is <b>four times as much drafting</b> as one hero per elite. A hero has five spec cards
 and six class cards against four draftable slots, so a hero at the cap will be dropping
@@ -1090,7 +1106,7 @@ SPEC_POOLS, the draft reads these.</p>
 <tr><td><b>Mage</b> (all three specs)</td><td>Magic Barrier, Mirror Image, Magic Missiles, Mana Well, Dispel, Blink</td></tr>
 <tr><td><b>Cleric</b> (all three specs)</td><td>Ministration, Consecration, Chastise, Unburden, Exhortation, Undying Vigil</td></tr>
 <tr><td><b>Hunter</b> (all three specs)</td><td>Field Dressing, Camouflage, Aimed Volley, Bola, Hunter's Mark, Arcane Arrows</td></tr>
-<tr><td><b>Warrior</b> (all three specs)</td><td>Battle Trance, Rally, Charge, Cleave, Warcry, Iron Will</td></tr>
+<tr><td><b>Warrior</b> (all three specs)</td><td>Battle Trance, Rally, Charge, Cleave, Warcry, Ironclad</td></tr>
 </table>
 <p><b>THE DRAFT IS COMPLETE.</b> All four class pools hold six, so <b>one card in four is
 class-wide</b> and that seam draws a real entry for <b>every hero in the game</b> — no class
@@ -1257,7 +1273,7 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Charge</b></td><td>20 Rage, <b>1.0</b>, 3cd, one enemy</td><td><b>25% of Attack</b> and <b>20 Break damage</b>; the target is <b>Dazed for 1 turn</b> (Perfect: 2). <b>Builds 30 Rage</b>, so it net-generates 10.</td><td>Reaching something now. The very fast initiative is the point — it is a Warrior's only answer to a caster winding up. It is also the one class-wide card in the game that generates its resource, and the one that beats the free basic rather than sitting under it: Strike wins only on net Rage and on having no cooldown.</td></tr>
 <tr><td><b>Cleave</b></td><td>25 Rage, 2.5, 3cd, three chosen enemies</td><td><b>15% of Attack</b> (Perfect: 22%) and <b>15 Break damage</b> to each of three chosen enemies.</td><td>Breadth from a narrow class. Three <i>chosen</i> enemies rather than three random ones is what separates it from War Stomp.</td></tr>
 <tr><td><b>Warcry</b></td><td>20 Rage, 2.0, 5cd, party</td><td>The whole party deals <b>20% more damage for 3 turns</b> (Perfect: 4).</td><td>The party buff the class lacks — nothing else a Warrior does improves anyone else's numbers.</td></tr>
-<tr><td><b>Iron Will</b></td><td>20 Rage, 1.5, 4cd, self</td><td>For 3 turns (Perfect: 4) he <b>cannot be Stunned, Frozen, Dazed or Broken</b>, and takes <b>15% less damage</b>. The Break half is a <b>cap, not an immunity</b>: his meter fills to <b>99</b> and no further, so pressure still accumulates and simply cannot cross.</td><td>Refusing to be stopped. Every Warrior spine dies to losing a turn — and the cap makes it a delay rather than a negation: the moment it ends he is one hit from Broken.</td></tr>
+<tr><td><b>Ironclad</b></td><td>20 Rage, 1.5, 4cd, self</td><td>For 3 turns (Perfect: 4) he <b>cannot be Stunned, Frozen, Dazed or Broken</b>, and takes <b>15% less damage</b>. The Break half is a <b>cap, not an immunity</b>: his meter fills to <b>99</b> and no further, so pressure still accumulates and simply cannot cross.</td><td>Refusing to be stopped. Every Warrior spine dies to losing a turn — and the cap makes it a delay rather than a negation: the moment it ends he is one hit from Broken.</td></tr>
 </table>
 
 <h3>6.1 Warrior</h3>

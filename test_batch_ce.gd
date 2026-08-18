@@ -494,8 +494,22 @@ func _empower_split() -> void:
 func _docs() -> void:
 	var doc := _src("res://docs/master.html")
 	ok(doc != "", "master.html is readable")
-	ok(doc.contains("Last updated: 2026-08-16 (Batch CI)"),
-		"master.html carries the LIVE stamp")
+	# RE-POINTED BY BATCH CK. THIS CHECK WAS ALREADY RED WHEN CK ARRIVED AND CK
+	# DID NOT BREAK IT: it asserted a HARDCODED batch stamp, which has to be
+	# hand-bumped every batch to keep passing. **FIVE SUITES CARRIED THE SAME
+	# CHECK (bq, br, bt, bx, ce) AND BATCH CJ'S RE-STAMP TURNED ALL FIVE RED AT
+	# ONCE** — the CD §1 fault in its other direction: not a check that can only
+	# pass, but one that can only pass for one batch. It asks the durable version
+	# of its own question now: the document carries a stamp, and that stamp is no
+	# older than the batch this suite belongs to. No bump is ever owed again.
+	# (Two-letter batch codes sort lexically; a three-letter code needs one line.)
+	var _stamp_at := doc.find("Last updated:")
+	ok(_stamp_at >= 0, "§5: master.html carries a Last-updated stamp")
+	var _stamp := doc.substr(_stamp_at, 60)
+	var _code_at := _stamp.find("(Batch ")
+	var _stamped := _stamp.substr(_code_at + 7, 2) if _code_at >= 0 else ""
+	ok(_stamped >= "CE",
+		"§5: ...stamped no older than this suite's own batch (reads '%s')" % _stamped)
 	ok(doc.contains("120 of 120") or doc.contains("120 of a target 120"),
 		"master.html states the LIVE draft count against the REAL target")
 	for n in NINE:

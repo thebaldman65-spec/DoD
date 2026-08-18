@@ -69,7 +69,19 @@ const STATUS_INFO := {
 	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less damage\n(a Shieldmaster's ward)."],
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
 	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of all attack damage\nthis unit takes echoes to its\nwhole party."],
-	"battle_shout": ["Battle Shout", "BS", Color(0.95, 0.45, 0.30), "+8% damage, plus 1% per 20 blood\nbuildup on the enemy party (at cast time)."],
+	# BATCH CK §3 — THIS FALLBACK CARRIES NO MAGNITUDE ON PURPOSE, AND THAT IS
+	# THE WHOLE REASON IT WAS TOUCHED. It read "+8% damage, plus 1% per 20 blood
+	# buildup on the enemy party (at cast time)": correct for `battle_shout_node`
+	# 0, WRONG for 1 (12%) and 2 (18%), and silent on a duration that moves 2/3/4
+	# with the same node. **THE LIVE PATH OVERWRITES IT IN THE SAME LOOP** — the
+	# cast calls `update_status` immediately after `_apply_status` with a string
+	# carrying the real total, base, turns and buildup — so this string is
+	# probably unreachable in play. It was rewritten anyway because it is the
+	# only copy of Battle Shout's number that does NOT move with the node, and a
+	# later batch retuning the tiers would not think to come here. A fallback
+	# with no numbers in it cannot drift. `master.html`'s §4.6 row is correct and
+	# lists all three tiers; it was deliberately left alone.
+	"battle_shout": ["Battle Shout", "BS", Color(0.95, 0.45, 0.30), "More damage dealt, to every hero and\nno companion. The more Bleed the enemy\nparty carried when the shout went up,\nthe larger the bonus."],
 	"blood_price": ["Blood Price", "BP", Color(0.85, 0.25, 0.25), "Paid in his own blood:\n+25% damage dealt."],
 	"scent": ["Scent of Blood", "SB", Color(0.85, 0.3, 0.3), "Fed by bleedouts: bonus damage for\neach enemy bled out this battle."],
 	"deathwish": ["Deathwish", "DW", Color(0.9, 0.3, 0.3), "Below 35% health: bonus damage —\nnothing left to lose."],
@@ -292,7 +304,13 @@ const STATUS_INFO := {
 	"party_mark": ["Hunter's Mark", "HM", Color(0.85, 0.60, 0.30), "Called out: the WHOLE PARTY deals 15%\nmore damage to this enemy — every\nhero and every companion, not just the one\nwho marked it."],
 	"battle_trance": ["Battle Trance", "BT", Color(0.90, 0.55, 0.40), "Somewhere the pain cannot follow: at\nthe start of each turn, heals 3% of\nmaximum health PLUS HALF the damage\ntaken since the last one. It arrives\nAFTER the beating, never before."],
 	"warcry": ["Warcry", "Wc", Color(0.95, 0.60, 0.35), "The line is on the front foot:\n+20% damage dealt."],
-	"ironclad": ["Iron Will", "IW", Color(0.80, 0.80, 0.88), "Teeth set: cannot be Stunned, Frozen,\nDazed or Broken, and takes 15% less\ndamage. The Break meter still fills —\nto 99, and no further."],
+	# BATCH CK §2: the label and the tag follow the id now. This chip read "Iron
+	# Will" / "IW" while the WARDEN'S TALENT chip read "Iron Will" too, off a
+	# different id (`iron_will`, set in the hero-spawn block) and a different
+	# mechanic — the one collision in the game that was not deliberate. THE TAG
+	# IS "Ir" AND NOT "Ic" BECAUSE `intercession` ALREADY HOLDS "IC", and two
+	# chips a case-change apart is the collision again in two characters.
+	"ironclad": ["Ironclad", "Ir", Color(0.80, 0.80, 0.88), "Teeth set: cannot be Stunned, Frozen,\nDazed or Broken, and takes 15% less\ndamage. The Break meter still fills —\nto 99, and no further."],
 	# ---- BATCH CB: the Mage draft's tranche-3 statuses ----
 	# FIVE FOR NINE ABILITIES. Firedraw, Pyre Wake, Deep Winter and Cold Iron all
 	# resolve inside the cast that fires them and carry nothing.
@@ -570,7 +588,7 @@ const ARCANE_ARROW_SPLASH := 0.5  # of the hit's damage, to a random other enemy
 const BATTLE_TRANCE_FLOOR := 0.03 # of maximum health, the tick's floor
 const BATTLE_TRANCE_SHARE := 0.5  # of the damage taken since his last turn
 const WARCRY_PCT := 20            # more damage dealt, party-wide
-const IRON_WILL_CUT_PCT := 15     # less damage taken while it holds
+const IRONCLAD_CUT_PCT := 15     # less damage taken while it holds
 # Batch W: this battle's dmg/heal/prevented per hero — banked into the
 # per-spec share pools at battle end (rotation needs "share of the battles
 # this spec was IN", which the stage totals can't give).
@@ -3163,13 +3181,15 @@ func _player_turn(u: BattleUnit) -> void:
 				"consecration", "exhortation",
 				# BATCH BR. Five of the twelve have nothing to click:
 				# `field_dressing`, `camouflage`, `arcane_arrows`,
-				# `battle_trance` and `iron_will` are self, `warcry` is
+				# `battle_trance` and `ironclad` are self, `warcry` is
 				# party-wide, which is the same thing to this list. `rally_ally`
 				# is NOT here — it is ally-facing and falls through to the ALLY
 				# branch below, where its pool excludes him for the reason
 				# Covering Guard's does.
+				# BATCH CK §2 renamed `iron_will` -> `ironclad` here; this and
+				# the `_resolve` match are the ability's only two read sites.
 				"field_dressing", "camouflage", "arcane_arrows",
-				"battle_trance", "iron_will", "warcry",
+				"battle_trance", "ironclad", "warcry",
 				# BATCH BT. `slow_burn` takes the WHOLE enemy team and the other
 				# two are self, so none of the three has anything to click.
 				# `killing_frost` is NOT here: it carries `aoe`, so it falls
@@ -8038,7 +8058,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					if strike_target.is_hero:
 						_prev(strike_target, fb_stopped)
 						_forge_body_throw(strike_target, fb_stopped)
-			# BATCH BR — IRON WILL's damage half. A flat 15% while it holds,
+			# BATCH BR — IRONCLAD's damage half (the ability, renamed from Iron
+			# Will at CK §2 — the WARDEN TALENT of that name is a different
+			# mitigation, forty lines below). A flat 15% while it holds,
 			# booked to the prevented ledger like every other instrumented
 			# mitigation and credited to HIM, because it is his own card on
 			# himself. The status-refusal half lives in `_apply_status` and the
@@ -8046,7 +8068,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# says where the other two are.
 			if strike_target.has_status("ironclad"):
 				var iw_was := raw
-				raw *= 1.0 - IRON_WILL_CUT_PCT / 100.0
+				raw *= 1.0 - IRONCLAD_CUT_PCT / 100.0
 				if strike_target.is_hero:
 					_prev(strike_target, iw_was - raw)
 			# BATCH BT — HOARFROST ARMOR's mitigation half. Its RETALIATION half
@@ -10503,7 +10525,7 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 		_log("   → %s resists the %s (boss — Break them first)" % [target.unit_name,
 			String(STATUS_INFO[id][0])], "#909090")
 		return
-	# BATCH BR — IRON WILL refuses the three statuses that COST HIM A TURN,
+	# BATCH BR — IRONCLAD refuses the three statuses that COST HIM A TURN,
 	# and nothing else. It sits beside the boss immunity because it is the
 	# same kind of rule (this unit does not take that status) and above
 	# Hallowed because it is narrower — three named ids, not every debuff.
@@ -10519,8 +10541,8 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 	# immune here"; a hero who spent 20 Rage on three turns of not losing a
 	# turn is a different promise.
 	if target.has_status("ironclad") and id in ["stunned", "frozen", "dazed"]:
-		target.float_text("IRON WILL", Color(0.80, 0.80, 0.88))
-		_log("   → %s refuses the %s (Iron Will)" % [target.unit_name,
+		target.float_text("IRONCLAD", Color(0.80, 0.80, 0.88))
+		_log("   → %s refuses the %s (Ironclad)" % [target.unit_name,
 			String(STATUS_INFO[id][0])], "#c0c0d0")
 		return
 	# Hallowed (Empowered Divine Plea): shrugs off every new debuff.
@@ -15337,7 +15359,10 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, wc_n, "hero" if wc_n == 1 else "heroes",
 				WARCRY_PCT, wc_turns,
 				" [PERFECT]" if is_perfect else ""], "#e8c860")
-		"iron_will":
+		# BATCH CK §2 — WAS `iron_will`, WHICH WAS ALSO THE WARDEN TALENT'S
+		# STATUS ID. This match key and the self-target list above are the only
+		# two places the ability's `special` is read.
+		"ironclad":
 			# AXIS: refusing to be stopped. Every Warrior spine dies to losing a
 			# turn — a stunned Berserker is not bleeding anyone, a Broken Warden
 			# is not blocking.
@@ -15345,13 +15370,13 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# THE BREAK HALF IS A CAP, NOT AN IMMUNITY, and the clamp lives in
 			# `unit.take_hit` BELOW the meter write and ABOVE the threshold, so
 			# it leaves him at 99. Read that block before touching this one.
-			var iw_turns := 4 if is_perfect else 3
-			_apply_status(attacker, "ironclad", iw_turns)
+			var ic_turns := 4 if is_perfect else 3
+			_apply_status(attacker, "ironclad", ic_turns)
 			_sfx("parry", -7.0, 0.7)
-			attacker.float_text("IRON WILL", Color(0.80, 0.80, 0.88))
+			attacker.float_text("IRONCLAD", Color(0.80, 0.80, 0.88))
 			_message("%s sets his teeth" % attacker.unit_name)
-			_log("%s: Iron Will — %d turns of no Stun, Freeze, Daze or Break, and %d%% less damage%s" % [
-				attacker.unit_name, iw_turns, IRON_WILL_CUT_PCT,
+			_log("%s: Ironclad — %d turns of no Stun, Freeze, Daze or Break, and %d%% less damage%s" % [
+				attacker.unit_name, ic_turns, IRONCLAD_CUT_PCT,
 				" [PERFECT]" if is_perfect else ""], "#70d878")
 		# ============ BATCH BT: THE MAGE NINE ============
 		# SIX OF THE NINE RESOLVE HERE. Stoke, Arcane Bolt and Arcane Echo are

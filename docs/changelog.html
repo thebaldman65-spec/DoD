@@ -13,6 +13,227 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-17 &mdash; Batch CK: THE DRAFT CARD, THE IRONCLAD RENAME, AND THE SECOND AUDIT PASS</h2>
+<p><i>Three code changes and one read-only audit. <b>No description was rewritten</b> &mdash;
+that is CL's job, scoped by CJ's report and now by this batch's. <b>No magnitude moved and the
+save version did not move</b> (still v10). CJ's two bucket-1 items are both CLOSED here, and so
+is its largest bucket-2 item. Under the Batch CG convention this is a content batch and ships
+<b>no new test suite</b>; five existing suites were RE-POINTED IN PLACE, four of them for a
+fault this batch did not cause.</i></p>
+
+<h3>&sect;1 &mdash; THE DRAFT CARD GETS THE COMPUTED BLOCK, AND IT IS ONE BUILDER FOR TWO SCREENS</h3>
+<p>The draft card rendered <code>ab.description</code> and <b>nothing else</b> &mdash; no
+computed damage, no Break damage, no cost, no cooldown, no initiative and <b>no Perfect</b>
+&mdash; on the one screen whose whole purpose is comparing cards. It now renders all of them,
+under the description, in a second label and a cooler tint so authored prose and computed
+figures read as different kinds of writing.</p>
+<p><b>WHAT THIS FIXES.</b> <b>30 of the 66 damaging abilities never state their damage in
+prose</b>, because every other surface computes it. <b>Ice Lance</b> was the sharpest case:
+<code>damage: 35</code> in the dict against a card reading only "+5% of Attack per Chilled
+stack", so it drafted as a per-stack ability. <b>Aimed Shot's card was, in full,</b> <i>"A
+perfect line. Patient, precise, final."</i> &mdash; <code>damage: 45</code>,
+<code>perfect_text: "+20 Focus"</code>, a blank card for the hardest-hitting entry in the
+Sharpshooter's pool. And <b>all 190-odd <code>perfect_text</code> strings were invisible while
+drafting.</b></p>
+<p><b>THE BRIEF SAID TO REUSE THE BLOCK <code>blacksmith_screen.gd</code> ALREADY BUILDS, AND
+THAT BLOCK DOES NOT EXIST.</b> The claim came forward from CJ's own report and neither this
+batch nor CJ had checked it: <code>blacksmith_screen.gd</code> renders
+<code>Run.upgrade_desc</code> and <code>ab.description</code> and no computed values at all. The
+only two computed blocks in the game were <code>battle._ability_tooltip</code> and an inline one
+in <code>party_screen</code>. <b>So the shared builder had to be WRITTEN rather than reused
+&mdash; <code>Classes.computed_block</code> &mdash; and BOTH the draft card and the hero sheet
+were pointed at it</b>, which is what keeps the copy count at two instead of taking it to
+three. That was the whole point of the instruction, and it is honoured; the premise behind it
+was simply wrong.</p>
+<p><b>THE THIRD COPY IS DELIBERATELY LEFT ALONE AND THE REASON IS RECORDED.</b>
+<code>battle._ability_tooltip</code> reads a live <code>BattleUnit</code>: Surge, Empower and
+the Resonance curve multiply its damage and it prints "(ready in N)" off that unit's cooldown
+clock. It is a mid-combat tooltip with live state in it rather than a static card, and folding
+it in would move numbers inside a fight.</p>
+<p><b>THE CARD SHOWS THE SCALING PERCENTAGE, NOT A COMPUTED RANGE, AND THAT IS A DECISION WITH A
+REASON.</b> <b>The map screen has no live Attack to compute a range from.</b> Only
+<code>party_screen._draw_detail</code> and the battle spawn build a hero's live Attack, each
+with its own sixty-line prologue (hero config, kit overrides, passive, spec stats, tree, runes,
+upgrades, node scaling) &mdash; and a third copy of THAT on the map screen would be a far worse
+duplication than the one this section exists to prevent. The shared builder <b>takes an Attack
+figure and prints the real range when it is given one</b>, so the hero sheet gets the range and
+the draft card gets the percentage, and <b>when that prologue is extracted the draft card
+changes by one argument.</b> Recorded as owed in <code>CLAUDE.md</code>. Showing the percentage
+is not a workaround: the draft screen is one of the two arithmetic-ALLOWED surfaces in the
+standard, which may show percentages and formulas outright.</p>
+<p><b>THE HERO SHEET GAINED THREE LINES AND LOST NONE.</b> Routing it through the shared builder
+gives it the cost, cooldown and initiative lines the block carries &mdash; every one a number
+that sheet already had and was not showing. Its <i>"Scaling: N% of Attack"</i> line stays
+outside the block, because on the draft card the block's own damage line IS the scaling and the
+card would print it twice.</p>
+<p><b>THE LAYOUT RISK WAS REAL AND IT IS REPORTED RATHER THAN PAPERED OVER, EXACTLY AS THE BRIEF
+ASKED.</b> Measured in a headless run of the real screen with the real theme font (Open Sans
+SemiBold), across three sampled draws:</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Measurement</th><th>Before</th><th>After</th></tr>
+<tr><td>Column content height, against a <b>388px</b> scroll viewport</td>
+<td>313&ndash;389px (three of four columns already at or over it)</td>
+<td><b>557&ndash;671px</b></td></tr>
+<tr><td>Added per column</td><td>&mdash;</td><td><b>+225 to +282px</b>, 12&ndash;14 block lines
+across three cards</td></tr>
+<tr><td>Widest font-11 line against the <b>258px</b> card</td><td>&mdash;</td>
+<td><b>354px</b> &mdash; a <code>perfect_text</code> line ("Answering Steel")</td></tr>
+</table>
+<p><b>NOTHING IS CLIPPED AND NOTHING WAS SHRUNK.</b> The cards live in a
+<code>ScrollContainer</code> with horizontal scrolling disabled and autowrap on, so over-tall
+content scrolls and over-wide lines wrap. <b>The honest cost is that the column now runs about
+1.5 viewports where it ran about one</b>, so a player sees roughly two cards at a time instead
+of three on the screen built for comparing three. <b>The font was not shrunk and the block was
+not truncated</b> &mdash; the brief forbade both, and the column panel itself (540px) did not
+grow.</p>
+<p><b>A NEW MEASUREMENT, BECAUSE CK IS THE FIRST SURFACE EVER TO RENDER A
+<code>perfect_text</code>:</b> swept all 193 of them (over 207 resolvable abilities) against the
+258px card. <b>17 are wider than the card and wrap to exactly two rows; none reaches three.</b>
+CJ's 44-character ceiling holds 936/936 <i>description</i> lines and never bound
+<code>perfect_text</code>, which carries no authored breaks and autowraps correctly.</p>
+<p><b>CONSEQUENCE RECORDED, NOT FIXED HERE:</b> making Perfect visible exposes strings nothing
+has ever rendered, and <b>107 of them are in the "60 Rage instead of 40" shape the standard
+rejects</b>. They were not wrong before; they were invisible. CL cleans them up.</p>
+
+<h3>&sect;2 &mdash; THE ABILITY "IRON WILL" IS NOW "IRONCLAD" (CJ bucket 1.1, CLOSED)</h3>
+<p>Two unrelated mechanics wore the chip label <b>Iron Will</b>: the class-wide Warrior
+<b>ability</b> (immunity to Stun, Freeze, Daze and Broken plus a flat 15% cut) and the Warden
+<b>talent</b> (&minus;12% damage taken per rank per debuff on him). They do not resemble each
+other, and <code>master.html</code> &sect;4.6 had a single "Iron Will" row that described the
+<i>talent</i> &mdash; so a reader checking the ability got the other mechanic's answer.</p>
+<p><b>The ability's own status id was already <code>ironclad</code>, so the rename made the card
+agree with the code and NO NEW WORD ENTERED THE GAME.</b> The talent keeps
+<code>iron_will</code> and keeps the name Iron Will. Renamed: the
+<code>CLASS_DRAFT_POOLS["warrior"]</code> entry, the ability def and its
+<code>display_name</code>, the chip label, <code>IRON_WILL_CUT_PCT</code> &rarr;
+<code>IRONCLAD_CUT_PCT</code>, the float text and both log lines, and
+<code>master.html</code>.</p>
+<p><b>TWO SITES BEYOND THE BRIEF'S LIST, BOTH DISCLOSED.</b> <b>(1) The ability's
+<code>special</code> moved too</b>, <code>iron_will</code> &rarr; <code>ironclad</code> &mdash;
+an ability named Ironclad dispatching on <code>iron_will</code> would have left the collision
+alive in the code layer, where a later batch grepping for the talent hits it. Two read sites,
+both in <code>battle.gd</code> (the <code>_resolve</code> match and the self-target list), and
+after the change <b>no <code>iron_will</code> string anywhere in the codebase belongs to the
+ability.</b> <b>(2) The chip tag is <code>Ir</code>, not <code>Ic</code></b>, because
+<code>intercession</code> already holds <code>IC</code> and two chips a case-change apart is the
+same collision in two characters.</p>
+<p><b><code>master.html</code> &sect;4.6 now carries TWO status rows where it carried one</b>,
+each naming which of the two it is &mdash; and the ability's row had been <b>absent
+entirely</b>.</p>
+<p><b><code>berserk</code>/<code>berserk_risk</code> and
+<code>formless</code>/<code>formless_recoil</code> WERE NOT TOUCHED.</b> Those pairs share a
+label deliberately: each is the upside and the price of one ability, separated by chip tag and
+colour. Iron Will was a collision; those are a pattern. A sweep of
+<code>STATUS_INFO</code> confirms the end state &mdash; <b>159 rows, and the only duplicate
+labels left are those two pairs.</b></p>
+<p><b>THE KNOWN FLAKE ON THIS PATH DID NOT FIRE.</b> <code>test_batch_br</code>'s
+<i>"&hellip;really cuts the damage"</i> check reproduces roughly 1 pass in 9 and was confirmed
+at CD. The suite was run <b>four times after the rename: 1447 checks, 0 failures, every
+time.</b> It was not touched and it is still BR's thread.</p>
+<p><b>The last card-vs-node collision in the game is now KILLING FROST</b> (a Cryomancer card
+and a Cryomancer node), and it is deliberately left: unlike Iron Will its two halves both make
+a held enemy colder, and no document describes one under the other's name. The reason is written
+beside it in <code>classes.gd</code>.</p>
+
+<h3>&sect;3 &mdash; BATTLE SHOUT'S FALLBACK LOSES ITS NUMBERS (CJ bucket 1.2, CLOSED)</h3>
+<p><code>STATUS_INFO["battle_shout"]</code> hardcoded <i>"+8% damage, plus 1% per 20 blood
+buildup"</i> &mdash; right for <code>battle_shout_node</code> 0 and <b>wrong for 1 (12%) and 2
+(18%)</b>, and it stated no duration while the duration also moves (2/3/4).</p>
+<p><b>THE NUMBERS WERE STRIPPED RATHER THAN CORRECTED, AND THAT IS THE POINT.</b> There is no
+single number that is right here: changing 8% to 12% would make it wrong for two node states
+instead of two. The fallback now describes what Battle Shout does and states <b>no magnitude and
+no duration</b>, so it cannot disagree with any tier and <b>cannot drift when a later batch
+retunes them</b>, which is the only reason it was worth touching &mdash; the cast path calls
+<code>update_status</code> immediately after <code>_apply_status</code> and overwrites the chip
+with a live string carrying the real total, base, turns and buildup, so the fallback is probably
+unreachable in play. <b><code>master.html</code> was deliberately left alone</b>: its &sect;4.6
+row is correct and lists all three tiers.</p>
+
+<h3>&sect;4 &mdash; THE SECOND AUDIT PASS, REPORT ONLY (<code>docs/text-audit.html</code>, new
+&sect;CK)</h3>
+<p>CJ verified abilities, runes, statuses and the length ceiling and named four populations it
+could not reach. <b>Three of the four are audited here</b> &mdash; the <b>93 glossary
+entries</b>, <b>all enemy text</b> (21 names, 50 ability names, the 10 descriptions) and <b>all
+event text</b> (20 bodies, 46 labels, 46 outcomes). Same three buckets. <b>Nothing was
+fixed.</b></p>
+<p><b>THE CLEAN RESULTS FIRST, BECAUSE THEY BOUND THE WORK:</b> all <b>46 event choice labels
+agree with their payloads, 0 mismatches</b>; all <b>93 <code>see_also</code> pointers
+resolve</b>; and <b>every status glossary entry that quotes a constant quotes it correctly</b>
+&mdash; Broken's <code>0.7</code> and <code>+0.25</code>, Sunder's <code>0.65</code> and the
+claim that the two MULTIPLY, Frostbite's <code>0.5</code>, Dazed on top of the 5% base, Chilled
+1/2/3/4 with the 15% cut at three, Ruin's 10 and 0.40, Glacial Hold's 15 and 30, Frostbind's
+40%, Psychosis' 0.5 base.</p>
+<p><b>BUCKET 1 &mdash; ONE FINDING, AND IT IS ON THE END BOSS.</b> <b>The Hollow Crown's
+REGALIA</b> reads <i>"Wards an ally against the next blow"</i> but its payload is
+<code>enemy_shield</code>, which is <b>3 turns of 25% less damage</b> &mdash; a one-charge ward
+is a different status entirely. <b>And it can never be cast:</b> support casts are chosen by
+literal display name and "Regalia" is not among them, while the attack list filters on
+<code>damage &gt; 0</code> and Regalia has no damage. <b>Nothing in the game can select it</b>
+&mdash; and <code>battle.gd</code>'s own comment lists it as a live shield source, so the code's
+notes believe it fires. A boss met alone also has no ally to ward, so it is not obvious it was
+ever meant to. <b>A design question, reported.</b></p>
+<p><b>BUCKET 2 &mdash; THE STRUCTURAL ONE IS THE EVENT SCREEN, and it is CJ's &sect;2.1 again in
+a different file.</b> <b>17 of the 30 event choices that carry an effect state nothing about it
+in the label (57%)</b>, and <code>event_screen.gd</code> puts only the label on the button
+&mdash; the effect summary is rendered <b>after the choice is made</b>. <b>Five events put a
+bare choice directly beside a fully-stated one on the same screen</b> (blood_altar,
+scarland_mirage, wardens_echo, collectors_grave, plague_victim), so the player compares a named
+cost against an unnamed one &mdash; and the pattern is that the <i>escalated</i> option states
+its terms while the <i>first</i> one does not, which is backwards from where the information is
+needed. Also: <b>40 of 50 enemy abilities carry no description at all</b>; <b>every enemy
+support ability omits the condition that fires it</b> (the Bog Troll's half-health gate, the
+Withered Warden's 70% gate and 60% roll, the Shieldmaster's one-ward-at-a-time rule, the
+Totem's two-wounded-bodies rule); and <b>three glossary entries state a base a talent then
+moves</b> (Exsanguination takes a bleedout from 20% to 35%, Slaughterhouse stops the meter
+resetting to zero, Whispers lifts Psychosis above 50%).</p>
+<p><b>BUCKET 3 &mdash; PROSE.</b> The glossary and events are written in second person against
+the standard's no-pronoun rule (glossary <code>long</code> 30%, event outcomes 48%), while
+<b>the ten enemy ability descriptions are ten for ten clean and are the calibration example a
+rewrite should use</b>. <b>77 of 93 glossary entries use an ASCII hyphen where the whole rest of
+the game uses an em dash</b> &mdash; one judgement call applied 77 times. And a first-ever sweep
+of <b>211 hero ability names against 50 enemy ones</b> found <b>"Crushing Blow" on both sides of
+the field</b> with different numbers (Orc Chief 34, the Warrior's own 43), beside a Warrior
+talent called <b>Crushing Blows</b> &mdash; three things sharing a stem in one combat log, which
+is a worse shape than the card-vs-node collisions because both halves are abilities.</p>
+<p><b>THE 324 TALENT NODES ARE STILL DEFERRED, DELIBERATELY, and are RECORDED AS OWED in
+<code>CLAUDE.md</code></b> so they cannot quietly disappear. 92 of them state a number their own
+payload cannot produce, because talent payloads are mostly flag values whose magnitudes live in
+<code>battle.gd</code> and <code>unit.gd</code>; each needs its own read-site checked. That is a
+batch by itself. <b>&sect;CK also states its OWN gap:</b> the 65 non-status glossary entries were
+read for sense rather than traced claim by claim.</p>
+
+<h3>&sect;5 &mdash; FIVE SUITES RE-POINTED, AND FOUR OF THEM WERE ALREADY RED BEFORE THIS BATCH</h3>
+<p>Under Batch CG's convention a content batch ships no suite but still re-points in place
+anything its own change made false. <b><code>test_batch_br</code> was re-pointed for the rename</b>
+&mdash; the pool literal, the Break-damage table, the live spawn grant, the constant, and the
+refusal-ledger check, which would otherwise have <b>passed vacuously</b> (a ledger holding "Iron
+Will" refuses a name the pool no longer carries, so its <code>has()</code> reads false for the
+wrong reason &mdash; the exact fault CD &sect;1 exists to close). Its collision block was
+<b>INVERTED rather than deleted</b>, and is asserted from both ends so that renaming the wrong
+half cannot satisfy it. A second frozen literal, <code>AS_BR_SHIPPED</code>, was added beside
+the live one because <b>the changelog is HISTORY and must keep saying "Iron Will"</b> while
+<code>master.html</code> is current truth and must say Ironclad &mdash; pointing both loops at
+the live pool would have demanded an older entry be rewritten to claim something BR did not do.</p>
+<p><b>AND A FINDING THIS BATCH DID NOT GO LOOKING FOR.</b> <b>Five suites (bq, br, bt, bx, ce)
+each carried a HARDCODED <code>master.html</code> batch stamp, and Batch CJ's re-stamp turned
+all five red at once.</b> They were failing before CK touched anything &mdash; verified against
+<code>HEAD</code>. This is the CD &sect;1 fault in its other direction: not a check that can only
+pass, but <b>one that can only pass for a single batch</b>, and it had to be hand-bumped every
+batch to keep asking its question. <code>br</code>'s had drifted furthest &mdash; the assertion
+read "Batch CI" under a message saying "Batch CH". <b>All five now read the stamp and compare it
+against the suite's own batch, so no bump is ever owed again.</b> Every one is green: br 1447,
+bq 739, bt 455, bx 142, ce 1109, plus aj 418 and cb 1181, all 0 failures.</p>
+
+<h3>VERIFIED</h3>
+<p><b>The Batch CG floor, which is the whole verification ask for a content batch:</b>
+<code>check_parse.gd</code> <b>0 failures</b>; <code>check_map_screen.tscn</code> builds the
+lattice and the four-column draft against a live run, opens the pick overlay, the rune pouch and
+the drop step and confirms through the real door &mdash; <b>OK</b>; <code>./sim.sh 6</code> runs
+six live battles with <b>zero <code>SCRIPT ERROR</code>, zero invalid calls, zero nil
+access</b>. Seven suites run green &mdash; <b>5,491 checks, 0 failures</b> (br 1447, cb 1181, ce 1109, bq 739, bt 455, aj 418, bx 142). <b>The layout measurement in
+&sect;1 was taken with a scratch harness that was deleted afterwards</b> &mdash; a content batch
+ships no measurement instrument either.</p>
+
 <h2>2026-08-17 &mdash; Batch CJ: THE TEXT STANDARD AND THE FULL TEXT AUDIT</h2>
 <p><i>Two documents and <b>NO REWRITES</b>. No description edited, no ability changed, no
 magnitude moved, no save version moved (still v10). <b>Not one line of game code was
