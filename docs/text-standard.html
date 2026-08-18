@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Dawn of Decay — The Text Standard</title></head>
+<body>
+<p align="right"><b>Last updated: 2026-08-17 (Batch CJ)</b></p>
+<h1>DAWN OF DECAY — THE TEXT STANDARD</h1>
+<p><i>The rules every player-facing string is written to. Binding on every batch from CJ
+forward, including any tuning that comes out of playtesting. This document says how text is
+written; <b>the audit report (<code>text-audit.html</code>) says where the current text
+breaks these rules</b>. Neither one edits a description — the rewrite passes do that, scoped
+by the audit and governed by this.</i></p>
+
+<h2>0. What this governs, and the one rule above all the others</h2>
+<p>Every string a player can read: ability <code>description</code> and
+<code>perfect_text</code>, the twelve <code>passive_desc</code> blocks, class passive
+<code>desc</code>, status labels and chip tooltips, talent node text, rune and relic text,
+glossary entries, and the tables in <code>master.html</code>.</p>
+<p><b>THE CODE'S FIELD IS AUTHORITATIVE.</b> It is the only copy a player ever reads.
+<code>master.html</code> is corrected toward it, never the reverse. That is the project's
+standing rule and it governs this document too — where the two disagree, the document is
+wrong by definition, whatever it says and however well it says it.</p>
+<p><b>There are two copies of nearly every description and they were written separately.</b>
+Of the 120 draft ability rows in <code>master.html</code>, <b>not one</b> carries the code's
+sentence — every single one is an independently authored paraphrase, and
+<b>the document's copy is a median 3.0x longer</b> (118 of 120 rows are longer; the widest is
+5.7x). They agree on the numbers — that was measured, see the audit — but they are not the
+same prose. <b>Anyone calibrating "how the cards read" from <code>master.html</code> is
+calibrating from text no player has ever seen.</b></p>
+
+<h2>1. THE TWO TIERS — the load-bearing rule</h2>
+<p><b>DRAFT SCREEN AND GLOSSARY — percentages and formulas are allowed.</b> This is where
+the player is comparing cards and wants the arithmetic available.</p>
+<p><b>EVERYWHERE ELSE, ESPECIALLY MID-COMBAT — no arithmetic.</b> A real computed number
+where one is available at tooltip time; otherwise plain direct language. <b>The player must
+never be asked to do math while choosing an action.</b></p>
+<p>Where a live value is cheap to compute from data already at hand, use it. Where it is
+not, use the formula and leave a note in the batch that writes it — the live-value version
+is a later batch.</p>
+<p><b>Which surface a string lands on is not a matter of opinion, and the tiers cut across a
+single field.</b> One ability <code>description</code> is rendered by five different screens,
+and only some of them are the draft:</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Surface</th><th>Shows</th><th>Tier</th></tr>
+<tr><td>Draft card (<code>map_screen.gd</code>)</td><td><code>description</code> ONLY — no
+computed damage, no cost, no cooldown, <b>no Perfect</b></td><td><b>Arithmetic
+allowed</b></td></tr>
+<tr><td>Blacksmith commission (<code>blacksmith_screen.gd</code>)</td><td><code>description</code>
++ live damage + scaling + Perfect</td><td>Arithmetic allowed</td></tr>
+<tr><td>Battle button tooltip (<code>battle.gd</code>)</td><td><code>description</code> + live
+damage/BD + cooldown + initiative + Perfect</td><td><b>NO arithmetic</b></td></tr>
+<tr><td>Hero sheet (<code>party_screen.gd</code>)</td><td><code>description</code> + Perfect;
+<code>passive_desc</code> in its own block</td><td>NO arithmetic</td></tr>
+<tr><td>Offer / drop picker (<code>map_screen.gd</code>)</td><td><code>description</code> ONLY
+</td><td>NO arithmetic</td></tr>
+</table>
+<p><b>The battle tooltip already computes the real numbers</b> — damage range against the
+unit's current Attack, Break damage, cooldown with turns remaining, initiative cost, and the
+Perfect line. A description that also states "25% of Attack" is stating in arithmetic what
+the line beneath it states as a number. <b>The live value wins; the formula goes.</b></p>
+
+<h2>2. DIRECTNESS</h2>
+<p>State the effect, then the Perfect variant. Stop.</p>
+<p><b>NO DESIGN RATIONALE ON A CARD, EVER.</b> This is the dominant fluff pattern and it is
+everywhere, because these strings were written by whoever was justifying the decision at the
+time. The example to calibrate against — Blood Offering, <b>as <code>master.html</code>
+currently reads</b>:</p>
+<blockquote><i>He loses 20% of his CURRENT health and gains 40 Rage (Perfect: 60). Because it
+is a share of what is left rather than of his maximum, it can never take him below 1 — and it
+costs less the lower he is.</i></blockquote>
+<p>The second sentence explains <b>why the number was chosen</b>. That belongs in the
+changelog. The card should read:</p>
+<blockquote><i>Loses 20% of current health. Gains 40 Rage (Perfect: 60).</i></blockquote>
+<p><b>The code's card for the same ability is a different string</b>, and it is already much
+closer to the target — which is the shape of the whole problem:</p>
+<blockquote><i>Open a vein on purpose: lose 20% of your CURRENT health and gain 40 Rage. It
+can never take you below 1 — and the lower you are, the less it costs.</i></blockquote>
+<p>It still breaks three rules below (second person, a rationale clause, a flavor opener
+carrying mechanics), but it is two sentences rather than three and it does not lecture.
+<b>The rewrite passes are correcting the code's string, not the document's.</b></p>
+
+<h2>3. FLAVOR</h2>
+<p>Allowed, and welcome where a card earns it. <b>One short clause, mechanically empty, and
+it must not restate what the mechanics line already said.</b> Never a sentence explaining how
+or why the ability works. <b>If it could be mistaken for a rule, cut it.</b></p>
+<p>Two failure modes, both currently present:</p>
+<ul>
+<li><b>Flavor that carries the mechanics.</b> "Open a vein on purpose:" is the sentence's
+subject — cut it and the sentence loses its verb. Flavor must be removable.</li>
+<li><b>Flavor instead of mechanics.</b> Aimed Shot reads, in full: <i>"A perfect line.
+Patient, precise, final."</i> It deals damage, builds Focus and grants +20 Focus on a
+Perfect, and the card says none of it. <b>On the draft screen, where no computed line
+follows, that card is blank.</b></li>
+</ul>
+<p><b>"Perfect" is a mechanic and the word is reserved.</b> Aimed Shot's "A perfect line" is
+flavor colliding with the keyword on a card that also has a Perfect bonus.</p>
+
+<h2>4. THE CONSISTENCY RULES</h2>
+
+<h3>4.1 Person — no pronouns</h3>
+<p>"Loses 20% of current health", not "he loses" and not "you lose". <b>Pick this once and it
+never drifts again.</b></p>
+<p>Currently the field is split in both directions: <b>86 of 204 ability descriptions use
+second person</b> ("you", "your") and <b>44 use third person</b> ("he", "his", "her"). Some
+use both. <code>master.html</code> is uniformly third-person, so the document and the card
+disagree on voice for most of the game.</p>
+
+<h3>4.2 Whose percentage — always name the owner</h3>
+<p>"20% of his maximum health" and "20% of the target's maximum health" are different
+abilities and currently read the same. <b>Name the owner every time, even when it seems
+obvious</b> — it is only obvious to whoever wrote it.</p>
+
+<h3>4.3 Perfect — one notation everywhere</h3>
+<p><b><code>(Perfect: X)</code></b>, and X is the changed value, not a sentence about it.</p>
+<p>The rendered <i>label</i> is already uniform, because every surface that shows it supplies
+the words "Perfect: " itself. <b>The inconsistency is inside the field</b> — 190
+<code>perfect_text</code> strings in at least four shapes: a bare value
+(<i>"+10 bonus Mana"</i>), an "instead" comparison (<i>"60 Rage instead of 40"</i>, 107 of
+them), a full sentence (<i>"The debt pays 35% of maximum health instead of 25%"</i>), and a
+compound (<i>"+20% parry instead of +15%, and holds 6 turns instead of 4"</i>).</p>
+<p><b>The value alone is the standard</b>: the base is on the line above, so "instead of 40"
+repeats it. Two other faults to fix while passing through:</p>
+<ul>
+<li><b>Never state the Perfect condition inside the <code>description</code> as well.</b>
+Four abilities do (Deadfall, Pommel Strike, Aimed Shot, Snare Trap) — the tooltip then says
+it twice.</li>
+<li><b>The draft card shows no Perfect at all.</b> A card is drafted on a screen that never
+mentions its Perfect bonus. That is a code gap, not a text gap — recorded in the audit and
+owed to a later batch.</li>
+</ul>
+
+<h3>4.4 Keywords capitalised</h3>
+<p>Mechanics take a capital so the player can tell the mechanic from the ordinary word:
+<b>Break, Broken, Block, Parry, Perfect, Chilled, Frozen, Burn, Ruin, Faith, Mercy, Rage,
+Focus, Loyalty, Resonance, Empower.</b></p>
+<p><b>Break is the one that matters most</b> — "break" as a verb appears in ordinary prose
+and reads as the mechanic. The ability corpus is currently clean on this (no lowercase
+"break" in any of the 204), and it is written down so it stays that way.</p>
+<p>Damage against the Break meter is <b>"Break damage (BD)"</b> everywhere — the project's
+existing term, unchanged.</p>
+
+<h3>4.5 Duration vs cooldown — never a bare "3 turns"</h3>
+<p>Write <b>"for 3 turns"</b> for a duration and <b>"3-turn cooldown"</b> for a cooldown, and
+never let the bare number stand for either. <b>97 of 204 descriptions</b> currently carry a
+bare "N turns" with nothing distinguishing which is meant.</p>
+<p>The tooltip prints its own <code>Cooldown: N turns</code> line, so a description restating
+the cooldown is both a second copy and a chance to disagree. <b>Descriptions state durations;
+the renderer states cooldowns.</b></p>
+
+<h3>4.6 Stacking and refresh — state what a second cast does</h3>
+<p>Whenever a second cast is possible, say what it does: refresh, extend, stack, or replace.
+<b>This is currently absent almost everywhere — of 61 abilities that grant a timed effect,
+53 say nothing about recasting.</b></p>
+
+<h3>4.7 No literal <code>\n</code> in a prose field — WITH ONE MEASURED EXCEPTION</h3>
+<p><b>The rule is right and the reason it cannot be applied everywhere at once is worth
+stating, because applying it blindly would break the battle tooltip.</b></p>
+<p>Nothing in the project overrides <code>make_custom_tooltip</code>, so every tooltip is
+Godot's default — <b>and Godot's default tooltip does not autowrap.</b> It grows to fit the
+longest line. The authored <code>\n</code> in an ability description is therefore
+load-bearing on the battle button, the hero sheet and the rune slot: strip it and a 322-character
+description renders as one line roughly two thousand pixels wide.</p>
+<ul>
+<li><b><code>passive_desc</code> — the rule applies now.</b> It renders in an
+<i>autowrapping</i> 400px label on the hero sheet, where the authored breaks fight the soft
+wrap instead of helping it. <b>23 of its 67 lines are wider than the box that holds them</b>
+(measured, up to 71 characters against a 61-character budget), across five specs — Arcanist,
+Holy, Inquisitor, Occultist and Beastmaster. This is the "wraps badly at different widths"
+case, and it is real.</li>
+<li><b>Ability <code>description</code> — the breaks stay until there is an autowrapping
+tooltip.</b> Removing them is a code batch (a custom tooltip), not a text batch. Until then
+the hand-wrap is what keeps the tooltip readable, and it is held to the ceiling below.</li>
+</ul>
+<p>One inconsistency to fix on the way past: <code>spec_choice_screen.gd</code> flattens
+<code>\n</code> to a space for ability descriptions and <b>does not do the same for
+<code>passive_desc</code> two expressions later</b>, so the passive block hard-wraps inside a
+298px column on that screen.</p>
+
+<h3>4.8 The length ceiling — 44 characters, and it was measured</h3>
+<p><b>An authored line may not exceed 44 characters.</b></p>
+<p>Measured, not guessed, against the real font at the real sizes the screens set. The
+narrowest surface that renders a description is the <b>draft card: 258px wide at font size
+11</b> (<code>DRAFT_COL_W</code> 296 less 38). The default theme font is Open Sans SemiBold.
+Across all 1,846 authored lines in the game:</p>
+<ul>
+<li><b>Every observed line of 44 characters or fewer fits.</b> The widest 44-character line
+measured 241px against a 258px budget.</li>
+<li><b>45 is the first length at which a line overflows</b> — 263px, over budget.</li>
+<li>The ceiling is a character count rather than a pixel count because the prose uses
+ALL-CAPS runs for emphasis, and caps are wider: 44 mixed-case characters fit comfortably, but
+44 capitals would not. 44 holds for both because no authored line is all capitals.</li>
+</ul>
+<p><b>The ability corpus already holds this ceiling perfectly — 936 of 936 lines, zero
+overflows.</b> The existing hand-wrapping discipline is correct and the ceiling is written
+down to record it, not to change it. <b>Everything that overflows is a field that does not
+carry authored breaks at all</b> (talent and rune text, which autowrap and are fine) <b>or
+<code>passive_desc</code></b> (§4.7).</p>
+
+<h2>5. HOW TO APPLY THIS</h2>
+<ol>
+<li><b>Fix WRONG before writing prose.</b> Polishing the grammar on a wrong description makes
+it read more confidently while staying wrong, which is worse than leaving it clumsy. The
+audit's bucket 1 is the queue.</li>
+<li><b>Edit the code's field. Then correct <code>master.html</code> toward it.</b> Never the
+reverse, and never only one of the two.</li>
+<li><b>Rationale goes to <code>changelog.html</code>, never onto the card.</b> If a sentence
+explains a choice, it has a home and this is not it.</li>
+<li><b>Check the surface before allowing arithmetic</b> (§1). The same field is read by a
+screen that computes numbers for you and a screen that does not.</li>
+</ol>
+</body>
+</html>

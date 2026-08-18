@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Dawn of Decay — The Text Audit (Batch CJ)</title></head>
+<body>
+<p align="right"><b>Last updated: 2026-08-17 (Batch CJ)</b></p>
+<h1>DAWN OF DECAY — THE FULL TEXT AUDIT</h1>
+<p><i>Every player-facing string, compared three ways: <b>what the code does</b>, <b>what the
+code's description says</b>, and <b>what <code>master.html</code> says</b>. This is a REPORT.
+Nothing here was fixed — no description was edited, no ability changed, no magnitude moved.
+The rewrite passes are scoped from this document and governed by
+<code>text-standard.html</code>.</i></p>
+
+<h2>THE HEADLINE, BEFORE THE BUCKETS</h2>
+<p><b>The numbers are sound. The prose is not.</b> Every mechanically checkable relationship
+in the game came back clean, and that is the most important result here because it changes
+what the rewrite batches are: <b>they are a prose job, not a repair job.</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Check</th><th>Result</th></tr>
+<tr><td>120 ability stat cells in <code>master.html</code> (cost, initiative, cooldown) vs the
+ability dicts</td><td><b>120 / 120 agree</b></td></tr>
+<tr><td>Damage magnitudes ("% of Attack") in the document vs <code>damage</code></td>
+<td><b>0 disagreements</b></td></tr>
+<tr><td>Stated status durations vs <code>applies_status.turns</code></td><td><b>14 / 14
+agree</b></td></tr>
+<tr><td>65 rune <code>desc</code> vs <code>payload</code></td><td><b>every magnitude traced</b>
+to a payload value or to the talent/upgrade the payload points at</td></tr>
+<tr><td>Status chip tooltips vs the constants they quote (hand-read)</td><td><b>correct</b> —
+Slow 0.75, Chilled at 1/2/3/4, Burn 6, Poison 3/stack, Decay 10 BD, Ruin cap 0.40</td></tr>
+<tr><td>The Arcanist's Resonance formula, checked to the decimal</td><td><b>correct</b> —
+n(n+1)/2 with steps 1.5 / 0.75; 5 stacks = 22%/11%, 12 = 117%/59%</td></tr>
+<tr><td>936 authored ability lines vs the measured 44-character ceiling</td><td><b>936 / 936
+inside it</b></td></tr>
+</table>
+<p><b>Two exceptions survived, and they are bucket 1.</b></p>
+
+<h2>&sect;0 — HOW MANY COPIES OF EACH STRING EXIST</h2>
+<p><b>774 authored strings, 1,846 authored lines</b>, extracted from the code and data rather
+than sampled.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Category</th><th>Count</th><th>Authored where</th><th>Copies</th></tr>
+<tr><td>Ability <code>description</code></td><td>204</td><td><code>classes.gd</code></td>
+<td><b>TWO</b> — and a second in <code>master.html</code>'s draft table (120 rows)</td></tr>
+<tr><td>Ability <code>perfect_text</code></td><td>190</td><td><code>classes.gd</code></td>
+<td><b>TWO</b> — restated inline in the document's prose</td></tr>
+<tr><td><code>passive_desc</code></td><td>12</td><td><code>classes.gd</code> SPEC_INFO</td>
+<td><b>TWO</b> — none verbatim in the document</td></tr>
+<tr><td>Class passive <code>desc</code></td><td>4</td><td><code>classes.gd</code></td><td>TWO</td></tr>
+<tr><td>Status label + chip tooltip</td><td>147</td><td><code>battle.gd</code> STATUS_INFO</td>
+<td><b>TWO</b> — 78 matched rows in the document's §4.6 table</td></tr>
+<tr><td>Talent node text</td><td>324</td><td><code>talents.gd</code></td><td>ONE for most
+(116 appear verbatim in the document; 13 have a row that differs)</td></tr>
+<tr><td>Rune <code>desc</code></td><td>65</td><td><code>data/runes.json</code></td><td><b>ONE</b>
+— the document describes the system, not each rune</td></tr>
+<tr><td>Relic <code>desc</code></td><td>18</td><td><code>relics.gd</code></td><td><b>ONE</b> —
+the document names 6 of the 18 in passing and describes none of them</td></tr>
+<tr><td>Glossary</td><td>93</td><td><code>data/glossary.json</code></td><td><b>ONE</b> — the
+document points at the system rather than copying entries (3 <code>short</code> lines appear
+verbatim, 0 <code>long</code>)</td></tr>
+</table>
+
+<h3>The finding that reframes the whole batch</h3>
+<p><b>Of the 120 draft ability rows in <code>master.html</code>, NOT ONE carries the code's
+sentence.</b> All 120 are independently authored paraphrases, and the document's copy is a
+<b>median 3.0x longer</b> than the card's (118 of 120 are longer; the widest is 5.7x).</p>
+<p><b>The two copies agree on the numbers and disagree on almost every word.</b> The drift is
+not factual — it is that one of them was written to be read on a card and the other was
+written to explain a decision.</p>
+<p>Blood Offering is the case to look at, because the batch brief quotes it as the calibration
+example for fluff — <b>and the quoted text is the document's, not the card's</b>:</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Copy</th><th>Text</th></tr>
+<tr><td><b><code>master.html</code></b></td><td><i>He loses 20% of his CURRENT health and gains
+40 Rage (Perfect: 60). Because it is a share of what is left rather than of his maximum, it can
+never take him below 1 — and it costs less the lower he is.</i></td></tr>
+<tr><td><b><code>classes.gd</code> (what the player reads)</b></td><td><i>Open a vein on
+purpose: lose 20% of your CURRENT health and gain 40 Rage. It can never take you below 1 — and
+the lower you are, the less it costs.</i></td></tr>
+<tr><td><b>the code</b> (<code>battle.gd:14240</code>)</td><td>20% of current HP, floored at 1;
+40 Rage, 60 on Perfect. <b>Both copies are true.</b></td></tr>
+</table>
+<p><b>The consequence for the rewrite batches: the fluff problem is smaller on the cards than
+the brief assumes, and larger in the document.</b> The card is already two sentences instead
+of three and does not lecture. It still breaks the person rule and still carries a rationale
+clause — but a rewrite pass calibrated against the document's verbosity would over-correct
+text that is already most of the way there.</p>
+
+<h2>BUCKET 1 — WRONG</h2>
+<p><i>A number or condition that does not match the code. <b>These are design questions, not
+typos.</b> A tooltip that misstates what a card does means decisions have been made from bad
+information, and what needs deciding is whether the code or the intent was right.</i></p>
+
+<h3>1.1 &mdash; "Iron Will" is the name of TWO different mechanics, and the document
+documents only one of them</h3>
+<p><b>Severity: highest in the batch.</b> Two unrelated things wear the chip name <b>Iron
+Will</b>:</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>&nbsp;</th><th>The ABILITY</th><th>The TALENT</th></tr>
+<tr><td>Status id</td><td><code>ironclad</code> (<code>battle.gd:295</code>)</td>
+<td><code>iron_will</code> (<code>battle.gd:1075</code>)</td></tr>
+<tr><td>Chip label</td><td><b>"Iron Will"</b></td><td><b>"Iron Will"</b></td></tr>
+<tr><td>What it does</td><td>Cannot be Stunned, Frozen, Dazed or Broken; takes <b>15%</b> less
+damage (<code>IRON_WILL_CUT_PCT</code>); the Break meter still fills, to 99 and no further.
+3 turns, 4 on Perfect.</td><td><b>-12% damage taken per rank, per debuff currently on the
+Warden</b> (<code>unit.gd:368</code>). Permanent chip, value follows the live debuff count.</td></tr>
+<tr><td>In <code>master.html</code> §4.6</td><td><b>ABSENT</b></td><td>Present — and it is the
+row that carries the name "Iron Will"</td></tr>
+</table>
+<p><b>Why this is bucket 1 and not a naming quibble:</b> the document's status table has one
+row called "Iron Will" and it describes the talent. A reader checking what Iron Will does gets
+the talent's answer for the ability's question. The two do not resemble each other — one is an
+immunity block with a flat cut, the other is a scaling mitigation with no immunities.</p>
+<p><b>The game already has a deliberate same-label pattern, and this is NOT it.</b>
+<code>berserk</code>/<code>berserk_risk</code> both read "Berserk" and
+<code>formless</code>/<code>formless_recoil</code> both read "Formless" — each pair is the
+upside and the price of ONE ability, distinguished by chip tag (<code>Bk</code> vs
+<code>Bk!</code>) and colour, and both halves are correct. Iron Will is two separate things
+that collided.</p>
+<p><b>The decision owed:</b> rename one of them, or accept the collision and give the document
+both rows. <b>A rename is an ability/talent change and is out of scope for a text batch</b> —
+which is exactly why this is reported rather than fixed.</p>
+
+<h3>1.2 &mdash; Battle Shout's registry tooltip hardcodes the lowest of three tiers</h3>
+<p><code>STATUS_INFO["battle_shout"]</code> (<code>battle.gd:72</code>) reads:</p>
+<blockquote><i>+8% damage, plus 1% per 20 blood buildup on the enemy party (at cast time).</i></blockquote>
+<p>The code (<code>battle.gd:16588</code>) picks the base from
+<code>battle_shout_node</code>:</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th><code>battle_shout_node</code></th><th>How it was obtained</th><th>Base</th><th>Turns</th></tr>
+<tr><td>0</td><td>earned from a pick, node never taken</td><td><b>8%</b></td><td>2</td></tr>
+<tr><td>1</td><td>the node granted it</td><td><b>12%</b></td><td>3</td></tr>
+<tr><td>2</td><td>the node upgraded an earned copy</td><td><b>18%</b></td><td>4</td></tr>
+</table>
+<p><b>The registry string is right for one of the three cases and wrong for the other two</b>,
+and it states no duration at all while the duration also moves (2/3/4).</p>
+<p><b>Mitigating, and it should be weighed:</b> the cast path calls
+<code>update_status</code> immediately after <code>_apply_status</code> and overwrites the chip
+with a live string that names the real total, the real base, the real turns and the real blood
+buildup. <b>So the wrong text is a fallback that the live path replaces in the same loop</b> —
+it is not believed to be reachable in normal play. It is reported because it is the only copy
+of Battle Shout's number that does not move with the node, and because a later batch that
+changes the tiers will not think to change it. <b><code>master.html</code> is CORRECT here</b>
+— its row lists all three tiers.</p>
+
+<h2>BUCKET 2 — INCOMPLETE</h2>
+<p><i>Accurate as far as it goes, but omits something the player needs.</i></p>
+
+<h3>2.1 &mdash; THE STRUCTURAL ONE: the draft card shows the description and nothing else</h3>
+<p><b>This is the largest single finding in the audit and it is one code path.</b>
+<code>map_screen.gd:1202</code> renders <code>ab.description</code> on the draft card and
+<b>nothing else</b> — no computed damage, no Break damage, no cost, no cooldown, no initiative,
+and <b>no Perfect</b>. Every other surface that shows a description adds the computed lines
+beneath it.</p>
+<p>The consequences compound:</p>
+<ul>
+<li><b>30 of the 66 damaging abilities never state their damage in the description</b>, because
+the tooltip computes it. On the draft card those 30 cards show no damage figure at all.
+<b>Ice Lance is the sharpest case</b>: <code>damage: 35</code> in the dict, and the card says
+only "+5% of Attack per Chilled stack on the target". On the draft screen it reads as a
+5%-per-stack ability, understating it by 35% of Attack.</li>
+<li><b>No card shows its Perfect bonus while being drafted.</b> All 190
+<code>perfect_text</code> strings are invisible on the one screen whose whole purpose is
+comparing cards.</li>
+<li><b>Aimed Shot's card is, in full:</b> <i>"A perfect line. Patient, precise, final."</i>
+Its dict is <code>damage: 45</code>, <code>cost: 20</code>, <code>cooldown: 1</code>,
+<code>perfect_text: "+20 Focus"</code> — <b>the hardest-hitting card in the Sharpshooter's
+pool, and its description states none of it.</b> On the draft card that is a blank card. It
+also spends its one sentence on the word "perfect", which is a reserved mechanic.</li>
+</ul>
+<p><b>This is a code gap, not a text gap</b>, and it cannot be closed by rewriting
+descriptions — writing the numbers into the prose would put arithmetic back on the mid-combat
+tooltip, which the standard forbids. <b>Owed to a later batch: the draft card should render
+the same computed block the blacksmith card already builds.</b></p>
+
+<h3>2.2 &mdash; 53 of 61 timed abilities never say what a second cast does</h3>
+<p>61 ability descriptions grant an effect "for N turns". <b>Eight say whether recasting
+refreshes, extends, stacks or replaces. Fifty-three are silent.</b> The brief's claim that this
+is "absent almost everywhere" is confirmed at <b>87%</b>.</p>
+
+<h3>2.3 &mdash; The status chips are consistently thinner than the document</h3>
+<p>Of 78 status rows matched between <code>STATUS_INFO</code> and
+<code>master.html</code> §4.6:</p>
+<ul>
+<li><b>41 rows: the document states a number the chip omits</b> — nearly always the
+<b>duration</b> (Decay "3 turns", Dazed "3 turns", Frostbite "2 turns", Bewitched "3 turns",
+High Guard "2 turns", Rallied, Stabilized...) or the <b>source</b> that applies it.</li>
+<li><b>0 rows: the chip states a number the document omits.</b></li>
+<li>2 rows differ in both directions: <b>Ruin</b> (chip omits the 40% lifesteal cap; document
+omits the every-10th-stack detonation) and <b>Iron Will</b> (bucket 1.1).</li>
+</ul>
+<p><b>The asymmetry is the finding.</b> The document is uniformly the more complete copy, so
+the chips are where the gaps are — and the chip is the only one a player reads mid-fight.
+Several chips are also vaguer than they need to be where the value is live and known:
+Shieldwall's chip says "bonus Block chance" where the document says "+25%", Elemental Weakness
+says "resistances reduced" where the document says "by 20%".</p>
+
+<h2>BUCKET 3 — PROSE ONLY</h2>
+<p><i>Correct and complete, just badly written or padded with rationale.</i></p>
+
+<h3>3.1 &mdash; Person: split in both directions, 130 of 204</h3>
+<p><b>86 ability descriptions use second person</b> ("you", "your"). <b>44 use third person</b>
+("he", "his", "her"). Some use both. <code>master.html</code> is uniformly third person, so
+the document and the card disagree on voice for most of the game. The standard's answer is
+neither: no pronouns.</p>
+
+<h3>3.2 &mdash; 97 of 204 carry a bare "N turns"</h3>
+<p>Nothing in the sentence distinguishes a duration from a cooldown. The tooltip prints its own
+<code>Cooldown: N turns</code> line underneath, so a description restating the cooldown is a
+second copy that can drift.</p>
+
+<h3>3.3 &mdash; <code>perfect_text</code> is one field in four shapes</h3>
+<p>190 strings: a bare value (<i>"+10 bonus Mana"</i>), an "instead" comparison
+(<b>107 of them</b> — <i>"60 Rage instead of 40"</i>), a full sentence (<i>"The debt pays 35% of
+maximum health instead of 25%"</i>), and compounds (<i>"+20% parry instead of +15%, and holds 6
+turns instead of 4"</i>). The rendered <b>label</b> is uniform because every surface supplies
+"Perfect: " itself — the inconsistency is entirely inside the field.</p>
+<p><b>Four abilities also state the Perfect condition inside the <code>description</code></b>
+— Deadfall, Pommel Strike, Aimed Shot, Snare Trap — so the tooltip says it twice.</p>
+
+<h3>3.4 &mdash; <code>passive_desc</code>: the known offender, now measured</h3>
+<p>The twelve blocks are the worst text in the game against the standard, and the measurement
+is exact. They render in an <b>autowrapping 400px label at font size 13</b>
+(<code>party_screen.gd:253</code>), whose budget is <b>61 characters</b> a line.
+<b>23 of their 67 authored lines are wider than that</b>, running to <b>71 characters</b>, so
+the hard breaks and the soft wrap fight and the block comes out ragged. Five specs are
+affected: <b>Arcanist, Holy, Inquisitor, Occultist, Beastmaster</b>.</p>
+<p><b>The Arcanist's is the single worst string in the game</b> and it is the exhibit for the
+no-arithmetic rule — correct to the decimal, and unreadable:</p>
+<blockquote><i>Runaway Resonance: damaging casts build stacks (2 on a crit) with NO MAXIMUM,
+and nothing removes them. The bonuses COMPOUND: at N stacks +1.5% x N(N+1)/2 damage and +0.75%
+x N(N+1)/2 damage taken, plus a flat +1% crit per stack. 5 stacks = +22%/+11%; 12 =
++117%/+59%.</i></blockquote>
+<p>It puts a <b>triangular-number formula in algebra</b> on the hero sheet, then works two
+examples. The stack count is known at display time, so the live value is computable and the
+formula does not need to be there at all.</p>
+<p><b>One code inconsistency found alongside it:</b>
+<code>spec_choice_screen.gd:126</code> flattens <code>\n</code> to a space for ability
+descriptions and <b>does not do the same for <code>passive_desc</code> on the very next
+line</b>, so the passive block hard-wraps inside a 298px column on that screen.</p>
+
+<h3>3.5 &mdash; Rationale on the card</h3>
+<p>The dominant fluff pattern, and it is heavier in <code>master.html</code> than in the code
+(§0). On the cards it shows up as a trailing clause explaining why the number is what it is —
+Blood Offering's "and the lower you are, the less it costs", Reckless Abandon's "and three
+turns with nothing left to cast". Both are true, neither is a rule, and both belong in the
+changelog.</p>
+<p>A second, subtler form: <b>flavor that carries the mechanics</b>. "Open a vein on purpose:"
+is the sentence's subject — remove the flavor and the sentence loses its verb. Flavor has to be
+removable, and across the corpus most of the opening clauses are not.</p>
+
+<h2>THE LENGTH CEILING — MEASURED, NOT GUESSED</h2>
+<p>Measured against the real theme font (<b>Open Sans SemiBold</b>) at the real sizes the
+screens set, over all 1,846 authored lines. The narrowest surface that shows a description is
+the <b>draft card, 258px at font size 11</b>.</p>
+<ul>
+<li><b>Every observed line of 44 characters or fewer fits</b> (widest measured 241px against a
+258px budget).</li>
+<li><b>45 is the first length that overflows</b> (263px).</li>
+<li><b>The ability corpus already holds it: 936 of 936 lines.</b> The existing hand-wrapping
+discipline is exactly right and needs no change.</li>
+</ul>
+<p>Everything that overflows is either a field with no authored breaks at all (talent and rune
+text, which autowrap correctly and are fine) or <code>passive_desc</code> (§3.4).</p>
+
+<h2>COVERAGE — WHAT WAS AND WAS NOT VERIFIED</h2>
+<p><i>Stated plainly, because an audit that overstates its own reach is worse than a narrow
+one.</i></p>
+<p><b>Mechanically checked, whole population:</b> all 204 ability descriptions against their
+own dicts (cooldown, cost, damage, heal, applied-status duration); all 120 document stat cells;
+all 65 runes against their payloads; all 1,846 lines against the measured ceiling; the full
+style sweep (person, bare turns, Perfect notation, keyword capitalisation, literal
+<code>\n</code>); all 78 matched status rows document-vs-code.</p>
+<p><b>Hand-read against <code>battle.gd</code>:</b> the status constants named in the headline
+table; Blood Offering, Blood Price, Battle Shout, Iron Will, Ice Lance, the Resonance curve,
+the Ruin lifesteal cap and its Gluttony/Soul Leech terms, the generic upgrade fallback behind
+the Rune of the Last Rites.</p>
+<p><b>NOT exhaustively verified:</b> <b>the 324 talent nodes against their runtime behaviour.</b>
+Talent payloads are mostly flag values (<code>ranks: 1</code>) whose magnitudes live in
+<code>battle.gd</code> and <code>unit.gd</code>, so 92 nodes state a number their own payload
+cannot produce — <b>this is expected and is not itself a finding</b>, but it means each of the
+92 needs a read of its own read-site to confirm. Also not exhaustively verified: the 93
+glossary entries against behaviour, and the enemy and event text. <b>Those three are the honest
+gap in this audit and are the obvious scope for a follow-up.</b></p>
+</body>
+</html>

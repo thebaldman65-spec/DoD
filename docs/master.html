@@ -1,11 +1,23 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-16 (Batch CI)</b></p>
+<p align="right"><b>Last updated: 2026-08-17 (Batch CJ)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
 changes lives in the changelog. Engine: Godot 4.7, all UI built in code.</i></p>
+<p><b>PLAYER-FACING TEXT IS GOVERNED BY <a href="text-standard.html">THE TEXT STANDARD</a>
+(<code>docs/text-standard.html</code>)</b> — how every ability, status, talent, rune and
+glossary string is written: the two tiers (arithmetic on the draft screen and in the glossary,
+never mid-combat), no design rationale on a card, and the consistency rules for person,
+ownership, Perfect notation, keywords, duration vs cooldown, stacking, and the measured
+44-character line ceiling. <b>Every batch writes its text to it.</b> Where this document and a
+description in the code disagree, <b>the code's field is authoritative and this document is
+corrected toward it</b>. What is currently non-conforming is catalogued in
+<a href="text-audit.html">the text audit</a> (<code>docs/text-audit.html</code>, Batch CJ),
+which is a report only — <b>note that the ability descriptions in this document are NOT the
+strings the player reads; they are a second, independently authored copy</b> (§0 of the
+audit).</p>
 
 <h2>1. Concept</h2>
 <p>A turn-based party roguelike. The world is being consumed by <b>the Decay</b>; the player

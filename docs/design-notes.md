@@ -4,6 +4,40 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The card and the document were never the same sentence (Batch CJ) — 2026-08-17
+
+The text standard exists because of one measurement, and it was not the one the batch set out
+to take. **Of the 120 draft ability rows in master.html, zero carry the string the code hands
+the player.** Not "most have drifted" — none were ever the same. Two people-shaped efforts wrote
+two descriptions of every ability, and the reason nobody noticed is that **they agree on all the
+numbers**. The drift is entirely in the prose, which is the kind that no consistency check
+catches and no bug report describes.
+
+That matters more than it first looks, because **the brief for this batch quoted the document as
+if it were the card.** The calibration example for "here is the fluff problem" was Blood
+Offering's master.html row — three sentences, the third explaining why the number was chosen.
+The card the player actually reads is two sentences and does not lecture. Had the rewrite passes
+been calibrated against the document, they would have been aimed at prose no player has seen,
+and they would have over-corrected text already most of the way to the target.
+
+**The general lesson is about which copy a standard is allowed to be calibrated from.** A design
+document that paraphrases rather than quotes is not a second copy of the text — it is a
+*description* of the text, and it drifts in the one direction documents always drift: longer, and
+toward explaining the decision. The standing rule that the code's field is authoritative already
+said which copy wins a disagreement. What it did not say, and now does, is that **the document
+cannot be used to judge how the game reads**, because it is not written in the game's voice and
+never was.
+
+The second thing worth recording is **why the "no literal `\n`" rule shipped with an exception
+instead of whole.** Written as briefed, it would have been correct about `passive_desc` and
+destructive everywhere else: nothing in the project overrides `make_custom_tooltip`, so Godot's
+default tooltip does not autowrap, and the hand-wrapping that looks like sloppy authoring is the
+only thing keeping a 322-character description from rendering as one line two thousand pixels
+wide. The measurement changed the rule rather than the rule surviving the measurement — and the
+44-character ceiling it produced turned out to be **exactly the discipline the ability corpus was
+already keeping, 936 lines out of 936**. A standard that had been guessed instead of measured
+would have picked a rounder number and quietly invalidated every card in the game.
+
 ## Two answers to one cruelty, and the discipline of not merging them (Batch CI) — 2026-08-16
 
 The Warrior nine close the draft, and the pair worth recording is **Anvil and Recompense** —

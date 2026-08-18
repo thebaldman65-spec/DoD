@@ -18,6 +18,39 @@ updated alongside `docs/changelog.html` (the living changelog). The original
   no vault lists, no "was/now/moved/reworked/renamed" notes, no decision
   dates — change history belongs in changelog.html alone.
 - Terminology: damage against the Break meter = "Break damage (BD)" everywhere.
+- **ALL PLAYER-FACING TEXT IS WRITTEN TO `docs/text-standard.html` (STANDING, SET AT BATCH CJ).
+  EVERY BATCH FROM CJ FORWARD, INCLUDING TUNING THAT COMES OUT OF PLAYTESTING.** Ability
+  `description` and `perfect_text`, `passive_desc`, status/chip text, talent nodes, runes,
+  relics, glossary, and master.html's tables. The load-bearing rules:
+  · **TWO TIERS. Draft screen and glossary MAY show percentages and formulas; EVERYWHERE ELSE,
+    ESPECIALLY MID-COMBAT, MAY NOT** — a real computed number where one is available at tooltip
+    time, otherwise plain language. **The player must never be asked to do math while choosing
+    an action.** The battle tooltip already computes damage/BD/cooldown/initiative/Perfect, so a
+    description restating them in arithmetic is a second copy of a number the renderer has.
+  · **NO DESIGN RATIONALE ON A CARD, EVER — it goes in `changelog.html`.** Flavor is welcome:
+    ONE short clause, mechanically empty, removable. If it could be mistaken for a rule, cut it.
+  · **No pronouns** ("Loses 20% of current health", not "he loses"/"you lose"). **Always name
+    whose percentage.** **`(Perfect: X)`, the value alone.** **Keywords capitalised — Break
+    matters most.** **Never a bare "3 turns"** (duration vs cooldown). **State what a second
+    cast does** whenever one is possible.
+  · **LINE CEILING 44 CHARACTERS, MEASURED not guessed** (Open Sans SemiBold at font 11 in the
+    258px draft card; 45 is where it overflows). **The ability corpus already holds it, 936/936
+    lines — do not "fix" it.**
+  · **`\n` IS LOAD-BEARING IN TOOLTIPS AND MUST NOT BE STRIPPED THERE.** Nothing overrides
+    `make_custom_tooltip`, so Godot's default tooltip does NOT autowrap — strip the breaks and a
+    322-char description renders ~2000px wide. The no-`\n` rule applies TO `passive_desc` (it
+    renders in an autowrapping 400px label, where 23 of its 67 lines overflow); removing them
+    from ability descriptions needs a custom tooltip FIRST, which is a code batch.
+  · **THE CODE'S FIELD IS AUTHORITATIVE — master.html is corrected toward it, never the reverse.**
+    **THE TWO ARE NOT THE SAME STRING: of 120 draft ability rows in master.html, ZERO carry the
+    code's sentence** (independently authored, median 3.0x longer). **Do not calibrate "how the
+    cards read" from master.html — it is text no player has ever seen.**
+  · `docs/text-audit.html` (Batch CJ) is the REPORT of what is currently non-conforming, in
+    three buckets. **Bucket 1 first: polishing the grammar on a wrong description makes it read
+    more confidently while staying wrong.** Its two bucket-1 items are OPEN DESIGN QUESTIONS,
+    not typos: **"Iron Will" is the chip name of TWO unrelated mechanics** (the `ironclad`
+    ability vs the `iron_will` talent — master.html documents only the talent), and **Battle
+    Shout's registry tooltip hardcodes 8% when the code picks 8/12/18 by node**.
 - `addendum.html` is RETIRED (frozen history; do not update it). **Batch BZ MOVED IT OUT OF THE
   REPO** to `/Users/zipples/Documents/DoD-archive/addendum.html`; it is no longer `docs/addendum.html`.
 - User drops new assets in `../imported files/` — always check there.

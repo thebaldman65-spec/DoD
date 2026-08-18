@@ -13,6 +13,115 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-17 &mdash; Batch CJ: THE TEXT STANDARD AND THE FULL TEXT AUDIT</h2>
+<p><i>Two documents and <b>NO REWRITES</b>. No description edited, no ability changed, no
+magnitude moved, no save version moved (still v10). <b>Not one line of game code was
+touched</b> &mdash; the batch ships <code>docs/text-standard.html</code> (the rules all
+player-facing text is written to, now a standing rule in CLAUDE.md) and
+<code>docs/text-audit.html</code> (what currently breaks them, in three buckets, report only).
+The rewrite passes come after, governed by the first and scoped by the second.</i></p>
+
+<h3>&sect;0 &mdash; THE COPY COUNT, AND THE FINDING THAT REFRAMED THE BATCH</h3>
+<p><b>774 authored player-facing strings, 1,846 authored lines</b>, extracted rather than
+sampled: 204 ability descriptions, 190 <code>perfect_text</code>, 12 <code>passive_desc</code>,
+4 class passives, 147 statuses, 324 talent nodes, 65 runes, 18 relics, 93 glossary entries.</p>
+<p><b>Ability descriptions, passives and statuses are written TWICE</b> &mdash; once in the code
+and once in <code>master.html</code>. Runes, relics and the glossary are written once.</p>
+<p><b>AND THE TWO COPIES SHARE NO PROSE. Of the 120 draft ability rows in master.html, ZERO
+carry the code's sentence</b> &mdash; all 120 are independently authored paraphrases, and the
+document's copy is a <b>median 3.0x longer</b> (118 of 120 longer, widest 5.7x). <b>The brief's
+own calibration example was quoted from the document, not from the card.</b> Blood Offering
+reads one way in master.html and a different, shorter way in <code>classes.gd</code>, and
+<b>both are true</b> &mdash; the code does 20% of current HP floored at 1, 40 Rage / 60 Perfect.
+The consequence, written into the standard: <b>the fluff problem is smaller on the cards than
+assumed and larger in the document</b>, and a rewrite calibrated against master.html's
+verbosity would over-correct text already most of the way there.</p>
+
+<h3>&sect;1 &mdash; THE STANDARD (<code>docs/text-standard.html</code>, linked from master.html)</h3>
+<p>Two tiers &mdash; <b>draft screen and glossary may show arithmetic, everywhere else may
+not</b>; no design rationale on a card, ever; flavor allowed as one short removable clause;
+no pronouns; always name whose percentage; <code>(Perfect: X)</code> as the value alone;
+keywords capitalised (Break above all); never a bare "3 turns"; state what a second cast does.
+<b>A per-surface table settles which tier a string is in</b>, because one
+<code>description</code> field is rendered by five screens and only two of them are the draft.</p>
+<p><b>THE LENGTH CEILING IS 44 CHARACTERS AND IT WAS MEASURED, NOT GUESSED.</b> A throwaway
+Godot instrument asked the real theme font (Open Sans SemiBold) at the real sizes the screens
+set: the narrowest surface is the <b>draft card at 258px, font 11</b>; every observed line of
+&le;44 chars fits (widest 241px), and <b>45 is where it overflows</b> (263px). <b>The ability
+corpus already holds it &mdash; 936 of 936 lines.</b> The existing hand-wrap discipline is
+correct and the ceiling records it rather than changing it.</p>
+<p><b>THE "NO LITERAL <code>\n</code>" RULE SHIPPED WITH A MEASURED EXCEPTION, BECAUSE APPLYING
+IT BLINDLY WOULD BREAK THE BATTLE TOOLTIP.</b> Nothing in the project overrides
+<code>make_custom_tooltip</code>, so every tooltip is Godot's default &mdash; <b>which does not
+autowrap</b>. The authored breaks are load-bearing there; strip them and a 322-character
+description renders one line ~2000px wide. <b>The rule therefore binds
+<code>passive_desc</code> NOW</b> (it renders in an autowrapping 400px label whose budget is 61
+characters, and <b>23 of its 67 lines run to 71</b> &mdash; Arcanist, Holy, Inquisitor,
+Occultist, Beastmaster), and binds ability descriptions only once a custom autowrapping tooltip
+exists, which is a code batch.</p>
+
+<h3>&sect;2 &mdash; THE AUDIT (<code>docs/text-audit.html</code>, report only)</h3>
+<p><b>THE HEADLINE IS THAT THE NUMBERS ARE SOUND.</b> Every mechanically checkable relationship
+came back clean: <b>120/120</b> document stat cells (cost, initiative, cooldown) match the
+ability dicts; <b>0</b> damage-magnitude disagreements; <b>14/14</b> applied status durations
+match their prose; all <b>65</b> rune descriptions trace to their payloads; the hand-read status
+constants are correct (Slow 0.75, Chilled at 1/2/3/4, Burn 6, Poison 3/stack, Decay 10 BD, Ruin
+cap 0.40); and the Arcanist's Resonance formula is right to the decimal. <b>That result is what
+makes the rewrites a prose job rather than a repair job.</b></p>
+<p><b>BUCKET 1 &mdash; WRONG: two, and both are design questions rather than typos.</b></p>
+<p><b>1.1 &mdash; "IRON WILL" IS THE CHIP NAME OF TWO UNRELATED MECHANICS.</b> The
+<code>ironclad</code> status (from the ABILITY) reads "Iron Will" and means no Stun/Freeze/Daze/
+Break plus 15% less damage with the Break meter capped at 99. The <code>iron_will</code> status
+(from the TALENT) also reads "Iron Will" and means &minus;12% damage taken per rank per debuff
+on the Warden. <b>master.html's status table has one row called "Iron Will" and it describes the
+talent</b>, so a reader checking the ability gets the talent's answer. <b>The game already has a
+deliberate same-label pattern and this is not it</b> &mdash; berserk/berserk_risk and
+formless/formless_recoil are the upside and the price of ONE ability, tagged Bk/Bk! and Fm/Fm!.
+The fix is a rename, which is an ability change and out of scope for a text batch.</p>
+<p><b>1.2 &mdash; BATTLE SHOUT'S REGISTRY TOOLTIP HARDCODES THE LOWEST OF THREE TIERS.</b> It
+says "+8% damage"; the code picks <b>8 / 12 / 18</b> (and <b>2 / 3 / 4</b> turns) from
+<code>battle_shout_node</code>. <b>Reported with its mitigation stated</b>: the cast path
+overwrites the chip with a live string in the same loop, so the wrong text is a fallback not
+believed reachable in play &mdash; but it is the only copy of the number that does not move with
+the node. <b>master.html is CORRECT here and lists all three tiers.</b></p>
+<p><b>BUCKET 2 &mdash; INCOMPLETE. The largest single finding is one code path:</b> the draft
+card renders <code>description</code> and <b>nothing else</b> &mdash; no damage, no BD, no cost,
+no cooldown, <b>no Perfect</b>. So <b>30 of 66 damaging abilities show no damage figure while
+being drafted</b> (Ice Lance the sharpest: <code>damage: 35</code> in the dict, and the card
+states only "+5% of Attack per Chilled stack"), <b>all 190 Perfect bonuses are invisible on the
+one screen whose purpose is comparing cards</b>, and Aimed Shot &mdash; <code>damage: 45</code>,
+the hardest-hitting card in its pool &mdash; draws as <i>"A perfect line. Patient, precise,
+final."</i> and nothing else. <b>This cannot be fixed by rewriting prose</b> without putting
+arithmetic back on the mid-combat tooltip; the draft card wants the computed block the
+blacksmith card already builds. Also: <b>53 of 61 timed abilities never say what a second cast
+does</b> (87%, confirming the brief), and of 78 matched status rows <b>41 have a number in the
+document that the chip omits</b> &mdash; usually the duration &mdash; against <b>0</b> the other
+way.</p>
+<p><b>BUCKET 3 &mdash; PROSE ONLY.</b> Person is split in both directions (<b>86</b> second
+person, <b>44</b> third, of 204); <b>97</b> carry a bare "N turns"; <code>perfect_text</code> is
+one field in four shapes (107 of 190 use "instead of", restating a base the line above already
+gives) and <b>four abilities state the Perfect condition in the description as well</b>, so the
+tooltip says it twice. <b>The Arcanist's <code>passive_desc</code> is the worst string in the
+game</b> &mdash; correct to the decimal, and it puts a triangular-number formula in algebra
+(<code>N(N+1)/2</code>) on the hero sheet with two worked examples, when the stack count is
+known at display time and the live value is computable.</p>
+<p><b>ONE CODE INCONSISTENCY FOUND IN PASSING, REPORTED NOT FIXED:</b>
+<code>spec_choice_screen.gd</code> flattens <code>\n</code> to a space for ability descriptions
+and <b>does not do the same for <code>passive_desc</code> on the very next line</b>, so the
+passive block hard-wraps inside a 298px column there.</p>
+<p><b>COVERAGE IS STATED IN THE REPORT RATHER THAN IMPLIED.</b> Whole-population mechanical
+checks cover all 204 abilities, 120 document rows, 65 runes, 78 status rows and all 1,846 lines.
+<b>NOT exhaustively verified: the 324 talent nodes against runtime behaviour</b> (their payloads
+are mostly flags whose magnitudes live in battle.gd, so 92 state a number their own payload
+cannot produce &mdash; expected, but each needs its own read-site checked), the 93 glossary
+entries, and enemy/event text. <b>That is the honest gap and the obvious follow-up scope.</b></p>
+
+<h3>&sect;3 &mdash; VERIFICATION</h3>
+<p><b>The content-batch floor (standing since CG): it parses, it runs, a live battle throws
+nothing.</b> No suite shipped. <b>No game code was modified in this batch</b>, so the surface at
+risk was documentation only; the parse gate and a live battle were run regardless and are clean.
+The measuring instrument was a throwaway and was deleted after it reported.</p>
+
 <h2>2026-08-16 &mdash; Batch CI: tranche 3, the WARRIOR nine (THE DRAFT IS COMPLETE)</h2>
 <p><i>Nine spec draft abilities, three per Warrior spec. The Warrior pools go 5 &rarr; 8, and the
 draft goes 111 &rarr; <b>120 of 120</b>. <b>TRANCHE 3 CLOSES AND THE ABILITY DRAFT IS FINISHED</b>
