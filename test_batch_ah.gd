@@ -366,18 +366,31 @@ func _test_perfects() -> void:
 		"Hack and Slash": "Bleed lands on every strike.",
 		"Blizzard": "Two stacks of Chilled on every enemy.",
 		"Pommel Strike": "The Stun lands even on a boss.",
-		"Snare Trap": "The Stun lands even on a boss.",
 		"Firestorm": "Every enemy takes an even share.",
 		"Arcane Barrage": "No two bolts strike the same enemy.",
 		"Triple Shot": "One arrow is a guaranteed critical.",
-		# RE-POINTED BY BATCH BD, with the reason in the file: the perfect no
-		# longer names the victim. That clause was exactly what made Deadfall a
-		# copy of Snare Trap, so it is DELETED rather than reworded — but the
-		# ability still runs a check (asserted below) and its perfect still
-		# buys reliability rather than magnitude, which is what this battery is
-		# really about. test_batch_bd owns the re-spec itself.
-		"Deadfall": "A fourth spring.",
 	}
+	# INVERTED BY BATCH CP §1, NOT DELETED — SNARE TRAP AND DEADFALL LOST THEIR
+	# BARS AT CN §2, so CN §3 correctly CLEARED both Perfects and FOLDED each
+	# bonus into the base effect. Asserting the old strings was asserting
+	# pre-CN behaviour, and it had been red since CN because CG-CO shipped
+	# implement-only and nobody ran the battery.
+	#
+	# THE FOLD IS WHAT IS ASSERTED NOW, because that is the property worth
+	# keeping: Deadfall's "fourth spring" is not gone, it is UNCONDITIONAL
+	# (`DEADFALL_CHARGES + 1` at the cast site), so a later batch that quietly
+	# took the fourth spring away would trip here rather than looking like CN.
+	var folded := ["Snare Trap", "Deadfall"]
+	for name in folded:
+		var fab := _find_anywhere(name)
+		ok(fab != null, "%s still exists" % name)
+		if fab == null:
+			continue
+		ok(not fab.runs_skill_check(),
+			"%s runs NO check after CN §2" % name)
+		ok(fab.perfect_text == "" and fab.perfect_id == "",
+			"...so its Perfect is CLEARED rather than advertising a dead bonus (%s)"
+				% name)
 	for name in expected:
 		var ab := _find_anywhere(name)
 		ok(ab != null, "%s still exists" % name)
@@ -389,11 +402,19 @@ func _test_perfects() -> void:
 		ok(ab.perfect_id == "", "%s carries no magnitude perfect_id" % name)
 		if ab.multi_hits > 0 or ab.random_hits > 0:
 			ok(not ab.perfect_extra_hit, "%s gains no extra hit on a perfect" % name)
-	# Deadfall had to GAIN a skill check to have a perfect at all, and it
-	# KEEPS it after Batch BD — the perfect buys a fourth spring now.
+	# BATCH CP §1 — THIS CHECK HAD STOPPED ASKING ITS QUESTION AND WAS PASSING
+	# FOR THE WRONG REASON, which is the harder of the two faults to see. It
+	# read `not deadfall.no_skill_check` — the EXPLICIT OPT-OUT FLAG — and that
+	# flag is still false, so it went on printing a pass while CN's parameteric
+	# criterion had already taken Deadfall's bar away. `no_skill_check` has not
+	# been the answer to "does this run a check" since CN §1;
+	# `runs_skill_check()` is. It asserts the FOLD instead, above, and the flag
+	# is pinned here for what it actually still means.
 	var deadfall := _find_anywhere("Deadfall")
 	ok(deadfall != null and not deadfall.no_skill_check,
-		"Deadfall now runs a skill check")
+		"Deadfall never took the EXPLICIT opt-out (`no_skill_check` is still false)")
+	ok(deadfall != null and not deadfall.runs_skill_check(),
+		"...and the PARAMETERIC criterion is what removed its bar (CN §2)")
 	# Triple Shot fires the three arrows its name and text always promised.
 	var triple := _find_anywhere("Triple Shot")
 	ok(triple != null and triple.multi_hits == 3, "Triple Shot fires three arrows")
@@ -433,8 +454,21 @@ func _test_doc_matches_code() -> void:
 	# The stamp moves with every batch that touches the doc; what this line
 	# is really guarding is that the doc was touched AT ALL when the code
 	# below it changed. Bump it, do not delete it.
-	ok(doc.contains("Last updated: 2026-08-17 (Batch CM)"),
-		"master.html carries the current batch's stamp")
+	# BATCH CP §1 — RE-POINTED, AND THE PATTERN IS THE FINDING RATHER THAN THE
+	# BUMP. This was a LITERAL stamp, so it passed for exactly one batch and had
+	# to be hand-bumped forever; CJ's re-stamp turned five such checks red at
+	# once and CK repaired those five while leaving these three. It asks the
+	# question the comment above always said it was asking — was the doc touched
+	# AT ALL — as a comparison against this suite's OWN batch code, so no bump is
+	# ever owed again. (Two-letter batch codes sort lexically; a three-letter
+	# code needs one more line.)
+	var _stamp_at := doc.find("Last updated:")
+	ok(_stamp_at >= 0, "master.html carries a Last-updated stamp")
+	var _stamp := doc.substr(_stamp_at, 60)
+	var _code_at := _stamp.find("(Batch ")
+	var _stamped := _stamp.substr(_code_at + 7, 2) if _code_at >= 0 else ""
+	ok(_stamped >= "AH",
+		"...stamped no older than this suite's own batch (reads '%s')" % _stamped)
 	for spec in Classes.SPEC_POOLS:
 		var listed: String = ", ".join(Classes.SPEC_POOLS[spec])
 		ok(doc.contains(listed),

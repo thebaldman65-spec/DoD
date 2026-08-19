@@ -4896,6 +4896,14 @@ func _eff_cost(u: BattleUnit, ab: Ability, target: BattleUnit = null) -> int:
 # overwrites the standing buff downward. All three are outside this batch's
 # scope because their payload is more than the status, so the refusal cannot
 # reach them and this batch does not pretend to fix them.
+#
+# **BATCH CP §0 CLOSED IT** — not by widening the refusal (the scope limit
+# above was right: those three deliver a second payload and must still cast)
+# but by CLAMPING the three call sites. Each reads `status_power` before
+# `_apply_status` and writes the chip only when the new value is at least the
+# standing one. `update_status` ITSELF IS DELIBERATELY NOT CLAMPED — see the
+# call-site census in CP's changelog entry for why a global max would be wrong
+# at the counter sites.
 
 # THE QUALIFYING SET: 58 abilities whose whole payload is a status application.
 # Membership is asserted against the live corpus by `check_co.gd`.
@@ -15259,10 +15267,18 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				# WON, so a wrong figure in the apply could not be observed at all.
 				# Found by this batch's own negative control; a local is the fix.
 				var es_cut := es_n * EYE_STORM_CUT_PCT
+				# BATCH CP §0 — THE CLAMP, three of three. See Battle Shout for
+				# the rule. This one is the sharpest of the three because the
+				# cut is read off the BOARD: casting into a field of two after
+				# casting into a field of five is an ordinary tactical
+				# sequence, not a misplay, and it used to cost him 3/5 of his
+				# standing mitigation. The taunts above land either way.
+				var es_had := attacker.status_power("eye_storm")
 				_apply_status(attacker, "eye_storm", es_turns + 1, es_cut)
-				attacker.update_status("eye_storm", "-%d%%" % es_cut,
-					"Eye of the Storm: %d enemies taunted,\nso he takes %d%% less damage while\nthe storm holds." % [
-						es_n, es_cut], es_cut)
+				if es_cut >= es_had:
+					attacker.update_status("eye_storm", "-%d%%" % es_cut,
+						"Eye of the Storm: %d enemies taunted,\nso he takes %d%% less damage while\nthe storm holds." % [
+							es_n, es_cut], es_cut)
 			_sfx("break", -7.0, 0.7)
 			attacker.float_text("EYE OF THE STORM", Color(0.85, 0.80, 0.95), true)
 			_message("%s takes the whole field!" % attacker.unit_name)
@@ -17198,9 +17214,22 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			for h in heroes:
 				if h.dead:
 					continue
+				# BATCH CP §0 — THE CLAMP, one of three. `_apply_status` MAXES
+				# power (via `add_status`); the `update_status` under it
+				# ASSIGNS, so a weaker shout used to drag the standing one
+				# DOWN — worse than the waste CO was written to refuse. Read
+				# what stands FIRST and write the chip only when this shout is
+				# at least as strong. `status_power` returns -1 when nothing
+				# stands, so a fresh shout always writes.
+				#
+				# THE CAST STILL PROCEEDS AND STILL PAYS: the +5 Rage below is
+				# outside this branch, which is exactly why CO's refusal could
+				# not reach this card and why the clamp is here instead.
+				var shout_had: int = h.status_power("battle_shout")
 				_apply_status(h, "battle_shout", shout_turns, shout_pct)
-				h.update_status("battle_shout", "+%d%%" % shout_pct, shout_desc,
-					shout_pct)
+				if shout_pct >= shout_had:
+					h.update_status("battle_shout", "+%d%%" % shout_pct,
+						shout_desc, shout_pct)
 				shout_n += 1
 			attacker.resource = mini(attacker.resource + 5, attacker.max_resource)
 			attacker.float_text("+5 Rage", Color(1.0, 0.5, 0.4))
@@ -17716,10 +17745,17 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			attacker.resource = mini(attacker.resource + st_mana, attacker.max_resource)
 			var st_dr := 10 * st_stacks
 			_sfx("heal", -7.0, 0.9)
+			# BATCH CP §0 — THE CLAMP, two of three. See Battle Shout for the
+			# rule. Venting two stacks after venting five must not replace a
+			# -50% ward with a -20% one; the Mana and the 5% heal below are
+			# paid either way, which is why the ward is the only thing this
+			# guard protects.
+			var st_had := attacker.status_power("stabilized")
 			_apply_status(attacker, "stabilized", 2, st_dr)
-			attacker.update_status("stabilized", "-%d%%" % st_dr,
-				"Stabilized: takes %d%% less damage\n(10%% per Resonance stack consumed)." % st_dr,
-				st_dr)
+			if st_dr >= st_had:
+				attacker.update_status("stabilized", "-%d%%" % st_dr,
+					"Stabilized: takes %d%% less damage\n(10%% per Resonance stack consumed)." % st_dr,
+					st_dr)
 			attacker.float_text("+%d Mana" % st_mana, Color(0.5, 0.7, 1.0))
 			var st_heal := maxi(int(round(attacker.max_hp * 0.05)), 1)
 			attacker.heal_amount(st_heal)

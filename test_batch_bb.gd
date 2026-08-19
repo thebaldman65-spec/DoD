@@ -813,8 +813,21 @@ func _docs() -> void:
 	# is the canonical one and moves with every batch that touches the doc. What
 	# it is really guarding is that the doc was touched AT ALL. Bump it, do not
 	# delete it.
-	ok(doc.contains("Last updated: 2026-08-17 (Batch CM)"),
-		"§7: master.html carries the current batch's stamp")
+	# BATCH CP §1 — RE-POINTED, AND THE PATTERN IS THE FINDING RATHER THAN THE
+	# BUMP. This was a LITERAL stamp, so it passed for exactly one batch and had
+	# to be hand-bumped forever; CJ's re-stamp turned five such checks red at
+	# once and CK repaired those five while leaving these three. It asks the
+	# question the comment above always said it was asking — was the doc touched
+	# AT ALL — as a comparison against this suite's OWN batch code, so no bump is
+	# ever owed again. (Two-letter batch codes sort lexically; a three-letter
+	# code needs one more line.)
+	var _stamp_at := doc.find("Last updated:")
+	ok(_stamp_at >= 0, "master.html carries a Last-updated stamp")
+	var _stamp := doc.substr(_stamp_at, 60)
+	var _code_at := _stamp.find("(Batch ")
+	var _stamped := _stamp.substr(_code_at + 7, 2) if _code_at >= 0 else ""
+	ok(_stamped >= "BB",
+		"...stamped no older than this suite's own batch (reads '%s')" % _stamped)
 	ok(doc.contains("Rot"), "§7: §3a's modifier table has Rot back")
 	# The pool tables are verbatim — test_batch_ah asserts them too, so this is
 	# the early warning rather than the only guard.

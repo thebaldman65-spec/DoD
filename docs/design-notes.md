@@ -3896,3 +3896,56 @@ while carrying the flag that suppresses it. Neither would have failed a parse, a
 battle. **The suites that pay for themselves are the ones that assert a PROPERTY of every entry
 rather than facts about particular entries** — a per-entry loop written three tranches ago is what
 caught a card authored today.
+
+## Batch CP — the clamp, and why the verification was the larger half
+
+§0 is three lines in three places, and it is the smallest part of the batch. The reason it needed
+doing is that CO's refusal was scoped correctly and therefore could not reach these three: an
+ability that also converts a resource must still cast when its buff would not improve, so the
+refusal stops at the door and the downgrade happens inside. Separating "this cast is pointless"
+from "this cast is harmful" is what let both rules be right — CO refuses the first, CP clamps the
+second, and neither had to widen into the other.
+
+The census matters more than the clamp. The obvious tidy-up here is to clamp `update_status`
+itself, once, and be done; the census exists to say why that would be a bug rather than a
+simplification. Two sites read the standing power, subtract one, and write it back — they are
+countdowns wearing the same function — and a global max would make Held Breath and Hunter's
+Instinct unspendable forever, silently. That is the shape of nearly every fault this project keeps
+finding: not a wrong number, but a right number read by something that wanted a different question
+answered.
+
+The rest of the batch is about instruments, and the finding is uncomfortable in a useful way. The
+battery had not been run since CE. In that gap CN folded 105 orphaned Perfect bonuses into base
+effects — a good change, deliberately made, well documented — and roughly seventy assertions across
+seventeen suites have been asserting the pre-fold numbers ever since. Nothing failed loudly,
+because nothing ran. CD had already built the one instrument that can see another suite failing,
+and it did see it; what was missing was anybody running the battery CD lives in. The lesson is not
+"write better tests", it is that a test suite is a claim about the present tense, and a batch that
+ships without running them is a batch that has stopped making that claim.
+
+Two of the four instrument faults were the harness rather than the code, and both were mine to
+create. A hung suite takes the whole battery with it, so the counts after it go missing rather than
+wrong — and a count-diffing rule cannot see a count that was never printed. Worse, killing the hung
+suite's Godot does not kill the battery that spawned it, so a second invocation ran alongside the
+first into one log directory and every number became whichever process finished last. Nothing
+errored. That is the same failure as a check that can only pass, arriving through the reporting
+layer instead of the assertion layer, and it is why the watchdog and the lock are in the script
+rather than in a note.
+
+The hint deadlock is recorded as a near miss worth keeping. Both orientation cards await a signal
+only a real player emits, behind a guard that every hand-driven suite satisfies; CM answered that
+trap by setting two Profile flags inside the one file it had just written, which fixed CM's own gate
+and left four older suites to hang. A flag somebody has to remember to set is not a guard. The fix
+was written and then reverted, because it did not unhang the four suites it was aimed at, and
+shipping a product change that does not fix what it aimed at — in a batch whose §0 is the only
+sanctioned code change — is the scope creep that makes a later failure impossible to attribute.
+Reverting it cost nothing and keeps the batch readable.
+
+Finally, two of the brief's own numbers were wrong and both corrections came from measuring rather
+than arguing. The literal-digit rule is at 89 sites, not two hundred, and most of them are prose
+that was never a resolved value — so CL's decision to report rather than assert was right, and the
+honest form is a baseline that catches the next one instead of a gate that fails against correct
+text today. And the Perfect biconditional is not a biconditional: the half that is project law
+holds at zero violations, and the converse has been false since long before the batch that
+supposedly caused it. Naming the five exceptions is worth more than enforcing a rule the corpus
+never followed.

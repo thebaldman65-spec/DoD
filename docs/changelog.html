@@ -13,6 +13,252 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-18 &mdash; Batch CP: THE CLAMP, AND THE FIRST DEDICATED TEST BATCH</h2>
+<p><i>&sect;0 clamps three call sites where a weaker recast was dragging a standing buff
+<b>downward</b> &mdash; worse than the waste CO was written to fix. Everything after it is
+verification, and the verification is the larger half: <b>the battery had not been run since
+Batch CE</b>, and running it found that <b>Batch CN's fold of 105 orphaned Perfects into base
+effects left roughly seventy assertions across seventeen suites pinning pre-CN magnitudes</b>,
+plus <b>four suites that hang outright</b>. No game magnitude moves outside &sect;0. Save
+version did not move (still v10).</i></p>
+
+<h3>&sect;0 &mdash; THE CLAMP</h3>
+<p><code>update_status</code> <b>ASSIGNS</b> where <code>add_status</code> <b>MAXES</b>. On
+<b>Battle Shout</b>, <b>Stabilize</b> and <b>Eye of the Storm</b> the power handed to
+<code>update_status</code> is computed from live state, so a weaker recast overwrote the standing
+value instead of merely failing to improve it. All three carry a second payload, so CO's scope
+limit correctly kept them out of the refusal &mdash; the downgrade is separable from the
+conversion, and only the downgrade was the harm.</p>
+<p>Each site now reads <code>status_power</code> <b>BEFORE</b> <code>_apply_status</code> and
+writes the chip only when the new value is at least as strong. <code>status_power</code> returns
+<code>-1</code> when nothing stands, so a fresh cast always writes. <b>The cast still proceeds and
+still pays</b> &mdash; Battle Shout's +5 Rage, Stabilize's Mana and 5% heal, and Eye of the
+Storm's taunts are all outside the guarded branch, which is exactly why the refusal could not
+reach these three and why the fix belongs at the call site.</p>
+<p><b>THE NEGATIVE CONTROL IS THE EVIDENCE, AND IT SHOWS THE BUG RATHER THAN ARGUING FOR IT.</b>
+With all three clamps removed, <code>test_batch_cp</code> trips <b>six</b> checks &mdash; three
+at the source and three live, reading <b>eye_storm 50 &rarr; 24</b> and <b>stabilized 70 &rarr;
+10</b>. <code>battle.gd</code> came back byte-identical by hash afterwards.</p>
+
+<h3>&sect;0 &mdash; THE CALL-SITE CENSUS CO WAS ASKED FOR AND NEVER REPORTED</h3>
+<p><b>69 call sites</b> (67 in <code>battle.gd</code>, 2 in <code>unit.gd</code>). <b>42 pass a
+power argument; 27 do not</b> &mdash; power defaults to <code>-1</code> and is only written when
+<code>power &gt;= 0</code>, so at those 27 a global max would be a no-op.</p>
+<p><b>AND THE CENSUS ANSWERS THE QUESTION IT EXISTS FOR: <code>update_status</code> MUST NOT BE
+CLAMPED GLOBALLY. Two sites settle it on their own.</b></p>
+<pre>battle.gd:10510   held_breath   var hb_left := attacker.status_power("held_breath") - 1
+battle.gd:10553   instinct      var hi_left := attacker.status_power("instinct") - 1</pre>
+<p>Both <b>read the standing power, subtract one, and write it back</b> &mdash; they are
+countdowns. A global <code>maxi(s.power, power)</code> would freeze both at their opening value,
+so Held Breath and Hunter's Instinct would never be spent. <b>Nothing would crash and nothing
+would log.</b> Six more banks decrement through the same door and would break the same way:
+<code>mirror</code>, <code>arrows</code>, <code>feint_guard</code>, <code>berserk</code>,
+<code>deadfall</code> and <code>loyalty</code>.</p>
+<p><b>THE SHAPE, MEASURED: 29 SITES CALL <code>_apply_status</code> AND THEN
+<code>update_status</code> ON THE SAME STATUS</b> &mdash; that is the pattern that can downgrade.
+Of the 29: <b>11</b> pass a constant or a talent-rank product and cannot fall for one caster;
+<b>10</b> pass <code>0</code> or no power at all; <b>3</b> are the ones clamped here; <b>1</b>
+(<code>shield_charges</code>) reads the held value and adds, so Interpose can only grow;
+<b>1</b> (<code>spite</code>) passes a <i>cap</i> as the power while its chip text carries the
+live figure, so a naive &ldquo;never write a smaller number&rdquo; rule would be <b>wrong</b>
+there.</p>
+<p><b>REPORTED, NOT FIXED &mdash; TWO MORE SITES HAVE THE IDENTICAL DEFECT AND &sect;0's SCOPE
+DID NOT NAME THEM.</b> <b><code>blood_debt</code></b> (battle.gd:9599) passes 35 on a perfect
+cast and 25 otherwise, so re-marking the same enemy with a non-perfect Blood Debt drops the
+standing share; the site's own comment says the power exists so the bleedout site need not
+re-derive whether the cast was perfect, which is precisely the value a weaker recast overwrites.
+<b><code>reckless_abandon</code></b> (battle.gd:15006) scales with Rage spent and the cast
+<i>zeroes the Rage bar</i>, so a second cast inside its own window is necessarily cheaper and
+lands smaller &mdash; CM gates it below one full step, not below the standing value. Both take
+the same three-line clamp. <b>Not applied here</b>, because widening a fix past its brief is how
+a batch stops being attributable.</p>
+
+<h3>&sect;1 &mdash; THE INSTRUMENTS, AUDITED BEFORE BEING TRUSTED</h3>
+<p><b>check_parse IS NEGATIVE-CONTROLLED AND THE CN REPAIR IS REAL.</b> With a deliberate syntax
+error appended to <code>classes.gd</code> the gate exits <b>1</b>, prints <b><code>check_parse:
+16 failures</code></b>, names <code>PARSE FAILED: res://scripts/classes.gd</code> explicitly, and
+the stderr grep reads <b>127</b>. Restored byte-identical; back to 0 and 0. <b>An instrument
+repaired without a control is an instrument nobody has tested &mdash; this one is tested now.</b>
+The cascade to 16 files is honest: everything that depends on <code>classes.gd</code> genuinely
+cannot instantiate.</p>
+<p><b>FOUR SUITES HANG, AND THE BATTERY COULD NOT SEE IT BECAUSE A HANG HAS NO COUNT.</b>
+<code>test_batch_al</code>, <code>bp</code>, <code>br</code> and <code>bw</code> stop producing
+output and sit at roughly zero CPU indefinitely &mdash; <code>bp</code> was held for <b>ten
+minutes</b> with <b>two lines</b> of output. <b>REPRODUCED ON UNMODIFIED HEAD</b>, so it is not
+this batch's doing. Two consequences worth separating: a hung suite takes the <i>whole battery</i>
+with it, so every later count is <b>missing rather than wrong</b> &mdash; the one failure mode a
+count-diffing rule cannot catch; and because Godot buffers stdout when not a TTY, a killed suite
+loses its buffer and reads as a suite that printed nothing.</p>
+<p><b>A LATENT DEADLOCK WAS FOUND WHILE CHASING IT, IS REPORTED, AND WAS DELIBERATELY NOT
+SHIPPED.</b> Both skill-check orientation cards <code>await _hint_done</code> &mdash; a signal
+only a real click or key press emits &mdash; behind a guard of
+<code>not sim and not autoplay and Run.active and not Run.sim_run</code>. Every hand-driven suite
+satisfies all four, and every one redirects <code>Profile</code> to a scratch file so the
+&ldquo;taught&rdquo; flag is always unset. <b><code>check_cm_live.gd</code> sets BOTH flags by
+hand</b>, which is CM knowing about the trap and answering it in the one file it had just
+written. <b>A PROFILE FLAG IS NOT A BOT GUARD</b>, and CLAUDE.md's standing rule is that a new
+modal must bot-guard its await. <b>The fix was written, tested, and REVERTED: it did not unhang
+the four suites</b>, and shipping a product change that does not fix what it aimed at, in a batch
+whose &sect;0 is the only sanctioned code change, is the scope creep CA warned about. The hang
+needs its own batch; this is the first half of its diagnosis.</p>
+<p><b>THE BATTERY IS A SCRIPT IN THE REPO NOW (<code>run_battery.sh</code>), AND IT CARRIES THE
+THREE SCARS IT KEPT RE-LEARNING</b>: flags in an <b>array</b> (zsh does not word-split an
+unquoted expansion, which silently under-ran <code>test_batch_bl</code>), a count grep that
+accepts a comma or none, and a <code>^ *FAIL</code> grep that does not need an indent. It adds
+two of its own: a <b>per-suite watchdog</b>, because a hang must be reported as its own outcome
+rather than as a suite with no count; and a <b>lock</b>, because <b>killing a hung suite's Godot
+does not kill the battery that spawned it</b> &mdash; two invocations ran into one log directory
+during this batch, every count became whichever process finished last, and nothing errored.
+<b>That contaminated run was discarded and re-run.</b></p>
+<p><b>AND THE BATTERY'S OWN REPORT COULD NOT READ ITS OWN SUITES: THEY PRINT COUNTS IN FIVE
+DIFFERENT FORMATS</b> (<code>N checks, M failures</code> / <code>N passed, M FAILED</code> /
+<code>N checks / M failures</code> / <code>checks: N&nbsp;&nbsp;failures: M</code> /
+<code>sections: S&nbsp;&nbsp;checks: N&nbsp;&nbsp;failures: M</code>), so any single grep reports
+<code>?</code> for some. CD found this once from one direction; it is wider than one grep.
+<b>A COUNT THE HARNESS CANNOT PARSE IS WORSE THAN A COUNT NOBODY DIFFS.</b></p>
+<p><b>THE THREE HARD-CODED STAMP GATES ARE RE-POINTED, AND THE PATTERN IS THE FINDING RATHER
+THAN THE BUMP.</b> <code>test_batch_ah</code>, <code>bb</code> and <code>bn</code> each asserted
+a <b>LITERAL</b> stamp (<code>Batch CM</code> against a live <code>Batch CO</code>), so each
+passed for exactly one batch and had to be hand-bumped forever. CJ's re-stamp turned five such
+checks red at once and CK repaired those five while leaving these three. All three now compare
+against their own suite's batch code, so <b>no bump is ever owed again</b>. That took
+<code>test_batch_bn</code> from red to <b>81/0</b>.</p>
+
+<h3>&sect;1/&sect;4 &mdash; THE FINDING THAT DOMINATES THE BATCH: CN's FOLD LEFT SEVENTEEN SUITES
+ASSERTING PRE-CN MAGNITUDES</h3>
+<p><b>CN &sect;3 folded 105 orphaned Perfect bonuses into base effects</b> &mdash; the ability is
+slightly stronger and nothing is lost &mdash; and <b>CG through CO shipped implement-only, so the
+battery was last run at CE.</b> The consequence is arithmetic rather than opinion: <b>roughly
+seventy assertions across seventeen suites still pin the pre-fold base</b>, and every one of them
+has been red since CN without anyone seeing it. A representative slice, all one root cause:</p>
+<ul>
+<li><b>Deadfall arms FOUR springs</b> where <code>test_batch_bd</code> asserts three
+(<code>DEADFALL_CHARGES + 1</code> at the cast site, the constant left at 3 with a comment)
+&mdash; <b>13 failures</b>, plus <code>ah_battle</code>'s &ldquo;an ordinary rig arms three&rdquo;.</li>
+<li><b>Elevation hands over 3 stacks</b> where <code>test_batch_ce</code> asserts 2 &mdash; its
+own perfect's extra stack, folded.</li>
+<li><b>Recant returns 40%</b> where <code>test_batch_bu</code> asserts 30% (<b>11 failures</b>).</li>
+<li><b>Mirror Image stands up four images</b> where <code>test_batch_bq</code> asserts three.</li>
+<li><b>Ember Debt burns 12 turns</b> where <code>test_batch_bs</code> asserts 8;
+<b>Slow Burn holds 4</b> where <code>bt</code> asserts 3 (<b>13 failures</b>);
+<b>Bloodbond takes 25%</b> where <code>bv</code> asserts half.</li>
+<li><b>Resurrection returns 25%</b> where <code>test_batch_av</code> asserts 20%.</li>
+</ul>
+<p><b>REPORTED, AND ONLY THE MECHANICAL ONES REPAIRED</b>, per &sect;1's own instruction to report
+before repairing. <b>Each of the remaining ~70 needs its own read site opened to confirm the new
+base is what CN intended</b> &mdash; that is a batch, not a section, and it is the obvious next
+one.</p>
+<p><b>TWO OF THE REPAIRS ARE INVERSIONS AND ONE OF THEM WAS PASSING FOR THE WRONG REASON, WHICH
+IS THE HARDER FAULT TO SEE.</b> <code>test_batch_ah</code> asserted Snare Trap's and Deadfall's
+old <code>perfect_text</code>; both lost their bars at CN &sect;2, so CN correctly CLEARED both
+Perfects, and the assertion is <b>inverted rather than deleted</b> &mdash; it asserts the fold,
+so a later batch that quietly took the fourth spring away trips here rather than looking like CN.
+Beside it, <code>ah</code>'s &ldquo;Deadfall now runs a skill check&rdquo; read
+<code>not deadfall.no_skill_check</code> &mdash; the <b>explicit opt-out flag</b>, still false
+&mdash; and went on printing a pass while the <b>parameteric</b> criterion had already taken the
+bar away. <code>no_skill_check</code> has not been the answer to that question since CN &sect;1;
+<code>runs_skill_check()</code> is. <b>test_batch_ah is 5626/0.</b></p>
+<p><b>AND test_batch_cd IS THE ONE INSTRUMENT THAT WORKED THROUGHOUT.</b> It is the only suite
+that can see another suite's failures &mdash; it runs five as child processes and reads their
+stderr &mdash; and its three failures were, exactly, <code>ah</code>, <code>bb</code> and
+<code>bj</code> reporting non-zero. <b>CD built the thing that would have caught all of this five
+batches earlier, and it did catch it; what was missing was anybody running the battery it lives
+in.</b></p>
+
+<h3>&sect;2 &mdash; THE TWENTY-SEVEN UNCOVERED ABILITIES</h3>
+<p><b>NEW <code>test_batch_cp.gd</code>: 693 checks / 0 failures / 0 throws.</b> Coverage of the
+twenty-seven tranche-3 cards in the standard shape: each resolves through
+<code>pool_ability</code> <b>to itself</b> (a card resolving to a different name is the resolver
+answering the wrong question &mdash; CH's Harvest collision), carries a description, a delay and
+a cooldown, sits in <b>exactly one</b> spec draft pool, and is <b>absent from
+<code>SPEC_POOLS</code> and <code>CLASS_DRAFT_POOLS</code></b>, so a spec card cannot silently
+re-weight the boss draw or the class seam. <code>SPEC_DRAFT_POOLS</code> holds <b>96 across
+twelve specs at eight apiece.</b></p>
+<p><b>THE TWO CG INVERSIONS WERE INVERTED, NOT DELETED &mdash; CONFIRMED, WHICH WAS THE POINT OF
+ASKING.</b> A deletion is silent coverage loss and looks identical from the outside. Both carry
+an explicit &ldquo;INVERTED BY BATCH CG &sect;2, NOT DELETED&rdquo; note with byte-identical
+setups: <b>Elevation grants real Faith</b>, driven at three depths so a floor-writing version
+fails at every one, and <b>Blessing of the Faithful drops the peak</b>, which was CE's own
+negative control. <code>ELEVATION_STACKS_TEST := 2</code> is pinned, which is also what makes
+CN's fold to 3 visible as a failure rather than as a mystery.</p>
+<p><b>ANVIL AND RECOMPENSE CANCEL, AND WHAT IS ASSERTED IS THE ORDERING</b> rather than a
+carve-out: Anvil refuses the Heavy Plating reset, Recompense is paid <i>by</i> that reset, and the
+payment sits inside the <code>else</code> of the Anvil branch, so holding both pays nothing. Read
+positionally, so a rename cannot make it pass vacuously; both cards' own text names the other.</p>
+<p><b>STALKING HORSE'S AFFLICTIONS ARE ALL IN <code>DEBUFF_IDS</code>, and the failure that
+catches is silent</b>: Trapper's breadth term counts that curated list only, so an affliction
+outside it would apply, log and read as working while paying the Survivalist's multiplier
+nothing.</p>
+
+<h3>&sect;3 &mdash; TWO CORRECTIONS TO THE BRIEF, BOTH MEASURED RATHER THAN ARGUED</h3>
+<p><b>THE LITERAL-DIGIT RULE IS NOT AT TWO HUNDRED SITES. IT IS AT 89 ACROSS 979 AUTHORED
+FIELDS, AND CL WAS RIGHT TO MAKE IT A REPORT.</b> Swept over every authored field rather than
+CL's abilities-only slice, most of the 89 are legitimate prose that is not a resolved value at
+all &mdash; <code>(max 5)</code>, <code>(0-100)</code>, <code>(2 on a crit)</code>,
+<code>(cap 100)</code> &mdash; so <b>asserting zero would fail against correct text</b>. It ships
+as a <b>baseline</b> instead, which is the form that bites: the <b>fourteen</b> ability-level
+offenders are pinned <b>exactly</b> (that is the surface CL's rule was written about and the one
+CK taught the draft card to render) and the whole-corpus count is pinned as a <b>ceiling</b>. A
+new authored digit trips either way, and the fourteen are recorded as owed rather than silently
+rewritten &mdash; rewriting shipped player-facing text is authoring, and this is a test batch.</p>
+<p><b>THE PERFECT BICONDITIONAL DOES NOT HOLD, AND THE CONVERSE SHOULD NOT.</b> CN's enforceable
+direction &mdash; runs no check &rArr; carries no Perfect &mdash; holds at <b>ZERO violations</b>
+over the whole corpus. The converse fails for <b>five</b> abilities (Called Shot, Coup de
+Gr&acirc;ce, Pinning Shot, Powershot, Rampage), and their bars are not idle: the grade still
+multiplies damage. <b>Git settles it</b> &mdash; all five have carried an empty
+<code>perfect_text</code> since long before CN, so this is an authoring pattern rather than a
+regression CN left behind. All five are <b>named</b> in the suite so a sixth trips and has to be
+a decision.</p>
+<p><b>CK's MISSING MEASUREMENT, PRODUCED.</b> The computed block against the 258px draft card
+(<code>DRAFT_COL_W</code> 296 less 38), measured with real font metrics at the label's own font
+size: <b>195 abilities carry a block, 725 lines, mean 3.72 lines a card</b> &mdash; the brief's
+&ldquo;five added lines&rdquo; is 3.72 &mdash; and <b>8 lines (1.1%) exceed the card width</b>,
+worst <b>+94px</b> (Feint's Perfect), the rest between +7 and +25px. So the block's cost is its
+<b>line count</b>, which CK already measured as the column going 313-389px to 557-671px against a
+388px viewport; it is <b>not</b> a wrapping problem. Shipped as
+<code>check_ck_width.gd</code>.</p>
+<p>Also asserted: <b>the Ironclad rename is complete</b> &mdash; <code>Ironclad</code> resolves
+to the ability, <code>Iron Will</code> resolves to <b>no</b> ability, the
+<code>wd_iron_will</code> node still carries the name Iron Will, and master.html carries both
+rows &mdash; and <b>the draft card renders the computed block</b> through the same
+<code>Classes.computed_block</code> builder the hero sheet uses.</p>
+
+<h3>&sect;4 &mdash; THE BATTERY</h3>
+<p><b>No run was in flight</b> &mdash; no <code>run_save.bin</code> before or after &mdash; so
+nothing needed backing up, and <b>profile.json, relics.json and trees.json are byte-identical by
+hash</b> across the whole batch.</p>
+<p><b>EVERY GATE GREEN</b>: check_parse 0 &middot; check_flow 0 &middot; check_cl_resolver 0
+&middot; check_cm 0 &middot; check_cm_live 0 &middot; check_cn 0 &middot; check_co 0 &middot;
+check_map_screen OK &middot; <b>run-harness gates 1/2/3 PASS at 22 / 165 / 8</b>, CA's recorded
+counts, unmoved.</p>
+<p><b>THE SUITES.</b> <b>ah 5626/0</b> (repaired) &middot; ah_battle 65/<b>1</b> &middot; ai
+2217/0 &middot; aj 418/0 &middot; ak 528/0 &middot; <b>al HUNG</b> &middot; an 6050/0 (inside its
+documented drift &mdash; never pin it) &middot; ar 735/<b>1</b> &middot; as 396/0 &middot; at
+470/0 &middot; au 336/0 &middot; av 324/<b>2</b> &middot; aw 350/<b>1</b> &middot; ax 342/0
+&middot; ay 484/0 &middot; az 519/0 &middot; ba 690/0 &middot; <b>bb 177/2</b> (stamp repaired)
+&middot; bc 91/0 &middot; bd 70/<b>13</b> &middot; be 34/0 &middot; bf 78/0 &middot; bg
+47/<b>1</b> &middot; bh 233/<b>2</b> &middot; bi 91/<b>1</b> &middot; bj 67/<b>1</b> &middot; bk
+130/0 (drift) &middot; bl 88/0 &middot; bm 1891/0 &middot; <b>bn 81/0</b> (repaired) &middot; bo
+1025/0 &middot; <b>bp HUNG</b> &middot; bq 739/<b>10</b> &middot; <b>br HUNG</b> &middot; bs
+263/<b>4</b> &middot; bt 455/<b>13</b> &middot; bu 477/<b>11</b> &middot; bv 897/<b>3</b> &middot;
+<b>bw HUNG</b> &middot; bx 142/0 &middot; cb 1181/<b>4</b> &middot; cd 86/<b>3</b> &middot; ce
+1109/<b>9</b> &middot; runes 3121/0 &middot; rune_battle 97/0 &middot; <b>NEW cp 693/0</b>.</p>
+<p><b>COUNTS THAT FELL, WHICH IS THIS PROJECT'S SIGNATURE:</b> <b>ah 5625 &rarr; 5624</b> before
+its repair (5626 after) and <b>bt 457 &rarr; 455</b>. Everything else is unmoved or ROSE, and
+every rise is CN-era content the suites' own loops walked: <b>bo 898 &rarr; 1025</b>, <b>cb 1163
+&rarr; 1181</b>, <b>ce 1063 &rarr; 1109</b>, bs +1, bu +1, bv +4, bx +1, cd +1, bb +2.
+<b>bt's fall is the one to explain and it is not explained here</b> &mdash; it sits beside 13
+failures in the same suite, so it wants reading with them.</p>
+<p><b>READ THE COUNTS, NOT ONLY THE FAILURES &mdash; AND THIS BATTERY ADDS A THIRD COLUMN: READ
+WHAT HAS NO COUNT AT ALL.</b> Four suites produced no count, and before the watchdog they
+produced no <i>battery</i> either.</p>
+
+<h3>&sect;5 &mdash; THE PUSH CHECK</h3>
+<p><b>Reported at the start of the batch and again at the end.</b> Local HEAD and
+<code>git ls-remote origin main</code> agreed on <code>e3fb49a</code> before any work began
+&mdash; so the missing-credential-helper backlog that stranded four batches is genuinely closed
+&mdash; and the check is reported again below against this batch's own commit.</p>
+
 <h2>2026-08-18 &mdash; Batch CO: A RECAST THAT WOULD DO NOTHING IS REFUSED</h2>
 <p><i><code>add_status</code> resolves a re-application as <code>max()</code> on duration and
 power. For any status whose power is a <b>snapshot of live state</b>, a recast could therefore

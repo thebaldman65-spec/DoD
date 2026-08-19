@@ -253,6 +253,107 @@ ONE answer, asked by the cast path and by the draft card alike.
   **the WARDEN's own roughly double** (he acts ~7 times and braces 7–9). **Uncapped on purpose
   for the first pass** — a cap is a retreat available afterwards, and it is a designer's call.
 
+## THE THREE CLAMPED CALL SITES, AND WHY `update_status` IS NOT CLAMPED (STANDING, SET AT CP §0)
+**`update_status` ASSIGNS power where `add_status` MAXES it.** On the three sites whose power is
+computed from LIVE STATE, that let a weaker recast overwrite a standing buff DOWNWARD — worse than
+the waste CO's refusal was written to fix, and unreachable by that refusal because all three carry
+a second payload.
+- **THE CLAMP IS AT THE CALL SITE, THREE TIMES: Battle Shout, Stabilize, Eye of the Storm.** Each
+  reads `status_power` BEFORE `_apply_status` and writes the chip only when the new value is at
+  least as strong. `status_power` returns **-1** when nothing stands, so a fresh cast always
+  writes. **THE CAST STILL PAYS** — the +5 Rage, the Mana and 5% heal, and the taunts all sit
+  OUTSIDE the guarded branch, which is the whole reason the fix belongs here and not in the gate.
+- **DO NOT CLAMP `update_status` GLOBALLY, AND TWO SITES SETTLE IT ALONE.** `held_breath` and
+  `instinct` compute `status_power(...) - 1` and write it back — they are COUNTDOWNS, and a global
+  `maxi` freezes them at their opening value forever, so neither is ever spent. Six more banks
+  decrement through the same door: `mirror`, `arrows`, `feint_guard`, `berserk`, `deadfall`,
+  `loyalty`. **Nothing would crash and nothing would log.**
+- **THE CENSUS IS IN CP's CHANGELOG ENTRY AND IS THE ARTEFACT TO READ BEFORE TOUCHING THIS**: 69
+  call sites, 42 passing a power, and 29 of them calling `_apply_status` then `update_status` on
+  one status (the shape that can downgrade). **`spite` is the trap in that list** — it passes a
+  CAP as the power while its chip text carries the live figure, so a naive "never write a smaller
+  number" rule would be WRONG there.
+- **REPORTED, NOT FIXED — TWO MORE SITES HAVE THE IDENTICAL DEFECT:** `blood_debt` (35 on a
+  perfect, 25 otherwise, so a non-perfect re-mark drops the standing share) and
+  `reckless_abandon` (scales with Rage spent, and the cast ZEROES the bar, so a second cast in its
+  own window is necessarily smaller — CM gates it below one full step, not below the standing
+  value). Both take the same three-line clamp; CP scoped itself to the three CO recorded.
+
+## THE BATTERY IS A SCRIPT NOW — `run_battery.sh` (STANDING, SET AT CP §1)
+It was reconstructed by hand every batch, and this file carried three scars from that. All three
+are baked in: **flags in an ARRAY** (zsh does not word-split an unquoted expansion, which silently
+under-ran `test_batch_bl`), a **count grep that accepts a comma or none**, and a **`^ *FAIL` grep
+that needs no indent**. Two are CP's own:
+- **A PER-SUITE WATCHDOG, because a hang has no count and a hung suite takes the whole battery with
+  it.** Every later count then goes MISSING rather than wrong, which is the one failure mode a
+  count-diffing rule cannot catch. A timeout is reported as its OWN outcome.
+- **A LOCK, because killing a hung suite's Godot does NOT kill the battery that spawned it.** Two
+  invocations ran into one log directory during CP, every count became whichever process finished
+  last, and nothing errored. That run was discarded.
+- **THE SUITES PRINT COUNTS IN FIVE DIFFERENT FORMATS** (`N checks, M failures` / `N passed, M
+  FAILED` / `N checks / M failures` / `checks: N  failures: M` / `sections: S  checks: N
+  failures: M`), so any single grep reports `?` for some. **A COUNT THE HARNESS CANNOT PARSE IS
+  WORSE THAN A COUNT NOBODY DIFFS** — CD's rule, one layer further out.
+
+## FOUR SUITES HANG, AND THE DIAGNOSIS IS HALF DONE (OPEN, CP §1)
+**`test_batch_al`, `bp`, `br` and `bw` stop producing output and sit at ~0% CPU indefinitely**
+(`bp` held for TEN MINUTES on two lines). **REPRODUCED ON UNMODIFIED HEAD** — not CP's doing, and
+they all ran at CE. Because Godot buffers stdout when not a TTY, a killed suite loses its buffer
+and reads as one that printed nothing. **They are excluded from the battery by the watchdog rather
+than fixed.**
+- **A LATENT DEADLOCK WAS FOUND WHILE CHASING IT AND IS NOT THE CAUSE.** Both skill-check
+  orientation cards `await _hint_done` — a signal only a real click or key press emits — behind
+  `not sim and not autoplay and Run.active and not Run.sim_run`. **Every hand-driven suite
+  satisfies all four**, and each redirects `Profile` to a scratch file so the "taught" flag is
+  never set. **`check_cm_live.gd` sets BOTH flags by hand**, which is CM knowing about the trap
+  and answering it only in the file it had just written. **A PROFILE FLAG IS NOT A BOT GUARD.**
+  The fix was written, tested and **REVERTED — it did not unhang the four** — but the deadlock is
+  real and a future headless modal will hit it.
+
+## CN's FOLD LEFT SEVENTEEN SUITES ASSERTING PRE-CN MAGNITUDES (OPEN, THE NEXT BATCH — CP §1/§4)
+**CN §3 folded 105 orphaned Perfect bonuses into base effects, and CG through CO shipped
+implement-only, so the battery was last run at CE.** Roughly **seventy assertions across seventeen
+suites still pin the pre-fold base** and have been red since CN.
+Representative, all one root cause: **Deadfall arms FOUR springs** where `bd` asserts three
+(`DEADFALL_CHARGES + 1` at the cast site, constant left at 3) — 13 failures; **Elevation hands
+over 3** where `ce` asserts 2; **Recant returns 40%** where `bu` asserts 30% — 11 failures;
+**Mirror Image stands four images** where `bq` asserts three; **Ember Debt burns 12** where `bs`
+asserts 8; **Slow Burn holds 4** where `bt` asserts 3 — 13 failures; **Resurrection returns 25%**
+where `av` asserts 20%.
+- **EACH ONE NEEDS ITS OWN READ SITE OPENED to confirm the new base is what CN intended**, which
+  is why CP reported them and repaired only the mechanical ones. There is no sweep that answers it.
+- **`test_batch_cd` IS THE ONE INSTRUMENT THAT WORKED THROUGHOUT** — the only suite that can see
+  another suite's failures, and its three failures were exactly `ah`, `bb` and `bj` reading
+  non-zero. **CD built the thing that would have caught all of this five batches earlier and it
+  DID catch it; what was missing was anybody running the battery it lives in.**
+- **NO LITERAL STAMP CHECKS REMAIN.** `ah`, `bb` and `bn` each pinned `Batch CM` against a live
+  `Batch CO`, so each passed for exactly one batch. All three compare against their own batch code
+  now (CK's shape). **DO NOT AUTHOR ANOTHER LITERAL-STAMP CHECK.**
+- **AND ONE CHECK WAS PASSING FOR THE WRONG REASON, which is the harder fault to see:** `ah`'s
+  "Deadfall now runs a skill check" read `not deadfall.no_skill_check` — the EXPLICIT OPT-OUT,
+  still false — while CN's PARAMETERIC criterion had already taken the bar away.
+  **`no_skill_check` has not been the answer to "does this run a check" since CN §1;
+  `runs_skill_check()` is.**
+
+## THE LITERAL-DIGIT RULE IS A BASELINE, NOT A GATE (STANDING, CP §3)
+CL §1's rule is that a parenthetical is COMPUTED and never authored. **Swept over every authored
+field the corpus holds 89 across 979 fields — not the ~200 CP's brief assumed — and CL was RIGHT
+to make it a report**: most are legitimate prose that is not a resolved value (`(max 5)`,
+`(0-100)`, `(2 on a crit)`, `(cap 100)`), so **asserting zero fails against correct text.**
+`test_batch_cp` pins the **fourteen ability-level offenders EXACTLY** (the surface CL's rule was
+about, and the one CK taught the draft card to render) and the corpus count as a **CEILING**. A new
+authored digit trips either way; the fourteen are recorded as OWED rather than rewritten, because
+rewriting shipped player-facing text is authoring.
+**AND THE PERFECT RULE IS NOT A BICONDITIONAL.** CN's enforceable direction — runs no check ⇒ no
+Perfect — holds at **ZERO violations**. The converse fails for **five** abilities (Called Shot,
+Coup de Grâce, Pinning Shot, Powershot, Rampage) whose bars still multiply damage, and **git shows
+all five have had an empty `perfect_text` since long before CN** — an authoring pattern, not a
+regression. All five are NAMED so a sixth trips.
+**CK's MISSING WIDTH MEASUREMENT (`check_ck_width.gd`): 195 abilities, 725 block lines, mean 3.72
+a card (the brief's "five" is 3.72), and 8 lines (1.1%) exceed the 258px card — worst +94px
+(Feint's Perfect).** So the block costs the column its LINE COUNT, which CK already measured; it is
+NOT a wrapping problem.
+
 ## A recast that would not improve is REFUSED (STANDING, SET AT BATCH CO)
 **THE RULE: a status recast that would improve neither duration nor power is refused, and the
 refusal is scoped to abilities whose WHOLE PAYLOAD is the status.** `_recast_refused` is the ONE

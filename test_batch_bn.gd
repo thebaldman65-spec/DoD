@@ -480,8 +480,21 @@ func _docs() -> void:
 	# test_batch_bb carry — three copies of one assertion, and all three must
 	# move together or the batch that bumps master.html trips two suites it did
 	# not touch.
-	ok(doc.contains("Last updated: 2026-08-17 (Batch CM)"),
-		"master.html carries the current batch's stamp")
+	# BATCH CP §1 — RE-POINTED, AND THE PATTERN IS THE FINDING RATHER THAN THE
+	# BUMP. This was a LITERAL stamp, so it passed for exactly one batch and had
+	# to be hand-bumped forever; CJ's re-stamp turned five such checks red at
+	# once and CK repaired those five while leaving these three. It asks the
+	# question the comment above always said it was asking — was the doc touched
+	# AT ALL — as a comparison against this suite's OWN batch code, so no bump is
+	# ever owed again. (Two-letter batch codes sort lexically; a three-letter
+	# code needs one more line.)
+	var _stamp_at := doc.find("Last updated:")
+	ok(_stamp_at >= 0, "master.html carries a Last-updated stamp")
+	var _stamp := doc.substr(_stamp_at, 60)
+	var _code_at := _stamp.find("(Batch ")
+	var _stamped := _stamp.substr(_code_at + 7, 2) if _code_at >= 0 else ""
+	ok(_stamped >= "BN",
+		"...stamped no older than this suite's own batch (reads '%s')" % _stamped)
 	# The number AND the reason it was chosen travel together, or the next
 	# reader sees a float with no argument behind it.
 	ok(doc.contains("&times;0.50") or doc.contains("×0.50"),

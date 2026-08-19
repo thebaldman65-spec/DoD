@@ -1,0 +1,113 @@
+#!/bin/zsh
+# BATCH CP — THE BATTERY, AS A SCRIPT IN THE REPO.
+#
+# It was reconstructed by hand every batch until now, and CLAUDE.md carries
+# three separate scars from that: a flags STRING that zsh would not word-split
+# (test_batch_bl silently under-ran), a `grep -E "checks,"` that missed every
+# suite printing "N checks / M failures" without a comma, and a `^  FAIL:`
+# grep that swallowed the one suite whose failure lines carry no indent.
+# All three fixes are baked in here so they cannot be un-learned again.
+#
+#   ./run_battery.sh            -> every suite + every gate, one line each
+#   ./run_battery.sh bo bp      -> only the named suites
+#
+# THE THROW COUNT IS REPORTED BESIDE THE CHECK COUNT AND IS NOT OPTIONAL:
+# CD found seven SCRIPT ERRORs hiding 2,714 assertions behind suites that
+# printed zero failures. A suite that throws is not a suite that passed.
+cd "$(dirname "$0")"
+GODOT=/Applications/Godot.app/Contents/MacOS/Godot
+OUT=${DOD_BATTERY_OUT:-/tmp/dod_battery}
+
+# TWO BATTERIES WRITING ONE LOG DIRECTORY IS A SILENT DATA FAULT, AND CP HIT IT.
+# Killing a HUNG SUITE's Godot does not kill the battery that spawned it — the
+# script simply moves to the next suite — so a second invocation ran alongside
+# the first, both writing `$OUT`, and every count became whichever process
+# finished last. Nothing errored and the report looked ordinary.
+# The lock makes the second invocation refuse instead.
+LOCK="$OUT/.battery.lock"
+mkdir -p "$OUT"
+if ! mkdir "$LOCK" 2>/dev/null; then
+  echo "REFUSING: a battery is already writing $OUT (lock: $LOCK)."
+  echo "If that is stale, remove it and re-run."
+  exit 1
+fi
+trap 'rmdir "$LOCK" 2>/dev/null' EXIT INT TERM
+
+# Suite -> extra flags. zsh does NOT word-split an unquoted string expansion,
+# so flags live in an ARRAY and are expanded "${(@)...}" or the flag arrives
+# as one token and is rejected.
+typeset -A EXTRA
+EXTRA[test_batch_bl]="--fixed-fps 12"
+
+SUITES=(
+  test_batch_ah test_batch_ah_battle test_batch_ai test_batch_aj test_batch_ak
+  test_batch_al test_batch_an test_batch_ar test_batch_as test_batch_at
+  test_batch_au test_batch_av test_batch_aw test_batch_ax test_batch_ay
+  test_batch_az test_batch_ba test_batch_bb test_batch_bc test_batch_bd
+  test_batch_be test_batch_bf test_batch_bg test_batch_bh test_batch_bi
+  test_batch_bj test_batch_bk test_batch_bl test_batch_bm test_batch_bn
+  test_batch_bo test_batch_bp test_batch_bq test_batch_br test_batch_bs
+  test_batch_bt test_batch_bu test_batch_bv test_batch_bw test_batch_bx
+  test_batch_cb test_batch_cd test_batch_ce test_runes test_rune_battle
+)
+GATES=(check_parse check_flow check_map check_cl_resolver check_cl_width
+       check_cm check_cm_live check_cn check_co)
+
+[[ $# -gt 0 ]] && { SUITES=(); for a in "$@"; do SUITES+=("test_batch_$a"); done }
+
+# A WATCHDOG, BECAUSE A HUNG SUITE IS WORSE THAN A FAILING ONE AND BATCH CP
+# FOUND ONE. `test_batch_al` stops producing output and sits at ~0% CPU
+# forever; run without a bound it takes the whole battery with it, and the
+# report never prints — so every count after it is missing rather than wrong,
+# which is the one failure mode a count-diffing rule cannot see.
+# macOS ships no `timeout`, so this is the watchdog written out: run detached,
+# poll, kill on expiry, and REPORT THE TIMEOUT AS ITS OWN OUTCOME rather than
+# letting it read as a suite with no count.
+TIMEOUT=${DOD_SUITE_TIMEOUT:-240}
+
+run_one() {
+  local name=$1 log="$OUT/$1.log"
+  local -a flags
+  flags=(${=EXTRA[$name]})
+  "$GODOT" --headless --path . "${flags[@]}" --script "$name.gd" >"$log" 2>&1 &
+  local pid=$! waited=0 timedout=0
+  while kill -0 $pid 2>/dev/null; do
+    if (( waited >= TIMEOUT )); then
+      kill -9 $pid 2>/dev/null; timedout=1; break
+    fi
+    sleep 2; (( waited += 2 ))
+  done
+  wait $pid 2>/dev/null
+  # A count with no comma is still a count (BQ's lost grep), and a FAIL line
+  # with no indent is still a failure (BK's swallowed reason).
+  local checks=$(grep -oE '[0-9]+ checks' "$log" | tail -1 | grep -oE '[0-9]+')
+  local fails=$(grep -oE '[0-9]+ (failures|failed)' "$log" | tail -1 | grep -oE '[0-9]+')
+  local throws=$(grep -cE 'SCRIPT ERROR|Parse Error' "$log")
+  local faillines=$(grep -cE '^ *FAIL' "$log")
+  if (( timedout )); then
+    printf '%-22s *** TIMED OUT after %ss *** (no count; %s log lines)\n' \
+      "$name" "$TIMEOUT" "$(wc -l < "$log" | tr -d ' ')"
+  else
+    printf '%-22s checks=%-6s fails=%-4s throws=%-3s FAILlines=%s\n' \
+      "$name" "${checks:-?}" "${fails:-?}" "$throws" "$faillines"
+  fi
+}
+
+echo "=== SUITES ==="
+for s in $SUITES; do run_one $s; done
+echo "=== GATES ==="
+for g in $GATES; do run_one $g; done
+echo "=== RUN HARNESS (gates 1/2/3 — live counts 22/165/8) ==="
+for n in 1 2 3; do
+  DOD_GATE=$n "$GODOT" --headless --path . --script test_run_harness.gd \
+    >"$OUT/harness_$n.log" 2>&1
+  printf 'GATE %s  %s  throws=%s\n' "$n" \
+    "$(grep -oE 'GATE [0-9] (PASS|FAIL)[^)]*\)?' "$OUT/harness_$n.log" | tail -1)" \
+    "$(grep -cE 'SCRIPT ERROR|Parse Error' "$OUT/harness_$n.log")"
+done
+echo "=== check_map_screen (SCENE run — autoloads do not resolve under --script) ==="
+"$GODOT" --headless --path . res://check_map_screen.tscn >"$OUT/check_map_screen.log" 2>&1
+printf 'check_map_screen        %s  throws=%s\n' \
+  "$(grep -oE '[0-9]+ checks[^:]*' "$OUT/check_map_screen.log" | tail -1)" \
+  "$(grep -cE 'SCRIPT ERROR|Parse Error' "$OUT/check_map_screen.log")"
+echo "=== DONE. Logs in $OUT ==="
