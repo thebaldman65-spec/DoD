@@ -21,7 +21,6 @@ var aoe := false         # hits every living enemy (no miss/parry rolls)
 var random_hits := 0     # strikes this many random living enemies instead
 var multi_hits := 0      # strikes the SAME target this many times
 var perfect_extra_hit := true  # multi/random-hit attacks: Perfect adds one hit
-var no_skill_check := false    # resolves without the timing bar (summons)
 # BATCH CM §1 — a SLOPPY grade loses the cast outright: no damage, no status,
 # no consumption, and the turn is spent. Good and Perfect both resolve
 # normally. Read at the CALL SITE (battle._hero_turn), never inside the
@@ -73,7 +72,7 @@ const DAMAGE_SPECIALS := ["blood_tribute", "breaking_darkness", "call_wild",
 	"call_wilds", "cinderfall", "cull", "feint", "guard_change", "gut_rip",
 	"harvest", "kill_command", "killing_frost", "precision_strike",
 	"primal_surge", "pyre_wake", "reprisal", "requiem", "savage_sweep",
-	"shield_slam", "suffering", "summon", "twin_hunt", "unleash", "wildfire",
+	"shield_slam", "suffering", "twin_hunt", "unleash", "wildfire",
 	"winters_toll"]
 
 # §2'S HEAL OVERRIDE, AND IT IS AN AUTHORED LIST BECAUSE IT IS A DESIGNER CALL
@@ -97,10 +96,33 @@ const HEAL_SPECIALS := ["dark_pact", "dawnbreak", "divine_plea",
 
 # TRUE when this ability still puts a bar on screen.
 #
-# `no_skill_check` STAYS THE EXPLICIT OPT-OUT IT ALWAYS WAS and is tested first,
-# so the summons keep resolving silently for the reason they always did rather
-# than because a table happens to agree.
+# BATCH CQ §5 — `no_skill_check` IS GONE AND THIS FUNCTION IS THE ONLY ANSWER.
+# The field was a SECOND way to ask the same question, and two answers is how
+# they disagree silently: on DEADFALL the flag said "runs a bar" (it was never
+# set) while the criterion had already taken the bar away, and `test_batch_ah`
+# passed by reading the flag — the right answer from the wrong oracle.
 #
+# DELETING IT WAS NOT FREE AND THE PRICE IS RECORDED HERE. The flag was
+# load-bearing on FOUR of its thirteen carriers, where the criterion would
+# have handed back a bar the game does not draw today:
+#
+#   · SUMMON AGUILA / CANIS / URSUS — the table was simply WRONG. `_do_summon`
+#     is 139 lines and reaches no damage leaf at all: a summon puts a beast on
+#     the field and the beast strikes on ITS OWN later turns. `"summon"` is
+#     struck from DAMAGE_SPECIALS above, which is a correction to a derived
+#     table rather than a change to a card, and all three keep resolving
+#     silently for the criterion's own reason.
+#
+#   · CALL OF THE WILD is the one real disagreement, and it is NOT this
+#     batch's to settle. It DOES deal damage at cast — `_companion_strike`
+#     for each beast standing, `_ghost_hit` for each absent one — so the
+#     criterion says it earns a bar, while the flag has always said it does
+#     not, alongside every other beast-command card in its family. Handing it
+#     a timing bar is a design change and goes to the designer as a report.
+#     Until he answers, the exception is NAMED HERE rather than hidden in a
+#     data field, so there is still exactly one place that knows.
+const NO_BAR_BY_DESIGN := ["call_wild"]
+
 # A GATED ABILITY ALWAYS KEEPS ITS BAR, and this clause is the one addition §2
 # did not ask for. Batch CM's RECKLESS ABANDON has no damage and no Break damage
 # — it spends the whole Rage bar for a three-turn multiplier — so the criterion
@@ -110,7 +132,7 @@ const HEAL_SPECIALS := ["dark_pact", "dawnbreak", "divine_plea",
 # anywhere in the game, which makes this the criterion's own logic rather than
 # an exception to it.
 func runs_skill_check() -> bool:
-	if no_skill_check:
+	if special in NO_BAR_BY_DESIGN:
 		return false
 	if gated:
 		return true

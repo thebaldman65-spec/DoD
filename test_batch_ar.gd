@@ -430,8 +430,16 @@ func _kit() -> void:
 	# terms rather than a version of them somebody remembers? — is unchanged and
 	# is asked of what it says NOW: the refund, and that holding fire is free.
 	ok(pdesc.contains("refunds 1 Mana"), "...its refund clause is stated")
-	ok(pdesc.contains("costs him\nnothing"),
-		"...and so is the fact that holding fire costs nothing (%s)" % pdesc)
+	# BATCH CQ §3 — CL CUT THE CLAUSE THIS WAS READING, and not as part of any
+	# fold: CL's prose pass removed rationale clauses across the corpus, so
+	# "costs him nothing" is no longer in the text. The QUESTION BS §2 set is
+	# still the right one — does the passive state its live terms rather than a
+	# remembered version — so it is asked of the absence instead: there is no
+	# cost, and the text must not invent one. `+40%` and the refund clause are
+	# asserted above and below; this line owns the cost half.
+	ok(not pdesc.to_lower().contains("cost") \
+			and not pdesc.to_lower().contains("spend"),
+		"...and holding fire still costs nothing, so the text names no cost (%s)" % pdesc)
 	ok(not pdesc.to_lower().contains("drain"),
 		"...and no drain survives in it")
 	ok(pdesc.contains("refunds"), "...and the refund")

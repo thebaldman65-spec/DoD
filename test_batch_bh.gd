@@ -472,12 +472,18 @@ func _the_fallback_is_byte_compatible() -> void:
 # a grader that cannot see which ability is being cast.
 func _the_perfect_window_is_a_constant() -> void:
 	var bsrc := _src("res://scripts/battle.gd")
-	ok(bsrc.contains("const PERFECT_HALF :="),
-		"§1: the Perfect window is a script CONSTANT, not an Ability field")
+	# BATCH CQ §3 — RE-POINTED TO WHERE CN §1 PUT IT. The window was a bare
+	# `const PERFECT_HALF`; CN made the skill check PARAMETERIC and the window
+	# is now `perfect_half` in the profile handed to the check per cast. The
+	# question this section exists to ask is UNCHANGED and is the reason
+	# `up_sure` was never written — the window is a SCRIPT-side value that the
+	# grader reads, not a field on the Ability — so it is asked of the profile.
+	ok(bsrc.contains("\"perfect_half\":"),
+		"§1: the Perfect window is a script-side profile value, not an Ability field")
 	ok(bsrc.contains("func _grade_skill_check() -> void:"),
 		"§1: ...and the grader takes NO arguments, so it cannot see the ability")
-	ok(bsrc.contains("if dist <= PERFECT_HALF:"),
-		"§1: ...it compares against that constant directly")
+	ok(bsrc.contains("if dist <= float(sc_profile[\"perfect_half\"]):"),
+		"§1: ...it compares against that profile value directly")
 	var asrc := _src("res://scripts/ability.gd")
 	ok(not asrc.contains("perfect_half") and not asrc.contains("perfect_window"),
 		"§1: Ability carries no per-ability Perfect window to widen")

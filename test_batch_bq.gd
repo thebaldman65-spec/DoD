@@ -493,12 +493,13 @@ func _live_barrier_and_mirror() -> void:
 	var foe: BattleUnit = foes[0]
 	mage.resource = mage.max_resource
 	mage.hp = mage.max_hp
-	# ---- MAGIC BARRIER ABSORBS 15% OF **MAXIMUM** HEALTH ----
+	# ---- MAGIC BARRIER ABSORBS 20% OF **MAXIMUM** HEALTH ----
+	# BATCH CQ §3 — TWENTY SINCE CN §3'S FOLD (the perfect's 20% became the base).
 	await scene.call("_resolve", mage, barrier, mage, "good")
-	var want_absorb := int(round(mage.max_hp * 0.15))
+	var want_absorb := int(round(mage.max_hp * 0.20))
 	ok(mage.has_status("barrier"), "§3: Magic Barrier lands a barrier")
 	ok(mage.status_power("barrier") == want_absorb,
-		"§3: ...worth 15%% of his MAXIMUM health (%d, wanted %d)" % [
+		"§3: ...worth 20%% of his MAXIMUM health (%d, wanted %d)" % [
 			mage.status_power("barrier"), want_absorb])
 	# It is NOT a Divine Shield: Faith is the Devout's engine and a Mage ward
 	# feeding Conviction would be a spec mechanic leaking through a class card.
@@ -516,8 +517,9 @@ func _live_barrier_and_mirror() -> void:
 	mage.armor = 0.0
 	mage.resource = mage.max_resource
 	await scene.call("_resolve", mage, mirror, mage, "good")
-	ok(mage.status_power("mirror") == 3,
-		"§3: Mirror Image stands up three images (%d)" % mage.status_power("mirror"))
+	# BATCH CQ §3 — FOUR IMAGES SINCE CN §3'S FOLD.
+	ok(mage.status_power("mirror") == 4,
+		"§3: Mirror Image stands up four images (%d)" % mage.status_power("mirror"))
 	var strike: Ability = foe.abilities[0]
 	var aoe: Ability = Ability.make({"display_name": "Test Sweep", "cost": 0,
 		"damage": 20, "pressure": 0, "delay": 2.0, "aoe": true})
@@ -525,15 +527,18 @@ func _live_barrier_and_mirror() -> void:
 	# never move, the single-target spends below fail; if the AoE spends one,
 	# this does.
 	await scene.call("_resolve", foe, strike, mage, "good")
-	ok(mage.status_power("mirror") == 2,
+	ok(mage.status_power("mirror") == 3,
 		"§6: a single-target attack spends ONE image (%d left)" % \
 			mage.status_power("mirror"))
 	var hp_mid := mage.hp
 	await scene.call("_resolve", foe, aoe, mage, "good")
-	ok(mage.status_power("mirror") == 2,
+	ok(mage.status_power("mirror") == 3,
 		"§6: an AREA attack spends NONE (%d left)" % mage.status_power("mirror"))
 	ok(mage.hp < hp_mid, "§6: ...because it landed instead — the images cannot see it")
 	mage.hp = mage.max_hp
+	# BATCH CQ §3 — ONE MORE STRIKE THAN BEFORE, because the fold banked a
+	# fourth image. Three single-target blows are spent below to empty it.
+	await scene.call("_resolve", foe, strike, mage, "good")
 	await scene.call("_resolve", foe, strike, mage, "good")
 	await scene.call("_resolve", foe, strike, mage, "good")
 	# NOTE: `status_power` returns -1 for a status that is not there, not 0 —
@@ -541,9 +546,9 @@ func _live_barrier_and_mirror() -> void:
 	# it (every read guards on `< 1` or `> 0`), but a check written the obvious
 	# way reads -1 and fails against working code.
 	ok(not mage.has_status("mirror"),
-		"§6: the third single-target attack spends the last image and clears the chip")
+		"§6: the last single-target attack spends the last image and clears the chip")
 	ok(mage.hp == mage.max_hp,
-		"§6: ...and not one of those three landed a point of damage")
+		"§6: ...and not one of those blows landed a point of damage")
 	# WITH THE IMAGES GONE THE BLOW LANDS. Forced past the 5% miss so the
 	# assertion is deterministic rather than usually true.
 	foe.no_cover = 1
@@ -610,9 +615,10 @@ func _live_mana_well_and_blink() -> void:
 	ok(cannon_cd > 0, "§6: ...and so is a kit ability (%d)" % cannon_cd)
 	mage.resource = mage.max_resource
 	await scene.call("_resolve", mage, blink, mage, "good")
-	ok(int(mage.cooldowns.get("Magic Missiles", 0)) == missiles_cd - 1,
-		"§6: Blink takes a turn off the DRAFTED ability's cooldown")
-	ok(int(mage.cooldowns.get("Arcane Cannon", 0)) == cannon_cd - 1,
+	# BATCH CQ §3 — TWO TURNS SINCE CN §3'S FOLD, not one.
+	ok(int(mage.cooldowns.get("Magic Missiles", 0)) == missiles_cd - 2,
+		"§6: Blink takes TWO turns off the DRAFTED ability's cooldown")
+	ok(int(mage.cooldowns.get("Arcane Cannon", 0)) == cannon_cd - 2,
 		"§6: ...and off the kit ability's")
 	# AND NOT OFF ITS OWN — the other half of the same cast, so a helper that
 	# simply walked everything trips here.
@@ -663,7 +669,9 @@ func _live_dispel() -> void:
 	for id in ["exposed", "cripple", "sunder"]:
 		if ally.has_status(id):
 			left += 1
-	ok(left == 1, "§3: Dispel strips exactly TWO harmful effects from an ally (%d left)" % left)
+	# BATCH CQ §3 — THREE SINCE CN §3'S FOLD, so the ally is left clean and
+	# the setup above (three afflictions) is exactly emptied.
+	ok(left == 0, "§3: Dispel strips exactly THREE harmful effects from an ally (%d left)" % left)
 	# ---- THE ENEMY HALF: DOES ANYTHING EXIST TO REMOVE? §3 ASKED, SO IT IS
 	# MEASURED. `shielded` is the only beneficial status an enemy can carry.
 	scene.call("_apply_status", foe, "shielded", 3)
@@ -887,9 +895,9 @@ func _live_exhortation() -> void:
 	for h in scene.get("heroes"):
 		if h.is_companion:
 			continue
-		if h.status_power("exhorted") == 25:
+		if h.status_power("exhorted") == 35:
 			called += 1
-	ok(called == 4, "§4: Exhortation banks 25%% on the whole party (%d)" % called)
+	ok(called == 4, "§4: Exhortation banks 35%% on the whole party (%d)" % called)
 	# ---- BANKED, NOT TIMED — §6's own check, with a SLOW hero ----
 	# Ten status ticks is far past any nominal window a 2- or 3-turn buff would
 	# have had. If it were on a clock this is where it would be gone.
@@ -903,7 +911,7 @@ func _live_exhortation() -> void:
 		return
 	for _t in 10:
 		slow.tick_statuses()
-	ok(slow.status_power("exhorted") == 25,
+	ok(slow.status_power("exhorted") == 35,
 		"§6: it is still there after TEN turns — banked, not timed (%d)" % \
 			slow.status_power("exhorted"))
 	ok(slow.has_status("exhorted"), "§6: ...and the chip is still on the bar")

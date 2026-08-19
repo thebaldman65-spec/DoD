@@ -335,7 +335,7 @@ const LANE_TREES := {
 				"damage": 35, "pressure": 20, "delay": 3.5, "anim": "attack02",
 				"resource_gain": 10,
 				"perfect_id": "", "perfect_text": "Initiative cost 3.0 instead",
-				"description": "A committed thrust. In Aggressive\nstance it Exposes the target; in\nDefensive it Cripples them (3 turns).\nBuilds 10 Rage."},
+				"description": "A committed thrust. In Aggressive\nstance it Exposes the target; in\nDefensive it Cripples them for\n3 turns. Builds 10 Rage."},
 				"upgrade": [
 					{"stat": {"lunge_upgraded": 1}},
 					{"ability": "Lunge", "set": {"cost": 15,
@@ -866,7 +866,7 @@ const LANE_TREES := {
 			"payload": {"new_ability": {"display_name": "Immolate", "cost": 15,
 				"special": "immolate", "delay": 1.5, "anim": "attack03", "cooldown": 2,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Wrap yourself in it: for 4 turns you\ntake 20% LESS damage, and whatever\nstrikes you is set Burning (3 turns)."}}},
+				"description": "Wrap yourself in it: for 4 turns you\ntake 20% LESS damage, and whatever\nstrikes you is set Burning for\n3 turns."}}},
 		{"id": "py_molten", "name": "Backblast", "ranks": 1, "lane": "Inferno", "row": 5,
 			"desc": "Once per battle, the first time you drop below 40% health: every enemy is set Burning 4 turns and you heal {v}% of maximum.",
 			"scale": {"step": 15},
@@ -952,7 +952,7 @@ const LANE_TREES := {
 				"perfect_extra_hit": false, "delay": 3.5, "anim": "attack03", "cooldown": 4,
 				"applies_status": {"id": "burn", "turns": 2},
 				"perfect_id": "", "perfect_text": "Every enemy takes an even share.",
-				"description": "The sky ignites: 6-8 bolts rake random\nenemies for 12% of Attack, each one\nsetting its victim Burning (2 turns\nper bolt — repeats stack). Twelve to\nsixteen turns of drain in one cast."}}},
+				"description": "The sky ignites: 6-8 bolts rake random\nenemies for 12% of Attack, each one\nsetting its victim Burning for 2 turns\nper bolt — repeats stack. Twelve to\nsixteen turns of drain in one cast."}}},
 		# Out of the vault (Batch AR), minus its Empower clause — Empower is a
 		# named mechanic belonging to the Holy Cleric's Mercy system, and this
 		# ability never should have granted it.
@@ -1006,7 +1006,7 @@ const LANE_TREES := {
 			"payload": {"new_ability": {"display_name": "Rime", "cost": 25,
 				"special": "rime", "delay": 3.0, "anim": "attack02", "cooldown": 3,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Hoarfrost takes root: Frostbites the\ntarget (-50% healing received, 2 turns);\nfor 4 turns, every stack of Chilled\nthis enemy gains also chills one\nother random enemy."}}},
+				"description": "Hoarfrost takes root: Frostbites the\ntarget — 50% less healing received,\nfor 2 turns. For 4 turns, every stack\nof Chilled this enemy gains also\nchills one other random enemy."}}},
 		{"id": "cr_icy_resolve", "name": "Icy Resolve", "ranks": 1, "lane": "Winter", "row": 5,
 			"desc": "Rime lasts {v} additional turns.",
 			"scale": {"step": 2},

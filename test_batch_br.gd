@@ -802,15 +802,16 @@ func _live_arcane_arrows() -> void:
 	hunter.resource = hunter.max_resource
 	# ---- BANKED, NOT TIMED ----
 	await scene.call("_resolve", hunter, arrows, hunter, "good")
-	ok(hunter.status_power("arrows") == 5,
-		"§6: Arcane Arrows banks five charges (%d)" % hunter.status_power("arrows"))
+	# BATCH CQ §3 — SIX SINCE CN §3'S FOLD (the perfect's sixth became the base).
+	ok(hunter.status_power("arrows") == 6,
+		"§6: Arcane Arrows banks six charges (%d)" % hunter.status_power("arrows"))
 	var st: Dictionary = hunter.get_status("arrows")
 	ok(int(st.get("turns", 0)) == -1,
 		"§6: ...BATTLE-LONG (-1 turns), which is what makes 'banked' true")
 	# "They persist" is trivially true if nothing ever ticks — so tick.
 	for _i in 6:
 		hunter.tick_statuses()
-	ok(hunter.status_power("arrows") == 5,
+	ok(hunter.status_power("arrows") == 6,
 		"§6: ...and six turns of ticking spends NONE of them (%d)" % \
 			hunter.status_power("arrows"))
 	# ---- §1: A THREE-SHOT ABILITY SPENDS THREE ----
@@ -819,8 +820,8 @@ func _live_arcane_arrows() -> void:
 	var others_hp_before: int = foes[1].hp + foes[2].hp
 	hunter.resource = hunter.max_resource
 	await scene.call("_resolve", hunter, volley, foe, "good")
-	ok(hunter.status_power("arrows") == 2,
-		"§6: a THREE-shot volley spends THREE charges, 5 -> 2 (got %d)" % \
+	ok(hunter.status_power("arrows") == 3,
+		"§6: a THREE-shot volley spends THREE charges, 6 -> 3 (got %d)" % \
 			hunter.status_power("arrows"))
 	ok(foes[1].hp + foes[2].hp < others_hp_before,
 		"§6: ...and the splash reached the OTHER enemies, which is the on-hit half")
@@ -832,13 +833,18 @@ func _live_arcane_arrows() -> void:
 	if single != null:
 		hunter.resource = hunter.max_resource
 		await scene.call("_resolve", hunter, single, foe, "good")
-		ok(hunter.status_power("arrows") == 1,
-			"§6: ...while a SINGLE strike spends exactly one, 2 -> 1 (got %d)" % \
+		ok(hunter.status_power("arrows") == 2,
+			"§6: ...while a SINGLE strike spends exactly one, 3 -> 2 (got %d)" % \
 				hunter.status_power("arrows"))
 	# THE LAST CHARGE CLEARS THE CHIP. `status_power` returns -1 for an absent
 	# status rather than 0, so absence is asserted with `has_status`.
-	hunter.resource = hunter.max_resource
-	await scene.call("_resolve", hunter, single, foe, "good")
+	# BATCH CQ §3 — SPEND WHAT IS LEFT RATHER THAN A FIXED ONE. The fold banked
+	# a sixth charge, so a single hard-coded shot no longer reaches the bottom;
+	# the question ("the LAST charge clears the chip") is asked of whatever the
+	# count happens to be.
+	for _spend in maxi(hunter.status_power("arrows"), 0):
+		hunter.resource = hunter.max_resource
+		await scene.call("_resolve", hunter, single, foe, "good")
 	ok(not hunter.has_status("arrows"),
 		"§6: the last charge spends and the chip goes")
 	# A HIT THAT NEVER LANDED SPENDS NOTHING — asserted through the ONE spend
@@ -1191,22 +1197,41 @@ func _live_iron_will() -> void:
 	# retried (the AK/AL/AR discipline).
 	foe.crit_bonus = -1.0
 	var strike: Ability = foe.abilities[0]
-	var hp_a := wd.hp
-	await scene.call("_resolve", foe, strike, wd, "good")
-	var with_iw := hp_a - wd.hp
+	# BATCH CQ §1 — SAMPLED RATHER THAN SINGLE-SHOT, AND THE LAST FORCED
+	# VARIABLE IS THE ONE THAT HAS NO FIELD. This compared ONE blow against ONE
+	# blow with the block, the parry, the plating ramp and the crit all driven
+	# off by hand — and then rolled `randf_range(0.9, 1.1)` twice anyway,
+	# because the damage variance is a literal inside `_resolve` with no handle
+	# to zero. **A 15% cut cannot clear a 22% spread on one swing**: a warded
+	# high roll is 1.1 x 0.85 = 0.935 of base against an unwarded low roll of
+	# 0.90, so the comparison INVERTS outright a few runs in a hundred. It read
+	# `29 taken against 28` on the first battery that ever got this far.
+	#
+	# It has effectively never been exercised: `br` is one of the four suites
+	# that deadlocked from CM until §1 of this batch, so this line has not run
+	# in a battery since. Averaging the variance out is the same answer
+	# `check_cm_live` already uses for the brace ratio, and it keeps the AK/AL/AR
+	# rule the block above states — FORCED, NOT RETRIED. The plating cancel is
+	# re-applied before every swing for the reason the old comment gives.
+	const IRONCLAD_SAMPLES := 20
+	var with_iw := 0
+	var without_iw := 0
+	for _i in IRONCLAD_SAMPLES:
+		wd.hp = wd.max_hp
+		wd.plating_bonus = -0.15
+		var hp_a := wd.hp
+		await scene.call("_resolve", foe, strike, wd, "good")
+		with_iw += hp_a - wd.hp
 	wd.remove_status("ironclad")
-	wd.hp = wd.max_hp
-	# AND THE PLATING RAMP IS RE-ZEROED BETWEEN THE TWO BLOWS. Heavy Plating
-	# climbs +8% Block per UNBLOCKED hit, so the first swing leaves the second
-	# with a real block chance — and a blocked swing is a FULL negation, which
-	# reads as 0 damage and inverts the comparison about one run in twelve. The
-	# cancel has to be re-applied, not applied once.
-	wd.plating_bonus = -0.15
-	var hp_b := wd.hp
-	await scene.call("_resolve", foe, strike, wd, "good")
-	var without_iw := hp_b - wd.hp
+	for _i in IRONCLAD_SAMPLES:
+		wd.hp = wd.max_hp
+		wd.plating_bonus = -0.15
+		var hp_b := wd.hp
+		await scene.call("_resolve", foe, strike, wd, "good")
+		without_iw += hp_b - wd.hp
 	ok(with_iw < without_iw,
-		"§3: Ironclad really cuts the damage (%d taken against %d)" % [with_iw, without_iw])
+		"§3: Ironclad really cuts the damage (%d taken against %d over %d swings each)"
+			% [with_iw, without_iw, IRONCLAD_SAMPLES])
 	var battle_src := _src("res://scripts/battle.gd")
 	# RE-POINTED BY BATCH CK §2: was IRON_WILL_CUT_PCT.
 	ok(battle_src.contains("const IRONCLAD_CUT_PCT := 15"),
@@ -1252,15 +1277,20 @@ func _live_hits_not_casts() -> void:
 	mage.resource = mage.max_resource
 	var foe: BattleUnit = (scene.get("enemies") as Array)[0]
 	await scene.call("_resolve", mage, mirror, mage, "good")
-	ok(mage.status_power("mirror") == 3,
-		"§1: three images standing (%d)" % mage.status_power("mirror"))
+	# BATCH CQ §3 — FOUR IMAGES SINCE CN §3'S FOLD.
+	ok(mage.status_power("mirror") == 4,
+		"§1: four images standing (%d)" % mage.status_power("mirror"))
 	var triple: Ability = Ability.make({"display_name": "Test Flurry", "cost": 0,
 		"damage": 20, "pressure": 0, "delay": 2.0, "multi_hits": 3,
 		"perfect_extra_hit": false})
 	var hp_before := mage.hp
 	await scene.call("_resolve", foe, triple, mage, "good")
-	ok(not mage.has_status("mirror"),
-		"§1: a THREE-strike blow spends THREE images, not one")
+	# BATCH CQ §3 — THREE OF FOUR, so one image is left standing and the chip
+	# stays up. The question is "one image per STRIKE, not per cast", and the
+	# count it leaves behind is what answers it.
+	ok(mage.status_power("mirror") == 1,
+		"§1: a THREE-strike blow spends THREE images, not one (%d left)" % \
+			mage.status_power("mirror"))
 	ok(mage.hp == hp_before,
 		"§1: ...and not one of the three landed a point of damage")
 	# AND AN AREA ATTACK STILL SPENDS NONE — BQ's rule, unchanged. The gate is
@@ -1268,12 +1298,12 @@ func _live_hits_not_casts() -> void:
 	# target, i.e. single-target, and an area attack is not.
 	mage.resource = mage.max_resource
 	await scene.call("_resolve", mage, mirror, mage, "good")
-	ok(mage.status_power("mirror") == 3, "§1: three images again")
+	ok(mage.status_power("mirror") == 4, "§1: four images again")
 	var aoe: Ability = Ability.make({"display_name": "Test Sweep", "cost": 0,
 		"damage": 20, "pressure": 0, "delay": 2.0, "aoe": true})
 	var hp_aoe := mage.hp
 	await scene.call("_resolve", foe, aoe, mage, "good")
-	ok(mage.status_power("mirror") == 3,
+	ok(mage.status_power("mirror") == 4,
 		"§1: an AREA attack spends NONE (%d left)" % mage.status_power("mirror"))
 	ok(mage.hp < hp_aoe, "§1: ...because it landed instead")
 	# THE REACHABILITY CLAIM, ASSERTED RATHER THAN STATED: no enemy in the

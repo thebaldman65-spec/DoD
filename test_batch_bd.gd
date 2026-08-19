@@ -174,11 +174,17 @@ func _the_spec() -> void:
 	ok(abs(ab.delay - 2.0) < 0.001, "§1: 2.0 initiative (reads %s)" % str(ab.delay))
 	ok(ab.cooldown == 5, "§1: 5 turn cooldown (reads %d)" % ab.cooldown)
 	ok(ab.special == "deadfall", "§1: it is still the deadfall special")
-	# It KEEPS its skill check (Batch AH gave it one) — the perfect just buys
-	# something else now.
-	ok(not ab.no_skill_check, "§1: it still runs a skill check")
-	ok(ab.perfect_text == "A fourth spring.",
-		"§1: the perfect is a fourth spring, NOT naming the victim (reads '%s')" % \
+	# BATCH CQ §5 — RE-POINTED AND INVERTED. AH gave Deadfall a check; CN's
+	# parameteric criterion took it away again, and this line went on reading
+	# the explicit opt-out flag (never set) and reporting the bar as present.
+	# The flag is deleted; `runs_skill_check()` is the single source.
+	ok(not ab.runs_skill_check(), "§1: CN's criterion removed its skill check")
+	# BATCH CQ §3 — CN §3 FOLDED THE FOURTH SPRING INTO THE BASE and cleared
+	# the text with it, because a card that runs no bar must not advertise a
+	# bonus nothing can fire. The fourth spring is asserted as the BASE count
+	# below; what is pinned here is that the advertisement is gone.
+	ok(ab.perfect_text == "",
+		"§1: the perfect text is CLEARED — the fourth spring is base now (reads '%s')" % \
 			ab.perfect_text)
 	ok(not ab.perfect_text.to_lower().contains("choose") \
 		and not ab.perfect_text.to_lower().contains("name"),
@@ -295,7 +301,7 @@ func _live_three_springs_then_nothing() -> void:
 	ok(sv != null, "the Survivalist stands")
 	if sv != null:
 		await _arm(scene, sv)
-		ok(sv.deadfall_armed == 3, "one cast arms THREE springs (reads %d)" % \
+		ok(sv.deadfall_armed == 4, "one cast arms FOUR springs since CN's fold (reads %d)" % \
 			sv.deadfall_armed)
 		var sprung := 0
 		for _i in 12:
@@ -306,7 +312,7 @@ func _live_three_springs_then_nothing() -> void:
 			scene.call("_deadfall_tick", foe)
 			if _stat_of(scene, "deadfall_springs") > before:
 				sprung += 1
-		ok(sprung == 3, "exactly three springs, then nothing (read %d)" % sprung)
+		ok(sprung == 4, "exactly four springs, then nothing (read %d)" % sprung)
 		ok(sv.deadfall_armed == 0, "the charges are spent")
 		ok(not sv.has_status("deadfall"), "and the chip is gone with them")
 		_report.append("springs from one ordinary cast: %d" % sprung)
@@ -338,7 +344,7 @@ func _live_dormancy_blocks_then_allows() -> void:
 		ok(seq[1].begins_with("rest"), "turn 2: the dormancy blocks it")
 		ok(seq[2].begins_with("rest"), "turn 3: still resting — the rest is TWO turns")
 		ok(seq[3] == "spring", "turn 4: it re-arms and springs again")
-		ok(sv.deadfall_armed == 1, "two of three charges are spent")
+		ok(sv.deadfall_armed == 2, "two of four charges are spent")
 		_report.append("dormancy sequence over four enemy turns: %s" % \
 			", ".join(seq))
 	await _kill(scene)
@@ -350,11 +356,13 @@ func _live_perfect_gives_four() -> void:
 	var sv := _sv(scene)
 	if sv != null:
 		await _arm(scene, sv, "perfect")
-		ok(sv.deadfall_armed == 4, "a PERFECT rig arms four springs (reads %d)" % \
+		# BATCH CQ §3 — THIS PASSED FOR THE WRONG REASON AFTER CN'S FOLD: four
+		# is now what EVERY rig arms, so the grade decides nothing here.
+		ok(sv.deadfall_armed == 4, "a perfect rig arms four — as every rig does (reads %d)" % \
 			sv.deadfall_armed)
 		# It SETS rather than adds: a second cast does not stack a second trap.
 		await _arm(scene, sv, "good")
-		ok(sv.deadfall_armed == 3,
+		ok(sv.deadfall_armed == 4,
 			"a further cast REPLACES the trap rather than stacking (reads %d)" % \
 				sv.deadfall_armed)
 	await _kill(scene)
@@ -413,9 +421,9 @@ func _live_nodes_pay_per_spring() -> void:
 				dmg_total += _stat_of(scene, "dmg_hero_" + sv.unit_name) - dm_before
 				ok(foe.has_status("caught"),
 					"Caught Fast is re-applied on spring %d" % springs)
-		ok(springs == 3, "three springs to pay for")
-		ok(abs(bd_total - 270.0) < 0.5,
-			"Bone Breaker pays 90 on EACH of three springs = 270 (read %.0f)" % bd_total)
+		ok(springs == 4, "four springs to pay for")
+		ok(abs(bd_total - 360.0) < 0.5,
+			"Bone Breaker pays 90 on EACH of four springs = 360 (read %.0f)" % bd_total)
 		_report.append("§2 per-spring totals across a full deadfall: Bone Breaker %.0f Break (90 x 3) | trap damage %.0f (20%% of %d Attack, x1.5 Cruel Devices, three springs) | Caught Fast re-applied %d times for %d turns each" % [
 			bd_total, dmg_total, sv.attack, springs, sv.caught_fast])
 	await _kill(scene)
@@ -434,7 +442,7 @@ func _live_cap_counts_a_deadfall_as_one() -> void:
 		ok(bool(scene.call("_ability_usable", sv, snare)),
 			"with nothing out, Snare Trap is allowed")
 		await _arm(scene, sv)
-		ok(sv.deadfall_armed == 3, "three charges are out")
+		ok(sv.deadfall_armed == 4, "four charges are out")
 		ok(not bool(scene.call("_ability_usable", sv, snare)),
 			"at the base cap of ONE, an armed deadfall locks Snare Trap out")
 		ok(not bool(scene.call("_ability_usable", sv, dfall)),
@@ -462,7 +470,7 @@ func _live_cap_counts_a_deadfall_as_one() -> void:
 		foes[0].remove_status("snared")
 		foes[1].remove_status("snared")
 		sv.deadfall_network = 0
-		_report.append("trap cap: a 3-charge deadfall counts as 1 occupant, and composes with snares")
+		_report.append("trap cap: a 4-charge deadfall counts as 1 occupant, and composes with snares")
 	await _kill(scene)
 	_live_ran += 1
 
@@ -474,12 +482,17 @@ func _live_slot_frees_on_the_last_charge() -> void:
 	var snare: Ability = Classes.pool_ability("Snare Trap")
 	if sv != null:
 		await _arm(scene, sv)
-		for i in 3:
+		# BATCH CQ §3 — THE LOOP READS THE ARMED COUNT RATHER THAN A LITERAL.
+		# It span three charges because that was the number CN's fold changed;
+		# written this way the question ("the slot frees on the LAST charge,
+		# whichever number that is") survives the next re-tune without a bump.
+		var charges: int = sv.deadfall_armed
+		for i in charges:
 			foe.hp = foe.max_hp
 			foe.remove_status("stunned")
 			sv.deadfall_dormant = 0
 			scene.call("_deadfall_tick", foe)
-			if i < 2:
+			if i < charges - 1:
 				ok(not bool(scene.call("_ability_usable", sv, snare)),
 					"with %d charge(s) left the slot is still held" % sv.deadfall_armed)
 		ok(sv.deadfall_armed == 0, "the last charge is spent")
@@ -501,14 +514,14 @@ func _live_chip_shows_charges_and_rest() -> void:
 	if sv != null:
 		await _arm(scene, sv)
 		var ready_txt := String(sv.get_status("deadfall").get("short", ""))
-		ok(ready_txt == "DF3",
+		ok(ready_txt == "DF4",
 			"armed and ready reads the charge count (reads '%s')" % ready_txt)
 		foe.hp = foe.max_hp
 		scene.call("_deadfall_tick", foe)
 		var st: Dictionary = sv.get_status("deadfall")
 		var rest_txt := String(st.get("short", ""))
-		# Two charges left, two turns of rest — the chip has to carry both.
-		ok(rest_txt == "DF2\u00b72",
+		# Three charges left, two turns of rest — the chip has to carry both.
+		ok(rest_txt == "DF3\u00b72",
 			"resting reads charges AND rest turns (reads '%s')" % rest_txt)
 		ok(rest_txt != ready_txt,
 			"...and it is visibly a different state from armed-and-ready")

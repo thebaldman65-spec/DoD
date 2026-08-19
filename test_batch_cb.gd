@@ -532,10 +532,12 @@ func _live_firedraw() -> void:
 	await scene.call("_resolve", py, _card("Firedraw"), mark, "good")
 	ok(_burn_turns(shallow) == 0,
 		"the shallow source gave its 2 and is out (got %d)" % _burn_turns(shallow))
-	ok(_burn_turns(deep) == 6,
-		"the deep source gave exactly 4 of its 10 (got %d)" % _burn_turns(deep))
-	ok(_burn_turns(mark) == 6,
-		"the target carries 2 + 4 = 6 (got %d)" % _burn_turns(mark))
+	# BATCH CQ §3 — SIX SINCE CN §3'S FOLD (`FIREDRAW_TAKE_PERFECT`), so the
+	# deep source is left holding four rather than six.
+	ok(_burn_turns(deep) == 4,
+		"the deep source gave exactly 6 of its 10 (got %d left)" % _burn_turns(deep))
+	ok(_burn_turns(mark) == 8,
+		"the target carries 2 + 6 = 8 (got %d)" % _burn_turns(mark))
 	scene.queue_free()
 	await process_frame
 
@@ -659,8 +661,13 @@ func _live_emberkeep() -> void:
 	ok(_burn_turns(old_fire) == 3, "a 3-turn fire stands before the cast")
 	await scene.call("_resolve", py, _card("Emberkeep"), py, "good")
 	ok(py.has_status("emberkeep"), "the window is open")
-	ok(int(py.get_status("emberkeep").get("turns", 0)) == 3,
-		"...for three turns")
+	# BATCH CQ §3 — FOUR SINCE CN §3'S FOLD, AND THE FOLD MADE IT PERMANENT.
+	# Emberkeep's cooldown is 4 and the window is now 4, so it can be re-opened
+	# the turn it closes and never has to lapse. §2 flags it in that class and
+	# the magnitude is UNREVIEWED — the value is pinned here so the change is
+	# visible rather than absorbed, not because the designer has blessed it.
+	ok(int(py.get_status("emberkeep").get("turns", 0)) == 4,
+		"...for four turns — which now MEETS its own 4-turn cooldown")
 	ok(_burn_turns(old_fire) == 3,
 		"FIRE ALREADY ON THE BOARD IS UNTOUCHED (got %d) — that is Stoke's job"
 			% _burn_turns(old_fire))
@@ -954,8 +961,11 @@ func _live_threshold() -> void:
 		"Threshold SETS the meter to exactly %d (got %d)" % [
 			THRESHOLD_STACKS_TEST, arc.second_resource])
 	ok(arc.has_status("threshold_lock"), "and the lockout is up")
-	ok(int(arc.get_status("threshold_lock").get("turns", 0)) == 3,
-		"...for three turns")
+	# BATCH CQ §3 — TWO SINCE CN §3'S FOLD, and this one folded DOWNWARD: the
+	# perfect bought a SHORTER lockout (`THRESHOLD_LOCK_TURNS_PERFECT` = 2
+	# against the base 3), so the fold is a buff expressed as a smaller number.
+	ok(int(arc.get_status("threshold_lock").get("turns", 0)) == 2,
+		"...for two turns — the folded, shorter lockout")
 	# IT REFUSES ALL GAIN, AT THE ONE DOOR. Driven through the door itself AND
 	# through two of the cards §7 names, because a gate written per-card would
 	# pass the first and fail the others.

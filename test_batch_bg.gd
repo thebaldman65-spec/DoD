@@ -343,7 +343,11 @@ func _the_chip_and_the_passive_name_the_doubling() -> void:
 	ok(j > 0, "§2: the Devout's passive block is findable")
 	ok(csrc.substr(j, 600).contains("Apostle adds another 1x"),
 		"§2: ...and the passive block names Apostle's share of the multiplier")
-	ok(csrc.substr(j, 600).contains("HIGHEST COUNT HELD THIS BATTLE"),
+	# BATCH CQ §3 — FLATTENED BEFORE THE READ. CL's prose pass re-wrapped the
+	# Devout's passive block and the line break now falls between "HELD" and
+	# "THIS BATTLE", so a raw substring search misses a sentence that is still
+	# there and still says exactly what this asserts. Not a fold consequence.
+	ok(csrc.substr(j, 600).replace("\\n", " ").contains("HIGHEST COUNT HELD THIS BATTLE"),
 		"§2/BI: ...and the peak rule as well")
 
 

@@ -546,8 +546,12 @@ func _negative_control_source() -> void:
 					"NEGATIVE CONTROL: a reversal node touches only cost and cooldown (found %s)" % f)
 	# The return health lives in ONE place — the resurrection branch — and no
 	# talent field reaches it.
-	ok(bsrc.contains("var rez_frac := 0.25 if is_perfect else 0.2"),
-		"the return health is still 20% / 25% perfect / 100% Empowered")
+	# BATCH CQ §3 — RE-POINTED TO THE FOLDED SOURCE. CN §3 folded the perfect's
+	# 25% into the base, so the ternary this pinned is gone and 25% is what a
+	# raise returns. Empower's 100% reassignment is what the block below still
+	# guards, and that is untouched.
+	ok(bsrc.contains("var rez_frac := 0.25"),
+		"the return health is 25% since CN's fold / 100% Empowered")
 	# EXACTLY ONE reassignment exists — Empower's. A Serenity or Martyrdom that
 	# also moved it would add a second, and would read as generosity rather
 	# than as the thing that makes Empower pointless.
@@ -701,8 +705,8 @@ func _live_serenity() -> void:
 	await scene._resolve_special(c, res, fallen, "good", 1.0)
 	ok(not fallen.dead, "...and she raises them holding NO Mercy at all")
 	var frac := float(fallen.hp) / float(fallen.max_hp)
-	ok(abs(frac - 0.2) < 0.03,
-		"THE RETURN HEALTH IS UNTOUCHED at 20%% (got %.0f%%)" % (frac * 100.0))
+	ok(abs(frac - 0.25) < 0.03,
+		"THE RETURN HEALTH IS UNTOUCHED by Serenity at 25%% (got %.0f%%)" % (frac * 100.0))
 	_report.append("Serenity raise returns %.0f%% health — Empower's 100%% is untouched"
 		% (frac * 100.0))
 	await _kill(scene)

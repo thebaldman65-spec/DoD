@@ -449,21 +449,32 @@ func _test_deadfall_aim() -> void:
 		scene.free()
 		return
 	var ab: Ability = Classes.pool_ability("Deadfall")
-	ok(ab != null and not ab.no_skill_check, "Deadfall resolves and still takes a check")
+	# BATCH CQ §5 — THE FLAG IS GONE AND THIS CHECK WAS BACKWARDS. It read the
+	# opt-out flag (false) and reported "still takes a check"; CN's criterion
+	# took Deadfall's bar away, so the true statement is the opposite one.
+	ok(ab != null and not ab.runs_skill_check(),
+		"Deadfall resolves WITHOUT a check (CN's criterion, not the deleted flag)")
 	scene.set("autoplay", false)
 	await scene._resolve_special(sv, ab, sv, "perfect", 1.0)
 	scene.set("autoplay", true)
-	ok(sv.deadfall_armed == 4, "a PERFECT rig arms FOUR springs (reads %d)" % \
-		sv.deadfall_armed)
+	# BATCH CQ §3 — THIS ONE PASSED FOR THE WRONG REASON. CN §3 folded the
+	# perfect's fourth spring into the base, so FOUR is what every rig arms
+	# and the grade no longer decides anything here. Re-pointed to say that.
+	ok(sv.deadfall_armed == 4,
+		"every rig arms FOUR springs since CN's fold (reads %d)" % sv.deadfall_armed)
 	# THE OLD BEHAVIOUR IS ASSERTED GONE, not merely unused: no picker opened
 	# (nothing answered one and the call returned), and the field it wrote to
 	# does not exist any more.
 	ok(not sv.get_property_list().any(
 			func(pr): return String(pr["name"]) == "deadfall_aims"),
 		"...and `deadfall_aims` is gone with the clause that wrote it")
-	# An ORDINARY rig arms three, and REPLACES rather than stacking.
+	# BATCH CQ §3 — AN ORDINARY RIG ARMS FOUR TOO, and REPLACES rather than
+	# stacking. The replacement is the half of this check that still asks a
+	# question; the count is the folded value (CN §3, DEADFALL_CHARGES + 1).
 	await scene._resolve_special(sv, ab, sv, "good", 1.0)
-	ok(sv.deadfall_armed == 3, "an ordinary rig arms three, replacing the four")
+	ok(sv.deadfall_armed == 4,
+		"an ordinary rig arms FOUR as well, replacing rather than stacking (reads %d)" % \
+			sv.deadfall_armed)
 	for _i in 6:
 		await process_frame
 	scene.free()

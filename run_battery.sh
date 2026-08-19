@@ -65,14 +65,30 @@ GATES=(check_parse check_flow check_map check_cl_resolver check_cl_width
 # letting it read as a suite with no count.
 TIMEOUT=${DOD_SUITE_TIMEOUT:-240}
 
+# BATCH CQ §1 — A PER-TARGET BOUND, BECAUSE "TIMED OUT" AND "HUNG" ARE NOT THE
+# SAME OUTCOME AND THE WATCHDOG COULD NOT TELL THEM APART. `check_map` was
+# reported as `*** TIMED OUT after 240s ***` on EVERY run including unmodified
+# HEAD, which reads exactly like the four suites that genuinely deadlocked.
+# It is not hung: it runs at **99% CPU for about five minutes** and then
+# finishes and prints its distributions — it walks 1,500 generated maps across
+# four routing policies, and that is simply what that costs. CLAUDE.md's
+# hang taxonomy says CHECK CPU FIRST and it is right: ~1-2% is a deadlock or
+# the idle throttle, 30-50% with a growing log is TextServer exhaustion, and
+# 99% with no output is a gate doing its job slowly. Raising the GLOBAL bound
+# would have blunted the watchdog for everything else, so the bound is
+# per-target, the same shape `EXTRA` already uses for flags.
+typeset -A TMO
+TMO[check_map]=600
+
 run_one() {
   local name=$1 log="$OUT/$1.log"
   local -a flags
   flags=(${=EXTRA[$name]})
+  local limit=${TMO[$name]:-$TIMEOUT}
   "$GODOT" --headless --path . "${flags[@]}" --script "$name.gd" >"$log" 2>&1 &
   local pid=$! waited=0 timedout=0
   while kill -0 $pid 2>/dev/null; do
-    if (( waited >= TIMEOUT )); then
+    if (( waited >= limit )); then
       kill -9 $pid 2>/dev/null; timedout=1; break
     fi
     sleep 2; (( waited += 2 ))
@@ -86,7 +102,7 @@ run_one() {
   local faillines=$(grep -cE '^ *FAIL' "$log")
   if (( timedout )); then
     printf '%-22s *** TIMED OUT after %ss *** (no count; %s log lines)\n' \
-      "$name" "$TIMEOUT" "$(wc -l < "$log" | tr -d ' ')"
+      "$name" "$limit" "$(wc -l < "$log" | tr -d ' ')"
   else
     printf '%-22s checks=%-6s fails=%-4s throws=%-3s FAILlines=%s\n' \
       "$name" "${checks:-?}" "${fails:-?}" "$throws" "$faillines"

@@ -947,7 +947,9 @@ func _live_fallbacks() -> void:
 
 func _live_bastion_and_stalwart() -> void:
 	# MEASURE THE COMBINATION, because it is legal now and it is large: a
-	# shield absorbing 50% of his maximum, on no cooldown.
+	# shield absorbing 55% of his maximum, on no cooldown.
+	# BATCH CQ §3 — 55 SINCE CN §3'S FOLD: Divine Shield's base went 30% -> 35%
+	# (the perfect's share, folded in) and Stalwart still adds its 20 points.
 	var scene := await _spawn({"dv_stalwart": 1, "dv_bastion": 1})
 	var dv := _hero(scene, 2)
 	var ally := _hero(scene, 0)
@@ -964,10 +966,10 @@ func _live_bastion_and_stalwart() -> void:
 		ok(not st.is_empty(), "the shield lands")
 		if not st.is_empty():
 			var pow_got := int(st.get("power", 0))
-			var want := int(round(dv.max_hp * 0.50))
+			var want := int(round(dv.max_hp * 0.55))
 			ok(abs(pow_got - want) <= 1,
-				"...absorbing 50%% of his maximum (want %d, got %d)" % [want, pow_got])
-			_report.append("STALWART + BASTION, now legal together: %d absorb (50%% of %d max) on a 0-turn cooldown" % [
+				"...absorbing 55%% of his maximum (want %d, got %d)" % [want, pow_got])
+			_report.append("STALWART + BASTION, now legal together: %d absorb (55%% of %d max) on a 0-turn cooldown" % [
 				pow_got, dv.max_hp])
 		# And the absorb feeds Faith — the reason the pair is an engine.
 		ally.faith_stacks = 0

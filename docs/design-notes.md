@@ -4,6 +4,67 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A mechanical consequence is still a decision (Batch CQ) — 2026-08-18
+
+CN removed the timing bar from 113 abilities on a criterion that was right, and that left 105
+Perfect bonuses with nothing to fire them. Folding each one into its base effect is the obvious
+answer, it is what CN did, and at every single one of the 105 sites it is defensible: the bonus
+existed, the player can no longer earn it, and deleting it outright would quietly nerf 105 cards.
+
+**The trouble is that the same argument is available 105 times, and nobody ever has to think about
+the total.** Each fold is a two-token edit — `X if is_perfect else Y` becomes `X` — and reads as
+tidying up after a decision already taken. Nothing in the diff says "this card is now 50% stronger
+for the rest of the run". Reviewing the fold card by card, which is the natural way to review it,
+is the one way to guarantee you never see the size of it.
+
+What the census showed once it was taken: **40 of the 57 duration folds now meet or exceed the
+ability's own cooldown, 18 of them pushed over the line by the fold itself.** A buff whose duration
+reaches its cooldown is not a longer buff, it is a *permanent* one — the cooldown has stopped being
+a constraint and has become a formality. That is a change in kind, not degree, and it is invisible
+in a diff of magnitudes because the magnitude that moved (3 to 4) says nothing about the number it
+has to be compared against (a cooldown declared 200 lines away in another file).
+
+The generalisable bit: **the batch that performs a sweeping mechanical change is the one least able
+to judge it, because a sweep is exactly the shape that makes each instance look local.** The defence
+is not more care per site — care per site is what produced this — it is to compute the aggregate and
+put it in front of the person whose call it is. Report all 105, revert only where the fold overwrote
+a decision that was actually made (Elevation, where the designer had picked 2 over 3 with a raised
+cost eight batches earlier), and leave the rest alone. A batch that "corrects" 105 magnitudes on its
+own judgment has repeated the fault it was sent to find.
+
+There is a smaller version of the same lesson in the two abilities whose folded Perfect had never
+been implemented at all. Mana Shield promised a cheaper initiative cost and Mass Hysteria a shorter
+cooldown; neither handler had ever contained an `is_perfect` branch. **Reading the read site rather
+than the tooltip is what separated a real magnitude change from a deleted lie**, and it is why the
+audit is worth more than the diff that motivated it — the diff would have shown 105 identical-looking
+edits and the read sites showed 103 changes and 2 corrections.
+
+## A guard that names the bots is not a guard against their absence (Batch CQ §1) — 2026-08-18
+
+Four suites hung for five batches, and the reason is a sentence that reads as obviously complete:
+`if sim or autoplay`. Those are the two bots. Everything that is not a bot is a player, so the
+`else` branch can safely wait for a key press.
+
+Except a hand-driven test suite is neither. It sets `Run.active`, clears `sim`, `autoplay` and
+`sim_run` — **deliberately**, because it wants the real battle path rather than the simulated one —
+and then it is a third thing the dichotomy never contemplated: a caller that is not a bot and has no
+hands. The await it reaches can never complete, and the failure presents as a process sitting at 0%
+CPU with its output buffer unflushed, which looks far more like an environment problem than a logic
+one.
+
+Two things made it durable. The first is that the previous batch found a *different* await with the
+same shape (the orientation cards), fixed it, saw the suites still hang, and correctly reverted —
+a right diagnosis of a real defect that happened not to be *this* defect, which is one of the more
+expensive things that can happen to an investigation. The second is that the codebase had already
+answered the question in a third place: `check_cm_live.gd` set two Profile flags by hand to dodge
+the cards. **A workaround in one file is the shape of a bug nobody has named yet** — it is what
+knowledge of a trap looks like before someone writes the guard.
+
+The fix is one predicate, `_nobody_can_press()`, read by all three sites, and its third term is
+`DisplayServer.get_name() == "headless"`. That term is the honest one: it asks whether there is a
+surface to draw on and a device to press with, which is the question the await actually depends on,
+rather than enumerating the callers who happen not to have one.
+
 ## The brief's own examples failed its own scope limit (Batch CO) — 2026-08-18
 
 The batch named five cards as cases of the bug and then, one section later, set a scope limit that

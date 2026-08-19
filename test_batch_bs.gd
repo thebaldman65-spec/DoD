@@ -960,16 +960,18 @@ func _live_ember_debt() -> void:
 	await scene._resolve(py, ed, foe, "good")
 	ok(foe.has_status("burn"), "it sets its target Burning")
 	if foe.has_status("burn"):
-		ok(int(foe.get_status("burn").get("turns", 0)) == 8,
-			"...for 8 turns (got %d)" % int(foe.get_status("burn").get("turns", 0)))
-	ok(py.resource == mana_was - ed.cost + 8,
-		"...and Overburn refunds all 8 immediately: %d - %d + 8 = %d (got %d)" % [
-			mana_was, ed.cost, mana_was - ed.cost + 8, py.resource])
+		# BATCH CQ §3 — TWELVE SINCE CN §3'S FOLD (the perfect's 12 became base).
+		ok(int(foe.get_status("burn").get("turns", 0)) == 12,
+			"...for 12 turns (got %d)" % int(foe.get_status("burn").get("turns", 0)))
+	# The refund IS the turn count, so it moved with it — one number, one place.
+	ok(py.resource == mana_was - ed.cost + 12,
+		"...and Overburn refunds all 12 immediately: %d - %d + 12 = %d (got %d)" % [
+			mana_was, ed.cost, mana_was - ed.cost + 12, py.resource])
 	# THE FIRE IS NOT CONSUMED — that is the whole distinction from every other
 	# payer, and "it burns" is trivially true unless the turns are re-read.
-	ok(int(foe.get_status("burn").get("turns", 0)) == 8,
+	ok(int(foe.get_status("burn").get("turns", 0)) == 12,
 		"the fire still stands its full term after being paid for")
-	ok(int(scene.call("_total_burn_turns")) >= 8,
+	ok(int(scene.call("_total_burn_turns")) >= 12,
 		"...and still feeds the damage bonus")
 	scene.queue_free()
 	await process_frame
@@ -982,7 +984,7 @@ func _live_ember_debt() -> void:
 		var ed2: Ability = Classes.pool_ability("Ember Debt")
 		py2.resource = 40
 		await cruc._resolve(py2, ed2, cruc.get("enemies")[0], "good")
-		ok(py2.resource == 40 - ed2.cost + 16,
-			"Crucible doubles the up-front refund to 16 (got %d)" % py2.resource)
+		ok(py2.resource == 40 - ed2.cost + 24,
+			"Crucible doubles the up-front refund to 24 (got %d)" % py2.resource)
 	cruc.queue_free()
 	await process_frame

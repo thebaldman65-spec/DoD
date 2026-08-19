@@ -357,7 +357,9 @@ func _the_two_texts_state_the_peak_rule() -> void:
 		"§1: the status default states the peak rule")
 	var csrc := _src("res://scripts/classes.gd")
 	var j := csrc.find("\"passive_desc\": \"Conviction:")
-	ok(j > 0 and csrc.substr(j, 700).contains("HIGHEST COUNT HELD THIS BATTLE"),
+	# BATCH CQ §3 — FLATTENED BEFORE THE READ (see bg): CL re-wrapped the block
+	# and the break now falls inside the phrase. The sentence is unchanged.
+	ok(j > 0 and csrc.substr(j, 700).replace("\\n", " ").contains("HIGHEST COUNT HELD THIS BATTLE"),
 		"§1: ...and so does Conviction's passive block")
 	ok(csrc.substr(j, 700).contains("2 a hit"),
 		"§1: ...which also states §2's new absorb rate")

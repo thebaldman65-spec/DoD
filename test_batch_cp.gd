@@ -50,9 +50,24 @@ const WARRIOR_NINE := ["Unslaked", "Spite", "Boil Over",
 # way; the fourteen below are recorded as owed rather than silently rewritten,
 # because rewriting shipped player-facing text is authoring and this is a test
 # batch (CG's standing convention, read from the other side).
-const AUTHORED_DIGIT_ABILITIES := ["Called Shot", "Crushing Blow", "Divine Plea",
-	"Firestorm", "Funeral Pyre", "Heal", "Immolate", "Lunge", "Mana Shield",
-	"Renewal", "Rime", "Shatter", "Shrapnel Charge", "Stabilize"]
+# BATCH CQ §5 — THIRTEEN OF CP'S FOURTEEN ARE FIXED AND ONE WAS NEVER A DEFECT.
+# CP pinned fourteen ability-level parentheticals carrying a typed digit. Each
+# was a second copy of a number that lives in code — an armor shred, a status
+# duration, an Empower cost — and CL's standing rule is that a parenthetical is
+# the shape reserved for a value the renderer computes, so a typed one is
+# indistinguishable from a rendered one. Thirteen are rephrased so the number
+# stands in PROSE, where it is allowed, and no parenthesis mimics a computed
+# value. The 44-character draft-card ceiling was respected line by line.
+#
+# SHATTER IS NOT ONE OF THEM AND STAYS. Its `(max 12)` is a CAP, which is the
+# exact "legitimate prose" shape CP's own report names alongside `(max 5)` and
+# `(0-100)` — it is not a second copy of anything, it bounds the sentence it
+# sits in. It was swept up by the regex rather than by the rule.
+const AUTHORED_DIGIT_ABILITIES := ["Shatter"]
+# THE BASELINE IS KEPT AT CP'S 89 DELIBERATELY (the brief's instruction). It is
+# a CEILING, not an equality: the corpus count fell when the thirteen were
+# fixed, and holding the old number means the check still catches GROWTH
+# without pretending the remaining prose sites have been audited one by one.
 const AUTHORED_DIGIT_CORPUS_CEILING := 89
 
 # CP §3 — the five abilities that RUN a check and state no Perfect. Named, so a
@@ -412,8 +427,15 @@ func _clamp_source() -> void:
 	# new value is at least as strong. Asserted by NAME at each site, because a
 	# clamp deleted from one of the three is the failure that reads exactly like
 	# the card working.
+	# BATCH CQ §0 — THE LAST TWO SITES JOIN THE THREE. `blood_debt` (35 on a
+	# Perfect, 25 on a plain re-mark, and the mark SURVIVES its own bleedout so
+	# re-marking is routine) and `reckless_abandon` (power scales with the Rage
+	# actually spent, and the cast zeroes the bar, so the second cast in a
+	# window is nearly always the weaker one) carried the identical
+	# apply-then-assign defect. CP reported them; CQ clamps them. Five of five.
 	for pair in [["shout_had", "battle_shout"], ["st_had", "stabilized"],
-			["es_had", "eye_storm"]]:
+			["es_had", "eye_storm"], ["bd_had", "blood_debt"],
+			["ra_had", "reckless_abandon"]]:
 		ok(src.contains("%s" % pair[0]),
 			"§0: the %s site reads what stands first (%s)" % [pair[1], pair[0]])
 		ok(src.contains("if %s >= %s" % [_new_of(pair[1]), pair[0]])

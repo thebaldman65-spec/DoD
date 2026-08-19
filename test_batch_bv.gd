@@ -718,7 +718,9 @@ func _live_bloodbond() -> void:
 	ok(bm.get_status("bloodbond").turns < 0,
 		"and it is BATTLE-LONG — a placed guard, not a window (turns %s)"
 			% bm.get_status("bloodbond").turns)
-	ok(bm.status_power("bloodbond") == 50, "it will take HALF (got %d)"
+	# BATCH CQ §3 — A QUARTER SINCE CN §3'S FOLD (the perfect's 25 became the
+	# base), so the hunter now takes a quarter of the blow rather than half.
+	ok(bm.status_power("bloodbond") == 25, "it will take a QUARTER (got %d)"
 		% bm.status_power("bloodbond"))
 	# AGE IT. Ten ticks is past any duration this could plausibly have been
 	# given, and the guard must be untouched.
@@ -738,9 +740,9 @@ func _live_bloodbond() -> void:
 	beast.take_hit(blow, 0)
 	ok(not beast.dead, "the companion is not felled")
 	ok(beast.hp == 1, "it is left on EXACTLY 1 (got %d)" % beast.hp)
-	ok(bm.hp == hunter_hp_was - blow / 2,
-		"and the hunter took EXACTLY half the blow — %d, got %d"
-			% [blow / 2, hunter_hp_was - bm.hp])
+	ok(bm.hp == hunter_hp_was - blow / 4,
+		"and the hunter took EXACTLY a quarter of the blow — %d, got %d"
+			% [blow / 4, hunter_hp_was - bm.hp])
 	ok(not bm.has_status("bloodbond"), "the guard is SPENT once it fires")
 	# THE SECOND BLOW HAS NO GUARD LEFT. This is the negative control that
 	# matters: a version refusing every killing blow passes everything above.
@@ -920,7 +922,9 @@ func _live_ghostpack() -> void:
 		"the Ghost Pack NODE is not learned, so any strike below is the CARD's")
 	await scene.call("_resolve", bm, _card("Ghostpack"), bm, "good")
 	ok(bm.has_status("ghostpack"), "the window is open")
-	ok(bm.get_status("ghostpack").turns == 3, "for 3 turns (got %s)"
+	# BATCH CQ §3 — FOUR SINCE CN §3'S FOLD. Ghostpack's cooldown is 5, so the
+	# window still closes before it can be re-opened.
+	ok(bm.get_status("ghostpack").turns == 4, "for 4 turns (got %s)"
 		% bm.get_status("ghostpack").turns)
 	var foe: BattleUnit = _live_foes(scene)[0]
 	var hp_was: int = foe.hp

@@ -225,8 +225,13 @@ func _initialize() -> void:
 	# The ability descs corrected toward the code.
 	ok(csrc.contains("kindled 1 Faith"),
 		"§2: Consecrated Ground's tooltip states its Faith drip")
-	ok(csrc.contains("\"perfect_text\": \"Deals 12% of Attack\""),
-		"§2: Explosive Shot's perfect states its unit")
+	# BATCH CQ §3 — CL's LIVE VALUES, NOT A FOLD. Explosive Shot still runs a
+	# check and still states a perfect; CL replaced the authored "12% of
+	# Attack" with the `{atk:12}` token that `Classes.resolve_values` expands
+	# at render time, so the unit is stated by the RESOLVER now. The card is
+	# not one of CN's 105 — its perfect survives.
+	ok(csrc.contains("\"perfect_text\": \"Deals {atk:12}\""),
+		"§2: Explosive Shot's perfect states its unit through CL's token")
 	ok(csrc.contains("20% of Attack as nature"),
 		"§2: Shrapnel Charge states its unit")
 	# RE-POINTED AT BATCH BX §4 (prose only — "beasts" became "companions").

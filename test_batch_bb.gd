@@ -777,14 +777,17 @@ func _live_ashes_returns_the_mage() -> void:
 	mage.revive(1.0)
 	mage.hp = mage.max_hp
 	await scene.call("_resolve_special", mage, ashes, mage, "good", 1.0)
-	ok(mage.ashes_return == _const(scene, "ASHES_RETURN"),
+	# BATCH CQ §3 — THE HANDLER READS `ASHES_RETURN_PERFECT` SINCE CN'S FOLD.
+	# `ASHES_RETURN` (25) is still declared and is still the pre-fold number;
+	# the cast arms the folded one, so that is the constant to compare against.
+	ok(mage.ashes_return == _const(scene, "ASHES_RETURN_PERFECT"),
 		"§6: the cast arms the return share (%d%%)" % mage.ashes_return)
 	mage.take_hit(doomed, 0)
 	ok(not mage.dead,
 		"§6: THE PHOENIX REFUSES THE GRAVE — the lethal blow is survived")
-	ok(mage.hp == maxi(int(mage.max_hp * 0.01 * _const(scene, "ASHES_RETURN")), 1),
+	ok(mage.hp == maxi(int(mage.max_hp * 0.01 * _const(scene, "ASHES_RETURN_PERFECT")), 1),
 		"§6: ...and he returns at exactly %d%% (%d of %d)"
-		% [_const(scene, "ASHES_RETURN"), mage.hp, mage.max_hp])
+		% [_const(scene, "ASHES_RETURN_PERFECT"), mage.hp, mage.max_hp])
 	ok(mage.ashes_used, "§6: the rise is spent")
 	# ONCE PER BATTLE: the second lethal blow lands.
 	mage.take_hit(doomed, 0)

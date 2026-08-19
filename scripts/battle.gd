@@ -5707,7 +5707,7 @@ func _open_summon_picker(u: BattleUnit) -> void:
 				swap_desc += "\nReplaces whichever companion holds LESS\nLoyalty (ties: the older)."
 			_summon_opts.append(Ability.make({"display_name": "Swap " + beast,
 				"cooldown": 0, "cost": 10, "special": "summon", "delay": 1.0,
-				"anim": "attack01", "no_skill_check": true,
+				"anim": "attack01",
 				"perfect_id": "", "perfect_text": "",
 				"description": swap_desc}))
 	else:
@@ -9595,10 +9595,24 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and not strike_target.is_hero:
 				var bd_pct := int(round(100.0 * (BLOOD_DEBT_PERFECT_HEAL \
 					if is_perfect else BLOOD_DEBT_HEAL)))
+				# BATCH CQ §0 — THE CLAMP, four of five sites overall. The
+				# identical apply-then-assign defect CP clamped on Battle
+				# Shout, Stabilize and Eye of the Storm: `_apply_status` MAXES
+				# the power, the `update_status` under it ASSIGNS, and the
+				# bleedout site reads `status_power`. A PLAIN RE-MARK AT 25 ON
+				# A STANDING PERFECT MARK OF 35 USED TO CUT THE DEBT BY TEN
+				# POINTS, and re-marking is the ordinary thing to do — the mark
+				# SURVIVES its own bleedout, so the wound gets re-opened and
+				# re-marked as a matter of course. `status_power` returns -1
+				# when nothing stands, so a fresh mark always writes. The mark
+				# itself, its source and the log are outside the guard: the
+				# cast still lands and still names the debt.
+				var bd_had: int = strike_target.status_power("blood_debt")
 				_apply_status(strike_target, "blood_debt", -1, bd_pct, 0, attacker)
-				strike_target.update_status("blood_debt", "BD!",
-					"Blood Debt: every time this enemy BLEEDS\nOUT, %s heals %d%% of his maximum\nhealth. The mark SURVIVES the bleedout,\nso a re-opened wound pays again." % [
-						attacker.unit_name, bd_pct], bd_pct)
+				if bd_pct >= bd_had:
+					strike_target.update_status("blood_debt", "BD!",
+						"Blood Debt: every time this enemy BLEEDS\nOUT, %s heals %d%% of his maximum\nhealth. The mark SURVIVES the bleedout,\nso a re-opened wound pays again." % [
+							attacker.unit_name, bd_pct], bd_pct)
 				_log("   → Blood Debt: the debt is named on %s — every bleedout pays %s %d%% of maximum health%s" % [
 					strike_target.unit_name, attacker.unit_name, bd_pct,
 					" [PERFECT]" if is_perfect else ""], "#e05050")
@@ -11602,7 +11616,8 @@ const ALMS_WARD_PCT := 12
 # laying it does not take the ward with her, and one number is read by the chip
 # and by the absorb alike.
 const VESPERS_PCT := 0.20
-# ELEVATION: the stacks of REAL Faith it hands every ally (a perfect adds one).
+# ELEVATION: the stacks of REAL Faith it hands every ally. There is no perfect
+# bonus on top any more (CN §2 took the bar off the card); the grant IS this.
 #
 # BATCH CG §2 — IT WAS A PEAK FLOOR AND IS A PLAIN GRANT. The old constant was
 # the high-water mark it raised every ally TO; this is a count it ADDS, through
@@ -15001,11 +15016,21 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var ra_turns := 3
 			attacker.resource = 0
 			attacker.refresh_bars()
+			# BATCH CQ §0 — THE CLAMP, five of five. Same defect, and this is
+			# the one that bites hardest: the buff scales off the Rage
+			# ACTUALLY SPENT, so the second cast in a window is nearly always
+			# the weaker one — he dumps a full bar for +20%, rebuilds 30 Rage,
+			# dumps again, and the all-in buff used to fall to +6%. The card is
+			# one of CM's gated five, so it also keeps its bar. The bar is
+			# zeroed and the float text fires either way; only the chip and the
+			# power it carries are guarded.
+			var ra_had: int = attacker.status_power("reckless_abandon")
 			if ra_pct > 0:
 				_apply_status(attacker, "reckless_abandon", ra_turns, ra_pct)
-				attacker.update_status("reckless_abandon", "+%d%%" % ra_pct,
-					"Reckless Abandon: +%d%% damage for %d turns —\n%d Rage was spent to buy it, at %d%%\nper 10. There is nothing left to cast." % [
-						ra_pct, ra_turns, ra_spent, ra_step], ra_pct)
+				if ra_pct >= ra_had:
+					attacker.update_status("reckless_abandon", "+%d%%" % ra_pct,
+						"Reckless Abandon: +%d%% damage for %d turns —\n%d Rage was spent to buy it, at %d%%\nper 10. There is nothing left to cast." % [
+							ra_pct, ra_turns, ra_spent, ra_step], ra_pct)
 			_sfx("crit", -7.0, 0.7)
 			attacker.float_text("-%d %s" % [ra_spent, attacker.resource_name],
 				Color(1.0, 0.5, 0.4))
@@ -16588,7 +16613,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Elevation — no Devout stands, so Faith pays nothing" % \
 					attacker.unit_name, "#909090")
 			else:
-				var el_stacks := ELEVATION_STACKS + 1
+				# BATCH CQ §2 — REVERTED TO 2, WHICH IS WHAT THE DESIGNER
+				# CHOSE. CN §3 folded the Perfect's +1 in here and made the
+				# grant 3. That was not drift: 3 and 2 were both on the table
+				# at CG and the conservative option was picked DELIBERATELY,
+				# with a raised cost paid for it. `ELEVATION_STACKS_TEST := 2`
+				# in test_batch_cp pins the intended value and was already
+				# red against the folded 3.
+				var el_stacks := ELEVATION_STACKS
 				var el_n := 0
 				for el_h in heroes:
 					if el_h.dead or el_h.is_companion:
@@ -19915,6 +19947,25 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 # Sharpshooter basic is the first. A cancel on ANY press cancels the whole
 # check rather than the press, because a player who has decided not to cast is
 # not asking to skip a repetition.
+# BATCH CQ §1 — "IS THERE ANYBODY THERE TO PRESS?", ASKED IN ONE PLACE.
+#
+# Every await in this file that waits on a HUMAN — the two orientation cards
+# and the defensive brace — was guarded by `sim or autoplay`, and that pair
+# describes the two BOTS rather than the absence of a player. A hand-driven
+# test suite is neither: it sets `Run.active`, clears `sim`, `autoplay` and
+# `sim_run` precisely because it wants the real battle path, and then nothing
+# on the far side of the await can ever fire. `test_batch_al` stopped here
+# for 240 seconds at zero CPU, mid-turn, which is CLAUDE.md's hang mode (1).
+#
+# THE DISPLAY SERVER IS THE THIRD TERM AND IT IS THE HONEST ONE: under
+# `--headless` there is no surface to draw the bar on and no device to press
+# it with, so an await on a press is an await on nothing. It is asked here so
+# that the three call sites cannot drift apart again — the fault was that they
+# each answered this question separately and two of them answered it wrong.
+func _nobody_can_press() -> bool:
+	return sim or autoplay or DisplayServer.get_name() == "headless"
+
+
 func _run_skill_check(cancellable := false, mode := "",
 		profile: Dictionary = {}) -> String:
 	# First-run orientation (Batch Z): the design's own framing is that the
@@ -19930,7 +19981,29 @@ func _run_skill_check(cancellable := false, mode := "",
 	# own pointer rather than a paragraph bolted onto a card about casting.
 	# Whichever kind the player meets first teaches itself; the other still
 	# waits for its own first time.
-	if not sim and not autoplay and Run.active and not Run.sim_run:
+	# BATCH CQ §1 — THE BOT GUARD THE STANDING RULE ALREADY REQUIRED, AND IT
+	# IS A REAL DEADLOCK RATHER THAN A TEST INCONVENIENCE. Both cards end in
+	# `await _hint_done`, and that signal is emitted by ONE thing: the card's
+	# own button being pressed. With no player there is no press and no
+	# timeout, so the coroutine that opened the card never resumes and the
+	# battle stops mid-turn at zero CPU — the shape CLAUDE.md files as
+	# hang mode (1).
+	#
+	# The four conditions above do not exclude a bot: a hand-driven suite sets
+	# `Run.active` and clears `sim`, `autoplay` and `sim_run` precisely because
+	# it wants the real battle path, and every suite redirects `Profile` to a
+	# scratch file, so the "taught" flag is ALWAYS unset on the first bar.
+	# `check_cm_live.gd` sets both flags by hand; that is one file knowing about
+	# the trap, not a guard — A PROFILE FLAG IS NOT A BOT GUARD, which is
+	# CLAUDE.md's rule for new modal/picker flows verbatim.
+	#
+	# THE DISPLAY SERVER IS THE HONEST TEST because it answers the question the
+	# card actually asks — is there anybody there to read it — rather than a
+	# proxy for it. Under `--headless` there is no surface to draw on and no
+	# input device to press with, so a modal that waits for a press can only
+	# ever wait forever. The flag is deliberately NOT set on this path: nobody
+	# was taught anything, so nothing should be recorded as taught.
+	if not _nobody_can_press() and Run.active and not Run.sim_run:
 		if mode == "defensive":
 			if not Profile.flag("defensive_check_taught"):
 				await _show_defensive_check_hint()
@@ -20454,7 +20527,12 @@ func _defensive_brace(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 	# no mitigation: Sloppy and Good are identical here, so the bot's own 15%
 	# Sloppy rate is irrelevant to the outcome and is deliberately not rolled.
 	var braced: bool
-	if sim or autoplay:
+	# BATCH CQ §1 — `_nobody_can_press()` RATHER THAN `sim or autoplay`, and
+	# this is the line the four hung suites were stopped on. A headless suite
+	# driving `_resolve` directly is not a sim and not the bot, so it fell to
+	# the `else` and awaited a key press that no device exists to send. It now
+	# rolls on the same footing the bot does.
+	if _nobody_can_press():
 		braced = randf() < DEF_BOT_PERFECT
 	else:
 		# Two statements rather than `await ... == "perfect"`: `await` binds

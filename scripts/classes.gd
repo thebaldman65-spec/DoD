@@ -563,18 +563,26 @@ static func computed_block(ab: Ability, attack: int = 0,
 	var lines := PackedStringArray()
 	if ab.damage > 0:
 		var bd := "   BD: %d" % ab.pressure
+		# BATCH CQ §5 — THE HIT COUNT MOVES TO THE DAMAGE IT MULTIPLIES, and
+		# that is what takes four of the eight overflowing lines off the card.
+		# `   × 3 hits` at the END of the line put four multi-hit cards 7px
+		# past the 258px column (Hack and Slash, Rampage, Sweeping Strikes,
+		# War Stomp); the card autowraps, so those 7px cost a WHOLE EXTRA ROW
+		# each — the block's cost to the column is its line count, and a line
+		# that silently becomes two is an unbudgeted line. `×3` sitting against
+		# the damage reads as the multiplier it is and lands 25px inside.
 		var hits := ""
 		if ab.random_hits > 0 or ab.multi_hits > 0:
-			hits = "   × %d hits" % maxi(ab.random_hits, ab.multi_hits)
+			hits = " ×%d" % maxi(ab.random_hits, ab.multi_hits)
 		if attack > 0:
 			# The same 0.9/1.1 variance band the battle tooltip quotes, off the
 			# same field — this is the range the strike loop will roll inside.
 			var hit := ab.damage * 0.01 * float(attack)
-			lines.append("Damage: %d–%d (%s)%s%s" % [int(hit * 0.9),
-				int(round(hit * 1.1)), ab.dmg_type.capitalize(), bd, hits])
+			lines.append("Damage: %d–%d%s (%s)%s" % [int(hit * 0.9),
+				int(round(hit * 1.1)), hits, ab.dmg_type.capitalize(), bd])
 		else:
-			lines.append("Damage: %d%% of Attack (%s)%s%s" % [ab.damage,
-				ab.dmg_type.capitalize(), bd, hits])
+			lines.append("Damage: %d%% of Attack%s (%s)%s" % [ab.damage,
+				hits, ab.dmg_type.capitalize(), bd])
 	if ab.heal > 0:
 		lines.append("Heals: %d" % ab.heal)
 	# NO COST LINE ON A FREE ABILITY rather than a "Costs nothing" line: the
@@ -999,7 +1007,7 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Feint", "cost": 25,
 				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 4,
 				"anim": "attack02", "special": "feint",
-				"perfect_id": "", "perfect_text": "Defensive banks a third charge; Aggressive strikes for 45%",
+				"perfect_id": "", "perfect_text": "A third charge, or 45% in Aggressive",
 				"description": "Sell an opening.\nFROM AGGRESSIVE: strike for 35% of\nAttack, and that enemy's next attack\nlands on one of its OWN allies.\nFROM DEFENSIVE: no strike — bank 2\ncharges, each parrying an attack\noutright and returning its damage to\nthe attacker.\nEither way the stance then SWITCHES."})
 		# ----- SWORDMASTER, TRANCHE 2 (Batch BW): THE FIRST STANCE-GATED CARDS.
 		#
@@ -1555,7 +1563,7 @@ static func draft_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Twin Hunt", "cost": 25,
 				"damage": 40, "pressure": 12, "delay": 2.5, "cooldown": 3,
 				"anim": "attack02", "special": "twin_hunt",
-				"perfect_id": "", "perfect_text": "The companion's blow lands at {atk:55}",
+				"perfect_id": "", "perfect_text": "Companion strikes at {atk:55}",
 				"description": "Strike as one: the Beastmaster and his\ncompanion each hit for 40% of Attack. If\nthe COMPANION'S blow is the killing one,\nhis next ability costs nothing."})
 		# AXIS: rotation without the tax. BJ measured swaps at 0.05 per trash
 		# battle — the central verb of an entire lane barely happens.
@@ -2083,7 +2091,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"cost": 25, "damage": 0, "pressure": 0, "delay": 2.5,
 				"cooldown": 4, "anim": "attack02", "special": "funeral_pyre",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Put the fire out and wear it: consume\nALL Burn on one enemy and gain a\nshield worth 200% of the damage that\nBurn would still have dealt (3 turns).\nOverburn refunds every turn consumed."})
+				"description": "Put the fire out and wear it: consume\nALL Burn on one enemy and gain a\nshield worth 200% of the damage that\nBurn would still have dealt. It holds\n3 turns. Overburn refunds every turn\nconsumed."})
 		# ----- CRYOMANCER: get a hold, pay before the hold, survive without
 		# one. HIS POOL'S TWO EXISTING CARDS BOTH ASSUME HE ALREADY HOLDS
 		# SOMETHING — Winter's Toll collects interest on a hold, Rimebinding
@@ -3080,7 +3088,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.5, "cooldown": 5, "anim": "attack03",
 				"special": "elevation",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Raise them up: every ally gains 3\nstacks of Faith.\nAn ally already holding 3 crosses the\ncap and RELEASES on the spot — and\ntheir peak does not fall for it."})
+				"description": "Raise them up: every ally gains 2\nstacks of Faith.\nAn ally already holding 3 crosses the\ncap and RELEASES on the spot — and\ntheir peak does not fall for it."})
 		# AXIS: the payout that does not exist for him. An ally's fifth stack
 		# heals them 15% and hands him Mana; HIS count holds at five and never
 		# releases, so his Faith pools and buys him nothing beyond the peak it
@@ -3287,7 +3295,7 @@ static func draft_ability(display_name: String) -> Ability:
 		"Last Howl":
 			return Ability.make({"display_name": "Last Howl", "cost": 20,
 				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
-				"anim": "attack01", "special": "last_howl", "no_skill_check": true,
+				"anim": "attack01", "special": "last_howl",
 				"perfect_id": "", "perfect_text": "",
 				"description": "Swear the last howl: for the rest of the\nbattle, every companion that falls\ngives you +3% strike damage per stack\nof Loyalty it had earned. The meter\nbreaks as it always did — this is paid\nout of what it held, not instead."})
 		# AXIS: the rotation stops costing the bond. THE PACK's whole lane is
@@ -3310,7 +3318,7 @@ static func draft_ability(display_name: String) -> Ability:
 		"Succession":
 			return Ability.make({"display_name": "Succession", "cost": 20,
 				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
-				"anim": "attack01", "special": "succession", "no_skill_check": true,
+				"anim": "attack01", "special": "succession",
 				"perfect_id": "", "perfect_text": "",
 				"description": "For 6 turns a swap hands on the bond:\nthe arriving companion starts with HALF\nthe Loyalty of the one it replaces,\ninstead of whatever it had earned\nbefore. It never lowers a deeper bond."})
 		# AXIS: the meter as AMMUNITION. Loyalty pays continuously and has no
@@ -3380,7 +3388,7 @@ static func draft_ability(display_name: String) -> Ability:
 		"Fault Line":
 			return Ability.make({"display_name": "Fault Line", "cost": 20,
 				"damage": 0, "pressure": 0, "delay": 1.5, "cooldown": 4,
-				"anim": "attack01", "special": "fault_line", "no_skill_check": true,
+				"anim": "attack01", "special": "fault_line",
 				"perfect_id": "", "perfect_text": "",
 				"description": "For 6 turns, while your Focus stands\nABOVE the conversion point, every\nattack you land also deals 20 Break\ndamage. Deep Focus moves that line\ndown with it."})
 		# AXIS: driving an uncapped meter DEEP inside a single turn. Every other
@@ -3440,7 +3448,7 @@ static func draft_ability(display_name: String) -> Ability:
 		"Stalking Horse":
 			return Ability.make({"display_name": "Stalking Horse", "cost": 25,
 				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 4,
-				"anim": "attack01", "special": "stalking_horse", "no_skill_check": true,
+				"anim": "attack01", "special": "stalking_horse",
 				"perfect_id": "", "perfect_text": "",
 				"description": "Play the stalking horse for 4 turns:\nenemies are drawn to swing at YOU, and\nevery attacker takes a DIFFERENT\naffliction — Poison, then Cripple, then\nSlowed, Exposed, Dazed and Blind. Your\nown breadth, built off their turns."})
 		# AXIS: the party feeding his engine. Trapper's breadth term counts
@@ -3462,7 +3470,7 @@ static func draft_ability(display_name: String) -> Ability:
 		"Downwind":
 			return Ability.make({"display_name": "Downwind", "cost": 25,
 				"damage": 0, "pressure": 0, "delay": 2.0, "cooldown": 5,
-				"anim": "attack01", "special": "downwind", "no_skill_check": true,
+				"anim": "attack01", "special": "downwind",
 				"perfect_id": "", "perfect_text": "",
 				"description": "For 4 turns the wind carries it: every\nharmful effect any hero lands on an\nenemy is copied onto a SECOND enemy,\npreferring one that does not have it.\nHis engine, fed by the whole party."})
 		# AXIS: spending the breadth. It DELIBERATELY FIGHTS HIS OWN PASSIVE —
@@ -3531,7 +3539,7 @@ static func vault_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Mana Shield", "cooldown": 3,
 				"cost": 15, "special": "mana_shield", "delay": 2.0, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "",
-				"description": "50% of damage taken converts into\nMana (3 turns). It is quick to cast."})
+				"description": "50% of damage taken converts into\nMana for 3 turns. It is quick to cast."})
 		# BATCH BB §6 — ASHES OF AL'AR GETS A HOME, AND IT NEEDED A WRAPPER.
 		# The batch brief calls this "one array entry"; IT IS NOT, and the
 		# difference is worth stating rather than quietly absorbing. Ashes of
@@ -3645,7 +3653,7 @@ static func trimmed_kit_ability(display_name: String) -> Ability:
 				"damage": 0, "pressure": 0, "special": "stabilize", "delay": 1.5,
 				"anim": "attack01",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Vent the storm: consumes all\nResonance ABOVE 2 — +5 Mana and +10%\ndamage reduction (2 turns) per stack\nconsumed, and heals {mhp:5}.\nUnusable at 2 or fewer."})
+				"description": "Vent the storm: consumes all\nResonance ABOVE 2 — +5 Mana and +10%\ndamage reduction for 2 turns per\nstack consumed, and heals {mhp:5}.\nUnusable at 2 or fewer."})
 		"Shatterpoint":
 			return Ability.make({"display_name": "Shatterpoint", "cost": 30,
 				"damage": 20, "pressure": 40, "delay": 3.0, "anim": "attack03",
@@ -3670,7 +3678,7 @@ static func survivalist_pool_ability(display_name: String) -> Ability:
 				"description": "A bursting powder charge rakes ALL\nenemies with nature damage and heavy\nBreak pressure, Poisoning each."})
 		"Venom Coating":
 			return Ability.make({"display_name": "Venom Coating", "cooldown": 5, "cost": 20,
-				"special": "venom_coat", "delay": 1.5, "anim": "attack01", "no_skill_check": true,
+				"special": "venom_coat", "delay": 1.5, "anim": "attack01",
 				"perfect_id": "", "perfect_text": "",
 				"description": "Coat your arrows: for 4 turns every\nattack applies Poison and refreshes\nexisting Poison timers."})
 		"Hamstring":
@@ -3731,7 +3739,7 @@ static func sharpshooter_pool_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Called Shot", "cooldown": 3, "cost": 25,
 				"damage": 25, "pressure": 10, "delay": 3.0, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Pick your spot before loosing:\nSUNDER the target's armor (-35%,\n2 turns), CRACK their Break meter\n(+30 BD), or lay them EXPOSED\n(3 turns)."})
+				"description": "Pick your spot before loosing:\nSUNDER the target's armor by 35% for\n2 turns, CRACK their Break meter for\n30 BD, or lay them EXPOSED for\n3 turns."})
 	return null
 
 
@@ -3739,7 +3747,7 @@ static func beastmaster_pool_ability(display_name: String) -> Ability:
 	match display_name:
 		"Bestial Wrath":
 			return Ability.make({"display_name": "Bestial Wrath", "cooldown": 3, "cost": 25,
-				"special": "bestial", "delay": 3.5, "anim": "attack01", "no_skill_check": true,
+				"special": "bestial", "delay": 3.5, "anim": "attack01",
 				"perfect_id": "", "perfect_text": "",
 				"description": "Unleash the companion for 3 turns —\nUrsus: max health DOUBLES, +50%\narmor, taunts 3 random enemies.\nCanis: +50% damage and +10 Bleed on\nits bleeding strikes. Aguila: +25%\ndamage and every strike BLINDS.\nRequires a living companion."})
 		"Spirit Bond":
@@ -3754,7 +3762,7 @@ static func beastmaster_pool_ability(display_name: String) -> Ability:
 				"description": "Spend ALL Loyalty: each living companion\nstrikes for 15% of your Attack per\nstack it spends, and you gain +10%\ndamage for the total turns. Loyalty\nresets to 0. Requires a companion with\nLoyalty."})
 		"Call of the Wild":
 			return Ability.make({"display_name": "Call of the Wild", "cooldown": 4, "cost": 30,
-				"special": "call_wild", "delay": 4.0, "anim": "attack01", "no_skill_check": true,
+				"special": "call_wild", "delay": 4.0, "anim": "attack01",
 				"perfect_id": "", "perfect_text": "",
 				"description": "The whole pack answers: your living\ncompanions make their own strikes, the\nabsent ones appear to strike for 15%\nof your Attack, every arrival effect\nfires, and the absent depart."})
 		"Mark of the Hunt":
@@ -3785,7 +3793,7 @@ static func pending_talent_ability(display_name: String) -> Ability:
 				"cost": 0, "faith_cost": 2, "special": "divine_plea",
 				"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
 				"perfect_id": "", "perfect_text": "Restores 10 Mana",
-				"description": "Spend 2 Mercy: FULLY heal an ally.\nEmpower (+1 Mercy): also cleanse all\ndebuffs and Hallow them against new\nones for 3 turns."})
+				"description": "Spend 2 Mercy: FULLY heal an ally.\nEmpower for 1 more Mercy: also\ncleanse all debuffs and Hallow them\nagainst new ones for 3 turns."})
 		# BATCH AV — THE REVERSAL BUTTON: death itself refused rather than
 		# healed away. NO faith_cost: it costs Mercy ON TRIGGER, not on cast,
 		# so a Cleric holding nothing arms nothing (battle._on_intercession_save
@@ -4099,7 +4107,7 @@ static func spec_abilities(spec: String) -> Array:
 					"cooldown": 2,
 					"applies_status": {"id": "sunder", "turns": 3},
 					"perfect_id": "", "perfect_text": "+5 bonus BD",
-					"description": "Moderate damage. Sunders armor\n(-35%) for 3 turns. Builds 10 Rage."}),
+					"description": "Moderate damage. Sunders armor by\n35% for 3 turns. Builds 10 Rage."}),
 				# Shieldwall graduated from the talent tree (Batch G): his one
 				# moment of control over the Block identity belongs in the base
 				# kit. Batch AB made it a STANCE — it and Interpose were the
@@ -4233,12 +4241,12 @@ static func spec_abilities(spec: String) -> Array:
 			return [
 				Ability.make({"display_name": "Heal", "cooldown": 1, "cost": 20, "special": "holy_heal",
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
-					"perfect_id": "", "perfect_text": "Cleric also recovers {mhp:5}",
-					"description": "Mend an ally for 40% of the Cleric's\nmax health. Empower (1 Mercy): also\ncleanses all harmful effects."}),
+					"perfect_id": "", "perfect_text": "Also recovers {mhp:5}",
+					"description": "Mend an ally for 40% of the Cleric's\nmax health. Empower for 1 Mercy:\nalso cleanses all harmful effects."}),
 				Ability.make({"display_name": "Renewal", "cooldown": 3, "cost": 20, "special": "renewal",
 					"target": Ability.Target.ALLY, "delay": 3.0, "anim": "attack02",
-					"perfect_id": "", "perfect_text": "Also heals 5% of the Cleric's health instantly",
-					"description": "Ally heals 15% of the Cleric's max\nhealth at the start of each of their\nturns, for 5 turns. Empower (1 Mercy):\nRenewal also blankets the Cleric."}),
+					"perfect_id": "", "perfect_text": "Heals 5% of the Cleric's health at once",
+					"description": "Ally heals 15% of the Cleric's max\nhealth at the start of each of their\nturns, for 5 turns. Empower for\n1 Mercy: Renewal also blankets the\nCleric."}),
 				Ability.make({"display_name": "Hymn of Hope", "cooldown": 2, "cost": 0, "faith_cost": 1,
 					"special": "hymn", "delay": 3.5, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "Heals 25%",
@@ -4287,19 +4295,19 @@ static func spec_abilities(spec: String) -> Array:
 		"beastmaster":
 			return [
 				Ability.make({"display_name": "Summon Ursus", "cooldown": 3, "cost": 20, "special": "summon",
-					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
+					"delay": 3.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
 					"description": "Call the bear (110 HP): attacks with\nyou, striking your target AND adjacent\nenemies for 10% of your Attack.\nSavage Presence: enemies are drawn to\nUrsus; you take 10% less damage.\nOn arrival: GUARDIAN'S ROAR — taunts\nthe weakest enemy, bear takes 25% less\ndamage for 2 turns.\nLoyalty gift: +3% max health per stack."}),
 				Ability.make({"display_name": "Summon Canis", "cooldown": 3, "cost": 20, "special": "summon",
-					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
+					"delay": 3.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
 					"description": "Call the wolf (80 HP): attacks with you\nfor 20% of your Attack, building\n20 Bleed. Always ELUSIVE: enemies miss\nit 25% more. Pack Bond: +15% damage\nper enemy under 35% health.\nOn arrival: BLOODHOWL — 15 Bleed\nto every enemy.\nLoyalty gift: +2 Bleed per stack."}),
 				Ability.make({"display_name": "Summon Aguila", "cooldown": 3, "cost": 20, "special": "summon",
-					"delay": 3.0, "anim": "attack01", "no_skill_check": true,
+					"delay": 3.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
 					"description": "Call the eagle (80 HP): attacks with you\nfor 20% of your Attack, applying\nExposed. Always ELUSIVE: enemies miss\nit 25% more. Pack Bond: the whole\nparty gains +10% crit chance.\nOn arrival: dives a chosen enemy for\n15% of your Attack, Dazing them.\nLoyalty gift: ignores 20% armor\nper stack."}),
 				Ability.make({"display_name": "Hunter's Instinct", "cooldown": 3, "cost": 20, "special": "instinct",
-					"delay": 2.5, "anim": "attack01", "no_skill_check": true,
+					"delay": 2.5, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
 					"description": "Empower your next 3 Quick Shots:\neach deals +10% of your Attack and\nheals your companion for 15% of\nits max health."}),
 				Ability.make({"display_name": "Kill Command", "cooldown": 3, "cost": 30, "special": "kill_command",
@@ -4318,7 +4326,7 @@ static func spec_abilities(spec: String) -> Array:
 					"perfect_id": "", "perfect_text": "",
 					"description": "+2% damage for every point of the\ntarget's Break bar already FULL —\nthe team breaks them, the marksman\nends them."}),
 				Ability.make({"display_name": "Hold Breath", "cooldown": 3, "cost": 15, "special": "hold_breath",
-					"delay": 1.5, "anim": "attack01", "no_skill_check": true,
+					"delay": 1.5, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
 					"description": "Patience made literal: gain +40 Focus,\nand your next attack is a GUARANTEED\ncritical that ignores all armor."}),
 			]
@@ -4333,7 +4341,7 @@ static func spec_abilities(spec: String) -> Array:
 					"pressure": 25, "delay": 3.0, "anim": "attack03", "choose_two": true,
 					"applies_status": {"id": "cripple", "turns": 3},
 					"perfect_id": "status_plus", "perfect_text": "Adds Slowed; everything lasts 4 turns",
-					"description": "A scattering charge rips TWO chosen\nenemies for 20% of Attack as nature\ndamage each,\nleaving them Poisoned AND Crippled\n(3 turns). Two statuses on two targets\n— the engine of the hunt."}),
+					"description": "A scattering charge rips TWO chosen\nenemies for 20% of Attack as nature\ndamage each, leaving them Poisoned\nAND Crippled for 3 turns. Two\nstatuses on two targets — the engine\nof the hunt."}),
 				Ability.make({"display_name": "Snare Trap", "cooldown": 3, "cost": 20, "special": "snare_trap",
 					"delay": 2.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",

@@ -405,7 +405,9 @@ func _live_berserker() -> void:
 	ok(bz.hp == full_hp - maxi(int(round(full_hp * 0.20)), 1),
 		"§2: Blood Offering costs exactly 20%% of CURRENT health (%d -> %d of %d)" % [
 			full_hp, bz.hp, bz.max_hp])
-	ok(bz.resource == 40, "§2: ...and pays 40 Rage (got %d)" % bz.resource)
+	# BATCH CQ §3 — SIXTY SINCE CN §3'S FOLD: the perfect paid 60 and the base
+	# 40, the bar came off the card, and 60 is what every cast pays.
+	ok(bz.resource == 60, "§2: ...and pays 60 Rage (got %d)" % bz.resource)
 	# THE COST SHRINKS AS HE DROPS — the property that makes it right for a spec
 	# that wants to live low. A percentage of MAXIMUM would charge the same.
 	var high_cost := full_hp - bz.hp
@@ -435,7 +437,7 @@ func _live_berserker() -> void:
 	ok(bz.hp >= 1 and not bz.dead,
 		"§2: BLOOD OFFERING CANNOT REDUCE HIM BELOW 1 (%d HP, dead=%s)" % [
 			bz.hp, bz.dead])
-	ok(bz.resource == 40, "§2: ...and still pays in full at 1 HP")
+	ok(bz.resource == 60, "§2: ...and still pays in full at 1 HP")
 	# The perfect pays more, and it is the RAGE that moves — not the toll.
 	bz.hp = bz.max_hp
 	bz.resource = 0

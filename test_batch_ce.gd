@@ -59,7 +59,8 @@ const REAL_SAVE := "user://run_save.bin"
 # Mirrored from battle.gd so each check states what it depends on rather than
 # hiding it inside a magic number.
 const ALMS_WARD_PCT_TEST := 12
-const MANTLE_HOPS_TEST := 2
+# BATCH CQ §3 — THREE SINCE CN §3'S FOLD (`MANTLE_HOPS + 1` at the read site).
+const MANTLE_HOPS_TEST := 3
 const JUBILEE_MIN_FAITH_TEST := 3
 # RE-POINTED BY BATCH CG. Four of CE's magnitudes moved and one arrived; the
 # figures are transcribed here rather than read off the constants they check,
@@ -552,8 +553,13 @@ func _docs() -> void:
 	# Plating's climb and the glossary taught neither. The question this check
 	# asks is unchanged — the glossary grows deliberately, one entry per thing a
 	# player has nowhere else to learn, rather than one per status.
-	ok(gj != null and gj.size() == 93,
-		"the glossary holds 93 entries (91 + CI's two)")
+	# BATCH CQ §3 — NINETY-FOUR SINCE BATCH CO, which added "Recasting a
+	# Standing Effect". Not a fold consequence; the battery has not been green
+	# here since CO shipped. The count stays PINNED deliberately — the glossary
+	# grows one entry per thing a player cannot learn anywhere else, so growth
+	# should have to be stated rather than absorbed.
+	ok(gj != null and gj.size() == 94,
+		"the glossary holds 94 entries (91 + CI's two + CO's one)")
 	var log_live := _src("res://docs/changelog.html")
 	ok(log_live.contains("Batch CE"), "the changelog carries a Batch CE entry")
 	ok(log_live.contains("102"), "...and states the new draft count")
@@ -931,15 +937,23 @@ func _live_elevation() -> void:
 	ok(low.faith_peak == 5,
 		"...while his PEAK stands at the 5 he reached (%d)" % low.faith_peak)
 	dv.resource = dv_mana
-	# THE PERFECT HANDS OVER ONE MORE.
+	# BATCH CQ §2 — THERE IS NO PERFECT TO HAND ONE MORE. CN §2 took Elevation's
+	# timing bar off (it resolves nothing a grade could multiply), and CN §3
+	# folded the orphaned +1 into the base — which overwrote the designer's
+	# explicit CG choice of TWO with a raised cost, picked over three when both
+	# were on the table. CQ §2 restored the 2. What is asserted now is that the
+	# GRADE CHANGES NOTHING, which is the durable form of the question and the
+	# thing that would catch the fold coming back.
 	dv.cooldowns.clear()
 	for h in scene.get("heroes"):
 		h.faith_stacks = 0
 		h.faith_peak = 0
 	await scene.call("_resolve", dv, _card("Elevation"), dv, "perfect")
-	ok(low.faith_stacks == ELEVATION_STACKS_TEST + 1,
-		"a perfect hands over %d stacks (%d)"
-			% [ELEVATION_STACKS_TEST + 1, low.faith_stacks])
+	ok(low.faith_stacks == ELEVATION_STACKS_TEST,
+		"a 'perfect' hands over the same %d stacks — the card runs no check (%d)"
+			% [ELEVATION_STACKS_TEST, low.faith_stacks])
+	ok(not _card("Elevation").runs_skill_check(),
+		"...because Elevation runs no timing bar at all (CN §2)")
 	# AND THE GATE IS GONE. CE refused the cast once every peak stood at the
 	# floor, which was the right question about a card that raised a FLOOR and
 	# is meaningless about one that hands over stacks — it would have darkened
@@ -1078,21 +1092,34 @@ func _live_mantle() -> void:
 			% int(second.get_status("barrier").get("mantle", 0)))
 	ok(bool(second.get_status("barrier").get("divine", false)),
 		"...and the hop is a Divine Shield too")
-	# SECOND HOP, then the chain STOPS. The hop count is what bounds it, which is
-	# why there is no re-entrancy lock.
-	second.take_hit(second.status_power("barrier"), 0)
-	var third: BattleUnit = null
-	for h in scene.get("heroes"):
-		if h.has_status("barrier"):
-			third = h
-	ok(third != null and third != second, "it passes a second time")
-	if third == null:
-		scene.queue_free()
-		return
-	ok(int(third.get_status("barrier").get("mantle", 0)) == 0,
-		"...and arrives with no passes left (%d)"
-			% int(third.get_status("barrier").get("mantle", 0)))
-	third.take_hit(third.status_power("barrier"), 0)
+	# THE REMAINING HOPS, then the chain STOPS. The hop count is what bounds it,
+	# which is why there is no re-entrancy lock.
+	#
+	# BATCH CQ §3 — WALKED RATHER THAN UNROLLED. This was written out hop by
+	# hop for a two-pass Mantle; CN §3 folded the perfect's third pass into the
+	# base, and an unrolled chain needs a new stanza every time that number
+	# moves. Driven off MANTLE_HOPS_TEST it asks the same question at any
+	# count: each hop arrives carrying one fewer, and the shield dies with the
+	# last of them.
+	var carrier: BattleUnit = second
+	var hops_left: int = MANTLE_HOPS_TEST - 1
+	while hops_left > 0:
+		carrier.take_hit(carrier.status_power("barrier"), 0)
+		var nxt: BattleUnit = null
+		for h in scene.get("heroes"):
+			if h.has_status("barrier"):
+				nxt = h
+		hops_left -= 1
+		ok(nxt != null and nxt != carrier,
+			"it passes again (%d pass(es) still owed)" % hops_left)
+		if nxt == null:
+			scene.queue_free()
+			return
+		ok(int(nxt.get_status("barrier").get("mantle", 0)) == hops_left,
+			"...and arrives carrying %d pass(es) (%d)" % [
+				hops_left, int(nxt.get_status("barrier").get("mantle", 0))])
+		carrier = nxt
+	carrier.take_hit(carrier.status_power("barrier"), 0)
 	var fourth := 0
 	for h in scene.get("heroes"):
 		if h.has_status("barrier"):

@@ -406,15 +406,15 @@ func _test_perfects() -> void:
 	# FOR THE WRONG REASON, which is the harder of the two faults to see. It
 	# read `not deadfall.no_skill_check` — the EXPLICIT OPT-OUT FLAG — and that
 	# flag is still false, so it went on printing a pass while CN's parameteric
-	# criterion had already taken Deadfall's bar away. `no_skill_check` has not
-	# been the answer to "does this run a check" since CN §1;
-	# `runs_skill_check()` is. It asserts the FOLD instead, above, and the flag
-	# is pinned here for what it actually still means.
+	# criterion had already taken Deadfall's bar away.
+	#
+	# BATCH CQ §5 — AND NOW THERE IS NOTHING LEFT TO READ WRONGLY. The flag is
+	# DELETED; `runs_skill_check()` is the only answer in the codebase, so the
+	# second oracle that made this check passable-while-wrong cannot be
+	# consulted by anybody again. CP's flag-pin went with the flag.
 	var deadfall := _find_anywhere("Deadfall")
-	ok(deadfall != null and not deadfall.no_skill_check,
-		"Deadfall never took the EXPLICIT opt-out (`no_skill_check` is still false)")
 	ok(deadfall != null and not deadfall.runs_skill_check(),
-		"...and the PARAMETERIC criterion is what removed its bar (CN §2)")
+		"the PARAMETERIC criterion is what removed Deadfall's bar (CN §2)")
 	# Triple Shot fires the three arrows its name and text always promised.
 	var triple := _find_anywhere("Triple Shot")
 	ok(triple != null and triple.multi_hits == 3, "Triple Shot fires three arrows")

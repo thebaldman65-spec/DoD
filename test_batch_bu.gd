@@ -443,7 +443,29 @@ func _source_rules() -> void:
 	# RECANT NEVER TOUCHES THE SECOND METER.
 	var at_rc := code.find('\t\t"recant":')
 	ok(at_rc > 0, "the Recant branch is anchored at its own match case")
-	ok(not code.substr(at_rc, 1200).contains("second_resource"),
+	# BATCH CQ §3 — THE COMMENT WAS TRIPPING THE CHECK ON ITS OWN CARD. This
+	# read the raw branch text for `second_resource`, and the branch OPENS with
+	# a comment explaining that it deliberately never touches `second_resource`
+	# — so the check failed on the very sentence promising what it asserts.
+	# Not a fold consequence: BU shipped both, and the battery has not been
+	# green here since. It asks the question of CODE now, with comments dropped.
+	# The window is the BRANCH, found by walking to the next case label, rather
+	# than a byte count that can overrun into a neighbour that legitimately
+	# does touch the spec meter. Comment lines are dropped so the branch's own
+	# explanation of the rule cannot be mistaken for a breach of it.
+	var rc_code := ""
+	var rc_started := false
+	for rc_line in code.split("\n"):
+		if rc_line == "\t\t\"recant\":":
+			rc_started = true
+			continue
+		if not rc_started:
+			continue
+		if rc_line.begins_with("\t\t\"") and rc_line.ends_with("\":"):
+			break
+		if not rc_line.strip_edges().begins_with("#"):
+			rc_code += rc_line + "\n"
+	ok(rc_code != "" and not rc_code.contains("second_resource"),
 		"Recant never writes a spec meter")
 	# ANOINTING'S HOOK IS INSIDE THE HIT LOOP, beside Arcane Arrows'.
 	var at_hook := code.find('has_status("anointed")')
@@ -584,9 +606,10 @@ func _live_recant() -> void:
 		u.resource = 0
 		var meter_was: int = u.second_resource
 		await scene.call("_resolve", holy, _card("Recant"), u, "good")
-		var want := maxi(int(round(u.max_resource * 0.30)), 1)
+		# BATCH CQ §3 — FORTY PER CENT SINCE CN §3'S FOLD (was 30, perfect 40).
+		var want := maxi(int(round(u.max_resource * 0.40)), 1)
 		ok(u.resource == want,
-			"Recant gives %s exactly 30%% of maximum %s (%d, got %d)" % [
+			"Recant gives %s exactly 40%% of maximum %s (%d, got %d)" % [
 				u.unit_name, u.resource_name, want, u.resource])
 		ok(u.second_resource == meter_was,
 			"and %s's spec meter is UNTOUCHED (%d -> %d)" % [
@@ -638,8 +661,11 @@ func _live_shared_grief() -> void:
 	ok(holy.hp < holy.max_hp * 0.5,
 		"and the cast really did carry her across the Mercy window (%d of %d)" % [
 			holy.hp, holy.max_hp])
-	ok(holy.second_resource == 3,
-		"she gains EXACTLY 3 Mercy — not 4, which a `take_hit` cost would pay"
+	# BATCH CQ §3 — FOUR SINCE CN §3'S FOLD. The point of the check is that the
+	# grant is EXACT and comes from the card rather than from a `take_hit`
+	# refund, so the number moves and the question does not.
+	ok(holy.second_resource == 4,
+		"she gains EXACTLY 4 Mercy — the card's own grant, not a `take_hit` cost"
 			+ " (got %d)" % holy.second_resource)
 	# THE FLOOR. Driven at 1 health, where a 25%-of-maximum cost is far more
 	# than she has: it must leave her alive rather than kill its own caster.
@@ -648,7 +674,7 @@ func _live_shared_grief() -> void:
 	await scene.call("_resolve", holy, _card("Shared Grief"), holy, "good")
 	ok(holy.hp == 1, "it can never take her below 1 (got %d)" % holy.hp)
 	ok(not holy.dead, "and she is not dead")
-	ok(holy.second_resource == 3, "and she is still paid her 3 Mercy")
+	ok(holy.second_resource == 4, "and she is still paid her 4 Mercy")
 	# THE CAP IS THE METER'S, NOT THE CARD'S.
 	holy.second_resource = holy.second_max
 	await scene.call("_resolve", holy, _card("Shared Grief"), holy, "good")
@@ -757,9 +783,14 @@ func _live_ordination() -> void:
 	for u in [w, m, hn]:
 		u.faith_peak = u.faith_stacks
 	await scene.call("_resolve", dv, _card("Ordination"), dv, "good")
-	ok(m.faith_stacks == 4,
-		"Ordination found the FLOOR (the mage on 1 is now 4, got %d)"
-			% m.faith_stacks)
+	# BATCH CQ §3 — AND THE FOLD CHANGED THE OUTCOME IN KIND, NOT ONLY IN
+	# DEGREE. Ordination granted 3 and now grants 4, so the mage standing on 1
+	# reaches FIVE — the cap — and RELEASES on the spot: the count resets to
+	# zero and the PEAK keeps the five (BI §1). The floor is still what the
+	# card found; the peak is what proves it, because the count no longer can.
+	ok(m.faith_stacks == 0 and m.faith_peak >= 5,
+		"Ordination found the FLOOR — the mage on 1 took 4, hit the cap and RELEASED (count %d, peak %d)"
+			% [m.faith_stacks, m.faith_peak])
 	ok(w.faith_stacks == 3 and hn.faith_stacks == 2,
 		"and nobody else moved (%d/%d)" % [w.faith_stacks, hn.faith_stacks])
 	# IT IS NOT PLAYER-CHOSEN: the same cast aimed at a different body still
@@ -767,7 +798,7 @@ func _live_ordination() -> void:
 	m.faith_stacks = 0
 	m.faith_peak = 0
 	await scene.call("_resolve", dv, _card("Ordination"), w, "good")
-	ok(m.faith_stacks == 3,
+	ok(m.faith_stacks == 4,
 		"aiming it elsewhere changes nothing — it still finds the floor (got %d)"
 			% m.faith_stacks)
 	# THE CASTER IS EXCLUDED. His own Faith holds at five and never releases, so
@@ -1045,8 +1076,10 @@ func _live_transference() -> void:
 		"the two piles are 7 and 3 — they sum to the threshold of %d"
 			% RUIN_THRESHOLD_TEST)
 	await scene.call("_resolve", occ, _card("Transference"), dest, "good")
-	ok(dest.status_stacks("ruin") == 10,
-		"EVERY stack moved (10, got %d)" % dest.status_stacks("ruin"))
+	# BATCH CQ §3 — TEN MOVED PLUS THE TWO CN §3 FOLDED IN ON ARRIVAL.
+	ok(dest.status_stacks("ruin") == 12,
+		"EVERY stack moved, plus the folded 2 on arrival (12, got %d)" % \
+			dest.status_stacks("ruin"))
 	ok(src.status_stacks("ruin") == 0,
 		"and the source is empty (got %d)" % src.status_stacks("ruin"))
 	ok(not dest.has_status("ruin_primed"),
@@ -1064,9 +1097,9 @@ func _live_transference() -> void:
 	await scene.call("_resolve", occ, _card("Transference"), dest, "good")
 	ok(bystander.status_stacks("ruin") == 0 and src.status_stacks("ruin") == 2,
 		"the DEEPEST other pile (6) moved, not the shallower one (2)")
-	ok(dest.status_stacks("ruin") == dest_was + 6,
-		"and it all arrived (%d, got %d)" % [
-			dest_was + 6, dest.status_stacks("ruin")])
+	ok(dest.status_stacks("ruin") == dest_was + 6 + 2,
+		"and it all arrived, plus the folded 2 (%d, got %d)" % [
+			dest_was + 6 + 2, dest.status_stacks("ruin")])
 	# A PERFECT ADDS TWO ON ARRIVAL, and those two are the only stacks the card
 	# ever CREATES.
 	scene.call("_gain_ruin", src, 3)
@@ -1100,8 +1133,11 @@ func _live_anointing() -> void:
 	for h in scene.get("heroes"):
 		if not h.is_companion:
 			ok(h.has_status("anointed"), "%s is anointed" % h.unit_name)
-	ok(int(occ.get_status("anointed").get("turns", 0)) == 3,
-		"the anointing runs 3 turns")
+	# BATCH CQ §3 — FOUR SINCE CN §3'S FOLD. Anointing's cooldown is 5, so the
+	# buff still expires before it can be recast: this fold did NOT make it
+	# permanent, which is the class of fold §2 flags separately.
+	ok(int(occ.get_status("anointed").get("turns", 0)) == 4,
+		"the anointing runs 4 turns")
 	# (a) A SINGLE-STRIKE ABILITY APPLIES EXACTLY ONE.
 	var single: Ability = Ability.make({"display_name": "BU Probe", "damage": 10,
 		"cost": 0, "pressure": 0, "delay": 2.0, "anim": "attack01"})

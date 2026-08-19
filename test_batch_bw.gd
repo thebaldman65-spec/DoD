@@ -73,12 +73,17 @@ const REAL_SAVE := "user://run_save.bin"
 
 # Mirrored from battle.gd so each check states what it depends on.
 const RECKLESS_PCT_PER_10_TEST := 2
-const BERSERK_STRIKES_TEST := 3
+# BATCH CQ §3 — FOUR SINCE CN §3'S FOLD. Berserk banked three and a Perfect
+# banked a fourth; the bar came off the card, so the fourth is what every cast
+# banks (`BERSERK_STRIKES + 1` at the read site).
+const BERSERK_STRIKES_TEST := 4
 const BERSERK_RISK_PCT_TEST := 30
 const BLOOD_DEBT_HEAL_TEST := 0.25
 const BATTLE_POISE_TICK_TEST := 1
 const SHIELD_SLAM_PCT_TEST := 0.15
-const VENDETTA_CUT_TEST := 0.20
+# BATCH CQ §3 — THIRTY SINCE CN §3'S FOLD (`VENDETTA_PERFECT_CUT` is what the
+# handler reads now; `VENDETTA_CUT` is still declared and is the pre-fold 20).
+const VENDETTA_CUT_TEST := 0.30
 const AEGIS_WALL_PCT_TEST := 0.08
 
 var checks := 0
@@ -851,8 +856,13 @@ func _live_berserk() -> void:
 		and bz.status_power("berserk_risk") == BERSERK_RISK_PCT_TEST,
 		"and the 30%% risk is a SEPARATE status (got %d)" % \
 			bz.status_power("berserk_risk"))
-	# THE HIT COUNT. Hack and Slash is `multi_hits: 3`, so one cast spends all
-	# three charges and lands six.
+	# THE HIT COUNT. Hack and Slash is `multi_hits: 3`, so one cast spends THREE
+	# charges and lands six.
+	#
+	# BATCH CQ §3 — IT NO LONGER EMPTIES THE BANK, and that is the fold showing
+	# through rather than a fault: four are banked now, so a three-hit cast
+	# leaves ONE standing and the chip stays up. The question worth asking is
+	# still "one charge per hit", so it is asked that way.
 	var hack := _find(bz, "Hack and Slash")
 	ok(hack != null, "the Berserker holds Hack and Slash to drive the count")
 	if hack != null:
@@ -863,24 +873,31 @@ func _live_berserk() -> void:
 		bz.resource = bz.max_resource
 		bz.cooldowns.clear()
 		await scene.call("_resolve", bz, hack, foe, "good")
-		ok(bz.berserk_strikes == 0,
-			"a THREE-HIT ability spends all three charges in one cast (got %d left)"
-				% bz.berserk_strikes)
-		ok(not bz.has_status("berserk"),
-			"and the chip clears when the bank empties")
+		ok(bz.berserk_strikes == BERSERK_STRIKES_TEST - 3,
+			"a THREE-HIT ability spends exactly three charges, %d -> %d (got %d)" % [
+				BERSERK_STRIKES_TEST, BERSERK_STRIKES_TEST - 3, bz.berserk_strikes])
+		ok(bz.has_status("berserk"),
+			"and the chip stands while a charge is left")
 	# THE TWO CLOCKS ARE SEPARATE. Aged past the 3-turn window, the RISK is gone
 	# and any unspent CHARGES stand — a single-status version fails one of these
 	# whichever way it was built.
 	bz.resource = bz.max_resource
 	bz.cooldowns.clear()
 	await scene.call("_resolve", bz, _card("Berserk"), bz, "good")
+	# BATCH CQ §3 — THE BANK IS READ RATHER THAN PREDICTED. `berserk_strikes`
+	# ADDS, and the three-hit cast above now leaves one charge standing, so a
+	# fresh Berserk banks four ON TOP of it. Pinning the literal made this
+	# assertion depend on what the block before it happened to leave behind;
+	# the question here is only whether the charges SURVIVE the ticks, so it
+	# compares against the count taken the moment before ticking.
+	var banked: int = bz.berserk_strikes
 	for _i in 4:
 		bz.tick_statuses()
 	ok(not bz.has_status("berserk_risk"),
 		"the 30% risk expires on its own 3-turn clock")
-	ok(bz.berserk_strikes == BERSERK_STRIKES_TEST and bz.has_status("berserk"),
-		"while the CHARGES survive the same ticks — they wait until spent (got %d)"
-			% bz.berserk_strikes)
+	ok(bz.berserk_strikes == banked and banked > 0 and bz.has_status("berserk"),
+		"while the CHARGES survive the same ticks — they wait until spent (%d, still %d)"
+			% [banked, bz.berserk_strikes])
 	# THE RISK IS REAL DAMAGE TAKEN. Amplified, ratio with open ground.
 	var raider: BattleUnit = _live_foes(scene)[0]
 	var swing: Ability = raider.abilities[0]

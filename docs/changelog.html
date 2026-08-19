@@ -13,6 +13,375 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-18 &mdash; Batch CQ: THE BATTERY FINISHES, AND THE FOLD IS ACCOUNTED FOR</h2>
+<p><i>The battery runs end to end for the first time since Batch CE: <b>the four hanging suites
+are diagnosed and fixed</b>, and the deadlock behind them was NOT the one CP suspected. All 105
+of CN's folded abilities are reported with the value before the fold and the value now, read at
+the read site. <b>Exactly one is reverted</b> &mdash; Elevation, where the fold overwrote an
+explicit CG decision. Everything else is reported and left alone. The two remaining clamp sites
+are closed, <code>no_skill_check</code> is deleted, and the eight overflowing draft-card lines
+are gone. Save version did not move (still v10).</i></p>
+
+<h3>&sect;0 &mdash; THE LAST TWO CLAMPS, AND THE CENSUS STILL STANDS</h3>
+<p><b>BLOOD DEBT</b> and <b>RECKLESS ABANDON</b> carried the identical apply-then-assign defect
+CP clamped on Battle Shout, Stabilize and Eye of the Storm: <code>_apply_status</code> MAXES the
+power, the <code>update_status</code> beneath it ASSIGNS, and the consuming site reads
+<code>status_power</code>. Both are clamped the same way &mdash; read what stands first, write
+the chip only when the new value is at least as strong. Five of five.</p>
+<p><b>Blood Debt is the one where re-marking is ROUTINE rather than a misplay</b>: the mark
+SURVIVES its own bleedout, so a re-opened wound gets re-marked as a matter of course, and a plain
+25 landing on a standing Perfect 35 used to cut the debt by ten points. <b>Reckless Abandon is
+the one that bites hardest</b>: the buff scales off the Rage ACTUALLY SPENT and the cast zeroes
+the bar, so the second cast in a window is nearly always the weaker one &mdash; a full bar for
++20%, rebuild 30 Rage, cast again, and the all-in buff fell to +6%. It is one of CM's gated five,
+so a Sloppy also loses it outright.</p>
+<p><b>STILL NO GLOBAL CLAMP, and CP's census is unchanged</b>: 69 sites, 29 with the shape.
+Countdowns written back through <code>update_status</code> would freeze forever under a global
+max &mdash; <code>held_breath</code> and <code>instinct</code> compute
+<code>status_power(...) - 1</code> and write it back, and <code>spite</code> passes a CAP as the
+power while its chip carries the live figure. The other 24 are left alone deliberately.
+<code>test_batch_cp</code> pins all five sites by name now.</p>
+
+<h3>&sect;1 &mdash; A BATTERY THAT CANNOT FINISH IS NOT AN INSTRUMENT</h3>
+<p><b>ALL FOUR HANGING SUITES RUN NOW &mdash; al, bp, br AND bw &mdash; AND THE CAUSE WAS NOT
+THE ORIENTATION CARD.</b> CP found a latent deadlock in the two skill-check orientation cards,
+wrote a fix, tested it, saw that it did not unhang the suites, and reverted it. <b>That
+observation was correct and is confirmed here</b>: shipping the card guard alone leaves
+<code>test_batch_al</code> stopped in exactly the same place.</p>
+<p><b>THE REAL DEADLOCK IS <code>_defensive_brace</code>.</b> CM's defensive check has a bot
+guard &mdash; <code>if sim or autoplay: braced = randf() &lt; DEF_BOT_PERFECT</code> &mdash; and
+that pair names the two BOTS rather than the absence of a player. A hand-driven suite is neither:
+it sets <code>Run.active</code> and clears <code>sim</code>, <code>autoplay</code> and
+<code>sim_run</code> precisely because it wants the real battle path. So it fell to the
+<code>else</code> and awaited <code>_skill_done</code> &mdash; a signal only a key press or click
+emits &mdash; with no input device in the process. <b>Reproduced by bisection: al stops inside
+<code>_live_spite_break</code>, on the line that has an enemy strike a WARDEN, which is exactly
+where a defensive bar appears.</b> Zero CPU, mid-battle, no output: CLAUDE.md's hang mode (1).</p>
+<p><b>THE FIX IS ONE QUESTION ASKED IN ONE PLACE.</b> <code>_nobody_can_press()</code> returns
+<code>sim or autoplay or DisplayServer.get_name() == "headless"</code>, and all three awaits that
+wait on a human now read it: both orientation cards and the defensive brace. <b>The display
+server is the honest third term</b> &mdash; under <code>--headless</code> there is no surface to
+draw the bar on and no device to press it with, so an await on a press is an await on nothing.
+The fault was that three call sites each answered "is there anybody there" separately and two of
+them answered it wrong; asking once is what stops them drifting apart again. <b>CP's card fix
+ships too, as the real defect it is rather than as a fix for the hang.</b></p>
+<p><b>AND br HAD ONE OF ITS OWN, FOUND THE SAME WAY.</b> <code>br</code> is one of the four
+suites that deadlocked, so its Ironclad check had not run in a battery since CM either. It
+compared ONE blow against ONE blow with the block, the parry, the plating ramp and the crit all
+driven off by hand &mdash; and then rolled <code>randf_range(0.9, 1.1)</code> twice anyway,
+because the damage variance is a literal inside <code>_resolve</code> with no field to zero.
+<b>A 15% cut cannot clear a 22% spread on a single swing</b>: a warded high roll is
+1.1 &times; 0.85 = 0.935 of base against an unwarded low roll of 0.90, so the comparison inverts
+outright. It read <b><code>29 taken against 28</code></b> on the first battery that ever reached
+it. Sampled over twenty swings each way now &mdash; the answer <code>check_cm_live</code> already
+uses for its brace ratio &mdash; which keeps the AK/AL/AR rule the block states in its own
+comment: <b>forced, not retried</b>. <b>Both of these are the deadlock's real cost:</b> two live
+checks sat unexercised for five batches, and neither was a fold consequence.</p>
+<p><b>A FIFTH TARGET WAS BEING REPORTED AS HUNG AND IS NOT HUNG.</b>
+<code>check_map</code> printed <code>*** TIMED OUT after 240s ***</code> on every run of this
+batch <b>including the baseline on unmodified HEAD</b>, with a banner and nothing else &mdash;
+which reads exactly like the four suites that genuinely deadlocked. <b>Run on its own it uses
+99% CPU for five minutes and then finishes and prints its distributions.</b> It walks 1,500
+generated maps across four routing policies; that is simply what it costs. <b>CP's watchdog is
+the right instrument and it could not tell a slow gate from a stopped one</b>, which is the same
+class of error as the fault it was written to catch, pointing the other way. CLAUDE.md's own
+taxonomy is what splits them and it says CHECK CPU FIRST: ~1-2% is a deadlock or the idle
+throttle, 30-50% with a growing log is TextServer exhaustion, and <b>99% with no output is a gate
+doing its job slowly</b>. The bound is <b>per-target</b> now (<code>TMO[check_map]=600</code>,
+the shape <code>EXTRA</code> already uses for flags) rather than raised globally, because a
+looser global bound would have blunted the watchdog for everything else.</p>
+<p><b>AND ONE THING THE GUARD COSTS, REPORTED RATHER THAN ABSORBED.</b>
+<code>check_cm_live.gd</code>'s two hand-set Profile flags are deleted &mdash; the cards are
+guarded now, so the flags have nothing left to dodge &mdash; but <b>four checks in that gate are
+RED and have been since CM</b>. <b>The identical four fail on unmodified HEAD, so the guard did
+not cause them</b>; it does, however, change what they could ever have measured. That harness is
+built to BE the player: it polls <code>sc_active</code>, writes <code>sc_pos</code> and calls
+<code>_grade_skill_check()</code> itself, which is why it was never one of the four that hung.
+With <code>_nobody_can_press()</code> true the brace takes the bot branch, so <b>the defensive
+bar cannot appear in a headless run at all</b> &mdash; two of the four are now unsatisfiable
+rather than merely failing, and the two ratio checks measure a 20%-Perfect bot mix instead of a
+forced brace. <b>The repair is left undone deliberately and is recorded as owed in the gate
+itself.</b> Re-pointing them at the bot's own rate, or giving the guard an explicit opt-in a
+willing harness can set, both need the diagnosis of the original four that this batch did not do
+&mdash; and an opt-in this harness then failed to drive would turn four known reds into a HANG,
+which is strictly worse. <b>Repair only what is understood.</b></p>
+<p><b>AND WITH al RUNNING FOR THE FIRST TIME, IT FAILED ONE CHECK IN SIX &mdash; A REAL
+DEFECT THE DEADLOCK HAD BEEN HIDING.</b> <code>_live_spite_break</code> forces the blow to land
+before measuring Spite's reflect, and it did that with <code>block_chance = 0.0</code>.
+<b>Zero is not off on a Warden</b>: <code>_live_block_chance</code> is
+<code>clampf(block_chance + _plating_slice(u), 0, 1)</code> and <code>_plating_slice</code> hands
+a HEAVY PLATING unit a flat <b>0.15</b> before his own field is read, so he blocked roughly one
+hit in six, the blow landed for nothing, and Spite reflects only on <code>final &gt; 0</code>.
+<b>This suite already carried the warning in prose</b> &mdash; <code>_live_fields</code> says in
+terms that a large negative field is what actually turns the roll off &mdash; and the check three
+sections below it did not apply it. Driven negative now, green over eight consecutive runs.
+<b>Two wrong fixes were tried first and both are worth recording</b>: zeroing armor alone did
+nothing, and raising the ATTACKER's damage to force a landing reintroduced the flake from the
+other end, because a crit on the high roll could fell a 200-health Warden.</p>
+<p><b>BOTH OF CP'S HARNESS FAULTS HOLD.</b> The per-suite watchdog reported
+<code>test_batch_al</code> as <code>*** TIMED OUT after 240s ***</code> on the pre-fix baseline
+run rather than letting it swallow the battery, and the lock is in place so a second invocation
+refuses instead of writing into a live log directory. Both were exercised in anger during this
+batch.</p>
+
+<h3>&sect;2 &mdash; THE FOLD AUDIT: ALL 105 REPORTED, ONE REVERTED</h3>
+<p><b>THE FINDING IS THAT 105 ABILITIES GOT STRONGER AND NOBODY DECIDED THEY SHOULD.</b> Every
+row below was read at its READ SITE &mdash; the handler in <code>battle.gd</code> &mdash; and not
+inferred from <code>perfect_text</code> history. The shape is mechanical throughout: CN removed
+the timing bar, which orphaned the Perfect bonus, and the fold rewrote
+<code>X if is_perfect else Y</code> as <code>X</code>. <b>99 live in <code>classes.gd</code>'s
+corpus and 6 in <code>talents.gd</code></b> (Battle Shout, Hold the Line, Immolate, Phoenix
+Rebirth, Rime, Overcharge).</p>
+<p><b>THE ONE REVERSAL, AND IT IS REVERTED: ELEVATION.</b> The designer chose <b>2 Faith with a
+raised cost</b> at CG, explicitly picking the conservative option over 3 when both were on the
+table. The fold made it 3. That is not drift, it is a decision undone. <code>el_stacks</code>
+reads <code>ELEVATION_STACKS</code> again rather than <code>ELEVATION_STACKS + 1</code>, and the
+description is back to "every ally gains 2". <code>ELEVATION_STACKS_TEST := 2</code> in
+<code>test_batch_cp</code> was already pinning the intended value and was already red against the
+folded 3.</p>
+<p><b>THE FOUR FLAGGED FIRST AND LOUDEST, because the fold pushed cards that were ALREADY
+recorded as possibly overtuned:</b></p>
+<ul>
+<li><b>ANVIL</b> &mdash; 3 turns &rarr; 4, against a 5-turn cooldown. Recorded at CI as
+"potentially the strongest card in the batch" and shipped deliberately untuned; the fold tuned it
+upward without anybody asking.</li>
+<li><b>FORMLESS</b> &mdash; 3 turns &rarr; 4, against a 6-turn cooldown. It grants BOTH stances
+and every stance-gated card, so the extra turn is an extra turn of the whole kit.</li>
+<li><b>DIVINE PRESENCE</b> &mdash; 4 turns &rarr; 6, <b>against a 4-turn cooldown</b>. It was
+flagged at CG as already running 100% uptime at 4-against-4. <b>THE DURATION NOW EXCEEDS THE
+COOLDOWN BY TWO TURNS, SO THE COOLDOWN HAS STOPPED EXISTING</b> &mdash; the buff can be refreshed
+two turns before it would lapse and can never be off.</li>
+<li><b>VESPERS</b> &mdash; 4 turns &rarr; 6, against a 4-turn cooldown, so the same. <b>ONE
+CORRECTION TO THE BRIEF, MEASURED:</b> only the DURATION was a Perfect value. The absorb is
+<code>maxi(int(round(attacker.max_hp * VESPERS_PCT)), 1)</code> and has never sat inside an
+<code>is_perfect</code> branch &mdash; <code>VESPERS_PCT := 0.20</code> is byte-identical at CG,
+CK and HEAD. The absorb did not move.</li>
+</ul>
+<p><b>AND THE CLASS THAT IS INVISIBLE IN A DIFF OF MAGNITUDES: 40 OF THE 57 DURATION FOLDS NOW
+MEET OR EXCEED THEIR OWN COOLDOWN.</b> <b>18 of those were pushed over BY THIS FOLD</b> (they sat
+below their cooldown before it) &mdash; Battle Poise, Feigned Guard, Covering Guard, Turn the
+Blade, Null Field, Undying Vigil, Battle Trance, Ironclad, Slow Burn, Hoarfrost Armor, Emberkeep,
+Frostbind, Resonant Field, Penance, Stalking Horse, Divine Wrath, Umbral Sigil and Consecrated
+Ground. The other 22 already met or exceeded it and the fold widened the gap. <b>That class of
+change converts a timed buff into a permanent one and it does not look like a buff in a
+diff.</b></p>
+<p><b>TWO OF THE 105 WERE NEVER IMPLEMENTED AT ALL.</b> <b>MANA SHIELD</b> ("Initiative cost 1.5
+instead of 2") and <b>MASS HYSTERIA</b> ("Cooldown becomes 3 instead") advertised Perfect bonuses
+that no code delivered &mdash; neither handler contains <code>is_perfect</code> at CK or anywhere
+before it. For those two the fold changed nothing mechanically; it deleted a false
+advertisement.</p>
+<p><b>THE FULL REPORT. Before and after are read at the handler.</b> <code>uptime</code> marks
+duration folds against the ability's own cooldown: <b>&ge; cd (NEW)</b> means this fold pushed it
+over, <b>&ge; cd (already)</b> means it was over before and the fold widened it.</p>
+<table border="1" cellpadding="3" cellspacing="0" style="border-collapse:collapse;font-size:13px">
+<tr><th>#</th><th>Ability</th><th>read site</th><th>before the fold</th><th>now</th><th>cd</th><th>uptime</th><th>note</th></tr>
+<tr><td>1</td><td>Blood Offering</td><td><code>blood_offering</code></td><td>40 Rage</td><td>60 Rage</td><td>3</td><td></td><td></td></tr>
+<tr><td>2</td><td>Berserk</td><td><code>berserk</code></td><td>3 doubled strikes</td><td>4 doubled strikes</td><td>5</td><td></td><td>BERSERK_STRIKES=3</td></tr>
+<tr><td>3</td><td>Battle Poise</td><td><code>battle_poise</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
+<tr><td>4</td><td>Feigned Guard</td><td><code>feigned_guard</code></td><td>2 turns</td><td>3 turns</td><td>3</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
+<tr><td>5</td><td>Covering Guard</td><td><code>covering_guard</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
+<tr><td>6</td><td>Eye of the Storm</td><td><code>eye_of_storm</code></td><td>2 turns</td><td>3 turns</td><td>4</td><td></td><td></td></tr>
+<tr><td>7</td><td>Vendetta</td><td><code>vendetta</code></td><td>20% cut</td><td>30% cut</td><td>4</td><td></td><td>VENDETTA_CUT/PERFECT_CUT</td></tr>
+<tr><td>8</td><td>Aegis Wall</td><td><code>aegis_wall</code></td><td>3 turns</td><td>4 turns</td><td>5</td><td></td><td></td></tr>
+<tr><td>9</td><td>Unslaked</td><td><code>unslaked</code></td><td>3 turns</td><td>4 turns</td><td>5</td><td></td><td></td></tr>
+<tr><td>10</td><td>Spite</td><td><code>spite</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td>cap also 30%-&gt;40% (SPITE_CAP/PERFECT_CAP)</td></tr>
+<tr><td>11</td><td><b>Anvil</b></td><td><code>anvil</code></td><td>3 turns</td><td>4 turns</td><td>5</td><td></td><td>CI: &#x27;potentially strongest card in the batch&#x27;</td></tr>
+<tr><td>12</td><td>Recompense</td><td><code>recompense</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td></td></tr>
+<tr><td>13</td><td>Turn the Blade</td><td><code>turn_the_blade</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
+<tr><td>14</td><td>Discipline</td><td><code>discipline</code></td><td>5 turns</td><td>7 turns</td><td>5</td><td>&ge; cd (already)</td><td>step also 3%-&gt;4% per turn held</td></tr>
+<tr><td>15</td><td>Answering Steel</td><td><code>answering_steel</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td>parry also 15%-&gt;20%</td></tr>
+<tr><td>16</td><td><b>Formless</b></td><td><code>formless</code></td><td>3 turns</td><td>4 turns</td><td>6</td><td></td><td>grants BOTH stances + every stance-gated card</td></tr>
+<tr><td>17</td><td>Ember Debt</td><td><code>ember_debt</code></td><td>8 turns</td><td>12 turns</td><td>4</td><td>&ge; cd (already)</td><td>Burn turns on the target</td></tr>
+<tr><td>18</td><td>Rimebinding</td><td><code>rimebinding</code></td><td>rb_deepest</td><td>rb_deepest + 1</td><td>3</td><td></td><td>Chilled stacks copied</td></tr>
+<tr><td>19</td><td>Null Field</td><td><code>null_field</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
+<tr><td>20</td><td>Rite of Return</td><td><code>rite_of_return</code></td><td>3 turns</td><td>4 turns</td><td>5</td><td></td><td></td></tr>
+<tr><td>21</td><td>Vow of Suffering</td><td><code>vow_suffering</code></td><td>3 turns</td><td>4 turns</td><td>3</td><td>&ge; cd (already)</td><td></td></tr>
+<tr><td>22</td><td>Aegis Reversal</td><td><code>aegis_reversal</code></td><td>x1.0 of shield left</td><td>x1.5 of shield left</td><td>4</td><td></td><td></td></tr>
+<tr><td>23</td><td>Blight the Well</td><td><code>blight_well</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td></td></tr>
+<tr><td>24</td><td>Covenant of Ash</td><td><code>covenant_ash</code></td><td>0 Ruin on the mark</td><td>2 Ruin on the mark</td><td>4</td><td></td><td></td></tr>
+<tr><td>25</td><td>Quarry's Mark</td><td><code>quarrys_mark</code></td><td>no Focus on the mark</td><td>+20 Focus on the mark</td><td>3</td><td></td><td></td></tr>
+<tr><td>26</td><td>Choking Smoke</td><td><code>choking_smoke</code></td><td>2 turns</td><td>3 turns</td><td>4</td><td></td><td></td></tr>
+<tr><td>27</td><td>Snare Line</td><td><code>snare_line</code></td><td>1 turns</td><td>2 turns</td><td>4</td><td></td><td></td></tr>
+<tr><td>28</td><td>Magic Barrier</td><td><code>magic_barrier</code></td><td>15% of max HP</td><td>20% of max HP</td><td>4</td><td></td><td></td></tr>
+<tr><td>29</td><td>Mirror Image</td><td><code>mirror_image</code></td><td>3 images</td><td>4 images</td><td>4</td><td></td><td></td></tr>
+<tr><td>30</td><td>Mana Well</td><td><code>mana_well</code></td><td>3 turns</td><td>4 turns</td><td>5</td><td></td><td></td></tr>
+<tr><td>31</td><td>Dispel</td><td><code>dispel</code></td><td>2 effects</td><td>3 effects</td><td>3</td><td></td><td></td></tr>
+<tr><td>32</td><td>Blink</td><td><code>blink</code></td><td>1 turn off cooldowns</td><td>2 turns off cooldowns</td><td>3</td><td></td><td></td></tr>
+<tr><td>33</td><td>Consecration</td><td><code>consecration</code></td><td>3 turns</td><td>4 turns</td><td>5</td><td></td><td></td></tr>
+<tr><td>34</td><td>Unburden</td><td><code>unburden</code></td><td>2 turns</td><td>3 turns</td><td>4</td><td></td><td></td></tr>
+<tr><td>35</td><td>Exhortation</td><td><code>exhortation</code></td><td>25% more damage</td><td>35% more damage</td><td>4</td><td></td><td></td></tr>
+<tr><td>36</td><td>Undying Vigil</td><td><code>undying_vigil</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
+<tr><td>37</td><td>Camouflage</td><td><code>camouflage</code></td><td>2 turns</td><td>3 turns</td><td>4</td><td></td><td></td></tr>
+<tr><td>38</td><td>Bola</td><td><code>bola</code></td><td>3 turns</td><td>4 turns</td><td>3</td><td>&ge; cd (already)</td><td>both statuses</td></tr>
+<tr><td>39</td><td>Hunter's Mark</td><td><code>hunters_mark</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td></td></tr>
+<tr><td>40</td><td>Arcane Arrows</td><td><code>arcane_arrows</code></td><td>5 charges</td><td>6 charges</td><td>5</td><td></td><td>ARCANE_ARROW_CHARGES=5</td></tr>
+<tr><td>41</td><td>Battle Trance</td><td><code>battle_trance</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
+<tr><td>42</td><td>Rally</td><td><code>rally_ally</code></td><td>no resource refund</td><td>+15% of max resource</td><td>4</td><td></td><td></td></tr>
+<tr><td>43</td><td>Warcry</td><td><code>warcry</code></td><td>3 turns</td><td>4 turns</td><td>5</td><td></td><td></td></tr>
+<tr><td>44</td><td>Ironclad</td><td><code>ironclad</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
+<tr><td>45</td><td>Slow Burn</td><td><code>slow_burn</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td>SLOW_BURN_TURNS=3</td></tr>
+<tr><td>46</td><td>Funeral Pyre</td><td><code>funeral_pyre</code></td><td>shield 150%</td><td>shield 200%</td><td>4</td><td></td><td>PYRE_SHARE/PERFECT</td></tr>
+<tr><td>47</td><td>Flash Freeze</td><td><code>flash_freeze</code></td><td>spares an UNBROKEN boss</td><td>takes an UNBROKEN boss too</td><td>5</td><td></td><td></td></tr>
+<tr><td>48</td><td>Hoarfrost Armor</td><td><code>hoarfrost_armor</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td>HOARFROST_TURNS=3</td></tr>
+<tr><td>49</td><td>Inner Arcane</td><td><code>inner_arcane</code></td><td>+0 bonus Resonance</td><td>+1 bonus Resonance</td><td>3</td><td></td><td></td></tr>
+<tr><td>50</td><td>Firedraw</td><td><code>firedraw</code></td><td>draws 4 turns each</td><td>draws 6 turns each</td><td>4</td><td></td><td>FIREDRAW_TAKE/PERFECT</td></tr>
+<tr><td>51</td><td>Emberkeep</td><td><code>emberkeep</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td>EMBERKEEP_TURNS=3</td></tr>
+<tr><td>52</td><td>Deep Winter</td><td><code>deep_winter</code></td><td>floor(deepest/2)</td><td>floor((deepest+1)/2)</td><td>4</td><td></td><td>rounds UP</td></tr>
+<tr><td>53</td><td>Frostbind</td><td><code>frostbind</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td>FROSTBIND_TURNS=3</td></tr>
+<tr><td>54</td><td>Resonant Field</td><td><code>resonant_field</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td>RESONANT_FIELD_TURNS=3</td></tr>
+<tr><td>55</td><td>Threshold</td><td><code>threshold</code></td><td>3-turn lockout</td><td>2-turn lockout</td><td>5</td><td></td><td>SHORTER lockout = buff</td></tr>
+<tr><td>56</td><td>Recant</td><td><code>recant</code></td><td>restores 30%</td><td>restores 40%</td><td>4</td><td></td><td></td></tr>
+<tr><td>57</td><td>Shared Grief</td><td><code>shared_grief</code></td><td>3 Mercy</td><td>4 Mercy</td><td>4</td><td></td><td></td></tr>
+<tr><td>58</td><td>Ordination</td><td><code>ordination</code></td><td>3 Faith</td><td>4 Faith</td><td>4</td><td></td><td></td></tr>
+<tr><td>59</td><td>Transference</td><td><code>transference</code></td><td>+0 stacks</td><td>+2 stacks</td><td>3</td><td></td><td></td></tr>
+<tr><td>60</td><td>Anointing</td><td><code>anointing</code></td><td>3 turns</td><td>4 turns</td><td>5</td><td></td><td></td></tr>
+<tr><td>61</td><td>Bloodbond</td><td><code>bloodbond</code></td><td>hunter takes 50%</td><td>hunter takes 25%</td><td>4</td><td></td><td>LOWER = buff</td></tr>
+<tr><td>62</td><td>Ghostpack</td><td><code>ghostpack</code></td><td>3 turns</td><td>4 turns</td><td>5</td><td></td><td></td></tr>
+<tr><td>63</td><td>Preparation</td><td><code>preparation</code></td><td>no Mana refund</td><td>+15 Mana</td><td>5</td><td></td><td></td></tr>
+<tr><td>64</td><td><b>Divine Presence</b></td><td><code>divine_presence</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td>CG: already flagged at 100% uptime</td></tr>
+<tr><td>65</td><td>Alms</td><td><code>alms</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td></td></tr>
+<tr><td>66</td><td><b>Vespers</b></td><td><code>vespers</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td>absorb was ALSO a Perfect value - see note</td></tr>
+<tr><td>67</td><td><b>Elevation &nbsp;&larr; REVERTED</b></td><td><code>elevation</code></td><td>2 Faith to every ally</td><td>3 Faith to every ally</td><td>5</td><td></td><td>ELEVATION_STACKS=2 - THE REVERSAL</td></tr>
+<tr><td>68</td><td>Mantle</td><td><code>mantle</code></td><td>2 hops</td><td>3 hops</td><td>4</td><td></td><td>MANTLE_HOPS=2</td></tr>
+<tr><td>69</td><td>Penance</td><td><code>penance</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
+<tr><td>70</td><td>Last Howl</td><td><code>last_howl</code></td><td>2% a stack</td><td>3% a stack</td><td>4</td><td></td><td></td></tr>
+<tr><td>71</td><td>Succession</td><td><code>succession</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td></td></tr>
+<tr><td>72</td><td>Reacquire</td><td><code>reacquire</code></td><td>no Focus on the mark</td><td>+25 Focus at once</td><td>4</td><td></td><td></td></tr>
+<tr><td>73</td><td>Fault Line</td><td><code>fault_line</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td></td></tr>
+<tr><td>74</td><td>Stalking Horse</td><td><code>stalking_horse</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
+<tr><td>75</td><td>Downwind</td><td><code>downwind</code></td><td>3 turns</td><td>4 turns</td><td>5</td><td></td><td></td></tr>
+<tr><td>76</td><td>Rallying Shout</td><td><code>rally</code></td><td>-int(30*mult) Pressure, +20% res</td><td>-50 Pressure, +30% res</td><td>3</td><td></td><td>lost its grade scaling</td></tr>
+<tr><td>77</td><td>Retaliation</td><td><code>retaliate</code></td><td>3 turns</td><td>4 turns</td><td>3</td><td>&ge; cd (already)</td><td></td></tr>
+<tr><td>78</td><td>Mana Shield</td><td><code>mana_shield</code></td><td>(unimplemented)</td><td>(unchanged)</td><td>3</td><td></td><td>claimed &#x27;Initiative cost 1.5 instead of 2&#x27;</td></tr>
+<tr><td>79</td><td>Ashes of Al'ar</td><td><code>ashes</code></td><td>returns at 25%</td><td>returns at 40%</td><td>&mdash;</td><td></td><td>ASHES_RETURN/PERFECT</td></tr>
+<tr><td>80</td><td>Arcane Surge</td><td><code>surge</code></td><td>+1 Resonance</td><td>+2 Resonance</td><td>3</td><td></td><td></td></tr>
+<tr><td>81</td><td>Divine Wrath</td><td><code>divine_wrath</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
+<tr><td>82</td><td>Umbral Sigil</td><td><code>umbral_sigil</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
+<tr><td>83</td><td>Blood Price</td><td><code>blood_price</code></td><td>costs 15% of current HP</td><td>costs 7.5% of current HP</td><td>3</td><td></td><td>LOWER = buff</td></tr>
+<tr><td>84</td><td>Interpose</td><td><code>interpose</code></td><td>Warden excluded</td><td>Warden gains a charge too</td><td>4</td><td></td><td></td></tr>
+<tr><td>85</td><td>Stabilize</td><td><code>stabilize</code></td><td>no heal</td><td>heals 5% of max HP</td><td>3</td><td></td><td></td></tr>
+<tr><td>86</td><td>Deadfall</td><td><code>deadfall</code></td><td>3 springs</td><td>4 springs</td><td>5</td><td></td><td>DEADFALL_CHARGES=3</td></tr>
+<tr><td>87</td><td>Quick Draw</td><td><code>quickdraw</code></td><td>5 turns</td><td>6 turns</td><td>5</td><td>&ge; cd (already)</td><td></td></tr>
+<tr><td>88</td><td>Mark of the Hunt</td><td><code>mark_hunt</code></td><td>5 turns</td><td>7 turns</td><td>3</td><td>&ge; cd (already)</td><td></td></tr>
+<tr><td>89</td><td>Resurrection</td><td><code>resurrection</code></td><td>returns at 20%</td><td>returns at 25%</td><td>3</td><td></td><td></td></tr>
+<tr><td>90</td><td>Sacred Resolve</td><td><code>unity</code></td><td>3 turns</td><td>4 turns</td><td>5</td><td></td><td>+ resolve_extra_turns</td></tr>
+<tr><td>91</td><td>Mass Hysteria</td><td><code>hysteria</code></td><td>(unimplemented)</td><td>(unchanged)</td><td>4</td><td></td><td>claimed &#x27;Cooldown becomes 3 instead&#x27;</td></tr>
+<tr><td>92</td><td>Bulwark of Fortitude</td><td><code>bulwark</code></td><td>no party heal</td><td>party heals 5% max HP</td><td>3</td><td></td><td></td></tr>
+<tr><td>93</td><td>Shieldwall</td><td><code>shield_block</code></td><td>2 turns</td><td>3 turns</td><td>2</td><td>&ge; cd (already)</td><td>+ 2 x shield_mastery_ranks</td></tr>
+<tr><td>94</td><td>Divine Shield</td><td><code>divine_shield</code></td><td>absorbs 30%</td><td>absorbs 35%</td><td>2</td><td></td><td>+ 0.01 x stalwart_step</td></tr>
+<tr><td>95</td><td>Consecrated Ground</td><td><code>cons_ground</code></td><td>2 turns</td><td>3 turns</td><td>3</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
+<tr><td>96</td><td>Blessing of Zeal</td><td><code>zeal</code></td><td>3 turns</td><td>4 turns</td><td>2</td><td>&ge; cd (already)</td><td></td></tr>
+<tr><td>97</td><td>Bewitch</td><td><code>bewitch</code></td><td>no instant strike</td><td>target attacks instantly</td><td>4</td><td></td><td>CN: lost its bar for this</td></tr>
+<tr><td>98</td><td>Tripwire</td><td><code>tripwire</code></td><td>5 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td></td></tr>
+<tr><td>99</td><td>Snare Trap</td><td><code>snare_trap</code></td><td>Stun spares a boss</td><td>Stun lands on a boss</td><td>3</td><td></td><td></td></tr>
+<tr><td>100</td><td>Battle Shout</td><td><code>battle_shout</code></td><td>no Rage refund</td><td>+5 Rage</td><td>2</td><td></td><td>TALENT</td></tr>
+<tr><td>101</td><td>Hold the Line</td><td><code>hold_the_line</code></td><td>no Rage refund</td><td>+5 Rage</td><td>6</td><td></td><td>TALENT</td></tr>
+<tr><td>102</td><td>Immolate</td><td><code>immolate</code></td><td>3 turns</td><td>4 turns</td><td>2</td><td>&ge; cd (already)</td><td>TALENT</td></tr>
+<tr><td>103</td><td>Phoenix Rebirth</td><td><code>phoenix</code></td><td>costs 25% of current HP</td><td>costs 15% of current HP</td><td>4</td><td></td><td>TALENT - LOWER = buff</td></tr>
+<tr><td>104</td><td>Rime</td><td><code>rime</code></td><td>3 turns</td><td>4 turns</td><td>3</td><td>&ge; cd (already)</td><td>TALENT + icy_resolve_ranks</td></tr>
+<tr><td>105</td><td>Overcharge</td><td><code>overcharge</code></td><td>gains 50% of Resonance</td><td>gains 100% of Resonance</td><td>5</td><td></td><td>TALENT</td></tr>
+</table>
+
+<h3>&sect;3 &mdash; THE STALE ASSERTIONS, REPAIRED TO INTENT</h3>
+<p>The pre-fix battery reported <b>95 failing assertions across 20 suites</b>. All are repaired
+and every suite is green. <b>The rule applied throughout: repair to the value &sect;2 establishes
+as intended, never to whatever the code happens to do.</b> Elevation is the case that rule exists
+for &mdash; <code>test_batch_ce</code> asserted "a perfect hands over 3 stacks", and rewriting
+that to 3 would have blessed the accident and destroyed the evidence. It asserts the reverted 2,
+and asserts that the GRADE CHANGES NOTHING, which is the durable form of the question.</p>
+<p><b>NO ASSERTION WAS LEFT DELIBERATELY RED, and the reason is worth stating rather than
+assuming.</b> &sect;3 reserves a known red for a fold &sect;2 reports as undecided. None of the
+four cards &sect;2 flags loudest &mdash; Anvil, Formless, Divine Presence, Vespers &mdash; has a
+failing assertion, so the carve-out turned out to be empty in practice. Where a repaired
+assertion sits on an UNREVIEWED magnitude the comment above it says so in terms
+(<code>test_batch_bt</code>'s Slow Burn and <code>test_batch_cb</code>'s Emberkeep both name the
+cooldown they now meet), so the evidence lives beside the check rather than only in this
+entry.</p>
+<p><b>THREE OF THE 95 WERE NOT THE FOLD AT ALL, AND EACH HAD BEEN RED LONGER.</b>
+<code>test_batch_bu</code>'s "Recant never writes a spec meter" read the branch's raw text for
+<code>second_resource</code> and <b>tripped on the branch's own comment explaining that it
+deliberately never touches it</b> &mdash; BU shipped both the comment and the check, so it has
+never been green. <code>test_batch_ce</code>'s glossary count went stale at <b>CO</b>, which
+added "Recasting a Standing Effect" as the 94th entry. <code>test_batch_ar</code>'s Overburn
+check read a clause <b>CL</b> deleted in its prose pass. Two more &mdash;
+<code>test_batch_bg</code> and <code>test_batch_bi</code> &mdash; searched the Devout's passive
+block for a phrase that is still there but which CL's re-wrap split across a line break; both
+flatten newlines before the read now.</p>
+
+<h3>&sect;4 &mdash; <code>bt</code>: THE FALL AND THE FAILURES ARE NOT THE SAME CAUSE</h3>
+<p><b>THE BRIEF'S HYPOTHESIS IS WRONG, AND MEASURING IT IS THE ANSWER.</b> The 13 failures and
+the two-check fall have nothing to do with each other.</p>
+<p><b>THE 13 FAILURES ARE &sect;3's POPULATION, ENTIRELY</b>: Slow Burn 3&rarr;4 turns (3
+failures), Funeral Pyre 150%&rarr;200% (2), Flash Freeze's boss carve-out folded away (4), Inner
+Arcane +0&rarr;+1 Resonance (4). <b>Flash Freeze is the loudest of them</b>: taking an UNBROKEN
+boss was the Perfect's reward, the handler now passes <code>true</code> unconditionally, and
+every Flash Freeze seals a boss that has not been Broken.</p>
+<p><b>THE FALL IS TEST-SIDE AND DELIBERATE, AND A NEGATIVE CONTROL PROVES IT.</b> With the four
+folded values reverted in <code>battle.gd</code>, <code>bt</code> reports <b>455 checks</b>
+&mdash; the same count, with 13 failures becoming 5. The fold moves no check count at all.
+Running the suite section by section against a CE worktree splits it exactly:
+<b><code>_pools</code> lost 3</b> and <b><code>_docs</code> gained 1</b>, for a net of &minus;2.
+<code>_pools</code>'s tranche-3 depth loop ran over SIX specs at CE asserting "still five &mdash;
+its third of tranche 3 is owed"; CH moved the Hunter three up to the eight-deep assertion and CI
+moved the Warrior three, leaving a THREE-spec loop. <code>_docs</code> gained one because CK
+replaced a hard-coded stamp assertion with two durable ones. <b>CLAUDE.md already records the
+same loop causing <code>bt 460 &rarr; 457</code> when it went twelve-spec to six</b>; this is the
+same mechanism one tranche later, and it is a suite correctly following the content rather than a
+regression.</p>
+
+<h3>&sect;5 &mdash; THREE SMALL DEFECTS</h3>
+<p><b>THIRTEEN OF CP'S FOURTEEN AUTHORED DIGITS ARE FIXED, AND THE FOURTEENTH WAS NEVER A
+DEFECT.</b> Each of the thirteen was a parenthetical carrying a typed number that also lives in
+code &mdash; an armor shred, a status duration, an Empower cost &mdash; and CL's standing rule is
+that a parenthetical is the shape reserved for a value the renderer computes, so a typed one is
+indistinguishable from a rendered one. All thirteen are rephrased so the number stands in PROSE,
+where it is allowed, with the 44-character draft-card ceiling respected line by line.
+<b>SHATTER'S <code>(max 12)</code> STAYS</b>: it is a CAP, the exact "legitimate prose" shape
+CP's own report names alongside <code>(max 5)</code> and <code>(0-100)</code>. It was swept up by
+the regex rather than by the rule. <b>The corpus ceiling is KEPT at CP's 89</b> &mdash; it is a
+ceiling and not an equality, so holding the old number still catches growth without pretending
+the remaining prose sites have been audited one by one.</p>
+<p><b>ALL EIGHT OVERFLOWING DRAFT-CARD LINES ARE GONE; the widest block line is now 256px against
+the 258px column.</b> Four were multi-hit damage lines pushed 7px over by a trailing
+<code>&nbsp;&nbsp;&nbsp;&times; 3 hits</code>; the hit count moves to the damage it MULTIPLIES
+(<code>Damage: 10% of Attack &times;3 (Physical)&nbsp;&nbsp;&nbsp;BD: 10</code>), which fixes all
+four in <code>computed_block</code> rather than card by card and lands 25px inside. The other
+four were long Perfect lines &mdash; Feint (+94px, the worst), Twin Hunt (+25), Renewal (+19) and
+Heal (+15) &mdash; each tightened without losing what it says; Feint's stance split is stated at
+length in its own description directly above, so the Perfect line only has to name what the
+Perfect ADDS. <b>Every candidate was MEASURED against the font rather than guessed at.</b></p>
+<p><b><code>no_skill_check</code> IS DELETED AND <code>runs_skill_check()</code> IS THE ONLY
+ANSWER IN THE CODEBASE.</b> Two ways to ask one question is how they disagree silently: on
+DEADFALL the flag said "runs a bar" (it was never set) while CN's criterion had already taken the
+bar away, and <code>test_batch_ah</code> passed by reading the flag &mdash; the right answer from
+the wrong oracle. <b>DELETING IT WAS NOT FREE, and the price is recorded rather than
+absorbed.</b> The flag was load-bearing on FOUR of its thirteen carriers:</p>
+<ul>
+<li><b>SUMMON AGUILA / CANIS / URSUS</b> &mdash; the table was simply WRONG.
+<code>_do_summon</code> is 139 lines and reaches <b>no damage leaf at all</b>: a summon puts a
+beast on the field and the beast strikes on ITS OWN later turns. <code>"summon"</code> is struck
+from <code>DAMAGE_SPECIALS</code>, which corrects a derived table rather than changing a card.</li>
+<li><b>CALL OF THE WILD is the one real disagreement, and it is NOT this batch's to settle.</b>
+It DOES deal damage at cast &mdash; <code>_companion_strike</code> for each beast standing,
+<code>_ghost_hit</code> for each absent one &mdash; so the criterion says it earns a bar, while
+the flag has always said it does not, alongside every other beast-command card in its family.
+<b>Handing it a timing bar is a design change and goes to the designer as a report.</b> Until he
+answers, the exception is NAMED in <code>Ability.NO_BAR_BY_DESIGN</code> rather than hidden in a
+data field, so there is still exactly one place that knows.</li>
+</ul>
+<p><b>The result is byte-for-byte behaviour: <code>check_cn</code> reports 113 of 211 abilities
+running no check, which is CN's own number.</b></p>
+
+<h3>&sect;6 &mdash; THE STANDING RULE THIS BATCH EXISTS TO WRITE DOWN</h3>
+<p><b>A FOLD, A RENAME OR A REFACTOR THAT CHANGES A MAGNITUDE IS A DESIGN CHANGE. IT GOES TO THE
+DESIGNER AS A REPORT AND IS NEVER APPLIED ON THE BATCH'S OWN JUDGMENT.</b> CN's fold was
+mechanically correct and locally reasonable at all 105 sites &mdash; an orphaned Perfect bonus
+genuinely has nowhere to go once the bar comes off &mdash; and it still moved 105 magnitudes
+nobody chose, undid one explicit decision, and converted eighteen timed buffs into permanent
+ones. <b>The batch that folds is exactly the batch least able to see that</b>, because each
+individual fold looks like tidying. The rule is recorded in <code>CLAUDE.md</code> and is why
+&sect;2 of this batch is a report with one reversal rather than a retune of 105 cards.</p>
+
 <h2>2026-08-18 &mdash; Batch CP: THE CLAMP, AND THE FIRST DEDICATED TEST BATCH</h2>
 <p><i>&sect;0 clamps three call sites where a weaker recast was dragging a standing buff
 <b>downward</b> &mdash; worse than the waste CO was written to fix. Everything after it is

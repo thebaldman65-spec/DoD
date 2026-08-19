@@ -18,6 +18,43 @@ updated alongside `docs/changelog.html` (the living changelog). The original
   no vault lists, no "was/now/moved/reworked/renamed" notes, no decision
   dates — change history belongs in changelog.html alone.
 - Terminology: damage against the Break meter = "Break damage (BD)" everywhere.
+- **FULL BATTERY AT BATCH CQ — 45 SUITES, ZERO THROWS, ZERO FAILURES, AND IT FINISHED FOR THE
+  FIRST TIME SINCE CE.** ah 5625, ah_battle 65, ai 2217, aj 418, ak 528, **al 560**, an 6051,
+  ar 735, as 396, at 470, au 336, av 324, aw 350, ax 342, ay 484, az 519, ba 690, bb 177, bc 91,
+  **bd 71**, be 34, bf 78, bg 47, bh 233, bi 91, bj 67, bk 130, bl 88, bm 1891, bn 81, bo 1025,
+  **bp 272**, **bq 739**, **br 1447**, bs 263, **bt 455**, bu 477, bv 897, **bw 548**, bx 142,
+  cb 1181, cd 86, **ce 1112**, runes 3121, rune_battle 97. **al, bp, br and bw are counts rather
+  than timeouts for the first time** — they deadlocked on `_defensive_brace` from CM until CQ §1.
+  `bd 70 -> 71` is CQ §3 rewriting Deadfall's last-charge loop to read the armed count instead of
+  a literal; `ce 1109 -> 1112` is §3's Elevation re-point adding a criterion check; `bn 80 -> 81`
+  and `bo 898 -> 1025` are CO's, not this batch's — the battery had not run since CE, so five
+  batches of drift land in one reading and **no count here should be diffed against CE's without
+  that caveat**. `an` read **6051 and 6054 on two consecutive full runs of this same tree**, which is its
+  DOCUMENTED drift and is exactly why it is never pinned. Every other count above reproduced
+  EXACTLY across both runs.
+  **THE ONE RED: `check_cm_live` reports 4 failures, identical on unmodified HEAD, recorded as
+  owed in the gate itself (CQ §1).** `check_map` is NOT a hang — 99% CPU for ~5 minutes; the
+  battery gives it a per-target 600s bound.
+- **A FOLD, A RENAME OR A REFACTOR THAT CHANGES A MAGNITUDE IS A DESIGN CHANGE. IT GOES TO THE
+  DESIGNER AS A REPORT AND IS NEVER APPLIED ON THE BATCH'S OWN JUDGMENT (STANDING, SET AT BATCH
+  CQ §6).** The rule exists because of CN §3: removing the timing bar from 113 abilities orphaned
+  their Perfect bonuses, and folding each one into its base effect was mechanically correct and
+  locally reasonable at all **105** sites — an orphaned bonus genuinely has nowhere else to go.
+  It still **moved 105 magnitudes nobody chose**, **undid one explicit decision** (Elevation: the
+  designer picked 2 Faith with a raised cost over 3 at CG, and the fold made it 3), and
+  **converted eighteen timed buffs into permanent ones** by pushing their duration to or past
+  their own cooldown — a class of change that is invisible in a diff of magnitudes.
+  **THE BATCH THAT FOLDS IS THE ONE LEAST ABLE TO SEE THIS**, because each individual fold looks
+  like tidying; only the census shows the size of it. Report every one, revert only where the
+  change overwrote an explicit, recent decision, and leave the rest for the designer.
+- **"IS THERE ANYBODY THERE TO PRESS?" IS ONE QUESTION, ASKED IN ONE PLACE (STANDING, CQ §1).**
+  `battle._nobody_can_press()` is `sim or autoplay or DisplayServer.get_name() == "headless"`.
+  `sim or autoplay` names the two BOTS, **not the absence of a player**: a hand-driven suite is
+  neither, because it sets `Run.active` and clears `sim`/`autoplay`/`sim_run` precisely to get
+  the real battle path. Four suites (al, bp, br, bw) hung for five batches on
+  `_defensive_brace`'s `else` branch awaiting `_skill_done` — a signal only a key press emits —
+  at zero CPU, mid-battle, which is hang mode (1) below. **A Profile flag is not a bot guard**
+  either: `check_cm_live.gd` set two by hand, which is one file knowing about the trap.
 - **ALL PLAYER-FACING TEXT IS WRITTEN TO `docs/text-standard.html` (STANDING, SET AT BATCH CJ).
   EVERY BATCH FROM CJ FORWARD, INCLUDING TUNING THAT COMES OUT OF PLAYTESTING.** Ability
   `description` and `perfect_text`, `passive_desc`, status/chip text, talent nodes, runes,

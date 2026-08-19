@@ -569,11 +569,16 @@ func _live_bulwark_line() -> void:
 	if wd != null:
 		ok(wd.shield_mastery_ranks == 1, "Shield Mastery reached the unit")
 		await scene._resolve_special(wd, _find(wd, "Shieldwall"), wd, "good", 1.0)
-		# Base 2 turns + Shield Mastery's 2 = 4, the batch's own number.
+		# BATCH CQ §3 — BASE **3** SINCE CN §3'S FOLD, + Shield Mastery's 2 = 5.
+		# Shieldwall banked 2 turns and a Perfect banked a third; CN took the
+		# card's timing bar off and folded the third turn into the base, so the
+		# node's +2 now rides a 3 rather than a 2. Shieldwall's cooldown is 2,
+		# so the stance already outlasted its own cooldown before the fold —
+		# this widened an existing gap rather than opening one.
 		ok(wd.has_status("shieldwall"), "the stance went up")
 		var wall := wd.get_status("shieldwall")
-		ok(int(wall.get("turns", 0)) == 4,
-			"Shield Mastery holds the stance 4 turns (got %d)" % int(wall.get("turns", 0)))
+		ok(int(wall.get("turns", 0)) == 5,
+			"Shield Mastery holds the stance 5 turns (got %d)" % int(wall.get("turns", 0)))
 		var allies := _allies(scene, wd)
 		ok(allies.size() == 3, "there are three allies to cover (%d)" % allies.size())
 		var covered := 0
@@ -583,7 +588,7 @@ func _live_bulwark_line() -> void:
 				ok(a.status_power("bulwark_line") == 10,
 					"%s is covered at +10%% Block (got %d)" % [
 						a.unit_name, a.status_power("bulwark_line")])
-				ok(int(a.get_status("bulwark_line").get("turns", 0)) == 4,
+				ok(int(a.get_status("bulwark_line").get("turns", 0)) == 5,
 					"...for exactly as long as the stance holds")
 		ok(covered == allies.size(),
 			"EVERY ally is covered (%d of %d)" % [covered, allies.size()])
@@ -620,8 +625,8 @@ func _live_bulwark_line() -> void:
 			if a.has_status("bulwark_line"):
 				any = true
 		ok(not any, "without Bulwark Line the stance covers nobody")
-		ok(int(wd2.get_status("shieldwall").get("turns", 0)) == 2,
-			"...and holds the base 2 turns without Shield Mastery")
+		ok(int(wd2.get_status("shieldwall").get("turns", 0)) == 3,
+			"...and holds the folded base 3 turns without Shield Mastery")
 	plain.free()
 	await process_frame
 
@@ -694,12 +699,40 @@ func _live_spite_break() -> void:
 		var foe: BattleUnit = solo.get("enemies")[0]
 		foe.pressure = 0
 		# Forced to LAND and forced NOT to be blocked or parried, so the
-		# reflect is certain: block_chance 0 with no plating ramp, parry 0,
-		# and the attacker carrying the no_cover miss bypass.
-		wd.block_chance = 0.0
+		# reflect is certain: the attacker carries the no_cover miss bypass,
+		# and the block and parry rolls are driven NEGATIVE rather than to zero.
+		#
+		# BATCH CQ §1 — ZERO WAS NEVER ENOUGH HERE, AND THIS SUITE ALREADY SAID
+		# SO ONE SECTION ABOVE. `_live_block_chance` is
+		# `clampf(block_chance + _plating_slice(u), 0, 1)` and `_plating_slice`
+		# hands a HEAVY PLATING Warden a flat **0.15** before his own field is
+		# read — so `block_chance = 0.0` left him blocking roughly one hit in
+		# six, the blow landed for nothing, and Spite reflects only on
+		# `final > 0`. That is the 1-in-6 this check had been failing at, and
+		# it was invisible for five batches because the suite never reached
+		# this line: it deadlocked three sections earlier. `_live_fields`
+		# carries the same warning in prose; this is it applied.
+		wd.block_chance = -10.0
 		wd.plating_bonus = 0.0
-		wd.parry_chance = 0.0
+		wd.parry_chance = -10.0
 		foe.no_cover = 1
+		# BATCH CQ §1 — THE MITIGATION IS FORCED OFF TOO, and this is the AL/AR
+		# determinism discipline applied to a variable that only became live
+		# when the suite started completing. A WARDEN ALWAYS CARRIES A
+		# DEFENSIVE CHECK (`_has_defensive_check` returns true on
+		# `heavy_plating` regardless of stance), so every incoming blow now
+		# rolls the bot's brace — a real random draw that can cut the blow by
+		# 15% AND shifts every roll after it. Between that cut and the Warden's
+		# own armor, a low damage roll could floor `final` to nothing, and
+		# Spite reflects only when `final > 0`: the check failed once in four
+		# runs on exactly that. Armor off makes the landed damage certain, and
+		# the health is raised so the Warden cannot be FELLED by the blow it is
+		# supposed to reflect — a first attempt raised the ATTACKER instead and
+		# reintroduced the flake from the other end, because a crit on the high
+		# roll could take a 200-health Warden off the board.
+		wd.armor = 0.0
+		wd.max_hp = 100000
+		wd.hp = 100000
 		var foe_hp: int = foe.hp
 		await solo._resolve(foe, _find(foe, foe.abilities[0].display_name),
 			wd, "good")

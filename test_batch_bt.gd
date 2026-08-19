@@ -562,15 +562,21 @@ func _live_slow_burn() -> void:
 	ok(marked == _live_foes(scene).size(),
 		"Slow Burn marks EVERY living enemy (%d of %d)" % [
 			marked, _live_foes(scene).size()])
-	ok(int(victim.get_status("slow_burn").get("turns", 0)) == 3,
-		"...for three turns (got %d)" % int(victim.get_status("slow_burn").get("turns", 0)))
+	# BATCH CQ §3 — FOUR SINCE CN §3'S FOLD, AND THE FOLD MADE IT PERMANENT.
+	# Slow Burn's cooldown is 4 and the hold is now 4, so it can be recast the
+	# turn it lapses and the Burn need never count down again. §2 flags this in
+	# the class of folds that convert a timed effect into a standing one; the
+	# magnitude is UNREVIEWED and is pinned here so it stays visible.
+	ok(int(victim.get_status("slow_burn").get("turns", 0)) == 4,
+		"...for four turns — which now MEETS its own 4-turn cooldown (got %d)" % \
+			int(victim.get_status("slow_burn").get("turns", 0)))
 	# THREE TICKS. The clock must not move, and the fire must still burn.
 	var turns_was := int(victim.get_status("burn").get("turns", 0))
 	hp_was = victim.hp
-	for _i in 3:
+	for _i in 4:
 		victim.tick_statuses()
 	ok(int(victim.get_status("burn").get("turns", 0)) == turns_was,
-		"three ticks under Slow Burn leave the Burn at %d (got %d)" % [
+		"four ticks under Slow Burn leave the Burn at %d (got %d)" % [
 			turns_was, int(victim.get_status("burn").get("turns", 0))])
 	ok(victim.has_status("burn"), "...and the Burn is still standing")
 	# The DAMAGE half, driven through the same path the turn loop uses — a
@@ -583,7 +589,7 @@ func _live_slow_burn() -> void:
 	# THE MARKER'S OWN CLOCK RAN OUT, so the hold is three turns and not
 	# forever — the failure that would read as working for a whole battle.
 	ok(not victim.has_status("slow_burn"),
-		"the marker itself expired after three turns — the hold is not permanent")
+		"the marker itself expired after four turns — the hold is not permanent")
 	victim.tick_statuses()
 	ok(int(victim.get_status("burn").get("turns", 0)) == turns_was - 1,
 		"...and the Burn resumes counting down afterwards")
@@ -660,8 +666,9 @@ func _live_funeral_pyre() -> void:
 	ok(not victim.has_status("burn"),
 		"Funeral Pyre consumes ALL the Burn on its target")
 	var shield: int = py.status_power("barrier")
-	ok(shield == 60,
-		"the shield is 150%% of the 40 that Burn still owed = 60 (got %d)" % shield)
+	# BATCH CQ §3 — 200% SINCE CN §3'S FOLD (`PYRE_SHARE_PERFECT`).
+	ok(shield == 80,
+		"the shield is 200%% of the 40 that Burn still owed = 80 (got %d)" % shield)
 	# THE REFUND, measured as a Mana delta rather than inferred: 5 turns
 	# consumed is 5 Mana through the ONE door every other consumer shares.
 	ok(py.resource == 80,
@@ -671,7 +678,7 @@ func _live_funeral_pyre() -> void:
 	var hp_was: int = py.hp
 	py.take_hit(20, 0)
 	ok(py.hp == hp_was, "the shield actually absorbs (%d -> %d)" % [hp_was, py.hp])
-	ok(py.status_power("barrier") == 40,
+	ok(py.status_power("barrier") == 60,
 		"...and it is spent down by what it ate (got %d)" % py.status_power("barrier"))
 	# NOT DIVINE: it must feed no Faith, or a Mage card would drive the Devout's
 	# engine.
@@ -747,9 +754,16 @@ func _live_flash_freeze() -> void:
 		return
 	boss.broken = false
 	await bscene.call("_resolve", bcryo, _card("Flash Freeze"), boss, "good")
-	ok(not boss.has_status("frozen"),
-		"an UNBROKEN boss resists Flash Freeze — the carve-out is untouched")
-	ok(not bscene.call("_is_held", boss), "...and is not held")
+	# BATCH CQ §3 — THE CARVE-OUT IS GONE, AND IT IS THE LOUDEST CONSEQUENCE OF
+	# CN §3'S FOLD IN THIS SUITE. Taking an UNBROKEN boss was the PERFECT's
+	# reward: the handler read `_hold_freeze(target, attacker, is_perfect)` and
+	# now passes `true` unconditionally, so EVERY Flash Freeze seals a boss
+	# that has not been Broken. INVERTED rather than deleted — this is the
+	# assertion that would catch the carve-out coming back, and the magnitude
+	# behind it is UNREVIEWED.
+	ok(boss.has_status("frozen"),
+		"an UNBROKEN boss is TAKEN now — CN folded the carve-out into the base")
+	ok(bscene.call("_is_held", boss), "...and is held")
 	# THE BOSS, BROKEN: it takes hold — and it is TIMED, one turn, not a
 	# lockdown. That distinction is the whole of what §3 asked be verified
 	# before the card's text was written.
@@ -786,16 +800,25 @@ func _live_flash_freeze() -> void:
 		return
 	pboss.broken = false
 	await pscene.call("_resolve", pcryo, _card("Flash Freeze"), pboss, "perfect")
+	# BATCH CQ §3 — THIS NOW PASSES FOR A DIFFERENT REASON, and saying so is the
+	# point: `force` was the PERFECT's exception and the fold made it the rule,
+	# so a "perfect" cast is indistinguishable from an ordinary one here.
 	ok(pboss.has_status("frozen"),
-		"a PERFECT Flash Freeze takes an UNBROKEN boss — the `force` exception")
+		"a 'perfect' Flash Freeze takes an UNBROKEN boss — as every cast now does")
 	ok(int(pboss.get_status("frozen").get("turns", -1)) == 1,
 		"...and it is STILL one turn, never a longer hold (got %d)" % \
 			int(pboss.get_status("frozen").get("turns", -1)))
 	# THE DESCRIPTION MUST SAY SO. §3: the card must not promise more than it
 	# delivers, and a boss clause is exactly where that goes wrong.
-	var desc := _card("Flash Freeze").description
-	ok(desc.contains("BOSS") and desc.contains("Broken"),
-		"the card's text states the boss rule")
+	# BATCH CQ §3 — RE-POINTED TO THE TEXT CN REWROTE. The card used to promise
+	# that a boss had to be Broken first; the fold deleted that condition and
+	# CL/CN rewrote the line to "the ice takes even an UNBROKEN boss". This
+	# check asserted the OLD promise, so it was pinning a rule the card no
+	# longer runs. Newlines are flattened first — the description wraps at
+	# authored line breaks, and "ONE\nturn" is the same sentence as "ONE turn".
+	var desc := _card("Flash Freeze").description.replace("\n", " ")
+	ok(desc.contains("UNBROKEN boss"),
+		"the card's text states the boss rule — that the ice takes one unbroken")
 	ok(desc.contains("ONE turn"),
 		"...and that it buys one turn against one, not a lockdown")
 	pscene.queue_free()
@@ -989,27 +1012,31 @@ func _live_inner_arcane() -> void:
 	arc.second_resource = 0
 	arc.hp = arc.max_hp
 	await scene.call("_resolve", arc, _card("Inner Arcane"), arc, "good")
-	ok(arc.second_resource == 3,
-		"three living enemies bank 3 Resonance (got %d)" % arc.second_resource)
+	# BATCH CQ §3 — ONE MORE THAN THE COUNT SINCE CN §3'S FOLD (+1 flat).
+	ok(arc.second_resource == 4,
+		"three living enemies bank 3 + the folded 1 = 4 Resonance (got %d)" % \
+			arc.second_resource)
 	# THE COUNT HALF: kill one, and the card pays less. It reads the LIVING.
 	foes[0].hp = 0
 	foes[0].dead = true
 	arc.second_resource = 0
 	await scene.call("_resolve", arc, _card("Inner Arcane"), arc, "good")
-	ok(arc.second_resource == 2,
-		"a corpse pays nothing — two living enemies bank 2 (got %d)" % arc.second_resource)
+	ok(arc.second_resource == 3,
+		"a corpse pays nothing — two living enemies bank 2 + 1 = 3 (got %d)" % \
+			arc.second_resource)
 	# THE HEALTH HALF, with the count held fixed at two: below half it doubles.
 	arc.hp = int(arc.max_hp * 0.4)
 	arc.second_resource = 0
 	await scene.call("_resolve", arc, _card("Inner Arcane"), arc, "good")
-	ok(arc.second_resource == 4,
-		"below half health the same two enemies bank 4 (got %d)" % arc.second_resource)
+	ok(arc.second_resource == 5,
+		"below half health the same two enemies bank 4 + 1 = 5 (got %d)" % \
+			arc.second_resource)
 	# THE BOUNDARY IS "AT OR BELOW HALF", asserted rather than left to a
 	# rounding argument.
 	arc.hp = int(arc.max_hp / 2)
 	arc.second_resource = 0
 	await scene.call("_resolve", arc, _card("Inner Arcane"), arc, "good")
-	ok(arc.second_resource == 4, "exactly half counts as below (got %d)" % arc.second_resource)
+	ok(arc.second_resource == 5, "exactly half counts as below (got %d)" % arc.second_resource)
 	scene.queue_free()
 	await process_frame
 
