@@ -31,12 +31,13 @@
 #   burn whose turns and tick are both known and DIFFERENT numbers (a
 #   turns-only or tick-only implementation reads wrong), the burn is asserted
 #   GONE, and the Mana delta is asserted separately.
-# · FLASH FREEZE against a boss, EXACTLY as the carve-out allows. "It froze" is
+# · FLASH FREEZE against a boss, EXACTLY as BATCH CR §1 rules it. "It froze" is
 #   trivially true against a raider, so the same cast is driven at an UNBROKEN
-#   boss (refused), a BROKEN boss (held, and TIMED — one turn, not a lockdown)
-#   and an unbroken boss on a PERFECT (held, still timed). The description is
-#   asserted to say the boss rule, because a card promising more than it
-#   delivers is the failure §3 named.
+#   boss (REFUSED), a BROKEN boss (held, and TIMED — one turn, not a lockdown)
+#   and an unbroken boss on a "PERFECT" (still refused — the card runs no bar,
+#   so the grade is inert and there is no exception left to buy). The
+#   description is asserted to say the boss rule, because a card promising more
+#   than it delivers is the failure §3 named.
 # · KILLING FROST hits only CHILLED enemies and adds stacks to each. "Damage
 #   happened" is trivially true of an AoE, so the field is built with a chilled
 #   HALF and an unchilled half in the SAME battle and both are read.
@@ -754,16 +755,16 @@ func _live_flash_freeze() -> void:
 		return
 	boss.broken = false
 	await bscene.call("_resolve", bcryo, _card("Flash Freeze"), boss, "good")
-	# BATCH CQ §3 — THE CARVE-OUT IS GONE, AND IT IS THE LOUDEST CONSEQUENCE OF
-	# CN §3'S FOLD IN THIS SUITE. Taking an UNBROKEN boss was the PERFECT's
-	# reward: the handler read `_hold_freeze(target, attacker, is_perfect)` and
-	# now passes `true` unconditionally, so EVERY Flash Freeze seals a boss
-	# that has not been Broken. INVERTED rather than deleted — this is the
-	# assertion that would catch the carve-out coming back, and the magnitude
-	# behind it is UNREVIEWED.
-	ok(boss.has_status("frozen"),
-		"an UNBROKEN boss is TAKEN now — CN folded the carve-out into the base")
-	ok(bscene.call("_is_held", boss), "...and is held")
+	# BATCH CR §1 — INVERTED BACK, AND CQ'S NOTE IS WHY THIS WORKED. CQ inverted
+	# this check to the folded behaviour and wrote that it was "the assertion
+	# that would catch the carve-out coming back"; the designer then ruled the
+	# carve-out out entirely. The gate is BROKEN now, not a Perfect and not
+	# nothing: hard control lands on a boss only once that boss is Broken. The
+	# ruling is what this pins, and it is the same `target.broken` check in
+	# `_apply_status` that the Madness lane reads.
+	ok(not boss.has_status("frozen"),
+		"an UNBROKEN boss REFUSES the ice — CR §1 gates hard control on Broken")
+	ok(not bscene.call("_is_held", boss), "...and is not held")
 	# THE BOSS, BROKEN: it takes hold — and it is TIMED, one turn, not a
 	# lockdown. That distinction is the whole of what §3 asked be verified
 	# before the card's text was written.
@@ -774,10 +775,9 @@ func _live_flash_freeze() -> void:
 		"...for exactly ONE turn — a boss shrugs it off, which is not a lockdown")
 	ok(not is_inf(boss.next_time),
 		"...and it keeps its place on the timeline, unlike an ordinary hold")
-	# THE PERFECT is what keeps this card from being a strictly worse Glacial
-	# Prison: it passes `force`, the call-site-visible boss exception two other
-	# perfects already buy. STILL ONE TURN — it buys the turn EARLIER, never a
-	# longer one, and that is asserted rather than assumed.
+	# BATCH CR §1 — THERE IS NO PERFECT EXCEPTION LEFT TO ASSERT. The card runs
+	# no bar, so a "perfect" cast is an ordinary one; the section below pins
+	# that it is ordinary AGAINST THE BROKEN GATE rather than against `force`.
 	bscene.queue_free()
 	await process_frame
 	# THE PERFECT, ON A FRESH BATTLE. The boss above is still in `_holds`, and
@@ -800,25 +800,25 @@ func _live_flash_freeze() -> void:
 		return
 	pboss.broken = false
 	await pscene.call("_resolve", pcryo, _card("Flash Freeze"), pboss, "perfect")
-	# BATCH CQ §3 — THIS NOW PASSES FOR A DIFFERENT REASON, and saying so is the
-	# point: `force` was the PERFECT's exception and the fold made it the rule,
-	# so a "perfect" cast is indistinguishable from an ordinary one here.
-	ok(pboss.has_status("frozen"),
-		"a 'perfect' Flash Freeze takes an UNBROKEN boss — as every cast now does")
-	ok(int(pboss.get_status("frozen").get("turns", -1)) == 1,
-		"...and it is STILL one turn, never a longer hold (got %d)" % \
-			int(pboss.get_status("frozen").get("turns", -1)))
+	# BATCH CR §1 — A "PERFECT" CAST BUYS NOTHING HERE AND THAT IS THE CHECK.
+	# The card runs no bar, so the grade string is inert; `force` is no longer
+	# passed, so the Broken gate answers every cast the same way. This is the
+	# assertion that catches a future batch re-opening the door with `force`.
+	ok(not pboss.has_status("frozen"),
+		"a 'perfect' Flash Freeze still REFUSES an unbroken boss — no bar, no exception")
 	# THE DESCRIPTION MUST SAY SO. §3: the card must not promise more than it
 	# delivers, and a boss clause is exactly where that goes wrong.
-	# BATCH CQ §3 — RE-POINTED TO THE TEXT CN REWROTE. The card used to promise
-	# that a boss had to be Broken first; the fold deleted that condition and
-	# CL/CN rewrote the line to "the ice takes even an UNBROKEN boss". This
-	# check asserted the OLD promise, so it was pinning a rule the card no
-	# longer runs. Newlines are flattened first — the description wraps at
-	# authored line breaks, and "ONE\nturn" is the same sentence as "ONE turn".
+	# BATCH CR §1 — RE-POINTED AGAIN, TO THE RULING. CQ pointed this at the
+	# fold's promise ("the ice takes even an UNBROKEN boss"); that promise is
+	# withdrawn, and the card now carries the corpus's standing phrasing, the
+	# same sentence Mind Flay and Bewitch already use. Newlines are flattened
+	# first — the description wraps at authored line breaks, so "ONE\nturn"
+	# is the same sentence as "ONE turn".
 	var desc := _card("Flash Freeze").description.replace("\n", " ")
-	ok(desc.contains("UNBROKEN boss"),
-		"the card's text states the boss rule — that the ice takes one unbroken")
+	ok(desc.contains("A BOSS RESISTS UNTIL BROKEN"),
+		"the card's text states the boss rule — a boss resists until Broken")
+	ok(not desc.contains("UNBROKEN boss"),
+		"...and no longer promises the ice takes one unbroken")
 	ok(desc.contains("ONE turn"),
 		"...and that it buys one turn against one, not a lockdown")
 	pscene.queue_free()

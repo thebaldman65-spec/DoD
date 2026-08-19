@@ -2631,15 +2631,15 @@ func _run_battle() -> void:
 		# on this enemy first, then any armed deadfall (whoever acts first).
 		if not u.is_hero and not u.dead and u.has_status("snared"):
 			var sn_idx := u.status_power("snared")
-			var sn_perfect: bool = u.get_status("snared").get("perfect", false)
 			u.remove_status("snared")
 			if sn_idx >= 0 and sn_idx < heroes.size() and not heroes[sn_idx].dead:
 				_message("The snare springs on %s!" % u.unit_name)
 				_log("%s's snare springs on %s" % [heroes[sn_idx].unit_name,
 					u.unit_name], "#c8a860")
-				# A perfectly rigged snare holds a boss (Batch AH); the Poison is
-				# a flat 4 turns either way now.
-				_spring_trap(heroes[sn_idx], u, 0.0, sn_perfect)
+				# BATCH CR §1 — THE SPRING NO LONGER FORCES ITS STUN. A boss
+				# shrugs it off until BROKEN, through the one check in
+				# `_apply_status`; the Poison is a flat 4 turns either way.
+				_spring_trap(heroes[sn_idx], u, 0.0)
 				_apply_poison(heroes[sn_idx], u, 4)
 		# BATCH BO §5 — SNARE LINE. The traps stop waiting: every enemy that
 		# ACTS while the line holds springs one where it stands. It sits beside
@@ -5013,14 +5013,23 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		# Alms and Divine Presence are Mercy cards and REFUSE THEMSELVES in a kit
 		# that holds none — the handler says so and applies nothing, so the gate
 		# must agree rather than protect a status that never lands.
+		#
+		# BATCH CR §3 — THESE TURN COUNTS ARE A SECOND COPY OF THE HANDLER'S AND
+		# MUST BE EDITED WITH IT. CR reverted three durations 6 -> 4 in the cast
+		# handlers and left this table at 6; the gate then proposed a longer
+		# write than the handler performs, read it as an improvement, and stopped
+		# refusing a saturated recast on all three cards. **`check_co` CAUGHT IT**
+		# — three failures, by name — which is the whole reason that gate spawns
+		# real battles instead of reading the table. Batch BP's Eye of the Storm
+		# is the same defect one door along: two copies of one figure.
 		"alms":
 			if u.second_resource_name != "Mercy":
 				return []
-			return [{"id": "alms", "turns": 6, "power": ALMS_WARD_PCT}]
+			return [{"id": "alms", "turns": 4, "power": ALMS_WARD_PCT}]
 		"divine_presence":
 			if u.second_resource_name != "Mercy":
 				return []
-			return [{"id": "divine_presence", "turns": 6, "power": 0}]
+			return [{"id": "divine_presence", "turns": 4, "power": 0}]
 		# THREE BANKED COUNTERS THAT PRE-MAX AGAINST WHAT IS HELD, so a recast
 		# tops the pile back up and only a FULL pile refuses. The arithmetic is
 		# the handler's own, read from the same status it will overwrite.
@@ -5094,7 +5103,7 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 			return [{"id": "slow", "turns": 4, "power": 0},
 				{"id": "cripple", "turns": 4, "power": 0}]
 		"vespers":
-			return [{"id": "vespers", "turns": 6,
+			return [{"id": "vespers", "turns": 4,
 				"power": maxi(int(round(u.max_hp * VESPERS_PCT)), 1)}]
 		# THE TWO DIVINE BARRIER WRITERS, AND THEY CARRY RIDERS. `barrier` is a
 		# SHARED status: `_grant_divine_shield` stamps `divine`, Blessed Barrier,
@@ -11170,10 +11179,15 @@ func _apply_status(target: BattleUnit, id: String, turns: int, power := 0,
 	# than by a refusal. Adding "broken" to this list would look like the
 	# same rule and would quietly replace a delay with a negation.
 	#
-	# `force` DOES NOT BYPASS IT. That argument is the boss carve-out bought
-	# by two perfects (Pommel Strike, Snare Trap) and it means "a boss is not
-	# immune here"; a hero who spent 20 Rage on three turns of not losing a
-	# turn is a different promise.
+	# `force` DOES NOT BYPASS IT. That argument means "a boss is not immune
+	# here"; a hero who spent 20 Rage on three turns of not losing a turn is a
+	# different promise.
+	# BATCH CR §1 — EXACTLY ONE CALLER PASSES IT NOW: Pommel Strike's perfect,
+	# which is still expressible because that card KEPT ITS BAR (25 damage, so
+	# `runs_skill_check()` is true). Flash Freeze and Snare Trap bought the same
+	# carve-out with perfects CN orphaned, and both are BROKEN-gated from CR §1
+	# instead. A future caller passing `true` is re-opening that door: the
+	# standing rule is that hard control lands on a boss only once it is Broken.
 	if target.has_status("ironclad") and id in ["stunned", "frozen", "dazed"]:
 		target.float_text("IRONCLAD", Color(0.80, 0.80, 0.88))
 		_log("   → %s refuses the %s (Ironclad)" % [target.unit_name,
@@ -14099,7 +14113,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 		is_perfect = false
 	match ab.special:
 		"rally":
-			var pressure_cut := 50
+			# BATCH CR §2 — 50 WAS THE PERFECT'S NUMBER AND IS BACK TO THE BASE'S.
+			# Pre-fold this read `50 if is_perfect else int(30 * mult)`; CN took
+			# the bar off, so the perfect became the base. The old BASE is the
+			# ruling, not the old formula — with no bar there is no `mult` to
+			# scale by, so 30 is flat and cannot come back as a grade curve.
+			# The 20% -> 30% resource fold on the line below is ACCEPTED (CR §4,
+			# the 33 magnitude folds) and is deliberately NOT reverted with it.
+			var pressure_cut := 30
 			var res_pct := 0.30
 			_sfx("heal", -9.0, 0.7)
 			_message("%s rallies the party!" % attacker.unit_name)
@@ -14342,10 +14363,12 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s bewitches %s!" % [attacker.unit_name, target.unit_name])
 			_log("%s: Bewitch — %s will turn on its allies (3 turns)" % [
 				attacker.unit_name, target.unit_name], "#c070e0")
-			# Perfect: the charm takes hold INSTANTLY — one strike right now.
-			if target.has_status("bewitch") and not target.dead:
-				await _wait(0.4)
-				await _bewitched_strike(target)
+			# BATCH CR §2 — THE INSTANT STRIKE IS REMOVED. It was the PERFECT's
+			# half; CN took this card's bar away (the whole of its damage sat
+			# inside `if is_perfect`), so the strike became unconditional and a
+			# free extra enemy attack arrived with no gate on it — acquired by
+			# accident rather than chosen. Base behaviour only: the charm is
+			# three turns of the target attacking its own, starting on ITS turn.
 		"dark_pact":
 			# Blood for blood: the Occultist bleeds so the party may live.
 			# Pact of Flesh thins the toll (20% base, -10%/rank — free at 2).
@@ -14488,9 +14511,12 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			if target != null and not target.dead:
 				var sn_i := heroes.find(attacker)
 				_apply_status(target, "snared", -1, sn_i)
-				var sn_st: Dictionary = target.get_status("snared")
-				if not sn_st.is_empty():
-					sn_st["perfect"] = true
+				# BATCH CR §1 — THE `perfect` STAMP IS GONE. It was the PERFECT's
+				# clause (the spring's Stun holding an unbroken boss); CN took the
+				# bar off this card, so the stamp became unconditional and boss
+				# immunity to hard control silently ceased to exist. The gate is
+				# the Broken check in `_apply_status` now, reached by the spring
+				# simply not forcing — see `_spring_trap`.
 				_sfx("click", -8.0, 0.8)
 				_message("%s rigs a snare under %s" % [attacker.unit_name,
 					target.unit_name])
@@ -16101,14 +16127,16 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# freeze in the game, so the limit eviction, Glacial Economy, Bitter
 			# Cold AND THE BOSS CARVE-OUT all come free.
 			#
-			# THE PERFECT IS THE ONE THING HERE THAT TOUCHES A STRUCTURAL RULE
-			# AND IT IS FLAGGED RATHER THAN BURIED: it passes `force`, the
-			# call-site-visible boss exception that Pommel Strike's and Snare
-			# Trap's perfects already buy. It is what keeps this card from being
-			# a strictly worse Glacial Prison (25 Mana, 2.5, 4cd for the same
-			# freeze), which no node can do. IT IS STILL ONLY ONE TURN — a held
-			# boss is `timed` whether it was Broken or forced, so the perfect
-			# buys the turn EARLIER, never a longer one.
+			# BATCH CR §1 — IT NO LONGER PASSES `force`, AND THAT IS A RULING
+			# RATHER THAN A TIDY-UP. The `force` was the PERFECT's clause; CN
+			# took the bar off this card, so the perfect became the base and
+			# boss immunity to hard control silently ceased to exist. "Only on a
+			# Perfect" is not expressible on an ability with no bar, so the gate
+			# moved to the mechanic that already exists: the ice takes a boss
+			# ONLY ONCE IT IS BROKEN. That is the same `target.broken` test the
+			# Madness lane reads, applied in `_apply_status` — ONE check, not a
+			# second one written here. IT IS STILL ONLY ONE TURN against a boss:
+			# a held boss is `timed`, so this buys the turn, never a lockdown.
 			if target != null and not target.dead:
 				if not target.has_status("chilled"):
 					_apply_status(target, "chilled", 3, 0, 0, attacker)
@@ -16116,15 +16144,17 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_sfx("break", -9.0, 0.7)
 				_message("%s seals %s in ice!" % [attacker.unit_name,
 					target.unit_name])
-				# LOG HONESTY, found by watching a smoke: the perfect's clause is
+				# LOG HONESTY, found by watching a smoke: the boss clause is
 				# about a BOSS, so claiming it against a raider announces a bigger
 				# effect than the one that fired. Say it only when it is the thing
-				# that actually happened.
-				var ff_forced := target.is_boss and not target.broken
+				# that actually happened — and after CR §1 the thing that happens
+				# is a BROKEN boss taking the ice. An unbroken one bounces inside
+				# `_apply_status`, which logs its own refusal.
+				var ff_boss := target.is_boss and target.broken
 				_log("%s: Flash Freeze closes on %s%s" % [attacker.unit_name,
 					target.unit_name,
-					" — and the ice takes an UNBROKEN boss" if ff_forced else ""], "#7cc8f0")
-				_hold_freeze(target, attacker, true)
+					" — and a BROKEN boss takes the ice for one turn" if ff_boss else ""], "#7cc8f0")
+				_hold_freeze(target, attacker)
 		"killing_frost":
 			# AXIS: the accumulation pays on its own. His stacks have only ever
 			# counted toward a freeze, so a fight where the freeze never lands
@@ -16552,7 +16582,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Divine Presence — he holds no Mercy to keep the watch for" % \
 					attacker.unit_name, "#909090")
 			else:
-				var mt_turns := 6
+				# BATCH CR §3 — 6 WAS THE PERFECT'S DURATION (`6 if is_perfect
+				# else 4`), and against a 4-turn cooldown the fold made the watch
+				# PERMANENT. The ruling is `duration > cooldown`, not `>=`: a
+				# duration equal to its cooldown still spends an action and its
+				# resource every cycle, which is a real tradeoff; slack on top is
+				# where the decision disappears. CG had already flagged this card
+				# at 100% uptime before the fold widened it.
+				var mt_turns := 4
 				_apply_status(attacker, "divine_presence", mt_turns)
 				_sfx("heal", -9.0, 0.8)
 				_message("%s keeps the watch" % attacker.unit_name)
@@ -16564,7 +16601,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Alms — he holds no Mercy to give away" % \
 					attacker.unit_name, "#909090")
 			else:
-				var al_turns := 6
+				# BATCH CR §3 — 6 was the perfect's; 4 is the base, against a
+				# 4-turn cooldown. See `divine_presence` above for the ruling.
+				var al_turns := 4
 				# THE PERCENTAGE RIDES THE STATUS POWER, so the chip a player
 				# reads and the ward `_alms_spill` lays are ONE number. Batch BP's
 				# Eye of the Storm is what two copies of one figure costs.
@@ -16583,7 +16622,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				_log("%s: Vespers finds nobody to say it over" % \
 					attacker.unit_name, "#909090")
 			else:
-				var vs_turns := 6
+				# BATCH CR §3 — 6 was the perfect's; 4 is the base, against a
+				# 4-turn cooldown. THE ABSORB IS NOT TOUCHED: `VESPERS_PCT` has
+				# been 0.20 at CG, CK and HEAD and was never Perfect-gated, so
+				# there is nothing to revert on that half.
+				var vs_turns := 4
 				var vs_power := maxi(int(round(attacker.max_hp * VESPERS_PCT)), 1)
 				_apply_status(target, "vespers", vs_turns, vs_power, 0, attacker)
 				target.float_text("VESPERS %d" % vs_power,

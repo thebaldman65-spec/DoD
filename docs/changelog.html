@@ -13,6 +13,227 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-19 &mdash; Batch CR: THE FOLD RULINGS</h2>
+<p><i>The designer's rulings on CQ's 105-fold audit. <b>Boss immunity to hard control is
+BROKEN-gated now</b> rather than Perfect-gated, because CN's fold silently deleted it; four
+values are reverted; and the rest of the audit stands as shipped. <b>The census that CQ built to
+find the fold has been re-run against the ruling itself, and it reports that the ruling's own
+rule catches ten more cards than the ruling's list names</b> &mdash; reported, not applied. Save
+version did not move (still v10).</i></p>
+
+<h3>&sect;1 &mdash; HARD CONTROL LANDS ON A BOSS ONLY ONCE IT IS BROKEN</h3>
+<p><b>FLASH FREEZE</b> and <b>SNARE TRAP</b>'s Stun each spared an unbroken boss unless a Perfect
+landed. CN removed their bars, their Perfect became their base, and <b>boss immunity to hard
+control silently ceased to exist</b> &mdash; the Occultist's whole Madness gate rests on Broken
+meaning something. Neither could be restored to its old condition, because <b>"only on a Perfect"
+is not expressible on an ability with no bar.</b> So the gate moved to the mechanic that already
+exists:</p>
+<p style="margin-left:2em"><b>Hard control lands on a boss only once that boss is BROKEN. Never
+before.</b></p>
+<p><b>NO SECOND CHECK WAS WRITTEN, AND THAT IS THE WHOLE IMPLEMENTATION.</b>
+<code>_apply_status</code> has always refused <code>stunned</code>, <code>frozen</code>,
+<code>psychosis</code>, <code>bewitch</code> and <code>hysteria</code> on <code>target.is_boss and
+not target.broken</code> &mdash; the same <code>broken</code> the Madness lane reads. Both
+abilities obey the rule by <b>no longer passing <code>force</code></b>: Flash Freeze's
+<code>_hold_freeze(target, attacker, true)</code> loses its third argument, and Snare Trap stops
+stamping <code>sn_st["perfect"] = true</code> on the snare it lays, so <code>_spring_trap</code>
+forces nothing. <b>This is better than the pre-fold behaviour rather than a restoration of it: a
+bypass earned through play rather than through timing.</b></p>
+<p><b>THE CENSUS OF EVERY ABILITY THAT APPLIES HARD CONTROL TO A BOSS, reported and NOT extended
+to:</b> <b>POMMEL STRIKE</b> is the one ability left buying past the carve-out, and it is still
+expressible there because <b>that card KEPT its bar</b> (25 damage, so
+<code>runs_skill_check()</code> is true) &mdash; its perfect still lands the Stun on an unbroken
+boss. Whether it joins the rule is a designer's call. Everything else already conformed:
+<b>Mind Flay</b> (whose card already says "A BOSS RESISTS UNTIL BROKEN"), <b>Bewitch</b>,
+<b>Mass Hysteria</b>, <b>Glacial Prison</b> and <b>Cryoclasm</b> (both through
+<code>_hold_freeze</code> passing nothing), <b>Spread of Madness</b> (which filters
+<code>not e.is_boss or e.broken</code> itself) and <b>Ricochet</b>'s stagger.
+<code>_spring_trap</code>'s <code>force_stun</code> parameter survives with <b>no caller passing
+true</b>; removing a shared helper's argument is adjacent scope, so it is left and asserted.</p>
+
+<h3>&sect;2 &mdash; TWO REVERTS, AND THE HALF OF ONE THAT STANDS</h3>
+<p><b>BEWITCH &mdash; the instant strike is REMOVED.</b> It was the Perfect-only half, and the
+fold made it unconditional: <b>a free extra ENEMY attack with no natural gate</b>, acquired by
+accident. Base behaviour only &mdash; three turns of the target attacking its own, starting on its
+own turn. Losing the bar was still correct (there is no base damage for a grade to multiply);
+folding was the separate mistake. <b>The criterion decides whether an ability GRADES; it does not
+decide what an orphaned bonus BECOMES, and CN answered only the first question.</b></p>
+<p><b>RALLYING SHOUT &mdash; Pressure back to a flat 30</b>, from the folded 50. Pre-fold it read
+<code>50 if is_perfect else int(30 * mult)</code>; with no bar there is no <code>mult</code>, so
+<b>the old BASE is the ruling and not the old formula</b> &mdash; the grade scaling cannot come
+back. <b>The 20%&rarr;30% resource fold on the line beneath it is ACCEPTED and deliberately not
+reverted with it</b> (&sect;4, the 33 magnitude folds).</p>
+
+<h3>&sect;3 &mdash; THREE DURATION REVERTS, AND THE RULE IS <code>&gt;</code> NOT <code>&ge;</code></h3>
+<p><b>The ruling is <code>duration &gt; cooldown</code>, not <code>duration &ge; cooldown</code>.</b>
+A duration equal to its cooldown is a maintenance cost &mdash; holding the buff spends an action
+and its resource every cycle, which is a real tradeoff. A duration that <i>exceeds</i> the
+cooldown with slack is where the decision disappears. <b>Scoped to self-buffs and party buffs
+only</b>: an enemy debuff must be re-applied per target and costs an action each time.</p>
+<p><b>DIVINE PRESENCE, ALMS and VESPERS</b> all revert 6 &rarr; <b>4 turns</b> against their
+4-turn cooldowns. All three read <code>6 if is_perfect else 4</code> before the fold.
+<b>VESPERS' ABSORB IS NOT TOUCHED</b> &mdash; <code>VESPERS_PCT</code> has been 0.20 at CG, CK and
+HEAD and was never Perfect-gated, exactly as CQ corrected the brief.</p>
+<p><b>THE BRIEF SAID "TWO DURATION REVERTS" AND NAMED THREE.</b> &sect;3's enumeration is the
+operative scope and all three were the same shape, so all three are reverted.</p>
+
+<h3>&sect;3a &mdash; THE FINDING: THE RULING'S RULE CATCHES TEN MORE CARDS THAN ITS LIST NAMES</h3>
+<p><b>REPORTED, NOT APPLIED.</b> The <code>&gt;</code> refinement is a real improvement on CQ's
+<code>&ge;</code> classification &mdash; and re-running CQ's own census under it is what shows the
+gap. <b>CQ's twenty-two "<code>&ge; cd</code> (already)" rows are not twenty-two abilities that
+were already permanent.</b> That label meant the pre-fold value was at <i>or</i> past the
+cooldown, and <b>for seventeen of them it was exactly AT it</b> &mdash; which under
+<code>&gt;</code> is the maintenance cost the ruling explicitly wants to keep, and the fold pushed
+every one of them past it. <b>Only FIVE of the twenty-two were genuinely past their cooldown
+before CN</b> (Ember Debt, Mark of the Hunt, Blessing of Zeal, Tripwire, Immolate).</p>
+<p><b>So &sect;4 accepts a bucket defined by <code>&ge;</code> while &sect;3 reverts on
+<code>&gt;</code>, and the rows fall through the gap.</b> Ten self or party buffs &mdash;
+&sect;3's own declared scope &mdash; are in exactly the class the three reverted cards were in,
+and are left standing because <b>a batch does not retune 105 magnitudes on its own judgment, and
+it does not retune ten either</b> (the CQ &sect;6 standing rule).</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Ability</th><th>cd</th><th>pre-CN base</th><th>now</th><th>class</th></tr>
+<tr><td><b>Answering Steel</b></td><td>4</td><td>4 (= cd)</td><td>6</td><td>fold pushed PAST</td></tr>
+<tr><td><b>Discipline</b></td><td>5</td><td>5 (= cd)</td><td>7</td><td>fold pushed PAST</td></tr>
+<tr><td><b>Fault Line</b></td><td>4</td><td>4 (= cd)</td><td>6</td><td>fold pushed PAST</td></tr>
+<tr><td><b>Quick Draw</b></td><td>5</td><td>5 (= cd)</td><td>6</td><td>fold pushed PAST</td></tr>
+<tr><td><b>Recompense</b></td><td>4</td><td>4 (= cd)</td><td>6</td><td>fold pushed PAST</td></tr>
+<tr><td><b>Retaliation</b></td><td>3</td><td>3 (= cd)</td><td>4</td><td>fold pushed PAST</td></tr>
+<tr><td><b>Shieldwall</b></td><td>2</td><td>2 (= cd)</td><td>3</td><td>fold pushed PAST (both <code>shieldwall</code> and <code>bulwark_line</code>)</td></tr>
+<tr><td><b>Spite</b></td><td>4</td><td>4 (= cd)</td><td>6</td><td>fold pushed PAST</td></tr>
+<tr><td><b>Succession</b></td><td>4</td><td>4 (= cd)</td><td>6</td><td>fold pushed PAST</td></tr>
+<tr><td><b>Vow of Suffering</b></td><td>3</td><td>3 (= cd)</td><td>4</td><td>fold pushed PAST (cast on an ALLY, so it is a party buff)</td></tr>
+</table>
+<p><b>TRIPWIRE IS NOT AN ENEMY DEBUFF AND THE BRIEF LISTED IT AS ONE.</b> Its handler reads
+<code>_apply_status(attacker, "tripwire", 6)</code> &mdash; the wire is a status on the HUNTER,
+who then retaliates. It is a self-buff at 6 turns against a 4-turn cooldown, <b>and its pre-CN
+base of 5 was already past it</b>, so it sits in &sect;4's genuinely-accepted five rather than in
+the class above. Left alone either way; the classification is what is corrected.</p>
+
+<h3>&sect;3b &mdash; ENEMY DEBUFFS WHOSE DURATION EXCEEDS THEIR COOLDOWN (REPORT ONLY)</h3>
+<p>The brief named five and asked for any others. <b>There is one more, RIME</b>, and Tripwire
+(above) is not one of them.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Ability</th><th>cd</th><th>status</th><th>pre-CN base</th><th>now</th><th>note</th></tr>
+<tr><td>Ember Debt</td><td>4</td><td><code>burn</code></td><td>8</td><td>12</td><td>already past before CN</td></tr>
+<tr><td>Mark of the Hunt</td><td>3</td><td><code>hunt_mark</code></td><td>5</td><td>7</td><td>already past before CN</td></tr>
+<tr><td>Blight the Well</td><td>4</td><td><code>blight</code></td><td>4 (= cd)</td><td>6</td><td>the fold pushed it past</td></tr>
+<tr><td>Bola</td><td>3</td><td><code>slow</code> + <code>cripple</code></td><td>3 (= cd)</td><td>4</td><td>the fold pushed it past</td></tr>
+<tr><td>Hunter's Mark</td><td>4</td><td><code>party_mark</code></td><td>4 (= cd)</td><td>6</td><td>the fold pushed it past</td></tr>
+<tr><td><b>Rime</b></td><td>3</td><td><code>rime</code></td><td>3 (= cd)</td><td>4 (+ Icy Resolve)</td><td><b>NOT IN THE BRIEF'S LIST</b> &mdash; the fold pushed it past</td></tr>
+</table>
+<p><b>Six field-level <code>applies_status</code> debuffs also exceed their cooldown</b> &mdash;
+Crushing Blow, Explosive Shot, Hex of Ruin, Mind Flay, Shrapnel Charge and Sweeping Strikes
+&mdash; <b>but the fold did not touch any of them</b>: their <code>applies_status</code> turns
+are byte-identical from CK to HEAD, and all six kept their bars. They predate CN and belong to
+&sect;4's accepted set.</p>
+
+<h3>&sect;4 &mdash; RECORDED AS DECIDED, SO NO LATER BATCH REOPENS THEM</h3>
+<p>All <b>33 magnitude folds</b> (nearly everything moved 20&ndash;35%, so relative balance
+between abilities barely shifted, and the pre-fold values were themselves never validated by
+play). The <b>other ten gate folds</b> &mdash; Rage refunds, Focus on a mark, the 5% heals,
+Interpose covering the Warden. <b>Anvil</b> and <b>Formless</b> at 4 turns, both still shorter
+than their cooldowns, both to be judged in play. <b>Threshold's lockout at 2 turns</b> &mdash; its
+number had moved twice without a decision, and this is the decision. <b>Mana Shield</b> and
+<b>Mass Hysteria</b>, where the fold deleted tooltips for Perfects no handler ever implemented.
+The <b>durations already at or past their cooldown before CN</b> and the <b>18 the fold pushed to
+EQUAL their cooldown</b> &mdash; with &sect;3a's correction to what the first of those two counts
+actually contains.</p>
+
+<h3>&sect;5 &mdash; THE ASSERTIONS, AND A CORRECTION TO THE BRIEF'S PREMISE</h3>
+<p><b>THE ~70 STALE ASSERTIONS WERE NOT LEFT RED. CQ REPAIRED THEM.</b> The brief's &sect;5 reads
+"CQ &sect;3 left them red rather than repairing them to whatever the code happened to do"; CQ's own
+commit says <b>"95 STALE ASSERTIONS REPAIRED TO INTENT across 20 suites"</b>, and CLAUDE.md
+records the CQ battery at <b>45 suites, zero throws, zero failures</b>. The premise is half right
+and the half that matters is the qualifier: CQ repaired them <i>to intent</i>, which for the seven
+cards this batch rules on meant <b>to the folded behaviour</b> &mdash; the best available reading
+at the time, and the reading CR has now overturned.</p>
+<p><b>So &sect;5's real work was the assertions CR's own rulings invalidated, and CQ's discipline
+is what made them findable.</b> The clearest case is <code>test_batch_bt</code>'s Flash Freeze
+block: CQ inverted it to the folded behaviour and wrote in the file that it was <b>"the assertion
+that would catch the carve-out coming back, and the magnitude behind it is UNREVIEWED."</b> It
+caught it. That check is inverted back, to the ruling rather than to the code.</p>
+
+<h3>&sect;6 &mdash; CQ'S LOOSE ENDS, CONFIRMED</h3>
+<p><b>THE FOUR HANGING SUITES RUN TO COMPLETION.</b> <code>al</code>, <code>bp</code>,
+<code>br</code> and <code>bw</code> all produce counts, none times out, and the diagnosis
+(<code>_defensive_brace</code>'s bot guard naming the two BOTS rather than the absence of a
+player) has held for a second batch. The five-batch hang is closed.</p>
+<p><b><code>bt</code>'s FALL AND ITS 13 FAILURES WERE NOT THE SAME CAUSE, AND CQ ALREADY PROVED
+IT.</b> &sect;6 asks this batch to confirm they were the same; they were not, and the measurement
+is CQ's own. The <b>13 failures</b> were the fold's population entirely (Slow Burn, Funeral Pyre,
+Flash Freeze's carve-out, Inner Arcane) &mdash; CQ's negative control reverted the four folded
+values in <code>battle.gd</code> and <code>bt</code> reported <b>the same 455 checks with 13
+failures becoming 5</b>, so the fold moved no check count at all. The <b>457 &rarr; 455 fall</b>
+is test-side and correct: <code>_pools</code>'s tranche-3 depth loop lost 3 as CH and CI moved the
+Hunter and Warrior threes to the eight-deep assertion, and <code>_docs</code> gained 1 when CK
+replaced a hard-coded stamp with two durable ones. <b>Both are resolved; the brief's hypothesis
+about their being one cause is the thing to record as answered.</b></p>
+<p><b>CP'S TWO HARNESS FAULTS BOTH STILL HOLD.</b> The <b>per-suite watchdog</b> (with CQ's
+per-target bound, so a slow gate is not reported as a stopped one) and the <b>lock</b> are both in
+<code>run_battery.sh</code>, and the lock was confirmed by DRIVING it rather than by reading it:
+a second invocation against a live log directory refuses with <code>REFUSING: a battery is already
+writing ...</code> and writes nothing.</p>
+
+<h3>&sect;7 &mdash; THE STANDING RULE THIS BATCH EXISTS TO WRITE DOWN</h3>
+<p style="margin-left:2em"><b>Removing a skill check from an ability makes its Perfect-only
+behaviour unconditional. Any Perfect that gated a BINARY &mdash; boss immunity, an extra strike, a
+refund &mdash; must be ruled on BEFORE the bar comes off, not audited afterwards.</b></p>
+<p><b>A MAGNITUDE FOLD IS VISIBLE IN A DIFF AND A CENSUS CAN FIND IT LATER; A BINARY IS NOT A
+MAGNITUDE.</b> "The Stun lands on an unbroken boss" and "one of those strikes lands at once" are
+rules that switch from off to always-on, and nothing in <code>X if is_perfect else Y</code>
+becoming <code>X</code> says which kind of thing just changed. CN's criterion answered <i>does
+this ability still grade?</i> correctly 113 times. <b>It never asked what the orphaned bonus
+should become</b>, and folding was assumed because folding preserves the most. Three of the seven
+cards here are that gap: Bewitch's free enemy attack, and Flash Freeze and Snare Trap between them
+deleting a game-wide immunity rule.</p>
+
+<h3>&sect;8 &mdash; VERIFIED</h3>
+<p><b>THE DEFECT THIS BATCH INTRODUCED AND THE GATE THAT CAUGHT IT, recorded because it is the
+useful part.</b> The three &sect;3 durations are declared TWICE &mdash; once in the cast handler
+and once in <code>_recast_writes</code>'s proposal table, which the CO recast gate reads to decide
+whether a second cast would improve anything. Reverting only the handlers left the table
+proposing 6 against a standing 4, so the gate read every recast as an improvement and
+<b>stopped refusing a saturated recast on Alms, Divine Presence and Vespers</b>. <code>check_co</code>
+failed all three BY NAME on the first battery run. <b>That gate spawns two real battles and casts
+all 58 gated abilities onto every unit they can reach rather than reading the table, which is
+exactly why it could see this</b> &mdash; and it is Batch BP's Eye of the Storm lesson one door
+along: two copies of one figure. Both copies now move together, and the rule is written at the
+table.</p>
+<p><b>FULL BATTERY, TWICE, AFTER THE FIX: 45 SUITES, ZERO THROWS, ZERO FAILURES.</b>
+ah 5625, ah_battle 65, ai 2217, aj 418, ak 528, <b>al 560</b>, an 6054, ar 735, as 396, at 470,
+au 336, av 324, aw 350, <b>ax 345</b>, ay 484, az 519, ba 690, bb 177, bc 91, bd 71, be 34, bf 78,
+bg 47, bh 233, bi 91, bj 67, <b>bk 130</b>, bl 88, bm 1891, bn 81, bo 1025, <b>bp 272</b>,
+<b>bq 739</b>, <b>br 1447</b>, bs 263, <b>bt 455</b>, bu 477, bv 897, <b>bw 548</b>, bx 142,
+cb 1181, cd 86, ce 1112, runes 3121, rune_battle 97.
+<b>Every count reproduces CQ's exactly except three, and all three are accounted for:</b>
+<code>ax</code> is <b>342 &rarr; 345</b>, the three assertions &sect;1 added to pin its two closed
+doors and its one open one; <code>an</code> reads 6054, inside its documented 6051&ndash;6054
+drift; and <code>bk</code> is the finding below.</p>
+<p><b><code>bk</code> IS A SECOND DRIFTING SUITE AND CLAUDE.md PINS IT AS IF IT WERE STABLE.</b>
+It read <b>129 on the first battery run and 130 on the second</b>, and four consecutive runs gave
+<b>129, 130, 129, 130 &mdash; always 0 failures.</b> The cause is structural rather than flaky: bk
+generates real zone maps and then walks them (<code>for j in nodes.size()</code>, <code>for prev
+in run.map[s-1]</code>, <code>for t in out</code>), so its check COUNT is a function of the
+topology it happened to roll. <b>A count-diffing rule reads 129 as a regression, which is the one
+thing the drift note on <code>an</code> exists to prevent.</b> Recorded as a band, not a number.</p>
+<p><b>THE ONE RED IS <code>check_cm_live</code>'s FOUR, UNCHANGED AND NOT THIS BATCH'S.</b> They
+are the four CQ diagnosed and recorded as OWED inside the gate itself: <code>_nobody_can_press()</code>
+is true headless, so the defensive brace takes the bot branch and the bar cannot appear in a
+headless run at all, which makes two of them unsatisfiable and turns the other two into
+measurements of a 20%-Perfect bot mix. Identical on unmodified HEAD. <b>Reported rather than
+repaired, on CQ's own reasoning: repair only what is understood, and an opt-in this harness then
+failed to drive would turn four known reds into a hang.</b></p>
+<p>Gates: <code>check_parse</code>, <code>check_flow</code>, <code>check_map</code>,
+<code>check_cl_resolver</code>, <code>check_cl_width</code>, <code>check_cm</code>,
+<code>check_cn</code> and <code>check_co</code> all 0 failures; run-harness gates 1/2/3 pass
+(22/165/8); <code>check_map_screen</code> 0 throws. <b>Parse verified by grepping stderr for
+<code>Parse Error</code>, never by the tally</b> &mdash; 0 across the tree and 0 across the four
+edited suites, which <code>check_parse</code> does not cover (it walks
+<code>res://scripts</code> and <code>res://scenes</code> only).</p>
+<p><b>NO RUN WAS DESTROYED:</b> <code>user://run_save.bin</code> did not exist before the battery,
+so the designer had no run in flight to lose.</p>
+
 <h2>2026-08-18 &mdash; Batch CQ: THE BATTERY FINISHES, AND THE FOLD IS ACCOUNTED FOR</h2>
 <p><i>The battery runs end to end for the first time since Batch CE: <b>the four hanging suites
 are diagnosed and fixed</b>, and the deadlock behind them was NOT the one CP suspected. All 105
@@ -221,7 +442,7 @@ over, <b>&ge; cd (already)</b> means it was over before and the fold widened it.
 <tr><td>44</td><td>Ironclad</td><td><code>ironclad</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
 <tr><td>45</td><td>Slow Burn</td><td><code>slow_burn</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td>SLOW_BURN_TURNS=3</td></tr>
 <tr><td>46</td><td>Funeral Pyre</td><td><code>funeral_pyre</code></td><td>shield 150%</td><td>shield 200%</td><td>4</td><td></td><td>PYRE_SHARE/PERFECT</td></tr>
-<tr><td>47</td><td>Flash Freeze</td><td><code>flash_freeze</code></td><td>spares an UNBROKEN boss</td><td>takes an UNBROKEN boss too</td><td>5</td><td></td><td></td></tr>
+<tr><td>47</td><td><b>Flash Freeze &nbsp;&larr; RE-GATED (CR &sect;1)</b></td><td><code>flash_freeze</code></td><td>spares an UNBROKEN boss</td><td><b>lands only on a BROKEN boss</b></td><td>5</td><td></td><td>no longer passes <code>force</code> - the Broken check in <code>_apply_status</code> rules</td></tr>
 <tr><td>48</td><td>Hoarfrost Armor</td><td><code>hoarfrost_armor</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td>HOARFROST_TURNS=3</td></tr>
 <tr><td>49</td><td>Inner Arcane</td><td><code>inner_arcane</code></td><td>+0 bonus Resonance</td><td>+1 bonus Resonance</td><td>3</td><td></td><td></td></tr>
 <tr><td>50</td><td>Firedraw</td><td><code>firedraw</code></td><td>draws 4 turns each</td><td>draws 6 turns each</td><td>4</td><td></td><td>FIREDRAW_TAKE/PERFECT</td></tr>
@@ -238,9 +459,9 @@ over, <b>&ge; cd (already)</b> means it was over before and the fold widened it.
 <tr><td>61</td><td>Bloodbond</td><td><code>bloodbond</code></td><td>hunter takes 50%</td><td>hunter takes 25%</td><td>4</td><td></td><td>LOWER = buff</td></tr>
 <tr><td>62</td><td>Ghostpack</td><td><code>ghostpack</code></td><td>3 turns</td><td>4 turns</td><td>5</td><td></td><td></td></tr>
 <tr><td>63</td><td>Preparation</td><td><code>preparation</code></td><td>no Mana refund</td><td>+15 Mana</td><td>5</td><td></td><td></td></tr>
-<tr><td>64</td><td><b>Divine Presence</b></td><td><code>divine_presence</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td>CG: already flagged at 100% uptime</td></tr>
-<tr><td>65</td><td>Alms</td><td><code>alms</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td></td></tr>
-<tr><td>66</td><td><b>Vespers</b></td><td><code>vespers</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td>absorb was ALSO a Perfect value - see note</td></tr>
+<tr><td>64</td><td><b>Divine Presence &nbsp;&larr; REVERTED (CR &sect;3)</b></td><td><code>divine_presence</code></td><td>4 turns</td><td><b>4 turns</b></td><td>4</td><td>= cd</td><td>CG: already flagged at 100% uptime. 6 was the perfect&#x27;s; 4 is the base</td></tr>
+<tr><td>65</td><td><b>Alms &nbsp;&larr; REVERTED (CR &sect;3)</b></td><td><code>alms</code></td><td>4 turns</td><td><b>4 turns</b></td><td>4</td><td>= cd</td><td>6 was the perfect&#x27;s; 4 is the base</td></tr>
+<tr><td>66</td><td><b>Vespers &nbsp;&larr; REVERTED (CR &sect;3)</b></td><td><code>vespers</code></td><td>4 turns</td><td><b>4 turns</b></td><td>4</td><td>= cd</td><td>duration only. <code>VESPERS_PCT</code> 0.20 was NEVER perfect-gated and is untouched</td></tr>
 <tr><td>67</td><td><b>Elevation &nbsp;&larr; REVERTED</b></td><td><code>elevation</code></td><td>2 Faith to every ally</td><td>3 Faith to every ally</td><td>5</td><td></td><td>ELEVATION_STACKS=2 - THE REVERSAL</td></tr>
 <tr><td>68</td><td>Mantle</td><td><code>mantle</code></td><td>2 hops</td><td>3 hops</td><td>4</td><td></td><td>MANTLE_HOPS=2</td></tr>
 <tr><td>69</td><td>Penance</td><td><code>penance</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
@@ -250,7 +471,7 @@ over, <b>&ge; cd (already)</b> means it was over before and the fold widened it.
 <tr><td>73</td><td>Fault Line</td><td><code>fault_line</code></td><td>4 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td></td></tr>
 <tr><td>74</td><td>Stalking Horse</td><td><code>stalking_horse</code></td><td>3 turns</td><td>4 turns</td><td>4</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
 <tr><td>75</td><td>Downwind</td><td><code>downwind</code></td><td>3 turns</td><td>4 turns</td><td>5</td><td></td><td></td></tr>
-<tr><td>76</td><td>Rallying Shout</td><td><code>rally</code></td><td>-int(30*mult) Pressure, +20% res</td><td>-50 Pressure, +30% res</td><td>3</td><td></td><td>lost its grade scaling</td></tr>
+<tr><td>76</td><td><b>Rallying Shout &nbsp;&larr; PART-REVERTED (CR &sect;2)</b></td><td><code>rally</code></td><td>-int(30*mult) Pressure, +20% res</td><td><b>-30 Pressure (flat)</b>, +30% res</td><td>3</td><td></td><td>the old BASE, not the old formula - with no bar there is no <code>mult</code>. The resource fold STANDS (&sect;4)</td></tr>
 <tr><td>77</td><td>Retaliation</td><td><code>retaliate</code></td><td>3 turns</td><td>4 turns</td><td>3</td><td>&ge; cd (already)</td><td></td></tr>
 <tr><td>78</td><td>Mana Shield</td><td><code>mana_shield</code></td><td>(unimplemented)</td><td>(unchanged)</td><td>3</td><td></td><td>claimed &#x27;Initiative cost 1.5 instead of 2&#x27;</td></tr>
 <tr><td>79</td><td>Ashes of Al'ar</td><td><code>ashes</code></td><td>returns at 25%</td><td>returns at 40%</td><td>&mdash;</td><td></td><td>ASHES_RETURN/PERFECT</td></tr>
@@ -271,9 +492,9 @@ over, <b>&ge; cd (already)</b> means it was over before and the fold widened it.
 <tr><td>94</td><td>Divine Shield</td><td><code>divine_shield</code></td><td>absorbs 30%</td><td>absorbs 35%</td><td>2</td><td></td><td>+ 0.01 x stalwart_step</td></tr>
 <tr><td>95</td><td>Consecrated Ground</td><td><code>cons_ground</code></td><td>2 turns</td><td>3 turns</td><td>3</td><td><b>&ge; cd (NEW)</b></td><td></td></tr>
 <tr><td>96</td><td>Blessing of Zeal</td><td><code>zeal</code></td><td>3 turns</td><td>4 turns</td><td>2</td><td>&ge; cd (already)</td><td></td></tr>
-<tr><td>97</td><td>Bewitch</td><td><code>bewitch</code></td><td>no instant strike</td><td>target attacks instantly</td><td>4</td><td></td><td>CN: lost its bar for this</td></tr>
+<tr><td>97</td><td><b>Bewitch &nbsp;&larr; REVERTED (CR &sect;2)</b></td><td><code>bewitch</code></td><td>no instant strike</td><td><b>no instant strike</b></td><td>4</td><td></td><td>CN: lost its bar for this. The strike is REMOVED, not folded - a free extra enemy attack with no gate</td></tr>
 <tr><td>98</td><td>Tripwire</td><td><code>tripwire</code></td><td>5 turns</td><td>6 turns</td><td>4</td><td>&ge; cd (already)</td><td></td></tr>
-<tr><td>99</td><td>Snare Trap</td><td><code>snare_trap</code></td><td>Stun spares a boss</td><td>Stun lands on a boss</td><td>3</td><td></td><td></td></tr>
+<tr><td>99</td><td><b>Snare Trap &nbsp;&larr; RE-GATED (CR &sect;1)</b></td><td><code>snare_trap</code></td><td>Stun spares a boss</td><td><b>Stun lands only on a BROKEN boss</b></td><td>3</td><td></td><td>the <code>perfect</code> stamp is gone; the spring no longer forces</td></tr>
 <tr><td>100</td><td>Battle Shout</td><td><code>battle_shout</code></td><td>no Rage refund</td><td>+5 Rage</td><td>2</td><td></td><td>TALENT</td></tr>
 <tr><td>101</td><td>Hold the Line</td><td><code>hold_the_line</code></td><td>no Rage refund</td><td>+5 Rage</td><td>6</td><td></td><td>TALENT</td></tr>
 <tr><td>102</td><td>Immolate</td><td><code>immolate</code></td><td>3 turns</td><td>4 turns</td><td>2</td><td>&ge; cd (already)</td><td>TALENT</td></tr>

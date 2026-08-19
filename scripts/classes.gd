@@ -2116,7 +2116,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"cost": 30, "damage": 0, "pressure": 0, "delay": 3.0,
 				"cooldown": 5, "anim": "attack03", "special": "flash_freeze",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Seal it now: the target is Frozen\noutright whatever its Chilled stacks,\nand joins the Glacial Hold.\nThe ice takes even an UNBROKEN boss —\nbut a held boss shrugs it off after ONE\nturn. That turn is what this buys\nagainst one; it is not a lockdown."})
+				"description": "Seal it now: the target is Frozen\noutright whatever its Chilled stacks,\nand joins the Glacial Hold.\nA BOSS RESISTS UNTIL BROKEN — and even\nthen the ice holds it ONE turn only.\nThat turn is what this buys against\none; it is not a lockdown."})
 		# AXIS: the accumulation pays on its own. His stacks currently do
 		# nothing but count toward a freeze, so a fight where the freeze never
 		# lands is a fight where his build did nothing.
@@ -2989,7 +2989,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.0, "cooldown": 4, "anim": "attack03",
 				"special": "divine_presence",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Keep the watch: for 6 turns, gain 2\nMercy at the start of every SECOND\nturn of yours on which NO ally fell\nbelow the window. A fall pays the\npassive instead and breaks that watch."})
+				"description": "Keep the watch: for 4 turns, gain 2\nMercy at the start of every SECOND\nturn of yours on which NO ally fell\nbelow the window. A fall pays the\npassive instead and breaks that watch."})
 		# AXIS: the overflow. Mercy caps at 5 and a bad fight over-earns it; the
 		# excess is simply gone. This is the sixth stack going somewhere.
 		#
@@ -3012,7 +3012,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.0, "cooldown": 4, "anim": "attack02",
 				"special": "alms",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Give away what will not fit: for 6\nturns, every stack of Mercy earned at\nthe CAP instead wards the ally who\nearned it, absorbing 12% of your\nmaximum health."})
+				"description": "Give away what will not fit: for 4\nturns, every stack of Mercy earned at\nthe CAP instead wards the ally who\nearned it, absorbing 12% of your\nmaximum health."})
 		# AXIS: the crossing itself. Her engine is fuelled by allies falling
 		# below the window, and every other card of hers is about what to do
 		# once one has. This is the one that REFUSES the fall — and it is the
@@ -3050,7 +3050,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.0, "cooldown": 4, "anim": "attack03",
 				"special": "vespers", "target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Say the evening office over them: for 6\nturns, or until it fires, the next blow\nthat would take that ally below half\nhealth is absorbed for 20% of YOUR\nmaximum. No crossing, no Mercy."})
+				"description": "Say the evening office over them: for 4\nturns, or until it fires, the next blow\nthat would take that ally below half\nhealth is absorbed for 20% of YOUR\nmaximum. No crossing, no Mercy."})
 		# ----- DEVOUT: two cards against the asymmetry nobody had exploited,
 		# and one shield. FAITH IS PAID ON THE HIGHEST COUNT HELD THIS BATTLE
 		# (`faith_peak`, Batch BI), so an early spike is worth exactly as much
@@ -3529,7 +3529,7 @@ static func vault_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Rallying Shout", "cost": 25,
 				"special": "rally", "delay": 2.5, "anim": "attack03", "cooldown": 3,
 				"perfect_id": "", "perfect_text": "",
-				"description": "Raise the line: the whole party sheds\n50 Pressure, and every other ally\nregains 30% of their resource."})
+				"description": "Raise the line: the whole party sheds\n30 Pressure, and every other ally\nregains 30% of their resource."})
 		"Retaliation":
 			return Ability.make({"display_name": "Retaliation", "cost": 20,
 				"special": "retaliate", "delay": 2.0, "anim": "attack01", "cooldown": 3,
@@ -4286,7 +4286,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Bewitch", "cooldown": 4, "cost": 25,
 					"special": "bewitch", "delay": 3.5, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "",
-					"description": "Charm a mind — for 3 turns the target\nbasic-attacks its OWN allies, Dazing\nthem with every strike — and one of\nthose strikes lands at once.\nA BOSS RESISTS UNTIL BROKEN."}),
+					"description": "Charm a mind — for 3 turns the target\nbasic-attacks its OWN allies, Dazing\nthem with every strike.\nA BOSS RESISTS UNTIL BROKEN."}),
 				Ability.make({"display_name": "Dark Pact", "cooldown": 3, "cost": 20,
 					"special": "dark_pact", "delay": 3.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "Restores 5 Mana",
@@ -4345,7 +4345,7 @@ static func spec_abilities(spec: String) -> Array:
 				Ability.make({"display_name": "Snare Trap", "cooldown": 3, "cost": 20, "special": "snare_trap",
 					"delay": 2.0, "anim": "attack01",
 					"perfect_id": "", "perfect_text": "",
-					"description": "Rig a snare on one enemy: the next\ntime it acts, it is STUNNED for 1 turn\nand Poisoned for 4. The stun lands even\non a boss."}),
+					"description": "Rig a snare on one enemy: the next\ntime it acts, it is STUNNED for 1 turn\nand Poisoned for 4. A BOSS RESISTS\nUNTIL BROKEN."}),
 			]
 	return []
 

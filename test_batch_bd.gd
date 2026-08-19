@@ -370,9 +370,11 @@ func _live_perfect_gives_four() -> void:
 
 
 # The ordinary boss rule, inherited rather than re-implemented — the spring
-# passes no `force_stun`, so a boss shrugs it until Broken. A perfect Deadfall
-# does NOT buy past it (that is Snare Trap's perfect, and keeping the two
-# distinct is the point of the batch).
+# passes no `force_stun`, so a boss shrugs it until Broken.
+# BATCH CR §1 — AND SNARE TRAP IS THE SAME RULE NOW. This comment used to
+# distinguish the deadfall from Snare Trap's perfect, which bought past the
+# carve-out; CN orphaned that perfect and CR deleted it, so both traps ask the
+# one Broken question. The distinction is gone, and its absence is the ruling.
 func _live_boss_shrugs_unless_broken() -> void:
 	var scene := await _spawn({}, ["boss"])
 	var sv := _sv(scene)

@@ -66,8 +66,12 @@ var description := ""
 # ONLY THE BASE EFFECT COUNTS. A handler whose ONLY damage sits inside its
 # `if is_perfect` branch is caught, because that branch is the orphaned bonus
 # §3 folds in rather than a reason to keep grading. BEWITCH is the whole of
-# that case: its strike was Perfect-only, so it loses its bar and the strike
-# becomes what Bewitch always does.
+# that case: its strike was Perfect-only, so it loses its bar.
+# BATCH CR §2 — AND THE STRIKE IS REMOVED RATHER THAN FOLDED. Losing the bar is
+# still correct (there is no base damage for a grade to multiply), but folding
+# the strike in gave the card a free extra enemy attack with no gate on it. The
+# criterion decides whether an ability GRADES; it does not decide what an
+# orphaned bonus becomes, and those are two questions.
 const DAMAGE_SPECIALS := ["blood_tribute", "breaking_darkness", "call_wild",
 	"call_wilds", "cinderfall", "cull", "feint", "guard_change", "gut_rip",
 	"harvest", "kill_command", "killing_frost", "precision_strike",

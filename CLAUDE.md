@@ -18,23 +18,29 @@ updated alongside `docs/changelog.html` (the living changelog). The original
   no vault lists, no "was/now/moved/reworked/renamed" notes, no decision
   dates — change history belongs in changelog.html alone.
 - Terminology: damage against the Break meter = "Break damage (BD)" everywhere.
-- **FULL BATTERY AT BATCH CQ — 45 SUITES, ZERO THROWS, ZERO FAILURES, AND IT FINISHED FOR THE
-  FIRST TIME SINCE CE.** ah 5625, ah_battle 65, ai 2217, aj 418, ak 528, **al 560**, an 6051,
-  ar 735, as 396, at 470, au 336, av 324, aw 350, ax 342, ay 484, az 519, ba 690, bb 177, bc 91,
-  **bd 71**, be 34, bf 78, bg 47, bh 233, bi 91, bj 67, bk 130, bl 88, bm 1891, bn 81, bo 1025,
-  **bp 272**, **bq 739**, **br 1447**, bs 263, **bt 455**, bu 477, bv 897, **bw 548**, bx 142,
-  cb 1181, cd 86, **ce 1112**, runes 3121, rune_battle 97. **al, bp, br and bw are counts rather
-  than timeouts for the first time** — they deadlocked on `_defensive_brace` from CM until CQ §1.
-  `bd 70 -> 71` is CQ §3 rewriting Deadfall's last-charge loop to read the armed count instead of
-  a literal; `ce 1109 -> 1112` is §3's Elevation re-point adding a criterion check; `bn 80 -> 81`
-  and `bo 898 -> 1025` are CO's, not this batch's — the battery had not run since CE, so five
-  batches of drift land in one reading and **no count here should be diffed against CE's without
-  that caveat**. `an` read **6051 and 6054 on two consecutive full runs of this same tree**, which is its
-  DOCUMENTED drift and is exactly why it is never pinned. Every other count above reproduced
-  EXACTLY across both runs.
-  **THE ONE RED: `check_cm_live` reports 4 failures, identical on unmodified HEAD, recorded as
-  owed in the gate itself (CQ §1).** `check_map` is NOT a hang — 99% CPU for ~5 minutes; the
-  battery gives it a per-target 600s bound.
+- **FULL BATTERY AT BATCH CR — 45 SUITES, ZERO THROWS, ZERO FAILURES, RUN TWICE.** ah 5625,
+  ah_battle 65, ai 2217, aj 418, ak 528, al 560, an 6054, ar 735, as 396, at 470, au 336, av 324,
+  aw 350, **ax 345**, ay 484, az 519, ba 690, bb 177, bc 91, bd 71, be 34, bf 78, bg 47, bh 233,
+  bi 91, bj 67, **bk 129–130**, bl 88, bm 1891, bn 81, bo 1025, bp 272, bq 739, br 1447, bs 263,
+  bt 455, bu 477, bv 897, bw 548, bx 142, cb 1181, cd 86, ce 1112, runes 3121, rune_battle 97.
+  **EVERY COUNT REPRODUCES CQ's EXCEPT THREE, AND ALL THREE ARE ACCOUNTED FOR**: `ax` is 342 → 345
+  (CR §1 added three assertions), `an` 6054 is inside its documented drift, and `bk` is below.
+- **`bk` IS A SECOND DRIFTING SUITE AND IT WAS PINNED HERE AS IF IT WERE STABLE (FOUND AT CR).**
+  It read **129 on one battery run and 130 on the next**, and four consecutive runs gave
+  **129, 130, 129, 130 — always 0 failures.** It generates real zone maps and then walks them
+  (`for j in nodes.size()`, `for prev in run.map[s-1]`, `for t in out`), so its check COUNT is a
+  function of the topology it rolled. **RECORD IT AS A BAND. A count-diffing rule reads 129 as a
+  regression**, which is the exact thing `an`'s drift note exists to prevent — and `an` was the
+  only suite carrying one.
+- **THE ONE RED: `check_cm_live` reports 4 failures, identical on unmodified HEAD, recorded as
+  owed in the gate itself (CQ §1) and UNCHANGED AT CR.** `check_map` is NOT a hang — 99% CPU for
+  ~5 minutes; the battery gives it a per-target 600s bound.
+- **THE FOUR HANGING SUITES ARE CLOSED FOR A SECOND BATCH (CR §6).** al 560, bp 272, br 1447 and
+  bw 548 all produce counts on both runs; CQ's `_nobody_can_press()` diagnosis has held.
+- **`check_parse` DOES NOT COVER THE TEST SUITES (noted at CR).** It walks `res://scripts` and
+  `res://scenes` only, so a syntax error in a root-level `test_batch_*.gd` is invisible to it and
+  surfaces only when the battery reaches that suite — up to forty minutes in. Load them directly
+  when a suite has just been edited.
 - **A FOLD, A RENAME OR A REFACTOR THAT CHANGES A MAGNITUDE IS A DESIGN CHANGE. IT GOES TO THE
   DESIGNER AS A REPORT AND IS NEVER APPLIED ON THE BATCH'S OWN JUDGMENT (STANDING, SET AT BATCH
   CQ §6).** The rule exists because of CN §3: removing the timing bar from 113 abilities orphaned
@@ -227,8 +233,12 @@ ONE answer, asked by the cast path and by the draft card alike.
   damage or BD; **a field-only test would have stripped the bar off every one of them.**
 - **ONLY THE BASE EFFECT COUNTS.** A handler whose only damage sits inside `if is_perfect` is
   caught — that branch is the orphaned bonus, not a reason to keep grading. **BEWITCH is the
-  whole of that case**: its strike was Perfect-only, so it lost its bar and the strike is now
-  what Bewitch always does.
+  whole of that case**: its strike was Perfect-only, so it lost its bar.
+  · **THE STRIKE IS REMOVED, NOT FOLDED (BATCH CR §2).** Losing the bar is still right — there
+    is no base damage for a grade to multiply. Folding the strike in was the separate mistake:
+    it handed the card a free extra ENEMY attack with no natural gate, acquired by accident.
+    **THE CRITERION DECIDES WHETHER AN ABILITY GRADES; IT DOES NOT DECIDE WHAT AN ORPHANED BONUS
+    BECOMES. Those are two questions and CN answered only the first.**
 - **FOUR OVERRIDES.** **Heals keep their check** (`Ability.HEAL_SPECIALS`, an authored list
   because "is this a heal" is a question about the card — RENEWAL heals through a status, so
   nothing heals at cast time and a purely mechanical read would have taken its bar away while
@@ -347,10 +357,23 @@ than fixed.**
   The fix was written, tested and **REVERTED — it did not unhang the four** — but the deadlock is
   real and a future headless modal will hit it.
 
-## CN's FOLD LEFT SEVENTEEN SUITES ASSERTING PRE-CN MAGNITUDES (OPEN, THE NEXT BATCH — CP §1/§4)
-**CN §3 folded 105 orphaned Perfect bonuses into base effects, and CG through CO shipped
-implement-only, so the battery was last run at CE.** Roughly **seventy assertions across seventeen
-suites still pin the pre-fold base** and have been red since CN.
+## CN's FOLD LEFT SEVENTEEN SUITES ASSERTING PRE-CN MAGNITUDES (CLOSED AT CQ — CP §1/§4)
+**CLOSED, AND THE CLOSING IS WORTH READING BEFORE TRUSTING A NUMBER IN HERE.** CQ §3 repaired
+**95 assertions across 20 suites**, not the ~70 across 17 CP predicted, and the battery has been
+green since. **BATCH CR's BRIEF STATED THE OPPOSITE — that CQ "left them red" — and it was
+wrong**; the section below is kept because its ROOT-CAUSE list is still the best account of what
+the fold did, not because anything in it is outstanding.
+- **CQ REPAIRED THEM TO INTENT, WHICH FOR SEVEN CARDS MEANT TO THE FOLDED BEHAVIOUR** — the best
+  reading available then, and the one CR §1–§3 overturned. **THAT IS NOT A FAULT IN CQ's WORK;
+  IT IS WHY THE WORK PAID.** `bt`'s Flash Freeze check was INVERTED with the reason in the file
+  ("the assertion that would catch the carve-out coming back, and the magnitude behind it is
+  UNREVIEWED") and **it caught it one batch later.** A repair that records what it is pinning and
+  why is the difference between a suite that survives a ruling and one that quietly agrees with
+  whatever shipped.
+- **CR RE-POINTED THE ASSERTIONS ITS OWN RULINGS INVALIDATED**, to the ruling and not to the code.
+The original CP-era statement follows.
+**Roughly seventy assertions across seventeen suites still pin the pre-fold base** and were red
+from CN until CQ.
 Representative, all one root cause: **Deadfall arms FOUR springs** where `bd` asserts three
 (`DEADFALL_CHARGES + 1` at the cast site, constant left at 3) — 13 failures; **Elevation hands
 over 3** where `ce` asserts 2; **Recant returns 40%** where `bu` asserts 30% — 11 failures;
@@ -371,6 +394,46 @@ where `av` asserts 20%.
   still false — while CN's PARAMETERIC criterion had already taken the bar away.
   **`no_skill_check` has not been the answer to "does this run a check" since CN §1;
   `runs_skill_check()` is.**
+
+## HARD CONTROL LANDS ON A BOSS ONLY ONCE IT IS BROKEN (STANDING, SET AT BATCH CR §1)
+> **Hard control lands on a boss only once that boss is BROKEN. Never before.**
+
+**THE CHECK ALREADY EXISTED AND THERE IS STILL ONLY ONE OF IT.** `_apply_status` refuses
+`stunned`, `frozen`, `psychosis`, `bewitch` and `hysteria` on `target.is_boss and not
+target.broken` — the same `broken` the Occultist's Madness lane rests on. **A SECOND CHECK MUST
+NOT BE WRITTEN**; an ability obeys this rule by not passing `force`.
+- **WHY IT HAD TO BE RE-RULED.** Flash Freeze and Snare Trap bought the boss carve-out with their
+  PERFECTS. CN took the bar off both, their Perfect became their base, and **boss immunity to
+  hard control silently ceased to exist** — the Occultist's whole gate rests on Broken meaning
+  something. Neither could be restored to its old condition, because **"only on a Perfect" is not
+  expressible on an ability with no bar.** So the gate moved to the mechanic that already exists.
+  **THIS IS BETTER THAN THE PRE-FOLD BEHAVIOUR, NOT A RESTORATION OF IT: a bypass earned through
+  play rather than through timing.**
+- **`force` HAS EXACTLY ONE CALLER NOW AND IT IS POMMEL STRIKE.** That card KEPT its bar (25
+  damage, so `runs_skill_check()` is true), so "only on a Perfect" is still expressible there and
+  its perfect still lands the Stun on an unbroken boss. **REPORTED AND DELIBERATELY NOT CHANGED
+  AT CR** — it is the one ability left applying hard control to a boss on a condition other than
+  Broken, and whether it joins the rule is a designer's call, not a batch's.
+- **`_spring_trap`'s `force_stun` PARAMETER SURVIVES WITH NO CALLER PASSING TRUE.** Left in place
+  rather than removed (a shared helper's signature is adjacent scope), but **a future caller
+  passing `true` is re-opening the door this rule closed.**
+- **THE CONFORMING SET, CENSUSED AT CR AND WORTH NOT RE-DERIVING:** Mind Flay (`psychosis`),
+  Bewitch, Mass Hysteria, Glacial Prison and Cryoclasm (both through `_hold_freeze` with no
+  force), Spread of Madness (which filters `not e.is_boss or e.broken` itself) and Ricochet's
+  stagger all already gate on Broken. **Flash Freeze and Snare Trap were the only two that did
+  not.**
+
+## REMOVING A SKILL CHECK MAKES ITS PERFECT-ONLY BEHAVIOUR UNCONDITIONAL (STANDING, CR §7)
+> **Any Perfect that gated a BINARY — boss immunity, an extra strike, a refund — must be ruled on
+> BEFORE the bar comes off, not audited afterwards.**
+
+A magnitude fold is visible in a diff and a census can find it later. **A BINARY IS NOT A
+MAGNITUDE**: "the Stun lands on an unbroken boss" and "one of those strikes lands at once" are
+rules that switch from off to always-on, and nothing in the diff of `X if is_perfect else Y`
+becoming `X` says which kind of thing just changed. CN's criterion answered *does this ability
+still grade?* correctly 113 times; **it never asked what the orphaned bonus should become**, and
+folding was assumed because folding preserves the most. Three of CR's seven cards are that gap:
+Bewitch's free enemy attack, and Flash Freeze and Snare Trap deleting a game-wide immunity rule.
 
 ## THE LITERAL-DIGIT RULE IS A BASELINE, NOT A GATE (STANDING, CP §3)
 CL §1's rule is that a parenthetical is COMPUTED and never authored. **Swept over every authored
@@ -431,6 +494,15 @@ answer; `RECAST_GATED` (58 abilities) is the set.
 - **AN ABILITY THAT PROPOSES NO WRITE AT ALL IS NOT THIS GATE'S QUESTION** (Alms and Divine
   Presence in a kit without Mercy): the handler already logs why, and refusing there would darken
   a button with a reason this rule cannot state.
+- **A STATUS DURATION IS DECLARED TWICE AND BOTH COPIES MUST MOVE (STANDING, FOUND AT CR §3).**
+  The cast handler writes it, and **`_recast_writes` declares it again** so the gate can predict
+  what a recast would do. CR reverted three durations 6 → 4 in the handlers and left the table at
+  6; the gate then proposed a longer write than the handler performs, read every recast as an
+  improvement, and **stopped refusing a saturated recast on Alms, Divine Presence and Vespers.**
+  **`check_co` FAILED ALL THREE BY NAME**, which is what a gate that spawns real battles buys over
+  one that reads the table. **ANY EDIT TO A DURATION, POWER OR RIDER ON A `RECAST_GATED` ABILITY
+  OWES THE SAME EDIT AT `_recast_writes`** — it is Batch BP's Eye of the Storm (two copies of one
+  figure) one door along.
 - **`check_co.gd` IS THE ANTI-ROT PROOF AND IT IS A LIVE ONE.** It spawns **two** real battles —
   Alms and Divine Presence need Mercy, Mantle needs a living Devout, so one party cannot write the
   whole set — casts all 58 onto every unit each can reach, and asserts the gate's prediction

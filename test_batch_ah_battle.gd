@@ -212,20 +212,28 @@ func _test_boss_stun() -> void:
 		scene._apply_status(boss, "stunned", 1)
 		ok(not boss.has_status("stunned"),
 			"an unbroken boss still shrugs off an ordinary Stun")
-		# The Batch AH perfects, and ONLY them, get through.
+		# `force` still gets through, and after BATCH CR §1 exactly ONE caster
+		# passes it: Pommel Strike's perfect, which kept its bar. These two
+		# checks pin the DOOR rather than any ability — CR's standing rule is
+		# that hard control lands on a boss only once Broken, so a NEW caller
+		# passing `true` is re-opening this door and these are what would see it.
 		scene._apply_status(boss, "stunned", 1, 0, 0, null, true)
 		ok(boss.has_status("stunned"), "a forced Stun lands on an unbroken boss")
 		boss.remove_status("stunned")
-		# Snare Trap's perfect routes through _spring_trap.
+		# BATCH CR §1 — SNARE TRAP NO LONGER ROUTES A FORCE THROUGH HERE. Its
+		# `perfect` stamp was CN-orphaned and is deleted, so the spring's own
+		# call passes nothing and a boss shrugs it until Broken. The
+		# `force_stun` PARAMETER survives with no caller passing true, and that
+		# is what the second check below pins.
 		var sv := _hero(scene, "trapper")
 		ok(sv != null, "the Survivalist spawned")
 		if sv != null:
 			scene._spring_trap(sv, boss, 0.0, false)
 			ok(not boss.has_status("stunned"),
-				"an ordinary snare does not hold a boss")
+				"a snare does not hold an unbroken boss — CR §1 gates it on Broken")
 			scene._spring_trap(sv, boss, 0.0, true)
 			ok(boss.has_status("stunned"),
-				"a PERFECTLY rigged snare holds an unbroken boss")
+				"the force_stun door still opens — and now nothing in the game passes it")
 			boss.remove_status("stunned")
 		# The other immune ids are untouched by the new argument's default.
 		scene._apply_status(boss, "frozen", 2)

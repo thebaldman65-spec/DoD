@@ -4,6 +4,47 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A ruling stated as a rule, applied to a list (Batch CR) — 2026-08-19
+
+CQ's census found the fold and handed it over. CR is the designer's answer, and the answer has the
+same shape as the thing it corrects.
+
+§3 states a rule and states it carefully: **`duration > cooldown`, not `duration >= cooldown`** — a
+buff whose duration equals its cooldown still spends an action and its resource every cycle, which
+is a real cost, and only slack on top makes the decision disappear. That refinement is right, and it
+is a genuine improvement on CQ's `>=` classification. It then names three abilities to revert.
+
+Applied as written, the rule catches thirteen. CQ's own published table is what shows it: its
+twenty-two "`>= cd` (already)" rows are not twenty-two abilities that were already permanent — that
+label meant the pre-fold value was already at *or* past the cooldown, and for seventeen of them it
+was exactly *at* it. Under `>`, "at" is the tradeoff the ruling wants to keep, and the fold pushed
+all seventeen past it. Ten of those are self or party buffs, which is §3's own declared scope, and
+three of the ten are the three that got reverted.
+
+**So the accepted bucket in §4 is defined by one test and the revert in §3 by a different one, and
+the rows fall through the gap.** §4 accepts "the 22 durations already at or past their cooldown
+before CN" — that sentence is CQ's `>=` reading, and it swallows the exact rows §3's `>` reading
+would revert. Only five of the twenty-two were genuinely past their cooldown before the fold.
+
+The generalisable bit is not "the brief was wrong". It is that **a rule and a list are different
+artefacts, and shipping both invites the reader to assume they agree.** The list is what gets
+applied; the rule is what gets remembered and cited later. When they disagree, the disagreement is
+invisible for exactly as long as nobody recomputes the rule — which, on this project, has been about
+one batch. CQ's fold looked local 105 times; this ruling looks complete once. Both need the same
+defence: compute the aggregate, put it beside the list, and let the person whose call it is see the
+difference before it is spent.
+
+Three of the seven cards this batch touched also make the smaller point that **an orphaned Perfect
+is not one question but two.** CN's criterion answered "does this ability still grade?" correctly
+every time. It did not answer "and what becomes of the bonus?", and folding was assumed to be the
+answer because it is the answer that preserves the most. For Bewitch it granted a free extra enemy
+attack that nothing gates; for Flash Freeze and Snare Trap it deleted boss immunity to hard control
+across the whole game, because "only on a Perfect" was the gate and the gate was the bar. Neither
+is visible as a magnitude. The fix for the second was not to restore the old condition — it is no
+longer expressible — but to move the gate onto Broken, a mechanic that already exists and that the
+Occultist's whole lane already depends on. **That is better than what it replaced: a bypass earned
+through play rather than through timing.**
+
 ## A mechanical consequence is still a decision (Batch CQ) — 2026-08-18
 
 CN removed the timing bar from 113 abilities on a criterion that was right, and that left 105

@@ -434,8 +434,14 @@ func _no_exclusive_pairs() -> void:
 
 func _boss_legibility() -> void:
 	# THE MECHANIC IS UNTOUCHED. The guard still refuses all three madness
-	# statuses on an unbroken boss, and `force` is still the only way past it
-	# (two callers, both Batch AH perfects) — no Occultist workaround was added.
+	# statuses on an unbroken boss, and `force` is still the only way past it —
+	# no Occultist workaround was added.
+	# BATCH CR §1 — RE-POINTED: "two callers, both Batch AH perfects" IS NOW
+	# ONE. Flash Freeze and Snare Trap bought the carve-out with perfects CN
+	# orphaned, so both were re-gated on BROKEN; only Pommel Strike still buys
+	# it, and only because it KEPT its bar. The three checks below pin that
+	# both doors are shut, because CR's standing rule is that nothing else may
+	# pass `force` and prose alone has never held a rule on this project.
 	var bsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
 	ok(bsrc.contains('if not force and id in ["stunned", "frozen", "psychosis", "bewitch", "hysteria"] \\'),
 		"the boss guard still refuses all three madness statuses")
@@ -450,6 +456,14 @@ func _boss_legibility() -> void:
 		"...and `force` is still an explicit argument (2 declarations: _apply_status, _hold_freeze)")
 	ok(bsrc.contains('_apply_status(target, "frozen", 1 if timed else -1, 0, 0, null, force)'),
 		"...and _hold_freeze THREADS it rather than deciding by name")
+	# BATCH CR §1 — THE TWO CLOSED DOORS, ASSERTED SHUT.
+	ok(not bsrc.contains("_hold_freeze(target, attacker, true)"),
+		"Flash Freeze no longer FORCES the freeze — a boss resists until Broken")
+	ok(not bsrc.contains('sn_st["perfect"] = true'),
+		"Snare Trap no longer stamps its spring PERFECT — the Stun waits on Broken")
+	# ...and the one door that stays open, named so a sixth caller is visible.
+	ok(bsrc.contains('is_perfect and ab.display_name == "Pommel Strike"'),
+		"POMMEL STRIKE is the one ability left buying past the carve-out (it kept its bar)")
 	# THE LANE TEXT says it, where a player picking talents reads it.
 	for id in ["oc_spread", "oc_whispers", "oc_mind_flay", "oc_hysteria"]:
 		var txt := Talents.desc_for(_node(id), 1)
