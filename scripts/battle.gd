@@ -174,6 +174,16 @@ const STATUS_INFO := {
 	"empower": ["Empower", "+A", Color(0.95, 0.45, 0.35), "+25% damage dealt."],
 	"exposed": ["Exposed", "E", Color(0.95, 0.9, 0.4), "Takes 15% more damage."],
 	"cripple": ["Cripple", "C", Color(0.5, 0.4, 0.55), "-25% damage dealt."],
+	# BATCH CT §5 — the Cursed Visage's curse. WEAKER AND PERMANENT, against
+	# Cripple's stronger and brief: -15% for the rest of the battle, on every
+	# living enemy at once, from one button that costs no turn. The magnitude is
+	# deliberately modest for exactly that reason (§4 flags the item as NOT
+	# TUNED) — permanent and universal is worth far more than large and brief.
+	# The chip is "Hx" and a distinctly redder purple, so it can never be read
+	# as Cripple's "C" at a glance; see unit.gd's DEBUFF_IDS note for why the
+	# name is Hexed and not the brief's `crippled`.
+	"hexed": ["Hexed", "Hx", Color(0.72, 0.35, 0.62),
+		"-15% damage dealt, for the\nrest of the battle."],
 	"retaliate": ["Retaliation", "R!", Color(0.95, 0.6, 0.25), "Counters attackers with a basic strike."],
 	"dazed": ["Dazed", "Dz", Color(0.95, 0.7, 0.35), "Attacks are 20% more likely to miss."],
 	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less damage\n(a Shieldmaster's ward)."],
@@ -862,11 +872,23 @@ func _ready() -> void:
 
 # ---------- setup ----------
 
+# BATCH CT §1: the pouch is a SLOT LIST now, so the battle copy is keyed off
+# `Run.items` — the types the party actually HOLDS — rather than off every id
+# that exists. A held slot whose stack has run to zero is still a slot and
+# still appears (greyed): it is only freed by a discard or a sale, which is
+# the half of the cap that makes it bind.
+#
+# The `defaults` branch is the no-run case (a scene opened directly, the
+# battle tests). It had an entry per id and would now be a missing-key crash
+# for the three new ones, so it names its four types and is read the same way
+# a live pouch is.
 func _init_items() -> void:
-	var defaults := {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
-	for id in Run.ITEM_IDS:
-		var count: int = Run.items.get(id, 0) if Run.active else defaults[id]
-		items[id] = [Run.ITEM_INFO[id][0], count, Run.ITEM_INFO[id][1]]
+	var defaults := {"health": 2, "mana": 1, "bomb": 1, "revive": 1}
+	var pouch: Dictionary = Run.items if Run.active else defaults
+	for id in pouch:
+		if not Run.ITEM_INFO.has(id):
+			continue  # a save from a build that knew an id this one does not
+		items[id] = [Run.ITEM_INFO[id][0], int(pouch[id]), Run.ITEM_INFO[id][1]]
 
 
 func _build_arena() -> void:
@@ -4774,20 +4796,29 @@ func _refund_item(item_id: String) -> void:
 
 
 func _use_item(item_id: String) -> void:
-	if items[item_id][1] <= 0 or item_used:
+	# BATCH CT §1: the pouch is a SLOT LIST, so an id the party does not HOLD has
+	# no entry here at all — `items[item_id]` on it is a missing-key crash rather
+	# than a zero count. The picker only ever offers held slots, so this guard is
+	# for the hotkey path and for a test firing an id directly; it is the same
+	# belt-and-braces second gate the shop's buy button already carries.
+	if not items.has(item_id) or items[item_id][1] <= 0 or item_used:
 		return
 	item_used = true
 	action_panel.visible = false
 	items[item_id][1] -= 1
 	match item_id:
 		"bomb":
+			# BATCH CT §6: the damage rides `Run.combat_wins` at the heroes' own
+			# +2%-per-win rate. Base 50, so a run opens unchanged.
+			var bomb_dmg: int = Run.bomb_damage() if Run.active \
+				else Run.BOMB_BASE_DAMAGE
 			_message("Bomb thrown!")
-			_log("Item: Bomb — 50 dmg to all enemies", "#e0c060")
+			_log("Item: Bomb — %d dmg to all enemies" % bomb_dmg, "#e0c060")
 			_sfx("bomb", -2.0)
 			_shake()
 			for e in enemies.filter(func(en): return not en.dead):
-				var result: Dictionary = e.take_hit(50, 0)
-				e.float_text("50", Color(1.0, 0.8, 0.4))
+				var result: Dictionary = e.take_hit(bomb_dmg, 0)
+				e.float_text(str(bomb_dmg), Color(1.0, 0.8, 0.4))
 				if result.died:
 					_message("%s falls!" % e.unit_name)
 					_log("† %s dies" % e.unit_name, "#e05050")
@@ -4802,11 +4833,21 @@ func _use_item(item_id: String) -> void:
 			if heal_target == null:
 				_refund_item(item_id)
 				return
-			heal_target.heal_amount(40, true)
+			# BATCH CT §6: 20% of the drinker's MAXIMUM, not a flat 40. The heal
+			# reports what actually landed (heal_amount clamps at full health), so
+			# the float and the log can never claim a heal the hero did not get.
+			var hp_want: int = Run.health_potion_heal(heal_target.max_hp)
+			var hp_got: int = heal_target.heal_amount(hp_want, true)
 			_sfx("potion", -6.0)
-			heal_target.float_text("+40", Color(0.4, 0.9, 0.45))
+			# A refused heal has ALREADY floated its own reason (Bloodless, the
+			# Ancient Pact), so a "+0" on top of it would be noise stacked on the
+			# answer. The old flat version floated "+40" through those refusals
+			# regardless, which was simply untrue.
+			if hp_got > 0:
+				heal_target.float_text("+%d" % hp_got, Color(0.4, 0.9, 0.45))
 			_message("%s drinks a Health Potion" % heal_target.unit_name)
-			_log("Item: Health Potion — %s +40 HP" % heal_target.unit_name, "#e0c060")
+			_log("Item: Health Potion — %s +%d HP" % [heal_target.unit_name, hp_got],
+				"#e0c060")
 			await _wait(0.5)
 		"mana":
 			var drinkers := heroes.filter(func(h): return not h.dead)
@@ -4816,12 +4857,20 @@ func _use_item(item_id: String) -> void:
 			if mana_target == null:
 				_refund_item(item_id)
 				return
-			mana_target.resource = mini(mana_target.resource + 40, mana_target.max_resource)
+			# BATCH CT §6: 40% of MAXIMUM resource, which is the old flat 40 exactly
+			# at the base max of 100 — a run opens unchanged on this one. Reports
+			# what landed rather than what was asked for, same as the heal above.
+			var mp_want: int = Run.mana_potion_restore(mana_target.max_resource)
+			var mp_before: int = mana_target.resource
+			mana_target.resource = mini(mana_target.resource + mp_want,
+				mana_target.max_resource)
+			var mp_got: int = mana_target.resource - mp_before
 			mana_target.refresh_bars()
 			_sfx("potion", -8.0, 1.2)
-			mana_target.float_text("+40 %s" % mana_target.resource_name, Color(0.5, 0.7, 1.0))
+			mana_target.float_text("+%d %s" % [mp_got, mana_target.resource_name],
+				Color(0.5, 0.7, 1.0))
 			_message("%s drinks a Mana Potion" % mana_target.unit_name)
-			_log("Item: Mana Potion — %s +40 %s" % [mana_target.unit_name,
+			_log("Item: Mana Potion — %s +%d %s" % [mana_target.unit_name, mp_got,
 				mana_target.resource_name], "#e0c060")
 			await _wait(0.5)
 		"revive":
@@ -4853,6 +4902,108 @@ func _use_item(item_id: String) -> void:
 			_log("Item: Defense Potion — party gains Fortify", "#e0c060")
 			for h in heroes.filter(func(he): return not he.dead):
 				_apply_status(h, "fortify", 3)
+			await _wait(0.6)
+		# ---------- BATCH CT §4: the three new ones ----------
+		"cleanse":
+			# THE HOLE THIS CLOSES IS REAL: Cleansing Rite is a CLERIC ability, so
+			# a party without a Cleric has no answer to a debuff at all — and that
+			# worsens the moment enemy interference lands.
+			#
+			# IT READS `DEBUFF_IDS` RATHER THAN A HAND-ROLLED LIST, exactly as §4
+			# required, and it does so through `_cleansable_debuffs` — the same
+			# derivation the Rite itself uses. That helper IS the DEBUFF_IDS read
+			# plus the three carve-outs that already exist for stated reasons:
+			# `broken` and `bleed` are METER states rather than afflictions, and
+			# sticky poison (Slow Acting, Perfected Toxin) "refuses every cleanse,
+			# this one included". Using raw DEBUFF_IDS here would have made a 35g
+			# consumable strictly better than the Cleric ability it stands in for,
+			# which is the opposite of standing in for it.
+			var cl_living := heroes.filter(func(h): return not h.dead)
+			var cl_afflicted := cl_living.filter(
+				func(h): return not _cleansable_debuffs(h).is_empty())
+			if cl_afflicted.is_empty():
+				# Nothing to strip: the draught is handed back rather than drunk.
+				# A consumable that vanishes for no effect is the same silent theft
+				# the item cap's refusal message exists to avoid.
+				_refund_item(item_id)
+				_message("No one is afflicted — the draught stays corked.")
+				return
+			var cl_target: BattleUnit = cl_afflicted[0]
+			if cl_afflicted.size() > 1:
+				cl_target = await _pick_target(cl_afflicted)
+			if cl_target == null:
+				_refund_item(item_id)
+				return
+			var cl_taken := PackedStringArray()
+			for cl_s in _cleansable_debuffs(cl_target):
+				cl_taken.append(String(cl_s.get("id", "")))
+			for cl_id in cl_taken:
+				cl_target.remove_status(cl_id)
+			_sfx("potion", -6.0, 1.1)
+			cl_target.float_text("CLEANSED", Color(0.6, 0.95, 0.85))
+			_message("%s is cleansed!" % cl_target.unit_name)
+			_log("Item: Cleansing Draught — %s loses %d debuff%s" % [
+				cl_target.unit_name, cl_taken.size(),
+				"" if cl_taken.size() == 1 else "s"], "#e0c060")
+			await _wait(0.6)
+		"visage":
+			# FLAGGED, NOT TUNED (§4's own words). Nothing else in the game applies
+			# a permanent, party-wide debuff from one button that costs no turn.
+			# The -15% magnitude is modest for exactly that reason.
+			var vs_living := enemies.filter(func(en): return not en.dead)
+			if vs_living.is_empty():
+				_refund_item(item_id)
+				_message("Nothing left to curse.")
+				return
+			_sfx("potion", -4.0, 0.7)
+			_shake()
+			_message("The Visage opens its eyes!")
+			for vs_e in vs_living:
+				# -1 turns is the battle-long convention (`_turns_left` reads it as
+				# 999 remaining); `force` is NOT passed, so nothing here bypasses an
+				# immunity the rest of the game respects.
+				_apply_status(vs_e, "hexed", -1)
+			_log("Item: Cursed Visage — %d enem%s Hexed for the battle (-15%% damage)" % [
+				vs_living.size(), "y" if vs_living.size() == 1 else "ies"], "#e0c060")
+			await _wait(0.8)
+		"hourglass":
+			# WRITTEN THROUGH `next_time`, which is the field Revive already
+			# re-slots a returning hero with — §4 was explicit that there must not
+			# be a second scheduling path, and there is not. The idiom is
+			# Watchtower's exactly: find the soonest OTHER unit and land just
+			# ahead of it, clamped to `_clock` so nothing is scheduled in the past.
+			# Landing at `soonest - 0.01` rather than incrementing is also what
+			# waives the initiative delay of the current action — there is no
+			# BASIC_DELAY added anywhere on this path.
+			var hg_living := heroes.filter(
+				func(h): return not h.dead and not h.is_companion)
+			if hg_living.is_empty():
+				_refund_item(item_id)
+				return
+			# ANY living hero, not only the one acting (§4).
+			var hg_target: BattleUnit = hg_living[0]
+			if hg_living.size() > 1:
+				hg_target = await _pick_target(hg_living)
+			if hg_target == null:
+				_refund_item(item_id)
+				return
+			var hg_soonest := INF
+			for hg_u in heroes + enemies:
+				if hg_u == hg_target or hg_u.dead:
+					continue
+				if hg_u.next_time < hg_soonest:
+					hg_soonest = hg_u.next_time
+			if hg_soonest < INF:
+				hg_target.next_time = maxf(hg_soonest - 0.01, _clock)
+			else:
+				hg_target.next_time = _clock
+			_sfx("potion", -5.0, 1.3)
+			hg_target.float_text("NEXT", Color(0.95, 0.85, 0.45))
+			_message("%s steps out of the hour!" % hg_target.unit_name)
+			_log("Item: Resonating Hourglass — %s acts next" % hg_target.unit_name,
+				"#e0c060")
+			# A queue that reorders invisibly reads as a bug (§4).
+			_rebuild_turn_bar()
 			await _wait(0.6)
 	if not battle_over and current_hero != null and not current_hero.dead:
 		_show_actions(current_hero)
@@ -6144,7 +6295,9 @@ func _open_item_picker() -> void:
 	box.add_child(title)
 	_item_btns = []
 	_item_ids = []
-	for id in Run.ITEM_IDS:
+	# BATCH CT §1: the held slots, in ITEM_IDS order so the list does not
+	# reshuffle itself between fights as the pouch changes shape.
+	for id in Run.ITEM_IDS.filter(func(i): return items.has(i)):
 		var entry: Array = items[id]
 		var b := Button.new()
 		b.text = "%s  x%d" % [entry[0], entry[1]]
@@ -6155,6 +6308,17 @@ func _open_item_picker() -> void:
 		var usable: bool = entry[1] > 0
 		if id == "revive":
 			usable = usable and heroes.any(func(h): return h.dead)
+		# BATCH CT §4: the same door Revive already uses — an item with nothing
+		# to act on is greyed HERE rather than being drunk and refunded. The
+		# refund inside `_use_item` stays as the second gate (the hotkey path and
+		# the tests reach it directly), on the shop's own belt-and-braces rule.
+		if id == "cleanse":
+			usable = usable and heroes.any(
+				func(h): return not h.dead and not _cleansable_debuffs(h).is_empty())
+			if not usable and entry[1] > 0:
+				b.tooltip_text = "%s\n\nNo one is afflicted." % entry[2]
+		if id == "visage":
+			usable = usable and enemies.any(func(e): return not e.dead)
 		b.disabled = not usable
 		b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(_confirm_item.bind(_item_ids.size()))
@@ -8423,6 +8587,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					raw *= 1.0 - 0.05 * sc_r
 			if attacker.has_status("cripple"):
 				raw *= 0.75
+			# BATCH CT §5: the Cursed Visage's hex. MULTIPLICATIVE with Cripple
+			# rather than replacing it — they are separate statuses from separate
+			# sources and both are on the board at once often enough (the Visage
+			# hits everything; Cripple is aimed), so stacking is the only reading
+			# that does not make one of them silently free.
+			if attacker.has_status("hexed"):
+				raw *= 0.85
 			# Chilled x3: frozen muscles swing 15% softer. Hungering Cold
 			# (talent) deepens the malus per stack.
 			var atk_chill := attacker.status_stacks("chilled")
@@ -21233,6 +21404,20 @@ func _resolve_boss(gold_gain: int, is_end: bool) -> void:
 	if not is_end:
 		Run.bank_zone_boss_points()
 		boss_text += "\n\nEach spec that walked this road banks 1 talent point."
+		# BATCH CT §1 — THE POUCH GROWS, AND IT IS ANNOUNCED HERE.
+		# §1 said to copy the rune ladder's zone-victory announcement; there is
+		# no such announcement to copy (Batch AN §9 deleted the rune ladder
+		# outright and rune_slots() has been flat 3 ever since), so this is it,
+		# written to sit beside the talent-point line the player already reads on
+		# this screen. It is computed from the ladder rather than restated, so it
+		# cannot drift from ITEM_SLOTS_BY_ZONE.
+		var slots_now := Run.item_slots()
+		var next_zone_i: int = mini(Run.zone_idx + 1,
+			Run.ITEM_SLOTS_BY_ZONE.size() - 1)
+		var slots_next: int = int(Run.ITEM_SLOTS_BY_ZONE[next_zone_i])
+		if Run.has_next_zone() and slots_next > slots_now:
+			boss_text += "\n\nTHE PACKS ARE RE-SLUNG: the pouch holds %d kinds now, not %d." % [
+				slots_next, slots_now]
 		if not relic.is_empty():
 			boss_text += "\n\nRELIC UNLOCKED: %s\n%s" % [relic["name"], relic["desc"]]
 		var picked: Array = _award_ability_picks()
@@ -21269,14 +21454,25 @@ func _resolve_boss(gold_gain: int, is_end: bool) -> void:
 	_show_run_summary(comp_snap)
 
 
-# One consumable into the pouch, honouring the §6 cap of six per type. A
-# refused drop SAYS SO — a reward that silently evaporates reads as a bug,
-# which is the whole reason add_item reports what landed.
+# One consumable into the pouch. THREE OUTCOMES SINCE BATCH CT, and §3 was
+# emphatic that the last two must not be conflated:
+#   * it LANDS;
+#   * there is NO SLOT for the type — that is a CHOICE, queued as a swap offer
+#     the map screen puts to the player (take it and give up a stack, or
+#     decline). Not a refusal;
+#   * the STACK is full — that IS a refusal, with a message, and it is Batch
+#     AN's rule standing unchanged. NO ROOM IS A CHOICE, A FULL STACK IS A WALL.
+# A reward that silently evaporates reads as a bug, which is the whole reason
+# add_item reports what landed and why this returns a line for every branch.
 func _drop_item_line(id: String) -> String:
+	if Run.offer_item(id):
+		return "\n%s — no room in the pouch. Choose on the map." % Run.ITEM_INFO[id][0]
 	if Run.add_item(id) > 0:
 		return "\n+1 %s" % Run.ITEM_INFO[id][0]
+	# The type's OWN stack cap, not a hardcoded six — three of the eight items
+	# carry smaller ones since §4.
 	return "\n%s — the party already carries %d, and cannot hold more." % [
-		Run.ITEM_INFO[id][0], Run.ITEM_CAP]
+		Run.ITEM_INFO[id][0], Run.item_stack_cap(id)]
 
 
 func _hero_label(member: Dictionary) -> String:

@@ -505,7 +505,18 @@ func _section_save(rsrc: String) -> void:
 	var run: Node = load("res://scripts/run_state.gd").new()
 	run.sim_run = true
 	run.new_run()
-	ok(rsrc.contains("\"version\": 10"), "§2: the save version is 10 (BATCH BM)")
+	# BATCH CT re-pointed this line IN PLACE rather than deleting it, on BK §6's
+	# precedent (read the note there — it is the same lesson, learned twice).
+	# It pinned the literal `"version": 10` and broke the moment CT's slotted
+	# pouch raised it to 11, and that is the wrong thing for THIS suite to own:
+	# **BL's invariant is that the recap ledgers are IN the save**, not whatever
+	# number the newest batch happens to be writing. Asserted as "9 or later" —
+	# BL's own floor — so the next bump does not fail a recap test either.
+	var bl_ver := -1
+	var bl_vpos := rsrc.find("\"version\": ")
+	if bl_vpos >= 0:
+		bl_ver = int(rsrc.substr(bl_vpos + 11, 3).strip_edges().split(",")[0])
+	ok(bl_ver >= 9, "§2: the save version is 9 or later (found %d)" % bl_ver)
 	# TOLERANT LOAD: a v8 tally with none of the new keys must load and simply
 	# start the counters mid-run, not crash the first writer that touches them.
 	run.tally = {"damage": {}, "gold_earned": 0, "gold_spent": 0,

@@ -331,6 +331,141 @@ ONE answer, asked by the cast path and by the draft card alike.
   **the WARDEN's own roughly double** (he acts ~7 times and braces 7–9). **Uncapped on purpose
   for the first pass** — a cap is a retreat available afterwards, and it is a designer's call.
 
+## A SUITE MUST NOT PIN THE SAVE VERSION LITERAL (STANDING — BK §6's RULE, RE-LEARNED AT CT)
+**Three batches have now broken a sibling suite by bumping the save version.** BL's recap ledgers
+broke BK's pinned `8`; BM's move to `10` broke it again; **CT's move to `11` broke `test_batch_bl`
+and `test_batch_bm`, both of which pinned `10`.** BK §6 was re-pointed to **"8 or later"** with a
+comment saying "so the next bump does not fail a map test either" — and BK is the one that passed.
+- **A suite asserts the INVARIANT IT OWNS, never the newest number.** BL owns "the recap ledgers are
+  in the save"; BM owns "the party and its equipped talents are in the save, and a pre-v10 save is
+  refused". Neither is a claim about which version is current.
+- **The idiom is BK's, and all three now use it:** parse the number out of the source and assert
+  `>=` a floor. Do not write `contains('"version": N')`.
+- **The refusal floor is a SEPARATE assertion and it is fine to pin** — `if save_version < 10:` is a
+  real invariant about what this build will load, not a moving number.
+- **THE SAME DISEASE, THIRD DOOR: `test_batch_bx` pinned the SOURCE TEXT of a guard.** CT split
+  `if Run.sim_run or _draft_columns().is_empty():` into two guards so §3's chaining had somewhere to
+  live; the behaviour is identical. Re-pointed and **SCOPED TO THE FUNCTION BODY** — strictly
+  stronger than the global `contains` it replaced, which would have passed on either of the two
+  `if Run.sim_run:` lines elsewhere in that file. **A source-grep suite should scope to the function
+  it is talking about**, or it is asserting that a string exists somewhere in 2,000 lines.
+- **NOT EVERY PIN IS A MISTAKE, AND `test_batch_ce`'s GLOSSARY COUNT IS THE COUNTER-EXAMPLE.** Its
+  comment says the count is pinned *deliberately*, so growth "should have to be stated rather than
+  absorbed". **Bump it and say what was added and why; do not loosen it to `>=`.** CT bumped 94 → 96
+  and, in doing so, deleted three entries it had already written — per-item entries for the three new
+  items, each fully described by its own tooltip, in a category (`run`) that has never held one.
+  **The pin did its job: it forced the question and the answer was "two, not five".**
+
+## NEVER `preload` A SCRIPT THAT NAMES AN AUTOLOAD (STANDING, SET AT BATCH CT — AND IT COST A GATE)
+**`run_sim.gd` carried a hand-copied mirror of `shop_screen.gd`'s `ITEM_PRICES`. CT replaced the
+copy with `const ITEM_PRICES := preload("res://scripts/shop_screen.gd").ITEM_PRICES` — and that
+"fix" was worse than the duplication it removed.**
+- `shop_screen.gd` names the **`Run` autoload** at compile time. **Autoloads are NOT registered when
+  a `--script` SceneTree compiles its dependency chain**, so the preload failed with
+  `Identifier not found: Run`, cascaded through `run_sim.gd`, and took **`test_run_harness.gd`** down
+  with it.
+- **THE DAMAGE WAS NEARLY INVISIBLE.** The battery still printed `GATE 1 PASS`, `GATE 2 PASS`,
+  `GATE 3 PASS`. The only tells were `throws=3` beside them and **GATE 2 reporting 57 checks against
+  its documented 165** — it ran barely a third of itself and said PASS. **This is exactly why the
+  battery reports the throw count beside the check count** (CD's rule), and exactly why the live
+  counts 22/165/8 are written into `run_battery.sh`'s own header. **Read both. A gate that passes
+  with throws is not a gate that passed.**
+- **THE FIX IS RUNTIME, NOT COMPILE TIME:** `ITEM_PRICES` and `SELL_FRACTION` now live in
+  `run_state.gd` beside `ITEM_INFO` and the stack caps — §6's "single place these numbers are
+  written" covers a price as much as a heal — and both consumers read them off the run node they
+  already hold. **No preload, so nothing to fail at compile time.**
+- **The general rule: a `--script` harness can only compile files that name no autoload.** Reading a
+  const off the autoload's own script at runtime is always safe; `preload`ing anything that mentions
+  `Run`, `Profile`, `Talents`, `Classes` or `Relics` is never safe.
+
+## THE POUCH IS SLOT-LIMITED (STANDING, SET AT BATCH CT §1)
+**Acquiring an item is a choice about what to give up.** A **slot** holds one item **TYPE** and its
+whole stack — six Health Potions are one slot, not six. **4 → 5 → 6 by zone**
+(`ITEM_SLOTS_BY_ZONE`), announced on the zone-victory screen in `_resolve_boss`.
+- **THE CAP IS THE DESIGN, NOT A LIMITATION.** Items cost no turn, so before it the shop only ever
+  asked "can you afford it" and the answer was yes to everything in reach. Gold was the only
+  ceiling; slots are the tradeoff.
+- **A STACK FALLING TO ZERO DOES NOT FREE ITS SLOT.** The key stays in `Run.items` until the type is
+  **discarded** (map pouch, confirmed) or **sold** (merchant, 40% of listed price). This is why
+  `slots_used()` is `items.size()` and never a count of positive stacks — if an emptied stack freed
+  its slot the cap would stop binding exactly when it should be biting. **Every writer of
+  `Run.items` must respect this**; `events.gd`'s negative-count take is the one direct write left,
+  and it is deliberate for exactly this reason.
+- **TWO WALLS, AND THEY MUST NEVER BE CONFLATED: NO ROOM IS A CHOICE, A FULL STACK IS A WALL.**
+  A grant with no slot becomes a **swap offer** queued on `Run.pending_item_offers` and resolved by
+  the map's owed-pick overlay (take it and give up a named stack, or **decline** — declining is
+  always a button). A grant over the **per-type stack cap** is still **refused with a message**,
+  which is Batch AN §6 standing unchanged. `needs_slot()` answers the first; `item_full()` the
+  second. **Ask `needs_slot()` BEFORE `add_item()`** or a choice is printed as a refusal.
+- **STACK CAPS ARE PER TYPE NOW** (`ITEM_STACK_CAPS`, default `ITEM_CAP` = 6): Cleansing Draught 4,
+  Cursed Visage 2, Resonating Hourglass 2. **Never hardcode "six" in a refusal message again** —
+  three of the eight items are not six.
+- **A SALE MUST BE A LOSS** (`SELL_FRACTION` = 0.4). An even trade makes the shop a free locker:
+  buy everything, park the overflow with the merchant, collect it next visit, and the cap means
+  nothing.
+
+## ITEM EFFECTS ARE PERCENTAGES OR SCALE WITH RUN DEPTH (STANDING, SET AT BATCH CT §6)
+**A flat number in the pouch decays against a party that grows.** The free healing scaled and the
+paid healing did not: clearing a slot heals `SLOT_HEAL_PCT` (15%) of maximum and heroes gain **+2%
+base HP per win**, so a flat-40 Health Potion was worth less every fight while the shop kept
+charging 30 gold for it. **Do not author a flat item value.**
+- Health **20% of max HP**; Mana **40% of max resource**; Bomb **50 base × (1 + 0.02 ×
+  `combat_wins`)**, the heroes' own rate. Revive (50%) and Defense (+10% armor) were already
+  percentages and are untouched.
+- **The values live in `Run` as functions** — `health_potion_heal`, `mana_potion_restore`,
+  `bomb_damage` — and **battle and map both CALL them**. The old comment claimed the two "read the
+  same 40" while each spelled the literal out separately, which is a claim, not a mechanism.
+- **FLAGGED, NOT TUNED: the Health Potion is a NERF at run start.** Base class HP is 154/99/121/110,
+  so 20% is 31/20/24/22 against the old 40, and it only overtakes 40 past 200 max HP. Shipped as the
+  brief specified. Mana's 40% **is** the old flat 40 at the base max of 100, and the Bomb opens at
+  50 — those two are washes and this one is not.
+
+## `hexed` IS NOT `crippled`, AND THE BRIEF ASKED FOR `crippled` (STANDING, SET AT BATCH CT §5)
+**`cripple` already existed** — "Cripple", −25% damage dealt, in `DEBUFF_IDS`, applied by three
+abilities and two enemies. The glossary entry for it reads "A **crippled** unit deals 25% less
+damage" and `battle.gd`'s Corrupted Channeling comment says "a **Crippled** enemy". Batch CT's brief
+asked for a second status called `crippled` / "Crippled" at −15%. **It shipped as `hexed` /
+"Hexed", chip "Hx".**
+- **Every number and rule of §5 is unchanged** — −15% damage dealt, battle-long (`-1` turns), in
+  `DEBUFF_IDS` so a Trapper counts it and the derived `_dispellable_buffs` set cannot reach it.
+  Only the name moved.
+- **Why:** two chips a player cannot tell apart, and twelve `has_status("cripple")` call sites one
+  typo away from a silent bug, is not worth a homonym. **If a later batch wants the brief's name,
+  it is a rename — but rename `cripple` too, or the pair is unreadable again.**
+- **The two STACK** (multiplicative, `raw *= 0.75` then `raw *= 0.85`). Separate statuses from
+  separate sources; stacking is the only reading that leaves neither silently free.
+
+## BATCH CT's BRIEF WAS WRONG IN FIVE PLACES (ON THE VERIFY-THE-BRIEF RULE)
+**Read this beside the CR entry above: it is the same failure again, and the same fix caught it.**
+Every claim was checked against the repo before implementing.
+1. **§1's "rune equip-slot precedent" does not exist.** Batch AN §9 **deleted** the 2→3→4 ladder;
+   `rune_slots()` has returned a flat 3 ever since, and **there was no zone-victory announcement to
+   copy**. The 4/5/6 item ladder still ships — it is right here for the opposite reason it was
+   wrong for runes — and the announcement was **written from scratch**.
+2. **§1's "six buttons fit the existing row" is FALSE**, and it explicitly said no layout fix was
+   needed. At `VIEW_X + 4 + i * 190` with width 182, button six spans **x=1270–1452 on a 1280-wide
+   viewport**. Five fit at that pitch. Now 158/150; rightmost edge x=1260. **`check_ct_map.tscn`
+   measures it and fails at the old pitch.**
+3. **§5's `crippled` collides with the existing `cripple`** — see the section above.
+4. **§3's "elite cache and rune offer pattern" is two things, neither of them right.** There is no
+   "elite cache" (the spoils call it a **rune cache**), and `offer_screen.gd` states in its own
+   header "There is **NO** decline" — so it cannot model an interaction §3 requires a decline for.
+   Built on the **owed-pick overlay** instead, which is what the rune cache actually uses.
+5. **§4's "exactly as the Bomb and Defense Potion already do" is two mechanisms, not one.** The Bomb
+   is refused by `_usable_on_map` (button never lights); the Defense Potion's button is **enabled**
+   and toasts a refusal after the press. The three new items follow **the Bomb**.
+
+**And two things the brief did not mention, both found by measuring:**
+- **`run_sim.gd` hand-copied `ITEM_PRICES`** from `shop_screen.gd` and indexes it by
+  `run.ITEM_IDS` — a **missing-key crash in every sim run** the moment three ids landed, which no
+  parse gate can see. It reads the real constant now.
+- **The shop's supplies column collides with the draft section at eight types** (row 8 ending at
+  y=600 through a header at y=452). Re-pitched to 36/32.
+- **`run_sim.gd` needed a stated DROP POLICY**, because the swap offer is a map overlay and the sim
+  has no map. **It DECLINES** a drop needing a slot it has not got — the conservative legal answer,
+  so the sim's item economy is a **floor** on the real thing — and **the declines are counted and
+  printed** (`drops declined for want of a slot`, 1.3/run at balanced routing). **No silent caps.**
+
 ## THE SHARPSHOOTER'S BASIC IS A SEQUENCE (STANDING, SET AT BATCH CS)
 **His BASIC ATTACK ONLY. No other ability of his changes, and no other hero's bar moves at all.**
 `_is_sharpshooter_basic` is the single answer to "is this it" — read off the hero's passive

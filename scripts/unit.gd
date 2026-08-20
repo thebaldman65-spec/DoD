@@ -43,6 +43,25 @@ const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
 	# PARTY — the first two on Holy herself, the third a ward she lays on an
 	# ally.
 	"breaking_darkness", "penance",
+	# BATCH CT §5 — `hexed` is the Cursed Visage's battle-long -15% damage-dealt
+	# curse, laid on every living ENEMY. Listed here for both of the usual two
+	# consequences, and the second is the one that matters: a Survivalist's
+	# Trapper counts it toward his breadth (intended — §5 says so), and listing
+	# it keeps it OUT of the derived `_dispellable_buffs` set, so a Mage's own
+	# Dispel can never strip the party's own hundred-gold work back off the
+	# enemy carrying it. That is the rule CE set for `anathema` and `penance`.
+	#
+	# WHY `hexed` AND NOT `crippled`, WHICH IS WHAT THE BRIEF ASKED FOR: the
+	# status two lines up this list is already `cripple` — "Cripple", -25%
+	# damage dealt — and the glossary's own entry for it reads "A CRIPPLED unit
+	# deals 25% less damage", as does battle.gd's Corrupted Channeling comment.
+	# Shipping a second status displayed "Crippled" that also reduces damage
+	# dealt, differing only by ten points and a duration, is two chips a player
+	# cannot tell apart and twelve `has_status("cripple")` call sites one typo
+	# away from a silent bug. The MECHANISM is exactly what §5 specified —
+	# -15%, battle-long, in this list, out of the dispellable set; only the name
+	# moved, and "Hexed" is what the Cursed Visage would lay anyway.
+	"hexed",
 	# BATCH BT — `slow_burn` IS a genuine debuff and is listed as one, which
 	# makes it CLEANSABLE by a mender's Cleansing Rite. That is the counterplay
 	# rather than an oversight (Blight the Well's precedent): a card that makes

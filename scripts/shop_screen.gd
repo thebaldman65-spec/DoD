@@ -4,11 +4,19 @@ extends Node2D
 
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
-const ITEM_PRICES := {"health": 30, "mana": 30, "bomb": 45, "revive": 80, "defense": 40}
+# BATCH CT: the prices and the sell fraction moved to `Run`, beside ITEM_INFO
+# and the stack caps — §6's "single place these numbers are written" covers a
+# price as much as a heal. `run_sim.gd` kept a hand-copied mirror of the table
+# that would have crashed the moment §4 added three ids; both read the one
+# table now, at runtime, through the run node each already holds.
 
 # Rune generation lives in Run (shared with elite drops); runes are run-scoped
 # and only offered for classes present in the current party.
 var offers: Array = []  # [{member_idx, rune}]
+# BATCH CT §2: which Sell button is armed, if any. Session state on the screen
+# rather than on the run — leaving the shop with a button armed and coming back
+# must not find it still armed.
+var _sell_pending := ""
 
 
 func _ready() -> void:
@@ -69,31 +77,79 @@ func _draw_screen() -> void:
 	add_child(gold_label)
 
 	# Consumables column.
+	#
+	# BATCH CT: EIGHT ITEM TYPES, NOT FIVE, AND THE OLD PITCH DOES NOT HOLD THEM.
+	# At 56 apart and 46 tall, row 6 lands at y=442 and row 8 ends at y=600 —
+	# straight through the DRAFT header at 452 and its four buttons below it.
+	# Nothing in the brief flagged this (its only layout note is about the map
+	# pouch), so it is measured rather than assumed: 8 rows at a 36 pitch and 32
+	# tall run 162..446, which clears 452 with six pixels to spare and moves
+	# nothing else on the screen.
+	#
+	# EVERY TYPE IS LISTED, HELD OR NOT. The shop is where a type you do not own
+	# is acquired, so a slot-less pouch greys the button and says which wall it
+	# hit — a missing row would read as "the merchant is out", which is a
+	# different and untrue statement.
 	var items_header := Label.new()
-	items_header.text = "SUPPLIES"
+	items_header.text = "SUPPLIES  (pouch: %d/%d slots)" % [
+		Run.slots_used(), Run.item_slots()]
 	items_header.add_theme_font_size_override("font_size", 17)
 	items_header.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
 	items_header.position = Vector2(140, 130)
 	add_child(items_header)
 	var row := 0
 	for id in Run.ITEM_IDS:
-		var price := _price(ITEM_PRICES[id])
+		var price := _price(Run.ITEM_PRICES[id])
 		var have := int(Run.items.get(id, 0))
+		var cap: int = Run.item_stack_cap(id)
 		var full: bool = Run.item_full(id)
+		# §3's distinction, at the shop door: NO SLOT is a wall here rather than
+		# an offer — a purchase is a thing the player initiates, so the honest
+		# answer is "not until you free a slot", and the Sell button beside it is
+		# how they do that. The swap OFFER exists for grants the player did not
+		# ask for and cannot otherwise take.
+		var no_slot: bool = Run.needs_slot(id)
 		var btn := Button.new()
 		btn.text = "%s — %dg   (have %d/%d)%s" % [Run.ITEM_INFO[id][0], price,
-			have, Run.ITEM_CAP, "  FULL" if full else ""]
-		btn.custom_minimum_size = Vector2(360, 46)
-		btn.position = Vector2(140, 162 + row * 56)
+			have, cap, "  FULL" if full else ("  NO SLOT" if no_slot else "")]
+		btn.custom_minimum_size = Vector2(360, 32)
+		btn.position = Vector2(140, 162 + row * 36)
+		btn.add_theme_font_size_override("font_size", 13)
 		# Batch AN §6: a full stack greys the button rather than taking the
 		# gold. Refusing at the door is the honest half of the cap — refusing
 		# after payment would be theft with a message attached.
-		btn.tooltip_text = Run.ITEM_INFO[id][1] + (
-			"\n\nThe party can carry %d of these, and already does." % Run.ITEM_CAP
-			if full else "")
-		btn.disabled = Run.gold < price or full
+		var why := ""
+		if full:
+			why = "\n\nThe party can carry %d of these, and already does." % cap
+		elif no_slot:
+			why = "\n\nThe pouch is full at %d kinds. Sell or discard\na stack to make room." % \
+				Run.item_slots()
+		btn.tooltip_text = Run.ITEM_INFO[id][1] + why
+		btn.disabled = Run.gold < price or full or no_slot
 		btn.pressed.connect(_buy_item.bind(id))
 		add_child(btn)
+		# §2: sell back, for a fraction. Only for a type actually held — the slot
+		# is what is being sold as much as the stack, and both go together.
+		if Run.items.has(id):
+			var sell := Button.new()
+			var value := _sell_value(id)
+			# TWO PRESSES, NOT ONE. This button sits inches from the BUY button and
+			# destroys a whole stack — losing six Health Potions to a misclick
+			# mid-run is not a mistake the 12 gold back makes up for. The map's
+			# Discard asks first for the same reason; here the ask fits inside the
+			# button rather than needing an overlay the shop has none of.
+			var armed: bool = _sell_pending == id
+			sell.text = "Sure? +%dg" % value if armed else "Sell +%dg" % value
+			sell.custom_minimum_size = Vector2(96, 32)
+			sell.position = Vector2(508, 162 + row * 36)
+			sell.add_theme_font_size_override("font_size", 12)
+			if armed:
+				sell.add_theme_color_override("font_color", Color(0.95, 0.75, 0.4))
+			sell.tooltip_text = "Sell the whole stack (%d %s) and free the slot.\nWorth %dg of the %dg they cost — a sale is a loss.\n%s" % [
+				have, Run.ITEM_INFO[id][0], value, price,
+				"Press again to confirm." if armed else "Press twice to sell."]
+			sell.pressed.connect(_sell_item.bind(id))
+			add_child(sell)
 		row += 1
 
 	# BATCH BO §3 — THE MERCHANT SELLS A DRAFT PICK. The third of the four
@@ -186,16 +242,55 @@ func _price(base: int) -> int:
 
 
 func _buy_item(id: String) -> void:
-	var price := _price(ITEM_PRICES[id])
-	# The cap is checked BEFORE the gold moves, so a purchase that cannot
+	var price := _price(Run.ITEM_PRICES[id])
+	# BOTH caps are checked BEFORE the gold moves, so a purchase that cannot
 	# land never costs anything (the button is greyed too — this is the
 	# second gate, for the hotkey and the test that fires it directly).
-	if Run.gold < price or Run.item_full(id):
+	if Run.gold < price or Run.item_full(id) or Run.needs_slot(id):
 		return
 	if Run.add_item(id) < 1:
 		return
 	Run.gold -= price
 	Run.tally_add("gold_spent", price)
+	# Buying is the opposite intent to selling: an armed Sell is stale now.
+	_sell_pending = ""
+	_draw_screen()
+
+
+# BATCH CT §2 — what a stack sells for. Read off the SAME `_price` the buy
+# button shows, so a Peddler's Lodestone discount cuts the sale as well as the
+# purchase and the two can never be arbitraged against each other. Always at
+# least 1g, and always strictly less than the purchase price: SELL_FRACTION is
+# 0.4, and 0.4 of the cheapest item in the table (30g) is 12g, so the floor
+# never collides with the price.
+func _sell_value(id: String) -> int:
+	return maxi(int(round(_price(Run.ITEM_PRICES[id]) * Run.SELL_FRACTION)), 1)
+
+
+# The whole stack and the slot together — §2 is explicit that a partial stack
+# cannot be split across slots, so there is no "sell three of six".
+#
+# A SALE PAYS EVEN ON AN EMPTY SLOT, and it pays the same. The slot is the
+# thing with the value here: it is what the cap rations, and a player who
+# drank their last Bomb should not have to DISCARD the empty slot for nothing
+# when a merchant is standing right there. `have` is reported in the toastless
+# redraw below rather than gating the sale.
+func _sell_item(id: String) -> void:
+	if not Run.items.has(id):
+		_sell_pending = ""
+		return
+	# First press ARMS, second press sells. Arming a different row disarms the
+	# one before it, so only ever one button is hot.
+	if _sell_pending != id:
+		_sell_pending = id
+		_draw_screen()
+		return
+	_sell_pending = ""
+	var value := _sell_value(id)
+	if not Run.discard_item(id):
+		return
+	Run.gold += value
+	Run.tally_add("gold_earned", value)
 	_draw_screen()
 
 

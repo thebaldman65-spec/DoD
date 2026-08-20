@@ -113,6 +113,10 @@ static var gold_spent := 0.0      # what the shop policy paid out
 static var gold_unspent := 0.0    # balance at wipe or completion
 static var heals_bought := 0      # rule 1: potions for the wounded
 static var restock_bought := 0    # rule 2: consumables bought back at count 0
+# BATCH CT §3: drops the sim DECLINED for want of a pouch slot. Counted and
+# reported rather than swallowed — a cap the report does not mention reads as
+# "everything landed", which is exactly the silence this project keeps banning.
+static var drops_no_slot := 0
 static var runes_bought := 0      # rule 2: runes bought (equipped at purchase)
 static var _run_gold_spent := 0   # gold paid this run (shop policy only)
 static var _cur_tier := ""        # tier key of the battle in flight
@@ -461,11 +465,21 @@ static func _avg_hp(run: Node) -> float:
 
 # ---------- the shop policy (Batch U) ----------
 
-# Prices mirror shop_screen.gd (flat, no tier scaling; only the relic
-# discount moves them). Stock never runs out; runes are one per member
-# per visit, dupes re-rolled, price set by rarity (50/100/160).
-const ITEM_PRICES := {"health": 30, "mana": 30, "bomb": 45, "revive": 80,
-	"defense": 40}
+# Prices come STRAIGHT OFF `Run` now (flat, no tier scaling; only the relic
+# discount moves them). Stock never runs out; runes are one per member per
+# visit, dupes re-rolled, price set by rarity (50/100/160).
+#
+# BATCH CT: this used to be a hand-copied MIRROR of shop_screen.gd's table, and
+# the copy broke the moment §4 added three ids — the loop below walks
+# `run.ITEM_IDS` and indexes it, so a Cleansing Draught would have been a
+# missing-key crash in every sim run, which no parse gate can see.
+#
+# **READ OFF THE RUN NODE AT RUNTIME, NEVER `preload`ed.** Preloading
+# `shop_screen.gd` was tried first and it broke the WHOLE RUN HARNESS: that
+# file names the `Run` autoload at compile time, autoloads are not registered
+# when a `--script` SceneTree compiles its dependency chain, and the failure
+# cascaded through this file into `test_run_harness.gd` ("Identifier not found:
+# Run"). `run` is a parameter here; there is nothing to preload.
 const GOLD_RESERVE := 40  # no purchase may dip below this — heals stay reachable
 
 
@@ -479,14 +493,29 @@ static func _price(run: Node, base: int) -> int:
 # slot (equipped at purchase: the sim has no party screen, so an
 # unequippable rune would be dead gold and is never offered to it);
 # (3) every purchase respects the reserve.
+# One drop, under the sim's stated policy: take it if it fits, DECLINE if it
+# would need a slot the pouch has not got. See the call site for why declining
+# rather than swapping is the honest default.
+static func _sim_drop(run: Node, id: String) -> void:
+	if run.needs_slot(id):
+		drops_no_slot += 1
+		return
+	run.add_item(id)
+
+
 static func _shop_visit(run: Node) -> void:
-	var heal_price := _price(run, ITEM_PRICES["health"])
+	var heal_price := _price(run, int(run.ITEM_PRICES["health"]))
 	for m in run.party:
 		if float(m["hp"]) / float(m["max_hp"]) < 0.5 \
 				and run.gold - heal_price >= GOLD_RESERVE:
 			run.gold -= heal_price
 			_run_gold_spent += heal_price
-			run.items["health"] = int(run.items.get("health", 0)) + 1
+			# BATCH CT: through `add_item`, so the sim's pouch obeys the same two
+			# walls the player's does. Health is in the opening four, so its slot
+			# always exists and this can only ever be refused by the STACK cap —
+			# which is the same refusal a player meets, and the gold is spent
+			# either way because the sim's policy already decided to spend it.
+			run.add_item("health")
 			heals_bought += 1
 	var offers := _roll_rune_offers(run)
 	for guard in 32:  # each buy shrinks the offer set; 32 = runaway insurance
@@ -496,7 +525,13 @@ static func _shop_visit(run: Node) -> void:
 		for id in run.ITEM_IDS:
 			if int(run.items.get(id, 0)) > 0:
 				continue  # already carried
-			var p := _price(run, int(ITEM_PRICES[id]))
+			# BATCH CT §1: and it cannot buy a type it has no SLOT for. Without
+			# this the restock loop would keep picking the most expensive unheld
+			# type forever, paying for it and never receiving it — the guard below
+			# would break the loop only after the gold was gone.
+			if run.needs_slot(id):
+				continue
+			var p := _price(run, int(run.ITEM_PRICES[id]))
 			if run.gold - p >= GOLD_RESERVE and p > best_price:
 				best_item = id
 				best_offer = -1
@@ -512,7 +547,7 @@ static func _shop_visit(run: Node) -> void:
 		run.gold -= best_price
 		_run_gold_spent += best_price
 		if best_item != "":
-			run.items[best_item] = int(run.items.get(best_item, 0)) + 1
+			run.add_item(best_item)
 			restock_bought += 1
 		else:
 			var offer: Dictionary = offers[best_offer]
@@ -691,12 +726,20 @@ static func on_battle_end(run: Node, battle, victory: bool) -> void:
 			if rune["equipped"]:
 				rune_elite_equipped += 1
 			looter["runes"] = looter.get("runes", []) + [rune]
-		# Batch AN §6: drops honour the six-per-type cap, through the same
+		# Batch AN §6: drops honour the per-type stack cap, through the same
 		# Run.add_item every other grant uses — a sim that could stockpile
 		# past the cap would report an economy the game cannot produce.
-		run.add_item(run.random_loot())
+		#
+		# BATCH CT §3: AND THE SLOT CAP. A drop with no slot is a SWAP OFFER in
+		# the real game, answered on the map; the sim has no map, so it needs a
+		# POLICY and the policy is stated rather than implied: **IT DECLINES.**
+		# That is a legal player answer and the conservative one, so the sim's
+		# item economy is a FLOOR on the real thing rather than a guess at it.
+		# The declines are counted and printed, because an unreported cap reads
+		# as "everything landed".
+		_sim_drop(run, run.random_loot())
 		for extra_i in int(run.relic_add("loot_extra")):
-			run.add_item(run.random_loot())
+			_sim_drop(run, run.random_loot())
 		# BATCH BO §3 / BATCH BX §2 — AN ELITE OFFERS A DRAFT TO EVERY LIVING
 		# HERO. BO offered to one drawn at random; BX makes it party-wide, and
 		# the walk has to match battle.gd's victory branch or the sim measures a
@@ -1229,8 +1272,8 @@ static func _print_report(battle) -> void:
 	if shops_on:
 		print("Shop buys per run: heals %.1f   restock %.1f   runes %.1f" % [
 			heals_bought / runs, restock_bought / runs, runes_bought / runs])
-	print("Items: used %.1f/run   carried unused at end %.1f" % [
-		items_used / runs, items_left / runs])
+	print("Items: used %.1f/run   carried unused at end %.1f   drops declined for want of a slot %.1f/run" % [
+		items_used / runs, items_left / runs, drops_no_slot / runs])
 	# Batch BK: merchants and events are WALKED to now, not rolled — read these
 	# against the map's own copies (5 merchants and 5 events a zone, 15 each a
 	# run) rather than against a per-fight chance.

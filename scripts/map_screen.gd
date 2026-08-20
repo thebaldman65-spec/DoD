@@ -57,6 +57,13 @@ const VIEW_X := 316.0
 const VIEW_Y := 84.0
 const VIEW_W := 956.0
 const VIEW_H := 452.0
+# BATCH CT §1: the pouch row, sized so SIX slots fit inside the 1280 viewport.
+# VIEW_W is exactly the space from VIEW_X to the right edge, so the pitch is
+# derived from it rather than guessed: 6 * 158 = 948, and the last button ends
+# at VIEW_X + 4 + 5 * 158 + 150 = 1265. The old 190/182 pair fit five and ran
+# the sixth 172px off-screen — see the note in the footer for the whole story.
+const POUCH_PITCH := 158.0
+const POUCH_BTN_W := 150.0
 
 # How far the lattice is scrolled, kept across the redraws a pick or a potion
 # triggers — a screen that jumped back to column 1 every time a point was
@@ -1041,7 +1048,14 @@ func _draft_columns() -> Array:
 
 
 func _maybe_open_party_draft() -> void:
-	if Run.sim_run or _draft_columns().is_empty():
+	if Run.sim_run:
+		return
+	if _draft_columns().is_empty():
+		# BATCH CT §3: nothing owed on the draft, so the pouch's own owed pick
+		# gets the screen. CHAINED rather than raced, on the same precedent the
+		# framing card and the draft use two functions up: two overlays opening
+		# over each other is the failure ordering exists to prevent.
+		_check_item_offers()
 		return
 	_open_party_draft()
 
@@ -1376,6 +1390,11 @@ func _confirm_party_draft() -> void:
 		_toast("The party keeps its kits as they are.")
 	else:
 		_toast(" · ".join(took))
+	# BATCH CT §3: the same elite victory that owed this draft can also have
+	# queued a swap offer (the spoils grant a consumable too, and the Gravelight
+	# Lantern grants a second). CHAINED off the draft closing rather than opened
+	# beside it — see _maybe_open_party_draft.
+	_check_item_offers()
 
 
 func _pick_upgrade(idx: int, choice: int) -> void:
@@ -1530,44 +1549,109 @@ func _draw_footer() -> void:
 
 	# §6: potions are usable HERE, not only in battle. Each item is a button;
 	# pressing it asks which hero, then applies the effect on the map.
+	#
+	# BATCH CT §1 — THE ROW IS THE SLOT LIST. It draws the types the party
+	# HOLDS (up to `Run.item_slots()`), not every id that exists, and an empty
+	# held slot is drawn greyed rather than vanishing — a slot is only freed by
+	# a discard or a sale.
+	#
+	# **THE BRIEF'S LAYOUT CLAIM IS WRONG AND THIS IS THE FIX IT SAID WAS NOT
+	# NEEDED.** §1: "Six buttons fit the existing row... The slot cap removes the
+	# layout problem rather than requiring a fix for it." At the old pitch they
+	# do not. `VIEW_X + 4 + i * 190` puts button 6 (i = 5) at x = 1270 with a
+	# width of 182, so it spans 1270..1452 on a viewport that is 1280 wide — 172
+	# pixels of it off the screen, and the whole of its label. FIVE fit at that
+	# pitch and no more. The pitch and width below are sized from the space that
+	# actually exists: VIEW_X + 4 to the right edge is 956px, so six buttons at a
+	# 158 pitch and 150 wide end at 1265, inside the edge with room to spare.
+	var slot_cap := Run.item_slots()
 	var hint := Label.new()
-	hint.text = "Potions (usable here — max %d of each)" % Run.ITEM_CAP
+	hint.text = "Pouch  %d/%d slots (a slot holds one kind — discard to free it)" % [
+		Run.slots_used(), slot_cap]
 	hint.add_theme_font_size_override("font_size", 11)
 	hint.add_theme_color_override("font_color", Color(0.6, 0.57, 0.55))
 	hint.position = Vector2(VIEW_X + 120, 560)
 	add_child(hint)
-	for i in Run.ITEM_IDS.size():
-		var id: String = Run.ITEM_IDS[i]
+	# ITEM_IDS order, so the row does not reshuffle as the pouch changes shape.
+	var held: Array = Run.ITEM_IDS.filter(func(i): return Run.items.has(i))
+	for i in held.size():
+		var id: String = held[i]
 		var have := int(Run.items.get(id, 0))
 		var btn := Button.new()
 		btn.text = "%s  x%d" % [Run.ITEM_INFO[id][0].replace(" Potion", ""), have]
-		btn.custom_minimum_size = Vector2(182, 32)
-		btn.position = Vector2(VIEW_X + 4 + i * 190, 584)
+		btn.custom_minimum_size = Vector2(POUCH_BTN_W, 32)
+		btn.position = Vector2(VIEW_X + 4 + i * POUCH_PITCH, 584)
 		btn.add_theme_font_size_override("font_size", 12)
 		btn.tooltip_text = _map_item_tooltip(id)
 		btn.disabled = have < 1 or not _usable_on_map(id)
-		if have >= Run.ITEM_CAP:
+		if have >= Run.item_stack_cap(id):
 			btn.add_theme_color_override("font_color", Color(0.95, 0.75, 0.4))
 		btn.pressed.connect(Music.click)
 		btn.pressed.connect(_use_item.bind(id))
 		add_child(btn)
+		# §2 — DISCARD, FROM THE POUCH, ANY TIME. A wasted purchase has to be
+		# recoverable or one mistake at the shop follows the player for the whole
+		# run. It is its own small button rather than a gesture on the one above,
+		# because the button above is DISABLED for every battle-only item and for
+		# every empty stack — which is exactly when a player most wants the slot
+		# back.
+		var drop := Button.new()
+		drop.text = "Discard"
+		drop.custom_minimum_size = Vector2(POUCH_BTN_W, 20)
+		drop.position = Vector2(VIEW_X + 4 + i * POUCH_PITCH, 618)
+		drop.add_theme_font_size_override("font_size", 10)
+		drop.add_theme_color_override("font_color", Color(0.78, 0.55, 0.5))
+		drop.tooltip_text = "Give up the slot and everything in it (%d %s).\nThe stack is lost." % [
+			have, Run.ITEM_INFO[id][0]]
+		drop.pressed.connect(Music.click)
+		drop.pressed.connect(_confirm_discard.bind(id))
+		add_child(drop)
+	# The free slots, drawn as empty frames so the cap is visible BEFORE the
+	# player is standing in a shop wondering why a button is greyed.
+	for i in range(held.size(), slot_cap):
+		var empty := Label.new()
+		empty.text = "— empty slot —"
+		empty.custom_minimum_size = Vector2(POUCH_BTN_W, 32)
+		empty.position = Vector2(VIEW_X + 4 + i * POUCH_PITCH, 590)
+		empty.add_theme_font_size_override("font_size", 11)
+		empty.add_theme_color_override("font_color", Color(0.42, 0.40, 0.38))
+		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		empty.size = Vector2(POUCH_BTN_W, 32)
+		add_child(empty)
 
 
-# The Bomb is the one item with no meaning outside a fight — there is
-# nothing on the map to throw it at. It stays in the pouch and says why,
-# rather than being silently absent from a list of five.
+# BATCH CT §4: four items now have no meaning outside a fight. Each stays in
+# the pouch with a DISABLED button and a tooltip saying why, rather than being
+# silently absent from the row — which is the BOMB's idiom.
+#
+# §4 said to do this "exactly as the Bomb and Defense Potion already do", and
+# those are two different mechanisms, not one. The Bomb is refused HERE, by
+# `_usable_on_map`, so its button never lights up. The Defense Potion's button
+# is ENABLED and refuses inside `_use_item` with a toast AFTER the press. The
+# Bomb's is the one that actually reads — a button you cannot press, that says
+# why on hover, beats a button that looks live and then declines — so the
+# three new ones follow it. The Defense Potion is left exactly as it was:
+# changing it is not in this batch.
+const MAP_REFUSAL := {
+	"bomb": "Nothing here to throw it at — battle only.",
+	"cleanse": "Nothing to cleanse between fights — battle only.",
+	"visage": "There is no one here to curse — battle only.",
+	"hourglass": "Nothing is waiting on a turn out here — battle only.",
+}
+
+
 func _usable_on_map(id: String) -> bool:
-	return id != "bomb"
+	return not MAP_REFUSAL.has(id)
 
 
 func _map_item_tooltip(id: String) -> String:
 	var base: String = Run.ITEM_INFO[id][1]
 	if not _usable_on_map(id):
-		return "%s\n\nNothing here to throw it at — battle only." % base
+		return "%s\n\n%s" % [base, MAP_REFUSAL.get(id, "Battle only.")]
 	if int(Run.items.get(id, 0)) < 1:
-		return "%s\n\nNone carried." % base
-	if int(Run.items.get(id, 0)) >= Run.ITEM_CAP:
-		return "%s\n\nCarrying the maximum (%d)." % [base, Run.ITEM_CAP]
+		return "%s\n\nNone carried — the slot is still held.\nDiscard it to free the slot." % base
+	if int(Run.items.get(id, 0)) >= Run.item_stack_cap(id):
+		return "%s\n\nCarrying the maximum (%d)." % [base, Run.item_stack_cap(id)]
 	return "%s\n\nClick to use it now." % base
 
 
@@ -1631,9 +1715,148 @@ func _open_target_picker(id: String, eligible: Array) -> void:
 	box.add_child(cancel)
 
 
-# The map-side effects mirror the battle item table (Run.ITEM_INFO is the
-# one place the numbers are written down, so these read the same 40 / 50%
-# the fight does).
+# ---------- BATCH CT §2: discarding a slot ----------
+#
+# CONFIRMED, NOT INSTANT. The stack is lost and the button sits directly under
+# a button the player presses to DRINK a potion, so a misclick here would cost
+# a whole stack for a one-pixel error. Every other irreversible thing on this
+# screen asks first.
+func _confirm_discard(id: String) -> void:
+	var have := int(Run.items.get(id, 0))
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = 70
+	add_child(overlay)
+	var dim := ColorRect.new()
+	dim.size = Vector2(1280, 720)
+	dim.color = Color(0, 0, 0, 0.75)
+	overlay.add_child(dim)
+	var panel := PanelContainer.new()
+	panel.position = Vector2(440, 264)
+	overlay.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	panel.add_child(box)
+	var title := Label.new()
+	title.text = "Discard the %s?" % Run.ITEM_INFO[id][0]
+	title.add_theme_font_size_override("font_size", 17)
+	title.add_theme_color_override("font_color", Color(0.9, 0.85, 0.7))
+	box.add_child(title)
+	var body := Label.new()
+	body.text = "The slot comes free. %s is lost." % (
+		"All %d of them" % have if have > 1 else
+		("The one you carry" if have == 1 else "Nothing"))
+	body.add_theme_font_size_override("font_size", 13)
+	body.add_theme_color_override("font_color", Color(0.75, 0.72, 0.68))
+	box.add_child(body)
+	var yes := Button.new()
+	yes.text = "Discard it"
+	yes.custom_minimum_size = Vector2(320, 34)
+	yes.pressed.connect(Music.click)
+	yes.pressed.connect(func():
+		overlay.queue_free()
+		if Run.discard_item(id):
+			Run.save_run()
+			_draw_screen()
+			_toast("The %s is gone. A slot comes free." % Run.ITEM_INFO[id][0]))
+	box.add_child(yes)
+	var no := Button.new()
+	no.text = "Keep it"
+	no.custom_minimum_size = Vector2(320, 32)
+	no.pressed.connect(overlay.queue_free)
+	box.add_child(no)
+
+
+# ---------- BATCH CT §3: a drop with no room is a SWAP OFFER ----------
+#
+# Queued by whatever granted it (elite spoils, an event, the bargain) and
+# resolved HERE, because the map is where owed picks are resolved — the same
+# door `rune_picks_owed` and the draft picks come through, which this file's
+# own header calls "an owed pick opens its own overlay".
+#
+# DECLINING IS ALWAYS A BUTTON, per the standing rule that governs events.
+# Offers are resolved ONE AT A TIME and the overlay re-opens for the next, so
+# a Gravelight Lantern elite handing over two unheld types asks twice rather
+# than making one compound decision out of two.
+func _check_item_offers() -> void:
+	if Run.pending_item_offers.is_empty():
+		return
+	var id := String(Run.pending_item_offers[0])
+	# The pouch may have changed since the offer was queued — a discard on the
+	# way here can have made the room. Take it silently in that case: an offer
+	# to give something up when nothing has to be given up is a question with
+	# one answer.
+	if not Run.needs_slot(id):
+		Run.pending_item_offers.pop_front()
+		if Run.add_item(id) > 0:
+			_toast("+1 %s" % Run.ITEM_INFO[id][0])
+		Run.save_run()
+		_draw_screen()
+		return
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = 72
+	add_child(overlay)
+	var dim := ColorRect.new()
+	dim.size = Vector2(1280, 720)
+	dim.color = Color(0, 0, 0, 0.8)
+	overlay.add_child(dim)
+	var panel := PanelContainer.new()
+	panel.position = Vector2(408, 176)
+	overlay.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	panel.add_child(box)
+	var title := Label.new()
+	title.text = "The pouch is full — %s" % Run.ITEM_INFO[id][0]
+	title.add_theme_font_size_override("font_size", 18)
+	title.add_theme_color_override("font_color", Color(0.9, 0.85, 0.7))
+	box.add_child(title)
+	var body := Label.new()
+	body.text = "%s\n\nTake it in place of which stack?" % Run.ITEM_INFO[id][1]
+	body.add_theme_font_size_override("font_size", 13)
+	body.add_theme_color_override("font_color", Color(0.75, 0.72, 0.68))
+	body.custom_minimum_size = Vector2(400, 0)
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(body)
+	for held_id in Run.ITEM_IDS.filter(func(i): return Run.items.has(i)):
+		var b := Button.new()
+		b.text = "Give up %s  (x%d)" % [Run.ITEM_INFO[held_id][0],
+			int(Run.items.get(held_id, 0))]
+		b.custom_minimum_size = Vector2(400, 32)
+		b.add_theme_font_size_override("font_size", 13)
+		b.tooltip_text = Run.ITEM_INFO[held_id][1]
+		b.pressed.connect(Music.click)
+		b.pressed.connect(func():
+			overlay.queue_free()
+			Run.pending_item_offers.pop_front()
+			if Run.swap_item(held_id, id):
+				_toast("The %s goes. +1 %s." % [Run.ITEM_INFO[held_id][0],
+					Run.ITEM_INFO[id][0]])
+			Run.save_run()
+			_draw_screen()
+			# The next offer, if the same victory queued more than one.
+			_check_item_offers())
+		box.add_child(b)
+	var decline := Button.new()
+	decline.text = "Leave it behind"
+	decline.custom_minimum_size = Vector2(400, 34)
+	decline.pressed.connect(Music.click)
+	decline.pressed.connect(func():
+		overlay.queue_free()
+		Run.pending_item_offers.pop_front()
+		Run.save_run()
+		_toast("The %s is left on the road." % Run.ITEM_INFO[id][0])
+		_check_item_offers())
+	box.add_child(decline)
+
+
+# The map-side effects mirror the battle item table. BATCH CT §6 made the
+# numbers percentages, and both sides now call the SAME `Run` helpers rather
+# than each repeating a literal — which is what "Run.ITEM_INFO stays the
+# single place these numbers are written" has to mean in practice, because
+# the old comment claimed the two read the same 40 while each spelled it out
+# separately and nothing stopped them drifting.
 func _apply_item(id: String, idx: int, overlay: Control) -> void:
 	overlay.queue_free()
 	if int(Run.items.get(id, 0)) < 1:
@@ -1643,7 +1866,8 @@ func _apply_item(id: String, idx: int, overlay: Control) -> void:
 	match id:
 		"health":
 			var before := int(member["hp"])
-			member["hp"] = mini(before + 40, int(member["max_hp"]))
+			member["hp"] = mini(before + Run.health_potion_heal(int(member["max_hp"])),
+				int(member["max_hp"]))
 			line = "%s recovers %d HP." % [String(member["key"]).capitalize(),
 				int(member["hp"]) - before]
 		"mana":
@@ -1651,7 +1875,9 @@ func _apply_item(id: String, idx: int, overlay: Control) -> void:
 				_toast("%s has no Mana to restore." % String(member["key"]).capitalize())
 				return
 			var mana_was := int(member["mana"])
-			member["mana"] = mini(mana_was + 40, int(member["max_mana"]))
+			member["mana"] = mini(
+				mana_was + Run.mana_potion_restore(int(member["max_mana"])),
+				int(member["max_mana"]))
 			line = "%s recovers %d Mana." % [String(member["key"]).capitalize(),
 				int(member["mana"]) - mana_was]
 		"revive":

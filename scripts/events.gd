@@ -256,17 +256,42 @@ static func apply(run: Node, fx: Dictionary) -> String:
 			return "%s: %+d%% Attack for the run" % [", ".join(blessed),
 				int(round(amount * 100))]
 		"item":
+			# BATCH CT §7 — BOTH ITEM VERBS GO THROUGH `Run` NOW. They wrote
+			# `items[id]` directly before this batch, which meant an event grant
+			# ignored the per-type stack cap entirely — Batch AN's six was already
+			# reachable past by "The Cache" and its kin, silently. With a SLOT cap
+			# on top of that, a direct write would also have conjured a whole new
+			# slot out of nothing, so the leak is closed rather than widened.
+			#
+			# A NEGATIVE COUNT IS A TAKE, and it still writes directly: Spoiled
+			# Stores removes a potion, no cap applies to a removal, and — the part
+			# that matters — it MUST NOT free the slot. A stack falling to zero
+			# keeps its slot (§1); only a discard or a sale releases one.
 			var items: Dictionary = run.get("items")
 			var id := String(fx.get("id", "health"))
 			var count := int(fx.get("count", 1))
-			items[id] = maxi(int(items.get(id, 0)) + count, 0)
-			return "%+d %s" % [count, run.ITEM_INFO[id][0]]
+			if count < 0:
+				if not items.has(id):
+					return ""
+				var was := int(items.get(id, 0))
+				items[id] = maxi(was + count, 0)
+				return "%+d %s" % [items[id] - was, run.ITEM_INFO[id][0]]
+			if run.offer_item(id):
+				return "%s — no room in the pouch; choose on the map" % run.ITEM_INFO[id][0]
+			var landed: int = run.add_item(id, count)
+			if landed < 1:
+				return "%s — the party can carry no more" % run.ITEM_INFO[id][0]
+			return "%+d %s" % [landed, run.ITEM_INFO[id][0]]
 		"random_item":
 			var got := PackedStringArray()
 			for i in int(fx.get("count", 1)):
 				var id: String = run.random_loot()
-				var items: Dictionary = run.get("items")
-				items[id] = int(items.get(id, 0)) + 1
+				if run.offer_item(id):
+					got.append("%s (no room — choose on the map)" % run.ITEM_INFO[id][0])
+					continue
+				if run.add_item(id) < 1:
+					got.append("%s (already at the cap)" % run.ITEM_INFO[id][0])
+					continue
 				got.append(run.ITEM_INFO[id][0])
 			return "found: %s" % ", ".join(got)
 		"revive_pct":

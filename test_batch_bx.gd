@@ -460,8 +460,26 @@ func _screen_source() -> void:
 		"§2: the screen commits through the run's two doors and no others")
 	ok(map.contains("_maybe_open_party_draft()"),
 		"§2: the screen opens on arriving at the map after an elite")
-	ok(map.contains("if Run.sim_run or _draft_columns().is_empty():"),
-		"§2: ...never in a sim, and never with nothing to offer")
+	# BATCH CT re-pointed this IN PLACE, on BK §6's precedent and for the same
+	# reason the save-version pins were re-pointed: **this suite owns the
+	# INVARIANT — the draft never opens in a sim, and never with nothing to
+	# offer — not the one-line FORMULATION of it.** CT split the combined
+	# condition into two guards so that "nothing owed" could chain into the
+	# pouch's own owed pick (§3), which the combined form had no room for. The
+	# behaviour is unchanged: a sim still returns before anything opens.
+	#
+	# SCOPED TO THE FUNCTION BODY, which makes it STRICTLY STRONGER than the
+	# global `contains` it replaces — that one would have passed on either guard
+	# appearing anywhere else in a 2,000-line file.
+	var mopd_at := map.find("func _maybe_open_party_draft(")
+	var mopd_end := map.find("\nfunc ", mopd_at + 1)
+	var mopd := map.substr(mopd_at, mopd_end - mopd_at) if mopd_at >= 0 else ""
+	ok(mopd.contains("if Run.sim_run:"),
+		"§2: ...never in a sim")
+	ok(mopd.contains("_draft_columns().is_empty()"),
+		"§2: ...and never with nothing to offer")
+	ok(mopd.contains("_open_party_draft()"),
+		"§2: ...and it is still the party screen it opens when there IS something")
 
 
 func _live_one_action() -> void:

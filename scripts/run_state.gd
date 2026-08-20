@@ -61,21 +61,118 @@ const BRANCH_WEIGHT := 1.5
 const MIN_COLUMN := 2
 
 # All item metadata lives here; battle and map both read it.
-const ITEM_IDS := ["health", "mana", "bomb", "revive", "defense"]
+#
+# BATCH CT §6 — THE FLAT NUMBERS ARE GONE FROM THE THREE THAT HAD THEM. The
+# free healing scaled and the paid healing did not: clearing a slot heals
+# SLOT_HEAL_PCT (15%) of maximum and heroes gain +2% base HP per win, so a
+# flat 40 decayed against the party carrying it while the shop kept charging
+# 30 gold. Health and Mana are percentages now and the Bomb rides the same
+# +2%-per-win rate the heroes do. Revive (50%) and Defense (+10% armor) were
+# already percentages and are UNTOUCHED.
+#
+# THIS TABLE IS THE ONLY PLACE THESE NUMBERS ARE WRITTEN. Battle and map both
+# read it, and both read the constants below rather than repeating a literal,
+# so the two can never drift.
+const HEALTH_POTION_PCT := 0.20   # of the target's MAXIMUM health
+# FLAGGED (§6 asked for the figure to be flagged): 40% of a base 100
+# max_resource is the current flat 40 exactly, so a run opens unchanged on
+# this one. Every hero starts at max_resource 100 (BattleUnit.max_resource),
+# which is what makes the match exact rather than approximate.
+const MANA_POTION_PCT := 0.40     # of the target's MAXIMUM resource
+const BOMB_BASE_DAMAGE := 50      # unchanged at zero wins, scaled by the rate below
+const BOMB_WIN_SCALE := 0.02      # +2% per combat win — the heroes' own rate
+
+const ITEM_IDS := ["health", "mana", "bomb", "revive", "defense",
+	"cleanse", "visage", "hourglass"]
 const ITEM_INFO := {
-	"health": ["Health Potion", "Restores 40 HP to one ally."],
-	"mana": ["Mana Potion", "Restores 40 Mana (or Rage) to one ally."],
-	"bomb": ["Bomb", "Deals 50 damage to all enemies."],
+	"health": ["Health Potion", "Restores 20% of one ally's maximum health."],
+	"mana": ["Mana Potion", "Restores 40% of one ally's maximum Mana (or Rage)."],
+	"bomb": ["Bomb", "Deals 50 damage to all enemies, +2% per victory this run."],
 	"revive": ["Revive Potion", "Revives a fallen ally at 50% HP."],
 	"defense": ["Defense Potion", "+10% armor to all living party members for 3 turns."],
+	# BATCH CT §4 — the three new ones. All BATTLE ONLY: on the map they sit
+	# in the pouch with a disabled button that says why, which is the BOMB's
+	# idiom (`_usable_on_map`), not the Defense Potion's (that one is enabled
+	# and refuses with a toast on press). The brief called those one pattern;
+	# they are two, and the Bomb's is the one that actually reads.
+	"cleanse": ["Cleansing Draught",
+		"Removes every debuff from one chosen hero. Battle only."],
+	"visage": ["Cursed Visage",
+		"Hexes every living enemy for the rest of the battle (-15% damage dealt). Battle only."],
+	"hourglass": ["Resonating Hourglass",
+		"One chosen hero acts next, ahead of the whole queue. Battle only."],
 }
-# Potions drop more often than the heavy items.
-const LOOT_POOL := ["health", "health", "mana", "mana", "bomb", "revive", "defense"]
+# Potions drop more often than the heavy items. BATCH CT §7: `cleanse` joins
+# at a LIGHT weight (one entry against the potions' two). The Cursed Visage
+# and the Resonating Hourglass are deliberately absent — shop-only, so what
+# they cost is what they are worth.
+const LOOT_POOL := ["health", "health", "mana", "mana", "bomb", "revive",
+	"defense", "cleanse"]
 # Batch AN §6: six of each item type, and that is the whole stack. A
 # purchase or a drop above the cap is REFUSED with a message rather than
 # swallowed — a reward that silently evaporates reads as a bug, and the
 # shop must be able to grey the button rather than take the gold.
+# BATCH CT keeps this as the DEFAULT and adds per-type exceptions below.
 const ITEM_CAP := 6
+# BATCH CT §4: the heavy new items carry their own, smaller stack caps.
+# Anything absent uses ITEM_CAP.
+const ITEM_STACK_CAPS := {"cleanse": 4, "visage": 2, "hourglass": 2}
+
+# ---------- BATCH CT: THE PRICES LIVE HERE, WITH THE REST OF THE ITEM TABLE ----------
+#
+# They were a `const` in `shop_screen.gd` with a HAND-COPIED MIRROR in
+# `run_sim.gd`, and the mirror indexes itself by `ITEM_IDS` — so the day §4
+# added three ids the sim became a missing-key crash, which no parse gate can
+# see. §6 says this table is the single place the item numbers are written, and
+# a price is an item number.
+#
+# **IT MUST LIVE HERE AND NOT BE `preload`ed FROM `shop_screen.gd`.** That was
+# tried and it broke the entire run harness: `shop_screen.gd` names the `Run`
+# AUTOLOAD at compile time, autoloads are not registered when a `--script`
+# SceneTree compiles its dependency chain, and `run_sim.gd` preloading it took
+# `test_run_harness.gd` down with it ("Identifier not found: Run"). Reading a
+# const off the autoload's OWN script has no such problem: every consumer
+# already holds the run node and reads it at RUNTIME.
+#
+# The five original prices are unchanged (§7); the three new ones are listings.
+const ITEM_PRICES := {"health": 30, "mana": 30, "bomb": 45, "revive": 80,
+	"defense": 40, "cleanse": 35, "visage": 100, "hourglass": 90}
+
+# BATCH CT §2 — SELL BACK, AND IT MUST BE A LOSS. An even trade would make the
+# shop a free locker: buy everything, park the overflow with the merchant,
+# collect it next visit, and the slot cap stops meaning anything at all. Two
+# fifths is enough that a wasted purchase is recoverable and not enough that
+# round-tripping is a strategy.
+const SELL_FRACTION := 0.4
+
+# ---------- BATCH CT §1: THE POUCH IS SLOTTED ----------
+#
+# A SLOT HOLDS ONE ITEM TYPE AND ITS WHOLE STACK — six Health Potions are one
+# slot, not six. The cap is the design and not a limitation: items cost no
+# turn, so until now the shop only ever asked "can you afford it", and the
+# answer was yes to everything in reach. A slot cap turns that into WHAT DO
+# YOU MAKE ROOM FOR.
+#
+# THE BRIEF'S NAMED PRECEDENT DOES NOT EXIST. §1 says to follow the rune
+# equip-slot ladder "exactly — it already grows 2 -> 3 -> 4 by zone and
+# announces each new slot on the zone-victory screen". It does not: Batch AN
+# §9 DELETED that ladder and `rune_slots()` has returned a flat 3 ever since,
+# with the reason written above it — a growth ladder means a run that dies in
+# zone 2 never owns the last slot. There was no announcement to copy either,
+# so this batch WRITES one (see battle.gd `_resolve_boss`).
+#
+# The ladder is still right HERE, and for the opposite reason it was wrong for
+# runes: rune slots growing was dilution, because an empty slot is dead weight
+# you cannot fill on demand. A pouch slot is filled the moment you reach a
+# merchant, so growth is the tradeoff LOOSENING as the party's income does —
+# which is the arc, not a dilution of it.
+const ITEM_SLOTS_BY_ZONE := [4, 5, 6]
+
+# A STACK FALLING TO ZERO DOES NOT FREE ITS SLOT. The key stays in `items`
+# until the type is DISCARDED or SOLD (§2). Otherwise the cap stops binding
+# the moment a stack empties — which is exactly when it should be biting —
+# and the tradeoff evaporates. This is why every count-of-slots question below
+# reads `items.size()` and never "how many types hold a positive count".
 
 var active := false
 var specs_chosen := false  # locked in during the pre-run awakening
@@ -132,6 +229,26 @@ var seen_events: Array = []  # event ids drawn this run (non-repeating pool)
 # re-offered — the same shape as pending_event.
 var pending_modifier := ""
 var pending_reward := {}   # the reward the accepted option pays on victory
+# BATCH CT §3 — DROPS THAT HAVE NO SLOT, WAITING FOR THE MAP TO ASK.
+# A drop, an elite cache or an event can hand the party a type it has no slot
+# for. That is NOT the refusal a full stack gets: it is a CHOICE, offered as
+# "take it and give up a stack, or decline". The grant happens in BATTLE (the
+# victory screen) or in an EVENT, and neither of those is a place to put a
+# five-button overlay, so the offer QUEUES here and the MAP resolves it — the
+# same shape `rune_picks_owed` and the draft picks already use, which is the
+# pattern map_screen.gd's header calls "an owed pick opens its own overlay".
+#
+# THE BRIEF NAMED A DIFFERENT PATTERN AND IT IS NOT THE RIGHT ONE. §3 says to
+# reuse "the elite cache and rune offer pattern". There is no elite cache —
+# the elite spoils call it a RUNE CACHE, and that IS the owed-pick overlay
+# used here. The "rune offer" is the merchant's rune column, and the OFFER
+# SCREEN (offer_screen.gd) is the pre-fight bargain, which says in its own
+# header "There is NO decline" — so it cannot be the model for an interaction
+# whose §3 requires a decline button. The owed-pick overlay can, and is.
+#
+# SAVED WITH THE RUN: an offer is a reward already earned, and quitting
+# between the victory screen and the map must not eat it.
+var pending_item_offers: Array = []  # item ids awaiting a swap-or-decline
 # Which hero the sheet opens onto (Batch AN: the map cards ARE the party
 # list, so the sheet is always entered for a specific hero). Session-scoped
 # — a resumed run opens the map, never a sheet.
@@ -345,15 +462,49 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 		party.append({"key": key, "hp": base["hp"], "max_hp": base["hp"],
 			"mana": base["mana"], "max_mana": 100, "spec": "",
 			"talents": {}, "runes": []})
-	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1, "defense": 1}
+	# ZONE FIRST, THEN THE POUCH. `add_item` reads `item_slots()`, which reads
+	# `zone_idx` — and this used to be assigned forty lines further down, so a
+	# SECOND run started in the same session would have sized the opening pouch
+	# off the PREVIOUS run's zone (six slots deep into a zone-3 death, not four).
+	# Nothing read the slot count before this batch, so the stale read was
+	# harmless until now. It is not harmless now.
+	zone_idx = 0
+	# BATCH CT §1 — THE RESOLUTION, WRITTEN DOWN AS THE BRIEF REQUIRED.
+	# Five starting TYPES against four slots at zone 1 does not fit, and §1
+	# gave two ways out: drop the opening to four types, or make the player
+	# pick four before the first map. **THE OPENING DROPS TO FOUR TYPES**, and
+	# the type dropped is the DEFENSE POTION.
+	#
+	# Why that one and why not the picker: a choose-four screen before the run
+	# has begun asks the player to price five items they have never used, which
+	# is a decision with no information in it — the shop asks the same question
+	# later, with a run's worth of context behind it. And of the five, Defense
+	# is the one whose absence costs least: it is the only one that is purely a
+	# hedge (+10% armor for 3 turns), where Health, Mana and Revive answer
+	# states a party cannot otherwise leave and the Bomb is the pouch's only
+	# offense. It is still sold at every merchant from the first one.
+	#
+	# NOTHING STARTS OVER CAPACITY, and that is checked rather than assumed —
+	# see the loop below.
+	items = {"health": 2, "mana": 1, "bomb": 1, "revive": 1}
+	# Relic start_items go through `add_item` now, which enforces BOTH walls:
+	# the per-type stack cap AND the slot cap. §7 flagged that a relic can push
+	# the opening pouch over its slot cap and asked that it resolve through §3's
+	# offer rather than silently — but §3's offer is a MAP overlay and there is
+	# no map yet at `new_run`, so the honest resolution here is that a relic
+	# cannot overflow the opening in the first place.
+	#
+	# WITH TODAY'S TWO RELICS IT CANNOT: Waystone Shard grants health/mana/bomb
+	# and Packmother's Satchel grants health/mana — every one of those types is
+	# already in the opening four, so neither needs a slot and neither is
+	# refused. The guard is here for the relic that is not written yet, and if
+	# one ever is, this is the line that will refuse it (visibly, in the count)
+	# rather than the pouch silently going five wide at zone 1.
 	for id in relic_dict("start_items"):
-		items[id] = int(items.get(id, 0)) + int(relic_dict("start_items")[id])
-	# Relic start_items can push a stack past the cap on its own.
-	for id in items:
-		items[id] = mini(int(items[id]), ITEM_CAP)
+		add_item(id, int(relic_dict("start_items")[id]))
 	gold = 60 + int(relic_add("start_gold"))
 	combat_wins = 0
-	zone_idx = 0
+	# zone_idx is set above, before the pouch is filled — see the note there.
 	draw_zones()
 	_enter_zone()
 	slot_idx = -1
@@ -363,6 +514,7 @@ func new_run(keys := ["warrior", "mage", "cleric", "hunter"], relics: Array = []
 	pending_event = ""
 	pending_modifier = ""
 	pending_reward = {}
+	pending_item_offers = []
 	pending_shop = false
 	# A fresh run starts clean, and starts un-summoned and un-travelled.
 	debug_used = false
@@ -1560,8 +1712,18 @@ func save_run() -> void:
 	# REFUSED AND CLEARED on load, for the same reason BK refused pre-v8: the
 	# migration would have to invent a slot the party never stood in, and a
 	# wipe that says so beats that.
+	# v11 (BATCH CT): the pouch is SLOTTED and `items` is the slot list — a key
+	# present at count 0 is a HELD, EMPTY slot, which is a state no earlier save
+	# could contain. TOLERANT, not refused: a v10 save's `items` is a legal slot
+	# list already (every key it holds is a type the party owns), and if it holds
+	# MORE keys than the zone's slot cap allows, the pouch is simply over
+	# capacity until the player discards or sells one. That is a state the UI
+	# renders honestly and the player can leave, so it beats wiping the run. The
+	# only genuinely new field is `pending_item_offers`, which a v10 save has
+	# none of and correctly loads empty.
 	file.store_var({
-		"version": 10, "party": party, "items": items, "gold": gold,
+		"version": 11, "party": party, "items": items, "gold": gold,
+		"pending_item_offers": pending_item_offers,
 		"tally": tally, "debug_used": debug_used,
 		"difficulty": difficulty,
 		"zone_idx": zone_idx, "zone_name": zone_name, "zone_draw": zone_draw,
@@ -1635,6 +1797,9 @@ func load_run() -> bool:
 	pending_event = ""
 	pending_modifier = ""
 	pending_reward = {}
+	# BATCH CT §3: a v10 save has no offers and loads with none, which is right —
+	# it was written by a build that could not create one.
+	pending_item_offers = data.get("pending_item_offers", [])
 	encounter = {}
 	active = true
 	return true
@@ -1742,19 +1907,110 @@ func sim_equipped_talents(spec: String) -> Dictionary:
 # ---------- Batch AN §6: the item cap ----------
 
 # Every grant of a consumable goes through here. Returns how many actually
-# landed, so the caller can say "refused" instead of pretending. The cap is
-# per ITEM TYPE, not per pouch: six Health Potions and six Bombs is legal.
+# landed, so the caller can say "refused" instead of pretending.
+#
+# THERE ARE NOW TWO WALLS AND THEY MEAN DIFFERENT THINGS (BATCH CT §3):
+#   * the STACK CAP is per ITEM TYPE — six Health Potions and six Bombs is
+#     legal — and a grant over it is REFUSED with a message. That rule is
+#     Batch AN's and it STANDS.
+#   * the SLOT CAP is per POUCH, and a grant that has no slot is NOT refused:
+#     it becomes a SWAP OFFER (§3). `add_item` still returns 0 for it, because
+#     nothing landed — but callers must ask `needs_slot()` FIRST and route to
+#     the offer instead of printing "cannot hold more". The two must never be
+#     conflated: NO ROOM IS A CHOICE, A FULL STACK IS A WALL.
 func add_item(id: String, count := 1) -> int:
+	if not items.has(id) and slots_free() < 1:
+		return 0
 	var have := int(items.get(id, 0))
-	var room := maxi(ITEM_CAP - have, 0)
+	var room := maxi(item_stack_cap(id) - have, 0)
 	var landed := mini(count, room)
 	if landed > 0:
 		items[id] = have + landed
 	return landed
 
 
+# The stack cap for one type: the §4 exceptions, else Batch AN's six.
+func item_stack_cap(id: String) -> int:
+	return int(ITEM_STACK_CAPS.get(id, ITEM_CAP))
+
+
 func item_full(id: String) -> bool:
-	return int(items.get(id, 0)) >= ITEM_CAP
+	return int(items.get(id, 0)) >= item_stack_cap(id)
+
+
+# ---------- BATCH CT §1/§2/§3: the slot cap ----------
+
+# Slots grow 4 -> 5 -> 6 with the zone. Clamped at both ends so a zone index
+# past the ladder (the end boss sits in the last zone) keeps the last value
+# rather than reading off the end.
+func item_slots() -> int:
+	return int(ITEM_SLOTS_BY_ZONE[clampi(zone_idx, 0, ITEM_SLOTS_BY_ZONE.size() - 1)])
+
+
+# A held type occupies its slot whether or not the stack has anything left
+# in it — see the note on ITEM_SLOTS_BY_ZONE for why that is the load-bearing
+# half of the whole cap.
+func slots_used() -> int:
+	return items.size()
+
+
+func slots_free() -> int:
+	return maxi(item_slots() - slots_used(), 0)
+
+
+# True when this type would need a NEW slot and there is none — i.e. the §3
+# swap-offer case, as distinct from a full stack.
+func needs_slot(id: String) -> bool:
+	return not items.has(id) and slots_free() < 1
+
+
+# §2: both of these free the slot ENTIRELY. A partial stack cannot be split
+# across slots, so there is no "discard three of six" — the type goes.
+func discard_item(id: String) -> bool:
+	if not items.has(id):
+		return false
+	items.erase(id)
+	return true
+
+
+# §3: take the offered type, giving up `drop_id` to make the room. One call so
+# the erase and the add can never half-happen.
+func swap_item(drop_id: String, take_id: String, count := 1) -> bool:
+	if not items.has(drop_id) or items.has(take_id):
+		return false
+	items.erase(drop_id)
+	return add_item(take_id, count) > 0
+
+
+# §3: queue a grant that has no slot. Returns true when the offer was made,
+# false when the type is at its STACK cap and there is nothing to offer — the
+# two cases the brief insisted must not be conflated.
+func offer_item(id: String) -> bool:
+	if not needs_slot(id):
+		return false
+	pending_item_offers.append(id)
+	return true
+
+
+# ---------- BATCH CT §6: the item values, in one place ----------
+#
+# Battle and map both call these rather than repeating a literal. Every one
+# is a percentage or scales with run depth, which is the standing rule this
+# batch records: A FLAT NUMBER IN THE POUCH DECAYS AGAINST A PARTY THAT GROWS.
+
+func health_potion_heal(max_hp: int) -> int:
+	return maxi(int(round(max_hp * HEALTH_POTION_PCT)), 1)
+
+
+func mana_potion_restore(max_resource: int) -> int:
+	return maxi(int(round(max_resource * MANA_POTION_PCT)), 1)
+
+
+# The Bomb rides the heroes' own +2%-per-win rate, so a run OPENS unchanged
+# at 50 and keeps pace after. `combat_wins` is the same counter battle.gd
+# scales hero Attack and HP off.
+func bomb_damage() -> int:
+	return int(round(BOMB_BASE_DAMAGE * (1.0 + BOMB_WIN_SCALE * combat_wins)))
 
 
 # ---------- Batch AN §3: the offer ----------
@@ -1971,9 +2227,17 @@ func claim_reward() -> Dictionary:
 			return {"text": "+%d gold (the bargain)" % amount, "shop": false}
 		"potion":
 			var id: String = random_loot()
-			if add_item(id) < 1:
-				return {"text": "The bargain offered a %s — the party is already carrying six."
+			# BATCH CT §3/§7: the bargain's potion is a grant like any other, so
+			# it splits the same three ways. NO SLOT is a swap offer waiting on the
+			# map; a FULL STACK is still the flat refusal Batch AN wrote — and the
+			# refusal now names the type's OWN cap instead of a hardcoded "six",
+			# which stopped being true the moment §4 gave three items smaller ones.
+			if offer_item(id):
+				return {"text": "The bargain offered a %s — no room in the pouch.\nChoose on the map." \
 					% ITEM_INFO[id][0], "shop": false}
+			if add_item(id) < 1:
+				return {"text": "The bargain offered a %s — the party is already carrying %d."
+					% [ITEM_INFO[id][0], item_stack_cap(id)], "shop": false}
 			return {"text": "+1 %s (the bargain)" % ITEM_INFO[id][0], "shop": false}
 		"rune":
 			var looter: Dictionary = party.pick_random()

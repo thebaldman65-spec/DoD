@@ -51,7 +51,7 @@ SUITES=(
   test_batch_cb test_batch_cd test_batch_ce test_runes test_rune_battle
 )
 GATES=(check_parse check_flow check_map check_cl_resolver check_cl_width
-       check_cm check_cm_live check_cn check_co check_cs)
+       check_cm check_cm_live check_cn check_co check_cs check_ct)
 
 [[ $# -gt 0 ]] && { SUITES=(); for a in "$@"; do SUITES+=("test_batch_$a"); done }
 
@@ -132,9 +132,18 @@ for n in 1 2 3; do
     "$(grep -oE 'GATE [0-9] (PASS|FAIL)[^)]*\)?' "$OUT/harness_$n.log" | tail -1)" \
     "$(grep -cE 'SCRIPT ERROR|Parse Error' "$OUT/harness_$n.log")"
 done
-echo "=== check_map_screen (SCENE run — autoloads do not resolve under --script) ==="
+echo "=== SCENE RUNS (autoloads do not resolve under --script) ==="
 "$GODOT" --headless --path . res://check_map_screen.tscn >"$OUT/check_map_screen.log" 2>&1
 printf 'check_map_screen        %s  throws=%s\n' \
   "$(grep -oE '[0-9]+ checks[^:]*' "$OUT/check_map_screen.log" | tail -1)" \
   "$(grep -cE 'SCRIPT ERROR|Parse Error' "$OUT/check_map_screen.log")"
+# BATCH CT: the pouch render gate. Measures every drawn button's rect against the
+# 1280-wide viewport at 4, 5 and 6 slots — an off-screen button is a DRAW-time
+# fact no parse gate and no source read can see, which is exactly how CT's brief
+# came to assert that six buttons fit a row that holds five.
+"$GODOT" --headless --path . --quit-after 900 res://check_ct_map.tscn \
+  >"$OUT/check_ct_map.log" 2>&1
+printf 'check_ct_map            %s  throws=%s\n' \
+  "$(grep -oE '[0-9]+ checks / [0-9]+ failures' "$OUT/check_ct_map.log" | tail -1)" \
+  "$(grep -cE 'SCRIPT ERROR|Parse Error' "$OUT/check_ct_map.log")"
 echo "=== DONE. Logs in $OUT ==="

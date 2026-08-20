@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-19 (Batch CS)</b></p>
+<p align="right"><b>Last updated: 2026-08-20 (Batch CT)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -297,15 +297,35 @@ removed a rune from a hero — <code>equipped</code> has exactly one writer and 
 grows. Building a removal path for one event would put a second, untested writer beside the
 one careful one.</p>
 
-<h3>3c. Attrition and potions</h3>
+<h3>3c. Attrition, the pouch and its slots</h3>
 <p><b>There is no resting.</b> Clearing any encounter heals the party <b>15% of max HP</b>
 (the Chalice of Dawn relic's 10% stacks on top). <b>Potions are usable on the map screen</b>,
-not only in battle: the inventory is interactive and targets a hero from the stat cards. The
-Bomb is battle-only (nothing on the road to throw it at) and the Defense Potion is
-battle-only (its 3 turns mean nothing outside a fight); both say so on hover.
-<b>Potion cap: 6 per item type</b> — purchases and drops above the cap are <b>refused with a
-message</b> rather than silently lost, and the shop greys a full stack rather than taking the
-gold.</p>
+not only in battle: the inventory is interactive and targets a hero from the stat cards. Four
+items are <b>battle-only</b> — the Bomb (nothing on the road to throw it at), the Cleansing
+Draught, the Cursed Visage and the Resonating Hourglass — and each sits in the pouch with a
+disabled button that says why on hover. The Defense Potion is also meaningless outside a fight
+and refuses with a message when pressed.</p>
+<p><b>THE POUCH IS SLOT-LIMITED, AND ACQUIRING AN ITEM IS A CHOICE ABOUT WHAT TO GIVE UP.</b>
+A <b>slot</b> holds one item <b>TYPE</b> and its whole stack — six Health Potions occupy one
+slot, not six. <b>Slots grow with the zone: 4 → 5 → 6</b>, announced on the zone-victory screen
+beside the talent-point line. The cap is the design, not a limitation: items cost no turn, so
+until it existed the shop only ever asked whether you could afford a thing.</p>
+<ul>
+<li><b>The opening is four types in four slots</b> — Health ×2, Mana, Bomb, Revive. The Defense
+Potion was dropped from the opening to make it fit; it is sold at every merchant.</li>
+<li><b>A stack falling to zero does NOT free its slot.</b> Only <b>discarding</b> it from the
+pouch (its own small button, confirmed) or <b>selling it back</b> at a merchant releases one.
+Both take the whole stack — a partial stack cannot be split across slots.</li>
+<li><b>Sell-back pays 40% of the listed price</b>, discounts included. A sale must be a loss, or
+the shop becomes a free locker and the cap stops meaning anything.</li>
+<li><b>A drop with no slot is an OFFER, not a refusal</b>: take it and give up a named stack, or
+leave it behind. It waits on the map, resolved by the same overlay every owed pick uses, and is
+saved with the run. <b>A drop over a per-type STACK cap is still refused with a message</b> — no
+room is a choice, a full stack is a wall.</li>
+<li><b>Stack caps are per type:</b> 6 for the five originals, <b>4</b> for the Cleansing Draught,
+<b>2</b> each for the Cursed Visage and the Resonating Hourglass. The shop greys a full stack
+rather than taking the gold, and greys a type with no slot as <b>NO SLOT</b>.</li>
+</ul>
 
 <ul>
 <li><b>Zones — authored slots:</b> a run is <b>three zone slots</b>, and each slot draws
@@ -574,7 +594,7 @@ bonuses (+15% with Aguila summoned). Guaranteed: Ice Lance vs Frozen; a perfect 
 Resonance builds
 only on the Mage's own casts — parry counters do not grant stacks.</li>
 <li><b>Attacker modifiers:</b> Resonance +1.5% × N(N+1)/2 at N stacks (a COMPOUNDING
-curve, not a per-stack slope — see §5.1); Surge +20%; Empower +25%; Cripple −25%;
+curve, not a per-stack slope — see §5.1); Surge +20%; Empower +25%; Cripple −25%; Hexed −15%;
 Blood Frenzy up to +40% as HP falls; Seasoned Fighter +15% above half HP; relic bonuses
 (global +10% dragonbone; fire/holy +20% emberheart); Powershot +2% per 1% of the target's
 EMPTY Break bar; Overpower +0.5 per point of target Break; Volatility +30% on Arcane
@@ -770,6 +790,12 @@ survive at 1 HP and the Cleric loses 1 Mercy. She must be holding one when it la
 <tr><td>Empower</td><td>+25% damage dealt.</td></tr>
 <tr><td>Exposed</td><td>Takes 15% more damage.</td></tr>
 <tr><td>Cripple</td><td>−25% damage dealt.</td></tr>
+<tr><td><b>Hexed</b></td><td><b>−15% damage dealt, for the rest of the battle.</b> The
+Cursed Visage's payload (&sect;4.7), laid on every living enemy at once for no turn &mdash; which is
+why the number is small where Cripple's is large. <b>The two stack</b> when both land: separate
+statuses from separate sources. It is a debuff, so a Survivalist's Trapper counts it and a mender's
+Cleansing Rite could take it &mdash; but a Mage's Dispel never can, which keeps the party from
+stripping their own work back off.</td></tr>
 <tr><td>Retaliation</td><td>Counters attackers with a basic strike.</td></tr>
 <tr><td>Parry Up</td><td>Raised parry chance for 2 turns, from a perfect Guard Change:
 +10% base, +15% more with the Swordsmanship talent and +5% more with the Rune of the Still
@@ -808,9 +834,33 @@ whole battle.</p>
 <h3>4.7 Items in battle</h3>
 <p>The party inventory is shared and opens as a picker via <b>Alt</b> or the "[Alt] Items"
 button (Tab cycles, Space uses, X closes — see §10). Using an item does <b>not</b> consume
-the turn, but each hero may use only one item per turn. Bomb: 50 damage to all enemies.
-Health Potion: +40 HP. Mana Potion: +40 Mana/Rage. Revive Potion: fallen ally returns at 50%
-HP. Defense Potion: party gains Fortify (3 turns).</p>
+the turn, but each hero may use only one item per turn. <b>The picker lists the slots the
+party HOLDS</b> (§3c), not every item that exists — including a held slot whose stack has run
+to zero, which is greyed rather than hidden.</p>
+<table border="1" cellpadding="4">
+<tr><th>Item</th><th>Effect in battle</th><th>Stack cap</th></tr>
+<tr><td><b>Health Potion</b></td><td><b>20% of the target's maximum health.</b></td><td>6</td></tr>
+<tr><td><b>Mana Potion</b></td><td><b>40% of the target's maximum Mana/Rage</b> (= the old flat
+40 at the base maximum of 100).</td><td>6</td></tr>
+<tr><td><b>Bomb</b></td><td><b>50 damage to all enemies, +2% per combat win this run</b> — the
+heroes' own scaling rate, so a run opens unchanged at 50.</td><td>6</td></tr>
+<tr><td><b>Revive Potion</b></td><td>Fallen ally returns at 50% HP, re-slotted onto the timeline.
+<b>Unchanged.</b></td><td>6</td></tr>
+<tr><td><b>Defense Potion</b></td><td>Party gains Fortify (3 turns). <b>Unchanged.</b></td><td>6</td></tr>
+<tr><td><b>Cleansing Draught</b></td><td>Removes <b>every debuff</b> from one chosen hero — the
+same set a Cleric's Cleansing Rite takes, and no more (meter states like Broken and the Bleed
+buildup stay; sticky poison refuses this cleanse as it refuses every other). Greyed when no one is
+afflicted, and handed back rather than swallowed if used anyway.</td><td><b>4</b></td></tr>
+<tr><td><b>Cursed Visage</b></td><td>Applies <b>Hexed</b> (§4.6) to every living enemy for the
+<b>rest of the battle</b>.</td><td><b>2</b></td></tr>
+<tr><td><b>Resonating Hourglass</b></td><td><b>Any living hero</b> — not only the one acting —
+acts next, ahead of every other unit, with the initiative delay of their current action waived.
+Written through <code>next_time</code>, the same field a Revive re-slots with; the turn bar is
+rebuilt so the new order is visible.</td><td><b>2</b></td></tr>
+</table>
+<p><b>Every item value is a percentage or scales with run depth.</b> A flat number in the pouch
+decays against a party that grows: the victory heal is 15% of maximum and heroes gain +2% base HP
+per win, so a flat 40 was worth less every fight while the shop kept charging 30 gold for it.</p>
 <h3>4.8 Enemy AI</h3>
 <p>Enemies hunt the most wounded hero 40% of the time and pick randomly otherwise; if any
 hero is Broken they exploit it
@@ -2151,8 +2201,20 @@ always — no ability pick (nothing follows it) and no points.</li>
 offered each time and drawn from that hero's <b>spec pool only</b>. The end boss awards none.
 Each <b>mini-boss</b> instead awards a <b>generic ability upgrade</b>, three offered — three a
 run (see §6a).</li>
-<li><b>Consumable prices:</b> Health 30, Mana 30, Bomb 45, Revive 80, Defense 40. Starting
-inventory: 2 Health, 1 Mana, 1 Bomb, 1 Revive, 1 Defense.</li>
+<li><b>Consumable prices:</b> Health 30, Mana 30, Bomb 45, Revive 80, Defense 40,
+<b>Cleansing Draught 35, Resonating Hourglass 90, Cursed Visage 100</b>. <b>The five original
+prices, starting gold and per-fight gold are unchanged</b> &mdash; the three new lines are
+listings, not a re-pricing. <b>Starting inventory: 2 Health, 1 Mana, 1 Bomb, 1 Revive</b> &mdash;
+four types in the four slots a zone-1 pouch holds (&sect;3c). The Defense Potion was dropped from the
+opening to make it fit and is sold at every merchant.</li>
+<li><b>Sell-back:</b> a merchant buys any held stack for <b>40% of its listed price</b>, discounts
+included, and the slot comes free with it. <b>A sale is always a loss</b>, or the shop becomes a free
+locker and the slot cap stops meaning anything. A sale pays on an emptied slot too, and pays the
+same: the slot is what is being sold.</li>
+<li><b>Slots are a second currency.</b> With gold the only ceiling, everything in reach was worth
+buying; with 4&ndash;6 slots the merchant asks what you will give up. Two of the three new items
+(<b>Cursed Visage</b>, <b>Resonating Hourglass</b>) are <b>shop-only and never drop</b>, so what they
+cost is what they are worth; the <b>Cleansing Draught</b> is in the loot pool at a light weight.</li>
 <li><b>The blacksmith &mdash; the gold sink</b> (Batch BK). Batch BJ measured <b>63% of every
 run's gold going unspent</b>, with 13.6 shop-rune refusals a run for <i>no free slot</i>
 against 6.8 for the gold reserve: <b>slots were the binding constraint, not prices</b>, so no

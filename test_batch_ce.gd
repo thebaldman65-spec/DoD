@@ -558,8 +558,24 @@ func _docs() -> void:
 	# here since CO shipped. The count stays PINNED deliberately — the glossary
 	# grows one entry per thing a player cannot learn anywhere else, so growth
 	# should have to be stated rather than absorbed.
-	ok(gj != null and gj.size() == 94,
-		"the glossary holds 94 entries (91 + CI's two + CO's one)")
+	# BATCH CT §5/§8 — NINETY-SIX. **THE PIN IS BUMPED, NOT LOOSENED**, because
+	# the paragraph above is right that growth should have to be STATED. CT added
+	# exactly two, and the discipline is in what it did NOT add:
+	#   * `status_hexed` — a new status with a chip on the board. §5 required it,
+	#     and a player meeting "Hx" has nowhere else to learn that it is
+	#     permanent, or that it is a different thing from Cripple's "C".
+	#   * `pouch_slots` — the slot cap is a SYSTEM, which is what this category
+	#     holds (zones, merchant, bargain, severity), and its two load-bearing
+	#     rules are invisible in play: an emptied stack KEEPS its slot, and a
+	#     drop with no room is an offer rather than a refusal.
+	# **Three per-item entries were written and then DELETED** — Cleansing
+	# Draught, Cursed Visage, Resonating Hourglass. Every one of them is fully
+	# described by its own shop and pouch tooltip, this category has never held a
+	# per-item entry (there is no `item_health`), and three of eight items is a
+	# worse state than none. What they taught that a tooltip cannot — the
+	# shop-only rule and the stack caps — is folded into `pouch_slots` instead.
+	ok(gj != null and gj.size() == 96,
+		"the glossary holds 96 entries (94 + CT's two)")
 	var log_live := _src("res://docs/changelog.html")
 	ok(log_live.contains("Batch CE"), "the changelog carries a Batch CE entry")
 	ok(log_live.contains("102"), "...and states the new draft count")

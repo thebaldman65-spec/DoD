@@ -13,6 +13,224 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-20 &mdash; Batch CT: THE POUCH GETS SLOTS, AND THREE ITEMS TO COMPETE FOR THEM</h2>
+<p><i>The pouch becomes a <b>slotted inventory that grows with the run</b> (4 &rarr; 5 &rarr; 6 by
+zone), three items join the list, and the three flat potions become percentages. <b>Save version
+moved to v11</b> &mdash; tolerant, a v10 save loads. <b>Five claims in the brief were wrong and are
+corrected here rather than implemented as written</b>; each is listed in &sect;0 below with what the
+repo actually contains.</i></p>
+
+<h3>&sect;0 &mdash; WHAT THE BRIEF GOT WRONG</h3>
+<p><b>Recorded first because four of the five changed what was built.</b></p>
+<table border="1" cellpadding="4">
+<tr><th>The brief said</th><th>The repo says</th><th>What shipped</th></tr>
+<tr><td>&sect;1: follow the rune equip-slot precedent, which "grows 2&nbsp;&rarr;&nbsp;3&nbsp;&rarr;&nbsp;4
+by zone and announces each new slot on the zone-victory screen"</td>
+<td><b>That ladder was deleted by Batch AN &sect;9.</b> <code>rune_slots()</code> has returned a flat
+3 ever since, and the reason is written above it: a growth ladder means a run that dies in zone 2
+never owns the last slot. <b>There is no announcement anywhere to copy.</b></td>
+<td>The 4/5/6 ladder ships as briefed &mdash; it is right here for the opposite reason it was wrong
+for runes &mdash; and <b>the announcement was written from scratch</b> in <code>_resolve_boss</code>,
+beside the talent-point line.</td></tr>
+<tr><td>&sect;1: "Six buttons fit the existing row&hellip; <b>the slot cap removes the layout problem
+rather than requiring a fix for it</b>"</td>
+<td><b>They do not fit.</b> At <code>VIEW_X + 4 + i * 190</code> with width 182, button six spans
+x=1270&ndash;1452 on a <b>1280-wide</b> viewport &mdash; 172px and its whole label off-screen. Five
+fit at that pitch, not six.</td>
+<td>Pitch and width re-derived from the space that exists (158/150; rightmost edge x=1260).
+<b><code>check_ct_map.tscn</code> measures it</b>, and fails at the old pitch.</td></tr>
+<tr><td>&sect;5: add a new status <code>crippled</code>, "Crippled", &minus;15% damage dealt</td>
+<td><b><code>cripple</code> already exists</b> &mdash; "Cripple", &minus;25% damage dealt, already in
+<code>DEBUFF_IDS</code>, applied by three abilities and two enemies. The glossary entry for it reads
+"A <b>crippled</b> unit deals 25% less damage", and <code>battle.gd</code>'s Corrupted Channeling
+comment says "a <b>Crippled</b> enemy".</td>
+<td><b>Shipped as <code>hexed</code> / "Hexed", chip "Hx".</b> Every number and rule of &sect;5 is
+unchanged; only the name moved. Two chips a player cannot tell apart, and twelve
+<code>has_status("cripple")</code> call sites one typo from a silent bug, was not worth the
+homonym.</td></tr>
+<tr><td>&sect;3: "reuse the elite cache and rune offer pattern&hellip; declining is always a
+button"</td>
+<td><b>There is no "elite cache"</b> &mdash; the spoils call it a <b>rune cache</b>. And the
+<b>offer screen</b> states in its own header: "There is <b>NO</b> decline." It cannot be the model
+for an interaction that requires one.</td>
+<td>Built on the <b>owed-pick overlay</b> &mdash; the pattern the rune cache and the draft picks
+actually use, which <code>map_screen.gd</code>'s header calls "an owed pick opens its own overlay".
+It declines.</td></tr>
+<tr><td>&sect;4: battle-only items sit in the pouch and say why "exactly as the Bomb and Defense
+Potion already do"</td>
+<td><b>Those are two different mechanisms.</b> The Bomb is refused by
+<code>_usable_on_map</code> so its button never lights. The Defense Potion's button is
+<b>enabled</b> and refuses with a toast after the press.</td>
+<td>The three new items follow <b>the Bomb</b>. A button you cannot press, that says why on hover,
+beats one that looks live and then declines. The Defense Potion is left exactly as it was.</td></tr>
+</table>
+
+<h3>&sect;1 &mdash; SLOTS</h3>
+<p><b>A slot holds one item TYPE and its whole stack.</b> Six Health Potions occupy one slot.
+<b>4 &rarr; 5 &rarr; 6 by zone</b>, announced on the zone-victory screen.</p>
+<p><b>THE OPENING RESOLUTION, WRITTEN DOWN AS &sect;1 REQUIRED:</b> five starting types against four
+slots does not fit, and <b>the opening drops to four types &mdash; the Defense Potion is the one
+dropped.</b> A choose-four screen before the run has begun asks the player to price five items they
+have never used; the shop asks the same question later with a run's worth of context behind it. Of
+the five, Defense is the only pure hedge &mdash; Health, Mana and Revive answer states a party
+cannot otherwise leave, and the Bomb is the pouch's only offense. It is sold at every merchant.
+<b>Nothing starts over capacity, and <code>check_ct.gd</code> asserts it.</b></p>
+<p><b>A stack falling to zero does NOT free its slot</b> &mdash; otherwise the cap stops binding the
+moment a stack empties, exactly when it should be biting. Only a discard or a sale releases one.</p>
+<p><b>An ordering bug was found and fixed on the way:</b> <code>new_run</code> assigned
+<code>zone_idx = 0</code> <em>after</em> filling the pouch. Nothing read the slot count before this
+batch, so the stale read was harmless; a second run in one session would now have sized its opening
+pouch off the previous run's zone.</p>
+
+<h3>&sect;2 &mdash; FREEING A SLOT: DISCARD AND SELL</h3>
+<p><b>Discard</b> from the pouch at any time, from its own small button under each slot &mdash;
+because the button above it is disabled for every battle-only item and every empty stack, which is
+exactly when a player most wants the slot back. <b>Confirmed, not instant.</b></p>
+<p><b>Sell back at the merchant for 40% of the listed price</b> (<code>SELL_FRACTION</code>), read
+off the same <code>_price</code> the buy button shows, so a Peddler's Lodestone discount cuts both
+and the two cannot be arbitraged. An even trade would make the shop a free locker. <b>A sale pays
+on an empty slot too</b>, and pays the same: the slot is the thing being sold.</p>
+
+<h3>&sect;3 &mdash; A DROP WITH NO ROOM IS A SWAP OFFER</h3>
+<p>A grant with no slot <b>queues on the run</b> and the <b>map</b> puts it to the player: give up a
+named stack, or <b>leave it behind</b>. Offers resolve one at a time. <b>Saved with the run</b> &mdash;
+an offer is a reward already earned.</p>
+<p><b>The two walls are kept apart, which &sect;3 was emphatic about: NO ROOM IS A CHOICE, A FULL
+STACK IS A WALL.</b> A drop over a per-type stack cap is still refused with a message.</p>
+
+<h3>&sect;4 &mdash; THE THREE NEW ITEMS</h3>
+<table border="1" cellpadding="4">
+<tr><th>Item</th><th>Price</th><th>Stack</th><th>Effect</th></tr>
+<tr><td><b>Cleansing Draught</b> (<code>cleanse</code>)</td><td>35g</td><td>4</td>
+<td>Removes every debuff from one chosen hero. <b>Reads <code>DEBUFF_IDS</code> through
+<code>_cleansable_debuffs</code></b> &mdash; the Rite's own derivation, so it can never strip a buff
+and never outdoes the Cleric ability it stands in for. Closes a real hole: a party without a Cleric
+had no answer to a debuff at all. <b>Drops as loot, at a light weight.</b></td></tr>
+<tr><td><b>Cursed Visage</b> (<code>visage</code>)</td><td>100g</td><td>2</td>
+<td>Hexes every living enemy for the <b>rest of the battle</b>. <b>FLAGGED, NOT TUNED</b> &mdash;
+nothing else applies a permanent party-wide debuff from one button that costs no turn.
+<b>Shop-only.</b></td></tr>
+<tr><td><b>Resonating Hourglass</b> (<code>hourglass</code>)</td><td>90g</td><td>2</td>
+<td>Any living hero &mdash; not only the one acting &mdash; acts next, initiative delay waived.
+Written through <code>next_time</code> on Watchtower's idiom; <b>no second scheduling path</b>.
+Followed by <code>_rebuild_turn_bar()</code>. <b>Shop-only.</b></td></tr>
+</table>
+<p>All three are <b>battle only</b> and sit in the map pouch with a disabled button saying why.</p>
+
+<h3>&sect;5 &mdash; THE <code>hexed</code> STATUS</h3>
+<p><b>&minus;15% damage dealt, battle-long</b> via the negative-duration convention. <b>In
+<code>DEBUFF_IDS</code></b> (a Survivalist's Trapper counts it), and therefore <b>out of the derived
+<code>_dispellable_buffs</code> set</b>, so a Mage's Dispel can never strip the party's own hundred
+gold of work back off &mdash; the rule CE set for <code>anathema</code> and <code>penance</code>.
+<b>Multiplicative with Cripple</b> rather than replacing it: separate statuses from separate sources,
+and stacking is the only reading that leaves neither silently free. Chip, log line and glossary entry
+on the usual pattern. <b>See &sect;0 for why it is not called <code>crippled</code>.</b></p>
+
+<h3>&sect;6 &mdash; FLAT POTIONS BECOME PERCENTAGES</h3>
+<ul>
+<li><b>Health Potion &mdash; 20% of maximum health.</b> <b>FLAGGED:</b> this is a <b>nerf at run
+start</b>, not a wash. Base class HP is 154/99/121/110, so 20% is <b>31/20/24/22</b> against the old
+flat 40 &mdash; it only overtakes 40 once maximum HP passes 200. Shipped as &sect;6 specified; the
+figure is flagged because &sect;6 was careful to keep the Bomb and Mana openings unchanged and did
+not say the same for this one.</li>
+<li><b>Mana Potion &mdash; 40% of maximum resource. FLAGGED, as &sect;6 asked.</b> Base
+<code>max_resource</code> is 100, so 40% <b>is</b> the old flat 40 exactly. A run opens unchanged.</li>
+<li><b>Bomb &mdash; 50 base, +2% per combat win</b>, the heroes' own rate. A run opens unchanged.</li>
+<li><b>Revive and Defense are untouched</b>, as instructed.</li>
+</ul>
+<p>Battle and map both call the same <code>Run</code> helpers now rather than each spelling out a
+literal &mdash; which is what "<code>Run.ITEM_INFO</code> stays the single place these numbers are
+written" has to mean in practice.</p>
+
+<h3>&sect;7 &mdash; EVERYTHING ELSE THAT TOUCHES ITEMS</h3>
+<ul>
+<li><b>The <code>item</code> and <code>random_item</code> event verbs bypassed <code>add_item</code>
+entirely</b> and wrote <code>items[id]</code> directly &mdash; so <b>Batch AN's per-type cap was
+already leaking through every event grant</b>, before this batch. Both now route through
+<code>Run</code>. <b>A negative count is a take and still writes directly</b>, because a removal has
+no cap and <b>must not free the slot</b>.</li>
+<li><b>Spoiled Stores</b> (removes two potions) works unchanged and no longer risks freeing a slot.</li>
+<li><b>Waystone Shard and Packmother's Satchel cannot overflow the opening</b> &mdash; every type
+they grant is already in the opening four. <code>new_run</code> routes them through
+<code>add_item</code> anyway, so a future relic is refused visibly rather than silently widening the
+pouch. <b>Asserted per relic in <code>check_ct.gd</code>.</b></li>
+<li><b>Gravelight Lantern</b>'s extra consumable goes down the same three-way split as any drop.</li>
+<li><b><code>run_sim.gd</code> carried a hand-copied mirror of <code>ITEM_PRICES</code></b>, which
+would have been a <b>missing-key crash in every sim run</b> the moment three ids were added &mdash;
+a crash no parse gate can see. <b><code>ITEM_PRICES</code> and <code>SELL_FRACTION</code> now live in
+<code>run_state.gd</code></b> beside <code>ITEM_INFO</code> and the stack caps, read at runtime by
+both the shop and the sim off the run node each already holds.
+<br><b>THE FIRST ATTEMPT AT THIS WAS WORSE THAN THE DUPLICATION AND IS WORTH RECORDING.</b> The mirror
+was replaced with <code>preload("res://scripts/shop_screen.gd").ITEM_PRICES</code> &mdash; but that
+file names the <code>Run</code> <b>autoload at compile time</b>, and autoloads are not registered when
+a <code>--script</code> SceneTree compiles its dependency chain. The preload failed with
+<code>Identifier not found: Run</code> and took <b><code>test_run_harness.gd</code></b> down with it.
+<b>The battery still printed GATE 1/2/3 PASS.</b> The only tells were <code>throws=3</code> beside
+them and <b>GATE 2 reporting 57 checks against its documented 165</b> &mdash; it ran a third of itself
+and said PASS. Caught by reading the throw count and the live counts together, which is precisely what
+both were put there for. The sim also respects the slot cap, or its restock loop would pay for
+types it could never receive. Its <b>drop policy is stated rather than implied: it DECLINES</b> a
+drop that would need a slot it has not got &mdash; the conservative legal answer, so the sim's item
+economy is a floor on the real thing &mdash; and <b>the declines are counted and printed</b>
+(<code>drops declined for want of a slot</code>, measuring <b>1.3/run</b> at balanced routing), because
+an unreported cap reads as "everything landed".</li>
+<li><b>The shop's supplies column would have collided with the draft section</b> at eight types
+(row 8 ending at y=600 through a header at y=452). Re-pitched to 36/32; nothing else on the screen
+moved. Not flagged by the brief.</li>
+<li><code>LOOT_POOL</code> gains <code>cleanse</code> at a light weight. <b>Starting gold, the five
+old prices and per-fight gold are unchanged.</b></li>
+</ul>
+
+<h3>&sect;8 &mdash; THE GATES</h3>
+<p><b><code>check_ct.gd</code> &mdash; 113 checks, 0 failures.</b> Drives each new item through the
+real <code>_use_item</code> on live units in a spawned battle (emitting
+<code>_target_picked</code> from the test side to walk a path that normally needs a mouse), rather
+than re-implementing the effects beside them. <b>It also round-trips a real v10 save to prove the
+tolerance this entry claims</b> &mdash; writing one, loading it, and asserting the pouch survives and
+the offer queue comes back empty. That test touches the player's actual
+<code>user://run_save.bin</code>, so it <b>backs up any real save and restores it</b>: a gate that eats
+an in-progress run to prove a point about migrations is a worse bug than the one it is testing.
+<b>Proven to bite</b>: breaking the Visage's duration produced 3 failures, breaking
+<code>discard_item</code> produced 4, raising the save-refusal floor to 11 produced 3.</p>
+<p><b><code>check_ct_map.tscn</code> &mdash; 83 checks, 0 failures.</b> Renders the pouch <b>full and
+empty</b> at 4, 5 and 6 slots and asserts every drawn rect lies inside the 1280-wide viewport; then
+renders the <b>shop</b> and asserts its eight supply rows end above the draft header, and that a
+Sell takes <b>two</b> presses. <b>Proven to bite</b>: 3 failures at the brief's claimed pouch pitch
+(rightmost edge x=1452), 2 more at the old shop pitch (supplies ending at y=488 through a header at
+y=452).</p>
+<p><b>THE GLOSSARY GREW BY TWO, AND THE THREE ENTRIES THAT DID NOT EARN THEIR PLACE WERE
+DELETED.</b> <code>test_batch_ce</code> pins the glossary's entry count <b>deliberately</b> — its
+comment says growth "should have to be stated rather than absorbed" — so the pin was <b>bumped with a
+reason, not loosened</b>. CT adds <b><code>status_hexed</code></b> (a chip on the board a player has
+nowhere else to learn, and one they must not confuse with Cripple's) and <b><code>pouch_slots</code></b>
+(a system, which is what that category holds, whose two load-bearing rules are invisible in play: an
+emptied stack keeps its slot, and a drop with no room is an offer rather than a refusal). <b>Per-item
+entries for the Cleansing Draught, Cursed Visage and Resonating Hourglass were written and then
+deleted</b> — each is fully described by its own tooltip, the category has never held a per-item entry
+(there is no <code>item_health</code>), and three of eight items is a worse state than none. What they
+taught that a tooltip cannot — shop-only, and the stack caps — is folded into
+<code>pouch_slots</code>.</p>
+<p><b>THE v11 BUMP BROKE TWO SUITES THAT PINNED THE LITERAL, AND THIS IS THE THIRD TIME.</b>
+<code>test_batch_bl</code> asserted <code>"version": 10</code> and <code>test_batch_bm</code>
+asserted <code>v10</code> exactly. <b><code>test_batch_bk</code> already learned this</b> — BL broke
+BK's pinned <code>8</code>, and BK's §6 was re-pointed to "8 or later" with a comment saying "so the
+next bump does not fail a map test either". BK passed this batch; the other two did not.
+<b>Both re-pointed IN PLACE on that precedent</b>, to the invariant each actually owns: BL's is that
+the recap ledgers are in the save (now "9 or later"), BM's is that the party and its equipped talents
+are in the save and a pre-v10 save is refused (now "10 or later"). <b>Neither suite owns the newest
+version number, and neither should assert it.</b></p>
+<p><b>A THIRD suite, <code>test_batch_bx</code>, pinned the SOURCE TEXT of a guard this batch
+split in two.</b> §3's chaining needed <code>_maybe_open_party_draft</code>'s single
+<code>if Run.sim_run or _draft_columns().is_empty():</code> to become two guards, so the pouch's own
+owed pick could take the screen when the draft had nothing to offer. <b>The behaviour is
+identical</b> — a sim still returns before anything opens. Re-pointed to the invariant BX owns, and
+<b>SCOPED to the function body</b>, which makes it strictly stronger than the global
+<code>contains</code> it replaces: <code>map_screen.gd</code> holds two
+<code>if Run.sim_run:</code> lines, and the old form would have passed on either.</p>
+<p>Parse verified by <b>grepping the engine's stderr for <code>Parse Error</code></b>, never a tally
+&mdash; Batch CN's scar. Headless runs complete at <b>100%</b> with <b>0 script errors</b>, and both
+new gates are registered in <code>run_battery.sh</code>.</p>
+
 <h2>2026-08-19 &mdash; Batch CS: THE SHARPSHOOTER'S BASIC BECOMES A SEQUENCE</h2>
 <p><i>His basic attack runs a <b>multi-press skill check that grows with Focus</b>, resolves with
 <b>partial credit</b>, and pays in <b>Focus rather than damage</b>. It is the first thing to use
