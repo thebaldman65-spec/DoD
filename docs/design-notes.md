@@ -4051,3 +4051,70 @@ text today. And the Perfect biconditional is not a biconditional: the half that 
 holds at zero violations, and the converse has been false since long before the batch that
 supposedly caused it. Naming the five exceptions is worth more than enforcing a rule the corpus
 never followed.
+
+## Batch CS — a sequence that grows without getting harder
+
+The Sharpshooter's basic attack is the action he presses more than any other, and it is now the
+only ability in the game that runs more than one timing window. Everything difficult about this
+batch follows from that one sentence: a mechanic that scales with a meter, attached to the button
+a player hits most, is exactly where a scaling difficulty curve does the most damage.
+
+The cap at four presses is the whole design, not a rounding. Focus has no ceiling by deliberate
+choice — the spec's identity is that patience keeps paying — so "one press per 50 Focus" with no
+cap makes 400 Focus a nine-press sequence with a tightening window. That is not a hard ability;
+it is an ability a player without the reflexes cannot use at all, on the attack they press most,
+and losing access to your basic attack because you played your class well is the failure that
+sank timed hits in Legend of Dragoon and Mother 3. The cap is recorded in three places with its
+reason attached, because a later batch reading "four" without the reason will read it as
+arbitrary and raise it.
+
+The harder half was §4: each press must be narrower than the one before, and the whole sequence
+must be about as hard to land at four presses as at one. Those pull in opposite directions, and
+the resolution is that the OPENING window widens as the count rises. What made that a real
+decision rather than a slider is that **nothing in the project can measure it.** The bot never
+runs the bar — it rolls a grade off fixed probabilities — so no sim, no battery run and no
+telemetry can tell whether a four-press sequence is actually as achievable as a one-press cast.
+The number had to come from a model, so the model is written down: difficulty is time inside the
+window, which is the standing rule the profiles were already authored to; a player's timing error
+is roughly Gaussian; a press's risk is that Gaussian's tail outside the window and a sequence's
+risk is the sum of its presses'. Under it, holding the total risk flat costs a 1.86x opening
+window at four presses rather than the 4x a naive reading suggests, because the tail is steep.
+The gate re-derives the table from the constants rather than trusting it, so a hand-edited row
+cannot pass silently — but the assumption underneath is a guess about human reflexes, and it is
+flagged as one.
+
+The Perfect window deliberately does not widen with the press count, and that is where §3 and §4
+would have quietly contradicted each other. §3 says damage resolves off the first press so that
+deep Focus makes him ramp faster rather than hit harder per swing. §4 says the opening window
+widens with the count. Apply the widening to the Perfect window too and the first press — the one
+that sets the damage — becomes easier to Perfect the deeper his meter runs, which is precisely
+the damage increase §3 exists to prevent. Only the Good window widens, because "landing the
+sequence" is defined in terms of Good or better, and that is what the constant-difficulty rule is
+about.
+
+Partial credit replaced the worst-grade combine rather than joining it. CN shipped multi-press as
+a parameter with a placeholder rule — the set is worth its weakest press — and labelled it as a
+placeholder. Leaving both reachable would have been two answers to "what is a sequence worth",
+which is the shape of the `no_skill_check` scar: the flag and the criterion disagreed silently and
+a test passed by reading the wrong oracle. The combine and its ordering table are deleted.
+
+Two things in the brief did not match the repo and are reported rather than silently obeyed. The
+brief describes the full-sequence bonus as "the Perfect bonus, +20 Focus"; Quick Shot's actual
+Perfect bonus is +10 Mana, and +20 Focus belongs to Aimed Shot. Since Quick Shot is a protected
+core the Beastmaster and the Survivalist also carry, changing its Perfect bonus would have
+changed two other specs' basics, so the +20 was implemented as a named full-sequence bonus and
+Quick Shot's own Perfect was left alone. And the brief's flagged sentence — that a full four-press
+sequence should be worth meaningfully more than four single presses — only holds if the bonus is
+read against per-press Focus rather than against four separate one-press casts. Both readings are
+in the changelog for the designer to rule on.
+
+The gate is live because it has to be. The bot cannot press a bar, so partial credit, the
+tapering windows and the tell are exercised nowhere in the existing battery; `check_cs.gd` spawns
+a real battle, drives the Sharpshooter's bar by hand at every press count the design allows, and
+measures what the sequence actually paid. It was then broken on purpose five ways — the cap
+raised, the per-press figure moved, partial credit removed, the Perfect window widened with the
+count, the widening table flattened — and it caught four. The fifth, moving the per-press Focus
+figure, passed clean, because every payout assertion was written in terms of the constant and so
+followed it. That gap is the reason the payout numbers are now pinned to the values the
+documentation quotes: a figure flagged as the designer's to move is exactly the figure that must
+not move without the documents that quote it moving too.

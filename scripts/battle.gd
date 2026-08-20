@@ -28,15 +28,99 @@ const BASIC_DELAY := 2.0
 #                              which is deliberate — CO is where an off-centre
 #                              bar becomes a spec's identity.
 #   sweep_time               — seconds for one end-to-end pass of the marker
-#   presses                  — how many windows must be landed (see
-#                              `_run_skill_check` for how the grades combine)
+#   presses                  — how many windows the sequence asks for (see
+#                              `_run_skill_check`; BATCH CS replaced CN's
+#                              worst-grade combine with partial credit)
+#   press_taper              — BATCH CS §4: each press's windows are this
+#                              fraction of the previous press's. 1.0 is the
+#                              default and it is the NO-OP — every press the
+#                              same width, which is what a one-press check
+#                              means and what every non-Sharpshooter bar runs.
 const SC_PROFILE_DEFAULT := {
 	"perfect_half": 0.045,
 	"good_half": 0.16,
 	"centre": 0.5,
 	"sweep_time": 0.72,
 	"presses": 1,
+	"press_taper": 1.0,
 }
+
+
+# ---------- BATCH CS — THE SHARPSHOOTER'S BASIC IS A SEQUENCE ----------
+#
+# §1 — HOW MANY PRESSES: one, plus one for every 50 Focus HELD AT THE MOMENT
+# THE BAR OPENS, capped at four.
+#
+#   0–49 → 1     50–99 → 2     100–149 → 3     150+ → 4 (THE CAP)
+#
+# **THE CAP IS THE POINT AND IT IS NOT A ROUNDING CHOICE.** Focus has no
+# ceiling (`FOCUS_UNCAPPED`), so an uncapped rule makes 400 Focus a nine-press
+# sequence with a tightening window on his most-used action — an ability a
+# player without the reflexes simply cannot use. That is the failure that sank
+# timed hits in Legend of Dragoon and Mother 3, and it would land on the attack
+# he presses most. **Four is the ceiling; Focus keeps climbing and the sequence
+# does not.** A later batch reading four as arbitrary and raising it is the
+# thing this paragraph exists to stop.
+const SS_SEQ_STEP := 50          # Focus per extra press
+const SS_SEQ_MAX_PRESSES := 4    # THE CAP (see above — do not raise it)
+
+# §3 — WHAT IT PAYS. Focus, not damage: his basic already carries its damage,
+# and the sequence feeds the meter his whole spec runs on, so a deep sequence
+# drives Focus deep faster. Focus converts to crit CHANCE and then to crit
+# MULTIPLIER (`unit.focus_crit_chance` / `focus_crit_mult`), so the damage
+# increase arrives THROUGH the meter rather than beside it.
+#
+# **FLAGGED, NOT TUNED — `SS_SEQ_FOCUS_PER_PRESS` IS THE DESIGNER'S NUMBER.**
+# At 8 a full four-press sequence pays 32 + 20 = 52 Focus against a single
+# press's 8 + 20 = 28 — 1.9x — and with the passive's own +20 for a same-target
+# shot on top of both, the WHOLE TURN is 72 Focus at 150 against 48 at 0, which
+# is 1.5x. The ramp rewarding itself, which is §3's stated intent, and the
+# figure to move if it reads hot in play.
+const SS_SEQ_FOCUS_PER_PRESS := 8
+# The full-sequence bonus: EVERY press landed, at any press count. A partial
+# sequence pays its per-press Focus and no bonus.
+const SS_SEQ_FULL_BONUS := 20
+
+# §4 — THE WINDOW TIGHTENS, BUT THE SEQUENCE DOES NOT GET HARDER.
+#
+# THE MODEL, WRITTEN DOWN BECAUSE NOTHING IN THIS PROJECT CAN MEASURE IT.
+# CLAUDE.md already records the reason: **the bot never runs the bar** — it
+# rolls a grade off fixed probabilities — so a widened window is invisible to
+# every instrument the repo owns. These numbers therefore come from a stated
+# model rather than from play data, and the model is the thing to argue with:
+#
+#   · Difficulty is TIME IN THE WINDOW, `half * sweep_time` seconds, which is
+#     CN's own standing rule ("the window is authored as a FRACTION OF SWEEP
+#     TIME") read as an equation.
+#   · The player's timing error is Gaussian with SD ~60 ms. That single
+#     assumption is what makes a modest widening buy a large drop in risk:
+#     near-misses cluster at the window's edge, so the tail is steep.
+#   · A press's miss-risk is that Gaussian's tail outside the Good window, and
+#     the SEQUENCE's risk is the sum of its presses'. Holding that sum constant
+#     is exactly §4's demand that "a four-press sequence must not be four times
+#     as likely to break as a one-press cast".
+#
+# `SS_SEQ_OPEN[n - 1]` is the widening applied to the FIRST press's Good window
+# of an n-press sequence, solved from that model. Under it the whole sequence
+# lands 89.7% / 90.0% / 90.0% / 90.0% of the time at one, two, three and four
+# presses — constant, which is the section's whole requirement.
+const SS_SEQ_OPEN := [1.0, 1.307, 1.574, 1.861]
+# Each press's windows are 85% of the previous press's, so the sequence has a
+# SHAPE rather than being one press repeated. At four presses the Good half
+# runs 0.350 → 0.298 → 0.253 → 0.215.
+const SS_SEQ_TAPER := 0.85
+# **HIS EXCEPTION IS A FIXED OFFSET, NOT A SLOPE.** The Sharpshooter's bar is
+# the one sanctioned spec-level exception to "vary the character, hold the
+# difficulty constant": his is meant to be harder and to pay more. It is 15%
+# less timing tolerance than everybody else's — the SAME 15% at one press and
+# at four, so he is harder than everyone else rather than harder the better he
+# plays. Applied against `SC_PROFILE_DEFAULT` rather than baked into a literal,
+# so it stays an offset FROM the default if a later batch moves the default.
+const SS_SEQ_OFFSET := 0.85
+# And a faster sweep, which is the "vary the character" half: his bar reads as
+# a snappier instrument. Because difficulty is time-in-window, a quicker sweep
+# is paid for with proportionally WIDER zones and the difficulty does not move.
+const SS_SEQ_SWEEP := 0.52
 
 # Ability hotkeys, mapped to ability slots in kit order (shown on the
 # buttons). Batch AH: there is no cap on how many abilities a hero holds,
@@ -705,6 +789,23 @@ var sc_profile: Dictionary = SC_PROFILE_DEFAULT
 # player would be aiming at a lie.
 var sc_good_zone: ColorRect
 var sc_perfect_zone: ColorRect
+# BATCH CS §2 — WHAT THE SEQUENCE EARNED, WRITTEN BY THE BAR THAT JUST RAN.
+#
+# `_run_skill_check` returns a GRADE and the sequence needs a second answer —
+# how many presses landed — so one of the two has to travel another way. It is
+# a member rather than a changed return type because the function has three
+# call sites and only one of them is a sequence: widening the return to a
+# Dictionary would make the defensive brace and every ordinary cast pay for a
+# feature neither has.
+#
+# **IT CANNOT GO STALE, AND THAT IS BUILT RATHER THAN REMEMBERED.** It is
+# cleared at the top of every `_hero_turn` grade attempt and written by
+# whichever branch produced the grade — the bar, the bot's roll, or neither.
+# An empty dictionary means NO SEQUENCE RAN, which is what the no-bar branch
+# leaves behind and the one honest answer there.
+#   presses — how many the bar asked for      landed — how many were landed
+#   full    — every press landed
+var sc_sequence: Dictionary = {}
 
 
 func _ready() -> void:
@@ -1717,6 +1818,11 @@ func _apply_sc_profile(profile: Dictionary) -> void:
 	prof["centre"] = clampf(float(prof["centre"]), 0.0, 1.0)
 	prof["sweep_time"] = maxf(float(prof["sweep_time"]), 0.05)
 	prof["presses"] = maxi(int(prof["presses"]), 1)
+	# BATCH CS §4 — the taper narrows; it may not widen and it may not collapse
+	# the window to nothing. Clamped here for the same reason `centre` is: an
+	# authored profile is the caller's business, a window drawn off the track
+	# or shrunk to zero is this function's.
+	prof["press_taper"] = clampf(float(prof["press_taper"]), 0.2, 1.0)
 	sc_profile = prof
 	var centre := float(prof["centre"])
 	for pair in [[sc_good_zone, float(prof["good_half"])],
@@ -3485,6 +3591,13 @@ func _player_turn(u: BattleUnit) -> void:
 			# CO replaces this bar with a multi-press check; removing it here
 			# and restoring it there would be churn on the one basic attack that
 			# matters most.
+			# BATCH CS — AND THE SEQUENCE IS DECIDED HERE, ABOVE ALL THREE
+			# BRANCHES, so the bot and the player read the same press count off
+			# the same Focus at the same instant. `sc_sequence` is cleared for
+			# every attempt: the no-bar branch below leaves it empty, which is
+			# the honest answer to "what did the sequence earn" when none ran.
+			sc_sequence = {}
+			var ss_seq: bool = _is_sharpshooter_basic(u, ab)
 			if not ab.runs_skill_check() \
 					or (ab == u.abilities[0] and u.passive_id != "lethal_aim"):
 				grade = "good"
@@ -3496,14 +3609,43 @@ func _player_turn(u: BattleUnit) -> void:
 				# bot Sloppy on one of §1's five loses the same cast a player's
 				# does. Without that the bot would play a strictly easier game
 				# than the player on exactly the five most decisive abilities.
-				var roll := randf()
-				grade = "perfect" if roll < 0.20 else ("fail" if roll > 0.85 else "good")
+				#
+				# BATCH CS §5 — THE BOT GETS A SEQUENCE ROLL, AND IT IS THE ONLY
+				# WAY THIS BATCH REACHES THE SIM AT ALL. The bot never runs the
+				# bar; it rolls a grade off these fixed probabilities and is
+				# blind to every window this batch widens. Left at one roll, a
+				# simulated Sharpshooter never earns the sequence Focus, his ramp
+				# reads far weaker than it is, and the sim is the only thing that
+				# plays him at volume. Roll per press, STOP AT THE FIRST FAILURE,
+				# and apply partial credit exactly as the bar does.
+				#
+				# AT ONE PRESS THIS IS THE OLD LINE EXACTLY — one `randf()`, the
+				# same two thresholds — so every other hero's roll and the RNG
+				# stream behind it are untouched.
+				var seq_presses: int = _sequence_presses(u) if ss_seq else 1
+				var seq_landed := 0
+				grade = "fail"
+				for i in seq_presses:
+					var roll := randf()
+					var one := "perfect" if roll < 0.20 else ("fail" if roll > 0.85 else "good")
+					if i == 0:
+						grade = one
+					if one == "fail":
+						break
+					seq_landed += 1
+				sc_sequence = {"presses": seq_presses, "landed": seq_landed,
+					"full": seq_landed >= seq_presses}
 				break
 			# Auto-cast abilities (no target click) can cancel during the skill check.
 			# BATCH CM §1 — the bar is told WHICH KIND of cast it is grading, so the
 			# stakes are on screen at the moment of the press. It is not told which
 			# ABILITY: the grader stays argument-free and the gate is tested here.
-			grade = await _run_skill_check(true, "gated" if ab.gated else "")
+			#
+			# BATCH CS §1 — AND THE PROFILE IS BUILT NOW, from Focus held AT THE
+			# MOMENT THE BAR OPENS. Reading it any earlier would price the
+			# sequence off a meter the targeting step could still have moved.
+			grade = await _run_skill_check(true, "gated" if ab.gated else "",
+				_sharpshooter_basic_profile(u) if ss_seq else {})
 			if grade != "cancel":
 				break
 		# Cancelled: back to the action bar to pick something else.
@@ -3544,6 +3686,14 @@ func _player_turn(u: BattleUnit) -> void:
 		await _gated_failure(u, ab)
 	else:
 		await _resolve(u, ab, target, grade)
+	# BATCH CS §3 — THE SEQUENCE PAYS, AND IT PAYS AFTER `_resolve` FOR A REASON
+	# THE FOCUS ENGINE MAKES CONCRETE. `_sharpshooter_focus` runs inside
+	# `_resolve`, and on a TARGET SWITCH it dumps the meter to zero. Pay the
+	# sequence before that and a player who lands four presses on a new mark
+	# watches every point he just earned deleted by the same shot that earned
+	# it. After the engine, the switch has already been paid for and what the
+	# sequence bought survives it.
+	_pay_sequence_focus(u, ab)
 	# ---- BATCH BM §2: the two row-8 nodes that fire when a hero's turn ENDS ----
 	# PRACTISED HANDS (Survivalist, Guerilla row 8): the COUNT of actions
 	# becomes the weapon. Improvised pays for his first two; this pays for
@@ -19417,6 +19567,107 @@ func _focus_cap(u: BattleUnit) -> int:
 	return FOCUS_UNCAPPED
 
 
+# ---------- BATCH CS — THE SHARPSHOOTER'S BASIC-ATTACK SEQUENCE ----------
+
+# THE ONE ANSWER TO "IS THIS THE SEQUENCE", asked by all three grade branches
+# and by the payout, so none of them can decide it differently.
+#
+# IT IS READ OFF THE HERO AND OFF SLOT 0, NOT OFF A NAME — CN's rule, and the
+# reason is unchanged: his basic IS Quick Shot, the same object the Beastmaster
+# and the Survivalist carry (`Classes.PROTECTED_CORES`), so there is no card to
+# flag and the question has to be asked of the caster. **THIS APPLIES TO HIS
+# BASIC ATTACK ONLY. No other ability of his changes.**
+func _is_sharpshooter_basic(u: BattleUnit, ab: Ability) -> bool:
+	return u != null and ab != null and u.passive_id == "lethal_aim" \
+		and not u.abilities.is_empty() and ab == u.abilities[0]
+
+
+# §1 — ONE PRESS, PLUS ONE FOR EVERY 50 FOCUS HELD, CAPPED AT FOUR.
+#
+#   0–49 → 1     50–99 → 2     100–149 → 3     150+ → 4
+#
+# THE CAP IS THE POINT (see `SS_SEQ_MAX_PRESSES`). Read at the moment the bar
+# opens, from Focus held at that instant.
+func _sequence_presses(u: BattleUnit) -> int:
+	if u == null or u.second_resource_name != "Focus":
+		return 1
+	return clampi(1 + int(u.second_resource / SS_SEQ_STEP), 1, SS_SEQ_MAX_PRESSES)
+
+
+# §1/§4 — THE PROFILE HIS BASIC HANDS THE BAR.
+#
+# **THE OFFSET IS TAKEN AGAINST `SC_PROFILE_DEFAULT` RATHER THAN WRITTEN AS A
+# LITERAL**, so it stays an offset FROM everyone else's bar if a later batch
+# moves the default — which is what "a fixed offset, not a slope" has to mean
+# structurally rather than as a note. `scale` converts the default's tolerance
+# in SECONDS into a half-width on his faster sweep, then takes his 15%:
+#
+#     half = default_half * default_sweep * OFFSET / his_sweep
+#
+# so `half * his_sweep` is exactly 0.85 of `default_half * default_sweep` — the
+# same time in the window, at every press count.
+#
+# ONLY THE GOOD WINDOW WIDENS WITH THE PRESS COUNT. §4's constant difficulty is
+# about LANDING the sequence, and §2 defines "landed" as Good or better, so the
+# Good window is the one the rule is about. **The Perfect window is deliberately
+# held fixed**, because the first press's Perfect is what sets the damage and §3
+# is explicit that a deep-Focus Sharpshooter should ramp faster and NOT hit
+# harder per swing. Widen it with the count and depth would buy damage directly,
+# beside the meter instead of through it.
+func _sharpshooter_basic_profile(u: BattleUnit) -> Dictionary:
+	var presses := _sequence_presses(u)
+	var scale: float = float(SC_PROFILE_DEFAULT["sweep_time"]) \
+		* SS_SEQ_OFFSET / SS_SEQ_SWEEP
+	var open_widen: float = float(SS_SEQ_OPEN[presses - 1])
+	return {
+		"perfect_half": float(SC_PROFILE_DEFAULT["perfect_half"]) * scale,
+		"good_half": float(SC_PROFILE_DEFAULT["good_half"]) * scale * open_widen,
+		"centre": float(SC_PROFILE_DEFAULT["centre"]),
+		"sweep_time": SS_SEQ_SWEEP,
+		"presses": presses,
+		"press_taper": SS_SEQ_TAPER,
+	}
+
+
+# §3 — WHAT THE SEQUENCE PAID, AND IT IS FOCUS RATHER THAN DAMAGE.
+#
+# Each landed press grants `SS_SEQ_FOCUS_PER_PRESS`; a FULL sequence — every
+# press landed — grants `SS_SEQ_FULL_BONUS` on top. A partial grants its
+# per-press Focus and no bonus, which is §2's partial credit read into the
+# payout: the presses he landed are worth what they were worth.
+#
+# **IT PAYS OFF `sc_sequence` AND NOTHING ELSE.** An EMPTY dictionary means no
+# bar and no bot roll produced a sequence this turn, and it pays nothing — the
+# state the no-bar branch leaves behind, and the one honest answer there.
+#
+# **`_gain_focus` IS THE ONLY WAY IN**, so Spray of Arrows' 50-point ceiling,
+# the conversion-point signature and the deepest-Focus ledger all see this Focus
+# exactly as they see the engine's. A second write site would be a second set of
+# rules for the same meter.
+func _pay_sequence_focus(u: BattleUnit, ab: Ability) -> void:
+	if not _is_sharpshooter_basic(u, ab) or u.dead or sc_sequence.is_empty():
+		return
+	var landed := int(sc_sequence.get("landed", 0))
+	var presses := int(sc_sequence.get("presses", 0))
+	if landed <= 0:
+		if presses > 1:
+			_log("   → The chain broke on the first shot — no Focus from the sequence",
+				"#909090")
+		return
+	var gain := landed * SS_SEQ_FOCUS_PER_PRESS
+	var full: bool = bool(sc_sequence.get("full", false))
+	if full:
+		gain += SS_SEQ_FULL_BONUS
+	_gain_focus(u, gain)
+	if full:
+		_log("   → The sequence holds — %d of %d, +%d Focus (%d + the %d full-sequence bonus)" % [
+			landed, presses, gain, landed * SS_SEQ_FOCUS_PER_PRESS,
+			SS_SEQ_FULL_BONUS], "#a0d060")
+	else:
+		_log("   → The chain broke at %d of %d — the %d shot%s already landed still pay: +%d Focus" % [
+			landed, presses, landed, "" if landed == 1 else "s", gain], "#e0a050")
+
+
 # THE BOT'S MARK (Batch AZ §7), the AX `_ruin_focus` shape. A Sharpshooter
 # aims everything he casts at the enemy he is already working, and gives it up
 # only when it is dead — the ONE answer to "who is he shooting", so no pick in
@@ -19984,12 +20235,17 @@ func _apply_perfect_bonus(attacker: BattleUnit, target: BattleUnit, ab: Ability,
 # numbers and the zone rects from it before the marker moves.
 #
 # PRESSES: a profile asking for more than one window runs the sweep that many
-# times and RETURNS THE WORST GRADE OF THE SET — "how many windows must be
-# landed" read literally, so three Perfects are a Perfect and one Sloppy among
-# them is a Sloppy. Nothing in this batch asks for more than one; CO's
-# Sharpshooter basic is the first. A cancel on ANY press cancels the whole
-# check rather than the press, because a player who has decided not to cast is
-# not asking to skip a repetition.
+# times, STOPS AT THE FIRST MISS, and RETURNS THE FIRST PRESS'S GRADE — how
+# many landed travels back in `sc_sequence`. A cancel on ANY press cancels the
+# whole check rather than the press, because a player who has decided not to
+# cast is not asking to skip a repetition.
+#
+# BATCH CS §2 — AND THIS REPLACES CN's WORST-GRADE COMBINE, WHICH CN's OWN
+# COMMENT HERE CALLED A PLACEHOLDER. That note also said "CO's Sharpshooter
+# basic is the first" caller to ask for more than one press. **CO did not do
+# it** — CO was the recast refusal — and the Sharpshooter's basic arrives here
+# at CS instead. The bar was left on his basic at CN precisely so this batch
+# would not have to remove and restore it.
 # BATCH CQ §1 — "IS THERE ANYBODY THERE TO PRESS?", ASKED IN ONE PLACE.
 #
 # Every await in this file that waits on a HUMAN — the two orientation cards
@@ -20080,23 +20336,73 @@ func _run_skill_check(cancellable := false, mode := "",
 		sc_cancel.position = Vector2(358, 15)
 		sc_cancel.pressed.connect(_cancel_skill_check)
 		sc_root.add_child(sc_cancel)
-	# ONE ITERATION AT THE DEFAULT, AND THE LOOP IS WRITTEN SO THAT IT SHOWS.
-	# `presses` is 1 everywhere in this batch, so this runs the same single
-	# sweep the function has always run, resets the same two variables in the
-	# same order, and awaits the same signal — the multi-press path adds no
-	# statement to the single-press one beyond a comparison that cannot change
-	# its answer.
+	# BATCH CS §2 — PARTIAL CREDIT, AND IT REPLACES CN's COMBINE RATHER THAN
+	# SITTING BESIDE IT. **EACH LANDED PRESS COUNTS; A MISS ENDS THE SEQUENCE
+	# AND KEEPS EVERYTHING EARNED BEFORE IT** — Shadow Hearts' rule, and the
+	# difference between an involved check and a punishing one. A four-press
+	# attempt that misses on the second is worth ONE press, not zero.
+	#
+	# CN's default returned the WORST GRADE OF THE SET, which was a placeholder
+	# it labelled as one. **BOTH BEHAVIOURS ARE NOT LEFT REACHABLE**: the
+	# combine and its `_GRADE_ORDER` table are deleted rather than kept for a
+	# caller that might want the harsh reading, because two answers to "what is
+	# a sequence worth" is how they disagree silently — the scar `no_skill_check`
+	# left at CQ §5.
+	#
+	# "LANDED" MEANS GOOD OR BETTER. A Sloppy is the miss that ends it.
+	#
+	# **THE GRADE THIS FUNCTION RETURNS IS THE FIRST PRESS'S**, because §3 keeps
+	# the change confined to the meter: damage resolves exactly as a single-press
+	# basic's does today and presses two through four add none. What the rest of
+	# the sequence bought is Focus, and it is paid by the caller off `sc_sequence`.
 	var presses := maxi(int(sc_profile["presses"]), 1)
-	var grade := "perfect"
+	# §4's taper is applied per press from the OPENING widths, not compounded off
+	# whatever the last press left behind, so press i is always taper^i of the
+	# profile the caller authored.
+	var seq_base := sc_profile.duplicate()
+	var base_good := float(seq_base["good_half"])
+	var base_perfect := float(seq_base["perfect_half"])
+	# The top line is RESTORED rather than rebuilt, tint included. Only the
+	# Sharpshooter's basic asks for more than one press today and its mode is
+	# "", so the tint is never set — but rebuilding it would mean a second copy
+	# of the `match mode` block above, and the two would drift the first time a
+	# gated ability ever ran a sequence.
+	var seq_hint := sc_hint.text
+	var seq_tint := sc_hint.has_theme_color_override("font_color")
+	var seq_color := sc_hint.get_theme_color("font_color")
+	var grade := "fail"
+	var landed := 0
+	var cancelled := false
+	sc_sequence = {"presses": presses, "landed": 0, "full": false}
 	for i in presses:
+		if presses > 1:
+			_apply_press_window(seq_base, base_good, base_perfect, i)
+			# §6 — THE TELL, ON THE BAR ITSELF, WHICH IS CM's GATED TELL APPLIED
+			# TO A DIFFERENT STAKE. A player who does not know a fourth press is
+			# coming cannot plan for it, so the count is on screen BEFORE the
+			# first press sweeps; and the live press is named on every one of
+			# them. The first press says what it is FOR — it is the one that
+			# sets the damage, and nothing else on screen says so.
+			sc_hint.text = "SHOT %d OF %d  —  %s" % [i + 1, presses,
+				"THIS ONE SETS THE DAMAGE" if i == 0 else "KEEP THE CHAIN"]
+			sc_hint.add_theme_color_override("font_color",
+				Color(0.65, 0.90, 0.55))
 		sc_pos = 0.0
 		sc_dir = 1.0
 		sc_active = true
 		var one: String = await _skill_done
 		if one == "cancel":
-			grade = "cancel"
+			cancelled = true
 			break
-		grade = _worse_grade(grade, one)
+		if i == 0:
+			grade = one
+		if one == "fail":
+			# THE SEQUENCE ENDS HERE AND READS AS ENDED. A bar that simply
+			# stopped would read as dropped input, which is the one way a check
+			# the player DID press can feel like a bug.
+			_sfx("click", -12.0, 0.55)
+			break
+		landed += 1
 		# The running tally, and only when there IS one to keep: a player being
 		# asked for three windows needs to know which one is coming, and a
 		# player being asked for one has a result line arriving in a moment.
@@ -20107,12 +20413,24 @@ func _run_skill_check(cancellable := false, mode := "",
 			_sfx("click", -12.0, 1.2)
 			await _wait(0.12)
 			sc_result.text = ""
+	sc_sequence["landed"] = landed
+	sc_sequence["full"] = landed >= presses
+	if presses > 1:
+		sc_hint.text = seq_hint
+		if seq_tint:
+			sc_hint.add_theme_color_override("font_color", seq_color)
+		else:
+			sc_hint.remove_theme_color_override("font_color")
 	if sc_cancel != null:
 		sc_cancel.queue_free()
 		sc_cancel = null
-	if grade == "cancel":
+	if cancelled:
+		# A cancel on ANY press cancels the whole check rather than the press: a
+		# player who has decided not to cast is not asking to skip a repetition.
+		# Nothing was earned, so nothing is reported as earned.
+		sc_sequence = {"presses": presses, "landed": 0, "full": false}
 		sc_root.visible = false
-		return grade
+		return "cancel"
 	match grade:
 		"perfect":
 			_sfx("perfect", -6.0)
@@ -20139,20 +20457,47 @@ func _run_skill_check(cancellable := false, mode := "",
 		elif mode == "defensive":
 			sc_result.text = "Braced"
 			sc_result.add_theme_color_override("font_color", Color(0.6, 0.85, 0.6))
+	# BATCH CS §6 — A FOURTH READING, AND IT IS A SEQUENCE'S READING RATHER THAN
+	# A MODE'S. It is keyed on `presses > 1` and not on a new `mode` string
+	# deliberately: at 0–49 Focus the Sharpshooter's basic IS a one-press check
+	# and should read as the ordinary bar it is, so the count is the honest
+	# condition. The line carries BOTH answers the sequence produced — how much
+	# of the chain was kept, and the first press's grade, which is the one that
+	# set the damage — because a player who sees only "2 / 4" cannot tell
+	# whether the shot that landed hit hard.
+	if presses > 1:
+		var first_word: String = {"perfect": "PERFECT", "good": "Good",
+			"fail": "Sloppy"}.get(grade, grade)
+		if landed >= presses:
+			sc_result.text = "FULL SEQUENCE %d / %d  —  %s" % [
+				landed, presses, first_word]
+			sc_result.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3))
+		else:
+			sc_result.text = "CHAIN BROKEN %d / %d  —  %s" % [
+				landed, presses, first_word]
+			sc_result.add_theme_color_override("font_color", Color(0.85, 0.55, 0.4))
 	await _wait(0.45)
 	sc_root.visible = false
 	return grade
 
 
-# BATCH CN §1 — THE MULTI-PRESS COMBINE, AND IT IS DELIBERATELY THE HARSH ONE.
-# "How many windows must be landed" means all of them, so the set is worth its
-# weakest press. Written as an ordering rather than a match on pairs so that a
-# fourth grade, if one is ever added, has one place to be ranked.
-const _GRADE_ORDER := {"fail": 0, "good": 1, "perfect": 2}
-
-
-func _worse_grade(a: String, b: String) -> String:
-	return a if _GRADE_ORDER.get(a, 0) <= _GRADE_ORDER.get(b, 0) else b
+# BATCH CS §4 — ONE PRESS'S WINDOWS, AND IT GOES THROUGH `_apply_sc_profile`
+# FOR THE REASON THAT FUNCTION EXISTS. The taper changes what the player is
+# aiming at, so it has to change what the grader measures on the same line of
+# execution — narrowing the rects here and leaving `sc_profile` alone would
+# make the bar a lie in the exact way CN built the single entry point to stop.
+#
+# `base_good` / `base_perfect` are the OPENING widths, so press i is taper^i of
+# what the caller authored rather than of whatever the last press left behind.
+# Compounding off the live profile would be the same numbers today and a
+# different bar the first time a press is ever re-run.
+func _apply_press_window(base: Dictionary, base_good: float,
+		base_perfect: float, index: int) -> void:
+	var shrink: float = pow(float(base["press_taper"]), float(index))
+	var prof := base.duplicate()
+	prof["good_half"] = base_good * shrink
+	prof["perfect_half"] = base_perfect * shrink
+	_apply_sc_profile(prof)
 
 
 func _cancel_skill_check() -> void:

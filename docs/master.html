@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-19 (Batch CR)</b></p>
+<p align="right"><b>Last updated: 2026-08-19 (Batch CS)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -359,14 +359,16 @@ going to act. <b>Hovering any individual ability re-sorts the bar with a gold "g
 portrait</b> showing where that cast would land your next turn. The ghost locks in when the
 ability is chosen and persists through targeting and the skill check.</p>
 <h3>4.2 Skill checks</h3>
-<p><b>There are three cases: the normal check, the gated check, and the defensive check. All
-three use the same bar, the same 0.72s sweep and the same zones</b> &mdash; a cursor sweeps
-0→1→0, stopped with <b>Spacebar or Left Click</b>.</p>
+<p><b>There are four cases: the normal check, the gated check, the defensive check, and the
+Sharpshooter's SEQUENCE. All four use the same bar and the same kind of zones</b> &mdash; a
+cursor sweeps 0→1→0, stopped with <b>Spacebar or Left Click</b>. The first three run one
+0.72s sweep; the sequence runs up to four faster ones.</p>
 <p><b>THE BAR IS PARAMETERIC.</b> The window half-widths, where the Perfect window sits, the
-sweep time, and how many windows must be landed are a <b>profile</b> handed to the check per
-cast, rather than constants. <b>One default profile is in force everywhere</b> &mdash; ±0.045
-Perfect, ±0.16 Good, centred at 0.5, 0.72s, one press &mdash; and it is the numbers in the
-table below. Nothing overrides it today.</p>
+sweep time, how many presses the check asks for, and how much each press narrows are a
+<b>profile</b> handed to the check per cast, rather than constants. <b>One default profile is in
+force everywhere but one ability</b> &mdash; ±0.045 Perfect, ±0.16 Good, centred at 0.5,
+0.72s, one press, no narrowing &mdash; and it is the numbers in the table below. <b>The
+Sharpshooter's basic attack is the only thing in the game that overrides it.</b></p>
 <p><b>THE NORMAL CHECK.</b> Every hero action runs one <b>except</b> the two classes of action
 below, which resolve at a fixed <b>Good</b>.</p>
 <ul>
@@ -376,7 +378,7 @@ because ×1.15 and ×0.6 would both resolve to nothing. <b>Healing abilities kee
 (a heal's magnitude is multiplied by the grade), and so does anything carrying <b>Break damage
 but no HP damage</b>. A <b>gated</b> ability always keeps its check.</li>
 <li><b>Basic attacks</b>, with one exception: the <b>Sharpshooter's</b> basic still runs its
-check.</li>
+check &mdash; and it runs the SEQUENCE below rather than an ordinary single press.</li>
 </ul>
 <table border="1" cellpadding="4">
 <tr><th>Grade</th><th>Zone (half-width around center)</th><th>Damage</th><th>BD</th><th>Extra</th></tr>
@@ -435,6 +437,56 @@ or parry rolls</b>, exactly as the offensive bar does not touch miss, parry or c
 multiplies what lands, after those resolve. <b>There is no Cancel button</b> — a hero cannot
 decline to be attacked. An attack on any other hero resolves with no bar and no pause. The sim
 bot rolls 20% Perfect and otherwise takes no mitigation.</p>
+<p><b>THE SEQUENCE &mdash; THE SHARPSHOOTER'S BASIC ATTACK, AND NOTHING ELSE IN THE GAME.</b>
+His basic runs a <b>multi-press check that grows with Focus</b>, resolves with <b>partial
+credit</b>, and pays in <b>Focus rather than damage</b>. No other ability of his changes.</p>
+<table border="1" cellpadding="4">
+<tr><th>Focus held when the bar opens</th><th>Presses</th></tr>
+<tr><td>0&ndash;49</td><td>1</td></tr>
+<tr><td>50&ndash;99</td><td>2</td></tr>
+<tr><td>100&ndash;149</td><td>3</td></tr>
+<tr><td>150+</td><td><b>4 &mdash; the cap</b></td></tr>
+</table>
+<p><b>THE CAP IS DELIBERATE AND IT IS NOT A ROUNDING CHOICE.</b> Focus has no ceiling, so an
+uncapped rule would make 400 Focus a nine-press sequence with a tightening window on his
+most-used action &mdash; an ability a player without the reflexes simply cannot use. Four is the
+ceiling; Focus keeps climbing and the sequence does not. The count is read <b>at the moment the
+bar opens</b>, from the Focus held at that instant.</p>
+<p><b>PARTIAL CREDIT: every landed press counts, and a miss ends the sequence while keeping
+everything earned before it.</b> A four-press attempt that misses on the second is worth
+<b>one</b> press, not zero. <b>&ldquo;Landed&rdquo; means Good or better</b> &mdash; a Sloppy is
+the miss that ends it.</p>
+<p><b>WHAT IT PAYS: Focus.</b> Each landed press grants <b>8 Focus</b>. A <b>full sequence</b>
+&mdash; every press landed &mdash; grants a further <b>20 Focus</b> on top; a partial grants its
+per-press Focus and no bonus. <b>Damage resolves off the FIRST press's grade</b>, exactly as a
+single-press basic does, and presses two through four add none. That keeps the change confined
+to the meter: <b>a deep-Focus Sharpshooter ramps faster, he does not hit harder per swing</b>
+&mdash; Focus already converts to crit chance and then to crit multiplier, so the damage
+increase arrives through the meter rather than beside it.</p>
+<table border="1" cellpadding="4">
+<tr><th>Presses</th><th>Full sequence</th><th>Broken after 1</th><th>Broken after 2</th><th>Broken after 3</th></tr>
+<tr><td>1</td><td>28 Focus</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+<tr><td>2</td><td>36 Focus</td><td>8</td><td>&mdash;</td><td>&mdash;</td></tr>
+<tr><td>3</td><td>44 Focus</td><td>8</td><td>16</td><td>&mdash;</td></tr>
+<tr><td>4</td><td>52 Focus</td><td>8</td><td>16</td><td>24</td></tr>
+</table>
+<p><b>THE WINDOW TIGHTENS, BUT THE SEQUENCE DOES NOT GET HARDER.</b> Each press is
+<b>85%</b> of the width of the one before it, so the sequence has a shape rather than being one
+press repeated &mdash; and the <b>opening window widens as the press count rises</b>, so that
+landing a full sequence is about as achievable at 150 Focus as at 0. Without that, playing a
+Sharpshooter well would make his basic progressively harder to use, which punishes the player
+for the thing the spec is built to do.</p>
+<p><b>His bar is the one sanctioned exception to &ldquo;vary the character, hold the difficulty
+constant&rdquo;: it is meant to be harder and to pay more. That exception is a FIXED OFFSET, not
+a slope</b> &mdash; <b>15% less timing tolerance than everybody else's, the same 15% at one
+press and at four.</b> Harder than everyone else's, not harder the better you play. His bar also
+sweeps faster (0.52s against 0.72s), which is what makes it feel like a different instrument;
+because difficulty is measured as time inside the window, the quicker sweep is paid for with
+proportionally wider zones and does not move the difficulty.</p>
+<p><b>The bar shows how many presses are coming before the first one, and names the live press
+throughout</b> (&ldquo;SHOT 2 OF 4&rdquo;), and a sequence that ends early says so
+(&ldquo;CHAIN BROKEN 2 / 4&rdquo;) rather than simply vanishing. The <b>sim bot</b> rolls its
+grade per press, stops at the first failure, and earns the same partial credit.</p>
 <p><b>Perfect bonuses buy RELIABILITY, not magnitude, wherever an ability already carries a
 chance roll.</b> On those the Perfect does not add damage or a hit — it removes the roll:
 Wildstrikes and Hack and Slash land their Bleed on every strike, Blizzard puts 2 stacks of
@@ -927,7 +979,10 @@ Pyromancer's Magic Bolt is reforged into <b>Fireball</b>, the Cryomancer's into
 <li><b>Cleric:</b> Smite — 22 holy / 16 BD / 2.0 (Perfect: self-heal 8; the Occultist's
 Smite is corrupted into <b>Shadowrend</b> — 25% Atk shadow, Cripples 2 turns; both
 perfects: the Cleric recovers 5% max health).</li>
-<li><b>Hunter:</b> Quick Shot — 20 dmg / 14 BD / 2.0 (Perfect: +10 Mana).</li>
+<li><b>Hunter:</b> Quick Shot — 20 dmg / 14 BD / 2.0 (Perfect: +10 Mana). In a
+<b>Sharpshooter's</b> hands only, this is the multi-press SEQUENCE of §4.2; the Beastmaster and
+the Survivalist carry the same card and it resolves at a fixed Good for them, as every other
+basic attack does.</li>
 </ul>
 
 <h2>6. Archetypes &amp; Specializations</h2>
@@ -1139,7 +1194,7 @@ not because the passive needs them.</p>
 <tr><td><b>Devout</b></td><td>3</td><td>Divine Shield, Consecrated Ground</td><td>Conviction builds only on Divine Shield absorbs, and the ground's drip is two thirds of all Faith.</td></tr>
 <tr><td><b>Occultist</b></td><td>3</td><td>Shadowrend, Hex of Ruin</td><td>Wrath of the Old Gods marks on debuffs he applies; these two are the debuffs he always holds.</td></tr>
 <tr><td><b>Beastmaster</b></td><td>3</td><td>All three summons</td><td>Pack Bond reads a living companion. With no summon there is no boon, no Loyalty and no passive at all. His five opening abilities cost three slots — the summons share one bar entry.</td></tr>
-<tr><td><b>Sharpshooter</b></td><td>3</td><td>Quick Shot</td><td>Lethal Aim counts consecutive single-target attacks; the free shot lets him stay on a mark every turn.</td></tr>
+<tr><td><b>Sharpshooter</b></td><td>3</td><td>Quick Shot</td><td>Lethal Aim counts consecutive single-target attacks; the free shot lets him stay on a mark every turn — and his Quick Shot alone runs the multi-press SEQUENCE (§4.2).</td></tr>
 <tr><td><b>Survivalist</b></td><td>3</td><td>—</td><td>Trapper's poison rides being struck, and its breadth term counts statuses from any source — including his allies'.</td></tr>
 </table>
 
@@ -1760,6 +1815,10 @@ patience is +50% crit. Every point beyond 100 grants <b>+0.5% of critical MULTIP
 instead, so Lethal Aim's ×2 becomes ×2.5 at 200 Focus, ×3 at 300, and it never stops
 paying: patience buys certainty first, then force. The decision the spec is built around:
 the enemy you've been working is rarely the enemy that most needs to die right now.<br>
+<b>HIS BASIC ATTACK IS A SEQUENCE</b> (&sect;4.2): Quick Shot runs one press plus one for every
+50 Focus he holds, capped at four, resolved with partial credit and paid in Focus &mdash; 8 a
+landed press, plus 20 more for a full sequence. <b>His basic attack only; no other ability of
+his changes.</b><br>
 Aimed Shot — 20 Mana, 45 dmg / 15 BD / 3.0, 1cd (Perfect: +20 Focus).<br>
 Powershot — 25 Mana, 20 dmg / 20 BD / 3.0, 2cd: +2% damage for every point of the target's
 Break bar already FULL — the team breaks them, the marksman ends them.<br>

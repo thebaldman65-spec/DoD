@@ -13,6 +13,202 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-19 &mdash; Batch CS: THE SHARPSHOOTER'S BASIC BECOMES A SEQUENCE</h2>
+<p><i>His basic attack runs a <b>multi-press skill check that grows with Focus</b>, resolves with
+<b>partial credit</b>, and pays in <b>Focus rather than damage</b>. It is the first thing to use
+CN's <code>presses</code> parameter and it <b>replaces</b> CN's placeholder combine rather than
+joining it. <b>His basic attack only &mdash; no other ability of his changes, and no other hero's
+bar moves at all.</b> Save version did not move (still v10).</i></p>
+
+<h3>&sect;1 &mdash; HOW MANY PRESSES, AND WHY FOUR IS THE CEILING</h3>
+<p><b>One press, plus one for every 50 Focus held, capped at four.</b></p>
+<table border="1" cellpadding="4">
+<tr><th>Focus held when the bar opens</th><th>Presses</th></tr>
+<tr><td>0&ndash;49</td><td>1</td></tr>
+<tr><td>50&ndash;99</td><td>2</td></tr>
+<tr><td>100&ndash;149</td><td>3</td></tr>
+<tr><td>150+</td><td><b>4 &mdash; the cap</b></td></tr>
+</table>
+<p><b>THE CAP IS THE POINT AND IT IS NOT A ROUNDING CHOICE.</b> Focus has no ceiling, so an
+uncapped rule makes 400 Focus a nine-press sequence with a tightening window on his most-used
+action &mdash; an ability a player without the reflexes simply cannot use. That is the failure
+that sank timed hits in Legend of Dragoon and Mother 3, and it would land on the attack he
+presses most. <b>Four is the ceiling; Focus keeps climbing and the sequence does not.</b> The
+reason is recorded beside the number in <code>battle.gd</code>, in <code>CLAUDE.md</code> and in
+master.html &sect;4.2, so a later batch cannot read four as arbitrary and raise it.</p>
+<p>The count is read <b>at the moment the bar opens</b>, from Focus held at that instant &mdash;
+after targeting, not before it.</p>
+
+<h3>&sect;2 &mdash; PARTIAL CREDIT, AND IT REPLACES CN's COMBINE</h3>
+<p><b>Each landed press counts. A miss ends the sequence and keeps everything earned before
+it.</b> A four-press attempt that misses on the second is worth <b>one</b> press, not zero.
+<b>&ldquo;Landed&rdquo; means Good or better</b> &mdash; a Sloppy is the miss that ends it.</p>
+<p><b>CN's <code>presses</code> default returned the WORST GRADE OF THE SET, and CN's own comment
+called that a placeholder. It is deleted, not left reachable</b> &mdash;
+<code>_worse_grade</code> and its <code>_GRADE_ORDER</code> table are gone. Two answers to
+&ldquo;what is a sequence worth&rdquo; is how they disagree silently, which is the scar
+<code>no_skill_check</code> left at CQ &sect;5: the flag and the criterion disagreed and a test
+passed by reading the wrong oracle.</p>
+<p><b>CN's comment also said &ldquo;CO's Sharpshooter basic is the first&rdquo; caller to ask for
+more than one press. CO did not do it</b> &mdash; CO was the recast refusal &mdash; and the
+comment is corrected in place. CN's decision to leave the bar ON his basic was right: this batch
+replaced it where it stood rather than removing and restoring it.</p>
+
+<h3>&sect;3 &mdash; WHAT IT PAYS: FOCUS, NOT DAMAGE</h3>
+<p>Each landed press grants <b>8 Focus</b>. A <b>full sequence</b> &mdash; every press landed
+&mdash; grants a further <b>20 Focus</b>; a partial grants its per-press Focus and no bonus.
+<b>Damage resolves off the FIRST press's grade</b>, exactly as a single-press basic does today,
+and presses two through four add none.</p>
+<table border="1" cellpadding="4">
+<tr><th>Presses</th><th>Full</th><th>Broken after 1</th><th>Broken after 2</th><th>Broken after 3</th></tr>
+<tr><td>1</td><td>28</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+<tr><td>2</td><td>36</td><td>8</td><td>&mdash;</td><td>&mdash;</td></tr>
+<tr><td>3</td><td>44</td><td>8</td><td>16</td><td>&mdash;</td></tr>
+<tr><td>4</td><td>52</td><td>8</td><td>16</td><td>24</td></tr>
+</table>
+<p>That last rule keeps the change confined to the meter. <b>A deep-Focus Sharpshooter ramps
+faster; he does not hit harder per swing</b> &mdash; Focus already converts to crit chance and
+then to crit multiplier, so the damage increase arrives through the meter rather than beside it.
+The Focus is paid <b>after</b> <code>_resolve</code>, deliberately: the Focus engine dumps the
+meter to zero on a target switch, so paying before it would delete the points the same shot just
+earned. <b>The same ordering means a KILLING sequence pays on top of the 50 a kill
+retains</b> rather than being swallowed by it &mdash; a full four-press kill from 150 Focus
+leaves him on 102 against the next mark (the meter caps to 50 on the kill, then the sequence
+pays its 52), and 202 if he holds Overkill, which keeps the meter whole. That follows from &ldquo;each landed press grants Focus&rdquo; read
+unconditionally, and it is noted here rather than left to be discovered.</p>
+<p><b>FLAGGED, NOT TUNED &mdash; the per-press figure of 8 is the designer's number.</b> At 8, a
+full four-press sequence pays 52 Focus against a single press's 28 &mdash; <b>1.9&times;</b>
+&mdash; and with the passive's own +20 for a same-target shot on top of both, <b>the whole turn
+is 72 Focus at 150 against 48 at 0, which is 1.5&times;</b>. It is the figure to move if that reads hot in play, and moving it
+means moving this entry, master.html and the glossary with it &mdash; <code>check_cs.gd</code>
+pins it for exactly that reason.</p>
+
+<h3>&sect;4 &mdash; THE WINDOW TIGHTENS, BUT THE SEQUENCE DOES NOT GET HARDER</h3>
+<p><b>Each press is 85% of the width of the one before it</b>, so the sequence has a shape rather
+than being one press repeated. At four presses the Good half-width runs 0.350 &rarr; 0.298 &rarr;
+0.253 &rarr; 0.215.</p>
+<p><b>AND THE OPENING WINDOW WIDENS AS THE PRESS COUNT RISES</b>, by 1.00 / 1.31 / 1.57 / 1.86, so
+landing a full sequence stays about as achievable at 150 Focus as at 0. Without it, playing a
+Sharpshooter well would make his basic progressively harder to use.</p>
+<p><b>THE MODEL IS WRITTEN DOWN BECAUSE NOTHING IN THE PROJECT CAN MEASURE IT.</b> CLAUDE.md
+already records why: <b>the bot never runs the bar</b> &mdash; it rolls a grade off fixed
+probabilities &mdash; so a widened window is invisible to every instrument the repo owns. The
+numbers therefore come from a stated model rather than from play data: difficulty is <b>time
+inside the window</b> (CN's standing rule read as an equation), the player's timing error is
+Gaussian with an SD of about <b>60 ms</b>, a press's miss-risk is that Gaussian's tail outside the
+Good window, and the sequence's risk is the sum of its presses'. Under it the whole sequence lands
+<b>89.7% / 90.0% / 90.0% / 90.0%</b> at one, two, three and four presses. <b>The 60 ms is a guess
+about human reflexes and is flagged as one</b>; <code>check_cs.gd</code> re-derives the table from
+the constants so a hand-edited row cannot pass silently, but it cannot check the assumption.</p>
+<p><b>THE PERFECT WINDOW DELIBERATELY DOES NOT WIDEN WITH THE COUNT, and that is where &sect;3
+and &sect;4 would have contradicted each other.</b> The first press's Perfect is what sets the
+damage; widen it with the press count and depth would buy damage <i>directly</i>, which is exactly
+what &sect;3 exists to prevent. Only the Good window widens, because &ldquo;landed&rdquo; is
+defined as Good or better and that is what the constant-difficulty rule is about.</p>
+<p><b>His exception is a FIXED OFFSET, NOT A SLOPE: 15% less timing tolerance than everybody
+else's, the same 15% at one press and at four.</b> It is taken against
+<code>SC_PROFILE_DEFAULT</code> rather than written as a literal, so it stays an offset FROM the
+default if a later batch moves the default. His bar also sweeps in <b>0.52s</b> against everyone
+else's 0.72s, which is the &ldquo;vary the character&rdquo; half; because difficulty is
+time-in-window, the quicker sweep is paid for with proportionally wider zones and does not move
+the difficulty.</p>
+
+<h3>&sect;5 &mdash; THE BOT</h3>
+<p>The bot never runs the bar and is blind to every window this batch widens. It now <b>rolls its
+grade per press, stops at the first failure, and earns the same partial credit</b> &mdash; it
+lands 2.69 of four on average. Without it a simulated Sharpshooter never earns the sequence Focus
+and his ramp reads far weaker than it is, and the sim is the only thing that plays him at volume.
+<b>At one press the roll is byte-for-byte the line it has always been</b>, one
+<code>randf()</code> against the same two thresholds, so no other hero's grade and no other part
+of the RNG stream moves.</p>
+
+<h3>&sect;6 &mdash; THE TELL</h3>
+<p>The bar names <b>how many presses are coming before the first one</b> and <b>which press is
+live</b> throughout &mdash; &ldquo;SHOT 1 OF 4 &mdash; THIS ONE SETS THE DAMAGE&rdquo;, then
+&ldquo;SHOT 2 OF 4 &mdash; KEEP THE CHAIN&rdquo;. A sequence that ends early <b>reads as
+ended</b>: &ldquo;CHAIN BROKEN 2 / 4 &mdash; Good&rdquo;, with its own sound, rather than the bar
+simply vanishing and reading as dropped input. A full one says &ldquo;FULL SEQUENCE 4 / 4 &mdash;
+PERFECT&rdquo;. Both lines carry the <b>first press's grade</b> as well as the tally, because a
+player who sees only &ldquo;2 / 4&rdquo; cannot tell whether the shot that landed hit hard. This
+is CM's gated tell applied to a different stake &mdash; the stakes on the one surface the player
+is actually looking at.</p>
+<p>The reading is keyed on <b>the press count</b> rather than on a new <code>mode</code> string:
+at 0&ndash;49 Focus his basic IS a one-press check and should read as the ordinary bar it is.</p>
+
+<h3>&sect;7 &mdash; TWO THINGS THE BRIEF STATED THAT THE REPO DOES NOT (REPORTED, NOT SILENTLY OBEYED)</h3>
+<p><b>1. &ldquo;The Perfect bonus, +20 Focus&rdquo; is not Quick Shot's Perfect bonus.</b>
+&sect;3 describes the full-sequence reward as &ldquo;the Perfect bonus, +20 Focus&rdquo;.
+<b>Quick Shot's actual Perfect bonus is <code>perfect_id: "mana"</code> &mdash; +10 Mana.</b> The
++20 Focus bonus (<code>focus20</code>) belongs to <b>Aimed Shot</b>, his spec ability.
+<b>Quick Shot is a protected core the Beastmaster and the Survivalist also carry</b>, so changing
+its Perfect bonus would have changed two other specs' basic attacks. <b>The +20 Focus is
+therefore implemented as a NAMED FULL-SEQUENCE BONUS</b> and Quick Shot's own Perfect (+10 Mana on
+a Perfect first press) is untouched. If the designer meant the other reading &mdash; that a full
+sequence should fire the ability's own Perfect bonus &mdash; that is a one-line change and a
+different feature.</p>
+<p><b>2. &ldquo;Worth meaningfully more than four single presses&rdquo; only holds under one
+reading.</b> &sect;3's flag asks that a full four-press sequence be worth meaningfully more than
+four single presses. As shipped, the full-sequence bonus fires at EVERY press count including one
+&mdash; &sect;3's own wording is &ldquo;every press landed&rdquo;, unconditional &mdash; so four
+separate one-press casts pay 4&times;28 = 112 and one full four-press sequence pays 52. The
+sentence holds if &ldquo;four single presses&rdquo; means four times the per-press Focus (32
+against 52); it does not hold if it means four separate casts. <b>The alternative is to require
+two or more presses for the bonus</b>, which makes the sentence exact (4&times;8 = 32 against 52)
+at the cost of an unstated exception in an otherwise unconditional rule. <b>Shipped literally;
+the ruling is the designer's.</b></p>
+
+<p><b>3. A CONSEQUENCE OF &sect;2 AND &sect;3 THAT THE BRIEF DOES NOT ADDRESS: the gold Perfect
+zone is drawn on presses two through four and buys nothing there.</b> &sect;2 defines
+&ldquo;landed&rdquo; as Good or better and &sect;3 puts the damage on the first press, so a
+Perfect on the second, third or fourth press is worth exactly what a Good is. The zone is still
+drawn and still graded &mdash; one code path, no special case &mdash; so a player aiming at gold
+on the fourth shot is aiming at nothing. <b>Reported, not acted on.</b> The obvious fix is to
+hide the Perfect zone after the first press, which would also make &ldquo;the first press sets
+the damage&rdquo; visible without a word of text; that is a design change beyond the brief and it
+is the designer's call.</p>
+
+<h3>&sect;9 &mdash; TWO THINGS THE BATTERY TURNED UP, NEITHER CAUSED BY THIS BATCH</h3>
+<p><b>THE BATTERY's COUNT GREP HAS BEEN TOO NARROW FOR A THIRD TIME.</b> Seven suites print
+<code>checks: N&nbsp;&nbsp;&nbsp;failures: N</code> and two print
+<code>BATCH XX: N passed, N FAILED</code>; <code>[0-9]+ checks</code> matches neither, so
+<b>ai, bm, bn, bo, bp, bq and br all reported <code>checks=? fails=?</code> &mdash; every one of
+them pinned with a number in CLAUDE.md.</b> A count-diffing rule cannot see a regression in a
+suite whose count reads <code>?</code>, which is CP's watchdog blind spot arriving through the
+parser instead of through a hang. <b>All three shapes are matched now</b> and the recovered counts
+are 2217 / 1891 / 81 / 1025 / 272 / 739 / 1447, every one reproducing CR's.</p>
+<p><b><code>test_batch_bo</code> HAS A FLAKY ASSERTION, AND IT IS A THIRD KIND OF INSTABILITY.</b>
+<code>an</code> and <code>bk</code> drift in their check COUNT; <b>bo's count is steady at 1025
+and one assertion fails by chance.</b> Its &sect;5 NULL FIELD check resolves the same enemy attack
+at 2 Resonance and at 14 and requires the deeper one to hurt less; the damage carries a 0.9&ndash;1.1
+variance roll, so when both land on the same integer &mdash; observed once as <b>&ldquo;16 damage
+at 2 stacks, 16 at 14&rdquo;</b> &mdash; it fails. <b><code>test_batch_bo.gd</code> calls
+<code>seed()</code> zero times.</b> Measured: <b>1 failure in 13 runs on the CS tree, 0 in 8 on
+unmodified HEAD</b>, and <b>the test reaches none of this batch's code</b> &mdash; it calls
+<code>_resolve</code> directly and never enters <code>_hero_turn</code>,
+<code>_run_skill_check</code> or the sequence. <b>Reported, not repaired</b>: seeding the suite or
+widening the gap the assertion measures are both changes to somebody else's test, and which one is
+right is a call for the batch that owns it.</p>
+
+<h3>&sect;8 &mdash; THE GATE, AND THE GAP IT HAD</h3>
+<p><b><code>check_cs.gd</code> is a LIVE gate &mdash; 104 checks, 0 failures &mdash; and it is
+live because it has to be.</b> The bot cannot press a bar, so partial credit, the tapering windows
+and the tell are exercised nowhere in the existing battery. It spawns a real non-autoplay battle
+with a Sharpshooter, drives his bar by hand at every press count the design allows, and measures
+what the sequence actually paid; it also resolves the basic for real at each count, which is this
+batch's floor.</p>
+<p><b>IT WAS THEN BROKEN ON PURPOSE FIVE WAYS AND CAUGHT FOUR.</b> The cap raised to five, partial
+credit removed, the Perfect window widened with the count, and the widening table flattened all
+produced failures. <b>Moving the per-press Focus figure from 8 to 9 passed clean</b>, because
+every payout assertion was written as <code>landed &times; SS_SEQ_FOCUS_PER_PRESS</code> and so
+followed the constant wherever it went. <b>The payout numbers are pinned now</b>, with a failure
+message that says the documents quote them &mdash; a figure flagged as the designer's to move is
+exactly the figure that must not move without the documents that quote it moving too.</p>
+<p><code>check_cn.gd</code> failed on the first run of this batch, correctly:
+<code>SC_PROFILE_DEFAULT</code> gained a sixth field, <code>press_taper</code>, and that gate
+asserts the field COUNT. <b>Its default is 1.0, the no-op</b> &mdash; every press the same width,
+which is what the five numbers always described &mdash; so no other bar in the game moves. The
+gate is updated and the count assertion stays.</p>
+
 <h2>2026-08-19 &mdash; Batch CR: THE FOLD RULINGS</h2>
 <p><i>The designer's rulings on CQ's 105-fold audit. <b>Boss immunity to hard control is
 BROKEN-gated now</b> rather than Perfect-gated, because CN's fold silently deleted it; four

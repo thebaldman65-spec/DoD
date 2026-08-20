@@ -18,13 +18,30 @@ updated alongside `docs/changelog.html` (the living changelog). The original
   no vault lists, no "was/now/moved/reworked/renamed" notes, no decision
   dates — change history belongs in changelog.html alone.
 - Terminology: damage against the Break meter = "Break damage (BD)" everywhere.
-- **FULL BATTERY AT BATCH CR — 45 SUITES, ZERO THROWS, ZERO FAILURES, RUN TWICE.** ah 5625,
-  ah_battle 65, ai 2217, aj 418, ak 528, al 560, an 6054, ar 735, as 396, at 470, au 336, av 324,
-  aw 350, **ax 345**, ay 484, az 519, ba 690, bb 177, bc 91, bd 71, be 34, bf 78, bg 47, bh 233,
-  bi 91, bj 67, **bk 129–130**, bl 88, bm 1891, bn 81, bo 1025, bp 272, bq 739, br 1447, bs 263,
-  bt 455, bu 477, bv 897, bw 548, bx 142, cb 1181, cd 86, ce 1112, runes 3121, rune_battle 97.
-  **EVERY COUNT REPRODUCES CQ's EXCEPT THREE, AND ALL THREE ARE ACCOUNTED FOR**: `ax` is 342 → 345
-  (CR §1 added three assertions), `an` 6054 is inside its documented drift, and `bk` is below.
+- **FULL BATTERY AT BATCH CS — 45 SUITES, ZERO THROWS, ZERO FAILURES, ZERO FAIL LINES.** ah 5625,
+  ah_battle 65, ai 2217, aj 418, ak 528, al 560, **an 6052**, ar 735, as 396, at 470, au 336,
+  av 324, aw 350, ax 345, ay 484, az 519, ba 690, bb 177, bc 91, bd 71, be 34, bf 78, bg 47,
+  bh 233, bi 91, bj 67, **bk 129–130**, bl 88, bm 1891, bn 81, bo 1025, bp 272, bq 739, br 1447,
+  bs 263, bt 455, bu 477, bv 897, bw 548, bx 142, cb 1181, cd 86, ce 1112, runes 3121,
+  rune_battle 97. Run harness 22/165/8, all PASS. **EVERY COUNT REPRODUCES CR's EXCEPT `an`
+  (6052 against 6054, inside its documented drift) AND `bk` (129, inside its band).**
+- **`bo` HAS A FLAKY ASSERTION — A THIRD KIND OF INSTABILITY, FOUND AT CS.** `an` and `bk` drift
+  in their check COUNT; **`bo`'s count is rock steady at 1025 and one of its assertions fails by
+  chance.** §5's NULL FIELD check resolves the same enemy attack at 2 Resonance and at 14 and
+  requires `deep < shallow`; the damage carries a 0.9–1.1 variance roll, so when both land on the
+  same integer — **observed once as "16 damage at 2 stacks, 16 at 14"** — the assertion fails.
+  **`test_batch_bo.gd` CALLS `seed()` ZERO TIMES**, so its stream differs every run.
+  **MEASURED AT CS: 1 failure in 13 runs on the CS tree, 0 in 8 on unmodified HEAD, and the test
+  reaches NONE of CS's code** — it calls `_resolve` directly and never touches `_hero_turn`,
+  `_run_skill_check` or the sequence. **A count-diffing rule reads this as a regression** and it
+  is not one; the repair is to seed the suite or to widen the gap the assertion measures.
+- **THE BATTERY's COUNT GREP WAS TOO NARROW FOR THE THIRD TIME, FOUND AND FIXED AT CS.** Seven
+  suites print `checks: N   failures: N` and two print `BATCH XX: N passed, N FAILED`;
+  `[0-9]+ checks` matched neither, so **ai, bm, bn, bo, bp, bq and br all reported `checks=?
+  fails=?` — every one of them pinned with a number in this very list.** A count-diffing rule
+  cannot see a regression in a suite whose count reads `?`, which is CP's watchdog blind spot
+  arriving through the parser instead of through a hang. All three shapes are matched now, and
+  the counts above are the recovered ones.
 - **`bk` IS A SECOND DRIFTING SUITE AND IT WAS PINNED HERE AS IF IT WERE STABLE (FOUND AT CR).**
   It read **129 on one battery run and 130 on the next**, and four consecutive runs gave
   **129, 130, 129, 130 — always 0 failures.** It generates real zone maps and then walks them
@@ -188,18 +205,24 @@ it is carrying its own history.**
   **Recorded as a CODE-HEALTH observation: a file that size wants splitting eventually, and doing
   it deliberately is far cheaper than doing it when it becomes unworkable.**
 
-## The skill check — THREE CASES, AND THE BAR IS PARAMETERIC (STANDING, SET AT CM AND CN)
-`docs/master.html` §4.2 documents all three cases. **They share ONE bar, ONE sweep and ONE set of
+## The skill check — FOUR CASES, AND THE BAR IS PARAMETERIC (STANDING, SET AT CM, CN AND CS)
+`docs/master.html` §4.2 documents all four cases: the normal check, the gated check, the
+defensive check, and **BATCH CS's SHARPSHOOTER SEQUENCE**. **They share ONE bar and ONE set of
 zones — and as of BATCH CN those are a PROFILE rather than constants.**
 - **THE DEFAULT PROFILE IS AUTHORITATIVE, NOT A FALLBACK.** `battle.SC_PROFILE_DEFAULT` holds
-  `perfect_half` 0.045, `good_half` 0.16, `centre` 0.5, `sweep_time` 0.72, `presses` 1 — today's
-  numbers exactly — and **every caller uses it; nothing overrides it yet.** **A LATER BATCH THAT
-  EDITS A VALUE THERE CHANGES EVERY CHECK IN THE GAME AT ONCE.** `check_cn.gd` asserts the five
-  values, and asserts that the zone rects and the grade boundaries the profile produces are the
-  ones the pre-CN formulas drew.
-- **`centre` AND `presses` ARE WIRED AND UNUSED.** Nothing in the game moves the window off 0.5
-  or asks for a second press. Multi-press returns the **worst** grade of the set ("how many
-  windows must be landed", read literally). CO is where both get used.
+  `perfect_half` 0.045, `good_half` 0.16, `centre` 0.5, `sweep_time` 0.72, `presses` 1,
+  `press_taper` 1.0 — today's numbers exactly — and **every caller uses it except the
+  Sharpshooter's basic attack.** **A LATER BATCH THAT EDITS A VALUE THERE CHANGES EVERY CHECK IN
+  THE GAME AT ONCE.** `check_cn.gd` asserts the six values AND THE FIELD COUNT, and asserts that
+  the zone rects and the grade boundaries the profile produces are the ones the pre-CN formulas
+  drew. **CS ADDED THE SIXTH FIELD AND check_cn CAUGHT IT ON THE FIRST RUN, WHICH IS THE GATE
+  WORKING** — `press_taper` 1.0 is the NO-OP, so nothing else moved.
+- **`centre` IS WIRED AND UNUSED; `presses` IS USED BY EXACTLY ONE ABILITY.** Nothing in the game
+  moves the window off 0.5. **`presses` > 1 is the Sharpshooter's basic attack and nothing else
+  (BATCH CS).** CN's worst-grade combine was a placeholder and **CS deleted it** — a sequence is
+  now the SUM OF WHAT LANDED, and `_worse_grade` / `_GRADE_ORDER` are gone rather than left
+  reachable. CN's comment saying "CO's Sharpshooter basic is the first" was wrong about the
+  batch — CO was the recast refusal — and is corrected in place.
 - **THE ZONE RECTS ARE RESIZED PER CAST** (`_apply_sc_profile`), not built once at UI setup.
   Grading and drawing come off the same dictionary on the same line of execution — split them and
   a profile that widens the window grades one thing and draws another, and **the player would be
@@ -220,6 +243,12 @@ zones — and as of BATCH CN those are a PROFILE rather than constants.**
 >
 > **TWO DELIBERATE EXCEPTIONS, BOTH OPT-IN:** the **Sharpshooter**, whose bar is meant to be
 > harder and to pay more, and the **relic that swaps a hero's bar for a riskier one while held.**
+>
+> **THE SHARPSHOOTER'S EXCEPTION IS SPENT AS OF CS, AND IT IS A FIXED OFFSET RATHER THAN A
+> SLOPE: 15% less timing tolerance than everybody else's, THE SAME 15% AT ONE PRESS AND AT
+> FOUR.** Harder than everyone else's, not harder the better you play. It is taken against
+> `SC_PROFILE_DEFAULT` in `_sharpshooter_basic_profile` rather than written as a literal, so it
+> survives a change to the default as an offset.
 
 ### WHERE THE CHECK COMES OFF (STANDING, SET AT BATCH CN §2)
 **113 of the 211 drafted abilities now run no bar at all.** `Ability.runs_skill_check()` is the
@@ -252,7 +281,9 @@ ONE answer, asked by the cast path and by the draft card alike.
   lose the check that produces the Sloppy.**
 - **BASIC ATTACKS RESOLVE AT A FIXED GOOD, EXCEPT THE SHARPSHOOTER'S.** Read off **slot 0** and
   off the **hero's passive** (`lethal_aim`), not off a name: his basic IS Quick Shot, the same
-  object the Beastmaster and Mystic carry, so there is no card to flag.
+  object the Beastmaster and Mystic carry, so there is no card to flag. **CS made his the
+  SEQUENCE and `_is_sharpshooter_basic` is the one answer to "is this it"**, asked by all three
+  grade branches and by the payout so none of them can decide it differently.
 - **THE NO-CHECK TEST SITS ABOVE THE AUTOPLAY ROLL AND THAT ORDER IS LOAD-BEARING.** Leave the
   bot's 20%-Perfect roll on top and it still rolls Perfects nobody can press for, **every folded
   bonus gets paid twice in a sim**, and the balance numbers stop describing the player's game.
@@ -299,6 +330,67 @@ ONE answer, asked by the cast path and by the draft card alike.
   Warden in the party, against 22.8–27.3 hero actions.** The party's presses rise about a third;
   **the WARDEN's own roughly double** (he acts ~7 times and braces 7–9). **Uncapped on purpose
   for the first pass** — a cap is a retreat available afterwards, and it is a designer's call.
+
+## THE SHARPSHOOTER'S BASIC IS A SEQUENCE (STANDING, SET AT BATCH CS)
+**His BASIC ATTACK ONLY. No other ability of his changes, and no other hero's bar moves at all.**
+`_is_sharpshooter_basic` is the single answer to "is this it" — read off the hero's passive
+(`lethal_aim`) and off **slot 0**, never off a name, because his basic IS Quick Shot and the
+Beastmaster and Survivalist carry the same object.
+- **ONE PRESS, PLUS ONE PER 50 FOCUS HELD, CAPPED AT FOUR.** 0–49 → 1, 50–99 → 2, 100–149 → 3,
+  150+ → 4. Read **at the moment the bar opens**, from Focus held at that instant.
+- **THE CAP IS THE POINT AND IT IS NOT A ROUNDING CHOICE. DO NOT RAISE IT.** Focus has no ceiling
+  (`FOCUS_UNCAPPED`), so an uncapped rule makes 400 Focus a NINE-press sequence with a tightening
+  window **on the action he presses most** — an ability a player without the reflexes cannot use.
+  That is the failure that sank timed hits in Legend of Dragoon and Mother 3. `check_cs.gd`
+  asserts the cap, and the reason sits beside `SS_SEQ_MAX_PRESSES` in `battle.gd`.
+- **PARTIAL CREDIT: every landed press counts, a miss ENDS the sequence and keeps what came
+  before.** "Landed" is **Good or better**. A four-press attempt missing on the second is worth
+  ONE press. **This REPLACED CN's worst-grade combine rather than joining it — `_worse_grade` and
+  `_GRADE_ORDER` are deleted, so both behaviours are not left reachable.**
+- **IT PAYS IN FOCUS, NOT DAMAGE.** `SS_SEQ_FOCUS_PER_PRESS` (8) a landed press, plus
+  `SS_SEQ_FULL_BONUS` (20) for a full sequence. **Damage resolves off the FIRST press's grade**
+  and presses two through four add none — a deep-Focus Sharpshooter **ramps faster, he does not
+  hit harder per swing**, because Focus already converts to crit chance and then crit multiplier.
+- **THE PAYOUT IS AFTER `_resolve`, NOT BEFORE IT.** `_sharpshooter_focus` runs inside `_resolve`
+  and **dumps the meter to zero on a target switch**; paying first would delete the points the
+  same shot just earned. `_gain_focus` is the only way in, so Spray of Arrows' ceiling, the
+  conversion signature and the deepest-Focus ledger all see it as they see the engine's.
+- **THE WINDOW TIGHTENS 15% A PRESS, AND THE OPENING WINDOW WIDENS WITH THE COUNT** (1.00 / 1.31 /
+  1.57 / 1.86) so the whole sequence stays about as achievable at four presses as at one.
+  **ONLY THE GOOD WINDOW WIDENS. THE PERFECT WINDOW IS DELIBERATELY HELD FIXED** — the first
+  press's Perfect sets the damage, so widening it with the count would let depth buy damage
+  directly, which is the thing "ramp faster, not hit harder" exists to prevent.
+- **THE §4 NUMBERS COME FROM A STATED MODEL, NOT FROM PLAY DATA, AND NOTHING IN THIS REPO CAN
+  MEASURE THEM.** The bot never runs the bar, so a widened window is invisible to every instrument
+  the project owns. The model: difficulty is **time inside the window**; the player's timing error
+  is Gaussian with **SD ≈ 60 ms**; a press's risk is that tail and a sequence's risk is the sum of
+  its presses'. Under it the sequence lands **89.7 / 90.0 / 90.0 / 90.0%** at 1–4 presses.
+  `check_cs.gd` re-derives the table from the constants so a hand-edited row cannot pass silently
+  — **but the 60 ms is a guess about human reflexes and the gate cannot check it.**
+- **THE PAYOUT CONSTANTS ARE PINNED IN `check_cs.gd`, AND THE REASON IS A GAP THAT GATE HAD.**
+  Every payout assertion is written as `landed * SS_SEQ_FOCUS_PER_PRESS`, so a negative control
+  that moved 8 to 9 **passed clean**. The changelog, master.html §4.2 and the glossary all quote
+  the figure; pinning it means moving it is one line here and four in the docs, together.
+- **THE TELL IS KEYED ON THE PRESS COUNT, NOT ON A NEW `mode`.** At 0–49 Focus his basic IS a
+  one-press check and reads as the ordinary bar. Above that the bar says "SHOT n OF N" before the
+  first press and on every one, and an early end reads as **"CHAIN BROKEN 2 / 4 — Good"** rather
+  than vanishing, because a sequence that just stops reads as dropped input.
+- **THE BOT ROLLS PER PRESS AND STOPS AT THE FIRST FAILURE.** At one press it is byte-for-byte the
+  line it always was — one `randf()`, the same thresholds — so no other hero's grade moves.
+- **`check_cs.gd` IS A LIVE GATE (104 checks) BECAUSE IT HAS TO BE.** The bot cannot press a bar,
+  so nothing else in the battery reaches partial credit, the taper or the tell. It spawns a real
+  battle, drives the bar by hand at every press count, and resolves the basic for real at each.
+- **OPEN, REPORTED AT CS AND NOT ACTED ON: the gold Perfect zone is drawn on presses 2–4 and buys
+  nothing there.** "Landed" is Good or better and the damage is on the first press, so a Perfect
+  on a later press is worth exactly a Good. It is still drawn and still graded — one code path,
+  no special case. **Hiding it after the first press is the obvious fix and would also make "the
+  first press sets the damage" visible without text**, but that is a design change and the
+  designer's call.
+- **THREE THINGS THE BRIEF DID NOT ACCOUNT FOR ARE REPORTED IN THE CHANGELOG §7.** The largest:
+  the brief called the full-sequence reward "the Perfect bonus, +20 Focus", but **Quick Shot's
+  Perfect bonus is +10 Mana** (`perfect_id: "mana"`) and the +20 Focus (`focus20`) belongs to
+  **Aimed Shot**. Quick Shot is a protected core the Beastmaster and Survivalist also carry, so
+  the +20 shipped as a NAMED full-sequence bonus and Quick Shot's own Perfect is untouched.
 
 ## THE THREE CLAMPED CALL SITES, AND WHY `update_status` IS NOT CLAMPED (STANDING, SET AT CP §0)
 **`update_status` ASSIGNS power where `add_status` MAXES it.** On the three sites whose power is

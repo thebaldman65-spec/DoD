@@ -11,9 +11,14 @@ const CEILING := 44
 # §1's default IS today's bar. If a later batch edits these it changes every
 # check in the game at once, which is the point of asserting them here rather
 # than trusting the dictionary to be read.
+# BATCH CS ADDED `press_taper`, AND THIS GATE CAUGHT IT — which is the gate
+# working. The sixth field's default is 1.0, the NO-OP: every press the same
+# width, which is what the five numbers above have always described. The
+# assertion below on the field COUNT is what makes a seventh field impossible
+# to add in silence, so it stays.
 const WANT_PROFILE := {
 	"perfect_half": 0.045, "good_half": 0.16, "centre": 0.5,
-	"sweep_time": 0.72, "presses": 1,
+	"sweep_time": 0.72, "presses": 1, "press_taper": 1.0,
 }
 
 

@@ -51,7 +51,7 @@ SUITES=(
   test_batch_cb test_batch_cd test_batch_ce test_runes test_rune_battle
 )
 GATES=(check_parse check_flow check_map check_cl_resolver check_cl_width
-       check_cm check_cm_live check_cn check_co)
+       check_cm check_cm_live check_cn check_co check_cs)
 
 [[ $# -gt 0 ]] && { SUITES=(); for a in "$@"; do SUITES+=("test_batch_$a"); done }
 
@@ -96,8 +96,19 @@ run_one() {
   wait $pid 2>/dev/null
   # A count with no comma is still a count (BQ's lost grep), and a FAIL line
   # with no indent is still a failure (BK's swallowed reason).
-  local checks=$(grep -oE '[0-9]+ checks' "$log" | tail -1 | grep -oE '[0-9]+')
-  local fails=$(grep -oE '[0-9]+ (failures|failed)' "$log" | tail -1 | grep -oE '[0-9]+')
+  #
+  # BATCH CS — AND A COUNT WITH A COLON IS STILL A COUNT. THIS IS THE THIRD TIME
+  # THIS GREP HAS BEEN TOO NARROW. Seven suites print `checks: N   failures: N`
+  # and two print `BATCH XX: N passed, N FAILED`; `[0-9]+ checks` matches
+  # neither, so the report showed `checks=? fails=?` for ai, bm, bn, bo, bp, bq
+  # and br — **every one of which CLAUDE.md pins with a number.** A count-diffing
+  # rule cannot see a regression in a suite whose count reads `?`, which is the
+  # same blind spot CP's watchdog exists to close, arriving through the parser
+  # instead of through a hang. All three shapes are matched now.
+  local checks=$(grep -oE '([0-9]+ (checks|passed))|(checks: *[0-9]+)' "$log" \
+    | tail -1 | grep -oE '[0-9]+')
+  local fails=$(grep -oiE '([0-9]+ (failures|failed))|((failures|failed): *[0-9]+)' "$log" \
+    | tail -1 | grep -oE '[0-9]+')
   local throws=$(grep -cE 'SCRIPT ERROR|Parse Error' "$log")
   local faillines=$(grep -cE '^ *FAIL' "$log")
   if (( timedout )); then
