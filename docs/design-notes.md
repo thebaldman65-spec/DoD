@@ -4210,3 +4210,36 @@ figure, passed clean, because every payout assertion was written in terms of the
 followed it. That gap is the reason the payout numbers are now pinned to the values the
 documentation quotes: a figure flagged as the designer's to move is exactly the figure that must
 not move without the documents that quote it moving too.
+
+
+## Batch CW — why the project guide got split in two
+
+The knowledge sync had a ceiling and `CLAUDE.md` was eating it, but the size was the symptom.
+The real problem was that one file was answering two different questions — "what rule binds me"
+and "what happened here" — and the second kind of content grows without limit while the first
+does not. A block per batch since the beginning meant sixty narratives around twenty rules, and
+the rules lost.
+
+The test that decided every line: does it tell a future session what to do or not do? Everything
+else had somewhere better to be. What happened is the changelog's job and always was. What is
+true right now needed a home that could not grow, which is why `state.md` is rewritten rather
+than appended to — an append-only "current state" file becomes a second changelog within a dozen
+batches, and then nobody trusts either.
+
+The part worth defending is the gathering. A rule stated inside a story about the batch that
+learned it reads as history, so it gets skimmed, and then it gets rediscovered the expensive way.
+The `inquisitor` pool key is the sharpest example in the project: writing `devout` raises nothing
+and resolves nothing, so the batch that gets it wrong ships cards no hero can be offered and
+finds out later. That is not a fact about a batch, it is a landmine with a note beside it, and
+the note belongs where someone will read it before stepping.
+
+Writing the stamp-gate rule proved the point against itself. The first version was wrong — a grep
+matched comments rather than assertions and reported half the real count — and it was only caught
+by going and reading the suites. A rule asserted from a document about the code is exactly the
+thing that rots; the fix was to check, and then to write the grep into the rule so the next
+session checks too.
+
+Reports moving into the repo is the same instinct applied to the other direction of the relay.
+The reports were being retyped by hand between two instances, and a hand copy that drops something
+is invisible — CL's overflow measurement was reported missing while sitting in the file it was
+supposed to be missing from. A committed file cannot be mistyped in transit.

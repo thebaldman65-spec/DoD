@@ -13,6 +13,109 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-20 &mdash; Batch CW: THE <code>CLAUDE.md</code> SPLIT, AND REPORTS MOVE INTO THE REPO</h2>
+<p><i><b>DOCUMENTATION ARCHITECTURE ONLY. Nothing the game does changed</b> &mdash; no code, no
+magnitude, no player-facing text, no save version (still v10). <code>CLAUDE.md</code> goes
+<b>883.5 KB / 11,066 lines &rarr; 144.2 KB / 1,796 lines</b>, an <b>83.7% cut</b>, and the
+knowledge sync goes <b>6.15 MB &rarr; 5.46 MB</b> (739 KB off that file; 706 KB / 11.2% net,
+after this batch&rsquo;s own new files). It was doing two jobs and doing
+both badly: standing rules and a narrative block per batch, and the rules were buried among sixty
+of them. <b>The full report is in <code>docs/reports/CW.md</code></b> &mdash; the first batch
+report written into the repo instead of a chat window, which is this batch&rsquo;s own &sect;3.</i></p>
+
+<h3>&sect;0 &mdash; THE FILE WAS NOT SHAPED THE WAY THE BRIEF DESCRIBED</h3>
+<p>Every measurable claim was re-derived before anything was edited. The brief&rsquo;s premise was
+right in the way that counts &mdash; the rules <i>were</i> buried &mdash; but the shape was
+different, and <b>one error would have caused real damage if followed literally.</b></p>
+<ul>
+<li><b>&sect;5 says the test suites are &ldquo;the bulk of the <code>scripts</code> folder&rsquo;s
+36%&rdquo;. They are not in <code>scripts/</code> at all</b> &mdash; all 44 live at the repo root.
+<code>scripts/</code> is 34.9% of the sync and holds <b>zero</b> suites: it is
+<code>battle.gd</code>, <code>unit.gd</code>, <code>classes.gd</code>, <code>talents.gd</code>,
+<code>run_state.gd</code> and the screens, every one of which &sect;5 itself lists under
+&ldquo;stays selected&rdquo;. <b>Deselecting &ldquo;the scripts folder&rdquo; would drop the game
+code and keep every suite &mdash; the exact inverse of the intent.</b> The suites are their own
+block: 1,700 KB, 27.0%.</li>
+<li><b>It was not larger than the changelog, master document and design notes combined</b> &mdash;
+883.5 KB against their 1,073.1 KB. Larger than any one of them, and than master + design-notes
+together. The 15% figure measured 14.0%.</li>
+<li><b>The suites are not &ldquo;one per batch since BN&rdquo;</b> &mdash; 44 spanning
+<code>ah</code> to <code>cp</code> with gaps, starting twenty batches earlier.</li>
+<li><b>The flake is in <code>bo</code>, not <code>br</code></b>, and <b>the four hanging suites
+were closed two batches running</b> &mdash; both corrected in <code>docs/state.md</code>.</li>
+<li><b>There were 60 batch blocks, not the ~40 estimated, and they were 8,894 of the 11,066
+lines.</b> The bulk was one <code>Current systems snapshot</code> section holding 86% of the file.</li>
+</ul>
+
+<h3>&sect;1 &mdash; <code>CLAUDE.md</code> IS STANDING RULES ONLY</h3>
+<p><b>Rules that govern future behaviour, in the file&rsquo;s own voice, dateless.</b> Kept: the
+working agreement, the skill check and its profile rule, the duration and hero/ally conventions,
+the pouch, item effects, the clamped call sites, hard control, the recast refusal, the text
+standard, the seventeen standing subsections, the tooling reference and the architecture map.
+<b>Dropped: every batch narrative, the older snapshot, and two sections still marked open that had
+been closed for batches</b> (the four hanging suites, and CN&rsquo;s fold debt closed at CQ).</p>
+<p><b>THE GATHER IS THE POINT OF THE BATCH.</b> A new section, <b>THE TRAPS</b>, collects the rules
+that were stated inside a narrative and would have been lost with it &mdash; the brief named five
+and the sweep found more: the <code>inquisitor</code> pool key that <b>fails silently</b>, the
+<code>mystic</code> spec id, the <code>wild_communion_ranks</code> naming trap, the
+<code>_step</code> float that <code>STAT_INT_KEYS</code> would round to 1, the gate rules (a gate
+reports its count not a verdict; a gate running zero checks must fail; <b>a count nobody diffs is a
+word</b>), grepping stderr for a parse rather than trusting a tally, the battery destroying the
+player&rsquo;s in-progress run, zsh not word-splitting unquoted expansions, and <code>\n</code> in
+a GDScript string being two characters so <code>\bword\b</code> silently fails on every
+hand-wrapped tooltip.</p>
+<p><b>THE STAMP-GATE RULE WAS WRITTEN WRONG FIRST AND CORRECTED BEFORE SHIPPING</b>, which is worth
+recording because it is the same fault the section exists to prevent. A grep for batch codes
+matched <i>comments</i> and reported seven suites. <b>The real gate is in fourteen &mdash; and none
+is a literal any more</b>: each reads the two-letter code out of <code>(Batch XX)</code> and
+asserts it is no older than its own batch, so no bump is owed on a re-stamp. What carries forward
+is the prohibition and one live caveat: <b>the comparison leans on two-letter codes sorting
+lexically, and a three-letter batch code needs one more line in each of the fourteen.</b></p>
+<p><b>ONE DOCUMENTATION FAULT CORRECTED TOWARD THE CODE: the architecture section said the run save
+was v7. It is v10.</b></p>
+
+<h3>&sect;2 &mdash; <code>docs/state.md</code></h3>
+<p>New, and <b>overwritten every batch rather than appended to, so it cannot grow.</b> Where the
+project is, the open queue, live counts and constants, and known-broken. The battery counts, the
+drift bands, the flake and the one red moved here out of <code>CLAUDE.md</code>, where they had
+been sitting among the rules. <b>Anything that reads as &ldquo;what happened&rdquo; was left out.</b></p>
+
+<h3>&sect;3 &mdash; REPORTS GO INTO THE REPO</h3>
+<p><b>From CW each batch writes <code>docs/reports/&lt;CODE&gt;.md</code> and commits it.</b> The
+copying is what this replaces, and it had already lost things: CL&rsquo;s overflow measurement was
+written into <code>text-standard.html</code> &sect;4.8 and then reported as missing. <b>A report
+that says something is absent when it is present is harder to catch than an absence</b> &mdash;
+nobody goes looking for a thing they have been told is not there. <b>Retrofit nothing.</b></p>
+
+<h3>&sect;4 &mdash; THE CHANGELOG ARCHIVE IS A RULE, NOT AN EVENT</h3>
+<p><b>Threshold 400 KB</b>, cut at a batch boundary, leaving the live file around 150 KB &mdash; the
+size BZ&rsquo;s own cut produced. Archive means <b>move out of the repo, never delete</b>; the live
+file never moves, which is why <code>build_docs.py</code> keeps working. <b>The verification is the
+part worth having as a rule:</b> assert the <code>&lt;h2&gt;</code> counts sum with zero overlap and
+order preserved, and that the two bodies rejoined are <b>byte-identical</b> to the original.
+<b>Never assert file sizes</b> &mdash; sizes agreeing is consistent with a duplicated entry and a
+dropped one. CD&rsquo;s pattern is binding on anything that reads the changelog: anchor on the
+<code>&lt;h2&gt;</code> and follow the path out of the live file&rsquo;s own header.</p>
+<p><b>THIS FILE IS 486 KB &mdash; ALREADY OVER THE NEW THRESHOLD, AND THE CUT IS NOT TAKEN HERE.</b>
+The brief scoped &sect;4 to writing the rule, and a cut is a content operation that wants its own
+verification pass. <b>It is owed at CX and is the first thing the next batch should take.</b></p>
+
+<h3>&sect;5 &mdash; WHAT COMES OUT OF THE SYNC</h3>
+<p>Not a repo change &mdash; a list for the designer to apply in the connector&rsquo;s file picker,
+and <b>deselecting is not deleting</b>. <b>Take out 1,702 KB (30.4%): the 44 suites at the repo
+root</b> (Claude Code reads them off disk; <b>they cannot be archived, since they must be in the
+repo to run</b>) <b>and <code>docs/build_docs.py</code></b>; plus the two audit documents (75 KB)
+once their findings are confirmed applied. <b>The archived changelog is already outside the repo
+and was never synced.</b> <b>Applying it takes the sync to 3.80 MB</b> from 6.15 MB before this
+batch &mdash; a cumulative <b>38.2%</b>, none of it by deleting anything.</p>
+
+<h3>VERIFIED</h3>
+<p><b>The floor is that it parses and it runs, which is the point of doing this now.</b>
+<code>check_parse.gd</code> headless with <b>stderr grepped for <code>Parse Error|SCRIPT ERROR</code>
+&mdash; 0 matches</b>, which is the authority rather than the tally (the tally agreed at 0). The
+game launches and runs to <code>--quit-after 150</code>, <b>exit 0</b>, nothing on the stream.
+<b>No file under <code>scripts/</code>, <code>scenes/</code> or <code>data/</code> was touched.</b></p>
+
 <h2>2026-08-20 &mdash; Batch CV: THE TALENT AUDIT CORRECTIONS</h2>
 <p><i><b>IMPLEMENT ONLY.</b> CU audited all 324 nodes and changed nothing; this batch applies the
 rulings. <b>52 node texts moved and NO read site did</b> &mdash; every disagreement was settled in
