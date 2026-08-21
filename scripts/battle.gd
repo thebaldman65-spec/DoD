@@ -5238,13 +5238,21 @@ func _eff_cost(u: BattleUnit, ab: Ability, target: BattleUnit = null) -> int:
 # call-site census in CP's changelog entry for why a global max would be wrong
 # at the counter sites.
 
-# THE QUALIFYING SET: 58 abilities whose whole payload is a status application.
+# THE QUALIFYING SET: 59 abilities whose whole payload is a status application.
 # Membership is asserted against the live corpus by `check_co.gd`.
+#
+# **BATCH DA §2 ADDED THE 59th, GLACIAL PRISON, AND IT IS THE FIRST TALENT-GRANT
+# IN THE SET.** It was reachable all along and nothing could see it: the Batch CL
+# walk four gates carried never enumerated the five abilities a talent node
+# grants into no pool, so CO's criterion was never run over them. `check_cz`
+# re-ran the criterion once `Classes.ability_corpus()` reached 216 and named this
+# one; DA takes it.
 const RECAST_GATED := ["aegis_wall", "alms", "anointing", "answering_steel",
 	"anvil", "arcane_arrows", "battle_poise", "bloodbond", "bola", "camouflage",
 	"choking_smoke", "cons_ground", "consecration", "covering_guard",
 	"divine_presence", "divine_shield", "divine_wrath", "downwind", "emberkeep",
-	"exhortation", "feigned_guard", "formless", "ghostpack", "hoarfrost_armor",
+	"exhortation", "feigned_guard", "formless", "ghostpack", "glacial_prison",
+	"hoarfrost_armor",
 	"hysteria", "immolate", "instinct", "interpose", "ironclad", "last_howl",
 	"magic_barrier", "mana_shield", "mana_well", "mantle", "mirror_image",
 	"null_field", "penance", "quickdraw", "recompense", "resonant_field",
@@ -5292,7 +5300,7 @@ func _recast_targets(u: BattleUnit, ab: Ability) -> Array:
 			return heroes.filter(func(h): return not h.dead and not h.is_companion \
 				and h != u)
 		"hysteria", "slow_burn", "choking_smoke", "rime", "umbral_sigil", \
-				"penance", "bola":
+				"penance", "bola", "glacial_prison":
 			return enemies.filter(func(e): return not e.dead)
 		"covering_guard":
 			return _hero_side().filter(func(h): return h != u)
@@ -5432,6 +5440,45 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		"rime":
 			return [{"id": "rime", "turns": 4 + u.icy_resolve_ranks, "power": 0},
 				{"id": "frostbite", "turns": 2, "power": 0}]
+		# BATCH DA §2 — THE ONLY MEMBER WHOSE HANDLER GUARDS ITS OWN WRITE, so
+		# the GUARD is mirrored here and not just the value: on an already-Chilled
+		# target `_resolve_special` does not merely lose a max(), it never calls
+		# `_apply_status` at all.
+		#
+		# TWO HALVES, AND THE TEST IS EXACT ON BOTH. The CHILLED half is proposed
+		# only when it would land — the handler reads
+		# `if not target.has_status("chilled")`, so a target carrying any Chilled
+		# gets nothing from it, neither a refresh nor a stack, and proposing a
+		# write there would have the gate read its own optimism as an improvement
+		# (CR §3 from the other direction). The FREEZE half is proposed
+		# unconditionally and `_status_write_improves` decides it, exactly as
+		# every other member of this table works: `_hold_freeze` returns
+		# immediately on an already-frozen target, and a proposed `frozen` that is
+		# neither longer nor deeper than the standing one is what "would not
+		# improve" means. The duration is `_freeze_turns`, the handler's own.
+		#
+		# SO IT REFUSES ONLY WHEN EVERY LIVING ENEMY IS BOTH FROZEN AND CHILLED,
+		# which is the honest scope of a rule that darkens a BUTTON rather than a
+		# pick — the same scope Rime, Bola and Hysteria have carried since CO.
+		# §2 asks which half decides it: the Chilled half almost never saves the
+		# cast, because a frozen body always carries Chilled (`_hold_freeze` sets
+		# the pile to 4 for a hold and 1 for ordinary ice), so the POOL decides it
+		# — one clean enemy anywhere keeps the button lit. Measured in
+		# `docs/reports/DA.md`.
+		#
+		# ONE KNOWN INEXACTNESS AND IT ERRS TOWARD ALLOWING: a NON-BOSS holding a
+		# one-turn freeze while a Cryomancer stands would read the proposed
+		# permanent hold as an improvement while the handler wrote nothing.
+		# `_apply_status(_, "frozen", …)` has exactly ONE call site, inside
+		# `_hold_freeze`, and it cannot produce that pairing — it needs a
+		# Cryomancer who died, let the ice land timed, and was resurrected.
+		# Allowing a wasted cast is the safe error; refusing a live one is not.
+		"glacial_prison":
+			var gp: Array = []
+			if not t.has_status("chilled"):
+				gp.append({"id": "chilled", "turns": 3, "power": 0})
+			gp.append({"id": "frozen", "turns": _freeze_turns(t), "power": 0})
+			return gp
 		"bola":
 			return [{"id": "slow", "turns": 4, "power": 0},
 				{"id": "cripple", "turns": 4, "power": 0}]
@@ -11300,6 +11347,25 @@ func _hold_window_mult() -> float:
 	return 1.0 + (HOLD_WINDOW + _max_hero_rank("killing_frost")) * 0.01
 
 
+# WOULD A FREEZE ON `target` BE A HOLD, OR ORDINARY ICE? The ONE authored copy
+# of the question. A hold needs a living Cryomancer, and it is never laid on a
+# HERO — Hoarfrost plus an enemy chill can reach one, and a held hero would be a
+# softlock wearing the spec's clothes.
+func _freeze_holds(target: BattleUnit) -> bool:
+	return _living_hero_passive("permafrost") != null and not target.is_hero
+
+
+# HOW LONG THAT FREEZE WOULD LAST, and the ONE authored copy of THAT. One turn
+# for a boss (the carve-out — it shrugs the ice off and acts again) or for
+# ordinary ice with no Cryomancer standing; PERMANENT for a real prison.
+#
+# TWO CALLERS AND THAT IS THE WHOLE REASON IT EXISTS: `_hold_freeze` performs
+# the write, and `_recast_writes` PROPOSES it for Glacial Prison's refusal
+# (Batch DA §2). Two copies of one duration is CR §3's defect exactly.
+func _freeze_turns(target: BattleUnit) -> int:
+	return 1 if (target.is_boss or not _freeze_holds(target)) else -1
+
+
 # THE ONE PLACE A HOLD BEGINS. THREE callers: the Chilled-4 branch of
 # _apply_status, Glacial Prison, and Batch BT's Flash Freeze (both of the
 # latter skip straight to it).
@@ -11328,10 +11394,18 @@ func _hold_freeze(target: BattleUnit, src: BattleUnit, force := false) -> void:
 	# an enemy chill can reach — means an ORDINARY freeze, not a hold. A held
 	# hero would be a softlock wearing the spec's clothes.
 	var cryo := _living_hero_passive("permafrost")
-	var holding := cryo != null and not target.is_hero
+	# BATCH DA §2 — BOTH FACTS COME OUT OF ONE AUTHORED COPY EACH. Glacial
+	# Prison's recast refusal PROPOSES the duration this line writes, and CR §3's
+	# defect was exactly a duration authored in the handler and again in the
+	# gate's table: they diverged, the gate read its own longer number as an
+	# improvement, and it stopped refusing anything. `_freeze_holds` and
+	# `_freeze_turns` are below; the branches further down still read `holding`
+	# and `timed`, which now derive from them rather than restating them.
+	var holding := _freeze_holds(target)
 	# The boss carve-out: one turn of ice, then it acts again on its own.
-	var timed := target.is_boss or not holding
-	_apply_status(target, "frozen", 1 if timed else -1, 0, 0, null, force)
+	var frozen_turns := _freeze_turns(target)
+	var timed := frozen_turns > 0
+	_apply_status(target, "frozen", frozen_turns, 0, 0, null, force)
 	if not target.has_status("frozen"):
 		return                      # boss immunity bounced it; the stacks sit
 	# (`was_frozen` was stamped here until Batch BJ §1 — the old "shattering"
@@ -13958,6 +14032,17 @@ var _communion_chain := false
 # it lowers the ceiling on the held benefit from 5 stacks to 3 for every ally
 # at once. The lane trades depth of hold for frequency of release, deliberately,
 # and `docs/reports/CZ.md` reports both halves measured rather than one.
+#
+# ===== BATCH DA §1 — THE THRESHOLD STAYS AND THE BUILDERS WENT BACK =====
+# The paragraph above says the threshold "does not move alone" and DA makes it
+# move alone anyway, so the reversal is written here rather than left to be
+# inferred. CZ's own §2 found that CY's arrival figure — the 1.6-of-5 quoted two
+# paragraphs up — samples the DEVOUT'S OWN meter, which holds and never releases
+# by rule. It was never a measure of release frequency; `releases/battle` was,
+# and it read 0.81 at rung 2 rather than a third of what was needed. **THE
+# THRESHOLD WAS SIZED AGAINST STRUCTURE AND SURVIVES; THE BUILDERS WERE SIZED
+# AGAINST THE BAD FIGURE AND DO NOT.** Both are back at their pre-CZ rates
+# (`FAITH_PER_ABSORB` 2, `FAITH_PER_GROUND_TURN` 1, below).
 const FAITH_RELEASE := 3
 const FAITH_MITIGATION_PCT := 2.0
 const FAITH_DAMAGE_PCT := 1.5
@@ -14407,42 +14492,44 @@ func _swear_opening_oath() -> void:
 # what says where; this row has had six batches and four briefs with something
 # wrong in them, and it does not get a fifth guess.
 #
-# **BATCH CZ §2 — THREE, AND BI's PREDICTION IS THE REASON.** It said outright
-# that 2 would be insufficient and it was right for four batches. CZ raises the
-# threshold and the builders together (see `FAITH_RELEASE` above), because the
-# decomposition BI asked for has now run: at rung 2 the party gains 10.8 Faith a
-# battle of which **absorbs are 3.7** across 2.3 absorbed hits — 1.6 Faith an
-# absorb ACTUALLY LANDED, against the 2 the constant promises, because the cap
-# throws the remainder away. Raising the rate raises what survives the cap too.
+# **BATCH CZ §2 RAISED THIS TO THREE AND BATCH DA §1 PUT IT BACK.** CZ's own
+# reasoning is why: it sized the raise against CY's arrival measurement, and CZ
+# itself then found that measurement was answering a different question — the
+# `conviction` row samples the DEVOUT'S OWN meter, which holds at the threshold
+# and never releases by rule. The figure that answers "does a release fire" is
+# `releases/battle`, and it read **0.81 a battle at rung 2**, not 1.6 of 5.
+# Tripling the builders on top of a halved threshold took it to **4.24**, a
+# fivefold move sized against a number that was wrong.
 #
-# **FLAGGED, NOT TUNED**, exactly as the brief asks: the figure is here, the
-# measured result is in `docs/reports/CZ.md` beside CY's original, and this is
-# the one line to move.
+# **AND IT REMOVED A MECHANIC, WHICH IS THE HALF THAT DECIDED IT.** At 3 per
+# absorb against a threshold of 3, ONE ABSORBED HIT IS A WHOLE RELEASE — a
+# shielded ALLY never HOLDS Faith at all, so the high-water mark Conviction is
+# built on (`faith_peak`, BI §1) stops existing for allies and the card stops
+# being a ramp. That is a larger change than the one that was asked for and
+# nobody chose it. CZ recorded the concern here rather than burying it; DA acted
+# on it.
 #
-# **AND THE CONCERN IS RECORDED RATHER THAN BURIED, BECAUSE IT IS REAL.** THREE
-# PER ABSORB AGAINST A THRESHOLD OF THREE MEANS ONE ABSORBED HIT IS A WHOLE
-# RELEASE: a shielded ALLY now never HOLDS Faith at all — he fills and pays out
-# on the same blow, and the held half of the meter stops existing for him. The
-# peak still pays (BI §1), so nothing is lost, but the card stops being a ramp
-# and becomes a per-hit heal. Two things say ship it anyway: the brief names
-# both builders as barely firing and asks for both to move, and the DEVOUT'S
-# OWN meter — the one the batch is measured on — is fed by the ground, not by
-# absorbs (measured: 3 per absorb moves his peak by nothing at all).
-# **`FAITH_PER_ABSORB := 2` IS THE MEASURED ALTERNATIVE**, one character away:
-# it holds releases at 3.2 a battle instead of 5.3 and costs 0.3 of the peak.
-# `docs/reports/CZ.md` prints all four combinations that were measured.
-const FAITH_PER_ABSORB := 3
+# **THE THRESHOLD IS THE HALF THAT STAYS.** `FAITH_RELEASE` is still 3 (see
+# above) — it was sized against structure rather than against the bad figure,
+# and CZ measured the threshold move ALONE at **2.71 releases a battle** at
+# rung 2 against the 0.81 it started from. That combination is this one:
+# `docs/reports/CZ.md` prints all four that were measured, and `docs/reports/DA.md`
+# re-measures this one at every rung.
+const FAITH_PER_ABSORB := 2
 
 # BATCH CZ §2 — THE GROUND'S DRIP, AND IT WAS A LITERAL `1` AT ITS ONE SITE.
-# **TWO NOW.** It is the LARGER of the two builders by volume — the rung-2
-# decomposition reads ground 6.9 against absorbs 3.7 — and it is the one the
-# Devout controls, so raising it raises the half of the meter a player can play
-# toward. The denominator is already measured and already reported: the ground
-# is up on **43% of hero turns** (6.8 of 15.8 a battle), so doubling the drip
-# does not double the meter — it doubles the share of turns that were already
-# paying, which is why the two builders move together rather than one of them
-# being asked to carry the batch.
-const FAITH_PER_GROUND_TURN := 2
+# **THE CONSTANT IS CZ'S AND IT STAYS; THE VALUE IS BACK TO ONE (BATCH DA §1).**
+# Naming it was the durable half of that change — a rate with a name can be
+# measured and moved, and a bare literal at a call site cannot — so the revert
+# moves the number and keeps the name. It is still the LARGER of the two
+# builders by volume (the rung-2 decomposition reads ground 6.9 against absorbs
+# 3.7 at CZ's rates) and still the one the Devout controls, on **43% of hero
+# turns** (6.8 of 15.8 a battle).
+#
+# It goes back for the same reason the absorb rate does: both were sized against
+# CY's arrival row, which was measuring the Devout's held meter rather than
+# release frequency. **The threshold at 3 is the honest half and it stays alone.**
+const FAITH_PER_GROUND_TURN := 1
 
 
 func _on_shield_absorbed(holder: BattleUnit) -> void:

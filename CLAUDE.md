@@ -753,21 +753,33 @@ firing"; the number that answers that was printed four lines below it the whole 
   mis-reading happened to be sound, so it survived until a batch tried to fix the number rather
   than the mechanism.
 
-## FAITH RELEASES AT `FAITH_RELEASE`, AND THE LANE TRADES DEPTH FOR FREQUENCY (STANDING, CZ §2)
+## FAITH RELEASES AT `FAITH_RELEASE`, AND THE LANE TRADES DEPTH FOR FREQUENCY (STANDING, CZ §2, AMENDED DA §1)
 **The threshold is ONE number (`battle.FAITH_RELEASE`, 3) and it was a literal `5` in three
 places** — the cap on the count, the release branch, and Communion's "still building" guard.
+**THE BUILDERS ARE BACK AT THEIR PRE-CZ RATES: `FAITH_PER_ABSORB` 2, `FAITH_PER_GROUND_TURN` 1.**
 - **SHORTENING THE BAR LOWERS THE HELD CEILING TOO, AND THAT IS THE COST.** Faith pays on the
   highest count held and the count caps at the threshold, so the deepest benefit an ally can carry
   fell from 5 stacks to 3. **The lane trades depth of hold for frequency of release, deliberately.**
-  Raising the builders (`FAITH_PER_ABSORB`, `FAITH_PER_GROUND_TURN`) is what buys some of it back.
-- **A BUILDER RATE THAT MEETS THE THRESHOLD IN ONE EVENT CHANGES WHAT THE CARD IS.** At 3 per
-  absorb against a threshold of 3, **one absorbed hit is a whole release** — a shielded ally never
-  HOLDS Faith, and the card stops being a ramp and becomes a per-hit heal. Shipped and flagged
-  beside the constant. **A magnitude that changes what a card IS must never be a silent consequence
-  of a threshold moving somewhere else.**
+- **A BUILDER RATE THAT MEETS THE THRESHOLD IN ONE EVENT CHANGES WHAT THE CARD IS, AND THAT IS WHY
+  CZ's BUILDERS WENT BACK.** At 3 per absorb against a threshold of 3, **one absorbed hit is a
+  whole release** — a shielded ally never HOLDS Faith, so `faith_peak`, the high-water mark the
+  whole lane pays on, stops existing for allies and the card becomes a per-hit heal. **A magnitude
+  that changes what a card IS must never be a silent consequence of a threshold moving somewhere
+  else.** `check_da` asserts the RELATIONSHIP (`FAITH_PER_ABSORB < FAITH_RELEASE`) rather than the
+  number, and drives one absorb live to prove the hold is there.
+- **THE THRESHOLD WAS SIZED AGAINST STRUCTURE AND THE BUILDERS WERE SIZED AGAINST A BAD NUMBER.**
+  That is the whole of why one stayed and both went back. CZ sized the builders against CY's
+  arrival row and then itself proved that row samples the Devout's own held meter; the figure that
+  answers "does a release fire" is `releases/battle`, and it read **0.81 a battle at rung 2**, not
+  1.6 of 5. **When a batch discredits the measurement it is sized against, everything it sized is
+  owed a re-derivation — including the parts that look fine.**
 - **RAISING THE ABSORB RATE DOES NOT MOVE THE ARRIVAL FIGURE.** That row is the Devout's own meter,
   fed by the ground drip on his own turns; absorbs buy ally release frequency and nothing else.
   Measured, not assumed.
+- **THE THRESHOLD ALONE IS WORTH ROUGHLY A TRIPLING OF RELEASES** — 0.81 → **2.60** a battle at
+  rung 2, against 4.24 for the threshold plus tripled builders. Measured at every rung in
+  `docs/reports/DA.md`. **Elevation (2 of 3) and Blessing of the Faithful (3 of 3) were reported
+  and deliberately not changed at either batch.**
 
 ## A PURE BUFF COSTS HALF A SWING (STANDING, SET AT BATCH CY §1)
 > **A pure buff's initiative delay is capped at HALF the basic attack's delay. Setting up costs
@@ -861,16 +873,46 @@ both grant shapes go through. **The corpus is 216; the CL walk alone reaches 211
   missing the five; if it ever stops being, the gap closed itself and every report about it is
   stale.
 - **CN's CRITERION OWES NOTHING** — re-run over the five it answers all of them correctly, and only
-  its printed population was ever short. **CO OWES ONE RULING ON ONE ABILITY: GLACIAL PRISON**,
-  whose whole cast-time payload is Chilled plus `_hold_freeze`, and `_hold_freeze` returns
-  immediately on an already-`frozen` target — **so a recast onto a held enemy writes nothing**.
-  Reported at CZ, not taken (CQ §6). The `_recast_writes` half must be right before the table entry
-  goes in.
+  its printed population was ever short. **CO's ONE RULING WAS TAKEN AT DA §1: GLACIAL PRISON IS
+  GATED**, and it is the first talent-grant in `RECAST_GATED`. **That is what the enumeration hole
+  actually cost** — the criterion could not be applied to an ability no walk in the project could
+  see, so the defect was invisible rather than merely unfixed.
+
+## A HELPER COPIED BETWEEN GATES INHERITS ITS BUGS AND DIVERGES SILENTLY (STANDING, SET AT DA §3)
+> **Enumerate the ability corpus through `Classes.ability_corpus()`. Never copy another gate's
+> walk.** A talent can grant an ability that lives in no pool, and a hand-rolled walk misses five.
+> **A helper copied between gates inherits its bugs silently and diverges from its origin without
+> anything reporting it.**
+
+**THIS IS A DIFFERENT FAILURE FROM EVERY OTHER TRAP IN THIS FILE AND IT IS THE FIRST CONFIRMED CASE
+IN THE PROJECT.** The rest are DRIFT: one authority, edited, and a second copy left behind. This is
+**PROPAGATION BY COPY** — five gates were wrong in five places from birth, because four of them
+copied `check_cl_width`'s walk rather than deriving one. **Fixing the origin leaves four.** Drift
+gives you one stale copy and a chance that a diff notices; a copied helper gives you N, all born
+wrong, none of them diffed against anything.
+
+- **THE TELL IS A HELPER WITH THE SAME NAME IN THREE OR MORE GATES.** Ask whether the answer belongs
+  to the GAME's data rather than to the test — `ability_corpus` did, which is why it lives on
+  `Classes` and not in a gate.
+- **CZ's `_cl_only_corpus` IS THE ONE ALLOWED COPY** and it is allowed because being a copy is its
+  job: it is the negative control that proves the old walk still misses the five. **`check_da`
+  names it as the exemption, so a later reader cannot "consolidate" it into uselessness.**
+- **THE SWEEP RAN AT DA §3 AND FOUND ONE MORE, REPORTED AND NOT CONSOLIDATED: `_spawn`, THE BATTLE
+  FIXTURE, IS COPIED INTO SEVEN GATES AS FOUR DIVERGENT BODIES.** It has already cost twice — the
+  copied `_report` diverged into `"N checks, M failures"` and `"N checks / M failures"`, which is
+  the exact `grep -E "checks,"` scar recorded in `run_battery.sh`'s own header; and CQ §1 removed
+  the two hand-set `Profile` flags from `check_cm_live`'s copy and left them standing in
+  `check_co`'s and `check_ct`'s, with nothing anywhere reporting the divergence. **`check_da` §3
+  prints the census every run so the number cannot rot into a sentence nobody re-checks.**
+- **CONSOLIDATING THEM IS ITS OWN BATCH.** A shared fixture has to serve four legitimately
+  different needs (a party parameter, `check_cs`'s determinism forcing, `check_ct`'s pre-loaded
+  pouch, `check_cm_live`'s deliberately absent flags) and getting that wrong breaks every gate at
+  once.
 
 ## A recast that would not improve is REFUSED (STANDING, SET AT BATCH CO)
 **THE RULE: a status recast that would improve neither duration nor power is refused, and the
 refusal is scoped to abilities whose WHOLE PAYLOAD is the status.** `_recast_refused` is the ONE
-answer; `RECAST_GATED` (58 abilities) is the set.
+answer; `RECAST_GATED` (**59** abilities since DA §2) is the set.
 
 - **WHY IT EXISTS.** `add_status` resolves a re-application as `max()` on duration and power, so a
   status whose power is a **snapshot of live state** could be recast at a weaker value, have that
@@ -916,9 +958,22 @@ answer; `RECAST_GATED` (58 abilities) is the set.
   one that reads the table. **ANY EDIT TO A DURATION, POWER OR RIDER ON A `RECAST_GATED` ABILITY
   OWES THE SAME EDIT AT `_recast_writes`** — it is Batch BP's Eye of the Storm (two copies of one
   figure) one door along.
+- **A HANDLER THAT GUARDS ITS OWN WRITE NEEDS THE GUARD MIRRORED, NOT THE VALUE (STANDING, DA §2).**
+  Every other member of the set calls `_apply_status` unconditionally and lets `add_status`'s
+  `max()` discard the weaker value; **Glacial Prison does not** — it reads
+  `if not target.has_status("chilled")` and never calls it at all. `_recast_writes` therefore
+  proposes the Chilled half **only when it would land**, and proposes the freeze half
+  unconditionally so `_status_write_improves` can decide it. Get this backwards and the table reads
+  its own optimism as an improvement — **CR §3 from the other direction.**
+- **THE REFUSAL DARKENS A BUTTON, NOT A PICK, AND THAT BOUNDS WHAT IT CAN EVER BUY.** For a
+  picked-target card the pool is every legal target, so the button dims only when **no** legal pick
+  would improve. On Glacial Prison one unfrozen enemy anywhere keeps it lit; the refusal is real but
+  it fires on single-enemy boards and little else. **That is the honest scope of the rule and not a
+  defect in it** — Rime, Bola and Hysteria have carried the same scope since CO. **A per-pick
+  refusal would be a second path, which CO forbids: one door, `_ability_usable`.**
 - **`check_co.gd` IS THE ANTI-ROT PROOF AND IT IS A LIVE ONE.** It spawns **two** real battles —
   Alms and Divine Presence need Mercy, Mantle needs a living Devout, so one party cannot write the
-  whole set — casts all 58 onto every unit each can reach, and asserts the gate's prediction
+  whole set — casts all 59 onto every unit each can reach, and asserts the gate's prediction
   against what actually landed. It also asserts the excluded cards OUT by name.
 - **KNOWN, RECORDED, NOT FIXED:** Battle Shout, Stabilize and Eye of the Storm call
   `update_status` with a *computed* power after `_apply_status`, and `update_status` **assigns**

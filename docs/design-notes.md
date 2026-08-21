@@ -4493,3 +4493,72 @@ pattern as the changelog case, arriving through a different door. That is the re
 implement-only convention: not that things break, but that **the interval between breaking and
 noticing is now measured in batches**, and the batch that finds it is never the batch that can
 best decide what to do about it.
+
+
+## Batch DA — the honest half of a two-part change, and the first copy-propagated defect
+
+Two corrections, and they are opposite shapes. One is a magnitude going back; one is a refusal
+going in. What connects them is that both were made possible by the *previous* batch reporting
+something against its own interest.
+
+**CZ discredited the measurement CZ was sized against, and shipped anyway.** That is the thing
+worth writing down. Its §2 found that CY's Faith arrival row samples the Devout's own meter — the
+one that holds and never releases by rule — so the "1.6 of the 5 a release needs" that motivated
+the whole change had never been a measure of release frequency at all. The batch wrote that finding
+up clearly, printed the row that *does* answer the question (0.81 releases a battle), and then kept
+the magnitudes it had already sized against the bad number. Not dishonestly: it re-measured
+afterwards and reported four combinations, one of which was the one this batch has now reverted to.
+
+The general lesson is not "re-measure". It is that **a batch that discredits its own instrument has
+acquired an obligation it cannot discharge in the same batch**, because everything it has already
+built is sized against the discredited figure and unpicking that is a second batch's worth of work.
+The right move is what CZ actually did — ship, flag hard, name the one-character alternative — and
+the failure mode to avoid is the quieter one where the finding goes in the report and the
+magnitudes never get revisited because the report reads as though the matter was settled.
+
+**The half that survived and the half that did not split along a clean line, and it is not "how
+big".** The threshold was sized against *structure*: a bar of five in a fight lasting three to five
+turns per hero is too long, and that argument does not depend on the arrival figure at all.
+The builders were sized against the *number*. So one stayed and both went back, and the
+re-measurement confirms the split was real — the threshold alone still roughly triples releases at
+every rung. **When an instrument turns out to be wrong, sort the decisions by what they were
+actually resting on, not by how confident they felt.**
+
+**The second reason the builders went back is the one that would have decided it even if the
+numbers had been fine.** Three per absorb against a threshold of three means one absorbed hit is a
+whole release, so a shielded ally never *holds* Faith — and Conviction pays on the high-water mark.
+The mechanic did not get weaker; it stopped existing for allies. **A magnitude that changes what a
+card IS is not a tuning change**, and it should never arrive as a consequence of a threshold moving
+somewhere else. That is a different kind of reviewable event from "this number is too high", and
+the two want different scrutiny.
+
+**Glacial Prison is a small refusal with one interesting property.** Every other member of CO's set
+calls `_apply_status` unconditionally and relies on `add_status`'s `max()` to discard a weaker
+value; the gate's job there is to predict the max. Glacial Prison **guards its own write** — it
+never calls the function at all on a Chilled target — so the prediction table has to mirror the
+*guard*, not the value. Mirroring the value would make the gate propose a write the handler will
+never perform, read it as an improvement, and stop refusing: CR §3's defect approached from the
+opposite side.
+
+**And it exposed how narrow this class of refusal really is.** The rule darkens a *button*, and a
+button serves every legal target, so a picked-target card can only ever be refused when *no* enemy
+would improve. On Glacial Prison one unfrozen enemy keeps it lit. That is not a flaw — Rime and
+Bola have had the same scope since CO — but it is worth being explicit that **"refuse a cast that
+would do nothing" and "refuse a cast onto this target that would do nothing" are different
+features**, and only the first one exists. Building the second means a per-pick affordance, which
+means a second decision site, which is the thing CO exists to prevent.
+
+**The copied-helper rule is the first genuinely new failure mode this project has recorded in a
+while.** Everything in the traps list is drift: one authority, edited, a stale copy left behind.
+This is propagation — five gates carrying one enumeration hole because four copied the fifth's
+walk rather than deriving one. The asymmetry is what makes it worth its own rule: **drift leaves
+one wrong copy and a chance that a diff notices; a copy leaves N wrong copies, all born wrong, none
+of them compared against anything.** Fixing the origin leaves four.
+
+The sweep for others found the battle fixture `_spawn` in seven gates as four divergent bodies, and
+the divergence has already cost twice — once when a copied `_report` drifted into two output
+formats and the battery's grep silently missed one of them, and once when CQ removed two
+`Profile.set_flag` lines from one copy on purpose and left them standing in two others with nothing
+reporting the split. **Neither was found by a test. Both were found by someone reading two files
+side by side**, which is the strongest argument for the rule: this defect class has no detector,
+so it needs a habit instead.

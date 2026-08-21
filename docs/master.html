@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-21 (Batch CZ)</b></p>
+<p align="right"><b>Last updated: 2026-08-21 (Batch DA)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -761,13 +761,13 @@ Block; a block it buys is logged as "(Bulwark Line)".</td></tr>
 health, snapshotted (and Mercy-scaled) when cast.</td></tr>
 <tr><td>Hallowed</td><td>Immune to new debuffs (Empowered Divine Plea, 3
 turns).</td></tr>
-<tr><td>Faith</td><td>Conviction (Devout passive): Divine Shield absorbs (3 a hit) AND
-standing on Consecrated Ground (2 an ally a turn) build stacks, max 3.
+<tr><td>Faith</td><td>Conviction (Devout passive): Divine Shield absorbs (2 a hit) AND
+standing on Consecrated Ground (1 an ally a turn) build stacks, max 3.
 <b>WHAT A STACK PAYS IS READ OFF THE HIGHEST COUNT THE CARRIER HAS HELD THIS BATTLE, NOT
 THE COUNT HELD RIGHT NOW</b> — 2% damage mitigation and +1.5% damage dealt per PEAK stack.
 The Apostle capstone adds another 1× and Fervor another again while the carrier stands on
 Consecrated Ground, so <b>the two together are TRIPLE and never quadruple: they add to the
-base rather than multiplying each other</b>. At 5 the bearer heals 15% max health, the
+base rather than multiplying each other</b>. At 3 the bearer heals 15% max health, the
 COUNT resets — <b>the peak does not, so a release never takes the held benefit away</b> —
 the Devout recovers 3% max Mana, and the Devout's own maximum health rises 3% of his base
 for the rest of the battle (he is healed for that amount too).
@@ -1384,7 +1384,7 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Ordination</b></td><td>25 Mana, 2.0, 4cd</td><td>Grants <b>4 Faith</b> to the ally holding the <b>LEAST</b> Faith. Not player-chosen: it always finds the floor.</td><td>Starting the engine without waiting to be hit. Every other Faith source he owns is reactive (an absorb) or slow (the ground's drip).<br><b>Why the floor:</b> it points the card at the ally <b>Communion cannot reach</b>, since that roll scales with their <i>own</i> stacks and an ally on zero is never rolled for. <b>The grant is larger than the release threshold</b>, so it always carries its target over the line and heals them; the remainder is spent rather than banked, which is the price of a card that never has to be aimed.<br><b>Builds with:</b> <b>Blessed are the Faithful</b> (the release it walks them toward heals 35% of their maximum), <b>Communion</b>, <b>Binding Oath</b> (an ally's release swears him a stack of his own) and <b>Reliquary</b> below, which cashes the peaks this raises.</td></tr>
 <tr><td><b>Fortified Spirit</b></td><td>25 Mana, 2.0, 4cd, one ally</td><td>That ally's <b>maximum health rises by 30% of the Devout's</b> and they are healed for the same amount (Perfect: 40%). The loan then <b>decays by a tenth of his maximum at the start of each of their turns</b> — 30 → 20 → 10 → gone. <b>Current health clamps under it</b>, so an ally kept topped up loses real health on the way down while one sitting at half never notices.</td><td>Lending the number his whole kit is built on. Divine Shield absorbs 30% of his maximum, Afterglow heals 20% of it, Healing Pulse ticks 8% of it — this is the first thing that lends the <i>figure itself</i>, and it stacks with a shield rather than duplicating one: a shield is a bucket that empties, this is a bigger bucket.<br><b>Builds with:</b> <b>Unwavering Faith</b> (+20% his maximum) enlarges every point of it, and it rewards healing them <i>inside</i> the window — <b>Healing Pulse</b> and <b>Consecrated Ground</b> both tick a share in before it closes.</td></tr>
 <tr><td><b>Reliquary</b></td><td>30 Mana, 2.5, 5cd, all allies</td><td>Every ally is healed for <b>2.5% of the Devout's maximum health per point of their PEAK Faith</b> this battle (Perfect: 3.5%). The peak never falls, so <b>an ally who released down to zero is still paid in full</b> for what they carried.</td><td>Cashing an accumulation nothing else reads. It grows all fight and pays most to whoever has <i>carried</i> the most faith — investment collecting on its own record.<br><b>Builds with:</b> <b>Unwavering Faith</b> and Conviction's own growth enlarge every point; <b>Ordination</b> above raises the very peaks it reads.</td></tr>
-<tr><td><b>Elevation</b></td><td>35 Mana, 2.5, 5cd, all allies</td><td><b>Every ally gains 2 stacks of Faith</b>, visible on the bar. <b>An ally already holding 3 or more reaches the cap of 5 and RELEASES</b> — healed 15% of their maximum, the count reset, the Devout paid 3% of his Mana. Their <b>peak is untouched by the release</b>, so it costs them nothing they were holding.</td><td>Both of his builders are slow drips — 2 a shielded hit, 1 an ally turn on the ground — and nothing in the game let him hand a stack over. This is a whole party's worth at once.<br><b>Builds with:</b> <b>Apostle</b> and <b>Fervor</b>, multipliers on the held half; <b>Reliquary</b> reads the peaks these stacks ratchet on their way up; <b>Unwavering Faith</b> enlarges the figure both are shares of; and <b>Binding Oath</b> swears him a stack of his own on every release this triggers, so a party sitting at three turns one cast into four payouts.</td></tr>
+<tr><td><b>Elevation</b></td><td>35 Mana, 2.5, 5cd, all allies</td><td><b>Every ally gains 2 stacks of Faith</b>, visible on the bar. <b>An ally already holding 1 or more reaches the threshold of 3 and RELEASES</b> — healed 15% of their maximum, the count reset, the Devout paid 3% of his Mana. Their <b>peak is untouched by the release</b>, so it costs them nothing they were holding.</td><td>Both of his builders are slow drips — 2 a shielded hit, 1 an ally turn on the ground — and nothing in the game let him hand a stack over. This is a whole party's worth at once.<br><b>Builds with:</b> <b>Apostle</b> and <b>Fervor</b>, multipliers on the held half; <b>Reliquary</b> reads the peaks these stacks ratchet on their way up; <b>Unwavering Faith</b> enlarges the figure both are shares of; and <b>Binding Oath</b> swears him a stack of his own on every release this triggers, so a party sitting at three turns one cast into four payouts.</td></tr>
 <tr><td><b>Blessing of the Faithful</b></td><td>20 Mana, 2.0, 4cd, self</td><td>Spends <b>ALL of his own Faith</b> for <b>6% of his maximum health and 3% of maximum Mana per stack</b> (Perfect: 8%). <b>Needs 3 held.</b> His <b>PEAK DROPS TO MATCH</b>: the mitigation and damage those stacks were buying for the rest of the fight are spent with them.</td><td>The payout that does not exist for him. An ally reaching the threshold is healed and hands him Mana; his own count holds there and never releases, so his Faith pools. <b>Needing 3 held is now the WHOLE bar</b>, so the card is castable exactly when his meter is full — and only by him, since an ally reaching 3 releases on the spot. This is what finally spends it — <b>burst sustain bought with permanent mitigation</b>, rather than a payout that costs nothing.<br><b>It is not a release and must never become one</b> — no principal growth, no Communion, no Binding Oath.<br><b>Builds with:</b> <b>Binding Oath</b> (an ally's release swears him a stack, so a releasing party rebuilds both the count and the peak this spends), <b>Consecrated Ground</b>'s drip onto its own caster, and <b>Unwavering Faith</b>, which makes every point of the heal larger.</td></tr>
 <tr><td><b>Mantle</b></td><td>25 Mana, 1.0, 4cd, one ally</td><td>A <b>Divine Shield worth 25% of his maximum health</b> — and when it <b>breaks</b> it <b>passes to the ally on the lowest health</b>, three times. It never passes back to the body it just left. <b>Every hop is a real Divine Shield</b>, so every one of them builds Faith.</td><td>The absorb is the dry source of his whole engine — Conviction builds only on Divine Shield absorbs, and those were measured at 1.5 a battle. A shield that becomes three shields is three times the trigger.<br><b>Builds with:</b> every Divine Shield rider, because each hop is one — <b>Blessed Barrier</b>, <b>Afterglow</b>, <b>Warded Robes</b>, <b>Sacred Covenant</b>. <b>Blessing of Zeal</b> doubles the Faith every absorb pays. Deliberate <b>anti-synergy with Unyielding Aegis</b>: a re-formed shield has not broken, so it does not pass.</td></tr>
 <tr><td colspan="4"><b>Occultist</b> — <i>what else can be corrupted</i></td></tr>
@@ -1720,8 +1720,8 @@ Mercy is paid ON TRIGGER, not on cast, so a Cleric holding none arms nothing.<br
 three BY DESIGN — Divine Shield, Afterglow, Healing Pulse and the Faith release all pay
 out percentages of HIS maximum: his own bulk is what he lends out).<br>
 Passive <i>Conviction</i>: allies build <b>Faith</b> whenever
-<b>Divine Shield absorbs damage for them</b> (3 per absorbed hit) and whenever they begin
-a turn standing on <b>Consecrated Ground</b> (2 per ally per turn) — max 3 stacks; doubled
+<b>Divine Shield absorbs damage for them</b> (2 per absorbed hit) and whenever they begin
+a turn standing on <b>Consecrated Ground</b> (1 per ally per turn) — max 3 stacks; doubled
 under Blessing of Zeal; the stacks only work while the Devout stands.
 <b>THE HELD VALUE IS PAID ON THE PEAK — the highest Faith the carrier has held this
 battle — RATHER THAN ON THE CURRENT COUNT.</b> That is what stops Conviction's two halves
@@ -1748,7 +1748,7 @@ the fight.<br>
 Divine Shield — 15 Mana, 1.0, 2cd; an ally shield absorbing 35% of the Devout's max
 health, then it breaks.<br>
 Consecrated Ground — 25 Mana, 1.0, 3cd; the party takes 15% less damage, reflects
-10% of damage taken, and <b>every ally gains 2 Faith at the start of their turn</b>, for
+10% of damage taken, and <b>every ally gains 1 Faith at the start of their turn</b>, for
 2 turns (Perfect: 3 turns). The Faith drip needs no talent — it is Conviction's only
 party-wide source.<br>
 Blessing of Zeal — 20 Mana, 2.0, 2cd; an ally deals +15% damage for 3 turns, their

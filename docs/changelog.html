@@ -14,6 +14,181 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-21 &mdash; Batch DA: ROLL BACK FAITH&rsquo;S BUILDERS, REFUSE GLACIAL PRISON</h2>
+<p><i>Two corrections and one standing rule. <b>Faith&rsquo;s two builders go back to their pre-CZ
+rates and the release threshold stays at 3</b>; <b>Glacial Prison joins CO&rsquo;s recast
+refusal</b>, the first talent-granted ability in that set; and <b>a helper copied between gates is
+recorded as a named failure mode</b>, with the sweep for others reported and nothing consolidated.
+<b>No save version moves (still v10).</b> The full report is <code>docs/reports/DA.md</code>.</i></p>
+
+<h3>&sect;1 &mdash; FAITH&rsquo;S BUILDERS GO BACK; THE THRESHOLD STAYS</h3>
+<p><b><code>FAITH_PER_ABSORB</code> 3 &rarr; 2 and <code>FAITH_PER_GROUND_TURN</code> 2 &rarr; 1.
+<code>FAITH_RELEASE</code> is untouched at 3.</b> The named constant for the ground drip is
+CZ&rsquo;s and it stays &mdash; naming the rate was the durable half of that change, since a bare
+literal at a call site can be neither measured nor moved. The revert moves the number and keeps the
+name.</p>
+<p><b>WHY THE THRESHOLD WAS THE HONEST HALF AND THE BUILDERS WERE NOT.</b> CZ sized the builders
+against CY&rsquo;s arrival measurement and then, in the same batch, <b>proved that measurement was
+answering a different question</b>: the <code>conviction</code> row samples the DEVOUT&rsquo;S OWN
+meter, which holds at the threshold and never releases by rule. The figure that answers &ldquo;does
+a release fire&rdquo; is <code>releases/battle</code>, and it read <b>0.81 a battle at rung 2</b>,
+not 1.6 of 5. Tripling the builders on top of a halved threshold took it to <b>4.24</b> &mdash; a
+fivefold change sized against a number that was wrong. <b>The threshold was sized against structure
+instead</b> (a bar of five in a fight lasting three to five turns per hero), and that argument never
+depended on the arrival figure at all.</p>
+<p><b>AND IT REMOVED A MECHANIC, WHICH IS THE HALF THAT DECIDED IT.</b> At 3 per absorb against a
+threshold of 3, <b>one absorbed hit was a whole release</b>: a shielded ALLY filled and paid out on
+the same blow and <b>never held Faith at all</b>, so <code>faith_peak</code> &mdash; the high-water
+mark the entire lane pays its mitigation and damage on &mdash; stopped existing for allies. The card
+stopped being a ramp and became a per-hit heal. <b>CZ recorded that concern in full rather than
+burying it; it was a larger change than the one that was asked for and nobody chose it.</b></p>
+<p><b>RE-MEASURED AT EVERY RUNG.</b> Releases a battle, before CZ &rarr; CZ shipped &rarr; now:
+rung 1 <b>0.51 &rarr; 3.83 &rarr; 1.93</b>; rung 2 <b>0.81 &rarr; 4.24 &rarr; 2.60</b>; rung 3
+<b>0.75 &rarr; 5.28 &rarr; 2.48</b>; Sharpshooter party <b>1.49 &rarr; 6.39 &rarr; 3.62</b>.
+<b>The threshold alone lands between the two at every rung and is nowhere near 0.81 &mdash; it is
+roughly a TRIPLING of the pre-CZ rate.</b> So the threshold was the half that mattered: it does most
+of the work the builders were also asked to do, without changing what the card is. Devout healing a
+battle comes back about a third from CZ&rsquo;s peak and stays well above where the lane started
+(rung 2: 69 &rarr; 178 &rarr; 133).</p>
+<p><b>ELEVATION AND BLESSING OF THE FAITHFUL ARE REPORTED AND UNCHANGED, AS INSTRUCTED.</b>
+Elevation grants 2 against a threshold of 3 &mdash; <b>67% of a release, party-wide, in one
+cast</b>. Blessing of the Faithful still needs 3 held of a possible 3, <b>the whole bar</b>, and is
+still castable only by the Devout since an ally reaching 3 releases on the spot. Both are printed by
+<code>check_cz</code> and <code>check_da</code> every run so neither can drift silently.</p>
+<p><b>A CZ DOCUMENTATION MISS THE REVERT EXPOSED, FIXED HERE.</b> <code>master.html</code> still
+described the release threshold as <b>5</b> in two places &mdash; Elevation&rsquo;s card
+(&ldquo;reaches the cap of 5 and RELEASES&rdquo;) and the Faith status row (&ldquo;At 5 the bearer
+heals 15%&rdquo;). <b>CZ moved that number in three code sites and in three of five prose sites.</b>
+Both are corrected, along with the builder rates in the status row, the spec block, Consecrated
+Ground&rsquo;s card and the glossary.</p>
+
+<h3>&sect;2 &mdash; GLACIAL PRISON IS REFUSED WHEN IT WOULD WRITE NOTHING</h3>
+<p><b>Its whole cast-time payload is Chilled plus <code>_hold_freeze</code></b>, and that function
+returns immediately on an already-<code>frozen</code> target &mdash; so a recast onto a held enemy
+writes nothing while costing the turn, the resource and the cooldown. <b>Three edits and no
+fourth:</b> <code>RECAST_GATED</code> gains it (<b>59</b> now), <code>_recast_targets</code> adds it
+to the living-enemies pool, and <code>_recast_writes</code> gains its case. The refusal is
+<code>_recast_refused</code> called from <code>_ability_usable</code>, <b>the same door every other
+refusal uses</b>. <code>check_da</code> counts the occurrences of <code>_recast_refused</code> in
+<code>battle.gd</code> and fails on a fourth, so a second path cannot be added quietly.</p>
+<p><b>IT IS THE FIRST TALENT-GRANT IN THE SET, AND THAT IS WHAT THE ENUMERATION HOLE ACTUALLY
+COST.</b> CO&rsquo;s criterion could not be applied to an ability no walk in the project could see,
+so the defect was <i>invisible</i> rather than merely unfixed.</p>
+<p><b>THE ONE MEMBER WHOSE HANDLER GUARDS ITS OWN WRITE, SO THE TABLE MIRRORS THE GUARD AND NOT THE
+VALUE.</b> Every other member calls <code>_apply_status</code> unconditionally and lets
+<code>add_status</code>&rsquo;s <code>max()</code> discard the weaker value; Glacial Prison reads
+<code>if not target.has_status("chilled")</code> and never calls it at all. So <b>the Chilled half
+is proposed only when it would land</b> &mdash; proposing it on an already-Chilled target would have
+the gate read its own optimism as an improvement, <b>CR &sect;3 from the other direction</b> &mdash;
+while <b>the freeze half is proposed unconditionally</b> and <code>_status_write_improves</code>
+decides it, exactly as every other member works. <b>The duration comes out of one authored copy:</b>
+<code>_freeze_turns()</code> is new, <code>_hold_freeze</code> now calls it for the number it writes,
+and CR &sect;3&rsquo;s defect was precisely a duration authored in the handler and again in the
+table.</p>
+<p><b>WHICH HALF DECIDES IT: NEITHER.</b> The Chilled half saves the cast approximately never, and
+that is a proof rather than a sample &mdash; <code>_hold_freeze</code> is the only site in the
+project that writes <code>frozen</code>, and every path through it that lands the freeze also writes
+Chilled (4 stacks for a real hold, 1 for ordinary ice), so <b>a frozen body always carries
+Chilled</b>. <b>What decides the button is the POOL:</b> the rule darkens a BUTTON rather than a
+PICK, so it fires only when <i>every</i> living enemy is frozen, and one unfrozen enemy anywhere
+keeps it lit. <b>That is the honest scope of the rule and not a defect in it</b> &mdash; Rime, Bola
+and Hysteria have carried the same scope since CO, and a per-pick refusal would be the second path
+&sect;2 forbids by name.</p>
+<p><b>ONE KNOWN INEXACTNESS, ERRING TOWARD ALLOWING.</b> A NON-BOSS carrying a one-turn freeze while
+a Cryomancer stands would read the proposed permanent hold as an improvement while the handler wrote
+nothing. <code>_apply_status(_, "frozen", &hellip;)</code> has <b>exactly one call site</b> and
+cannot produce that pairing; it needs a Cryomancer who died, let the ice land timed, and was
+resurrected. <b>Allowing a wasted cast is the safe error; refusing a live one is not.</b></p>
+<p><b>HOW OFTEN IT FIRES CANNOT BE READ OFF THE SIM, AND SAYING SO IS THE FINDING.</b>
+<code>DOD_SIM_BUILDS</code> defaults to each tree&rsquo;s FIRST lane, which for the Cryomancer is
+<b>Winter</b> &mdash; so the sim&rsquo;s Cryomancer has never held Glacial Prison, Second Prison or
+Absolute Zero, and <b>no figure in any prior report speaks to this card at all</b>. A fifth run was
+made on <code>cryomancer:Deep Freeze</code> as a live smoke test: it freezes less often and holds far
+longer (holds lasting &ge;3 turns <b>2.65</b> a battle against the default&rsquo;s 1.75), and it is
+the build that takes <b>Absolute Zero</b>, which removes the hold limit &mdash; so that is the build
+in which an all-enemies-frozen board is genuinely reachable. 25 runs, no throws, Faith figures
+steady across the build change.</p>
+
+<h3>&sect;3 &mdash; A HELPER COPIED BETWEEN GATES INHERITS ITS BUGS SILENTLY</h3>
+<p>Recorded as a standing rule in <code>CLAUDE.md</code>:</p>
+<blockquote><p><b>Enumerate the ability corpus through <code>Classes.ability_corpus()</code>. Never
+copy another gate&rsquo;s walk.</b> A talent can grant an ability that lives in no pool, and a
+hand-rolled walk misses five. <b>A helper copied between gates inherits its bugs silently and
+diverges from its origin without anything reporting it.</b></p></blockquote>
+<p><b>THIS IS A DIFFERENT FAILURE FROM EVERYTHING ELSE IN <code>CLAUDE.md</code>&rsquo;S TRAPS, AND
+THE FIRST CONFIRMED CASE IN THE PROJECT.</b> The rest are DRIFT &mdash; one authority, edited, a
+stale copy left behind. This is <b>propagation by copy</b>: five gates wrong in five places from
+birth, because four copied <code>check_cl_width</code>&rsquo;s walk rather than deriving one.
+<b>Fixing the origin leaves four.</b> Drift leaves one wrong copy and a chance a diff notices it; a
+copy leaves N, all born wrong, none of them compared against anything. <code>check_da</code>
+<b>asserts the rule</b> rather than only stating it, with CZ&rsquo;s <code>_cl_only_corpus</code>
+named as the one exemption &mdash; being a copy is its job there, and the gate asserts it is
+<i>still</i> a copy so a later reader cannot consolidate it into uselessness.</p>
+<p><b>THE SWEEP FOUND ONE MORE AND CHANGES NOTHING.</b> <code>_spawn</code>, the battle fixture, is
+copied into <b>SEVEN gates as FOUR divergent bodies</b> &mdash; and the signature diverged too
+(<code>_spawn(specs: Array)</code>, <code>_spawn()</code>, <code>_spawn(run: Node)</code>).
+<b>It has already cost twice.</b> The copied <code>_report</code> drifted into
+<code>&quot;N checks, M failures&quot;</code> and <code>&quot;N checks / M failures&quot;</code>,
+and <code>run_battery.sh</code>&rsquo;s own header records the scar: a <code>grep -E
+&quot;checks,&quot;</code> that silently missed every suite printing the second form. And <b>CQ
+&sect;1 deliberately deleted the two hand-set <code>Profile.set_flag</code> lines from
+<code>check_cm_live</code>&rsquo;s copy and left them standing in <code>check_co</code>&rsquo;s and
+<code>check_ct</code>&rsquo;s, with nothing anywhere reporting the divergence.</b>
+<code>check_da</code> prints the census every run so the number cannot rot into a sentence nobody
+re-checks. <b>CONSOLIDATION IS ITS OWN BATCH:</b> a shared fixture has to serve four legitimately
+different needs (a party parameter, <code>check_cs</code>&rsquo;s determinism forcing,
+<code>check_ct</code>&rsquo;s pre-loaded pouch, <code>check_cm_live</code>&rsquo;s deliberately
+absent flags), and getting it wrong breaks every gate at once.</p>
+<p><b>THE SAME DEFECT IS FAR LARGER IN THE SUITES, REPORTED AND OUT OF SCOPE:</b> the same sweep
+over the 47 <code>test_batch_*.gd</code> files finds <code>_spawn</code> in <b>37 suites as 34
+distinct bodies</b>, <code>_run</code> in 39 as 39, and <code>_kill</code> copied
+<b>byte-identically into 14</b>.</p>
+
+<h3>&sect;4 &mdash; CY&rsquo;S TWO HEADLINE MEASUREMENTS WERE BOTH INSTRUMENT FAULTS</h3>
+<p><b>Recorded so that a later reader does not cite either figure as evidence.</b> Neither finding
+is new &mdash; CZ reported both against its own interest &mdash; but they are scattered across two
+reports and they belong together in the record.</p>
+<ul>
+<li><b>THE FAITH ARRIVAL ROW SAMPLED A METER THAT NEVER RELEASES.</b> &ldquo;Faith reaches 1.6 of
+the 5 a release needs, so the average fight ends without a Devout release ever firing&rdquo; is not
+what the number says. The <code>conviction</code> row samples the <b>Devout&rsquo;s own</b> meter,
+and his Faith <b>holds at the threshold and never releases by rule</b> (Batch BH &sect;2). It has
+never been a measure of release frequency. The row that answers that question was in the same report
+all along: <code>releases/battle</code>, reading <b>0.51 to 1.49</b> on unmodified HEAD. Releases
+were firing.</li>
+<li><b>THE BLOOD FRENZY REGRESSION SAT INSIDE THE INSTRUMENT&rsquo;S OWN ERROR BAR.</b> The
+<b>12.2 &rarr; 11.8</b> movement that motivated CZ &sect;1 is smaller than the <b>&plusmn;1.5 points
+of band</b> this instrument carries at n=25 on an unseeded sim. <b>The number was not the
+evidence.</b></li>
+</ul>
+<p><b>CZ &sect;1 REMAINS CORRECT ON ITS STRUCTURAL REASONING AND IS NOT REVISITED.</b> A passive
+paid in damage TAKEN really does invert against every batch that improves party survivability; that
+mechanism is real, it is a standing rule in <code>CLAUDE.md</code>, and it was worth fixing. <b>The
+fix was worth making for the mechanism, not for the number</b> &mdash; and the Rage term it added is
+untouched here, measuring 17.1 / 20.7 / 22.6 / 26.2 across the four arms against CZ&rsquo;s
+17.4 / 20.9 / 22.8 / 26.2, which is the control that says this batch moved Faith and nothing
+else.</p>
+
+<h3>Verification</h3>
+<p><b>Seven gates, zero failures, zero throws.</b> <code>check_parse</code> 0 (<b>stderr grepped for
+<code>Parse Error</code>, never the tally</b> &mdash; and it caught a real error in this batch that
+the tally did not: <code>check_da</code>&rsquo;s first run exited 0 with two <code>Parse Error</code>
+lines on stderr), <b><code>check_da</code> 30 checks / 0 failures</b> (new, and added to
+<code>run_battery.sh</code>&rsquo;s <code>GATES</code> array, now <b>fourteen</b>),
+<code>check_co</code> 0 at <b>59</b> gated abilities with the new member driven live,
+<code>check_cz</code> 0, <code>check_cn</code> 0, <code>check_cm</code> 0, <code>check_flow</code>
+0.</p>
+<p><b>FIVE COMPLETE RUNS OF THE GAME</b> &mdash; 25 runs each, ~2,500 battles a pass. Completions
+CZ &rarr; DA: rung 1 100&rarr;100%, rung 2 72&rarr;80%, rung 3 52&rarr;56%, Sharpshooter party
+72&rarr;76%. Depth: 48.00&rarr;48.00, 46.56&rarr;47.12, 42.84&rarr;44.76, 47.04&rarr;46.12.
+<b>NO ARM MOVED FURTHER THAN ITS OWN COMBINED STANDARD ERROR</b>, so taking a third of the
+Devout&rsquo;s healing back off did not make the game measurably harder &mdash; the expected result
+for a change aimed at what a card IS rather than at difficulty.</p>
+<p><b>NO SUITE AND NO FULL BATTERY WAS RUN;</b> DA is implement-only under the standing convention.
+<b>One piece of good news for the batch that owes one:</b> <code>test_batch_bi</code> asserts
+<code>const FAITH_PER_ABSORB := 2</code> and an ally holding 2 after one absorb, so CZ had turned it
+red and <b>this revert turns it back green</b> without the suite being run.</p>
+
 <h2>2026-08-21 &mdash; Batch CZ: TWO RAMPS THAT DO NOT ARRIVE, AND A HOLE IN THE ENUMERATION</h2>
 <p><i>CY measured four ramp specs and found two arriving and two not. This is the repair for the
 two that do not, plus the enumeration gap CY reported and did not close. <b>Blood Frenzy gets a
