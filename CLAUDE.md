@@ -331,6 +331,54 @@ ONE answer, asked by the cast path and by the draft card alike.
   **the WARDEN's own roughly double** (he acts ~7 times and braces 7–9). **Uncapped on purpose
   for the first pass** — a cap is a retreat available afterwards, and it is a designer's call.
 
+## A DURATION IS STATED AS APPLIED (STANDING, SET AT BATCH CV §1)
+> **"N turns" is the number the code passes to `_apply_status`. It is never the acting-turn
+> count, and `tick_statuses()` running before a unit acts is an implementation detail rather
+> than a wording convention.**
+
+`tick_statuses()` (`unit.gd:2171`) decrements at the START of a unit's turn, so a status applied
+with `N` covers `N` calendar turns and `N-1` of the bearer's own actions. **Both readings were in
+use across the trees** — CU found `cr_rime` using both in a single sentence, the node saying 3 and
+the ability description inside its own payload saying 4.
+
+**THE CHIP DECIDES IT.** The chip counts down the raw value, so a node saying 3 while the chip
+shows 4 contradicts something the player is looking at right now. The acting-turn reading also
+makes every text a TRANSLATION of its own code, and translations rot — which is exactly how the
+corpus came to hold both at once.
+
+**NO CODE MOVED. FIVE NODE TEXTS DID**: `sm_deep_thrust` (1→2), `py_flame_shield` (3→4),
+`dv_resolve` (3/5→4/6), `cr_rime` (3→4) and — found by CV's own sweep of all 324, not named in the
+brief — `wd_hold_line` (the undying window, 1/2→2/3). The Tempo chip's legend said "one turn" and
+moved with them. **The one place the old reading was written down as a rule was
+`battle.gd`'s `hold_the_line` comment**; it now records the ruling instead.
+
+## HERO AND ALLY ARE NOT SYNONYMS (STANDING, SET AT BATCH CV §4)
+> **HERO — the four party members. ALLY — heroes and companions together.**
+
+A Beastmaster's beast stands in `heroes`, is visibly on the player's side, and is skipped by
+`is_companion` filters all over `battle.gd`. **Twenty-eight node texts promised "every ally" or
+"the whole party" and paid only the four**; all twenty-eight now say *hero*. **CV's brief said
+sixteen — the mechanical sweep of all 41 ally/party-worded nodes found twenty-eight**, and the
+three extra populations are why: **23** are shorted by an explicit `is_companion` filter in
+`battle.gd`, **2 more** (`hl_guardian`, `hl_resurrection`) by `unit.gd:1320`'s
+`is_hero and not is_companion` gate on `below_half_cb` — a Mercy generator, not a filter — and
+**3 more** (`dv_apostle`, `dv_fervor`, `dv_oath`) because `_gain_faith` refuses companions
+outright, so a beast can never hold the stack the node is written around.
+
+**THE EXCLUSION ITSELF IS INTENDED AND NO READ SITE MOVED.** Under The Pack a party-wide buff
+would otherwise reach six units.
+
+**FOUR TEXTS MOVED THE OTHER WAY.** `wd_rally`, `wd_hold_line`, `dv_devoutness` and `dv_waters`
+said "party" and their read sites genuinely include companions, so they say *ally* now. Precision
+runs both directions or the two words are decoration. **Thirty-two node texts in total.**
+
+`wd_tank_spank` was already right and is the proof the distinction is worth having: it says "ally", and `heroes.filter(func(h): return not
+h.dead)` is the whole of its filter.
+
+**WHEN WRITING A NEW NODE, THE TEST IS THE READ SITE'S FILTER, NOT THE SENTENCE'S RHYTHM.**
+`_hero_side()` includes companions; a bare `heroes.filter(... not h.is_companion)` does not;
+`_gain_faith` refuses them outright, so nothing Faith-flavoured can ever say "ally".
+
 ## A SUITE MUST NOT PIN THE SAVE VERSION LITERAL (STANDING — BK §6's RULE, RE-LEARNED AT CT)
 **Three batches have now broken a sibling suite by bumping the save version.** BL's recap ledgers
 broke BK's pinned `8`; BM's move to `10` broke it again; **CT's move to `11` broke `test_batch_bl`
@@ -10642,44 +10690,52 @@ Battle has burger menu (restart/settings overlay/exit); skill checks accept
 Space or left click; no announcer text (combat log only).
 
 ## Known open threads
-- **DELIVERED BY BATCH CU AND NOW AN OPEN QUEUE, NOT A DEFERRAL: THE TALENT AUDIT.** All 324
-  nodes were audited against their runtime behaviour and the report is `docs/talent-audit.html`
-  (CJ deferred it, CK §4 deferred it again; CU closed it). **It was the LAST of the four
-  populations CJ named as unreached** — CK closed the other three (93 glossary entries, all enemy
-  text, all event text) in `docs/text-audit.html` §CK.
-  · **BUCKET 1 IS OPEN AND AWAITING THE DESIGNER'S RULINGS. Batch CV applies whatever he rules;
-    CU changed nothing** (CQ's precedent — talent and ability values reach the designer as
-    options, and fixing them destroys the evidence of which way the disagreement pointed).
-    **Six nodes state a number the read site does not produce, and four of the six were broken by
-    the same event:** CN's removal of skill-check bars turned a perfect's number into the base
-    and left the talent quoting the old base behind. `dv_stalwart` (says 50%/base 30%, does
-    55%/base 35% — CQ's own fold row at `changelog.html:906` records the base moving),
-    `wd_shieldwall` (says 4 turns, does 5, **and** its "perfect cast" cannot occur),
-    `py_rebirth` (says 25% of health, takes 15%), `cr_rime` (says 3 turns; the ability
-    description in its OWN payload says 4, and the code does 4), `dv_resolve` (3/5 stated, 4/6
-    applied), `sm_high_guard` (2 stated, 3 applied).
-  · **FOUR NODES ADVERTISE A PERFECT THAT CANNOT HAPPEN** — `dv_resolve`, `dv_bulwark`,
+- **CLOSED BY BATCH CV: THE TALENT AUDIT.** All 324 nodes were audited against their runtime
+  behaviour by CU (`docs/talent-audit.html`) and **CV applied the rulings** — CJ deferred the
+  audit, CK §4 deferred it again, CU reported it and changed nothing, CV moved the text. **It was
+  the LAST of the four populations CJ named as unreached**; CK closed the other three (93
+  glossary entries, all enemy text, all event text) in `docs/text-audit.html` §CK.
+  · **BUCKET 1 IS RULED AND APPLIED. Six nodes stated a number their read site does not produce,
+    and four of the six were broken by the same event:** CN's removal of skill-check bars turned a
+    perfect's number into the base and left the talent quoting the old base behind. `dv_stalwart`
+    (said 50%/base 30%, does **55%/base 35%**), `wd_shieldwall` (said 4 turns, does **5**),
+    `py_rebirth` (said 25% of health, takes **15%**), `cr_rime` (said 3 turns; the ability
+    description in its OWN payload said 4, and the code does 4), `dv_resolve` (3/5 stated, **4/6**
+    applied), `sm_high_guard` (2 stated, **3** applied). **The code was right in all six; the text
+    moved.**
+  · **FOUR NODES ADVERTISED A PERFECT THAT CANNOT HAPPEN** — `dv_resolve`, `dv_bulwark`,
     `oc_hysteria`, `wd_shieldwall`. **Measured, not inferred:** `check_cu.gd` loads the live
-    `Ability` objects and asks `runs_skill_check()`. This is CJ's `mana_shield`/`hysteria` shape.
-    **The lesson generalises past talents: any text quoting a base or a perfect of one of the 113
-    abilities CN unbarred is suspect until re-read.**
-  · **THE ONE CROSS-CUTTING DESIGN QUESTION: what does "N turns" mean?** `tick_statuses()` runs
-    at the START of a unit's turn (`unit.gd:2171`), so value `N` = `N` calendar turns = `N-1`
-    acting turns. **Both readings are in use across the trees**, and `cr_rime` uses both in one
-    sentence. Rule it once; roughly a third of the duration statements move by one either way.
-  · **`92` WAS SLIGHTLY LOW.** CU re-ran that census by its own method and got **107**; the
-    difference is incidental numbers set by a handler rather than the payload. Conclusion
-    unchanged — almost all of them are correct, and the flag payload is an idiom, not a fault.
-  · **CU'S OWN STATED GAP, AND IT IS REAL:** only **68 of 324** got the line-by-line semantic
-    read that catches caps, exclusions and interactions (berserker, swordmaster, half the
-    warden). **Not one of the Mystic's 27 nodes was hand-opened** — it produced no hits in any
-    automated pass, and zero flags is evidence about magnitudes and nothing about scope. Every
-    node did get: extraction from the live trees, a confirmed non-comment read site (319/319
-    stat fields), a machine magnitude comparison, and three sweeps (52/52 base-quoting nodes,
-    8/8 perfect claims, 20/20 scope claims). **The scope sweep is the model for closing the
-    gap cheaply** — one mechanical question asked of all 324 at once, which is how the largest
-    bucket-2 finding was found: **16 nodes promise "every ally" and mean the party minus
-    companions**, and none of them says so.
+    `Ability` objects and asks `runs_skill_check()`. Three were CUT. **`dv_bulwark` WAS NOT**:
+    CQ's fold made its 5% party heal UNCONDITIONAL (CR §7's standing rule), so its text now says
+    the heal *happens*. **The lesson generalises past talents: any text quoting a base or a
+    perfect of one of the 113 abilities CN unbarred is suspect until re-read.**
+  · **THE ABILITY CORPUS CARRIED TWO ORPHANED `perfect_text`s, AND CV SWEPT ALL 220 rather than
+    the 37 CU named** (`check_cv.gd` pass 1 — a NAMED list cannot audit itself). Intercession's
+    "The window lasts a turn longer" and **Backdraft's "3 turns each instead"**, both on cards
+    `runs_skill_check()` reports as barless. Both cleared; the corpus now measures **zero**.
+    Mass Hysteria's description also ended "Cooldown 3." — the dead perfect's number, not the
+    base's 4 — and that sentence went with them.
+  · **"N TURNS" IS RULED: IT IS THE CALENDAR COUNT, STATED AS APPLIED.** See the standing section
+    above. Roughly a third of the duration statements were at risk; **five actually moved.**
+  · **STRICKEN: THE "92 NODES STATE A NUMBER THEIR OWN PAYLOAD CANNOT PRODUCE" NOTE.** It was a
+    FALSE ALARM and must stop being quoted as an open defect. **What CU actually measured: the
+    census is 107, not 92** (the difference is incidental numbers set by a handler rather than by
+    the payload), **and the finding is that the flag payload is an IDIOM, not a fault** — a talent
+    payload is mostly a flag whose magnitude lives in `battle.gd` or `unit.gd`, so a node's text
+    quoting a number its payload does not contain is the normal shape of a node. The real work was
+    always the read-site check, which CU did on all 324 by machine and CV finished by hand.
+  · **CU'S STATED GAP IS CLOSED.** Only **68 of 324** got CU's line-by-line semantic read
+    (berserker, swordmaster, half the warden) and **not one of the Mystic's 27 was hand-opened**.
+    CV asked CU's own recommended shape — one mechanical question of all 324 at once — twice:
+    **undeclared caps** (`sm_dominant` against `effective_armor()`'s `minf(a, 0.85)`,
+    `cr_winters_depth` and `ss_sunder_shot` against the 75% Constitution-thinning clamp,
+    `wd_iron_will` against its 90% mitigation floor) and **undeclared exclusions**
+    (`sm_momentum_sm`, `sv_cocktail` and `sv_vulture` all count through `_status_count`, which
+    skips `broken` — the one affliction the Breaker lane exists to produce). **Then the Mystic's
+    27 were hand-read** and produced two more: `sv_creeping`'s "any status" excludes the Poison
+    itself, and `sv_hitrun`'s "whenever you apply a status" reaches four call sites rather than
+    every application — **that one is REPORTED, not reworded**, because narrowing the text and
+    widening the code are both design answers.
   · **CK's own stated gap, smaller and in the same shape:** the **65 non-status glossary entries**
     were read for sense, not traced claim by claim. The 28 status entries were the population
     where a claim maps onto a constant, and all 28 were hand-read and came back correct.

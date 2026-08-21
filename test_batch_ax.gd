@@ -336,9 +336,9 @@ func _magnitudes() -> void:
 	for pair in [["oc_deep_hex", "take 5% more damage"],
 			["oc_whispers", "seizes its victim 95% of the time"],
 			["oc_soul_leech", "rises to 5% per stack"],
-			["oc_barter", "heals every other ally 35%"],
+			["oc_barter", "heals every other hero 35%"],
 			["oc_pact_flesh", "a cost of 5% rather than 20%"],
-			["oc_pleasure", "the party heals 2.5%"],
+			["oc_pleasure", "every hero heals 2.5%"],
 			["oc_avatar_ruin", "every 5th stack instead of every 10th"]]:
 		var txt := Talents.desc_for(_node(String(pair[0])), 1)
 		ok(txt.contains(String(pair[1])),

@@ -116,8 +116,19 @@ func _passive_desc_live(cfg: Dictionary, spec: String) -> String:
 				int(round((0.15 + float(cfg.get("seasoned_off_bonus", 0.0))) * 100)),
 				int(round((0.15 + float(cfg.get("seasoned_def_bonus", 0.0))) * 100))]
 		"bloodrage":
-			desc = "Blood Frenzy: +%s%% damage for every 5%% of health\nmissing. Half the highest bonus reached in a battle\nis kept as a floor for the rest of it." % \
-				String.num(2.0 + float(cfg.get("bloodrage_step_bonus", 0.0)), 1)
+			# BATCH CV §6 — THE FLOOR IS INTERPOLATED, NOT HARDCODED AT HALF.
+			# Scar Tissue holds 85% of the peak and 100% with Unstoppable, and
+			# the in-battle chip has read the SAME `[50, 85, 100]` table off the
+			# same counter since AL — so two surfaces disagreed in front of the
+			# player, on a number the sheet is the one place to compare builds
+			# by. `scar_tissue_ranks` is on `cfg` by the time this runs:
+			# `apply_from_tree` writes every payload stat into it above, and
+			# this function is called after that.
+			var br_keep: int = [50, 85, 100][clampi(
+				int(cfg.get("scar_tissue_ranks", 0)), 0, 2)]
+			desc = "Blood Frenzy: +%s%% damage for every 5%% of health\nmissing. %d%% of the highest bonus reached in a\nbattle is kept as a floor for the rest of it." % [
+				String.num(2.0 + float(cfg.get("bloodrage_step_bonus", 0.0)), 1),
+				br_keep]
 	return Classes.resolve_values(desc,
 		Classes.value_ctx_from_config(cfg)).replace("\n", " ")
 

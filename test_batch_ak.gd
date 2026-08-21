@@ -275,10 +275,14 @@ func _node_values() -> void:
 			"'%s' tooltip renders %s: \"%s\"" % [id, DESC_NUMBERS[id], text])
 		ok(not text.contains("{v}"), "'%s' tooltip has no unrendered placeholder" % id)
 	# High Guard's whole content is prose, so it is checked by hand.
+	# BATCH CV §2.6 — 3 TURNS, NOT 2. `battle.gd`'s `_apply_status(strike_target,
+	# "high_guard", 3)` has always applied three; this suite pinned the tooltip's
+	# wrong number, which is CQ's "a suite asserting a pre-fold magnitude" shape
+	# from the other direction — the assertion was defending the defect.
 	var hg: Dictionary = Talents.node_in_tree(tree, "sm_high_guard")
 	ok(Talents.desc_for(hg, 1).contains("40%") \
-		and Talents.desc_for(hg, 1).contains("2 turns"),
-		"High Guard's tooltip says 40% for 2 turns")
+		and Talents.desc_for(hg, 1).contains("3 turns"),
+		"High Guard's tooltip says 40% for 3 turns")
 	# Riposte and Opportunist both answer with Overpower now; the tooltips
 	# have to say so or the player cannot tell they are the same answer.
 	ok(Talents.desc_for(Talents.node_in_tree(tree, "sm_riposte"), 1).contains("Overpower"),

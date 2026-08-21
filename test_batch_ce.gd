@@ -574,8 +574,16 @@ func _docs() -> void:
 	# per-item entry (there is no `item_health`), and three of eight items is a
 	# worse state than none. What they taught that a tooltip cannot — the
 	# shop-only rule and the stack caps — is folded into `pouch_slots` instead.
-	ok(gj != null and gj.size() == 96,
-		"the glossary holds 96 entries (94 + CT's two)")
+	# BATCH CV §4 — NINETY-SEVEN. **THE PIN IS BUMPED, NOT LOOSENED**, and the
+	# one entry is `hero_vs_ally`. CV established HERO (the four party members)
+	# and ALLY (heroes and companions) as distinct words and moved thirty-two
+	# node texts onto them; a player meeting "every hero" on one talent and
+	# "every ally" on the next has nowhere else to learn that the difference is
+	# a Beastmaster's beast. That is this category's own test — one entry per
+	# thing a player cannot learn anywhere else — and it is the reason the
+	# vocabulary is worth having rather than a second word for the same set.
+	ok(gj != null and gj.size() == 97,
+		"the glossary holds 97 entries (96 + CV's hero/ally)")
 	var log_live := _src("res://docs/changelog.html")
 	ok(log_live.contains("Batch CE"), "the changelog carries a Batch CE entry")
 	ok(log_live.contains("102"), "...and states the new draft count")

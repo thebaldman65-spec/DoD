@@ -3802,7 +3802,15 @@ static func pending_talent_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Intercession", "cooldown": 4,
 				"cost": 25, "special": "intercession", "delay": 2.0,
 				"anim": "attack03",
-				"perfect_id": "", "perfect_text": "The window lasts a turn longer",
+				# BATCH CV §3 — CLEARED. `runs_skill_check()` is FALSE here (no
+				# damage, no heal, no Break damage, `intercession` is in neither
+				# DAMAGE_SPECIALS nor HEAL_SPECIALS), so the card draws no bar
+				# and this promise was unreachable. The +1 turn still sits in
+				# `battle.gd`'s handler behind `is_perfect`, which is dead code
+				# in the same way and is left for the same reason CQ left the
+				# others: deleting a mechanic is a design change, deleting a
+				# claim the game cannot honour is a correction.
+				"perfect_id": "", "perfect_text": "",
 				"description": "For 2 turns the next lethal blow\nagainst ANY hero is refused — they\nsurvive at 1 health and the Cleric\nloses 1 Mercy. She must be holding\none when it lands."})
 		"Sacred Resolve":
 			return Ability.make({"display_name": "Sacred Resolve", "cooldown": 5,
@@ -3820,7 +3828,7 @@ static func pending_talent_ability(display_name: String) -> Ability:
 			return Ability.make({"display_name": "Mass Hysteria", "cooldown": 4,
 				"cost": 30, "special": "hysteria", "delay": 4.0, "anim": "attack03",
 				"perfect_id": "", "perfect_text": "",
-				"description": "The warband turns on itself: next\nturn every minion strikes a fellow\nwith DOUBLE Break damage, Sundering\nthem for 3 turns. A BOSS RESISTS\nUNTIL BROKEN. Cooldown 3."})
+				"description": "The warband turns on itself: next\nturn every minion strikes a fellow\nwith DOUBLE Break damage, Sundering\nthem for 3 turns. A BOSS RESISTS\nUNTIL BROKEN."})
 		"Bulwark of Fortitude":
 			return Ability.make({"display_name": "Bulwark of Fortitude", "cooldown": 3,
 				"cost": 30, "special": "bulwark", "delay": 3.0, "anim": "attack03",

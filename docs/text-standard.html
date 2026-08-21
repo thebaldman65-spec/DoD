@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — The Text Standard</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-17 (Batch CJ)</b></p>
+<p align="right"><b>Last updated: 2026-08-20 (Batch CV &mdash; &sect;4.5a and &sect;4.9)</b></p>
 <h1>DAWN OF DECAY — THE TEXT STANDARD</h1>
 <p><i>The rules every player-facing string is written to. Binding on every batch from CJ
 forward, including any tuning that comes out of playtesting. This document says how text is
@@ -189,6 +189,18 @@ bare "N turns" with nothing distinguishing which is meant.</p>
 the cooldown is both a second copy and a chance to disagree. <b>Descriptions state durations;
 the renderer states cooldowns.</b></p>
 
+<h3>4.5a A DURATION IS STATED AS APPLIED (BINDING, SET AT BATCH CV &sect;1)</h3>
+<p><b>"N turns" is the number the code passes to <code>_apply_status</code> &mdash; the CALENDAR
+count. It is never the acting-turn count.</b> <code>tick_statuses()</code> decrements at the
+START of a unit's turn, so a status applied with 4 covers four calendar turns and three of the
+bearer's own actions. <b>Write 4.</b></p>
+<p><b>THE CHIP DECIDES IT.</b> The chip counts down the raw value, so a node that says 3 while
+the chip shows 4 contradicts something the player is looking at. The acting-turn reading also
+makes every description a TRANSLATION of its own code &mdash; and translations rot, which is how
+the corpus came to hold both readings at once, <code>cr_rime</code> using both in one sentence.
+<b><code>tick_statuses()</code> running before a unit acts is an implementation detail and never
+a wording convention.</b></p>
+
 <h3>4.6 Stacking and refresh — state what a second cast does</h3>
 <p>Whenever a second cast is possible, say what it does: refresh, extend, stack, or replace.
 <b>This is currently absent almost everywhere — of 61 abilities that grant a timed effect,
@@ -260,6 +272,25 @@ computed block <i>autowraps</i>, so the ceiling does not bind there, and the onl
 renders <code>perfect_text</code> without wrapping is the battle tooltip, which grows to fit
 rather than clipping. <b>Recorded as measured, not filed as owed</b> — rewrapping 76 lines to a
 ceiling that does not bind them would be work with no reader.</p>
+
+<h2>4.9 HERO AND ALLY ARE NOT SYNONYMS (BINDING, SET AT BATCH CV &sect;4)</h2>
+<blockquote><b>HERO</b> &mdash; the four party members. <b>ALLY</b> &mdash; heroes and
+companions together.</blockquote>
+<p>A Beastmaster's beast stands in <code>heroes</code>, is visibly on the player's side, and is
+skipped by <code>is_companion</code> filters throughout <code>battle.gd</code>. Twenty-five node
+texts promised "every ally" or "the whole party" and paid only the four. <b>The exclusion is
+intended</b> &mdash; under The Pack a party-wide buff would otherwise reach six units &mdash;
+<b>so the words move, never the read site.</b></p>
+<p><b>THE TEST IS THE READ SITE'S FILTER, NOT THE SENTENCE'S RHYTHM.</b>
+<code>_hero_side()</code> includes companions, so an ability that targets through it says
+<i>ally</i>. A bare <code>heroes.filter(func(h): return not h.dead and not h.is_companion)</code>
+does not, so it says <i>hero</i>. <code>_gain_faith</code> refuses companions outright, so
+nothing Faith-flavoured can ever say <i>ally</i>. <b>"Party" is not one of the two words</b>;
+it reads as either and is what let twenty-five texts drift.</p>
+<p><b>Precision runs both directions.</b> Four texts that said "party" while their read sites
+genuinely included companions were moved TO <i>ally</i> (<code>wd_rally</code>,
+<code>wd_hold_line</code>, <code>dv_devoutness</code>, <code>dv_waters</code>), because two words
+that only ever narrow are one word with extra steps.</p>
 
 <h2>5. HOW TO APPLY THIS</h2>
 <ol>

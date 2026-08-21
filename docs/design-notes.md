@@ -4,6 +4,56 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Two words, and a number nobody could disagree with (Batch CV) — 2026-08-20
+
+CU's audit produced fifty-odd findings and CV moved fifty-two node texts, and the interesting
+thing is how few *decisions* that took. Six nodes were individually wrong and all six were
+settled the same way — the code is right, the text is behind — which is not a judgement call at
+all once you have both numbers side by side. Everything else came out of two conventions, and a
+convention is the cheapest thing a corpus of 324 hand-written strings can be given.
+
+The first is that a duration is stated as applied. This had been genuinely ambiguous: `4` passed
+to `_apply_status` is four calendar turns and three of the bearer's own actions, and both
+readings were in the trees, `cr_rime` using both in a single sentence. The argument that settles
+it is not about which is more accurate — it is that **the chip is on screen**. It counts down the
+raw value, so a node saying 3 while the chip shows 4 contradicts something the player is looking
+at right now. The acting-turn reading is a translation, and a translation of your own code is a
+second copy that will drift. That is the same reasoning CL used to ban authored parentheticals
+and the same reasoning behind `_faith_stack_mult` being one function: **one number, one owner.**
+
+The second is that HERO and ALLY are different words. This one is worth dwelling on because the
+sweep found nearly twice what the brief expected — 28 nodes, not 16 — and the extra twelve are
+not obscure. They were missed because "does this read site skip companions?" has three different
+answers depending on *where* the skip lives. Twenty-three are an explicit
+`not h.is_companion` in a `battle.gd` filter, which any grep finds. Two more are the Cleric's
+Mercy generator, where the exclusion is in `unit.gd`'s `below_half_cb` gate — a *trigger* that
+companions never fire rather than a filter that removes them. Three more are Faith, where
+`_gain_faith` refuses companions outright, so a beast cannot hold the stack the node is written
+around and the promise is vacuous rather than short. **One question, three mechanisms, and only
+the first is greppable.** That is the general shape of why mechanical sweeps under-count, and it
+is worth remembering the next time one comes back clean.
+
+The corrections also run the other way, which is the part that makes the vocabulary real rather
+than decorative. Four nodes said "party" while their read sites genuinely included companions,
+and they now say *ally*. Two words that only ever narrow are one word with extra steps.
+
+Two things were deliberately left alone, and both are the same rule: **a node whose behaviour
+looks wrong rather than undocumented goes to the designer.** `sv_hitrun` promises Elusive
+"whenever you apply a status" and `_hit_and_run` is called from four sites — narrowing the text
+and widening the code are both design answers, and picking one silently is authoring. Battle
+Shout is stranger: its loop has no companion filter, so companions *do* hear it, while its own
+read-site comment and its chip legend both say they do not. The code and its documentation
+disagree about intent, and there is no version of "fix the text" that is not also a ruling on
+what the card is for.
+
+The last thing worth recording is that two suites were **pinning the defect**. CQ's finding was
+that seventeen suites asserted pre-CN magnitudes — a suite lagging the code. `test_batch_ak`
+asserted High Guard's tooltip says "2 turns" and `test_batch_aw` asserted Stalwart renders 50,
+and in both cases the code had never agreed. That is the same fault from the other direction: an
+assertion written from the text rather than from the read site turns a documentation bug into a
+regression test for it. **A check should read the thing that computes, not the thing that
+describes.**
+
 ## The errors clustered, and the cluster was the finding (Batch CU) — 2026-08-20
 
 The talent audit had been owed since CJ and was framed by its own record as ninety-two separate

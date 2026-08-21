@@ -290,7 +290,7 @@ func _magnitudes() -> void:
 			["dv_aegis", "aegis_ranks", 60],
 			["dv_afterglow", "afterglow_ranks", 20],
 			["dv_warded", "warded_ranks", 25],
-			["dv_stalwart", "stalwart_step", 20],       # 30 + 20 = 50%
+			["dv_stalwart", "stalwart_step", 20],       # 35 + 20 = 55% (CV §2.1)
 			["dv_unyielding", "unyielding_ranks", 90],
 			# RE-POINTED IN PLACE BY BATCH BE, with the reason in the file: AW
 			# priced this at 40 and BC's leave-one-out grid then measured the
@@ -342,7 +342,7 @@ func _magnitudes() -> void:
 	# rendered total — like Apostle it is a gate whose two magnitudes are
 	# battle.gd constants, so its tooltip states them outright and
 	# test_batch_bh asserts them there.
-	for pair in [["dv_stalwart", "50"], ["dv_faithful", "35"],
+	for pair in [["dv_stalwart", "55"], ["dv_faithful", "35"],
 			["dv_righteous", "35"]]:
 		var n := _node(String(pair[0]))
 		var shown := Talents.desc_for(n, 1)

@@ -92,7 +92,7 @@ const PROSE_NUMBERS := {
 	"wd_rally": ["30", "3 turns"],
 	"wd_tank_spank": ["ALWAYS"],
 	"wd_plating": ["20%"],
-	"wd_shieldwall": ["4 turns", "5"],
+	"wd_shieldwall": ["5 turns"],
 	"wd_endurance": ["75"],
 }
 

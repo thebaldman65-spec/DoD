@@ -128,6 +128,17 @@
   ]
  },
  {
+  "id": "hero_vs_ally",
+  "term": "Hero and Ally",
+  "category": "combat",
+  "short": "A HERO is one of your four party members. An ALLY is a hero OR a companion - the two words are not interchangeable.",
+  "long": "Your side of the field can hold more than four bodies. The four party members are HEROES. A Beastmaster's companion - Ursus, Canis or Aguila - fights beside them, takes hits, and can be healed, but it is NOT a hero: it is an ALLY, and so is every hero. The distinction is load-bearing because most party-wide talents deliberately pay the four and not the beast; under THE PACK a Beastmaster fields two companions at once, and a buff that reached all six would be worth half again as much in his party as in anyone else's. So the wording tells you which you are getting. A talent that says HERO pays the four - Standard Bearer's lent armor, Bulwark of Fortitude, the Devout's Healing Pulse, the Occultist's party heals. A talent that says ALLY pays companions too - Tank and Spank's Empower, Rally's healing bonus, Hold the Line, Devoutness, Cleansing Waters. Targeting follows the same rule: a single-target support ability you aim by hand CAN be aimed at a companion, so Divine Shield on the bear is a legal and sometimes correct play, while the same shield's Radient Aegis echo can only land on a hero. Faith is heroes-only outright - a companion can never hold a stack of it.",
+  "see_also": [
+   "pack_bond",
+   "fallen"
+  ]
+ },
+ {
   "id": "status_broken",
   "term": "Broken",
   "category": "statuses",

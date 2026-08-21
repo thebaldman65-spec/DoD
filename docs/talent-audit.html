@@ -1,8 +1,42 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — The Talent Audit (Batch CU)</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-20 (Batch CU)</b></p>
+<p align="right"><b>Last updated: 2026-08-20 (Batch CV &mdash; every finding ruled)</b></p>
 <h1>DAWN OF DECAY — THE TALENT AUDIT</h1>
+
+<div style="border:2px solid #444; padding:8px; margin:8px 0">
+<p><b>STATUS: CLOSED BY BATCH CV (2026-08-20). EVERY FINDING BELOW IS RULED.</b> The report is
+left standing as written &mdash; it is the evidence of which way each disagreement pointed, and
+CQ's rule is that fixing a value destroys that evidence. <b>What CV did to each finding:</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Finding</th><th>Ruling</th><th>What moved</th></tr>
+<tr><td>&sect;2 &mdash; what "N turns" means</td><td><b>THE CALENDAR COUNT. A duration is stated as APPLIED.</b></td><td>Text only, 5 nodes: <code>sm_deep_thrust</code> 1&rarr;2, <code>py_flame_shield</code> 3&rarr;4, <code>dv_resolve</code> 3/5&rarr;4/6, <code>cr_rime</code> 3&rarr;4, and <b><code>wd_hold_line</code> 1/2&rarr;2/3, which this report did not find</b>. No code moved.</td></tr>
+<tr><td>&sect;1.1 &mdash; four dead Perfect clauses</td><td><b>CUT THREE; <code>dv_bulwark</code> IS NOT ONE OF THEM.</b></td><td><code>dv_resolve</code>, <code>oc_hysteria</code> and <code>wd_shieldwall</code> lose the clause. <code>dv_bulwark</code>'s 5% party heal is UNCONDITIONAL (CR &sect;7) and its text now says the heal <i>happens</i>.</td></tr>
+<tr><td>&sect;1.2 Stalwart</td><td><b>The code is right: 55% over a 35% base.</b></td><td>The node's <code>scale</code> base 30&rarr;35, and the base it quotes with it.</td></tr>
+<tr><td>&sect;1.3 Shield Mastery</td><td><b>The code is right: 5 turns.</b></td><td>Text to 5; the "perfect cast" half went under &sect;1.1. <code>test_batch_al</code>'s table moved with it.</td></tr>
+<tr><td>&sect;1.4 Phoenix Rebirth</td><td><b>The code is right: 15%.</b></td><td>Text 25&rarr;15.</td></tr>
+<tr><td>&sect;1.5 Rime</td><td><b>The code is right: 4 turns</b> &mdash; which is what the ability description in its own payload already said.</td><td>Node text 3&rarr;4; the two strings agree now.</td></tr>
+<tr><td>&sect;1.7 High Guard</td><td><b>The code is right: 3 turns.</b></td><td>Text 2&rarr;3, and <code>test_batch_ak</code>'s assertion, which had been pinning the wrong number.</td></tr>
+<tr><td>&sect;3 &mdash; unreachable clauses</td><td><b>Intercession's <code>perfect_text</code> cleared</b>, and the corpus swept for others.</td><td>The sweep ran over <b>all 220 ability definitions</b> rather than the 37 named here &mdash; a NAMED list cannot audit itself &mdash; and found <b>one more: Backdraft</b>. Both cleared; the corpus now measures zero. Mass Hysteria's description also ended "Cooldown 3.", the dead perfect's number rather than the base's 4.</td></tr>
+<tr><td>&sect;4.1 &mdash; "every ally" means the party minus companions</td><td><b>HERO = the four party members. ALLY = heroes and companions.</b> No read site moved.</td><td><b>Twenty-eight texts, not sixteen</b>: this report's scope sweep asked 20 nodes, CV asked all 41 that use ally/party language. 23 are shorted by an explicit <code>is_companion</code> filter, 2 more by <code>unit.gd:1320</code>'s gate on <code>below_half_cb</code>, and 3 more because <code>_gain_faith</code> refuses companions so no beast can hold Faith. <b>Four MORE moved the other way, to <i>ally</i></b>, their read sites genuinely including companions &mdash; 32 node texts in all.</td></tr>
+<tr><td>&sect;4.2 &mdash; undeclared caps and exclusions</td><td><b>Both sweeps run over all 324.</b></td><td>Caps declared on <code>sm_dominant</code>, <code>cr_winters_depth</code>, <code>ss_sunder_shot</code>, <code>wd_iron_will</code>. Exclusions declared on <code>sm_momentum_sm</code>, <code>sv_cocktail</code>, <code>sv_vulture</code>, <code>sv_creeping</code>.</td></tr>
+<tr><td>&sect;4.3 &mdash; interactions stated on one partner only</td><td><b>Stated on both.</b></td><td><code>dv_apostle</code> names Fervor now; <code>ar_conduit</code> and <code>ar_wrath</code> name each other and the 3.5% step they add up to.</td></tr>
+<tr><td>&sect;4.4 &mdash; adjacent surfaces</td><td><b>Blood Frenzy's floor interpolated; Guard Change reported and left.</b></td><td><code>party_screen.gd</code> reads the same <code>[50, 85, 100]</code> table the in-battle chip has always read.</td></tr>
+<tr><td>&sect;4.5 &mdash; read-site comments</td><td><b>All four corrected.</b></td><td>Overwhelm (3&rarr;8%/rank), Dominant Presence (5&rarr;15%/rank), Divine Shield (30% plus a perfect that cannot happen &rarr; 35%), High Guard (a turn &rarr; 3).</td></tr>
+<tr><td>&sect;0's gap &mdash; 256 nodes never semantically read</td><td><b>CLOSED, by two mechanical sweeps plus the Mystic's 27 by hand.</b></td><td>The hand-read produced two findings no automated pass here could have reached: <code>sv_creeping</code> and <code>sv_hitrun</code>.</td></tr>
+</table>
+<p><b>TWO THINGS ARE REPORTED RATHER THAN FIXED, AND BOTH ARE NEW.</b></p>
+<ul>
+<li><b><code>sv_hitrun</code> over-promises.</b> "Whenever you apply a status to an enemy, you gain
+Elusive" &mdash; <code>_hit_and_run</code> is called from <b>four</b> sites (any poison
+application, Hamstring, a Snare Trap set, a trap spring), and it does not re-arm while Elusive
+already stands. Narrowing the text and widening the code are both design answers.</li>
+<li><b>Battle Shout's code and its own documentation disagree about intent.</b> The loop is
+<code>for h in heroes</code> with no companion filter, so a companion DOES hear it &mdash; while
+the read-site comment says "Companions don't hear it" and the chip legend says "to every hero and
+no companion". That is a behaviour question, not a text one, so nothing was touched.</li>
+</ul>
+</div>
 
 <p><i>All 324 talent nodes, compared three ways: <b>what the node's text says</b>, <b>what its
 payload carries</b>, and <b>what the read site actually does with it</b>. This is a REPORT.
@@ -335,9 +369,10 @@ and exactly the kind of thing that cannot be read off a payload.</li>
 <code>UNWAVERING_STEPS = 5</code> &times; 10).</li>
 </ul>
 
-<h2>&sect;7 — THE QUEUE</h2>
-<p><b>Bucket 1 is open and awaiting the designer's rulings.</b> Batch CV applies whatever he
-rules. In the order they are cheapest to rule on:</p>
+<h2>&sect;7 — THE QUEUE <i>(EMPTIED BY BATCH CV — see the banner at the top for each ruling)</i></h2>
+<p><b>Bucket 1 was open and awaiting the designer's rulings; every item below has been ruled
+and applied.</b> The list is kept in its original order, which was the order they were cheapest
+to rule on:</p>
 <ol>
 <li><b>&sect;2 first</b>, because it changes what several of the others mean: does "N turns"
 count the turn it was cast?</li>
@@ -350,9 +385,12 @@ whichever way &sect;2 goes.</li>
 <li><b>&sect;4.1</b> — one word on whether "ally" includes companions, then sixteen texts or
 one glossary line.</li>
 </ol>
-<p><b>And the gap in &sect;0 is part of the queue too:</b> 256 nodes have not had the
+<p><b>And the gap in &sect;0 was part of the queue too:</b> 256 nodes had not had the
 line-by-line semantic read that produced every bucket-2 finding here. The scope sweep is the
 model for closing it cheaply — a single mechanical question asked of all 324 at once, rather
-than nine more specs read by hand.</p>
+than nine more specs read by hand. <b>CV took that advice and asked two: undeclared caps and
+undeclared exclusions. It also hand-read the Mystic's 27</b> — the spec that produced zero
+automated hits, so not one node had ever been opened — and that hand-read found two things
+neither sweep could have.</p>
 
 </body></html>

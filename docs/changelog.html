@@ -13,6 +13,206 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-20 &mdash; Batch CV: THE TALENT AUDIT CORRECTIONS</h2>
+<p><i><b>IMPLEMENT ONLY.</b> CU audited all 324 nodes and changed nothing; this batch applies the
+rulings. <b>52 node texts moved and NO read site did</b> &mdash; every disagreement was settled in
+the code's favour, which is what "the code is authoritative and the document is corrected toward
+it" means when the document is a tooltip. Two conventions settle most of it (a duration is stated
+as APPLIED; HERO and ALLY are different words), six nodes were individually wrong, and two
+mechanical sweeps plus the Mystic's 27 by hand close the coverage gap CU declared.
+<b><code>docs/talent-audit.html</code> now carries a per-finding disposition table.</b></i></p>
+
+<h3>&sect;0 &mdash; WHERE THE BRIEF WAS RIGHT, AND THE THREE COUNTS THAT MOVED</h3>
+<p>Every mechanical claim in the brief was re-derived against the repo before anything was
+edited, and the six wrong nodes, the four dead Perfects, the three surfaces and both known sweep
+cases all check out exactly as described. <b>Three counts came back larger:</b></p>
+<ul>
+<li><b>&sect;1's duration sweep found FIVE nodes, not four.</b> <code>wd_hold_line</code> states
+its undying window as 1 and 2 turns where <code>battle.gd</code> applies 2 and 3 &mdash; and the
+comment above it was the one place in the codebase where the acting-turn reading was written
+down as a rule ("so 'one turn' is 2 and 'two turns' is 3"). That comment is where the convention
+now lives, stating the ruling instead.</li>
+<li><b>&sect;4's vocabulary sweep found 28 nodes shorting companions, not 16</b>, plus 4 more
+worded the other way round. CU's scope sweep asked <b>20</b> nodes; this one asked <b>all 41</b>
+that use ally/party language. Of the 28: 23 are shorted by an explicit <code>is_companion</code>
+filter, 2 (<code>hl_guardian</code>, <code>hl_resurrection</code>) by <code>unit.gd:1320</code>'s
+<code>is_hero and not is_companion</code> gate on <code>below_half_cb</code> &mdash; a Mercy
+generator rather than a filter, which no <code>battle.gd</code> grep would surface &mdash; and 3
+(<code>dv_apostle</code>, <code>dv_fervor</code>, <code>dv_oath</code>) because
+<code>_gain_faith</code> refuses companions outright, so no beast can ever hold the stack those
+nodes are written around.</li>
+<li><b>&sect;3's orphan sweep ran over all 220 ability definitions rather than the 37 CU named</b>,
+because a NAMED list cannot audit itself &mdash; the list is the thing under suspicion. It found
+one beyond Intercession: <b>Backdraft</b>, carrying "3 turns each instead" on a card
+<code>runs_skill_check()</code> reports as barless.</li>
+</ul>
+
+<h3>&sect;1 &mdash; A DURATION IS STATED AS APPLIED</h3>
+<p><b>"N turns" is the number the code passes to <code>_apply_status</code> &mdash; the calendar
+count, not the acting count.</b> <code>tick_statuses()</code> decrements at the start of a unit's
+turn, so a status applied with 4 covers four calendar turns and three of the bearer's own
+actions; both readings were in use across the trees and <code>cr_rime</code> used both in one
+sentence.</p>
+<p><b>THE CHIP DECIDES IT.</b> The chip counts down the raw value, so a node saying 3 while the
+chip shows 4 contradicts something the player is looking at. The acting-turn reading also makes
+every text a TRANSLATION of its own code, and translations rot &mdash; which is exactly how the
+corpus came to hold both at once.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Node</th><th>Said</th><th>Applies</th></tr>
+<tr><td><code>sm_deep_thrust</code> (Tempo)</td><td>1 turn</td><td><b>2</b></td></tr>
+<tr><td><code>py_flame_shield</code> (Immolate)</td><td>3 turns</td><td><b>4</b> &mdash; which its own payload description already said</td></tr>
+<tr><td><code>dv_resolve</code> (Sacred Resolve)</td><td>3 / 5</td><td><b>4 / 6</b></td></tr>
+<tr><td><code>cr_rime</code> (Rime)</td><td>3 turns</td><td><b>4</b> &mdash; the payload description already said 4; it shipped the contradiction itself</td></tr>
+<tr><td><code>wd_hold_line</code> (Hold the Line)</td><td>1 / 2 turns of undying</td><td><b>2 / 3</b> &mdash; found by the sweep, not by the brief</td></tr>
+</table>
+<p>The <b>Tempo chip's legend</b> said "for one turn" and moved with them. Nothing else in the 42
+nodes that state a fixed turn count disagrees with its read site &mdash; the other 37 were
+machine-listed and hand-checked against theirs.</p>
+
+<h3>&sect;2 &mdash; SIX WRONG NODES, AND THE CODE WAS RIGHT IN ALL SIX</h3>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Node</th><th>Said</th><th>Read site</th></tr>
+<tr><td><code>dv_stalwart</code> (Stalwart)</td><td>50%, base 30%</td><td><code>0.35 + 0.01 * stalwart_step</code> at both sites &rarr; <b>55% over a 35% base</b></td></tr>
+<tr><td><code>wd_shieldwall</code> (Shield Mastery)</td><td>4 turns, or 5 on a perfect</td><td><code>3 + 2 * shield_mastery_ranks</code> &rarr; <b>5</b>, and the perfect cannot occur</td></tr>
+<tr><td><code>py_rebirth</code> (Phoenix Rebirth)</td><td>25% of current health</td><td><code>int(attacker.hp * 0.15)</code> &rarr; <b>15%</b></td></tr>
+<tr><td><code>cr_rime</code> (Rime)</td><td>3 turns</td><td><b>4</b> &mdash; see &sect;1</td></tr>
+<tr><td><code>dv_resolve</code></td><td>3 / 5</td><td><b>4 / 6</b> &mdash; see &sect;1</td></tr>
+<tr><td><code>sm_high_guard</code> (High Guard)</td><td>2 turns</td><td><code>_apply_status(strike_target, "high_guard", 3)</code> &rarr; <b>3</b>. The 40% was right.</td></tr>
+</table>
+<p><b>FOUR READ-SITE COMMENTS CONTRADICTED THE LINE BENEATH THEM AND ARE CORRECTED</b> &mdash;
+Overwhelm ("+3%/rank" over <code>8 * overwhelm_ranks</code>), Dominant Presence ("5%/rank" over
+<code>0.15 * dominant_ranks</code>), Divine Shield ("Absorbs 30% (perfect 35%)" over
+<code>0.35 + ...</code>, with no perfect left to name), and High Guard ("for a turn" over 3).
+<b>This audit's whole method was distrusting comments; leaving them would be leaving the next
+reader the trap that was just navigated.</b> <code>unit.gd</code>'s field comments for
+<code>high_guard</code> and <code>tempo_ranks</code> carried the same two numbers and moved too.</p>
+<p><b>TWO SUITES WERE PINNING THE DEFECT.</b> <code>test_batch_ak</code> asserted High Guard's
+tooltip says "2 turns" and <code>test_batch_aw</code> asserted Stalwart renders 50 &mdash; CQ's
+"a suite asserting a pre-fold magnitude" shape from the other direction, where the assertion was
+defending the wrong number rather than lagging it. <code>test_batch_al</code>'s Shield Mastery
+row moved with &sect;3.</p>
+
+<h3>&sect;3 &mdash; DEAD PERFECT CLAUSES, AND THE ABILITY CORPUS SWEPT FOR MORE</h3>
+<p><b>Measured, not inferred:</b> <code>check_cv.gd</code> loads the live <code>Ability</code>
+objects and asks <code>runs_skill_check()</code>.</p>
+<ul>
+<li><b>CUT:</b> <code>dv_resolve</code> "Perfect: 4 turns", <code>oc_hysteria</code> "Perfect:
+3cd" (CQ already recorded Mass Hysteria's Perfect as never implemented at all),
+<code>wd_shieldwall</code> "or 5 on a perfect cast".</li>
+<li><b>NOT CUT &mdash; <code>dv_bulwark</code>.</b> CQ's fold made the 5% party heal
+UNCONDITIONAL and CR &sect;7 accepted it, so the text must say the heal <i>happens</i>. Losing the
+clause would have deleted a shipped effect from the description of the ability that has it.</li>
+<li><b>CLEARED IN THE ABILITY CORPUS:</b> Intercession's <code>perfect_text</code> (the card
+measures <code>bar=false</code>) and <b>Backdraft's</b>, found by the 220-name sweep. The corpus
+now measures <b>zero</b> abilities carrying a <code>perfect_text</code> with no bar. Mass
+Hysteria's description also ended "Cooldown 3." &mdash; the dead perfect's number rather than the
+base's 4 &mdash; and that sentence went with them.</li>
+<li><b>LEFT ALONE:</b> <code>oc_mind_flay</code>, <code>sm_execute</code>,
+<code>sm_swordsmanship</code>, <code>hl_holy_light</code>. Their bars are live and their clauses
+are correct.</li>
+</ul>
+<p>Intercession's handler still adds <code>+ (1 if is_perfect else 0)</code>, which is dead code
+in the same way. <b>It is left standing:</b> deleting a mechanic is a design change; deleting a
+claim the game cannot honour is a correction.</p>
+
+<h3>&sect;4 &mdash; HERO AND ALLY ARE NOT SYNONYMS</h3>
+<blockquote><b>HERO</b> &mdash; the four party members. <b>ALLY</b> &mdash; heroes and companions
+together.</blockquote>
+<p>A Beastmaster's beast stands in <code>heroes</code>, is visibly on the player's side, and
+receives none of what 28 nodes promised it. <b>The exclusion itself is intended</b> &mdash; under
+The Pack a party-wide buff would otherwise reach six units &mdash; <b>so no read site changed.
+Only the words did.</b></p>
+<p><b>Precision runs both directions.</b> <code>wd_rally</code>, <code>wd_hold_line</code>,
+<code>dv_devoutness</code> and <code>dv_waters</code> said "party" while their read sites
+genuinely include companions, and now say <i>ally</i>. Two words that only ever narrow are one
+word with extra steps. <b><code>wd_tank_spank</code> was already right</b> and is the proof the
+vocabulary is worth having: it says "ally", and <code>heroes.filter(func(h): return not
+h.dead)</code> is the whole of its filter.</p>
+<p>Targeting was checked rather than assumed, and it splits the same way:
+<code>_hero_side()</code> includes companions, so <b>Divine Shield can legally be cast on the
+bear</b> and <code>dv_layered</code>'s "an ally who already holds one" is correct as written
+&mdash; while <code>dv_aegis</code>'s echo filters companions out and is not.</p>
+<p>Both terms are added to <b>the glossary</b> (<code>hero_vs_ally</code>, the 97th entry), the
+<b>text standard</b> (&sect;4.9) and <b>CLAUDE.md</b>.</p>
+
+<h3>&sect;5 &mdash; TWO SWEEPS, AND THE MYSTIC'S 27 BY HAND</h3>
+<p>CU machine-checked magnitudes on all 324 but gave the line-by-line semantic read to only
+<b>68</b>. Its own recommendation was the model &mdash; ask one mechanical question of all 324 at
+once rather than reading nine more specs by hand &mdash; and this batch asked two.</p>
+<p><b>SWEEP 1, UNDECLARED CAPS.</b> Four nodes are bounded at their read site and never said so:
+<code>sm_dominant</code> (unbounded multiplicative armor growth against
+<code>effective_armor()</code>'s <code>minf(a, 0.85)</code> ceiling &mdash; with Endurance one
+line below documenting its own +75% cap), <code>cr_winters_depth</code> and
+<code>ss_sunder_shot</code> (both thin the same divisor, capped at 75% with a floor of 10
+Constitution), and <code>wd_iron_will</code> (<code>maxf(1.0 - 0.01 * iw_pct, 0.1)</code> &mdash;
+a 90% ceiling reachable at eight debuffs). <b>Nodes that already state their caps correctly
+&mdash; <code>py_forge_body</code>, <code>oc_soul_leech</code>, <code>ss_unwavering</code>,
+<code>wd_endurance</code>, Heavy Plating's own passive line &mdash; are what made the question
+answerable mechanically.</b></p>
+<p><b>SWEEP 2, UNDECLARED EXCLUSIONS.</b> Three nodes count through <code>_status_count</code>,
+which walks <code>DEBUFF_IDS</code> and skips <b><code>broken</code></b> &mdash; the one
+affliction the Breaker lane exists to produce: <code>sm_momentum_sm</code> (Overwhelm, the known
+case), <code>sv_cocktail</code> and <code>sv_vulture</code>. All three now say so.
+<code>_unique_enemy_debuffs</code> does NOT skip it, so <code>oc_pleasure</code>'s "every UNIQUE
+debuff" is correct and was left.</p>
+<p><b>THEN THE MYSTIC'S 27 WERE HAND-READ</b> &mdash; the spec that produced zero automated hits,
+so not one node had ever been opened, which is real evidence about magnitudes and none at all
+about scope. It produced two findings neither sweep could reach:</p>
+<ul>
+<li><b><code>sv_creeping</code> &mdash; FIXED.</b> "Applying any status to a Poisoned enemy
+refreshes its Poison" &mdash; <code>_creeping_refresh</code> returns early when the status applied
+IS the poison, so the one application a player would most expect to work does not.</li>
+<li><b><code>sv_hitrun</code> &mdash; REPORTED, NOT REWORDED.</b> "Whenever you apply a status to
+an enemy, you gain Elusive" &mdash; <code>_hit_and_run</code> is called from <b>four</b> sites
+(any poison application, Hamstring, a Snare Trap set, a trap spring) and does not re-arm while
+Elusive already stands. Narrowing the text and widening the code are both design answers, so it
+goes to the designer under the brief's own rule.</li>
+</ul>
+
+<h3>&sect;6 &mdash; SURFACES THAT CONTRADICTED A CORRECT NODE</h3>
+<ul>
+<li><b><code>party_screen.gd</code> hardcoded the Blood Frenzy floor at half.</b> Scar Tissue
+makes it 85% and 100% with Unstoppable, and the in-battle chip has read the same
+<code>[50, 85, 100]</code> table off the same counter since AL &mdash; so <b>two surfaces
+disagreed in front of the player</b>, on the number the party sheet exists to compare builds by.
+The sheet reads the table now.</li>
+<li><b><code>dv_apostle</code> promised double and paid triple.</b> With <code>dv_fervor</code>
+the stacks count TRIPLE (<code>_faith_stack_mult</code> is written as a sum on purpose) and only
+Fervor's text said so &mdash; a player taking the capstone first was told double. Stated on
+both.</li>
+<li><b><code>ar_wrath</code> and <code>ar_conduit</code> add to a 3.5% step</b>
+(<code>RESONANCE_DMG_STEP</code> 1.5 + Conduit 0.5 + Wrath's second 1.5) and neither mentioned
+the other. Both do now.</li>
+<li><b>Guard Change's fixed <code>perfect_text</code> cannot know about
+<code>sm_swordsmanship</code>: reported, left.</b> That is a surface problem, not a text one.</li>
+</ul>
+
+<h3>&sect;7 &mdash; THE STALE NOTE, STRUCK</h3>
+<p><b>"92 nodes state a number their own payload cannot produce" was a FALSE ALARM and stops
+being quoted as an open defect.</b> What CU actually measured: <b>the census is 107, not 92</b>
+(the difference is incidental numbers set by a handler rather than by the payload), <b>and the
+finding is that the flag payload is an IDIOM, not a fault</b> &mdash; a talent payload is mostly
+a flag whose magnitude lives in <code>battle.gd</code> or <code>unit.gd</code>, so a node quoting
+a number its payload does not contain is the normal shape of a node. The real work was always the
+read-site check, which CU did on all 324 by machine and CV finished by hand. <code>CLAUDE.md</code>
+now records that instead.</p>
+
+<h3>&sect;8 &mdash; WHAT WAS DELIBERATELY NOT TOUCHED</h3>
+<ul>
+<li><b>Battle Shout's code and its own documentation disagree about intent.</b> The loop is
+<code>for h in heroes</code> with no companion filter, so a companion DOES hear it &mdash; while
+the read-site comment says "Companions don't hear it" and the chip legend says "to every hero and
+no companion". <b>A node whose behaviour looks wrong rather than undocumented goes to the
+designer</b>, and reporting it is the whole answer here: fixing the comment would endorse a
+behaviour, and fixing the code would delete one.</li>
+<li><b>Intercession's dead <code>is_perfect</code> branch</b> &mdash; see &sect;3.</li>
+<li><b>The Trapper passive's own line</b> ("+8% damage per DIFFERENT status effect") carries
+&sect;5's Broken omission on a SPEC PASSIVE rather than a node. The sweep's mandate was the 324;
+the passive is reported here.</li>
+<li><b>Every read site.</b> 52 node texts moved and zero code paths did, other than the party
+sheet's hardcoded floor &mdash; which is a surface reading a table, not a rule changing.</li>
+</ul>
+
 <h2>2026-08-20 &mdash; Batch CU: THE TALENT AUDIT</h2>
 <p><i><b>REPORT ONLY &mdash; nothing was fixed.</b> All 324 talent nodes compared three ways
 (node text, payload, read site), delivered as <b><code>docs/talent-audit.html</code></b> on

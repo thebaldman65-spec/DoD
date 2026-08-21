@@ -364,13 +364,13 @@ const LANE_TREES := {
 		# Precision Strikes — one crits into debuffs, this damages into
 		# them.
 		{"id": "sm_momentum_sm", "name": "Overwhelm", "ranks": 1, "lane": "Blade", "row": 6,
-			"desc": "+{v}% damage for every debuff on the target.",
+			"desc": "+{v}% damage for every debuff on the target. Broken is a Break-meter state rather than an affliction and is not one of them.",
 			"scale": {"step": 8},
 			"payload": {"stat": {"overwhelm_ranks": 1}}},
 		# Re-spec (was Deep Thrust, +5 Pommel damage): pays for pressing
 		# the button the whole spec turns on.
 		{"id": "sm_deep_thrust", "name": "Tempo", "ranks": 1, "lane": "Blade", "row": 7,
-			"desc": "Switching stance grants +{v}% damage for 1 turn.",
+			"desc": "Switching stance grants +{v}% damage for 2 turns.",
 			"scale": {"step": 30},
 			"payload": {"stat": {"tempo_ranks": 1}}},
 		# --- Lane B: Poise — the defensive half, and ALL the parry
@@ -406,7 +406,7 @@ const LANE_TREES := {
 			"scale": {"base": 10, "step": 15},
 			"payload": {"stat": {"swordsmanship_parry": 0.15}}},
 		{"id": "sm_high_guard", "name": "High Guard", "ranks": 1, "lane": "Poise", "row": 5,
-			"desc": "Take 40% less damage for 2 turns after parrying an attack.",
+			"desc": "Take 40% less damage for 3 turns after parrying an attack.",
 			"payload": {"stat": {"high_guard": 1}}},
 		# Moved from Duelist: the parry payoff sits behind the parry lane.
 		# Batch AK upgraded the counter from a basic Strike to a free
@@ -443,7 +443,7 @@ const LANE_TREES := {
 				]}},
 		# Moved from Poise: debuff-fed armor is pressure bookkeeping.
 		{"id": "sm_dominant", "name": "Dominant Presence", "ranks": 1, "lane": "Breaker", "row": 3,
-			"desc": "Armor value is increased by {v}% for every debuff the Swordmaster has applied this battle.",
+			"desc": "Armor value is increased by {v}% for every debuff the Swordmaster has applied this battle. The growth is unbounded but armor is not: no amount of it reduces a blow by more than 85%.",
 			"scale": {"step": 15},
 			"payload": {"stat": {"dominant_ranks": 1}}},
 		# Moved from Duelist. Batch AK widened the trigger: a parried blow
@@ -582,7 +582,7 @@ const LANE_TREES := {
 		# refunded): Shieldwall stopped granting charges, so "+1 charge/rank"
 		# stopped meaning anything. The stance's length is the dial now.
 		{"id": "wd_shieldwall", "name": "Shield Mastery", "ranks": 1, "lane": "Plate", "row": 5,
-			"desc": "Shieldwall's stance holds {v} turns longer — 4 turns, or 5 on a perfect cast.",
+			"desc": "Shieldwall's stance holds {v} turns longer — 5 turns.",
 			"scale": {"step": 2},
 			"payload": {"stat": {"shield_mastery_ranks": 1}}},
 		# Re-spec (was Layered Plating, a flat armor dial; same id, so saved
@@ -618,7 +618,7 @@ const LANE_TREES := {
 		# was +5%/rank DAMAGE per debuff, ~14 damage at full stack on a
 		# 75-Attack character.
 		{"id": "wd_iron_will", "name": "Iron Will", "ranks": 1, "lane": "Threat", "row": 3,
-			"desc": "The Warden takes {v}% less damage for every debuff currently on him.",
+			"desc": "The Warden takes {v}% less damage for every debuff currently on him, to a maximum of 90%.",
 			"scale": {"step": 12},
 			"payload": {"stat": {"iron_will_ranks": 1}}},
 		{"id": "wd_sundering", "name": "Sundering", "ranks": 1, "lane": "Threat", "row": 4,
@@ -665,7 +665,7 @@ const LANE_TREES := {
 			"desc": "Mocking Blow ALWAYS Empowers a random ally (2 turns).",
 			"payload": {"stat": {"tank_spank_ranks": 1}}},
 		{"id": "wd_rally", "name": "Rally", "ranks": 1, "lane": "Banner", "row": 2,
-			"desc": "Every attack Blocked by Heavy Plating grants the party +30% healing received for 3 turns.",
+			"desc": "Every attack Blocked by Heavy Plating grants every ally +30% healing received for 3 turns.",
 			"payload": {"stat": {"rally": 1}}},
 		# RE-SPEC (Batch AL; was Rallying Stomp, "War Stomp restores +5% more
 		# resource" — and before that Stomp Drill, -5 cost). Same id, so
@@ -698,7 +698,7 @@ const LANE_TREES := {
 		# that Shieldwall's own stance does, so the cover is real Block, not
 		# a separate mitigation site.
 		{"id": "wd_bannerman", "name": "Bulwark Line", "ranks": 1, "lane": "Banner", "row": 5,
-			"desc": "Shieldwall also grants every ally +{v}% Block chance for its duration. If he owns Interpose, each ally gains 1 additional shield charge from it as well.",
+			"desc": "Shieldwall also grants every other hero +{v}% Block chance for its duration. If he owns Interpose, each hero gains 1 additional shield charge from it as well.",
 			"scale": {"step": 10},
 			"payload": {"stat": {"bulwark_ally_block": 10},
 				"also": [
@@ -709,13 +709,13 @@ const LANE_TREES := {
 		# Warden being healthy — the party's mitigation depends on keeping
 		# him standing, so healing him is protecting everyone.
 		{"id": "wd_fortress", "name": "Shared Vigil", "ranks": 1, "lane": "Banner", "row": 6,
-			"desc": "Allies take {v}% less damage while the Warden is above 50% health.",
+			"desc": "Heroes take {v}% less damage while the Warden is above 50% health.",
 			"scale": {"step": 12},
 			"payload": {"stat": {"shared_vigil_ranks": 1}}},
 		# Re-spec (was Veteran's Will, an Iron Will deepener): the lane's
 		# thesis in one node — he eats what would have killed you.
 		{"id": "wd_veteran", "name": "Steadfast", "ranks": 1, "lane": "Banner", "row": 7,
-			"desc": "When damage would drop an ally below 20% health, the Warden absorbs {v}% of it instead.",
+			"desc": "When damage would drop a hero below 20% health, the Warden absorbs {v}% of it instead.",
 			"scale": {"step": 60},
 			"payload": {"stat": {"steadfast_ranks": 1}}},
 		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
@@ -737,7 +737,7 @@ const LANE_TREES := {
 		# CONVERTS: his armor is the deepest number in the tree and it has always
 		# been his alone. Banner's thesis is that it should not be.
 		{"id": "wd_standard", "name": "Standard Bearer", "ranks": 1, "lane": "Banner", "row": 8,
-			"desc": "Every ally is protected by {v}% of the Warden's own armor value, on top of their own.",
+			"desc": "Every other hero is protected by {v}% of the Warden's own armor value, on top of their own.",
 			"scale": {"step": 50},
 			"payload": {"stat": {"standard_bearer": 50}}},
 		# --- Capstones (row 9): take ONE, no lane requirement ---
@@ -765,7 +765,7 @@ const LANE_TREES := {
 		# take the capstone rather than a reason to avoid it.
 		{"id": "wd_hold_line", "name": "Hold the Line", "ranks": 1, "lane": "Banner", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Hold the Line — the party takes 50% less Break damage for 2 turns and cannot die for a turn (30 Rage, 3.0 int, 6cd). If Hold the Line was already earned, this UPGRADES it instead: 80% less Break damage, and the no-death window lasts 2 turns.",
+			"desc": "New ability: Hold the Line — every ally takes 50% less Break damage for 2 turns and cannot die for 2 turns (30 Rage, 3.0 int, 6cd). If Hold the Line was already earned, this UPGRADES it instead: 80% less Break damage, and the no-death window lasts 3 turns.",
 			"payload": {"new_ability": {"display_name": "Hold the Line", "cost": 30,
 				"special": "hold_the_line", "delay": 3.0, "anim": "attack03",
 				"cooldown": 6,
@@ -817,7 +817,7 @@ const LANE_TREES := {
 			"desc": "New ability: Backdraft — add 2 turns of Burn to every burning enemy (20 Mana, 2.0 int, 3cd).",
 			"payload": {"new_ability": {"display_name": "Backdraft", "cost": 20,
 				"special": "backdraft", "delay": 2.0, "anim": "attack03", "cooldown": 3,
-				"perfect_id": "", "perfect_text": "3 turns each instead",
+				"perfect_id": "", "perfect_text": "",
 				"description": "Feed the fire air: every burning enemy\ngains 2 more turns of Burn. It starts\nno fires — it only deepens the ones\nalready lit, drain and all."}}},
 		{"id": "py_ashes", "name": "Wildfire Spread", "ranks": 1, "lane": "Kindling", "row": 5,
 			"desc": "Wildfire applies {v} turn of Burn to non-burning enemies before it consumes.",
@@ -862,7 +862,7 @@ const LANE_TREES := {
 		# way, which is the AR standard for this node read against a lane that
 		# now defends instead of paying.
 		{"id": "py_flame_shield", "name": "Immolate", "ranks": 1, "lane": "Inferno", "row": 4,
-			"desc": "New ability: Immolate — for 3 turns you take 20% less damage and anything that strikes you is set Burning 3 turns (15 Mana, 1.5 int, 2cd).",
+			"desc": "New ability: Immolate — for 4 turns you take 20% less damage and anything that strikes you is set Burning 3 turns (15 Mana, 1.5 int, 2cd).",
 			"payload": {"new_ability": {"display_name": "Immolate", "cost": 15,
 				"special": "immolate", "delay": 1.5, "anim": "attack03", "cooldown": 2,
 				"perfect_id": "", "perfect_text": "",
@@ -958,7 +958,7 @@ const LANE_TREES := {
 		# ability never should have granted it.
 		{"id": "py_rebirth", "name": "Phoenix Rebirth", "ranks": 1, "lane": "Inferno", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Phoenix Rebirth — sacrifice 25% of current health and your Mana returns to full (2.0 int, 4cd).",
+			"desc": "New ability: Phoenix Rebirth — sacrifice 15% of current health and your Mana returns to full (2.0 int, 4cd).",
 			"payload": {"new_ability": {"display_name": "Phoenix Rebirth", "cost": 0,
 				"special": "phoenix", "delay": 2.0, "anim": "attack03", "cooldown": 4,
 				"perfect_id": "", "perfect_text": "",
@@ -1002,7 +1002,7 @@ const LANE_TREES := {
 			"scale": {"step": 2},
 			"payload": {"stat": {"grasp_ranks": 2}}},
 		{"id": "cr_rime", "name": "Rime", "ranks": 1, "lane": "Winter", "row": 4,
-			"desc": "New ability: Rime — inflicts Frostbite (-50% healing received, 2 turns); for 3 turns, every stack of Chilled the target gains also chills one other random enemy (25 Mana, 3.0 int, 3cd).",
+			"desc": "New ability: Rime — inflicts Frostbite (-50% healing received, 2 turns); for 4 turns, every stack of Chilled the target gains also chills one other random enemy (25 Mana, 3.0 int, 3cd).",
 			"payload": {"new_ability": {"display_name": "Rime", "cost": 25,
 				"special": "rime", "delay": 3.0, "anim": "attack02", "cooldown": 3,
 				"perfect_id": "", "perfect_text": "",
@@ -1117,13 +1117,13 @@ const LANE_TREES := {
 		# Winter already IS that, and a node that freezes more often feeds the
 		# open _hold_release/_hold_freeze recursion. Reported in the changelog.)
 		{"id": "cr_winters_depth", "name": "Winter's Depth", "ranks": 1, "lane": "Winter", "row": 8,
-			"desc": "Every stack of Chilled lowers its bearer's Constitution by {v}% — the colder they are, the easier they Break.",
+			"desc": "Every stack of Chilled lowers its bearer's Constitution by {v}%, by at most 75% and never below 10 Constitution — the colder they are, the easier they Break.",
 			"scale": {"step": 8},
 			"payload": {"stat": {"winters_depth": 8}}},
 		# READS AN ACCUMULATED QUANTITY (how many he holds) and pays the PARTY a
 		# second currency while the hold lasts.
 		{"id": "cr_cold_storage", "name": "Cold Storage", "ranks": 1, "lane": "Deep Freeze", "row": 8,
-			"desc": "At the start of each of his turns every ally regains {v}% of their maximum resource for each enemy he is holding.",
+			"desc": "At the start of each of his turns every hero regains {v}% of their maximum resource for each enemy he is holding.",
 			"scale": {"step": 5},
 			"payload": {"stat": {"cold_storage": 5}}},
 		# READS AN ACCUMULATED QUANTITY (turns held) and buys TIME with it — the
@@ -1232,7 +1232,7 @@ const LANE_TREES := {
 		# POINTS on the curve's step, and it is a FLOAT, so it must never be
 		# named "_ranks" (Runes.STAT_INT_KEYS would coerce 0.5 to 0).
 		{"id": "ar_conduit", "name": "Conduit", "ranks": 1, "lane": "Overload", "row": 1,
-			"desc": "The damage curve's step rises from 1.5% to {v}% per stack.",
+			"desc": "The damage curve's step rises from 1.5% to {v}% per stack. With Magi's Wrath, which adds another 1.5 points, the step is 3.5% per stack.",
 			"scale": {"base": 1.5, "step": 0.5},
 			"payload": {"stat": {"conduit_step": 0.5}}},
 		# Re-spec in place (it was Cannon AND Wrath, +5%/rank each way): the
@@ -1382,7 +1382,7 @@ const LANE_TREES := {
 		# of this node, so it is not dead and owes nothing extra.
 		{"id": "ar_wrath", "name": "Magi's Wrath", "ranks": 1, "lane": "Overload", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Magi's Wrath — 15% of Attack as arcane to ALL enemies; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd). ALSO doubles the damage curve's step: 1.5% to 3% per stack.",
+			"desc": "New ability: Magi's Wrath — 15% of Attack as arcane to ALL enemies; BD = 2.5 x stacks; recoil 15% of damage dealt, -3% per enemy hit (30 Mana, 4.0 int, 4cd). ALSO doubles the damage curve's step: 1.5% to 3% per stack, or 3.5% with Conduit.",
 			"payload": {"new_ability": {"display_name": "Magi's Wrath", "cost": 30,
 				"dmg_type": "arcane", "damage": 15, "pressure": 0, "aoe": true,
 				"delay": 4.0, "anim": "attack03", "cooldown": 4, "recoil_base": 0.15,
@@ -1455,11 +1455,11 @@ const LANE_TREES := {
 		# One half of the wasted-healing fork: crit investment pays out
 		# sideways — it needs Triage to fire at all.
 		{"id": "hl_brilliance", "name": "Radiant Cascade", "ranks": 1, "lane": "Radiance", "row": 6,
-			"desc": "A CRITICAL heal also splashes 75% of its value onto the lowest-health other ally.",
+			"desc": "A CRITICAL heal also splashes 75% of its value onto the lowest-health other hero.",
 			"payload": {"stat": {"cascade_pct": 75}}},
 		# The other half: raw output spills over instead of being wasted.
 		{"id": "hl_overflow", "name": "Overflow", "ranks": 1, "lane": "Radiance", "row": 7,
-			"desc": "60% of any overhealing spills onto the lowest-health other ally immediately.",
+			"desc": "60% of any overhealing spills onto the lowest-health other hero immediately.",
 			"payload": {"stat": {"overflow_pct": 60}}},
 		# --- Lane B: MERCY — the resource economy: earning stacks, holding
 		# them, spending them, and Empower. ---
@@ -1481,7 +1481,7 @@ const LANE_TREES := {
 		# paid her nothing, the one place her reactive economy wasted what it
 		# earned.
 		{"id": "hl_resurrection", "name": "Grace", "ranks": 1, "lane": "Mercy", "row": 5,
-			"desc": "When an ally would earn you a stack of Mercy while you are at maximum, the stack instead heals that ally for 20% of your maximum health.",
+			"desc": "When a hero would earn you a stack of Mercy while you are at maximum, the stack instead heals that hero for 20% of your maximum health.",
 			"payload": {"stat": {"grace_pct": 20}}},
 		# A rhythm rather than a discount — bank to the threshold, then
 		# Empower freely until you drop below it. Re-priced 4 -> 3: at 4 of a
@@ -1500,10 +1500,10 @@ const LANE_TREES := {
 		# the economy, and this lane takes REVERSAL — which is what gives her
 		# three real questions instead of two. ---
 		{"id": "hl_guardian", "name": "Guardian Angel", "ranks": 1, "lane": "Vigil", "row": 1,
-			"desc": "Allies falling below 65% health earn you a stack of Mercy, up from 50%.",
+			"desc": "Heroes falling below 65% health earn you a stack of Mercy, up from 50%.",
 			"payload": {"stat": {"guardian_step": 15}}},
 		{"id": "hl_presence", "name": "Divine Presence", "ranks": 1, "lane": "Vigil", "row": 2,
-			"desc": "At the end of your turn, the lowest-health ally is healed for 8% of their maximum health.",
+			"desc": "At the end of your turn, the lowest-health hero is healed for 8% of their maximum health.",
 			"payload": {"stat": {"divine_presence_pct": 8}}},
 		{"id": "hl_last_hope", "name": "Last Hope", "ranks": 1, "lane": "Vigil", "row": 3,
 			"desc": "Allies under 25% of their maximum health receive 40% more healing.",
@@ -1526,7 +1526,7 @@ const LANE_TREES := {
 		# the name that fits it. THIS IS A LABEL ONLY — the counter
 		# `holy_vigil_pct` and every read site are untouched.
 		{"id": "hl_beacon", "name": "Hour of Need", "ranks": 1, "lane": "Vigil", "row": 5,
-			"desc": "While any hero is below 30% health, the whole party takes 15% less damage.",
+			"desc": "While any hero is below 30% health, every hero takes 15% less damage.",
 			"payload": {"stat": {"holy_vigil_pct": 15}}},
 		# Re-spec: the ward stops riding Renewal and rides the HEALING, so
 		# every cast leaves something behind.
@@ -1556,7 +1556,7 @@ const LANE_TREES := {
 		# READS AN ACCUMULATED QUANTITY: Mercy held has only ever paid HER. It
 		# pays the party now — a currency the meter could not previously buy.
 		{"id": "hl_communion_mercy", "name": "Communion of Mercy", "ranks": 1, "lane": "Mercy", "row": 8,
-			"desc": "Every stack of Mercy the Cleric holds grants the whole party {v}% damage reduction.",
+			"desc": "Every stack of Mercy the Cleric holds grants every hero {v}% damage reduction.",
 			"scale": {"step": 2},
 			"payload": {"stat": {"mercy_aegis": 2}}},
 		# REMOVES A CONSTRAINT: the lane's reversals all arrive on her turn, and
@@ -1571,7 +1571,7 @@ const LANE_TREES := {
 		# wasted at all.
 		{"id": "hl_sanctum", "name": "Sanctum", "ranks": 1, "lane": "Radiance", "row": 9,
 			"capstone": true,
-			"desc": "Your healing is increased by 60%, and ALL of your overhealing spills onto the lowest-health other ally.",
+			"desc": "Your healing is increased by 60%, and ALL of your overhealing spills onto the lowest-health other hero.",
 			"payload": {"stat": {"sanctum": 1}}},
 		# Empower goes unconditional AND becomes a generator — the payoff for
 		# a lane built on the resource. Supersedes Ardor rather than stacking
@@ -1618,7 +1618,7 @@ const LANE_TREES := {
 			"scale": {"step": 20},
 			"payload": {"stat": {"blessed_barrier_ranks": 20}}},
 		{"id": "dv_aegis", "name": "Radient Aegis", "ranks": 1, "lane": "Bulwark", "row": 2,
-			"desc": "Casting Divine Shield has a {v}% chance to cast it again on another ally.",
+			"desc": "Casting Divine Shield has a {v}% chance to cast it again on another hero.",
 			"scale": {"step": 60},
 			"payload": {"stat": {"aegis_ranks": 60}}},
 		{"id": "dv_afterglow", "name": "Afterglow", "ranks": 1, "lane": "Bulwark", "row": 3,
@@ -1631,8 +1631,8 @@ const LANE_TREES := {
 			"payload": {"stat": {"warded_ranks": 25}}},
 		# The counter holds the INCREASE on the 30% the ability pays without it.
 		{"id": "dv_stalwart", "name": "Stalwart", "ranks": 1, "lane": "Bulwark", "row": 5,
-			"desc": "Divine Shield absorbs {v}% of the Devout's max health (up from the base 30%).",
-			"scale": {"base": 30, "step": 20},
+			"desc": "Divine Shield absorbs {v}% of the Devout's max health (up from the base 35%).",
+			"scale": {"base": 35, "step": 20},
 			"payload": {"stat": {"stalwart_step": 20}}},
 		# BASTION GOING TO ZERO IS THE LANE'S STATEMENT and the direct answer to
 		# the other half of §2's problem: a shield every turn is a Faith engine.
@@ -1661,7 +1661,7 @@ const LANE_TREES := {
 		# ability whose chance climbs with stacks and then vanishes at the top
 		# reads as a bug unless the tooltip says otherwise.
 		{"id": "dv_communion", "name": "Communion", "ranks": 1, "lane": "Faith", "row": 1,
-			"desc": "When a party member reaches 5 Faith, every other member who is still BUILDING Faith has a ({v} x their own Faith stacks)% chance to gain 1 stack. The chance therefore peaks at 60% on an ally holding 4 — an ally already at 5 is at the payout rather than building, and is not rolled for at all.",
+			"desc": "When a hero reaches 5 Faith, every other hero who is still BUILDING Faith has a ({v} x their own Faith stacks)% chance to gain 1 stack. The chance therefore peaks at 60% on a hero holding 4 — a hero already at 5 is at the payout rather than building, and is not rolled for at all.",
 			"scale": {"step": 15},
 			"payload": {"stat": {"communion_ranks": 15}}},
 		# THE MOST INVESTMENT-SHAPED NODE IN THE GAME with Conviction's third
@@ -1672,7 +1672,7 @@ const LANE_TREES := {
 			"scale": {"step": 20},
 			"payload": {"stat": {"max_hp_pct": 0.20}}},
 		{"id": "dv_devoutness", "name": "Devoutness", "ranks": 1, "lane": "Faith", "row": 3,
-			"desc": "The entire party takes {v}% less Break damage.",
+			"desc": "Every ally takes {v}% less Break damage.",
 			"scale": {"step": 20},
 			"payload": {"stat": {"devoutness_ranks": 20}}},
 		# The counter holds the INCREASE on the release's base 15%.
@@ -1711,7 +1711,7 @@ const LANE_TREES := {
 		# "triple" rather than "quadruple" for that reason. See
 		# `battle._faith_stack_mult`, which is written as a sum on purpose.
 		{"id": "dv_fervor", "name": "Fervor", "ranks": 1, "lane": "Faith", "row": 6,
-			"desc": "While Consecrated Ground holds, every ally standing on it counts each stack of Faith DOUBLE: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. It grants no extra Faith at all. With Apostle the stacks count TRIPLE: the two nodes ADD to the base rather than multiplying each other.",
+			"desc": "While Consecrated Ground holds, every hero standing on it counts each stack of Faith DOUBLE: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. It grants no extra Faith at all. With Apostle the stacks count TRIPLE: the two nodes ADD to the base rather than multiplying each other.",
 			"payload": {"stat": {"fervor": 1}}},
 		# BATCH BH §2 — THE LARGEST UNTOUCHED AXIS IN THE LANE: THE DEVOUT'S OWN
 		# FAITH. Its old effect (a release leaves a remnant standing) was the
@@ -1728,14 +1728,14 @@ const LANE_TREES := {
 		# its own caster and `_gain_faith` never excluded him — AND IT RELEASED,
 		# which was an uncounted frequency source. The re-spec closes that too.
 		{"id": "dv_oath", "name": "Binding Oath", "ranks": 1, "lane": "Faith", "row": 7,
-			"desc": "Whenever an ally's Faith releases, the Devout gains {v} stack of Faith himself. His own Faith never releases — it holds, paying him the same mitigation and damage it pays them.",
+			"desc": "Whenever a hero's Faith releases, the Devout gains {v} stack of Faith himself. His own Faith never releases — it holds, paying him the same mitigation and damage it pays them.",
 			"scale": {"step": 1},
 			"payload": {"stat": {"oath_faith": 1}}},
 		# --- Lane ZEAL — EVERYONE, SHALLOWLY: invest a little in the whole
 		# party. (Its old thesis was "everything else he casts", which is the
 		# fault Holy's Sanctuary had — a lane named after the leftovers.) ---
 		{"id": "dv_waters", "name": "Cleansing Waters", "ranks": 1, "lane": "Zeal", "row": 1,
-			"desc": "While Consecrated Ground or Sacred Resolve holds, each party member has a {v}% chance each turn to be cleansed of one harmful effect.",
+			"desc": "While Consecrated Ground or Sacred Resolve holds, each ally has a {v}% chance each turn to be cleansed of one harmful effect.",
 			"scale": {"step": 50},
 			"payload": {"stat": {"waters_ranks": 50}}},
 		# The counter holds the INCREASE on the ground's base 10% reflect.
@@ -1746,11 +1746,11 @@ const LANE_TREES := {
 		# §5: the authored fallback for a hero who already EARNED Sacred Resolve
 		# — the node pays a longer split instead of a grant it cannot make.
 		{"id": "dv_resolve", "name": "Sacred Resolve", "ranks": 1, "lane": "Zeal", "row": 3,
-			"desc": "New ability: Sacred Resolve — all damage received is split evenly among living heroes for 3 turns; Break damage still lands on the struck hero (25 Mana, 2.5 int, 5cd; Perfect: 4 turns). Already owned: the split lasts 5 turns instead.",
+			"desc": "New ability: Sacred Resolve — all damage received is split evenly among living heroes for 4 turns; Break damage still lands on the struck hero (25 Mana, 2.5 int, 5cd). Already owned: the split lasts 6 turns instead.",
 			"payload": {"grant_ability": "Sacred Resolve",
 				"upgrade": [{"stat": {"resolve_extra_turns": 2}}]}},
 		{"id": "dv_pulse", "name": "Healing Pulse", "ranks": 1, "lane": "Zeal", "row": 4,
-			"desc": "While Consecrated Ground or Sacred Resolve holds, the party heals {v}% of the Devout's max health each turn.",
+			"desc": "While Consecrated Ground or Sacred Resolve holds, every hero heals {v}% of the Devout's max health each turn.",
 			"scale": {"step": 8},
 			"payload": {"stat": {"pulse_ranks": 8}}},
 		{"id": "dv_crusade", "name": "Crusader's Tempo", "ranks": 1, "lane": "Zeal", "row": 5,
@@ -1765,7 +1765,7 @@ const LANE_TREES := {
 			"scale": {"step": 35},
 			"payload": {"stat": {"purity_ranks": 35}}},
 		{"id": "dv_lifewell", "name": "Lifewell", "ranks": 1, "lane": "Zeal", "row": 7,
-			"desc": "Damage reflected by Consecrated Ground heals the party for {v}% of the amount reflected.",
+			"desc": "Damage reflected by Consecrated Ground heals every hero for {v}% of the amount reflected.",
 			"scale": {"step": 80},
 			"payload": {"stat": {"lifewell_ranks": 80}}},
 		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
@@ -1797,7 +1797,7 @@ const LANE_TREES := {
 		# CLERIC capstone to owe a fallback at all. Corrected toward the code.
 		{"id": "dv_bulwark", "name": "Bulwark of Fortitude", "ranks": 1, "lane": "Bulwark", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Bulwark of Fortitude — for 3 turns the party takes NO Break damage, has its armor increased by 50%, and heals 10% of max health each turn (30 Mana, 3.0 int, 3cd; Perfect: the party instantly heals 5%). Already owned: it lasts 4 turns instead.",
+			"desc": "New ability: Bulwark of Fortitude — for 3 turns every hero takes NO Break damage, has their armor increased by 50%, and heals 10% of max health each turn; the cast itself heals every hero 5% at once (30 Mana, 3.0 int, 3cd). Already owned: it lasts 4 turns instead.",
 			"payload": {"grant_ability": "Bulwark of Fortitude",
 				"upgrade": [{"stat": {"bulwark_extra_turns": 1}}]}},
 		# BATCH BG §2 — RE-SPECCED OFF THE FREQUENCY AXIS, and the id, the lane
@@ -1823,7 +1823,7 @@ const LANE_TREES := {
 		# plus a row-6 node, and it is meant to be strong.
 		{"id": "dv_apostle", "name": "Apostle", "ranks": 1, "lane": "Faith", "row": 9,
 			"capstone": true,
-			"desc": "Every stack of Faith an ally carries is worth double: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. Releases still reset the count — and the value is paid on the highest count held this battle, so a release never takes it away.",
+			"desc": "Every stack of Faith a hero carries is worth double: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. With Fervor, on Consecrated Ground, they count TRIPLE. Releases still reset the count — and the value is paid on the highest count held this battle, so a release never takes it away.",
 			"payload": {"stat": {"apostle": 1}}},
 		# The counter is the gate AND the magnitude — one field, one read site.
 		{"id": "dv_judgement", "name": "Judgement", "ranks": 1, "lane": "Zeal", "row": 9,
@@ -1884,7 +1884,7 @@ const LANE_TREES := {
 		# BATCH BB §2 gave it its second clause: Perfected Toxin leaves no clock
 		# to refresh, so against a permanent poison the node deepens instead.
 		{"id": "sv_creeping", "name": "Creeping Death", "ranks": 1, "lane": "Venom", "row": 5,
-			"desc": "Applying any status to a Poisoned enemy refreshes its Poison to full duration — or, if that Poison is permanent, adds a stack instead (once per enemy per turn).",
+			"desc": "Applying any status OTHER than the Poison itself to a Poisoned enemy refreshes its Poison to full duration — or, if that Poison is permanent, adds a stack instead (once per enemy per turn).",
 			"payload": {"stat": {"creeping_death": 1}}},
 		# The only node in the lane that was already pointed at BREADTH rather
 		# than depth, and tissue death from venom is what venomous bites do — so
@@ -1897,7 +1897,7 @@ const LANE_TREES := {
 		# self-propagating — he oils their blades. The closest thing to Plague
 		# Bearer's REACH that stays out of the reserved space.
 		{"id": "sv_plague", "name": "Quartermaster", "ranks": 1, "lane": "Venom", "row": 7,
-			"desc": "Your allies' basic attacks also apply your Poison.",
+			"desc": "Every other hero's basic attacks also apply your Poison.",
 			"payload": {"stat": {"quartermaster": 1}}},
 		# --- Lane B: Snares — the affliction that STOPS ---
 		{"id": "sv_wire", "name": "Reinforced Wire", "ranks": 1, "lane": "Snares", "row": 1,
@@ -1952,7 +1952,7 @@ const LANE_TREES := {
 			"scale": {"step": 2},
 			"payload": {"stat": {"field_medic": 2}}},
 		{"id": "sv_vulture", "name": "Vulture", "ranks": 1, "lane": "Guerilla", "row": 5,
-			"desc": "+{v}% damage against enemies afflicted by 3 or more different statuses.",
+			"desc": "+{v}% damage against enemies afflicted by 3 or more different statuses. Broken is not one of them.",
 			"scale": {"step": 60},
 			"payload": {"stat": {"vulture": 60}}},
 		{"id": "sv_ghillie", "name": "Ghillie Suit", "ranks": 1, "lane": "Guerilla", "row": 6,
@@ -1971,7 +1971,7 @@ const LANE_TREES := {
 		# BREADTH BECOMES SELF-PROPAGATING WITHIN ONE ENEMY — the BA contagion
 		# reservation holds: nothing spreads between enemies or from a corpse.
 		{"id": "sv_cocktail", "name": "Cocktail", "ranks": 1, "lane": "Venom", "row": 8,
-			"desc": "At the start of a Poisoned enemy's turn its Poison gains a stack for every {v} OTHER statuses it carries.",
+			"desc": "At the start of a Poisoned enemy's turn its Poison gains a stack for every {v} OTHER statuses it carries. Broken is not counted.",
 			"scale": {"step": 2},
 			"payload": {"stat": {"cocktail": 2}}},
 		# REMOVES A CONSTRAINT: a trap is spent the moment it works, so the lane
@@ -2005,7 +2005,7 @@ const LANE_TREES := {
 		# read site reads a number rather than deriving one from a flag.
 		{"id": "sv_force", "name": "Force of Nature", "ranks": 1, "lane": "Guerilla", "row": 9,
 			"capstone": true,
-			"desc": "Trapper's bonus rises to +{v}% per different status — and applies to your ENTIRE party's damage.",
+			"desc": "Trapper's bonus rises to +{v}% per different status — Broken excluded — and applies to every hero's damage.",
 			"scale": {"step": 20},
 			"payload": {"stat": {"force_of_nature": 20}}},
 	],
@@ -2138,7 +2138,7 @@ const LANE_TREES := {
 		# ARMOR AND BREAK STOP BEING SEPARATE PROBLEMS: his armor penetration
 		# thins Constitution by the same share.
 		{"id": "ss_sunder_shot", "name": "Sunder Shot", "ranks": 1, "lane": "Penetration", "row": 8,
-			"desc": "The armor the Sharpshooter ignores is also Constitution he ignores: a target resists his Break damage {v}% less for each point of his armor penetration.",
+			"desc": "The armor the Sharpshooter ignores is also Constitution he ignores: a target resists his Break damage {v}% less for each point of his armor penetration, by at most 75% and never below 10 Constitution.",
 			"scale": {"step": 100},
 			"payload": {"stat": {"sunder_shot": 100}}},
 		# THE METER SURVIVES WHAT CLEARS IT: the payout halves it rather than
@@ -2432,7 +2432,7 @@ const LANE_TREES := {
 			"scale": {"step": 3},
 			"payload": {"stat": {"delirium_ranks": 3}}},
 		{"id": "oc_cackling", "name": "Cackling Mirror", "ranks": 1, "lane": "Madness", "row": 6,
-			"desc": "When an enemy strikes a fellow, the party heals {v}% of the damage dealt.",
+			"desc": "When an enemy strikes a fellow, every hero heals {v}% of the damage dealt.",
 			"scale": {"step": 15},
 			"payload": {"stat": {"cackling_ranks": 15}}},
 		{"id": "oc_torment", "name": "Lingering Torment", "ranks": 1, "lane": "Madness", "row": 7,
@@ -2460,11 +2460,11 @@ const LANE_TREES := {
 		# A FRACTIONAL magnitude, so the field must NOT end in "_ranks" —
 		# Runes.STAT_INT_KEYS coerces anything with that suffix to an int.
 		{"id": "oc_pleasure", "name": "Pleasure from Pain", "ranks": 1, "lane": "Leech", "row": 4,
-			"desc": "At the end of the Occultist's turn, the party heals {v}% of his maximum health for every UNIQUE debuff on the enemy team.",
+			"desc": "At the end of the Occultist's turn, every hero heals {v}% of his maximum health for every UNIQUE debuff on the enemy team.",
 			"scale": {"step": 2.5},
 			"payload": {"stat": {"pleasure_pct": 2.5}}},
 		{"id": "oc_murderous", "name": "Murderous Intent", "ranks": 1, "lane": "Leech", "row": 5,
-			"desc": "When a Bewitched enemy kills one of its fellows, the lowest-health party member heals {v}% of the Occultist's maximum health.",
+			"desc": "When a Bewitched enemy kills one of its fellows, the lowest-health hero heals {v}% of the Occultist's maximum health.",
 			"scale": {"step": 35},
 			"payload": {"stat": {"murderous_ranks": 35}}},
 		# The in-lane fork: one ability, pay less or get more. Dark Pact is the
@@ -2478,7 +2478,7 @@ const LANE_TREES := {
 		# base the kit already pays (Dark Pact's 15%), so it takes the `_step`
 		# name the other three do — §5 named three; this one has the same shape.
 		{"id": "oc_barter", "name": "Dark Barter", "ranks": 1, "lane": "Leech", "row": 7,
-			"desc": "Dark Pact heals every other ally {v}% of their maximum health (up from the base 15%).",
+			"desc": "Dark Pact heals every other hero {v}% of their maximum health (up from the base 15%).",
 			"scale": {"base": 15, "step": 20},
 			"payload": {"stat": {"barter_step": 20}}},
 		# --- Row 8 (BATCH BM §2): the node that only matters once the rest of
@@ -2518,12 +2518,12 @@ const LANE_TREES := {
 		# gets it back twice as often instead of a grant it cannot make.
 		{"id": "oc_hysteria", "name": "Mass Hysteria", "ranks": 1, "lane": "Madness", "row": 9,
 			"capstone": true,
-			"desc": "New ability: Mass Hysteria — next turn every minion strikes a fellow with DOUBLE Break damage, Sundering them for 3 turns (30 Mana, 4.0 int, 4cd; Perfect: 3cd). Bosses resist until Broken. Already owned: its cooldown falls to 2.",
+			"desc": "New ability: Mass Hysteria — next turn every minion strikes a fellow with DOUBLE Break damage, Sundering them for 3 turns (30 Mana, 4.0 int, 4cd). Bosses resist until Broken. Already owned: its cooldown falls to 2.",
 			"payload": {"grant_ability": "Mass Hysteria",
 				"upgrade": [{"ability": "Mass Hysteria", "set": {"cooldown": 2}}]}},
 		{"id": "oc_soul_glut", "name": "Soul Glut", "ranks": 1, "lane": "Leech", "row": 9,
 			"capstone": true,
-			"desc": "Whenever a hero heals by striking a Ruined target, the whole party heals for the same amount. Still under the 40% cap.",
+			"desc": "Whenever a hero heals by striking a Ruined target, every hero heals for the same amount. Still under the 40% cap.",
 			"payload": {"stat": {"soul_glut": 1}}},
 	],
 }

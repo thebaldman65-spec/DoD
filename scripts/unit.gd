@@ -374,7 +374,7 @@ var precision_ranks := 0      # Precision Strikes: crit vs dazed/crippled/expose
 var opportunist := 0          # Opportunist: counter enemy misses AND parries with Overpower
 var blade_crit_ranks := 0     # Seasoned Fighter node: crit for Lunge/Overpower
 var swordsmanship_parry := 0.0 # Swordsmanship: the perfect Guard Change parry spike
-var high_guard := 0           # High Guard: -40% damage 2 turns after parrying
+var high_guard := 0           # High Guard: -40% damage 3 turns after parrying
 var dominant_ranks := 0       # Dominant Presence: armor per debuff applied
 var debuffs_applied := 0
 var unkillable_ranks := 0     # Unkillable: heal on block
@@ -424,7 +424,7 @@ var stance := "aggressive"    # Swordmaster guard (aggressive|defensive), fresh 
 # talents.gd for the node text.
 var killing_edge_ranks := 0   # Killing Edge: +15% crit while Aggressive
 var overwhelm_ranks := 0      # Overwhelm: +8% damage per debuff on the target
-var tempo_ranks := 0          # Tempo: stance switch grants +30% damage 1 turn
+var tempo_ranks := 0          # Tempo: stance switch grants +30% damage 2 turns
 var bracing_ranks := 0        # Bracing: +30 Constitution while Defensive
 var deflection := 0           # Deflection: parry works against ranged attacks
 var pressure_point_ranks := 0 # Pressure Point: Pommel Strike +30 BD
@@ -2265,7 +2265,7 @@ func effective_armor() -> float:
 	if mod_ignore_armor:
 		return 0.0
 	var a := armor
-	# Dominant Presence: armor value grows 5%/rank per debuff applied.
+	# Dominant Presence: armor value grows 15%/rank per debuff applied.
 	if dominant_ranks > 0 and debuffs_applied > 0:
 		a *= 1.0 + 0.15 * dominant_ranks * debuffs_applied
 	# Endurance: +3%/rank armor per turn without an external heal, CAPPED at

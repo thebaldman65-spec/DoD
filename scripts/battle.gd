@@ -211,7 +211,7 @@ const STATUS_INFO := {
 	# granting them — the block log names this as its source.
 	"shield_charges": ["Interpose", "IP", Color(0.65, 0.72, 0.85), "The next attacks against this unit\nare BLOCKED (one charge each)."],
 	"high_guard": ["High Guard", "HG", Color(0.55, 0.80, 0.95), "Takes 40% less damage."],
-	"tempo": ["Tempo", "T+", Color(0.4, 0.9, 1.0), "The pivot's momentum: bonus damage\nfor one turn (granted by switching\nstance)."],
+	"tempo": ["Tempo", "T+", Color(0.4, 0.9, 1.0), "The pivot's momentum: bonus damage\nfor two turns (granted by switching\nstance)."],
 	"killing_edge": ["Killing Edge", "KE", Color(0.95, 0.5, 0.35), "The Aggressive guard hunts the\nopening: bonus critical chance while\nthe stance holds."],
 	"bracing": ["Bracing", "Br", Color(0.55, 0.80, 0.95), "The raised guard is harder to Break:\nbonus Constitution while the Defensive\nstance holds."],
 	"elem_weak": ["Elemental Weakness", "EW", Color(0.40, 0.80, 0.75), "Elemental resistances reduced."],
@@ -8053,7 +8053,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if attacker.is_ranged:
 					_log("   → Talent: Deflection — %s turns the shot aside" % \
 						strike_target.unit_name, "#b0a8e0")
-				# High Guard: a parry hardens the stance for a turn.
+				# High Guard: a parry hardens the stance for 3 turns.
 				if strike_target.high_guard > 0:
 					_apply_status(strike_target, "high_guard", 3)
 				# BATCH BW — BATTLE POISE. **PER PARRY, NOT PER TURN**, which is
@@ -8795,7 +8795,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					raw *= 1.15 + attacker.seasoned_off_bonus + sf_disc
 				else:
 					raw *= 0.90
-			# Overwhelm: every wound on the target is leverage (+3%/rank per
+			# Overwhelm: every wound on the target is leverage (+8%/rank per
 			# debuff — the curated DEBUFF_IDS count, Broken excluded).
 			if attacker.overwhelm_ranks > 0:
 				var ow_n := _status_count(strike_target)
@@ -14496,7 +14496,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s surges with power!" % attacker.unit_name)
 			_log("%s: Arcane Surge — +20%% attack next turn" % attacker.unit_name, "#70d878")
 		"divine_shield":
-			# Absorbs 30% (perfect 35%) of the DEVOUT's max health, carrying
+			# Absorbs 35% of the DEVOUT's max health — CN took the bar off, so
+			# there is no perfect half left to name — carrying
 			# the tree's riders (Blessed Barrier / Afterglow; Covenant fires
 			# through the lethal-save hook). Stalwart deepens the absorb.
 			var ds_pct := 0.35 + 0.01 * attacker.stalwart_step
@@ -17784,9 +17785,12 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# UPGRADED (Batch AL — the wd_hold_line capstone landing on a
 			# Hold the Line he already earned from a pool pick): the Break
 			# cut rises 50% -> 80% and the no-death window doubles. The cut
-			# rides the status' power so unit.gd keeps ONE read site; the
-			# undying turns carry the usual hero-turn tick offset, so "one
-			# turn" is 2 and "two turns" is 3.
+			# rides the status' power so unit.gd keeps ONE read site.
+			# BATCH CV §1 — THE WINDOW IS 2 TURNS AND 3, AND THE TEXT NOW SAYS
+			# SO. This comment used to translate them down to "one turn" and
+			# "two turns" for the tick that runs before the hero acts; that
+			# translation is the convention CV abolished. A duration is stated
+			# as APPLIED, because the chip counts down the applied number.
 			var hl_up := attacker.hold_line_upgraded > 0
 			var hl_cut := 80 if hl_up else 50
 			var hl_undying := 3 if hl_up else 2
