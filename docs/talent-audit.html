@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Dawn of Decay — The Talent Audit (Batch CU)</title></head>
+<body>
+<p align="right"><b>Last updated: 2026-08-20 (Batch CU)</b></p>
+<h1>DAWN OF DECAY — THE TALENT AUDIT</h1>
+
+<p><i>All 324 talent nodes, compared three ways: <b>what the node's text says</b>, <b>what its
+payload carries</b>, and <b>what the read site actually does with it</b>. This is a REPORT.
+<b>Nothing here was fixed</b> — no node text was rewritten, no magnitude moved, no payload
+changed. Bucket 1 is a queue of design questions for the designer, not a list of typos.</i></p>
+
+<p>This is the fourth and last of the populations Batch CJ named as unreached, deferred by CJ
+and again by CK &sect;4. The three others (93 glossary entries, all enemy text, all event text)
+were closed by CK in <code>text-audit.html</code> &sect;CK.</p>
+
+<h2>THE HEADLINE, BEFORE THE BUCKETS</h2>
+<p><b>The trees are in far better shape than the deferral implied — and the errors that do exist
+cluster, which is the useful result.</b> The 92 nodes recorded in <code>CLAUDE.md</code> as
+"stating a number their own payload cannot produce" are almost all <i>correct</i>: the flag
+payload is an idiom, and the magnitude at the read site matches the text. Six nodes do not, and
+<b>four of the six were broken by the same event</b> — Batch CN's removal of skill-check bars,
+which turned a perfect's number into the base and left the talent that quoted the old base
+behind.</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Check</th><th>Result</th></tr>
+<tr><td>Nodes enumerated from the live <code>LANE_TREES</code> through Godot</td><td><b>324 / 324</b></td></tr>
+<tr><td>Distinct payload stat fields resolved to a non-comment read site</td><td><b>319 / 319</b></td></tr>
+<tr><td>Every stated number machine-checked against the numbers at its read site</td><td><b>324 / 324</b> — 38 flagged, all 38 hand-opened</td></tr>
+<tr><td>Nodes quoting a BASE value they do not own ("up from the base 30%")</td><td><b>52 / 52 hand-verified</b> against the base constant — 2 wrong</td></tr>
+<tr><td>Nodes advertising a Perfect, measured against <code>runs_skill_check()</code> on live Ability objects</td><td><b>8 / 8</b> — <b>4 of the 8 name a Perfect that cannot occur</b></td></tr>
+<tr><td>Nodes claiming a party/ally-wide scope, checked against companion exclusion</td><td><b>20 / 20</b> — <b>16 exclude companions and none say so</b></td></tr>
+<tr><td>Payload flags with NO read site anywhere (CJ's <code>mana_shield</code> shape)</td><td><b>none at field level</b> — but see &sect;3, four clauses have no code path</td></tr>
+</table>
+
+<h2>&sect;0 — COVERAGE, STATED HONESTLY</h2>
+<p><b>CJ's audit reported 120 of 120 stat cells clean and was later found to have had no check
+for stated bonuses with no code path at all. An audit that overstates its own reach is worse
+than a narrow one that admits its edges</b>, so this section is deliberately specific about
+what was NOT done.</p>
+
+<h3>What every one of the 324 got</h3>
+<ul>
+<li><b>Extraction from the live trees, not a hand-parse.</b> A throwaway Godot script walked
+<code>Talents.LANE_TREES</code> and dumped all 324 with their rendered text (through
+<code>Talents.desc_for</code>, the same function the tooltip calls), payload, scale,
+<code>granted_name</code> and <code>collision_kind</code>. 12 specs &times; 27 cells = 324, confirmed.</li>
+<li><b>A read site, opened.</b> Every distinct stat field a payload writes (319 of them) was
+resolved to at least one line of shipped code that is not a comment and not the
+<code>unit.gd</code> declaration. <b>Comment-only mentions were rejected as read sites</b> — a
+field whose only appearance outside <code>talents.gd</code> is prose would be dead, and none are.</li>
+<li><b>A magnitude comparison.</b> Every number in every node's rendered text was compared
+against the numbers present in the payload and within &plusmn;8 non-comment lines of every read
+site, with unit conversions (0.12&harr;12, 1.15&harr;15, 0.60&harr;40) applied both ways.</li>
+<li><b>The three targeted sweeps</b> in the table above: base-quoting, Perfect-claiming,
+party-scope.</li>
+</ul>
+
+<h3>What only 68 of the 324 got — AND THIS IS THE GAP</h3>
+<p><b>Line-by-line semantic reading</b> — the pass that catches caps, silent exclusions,
+conditions, interactions and "whose percentage is it" — was done node-by-node for <b>berserker
+(27), swordmaster (27) and warden (14 of 27)</b>. That is <b>68 of 324</b>. Every bucket-2
+finding below except the scope sweep came out of those 68, which is the honest reason to expect
+more in the other nine specs: <b>the yield was roughly one INCOMPLETE per ten nodes read, and
+256 nodes have not been read that way.</b></p>
+<p><b>The Mystic is the thinnest spot in this document.</b> It produced zero hits in every
+automated pass, so <b>not one of its 27 nodes was hand-opened</b>. Zero flags is real evidence
+about magnitudes and nothing at all about caps or scope. Cryomancer, arcanist, holy,
+inquisitor, sharpshooter, beastmaster, occultist and pyromancer each had only their flagged
+nodes opened (between 1 and 7 apiece).</p>
+<p><b>Two things nothing here checked at all:</b> whether a node's magnitude is <i>well
+balanced</i> (out of scope — that is the work this audit exists to make possible), and whether
+the <b>tooltip surfaces</b> that re-render node text agree with it. One such disagreement was
+found by accident (&sect;4, the Blood Frenzy floor) and there is no reason to think it is alone.</p>
+
+<h2>&sect;1 — BUCKET 1: WRONG</h2>
+<p><b>These are design questions, not typos.</b> In each case either the text or the code was
+right and only the designer can say which. <b>Nothing below was changed.</b></p>
+
+<h3>1.1 — The four broken by the same event: a Perfect that cannot happen</h3>
+<p>Batch CN removed the skill-check bar from 113 abilities. <b>Four talent nodes still advertise
+a Perfect on an ability that has had no bar since.</b> This was not inferred from the text — the
+live <code>Ability</code> objects were loaded through every lookup <code>Classes</code> exposes
+and asked <code>runs_skill_check()</code> directly.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Node</th><th>Tree / lane / row</th><th>The clause that cannot fire</th><th>Measured</th></tr>
+<tr><td><code>dv_resolve</code> Sacred Resolve</td><td>inquisitor / Zeal / 3</td><td>"Perfect: 4 turns"</td><td><code>bar=false</code>, <code>perfect_id=""</code>, <code>perfect_text=""</code></td></tr>
+<tr><td><code>dv_bulwark</code> Bulwark of Fortitude</td><td>inquisitor / Bulwark / 9</td><td>"Perfect: the party instantly heals 5%"</td><td><code>bar=false</code></td></tr>
+<tr><td><code>oc_hysteria</code> Mass Hysteria</td><td>occultist / Madness / 9</td><td>"Perfect: 3cd"</td><td><code>bar=false</code></td></tr>
+<tr><td><code>wd_shieldwall</code> Shield Mastery</td><td>warden / Plate / 5</td><td>"or 5 on a perfect cast"</td><td><code>bar=false</code></td></tr>
+</table>
+<p><b>This is CJ's <code>mana_shield</code>/<code>hysteria</code> shape exactly</b> — an
+advertised bonus no handler implements — and it is why &sect;3's NO READ SITE category was worth
+keeping separate. At field level nothing is orphaned; at <i>clause</i> level, four are.
+<b>Two of the eight Perfect-claiming nodes are fine</b> and are listed here so the ruling is not
+applied too widely: <code>oc_mind_flay</code> ("Perfect: 4 turns" — Mind Flay has
+<code>bar=true</code>, <code>perfect_text="Psychosis lasts 4 turns"</code>) and
+<code>sm_execute</code> ("a perfect guarantees a crit" — <code>bar=true</code>,
+<code>perfect_text="Guaranteed critical strike"</code>). <code>sm_swordsmanship</code> and
+<code>hl_holy_light</code> are also clean.</p>
+
+<h3>1.2 — <code>dv_stalwart</code> "Stalwart" — BOTH numbers wrong</h3>
+<p><i>inquisitor / Bulwark / row 5.</i> Text: <b>"Divine Shield absorbs 50% of the Devout's max
+health (up from the base 30%)."</b> Payload: <code>{"stalwart_step": 20}</code>.</p>
+<p>Two read sites agree with each other and disagree with the text:
+<code>battle.gd:5431</code> (the intent preview) and <code>battle.gd:14502</code> (the cast) both
+compute <code>0.35 + 0.01 * stalwart_step</code>. At <code>stalwart_step = 20</code> that is
+<b>0.55 — the shield absorbs 55%, not 50% — and the base it is added to is 35%, not 30%.</b></p>
+<p><b>The cause is on the record.</b> CQ's fold audit row for Divine Shield
+(<code>changelog.html:906</code>) reads base "absorbs 30%", perfect "absorbs 35%"; CN took the
+bar off, so the perfect's number became the base, and CQ's own summary states it plainly at
+<code>changelog.html:1450</code>: <i>"Divine Shield absorbs 35% instead of 30%"</i>. Divine
+Shield was not among CR's three duration reverts. <b>The ability moved and the talent quoting it
+did not.</b></p>
+<p><b>The read site's own comment is a third answer.</b> <code>battle.gd:14498</code> still says
+"Absorbs 30% (perfect 35%)" directly above a line that does 35% unconditionally with no perfect
+gate at all. <b>Three statements of one number, no two alike.</b></p>
+
+<h3>1.3 — <code>wd_shieldwall</code> "Shield Mastery" — the duration is 5, the text says 4</h3>
+<p><i>warden / Plate / row 5.</i> Text: <b>"Shieldwall's stance holds 2 turns longer — 4 turns,
+or 5 on a perfect cast."</b> Payload: <code>{"shield_mastery_ranks": 1}</code>.</p>
+<p>Both read sites compute <code>3 + 2 * shield_mastery_ranks</code> —
+<code>battle.gd:5358</code> (intent preview) and <code>battle.gd:17719</code> (the cast). Base
+Shieldwall is 3; with the node it is <b>5</b>. <b>"2 turns longer" is right and "4 turns" is
+wrong</b>, and the perfect clause on top of it cannot fire (&sect;1.1). <b>Both halves of one
+sentence are wrong for two unrelated reasons.</b></p>
+
+<h3>1.4 — <code>py_rebirth</code> "Phoenix Rebirth" — 25% stated, 15% taken</h3>
+<p><i>pyromancer / Inferno / row 9 (capstone).</i> Text: <b>"sacrifice 25% of current health and
+your Mana returns to full."</b> <code>battle.gd:14532</code>:
+<code>var sacrifice := int(attacker.hp * 0.15)</code>. <b>The cost is 15% of current health.</b>
+The Mana half is correct (<code>resource = max_resource</code>). Nothing else scales it — this
+is the whole of the cost.</p>
+
+<h3>1.5 — <code>cr_rime</code> "Rime" — the node contradicts the ability it installs</h3>
+<p><i>cryomancer / Winter / row 4.</i> The node text says the chilling spread lasts <b>"for 3
+turns"</b>. The <code>new_ability</code> description in <b>the very same payload</b> says
+<b>"For 4 turns"</b>. The handler applies <code>{"id": "rime", "turns": 4 + icy_resolve_ranks}</code>.
+<b>The code and the ability description agree on 4; only the node text says 3.</b> This one needs
+no convention ruling to be wrong — <b>the node disagrees with a string it ships itself.</b>
+(The Frostbite half — "-50% healing received, 2 turns" — is correct: <code>turns: 2</code>, and
+<code>unit.gd:3109</code> halves the heal.)</p>
+
+<h3>1.6 — <code>dv_resolve</code> "Sacred Resolve" — both durations off by one</h3>
+<p><i>inquisitor / Zeal / row 3.</i> Text: <b>"split evenly among living heroes for 3 turns"</b>
+and <b>"Already owned: the split lasts 5 turns instead"</b>. <code>battle.gd:14620</code>:
+<code>var res_turns := 4 + attacker.resolve_extra_turns</code>, and the node's upgrade sets
+<code>resolve_extra_turns: 2</code>. <b>Base 4, upgraded 6.</b> Stated 3 and 5.</p>
+<p>Read &sect;2 before ruling on this one: under the acting-turn convention 4 <i>is</i> "3
+turns", and this node would be right. It is filed here rather than in &sect;2 because
+<b><code>dv_bulwark</code>, in the same tree, states its duration the other way</b> — 3 applied
+and "for 3 turns" stated, 4 applied and "4 turns instead" stated, both correct under the
+calendar convention. <b>The two nodes cannot both be right.</b></p>
+
+<h3>1.7 — <code>sm_high_guard</code> "High Guard" — 2 stated, 3 applied</h3>
+<p><i>swordmaster / Poise / row 5.</i> Text: <b>"Take 40% less damage for 2 turns after
+parrying an attack."</b> The 40% is correct (<code>battle.gd:9123</code>,
+<code>raw *= 0.60</code>). The duration is <code>_apply_status(strike_target, "high_guard", 3)</code>
+at <code>battle.gd:8058</code>.</p>
+<p><b>Three surfaces, three different durations:</b> the read site's own comment
+(<code>battle.gd:8056</code>) says "hardens the stance <b>for a turn</b>", the node says <b>2</b>,
+the value is <b>3</b>, and <code>STATUS_INFO</code> (<code>battle.gd:213</code>) states no
+duration at all. <code>sm_swordsmanship</code> — also defensive, also the Poise lane — applies 2
+and says "2 turns", which is what makes High Guard's 3 the outlier rather than the rule.</p>
+
+<h2>&sect;2 — THE CROSS-CUTTING DESIGN QUESTION: WHAT DOES "N TURNS" MEAN?</h2>
+<p><b>This is one ruling that settles a dozen nodes, so it is set apart from bucket 1 rather
+than filed as a dozen typos.</b></p>
+<p><code>tick_statuses()</code> runs at the <b>start</b> of a unit's turn, before it acts
+(<code>unit.gd:2171</code>, called at <code>battle.gd:2844</code>). So a status applied with
+value <code>N</code> during a unit's own turn is present on the calendar for <code>N</code>
+turns (the cast turn plus <code>N-1</code>) and gives that unit <code>N-1</code> <i>acting</i>
+turns. Both readings are defensible. <b>The corpus uses both.</b></p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Node</th><th>Applied</th><th>Stated</th><th>Reading it assumes</th></tr>
+<tr><td><code>sm_deep_thrust</code> Tempo <code>battle.gd:13404</code></td><td>2</td><td>"1 turn"</td><td>acting</td></tr>
+<tr><td><code>py_flame_shield</code> Immolate <code>battle.gd:18048</code></td><td>4</td><td>"3 turns"</td><td>acting</td></tr>
+<tr><td><code>dv_resolve</code> Sacred Resolve <code>battle.gd:14620</code></td><td>4 / 6</td><td>"3" / "5"</td><td>acting</td></tr>
+<tr><td><code>bz_battle_shout</code> <code>battle.gd:17625</code></td><td>3</td><td>"3 turns"</td><td><b>calendar</b></td></tr>
+<tr><td><code>sm_swordsmanship</code> <code>battle.gd:17699</code></td><td>2</td><td>"2 turns"</td><td><b>calendar</b></td></tr>
+<tr><td><code>dv_bulwark</code> <code>battle.gd:14663</code></td><td>3 / 4</td><td>"3" / "4"</td><td><b>calendar</b></td></tr>
+<tr><td><code>wd_elem_weak</code> <code>battle.gd:9953</code></td><td>3</td><td>"3 turns"</td><td><b>calendar</b></td></tr>
+<tr><td><code>wd_rally</code> <code>battle.gd:7952</code></td><td>3</td><td>"3 turns"</td><td><b>calendar</b></td></tr>
+<tr><td><code>wd_tank_spank</code> <code>battle.gd:10028</code></td><td>2</td><td>"2 turns"</td><td><b>calendar</b></td></tr>
+<tr><td><code>cr_rime</code> <code>battle.gd</code> rime arm</td><td>4 rime / 2 frostbite</td><td>"3 turns" / "2 turns"</td><td><b>BOTH, in one sentence</b></td></tr>
+</table>
+<p><b><code>cr_rime</code> is the proof that this is a real inconsistency and not a reading of
+mine</b>: one node states two durations set by one handler, and uses a different convention for
+each. Whichever way the designer rules, roughly a third of the duration statements in the trees
+move by one — which is exactly why <b>nothing here was touched</b>.</p>
+
+<h2>&sect;3 — NO READ SITE, AND UNREACHABLE</h2>
+<p><b>NO READ SITE — none at field level, and that is a real result.</b> All 319 distinct stat
+fields the 324 payloads write have at least one live, non-comment read site. Comment-only
+mentions were explicitly rejected, so this is not the weaker claim that the name appears
+somewhere. <b>The four dead clauses in &sect;1.1 are the functional equivalent</b> and are filed
+there because they are dead for a reason the designer needs to see.</p>
+<p><b>UNREACHABLE — no node is ungrantable.</b> All 324 were enumerated <i>from</i> the trees,
+so none is orphaned by a rename or absent from a tree; all 12 specs are reachable; every payload
+condition (<code>has_node</code>, <code>owns_ability</code>) names a node or ability that exists.</p>
+<p><b>The reverse case does exist, and is reported because it is the shape a later batch will
+misread.</b> Four fields have live read sites in <code>battle.gd</code> and are written by <b>no
+node at all</b> — <code>seeding_ranks</code>, <code>emp_frostbolt_ranks</code>,
+<code>frost_ward_ranks</code>, <code>freezing_ranks</code>. Each is commented "no node:" in
+<code>unit.gd</code>, so this is known and deliberate; the nodes that once wrote them
+(<code>py_seeding</code>, <code>cr_emp_frostbolt</code>, <code>cr_frost_ward</code>,
+<code>cr_freezing</code>) were re-specced onto different fields and their texts are correct
+against the NEW fields. <b>Dead code, not a dead node</b> — listed so the next reader does not
+trace a node to the wrong site.</p>
+
+<h2>&sect;4 — BUCKET 2: INCOMPLETE</h2>
+
+<h3>4.1 — Sixteen nodes promise the party and mean the party minus companions</h3>
+<p><b>The largest single population in this audit.</b> Of 20 nodes whose text says "every ally",
+"the whole party", "every hero" or "each ally", <b>16 have read sites that explicitly skip
+<code>is_companion</code> units</b>, and <b>not one says so</b>. A Beastmaster's beast stands in
+<code>heroes</code>, is visibly on the player's side, and receives none of it.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Node</th><th>Tree</th><th>Read site</th></tr>
+<tr><td><code>wd_stomp_drill</code> Rallying Cry</td><td>warden</td><td><code>battle.gd:2899</code></td></tr>
+<tr><td><code>wd_bannerman</code> Bulwark Line</td><td>warden</td><td><code>battle.gd:17741</code></td></tr>
+<tr><td><code>wd_standard</code> Standard Bearer</td><td>warden</td><td><code>battle.gd:3237</code></td></tr>
+<tr><td><code>cr_cold_storage</code></td><td>cryomancer</td><td><code>battle.gd:3253</code></td></tr>
+<tr><td><code>cr_frostbound</code></td><td>cryomancer</td><td><code>battle.gd:11399</code></td></tr>
+<tr><td><code>hl_beacon</code> Hour of Need</td><td>holy</td><td><code>battle.gd:9081</code></td></tr>
+<tr><td><code>hl_communion_mercy</code></td><td>holy</td><td><code>battle.gd:9095</code></td></tr>
+<tr><td><code>dv_fervor</code>, <code>dv_pulse</code>, <code>dv_lifewell</code>, <code>dv_creed</code>, <code>dv_bulwark</code></td><td>inquisitor</td><td><code>battle.gd:13852 / 2623 / 9752 / 13216 / 14664</code></td></tr>
+<tr><td><code>oc_cackling</code>, <code>oc_pleasure</code>, <code>oc_barter</code>, <code>oc_soul_glut</code></td><td>occultist</td><td><code>battle.gd:9514 / 3752 / 14709 / 9492</code></td></tr>
+</table>
+<p><b>One ruling covers all sixteen:</b> either "ally" excludes companions as a house term and
+the glossary should say so once, or these texts each need a clause. The exclusion is
+consistent across every site, so this reads as intent that was never written down rather than
+sixteen separate oversights.</p>
+
+<h3>4.2 — Caps and exclusions the text does not mention</h3>
+<ul>
+<li><b><code>sm_momentum_sm</code> "Overwhelm"</b> (swordmaster / Blade / 6) — "+8% damage for
+every debuff on the target". <code>_status_count</code> (<code>battle.gd:19293</code>) walks
+<code>DEBUFF_IDS</code> but <b>skips <code>"broken"</code></b>. Broken is the one affliction the
+whole Breaker lane exists to produce, and it is the one that does not count.</li>
+<li><b><code>sm_dominant</code> "Dominant Presence"</b> (swordmaster / Breaker / 3) — "+15%
+armor for every debuff applied" is correct and relative (<code>unit.gd:2270</code>), but
+<code>effective_armor()</code> ends <code>return minf(a, 0.85)</code>
+(<code>unit.gd:2304</code>). The growth is unbounded and multiplicative, so <b>the ceiling is
+reached in a long fight</b>. Endurance, <i>one line below it in the same function</i>, documents
+its own +75% cap — so the omission is inconsistent within a single screen of code.</li>
+<li><b><code>wd_tank_spank</code> "Tank and Spank"</b> (warden / Banner / 1) — "Empowers a
+random ally". <code>battle.gd:10023</code> picks from <code>heroes.filter(not dead)</code>,
+which <b>includes the Warden himself and includes companions</b>. It is the one node where a
+companion IS eligible, and it is the one that says "ally" meaning "anyone".</li>
+</ul>
+
+<h3>4.3 — Interactions stated on one node and not its partner</h3>
+<ul>
+<li><b><code>dv_apostle</code></b> (inquisitor / Faith / 9) says Faith stacks are "worth
+double". <b><code>dv_fervor</code></b> (Faith / 6) says the same, <i>and</i> spells out "With
+Apostle the stacks count TRIPLE: the two nodes ADD to the base rather than multiplying each
+other" — which <code>_faith_stack_mult</code> (<code>battle.gd:13846</code>) confirms. Both are
+ownable. <b>The interaction is documented on the row-6 node and not on the capstone</b>, so a
+player who takes the capstone first is told "double" and gets triple.</li>
+<li><b><code>ar_wrath</code></b> says it doubles the curve's step, "1.5% to 3%". True alone;
+with <code>ar_conduit</code> (which raises the step to 2%) the result is 3.5%, and neither text
+mentions the other.</li>
+<li><b><code>ar_harmonics</code></b> — "Arcane Explosion builds 2 Resonance instead of 1" is the
+non-crit case; <code>battle.gd:11029</code> shows a crit builds 2 (or more) before the node's
++1. Accurate as far as it goes.</li>
+</ul>
+
+<h3>4.4 — Adjacent surfaces that contradict a correct node</h3>
+<p>Found while tracing read sites. <b>Not talent text, but they put a wrong number in front of
+the player about a talent</b>, which is the same harm.</p>
+<ul>
+<li><b><code>party_screen.gd:119</code></b> renders the Blood Frenzy passive as "<b>Half</b> the
+highest bonus reached in a battle is kept as a floor". It interpolates the <i>step</i> from
+<code>cfg</code> correctly but <b>hardcodes the floor fraction</b>. With
+<code>bz_frenzied_edge</code> (Scar Tissue) the floor keeps <b>85%</b>, and 100% with
+<code>bz_unstoppable</code> as well (<code>unit.gd:2400</code>). <b>The node is right and the
+party screen is wrong.</b> The in-battle chip (<code>unit.gd:1856</code>) gets it right, so the
+two surfaces disagree with each other.</li>
+<li><b>Guard Change's <code>perfect_text</code></b> is the fixed string "+10% Parry chance for 2
+turns". With <code>sm_swordsmanship</code> the grant is 25% (<code>battle.gd:17694</code>), which
+the node states correctly. The ability tooltip cannot know about the node.</li>
+<li><b>Intercession's <code>perfect_text</code></b> — "The window lasts a turn longer" — is
+unreachable: the ability measures <code>bar=false</code>. The <i>node</i>
+(<code>hl_inner_faith</code>) is clean; the ability it grants carries a dead line. This is an
+ability-corpus finding, in CJ/CK's territory rather than this one's, and is recorded here
+because this audit is what found it.</li>
+</ul>
+
+<h3>4.5 — Read-site comments that contradict the line beneath them</h3>
+<p>Not player-facing, and reported because <b>an audit that trusts a comment gets the wrong
+answer</b> — the failure mode this batch was written to avoid.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Site</th><th>Comment says</th><th>Code does</th></tr>
+<tr><td><code>battle.gd:8798</code> (Overwhelm)</td><td>"+3%/rank per debuff"</td><td><code>8 * overwhelm_ranks * n</code></td></tr>
+<tr><td><code>unit.gd:2268</code> (Dominant Presence)</td><td>"armor value grows 5%/rank"</td><td><code>1.0 + 0.15 * dominant_ranks * n</code></td></tr>
+<tr><td><code>battle.gd:14498</code> (Divine Shield)</td><td>"Absorbs 30% (perfect 35%)"</td><td><code>0.35 + ...</code>, no perfect gate</td></tr>
+<tr><td><code>battle.gd:8056</code> (High Guard)</td><td>"hardens the stance for a turn"</td><td><code>_apply_status(..., 3)</code></td></tr>
+</table>
+
+<h2>&sect;5 — BUCKET 3: PROSE ONLY</h2>
+<p><b>Thin, and that is a finding in itself.</b> CJ's audit found the ability corpus was "a
+prose job, not a repair job"; the talent corpus is the reverse. Node text is terse, states its
+number, and mostly carries no rationale — Batch AJ's re-author left the padding in the
+<i>code comments</i> rather than the descriptions. <b>The systematic prose issue is &sect;2's
+duration wording</b>, which is a convention question and is filed there.</p>
+<p>The one recurring stylistic note across the 68 nodes read closely: several state a percentage
+without saying whose it is — <code>wd_stomp_drill</code>'s "restores 20% more resource" is
++20 percentage points (10%&rarr;30%, <code>battle.gd:10550</code>), not 20% more of 10%. It is
+correct; it is ambiguous. <b>Text standard &sect;4.5's shape, applied to percentages rather than
+turns, would settle it.</b></p>
+
+<h2>&sect;6 — WHAT WAS VERIFIED CLEAN, SO THE RULINGS ARE NOT APPLIED TOO WIDELY</h2>
+<p>Every one of these was hand-opened and came back correct. They are listed because <b>a report
+that names only failures makes the failures look like the pattern.</b></p>
+<ul>
+<li><b>All 27 berserker nodes.</b> Including the three cross-row conditions, which resolve
+exactly as the Batch AJ header claims: Crushing Blows' step 20&rarr;15 with Savagery
+(<code>battle.gd:7109</code>), Scar Tissue's floor 85&rarr;100 with Unstoppable
+(<code>unit.gd:2400</code>), and Measured Rage zeroing the damage-taken term outright rather
+than summing &minus;0.20 and +0.15 (<code>battle.gd:9142</code>).</li>
+<li><b>50 of the 52 base-quoting nodes.</b> Every one traced to the constant it quotes:
+<code>DOT_STATUSES["burn"] = 6</code>, <code>RESONANCE_DMG_STEP = 1.5</code>,
+<code>BOND_STEP = 0.20</code>, <code>HOLD_WINDOW = 15</code>, <code>RUIN_THRESHOLD = 10</code>,
+<code>FAITH_MITIGATION_PCT = 2.0</code>, Fireball's <code>applies_status.turns = 3</code>,
+Heavy Plating's 0.08 climb and 0.40 cap, and the rest. <b>The two that failed are &sect;1.2 and
+&sect;1.3.</b></li>
+<li><b>Every "always" claim.</b> <code>oc_emp_hex</code>'s "ALWAYS applies Decay" is a
+probability roll — <code>randf() &lt; 0.01 * emp_hex_ranks</code> at
+<code>battle.gd:9864</code> — with <code>emp_hex_ranks = 100</code>, so it is always. Correct,
+and exactly the kind of thing that cannot be read off a payload.</li>
+<li><b>The capped nodes that DO state their cap:</b> <code>py_forge_body</code> ("up to 50%",
+<code>FORGE_BODY_CAP = 0.50</code>), <code>oc_soul_leech</code> ("Capped at 40%",
+<code>RUIN_LEECH_CAP = 0.40</code>), <code>ss_unwavering</code> ("maximum of +50",
+<code>UNWAVERING_STEPS = 5</code> &times; 10).</li>
+</ul>
+
+<h2>&sect;7 — THE QUEUE</h2>
+<p><b>Bucket 1 is open and awaiting the designer's rulings.</b> Batch CV applies whatever he
+rules. In the order they are cheapest to rule on:</p>
+<ol>
+<li><b>&sect;2 first</b>, because it changes what several of the others mean: does "N turns"
+count the turn it was cast?</li>
+<li><b>&sect;1.1</b> — four dead Perfect clauses. Restore the bars, or cut the clauses.</li>
+<li><b>&sect;1.2 Stalwart</b> — 55% and a 35% base, or move the code back to 50/30.</li>
+<li><b>&sect;1.3 Shield Mastery</b> — 5 turns, or move the code to 4.</li>
+<li><b>&sect;1.4 Phoenix Rebirth</b> — 15% or 25%.</li>
+<li><b>&sect;1.5 Rime</b> — 3 or 4; the node and the ability description it ships must agree
+whichever way &sect;2 goes.</li>
+<li><b>&sect;4.1</b> — one word on whether "ally" includes companions, then sixteen texts or
+one glossary line.</li>
+</ol>
+<p><b>And the gap in &sect;0 is part of the queue too:</b> 256 nodes have not had the
+line-by-line semantic read that produced every bucket-2 finding here. The scope sweep is the
+model for closing it cheaply — a single mechanical question asked of all 324 at once, rather
+than nine more specs read by hand.</p>
+
+</body></html>

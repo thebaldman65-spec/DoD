@@ -4,6 +4,48 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The errors clustered, and the cluster was the finding (Batch CU) — 2026-08-20
+
+The talent audit had been owed since CJ and was framed by its own record as ninety-two separate
+problems: ninety-two nodes state a number their payload cannot produce, so ninety-two read sites
+have to be opened one at a time. That framing was right about the method and wrong about the
+shape of the answer. Almost all ninety-two are correct — the flag payload is an idiom, not a
+fault, and the magnitude at the read site matches the text. Six are wrong, and four of the six
+were broken by one event.
+
+That event was Batch CN taking the skill-check bar off a hundred and thirteen abilities. When an
+ability loses its bar its perfect becomes unreachable, and CQ's fold audit dealt with the
+consequence *for the abilities* — the perfect's number became the base, and CQ recorded every
+row. What nobody swept was everything else that had quoted those numbers. A talent node that
+says "up from the base 30%" is a second copy of a number it does not own, and Divine Shield's
+base had moved to 35% in CQ's own table while the talent quoting it stayed at 30. Four more nodes
+still advertise a "Perfect:" clause on an ability that has had no bar for two batches.
+
+The general rule this batch is worth stating for: **a change to a value is not finished when
+every site that computes it is updated; it is finished when every site that quotes it is
+updated.** The quoting sites are in a different file, are prose rather than code, and no test
+touches them. CN's change was correct, CQ's accounting of it was thorough, and the aftershock
+still landed three batches later in a population neither of them was looking at.
+
+The second finding has the same shape from the other direction. Sixteen nodes promise "every
+ally" or "the whole party" and every one of their read sites skips companions. Sixteen
+consistent exclusions is not sixteen oversights; it is a house rule that was never written down,
+and it was found by asking one mechanical question of all three hundred and twenty-four nodes at
+once rather than by reading them. That is the cheap way to close the rest of this audit: the
+line-by-line read reached sixty-eight of the three hundred and twenty-four and produced roughly
+one finding per ten nodes, which is honest about how much is still unread, and the sweep reached
+all of them in one pass.
+
+Nothing was fixed, and that is the point rather than a limitation. CQ examined a hundred and five
+changes and altered exactly one, because talent and ability values reach the designer as options.
+Six magnitudes corrected on this batch's own judgement would have repeated the fault the batch
+was sent to find, and would have destroyed the evidence: after the fix nobody can tell whether
+the text or the code was the thing that was right. The one carve-out taken was the brief's own —
+a node that cannot be audited without running it may be run — and it earned itself immediately.
+No amount of reading `talents.gd` can show that a node's "Perfect:" clause is dead, because the
+claim is in the node and the refutation is in `Ability.runs_skill_check()`. `check_cu.gd` asks
+the live objects, and four of the six bucket-1 items came out of that one question.
+
 ## A ruling stated as a rule, applied to a list (Batch CR) — 2026-08-19
 
 CQ's census found the fold and handed it over. CR is the designer's answer, and the answer has the

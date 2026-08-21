@@ -13,6 +13,107 @@ knowledge-base sync carries; <b>nothing was deleted</b>. <b>A file outside the r
 version control and is not backed up by GitHub</b> — see the Batch BZ entry below for what
 that costs and what to do about it.</p>
 
+<h2>2026-08-20 &mdash; Batch CU: THE TALENT AUDIT</h2>
+<p><i><b>REPORT ONLY &mdash; nothing was fixed.</b> All 324 talent nodes compared three ways
+(node text, payload, read site), delivered as <b><code>docs/talent-audit.html</code></b> on
+<code>text-audit.html</code>'s pattern. This closes the LAST of the four populations Batch CJ
+named as unreached, deferred by CJ and again by CK &sect;4. <b>Bucket 1 is an open queue awaiting
+the designer's rulings</b>; Batch CV applies them.</i></p>
+
+<h3>&sect;0 &mdash; WHAT THE BRIEF GOT RIGHT, AND THE ONE NUMBER THAT MOVED</h3>
+<p>The brief's factual claims check out against the repo: <code>CLAUDE.md</code> records exactly
+324 nodes, 92 stating a number their payload cannot produce, deferred by CJ and CK &sect;4, with
+the other three populations closed by CK. <b>One divergence:</b> re-running that census under
+this batch's own method (every number in the rendered text vs every number the payload can
+produce) returns <b>107</b>, not 92 &mdash; the difference is incidental numbers such as
+durations that come from a handler rather than the payload. <b>The population is slightly larger
+than recorded and the conclusion is unchanged</b>: almost all of them are correct.</p>
+
+<h3>&sect;1 &mdash; THE HEADLINE: THE TREES ARE SOUNDER THAN THE DEFERRAL IMPLIED, AND THE
+ERRORS CLUSTER</h3>
+<p><b>Six nodes state a number or condition the read site does not produce, and four of the six
+were broken by one event</b> &mdash; Batch CN's removal of skill-check bars, which turned a
+perfect's number into the base and left the talent quoting the old base behind. That is the
+useful result: <b>not 92 scattered errors but one systematic aftershock</b>, plus two isolated
+magnitudes.</p>
+<table border="1" cellpadding="4">
+<tr><th>Node</th><th>Text says</th><th>Read site does</th></tr>
+<tr><td><code>dv_stalwart</code> Stalwart</td><td>absorbs 50%, "base 30%"</td>
+<td><b>55%, base 35%</b> &mdash; <code>battle.gd:5431</code>, <code>:14502</code>. CQ's own fold
+row (<code>changelog.html:906</code>, and the summary at <code>:1450</code>) records the base
+moving 30&nbsp;&rarr;&nbsp;35 when CN took the bar off. The talent was never re-read.</td></tr>
+<tr><td><code>wd_shieldwall</code> Shield Mastery</td><td>"4 turns, or 5 on a perfect cast"</td>
+<td><b>5 turns</b> (<code>3 + 2 * ranks</code>, <code>battle.gd:5358</code>, <code>:17719</code>)
+<b>and Shieldwall has no bar</b>, so the perfect clause is dead. Both halves of one sentence,
+wrong for two unrelated reasons.</td></tr>
+<tr><td><code>py_rebirth</code> Phoenix Rebirth</td><td>sacrifice 25% of current health</td>
+<td><b>15%</b> &mdash; <code>battle.gd:14532</code></td></tr>
+<tr><td><code>cr_rime</code> Rime</td><td>"for 3 turns"</td>
+<td><b>4</b> &mdash; and <b>the ability description in the same payload says 4 too</b>. The node
+contradicts a string it ships itself.</td></tr>
+<tr><td><code>dv_resolve</code> Sacred Resolve</td><td>3 turns / 5 upgraded</td>
+<td><b>4 / 6</b> &mdash; <code>battle.gd:14620</code>. See &sect;2.</td></tr>
+<tr><td><code>sm_high_guard</code> High Guard</td><td>"for 2 turns"</td>
+<td><b>3</b> &mdash; <code>battle.gd:8058</code>. The 40% is right.</td></tr>
+</table>
+<p><b>FOUR NODES ADVERTISE A PERFECT THAT CANNOT HAPPEN</b> (<code>dv_resolve</code>,
+<code>dv_bulwark</code>, <code>oc_hysteria</code>, <code>wd_shieldwall</code>). <b>This was
+measured, not inferred:</b> <code>check_cu.gd</code> loads the live <code>Ability</code> objects
+through every lookup <code>Classes</code> exposes and asks <code>runs_skill_check()</code>. It is
+CJ's <code>mana_shield</code>/<code>hysteria</code> shape &mdash; an advertised bonus no handler
+implements &mdash; and it is the reason the brief's separate NO READ SITE category earned its
+place.</p>
+
+<h3>&sect;2 &mdash; ONE RULING SETTLES A DOZEN NODES: WHAT DOES "N TURNS" MEAN?</h3>
+<p><code>tick_statuses()</code> runs at the START of a unit's turn, before it acts
+(<code>unit.gd:2171</code>, <code>battle.gd:2844</code>), so a status applied with value
+<code>N</code> is on the calendar for <code>N</code> turns and gives <code>N-1</code> ACTING
+turns. <b>Both readings are defensible and the corpus uses both</b> &mdash; Tempo (2 applied,
+"1 turn"), Immolate (4, "3 turns") and Sacred Resolve (4, "3 turns") assume one; Battle Shout
+(3, "3 turns"), Swordsmanship (2, "2 turns") and Bulwark of Fortitude (3, "3 turns") assume the
+other. <b><code>cr_rime</code> uses both conventions in one sentence</b>, for two statuses set by
+one handler &mdash; which is what proves this is a genuine inconsistency rather than a reading.
+<b>Filed apart from bucket 1 deliberately: it is one design question, not a dozen typos, and
+roughly a third of the trees' duration statements move by one whichever way it goes.</b></p>
+
+<h3>&sect;3 &mdash; BUCKET 2's LARGEST POPULATION: SIXTEEN NODES PROMISE THE PARTY AND MEAN THE
+PARTY MINUS COMPANIONS</h3>
+<p>Of 20 nodes whose text says "every ally", "the whole party" or "every hero", <b>16 have read
+sites that explicitly skip <code>is_companion</code> units and not one says so</b>. Every
+exclusion was opened and confirmed individually. A Beastmaster's beast stands in
+<code>heroes</code>, is visibly on the player's side, and receives none of it. <b>One ruling on
+whether "ally" includes companions closes all sixteen</b> &mdash; the consistency across every
+site reads as intent that was never written down.</p>
+<p>Also reported: caps and exclusions the text omits (Overwhelm's "every debuff" silently
+excludes Broken, the one affliction its own lane exists to produce; Dominant Presence's
+unbounded armor growth meets a hard 85% ceiling that Endurance, one line below it, DOES
+document), an interaction stated on a row-6 node but not on the capstone that shares it, and
+<b>a party-screen line that contradicts a correct node</b> &mdash;
+<code>party_screen.gd:119</code> hardcodes "Half the highest bonus" for the Blood Frenzy floor
+while Scar Tissue makes it 85% or 100%, and the in-battle chip gets it right, so the two
+surfaces disagree.</p>
+
+<h3>&sect;4 &mdash; THE COVERAGE GAP, STATED IN THE DOCUMENT RATHER THAN GLOSSED</h3>
+<p><b>All 324 got</b> extraction from the live trees, a read site opened and confirmed
+non-comment (319/319 stat fields), a machine magnitude comparison, and three targeted sweeps
+(52/52 base-quoting nodes hand-verified against the constant they quote; 8/8 Perfect claims
+measured; 20/20 scope claims checked). <b>Only 68 of 324 got the line-by-line semantic read</b>
+that catches caps, exclusions and interactions &mdash; berserker, swordmaster and half the
+warden. <b>The Mystic is the thinnest spot: zero of its 27 nodes were hand-opened</b>, because it
+produced no hits in any automated pass, and zero flags is evidence about magnitudes and nothing
+about scope. <b>CJ reported 120/120 clean and was later found to have had no check for stated
+bonuses with no code path at all; an audit that overstates its reach is worse than a narrow one
+that admits its edges</b>, so &sect;0 of the document names the gap and &sect;7 puts it in the
+queue.</p>
+
+<h3>&sect;5 &mdash; WHAT WAS NOT DONE</h3>
+<p><b>No node text was rewritten, no magnitude moved, no payload changed.</b> CQ's fold audit is
+the precedent: it examined 105 changes and altered exactly one, because ability and talent values
+reach the designer as options. <b>A batch that quietly corrected six magnitudes on its own
+judgement would repeat the fault it was sent to find</b> and would destroy the evidence &mdash;
+after the fix nobody can tell which way the disagreement pointed. The one thing that was run
+rather than read is <code>check_cu.gd</code>, under the brief's own carve-out.</p>
+
 <h2>2026-08-20 &mdash; Batch CT: THE POUCH GETS SLOTS, AND THREE ITEMS TO COMPETE FOR THEM</h2>
 <p><i>The pouch becomes a <b>slotted inventory that grows with the run</b> (4 &rarr; 5 &rarr; 6 by
 zone), three items join the list, and the three flat potions become percentages. <b>Save version

@@ -10642,15 +10642,44 @@ Battle has burger menu (restart/settings overlay/exit); skill checks accept
 Space or left click; no announcer text (combat log only).
 
 ## Known open threads
-- **OWED, AND RECORDED SO IT CANNOT QUIETLY DISAPPEAR: THE 324 TALENT NODES HAVE NEVER BEEN
-  AUDITED AGAINST THEIR RUNTIME BEHAVIOUR (deferred by CJ, deferred again by CK §4, deliberately
-  both times).** **92 of them state a number their own payload cannot produce**, which is
-  EXPECTED and is not itself the finding: talent payloads are mostly flag values (`ranks: 1`)
-  whose magnitudes live in `battle.gd` and `unit.gd`. **The consequence is that each of the 92
-  needs its own read-site opened and read** — there is no sweep that answers it, which is why it
-  is a batch by itself rather than a section of one. It is the LAST of the four populations CJ
-  named as unreached; CK closed the other three (the 93 glossary entries, all enemy text, all
-  event text) in `docs/text-audit.html` §CK.
+- **DELIVERED BY BATCH CU AND NOW AN OPEN QUEUE, NOT A DEFERRAL: THE TALENT AUDIT.** All 324
+  nodes were audited against their runtime behaviour and the report is `docs/talent-audit.html`
+  (CJ deferred it, CK §4 deferred it again; CU closed it). **It was the LAST of the four
+  populations CJ named as unreached** — CK closed the other three (93 glossary entries, all enemy
+  text, all event text) in `docs/text-audit.html` §CK.
+  · **BUCKET 1 IS OPEN AND AWAITING THE DESIGNER'S RULINGS. Batch CV applies whatever he rules;
+    CU changed nothing** (CQ's precedent — talent and ability values reach the designer as
+    options, and fixing them destroys the evidence of which way the disagreement pointed).
+    **Six nodes state a number the read site does not produce, and four of the six were broken by
+    the same event:** CN's removal of skill-check bars turned a perfect's number into the base
+    and left the talent quoting the old base behind. `dv_stalwart` (says 50%/base 30%, does
+    55%/base 35% — CQ's own fold row at `changelog.html:906` records the base moving),
+    `wd_shieldwall` (says 4 turns, does 5, **and** its "perfect cast" cannot occur),
+    `py_rebirth` (says 25% of health, takes 15%), `cr_rime` (says 3 turns; the ability
+    description in its OWN payload says 4, and the code does 4), `dv_resolve` (3/5 stated, 4/6
+    applied), `sm_high_guard` (2 stated, 3 applied).
+  · **FOUR NODES ADVERTISE A PERFECT THAT CANNOT HAPPEN** — `dv_resolve`, `dv_bulwark`,
+    `oc_hysteria`, `wd_shieldwall`. **Measured, not inferred:** `check_cu.gd` loads the live
+    `Ability` objects and asks `runs_skill_check()`. This is CJ's `mana_shield`/`hysteria` shape.
+    **The lesson generalises past talents: any text quoting a base or a perfect of one of the 113
+    abilities CN unbarred is suspect until re-read.**
+  · **THE ONE CROSS-CUTTING DESIGN QUESTION: what does "N turns" mean?** `tick_statuses()` runs
+    at the START of a unit's turn (`unit.gd:2171`), so value `N` = `N` calendar turns = `N-1`
+    acting turns. **Both readings are in use across the trees**, and `cr_rime` uses both in one
+    sentence. Rule it once; roughly a third of the duration statements move by one either way.
+  · **`92` WAS SLIGHTLY LOW.** CU re-ran that census by its own method and got **107**; the
+    difference is incidental numbers set by a handler rather than the payload. Conclusion
+    unchanged — almost all of them are correct, and the flag payload is an idiom, not a fault.
+  · **CU'S OWN STATED GAP, AND IT IS REAL:** only **68 of 324** got the line-by-line semantic
+    read that catches caps, exclusions and interactions (berserker, swordmaster, half the
+    warden). **Not one of the Mystic's 27 nodes was hand-opened** — it produced no hits in any
+    automated pass, and zero flags is evidence about magnitudes and nothing about scope. Every
+    node did get: extraction from the live trees, a confirmed non-comment read site (319/319
+    stat fields), a machine magnitude comparison, and three sweeps (52/52 base-quoting nodes,
+    8/8 perfect claims, 20/20 scope claims). **The scope sweep is the model for closing the
+    gap cheaply** — one mechanical question asked of all 324 at once, which is how the largest
+    bucket-2 finding was found: **16 nodes promise "every ally" and mean the party minus
+    companions**, and none of them says so.
   · **CK's own stated gap, smaller and in the same shape:** the **65 non-status glossary entries**
     were read for sense, not traced claim by claim. The 28 status entries were the population
     where a claim maps onto a constant, and all 28 were hand-read and came back correct.
