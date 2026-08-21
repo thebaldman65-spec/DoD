@@ -314,7 +314,9 @@ CZ had turned it red and **this revert turns it back green** without the suite b
   party is what makes arms comparable across batches), but **no sim figure can be quoted about a
   card in a non-default lane**, and several have been.
 - **`master.html` HAD TWO STALE FAITH THRESHOLDS FROM CZ** — fixed here, and §1 says where. Worth
-  noting as a pattern: **CZ moved a number in three code sites and two of five prose sites.**
+  noting as a pattern: **CZ moved that number in three code sites and in three of five prose
+  sites** — the spec block, the glossary and Blessing of the Faithful's card were updated; the
+  Faith status row and Elevation's card were not.
 - **`_recast_refusal_note` NAMES "FROZEN", NOT "HELD".** The refusal on a held enemy reads *"Frozen
   already stands at full strength"*, while the nameplate on that enemy reads **HELD** (Batch AS §4
   renamed it deliberately, because a player who cannot see why an enemy stopped taking turns is
