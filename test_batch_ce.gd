@@ -584,9 +584,43 @@ func _docs() -> void:
 	# vocabulary is worth having rather than a second word for the same set.
 	ok(gj != null and gj.size() == 97,
 		"the glossary holds 97 entries (96 + CV's hero/ally)")
-	var log_live := _src("res://docs/changelog.html")
-	ok(log_live.contains("Batch CE"), "the changelog carries a Batch CE entry")
-	ok(log_live.contains("102"), "...and states the new draft count")
+	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
+	# threshold, so CX cut it at the CN/CO boundary: Batch CE — with everything
+	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old
+	# `contains("Batch CE")` would have gone on PASSING against the live file,
+	# because later entries name the batch in their own prose — A CHECK THAT PASSES
+	# WITHOUT ITS SUBJECT BEING IN THE FILE AT ALL. That is BZ's failure in
+	# test_batch_bb and CD's in test_batch_bo, repaired here before it could bite.
+	#
+	# CD's pattern: anchor on the `<h2>` HEADING, and read the archive's path out of
+	# the LIVE changelog's own header rather than hardcoding it, so the NEXT cut
+	# moves this with it. See test_batch_bn for the full reasoning and the one
+	# consequence — this suite now depends on a file that is NOT IN VERSION CONTROL
+	# and FAILS LOUDLY without it, which is correct.
+	var live_log := _src("res://docs/changelog.html")
+	var arch_mark := live_log.find("/changelog-archive.html</code>")
+	ok(arch_mark > 0, "the live changelog names the archive's full path")
+	var arch_open := live_log.rfind("<code>", arch_mark) + 6
+	var arch_path := live_log.substr(arch_open,
+		arch_mark + "/changelog-archive.html".length() - arch_open)
+	var log_doc := _src(arch_path)
+	ok(log_doc.length() > 100000,
+		"the archive opens at %s (%d chars)" % [arch_path, log_doc.length()])
+	ok(not live_log.contains("<h2>2026-08-16 &mdash; Batch CE"),
+		"CX moved this batch's entry OUT of the live changelog")
+	ok(log_doc.contains("<h2>2026-08-16 &mdash; Batch CE"),
+		"...and the archive carries the Batch CE entry")
+	# AND THE DRAFT COUNT IS READ INSIDE THE ENTRY, NOT ACROSS THE FILE. It used
+	# to be `contains("102")` against the whole changelog; against a 1 MB archive
+	# that is a check that CAN ONLY PASS — three digits turn up in any document
+	# with enough numbers in it. BR's rule, applied where the move exposed it.
+	var ce_at := log_doc.find("&mdash; Batch CE:")
+	ok(ce_at >= 0, "...under its own <h2> heading")
+	if ce_at >= 0:
+		var ce_end := log_doc.find("<h2>", ce_at + 4)
+		var ce_entry := log_doc.substr(ce_at,
+			(ce_end - ce_at) if ce_end > ce_at else -1)
+		ok(ce_entry.contains("102"), "...and the CE entry states the new draft count")
 
 
 # ---------- the live harness ----------

@@ -168,7 +168,9 @@ so it arrives through the knowledge sync instead of being hand-copied into a cha
 ## THE CHANGELOG IS ARCHIVED ON A SCHEDULE (STANDING, SET AT BATCH CW §4)
 
 BZ split the changelog once, by hand, when it got too large. **This is that split as a rule
-rather than an event.**
+rather than an event.** **CX is the first cut made BY the rule** — live 494.2 KB → 162.1 KB at the
+CN/CO boundary, 23 entries moved, 140 entries before and after. Its two lessons are folded in
+below.
 
 - **THE THRESHOLD IS 400 KB.** When `docs/changelog.html` exceeds it, cut at the next batch
   boundary and move the OLDEST entries into `changelog-archive.html`, leaving the live file the
@@ -182,8 +184,17 @@ rather than an event.**
 - **ASSERT THE HALVES RE-CONCATENATE BYTE FOR BYTE BEFORE TRUSTING THE SPLIT.** Extract every
   `<h2>` heading from the original and from both halves: the counts must sum, with zero overlap
   and order preserved, and the two bodies joined must be byte-identical to the original.
-  **A split that drops one entry of 118 is invisible and no suite would catch it. Do not assert
+  **A split that drops one entry of 140 is invisible and no suite would catch it. Do not assert
   file sizes** — sizes agreeing is consistent with a duplicated entry and a dropped one.
+- **AN `<h2>` DOES NOT ALWAYS FIT ON ONE LINE, AND A LINE-ANCHORED EXTRACTOR WILL QUIETLY MISS
+  ONE.** Batch BF's heading wraps, so `^<h2>.*</h2>$` counts 107 where the archive holds 108.
+  **Match across lines, and count the same thing two different ways** — CX caught this only
+  because a `grep -c '^<h2>'` and a regex disagreed by one, which is exactly the size of the
+  error the byte-for-byte rule exists to catch.
+- **VERIFY FROM A BACKUP, WITH A SECOND SCRIPT.** The splitter asserting its own arithmetic proves
+  the splitter self-consistent, not the split correct. CX re-derived every heading from untouched
+  copies of both original files and asserted each of the 140 appears **exactly once** across the
+  two halves, and that none was invented.
 - **BOTH HALVES CARRY A HEADER NAMING THE OTHER**, with the counterpart's full path. In a year
   neither file's contents will say where the rest went.
 - **ANYTHING THAT READS THE CHANGELOG FOLLOWS CD'S PATTERN — ANCHOR ON THE `<h2>` HEADING, AND
@@ -192,6 +203,13 @@ rather than an event.**
   that batch in its own prose, so it **passes without its subject being in the file at all** —
   a check that has stopped asking its question, with no throw to announce it. Two suites have
   done exactly this.
+- **THE CUT IS NOT DONE UNTIL EVERY SUITE WHOSE ENTRY MOVED IS RE-POINTED, IN THE SAME BATCH.**
+  CX moved 23 entries and re-pointed **eleven suites** (bp, bq, br, bs, bt, bu, bv, bw, bx, cb,
+  ce). **Eight of them would have gone on PASSING** — a bare `contains("Batch XX")` is satisfied
+  by a later entry naming the batch in prose. BZ left that debt for BB, CD found the same thing in
+  BO two batches later; **it is cheaper by far to repair it in the batch that causes it.**
+  Fourteen suites now read the archive, so a cut that forgets this breaks a suite the batch never
+  touched.
 - **A FILE IN THE ARCHIVE IS NOT IN VERSION CONTROL AND IS NOT BACKED UP BY GITHUB.** If the
   machine is lost, it is lost with it. The archive folder must live somewhere the machine backs
   up — iCloud-synced Documents, a Time Machine target, or a second private repo. **At BZ none of
@@ -773,6 +791,20 @@ have been lost with it. **Live counts belong in `docs/state.md`; the rule is wha
 - **A `_step` FIELD IS A FLOAT AND IS DELIBERATELY ABSENT FROM `Runes.STAT_INT_KEYS`**
   (`wild_communion_step`, `absolute_step`, `guardian_step`, `conduit_step`). Adding one there
   coerces 1.5 to 1 **with nothing crashing** — the payload silently pays a third less.
+
+- **AN ENEMY ABILITY'S `"target": "ally"` MEANS *OWN SIDE*, NOT "somebody else" — AND THERE IS NO
+  `"self"`.** `Ability.Target` is `{ENEMY, ALLY}` and `Enemies.config` maps the literal string
+  `"ally"` and nothing else, so **`"target": "self"` is silently unmapped and falls through to
+  `Target.ENEMY`** — a boss authored that way wards a hero. **Every self-cast in the game is
+  tagged `"ally"`**: the Bog Troll's Regenerate, the Ritual Chanter's Cleansing Rite, the Grave
+  Totem's Dark Vigil, and the Hollow Crown's Regalia. **The unit a support cast lands on is chosen
+  in `_enemy_support_action`, not in the data** — re-point a cast there, never in the JSON.
+- **A PAYLOAD SHARED BY TWO ABILITIES MUST LOG `ab.display_name`, NEVER A LITERAL NAME.** The
+  `enemy_shield` branch printed the string "Shielding", which was harmless while one ability used
+  it and became a lie the moment a second did — the Hollow Crown announced its Regalia as the
+  Shieldmaster's card. **`_resolve_special` has `ab` in scope at every branch; use it.** A message
+  that names the caster twice ("X shields X!") is the same tell that a branch never expected a
+  self-cast.
 
 ### GATES THAT PASS WITHOUT ASKING THEIR QUESTION
 - **A GATE REPORTS ITS CHECK COUNT, NOT A VERDICT** — `GATE 2 PASS (165 checks)`, never a bare

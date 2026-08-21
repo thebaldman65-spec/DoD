@@ -689,8 +689,32 @@ func _docs() -> void:
 	ok(master.contains("120 of"), "master.html states the new draft count")
 	ok(master.contains("Builds with"),
 		"and the draft tables still carry the synergy line a player reads")
-	var chlog := FileAccess.get_file_as_string("res://docs/changelog.html")
-	ok(chlog.contains("Batch BW"), "the changelog carries a BW entry")
+	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
+	# threshold, so CX cut it at the CN/CO boundary: Batch BW — with everything
+	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old
+	# `contains("Batch BW")` would have gone on PASSING against the live file,
+	# because later entries name the batch in their own prose — A CHECK THAT PASSES
+	# WITHOUT ITS SUBJECT BEING IN THE FILE AT ALL. That is BZ's failure in
+	# test_batch_bb and CD's in test_batch_bo, repaired here before it could bite.
+	#
+	# CD's pattern: anchor on the `<h2>` HEADING, and read the archive's path out of
+	# the LIVE changelog's own header rather than hardcoding it, so the NEXT cut
+	# moves this with it. See test_batch_bn for the full reasoning and the one
+	# consequence — this suite now depends on a file that is NOT IN VERSION CONTROL
+	# and FAILS LOUDLY without it, which is correct.
+	var live_log := FileAccess.get_file_as_string("res://docs/changelog.html")
+	var arch_mark := live_log.find("/changelog-archive.html</code>")
+	ok(arch_mark > 0, "the live changelog names the archive's full path")
+	var arch_open := live_log.rfind("<code>", arch_mark) + 6
+	var arch_path := live_log.substr(arch_open,
+		arch_mark + "/changelog-archive.html".length() - arch_open)
+	var chlog := FileAccess.get_file_as_string(arch_path)
+	ok(chlog.length() > 100000,
+		"the archive opens at %s (%d chars)" % [arch_path, chlog.length()])
+	ok(not live_log.contains("<h2>2026-08-14 &mdash; Batch BW"),
+		"CX moved this batch's entry OUT of the live changelog")
+	ok(chlog.contains("<h2>2026-08-14 &mdash; Batch BW"),
+		"...and the archive carries the Batch BW entry")
 	# THE GLOSSARY OWES THE STANCE GATE AN ENTRY: "requires Aggressive" is a rule
 	# the game has never had before, and a player meeting a greyed-out card needs
 	# to know why.

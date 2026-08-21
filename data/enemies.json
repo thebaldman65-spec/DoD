@@ -693,7 +693,7 @@
     "anim": "attack02"
    },
    {
-    "display_name": "Crushing Blow",
+    "display_name": "Chieftain's Maul",
     "cost": 20,
     "damage": 34,
     "pressure": 56,
@@ -1099,7 +1099,7 @@
     "delay": 3.0,
     "anim": "attack03",
     "target": "ally",
-    "description": "Wards an ally against the next blow."
+    "description": "The Crown wards itself: 25% less damage taken for 3 turns."
    },
    {
     "display_name": "Sundering Decree",

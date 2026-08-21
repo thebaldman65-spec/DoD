@@ -4243,3 +4243,79 @@ Reports moving into the repo is the same instinct applied to the other direction
 The reports were being retyped by hand between two instances, and a hand copy that drops something
 is invisible — CL's overflow measurement was reported missing while sitting in the file it was
 supposed to be missing from. A committed file cannot be mistyped in transit.
+
+
+---
+
+## Batch CX — the cut, and three rulings
+
+Three of the four items this batch carried were one-line design decisions with real code behind
+them, and the fourth was a decision not to spend a week. What is worth writing down is what the
+work turned up on the way to doing it.
+
+**The cut was never really about size.** 494 KB against a 400 KB threshold is a number, and moving
+23 entries out is mechanical. The part that mattered is that eleven suites asserted their own
+changelog entry against the live file, and **eight of them would have gone on passing after the
+entry left** — a bare `contains("Batch BS")` is satisfied by any later entry that mentions BS in
+prose, and later entries mention each other constantly. So the cut would have looked completely
+clean: green suites, correct counts, and eight checks quietly asking nothing.
+
+That has now happened three times here. BZ caused it in `test_batch_bb` and left it; CD found the
+same shape in `test_batch_bo` two batches later and repaired one of them. The lesson is not
+"anchor on the heading" — that was already written down. The lesson is that **the batch that moves
+the entries is the only batch that cheaply knows which suites care**, and leaving the re-point for
+later converts a mechanical edit into an archaeology problem.
+
+**The verification found its own bug, which is the argument for writing verification you do not
+believe you need.** Batch BF's `<h2>` wraps across two lines, so a line-anchored extractor counted
+107 headings where the archive holds 108. Nothing about the split was wrong; the *checker* was.
+It surfaced only because two different counting methods disagreed by one — and one is precisely
+the error the byte-for-byte rule exists to catch. A checker that agrees with itself proves
+nothing. The second script this batch ran re-derived everything from untouched backups rather than
+from the splitter's own variables, which is the only version of that check with any independence
+in it.
+
+**Regalia is a good example of a bug that reads like a design question.** The state file described
+it as one: wire it in, re-point it, or retire it. But the useful observation is that *re-pointing
+alone would have changed nothing*, because the chooser names its candidates as literal strings and
+Regalia was not in the list. An ability can be perfectly well-formed — correct payload, correct
+target field, a description, an animation — and be unreachable because one function somewhere
+enumerates six names and it is not among them. The data says nothing is wrong. Nothing throws.
+It simply never happens.
+
+And the two smaller faults underneath it were the same fault at different layers. The description
+named `shield_charges` while the payload was `enemy_shield`; the log line named "Shielding" while
+the ability was Regalia; and `battle.gd`'s comment counted two live shield sources when only one
+had ever fired. **Three separate places asserting something the code did not do, none of them
+checkable, all of them confident.** The comment is the one worth flagging — CU exists because a
+comment is not evidence, and here was a comment that had been wrong since the day it was written
+and would have stayed wrong forever, because nothing that could contradict it ever ran.
+
+**The rename is the least interesting item and produced the most useful tool.** Sweeping a
+candidate name against 700 abilities, nodes, statuses and runes is cheap once written, and it
+rejected three of four candidates — including "Skullsplitter", which passes a word-level sweep
+because it is one word and fails a human one because it reads identically to Skull Crack in a
+combat log. The rule already said to treat a near-miss as a hit. What it did not say, and what
+this batch learned, is that **the sweep has to be run against the components as well as the whole
+string**, or a compound word walks straight through it.
+
+**The thing this batch did not do is the one worth defending.** Per-hero relics is a good ruling
+and the reason given for it is right — party-wide, a bar-swapping relic changes all four bars and
+is a blunt object; per-hero it becomes a choice about which hero gambles. But it is a save-format
+change with 25 read sites, four signature changes, two acquisition surfaces and thirteen relic
+descriptions worded party-wide. The brief said to report the scope and stop
+if it is large, and the value of actually stopping is that the four genuinely ambiguous
+hooks — the victory heals, the rest heal, the resource floor — got reported as questions instead of
+being answered by whichever way the implementation happened to fall. **A guess buried in a diff is
+much harder to revisit than a question in a report.**
+
+**And the suites found something nobody was looking for.** CW's `CLAUDE.md` split dropped every
+batch narrative, and seven suites assert against text that went with it — ten red assertions and
+an eleventh in the count-differ that notices them, sitting there for four batches because CT
+through CW were all implement-only and no battery has run since CS. Two of the ten pass by
+accident, matching a passing mention inside a surviving rule
+rather than the block they were written for, which is the same "stopped asking its question"
+pattern as the changelog case, arriving through a different door. That is the real cost of the
+implement-only convention: not that things break, but that **the interval between breaking and
+noticing is now measured in batches**, and the batch that finds it is never the batch that can
+best decide what to do about it.

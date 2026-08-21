@@ -1373,8 +1373,32 @@ func _docs() -> void:
 	# master.html state the draft's LIVE pool count against the REAL target?
 	ok(master.contains("120 of 120"),
 		"§5: ...and master.html states the live pool count against the real target")
-	var changelog := _src("res://docs/changelog.html")
-	ok(changelog.find("Batch BR") >= 0, "§5: the changelog has a Batch BR entry")
+	# RE-POINTED AT THE ARCHIVE BY BATCH CX. The live changelog passed CW's 400 KB
+	# threshold, so CX cut it at the CN/CO boundary: Batch BR — with everything
+	# from BP to CN — moved OUT OF THE REPO into `changelog-archive.html`. The old
+	# `contains("Batch BR")` would have gone on PASSING against the live file,
+	# because later entries name the batch in their own prose — A CHECK THAT PASSES
+	# WITHOUT ITS SUBJECT BEING IN THE FILE AT ALL. That is BZ's failure in
+	# test_batch_bb and CD's in test_batch_bo, repaired here before it could bite.
+	#
+	# CD's pattern: anchor on the `<h2>` HEADING, and read the archive's path out of
+	# the LIVE changelog's own header rather than hardcoding it, so the NEXT cut
+	# moves this with it. See test_batch_bn for the full reasoning and the one
+	# consequence — this suite now depends on a file that is NOT IN VERSION CONTROL
+	# and FAILS LOUDLY without it, which is correct.
+	var live_log := _src("res://docs/changelog.html")
+	var arch_mark := live_log.find("/changelog-archive.html</code>")
+	ok(arch_mark > 0, "§5: the live changelog names the archive's full path")
+	var arch_open := live_log.rfind("<code>", arch_mark) + 6
+	var arch_path := live_log.substr(arch_open,
+		arch_mark + "/changelog-archive.html".length() - arch_open)
+	var changelog := _src(arch_path)
+	ok(changelog.length() > 100000,
+		"§5: the archive opens at %s (%d chars)" % [arch_path, changelog.length()])
+	ok(not live_log.contains("<h2>2026-08-14 &mdash; Batch BR"),
+		"§5: CX moved this batch's entry OUT of the live changelog")
+	ok(changelog.contains("<h2>2026-08-14 &mdash; Batch BR"),
+		"§5: ...and the archive carries the Batch BR entry")
 	# SLICE ON THE HEADING, NOT ON THE PHRASE — the BE lesson, and it is a real
 	# one: a later entry saying "every suite at its Batch BR count" in its own
 	# regression line would otherwise steal the slice and every assertion below

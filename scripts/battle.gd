@@ -6924,6 +6924,30 @@ func _enemy_support_action(u: BattleUnit) -> Array:
 	if shield_ab != null \
 			and not allies.any(func(a): return a.has_status("shielded")):
 		return [shield_ab, _lowest_hp(allies)]
+	# THE HOLLOW CROWN: REGALIA, AND IT WARDS ITSELF (BATCH CX §3). It has been
+	# uncastable since the day it was authored, and re-pointing its TARGET alone
+	# would have changed nothing — THIS list is the actual fix. This function
+	# names its candidates LITERALLY, Regalia was not among them, and the attack
+	# list below filters on `damage > 0`, which Regalia has none of. So nothing
+	# in the game could select it. (One path could: `_psychotic_support` matches
+	# on `special`, not on the name, so a maddened Crown could always turn it on
+	# the party. The normal fight could not.)
+	#
+	# SELF, NOT AN ALLY, and the JSON must stay `"target": "ally"` — DO NOT
+	# "correct" it to "self". `Ability.Target` is {ENEMY, ALLY} only; "ally"
+	# means OWN SIDE, and a caster is on its own side. Regenerate, Cleansing
+	# Rite and Dark Vigil are all self-casts tagged `"ally"` for exactly this
+	# reason, and an unmapped "self" would fall through to Target.ENEMY — the
+	# boss would ward a hero. The end boss is also met ALONE, so there was never
+	# an ally to ward in the fight the ability actually appears in.
+	#
+	# IT COSTS THE TURN, so this is not a free 25%: a support cast returns
+	# instead of attacking, and the ward runs 3 turns, so the Crown is trading
+	# roughly one turn in four for 25% less damage taken. A taunt still forces
+	# it to attack, and a Dispel still strips the ward.
+	var regalia := _find_ability(u, "Regalia")
+	if regalia != null and not u.has_status("shielded"):
+		return [regalia, u]
 	# Withered Warden: tends the most wounded of its warband (itself included).
 	var growth := _find_ability(u, "Wild Growth")
 	if growth != null:
@@ -16016,6 +16040,14 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# ONE thing, usually nothing. Reported rather than dropped — the ally
 			# half is a real answer on its own, and authoring enemy buffs is a
 			# content decision that belongs to whoever wants one.
+			#
+			# BATCH CX §3 — THIS COMMENT WAS WRONG WHEN IT WAS WRITTEN, AND IS
+			# TRUE ONLY AS OF CX. Regalia had never fired: nothing could select
+			# it, so the enemy half was applied by ONE kind, not two, and this
+			# note believed a source was live that was not. It is the exact trap
+			# CU was written to avoid — a comment is not evidence. The count is
+			# correct now because CX put Regalia into `_enemy_support_action`;
+			# before that, "two of nineteen" should have read "one".
 			var dp_n := 3
 			if target != null and not target.dead:
 				var dp_taken: Array = []
@@ -17851,14 +17883,25 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				attacker.unit_name, target.unit_name], "#c070e0")
 		"enemy_shield":
 			# The Shieldmaster's ward: one ally holds it at a time.
+			#
+			# BATCH CX §3 — AND THE HOLLOW CROWN'S REGALIA, WHICH WARDS ITSELF.
+			# The log line named "Shielding" as a LITERAL, so the moment a second
+			# ability shared this payload it printed the wrong ability's name;
+			# and the message said the caster's name twice on a self-ward. Both
+			# are the same fault as a description naming a mechanic its payload
+			# does not implement, which is the other half of this section.
 			for a in (enemies if not attacker.is_hero else heroes):
 				if a != target and a.has_status("shielded"):
 					a.remove_status("shielded")
 			_sfx("parry", -7.0, 0.6)
 			_apply_status(target, "shielded", 3)
-			_message("%s shields %s!" % [attacker.unit_name, target.unit_name])
-			_log("%s: Shielding — %s takes 25%% less damage (3 turns)" % [
-				attacker.unit_name, target.unit_name], "#e0a0a0")
+			if target == attacker:
+				_message("%s wards itself!" % attacker.unit_name)
+			else:
+				_message("%s shields %s!" % [attacker.unit_name, target.unit_name])
+			_log("%s: %s — %s takes 25%% less damage (3 turns)" % [
+				attacker.unit_name, ab.display_name,
+				"it" if target == attacker else target.unit_name], "#e0a0a0")
 		"wild_growth":
 			var growth := maxi(int(round(target.max_hp * 0.20)), 1)
 			_sfx("heal", -6.0, 0.8)
