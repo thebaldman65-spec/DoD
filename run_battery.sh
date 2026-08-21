@@ -51,7 +51,8 @@ SUITES=(
   test_batch_cb test_batch_cd test_batch_ce test_runes test_rune_battle
 )
 GATES=(check_parse check_flow check_map check_cl_resolver check_cl_width
-       check_cm check_cm_live check_cn check_co check_cs check_ct check_cy)
+       check_cm check_cm_live check_cn check_co check_cs check_ct check_cy
+       check_cz)
 
 [[ $# -gt 0 ]] && { SUITES=(); for a in "$@"; do SUITES+=("test_batch_$a"); done }
 

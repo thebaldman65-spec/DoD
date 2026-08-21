@@ -2421,8 +2421,13 @@ const UPGRADE_PRIORITY := ["up_damage", "up_cooldown", "up_free", "up_speed",
 # Does this upgrade have anything to change on this ability? An upgrade
 # offered on an ability it cannot touch (Honed on Heal, Effortless on a
 # 0-cost basic) reads as a reward and does nothing, which is the whole bug
-# the wiring exists to close. Swift is the one that fits everything —
-# every ability has a delay.
+# the wiring exists to close.
+#
+# BATCH CZ §4 — "SWIFT FITS EVERYTHING BECAUSE EVERY ABILITY HAS A DELAY" WAS
+# TRUE FOR EIGHT BATCHES AND STOPPED BEING TRUE WITHOUT A LINE CHANGING HERE.
+# CY capped the pure buffs at 1.0 and Swift's floor was a literal 1.0, so on 52
+# cards the reward became a no-op — the exact dud this function exists to refuse,
+# arriving through the one branch that never asked. It asks now.
 func upgrade_fits(id: String, ab: Ability) -> bool:
 	match id:
 		"up_damage":
@@ -2441,6 +2446,15 @@ func upgrade_fits(id: String, ab: Ability) -> bool:
 			# Armor only matters to a hit that deals damage, and an ability
 			# already piercing everything has nothing left to take.
 			return ab.damage > 0 and ab.armor_pierce < 1.0
+		"up_speed":
+			# BATCH CZ §4 — SWIFT NO LONGER "FITS EVERYTHING". It fits every
+			# ability that is not already AT the floor, which is the honest
+			# version of the same claim and the one that stops the reward being
+			# offered where it buys nothing. Nothing in the shipped game sits at
+			# the floor today (the cheapest card is a capped buff at twice it),
+			# so this changes no offer — it is what keeps the dud closed if a
+			# later batch authors something cheaper.
+			return ab.delay > Ability.DELAY_FLOOR
 		"up_certain":
 			# Either reliability roll, and NEITHER when it is already a
 			# certainty — a guaranteed status offered "Certain" is the dud.
@@ -2525,7 +2539,15 @@ func _stamp_upgrade(id: String, ab: Ability) -> void:
 			# `cost` alone. faith_cost (Mercy) is never touched.
 			ab.cost = 0
 		"up_speed":
-			ab.delay = maxf(ab.delay * 0.75, 1.0)
+			# BATCH CZ §4 — THE FLOOR IS `Ability.DELAY_FLOOR`, NOT A LITERAL.
+			# It WAS a literal 1.0, and CY's cap landed exactly on it: every one
+			# of the 52 pure buffs came down to 1.0 and Swift stopped doing
+			# anything at all on any of them, overnight and in silence. The
+			# floor is written against the cap now (half of it), so the two can
+			# never collide again — CR's rule, one rung further down: a value is
+			# not finished when every site that COMPUTES it is updated, it is
+			# finished when every site that QUOTES it is.
+			ab.delay = maxf(ab.delay * 0.75, Ability.DELAY_FLOOR)
 		"up_break":
 			ab.pressure *= 2
 		"up_wide":

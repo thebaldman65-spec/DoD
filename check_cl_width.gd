@@ -79,30 +79,19 @@ func _initialize() -> void:
 
 
 # EVERY ability, not the ones that happen to be in a kit. The kits and spec
-# cores are a minority of the corpus — most of the 204 live in the draft POOLS,
-# and a width report that measured only the kits would be measuring a fifth of
-# the game and reporting it as all of it.
+# cores are a minority of the corpus — most of them live in the draft POOLS, and
+# a width report that measured only the kits would be measuring a fifth of the
+# game and reporting it as all of it.
+#
+# BATCH CZ §0 — AND "EVERY" NOW MEANS EVERY. This walk was the ORIGINAL Batch CL
+# enumeration, the one three later gates copied, and it has always stopped at
+# the kits and the pools: five abilities that a talent node grants into no pool
+# (Backdraft, Pyroblast, Glacial Prison, Cryoclasm, Intercession) were never
+# width-checked at all. It reads `Classes.ability_corpus()` now, like every
+# other gate, so those five descriptions are measured with the rest.
 func _corpus() -> Array:
 	var out: Array = []
-	var seen := {}
-	var add := func(ab):
-		if ab == null or seen.has(ab.display_name):
-			return
-		seen[ab.display_name] = true
+	for ab in Classes.ability_corpus():
 		out.append([ab.display_name, "description", ab.description])
 		out.append([ab.display_name, "perfect_text", ab.perfect_text])
-	for key in ["warrior", "mage", "cleric", "hunter"]:
-		for ab in Classes.kit(key):
-			add.call(ab)
-		for nm in Classes.class_pool(key):
-			add.call(Classes.pool_ability(String(nm)))
-		for nm in Classes.class_draft_pool(key):
-			add.call(Classes.pool_ability(String(nm)))
-	for spec in Classes.SPEC_INFO:
-		for ab in Classes.spec_abilities(spec):
-			add.call(ab)
-		for nm in Classes.spec_pool(spec):
-			add.call(Classes.spec_pool_ability(spec, String(nm)))
-		for nm in Classes.spec_draft_pool(spec):
-			add.call(Classes.spec_pool_ability(spec, String(nm)))
 	return out

@@ -713,6 +713,62 @@ a card (the brief's "five" is 3.72), and 8 lines (1.1%) exceed the 258px card �
 (Feint's Perfect).** So the block costs the column its LINE COUNT, which CK already measured; it is
 NOT a wrapping problem.
 
+## A PASSIVE PAID IN DAMAGE TAKEN INVERTS AGAINST EVERY BATCH THAT HELPS THE PARTY (STANDING, CZ §1)
+> **A passive paid in what the party is trying to prevent needs a SECOND TERM the hero controls.
+> Tuning cannot fix it — any number you pick is a number the next mitigation buff will erode.**
+
+Blood Frenzy pays the Berserker for health he has already LOST, so **better healing, better
+mitigation and better play all weaken him.** CY did not set out to nerf him: it made buffs cheaper
+to hold, the party held more of them, he took less damage, and his own band got *shallower* in a
+batch aimed at helping him. **That will keep happening.**
+- **THE SECOND TERM IS RAGE SPENT, AND WHAT MAKES IT THE RIGHT ONE IS THAT HE CONTROLS IT.** Every
+  other candidate was a version of "the fight went badly", which is the same failure one door
+  along. His pool already moves Rage constantly, so **his own cards feed his own passive.**
+- **THE BAND DOES NOT GROW, AND ENFORCING THAT IS HALF THE DESIGN.** `FRENZY_MAX_STEPS` = 20 is the
+  ceiling the health term ALREADY had; the steps are SUMMED and then CLAMPED, so the second term
+  fills the band **sooner** and can never make it **deeper**. **A Berserker already in the red gains
+  nothing from it** — at that point the identity term is paying in full. Adding on top would change
+  what the spec IS.
+- **THE RATE IS A RULE, NOT A CONSTANT: `FRENZY_RAGE_PER_STEP` = 5, because a full Rage bar is 100
+  and five Rage is 5% of it** — the health term's own rate off the other bar. *+2% per 5% of health
+  missing, +2% per 5% of Rage spent.*
+- **THE LEDGER BOOKS WHAT LEFT THE BAR, NEVER `ab.cost`.** One function
+  (`BattleUnit.note_resource_spent`), three callers. Measuring the bar is what catches the waivers
+  (Snap Shot, Twin Hunt), the discounts (`_eff_cost`), the refunds (`resource_gain`) and the clamp
+  at zero **without knowing any of their names** — and it is what makes the term un-farmable.
+- **A FOURTH SPEND SITE ADDED LATER MUST REPORT TO IT** or the band silently under-pays.
+
+## WHAT A METER MEASURES IS NOT ALWAYS WHAT THE REPORT SAYS IT MEASURES (STANDING, FOUND AT CZ §2)
+**`CY_METERS`' `conviction` row samples the DEVOUT'S OWN Faith, and his Faith HOLDS at the
+threshold and never releases by rule (Batch BH §2).** It has never been able to say anything about
+release frequency. Four batches quoted it as "the average fight ends without a release ever
+firing"; the number that answers that was printed four lines below it the whole time —
+`releases/battle` in the Faith decomposition, reading **0.51 to 1.49** on unmodified HEAD.
+- **THE INSTRUMENT WAS NOT WRONG. THE SENTENCE ATTACHED TO IT WAS**, and the repair differs: a
+  wrong instrument gets rebuilt, a wrong sentence gets rewritten. **Rebuilding an instrument
+  mid-comparison throws away every figure you wanted to compare against**, so the row keeps its
+  meaning and the caveat is written beside it in the code.
+- **THE GENERAL TRAP: when a measurement and its interpretation agree about the VERDICT, nothing
+  forces anyone to check whether they agree about the SUBJECT.** Every consequence drawn from the
+  mis-reading happened to be sound, so it survived until a batch tried to fix the number rather
+  than the mechanism.
+
+## FAITH RELEASES AT `FAITH_RELEASE`, AND THE LANE TRADES DEPTH FOR FREQUENCY (STANDING, CZ §2)
+**The threshold is ONE number (`battle.FAITH_RELEASE`, 3) and it was a literal `5` in three
+places** — the cap on the count, the release branch, and Communion's "still building" guard.
+- **SHORTENING THE BAR LOWERS THE HELD CEILING TOO, AND THAT IS THE COST.** Faith pays on the
+  highest count held and the count caps at the threshold, so the deepest benefit an ally can carry
+  fell from 5 stacks to 3. **The lane trades depth of hold for frequency of release, deliberately.**
+  Raising the builders (`FAITH_PER_ABSORB`, `FAITH_PER_GROUND_TURN`) is what buys some of it back.
+- **A BUILDER RATE THAT MEETS THE THRESHOLD IN ONE EVENT CHANGES WHAT THE CARD IS.** At 3 per
+  absorb against a threshold of 3, **one absorbed hit is a whole release** — a shielded ally never
+  HOLDS Faith, and the card stops being a ramp and becomes a per-hit heal. Shipped and flagged
+  beside the constant. **A magnitude that changes what a card IS must never be a silent consequence
+  of a threshold moving somewhere else.**
+- **RAISING THE ABSORB RATE DOES NOT MOVE THE ARRIVAL FIGURE.** That row is the Devout's own meter,
+  fed by the ground drip on his own turns; absorbs buy ally release frequency and nothing else.
+  Measured, not assumed.
+
 ## A PURE BUFF COSTS HALF A SWING (STANDING, SET AT BATCH CY §1)
 > **A pure buff's initiative delay is capped at HALF the basic attack's delay. Setting up costs
 > less tempo than swinging.**
@@ -753,16 +809,63 @@ count that eats incoming attacks* — percentage mitigation for N turns is NOT o
 second payload, and every enemy ability.
 **HALF IS THE DESIGNER'S FIRST GUESS AND IS FLAGGED, NOT TUNED.**
 
-## THE CL ENUMERATION MISSES FIVE ABILITIES (STANDING, FOUND AT BATCH CY §1)
-**`check_cn.gd`, `check_co.gd` and every copy of the Batch CL enumeration walk 211 abilities. The
-corpus is 216.** CL walks the kits, the class pools and the spec pools — **a talent node that
-GRANTS an ability which is in no pool is invisible to it.** The five are **Backdraft, Pyroblast,
-Glacial Prison, Cryoclasm and Intercession**, and **Intercession is a pure buff**, so a CL-only
-sweep would have left it at full price while its fifty-one neighbours were halved.
-**The fix is one loop:** walk `Talents.LANE_TREES` and resolve each `new_ability` /
-`grant_ability` through **`Talents.granted_ability`**, the one resolver both shapes go through.
-`check_cy.gd` does. **CN's and CO's tables were derived over the smaller corpus and have NOT been
-re-derived** — that is owed, not done.
+### A SHIELD TAKES THE CAP; A HEAL DOES NOT (STANDING, RULED AT BATCH CZ §3)
+> **A shield is played BEFORE the blow. A heal answers what just happened.**
+
+CY reported the six shields and changed none of them; **CZ ruled they take the cap** — Divine
+Shield, Interpose, Magic Barrier, Mantle, Mirror Image and Vespers, all now at `BUFF_DELAY_CAP`.
+**The mechanical criterion that separated them from pure buffs is still correct and is not what
+decided this**: *what kind of thing is this* and *what should it cost in tempo* are two questions,
+and conflating them is why they sat unruled for a batch.
+- **THEY ARE A SEPARATE POPULATION AND MUST STAY ONE.** `Ability.SHIELD_SPECIALS` is a second list,
+  never five names appended to `PURE_BUFFS`, so CY's table stays checkable as the thing CY derived.
+  **`Ability.takes_delay_cap()` is the ONE function that unions them** — `make()` and every gate
+  ask it, so the two populations can never be capped by two different rules.
+- **THE FIFTEEN HEALS KEEP THEIR FULL PRICE AND THE NEGATIVE HALF IS ASSERTED.** `check_cz.gd`
+  fails if any drafted heal is caught by the cap or sits at or under it. A rule with only its
+  positive half checked would let a later batch halve every heal in the game and still pass.
+
+### THE LADDER HAS THREE RUNGS AND EVERY ONE IS WRITTEN AGAINST THE ONE ABOVE (STANDING, CZ §4)
+`BASIC_DELAY` **2.0** (a swing) → `BUFF_DELAY_CAP` **1.0** (setup, half a swing) →
+`Ability.DELAY_FLOOR` **0.5** (the cheapest an UPGRADE can buy, half the cap again).
+- **`up_speed`'S FLOOR WAS A LITERAL `1.0` AND CY'S CAP LANDED EXACTLY ON IT.** Swift was live on
+  all 52 pure buffs one day and bought nothing at all the next, in total silence. **CR's rule, one
+  rung further down: a floor is a QUOTING SITE even when it quotes a number nobody thought was
+  related.** It became a quote of the cap retroactively, by collision.
+- **A JUSTIFICATION FOR NOT CHECKING SOMETHING IS A THING TO RE-READ WHENEVER ITS SUBJECT MOVES.**
+  `upgrade_fits` fell through to `return true` on the comment "Swift is the one that fits
+  everything — every ability has a delay". True for eight batches, false overnight, and the comment
+  is what stopped anyone looking. **Nothing in a diff points at a comment.**
+- **ASSERT THE GENERAL PROPERTY, NEVER A LIST.** `check_cz.gd` asserts that Swift changes the delay
+  of every ability `upgrade_fits` says it fits — true today and true whatever a later batch
+  authors, where a list of 52 names would have rotted immediately.
+- **ZERO IS REACHABLE AND DELIBERATELY NOT HERE.** Instinctive Rotation sets `eff_delay = 0.0` as a
+  talent's whole payload; an upgrade must not buy what a node exists to grant.
+- **MANA SHIELD'S `minf(eff_delay, 1.5)` IS INERT AND IS KEPT ANYWAY.** It is a CLAMP: what it does
+  now is keep the discount unable to RAISE the cost, which is the exact failure CY caught it in.
+
+## THE ENUMERATION IS `Classes.ability_corpus()` AND IT IS THE ONLY ONE (STANDING, SET AT CZ §0)
+**"What are all the abilities in the game?" has exactly one answer and it lives on `Classes`, not
+in a gate.** It walks the kits, the class pools and the spec pools (the Batch CL enumeration) and
+then walks `Classes.talent_granted_names()` through **`Talents.granted_ability`**, the one resolver
+both grant shapes go through. **The corpus is 216; the CL walk alone reaches 211.**
+- **DO NOT WRITE A SECOND COPY OF IT IN A GATE.** Five gates each held their own — `check_cm`,
+  `check_cn`, `check_co`, `check_cy` and **`check_cl_width`, the original the other four copied** —
+  and the first three plus the original all carried the same hole for as long as they existed:
+  **a talent node that GRANTS an ability which is in no pool was invisible to every one of them.**
+  The five it missed are **Backdraft, Pyroblast, Glacial Prison, Cryoclasm and Intercession**.
+- **IT LIVES ON THE GAME'S DATA RATHER THAN ON THE TEST**, because a gate that owns the answer is a
+  second authority the game itself never consults. `Classes.pool_ability` already falls through to
+  `Talents.granted_ability`, so this is a dependency the file had, used a second time.
+- **`check_cz.gd` KEEPS THE OLD CL WALK AS A NEGATIVE CONTROL.** Its whole job is to still be
+  missing the five; if it ever stops being, the gap closed itself and every report about it is
+  stale.
+- **CN's CRITERION OWES NOTHING** — re-run over the five it answers all of them correctly, and only
+  its printed population was ever short. **CO OWES ONE RULING ON ONE ABILITY: GLACIAL PRISON**,
+  whose whole cast-time payload is Chilled plus `_hold_freeze`, and `_hold_freeze` returns
+  immediately on an already-`frozen` target — **so a recast onto a held enemy writes nothing**.
+  Reported at CZ, not taken (CQ §6). The `_recast_writes` half must be right before the table entry
+  goes in.
 
 ## A recast that would not improve is REFUSED (STANDING, SET AT BATCH CO)
 **THE RULE: a status recast that would improve neither duration nor power is refused, and the

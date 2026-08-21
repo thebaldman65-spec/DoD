@@ -352,62 +352,18 @@ func _spawn(specs: Array) -> Node:
 	return scene
 
 
-# The Batch CL enumeration, as check_cn.gd and check_co.gd use — PLUS THE FIVE
-# ABILITIES IT HAS ALWAYS MISSED, which is a finding rather than a convenience.
+# BATCH CZ §0 — THE ENUMERATION MOVED TO `Classes.ability_corpus()`.
 #
-# CL walks the kits, the class pools and the spec pools. A talent node that
-# GRANTS an ability which is in no pool is therefore invisible to it, and there
-# are five: Backdraft, Pyroblast, Glacial Prison, Cryoclasm and INTERCESSION.
-# The last one is a party-wide death-save whose entire payload is a status on
-# every living hero — a pure buff by §1's criterion, and one that a CL-only
-# sweep would have left at full price while its forty-nine neighbours were
-# halved. `Talents.granted_ability` is the one resolver both grant shapes go
-# through, so walking `LANE_TREES` through it cannot drift from what a talent
-# purchase actually hands the player.
+# CY built the complete walk HERE, in a gate, because it needed the five
+# abilities the Batch CL enumeration has always missed — Backdraft, Pyroblast,
+# Glacial Prison, Cryoclasm and INTERCESSION, which is a pure buff a CL-only
+# sweep would have left at full price. It reported the gap rather than closing
+# it, and `check_cm`, `check_cn` and `check_co` each kept their own holed copy.
+#
+# CZ CLOSED IT AT THE SOURCE. The walk is one static function on `Classes` now
+# and all four gates call it, so the corpus is 216 for every one of them. The
+# grant-resolves assertion CY ran inline moved with it, into `check_cz.gd`,
+# which walks `Classes.talent_granted_names()` and fails on any name that
+# resolves to nothing.
 func _corpus() -> Array:
-	var out := _cl_corpus()
-	var seen := {}
-	for ab in out:
-		seen[ab.display_name] = true
-	for spec_key in Talents.LANE_TREES:
-		for node in Talents.LANE_TREES[spec_key]:
-			var pay: Dictionary = node.get("payload", {})
-			var nm := ""
-			if pay.has("new_ability"):
-				nm = String(pay["new_ability"]["display_name"])
-			elif pay.has("grant_ability"):
-				nm = String(pay["grant_ability"])
-			if nm == "" or seen.has(nm):
-				continue
-			var ab = Talents.granted_ability(nm)
-			if ab == null:
-				ok(false, "talent grant `%s` resolves to nothing" % nm)
-				continue
-			seen[nm] = true
-			out.append(ab)
-	return out
-
-
-func _cl_corpus() -> Array:
-	var out: Array = []
-	var seen := {}
-	var add := func(ab):
-		if ab == null or seen.has(ab.display_name):
-			return
-		seen[ab.display_name] = true
-		out.append(ab)
-	for key in ["warrior", "mage", "cleric", "hunter"]:
-		for ab in Classes.kit(key):
-			add.call(ab)
-		for nm in Classes.class_pool(key):
-			add.call(Classes.pool_ability(String(nm)))
-		for nm in Classes.class_draft_pool(key):
-			add.call(Classes.pool_ability(String(nm)))
-	for spec in Classes.SPEC_INFO:
-		for ab in Classes.spec_abilities(spec):
-			add.call(ab)
-		for nm in Classes.spec_pool(spec):
-			add.call(Classes.spec_pool_ability(spec, String(nm)))
-		for nm in Classes.spec_draft_pool(spec):
-			add.call(Classes.spec_pool_ability(spec, String(nm)))
-	return out
+	return Classes.ability_corpus()

@@ -72,6 +72,29 @@ var description := ""
 const BASIC_DELAY := 2.0
 const BUFF_DELAY_CAP := BASIC_DELAY * 0.5
 
+# ================== BATCH CZ §4 — THE THIRD RUNG OF THE LADDER ==================
+#
+# **THE SMALLEST INITIATIVE COST AN UPGRADE CAN BUY.** `run_state._stamp_upgrade`
+# floors the SWIFT upgrade here, and until CZ that floor was a literal `1.0` —
+# which CY's cap had just made **exactly the cap**, so Swift was a DEAD PICK on
+# all 52 pure buffs. `maxf(1.0 * 0.75, 1.0)` is 1.0: the reward was live on every
+# one of them the day before and bought nothing the day after.
+#
+# WRITTEN AGAINST `BUFF_DELAY_CAP`, WHICH IS WRITTEN AGAINST `BASIC_DELAY`, so
+# all three rungs move together and the relationship survives a retune. The
+# ladder reads: **a swing is 2.0, setting up is half of that, and the floor is
+# half again** — 0.5 today, a quarter of a swing.
+#
+# **THE VALUE IS A JUDGEMENT CALL AND IS FLAGGED RATHER THAN DERIVED.** Half the
+# cap is chosen because it is the only number that keeps Swift meaningful on the
+# cheapest card in the game without making it free: 25% off a capped buff is
+# 0.75, which clears 0.5 with room, so ONE Swift always does something and no
+# stack of them can reach zero. Zero is reachable elsewhere and deliberately not
+# here — Instinctive Rotation sets `eff_delay = 0.0` at the cast site as a
+# talent's whole payload, and an upgrade should not be able to buy what a
+# capstone-adjacent node exists to grant.
+const DELAY_FLOOR := BUFF_DELAY_CAP * 0.5
+
 # ---------- WHICH ABILITIES ARE PURE BUFFS ----------
 #
 # **DERIVED BY WALKING `battle._resolve_special`'S CALL GRAPH, NOT BY READING
@@ -109,12 +132,16 @@ const BUFF_DELAY_CAP := BASIC_DELAY * 0.5
 #     question was authored once, in CN §2, and asking it a second way here is
 #     how two answers start disagreeing.
 #   · SHIELDS. Divine Shield, Magic Barrier, Mantle, Interpose, Mirror Image and
-#     Vespers. Adjacent to buffs and arguably the same case, so they go to the
+#     Vespers. Adjacent to buffs and arguably the same case, so they went to the
 #     designer as a list. The line is mechanical: a shield is a CONSUMABLE
 #     absorb pool or charge count that eats incoming attacks. Percentage
 #     mitigation running for N turns is not one — it has no pool — which is why
 #     Immolate, Ironclad, Camouflage and Consecrated Ground are buffs and those
 #     six are not.
+#     **BATCH CZ §3 RULED: THEY TAKE THE CAP.** The criterion above is still
+#     correct and they are still not pure buffs — they are capped as their own
+#     population (`SHIELD_SPECIALS`), on the tempo rule rather than the payload
+#     one. See the CZ §3 header below.
 #   · ENEMY ABILITIES, and anything that writes to an enemy at all. This is a
 #     hero tempo problem.
 #
@@ -140,9 +167,52 @@ const PURE_BUFFS := ["aegis_wall", "alms", "anointing", "answering_steel",
 	"unslaked", "venom_coat", "vow_suffering", "warcry"]
 
 
+# ================== BATCH CZ §3 — AND A SHIELD IS SETUP TOO ==================
+#
+# **CY REPORTED THESE SIX AND CHANGED NONE OF THEM**, because the criterion that
+# excluded them is mechanical and it is still correct: a shield is a CONSUMABLE
+# ABSORB POOL OR CHARGE COUNT that eats incoming attacks, which is not a status
+# that buffs anybody. They are a separate population and they stay one — this is
+# a second list, not five more names appended to `PURE_BUFFS`, so CY's table can
+# still be checked as the thing CY derived.
+#
+# **THE RULE THEY JOIN IS ABOUT TEMPO, AND IT IS WIDER THAN "PURE BUFF":**
+#
+#   A SHIELD TAKES THE BUFF DELAY CAP. A HEAL DOES NOT.
+#   **A shield is played BEFORE the blow; a heal answers what just happened.**
+#
+# That distinction is the whole ruling and it is the reason the fifteen heals
+# named in `HEAL_SPECIALS` are untouched for a second batch running. Anvil and
+# Mantle are bought on a turn where nothing has gone wrong yet and are worth
+# nothing if the fight ends first — the exact bind §1 was written for. A heal is
+# spent on damage that has already landed, so the turn it costs has already been
+# earned by the thing it is answering, and a cheap heal is a different design
+# question (how survivable is the party) from a cheap setup (can a ramp arrive).
+#
+# **INTERPOSE AND MIRROR IMAGE ARE CHARGE COUNTS RATHER THAN POOLS** and are in
+# for the same reason: a blocked attack and an absorbed one are both setup
+# bought in advance. CO's `ALWAYS_IMPROVES` already names Interpose as the one
+# member of its own table that can never refuse; that is a statement about
+# additivity and has nothing to say about tempo.
+const SHIELD_SPECIALS := ["divine_shield", "interpose", "magic_barrier",
+	"mantle", "mirror_image", "vespers"]
+
+
 # TRUE when §1's cap binds this ability.
 func is_pure_buff() -> bool:
 	return special in PURE_BUFFS
+
+
+# TRUE when this ability is one of CZ §3's six shields.
+func is_shield() -> bool:
+	return special in SHIELD_SPECIALS
+
+
+# THE ONE ANSWER TO "DOES THE CAP BIND THIS CARD". Two populations, derived by
+# two different criteria and kept separately checkable, but exactly one function
+# that unions them — so `make()` below and every gate ask the same question.
+static func takes_delay_cap(sp: String) -> bool:
+	return sp in PURE_BUFFS or sp in SHIELD_SPECIALS
 
 
 # ---------- BATCH CN §2 — WHICH ABILITIES RUN A TIMING BAR ----------
@@ -258,6 +328,9 @@ static func make(d: Dictionary):
 	# on today's data and `check_cy.gd` asserts that it is. It is not redundant:
 	# it is what makes the rule true for content a later batch adds, including
 	# content added by somebody who has not read this file.
-	if a.special in PURE_BUFFS:
+	# BATCH CZ §3 — AND THE SIX SHIELDS COME THROUGH THE SAME DOOR. The union
+	# is asked as one question (`takes_delay_cap`) so the two populations can
+	# never be capped by two different rules.
+	if takes_delay_cap(a.special):
 		a.delay = minf(a.delay, BUFF_DELAY_CAP)
 	return a

@@ -4,6 +4,137 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A passive paid in what the party is trying to prevent will fight every batch that helps (Batch CZ) — 2026-08-21
+
+Blood Frenzy pays the Berserker for health he has already lost. That reads as a clean risk-reward
+design and it is one — right up until you notice what it does to the rest of the project. **Every
+improvement to party survivability weakens him.** Better healing, better mitigation, better play:
+each of them takes away the thing his passive is paid in. CY did not set out to nerf the Berserker;
+it made buffs cheaper to hold, the party held more of them, he took less damage, and his own band
+got *shallower* in a batch that was aimed at helping him.
+
+**That is not a tuning problem and it does not have a tuning fix.** Any number you pick is a number
+the next batch's mitigation buff will erode. The fix has to be structural, and the shape of it is:
+give the passive a second term that reads something the party cannot take away.
+
+**Rage spent is that term, and the reason it is the right one is not that it was available — it is
+that he controls it.** Every other candidate was some version of "the fight went badly", which is
+the same failure one door along. His pool already moves Rage constantly (Blood Offering, Reckless
+Abandon, Unslaked, Boil Over), so his own cards start feeding his own passive, which is a coupling
+the spec has never had. He spends the resource anyway; now the spending is worth something twice.
+
+**The half of the design that took the most thought was refusing to raise his ceiling.** The
+obvious version adds the Rage term on top and the band gets deeper — and that changes what the spec
+IS, because "he fights better hurt" stops being the whole story if he can reach the same numbers
+without being hurt at all. So the two terms are summed and then clamped at the twentieth step,
+which is exactly where the missing-health term already topped out. **The second term makes the band
+arrive sooner and can never make it bigger.** A Berserker at death's door gets nothing from it,
+which is the correct answer: at that point the identity term is already paying in full.
+
+**The general rule, because this will recur: a passive paid in damage taken inverts against every
+improvement to party survivability, so it needs a second term the hero controls.** Faith is the
+same family from the other side — it is paid in absorbs, which also require the party to be under
+pressure — and it needed the same kind of help for a related reason.
+
+## What a meter measures is not always what the report says it measures (Batch CZ) — 2026-08-21
+
+Four batches have now quoted "Faith reaches a third of the 5 a release needs, so the average fight
+ends without a release ever firing." The first half is a real measurement. **The second half is not
+what that number says, and nobody noticed for two batches because the two readings agree about
+whether the situation is bad.**
+
+The arrival row samples the Devout's own meter. **His Faith holds at the threshold and never
+releases, by rule, and has since Batch BH.** So the row has never been able to say anything about
+release frequency — it measures how full one non-releasing meter gets. The number that answers the
+actual question was printed four lines below it the whole time: `releases/battle`, which read 0.51
+to 1.49 on unmodified HEAD. Releases were firing, roughly one a battle.
+
+**The instrument was not wrong. The sentence attached to it was.** That distinction matters because
+the repair is different in each case: a wrong instrument gets rebuilt, a wrong sentence gets
+rewritten, and rebuilding an instrument mid-comparison throws away every figure you wanted to
+compare against. So the row keeps its meaning, the caveat is written beside it in the code, and
+both numbers get reported from here rather than one standing in for the other.
+
+**The generalisation worth keeping: when a measurement and its interpretation agree about the
+VERDICT, nothing forces anyone to check whether they agree about the SUBJECT.** Faith was
+genuinely under-arriving and a release genuinely was too rare, so every consequence drawn from the
+mis-reading happened to be sound. It would have kept being sound until somebody tried to fix the
+number rather than the mechanism — which is what this batch was, and is why it surfaced here.
+
+## Shortening a bar and filling it faster are different fixes, and the difference is the held half (Batch CZ) — 2026-08-21
+
+Faith's threshold moved from 5 to 3 and both its builders rose. Either change alone would have
+raised the release count; the reason both were needed is that they do different things to the
+*other* half of the meter.
+
+Faith pays mitigation and damage on the highest count held this battle, and the count caps at the
+threshold. **So lowering the threshold lowers the held ceiling too** — the deepest benefit an ally
+can carry fell from five stacks to three, which is a real cost paid by every ally at once. Raising
+the builders is what buys some of that back: a shorter bar filled faster reaches its (lower) peak
+more reliably, so more allies spend more of the fight at the top of it rather than partway up.
+
+**The lane trades depth of hold for frequency of release, deliberately**, and that is a design
+statement rather than a tuning outcome. It is worth writing down because the reverse trade is
+always available and looks equally reasonable on paper — a taller bar filled slower would make each
+stack matter more and each release rarer, which is what the lane already had and what four batches
+of measurement said was not working.
+
+**The thing that nearly went wrong: at three Faith per absorbed hit against a threshold of three,
+one absorbed hit is a whole release.** A shielded ally never *holds* Faith at all — he fills and
+pays out on the same blow. Nothing is lost mechanically, because the peak keeps paying, but the
+card stops being a ramp and becomes a per-hit heal, and that is a different card wearing the same
+text. It shipped because the brief named both builders, and it is flagged in the code beside the
+constant with the measured alternative one character away. **A magnitude that changes what a card
+IS should never be a silent consequence of a threshold moving somewhere else.**
+
+## A literal that used to be safe becomes a trap the moment the thing it guards moves (Batch CZ) — 2026-08-21
+
+CY capped pure buffs at 1.0. `up_speed`'s floor was a literal `1.0`. The upgrade was live on
+fifty-two abilities the day before and bought nothing at all the day after, and **nothing anywhere
+said so** — not a test, not a warning, not a log line. `maxf(1.0 * 0.75, 1.0)` is a perfectly
+healthy-looking expression.
+
+CR's rule covers half of this already: *a change to a value is not finished when every site that
+computes it is updated; it is finished when every site that QUOTES it is updated.* The other half
+is the one this found: **a floor is a quoting site even when it quotes a number nobody thought of
+as related.** The floor was not written against the buff cap — the buff cap did not exist when the
+floor was written. It became a quote of it retroactively, by collision.
+
+The repair is the same discipline CY used one rung up: write the floor against the cap
+(`BUFF_DELAY_CAP * 0.5`) so the ladder moves as one thing. **The more useful half of the repair is
+the assertion**, which is general rather than a list: Swift must change the delay of every ability
+`upgrade_fits` says it fits. That is true today and stays true whatever a later batch authors,
+where a list of fifty-two names would have rotted immediately.
+
+**And `upgrade_fits` had a comment explaining why it never asked.** "Swift is the one that fits
+everything — every ability has a delay." True for eight batches, false overnight, and the comment
+is what stopped anyone looking. **A justification for not checking something is a thing to re-read
+whenever the thing it talks about changes**, and nothing in a diff points at it.
+
+## A shield is setup and a heal is a response, which is why only one of them gets cheaper (Batch CZ) — 2026-08-21
+
+CY capped pure buffs and left six shields and fifteen heals alone, reporting both as rulings owed.
+The two look adjacent and they are not, and the line between them is worth stating because it will
+be asked again about the next category.
+
+**A shield is played before the blow. A heal answers one that has already landed.** That is the
+whole distinction and it decides the tempo question by itself: setup has to be bought speculatively,
+out of a fight that lasts three to five turns per hero, and if it costs a full swing it never
+returns its price. A heal's turn has already been earned by the thing it is answering — the damage
+happened, somebody has to fix it, and no player is weighing "is this worth a turn" the way they
+weigh a pre-emptive buff.
+
+**The mechanical criterion that separated them at CY is still correct and is not what decided
+this.** A shield is a consumable absorb pool; percentage mitigation for N turns is not one. That
+answers *what kind of thing is this*, which is a different question from *what should it cost in
+tempo*, and conflating the two is why the shields sat unruled for a batch. So they are capped as
+their own population rather than folded into `PURE_BUFFS`: CY's table stays checkable as the thing
+CY derived, and there is exactly one function that unions the two for the cap to ask.
+
+**The half that makes it a rule rather than a preference is that the negative half is asserted.**
+A gate that only checks "the shields are cheap" would pass just as happily on a build where every
+heal in the game had been halved too.
+
 ## The cost of a turn is only knowable once you know how many there are (Batch CY) — 2026-08-21
 
 This batch had a rule to apply and a measurement to take, and the measurement is the part worth

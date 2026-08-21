@@ -823,6 +823,84 @@ static func pool_ability(display_name: String) -> Ability:
 	return Talents.granted_ability(display_name)
 
 
+# ================== BATCH CZ §0 — THE ENUMERATION, IN ONE PLACE ==================
+#
+# **WHAT ARE ALL THE ABILITIES IN THE GAME?** Four gates asked that question and
+# each carried its own copy of the answer — `check_cm`, `check_cn`, `check_co`
+# and `check_cy` — and the first three copies were WRONG in the same way for as
+# long as they have existed. This function is the only copy now.
+#
+# THE HOLE, AND WHY IT MATTERED. The Batch CL walk enumerates the kits, the
+# class pools and the spec pools. **A talent node that GRANTS an ability which
+# is in no pool is invisible to it**, and there are FIVE: Backdraft, Pyroblast,
+# Glacial Prison, Cryoclasm and INTERCESSION. CY found them by walking
+# `Talents.LANE_TREES` for its own population and reported the gap rather than
+# closing it; CN's timing-bar table and CO's recast-refusal table were both
+# derived over the 211 the CL walk reaches, so both were derived over an
+# incomplete set. **`check_cz.gd` re-runs both criteria over the complete 216
+# and reports what the five turn out to be.**
+#
+# IT LIVES ON `Classes` RATHER THAN IN A GATE because the question is about the
+# GAME'S DATA, not about testing it: a gate that owns the answer is a second
+# authority the game itself never consults. `pool_ability` already falls
+# through to `Talents.granted_ability` for the same reason (see just above), so
+# the reach into the trees is not a new dependency — it is the one this file
+# already has, used a second time.
+#
+# NULLS ARE SKIPPED IN SILENCE HERE AND ASSERTED IN THE GATE. A grant naming an
+# ability that resolves to nothing is a real defect, but this function's job is
+# to return a corpus; `check_cz.gd` walks the same grant names and fails on any
+# that does not resolve, so the defect still has exactly one place that shouts.
+static func ability_corpus() -> Array:
+	var out: Array = []
+	var seen := {}
+	var add := func(ab):
+		if ab == null or seen.has(ab.display_name):
+			return
+		seen[ab.display_name] = true
+		out.append(ab)
+	for key in ["warrior", "mage", "cleric", "hunter"]:
+		for ab in kit(key):
+			add.call(ab)
+		for nm in class_pool(key):
+			add.call(pool_ability(String(nm)))
+		for nm in class_draft_pool(key):
+			add.call(pool_ability(String(nm)))
+	for spec in SPEC_INFO:
+		for ab in spec_abilities(spec):
+			add.call(ab)
+		for nm in spec_pool(spec):
+			add.call(spec_pool_ability(spec, String(nm)))
+		for nm in spec_draft_pool(spec):
+			add.call(spec_pool_ability(spec, String(nm)))
+	for nm in talent_granted_names():
+		add.call(Talents.granted_ability(String(nm)))
+	return out
+
+
+# The display names every talent node GRANTS, in tree order. Split out from
+# `ability_corpus` so a gate can walk the same names and assert that each one
+# still resolves — the corpus itself skips a null, and something has to notice.
+# Both grant shapes go through it: `new_ability` (the node carries the
+# definition) and `grant_ability` (the node names a card defined elsewhere).
+static func talent_granted_names() -> Array:
+	var out: Array = []
+	var seen := {}
+	for spec_key in Talents.LANE_TREES:
+		for node in Talents.LANE_TREES[spec_key]:
+			var pay: Dictionary = node.get("payload", {})
+			var nm := ""
+			if pay.has("new_ability"):
+				nm = String(pay["new_ability"]["display_name"])
+			elif pay.has("grant_ability"):
+				nm = String(pay["grant_ability"])
+			if nm == "" or seen.has(nm):
+				continue
+			seen[nm] = true
+			out.append(nm)
+	return out
+
+
 # -- THE DRAFTED ABILITIES — ONE HUNDRED AND ELEVEN OF A TARGET 120 (BO..CH) --
 #
 # BATCH BO SHIPPED EIGHTEEN — six MAGE, six CLERIC, six HUNTER — and named the
@@ -1639,7 +1717,7 @@ static func draft_ability(display_name: String) -> Ability:
 		"Magic Barrier":
 			return Ability.make({"display_name": "Magic Barrier",
 				"dmg_type": "arcane", "cost": 25, "damage": 0, "pressure": 0,
-				"delay": 2.0, "cooldown": 4, "anim": "attack03",
+				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 4, "anim": "attack03",
 				"special": "magic_barrier",
 				"perfect_id": "", "perfect_text": "",
 				"description": "Raise a ward of raw magic: absorbs\ndamage equal to 20% of your maximum\nhealth for 3 turns. It eats a share of\nEVERYTHING, area attacks included."})
@@ -1651,7 +1729,7 @@ static func draft_ability(display_name: String) -> Ability:
 		"Mirror Image":
 			return Ability.make({"display_name": "Mirror Image",
 				"dmg_type": "arcane", "cost": 20, "damage": 0, "pressure": 0,
-				"delay": 2.0, "cooldown": 4, "anim": "attack03",
+				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 4, "anim": "attack03",
 				"special": "mirror_image",
 				"perfect_id": "", "perfect_text": "",
 				"description": "Step behind four copies of yourself:\nthe next FOUR single-target attacks\nagainst you MISS outright. Area attacks\nnever miss, so they never spend one.\nThe images wait until spent."})
@@ -2565,7 +2643,7 @@ static func draft_ability(display_name: String) -> Ability:
 				"delay": 2.0, "cooldown": 4, "anim": "attack02",
 				"special": "ordination",
 				"perfect_id": "", "perfect_text": "",
-				"description": "Ordain the least of them: grant 4 Faith\nto the ally holding the LEAST.\nIt always finds the floor — never the\nally who is nearly there — so no stack\nis ever wasted over the cap of five."})
+				"description": "Ordain the least of them: grant 4 Faith\nto the ally holding the LEAST.\nIt always finds the floor — never the\nally who is nearly there — so it carries\nthem past the release and heals them."})
 		# AXIS: lending the number his whole kit is built on. Divine Shield
 		# absorbs 30% of HIS maximum, Afterglow heals 20% of it, Healing Pulse
 		# ticks 8% of it — every one of those spends the figure. THIS IS THE
@@ -3047,7 +3125,7 @@ static func draft_ability(display_name: String) -> Ability:
 		"Vespers":
 			return Ability.make({"display_name": "Vespers",
 				"dmg_type": "holy", "cost": 25, "damage": 0, "pressure": 0,
-				"delay": 2.0, "cooldown": 4, "anim": "attack03",
+				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 4, "anim": "attack03",
 				"special": "vespers", "target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "",
 				"description": "Say the evening office over them: for 4\nturns, or until it fires, the next blow\nthat would take that ally below half\nhealth is absorbed for 20% of YOUR\nmaximum. No crossing, no Mercy."})
@@ -3151,7 +3229,7 @@ static func draft_ability(display_name: String) -> Ability:
 		"Mantle":
 			return Ability.make({"display_name": "Mantle",
 				"dmg_type": "holy", "cost": 25, "damage": 0, "pressure": 0,
-				"delay": 2.5, "cooldown": 4, "anim": "attack03",
+				"delay": Ability.BUFF_DELAY_CAP, "cooldown": 4, "anim": "attack03",
 				"special": "mantle", "target": Ability.Target.ALLY,
 				"perfect_id": "", "perfect_text": "",
 				"description": "Lay the mantle: a Divine Shield worth\n25% of your maximum health — and when\nit BREAKS it passes to the ally on the\nlowest health, three times. Every one\nof them builds Faith like the first."})
@@ -3624,7 +3702,7 @@ static func trimmed_kit_ability(display_name: String) -> Ability:
 				"description": "Slam the earth: 3 shockwaves rip\nrandom enemies for 15% Attack damage\nand 15 BD each. Allies regain 10%\nof their resource."})
 		"Interpose":
 			return Ability.make({"display_name": "Interpose", "cost": 25,
-				"special": "interpose", "delay": 2.0, "anim": "attack01",
+				"special": "interpose", "delay": Ability.BUFF_DELAY_CAP, "anim": "attack01",
 				"cooldown": 4,
 				"perfect_id": "", "perfect_text": "",
 				"description": "Throw the wall wide: EVERY ally, the\nWarden included, gains a shield charge\n— the next attack against them is\nBLOCKED."})
@@ -4044,7 +4122,7 @@ const SPEC_INFO := {
 	"inquisitor": {"name": "Devout", "constitution": 110, "archetype": "Warder", "passive": "conviction",
 		"max_hp": 175, "armor": 0.18,
 		"resists": {"holy": 0.15, "fire": 0.10, "shadow": -0.10},
-		"passive_desc": "Conviction: allies build Faith whenever Divine Shield\nabsorbs damage for them — 2 a hit, max 5 stacks, doubled\nunder Blessing of Zeal. Each stack: 2% damage mitigation\nand +1.5% damage dealt, PAID ON THE HIGHEST COUNT HELD\nTHIS BATTLE. Apostle adds another 1x and Fervor another\non Consecrated Ground, so both together are triple, not\nquadruple. At 5 the ally is healed for {mhp:15|ally}, and\nthe COUNT resets while the peak does not. The Devout\nrecovers {res:3}, carries Faith as well, and that count\nnever releases.",
+		"passive_desc": "Conviction: allies build Faith whenever Divine Shield\nabsorbs damage for them — 3 a hit, max 3 stacks, doubled\nunder Blessing of Zeal. Each stack: 2% damage mitigation\nand +1.5% damage dealt, PAID ON THE HIGHEST COUNT HELD\nTHIS BATTLE. Apostle adds another 1x and Fervor another\non Consecrated Ground, so both together are triple, not\nquadruple. At 3 the ally is healed for {mhp:15|ally}, and\nthe COUNT resets while the peak does not. The Devout\nrecovers {res:3}, carries Faith as well, and that count\nnever releases.",
 		"blurb": "A living shrine — faith made armor for the whole party."},
 	"occultist": {"name": "Occultist", "constitution": 95, "archetype": "Pressure", "passive": "old_gods",
 		"max_hp": 155, "armor": 0.08,
@@ -4268,13 +4346,14 @@ static func spec_abilities(spec: String) -> Array:
 			# are talent-granted (pending_talent_ability).
 			return [
 				Ability.make({"display_name": "Divine Shield", "cooldown": 2, "cost": 15, "special": "divine_shield",
-					"target": Ability.Target.ALLY, "delay": 2.5, "anim": "attack03",
+					"target": Ability.Target.ALLY, "delay": Ability.BUFF_DELAY_CAP,
+					"anim": "attack03",
 					"perfect_id": "", "perfect_text": "",
 					"description": "Grant an ally a holy shield that\nabsorbs 35% of the Devout's max\nhealth, then breaks."}),
 				Ability.make({"display_name": "Consecrated Ground", "cooldown": 3, "cost": 25, "special": "cons_ground",
 					"delay": Ability.BUFF_DELAY_CAP, "anim": "attack03",
 					"perfect_id": "", "perfect_text": "",
-					"description": "Holy ground blooms underfoot: the\nparty takes 15% less damage and\nreflects 10% of damage taken,\nfor 3 turns — and every ally is\nkindled 1 Faith at the start of\ntheir turn while it holds."}),
+					"description": "Holy ground blooms underfoot: the\nparty takes 15% less damage and\nreflects 10% of damage taken,\nfor 3 turns — and every ally is\nkindled 2 Faith at the start of\ntheir turn while it holds."}),
 				Ability.make({"display_name": "Blessing of Zeal", "cooldown": 2, "cost": 20, "special": "zeal",
 					"target": Ability.Target.ALLY, "delay": 2.0, "anim": "attack02",
 					"perfect_id": "", "perfect_text": "",

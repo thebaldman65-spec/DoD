@@ -1657,12 +1657,14 @@ const LANE_TREES := {
 		# and this takes it below where it started.
 		# BATCH BF §2 — THE CONDITION, AND IT IS WRITTEN AS AN INCLUSION BECAUSE
 		# THE MECHANIC READS BETTER THAT WAY: fervor spreads to allies who are
-		# STILL BUILDING it. An ally sitting at five is not building — he is at
-		# the payout. The cliff (60% at four, 0% at five) is stated outright: an
-		# ability whose chance climbs with stacks and then vanishes at the top
+		# STILL BUILDING it. An ally sitting at the threshold is not building —
+		# he is at the payout. BATCH CZ §2 moved that threshold from five to
+		# three, so the cliff moved with it and the node's text says three.
+		# The cliff (its peak one stack below, 0% at the threshold) is stated
+		# outright: an ability whose chance climbs with stacks and then vanishes at the top
 		# reads as a bug unless the tooltip says otherwise.
 		{"id": "dv_communion", "name": "Communion", "ranks": 1, "lane": "Faith", "row": 1,
-			"desc": "When a hero reaches 5 Faith, every other hero who is still BUILDING Faith has a ({v} x their own Faith stacks)% chance to gain 1 stack. The chance therefore peaks at 60% on a hero holding 4 — a hero already at 5 is at the payout rather than building, and is not rolled for at all.",
+			"desc": "When a hero reaches 3 Faith, every other hero who is still BUILDING Faith has a ({v} x their own Faith stacks)% chance to gain 1 stack. The chance therefore peaks on a hero holding 2 — a hero already at 3 is at the payout rather than building, and is not rolled for at all.",
 			"scale": {"step": 15},
 			"payload": {"stat": {"communion_ranks": 15}}},
 		# THE MOST INVESTMENT-SHAPED NODE IN THE GAME with Conviction's third
@@ -1678,7 +1680,7 @@ const LANE_TREES := {
 			"payload": {"stat": {"devoutness_ranks": 20}}},
 		# The counter holds the INCREASE on the release's base 15%.
 		{"id": "dv_faithful", "name": "Blessed are the Faithful", "ranks": 1, "lane": "Faith", "row": 4,
-			"desc": "The heal at 5 stacks of Faith restores {v}% max health (up from the base 15%).",
+			"desc": "The heal at 3 stacks of Faith restores {v}% max health (up from the base 15%).",
 			"scale": {"base": 15, "step": 20},
 			"payload": {"stat": {"faithful_step": 20}}},
 		# Two magnitudes, two fields: the heal is a percentage, the Faith is a
@@ -1812,7 +1814,7 @@ const LANE_TREES := {
 		# exact term BE and BF spent two batches taming, so a capstone whose
 		# whole effect was that term would keep producing the same cancellation
 		# at any price. Conviction has two halves — what a stack does WHILE
-		# HELD and what happens when five RELEASE — and all eight Faith nodes
+		# HELD and what happens when the threshold RELEASES — and all eight nodes
 		# touch the release half. The held half was the one untouched,
 		# capstone-sized axis in the lane. See battle.gd's `_faith_stack_mult`.
 		# BATCH BI §1 — same two corrections as Fervor: the per-stack figures came

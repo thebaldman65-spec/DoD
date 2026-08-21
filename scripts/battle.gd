@@ -309,7 +309,7 @@ const STATUS_INFO := {
 	"overcharged": ["Overcharged", "OC", Color(0.8, 0.5, 1.0), "Overcharge is spent for this\nbattle — the storm has no feeding\nleft in it."],
 	"sanctified": ["Hallowed", "Hw", Color(0.98, 0.88, 0.55), "Warded by the light: immune to\nnew debuffs."],
 	"capacitor": ["Holy Capacitor", "HC", Color(0.95, 0.9, 0.6), "Stored overhealing, released by\nthe next Heal."],
-	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith, 2 a hit — 2% mitigation\nand +1.5% damage per stack, paid on\nthe HIGHEST count held this battle.\nAt 5 the bearer is healed and the\ncount resets; the peak keeps paying."],
+	"faith": ["Faith", "F1", Color(0.98, 0.85, 0.45), "Conviction: Divine Shield absorbs\nbuild Faith, 3 a hit — 2% mitigation\nand +1.5% damage per stack, paid on\nthe HIGHEST count held this battle.\nAt 3 the bearer is healed and the\ncount resets; the peak keeps paying."],
 	"cons_ground": ["Consecrated Ground", "CG", Color(0.9, 0.82, 0.5), "Standing on holy ground: takes 15%\nless damage and reflects 10% of\ndamage taken."],
 	"zeal": ["Blessing of Zeal", "Z+", Color(1.0, 0.78, 0.35), "+15% damage dealt; Faith gain\nis doubled."],
 	"bulwark": ["Bulwark of Fortitude", "BF", Color(0.85, 0.9, 1.0), "The unbreakable stand: NO Break\ndamage taken, armor increased by\n50%, and 10% max health regained\neach turn."],
@@ -7386,8 +7386,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	# COST only: the cooldown still runs, unlike Snap Shot's.
 	var was_free_ability := attacker.free_ability > 0 and ab.cost > 0 \
 		and not is_counter and not was_snap
+	# BATCH CZ §1 — BLOOD FRENZY'S SECOND TERM IS BOOKED HERE, off the BAR
+	# rather than off `ab.cost`. This one line is where every ability in the
+	# game pays, so measuring the difference catches the waivers (Snap Shot,
+	# Twin Hunt), the discounts (`_eff_cost`), the refunds (`resource_gain`)
+	# and the clamp at zero without knowing any of their names. It books the
+	# NET, so a card that hands back what it took feeds the band nothing.
+	var cz_res_before: int = attacker.resource
 	attacker.resource = clampi(attacker.resource - _eff_cost(attacker, ab, target) \
 		+ ab.resource_gain, 0, attacker.max_resource)
+	attacker.note_resource_spent(cz_res_before - attacker.resource)
 	attacker.refresh_bars()
 	if was_free_ability:
 		attacker.free_ability -= 1
@@ -11146,6 +11154,13 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# as a bonus — the one card in the game where "it is quick to cast"
 		# would have made it slower. `minf` keeps the discount able only to
 		# lower, which is what it always claimed to do.
+		# BATCH CZ §4 — AND THE CLAMP IS NOW INERT, WHICH IS REPORTED RATHER
+		# THAN DELETED. Mana Shield is a pure buff, so its delay IS the cap
+		# (1.0) and `minf(1.0, 1.5)` can never bind. The line stays because it
+		# is a CLAMP: it is the thing that keeps the discount unable to raise
+		# the cost if either number is ever retuned, which is exactly the
+		# failure CY caught it in the act of. Its description still says "It is
+		# quick to cast" — true, and no longer distinguishing.
 		if ab.display_name == "Mana Shield":
 			eff_delay = minf(eff_delay, 1.5)
 		if grade == "perfect" and ab.display_name == "Lunge":
@@ -13773,8 +13788,15 @@ func _cy_sample() -> void:
 			"bloodrage":
 				# The live band, exactly as `frenzy_bonus()` computes it, minus
 				# the ratchet. Reported as percentage points.
+				# BATCH CZ §1 — AND IT CARRIES BOTH TERMS NOW, summed and
+				# clamped the same way, or the instrument would report the
+				# half of the passive the batch did not change. `rage_spent`
+				# is a plain field read and `frenzy_rage_steps()` is pure, so
+				# the sampler stays read-only by construction.
 				var step: float = (2.0 + h.bloodrage_step_bonus) / 100.0
-				var cur: float = int((1.0 - h.hp / float(h.max_hp)) * 100.0 / 5.0) * step
+				var steps: int = int((1.0 - h.hp / float(h.max_hp)) * 100.0 / 5.0) \
+					+ h.frenzy_rage_steps()
+				var cur: float = mini(steps, BattleUnit.FRENZY_MAX_STEPS) * step
 				v = maxf(cur, h.frenzy_floor) * 100.0
 			"pack":
 				# The DEEPEST bond standing on any one beast — the meter Pack
@@ -13916,6 +13938,27 @@ var _communion_chain := false
 # moments, now paid reliably.
 # Both are floats because 1.5 is not an integer and rounding it at the constant
 # would silently ship 1% or 2%; the two read sites multiply into a float anyway.
+# ============= BATCH CZ §2 — THE RELEASE THRESHOLD, AS A NUMBER =============
+#
+# **FIVE BECOMES THREE, AND IT WAS A LITERAL IN THREE PLACES.** The cap on the
+# count, the release branch and Communion's "still building" guard each carried
+# their own `5`, so the threshold was three numbers that happened to agree.
+#
+# WHY IT MOVED. CY measured the Devout's meter at **1.6 of the 5 a release
+# needs**, rising to 2.1 after the buff-delay cap — roughly a third of the way,
+# in a fight that lasts three to five turns per hero. **The threshold alone was
+# not the constraint and it does not move alone**: the builders are raised in
+# the same batch (`FAITH_PER_ABSORB`, `FAITH_PER_GROUND_TURN` below), because a
+# meter that fills at a third of the rate it needs is not fixed by shortening
+# the bar — that only makes each release cheaper, not more frequent.
+#
+# **WHAT IT DOES TO THE HELD HALF IS NOT A SIDE EFFECT, IT IS HALF THE CHANGE.**
+# Faith pays mitigation and damage on `faith_peak`, the HIGHEST count held this
+# battle (Batch BI §1), and the count is capped at the threshold — so lowering
+# it lowers the ceiling on the held benefit from 5 stacks to 3 for every ally
+# at once. The lane trades depth of hold for frequency of release, deliberately,
+# and `docs/reports/CZ.md` reports both halves measured rather than one.
+const FAITH_RELEASE := 3
 const FAITH_MITIGATION_PCT := 2.0
 const FAITH_DAMAGE_PCT := 1.5
 
@@ -13969,8 +14012,11 @@ static func _faith_pct_text(v: float) -> String:
 # numbers, the count and the peak, with the value keyed to the peak.
 func _refresh_faith_chip(u: BattleUnit, devout: BattleUnit) -> void:
 	var mult := _faith_stack_mult(devout, u)
-	var f_tail := "At 5 stacks: healed for %d%% max\nhealth and the count resets —\nthe PEAK keeps paying." % [
-		15 + devout.faithful_step]
+	# BATCH CZ §2 — THE THRESHOLD IS READ, NOT SPELLED. It moved from five to
+	# three this batch and this chip is the one place a player is told what it
+	# is, so it quotes `FAITH_RELEASE` rather than a literal.
+	var f_tail := "At %d stacks: healed for %d%% max\nhealth and the count resets —\nthe PEAK keeps paying." % [
+		FAITH_RELEASE, 15 + devout.faithful_step]
 	if u == devout:
 		f_tail = "His own Faith HOLDS — the\ncount never releases."
 	var f_desc := "Conviction: Faith x%d (peak %d) —\n%s%% damage mitigation and +%s%%\ndamage dealt, paid on the PEAK.\n%s" % [
@@ -14112,7 +14158,7 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	# ONE BRANCH, so there is one answer to "can this unit release".
 	var own := u == devout
 	var f_was := u.faith_stacks
-	u.faith_stacks = mini(u.faith_stacks + n, 5)
+	u.faith_stacks = mini(u.faith_stacks + n, FAITH_RELEASE)
 	# BATCH BI §1 — THE PEAK RATCHETS HERE AND NOWHERE ELSE. It is raised from
 	# the count immediately after the count moves, so there is exactly one line
 	# in the file where the two can disagree and it is this one.
@@ -14124,10 +14170,10 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 	# call, the `_devout_heal` pattern, so the parts can never disagree with the
 	# sum — which is the property §5 asserts.
 	_faith_gained(u, u.faith_stacks - f_was, source)
-	if own or u.faith_stacks < 5:
+	if own or u.faith_stacks < FAITH_RELEASE:
 		_refresh_faith_chip(u, devout)
 		return
-	# The fifth stack: an ALLY releases, always to zero.
+	# The threshold stack: an ALLY releases, always to zero.
 	#
 	# BATCH BG §2 took Apostle off this branch (the capstone no longer changes
 	# what a release consumes). BATCH BH §2 TOOK BINDING OATH'S REMNANT, WHICH
@@ -14210,7 +14256,7 @@ func _gain_faith(u: BattleUnit, n: int, source: String) -> void:
 		_communion_chain = true
 		for h in heroes:
 			if h == u or h.dead or h.is_companion or h.faith_stacks <= 0 \
-					or h.faith_stacks >= 5:
+					or h.faith_stacks >= FAITH_RELEASE:
 				continue
 			if randf() < 0.01 * devout.communion_ranks * h.faith_stacks:
 				_log("   → Talent: Communion — %s's fervor spreads to %s" % [
@@ -14308,11 +14354,11 @@ func _ground_faith_tick(u: BattleUnit) -> void:
 	if not u.has_status("cons_ground"):
 		return
 	_stat("faith_ground_turns")
-	_log("   → Consecrated Ground kindles %s (+1 Faith)%s" % [
-		u.unit_name,
+	_log("   → Consecrated Ground kindles %s (+%d Faith)%s" % [
+		u.unit_name, FAITH_PER_GROUND_TURN,
 		" — and his Faith is worth double here (Fervor)" \
 			if devout.fervor > 0 else ""], "#c8b880")
-	_gain_faith(u, 1, "ground")
+	_gain_faith(u, FAITH_PER_GROUND_TURN, "ground")
 
 
 # BATCH BQ — CONSECRATION's drip: 5% of a hero's OWN maximum at the start of
@@ -14360,9 +14406,43 @@ func _swear_opening_oath() -> void:
 # to come from somewhere else and the DECOMPOSITION — not another guess — is
 # what says where; this row has had six batches and four briefs with something
 # wrong in them, and it does not get a fifth guess.
-# The magnitude lives here rather than in a constant because it is one number at
-# one site; if a later batch wants to tune it, this is the line.
-const FAITH_PER_ABSORB := 2
+#
+# **BATCH CZ §2 — THREE, AND BI's PREDICTION IS THE REASON.** It said outright
+# that 2 would be insufficient and it was right for four batches. CZ raises the
+# threshold and the builders together (see `FAITH_RELEASE` above), because the
+# decomposition BI asked for has now run: at rung 2 the party gains 10.8 Faith a
+# battle of which **absorbs are 3.7** across 2.3 absorbed hits — 1.6 Faith an
+# absorb ACTUALLY LANDED, against the 2 the constant promises, because the cap
+# throws the remainder away. Raising the rate raises what survives the cap too.
+#
+# **FLAGGED, NOT TUNED**, exactly as the brief asks: the figure is here, the
+# measured result is in `docs/reports/CZ.md` beside CY's original, and this is
+# the one line to move.
+#
+# **AND THE CONCERN IS RECORDED RATHER THAN BURIED, BECAUSE IT IS REAL.** THREE
+# PER ABSORB AGAINST A THRESHOLD OF THREE MEANS ONE ABSORBED HIT IS A WHOLE
+# RELEASE: a shielded ALLY now never HOLDS Faith at all — he fills and pays out
+# on the same blow, and the held half of the meter stops existing for him. The
+# peak still pays (BI §1), so nothing is lost, but the card stops being a ramp
+# and becomes a per-hit heal. Two things say ship it anyway: the brief names
+# both builders as barely firing and asks for both to move, and the DEVOUT'S
+# OWN meter — the one the batch is measured on — is fed by the ground, not by
+# absorbs (measured: 3 per absorb moves his peak by nothing at all).
+# **`FAITH_PER_ABSORB := 2` IS THE MEASURED ALTERNATIVE**, one character away:
+# it holds releases at 3.2 a battle instead of 5.3 and costs 0.3 of the peak.
+# `docs/reports/CZ.md` prints all four combinations that were measured.
+const FAITH_PER_ABSORB := 3
+
+# BATCH CZ §2 — THE GROUND'S DRIP, AND IT WAS A LITERAL `1` AT ITS ONE SITE.
+# **TWO NOW.** It is the LARGER of the two builders by volume — the rung-2
+# decomposition reads ground 6.9 against absorbs 3.7 — and it is the one the
+# Devout controls, so raising it raises the half of the meter a player can play
+# toward. The denominator is already measured and already reported: the ground
+# is up on **43% of hero turns** (6.8 of 15.8 a battle), so doubling the drip
+# does not double the meter — it doubles the share of turns that were already
+# paying, which is why the two builders move together rather than one of them
+# being asked to carry the batch.
+const FAITH_PER_GROUND_TURN := 2
 
 
 func _on_shield_absorbed(holder: BattleUnit) -> void:
@@ -15461,6 +15541,11 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			var ra_pct := (ra_spent / RECKLESS_STEP) * ra_step
 			var ra_turns := 3
 			attacker.resource = 0
+			# BATCH CZ §1 — the whole bar left it, and the band is told. This
+			# is the Berserker card the second term was written for: the one
+			# that turns the resource into damage is now also the one that
+			# turns it into the passive's floor.
+			attacker.note_resource_spent(ra_spent)
 			attacker.refresh_bars()
 			# BATCH CQ §0 — THE CLAMP, five of five. Same defect, and this is
 			# the one that bites hardest: the buff scales off the Rage
@@ -21275,6 +21360,15 @@ func _check_end() -> void:
 			_stat("cy_meter_n_" + cy_h.passive_id)
 			_stat("cy_meter_" + cy_h.passive_id,
 				float(_cy_peak.get(cy_h.passive_id, 0.0)))
+			# BATCH CZ §1 — THE RATE'S OWN DENOMINATOR, banked the same way and
+			# on the same tick so the two can never be averaged over different
+			# battles. `cy_meter_bloodrage` says how deep the band got; this
+			# says how much Rage was spent to get there, and the quotient is
+			# what `FRENZY_RAGE_PER_STEP` is set against. Read at battle END
+			# rather than sampled per turn, because `rage_spent` only ever
+			# rises — the end value IS the peak.
+			if cy_h.passive_id == "bloodrage":
+				_stat("cz_rage_spent", float(cy_h.rage_spent))
 		# BATCH BJ §3a — the signature table's numerators and denominators:
 		# for every spec STANDING in this battle, one denominator tick and this
 		# battle's moment counts, split trash/boss exactly as Ruin's are. The
@@ -21873,7 +21967,17 @@ const CY_METERS := [
 	["bloodrage", "Blood Frenzy", 40.0, "points"],
 	["pack", "Loyalty", 5.0, "stacks (deepest single bond)"],
 	["lethal_aim", "Focus", 100.0, "points"],
-	["conviction", "Faith", 5.0, "stacks"],
+	# BATCH CZ §2 — THE DENOMINATOR MOVED WITH THE THRESHOLD (5 -> 3), because
+	# the row's whole meaning is "against the number the spec is built around"
+	# and that number is `FAITH_RELEASE`. A fixed 5.0 here would have kept
+	# reporting arrival against a threshold the game no longer has.
+	#
+	# **AND READ THE ROW FOR WHAT IT IS.** It samples the DEVOUT'S OWN meter,
+	# and his Faith HOLDS and never releases by rule (Batch BH §2) — so it has
+	# never been a measure of whether a release fires. The number that answers
+	# that is `releases/battle` in the Faith decomposition below, and CZ §2
+	# reports both rather than letting one stand in for the other.
+	["conviction", "Faith", float(FAITH_RELEASE), "stacks"],
 ]
 
 
@@ -21900,6 +22004,18 @@ static func cy_report_line(stats: Dictionary) -> String:
 		lines.append("  %-13s peak %6.1f of %.0f %s  =  %3.0f%% of what the spec is built around (n=%d)" % [
 			String(m[1]), peak, float(m[2]), String(m[3]),
 			100.0 * peak / float(m[2]), int(mn)])
+	# BATCH CZ §1 — THE RATE, REPORTED RATHER THAN TUNED QUIETLY. Rage spent per
+	# battle is the figure `BattleUnit.FRENZY_RAGE_PER_STEP` is set against, and
+	# the steps it buys are printed beside it so the brief's question — does the
+	# second term reach a meaningful share of the band — is answered by the
+	# instrument instead of by arithmetic in a report nobody can re-run.
+	var cz_n: float = stats.get("cy_meter_n_bloodrage", 0.0)
+	if cz_n > 0.0:
+		var cz_rage: float = stats.get("cz_rage_spent", 0.0) / cz_n
+		var cz_steps: float = cz_rage / float(BattleUnit.FRENZY_RAGE_PER_STEP)
+		lines.append("  BATCH CZ §1 — Rage spent/battle %5.1f  =  %.1f of %d steps  =  +%.1f points of the band (n=%d, %d Rage a step)" % [
+			cz_rage, cz_steps, BattleUnit.FRENZY_MAX_STEPS, cz_steps * 2.0,
+			int(cz_n), BattleUnit.FRENZY_RAGE_PER_STEP])
 	if lines.is_empty():
 		return ""
 	return "\n".join(lines)

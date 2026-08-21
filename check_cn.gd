@@ -141,27 +141,11 @@ func _initialize() -> void:
 	quit(1 if bad > 0 else 0)
 
 
-# The Batch CL enumeration, returning the Ability objects themselves.
+# BATCH CZ §0 — THE ENUMERATION IS `Classes.ability_corpus()` NOW, AND THIS
+# GATE NO LONGER CARRIES A COPY OF IT. The copy it used to carry was the Batch
+# CL walk, which reaches the kits, the class pools and the spec pools and MISSES
+# the five abilities a talent node grants into no pool at all (Backdraft,
+# Pyroblast, Glacial Prison, Cryoclasm, Intercession). Four gates held four
+# copies of the same hole; there is one enumeration now and it reaches 216.
 func _corpus() -> Array:
-	var out: Array = []
-	var seen := {}
-	var add := func(ab):
-		if ab == null or seen.has(ab.display_name):
-			return
-		seen[ab.display_name] = true
-		out.append(ab)
-	for key in ["warrior", "mage", "cleric", "hunter"]:
-		for ab in Classes.kit(key):
-			add.call(ab)
-		for nm in Classes.class_pool(key):
-			add.call(Classes.pool_ability(String(nm)))
-		for nm in Classes.class_draft_pool(key):
-			add.call(Classes.pool_ability(String(nm)))
-	for spec in Classes.SPEC_INFO:
-		for ab in Classes.spec_abilities(spec):
-			add.call(ab)
-		for nm in Classes.spec_pool(spec):
-			add.call(Classes.spec_pool_ability(spec, String(nm)))
-		for nm in Classes.spec_draft_pool(spec):
-			add.call(Classes.spec_pool_ability(spec, String(nm)))
-	return out
+	return Classes.ability_corpus()

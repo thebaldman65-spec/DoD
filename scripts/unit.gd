@@ -320,6 +320,10 @@ var bloodrage_step_bonus := 0.0  # Unstoppable: adds to Blood Frenzy's 2%/step
 var frenzy_floor := 0.0  # Blood Frenzy v2: half the peak bonus this battle
                          # (fraction; ratchets up, never resets mid-battle —
                          # units are built fresh each battle)
+var rage_spent := 0      # Blood Frenzy v3 (Batch CZ §1): Rage that has LEFT
+                         # this unit's bar this battle — the second term, and
+                         # the only one he controls. Fresh per battle, like
+                         # `frenzy_floor`, because units are built each battle.
 var scar_tissue_ranks := 0    # Scar Tissue: floor keeps 85% of the peak; 2 =
                               # Unstoppable was taken too, so it keeps 100%
 var scent_ranks := 0          # Scent of Blood: +10% damage per bleedout
@@ -616,6 +620,46 @@ var still_mind_ranks := 0     # no writer: Stabilize leaves extra stacks
 # pattern): the node took on_edge_* for new units, so the rune keeps its old
 # formula on its own field rather than being silently re-tuned by the node's.
 var rune_on_edge_ranks := 0
+
+
+# ---------- BLOOD FRENZY'S BAND (Batch CZ §1) ----------
+#
+# **TWO TERMS, ONE BAND.** `frenzy_bonus()` sums the steps and clamps them here.
+#
+# `FRENZY_MAX_STEPS` IS NOT A NEW CEILING — it is the one the health term
+# already had. `int((1 - hp/max_hp) * 100 / 5)` reaches exactly 20 at zero
+# health, so writing it down changes nothing about a Berserker who has never
+# spent a point of Rage. It exists so the SECOND term cannot deepen the band:
+# CZ §1 is a floor, not a raise, and the difference has to be enforced rather
+# than intended.
+#
+# **`FRENZY_RAGE_PER_STEP` IS FLAGGED, NOT TUNED, AND THE FIGURE IS REPORTED.**
+# The brief asks for a rate that reaches a meaningful share of the band in an
+# average fight — CY measured a fight at 3.5 to 4.5 turns depending on rung —
+# and asks for the number to be stated rather than moved quietly.
+#
+# **FIVE, BECAUSE THE TWO TERMS THEN READ AS ONE SENTENCE.** The health term is
+# one step per 5% of the health bar; a Berserker's Rage maximum is 100, so five
+# Rage IS 5% of the Rage bar. The passive says *+2% per 5% of health missing,
+# +2% per 5% of Rage spent* — the same rate off either bar, which is a rule
+# rather than a tuning constant and survives a retune of both.
+#
+# **WHAT IT MEASURES OUT AT, over four 25-run sims: 37.3 / 39.5 / 47.9 / 57.8
+# Rage spent a battle** at rungs 1 / 2 / 3 / the Sharpshooter party — 7.5 to
+# 11.6 of the 20 steps. **Blood Frenzy's measured peak goes 13.4 -> 20.9 of 40
+# points at rung 2 (33% -> 52% of the band) and 12.1 -> 22.8 at rung 3**, which
+# is the regression CY reported closed and then some. The full before/after is
+# in `docs/reports/CZ.md`; this is the figure to argue with if the rate is
+# wrong.
+#
+# THE ONE CASE WORTH NAMING: RECKLESS ABANDON dumps the whole bar, so a full
+# 100 books all twenty steps at once and the clamp eats any that a wound had
+# already bought. That is the coupling the batch is FOR — his own card feeding
+# his own passive — and it costs a turn and every point of his resource. It
+# cannot take him past a band a dying Berserker already reaches.
+const FRENZY_MAX_STEPS := 20     # the band: 20 steps, +40% at the default 2% step
+const FRENZY_RAGE_PER_STEP := 5  # Rage that must leave the bar to buy one step
+                                 # — 5% of a full bar, the health term's rate
 
 
 # ---------- RUNAWAY RESONANCE (Batch AT) ----------
@@ -1856,8 +1900,15 @@ func refresh_bars() -> void:
 				var keep_pct: int = [50, 85, 100][clampi(scar_tissue_ranks, 0, 2)]
 				s.short = "+%d%% (floor %d%%)" % [int(round(live)),
 					int(round(floor_pct))]
-				s.desc = "Blood Frenzy: +%.1f%% damage per 5%% HP missing.\nCurrently +%.1f%%. The floor — %d%% of the highest\nbonus reached this battle — is +%.1f%%\nand never falls." % [
-					step, live, keep_pct, floor_pct]
+				# BATCH CZ §1 — THE CHIP NAMES BOTH TERMS, because a passive
+				# with a hidden half is a passive the player cannot play
+				# toward. The Rage line reports what he has ALREADY BANKED,
+				# in the band's own units, so "spend Rage to feed the band"
+				# is legible from the bar rather than from the patch notes.
+				s.desc = "Blood Frenzy: +%.1f%% damage per 5%% HP missing,\nand +%.1f%% per %d Rage spent (%d spent = +%.1f%%).\nCurrently +%.1f%%, capped at +%.1f%%. The floor —\n%d%% of the highest bonus reached this battle —\nis +%.1f%% and never falls." % [
+					step, step, FRENZY_RAGE_PER_STEP, rage_spent,
+					frenzy_rage_steps() * step,
+					live, FRENZY_MAX_STEPS * step, keep_pct, floor_pct]
 				_refresh_chips()
 				break
 	# Heavy Plating chip shows the LIVE total Block chance — the whole value
@@ -2383,6 +2434,51 @@ func return_to_idle() -> void:
 
 # ---------- damage / healing ----------
 
+# ================== BATCH CZ §1 — THE SECOND TERM'S LEDGER ==================
+#
+# **RAGE THAT LEFT THE BAR.** One function, called from the three sites that can
+# lower a Rage hero's resource, so there is exactly one answer to "how much has
+# he spent" and a fourth site added later has one obvious place to report to.
+#
+# WHY THIS TERM AND NOT ANOTHER. Blood Frenzy is paid in health MISSING, which
+# inverts it against the whole rest of the game: every improvement to party
+# survivability — better healing, better mitigation, better play — makes the
+# Berserker's own passive weaker. CY measured that happening. Capping buff
+# delays made mitigation cheaper to hold, the Berserker took less damage, and
+# his band got SHALLOWER (12.2 -> 11.8 at rung 2) in a batch aimed at helping
+# him. That will keep happening to every future batch that helps the party.
+# **Rage spent is the only term genuinely under his control**, and his pool
+# already moves Rage constantly — Blood Offering, Reckless Abandon, Unslaked,
+# Boil Over. His own cards start feeding his own passive.
+#
+# IT IS THE **NET** OUT OF THE BAR, NOT THE STICKER COST, and that is what makes
+# it un-farmable: Battle Shout costs 15 and hands back 5, so it books 10. A card
+# that refunded itself entirely would book nothing. Snap Shot and Twin Hunt
+# waive the cost outright and book nothing, which is correct — he committed no
+# Rage. Every one of those cases falls out of measuring the bar rather than
+# reading `ab.cost`, which is the reason it is measured that way.
+#
+# LAST RITES IS COUNTED AND THAT IS A JUDGEMENT CALL, recorded rather than
+# buried. Its Rage leaves the bar to pay for a wound rather than to cast
+# something, so it is not "spent" in the ordinary sense — but it is Rage a
+# talent HE chose converts into survival, it is the one node in the game that
+# already couples his two resources, and excluding it would mean the deeper he
+# invests in the Fury lane the less his own passive notices.
+func note_resource_spent(amount: int) -> void:
+	if amount <= 0 or resource_name != "Rage":
+		return
+	rage_spent += amount
+
+
+# BATCH CZ §1 — THE SECOND TERM ITSELF, in steps of the same band. Its own
+# function so the sim's read-only sampler can call it without touching the
+# ratchet inside `frenzy_bonus()`, which is the property CY's instrument turns
+# on. Returns STEPS, not a fraction — the caller owns what a step is worth,
+# because Unstoppable moves that and this term rides the same step it does.
+func frenzy_rage_steps() -> int:
+	return rage_spent / FRENZY_RAGE_PER_STEP
+
+
 # Applies damage + Pressure. Returns what happened so battle.gd can react.
 # Blood Frenzy v2 (Berserker passive): +step per full 5% of health
 # missing, with a RATCHETING FLOOR — half the highest bonus reached
@@ -2392,7 +2488,16 @@ func return_to_idle() -> void:
 # healed away before his next attack still banks its floor.
 func frenzy_bonus() -> float:
 	var step := (2.0 + bloodrage_step_bonus) / 100.0
-	var current := int((1.0 - hp / float(max_hp)) * 100.0 / 5.0) * step
+	# BATCH CZ §1 — TWO TERMS INTO ONE BAND, AND THE BAND DOES NOT GROW.
+	# The steps are SUMMED and then clamped at `FRENZY_MAX_STEPS`, which is the
+	# twentieth step the health term already tops out at, so the second term can
+	# only ever fill the band SOONER — never make it deeper. That is the whole
+	# shape of the fix: he is being given a FLOOR a well-played party cannot take
+	# away, not a higher ceiling. A Berserker already in the red gets nothing
+	# from it, which is correct — at that point the identity term is paying.
+	var steps: int = int((1.0 - hp / float(max_hp)) * 100.0 / 5.0) \
+		+ frenzy_rage_steps()
+	var current: float = mini(steps, FRENZY_MAX_STEPS) * step
 	# Scar Tissue: the floor keeps 85% of the peak instead of half — or ALL
 	# of it at 2, which is the node plus its cross-row partner Unstoppable
 	# (see the Batch AJ header in talents.gd). At 100% the floor tracks the
@@ -2560,6 +2665,7 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 		if paid > 0:
 			amount -= paid / maxi(last_rites, 1)
 			resource -= paid
+			note_resource_spent(paid)  # BATCH CZ §1 — it left the bar
 			float_text("-%d Rage" % paid, Color(0.9, 0.35, 0.3))
 			_proc_log("Talent: Last Rites — %s pays %d of the wound in Rage" % [
 				unit_name, paid])

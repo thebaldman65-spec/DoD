@@ -5,46 +5,50 @@
 the rules that bind future work belong in `CLAUDE.md`, and what the game currently *is* belongs
 in `docs/master.html`.
 
-*Last rewritten: 2026-08-21 (Batch CY).*
+*Last rewritten: 2026-08-21 (Batch CZ).*
 
 ---
 
 ## WHERE THE PROJECT IS
 
-- **Last batch: CY** — a buff costs half a swing. **`Ability.BUFF_DELAY_CAP := BASIC_DELAY * 0.5`
-  caps a pure buff's initiative delay; 52 abilities are in the population and 51 came down to
-  1.0.** Nothing else about any of them moved. §0 measured the two things the fix is aimed at and
-  §2 reported the fold reaching back into CR without changing anything.
-- **Next letter: CZ.**
+- **Last batch: CZ** — the two ramps that did not arrive, and the enumeration hole.
+  **Blood Frenzy has a second term the Berserker controls (Rage spent, at the health term's own
+  rate); Faith releases at 3 with both builders raised; the six shields take the buff delay cap;
+  `up_speed` is revived from a floor CY's cap had made unreachable; and the ability enumeration is
+  one function that reaches 216.** No save version moves (still v10).
+- **Next letter: DA.** (CZ is the last two-letter code in the C block. **The stamp gate in fourteen
+  suites reads a TWO-LETTER code out of `(Batch XX)` and compares it lexically — `DA` sorts AFTER
+  `CZ`, so the comparison still works, but this is the boundary `CLAUDE.md` warns about: a
+  three-letter code would break `substr(_code_at + 7, 2)` in all fourteen.**)
 - **Phase.** The ability draft is COMPLETE (120 of 120) and all twelve talent trees are
-  purpose-authored, so the content build-out that ran from BO to CI is finished. Recent batches
-  have been correction and consolidation: the skill-check rework (CM/CN/CS), the fold rulings
-  (CQ/CR), the pouch (CT), the talent audit (CU reported, CV applied), the documentation split
-  (CW), the archive cut (CX) and this batch's tempo rule.
-- **The open work is still mostly DESIGN DECISIONS**, and CY added two more to the pile rather
-  than clearing any: the shield ruling and what to do about the two ramps that still do not
-  arrive.
+  purpose-authored. Recent batches are correction and consolidation: the skill-check rework
+  (CM/CN/CS), the fold rulings (CQ/CR), the pouch (CT), the talent audit (CU/CV), the documentation
+  split (CW), the archive cut (CX), the tempo rule (CY) and this batch's two ramp repairs.
+- **The open work is still mostly DESIGN DECISIONS.** CZ cleared three of CY's four (the shields,
+  Blood Frenzy, Faith) and added one small one (Glacial Prison).
 
 ---
 
 ## THE OPEN QUEUE — OWED, AND AWAITING A DECISION
 
-**Named by CY, and both are one-line rulings with the evidence already gathered:**
-- **THE SHIELDS.** `divine_shield`, `magic_barrier`, `mantle`, `interpose`, `mirror_image`,
-  `vespers` — six abilities at 2.0–2.5 initiative that §1 reported and did not touch. **They are
-  adjacent to buffs and arguably the same case.** The criterion that excluded them is mechanical:
-  a shield is a *consumable absorb pool or charge count that eats incoming attacks*. Say yes and
-  they all go to 1.0 in one edit; say no and the criterion is confirmed.
-- **BLOOD FRENZY AND FAITH STILL DO NOT ARRIVE, AND THE CAP WAS NOT ENOUGH.** After the change,
-  peak Faith is **2.1 of the 5** a release needs and peak Frenzy is **11.8 of 40 points** at rung
-  2. **Frenzy went DOWN**, because cheaper mitigation buffs mean the Berserker takes less damage
-  and his band is paid in damage taken. **§3's reserved option — a ramp spec starting a fight with
-  meter on the clock — is the thing this measurement is asking for**, and it was offered to the
-  designer at CY and not taken.
-  - **A judgement call inside §1 that the designer may want to overturn:** the five DEATH-SAVES
-    (Rite of Return, Bloodbond, Intercession, Ashes of Al'ar, Undying Vigil) and the three
-    HEAL-OVER-TIME buffs (Consecration, Aegis Wall, Battle Trance) were ruled buffs and capped. If
-    either group should have gone with the shields, they leave as one group.
+**Named by CZ, and it is one line:**
+- **SHOULD GLACIAL PRISON JOIN `RECAST_GATED`?** It is the one of the five talent-granted abilities
+  that fits CO's refusal criterion: its whole cast-time payload is Chilled plus `_hold_freeze`, and
+  `_hold_freeze` returns immediately on an already-`frozen` target — **so a recast onto a held
+  enemy writes nothing at all.** One entry in one array **plus the matching `_recast_writes`
+  declaration**, which must be right first (CR §3's lesson: a duration declared in the handler and
+  not in the table makes the gate stop refusing). **Reported at CZ, not taken.**
+
+**Carried, and both now have measurements attached that they did not have before:**
+- **THE FAITH BUILDER RATE IS SHIPPED HOT AND THE ALTERNATIVE IS ONE CHARACTER AWAY.** At
+  `FAITH_PER_ABSORB` 3 against a threshold of 3, **one absorbed hit is a whole release** and a
+  shielded ally never holds Faith. Releases went **0.81 → 4.24** a battle at rung 2 and the
+  Devout's total healing roughly **tripled** (69 → 178). `FAITH_PER_ABSORB := 2` measures at 3.2
+  releases and costs 0.3 of the peak. **All four combinations are in `docs/reports/CZ.md`.**
+- **THE FRENZY RATE IS `FRENZY_RAGE_PER_STEP` = 5** and is a rule rather than a constant (five Rage
+  is 5% of a full bar, the health term's own rate). Peak Frenzy went **13.4 → 20.9 of 40** at rung
+  2. **Reckless Abandon dumping a full bar books all twenty steps at once** — named, not discovered
+  later.
 
 **Named by the designer, carried from CX:**
 - **Enemy interference as a status.** Not yet specified.
@@ -72,18 +76,17 @@ in `docs/master.html`.
 - **Browser playtesting with friends.**
 
 **Carried from the code, reported and deliberately not fixed:**
-- **THE BATCH CL ENUMERATION MISSES FIVE ABILITIES AND `check_cn` / `check_co` BOTH WALK IT.** It
-  enumerates kits, class pools and spec pools; **a talent node that GRANTS an ability which is in
-  no pool is invisible to it.** The five are **Backdraft, Pyroblast, Glacial Prison, Cryoclasm and
-  Intercession** — the corpus is **216, not 211**. `check_cy.gd` walks `Talents.LANE_TREES`
-  through `Talents.granted_ability` and sees all 216; **CN's and CO's tables have NOT been
-  re-derived against the larger corpus.** Four of the five are enemy-facing and could not join
-  either table, so the exposure is small — but it is unmeasured.
-- **`up_speed` IS A DEAD PICK ON ALL 52 PURE BUFFS.** `run_state._stamp_upgrade` reads
-  `ab.delay = maxf(ab.delay * 0.75, 1.0)` and that floor is a **literal 1.0**, which is now exactly
-  the cap. The upgrade was live on every one of them yesterday. Reported at CY, unchanged. **The
-  floor being a literal rather than `Ability.BUFF_DELAY_CAP` is the thing to look at when either
-  number is next touched.**
+- **`check_cu` AND `check_cv` ARE NOT IN `run_battery.sh`'s `GATES` ARRAY.** CY's report lists both
+  among the nine gates it ran and the battery runs neither — they are hand-run or not run. Both
+  were hand-run at CZ (0 failures each). **They are audit REPORTS rather than pass/fail gates**, so
+  what a failure means there is a decision rather than a detail.
+- **CY's PRINTED AFTER-FIGURES DO NOT REPRODUCE, AND NOTHING IS WRONG.** Re-measured on unmodified
+  HEAD at the same settings, the same instrument reads Frenzy **6.2 / 13.4 / 12.1 / 13.9** against
+  CY's **7.4 / 11.8 / 12.7 / 12.7**, and Faith **1.9 / 2.3 / 2.4 / 2.8** against **1.9 / 2.1 / 2.1
+  / 2.8**. That is n=25 noise on an unseeded sim — roughly **±1.5 points of band and ±0.2 of a
+  Faith stack**. **The 12.2 → 11.8 "regression" that motivated CZ §1 is smaller than the
+  instrument's own error bar; the inversion it revealed is real and structural, but the number was
+  not the evidence.** Quote no figure from this instrument without that band attached.
 - **The code identifiers still reading "beast".** The PROSE was renamed; the fields were not, on
   purpose — a missed rename in prose is a typo, a missed rename in a field is a bug, so the two
   want separate passes with separate tests. **`beastmaster` / `Beastmaster` / `BEASTMASTER` are
@@ -104,15 +107,25 @@ in `docs/master.html`.
 
 ## LIVE COUNTS AND CONSTANTS WORTH HAVING AT HAND
 
-*Re-derive these before quoting them in a brief; they move. CY re-derived every figure below.*
+*Re-derive these before quoting them in a brief; they move. CZ re-derived every figure below.*
 
-- **A PURE BUFF COSTS HALF A SWING.** `Ability.BASIC_DELAY` = **2.0** (the one authored copy in the
-  project; `battle.BASIC_DELAY` is an alias) and `Ability.BUFF_DELAY_CAP` = **`BASIC_DELAY * 0.5`**
-  = 1.0 today. **`Ability.PURE_BUFFS` holds 52 specials**; the clamp is applied in `Ability.make()`
-  and the 52 authored definitions are written as `Ability.BUFF_DELAY_CAP`, so the two cannot
-  disagree. **Feigned Guard was already at the cap and is the only member that did not move.**
-- **THE ABILITY CORPUS IS 216, NOT 211.** The CL enumeration reaches 211; the five it misses are
-  listed under the open queue.
+- **THE TEMPO LADDER HAS THREE RUNGS AND EACH IS WRITTEN AGAINST THE ONE ABOVE.**
+  `Ability.BASIC_DELAY` = **2.0** (the one authored copy in the project; `battle.BASIC_DELAY` is an
+  alias) → `Ability.BUFF_DELAY_CAP` = `BASIC_DELAY * 0.5` = **1.0** → `Ability.DELAY_FLOOR` =
+  `BUFF_DELAY_CAP * 0.5` = **0.5**, the cheapest an ability UPGRADE can buy.
+- **THE CAP BINDS 58 ABILITIES IN TWO POPULATIONS.** `Ability.PURE_BUFFS` holds **52** specials
+  (CY's, unchanged) and `Ability.SHIELD_SPECIALS` holds **6** (CZ's). **`Ability.takes_delay_cap()`
+  is the one function that unions them** and `Ability.make()` applies the clamp; the 58 authored
+  definitions are written as `Ability.BUFF_DELAY_CAP`, so data and clamp cannot disagree.
+- **THE ABILITY CORPUS IS 216, AND `Classes.ability_corpus()` IS THE ONLY WALK THAT REACHES IT.**
+  The Batch CL enumeration alone reaches **211**; the five it misses (Backdraft, Pyroblast, Glacial
+  Prison, Cryoclasm, Intercession) are talent grants that live in no pool. **22 talent-granted
+  names in total**, all resolving.
+- **BLOOD FRENZY: TWO TERMS, ONE BAND.** `BattleUnit.FRENZY_MAX_STEPS` = **20** (the ceiling the
+  health term already had) and `FRENZY_RAGE_PER_STEP` = **5**. Steps are summed then clamped.
+- **FAITH: `battle.FAITH_RELEASE` = 3**, `FAITH_PER_ABSORB` = **3**, `FAITH_PER_GROUND_TURN` =
+  **2**. `JUBILEE_MIN_FAITH` is still **3**, which is now the WHOLE bar. `ELEVATION_STACKS` is
+  still **2**, which is now **67% of a release**.
 - **The ability draft is COMPLETE at 120 of 120** — `SPEC_DRAFT_POOLS` is **96** (12 specs × 8)
   and `CLASS_DRAFT_POOLS` is **24** (4 classes × 6).
 - **Ability slot cap: 7** (`ABILITY_SLOT_CAP`), with twelve protected cores.
@@ -130,37 +143,50 @@ in `docs/master.html`.
   per batch), plus `test_run_harness`, `test_runes` and `test_rune_battle`. **They live at the
   repo ROOT, not in `scripts/`.**
 - **`run_battery.sh` runs 45 suites and MISSES ONE: `test_batch_cp` is not in its `SUITES`
-  array.** Its `GATES` array is now **twelve** — `check_cy` was added this batch.
+  array.** Its `GATES` array is now **thirteen** — `check_cz` was added this batch.
 - **The master.html stamp gate is duplicated across 14 suites** (ah, bb, bn, bo, bp, bq, br, bs,
   bt, bu, bv, bw, bx, ce), all on the self-comparing pattern — no bump is owed on a re-stamp.
 - **Run harness gate counts: 22 / 165 / 8.**
-- **master.html stamp: `Last updated: 2026-08-21 (Batch CY)`.**
+- **master.html stamp: `Last updated: 2026-08-21 (Batch CZ)`.**
 
-### HOW LONG A FIGHT IS — THE NUMBER NOTHING IN THE PROJECT HELD UNTIL CY
+### HOW LONG A FIGHT IS
 - **Rounds to resolution, measured as TURNS PER LIVING PARTY MEMBER** (companions excluded from
-  both halves), over four `--run 25` sims:
+  both halves), over four `--run 25` sims, **after CZ**:
 
-  | rung | trash | elite | boss |
+  | party / rung | trash | elite | boss |
   |---|---|---|---|
-  | 1 wanderer | 3.5 | 3.0 | 3.8 |
-  | 2 warden | 3.8 | 3.3 | 4.3 |
-  | 3 ruin | 4.1 | 3.6 | 4.5 |
+  | 1 wanderer | 3.9 | 3.5 | 3.9 |
+  | 2 warden | 4.3 | 3.7 | 4.9 |
+  | 3 ruin | 4.9 | 4.5 | 4.7 |
+  | 2 warden, Sharpshooter | 5.8 | 5.0 | 6.5 |
 
-  **A fight is three to five turns per hero, and ELITE FIGHTS ARE THE SHORTEST OF THE THREE KINDS
-  AT EVERY RUNG.** After the cap the same measurement reads 4.4 / 3.4 / 4.1 at rung 2 — **cheaper
-  buffs made fights LONGER, not shorter.**
+  **A fight is still three to six turns per hero, and elite fights are the shortest of the three
+  kinds at every rung.** Fights got slightly longer again for CY's reason — a party that survives
+  takes more turns.
 - **THE SIM'S OWN `Avg rounds/battle` LINE DIVIDES BY THREE AND THE PARTY IS FOUR.** It has been
   reading a third high since the class draft. `cy_report_line` is the one to read instead.
-- **Ramp arrival, per-battle peak against what the spec is built around** (rung 2, before → after
-  the cap): **Blood Frenzy 12.2 → 11.8 of 40 points**; **Faith 1.6 → 2.1 of 5**; **Loyalty
-  20.0 → 20.4 of 5**; **Focus 131.3 → 139.4 of 100** (Sharpshooter party). **Loyalty and Focus
-  over-arrive; Frenzy and Faith do not arrive, and Frenzy moved the wrong way.**
+- **RAMP ARRIVAL, per-battle peak against what the spec is built around (before → after CZ):**
+
+  | spec | meter | rung 1 | rung 2 | rung 3 | SS party |
+  |---|---|---|---|---|---|
+  | Berserker | Blood Frenzy (of 40) | 6.2 → **17.4** | 13.4 → **20.9** | 12.1 → **22.8** | 13.9 → **26.2** |
+  | Devout | Faith (of 5 → of 3) | 1.9 → **2.5** | 2.3 → **2.4** | 2.4 → **2.4** | 2.8 → **2.5** |
+  | Devout | releases/battle | 0.51 → **3.83** | 0.81 → **4.24** | 0.75 → **5.28** | 1.49 → **6.39** |
+  | Beastmaster | Loyalty (of 5) | 19.3 → 19.0 | 23.0 → 21.2 | 20.3 → 20.6 | — |
+  | Sharpshooter | Focus (of 100) | — | — | — | 131.1 → 130.9 |
+
+  **Frenzy 33% → 52% of its band at rung 2; Faith 46% → 81% of its (new, lower) threshold.**
+  **Loyalty and Focus still over-arrive and were not touched.**
+- **RAGE SPENT PER BATTLE (the figure the Frenzy rate is set against): 37.3 / 39.5 / 47.9 / 57.8**
+  at rungs 1/2/3 and the Sharpshooter party — **7.5 to 11.6 of the 20 steps.**
 - **CONFOUNDER ON EVERY FIGURE ABOVE: the sim party is FULLY TALENTED (`rows=9 of 9`)**, which is
-  stronger than a real player at zone 1. The rung-1 row is the closest thing to an under-equipped
-  party and it is the SHORTEST fight in the table.
+  stronger than a real player at zone 1.
+- **AND THE INSTRUMENT'S OWN CAVEAT: the `conviction` row samples the DEVOUT'S OWN meter, which
+  HOLDS at the threshold and never releases by rule.** It has never measured release frequency —
+  `releases/battle` in the Faith decomposition is the row that does.
 
 ### The changelog
-- **The live file starts at Batch CO and holds 11 entries** (CO → CY), **176.4 KB**. The 400 KB
+- **The live file starts at Batch CO and holds 12 entries** (CO → CZ), **192.7 KB**. The 400 KB
   threshold is a long way off.
 - **`DoD-archive/changelog-archive.html` holds 131 entries** (BP → CN) and is **1042.0 KB**.
 - **Fourteen suites depend on a file that is not in version control** — bp, bq, br, bs, bt, bu,
@@ -170,20 +196,20 @@ in `docs/master.html`.
 ### Knowledge sync, measured at CY
 *Measured over `.gd .md .html .json .py .sh`, excluding `assets/`, `.git/` and `.godot/`.
 **Treat the file COUNT as method-dependent** — CW's filter counted 126 and CX's 108.*
-- **111 files, 5.26 MB.**
-- Heaviest: `scripts/battle.gd` **1137.0 KB**, `docs/master.html` **318.8 KB**,
-  `docs/design-notes.md` **279.1 KB**, `scripts/classes.gd` **270.2 KB**,
-  `scripts/talents.gd` **180.9 KB**, `docs/changelog.html` **176.4 KB**, `CLAUDE.md` **150.3 KB**.
+- **111 files, 5.26 MB** at CY; CZ adds `check_cz.gd` and `docs/reports/CZ.md`.
+- Heaviest: `scripts/battle.gd` **~1140 KB**, `docs/master.html` **~320 KB**,
+  `docs/design-notes.md` **~290 KB**, `scripts/classes.gd` **~271 KB**,
+  `scripts/talents.gd` **~181 KB**, `docs/changelog.html` **192.7 KB**, `CLAUDE.md` **158.7 KB**.
 - **The 47 suite files total ~1,800 KB**, still the single largest block. **They cannot be
   archived (they must be in the repo to run) but they CAN be deselected from the sync.**
-- **`scripts/` is ~2,219 KB across 28 files and contains ZERO test suites.** All game code.
+- **`scripts/` contains ZERO test suites.** All game code.
 
 ---
 
 ## KNOWN-BROKEN AND DELIBERATELY UNFIXED
 
 - **CW'S `CLAUDE.md` SPLIT LEFT ELEVEN RED ASSERTIONS ACROSS EIGHT SUITES, AND CX FOUND THEM BY
-  RUNNING THEM. THEY ARE STILL RED — CY DID NOT RUN THE SUITES.** CW dropped every batch
+  RUNNING THEM. THEY ARE STILL RED — NEITHER CY NOR CZ RAN THE SUITES.** CW dropped every batch
   narrative; seven suites assert against text that went with it. **None is a changelog check.** Not
   repaired, because what those assertions should ask INSTEAD is a decision:
   - `test_batch_bb` — `BATCH BB`, `rot_hp_lost`
@@ -199,9 +225,13 @@ in `docs/master.html`.
   - **AND TWO THAT PASS BY ACCIDENT, WHICH IS WORSE.** `contains("BATCH BN")` and
     `contains("BATCH BS")` still match — a passing mention inside two surviving rules, not a batch
     block. **A check that has stopped asking its question, with no red to announce it.**
-- **CY MOVED 52 ABILITY DELAYS AND NO SUITE HAS BEEN RUN AGAINST THEM.** Any suite that asserts a
-  delay literal, a timeline position or a battle outcome for one of the 52 may be red and nobody
-  knows. **The next dedicated test batch owes a full battery for this reason as well as CW's.**
+- **CY MOVED 52 ABILITY DELAYS AND CZ MOVED SIX MORE, AND NO SUITE HAS BEEN RUN AGAINST ANY OF
+  THEM.** Any suite asserting a delay literal, a timeline position or a battle outcome for one of
+  the 58 may be red and nobody knows.
+- **CZ MOVED THE FAITH RELEASE THRESHOLD FROM 5 TO 3 AND BOTH BUILDER RATES, AND NO SUITE HAS BEEN
+  RUN AGAINST THAT EITHER.** `test_batch_bi`, `test_batch_bf`, `test_batch_be` and `test_batch_av`
+  all drive Faith; **any of them that walks a meter to five or asserts a release count is a
+  candidate.** The next test batch owes this list a pass before anything else.
 - **`data/glossary.json` still reads "beast" once in prose** — "pay the four and not the beast",
   inside CV's own hero/ally entry. `test_batch_bx` §4 catches it. It belongs to the prose rename
   pass.
@@ -224,20 +254,25 @@ in `docs/master.html`.
 
 ### Last measurements
 
-**CY RAN NINE GATES AND EIGHT COMPLETE RUNS OF THE GAME. ZERO GATE FAILURES, ZERO THROWS.**
-`check_parse` 0, `check_cn` 0, `check_co` 0, `check_cs` 104/0, `check_ct` 113/0, `check_cu` 0,
-`check_cv` 0 (324 nodes), `check_flow` 0, **`check_cy` 0** (52 pure buffs, 104 live casts across
-two fixtures).
+**CZ RAN ELEVEN GATES AND EIGHT COMPLETE RUNS OF THE GAME. ZERO GATE FAILURES, ZERO THROWS.**
+`check_parse` 0 (stderr grepped for `Parse Error`, never the tally), `check_cm` 0, `check_cn` 0,
+`check_co` 0, `check_cs` 104/0, `check_ct` 113/0, `check_cu` 0, `check_cv` 0 (324 nodes),
+`check_cy` 0, **`check_cz` 0**, `check_flow` 0. `check_cl_width` (a report, not a gate): 216
+abilities, 8 description lines over the 44-character ceiling — **unchanged, and all five of the
+newly-reached talent-granted abilities are clean.**
 
 **The eight runs are four before the change and four after** — 25 runs each, three difficulty
-rungs, ~2,300 battles a pass. **Completions before → after: rung 1 100→100%, rung 2 52→84%, rung 3
-12→36%, Sharpshooter party 48→52%. Depth reached: 46.32→46.80, 33.16→39.88, 41.12→42.60.** Depth
-rose in all three measurable arms; **only rung 3's move is bigger than the combined standard
-error**, and completions are the noisy secondary the harness says never to quote alone.
+rungs, ~2,500 battles a pass. **Completions before → after: rung 1 100→100%, rung 2 60→72%, rung 3
+44→52%, Sharpshooter party 68→72%. Depth reached: 48.00→48.00, 45.64→46.56, 43.04→42.84,
+44.68→47.04.** **Only the Sharpshooter arm's move is bigger than the combined standard error**, and
+completions are the noisy secondary the harness says never to quote alone. **The honest summary is
+that the batch did not make the game measurably harder or easier**, which is the right outcome for
+a change aimed at two specs rather than at difficulty.
 
-**NO SUITE AND NO FULL BATTERY HAS BEEN RUN SINCE CS.** CT, CU, CV, CW, CX and CY were all
+**NO SUITE AND NO FULL BATTERY HAS BEEN RUN SINCE CS.** CT, CU, CV, CW, CX, CY and CZ were all
 implement-only under the standing convention; **the next dedicated test batch owes one**, against
-a `CLAUDE.md` that ten assertions no longer match AND 52 abilities whose initiative cost moved.
+a `CLAUDE.md` that ten assertions no longer match, 58 abilities whose initiative cost moved, and a
+Faith threshold that several suites may quote.
 
 **Full-battery baseline, at CS: 45 suites, zero throws, zero failures.** Counts:
 ah 5625, ah_battle 65, ai 2217, aj 418, ak 528, al 560, **an 6052**, ar 735, as 396, at 470,

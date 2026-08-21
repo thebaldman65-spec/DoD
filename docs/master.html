@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-08-21 (Batch CY)</b></p>
+<p align="right"><b>Last updated: 2026-08-21 (Batch CZ)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -367,7 +367,12 @@ There is no Party button and no separate Party screen.</li>
 <h3>4.1 Initiative timeline</h3>
 <p>Every unit sits on a shared timeline. After acting, a unit's next turn arrives after
 <b>delay × 100 / effective speed</b> time units (delay is the ability's initiative cost,
-listed in every tooltip; basic actions are 2.0, heavy abilities up to 6.0). Speed 100 is
+listed in every tooltip; basic actions are 2.0, heavy abilities up to 6.0). <b>SETUP IS
+CAPPED AT HALF A SWING — 1.0.</b> A pure buff or a shield costs no more than that, however
+it is authored, because <b>a shield and a buff are both played BEFORE the blow</b>. <b>A HEAL
+IS NOT SETUP AND KEEPS ITS FULL PRICE</b>: it answers what has already landed, so the turn it
+costs has been earned by the thing it answers. <b>The floor beneath all of it is 0.5</b>, half
+the setup cap again, and it is the cheapest an ability upgrade can buy. Speed 100 is
 average. <b>Effective speed is what the timeline reads, everywhere</b> — the opening roll
 that seeds the first turn order as well as every reschedule after it — so every modifier to
 speed genuinely bends the clock. Slow reduces it to 75%; Chilled to 75% at one stack and 50%
@@ -595,7 +600,7 @@ Resonance builds
 only on the Mage's own casts — parry counters do not grant stacks.</li>
 <li><b>Attacker modifiers:</b> Resonance +1.5% × N(N+1)/2 at N stacks (a COMPOUNDING
 curve, not a per-stack slope — see §5.1); Surge +20%; Empower +25%; Cripple −25%; Hexed −15%;
-Blood Frenzy up to +40% as HP falls; Seasoned Fighter +15% above half HP; relic bonuses
+Blood Frenzy up to +40%, built from HP missing AND Rage spent; Seasoned Fighter +15% above half HP; relic bonuses
 (global +10% dragonbone; fire/holy +20% emberheart); Powershot +2% per 1% of the target's
 EMPTY Break bar; Overpower +0.5 per point of target Break; Volatility +30% on Arcane
 Cannon; Fireball perfects at 25% of Attack. <b>Neither Arcane Cannon nor Magi's Wrath
@@ -756,8 +761,8 @@ Block; a block it buys is logged as "(Bulwark Line)".</td></tr>
 health, snapshotted (and Mercy-scaled) when cast.</td></tr>
 <tr><td>Hallowed</td><td>Immune to new debuffs (Empowered Divine Plea, 3
 turns).</td></tr>
-<tr><td>Faith</td><td>Conviction (Devout passive): Divine Shield absorbs (2 a hit) AND
-standing on Consecrated Ground (1 an ally a turn) build stacks, max 5.
+<tr><td>Faith</td><td>Conviction (Devout passive): Divine Shield absorbs (3 a hit) AND
+standing on Consecrated Ground (2 an ally a turn) build stacks, max 3.
 <b>WHAT A STACK PAYS IS READ OFF THE HIGHEST COUNT THE CARRIER HAS HELD THIS BATTLE, NOT
 THE COUNT HELD RIGHT NOW</b> — 2% damage mitigation and +1.5% damage dealt per PEAK stack.
 The Apostle capstone adds another 1× and Fervor another again while the carrier stands on
@@ -766,7 +771,7 @@ base rather than multiplying each other</b>. At 5 the bearer heals 15% max healt
 COUNT resets — <b>the peak does not, so a release never takes the held benefit away</b> —
 the Devout recovers 3% max Mana, and the Devout's own maximum health rises 3% of his base
 for the rest of the battle (he is healed for that amount too).
-<b>The Devout carries Faith of his own, and his count never releases</b> — it holds at 5,
+<b>The Devout carries Faith of his own, and his count never releases</b> — it holds at 3,
 paying him the same mitigation and damage it pays everyone else. The chip counts current
 stacks ("F3") and states the peak beside them; it stays up at F0 after a release, because
 the peak is still paying. The peak is per-battle and is zeroed when the next fight
@@ -1084,8 +1089,10 @@ second upgrade on the same ability is worth taking:</p>
 <td>it has a cooldown</td></tr>
 <tr><td><b>Effortless</b></td><td>Costs no Rage / Mana / Focus. <b>Mercy is unaffected</b>,
 so a free Resurrection is not on the table.</td><td>it has a resource cost</td></tr>
-<tr><td><b>Swift</b></td><td>Arrives 25% sooner, never below 1.0 initiative delay.</td>
-<td>always — everything has an initiative delay</td></tr>
+<tr><td><b>Swift</b></td><td>Arrives 25% sooner, never below <b>0.5</b> initiative delay —
+half the setup cap, which is itself half a basic swing.</td>
+<td>anything not already sitting at that floor. Nothing in the game does today: the
+cheapest cards are setup at 1.0, so Swift takes them to 0.75</td></tr>
 <tr><td><b>Weighted</b></td><td>Break damage doubled.</td><td>it deals Break damage</td></tr>
 <tr><td><b>Widened</b></td><td>Strikes one additional target, or lands one additional hit.</td>
 <td>it strikes several random enemies, or the same enemy several times. <b>Not</b> an area
@@ -1235,7 +1242,7 @@ a real answer — those specs' opening abilities are protected because they ship
 not because the passive needs them.</p>
 <table border="1" cellpadding="4">
 <tr><th>Spec</th><th>Slots</th><th>Its passive needs</th><th>Why</th></tr>
-<tr><td><b>Berserker</b></td><td>3</td><td>—</td><td>Blood Frenzy reads his own health bar and nothing else.</td></tr>
+<tr><td><b>Berserker</b></td><td>3</td><td>—</td><td>Blood Frenzy reads his own health bar and his own Rage spent, and no ability.</td></tr>
 <tr><td><b>Warden</b></td><td>3</td><td>—</td><td>Heavy Plating is a Block-chance rule; it reads no ability.</td></tr>
 <tr><td><b>Swordmaster</b></td><td>3</td><td>Guard Change</td><td>Seasoned Fighter is two stances, and Guard Change is the only stance swap in the game.</td></tr>
 <tr><td><b>Pyromancer</b></td><td>3</td><td>Fireball, Detonation</td><td>Overburn needs a Burn applier to build the field and a spender to empty it.</td></tr>
@@ -1370,16 +1377,16 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Reprisal</b></td><td>25 Mana, 2.5, 3cd, one enemy, 6 BD</td><td>Holy damage equal to <b>50% of the healing she has LANDED in the last two turns</b> (Perfect: 75%). <b>Overhealing is not healing</b> — only what actually closed a wound counts. Offered only once she has healed something.</td><td>Her healing becomes a weapon — her only offence, and the answer to the turn where nobody is hurt.<br><b>Builds with:</b> everything that raises her throughput. <b>Triage</b>, <b>Heavenly Aura</b>, <b>Sanctum</b> and <b>Radiant Cascade</b> all feed the same two-turn window this reads, which is what makes it the Radiance lane's payoff card.</td></tr>
 <tr><td><b>Divine Presence</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 4 turns she gains <b>2 Mercy at the start of every SECOND turn of hers on which no ally fell below the window</b> — so it fires twice, for 4 Mercy. A fall pays the passive instead and breaks that watch — and only that one. Two stacks arriving together <b>can cross the cap from below</b>, and the spare one spills into <b>Alms</b>.</td><td>Mercy on her own terms. Her meter is fuelled by the party being hurt, so she can play perfectly and be starved; this pays her on exactly the turns the passive did not. <b>The two sources are mutually exclusive by construction</b>, which is why it can never simply be better than waiting.<br><b>Builds with:</b> <b>Heavenly Aura</b> (+12% healing per stack HELD), which turns a quiet fight into a throughput fight; <b>Ardor</b>, which stops Empower consuming a stack at 3+, and three quiet turns is what switches it on; <b>Martyr's Vigor</b> raises the ceiling it climbs toward. Beside <b>Alms</b> it is the whole answer to the meter's two edges — and the first pair of her own draft cards that feed each other.</td></tr>
 <tr><td><b>Alms</b></td><td>20 Mana, 1.0, 4cd, self</td><td>For 4 turns, <b>every stack of Mercy earned while she is at the CAP wards the ally who earned it instead of being lost</b>, absorbing 12% of her maximum health.</td><td>The sixth stack goes somewhere. A bad fight over-earns the meter and the excess is simply gone.<br><b>Builds with:</b> <b>Grace</b> above all — that talent turns the same wasted stack into <i>healing</i>, and the two STACK on one spill: one pays health a full bar discards, the other a barrier a full bar keeps. <b>Blessed Vestments</b> wards on every heal she lands, so a party holding both wears two layers. Deliberate <b>anti-synergy with Martyr's Vigor</b>, which raises the cap and so makes the spill rarer.</td></tr>
-<tr><td><b>Vespers</b></td><td>25 Mana, 2.0, 4cd, one ally</td><td>For 4 turns, <b>or until it fires</b>: the next blow that would take that ally <b>below half health</b> is absorbed for <b>20% of the Holy Cleric's maximum health</b>. A blow bigger than the ward still crosses. <b>If the ally does not cross, she earns no Mercy for a crossing that never happened.</b></td><td>The crossing itself. Her engine is fuelled by allies falling below the window and every other card of hers is about what to do once one has; this is the one that <b>refuses the fall</b> — and the only place in her pool where helping an ally starves her own engine.<br><b>Builds with:</b> <b>Guardian Angel</b>, which widens the very window it watches (the ward reads the Mercy line, not a fixed half); <b>Intercession</b> and <b>Martyrdom</b>, which answer the LETHAL blow where this answers the one before it. The deliberate <b>anti-synergy</b> is with her own engine — with <b>Alms</b> and with <b>Divine Presence</b>'s overflow, both of which want the crossings this refuses.</td></tr>
+<tr><td><b>Vespers</b></td><td>25 Mana, 1.0, 4cd, one ally</td><td>For 4 turns, <b>or until it fires</b>: the next blow that would take that ally <b>below half health</b> is absorbed for <b>20% of the Holy Cleric's maximum health</b>. A blow bigger than the ward still crosses. <b>If the ally does not cross, she earns no Mercy for a crossing that never happened.</b></td><td>The crossing itself. Her engine is fuelled by allies falling below the window and every other card of hers is about what to do once one has; this is the one that <b>refuses the fall</b> — and the only place in her pool where helping an ally starves her own engine.<br><b>Builds with:</b> <b>Guardian Angel</b>, which widens the very window it watches (the ward reads the Mercy line, not a fixed half); <b>Intercession</b> and <b>Martyrdom</b>, which answer the LETHAL blow where this answers the one before it. The deliberate <b>anti-synergy</b> is with her own engine — with <b>Alms</b> and with <b>Divine Presence</b>'s overflow, both of which want the crossings this refuses.</td></tr>
 <tr><td colspan="4"><b>Devout</b> — <i>what else can he lend</i></td></tr>
 <tr><td><b>Vow of Suffering</b></td><td>20 Mana, 1.0, 3cd, one ally</td><td>For 4 turns, half the damage that ally takes is redirected to the Devout — and every share he eats kindles that ally 1 Faith.</td><td>Mitigation by relocation. Divine Shield absorbs a capped amount; this has no cap.</td></tr>
 <tr><td><b>Aegis Reversal</b></td><td>30 Mana, 2.5, 4cd, one ally</td><td>Consumes that ally's Divine Shield; their next attack deals bonus damage worth half again whatever the shield had left.</td><td>Unspent protection becomes offence — and it is the Devout dealing damage without attacking.</td></tr>
-<tr><td><b>Ordination</b></td><td>25 Mana, 2.0, 4cd</td><td>Grants <b>4 Faith</b> to the ally holding the <b>LEAST</b> Faith. Not player-chosen: it always finds the floor.</td><td>Starting the engine without waiting to be hit. Every other Faith source he owns is reactive (an absorb) or slow (the ground's drip).<br><b>Why the floor:</b> Faith caps at five, so three granted to an ally already on four throws two away — and it points the card at the ally <b>Communion cannot reach</b>, since that roll is 15% × their <i>own</i> stacks and an ally on zero is never rolled for.<br><b>Builds with:</b> <b>Blessed are the Faithful</b> (the release it walks them toward heals 35% of their maximum), <b>Communion</b>, <b>Binding Oath</b> (an ally's release swears him a stack of his own) and <b>Reliquary</b> below, which cashes the peaks this raises.</td></tr>
+<tr><td><b>Ordination</b></td><td>25 Mana, 2.0, 4cd</td><td>Grants <b>4 Faith</b> to the ally holding the <b>LEAST</b> Faith. Not player-chosen: it always finds the floor.</td><td>Starting the engine without waiting to be hit. Every other Faith source he owns is reactive (an absorb) or slow (the ground's drip).<br><b>Why the floor:</b> it points the card at the ally <b>Communion cannot reach</b>, since that roll scales with their <i>own</i> stacks and an ally on zero is never rolled for. <b>The grant is larger than the release threshold</b>, so it always carries its target over the line and heals them; the remainder is spent rather than banked, which is the price of a card that never has to be aimed.<br><b>Builds with:</b> <b>Blessed are the Faithful</b> (the release it walks them toward heals 35% of their maximum), <b>Communion</b>, <b>Binding Oath</b> (an ally's release swears him a stack of his own) and <b>Reliquary</b> below, which cashes the peaks this raises.</td></tr>
 <tr><td><b>Fortified Spirit</b></td><td>25 Mana, 2.0, 4cd, one ally</td><td>That ally's <b>maximum health rises by 30% of the Devout's</b> and they are healed for the same amount (Perfect: 40%). The loan then <b>decays by a tenth of his maximum at the start of each of their turns</b> — 30 → 20 → 10 → gone. <b>Current health clamps under it</b>, so an ally kept topped up loses real health on the way down while one sitting at half never notices.</td><td>Lending the number his whole kit is built on. Divine Shield absorbs 30% of his maximum, Afterglow heals 20% of it, Healing Pulse ticks 8% of it — this is the first thing that lends the <i>figure itself</i>, and it stacks with a shield rather than duplicating one: a shield is a bucket that empties, this is a bigger bucket.<br><b>Builds with:</b> <b>Unwavering Faith</b> (+20% his maximum) enlarges every point of it, and it rewards healing them <i>inside</i> the window — <b>Healing Pulse</b> and <b>Consecrated Ground</b> both tick a share in before it closes.</td></tr>
 <tr><td><b>Reliquary</b></td><td>30 Mana, 2.5, 5cd, all allies</td><td>Every ally is healed for <b>2.5% of the Devout's maximum health per point of their PEAK Faith</b> this battle (Perfect: 3.5%). The peak never falls, so <b>an ally who released down to zero is still paid in full</b> for what they carried.</td><td>Cashing an accumulation nothing else reads. It grows all fight and pays most to whoever has <i>carried</i> the most faith — investment collecting on its own record.<br><b>Builds with:</b> <b>Unwavering Faith</b> and Conviction's own growth enlarge every point; <b>Ordination</b> above raises the very peaks it reads.</td></tr>
 <tr><td><b>Elevation</b></td><td>35 Mana, 2.5, 5cd, all allies</td><td><b>Every ally gains 2 stacks of Faith</b>, visible on the bar. <b>An ally already holding 3 or more reaches the cap of 5 and RELEASES</b> — healed 15% of their maximum, the count reset, the Devout paid 3% of his Mana. Their <b>peak is untouched by the release</b>, so it costs them nothing they were holding.</td><td>Both of his builders are slow drips — 2 a shielded hit, 1 an ally turn on the ground — and nothing in the game let him hand a stack over. This is a whole party's worth at once.<br><b>Builds with:</b> <b>Apostle</b> and <b>Fervor</b>, multipliers on the held half; <b>Reliquary</b> reads the peaks these stacks ratchet on their way up; <b>Unwavering Faith</b> enlarges the figure both are shares of; and <b>Binding Oath</b> swears him a stack of his own on every release this triggers, so a party sitting at three turns one cast into four payouts.</td></tr>
-<tr><td><b>Blessing of the Faithful</b></td><td>20 Mana, 2.0, 4cd, self</td><td>Spends <b>ALL of his own Faith</b> for <b>6% of his maximum health and 3% of maximum Mana per stack</b> (Perfect: 8%). <b>Needs 3 held.</b> His <b>PEAK DROPS TO MATCH</b>: the mitigation and damage those stacks were buying for the rest of the fight are spent with them.</td><td>The payout that does not exist for him. An ally's fifth stack heals them and hands him Mana; his own count holds at five and never releases, so his Faith pools. This is what finally spends it — <b>burst sustain bought with permanent mitigation</b>, rather than a payout that costs nothing.<br><b>It is not a release and must never become one</b> — no principal growth, no Communion, no Binding Oath.<br><b>Builds with:</b> <b>Binding Oath</b> (an ally's release swears him a stack, so a releasing party rebuilds both the count and the peak this spends), <b>Consecrated Ground</b>'s drip onto its own caster, and <b>Unwavering Faith</b>, which makes every point of the heal larger.</td></tr>
-<tr><td><b>Mantle</b></td><td>25 Mana, 2.5, 4cd, one ally</td><td>A <b>Divine Shield worth 25% of his maximum health</b> — and when it <b>breaks</b> it <b>passes to the ally on the lowest health</b>, three times. It never passes back to the body it just left. <b>Every hop is a real Divine Shield</b>, so every one of them builds Faith.</td><td>The absorb is the dry source of his whole engine — Conviction builds only on Divine Shield absorbs, and those were measured at 1.5 a battle. A shield that becomes three shields is three times the trigger.<br><b>Builds with:</b> every Divine Shield rider, because each hop is one — <b>Blessed Barrier</b>, <b>Afterglow</b>, <b>Warded Robes</b>, <b>Sacred Covenant</b>. <b>Blessing of Zeal</b> doubles the Faith every absorb pays. Deliberate <b>anti-synergy with Unyielding Aegis</b>: a re-formed shield has not broken, so it does not pass.</td></tr>
+<tr><td><b>Blessing of the Faithful</b></td><td>20 Mana, 2.0, 4cd, self</td><td>Spends <b>ALL of his own Faith</b> for <b>6% of his maximum health and 3% of maximum Mana per stack</b> (Perfect: 8%). <b>Needs 3 held.</b> His <b>PEAK DROPS TO MATCH</b>: the mitigation and damage those stacks were buying for the rest of the fight are spent with them.</td><td>The payout that does not exist for him. An ally reaching the threshold is healed and hands him Mana; his own count holds there and never releases, so his Faith pools. <b>Needing 3 held is now the WHOLE bar</b>, so the card is castable exactly when his meter is full — and only by him, since an ally reaching 3 releases on the spot. This is what finally spends it — <b>burst sustain bought with permanent mitigation</b>, rather than a payout that costs nothing.<br><b>It is not a release and must never become one</b> — no principal growth, no Communion, no Binding Oath.<br><b>Builds with:</b> <b>Binding Oath</b> (an ally's release swears him a stack, so a releasing party rebuilds both the count and the peak this spends), <b>Consecrated Ground</b>'s drip onto its own caster, and <b>Unwavering Faith</b>, which makes every point of the heal larger.</td></tr>
+<tr><td><b>Mantle</b></td><td>25 Mana, 1.0, 4cd, one ally</td><td>A <b>Divine Shield worth 25% of his maximum health</b> — and when it <b>breaks</b> it <b>passes to the ally on the lowest health</b>, three times. It never passes back to the body it just left. <b>Every hop is a real Divine Shield</b>, so every one of them builds Faith.</td><td>The absorb is the dry source of his whole engine — Conviction builds only on Divine Shield absorbs, and those were measured at 1.5 a battle. A shield that becomes three shields is three times the trigger.<br><b>Builds with:</b> every Divine Shield rider, because each hop is one — <b>Blessed Barrier</b>, <b>Afterglow</b>, <b>Warded Robes</b>, <b>Sacred Covenant</b>. <b>Blessing of Zeal</b> doubles the Faith every absorb pays. Deliberate <b>anti-synergy with Unyielding Aegis</b>: a re-formed shield has not broken, so it does not pass.</td></tr>
 <tr><td colspan="4"><b>Occultist</b> — <i>what else can be corrupted</i></td></tr>
 <tr><td><b>Blight the Well</b></td><td>25 Mana, 2.5, 4cd, one enemy</td><td>For 6 turns, healing that enemy receives damages it instead.</td><td>Corrupting recovery. <b>Deliberately situational</b> — near-dead against a warband with no healer, decisive against one with.</td></tr>
 <tr><td><b>Covenant of Ash</b></td><td>20 Mana, 2.0, 4cd, one enemy</td><td>Marks it; while the mark holds, every Ruin stack applied to any enemy also lands here. One covenant at a time.</td><td>Corruption that compounds onto a chosen target — spread pressure becomes focused pressure without giving up the spread.</td></tr>
@@ -1417,8 +1424,8 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <tr><td><b>Downwind</b></td><td>25 Mana, 1.0, 5cd, self</td><td>For <b>4 turns</b> every harmful effect <b>any hero</b> lands on an enemy is <b>copied onto a second enemy</b>, preferring one that does not already carry it.</td><td>He is the one spec in the game whose passive an ally can pay into — Trapper's breadth counts afflictions from <i>any</i> source — and this is the card that says so.<br><b>Builds with:</b> any ally who applies statuses in volume, the <b>Occultist</b> above all, then the <b>Cryomancer</b> and the <b>Pyromancer</b>; plus his own <b>Quartermaster</b>, and <b>Cull</b> below, which cashes what this spreads.</td></tr>
 <tr><td><b>Cull</b></td><td>30 Mana, 3.0, 5cd, one enemy</td><td><b>CONSUMES every affliction on one enemy</b>, and <b>EVERY</b> enemy takes <b>10% of Attack in nature damage per status removed</b> (Perfect: 12%). A poison that cannot be cleansed stays — and is not paid for.</td><td>Spending the breadth, and it <b>deliberately fights his own passive</b>: what Trapper spent the fight building is what this eats. That tension is the card.<br><b>Builds with:</b> <b>Downwind</b> above all (it spreads the board this cashes), <b>Stalking Horse</b> (which builds it off enemy turns), and <b>Slow Acting</b> and <b>Perfected Toxin</b>, whose uncleansable poison stays on the body. It is <i>not</i> Harvest: that one empties one enemy and heals him; this bills the whole field and heals nothing.</td></tr>
 <tr><td colspan="4"><b>Class-wide — MAGE</b> (all three specs) — <i>the tools every spine wants and no spine provides, because a spine that provided them would stop being a spine</i></td></tr>
-<tr><td><b>Magic Barrier</b></td><td>25 Mana, 2.0, 4cd, self</td><td>Absorbs damage equal to <b>20% of his maximum health</b> for 3 turns. It is an ordinary barrier, so it eats a share of <i>everything</i> — area attacks included.</td><td>The floor beneath all three Mage spines. Absorption, where Mirror Image is evasion.</td></tr>
-<tr><td><b>Mirror Image</b></td><td>20 Mana, 2.0, 4cd, self</td><td>The next <b>four single-target attacks</b> against him miss outright. Area attacks roll no miss at all, so they spend no image. The images <b>wait until spent</b>.</td><td>Evasion rather than absorption. Better than the Barrier against three big hits, worse against a swarm — neither is a strict upgrade of the other.</td></tr>
+<tr><td><b>Magic Barrier</b></td><td>25 Mana, 1.0, 4cd, self</td><td>Absorbs damage equal to <b>20% of his maximum health</b> for 3 turns. It is an ordinary barrier, so it eats a share of <i>everything</i> — area attacks included.</td><td>The floor beneath all three Mage spines. Absorption, where Mirror Image is evasion.</td></tr>
+<tr><td><b>Mirror Image</b></td><td>20 Mana, 1.0, 4cd, self</td><td>The next <b>four single-target attacks</b> against him miss outright. Area attacks roll no miss at all, so they spend no image. The images <b>wait until spent</b>.</td><td>Evasion rather than absorption. Better than the Barrier against three big hits, worse against a swarm — neither is a strict upgrade of the other.</td></tr>
 <tr><td><b>Magic Missiles</b></td><td>15 Mana, 2.0, 2cd, one enemy</td><td>Three bolts at <b>12% of Attack</b> each, 3 BD a bolt (Perfect: a fourth bolt).</td><td>The reliable filler. Multi-hit, so it plays with anything reading hits rather than casts, and cheap enough to cast while saving for something bigger.</td></tr>
 <tr><td><b>Mana Well</b></td><td>20 Mana, 1.0, 5cd, self</td><td>For 4 turns his <b>Mana regeneration is doubled</b> — the live figure, so Evocation and any rune are doubled with it.</td><td>Costs Mana to make Mana: net-positive only if the fight lasts, so it is a read on the fight rather than a free button.</td></tr>
 <tr><td><b>Dispel</b></td><td>15 Mana, 1.5, 3cd, either side</td><td>Removes <b>three harmful effects from an ally, or three beneficial effects from an enemy</b>. The only ability in the game that may target either side.</td><td>Utility nobody has. <b>Note:</b> the enemy half is thin — a ward from a Shieldmaster (on an ally) or the Hollow Crown&rsquo;s <b>Regalia</b> (on itself) is the only beneficial effect an enemy can carry. Until Batch CX the Crown&rsquo;s half could never fire, so in practice there was one source, not two.</td></tr>
@@ -1451,8 +1458,15 @@ beside. A card that appears in nobody's build plan is a card that fills a slot.<
 <li><b>Berserker (Ramp)</b> — <b>Stat block:</b> 175 HP / 15% armor / +10% shadow &amp;
 nature resist, −15% frost (the glass brawler: a bigger visible pool over mitigation —
 more Frenzy runway, more Rage from being hit).<br>
-Passive <i>Blood Frenzy</i>: +2% damage for every 5% of health
-missing (stepped; the Unstoppable talent raises the 2% to 2.5/3/3.5%). Half the highest
+Passive <i>Blood Frenzy</i>: <b>TWO TERMS INTO ONE BAND</b> — +2% damage for every 5% of
+health missing, <b>and +2% for every 5 Rage he has SPENT this battle</b> (stepped; the
+Unstoppable talent raises the 2% to 2.5/3/3.5%). <b>Five Rage is 5% of a full Rage bar, so
+the two terms pay at the same rate off either bar.</b> The steps are SUMMED and then
+capped at twenty, which is the ceiling the missing-health term already had — <b>the Rage
+term fills the band SOONER and never makes it deeper</b>, so a Berserker already in the red
+gains nothing from it. Rage spent counts what actually LEFT the bar, so a card that hands
+some back books only the difference, and a waived cost books nothing.
+Half the highest
 bonus reached each battle is kept as a RATCHETING FLOOR — the live bonus never drops below
 it, so his fury never fully cools (the Scar Tissue talent deepens the floor to 60/70/75%
 of the peak). The floor banks on every hit taken, even one healed away.<br>
@@ -1498,7 +1512,7 @@ Shieldwall — 25 Rage, 1.0, 2cd, self-cast with no target selection: +25% Block
 Tenacity and Rally — which Interpose's charges never do. The chip reads "+25% Block"; the
 Shield Mastery talent adds +2 turns to every cast, and the Bulwark Line talent throws
 +10% Block over every ally for the same duration.<br>
-<i>Earnable (§6a):</i> Interpose — 25 Rage, 2.0 int, 4cd, self-cast with no
+<i>Earnable (§6a):</i> Interpose — 25 Rage, 1.0 int, 4cd, self-cast with no
 target selection: every OTHER living
 ally gains 1 shield charge — the next attack against them is BLOCKED (Perfect: the
 Warden gains a charge too). Charges ADD to any the ally is already holding, and are the
@@ -1706,8 +1720,8 @@ Mercy is paid ON TRIGGER, not on cast, so a Cleric holding none arms nothing.<br
 three BY DESIGN — Divine Shield, Afterglow, Healing Pulse and the Faith release all pay
 out percentages of HIS maximum: his own bulk is what he lends out).<br>
 Passive <i>Conviction</i>: allies build <b>Faith</b> whenever
-<b>Divine Shield absorbs damage for them</b> (2 per absorbed hit) and whenever they begin
-a turn standing on <b>Consecrated Ground</b> (1 per ally per turn) — max 5 stacks; doubled
+<b>Divine Shield absorbs damage for them</b> (3 per absorbed hit) and whenever they begin
+a turn standing on <b>Consecrated Ground</b> (2 per ally per turn) — max 3 stacks; doubled
 under Blessing of Zeal; the stacks only work while the Devout stands.
 <b>THE HELD VALUE IS PAID ON THE PEAK — the highest Faith the carrier has held this
 battle — RATHER THAN ON THE CURRENT COUNT.</b> That is what stops Conviction's two halves
@@ -1718,23 +1732,23 @@ Each PEAK stack: 2%
 damage mitigation and +1.5% damage dealt — <b>the Apostle capstone adds another 1× and
 Fervor another again while the carrier stands on Consecrated Ground, and THE TWO ADD
 RATHER THAN MULTIPLY: both together are ×3, so a stack is worth 6% and +4.5%, never the ×4
-a product would give</b>. At a peak of five with both, that is 30% mitigation and +22.5%
+a product would give</b>. At a peak of three with both, that is 18% mitigation and +13.5%
 damage on every ally while the ground holds.
-At 5 stacks the ally is healed for 15% of max
+At 3 stacks the ally is healed for 15% of max
 health, their Faith COUNT resets, and the Devout recovers 3% max Mana — <b>and the Devout's own
 maximum health rises by 3% of his BASE maximum for the rest of the battle, healing him for
 the same amount</b>. That growth is linear on his base (3% per release, never 3% of the
 new total) and it lasts the battle only — it does not follow him out of the fight.<br>
 <b>THE DEVOUT HOLDS FAITH OF HIS OWN, AND IT NEVER RELEASES.</b> He builds stacks like
 anyone else — his own Consecrated Ground drips onto him, and Binding Oath swears him one
-every time an ally releases — but at 5 they simply hold, paying him the same mitigation and
+every time an ally releases — but at 3 they simply hold, paying him the same mitigation and
 damage they pay the party. Only an ALLY'S Faith releases, and a release always resets that
 ally's COUNT to zero — his peak, and so everything the peak pays, stands for the rest of
 the fight.<br>
-Divine Shield — 15 Mana, 2.5, 2cd; an ally shield absorbing 35% of the Devout's max
+Divine Shield — 15 Mana, 1.0, 2cd; an ally shield absorbing 35% of the Devout's max
 health, then it breaks.<br>
 Consecrated Ground — 25 Mana, 1.0, 3cd; the party takes 15% less damage, reflects
-10% of damage taken, and <b>every ally gains 1 Faith at the start of their turn</b>, for
+10% of damage taken, and <b>every ally gains 2 Faith at the start of their turn</b>, for
 2 turns (Perfect: 3 turns). The Faith drip needs no talent — it is Conviction's only
 party-wide source.<br>
 Blessing of Zeal — 20 Mana, 2.0, 2cd; an ally deals +15% damage for 3 turns, their
@@ -2081,10 +2095,10 @@ build lands three distinct statuses.</p>
 <p><b>Beastmaster</b> — <b>DEVOTION</b> (partnership in depth: one companion, further) · <b>THE PACK</b> (partnership in breadth: many companions, rotated) · <b>HANDLER</b> (what he does when the partnership is not the answer)</p>
 <table border="1" cellpadding="4">
 <tr><th>Row</th><th>Bulwark</th><th>Faith</th><th>Zeal</th></tr>
-<tr><td>1</td><td><b>Blessed Barrier</b> — Divine Shield converts 20% of the damage it absorbs into healing for its holder.</td><td><b>Communion</b> — When a hero reaches 5 Faith, every other hero who is still BUILDING Faith has a (15 x their own Faith stacks)% chance to gain 1 stack. The chance therefore peaks at 60% on a hero holding 4 — a hero already at 5 is at the payout rather than building, and is not rolled for at all.</td><td><b>Cleansing Waters</b> — While Consecrated Ground or Sacred Resolve holds, each ally has a 50% chance each turn to be cleansed of one harmful effect.</td></tr>
+<tr><td>1</td><td><b>Blessed Barrier</b> — Divine Shield converts 20% of the damage it absorbs into healing for its holder.</td><td><b>Communion</b> — When a hero reaches 3 Faith, every other hero who is still BUILDING Faith has a (15 x their own Faith stacks)% chance to gain 1 stack. The chance therefore peaks on a hero holding 2 — a hero already at 3 is at the payout rather than building, and is not rolled for at all.</td><td><b>Cleansing Waters</b> — While Consecrated Ground or Sacred Resolve holds, each ally has a 50% chance each turn to be cleansed of one harmful effect.</td></tr>
 <tr><td>2</td><td><b>Radient Aegis</b> — Casting Divine Shield has a 60% chance to cast it again on another hero.</td><td><b>Unwavering Faith</b> — Increases the Devout&#x27;s maximum health by 20%.</td><td><b>Righteous Fire</b> — Consecrated Ground reflects 35% of damage taken (up from the base 10%).</td></tr>
 <tr><td>3</td><td><b>Afterglow</b> — When Divine Shield breaks, its holder is healed for 20% of the Devout&#x27;s max health.</td><td><b>Devoutness</b> — Every ally takes 20% less Break damage.</td><td><b>Sacred Resolve</b> — New ability: Sacred Resolve — all damage received is split evenly among living heroes for 4 turns; Break damage still lands on the struck hero (25 Mana, 1.0 int, 5cd). Already owned: the split lasts 6 turns instead.</td></tr>
-<tr><td>4</td><td><b>Warded Robes</b> — While Divine Shield holds, its holder has +25% armor.</td><td><b>Blessed are the Faithful</b> — The heal at 5 stacks of Faith restores 35% max health (up from the base 15%).</td><td><b>Healing Pulse</b> — While Consecrated Ground or Sacred Resolve holds, every hero heals 8% of the Devout&#x27;s max health each turn.</td></tr>
+<tr><td>4</td><td><b>Warded Robes</b> — While Divine Shield holds, its holder has +25% armor.</td><td><b>Blessed are the Faithful</b> — The heal at 3 stacks of Faith restores 35% max health (up from the base 15%).</td><td><b>Healing Pulse</b> — While Consecrated Ground or Sacred Resolve holds, every hero heals 8% of the Devout&#x27;s max health each turn.</td></tr>
 <tr><td>5</td><td><b>Stalwart</b> — Divine Shield absorbs 55% of the Devout&#x27;s max health (up from the base 35%).</td><td><b>Sacred Covenant</b> — Should a shield prevent lethal damage, its holder is healed for 25% max health and gains 2 Faith stacks.</td><td><b>Crusader&#x27;s Tempo</b> — Blessing of Zeal ticks its target&#x27;s cooldowns down 3 additional turn(s) on cast.</td></tr>
 <tr><td>6</td><td><b>Bastion</b> — Divine Shield has no cooldown at all.</td><td><b>Fervor</b> — While Consecrated Ground holds, every hero standing on it counts each stack of Faith DOUBLE: 4% damage mitigation and +3% damage dealt per stack, up from 2% and +1.5%. It grants no extra Faith at all. With Apostle the stacks count TRIPLE: the two nodes ADD to the base rather than multiplying each other.</td><td><b>Purity</b> — Blessing of Zeal also grants its target a Divine Shield absorbing 35% of the Devout&#x27;s max health.</td></tr>
 <tr><td>7</td><td><b>Unyielding Aegis</b> — When Divine Shield breaks, it immediately re-forms at 90% of its original strength (once per cast).</td><td><b>Binding Oath</b> — Whenever a hero&#x27;s Faith releases, the Devout gains 1 stack of Faith himself. His own Faith never releases — it holds, paying him the same mitigation and damage it pays them.</td><td><b>Lifewell</b> — Damage reflected by Consecrated Ground heals every hero for 80% of the amount reflected.</td></tr>

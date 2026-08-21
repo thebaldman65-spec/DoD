@@ -14,6 +14,201 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-21 &mdash; Batch CZ: TWO RAMPS THAT DO NOT ARRIVE, AND A HOLE IN THE ENUMERATION</h2>
+<p><i>CY measured four ramp specs and found two arriving and two not. This is the repair for the
+two that do not, plus the enumeration gap CY reported and did not close. <b>Blood Frenzy gets a
+second term the Berserker controls</b>, <b>Faith&rsquo;s release threshold falls from 5 to 3 and
+both its builders rise</b>, <b>the six shields take the buff delay cap</b>, and <b><code>up_speed</code>
+is revived from a floor CY&rsquo;s cap had made unreachable</b>. <b>No save version moves (still
+v10).</b> The full report is <code>docs/reports/CZ.md</code>.</i></p>
+
+<h3>&sect;0 &mdash; THE ENUMERATION REACHES 216 NOW, AND IT IS ONE FUNCTION</h3>
+<p><b><code>Classes.ability_corpus()</code> is the only enumeration in the project.</b> It walks
+the kits, the class pools and the spec pools exactly as the Batch CL enumeration did, then walks
+<code>Classes.talent_granted_names()</code> through <code>Talents.granted_ability</code> &mdash;
+the one resolver both grant shapes go through. <b>FIVE gates carried five copies of the same hole,
+not the two the brief named:</b> <code>check_cm</code>, <code>check_cn</code>, <code>check_co</code>,
+<code>check_cy</code> (which had built the complete walk inline for its own use) and
+<b><code>check_cl_width</code> &mdash; the ORIGINAL, the one the other four copied.</b> All five
+read the shared function now. It lives on <code>Classes</code> rather than in a gate because the
+question is about the game&rsquo;s data rather than about testing it.</p>
+<p><b>THE CL WALK REACHES 211; THE COMPLETE WALK REACHES 216.</b> <code>check_cz.gd</code>
+re-derives the old walk as a <b>negative control</b> &mdash; its whole job is to still be missing
+the five, so a later batch cannot let the gap close itself and leave this report stale.</p>
+<p><b>CN OWES NOTHING.</b> Its criterion, re-run over the five, already answers all of them
+correctly: Backdraft, Glacial Prison, Cryoclasm and Intercession deal no damage and no Break
+damage, so the grade has nothing to multiply and the bar is correctly off; Pyroblast is an ordinary
+attack and correctly keeps its bar. Only CN&rsquo;s printed <i>population</i> was short.</p>
+<p><b>CO OWES ONE RULING, ON ONE ABILITY &mdash; GLACIAL PRISON.</b> Its whole cast-time payload is
+Chilled plus <code>_hold_freeze</code>, and that function returns immediately on a target that is
+already <code>frozen</code>, so <b>a recast onto a held enemy writes nothing at all</b> &mdash;
+precisely the waste CO exists to refuse. The other four do not qualify: Backdraft is additive
+(Interpose&rsquo;s shape, so a recast always improves), Cryoclasm moves state between two enemies
+and reschedules one, Pyroblast attacks, Intercession is an ally buff already inside CY&rsquo;s cap.
+<b>REPORTED, NOT TAKEN</b> &mdash; CQ &sect;6&rsquo;s rule, and the <code>_recast_writes</code>
+half has to be right before the table entry goes in.</p>
+<p><b>ONE THING THE REPAIR SURFACED FOR FREE: <code>check_cl_width</code> had never measured those
+five descriptions at all.</b> Re-pointed, it now does, and <b>all five are clean</b> &mdash; zero
+authored lines over the 44-character ceiling, corpus figure unchanged at 8.</p>
+
+<h3>&sect;1 &mdash; BLOOD FRENZY GETS A SECOND TERM HE CONTROLS</h3>
+<p><b>+2% per 5% of health missing, AND +2% per 5% of Rage spent. The same rate off either bar.</b>
+The inversion was the problem rather than the number: Blood Frenzy is paid in health MISSING, so
+every improvement to party survivability weakens it &mdash; CY&rsquo;s cheaper mitigation buffs
+made the Berserker take less damage and his own band got shallower, in a batch aimed at helping
+him. <b>Rage spent is the only term genuinely under his control</b>, and his pool already moves
+Rage constantly.</p>
+<p><b>TWO TERMS, ONE BAND, AND THE BAND DOES NOT GROW.</b> <code>FRENZY_MAX_STEPS</code> = 20 is
+not a new ceiling &mdash; it is the one the health term always had at zero health. The steps are
+SUMMED and then CLAMPED, so the second term can only fill the band <i>sooner</i>, never make it
+<i>deeper</i>. <b>His identity as the spec that fights better hurt is not rewritten</b>; he is
+given a floor a well-played party cannot take away, and a Berserker already in the red gets nothing
+from it.</p>
+<p><b>THE RATE IS FLAGGED AND THE FIGURE IS REPORTED: <code>FRENZY_RAGE_PER_STEP</code> = 5.</b>
+A Berserker&rsquo;s Rage maximum is 100, so five Rage IS 5% of the Rage bar &mdash; the health
+term&rsquo;s own rate off the other bar, which makes it a rule rather than a tuning constant.
+<b>Measured Rage spent a battle across four 25-run sims: 37.3 / 39.5 / 47.9 / 57.8</b> at rungs
+1/2/3 and the Sharpshooter party &mdash; 7.5 to 11.6 of the 20 steps.</p>
+<p><b>CY&rsquo;S FOUR SIMS, RE-RUN. Blood Frenzy&rsquo;s peak, of 40 points:</b> rung 1
+<b>6.2 &rarr; 17.4</b>, rung 2 <b>13.4 &rarr; 20.9</b>, rung 3 <b>12.1 &rarr; 22.8</b>,
+Sharpshooter party <b>13.9 &rarr; 26.2</b>. <b>At rung 2 that is 33% &rarr; 52% of the band, and
+the regression CY reported is closed in every arm.</b></p>
+<p><b>THE LEDGER BOOKS WHAT LEFT THE BAR, NOT <code>ab.cost</code>.</b> One function
+(<code>BattleUnit.note_resource_spent</code>) and three callers &mdash; the one line in
+<code>_resolve</code> where every ability in the game pays, Reckless Abandon&rsquo;s bar dump, and
+Last Rites. Measuring the bar rather than a field is what makes it un-farmable: Battle Shout costs
+15 and refunds 5, so it books 10; Snap Shot and Twin Hunt waive the cost outright and book nothing.
+<b>A judgement call recorded rather than buried: Last Rites is counted</b>, because it is Rage a
+talent he chose converts into survival and excluding it would mean the deeper he invests in the
+Fury lane the less his own passive notices. <b>Reckless Abandon is the extreme case and is named
+rather than discovered later</b> &mdash; a full 100 books all twenty steps at once, for a turn and
+every point of his resource, and the clamp means it cannot take him past a band a dying Berserker
+already reaches.</p>
+
+<h3>&sect;2 &mdash; FAITH REACHES ITS RELEASE</h3>
+<p><b>THE THRESHOLD FALLS FROM 5 TO 3, AND IT WAS A LITERAL FIVE IN THREE PLACES</b> &mdash; the
+cap on the count, the release branch and Communion&rsquo;s &ldquo;still building&rdquo; guard.
+<code>battle.FAITH_RELEASE</code> is one number now. <b>Both builders rise with it</b>, because a
+meter filling at a third of the rate it needs is not fixed by shortening the bar: <b>Faith per
+absorbed hit 2 &rarr; 3</b> (<code>FAITH_PER_ABSORB</code>) and <b>Faith per ally turn on
+Consecrated Ground 1 &rarr; 2</b> (<code>FAITH_PER_GROUND_TURN</code>, which was a bare literal at
+its one call site).</p>
+<p><b>MEASURED, AT EACH RUNG, BESIDE CY&rsquo;S ORIGINALS. Peak Faith:</b> rung 1
+<b>1.9 of 5 (39%) &rarr; 2.5 of 3 (85%)</b>, rung 2 <b>2.3 (46%) &rarr; 2.4 (81%)</b>, rung 3
+<b>2.4 (47%) &rarr; 2.4 (80%)</b>, Sharpshooter party <b>2.8 (56%) &rarr; 2.5 (84%)</b>. <b>Faith
+releases per battle:</b> <b>0.51 &rarr; 3.83</b>, <b>0.81 &rarr; 4.24</b>, <b>0.75 &rarr; 5.28</b>,
+<b>1.49 &rarr; 6.39</b>.</p>
+<p><b>FLAGGED HARD, BECAUSE IT IS A LARGE POWER SWING: releases rose five- to seven-fold and the
+Devout&rsquo;s total healing roughly TRIPLED</b> (69 &rarr; 178 a battle at rung 2). Four
+combinations were measured before one shipped: the threshold move ALONE already takes releases to
+2.71; 3&nbsp;absorb / 1&nbsp;ground reads 2.81; 2/2 reads 3.17; the shipped 3/2 reads 5.31.
+<b><code>FAITH_PER_ABSORB := 2</code> is the measured alternative and is one character away.</b></p>
+<p><b>A CONCERN IN THE SHIPPED NUMBERS, STATED RATHER THAN BURIED: three per absorb against a
+threshold of three means ONE ABSORBED HIT IS A WHOLE RELEASE.</b> A shielded ally never HOLDS
+Faith now &mdash; he fills and pays out on the same blow, and the held half of the meter stops
+existing for him. Nothing is lost (the peak keeps paying), but the card stops being a ramp and
+becomes a per-hit heal. <b>And raising the absorb rate does not move the figure the batch is
+measured on</b>: the Faith arrival row samples the DEVOUT&rsquo;S OWN meter, which is fed by the
+ground drip on his own turns rather than by absorbs.</p>
+<p><b>THE INSTRUMENT WAS MEASURING SOMETHING ELSE, AND IT IS WORTH KNOWING. CY&rsquo;s
+&ldquo;Faith reaches 1.6 of the 5 a release needs, so the average fight ends without a release ever
+firing&rdquo; is not what that number says.</b> The <code>conviction</code> row samples the
+DEVOUT&rsquo;S OWN meter, and <b>his Faith HOLDS at the threshold and never releases by rule</b>
+(Batch BH &sect;2) &mdash; it has never been a measure of whether a release fires. The number that
+answers that was in the same report all along: the Faith decomposition&rsquo;s
+<code>releases/battle</code>, which read <b>0.51 to 1.49</b> on unmodified HEAD. Releases were
+firing. Both rows are reported now rather than one standing in for the other, and the caveat is
+written into <code>CY_METERS</code> beside the row.</p>
+<p><b>TWO INTERACTIONS CHECKED AND REPORTED, WITH NOTHING CHANGED.</b> <b>Blessing of the Faithful</b>
+needs 3 Faith held, which was most of a bar and is now <b>exactly the bar</b> &mdash; so the card is
+castable precisely when the meter is full, <b>and only by the Devout</b>, since an ally reaching 3
+releases on the spot and can never be holding three when the button is read. <b>Elevation</b>
+grants 2, which was 40% of a release and is now <b>67%</b> of one, to every ally at once &mdash;
+and it is the one magnitude in this lane with a history of being moved by accident. <b>A third the
+brief did not name: the held half lost two stacks of ceiling.</b> Faith pays on the highest count
+held and the count caps at the threshold, so the deepest benefit an ally can hold fell from 5
+stacks (10% mitigation, +7.5% damage) to 3 (6%, +4.5%). <b>The lane trades depth of hold for
+frequency of release</b>, deliberately.</p>
+
+<h3>&sect;3 &mdash; SHIELDS TAKE THE SAME DELAY CAP</h3>
+<p><b>THE RULE, AND IT IS THE POINT OF THE SECTION: A SHIELD TAKES THE BUFF DELAY CAP; A HEAL DOES
+NOT. A shield is played BEFORE the blow; a heal answers what just happened.</b> <b>Divine Shield</b>
+2.5 &rarr; 1.0, <b>Mantle</b> 2.5 &rarr; 1.0, <b>Interpose</b>, <b>Magic Barrier</b>, <b>Mirror
+Image</b> and <b>Vespers</b> all 2.0 &rarr; 1.0. Nothing else about any of them moved.</p>
+<p><b>THEY ARE A SEPARATE POPULATION AND STAY ONE.</b> <code>Ability.SHIELD_SPECIALS</code> is a
+second list rather than five names appended to <code>PURE_BUFFS</code>, so CY&rsquo;s table can
+still be checked as the thing CY derived and the criterion that excluded them &mdash; a
+<i>consumable absorb pool or charge count</i> &mdash; is still correct. They are capped on the
+TEMPO rule rather than on the payload one, and <code>Ability.takes_delay_cap()</code> is the one
+function that unions the two so <code>make()</code> and every gate ask the same question.</p>
+<p><b>ONE OF THE SIX IS ON CR&rsquo;S DURATION LIST: VESPERS</b>, whose 4-turn duration meets its
+own 4-turn cooldown. CR accepted that on the reasoning that holding it costs an action and its
+resource every cycle; <b>at half delay that maintenance is now half price</b>. Nothing is changed
+&mdash; the same fold CY reported for 28 of the 52, surfacing now rather than in an audit five
+batches out.</p>
+<p><b>THE FIFTEEN HEALS ARE UNTOUCHED FOR A SECOND BATCH, AND NOW BOTH HALVES ARE ASSERTED.</b>
+<code>check_cz.gd</code> fails if any drafted heal is caught by the cap or sits at or under it: a
+rule with only its positive half checked would let a later batch halve every heal in the game and
+still pass.</p>
+
+<h3>&sect;4 &mdash; <code>up_speed</code> IS REVIVED, AND THE SWEEP FOUND ONE MORE</h3>
+<p><b>Swift&rsquo;s floor was a literal <code>1.0</code> &mdash; exactly CY&rsquo;s cap &mdash; so
+it was a DEAD PICK on all 52 pure buffs.</b> <code>maxf(1.0 &times; 0.75, 1.0)</code> is 1.0: the
+reward was live on every one of them the day before and bought nothing the day after, in silence.
+<b><code>Ability.DELAY_FLOOR</code> is <code>BUFF_DELAY_CAP &times; 0.5</code> = 0.50 today</b>, so
+the ladder reads <b>a swing 2.00, setting up 1.00, and the cheapest an upgrade can buy 0.50</b> and
+all three move together on a retune.</p>
+<p><b>FLAGGED: half the cap is a judgement call.</b> It is the only value that keeps Swift
+meaningful on the cheapest card in the game without making it free &mdash; 25% off a capped buff is
+0.75, which clears 0.50 with room, so one Swift always does something and no stack of them reaches
+zero. <b>Zero is reachable elsewhere and deliberately not here</b>: Instinctive Rotation sets the
+delay to 0.0 as a talent&rsquo;s whole payload, and an upgrade should not buy what a node exists to
+grant.</p>
+<p><b><code>upgrade_fits(&quot;up_speed&quot;)</code> now asks a question.</b> It fell through to
+<code>return true</code> on the note that &ldquo;Swift is the one that fits everything &mdash; every
+ability has a delay&rdquo;, which was true for eight batches and stopped being true without a line
+changing there. <b>It changes no offer today</b> and is what keeps the dud closed if a later batch
+authors something cheaper.</p>
+<p><b>THE SWEEP FOUND EXACTLY TWO SITES AND THE SECOND IS A FINDING: Mana Shield&rsquo;s
+<code>minf(eff_delay, 1.5)</code> IS NOW INERT.</b> Mana Shield is a pure buff, so its delay IS the
+cap and the clamp can never bind. <b>It is reported and KEPT, not deleted</b> &mdash; it is a
+clamp, and what it does is keep the discount unable to RAISE the cost, which is the exact failure
+CY caught it in the act of. Its description still says &ldquo;It is quick to cast&rdquo;: true, and
+no longer distinguishing. Nothing else in the project floors or compares a delay against a literal;
+no rune, relic or talent modifies <code>delay</code> at all.</p>
+
+<h3>&sect;5 &mdash; GATES</h3>
+<p><b>ELEVEN GATES, ZERO FAILURES, ZERO THROWS.</b> <code>check_parse</code> 0 (stderr grepped for
+<code>Parse Error</code>, never the tally), <code>check_cm</code> 0, <code>check_cn</code> 0,
+<code>check_co</code> 0, <code>check_cs</code> 104/0, <code>check_ct</code> 113/0,
+<code>check_cu</code> 0, <code>check_cv</code> 0 (324 nodes), <code>check_cy</code> 0,
+<b><code>check_cz</code> 0</b>, <code>check_flow</code> 0. <b><code>check_cz.gd</code> is new and
+joins the battery&rsquo;s gate list, which is now thirteen.</b> It covers all five sections and the
+two halves only a live battle can settle: a real cast has to reach the Rage ledger with what
+actually left the bar, and an ally walked to the threshold has to release <b>while the Devout&rsquo;s
+own meter, driven to the same count, holds</b> &mdash; the negative control that stops &sect;2&rsquo;s
+rule passing for the wrong reason.</p>
+<p><b>Eight complete runs of the game, four before and four after</b> &mdash; 25 runs each, three
+difficulty rungs, ~2,500 battles a pass. <b>Completions before &rarr; after:</b> rung 1 100 &rarr;
+100%, rung 2 60 &rarr; 72%, rung 3 44 &rarr; 52%, Sharpshooter party 68 &rarr; 72%. <b>Depth
+reached:</b> 48.00 &rarr; 48.00, 45.64 &rarr; 46.56, 43.04 &rarr; 42.84, 44.68 &rarr; 47.04.
+<b>Only the Sharpshooter arm&rsquo;s move is bigger than the combined standard error</b>, and
+completions are the noisy secondary the harness says never to quote alone. <b>The honest summary is
+that the batch did not make the game measurably harder or easier</b>, which is the right outcome for
+a change aimed at two specs rather than at difficulty.</p>
+<p><b>NO SUITE AND NO FULL BATTERY WAS RUN.</b> CZ is implement-only under the standing convention.
+The next dedicated test batch owes one against CW&rsquo;s eleven unrepaired assertions, CY&rsquo;s
+52 moved delays, and this batch&rsquo;s six more plus a Faith threshold three suites may quote.</p>
+<p><b>FOUND WHILE WORKING, REPORTED AND NOT FIXED.</b> <b><code>check_cu</code> and
+<code>check_cv</code> are NOT in <code>run_battery.sh</code>&rsquo;s <code>GATES</code> array</b>
+&mdash; CY&rsquo;s report lists both among the nine gates it ran and the battery runs neither. Both
+were run by hand here (0 failures each). <b>And CY&rsquo;s printed after-figures do not reproduce
+on unmodified HEAD</b>: re-measured at the same settings the same instrument reads Frenzy
+6.2 / 13.4 / 12.1 / 13.9 against CY&rsquo;s 7.4 / 11.8 / 12.7 / 12.7. That is n=25 noise on an
+unseeded sim &mdash; roughly &plusmn;1.5 points of band &mdash; and it means <b>the 12.2 &rarr; 11.8
+regression that motivated &sect;1 is smaller than this instrument&rsquo;s own error bar. The
+inversion it revealed is real and structural; the number was not the evidence.</b></p>
+
 <h2>2026-08-21 &mdash; Batch CY: A BUFF COSTS HALF A SWING</h2>
 <p><i>One systematic rule applied to <b>52 abilities</b>: a pure buff&rsquo;s initiative delay is
 capped at <b>half the basic attack&rsquo;s</b>. <b>51 came down to 1.0; one was already there.</b>
