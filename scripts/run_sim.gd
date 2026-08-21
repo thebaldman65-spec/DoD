@@ -1213,6 +1213,13 @@ static func _print_report(battle) -> void:
 	var bp_line: String = battle.break_prevented_line(battle.sim_stats)
 	if bp_line != "":
 		print(bp_line)
+	# BATCH CY §0: rounds to resolution split trash/elite/boss, and the four
+	# ramp meters against what each spec is built around. A RUN is the only
+	# instrument that meets all three encounter kinds, so this is the reading
+	# the batch is judged on.
+	var cy_line: String = battle.cy_report_line(battle.sim_stats)
+	if cy_line != "":
+		print(cy_line)
 	# Batch AX §0: the only instrument that meets a boss, so the trash/boss
 	# split lives here as well as in the standalone report.
 	var rx_line: String = battle.ruin_report_line(battle.sim_stats)

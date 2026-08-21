@@ -45,6 +45,106 @@ var cooldown := 0        # turns before this ability can be used again (0 = none
 var description := ""
 
 
+# ================== BATCH CY §1 — A BUFF COSTS HALF A SWING ==================
+#
+# **A PURE BUFF'S INITIATIVE DELAY IS CAPPED AT HALF THE BASIC ATTACK'S.** The
+# design statement is *setting up costs less tempo than swinging*, which is why
+# the cap is written against `BASIC_DELAY` rather than as the 1.0 it evaluates
+# to today: retune the baseline and the rule stays true instead of silently
+# becoming a different rule.
+#
+# WHY IT EXISTS. Playtesting found that the ramp specs cannot ramp inside the
+# fights the game actually has, and §0 measured the reason: a fight resolves in
+# **three to five turns per hero** — trash 3.5/3.8/4.1 rounds at the three
+# difficulty rungs, and elite fights are the SHORTEST of the three kinds. A turn
+# spent setting up is a quarter to a third of the whole fight, so the setup
+# never returns its cost and Blood Frenzy, Faith and their neighbours play as if
+# their engines were not there.
+#
+# WHAT IT IS NOT. The buff is not free and does not stack onto another action:
+# it still costs its resource, its cooldown and half a swing. A free buff would
+# make every buff strictly correct to cast and would delete the decision across
+# the entire category — and Anvil, Formless, Discipline, Unslaked and Spite were
+# all priced as turns you spend.
+#
+# **HALF IS THE DESIGNER'S FIRST GUESS AND IS FLAGGED, NOT TUNED.** It ships as
+# written; `check_cy.gd` prints the resulting table.
+const BASIC_DELAY := 2.0
+const BUFF_DELAY_CAP := BASIC_DELAY * 0.5
+
+# ---------- WHICH ABILITIES ARE PURE BUFFS ----------
+#
+# **DERIVED BY WALKING `battle._resolve_special`'S CALL GRAPH, NOT BY READING
+# `damage` AND `pressure`.** Those two fields are ZERO on 137 of the 216
+# abilities in the corpus, including Feint, Guard Change and Kill Command, which
+# hit hard from inside their handlers — a field test would have halved the price
+# of every one of them. CN paid for that lesson on the timing bar and CO paid
+# for it again on the recast refusal; this is the third table derived the same
+# way, and `check_cy.gd` re-walks it live so it cannot rot.
+#
+# THE CRITERION, STATED SO A LATER BATCH CAN APPLY IT RATHER THAN GUESS AT IT:
+#
+#   A PURE BUFF is an ability whose ENTIRE cast-time payload is one or more
+#   statuses (or status-backed flags) written to the CASTER or to LIVING ALLIES.
+#   At cast it deals no damage and no Break damage, heals nobody, moves no
+#   resource, no Pressure, no cooldown and no initiative, summons and revives
+#   nobody, strips nothing, and writes NOTHING AT ALL to any enemy.
+#
+# CAST TIME IS THE WHOLE OF IT, because the delay is paid at cast. What the
+# status goes on to do afterwards — Venom Coating poisoning every later hit,
+# Tripwire springing on an enemy's turn, Arcane Arrows striking a second body —
+# is what the buff IS, not a second payload. The alternative reading would put
+# half this list outside the rule for doing its job.
+#
+# §1'S FOUR EXCLUDED POPULATIONS, each reported by `check_cy.gd` and each
+# CHANGED IN NO WAY:
+#
+#   · ANYTHING WITH A SECOND PAYLOAD. Battle Shout and Hold the Line hand back
+#     Rage, Stabilize vents Resonance and heals, Blink eats cooldowns,
+#     Preparation buys a turn, Elevation and Ordination grant Faith, Hold
+#     Breath and Quarry's Mark grant Focus, Dispel and Unburden strip effects.
+#     Its delay is priced for the whole thing.
+#   · HEALS. "A heal is a response to what just happened, not setup." The answer
+#     to *is this card a heal* is `HEAL_SPECIALS` plus the `heal` fields — the
+#     question was authored once, in CN §2, and asking it a second way here is
+#     how two answers start disagreeing.
+#   · SHIELDS. Divine Shield, Magic Barrier, Mantle, Interpose, Mirror Image and
+#     Vespers. Adjacent to buffs and arguably the same case, so they go to the
+#     designer as a list. The line is mechanical: a shield is a CONSUMABLE
+#     absorb pool or charge count that eats incoming attacks. Percentage
+#     mitigation running for N turns is not one — it has no pool — which is why
+#     Immolate, Ironclad, Camouflage and Consecrated Ground are buffs and those
+#     six are not.
+#   · ENEMY ABILITIES, and anything that writes to an enemy at all. This is a
+#     hero tempo problem.
+#
+# TWO JUDGEMENT CALLS ARE RECORDED RATHER THAN BURIED, because they are the
+# designer's to overturn:
+#   · THE DEATH-SAVES ARE IN — Rite of Return, Bloodbond, Intercession, Ashes of
+#     Al'ar and Undying Vigil. Each is armed BEFORE the blow it answers, which is
+#     setup by every test §1 states, and none of them is an absorb pool. If the
+#     designer rules them shields they leave as one group.
+#   · THE HEAL-OVER-TIME BUFFS ARE IN — Consecration, Aegis Wall and Battle
+#     Trance heal through a status they set. `HEAL_SPECIALS` says none of them is
+#     a heal card, and none heals a point at cast, so the authored answer stands.
+const PURE_BUFFS := ["aegis_wall", "alms", "anointing", "answering_steel",
+	"anvil", "arcane_arrows", "ashes", "battle_poise", "battle_trance",
+	"berserk", "bloodbond", "camouflage", "cons_ground", "consecration",
+	"covering_guard", "deadfall", "discipline", "divine_presence",
+	"divine_wrath", "downwind", "emberkeep", "exhortation", "fault_line",
+	"feigned_guard", "formless", "ghostpack", "hoarfrost_armor", "immolate",
+	"instinct", "intercession", "ironclad", "last_howl", "mana_shield",
+	"mana_well", "null_field", "quickdraw", "recompense", "resonant_field",
+	"retaliate", "rite_of_return", "shield_block", "spite", "stalking_horse",
+	"succession", "tripwire", "turn_the_blade", "undying_vigil", "unity",
+	"unslaked", "venom_coat", "vow_suffering", "warcry"]
+
+
+# TRUE when §1's cap binds this ability.
+func is_pure_buff() -> bool:
+	return special in PURE_BUFFS
+
+
 # ---------- BATCH CN §2 — WHICH ABILITIES RUN A TIMING BAR ----------
 #
 # THE CRITERION IS MECHANICAL, NOT CATEGORICAL: the check comes off wherever the
@@ -149,4 +249,15 @@ static func make(d: Dictionary):
 	var a = new()
 	for key in d:
 		a.set(key, d[key])
+	# BATCH CY §1 — THE CAP, AT THE ONE PLACE AN ABILITY IS EVER BUILT. Every
+	# definition in the game reaches this function, so there is exactly one
+	# answer to "what does this buff cost" and every reader — the draft card,
+	# the tooltip, the timeline preview, the cast itself — gets the same one.
+	#
+	# THE AUTHORED DEFINITIONS ARE ALREADY AT THE CAP, so this clamp is a no-op
+	# on today's data and `check_cy.gd` asserts that it is. It is not redundant:
+	# it is what makes the rule true for content a later batch adds, including
+	# content added by somebody who has not read this file.
+	if a.special in PURE_BUFFS:
+		a.delay = minf(a.delay, BUFF_DELAY_CAP)
 	return a

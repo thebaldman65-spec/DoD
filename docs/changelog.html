@@ -14,6 +14,175 @@ either time. <b>A file outside the repo is not in version control and is not bac
 GitHub</b> &mdash; see the <b>Batch CX</b> entry below for what that costs and what to do about
 it.</p>
 
+<h2>2026-08-21 &mdash; Batch CY: A BUFF COSTS HALF A SWING</h2>
+<p><i>One systematic rule applied to <b>52 abilities</b>: a pure buff&rsquo;s initiative delay is
+capped at <b>half the basic attack&rsquo;s</b>. <b>51 came down to 1.0; one was already there.</b>
+Nothing else about any of them moved &mdash; no cost, no cooldown, no duration, no magnitude.
+&sect;0 measured the thing the fix is aimed at and nobody had ever measured: <b>a fight is 3.0 to
+5.5 turns per hero</b>. <b>No save version moves (still v10).</b> The full report is
+<code>docs/reports/CY.md</code>.</i></p>
+
+<h3>&sect;0 &mdash; THE TWO MEASUREMENTS, BOTH TAKEN BEFORE A LINE OF &sect;1 WAS WRITTEN</h3>
+<p><b>HOW LONG IS A FIGHT? THREE TO FIVE TURNS PER HERO.</b> Four <code>--run 25</code> sims across
+three difficulty rungs, ~2,300 battles: <b>trash 3.5 / 3.8 / 4.1 rounds</b> at rungs 1/2/3,
+<b>boss 3.8 / 4.3 / 4.5</b>, and <b>elite 3.0 / 3.3 / 3.6 &mdash; the SHORTEST of the three kinds
+at every rung</b>, which is the finding nobody would have predicted. <b>Spending a turn on setup is
+20&ndash;33% of everything a hero will do in the fight.</b></p>
+<p><b>Rounds are counted as turns per living party member, and that is a correction.</b> The
+standing report line divides <code>hero_actions</code> by three; <b>the party has been FOUR since
+the class draft</b>, so that line has been reading a third high. Companions are excluded from both
+halves of the fraction &mdash; a summoned beast takes turns the hero did not spend, which would
+have made a Beastmaster&rsquo;s fights look longest when he is the spec least able to afford a
+setup turn.</p>
+<p><b>DOES THE RAMP ARRIVE? TWO OF THE FOUR DO, AND TWO DO NOT.</b> Each meter is banked as a
+per-battle peak and reported <b>as a fraction of what the spec is built around</b>, at rung 2:
+<b>Blood Frenzy 12.2 of 40 points = 31%</b>; <b>Faith 1.6 of the 5 stacks a release needs =
+32%</b>; <b>Loyalty 20.0 of 5 = 400%</b>; <b>Focus 131.3 of 100 = 131%</b>. Loyalty and Focus are
+uncapped meters that tick on a timer, so they arrive and keep going (deepest observed 66 and 460).
+Blood Frenzy and Faith have to be EARNED out of what the fight does to you, and both land near a
+third. <b>1.6 of 5 means the average fight ends without a Faith release ever firing.</b></p>
+<p>The sampler is <b>read-only by construction</b> &mdash; <code>frenzy_bonus()</code> is
+deliberately not called, because it ratchets the floor as a side effect and <b>an instrument that
+moves what it measures is not an instrument</b>.</p>
+<p><b>CONFOUNDER, NAMED:</b> every sim party is FULLY TALENTED (<code>rows=9 of 9</code>), which is
+stronger than a real player at zone 1. Weakening the party does not lengthen the fight &mdash; the
+rung-1 row is the closest thing to an under-equipped party and it is the SHORTEST fight in the
+table, because the enemy budget falls with the rung.</p>
+
+<h3>&sect;0a &mdash; AND WHAT IT DID: THE SAME FOUR SIMS, RE-RUN AFTER THE CAP</h3>
+<p><b>Beyond the brief&rsquo;s ask, and here because &ldquo;half is the designer&rsquo;s first
+guess&rdquo; is a decision that wants evidence.</b> Read with the harness&rsquo;s own warning
+attached: at n=25 completions are a noisy secondary and depth reached is the primary, SE 0.5&ndash;2.8
+slots; the runs are not seed-paired. <b>Completions: rung 1 100&rarr;100%, rung 2
+52&rarr;84%, rung 3 12&rarr;36%, Sharpshooter party 48&rarr;52%. Depth reached: 46.32&rarr;46.80,
+33.16&rarr;39.88, 41.12&rarr;42.60.</b> <b>Depth rose in all three measurable arms and only rung
+3&rsquo;s move exceeds the combined standard error.</b> The change helps, it helps most where the
+party was losing, and n=25 cannot size it more precisely than that.</p>
+<p><b>FIGHTS GOT LONGER, NOT SHORTER</b> &mdash; trash at rung 2 <b>3.8 &rarr; 4.4</b> rounds. A
+cheaper buff does not end fights faster; it buys a party that survives to take more turns.
+<b>FAITH IS THE METER THAT ANSWERED</b>: peak Faith rose at every rung (<b>1.6 &rarr; 2.1</b> at
+rung 2, roughly a third more) and <b>is still short of the 5 a release needs</b>.
+<b>AND BLOOD FRENZY WENT THE OTHER WAY, WHICH IS NOT A BUG</b>: peak Frenzy FELL at every rung
+(<b>12.2 &rarr; 11.8</b> at rung 2, <b>14.4 &rarr; 12.7</b> at rung 3). Blood Frenzy pays for health
+already lost, and the cap made Spite, Ironclad and every other mitigation buff cheaper to hold, so
+<b>the Berserker takes less damage and his own band gets shallower</b>. <b>Cheaper defence is a nerf
+to the one passive that is paid in damage taken.</b> Flagged for the designer; no number was changed
+to hide it.</p>
+
+<h3>&sect;1 &mdash; THE RULE, AND IT IS WRITTEN AGAINST <code>BASIC_DELAY</code></h3>
+<p><b><code>Ability.BUFF_DELAY_CAP := BASIC_DELAY * 0.5</code>.</b> The design statement is
+<i>setting up costs less tempo than swinging</i>, so the cap is expressed against the baseline
+rather than as the 1.0 it evaluates to today &mdash; retune the baseline and the rule stays true
+instead of silently becoming a different rule. <b><code>BASIC_DELAY</code> itself moved onto
+<code>Ability</code></b> and <code>battle.gd</code> now aliases it: the delay is an ability&rsquo;s
+property and <code>Ability.make</code> is where the cap has to be applied, so that is where the one
+authored <code>2.0</code> lives. All twelve of battle.gd&rsquo;s sites read the alias and there is
+still exactly one 2.0 in the project.</p>
+<p><b>THE CAP IS APPLIED IN TWO PLACES AND THEY CANNOT DISAGREE.</b>
+<code>Ability.make()</code> clamps it &mdash; one function, so the draft card, the tooltip, the
+timeline preview and the cast all get the same answer. The <b>52 authored definitions were
+rewritten to <code>Ability.BUFF_DELAY_CAP</code></b> so the data does not lie about what the card
+costs, which is CR&rsquo;s own rule: <i>a change to a value is finished when every site that QUOTES
+it is updated</i>, and an authored literal is a quoting site. <b>The clamp is therefore a no-op on
+today&rsquo;s data and <code>check_cy.gd</code> asserts that it is</b> &mdash; it is what keeps the
+rule true for content a later batch adds.</p>
+<p><b>THE POPULATION WAS DERIVED BY WALKING <code>_resolve_special</code>&rsquo;S CALL GRAPH, NOT BY
+READING <code>damage</code> AND <code>pressure</code>.</b> Those two fields are <b>zero on 137 of
+the 216 abilities</b>, Feint, Guard Change and Kill Command among them, and every one of those hits
+hard from inside its handler. CN paid for that lesson on the timing bar, CO paid for it again on
+the recast refusal, and this is the third table derived the same way. The criterion, stated so a
+later batch can apply it rather than guess: <b>a PURE BUFF is an ability whose ENTIRE cast-time
+payload is one or more statuses (or status-backed flags) written to the CASTER or to LIVING
+ALLIES</b> &mdash; no damage, no Break damage, no heal, no resource, no Pressure, no cooldown, no
+initiative, no summon, no revive, no purge, and <b>nothing at all written to any enemy</b>.</p>
+<p><b>Cast time is the whole of it, because the delay is paid at cast.</b> What the status goes on
+to do afterwards &mdash; Venom Coating poisoning every later hit, Tripwire springing on an
+enemy&rsquo;s turn, Arcane Arrows striking a second body &mdash; is what the buff IS, not a second
+payload.</p>
+
+<h3>&sect;1a &mdash; A CORRECTION TO THE CORPUS ITSELF, AND IT CHANGED THE ANSWER</h3>
+<p><b>The Batch CL enumeration that <code>check_cn.gd</code> and <code>check_co.gd</code> both walk
+MISSES FIVE ABILITIES, and always has.</b> It walks the kits, the class pools and the spec pools; a
+talent node that GRANTS an ability which is in no pool is invisible to it. The five are
+<b>Backdraft, Pyroblast, Glacial Prison, Cryoclasm and INTERCESSION</b>.</p>
+<p><b>Intercession is a pure buff</b> &mdash; a party-wide death-save whose whole payload is a
+status on every living hero &mdash; so a CL-only sweep would have left it at 2.0 while its
+fifty-one neighbours came down to 1.0. <code>check_cy.gd</code> walks
+<code>Talents.LANE_TREES</code> through <code>Talents.granted_ability</code> on top of the CL
+enumeration, so the corpus it checks is <b>216, not 211</b>. <b>CN&rsquo;s and CO&rsquo;s tables
+were derived over the smaller corpus and are NOT re-derived here</b> &mdash; whether either needs
+re-running against 216 is a decision, not a detail. Four of the five are enemy-facing and could
+not join either table.</p>
+
+<h3>&sect;1b &mdash; THE COUNT, AND THE THREE POPULATIONS THAT DID NOT MOVE</h3>
+<p><b>52 pure buffs. 51 came down to 1.0; FEIGNED GUARD was already at the cap and did not
+change.</b> The distribution: 2 fall by 2.0, 10 by 1.5, 24 by 1.0, 15 by 0.5. The largest single
+moves are <b>Consecrated Ground</b> and <b>Rite of Return</b>, both 3.0 &rarr; 1.0.</p>
+<p><b>Reported and untouched: 15 HEALS, 6 SHIELDS, 66 that do more than buff, and every enemy
+ability.</b> <b>SHIELDS GO TO THE DESIGNER AS A LIST</b>, exactly as the brief asks &mdash; Divine
+Shield, Magic Barrier, Mantle, Interpose, Mirror Image and Vespers. The line is mechanical: a
+shield is a <b>consumable absorb pool or charge count that eats incoming attacks</b>. Percentage
+mitigation running for N turns is not one, which is why Immolate, Ironclad, Camouflage and
+Consecrated Ground are buffs and those six are not. For the heals the answer to <i>is this card a
+heal</i> is <code>HEAL_SPECIALS</code> plus the <code>heal</code> fields &mdash; CN &sect;2 authored
+that question once and this batch does not ask it a second way.</p>
+<p><b>TWO JUDGEMENT CALLS ARE RECORDED RATHER THAN BURIED</b>, in
+<code>ability.gd</code> beside the table. <b>The death-saves are IN</b> &mdash; Rite of Return,
+Bloodbond, Intercession, Ashes of Al&rsquo;ar and Undying Vigil are each armed BEFORE the blow they
+answer, which is setup by every test the rule states, and none is an absorb pool; if the designer
+rules them shields they leave as one group. <b>The heal-over-time buffs are IN</b> &mdash;
+Consecration, Aegis Wall and Battle Trance heal through a status they set, none heals a point at
+cast, and <code>HEAL_SPECIALS</code> says none of the three is a heal card.</p>
+
+<h3>&sect;2 &mdash; THE CONSEQUENCE THAT REACHES BACK INTO CR</h3>
+<p><b>CR accepted 40 buffs whose duration meets or exceeds its own cooldown</b>, on the reasoning
+that holding one costs an action and its resource every cycle. <b>At half delay that maintenance is
+half price, and 28 of the 40 are in &sect;1&rsquo;s population.</b> All 28 are tabled with their
+duration, cooldown and new delay in <code>docs/reports/CY.md</code>, and <b>NONE OF THEM CHANGED</b>
+beyond the delay every other member got. The twelve that are not in the population are excluded for
+reasons this batch did not touch: ten write to enemies, <code>zeal</code> ticks cooldowns and
+<code>vespers</code> is a shield.</p>
+<p><b>The sharpest row is IMMOLATE</b>: a 4-turn window on a 2-turn cooldown that now costs half a
+swing to hold. CR&rsquo;s maintenance argument was already thinnest there.</p>
+<p><b>A SECOND, SMALLER FOLD, FOUND WHILE APPLYING THIS ONE.</b> The <code>up_speed</code> ability
+upgrade reads <code>ab.delay = maxf(ab.delay * 0.75, 1.0)</code>. <b>Its floor is a literal 1.0,
+which is now exactly the cap &mdash; so <code>up_speed</code> on any of the 52 is a DEAD PICK, and
+it was live on all of them yesterday.</b> Reported, changed in no way.</p>
+<p><b>AND CO&rsquo;S RECAST REFUSAL WILL FIRE MORE.</b> Cheaper buffs get recast more often, so the
+gate that refuses a recast which would not improve gets asked more often. That is correct behaviour
+and needs no change; <b>a later reader should not read the increase as a regression</b>.</p>
+
+<h3>&sect;2a &mdash; THE ONE MECHANICAL CONSEQUENCE THAT HAD TO BE TAKEN</h3>
+<p><b>MANA SHIELD&rsquo;S FLAT DISCOUNT IS CLAMPED RATHER THAN ASSIGNED.</b> CN &sect;3 made it
+unconditional (<code>eff_delay = 1.5</code> at the cast site) and &sect;1 brings its authored 2.0
+down to 1.0. Left alone the discount would have been <b>a penalty dressed as a bonus</b> &mdash;
+the one card in the game where <i>it is quick to cast</i> made it slower. It reads
+<code>minf(eff_delay, 1.5)</code> now, which is what the discount always claimed to do.</p>
+
+<h3>&sect;3 &mdash; WHAT THIS DELIBERATELY DOES NOT DO</h3>
+<p><b>Buffs are not free and do not stack onto another action</b> &mdash; the cost is reduced, not
+removed, and every one still spends its resource, its cooldown and half a swing. A free buff would
+make every buff strictly correct to cast and would delete the decision across the whole category.
+<b>No ramp spec starts a fight with meter on the clock</b>; that is still available, and
+<b>&sect;0&rsquo;s Faith measurement is now the argument for it</b>. <b>No enemy health changes</b>
+and <b>the turn structure does not change</b>.</p>
+
+<h3>&sect;4 &mdash; THE GATE</h3>
+<p><b><code>check_cy.gd</code> is new and joins the battery&rsquo;s gate list.</b> It asserts the
+rule against <code>BASIC_DELAY</code>, the table&rsquo;s shape, <b>the excluded populations BY
+NAME</b> (CO&rsquo;s lesson: a gate that can only pass is a gap), the mechanical half against each
+ability&rsquo;s own fields, CN&rsquo;s criterion from the other side (a pure buff runs no timing
+bar) &mdash; and then <b>the live half: it spawns two real battles across two parties, casts all 52
+through <code>_resolve_special</code>, and asserts every enemy&rsquo;s health, resource and status
+set and every hero&rsquo;s health, resource, second resource and Faith are exactly where they
+were</b>. <b>104 casts, 0 failures.</b> The derivation is executed, not read.</p>
+<p><b>Nine gates run clean:</b> <code>check_parse</code> 0, <code>check_cn</code> 0,
+<code>check_co</code> 0, <code>check_cs</code> 104/0, <code>check_ct</code> 113/0,
+<code>check_cu</code> 0, <code>check_cv</code> 0, <code>check_flow</code> 0, <code>check_cy</code>
+0. <b>Eight complete runs of the game finished end to end</b> (four before the change, four after;
+25 runs each). <b>NO FULL BATTERY WAS RUN</b> &mdash; implement-only under the standing convention,
+and the next dedicated test batch still owes one.</p>
+
 <h2>2026-08-20 &mdash; Batch CX: THE CHANGELOG CUT, AND THREE RULINGS</h2>
 <p><i>Four items, and <b>one of them was deliberately not implemented</b>. &sect;1 executes the
 archive rule CW wrote and did not use: the live changelog goes <b>494.2 KB &rarr; 148.7 KB</b>,

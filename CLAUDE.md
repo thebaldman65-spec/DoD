@@ -713,6 +713,57 @@ a card (the brief's "five" is 3.72), and 8 lines (1.1%) exceed the 258px card �
 (Feint's Perfect).** So the block costs the column its LINE COUNT, which CK already measured; it is
 NOT a wrapping problem.
 
+## A PURE BUFF COSTS HALF A SWING (STANDING, SET AT BATCH CY §1)
+> **A pure buff's initiative delay is capped at HALF the basic attack's delay. Setting up costs
+> less tempo than swinging.**
+
+**WRITE IT AGAINST `BASIC_DELAY`, NEVER AS THE 1.0 IT EVALUATES TO.** `Ability.BUFF_DELAY_CAP` is
+`BASIC_DELAY * 0.5`, and `BASIC_DELAY` lives on **`Ability`** (battle.gd aliases it) because the
+delay is an ability's property and `Ability.make` is where the cap is applied. There is exactly one
+authored `2.0` in the project. **A later batch that retunes the baseline retunes the rule with it;
+a later batch that writes `1.0` has replaced the rule with a coincidence.**
+
+**THE REASON, SO NOBODY LIFTS THE CAP AS ARBITRARY.** §0 measured the fight the game actually has:
+**3.0 to 5.5 turns per hero** — trash 3.5/3.8/4.1 rounds at the three difficulty rungs, and
+**elite fights are the shortest of the three kinds at every rung**. A turn spent setting up is
+**20–33% of everything a hero will do**, so the ramp specs' engines never returned their cost.
+Blood Frenzy reaches 31% of its band and Faith 1.6 of the 5 a release needs; **the average fight
+ends without a Faith release ever firing.**
+
+**THE BUFF IS NOT FREE AND MUST NOT BECOME FREE.** It still spends its resource, its cooldown and
+half a swing. A free buff makes every buff strictly correct to cast and deletes the decision across
+the whole category — and Anvil, Formless, Discipline, Unslaked and Spite were all priced as turns
+you spend.
+
+**THE POPULATION IS DERIVED BY WALKING `battle._resolve_special`, NEVER BY READING `damage` AND
+`pressure`** — those are zero on **137 of 216** abilities, Feint and Kill Command among them.
+`Ability.PURE_BUFFS` (52) is the set and `check_cy.gd` re-walks it live. The criterion:
+
+> **A PURE BUFF is an ability whose ENTIRE cast-time payload is one or more statuses (or
+> status-backed flags) written to the CASTER or to LIVING ALLIES.** At cast: no damage, no Break
+> damage, no heal, no resource, no Pressure, no cooldown, no initiative, no summon, no revive, no
+> purge, and **nothing at all written to any enemy**.
+
+**CAST TIME IS THE WHOLE OF IT, because the delay is paid at cast.** What the status goes on to do
+— Venom Coating poisoning later hits, Tripwire springing on an enemy's turn — is what the buff IS,
+not a second payload.
+**FOUR POPULATIONS ARE EXCLUDED AND REPORTED, NOT CHANGED:** heals (`HEAL_SPECIALS` plus the `heal`
+fields is the ONE answer to *is this a heal*), **shields** (a *consumable absorb pool or charge
+count that eats incoming attacks* — percentage mitigation for N turns is NOT one), anything with a
+second payload, and every enemy ability.
+**HALF IS THE DESIGNER'S FIRST GUESS AND IS FLAGGED, NOT TUNED.**
+
+## THE CL ENUMERATION MISSES FIVE ABILITIES (STANDING, FOUND AT BATCH CY §1)
+**`check_cn.gd`, `check_co.gd` and every copy of the Batch CL enumeration walk 211 abilities. The
+corpus is 216.** CL walks the kits, the class pools and the spec pools — **a talent node that
+GRANTS an ability which is in no pool is invisible to it.** The five are **Backdraft, Pyroblast,
+Glacial Prison, Cryoclasm and Intercession**, and **Intercession is a pure buff**, so a CL-only
+sweep would have left it at full price while its fifty-one neighbours were halved.
+**The fix is one loop:** walk `Talents.LANE_TREES` and resolve each `new_ability` /
+`grant_ability` through **`Talents.granted_ability`**, the one resolver both shapes go through.
+`check_cy.gd` does. **CN's and CO's tables were derived over the smaller corpus and have NOT been
+re-derived** — that is owed, not done.
+
 ## A recast that would not improve is REFUSED (STANDING, SET AT BATCH CO)
 **THE RULE: a status recast that would improve neither duration nor power is refused, and the
 refusal is scoped to abilities whose WHOLE PAYLOAD is the status.** `_recast_refused` is the ONE

@@ -862,9 +862,10 @@ const LANE_TREES := {
 		# way, which is the AR standard for this node read against a lane that
 		# now defends instead of paying.
 		{"id": "py_flame_shield", "name": "Immolate", "ranks": 1, "lane": "Inferno", "row": 4,
-			"desc": "New ability: Immolate — for 4 turns you take 20% less damage and anything that strikes you is set Burning 3 turns (15 Mana, 1.5 int, 2cd).",
+			"desc": "New ability: Immolate — for 4 turns you take 20% less damage and anything that strikes you is set Burning 3 turns (15 Mana, 1.0 int, 2cd).",
 			"payload": {"new_ability": {"display_name": "Immolate", "cost": 15,
-				"special": "immolate", "delay": 1.5, "anim": "attack03", "cooldown": 2,
+				"special": "immolate", "delay": Ability.BUFF_DELAY_CAP,
+				"anim": "attack03", "cooldown": 2,
 				"perfect_id": "", "perfect_text": "",
 				"description": "Wrap yourself in it: for 4 turns you\ntake 20% LESS damage, and whatever\nstrikes you is set Burning for\n3 turns."}}},
 		{"id": "py_molten", "name": "Backblast", "ranks": 1, "lane": "Inferno", "row": 5,
@@ -1513,7 +1514,7 @@ const LANE_TREES := {
 		# id held the same row of the same lane. AUTHORED FALLBACK (AU §1):
 		# already owned -> the window lasts 3 turns instead of 2.
 		{"id": "hl_inner_faith", "name": "Intercession", "ranks": 1, "lane": "Vigil", "row": 4,
-			"desc": "New ability: Intercession — for 2 turns the next lethal blow against any hero is refused: they survive at 1 health and you lose 1 Mercy (25 Mana, 2.0 int, 4cd). If Intercession was already earned, its window lasts 3 turns instead.",
+			"desc": "New ability: Intercession — for 2 turns the next lethal blow against any hero is refused: they survive at 1 health and you lose 1 Mercy (25 Mana, 1.0 int, 4cd). If Intercession was already earned, its window lasts 3 turns instead.",
 			"payload": {"grant_ability": "Intercession",
 				"upgrade": [{"stat": {"intercession_long": 1}}]}},
 		# RE-SPEC of hl_beacon (turn-start pulse on the nearly-dead) — the
@@ -1746,7 +1747,7 @@ const LANE_TREES := {
 		# §5: the authored fallback for a hero who already EARNED Sacred Resolve
 		# — the node pays a longer split instead of a grant it cannot make.
 		{"id": "dv_resolve", "name": "Sacred Resolve", "ranks": 1, "lane": "Zeal", "row": 3,
-			"desc": "New ability: Sacred Resolve — all damage received is split evenly among living heroes for 4 turns; Break damage still lands on the struck hero (25 Mana, 2.5 int, 5cd). Already owned: the split lasts 6 turns instead.",
+			"desc": "New ability: Sacred Resolve — all damage received is split evenly among living heroes for 4 turns; Break damage still lands on the struck hero (25 Mana, 1.0 int, 5cd). Already owned: the split lasts 6 turns instead.",
 			"payload": {"grant_ability": "Sacred Resolve",
 				"upgrade": [{"stat": {"resolve_extra_turns": 2}}]}},
 		{"id": "dv_pulse", "name": "Healing Pulse", "ranks": 1, "lane": "Zeal", "row": 4,

@@ -4,6 +4,49 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The cost of a turn is only knowable once you know how many there are (Batch CY) — 2026-08-21
+
+This batch had a rule to apply and a measurement to take, and the measurement is the part worth
+keeping. **A fight in this game lasts three to five turns per hero.** Nothing in the project said
+so. The sim has printed "Avg rounds/battle" since long before the class draft and it divides hero
+actions by three, so it has been describing a three-hero party for as long as the party has had
+four members — reading a third high, in a line nobody had reason to distrust.
+
+**Every price in an initiative system is a fraction of a number that was never written down.** A
+2.5-delay buff is expensive or cheap depending entirely on whether the fight is four turns or
+twelve, and every one of the fifty-two was priced without that denominator being available to the
+person pricing it. That is not a mistake anybody made; it is a measurement nobody had. The
+generalisable version: **a cost expressed in turns is meaningless until the length of a fight is a
+published figure**, and the same is true of durations, cooldowns and every ramp threshold in the
+game.
+
+The second finding is the one that changes what should happen next, and it is the one the brief did
+not ask for. The four ramp meters were measured against the number each spec is *built* around —
+Focus converts at 100, Faith releases at 5, Pack Bond reads ×2 at 5 Loyalty, Blood Frenzy's band
+tops out at +40 points. **Two of the four over-shoot and two land at about a third.** Loyalty
+reaches 400% of its reference and Focus 131% of its conversion point; Blood Frenzy reaches 31% of
+its band and Faith 1.6 of the 5 a release needs.
+
+The split is not random and it is not about tempo. **Loyalty and Focus tick on a timer** — a stack
+per hunter turn per beast, Focus on every shot — so they arrive whether or not the fight
+cooperates. **Blood Frenzy and Faith are conditional**: one pays for health already lost, the other
+for absorbs and consecrated ground. A conditional meter in a four-round fight does not get four
+chances, it gets however many chances the fight happens to offer, and the answer measured here is
+"about one and a half".
+
+So **the cap is the right fix for the tempo problem and is not, on its own, the fix for the ramp
+problem.** Halving a setup cost gives a Devout half a turn back; it does not give him the three and
+a half Faith he is short. The reserved option — starting a fight with meter on the clock — was
+offered and not taken, and this measurement is the argument that it will be needed. **A rule aimed
+at four things where two of them were never broken is worth noticing before the next batch aims a
+second rule at the same four.**
+
+The smaller lesson is about corpus enumeration. The Batch CL walk has been copied into three gates
+and it misses five abilities, because it enumerates *pools* and a talent can grant an ability that
+lives in no pool. One of the five is a pure buff. **A derived population is only as complete as the
+enumeration under it, and an enumeration that has been copied three times has been reviewed
+zero times** — each copy inherits the gap and adds confidence to it.
+
 ## Two words, and a number nobody could disagree with (Batch CV) — 2026-08-20
 
 CU's audit produced fifty-odd findings and CV moved fifty-two node texts, and the interesting

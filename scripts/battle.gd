@@ -6,7 +6,12 @@ signal _ability_picked(ability)
 signal _target_picked(unit)
 signal _skill_done(grade)
 
-const BASIC_DELAY := 2.0
+# BATCH CY §1 — ONE BASELINE, AND IT LIVES ON THE ABILITY. The delay is an
+# ability's property, and `Ability` is where the pure-buff cap has to be written
+# (it is applied in `Ability.make`, which `ability.gd` cannot reach out of). So
+# the authored number moved there and this is the alias: every one of the twelve
+# sites below still reads `BASIC_DELAY`, and there is still exactly ONE 2.0.
+const BASIC_DELAY := Ability.BASIC_DELAY
 
 # BATCH CN §1 — THE BAR IS PARAMETERIC, AND THIS DICTIONARY IS ITS DEFAULT.
 #
@@ -594,6 +599,29 @@ var sweep := false
 # AoE actually feeds on. Recorded once per battle; battles that end
 # before round 3 record their end-state count (a win records 0).
 var _r3_recorded := false
+# ---------- BATCH CY §0 — HOW LONG IS A FIGHT, AND DOES THE RAMP ARRIVE ----------
+#
+# TWO MEASUREMENTS AND NO MECHANICS. §1 caps a pure buff's initiative at half a
+# swing, and that cap is aimed at a number nobody in this project had ever
+# measured: how many turns a hero actually gets before the fight is over. A
+# setup turn is only expensive relative to the turns it buys, so the cap cannot
+# be judged without it.
+#
+# ROUNDS ARE COUNTED AS TURNS PER LIVING PARTY MEMBER, not as `hero_actions / 3`
+# — the standing report line divides by three and the party has been FOUR since
+# the class draft, so it has been reading a third high. Companions are excluded
+# from both halves of the fraction: a summoned beast takes turns the hero did
+# not spend, and counting it would make a Beastmaster's fights look longer than
+# anybody else's when he is the spec least able to afford a setup turn.
+#
+# THE METERS ARE BANKED AS PEAKS AND REPORTED AGAINST WHAT THE SPEC IS BUILT
+# AROUND, because a raw number answers nothing: Focus converts at 100, Faith
+# releases at 5, Pack Bond reads x2 at 5 Loyalty, and Blood Frenzy's band tops
+# out at +40%. Sampled once per unit turn and READ-ONLY — `frenzy_bonus()` is
+# deliberately NOT called, because it ratchets the floor as a side effect and an
+# instrument that moves what it measures is not an instrument.
+var _cy_turns := 0            # non-companion hero turns taken this battle
+var _cy_peak := {}            # passive_id -> deepest meter reached this battle
 # Stalemate guard (Batch W, sims only): a fight neither side can finish —
 # see the guard in _run_battle. ~12 rounds is a long real battle; 10 units
 # x 60 rounds is far past anything legitimate.
@@ -2416,6 +2444,10 @@ func _run_battle() -> void:
 			active_unit.set_plate_active(false)
 		active_unit = u
 		u.set_plate_active(true)
+		if sim:
+			if u.is_hero and not u.is_companion:
+				_cy_turns += 1
+			_cy_sample()
 		for dot_id in DOT_STATUSES:
 			if u.has_status(dot_id) and not u.dead:
 				# Poison never ticks on the turn it was applied.
@@ -11108,8 +11140,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		# of the two orphans that sat outside `_resolve_special`. It is a pure
 		# self-buff, so §2 caught it and there is no grade left to read; the
 		# other three below are all abilities that still run a bar.
+		# BATCH CY §1 — CLAMPED, BECAUSE THE CAP NOW OUT-RANKS THE DISCOUNT.
+		# Mana Shield is a pure self-buff, so §1 brings its authored 2.0 down to
+		# half a swing; CN's unconditional 1.5 would then be a PENALTY dressed
+		# as a bonus — the one card in the game where "it is quick to cast"
+		# would have made it slower. `minf` keeps the discount able only to
+		# lower, which is what it always claimed to do.
 		if ab.display_name == "Mana Shield":
-			eff_delay = 1.5
+			eff_delay = minf(eff_delay, 1.5)
 		if grade == "perfect" and ab.display_name == "Lunge":
 			eff_delay = 3.0
 		if grade == "perfect" and ab.display_name == "Arcane Cannon":
@@ -13720,6 +13758,42 @@ func _gain_ruin(target: BattleUnit, n: int = 1) -> void:
 
 # Is this a boss fight? Read off the field rather than the encounter, so a
 # mini-boss lineup and a zone boss both count and a driven test can set it.
+# BATCH CY §0 — the peak sampler. READ-ONLY BY CONSTRUCTION: every term below
+# is a field read or a pure computation, and Blood Frenzy's live bonus is
+# recomputed here rather than taken from `frenzy_bonus()` precisely because
+# that function ratchets `frenzy_floor` as a side effect. Sampling it would
+# bank a floor at a moment the game would not have banked one, which is a
+# measurement changing the thing it measures.
+func _cy_sample() -> void:
+	for h in heroes:
+		if h.dead or h.is_companion or h.passive_id == "":
+			continue
+		var v := 0.0
+		match h.passive_id:
+			"bloodrage":
+				# The live band, exactly as `frenzy_bonus()` computes it, minus
+				# the ratchet. Reported as percentage points.
+				var step: float = (2.0 + h.bloodrage_step_bonus) / 100.0
+				var cur: float = int((1.0 - h.hp / float(h.max_hp)) * 100.0 / 5.0) * step
+				v = maxf(cur, h.frenzy_floor) * 100.0
+			"pack":
+				# The DEEPEST bond standing on any one beast — the meter Pack
+				# Bond's curve actually reads, one beast at a time.
+				for kind in h.loyalty:
+					v = maxf(v, float(int(h.loyalty[kind])))
+			"lethal_aim":
+				if h.second_resource_name == "Focus":
+					v = float(h.second_resource)
+			"conviction":
+				# `faith_peak` is already a per-battle high-water mark that
+				# never falls (Batch BI §1), so the max here is belt and braces.
+				v = float(maxi(h.faith_stacks, h.faith_peak))
+			_:
+				continue
+		if v > float(_cy_peak.get(h.passive_id, 0.0)):
+			_cy_peak[h.passive_id] = v
+
+
 func _boss_fight() -> bool:
 	for e in enemies:
 		if e.is_boss:
@@ -21178,6 +21252,29 @@ func _check_end() -> void:
 		# half — which is the half the design is aimed at.
 		if heroes.any(func(h): return h.passive_id == "old_gods"):
 			_stat("ruin_boss_battles" if _boss_fight() else "ruin_trash_battles")
+		# BATCH CY §0 — ROUNDS TO RESOLUTION, SPLIT THE WAY THE DESIGN SPLITS.
+		# Trash / elite / boss, because "how long is a fight" has three answers
+		# and the ramp specs live or die on the shortest of them. The party size
+		# is counted from the units that STARTED the battle (dead included) —
+		# dividing by the survivors would make a wipe read as a long fight.
+		var cy_kind := "trash"
+		if _boss_fight():
+			cy_kind = "boss"
+		elif Run.active and String(Run.encounter.get("type", "")) in ["elite", "miniboss"]:
+			cy_kind = "elite"
+		var cy_party := heroes.filter(func(h): return not h.is_companion).size()
+		_stat("cy_battles_" + cy_kind)
+		_stat("cy_rounds_" + cy_kind, float(_cy_turns) / maxf(float(cy_party), 1.0))
+		# And the four meters, banked per battle a spec STOOD in so the average
+		# is over its own fights rather than over every battle in the sim.
+		for cy_h in heroes:
+			if cy_h.is_companion or cy_h.passive_id == "":
+				continue
+			if not cy_h.passive_id in ["bloodrage", "pack", "lethal_aim", "conviction"]:
+				continue
+			_stat("cy_meter_n_" + cy_h.passive_id)
+			_stat("cy_meter_" + cy_h.passive_id,
+				float(_cy_peak.get(cy_h.passive_id, 0.0)))
 		# BATCH BJ §3a — the signature table's numerators and denominators:
 		# for every spec STANDING in this battle, one denominator tick and this
 		# battle's moment counts, split trash/boss exactly as Ruin's are. The
@@ -21680,6 +21777,9 @@ func _print_sim_report() -> void:
 			sim_stats.get("conviction_growth", 0.0) / cg_n,
 			sim_stats.get("conviction_growth_pct", 0.0) / cg_n,
 			int(sim_stats.get("conviction_growth_max", 0.0))])
+	var cyx := cy_report_line(sim_stats)
+	if cyx != "":
+		print(cyx)
 	var rx := ruin_report_line(sim_stats)
 	if rx != "":
 		print(rx)
@@ -21755,6 +21855,56 @@ static func signature_report_block(stats: Dictionary) -> String:
 # specialist by construction. Shared by the standalone report and RunSim's,
 # since only a RUN ever meets a boss. Returns "" when no Occultist stood — a
 # zero on a party without one reads as a broken instrument rather than a line.
+# BATCH CY §0 — THE TWO MEASUREMENTS, AS ONE BLOCK. Shared by the standalone
+# report and RunSim's, the `ruin_report_line` pattern, and it returns "" when
+# nothing was measured rather than printing a row of zeroes.
+#
+# THE DENOMINATORS ARE THE POINT. A meter's raw depth says nothing on its own —
+# what matters is the depth beside the number the spec is BUILT AROUND, so each
+# row is printed as a fraction of it. Those four numbers are read from the
+# places that own them and are quoted here rather than re-derived:
+#   Blood Frenzy  40 points — 2% a step (`bloodrage_step_bonus` aside) x 20
+#                 steps, the band at zero health.
+#   Loyalty        5 stacks — where the Pack Bond curve reads x2 (`BOND_STEP`).
+#   Focus        100 points — `BattleUnit.FOCUS_CONVERT`, where chance stops
+#                 and the critical multiplier starts.
+#   Faith          5 stacks — the release threshold.
+const CY_METERS := [
+	["bloodrage", "Blood Frenzy", 40.0, "points"],
+	["pack", "Loyalty", 5.0, "stacks (deepest single bond)"],
+	["lethal_aim", "Focus", 100.0, "points"],
+	["conviction", "Faith", 5.0, "stacks"],
+]
+
+
+static func cy_report_line(stats: Dictionary) -> String:
+	var lines := PackedStringArray()
+	var kinds := PackedStringArray()
+	var any_kind := false
+	for kind in ["trash", "elite", "boss"]:
+		var n: float = stats.get("cy_battles_" + kind, 0.0)
+		if n <= 0.0:
+			kinds.append("%s n=0" % kind)
+			continue
+		any_kind = true
+		kinds.append("%s %.1f (n=%d)" % [kind,
+			stats.get("cy_rounds_" + kind, 0.0) / n, int(n)])
+	if any_kind:
+		lines.append("BATCH CY §0 — rounds to resolution (turns per party member): "
+			+ " | ".join(kinds))
+	for m in CY_METERS:
+		var mn: float = stats.get("cy_meter_n_" + String(m[0]), 0.0)
+		if mn <= 0.0:
+			continue
+		var peak: float = stats.get("cy_meter_" + String(m[0]), 0.0) / mn
+		lines.append("  %-13s peak %6.1f of %.0f %s  =  %3.0f%% of what the spec is built around (n=%d)" % [
+			String(m[1]), peak, float(m[2]), String(m[3]),
+			100.0 * peak / float(m[2]), int(mn)])
+	if lines.is_empty():
+		return ""
+	return "\n".join(lines)
+
+
 static func ruin_report_line(stats: Dictionary) -> String:
 	var rt_n: float = stats.get("ruin_trash_battles", 0.0)
 	var rb_n: float = stats.get("ruin_boss_battles", 0.0)
